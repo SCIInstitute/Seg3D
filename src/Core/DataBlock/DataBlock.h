@@ -187,7 +187,7 @@ public:
 
   // UPDATE_HISTOGRAM:
   // Recompute the histogram. This needs to be triggered each time the data is updated
-  void update_histogram();
+  bool update_histogram();
   
   // UPDATE_DATA_TYPE:
   // Reset the data type
@@ -201,6 +201,10 @@ public:
   // INCREASE_GENERATION:
   // Increase the generation number to a new unique number.
   void increase_generation();
+
+  // SET_HISTOGRAM:
+  // Set the histogram of the dataset
+  void set_histogram( const Histogram& histogram );
 
 private:
   friend class DataBlockManager;
@@ -217,10 +221,6 @@ protected:
   // SET_TYPE
   // Set the type of the data
   void set_type( DataType type );
-
-  // SET_HISTOGRAM:
-  // Set the histogram of the dataset
-  void set_histogram( const Histogram& histogram );
 
 public:
   // SET_DATA

@@ -126,6 +126,12 @@ public:
   
     Core::DataBlockHandle input_data_block = Core::ITKDataBlock::New( input_image );
   
+    if ( !input_data_block )
+    {
+      this->report_error( "Could not allocate enough memory." );
+      return;   
+    }
+  
     // Build the Discrete Gaussian filter
     typename DGFilterType::Pointer dgfilter = DGFilterType::New();
     
@@ -142,14 +148,20 @@ public:
     }
     catch ( ... )
     {
-      StatusBar::SetMessage( Core::LogMessageType::ERROR_E,  
-        "IntensityCorrection filter failed." );
+      this->report_error( "Internal error." );
+      return; 
     }
 
     if ( this->check_abort() ) return;
 
     typename FLOAT_CONTAINER_TYPE::Handle dg_image( new FLOAT_CONTAINER_TYPE( 
       dgfilter->GetOutput() ) );
+
+    if ( !dg_image )
+    {
+      this->report_error( "Could not allocate enough memory." );
+      return;     
+    }
 
     typename Core::DataBlockHandle dg_data_block = Core::ITKDataBlock::New( dg_image );
     float data_min = std::numeric_limits<float>::max();
@@ -182,22 +194,36 @@ public:
     }
     catch ( ... )
     {
-      StatusBar::SetMessage( Core::LogMessageType::ERROR_E,  
-        "IntensityCorrection filter failed." );   
+      this->report_error( "Internal error." );
+      return; 
     }
 
     if ( this->check_abort() ) return;
     
     typename FLOAT_CONTAINER_TYPE::Handle gmag_image( new FLOAT_CONTAINER_TYPE( 
       gmag_filter->GetOutput() ) );
+
+    if ( !gmag_image )
+    {
+      this->report_error( "Could not allocate enough memory." );
+      return;     
+    }
   
     Core::DataBlockHandle gmag_data_block = Core::ITKDataBlock::New( gmag_image );
+
+    if ( !gmag_data_block )
+    {
+      this->report_error( "Could not allocate enough memory." );
+      return;     
+    }
+    
     {
       float* data = reinterpret_cast<float*>( gmag_data_block->get_data() );
       size_t size = gmag_data_block->get_size();
       const float inv_edge_sqr = 1.0 / ( this->edge_ * this->edge_ );
       for ( size_t j = 0; j < size; j++ ) data[ j ] = exp( - data[ j ] * inv_edge_sqr );
     }
+    
     if ( this->check_abort() ) return;
 
     // Take the Gradient Magnitude of the log image.
@@ -217,8 +243,8 @@ public:
     }
     catch ( ... )
     {
-      StatusBar::SetMessage( Core::LogMessageType::ERROR_E,  
-        "IntensityCorrection filter failed." );       
+      this->report_error( "Internal error." );
+      return;       
     }
 
     if ( this->check_abort() ) return;
@@ -241,192 +267,200 @@ public:
     float zcenter = static_cast<float>( size_z ) / 2.0;
 
     // Build F (U?)
-    // Note:  Float matrix args?
-    vnl_matrix< float > U( 3 * size, 1, 0.0f );
-    
-    typedef itk::ImageRegionIterator< GradientImageType > GradientImageIterator;
-    GradientImageIterator grad_iter(gradient_image, gradient_image->GetLargestPossibleRegion());
-
-    float* W = reinterpret_cast<float*>( gmag_data_block->get_data() );
-    float* res = reinterpret_cast<float*>( dg_data_block->get_data() );
-    VALUE_TYPE* input = reinterpret_cast<VALUE_TYPE*>( input_data_block->get_data() );
-
-    size_t j = 0;
-    
-    while ( !grad_iter.IsAtEnd() )
+    try
     {
-      GradientPixelType v = grad_iter.Get();
+      vnl_matrix< float > U( 3 * size, 1, 0.0f );
+      
+      typedef itk::ImageRegionIterator< GradientImageType > GradientImageIterator;
+      GradientImageIterator grad_iter(gradient_image, gradient_image->GetLargestPossibleRegion());
 
-      U[j         ][0] = W[j] * v[0] * xscale;
-      U[j + size  ][0] = W[j] * v[1] * yscale;
-      U[j + 2*size][0] = W[j] * v[2] * zscale;
+      float* W = reinterpret_cast<float*>( gmag_data_block->get_data() );
+      float* res = reinterpret_cast<float*>( dg_data_block->get_data() );
+      VALUE_TYPE* input = reinterpret_cast<VALUE_TYPE*>( input_data_block->get_data() );
 
-      ++j;
-      ++grad_iter;
-    }
-  
-    /// Clear memory for image
-    gradient_image = 0;
-  
-    // Build A
-    static int order_counts[ 5 ] = { 0, 3, 9, 19, 34 };
-    const int  order = order_counts[ this->order_ ];
-    vnl_matrix<float> ATA( order, order, 0 );
-    vnl_matrix<float> uT( order, 1, 0 );
-
-    //
-    //  loop over all the pixels in the image and calculate ATA in-place.
-    //
-    for( size_t z = 0; z < size_z; z++ )
-    {
-      this->dst_layer_->update_progress( 
-        static_cast<float>( z )/static_cast<float>( size_z ), 0.25f, 0.35f );
-      if ( this->check_abort() ) return;
-
-      for ( size_t y = 0; y < size_y; y++ )
+      size_t j = 0;
+      
+      while ( !grad_iter.IsAtEnd() )
       {
-        for ( size_t x = 0; x < size_x; x++ )
+        GradientPixelType v = grad_iter.Get();
+
+        U[j         ][0] = W[j] * v[0] * xscale;
+        U[j + size  ][0] = W[j] * v[1] * yscale;
+        U[j + 2*size][0] = W[j] * v[2] * zscale;
+
+        ++j;
+        ++grad_iter;
+      }
+    
+      /// Clear memory for image
+      gradient_image = 0;
+    
+      // Build A
+      static int order_counts[ 5 ] = { 0, 3, 9, 19, 34 };
+      const int  order = order_counts[ this->order_ ];
+      vnl_matrix<float> ATA( order, order, 0 );
+      vnl_matrix<float> uT( order, 1, 0 );
+
+      //
+      //  loop over all the pixels in the image and calculate ATA in-place.
+      //
+      for( size_t z = 0; z < size_z; z++ )
+      {
+        this->dst_layer_->update_progress( 
+          static_cast<float>( z )/static_cast<float>( size_z ), 0.25f, 0.35f );
+        if ( this->check_abort() ) return;
+
+        for ( size_t y = 0; y < size_y; y++ )
         {
-          const float nx = ( static_cast<float>( x ) - xcenter ) / xscale;
-          const float ny = ( static_cast<float>( y ) - ycenter ) / yscale;
-          const float nz = ( static_cast<float>( z ) - zcenter ) / zscale;
-
-          const size_t row_num = ( ( size_x * size_y * z) + ( size_x * y ) + x );
-          const float w = W[ row_num ];
-
-          for( int i = 0; i < order; i++ )
+          for ( size_t x = 0; x < size_x; x++ )
           {
-            for( int j = 0; j < order; j++ )
-            {   
-              float val = ATA(i, j);
+            const float nx = ( static_cast<float>( x ) - xcenter ) / xscale;
+            const float ny = ( static_cast<float>( y ) - ycenter ) / yscale;
+            const float nz = ( static_cast<float>( z ) - zcenter ) / zscale;
 
-              const float ax = getAx( w, nx, ny, nz, j);
-              const float axt = getAx( w, nx, ny, nz, i);
+            const size_t row_num = ( ( size_x * size_y * z) + ( size_x * y ) + x );
+            const float w = W[ row_num ];
 
-              val += ax * axt;
+            for( int i = 0; i < order; i++ )
+            {
+              for( int j = 0; j < order; j++ )
+              {   
+                float val = ATA(i, j);
 
-              const float ay = getAy( w, nx, ny, nz, j);
-              const float ayt = getAy( w, nx, ny, nz, i);
+                const float ax = getAx( w, nx, ny, nz, j);
+                const float axt = getAx( w, nx, ny, nz, i);
 
-              val += ay * ayt;
+                val += ax * axt;
 
-              const float az = getAz( w, nx, ny, nz, j);
-              const float azt = getAz( w, nx, ny, nz, i);
+                const float ay = getAy( w, nx, ny, nz, j);
+                const float ayt = getAy( w, nx, ny, nz, i);
 
-              val += az * azt;
+                val += ay * ayt;
 
-              if( j == 0 ) // only need to do this once
-              {
-                float u_val = uT( i, 0 );
-                const size_t h = size_x * size_y * z + size_x * y + x;
-                u_val += ( axt * U( h, 0 ) ) +
-                  ( ayt * U( h + size, 0 ) ) +
-                  ( azt * U( h + (2 * size ), 0 ) );
-                uT( i, 0 ) = u_val;
+                const float az = getAz( w, nx, ny, nz, j);
+                const float azt = getAz( w, nx, ny, nz, i);
 
+                val += az * azt;
+
+                if( j == 0 ) // only need to do this once
+                {
+                  float u_val = uT( i, 0 );
+                  const size_t h = size_x * size_y * z + size_x * y + x;
+                  u_val += ( axt * U( h, 0 ) ) +
+                    ( ayt * U( h + size, 0 ) ) +
+                    ( azt * U( h + (2 * size ), 0 ) );
+                  uT( i, 0 ) = u_val;
+
+                }
+
+                ATA(i, j) = val;
               }
-
-              ATA(i, j) = val;
             }
           }
         }
       }
-    }
 
-    if ( this->check_abort() ) return;
-    vnl_matrix< float > ATA_inv = vnl_matrix_inverse<float>(ATA);
-    this->dst_layer_->update_progress( 0.7f );
+      if ( this->check_abort() ) return;
+      vnl_matrix< float > ATA_inv = vnl_matrix_inverse<float>(ATA);
+      this->dst_layer_->update_progress( 0.7f );
 
-    if ( this->check_abort() ) return;
-    vnl_matrix< float > alphaM = ATA_inv * uT;
+      if ( this->check_abort() ) return;
+      vnl_matrix< float > alphaM = ATA_inv * uT;
 
-    this->dst_layer_->update_progress( 0.85f );
-    if ( this->check_abort() ) return;
+      this->dst_layer_->update_progress( 0.85f );
+      if ( this->check_abort() ) return;
 
-    vnl_vector< float > alpha = alphaM.get_column(0);
-    if ( this->check_abort() ) return;
+      vnl_vector< float > alpha = alphaM.get_column(0);
+      if ( this->check_abort() ) return;
 
-    this->dst_layer_->update_progress( 0.9f );
+      this->dst_layer_->update_progress( 0.9f );
 
-    // Create the source - illumination field.
-    size_t i = 0;
-    
-    float new_data_min = std::numeric_limits<float>::max();
-    float new_data_max = std::numeric_limits<float>::min();
-    
-    for ( size_t z = 0; z < size_z; z++ )
-    {
-      for ( size_t y = 0; y < size_y; y++ ) 
+      // Create the source - illumination field.
+      size_t i = 0;
+      
+      float new_data_min = std::numeric_limits<float>::max();
+      float new_data_max = std::numeric_limits<float>::min();
+      
+      for ( size_t z = 0; z < size_z; z++ )
       {
-        for (size_t x = 0; x < size_x; x++)
+        for ( size_t y = 0; y < size_y; y++ ) 
         {
-          const float nx = ( static_cast<float>( x ) - xcenter) / xscale;
-          const float ny = ( static_cast<float>( y ) - ycenter) / yscale;
-          const float nz = ( static_cast<float>( z ) - zcenter) / zscale;
-
-          float val = alpha[0] * nx + alpha[1] * ny + alpha[2] * nz;
-
-          if ( this->order_ > 1)
+          for (size_t x = 0; x < size_x; x++)
           {
-            val +=
-              alpha[3] * nx * nx +
-              alpha[4] * nx * ny +
-              alpha[5] * nx * nz +
-              alpha[6] * ny * ny +
-              alpha[7] * ny * nz +
-              alpha[8] * nz * nz;
+            const float nx = ( static_cast<float>( x ) - xcenter) / xscale;
+            const float ny = ( static_cast<float>( y ) - ycenter) / yscale;
+            const float nz = ( static_cast<float>( z ) - zcenter) / zscale;
 
-            if ( this->order_ > 2)
+            float val = alpha[0] * nx + alpha[1] * ny + alpha[2] * nz;
+
+            if ( this->order_ > 1)
             {
               val +=
-                alpha[9] * nx * nx * nx +
-                alpha[10] * nx * nx * ny +
-                alpha[11] * nx * nx * nz +
-                alpha[12] * nx * ny * ny +
-                alpha[13] * nx * ny * nz +
-                alpha[14] * nx * nz * nz +
-                alpha[15] * ny * ny * ny +
-                alpha[16] * ny * ny * nz +
-                alpha[17] * ny * nz * nz +
-                alpha[18] * nz * nz * nz;
-           
-              if ( this->order_ > 3 )
+                alpha[3] * nx * nx +
+                alpha[4] * nx * ny +
+                alpha[5] * nx * nz +
+                alpha[6] * ny * ny +
+                alpha[7] * ny * nz +
+                alpha[8] * nz * nz;
+
+              if ( this->order_ > 2)
               {
                 val +=
-                alpha[19] * nx * nx * nx * nx +
-                alpha[20] * nx * nx * nx * ny +
-                alpha[21] * nx * nx * nx * nz +
-                alpha[22] * nx * nx * ny * ny +
-                alpha[23] * nx * nx * ny * nz +
-                alpha[24] * nx * nx * nz * nz +
-                alpha[25] * nx * ny * ny * ny +
-                alpha[26] * nx * ny * ny * nz +
-                alpha[27] * nx * ny * nz * nz +
-                alpha[28] * nx * nz * nz * nz +
-                alpha[29] * ny * ny * ny * ny +
-                alpha[30] * ny * ny * ny * nz +
-                alpha[31] * ny * ny * nz * nz +
-                alpha[32] * ny * nz * nz * nz +
-                alpha[33] * nz * nz * nz * nz;
-              }
-            } 
+                  alpha[9] * nx * nx * nx +
+                  alpha[10] * nx * nx * ny +
+                  alpha[11] * nx * nx * nz +
+                  alpha[12] * nx * ny * ny +
+                  alpha[13] * nx * ny * nz +
+                  alpha[14] * nx * nz * nz +
+                  alpha[15] * ny * ny * ny +
+                  alpha[16] * ny * ny * nz +
+                  alpha[17] * ny * nz * nz +
+                  alpha[18] * nz * nz * nz;
+             
+                if ( this->order_ > 3 )
+                {
+                  val +=
+                  alpha[19] * nx * nx * nx * nx +
+                  alpha[20] * nx * nx * nx * ny +
+                  alpha[21] * nx * nx * nx * nz +
+                  alpha[22] * nx * nx * ny * ny +
+                  alpha[23] * nx * nx * ny * nz +
+                  alpha[24] * nx * nx * nz * nz +
+                  alpha[25] * nx * ny * ny * ny +
+                  alpha[26] * nx * ny * ny * nz +
+                  alpha[27] * nx * ny * nz * nz +
+                  alpha[28] * nx * nz * nz * nz +
+                  alpha[29] * ny * ny * ny * ny +
+                  alpha[30] * ny * ny * ny * nz +
+                  alpha[31] * ny * ny * nz * nz +
+                  alpha[32] * ny * nz * nz * nz +
+                  alpha[33] * nz * nz * nz * nz;
+                }
+              } 
+            }
+          
+            res[ i ] = ( static_cast<float>( input[ i ] ) - data_min ) * 
+              exp( -val ) + data_min;
+            if ( res[ i ] < new_data_min ) new_data_min = res[ i ];
+            if ( res[ i ] > new_data_max ) new_data_max = res[ i ];
+            i++;
           }
-        
-          res[ i ] = ( static_cast<float>( input[ i ] ) - data_min ) * exp( -val ) + data_min;
-          if ( res[ i ] < new_data_min ) new_data_min = res[ i ];
-          if ( res[ i ] > new_data_max ) new_data_max = res[ i ];
-          i++;
         }
+      } 
+    
+    
+      float factor = ( data_max - data_min ) / ( new_data_max - new_data_min );
+      for ( size_t j = 0; j < size; j++ ) 
+      {
+        res[ j ] = ( factor * ( res[ j ] - new_data_min ) ) + data_min;
       }
-    } 
-  
-  
-    float factor = ( data_max - data_min ) / ( new_data_max - new_data_min );
-    for ( size_t j = 0; j < size; j++ ) 
-    {
-      res[ j ] = ( factor * ( res[ j ] - new_data_min ) ) + data_min;
     }
-  
+    catch ( ... )
+    {
+      this->report_error( "Could not allocate enough memory." );
+      return;   
+    }
+    
     if ( this->check_abort() ) return;
     this->dst_layer_->update_progress( 0.99f );
       
@@ -440,7 +474,8 @@ public:
     }
     else
     {
-      this->insert_itk_image_pointer_into_layer<float>( this->dst_layer_, dg_image->get_image() );  
+      this->insert_itk_image_pointer_into_layer<float>( this->dst_layer_, 
+        dg_image->get_image() );  
     }
   }
   SCI_END_TYPED_ITK_RUN()
@@ -449,8 +484,16 @@ public:
   // The name of the filter, this information is used for generating new layer labels.
   virtual std::string get_filter_name() const
   {
-    return "IntensCorr";
+    return "Intensity Correction Filter";
   }
+  
+  // GET_LAYER_PREFIX:
+  // This function returns the name of the filter. The latter is prepended to the new layer name, 
+  // when a new layer is generated. 
+  virtual std::string get_layer_prefix() const
+  {
+    return "IntensCorr";  
+  } 
 };
 
 
@@ -561,7 +604,10 @@ bool ActionIntensityCorrectionFilter::run( Core::ActionContextHandle& context,
   algo->preserve_data_format_ = this->preserve_data_format_.value();
 
   // Find the handle to the layer
-  algo->find_layer( this->target_layer_.value(), algo->src_layer_ );
+  if ( !( algo->find_layer( this->target_layer_.value(), algo->src_layer_ ) ) )
+  {
+    return false;
+  }
 
   if ( this->replace_.value() )
   {

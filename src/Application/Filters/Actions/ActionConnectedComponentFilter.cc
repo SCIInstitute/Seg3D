@@ -158,8 +158,8 @@ public:
     } 
     catch ( ... ) 
     {
-      StatusBar::SetMessage( Core::LogMessageType::ERROR_E,  
-        "ConnectedComponentFilter failed." );
+      this->report_error( "Internal error in filter." );
+      return;
     }
 
     // As ITK filters generate an inconsistent abort behavior, we record our own abort flag
@@ -168,6 +168,12 @@ public:
 
     Core::DataBlockHandle output_datablock = Core::ITKDataBlock::New(
       filter->GetOutput() );
+    
+    if ( ! output_datablock )
+    {
+      this->report_error("Could not allocate enough memory.");
+      return;
+    }
     
     unsigned int max_label = filter->GetObjectCount();
     std::vector<unsigned int> lut( max_label + 1, 0 );
@@ -241,8 +247,13 @@ public:
     }
     
     Core::MaskDataBlockHandle mask_datablock;
-    Core::MaskDataBlockManager::Convert( output_datablock, 
-      this->dst_layer_->get_grid_transform(), mask_datablock );
+    if ( ! ( Core::MaskDataBlockManager::Convert( output_datablock, 
+      this->dst_layer_->get_grid_transform(), mask_datablock ) ) )  
+    {
+      this->report_error("Could not allocate enough memory.");
+      return;
+    }
+      
     this->dst_layer_->update_progress_signal_( 1.0 );
     
     this->dispatch_insert_mask_volume_into_layer( this->dst_layer_,
@@ -255,7 +266,15 @@ public:
   // The name of the filter, this information is used for generating new layer labels.
   virtual std::string get_filter_name() const
   {
-    return "ConnectedComponent";
+    return "ConnectedComponent Filter";
+  }
+
+  // GET_LAYER_PREFIX:
+  // This function returns the name of the filter. The latter is prepended to the new layer name, 
+  // when a new layer is generated. 
+  virtual std::string get_layer_prefix() const
+  {
+    return "ConnectedComponent";  
   }
 };
 

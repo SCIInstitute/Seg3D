@@ -135,6 +135,7 @@ bool MaskDataBlockManager::create( GridTransform grid_transform, MaskDataBlockHa
     // Could not find empty position, so create a new data block
     data_block = StdDataBlock::New( grid_transform.get_nx(), grid_transform.get_ny(), 
       grid_transform.get_nz(), DataType::UCHAR_E );
+    if ( !data_block ) return false;        
     mask_bit = 0;
     mask_entry_index = mask_list.size();
     mask_list.push_back( MaskDataBlockEntry( data_block, grid_transform ) );
@@ -142,8 +143,8 @@ bool MaskDataBlockManager::create( GridTransform grid_transform, MaskDataBlockHa
 
   // Generate the new mask
   mask = MaskDataBlockHandle( new MaskDataBlock( data_block, mask_bit ) );
+  
   // Clear the mask before using it
-  // TODO: we might want to put this logic in the constructor of MaskVolume
   
   size_t data_size = grid_transform.get_nx() * grid_transform.get_ny() * grid_transform.get_nz();
   unsigned char* data = mask->get_mask_data();

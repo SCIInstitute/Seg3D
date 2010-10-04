@@ -108,7 +108,7 @@ public:
     Core::ITKImageDataT<float>::Handle input_image; 
     this->get_itk_image_from_layer<float>( this->src_layer_, input_image );
         
-    // Create a new ITK filter instantiation.   
+    // Create a new ITK filter instantiation. 
     filter_type::Pointer filter = filter_type::New();
 
     // Relay abort and progress information to the layer that is executing the filter.
@@ -128,8 +128,8 @@ public:
     } 
     catch ( ... ) 
     {
-      StatusBar::SetMessage( Core::LogMessageType::ERROR_E,  
-        "CannyEdgeDetectionFilter failed." );
+      this->report_error( "Internal error in filter." );
+      return;
     }
 
     // As ITK filters generate an inconsistent abort behavior, we record our own abort flag
@@ -144,8 +144,17 @@ public:
   // The name of the filter, this information is used for generating new layer labels.
   virtual std::string get_filter_name() const
   {
+    return "CannyEdge Filter";
+  }
+  
+  // GET_LAYER_PREFIX:
+  // This function returns the name of the filter. The latter is prepended to the new layer name, 
+  // when a new layer is generated. 
+  virtual std::string get_layer_prefix() const
+  {
     return "CannyEdge";
   }
+  
 };
 
 
@@ -160,13 +169,22 @@ bool ActionCannyEdgeDetectionFilter::run( Core::ActionContextHandle& context,
   algo->threshold_ = this->threshold_.value();
 
   // Find the handle to the layer
-  algo->find_layer( this->target_layer_.value(), algo->src_layer_ );
+  if ( !( algo->find_layer( this->target_layer_.value(), algo->src_layer_ ) ) )
+  {
+    return false;
+  }
 
   // Lock the src layer, so it cannot be used else where
-  algo->lock_for_use( algo->src_layer_ );
+  if ( !( algo->lock_for_use( algo->src_layer_ ) ) )
+  {
+    return false;
+  }
   
   // Create the destination layer, which will show progress
-  algo->create_and_lock_mask_layer_from_layer( algo->src_layer_, algo->dst_layer_ );
+  if ( !( algo->create_and_lock_mask_layer_from_layer( algo->src_layer_, algo->dst_layer_ ) ) )
+  {
+    return false;
+  }
 
   // Return the id of the destination layer.
   result = Core::ActionResultHandle( new Core::ActionResult( algo->dst_layer_->get_layer_id() ) );

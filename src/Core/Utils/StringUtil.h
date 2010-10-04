@@ -69,8 +69,8 @@ std::string ExportToString( const unsigned long long& value );
 std::string ExportToString( const float& value );
 std::string ExportToString( const double& value );
 
-std::string ExportToString( const float& value, int percision );
-std::string ExportToString( const double& value, int percision );
+std::string ExportToString( const float& value, int precision );
+std::string ExportToString( const double& value, int precision );
 
 std::string ExportToString( const std::string& value );
 

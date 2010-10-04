@@ -227,36 +227,28 @@ void DataBlock::increase_generation()
   this->generation_ = DataBlockManager::Instance()->increment_generation( this->generation_ );
 }
 
-void DataBlock::update_histogram()
+bool DataBlock::update_histogram()
 {
   lock_type lock( this->get_mutex() );
 
   switch( this->data_type_ )
   {
     case DataType::CHAR_E:
-      this->histogram_.compute( reinterpret_cast<signed char*>( get_data() ), get_size() );
-      break;
+      return this->histogram_.compute( reinterpret_cast<signed char*>( get_data() ), get_size() );
     case DataType::UCHAR_E:
-      this->histogram_.compute( reinterpret_cast<unsigned char*>( get_data() ), get_size() );
-      break;
+      return this->histogram_.compute( reinterpret_cast<unsigned char*>( get_data() ), get_size() );
     case DataType::SHORT_E:
-      this->histogram_.compute( reinterpret_cast<short*>( get_data() ), get_size() );
-      break;
+      return this->histogram_.compute( reinterpret_cast<short*>( get_data() ), get_size() );
     case DataType::USHORT_E:
-      this->histogram_.compute( reinterpret_cast<unsigned short*>( get_data() ), get_size() );
-      break;
+      return this->histogram_.compute( reinterpret_cast<unsigned short*>( get_data() ), get_size() );
     case DataType::INT_E:
-      this->histogram_.compute( reinterpret_cast<int*>( get_data() ), get_size() );
-      break;
+      return this->histogram_.compute( reinterpret_cast<int*>( get_data() ), get_size() );
     case DataType::UINT_E:
-      this->histogram_.compute( reinterpret_cast<unsigned int*>( get_data() ), get_size() );
-      break;
+      return this->histogram_.compute( reinterpret_cast<unsigned int*>( get_data() ), get_size() );
     case DataType::FLOAT_E:
-      this->histogram_.compute( reinterpret_cast<float*>( get_data() ), get_size() );
-      break;
+      return this->histogram_.compute( reinterpret_cast<float*>( get_data() ), get_size() );
     case DataType::DOUBLE_E:
-      this->histogram_.compute( reinterpret_cast<double*>( get_data() ), get_size() );
-      break;
+      return this->histogram_.compute( reinterpret_cast<double*>( get_data() ), get_size() );
   }
 }
 

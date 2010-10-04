@@ -59,9 +59,18 @@ ITKDataBlock::~ITKDataBlock()
 
 DataBlockHandle ITKDataBlock::New( ITKImageDataHandle itk_data, generation_type generation )
 {
-  DataBlockHandle data_block( new ITKDataBlock( itk_data ) );
-  DataBlockManager::Instance()->register_datablock( data_block, generation );
-  return data_block;
+  try
+  {
+    DataBlockHandle data_block( new ITKDataBlock( itk_data ) );
+    DataBlockManager::Instance()->register_datablock( data_block, generation );
+    return data_block;
+  }
+  catch ( ... )
+  {
+    // Return an empty handle
+    DataBlockHandle data_block;
+    return data_block;
+  }
 }
 
 } // end namespace Core

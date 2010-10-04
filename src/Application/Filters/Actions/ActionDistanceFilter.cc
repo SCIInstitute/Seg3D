@@ -124,8 +124,8 @@ public:
     } 
     catch ( ... ) 
     {
-      StatusBar::SetMessage( Core::LogMessageType::ERROR_E,  
-        "DistanceFilter failed." );
+      this->report_error( "Encountered an internal error." );
+      return;
     }
 
     // As ITK filters generate an inconsistent abort behavior, we record our own abort flag
@@ -140,7 +140,15 @@ public:
   // The name of the filter, this information is used for generating new layer labels.
   virtual std::string get_filter_name() const
   {
-    return "Distance";
+    return "Distance Filter";
+  }
+
+  // GET_LAYER_PREFIX:
+  // This function returns the name of the filter. The latter is prepended to the new layer name, 
+  // when a new layer is generated. 
+  virtual std::string get_layer_prefix() const
+  {
+    return "Distance";  
   }
 };
 
@@ -156,7 +164,10 @@ bool ActionDistanceFilter::run( Core::ActionContextHandle& context,
   algo->inside_positive_ = this->inside_positive_.value();
 
   // Find the handle to the layer
-  algo->find_layer( this->target_layer_.value(), algo->src_layer_ );
+  if ( !( algo->find_layer( this->target_layer_.value(), algo->src_layer_ ) ) )
+  {
+    return false;
+  }
 
   if ( this->replace_.value() )
   {

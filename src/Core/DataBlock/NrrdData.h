@@ -50,6 +50,7 @@
 
 #include <Core/DataBlock/DataType.h>
 #include <Core/DataBlock/DataBlock.h>
+#include <Core/DataBlock/Histogram.h>
 
 namespace Core
 {
@@ -111,6 +112,16 @@ public:
   // SET_TRANSFORM:
   // Set the transfrom in the nrrd data
   void set_transform( Transform& transform );
+
+  // GET_HISTOGRAM:
+  // Get the histogram from the nrrd
+  // NOTE: If the data source can be trusted, the histogram is taken from the meta data,
+  // otherwise it is recomputed
+  Histogram get_histogram( bool trust_meta_data = false );
+
+  // SET_HISTOGRAM:
+  // Insert a histogram into a nrrd's meta data
+  void set_histogram( const Histogram& histogram );
 
   // GET_NX, GET_NY, GET_NZ:
   // Get the dimensions of the nrrd

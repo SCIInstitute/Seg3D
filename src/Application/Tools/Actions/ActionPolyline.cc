@@ -76,7 +76,7 @@ bool ActionPolyline::validate( Core::ActionContextHandle& context )
     return false;
   }
 
-  if ( !this->private_->target_layer_.handle()->is_valid() )
+  if ( !this->private_->target_layer_.handle()->has_valid_data() )
   {
     context->report_error( "Mask layer '" + this->private_->target_layer_id_.value() + 
       "' is invalid." );

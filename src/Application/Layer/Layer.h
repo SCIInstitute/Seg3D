@@ -94,13 +94,13 @@ public:
   // Get the data type of the underlying data
   virtual Core::DataType get_data_type() const = 0;
 
-  // IS_VALID:
-  // Check whether the layer has valid data
-  virtual bool is_valid() const = 0;
-
   // GET_VOLUME:
   // Get the underlying volume.
   virtual Core::VolumeHandle get_volume() const = 0;
+
+  // HAS_VALID_DATA:
+  // Check whether the layer has valid data
+  virtual bool has_valid_data() const = 0;
     
   // UPDATE_PROGRESS:
   // Update the progress bar associated with this layer

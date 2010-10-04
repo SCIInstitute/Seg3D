@@ -101,28 +101,38 @@ public:
     if ( ! ( Core::MaskDataBlockManager::Convert( input_volume->get_mask_data_block(), 
       input_data_block, Core::DataType::UCHAR_E ) ) )
     {
-      StatusBar::SetMessage( Core::LogMessageType::ERROR_E, "ErodeFilter failed." );
+      this->report_error( "Could not allocate enough memory." );
       return;
-    }       
+    }   
     
     Core::DataBlock::index_type nx = input_data_block->get_nx();
     Core::DataBlock::index_type ny = input_data_block->get_ny();
     Core::DataBlock::index_type nz = input_data_block->get_nz();
     unsigned char* data = reinterpret_cast<unsigned char*>( input_data_block->get_data() );
   
-    std::vector< std::vector<Core::DataBlock::index_type> > neighbors( 0x40 );
-    for ( size_t k = 0; k < neighbors.size(); k++ )
+    std::vector< std::vector<Core::DataBlock::index_type> > neighbors;
+    try
     {
-      if ( ! ( k & 0x1 ) ) neighbors[ k ].push_back( -1 );
-      if ( ! ( k & 0x2 ) ) neighbors[ k ].push_back( 1 );
+      neighbors.resize( 0x40 );
 
-      if ( ! ( k & 0x4 ) ) neighbors[ k ].push_back( -nx );
-      if ( ! ( k & 0x8 ) ) neighbors[ k ].push_back( nx );
+      for ( size_t k = 0; k < neighbors.size(); k++ )
+      {
+        if ( ! ( k & 0x1 ) ) neighbors[ k ].push_back( -1 );
+        if ( ! ( k & 0x2 ) ) neighbors[ k ].push_back( 1 );
 
-      if ( ! ( k & 0x10 ) ) neighbors[ k ].push_back( -nx * ny );
-      if ( ! ( k & 0x20 ) ) neighbors[ k ].push_back( nx * ny );
+        if ( ! ( k & 0x4 ) ) neighbors[ k ].push_back( -nx );
+        if ( ! ( k & 0x8 ) ) neighbors[ k ].push_back( nx );
+
+        if ( ! ( k & 0x10 ) ) neighbors[ k ].push_back( -nx * ny );
+        if ( ! ( k & 0x20 ) ) neighbors[ k ].push_back( nx * ny );
+      }
     }
-  
+    catch ( ... )
+    {
+      this->report_error( "Could not allocate enough memory." );
+      return;   
+    }
+      
     unsigned char current_label = 2;
     unsigned char previous_label = 1;
     float current_progress = 0.0f;
@@ -178,12 +188,18 @@ public:
     if (!( Core::MaskDataBlockManager::ConvertLabel( input_data_block, 
       this->src_layer_->get_grid_transform(), output_mask, 1.0 ) ) )
     {
-      StatusBar::SetMessage( Core::LogMessageType::ERROR_E, "ErodeFilter failed." );
-      return;
+      this->report_error( "Could not allocate enough memory." );
+      return; 
     }
 
     Core::MaskVolumeHandle mask_volume( new Core::MaskVolume( 
       this->src_layer_->get_grid_transform(), output_mask ) );
+
+    if ( !mask_volume )
+    {
+      this->report_error( "Could not allocate enough memory." );
+      return;     
+    } 
       
     this->dispatch_insert_mask_volume_into_layer( this->dst_layer_, mask_volume, true );
   }
@@ -192,7 +208,15 @@ public:
   // The name of the filter, this information is used for generating new layer labels.
   virtual std::string get_filter_name() const
   {
-    return "Erode";
+    return "Erode Filter";
+  }
+
+  // GET_LAYER_PREFIX:
+  // This function returns the name of the filter. The latter is prepended to the new layer name, 
+  // when a new layer is generated. 
+  virtual std::string get_layer_prefix() const
+  {
+    return "Erode"; 
   }
 };
 
@@ -207,7 +231,10 @@ bool ActionErodeFilter::run( Core::ActionContextHandle& context,
   algo->radius_ = this->radius_.value();
 
   // Find the handle to the layer
-  algo->find_layer( this->target_layer_.value(), algo->src_layer_ );
+  if ( !( algo->find_layer( this->target_layer_.value(), algo->src_layer_ ) ) )
+  {
+    return false;   
+  }
 
   if ( this->replace_.value() )
   {

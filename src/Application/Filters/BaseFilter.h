@@ -152,9 +152,19 @@ public:
   // -- filter specific information --
 public:
   // GET_FILTER_NAME:
-  // This function returns the name of the filter. The latter prepended to the new layer name, 
-  // when a new layer is generated. 
+  // This functions returns the name of the filter that is used in the error report.
   virtual std::string get_filter_name() const = 0;
+  
+  // GET_LAYER_PREFIX:
+  // This function returns the name of the filter. The latter is prepended to the new layer name, 
+  // when a new layer is generated. 
+  virtual std::string get_layer_prefix() const = 0;
+
+  // -- error handling --
+public:
+  // REPORT_ERROR:
+  // Report an error to the user
+  void report_error( const std::string& error );
 
   // -- internals --
 private:

@@ -117,6 +117,17 @@ public:
   {
   }
 
+  ActionParameter& operator=( const T& value )
+  {
+    value_ = value;
+    return *this;
+  }
+
+  const T& operator()()
+  {
+    return value_;
+  }
+
   // -- access to value --
 public:
   // General access to the parameter value
@@ -192,6 +203,14 @@ public:
 
   // DESTRUCTOR
   virtual ~ActionParameterVariant();
+
+  // Direct assignment
+  template< class T >
+  ActionParameterVariant& operator=( const T& value )
+  {
+    this->set_value( value );
+    return *this;
+  }
 
   // -- functions for accessing data --
 public:

@@ -114,9 +114,9 @@ bool ImportFromString( const std::string& str, Vector& value )
   if ( values.size() == 3 )
   {
     value = Vector( values[ 0 ], values[ 1 ], values[ 2 ] );
-    return ( true );
+    return true;
   }
-  return ( false );
+  return false;
 }
 
 bool ImportFromString( const std::string& str, VectorF& value )
@@ -126,9 +126,9 @@ bool ImportFromString( const std::string& str, VectorF& value )
   if ( values.size() == 3 )
   {
     value = VectorF( values[ 0 ], values[ 1 ], values[ 2 ] );
-    return ( true );
+    return true;
   }
-  return ( false );
+  return false;
 }
 
 bool ImportFromString( const std::string& str, std::vector< Vector >& value )
@@ -144,9 +144,9 @@ bool ImportFromString( const std::string& str, std::vector< Vector >& value )
       size_t offset = j * 3;
       value[ j ] = Vector( values[ offset + 0 ], values[ offset + 1 ], values[ offset + 2 ] );
     }
-    return ( true );
+    return true;
   }
-  return ( false );
+  return false;
 }
 
 bool ImportFromString( const std::string& str, std::vector< VectorF >& value )
@@ -162,9 +162,9 @@ bool ImportFromString( const std::string& str, std::vector< VectorF >& value )
       size_t offset = j * 3;
       value[ j ] = VectorF( values[ offset + 0 ], values[ offset + 1 ], values[ offset + 2 ] );
     }
-    return ( true );
+    return true;
   }
-  return ( false );
+  return false;
 }
 
 } // End namespace Core

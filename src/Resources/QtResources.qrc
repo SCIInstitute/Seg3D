@@ -109,8 +109,10 @@
         <file>Images/TextOff.png</file>
         <file>Images/UpArrowWhite.png</file>
         <file>Images/Visible.png</file>
+        <file>Images/VisiblePlus.png</file>
         <file>Images/VisibleWhite.png</file>
         <file>Images/VisibleOff.png</file>
+        <file>Images/VisiblePlusOff.png</file>
         <file>Images/VolumeVisible.png</file>
         <file>Images/VolumeVisibleOff.png</file>
         <file>Images/Vview.png</file>
@@ -124,5 +126,7 @@
         <file>Images/Arrow.png</file>
         <file>Images/Info.png</file>
         <file>Images/InfoOff.png</file>
+        <file>Images/Appearance.png</file>
+        <file>Images/AppearanceOff.png</file>
     </qresource>
 </RCC>

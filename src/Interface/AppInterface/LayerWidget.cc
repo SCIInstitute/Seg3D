@@ -548,8 +548,6 @@ void LayerWidget::update_widget_state( bool initialize )
     active_layer = ( LayerManager::Instance()->get_active_layer() == this->private_->layer_ );
   }
   
-  CORE_LOG_DEBUG( std::string(" data state = ") + data_state );
-  
   if ( data_state == Layer::AVAILABLE_C )
   {
     // Change the color of the widget

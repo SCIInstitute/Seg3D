@@ -180,7 +180,7 @@ Core::DataVolumeHandle DataLayer::get_data_volume() const
   return this->data_volume_;
 }
 
-bool DataLayer::is_valid() const
+bool DataLayer::has_valid_data() const
 {
   Layer::lock_type lock( Layer::GetMutex() );
 
@@ -261,7 +261,21 @@ bool DataLayer::post_load_states( const Core::StateIO& state_io )
   
 void DataLayer::clean_up()
 {
-  this->data_volume_.reset();
+  // Abort any filter still using this layer
+  this->abort_signal_();
+  
+  // Clean up the data that is still associated with this layer
+  {
+    Layer::lock_type lock( Layer::GetMutex() );
+    if ( this->data_volume_ ) 
+    {
+      Core::DataVolume::CreateInvalidData( this->data_volume_->get_grid_transform(), 
+        this->data_volume_ );
+    }
+  }
+  
+  // Remove all the connections
+  this->disconnect_all();   
 }
 
 } // end namespace Seg3D

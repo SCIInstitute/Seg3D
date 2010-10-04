@@ -354,7 +354,7 @@ void ViewerPrivate::insert_layer( LayerHandle layer )
     volume_slice->move_slice_to( this->active_layer_slice_->depth() );
   }
 
-  if ( !this->viewer_->is_volume_view() && layer->is_valid() )
+  if ( !this->viewer_->is_volume_view() && layer->has_valid_data() )
   {
     this->viewer_->redraw( false );
   }

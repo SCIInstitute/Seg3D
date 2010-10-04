@@ -131,8 +131,8 @@ public:
     } 
     catch ( ... ) 
     {
-      StatusBar::SetMessage( Core::LogMessageType::ERROR_E,  
-        "OtsuThresholdFilter failed." );
+      this->report_error( "Could not allocate enough memory." );
+      return;
     }
 
     // As ITK filters generate an inconsistent abort behavior, we record our own abort flag
@@ -151,7 +151,15 @@ public:
   // The name of the filter, this information is used for generating new layer labels.
   virtual std::string get_filter_name() const
   {
-    return "OtsuThreshold";
+    return "OtsuThreshold Filter";
+  }
+
+  // GET_LAYER_PREFIX:
+  // This function returns the name of the filter. The latter is prepended to the new layer name, 
+  // when a new layer is generated. 
+  virtual std::string get_layer_prefix() const
+  {
+    return "OtsuThreshold"; 
   }
 };
 
@@ -166,7 +174,10 @@ bool ActionOtsuThresholdFilter::run( Core::ActionContextHandle& context,
   algo->amount_ = this->amount_.value();
 
   // Find the handle to the layer
-  algo->find_layer( this->target_layer_.value(), algo->src_layer_ );
+  if ( !( algo->find_layer( this->target_layer_.value(), algo->src_layer_ ) ) )
+  {
+    return false;
+  }
 
   algo->dst_layer_.resize( algo->amount_ + 1 );
 

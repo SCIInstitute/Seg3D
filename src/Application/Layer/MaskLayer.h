@@ -72,9 +72,9 @@ public:
   // Get the data type of the underlying data
   virtual Core::DataType get_data_type() const;
 
-  // IS_VALID:
-  // Check whether the layer has valid data.
-  virtual bool is_valid() const;
+  // HAS_VALID_DATA:
+  // Check whether the layer has valid data
+  virtual bool has_valid_data() const;
   
   // GET_VOLUME:
   // Get the underlying volume.

@@ -32,6 +32,7 @@
 // Application includes
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/Filters/BaseFilter.h>
+#include <Application/StatusBar/StatusBar.h>
  
 namespace Seg3D
 {
@@ -39,6 +40,9 @@ namespace Seg3D
 class BaseFilterPrivate : public Core::ConnectionHandler
 {
 public:
+  // Keep track of errors
+  std::string error_;
+  
   // Keep track of which layers were locked.
   std::vector<LayerHandle> locked_layers_;
   
@@ -91,12 +95,19 @@ BaseFilter::~BaseFilter()
       LayerManager::DispatchUnlockOrDeleteLayer( this->private_->created_layers_[ j ] );
     }
   }
+  
+  
+  if ( this->private_->error_.size() )
+  {
+    StatusBar::SetMessage( Core::LogMessageType::ERROR_E, this->private_->error_ ); 
+  }
 }
 
 void BaseFilter::raise_abort()
 {
   boost::mutex::scoped_lock lock( this->private_->abort_mutex_ );
   this->private_->abort_ = true;
+  this->report_error( "Processing was aborted." );
 }
 
 bool BaseFilter::check_abort()
@@ -110,6 +121,11 @@ void BaseFilter::connect_abort( const  LayerHandle& layer )
   boost::mutex::scoped_lock lock( this->private_->abort_mutex_ );
   this->private_->add_connection( layer->abort_signal_.connect( boost::bind(
     &BaseFilterPrivate::handle_abort, this->private_ ) ) );
+}
+
+void BaseFilter::report_error( const std::string& error )
+{
+  this->private_->error_ = this->get_filter_name() +": " + error;
 }
 
 bool BaseFilter::find_layer( const std::string& layer_id, LayerHandle& layer )
@@ -127,16 +143,22 @@ bool BaseFilter::find_layer( const std::string& layer_id, LayerHandle& layer )
 
 bool BaseFilter::lock_for_use( LayerHandle layer )
 {
-  if ( !( LayerManager::LockForUse( layer ) ) ) return false;
-  
+  if ( !( LayerManager::LockForUse( layer ) ) ) 
+  {
+    this->report_error( "Could not lock '" + layer->get_layer_name() + "'." );
+    return false;
+  }
   this->private_->locked_layers_.push_back( layer );
   return true;
 }
 
 bool BaseFilter::lock_for_processing( LayerHandle layer )
 {
-  if ( !( LayerManager::LockForProcessing( layer ) ) ) return false;
-  
+  if ( !( LayerManager::LockForProcessing( layer ) ) )
+  {
+    this->report_error( "Could not lock '" + layer->get_layer_name() + "'." );
+    return false;
+  }
   this->private_->locked_layers_.push_back( layer );
   return true;
 }
@@ -152,6 +174,7 @@ bool BaseFilter::create_and_lock_data_layer_from_layer( LayerHandle src_layer,
     name, dst_layer ) ) )
   {
     dst_layer.reset();
+    this->report_error( "Could not allocate enough memory." );
     return false;
   }
   
@@ -172,6 +195,7 @@ bool BaseFilter::create_and_lock_data_layer( const Core::GridTransform& grid_tra
   if ( !( LayerManager::CreateAndLockDataLayer( grid_trans, name, dst_layer ) ) )
   {
     dst_layer.reset();
+    this->report_error( "Could not allocate enough memory." ); 
     return false;
   }
 
@@ -192,6 +216,7 @@ bool BaseFilter::create_and_lock_mask_layer_from_layer( LayerHandle src_layer, L
     name, dst_layer ) ) )
   {
     dst_layer.reset();
+    this->report_error( "Could not allocate enough memory." );
     return false;
   }
   
@@ -212,6 +237,7 @@ bool BaseFilter::create_and_lock_mask_layer( const Core::GridTransform& grid_tra
   if ( !( LayerManager::CreateAndLockMaskLayer( grid_trans, name, dst_layer ) ) )
   {
     dst_layer.reset();
+    this->report_error( "Could not allocate enough memory." );
     return false;
   }
 
@@ -250,8 +276,11 @@ bool BaseFilter::dispatch_unlock_layer( LayerHandle layer )
   }
 
   // If we did not find the layer return false, as we did not lock it in the first place.
-  if ( ! found_layer ) return false;
-
+  if ( ! found_layer ) 
+  {
+    this->report_error( "Internal error in filter logic." );
+    return false;
+  }
   // Send a request to the layer manager to unlock the layer.
   LayerManager::DispatchUnlockLayer( layer );
 
@@ -283,7 +312,11 @@ bool BaseFilter::dispatch_delete_layer( LayerHandle layer )
   }
   
   // If we did not find the layer return false, as we did not lock it in the first place.
-  if ( ! found_layer ) return false;
+  if ( ! found_layer ) 
+  {
+    this->report_error( "Internal error in filter logic." );
+    return false;
+  }
 
   // Send a request to the layer manager to unlock the layer.
   LayerManager::DispatchDeleteLayer( layer );

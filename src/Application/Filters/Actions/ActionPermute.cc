@@ -88,7 +88,15 @@ public:
   // The name of the filter, this information is used for generating new layer labels.
   virtual std::string get_filter_name() const
   {
-    return "Permute";
+    return "Flip/Rotate Filter";
+  }
+  
+  // GET_LAYER_PREFIX:
+  // This function returns the name of the filter. The latter is prepended to the new layer name, 
+  // when a new layer is generated. 
+  virtual std::string get_layer_prefix() const
+  {
+    return "FlipRotate";  
   }
 };
 
@@ -110,6 +118,12 @@ void PermuteAlgo::run()
       break;
     }
 
+    if ( ! this->dst_layers_[ i ] )
+    {
+      this->report_error( "Could not alocate enough memory." );
+      return;
+    }
+  
     if ( this->check_abort() )
     {
       return;
@@ -306,9 +320,13 @@ bool ActionPermute::run( Core::ActionContextHandle& context,
   algo->src_layers_.resize( num_of_layers );
   algo->dst_layers_.resize( num_of_layers );
   std::vector< std::string > dst_layer_ids( num_of_layers );
+  
   for ( size_t i = 0; i < num_of_layers; ++i )
   {
-    algo->find_layer( layer_ids[ i ], algo->src_layers_[ i ] );
+    if ( !( algo->find_layer( layer_ids[ i ], algo->src_layers_[ i ] ) ) )
+    {
+      return false;
+    }
     if ( algo->replace_ )
     {
       algo->lock_for_processing( algo->src_layers_[ i ] );
@@ -322,16 +340,23 @@ bool ActionPermute::run( Core::ActionContextHandle& context,
     switch ( algo->src_layers_[ i ]->type() )
     {
     case Core::VolumeType::DATA_E:
-      algo->create_and_lock_data_layer( this->private_->output_grid_trans_, 
-        algo->src_layers_[ i ], algo->dst_layers_[ i ] );
+      if ( !( algo->create_and_lock_data_layer( this->private_->output_grid_trans_, 
+        algo->src_layers_[ i ], algo->dst_layers_[ i ] ) ) )
+      {
+        return false;
+      }
       break;
     case Core::VolumeType::MASK_E:
-      algo->create_and_lock_mask_layer( this->private_->output_grid_trans_,
-        algo->src_layers_[ i ], algo->dst_layers_[ i ] );
+      if ( !( algo->create_and_lock_mask_layer( this->private_->output_grid_trans_,
+        algo->src_layers_[ i ], algo->dst_layers_[ i ] ) ) )
+      {
+        return false;
+      }
       break;
     default:
-      assert( false );
+      return false;
     }
+    
     algo->connect_abort( algo->dst_layers_[ i ] );
     dst_layer_ids[ i ] = algo->dst_layers_[ i ]->get_layer_id();
   }

@@ -126,8 +126,8 @@ public:
     if ( ! ( nrrdHistoEq( output_nrrd->nrrd(), input_nrrd->nrrd(), 0, this->bins_, 
       this->ignore_bins_, static_cast< float >( this->amount_ ) ) ) )
     {
-      StatusBar::SetMessage( Core::LogMessageType::ERROR_E,  
-        "HistogramEqualizationFilter failed." );
+      this->report_error( "Could not allocate enough memory." );
+      return; 
     }
 
     // Indicate that we are almost done.
@@ -143,7 +143,16 @@ public:
   // The name of the filter, this information is used for generating new layer labels.
   virtual std::string get_filter_name() const
   {
-    return "HistEqual";
+    return "Histogram Equalization Filter";
+  }
+  
+  
+  // GET_LAYER_PREFIX:
+  // This function returns the name of the filter. The latter is prepended to the new layer name, 
+  // when a new layer is generated. 
+  virtual std::string get_layer_prefix() const
+  {
+    return "HistEqual"; 
   }
 };
 
@@ -160,7 +169,10 @@ bool ActionHistogramEqualizationFilter::run( Core::ActionContextHandle& context,
   algo->ignore_bins_ = this->ignore_bins_.value();
 
   // Find the handle to the layer
-  algo->find_layer( this->target_layer_.value(), algo->src_layer_ );
+  if ( !( algo->find_layer( this->target_layer_.value(), algo->src_layer_ ) ) )
+  {
+    return false;
+  }
 
   if ( this->replace_.value() )
   {

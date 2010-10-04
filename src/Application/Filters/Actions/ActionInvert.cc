@@ -86,6 +86,7 @@ public:
       get_data_volume()->get_data_block();
     const T* src_data = reinterpret_cast< T* >( src_data_block->get_data() );
     T* dst_data = reinterpret_cast< T* >( dst->get_data() );
+
     size_t z_plane_size = src_data_block->get_nx() * src_data_block->get_ny();
     size_t nz = src_data_block->get_nz();
     size_t tenth_nz = nz / 10;
@@ -94,6 +95,7 @@ public:
     T min_val = static_cast< T >( src_data_block->get_min() );
     T max_val = static_cast< T >( src_data_block->get_max() );
     T bias = max_val + min_val;
+    
     size_t index = 0;
     for ( size_t z = 0; z < nz; ++z )
     {
@@ -120,6 +122,13 @@ public:
   {
     Core::DataBlockHandle dst_data_block = Core::StdDataBlock::New(
       this->src_layer_->get_grid_transform(), this->src_layer_->get_data_type() );
+      
+    if ( !dst_data_block )  
+    {
+      this->report_error( "Could not allocate enough memory." );
+      return;
+    }   
+            
     switch ( this->src_layer_->get_data_type() )
     {
     case Core::DataType::CHAR_E:
@@ -162,7 +171,15 @@ public:
   // The name of the filter, this information is used for generating new layer labels.
   virtual std::string get_filter_name() const
   {
-    return "Invert";
+    return "Invert Tool";
+  }
+
+  // GET_LAYER_PREFIX:
+  // This function returns the name of the filter. The latter is prepended to the new layer name, 
+  // when a new layer is generated. 
+  virtual std::string get_layer_prefix() const
+  {
+    return "Invert";  
   }
 };
 
@@ -175,7 +192,11 @@ bool ActionInvert::run( Core::ActionContextHandle& context,
 
   // Find the handle to the layer
   LayerHandle src_layer;
-  algo->find_layer( this->layer_id_.value(), src_layer );
+  
+  if ( !( algo->find_layer( this->layer_id_.value(), src_layer ) ) )
+  {
+    return false;
+  }
   algo->src_layer_ = boost::dynamic_pointer_cast< DataLayer >( src_layer );
 
   if ( this->replace_.value() )

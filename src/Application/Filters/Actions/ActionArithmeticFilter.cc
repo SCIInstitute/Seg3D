@@ -71,6 +71,14 @@ public:
   // The name of the filter, this information is used for generating new layer labels.
   virtual std::string get_filter_name() const
   {
+    return "Arithmetic Filter";
+  }
+
+  // GET_LAYER_PREFIX:
+  // This function returns the name of the filter. The latter is prepended to the new layer name, 
+  // when a new layer is generated. 
+  virtual std::string get_layer_prefix() const
+  {
     return "Arithmetic";
   }
 };
@@ -138,6 +146,7 @@ bool ActionArithmeticFilterPrivate::validate_parser( Core::ActionContextHandle& 
 
   const std::vector< std::string >& layer_ids = this->layer_ids_.value();
   std::vector< LayerHandle > layers( layer_ids.size() );
+
   std::string name( "A" );
   for ( size_t i = 0; i < layer_ids.size(); ++i )
   {
@@ -148,29 +157,51 @@ bool ActionArithmeticFilterPrivate::validate_parser( Core::ActionContextHandle& 
       switch ( layers[ i ]->type() )
       {
       case Core::VolumeType::MASK_E:
-        Core::MaskDataBlockManager::Convert( dynamic_cast< MaskLayer* >( layers[ i ].get() )->
-          get_mask_volume()->get_mask_data_block(), input_data_block, Core::DataType::UCHAR_E );
+        if ( ! ( Core::MaskDataBlockManager::Convert( dynamic_cast< MaskLayer* >( 
+          layers[ i ].get() )->get_mask_volume()->get_mask_data_block(), 
+          input_data_block, Core::DataType::UCHAR_E ) ) )
+        {
+          context->report_error( 
+            std::string("Arithmetic Filter: Running out of memory.") );
+          this->algo_.reset();
+          return false;
+        }
         break;
       case Core::VolumeType::DATA_E:
-        input_data_block = dynamic_cast< DataLayer* >( layers[ i ].get() )->
-          get_data_volume()->get_data_block();
+        if ( ! ( input_data_block = dynamic_cast< DataLayer* >( layers[ i ].get() )->
+          get_data_volume()->get_data_block() ) )
+        {
+          context->report_error( 
+            std::string("Arithmetic Filter: Running out of memory.") );
+          this->algo_.reset();
+          return false;
+        }
         break;
       }
 
       std::string error;
-      if ( !this->algo_->engine_.add_input_data_block( name, input_data_block, error ) )
+      if ( ! this->algo_->engine_.add_input_data_block( name, input_data_block, error ) )
       {
         context->report_error( error );
+        this->algo_.reset();
         return false;
       }
 
       if ( i == 0 && replace )
       {
-        this->algo_->lock_for_processing( layers[ i ] );
+        if ( ! ( this->algo_->lock_for_processing( layers[ i ] ) ) )
+        {
+          this->algo_.reset();
+          return false;
+        }
       }
       else
       {
-        this->algo_->lock_for_use( layers[ i ] );
+        if ( ! ( this->algo_->lock_for_use( layers[ i ] ) ) )
+        {
+          this->algo_.reset();
+          return false;       
+        }
       }
     }
   }
@@ -181,15 +212,26 @@ bool ActionArithmeticFilterPrivate::validate_parser( Core::ActionContextHandle& 
   }
   else if ( this->output_type_.value() == ActionArithmeticFilter::DATA_C )
   {
-    this->algo_->create_and_lock_data_layer_from_layer( layers[ 0 ], this->algo_->dst_layer_ );
+    if ( ! (this->algo_->create_and_lock_data_layer_from_layer( layers[ 0 ], 
+      this->algo_->dst_layer_ ) ) )
+    {
+      this->algo_.reset();
+      return false;   
+    }
   }
   else
   {
-    this->algo_->create_and_lock_mask_layer_from_layer( layers[ 0 ], this->algo_->dst_layer_ );
+    if ( ! ( this->algo_->create_and_lock_mask_layer_from_layer( layers[ 0 ], 
+      this->algo_->dst_layer_ ) ) )
+    {
+      this->algo_.reset();
+      return false;   
+    }
   }
 
   const Core::GridTransform& grid_trans = layers[ 0 ]->get_grid_transform();
   std::string error;
+
   if ( this->algo_->dst_layer_->type() == Core::VolumeType::MASK_E )
   {
     if( !this->algo_->engine_.add_output_data_block( ActionArithmeticFilter::RESULT_C, 
@@ -197,6 +239,8 @@ bool ActionArithmeticFilterPrivate::validate_parser( Core::ActionContextHandle& 
       Core::DataType::UCHAR_E, error ) )
     {
       context->report_error( error );
+      this->algo_.reset();
+      return false;
     }
   }
   else
@@ -206,12 +250,13 @@ bool ActionArithmeticFilterPrivate::validate_parser( Core::ActionContextHandle& 
       Core::DataType::FLOAT_E, error ) )
     {
       context->report_error( error );
+      this->algo_.reset();
+      return false;
     }
   }
 
   this->algo_->engine_.add_expressions( this->expressions_.value() );
 
-  
   if( !this->algo_->engine_.parse_and_validate( error ) )
   {
     context->report_error( error );

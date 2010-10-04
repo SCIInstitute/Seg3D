@@ -109,7 +109,7 @@ protected:
   
   // DELETE_LAYER:
   // Delete a layer from the list
-  void delete_layer( LayerHandle layer, bool invalidate_layerid = true  );
+  void delete_layer( LayerHandle layer );
   
   // CROP_LAYER:
   // Crops the selected layers based on the state of the crop panel

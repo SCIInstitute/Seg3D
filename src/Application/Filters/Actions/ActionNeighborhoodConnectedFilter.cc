@@ -102,6 +102,12 @@ public:
     Core::DataBlockHandle dst_mask = Core::StdDataBlock::New( 
       this->src_layer_->get_grid_transform(), Core::DataType::UCHAR_E );
 
+    if ( !dst_mask )
+    {
+      this->report_error( "Could not allocate enough memory." );
+      return;   
+    }
+
     // Get the dimensions
     int dimensions[ 3 ];
     dimensions[ 0 ] = static_cast< int >( src->get_nx() );
@@ -116,6 +122,7 @@ public:
     // Initialize the seeds and compute the threshold
     T min_val = std::numeric_limits< T >::max();
     T max_val = std::numeric_limits< T >::min();
+
     std::stack< std::vector< int > > seeds;
     for ( size_t i = 0; i < this->seeds_.size(); ++i )
     {
@@ -133,6 +140,7 @@ public:
     size_t visited_voxels = seeds.size();
     size_t last_report_voxels = visited_voxels;
     size_t progress_threshold = total_voxels / 40;
+
     while ( !seeds.empty() )
     {
       std::vector< int > seed_index = seeds.top();
@@ -192,12 +200,19 @@ public:
     
     this->dst_layer_->update_progress_signal_( 0.8 );
     Core::MaskDataBlockHandle mask_datablock;
-    Core::MaskDataBlockManager::Convert( dst_mask, 
-      this->dst_layer_->get_grid_transform(), mask_datablock );
+    if ( !( Core::MaskDataBlockManager::Convert( dst_mask, 
+      this->dst_layer_->get_grid_transform(), mask_datablock ) ) )
+    {
+      this->report_error( "Could not allocate enough memory." );
+      return;   
+    }
+      
     this->dst_layer_->update_progress_signal_( 1.0 );
+    
     this->dispatch_insert_mask_volume_into_layer( this->dst_layer_,
       Core::MaskVolumeHandle( new Core::MaskVolume(
       this->dst_layer_->get_grid_transform(), mask_datablock ) ), true );
+      
   }
 
   // RUN:
@@ -243,7 +258,15 @@ public:
   // The name of the filter, this information is used for generating new layer labels.
   virtual std::string get_filter_name() const
   {
-    return "NeighborhoodConnected";
+    return "NeighborhoodConnected Filter";
+  }
+
+  // GET_LAYER_PREFIX:
+  // This function returns the name of the filter. The latter is prepended to the new layer name, 
+  // when a new layer is generated. 
+  virtual std::string get_layer_prefix() const
+  {
+    return "NeighborhoodConnected"; 
   }
 };
 
@@ -255,7 +278,10 @@ bool ActionNeighborhoodConnectedFilter::run( Core::ActionContextHandle& context,
   boost::shared_ptr<NeighborhoodConnectedFilterAlgo> algo( new NeighborhoodConnectedFilterAlgo );
 
   // Find the handle to the layer
-  algo->find_layer( this->target_layer_.value(), algo->src_layer_ );
+  if ( !( algo->find_layer( this->target_layer_.value(), algo->src_layer_ ) ) )
+  {
+    return false;
+  }
 
   // Check the seed points against the source layer dimensions
   const Core::GridTransform& grid_trans = algo->src_layer_->get_grid_transform();
@@ -263,21 +289,31 @@ bool ActionNeighborhoodConnectedFilter::run( Core::ActionContextHandle& context,
   int nx = static_cast< int >( grid_trans.get_nx() );
   int ny = static_cast< int >( grid_trans.get_ny() );
   int nz = static_cast< int >( grid_trans.get_nz() );
-  const std::vector< Core::Point > seeds = this->seeds_.value();
-  std::vector< int > index( 3 );
-  for ( size_t i = 0; i < seeds.size(); ++i )
+
+  try
   {
-    Core::Point seed = inverse_trans * seeds[ i ];
-    index[ 0 ] = Core::Round( seed[ 0 ] );
-    index[ 1 ] = Core::Round( seed[ 1 ] );
-    index[ 2 ] = Core::Round( seed[ 2 ] );
-    if ( index[ 0 ] >= 0 && index[ 0 ] < nx &&
-      index[ 1 ] >= 0 && index[ 1 ] < ny &&
-      index[ 2 ] >= 0 && index[ 2 ] < nz )
+    std::vector< int > index( 3 );
+    const std::vector< Core::Point > seeds = this->seeds_.value();
+    for ( size_t i = 0; i < seeds.size(); ++i )
     {
-      algo->seeds_.push_back( index );
+      Core::Point seed = inverse_trans * seeds[ i ];
+      index[ 0 ] = Core::Round( seed[ 0 ] );
+      index[ 1 ] = Core::Round( seed[ 1 ] );
+      index[ 2 ] = Core::Round( seed[ 2 ] );
+      if ( index[ 0 ] >= 0 && index[ 0 ] < nx &&
+        index[ 1 ] >= 0 && index[ 1 ] < ny &&
+        index[ 2 ] >= 0 && index[ 2 ] < nz )
+      {
+        algo->seeds_.push_back( index );
+      }
     }
   }
+  catch ( ... )
+  {
+    algo->report_error( "Could not allocate enough memory." );
+    return false; 
+  }
+  
   if ( algo->seeds_.size() == 0 )
   {
     context->report_error( "All seed points are out of the volume boundary" );

@@ -109,7 +109,7 @@ bool LayerManager::insert_layer( LayerHandle layer )
       
       CORE_LOG_DEBUG( std::string( "Set Active Layer: " ) + layer->get_layer_id());
 
-      if ( layer->is_valid() )
+      if ( layer->has_valid_data() )
       {
         active_layer_ = layer;
         active_layer_changed = true;
@@ -226,7 +226,7 @@ bool LayerManager::move_layer_above( LayerHandle layer_to_move, LayerHandle targ
     group_below = target_layer->get_layer_group();
     
     // First we Delete the Layer from its list of layers
-    group_above->delete_layer( layer_to_move, false );
+    group_above->delete_layer( layer_to_move );
     group_below->move_layer_above( layer_to_move, target_layer );
     
     // If they are in the same group ---
@@ -288,7 +288,7 @@ void LayerManager::set_active_layer( LayerHandle layer )
     lock_type lock( this->get_mutex() );    
     
     // Do nothing if this layer is already the active one
-    if ( this->active_layer_ == layer || !layer->is_valid() )
+    if ( this->active_layer_ == layer || !layer->has_valid_data() )
     {
       return;
     }
@@ -423,8 +423,11 @@ void LayerManager::delete_layers( LayerGroupHandle group )
       if( ( *it )->selected_state_->get() )
       {   
         CORE_LOG_MESSAGE( std::string("Deleting Layer: ") + ( *it )->get_layer_id() );
+        
         layer_vector.push_back( *it );
         group->delete_layer( *it );
+        ( *it )->invalidate();
+        
         if ( *it == this->active_layer_ )
         {
           active_layer_deleted = true;
@@ -488,6 +491,7 @@ void LayerManager::delete_layer( LayerHandle layer )
     
     group = layer->get_layer_group();
     group->delete_layer( layer );
+    layer->invalidate();
     
     if( group->is_empty() )
     {   
@@ -604,7 +608,7 @@ LayerSceneHandle LayerManager::compose_layer_scene( size_t viewer_id )
       // Skip processing this layer if it's not visible or that is not valid.
       // NOTE: Layers that are not valid include the layers that are currently
       // under construction.
-      if ( !layer->visible_state_[ viewer_id ]->get() || !layer->is_valid() )
+      if ( !layer->visible_state_[ viewer_id ]->get() || !layer->has_valid_data() )
       {
         continue;
       }
@@ -689,7 +693,7 @@ void LayerManager::get_layer_names( std::vector< LayerIDNamePair >& layer_names,
     // NOTE: Only if a layer is valid do we save it in a session. An example of an invalid
     // layer is for instance a layer that was just created, but hasn't finished processing
     // its data.
-    if ( layers[ i ]->is_valid() && ( layers[ i ]->type() & type ) )
+    if ( layers[ i ]->has_valid_data() && ( layers[ i ]->type() & type ) )
     {
       layer_names.push_back( std::make_pair( layers[ i ]->get_layer_id(), 
         layers[ i ]->get_layer_name() ) );
@@ -711,7 +715,7 @@ void LayerManager::get_layer_names_from_group( LayerGroupHandle group,
     // NOTE: Only if a layer is valid do we save it in a session. An example of an invalid
     // layer is for instance a layer that was just created, but hasn't finished processing
     // its data.
-    if ( layers[ i ]->is_valid() && ( layers[ i ]->type() & type ) )
+    if ( layers[ i ]->has_valid_data() && ( layers[ i ]->type() & type ) )
     {
       layer_names.push_back( std::make_pair( layers[ i ]->get_layer_id(), 
         layers[ i ]->get_layer_name() ) );
@@ -1157,7 +1161,7 @@ void LayerManager::DispatchUnlockOrDeleteLayer( LayerHandle layer )
   // NOTE: We can only determine whether the layer is valid on the application thread.
   // Other instructions to insert data into the layer may still be in the application thread
   // queue, hence we need to process this at the end of the queue.
-  if( layer->is_valid() )
+  if( layer->has_valid_data() )
   {
     layer->data_state_->set( Layer::AVAILABLE_C );
   }

@@ -47,7 +47,7 @@ bool ActionComputeIsosurface::validate( Core::ActionContextHandle& context )
   }
 
   // Check for valid mask data
-  if( !this->mask_layer_.handle()->is_valid() ) 
+  if( !this->mask_layer_.handle()->has_valid_data() ) 
   {
     return false;
   }

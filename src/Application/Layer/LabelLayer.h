@@ -66,9 +66,9 @@ public:
   // Get the transform of the layer
   virtual Core::GridTransform get_grid_transform() const = 0;
 
-  // IS_VALID:
+  // HAS_VALID_DATA:
   // Check whether the layer has valid data
-  virtual bool is_valid() const = 0;
+  virtual bool has_valid_data() const = 0;
 
 public:
 

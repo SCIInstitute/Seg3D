@@ -349,6 +349,8 @@ bool MaskVolume::CreateEmptyMask( GridTransform grid_transform, MaskVolumeHandle
     MaskDataBlockManager::Create( grid_transform, mask_data_block );
   
   mask = MaskVolumeHandle( new MaskVolume( grid_transform, mask_data_block ) );
+
+  if ( !mask ) return false;
   return true;
 }
 
@@ -357,6 +359,8 @@ bool MaskVolume::CreateInvalidMask( GridTransform grid_transform, MaskVolumeHand
   MaskDataBlockHandle mask_data_block;
 
   mask = MaskVolumeHandle( new MaskVolume( grid_transform, mask_data_block ) );
+
+  if ( !mask ) return false;
   return true;
 }
 

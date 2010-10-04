@@ -56,31 +56,61 @@ public:
 
   virtual ~Histogram();
   
-  void compute( const signed char* data, size_t size );
-  void compute( const unsigned char* data, size_t size );
-  void compute( const short* data, size_t size );
-  void compute( const unsigned short* data, size_t size );
-  void compute( const int* data, size_t size );
-  void compute( const unsigned int* data, size_t size );
-  void compute( const float* data, size_t size );
-  void compute( const double* data, size_t size );
+  // COMPUTE:
+  // Compute a histogram on an arbitrary size of data
+  bool compute( const signed char* data, size_t size );
+  bool compute( const unsigned char* data, size_t size );
+  bool compute( const short* data, size_t size );
+  bool compute( const unsigned short* data, size_t size );
+  bool compute( const int* data, size_t size );
+  bool compute( const unsigned int* data, size_t size );
+  bool compute( const float* data, size_t size );
+  bool compute( const double* data, size_t size );
   
+  // GET_MIN:
+  // Get the minimum value of the data
   double get_min() const;
+
+  // GET_MAX:
+  // Get the maximum value of the data
   double get_max() const;
+  
+  // GET_MIN_BIN:
+  // Get the minimum size of a histogram bar
   size_t get_min_bin() const;
+
+  // GET_MAX_BIN:
+  // Get the maximum size of a histogram bar
   size_t get_max_bin() const;
   
+  // GET_BIN_SIZE:
+  // Get the size of each bin in data values
   double get_bin_size() const;
+  
+  // GET_BIN_START:
+  // Get the value where a specific bin starts
   double get_bin_start( size_t idx = 0) const;
+
+  // GET_BIN_END:
+  // Get the value where a specific bin ends
   double get_bin_end( size_t idx = 0) const;
   
+  // GET_SIZE:
+  // Get the number of bin in the histogram
   size_t get_size() const;
+  
+  // GET_BINS:
+  // Get the actual histogram data
   const std::vector<size_t>& get_bins() const;
   
+  // IS_VALID:
+  // Check whther histogram is valid
   bool is_valid() const;
         
 private:
-
+  friend std::string ExportToString( const Histogram& value );
+  friend bool ImportFromString( const std::string& str, Histogram& value );
+  
   double min_;
   double max_;
   
@@ -91,10 +121,17 @@ private:
   double bin_size_;
   
   std::vector<size_t> histogram_;
-  
-  void compute_min_max();
 
 };
+
+// EXPORTTOSTRING:
+// Put the contents of the histogram into a string
+std::string ExportToString( const Histogram& value );
+
+// IMPORTFROMSTRING:
+// Import the histogram from a string and return true if the conversion succeeded 
+bool ImportFromString( const std::string& str, Histogram& value );
+
 
 } // end namespace Core
 

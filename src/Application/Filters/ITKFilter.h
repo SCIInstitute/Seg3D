@@ -95,6 +95,7 @@ protected:
         if ( ! ( Core::DataBlock::ConvertDataType( volume->get_data_block(), 
           data_block, Core::GetDataType( reinterpret_cast<T*>( 0 ) ) ) ) )
         {
+          this->report_error( "Could not allocate enough memory." );
           return false;
         }
       }
@@ -112,6 +113,7 @@ protected:
       if ( ! ( Core::MaskDataBlockManager::Convert( volume->get_mask_data_block(), 
         data_block, Core::GetDataType( reinterpret_cast<T*>( 0 ) ), invert ) ) )
       {
+        this->report_error( "Could not allocate enough memory." );
         return false;
       }   
       transform = volume->get_transform();
@@ -126,7 +128,12 @@ protected:
     image = typename Core::ITKImageDataT<T>::Handle( 
       new Core::ITKImageDataT<T>( data_block, transform ) );
       
-    if ( !image ) return false;
+    if ( !image )
+    {
+      this->report_error( "Could not allocate enough memory." );
+      return false;
+    }
+    
     // Success
     return true;
   }
@@ -182,6 +189,7 @@ protected:
       if (!( Core::MaskDataBlockManager::Convert( data_block, 
         mask_layer->get_grid_transform(), mask ) ) )
       {
+        this->report_error( "Could not allocate enough memory." );
         return false;
       }
       
@@ -191,6 +199,8 @@ protected:
       this->dispatch_insert_mask_volume_into_layer( mask_layer, mask_volume, true );
       return true;
     }
+
+    this->report_error( "Encountered unknown data type." );
     return false;
   }
 
@@ -228,6 +238,7 @@ protected:
       if (!( Core::MaskDataBlockManager::ConvertLabel( data_block, 
         mask_layer->get_grid_transform(), mask, static_cast<double>( label ) ) ) )
       {
+        this->report_error( "Could not allocate enough memory." );
         return false;
       }
       
@@ -265,10 +276,21 @@ protected:
 
       // Wrap an ITKImageData object around the itk object
       Core::DataBlockHandle data_block_src = Core::ITKDataBlock::New<T>( itk_image ) ;
+      if ( ! data_block_src )
+      {
+        this->report_error( "Could not allocate enough memory." );
+        return false;     
+      }
+      
       Core::DataBlockHandle data_block_dst = data_block_src;
       if ( data_block_src->get_data_type() != data_type )
       {
-        Core::DataBlock::ConvertDataType( data_block_src, data_block_dst, data_type );
+        if ( !( Core::DataBlock::ConvertDataType( data_block_src, 
+          data_block_dst, data_type ) ) )
+        {
+          this->report_error( "Could not allocate enough memory." );
+          return false;             
+        }
       }
       
       Core::DataVolumeHandle data_volume( new Core::DataVolume( 
@@ -289,6 +311,12 @@ protected:
       // NOTE: This only generates a wrapper, no new data is generated
       Core::DataBlockHandle data_block = Core::ITKDataBlock::New<T>( 
         typename itk::Image<T,3>::Pointer( itk_image ) );
+
+      if ( ! data_block )
+      {
+        this->report_error( "Could not allocate enough memory." );
+        return false;     
+      }
       
       // NOTE: The only reason we need the transform here, is that data blocks are
       // sorted by grid transform so we can use the nrrd library to save them, the
@@ -299,6 +327,7 @@ protected:
       if (!( Core::MaskDataBlockManager::Convert( data_block, 
         mask_layer->get_grid_transform(), mask ) ) )
       {
+        this->report_error( "Could not allocate enough memory." );
         return false;
       }
       

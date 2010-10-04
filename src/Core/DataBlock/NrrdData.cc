@@ -70,10 +70,13 @@ NrrdData::NrrdData( DataBlockHandle data_block ) :
   this->private_->data_block_ = data_block;
   this->private_->nrrd_ = nrrdNew();
 
-  nrrdWrap_va( this->private_->nrrd_, data_block->get_data(), 
-    GetNrrdDataType( data_block->get_data_type() ), 3,
-    data_block->get_nx(), data_block->get_ny(),
-    data_block->get_nz() );
+  if ( this->private_->nrrd_ )
+  {
+    nrrdWrap_va( this->private_->nrrd_, data_block->get_data(), 
+      GetNrrdDataType( data_block->get_data_type() ), 3,
+      data_block->get_nx(), data_block->get_ny(),
+      data_block->get_nz() );
+  }
 }
 
 
@@ -89,12 +92,15 @@ NrrdData::NrrdData( DataBlockHandle data_block, Transform transform ) :
   this->private_->data_block_ = data_block;
   this->private_->nrrd_ = nrrdNew();
 
-  nrrdWrap_va( this->private_->nrrd_, data_block->get_data(), 
-    GetNrrdDataType( data_block->get_data_type() ), 3,
-    data_block->get_nx(), data_block->get_ny(),
-    data_block->get_nz() );
+  if ( this->private_->nrrd_ )
+  {
+    nrrdWrap_va( this->private_->nrrd_, data_block->get_data(), 
+      GetNrrdDataType( data_block->get_data_type() ), 3,
+      data_block->get_nx(), data_block->get_ny(),
+      data_block->get_nz() );
 
-  set_transform( transform );
+    set_transform( transform );
+  }
 }
 
 NrrdData::~NrrdData()
@@ -356,6 +362,62 @@ void NrrdData::set_transform( Transform& transform )
 
 }
 
+void NrrdData::set_histogram( const Histogram& histogram )
+{
+  if ( this->private_->nrrd_ )
+  {
+    nrrdKeyValueAdd( this->private_->nrrd_, "seg3d-histogram", 
+      ExportToString( histogram ).c_str() );
+  }
+}
+
+Histogram NrrdData::get_histogram( bool trust_meta_data )
+{
+  Histogram result;
+  if ( trust_meta_data )
+  {
+    char* value = nrrdKeyValueGet( this->private_->nrrd_, "seg3d-histogram" );
+    if ( value )
+    {
+    if ( ImportFromString( value, result ) )
+    {
+      free( value );
+      return result;
+    }
+    free ( value );
+    }
+  }
+  
+  switch ( this->get_data_type() )
+  {
+    case Core::DataType::CHAR_E:
+      result.compute( reinterpret_cast<signed char *>( this->get_data() ), this->get_size() );
+      break;
+    case Core::DataType::UCHAR_E:
+      result.compute( reinterpret_cast<unsigned char *>( this->get_data() ), this->get_size() );
+      break;
+    case Core::DataType::SHORT_E:
+      result.compute( reinterpret_cast<short *>( this->get_data() ), this->get_size() );
+      break;
+    case Core::DataType::USHORT_E:
+      result.compute( reinterpret_cast<unsigned short *>( this->get_data() ), this->get_size() );
+      break;
+    case Core::DataType::INT_E:
+      result.compute( reinterpret_cast<int *>( this->get_data() ), this->get_size() );
+      break;
+    case Core::DataType::UINT_E:
+      result.compute( reinterpret_cast<unsigned int *>( this->get_data() ), this->get_size() );
+      break;
+    case Core::DataType::FLOAT_E:
+      result.compute( reinterpret_cast<float *>( this->get_data() ), this->get_size() );
+      break;
+    case Core::DataType::DOUBLE_E:
+      result.compute( reinterpret_cast<double *>( this->get_data() ), this->get_size() );
+      break;
+  }
+  return result;
+}
+
 size_t NrrdData::get_nx() const
 {
   if ( this->private_->nrrd_ && this->private_->nrrd_->dim > 0 ) 
@@ -444,6 +506,7 @@ bool NrrdData::SaveNrrd( const std::string& filename, NrrdDataHandle nrrddata, s
 
   NrrdIoState* nio = nrrdIoStateNew();
   nrrdIoStateSet( nio,  nrrdIoStateZlibLevel, 6 );
+  nrrdIoStateEncodingSet( nio, nrrdEncodingGzip );
   
   if ( nrrdSave( filename.c_str(), nrrddata->nrrd(), nio ) )
   {

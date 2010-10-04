@@ -97,7 +97,7 @@ Core::MaskVolumeHandle MaskLayer::get_mask_volume() const
   return this->mask_volume_;
 }
 
-bool MaskLayer::is_valid() const
+bool MaskLayer::has_valid_data() const
 {
   Layer::lock_type lock( Layer::GetMutex() );
 
@@ -110,7 +110,6 @@ bool MaskLayer::is_valid() const
     return false;
   }
 }
-
 
 Core::VolumeHandle MaskLayer::get_volume() const
 {
@@ -224,8 +223,20 @@ bool MaskLayer::post_load_states( const Core::StateIO& state_io )
 
 void MaskLayer::clean_up()
 {
-  Layer::lock_type lock( Layer::GetMutex() );   
-  this->mask_volume_.reset();
+  // Abort any filter still using this layer
+  this->abort_signal_();
+  
+  // Clean up the data that is still associated with this layer
+  {
+    Layer::lock_type lock( Layer::GetMutex() );
+    if ( this->mask_volume_ )
+    {
+      Core::MaskVolume::CreateInvalidMask( this->mask_volume_->get_grid_transform(),
+        this->mask_volume_ );
+    }
+  }
+
+  // Remove all the connections
   this->disconnect_all();
 }
 

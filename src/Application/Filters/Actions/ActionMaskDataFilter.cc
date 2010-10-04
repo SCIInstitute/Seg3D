@@ -137,7 +137,7 @@ public:
     Core::DataBlockHandle output_data_block;
     if ( ! ( Core::DataBlock::Clone( input_data_volume->get_data_block(), output_data_block ) ) )
     {
-      StatusBar::SetMessage( Core::LogMessageType::ERROR_E, "MaskDataFilter failed." );
+      this->report_error( "Could not allocate enough memory." );
       return;
     }
     
@@ -248,6 +248,12 @@ public:
     Core::DataVolumeHandle output_data_volume( new Core::DataVolume( 
       this->src_layer_->get_grid_transform(), output_data_block ) );
       
+    if ( !output_data_volume )
+    {
+      this->report_error( "Could not allocate enough memory." );
+      return;
+    }
+      
     this->dispatch_insert_data_volume_into_layer( this->dst_layer_, output_data_volume, 
       true, true );
   }
@@ -257,7 +263,15 @@ public:
   // The name of the filter, this information is used for generating new layer labels.
   virtual std::string get_filter_name() const
   {
-    return "MaskData";
+    return "MaskData Filter";
+  }
+
+  // GET_LAYER_PREFIX:
+  // This function returns the name of the filter. The latter is prepended to the new layer name, 
+  // when a new layer is generated. 
+  virtual std::string get_layer_prefix() const
+  {
+    return "MaskData";  
   }
 };
 
@@ -273,7 +287,10 @@ bool ActionMaskDataFilter::run( Core::ActionContextHandle& context,
   algo->replace_with_ = this->replace_with_.value();
 
   // Find the handle to the layer
-  algo->find_layer( this->target_layer_.value(), algo->src_layer_ );
+  if ( !( algo->find_layer( this->target_layer_.value(), algo->src_layer_ ) ) )
+  {
+    return false;
+  }
   
   algo->find_layer( this->mask_layer_.value(), algo->mask_layer_ );
   algo->lock_for_use( algo->mask_layer_ );

@@ -141,10 +141,9 @@ bool DataVolume::LoadDataVolume( const boost::filesystem::path& filename,
   DataBlock::generation_type generation;
   Core::ImportFromString( filename.stem(), generation );
   Core::DataBlockHandle datablock( Core::NrrdDataBlock::New( nrrd, generation ) );
-  datablock->update_histogram();
+  datablock->set_histogram( nrrd->get_histogram( true ) );
 
-  volume = DataVolumeHandle( new DataVolume( nrrd->get_grid_transform(),
-    datablock ) );
+  volume = DataVolumeHandle( new DataVolume( nrrd->get_grid_transform(), datablock ) );
   return true;
 }
 
@@ -155,6 +154,7 @@ bool DataVolume::SaveDataVolume( const boost::filesystem::path& filepath, DataVo
     NrrdDataHandle nrrd = NrrdDataHandle( new NrrdData( 
       volume->data_block_, volume->get_grid_transform() ) );
 
+    nrrd->set_histogram( volume->data_block_->get_histogram() );
     if ( ! ( NrrdData::SaveNrrd( filepath.string(), nrrd, error ) ) ) 
     {
       CORE_LOG_ERROR( error );

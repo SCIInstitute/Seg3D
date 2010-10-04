@@ -124,8 +124,16 @@ public:
   // The name of the filter, this information is used for generating new layer labels.
   virtual std::string get_filter_name() const
   {
-    return "Resample";
+    return "Resample Tool";
   }
+  
+  // GET_LAYER_PREFIX:
+  // This function returns the name of the filter. The latter is prepended to the new layer name, 
+  // when a new layer is generated. 
+  virtual std::string get_layer_prefix() const
+  {
+    return "Resample";  
+  } 
 };
 
 ResampleAlgo::ResampleAlgo( const std::string& kernel, double param1, double param2 )
@@ -413,21 +421,18 @@ void ResampleAlgo::resample_mask_layer( MaskLayerHandle input, MaskLayerHandle o
     Core::NrrdDataHandle nrrd_data( new Core::NrrdData( nrrd_out ) );
     Core::DataBlockHandle data_block = Core::NrrdDataBlock::New( nrrd_data );
     Core::MaskDataBlockHandle mask_data_block;
-    Core::MaskDataBlockManager::Convert( data_block, nrrd_data->get_grid_transform(),
-      mask_data_block );
+    if ( !( Core::MaskDataBlockManager::Convert( data_block, nrrd_data->get_grid_transform(),
+      mask_data_block ) ) )
+    {
+      return;
+    }
+    
     Core::MaskVolumeHandle mask_volume( new Core::MaskVolume( 
       nrrd_data->get_grid_transform(), mask_data_block ) );
+    
     this->dispatch_insert_mask_volume_into_layer( output, mask_volume, true );
     output->update_progress_signal_( 1.0 );
     this->dispatch_unlock_layer( output );
-    if ( this->replace_ )
-    {
-      this->dispatch_delete_layer( input );
-    }
-    else
-    {
-      this->dispatch_unlock_layer( input );
-    }
   }
 }
 
@@ -449,6 +454,12 @@ void ResampleAlgo::run()
       break;
     }
 
+    if ( ! this->dst_layers_[ i ] )
+    {
+      this->report_error( "Could not alocate enough memory." );
+      return;
+    }
+    
     if ( this->check_abort() ) break;
   }
 }
@@ -609,6 +620,13 @@ bool ActionResample::run( Core::ActionContextHandle& context,
     default:
       assert( false );
     }
+
+    if ( !algo->dst_layers_[ i ] )
+    {
+      context->report_error( "Could not allocate enough memory." );
+      return false;
+    }
+    
     algo->connect_abort( algo->dst_layers_[ i ] );
     dst_layer_ids[ i ] = algo->dst_layers_[ i ]->get_layer_id();
   }

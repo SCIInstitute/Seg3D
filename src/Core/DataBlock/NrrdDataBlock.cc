@@ -63,9 +63,18 @@ NrrdDataBlock::~NrrdDataBlock()
 
 DataBlockHandle NrrdDataBlock::New( NrrdDataHandle nrrd_data, generation_type generation )
 {
-  DataBlockHandle data_block( new NrrdDataBlock( nrrd_data ) );
-  DataBlockManager::Instance()->register_datablock( data_block, generation );
-  return data_block;
+  try
+  {
+    DataBlockHandle data_block( new NrrdDataBlock( nrrd_data ) );
+    DataBlockManager::Instance()->register_datablock( data_block, generation );
+    return data_block;
+  }
+  catch ( ... )
+  {
+    // Return an empty handle
+    DataBlockHandle data_block;
+    return data_block;
+  } 
 }
 
 

@@ -120,8 +120,8 @@ public:
     } 
     catch ( ... ) 
     {
-      StatusBar::SetMessage( Core::LogMessageType::ERROR_E,  
-        "FillHolesFilter failed." );
+      this->report_error( "Internal error." );
+      return;
     }
 
     // As ITK filters generate an inconsistent abort behavior, we record our own abort flag
@@ -132,7 +132,17 @@ public:
       filter->GetOutput() );
     
     unsigned int max_label = filter->GetObjectCount();
-    std::vector<unsigned int> lut( max_label + 1, 1 );
+    std::vector<unsigned int> lut;
+
+    try
+    {
+      lut.resize( max_label + 1, 1 );
+    }
+    catch( ... )
+    {
+      this->report_error( "Could not allocate enough memory." );
+      return;   
+    }
     
     Core::GridTransform grid = input_image->get_grid_transform();
     Core::Transform trans = grid.get_inverse();
@@ -198,8 +208,13 @@ public:
     }
     
     Core::MaskDataBlockHandle mask_datablock;
-    Core::MaskDataBlockManager::Convert( output_datablock, 
-      this->dst_layer_->get_grid_transform(), mask_datablock );
+    if ( !( Core::MaskDataBlockManager::Convert( output_datablock, 
+      this->dst_layer_->get_grid_transform(), mask_datablock ) ) )
+    {
+      this->report_error( "Could not allocate enough memory." );
+      return;       
+    }
+    
     this->dst_layer_->update_progress_signal_( 1.0 );
     
     this->dispatch_insert_mask_volume_into_layer( this->dst_layer_,
@@ -212,7 +227,15 @@ public:
   // The name of the filter, this information is used for generating new layer labels.
   virtual std::string get_filter_name() const
   {
-    return "HolesFill";
+    return "FillHoles Filter";
+  }
+
+  // GET_LAYER_PREFIX:
+  // This function returns the name of the filter. The latter is prepended to the new layer name, 
+  // when a new layer is generated. 
+  virtual std::string get_layer_prefix() const
+  {
+    return "FillHoles"; 
   }
 };
 
@@ -224,7 +247,10 @@ bool ActionFillHolesFilter::run( Core::ActionContextHandle& context,
   boost::shared_ptr<FillHolesFilterAlgo> algo( new FillHolesFilterAlgo );
 
   // Find the handle to the layer
-  algo->find_layer( this->target_layer_.value(), algo->src_layer_ );
+  if ( !( algo->find_layer( this->target_layer_.value(), algo->src_layer_ ) ) )
+  {
+    return false;
+  }
   
   algo->seeds_ = this->seeds_.value();
   

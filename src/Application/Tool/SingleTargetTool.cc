@@ -129,7 +129,7 @@ void SingleTargetToolPrivate::handle_active_layer_changed( LayerHandle layer )
   else
   {
     this->tool_->valid_target_state_->set( ( layer->type() & this->target_type_ ) != 0 && 
-      layer->is_valid() );
+      layer->has_valid_data() );
     this->tool_->target_layer_state_->set( this->tool_->valid_target_state_->get() ? 
       layer->get_layer_id() : Tool::NONE_OPTION_C );
       
@@ -142,7 +142,7 @@ void SingleTargetToolPrivate::handle_use_active_layer_changed( bool use_active_l
   if ( use_active_layer )
   {
     LayerHandle layer = LayerManager::Instance()->get_active_layer();
-    this->tool_->valid_target_state_->set( layer && layer->is_valid() &&
+    this->tool_->valid_target_state_->set( layer && layer->has_valid_data() &&
       ( layer->type() & this->target_type_ ) );
     this->tool_->target_layer_state_->set( this->tool_->valid_target_state_->get() ? 
       layer->get_layer_id() : Tool::NONE_OPTION_C );
