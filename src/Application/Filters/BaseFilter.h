@@ -132,7 +132,7 @@ public:
 
   // DISPATCH_DELETE_LAYER:
   // Schedule a layer to be deleted
-  bool dispatch_delete_layer(LayerHandle layer );
+  bool dispatch_delete_layer( LayerHandle layer );
 
   // TODO:
   // These next two functions need to atomically set the provenance information as well

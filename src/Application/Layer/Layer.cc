@@ -54,6 +54,7 @@ class LayerPrivate : public Core::ConnectionHandler
 public:
   void handle_locked_state_changed( bool locked );
   void handle_data_state_changed( std::string data_state );
+  void handle_visible_state_changed( size_t viewer_id, bool visible );
 
   Layer* layer_;
 };
@@ -76,6 +77,15 @@ void LayerPrivate::handle_data_state_changed( std::string data_state )
     this->layer_->update_progress_signal_( 0.0 );
   }
   this->layer_->show_abort_message_state_->set( false );
+}
+
+void LayerPrivate::handle_visible_state_changed( size_t viewer_id, bool visible )
+{
+  if ( ViewerManager::Instance()->get_viewer( viewer_id )->
+    viewer_visible_state_->get() && visible )
+  {
+    this->layer_->master_visible_state_->set( true );
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -155,6 +165,8 @@ void Layer::initialize_states( const std::string& name, bool creating )
       this->visible_state_[ j ], true );
   }
 
+  this->add_state( "visible", this->master_visible_state_, true );
+
   // == The state of the lock ==
   this->add_state( "visual_lock", locked_state_, false );
 
@@ -188,6 +200,13 @@ void Layer::initialize_states( const std::string& name, bool creating )
     boost::bind( &LayerPrivate::handle_locked_state_changed, this->private_, _1 ) ) );
   this->private_->add_connection( this->data_state_->value_changed_signal_.connect( 
     boost::bind( &LayerPrivate::handle_data_state_changed, this->private_, _1 ) ) );
+
+  size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
+  for ( size_t i = 0; i < num_of_viewers; ++i )
+  {
+    this->private_->add_connection( this->visible_state_[ i ]->value_changed_signal_.connect(
+      boost::bind( &LayerPrivate::handle_visible_state_changed, this->private_, i, _1 ) ) );
+  }
 
   this->gui_state_group_.reset( new Core::BooleanStateGroup );
   this->gui_state_group_->add_boolean_state( this->show_information_state_ );
@@ -226,5 +245,11 @@ void Layer::update_progress( double amount, double progress_start /*= 0.0f*/, do
   this->update_progress_signal_( progress_start + amount * progress_amount );
 }
 
-} // end namespace Seg3D
+bool Layer::is_visible( size_t viewer_id ) const
+{
+  lock_type lock( Layer::GetMutex() );
 
+  return this->master_visible_state_->get() && this->visible_state_[ viewer_id ]->get();
+}
+
+} // end namespace Seg3D

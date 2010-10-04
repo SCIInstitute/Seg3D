@@ -815,8 +815,8 @@ void PaintTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
     if ( current_viewer )
     {
       size_t current_viewer_id = current_viewer->get_viewer_id();
-      layer_visible = target_layer->visible_state_[ current_viewer_id ]->get() &&
-        target_layer->get_layer_group()->visibility_state_[ current_viewer_id ]->get();
+      layer_visible = target_layer->is_visible( current_viewer_id ) && 
+        target_layer->has_valid_data();
     }
     
     data_constraint_layer_id = this->data_constraint_layer_state_->get();
@@ -1093,8 +1093,7 @@ bool PaintTool::handle_mouse_press( ViewerHandle viewer,
       size_t viewer_id = this->private_->viewer_->get_viewer_id();
       MaskLayerHandle layer = boost::dynamic_pointer_cast< Core::MaskLayer >(
         LayerManager::Instance()->get_layer_by_id( this->target_layer_state_->get() ) );
-      paintable = layer->get_layer_group()->visibility_state_[ viewer_id ]->get() && 
-        layer->visible_state_[ viewer_id ]->get();
+      paintable = layer->is_visible( viewer_id ) && layer->has_valid_data();
     }
   }
 

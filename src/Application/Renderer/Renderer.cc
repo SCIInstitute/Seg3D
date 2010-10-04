@@ -145,8 +145,7 @@ void RendererPrivate::process_slices( LayerSceneHandle& layer_scene, ViewerHandl
   {
     LayerSceneItemHandle layer_item = ( *layer_scene )[ layer_num ];
     bool layer_visible = false;
-    if ( layer_item->layer_->get_layer_group()->visibility_state_[ this->viewer_id_ ]->get() &&
-      layer_item->layer_->visible_state_[ this->viewer_id_ ]->get() )
+    if ( layer_item->layer_->is_visible( this->viewer_id_ ) )
     {
       Core::VolumeSliceHandle volume_slice = 
         viewer->get_volume_slice( layer_item->layer_id_ );

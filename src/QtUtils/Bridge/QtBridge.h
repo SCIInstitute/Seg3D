@@ -47,6 +47,7 @@
 #include <QtUtils/Widgets/QtSliderDoubleCombo.h>
 #include <QtUtils/Widgets/QtColorButton.h>
 #include <QtUtils/Widgets/QtColorBarWidget.h>
+#include <QtUtils/Widgets/QtTristateToolButton.h>
 
 // Core includes
 #include <Core/State/StateLabeledOption.h>
@@ -79,6 +80,9 @@ public:
   static void Connect(  QAbstractButton* qbutton, 
     std::vector<Core::StateBoolHandle>& state_handles, 
     Core::StateIntSetHandle& index_handle );
+  
+  // Connect a QtTristateToolButton to a tri-option state.
+  static void Connect( QtTristateToolButton* tristate_button, Core::StateOptionHandle& state );
 
   static void Connect( QButtonGroup* qbuttongroup, Core::StateOptionHandle& state_handle );
 

@@ -221,8 +221,16 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
     QtUtils::QtBridge::Connect( this->private_->ui_.selection_checkbox_, 
       layer->selected_state_ );
     QtUtils::QtBridge::Connect( this->private_->ui_.label_, layer->name_state_ );
-    QtUtils::QtBridge::Connect( this->private_->ui_.visibility_button_, layer->visible_state_,
-      ViewerManager::Instance()->active_viewer_state_ );
+
+    QtUtils::QtBridge::Connect( this->private_->ui_.visibility_button_, 
+      layer->master_visible_state_ );
+    QtUtils::QtBridge::Connect( this->private_->ui_.viewer_0_button_, layer->visible_state_[ 0 ] );
+    QtUtils::QtBridge::Connect( this->private_->ui_.viewer_1_button_, layer->visible_state_[ 1 ] );
+    QtUtils::QtBridge::Connect( this->private_->ui_.viewer_2_button_, layer->visible_state_[ 2 ] );
+    QtUtils::QtBridge::Connect( this->private_->ui_.viewer_3_button_, layer->visible_state_[ 3 ] );
+    QtUtils::QtBridge::Connect( this->private_->ui_.viewer_4_button_, layer->visible_state_[ 4 ] );
+    QtUtils::QtBridge::Connect( this->private_->ui_.viewer_5_button_, layer->visible_state_[ 5 ] );
+
     QtUtils::QtBridge::Connect( this->private_->opacity_adjuster_, layer->opacity_state_ );
     QtUtils::QtBridge::Connect( this->private_->ui_.lock_button_, layer->locked_state_ );
     
@@ -264,8 +272,6 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
     QtUtils::QtBridge::Show( this->private_->ui_.viewer_5_button_, 
       ViewerManager::Instance()->get_viewer( 5 )->viewer_visible_state_ );
     
-    
-
     std::vector< Core::StateBaseHandle > enable_states( 2 );
     enable_states[ 0 ] = layer->locked_state_;
     enable_states[ 1 ] = layer->data_state_;
@@ -318,6 +324,31 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
       !boost::lambda::bind( &Core::StateBool::get, layer->locked_state_.get() ) &&
       boost::lambda::bind( &Core::StateBool::get, 
       layer_group->show_delete_menu_state_.get() ) );
+
+    // Control the enable/disable state of the visibility_button_
+    enable_states.clear();
+    size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
+    std::vector< Core::StateBoolHandle > viewer_visible_states( num_of_viewers );
+    for ( size_t i = 0; i < num_of_viewers; ++i )
+    {
+      ViewerHandle viewer = ViewerManager::Instance()->get_viewer( i );
+      viewer_visible_states[ i ] = viewer->viewer_visible_state_;
+      enable_states.push_back( viewer->viewer_visible_state_ );
+      enable_states.push_back( layer->visible_state_[ i ] );
+    }
+    condition = ( boost::lambda::bind( &Core::StateBool::get, viewer_visible_states[ 0 ].get() ) &&
+      boost::lambda::bind( &Core::StateBool::get, layer->visible_state_[ 0 ].get() ) ) ||
+      ( boost::lambda::bind( &Core::StateBool::get, viewer_visible_states[ 1 ].get() ) &&
+      boost::lambda::bind( &Core::StateBool::get, layer->visible_state_[ 1 ].get() ) ) || 
+      ( boost::lambda::bind( &Core::StateBool::get, viewer_visible_states[ 2 ].get() ) &&
+      boost::lambda::bind( &Core::StateBool::get, layer->visible_state_[ 2 ].get() ) ) ||
+      ( boost::lambda::bind( &Core::StateBool::get, viewer_visible_states[ 3 ].get() ) &&
+      boost::lambda::bind( &Core::StateBool::get, layer->visible_state_[ 3 ].get() ) ) ||
+      ( boost::lambda::bind( &Core::StateBool::get, viewer_visible_states[ 4 ].get() ) &&
+      boost::lambda::bind( &Core::StateBool::get, layer->visible_state_[ 4 ].get() ) ) ||
+      ( boost::lambda::bind( &Core::StateBool::get, viewer_visible_states[ 5 ].get() ) &&
+      boost::lambda::bind( &Core::StateBool::get, layer->visible_state_[ 5 ].get() ) );
+    QtUtils::QtBridge::Enable( this->private_->ui_.visibility_button_, enable_states, condition );
 
     switch( this->get_volume_type() )
     {

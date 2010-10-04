@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>205</width>
-    <height>157</height>
+    <height>159</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -340,7 +340,7 @@ QWidget#buttons_{
                 <number>0</number>
                </property>
                <item>
-                <widget class="QToolButton" name="group_visibility_button_">
+                <widget class="QtUtils::QtTristateToolButton" name="group_visibility_button_">
                  <property name="minimumSize">
                   <size>
                    <width>20</width>
@@ -823,6 +823,13 @@ QWidget#buttons_{
   </layout>
  </widget>
  <layoutdefault spacing="2" margin="0"/>
+ <customwidgets>
+  <customwidget>
+   <class>QtUtils::QtTristateToolButton</class>
+   <extends>QToolButton</extends>
+   <header location="global">QtUtils/Widgets/QtTristateToolButton.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../../Resources/QtResources.qrc"/>
  </resources>

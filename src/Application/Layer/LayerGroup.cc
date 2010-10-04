@@ -26,8 +26,13 @@
  DEALINGS IN THE SOFTWARE.
 */
 
+// boost includes
+#include <boost/lambda/lambda.hpp>
+#include <boost/lambda/bind.hpp>
+
 // Core includes
 #include <Core/State/StateEngine.h>
+#include <Core/Utils/ScopedCounter.h>
 
 // Application includes
 #include <Application/Layer/DataLayer.h>
@@ -39,19 +44,143 @@
 namespace Seg3D
 {
 
-LayerGroup::LayerGroup( Core::GridTransform grid_transform ) :
-  StateHandler( "group", true )
-{
-  this->grid_transform_ = grid_transform;
+//////////////////////////////////////////////////////////////////////////
+// Class LayerGroupPrivate
+//////////////////////////////////////////////////////////////////////////
 
-  this->visibility_state_.resize( ViewerManager::Instance()->number_of_viewers() );
-  for ( size_t i = 0; i < this->visibility_state_.size(); ++i )
+class LayerGroupPrivate
+{
+public:
+  void update_layers_visible_state();
+  void handle_layers_visible_state_changed( std::string state );
+
+  LayerGroup* layer_group_;
+  size_t signal_block_count_;
+};
+
+void LayerGroupPrivate::update_layers_visible_state()
+{
+  ASSERT_IS_APPLICATION_THREAD();
+
+  if ( this->signal_block_count_ > 0 )
   {
-    this->add_state( "visible" + Core::ExportToString( i ), this->visibility_state_[ i ], true );
+    return;
   }
+
+  size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
+  size_t total_effective_layers = 0;
+  size_t total_visible_layers = 0;
+
+  layer_list_type::iterator it = this->layer_group_->layer_list_.begin();
+  while ( it != this->layer_group_->layer_list_.end() )
+  {
+    LayerHandle layer = *it;
+    bool layer_visible = false;
+
+    // Check the visibility of the layer in all the current visible viewers
+    // and make sure it's visible in at least one
+    for ( size_t i = 0; i < num_of_viewers; ++i )
+    {
+      ViewerHandle viewer = ViewerManager::Instance()->get_viewer( i );
+      if ( viewer->viewer_visible_state_->get() &&
+        layer->visible_state_[ i ]->get() )
+      {
+        layer_visible = true;
+        break;
+      }
+    }
+    
+    if ( layer_visible )
+    {
+      ++total_effective_layers;
+      if ( layer->master_visible_state_->get() )
+      {
+        ++total_visible_layers;
+      }
+    }
+    
+    ++it;
+  }
+
+  std::string state;
+  if ( total_visible_layers == 0 )
+  {
+    state = "none";
+  }
+  else if ( total_visible_layers == total_effective_layers )
+  {
+    state = "all";
+  }
+  else
+  {
+    state = "some";
+  }
+
+  {
+    Core::ScopedCounter signal_block( this->signal_block_count_ );
+    this->layer_group_->layers_visible_state_->set( state );
+  }
+}
+
+void LayerGroupPrivate::handle_layers_visible_state_changed( std::string state )
+{
+  if ( this->signal_block_count_ > 0 || state == "some" )
+  {
+    return;
+  }
+  
+  bool visible = state ==  "all";
+
+  Core::ScopedCounter signal_block( this->signal_block_count_ );
+
+  size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
+  layer_list_type::iterator it = this->layer_group_->layer_list_.begin();
+  while ( it != this->layer_group_->layer_list_.end() )
+  {
+    LayerHandle layer = *it;
+    bool layer_visible = false;
+
+    // Check the visibility of the layer in all the current visible viewers
+    // and make sure it's visible in at least one
+    for ( size_t i = 0; i < num_of_viewers; ++i )
+    {
+      ViewerHandle viewer = ViewerManager::Instance()->get_viewer( i );
+      if ( viewer->viewer_visible_state_->get() &&
+        layer->visible_state_[ i ]->get() )
+      {
+        layer_visible = true;
+        break;
+      }
+    }
+
+    if ( layer_visible )
+    {
+      layer->master_visible_state_->set( visible );
+    }
+
+    ++it;
+  }
+}
+
+
+
+//////////////////////////////////////////////////////////////////////////
+// Class LayerGroup
+//////////////////////////////////////////////////////////////////////////
+
+LayerGroup::LayerGroup( Core::GridTransform grid_transform ) :
+  StateHandler( "group", true ),
+  private_( new LayerGroupPrivate )
+{
+  this->private_->layer_group_ = this;
+  this->private_->signal_block_count_ = 0;
+
+  this->grid_transform_ = grid_transform;
   
   this->add_state( "isosurface_quality", this->isosurface_quality_state_, 
     "1.0", "1.0|0.5|0.25|0.125" );
+
+  this->add_state( "layers_visible", this->layers_visible_state_, "all", "none|some|all" );
 
   Core::Point dimensions( static_cast< double>( grid_transform.get_nx() ), 
     static_cast< double>( grid_transform.get_ny() ), 
@@ -70,6 +199,16 @@ LayerGroup::LayerGroup( Core::GridTransform grid_transform ) :
   this->gui_state_group_.reset( new Core::BooleanStateGroup );
   this->gui_state_group_->add_boolean_state( this->show_delete_menu_state_ );
   this->gui_state_group_->add_boolean_state( this->show_iso_menu_state_ );
+
+  size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
+  for ( size_t i = 0; i < num_of_viewers; ++i )
+  {
+    this->add_connection( ViewerManager::Instance()->get_viewer( i )->viewer_visible_state_->
+      state_changed_signal_.connect( boost::bind( 
+      &LayerGroupPrivate::update_layers_visible_state, this->private_ ) ) );
+  }
+  this->add_connection( this->layers_visible_state_->value_changed_signal_.connect(
+    boost::bind( &LayerGroupPrivate::handle_layers_visible_state_changed, this->private_, _1 ) ) );
 }
 
 LayerGroup::~LayerGroup()
@@ -83,19 +222,28 @@ void LayerGroup::insert_layer( LayerHandle new_layer )
   if( new_layer->type() == Core::VolumeType::MASK_E )
   { 
     this->layer_list_.push_front( new_layer );
-    return;
+  }
+  else
+  {
+    layer_list_type::iterator it = std::find_if( this->layer_list_.begin(), 
+      this->layer_list_.end(), boost::lambda::bind( &Layer::type, 
+      boost::lambda::bind( &LayerHandle::get, boost::lambda::_1 ) ) 
+      == Core::VolumeType::DATA_E );
+    this->layer_list_.insert( it, new_layer );
   }
     
-  for( layer_list_type::iterator i = this->layer_list_.begin(); 
-    i != this->layer_list_.end(); ++i )
+  // NOTE: LayerGroup will always out live layers, so it's safe to not keep track
+  // of the following connections.
+  new_layer->master_visible_state_->state_changed_signal_.connect( boost::bind(
+    &LayerGroupPrivate::update_layers_visible_state, this->private_ ) );
+  size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
+  for ( size_t i = 0; i < num_of_viewers; ++i )
   {
-    if( ( *i )->type() == Core::VolumeType::DATA_E )
-    {
-      this->layer_list_.insert( ( i ), new_layer );
-      return;
-    }
+    new_layer->visible_state_[ i ]->state_changed_signal_.connect( boost::bind(
+      &LayerGroupPrivate::update_layers_visible_state, this->private_ ) );
   }
-  this->layer_list_.push_back( new_layer );
+
+  this->private_->update_layers_visible_state();
 }
 
 
@@ -114,6 +262,7 @@ void LayerGroup::move_layer_above( LayerHandle layer_above, LayerHandle layer_be
 void LayerGroup::delete_layer( LayerHandle layer )
 {
   layer_list_.remove( layer );
+  this->private_->update_layers_visible_state();
 }
 
 void LayerGroup::get_layer_names( std::vector< LayerIDNamePair >& layer_names, 

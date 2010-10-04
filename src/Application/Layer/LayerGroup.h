@@ -56,6 +56,9 @@
 namespace Seg3D
 {
 
+class LayerGroupPrivate;
+typedef boost::shared_ptr< LayerGroupPrivate > LayerGroupPrivateHandle;
+
 // CLASS LayerGroup
 // This is the class that records the layers that are grouped together
 
@@ -65,6 +68,7 @@ typedef std::list< LayerHandle > layer_list_type;
 // Class definition
 class LayerGroup : public Core::StateHandler
 {
+  friend class LayerGroupPrivate;
 
   // -- constructor/destructor --
 public:
@@ -79,11 +83,13 @@ public:
   Core::StateOptionHandle isosurface_quality_state_;
 
   // = Group visibility =
-  std::vector< Core::StateBoolHandle > visibility_state_;
+  //std::vector< Core::StateBoolHandle > visibility_state_;
 
   Core::StatePointHandle dimensions_state_;
   Core::StatePointHandle origin_state_;
   Core::StatePointHandle spacing_state_;
+
+  Core::StateOptionHandle layers_visible_state_;
 
   // -- GUI related states --
 public:
@@ -171,6 +177,8 @@ private:
 
   // An exclusive group of boolean states that control the visibility of different parts
   Core::BooleanStateGroupHandle gui_state_group_;
+
+  LayerGroupPrivateHandle private_;
 };
 
 } // end namespace Seg3D

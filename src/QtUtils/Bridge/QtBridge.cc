@@ -61,6 +61,7 @@
 #include <QtUtils/Bridge/detail/QtShowConnector.h>
 #include <QtUtils/Bridge/detail/QtLabelConnector.h>
 #include <QtUtils/Bridge/detail/QtPlainTextEditConnector.h>
+#include <QtUtils/Bridge/detail/QtTristateToolButtonConnector.h>
 
 namespace QtUtils
 {
@@ -193,6 +194,11 @@ void QtBridge::Connect( QLabel* qlabel, Core::StateBaseHandle state )
 void QtBridge::Connect( QPlainTextEdit* qwidget, Core::StateStringHandle& state )
 {
   new QtPlainTextEditConnector( qwidget, state );
+}
+
+void QtBridge::Connect( QtTristateToolButton* tristate_button, Core::StateOptionHandle& state )
+{
+  new QtTristateToolButtonConnector( tristate_button, state );
 }
 
 void QtBridge::Enable( QWidget* qwidget, Core::StateBoolHandle& state, bool opposite_logic )

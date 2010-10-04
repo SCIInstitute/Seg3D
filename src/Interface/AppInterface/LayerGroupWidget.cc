@@ -137,7 +137,18 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   connect( this->private_->ui_.select_all_button_, SIGNAL( released() ), this, 
     SLOT( hide_show_checkboxes() ) );
   
-  
+  // Set the icons for the group visibility button
+  QIcon none_visible_icon;
+  none_visible_icon.addFile( QString::fromUtf8( ":/Images/VisibleOff.png" ), QSize(), QIcon::Normal );
+  QIcon some_visible_icon;
+  some_visible_icon.addFile( QString::fromUtf8( ":/Images/VisibleGray.png" ), QSize(), QIcon::Normal );
+  QIcon all_visible_icon;
+  all_visible_icon.addFile( QString::fromUtf8( ":/Images/VisibleWhite.png" ), QSize(), QIcon::Normal );
+  this->private_->ui_.group_visibility_button_->set_icons( none_visible_icon, 
+    some_visible_icon, all_visible_icon );
+  QtUtils::QtBridge::Connect( this->private_->ui_.group_visibility_button_, 
+    group->layers_visible_state_ );
+
   //Set the default values for the Group UI and make the connections to the state engine
       // --- GENERAL ---
   QtUtils::QtBridge::Connect( this->private_->ui_.group_iso_button_, 
@@ -148,9 +159,6 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   QtUtils::QtBridge::Show( this->private_->ui_.iso_quality_, group->show_iso_menu_state_ ); 
   QtUtils::QtBridge::Show( this->private_->ui_.delete_, group->show_delete_menu_state_ );
   
-    QtUtils::QtBridge::Connect( this->private_->ui_.group_visibility_button_, 
-    this->private_->group_->visibility_state_, 
-    ViewerManager::Instance()->active_viewer_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.group_new_button_, 
     boost::bind( &ActionNewMaskLayer::Dispatch, 
     Core::Interface::GetWidgetActionContext(), this->private_->group_ ) );

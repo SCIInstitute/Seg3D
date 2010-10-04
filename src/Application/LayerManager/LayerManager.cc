@@ -592,10 +592,10 @@ LayerSceneHandle LayerManager::compose_layer_scene( size_t viewer_id )
   group_list_type::reverse_iterator group_iterator = this->group_list_.rbegin();
   for ( ; group_iterator != this->group_list_.rend(); group_iterator++)
   {
-    if ( !( *group_iterator )->visibility_state_[ viewer_id ]->get() )
-    {
-      continue;
-    }
+//    if ( !( *group_iterator )->visibility_state_[ viewer_id ]->get() )
+//    {
+//      continue;
+//    }
     
     layer_list_type layer_list = ( *group_iterator )->get_layer_list();
 
@@ -608,7 +608,7 @@ LayerSceneHandle LayerManager::compose_layer_scene( size_t viewer_id )
       // Skip processing this layer if it's not visible or that is not valid.
       // NOTE: Layers that are not valid include the layers that are currently
       // under construction.
-      if ( !layer->visible_state_[ viewer_id ]->get() || !layer->has_valid_data() )
+      if ( !layer->is_visible( viewer_id ) || !layer->has_valid_data() )
       {
         continue;
       }

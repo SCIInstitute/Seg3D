@@ -106,6 +106,10 @@ public:
   // Update the progress bar associated with this layer
   void update_progress( double amount, double progress_start = 0.0f, double progress_amount = 1.0f ); 
   
+  // IS_VISIBLE:
+  // Returns true if the layer is visible in the specified viewer, otherwise false;
+  bool is_visible( size_t viewer_id ) const;
+
   // -- layer progress signals --
 public:
 
@@ -139,6 +143,9 @@ public:
 
   // Per viewer state of whether this layer is visible
   std::vector< Core::StateBoolHandle > visible_state_;
+
+  // Master state of the layer visibility
+  Core::StateBoolHandle master_visible_state_;
 
   // State indicating whether the layer is locked
   Core::StateBoolHandle locked_state_;
