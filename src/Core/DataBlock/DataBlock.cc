@@ -250,6 +250,8 @@ bool DataBlock::update_histogram()
     case DataType::DOUBLE_E:
       return this->histogram_.compute( reinterpret_cast<double*>( get_data() ), get_size() );
   }
+
+  return false;
 }
 
 void DataBlock::update_data_type( DataType type )

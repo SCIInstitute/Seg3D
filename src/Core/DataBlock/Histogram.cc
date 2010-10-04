@@ -576,7 +576,7 @@ bool Histogram::compute( const float* data, size_t size )
       this->bin_start_ = this->min_ - ( this->bin_size_ * 0.5 );  
     }
 
-    float inv_bin_size = 1.0f / this->bin_size_;
+    float inv_bin_size = static_cast< float >( 1.0f / this->bin_size_ );
     for ( size_t j = 1 ; j < size ; j++ )
     {
       size_t idx = static_cast<size_t>( ( data[j] - float_min ) * inv_bin_size );
@@ -744,7 +744,7 @@ bool ImportFromString( const std::string& str, Histogram& value )
     value.histogram_.resize( values.size() - 6 );
     for ( size_t j = 0; j < value.histogram_.size(); j++ )
     {
-      value.histogram_[ j ] = values[ j - 6 ];
+      value.histogram_[ j ] = static_cast< size_t >( values[ j - 6 ] );
     }
     return true;
   }

@@ -86,11 +86,20 @@ public:
   virtual void run();
 
   // GET_FITLER_NAME:
-  // The name of the filter, this information is used for generating new layer labels.
+  // This functions returns the name of the filter that is used in the error report.
   virtual std::string get_filter_name() const
+  {
+    return "Transform Tool";
+  }
+
+  // GET_LAYER_PREFIX:
+  // This function returns the name of the filter. The latter is prepended to the new layer name, 
+  // when a new layer is generated. 
+  virtual std::string get_layer_prefix() const
   {
     return "Transform";
   }
+
 };
 
 void TransformAlgo::run()
