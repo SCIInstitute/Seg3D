@@ -45,7 +45,7 @@ class FillHolesFilter : public SeedPointsTool
 SEG3D_TOOL(
 SEG3D_TOOL_NAME( "FillHolesFilter", "Fill all the holes not marked with a seed point" )
 SEG3D_TOOL_MENULABEL( "Fill Holes" )
-SEG3D_TOOL_MENU( "Filters" )
+SEG3D_TOOL_MENU( "Basic Filters" )
 SEG3D_TOOL_SHORTCUT_KEY( "Alt+Shift+F" )
 SEG3D_TOOL_URL( "http://seg3d.org/" )
 )

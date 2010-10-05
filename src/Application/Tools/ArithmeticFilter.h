@@ -39,7 +39,7 @@ class ArithmeticFilter : public SingleTargetTool
 SEG3D_TOOL(
 SEG3D_TOOL_NAME( "ArithmeticFilter", "Filter for evaluating an expression on data" )
 SEG3D_TOOL_MENULABEL( "Arithmetic" )
-SEG3D_TOOL_MENU( "Filters" )
+SEG3D_TOOL_MENU( "Basic Filters" )
 SEG3D_TOOL_SHORTCUT_KEY( "Alt+Shift+A" )
 SEG3D_TOOL_URL( "http://seg3d.org/" )
 )

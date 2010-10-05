@@ -40,7 +40,7 @@ class NeighborhoodConnectedFilter : public SeedPointsTool
 SEG3D_TOOL(
   SEG3D_TOOL_NAME( "NeighborhoodConnectedFilter", "Define mask based on value range connected to seed points" )
   SEG3D_TOOL_MENULABEL( "Neighborhood Connected" )
-  SEG3D_TOOL_MENU( "Filters" )
+  SEG3D_TOOL_MENU( "Basic Filters" )
   SEG3D_TOOL_SHORTCUT_KEY( "Alt+N" )
   SEG3D_TOOL_URL( "http://seg3d.org/" )
 )
