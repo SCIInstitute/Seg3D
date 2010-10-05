@@ -39,7 +39,7 @@
 #include <list>
 
 // Boost includes 
-#include <boost/shared_ptr.hpp>
+#include <boost/smart_ptr.hpp>
 #include <boost/thread/mutex.hpp>
 
 // Core includes
@@ -66,7 +66,7 @@ typedef boost::shared_ptr< LayerGroupPrivate > LayerGroupPrivateHandle;
 typedef std::list< LayerHandle > layer_list_type;
 
 // Class definition
-class LayerGroup : public Core::StateHandler
+class LayerGroup : public Core::StateHandler, public boost::enable_shared_from_this< LayerGroup >
 {
   friend class LayerGroupPrivate;
 
@@ -74,7 +74,13 @@ class LayerGroup : public Core::StateHandler
 public:
 
   LayerGroup( Core::GridTransform grid_transform );
+  LayerGroup( const std::string& state_id );
   virtual ~LayerGroup();
+  
+private:
+  // INITIALIZE_STATES:
+  // This function sets the initial states of the layer, and returns true if successful
+  void initialize_states();
 
   // -- state variables --
 public:
@@ -98,6 +104,8 @@ public:
 
   // Whether to show the delete layers menu
   Core::StateBoolHandle show_delete_menu_state_;
+  
+  Core::StateStringHandle group_widget_layer_label_state_;
   
   // -- Layers contained within group --
 protected:
@@ -132,6 +140,17 @@ protected:
   // FLIP_LAYER:
   // Performs a flip or rotate on the selected layers based on which layers were selected
   void flip_layer();
+  
+protected:
+  // POST_SAVE_STATES:
+  // This function is called after the LayerGroup's states have been saved and then
+  // tells the layers to save their states as well.
+  virtual bool post_save_states( Core::StateIO& state_io );
+  
+  // POST_LOAD_STATES:
+  // this function creates the layers who's information was saved to file, and then tells them
+  // to populate their state variables from file
+  virtual bool post_load_states( const Core::StateIO& state_io );
   
   // -- Group transformation information --
 public:

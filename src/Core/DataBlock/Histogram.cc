@@ -744,7 +744,7 @@ bool ImportFromString( const std::string& str, Histogram& value )
     value.histogram_.resize( values.size() - 6 );
     for ( size_t j = 0; j < value.histogram_.size(); j++ )
     {
-      value.histogram_[ j ] = static_cast< size_t >( values[ j - 6 ] );
+      value.histogram_[ j ] = static_cast< size_t >( values[ j + 6 ] );
     }
     return true;
   }

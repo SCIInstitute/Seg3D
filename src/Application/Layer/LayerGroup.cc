@@ -26,12 +26,14 @@
  DEALINGS IN THE SOFTWARE.
 */
 
+
 // boost includes
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
 
 // Core includes
 #include <Core/State/StateEngine.h>
+#include <Core/State/StateIO.h>
 #include <Core/Utils/ScopedCounter.h>
 
 // Application includes
@@ -44,9 +46,9 @@
 namespace Seg3D
 {
 
-//////////////////////////////////////////////////////////////////////////
-// Class LayerGroupPrivate
-//////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////
+  // Class LayerGroupPrivate
+  //////////////////////////////////////////////////////////////////////////
 
 class LayerGroupPrivate
 {
@@ -89,7 +91,7 @@ void LayerGroupPrivate::update_layers_visible_state()
         break;
       }
     }
-    
+
     if ( layer_visible )
     {
       ++total_effective_layers;
@@ -98,7 +100,7 @@ void LayerGroupPrivate::update_layers_visible_state()
         ++total_visible_layers;
       }
     }
-    
+
     ++it;
   }
 
@@ -128,7 +130,7 @@ void LayerGroupPrivate::handle_layers_visible_state_changed( std::string state )
   {
     return;
   }
-  
+
   bool visible = state ==  "all";
 
   Core::ScopedCounter signal_block( this->signal_block_count_ );
@@ -163,7 +165,6 @@ void LayerGroupPrivate::handle_layers_visible_state_changed( std::string state )
 }
 
 
-
 //////////////////////////////////////////////////////////////////////////
 // Class LayerGroup
 //////////////////////////////////////////////////////////////////////////
@@ -174,23 +175,44 @@ LayerGroup::LayerGroup( Core::GridTransform grid_transform ) :
 {
   this->private_->layer_group_ = this;
   this->private_->signal_block_count_ = 0;
-
   this->grid_transform_ = grid_transform;
+  this->initialize_states();
   
+}
+
+LayerGroup::LayerGroup( const std::string& state_id ) :
+  StateHandler( state_id, false ),
+  private_( new LayerGroupPrivate )
+{
+  this->private_->layer_group_ = this;
+  this->private_->signal_block_count_ = 0;
+  this->grid_transform_ = Core::GridTransform( 1, 1, 1 );
+  this->initialize_states();
+}
+
+
+LayerGroup::~LayerGroup()
+{
+  // Disconnect all current connections
+  this->disconnect_all();
+}
+
+void LayerGroup::initialize_states()
+{
   this->add_state( "isosurface_quality", this->isosurface_quality_state_, 
     "1.0", "1.0|0.5|0.25|0.125" );
 
   this->add_state( "layers_visible", this->layers_visible_state_, "all", "none|some|all" );
 
-  Core::Point dimensions( static_cast< double>( grid_transform.get_nx() ), 
-    static_cast< double>( grid_transform.get_ny() ), 
-    static_cast< double>( grid_transform.get_nz() ) );
+  Core::Point dimensions( static_cast< double>( this->grid_transform_.get_nx() ), 
+    static_cast< double>( this->grid_transform_.get_ny() ), 
+    static_cast< double>( this->grid_transform_.get_nz() ) );
   this->add_state( "dimensions", this->dimensions_state_, dimensions );
 
-  this->add_state( "origin", this->origin_state_, grid_transform * Core::Point( 0, 0, 0 ) );
+  this->add_state( "origin", this->origin_state_, this->grid_transform_ * Core::Point( 0, 0, 0 ) );
 
   Core::Vector spacing( 1, 1, 1 );
-  spacing = grid_transform * spacing;
+  spacing = this->grid_transform_ * spacing;
   this->add_state( "spacing", this->spacing_state_, Core::Point( spacing ) );
 
   this->add_state( "show_iso_menu", this->show_iso_menu_state_, false );
@@ -211,14 +233,11 @@ LayerGroup::LayerGroup( Core::GridTransform grid_transform ) :
     boost::bind( &LayerGroupPrivate::handle_layers_visible_state_changed, this->private_, _1 ) ) );
 }
 
-LayerGroup::~LayerGroup()
-{
-  // Disconnect all current connections
-  this->disconnect_all();
-}
 
 void LayerGroup::insert_layer( LayerHandle new_layer )
-{
+{ 
+  new_layer->set_layer_group( this->shared_from_this() );
+
   if( new_layer->type() == Core::VolumeType::MASK_E )
   { 
     this->layer_list_.push_front( new_layer );
@@ -231,7 +250,7 @@ void LayerGroup::insert_layer( LayerHandle new_layer )
       == Core::VolumeType::DATA_E );
     this->layer_list_.insert( it, new_layer );
   }
-    
+
   // NOTE: LayerGroup will always out live layers, so it's safe to not keep track
   // of the following connections.
   new_layer->master_visible_state_->state_changed_signal_.connect( boost::bind(
@@ -295,6 +314,80 @@ void LayerGroup::get_layer_names( std::vector< LayerIDNamePair >& layer_names,
         ( *it )->get_layer_name() ) );
     }
   }
+}
+
+bool LayerGroup::post_save_states( Core::StateIO& state_io )
+{
+  TiXmlElement* lm_element = state_io.get_current_element();
+  assert( this->get_statehandler_id() == lm_element->Value() );
+
+  TiXmlElement* layers_element = new TiXmlElement( "layers" );
+  lm_element->LinkEndChild( layers_element );
+
+  state_io.push_current_element();
+  state_io.set_current_element( layers_element );
+  
+  layer_list_type::reverse_iterator it = this->layer_list_.rbegin();
+  for ( ; it != this->layer_list_.rend(); it++ )
+  {
+    ( *it )->save_states( state_io );
+  }
+  
+  state_io.pop_current_element();
+  return true;
+}
+
+bool LayerGroup::post_load_states( const Core::StateIO& state_io )
+{
+  const TiXmlElement* layers_element = state_io.get_current_element()->
+    FirstChildElement( "layers" );
+  if ( layers_element == 0 )
+  {
+    return false;
+  }
+
+  state_io.push_current_element();
+  state_io.set_current_element( layers_element );
+
+  bool success = true;
+  const TiXmlElement* layer_element = layers_element->FirstChildElement();
+  while ( layer_element != 0 )
+  {
+    std::string layer_id( layer_element->Value() );
+    std::string layer_type( layer_element->Attribute( "type" ) );
+    LayerHandle layer;
+    if ( layer_type == "data" )
+    {
+      layer.reset( new DataLayer( layer_id ) );
+    }
+    else if ( layer_type == "mask" )
+    {
+      layer.reset( new MaskLayer( layer_id ) );
+    }
+    else
+    {
+      CORE_LOG_ERROR( "Unsupported layer type" );
+    }
+
+    if ( layer && layer->load_states( state_io ) )
+    {
+      if( this->layer_list_.empty() )
+      {
+        this->grid_transform_ = layer->get_grid_transform();
+      }
+      this->insert_layer( layer );
+    }
+    else
+    {
+      success = false;
+    }
+
+    layer_element = layer_element->NextSiblingElement();
+  }
+
+  state_io.pop_current_element();
+  
+  return success;
 }
 
 } // end namespace Seg3D

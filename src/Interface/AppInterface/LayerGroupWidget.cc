@@ -65,8 +65,6 @@ public:
   LayerGroupHandle group_;
   
   Ui::LayerGroupWidget ui_;
-  
-  PushDragButton* activate_button_;
   DropSpaceWidget* drop_space_;
   OverlayWidget* overlay_;
 
@@ -95,25 +93,13 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   this->private_->ui_.iso_quality_->hide();
   this->private_->ui_.delete_->hide();
 
-  //add the PushDragButton
-  this->private_->activate_button_ = new PushDragButton( this->private_->ui_.group_header_ );
-  this->private_->activate_button_->setObjectName( QString::fromUtf8( "activate_button_" ) );
-  this->private_->activate_button_->setStyleSheet( StyleSheet::GROUP_PUSHDRAGBUTTON_C );
-  QSizePolicy sizePolicy( QSizePolicy::Preferred, QSizePolicy::Fixed );
-  sizePolicy.setHeightForWidth( 
-    this->private_->activate_button_->sizePolicy().hasHeightForWidth() );
-    this->private_->activate_button_->setSizePolicy( sizePolicy );
-    this->private_->activate_button_->setMinimumSize( QSize( 152, 21 ) );
-    this->private_->activate_button_->setCheckable( false );
-    this->private_->activate_button_->setFlat( true );
-  this->private_->ui_.horizontalLayout->insertWidget( 2, this->private_->activate_button_ );
 
   // set some values of the GUI
   std::string group_name = Core::ExportToString( 
     this->private_->group_->get_grid_transform().get_nx() ) + " x " +
     Core::ExportToString( this->private_->group_->get_grid_transform().get_ny() ) + " x " +
     Core::ExportToString( this->private_->group_->get_grid_transform().get_nz() );
-  this->private_->activate_button_->setText( QString::fromStdString( group_name ) );
+  this->private_->ui_.group_dimensions_label_->setText( QString::fromStdString( group_name ) );
 
   this->private_->drop_space_ = new DropSpaceWidget( this, 105 );
   this->private_->ui_.verticalLayout_12->insertWidget( 0, this->private_->drop_space_ );
@@ -167,7 +153,6 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   QtUtils::QtBridge::Connect( this->private_->iso_quality_button_group_, 
     this->private_->group_->isosurface_quality_state_ );
 
-/*  this->setMinimumHeight( 0 );*/
   this->private_->ui_.group_frame_layout_->setAlignment( Qt::AlignTop );
   this->private_->ui_.group_frame_layout_->setSpacing( 1 );
   this->private_->ui_.verticalLayout_13->setAlignment( Qt::AlignTop );

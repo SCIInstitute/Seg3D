@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>205</width>
+    <width>274</width>
     <height>159</height>
    </rect>
   </property>
@@ -23,6 +23,11 @@
   border-radius: 4px;
 }
 
+
+QLabel#group_dimensions_label_{
+  color: white;
+  font: bold;
+}
 QTabWidget::tab-bar {
   left: 5px;
  }
@@ -234,16 +239,7 @@ QWidget#buttons_{
          <property name="spacing">
           <number>0</number>
          </property>
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <property name="rightMargin">
-          <number>1</number>
-         </property>
-         <property name="bottomMargin">
+         <property name="margin">
           <number>0</number>
          </property>
          <item>
@@ -266,11 +262,20 @@ QWidget#buttons_{
              <height>21</height>
             </size>
            </property>
-           <layout class="QHBoxLayout" name="horizontalLayout">
+           <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0">
             <property name="spacing">
              <number>0</number>
             </property>
-            <property name="margin">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>6</number>
+            </property>
+            <property name="bottomMargin">
              <number>0</number>
             </property>
             <item>
@@ -310,16 +315,33 @@ QWidget#buttons_{
              </widget>
             </item>
             <item>
-             <widget class="QWidget" name="widget" native="true">
+             <widget class="QtUtils::QtTristateToolButton" name="group_visibility_button_" native="true">
               <property name="minimumSize">
                <size>
-                <width>25</width>
-                <height>20</height>
+                <width>21</width>
+                <height>21</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>25</width>
+                <width>21</width>
+                <height>21</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Turn on or off the group's visibility</string>
+              </property>
+              <property name="text" stdset="0">
+               <string/>
+              </property>
+              <property name="icon" stdset="0">
+               <iconset resource="../../Resources/QtResources.qrc">
+                <normaloff>:/Images/VisibleOff.png</normaloff>
+                <normalon>:/Images/VisibleWhite.png</normalon>:/Images/VisibleOff.png</iconset>
+              </property>
+              <property name="iconSize" stdset="0">
+               <size>
+                <width>20</width>
                 <height>20</height>
                </size>
               </property>
@@ -339,43 +361,27 @@ QWidget#buttons_{
                <property name="bottomMargin">
                 <number>0</number>
                </property>
-               <item>
-                <widget class="QtUtils::QtTristateToolButton" name="group_visibility_button_">
-                 <property name="minimumSize">
-                  <size>
-                   <width>20</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                 <property name="maximumSize">
-                  <size>
-                   <width>20</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                 <property name="toolTip">
-                  <string>Turn on or off the group's visibility</string>
-                 </property>
-                 <property name="text">
-                  <string/>
-                 </property>
-                 <property name="icon">
-                  <iconset resource="../../Resources/QtResources.qrc">
-                   <normaloff>:/Images/VisibleOff.png</normaloff>
-                   <normalon>:/Images/VisibleWhite.png</normalon>:/Images/VisibleOff.png</iconset>
-                 </property>
-                 <property name="iconSize">
-                  <size>
-                   <width>20</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                 <property name="checkable">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
               </layout>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QLabel" name="group_dimensions_label_">
+              <property name="text">
+               <string>TextLabel</string>
+              </property>
              </widget>
             </item>
            </layout>
@@ -470,7 +476,7 @@ QWidget#buttons_{
                 <height>27</height>
                </size>
               </property>
-              <layout class="QHBoxLayout" name="horizontalLayout_2">
+              <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,0,1">
                <property name="spacing">
                 <number>4</number>
                </property>
@@ -826,7 +832,7 @@ QWidget#buttons_{
  <customwidgets>
   <customwidget>
    <class>QtUtils::QtTristateToolButton</class>
-   <extends>QToolButton</extends>
+   <extends>QWidget</extends>
    <header location="global">QtUtils/Widgets/QtTristateToolButton.h</header>
   </customwidget>
  </customwidgets>

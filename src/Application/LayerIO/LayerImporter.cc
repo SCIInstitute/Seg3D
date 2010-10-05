@@ -137,8 +137,8 @@ bool LayerImporter::import_layer( LayerImporterMode mode, std::vector< LayerHand
   }
   
   Core::DataVolumeHandle src_volume( new Core::DataVolume( grid_transform, data_block ) );
-  Core::DataVolumeHandle canonical_vol;
-  Core::DataVolume::ConvertToCanonicalVolume( src_volume, canonical_vol );
+  Core::DataVolumeHandle canonical_vol = src_volume;
+//  Core::DataVolume::ConvertToCanonicalVolume( src_volume, canonical_vol );
 
   switch ( mode )
   {

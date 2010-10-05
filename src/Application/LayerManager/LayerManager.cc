@@ -32,21 +32,10 @@
 // Boost includes 
 #include <boost/lexical_cast.hpp>
 
-//ITK includes
-//#include "itkImageSeriesWriter.h"
-//#include "itkGDCMSeriesFileNames.h"
-//#include "itkGDCMImageIO.h"
-//#include "itkNumericSeriesFileNames.h"
-
 // Core includes
-// #include <Core/DataBlock/ITKImageData.h>
-// #include <Core/DataBlock/ITKDataBlock.h>
 #include <Core/Application/Application.h>
 #include <Core/Interface/Interface.h>
-/*#include <Core/Volume/Volume.h>*/
- #include <Core/DataBlock/MaskDataBlockManager.h>
-// #include <Core/DataBlock/NrrdData.h>
-/*#include <Core/DataBlock/StdDataBlock.h>*/
+#include <Core/DataBlock/MaskDataBlockManager.h>
 
 // Application includes
 #include <Application/Layer/LayerGroup.h>
@@ -118,8 +107,6 @@ bool LayerManager::insert_layer( LayerHandle layer )
     
     group_handle->insert_layer( layer );
       
-    layer->set_layer_group( group_handle );
-
     // Connect to the value_changed_signal of layer name
     // NOTE: LayerManager will always out-live layers, so it's safe to not disconnect.
     layer->name_state_->value_changed_signal_.connect( boost::bind(
@@ -745,23 +732,18 @@ bool LayerManager::post_save_states( Core::StateIO& state_io )
 {
   TiXmlElement* lm_element = state_io.get_current_element();
   assert( this->get_statehandler_id() == lm_element->Value() );
-  TiXmlElement* layers_element = new TiXmlElement( "layers" );
-  lm_element->LinkEndChild( layers_element );
-
+  
+  TiXmlElement* groups_element = new TiXmlElement( "groups" );
+  lm_element->LinkEndChild( groups_element );
+  
   state_io.push_current_element();
-  state_io.set_current_element( layers_element );
-
-  std::vector< LayerHandle > layers;
-  this->get_layers( layers );
-
-  //for( size_t i = 0; i < layers.size(); ++i )
-  int number_of_layers = static_cast< int >( layers.size() );
+  state_io.set_current_element( groups_element );
   
-  for( int i = ( number_of_layers - 1 ); i >= 0; i-- )
+  for( group_list_type::reverse_iterator i = group_list_.rbegin(); 
+    i != group_list_.rend(); ++i )
   {
-    layers[ i ]->save_states( state_io );
+    ( *i )->save_states( state_io );
   }
-  
 
   state_io.pop_current_element();
 
@@ -776,46 +758,42 @@ bool LayerManager::pre_load_states( const Core::StateIO& state_io )
 
 bool LayerManager::post_load_states( const Core::StateIO& state_io )
 {
-  const TiXmlElement* layers_element = state_io.get_current_element()->
-    FirstChildElement( "layers" );
-  if ( layers_element == 0 )
+  bool success = true;
+  
+  const TiXmlElement* groups_element = state_io.get_current_element()->
+    FirstChildElement( "groups" );
+  if ( groups_element == 0 )
   {
     return false;
   }
 
   state_io.push_current_element();
-  state_io.set_current_element( layers_element );
+  state_io.set_current_element( groups_element );
 
-  bool success = true;
-  const TiXmlElement* layer_element = layers_element->FirstChildElement();
-  while ( layer_element != 0 )
+  
+  const TiXmlElement* group_element = groups_element->FirstChildElement();
+  while ( group_element != 0 )
   {
-    std::string layer_id( layer_element->Value() );
-    std::string layer_type( layer_element->Attribute( "type" ) );
-    LayerHandle layer;
-    if ( layer_type == "data" )
-    {
-      layer.reset( new DataLayer( layer_id ) );
-    }
-    else if ( layer_type == "mask" )
-    {
-      layer.reset( new MaskLayer( layer_id ) );
-    }
-    else
-    {
-      CORE_LOG_ERROR( "Unsupported layer type" );
-    }
+    std::string group_id( group_element->Value() );
+    
+    LayerGroupHandle group;
+    group.reset( new LayerGroup( group_id ) );
 
-    if ( layer && layer->load_states( state_io ) )
+    if ( group->load_states( state_io ) )
     {
-      this->insert_layer( layer );
+      this->group_list_.push_front( group );
+      this->group_inserted_signal_( group );
+      
+      layer_list_type layer_list = group->get_layer_list();
+      layer_list_type::iterator it = layer_list.begin();
+      for ( ; it != layer_list.end(); it++ )
+      {
+        this->layer_inserted_signal_( ( *it ) );
+        this->layers_changed_signal_();
+      }
     }
-    else
-    {
-      success = false;
-    }
-
-    layer_element = layer_element->NextSiblingElement();
+    
+    group_element = group_element->NextSiblingElement();
   }
 
   state_io.pop_current_element();
@@ -832,6 +810,7 @@ bool LayerManager::post_load_states( const Core::StateIO& state_io )
     this->set_active_layer( active_layer );
   }
   
+  this->groups_changed_signal_();
   return success;
 }
 

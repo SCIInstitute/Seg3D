@@ -83,9 +83,6 @@ public:
   Ui::LayerWidget ui_;
   
   // Custom widgets that cannot be added by the Qt Designer
-  QtUtils::QtSliderDoubleCombo* opacity_adjuster_;
-  QtUtils::QtSliderDoubleCombo* brightness_adjuster_;
-  QtUtils::QtSliderDoubleCombo* contrast_adjuster_;
   QtUtils::QtColorBarWidget* color_widget_;
   
   // Drag and drop stuff
@@ -100,9 +97,6 @@ public:
   bool in_use_;
   bool picked_up_;
   int picked_up_layer_size_;
-  
-  QButtonGroup* viewer_button_group_;
-  
 };
 
 LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
@@ -145,6 +139,8 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   this->private_->ui_.label_->setAcceptDrops( false );
   this->private_->ui_.label_->setValidator( new QRegExpValidator( 
     QRegExp( QString::fromStdString( Core::StateName::REGEX_VALIDATOR_C ) ), this ) );
+  QSizePolicy size_policy( QSizePolicy::MinimumExpanding, QSizePolicy::Fixed );
+  this->private_->ui_. label_->setSizePolicy( size_policy );
 
   // Hide the tool bars and the selection checkbox
   this->private_->ui_.checkbox_widget_->hide();
@@ -155,8 +151,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   this->private_->ui_.opacity_bar_->hide();
   this->private_->ui_.volume_rendered_button_->hide();
   
-    
-  // add the PushDragButton
+  // add the PushDragButtongroup|group_0
   this->private_->activate_button_ = new PushDragButton( this->private_->ui_.typeGradient_ );
   this->private_->activate_button_->setObjectName( QString::fromUtf8( "activate_button_" ) );
   this->private_->activate_button_->setStyleSheet( StyleSheet::LAYER_PUSHDRAGBUTTON_C );
@@ -166,27 +161,12 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   this->private_->ui_.horizontalLayout_9->addWidget( this->private_->activate_button_ );
   this->private_->activate_button_->setAcceptDrops( false );
   
+   
+  
   // add the DropSpaceWidget
   this->private_->drop_space_ = new DropSpaceWidget( this );
-  this->private_->ui_.verticalLayout_3->insertWidget( 0, this->private_->drop_space_ );
+  this->private_->ui_.verticalLayout_10->insertWidget( 0, this->private_->drop_space_ );
   this->private_->drop_space_->hide();
-  
-  // add the SliderCombo Widgets
-  this->private_->opacity_adjuster_ = new QtUtils::QtSliderDoubleCombo( 
-    this->private_->ui_.opacity_bar_ );
-  this->private_->ui_.verticalLayout_2->addWidget( this->private_->opacity_adjuster_ );
-  this->private_->opacity_adjuster_->setObjectName( QString::fromUtf8( "opacity_adjuster_" ) );
-  
-  this->private_->brightness_adjuster_ = new QtUtils::QtSliderDoubleCombo( 
-    this->private_->ui_.bright_contrast_ );
-  this->private_->ui_.brightness_h_layout_->addWidget( this->private_->brightness_adjuster_ );
-  this->private_->brightness_adjuster_->setObjectName( 
-    QString::fromUtf8( "brightness_adjuster_" ) );
-  
-  this->private_->contrast_adjuster_ = new QtUtils::QtSliderDoubleCombo( 
-    this->private_->ui_.bright_contrast_ );
-  this->private_->ui_.contrast_h_layout_->addWidget( this->private_->contrast_adjuster_ );
-  this->private_->contrast_adjuster_->setObjectName( QString::fromUtf8( "contrast_adjuster_" ) );
   
   this->private_->color_widget_ = new QtUtils::QtColorBarWidget( this );
   this->private_->ui_.horizontalLayout_14->addWidget( this->private_->color_widget_ );
@@ -233,7 +213,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
     QtUtils::QtBridge::Connect( this->private_->ui_.viewer_4_button_, layer->visible_state_[ 4 ] );
     QtUtils::QtBridge::Connect( this->private_->ui_.viewer_5_button_, layer->visible_state_[ 5 ] );
 
-    QtUtils::QtBridge::Connect( this->private_->opacity_adjuster_, layer->opacity_state_ );
+    QtUtils::QtBridge::Connect( this->private_->ui_.opacity_adjuster_, layer->opacity_state_ );
     QtUtils::QtBridge::Connect( this->private_->ui_.lock_button_, layer->locked_state_ );
     
     LayerGroupHandle layer_group = layer->get_layer_group();
@@ -370,9 +350,9 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
           DataLayer* data_layer = dynamic_cast< DataLayer* >( layer.get() );
           if ( data_layer )
           {
-            QtUtils::QtBridge::Connect( this->private_->brightness_adjuster_, 
+            QtUtils::QtBridge::Connect( this->private_->ui_.brightness_adjuster_, 
               data_layer->brightness_state_ );
-            QtUtils::QtBridge::Connect( this->private_->contrast_adjuster_, 
+            QtUtils::QtBridge::Connect( this->private_->ui_.contrast_adjuster_, 
               data_layer->contrast_state_ );
             QtUtils::QtBridge::Connect( this->private_->ui_.datatype_label_,
               data_layer->data_type_state_ );
@@ -830,9 +810,7 @@ void LayerWidget::set_picked_up( bool picked_up )
 void LayerWidget::enable_drop_space( bool drop )
 {
   // First we check to see if it is picked up if so, we set change the way it looks
-  
   this->private_->drop_space_->set_height( this->private_->picked_up_layer_size_ + 4 );
-  
   
   if( this->private_->picked_up_ )
   {
