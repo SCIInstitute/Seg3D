@@ -816,7 +816,7 @@ void PaintTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
     {
       size_t current_viewer_id = current_viewer->get_viewer_id();
       layer_visible = target_layer->is_visible( current_viewer_id ) && 
-        target_layer->has_valid_data();
+        target_layer->has_valid_data() && target_layer->is_visible( viewer_id );
     }
     
     data_constraint_layer_id = this->data_constraint_layer_state_->get();

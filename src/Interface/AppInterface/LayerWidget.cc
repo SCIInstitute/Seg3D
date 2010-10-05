@@ -68,7 +68,7 @@
 namespace Seg3D
 {
 
-class LayerWidgetPrivate
+class LayerWidgetPrivate : public Core::ConnectionHandler
 {
 public:
   // Layer
@@ -206,8 +206,10 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
       boost::bind( &LayerWidget::UpdateState, qpointer ) );
     this->private_->layer_->data_state_->state_changed_signal_.connect(
       boost::bind( &LayerWidget::UpdateState, qpointer ) );
-    ViewerManager::Instance()->layout_state_->value_changed_signal_.connect(
-      boost::bind( &LayerWidget::UpdateViewerButtons, qpointer, _1 ) );
+    this->private_->add_connection( ViewerManager::Instance()->layout_state_->
+      value_changed_signal_.connect( boost::bind( &LayerWidget::UpdateViewerButtons, 
+      qpointer, _1 ) ) );
+    UpdateViewerButtons( qpointer, ViewerManager::Instance()->layout_state_->get() );
   
     // Progress forwarding 
     this->private_->layer_->update_progress_signal_.connect(
@@ -250,8 +252,6 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
     QtUtils::QtBridge::Show( this->private_->ui_.progress_bar_bar_, 
       layer->show_progress_bar_state_ );
     QtUtils::QtBridge::Show( this->private_->ui_.abort_bar_, layer->show_abort_message_state_ );
-    
-    //viewer_button_group = new Q
     
     // Connect all the buttons to the viewers
     QtUtils::QtBridge::Show( this->private_->ui_.viewer_0_button_, 
@@ -440,11 +440,6 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
     }   
   }
   
-//  this->private_->ui_.viewer_2_button_->hide();
-//  this->private_->ui_.viewer_3_button_->hide();
-//  this->private_->ui_.left_viewers_widget_->setMinimumWidth( 105 );
-  
-  
   // Set up the overlay widgets
   this->private_->overlay_ = new OverlayWidget( this );
   this->private_->overlay_->hide(); 
@@ -454,10 +449,10 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   this->update_widget_state( true );
   this->setUpdatesEnabled( true );
 }
-  
-  
+
 LayerWidget::~LayerWidget()
 {
+  this->private_->disconnect_all();
 }
 
 void LayerWidget::compute_isosurface()
@@ -987,12 +982,6 @@ void LayerWidget::UpdateViewerButtons( qpointer_type qpointer, std::string layou
     qpointer->private_->ui_.left_viewers_widget_->setMinimumWidth( 75 );
     qpointer->private_->ui_.left_viewers_widget_->setMaximumWidth( 75 );
   }
-
 }
-
-
-
-
-
 
 } //end namespace Seg3D

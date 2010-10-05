@@ -79,12 +79,14 @@ Transform GridTransform::transform() const
 
 bool GridTransform::operator==( const GridTransform& gt ) const
 {
-  return ( nx_ == gt.nx_ && ny_ == gt.ny_ && nz_ == gt.nz_ && mat_ == gt.mat_ );
+  return ( nx_ == gt.nx_ && ny_ == gt.ny_ && nz_ == gt.nz_ && 
+    Transform::operator==( gt ) );
 }
 
 bool GridTransform::operator!=( const GridTransform& gt ) const
 {
-  return ( nx_ != gt.nx_ || ny_ != gt.ny_ || nz_ != gt.nz_ || mat_ != gt.mat_ );
+  return ( nx_ != gt.nx_ || ny_ != gt.ny_ || nz_ != gt.nz_ || 
+    Transform::operator!=( gt ) );
 }
 
 void GridTransform::AlignToCanonicalCoordinates( const GridTransform& src_transform, 
