@@ -46,6 +46,8 @@
 #include <Application/ViewerManager/ViewerManager.h>
 #include <Application/ProjectManager/Actions/ActionSaveSession.h>
 #include <Application/ProjectManager/Actions/ActionLoadProject.h>
+#include <Application/Tools/Actions/ActionCopy.h>
+#include <Application/Tools/Actions/ActionPaste.h>
 
 // QtUtils includes
 #include <QtUtils/Bridge/QtBridge.h>
@@ -152,15 +154,17 @@ void AppMenu::create_file_menu( QMenu* qmenu )
 void AppMenu::create_edit_menu( QMenu* qmenu )
 {
   QAction* qaction;
-  qaction = qmenu->addAction( tr( "Select All") );
-  qaction->setShortcut( tr( "Ctrl+A" ) );
-  qaction->setToolTip( tr( "Select all viewers" ) );
-  int viewers[] = { 0, 1, 2, 3, 4, 5 }; 
-  std::set< int > all_viewers( viewers, viewers + 6 );
-  QtUtils::QtBridge::Connect( qaction, 
-    boost::bind( &Core::ActionSet::DispatchState< Core::StateIntSet >,
-      Core::Interface::GetWidgetActionContext(),
-      ViewerManager::Instance()->active_viewer_state_, all_viewers ) );
+  qaction = qmenu->addAction( tr( "Copy" ) );
+  qaction->setShortcut( tr( "Ctrl+C" ) );
+  qaction->setToolTip( tr( "Copy the current mask slice" ) );
+  QtUtils::QtBridge::Connect( qaction, boost::bind( &ActionCopy::Dispatch,
+    Core::Interface::GetWidgetActionContext() ) );
+
+  qaction = qmenu->addAction( tr( "Paste" ) );
+  qaction->setShortcut( tr( "Ctrl+V" ) );
+  qaction->setToolTip( tr( "Paste to the current mask slice" ) );
+  QtUtils::QtBridge::Connect( qaction, boost::bind( &ActionPaste::Dispatch,
+    Core::Interface::GetWidgetActionContext() ) );
 }
 
 void AppMenu::create_view_menu( QMenu* qmenu )

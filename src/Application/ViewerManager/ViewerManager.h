@@ -126,7 +126,7 @@ public:
   Core::StateOptionHandle layout_state_;
   
   // Number of the viewer that is the active viewer
-  Core::StateIntSetHandle active_viewer_state_;
+  Core::StateIntHandle active_viewer_state_;
   
   // Size of the grid
   Core::StateIntHandle grid_size_state_;

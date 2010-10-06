@@ -60,6 +60,7 @@ SET(INTERFACE_TOOLINTERFACE_SRCS
   ThresholdSegmentationLSFilterInterface.cc
   FlipToolInterface.cc
   TransformToolInterface.cc
+  ClipboardToolInterface.cc
 )
 
 SET(INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_SRCS
@@ -96,6 +97,7 @@ SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
   ThresholdSegmentationLSFilterInterface.h
   FlipToolInterface.h
   TransformToolInterface.h
+  ClipboardToolInterface.h
 )
 
 SET(INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_MOC_SRCS
@@ -135,6 +137,7 @@ SET(INTERFACE_TOOLINTERFACE_UI_SRCS
   ThresholdSegmentationLSFilterInterface.ui
   FlipToolInterface.ui
   TransformToolInterface.ui
+  ClipboardToolInterface.ui
 )
 
 SET(INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_UI_SRCS

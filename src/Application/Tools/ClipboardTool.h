@@ -26,61 +26,50 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_APPINTERFACE_VIEWERINTERFACE_H
-#define INTERFACE_APPINTERFACE_VIEWERINTERFACE_H
+#ifndef APPLICATION_TOOLS_CLIPBOARDTOOL_H
+#define APPLICATION_TOOLS_CLIPBOARDTOOL_H
 
-// QT includes
-#include <QtGui/QWidget>
-#include <QtCore/QPointer>
-
-// STL includes
-#include <set>
-#include <string>
-
-// Boost includes
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/thread.hpp>
-#include <boost/shared_ptr.hpp>
+#include <Application/Tool/SingleTargetTool.h>
 
 namespace Seg3D
 {
 
-class ViewerInterfacePrivate;
-typedef boost::shared_ptr< ViewerInterfacePrivate > ViewerInterfacePrivateHandle;
+class ClipboardToolPrivate;
+typedef boost::shared_ptr< ClipboardToolPrivate > ClipboardToolPrivateHandle;
 
-class ViewerInterface : public QWidget
+class ClipboardTool : public SingleTargetTool
 {
-  Q_OBJECT
 
-  // -- Private class containing all the widgets --
+SEG3D_TOOL
+(
+  SEG3D_TOOL_NAME( "ClipboardTool", "Tool for copy/paste mask slices" )
+  SEG3D_TOOL_MENULABEL( "Copy/Paste" )
+  SEG3D_TOOL_MENU( "Tools" )
+  SEG3D_TOOL_SHORTCUT_KEY( "Alt+B" )
+  SEG3D_TOOL_URL( "http://seg3d.org/" )
+)
+
+  // -- constructor/destructor --
+public:
+  ClipboardTool( const std::string& toolid );
+  virtual ~ClipboardTool();
+
+  // -- dispatch functions --
+public:
+  void copy( Core::ActionContextHandle context );
+  void paste( Core::ActionContextHandle context );
+
+  // -- State Variables --
+public:
+  Core::StateLabeledOptionHandle slice_type_state_;
+  Core::StateRangedIntHandle copy_slice_number_state_;
+  Core::StateRangedIntHandle paste_min_slice_number_state_;
+  Core::StateRangedIntHandle paste_max_slice_number_state_;
+
 private:
-  ViewerInterfacePrivateHandle private_;
-
-  // -- typedefs --
-public:
-  typedef QPointer< ViewerInterface > qpointer_type;
-  
-  // -- Constructor/Destructor --
-public:
-  ViewerInterface( QWidget *parent = 0 );
-  virtual ~ViewerInterface();
-
-  // -- Setting widget state --
-  void set_layout( const std::string& layout );
-
-public Q_SLOTS:
-  void set_active_viewer( int viewer_id );
-
-  // -- Slots --    
-public:
-  
-  // SetViewerLayout: (Thread safe slot)
-  static void SetViewerLayout( qpointer_type qpointer, std::string layout );
-
-  // SetActiveViewer: (Thread safe slot)
-  static void SetActiveViewer( qpointer_type qpointer, int active_viewer );
+  ClipboardToolPrivateHandle private_;
 };
 
-} // end namespaceSeg3D
+} // end namespace
 
 #endif

@@ -312,4 +312,37 @@ void MaskVolumeSlice::copy_slice_data( std::vector< unsigned char >& buffer ) co
   }
 }
 
+void MaskVolumeSlice::copy_slice_data( unsigned char* buffer ) const
+{
+  assert( buffer != 0 );
+  lock_type lock( this->get_mutex() );
+
+  {
+    MaskDataBlock::shared_lock_type volume_lock( 
+      this->mask_data_block_->get_mutex() );
+    CopyMaskData( this, buffer );
+  }
+}
+
+void MaskVolumeSlice::set_slice_data( const unsigned char* buffer, bool trigger_update )
+{
+  {
+    lock_type lock( this->get_mutex() );
+
+    {
+      MaskDataBlock::lock_type volume_lock( this->mask_data_block_->get_mutex() );
+      CopyCachedDataBack( this, buffer );
+    }
+    if ( trigger_update )
+    {
+      this->mask_data_block_->increase_generation();
+    }
+  }
+
+  if ( trigger_update )
+  {
+    this->mask_data_block_->mask_updated_signal_();
+  }
+}
+
 } // end namespace Core

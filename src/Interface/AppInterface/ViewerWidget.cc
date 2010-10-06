@@ -82,19 +82,8 @@ public:
 
 void ViewerWidgetPrivate::handle_widget_activated()
 {
-  if ( QApplication::keyboardModifiers() == Qt::ControlModifier )
-  {
-    Core::ActionAdd::Dispatch( Core::Interface::GetWidgetActionContext(),
-      ViewerManager::Instance()->active_viewer_state_, 
-      static_cast< int >( this->viewer_->get_viewer_id() ) );
-  }
-  else
-  {
-    std::set< int > active_viewer;
-    active_viewer.insert( static_cast< int >( this->viewer_->get_viewer_id() ) );
-    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
-      ViewerManager::Instance()->active_viewer_state_, active_viewer );
-  }
+  Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
+    ViewerManager::Instance()->active_viewer_state_, this->viewer_->get_viewer_id() );
 }
 
 ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :

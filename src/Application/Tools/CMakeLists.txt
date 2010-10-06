@@ -99,6 +99,8 @@ SET(APPLICATION_TOOLS_SRCS
   FlipTool.cc
   TransformTool.h
   TransformTool.cc
+  ClipboardTool.h
+  ClipboardTool.cc
   )
 
 SET(APPLICATION_TOOLS_NOREGISTER_SRCS
@@ -111,6 +113,10 @@ SET(APPLICATION_TOOLS_ACTIONS_SRCS
   Actions/ActionPaint.cc
   Actions/ActionPolyline.h
   Actions/ActionPolyline.cc
+  Actions/ActionCopy.h
+  Actions/ActionCopy.cc
+  Actions/ActionPaste.h
+  Actions/ActionPaste.cc
   )
 
 CORE_ADD_LIBRARY(Application_Tools 
@@ -126,6 +132,7 @@ TARGET_LINK_LIBRARIES(Application_Tools
                       Core_Interface
                       Core_Action
                       Core_State
+            Application_Clipboard
             Application_Filters
                       Application_Tool
                       Application_ToolManager

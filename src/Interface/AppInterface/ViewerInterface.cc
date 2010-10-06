@@ -26,6 +26,10 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// boost includes
+#include <boost/lambda/lambda.hpp>
+#include <boost/lambda/bind.hpp>
+
 // QT includes
 #include <QtGui> 
 
@@ -166,19 +170,11 @@ ViewerInterface::~ViewerInterface()
 {
 }
 
-void ViewerInterface::set_active_viewer( std::set< int > active_viewers )
+void ViewerInterface::set_active_viewer( int viewer_id )
 {
-  for ( size_t j = 0; j < private_->viewer_.size(); j++ )
-  {
-    this->private_->viewer_[ j ]->deselect();
-  }
-
-  std::set< int >::iterator it = active_viewers.begin();
-  while ( it != active_viewers.end() )
-  {
-    this->private_->viewer_[ *it ]->select();
-    ++it;
-  }
+  std::for_each( this->private_->viewer_.begin(), this->private_->viewer_.end(),
+    boost::lambda::bind( &ViewerWidget::deselect, boost::lambda::_1 ) );
+  this->private_->viewer_[ viewer_id ]->select();
 }
 
 void ViewerInterface::set_layout( const std::string& layout )
@@ -350,16 +346,16 @@ void ViewerInterface::SetViewerLayout( qpointer_type qpointer, std::string layou
   if( qpointer.data() ) qpointer->set_layout( layout );
 }
 
-void ViewerInterface::SetActiveViewer( qpointer_type qpointer, std::set< int > active_viewers )
+void ViewerInterface::SetActiveViewer( qpointer_type qpointer, int active_viewer )
 {
   if( !( Core::Interface::IsInterfaceThread() ) )
   {
     Core::Interface::Instance()->post_event( boost::bind( &ViewerInterface::SetActiveViewer,
-        qpointer, active_viewers ) );
+        qpointer, active_viewer ) );
     return;
   }
 
-  if( qpointer.data() ) qpointer->set_active_viewer( active_viewers );
+  if( qpointer.data() ) qpointer->set_active_viewer( active_viewer );
 }
 
 } // end namespace Seg3D

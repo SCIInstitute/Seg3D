@@ -89,6 +89,14 @@ public:
   // Copy the mask data of current slice into the buffer.
   void copy_slice_data( std::vector< unsigned char >& buffer ) const;
 
+  // COPY_SLICE_DATA:
+  // Copy the mask data of current slice into the buffer.
+  void copy_slice_data( unsigned char* buffer ) const;
+
+  // SET_SLICE_DATA:
+  // Replace the data of the slice with the content of the buffer.
+  void set_slice_data( const unsigned char* buffer, bool trigger_update = false );
+
 public:
   // CACHE_UPDATED_SIGNAL:
   // Triggered when the cache has been updated.

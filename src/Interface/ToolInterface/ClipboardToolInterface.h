@@ -26,61 +26,37 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_APPINTERFACE_VIEWERINTERFACE_H
-#define INTERFACE_APPINTERFACE_VIEWERINTERFACE_H
+#ifndef INTERFACE_TOOLINTERFACE_CLIPBOARDTOOLINTERFACE_H
+#define INTERFACE_TOOLINTERFACE_CLIPBOARDTOOLINTERFACE_H
 
-// QT includes
-#include <QtGui/QWidget>
-#include <QtCore/QPointer>
+// Application includes
+#include <Application/Tool/ToolFactory.h>
 
-// STL includes
-#include <set>
-#include <string>
+// Base class of the tool widget include
+#include <Interface/AppInterface/ToolWidget.h>
 
-// Boost includes
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/thread.hpp>
-#include <boost/shared_ptr.hpp>
 
 namespace Seg3D
 {
 
-class ViewerInterfacePrivate;
-typedef boost::shared_ptr< ViewerInterfacePrivate > ViewerInterfacePrivateHandle;
+class ClipboardToolInterfacePrivate;
 
-class ViewerInterface : public QWidget
+class ClipboardToolInterface : public ToolWidget
 {
-  Q_OBJECT
+Q_OBJECT
 
-  // -- Private class containing all the widgets --
+// -- constructor/destructor --
+public:
+  ClipboardToolInterface();
+  virtual ~ClipboardToolInterface();
+  virtual bool build_widget( QFrame* frame );
+  
+  // -- private structure with widget classes --
 private:
-  ViewerInterfacePrivateHandle private_;
+  boost::shared_ptr< ClipboardToolInterfacePrivate > private_;
 
-  // -- typedefs --
-public:
-  typedef QPointer< ViewerInterface > qpointer_type;
-  
-  // -- Constructor/Destructor --
-public:
-  ViewerInterface( QWidget *parent = 0 );
-  virtual ~ViewerInterface();
-
-  // -- Setting widget state --
-  void set_layout( const std::string& layout );
-
-public Q_SLOTS:
-  void set_active_viewer( int viewer_id );
-
-  // -- Slots --    
-public:
-  
-  // SetViewerLayout: (Thread safe slot)
-  static void SetViewerLayout( qpointer_type qpointer, std::string layout );
-
-  // SetActiveViewer: (Thread safe slot)
-  static void SetActiveViewer( qpointer_type qpointer, int active_viewer );
 };
 
-} // end namespaceSeg3D
+} // namespace Seg3D
 
 #endif

@@ -26,61 +26,52 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_APPINTERFACE_VIEWERINTERFACE_H
-#define INTERFACE_APPINTERFACE_VIEWERINTERFACE_H
+#ifndef APPLICATION_CLIPBOARD_CLIPBOARD_H
+#define APPLICATION_CLIPBOARD_CLIPBOARD_H
 
-// QT includes
-#include <QtGui/QWidget>
-#include <QtCore/QPointer>
-
-// STL includes
-#include <set>
-#include <string>
-
-// Boost includes
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/thread.hpp>
+#include <boost/utility.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/signals2.hpp>
+
+#include <Core/Utils/Singleton.h>
+
+#include <Application/Clipboard/ClipboardItem.h>
 
 namespace Seg3D
 {
 
-class ViewerInterfacePrivate;
-typedef boost::shared_ptr< ViewerInterfacePrivate > ViewerInterfacePrivateHandle;
+// Forward declarations
+class ClipboardPrivate;
+typedef boost::shared_ptr< ClipboardPrivate > ClipboardPrivateHandle;
 
-class ViewerInterface : public QWidget
+class Clipboard : public boost::noncopyable
 {
-  Q_OBJECT
-
-  // -- Private class containing all the widgets --
+  CORE_SINGLETON( Clipboard );
+  
 private:
-  ViewerInterfacePrivateHandle private_;
+  Clipboard();
+  ~Clipboard();
 
-  // -- typedefs --
 public:
-  typedef QPointer< ViewerInterface > qpointer_type;
-  
-  // -- Constructor/Destructor --
-public:
-  ViewerInterface( QWidget *parent = 0 );
-  virtual ~ViewerInterface();
+  // GET_ITEM:
+  // Get the current item stored at slot index.
+  ClipboardItemConstHandle get_item( size_t index = 0 );
 
-  // -- Setting widget state --
-  void set_layout( const std::string& layout );
+  // GET_ITEM:
+  // Create a new item with the specified width, height, and data type at the slot
+  // index, and return a handle to it.
+  ClipboardItemHandle get_item( size_t width, size_t height, 
+    Core::DataType data_type, size_t index = 0 );
 
-public Q_SLOTS:
-  void set_active_viewer( int viewer_id );
+  // NUMBER_OF_SLOTS:
+  // Return the number of storage slots in the clipboard.
+  size_t number_of_slots();
 
-  // -- Slots --    
-public:
-  
-  // SetViewerLayout: (Thread safe slot)
-  static void SetViewerLayout( qpointer_type qpointer, std::string layout );
+private:
+  ClipboardPrivateHandle private_;
 
-  // SetActiveViewer: (Thread safe slot)
-  static void SetActiveViewer( qpointer_type qpointer, int active_viewer );
 };
 
-} // end namespaceSeg3D
+} // end namespace Seg3D
 
 #endif
