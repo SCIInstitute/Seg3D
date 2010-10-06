@@ -344,12 +344,13 @@ const std::string& LayerGroupWidget::get_group_id()
 
 void LayerGroupWidget::verify_delete()
 {
-  QMessageBox message_box;
-  message_box.setText( QString::fromUtf8( "WARNING!") );
-  message_box.setInformativeText( QString::fromUtf8( "Are you sure you want to do this?" ) );
-  message_box.setStandardButtons( QMessageBox::Yes | QMessageBox::No );
-  message_box.setDefaultButton( QMessageBox::No );
-  if( QMessageBox::Yes == message_box.exec() )
+
+  // Check whether the users wants to save and whether the user wants to quit
+  int ret = QMessageBox::warning( this, "Delete Warning",
+    "Are you sure, you want to delete these layers ?",
+    QMessageBox::Yes | QMessageBox::No, QMessageBox::No  );
+        
+  if( ret == QMessageBox::Yes )
   {
     ActionDeleteLayers::Dispatch( Core::Interface::GetWidgetActionContext(), 
       this->private_->group_ );
