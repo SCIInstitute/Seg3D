@@ -191,19 +191,41 @@ void ProjectDockWidget::load_session()
 
   if( row_time != "" )
   {
-    QMessageBox message_box;
-    message_box.setText( QString::fromUtf8( "WARNING: By loading a saved session you will loose"
-      " any unsaved changes.") );
-    message_box.setInformativeText( QString::fromUtf8( "Are you sure you want to do this?" ) );
-    message_box.setStandardButtons( QMessageBox::Yes | QMessageBox::No );
-    message_box.setDefaultButton( QMessageBox::No );
-    if( QMessageBox::Yes == message_box.exec() )
+    if ( ProjectManager::Instance()->current_project_ )
     {
-      std::vector< std::string > sessions = ProjectManager::Instance()->current_project_->
-        sessions_state_->get();
+      if ( ProjectManager::Instance()->current_project_->check_changed() )
+      {
 
-      std::string session_name = sessions[ row ];
-      ActionLoadSession::Dispatch( Core::Interface::GetWidgetActionContext(), session_name );
+        // Check whether the users wants to save and whether the user wants to quit
+        int ret = QMessageBox::warning( this, "Save Current Session ?",
+          "Your current session has not been saved.\n"
+          "Do you want to save your changes?",
+          QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel );
+        
+        if ( ret == QMessageBox::Save )
+        {
+          Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+          ActionSaveSession::Dispatch( Core::Interface::GetWidgetActionContext(), false, 
+            ProjectManager::Instance()->current_project_->current_session_name_state_->get() );   
+        }
+
+        if ( ret != QMessageBox::Cancel )
+        {
+          std::vector< std::string > sessions = ProjectManager::Instance()->current_project_->
+          sessions_state_->get();
+
+          std::string session_name = sessions[ row ];
+          ActionLoadSession::Dispatch( Core::Interface::GetWidgetActionContext(), session_name );
+        }
+      }
+      else
+      {
+        std::vector< std::string > sessions = ProjectManager::Instance()->current_project_->
+          sessions_state_->get();
+
+        std::string session_name = sessions[ row ];
+        ActionLoadSession::Dispatch( Core::Interface::GetWidgetActionContext(), session_name );   
+      }
     }
   }
   this->disable_load_delete_and_export_buttons();

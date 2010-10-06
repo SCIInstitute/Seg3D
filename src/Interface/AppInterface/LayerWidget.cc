@@ -63,13 +63,16 @@
 //UI Includes
 #include "ui_LayerWidget.h"
 
-
-
 namespace Seg3D
 {
 
 class LayerWidgetPrivate : public Core::ConnectionHandler
 {
+  // -- destructor --
+public:
+  virtual ~LayerWidgetPrivate();
+
+  // -- GUI pieces --
 public:
   // Layer
   LayerHandle layer_;
@@ -98,6 +101,12 @@ public:
   bool picked_up_;
   int picked_up_layer_size_;
 };
+
+LayerWidgetPrivate::~LayerWidgetPrivate()
+{
+  this->disconnect_all();
+}
+
 
 LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   QWidget( parent ),
@@ -161,8 +170,6 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   this->private_->ui_.horizontalLayout_9->addWidget( this->private_->activate_button_ );
   this->private_->activate_button_->setAcceptDrops( false );
   
-   
-  
   // add the DropSpaceWidget
   this->private_->drop_space_ = new DropSpaceWidget( this );
   this->private_->ui_.verticalLayout_10->insertWidget( 0, this->private_->drop_space_ );
@@ -182,30 +189,55 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
   
     qpointer_type qpointer( this );
-    this->private_->layer_->locked_state_->state_changed_signal_.connect(
-      boost::bind( &LayerWidget::UpdateState, qpointer ) );
-    this->private_->layer_->data_state_->state_changed_signal_.connect(
-      boost::bind( &LayerWidget::UpdateState, qpointer ) );
-    this->private_->add_connection( ViewerManager::Instance()->layout_state_->
-      value_changed_signal_.connect( boost::bind( &LayerWidget::UpdateViewerButtons, 
-      qpointer, _1 ) ) );
+    
+    // Connect a slot to the signal that the visual lock state has changed
+    this->private_->add_connection( 
+      this->private_->layer_->locked_state_->state_changed_signal_.connect(
+        boost::bind( &LayerWidget::UpdateState, qpointer ) ) );
+
+    // Connect a slot to the signal that the data integrity state has changed
+    this->private_->add_connection( 
+      this->private_->layer_->data_state_->state_changed_signal_.connect(
+        boost::bind( &LayerWidget::UpdateState, qpointer ) ) );
+
+    // Connect a slot to the signal that posts updates to the current progress of a filter
+    this->private_->add_connection( 
+      this->private_->layer_->update_progress_signal_.connect(
+        boost::bind( &LayerWidget::UpdateProgress, qpointer, _1 ) ) );
+      
+    // Connect a slot to the signal that the active layer has changed
+    this->private_->add_connection( 
+      LayerManager::Instance()->active_layer_changed_signal_.connect(
+          boost::bind( &LayerWidget::UpdateActiveState, qpointer, _1 ) ) ); 
+    
+    // Connect a slot to the signal that indicates that the layout of the viewer has
+    // changed  
+    this->private_->add_connection( 
+      ViewerManager::Instance()->layout_state_->value_changed_signal_.connect(
+        boost::bind( &LayerWidget::UpdateViewerButtons, qpointer, _1 ) ) );
+      
+    // Reflect the current state in the widget      
     UpdateViewerButtons( qpointer, ViewerManager::Instance()->layout_state_->get() );
   
-    // Progress forwarding 
-    this->private_->layer_->update_progress_signal_.connect(
-      boost::bind( &LayerWidget::UpdateProgress, qpointer, _1 ) );
+    // Make the default connections, for any layer type, to the state engine
   
+    // Connect activate button to dispatching an action activating the current layer
     QtUtils::QtBridge::Connect( this->private_->activate_button_, 
       boost::bind( static_cast<void (*) ( Core::ActionContextHandle, LayerHandle )>( 
       &ActionActivateLayer::Dispatch ), Core::Interface::GetWidgetActionContext(), layer ) );
     
-    // make the default connections, for any layer type, to the state engine
+    // Connect the selection box in front of the widget to its underlying state
     QtUtils::QtBridge::Connect( this->private_->ui_.selection_checkbox_, 
       layer->selected_state_ );
+      
+    // Connect the label to the layer name state variable 
     QtUtils::QtBridge::Connect( this->private_->ui_.label_, layer->name_state_ );
 
+    // Connect the visibility button to its underlying state variable
     QtUtils::QtBridge::Connect( this->private_->ui_.visibility_button_, 
       layer->master_visible_state_ );
+      
+    // Connect the visibility buttons in the advanced viewer menu to their respective state 
     QtUtils::QtBridge::Connect( this->private_->ui_.viewer_0_button_, layer->visible_state_[ 0 ] );
     QtUtils::QtBridge::Connect( this->private_->ui_.viewer_1_button_, layer->visible_state_[ 1 ] );
     QtUtils::QtBridge::Connect( this->private_->ui_.viewer_2_button_, layer->visible_state_[ 2 ] );
@@ -213,7 +245,10 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
     QtUtils::QtBridge::Connect( this->private_->ui_.viewer_4_button_, layer->visible_state_[ 4 ] );
     QtUtils::QtBridge::Connect( this->private_->ui_.viewer_5_button_, layer->visible_state_[ 5 ] );
 
+    // Connect the opacity state to its state variable
     QtUtils::QtBridge::Connect( this->private_->ui_.opacity_adjuster_, layer->opacity_state_ );
+    
+    // Connect the visual lock button to the lock state variable
     QtUtils::QtBridge::Connect( this->private_->ui_.lock_button_, layer->locked_state_ );
     
     LayerGroupHandle layer_group = layer->get_layer_group();
@@ -334,89 +369,89 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
     {
       // This if for the Data Layers
       case Core::VolumeType::DATA_E:
-        {
-          // Update the icons
-          this->private_->activate_button_->setIcon(this->private_->data_layer_icon_);
+      {
+        // Update the icons
+        this->private_->activate_button_->setIcon(this->private_->data_layer_icon_);
+      
+        // Hide the buttons that are not needed for this widget
+        this->private_->ui_.compute_iso_surface_button_->hide();
+        this->private_->ui_.delete_iso_surface_button_->hide();
+        this->private_->ui_.show_iso_surface_button_->hide();
+        this->private_->ui_.iso_control_separator_line_->hide();
+        this->private_->ui_.border_fill_->hide();
+        this->private_->color_widget_->hide();
         
-          // Hide the buttons that are not needed for this widget
-          this->private_->ui_.compute_iso_surface_button_->hide();
-          this->private_->ui_.delete_iso_surface_button_->hide();
-          this->private_->ui_.show_iso_surface_button_->hide();
-          this->private_->ui_.iso_control_separator_line_->hide();
-          this->private_->ui_.border_fill_->hide();
-          this->private_->color_widget_->hide();
-          
-          // Add the layer specific connections
-          DataLayer* data_layer = dynamic_cast< DataLayer* >( layer.get() );
-          if ( data_layer )
-          {
-            QtUtils::QtBridge::Connect( this->private_->ui_.brightness_adjuster_, 
-              data_layer->brightness_state_ );
-            QtUtils::QtBridge::Connect( this->private_->ui_.contrast_adjuster_, 
-              data_layer->contrast_state_ );
-            QtUtils::QtBridge::Connect( this->private_->ui_.datatype_label_,
-              data_layer->data_type_state_ );
-            QtUtils::QtBridge::Connect( this->private_->ui_.min_label_,
-              data_layer->min_value_state_ );
-            QtUtils::QtBridge::Connect( this->private_->ui_.max_label_,
-              data_layer->max_value_state_ );
-          }
+        // Add the layer specific connections
+        DataLayer* data_layer = dynamic_cast< DataLayer* >( layer.get() );
+        if ( data_layer )
+        {
+          QtUtils::QtBridge::Connect( this->private_->ui_.brightness_adjuster_, 
+            data_layer->brightness_state_ );
+          QtUtils::QtBridge::Connect( this->private_->ui_.contrast_adjuster_, 
+            data_layer->contrast_state_ );
+          QtUtils::QtBridge::Connect( this->private_->ui_.datatype_label_,
+            data_layer->data_type_state_ );
+          QtUtils::QtBridge::Connect( this->private_->ui_.min_label_,
+            data_layer->min_value_state_ );
+          QtUtils::QtBridge::Connect( this->private_->ui_.max_label_,
+            data_layer->max_value_state_ );
         }
-        break;
+      }
+      break;
         
       // This is for the Mask Layers  
       case Core::VolumeType::MASK_E:
+      {
+        // Update the icons
+        this->private_->activate_button_->setIcon( this->private_->mask_layer_icon_ );
+
+        // Hide the buttons that are not needed for this widget
+        this->private_->ui_.bright_contrast_->hide();
+        this->private_->ui_.datainfo_widget_->hide();
+        
+        this->connect( this->private_->color_widget_, SIGNAL( color_changed( int ) ), 
+          this, SLOT( set_mask_background_color( int ) ) );
+          
+        MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( layer.get() );  
+        if ( mask_layer )
         {
-          // Update the icons
-          this->private_->activate_button_->setIcon( this->private_->mask_layer_icon_ );
+          // Connect isosurface buttons
+          QtUtils::QtBridge::Connect( this->private_->ui_.show_iso_surface_button_, 
+            mask_layer->show_isosurface_state_ );
+          connect( this->private_->ui_.compute_iso_surface_button_, 
+            SIGNAL( clicked() ), this, SLOT( compute_isosurface() ) );
+          connect( this->private_->ui_.delete_iso_surface_button_, 
+            SIGNAL( clicked() ), this, SLOT( delete_isosurface() ) );
 
-          // Hide the buttons that are not needed for this widget
-          this->private_->ui_.bright_contrast_->hide();
-          this->private_->ui_.datainfo_widget_->hide();
+          QtUtils::QtBridge::Connect( this->private_->ui_.border_selection_combo_, 
+            mask_layer->border_state_ );
+          QtUtils::QtBridge::Connect( this->private_->ui_.fill_selection_combo_, 
+            mask_layer->fill_state_ );
+          QtUtils::QtBridge::Connect( this->private_->color_widget_, 
+            mask_layer->color_state_,
+            PreferencesManager::Instance()->color_states_ );
           
-          this->connect( this->private_->color_widget_, SIGNAL( color_changed( int ) ), 
-            this, SLOT( set_mask_background_color( int ) ) );
-            
-          MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( layer.get() );  
-          if ( mask_layer )
-          {
-            // Connect isosurface buttons
-            QtUtils::QtBridge::Connect( this->private_->ui_.show_iso_surface_button_, 
-              mask_layer->show_isosurface_state_ );
-            connect( this->private_->ui_.compute_iso_surface_button_, 
-              SIGNAL( clicked() ), this, SLOT( compute_isosurface() ) );
-            connect( this->private_->ui_.delete_iso_surface_button_, 
-              SIGNAL( clicked() ), this, SLOT( delete_isosurface() ) );
+          QtUtils::QtBridge::Enable( this->private_->ui_.show_iso_surface_button_, 
+            mask_layer->iso_generated_state_ );
+          QtUtils::QtBridge::Enable( this->private_->ui_.delete_iso_surface_button_, 
+            mask_layer->iso_generated_state_ );
 
-            QtUtils::QtBridge::Connect( this->private_->ui_.border_selection_combo_, 
-              mask_layer->border_state_ );
-            QtUtils::QtBridge::Connect( this->private_->ui_.fill_selection_combo_, 
-              mask_layer->fill_state_ );
-            QtUtils::QtBridge::Connect( this->private_->color_widget_, 
-              mask_layer->color_state_,
-              PreferencesManager::Instance()->color_states_ );
-            
-            QtUtils::QtBridge::Enable( this->private_->ui_.show_iso_surface_button_, 
-              mask_layer->iso_generated_state_ );
-            QtUtils::QtBridge::Enable( this->private_->ui_.delete_iso_surface_button_, 
-              mask_layer->iso_generated_state_ );
-
-          
-            this->set_mask_background_color( mask_layer->color_state_->get() );
-          }
+        
+          this->set_mask_background_color( mask_layer->color_state_->get() );
         }
-        break;
+      }
+      break;
         
       // This is for the Label Layers
       case Core::VolumeType::LABEL_E:
-        {
-          // Update the icons
-          this->private_->activate_button_->setIcon(this->private_->label_layer_icon_);
-        }
-        break;
+      {
+        // Update the icons
+        this->private_->activate_button_->setIcon(this->private_->label_layer_icon_);
+      }
+      break;
         
       default:
-        break;
+      break;
     }   
   }
   
@@ -545,7 +580,7 @@ void LayerWidget::update_widget_state( bool initialize )
   
   {
     // NOTE:
-    // Since state can is changed on the application thread
+    // Since state is changed on the application thread
     // We need to lock the state engine to prevent any change
     // to be made into the state manager.
     Layer::lock_type lock( Layer::GetMutex() );
@@ -873,42 +908,6 @@ void LayerWidget::prep_for_animation( bool move_time )
   } 
 }
 
-void LayerWidget::UpdateState( qpointer_type qpointer )
-{
-  // Hand it off to the right thread
-  if( !( Core::Interface::IsInterfaceThread() ) )
-  {
-    Core::Interface::Instance()->post_event( boost::bind( &LayerWidget::UpdateState, qpointer) );
-    return; 
-  }
-
-  // When we are finally on the interface thread run this code:
-  if ( qpointer.data() )
-  {
-    qpointer->setUpdatesEnabled( false );
-    qpointer->update_widget_state();
-    qpointer->setUpdatesEnabled( true );
-  }
-}
-
-void LayerWidget::UpdateProgress( qpointer_type qpointer, double progress )
-{
-  // Hand it off to the right thread
-  if( !( Core::Interface::IsInterfaceThread() ) )
-  {
-    Core::Interface::Instance()->post_event( boost::bind( &LayerWidget::UpdateProgress, 
-      qpointer, progress) );
-    return; 
-  }
-
-  // When we are finally on the interface thread run this code:
-  if ( qpointer.data() )
-  {
-    qpointer->update_progress_bar( progress );
-    qpointer->update();
-  }
-}
-
 void LayerWidget::instant_hide_drop_space()
 {
   this->private_->drop_space_->instant_hide();
@@ -961,5 +960,64 @@ void LayerWidget::UpdateViewerButtons( qpointer_type qpointer, std::string layou
     qpointer->private_->ui_.left_viewers_widget_->setMaximumWidth( 75 );
   }
 }
+
+
+
+void LayerWidget::UpdateState( qpointer_type qpointer )
+{
+  // Hand it off to the right thread
+  if( !( Core::Interface::IsInterfaceThread() ) )
+  {
+    Core::Interface::Instance()->post_event( boost::bind( &LayerWidget::UpdateState, qpointer) );
+    return; 
+  }
+
+  // When we are finally on the interface thread run this code:
+  if ( qpointer.data() )
+  {
+    qpointer->setUpdatesEnabled( false );
+    qpointer->update_widget_state();
+    qpointer->setUpdatesEnabled( true );
+  }
+}
+
+void LayerWidget::UpdateActiveState( qpointer_type qpointer, LayerHandle layer )
+{
+  // Hand it off to the right thread
+  if( !( Core::Interface::IsInterfaceThread() ) )
+  {
+    Core::Interface::Instance()->post_event( 
+      boost::bind( &LayerWidget::UpdateActiveState, qpointer, layer ) );
+    return; 
+  }
+
+  // When we are finally on the interface thread run this code:
+  if ( qpointer.data() )
+  {
+    qpointer->setUpdatesEnabled( false );
+    qpointer->update_widget_state();
+    qpointer->setUpdatesEnabled( true );
+  }
+}
+
+
+void LayerWidget::UpdateProgress( qpointer_type qpointer, double progress )
+{
+  // Hand it off to the right thread
+  if( !( Core::Interface::IsInterfaceThread() ) )
+  {
+    Core::Interface::Instance()->post_event( boost::bind( &LayerWidget::UpdateProgress, 
+      qpointer, progress) );
+    return; 
+  }
+
+  // When we are finally on the interface thread run this code:
+  if ( qpointer.data() )
+  {
+    qpointer->update_progress_bar( progress );
+    qpointer->update();
+  }
+}
+
 
 } //end namespace Seg3D

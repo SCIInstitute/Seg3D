@@ -286,7 +286,7 @@ void LayerManager::set_active_layer( LayerHandle layer )
         
   } // We release the lock  here.
 
-  active_layer_changed_signal_( layer );  
+  this->active_layer_changed_signal_( layer );  
 }
 
 LayerGroupHandle LayerManager::get_layer_group( std::string group_id )
@@ -579,10 +579,6 @@ LayerSceneHandle LayerManager::compose_layer_scene( size_t viewer_id )
   group_list_type::reverse_iterator group_iterator = this->group_list_.rbegin();
   for ( ; group_iterator != this->group_list_.rend(); group_iterator++)
   {
-//    if ( !( *group_iterator )->visibility_state_[ viewer_id ]->get() )
-//    {
-//      continue;
-//    }
     
     layer_list_type layer_list = ( *group_iterator )->get_layer_list();
 

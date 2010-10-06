@@ -36,40 +36,49 @@
 // Qt includes
 #include <QtGui>
 
-// Application Includes
+// Core includes
 #include <Core/Utils/EnumClass.h>
+#include <Core/Utils/ConnectionHandler.h>
 
+// Application includes
 #include <Application/Layer/LayerGroup.h>
+
+// Interface includes
 #include <Interface/AppInterface/LayerGroupWidget.h>
 
 namespace Seg3D
 {
+
+
+// Forward declarations 
+class LayerManagerWidgetPrivate;
+typedef boost::shared_ptr<LayerManagerWidgetPrivate> LayerManagerWidgetPrivateHandle;
   
-  
-class LayerManagerWidget : public QScrollArea
+class LayerManagerWidget : public QScrollArea, public Core::ConnectionHandler
 {
 // Need to make it a Qt object
 Q_OBJECT
   
-//constructor - destructor
+  // -- constructor/destructor
 public:
   LayerManagerWidget( QWidget *parent = 0 );
   virtual ~LayerManagerWidget();
 
-public:
-  // MAKE_NEW_GROUP:
-  // function that creates a new group to put layers into 
-  LayerGroupWidget* make_new_group( LayerGroupHandle group );
-
-  
-  // SET_ACTIVE_LAYER:
-  // function for setting the local copy of the active layer
-  void set_active_layer( LayerHandle layer );
-  
-public:
+  // -- function that handle signals --
+private:
+  // HANDLE_GROUP_INTERNALS_CHANGE:
+  // This function is called when the internals of a group are modified.
   void handle_group_internals_change( LayerGroupHandle group );
   
+  // HANDLE_GROUP_CHANGED:
+  // This function is called when new groups are added or deleted and when their
+  // order changes.
   void handle_groups_changed();
+
+  // MAKE_NEW_GROUP:
+  // function that creates a new group to put layers into. 
+  LayerGroupWidget* make_new_group( LayerGroupHandle group );
+
     
 private Q_SLOTS:
   // PREP_LAYERS_FOR_DRAG_AND_DROP:
@@ -86,19 +95,20 @@ private Q_SLOTS:
   
   void notify_groups_of_picked_up_layer_size( int layer_size );
   
+  // -- internals of this class --
 private:
-  // private Qt GUI Components for the LayerManagerWidget
-  QWidget* main_;
-  QVBoxLayout* main_layout_;
-  QVBoxLayout* group_layout_;
-  LayerWidgetQWeakHandle active_layer_;
+  LayerManagerWidgetPrivateHandle private_;
 
-private:
-  QList< LayerGroupWidgetQHandle > group_list_;
+  // -- static functions for callbacks into this widget --
+public:
+  typedef QPointer< LayerManagerWidget > qpointer_type;
+  
+  // HANDLEGROUPINTERNALCHANGED:
+  static void HandleGroupInternalChanged( qpointer_type qpointer, LayerGroupHandle &group );
 
-  typedef std::map< std::string, LayerGroupWidgetQHandle > 
-    group_widget_map_type;
-  group_widget_map_type group_map_;
+  // HANDLEGROUPSCHANGED:
+  static void HandleGroupsChanged( qpointer_type qpointer );
+
 };
 
 } //endnamespace Seg3d

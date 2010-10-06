@@ -209,6 +209,10 @@ public:
   // UPDATESTATE:
   // Entry point for the state engine to notify state has changed
   static void UpdateState( qpointer_type qpointer );
+
+  // UPDATEACTIVESTATE:
+  // Entry point for the state engine to notify active layer has changed
+  static void UpdateActiveState( qpointer_type qpointer, LayerHandle layer );
   
   // UPDATEVIEWERBUTTONS:
   // update the layout of the viewer buttons

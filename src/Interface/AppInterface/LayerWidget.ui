@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>273</width>
+    <width>311</width>
     <height>414</height>
    </rect>
   </property>
@@ -907,11 +907,6 @@ QPushButton#activate_button_{
                    <verstretch>0</verstretch>
                   </sizepolicy>
                  </property>
-                 <property name="font">
-                  <font>
-                   <pointsize>8</pointsize>
-                  </font>
-                 </property>
                  <property name="text">
                   <string>Brightness:</string>
                  </property>
@@ -951,11 +946,6 @@ QPushButton#activate_button_{
                    <width>16777215</width>
                    <height>16777215</height>
                   </size>
-                 </property>
-                 <property name="font">
-                  <font>
-                   <pointsize>8</pointsize>
-                  </font>
                  </property>
                  <property name="text">
                   <string>Contrast:</string>
@@ -1171,11 +1161,6 @@ QPushButton#activate_button_{
             </property>
             <item>
              <widget class="QLabel" name="opacity_label_">
-              <property name="font">
-               <font>
-                <pointsize>8</pointsize>
-               </font>
-              </property>
               <property name="text">
                <string>Opacity:</string>
               </property>

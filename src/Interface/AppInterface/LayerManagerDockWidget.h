@@ -30,28 +30,12 @@
 #define INTERFACE_APPINTERFACE_LAYERMANAGERDOCKWIDGET_H
 
 // QT includes
-#include <QtGui>
-
-// STL includes
-#include <string>
-
-// Boost includes
-#include <boost/signals2/signal.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/thread.hpp>
-#include <boost/shared_ptr.hpp>
-
-// Core includes
-#include <Core/Utils/ConnectionHandler.h>
-
-// Interface includes
-#include <Interface/AppInterface/LayerWidget.h>
-#include <Interface/AppInterface/LayerManagerWidget.h>
+#include <QDockWidget>
 
 namespace Seg3D
 {
 
-class LayerManagerDockWidget : public QDockWidget, public Core::ConnectionHandler
+class LayerManagerDockWidget : public QDockWidget
 {
 Q_OBJECT
 
@@ -59,34 +43,6 @@ Q_OBJECT
 public:
   LayerManagerDockWidget( QWidget *parent = 0 );
   virtual ~LayerManagerDockWidget();
-
-  // -- functions that control the layer manager --
-public:
-  
-  //Set the active layer
-  void activate_layer_ui( LayerHandle &layer );
-  
-  // GROUPS_CHANGED_UI:
-  // function that handles sending notification to the ui that one of the groups has been changed
-  void groups_changed_ui();
-  
-  // GROUP_INTERNALS_CHANGED_UI:
-  // function that handles sending notification to the ui that the contents of one of the groups 
-  // has been changed
-  void group_internals_changed_ui( LayerGroupHandle &group );
-
-  // -- static functions for callbacks into this widget --
-public:
-  typedef QPointer< LayerManagerDockWidget > qpointer_type;
-  
-  static void HandleGroupInternalChanged( qpointer_type qpointer, LayerGroupHandle &group );
-  static void HandleGroupsChanged( qpointer_type qpointer );
-  static void HandleActivateLayer( qpointer_type qpointer, LayerHandle &layer );
-  
-  
-private:
-  QSharedPointer< LayerManagerWidget > layer_manager_widget_;
-  
 };
 
 } // end namespace Seg3D
