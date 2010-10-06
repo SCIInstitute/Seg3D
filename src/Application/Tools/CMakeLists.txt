@@ -71,6 +71,8 @@ SET(APPLICATION_TOOLS_SRCS
   DistanceFilter.cc
   FillHolesFilter.h
   FillHolesFilter.cc
+  GradientAnisotropicDiffusionFilter.h
+  GradientAnisotropicDiffusionFilter.cc
   GradientMagnitudeFilter.h
   GradientMagnitudeFilter.cc
   HistogramEqualizationFilter.h

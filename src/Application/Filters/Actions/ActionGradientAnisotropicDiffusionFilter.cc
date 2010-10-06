@@ -27,24 +27,24 @@
  */
 
 // ITK includes
-#include <itkCurvatureAnisotropicDiffusionImageFilter.h>
+#include <itkGradientAnisotropicDiffusionImageFilter.h>
 
 // Application includes
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/StatusBar/StatusBar.h>
 #include <Application/Filters/ITKFilter.h>
-#include <Application/Filters/Actions/ActionCurvatureAnisotropicDiffusionFilter.h>
+#include <Application/Filters/Actions/ActionGradientAnisotropicDiffusionFilter.h>
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
 // NOTE: Registration needs to be done outside of any namespace
-CORE_REGISTER_ACTION( Seg3D, CurvatureAnisotropicDiffusionFilter )
+CORE_REGISTER_ACTION( Seg3D, GradientAnisotropicDiffusionFilter )
 
 namespace Seg3D
 {
 
-bool ActionCurvatureAnisotropicDiffusionFilter::validate( Core::ActionContextHandle& context )
+bool ActionGradientAnisotropicDiffusionFilter::validate( Core::ActionContextHandle& context )
 {
   // Check for layer existance and type information
   std::string error;
@@ -87,7 +87,7 @@ bool ActionCurvatureAnisotropicDiffusionFilter::validate( Core::ActionContextHan
 // NOTE: The separation of the algorithm into a private class is for the purpose of running the
 // filter on a separate thread.
 
-class CurvatureAnisotropicDiffusionFilterAlgo : public ITKFilter
+class GradientAnisotropicDiffusionFilterAlgo : public ITKFilter
 {
 
 public:
@@ -108,7 +108,7 @@ public:
   SCI_BEGIN_TYPED_ITK_RUN( this->src_layer_->get_data_type() )
   {
     // Define the type of filter that we use.
-    typedef itk::CurvatureAnisotropicDiffusionImageFilter< 
+    typedef itk::GradientAnisotropicDiffusionImageFilter< 
       TYPED_IMAGE_TYPE, FLOAT_IMAGE_TYPE > filter_type;
 
     // Retrieve the image as an itk image from the underlying data structure
@@ -170,7 +170,7 @@ public:
   // The name of the filter, this information is used for generating new layer labels.
   virtual std::string get_filter_name() const
   {
-    return "AnisotropicDiffusion Filter";
+    return "Gradient AnisotropicDiffusion Filter";
   }
   
   // GET_LAYER_PREFIX:
@@ -178,17 +178,17 @@ public:
   // when a new layer is generated. 
   virtual std::string get_layer_prefix() const
   {
-    return "CurvAnisoDiff"; 
+    return "GradAnisoDiff"; 
   } 
 };
 
 
-bool ActionCurvatureAnisotropicDiffusionFilter::run( Core::ActionContextHandle& context, 
+bool ActionGradientAnisotropicDiffusionFilter::run( Core::ActionContextHandle& context, 
   Core::ActionResultHandle& result )
 {
   // Create algorithm
-  boost::shared_ptr<CurvatureAnisotropicDiffusionFilterAlgo> algo(
-    new CurvatureAnisotropicDiffusionFilterAlgo );
+  boost::shared_ptr<GradientAnisotropicDiffusionFilterAlgo> algo(
+    new GradientAnisotropicDiffusionFilterAlgo );
 
   // Copy the parameters over to the algorithm that runs the filter
   algo->iterations_ = this->iterations_.value();
@@ -227,13 +227,13 @@ bool ActionCurvatureAnisotropicDiffusionFilter::run( Core::ActionContextHandle& 
 }
 
 
-void ActionCurvatureAnisotropicDiffusionFilter::Dispatch( Core::ActionContextHandle context, 
+void ActionGradientAnisotropicDiffusionFilter::Dispatch( Core::ActionContextHandle context, 
   std::string layer_id, int iterations, double sensitivity, 
   bool preserve_data_format, bool replace )
 { 
   // Create a new action
-  ActionCurvatureAnisotropicDiffusionFilter* action = 
-    new ActionCurvatureAnisotropicDiffusionFilter;
+  ActionGradientAnisotropicDiffusionFilter* action = 
+    new ActionGradientAnisotropicDiffusionFilter;
 
   // Setup the parameters
   action->layer_id_.value() = layer_id;

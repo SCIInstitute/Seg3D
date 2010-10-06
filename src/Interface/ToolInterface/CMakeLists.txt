@@ -48,6 +48,7 @@ SET(INTERFACE_TOOLINTERFACE_SRCS
   DiscreteGaussianFilterInterface.cc
   DistanceFilterInterface.cc
   FillHolesFilterInterface.cc
+  GradientAnisotropicDiffusionFilterInterface.cc
   GradientMagnitudeFilterInterface.cc
   HistogramEqualizationFilterInterface.cc
   IntensityCorrectionFilterInterface.cc
@@ -83,6 +84,7 @@ SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
   DiscreteGaussianFilterInterface.h
   DistanceFilterInterface.h
   FillHolesFilterInterface.h
+  GradientAnisotropicDiffusionFilterInterface.h
   GradientMagnitudeFilterInterface.h
   HistogramEqualizationFilterInterface.h
   IntensityCorrectionFilterInterface.h
@@ -121,6 +123,7 @@ SET(INTERFACE_TOOLINTERFACE_UI_SRCS
   DiscreteGaussianFilterInterface.ui
   DistanceFilterInterface.ui
   FillHolesFilterInterface.ui
+  GradientAnisotropicDiffusionFilterInterface.ui
   GradientMagnitudeFilterInterface.ui
   HistogramEqualizationFilterInterface.ui
   IntensityCorrectionFilterInterface.ui

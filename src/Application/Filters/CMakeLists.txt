@@ -65,6 +65,8 @@ SET(APPLICATION_FILTERS_ACTIONS_SRCS
   Actions/ActionDistanceFilter.cc
   Actions/ActionErodeFilter.h
   Actions/ActionErodeFilter.cc
+  Actions/ActionGradientAnisotropicDiffusionFilter.h
+  Actions/ActionGradientAnisotropicDiffusionFilter.cc
   Actions/ActionGradientMagnitudeFilter.h
   Actions/ActionGradientMagnitudeFilter.cc
   Actions/ActionFillHolesFilter.h
