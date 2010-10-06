@@ -189,6 +189,8 @@ public:
       static_cast<size_t>( ny -1 ), static_cast<size_t>( nz -1 ) ) ];
     if ( val ) lut[ val ] = 0;
     
+    lut[ 0 ] = 1;
+    
     this->dst_layer_->update_progress_signal_( 0.80 );
     if ( this->check_abort() )
     {
