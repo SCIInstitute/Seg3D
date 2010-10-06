@@ -143,6 +143,7 @@ bool MaskDataBlockManager::create( GridTransform grid_transform, MaskDataBlockHa
 
   // Generate the new mask
   mask = MaskDataBlockHandle( new MaskDataBlock( data_block, mask_bit ) );
+  data_block->increase_generation();
   
   // Clear the mask before using it
   
@@ -215,6 +216,7 @@ void MaskDataBlockManager::release(DataBlockHandle& datablock, unsigned int mask
     {
       mask_list[ j ].bits_used_[mask_bit] = 0;
       mask_list[ j ].data_masks_[mask_bit].reset();
+      datablock->increase_generation();
 
       // If the DataBlock is not used any more clear it
       if ( mask_list[ j ].bits_used_.count() == 0 )
