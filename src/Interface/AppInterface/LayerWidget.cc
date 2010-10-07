@@ -160,6 +160,9 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   this->private_->ui_.opacity_bar_->hide();
   this->private_->ui_.volume_rendered_button_->hide();
   
+  QtUtils::QtBridge::Show( this->private_->ui_.advanced_visibility_button_, 
+    PreferencesManager::Instance()->advanced_visibility_settings_state_ );
+  
   // add the PushDragButtongroup|group_0
   this->private_->activate_button_ = new PushDragButton( this->private_->ui_.typeGradient_ );
   this->private_->activate_button_->setObjectName( QString::fromUtf8( "activate_button_" ) );

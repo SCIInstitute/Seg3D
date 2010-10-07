@@ -49,10 +49,6 @@ class AppPreferencesPrivate
 {
 public:
     Ui::AppPreferences ui_;
-  QtUtils::QtSliderDoubleCombo* opacity_adjuster_;
-  QtUtils::QtSliderIntCombo* auto_save_timer_adjuster_;
-  
-  //QVector< ColorButton* > color_buttons_;
   QButtonGroup* color_button_group_;
   QVector< ColorPickerWidget* > color_pickers_;
 };
@@ -101,11 +97,6 @@ void AppPreferences::change_project_directory()
 
 void AppPreferences::setup_general_prefs()
 {
-
-  this->private_->auto_save_timer_adjuster_ = new QtUtils::QtSliderIntCombo( this );
-  this->private_->ui_.horizontalLayout_13->addWidget( this->private_->auto_save_timer_adjuster_ );
-  this->private_->auto_save_timer_adjuster_->setObjectName( QString::fromUtf8( "auto_save_timer_adjuster_" ) );
-
   //Set Layers Preferences
   this->project_directory_.setPath( QString::fromStdString( PreferencesManager::Instance()->
     project_path_state_->export_to_string() ) );
@@ -127,8 +118,12 @@ void AppPreferences::setup_general_prefs()
     PreferencesManager::Instance()->auto_save_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.smart_save_checkbox_,
     PreferencesManager::Instance()->smart_save_state_ );
-  QtUtils::QtBridge::Connect( this->private_->auto_save_timer_adjuster_,
+  QtUtils::QtBridge::Connect( this->private_->ui_.auto_save_timer_adjuster_,
     PreferencesManager::Instance()->auto_save_time_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.advanced_visibility_checkbox_,
+    PreferencesManager::Instance()->advanced_visibility_settings_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.enable_compression_checkbox_,
+    PreferencesManager::Instance()->compression_state_ );
 
 }
 
@@ -170,13 +165,8 @@ void AppPreferences::setup_layer_prefs()
   this->private_->color_button_group_->button( 0 )->click();
   
 //Set Layers Preferences
-  // Add SliderSpin Combo for adjusting the default opacity of the layers
-  this->private_->opacity_adjuster_ = new QtUtils::QtSliderDoubleCombo( this );
-  this->private_->ui_.verticalLayout_2->addWidget( this->private_->opacity_adjuster_ );
-  this->private_->opacity_adjuster_->setObjectName( QString::fromUtf8( "opacity_adjuster_" ) );
-  
   //Connect Layers Preferences
-  QtUtils::QtBridge::Connect( this->private_->opacity_adjuster_, 
+  QtUtils::QtBridge::Connect( this->private_->ui_.opacity_adjuster_, 
     PreferencesManager::Instance()->default_layer_opacity_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.mask_fill_combobox_, 
     PreferencesManager::Instance()->default_mask_fill_state_ );

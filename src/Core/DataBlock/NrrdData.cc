@@ -25,6 +25,9 @@
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
  */
+ 
+//Application includes
+#include <Application/PreferencesManager/PreferencesManager.h>
 
 // Core includes
 #include <Core/Utils/Log.h>
@@ -506,7 +509,11 @@ bool NrrdData::SaveNrrd( const std::string& filename, NrrdDataHandle nrrddata, s
 
   NrrdIoState* nio = nrrdIoStateNew();
   nrrdIoStateSet( nio,  nrrdIoStateZlibLevel, 6 );
-  nrrdIoStateEncodingSet( nio, nrrdEncodingGzip );
+  // Turn on compression if the user wants it.
+  if( Seg3D::PreferencesManager::Instance()->compression_state_->get() )
+  { 
+    nrrdIoStateEncodingSet( nio, nrrdEncodingGzip );
+  }
   
   if ( nrrdSave( filename.c_str(), nrrddata->nrrd(), nio ) )
   {

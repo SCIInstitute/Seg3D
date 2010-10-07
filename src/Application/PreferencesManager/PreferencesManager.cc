@@ -96,41 +96,43 @@ void PreferencesManager::initialize_states()
   user_path = user_path / "Seg3D-Projects";
 
   //General Preferences
-  add_state( "project_path", project_path_state_, user_path.string() );
-  add_state( "full_screen_on_startup", full_screen_on_startup_state_, false );
-  add_state( "auto_save", auto_save_state_, true );
-  add_state( "auto_save_time", auto_save_time_state_, 15, 1, 120, 1 );
-  add_state( "smart_save", smart_save_state_, true );
+  add_state( "project_path", this->project_path_state_, user_path.string() );
+  add_state( "full_screen_on_startup", this->full_screen_on_startup_state_, false );
+  add_state( "auto_save", this->auto_save_state_, true );
+  add_state( "auto_save_time", this->auto_save_time_state_, 15, 1, 120, 1 );
+  add_state( "smart_save", this->smart_save_state_, true );
+  add_state( "advanced_visibility_settings", this->advanced_visibility_settings_state_, false );
+  add_state( "compression", this->compression_state_, true );
 
   
   //Viewer Preferences
-  add_state( "default_viewer_mode", default_viewer_mode_state_, "1and3", 
+  add_state( "default_viewer_mode", this->default_viewer_mode_state_, "1and3", 
     "single|1and1|1and2|1and3|2and2|2and3|3and3" );
-  add_state( "grid_size", grid_size_state_, 20 );
-  add_state( "background_color", background_color_state_, "black", 
+  add_state( "grid_size", this->grid_size_state_, 20 );
+  add_state( "background_color", this->background_color_state_, "black", 
     "black|lightgray|darkgray|gray|fuchsia" );
-  add_state( "show_slice_number", show_slice_number_state_, true );
+  add_state( "show_slice_number", this->show_slice_number_state_, true );
   
   //Layers Preferences
-  add_state( "default_layer_opacity", default_layer_opacity_state_, 1.0, 0.0, 1.0, 0.01 );
-  add_state( "default_mask_fill", default_mask_fill_state_, "striped", "none|striped|solid" );
-  add_state( "default_mask_border", default_mask_border_state_, "thick", "none|thin|thick" );
+  add_state( "default_layer_opacity", this->default_layer_opacity_state_, 1.0, 0.0, 1.0, 0.01 );
+  add_state( "default_mask_fill", this->default_mask_fill_state_, "striped", "none|striped|solid" );
+  add_state( "default_mask_border", this->default_mask_border_state_, "thick", "none|thin|thick" );
     
   this->color_states_.resize( 12 );
   for ( size_t j = 0; j < 12; j++ )
   {
     std::string stateid = std::string( "color_" ) + Core::ExportToString( j );
-    this->add_state( stateid, color_states_[ j ], this->default_colors_[ j ] );
+    this->add_state( stateid, this->color_states_[ j ], this->default_colors_[ j ] );
   }
   
   //Interface Controls Preferences
   
   //Sidebars Preferences
-  add_state( "show_tools_bar", show_tools_bar_state_, true );
-  add_state( "show_layermanager_bar", show_layermanager_bar_state_, true );
-  add_state( "show_projectmanager_bar", show_projectmanager_bar_state_, true );
-  add_state( "show_measurement_bar", show_measurement_bar_state_, false );
-  add_state( "show_history_bar", show_history_bar_state_, false );
+  add_state( "show_tools_bar", this->show_tools_bar_state_, true );
+  add_state( "show_layermanager_bar", this->show_layermanager_bar_state_, true );
+  add_state( "show_projectmanager_bar", this->show_projectmanager_bar_state_, true );
+  add_state( "show_measurement_bar", this->show_measurement_bar_state_, false );
+  add_state( "show_history_bar", this->show_history_bar_state_, false );
   
 }
 

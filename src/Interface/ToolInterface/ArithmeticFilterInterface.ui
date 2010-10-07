@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>223</width>
-    <height>471</height>
+    <height>473</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -171,7 +171,14 @@
              </widget>
             </item>
             <item>
-             <widget class="QComboBox" name="input_b_"/>
+             <widget class="QComboBox" name="input_b_">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
             </item>
            </layout>
           </widget>
@@ -199,7 +206,14 @@
              </widget>
             </item>
             <item>
-             <widget class="QComboBox" name="input_c_"/>
+             <widget class="QComboBox" name="input_c_">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
             </item>
            </layout>
           </widget>
@@ -227,7 +241,14 @@
              </widget>
             </item>
             <item>
-             <widget class="QComboBox" name="input_d_"/>
+             <widget class="QComboBox" name="input_d_">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
             </item>
            </layout>
           </widget>
@@ -295,7 +316,14 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QComboBox" name="predefined_expressions_"/>
+          <widget class="QComboBox" name="predefined_expressions_">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>
@@ -347,7 +375,14 @@
           </widget>
          </item>
          <item>
-          <widget class="QComboBox" name="output_type_"/>
+          <widget class="QComboBox" name="output_type_">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>

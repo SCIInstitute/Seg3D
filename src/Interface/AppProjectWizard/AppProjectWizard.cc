@@ -102,7 +102,6 @@ void ProjectInfoPage::initializePage()
 {
   this->project_path_lineedit_->setText( QString::fromStdString( ProjectManager::Instance()->current_project_path_state_->get() ) );
   registerField( "projectPath", this->project_path_lineedit_ );
-  
 }
   
 

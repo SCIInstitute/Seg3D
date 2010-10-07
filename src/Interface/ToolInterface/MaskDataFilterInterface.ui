@@ -167,7 +167,14 @@
        <number>4</number>
       </property>
       <item>
-       <widget class="QComboBox" name="replace_with_"/>
+       <widget class="QComboBox" name="replace_with_">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

@@ -417,7 +417,14 @@
              </widget>
             </item>
             <item>
-             <widget class="QComboBox" name="dst_group_combobox_"/>
+             <widget class="QComboBox" name="dst_group_combobox_">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
             </item>
            </layout>
           </widget>
@@ -448,7 +455,14 @@
              </widget>
             </item>
             <item>
-             <widget class="QComboBox" name="padding_combobox_"/>
+             <widget class="QComboBox" name="padding_combobox_">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
             </item>
            </layout>
           </widget>
@@ -684,7 +698,14 @@
        <number>4</number>
       </property>
       <item>
-       <widget class="QComboBox" name="kernel_combobox_"/>
+       <widget class="QComboBox" name="kernel_combobox_">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QWidget" name="param_widget_" native="true">
