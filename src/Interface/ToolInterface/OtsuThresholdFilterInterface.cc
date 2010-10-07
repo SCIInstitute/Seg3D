@@ -54,12 +54,9 @@ class OtsuThresholdFilterInterfacePrivate
 {
 public:
   Ui::OtsuThresholdFilterInterface ui_;
-  
-  QtUtils::QtSliderIntCombo *amount_;
-  QtUtils::QtHistogramWidget *histogram_;
 
 public:
-  static void UpdateHistogram( QPointer<QtUtils::QtHistogramWidget> qpointer,
+  static void UpdateHistogram( QPointer< QtUtils::QtHistogramWidget > qpointer,
     std::string old_layer_name, std::string layer_name, Core::ActionSource source );
 };
 
@@ -110,12 +107,8 @@ bool OtsuThresholdFilterInterface::build_widget( QFrame* frame )
   //Step 1 - build the Qt GUI Widget
   this->private_->ui_.setupUi( frame );
 
-  this->private_->amount_ = new QtUtils::QtSliderIntCombo();
-  this->private_->ui_.amountHLayout_bottom->addWidget( this->private_->amount_ );
-  
-  this->private_->histogram_ = new QtUtils::QtHistogramWidget( this );
-  this->private_->ui_.histogramHLayout->addWidget( this->private_->histogram_ );
-    
+  this->private_->ui_.horizontalLayout_3->setAlignment( Qt::AlignHCenter );
+
   //Step 2 - get a pointer to the tool
   OtsuThresholdFilter* tool = dynamic_cast< OtsuThresholdFilter* > ( this->tool().get() );
   
@@ -125,10 +118,10 @@ bool OtsuThresholdFilterInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Connect( this->private_->ui_.use_active_layer_, 
     tool->use_active_layer_state_ );
       
-  QtUtils::QtBridge::Connect( this->private_->amount_, 
+  QtUtils::QtBridge::Connect( this->private_->ui_.amount_, 
     tool->amount_state_ );
       
-  QPointer<QtUtils::QtHistogramWidget> qpointer( this->private_->histogram_ );
+  QPointer<QtUtils::QtHistogramWidget> qpointer( this->private_->ui_.histogram_ );
   this->add_connection( tool->target_layer_state_->value_changed_signal_.connect( boost::bind(
     &OtsuThresholdFilterInterfacePrivate::UpdateHistogram, qpointer, _1, _2, _3 ) ) );
   

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>213</width>
-    <height>307</height>
+    <height>283</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -52,61 +52,75 @@
     <number>4</number>
    </property>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_6">
-     <item>
-      <widget class="QGroupBox" name="target_groupbox_">
-       <property name="font">
-        <font>
-         <pointsize>10</pointsize>
-        </font>
-       </property>
-       <property name="title">
-        <string>Target Layer</string>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout_4">
-        <property name="margin">
-         <number>4</number>
+    <widget class="QGroupBox" name="target_groupbox_">
+     <property name="title">
+      <string>Target Layer</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_4">
+      <property name="margin">
+       <number>4</number>
+      </property>
+      <item>
+       <widget class="QComboBox" name="target_layer_">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
-        <item>
-         <widget class="QComboBox" name="target_layer_">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="use_active_layer_">
-          <property name="text">
-           <string>Always Use Active Layer</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
-    </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QWidget" name="widget_4" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>20</height>
+         </size>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="margin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QCheckBox" name="use_active_layer_">
+           <property name="text">
+            <string>Always Use Active Layer</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="amountHLayout_top">
-     <item>
-      <widget class="QGroupBox" name="groupBox">
-       <property name="title">
-        <string>Amount of thresholds</string>
-       </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <property name="margin">
-         <number>4</number>
-        </property>
-        <item>
-         <layout class="QHBoxLayout" name="amountHLayout_bottom"/>
-        </item>
-       </layout>
-      </widget>
-     </item>
-    </layout>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Number of thresholds</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <property name="leftMargin">
+       <number>4</number>
+      </property>
+      <property name="topMargin">
+       <number>2</number>
+      </property>
+      <property name="rightMargin">
+       <number>4</number>
+      </property>
+      <property name="bottomMargin">
+       <number>4</number>
+      </property>
+      <item>
+       <widget class="QtUtils::QtSliderIntCombo" name="amount_" native="true"/>
+      </item>
+     </layout>
+    </widget>
    </item>
    <item>
     <widget class="QWidget" name="widget" native="true">
@@ -131,12 +145,6 @@
       </property>
       <item>
        <widget class="QPushButton" name="runFilterButton">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
         <property name="layoutDirection">
          <enum>Qt::RightToLeft</enum>
         </property>
@@ -149,10 +157,24 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="histogramHLayout"/>
+    <widget class="QtUtils::QtHistogramWidget" name="histogram_" native="true"/>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QtUtils::QtSliderIntCombo</class>
+   <extends>QWidget</extends>
+   <header location="global">QtUtils/Widgets/QtSliderIntCombo.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QtUtils::QtHistogramWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">QtUtils/Widgets/QtHistogramWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

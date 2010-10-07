@@ -48,9 +48,6 @@ class IntensityCorrectionFilterInterfacePrivate
 {
 public:
   Ui::IntensityCorrectionFilterInterface ui_;
-  
-    QtUtils::QtSliderIntCombo *order_;
-  QtUtils::QtSliderDoubleCombo *edge_;
 };
 
 // constructor
@@ -69,14 +66,9 @@ bool IntensityCorrectionFilterInterface::build_widget( QFrame* frame )
 {
   //Step 1 - build the Qt GUI Widget
   this->private_->ui_.setupUi( frame );
+  this->private_->ui_.horizontalLayout_4->setAlignment( Qt::AlignHCenter );
+  this->private_->ui_.horizontalLayout_5->setAlignment( Qt::AlignHCenter );
 
-  //Add the SliderSpinCombos
-  this->private_->order_ = new QtUtils::QtSliderIntCombo();
-  this->private_->ui_.orderHLayout_bottom->addWidget( this->private_->order_ );
-
-  this->private_->edge_ = new QtUtils::QtSliderDoubleCombo();
-  this->private_->ui_.edgeHLayout_bottom->addWidget( this->private_->edge_ );
-  
   //Step 2 - get a pointer to the tool
   IntensityCorrectionFilter* tool = dynamic_cast< IntensityCorrectionFilter* > ( 
     this->tool().get() );
@@ -89,9 +81,9 @@ bool IntensityCorrectionFilterInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Connect( this->private_->ui_.preserve_data_format_,
     tool->preserve_data_format_state_ );
 
-  QtUtils::QtBridge::Connect( this->private_->order_, 
+  QtUtils::QtBridge::Connect( this->private_->ui_.order_, 
     tool->order_state_ );
-  QtUtils::QtBridge::Connect( this->private_->edge_, 
+  QtUtils::QtBridge::Connect( this->private_->ui_.edge_, 
     tool->edge_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.replaceCheckBox, 
     tool->replace_state_ );

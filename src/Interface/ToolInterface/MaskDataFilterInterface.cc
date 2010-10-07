@@ -66,6 +66,8 @@ bool MaskDataFilterInterface::build_widget( QFrame* frame )
 {
   //Step 1 - build the Qt GUI Widget
   this->private_->ui_.setupUi( frame );
+  this->private_->ui_.horizontalLayout_2->setAlignment( Qt::AlignHCenter );
+  this->private_->ui_.horizontalLayout_3->setAlignment( Qt::AlignHCenter );
 
   //Step 2 - get a pointer to the tool
   MaskDataFilter* tool = dynamic_cast< MaskDataFilter* > ( this->tool().get() );

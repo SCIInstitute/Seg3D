@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>225</width>
-    <height>166</height>
+    <height>155</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -47,11 +47,6 @@
    </property>
    <item>
     <widget class="QGroupBox" name="target_groupbox_">
-     <property name="font">
-      <font>
-       <pointsize>10</pointsize>
-      </font>
-     </property>
      <property name="title">
       <string>Target Layer</string>
      </property>
@@ -70,10 +65,28 @@
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="use_active_layer_">
-        <property name="text">
-         <string>Always Use Active Layer</string>
+       <widget class="QWidget" name="widget_3" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>20</height>
+         </size>
         </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="margin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QCheckBox" name="use_active_layer_">
+           <property name="text">
+            <string>Always Use Active Layer</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
      </layout>
@@ -102,12 +115,6 @@
       </property>
       <item>
        <widget class="QPushButton" name="clearSeedsButton">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
         <property name="text">
          <string>Clear Seeds</string>
         </property>
@@ -132,9 +139,18 @@
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,1">
       <property name="spacing">
-       <number>4</number>
+       <number>0</number>
       </property>
-      <property name="margin">
+      <property name="leftMargin">
+       <number>2</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
        <number>0</number>
       </property>
       <item>
@@ -149,12 +165,6 @@
       </item>
       <item>
        <widget class="QPushButton" name="runFilterButton">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
         <property name="text">
          <string>Run Filter</string>
         </property>

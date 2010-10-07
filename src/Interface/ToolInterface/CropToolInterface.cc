@@ -48,12 +48,6 @@ class CropToolInterfacePrivate
 {
 public:
   Ui::CropToolInterface ui_;
-  QtUtils::QtSliderDoubleCombo* crop_origin_x_;
-  QtUtils::QtSliderDoubleCombo* crop_origin_y_;
-  QtUtils::QtSliderDoubleCombo* crop_origin_z_;
-  QtUtils::QtSliderDoubleCombo* crop_width_;
-  QtUtils::QtSliderDoubleCombo* crop_height_;
-  QtUtils::QtSliderDoubleCombo* crop_depth_;
 };
 
 // constructor
@@ -72,24 +66,7 @@ bool CropToolInterface::build_widget( QFrame* frame )
 {
   //Step 1 - build the Qt GUI Widget
   this->private_->ui_.setupUi( frame );
-
-  this->private_->crop_origin_x_ = new QtUtils::QtSliderDoubleCombo( this );
-  this->private_->ui_.start_x_layout_->addWidget( this->private_->crop_origin_x_ );
-
-  this->private_->crop_origin_y_ = new QtUtils::QtSliderDoubleCombo( this );
-  this->private_->ui_.start_y_layout_->addWidget( this->private_->crop_origin_y_ );
-
-  this->private_->crop_origin_z_ = new QtUtils::QtSliderDoubleCombo( this );
-  this->private_->ui_.start_z_layout_->addWidget( this->private_->crop_origin_z_ );
-
-  this->private_->crop_width_ = new QtUtils::QtSliderDoubleCombo( this );
-  this->private_->ui_.size_x_layout_->addWidget( this->private_->crop_width_ );
-
-  this->private_->crop_height_ = new QtUtils::QtSliderDoubleCombo( this );
-  this->private_->ui_.size_y_layout_->addWidget( this->private_->crop_height_ );
-
-  this->private_->crop_depth_ = new QtUtils::QtSliderDoubleCombo( this );
-  this->private_->ui_.size_z_layout_->addWidget( this->private_->crop_depth_ );
+  this->private_->ui_.horizontalLayout->setAlignment( Qt::AlignHCenter );
 
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
@@ -104,13 +81,13 @@ bool CropToolInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Connect( this->private_->ui_.label_ny_, tool->input_dimensions_state_[ 1 ] );
   QtUtils::QtBridge::Connect( this->private_->ui_.label_nz_, tool->input_dimensions_state_[ 2 ] );
 
-  QtUtils::QtBridge::Connect( this->private_->crop_origin_x_, tool->cropbox_origin_state_[ 0 ] );
-  QtUtils::QtBridge::Connect( this->private_->crop_origin_y_, tool->cropbox_origin_state_[ 1 ] );
-  QtUtils::QtBridge::Connect( this->private_->crop_origin_z_, tool->cropbox_origin_state_[ 2 ] );
+  QtUtils::QtBridge::Connect( this->private_->ui_.crop_origin_x_, tool->cropbox_origin_state_[ 0 ] );
+  QtUtils::QtBridge::Connect( this->private_->ui_.crop_origin_y_, tool->cropbox_origin_state_[ 1 ] );
+  QtUtils::QtBridge::Connect( this->private_->ui_.crop_origin_z_, tool->cropbox_origin_state_[ 2 ] );
 
-  QtUtils::QtBridge::Connect( this->private_->crop_width_, tool->cropbox_size_state_[ 0 ] );
-  QtUtils::QtBridge::Connect( this->private_->crop_height_, tool->cropbox_size_state_[ 1 ] );
-  QtUtils::QtBridge::Connect( this->private_->crop_depth_, tool->cropbox_size_state_[ 2 ] );
+  QtUtils::QtBridge::Connect( this->private_->ui_.crop_width_, tool->cropbox_size_state_[ 0 ] );
+  QtUtils::QtBridge::Connect( this->private_->ui_.crop_height_, tool->cropbox_size_state_[ 1 ] );
+  QtUtils::QtBridge::Connect( this->private_->ui_.crop_depth_, tool->cropbox_size_state_[ 2 ] );
 
   QtUtils::QtBridge::Connect( this->private_->ui_.replace_checkbox_, tool->replace_state_ );
 

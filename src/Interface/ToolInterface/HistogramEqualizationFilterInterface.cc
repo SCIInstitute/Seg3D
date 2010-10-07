@@ -54,11 +54,6 @@ class HistogramEqualizationFilterInterfacePrivate
 {
 public:
   Ui::HistogramEqualizationFilterInterface ui_;
-    
-  QtUtils::QtSliderDoubleCombo *amount_;
-  QtUtils::QtLogSliderIntCombo *bins_;
-  QtUtils::QtSliderIntCombo    *ignore_bins_;
-  QtUtils::QtHistogramWidget   *histogram_;
   
 public:
   static void UpdateHistogram( QPointer<QtUtils::QtHistogramWidget> qpointer,
@@ -108,18 +103,7 @@ bool HistogramEqualizationFilterInterface::build_widget( QFrame* frame )
 {
   //Step 1 - build the Qt GUI Widget
   this->private_->ui_.setupUi( frame );
-
-  this->private_->amount_ = new QtUtils::QtSliderDoubleCombo();
-  this->private_->ui_.amountHLayout_bottom->addWidget( this->private_->amount_ );
-
-  this->private_->bins_ = new QtUtils::QtLogSliderIntCombo();
-  this->private_->ui_.binsHLayout_bottom->addWidget( this->private_->bins_ );
-
-  this->private_->ignore_bins_ = new QtUtils::QtSliderIntCombo();
-  this->private_->ui_.ignore_binsHLayout_bottom->addWidget( this->private_->ignore_bins_ );
-
-  this->private_->histogram_ = new QtUtils::QtHistogramWidget( this );
-  this->private_->ui_.histogramHLayout->addWidget( this->private_->histogram_ );
+  this->private_->ui_.horizontalLayout_2->setAlignment( Qt::AlignHCenter );
 
   //Step 2 - get a pointer to the tool
   HistogramEqualizationFilter* tool = dynamic_cast< HistogramEqualizationFilter* >( 
@@ -133,16 +117,16 @@ bool HistogramEqualizationFilterInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Connect( this->private_->ui_.replaceCheckBox, 
     tool->replace_state_ );
 
-  QtUtils::QtBridge::Connect( this->private_->amount_, 
+  QtUtils::QtBridge::Connect( this->private_->ui_.amount_, 
     tool->amount_state_ );
-  QtUtils::QtBridge::Connect( this->private_->bins_, 
+  QtUtils::QtBridge::Connect( this->private_->ui_.bins_, 
     tool->bins_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ignore_bins_, 
+  QtUtils::QtBridge::Connect( this->private_->ui_.ignore_bins_, 
     tool->ignore_bins_state_ );
   QtUtils::QtBridge::Enable( this->private_->ui_.runFilterButton,
     tool->valid_target_state_ );
     
-  QPointer<QtUtils::QtHistogramWidget> qpointer( this->private_->histogram_ );
+  QPointer<QtUtils::QtHistogramWidget> qpointer( this->private_->ui_.histogram_ );
   this->add_connection( tool->target_layer_state_->value_changed_signal_.connect( boost::bind(
     &HistogramEqualizationFilterInterfacePrivate::UpdateHistogram, qpointer, _1, _2, _3 ) ) );
   

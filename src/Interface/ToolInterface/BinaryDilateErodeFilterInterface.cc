@@ -49,9 +49,6 @@ class BinaryDilateErodeFilterInterfacePrivate
 {
 public:
   Ui::BinaryDilateErodeFilterInterface ui_;
-  
-    QtUtils::QtSliderIntCombo *erode_;
-  QtUtils::QtSliderIntCombo *dilate_;
 };
 
 // constructor
@@ -70,14 +67,8 @@ bool BinaryDilateErodeFilterInterface::build_widget( QFrame* frame )
 {
   // Step 1 - build the Qt GUI Widget
   this->private_->ui_.setupUi( frame );
+  this->private_->ui_.horizontalLayout->setAlignment( Qt::AlignHCenter );
 
-  // add sliderspinnercombo's
-  this->private_->erode_ = new QtUtils::QtSliderIntCombo();
-  this->private_->ui_.erodeHLayout_bottom->addWidget( this->private_->erode_ );
-
-  this->private_->dilate_ = new QtUtils::QtSliderIntCombo();
-  this->private_->ui_.dialateHLayout_bottom->addWidget( this->private_->dilate_ );
-  
   // Step 2 - get a pointer to the tool
   BinaryDilateErodeFilter* tool = dynamic_cast< BinaryDilateErodeFilter* > ( this->tool().get() );
   
@@ -86,9 +77,9 @@ bool BinaryDilateErodeFilterInterface::build_widget( QFrame* frame )
     tool->target_layer_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.use_active_layer_, 
     tool->use_active_layer_state_ );
-  QtUtils::QtBridge::Connect( this->private_->erode_, 
+  QtUtils::QtBridge::Connect( this->private_->ui_.erode_, 
     tool->erode_state_ );
-  QtUtils::QtBridge::Connect( this->private_->dilate_, 
+  QtUtils::QtBridge::Connect( this->private_->ui_.dilate_, 
     tool->dilate_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.replaceCheckBox, 
     tool->replace_state_ );

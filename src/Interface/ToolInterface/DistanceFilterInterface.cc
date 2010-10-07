@@ -63,6 +63,7 @@ bool DistanceFilterInterface::build_widget( QFrame* frame )
 {
   //Step 1 - build the Qt GUI Widget
   this->private_->ui_.setupUi( frame );
+  this->private_->ui_.horizontalLayout_2->setAlignment( Qt::AlignHCenter );
   
   //Step 2 - get a pointer to the tool
   DistanceFilter* tool = dynamic_cast< DistanceFilter* > ( this->tool().get() );

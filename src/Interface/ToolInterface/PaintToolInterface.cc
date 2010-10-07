@@ -51,11 +51,6 @@ class PaintToolInterfacePrivate
 {
 public:
   Ui::PaintToolInterface ui_;
-
-    QtUtils::QtSliderIntCombo *brush_radius_;
-  QtUtils::QtSliderDoubleCombo *upper_threshold_;
-  QtUtils::QtSliderDoubleCombo *lower_threshold_;
-  
 };
 
 // constructor
@@ -74,17 +69,11 @@ bool PaintToolInterface::build_widget( QFrame* frame )
 {
   //Step 1 - build the Qt GUI Widget
   this->private_->ui_.setupUi( frame );
-
-  //Add the SliderSpinCombos
-  this->private_->brush_radius_ = new QtUtils::QtSliderIntCombo( this, false );
-  this->private_->ui_.verticalLayout->addWidget( this->private_->brush_radius_ );
-
-  this->private_->upper_threshold_ = new QtUtils::QtSliderDoubleCombo( this, false );
-  this->private_->ui_.upperHLayout_bottom->addWidget( this->private_->upper_threshold_ );
   
-  this->private_->lower_threshold_ = new QtUtils::QtSliderDoubleCombo( this, false );
-  this->private_->ui_.lowerHLayout_bottom->addWidget( this->private_->lower_threshold_ );
-  
+  this->private_->ui_.horizontalLayout->setAlignment( Qt::AlignHCenter );
+  this->private_->ui_.horizontalLayout_2->setAlignment( Qt::AlignHCenter );
+  this->private_->ui_.horizontalLayout_3->setAlignment( Qt::AlignHCenter );
+
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
   PaintTool* tool = dynamic_cast< PaintTool* > ( base_tool_.get() );
@@ -102,11 +91,11 @@ bool PaintToolInterface::build_widget( QFrame* frame )
     tool->data_constraint_layer_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.negative_data_constraint_,
     tool->negative_data_constraint_state_ );
-  QtUtils::QtBridge::Connect( this->private_->brush_radius_, 
+  QtUtils::QtBridge::Connect( this->private_->ui_.brush_radius_, 
     tool->brush_radius_state_ );
-  QtUtils::QtBridge::Connect( this->private_->upper_threshold_, 
+  QtUtils::QtBridge::Connect( this->private_->ui_.upper_threshold_, 
     tool->upper_threshold_state_ );
-  QtUtils::QtBridge::Connect( this->private_->lower_threshold_, 
+  QtUtils::QtBridge::Connect( this->private_->ui_.lower_threshold_, 
     tool->lower_threshold_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.eraseCheckBox, 
     tool->erase_state_ );
@@ -117,21 +106,11 @@ bool PaintToolInterface::build_widget( QFrame* frame )
   
   boost::function< bool () > condition = boost::lambda::bind( &Core::StateLabeledOption::get, 
     tool->data_constraint_layer_state_.get() ) != Tool::NONE_OPTION_C;
-  QtUtils::QtBridge::Enable( this->private_->upper_threshold_, 
+  QtUtils::QtBridge::Enable( this->private_->ui_.upper_threshold_, 
     tool->data_constraint_layer_state_, condition );
-  QtUtils::QtBridge::Enable( this->private_->lower_threshold_,
+  QtUtils::QtBridge::Enable( this->private_->ui_.lower_threshold_,
     tool->data_constraint_layer_state_, condition );
   
-//#if defined ( __APPLE__ )  
-//  QFont font;
-//  font.setPointSize( 11 );
-//  this->setFont( font );
-////  this->private_->ui_.target_mask_->setFont( font );
-////  this->private_->ui_.mask_constraint_->setFont( font );
-////  this->private_->ui_.data_constraint_->setFont( font );
-//#endif
-  
-
   return true;
 } 
 

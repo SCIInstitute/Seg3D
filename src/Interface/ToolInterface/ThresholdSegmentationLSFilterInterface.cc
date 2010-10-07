@@ -51,14 +51,14 @@ class ThresholdSegmentationLSFilterInterfacePrivate
 public:
   Ui::ThresholdSegmentationLSFilterInterface ui_;
   
-  QtUtils::QtSliderIntCombo *iterations_;
-  QtUtils::QtSliderDoubleCombo *upper_threshold_;
-  QtUtils::QtSliderDoubleCombo *lower_threshold_;
-  QtUtils::QtSliderDoubleCombo *curvature_;
-  QtUtils::QtSliderDoubleCombo *edge_;
-  QtUtils::QtSliderDoubleCombo *propagation_;
-  TargetComboBox *target_;
-  MaskComboBox *mask_;
+//  QtUtils::QtSliderIntCombo *iterations_;
+//  QtUtils::QtSliderDoubleCombo *upper_threshold_;
+//  QtUtils::QtSliderDoubleCombo *lower_threshold_;
+//  QtUtils::QtSliderDoubleCombo *curvature_;
+//  QtUtils::QtSliderDoubleCombo *edge_;
+//  QtUtils::QtSliderDoubleCombo *propagation_;
+//  TargetComboBox *target_;
+//  MaskComboBox *mask_;
 };
 
 // constructor
@@ -77,31 +77,7 @@ bool ThresholdSegmentationLSFilterInterface::build_widget( QFrame* frame )
 {
   //Step 1 - build the Qt GUI Widget
   this->private_->ui_.setupUi( frame );
-
-  // add sliderspinnercombo's
-  this->private_->iterations_ = new QtUtils::QtSliderIntCombo();
-  this->private_->ui_.iterationsHLayout_bottom->addWidget( this->private_->iterations_ );
-
-  this->private_->upper_threshold_ = new QtUtils::QtSliderDoubleCombo();
-  this->private_->ui_.upperHLayout_bottom->addWidget( this->private_->upper_threshold_ );
-
-  this->private_->lower_threshold_ = new QtUtils::QtSliderDoubleCombo();
-  this->private_->ui_.lowerHLayout_bottom->addWidget( this->private_->lower_threshold_ );
-
-  this->private_->curvature_ = new QtUtils::QtSliderDoubleCombo();
-  this->private_->ui_.curvatureHLayout_bottom->addWidget( this->private_->curvature_ );
-
-  this->private_->edge_ = new QtUtils::QtSliderDoubleCombo();
-  this->private_->ui_.edgeHLayout_bottom->addWidget( this->private_->edge_ );
-
-  this->private_->propagation_ = new QtUtils::QtSliderDoubleCombo();
-  this->private_->ui_.propagationHLayout_bottom->addWidget( this->private_->propagation_ );
-  
-  this->private_->target_ = new TargetComboBox( this );
-  this->private_->ui_.activeHLayout->addWidget( this->private_->target_ );
-  
-  this->private_->mask_ = new MaskComboBox( this );
-  this->private_->ui_.maskHLayout->addWidget( this->private_->mask_ );
+  this->private_->ui_.horizontalLayout_5->setAlignment( Qt::AlignHCenter );
 
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
@@ -109,21 +85,15 @@ bool ThresholdSegmentationLSFilterInterface::build_widget( QFrame* frame )
       dynamic_cast< ThresholdSegmentationLSFilter* > ( base_tool_.get() );
       
   //Step 3 - connect the gui to the tool through the QtBridge
-  //QtUtils::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
-  this->connect( this->private_->target_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
-  //QtUtils::QtBridge::Connect( this->private_->mask_, tool->mask_layer_state_ );
-  QtUtils::QtBridge::Connect( this->private_->iterations_, tool->iterations_state_ );
-  QtUtils::QtBridge::Connect( this->private_->upper_threshold_, tool->upper_threshold_state_ );
-  QtUtils::QtBridge::Connect( this->private_->lower_threshold_, tool->lower_threshold_state_ );
-  QtUtils::QtBridge::Connect( this->private_->curvature_, tool->curvature_state_ );
-  QtUtils::QtBridge::Connect( this->private_->edge_, tool->propagation_state_ );
-  QtUtils::QtBridge::Connect( this->private_->propagation_, tool->edge_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.iterations_, tool->iterations_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.upper_threshold_, tool->upper_threshold_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.lower_threshold_, tool->lower_threshold_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.curvature_, tool->curvature_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.edge_, tool->propagation_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.propagation_, tool->edge_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
   
   this->connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), this, SLOT( execute_filter() ) );
-  
-  this->private_->target_->sync_layers();
-  this->private_->mask_->sync_layers();
   
   //Send a message to the log that we have finised with building the Segmentation Level Set Filter Interface
   CORE_LOG_DEBUG("Finished building a Segmentation Level Set Filter Interface");

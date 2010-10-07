@@ -61,7 +61,10 @@ TransformToolInterface::~TransformToolInterface()
 bool TransformToolInterface::build_widget( QFrame* frame )
 {
   //Step 1 - build the Qt GUI Widget
-  private_->ui_.setupUi( frame );
+  this->private_->ui_.setupUi( frame );
+  this->private_->ui_.horizontalLayout_13->setAlignment( Qt::AlignHCenter );
+  this->private_->ui_.horizontalLayout_7->setAlignment( Qt::AlignHCenter );
+  
 
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();

@@ -52,9 +52,6 @@ class ThresholdToolInterfacePrivate
 {
 public:
   Ui::ThresholdToolInterface ui_;
-  
-  QtUtils::QtSliderDoubleCombo *upper_threshold_;
-  QtUtils::QtSliderDoubleCombo *lower_threshold_;
   QtUtils::QtHistogramWidget *histogram_;
 };
 
@@ -74,16 +71,11 @@ bool ThresholdToolInterface::build_widget( QFrame* frame )
 {
   //Step 1 - build the Qt GUI Widget
   this->private_->ui_.setupUi( frame );
+  this->private_->ui_.horizontalLayout_2->setAlignment( Qt::AlignHCenter );
+  this->private_->ui_.horizontalLayout_3->setAlignment( Qt::AlignHCenter );
 
-  // Add the SliderSpinner Combos
-  this->private_->upper_threshold_ = new QtUtils::QtSliderDoubleCombo();
-  this->private_->ui_.verticalLayout_2->addWidget( this->private_->upper_threshold_ );
-
-  this->private_->lower_threshold_ = new QtUtils::QtSliderDoubleCombo();
-  this->private_->ui_.verticalLayout_3->addWidget( this->private_->lower_threshold_ );
-    
   this->private_->histogram_ = new QtUtils::QtHistogramWidget( this, 
-    this->private_->upper_threshold_, this->private_->lower_threshold_ );
+    this->private_->ui_.upper_threshold_, this->private_->ui_.lower_threshold_ );
   this->private_->ui_.histogramHLayout->addWidget( this->private_->histogram_ );
   
   //Step 2 - get a pointer to the tool
@@ -94,8 +86,8 @@ bool ThresholdToolInterface::build_widget( QFrame* frame )
   connect( this->private_->ui_.target_layer_, SIGNAL( currentIndexChanged( QString ) ), 
     this, SLOT( refresh_histogram( QString ) ) );
   QtUtils::QtBridge::Connect( this->private_->ui_.target_layer_, tool->target_layer_state_ );
-  QtUtils::QtBridge::Connect( this->private_->upper_threshold_, tool->upper_threshold_state_ );
-  QtUtils::QtBridge::Connect( this->private_->lower_threshold_, tool->lower_threshold_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.upper_threshold_, tool->upper_threshold_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.lower_threshold_, tool->lower_threshold_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.use_active_layer_, tool->use_active_layer_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.show_preview_checkbox_, 
     tool->show_preview_state_ );
@@ -109,9 +101,9 @@ bool ThresholdToolInterface::build_widget( QFrame* frame )
 
   boost::function< bool () > condition = boost::lambda::bind( &Core::StateLabeledOption::get, 
     tool->target_layer_state_.get() ) != Tool::NONE_OPTION_C;
-  QtUtils::QtBridge::Enable( this->private_->upper_threshold_, 
+  QtUtils::QtBridge::Enable( this->private_->ui_.upper_threshold_, 
     tool->target_layer_state_, condition );
-  QtUtils::QtBridge::Enable( this->private_->lower_threshold_,
+  QtUtils::QtBridge::Enable( this->private_->ui_.lower_threshold_,
     tool->target_layer_state_, condition );
 
   //Send a message to the log that we have finished with building the Threshold Tool Interface

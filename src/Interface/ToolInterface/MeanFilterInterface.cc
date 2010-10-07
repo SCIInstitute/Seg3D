@@ -47,8 +47,6 @@ class MeanFilterInterfacePrivate
 {
 public:
   Ui::MeanFilterInterface ui_;
-  
-  QtUtils::QtSliderIntCombo *radius_;
 };
 
 // constructor
@@ -67,9 +65,8 @@ bool MeanFilterInterface::build_widget( QFrame* frame )
 {
   //Step 1 - build the Qt GUI Widget
   this->private_->ui_.setupUi( frame );
-
-  this->private_->radius_ = new QtUtils::QtSliderIntCombo();
-  this->private_->ui_.radiusHLayout_bottom->addWidget( this->private_->radius_ );
+  this->private_->ui_.horizontalLayout_3->setAlignment( Qt::AlignHCenter );
+  this->private_->ui_.horizontalLayout_4->setAlignment( Qt::AlignHCenter );
 
   //Step 2 - get a pointer to the tool
   MeanFilter* tool = dynamic_cast< MeanFilter* > ( this->tool().get() );
@@ -82,7 +79,7 @@ bool MeanFilterInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Connect( this->private_->ui_.preserve_data_format_,
     tool->preserve_data_format_state_ );
 
-  QtUtils::QtBridge::Connect( this->private_->radius_, 
+  QtUtils::QtBridge::Connect( this->private_->ui_.radius_, 
     tool->radius_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.replaceCheckBox, 
     tool->replace_state_ );

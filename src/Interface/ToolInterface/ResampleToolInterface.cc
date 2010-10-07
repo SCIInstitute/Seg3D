@@ -52,10 +52,6 @@ class ResampleToolInterfacePrivate
 {
 public:
   Ui::ResampleToolInterface ui_;
-  QtUtils::QtSliderIntCombo* output_x_;
-  QtUtils::QtSliderIntCombo* output_y_;
-  QtUtils::QtSliderIntCombo* output_z_;
-  QtUtils::QtSliderDoubleCombo* scale_;
 };
 
 // constructor
@@ -74,18 +70,8 @@ bool ResampleToolInterface::build_widget( QFrame* frame )
 {
   //Step 1 - build the Qt GUI Widget
   this->private_->ui_.setupUi( frame );
-
-  this->private_->output_x_ = new QtUtils::QtSliderIntCombo( this );
-  this->private_->ui_.new_nx_layout_->addWidget( this->private_->output_x_ );
-
-  this->private_->output_y_ = new QtUtils::QtSliderIntCombo( this );
-  this->private_->ui_.new_ny_layout_->addWidget( this->private_->output_y_ );
-
-  this->private_->output_z_ = new QtUtils::QtSliderIntCombo( this );
-  this->private_->ui_.new_nz_layout_->addWidget( this->private_->output_z_ );
-
-  this->private_->scale_ = new QtUtils::QtSliderDoubleCombo( this );
-  this->private_->ui_.scale_layout_->addWidget( this->private_->scale_ );
+  this->private_->ui_.horizontalLayout_6->setAlignment( Qt::AlignHCenter );
+  this->private_->ui_.horizontalLayout_7->setAlignment( Qt::AlignHCenter );
 
   QButtonGroup* button_group = new QButtonGroup( this );
   button_group->addButton( this->private_->ui_.rb_another_group_ );
@@ -108,12 +94,12 @@ bool ResampleToolInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Connect( this->private_->ui_.dst_group_combobox_, tool->dst_group_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.padding_combobox_, tool->padding_value_state_ );
 
-  QtUtils::QtBridge::Connect( this->private_->output_x_, tool->output_dimensions_state_[ 0 ] );
-  QtUtils::QtBridge::Connect( this->private_->output_y_, tool->output_dimensions_state_[ 1 ] );
-  QtUtils::QtBridge::Connect( this->private_->output_z_, tool->output_dimensions_state_[ 2 ] );
+  QtUtils::QtBridge::Connect( this->private_->ui_.output_x_, tool->output_dimensions_state_[ 0 ] );
+  QtUtils::QtBridge::Connect( this->private_->ui_.output_y_, tool->output_dimensions_state_[ 1 ] );
+  QtUtils::QtBridge::Connect( this->private_->ui_.output_z_, tool->output_dimensions_state_[ 2 ] );
 
   QtUtils::QtBridge::Connect( this->private_->ui_.aspect_checkbox_, tool->constraint_aspect_state_ );
-  QtUtils::QtBridge::Connect( this->private_->scale_, tool->scale_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.scale_, tool->scale_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.kernel_combobox_, tool->kernel_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.sigma_spinbox_, tool->gauss_sigma_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.cutoff_spinbox_, tool->gauss_cutoff_state_ );
@@ -132,7 +118,7 @@ bool ResampleToolInterface::build_widget( QFrame* frame )
 
   QtUtils::QtBridge::Enable( this->private_->ui_.target_group_, 
     tool->use_active_group_state_, true ); 
-  QtUtils::QtBridge::Enable( this->private_->scale_, tool->constraint_aspect_state_ );
+  QtUtils::QtBridge::Enable( this->private_->ui_.scale_, tool->constraint_aspect_state_ );
 
   QtUtils::QtBridge::Show( this->private_->ui_.param_widget_, tool->has_params_state_ );
   QtUtils::QtBridge::Show( this->private_->ui_.widget_new_size_, tool->manual_size_state_ );

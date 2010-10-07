@@ -48,7 +48,6 @@ class DiscreteGaussianFilterInterfacePrivate
 {
 public:
   Ui::DiscreteGaussianFilterInterface ui_;
-    QtUtils::QtSliderDoubleCombo *blurring_distance_;
 };
 
 DiscreteGaussianFilterInterface::DiscreteGaussianFilterInterface() :
@@ -65,9 +64,8 @@ bool DiscreteGaussianFilterInterface::build_widget( QFrame* frame )
 {
   //Step 1 - build the Qt GUI Widget
   this->private_->ui_.setupUi( frame );
-
-  this->private_->blurring_distance_ = new QtUtils::QtSliderDoubleCombo();
-  this->private_->ui_.varianceHLayout_bottom->addWidget( this->private_->blurring_distance_ );
+  this->private_->ui_.horizontalLayout_3->setAlignment( Qt::AlignHCenter );
+  this->private_->ui_.horizontalLayout_4->setAlignment( Qt::AlignHCenter );
   
   //Step 2 - get a pointer to the tool
   DiscreteGaussianFilter* tool = dynamic_cast< DiscreteGaussianFilter* > ( this->tool().get() );
@@ -82,7 +80,7 @@ bool DiscreteGaussianFilterInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Connect( this->private_->ui_.preserve_data_format_,
     tool->preserve_data_format_state_ );
 
-  QtUtils::QtBridge::Connect( this->private_->blurring_distance_, 
+  QtUtils::QtBridge::Connect( this->private_->ui_.blurring_distance_, 
     tool->blurring_distance_state_ );
 
   // Step 4 - Qt connections

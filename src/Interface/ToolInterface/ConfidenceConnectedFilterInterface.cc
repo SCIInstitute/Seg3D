@@ -45,8 +45,6 @@ class ConfidenceConnectedFilterInterfacePrivate
 {
 public:
   Ui::ConfidenceConnectedFilterInterface ui_;
-    QtUtils::QtSliderIntCombo *iterations_;
-  QtUtils::QtSliderDoubleCombo *multiplier_;
 };
 
 // constructor
@@ -65,13 +63,7 @@ bool ConfidenceConnectedFilterInterface::build_widget( QFrame* frame )
 {
   //Step 1 - build the Qt GUI Widget
   this->private_->ui_.setupUi( frame );
-
-  //Add the SliderSpinCombos
-  this->private_->iterations_ = new QtUtils::QtSliderIntCombo();
-  this->private_->ui_.iterations_layout_->addWidget( this->private_->iterations_ );
-
-  this->private_->multiplier_ = new QtUtils::QtSliderDoubleCombo();
-  this->private_->ui_.multiplier_layout_->addWidget( this->private_->multiplier_ );
+  this->private_->ui_.horizontalLayout_3->setAlignment( Qt::AlignHCenter );
   
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool = tool();
@@ -81,8 +73,8 @@ bool ConfidenceConnectedFilterInterface::build_widget( QFrame* frame )
   //Step 3 - connect the gui to the tool through the QtBridge
   QtUtils::QtBridge::Connect( this->private_->ui_.target_layer_, tool->target_layer_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.use_active_layer_, tool->use_active_layer_state_ );
-  QtUtils::QtBridge::Connect( this->private_->iterations_, tool->iterations_state_ );
-  QtUtils::QtBridge::Connect( this->private_->multiplier_, tool->multiplier_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.iterations_, tool->iterations_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.multiplier_, tool->multiplier_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.clear_seeds_button_, boost::bind(
     &SeedPointsTool::clear, tool, Core::Interface::GetWidgetActionContext() ) );
   QtUtils::QtBridge::Connect( this->private_->ui_.run_button_, boost::bind(
