@@ -200,8 +200,8 @@ void ProjectManager::new_project( const std::string& project_name, const std::st
   this->changing_projects_ = true;
   this->current_project_->project_name_state_->set( project_name );
 
-  boost::filesystem::path path = complete( boost::filesystem::path( this->
-    current_project_path_state_->get().c_str(), boost::filesystem::native ) );
+  boost::filesystem::path path = complete( boost::filesystem::path( project_path, 
+    boost::filesystem::native ) );
 
   if( this->create_project_folders( path, this->current_project_->project_name_state_->get() ) )
   {
