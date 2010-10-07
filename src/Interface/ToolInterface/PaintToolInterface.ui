@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>243</width>
-    <height>371</height>
+    <width>199</width>
+    <height>391</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -182,17 +182,71 @@
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="negative_data_constraint_">
-        <property name="text">
-         <string>Negative Constraint</string>
+       <widget class="QWidget" name="widget_7" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>20</height>
+         </size>
         </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>2</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QCheckBox" name="negative_data_constraint_">
+           <property name="text">
+            <string>Negative Constraint</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="show_boundary_">
-        <property name="text">
-         <string>Show Boundary</string>
+       <widget class="QWidget" name="widget_8" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>20</height>
+         </size>
         </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>2</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QCheckBox" name="show_boundary_">
+           <property name="text">
+            <string>Show Boundary</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
       <item>
@@ -243,21 +297,26 @@
     </widget>
    </item>
    <item>
-    <widget class="QWidget" name="widget_5" native="true">
-     <layout class="QVBoxLayout" name="verticalLayout_7">
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Brush Size:</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_6">
       <property name="spacing">
-       <number>2</number>
+       <number>0</number>
       </property>
-      <property name="margin">
+      <property name="leftMargin">
        <number>4</number>
       </property>
-      <item>
-       <widget class="QLabel" name="brushLabel">
-        <property name="text">
-         <string>Brush Size:</string>
-        </property>
-       </widget>
-      </item>
+      <property name="topMargin">
+       <number>2</number>
+      </property>
+      <property name="rightMargin">
+       <number>4</number>
+      </property>
+      <property name="bottomMargin">
+       <number>4</number>
+      </property>
       <item>
        <widget class="QtUtils::QtSliderIntCombo" name="brush_radius_" native="true"/>
       </item>
@@ -299,15 +358,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QtUtils::QtSliderDoubleCombo</class>
-   <extends>QWidget</extends>
-   <header location="global">QtUtils/Widgets/QtSliderDoubleCombo.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>QtUtils::QtSliderIntCombo</class>
    <extends>QWidget</extends>
    <header location="global">QtUtils/Widgets/QtSliderIntCombo.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QtUtils::QtSliderDoubleCombo</class>
+   <extends>QWidget</extends>
+   <header location="global">QtUtils/Widgets/QtSliderDoubleCombo.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

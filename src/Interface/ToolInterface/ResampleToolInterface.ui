@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>278</width>
+    <width>227</width>
     <height>616</height>
    </rect>
   </property>
@@ -321,13 +321,13 @@
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>60</height>
+          <height>40</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
           <width>16777215</width>
-          <height>60</height>
+          <height>40</height>
          </size>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -812,15 +812,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QtUtils::QtSliderDoubleCombo</class>
-   <extends>QWidget</extends>
-   <header location="global">QtUtils/Widgets/QtSliderDoubleCombo.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>QtUtils::QtSliderIntCombo</class>
    <extends>QWidget</extends>
    <header location="global">QtUtils/Widgets/QtSliderIntCombo.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QtUtils::QtSliderDoubleCombo</class>
+   <extends>QWidget</extends>
+   <header location="global">QtUtils/Widgets/QtSliderDoubleCombo.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

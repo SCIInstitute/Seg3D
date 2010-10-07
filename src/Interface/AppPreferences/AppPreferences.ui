@@ -313,17 +313,14 @@ border: 1px solid gray;
               <number>6</number>
              </property>
              <item>
-              <spacer name="horizontalSpacer_3">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
+              <widget class="QCheckBox" name="advanced_visibility_checkbox_">
+               <property name="text">
+                <string>Enable Advanced Visibility Settings</string>
                </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>472</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
+              </widget>
+             </item>
+             <item>
+              <widget class="QWidget" name="widget_17" native="true"/>
              </item>
              <item>
               <widget class="QCheckBox" name="full_screen_on_startup_checkbox_">
@@ -975,6 +972,9 @@ border: 1px solid gray;
           </item>
           <item>
            <widget class="QCheckBox" name="measurement_checkbox_">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>Measurement</string>
             </property>
@@ -982,6 +982,9 @@ border: 1px solid gray;
           </item>
           <item>
            <widget class="QCheckBox" name="history_checkbox_">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>History</string>
             </property>
@@ -992,6 +995,9 @@ border: 1px solid gray;
        </item>
        <item>
         <widget class="QTabWidget" name="tabWidget">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="currentIndex">
           <number>0</number>
          </property>

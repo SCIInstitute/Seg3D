@@ -281,11 +281,11 @@ void AppMenu::create_window_menu( QMenu* qmenu )
   QtUtils::QtBridge::Connect( qaction, boost::bind( &ActionShowWindow::Dispatch, 
     Core::Interface::GetWidgetActionContext(), std::string( "project" ) ) );
 
-  // History Window
-  qaction = qmenu->addAction( "History Window" );
-  qaction->setShortcut( tr( "Ctrl+Shift+H" ) );
-  QtUtils::QtBridge::Connect( qaction, boost::bind( &ActionShowWindow::Dispatch, 
-    Core::Interface::GetWidgetActionContext(), std::string( "history" ) ) );
+//  // History Window
+//  qaction = qmenu->addAction( "History Window" );
+//  qaction->setShortcut( tr( "Ctrl+Shift+H" ) );
+//  QtUtils::QtBridge::Connect( qaction, boost::bind( &ActionShowWindow::Dispatch, 
+//    Core::Interface::GetWidgetActionContext(), std::string( "history" ) ) );
 
   //Tools Window
   qaction = qmenu->addAction( "Tools Window" );
@@ -299,11 +299,11 @@ void AppMenu::create_window_menu( QMenu* qmenu )
   QtUtils::QtBridge::Connect( qaction, boost::bind( &ActionShowWindow::Dispatch, 
     Core::Interface::GetWidgetActionContext(), std::string( "layermanager" ) ) );
 
-  // Measurement Window
-  qaction = qmenu->addAction( "Measurement Window" );
-  qaction->setShortcut( tr( "Ctrl+Shift+M" ) );
-  QtUtils::QtBridge::Connect( qaction, boost::bind( &ActionShowWindow::Dispatch, 
-    Core::Interface::GetWidgetActionContext(), std::string( "measurement" ) ) );
+//  // Measurement Window
+//  qaction = qmenu->addAction( "Measurement Window" );
+//  qaction->setShortcut( tr( "Ctrl+Shift+M" ) );
+//  QtUtils::QtBridge::Connect( qaction, boost::bind( &ActionShowWindow::Dispatch, 
+//    Core::Interface::GetWidgetActionContext(), std::string( "measurement" ) ) );
 
   qmenu->addSeparator();
 
