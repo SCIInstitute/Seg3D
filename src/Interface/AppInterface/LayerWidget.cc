@@ -433,7 +433,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
           QtUtils::QtBridge::Connect( this->private_->color_widget_, 
             mask_layer->color_state_,
             PreferencesManager::Instance()->color_states_ );
-          
+            
           QtUtils::QtBridge::Enable( this->private_->ui_.show_iso_surface_button_, 
             mask_layer->iso_generated_state_ );
           QtUtils::QtBridge::Enable( this->private_->ui_.delete_iso_surface_button_, 
@@ -496,6 +496,7 @@ void LayerWidget::delete_isosurface()
   // Dispatch action to delete isosurface
   MaskLayerHandle mask_layer = boost::dynamic_pointer_cast< MaskLayer >( this->private_->layer_ );
   ActionDeleteIsosurface::Dispatch( Core::Interface::GetWidgetActionContext(), mask_layer );
+  this->private_->ui_.show_iso_surface_button_->setChecked( false );
 }
   
 void LayerWidget::update_appearance( bool locked, bool active, bool in_use, bool initialize )

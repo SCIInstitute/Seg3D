@@ -71,16 +71,20 @@ AppMenu::AppMenu( QMainWindow* parent ) :
 
   // menus
   QMenu* file_menu = menubar->addMenu( tr( "&File" ) );
-  QMenu* edit_menu = menubar->addMenu( tr( "&Edit" ) );
-  QMenu* view_menu = menubar->addMenu( "&View" );
-  QMenu* window_menu = menubar->addMenu( "&Window" );
-
   create_file_menu( file_menu );
+  
+  QMenu* edit_menu = menubar->addMenu( tr( "&Edit" ) );
   create_edit_menu( edit_menu );
+  
+  QMenu* view_menu = menubar->addMenu( "&View" );
   create_view_menu( view_menu );
+  
+  create_tool_menus( menubar );
+  
+  QMenu* window_menu = menubar->addMenu( "&Window" );
   create_window_menu( window_menu );
 
-  create_tool_menus( menubar );
+  
 }
 
 AppMenu::~AppMenu()
@@ -242,8 +246,8 @@ void AppMenu::create_tool_menus( QMenuBar* qmenubar )
   ToolMenuList menu_list;
 
   ToolFactory::Instance()->list_menus( menu_list );
-  ToolMenuList::const_iterator mit = menu_list.begin();
-  ToolMenuList::const_iterator mit_end = menu_list.end(); 
+  ToolMenuList::const_reverse_iterator mit = menu_list.rbegin();
+  ToolMenuList::const_reverse_iterator mit_end = menu_list.rend();  
 
   while ( mit != mit_end )
   {
