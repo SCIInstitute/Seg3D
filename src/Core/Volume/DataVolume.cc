@@ -141,6 +141,8 @@ bool DataVolume::LoadDataVolume( const boost::filesystem::path& filename,
   DataBlock::generation_type generation;
   Core::ImportFromString( filename.stem(), generation );
   Core::DataBlockHandle datablock( Core::NrrdDataBlock::New( nrrd, generation ) );
+  
+  // Load the datablock and trust any histogram recorded inside of it.
   datablock->set_histogram( nrrd->get_histogram( true ) );
 
   volume = DataVolumeHandle( new DataVolume( nrrd->get_grid_transform(), datablock ) );

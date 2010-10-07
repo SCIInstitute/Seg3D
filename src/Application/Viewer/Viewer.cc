@@ -38,6 +38,7 @@
 #include <Core/Volume/MaskVolumeSlice.h>
 
 // Application includes
+#include <Application/PreferencesManager/PreferencesManager.h>
 #include <Application/Layer/DataLayer.h>
 #include <Application/Layer/MaskLayer.h>
 #include <Application/Layer/LayerGroup.h>
@@ -1108,8 +1109,17 @@ bool Viewer::key_press_event( int key, int modifiers )
     case Core::Key::KEY_LEFT_E:
     case Core::Key::KEY_DOWN_E:
     {
-      ActionOffsetSlice::Dispatch( Core::Interface::GetKeyboardActionContext(),
-        this->shared_from_this(), -1 );
+      if ( modifiers & Core::KeyModifier::SHIFT_MODIFIER_E )
+      {
+        ActionOffsetSlice::Dispatch( Core::Interface::GetKeyboardActionContext(),
+          this->shared_from_this(), 
+          -( PreferencesManager::Instance()->slice_step_multiplier_state_->get() ) );     
+      }
+      else
+      {
+        ActionOffsetSlice::Dispatch( Core::Interface::GetKeyboardActionContext(),
+          this->shared_from_this(), -1 );
+      }
       return true;    
     }
     
@@ -1118,8 +1128,17 @@ bool Viewer::key_press_event( int key, int modifiers )
     case Core::Key::KEY_RIGHT_E:
     case Core::Key::KEY_UP_E:
     {
-      ActionOffsetSlice::Dispatch( Core::Interface::GetKeyboardActionContext(),
-        this->shared_from_this(), 1 );
+      if ( modifiers & Core::KeyModifier::SHIFT_MODIFIER_E )
+      {
+        ActionOffsetSlice::Dispatch( Core::Interface::GetKeyboardActionContext(),
+          this->shared_from_this(), 
+          ( PreferencesManager::Instance()->slice_step_multiplier_state_->get() ) );        
+      }
+      else
+      {   
+        ActionOffsetSlice::Dispatch( Core::Interface::GetKeyboardActionContext(),
+          this->shared_from_this(), 1 );
+      }
       return true;
     }
   

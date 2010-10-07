@@ -47,6 +47,7 @@ QtLineEditConnector::QtLineEditConnector( QLineEdit* parent,
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
     parent->setText( QString( state->get().c_str() ) );
+    parent->setCursorPosition( 0 );
     this->add_connection( state->value_changed_signal_.connect(
       boost::bind( &QtLineEditConnector::SetLineEditText, qpointer, _1, _2 ) ) );
   }
@@ -65,7 +66,8 @@ QtLineEditConnector::QtLineEditConnector( QLineEdit* parent,
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
     parent->setText( QString( state->get().c_str() ) );
-
+    parent->setCursorPosition( 0 );
+    
     // NOTE: for StateName, always update the QLineEdit no matter what the source
     // of the change is, because the actual value set in the state may be different from
     // user input.
@@ -104,6 +106,7 @@ void QtLineEditConnector::SetLineEditText( QPointer< QtLineEditConnector > qpoin
 
   qpointer->block();
   qpointer->parent_->setText( QString( text.c_str() ) );
+  qpointer->parent_->setCursorPosition( 0 );
   qpointer->unblock();
 }
 
@@ -111,6 +114,7 @@ void QtLineEditConnector::set_state()
 {
   if ( !this->is_blocked() )
   {
+    this->parent_->setCursorPosition( 0 );
     std::string text = this->parent_->text().trimmed().toStdString();
     Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), this->state_, text );
   }

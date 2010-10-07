@@ -103,7 +103,7 @@ void PreferencesManager::initialize_states()
   add_state( "smart_save", this->smart_save_state_, true );
   add_state( "advanced_visibility_settings", this->advanced_visibility_settings_state_, false );
   add_state( "compression", this->compression_state_, true );
-  add_state( "slice_step_multiplier", this->slice_step_multiplier_state_, 16 );
+  add_state( "slice_step_multiplier", this->slice_step_multiplier_state_, 8 );
 
   
   //Viewer Preferences

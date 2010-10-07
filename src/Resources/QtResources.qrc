@@ -129,5 +129,7 @@
     <file>Images/InfoOff.png</file>
     <file>Images/Appearance.png</file>
     <file>Images/AppearanceOff.png</file>
+    <file>Images/Align.png</file>
+    <file>Images/AlignOff.png</file>	
   </qresource>
 </RCC>
