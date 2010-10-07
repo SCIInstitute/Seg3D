@@ -48,6 +48,14 @@ bool ActionSnap::validate( Core::ActionContextHandle& context )
         + "' does not exist" );
       return false;
     }
+
+    if ( !viewer->is_volume_view() )
+    {
+      context->report_error( "Viewer '" + Core::ExportToString( this->viewer_id_.value() ) +
+        "' not in volume view" );
+      return false;
+    }
+    
     this->viewer_weak_handle_ = viewer;
   }
 

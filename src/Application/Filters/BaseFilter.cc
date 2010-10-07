@@ -167,7 +167,7 @@ bool BaseFilter::create_and_lock_data_layer_from_layer( LayerHandle src_layer,
   LayerHandle& dst_layer )
 {
   // Generate a new name for the filter
-  std::string name = this->get_filter_name() + "_" + src_layer->get_layer_name();
+  std::string name = this->get_layer_prefix() + "_" + src_layer->get_layer_name();
 
   // Create the layer in creating mode
   if ( !( LayerManager::CreateAndLockDataLayer( src_layer->get_grid_transform(),
@@ -189,7 +189,7 @@ bool BaseFilter::create_and_lock_data_layer( const Core::GridTransform& grid_tra
                       LayerHandle src_layer, LayerHandle& dst_layer )
 {
   // Generate a new name for the filter
-  std::string name = this->get_filter_name() + "_" + src_layer->get_layer_name();
+  std::string name = this->get_layer_prefix() + "_" + src_layer->get_layer_name();
 
   // Create the layer in creating mode
   if ( !( LayerManager::CreateAndLockDataLayer( grid_trans, name, dst_layer ) ) )
@@ -209,7 +209,7 @@ bool BaseFilter::create_and_lock_data_layer( const Core::GridTransform& grid_tra
 bool BaseFilter::create_and_lock_mask_layer_from_layer( LayerHandle src_layer, LayerHandle& dst_layer )
 {
   // Generate a new name for the filter
-  std::string name = this->get_filter_name() + "_" + src_layer->get_layer_name();
+  std::string name = this->get_layer_prefix() + "_" + src_layer->get_layer_name();
 
   // Create the layer in creating mode
   if ( !( LayerManager::CreateAndLockMaskLayer( src_layer->get_grid_transform(),
@@ -231,7 +231,7 @@ bool BaseFilter::create_and_lock_mask_layer( const Core::GridTransform& grid_tra
                       LayerHandle src_layer, LayerHandle& dst_layer )
 {
   // Generate a new name for the filter
-  std::string name = this->get_filter_name() + "_" + src_layer->get_layer_name();
+  std::string name = this->get_layer_prefix() + "_" + src_layer->get_layer_name();
 
   // Create the layer in creating mode
   if ( !( LayerManager::CreateAndLockMaskLayer( grid_trans, name, dst_layer ) ) )
