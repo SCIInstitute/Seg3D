@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>311</width>
+    <width>273</width>
     <height>414</height>
    </rect>
   </property>
@@ -380,10 +380,13 @@ QPushButton#activate_button_{
                <string notr="true"/>
               </property>
               <property name="text">
-               <string notr="true">2116_test-2_121709-booger</string>
+               <string notr="true">2116_test-2_12170</string>
               </property>
               <property name="frame">
                <bool>false</bool>
+              </property>
+              <property name="cursorPosition">
+               <number>0</number>
               </property>
               <property name="alignment">
                <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>

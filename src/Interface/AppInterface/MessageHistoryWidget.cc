@@ -47,7 +47,7 @@ public:
 MessageHistoryWidget::MessageHistoryWidget( QWidget *parent ) :
   private_( new MessageHistoryWidgetPrivate )
 {
-  setWindowFlags(Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
+  //setWindowFlags(Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
   // Set up the private internals of the LayerManagerInterface class
   this->private_->ui_.setupUi( this );
   

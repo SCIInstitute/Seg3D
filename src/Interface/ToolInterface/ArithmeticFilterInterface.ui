@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>223</width>
+    <width>255</width>
     <height>473</height>
    </rect>
   </property>
@@ -56,7 +56,7 @@
           <height>30</height>
          </size>
         </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,2">
+        <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,10">
          <property name="spacing">
           <number>0</number>
          </property>
@@ -156,7 +156,7 @@
              <height>30</height>
             </size>
            </property>
-           <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,2">
+           <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,10">
             <property name="spacing">
              <number>0</number>
             </property>
@@ -191,7 +191,7 @@
              <height>30</height>
             </size>
            </property>
-           <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,2">
+           <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,10">
             <property name="spacing">
              <number>0</number>
             </property>
@@ -226,7 +226,7 @@
              <height>30</height>
             </size>
            </property>
-           <layout class="QHBoxLayout" name="horizontalLayout_9" stretch="1,2">
+           <layout class="QHBoxLayout" name="horizontalLayout_9" stretch="1,10">
             <property name="spacing">
              <number>0</number>
             </property>

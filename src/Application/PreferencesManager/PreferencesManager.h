@@ -74,6 +74,7 @@ public:
   Core::StateBoolHandle smart_save_state_;
   Core::StateBoolHandle advanced_visibility_settings_state_;
   Core::StateBoolHandle compression_state_;
+  Core::StateIntHandle slice_step_multiplier_state_;
   
   //Viewers Preferences
   Core::StateOptionHandle default_viewer_mode_state_;

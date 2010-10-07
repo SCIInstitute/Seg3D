@@ -124,6 +124,8 @@ void AppPreferences::setup_general_prefs()
     PreferencesManager::Instance()->advanced_visibility_settings_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.enable_compression_checkbox_,
     PreferencesManager::Instance()->compression_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.slice_step_multiplier_spinbox_,
+    PreferencesManager::Instance()->slice_step_multiplier_state_ );
 
 }
 

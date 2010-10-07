@@ -82,6 +82,7 @@ private:
 
 private Q_SLOTS:
   void fix_icon_status();
+  void swap_bars();
 
 private:
   static void SetMessage( QPointer< AppStatusBar > qpointer, 

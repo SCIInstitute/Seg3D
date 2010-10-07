@@ -72,6 +72,7 @@ AppStatusBar::AppStatusBar( QMainWindow* parent ) :
   this->statusbar_widget_ = new QWidget( this->statusbar_ );
   
   this->private_->ui_.setupUi( this->statusbar_widget_ );
+  this->private_->ui_.actives_->hide();
   
   
   this->history_widget_ = new MessageHistoryWidget( parent );
@@ -81,13 +82,16 @@ AppStatusBar::AppStatusBar( QMainWindow* parent ) :
   this->statusbar_->addWidget( this->statusbar_widget_, 1 );
   
   this->statusbar_->setStyleSheet( StyleSheet::STATUSBAR_C );
+  
+  connect( this->private_->ui_.swap_visibility_button_, 
+    SIGNAL( clicked() ), this, SLOT( swap_bars() ) );
     
-  connect(this->private_->ui_.info_button_, 
-    SIGNAL(clicked(bool)), this, SLOT(activate_history(bool)));
-  connect(this->history_widget_, 
+  connect( this->private_->ui_.info_button_, 
+    SIGNAL( clicked( bool ) ), this, SLOT( activate_history( bool ) ) );
+  connect( this->history_widget_, 
     SIGNAL( destroyed() ), this, SLOT( fix_icon_status() ) );
-  connect(this->private_->ui_.world_button_, 
-    SIGNAL(clicked(bool)), this, SLOT(set_coordinates_mode(bool)));
+  connect( this->private_->ui_.world_button_, 
+    SIGNAL( clicked( bool ) ), this, SLOT( set_coordinates_mode( bool ) ) );
 
   QtUtils::QtBridge::Connect( this->private_->ui_.layer_combobox_, 
     StatusBar::Instance()->active_layer_state_ );
@@ -105,6 +109,25 @@ AppStatusBar::~AppStatusBar()
   this->disconnect_all();
   this->history_widget_->close();
 }
+
+
+// -- private slots -- //
+void AppStatusBar::swap_bars()
+{
+  if( this->private_->ui_.actives_->isVisible() )
+  {
+    this->private_->ui_.actives_->hide();
+    this->private_->ui_.label_values_->show();
+  }
+  else
+  {
+    this->private_->ui_.actives_->show();
+    this->private_->ui_.label_values_->hide();
+  }
+}
+
+
+
 
 // -- public slots -- //
 
