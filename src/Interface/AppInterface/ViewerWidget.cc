@@ -36,6 +36,7 @@
 
 // Application includes
 #include <Application/Viewer/Actions/ActionAutoView.h>
+#include <Application/Viewer/Actions/ActionSnap.h>
 #include <Application/ViewerManager/ViewerManager.h>
 
 // QT includes
@@ -118,6 +119,7 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
   this->private_->buttons_.push_back( this->private_->ui_.auto_view_button_ );
   this->private_->buttons_.push_back( this->private_->ui_.lock_button_ );
   this->private_->buttons_.push_back( this->private_->ui_.slice_visible_button_ );
+  this->private_->buttons_.push_back( this->private_->ui_.snap_to_axis_button_ );
   this->private_->buttons_.push_back( this->private_->ui_.light_visible_button_ );
   this->private_->buttons_.push_back( this->private_->ui_.grid_button_ );
   this->private_->buttons_.push_back( this->private_->ui_.flip_horizontal_button_ );
@@ -170,10 +172,6 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
 
     this->connect( this->private_->ui_.flip_vertical_button_, SIGNAL( clicked() ),
       SLOT( flip_view_vert() ) );
-
-    this->connect( this->private_->ui_.auto_view_button_, SIGNAL( clicked() ),
-      SLOT( auto_view() ) );
-
   
     QtUtils::QtBridge::Connect( this->private_->ui_.viewer_mode_, 
       this->private_->viewer_->view_mode_state_ );
@@ -197,6 +195,14 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
       this->private_->viewer_->volume_isosurfaces_visible_state_ );
     QtUtils::QtBridge::Connect( this->private_->ui_.volume_rendering_visible_button_,
       this->private_->viewer_->volume_volume_rendering_visible_state_ );
+
+    QtUtils::QtBridge::Connect( this->private_->ui_.snap_to_axis_button_, boost::bind(
+      &ActionSnap::Dispatch, Core::Interface::GetWidgetActionContext(), 
+      this->private_->viewer_->get_viewer_id() ) );
+    QtUtils::QtBridge::Connect( this->private_->ui_.auto_view_button_, boost::bind( 
+      &ActionAutoView::Dispatch, Core::Interface::GetWidgetActionContext(),
+      this->private_->viewer_->get_viewer_id() ) );
+
     this->add_icons_to_combobox();
     
     this->private_->render_widget_->activate_signal_.connect(
@@ -323,6 +329,7 @@ void ViewerWidget::change_view_type( int index )
   this->private_->ui_.light_visible_button_->setVisible( is_volume_view );
   this->private_->ui_.isosurfaces_visible_button_->setVisible( is_volume_view );
   this->private_->ui_.volume_rendering_visible_button_->setVisible( is_volume_view);
+  this->private_->ui_.snap_to_axis_button_->setVisible( is_volume_view );
   
   // disable buttons that we dont use yet.
   this->private_->ui_.volume_rendering_visible_button_->setEnabled( false );
@@ -375,11 +382,6 @@ void ViewerWidget::flip_view_vert()
     Core::ActionFlip::Dispatch( Core::Interface::GetWidgetActionContext(),
     view2d_state, Core::FlipDirectionType::VERTICAL_E );
   }
-}
-
-void ViewerWidget::auto_view()
-{
-  ActionAutoView::Dispatch( Core::Interface::GetWidgetActionContext(), this->private_->viewer_->get_viewer_id() );
 }
 
 } // end namespace Seg3D

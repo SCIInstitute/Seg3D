@@ -131,6 +131,10 @@ public:
   // Auto adjust the view for the active layer
   void auto_view();
 
+  // SNAP_TO_AXIS:
+  // Snap the eye position of the volume view to the closest axis.
+  void snap_to_axis();
+
   // IS_VOLUME_VIEW:
   // Returns true if the current view mode is volume, otherwise false.
   bool is_volume_view() const;

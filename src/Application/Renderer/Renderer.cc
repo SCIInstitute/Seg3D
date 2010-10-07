@@ -39,6 +39,7 @@
 #include <Core/Graphics/Texture.h>
 #include <Core/Graphics/UnitCube.h>
 #include <Core/TextRenderer/TextRenderer.h>
+#include <Core/Graphics/ColorMap.h>
 
 // Application includes
 #include <Application/Layer/DataLayer.h>
@@ -54,7 +55,7 @@
 #include <Application/Renderer/SliceShader.h>
 #include <Application/Renderer/IsosurfaceShader.h>
 #include <Application/Viewer/Viewer.h>
-#include "Core/Graphics/ColorMap.h"
+#include <Application/Renderer/OrientationArrows.h>
 
 
 namespace Seg3D
@@ -117,6 +118,7 @@ public:
     ProxyRectangleHandle rect = ProxyRectangleHandle() );
   void process_isosurfaces( IsosurfaceArray& isosurfaces );
   void draw_isosurfaces( const IsosurfaceArray& isosurfaces, bool with_lighting );
+  void draw_orientation_arrows( const Core::View3D& view_3d );
 
   // -- Signals handling --
 public:
@@ -127,6 +129,7 @@ public:
 
   Renderer* renderer_;
 
+  OrientationArrowsHandle orientation_arrows_;
   SliceShaderHandle slice_shader_;
   IsosurfaceShaderHandle isosurface_shader_;
   Core::Texture2DHandle pattern_texture_;
@@ -537,6 +540,42 @@ void RendererPrivate::draw_isosurfaces( const IsosurfaceArray& isosurfaces, bool
   glDisable( GL_CULL_FACE );
 }
 
+void RendererPrivate::draw_orientation_arrows( const Core::View3D& view_3d )
+{
+  glPushAttrib( GL_VIEWPORT_BIT | GL_TRANSFORM_BIT );
+
+  // Set the viewport to the top right corner of the scene
+  int dimension = Core::Min( this->renderer_->width_, this->renderer_->height_ );
+  dimension /= 5;
+  glViewport( this->renderer_->width_ - dimension, 
+    this->renderer_->height_ - dimension, dimension, dimension );
+
+  // Compute the orientation of the axes
+  Core::Vector eye_dir = view_3d.eyep() - view_3d.lookat();
+  eye_dir.normalize();
+  eye_dir *= 3.5;
+
+  glMatrixMode( GL_PROJECTION );
+  glPushMatrix();
+  glLoadIdentity();
+  gluPerspective( 45.0f, 1.0, 0.1, 6.0 );
+
+  glMatrixMode( GL_MODELVIEW );
+  glPushMatrix();
+  glLoadIdentity();
+  gluLookAt( eye_dir[ 0 ], eye_dir[ 1 ], eye_dir[ 2 ], 0.0, 0.0, 0.0, view_3d.up().x(),
+    view_3d.up().y(), view_3d.up().z() );
+
+  this->orientation_arrows_->draw();
+
+  glPopMatrix();
+  glMatrixMode( GL_PROJECTION );
+  glPopMatrix();
+
+  glPopAttrib();
+}
+
+
 //////////////////////////////////////////////////////////////////////////
 // Implementation of class Renderer
 //////////////////////////////////////////////////////////////////////////
@@ -587,6 +626,7 @@ void Renderer::post_initialize()
     this->private_->pattern_texture_->set_image( PATTERN_SIZE_C, PATTERN_SIZE_C, 
       GL_ALPHA, MASK_PATTERNS_C, GL_ALPHA, GL_UNSIGNED_BYTE );
     this->private_->text_texture_.reset( new Core::Texture2D );
+    this->private_->orientation_arrows_.reset( new OrientationArrows );
   }
 
   this->private_->slice_shader_->enable();
@@ -721,6 +761,8 @@ bool Renderer::render()
     {
       this->private_->draw_isosurfaces( isosurfaces, with_lighting );
     }
+
+    this->private_->draw_orientation_arrows( view3d );
     
     glDisable( GL_BLEND );
   }

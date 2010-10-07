@@ -1504,4 +1504,47 @@ void Viewer::get_projection_matrix( Core::Matrix& proj_mat ) const
   Core::Transform::BuildOrtho2DMatrix( proj_mat, left, right, bottom, top );
 }
 
+void Viewer::snap_to_axis()
+{
+  ASSERT_IS_APPLICATION_THREAD();
+
+  Core::View3D view_3d = this->volume_view_state_->get();
+
+  // Snap the eye position
+  Core::Vector eye_vec = view_3d.eyep() - view_3d.lookat();
+  double eye_dist = eye_vec.normalize();
+  int closest_eye_axis = 0;
+  for ( int i = 1; i < 3; ++i )
+  {
+    if ( Core::Abs( eye_vec[ i ] ) > Core::Abs( eye_vec[ closest_eye_axis ] ) )
+    {
+      closest_eye_axis = i;
+    }
+  }
+
+  // Snap the up vector
+  // NOTE: The up vector must not line up with the eye vector
+  Core::Vector up = view_3d.up();
+  int closest_up_axis = 0;
+  if ( Core::Abs( up[ ( closest_eye_axis + 1 ) % 3 ] ) > 
+    Core::Abs( up[ ( closest_eye_axis + 2 ) % 3 ] ) )
+  {
+    closest_up_axis = ( closest_eye_axis + 1 ) % 3;
+  }
+  else
+  {
+    closest_up_axis = ( closest_eye_axis + 2 ) % 3;
+  }
+
+  Core::Vector new_eye_dir( 0.0, 0.0, 0.0 );
+  new_eye_dir[ closest_eye_axis ] = Core::Sign( eye_vec[ closest_eye_axis ] ) * eye_dist;
+  Core::Vector new_up( 0.0, 0.0, 0.0 );
+  new_up[ closest_up_axis ] = Core::Sign( up[ closest_up_axis ] );
+  
+  view_3d.eyep( view_3d.lookat() + new_eye_dir );
+  view_3d.up( new_up );
+
+  this->volume_view_state_->set( view_3d );
+}
+
 } // end namespace Seg3D

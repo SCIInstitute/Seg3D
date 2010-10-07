@@ -43,6 +43,8 @@ SET(APPLICATION_VIEW_ACTIONS_SRCS
   Actions/ActionAutoView.cc
   Actions/ActionOffsetSlice.h
   Actions/ActionOffsetSlice.cc
+  Actions/ActionSnap.h
+  Actions/ActionSnap.cc
   )
 
 CORE_ADD_LIBRARY(Application_Viewer ${APPLICATION_VIEW_SRCS}

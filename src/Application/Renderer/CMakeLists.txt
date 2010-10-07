@@ -38,6 +38,8 @@ SET(APPLICATION_RENDERER_SHADER_SRCS
   SliceShader.vert
   IsosurfaceShader.frag
   IsosurfaceShader.vert
+  OrientationArrowsShader.vert
+  OrientationArrowsShader.frag
   )
   
 CORE_IMPORT_SHADER(APPLICATION_RENDERER_SHADER_STRING_SRCS
@@ -54,6 +56,10 @@ SET(APPLICATION_RENDERER_SRCS
   SliceShader.cc
   IsosurfaceShader.h
   IsosurfaceShader.cc
+  OrientationArrows.h
+  OrientationArrows.cc
+  OrientationArrowsShader.h
+  OrientationArrowsShader.cc
   )
   
 CORE_ADD_LIBRARY(Application_Renderer ${APPLICATION_RENDERER_SRCS}

@@ -90,12 +90,7 @@ public Q_SLOTS:
   // FLIP_VIEW_VERT:
   // Flip the view vertically.
   void flip_view_vert();
-  
-  // AUTO_VIEW:
-  // Resize the viewer such that the scene is centered and scaled so most of the scene can be
-  // viewed.
-  void auto_view();
-  
+    
   // HANDLEVIEWMODECHANGED:
   // this handles signals from the viewer to keep the flip buttons in sync
   static void HandleViewModeChanged( ViewerWidgetHandle viewer_widget );
