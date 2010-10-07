@@ -453,6 +453,7 @@ void TransformTool::execute( Core::ActionContextHandle context )
     this->spacing_state_[ 1 ]->get(), this->spacing_state_[ 2 ]->get() );
   ActionTransform::Dispatch( context, this->target_layers_state_->get(), 
     origin, spacing, this->replace_state_->get() );
+  this->show_preview_state_->set( false );
 }
 
 void TransformTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )

@@ -61,9 +61,9 @@ MessageHistoryWidget::~MessageHistoryWidget()
   
 void MessageHistoryWidget::add_history_item(const QString &message, const QColor &color)
 {
-  QListWidgetItem* item = new QListWidgetItem(message, this->private_->ui_.history_list_);
+  QListWidgetItem* item = new QListWidgetItem( message, this->private_->ui_.history_list_ );
   item->setTextColor(color);
-  item->setFont(QFont("Lucida Grande", 13, QFont::Bold));
+  //item->setFont(QFont("Lucida Grande", 13, QFont::Bold));
   this->private_->ui_.history_list_->addItem(item);
   this->private_->ui_.history_list_->setCurrentItem(item);
 }

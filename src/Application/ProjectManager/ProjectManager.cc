@@ -113,9 +113,9 @@ void ProjectManager::rename_project( const std::string& new_name, Core::ActionSo
 {
 
   // If this is the first time the name has been set, then we set it, and return
-  if( !this->current_project_->name_status() )
+  if( !this->current_project_->is_valid() )
   {
-    this->current_project_->name_is_set( true );
+    this->current_project_->set_valid( true );
     return;
   }
 

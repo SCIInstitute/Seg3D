@@ -110,18 +110,18 @@ public:
   // NAME_IS_SET:
   // this function is set called to set the name_set_ toggle in the project so it knows if the name
   // has actually been set.
-  void name_is_set( bool set )
+  void set_valid( bool set )
   { 
-    this->name_set_ = set; 
+    this->valid_ = set; 
   }
   
   // NAME_STATUS:
   // this function is called to check the status of the project name.  This is because we get a 
   // signal that the project name has changed the first time it gets set.  This is a temporary 
   // stopgap until we can implement signal blocking
-  bool name_status()
+  bool is_valid()
   {
-    return this->name_set_; 
+    return this->valid_; 
   }
 
   // GET_SESSION_NAME:
@@ -182,7 +182,7 @@ private:
   SessionHandle current_session_;
 
   // whether a name has been assigned
-  bool name_set_;
+  bool valid_;
   
   // Where to save the project
   boost::filesystem::path project_path_;

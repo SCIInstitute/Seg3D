@@ -161,7 +161,7 @@ AppInterface::~AppInterface()
 
 void AppInterface::closeEvent( QCloseEvent* event )
 {
-  if ( ProjectManager::Instance()->current_project_ && 
+  if ( ProjectManager::Instance()->current_project_->is_valid() && 
     ProjectManager::Instance()->current_project_->check_changed() )
   {
 

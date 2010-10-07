@@ -47,7 +47,7 @@ namespace Seg3D
 
 Project::Project( const std::string& project_name ) :
   StateHandler( "project", false ),
-  name_set_( false ),
+  valid_( false ),
   changed_( false )
 { 
   add_state( "project_name", this->project_name_state_, project_name );

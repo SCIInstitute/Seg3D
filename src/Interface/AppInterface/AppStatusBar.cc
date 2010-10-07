@@ -87,7 +87,7 @@ AppStatusBar::AppStatusBar( QMainWindow* parent ) :
     SIGNAL( clicked() ), this, SLOT( swap_bars() ) );
     
   connect( this->private_->ui_.info_button_, 
-    SIGNAL( clicked( bool ) ), this, SLOT( activate_history( bool ) ) );
+    SIGNAL( clicked() ), this, SLOT( activate_history() ) );
   connect( this->history_widget_, 
     SIGNAL( destroyed() ), this, SLOT( fix_icon_status() ) );
   connect( this->private_->ui_.world_button_, 
@@ -155,9 +155,9 @@ void AppStatusBar::set_status_report_label( std::string& status )
 
 }
 
-void AppStatusBar::activate_history( bool is_active_ )
+void AppStatusBar::activate_history()
 {
-  if( is_active_ )
+  if( !this->history_widget_->isVisible() )
   {
     this->history_widget_->show();
   }
