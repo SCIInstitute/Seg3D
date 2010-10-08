@@ -39,6 +39,7 @@
 // Application includes
 #include <Application/ProjectManager/ProjectManager.h>
 #include <Application/Layer/DataLayer.h>
+#include <Application/PreferencesManager/PreferencesManager.h>
 
 namespace Seg3D
 {
@@ -224,8 +225,10 @@ bool DataLayer::pre_save_states( Core::StateIO& state_io )
     boost::filesystem::path volume_path = ProjectManager::Instance()->get_project_data_path() /
     generation;
     std::string error;
-    
-    if ( Core::DataVolume::SaveDataVolume( volume_path.string(), this->data_volume_ , error ) )
+
+    bool compress = PreferencesManager::Instance()->compression_state_->get();
+    if ( Core::DataVolume::SaveDataVolume( volume_path.string(), 
+      this->data_volume_ , error, compress ) )
     {
       return true;
     }

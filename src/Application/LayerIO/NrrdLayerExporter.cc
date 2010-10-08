@@ -34,6 +34,7 @@
 #include <Application/LayerIO/NrrdLayerExporter.h>
 #include <Application/Layer/DataLayer.h>
 #include <Application/Layer/MaskLayer.h>
+#include <Application/PreferencesManager/PreferencesManager.h>
 
 SCI_REGISTER_EXPORTER( Seg3D, NrrdLayerExporter );
 
@@ -101,8 +102,9 @@ bool NrrdLayerExporter::export_nrrd( const std::string& file_path )
   Core::NrrdDataHandle nrrd = Core::NrrdDataHandle( new Core::NrrdData( 
     temp_handle->get_data_volume()->get_data_block(), temp_handle->get_grid_transform() ) );
   
+  bool compress = PreferencesManager::Instance()->compression_state_->get();
   std::string error;
-  if ( !( Core::NrrdData::SaveNrrd( file_path, nrrd, error ) ) ) 
+  if ( !( Core::NrrdData::SaveNrrd( file_path, nrrd, error, compress ) ) ) 
   {
     CORE_LOG_ERROR( error );
     return false;
@@ -155,7 +157,8 @@ bool NrrdLayerExporter::export_single_masks( const std::string& path )
 
     // Step 6: Attempt to save the nrrd to the path that was passed and we return false if we 
     // can't
-    if ( !( Core::NrrdData::SaveNrrd( mask_path.string(), nrrd, error ) ) ) 
+    bool compress = PreferencesManager::Instance()->compression_state_->get();
+    if ( !( Core::NrrdData::SaveNrrd( mask_path.string(), nrrd, error, compress ) ) ) 
     {
       CORE_LOG_ERROR( error );
       return false;
@@ -210,7 +213,8 @@ bool NrrdLayerExporter::export_mask_label( const std::string& file_path )
   std::string error;
 
   // Step 6: Attempt to save the nrrd to the path that was passed and we return false if we can't
-  if ( !( Core::NrrdData::SaveNrrd( file_path, nrrd, error ) ) ) 
+  bool compress = PreferencesManager::Instance()->compression_state_->get();
+  if ( !( Core::NrrdData::SaveNrrd( file_path, nrrd, error, compress ) ) ) 
   {
     CORE_LOG_ERROR( error );
     return false;

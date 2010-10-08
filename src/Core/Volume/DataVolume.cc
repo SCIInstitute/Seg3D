@@ -149,7 +149,9 @@ bool DataVolume::LoadDataVolume( const boost::filesystem::path& filename,
   return true;
 }
 
-bool DataVolume::SaveDataVolume( const boost::filesystem::path& filepath, DataVolumeHandle& volume, std::string& error )
+bool DataVolume::SaveDataVolume( const boost::filesystem::path& filepath, 
+                DataVolumeHandle& volume, std::string& error,
+                bool compress )
 {
   if( !boost::filesystem::exists( filepath ) )
   {
@@ -157,7 +159,7 @@ bool DataVolume::SaveDataVolume( const boost::filesystem::path& filepath, DataVo
       volume->data_block_, volume->get_grid_transform() ) );
 
     nrrd->set_histogram( volume->data_block_->get_histogram() );
-    if ( ! ( NrrdData::SaveNrrd( filepath.string(), nrrd, error ) ) ) 
+    if ( ! ( NrrdData::SaveNrrd( filepath.string(), nrrd, error, compress ) ) ) 
     {
       CORE_LOG_ERROR( error );
       return false;

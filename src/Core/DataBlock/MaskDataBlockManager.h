@@ -88,7 +88,7 @@ public:
   // Do these need to be private ?
   // --JS
   void register_data_block( DataBlockHandle data_block, const GridTransform& grid_transform );
-  bool save_data_blocks( boost::filesystem::path data_save_path );
+  bool save_data_blocks( boost::filesystem::path path, bool compress );
     
   // COMPACT:
   // Compact the masks into less memory if possible by moving them around

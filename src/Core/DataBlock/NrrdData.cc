@@ -26,9 +26,6 @@
  DEALINGS IN THE SOFTWARE.
  */
  
-//Application includes
-#include <Application/PreferencesManager/PreferencesManager.h>
-
 // Core includes
 #include <Core/Utils/Log.h>
 #include <Core/Utils/StringUtil.h>
@@ -494,7 +491,8 @@ bool NrrdData::LoadNrrd( const std::string& filename, NrrdDataHandle& nrrddata, 
   return true;
 }
 
-bool NrrdData::SaveNrrd( const std::string& filename, NrrdDataHandle nrrddata, std::string& error )
+bool NrrdData::SaveNrrd( const std::string& filename, NrrdDataHandle nrrddata,
+            std::string& error, bool compress )
 {
   // Lock down the Teem library
   lock_type lock( GetMutex() );
@@ -510,7 +508,7 @@ bool NrrdData::SaveNrrd( const std::string& filename, NrrdDataHandle nrrddata, s
   NrrdIoState* nio = nrrdIoStateNew();
   nrrdIoStateSet( nio,  nrrdIoStateZlibLevel, 6 );
   // Turn on compression if the user wants it.
-  if( Seg3D::PreferencesManager::Instance()->compression_state_->get() )
+  if( compress )
   { 
     nrrdIoStateEncodingSet( nio, nrrdEncodingGzip );
   }

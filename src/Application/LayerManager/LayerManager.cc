@@ -36,6 +36,7 @@
 #include <Core/Application/Application.h>
 #include <Core/Interface/Interface.h>
 #include <Core/DataBlock/MaskDataBlockManager.h>
+#include <Core/State/StateIO.h>
 
 // Application includes
 #include <Application/Layer/LayerGroup.h>
@@ -43,12 +44,9 @@
 #include <Application/Layer/DataLayer.h>
 #include <Application/LayerManager/LayerScene.h>
 #include <Application/LayerManager/LayerAvailabilityNotifier.h>
-
-// Application action includes
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/ProjectManager/ProjectManager.h>
-#include "Core/State/StateIO.h"
-
+#include <Application/PreferencesManager/PreferencesManager.h>
 
 namespace Seg3D
 {
@@ -744,7 +742,8 @@ bool LayerManager::post_save_states( Core::StateIO& state_io )
   state_io.pop_current_element();
 
   return Core::MaskDataBlockManager::Instance()->save_data_blocks( 
-    Seg3D::ProjectManager::Instance()->get_project_data_path() );
+    ProjectManager::Instance()->get_project_data_path(),
+    PreferencesManager::Instance()->compression_state_->get() );
 } 
   
 bool LayerManager::pre_load_states( const Core::StateIO& state_io )
