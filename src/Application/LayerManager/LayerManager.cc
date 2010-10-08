@@ -771,8 +771,7 @@ bool LayerManager::post_load_states( const Core::StateIO& state_io )
   {
     std::string group_id( group_element->Value() );
     
-    LayerGroupHandle group;
-    group.reset( new LayerGroup( group_id ) );
+    LayerGroupHandle group( new LayerGroup( group_id ) );
 
     if ( group->load_states( state_io ) )
     {

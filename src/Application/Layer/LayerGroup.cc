@@ -54,6 +54,8 @@ class LayerGroupPrivate
 {
 public:
   void update_layers_visible_state();
+  void update_grid_information();
+
   void handle_layers_visible_state_changed( std::string state );
 
   LayerGroup* layer_group_;
@@ -164,6 +166,20 @@ void LayerGroupPrivate::handle_layers_visible_state_changed( std::string state )
   }
 }
 
+void LayerGroupPrivate::update_grid_information()
+{
+  Core::Point dimensions( static_cast< double>( this->layer_group_->grid_transform_.get_nx() ), 
+    static_cast< double>( this->layer_group_->grid_transform_.get_ny() ), 
+    static_cast< double>( this->layer_group_->grid_transform_.get_nz() ) );
+  this->layer_group_->dimensions_state_->set( dimensions );
+
+  this->layer_group_->origin_state_->set( this->layer_group_->grid_transform_ * 
+    Core::Point( 0, 0, 0 ) );
+
+  Core::Vector spacing( 1, 1, 1 );
+  spacing = this->layer_group_->grid_transform_ * spacing;
+  this->layer_group_->spacing_state_->set( Core::Point( spacing ) );
+}
 
 //////////////////////////////////////////////////////////////////////////
 // Class LayerGroup
@@ -208,12 +224,15 @@ void LayerGroup::initialize_states()
     static_cast< double>( this->grid_transform_.get_ny() ), 
     static_cast< double>( this->grid_transform_.get_nz() ) );
   this->add_state( "dimensions", this->dimensions_state_, dimensions );
+  this->dimensions_state_->set_session_priority( Core::StateBase::DO_NOT_LOAD_E );
 
   this->add_state( "origin", this->origin_state_, this->grid_transform_ * Core::Point( 0, 0, 0 ) );
+  this->origin_state_->set_session_priority( Core::StateBase::DO_NOT_LOAD_E );
 
   Core::Vector spacing( 1, 1, 1 );
   spacing = this->grid_transform_ * spacing;
   this->add_state( "spacing", this->spacing_state_, Core::Point( spacing ) );
+  this->spacing_state_->set_session_priority( Core::StateBase::DO_NOT_LOAD_E );
 
   this->add_state( "show_iso_menu", this->show_iso_menu_state_, false );
   this->add_state( "show_delete_menu", this->show_delete_menu_state_, false );
@@ -387,6 +406,7 @@ bool LayerGroup::post_load_states( const Core::StateIO& state_io )
 
   state_io.pop_current_element();
   
+  this->private_->update_grid_information();
   return success;
 }
 

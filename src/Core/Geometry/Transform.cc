@@ -290,15 +290,15 @@ bool Transform::operator==( const Transform& transform ) const
 
   Vector ex1 = project( ex ); Vector ex2 = transform.project( ex );
   double lex1 = ex1.normalize(); double lex2 = ex2.normalize();
-  if ( lex1 + lex2 > 0.0 && Abs( ( lex1 - lex2) / ( lex1 + lex2 ) ) > epsilon || Abs ( Dot( ex1, ex2 ) - 1.0 ) > epsilon ) return false;
+  if ( lex1 + lex2 > 0.0 && ( Abs( ( lex1 - lex2) / ( lex1 + lex2 ) ) > epsilon || Abs ( Dot( ex1, ex2 ) - 1.0 ) > epsilon ) ) return false;
 
   Vector ey1 = project( ey ); Vector ey2 = transform.project( ey );
   double ley1 = ey1.normalize(); double ley2 = ey2.normalize();
-  if ( ley1 + ley2 > 0.0 && Abs( ( ley1 - ley2 ) / ( ley1 + ley2 ) ) > epsilon || Abs ( Dot( ey1, ey2 ) - 1.0 ) > epsilon ) return false;
+  if ( ley1 + ley2 > 0.0 && ( Abs( ( ley1 - ley2 ) / ( ley1 + ley2 ) ) > epsilon || Abs ( Dot( ey1, ey2 ) - 1.0 ) > epsilon ) ) return false;
 
   Vector ez1 = project( ez ); Vector ez2 = transform.project( ez );
   double lez1 = ez1.normalize(); double lez2 = ez2.normalize();
-  if ( lez1 + lez2 > 0.0 && Abs( ( lez1 - lez2 ) / ( lez1 + lez2 ) ) > epsilon || Abs ( Dot( ez1, ez2 ) - 1.0 ) > epsilon ) return false;
+  if ( lez1 + lez2 > 0.0 && ( Abs( ( lez1 - lez2 ) / ( lez1 + lez2 ) ) > epsilon || Abs ( Dot( ez1, ez2 ) - 1.0 ) > epsilon ) ) return false;
   
   if ( ( project( origin ) - transform.project( origin ) ).length() > epsilon ) return false;
 
