@@ -55,16 +55,29 @@ public:
   virtual ~PolylineTool();
 
 public:
+
+  // HANDLE_MOUSE_PRESS:
+  // Called when a mouse button has been pressed.
   virtual bool handle_mouse_press( ViewerHandle viewer, 
     const Core::MouseHistory& mouse_history, 
     int button, int buttons, int modifiers );
+    
+  // HANDLE_MOUSE_RELEASE:
+  // Called when a mouse button has been released.
   virtual bool handle_mouse_release( ViewerHandle viewer, 
     const Core::MouseHistory& mouse_history, 
     int button, int buttons, int modifiers );
+    
+  // HANDLE_MOUSE_MOVE:
+  // Called when the mouse moves in a viewer.
   virtual bool handle_mouse_move( ViewerHandle viewer, 
     const Core::MouseHistory& mouse_history, 
     int button, int buttons, int modifiers );
 
+  // HANDLE_KEY_PRESS:
+  // Called when a key is pressed
+  virtual bool handle_key_press( ViewerHandle viewer, int key, int modifiers ); 
+  
   // REDRAW:
   // Draw seed points in the specified viewer.
   // The function should only be called by the renderer, which has a valid GL context.

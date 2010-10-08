@@ -59,6 +59,7 @@ public:
   bool handle_mouse_release( ViewerHandle viewer, const Core::MouseHistory& mouse_history,
     int button, int buttons, int modifiers );
   bool handle_wheel( ViewerHandle viewer, int delta, int x, int y, int buttons, int modifiers );
+  bool handle_key_press( ViewerHandle viewer, int key, int modifiers );
 
   void update_viewers( bool redraw_2d, bool redraw_3d );
 
@@ -152,6 +153,15 @@ bool ToolManagerPrivate::handle_wheel( ViewerHandle viewer, int delta,
   return false;
 }
 
+bool ToolManagerPrivate::handle_key_press( ViewerHandle viewer, int key, int modifiers )
+{
+  if ( this->active_tool_ )
+  {
+    return this->active_tool_->handle_key_press( viewer, key, modifiers );
+  }
+  return false;
+}
+
 void ToolManagerPrivate::update_viewers( bool redraw_2d, bool redraw_3d )
 {
   size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
@@ -195,6 +205,8 @@ ToolManager::ToolManager() :
       this->private_, _1, _2, _3, _4, _5 ) );
     viewer->set_wheel_event_handler( boost::bind( &ToolManagerPrivate::handle_wheel,
       this->private_, _1, _2, _3, _4, _5, _6 ) );
+    viewer->set_key_press_event_handler( boost::bind( &ToolManagerPrivate::handle_key_press,
+      this->private_, _1, _2, _3 ) );
   }
 }
 

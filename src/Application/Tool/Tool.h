@@ -142,6 +142,10 @@ public:
   virtual bool handle_wheel( ViewerHandle viewer, int delta, 
     int x, int y, int buttons, int modifiers );
 
+  // HANDLE_KEY_PRESS:
+  // Called when a key is pressed
+  virtual bool handle_key_press( ViewerHandle viewer, int key, int modifiers );
+
 public:
   // REDRAW:
   // Draw the tool in the specified viewer. Default implementation does nothing.

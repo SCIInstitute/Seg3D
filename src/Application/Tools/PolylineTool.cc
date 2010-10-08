@@ -187,6 +187,25 @@ void PolylineTool::erase( Core::ActionContextHandle context )
   this->private_->execute( context, true );
 }
 
+bool PolylineTool::handle_key_press( ViewerHandle viewer, int key, int modifiers )
+{
+  switch ( key )
+  {
+    case Core::Key::KEY_F_E:
+    {
+      this->fill( Core::Interface::GetKeyboardActionContext() );
+      return true;
+    }
+    case Core::Key::KEY_E_E:
+    {
+      this->erase( Core::Interface::GetKeyboardActionContext() );
+      return true;
+    }
+  }
+  return false;
+}
+
+
 void PolylineTool::reset( Core::ActionContextHandle context )
 {
   Core::ActionClear::Dispatch( context, this->vertices_state_ );

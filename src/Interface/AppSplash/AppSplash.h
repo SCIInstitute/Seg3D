@@ -77,6 +77,10 @@ private Q_SLOTS:
   // this function is called when a user double-clicks on an item in the list. 
   void open_recent();
 
+  // quit:
+  // this function close the application
+  void quit();
+
   // CALL_OPEN_RECENT:
   // this function is called when someone clicks the open recent button 
   void call_open_recent( QListWidgetItem* item );
@@ -84,9 +88,6 @@ private Q_SLOTS:
   // ENABLE_LOAD_RECENT_BUTTON:
   // this function enables the load recent button if you select a recent project from the list
   void enable_load_recent_button( QListWidgetItem* item );
-  
-public:
-  void closeEvent( QCloseEvent *event );
   
 private:
   // Internals of the splash screen

@@ -60,7 +60,9 @@ AppSplash::AppSplash( QWidget *parent ) :
   QDialog( parent ),
   private_( new AppSplashPrivate )
 {
-  this->setAttribute( Qt::WA_DeleteOnClose );
+  this->setAttribute( Qt::WA_DeleteOnClose, true );
+  
+  this->setWindowFlags( Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint );
   this->setModal( true );
 
   // Set up the private internals of the AppSplash class
@@ -79,7 +81,10 @@ AppSplash::AppSplash( QWidget *parent ) :
   
   connect( this->private_->ui_.load_recent_button_, SIGNAL( clicked() ), 
     this, SLOT( open_recent() ) );
-  
+
+  connect( this->private_->ui_.quit_seg3d_button_, SIGNAL( clicked() ), 
+    this, SLOT( quit() ) );
+      
   connect( this->private_->ui_.recent_project_listwidget_, SIGNAL( itemPressed( QListWidgetItem* ) ),
     this, SLOT( enable_load_recent_button( QListWidgetItem* ) ) );  
 
@@ -103,6 +108,11 @@ void AppSplash::new_project()
   this->new_project_wizard_->show();
   this->private_->ready_to_quit_ = false;
   this->close();
+}
+
+void AppSplash::quit()
+{
+  reinterpret_cast<QWidget*>( this->parent() )->close();
 }
   
 void AppSplash::open_existing()
@@ -193,15 +203,5 @@ void AppSplash::enable_load_recent_button( QListWidgetItem* not_used )
 {
   this->private_->ui_.load_recent_button_->setEnabled( true );
 }
-  
-void AppSplash::closeEvent( QCloseEvent *event )
-{
-  if( this->private_->ready_to_quit_ )
-  {
-    Q_EMIT dialog_closed();
-  }
-  event->accept();
-}
-
   
 } // end namespace Seg3D

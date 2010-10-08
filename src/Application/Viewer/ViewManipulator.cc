@@ -61,20 +61,26 @@ void ViewManipulator::mouse_press( const Core::MouseHistory& mouse_history, int 
     return;
   }
 
-  if ( modifiers == Core::KeyModifier::ALT_MODIFIER_E ) return;
+//  if ( modifiers == Core::KeyModifier::ALT_MODIFIER_E ) return;
 
   if ( this->viewer_->is_volume_view() )
   {
-    if ( button == Core::MouseButton::LEFT_BUTTON_E )
+    if ( button == Core::MouseButton::LEFT_BUTTON_E &&
+      !( modifiers == Core::KeyModifier::ALT_MODIFIER_E ) )
     {
       this->translate_active_ = true;
       this->compute_3d_viewplane();
     }
-    else if ( button == Core::MouseButton::RIGHT_BUTTON_E )
+    else if ( button == Core::MouseButton::RIGHT_BUTTON_E &&
+      !( modifiers == Core::KeyModifier::ALT_MODIFIER_E ) )
     {
       this->scale_active_ = true;
     }
-    else if ( button == Core::MouseButton::MID_BUTTON_E )
+    else if ( button == Core::MouseButton::MID_BUTTON_E ||
+      ( modifiers == Core::KeyModifier::ALT_MODIFIER_E  && 
+        button == Core::MouseButton::LEFT_BUTTON_E ) ||
+      ( modifiers == Core::KeyModifier::ALT_MODIFIER_E  && 
+        button == Core::MouseButton::RIGHT_BUTTON_E) )
     {
       this->rotate_active_ = true;
     }
