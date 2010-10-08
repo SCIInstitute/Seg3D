@@ -268,6 +268,7 @@ void CropAlgo::crop_mask_layer( MaskLayerHandle input, MaskLayerHandle output )
       dst_mask_data_block );
     Core::MaskVolumeHandle mask_volume( new Core::MaskVolume(
       output->get_grid_transform(), dst_mask_data_block ) );
+
     this->dispatch_insert_mask_volume_into_layer( output, mask_volume, true );
     output->update_progress_signal_( 1.0 );
     this->dispatch_unlock_layer( output );
@@ -417,8 +418,9 @@ bool ActionCrop::run( Core::ActionContextHandle& context,
   algo->src_layers_.resize( num_of_layers );
   algo->dst_layers_.resize( num_of_layers );
   std::vector< std::string > dst_layer_ids( num_of_layers );
-  for ( size_t i = 0; i < num_of_layers; ++i )
+  for ( size_t j = 0; j < num_of_layers; ++j )
   {
+    size_t i = num_of_layers - 1 - j;
     algo->find_layer( layer_ids[ i ], algo->src_layers_[ i ] );
     if ( algo->replace_ )
     {
@@ -439,6 +441,8 @@ bool ActionCrop::run( Core::ActionContextHandle& context,
     case Core::VolumeType::MASK_E:
       algo->create_and_lock_mask_layer( this->private_->output_grid_trans_,
         algo->src_layers_[ i ], algo->dst_layers_[ i ] );
+      static_cast< MaskLayer* >( algo->dst_layers_[ i ].get() )->color_state_->set(
+        static_cast< MaskLayer* >( algo->src_layers_[ i ].get() )->color_state_->get() );
       break;
     default:
       assert( false );

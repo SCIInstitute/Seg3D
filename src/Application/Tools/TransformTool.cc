@@ -255,7 +255,9 @@ void TransformToolPrivate::hit_test( ViewerHandle viewer, int x, int y )
 
   Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
   if ( viewer->is_volume_view() ||
-    this->tool_->target_group_state_->get() == "" )
+    this->tool_->target_group_state_->get() == "" ||
+    ( !this->tool_->show_border_state_->get() && 
+    !this->tool_->show_preview_state_->get() ) )
   {
     return;
   }
@@ -453,7 +455,10 @@ void TransformTool::execute( Core::ActionContextHandle context )
     this->spacing_state_[ 1 ]->get(), this->spacing_state_[ 2 ]->get() );
   ActionTransform::Dispatch( context, this->target_layers_state_->get(), 
     origin, spacing, this->replace_state_->get() );
-  this->show_preview_state_->set( false );
+  Core::Application::PostEvent( boost::bind( &Core::StateBool::set, 
+    this->show_preview_state_, false, Core::ActionSource::NONE_E ) );
+  Core::Application::PostEvent( boost::bind( &Core::StateBool::set, 
+    this->show_border_state_, false, Core::ActionSource::NONE_E ) );
 }
 
 void TransformTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )

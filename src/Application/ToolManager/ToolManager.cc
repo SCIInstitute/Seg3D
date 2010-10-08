@@ -74,20 +74,31 @@ public:
 bool ToolManagerPrivate::handle_mouse_enter( ViewerHandle viewer, int x, int y )
 {
   this->focus_viewer_ = viewer;
-  if ( this->active_tool_ )
+
+  ToolHandle active_tool;
   {
-    return this->active_tool_->handle_mouse_enter( viewer, x, y );
+    ToolManager::lock_type lock( ToolManager::Instance()->get_mutex() );
+    active_tool = this->active_tool_;
+  }
+  if ( active_tool )
+  {
+    return active_tool->handle_mouse_enter( viewer, x, y );
   }
   return false;
 }
 
 bool ToolManagerPrivate::handle_mouse_leave( ViewerHandle viewer )
 {
-  //svnassert( this->focus_viewer_ == viewer );
   this->focus_viewer_.reset();
-  if ( this->active_tool_ )
+
+  ToolHandle active_tool;
   {
-    return this->active_tool_->handle_mouse_leave( viewer );
+    ToolManager::lock_type lock( ToolManager::Instance()->get_mutex() );
+    active_tool = this->active_tool_;
+  }
+  if ( active_tool )
+  {
+    return active_tool->handle_mouse_leave( viewer );
   }
   return false;
 }
@@ -105,9 +116,14 @@ bool ToolManagerPrivate::handle_mouse_move( ViewerHandle viewer,
       mouse_history.current_.y_ );
   }
   
-  if ( this->active_tool_ )
+  ToolHandle active_tool;
   {
-    return this->active_tool_->handle_mouse_move( viewer, mouse_history, 
+    ToolManager::lock_type lock( ToolManager::Instance()->get_mutex() );
+    active_tool = this->active_tool_;
+  }
+  if ( active_tool )
+  {
+    return active_tool->handle_mouse_move( viewer, mouse_history, 
       button, buttons, modifiers );
   }
   return false;
@@ -119,9 +135,14 @@ bool ToolManagerPrivate::handle_mouse_press( ViewerHandle viewer,
 {
   this->focus_viewer_ = viewer;
 
-  if ( this->active_tool_ )
+  ToolHandle active_tool;
   {
-    return this->active_tool_->handle_mouse_press( viewer, mouse_history, 
+    ToolManager::lock_type lock( ToolManager::Instance()->get_mutex() );
+    active_tool = this->active_tool_;
+  }
+  if ( active_tool )
+  {
+    return active_tool->handle_mouse_press( viewer, mouse_history, 
       button, buttons, modifiers );
   }
   return false;
@@ -133,9 +154,14 @@ bool ToolManagerPrivate::handle_mouse_release( ViewerHandle viewer,
 {
   this->focus_viewer_ = viewer;
 
-  if ( this->active_tool_ )
+  ToolHandle active_tool;
   {
-    return this->active_tool_->handle_mouse_release( viewer, mouse_history, 
+    ToolManager::lock_type lock( ToolManager::Instance()->get_mutex() );
+    active_tool = this->active_tool_;
+  }
+  if ( active_tool )
+  {
+    return active_tool->handle_mouse_release( viewer, mouse_history, 
       button, buttons, modifiers );
   }
   return false;
@@ -146,18 +172,30 @@ bool ToolManagerPrivate::handle_wheel( ViewerHandle viewer, int delta,
 {
   this->focus_viewer_ = viewer;
 
-  if ( this->active_tool_ )
+  ToolHandle active_tool;
   {
-    return this->active_tool_->handle_wheel( viewer, delta, x, y, buttons, modifiers );
+    ToolManager::lock_type lock( ToolManager::Instance()->get_mutex() );
+    active_tool = this->active_tool_;
+  }
+  if ( active_tool )
+  {
+    return active_tool->handle_wheel( viewer, delta, x, y, buttons, modifiers );
   }
   return false;
 }
 
 bool ToolManagerPrivate::handle_key_press( ViewerHandle viewer, int key, int modifiers )
 {
-  if ( this->active_tool_ )
+  this->focus_viewer_ = viewer;
+
+  ToolHandle active_tool;
   {
-    return this->active_tool_->handle_key_press( viewer, key, modifiers );
+    ToolManager::lock_type lock( ToolManager::Instance()->get_mutex() );
+    active_tool = this->active_tool_;
+  }
+  if ( active_tool )
+  {
+    return active_tool->handle_key_press( viewer, key, modifiers );
   }
   return false;
 }

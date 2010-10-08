@@ -299,7 +299,6 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
 
     // The following buttons are enabled when the layer is not locked and not being created
     QtUtils::QtBridge::Enable( this->private_->activate_button_, enable_states, condition );
-
     QtUtils::QtBridge::Enable( this->private_->ui_.appearance_button_, enable_states, 
       condition );
     QtUtils::QtBridge::Enable( this->private_->ui_.volume_rendered_button_, enable_states, 
@@ -309,6 +308,8 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
     // The following buttons are enabled when the layer is not being created
     condition = boost::lambda::bind( &Core::StateOption::get, layer->data_state_.get() ) != 
       Layer::CREATING_C;
+    QtUtils::QtBridge::Enable( this->private_->ui_.opacity_button_, layer->data_state_, 
+      condition );
     QtUtils::QtBridge::Enable( this->private_->ui_.info_button_, layer->data_state_, 
       condition );
     QtUtils::QtBridge::Enable( this->private_->ui_.lock_button_, layer->data_state_, 

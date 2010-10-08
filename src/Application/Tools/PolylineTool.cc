@@ -47,12 +47,17 @@ SCI_REGISTER_TOOL( Seg3D, PolylineTool )
 namespace Seg3D
 {
 
+//////////////////////////////////////////////////////////////////////////
+// Class PolylineToolPrivate
+//////////////////////////////////////////////////////////////////////////
+
 class PolylineToolPrivate
 {
 public:
   void handle_vertices_changed();
   bool find_vertex( ViewerHandle viewer, int x, int y, size_t& index );
-  void execute( Core::ActionContextHandle context, bool erase );
+  void execute( Core::ActionContextHandle context, bool erase, 
+    ViewerHandle viewer = ViewerHandle() );
 
   PolylineTool* tool_;
   bool moving_vertex_;
@@ -106,7 +111,8 @@ bool PolylineToolPrivate::find_vertex( ViewerHandle viewer, int x, int y, size_t
   return false;
 }
 
-void PolylineToolPrivate::execute( Core::ActionContextHandle context, bool erase )
+void PolylineToolPrivate::execute( Core::ActionContextHandle context, 
+                  bool erase, ViewerHandle viewer )
 {
   Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
 
@@ -115,14 +121,17 @@ void PolylineToolPrivate::execute( Core::ActionContextHandle context, bool erase
     return;
   }
   
-  int active_viewer = ViewerManager::Instance()->active_viewer_state_->get();
-  if ( active_viewer < 0 )
+  // If no viewer specified, use the current active viewer
+  if ( !viewer )
   {
-    return;
+    int active_viewer = ViewerManager::Instance()->active_viewer_state_->get();
+    if ( active_viewer < 0 )
+    {
+      return;
+    }
+    viewer = ViewerManager::Instance()->get_viewer( static_cast< size_t >( active_viewer ) );
   }
   
-  ViewerHandle viewer = ViewerManager::Instance()->get_viewer( 
-    static_cast< size_t >( active_viewer ) );
   if ( !viewer || viewer->is_volume_view() )
   {
     return;
@@ -157,7 +166,9 @@ void PolylineToolPrivate::execute( Core::ActionContextHandle context, bool erase
     volume_slice->get_slice_type(), volume_slice->get_slice_number(), erase, vertices_2d );
 }
 
-
+//////////////////////////////////////////////////////////////////////////
+// Class PolylineTool
+//////////////////////////////////////////////////////////////////////////
 
 PolylineTool::PolylineTool( const std::string& toolid ) :
   SingleTargetTool( Core::VolumeType::MASK_E, toolid ),
@@ -193,18 +204,17 @@ bool PolylineTool::handle_key_press( ViewerHandle viewer, int key, int modifiers
   {
     case Core::Key::KEY_F_E:
     {
-      this->fill( Core::Interface::GetKeyboardActionContext() );
+      this->private_->execute( Core::Interface::GetKeyboardActionContext(), false, viewer );
       return true;
     }
     case Core::Key::KEY_E_E:
     {
-      this->erase( Core::Interface::GetKeyboardActionContext() );
+      this->private_->execute( Core::Interface::GetKeyboardActionContext(), true, viewer );
       return true;
     }
   }
   return false;
 }
-
 
 void PolylineTool::reset( Core::ActionContextHandle context )
 {
