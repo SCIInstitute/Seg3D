@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>273</width>
+    <width>311</width>
     <height>414</height>
    </rect>
   </property>
@@ -386,7 +386,7 @@ QPushButton#activate_button_{
                <bool>false</bool>
               </property>
               <property name="cursorPosition">
-               <number>0</number>
+               <number>17</number>
               </property>
               <property name="alignment">
                <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
@@ -1028,7 +1028,8 @@ QPushButton#activate_button_{
                  </property>
                  <property name="icon">
                   <iconset resource="../../Resources/QtResources.qrc">
-                   <normaloff>:/Images/VisibleOff.png</normaloff>:/Images/VisibleOff.png</iconset>
+                   <normaloff>:/Images/VisibleOff.png</normaloff>
+                   <normalon>:/Images/VisibleWhite.png</normalon>:/Images/VisibleOff.png</iconset>
                  </property>
                  <property name="checkable">
                   <bool>true</bool>
@@ -1048,7 +1049,8 @@ QPushButton#activate_button_{
                  </property>
                  <property name="icon">
                   <iconset resource="../../Resources/QtResources.qrc">
-                   <normaloff>:/Images/VisibleOff.png</normaloff>:/Images/VisibleOff.png</iconset>
+                   <normaloff>:/Images/VisibleOff.png</normaloff>
+                   <normalon>:/Images/VisibleWhite.png</normalon>:/Images/VisibleOff.png</iconset>
                  </property>
                  <property name="checkable">
                   <bool>true</bool>
@@ -1071,7 +1073,8 @@ QPushButton#activate_button_{
                  </property>
                  <property name="icon">
                   <iconset resource="../../Resources/QtResources.qrc">
-                   <normaloff>:/Images/VisibleOff.png</normaloff>:/Images/VisibleOff.png</iconset>
+                   <normaloff>:/Images/VisibleOff.png</normaloff>
+                   <normalon>:/Images/VisibleWhite.png</normalon>:/Images/VisibleOff.png</iconset>
                  </property>
                  <property name="checkable">
                   <bool>true</bool>
@@ -1103,7 +1106,8 @@ QPushButton#activate_button_{
                  </property>
                  <property name="icon">
                   <iconset resource="../../Resources/QtResources.qrc">
-                   <normaloff>:/Images/VisibleOff.png</normaloff>:/Images/VisibleOff.png</iconset>
+                   <normaloff>:/Images/VisibleOff.png</normaloff>
+                   <normalon>:/Images/VisibleWhite.png</normalon>:/Images/VisibleOff.png</iconset>
                  </property>
                  <property name="checkable">
                   <bool>true</bool>
@@ -1123,7 +1127,8 @@ QPushButton#activate_button_{
                  </property>
                  <property name="icon">
                   <iconset resource="../../Resources/QtResources.qrc">
-                   <normaloff>:/Images/VisibleOff.png</normaloff>:/Images/VisibleOff.png</iconset>
+                   <normaloff>:/Images/VisibleOff.png</normaloff>
+                   <normalon>:/Images/VisibleWhite.png</normalon>:/Images/VisibleOff.png</iconset>
                  </property>
                  <property name="checkable">
                   <bool>true</bool>
@@ -1143,7 +1148,8 @@ QPushButton#activate_button_{
                  </property>
                  <property name="icon">
                   <iconset resource="../../Resources/QtResources.qrc">
-                   <normaloff>:/Images/VisibleOff.png</normaloff>:/Images/VisibleOff.png</iconset>
+                   <normaloff>:/Images/VisibleOff.png</normaloff>
+                   <normalon>:/Images/VisibleWhite.png</normalon>:/Images/VisibleOff.png</iconset>
                  </property>
                  <property name="checkable">
                   <bool>true</bool>
@@ -1232,7 +1238,7 @@ QPushButton#activate_button_{
              </property>
              <property name="maximumSize">
               <size>
-               <width>70</width>
+               <width>80</width>
                <height>20</height>
               </size>
              </property>
@@ -1262,7 +1268,7 @@ QPushButton#activate_button_{
              </property>
              <property name="maximumSize">
               <size>
-               <width>70</width>
+               <width>80</width>
                <height>20</height>
               </size>
              </property>
@@ -1292,7 +1298,7 @@ QPushButton#activate_button_{
              </property>
              <property name="maximumSize">
               <size>
-               <width>70</width>
+               <width>80</width>
                <height>20</height>
               </size>
              </property>
@@ -1331,7 +1337,7 @@ QPushButton#activate_button_{
                 </property>
                 <property name="maximumSize">
                  <size>
-                  <width>70</width>
+                  <width>80</width>
                   <height>20</height>
                  </size>
                 </property>
