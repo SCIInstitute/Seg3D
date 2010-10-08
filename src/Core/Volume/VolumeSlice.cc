@@ -65,6 +65,7 @@ public:
     out_of_boundary_( copy.out_of_boundary_ ),
     left_( copy.left_ ), right_( copy.right_ ), 
     bottom_( copy.bottom_ ), top_( copy.top_ ),
+    depth_( copy.depth_ ),
     bottom_left_( copy.bottom_left_ ),
     bottom_right_( copy.bottom_right_ ),
     top_left_( copy.top_left_ ),

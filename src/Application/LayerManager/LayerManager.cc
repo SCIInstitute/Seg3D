@@ -651,11 +651,11 @@ Core::BBox LayerManager::get_layers_bbox()
   {
     LayerGroupHandle group = *group_iterator;
     const Core::GridTransform& grid_trans = group->get_grid_transform();
-    Core::Point pt( 0, 0, 0 );
+    Core::Point pt( -0.5, -0.5, -0.5 );
     bbox.extend( grid_trans * pt );
-    pt = Core::Point( static_cast< double >( grid_trans.get_nx() - 1 ), 
-      static_cast< double >( grid_trans.get_ny() - 1 ), 
-      static_cast< double >( grid_trans.get_nz() - 1 ) );
+    pt = Core::Point( static_cast< double >( grid_trans.get_nx() - 0.5 ), 
+      static_cast< double >( grid_trans.get_ny() - 0.5 ), 
+      static_cast< double >( grid_trans.get_nz() - 0.5 ) );
     bbox.extend( grid_trans * pt );
   }
 

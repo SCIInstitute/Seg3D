@@ -74,8 +74,8 @@ static void CopyMaskData( const MaskVolumeSlice* slice, unsigned char* buffer )
   size_t current_index = slice->to_index( 0, 0 );
 
   // Index strides in X and Y direction. Use int instead of size_t because strides might be negative.
-  const int x_stride = static_cast<int>( slice->to_index( 1, 0 ) - current_index );
-  const int y_stride =  static_cast<int>( slice->to_index( 0, 1 ) - current_index );
+  const int x_stride = slice->nx() > 1 ? static_cast< int >( slice->to_index( 1, 0 ) - current_index ) : 0;
+  const int y_stride = slice->ny() > 1 ? static_cast< int >( slice->to_index( 0, 1 ) - current_index ) : 0;
 
   unsigned char* mask_data = slice->get_mask_data_block()->get_mask_data();
   unsigned char mask_value = slice->get_mask_data_block()->get_mask_value();

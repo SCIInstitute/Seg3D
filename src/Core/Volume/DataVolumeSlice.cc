@@ -79,8 +79,8 @@ void CopyTypedData( DataVolumeSlice* slice, TYPE1* buffer, DataBlock* data_block
   size_t current_index = slice->to_index( 0, 0 );
 
   // Index strides in X and Y direction. Use int instead of size_t because strides might be negative.
-  const int x_stride = static_cast<int>( slice->to_index( 1, 0 ) - current_index );
-  const int y_stride =  static_cast<int>( slice->to_index( 0, 1 ) - current_index );
+  const int x_stride = slice->nx() > 1 ? static_cast<int>( slice->to_index( 1, 0 ) - current_index ) : 0;
+  const int y_stride = slice->ny() > 1 ? static_cast<int>( slice->to_index( 0, 1 ) - current_index ) : 0;
 
   const size_t nx = slice->nx();
   const size_t ny = slice->ny();
