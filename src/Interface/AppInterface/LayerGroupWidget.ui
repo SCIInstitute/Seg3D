@@ -130,27 +130,6 @@ QToolButton#group_visibility_button_:hover{
   background-color: rgba( 0, 0, 0, 30 ); border-radius: 3px;
 }
 
-QPushButton#activate_button_{
-  background-color:rgba(0, 0, 0, 0);
-  border-color: rgba(0, 0, 0, 0);
-  border: none;
-  height: 24px;
-  text-align: left;
-  color: white;
-  margin: 0 0 0 0;
-  padding: 0 0 0 0;
-  font: bold;
-}
-
-QPushButton#activate_button_:pressed{
-  background-color:rgba(0, 0, 0, 0);
-  border: none;
-  border-color: rgba(0, 0, 0, 0);
-  color: gray;
-  margin: 0 0 0 0;
-  padding: 0 0 0 0;
-}
-
 QFrame#group_frame_{
   background-color: rgba(0, 0, 0, 0);
   border: none;
@@ -161,9 +140,8 @@ QToolButton#open_button_{
   border-radius: 4px;
 }
 
-QToolButton#close_button_{
-  background-color: rgba(0, 0, 0, 0);
-  border-radius: 4px;
+QToolButton#open_button_:hover{
+  background-color: rgba( 0, 0, 0, 30 ); border-radius: 3px;
 }
 
 QWidget#group_header_{

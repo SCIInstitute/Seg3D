@@ -91,6 +91,7 @@ public:
   // -- functions to handle the properties of the interface --
 public:
   void set_full_screen( bool full_screen );
+  void set_project_name( std::string project_name );
 
 private:
   void add_windowids();
@@ -171,7 +172,13 @@ public:
   // Set full screen mode of the Main Window
   static void SetFullScreen( qpointer_type app_interface, 
     bool full_screen, Core::ActionSource source );
+    
+  static void SetProjectName( qpointer_type app_interface, 
+    std::string project_name, Core::ActionSource source );
+
+    
   
+
 };
 
 } //end namespace

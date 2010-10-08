@@ -50,6 +50,7 @@
 #include <Application/Tools/Actions/ActionPaste.h>
 
 // QtUtils includes
+#include <QtUtils/Utils/QtPointer.h>
 #include <QtUtils/Bridge/QtBridge.h>
 
 // Interface includes
@@ -71,7 +72,7 @@ AppMenu::AppMenu( QMainWindow* parent ) :
 
   // menus
   QMenu* file_menu = menubar->addMenu( tr( "&File" ) );
-  create_file_menu( file_menu );
+  create_file_menu( file_menu );  
   
   QMenu* edit_menu = menubar->addMenu( tr( "&Edit" ) );
   create_edit_menu( edit_menu );
@@ -83,6 +84,18 @@ AppMenu::AppMenu( QMainWindow* parent ) :
   
   QMenu* window_menu = menubar->addMenu( "&Window" );
   create_window_menu( window_menu );
+  
+  // NOTE: Connect state and reflect the current state (needs to be atomic, hence the lock)
+  {
+    // NOTE: State Engine is locked so the application thread cannot make
+    // any changes to it
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
+    // Connect and update full screen state
+    this->add_connection( ProjectManager::Instance()->recent_projects_state_->
+      value_changed_signal_.connect( boost::bind( &AppMenu::SetRecentFileList, 
+      qpointer_type( this ), _1, _2 ) ) );
+  }
 
   
 }
@@ -97,7 +110,7 @@ void AppMenu::create_file_menu( QMenu* qmenu )
   qaction = qmenu->addAction( tr( "&New Project" ) );
   qaction->setShortcut( tr( "Ctrl+P" ) );
   qaction->setToolTip( tr( "Start a new project." ) );
-  connect( qaction, SIGNAL( triggered() ), this, SLOT( open_project_wizard() ) );
+  connect( qaction, SIGNAL( triggered() ), this, SLOT( new_project_wizard() ) );
 
   qaction = qmenu->addAction( tr( "&Open Project" ) );
   qaction->setShortcut( QKeySequence::Open );
@@ -145,6 +158,10 @@ void AppMenu::create_file_menu( QMenu* qmenu )
   qaction->setToolTip( tr( "Export the active data layer to file." ) );
   QtUtils::QtBridge::Connect( qaction, 
     boost::bind( &AppLayerIO::ExportLayer, this->main_window_ ) );
+    
+  qmenu->addSeparator();
+    
+  this->file_menu_recents_ = qmenu->addMenu( tr( "&Recent Projects" ) );
   
   qmenu->addSeparator();
 
@@ -324,7 +341,7 @@ void AppMenu::create_window_menu( QMenu* qmenu )
     Core::Interface::GetWidgetActionContext(), std::string( "preferences" ) ) );
 }
   
-void AppMenu::open_project_wizard()
+void AppMenu::new_project_wizard()
 {
   QMessageBox message_box;
   message_box.setText( QString::fromUtf8( "WARNING: You will lose changes to your current" 
@@ -398,6 +415,42 @@ void AppMenu::open_project_folder()
   }
   CORE_LOG_ERROR( "There current project path seems to be invalid." );
 }
+
+void AppMenu::set_recent_file_list( std::vector< std::string > recent_projects )
+{
+  QAction* qaction = 0;
+  this->file_menu_recents_->clear();
+
+  for( size_t i = 0; i < recent_projects.size(); ++i )
+  {
+    if( recent_projects[ i ] != "" )
+    {
+      QString project_path = QString::fromStdString( ( Core::SplitString( 
+        recent_projects[ i ], "|" ) )[ 0 ] );
+        
+      QString project_name = QString::fromStdString( ( Core::SplitString( 
+        recent_projects[ i ], "|" ) )[ 1 ] );
+      
+      qaction = file_menu_recents_->addAction( project_name );
+      qaction->setToolTip( tr( "Load this recent project" ) );
+      
+      boost::filesystem::path path = boost::filesystem::path( project_path.toStdString() ) /
+        boost::filesystem::path( project_name.toStdString() );
+      
+      QtUtils::QtBridge::Connect( qaction, boost::bind( &ActionLoadProject::Dispatch,
+        Core::Interface::GetWidgetActionContext(), path.string() ) );
+
+    }
+  }
+}
+
+void AppMenu::SetRecentFileList( qpointer_type qpointer, 
+  std::vector< std::string > recent_projects, Core::ActionSource source )
+{
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
+    &AppMenu::set_recent_file_list, qpointer.data(), recent_projects ) ) );
+}
+
 
 
 

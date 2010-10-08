@@ -28,6 +28,10 @@
   font: bold;
 }
 
+QPushButton#activate_button_:hover{
+  color: silver;
+}
+
 QPushButton#activate_button_:pressed{
   background-color:rgba(0, 0, 0, 0);
   border-color: rgba(0, 0, 0, 0);
@@ -41,6 +45,10 @@ QToolButton#close_button_{
   border-radius: 4px;
 }
 
+QToolButton#close_button_:hover{
+  background-color: rgba(0, 0, 0, 20);
+}
+
 QToolButton#close_button_:pressed{
   background-color: rgb(68, 68, 68);
   border-radius: 4px;
@@ -49,6 +57,10 @@ QToolButton#close_button_:pressed{
 QToolButton#help_button_{
   background-color: rgba(0, 0, 0, 0);
   border-radius: 4px;
+}
+
+QToolButton#help_button_:hover{
+  background-color: rgba(0, 0, 0, 20);
 }
 
 QToolButton#help_button_:pressed{

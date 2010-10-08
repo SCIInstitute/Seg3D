@@ -37,20 +37,32 @@
 #include <QAction>
 #include <QMainWindow>
 
+
+// Interface Includes
 #include <Interface/AppInterface/ViewerInterface.h>
 #include <Interface/AppInterface/ViewAction.h>
 #include <Interface/AppInterface/AppLayerIO.h>
 
+// Core Includes
+#include <Core/Utils/ConnectionHandler.h>
+#include <Core/Action/Actions.h>
+
 namespace Seg3D
 {
 
-class AppMenu : public QObject
+class AppMenu : public QObject, private Core::ConnectionHandler
 {
 Q_OBJECT
 // -- constructor / destructor --    
 public:
   AppMenu( QMainWindow* parent = 0 );
   virtual ~AppMenu();
+  
+public:
+  typedef QPointer< AppMenu > qpointer_type;
+  void set_recent_file_list( std::vector< std::string > files );
+  static void SetRecentFileList( qpointer_type app_menu, 
+    std::vector< std::string > recent_projects, Core::ActionSource source );
 
   // -- functions for building menus --
 private:
@@ -60,14 +72,17 @@ private:
   void create_window_menu( QMenu* menu );
   void create_tool_menus( QMenuBar* menubar );
   
+  QMenu* file_menu_recents_;
+  
   // Keep a pointer to the main window
   QMainWindow*  main_window_;
   
 private Q_SLOTS:
-  void open_project_wizard();
+  void new_project_wizard();
   void open_project_from_file();
   void open_project_folder();
 };
+
 
 } // end namespace Seg3D
 

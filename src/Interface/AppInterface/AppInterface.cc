@@ -129,6 +129,7 @@ AppInterface::AppInterface()
 
   this->add_connection( Core::ActionDispatcher::Instance()->report_progress_signal_.connect( 
     boost::bind( &AppInterface::HandleReportProgress, qpointer_type( this ), _1 ) ) );
+    
 
   // NOTE: Connect state and reflect the current state (needs to be atomic, hence the lock)
   {
@@ -140,6 +141,10 @@ AppInterface::AppInterface()
     this->add_connection( InterfaceManager::Instance()->full_screen_state_->
       value_changed_signal_.connect( boost::bind( &AppInterface::SetFullScreen, 
       qpointer_type( this ), _1, _2 ) ) );
+      
+    this->add_connection( ProjectManager::Instance()->current_project_->project_name_state_->
+      value_changed_signal_.connect( boost::bind( &AppInterface::SetProjectName, 
+      qpointer_type( this ), _1, _2 ) ) ); 
   }
 
   this->center_seg3d_gui_on_screen( this );
@@ -255,6 +260,12 @@ void AppInterface::set_full_screen( bool full_screen )
 {
   if( full_screen ) showFullScreen();
   else showNormal();
+}
+
+void AppInterface::set_project_name( std::string project_name )
+{
+  setWindowTitle( QString( CORE_APPLICATION_NAME ) + " Version " + CORE_APPLICATION_VERSION +
+    " - " + QString::fromStdString( project_name ) );
 }
 
 void AppInterface::add_windowids()
@@ -518,6 +529,13 @@ void AppInterface::SetFullScreen( qpointer_type qpointer, bool full_screen, Core
   Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
       &AppInterface::set_full_screen, qpointer.data(), full_screen ) ) );
 }
+
+void AppInterface::SetProjectName( qpointer_type qpointer, std::string project_name, Core::ActionSource source )
+{
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
+    &AppInterface::set_project_name, qpointer.data(), project_name ) ) );
+}
+
 
 void AppInterface::open_project_wizard()
 {

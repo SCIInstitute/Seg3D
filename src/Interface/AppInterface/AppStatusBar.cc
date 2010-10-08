@@ -126,11 +126,7 @@ void AppStatusBar::swap_bars()
   }
 }
 
-
-
-
 // -- public slots -- //
-
 void AppStatusBar::set_coordinates_mode( bool is_world )
 {
   if( !is_world )
@@ -152,7 +148,6 @@ void AppStatusBar::set_status_report_label( std::string& status )
 {
   QString report = QString::fromStdString( status );
   this->private_->ui_.status_report_label_->setText( QString::fromUtf8( "Status: " ) + report );
-
 }
 
 void AppStatusBar::activate_history()
@@ -165,7 +160,6 @@ void AppStatusBar::activate_history()
   {
     this->history_widget_->hide();
   }
-
 }
   
 void AppStatusBar::fix_icon_status()
