@@ -188,9 +188,11 @@ void ViewManipulator::mouse_release( const Core::MouseHistory& mouse_history, in
   {
   case Core::MouseButton::LEFT_BUTTON_E:
     this->translate_active_ = false;
+    this->rotate_active_ = false;
     break;
   case Core::MouseButton::RIGHT_BUTTON_E:
     this->scale_active_ = false;
+    this->rotate_active_ = false;
     break;
   case Core::MouseButton::MID_BUTTON_E:
     this->rotate_active_ = false;
