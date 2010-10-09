@@ -741,7 +741,7 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
     {
       this->seethrough( false );
       LayerResamplerHandle layer_resampler( new LayerResampler(
-        this->private_->layer_, dst_group ) );
+        this->private_->layer_, this->private_->drop_layer_->private_->layer_ ) );
       LayerResamplerDialog* dialog = new LayerResamplerDialog( layer_resampler, this );
       if ( dialog->exec() == QDialog::Accepted )
       {

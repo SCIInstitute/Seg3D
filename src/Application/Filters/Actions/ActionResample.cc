@@ -77,6 +77,8 @@ public:
 
   Core::GridTransform grid_transform_;
   bool resample_to_grid_;
+  bool resample_to_layer_;
+  std::string dst_layer_id_;
   std::string padding_;
 };
 
@@ -502,6 +504,7 @@ ActionResample::ActionResample() :
   this->add_key( this->private_->replace_ );
 
   this->private_->resample_to_grid_ = false;
+  this->private_->resample_to_layer_ = false;
 }
 
 bool ActionResample::validate( Core::ActionContextHandle& context )
@@ -532,8 +535,25 @@ bool ActionResample::validate( Core::ActionContextHandle& context )
       return false;
     }
   }
+
+  if ( this->private_->resample_to_layer_ )
+  {
+    LayerHandle layer = LayerManager::Instance()->get_layer_by_id( 
+      this->private_->dst_layer_id_ );
+    if ( !layer )
+    {
+      context->report_error( "Invalid drop target" );
+      return false;
+    }
+    Core::GridTransform grid_trans = layer->get_grid_transform();
+    this->private_->x_.set_value( static_cast< int >( grid_trans.get_nx() ) );
+    this->private_->y_.set_value( static_cast< int >( grid_trans.get_ny() ) );
+    this->private_->z_.set_value( static_cast< int >( grid_trans.get_nz() ) );
+    this->private_->grid_transform_ = grid_trans;
+  }
   
-  if ( this->private_->resample_to_grid_ )
+  if ( this->private_->resample_to_grid_ || 
+    this->private_->resample_to_layer_ )
   {
     if ( this->private_->padding_ != ZERO_C &&
       this->private_->padding_ != MIN_C &&
@@ -581,13 +601,14 @@ bool ActionResample::run( Core::ActionContextHandle& context,
   algo->dimesions_[ 0 ] = static_cast< unsigned int >( this->private_->x_.value() );
   algo->dimesions_[ 1 ] = static_cast< unsigned int >( this->private_->y_.value() );
   algo->dimesions_[ 2 ] = static_cast< unsigned int >( this->private_->z_.value() );
-  algo->resample_to_grid_ = this->private_->resample_to_grid_;
+  algo->resample_to_grid_ = this->private_->resample_to_grid_ || 
+    this->private_->resample_to_layer_;
   algo->padding_ = this->private_->padding_;
 
   // Compute grid transform for the output layers
   const std::vector< std::string >& layer_ids = this->private_->layer_ids_.value();
   Core::GridTransform output_transform;
-  if ( this->private_->resample_to_grid_ )
+  if ( this->private_->resample_to_grid_ || this->private_->resample_to_layer_ )
   {
     output_transform = this->private_->grid_transform_;
   }
@@ -641,8 +662,14 @@ bool ActionResample::run( Core::ActionContextHandle& context,
     dst_layer_ids[ i ] = algo->dst_layers_[ i ]->get_layer_id();
   }
 
+  if ( this->private_->resample_to_layer_ )
+  {
+    LayerManager::Instance()->move_layer_above( algo->dst_layers_[ 0 ], 
+      LayerManager::Instance()->get_layer_by_id( this->private_->dst_layer_id_ ) );
+  }
+
   // Compute resample ranges if resampling to a given grid
-  if ( this->private_->resample_to_grid_ )
+  if ( this->private_->resample_to_grid_ || this->private_->resample_to_layer_ )
   {
     Core::Transform inverse_src_trans = algo->src_layers_[ 0 ]->
       get_grid_transform().get_inverse();
@@ -717,6 +744,29 @@ void ActionResample::Dispatch( Core::ActionContextHandle context,
   action->private_->replace_.set_value( replace );
 
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
+}
+
+void ActionResample::Dispatch( Core::ActionContextHandle context, 
+                const std::string& src_layer, const std::string& dst_layer, 
+                const std::string& padding, const std::string& kernel, 
+                double param1, double param2, bool replace )
+{
+  ActionResample* action = new ActionResample;
+
+  std::vector< std::string > layer_ids( 1, src_layer );
+  action->private_->layer_ids_.set_value( layer_ids );
+  action->private_->dst_layer_id_ = dst_layer;
+  action->private_->resample_to_layer_ = true;
+
+  action->private_->padding_ = padding;
+
+  action->private_->kernel_.set_value( kernel );
+  action->private_->param1_.set_value( param1 );
+  action->private_->param2_.set_value( param2 );
+  action->private_->replace_.set_value( replace );
+
+  Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
+
 }
 
 } // end namespace Seg3D

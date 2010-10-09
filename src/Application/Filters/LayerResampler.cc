@@ -42,7 +42,7 @@ public:
 
   LayerResampler* tool_;
   LayerHandle src_layer_;
-  LayerGroupHandle dst_group_;
+  LayerHandle dst_layer_;
 };
 
 void LayerResamplerPrivate::handle_kernel_changed( std::string kernel_name )
@@ -54,13 +54,13 @@ void LayerResamplerPrivate::handle_kernel_changed( std::string kernel_name )
 // Class LayerResampler
 //////////////////////////////////////////////////////////////////////////
 
-LayerResampler::LayerResampler( LayerHandle src_layer, LayerGroupHandle dst_group ) :
+LayerResampler::LayerResampler( LayerHandle src_layer, LayerHandle dst_layer ) :
   Core::StateHandler( "layerresampler", false ),
   private_( new LayerResamplerPrivate )
 {
   this->private_->tool_ = this;
   this->private_->src_layer_ = src_layer;
-  this->private_->dst_group_ = dst_group;
+  this->private_->dst_layer_ = dst_layer;
 
   std::vector< Core::OptionLabelPair > padding_values;
   padding_values.push_back( std::make_pair( ActionResample::ZERO_C, "0" ) );
@@ -95,10 +95,8 @@ void LayerResampler::execute( Core::ActionContextHandle context )
 {
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
 
-  std::vector< std::string > layer_ids( 1, this->private_->src_layer_->get_layer_id() );
-  ActionResample::Dispatch( context, layer_ids,
-    this->private_->dst_group_->get_grid_transform(), 
-    this->padding_value_state_->get(),
+  ActionResample::Dispatch( context, this->private_->src_layer_->get_layer_id(),
+    this->private_->dst_layer_->get_layer_id(), this->padding_value_state_->get(),
     this->kernel_state_->get(), this->gauss_sigma_state_->get(),
     this->gauss_cutoff_state_->get(), true );
 }

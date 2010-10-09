@@ -46,7 +46,7 @@ class LayerResampler : public Core::StateHandler
 {
   // -- constructor/destructor --
 public:
-  LayerResampler( LayerHandle src_layer, LayerGroupHandle dst_group );
+  LayerResampler( LayerHandle src_layer, LayerHandle dst_layer );
   virtual ~LayerResampler();
 
 public:
