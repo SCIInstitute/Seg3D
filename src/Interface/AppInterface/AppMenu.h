@@ -60,9 +60,13 @@ public:
   
 public:
   typedef QPointer< AppMenu > qpointer_type;
+  
   void set_recent_file_list( std::vector< std::string > files );
   static void SetRecentFileList( qpointer_type app_menu, 
     std::vector< std::string > recent_projects, Core::ActionSource source );
+    
+  void enable_disable_layer_actions();  
+  static void EnableDisableLayerActions( qpointer_type app_menu );
 
   // -- functions for building menus --
 private:
@@ -73,7 +77,12 @@ private:
   void create_tool_menus( QMenuBar* menubar );
   
   QMenu* file_menu_recents_;
+  QAction* export_segmentation_qaction_;
+  QAction* export_active_data_layer_qaction_;
   
+  QAction* copy_qaction_;
+  QAction* paste_qaction_;
+    
   // Keep a pointer to the main window
   QMainWindow*  main_window_;
   

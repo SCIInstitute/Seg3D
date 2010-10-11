@@ -253,31 +253,6 @@ void AppLayerIO::ExportLayer( QMainWindow* main_window )
 
 void AppLayerIO::ExportSegmentation( QMainWindow* main_window )
 {
-  bool mask_found = false;
-  std::vector< LayerHandle > layer_list;
-  LayerManager::Instance()->get_layers( layer_list );
-  for( size_t i = 0; i < layer_list.size(); ++i )
-  {
-    if( layer_list[ i ]->type() == Core::VolumeType::MASK_E )
-    {
-      mask_found = true;
-      break;
-    }
-  }
-  
-  if( !mask_found )
-  {
-    std::string error_message = 
-      std::string("You cannot export Segmentations unless you have them.");
-    QMessageBox message_box( main_window );
-    message_box.addButton( QMessageBox::Ok );
-    message_box.setIcon( QMessageBox::Critical );
-    message_box.setText( QString::fromStdString( error_message ) );
-    message_box.exec();
-    return;
-  }
-  
-  
   QPointer< AppSegmentationExportWizard > export_segmentation_wizard_ = 
     new AppSegmentationExportWizard( main_window );
   export_segmentation_wizard_->show();

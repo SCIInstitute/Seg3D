@@ -40,6 +40,7 @@
 //  Application includes
 #include <Application/Tool/ToolFactory.h>
 #include <Application/ToolManager/ToolManager.h>
+#include <Application/LayerManager/LayerManager.h>
 #include <Application/ProjectManager/ProjectManager.h>
 #include <Application/ToolManager/Actions/ActionOpenTool.h>
 #include <Application/InterfaceManager/Actions/ActionShowWindow.h>
@@ -93,11 +94,12 @@ AppMenu::AppMenu( QMainWindow* parent ) :
 
     // Connect and update full screen state
     this->add_connection( ProjectManager::Instance()->recent_projects_state_->
-      value_changed_signal_.connect( boost::bind( &AppMenu::SetRecentFileList, 
-      qpointer_type( this ), _1, _2 ) ) );
+      value_changed_signal_.connect( 
+      boost::bind( &AppMenu::SetRecentFileList,qpointer_type( this ), _1, _2 ) ) );
+      
+    this->add_connection( LayerManager::Instance()->layers_changed_signal_.connect( 
+      boost::bind( &AppMenu::EnableDisableLayerActions, qpointer_type( this ) ) ) );
   }
-
-  
 }
 
 AppMenu::~AppMenu()
@@ -147,17 +149,19 @@ void AppMenu::create_file_menu( QMenu* qmenu )
 
   qmenu->addSeparator();
 
-  qaction = qmenu->addAction( tr( "&Export Segmentation..." ) );
-  qaction->setShortcut( tr( "Ctrl+E" ) );
-  qaction->setToolTip( tr( "Export masks as a segmentation." ) );
-  QtUtils::QtBridge::Connect( qaction, 
+  this->export_segmentation_qaction_ = qmenu->addAction( tr( "&Export Segmentation..." ) );
+  this->export_segmentation_qaction_->setShortcut( tr( "Ctrl+E" ) );
+  this->export_segmentation_qaction_->setToolTip( tr( "Export masks as a segmentation." ) );
+  QtUtils::QtBridge::Connect( this->export_segmentation_qaction_, 
     boost::bind( &AppLayerIO::ExportSegmentation, this->main_window_ ) );
+  this->export_segmentation_qaction_->setEnabled( false );
 
-  qaction = qmenu->addAction( tr( "Export Active Data Layer...") );
-  qaction->setShortcut( tr( "Ctrl+Shift+S" ) );
-  qaction->setToolTip( tr( "Export the active data layer to file." ) );
-  QtUtils::QtBridge::Connect( qaction, 
+  this->export_active_data_layer_qaction_ = qmenu->addAction( tr( "Export Active Data Layer...") );
+  this->export_active_data_layer_qaction_->setShortcut( tr( "Ctrl+Shift+S" ) );
+  this->export_active_data_layer_qaction_->setToolTip( tr( "Export the active data layer to file." ) );
+  QtUtils::QtBridge::Connect( this->export_active_data_layer_qaction_, 
     boost::bind( &AppLayerIO::ExportLayer, this->main_window_ ) );
+  this->export_active_data_layer_qaction_->setEnabled( false ); 
     
   qmenu->addSeparator();
     
@@ -174,18 +178,19 @@ void AppMenu::create_file_menu( QMenu* qmenu )
 
 void AppMenu::create_edit_menu( QMenu* qmenu )
 {
-  QAction* qaction;
-  qaction = qmenu->addAction( tr( "Copy" ) );
-  qaction->setShortcut( tr( "Ctrl+C" ) );
-  qaction->setToolTip( tr( "Copy the current mask slice" ) );
-  QtUtils::QtBridge::Connect( qaction, boost::bind( &ActionCopy::Dispatch,
+  this->copy_qaction_ = qmenu->addAction( tr( "Copy" ) );
+  this->copy_qaction_->setShortcut( tr( "Ctrl+C" ) );
+  this->copy_qaction_->setToolTip( tr( "Copy the current mask slice" ) );
+  QtUtils::QtBridge::Connect( this->copy_qaction_, boost::bind( &ActionCopy::Dispatch,
     Core::Interface::GetWidgetActionContext() ) );
+  this->copy_qaction_->setEnabled( false );
 
-  qaction = qmenu->addAction( tr( "Paste" ) );
-  qaction->setShortcut( tr( "Ctrl+V" ) );
-  qaction->setToolTip( tr( "Paste to the current mask slice" ) );
-  QtUtils::QtBridge::Connect( qaction, boost::bind( &ActionPaste::Dispatch,
+  this->paste_qaction_ = qmenu->addAction( tr( "Paste" ) );
+  this->paste_qaction_->setShortcut( tr( "Ctrl+V" ) );
+  this->paste_qaction_->setToolTip( tr( "Paste to the current mask slice" ) );
+  QtUtils::QtBridge::Connect( this->paste_qaction_, boost::bind( &ActionPaste::Dispatch,
     Core::Interface::GetWidgetActionContext() ) );
+  this->paste_qaction_->setEnabled( false );
 }
 
 void AppMenu::create_view_menu( QMenu* qmenu )
@@ -450,6 +455,41 @@ void AppMenu::SetRecentFileList( qpointer_type qpointer,
   Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
     &AppMenu::set_recent_file_list, qpointer.data(), recent_projects ) ) );
 }
+
+void AppMenu::enable_disable_layer_actions()
+{
+  bool mask_layer_found = false;
+  bool data_layer_found = false;
+  std::vector< LayerHandle > layer_list;
+  LayerManager::Instance()->get_layers( layer_list );
+  for( size_t i = 0; i < layer_list.size(); ++i )
+  {
+    if( layer_list[ i ]->type() == Core::VolumeType::MASK_E )
+    {
+      mask_layer_found = true;
+    }
+    if( layer_list[ i ]->type() == Core::VolumeType::DATA_E)
+    {
+      data_layer_found = true;
+    }
+  }
+  
+  this->export_segmentation_qaction_->setEnabled( mask_layer_found );
+  this->export_active_data_layer_qaction_->setEnabled( data_layer_found );
+  
+  this->copy_qaction_->setEnabled( mask_layer_found );
+  this->paste_qaction_->setEnabled( mask_layer_found );
+}
+
+void AppMenu::EnableDisableLayerActions( qpointer_type qpointer )
+{
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
+    &AppMenu::enable_disable_layer_actions, qpointer.data() ) ) );
+}
+
+
+
+
 
 
 

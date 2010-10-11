@@ -163,7 +163,6 @@ void QtHistogramWidget::handle_left_button_click( int lower_location )
   double current_value = ( this->get_histogram_max() - 
     this->get_histogram_min() ) * percent_of_width;
   if( this->get_histogram_min() < 0 ) current_value = current_value + this->get_histogram_min();
-    
   this->lower_threshold_->setCurrentValue( current_value );
 }
 
