@@ -52,6 +52,7 @@ SET(CORE_GRAPHICS_SRCS
   GLSLProgram.cc
   ColorMap.h
   ColorMap.cc
+  Algorithm.h
   )
 
 

@@ -88,9 +88,6 @@ public:
 
   virtual ~PaintTool();
 
-  virtual void activate();
-  virtual void deactivate();
-
 public:
   // HANDLE_MOUSE_ENTER:
   // Called when the mouse has entered a viewer.
@@ -122,6 +119,10 @@ public:
   // Called when the mouse wheel has been rotated.
   virtual bool handle_wheel( ViewerHandle viewer, int delta, 
     int x, int y, int buttons, int modifiers );
+
+  // HANDLE_KEY_PRESS:
+  // Called when a key is pressed.
+  virtual bool handle_key_press( ViewerHandle viewer, int key, int modifiers );
   
   // REDRAW:
   // Draw the paint tool in the specified viewer.
@@ -140,6 +141,9 @@ private:
   friend class ActionPaint;
 
   bool paint( const PaintInfo& info );
+
+public:
+  void flood_fill( Core::ActionContextHandle context, bool erase );
 
   // -- state --
 public:

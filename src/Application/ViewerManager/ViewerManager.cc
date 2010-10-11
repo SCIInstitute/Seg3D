@@ -504,5 +504,15 @@ void ViewerManager::update_2d_viewers_overlay()
   }
 }
 
+ViewerHandle ViewerManager::get_active_viewer()
+{
+  int viewer_id;
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    viewer_id = this->active_viewer_state_->get();
+  }
+  return this->viewers_[ viewer_id ];
+}
+
 } // end namespace Seg3D
 

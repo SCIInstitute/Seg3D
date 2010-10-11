@@ -389,6 +389,10 @@ void RendererPrivate::draw_slice( LayerSceneItemHandle layer_item,
 
   double slice_width = volume_slice->right() - volume_slice->left();
   double slice_height = volume_slice->top() - volume_slice->bottom();
+  if ( slice_width == 0.0 || slice_height == 0.0 )
+  {
+    return;
+  }
 
   Core::TextureHandle slice_tex = volume_slice->get_texture();
   Core::Texture::lock_type slice_tex_lock( slice_tex->get_mutex() );

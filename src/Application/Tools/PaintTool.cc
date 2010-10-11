@@ -33,6 +33,7 @@
 #include <Core/Application/Application.h>
 #include <Core/Viewer/Mouse.h>
 #include <Core/Graphics/Texture.h>
+#include <Core/Graphics/Algorithm.h>
 #include <Core/RenderResources/RenderResources.h>
 #include <Core/Utils/ScopedCounter.h>
 #include <Core/Volume/DataVolumeSlice.h>
@@ -50,6 +51,7 @@
 #include <Application/ViewerManager/ViewerManager.h>
 #include <Application/Layer/DataLayer.h>
 #include <Application/Tools/Actions/ActionPaint.h>
+#include <Application/Tools/Actions/ActionFloodFill.h>
 
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL( Seg3D, PaintTool )
@@ -87,6 +89,8 @@ public:
 
   bool start_painting();
   void stop_painting();
+  void flood_fill( Core::ActionContextHandle context, bool erase, 
+    ViewerHandle viewer = ViewerHandle() );
 
   //PAINT:
   // Paint on the target layer with the brush centered at (x0, y0).
@@ -188,60 +192,6 @@ static void BresenhamCircle( std::vector< unsigned char >& buffer, int radius )
   }
 }
 
-// Flood fill the buffer with the given value, starting from (x, y). The algorithm stops
-// when it gets to the boundary of the buffer, or when it arrives at a point where the
-// value equals to the given value.
-static void FloodFill( std::vector< unsigned char >& buffer, int x, int y, 
-            int dimension, unsigned char value )
-{
-  std::stack< std::pair< int, int > > seed_points;
-  seed_points.push( std::make_pair( x, y ) );
-
-  while ( !seed_points.empty() )
-  {
-    std::pair< int, int > seed = seed_points.top();
-    seed_points.pop();
-
-    bool span_up = false;
-    bool span_down = false;
-    int x0 = seed.first;
-    int y0 = seed.second;
-    while ( x0 >= 0 && buffer[ y0 * dimension + x0 ] != value ) x0--;
-    x0++;
-
-    while ( x0 < dimension && buffer[ y0 * dimension + x0 ] != value )
-    {
-      SetPixel( buffer, x0, y0, dimension, value );
-
-      if ( !span_down && y0 > 0 && 
-        buffer[ ( y0 - 1 ) * dimension + x0 ] != value )
-      {
-        seed_points.push( std::make_pair( x0, y0 - 1 ) );
-        span_down = true;
-      }
-      else if ( span_down && y0 > 0 &&
-        buffer[ ( y0 - 1 ) * dimension + x0 ] == value )
-      {
-        span_down = false;
-      }
-
-      if ( !span_up && y0 < dimension - 1 &&
-        buffer[ ( y0 + 1 ) * dimension + x0 ] != value )
-      {
-        seed_points.push( std::make_pair( x0, y0 + 1 ) );
-        span_up = true;
-      }
-      else if ( span_up && y0 < dimension - 1 &&
-        buffer[ ( y0 + 1 ) * dimension + x0 ] == value )
-      {
-        span_up = false;
-      }
-
-      x0++;
-    }
-  }
-}
-
 void PaintToolPrivate::build_brush_mask()
 {
   this->radius_ = this->paint_tool_->brush_radius_state_->get();
@@ -254,7 +204,8 @@ void PaintToolPrivate::build_brush_mask()
   }
   memset( &this->brush_mask_[ 0 ], 0, sizeof( unsigned char ) * this->brush_mask_.size() );
   BresenhamCircle( this->brush_mask_, this->radius_ );
-  FloodFill( this->brush_mask_, this->radius_, this->radius_, brush_size, 1 );
+  Core::FloodFill( &this->brush_mask_[ 0 ], brush_size, brush_size, 
+    this->radius_, this->radius_, unsigned char( 1 ) );
 }
 
 void PaintToolPrivate::initialize()
@@ -671,6 +622,50 @@ void PaintToolPrivate::handle_layer_name_changed( std::string layer_id )
   }
 }
 
+void PaintToolPrivate::flood_fill( Core::ActionContextHandle context, 
+                  bool erase, ViewerHandle viewer )
+{
+  std::string layer_id;
+  int slice_type;
+  size_t slice_number;
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    layer_id = this->paint_tool_->target_layer_state_->get();
+    if ( layer_id == Tool::NONE_OPTION_C )
+    {
+      return;
+    }
+
+    if ( !viewer )
+    {
+      viewer = ViewerManager::Instance()->get_active_viewer();
+    }
+    
+    if ( viewer->is_volume_view() )
+    {
+      context->report_error( "Can't flood fill in the volume view." );
+      return;
+    }
+    Core::VolumeSliceHandle vol_slice = viewer->get_volume_slice( layer_id );
+    if ( vol_slice->out_of_boundary() )
+    {
+      context->report_error( "The mask layer is out of boundary in the active viewer." );
+      return;
+    }
+
+    LayerHandle layer = LayerManager::Instance()->get_layer_by_id( layer_id );
+    if ( !layer->is_visible( viewer->get_viewer_id() ) )
+    {
+      context->report_error( "Layer not visible in the active viewer" );
+      return;
+    }
+
+    slice_type = vol_slice->get_slice_type();
+    slice_number = vol_slice->get_slice_number();
+  }
+
+  ActionFloodFill::Dispatch( context, layer_id, slice_type, slice_number, erase );
+}
 
 //////////////////////////////////////////////////////////////////////////
 // Implementation of class PaintTool
@@ -752,14 +747,6 @@ PaintTool::PaintTool( const std::string& toolid ) :
 PaintTool::~PaintTool()
 {
   this->disconnect_all();
-}
-
-void PaintTool::activate()
-{
-}
-
-void PaintTool::deactivate()
-{
 }
 
 void PaintTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
@@ -1240,6 +1227,27 @@ bool PaintTool::paint( const PaintInfo& paint_info )
     return true;
   }
 
+  return false;
+}
+
+void PaintTool::flood_fill( Core::ActionContextHandle context, bool erase )
+{
+  this->private_->flood_fill( context, erase );
+}
+
+bool PaintTool::handle_key_press( ViewerHandle viewer, int key, int modifiers )
+{
+  if ( key == Core::Key::KEY_F_E )
+  {
+    this->private_->flood_fill( Core::Interface::GetKeyboardActionContext(), false, viewer );
+    return true;
+  }
+  else if ( key == Core::Key::KEY_E_E )
+  {
+    this->private_->flood_fill( Core::Interface::GetKeyboardActionContext(), true, viewer );
+    return true;
+  }
+  
   return false;
 }
 

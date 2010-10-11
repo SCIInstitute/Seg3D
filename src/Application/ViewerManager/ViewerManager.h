@@ -94,6 +94,7 @@ public:
 
   ViewerHandle get_viewer( size_t idx );
   ViewerHandle get_viewer( const std::string viewer_name );
+  ViewerHandle get_active_viewer();
 
   void get_2d_viewers_info( ViewerInfoList viewers[ 3 ] );
   void pick_point( size_t source_viewer, const Core::Point& pt );

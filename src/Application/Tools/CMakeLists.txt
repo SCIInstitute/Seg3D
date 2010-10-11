@@ -117,6 +117,8 @@ SET(APPLICATION_TOOLS_ACTIONS_SRCS
   Actions/ActionCopy.cc
   Actions/ActionPaste.h
   Actions/ActionPaste.cc
+  Actions/ActionFloodFill.h
+  Actions/ActionFloodFill.cc
   )
 
 CORE_ADD_LIBRARY(Application_Tools 

@@ -103,6 +103,10 @@ bool PaintToolInterface::build_widget( QFrame* frame )
     tool->show_data_cstr_bound_state_ );
   QtUtils::QtBridge::Enable( this->private_->ui_.target_mask_,
     tool->use_active_layer_state_, true );
+  QtUtils::QtBridge::Connect( this->private_->ui_.floodfill_button_, boost::bind(
+    &PaintTool::flood_fill, tool, Core::Interface::GetWidgetActionContext(), false ) );
+  QtUtils::QtBridge::Connect( this->private_->ui_.flooderase_button_, boost::bind(
+    &PaintTool::flood_fill, tool, Core::Interface::GetWidgetActionContext(), true ) );
   
   boost::function< bool () > condition = boost::lambda::bind( &Core::StateLabeledOption::get, 
     tool->data_constraint_layer_state_.get() ) != Tool::NONE_OPTION_C;
