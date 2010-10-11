@@ -134,6 +134,7 @@ void QtSliderIntCombo::setCurrentValue( int value )
     this->private_->ui_.horizontalSlider->setValue( value );
     this->private_->ui_.spinBox->setValue( value );
     block_signals( false );
+    Q_EMIT valueAdjusted( this->value_ );
 }
 
 

@@ -131,7 +131,9 @@ void QtHistogramWidget::set_min( double min )
   
   double min_location = ( ( this->private_->histogram_graph_->width() - 5 ) * percentage ) + 4;
   this->min_bar_->setGeometry( min_location, 4 , 4, this->private_->histogram_graph_->height() );
-  this->min_bar_->setStyleSheet( QString::fromUtf8( "border-left: 2px solid rgb( 237, 148, 31 ); border-bottom: 2px solid rgb( 237, 148, 31 ); border-top: 2px solid rgb( 237, 148, 31 );" ) );
+  this->min_bar_->setStyleSheet( QString::fromUtf8( "border-left: 2px solid rgb( 237, 148, 31 );"
+    "border-bottom: 2px solid rgb( 237, 148, 31 );"
+    "border-top: 2px solid rgb( 237, 148, 31 );" ) );
 }
 
 void QtHistogramWidget::set_max( double max )
@@ -144,10 +146,11 @@ void QtHistogramWidget::set_max( double max )
   }
   
   double percentage = max / ( this->get_histogram_max() - this->get_histogram_min() );
-  
   double max_location = ( ( this->private_->histogram_graph_->width() - 5 ) * percentage ) + 4;
   this->max_bar_->setGeometry( max_location, 4, 4, this->private_->histogram_graph_->height() );
-  this->max_bar_->setStyleSheet( QString::fromUtf8( "border-right: 2px solid rgb( 237, 148, 31 ); border-bottom: 2px solid rgb( 237, 148, 31 ); border-top: 2px solid rgb( 237, 148, 31 );" ) );
+  this->max_bar_->setStyleSheet( QString::fromUtf8( "border-right: 2px solid rgb( 237, 148, 31 );"
+    "border-bottom: 2px solid rgb( 237, 148, 31 );"
+    "border-top: 2px solid rgb( 237, 148, 31 );" ) );
 }
 
 void QtHistogramWidget::handle_left_button_click( int lower_location )
@@ -155,12 +158,13 @@ void QtHistogramWidget::handle_left_button_click( int lower_location )
   if( this->lower_threshold_ == 0 ) return;
   if( this->max_bar_->isHidden() ) this->max_bar_->show();
   if( this->min_bar_->isHidden() ) this->min_bar_->show();
-  this->min_bar_->setGeometry( lower_location + 4, 4, 4, this->private_->histogram_graph_->height() );
-  double percent_of_width = lower_location / double ( this->private_->histogram_graph_->width( ) );
-  double current_value = ( this->get_histogram_max() - this->get_histogram_min() ) * percent_of_width;
-  this->blockSignals( true );
+  double percent_of_width = lower_location / 
+    double ( this->private_->histogram_graph_->width( ) );
+  double current_value = ( this->get_histogram_max() - 
+    this->get_histogram_min() ) * percent_of_width;
+  if( this->get_histogram_min() < 0 ) current_value = current_value + this->get_histogram_min();
+    
   this->lower_threshold_->setCurrentValue( current_value );
-  this->blockSignals( false );
 }
 
 void QtHistogramWidget::handle_right_button_click( int upper_location )
@@ -168,9 +172,11 @@ void QtHistogramWidget::handle_right_button_click( int upper_location )
   if( this->upper_threshold_ == 0 ) return;
   if( this->max_bar_->isHidden() ) this->max_bar_->show();
   if( this->min_bar_->isHidden() ) this->min_bar_->show();
-  this->max_bar_->setGeometry( ( upper_location ), 4, 4, this->private_->histogram_graph_->height() );
-  double percent_of_width = upper_location / double ( this->private_->histogram_graph_->width() );
-  double current_value = ( this->get_histogram_max() - this->get_histogram_min() ) * percent_of_width;
+  double percent_of_width = upper_location / 
+    double ( this->private_->histogram_graph_->width() );
+  double current_value = ( this->get_histogram_max() - 
+    this->get_histogram_min() ) * percent_of_width;
+  if( this->get_histogram_min() < 0 ) current_value = current_value + this->get_histogram_min();
   this->upper_threshold_->setCurrentValue( current_value );
 }
 

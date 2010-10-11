@@ -142,6 +142,7 @@ void QtSliderDoubleCombo::setCurrentValue( double value )
     this->private_->ui_.horizontalSlider->setValue( static_cast<int>( this->value_ * 100.0 ) );
     this->private_->ui_.spinBox->setValue( this->value_ );
     this->block_signals( false );
+    Q_EMIT valueAdjusted( this->value_ );
 }
 
 void QtSliderDoubleCombo::change_min( double new_min )

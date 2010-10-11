@@ -199,6 +199,10 @@ private Q_SLOTS:
   // TRIGGER_ABORT:
   // Trigger the abort signal of the layer
   void trigger_abort();
+  
+  // SET_BRIGHTNESS_CONTRAST_TO_DEFAULT:
+  // dispatches actions that set the values of the brightness and contrast back to defaults
+  void set_brightness_contrast_to_default();
 
 protected:
   void resizeEvent( QResizeEvent *event );
@@ -221,6 +225,7 @@ public:
   // UPDATEPROGRESS:
   // Update the progress bar 
   static void UpdateProgress( qpointer_type qpointer, double progress );
+  
 };
 
 } //end namespace Seg3D
