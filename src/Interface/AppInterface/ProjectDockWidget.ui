@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>323</width>
-    <height>809</height>
+    <width>274</width>
+    <height>801</height>
    </rect>
   </property>
   <property name="styleSheet">
@@ -232,7 +232,7 @@
              <string>Controls for activating and deactivating Smart Autosave are located in the Preferences Manager</string>
             </property>
             <property name="text">
-             <string>Current project size on disk:</string>
+             <string>Project File Size:</string>
             </property>
            </widget>
           </item>
@@ -323,21 +323,6 @@
           </attribute>
           <attribute name="verticalHeaderDefaultSectionSize">
            <number>25</number>
-          </attribute>
-          <attribute name="verticalHeaderVisible">
-           <bool>false</bool>
-          </attribute>
-          <attribute name="verticalHeaderDefaultSectionSize">
-           <number>25</number>
-          </attribute>
-          <attribute name="horizontalHeaderStretchLastSection">
-           <bool>true</bool>
-          </attribute>
-          <attribute name="horizontalHeaderMinimumSectionSize">
-           <number>38</number>
-          </attribute>
-          <attribute name="horizontalHeaderDefaultSectionSize">
-           <number>90</number>
           </attribute>
           <column>
            <property name="text">

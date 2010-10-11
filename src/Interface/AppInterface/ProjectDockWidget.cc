@@ -144,12 +144,12 @@ ProjectDockWidget::ProjectDockWidget( QWidget *parent ) :
     this->disable_load_delete_and_export_buttons();
     
 #if defined ( __APPLE__ )  
-    QFont font;
-    font.setPointSize( 10 );
-    QApplication::setFont( font );
-    this->private_->ui_.delete_session_button_->setFont( font );
-    this->private_->ui_.load_session_button_->setFont( font );
-    this->private_->ui_.save_session_button_->setFont( font );
+//    QFont font;
+//    font.setPointSize( 10 );
+//    QApplication::setFont( font );
+//    this->private_->ui_.delete_session_button_->setFont( font );
+//    this->private_->ui_.load_session_button_->setFont( font );
+//    this->private_->ui_.save_session_button_->setFont( font );
 #endif
     
   }

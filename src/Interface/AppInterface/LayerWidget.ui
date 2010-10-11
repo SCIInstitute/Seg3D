@@ -198,21 +198,16 @@ QPushButton#activate_button_{
           <widget class="QWidget" name="checkbox_widget_" native="true">
            <property name="minimumSize">
             <size>
-             <width>25</width>
+             <width>21</width>
              <height>0</height>
             </size>
-           </property>
-           <property name="font">
-            <font>
-             <pointsize>18</pointsize>
-            </font>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_2">
             <property name="spacing">
              <number>0</number>
             </property>
             <property name="leftMargin">
-             <number>3</number>
+             <number>0</number>
             </property>
             <property name="topMargin">
              <number>6</number>

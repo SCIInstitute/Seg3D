@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>202</width>
-    <height>283</height>
+    <width>239</width>
+    <height>306</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -188,13 +188,13 @@
        <number>0</number>
       </property>
       <property name="leftMargin">
-       <number>4</number>
+       <number>2</number>
       </property>
       <property name="topMargin">
        <number>2</number>
       </property>
       <property name="rightMargin">
-       <number>4</number>
+       <number>2</number>
       </property>
       <property name="bottomMargin">
        <number>4</number>
@@ -257,6 +257,9 @@
          </size>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_6">
+         <property name="spacing">
+          <number>2</number>
+         </property>
          <property name="margin">
           <number>0</number>
          </property>
@@ -269,7 +272,7 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string>Run Dilate -&gt; Erode</string>
+            <string>Run Dilate - Erode</string>
            </property>
           </widget>
          </item>

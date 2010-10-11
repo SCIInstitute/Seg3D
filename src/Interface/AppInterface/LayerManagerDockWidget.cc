@@ -42,13 +42,12 @@ LayerManagerDockWidget::LayerManagerDockWidget( QWidget *parent ) :
   this->setAllowedAreas( Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea );
   this->setWindowTitle( "Layer Manager" );
 
-  this->resize( 280, 640 );
-  QSizePolicy sizePolicy( QSizePolicy::Fixed, QSizePolicy::Preferred );
-  sizePolicy.setHorizontalStretch(0);
-  sizePolicy.setVerticalStretch(0);
-  setSizePolicy( sizePolicy );
-  this->setMinimumSize( QSize( 280, 313 ) );
-    this->setMaximumSize( QSize( 524287, 524287 ) );
+//  this->resize( 240, 640 );
+//  QSizePolicy sizePolicy( QSizePolicy::Fixed, QSizePolicy::Preferred );
+//  sizePolicy.setHorizontalStretch(0);
+//  sizePolicy.setVerticalStretch(0);
+//  setSizePolicy( sizePolicy );
+  this->setMinimumSize( QSize( 260, 313 ) );
   
   this->setWidget( new LayerManagerWidget( this ) );
 }

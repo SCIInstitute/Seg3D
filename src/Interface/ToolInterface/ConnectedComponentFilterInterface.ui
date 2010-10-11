@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>251</width>
-    <height>244</height>
+    <width>230</width>
+    <height>277</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -15,18 +15,6 @@
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
-  </property>
-  <property name="minimumSize">
-   <size>
-    <width>0</width>
-    <height>100</height>
-   </size>
-  </property>
-  <property name="maximumSize">
-   <size>
-    <width>16777215</width>
-    <height>16777215</height>
-   </size>
   </property>
   <property name="windowTitle">
    <string>Connected Component Filter</string>
@@ -104,7 +92,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>Extact components connected to seeds</string>
+      <string>Seeds:</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <property name="spacing">
@@ -166,7 +154,7 @@
    <item>
     <widget class="QGroupBox" name="connected_to_mask_groupbox_">
      <property name="title">
-      <string>Extract components connected to mask</string>
+      <string>Extract components from mask:</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_5">
       <property name="leftMargin">

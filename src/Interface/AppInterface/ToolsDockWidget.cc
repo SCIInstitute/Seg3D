@@ -57,8 +57,8 @@ ToolsDockWidget::ToolsDockWidget( QWidget *parent ) :
   sizePolicy.setHorizontalStretch(0);
   sizePolicy.setVerticalStretch(0);
   setSizePolicy( sizePolicy );
-  setMinimumSize( QSize( 287, 300 ) );
-    setMaximumSize( QSize( 524287, 524287 ) );
+  setMinimumSize( QSize( 285, 300 ) );
+    //setMaximumSize( QSize( 524287, 524287 ) );
     
   // Create a new ToolBoxWidget that encapsulates all the tool widgets
   toolbox_ = new ToolBoxWidget( this );

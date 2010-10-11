@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>254</width>
-    <height>468</height>
+    <width>262</width>
+    <height>481</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -254,7 +254,7 @@
              <height>24</height>
             </size>
            </property>
-           <layout class="QHBoxLayout" name="horizontalLayout_12" stretch="1,2">
+           <layout class="QHBoxLayout" name="horizontalLayout_12" stretch="0,0">
             <property name="spacing">
              <number>0</number>
             </property>
@@ -263,6 +263,18 @@
             </property>
             <item>
              <widget class="QLabel" name="label">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>14</width>
+                <height>0</height>
+               </size>
+              </property>
               <property name="text">
                <string>X:</string>
               </property>
@@ -270,6 +282,12 @@
             </item>
             <item>
              <widget class="QDoubleSpinBox" name="origin_x_spinbox_">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="decimals">
                <number>6</number>
               </property>
@@ -286,7 +304,7 @@
              <height>24</height>
             </size>
            </property>
-           <layout class="QHBoxLayout" name="horizontalLayout_11" stretch="1,2">
+           <layout class="QHBoxLayout" name="horizontalLayout_11" stretch="0,0">
             <property name="spacing">
              <number>0</number>
             </property>
@@ -295,6 +313,18 @@
             </property>
             <item>
              <widget class="QLabel" name="label_2">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>14</width>
+                <height>0</height>
+               </size>
+              </property>
               <property name="text">
                <string>Y:</string>
               </property>
@@ -302,6 +332,12 @@
             </item>
             <item>
              <widget class="QDoubleSpinBox" name="origin_y_spinbox_">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="decimals">
                <number>6</number>
               </property>
@@ -318,7 +354,7 @@
              <height>24</height>
             </size>
            </property>
-           <layout class="QHBoxLayout" name="horizontalLayout_10" stretch="1,2">
+           <layout class="QHBoxLayout" name="horizontalLayout_10" stretch="0,0">
             <property name="spacing">
              <number>0</number>
             </property>
@@ -327,6 +363,18 @@
             </property>
             <item>
              <widget class="QLabel" name="label_3">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>14</width>
+                <height>0</height>
+               </size>
+              </property>
               <property name="text">
                <string>Z:</string>
               </property>
@@ -334,6 +382,12 @@
             </item>
             <item>
              <widget class="QDoubleSpinBox" name="origin_z_spinbox_">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="decimals">
                <number>6</number>
               </property>
@@ -374,7 +428,7 @@
              <height>24</height>
             </size>
            </property>
-           <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,2">
+           <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,0">
             <property name="spacing">
              <number>0</number>
             </property>
@@ -383,6 +437,18 @@
             </property>
             <item>
              <widget class="QLabel" name="label_4">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>14</width>
+                <height>0</height>
+               </size>
+              </property>
               <property name="text">
                <string>X:</string>
               </property>
@@ -390,6 +456,12 @@
             </item>
             <item>
              <widget class="QDoubleSpinBox" name="spacing_x_spinbox_">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="decimals">
                <number>6</number>
               </property>
@@ -406,7 +478,7 @@
              <height>24</height>
             </size>
            </property>
-           <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,2">
+           <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0">
             <property name="spacing">
              <number>0</number>
             </property>
@@ -415,6 +487,18 @@
             </property>
             <item>
              <widget class="QLabel" name="label_6">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>14</width>
+                <height>0</height>
+               </size>
+              </property>
               <property name="text">
                <string>Y:</string>
               </property>
@@ -422,6 +506,12 @@
             </item>
             <item>
              <widget class="QDoubleSpinBox" name="spacing_y_spinbox_">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="decimals">
                <number>6</number>
               </property>
@@ -438,7 +528,7 @@
              <height>24</height>
             </size>
            </property>
-           <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,2">
+           <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0">
             <property name="spacing">
              <number>0</number>
             </property>
@@ -447,6 +537,18 @@
             </property>
             <item>
              <widget class="QLabel" name="label_5">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>14</width>
+                <height>0</height>
+               </size>
+              </property>
               <property name="text">
                <string>Z:</string>
               </property>
@@ -454,6 +556,12 @@
             </item>
             <item>
              <widget class="QDoubleSpinBox" name="spacing_z_spinbox_">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="decimals">
                <number>6</number>
               </property>
