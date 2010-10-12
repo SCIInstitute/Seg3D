@@ -142,7 +142,6 @@ ResampleAlgo::ResampleAlgo( const std::string& kernel, double param1, double par
 {
   this->rsmc_ = nrrdResampleContextNew();
   this->rsmc_->verbose = 0;
-  nrrdResampleBoundarySet( this->rsmc_, nrrdBoundaryPad );
   nrrdResampleDefaultCenterSet( this->rsmc_, nrrdCenterCell );
   this->data_kernel_ = nrrdKernelSpecNew();
   this->mask_kernel_ = nrrdKernelSpecNew();
@@ -447,6 +446,15 @@ void ResampleAlgo::resample_mask_layer( MaskLayerHandle input, MaskLayerHandle o
 
 void ResampleAlgo::run()
 {
+  if ( this->resample_to_grid_ )
+  {
+    nrrdResampleBoundarySet( this->rsmc_, nrrdBoundaryPad );
+  }
+  else
+  {
+    nrrdResampleBoundarySet( this->rsmc_, nrrdBoundaryBleed );
+  }
+  
   for ( size_t i = 0; i < this->src_layers_.size(); ++i )
   {
     switch ( this->src_layers_[ i ]->type() )
