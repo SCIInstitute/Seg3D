@@ -227,8 +227,10 @@ bool DataLayer::pre_save_states( Core::StateIO& state_io )
     std::string error;
 
     bool compress = PreferencesManager::Instance()->compression_state_->get();
+    int level = PreferencesManager::Instance()->compression_level_state_->get();
+    
     if ( Core::DataVolume::SaveDataVolume( volume_path.string(), 
-      this->data_volume_ , error, compress ) )
+      this->data_volume_ , error, compress, level ) )
     {
       return true;
     }

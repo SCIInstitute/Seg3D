@@ -241,7 +241,7 @@ void MaskDataBlockManager::register_data_block( DataBlockHandle data_block,
   this->private_->mask_list_.push_back( MaskDataBlockEntry( data_block, grid_transform ) );
 }
 
-bool MaskDataBlockManager::save_data_blocks( boost::filesystem::path path, bool compress )
+bool MaskDataBlockManager::save_data_blocks( boost::filesystem::path path, bool compress, int level )
 {
   lock_type lock( get_mutex() );
 
@@ -260,7 +260,7 @@ bool MaskDataBlockManager::save_data_blocks( boost::filesystem::path path, bool 
 
       std::string error;
 
-      if ( ! ( NrrdData::SaveNrrd( volume_path.string(), nrrd, error, compress ) ) ) 
+      if ( ! ( NrrdData::SaveNrrd( volume_path.string(), nrrd, error, compress, level ) ) ) 
       {
         CORE_LOG_ERROR( error );
         return false;

@@ -383,6 +383,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
         this->private_->ui_.show_iso_surface_button_->hide();
         this->private_->ui_.iso_control_separator_line_->hide();
         this->private_->ui_.border_fill_->hide();
+        this->private_->ui_.mask_volume_widget_->hide();
         this->private_->color_widget_->hide();
         
         // Add the layer specific connections

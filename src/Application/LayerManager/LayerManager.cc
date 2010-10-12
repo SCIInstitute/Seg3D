@@ -806,7 +806,8 @@ bool LayerManager::post_save_states( Core::StateIO& state_io )
 
   return Core::MaskDataBlockManager::Instance()->save_data_blocks( 
     ProjectManager::Instance()->get_project_data_path(),
-    PreferencesManager::Instance()->compression_state_->get() );
+    PreferencesManager::Instance()->compression_state_->get(),
+    PreferencesManager::Instance()->compression_level_state_->get() );
 } 
   
 bool LayerManager::pre_load_states( const Core::StateIO& state_io )

@@ -117,6 +117,8 @@ private:
   // data type to use for the import
   bool scan_tiff();
   
+  // SET_PIXEL_TYPE:
+  // function that sets the pixel type, used for the png and tiff scanner's only
   bool set_pixel_type( std::string& type );
 
   // IMPORT_DICOM_SERIES:

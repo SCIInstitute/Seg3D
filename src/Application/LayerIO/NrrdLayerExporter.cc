@@ -103,8 +103,10 @@ bool NrrdLayerExporter::export_nrrd( const std::string& file_path )
     temp_handle->get_data_volume()->get_data_block(), temp_handle->get_grid_transform() ) );
   
   bool compress = PreferencesManager::Instance()->compression_state_->get();
+  int level = PreferencesManager::Instance()->compression_level_state_->get();
+
   std::string error;
-  if ( !( Core::NrrdData::SaveNrrd( file_path, nrrd, error, compress ) ) ) 
+  if ( !( Core::NrrdData::SaveNrrd( file_path, nrrd, error, compress, level ) ) ) 
   {
     CORE_LOG_ERROR( error );
     return false;
@@ -158,7 +160,9 @@ bool NrrdLayerExporter::export_single_masks( const std::string& path )
     // Step 6: Attempt to save the nrrd to the path that was passed and we return false if we 
     // can't
     bool compress = PreferencesManager::Instance()->compression_state_->get();
-    if ( !( Core::NrrdData::SaveNrrd( mask_path.string(), nrrd, error, compress ) ) ) 
+    int level = PreferencesManager::Instance()->compression_level_state_->get();
+
+    if ( !( Core::NrrdData::SaveNrrd( mask_path.string(), nrrd, error, compress, level ) ) ) 
     {
       CORE_LOG_ERROR( error );
       return false;
@@ -214,7 +218,9 @@ bool NrrdLayerExporter::export_mask_label( const std::string& file_path )
 
   // Step 6: Attempt to save the nrrd to the path that was passed and we return false if we can't
   bool compress = PreferencesManager::Instance()->compression_state_->get();
-  if ( !( Core::NrrdData::SaveNrrd( file_path, nrrd, error, compress ) ) ) 
+  int level = PreferencesManager::Instance()->compression_level_state_->get();
+
+  if ( !( Core::NrrdData::SaveNrrd( file_path, nrrd, error, compress, level ) ) ) 
   {
     CORE_LOG_ERROR( error );
     return false;

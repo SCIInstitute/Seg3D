@@ -491,8 +491,8 @@ bool NrrdData::LoadNrrd( const std::string& filename, NrrdDataHandle& nrrddata, 
   return true;
 }
 
-bool NrrdData::SaveNrrd( const std::string& filename, NrrdDataHandle nrrddata,
-            std::string& error, bool compress )
+bool NrrdData::SaveNrrd( const std::string& filename, NrrdDataHandle nrrddata, std::string& error, 
+  bool compress, int level )
 {
   // Lock down the Teem library
   lock_type lock( GetMutex() );
@@ -506,10 +506,11 @@ bool NrrdData::SaveNrrd( const std::string& filename, NrrdDataHandle nrrddata,
   }
 
   NrrdIoState* nio = nrrdIoStateNew();
-  nrrdIoStateSet( nio,  nrrdIoStateZlibLevel, 6 );
+  nrrdIoStateSet( nio,  nrrdIoStateZlibLevel, level );
   // Turn on compression if the user wants it.
   if( compress )
   { 
+  
     nrrdIoStateEncodingSet( nio, nrrdEncodingGzip );
   }
   

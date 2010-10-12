@@ -99,8 +99,7 @@ public:
 
   // SAVEDATAVOLUME:
   // Save a DataVolume to a nrrd file
-  static bool SaveDataVolume( const boost::filesystem::path& filepath, DataVolumeHandle& volume, 
-    std::string& error, bool compress );
+  static bool SaveDataVolume( const boost::filesystem::path& filepath, DataVolumeHandle& volume, std::string& error, bool compress, int level );
 
   // CREATEEMPTYDATA:
   // Create an empty data volume with given dimensions.

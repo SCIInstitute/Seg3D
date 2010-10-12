@@ -151,8 +151,8 @@ public:
 
   // SAVENRRD:
   // Save a nrrd to file from nrrd data structure
-  static bool SaveNrrd( const std::string& filename, NrrdDataHandle nrrddata, 
-    std::string& error, bool compress );
+  static bool SaveNrrd( const std::string& filename, NrrdDataHandle nrrddata, std::string& error, 
+    bool compress, int level );
 
   // -- Lock and Unlock Teem (Some parts of Teem are not thread safe) --
 public:
