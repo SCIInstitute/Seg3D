@@ -197,7 +197,7 @@ void TransformToolPrivate::handle_keep_aspect_ratio_changed( bool keep )
 
 void TransformToolPrivate::handle_show_border_changed( bool show )
 {
-  if ( this->tool_->preview_layer_state_->get() != "" )
+  if ( this->tool_->target_group_state_->get() != "" )
   {
     ViewerManager::Instance()->update_2d_viewers_overlay();
   }
@@ -682,6 +682,28 @@ bool TransformTool::handle_mouse_release( ViewerHandle viewer,
 void TransformTool::deactivate()
 {
   ViewerManager::Instance()->reset_cursor();
+}
+
+void TransformTool::reset()
+{
+  if ( !Core::Application::IsApplicationThread() )
+  {
+    Core::Application::PostEvent( boost::bind( &TransformTool::reset, this ) );
+    return;
+  }
+  
+  const std::string& group_id = this->target_group_state_->get();
+  if ( group_id == "" || group_id == Tool::NONE_OPTION_C )
+  {
+    return;
+  }
+  
+  this->private_->handle_target_group_changed( group_id );
+  if ( this->show_border_state_->get() || ( this->show_preview_state_->get() &&
+    this->preview_layer_state_->get() != "" ) )
+  {
+    ViewerManager::Instance()->update_2d_viewers_overlay();
+  }
 }
 
 } // end namespace Seg3D

@@ -413,6 +413,7 @@ void CropTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 
   Core::VolumeSliceType slice_type( Core::VolumeSliceType::AXIAL_E );
   Core::Point crop_origin, crop_end;
+  double depth;
 
   {
     Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
@@ -423,6 +424,11 @@ void CropTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
     {
       return;
     }
+
+    Core::StateView2D* state_view2d = static_cast< Core::StateView2D* >( 
+      viewer->get_active_view_state().get() );
+    depth = state_view2d->get().center().z();
+
     if ( viewer->view_mode_state_->get() == Viewer::SAGITTAL_C )
     {
       slice_type = Core::VolumeSliceType::SAGITTAL_E;
@@ -439,28 +445,21 @@ void CropTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
     }
   }
 
-  double start_x, start_y, end_x, end_y;
-  Core::VolumeSlice::ProjectOntoSlice( slice_type, crop_origin, start_x, start_y );
-  Core::VolumeSlice::ProjectOntoSlice( slice_type, crop_end, end_x, end_y );
+  double start_x, start_y, end_x, end_y, depth_min, depth_max;
+  Core::VolumeSlice::ProjectOntoSlice( slice_type, crop_origin, start_x, start_y, depth_min );
+  Core::VolumeSlice::ProjectOntoSlice( slice_type, crop_end, end_x, end_y, depth_max );
+  bool in_range = depth >= depth_min && depth <= depth_max;
 
-  glPushAttrib( GL_LINE_BIT | GL_POINT_BIT | GL_TRANSFORM_BIT );
+  glPushAttrib( GL_LINE_BIT | GL_TRANSFORM_BIT );
   glMatrixMode( GL_PROJECTION );
   glPushMatrix();
   glLoadIdentity();
   glMultMatrixd( proj_mat.data() );
 
-  glLineWidth( 2.0f );
-  glPointSize( 2.0f );
-  glColor3f( 1.0f, 0.0f, 0.0f );
+  glLineWidth( 1.0f );
+  glColor4f( 1.0f, 0.0f, 0.0f, in_range ? 1.0f : 0.5f );
 
   glBegin( GL_LINE_LOOP );
-  glVertex2d( start_x, start_y );
-  glVertex2d( end_x, start_y );
-  glVertex2d( end_x, end_y );
-  glVertex2d( start_x, end_y );
-  glEnd();
-
-  glBegin( GL_POINTS );
   glVertex2d( start_x, start_y );
   glVertex2d( end_x, start_y );
   glVertex2d( end_x, end_y );
@@ -539,5 +538,38 @@ void CropTool::deactivate()
 {
   ViewerManager::Instance()->reset_cursor();
 }
+
+void CropTool::reset()
+{
+  if ( !Core::Application::IsApplicationThread() )
+  {
+    Core::Application::PostEvent( boost::bind( &CropTool::reset, this ) );
+    return;
+  }
+  
+  const std::string& group_id = this->target_group_state_->get();
+  if ( group_id == "" || group_id == Tool::NONE_OPTION_C )
+  {
+    return;
+  }
+
+  // NOTE: Lock the state engine because the following changes need to be atomic
+  Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
+
+  Core::ScopedCounter signal_block( this->private_->signal_block_count_ );
+
+  for ( int i = 0; i < 3; ++i )
+  {
+    double min_val, max_val;
+    this->cropbox_origin_state_[ i ]->get_range( min_val, max_val );
+    this->cropbox_origin_state_[ i ]->set( min_val );
+    this->cropbox_size_state_[ i ]->set_range( 0, max_val - min_val );
+    this->cropbox_size_state_[ i ]->set( max_val - min_val );
+  }
+
+  state_lock.unlock();
+  ViewerManager::Instance()->update_2d_viewers_overlay();
+}
+
 
 } // end namespace Seg3D

@@ -94,6 +94,10 @@ public:
   // Execute the tool and dispatch the action
   virtual void execute( Core::ActionContextHandle context );
 
+  // RESET:
+  // Reset the transformation to its original state.
+  void reset();
+
   // -- state --
 public:
   Core::StateRangedDoubleHandle origin_state_[ 3 ];

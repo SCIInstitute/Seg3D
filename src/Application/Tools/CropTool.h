@@ -94,6 +94,10 @@ public:
   // Execute the tool and dispatch the action
   virtual void execute( Core::ActionContextHandle context );
 
+  // RESET:
+  // Reset the crop box to the full range of the layer.
+  void reset();
+
   // -- state --
 public:
   Core::StateIntHandle input_dimensions_state_[ 3 ];

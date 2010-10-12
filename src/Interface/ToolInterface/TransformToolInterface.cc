@@ -93,6 +93,8 @@ bool TransformToolInterface::build_widget( QFrame* frame )
 
   QtUtils::QtBridge::Connect( this->private_->ui_.execute_button_, boost::bind(
     &TransformTool::execute, tool, Core::Interface::GetWidgetActionContext() ) );
+  QtUtils::QtBridge::Connect( this->private_->ui_.reset_button_, boost::bind(
+    &TransformTool::reset, tool ) );
 
   QtUtils::QtBridge::Enable( this->private_->ui_.target_group_, 
     tool->use_active_group_state_, true ); 
