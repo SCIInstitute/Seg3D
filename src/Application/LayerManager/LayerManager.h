@@ -59,6 +59,8 @@ namespace Seg3D
 
 // Forward declaration
 class LayerManager;
+class LayerManagerPrivate;
+typedef boost::shared_ptr< LayerManagerPrivate > LayerManagerPrivateHandle;
 
 // Class definition
 class LayerManager : public Core::StateHandler
@@ -205,7 +207,7 @@ public:
   
   // state variables
 public:
-  Core::StateStringHandle active_layer_state_;
+  Core::StateLabeledOptionHandle active_layer_state_;
 
 public:
   // TODO: There are too many signals in here, we should clean this up
@@ -280,11 +282,8 @@ protected:
   
   
 private:
-    // list of the current groups 
-  group_list_type group_list_;
-  
-  // currently active layer
-  LayerHandle active_layer_;
+  friend class LayerManagerPrivate;
+  LayerManagerPrivateHandle private_;
 
   // -- static functions --
 public:

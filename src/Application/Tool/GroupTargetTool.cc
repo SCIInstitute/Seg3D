@@ -153,7 +153,11 @@ void GroupTargetToolPrivate::handle_target_group_changed( std::string group_id )
     group->get_layer_names( layer_names, this->target_type_ );
     if ( this->tool_->use_active_group_state_->get() )
     {
-      selected_layers.push_back( LayerManager::Instance()->get_active_layer()->get_layer_id() );
+      LayerHandle active_layer = LayerManager::Instance()->get_active_layer();
+      if ( active_layer )
+      {
+        selected_layers.push_back( active_layer->get_layer_id() );
+      }   
     } 
   }
   this->tool_->target_layers_state_->set_option_list( layer_names );

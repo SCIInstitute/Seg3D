@@ -41,7 +41,5 @@ CORE_ADD_LIBRARY(Application_StatusBar ${APPLICATION_STATUSBAR_SRCS} )
 TARGET_LINK_LIBRARIES(Application_StatusBar
                       Core_Interface
                       Core_Utils
-            Application_LayerManager
-            Application_ToolManager
                       ${SCI_BOOST_LIBRARY})
 

@@ -120,6 +120,10 @@ public:
   // Cause all the visible volume viewers to redraw.
   void update_volume_viewers();
 
+  // RESET_CURSOR:
+  // Reset the cursors of all the viewers to default.
+  void reset_cursor();
+
   // -- State information --
 public:
 

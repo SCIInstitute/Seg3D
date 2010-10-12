@@ -37,6 +37,7 @@
 #include <Core/Interface/Interface.h>
 #include <Core/DataBlock/MaskDataBlockManager.h>
 #include <Core/State/StateIO.h>
+#include <Core/Utils/ScopedCounter.h>
 
 // Application includes
 #include <Application/Layer/LayerGroup.h>
@@ -51,16 +52,94 @@
 namespace Seg3D
 {
 
+//////////////////////////////////////////////////////////////////////////
+// Class LayerManagerPrivate
+//////////////////////////////////////////////////////////////////////////
+
+class LayerManagerPrivate
+{
+public:
+  void update_layer_list();
+  void handle_active_layer_state_changed( std::string layer_id );
+  void handle_active_layer_changed();
+
+  size_t signal_block_count_;
+  LayerManager::group_list_type group_list_;
+  LayerHandle active_layer_;
+  LayerManager* layer_manager_;
+};
+
+void LayerManagerPrivate::update_layer_list()
+{
+  std::vector< LayerIDNamePair > layers;
+  this->layer_manager_->get_layer_names( layers );
+
+  {
+    Core::ScopedCounter counter( this->signal_block_count_ );
+    this->layer_manager_->active_layer_state_->set_option_list( layers );
+    if ( this->active_layer_ )
+    {
+      this->layer_manager_->active_layer_state_->set( this->active_layer_->get_layer_id() );
+    }
+  }
+}
+
+void LayerManagerPrivate::handle_active_layer_state_changed( std::string layer_id )
+{
+  if ( this->signal_block_count_ > 0 || layer_id == "" )
+  {
+    return;
+  }
+  
+  Core::ScopedCounter signal_block( this->signal_block_count_ );
+
+  this->layer_manager_->set_active_layer( this->layer_manager_->get_layer_by_id( layer_id ) );
+  // Set the state again because the requested active layer might not be valid
+  if ( this->active_layer_ )
+  {
+    this->layer_manager_->active_layer_state_->set( this->active_layer_->get_layer_id() );
+  }
+}
+
+void LayerManagerPrivate::handle_active_layer_changed()
+{
+  if ( this->signal_block_count_ > 0 )
+  {
+    return;
+  }
+  
+  Core::ScopedCounter signal_block( this->signal_block_count_ );
+  if ( this->active_layer_ )
+  {
+    this->layer_manager_->active_layer_state_->set( this->active_layer_->get_layer_id() );
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////
+// Class LayerManager
+//////////////////////////////////////////////////////////////////////////
+
 CORE_SINGLETON_IMPLEMENTATION( LayerManager );
 
 LayerManager::LayerManager() :
-  StateHandler( "layermanager", false )
+  StateHandler( "layermanager", false ),
+  private_( new LayerManagerPrivate )
 { 
-  this->add_state( "active_layer", this->active_layer_state_, "" );
+  this->add_state( "active_layer", this->active_layer_state_, "", "" );
+  this->private_->signal_block_count_ = 0;
+  this->private_->layer_manager_ = this;
+
+  this->add_connection( this->layers_changed_signal_.connect( boost::bind( 
+    &LayerManagerPrivate::update_layer_list, this->private_ ) ) );
+  this->add_connection( this->layer_name_changed_signal_.connect( boost::bind(
+    &LayerManagerPrivate::update_layer_list, this->private_ ) ) );
+  this->add_connection( this->active_layer_state_->value_changed_signal_.connect( boost::bind( 
+    &LayerManagerPrivate::handle_active_layer_state_changed, this->private_, _2 ) ) );
 }
 
 LayerManager::~LayerManager()
 {
+  this->disconnect_all();
 }
   
 bool LayerManager::insert_layer( LayerHandle layer )
@@ -74,8 +153,8 @@ bool LayerManager::insert_layer( LayerHandle layer )
     
     CORE_LOG_MESSAGE( std::string("Insert New Layer: ") + layer->get_layer_id());
         
-    for ( group_list_type::iterator it = group_list_.begin(); 
-       it != group_list_.end(); ++it )
+    for ( group_list_type::iterator it = this->private_->group_list_.begin(); 
+       it != this->private_->group_list_.end(); ++it )
     {
       // for testing 
       Core::GridTransform layer_grid_transform = layer->get_grid_transform();
@@ -92,13 +171,13 @@ bool LayerManager::insert_layer( LayerHandle layer )
     {
       new_group = true;
       group_handle = LayerGroupHandle( new LayerGroup(  layer->get_grid_transform() ) );
-      group_list_.push_front( group_handle );
+      this->private_->group_list_.push_front( group_handle );
       
       CORE_LOG_DEBUG( std::string( "Set Active Layer: " ) + layer->get_layer_id());
 
       if ( layer->has_valid_data() )
       {
-        active_layer_ = layer;
+        this->private_->active_layer_ = layer;
         active_layer_changed = true;
       } 
     }
@@ -109,7 +188,6 @@ bool LayerManager::insert_layer( LayerHandle layer )
     // NOTE: LayerManager will always out-live layers, so it's safe to not disconnect.
     layer->name_state_->value_changed_signal_.connect( boost::bind(
       &LayerManager::handle_layer_name_changed, this, layer->get_layer_id(), _2 ) );
-      
   } // unlocked from here
 
   CORE_LOG_DEBUG( std::string( "Signalling that new layer was inserted" ) );
@@ -159,10 +237,10 @@ bool LayerManager::move_group_above( std::string group_to_move_id, std::string g
     if( ( !group_above || !group_below ) || ( group_above == group_below ) )
       return false;
 
-    this->group_list_.remove( group_above );
+    this->private_->group_list_.remove( group_above );
     this->insert_group( group_above, group_below );
   }
-  
+
   this->groups_changed_signal_();
   this->layers_changed_signal_();
   this->layers_reordered_signal_();
@@ -172,13 +250,13 @@ bool LayerManager::move_group_above( std::string group_to_move_id, std::string g
 
 void LayerManager::insert_group( LayerGroupHandle group_above, LayerGroupHandle group_below )
 {
-  for( group_list_type::iterator i = this->group_list_.begin(); 
-    i != this->group_list_.end(); ++i )
+  for( group_list_type::iterator i = this->private_->group_list_.begin(); 
+    i != this->private_->group_list_.end(); ++i )
   {
     if( ( *i ) == group_below )
     {
       //we insert the layer
-      this->group_list_.insert( i, group_above );
+      this->private_->group_list_.insert( i, group_above );
     }
   }
 }
@@ -190,10 +268,7 @@ bool LayerManager::move_layer_above( LayerHandle layer_to_move, LayerHandle targ
   bool group_above_has_been_deleted = false;
   
   bool layer_has_changed_groups = false;
-  
-//  // This is the index we will send to tell the GUI where to put the layer
-//  int index;
-  
+    
   // These handles will let us send signals after we make the moves
   LayerGroupHandle group_above;
   LayerGroupHandle group_below;
@@ -221,7 +296,7 @@ bool LayerManager::move_layer_above( LayerHandle layer_to_move, LayerHandle targ
       //  from the list of groups and signal the GUI
       if( group_above->get_layer_list().empty() )
       {   
-        group_list_.remove( group_above );
+        this->private_->group_list_.remove( group_above );
         group_above_has_been_deleted = true;
       }
       // Set the weak handle in the layer we've inserted to the proper group
@@ -273,17 +348,18 @@ void LayerManager::set_active_layer( LayerHandle layer )
     lock_type lock( this->get_mutex() );    
     
     // Do nothing if this layer is already the active one
-    if ( this->active_layer_ == layer || !layer->has_valid_data() )
+    if ( this->private_->active_layer_ == layer || !layer->has_valid_data() )
     {
       return;
     }
     
     CORE_LOG_DEBUG( std::string("Set Active Layer: ") + layer->get_layer_id());
     
-    active_layer_ = layer;
+    this->private_->active_layer_ = layer;
         
   } // We release the lock  here.
 
+  this->private_->handle_active_layer_changed();
   this->active_layer_changed_signal_( layer );  
 }
 
@@ -291,8 +367,8 @@ LayerGroupHandle LayerManager::get_layer_group( std::string group_id )
 {
     lock_type lock( this->get_mutex() );
     
-  for( group_list_type::iterator i = group_list_.begin(); 
-    i != group_list_.end(); ++i )
+  for( group_list_type::iterator i = this->private_->group_list_.begin(); 
+    i != this->private_->group_list_.end(); ++i )
   {
     if (( *i )->get_group_id() == group_id ) 
     {
@@ -306,8 +382,8 @@ LayerHandle LayerManager::get_layer_by_id( const std::string& layer_id )
 {
   lock_type lock( this->get_mutex() );
 
-  for( group_list_type::iterator i = group_list_.begin(); 
-    i != group_list_.end(); ++i )
+  for( group_list_type::iterator i = this->private_->group_list_.begin(); 
+    i != this->private_->group_list_.end(); ++i )
   {
     for( layer_list_type::iterator j = ( *i )->layer_list_.begin(); 
       j != ( *i )->layer_list_.end(); ++j )
@@ -335,8 +411,8 @@ LayerHandle LayerManager::get_layer_by_name( const std::string& layer_name )
 {
   lock_type lock( this->get_mutex() );
 
-  for( group_list_type::iterator i = group_list_.begin(); 
-    i != group_list_.end(); ++i )
+  for( group_list_type::iterator i = this->private_->group_list_.begin(); 
+    i != this->private_->group_list_.end(); ++i )
   {
     for( layer_list_type::iterator j = ( *i )->layer_list_.begin(); 
       j != ( *i )->layer_list_.end(); ++j )
@@ -354,8 +430,8 @@ void LayerManager::get_groups( std::vector< LayerGroupHandle > &vector_of_groups
 {
     lock_type lock( this->get_mutex() );
     
-  for( group_list_type::iterator i = group_list_.begin(); 
-    i != group_list_.end(); ++i )
+  for( group_list_type::iterator i = this->private_->group_list_.begin(); 
+    i != this->private_->group_list_.end(); ++i )
   {
     vector_of_groups.push_back( *i );
   } 
@@ -365,8 +441,8 @@ void LayerManager::get_layers( std::vector< LayerHandle > &vector_of_layers )
 {
     lock_type lock( this->get_mutex() );
     
-  for( group_list_type::reverse_iterator i = group_list_.rbegin(); 
-    i != group_list_.rend(); ++i )
+  for( group_list_type::reverse_iterator i = this->private_->group_list_.rbegin(); 
+    i != this->private_->group_list_.rend(); ++i )
   {
       for( layer_list_type::iterator j = ( *i )->layer_list_.begin(); 
     j != ( *i )->layer_list_.end(); ++j )
@@ -413,7 +489,7 @@ void LayerManager::delete_layers( LayerGroupHandle group )
         group->delete_layer( *it );
         ( *it )->invalidate();
         
-        if ( *it == this->active_layer_ )
+        if ( *it == this->private_->active_layer_ )
         {
           active_layer_deleted = true;
         }
@@ -423,15 +499,15 @@ void LayerManager::delete_layers( LayerGroupHandle group )
     if( group->is_empty() )
     {   
       group->invalidate();
-      this->group_list_.remove( group );
+      this->private_->group_list_.remove( group );
     }
 
     if ( active_layer_deleted )
     {
-      this->active_layer_.reset();
-      if ( this->group_list_.size() > 0 )
+      this->private_->active_layer_.reset();
+      if ( this->private_->group_list_.size() > 0 )
       {
-        this->active_layer_ = this->group_list_.front()->layer_list_.back();
+        this->private_->active_layer_ = this->private_->group_list_.front()->layer_list_.back();
         active_layer_changed = true;
       }
     }
@@ -457,7 +533,7 @@ void LayerManager::delete_layers( LayerGroupHandle group )
   
   if ( active_layer_changed )
   {
-    this->active_layer_changed_signal_( this->active_layer_ );
+    this->active_layer_changed_signal_( this->private_->active_layer_ );
   }
   
 } // end delete_layer
@@ -481,15 +557,15 @@ void LayerManager::delete_layer( LayerHandle layer )
     if( group->is_empty() )
     {   
       group->invalidate();
-      this->group_list_.remove( group );
+      this->private_->group_list_.remove( group );
     }
 
-    if ( this->active_layer_ == layer )
+    if ( this->private_->active_layer_ == layer )
     {
-      this->active_layer_.reset();
-      if ( this->group_list_.size() > 0 )
+      this->private_->active_layer_.reset();
+      if ( this->private_->group_list_.size() > 0 )
       {
-        this->active_layer_ = this->group_list_.front()->layer_list_.back();
+        this->private_->active_layer_ = this->private_->group_list_.front()->layer_list_.back();
         active_layer_changed = true;
       }
     }
@@ -516,7 +592,7 @@ void LayerManager::delete_layer( LayerHandle layer )
   
   if ( active_layer_changed )
   {
-    this->active_layer_changed_signal_( this->active_layer_ );
+    this->active_layer_changed_signal_( this->private_->active_layer_ );
   }
   
 } // end delete_layer
@@ -528,8 +604,8 @@ bool LayerManager::delete_all()
   {
 
     // Cycle through all the groups and delete all the layers
-    group_list_type::iterator group_iterator = this->group_list_.begin();
-    for ( ; group_iterator != this->group_list_.end(); )
+    group_list_type::iterator group_iterator = this->private_->group_list_.begin();
+    for ( ; group_iterator != this->private_->group_list_.end(); )
     {
       // set all of the layers to selected so they are deleted.
       layer_list_type layer_list = ( *group_iterator )->get_layer_list();
@@ -542,7 +618,7 @@ bool LayerManager::delete_all()
       ++it_temp;
 
       this->delete_layers( *group_iterator );
-      if( group_list_.empty() )
+      if( this->private_->group_list_.empty() )
       {
         break;
       }
@@ -557,7 +633,7 @@ bool LayerManager::delete_all()
 LayerHandle LayerManager::get_active_layer()
 {
   lock_type lock( this->get_mutex() );  
-  return this->active_layer_;
+  return this->private_->active_layer_;
 }
 
 LayerManager::mutex_type& LayerManager::get_mutex()
@@ -574,8 +650,8 @@ LayerSceneHandle LayerManager::compose_layer_scene( size_t viewer_id )
   LayerSceneHandle layer_scene( new LayerScene );
 
   // For each layer group
-  group_list_type::reverse_iterator group_iterator = this->group_list_.rbegin();
-  for ( ; group_iterator != this->group_list_.rend(); group_iterator++)
+  group_list_type::reverse_iterator group_iterator = this->private_->group_list_.rbegin();
+  for ( ; group_iterator != this->private_->group_list_.rend(); group_iterator++)
   {
     
     layer_list_type layer_list = ( *group_iterator )->get_layer_list();
@@ -646,8 +722,8 @@ Core::BBox LayerManager::get_layers_bbox()
   lock_type lock( this->get_mutex() );
 
   Core::BBox bbox;
-  group_list_type::iterator group_iterator = this->group_list_.begin();
-  for ( ; group_iterator != this->group_list_.end(); group_iterator++)
+  group_list_type::iterator group_iterator = this->private_->group_list_.begin();
+  for ( ; group_iterator != this->private_->group_list_.end(); group_iterator++)
   {
     LayerGroupHandle group = *group_iterator;
     const Core::GridTransform& grid_trans = group->get_grid_transform();
@@ -707,16 +783,16 @@ void LayerManager::get_layer_names_from_group( LayerGroupHandle group,
 
 bool LayerManager::pre_save_states( Core::StateIO& state_io )
 {
-  lock_type lock( this->get_mutex() );
+  //lock_type lock( this->get_mutex() );
 
-  if( this->active_layer_ )
-  {
-    this->active_layer_state_->set( this->active_layer_->get_layer_id() );
-  }
-  else
-  {
-    this->active_layer_state_->set( "none" );
-  }
+  //if( this->private_->active_layer_ )
+  //{
+  //  this->active_layer_state_->set( this->private_->active_layer_->get_layer_id() );
+  //}
+  //else
+  //{
+  //  this->active_layer_state_->set( "none" );
+  //}
 
   return true;
 }
@@ -733,8 +809,8 @@ bool LayerManager::post_save_states( Core::StateIO& state_io )
   state_io.push_current_element();
   state_io.set_current_element( groups_element );
   
-  for( group_list_type::reverse_iterator i = group_list_.rbegin(); 
-    i != group_list_.rend(); ++i )
+  for( group_list_type::reverse_iterator i = this->private_->group_list_.rbegin(); 
+    i != this->private_->group_list_.rend(); ++i )
   {
     ( *i )->save_states( state_io );
   }
@@ -748,13 +824,10 @@ bool LayerManager::post_save_states( Core::StateIO& state_io )
   
 bool LayerManager::pre_load_states( const Core::StateIO& state_io )
 {
-  return this->delete_all();
-}
+  // Delete all the currently loaded layers
+  this->delete_all();
 
-bool LayerManager::post_load_states( const Core::StateIO& state_io )
-{
-  bool success = true;
-  
+  // Load the layers from session
   const TiXmlElement* groups_element = state_io.get_current_element()->
     FirstChildElement( "groups" );
   if ( groups_element == 0 )
@@ -765,47 +838,52 @@ bool LayerManager::post_load_states( const Core::StateIO& state_io )
   state_io.push_current_element();
   state_io.set_current_element( groups_element );
 
-  
   const TiXmlElement* group_element = groups_element->FirstChildElement();
   while ( group_element != 0 )
   {
     std::string group_id( group_element->Value() );
-    
     LayerGroupHandle group( new LayerGroup( group_id ) );
 
     if ( group->load_states( state_io ) )
     {
-      this->group_list_.push_front( group );
+      this->private_->group_list_.push_front( group );
       this->group_inserted_signal_( group );
-      
+
       layer_list_type layer_list = group->get_layer_list();
       layer_list_type::iterator it = layer_list.begin();
       for ( ; it != layer_list.end(); it++ )
       {
         this->layer_inserted_signal_( ( *it ) );
-        this->layers_changed_signal_();
       }
     }
-    
+
     group_element = group_element->NextSiblingElement();
   }
 
   state_io.pop_current_element();
 
+  this->groups_changed_signal_();
+  this->layers_changed_signal_();
+
+  return true;
+}
+
+bool LayerManager::post_load_states( const Core::StateIO& state_io )
+{ 
   // If there are layers loaded, restore the active layer state
-  if ( this->group_list_.size() > 0 )
+  if ( this->private_->group_list_.size() > 0 )
   {
     LayerHandle active_layer = this->get_layer_by_id( this->active_layer_state_->get() );
     if ( !active_layer )
     {
       CORE_LOG_ERROR( "Incorrect active layer state loaded from session" );
-      active_layer = this->group_list_.front()->layer_list_.back(); 
+      active_layer = this->private_->group_list_.front()->layer_list_.back(); 
     }
+    Core::ScopedCounter signal_block( this->private_->signal_block_count_ );
     this->set_active_layer( active_layer );
   }
   
-  this->groups_changed_signal_();
-  return success;
+  return true;
 }
 
 

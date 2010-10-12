@@ -44,6 +44,7 @@
 
 // Core includes
 #include <Core/State/StateHandler.h>
+#include <Core/State/StateLabeledOption.h>
 #include <Core/Utils/Log.h>
 #include <Core/Utils/Exception.h>
 
@@ -82,6 +83,7 @@ protected:
   friend class ActionOpenTool;
   friend class ActionCloseTool;
   friend class ActionActivateTool;
+  friend class ToolManagerPrivate;
 
   // OPEN_TOOL (accessed through Action):
   // Open a new tool into the current collection of active tools
@@ -148,6 +150,9 @@ protected:
 
 public:
   virtual int get_session_priority();
+
+public:
+  Core::StateLabeledOptionHandle active_tool_state_;
 
 private:
   ToolManagerPrivateHandle private_;

@@ -54,6 +54,8 @@ public:
   TransformTool( const std::string& toolid );
   virtual ~TransformTool();
 
+  virtual void deactivate();
+
 public:
 
   // HANDLE_MOUSE_LEAVE:

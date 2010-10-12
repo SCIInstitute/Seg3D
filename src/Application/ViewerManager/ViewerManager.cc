@@ -514,5 +514,13 @@ ViewerHandle ViewerManager::get_active_viewer()
   return this->viewers_[ viewer_id ];
 }
 
+void ViewerManager::reset_cursor()
+{
+  for ( size_t i = 0; i < this->viewers_.size(); ++i )
+  {
+    this->viewers_[ i ]->set_cursor( Core::CursorShape::ARROW_E );
+  }
+}
+
 } // end namespace Seg3D
 

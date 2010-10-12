@@ -94,9 +94,9 @@ AppStatusBar::AppStatusBar( QMainWindow* parent ) :
     SIGNAL( clicked( bool ) ), this, SLOT( set_coordinates_mode( bool ) ) );
 
   QtUtils::QtBridge::Connect( this->private_->ui_.layer_combobox_, 
-    StatusBar::Instance()->active_layer_state_ );
+    LayerManager::Instance()->active_layer_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.tool_combobox_,
-    StatusBar::Instance()->active_tool_state_ );
+    ToolManager::Instance()->active_tool_state_ );
 
   this->add_connection( StatusBar::Instance()->data_point_info_updated_signal_.connect( 
     boost::bind( &AppStatusBar::update_data_point_info, this, _1 ) ) );

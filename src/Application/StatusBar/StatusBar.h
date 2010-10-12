@@ -26,15 +26,14 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef CORE_INTERFACE_STATUSBAR_H
-#define CORE_INTERFACE_STATUSBAR_H
+#ifndef APPLICATION_STATUSBAR_STATUSBAR_H
+#define APPLICATION_STATUSBAR_STATUSBAR_H
 
 #include <boost/shared_ptr.hpp>
 #include <boost/signals2.hpp>
 
 #include <Core/Geometry/Point.h>
 #include <Core/State/StateHandler.h>
-#include <Core/State/StateLabeledOption.h>
 #include <Core/Utils/Singleton.h>
 
 namespace Seg3D
@@ -81,10 +80,6 @@ public:
 public:
   boost::signals2::signal< void ( DataPointInfoHandle ) > data_point_info_updated_signal_;
   boost::signals2::signal< void ( int, std::string ) > message_updated_signal_;
-
-public:
-  Core::StateLabeledOptionHandle active_layer_state_;
-  Core::StateLabeledOptionHandle active_tool_state_;
 
 private:
   StatusBarPrivateHandle private_;

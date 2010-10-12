@@ -535,4 +535,9 @@ bool CropTool::handle_mouse_release( ViewerHandle viewer,
   return false;
 }
 
+void CropTool::deactivate()
+{
+  ViewerManager::Instance()->reset_cursor();
+}
+
 } // end namespace Seg3D

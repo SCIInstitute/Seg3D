@@ -54,6 +54,8 @@ public:
   CropTool( const std::string& toolid );
   virtual ~CropTool();
 
+  virtual void deactivate();
+
 public:
 
   // HANDLE_MOUSE_LEAVE:

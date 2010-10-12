@@ -31,6 +31,7 @@
 #include <Core/Application/Application.h>
 #include <Core/Interface/Interface.h>
 #include <Core/State/StateIO.h>
+#include <Core/Utils/ScopedCounter.h>
 
 #include <Application/Session/Session.h>
 #include <Application/Tool/ToolFactory.h>
@@ -45,7 +46,10 @@
 namespace Seg3D
 {
 
-CORE_SINGLETON_IMPLEMENTATION( ToolManager );
+
+//////////////////////////////////////////////////////////////////////////
+// Class ToolManagerPrivate
+//////////////////////////////////////////////////////////////////////////
 
 class ToolManagerPrivate
 {
@@ -63,12 +67,16 @@ public:
 
   void update_viewers( bool redraw_2d, bool redraw_3d );
 
+  void update_tool_list();
+  void handle_active_tool_changed();
+  void handle_active_tool_state_changed( std::string tool_id );
+
   // All the open tools are stored in this hash map
   ToolManager::tool_list_type tool_list_;
   ToolHandle active_tool_;
   ViewerHandle focus_viewer_;
-
-  Core::StateStringHandle active_tool_state_;
+  ToolManager* tool_manager_;
+  size_t signal_block_count_;
 };
 
 bool ToolManagerPrivate::handle_mouse_enter( ViewerHandle viewer, int x, int y )
@@ -220,11 +228,55 @@ void ToolManagerPrivate::update_viewers( bool redraw_2d, bool redraw_3d )
   }
 }
 
+void ToolManagerPrivate::update_tool_list()
+{
+  std::vector< ToolIDNamePair > tool_names;
+  this->tool_manager_->get_tool_names( tool_names );
+
+  {
+    Core::ScopedCounter counter( this->signal_block_count_ );
+    this->tool_manager_->active_tool_state_->set_option_list( tool_names );
+  }
+}
+
+void ToolManagerPrivate::handle_active_tool_changed()
+{
+  if ( this->signal_block_count_ > 0 )
+  {
+    return;
+  }
+  
+  Core::ScopedCounter signal_block( this->signal_block_count_ );
+  if ( this->active_tool_ )
+  {
+    this->tool_manager_->active_tool_state_->set( this->active_tool_->toolid() );
+  }
+}
+
+void ToolManagerPrivate::handle_active_tool_state_changed( std::string tool_id )
+{
+  if ( this->signal_block_count_ > 0 || tool_id == "" )
+  {
+    return;
+  }
+  
+  Core::ScopedCounter signal_block( this->signal_block_count_ );
+  this->tool_manager_->activate_tool( tool_id );
+}
+
+//////////////////////////////////////////////////////////////////////////
+// Class ToolManager
+//////////////////////////////////////////////////////////////////////////
+
+CORE_SINGLETON_IMPLEMENTATION( ToolManager );
+
 ToolManager::ToolManager() :
   StateHandler( "toolmanager", false ),
   private_( new ToolManagerPrivate )
 {
-  this->add_state( "active_tool", this->private_->active_tool_state_, Tool::NONE_OPTION_C );
+  this->add_state( "active_tool", this->active_tool_state_, "", "" );
+  this->private_->tool_manager_ = this;
+  this->private_->signal_block_count_ = 0;
 
   // Register mouse event handlers for all the viewers
   size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
@@ -246,6 +298,15 @@ ToolManager::ToolManager() :
     viewer->set_key_press_event_handler( boost::bind( &ToolManagerPrivate::handle_key_press,
       this->private_, _1, _2, _3 ) );
   }
+
+  this->add_connection( this->open_tool_signal_.connect( boost::bind( 
+    &ToolManagerPrivate::update_tool_list, this->private_ ) ) );
+  this->add_connection( this->close_tool_signal_.connect( boost::bind( 
+    &ToolManagerPrivate::update_tool_list, this->private_ ) ) );
+  this->add_connection( this->activate_tool_signal_.connect( boost::bind( 
+    &ToolManagerPrivate::handle_active_tool_changed, this->private_ ) ) );
+  this->add_connection( this->active_tool_state_->value_changed_signal_.connect( boost::bind( 
+    &ToolManagerPrivate::handle_active_tool_state_changed, this->private_, _2 ) ) );
 }
 
 ToolManager::~ToolManager()
@@ -340,9 +401,15 @@ void ToolManager::close_tool( const std::string& toolid )
       this->private_->active_tool_->activate();
       this->activate_tool_signal_( this->private_->active_tool_ );
     }
-    else if ( tool->has_2d_visual() || tool->has_3d_visual() )
+
+    bool redraw_2d = tool->has_2d_visual() || ( this->private_->active_tool_ && 
+      this->private_->active_tool_->has_2d_visual() );
+    bool redraw_3d = tool->has_3d_visual() || ( this->private_->active_tool_ && 
+      this->private_->active_tool_->has_3d_visual() );
+
+    if ( redraw_2d || redraw_3d )
     {
-      this->private_->update_viewers( tool->has_2d_visual(), tool->has_3d_visual() );
+      this->private_->update_viewers( redraw_2d, redraw_3d );
     }
   }
 }
@@ -421,7 +488,7 @@ ToolHandle ToolManager::get_active_tool()
 
 bool ToolManager::pre_save_states( Core::StateIO& state_io )
 {
-  this->private_->active_tool_state_->set( this->active_toolid() );
+  //this->active_tool_state_->set( this->active_toolid() );
   return true;
 }
 
@@ -448,15 +515,17 @@ bool ToolManager::post_save_states( Core::StateIO& state_io )
   return true;
 }
 
-bool ToolManager::post_load_states( const Core::StateIO& state_io )
+bool ToolManager::pre_load_states( const Core::StateIO& state_io )
 {
+  this->delete_all();
+
   const TiXmlElement* tools_element = state_io.get_current_element()->
     FirstChildElement( "tools" );
   if ( tools_element == 0 )
   {
     return false;
   }
-  
+
   state_io.push_current_element();
   state_io.set_current_element( tools_element );
 
@@ -475,9 +544,14 @@ bool ToolManager::post_load_states( const Core::StateIO& state_io )
 
   state_io.pop_current_element();
 
-  if( this->private_->active_tool_state_->get() != Tool::NONE_OPTION_C )
+  return success;
+}
+
+bool ToolManager::post_load_states( const Core::StateIO& state_io )
+{
+  if( this->active_tool_state_->get() != "" )
   {
-    this->activate_tool( this->private_->active_tool_state_->get() );
+    this->activate_tool( this->active_tool_state_->get() );
   }
   else if ( !this->private_->tool_list_.empty() )
   {
@@ -485,11 +559,6 @@ bool ToolManager::post_load_states( const Core::StateIO& state_io )
   }
 
   return true;
-}
-
-bool ToolManager::pre_load_states( const Core::StateIO& state_io )
-{
-  return this->delete_all();
 }
 
 ToolHandle ToolManager::get_tool( const std::string& toolid )

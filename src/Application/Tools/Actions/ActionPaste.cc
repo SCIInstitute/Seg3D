@@ -89,9 +89,9 @@ bool ActionPaste::validate( Core::ActionContextHandle& context )
     }
     
     LayerHandle active_layer = LayerManager::Instance()->get_active_layer();
-    if ( active_layer->type() != Core::VolumeType::MASK_E )
+    if ( !active_layer || active_layer->type() != Core::VolumeType::MASK_E )
     {
-      context->report_error( "Can't paste onto a data layer" );
+      context->report_error( "Invalid paste target" );
       return false;
     }
     
