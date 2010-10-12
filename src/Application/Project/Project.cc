@@ -106,7 +106,6 @@ bool Project::initialize_from_file( const std::string& project_name )
   {
     if( this->load_session( this->get_session_name( 0 ) ) )
     {
-/*      this->data_manager_->initialize( this->project_path_ );*/
       return true;
     }
   }

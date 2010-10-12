@@ -36,6 +36,7 @@
 // ITK includes
 #include "itkRGBPixel.h"
 #include "itkTIFFImageIO.h"
+#include "itkVTKImageIO.h"
 
 // Boost includes 
 #include <boost/filesystem.hpp>
@@ -115,6 +116,8 @@ private:
   //  this function is called by import_header to scan a single tiff and determine what kind of 
   // data type to use for the import
   bool scan_tiff();
+  
+  bool set_pixel_type( std::string& type );
 
   // IMPORT_DICOM_SERIES:
   // Templated function that reads in a series of dicoms, creates the data_block_ and the
@@ -180,10 +183,13 @@ private:
  
     typedef itk::ImageSeriesReader< ImageType > ReaderType;
     typename ReaderType::Pointer reader = ReaderType::New();
+    
+    typedef itk::PNGImageIO ImageIOType;
+    typename ImageIOType::Pointer pngIO = ImageIOType::New();
  
-    reader->SetImageIO( itk::PNGImageIO::New() );
+    reader->SetImageIO( pngIO );
     reader->SetFileNames( this->file_list_ );
- 
+    
     try
     {
       reader->Update();
@@ -192,7 +198,7 @@ private:
     {
       return false;
     }
- 
+    
     this->data_block_ = Core::ITKDataBlock::New< PixelType >( 
       typename itk::Image< PixelType, 3 >::Pointer( reader->GetOutput() ) );
  
@@ -219,8 +225,11 @@ private:
 
     typedef itk::ImageSeriesReader< ImageType > ReaderType;
     typename ReaderType::Pointer reader = ReaderType::New();
-
-    reader->SetImageIO( itk::TIFFImageIO::New() );
+    
+    typedef itk::TIFFImageIO ImageIOType;
+    typename ImageIOType::Pointer tiffIO = ImageIOType::New();
+  
+    reader->SetImageIO( tiffIO );
     reader->SetFileNames( this->file_list_ );
 
     try
@@ -237,6 +246,8 @@ private:
 
     this->image_data_ = typename Core::ITKImageDataT< PixelType >::Handle( 
       new typename Core::ITKImageDataT< PixelType >( reader->GetOutput() ) );
+      
+//    std::string type = tiffIO->GetComponentTypeAsString( tiffIO->GetComponentType() );
 
     if( this->image_data_ && this->data_block_ )
     {

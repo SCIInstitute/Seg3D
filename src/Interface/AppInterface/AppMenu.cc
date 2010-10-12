@@ -348,42 +348,92 @@ void AppMenu::create_window_menu( QMenu* qmenu )
   
 void AppMenu::new_project_wizard()
 {
-  QMessageBox message_box;
-  message_box.setText( QString::fromUtf8( "WARNING: You will lose changes to your current" 
-    "project that haven't been saved.") );
-  message_box.setInformativeText( QString::fromUtf8( "Are you sure you want to do this?" ) );
-  message_box.setStandardButtons( QMessageBox::Yes | QMessageBox::No );
-  message_box.setDefaultButton( QMessageBox::No );
-  if( QMessageBox::Yes == message_box.exec() )
+  if ( ProjectManager::Instance()->current_project_ )
   {
-    QPointer< AppProjectWizard > new_project_wizard_ = 
-      new AppProjectWizard( this->main_window_);
-    new_project_wizard_->show();
+    if ( ProjectManager::Instance()->current_project_->check_changed() )
+    {
+      // Check whether the users wants to save and whether the user wants to quit
+      int ret = QMessageBox::warning( this->main_window_, "Create a new Project?",
+        "Your current session has not been saved.\n"
+        "Do you want to save your changes?",
+        QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel );
+
+      if ( ret == QMessageBox::Save )
+      {
+        Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+        ActionSaveSession::Dispatch( Core::Interface::GetWidgetActionContext(), false, 
+          ProjectManager::Instance()->current_project_->current_session_name_state_->get() );   
+      }
+
+      if ( ret != QMessageBox::Cancel )
+      {
+        QPointer< AppProjectWizard > new_project_wizard_ = 
+          new AppProjectWizard( this->main_window_);
+        new_project_wizard_->show();
+      }
+    }
+    else
+    {
+      QPointer< AppProjectWizard > new_project_wizard_ = 
+        new AppProjectWizard( this->main_window_);
+      new_project_wizard_->show();
+    }
   }
 }
 
 void AppMenu::open_project_from_file()
 {
-  QMessageBox message_box;
-  message_box.setText( QString::fromUtf8( "WARNING: You will lose changes to your current project that haven't been saved.") );
-  message_box.setInformativeText( QString::fromUtf8( "Are you sure you want to do this?" ) );
-  message_box.setStandardButtons( QMessageBox::Yes | QMessageBox::No );
-  message_box.setDefaultButton( QMessageBox::No );
-  if( QMessageBox::Yes == message_box.exec() )
+  if ( ProjectManager::Instance()->current_project_ )
   {
-    boost::filesystem::path current_projects_path = complete( 
-      boost::filesystem::path( ProjectManager::Instance()->
-      current_project_path_state_->get().c_str(), boost::filesystem::native ) );
+    if ( ProjectManager::Instance()->current_project_->check_changed() )
+    {
+      // Check whether the users wants to save and whether the user wants to quit
+      int ret = QMessageBox::warning( this->main_window_, "Create a new Project?",
+        "Your current session has not been saved.\n"
+        "Do you want to save your changes?",
+        QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel );
 
-    boost::filesystem::path full_path = ( QFileDialog::getOpenFileName ( this->main_window_,
-      tr( "Open Seg3D Project" ), QString::fromStdString( current_projects_path.string() ), 
-      tr( "Seg3D Project File ( *.s3d )" ) ) ).toStdString(); 
+      if ( ret == QMessageBox::Save )
+      {
+        Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+        ActionSaveSession::Dispatch( Core::Interface::GetWidgetActionContext(), false, 
+          ProjectManager::Instance()->current_project_->current_session_name_state_->get() );   
+      }
 
-    std::string path = full_path.parent_path().string();
-    
-    if( boost::filesystem::exists( full_path ) )
-    { 
-      ActionLoadProject::Dispatch( Core::Interface::GetWidgetActionContext(), path );
+      if ( ret != QMessageBox::Cancel )
+      {
+        boost::filesystem::path current_projects_path = complete( 
+          boost::filesystem::path( ProjectManager::Instance()->
+          current_project_path_state_->get().c_str(), boost::filesystem::native ) );
+
+        boost::filesystem::path full_path = ( QFileDialog::getOpenFileName ( this->main_window_,
+          tr( "Open Seg3D Project" ), QString::fromStdString( current_projects_path.string() ), 
+          tr( "Seg3D Project File ( *.s3d )" ) ) ).toStdString(); 
+
+        std::string path = full_path.parent_path().string();
+
+        if( boost::filesystem::exists( full_path ) )
+        { 
+          ActionLoadProject::Dispatch( Core::Interface::GetWidgetActionContext(), path );
+        }
+      }
+    }
+    else
+    {
+      boost::filesystem::path current_projects_path = complete( 
+        boost::filesystem::path( ProjectManager::Instance()->
+        current_project_path_state_->get().c_str(), boost::filesystem::native ) );
+
+      boost::filesystem::path full_path = ( QFileDialog::getOpenFileName ( this->main_window_,
+        tr( "Open Seg3D Project" ), QString::fromStdString( current_projects_path.string() ), 
+        tr( "Seg3D Project File ( *.s3d )" ) ) ).toStdString(); 
+
+      std::string path = full_path.parent_path().string();
+
+      if( boost::filesystem::exists( full_path ) )
+      { 
+        ActionLoadProject::Dispatch( Core::Interface::GetWidgetActionContext(), path );
+      }
     }
   }
 }

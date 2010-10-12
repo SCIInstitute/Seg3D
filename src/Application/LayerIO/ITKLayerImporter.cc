@@ -73,7 +73,6 @@ bool ITKLayerImporter::import_header()
   }
   else if( ( this->extension_ == ".tiff" ) || ( this->extension_ == ".tif" ) )
   {
-    // This currently does nothing but return true;
     return this->scan_tiff();
   }
 
@@ -178,13 +177,53 @@ bool ITKLayerImporter::scan_dicom()
 
 bool ITKLayerImporter::scan_png()
 {
-  return true;
+  typedef itk::ImageFileReader< itk::Image< signed short, 2 > > ReaderType;
+  ReaderType::Pointer reader = ReaderType::New();
+
+  typedef itk::PNGImageIO ImageIOType;
+  ImageIOType::Pointer pngIO = ImageIOType::New();
+
+  reader->SetImageIO( pngIO );
+  reader->SetFileName( this->file_list_[ 0 ] );
+
+  try
+  {
+    reader->Update();
+  }
+  catch( ... )
+  {
+    return false;
+  }
+
+  std::string type = pngIO->GetComponentTypeAsString( pngIO->GetComponentType() );
+  return this->set_pixel_type( type );
 }
 
 bool ITKLayerImporter::scan_tiff()
 {
-  return true;
+  typedef itk::ImageFileReader< itk::Image< signed short, 2 > > ReaderType;
+  ReaderType::Pointer reader = ReaderType::New();
+
+  typedef itk::TIFFImageIO ImageIOType;
+  ImageIOType::Pointer tiffIO = ImageIOType::New();
+
+  reader->SetImageIO( tiffIO );
+  reader->SetFileName( this->file_list_[ 0 ] );
+
+  try
+  {
+    reader->Update();
+  }
+  catch( ... )
+  {
+    return false;
+  }
+
+  std::string type = tiffIO->GetComponentTypeAsString( tiffIO->GetComponentType() );
+  return this->set_pixel_type( type );
 }
+
+
 
 bool ITKLayerImporter::load_data( Core::DataBlockHandle& data_block, 
                  Core::GridTransform& grid_trans )
@@ -217,11 +256,67 @@ bool ITKLayerImporter::load_data( Core::DataBlockHandle& data_block,
   }
   else if( this->extension_ == ".png" )
   {
-    if( !this->import_png_series< unsigned char >() ) return false; 
+    switch( this->pixel_type_ )
+    {
+    case Core::DataType::UCHAR_E:
+      if( !this->import_png_series< unsigned char >() ) return false;
+      break;
+    case Core::DataType::CHAR_E:
+      if( !this->import_png_series< signed char >() ) return false;
+      break;
+    case Core::DataType::USHORT_E:
+      if( !this->import_png_series< unsigned short >() ) return false;
+      break;
+    case Core::DataType::SHORT_E:
+      if( !this->import_png_series< signed short >() ) return false;
+      break;
+    case Core::DataType::UINT_E:
+      if( !this->import_png_series< signed int >() ) return false;
+      break;
+    case Core::DataType::INT_E:
+      if( !this->import_png_series< unsigned int >() ) return false;
+      break;
+    case Core::DataType::FLOAT_E:
+      if( !this->import_png_series< float >() ) return false;
+      break;
+    case Core::DataType::DOUBLE_E:
+      if( !this->import_png_series< double >() ) return false;
+      break;
+    default:
+      break;
+    }
   }
   else if( ( this->extension_ == ".tiff" ) || ( this->extension_ == ".tif" ) )
   {
-    if( !this->import_tiff_series< signed short >() ) return false;
+    switch( this->pixel_type_ )
+    {
+    case Core::DataType::UCHAR_E:
+      if( !this->import_tiff_series< unsigned char >() ) return false;
+      break;
+    case Core::DataType::CHAR_E:
+      if( !this->import_tiff_series< signed char >() ) return false;
+      break;
+    case Core::DataType::USHORT_E:
+      if( !this->import_tiff_series< unsigned short >() ) return false;
+      break;
+    case Core::DataType::SHORT_E:
+      if( !this->import_tiff_series< signed short >() ) return false;
+      break;
+    case Core::DataType::UINT_E:
+      if( !this->import_tiff_series< signed int >() ) return false;
+      break;
+    case Core::DataType::INT_E:
+      if( !this->import_tiff_series< unsigned int >() ) return false;
+      break;
+    case Core::DataType::FLOAT_E:
+      if( !this->import_tiff_series< float >() ) return false;
+      break;
+    case Core::DataType::DOUBLE_E:
+      if( !this->import_tiff_series< double >() ) return false;
+      break;
+    default:
+      break;
+    }
   }
   else
   {
@@ -240,5 +335,54 @@ std::string ITKLayerImporter::get_layer_name()
 {
   return boost::filesystem::path( this->get_filename() ).parent_path().filename();
 }
+
+bool ITKLayerImporter::set_pixel_type( std::string& type )
+{
+  if( type == "unsigned_char" )
+  {
+    this->pixel_type_ = Core::DataType::UCHAR_E;
+    return true;
+  }
+  else if( type == "char" )
+  {
+    this->pixel_type_ = Core::DataType::CHAR_E;
+    return true;
+  }
+  else if( type == "unsigned_short" )
+  {
+    this->pixel_type_ = Core::DataType::USHORT_E;
+    return true;
+  }
+  else if( type == "short" )
+  {
+    this->pixel_type_ = Core::DataType::SHORT_E;
+    return true;
+  }
+  else if( type == "unsigned_int" )
+  {
+    this->pixel_type_ = Core::DataType::UINT_E;
+    return true;
+  }
+  else if( type == "int" )
+  {
+    this->pixel_type_ = Core::DataType::INT_E;
+    return true;
+  }
+  else if( type == "float" )
+  {
+    this->pixel_type_ = Core::DataType::FLOAT_E;
+    return true;
+  }
+  else if( type == "double" )
+  {
+    this->pixel_type_ = Core::DataType::DOUBLE_E;
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
 
 } // end namespace seg3D

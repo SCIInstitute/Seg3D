@@ -62,8 +62,8 @@ AppPreferences::AppPreferences( QWidget *parent ) :
     this->private_->ui_.setupUi( this );
   
   // Initialize all the tabs
-  this->setup_general_prefs();
   this->setup_layer_prefs();
+  this->setup_general_prefs();
   this->setup_viewer_prefs();
   this->setup_sidebar_prefs();
   this->setup_interface_controls_prefs();
