@@ -106,6 +106,14 @@ public:
   typedef boost::signals2::signal<void ()> state_changed_signal_type;
   state_changed_signal_type state_changed_signal_;
 
+  // PRE_LOAD_STATES_SIGNAL_:
+  // Triggered at the beginning of load_states function.
+  boost::signals2::signal< void () > pre_load_states_signal_;
+
+  // POST_LOAD_STATES_SIGNAL_:
+  // Triggered at the end of load_states function.
+  boost::signals2::signal< void () > post_load_states_signal_;
+
   // -- Implementation details --
 private:
   StateEnginePrivate* private_;

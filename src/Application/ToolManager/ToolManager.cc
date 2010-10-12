@@ -488,7 +488,6 @@ ToolHandle ToolManager::get_active_tool()
 
 bool ToolManager::pre_save_states( Core::StateIO& state_io )
 {
-  //this->active_tool_state_->set( this->active_toolid() );
   return true;
 }
 

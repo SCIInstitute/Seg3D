@@ -84,6 +84,8 @@ bool operator>( const HandlerEntry& left, const HandlerEntry& right )
 
 bool  StateEngine::load_states( const StateIO& state_io )
 {
+  this->pre_load_states_signal_();
+
   // Put all the current state handlers in a priority queue in the descending order of priorities
   std::priority_queue< HandlerEntry > state_handlers;
   {
@@ -118,6 +120,7 @@ bool  StateEngine::load_states( const StateIO& state_io )
     }
   }
 
+  this->post_load_states_signal_();
   return success;
 }
 

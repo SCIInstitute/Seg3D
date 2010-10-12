@@ -75,6 +75,14 @@ private:
   // order changes.
   void handle_groups_changed();
 
+  // PRE_LOAD_STATES:
+  // Called on pre_load_states_signal_ from the StateEngine.
+  void pre_load_states();
+
+  // POST_LOAD_STATES:
+  // Called on post_load_states_signal_ from the StateEngine.
+  void post_load_states();
+
   // MAKE_NEW_GROUP:
   // function that creates a new group to put layers into. 
   LayerGroupWidget* make_new_group( LayerGroupHandle group );
@@ -109,6 +117,9 @@ public:
   // HANDLEGROUPSCHANGED:
   static void HandleGroupsChanged( qpointer_type qpointer );
 
+  static void PreLoadStates( qpointer_type qpointer );
+
+  static void PostLoadStates( qpointer_type qpointer );
 };
 
 } //endnamespace Seg3d

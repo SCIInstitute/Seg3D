@@ -27,11 +27,13 @@
  */
 
 
-#include <Core/Utils/Log.h>
-
 #include <sstream>
 #include <iostream>
 #include <boost/lexical_cast.hpp>
+
+#include <Core/Utils/Log.h>
+
+#include <QtUtils/Utils/QtPointer.h>
 
 //Application Includes
 #include <Application/LayerManager/Actions/ActionActivateLayer.h>
@@ -58,6 +60,8 @@ public:
   // Mapping of group name to its underlying widget
   typedef std::map< std::string, LayerGroupWidgetQHandle > group_widget_map_type;
   group_widget_map_type group_map_;
+
+  bool loading_states_;
 };
 
 
@@ -65,6 +69,8 @@ LayerManagerWidget::LayerManagerWidget( QWidget* parent ) :
   QScrollArea( parent ),
   private_( new LayerManagerWidgetPrivate )
 {
+  this->private_->loading_states_ = false;
+
   // Customize the settings for the scroll area
   setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
   setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded );
@@ -95,6 +101,11 @@ LayerManagerWidget::LayerManagerWidget( QWidget* parent ) :
   
   this->add_connection(LayerManager::Instance()->groups_changed_signal_.connect( 
     boost::bind( &LayerManagerWidget::HandleGroupsChanged, layer_widget ) ) );
+
+  this->add_connection( Core::StateEngine::Instance()->pre_load_states_signal_.connect( 
+    boost::bind( &LayerManagerWidget::PreLoadStates, layer_widget ) ) );
+  this->add_connection( Core::StateEngine::Instance()->post_load_states_signal_.connect( 
+    boost::bind( &LayerManagerWidget::PostLoadStates, layer_widget ) ) );
   
   // Add any layers that may have been added before the GUI was initialized
   this->handle_groups_changed();
@@ -108,6 +119,11 @@ LayerManagerWidget::~LayerManagerWidget()
 // Functions for handling Layer or LayerGroup changes from the LayerManager
 void LayerManagerWidget::handle_groups_changed()
 {
+  if ( this->private_->loading_states_ )
+  {
+    return;
+  }
+  
   // Get an up to date list from the layermanager
   std::vector< LayerGroupHandle > group_list;
   LayerManager::Instance()->get_groups( group_list );
@@ -178,6 +194,11 @@ void LayerManagerWidget::handle_groups_changed()
 
 void LayerManagerWidget::handle_group_internals_change( LayerGroupHandle group )
 {
+  if ( this->private_->loading_states_ )
+  {
+    return;
+  }
+  
   LayerManagerWidgetPrivate::group_widget_map_type::iterator it = 
     this->private_->group_map_.find( group->get_group_id() );
     
@@ -189,6 +210,24 @@ void LayerManagerWidget::handle_group_internals_change( LayerGroupHandle group )
   {
     CORE_THROW_LOGICERROR( "Group has not been created yet" );
   }
+}
+
+void LayerManagerWidget::pre_load_states()
+{
+  this->private_->loading_states_ = true;
+
+  QLayoutItem* group_item;
+  while ( ( group_item = this->private_->group_layout_->takeAt( 0 ) ) != 0 )
+  {
+    delete group_item;
+  }
+  this->private_->group_map_.clear();
+}
+
+void LayerManagerWidget::post_load_states()
+{
+  this->private_->loading_states_ = false;
+  this->handle_groups_changed();
 }
 
 LayerGroupWidget* LayerManagerWidget::make_new_group( LayerGroupHandle group )
@@ -275,5 +314,16 @@ void LayerManagerWidget::HandleGroupsChanged( qpointer_type qpointer )
    if( qpointer.data() ) qpointer->handle_groups_changed();
 }
 
+void LayerManagerWidget::PreLoadStates( qpointer_type qpointer )
+{
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
+    &LayerManagerWidget::pre_load_states, qpointer.data() ) ) );
+}
+
+void LayerManagerWidget::PostLoadStates( qpointer_type qpointer )
+{
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
+    &LayerManagerWidget::post_load_states, qpointer.data() ) ) );
+}
 
 }  // end namespace Seg3D

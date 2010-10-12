@@ -780,23 +780,10 @@ void LayerManager::get_layer_names_from_group( LayerGroupHandle group,
   }
 }
 
-
 bool LayerManager::pre_save_states( Core::StateIO& state_io )
 {
-  //lock_type lock( this->get_mutex() );
-
-  //if( this->private_->active_layer_ )
-  //{
-  //  this->active_layer_state_->set( this->private_->active_layer_->get_layer_id() );
-  //}
-  //else
-  //{
-  //  this->active_layer_state_->set( "none" );
-  //}
-
   return true;
 }
-  
 
 bool LayerManager::post_save_states( Core::StateIO& state_io )
 {

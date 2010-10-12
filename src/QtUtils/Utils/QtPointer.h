@@ -29,7 +29,8 @@
 #ifndef QTUTILS_UTILS_QTPOINTER_H
 #define QTUTILS_UTILS_QTPOINTER_H
 
-// QT includes/custom widget
+// QT includes
+#include <QCoreApplication>
 #include <QPointer>
 
 namespace QtUtils
@@ -38,7 +39,7 @@ namespace QtUtils
 template< class QPOINTER >
 void CheckQtPointerImpl( QPOINTER qpointer, boost::function< void() > function )
 {
-  if ( !( qpointer.isNull() ) ) 
+  if ( !qpointer.isNull() && !QCoreApplication::closingDown() ) 
   {
     function();
   }

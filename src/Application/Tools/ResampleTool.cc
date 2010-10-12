@@ -258,6 +258,8 @@ ResampleTool::ResampleTool( const std::string& toolid ) :
       boost::bind( &ResampleToolPrivate::handle_output_dimension_changed, 
       this->private_, i, _1 ) ) );
   }
+  this->add_connection( LayerManager::Instance()->groups_changed_signal_.connect( 
+    boost::bind( &ResampleToolPrivate::handle_target_group_changed, this->private_ ) ) );
   
   this->private_->handle_target_group_changed();
 }
