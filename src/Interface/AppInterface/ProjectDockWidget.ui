@@ -261,7 +261,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="sessions_tab_">
        <attribute name="title">
@@ -520,6 +520,9 @@
           </property>
           <property name="horizontalScrollBarPolicy">
            <enum>Qt::ScrollBarAlwaysOff</enum>
+          </property>
+          <property name="documentTitle">
+           <string/>
           </property>
          </widget>
         </item>

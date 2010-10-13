@@ -78,7 +78,7 @@ private:
   AppControllerPrivateHandle private_;
 
   QTabWidget* tw_controller_;
-  QToolButton* tb_action_;
+  QPushButton* tb_action_;
   QLineEdit* le_edit_action_;
   QLabel* l_action_status_;
   QLabel* l_action_usage_;
