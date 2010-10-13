@@ -98,6 +98,7 @@ bool ThresholdToolInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Enable( this->private_->ui_.run_button_, tool->valid_target_state_ );
   QtUtils::QtBridge::Enable( this->private_->ui_.target_layer_, 
     tool->use_active_layer_state_, true ); 
+  QtUtils::QtBridge::Enable( this->private_->histogram_, tool->valid_target_state_ );
 
   boost::function< bool () > condition = boost::lambda::bind( &Core::StateLabeledOption::get, 
     tool->target_layer_state_.get() ) != Tool::NONE_OPTION_C;

@@ -55,8 +55,10 @@ class ActionPaint : public Core::Action
     CORE_ACTION_KEY( "min_value", "0", "The minimum data constraint value." )
     CORE_ACTION_KEY( "max_value", "0", "The maximum data constraint value." )
     CORE_ACTION_KEY( "negative_data_constraint", "false", "Whether to negate the data constraint." )
-    CORE_ACTION_KEY( "mask_constraint", "<none>", "The ID of mask constraint layer." )
-    CORE_ACTION_KEY( "negative_mask_constraint", "false", "Whether to negate the mask constraint." )
+    CORE_ACTION_KEY( "mask_constraint1", "<none>", "The ID of first mask constraint layer." )
+    CORE_ACTION_KEY( "negative_mask_constraint1", "false", "Whether to negate the first mask constraint." )
+    CORE_ACTION_KEY( "mask_constraint2", "<none>", "The ID of second mask constraint layer." )
+    CORE_ACTION_KEY( "negative_mask_constraint2", "false", "Whether to negate the second mask constraint." )
     CORE_ACTION_KEY( "erase", "false", "Whether to erase instead of painting." )
   )
 

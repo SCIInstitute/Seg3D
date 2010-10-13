@@ -83,10 +83,14 @@ bool PaintToolInterface::build_widget( QFrame* frame )
     tool->target_layer_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.use_active_layer_, 
     tool->use_active_layer_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.mask_constraint_, 
-    tool->mask_constraint_layer_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.negative_mask_constraint_,
-    tool->negative_mask_constraint_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.mask_constraint1_, 
+    tool->mask_constraint1_layer_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.negative_mask_constraint1_,
+    tool->negative_mask_constraint1_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.mask_constraint2_, 
+    tool->mask_constraint2_layer_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.negative_mask_constraint2_,
+    tool->negative_mask_constraint2_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.data_constraint_, 
     tool->data_constraint_layer_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.negative_data_constraint_,

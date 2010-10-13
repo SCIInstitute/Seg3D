@@ -56,9 +56,12 @@ public:
   double min_val_;
   double max_val_;
   bool negative_data_constraint_;
-  std::string mask_constraint_layer_id_;
-  Core::MaskVolumeSliceHandle mask_constraint_slice_;
-  bool negative_mask_constraint_;
+  std::string mask_constraint1_layer_id_;
+  Core::MaskVolumeSliceHandle mask_constraint1_slice_;
+  bool negative_mask_constraint1_;
+  std::string mask_constraint2_layer_id_;
+  Core::MaskVolumeSliceHandle mask_constraint2_slice_;
+  bool negative_mask_constraint2_;
   int x0_, y0_, x1_, y1_;
   int brush_radius_;
   bool erase_;
@@ -66,8 +69,9 @@ public:
   // The following variables are set by ActionPaint when it's executed.
 
   bool inclusive_;
-  std::vector< unsigned char > mask_constraint_mask_;
-  std::vector< unsigned char > data_constraint_mask_;
+  //std::vector< unsigned char > mask_constraint1_mask_;
+  //std::vector< unsigned char > mask_constraint2_mask_;
+  //std::vector< unsigned char > data_constraint_mask_;
 };
 
 class PaintTool : public Tool, public boost::enable_shared_from_this< PaintTool >
@@ -150,11 +154,13 @@ public:
 
   Core::StateLabeledOptionHandle target_layer_state_;
   Core::StateLabeledOptionHandle data_constraint_layer_state_;
-  Core::StateLabeledOptionHandle mask_constraint_layer_state_;
+  Core::StateLabeledOptionHandle mask_constraint1_layer_state_;
+  Core::StateLabeledOptionHandle mask_constraint2_layer_state_;
 
   Core::StateBoolHandle use_active_layer_state_;
   Core::StateBoolHandle negative_data_constraint_state_;
-  Core::StateBoolHandle negative_mask_constraint_state_;
+  Core::StateBoolHandle negative_mask_constraint1_state_;
+  Core::StateBoolHandle negative_mask_constraint2_state_;
   Core::StateBoolHandle show_data_cstr_bound_state_;
   
   // Radius of the brush

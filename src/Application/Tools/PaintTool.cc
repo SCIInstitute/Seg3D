@@ -114,14 +114,17 @@ public:
   size_t signal_block_count_;
 
   bool has_data_constraint_;
-  bool has_mask_constraint_;
+  bool has_mask_constraint1_;
+  bool has_mask_constraint2_;
   double min_val_;
   double max_val_;
   bool negative_data_constraint_;
-  bool negative_mask_constraint_;
+  bool negative_mask_constraint1_;
+  bool negative_mask_constraint2_;
 
   Core::MaskVolumeSliceHandle target_slice_;
-  Core::MaskVolumeSliceHandle mask_constraint_slice_;
+  Core::MaskVolumeSliceHandle mask_constraint1_slice_;
+  Core::MaskVolumeSliceHandle mask_constraint2_slice_;
   Core::DataVolumeSliceHandle data_constraint_slice_;
   ViewerHandle viewer_;
 
@@ -298,18 +301,25 @@ void PaintToolPrivate::paint( const PaintInfo& paint_info, int xc, int yc, int& 
   unsigned char* buffer = paint_info.target_slice_->get_cached_data();
   size_t nx = paint_info.target_slice_->nx();
   Core::DataBlockHandle constraint_data_block;
-  Core::MaskDataBlockHandle constraint_mask_block;
+  Core::MaskDataBlockHandle constraint1_mask_block;
+  Core::MaskDataBlockHandle constraint2_mask_block;
   if ( paint_info.data_constraint_slice_ )
   {
     Core::DataVolumeHandle data_volume = boost::dynamic_pointer_cast
       < Core::DataVolume >( paint_info.data_constraint_slice_->get_volume() );
     constraint_data_block = data_volume->get_data_block();
   }
-  if ( paint_info.mask_constraint_slice_ )
+  if ( paint_info.mask_constraint1_slice_ )
   {
     Core::MaskVolumeHandle mask_volume = boost::dynamic_pointer_cast
-      < Core::MaskVolume >( paint_info.mask_constraint_slice_->get_volume() );
-    constraint_mask_block = mask_volume->get_mask_data_block();
+      < Core::MaskVolume >( paint_info.mask_constraint1_slice_->get_volume() );
+    constraint1_mask_block = mask_volume->get_mask_data_block();
+  }
+  if ( paint_info.mask_constraint2_slice_ )
+  {
+    Core::MaskVolumeHandle mask_volume = boost::dynamic_pointer_cast
+      < Core::MaskVolume >( paint_info.mask_constraint2_slice_->get_volume() );
+    constraint2_mask_block = mask_volume->get_mask_data_block();
   }
 
   size_t slice_x, slice_y, slice_index;
@@ -336,11 +346,21 @@ void PaintToolPrivate::paint( const PaintInfo& paint_info, int xc, int yc, int& 
           if ( !in_range ) continue;
         }
 
-        if ( constraint_mask_block )
+        if ( constraint1_mask_block )
         {
-          bool has_mask = constraint_mask_block->get_mask_at( current_index );
-          if ( ( has_mask && paint_info.negative_mask_constraint_ ) ||
-            ( !has_mask && !paint_info.negative_mask_constraint_ ) )
+          bool has_mask = constraint1_mask_block->get_mask_at( current_index );
+          if ( ( has_mask && paint_info.negative_mask_constraint1_ ) ||
+            ( !has_mask && !paint_info.negative_mask_constraint1_ ) )
+          {
+            continue;
+          }
+        }
+
+        if ( constraint2_mask_block )
+        {
+          bool has_mask = constraint2_mask_block->get_mask_at( current_index );
+          if ( ( has_mask && paint_info.negative_mask_constraint2_ ) ||
+            ( !has_mask && !paint_info.negative_mask_constraint2_ ) )
           {
             continue;
           }
@@ -512,7 +532,8 @@ void PaintToolPrivate::update_constraint_options()
   }
 
   this->paint_tool_->data_constraint_layer_state_->set_option_list( data_layer_names );
-  this->paint_tool_->mask_constraint_layer_state_->set_option_list( mask_layer_names );
+  this->paint_tool_->mask_constraint1_layer_state_->set_option_list( mask_layer_names );
+  this->paint_tool_->mask_constraint2_layer_state_->set_option_list( mask_layer_names );
 }
 
 bool PaintToolPrivate::start_painting()
@@ -535,14 +556,21 @@ bool PaintToolPrivate::start_painting()
     return false;
   }
 
-  const std::string& mask_constraint_id = this->paint_tool_->
-    mask_constraint_layer_state_->get();
+  const std::string& mask_constraint1_id = this->paint_tool_->
+    mask_constraint1_layer_state_->get();
+  const std::string& mask_constraint2_id = this->paint_tool_->
+    mask_constraint2_layer_state_->get();
   const std::string& data_constraint_id = this->paint_tool_->
     data_constraint_layer_state_->get();
-  if ( mask_constraint_id != Tool::NONE_OPTION_C )
+  if ( mask_constraint1_id != Tool::NONE_OPTION_C )
   {
-    this->mask_constraint_slice_ = boost::dynamic_pointer_cast< Core::MaskVolumeSlice >(
-      this->viewer_->get_volume_slice( mask_constraint_id ) );
+    this->mask_constraint1_slice_ = boost::dynamic_pointer_cast< Core::MaskVolumeSlice >(
+      this->viewer_->get_volume_slice( mask_constraint1_id ) );
+  }
+  if ( mask_constraint2_id != Tool::NONE_OPTION_C )
+  {
+    this->mask_constraint2_slice_ = boost::dynamic_pointer_cast< Core::MaskVolumeSlice >(
+      this->viewer_->get_volume_slice( mask_constraint2_id ) );
   }
   if ( data_constraint_id != Tool::NONE_OPTION_C )
   {
@@ -550,12 +578,14 @@ bool PaintToolPrivate::start_painting()
       this->viewer_->get_volume_slice( data_constraint_id ) );
   }
 
-  this->has_mask_constraint_ = this->mask_constraint_slice_.get() != 0;
+  this->has_mask_constraint1_ = this->mask_constraint1_slice_.get() != 0;
+  this->has_mask_constraint2_ = this->mask_constraint2_slice_.get() != 0;
   this->has_data_constraint_ = this->data_constraint_slice_.get() != 0;
   this->min_val_ = this->paint_tool_->lower_threshold_state_->get();
   this->max_val_ = this->paint_tool_->upper_threshold_state_->get();
   this->negative_data_constraint_ = this->paint_tool_->negative_data_constraint_state_->get();
-  this->negative_mask_constraint_ = this->paint_tool_->negative_mask_constraint_state_->get();
+  this->negative_mask_constraint1_ = this->paint_tool_->negative_mask_constraint1_state_->get();
+  this->negative_mask_constraint2_ = this->paint_tool_->negative_mask_constraint2_state_->get();
 
   return true;
 }
@@ -565,7 +595,8 @@ void PaintToolPrivate::stop_painting()
   this->painting_ = false;
   this->target_slice_->release_cached_data();
   this->target_slice_.reset();
-  this->mask_constraint_slice_.reset();
+  this->mask_constraint1_slice_.reset();
+  this->mask_constraint2_slice_.reset();
   this->data_constraint_slice_.reset();
 }
 
@@ -578,9 +609,12 @@ void PaintToolPrivate::setup_paint_info( PaintInfo& paint_info, int x0, int y0, 
   paint_info.min_val_ = this->paint_tool_->lower_threshold_state_->get();
   paint_info.max_val_ = this->paint_tool_->upper_threshold_state_->get();
   paint_info.negative_data_constraint_ = this->paint_tool_->negative_data_constraint_state_->get();
-  paint_info.mask_constraint_layer_id_ = this->paint_tool_->mask_constraint_layer_state_->get();
-  paint_info.mask_constraint_slice_ = this->mask_constraint_slice_;
-  paint_info.negative_mask_constraint_ = this->paint_tool_->negative_mask_constraint_state_->get();
+  paint_info.mask_constraint1_layer_id_ = this->paint_tool_->mask_constraint1_layer_state_->get();
+  paint_info.mask_constraint1_slice_ = this->mask_constraint1_slice_;
+  paint_info.negative_mask_constraint1_ = this->paint_tool_->negative_mask_constraint1_state_->get();
+  paint_info.mask_constraint2_layer_id_ = this->paint_tool_->mask_constraint2_layer_state_->get();
+  paint_info.mask_constraint2_slice_ = this->mask_constraint2_slice_;
+  paint_info.negative_mask_constraint2_ = this->paint_tool_->negative_mask_constraint2_state_->get();
   paint_info.brush_radius_ = this->paint_tool_->brush_radius_state_->get();
   paint_info.erase_ = this->erase_;
 
@@ -689,12 +723,15 @@ PaintTool::PaintTool( const std::string& toolid ) :
     Tool::NONE_OPTION_C, empty_names );
   this->add_state( "data_constraint", this->data_constraint_layer_state_, 
     Tool::NONE_OPTION_C, empty_names );
-  this->add_state( "mask_constraint", this->mask_constraint_layer_state_,
+  this->add_state( "mask_constraint1", this->mask_constraint1_layer_state_,
+    Tool::NONE_OPTION_C, empty_names );
+  this->add_state( "mask_constraint2", this->mask_constraint2_layer_state_,
     Tool::NONE_OPTION_C, empty_names );
 
   this->add_state( "use_active_layer", this->use_active_layer_state_, true );
   this->add_state( "negative_data_constraint", this->negative_data_constraint_state_, false );
-  this->add_state( "negative_mask_constraint", this->negative_mask_constraint_state_, false );
+  this->add_state( "negative_mask_constraint1", this->negative_mask_constraint1_state_, false );
+  this->add_state( "negative_mask_constraint2", this->negative_mask_constraint2_state_, false );
   this->add_state( "show_data_constraint_bound", this->show_data_cstr_bound_state_, false );
 
   this->add_state( "brush_radius", this->brush_radius_state_, 3, 0, 150, 1 );

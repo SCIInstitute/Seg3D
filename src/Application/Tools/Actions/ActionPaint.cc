@@ -55,14 +55,17 @@ public:
   Core::ActionParameter< double > min_val_;
   Core::ActionParameter< double > max_val_;
   Core::ActionParameter< bool > negative_data_constraint_;
-  Core::ActionParameter< std::string > mask_constraint_layer_id_;
-  Core::ActionParameter< bool > negative_mask_constraint_;
+  Core::ActionParameter< std::string > mask_constraint1_layer_id_;
+  Core::ActionParameter< bool > negative_mask_constraint1_;
+  Core::ActionParameter< std::string > mask_constraint2_layer_id_;
+  Core::ActionParameter< bool > negative_mask_constraint2_;
   Core::ActionParameter< bool > erase_;
 
   PaintToolWeakHandle paint_tool_weak_handle_;
   Core::ActionCachedHandle< Core::MaskVolumeSliceHandle > target_slice_;
   Core::ActionCachedHandle< Core::DataVolumeSliceHandle > data_constraint_slice_;
-  Core::ActionCachedHandle< Core::MaskVolumeSliceHandle > mask_constraint_slice_;
+  Core::ActionCachedHandle< Core::MaskVolumeSliceHandle > mask_constraint1_slice_;
+  Core::ActionCachedHandle< Core::MaskVolumeSliceHandle > mask_constraint2_slice_;
 };
 
 ActionPaint::ActionPaint() :
@@ -81,13 +84,16 @@ ActionPaint::ActionPaint() :
   this->add_key( this->private_->min_val_ );
   this->add_key( this->private_->max_val_ );
   this->add_key( this->private_->negative_data_constraint_ );
-  this->add_key( this->private_->mask_constraint_layer_id_ );
-  this->add_key( this->private_->negative_mask_constraint_ );
+  this->add_key( this->private_->mask_constraint1_layer_id_ );
+  this->add_key( this->private_->negative_mask_constraint1_ );
+  this->add_key( this->private_->mask_constraint2_layer_id_ );
+  this->add_key( this->private_->negative_mask_constraint2_ );
   this->add_key( this->private_->erase_ );
 
   this->add_cachedhandle( this->private_->target_slice_ );
   this->add_cachedhandle( this->private_->data_constraint_slice_ );
-  this->add_cachedhandle( this->private_->mask_constraint_slice_ );
+  this->add_cachedhandle( this->private_->mask_constraint1_slice_ );
+  this->add_cachedhandle( this->private_->mask_constraint2_slice_ );
 }
 
 ActionPaint::~ActionPaint()
@@ -160,24 +166,42 @@ bool ActionPaint::validate( Core::ActionContextHandle& context )
       this->private_->slice_number_.value() ) );
   }
 
-  if ( !this->private_->mask_constraint_slice_.handle() &&
-    this->private_->mask_constraint_layer_id_.value() != Tool::NONE_OPTION_C )
+  if ( !this->private_->mask_constraint1_slice_.handle() &&
+    this->private_->mask_constraint1_layer_id_.value() != Tool::NONE_OPTION_C )
   {
     MaskLayerHandle mask_constraint_layer = boost::dynamic_pointer_cast< MaskLayer >(
       LayerManager::Instance()->get_layer_by_id( 
-      this->private_->mask_constraint_layer_id_.value() ) );
+      this->private_->mask_constraint1_layer_id_.value() ) );
     if ( !mask_constraint_layer )
     {
       context->report_error( "Invalid mask constraint layer '" +
-        this->private_->mask_constraint_layer_id_.value() + "'" );
+        this->private_->mask_constraint1_layer_id_.value() + "'" );
       return false;
     }
-    this->private_->mask_constraint_slice_.handle().reset( new Core::MaskVolumeSlice(
+    this->private_->mask_constraint1_slice_.handle().reset( new Core::MaskVolumeSlice(
       mask_constraint_layer->get_mask_volume(), 
       this->private_->target_slice_.handle()->get_slice_type(),
       this->private_->slice_number_.value() ) );
   }
   
+  if ( !this->private_->mask_constraint2_slice_.handle() &&
+    this->private_->mask_constraint2_layer_id_.value() != Tool::NONE_OPTION_C )
+  {
+    MaskLayerHandle mask_constraint_layer = boost::dynamic_pointer_cast< MaskLayer >(
+      LayerManager::Instance()->get_layer_by_id( 
+      this->private_->mask_constraint2_layer_id_.value() ) );
+    if ( !mask_constraint_layer )
+    {
+      context->report_error( "Invalid mask constraint layer '" +
+        this->private_->mask_constraint2_layer_id_.value() + "'" );
+      return false;
+    }
+    this->private_->mask_constraint2_slice_.handle().reset( new Core::MaskVolumeSlice(
+      mask_constraint_layer->get_mask_volume(), 
+      this->private_->target_slice_.handle()->get_slice_type(),
+      this->private_->slice_number_.value() ) );
+  }
+
   return true;
 }
 
@@ -196,8 +220,10 @@ bool ActionPaint::run( Core::ActionContextHandle& context, Core::ActionResultHan
   paint_info.min_val_ = this->private_->min_val_.value();
   paint_info.max_val_ = this->private_->max_val_.value();
   paint_info.negative_data_constraint_ = this->private_->negative_data_constraint_.value();
-  paint_info.mask_constraint_slice_ = this->private_->mask_constraint_slice_.handle();
-  paint_info.negative_mask_constraint_ = this->private_->negative_mask_constraint_.value();
+  paint_info.mask_constraint1_slice_ = this->private_->mask_constraint1_slice_.handle();
+  paint_info.negative_mask_constraint1_ = this->private_->negative_mask_constraint1_.value();
+  paint_info.mask_constraint2_slice_ = this->private_->mask_constraint2_slice_.handle();
+  paint_info.negative_mask_constraint2_ = this->private_->negative_mask_constraint2_.value();
   paint_info.x0_ = this->private_->x0_.value();
   paint_info.y0_ = this->private_->y0_.value();
   paint_info.x1_ = this->private_->x1_.value();
@@ -228,8 +254,10 @@ Core::ActionHandle ActionPaint::Create( const PaintToolHandle& paint_tool,
   action->private_->min_val_.value() = paint_info.min_val_;
   action->private_->max_val_.value() = paint_info.max_val_;
   action->private_->negative_data_constraint_.value() = paint_info.negative_data_constraint_;
-  action->private_->mask_constraint_layer_id_.value() = paint_info.mask_constraint_layer_id_;
-  action->private_->negative_mask_constraint_.value() = paint_info.negative_mask_constraint_;
+  action->private_->mask_constraint1_layer_id_.value() = paint_info.mask_constraint1_layer_id_;
+  action->private_->negative_mask_constraint1_.value() = paint_info.negative_mask_constraint1_;
+  action->private_->mask_constraint2_layer_id_.value() = paint_info.mask_constraint2_layer_id_;
+  action->private_->negative_mask_constraint2_.value() = paint_info.negative_mask_constraint2_;
   action->private_->x0_.set_value( paint_info.x0_ );
   action->private_->y0_.set_value( paint_info.y0_ );
   action->private_->x1_.set_value( paint_info.x1_ );
@@ -240,7 +268,8 @@ Core::ActionHandle ActionPaint::Create( const PaintToolHandle& paint_tool,
   action->private_->paint_tool_weak_handle_ = paint_tool;
   action->private_->target_slice_.handle() = paint_info.target_slice_;
   action->private_->data_constraint_slice_.handle() = paint_info.data_constraint_slice_;
-  action->private_->mask_constraint_slice_.handle() = paint_info.mask_constraint_slice_;
+  action->private_->mask_constraint1_slice_.handle() = paint_info.mask_constraint1_slice_;
+  action->private_->mask_constraint2_slice_.handle() = paint_info.mask_constraint2_slice_;
 
   return Core::ActionHandle( action );
 }
