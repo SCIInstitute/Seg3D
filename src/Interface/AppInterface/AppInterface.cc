@@ -150,10 +150,14 @@ AppInterface::AppInterface()
       qpointer_type( this ), _1, _2 ) ) ); 
   }
 
-  
-  this->set_full_screen( PreferencesManager::Instance()->full_screen_on_startup_state_->get() );
-  
-  this->center_seg3d_gui_on_screen( this );
+  if( PreferencesManager::Instance()->full_screen_on_startup_state_->get() )
+  {
+    this->set_full_screen( true );
+  }
+  else 
+  {
+    this->center_seg3d_gui_on_screen( this );
+  }
   this->show_window( "splash" );
   
 }
@@ -436,24 +440,15 @@ void AppInterface::close_window( const std::string& windowid )
   std::string lower_windowid = Core::StringToLower( windowid );
   if( lower_windowid == "controller" )
   {
-    if( !( this->controller_interface_.isNull() ) )
-    {
-      this->controller_interface_->close();
-    }
+    if( !( this->controller_interface_.isNull() ) ) this->controller_interface_->close();
   }
   else if( lower_windowid == "preferences" )
   {
-    if( !( this->preferences_interface_.isNull() ) )
-    {
-      this->preferences_interface_->close();
-    }
+    if( !( this->preferences_interface_.isNull() ) ) this->preferences_interface_->close();
   }
   else if( lower_windowid == "splash" )
   {
-    if( !( this->splash_interface_.isNull() ) )
-    {
-      this->splash_interface_->close();
-    }
+    if( !( this->splash_interface_.isNull() ) ) this->splash_interface_->close();
   }
   else if( lower_windowid == "history_widget" )
   {
