@@ -294,37 +294,8 @@ std::string StateEngine::register_state_handler( const std::string &type_str,
       handler_id = type_str + id_number;
     }
   }
-  // Here we handle the case where we have previously loaded layers from file and the layer
-  // counting has already begun.
   else
   {
-    if ( id_components.size() > 1 )
-    {
-      std::string name = id_components[ 0 ];
-      int new_count;
-      Core::ImportFromString( id_components[ 1 ], new_count );
-      
-      Core::AtomicCounterHandle state_handler_counter;
-      state_handler_counter_map_type::iterator it = 
-        this->private_->state_handler_counter_map_.find( name );
-      
-      if ( it == this->private_->state_handler_counter_map_.end() )
-      {
-        state_handler_counter = Core::AtomicCounterHandle( 
-          new Core::AtomicCounter( new_count ) );
-        this->private_->state_handler_counter_map_.insert( 
-          state_handler_counter_map_type::value_type( name, state_handler_counter ) );
-      }
-      else
-      { 
-        if( ( *( *it ).second ) < new_count )
-        {
-          new_count++;
-          ( *it ).second = Core::AtomicCounterHandle( new Core::AtomicCounter( new_count ) );
-        }
-      }
-    }
-
     handler_id = type_str;
   }
 

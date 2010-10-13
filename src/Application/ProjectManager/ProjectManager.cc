@@ -41,6 +41,7 @@
 #include <Application/ProjectManager/AutoSave.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
 #include <Application/StatusBar/StatusBar.h>
+#include <Application/ToolManager/ToolManager.h>
 
 namespace Seg3D
 {
@@ -221,6 +222,7 @@ void ProjectManager::new_project( const std::string& project_name, const std::st
     this->current_project_->project_notes_state_->set( empty_vector );
     this->current_project_->save_custom_colors_state_->set( false );
     this->current_project_->clear_datamanager_list();
+    ToolManager::Instance()->open_default_tools();
     this->save_project( true );
   }
 
@@ -472,8 +474,6 @@ boost::posix_time::ptime ProjectManager::get_last_saved_session_time_stamp() con
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
   return this->last_saved_session_time_stamp_;
 }
-
-
 
 boost::filesystem::path ProjectManager::get_project_data_path() const
 {

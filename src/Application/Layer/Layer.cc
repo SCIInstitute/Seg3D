@@ -106,7 +106,7 @@ Layer::Layer( const std::string& name, bool creating ) :
 }
 
 Layer::Layer( const std::string& name, const std::string& state_id, bool creating ) :
-  StateHandler( state_id, false ),
+  StateHandler( state_id, true ),
   private_( new LayerPrivate )
 {
   this->private_->layer_ = this;

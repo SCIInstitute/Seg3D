@@ -100,10 +100,13 @@ int main( int argc, char **argv )
   
   // -- Add plugins into the architecture  
   Core::RegisterClasses();
-  
+
   // -- Start the application event handler --
   Core::Application::Instance()->start_eventhandler();
 
+  // Initialize the startup tools list
+  ToolFactory::Instance()->initialize_states();
+  
   // -- Setup the QT Interface Layer --
   if ( !( QtUtils::QtApplication::Instance()->setup( argc, argv ) ) ) return ( -1 );
 

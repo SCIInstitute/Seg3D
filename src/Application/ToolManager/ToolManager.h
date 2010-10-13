@@ -139,6 +139,10 @@ public:
   // create a new project
   bool delete_all();
 
+  // OPEN_DEFAULT_TOOLS:
+  // Open the startup tools chosen by the user.
+  void open_default_tools();
+
 protected:
   virtual bool pre_save_states( Core::StateIO& state_io );
 

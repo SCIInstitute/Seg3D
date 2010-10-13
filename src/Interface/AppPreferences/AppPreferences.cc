@@ -228,20 +228,48 @@ void AppPreferences::setup_sidebar_prefs()
     PreferencesManager::Instance()->show_history_bar_state_ );
   
   
-  ToolInfoList tool_types_list;
-  ToolInfoList::const_iterator it;
-  ToolInfoList::const_iterator it_end;
-  
-  ToolFactory::Instance()->list_tools( tool_types_list );
-  
-  it = tool_types_list.begin();
-  it_end = tool_types_list.end();
-  
-  while ( it != it_end )
+  ToolMenuList tool_menus;
+  ToolFactory::Instance()->list_menus( tool_menus );
+  if ( tool_menus.size() >= 1 )
   {
-    this->private_->ui_.filter_list_->addItem( QString::fromStdString( ( *it )->get_menu_label() ) );
-    ++it;
-  } 
+    this->private_->ui_.tools_tab_widget_->setTabText( 0, 
+      QString::fromStdString( tool_menus[ 0 ] ) );
+    QtUtils::QtBridge::Connect( this->private_->ui_.tools_list1_,
+      ToolFactory::Instance()->startup_tools_state_[ tool_menus[ 0 ] ] );
+    this->private_->ui_.tools_label1_->setText( QString::fromStdString( "Select which " +
+      Core::StringToLower( tool_menus[ 0 ] ) + " are active on startup" ) );
+  }
+  if ( tool_menus.size() >= 2 )
+  {
+    this->private_->ui_.tools_tab_widget_->setTabText( 1, 
+      QString::fromStdString( tool_menus[ 1 ] ) );
+    QtUtils::QtBridge::Connect( this->private_->ui_.tools_list2_,
+      ToolFactory::Instance()->startup_tools_state_[ tool_menus[ 1 ] ] );
+    this->private_->ui_.tools_label2_->setText( QString::fromStdString( "Select which " +
+      Core::StringToLower( tool_menus[ 1 ] ) + " are active on startup" ) );
+  }
+  if ( tool_menus.size() >= 3 )
+  {
+    this->private_->ui_.tools_tab_widget_->setTabText( 2, 
+      QString::fromStdString( tool_menus[ 2 ] ) );
+    QtUtils::QtBridge::Connect( this->private_->ui_.tools_list3_,
+      ToolFactory::Instance()->startup_tools_state_[ tool_menus[ 2 ] ] );
+    this->private_->ui_.tools_label3_->setText( QString::fromStdString( "Select which " +
+      Core::StringToLower( tool_menus[ 2 ] ) + " are active on startup" ) );
+  }
+
+  if ( tool_menus.size() < 3 )
+  {
+    this->private_->ui_.tools_tab_widget_->removeTab( 2 );
+  }
+  if ( tool_menus.size() < 2 )
+  {
+    this->private_->ui_.tools_tab_widget_->removeTab( 1 );
+  }
+  if ( tool_menus.size() < 1 )
+  {
+    this->private_->ui_.tools_tab_widget_->removeTab( 0 );
+  }
 }
   
 void AppPreferences::setup_interface_controls_prefs()
@@ -270,6 +298,7 @@ void AppPreferences::hide_the_others( int active )
 void AppPreferences::save_defaults()
 {
   PreferencesManager::Instance()->save_state();
+  ToolFactory::Instance()->save_settings();
   this->close();
 }
 

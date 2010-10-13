@@ -44,6 +44,7 @@
 #include <Core/Utils/Lockable.h>
 #include <Core/Utils/StringUtil.h>
 #include <Core/Utils/Singleton.h>
+#include <Core/State/StateLabeledMultiOption.h>
 
 // Application includes
 #include <Application/Tool/Tool.h>
@@ -142,7 +143,7 @@ typedef boost::shared_ptr<ToolFactoryPrivate> ToolFactoryPrivateHandle;
 
 
 // Class definition
-class ToolFactory : public Core::Lockable
+class ToolFactory : public Core::Lockable, private Core::StateHandler
 {
   CORE_SINGLETON( ToolFactory );
 
@@ -163,7 +164,6 @@ public:
   // factory.
   void register_toolinterface( ToolInterfaceBuilderBase* builder, 
     std::string toolinterface_name );
-
 
   // -- Instantiate tools and toolinterfaces --
 public:
@@ -191,7 +191,22 @@ public:
   // LIST_MENUS:
   // List the menus
   bool list_menus( ToolMenuList& menu_list );
-  
+
+  // -- State handling --
+public:
+  // INITIALIZE_STATES:
+  // Initialize state variables and load settings from file.
+  void initialize_states();
+
+  // SAVE_SETTINGS:
+  // Write the tools settings out to file.
+  void save_settings();
+
+  // -- State Variables --
+public:
+  typedef std::map< std::string, Core::StateLabeledMultiOptionHandle > startup_tools_map_type;
+  startup_tools_map_type startup_tools_state_;
+
   // -- internals of ToolFactory --
 private:
   ToolFactoryPrivateHandle private_;

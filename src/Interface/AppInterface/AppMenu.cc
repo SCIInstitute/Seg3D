@@ -268,8 +268,8 @@ void AppMenu::create_tool_menus( QMenuBar* qmenubar )
   ToolMenuList menu_list;
 
   ToolFactory::Instance()->list_menus( menu_list );
-  ToolMenuList::const_reverse_iterator mit = menu_list.rbegin();
-  ToolMenuList::const_reverse_iterator mit_end = menu_list.rend();  
+  ToolMenuList::const_iterator mit = menu_list.begin();
+  ToolMenuList::const_iterator mit_end = menu_list.end(); 
 
   while ( mit != mit_end )
   {

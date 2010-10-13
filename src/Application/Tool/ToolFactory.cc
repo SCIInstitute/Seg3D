@@ -26,9 +26,20 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#if defined(_MSC_VER)
+#pragma warning(disable : 4267 4244)
+#endif
+
 // STL includes
 #include <algorithm>
 #include <map>
+
+// boost includes
+#include <boost/lambda/lambda.hpp>
+#include <boost/regex.hpp>
+
+// Core includes
+#include <Core/State/StateIO.h>
 
 // Application includes
 #include <Application/Tool/ToolFactory.h>
@@ -73,6 +84,7 @@ public:
 CORE_SINGLETON_IMPLEMENTATION( ToolFactory );
 
 ToolFactory::ToolFactory() :
+  Core::StateHandler( "toolfactory", false ),
   private_( new ToolFactoryPrivate )
 {
 }
@@ -199,7 +211,7 @@ bool ToolFactory::list_menus( ToolMenuList& menu_list )
   }
   
   if ( menu_list.size() == 0 ) return false;
-  std::sort( menu_list.begin(), menu_list.end() );
+  std::sort( menu_list.begin(), menu_list.end(), boost::lambda::_1 > boost::lambda::_2 );
   
   return true;
 }
@@ -244,6 +256,55 @@ bool ToolFactory::create_toolinterface( const std::string& toolinterface_name,
   toolinterface = (*it).second->build();
 
   return true;
+}
+
+void ToolFactory::initialize_states()
+{
+  this->set_initializing( true );
+
+  ToolMenuList tool_menus;
+  this->list_menus( tool_menus );
+  std::vector< std::string > none_option;
+  for ( ToolMenuList::iterator menu_it = tool_menus.begin(); 
+    menu_it != tool_menus.end(); ++menu_it )
+  {
+    const std::string menu_name = *menu_it;
+    std::string state_name = boost::regex_replace( menu_name, boost::regex( "[^\\w]" ), "_" );
+    state_name = "startup_" + Core::StringToLower( state_name );
+    ToolInfoList tools;
+    this->list_tools( tools, menu_name );
+    Core::OptionLabelPairVector tools_vec;
+    for ( size_t i =0; i < tools.size(); ++i )
+    {
+      tools_vec.push_back( std::make_pair( tools[ i ]->get_name(), tools[ i ]->get_menu_label() ) );
+    }
+    Core::StateLabeledMultiOptionHandle state;
+    this->add_state( state_name, state, none_option, tools_vec );
+    this->startup_tools_state_[ menu_name ] = state;
+  }
+  
+  boost::filesystem::path config_path;
+  Core::Application::Instance()->get_config_directory( config_path );
+  Core::StateIO state_io;
+  if ( state_io.import_from_file( config_path / "tools.xml" ) )
+  {
+    this->load_states( state_io );
+  }
+
+  this->set_initializing( false );
+}
+
+void ToolFactory::save_settings()
+{
+  boost::filesystem::path config_path;
+  Core::Application::Instance()->get_config_directory( config_path );
+  Core::StateIO state_io;
+  state_io.initialize( "Seg3D2" );
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    this->save_states( state_io );
+  }
+  state_io.export_to_file( config_path / "tools.xml" );
 }
 
 } // end namespace seg3D

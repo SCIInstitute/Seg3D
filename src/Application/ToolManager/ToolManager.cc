@@ -26,6 +26,10 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// boost includes
+#include <boost/lambda/lambda.hpp>
+#include <boost/lambda/bind.hpp>
+
 #include <tinyxml.h>
 
 #include <Core/Application/Application.h>
@@ -600,6 +604,20 @@ bool ToolManager::delete_all()
 int ToolManager::get_session_priority()
 {
   return SessionPriority::TOOL_MANAGER_PRIORITY_E;
+}
+
+void ToolManager::open_default_tools()
+{
+  ToolFactory::startup_tools_map_type::const_iterator it = 
+    ToolFactory::Instance()->startup_tools_state_.begin();
+  while ( it != ToolFactory::Instance()->startup_tools_state_.end() )
+  {
+    const std::vector< std::string >& tools = ( *it ).second->get();
+    std::string tool_id;
+    std::for_each( tools.begin(), tools.end(), boost::lambda::bind( &ToolManager::open_tool,
+      this, boost::lambda::_1, boost::lambda::var( tool_id ) ) );
+    ++it;
+  }
 }
 
 } // end namespace Seg3D
