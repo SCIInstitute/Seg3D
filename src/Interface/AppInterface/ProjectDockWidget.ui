@@ -125,7 +125,7 @@
           <item>
            <widget class="QCheckBox" name="custom_colors_checkbox_">
             <property name="text">
-             <string>Include Custom Colors</string>
+             <string>Save Custom Colors in Project</string>
             </property>
            </widget>
           </item>
