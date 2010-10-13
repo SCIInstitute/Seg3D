@@ -35,6 +35,7 @@
 // Core includes
 #include <Core/Utils/Log.h>
 #include <Core/Utils/StringUtil.h>
+#include <Core/Math/MathFunctions.h>
 
 namespace Core
 {
@@ -113,6 +114,34 @@ std::string ToString( T val )
   return ( oss.str() );
 }
 
+inline std::string ToString( float val )
+{
+  if ( IsNan( val ) ) return "NaN";
+  if ( IsInfinite( val ) )
+  {
+    if ( val > 0 ) return "INF";
+    return "-INF";
+  }
+  
+  std::ostringstream oss;
+  oss << val;
+  return oss.str();
+}
+
+inline std::string ToString( double val )
+{
+  if ( IsNan( val ) ) return "NaN";
+  if ( IsInfinite( val ) )
+  {
+    if ( val > 0 ) return "INF";
+    return "-INF";
+  }
+
+  std::ostringstream oss;
+  oss << val;
+  return oss.str();
+}
+
 // Export a value to a string with percision control
 
 template< class T >
@@ -122,6 +151,36 @@ std::string ToString( T val, int precision )
   oss.precision( precision );
   oss << val;
   return ( oss.str() );
+}
+
+inline std::string ToString( float val, int precision )
+{
+  if ( IsNan( val ) ) return "NaN";
+  if ( IsInfinite( val ) )
+  {
+    if ( val > 0 ) return "INF";
+    return "-INF";
+  }
+
+  std::ostringstream oss;
+  oss.precision( precision );
+  oss << val;
+  return oss.str();
+}
+
+inline std::string ToString( double val, int precision )
+{
+  if ( IsNan( val ) ) return "NaN";
+  if ( IsInfinite( val ) )
+  {
+    if ( val > 0 ) return "INF";
+    return "-INF";
+  }
+
+  std::ostringstream oss;
+  oss.precision( precision );
+  oss << val;
+  return oss.str();
 }
 
 std::string StringToUpper( std::string str )
@@ -158,7 +217,7 @@ bool FromString( const std::string &str, double &value )
   // Handle special cases: nan, inf, and -inf
 
   // handle nan
-  if ( data.size() > 2 && ( data[ 0 ] == 'n' || data[ 0 ] == 'N' ) && ( data[ 1 ] == 'A'
+  if ( data.size() > 2 && ( data[ 0 ] == 'n' || data[ 0 ] == 'N' ) && ( data[ 1 ] == 'a'
       || data[ 1 ] == 'A' ) && ( data[ 2 ] == 'n' || data[ 2 ] == 'N' ) )
   {
     value = std::numeric_limits< double >::quiet_NaN();
@@ -219,7 +278,7 @@ bool FromString( const std::string &str, float &value )
   // Handle special cases: nan, inf, and -inf
 
   // handle nan
-  if ( data.size() > 2 && ( data[ 0 ] == 'n' || data[ 0 ] == 'N' ) && ( data[ 1 ] == 'A'
+  if ( data.size() > 2 && ( data[ 0 ] == 'n' || data[ 0 ] == 'N' ) && ( data[ 1 ] == 'a'
       || data[ 1 ] == 'A' ) && ( data[ 2 ] == 'n' || data[ 2 ] == 'N' ) )
   {
     value = std::numeric_limits< float >::quiet_NaN();
