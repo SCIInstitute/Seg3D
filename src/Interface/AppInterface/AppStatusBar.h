@@ -41,7 +41,7 @@
 #include <QtGui>
 
 // Interface includes
-#include <Interface/AppInterface/MessageHistoryWidget.h>
+//#include <Interface/AppInterface/MessageHistoryWidget.h>
 
 // Core includes
 #include <Core/Utils/ConnectionHandler.h>
@@ -68,7 +68,7 @@ private Q_SLOTS:
 
   // -- build status bar widgets -- //
 private:
-  MessageHistoryWidget* history_widget_;
+  //MessageHistoryWidget* history_widget_;
   bool show_world_coord_;
   void update_data_point_info( DataPointInfoHandle data_point );
   void update_data_point_label();

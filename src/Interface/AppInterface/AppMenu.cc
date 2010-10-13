@@ -73,18 +73,21 @@ AppMenu::AppMenu( QMainWindow* parent ) :
 
   // menus
   QMenu* file_menu = menubar->addMenu( tr( "&File" ) );
-  create_file_menu( file_menu );  
+  this->create_file_menu( file_menu );  
   
   QMenu* edit_menu = menubar->addMenu( tr( "&Edit" ) );
-  create_edit_menu( edit_menu );
+  this->create_edit_menu( edit_menu );
   
   QMenu* view_menu = menubar->addMenu( "&View" );
-  create_view_menu( view_menu );
+  this->create_view_menu( view_menu );
   
-  create_tool_menus( menubar );
+  this->create_tool_menus( menubar );
   
   QMenu* window_menu = menubar->addMenu( "&Window" );
-  create_window_menu( window_menu );
+  this->create_window_menu( window_menu );
+  
+  QMenu* help_menu = menubar->addMenu( "&Help" );
+  this->create_help_menu( help_menu );
   
   // NOTE: Connect state and reflect the current state (needs to be atomic, hence the lock)
   {
@@ -345,6 +348,31 @@ void AppMenu::create_window_menu( QMenu* qmenu )
   QtUtils::QtBridge::Connect( qaction, boost::bind( &ActionShowWindow::Dispatch,
     Core::Interface::GetWidgetActionContext(), std::string( "preferences" ) ) );
 }
+  
+  void AppMenu::create_help_menu( QMenu* qmenu )
+  {
+    QAction* qaction = 0;
+    qaction = qmenu->addAction( tr( "&About" ) );
+    qaction->setToolTip( tr( "About Seg3D 2.0" ) );
+    connect( qaction, SIGNAL( triggered() ), this, SLOT( about() ) );
+    
+    qaction = qmenu->addAction( tr( "&Keyboard Shortcuts" ) );
+    qaction->setToolTip( tr( "List of the keyboard shortcuts or 'hotkeys' for Seg3D 2.0" ) );
+
+  }
+  
+  void AppMenu::about()
+  {
+    QMessageBox::about( this->main_window_, tr( "About Seg3D 2.0" ), 
+      tr( "<h3>Seg3D 2.0</h3><p>Seg3D 2.0 is much awesomer than the old clunky Seg3D 1.0.</p>"
+        "<p>Seg3D is a free volume segmentation and processing tool developed by Numira "
+          "Biosciences in conjunction with the NIH Center for Integrative Biomedical "
+          "Computing at the University of Utah Scientific Computing and Imaging (SCI) "
+          "Institute. Seg3D combines a flexible manual segmentation interface with powerful "
+          "higher-dimensional image processing and segmentation algorithms from the Insight "
+          "Toolkit. Users can explore and label image volumes using volume rendering and "
+          "orthogonal slice view windows.</p>") );
+  }
   
 void AppMenu::new_project_wizard()
 {

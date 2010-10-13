@@ -684,8 +684,6 @@ void LayerWidget::set_group_menu_status( bool status )
 
 void LayerWidget::set_brightness_contrast_to_default()
 {
-  DataLayer* data_layer = dynamic_cast< DataLayer* >( this->private_->layer_.get() );
-  
   // These are hard coded because we have no way of retreiving the default values
   // We can set the sliderspinners directly because they will emit the proper signals
   this->private_->ui_.brightness_adjuster_->setCurrentValue( 50.0 );

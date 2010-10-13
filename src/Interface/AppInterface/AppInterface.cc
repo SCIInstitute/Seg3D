@@ -81,6 +81,9 @@ AppInterface::AppInterface()
   this->controller_interface_ = new AppController( this );
   this->controller_interface_->hide();
   
+  this->history_widget_ = new MessageHistoryWidget( this );
+  this->history_widget_->hide();
+  
   this->splash_interface_ = new AppSplash( this );
 
   // Define the main window viewer canvas
@@ -147,6 +150,9 @@ AppInterface::AppInterface()
       qpointer_type( this ), _1, _2 ) ) ); 
   }
 
+  
+  this->set_full_screen( PreferencesManager::Instance()->full_screen_on_startup_state_->get() );
+  
   this->center_seg3d_gui_on_screen( this );
   this->show_window( "splash" );
   
@@ -208,6 +214,12 @@ void AppInterface::closeEvent( QCloseEvent* event )
   {
     this->splash_interface_->close();
     this->splash_interface_->deleteLater();
+  }
+  
+  if( this->history_widget_ )
+  {
+    this->history_widget_->close();
+    this->history_widget_->deleteLater();
   }
   
   if( this->history_dock_window_ )
@@ -278,6 +290,7 @@ void AppInterface::add_windowids()
   InterfaceManager::Instance()->add_windowid( "layermanager" );
   InterfaceManager::Instance()->add_windowid( "tools" );
   InterfaceManager::Instance()->add_windowid( "measurement" );
+  InterfaceManager::Instance()->add_windowid( "history_widget" );
 }
 
 void AppInterface::show_window( const std::string& windowid )
@@ -295,6 +308,8 @@ void AppInterface::show_window( const std::string& windowid )
       this->controller_interface_->show();
       this->controller_interface_->raise();
     }
+    QRect rect = QApplication::desktop()->availableGeometry( this->controller_interface_ );
+    this->controller_interface_->move(rect.center() - this->controller_interface_->rect().center());
   }
   else if( lower_windowid == "preferences" )
   {
@@ -308,6 +323,8 @@ void AppInterface::show_window( const std::string& windowid )
       this->preferences_interface_->show();
       this->preferences_interface_->raise();
     }
+    QRect rect = QApplication::desktop()->availableGeometry( this->preferences_interface_ );
+    this->preferences_interface_->move(rect.center() - this->preferences_interface_->rect().center());
   }
   
   else if( lower_windowid == "splash" )
@@ -322,9 +339,24 @@ void AppInterface::show_window( const std::string& windowid )
       this->splash_interface_->show();
       this->splash_interface_->raise();
     }
-    
     QRect rect = QApplication::desktop()->availableGeometry( this->splash_interface_ );
     this->splash_interface_->move(rect.center() - this->splash_interface_->rect().center());
+  }
+  
+  else if( lower_windowid == "history_widget" )
+  {
+    if( this->history_widget_.isNull() )
+    {
+      this->history_widget_ = new MessageHistoryWidget( this );
+      this->history_widget_->show();
+    }
+    else
+    {
+      this->history_widget_->show();
+      this->history_widget_->raise();
+    }
+    QRect rect = QApplication::desktop()->availableGeometry( this->history_widget_ );
+    this->history_widget_->move(rect.center() - this->history_widget_->rect().center());
   }
   
   else if( lower_windowid == "project" )
@@ -422,6 +454,10 @@ void AppInterface::close_window( const std::string& windowid )
     {
       this->splash_interface_->close();
     }
+  }
+  else if( lower_windowid == "history_widget" )
+  {
+    if( !( this->history_widget_.isNull() ) ) this->history_widget_->close();
   }
   else if( lower_windowid == "project" )
   {

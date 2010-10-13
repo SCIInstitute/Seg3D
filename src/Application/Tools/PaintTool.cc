@@ -205,7 +205,7 @@ void PaintToolPrivate::build_brush_mask()
   memset( &this->brush_mask_[ 0 ], 0, sizeof( unsigned char ) * this->brush_mask_.size() );
   BresenhamCircle( this->brush_mask_, this->radius_ );
   Core::FloodFill( &this->brush_mask_[ 0 ], brush_size, brush_size, 
-    this->radius_, this->radius_, unsigned char( 1 ) );
+    this->radius_, this->radius_, ( unsigned char )( 1 ) );
 }
 
 void PaintToolPrivate::initialize()

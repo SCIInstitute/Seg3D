@@ -51,11 +51,11 @@ ToolsDockWidget::ToolsDockWidget( QWidget *parent ) :
 {
   // Update the title and where this window can be docked
   setAllowedAreas( Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea );
-  setWindowTitle( "Tools/Plugins" );
+  setWindowTitle( "Tools/Filters" );
 
   QSizePolicy sizePolicy( QSizePolicy::Fixed, QSizePolicy::Preferred );
-  sizePolicy.setHorizontalStretch(0);
-  sizePolicy.setVerticalStretch(0);
+  sizePolicy.setHorizontalStretch( 0 );
+  sizePolicy.setVerticalStretch( 0 );
   setSizePolicy( sizePolicy );
   setMinimumSize( QSize( 285, 300 ) );
     //setMaximumSize( QSize( 524287, 524287 ) );

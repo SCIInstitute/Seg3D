@@ -36,22 +36,19 @@
 #include <string>
 
 // Boost includes
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/thread.hpp>
 #include <boost/shared_ptr.hpp>
+
+// Core includes
+#include <Core/Utils/ConnectionHandler.h>
 
 namespace Seg3D
 {
 
 class MessageHistoryWidgetPrivate;
 
-class MessageHistoryWidget : public QDialog
+class MessageHistoryWidget : public QDialog, private Core::ConnectionHandler
 {
 Q_OBJECT
-
-  
-Q_SIGNALS:
-  void hidden();
   
 public:
   MessageHistoryWidget( QWidget *parent = 0 );
@@ -59,9 +56,11 @@ public:
 
 private:
   boost::shared_ptr< MessageHistoryWidgetPrivate > private_;
-  
-public:
-  void add_history_item(const QString &message, const QColor &color);
+
+private:
+  static void AddMessage( QPointer< MessageHistoryWidget > qpointer, 
+    int msg_type, std::string message );
+  void add_message( int msg_type, std::string message );
   
   
 

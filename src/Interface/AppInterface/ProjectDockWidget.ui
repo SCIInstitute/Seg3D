@@ -261,7 +261,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="sessions_tab_">
        <attribute name="title">
@@ -515,6 +515,9 @@
             <height>75</height>
            </size>
           </property>
+          <property name="focusPolicy">
+           <enum>Qt::StrongFocus</enum>
+          </property>
           <property name="horizontalScrollBarPolicy">
            <enum>Qt::ScrollBarAlwaysOff</enum>
           </property>
@@ -597,8 +600,11 @@
        </property>
        <item>
         <widget class="QPushButton" name="export_project_button_">
+         <property name="toolTip">
+          <string>Select a session you want to export to enable this button.</string>
+         </property>
          <property name="text">
-          <string>Export Project</string>
+          <string>Export Project Session</string>
          </property>
         </widget>
        </item>

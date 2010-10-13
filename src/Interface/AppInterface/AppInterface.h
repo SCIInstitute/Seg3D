@@ -49,6 +49,7 @@
 
 #include <Interface/AppInterface/ViewerInterface.h>
 #include <Interface/AppInterface/HistoryDockWidget.h>
+#include <Interface/AppInterface/MessageHistoryWidget.h>
 #include <Interface/AppInterface/LayerManagerDockWidget.h>
 #include <Interface/AppInterface/MeasurementDockWidget.h>
 #include <Interface/AppInterface/ProgressWidget.h>
@@ -117,6 +118,7 @@ private:
   // Pointers to dialog widgets
   QPointer< AppController > controller_interface_;
   QPointer< AppPreferences > preferences_interface_;
+  QPointer< MessageHistoryWidget > history_widget_;
   QPointer< AppSplash > splash_interface_;
 
   // The dock widgets

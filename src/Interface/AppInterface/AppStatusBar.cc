@@ -44,6 +44,9 @@
 #include <Interface/AppInterface/AppStatusBar.h>
 #include <Interface/AppInterface/StyleSheet.h>
 
+// Application includes
+#include <Application/InterfaceManager/Actions/ActionShowWindow.h>
+
 //UI Includes
 #include "ui_StatusBar.h"
 
@@ -73,9 +76,6 @@ AppStatusBar::AppStatusBar( QMainWindow* parent ) :
   
   this->private_->ui_.setupUi( this->statusbar_widget_ );
   this->private_->ui_.actives_->hide();
-  
-  
-  this->history_widget_ = new MessageHistoryWidget( parent );
 
   this->statusbar_->setContentsMargins( 0, 0, 0, 0 );
 
@@ -86,10 +86,10 @@ AppStatusBar::AppStatusBar( QMainWindow* parent ) :
   connect( this->private_->ui_.swap_visibility_button_, 
     SIGNAL( clicked() ), this, SLOT( swap_bars() ) );
     
-  connect( this->private_->ui_.info_button_, 
-    SIGNAL( clicked() ), this, SLOT( activate_history() ) );
-  connect( this->history_widget_, 
-    SIGNAL( destroyed() ), this, SLOT( fix_icon_status() ) );
+  QtUtils::QtBridge::Connect( this->private_->ui_.info_button_, boost::bind( &ActionShowWindow::Dispatch, 
+    Core::Interface::GetWidgetActionContext(), std::string( "history_widget" ) ) );
+  
+  
   connect( this->private_->ui_.world_button_, 
     SIGNAL( clicked( bool ) ), this, SLOT( set_coordinates_mode( bool ) ) );
 
@@ -107,7 +107,6 @@ AppStatusBar::AppStatusBar( QMainWindow* parent ) :
 AppStatusBar::~AppStatusBar()
 {
   this->disconnect_all();
-  this->history_widget_->close();
 }
 
 
@@ -152,14 +151,16 @@ void AppStatusBar::set_status_report_label( std::string& status )
 
 void AppStatusBar::activate_history()
 {
-  if( !this->history_widget_->isVisible() )
-  {
-    this->history_widget_->show();
-  }
-  else
-  {
-    this->history_widget_->hide();
-  }
+//  if( !this->history_widget_->isVisible() )
+//  {
+//    this->history_widget_->show();
+//  }
+//  else
+//  {
+//    this->history_widget_->hide();
+//  }
+  
+  
 }
   
 void AppStatusBar::fix_icon_status()
@@ -279,7 +280,7 @@ void AppStatusBar::set_message( int msg_type, std::string message )
   }
 
   this->private_->ui_.status_report_label_->setText( QString::fromStdString( message ) );
-  this->history_widget_->add_history_item( QString::fromStdString( message ), color_ );
+  //this->history_widget_->add_history_item( QString::fromStdString( message ), color_ );
 }
 
 void AppStatusBar::SetMessage( QPointer< AppStatusBar > qpointer, 

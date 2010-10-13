@@ -31,6 +31,7 @@
 #include <Core/Utils/Log.h>
 
 #include <Interface/AppInterface/HistoryDockWidget.h>
+
 #include "ui_HistoryDockWidget.h"
 
 namespace Seg3D
@@ -50,12 +51,13 @@ HistoryDockWidget::HistoryDockWidget( QWidget *parent ) :
 {
   // Set up the private internals of the LayerManagerInterface class
   this->private_->ui_.setupUi( this );
-
 }
 
 HistoryDockWidget::~HistoryDockWidget()
 {
 
 }
+  
+
 
 } // end namespace Seg3D

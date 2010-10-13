@@ -75,6 +75,9 @@ private:
   void create_view_menu( QMenu* menu );
   void create_window_menu( QMenu* menu );
   void create_tool_menus( QMenuBar* menubar );
+  void create_help_menu( QMenu* menu );
+  
+  
   
   QMenu* file_menu_recents_;
   QAction* export_segmentation_qaction_;
@@ -90,6 +93,7 @@ private Q_SLOTS:
   void new_project_wizard();
   void open_project_from_file();
   void open_project_folder();
+  void about();
 };
 
 
