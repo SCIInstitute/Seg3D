@@ -25,9 +25,14 @@
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
  */
+ 
+// Core Includes
+#include <Core/Interface/Interface.h>
+#include <Core/State/Actions/ActionSet.h> 
 
 // Application includes
 #include <Application/PreferencesManager/PreferencesManager.h>
+#include <Application/PreferencesManager/Actions/ActionSavePreferences.h>
 #include <Application/Tool/ToolFactory.h>
 
 // QtUtils includes
@@ -76,7 +81,7 @@ AppPreferences::AppPreferences( QWidget *parent ) :
 
   // connect the apply button to the save defaults function
   connect( this->private_->ui_.apply_button_, SIGNAL( clicked() ), 
-    this, SLOT( save_defaults() ) );
+    this, SLOT( save_settings() ) );
 
 
 }
@@ -94,7 +99,10 @@ void AppPreferences::change_project_directory()
     if ( path.isNull() == false )
     {
         project_directory_.setPath( path );
-    this->private_->ui_.path_->setText( project_directory_.absolutePath() );
+    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
+      PreferencesManager::Instance()->project_path_state_, 
+      project_directory_.absolutePath().toStdString() );
+    //this->private_->ui_.path_->setText( project_directory_.absolutePath() );
   }
 }
 
@@ -298,10 +306,12 @@ void AppPreferences::hide_the_others( int active )
   this->active_picker_->show();
 }
 
-void AppPreferences::save_defaults()
+void AppPreferences::save_settings()
 {
-  PreferencesManager::Instance()->save_state();
-  ToolFactory::Instance()->save_settings();
+  ActionSavePreferences::Dispatch( Core::Interface::GetWidgetActionContext() );
+
+//  PreferencesManager::Instance()->save_state();
+//  ToolFactory::Instance()->save_settings();
 }
   
 } // end namespace Seg3D

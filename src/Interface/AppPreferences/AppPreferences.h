@@ -87,7 +87,7 @@ private Q_SLOTS:
   // SAVE_DEFAULTS:
   // this function will cause Seg3D2 to save all the user preferences to a file which will be 
   // loaded next time the program starts
-  void save_defaults();
+  void save_settings();
   
 private:
   boost::shared_ptr< AppPreferencesPrivate > private_;

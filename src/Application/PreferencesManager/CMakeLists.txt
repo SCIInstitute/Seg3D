@@ -37,6 +37,8 @@ SET(APPLICATION_PREFERENCESMANAGER_SRCS
   )
 
 SET(APPLICATION_PREFERENCESMANAGER_ACTIONS_SRCS
+  Actions/ActionSavePreferences.h
+  Actions/ActionSavePreferences.cc
   )
 
 

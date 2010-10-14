@@ -114,12 +114,15 @@ border: 1px solid gray;
               </widget>
              </item>
              <item>
-              <widget class="QLineEdit" name="path_">
+              <widget class="QLabel" name="path_">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
                <property name="text">
                 <string>/users/wchristiansen/Seg3d2-Projects</string>
-               </property>
-               <property name="readOnly">
-                <bool>true</bool>
                </property>
               </widget>
              </item>
