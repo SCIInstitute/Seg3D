@@ -1318,7 +1318,7 @@ border: 1px solid gray;
          </size>
         </property>
         <property name="text">
-         <string>OK</string>
+         <string>Apply</string>
         </property>
        </widget>
       </item>

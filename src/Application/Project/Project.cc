@@ -83,13 +83,13 @@ void Project::set_changed( Core::ActionHandle action, Core::ActionResultHandle r
 {
   if ( action->get_type() !=  "SaveSession")
   {
-    if (   changed_ == true ) return;
+    if ( this->changed_ == true ) return;
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-    changed_ = true;
+    this->changed_ = true;
     return;
   }
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-  changed_ = false;
+  this->changed_ = false;
 }
 
 bool Project::check_changed()

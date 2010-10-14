@@ -83,40 +83,30 @@ AppController::AppController( QWidget* parent ) :
   setWindowTitle( QString( "Seg3D Controller" ) );
   qpointer_type controller( this );
 
-  // Step 3: Get short cuts to all the widgets
-  tw_controller_ = private_->ui_.TW_CONTROLLER;
-  tb_action_ = private_->ui_.TB_ACTION;
-  le_edit_action_ = private_->ui_.LE_EDIT_ACTION;
-  l_action_status_ = private_->ui_.L_ACTION_STATUS;
-  l_action_usage_ = private_->ui_.L_ACTION_USAGE;
-  tv_action_history_ = private_->ui_.TV_ACTION_HISTORY;
-  tv_state_engine_ = private_->ui_.TV_STATE_ENGINE;
-  tv_log_history_ = private_->ui_.TV_LOG_HISTORY;
-
   // Step 4: Fix the widget properties
-  l_action_status_->setText( "" );
-  l_action_usage_->setText( "" );
+  this->private_->ui_.L_ACTION_STATUS->setText( "" );
+  this->private_->ui_.L_ACTION_USAGE->setText( "" );
 
   // Set up the model view widgets
-  tv_action_history_->setModel( private_->action_history_model_ );
-  tv_action_history_->setColumnWidth( 0, 600 );
-  tv_action_history_->setColumnWidth( 1, 200 );
-  tv_action_history_->resizeRowsToContents();
+  this->private_->ui_.TV_ACTION_HISTORY->setModel( private_->action_history_model_ );
+  this->private_->ui_.TV_ACTION_HISTORY->setColumnWidth( 0, 600 );
+  this->private_->ui_.TV_ACTION_HISTORY->setColumnWidth( 1, 200 );
+  this->private_->ui_.TV_ACTION_HISTORY->resizeRowsToContents();
 
-  tv_state_engine_->setModel(private_->state_engine_model_ );
-  tv_state_engine_->setColumnWidth( 0, 500 );
-  tv_state_engine_->setColumnWidth( 1, 500 );
-  tv_state_engine_->resizeRowsToContents();
+  this->private_->ui_.TV_STATE_ENGINE->setModel(private_->state_engine_model_ );
+  this->private_->ui_.TV_STATE_ENGINE->setColumnWidth( 0, 500 );
+  this->private_->ui_.TV_STATE_ENGINE->setColumnWidth( 1, 500 );
+  this->private_->ui_.TV_STATE_ENGINE->resizeRowsToContents();
 
-  tv_log_history_->setModel( private_->log_history_model_ );
-  tv_log_history_->setColumnWidth( 0, 1000 );
-  tv_log_history_->resizeRowsToContents();
+  this->private_->ui_.TV_LOG_HISTORY->setModel( private_->log_history_model_ );
+  this->private_->ui_.TV_LOG_HISTORY->setColumnWidth( 0, 1000 );
+  this->private_->ui_.TV_LOG_HISTORY->resizeRowsToContents();
 
   // Get the list of actions
   std::vector<std::string> action_list;
   Core::ActionFactory::Instance()->action_list( action_list );
 
-  QMenu* action_menu = new QMenu( tb_action_ );
+  QMenu* action_menu = new QMenu( this->private_->ui_.TB_ACTION );
 
   std::vector<std::string>::iterator it = action_list.begin();
   std::vector<std::string>::iterator it_end = action_list.end();
@@ -129,7 +119,7 @@ AppController::AppController( QWidget* parent ) :
     ++it;
   }
 
-  tb_action_->setMenu( action_menu );
+  this->private_->ui_.TB_ACTION->setMenu( action_menu );
 
   // Step 5: Link the ActionHistory/StateEngine/EventLog to this widget and have it update 
   // automatically using the signal/slot system
@@ -145,7 +135,7 @@ AppController::AppController( QWidget* parent ) :
 
   // Step 6: Qt connections
   // Connect the edit box to the slot that posts the action
-  this->connect( le_edit_action_, SIGNAL( returnPressed() ), this, SLOT( post_action() ) );
+  this->connect( this->private_->ui_.LE_EDIT_ACTION, SIGNAL( returnPressed() ), this, SLOT( post_action() ) );
 }
 
 AppController::~AppController()
@@ -164,10 +154,10 @@ void AppController::closeEvent( QCloseEvent* event )
 void AppController::post_action()
 {
   // Clear usage string
-  l_action_usage_->setText( "" );
+  this->private_->ui_.L_ACTION_USAGE->setText( "" );
 
   // Post the action string
-  std::string action_string = le_edit_action_->text().toStdString();
+  std::string action_string = this->private_->ui_.LE_EDIT_ACTION->text().toStdString();
   std::string action_error;
   std::string action_usage;
 
@@ -186,12 +176,12 @@ void AppController::post_action()
 
 void AppController::post_action_message( std::string message )
 {
-  l_action_status_->setText( QString::fromStdString( message ) );
+  this->private_->ui_.L_ACTION_STATUS->setText( QString::fromStdString( message ) );
 }
 
 void AppController::post_action_usage( std::string usage )
 {
-  l_action_usage_->setText( QString::fromStdString( usage ) );
+  this->private_->ui_.L_ACTION_USAGE->setText( QString::fromStdString( usage ) );
 }
 
 void AppController::UpdateActionHistory( qpointer_type controller )
@@ -209,7 +199,7 @@ void AppController::UpdateActionHistory( qpointer_type controller )
   {
     controller->private_->action_history_model_->update();
     // Auto scroll to last action in the list
-    QScrollBar* scrollbar = controller->tv_action_history_->verticalScrollBar();
+    QScrollBar* scrollbar = controller->private_->ui_.TV_ACTION_HISTORY->verticalScrollBar();
     if ( scrollbar ) scrollbar->setValue( scrollbar->maximum() );
   }
 }
@@ -250,7 +240,7 @@ void AppController::UpdateLogHistory( qpointer_type controller, bool relay, int 
     controller->private_->log_history_model_->add_log_entry( message_type, message );
 
     // Auto scroll to last event in the list
-    QScrollBar* scrollbar = controller->tv_log_history_->verticalScrollBar();
+    QScrollBar* scrollbar = controller->private_->ui_.TV_LOG_HISTORY->verticalScrollBar();
     if ( scrollbar ) scrollbar->setValue( scrollbar->maximum() );
   }
 }
@@ -293,7 +283,7 @@ void AppController::SetActionType( qpointer_type controller, std::string action_
   // exist anymore
   if ( controller.data() )
   {
-    controller->le_edit_action_->setText( QString::fromStdString( action_type ) );
+    controller->private_->ui_.LE_EDIT_ACTION->setText( QString::fromStdString( action_type ) );
   }
 }
 

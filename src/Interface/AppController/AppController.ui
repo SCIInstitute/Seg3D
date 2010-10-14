@@ -77,11 +77,6 @@
           </property>
           <item>
            <widget class="QTableView" name="TV_ACTION_HISTORY">
-            <property name="font">
-             <font>
-              <pointsize>10</pointsize>
-             </font>
-            </property>
             <property name="frameShape">
              <enum>QFrame::StyledPanel</enum>
             </property>
@@ -294,6 +289,9 @@
          <attribute name="verticalHeaderVisible">
           <bool>false</bool>
          </attribute>
+         <attribute name="verticalHeaderMinimumSectionSize">
+          <number>12</number>
+         </attribute>
         </widget>
        </item>
       </layout>
@@ -308,11 +306,6 @@
        </property>
        <item>
         <widget class="QTableView" name="TV_LOG_HISTORY">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
          <property name="frameShadow">
           <enum>QFrame::Sunken</enum>
          </property>
@@ -336,6 +329,9 @@
          </attribute>
          <attribute name="verticalHeaderHighlightSections">
           <bool>false</bool>
+         </attribute>
+         <attribute name="verticalHeaderMinimumSectionSize">
+          <number>12</number>
          </attribute>
         </widget>
        </item>

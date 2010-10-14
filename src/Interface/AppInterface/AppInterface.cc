@@ -275,7 +275,11 @@ void AppInterface::center_seg3d_gui_on_screen( QWidget *widget )
 void AppInterface::set_full_screen( bool full_screen )
 {
   if( full_screen ) showFullScreen();
-  else showNormal();
+  else
+  {
+    showNormal();
+    this->center_seg3d_gui_on_screen( this );
+  }
 }
 
 void AppInterface::set_project_name( std::string project_name )

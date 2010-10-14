@@ -118,7 +118,7 @@ private:
   // INITIALIZE_DEFAULT_COLORS:
   // This function is called by the constructor to initialize a vector of default color values
   bool initialize_default_colors();
-
+  
   
 private:
   std::vector< Core::Color > default_colors_;

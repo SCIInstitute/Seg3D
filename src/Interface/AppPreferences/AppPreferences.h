@@ -69,6 +69,7 @@ private:
   // This function will initialize all the preferences contained within the interface control tab
   void setup_interface_controls_prefs();
   
+  
 private Q_SLOTS:
   // HIDE_THE_OTHERS
   // This function will hide the inactive colorpickers
@@ -92,7 +93,7 @@ private:
   boost::shared_ptr< AppPreferencesPrivate > private_;
   ColorPickerWidget* active_picker_;
   QDir project_directory_;
-
+  
 };
 
 }
