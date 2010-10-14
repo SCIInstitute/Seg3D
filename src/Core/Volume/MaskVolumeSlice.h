@@ -87,11 +87,11 @@ public:
 
   // COPY_SLICE_DATA:
   // Copy the mask data of current slice into the buffer.
-  void copy_slice_data( std::vector< unsigned char >& buffer ) const;
+  void copy_slice_data( std::vector< unsigned char >& buffer, bool invert = false ) const;
 
   // COPY_SLICE_DATA:
   // Copy the mask data of current slice into the buffer.
-  void copy_slice_data( unsigned char* buffer ) const;
+  void copy_slice_data( unsigned char* buffer, bool invert = false ) const;
 
   // SET_SLICE_DATA:
   // Replace the data of the slice with the content of the buffer.

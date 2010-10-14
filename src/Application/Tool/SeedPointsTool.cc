@@ -155,7 +155,8 @@ bool SeedPointsTool::handle_mouse_press( ViewerHandle viewer,
   }
 
   if ( modifiers == Core::KeyModifier::NO_MODIFIER_E &&
-    button == Core::MouseButton::LEFT_BUTTON_E )
+    ( button == Core::MouseButton::LEFT_BUTTON_E ||
+    button == Core::MouseButton::MID_BUTTON_E ) )
   {
     int u, v;
     target_slice->world_to_index( world_x, world_y, u, v );
@@ -278,5 +279,18 @@ void SeedPointsTool::handle_seed_points_changed()
 {
   ViewerManager::Instance()->update_2d_viewers_overlay();
 }
+
+bool SeedPointsTool::handle_key_press( ViewerHandle viewer, int key, int modifiers )
+{
+  if ( key == Core::Key::KEY_C_E )
+  {
+    Core::ActionClear::Dispatch( Core::Interface::GetKeyboardActionContext(),
+      this->seed_points_state_ );
+    return true;
+  }
+  
+  return SingleTargetTool::handle_key_press( viewer, key, modifiers );
+}
+
 
 } // end namespace Seg3D

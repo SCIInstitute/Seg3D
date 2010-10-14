@@ -65,6 +65,8 @@ void FloodFill( T* buffer, const int width, const int height,
     int y0 = seed.second;
     while ( x0 >= 0 && buffer[ y0 * width + x0 ] != value ) --x0;
     ++x0;
+    // in case the seed point doesn't meet the criteria for filling
+    x0 = std::min( x0, seed.first );  
 
     while ( x0 < width && buffer[ y0 * width + x0 ] != value )
     {
@@ -90,6 +92,68 @@ void FloodFill( T* buffer, const int width, const int height,
       }
       else if ( span_up && y0 < height - 1 &&
         buffer[ ( y0 + 1 ) * width + x0 ] == value )
+      {
+        span_up = false;
+      }
+
+      x0++;
+    }
+  }
+}
+
+// FLOODFILL:
+// Flood fill the buffer with the given value, starting from (x, y). The algorithm stops
+// when it gets to the boundary of the buffer, or when it arrives at a point where the
+// value equals to the given value, or when the condition evaluates to false.
+template< class T, class FUNCTOR >
+void FloodFill( T* buffer, const int width, const int height, 
+         const int x, const int y, const T value, FUNCTOR condition )
+{
+  std::stack< std::pair< int, int > > seed_points;
+  seed_points.push( std::make_pair( x, y ) );
+
+  while ( !seed_points.empty() )
+  {
+    std::pair< int, int > seed = seed_points.top();
+    seed_points.pop();
+
+    bool span_up = false;
+    bool span_down = false;
+    int x0 = seed.first;
+    int y0 = seed.second;
+    while ( x0 >= 0 && buffer[ y0 * width + x0 ] != value && condition( x0, y0 ) ) --x0;
+    ++x0;
+    // in case the seed point doesn't meet the criteria for filling
+    x0 = std::min( x0, seed.first );
+
+    while ( x0 < width && buffer[ y0 * width + x0 ] != value && condition( x0, y0 ) )
+    {
+      SetPixel( buffer, width, x0, y0, value );
+
+      if ( !span_down && y0 > 0 && 
+        buffer[ ( y0 - 1 ) * width + x0 ] != value &&
+        condition( x0, y0 -1 ) )
+      {
+        seed_points.push( std::make_pair( x0, y0 - 1 ) );
+        span_down = true;
+      }
+      else if ( span_down && y0 > 0 &&
+        ( buffer[ ( y0 - 1 ) * width + x0 ] == value ||
+        !condition( x0, y0 -1 ) ) )
+      {
+        span_down = false;
+      }
+
+      if ( !span_up && y0 < height - 1 &&
+        buffer[ ( y0 + 1 ) * width + x0 ] != value &&
+        condition( x0, y0 + 1 ) )
+      {
+        seed_points.push( std::make_pair( x0, y0 + 1 ) );
+        span_up = true;
+      }
+      else if ( span_up && y0 < height - 1 &&
+        ( buffer[ ( y0 + 1 ) * width + x0 ] == value ||
+        !condition( x0, y0 +1 ) ) )
       {
         span_up = false;
       }

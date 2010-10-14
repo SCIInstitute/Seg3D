@@ -81,10 +81,15 @@ bool PolylineToolInterface::build_widget( QFrame* frame )
     &PolylineTool::erase, tool, Core::Interface::GetWidgetActionContext() ) );
   QtUtils::QtBridge::Connect( this->private_->ui_.clear_button_, boost::bind(
     &PolylineTool::reset, tool, Core::Interface::GetWidgetActionContext() ) );
-  QtUtils::QtBridge::Enable( this->private_->ui_.fill_button_, tool->valid_target_state_ );
-  QtUtils::QtBridge::Enable( this->private_->ui_.erase_button_, tool->valid_target_state_ );
   QtUtils::QtBridge::Enable( this->private_->ui_.target_mask_, 
     tool->use_active_layer_state_, true );
+
+//  std::vector< Core::StateBaseHandle > related_states;
+//  related_states.push_back( tool->valid_target_state_ );
+//  related_states.push_back( ViewerManager::Instance()->active_viewer_state_ );
+//  boost::function< bool () > condition = 
+  QtUtils::QtBridge::Enable( this->private_->ui_.fill_button_, tool->valid_target_state_ );
+  QtUtils::QtBridge::Enable( this->private_->ui_.erase_button_, tool->valid_target_state_ );
 
   //Send a message to the log that we have finised with building the Polyline Tool Interface
   CORE_LOG_MESSAGE("Finished building a Polyline Tool Interface");

@@ -34,7 +34,7 @@
 #include <Core/Volume/MaskVolumeSlice.h>
 #include <Core/Volume/DataVolumeSlice.h>
 
-#include <Application/Tool/Tool.h>
+#include <Application/Tool/SeedPointsTool.h>
 
 namespace Seg3D
 {
@@ -67,14 +67,10 @@ public:
   bool erase_;
 
   // The following variables are set by ActionPaint when it's executed.
-
   bool inclusive_;
-  //std::vector< unsigned char > mask_constraint1_mask_;
-  //std::vector< unsigned char > mask_constraint2_mask_;
-  //std::vector< unsigned char > data_constraint_mask_;
 };
 
-class PaintTool : public Tool, public boost::enable_shared_from_this< PaintTool >
+class PaintTool : public SeedPointsTool, public boost::enable_shared_from_this< PaintTool >
 {
 
 SEG3D_TOOL
@@ -152,12 +148,10 @@ public:
   // -- state --
 public:
 
-  Core::StateLabeledOptionHandle target_layer_state_;
   Core::StateLabeledOptionHandle data_constraint_layer_state_;
   Core::StateLabeledOptionHandle mask_constraint1_layer_state_;
   Core::StateLabeledOptionHandle mask_constraint2_layer_state_;
 
-  Core::StateBoolHandle use_active_layer_state_;
   Core::StateBoolHandle negative_data_constraint_state_;
   Core::StateBoolHandle negative_mask_constraint1_state_;
   Core::StateBoolHandle negative_mask_constraint2_state_;

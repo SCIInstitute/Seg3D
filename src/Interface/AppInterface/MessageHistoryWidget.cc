@@ -69,6 +69,7 @@ MessageHistoryWidget::MessageHistoryWidget( QWidget *parent ) :
 
 MessageHistoryWidget::~MessageHistoryWidget()
 {
+  this->disconnect_all();
 }
 
 void MessageHistoryWidget::AddMessage( QPointer< MessageHistoryWidget > qpointer, int msg_type, std::string message )

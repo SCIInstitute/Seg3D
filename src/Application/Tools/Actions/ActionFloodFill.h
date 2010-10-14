@@ -37,16 +37,43 @@ namespace Seg3D
 class ActionFloodFillPrivate;
 typedef boost::shared_ptr< ActionFloodFillPrivate > ActionFloodFillPrivateHandle;
 
+class FloodFillInfo
+{
+public:
+  std::string target_layer_id_;
+  int slice_type_;
+  size_t slice_number_;
+  std::vector< Core::Point > seeds_;
+  std::string data_constraint_layer_id_;
+  double min_val_;
+  double max_val_;
+  bool negative_data_constraint_;
+  std::string mask_constraint1_layer_id_;
+  bool negative_mask_constraint1_;
+  std::string mask_constraint2_layer_id_;
+  bool negative_mask_constraint2_;
+  bool erase_;
+};
+
 class ActionFloodFill : public ActionLayer
 {
 
 CORE_ACTION
 ( 
   CORE_ACTION_TYPE( "Floodfill", "Flood fill the content of a mask slice "
-    "starting from seed points at the four corners.")
+    "starting from seed points." )
   CORE_ACTION_ARGUMENT( "target", "The ID of the target mask layer." )
   CORE_ACTION_ARGUMENT( "slice_type", "The slicing direction." )
   CORE_ACTION_ARGUMENT( "slice_number", "The slice number to be filled." )
+  CORE_ACTION_ARGUMENT( "seed_points", "The world coordinates of seed points." )
+  CORE_ACTION_KEY( "data_constraint", "<none>", "The ID of data constraint layer." )
+  CORE_ACTION_KEY( "min_value", "0", "The minimum data constraint value." )
+  CORE_ACTION_KEY( "max_value", "0", "The maximum data constraint value." )
+  CORE_ACTION_KEY( "negative_data_constraint", "false", "Whether to negate the data constraint." )
+  CORE_ACTION_KEY( "mask_constraint1", "<none>", "The ID of first mask constraint layer." )
+  CORE_ACTION_KEY( "negative_mask_constraint1", "false", "Whether to negate the first mask constraint." )
+  CORE_ACTION_KEY( "mask_constraint2", "<none>", "The ID of second mask constraint layer." )
+  CORE_ACTION_KEY( "negative_mask_constraint2", "false", "Whether to negate the second mask constraint." )
   CORE_ACTION_KEY( "erase", "false", "Whether to erase instead of fill." )
 )
 
@@ -63,8 +90,7 @@ private:
 public:
   // DISPATCH:
   // Dispatch the action.
-  static void Dispatch( Core::ActionContextHandle context, const std::string& layer_id, 
-    int slice_type, size_t slice_number, bool erase );
+  static void Dispatch( Core::ActionContextHandle context, const FloodFillInfo& params );
 };
 
 } // end namespace Seg3D

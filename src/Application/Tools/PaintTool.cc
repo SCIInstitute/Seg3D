@@ -659,13 +659,13 @@ void PaintToolPrivate::handle_layer_name_changed( std::string layer_id )
 void PaintToolPrivate::flood_fill( Core::ActionContextHandle context, 
                   bool erase, ViewerHandle viewer )
 {
-  std::string layer_id;
-  int slice_type;
-  size_t slice_number;
+  FloodFillInfo ff_params;
+  ff_params.erase_ = erase;
+  
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-    layer_id = this->paint_tool_->target_layer_state_->get();
-    if ( layer_id == Tool::NONE_OPTION_C )
+    ff_params.target_layer_id_ = this->paint_tool_->target_layer_state_->get();
+    if ( ff_params.target_layer_id_ == Tool::NONE_OPTION_C )
     {
       return;
     }
@@ -680,25 +680,34 @@ void PaintToolPrivate::flood_fill( Core::ActionContextHandle context,
       context->report_error( "Can't flood fill in the volume view." );
       return;
     }
-    Core::VolumeSliceHandle vol_slice = viewer->get_volume_slice( layer_id );
+    Core::VolumeSliceHandle vol_slice = viewer->get_volume_slice( ff_params.target_layer_id_ );
     if ( vol_slice->out_of_boundary() )
     {
       context->report_error( "The mask layer is out of boundary in the active viewer." );
       return;
     }
 
-    LayerHandle layer = LayerManager::Instance()->get_layer_by_id( layer_id );
+    LayerHandle layer = LayerManager::Instance()->get_layer_by_id( ff_params.target_layer_id_ );
     if ( !layer->is_visible( viewer->get_viewer_id() ) )
     {
       context->report_error( "Layer not visible in the active viewer" );
       return;
     }
 
-    slice_type = vol_slice->get_slice_type();
-    slice_number = vol_slice->get_slice_number();
+    ff_params.slice_type_ = vol_slice->get_slice_type();
+    ff_params.slice_number_ = vol_slice->get_slice_number();
+    ff_params.seeds_ = this->paint_tool_->seed_points_state_->get();
+    ff_params.data_constraint_layer_id_ = this->paint_tool_->data_constraint_layer_state_->get();
+    ff_params.min_val_ = this->paint_tool_->lower_threshold_state_->get();
+    ff_params.max_val_ = this->paint_tool_->upper_threshold_state_->get();
+    ff_params.negative_data_constraint_ = this->paint_tool_->negative_data_constraint_state_->get();
+    ff_params.mask_constraint1_layer_id_ = this->paint_tool_->mask_constraint1_layer_state_->get();
+    ff_params.negative_mask_constraint1_ = this->paint_tool_->negative_mask_constraint1_state_->get();
+    ff_params.mask_constraint2_layer_id_ = this->paint_tool_->mask_constraint2_layer_state_->get();
+    ff_params.negative_mask_constraint2_ = this->paint_tool_->negative_mask_constraint2_state_->get();
   }
 
-  ActionFloodFill::Dispatch( context, layer_id, slice_type, slice_number, erase );
+  ActionFloodFill::Dispatch( context, ff_params );
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -706,7 +715,7 @@ void PaintToolPrivate::flood_fill( Core::ActionContextHandle context,
 //////////////////////////////////////////////////////////////////////////
 
 PaintTool::PaintTool( const std::string& toolid ) :
-  Tool( toolid ),
+  SeedPointsTool( Core::VolumeType::MASK_E, toolid ),
   private_( new PaintToolPrivate )
 {
   this->private_->paint_tool_ = this;
@@ -719,8 +728,6 @@ PaintTool::PaintTool( const std::string& toolid ) :
   std::vector< LayerIDNamePair > empty_names( 1, 
     std::make_pair( Tool::NONE_OPTION_C, Tool::NONE_OPTION_C ) );
 
-  this->add_state( "target", this->target_layer_state_, 
-    Tool::NONE_OPTION_C, empty_names );
   this->add_state( "data_constraint", this->data_constraint_layer_state_, 
     Tool::NONE_OPTION_C, empty_names );
   this->add_state( "mask_constraint1", this->mask_constraint1_layer_state_,
@@ -728,7 +735,6 @@ PaintTool::PaintTool( const std::string& toolid ) :
   this->add_state( "mask_constraint2", this->mask_constraint2_layer_state_,
     Tool::NONE_OPTION_C, empty_names );
 
-  this->add_state( "use_active_layer", this->use_active_layer_state_, true );
   this->add_state( "negative_data_constraint", this->negative_data_constraint_state_, false );
   this->add_state( "negative_mask_constraint1", this->negative_mask_constraint1_state_, false );
   this->add_state( "negative_mask_constraint2", this->negative_mask_constraint2_state_, false );
@@ -788,6 +794,8 @@ PaintTool::~PaintTool()
 
 void PaintTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 {
+  SeedPointsTool::redraw( viewer_id, proj_mat );
+
   ViewerHandle viewer = ViewerManager::Instance()->get_viewer( viewer_id );
   ViewerHandle current_viewer;
   double world_x, world_y;
@@ -1156,10 +1164,12 @@ bool PaintTool::handle_mouse_press( ViewerHandle viewer,
     this->private_->brush_visible_ = this->private_->painting_;
   }
 
-  this->private_->update_same_mode_viewers();
-  bool accepted = this->private_->painting_;
+  if ( this->private_->painting_ )
+  {
+    return true;
+  }
 
-  return accepted;
+  return SeedPointsTool::handle_mouse_press( viewer, mouse_history, button, buttons, modifiers );
 }
 
 bool PaintTool::handle_mouse_release( ViewerHandle viewer,
@@ -1285,7 +1295,7 @@ bool PaintTool::handle_key_press( ViewerHandle viewer, int key, int modifiers )
     return true;
   }
   
-  return false;
+  return SeedPointsTool::handle_key_press( viewer, key, modifiers );
 }
 
 } // end namespace Seg3D

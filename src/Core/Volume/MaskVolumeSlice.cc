@@ -26,6 +26,10 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#include <algorithm>
+
+#include <boost/lambda/lambda.hpp>
+
 #include <Core/Application/Application.h>
 #include <Core/Volume/MaskVolumeSlice.h>
 #include <Core/RenderResources/RenderResources.h>
@@ -69,7 +73,7 @@ MaskVolumeSlice::~MaskVolumeSlice()
   this->disconnect_all();
 }
 
-static void CopyMaskData( const MaskVolumeSlice* slice, unsigned char* buffer )
+static void CopyMaskData( const MaskVolumeSlice* slice, unsigned char* buffer, bool invert = false )
 {
   size_t current_index = slice->to_index( 0, 0 );
 
@@ -93,6 +97,11 @@ static void CopyMaskData( const MaskVolumeSlice* slice, unsigned char* buffer )
       current_index += x_stride;
     }
     row_start += y_stride;
+  }
+
+  if ( invert )
+  {
+    std::for_each( buffer, buffer + nx * ny, boost::lambda::_1 = !boost::lambda::_1 );
   }
 }
 
@@ -300,7 +309,7 @@ void MaskVolumeSlice::clear_mask_at( size_t i, size_t j )
   this->mask_data_block_->clear_mask_at( this->to_index( i, j ) );
 }
 
-void MaskVolumeSlice::copy_slice_data( std::vector< unsigned char >& buffer ) const
+void MaskVolumeSlice::copy_slice_data( std::vector< unsigned char >& buffer, bool invert ) const
 {
   lock_type lock( this->get_mutex() );
 
@@ -308,11 +317,11 @@ void MaskVolumeSlice::copy_slice_data( std::vector< unsigned char >& buffer ) co
   {
     MaskDataBlock::shared_lock_type volume_lock( 
       this->mask_data_block_->get_mutex() );
-    CopyMaskData( this, &buffer[ 0 ] );
+    CopyMaskData( this, &buffer[ 0 ], invert );
   }
 }
 
-void MaskVolumeSlice::copy_slice_data( unsigned char* buffer ) const
+void MaskVolumeSlice::copy_slice_data( unsigned char* buffer, bool invert ) const
 {
   assert( buffer != 0 );
   lock_type lock( this->get_mutex() );
@@ -320,7 +329,7 @@ void MaskVolumeSlice::copy_slice_data( unsigned char* buffer ) const
   {
     MaskDataBlock::shared_lock_type volume_lock( 
       this->mask_data_block_->get_mutex() );
-    CopyMaskData( this, buffer );
+    CopyMaskData( this, buffer, invert );
   }
 }
 

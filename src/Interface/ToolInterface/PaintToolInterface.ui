@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>272</width>
-    <height>510</height>
+    <height>548</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -44,6 +44,9 @@
       <string>Target Layer</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_4">
+      <property name="spacing">
+       <number>4</number>
+      </property>
       <property name="margin">
        <number>4</number>
       </property>
@@ -59,12 +62,6 @@
       </item>
       <item>
        <widget class="QWidget" name="widget_4" native="true">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>20</height>
-         </size>
-        </property>
         <layout class="QHBoxLayout" name="horizontalLayout">
          <property name="spacing">
           <number>0</number>
@@ -97,6 +94,9 @@
       <string>Mask Constraint 1</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_5">
+      <property name="spacing">
+       <number>4</number>
+      </property>
       <property name="margin">
        <number>4</number>
       </property>
@@ -112,12 +112,6 @@
       </item>
       <item>
        <widget class="QWidget" name="widget_2" native="true">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>20</height>
-         </size>
-        </property>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <property name="spacing">
           <number>0</number>
@@ -150,6 +144,9 @@
       <string>Mask Constraint 2</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_7">
+      <property name="spacing">
+       <number>4</number>
+      </property>
       <property name="margin">
        <number>4</number>
       </property>
@@ -165,12 +162,6 @@
       </item>
       <item>
        <widget class="QWidget" name="widget_5" native="true">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>20</height>
-         </size>
-        </property>
         <layout class="QHBoxLayout" name="horizontalLayout_8">
          <property name="spacing">
           <number>0</number>
@@ -212,6 +203,9 @@
       <bool>false</bool>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_6">
+      <property name="spacing">
+       <number>4</number>
+      </property>
       <property name="leftMargin">
        <number>4</number>
       </property>
@@ -236,12 +230,6 @@
       </item>
       <item>
        <widget class="QWidget" name="widget_7" native="true">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>20</height>
-         </size>
-        </property>
         <layout class="QHBoxLayout" name="horizontalLayout_5">
          <property name="spacing">
           <number>0</number>
@@ -270,12 +258,6 @@
       </item>
       <item>
        <widget class="QWidget" name="widget_8" native="true">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>20</height>
-         </size>
-        </property>
         <layout class="QHBoxLayout" name="horizontalLayout_4">
          <property name="spacing">
           <number>0</number>
@@ -352,11 +334,11 @@
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>Brush Size:</string>
+      <string>Brush</string>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_6">
+     <layout class="QVBoxLayout" name="verticalLayout_9">
       <property name="spacing">
-       <number>0</number>
+       <number>4</number>
       </property>
       <property name="leftMargin">
        <number>4</number>
@@ -371,59 +353,87 @@
        <number>4</number>
       </property>
       <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Size:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QtUtils::QtSliderIntCombo" name="brush_radius_" native="true"/>
       </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QWidget" name="widget_6" native="true">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>30</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>30</height>
-      </size>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_3">
-      <property name="spacing">
-       <number>0</number>
-      </property>
-      <property name="margin">
-       <number>0</number>
-      </property>
       <item>
-       <widget class="QCheckBox" name="eraseCheckBox">
-        <property name="text">
-         <string>Erase Mode</string>
+       <widget class="QWidget" name="widget_6" native="true">
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>30</height>
+         </size>
         </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="margin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QCheckBox" name="eraseCheckBox">
+           <property name="text">
+            <string>Erase</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
      </layout>
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_7">
-     <item>
-      <widget class="QPushButton" name="floodfill_button_">
-       <property name="text">
-        <string>Flood Fill</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="flooderase_button_">
-       <property name="text">
-        <string>Flood Erase</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
+    <widget class="QGroupBox" name="groupBox_3">
+     <property name="title">
+      <string>Flood Fill</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_8">
+      <property name="spacing">
+       <number>4</number>
+      </property>
+      <property name="leftMargin">
+       <number>4</number>
+      </property>
+      <property name="topMargin">
+       <number>2</number>
+      </property>
+      <property name="rightMargin">
+       <number>4</number>
+      </property>
+      <property name="bottomMargin">
+       <number>4</number>
+      </property>
+      <item>
+       <widget class="QPushButton" name="floodfill_button_">
+        <property name="text">
+         <string>Fill</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="flooderase_button_">
+        <property name="text">
+         <string>Erase</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="clear_seeds_button_">
+        <property name="text">
+         <string>Clear Seeds</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </item>
   </layout>
  </widget>

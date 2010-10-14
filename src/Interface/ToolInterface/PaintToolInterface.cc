@@ -73,6 +73,7 @@ bool PaintToolInterface::build_widget( QFrame* frame )
   this->private_->ui_.horizontalLayout->setAlignment( Qt::AlignHCenter );
   this->private_->ui_.horizontalLayout_2->setAlignment( Qt::AlignHCenter );
   this->private_->ui_.horizontalLayout_3->setAlignment( Qt::AlignHCenter );
+  this->private_->ui_.horizontalLayout_8->setAlignment( Qt::AlignHCenter );
 
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
@@ -111,6 +112,8 @@ bool PaintToolInterface::build_widget( QFrame* frame )
     &PaintTool::flood_fill, tool, Core::Interface::GetWidgetActionContext(), false ) );
   QtUtils::QtBridge::Connect( this->private_->ui_.flooderase_button_, boost::bind(
     &PaintTool::flood_fill, tool, Core::Interface::GetWidgetActionContext(), true ) );
+  QtUtils::QtBridge::Connect( this->private_->ui_.clear_seeds_button_, boost::bind(
+    &SeedPointsTool::clear, tool, Core::Interface::GetWidgetActionContext() ) );
   
   boost::function< bool () > condition = boost::lambda::bind( &Core::StateLabeledOption::get, 
     tool->data_constraint_layer_state_.get() ) != Tool::NONE_OPTION_C;
