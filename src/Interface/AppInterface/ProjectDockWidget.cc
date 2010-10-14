@@ -58,7 +58,7 @@ public:
 
   Ui::ProjectDockWidget ui_;
   std::vector< std::string > notes;
-
+  bool resetting_;
   QStandardItemModel* note_model_;
 
 };
@@ -72,7 +72,8 @@ ProjectDockWidget::ProjectDockWidget( QWidget *parent ) :
     qpointer_type project_dock_widget( this );
     
     this->private_->ui_.setupUi( this );
-
+    this->private_->resetting_ = false;
+    
     // We dont want them to be able to save blank notes.
     this->private_->ui_.save_note_button_->setEnabled( false );
 
@@ -142,16 +143,7 @@ ProjectDockWidget::ProjectDockWidget( QWidget *parent ) :
     this->private_->ui_.horizontalLayout_2->setAlignment( Qt::AlignHCenter );
 
     this->disable_load_delete_and_export_buttons();
-    
-#if defined ( __APPLE__ )  
-//    QFont font;
-//    font.setPointSize( 10 );
-//    QApplication::setFont( font );
-//    this->private_->ui_.delete_session_button_->setFont( font );
-//    this->private_->ui_.load_session_button_->setFont( font );
-//    this->private_->ui_.save_session_button_->setFont( font );
-#endif
-    
+  
   }
 }
 
@@ -168,9 +160,16 @@ void ProjectDockWidget::save_session()
 
 void ProjectDockWidget::save_note()
 {
-  ProjectManager::Instance()->save_note( 
-    this->private_->ui_.note_edit_->toPlainText().toStdString() );
-  this->private_->ui_.note_edit_->setPlainText( QString::fromUtf8( "" ) );
+  std::string current_text = this->private_->ui_.note_edit_->toPlainText().toStdString();
+  if( current_text == "Enter your note here." ) return;
+
+  ProjectManager::Instance()->save_note( current_text );
+  this->private_->resetting_ = true;
+  this->private_->ui_.note_edit_->setStyleSheet( 
+    QString::fromUtf8( "QTextEdit#note_edit_{ color: light gray; }" ) );
+  this->private_->ui_.note_edit_->setPlainText( 
+    QString::fromUtf8( "Enter your note here." ) );
+  this->private_->ui_.save_note_button_->setEnabled( false );
 }
   
 void ProjectDockWidget::load_session()
@@ -206,16 +205,18 @@ void ProjectDockWidget::load_session()
         {
           Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
           ActionSaveSession::Dispatch( Core::Interface::GetWidgetActionContext(), false, 
-            ProjectManager::Instance()->current_project_->current_session_name_state_->get() );   
+            ProjectManager::Instance()->current_project_->
+            current_session_name_state_->get() );   
         }
 
         if ( ret != QMessageBox::Cancel )
         {
-          std::vector< std::string > sessions = ProjectManager::Instance()->current_project_->
-          sessions_state_->get();
+          std::vector< std::string > sessions = 
+            ProjectManager::Instance()->current_project_->sessions_state_->get();
 
           std::string session_name = sessions[ row ];
-          ActionLoadSession::Dispatch( Core::Interface::GetWidgetActionContext(), session_name );
+          ActionLoadSession::Dispatch( Core::Interface::GetWidgetActionContext(), 
+            session_name );
         }
       }
       else
@@ -224,7 +225,8 @@ void ProjectDockWidget::load_session()
           sessions_state_->get();
 
         std::string session_name = sessions[ row ];
-        ActionLoadSession::Dispatch( Core::Interface::GetWidgetActionContext(), session_name );   
+        ActionLoadSession::Dispatch( Core::Interface::GetWidgetActionContext(), 
+          session_name );   
       }
     }
   }
@@ -250,7 +252,7 @@ void ProjectDockWidget::delete_session()
   if( row_time != "" )
   {
     QMessageBox message_box;
-    message_box.setText( QString::fromUtf8( "WARNING: You are going to regret this.") );
+    message_box.setText( QString::fromUtf8( "WARNING: You cannot recover a deleted session.") );
     message_box.setInformativeText( QString::fromUtf8( "Are you sure you want to do this?" ) );
     message_box.setStandardButtons( QMessageBox::Yes | QMessageBox::No );
     message_box.setDefaultButton( QMessageBox::No );
@@ -260,7 +262,8 @@ void ProjectDockWidget::delete_session()
         sessions_state_->get();
 
       std::string session_name = sessions[ row ];
-      ActionDeleteSession::Dispatch( Core::Interface::GetWidgetActionContext(), session_name );
+      ActionDeleteSession::Dispatch( Core::Interface::GetWidgetActionContext(), 
+        session_name );
     }
   }
 
@@ -432,7 +435,22 @@ void ProjectDockWidget::HandleNoteSaved( qpointer_type qpointer )
 
 void ProjectDockWidget::enable_save_notes_button()
 {
-std::string current_text = this->private_->ui_.note_edit_->toPlainText().toStdString();
+  std::string current_text = this->private_->ui_.note_edit_->toPlainText().toStdString();
+  
+  if( current_text == "Enter your note here." )
+  {
+    if( !this->private_->resetting_ )
+    {
+      this->private_->ui_.note_edit_->setPlainText( 
+        QString::fromUtf8( "" ) );
+      this->private_->ui_.note_edit_->setStyleSheet( 
+        QString::fromUtf8( "QTextEdit#note_edit_{ color: black; }" ) );
+    }
+    else
+    {
+      this->private_->resetting_ = false;
+    }
+  }
 
   if( current_text.size() > 3 )
   {

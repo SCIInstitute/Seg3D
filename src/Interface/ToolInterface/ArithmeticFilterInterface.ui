@@ -291,6 +291,9 @@
           <height>80</height>
          </size>
         </property>
+        <property name="plainText">
+         <string>RESULT= </string>
+        </property>
        </widget>
       </item>
       <item>

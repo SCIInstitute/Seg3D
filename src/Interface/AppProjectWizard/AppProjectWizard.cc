@@ -31,6 +31,7 @@
 #include <Interface/AppProjectWizard/AppProjectWizard.h>
 #include <Application/ProjectManager/ProjectManager.h>
 #include <Application/ProjectManager/Actions/ActionNewProject.h>
+#include <Application/PreferencesManager/PreferencesManager.h>
 
 namespace Seg3D
 {
@@ -100,7 +101,7 @@ ProjectInfoPage::ProjectInfoPage( QWidget *parent )
   
 void ProjectInfoPage::initializePage()
 {
-  this->project_path_lineedit_->setText( QString::fromStdString( ProjectManager::Instance()->current_project_path_state_->get() ) );
+  this->project_path_lineedit_->setText( QString::fromStdString( PreferencesManager::Instance()->project_path_state_->get() ) );
   registerField( "projectPath", this->project_path_lineedit_ );
 }
   
