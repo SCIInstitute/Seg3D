@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>F_CONTROLLER</class>
- <widget class="QWidget" name="F_CONTROLLER">
+ <widget class="QDialog" name="F_CONTROLLER">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Controller</string>
+   <string>Seg3D Controller</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_5">
    <property name="spacing">

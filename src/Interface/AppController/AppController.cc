@@ -66,12 +66,20 @@ public:
 };
 
 AppController::AppController( QWidget* parent ) :
-  QWidget( parent, Qt::Window ), private_( new AppControllerPrivate )
+  QDialog( parent ), 
+  private_( new AppControllerPrivate )
 {
 
   // Step 1: Setup the private structure and allocate all the needed structures
   private_->ui_.setupUi( this );
   private_->context_ = Core::ActionContextHandle( new AppControllerContext( this ) );
+  
+  QIcon icon = windowIcon();
+  Qt::WindowFlags flags = windowFlags();
+  Qt::WindowFlags helpFlag = Qt::WindowContextHelpButtonHint;
+  flags = flags & ( ~helpFlag );
+  this->setWindowFlags( flags );
+  this->setWindowIcon( icon );
 
   // These next two are Qt objects and will be deleted when the parent object is
   // deleted

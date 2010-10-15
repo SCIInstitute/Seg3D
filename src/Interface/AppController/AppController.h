@@ -54,7 +54,7 @@ typedef boost::shared_ptr< AppControllerPrivate > AppControllerPrivateHandle;
 class AppController;
 
 // Class definition
-class AppController : public QWidget, private Core::ConnectionHandler
+class AppController : public QDialog, private Core::ConnectionHandler
 {
 Q_OBJECT
 
