@@ -27,7 +27,6 @@
  */
 
 // Application Includes
-#include <Application/Tool/ToolFactory.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
 #include <Application/PreferencesManager/Actions/ActionSavePreferences.h>
 
@@ -55,9 +54,6 @@ bool ActionSavePreferences::run( Core::ActionContextHandle& context,
   progress->begin_progress_reporting();
 
   PreferencesManager::Instance()->save_state();
-  // TODO: Split this action into separate actions for PreferencesManager and
-  // ToolFactory, otherwise there is a circular dependency.
-  ToolFactory::Instance()->save_settings();
 
   progress->end_progress_reporting();
 

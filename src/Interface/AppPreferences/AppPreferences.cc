@@ -34,6 +34,7 @@
 #include <Application/PreferencesManager/PreferencesManager.h>
 #include <Application/PreferencesManager/Actions/ActionSavePreferences.h>
 #include <Application/Tool/ToolFactory.h>
+#include <Application/Tool/Actions/ActionSaveToolPreferences.h>
 
 // QtUtils includes
 #include <QtUtils/Bridge/QtBridge.h>
@@ -309,9 +310,7 @@ void AppPreferences::hide_the_others( int active )
 void AppPreferences::save_settings()
 {
   ActionSavePreferences::Dispatch( Core::Interface::GetWidgetActionContext() );
-
-//  PreferencesManager::Instance()->save_state();
-//  ToolFactory::Instance()->save_settings();
+  ActionSaveToolPreferences::Dispatch( Core::Interface::GetWidgetActionContext() );
 }
   
 } // end namespace Seg3D

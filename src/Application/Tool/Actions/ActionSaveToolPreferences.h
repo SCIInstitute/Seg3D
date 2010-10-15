@@ -26,53 +26,39 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_PREFERENCESMANAGER_ACTIONS_ACTIONSAVEPREFERENCES_H
-#define APPLICATION_PREFERENCESMANAGER_ACTIONS_ACTIONSAVEPREFERENCES_H
-
+#ifndef APPLICATION_TOOL_ACTIONS_ACTIONSAVETOOLPREFERENCES_H
+#define APPLICATION_TOOL_ACTIONS_ACTIONSAVETOOLPREFERENCES_H
 
 // Core includes
 #include <Core/Action/Action.h> 
-#include <Core/Interface/Interface.h>
-
 
 namespace Seg3D
 {
 
-class ActionSavePreferences : public Core::Action
+class ActionSaveToolPreferences : public Core::Action
 {
   
 CORE_ACTION(
-  CORE_ACTION_TYPE( "SavePreferences", "Save Seg3D's Preferences." )
+  CORE_ACTION_TYPE( "SaveToolPreferences", "Save Seg3D's Tool Preferences." )
 )
 
   // -- Constructor/Destructor --
 public:
-  ActionSavePreferences()
-  {
-  }
-
-  virtual ~ActionSavePreferences()
-  {
-  }
+  ActionSaveToolPreferences() { }
+  virtual ~ActionSaveToolPreferences() {}
 
   // -- Functions that describe action --
 public:
   virtual bool validate( Core::ActionContextHandle& context );
   virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
   
-  // -- Dispatch this action from the interface --
 public:
-  
-  // CREATE:
-  // Create an action that saves the preferences
-  static Core::ActionHandle Create();
-  
   // DISPATCH:
-  // Dispatch an action that saves the preferences
+  // Dispatch an action that saves the tool preferences
   static void Dispatch( Core::ActionContextHandle context );
 
 };
 
 } // end namespace Seg3D
 
-#endif  //APPLICATION_PREFERENCESMANAGER_ACTIONS_ACTIONSAVEPREFERENCES_H
+#endif 

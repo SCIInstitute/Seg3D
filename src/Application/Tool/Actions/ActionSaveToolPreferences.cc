@@ -26,53 +26,44 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_PREFERENCESMANAGER_ACTIONS_ACTIONSAVEPREFERENCES_H
-#define APPLICATION_PREFERENCESMANAGER_ACTIONS_ACTIONSAVEPREFERENCES_H
+// Application Includes
+#include <Application/Tool/ToolFactory.h>
+#include <Application/Tool/Actions/ActionSaveToolPreferences.h>
 
-
-// Core includes
-#include <Core/Action/Action.h> 
-#include <Core/Interface/Interface.h>
-
+// REGISTER ACTION:
+// Define a function that registers the action. The action also needs to be
+// registered in the CMake file.
+CORE_REGISTER_ACTION( Seg3D, SaveToolPreferences )
 
 namespace Seg3D
 {
 
-class ActionSavePreferences : public Core::Action
+bool ActionSaveToolPreferences::validate( Core::ActionContextHandle& context )
 {
-  
-CORE_ACTION(
-  CORE_ACTION_TYPE( "SavePreferences", "Save Seg3D's Preferences." )
-)
+  return true;
+}
 
-  // -- Constructor/Destructor --
-public:
-  ActionSavePreferences()
-  {
-  }
+bool ActionSaveToolPreferences::run( Core::ActionContextHandle& context, 
+  Core::ActionResultHandle& result )
+{
+  std::string message = std::string( "Please wait, while your tool preferences are being saved..." );
 
-  virtual ~ActionSavePreferences()
-  {
-  }
+  Core::ActionProgressHandle progress = 
+    Core::ActionProgressHandle( new Core::ActionProgress( message ) );
 
-  // -- Functions that describe action --
-public:
-  virtual bool validate( Core::ActionContextHandle& context );
-  virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
-  
-  // -- Dispatch this action from the interface --
-public:
-  
-  // CREATE:
-  // Create an action that saves the preferences
-  static Core::ActionHandle Create();
-  
-  // DISPATCH:
-  // Dispatch an action that saves the preferences
-  static void Dispatch( Core::ActionContextHandle context );
+  progress->begin_progress_reporting();
 
-};
+  ToolFactory::Instance()->save_settings();
+
+  progress->end_progress_reporting();
+
+  return true;
+}
+
+void ActionSaveToolPreferences::Dispatch( Core::ActionContextHandle context )
+{
+  ActionSaveToolPreferences* action = new ActionSaveToolPreferences;
+  Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
+}
 
 } // end namespace Seg3D
-
-#endif  //APPLICATION_PREFERENCESMANAGER_ACTIONS_ACTIONSAVEPREFERENCES_H

@@ -48,7 +48,12 @@ SET(APPLICATION_TOOL_SRCS
   ToolFactory.cc
   )
 
-CORE_ADD_LIBRARY(Application_Tool ${APPLICATION_TOOL_SRCS} )
+SET(APPLICATION_TOOL_ACTIONS_SRCS
+  Actions/ActionSaveToolPreferences.h
+  Actions/ActionSaveToolPreferences.cc
+  )
+
+CORE_ADD_LIBRARY(Application_Tool ${APPLICATION_TOOL_SRCS} ${APPLICATION_TOOL_ACTIONS_SRCS} )
             
 TARGET_LINK_LIBRARIES(Application_Tool
                       Core_Utils
@@ -60,3 +65,5 @@ TARGET_LINK_LIBRARIES(Application_Tool
             ${SCI_TINYXML_LIBRARY}
                       ${SCI_ITK_LIBRARIES})
                     
+REGISTER_LIBRARY_AND_CLASSES(Application_Tool
+               ${APPLICATION_TOOL_ACTIONS_SRCS})
