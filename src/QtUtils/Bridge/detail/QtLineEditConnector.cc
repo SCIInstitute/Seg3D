@@ -52,7 +52,7 @@ QtLineEditConnector::QtLineEditConnector( QLineEdit* parent,
       boost::bind( &QtLineEditConnector::SetLineEditText, qpointer, _1, _2 ) ) );
   }
 
-  this->connect( parent, SIGNAL( editingFinished() ), SLOT( set_state() ) );
+  this->connect( parent, SIGNAL( textChanged( QString ) ), SLOT( set_state() ) );
 }
 
 QtLineEditConnector::QtLineEditConnector( QLineEdit* parent, 
@@ -114,7 +114,7 @@ void QtLineEditConnector::set_state()
 {
   if ( !this->is_blocked() )
   {
-    this->parent_->setCursorPosition( 0 );
+    //this->parent_->setCursorPosition( 0 );
     std::string text = this->parent_->text().trimmed().toStdString();
     Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), this->state_, text );
   }

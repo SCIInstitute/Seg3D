@@ -140,6 +140,16 @@ void AppPreferences::setup_general_prefs()
     PreferencesManager::Instance()->compression_level_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.slice_step_multiplier_spinbox_,
     PreferencesManager::Instance()->slice_step_multiplier_state_ );
+    
+  QtUtils::QtBridge::Connect( this->private_->ui_.x_lineedit_,
+    PreferencesManager::Instance()->x_axis_label_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.y_lineedit_,
+    PreferencesManager::Instance()->y_axis_label_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.z_lineedit_,
+    PreferencesManager::Instance()->z_axis_label_state_ );
+    
+  connect( this->private_->ui_.axis_combobox_, SIGNAL( currentIndexChanged ( int ) ), 
+    this, SLOT( set_axis_labels( int ) ) );
   
   QtUtils::QtBridge::Enable( this->private_->ui_.compression_adjuster_, 
     PreferencesManager::Instance()->compression_state_ );
@@ -289,6 +299,7 @@ void AppPreferences::setup_interface_controls_prefs()
   //Interface Controls Preferences  
 }
 
+
 void AppPreferences::set_buttons_to_default_colors()
 {
   std::vector< Core::Color > temp_color_list = PreferencesManager::Instance()->
@@ -312,5 +323,57 @@ void AppPreferences::save_settings()
   ActionSavePreferences::Dispatch( Core::Interface::GetWidgetActionContext() );
   ActionSaveToolPreferences::Dispatch( Core::Interface::GetWidgetActionContext() );
 }
-  
+
+void AppPreferences::set_axis_labels( int index )
+{
+  switch( index )
+  {
+    case 0:
+    {
+      this->private_->ui_.x_lineedit_->setText( "Sagittal" );
+      this->private_->ui_.y_lineedit_->setText( "Coronal" );
+      this->private_->ui_.z_lineedit_->setText( "Axial" );
+      this->private_->ui_.x_lineedit_->setEnabled( false );
+      this->private_->ui_.y_lineedit_->setEnabled( false );
+      this->private_->ui_.z_lineedit_->setEnabled( false );
+      break;
+    }
+    case 1:
+    {
+      this->private_->ui_.x_lineedit_->setText( "Sagittal" );
+      this->private_->ui_.y_lineedit_->setText( "Coronal" );
+      this->private_->ui_.z_lineedit_->setText( "Transverse" );
+      this->private_->ui_.x_lineedit_->setEnabled( false );
+      this->private_->ui_.y_lineedit_->setEnabled( false );
+      this->private_->ui_.z_lineedit_->setEnabled( false );
+      break;
+    }
+    case 2:
+    {
+      this->private_->ui_.x_lineedit_->setText( "X" );
+      this->private_->ui_.y_lineedit_->setText( "Y" );
+      this->private_->ui_.z_lineedit_->setText( "Z" );
+      this->private_->ui_.x_lineedit_->setEnabled( false );
+      this->private_->ui_.y_lineedit_->setEnabled( false );
+      this->private_->ui_.z_lineedit_->setEnabled( false );
+      break;
+    }
+    case 3:
+    {
+      this->private_->ui_.x_lineedit_->setText( "" );
+      this->private_->ui_.y_lineedit_->setText( "" );
+      this->private_->ui_.z_lineedit_->setText( "" );
+      this->private_->ui_.x_lineedit_->setEnabled( true );
+      this->private_->ui_.y_lineedit_->setEnabled( true );
+      this->private_->ui_.z_lineedit_->setEnabled( true );
+      break;
+    }
+    default:
+    {
+      break;
+    }
+  }
+}
+
+
 } // end namespace Seg3D

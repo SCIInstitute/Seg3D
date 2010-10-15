@@ -105,6 +105,10 @@ void PreferencesManager::initialize_states()
   add_state( "compression", this->compression_state_, true );
   add_state( "compression_level", this->compression_level_state_, 6, 0, 9, 1 );
   add_state( "slice_step_multiplier", this->slice_step_multiplier_state_, 8 );
+  
+  add_state( "x_axis_label", this->x_axis_label_state_, "Sagittal" );
+  add_state( "y_axis_label", this->y_axis_label_state_, "Coronal" );
+  add_state( "z_axis_label", this->z_axis_label_state_, "Axial" );
 
   
   //Viewer Preferences

@@ -84,6 +84,7 @@ public:
   void delete_layers( std::vector< LayerHandle > layers );
   void set_active_layer( LayerHandle layer );
   void handle_layer_volume_updated( std::string layer_id );
+  void set_viewer_labels();
 
   // -- Helper functions --
 public:
@@ -849,6 +850,21 @@ void ViewerPrivate::reset_active_slice()
   }
 }
 
+void ViewerPrivate::set_viewer_labels()
+{
+  Core::OptionLabelPairVector label_options;
+  label_options.push_back( std::make_pair( Viewer::SAGITTAL_C, 
+    PreferencesManager::Instance()->x_axis_label_state_->get() ) );
+  label_options.push_back( std::make_pair( Viewer::CORONAL_C, 
+    PreferencesManager::Instance()->y_axis_label_state_->get() ) );
+  label_options.push_back( std::make_pair( Viewer::AXIAL_C, 
+    PreferencesManager::Instance()->z_axis_label_state_->get() ) );
+  label_options.push_back( std::make_pair( Viewer::VOLUME_C, 
+    "Volume" ) );
+
+  this->viewer_->view_mode_state_->set_option_list( label_options );
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Implementation of class Viewer
 //////////////////////////////////////////////////////////////////////////
@@ -868,8 +884,20 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
   this->private_->slice_lock_count_ = 0;
   this->private_->view_manipulator_ = ViewManipulatorHandle( new ViewManipulator( this ) );
 
-  this->add_state( "view_mode", view_mode_state_, mode , SAGITTAL_C + 
-    "|" + CORONAL_C + "|" + AXIAL_C + "|" + VOLUME_C );
+  std::string sagittal = SAGITTAL_C + "=" + PreferencesManager::Instance()->x_axis_label_state_->get();
+  std::string coronal = CORONAL_C + "=" + PreferencesManager::Instance()->y_axis_label_state_->get();
+  std::string axial = AXIAL_C + "=" + PreferencesManager::Instance()->z_axis_label_state_->get();
+  
+  this->add_state( "view_mode", view_mode_state_, mode , sagittal + "|" + coronal 
+     + "|" + axial + "|" + VOLUME_C + "=Volume" );
+     
+  this->add_connection( PreferencesManager::Instance()->x_axis_label_state_->state_changed_signal_.
+    connect( boost::bind( &ViewerPrivate::set_viewer_labels, this->private_ ) ) );
+  this->add_connection( PreferencesManager::Instance()->y_axis_label_state_->state_changed_signal_.
+    connect( boost::bind( &ViewerPrivate::set_viewer_labels, this->private_ ) ) );
+  this->add_connection( PreferencesManager::Instance()->z_axis_label_state_->state_changed_signal_.
+    connect( boost::bind( &ViewerPrivate::set_viewer_labels, this->private_ ) ) );
+  
   this->view_mode_state_->set_session_priority( Core::StateBase::DEFAULT_LOAD_E + 1 );
 
   this->add_state( "axial_view", axial_view_state_ );
@@ -914,9 +942,11 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
     boost::bind( &Viewer::redraw, this, false ) ) );
 
   this->add_connection( this->view_mode_state_->value_changed_signal_.connect(
-    boost::bind( &ViewerPrivate::change_view_mode, this->private_, _1, _2 ) ) );
+    boost::bind( &ViewerPrivate::change_view_mode, this->private_, _2, _3 ) ) );
+    
   this->add_connection( this->slice_number_state_->value_changed_signal_.connect(
     boost::bind( &ViewerPrivate::set_slice_number, this->private_, _1, _2 ) ) );
+    
   this->add_connection( this->viewer_visible_state_->value_changed_signal_.connect(
     boost::bind( &ViewerPrivate::change_visibility, this->private_, _1 ) ) );
   this->add_connection( this->lock_state_->value_changed_signal_.connect(
@@ -969,6 +999,8 @@ Viewer::~Viewer()
   this->disconnect_all();
   this->reset_mouse_handlers();
 }
+
+
 
 void Viewer::resize( int width, int height )
 {

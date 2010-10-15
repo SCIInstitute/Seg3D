@@ -193,7 +193,7 @@ public:
   // -- State information --
 public:
 
-  Core::StateOptionHandle view_mode_state_;
+  Core::StateLabeledOptionHandle view_mode_state_;
 
   Core::StateView2DHandle axial_view_state_;
   Core::StateView2DHandle coronal_view_state_;

@@ -31,6 +31,7 @@
 
 //Application Includes
 #include <Application/Tools/FlipTool.h>
+#include <Application/PreferencesManager/PreferencesManager.h>
 
 //Interface Includes
 #include <Interface/ToolInterface/FlipToolInterface.h>
@@ -106,11 +107,69 @@ bool FlipToolInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Enable( this->private_->ui_.rotate_sagittal_ccw_button_, tool->valid_target_state_ );
   QtUtils::QtBridge::Enable( this->private_->ui_.rotate_sagittal_cw_button_, tool->valid_target_state_ );
 
+  this->add_connection( PreferencesManager::Instance()->x_axis_label_state_->value_changed_signal_.
+    connect( boost::bind( &FlipToolInterface::ChangeXAxisLabel, qpointer_type( this ), _1 ) ) );
+  this->add_connection( PreferencesManager::Instance()->y_axis_label_state_->value_changed_signal_.
+    connect( boost::bind( &FlipToolInterface::ChangeYAxisLabel, qpointer_type( this ), _1 ) ) );
+  this->add_connection( PreferencesManager::Instance()->z_axis_label_state_->value_changed_signal_.
+    connect( boost::bind( &FlipToolInterface::ChangeZAxisLabel, qpointer_type( this ), _1 ) ) );
+
+
   //Send a message to the log that we have finished with building the Flip Tool Interface
   CORE_LOG_DEBUG( "Finished building a Flip Tool Interface" );
 
   return true;
 } // end build_widget
+
+void FlipToolInterface::ChangeXAxisLabel( qpointer_type qpointer, std::string label )
+{
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
+    &FlipToolInterface::change_x_axis_label, qpointer.data(), label ) ) );
+}
+
+void FlipToolInterface::ChangeYAxisLabel( qpointer_type qpointer, std::string label )
+{
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
+    &FlipToolInterface::change_y_axis_label, qpointer.data(), label ) ) );
+}
+
+void FlipToolInterface::ChangeZAxisLabel( qpointer_type qpointer, std::string label )
+{
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
+    &FlipToolInterface::change_z_axis_label, qpointer.data(), label ) ) );
+}
+
+void FlipToolInterface::change_x_axis_label( std::string label )
+{
+  this->private_->ui_.rotate_coronal_cw_button_->setText( 
+    QString::fromStdString( label )+ QString::fromUtf8( " (Clockwise)" ) );
+  this->private_->ui_.rotate_coronal_ccw_button_->setText( 
+    QString::fromStdString( label )+ QString::fromUtf8( " (Counterclockwise)" ) );
+}
+
+void FlipToolInterface::change_y_axis_label( std::string label )
+{
+  this->private_->ui_.rotate_sagittal_cw_button_->setText( 
+    QString::fromStdString( label )+ QString::fromUtf8( " (Clockwise)" ) );
+  this->private_->ui_.rotate_sagittal_ccw_button_->setText( 
+    QString::fromStdString( label )+ QString::fromUtf8( " (Counterclockwise)" ) );
+}
+
+void FlipToolInterface::change_z_axis_label( std::string label )
+{
+  this->private_->ui_.rotate_axial_cw_button_->setText( 
+    QString::fromStdString( label )+ QString::fromUtf8( " (Clockwise)" ) );
+  this->private_->ui_.rotate_axial_ccw_button_->setText( 
+    QString::fromStdString( label )+ QString::fromUtf8( " (Counterclockwise)" ) );
+}
+
+
+
+
+
+
+
+
 
 
 } // namespace Seg3D

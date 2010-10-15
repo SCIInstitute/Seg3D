@@ -29,8 +29,12 @@
 #ifndef INTERFACE_TOOLINTERFACE_FLIPTOOLINTERFACE_H
 #define INTERFACE_TOOLINTERFACE_FLIPTOOLINTERFACE_H
 
+#include <QPointer>
+
 // Application includes
 #include <Application/Tool/ToolFactory.h>
+
+#include <QtUtils/Utils/QtPointer.h>
 
 // Base class of the tool widget include
 #include <Interface/AppInterface/ToolWidget.h>
@@ -47,11 +51,22 @@ class FlipToolInterface : public ToolWidget
 public:
   FlipToolInterface();
   virtual ~FlipToolInterface();
-
   virtual bool build_widget( QFrame* frame );
 
 private:
+  typedef QPointer< FlipToolInterface > qpointer_type;
+  static void ChangeXAxisLabel( qpointer_type qpointer, std::string label );
+  static void ChangeYAxisLabel( qpointer_type qpointer, std::string label );
+  static void ChangeZAxisLabel( qpointer_type qpointer, std::string label );
+  
+  void change_x_axis_label( std::string label );
+  void change_y_axis_label( std::string label );
+  void change_z_axis_label( std::string label );
+
+private:
   FlipToolInterfacePrivate* private_;
+  
+
 
 };
 

@@ -219,14 +219,14 @@ void ViewerWidget::add_icons_to_combobox()
   QIcon icon1;
   icon1.addFile( QString::fromUtf8(":/Images/Yview.png"), QSize(), QIcon::Normal, QIcon::On );
   this->private_->ui_.viewer_mode_->setItemIcon( 1, icon1 );
-  
+
   QIcon icon2;
   icon2.addFile( QString::fromUtf8(":/Images/Zview.png"), QSize(), QIcon::Normal, QIcon::On );
   this->private_->ui_.viewer_mode_->setItemIcon( 2, icon2 );
   
   QIcon icon3;
   icon3.addFile( QString::fromUtf8(":/Images/Vview.png"), QSize(), QIcon::Normal, QIcon::On );
-  this->private_->ui_.viewer_mode_->setItemIcon( 3, icon3 );  
+  this->private_->ui_.viewer_mode_->setItemIcon( 3, icon3 );
 }
 
 ViewerWidget::~ViewerWidget()
