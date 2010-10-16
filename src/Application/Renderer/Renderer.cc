@@ -554,6 +554,9 @@ void RendererPrivate::draw_orientation_arrows( const Core::View3D& view_3d )
   glViewport( this->renderer_->width_ - dimension, 
     this->renderer_->height_ - dimension, dimension, dimension );
 
+  // NOTE: Clear the depth buffer so the axes will not be occluded.
+  glClear( GL_DEPTH_BUFFER_BIT );
+
   // Compute the orientation of the axes
   Core::Vector eye_dir = view_3d.eyep() - view_3d.lookat();
   eye_dir.normalize();
@@ -766,6 +769,7 @@ bool Renderer::render()
       this->private_->draw_isosurfaces( isosurfaces, with_lighting );
     }
 
+    // NOTE: The orientation axes should be drawn the last, because it clears the depth buffer.
     this->private_->draw_orientation_arrows( view3d );
     
     glDisable( GL_BLEND );

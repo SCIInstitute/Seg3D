@@ -182,7 +182,6 @@ void QtComboBoxConnector::UpdateComboBoxItems( QPointer< QtComboBoxConnector > q
   qpointer->block();
 
   QComboBox* combobox = qpointer->parent_;
-  combobox->clear();
 
   // lock the state engine
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
@@ -192,10 +191,21 @@ void QtComboBoxConnector::UpdateComboBoxItems( QPointer< QtComboBoxConnector > q
   {
     Core::StateOption* state_option = static_cast< Core::StateOption* >( state_base );
     std::vector< std::string > option_list = state_option->option_list();
-    size_t num_items = option_list.size();
-    for ( size_t i = 0; i < num_items; i++ )
+    int num_items = static_cast< int >( option_list.size() );
+    if ( combobox->count() == num_items )
     {
-      combobox->addItem( QString( option_list[ i ].c_str() ) );
+      for ( int i = 0; i < num_items; i++ )
+      {
+        combobox->setItemText( i, QString( option_list[ i ].c_str() ) );
+      }   
+    }
+    else
+    {
+      combobox->clear();
+      for ( size_t i = 0; i < num_items; i++ )
+      {
+        combobox->addItem( QString( option_list[ i ].c_str() ) );
+      }
     }
     combobox->setCurrentIndex( state_option->index() );
   }
@@ -204,11 +214,23 @@ void QtComboBoxConnector::UpdateComboBoxItems( QPointer< QtComboBoxConnector > q
     Core::StateLabeledOption* state_labeled_option = 
       static_cast< Core::StateLabeledOption* >( state_base );
     std::vector< Core::OptionLabelPair > option_list = state_labeled_option->get_option_list();
-    size_t num_items = option_list.size();
-    for ( size_t i = 0; i < num_items; i++ )
+    int num_items = static_cast< int >( option_list.size() );
+    if ( combobox->count() == num_items )
     {
-      combobox->addItem( QString( option_list[ i ].second.c_str() ),
-        QVariant( option_list[ i ].first.c_str() ) );
+      for ( int i = 0; i < num_items; i++ )
+      {
+        combobox->setItemText( i, QString( option_list[ i ].second.c_str() ) );
+        combobox->setItemData( i, QVariant( option_list[ i ].first.c_str() ) );
+      }
+    }
+    else
+    {
+      combobox->clear();
+      for ( int i = 0; i < num_items; i++ )
+      {
+        combobox->addItem( QString( option_list[ i ].second.c_str() ),
+          QVariant( option_list[ i ].first.c_str() ) );
+      }
     }
     combobox->setCurrentIndex( state_labeled_option->index() );
   }

@@ -496,12 +496,12 @@ border: 1px solid gray;
                  <widget class="QComboBox" name="axis_combobox_">
                   <item>
                    <property name="text">
-                    <string>Coronal/Sagittal/Axial</string>
+                    <string>Sagittal/Coronal/Axial</string>
                    </property>
                   </item>
                   <item>
                    <property name="text">
-                    <string>Coronal/Sagittal/Transverse</string>
+                    <string>Sagittal/Coronal/Transverse</string>
                    </property>
                   </item>
                   <item>

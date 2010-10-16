@@ -758,7 +758,6 @@ void LayerManager::get_layer_names( std::vector< LayerIDNamePair >& layer_names,
   }
 }
 
-
 void LayerManager::get_layer_names_from_group( LayerGroupHandle group,
   std::vector< LayerIDNamePair >& layer_names, int type )
 {
@@ -841,6 +840,10 @@ bool LayerManager::pre_load_states( const Core::StateIO& state_io )
       layer_list_type::iterator it = layer_list.begin();
       for ( ; it != layer_list.end(); it++ )
       {
+        // Connect to the value_changed_signal of layer name
+        // NOTE: LayerManager will always out-live layers, so it's safe to not disconnect.
+        ( *it )->name_state_->value_changed_signal_.connect( boost::bind(
+          &LayerManager::handle_layer_name_changed, this, ( *it )->get_layer_id(), _2 ) );
         this->layer_inserted_signal_( ( *it ) );
       }
     }

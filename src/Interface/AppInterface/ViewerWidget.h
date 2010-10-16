@@ -54,7 +54,7 @@ namespace Seg3D
 
 // Forward declaration
 class ViewerWidget;
-typedef QPointer< ViewerWidget > ViewerWidgetHandle;
+typedef QPointer< ViewerWidget > ViewerWidgetQWeakHandle;
 
 class ViewerWidgetPrivate;
 typedef boost::shared_ptr< ViewerWidgetPrivate > ViewerWidgetPrivateHandle;
@@ -79,10 +79,6 @@ public Q_SLOTS:
   // This slot is triggered if another viewer is activated and this one needs to be deselected.
   void deselect();
   
-  // CHANGE_VIEW_TYPE:
-  // This slot is triggered when the viewer type is changed.
-  void change_view_type( int );
-  
   // FLIP_VIEW_HORIZ:
   // Flip the view horizontally.
   void flip_view_horiz();
@@ -90,10 +86,6 @@ public Q_SLOTS:
   // FLIP_VIEW_VERT:
   // Flip the view vertically.
   void flip_view_vert();
-    
-  // HANDLEVIEWMODECHANGED:
-  // this handles signals from the viewer to keep the flip buttons in sync
-  static void HandleViewModeChanged( ViewerWidgetHandle viewer_widget );
 
 protected:
 
@@ -111,6 +103,7 @@ private:
   int get_minimum_size();
   
 private:
+  friend class ViewerWidgetPrivate;
   // Internals of the viewer widget, so most dependencies do not need to
   // be included here.
   ViewerWidgetPrivateHandle private_;

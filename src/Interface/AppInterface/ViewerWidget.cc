@@ -26,6 +26,9 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// boost includes
+#include <boost/lambda/lambda.hpp>
+#include <boost/lambda/bind.hpp>
 
 // Core includes
 #include <Core/Utils/Log.h>
@@ -60,6 +63,10 @@
 namespace Seg3D
 {
 
+//////////////////////////////////////////////////////////////////////////
+// Class ViewerWidgetPrivate
+//////////////////////////////////////////////////////////////////////////
+
 class ViewerWidgetPrivate
 {
 public:
@@ -79,6 +86,9 @@ public:
   ViewerHandle viewer_;
   
   QVector< QToolButton* > buttons_;
+
+public:
+  static void HandleViewModeChanged( ViewerWidgetQWeakHandle viewer_widget );
 };
 
 void ViewerWidgetPrivate::handle_widget_activated()
@@ -86,6 +96,41 @@ void ViewerWidgetPrivate::handle_widget_activated()
   Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
     ViewerManager::Instance()->active_viewer_state_, this->viewer_->get_viewer_id() );
 }
+
+void ViewerWidgetPrivate::HandleViewModeChanged( ViewerWidgetQWeakHandle viewer_widget )
+{
+  if ( !Core::Interface::IsInterfaceThread() )
+  {
+    Core::Interface::PostEvent( boost::bind( &ViewerWidgetPrivate::HandleViewModeChanged,
+      viewer_widget ) );
+    return;
+  }
+  
+  if ( viewer_widget.isNull() || QCoreApplication::closingDown() )
+  {
+    return;
+  }
+  
+
+  QCoreApplication::postEvent( viewer_widget.data(), new QResizeEvent( 
+    viewer_widget->size(), viewer_widget->size() ) );
+
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+  bool is_volume_view = viewer_widget->private_->viewer_->is_volume_view();
+
+  if( !is_volume_view )
+  {
+    Core::StateView2D* view2d_state = static_cast< Core::StateView2D* >( 
+      viewer_widget->private_->viewer_->get_active_view_state().get() );
+    viewer_widget->private_->ui_.flip_horizontal_button_->setChecked( view2d_state->x_flipped() );
+    viewer_widget->private_->ui_.flip_vertical_button_->setChecked( view2d_state->y_flipped() );
+  }
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+// Class ViewerWidget
+//////////////////////////////////////////////////////////////////////////
 
 ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
   QWidget( parent ),
@@ -154,19 +199,13 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
   this->private_->render_widget_->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
   this->private_->ui_.viewer_layout_->addWidget( this->private_->render_widget_ );
   
+  // Hide the buttons we don't use yet
+  this->private_->ui_.volume_rendering_visible_button_->hide();
 
   // Update state of the widget to reflect current state
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
     
-    ViewerWidgetHandle viewer_widget( this );
-    
-    this->add_connection( this->private_->viewer_->view_mode_state_->value_changed_signal_.connect( 
-      boost::bind( &ViewerWidget::HandleViewModeChanged, viewer_widget ) ) );
-
-    this->connect( this->private_->ui_.viewer_mode_,
-      SIGNAL( currentIndexChanged( int ) ), SLOT( change_view_type( int ) ) );
-
     this->connect( this->private_->ui_.flip_horizontal_button_, SIGNAL( clicked() ),
       SLOT( flip_view_horiz() ) );
 
@@ -202,31 +241,49 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
     QtUtils::QtBridge::Connect( this->private_->ui_.auto_view_button_, boost::bind( 
       &ActionAutoView::Dispatch, Core::Interface::GetWidgetActionContext(),
       this->private_->viewer_->get_viewer_id() ) );
-
-    this->add_icons_to_combobox();
     
     this->private_->render_widget_->activate_signal_.connect(
       boost::bind( &ViewerWidgetPrivate::handle_widget_activated, this->private_  ) );
-  }
-}
-  
-void ViewerWidget::add_icons_to_combobox()
-{ 
-  QIcon icon;
-  icon.addFile( QString::fromUtf8(":/Images/Xview.png"), QSize(), QIcon::Normal, QIcon::On );
-  this->private_->ui_.viewer_mode_->setItemIcon( 0, icon );
-  
-  QIcon icon1;
-  icon1.addFile( QString::fromUtf8(":/Images/Yview.png"), QSize(), QIcon::Normal, QIcon::On );
-  this->private_->ui_.viewer_mode_->setItemIcon( 1, icon1 );
 
-  QIcon icon2;
-  icon2.addFile( QString::fromUtf8(":/Images/Zview.png"), QSize(), QIcon::Normal, QIcon::On );
-  this->private_->ui_.viewer_mode_->setItemIcon( 2, icon2 );
-  
-  QIcon icon3;
-  icon3.addFile( QString::fromUtf8(":/Images/Vview.png"), QSize(), QIcon::Normal, QIcon::On );
-  this->private_->ui_.viewer_mode_->setItemIcon( 3, icon3 );
+    // Show the following buttons when it's not volume view
+    boost::function< bool () > show_buttons_condition = boost::lambda::bind( 
+      &Core::StateLabeledOption::get, viewer->view_mode_state_.get() ) != 
+      boost::lambda::constant( Viewer::VOLUME_C );
+    QtUtils::QtBridge::Show( this->private_->ui_.flip_horizontal_button_, 
+      viewer->view_mode_state_, show_buttons_condition );
+    QtUtils::QtBridge::Show( this->private_->ui_.flip_vertical_button_, 
+      viewer->view_mode_state_, show_buttons_condition );
+    QtUtils::QtBridge::Show( this->private_->ui_.grid_button_, 
+      viewer->view_mode_state_, show_buttons_condition );
+    QtUtils::QtBridge::Show( this->private_->ui_.slice_visible_button_, 
+      viewer->view_mode_state_, show_buttons_condition );
+    QtUtils::QtBridge::Show( this->private_->ui_.picking_lines_visible_button_, 
+      viewer->view_mode_state_, show_buttons_condition );
+    QtUtils::QtBridge::Show( this->private_->picking_button_, 
+      viewer->view_mode_state_, show_buttons_condition );
+    QtUtils::QtBridge::Show( this->private_->ui_.overlay_visible_button_, 
+      viewer->view_mode_state_, show_buttons_condition );
+
+    // Show the following buttons when it's volume view
+    show_buttons_condition = boost::lambda::bind( 
+      &Core::StateLabeledOption::get, viewer->view_mode_state_.get() ) == 
+      boost::lambda::constant( Viewer::VOLUME_C );
+    QtUtils::QtBridge::Show( this->private_->ui_.slices_visible_button_, 
+      viewer->view_mode_state_, show_buttons_condition );
+    QtUtils::QtBridge::Show( this->private_->ui_.light_visible_button_, 
+      viewer->view_mode_state_, show_buttons_condition );
+    QtUtils::QtBridge::Show( this->private_->ui_.isosurfaces_visible_button_, 
+      viewer->view_mode_state_, show_buttons_condition );
+    QtUtils::QtBridge::Show( this->private_->ui_.snap_to_axis_button_, 
+      viewer->view_mode_state_, show_buttons_condition );
+
+    // When view mode changes, we need to rearrange the toolbar and update the flip buttons
+    // NOTE: This must happen after the toolbar buttons have been shown/hidden properly,
+    // and thus the connection should come after the previous QtBridge calls.
+    ViewerWidgetQWeakHandle viewer_widget( this );
+    this->add_connection( this->private_->viewer_->view_mode_state_->state_changed_signal_.
+      connect( boost::bind( &ViewerWidgetPrivate::HandleViewModeChanged, viewer_widget ) ) );
+  }
 }
 
 ViewerWidget::~ViewerWidget()
@@ -261,7 +318,7 @@ int ViewerWidget::get_minimum_size()
 
 void ViewerWidget::resizeEvent( QResizeEvent * event )
 {
-  // In the case that the widget hasnt been initialized we just use the arbitrary minimum size of
+  // In the case that the widget hasn't been initialized we just use the arbitrary minimum size of
   // 300px
   if( !this->private_->initialized_size_ )
   {
@@ -310,56 +367,6 @@ void ViewerWidget::select()
 void ViewerWidget::deselect()
 {
   this->private_->ui_.border_->setStyleSheet( StyleSheet::VIEWERNOTSELECTED_C );
-}
-
-void ViewerWidget::change_view_type( int index )
-{
-  bool is_volume_view = ( index == 3 );
-
-  // 2D viewer specific buttons
-  this->private_->ui_.flip_horizontal_button_->setVisible( !is_volume_view );
-  this->private_->ui_.flip_vertical_button_->setVisible( !is_volume_view );
-  this->private_->ui_.grid_button_->setVisible( !is_volume_view );
-  this->private_->ui_.slice_visible_button_->setVisible( !is_volume_view );
-  this->private_->ui_.picking_lines_visible_button_->setVisible( !is_volume_view );
-  this->private_->picking_button_->setVisible( !is_volume_view );
-
-  // 3D viewer specific buttons
-  this->private_->ui_.slices_visible_button_->setVisible( is_volume_view );
-  this->private_->ui_.light_visible_button_->setVisible( is_volume_view );
-  this->private_->ui_.isosurfaces_visible_button_->setVisible( is_volume_view );
-  this->private_->ui_.volume_rendering_visible_button_->setVisible( is_volume_view);
-  this->private_->ui_.snap_to_axis_button_->setVisible( is_volume_view );
-  
-  // disable buttons that we dont use yet.
-  this->private_->ui_.volume_rendering_visible_button_->setEnabled( false );
-  this->private_->ui_.overlay_visible_button_->setEnabled( !is_volume_view );
-  
-  this->resize( this->width(), this->height() );
-}
-  
-void ViewerWidget::HandleViewModeChanged( ViewerWidgetHandle viewer_widget )
-{
-  if( !( Core::Interface::IsInterfaceThread() ) )
-  {
-    Core::Interface::Instance()->post_event( boost::bind( &ViewerWidget::HandleViewModeChanged,
-      viewer_widget ) );
-    return;
-  }
-  
-  if( viewer_widget.data() )
-  {
-    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-    bool is_volume_view = viewer_widget->private_->viewer_->is_volume_view();
-
-    if( !is_volume_view )
-    {
-      Core::StateView2D* view2d_state = static_cast< Core::StateView2D* >( 
-        viewer_widget->private_->viewer_->get_active_view_state().get() );
-      viewer_widget->private_->ui_.flip_horizontal_button_->setChecked( view2d_state->x_flipped() );
-      viewer_widget->private_->ui_.flip_vertical_button_->setChecked( view2d_state->y_flipped() );
-    }
-  }
 }
   
 void ViewerWidget::flip_view_horiz()

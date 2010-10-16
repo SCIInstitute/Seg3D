@@ -56,6 +56,7 @@ FlipToolInterface::FlipToolInterface() :
 
 FlipToolInterface::~FlipToolInterface()
 {
+  this->disconnect_all();
 }
 
 // build the interface and connect it to the state manager
@@ -107,13 +108,19 @@ bool FlipToolInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Enable( this->private_->ui_.rotate_sagittal_ccw_button_, tool->valid_target_state_ );
   QtUtils::QtBridge::Enable( this->private_->ui_.rotate_sagittal_cw_button_, tool->valid_target_state_ );
 
-  this->add_connection( PreferencesManager::Instance()->x_axis_label_state_->value_changed_signal_.
-    connect( boost::bind( &FlipToolInterface::ChangeXAxisLabel, qpointer_type( this ), _1 ) ) );
-  this->add_connection( PreferencesManager::Instance()->y_axis_label_state_->value_changed_signal_.
-    connect( boost::bind( &FlipToolInterface::ChangeYAxisLabel, qpointer_type( this ), _1 ) ) );
-  this->add_connection( PreferencesManager::Instance()->z_axis_label_state_->value_changed_signal_.
-    connect( boost::bind( &FlipToolInterface::ChangeZAxisLabel, qpointer_type( this ), _1 ) ) );
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    this->change_x_axis_label( PreferencesManager::Instance()->x_axis_label_state_->get() );
+    this->change_y_axis_label( PreferencesManager::Instance()->y_axis_label_state_->get() );
+    this->change_z_axis_label( PreferencesManager::Instance()->z_axis_label_state_->get() );
 
+    this->add_connection( PreferencesManager::Instance()->x_axis_label_state_->value_changed_signal_.
+      connect( boost::bind( &FlipToolInterface::ChangeXAxisLabel, qpointer_type( this ), _1 ) ) );
+    this->add_connection( PreferencesManager::Instance()->y_axis_label_state_->value_changed_signal_.
+      connect( boost::bind( &FlipToolInterface::ChangeYAxisLabel, qpointer_type( this ), _1 ) ) );
+    this->add_connection( PreferencesManager::Instance()->z_axis_label_state_->value_changed_signal_.
+      connect( boost::bind( &FlipToolInterface::ChangeZAxisLabel, qpointer_type( this ), _1 ) ) );
+  }
 
   //Send a message to the log that we have finished with building the Flip Tool Interface
   CORE_LOG_DEBUG( "Finished building a Flip Tool Interface" );
@@ -141,17 +148,17 @@ void FlipToolInterface::ChangeZAxisLabel( qpointer_type qpointer, std::string la
 
 void FlipToolInterface::change_x_axis_label( std::string label )
 {
-  this->private_->ui_.rotate_coronal_cw_button_->setText( 
+  this->private_->ui_.rotate_sagittal_cw_button_->setText( 
     QString::fromStdString( label )+ QString::fromUtf8( " (Clockwise)" ) );
-  this->private_->ui_.rotate_coronal_ccw_button_->setText( 
+  this->private_->ui_.rotate_sagittal_ccw_button_->setText( 
     QString::fromStdString( label )+ QString::fromUtf8( " (Counterclockwise)" ) );
 }
 
 void FlipToolInterface::change_y_axis_label( std::string label )
 {
-  this->private_->ui_.rotate_sagittal_cw_button_->setText( 
+  this->private_->ui_.rotate_coronal_cw_button_->setText( 
     QString::fromStdString( label )+ QString::fromUtf8( " (Clockwise)" ) );
-  this->private_->ui_.rotate_sagittal_ccw_button_->setText( 
+  this->private_->ui_.rotate_coronal_ccw_button_->setText( 
     QString::fromStdString( label )+ QString::fromUtf8( " (Counterclockwise)" ) );
 }
 
@@ -162,14 +169,5 @@ void FlipToolInterface::change_z_axis_label( std::string label )
   this->private_->ui_.rotate_axial_ccw_button_->setText( 
     QString::fromStdString( label )+ QString::fromUtf8( " (Counterclockwise)" ) );
 }
-
-
-
-
-
-
-
-
-
 
 } // namespace Seg3D

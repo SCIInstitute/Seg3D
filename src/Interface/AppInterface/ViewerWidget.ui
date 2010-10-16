@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>386</width>
+    <width>394</width>
     <height>279</height>
    </rect>
   </property>
@@ -179,24 +179,6 @@ QComboBox::icon{
             </property>
             <item>
              <widget class="QWidget" name="viewer_mode_holder_" native="true">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>20</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>92</width>
-                <height>20</height>
-               </size>
-              </property>
               <layout class="QHBoxLayout" name="horizontalLayout">
                <property name="spacing">
                 <number>0</number>
@@ -215,12 +197,6 @@ QComboBox::icon{
                </property>
                <item>
                 <widget class="QComboBox" name="viewer_mode_">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
                  <property name="palette">
                   <palette>
                    <active>
@@ -576,6 +552,9 @@ QComboBox::icon{
                  <property name="currentIndex">
                   <number>0</number>
                  </property>
+                 <property name="sizeAdjustPolicy">
+                  <enum>QComboBox::AdjustToMinimumContentsLengthWithIcon</enum>
+                 </property>
                  <property name="iconSize">
                   <size>
                    <width>16</width>
@@ -590,22 +569,12 @@ QComboBox::icon{
                    <string notr="true">Sagittal</string>
                   </property>
                   <property name="icon">
-                   <iconset resource="../../Resources/QtResources.qrc">
-                    <normaloff>:/Images/XviewOff.png</normaloff>
+                   <iconset>
                     <normalon>:/Images/Xview.png</normalon>
                     <disabledoff>:/Images/Xview.png</disabledoff>
                     <activeoff>:/Images/Xview.png</activeoff>
-                    <selectedoff>:/Images/Xview.png</selectedoff>:/Images/XviewOff.png</iconset>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string notr="true">Axial</string>
-                  </property>
-                  <property name="icon">
-                   <iconset resource="../../Resources/QtResources.qrc">
-                    <normaloff>:/Images/ZviewOff.png</normaloff>
-                    <normalon>:/Images/Zview.png</normalon>:/Images/ZviewOff.png</iconset>
+                    <selectedoff>:/Images/Xview.png</selectedoff>
+                   </iconset>
                   </property>
                  </item>
                  <item>
@@ -613,9 +582,19 @@ QComboBox::icon{
                    <string notr="true">Coronal</string>
                   </property>
                   <property name="icon">
-                   <iconset resource="../../Resources/QtResources.qrc">
-                    <normaloff>:/Images/YviewOff.png</normaloff>
-                    <normalon>:/Images/Yview.png</normalon>:/Images/YviewOff.png</iconset>
+                   <iconset>
+                    <normalon>:/Images/Yview.png</normalon>
+                   </iconset>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string notr="true">Axial</string>
+                  </property>
+                  <property name="icon">
+                   <iconset>
+                    <normalon>:/Images/Zview.png</normalon>
+                   </iconset>
                   </property>
                  </item>
                  <item>
@@ -623,9 +602,9 @@ QComboBox::icon{
                    <string notr="true">Volume</string>
                   </property>
                   <property name="icon">
-                   <iconset resource="../../Resources/QtResources.qrc">
-                    <normaloff>:/Images/VviewOff.png</normaloff>
-                    <normalon>:/Images/Vview.png</normalon>:/Images/VviewOff.png</iconset>
+                   <iconset>
+                    <normalon>:/Images/Vview.png</normalon>
+                   </iconset>
                   </property>
                  </item>
                 </widget>
