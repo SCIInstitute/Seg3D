@@ -26,13 +26,13 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_APPINTERFACE_SINGLESHOTTOOLBUTTON_H
-#define INTERFACE_APPINTERFACE_SINGLESHOTTOOLBUTTON_H
+#ifndef QTUTILS_WIDGETS_SINGLESHOTTOOLBUTTON_H
+#define QTUTILS_WIDGETS_SINGLESHOTTOOLBUTTON_H
 
 // Qt includes
-#include <QtGui>
+#include <QToolButton>
 
-namespace Seg3D
+namespace QtUtils
 {
 
 class SingleShotToolButton : public QToolButton
@@ -47,6 +47,6 @@ protected:
   virtual void mouseReleaseEvent( QMouseEvent* e );
 };
 
-} // end namespace Seg3D
+} // end namespace QtUtils
 
 #endif

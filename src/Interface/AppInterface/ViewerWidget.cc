@@ -56,7 +56,6 @@
 #include "ui_ViewerWidget.h"
 
 // Interface includes
-#include <Interface/AppInterface/SingleShotToolButton.h>
 #include <Interface/AppInterface/StyleSheet.h>
 #include <Interface/AppInterface/ViewerWidget.h>
 
@@ -77,10 +76,6 @@ public:
 
   int minimum_toolbar_width_; 
   bool initialized_size_;
-
-  // We need a special single shot button for the picking button
-  QToolButton* picking_button_;
-  QIcon picking_icon_;
 
   // Handle to the underlying Viewer structure
   ViewerHandle viewer_;
@@ -110,7 +105,6 @@ void ViewerWidgetPrivate::HandleViewModeChanged( ViewerWidgetQWeakHandle viewer_
   {
     return;
   }
-  
 
   QCoreApplication::postEvent( viewer_widget.data(), new QResizeEvent( 
     viewer_widget->size(), viewer_widget->size() ) );
@@ -138,25 +132,6 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
 {
   this->private_->viewer_ = viewer;
   this->private_->ui_.setupUi( this );
-
-  // Setup the Icon
-  this->private_->picking_icon_.addPixmap( QPixmap( ":/Images/Picking.png" ), QIcon::Normal, QIcon::On );
-  this->private_->picking_icon_.addPixmap( QPixmap( ":/Images/PickingOff.png" ), QIcon::Normal, QIcon::Off );
-  
-  // Setup the Custom Picking Button
-  this->private_->picking_button_ =  new SingleShotToolButton( this->private_->ui_.less_common_tools_ );
-  this->private_->picking_button_->setCheckable( true );
-  this->private_->picking_button_->setToolButtonStyle( Qt::ToolButtonIconOnly );
-  this->private_->picking_button_->setIcon( this->private_->picking_icon_ );
-  this->private_->picking_button_->setText( QString( "Picking" ) );
-  this->private_->picking_button_->setToolTip( QString( "Make this viewer a target for picking" ) );
-  this->private_->picking_button_->setFixedHeight( 20 );
-  this->private_->picking_button_->setFixedWidth( 20 );
-  
-  this->private_->picking_button_->setMinimumHeight( 20 );
-  this->private_->picking_button_->setMinimumWidth( 20 );
-  this->private_->picking_button_->setMaximumHeight( 20 );
-  this->private_->picking_button_->setMaximumWidth( 20 );
   
   // IF YOU ADD ANOTHER BUTTON TO THE VIEWERWIDGET, PLEASE ADD IT TO THE buttons_ VECTOR.
   // We make a vector of all the buttons this way we can calculate the minimum size that the 
@@ -174,10 +149,8 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
   this->private_->buttons_.push_back( this->private_->ui_.volume_rendering_visible_button_ );
   this->private_->buttons_.push_back( this->private_->ui_.overlay_visible_button_ );
   this->private_->buttons_.push_back( this->private_->ui_.picking_lines_visible_button_ );
-  this->private_->buttons_.push_back( this->private_->picking_button_ );
-  
-  this->private_->ui_.less_common_tools_layout_->insertWidget( 0, this->private_->picking_button_ );
-  
+  this->private_->buttons_.push_back( this->private_->ui_.picking_button_ );
+    
 //  // Setup the widget so for a small size it can be broken into two
 //
 //  this->private_->minimum_toolbar_width_ = 300;
@@ -214,7 +187,7 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
   
     QtUtils::QtBridge::Connect( this->private_->ui_.viewer_mode_, 
       this->private_->viewer_->view_mode_state_ );
-    QtUtils::QtBridge::Connect( this->private_->picking_button_ , 
+    QtUtils::QtBridge::Connect( this->private_->ui_.picking_button_ , 
       this->private_->viewer_->is_picking_target_state_ );
     QtUtils::QtBridge::Connect( this->private_->ui_.grid_button_, 
       this->private_->viewer_->slice_grid_state_ );
@@ -259,7 +232,7 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
       viewer->view_mode_state_, show_buttons_condition );
     QtUtils::QtBridge::Show( this->private_->ui_.picking_lines_visible_button_, 
       viewer->view_mode_state_, show_buttons_condition );
-    QtUtils::QtBridge::Show( this->private_->picking_button_, 
+    QtUtils::QtBridge::Show( this->private_->ui_.picking_button_, 
       viewer->view_mode_state_, show_buttons_condition );
     QtUtils::QtBridge::Show( this->private_->ui_.overlay_visible_button_, 
       viewer->view_mode_state_, show_buttons_condition );

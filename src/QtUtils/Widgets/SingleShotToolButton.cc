@@ -28,9 +28,11 @@
 
 #include <cassert>
 
-#include <Interface/AppInterface/SingleShotToolButton.h>
+#include <QtGui>
 
-namespace Seg3D
+#include <QtUtils/Widgets/SingleShotToolButton.h>
+
+namespace QtUtils
 {
 
 SingleShotToolButton::SingleShotToolButton( QWidget *parent ) :
@@ -75,4 +77,4 @@ void SingleShotToolButton::mouseReleaseEvent( QMouseEvent *e )
   }
 }
 
-} // end namespace Seg3D
+} // end namespace QtUtils

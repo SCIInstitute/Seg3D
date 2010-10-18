@@ -229,10 +229,10 @@ double ViewManipulator::compute_scaling( int x0, int y0, int x1, int y1 ) const
     delta_y = -delta_y;
   }
 
-  double len = Core::Sqrt( delta_x * delta_x + delta_y * delta_y );
-  double scale = Core::Abs( delta_x ) > Core::Abs( delta_y ) ? delta_x : delta_y;
-  //double len = Core::Abs( delta_y );
-  //double scale = delta_y;
+  //double len = Core::Sqrt( delta_x * delta_x + delta_y * delta_y );
+  //double scale = Core::Abs( delta_x ) > Core::Abs( delta_y ) ? delta_x : delta_y;
+  double len = Core::Abs( delta_y );
+  double scale = delta_y;
 
   if ( scale > 0 )
   {

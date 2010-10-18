@@ -40,6 +40,7 @@ SET(QTUTILS_WIDGETS_SRCS
   QtSliderIntCombo.cc
   QtLogSliderIntCombo.cc
   QtTristateToolButton.cc
+  SingleShotToolButton.cc
 )
 
 SET(QTUTILS_WIDGETS_MOC_SRCS
@@ -51,6 +52,7 @@ SET(QTUTILS_WIDGETS_MOC_SRCS
   QtSliderIntCombo.h
   QtLogSliderIntCombo.h
   QtTristateToolButton.h
+  SingleShotToolButton.h
 )
 
 SET(QTUTILS_WIDGETS_NO_MOC_SRCS
