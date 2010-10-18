@@ -37,7 +37,7 @@ SET(INTERFACE_APPINTERFACE_SRCS
   AppLayerIO.cc
   AppStatusBar.cc
   HistoryDockWidget.cc
-  MessageHistoryWidget.cc
+  MessageWindow.cc
   LayerManagerWidget.cc
   LayerImporterWidget.cc
   LayerWidget.cc
@@ -69,7 +69,7 @@ SET(INTERFACE_APPINTERFACE_MOC_SRCS
   LayerGroupWidget.h
   LayerManagerWidget.h
   LayerManagerDockWidget.h
-  MessageHistoryWidget.h
+  MessageWindow.h
   MeasurementDockWidget.h
   ProgressWidget.h
   ProjectDockWidget.h
@@ -99,7 +99,7 @@ SET(INTERFACE_APPINTERFACE_UI_SRCS
   LayerManagerDockWidget.ui
   LayerWidget.ui
   MeasurementDockWidget.ui
-  MessageHistoryWidget.ui
+  MessageWindow.ui
   ProjectDockWidget.ui
   ProgressWidget.ui
   ToolBoxPageWidget.ui

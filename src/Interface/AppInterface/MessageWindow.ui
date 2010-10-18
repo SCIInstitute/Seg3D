@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MessageHistoryWidget</class>
- <widget class="QDialog" name="MessageHistoryWidget">
+ <class>MessageWindow</class>
+ <widget class="QDialog" name="MessageWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>Seg3D2.0 Message History</string>
+   <string>Seg3D 2.0 - Message History</string>
   </property>
   <property name="styleSheet">
    <string notr="true">QWidget#HistoryWidget {
@@ -45,13 +45,13 @@ QLabel#warning_label_{
     <number>6</number>
    </property>
    <property name="topMargin">
-    <number>6</number>
+    <number>12</number>
    </property>
    <property name="rightMargin">
     <number>6</number>
    </property>
    <property name="bottomMargin">
-    <number>4</number>
+    <number>2</number>
    </property>
    <item>
     <widget class="QGroupBox" name="groupBox">

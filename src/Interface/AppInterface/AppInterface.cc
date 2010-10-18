@@ -81,7 +81,7 @@ AppInterface::AppInterface()
   this->controller_interface_ = new AppController( this );
   this->controller_interface_->hide();
   
-  this->history_widget_ = new MessageHistoryWidget( this );
+  this->history_widget_ = new MessageWindow( this );
   this->history_widget_->hide();
   
   this->splash_interface_ = new AppSplash( this );
@@ -355,7 +355,7 @@ void AppInterface::show_window( const std::string& windowid )
   {
     if( this->history_widget_.isNull() )
     {
-      this->history_widget_ = new MessageHistoryWidget( this );
+      this->history_widget_ = new MessageWindow( this );
       this->history_widget_->show();
     }
     else

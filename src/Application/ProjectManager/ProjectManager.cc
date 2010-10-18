@@ -183,7 +183,8 @@ void ProjectManager::rename_project( const std::string& new_name, Core::ActionSo
   {
     this->add_to_recent_projects( this->current_project_path_state_->get(), new_name );
     
-    this->current_project_->set_project_path( path / new_name );
+    //this->current_project_->set_project_path( path / new_name );
+    this->set_project_path( path / new_name );
 
     StatusBar::Instance()->set_message( Core::LogMessageType::MESSAGE_E, 
       "The project name has been successfully changed to: '" + new_name  + "'" );
@@ -216,8 +217,9 @@ void ProjectManager::new_project( const std::string& project_name, const std::st
     path = path / project_name;
 
     std::vector< std::string > empty_vector;
-    this->current_project_->set_project_path( path );
-    this->current_project_path_state_->set( project_path );
+//    this->current_project_->set_project_path( path );
+//    this->current_project_path_state_->set( project_path );
+    this->set_project_path( path );
     this->current_project_->sessions_state_->set( empty_vector );
     this->current_project_->project_notes_state_->set( empty_vector );
     this->current_project_->save_custom_colors_state_->set( false );
@@ -236,11 +238,10 @@ void ProjectManager::open_project( const std::string& project_path )
 { 
   this->changing_projects_ = true;
   boost::filesystem::path path = project_path;
-  this->current_project_->set_project_path( path );
   
-  //this->current_project_->initialize_from_file( path, path.leaf() );
+  this->set_project_path( path );
+    
   this->current_project_->initialize_from_file( path.leaf() );
-  this->current_project_path_state_->set( path.parent_path().string() );
   this->add_to_recent_projects( path.parent_path().string(), path.leaf() );
 
   this->set_last_saved_session_time_stamp();
@@ -541,5 +542,12 @@ bool ProjectManager::is_saving() const
   ASSERT_ON_APPLICATION_THREAD();
   return this->session_saving_;
 }
+
+void ProjectManager::set_project_path( boost::filesystem::path path )
+{
+  this->current_project_->set_project_path( path );
+  this->current_project_path_state_->set( path.parent_path().string() );
+}
+
 
 } // end namespace seg3D

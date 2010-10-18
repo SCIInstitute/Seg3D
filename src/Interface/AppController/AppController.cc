@@ -74,6 +74,8 @@ AppController::AppController( QWidget* parent ) :
   private_->ui_.setupUi( this );
   private_->context_ = Core::ActionContextHandle( new AppControllerContext( this ) );
   
+  // Step 1.5: Remove the help button and set the icon because removing the button can occasionaly
+  // cause problems with it
   QIcon icon = windowIcon();
   Qt::WindowFlags flags = windowFlags();
   Qt::WindowFlags helpFlag = Qt::WindowContextHelpButtonHint;
@@ -88,7 +90,6 @@ AppController::AppController( QWidget* parent ) :
   private_->log_history_model_ = new AppControllerLogHistory( 1000, this );
 
   // Step 2: Modify the widget
-  setWindowTitle( QString( "Seg3D Controller" ) );
   qpointer_type controller( this );
 
   // Step 4: Fix the widget properties

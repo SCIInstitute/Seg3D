@@ -41,26 +41,26 @@
 #include <QtUtils/Bridge/QtBridge.h>
 
 // Interface Includes
-#include <Interface/AppInterface/MessageHistoryWidget.h>
+#include <Interface/AppInterface/MessageWindow.h>
 
-#include "ui_MessageHistoryWidget.h"
+#include "ui_MessageWindow.h"
 
 namespace Seg3D
 {
 
-class MessageHistoryWidgetPrivate
+class MessageWindowPrivate
 {
 public:
 
-  Ui::MessageHistoryWidget ui_;
+  Ui::MessageWindow ui_;
 
 };
 
-MessageHistoryWidget::MessageHistoryWidget( QWidget *parent ) :
+MessageWindow::MessageWindow( QWidget *parent ) :
   QDialog( parent ),
-  private_( new MessageHistoryWidgetPrivate ) 
+  private_( new MessageWindowPrivate )  
 {
-  // Set up the private internals of the LayerManagerInterface class
+  // Set up the private internals of the MessageWindow class
   this->private_->ui_.setupUi( this );
   
   QIcon icon = windowIcon();
@@ -70,23 +70,22 @@ MessageHistoryWidget::MessageHistoryWidget( QWidget *parent ) :
   this->setWindowFlags( flags );
   this->setWindowIcon( icon );
 
-  
   this->add_connection( StatusBar::Instance()->message_updated_signal_.connect( 
-    boost::bind( &MessageHistoryWidget::AddMessage, QPointer< MessageHistoryWidget >( this ), _1, _2 ) ) );
+    boost::bind( &MessageWindow::AddMessage, QPointer< MessageWindow >( this ), _1, _2 ) ) );
 }
 
-MessageHistoryWidget::~MessageHistoryWidget()
+MessageWindow::~MessageWindow()
 {
   this->disconnect_all();
 }
 
-void MessageHistoryWidget::AddMessage( QPointer< MessageHistoryWidget > qpointer, int msg_type, std::string message )
+void MessageWindow::AddMessage( QPointer< MessageWindow > qpointer, int msg_type, std::string message )
 {
   Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
-    &MessageHistoryWidget::add_message, qpointer.data(), msg_type, message ) ) );
+    &MessageWindow::add_message, qpointer.data(), msg_type, message ) ) );
 }
 
-void MessageHistoryWidget::add_message( int msg_type, std::string message )
+void MessageWindow::add_message( int msg_type, std::string message )
 {
   QColor color_ = QColor( 255, 255, 255 );
   std::string status_message = message;

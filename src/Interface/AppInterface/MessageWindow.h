@@ -44,21 +44,21 @@
 namespace Seg3D
 {
 
-class MessageHistoryWidgetPrivate;
+class MessageWindowPrivate;
 
-class MessageHistoryWidget : public QDialog, private Core::ConnectionHandler
+class MessageWindow : public QDialog, private Core::ConnectionHandler
 {
 Q_OBJECT
   
 public:
-  MessageHistoryWidget( QWidget *parent = 0 );
-  virtual ~MessageHistoryWidget();
+  MessageWindow( QWidget *parent = 0 );
+  virtual ~MessageWindow();
 
 private:
-  boost::shared_ptr< MessageHistoryWidgetPrivate > private_;
+  boost::shared_ptr< MessageWindowPrivate > private_;
 
 private:
-  static void AddMessage( QPointer< MessageHistoryWidget > qpointer, 
+  static void AddMessage( QPointer< MessageWindow > qpointer, 
     int msg_type, std::string message );
   void add_message( int msg_type, std::string message );
   

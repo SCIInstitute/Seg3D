@@ -73,9 +73,7 @@ AppPreferences::AppPreferences( QWidget *parent ) :
   flags = flags & ( ~helpFlag );
   this->setWindowFlags( flags );
   this->setWindowIcon( icon );
-  
-  //this->setWindowFlags( Qt::WindowContextHelpButtonHint );
-  
+
   // Initialize all the tabs
   this->setup_layer_prefs();
   this->setup_general_prefs();
@@ -86,7 +84,6 @@ AppPreferences::AppPreferences( QWidget *parent ) :
   //Hide the interface controls since they arent connected yet
   this->private_->ui_.prefs_tabs_->removeTab( 2 );
   
-
   // connect the apply button to the save defaults function
   connect( this->private_->ui_.apply_button_, SIGNAL( clicked() ), 
     this, SLOT( save_settings() ) );

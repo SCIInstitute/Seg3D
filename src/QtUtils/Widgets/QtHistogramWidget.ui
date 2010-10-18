@@ -54,6 +54,9 @@ QLabel#label_3{
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="toolTip">
+         <string>Left mouse sets the lower threshold, right mouse sets the upper</string>
+        </property>
         <layout class="QHBoxLayout" name="histogramLayout">
          <property name="spacing">
           <number>0</number>

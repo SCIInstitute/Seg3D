@@ -161,6 +161,8 @@ private:
   // CLEANUP_PROJECTS_LIST:
   // this function cleans up projects from the recent projects list that don't exist.
   void cleanup_projects_list();
+   
+  void set_project_path( boost::filesystem::path path );
 
 private:
   boost::posix_time::ptime  last_saved_session_time_stamp_;

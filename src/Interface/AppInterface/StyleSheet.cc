@@ -122,7 +122,17 @@ namespace Seg3D
     " padding-left: 4px;"
     " color: white;"
     " font: bold;"
-    "}" );
+    "}"
+    "QPushButton#activate_button_:hover{"
+    " color: silver;"
+    "}"
+    "QPushButton#activate_button_:pressed{"
+//    " background-color:rgba(0, 0, 0, 0);"
+//    " border-color: rgba(0, 0, 0, 0);"
+    " padding-left: 4px;"
+    " border: none;"
+    " color:  rgb(68, 68, 68);"
+    "}\n");
   const QString StyleSheet::TOOLBOXPAGEWIDGET_ACTIVATE_BUTTON_INACTIVE_C = QString( 
     "QPushButton#activate_button_{"
     " margin-right: 7px;"
@@ -131,7 +141,17 @@ namespace Seg3D
     " padding-left: 4px;"
     " color: rgb(25, 25, 25);"
     " font: normal;"
-    "}" );
+    "}"
+    "QPushButton#activate_button_:hover{"
+    " color: silver;"
+    "}"
+    "QPushButton#activate_button_:pressed{"
+//    " background-color:rgba(0, 0, 0, 0);"
+//    " border-color: rgba(0, 0, 0, 0);"
+    " padding-left: 4px;"
+    " border: none;"
+    " color:  rgb(68, 68, 68);"
+    "}");
   
 
 // === LayerWidget Styles === //
