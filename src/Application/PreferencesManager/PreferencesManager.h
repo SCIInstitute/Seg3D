@@ -76,6 +76,7 @@ public:
   Core::StateBoolHandle compression_state_;
   Core::StateRangedIntHandle compression_level_state_;
   Core::StateIntHandle slice_step_multiplier_state_;
+  Core::StateOptionHandle axis_labels_option_state_;
   Core::StateStringHandle x_axis_label_state_;
   Core::StateStringHandle y_axis_label_state_;
   Core::StateStringHandle z_axis_label_state_;

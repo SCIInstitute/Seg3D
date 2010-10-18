@@ -63,6 +63,11 @@ public:
   // RESET_HISTOGRAM:
   // Invalidate the current histogram
   void reset_histogram();
+  
+  bool get_logarithmic() const{ return this->logarithmic_; }
+  
+public Q_SLOTS:
+  void switch_between_linear_log_histogram();
 
 protected:
   // PAINTEVENT:
@@ -73,6 +78,7 @@ protected:
 
 private:
   Core::Histogram histogram_;
+  bool logarithmic_;
   
 };
 

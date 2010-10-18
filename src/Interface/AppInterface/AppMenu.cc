@@ -181,14 +181,14 @@ void AppMenu::create_file_menu( QMenu* qmenu )
 
 void AppMenu::create_edit_menu( QMenu* qmenu )
 {
-  this->copy_qaction_ = qmenu->addAction( tr( "Copy" ) );
+  this->copy_qaction_ = qmenu->addAction( tr( "Copy Mask Slice" ) );
   this->copy_qaction_->setShortcut( tr( "Ctrl+C" ) );
   this->copy_qaction_->setToolTip( tr( "Copy the current mask slice" ) );
   QtUtils::QtBridge::Connect( this->copy_qaction_, boost::bind( &ActionCopy::Dispatch,
     Core::Interface::GetWidgetActionContext() ) );
   this->copy_qaction_->setEnabled( false );
 
-  this->paste_qaction_ = qmenu->addAction( tr( "Paste" ) );
+  this->paste_qaction_ = qmenu->addAction( tr( "Paste Mask Slice" ) );
   this->paste_qaction_->setShortcut( tr( "Ctrl+V" ) );
   this->paste_qaction_->setToolTip( tr( "Paste to the current mask slice" ) );
   QtUtils::QtBridge::Connect( this->paste_qaction_, boost::bind( &ActionPaste::Dispatch,
@@ -364,7 +364,7 @@ void AppMenu::create_window_menu( QMenu* qmenu )
   void AppMenu::about()
   {
     QMessageBox::about( this->main_window_, tr( "About Seg3D 2.0" ), 
-      tr( "<h3>Seg3D 2.0</h3><p>Seg3D 2.0 is much awesomer than the old clunky Seg3D 1.0.</p>"
+      tr( "<h3>Seg3D 2.0</h3><p>Seg3D 2.0 is just as good as Seg3D 1.0, just newer!</p>"
         "<p>Seg3D is a free volume segmentation and processing tool developed by Numira "
           "Biosciences in conjunction with the NIH Center for Integrative Biomedical "
           "Computing at the University of Utah Scientific Computing and Imaging (SCI) "

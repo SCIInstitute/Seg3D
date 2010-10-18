@@ -107,7 +107,6 @@ void AppPreferences::change_project_directory()
     Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
       PreferencesManager::Instance()->project_path_state_, 
       project_directory_.absolutePath().toStdString() );
-    //this->private_->ui_.path_->setText( project_directory_.absolutePath() );
   }
 }
 
@@ -145,6 +144,8 @@ void AppPreferences::setup_general_prefs()
   QtUtils::QtBridge::Connect( this->private_->ui_.slice_step_multiplier_spinbox_,
     PreferencesManager::Instance()->slice_step_multiplier_state_ );
     
+  QtUtils::QtBridge::Connect( this->private_->ui_.axis_combobox_,
+    PreferencesManager::Instance()->axis_labels_option_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.x_lineedit_,
     PreferencesManager::Instance()->x_axis_label_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.y_lineedit_,

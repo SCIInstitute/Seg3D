@@ -82,7 +82,8 @@ public Q_SLOTS:
   
 private Q_SLOTS:
   void handle_right_button_click( int );
-  void handle_left_button_click( int ); 
+  void handle_left_button_click( int );
+  void set_histogram_view();
 
 private:
   QtHistogramWidgetPrivateHandle private_;
