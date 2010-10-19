@@ -112,6 +112,7 @@ protected:
   // NOTE: Only the layer manager groups the layers, this is all done
   // dynamically
   friend class LayerManager;
+  friend class LayerManagerPrivate;
 
   // INSERT_LAYER:
   // Inserts a layer in the correct position
@@ -124,22 +125,10 @@ protected:
   // DELETE_LAYER:
   // Delete a layer from the list
   void delete_layer( LayerHandle layer );
-  
-  // CROP_LAYER:
-  // Crops the selected layers based on the state of the crop panel
-  void crop_layer();
-    
-  // TRANSFORM_LAYER:
-  // Performs a transform on the selected layers based on the state of the transform panel
-  void transform_layer();
-  
-  // RESAMPLE_LAYER:
-  // Performs a resample on the selected layers based on the state of the resample panel
-  void resample_layer();
-  
-  // FLIP_LAYER:
-  // Performs a flip or rotate on the selected layers based on which layers were selected
-  void flip_layer();
+
+  // CLEAR:
+  // Delete all  the layers.
+  void clear();
   
 protected:
   // POST_SAVE_STATES:

@@ -83,6 +83,10 @@ private:
   // Called on post_load_states_signal_ from the StateEngine.
   void post_load_states();
 
+  // RESET:
+  // Remove all the layer widgets.
+  void reset();
+
   // MAKE_NEW_GROUP:
   // function that creates a new group to put layers into. 
   LayerGroupWidget* make_new_group( LayerGroupHandle group );
@@ -105,21 +109,9 @@ private Q_SLOTS:
   
   // -- internals of this class --
 private:
+  friend class LayerManagerWidgetPrivate;
+
   LayerManagerWidgetPrivateHandle private_;
-
-  // -- static functions for callbacks into this widget --
-public:
-  typedef QPointer< LayerManagerWidget > qpointer_type;
-  
-  // HANDLEGROUPINTERNALCHANGED:
-  static void HandleGroupInternalChanged( qpointer_type qpointer, LayerGroupHandle &group );
-
-  // HANDLEGROUPSCHANGED:
-  static void HandleGroupsChanged( qpointer_type qpointer );
-
-  static void PreLoadStates( qpointer_type qpointer );
-
-  static void PostLoadStates( qpointer_type qpointer );
 };
 
 } //endnamespace Seg3d

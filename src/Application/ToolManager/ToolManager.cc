@@ -75,6 +75,11 @@ public:
   void handle_active_tool_changed();
   void handle_active_tool_state_changed( std::string tool_id );
 
+  // DELETE_ALL:
+  // This function closes and deletes all the current tools. 
+  // It's called when the application is being reset.
+  void reset();
+
   // All the open tools are stored in this hash map
   ToolManager::tool_list_type tool_list_;
   ToolHandle active_tool_;
@@ -268,6 +273,20 @@ void ToolManagerPrivate::handle_active_tool_state_changed( std::string tool_id )
   this->tool_manager_->activate_tool( tool_id );
 }
 
+void ToolManagerPrivate::reset()
+{
+  ToolManager::tool_list_type::iterator it = this->tool_list_.begin();
+  while( it != this->tool_list_.end() )
+  {
+    ( *it ).second->invalidate();
+    ( *it ).second->close();
+    ++it;
+  }
+  this->active_tool_.reset();
+  this->tool_list_.clear();
+  ViewerManager::Instance()->reset_cursor();
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Class ToolManager
 //////////////////////////////////////////////////////////////////////////
@@ -311,6 +330,8 @@ ToolManager::ToolManager() :
     &ToolManagerPrivate::handle_active_tool_changed, this->private_ ) ) );
   this->add_connection( this->active_tool_state_->value_changed_signal_.connect( boost::bind( 
     &ToolManagerPrivate::handle_active_tool_state_changed, this->private_, _2 ) ) );
+  this->add_connection( Core::Application::Instance()->reset_signal_.connect( boost::bind(
+    &ToolManagerPrivate::reset, this->private_ ) ) );
 }
 
 ToolManager::~ToolManager()
@@ -520,7 +541,9 @@ bool ToolManager::post_save_states( Core::StateIO& state_io )
 
 bool ToolManager::pre_load_states( const Core::StateIO& state_io )
 {
-  this->delete_all();
+  // Make sure that the tool list is empty.
+  // NOTE: The application should have been properly reset before loading a session.
+  assert( this->private_->tool_list_.empty() );
 
   const TiXmlElement* tools_element = state_io.get_current_element()->
     FirstChildElement( "tools" );
@@ -586,19 +609,6 @@ void ToolManager::get_tool_names( std::vector< ToolIDNamePair >& tool_names )
     tool_names.push_back( std::make_pair( tool->toolid(), tool->tool_name() ) );
     it++;
   }
-}
-
-bool ToolManager::delete_all()
-{
-  tool_list_type::iterator it = this->private_->tool_list_.begin();
-  while( it != this->private_->tool_list_.end() )
-  {
-    ( *it ).second->invalidate();
-    tool_list_type::iterator temp_it = it;
-    it++;
-    this->close_tool( ( *temp_it ).first );
-  }
-  return true;
 }
 
 int ToolManager::get_session_priority()

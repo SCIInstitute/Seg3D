@@ -163,9 +163,6 @@ public:
   // this function sets the active layer
   void set_active_layer( LayerHandle layer );
 
-  // DELETE_ALL:
-  bool delete_all();
-
 private:
   // VALIDATE_LAYER_MOVE:
   // this function is used to validate that a layer move is the kind we want to allow. 

@@ -69,7 +69,7 @@ public:
   virtual ~ToolsDockWidget();
 
   // -- functions that control the toolbox --
-public:
+private:
 
   // OPEN_TOOL
   // The internals of opening a tool
@@ -83,6 +83,11 @@ public:
   // The internals of activating a tool
   void activate_tool( ToolHandle& tool );
 
+  // CLEAR:
+  // Delete all the tool widgets. 
+  // It is called when the Application reset_signal_ is triggered.
+  void clear();
+
   // -- internals of this class --
 private:
   // List of tool widgets
@@ -93,7 +98,7 @@ private:
   ToolBoxWidget* toolbox_;
 
   // -- static functions for callbacks into this widget --
-public:
+private:
   typedef QPointer< ToolsDockWidget > qpointer_type;
 
   // NOTE: This function do not take references as the parameters are
@@ -115,6 +120,10 @@ public:
   // This function should be called to close the tool, this one relays all the
   // information properly to the Qt thread
   static void HandleActivateTool( qpointer_type qpointer, ToolHandle tool );
+
+  // HANDLERESET:
+  // This function is called when reset_signal_ of Core::Application is triggered.
+  static void HandleReset( qpointer_type qpointer );
 };
 
 } // end namespace Seg3D

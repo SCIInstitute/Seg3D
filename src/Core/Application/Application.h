@@ -53,7 +53,7 @@ namespace Core
 
 class Application;
 
-class Application : public EventHandler, public Lockable
+class Application : public EventHandler, public RecursiveLockable
 {
   CORE_SINGLETON( Application );
 
@@ -69,6 +69,11 @@ public:
   // NOTE: This function should be called by main at the end of the program to ensure
   // that actions like saving the last session are properly executed.
   void finish();
+
+  // RESET:
+  // Reset the application. It triggers the reset_signal_.
+  // NOTE: This function should only be called in the application thread.
+  void reset();
 
   // -- Command line parser --
 public:
@@ -120,6 +125,12 @@ public:
   // Get the current username
   bool get_user_name( std::string& user_name );
 
+  // -- Signals --
+public:
+  // RESET_SIGNAL_:
+  // This signal is triggered by calling the reset function.
+  boost::signals2::signal< void () > reset_signal_;
+
   // -- Application thread --
 public:
   // ISAPPLICATIONTHREAD:
@@ -133,6 +144,14 @@ public:
   // POSTANDWAITEVENT:
   // Short cut to the event handler
   static void PostAndWaitEvent( boost::function< void() > function );
+
+  // GETMUTEX:
+  // Get the mutex of the application.
+  static mutex_type& GetMutex();
+
+  // RESET:
+  // Reset the application.
+  static void Reset();
 
   // -- Program information --
 public: 
@@ -165,9 +184,6 @@ public:
   // Get the name of the application
   static std::string GetApplicationName();
 };
-
-#define ASSERT_ON_APPLICATION_THREAD()\
-  assert( Core::Application::IsApplicationThread() )
 
 } // end namespace Core
 

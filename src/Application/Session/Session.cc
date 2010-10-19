@@ -56,9 +56,7 @@ bool Session::load( boost::filesystem::path path, const std::string& session_nam
     return false;
   }
 
-  ViewerManager::Instance()->disable_rendering();
   bool result = Core::StateEngine::Instance()->load_states( state_io );
-  ViewerManager::Instance()->enable_rendering();
   return result;
 }
   

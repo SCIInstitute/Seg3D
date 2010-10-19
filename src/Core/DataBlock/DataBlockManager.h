@@ -68,9 +68,13 @@ public:
   // Find a datablock with a specific generation number.
   bool find_datablock( DataBlock::generation_type generation, DataBlockHandle& datablock );
 
+  // CLEAR:
+  // Remove all the data blocks.
+  void clear();
+
 private:
   friend class DataBlock;
-  friend class ProjectManager;
+  friend class MaskDataBlockManager;
   
   // GET_GENERATION_COUNT:
   // Get the most recent generation number

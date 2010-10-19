@@ -34,6 +34,9 @@
 #include <Core/Utils/Log.h>
 #include <Core/Interface/Interface.h>
 
+// QtUtils includes
+#include <QtUtils/Utils/QtPointer.h>
+
 // Application includes
 #include <Application/Tool/ToolFactory.h>
 #include <Application/ToolManager/ToolManager.h>
@@ -87,6 +90,9 @@ ToolsDockWidget::ToolsDockWidget( QWidget *parent ) :
   add_connection( ToolManager::Instance()->activate_tool_signal_.connect( boost::bind(
       &ToolsDockWidget::HandleActivateTool, dock_widget, _1 ) ) );
 
+  this->add_connection( Core::Application::Instance()->reset_signal_.connect( boost::bind(
+    &ToolsDockWidget::HandleReset, dock_widget ) ) );
+
   ToolManager::tool_list_type tool_list = ToolManager::Instance()->tool_list();
   std::string active_toolid = ToolManager::Instance()->active_toolid();
 
@@ -110,7 +116,7 @@ ToolsDockWidget::ToolsDockWidget( QWidget *parent ) :
 
 ToolsDockWidget::~ToolsDockWidget()
 {
-  disconnect_all();
+  this->disconnect_all();
 }
 
 void ToolsDockWidget::open_tool( ToolHandle& tool )
@@ -192,6 +198,18 @@ void ToolsDockWidget::activate_tool( ToolHandle& tool )
   }
 }
 
+void ToolsDockWidget::clear()
+{
+  tool_widget_list_type::iterator it = this->tool_widget_list_.begin();
+  while ( it != this->tool_widget_list_.end() )
+  {
+    this->toolbox_->remove_tool( this->toolbox_->index_of( ( *it ).second ) );
+    ++it;
+  }
+
+  this->tool_widget_list_.clear();
+}
+
 void ToolsDockWidget::HandleOpenTool( qpointer_type qpointer, ToolHandle tool )
 {
   if( !( Core::Interface::IsInterfaceThread() ) )
@@ -226,6 +244,12 @@ void ToolsDockWidget::HandleActivateTool( qpointer_type qpointer, ToolHandle too
   }
 
   if( qpointer.data() ) qpointer->activate_tool( tool );
+}
+
+void ToolsDockWidget::HandleReset( qpointer_type qpointer )
+{
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, 
+    boost::bind( &ToolsDockWidget::clear, qpointer.data() ) ) );
 }
 
 } // end namespace Seg3D

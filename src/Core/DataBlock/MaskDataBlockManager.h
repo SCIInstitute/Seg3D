@@ -83,6 +83,9 @@ public:
   bool create( DataBlock::generation_type generation, unsigned int bit, 
     GridTransform& grid_transform, MaskDataBlockHandle& mask );
 
+  // CLEAR:
+  // Remove all the MaskDataBlock.
+  void clear();
 
   // TODO:
   // Do these need to be private ?

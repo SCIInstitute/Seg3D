@@ -199,6 +199,9 @@ void ProjectManager::rename_project( const std::string& new_name, Core::ActionSo
 
 void ProjectManager::new_project( const std::string& project_name, const std::string& project_path )
 {
+  // Reset the application.
+  Core::Application::Reset();
+
   this->changing_projects_ = true;
   this->current_project_->project_name_state_->set( project_name );
 
@@ -236,6 +239,9 @@ void ProjectManager::new_project( const std::string& project_name, const std::st
   
 void ProjectManager::open_project( const std::string& project_path )
 { 
+  // Reset the application.
+  Core::Application::Reset();
+  
   this->changing_projects_ = true;
   boost::filesystem::path path = project_path;
   
@@ -258,7 +264,7 @@ void ProjectManager::open_project( const std::string& project_path )
   
 void ProjectManager::save_project( bool autosave /*= false*/, std::string session_name )
 {
-  ASSERT_ON_APPLICATION_THREAD();
+  ASSERT_IS_APPLICATION_THREAD();
   this->session_saving_ = true;
   if( this->save_project_session( autosave, session_name ) )
   {
@@ -335,6 +341,9 @@ bool ProjectManager::save_project_session( bool autosave /*= false */, std::stri
   
 bool ProjectManager::load_project_session( const std::string& session_name )
 {
+  // Reset the application.
+  Core::Application::Reset();
+
   boost::filesystem::path path = complete( boost::filesystem::path( this->
     current_project_path_state_->get().c_str(), boost::filesystem::native ) );
 
@@ -539,7 +548,7 @@ double ProjectManager::get_time_since_last_saved_session() const
 
 bool ProjectManager::is_saving() const
 {
-  ASSERT_ON_APPLICATION_THREAD();
+  ASSERT_IS_APPLICATION_THREAD();
   return this->session_saving_;
 }
 

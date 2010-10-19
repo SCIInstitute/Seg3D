@@ -410,4 +410,11 @@ bool LayerGroup::post_load_states( const Core::StateIO& state_io )
   return success;
 }
 
+void LayerGroup::clear()
+{
+  std::for_each( this->layer_list_.begin(), this->layer_list_.end(), boost::lambda::bind( 
+    &Layer::invalidate, boost::lambda::bind( &LayerHandle::get, boost::lambda::_1 ) ) );
+  this->layer_list_.clear();
+}
+
 } // end namespace Seg3D

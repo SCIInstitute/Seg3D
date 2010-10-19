@@ -61,9 +61,6 @@ bool ActionNewProject::run( Core::ActionContextHandle& context,
 
   progress->begin_progress_reporting();
 
-  LayerManager::Instance()->delete_all();
-  ToolManager::Instance()->delete_all();
-
   ProjectManager::Instance()->new_project( this->project_name_.value(), 
     this->project_path_.value() );
 

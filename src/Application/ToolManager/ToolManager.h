@@ -134,11 +134,6 @@ public:
   // function that populates a passed vector of pairs with the tool names
   void get_tool_names( std::vector< ToolIDNamePair >& tool_names );
 
-  // DELETE_ALL:
-  // this function closes and deletes all the current tools.  It is used when preparing to open or
-  // create a new project
-  bool delete_all();
-
   // OPEN_DEFAULT_TOOLS:
   // Open the startup tools chosen by the user.
   void open_default_tools();

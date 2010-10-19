@@ -45,6 +45,9 @@
 namespace Seg3D
 {
 
+//////////////////////////////////////////////////////////////////////////
+// Class LayerManagerWidgetPrivate
+//////////////////////////////////////////////////////////////////////////
 
 class LayerManagerWidgetPrivate : public boost::noncopyable
 {
@@ -62,8 +65,58 @@ public:
   group_widget_map_type group_map_;
 
   bool loading_states_;
+
+  // -- static functions for callbacks into this widget --
+public:
+  typedef QPointer< LayerManagerWidget > qpointer_type;
+
+  // HANDLEGROUPINTERNALCHANGED:
+  static void HandleGroupInternalChanged( qpointer_type qpointer, LayerGroupHandle &group );
+
+  // HANDLEGROUPSCHANGED:
+  static void HandleGroupsChanged( qpointer_type qpointer );
+
+  static void PreLoadStates( qpointer_type qpointer );
+
+  static void PostLoadStates( qpointer_type qpointer );
+
+  static void HandleReset( qpointer_type qpointer );
 };
 
+void LayerManagerWidgetPrivate::HandleGroupInternalChanged( qpointer_type qpointer, 
+                          LayerGroupHandle &group )
+{
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind( 
+      &LayerManagerWidget::handle_group_internals_change, qpointer.data(), group ) ) );
+}
+
+void LayerManagerWidgetPrivate::HandleGroupsChanged( qpointer_type qpointer )
+{
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind( 
+      &LayerManagerWidget::handle_groups_changed, qpointer.data() ) ) );
+}
+
+void LayerManagerWidgetPrivate::PreLoadStates( qpointer_type qpointer )
+{
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
+    &LayerManagerWidget::pre_load_states, qpointer.data() ) ) );
+}
+
+void LayerManagerWidgetPrivate::PostLoadStates( qpointer_type qpointer )
+{
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
+    &LayerManagerWidget::post_load_states, qpointer.data() ) ) );
+}
+
+void LayerManagerWidgetPrivate::HandleReset( qpointer_type qpointer )
+{
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
+    &LayerManagerWidget::reset, qpointer.data() ) ) );
+}
+
+//////////////////////////////////////////////////////////////////////////
+// Class LayerManagerWidget
+//////////////////////////////////////////////////////////////////////////
 
 LayerManagerWidget::LayerManagerWidget( QWidget* parent ) :
   QScrollArea( parent ),
@@ -93,19 +146,21 @@ LayerManagerWidget::LayerManagerWidget( QWidget* parent ) :
   this->private_->main_->setAcceptDrops( true );
 
   LayerManager::lock_type lock( LayerManager::Instance()->get_mutex() );
-  qpointer_type layer_widget( this );
+  LayerManagerWidgetPrivate::qpointer_type layer_widget( this );
   
   // Connect the signals from the LayerManager to the GUI
   this->add_connection(LayerManager::Instance()->group_internals_changed_signal_.connect( 
-    boost::bind( &LayerManagerWidget::HandleGroupInternalChanged, layer_widget, _1 ) ) );
+    boost::bind( &LayerManagerWidgetPrivate::HandleGroupInternalChanged, layer_widget, _1 ) ) );
   
   this->add_connection(LayerManager::Instance()->groups_changed_signal_.connect( 
-    boost::bind( &LayerManagerWidget::HandleGroupsChanged, layer_widget ) ) );
+    boost::bind( &LayerManagerWidgetPrivate::HandleGroupsChanged, layer_widget ) ) );
 
   this->add_connection( Core::StateEngine::Instance()->pre_load_states_signal_.connect( 
-    boost::bind( &LayerManagerWidget::PreLoadStates, layer_widget ) ) );
+    boost::bind( &LayerManagerWidgetPrivate::PreLoadStates, layer_widget ) ) );
   this->add_connection( Core::StateEngine::Instance()->post_load_states_signal_.connect( 
-    boost::bind( &LayerManagerWidget::PostLoadStates, layer_widget ) ) );
+    boost::bind( &LayerManagerWidgetPrivate::PostLoadStates, layer_widget ) ) );
+  this->add_connection( Core::Application::Instance()->reset_signal_.connect(
+    boost::bind( &LayerManagerWidgetPrivate::HandleReset, layer_widget ) ) );
   
   // Add any layers that may have been added before the GUI was initialized
   this->handle_groups_changed();
@@ -214,14 +269,9 @@ void LayerManagerWidget::handle_group_internals_change( LayerGroupHandle group )
 
 void LayerManagerWidget::pre_load_states()
 {
-  this->private_->loading_states_ = true;
+  assert( this->private_->group_map_.empty() );
 
-  QLayoutItem* group_item;
-  while ( ( group_item = this->private_->group_layout_->takeAt( 0 ) ) != 0 )
-  {
-    delete group_item;
-  }
-  this->private_->group_map_.clear();
+  this->private_->loading_states_ = true;
 }
 
 void LayerManagerWidget::post_load_states()
@@ -248,7 +298,6 @@ LayerGroupWidget* LayerManagerWidget::make_new_group( LayerGroupHandle group )
   
   return new_group;
 }
-
 
 // Drag and Drop Functions  
 void LayerManagerWidget::prep_layers_for_drag_and_drop( bool move_time )
@@ -289,41 +338,14 @@ void LayerManagerWidget::notify_groups_of_picked_up_layer_size( int layer_size )
   }
 }
 
-void LayerManagerWidget::HandleGroupInternalChanged( qpointer_type qpointer, 
-  LayerGroupHandle &group )
+void LayerManagerWidget::reset()
 {
-  if( !( Core::Interface::IsInterfaceThread() ) )
+  QLayoutItem* group_item;
+  while ( ( group_item = this->private_->group_layout_->takeAt( 0 ) ) != 0 )
   {
-    Core::Interface::Instance()->post_event( boost::bind( 
-      &LayerManagerWidget::HandleGroupInternalChanged, qpointer, group ) );
-    return;
+    delete group_item;
   }
-  
-  if( qpointer.data() ) qpointer->handle_group_internals_change( group );
-}
-           
-void LayerManagerWidget::HandleGroupsChanged( qpointer_type qpointer )
-{
-   if( !( Core::Interface::IsInterfaceThread() ) )
-   {
-     Core::Interface::Instance()->post_event( boost::bind( 
-      &LayerManagerWidget::HandleGroupsChanged, qpointer ) );
-     return;
-   }
-   
-   if( qpointer.data() ) qpointer->handle_groups_changed();
-}
-
-void LayerManagerWidget::PreLoadStates( qpointer_type qpointer )
-{
-  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
-    &LayerManagerWidget::pre_load_states, qpointer.data() ) ) );
-}
-
-void LayerManagerWidget::PostLoadStates( qpointer_type qpointer )
-{
-  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
-    &LayerManagerWidget::post_load_states, qpointer.data() ) ) );
+  this->private_->group_map_.clear();
 }
 
 }  // end namespace Seg3D

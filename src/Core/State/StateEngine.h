@@ -46,6 +46,7 @@
 #include <Core/Utils/Singleton.h>
 #include <Core/Utils/Lockable.h>
 
+#include <Core/Application/Application.h>
 #include <Core/State/StateBase.h>
 
 namespace Core
@@ -53,17 +54,17 @@ namespace Core
 
 // CLASS STATEENGINE
 
-// Forward decclaration
+// Forward declaration
 class StateEngine;
 class StateEnginePrivate;
 class StateHandler;
 class StateIO;
 
 // Class definition
-class StateEngine : public Core::RecursiveLockable
+class StateEngine : public boost::noncopyable
 {
   CORE_SINGLETON( StateEngine );
-  
+
   // -- Constructor/destructor --
 private:
   StateEngine();
@@ -90,6 +91,13 @@ public:
   bool load_states( const StateIO& state_io );
 
   bool save_states( StateIO& state_io );
+
+  // -- mutex and lock --
+public:
+  typedef Application::mutex_type mutex_type;
+  typedef Application::lock_type lock_type;
+
+  mutex_type& get_mutex() const;
   
   // -- Interface for accounting stateids --
 private:

@@ -36,6 +36,7 @@
 #include <Core/Application/Application.h>
 #include <Core/Interface/Interface.h>
 #include <Core/DataBlock/MaskDataBlockManager.h>
+#include <Core/DataBlock/DataBlockManager.h>
 #include <Core/State/StateIO.h>
 #include <Core/Utils/ScopedCounter.h>
 
@@ -62,6 +63,7 @@ public:
   void update_layer_list();
   void handle_active_layer_state_changed( std::string layer_id );
   void handle_active_layer_changed();
+  void delete_all();
 
   size_t signal_block_count_;
   LayerManager::group_list_type group_list_;
@@ -115,6 +117,24 @@ void LayerManagerPrivate::handle_active_layer_changed()
   }
 }
 
+void LayerManagerPrivate::delete_all()
+{
+  // Clean up all the data blocks.
+  Core::MaskDataBlockManager::Instance()->clear();
+  Core::DataBlockManager::Instance()->clear();
+
+  // Cycle through all the groups and delete all the layers
+  LayerManager::group_list_type::iterator group_iterator = this->group_list_.begin();
+  while ( group_iterator != this->group_list_.end() )
+  {
+    ( *group_iterator )->clear();
+    ( *group_iterator )->invalidate();
+    ++group_iterator;
+  }
+  this->active_layer_.reset();
+  this->group_list_.clear();
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Class LayerManager
 //////////////////////////////////////////////////////////////////////////
@@ -135,6 +155,8 @@ LayerManager::LayerManager() :
     &LayerManagerPrivate::update_layer_list, this->private_ ) ) );
   this->add_connection( this->active_layer_state_->value_changed_signal_.connect( boost::bind( 
     &LayerManagerPrivate::handle_active_layer_state_changed, this->private_, _2 ) ) );
+  this->add_connection( Core::Application::Instance()->reset_signal_.connect( boost::bind(
+    &LayerManagerPrivate::delete_all, this->private_ ) ) );
 }
 
 LayerManager::~LayerManager()
@@ -464,7 +486,6 @@ void LayerManager::get_layers_in_group( LayerGroupHandle group ,
   }
 }
 
-
 void LayerManager::delete_layers( LayerGroupHandle group )
 {
   bool active_layer_changed = false;
@@ -596,39 +617,6 @@ void LayerManager::delete_layer( LayerHandle layer )
   }
   
 } // end delete_layer
-
-
-bool LayerManager::delete_all()
-{
-  lock_type lock( get_mutex() );
-  {
-
-    // Cycle through all the groups and delete all the layers
-    group_list_type::iterator group_iterator = this->private_->group_list_.begin();
-    for ( ; group_iterator != this->private_->group_list_.end(); )
-    {
-      // set all of the layers to selected so they are deleted.
-      layer_list_type layer_list = ( *group_iterator )->get_layer_list();
-      for( layer_list_type::iterator it = layer_list.begin(); it != layer_list.end(); ++it)
-      {
-        ( *it )->selected_state_->set( true );
-      }
-
-      group_list_type::iterator it_temp = group_iterator;
-      ++it_temp;
-
-      this->delete_layers( *group_iterator );
-      if( this->private_->group_list_.empty() )
-      {
-        break;
-      }
-      group_iterator = it_temp;
-    }
-
-  }
-  this->groups_changed_signal_();
-  return true;
-}
 
 LayerHandle LayerManager::get_active_layer()
 {
@@ -811,8 +799,9 @@ bool LayerManager::post_save_states( Core::StateIO& state_io )
   
 bool LayerManager::pre_load_states( const Core::StateIO& state_io )
 {
-  // Delete all the currently loaded layers
-  this->delete_all();
+  // Make sure that the group list is empty.
+  // NOTE: The application should have been properly reset before loading a session.
+  assert( this->private_->group_list_.empty() );
 
   // Load the layers from session
   const TiXmlElement* groups_element = state_io.get_current_element()->

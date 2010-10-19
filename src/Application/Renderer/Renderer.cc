@@ -138,8 +138,6 @@ public:
 
   size_t viewer_id_;
   bool rendering_enabled_;
-  bool blank_scene_rendered_;
-  bool blank_overlay_rendered_;
 };
 
 void RendererPrivate::process_slices( LayerSceneHandle& layer_scene, ViewerHandle& viewer )
@@ -482,11 +480,6 @@ void RendererPrivate::enable_rendering( bool enable )
     this->renderer_->redraw( true );
     this->renderer_->redraw_overlay( false );
   }
-  else
-  {
-    this->blank_scene_rendered_ = false;
-    this->blank_overlay_rendered_ = false;
-  }
 }
 
 void RendererPrivate::process_isosurfaces( IsosurfaceArray& isosurfaces )
@@ -674,24 +667,22 @@ void Renderer::post_initialize()
   }
   this->add_connection( ViewerManager::Instance()->picking_target_changed_signal_.connect(
     boost::bind( &RendererPrivate::picking_target_changed, this->private_, _1 ) ) );
-  this->add_connection( ViewerManager::Instance()->enable_rendering_signal_.connect(
-    boost::bind( &RendererPrivate::enable_rendering, this->private_, _1 ) ) );
+
+  this->add_connection( Core::StateEngine::Instance()->pre_load_states_signal_.connect(
+    boost::bind( &RendererPrivate::enable_rendering, this->private_, false ) ) );
+  this->add_connection( Core::StateEngine::Instance()->post_load_states_signal_.connect(
+    boost::bind( &RendererPrivate::enable_rendering, this->private_, true ) ) );
 }
 
 bool Renderer::render()
 {
-  glClearColor( 0.3f, 0.3f, 0.3f, 1.0f );
-  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
   if ( !this->private_->rendering_enabled_ )
   {
-    if ( !this->private_->blank_scene_rendered_ )
-    {
-      this->private_->blank_scene_rendered_ = true;
-      return true;
-    }
     return false;
   }
+
+  glClearColor( 0.3f, 0.3f, 0.3f, 1.0f );
+  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
   CORE_LOG_DEBUG( std::string("Renderer ") + Core::ExportToString( 
     this->private_->viewer_id_ ) + ": starting redraw" );
@@ -822,18 +813,13 @@ bool Renderer::render()
 
 bool Renderer::render_overlay()
 {
-  glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
-  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
   if ( !this->private_->rendering_enabled_ )
   {
-    if ( !this->private_->blank_overlay_rendered_ )
-    {
-      this->private_->blank_overlay_rendered_ = true;
-      return true;
-    }
     return false;
   }
+
+  glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
+  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
   CORE_LOG_DEBUG( std::string("Renderer ") + Core::ExportToString( 
     this->private_->viewer_id_ ) + ": starting redraw overlay" );

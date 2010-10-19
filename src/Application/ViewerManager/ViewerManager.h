@@ -100,14 +100,6 @@ public:
   void pick_point( size_t source_viewer, const Core::Point& pt );
   std::vector< size_t > get_locked_viewers( int mode_index );
 
-  // DISABLE_RENDERING:
-  // Triggers enable_rendering_signal_( false ).
-  void disable_rendering();
-
-  // ENABLE_RENDERING:
-  // Triggers enable_rendering_signal_( true ).
-  void enable_rendering();
-
   // UPDATE_VIEWERS:
   // Cause all the visible viewers in the specified mode to redraw overlay.
   void update_viewers_overlay( const std::string& view_mode );
@@ -164,8 +156,6 @@ private:
 public:
   typedef boost::signals2::signal< void ( size_t ) > picking_target_changed_signal_type;
   picking_target_changed_signal_type picking_target_changed_signal_;
-
-  boost::signals2::signal< void ( bool ) > enable_rendering_signal_;
 
 protected:
   // POST_SAVE_STATES:

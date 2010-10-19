@@ -123,4 +123,11 @@ void DataBlockManager::set_generation_count( DataBlock::generation_type generati
   this->private_->generation_ = generation;
 }
 
+void DataBlockManager::clear()
+{
+  lock_type lock( this->get_mutex() );
+  this->private_->generation_map_.clear();  
+  this->private_->generation_ = 0;
+}
+
 } // end namespace Core

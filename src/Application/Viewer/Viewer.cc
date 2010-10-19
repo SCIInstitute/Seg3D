@@ -73,8 +73,6 @@ class ViewerPrivate
 {
   // -- Signals handling --
 public:
-  void handle_layer_group_inserted( LayerGroupHandle layer_group );
-  void handle_layer_group_deleted( LayerGroupHandle layer_group );
   void change_view_mode( std::string mode, Core::ActionSource source );
   void set_slice_number( int num, Core::ActionSource source = Core::ActionSource::NONE_E );
   void change_visibility( bool visible );
@@ -85,6 +83,7 @@ public:
   void set_active_layer( LayerHandle layer );
   void handle_layer_volume_updated( std::string layer_id );
   void set_viewer_labels();
+  void reset();
 
   // -- Helper functions --
 public:
@@ -147,38 +146,6 @@ public:
 
   ViewManipulatorHandle view_manipulator_;
 };
-
-void ViewerPrivate::handle_layer_group_inserted( LayerGroupHandle layer_group )
-{
-  //Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-
-  //this->layer_connection_map_.insert( std::make_pair( layer_group->get_group_id(),
-  //  layer_group->visibility_state_[ this->viewer_->get_viewer_id() ]->state_changed_signal_.
-  //  connect( boost::bind( &ViewerPrivate::layer_state_changed, this, 
-  //  ViewModeType::NON_VOLUME_E ) ) ) );
-
-  //size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
-  //for ( size_t i = 0; i < num_of_viewers; ++i )
-  //{
-  //  this->layer_connection_map_.insert( std::make_pair( layer_group->get_group_id(),
-  //    layer_group->visibility_state_[ i ]->state_changed_signal_.connect( boost::bind(
-  //    &ViewerPrivate::layer_state_changed, this, ViewModeType::VOLUME_E ) ) ) );
-  //}
-}
-
-void ViewerPrivate::handle_layer_group_deleted( LayerGroupHandle layer_group )
-{
-  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-
-  std::pair< connection_map_type::iterator, connection_map_type::iterator > 
-    range = this->layer_connection_map_.equal_range( layer_group->get_group_id() );
-
-  for ( connection_map_type::iterator it = range.first; it != range.second; ++it )
-  {
-    ( *it ).second.disconnect();
-  }
-  this->layer_connection_map_.erase( layer_group->get_group_id() ); 
-}
 
 void ViewerPrivate::adjust_contrast_brightness( int dx, int dy )
 {
@@ -865,6 +832,15 @@ void ViewerPrivate::set_viewer_labels()
   this->viewer_->view_mode_state_->set_option_list( label_options );
 }
 
+void ViewerPrivate::reset()
+{
+  this->volume_slices_.clear();
+  this->layer_connection_map_.clear();
+  this->active_layer_slice_.reset();
+  this->viewer_->redraw( true );
+  this->viewer_->redraw_overlay( false );
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Implementation of class Viewer
 //////////////////////////////////////////////////////////////////////////
@@ -934,10 +910,6 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
     boost::bind( &ViewerPrivate::delete_layers, this->private_, _1 ) ) );
   this->add_connection( LayerManager::Instance()->active_layer_changed_signal_.connect(
     boost::bind( &ViewerPrivate::set_active_layer, this->private_, _1 ) ) );
-  this->add_connection( LayerManager::Instance()->group_inserted_signal_.connect(
-    boost::bind( &ViewerPrivate::handle_layer_group_inserted, this->private_, _1 ) ) );
-  this->add_connection( LayerManager::Instance()->group_deleted_signal_.connect(
-    boost::bind( &ViewerPrivate::handle_layer_group_deleted, this->private_, _1 ) ) );
   this->add_connection( LayerManager::Instance()->layers_reordered_signal_.connect(
     boost::bind( &Viewer::redraw, this, false ) ) );
 
@@ -992,6 +964,9 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
     boost::bind( &Viewer::redraw_overlay, this, false ) ) );
   this->add_connection( this->overlay_visible_state_->state_changed_signal_.connect(
     boost::bind( &Viewer::redraw_overlay, this, false ) ) );
+
+  this->add_connection( Core::Application::Instance()->reset_signal_.connect(
+    boost::bind( &ViewerPrivate::reset, this->private_ ) ) );
 }
 
 Viewer::~Viewer()
@@ -999,8 +974,6 @@ Viewer::~Viewer()
   this->disconnect_all();
   this->reset_mouse_handlers();
 }
-
-
 
 void Viewer::resize( int width, int height )
 {

@@ -291,9 +291,18 @@ void Application::log_finish()
 
 void Application::finish()
 {
-  Instance()->terminate_eventhandler();
+  this->terminate_eventhandler();
 }
 
+void Application::reset()
+{
+  // Make sure this function is being called from the application thread
+  ASSERT_IS_APPLICATION_THREAD();
+  // Lock the mutex so the reset operation will be atomic in the application thread.
+  lock_type lock( this->get_mutex() );
+  // Trigger the signal.
+  this->reset_signal_();
+}
 
 bool Application::IsApplicationThread()
 {
@@ -343,6 +352,16 @@ bool Application::Is32Bit()
 std::string Application::GetApplicationName()
 {
   return CORE_APPLICATION_NAME;
+}
+
+Application::mutex_type& Application::GetMutex()
+{
+  return Instance()->get_mutex();
+}
+
+void Application::Reset()
+{
+  Instance()->reset();
 }
 
 } // end namespace Core

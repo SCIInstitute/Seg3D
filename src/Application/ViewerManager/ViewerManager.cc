@@ -456,16 +456,6 @@ bool ViewerManager::pre_load_states( const Core::StateIO& state_io )
   return true;
 }
 
-void ViewerManager::disable_rendering()
-{
-  this->enable_rendering_signal_( false );
-}
-
-void ViewerManager::enable_rendering()
-{
-  this->enable_rendering_signal_( true );
-}
-
 void ViewerManager::update_viewers_overlay( const std::string& view_mode )
 {
   if ( !Core::Application::IsApplicationThread() )

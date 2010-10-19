@@ -324,4 +324,9 @@ void StateEngine::remove_state_handler( const std::string& handler_id )
   }
 }
 
+StateEngine::mutex_type& StateEngine::get_mutex() const
+{
+  return Application::GetMutex();
+}
+
 } // end namespace Core

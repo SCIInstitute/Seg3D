@@ -40,7 +40,7 @@
 #include <Core/Utils/Log.h>
 #include <Core/DataBlock/MaskDataBlockManager.h>
 #include <Core/DataBlock/StdDataBlock.h>
-#include <Core/DataBlock/NrrdData.h>
+#include <Core/DataBlock/DataBlockManager.h>
 
 // Application includes
 #include <Application/Layer/MaskLayer.h>
@@ -238,6 +238,8 @@ bool MaskDataBlockManager::compact()
 void MaskDataBlockManager::register_data_block( DataBlockHandle data_block, 
                          const GridTransform& grid_transform )
 {
+  lock_type lock( get_mutex() );
+
   this->private_->mask_list_.push_back( MaskDataBlockEntry( data_block, grid_transform ) );
 }
 
@@ -497,6 +499,16 @@ bool MaskDataBlockManager::Convert( MaskDataBlockHandle mask, DataBlockHandle& d
   return false;
 }
 
-
+void MaskDataBlockManager::clear()
+{
+  lock_type lock( this->get_mutex() );
+  MaskDataBlockManagerInternal::mask_list_type::iterator it = this->private_->mask_list_.begin();
+  while ( it != this->private_->mask_list_.end() )
+  {
+    DataBlockManager::Instance()->unregister_datablock( ( *it ).data_block_->get_generation() );
+    ++it;
+  }
+  this->private_->mask_list_.clear();
+}
 
 } // end namespace Core
