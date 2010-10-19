@@ -353,25 +353,34 @@ void AppMenu::create_window_menu( QMenu* qmenu )
   {
     QAction* qaction = 0;
     qaction = qmenu->addAction( tr( "&About" ) );
-    qaction->setToolTip( tr( "About Seg3D 2.0" ) );
+    std::string about = std::string( "About " ) + 
+      Core::Application::GetApplicationNameAndVersion();
+    qaction->setToolTip( QString::fromStdString( about ) );
     connect( qaction, SIGNAL( triggered() ), this, SLOT( about() ) );
     
-    qaction = qmenu->addAction( tr( "&Keyboard Shortcuts" ) );
-    qaction->setToolTip( tr( "List of the keyboard shortcuts or 'hotkeys' for Seg3D 2.0" ) );
+    qaction = qmenu->addAction( tr( "&Keyboard Shortcuts" ) ); 
+    qaction->setToolTip( QString( "List of the keyboard shortcuts or 'hotkeys' for " ) + 
+      QString::fromStdString( Core::Application::GetApplicationNameAndVersion() ) );
 
   }
   
   void AppMenu::about()
   {
-    QMessageBox::about( this->main_window_, tr( "About Seg3D 2.0" ), 
-      tr( "<h3>Seg3D 2.0</h3><p>Seg3D 2.0 is just as good as Seg3D 1.0, just newer!</p>"
-        "<p>Seg3D is a free volume segmentation and processing tool developed by Numira "
-          "Biosciences in conjunction with the NIH Center for Integrative Biomedical "
-          "Computing at the University of Utah Scientific Computing and Imaging (SCI) "
-          "Institute. Seg3D combines a flexible manual segmentation interface with powerful "
-          "higher-dimensional image processing and segmentation algorithms from the Insight "
-          "Toolkit. Users can explore and label image volumes using volume rendering and "
-          "orthogonal slice view windows.</p>") );
+    std::string about = std::string( "About " ) + 
+      Core::Application::GetApplicationNameAndVersion();
+
+    QMessageBox::about( this->main_window_, QString::fromStdString( about ), 
+      QString( "<h3>" ) + 
+      QString::fromStdString( Core::Application::GetApplicationNameAndVersion() ) +
+      QString( "</h3>" ) +
+      QString(
+        "<p align=\"justify\">Seg3D is a free volume segmentation and image processing tool created by the "
+        "NIH Center for Integrative Biomedical (CIBC) located at the Scientific Computing "
+        "and Imaging Instititute (SCI) at the University of Utah and developed in "
+        "collaboration with Numira Biosciences ."
+          "Seg3D combines a flexible manual segmentation interface with powerful "
+          "image processing and segmentation algorithms from the Insight "
+          "Toolkit.</p>") );
   }
   
 void AppMenu::new_project_wizard()
@@ -564,13 +573,5 @@ void AppMenu::EnableDisableLayerActions( qpointer_type qpointer )
   Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
     &AppMenu::enable_disable_layer_actions, qpointer.data() ) ) );
 }
-
-
-
-
-
-
-
-
 
 } // end namespace Seg3D

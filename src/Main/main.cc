@@ -111,11 +111,15 @@ int main( int argc, char **argv )
   if ( !( QtUtils::QtApplication::Instance()->setup( argc, argv ) ) ) return ( -1 );
 
   // -- Warn user about being an alpha version --
+
+  std::string warning = std::string( "<h3>" ) +
+    Core::Application::GetApplicationNameAndVersion() + 
+    "</h3><p align=\"left\">NOTE: This version of Seg3D is for Testing and Evaluation Only! "
+    "Compatibility with future releases of is NOT yet guaranteed.</p>";
   
-  QMessageBox::information( 0, "Seg3D 2.0 ALPHA 1", 
-    "Seg3D 2.0 ALPHA 1\n\n"
-    "NOTE: This version of Seg3D is for Testing and Evaluation Only! "
-    "Compatibility with future releases of Seg3D 2.0 is NOT guaranteed."  );
+  QMessageBox::information( 0, 
+    QString::fromStdString( Core::Application::GetApplicationNameAndVersion() ), 
+    QString::fromStdString( warning )  );
 
   // -- Setup Application Interface Window --
   AppInterface* app_interface = new AppInterface;

@@ -184,6 +184,14 @@ public:
   // GETAPPLICATIONNAME:
   // Get the name of the application
   static std::string GetApplicationName();
+
+  // GETRELEASENAME:
+  // Get the release of the application
+  static std::string GetReleaseName();
+  
+  // GETAPPLICATIONNAMEANDVERSION
+  // Get the name of the application and its version
+  static std::string GetApplicationNameAndVersion();
 };
 
 } // end namespace Core

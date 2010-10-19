@@ -354,6 +354,17 @@ std::string Application::GetApplicationName()
   return CORE_APPLICATION_NAME;
 }
 
+std::string Application::GetReleaseName()
+{
+  return CORE_APPLICATION_RELEASE;
+}
+
+std::string Application::GetApplicationNameAndVersion()
+{
+  return GetApplicationName() + " " + GetReleaseName() + " " + GetVersion();
+}
+
+
 Application::mutex_type& Application::GetMutex()
 {
   return Instance()->get_mutex();

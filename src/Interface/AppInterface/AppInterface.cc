@@ -59,8 +59,8 @@ AppInterface::AppInterface()
   InitQtResources();
 
   // Set the window information and set the version numbers
-  setWindowTitle( QString( CORE_APPLICATION_NAME ) + " Version " + CORE_APPLICATION_VERSION );
-  setWindowIconText( QString( CORE_APPLICATION_NAME ) );
+  setWindowTitle( QString::fromStdString( Core::Application::GetApplicationNameAndVersion() ) );
+  setWindowIconText( QString::fromStdString( Core::Application::GetApplicationName() ) );
 
   // TODO: Do we need this one?
   setDocumentMode( true );
@@ -284,7 +284,7 @@ void AppInterface::set_full_screen( bool full_screen )
 
 void AppInterface::set_project_name( std::string project_name )
 {
-  setWindowTitle( QString( CORE_APPLICATION_NAME ) + " Version " + CORE_APPLICATION_VERSION +
+  setWindowTitle( QString::fromStdString( Core::Application::GetApplicationNameAndVersion() ) +
     " - " + QString::fromStdString( project_name ) );
 }
 
