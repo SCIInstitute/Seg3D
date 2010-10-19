@@ -57,8 +57,11 @@ class ArithmeticFilterAlgo : public BaseFilter
 {
 
 public:
+  LayerHandle src_layer_;
   LayerHandle dst_layer_;
   Core::ArrayMathEngine engine_;
+
+  bool preserve_data_format_;
 
 public:
 
@@ -108,6 +111,15 @@ void ArithmeticFilterAlgo::run()
     }
     else
     {
+      if ( this->preserve_data_format_ && 
+        output_data_block->get_data_type() != this->src_layer_->get_data_type() )
+      {
+
+        Core::DataBlockHandle converted_data_block;
+        Core::DataBlock::ConvertDataType( output_data_block, converted_data_block, 
+          this->src_layer_->get_data_type() ); 
+        output_data_block = converted_data_block;
+      }
       this->dispatch_insert_data_volume_into_layer( this->dst_layer_, Core::DataVolumeHandle(
         new Core::DataVolume( this->dst_layer_->get_grid_transform(), output_data_block ) ), 
         false, true );
@@ -204,6 +216,17 @@ bool ActionArithmeticFilterPrivate::validate_parser( Core::ActionContextHandle& 
         }
       }
     }
+  }
+
+  // We must have a valid first input layer
+  if( !layers[ 0 ] )
+  {
+    return false;
+  }
+
+  if( this->preserve_data_format_.value() )
+  {
+    this->algo_->src_layer_ = layers[ 0 ];
   }
 
   if ( replace )
@@ -344,6 +367,9 @@ bool ActionArithmeticFilter::validate( Core::ActionContextHandle& context )
 bool ActionArithmeticFilter::run( Core::ActionContextHandle& context, 
   Core::ActionResultHandle& result )
 {
+  // Copy the parameters over to the algorithm that runs the filter
+  this->private_->algo_->preserve_data_format_ = this->private_->preserve_data_format_.value();
+
   this->private_->algo_->connect_abort( this->private_->algo_->dst_layer_ );
 
   // Connect ArrayMathEngine progress signal to output layer progress signal
