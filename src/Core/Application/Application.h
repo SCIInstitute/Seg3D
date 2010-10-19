@@ -129,6 +129,7 @@ public:
 public:
   // RESET_SIGNAL_:
   // This signal is triggered by calling the reset function.
+  // WARNING: Do NOT trigger this signal directly. Call the reset function instead.
   boost::signals2::signal< void () > reset_signal_;
 
   // -- Application thread --

@@ -54,6 +54,30 @@ QtSpinBoxConnector::QtSpinBoxConnector( QSpinBox* parent,
   this->connect( parent, SIGNAL( valueChanged( int ) ), SLOT( set_state( int ) ) );
 }
 
+QtSpinBoxConnector::QtSpinBoxConnector( QSpinBox* parent, 
+                     Core::StateRangedIntHandle& state, 
+                     bool blocking /*= true */ ) :
+  QtConnectorBase( parent, blocking ),
+  spinbox_( parent ),
+  state_( state )
+{
+  QPointer< QtSpinBoxConnector > qpointer( this );
+
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    int min_val, max_val;
+    state->get_range( min_val, max_val );
+    parent->setValue( state->get() );
+    parent->setRange( min_val, max_val );
+    this->add_connection( state->value_changed_signal_.connect(
+      boost::bind( &QtSpinBoxConnector::SetSpinBoxValue, qpointer, _1, _2 ) ) );
+    this->add_connection( state->range_changed_signal_.connect( boost::bind(
+      &QtSpinBoxConnector::SetSpinBoxRange, qpointer, _1, _2, _3 ) ) );
+  }
+
+  this->connect( parent, SIGNAL( valueChanged( int ) ), SLOT( set_state( int ) ) );
+}
+
 QtSpinBoxConnector::QtSpinBoxConnector( QDoubleSpinBox* parent, 
   Core::StateDoubleHandle& state, bool blocking ) :
   QtConnectorBase( parent, blocking ),
@@ -96,7 +120,6 @@ QtSpinBoxConnector::QtSpinBoxConnector( QDoubleSpinBox* parent,
   this->connect( parent, SIGNAL( valueChanged( double ) ), SLOT( set_state( double ) ) );
 }
 
-
 QtSpinBoxConnector::~QtSpinBoxConnector()
 {
   this->disconnect_all();
@@ -124,6 +147,31 @@ void QtSpinBoxConnector::SetSpinBoxValue( QPointer< QtSpinBoxConnector > qpointe
 
   qpointer->block();
   qpointer->spinbox_->setValue( val );
+  qpointer->unblock();
+}
+
+void QtSpinBoxConnector::SetSpinBoxRange( QPointer< QtSpinBoxConnector > qpointer,
+                     int min_val, int max_val, Core::ActionSource source )
+{
+  if ( source == Core::ActionSource::INTERFACE_WIDGET_E )
+  {
+    return;
+  }
+
+  if ( !Core::Interface::IsInterfaceThread() )
+  {
+    Core::Interface::PostEvent( boost::bind( &QtSpinBoxConnector::SetSpinBoxRange,
+      qpointer, min_val, max_val, source ) );
+    return;
+  }
+
+  if ( qpointer.isNull() || QCoreApplication::closingDown() )
+  {
+    return;
+  }
+
+  qpointer->block();
+  qpointer->spinbox_->setRange( min_val, max_val );
   qpointer->unblock();
 }
 

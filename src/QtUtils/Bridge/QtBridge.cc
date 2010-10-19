@@ -107,7 +107,12 @@ void QtBridge::Connect( QSpinBox* qspinbox, Core::StateIntHandle& state )
 {
   new QtSpinBoxConnector( qspinbox, state );  
 }
-  
+
+void QtBridge::Connect( QSpinBox* qspinbox, Core::StateRangedIntHandle& state )
+{
+  new QtSpinBoxConnector( qspinbox, state );  
+}
+
 void QtBridge::Connect( QComboBox* qcombobox, Core::StateOptionHandle& state )
 {
   new QtComboBoxConnector( qcombobox, state );

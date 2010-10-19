@@ -49,6 +49,9 @@ public:
   QtSpinBoxConnector( QSpinBox* parent, Core::StateIntHandle& state,
     bool blocking = true );
 
+  QtSpinBoxConnector( QSpinBox* parent, Core::StateRangedIntHandle& state,
+    bool blocking = true );
+
   QtSpinBoxConnector( QDoubleSpinBox* parent, Core::StateDoubleHandle& state,
     bool blocking = true );
 
@@ -61,6 +64,8 @@ public:
 private:
   static void SetSpinBoxValue( QPointer< QtSpinBoxConnector > qpointer,
     int val, Core::ActionSource source );
+  static void SetSpinBoxRange( QPointer< QtSpinBoxConnector > qpointer,
+    int min_val, int max_val, Core::ActionSource source );
   static void SetDoubleSpinBoxValue( QPointer< QtSpinBoxConnector > qpointer,
     double val, Core::ActionSource source );
   static void SetDoubleSpinBoxRange( QPointer< QtSpinBoxConnector > qpointer,

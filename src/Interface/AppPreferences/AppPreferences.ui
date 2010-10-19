@@ -234,9 +234,6 @@ border: 1px solid gray;
                    </item>
                    <item>
                     <widget class="QSpinBox" name="grid_size_spinbox_">
-                     <property name="enabled">
-                      <bool>false</bool>
-                     </property>
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                        <horstretch>0</horstretch>
@@ -283,9 +280,6 @@ border: 1px solid gray;
                 </property>
                 <item row="0" column="1">
                  <widget class="QComboBox" name="background_color_combobox_">
-                  <property name="enabled">
-                   <bool>false</bool>
-                  </property>
                   <property name="maximumSize">
                    <size>
                     <width>16777215</width>
@@ -296,9 +290,6 @@ border: 1px solid gray;
                 </item>
                 <item row="2" column="0">
                  <widget class="QCheckBox" name="show_slice_numbers_checkbox_">
-                  <property name="enabled">
-                   <bool>false</bool>
-                  </property>
                   <property name="text">
                    <string>Show Slice Numbers</string>
                   </property>
@@ -536,11 +527,7 @@ border: 1px solid gray;
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLineEdit" name="x_lineedit_">
-                  <property name="enabled">
-                   <bool>false</bool>
-                  </property>
-                 </widget>
+                 <widget class="QLineEdit" name="x_lineedit_"/>
                 </item>
                </layout>
               </widget>
@@ -562,11 +549,7 @@ border: 1px solid gray;
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLineEdit" name="y_lineedit_">
-                  <property name="enabled">
-                   <bool>false</bool>
-                  </property>
-                 </widget>
+                 <widget class="QLineEdit" name="y_lineedit_"/>
                 </item>
                </layout>
               </widget>
@@ -588,11 +571,7 @@ border: 1px solid gray;
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLineEdit" name="z_lineedit_">
-                  <property name="enabled">
-                   <bool>false</bool>
-                  </property>
-                 </widget>
+                 <widget class="QLineEdit" name="z_lineedit_"/>
                 </item>
                </layout>
               </widget>

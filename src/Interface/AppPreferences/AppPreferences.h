@@ -89,12 +89,7 @@ private Q_SLOTS:
   // this function will cause Seg3D2 to save all the user preferences to a file which will be 
   // loaded next time the program starts
   void save_settings();
-  
-  // SET_AXIS_LABELS
-  // this function will set the axis labels to predefined settings or enable the user to define
-  // their own
-  void set_axis_labels( int index );
-  
+
 private:
   boost::shared_ptr< AppPreferencesPrivate > private_;
   ColorPickerWidget* active_picker_;

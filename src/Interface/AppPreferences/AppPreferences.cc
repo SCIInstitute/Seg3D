@@ -25,7 +25,11 @@
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
  */
- 
+
+// boost includes
+#include <boost/lambda/lambda.hpp>
+#include <boost/lambda/bind.hpp>
+
 // Core Includes
 #include <Core/Interface/Interface.h>
 #include <Core/State/Actions/ActionSet.h> 
@@ -153,8 +157,18 @@ void AppPreferences::setup_general_prefs()
   QtUtils::QtBridge::Connect( this->private_->ui_.z_lineedit_,
     PreferencesManager::Instance()->z_axis_label_state_ );
     
-  connect( this->private_->ui_.axis_combobox_, SIGNAL( currentIndexChanged ( int ) ), 
-    this, SLOT( set_axis_labels( int ) ) );
+  QtUtils::QtBridge::Enable( this->private_->ui_.x_lineedit_, 
+    PreferencesManager::Instance()->axis_labels_option_state_,
+    boost::lambda::bind( &Core::StateLabeledOption::get, 
+    PreferencesManager::Instance()->axis_labels_option_state_.get() ) == "custom" );
+  QtUtils::QtBridge::Enable( this->private_->ui_.y_lineedit_, 
+    PreferencesManager::Instance()->axis_labels_option_state_,
+    boost::lambda::bind( &Core::StateLabeledOption::get, 
+    PreferencesManager::Instance()->axis_labels_option_state_.get() ) == "custom" );
+  QtUtils::QtBridge::Enable( this->private_->ui_.z_lineedit_, 
+    PreferencesManager::Instance()->axis_labels_option_state_,
+    boost::lambda::bind( &Core::StateLabeledOption::get, 
+    PreferencesManager::Instance()->axis_labels_option_state_.get() ) == "custom" );
   
   QtUtils::QtBridge::Enable( this->private_->ui_.compression_adjuster_, 
     PreferencesManager::Instance()->compression_state_ );
@@ -215,8 +229,8 @@ void AppPreferences::setup_layer_prefs()
 
 void AppPreferences::setup_viewer_prefs()
 {
-  
-//Connect Viewer Preferences
+  //Connect Viewer Preferences
+
   QtUtils::QtBridge::Connect( this->private_->ui_.viewer_mode_combobox_, 
     PreferencesManager::Instance()->default_viewer_mode_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.background_color_combobox_, 
@@ -225,7 +239,6 @@ void AppPreferences::setup_viewer_prefs()
     PreferencesManager::Instance()->grid_size_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.show_slice_numbers_checkbox_, 
     PreferencesManager::Instance()->show_slice_number_state_ );
-
 }
 
 void AppPreferences::setup_sidebar_prefs()
@@ -328,57 +341,5 @@ void AppPreferences::save_settings()
   ActionSavePreferences::Dispatch( Core::Interface::GetWidgetActionContext() );
   ActionSaveToolPreferences::Dispatch( Core::Interface::GetWidgetActionContext() );
 }
-
-void AppPreferences::set_axis_labels( int index )
-{
-  switch( index )
-  {
-    case 0:
-    {
-      this->private_->ui_.x_lineedit_->setText( "Sagittal" );
-      this->private_->ui_.y_lineedit_->setText( "Coronal" );
-      this->private_->ui_.z_lineedit_->setText( "Axial" );
-      this->private_->ui_.x_lineedit_->setEnabled( false );
-      this->private_->ui_.y_lineedit_->setEnabled( false );
-      this->private_->ui_.z_lineedit_->setEnabled( false );
-      break;
-    }
-    case 1:
-    {
-      this->private_->ui_.x_lineedit_->setText( "Sagittal" );
-      this->private_->ui_.y_lineedit_->setText( "Coronal" );
-      this->private_->ui_.z_lineedit_->setText( "Transverse" );
-      this->private_->ui_.x_lineedit_->setEnabled( false );
-      this->private_->ui_.y_lineedit_->setEnabled( false );
-      this->private_->ui_.z_lineedit_->setEnabled( false );
-      break;
-    }
-    case 2:
-    {
-      this->private_->ui_.x_lineedit_->setText( "X" );
-      this->private_->ui_.y_lineedit_->setText( "Y" );
-      this->private_->ui_.z_lineedit_->setText( "Z" );
-      this->private_->ui_.x_lineedit_->setEnabled( false );
-      this->private_->ui_.y_lineedit_->setEnabled( false );
-      this->private_->ui_.z_lineedit_->setEnabled( false );
-      break;
-    }
-    case 3:
-    {
-      this->private_->ui_.x_lineedit_->setText( "" );
-      this->private_->ui_.y_lineedit_->setText( "" );
-      this->private_->ui_.z_lineedit_->setText( "" );
-      this->private_->ui_.x_lineedit_->setEnabled( true );
-      this->private_->ui_.y_lineedit_->setEnabled( true );
-      this->private_->ui_.z_lineedit_->setEnabled( true );
-      break;
-    }
-    default:
-    {
-      break;
-    }
-  }
-}
-
 
 } // end namespace Seg3D

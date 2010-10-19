@@ -681,7 +681,12 @@ bool Renderer::render()
     return false;
   }
 
-  glClearColor( 0.3f, 0.3f, 0.3f, 1.0f );
+  // Lock the state engine
+  Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
+
+  Core::Color bkg_color = PreferencesManager::Instance()->get_background_color();
+
+  glClearColor( bkg_color.r(), bkg_color.g(), bkg_color.b(), 1.0f );
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
   CORE_LOG_DEBUG( std::string("Renderer ") + Core::ExportToString( 
@@ -689,9 +694,6 @@ bool Renderer::render()
 
   glMatrixMode( GL_PROJECTION );
   glLoadIdentity();
-
-  // Lock the state engine
-  Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
 
   ViewerHandle viewer = ViewerManager::Instance()->get_viewer( this->private_->viewer_id_ );
 
@@ -841,6 +843,9 @@ bool Renderer::render_overlay()
     bool show_grid = viewer->slice_grid_state_->get();
     bool show_picking_lines = viewer->slice_picking_visible_state_->get();
     bool show_overlay = viewer->overlay_visible_state_->get();
+    bool show_slice_num = PreferencesManager::Instance()->show_slice_number_state_->get();
+    int grid_spacing = PreferencesManager::Instance()->grid_size_state_->get();
+    Core::Color bkg_color = PreferencesManager::Instance()->get_background_color();
     Core::View2D view2d( static_cast< Core::StateView2D* > ( 
       viewer->get_active_view_state().get() )->get() );
     std::string view_mode = viewer->view_mode_state_->get();
@@ -894,8 +899,7 @@ bool Renderer::render_overlay()
     // Render the grid
     if ( show_overlay && show_grid )
     {
-      glColor4f( 0.1f, 0.1f, 0.1f, 0.75f );
-      int grid_spacing = 50;
+      glColor4f( 1.0f - bkg_color.r(), 1.0f - bkg_color.g(), 1.0f - bkg_color.b(), 0.75f );
       int center_x = this->width_ / 2;
       int center_y = this->height_ / 2;
       int vertical_lines = center_x / grid_spacing;
@@ -995,8 +999,8 @@ bool Renderer::render_overlay()
       glDisable( GL_LINE_STIPPLE );
     } // end if ( show_picking_lines )
 
-    // Render the text
-    if ( show_overlay )
+    // Render the slice number text
+    if ( show_overlay && show_slice_num )
     {
       std::vector< unsigned char > buffer( this->width_ * this->height_, 0 );
       this->private_->text_renderer_->render_aligned( slice_str, &buffer[ 0 ], 

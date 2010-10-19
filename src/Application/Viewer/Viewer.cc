@@ -834,6 +834,8 @@ void ViewerPrivate::set_viewer_labels()
 
 void ViewerPrivate::reset()
 {
+  ASSERT_IS_APPLICATION_THREAD();
+
   this->volume_slices_.clear();
   this->layer_connection_map_.clear();
   this->active_layer_slice_.reset();
@@ -873,6 +875,14 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
     connect( boost::bind( &ViewerPrivate::set_viewer_labels, this->private_ ) ) );
   this->add_connection( PreferencesManager::Instance()->z_axis_label_state_->state_changed_signal_.
     connect( boost::bind( &ViewerPrivate::set_viewer_labels, this->private_ ) ) );
+  this->add_connection( PreferencesManager::Instance()->grid_size_state_->state_changed_signal_.
+    connect( boost::bind( &Viewer::redraw_overlay, this, false ) ) );
+  this->add_connection( PreferencesManager::Instance()->show_slice_number_state_->
+    state_changed_signal_.connect( boost::bind( &Viewer::redraw_overlay, this, false ) ) );
+  this->add_connection( PreferencesManager::Instance()->background_color_state_->
+    state_changed_signal_.connect( boost::bind( &Viewer::redraw, this, true ) ) );
+  this->add_connection( PreferencesManager::Instance()->background_color_state_->
+    state_changed_signal_.connect( boost::bind( &Viewer::redraw_overlay, this, false ) ) );
   
   this->view_mode_state_->set_session_priority( Core::StateBase::DEFAULT_LOAD_E + 1 );
 

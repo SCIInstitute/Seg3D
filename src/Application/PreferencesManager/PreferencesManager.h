@@ -53,6 +53,8 @@ namespace Seg3D
 
 // Forward declaration
 class PreferencesManager;
+class PreferencesManagerPrivate;
+typedef boost::shared_ptr< PreferencesManagerPrivate > PreferencesManagerPrivateHandle;
 
 // Class definition
 class PreferencesManager : public Core::StateHandler
@@ -76,18 +78,17 @@ public:
   Core::StateBoolHandle compression_state_;
   Core::StateRangedIntHandle compression_level_state_;
   Core::StateIntHandle slice_step_multiplier_state_;
-  Core::StateOptionHandle axis_labels_option_state_;
+  Core::StateLabeledOptionHandle axis_labels_option_state_;
   Core::StateStringHandle x_axis_label_state_;
   Core::StateStringHandle y_axis_label_state_;
   Core::StateStringHandle z_axis_label_state_;
   
   //Viewers Preferences
   Core::StateOptionHandle default_viewer_mode_state_;
-  Core::StateIntHandle grid_size_state_;
-  Core::StateOptionHandle background_color_state_;
+  Core::StateRangedIntHandle grid_size_state_;
+  Core::StateLabeledOptionHandle background_color_state_;
   Core::StateBoolHandle show_slice_number_state_;
 
-  
   //Layers Preferences
   Core::StateRangedDoubleHandle default_layer_opacity_state_;
   Core::StateOptionHandle default_mask_fill_state_;
@@ -105,9 +106,19 @@ public:
   
 public:
   // GET_DEFAULT_COLORS:
-  // this function returns a vector of the default colors
-  const std::vector< Core::Color >& get_default_colors() const { return default_colors_; }
+  // This function returns a vector of the default colors
+  const std::vector< Core::Color >& get_default_colors() const;
+
+  // GET_COLOR:
+  // Get the color at the index.
   Core::Color get_color( int index ) const;
+
+  // GET_BACKGROUND_COLOR:
+  // Get the currently selected background color for the viewers.
+  Core::Color get_background_color() const;
+
+  // SAVE_STATE:
+  // Save the preferences to file.
   void save_state();
   
 private:
@@ -123,11 +134,9 @@ private:
   // This function is called by the constructor to initialize a vector of default color values
   bool initialize_default_colors();
   
-  
 private:
-  std::vector< Core::Color > default_colors_;
-  boost::filesystem::path local_config_path_;
-    
+  
+  PreferencesManagerPrivateHandle private_;
 };
 
 } // end namespace seg3D

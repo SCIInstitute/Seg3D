@@ -63,7 +63,7 @@ public:
   void update_layer_list();
   void handle_active_layer_state_changed( std::string layer_id );
   void handle_active_layer_changed();
-  void delete_all();
+  void reset();
 
   size_t signal_block_count_;
   LayerManager::group_list_type group_list_;
@@ -117,8 +117,10 @@ void LayerManagerPrivate::handle_active_layer_changed()
   }
 }
 
-void LayerManagerPrivate::delete_all()
+void LayerManagerPrivate::reset()
 {
+  ASSERT_IS_APPLICATION_THREAD();
+
   // Clean up all the data blocks.
   Core::MaskDataBlockManager::Instance()->clear();
   Core::DataBlockManager::Instance()->clear();
@@ -156,7 +158,7 @@ LayerManager::LayerManager() :
   this->add_connection( this->active_layer_state_->value_changed_signal_.connect( boost::bind( 
     &LayerManagerPrivate::handle_active_layer_state_changed, this->private_, _2 ) ) );
   this->add_connection( Core::Application::Instance()->reset_signal_.connect( boost::bind(
-    &LayerManagerPrivate::delete_all, this->private_ ) ) );
+    &LayerManagerPrivate::reset, this->private_ ) ) );
 }
 
 LayerManager::~LayerManager()

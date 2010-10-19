@@ -275,6 +275,8 @@ void ToolManagerPrivate::handle_active_tool_state_changed( std::string tool_id )
 
 void ToolManagerPrivate::reset()
 {
+  ASSERT_IS_APPLICATION_THREAD();
+
   ToolManager::tool_list_type::iterator it = this->tool_list_.begin();
   while( it != this->tool_list_.end() )
   {

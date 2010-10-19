@@ -107,8 +107,11 @@ public:
   // Connect a QDoubleSpinBox to a StateRangedDouble
   static void Connect( QDoubleSpinBox* qdoublespinbox, Core::StateRangedDoubleHandle& state );
 
-  // Connect a QSpinBox to a StateIntValue
-  static void Connect( QSpinBox* qspinbox, Core::StateIntHandle& state_handle );
+  // Connect a QSpinBox to a StateInt
+  static void Connect( QSpinBox* qspinbox, Core::StateIntHandle& state );
+
+  // Connect a QSpinBox to a StateRangedInt
+  static void Connect( QSpinBox* qspinbox, Core::StateRangedIntHandle& state );
   
   // Connect a QComboBox to StateOptionHandle
   static void Connect( QComboBox* qcombobox, Core::StateOptionHandle& state_handle );
