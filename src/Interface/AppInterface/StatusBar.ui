@@ -100,7 +100,6 @@ QComboBox::icon{
      </property>
      <property name="font">
       <font>
-       <pointsize>10</pointsize>
       </font>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_8">
@@ -126,7 +125,6 @@ QComboBox::icon{
         </property>
         <property name="font">
          <font>
-          <pointsize>10</pointsize>
          </font>
         </property>
         <property name="text">
@@ -173,7 +171,6 @@ QComboBox::icon{
      </property>
      <property name="font">
       <font>
-       <pointsize>10</pointsize>
       </font>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_6">
@@ -351,7 +348,6 @@ QComboBox::icon{
      </property>
      <property name="font">
       <font>
-       <pointsize>10</pointsize>
       </font>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="0,4,4,4,5">
@@ -383,7 +379,6 @@ QComboBox::icon{
         </property>
         <property name="font">
          <font>
-          <pointsize>10</pointsize>
          </font>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_7">
@@ -409,7 +404,6 @@ QComboBox::icon{
            </property>
            <property name="font">
             <font>
-             <pointsize>10</pointsize>
             </font>
            </property>
            <property name="text">
@@ -450,7 +444,6 @@ QComboBox::icon{
         </property>
         <property name="font">
          <font>
-          <pointsize>10</pointsize>
          </font>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
@@ -510,7 +503,6 @@ QComboBox::icon{
            </property>
            <property name="font">
             <font>
-             <pointsize>9</pointsize>
             </font>
            </property>
            <property name="text">
@@ -537,7 +529,6 @@ QComboBox::icon{
         </property>
         <property name="font">
          <font>
-          <pointsize>10</pointsize>
          </font>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1">
@@ -597,7 +588,6 @@ QComboBox::icon{
            </property>
            <property name="font">
             <font>
-             <pointsize>9</pointsize>
             </font>
            </property>
            <property name="text">
@@ -624,7 +614,6 @@ QComboBox::icon{
         </property>
         <property name="font">
          <font>
-          <pointsize>10</pointsize>
          </font>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,1">
@@ -684,7 +673,6 @@ QComboBox::icon{
            </property>
            <property name="font">
             <font>
-             <pointsize>9</pointsize>
             </font>
            </property>
            <property name="text">
@@ -711,7 +699,6 @@ QComboBox::icon{
         </property>
         <property name="font">
          <font>
-          <pointsize>10</pointsize>
          </font>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,1">
@@ -771,7 +758,6 @@ QComboBox::icon{
            </property>
            <property name="font">
             <font>
-             <pointsize>9</pointsize>
             </font>
            </property>
            <property name="text">
@@ -807,7 +793,6 @@ QComboBox::icon{
      </property>
      <property name="font">
       <font>
-       <pointsize>10</pointsize>
       </font>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_10">
