@@ -209,10 +209,23 @@ bool ActionArithmeticFilterPrivate::validate_parser( Core::ActionContextHandle& 
       }
       else
       {
-        if ( ! ( this->algo_->lock_for_use( layers[ i ] ) ) )
+        // Check if it was already locked
+        bool already_locked = false;
+        for ( size_t  j = 0; j < i; j++ )
         {
-          this->algo_.reset();
-          return false;       
+          if ( layers[ i ] == layers[ j ] )
+          {
+            already_locked = true;
+            break;
+          }
+        }
+        if ( ! already_locked )
+        {
+          if ( ! ( this->algo_->lock_for_use( layers[ i ] ) ) )
+          {
+            this->algo_.reset();
+            return false;       
+          }
         }
       }
     }
