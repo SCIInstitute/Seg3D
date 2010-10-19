@@ -44,10 +44,21 @@ namespace Seg3D
 BinaryDilateErodeFilter::BinaryDilateErodeFilter( const std::string& toolid ) :
   SingleTargetTool( Core::VolumeType::MASK_E, toolid )
 {
+  // Create an empty list of label options
+  std::vector< LayerIDNamePair > empty_list( 1, 
+    std::make_pair( Tool::NONE_OPTION_C, Tool::NONE_OPTION_C ) );
+
   // Need to set ranges and default values for all parameters
   this->add_state( "dilate", this->dilate_state_, 1, 1, 20, 1 );
   this->add_state( "erode", this->erode_state_, 1, 1, 20, 1 );
   this->add_state( "replace", this->replace_state_, false );
+
+  // Whether we use a mask to find which components to use
+  this->add_state( "mask", this->mask_state_, Tool::NONE_OPTION_C, empty_list );
+  this->add_dependent_layer_input( this->mask_state_, Core::VolumeType::MASK_E );
+
+  // Whether that mask should be inverted
+  this->add_state( "invert_mask", this->mask_invert_state_, false );
 }
 
 BinaryDilateErodeFilter::~BinaryDilateErodeFilter()
@@ -61,7 +72,9 @@ void BinaryDilateErodeFilter::execute_dilateerode( Core::ActionContextHandle con
     this->target_layer_state_->get(),
     this->replace_state_->get(),
     this->dilate_state_->get(),
-    this->erode_state_->get() );
+    this->erode_state_->get(),
+    this->mask_state_->get(),
+    this->mask_invert_state_->get() );
 }
 
 void BinaryDilateErodeFilter::execute_dilate( Core::ActionContextHandle context )
@@ -69,7 +82,9 @@ void BinaryDilateErodeFilter::execute_dilate( Core::ActionContextHandle context 
   ActionDilateFilter::Dispatch( context,
     this->target_layer_state_->get(),
     this->replace_state_->get(),
-    this->dilate_state_->get() );
+    this->dilate_state_->get(),
+    this->mask_state_->get(),
+    this->mask_invert_state_->get() );
 }
 
 void BinaryDilateErodeFilter::execute_erode( Core::ActionContextHandle context )
@@ -77,7 +92,9 @@ void BinaryDilateErodeFilter::execute_erode( Core::ActionContextHandle context )
   ActionErodeFilter::Dispatch( context,
     this->target_layer_state_->get(),
     this->replace_state_->get(),
-    this->erode_state_->get() );
+    this->erode_state_->get(),
+    this->mask_state_->get(),
+    this->mask_invert_state_->get() );
 }
 
 } // end namespace Seg3D

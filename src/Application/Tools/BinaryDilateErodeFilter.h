@@ -59,6 +59,12 @@ public:
 
   // Whether to replace the input layer with the output layer
   Core::StateBoolHandle replace_state_;
+
+  // Layerid of the mask layer
+  Core::StateLabeledOptionHandle mask_state_;
+    
+  // Whether mask should be inverted in this filter
+  Core::StateBoolHandle mask_invert_state_;
   
 public:
 

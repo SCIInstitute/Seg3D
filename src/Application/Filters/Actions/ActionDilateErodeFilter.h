@@ -43,8 +43,10 @@ CORE_ACTION(
   CORE_ACTION_TYPE( "DilateErodeFilter", "Filter that dilates a segmentation by a certain pixel radius and then erodes them away." )
   CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
   CORE_ACTION_KEY( "replace", "true", "Replace the old layer (true), or add an new mask layer (false)." )
-  CORE_ACTION_KEY( "dilate_radius", "2", "The distance in pixels over which the filter dilates a mask." )
-  CORE_ACTION_KEY( "erode_radius", "2", "The distance in pixels over which the filter erodes a mask." )
+  CORE_ACTION_KEY( "dilate_radius", "1", "The distance in pixels over which the filter dilates a mask." )
+  CORE_ACTION_KEY( "erode_radius", "1", "The distance in pixels over which the filter erodes a mask." )
+  CORE_ACTION_KEY( "mask", "<none>", "Only modify data within the mask." )
+  CORE_ACTION_KEY( "invert_mask", "false", "Whether the mask needs to be inverted." ) 
 )
   
   // -- Constructor/Destructor --
@@ -58,6 +60,10 @@ public:
     this->add_key( this->replace_ );    
     this->add_key( this->dilate_radius_ );
     this->add_key( this->erode_radius_ );
+
+    // Constraint
+    this->add_key( this->mask_layer_ );
+    this->add_key( this->mask_invert_ );  
   }
   
   virtual ~ActionDilateErodeFilter()
@@ -76,14 +82,18 @@ private:
   Core::ActionParameter< bool > replace_;
   Core::ActionParameter< int > dilate_radius_;
   Core::ActionParameter< int > erode_radius_;
-  
+
+  Core::ActionParameter< std::string > mask_layer_;
+  Core::ActionParameter< bool > mask_invert_;
+    
   // -- Dispatch this action from the interface --
 public:
 
   // DISPATCH:
   // Create and dispatch action that inserts the new layer 
   static void Dispatch( Core::ActionContextHandle context, 
-    std::string target_layer, bool replace, int dilate_radius, int erode_radius );
+    std::string target_layer, bool replace, int dilate_radius, int erode_radius,
+    std::string mask_layer, bool mask_invert );
           
 };
   

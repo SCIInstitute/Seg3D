@@ -60,11 +60,43 @@ bool ActionDilateErodeFilter::validate( Core::ActionContextHandle& context )
     context->report_need_resource( notifier );
     return false;
   }
+
+  // Check for layer existance and type information
+  if ( ( this->mask_layer_.value() != "" ) && ( this->mask_layer_.value() != "<none>" ) )
+  {
+    std::string error;
+    if ( ! LayerManager::CheckLayerExistanceAndType( this->mask_layer_.value(), 
+      Core::VolumeType::MASK_E, error ) )
+    {
+      context->report_error( error );
+      return false;
+    }
+    
+    if ( ! LayerManager::CheckLayerSize( this->mask_layer_.value(), this->target_layer_.value(),
+      error ) )
+    {
+      context->report_error( error );
+      return false;   
+    }
+    
+    // Check for layer availability 
+    if ( ! LayerManager::CheckLayerAvailability( this->mask_layer_.value(), false, notifier ) )
+    {
+      context->report_need_resource( notifier );
+      return false;
+    }
+  }
     
   // If the number of iterations is lower than one, we cannot run the filter
   if( this->dilate_radius_.value() < 0 )
   {
     context->report_error( "The radius needs to be larger than or equal to zero." );
+    return false;
+  }
+
+  if( this->dilate_radius_.value() > 254 )
+  {
+    context->report_error( "The radius is too large." );
     return false;
   }
 
@@ -74,6 +106,11 @@ bool ActionDilateErodeFilter::validate( Core::ActionContextHandle& context )
     return false;
   }
 
+  if( this->erode_radius_.value() > 254 )
+  {
+    context->report_error( "The radius is too large." );
+    return false;
+  }
   
   // Validation successful
   return true;
@@ -89,10 +126,13 @@ class DilateErodeFilterAlgo : public BaseFilter
 
 public:
   LayerHandle src_layer_;
+  LayerHandle mask_layer_;
   LayerHandle dst_layer_;
 
   int dilate_radius_;
   int erode_radius_;
+
+  bool invert_mask_;
 
 public:
   // RUN:
@@ -115,6 +155,8 @@ public:
     Core::DataBlock::index_type nx = input_data_block->get_nx();
     Core::DataBlock::index_type ny = input_data_block->get_ny();
     Core::DataBlock::index_type nz = input_data_block->get_nz();
+    Core::DataBlock::index_type size = input_data_block->get_size();
+
     unsigned char* data = reinterpret_cast<unsigned char*>( input_data_block->get_data() );
   
     std::vector< std::vector<Core::DataBlock::index_type> > neighbors;
@@ -138,6 +180,36 @@ public:
     {
       this->report_error( "Could not allocate enough memory." );
       return;   
+    }
+
+    // Inscribe mask
+    if ( this->mask_layer_ )
+    {
+      MaskLayerHandle mask_layer = boost::dynamic_pointer_cast<MaskLayer>( this->mask_layer_ );
+      if ( mask_layer )
+      {
+        Core::MaskDataBlockHandle mask_data_block = mask_layer->get_mask_volume()->
+          get_mask_data_block();      
+        Core::MaskDataBlock::shared_lock_type lock( mask_data_block->get_mutex() );
+        
+        unsigned char* mask_data = mask_data_block->get_mask_data();
+        unsigned char mask_value = mask_data_block->get_mask_value();
+        
+        if ( this->invert_mask_ )
+        {
+          for ( Core::DataBlock::index_type j = 0; j < size; j++ )
+          {
+            if ( data[ j ] == 0 && ( mask_data[ j ] & mask_value ) ) data[ j ] = 255;
+          }       
+        }
+        else
+        {
+          for ( Core::DataBlock::index_type j = 0; j < size; j++ )
+          {
+            if ( data[ j ] == 0 && !( mask_data[ j ] & mask_value ) ) data[ j ] = 255;
+          }
+        }
+      }
     }
   
     unsigned char current_label = 2;
@@ -193,7 +265,37 @@ public:
     Core::DataBlock::index_type data_size = input_data_block->get_size();
     for ( Core::DataBlock::index_type k = 0; k < data_size;  k++ )
     {
-      if ( data[ k ] ) data[ k ] = 1;
+      if ( data[ k ] == 0 || data[ k ] == 255 ) data[ k ] = 0; else data[ k ] = 1;
+    }
+
+    // Inscribe mask
+    if ( this->mask_layer_ )
+    {
+      MaskLayerHandle mask_layer = boost::dynamic_pointer_cast<MaskLayer>( this->mask_layer_ );
+      if ( mask_layer )
+      {
+        Core::MaskDataBlockHandle mask_data_block = mask_layer->get_mask_volume()->
+          get_mask_data_block();      
+        Core::MaskDataBlock::shared_lock_type lock( mask_data_block->get_mutex() );
+        
+        unsigned char* mask_data = mask_data_block->get_mask_data();
+        unsigned char mask_value = mask_data_block->get_mask_value();
+        
+        if ( this->invert_mask_ )
+        {
+          for ( Core::DataBlock::index_type j = 0; j < size; j++ )
+          {
+            if ( data[ j ] == 1 && ( mask_data[ j ] & mask_value ) ) data[ j ] = 255;
+          }       
+        }
+        else
+        {
+          for ( Core::DataBlock::index_type j = 0; j < size; j++ )
+          {
+            if ( data[ j ] == 1 && !( mask_data[ j ] & mask_value ) ) data[ j ] = 255;
+          }
+        }
+      }
     }
 
     current_label = 2;
@@ -225,7 +327,8 @@ public:
             for ( size_t m = 0; m < neigh.size(); m++ )
             {
               Core::DataBlock::index_type index = k + neigh[ m ];
-              if ( data[ index ] == 1  || data[ index ] == current_label ) continue;
+              if ( data[ index ] == 1  || data[ index ] == 255 || 
+                data[ index ] == current_label ) continue;
               data[ k ] = current_label;
             }
           }
@@ -244,6 +347,14 @@ public:
       previous_label++;
     }
     
+    if ( this->mask_layer_ )
+    {
+      for ( Core::DataBlock::index_type j = 0; j < size; j++ )
+      {
+        if ( data[ j ] == 255 ) data[ j ] = 1;
+      }
+    }
+
     Core::MaskDataBlockHandle output_mask;
 
     if (!( Core::MaskDataBlockManager::ConvertLabel( input_data_block, 
@@ -299,6 +410,17 @@ bool ActionDilateErodeFilter::run( Core::ActionContextHandle& context,
     return false;
   }
 
+  if ( this->mask_layer_.value().size() > 0 && this->mask_layer_.value() != "<none>" )
+  {
+    if ( !( algo->find_layer( this->mask_layer_.value(), algo->mask_layer_ ) ) )
+    {
+      return false;
+    }   
+    algo->lock_for_use( algo->mask_layer_ );
+  }
+  
+  algo->invert_mask_ = this->mask_invert_.value();  
+
   if ( this->replace_.value() )
   {
     // Copy the handles as destination and source will be the same
@@ -325,7 +447,8 @@ bool ActionDilateErodeFilter::run( Core::ActionContextHandle& context,
 }
 
 void ActionDilateErodeFilter::Dispatch( Core::ActionContextHandle context, 
-  std::string target_layer, bool replace, int dilate_radius, int erode_radius )
+  std::string target_layer, bool replace, int dilate_radius, int erode_radius, 
+  std::string mask_layer, bool mask_invert )
 { 
   // Create a new action
   ActionDilateErodeFilter* action = new ActionDilateErodeFilter;
@@ -335,7 +458,9 @@ void ActionDilateErodeFilter::Dispatch( Core::ActionContextHandle context,
   action->replace_.value() = replace;
   action->dilate_radius_.value() = dilate_radius;
   action->erode_radius_.value() = erode_radius;
-
+  action->mask_layer_.value() = mask_layer;
+  action->mask_invert_.value() = mask_invert;
+  
   // Dispatch action to underlying engine
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }

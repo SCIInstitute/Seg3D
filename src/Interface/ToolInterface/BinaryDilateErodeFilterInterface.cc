@@ -81,6 +81,11 @@ bool BinaryDilateErodeFilterInterface::build_widget( QFrame* frame )
     tool->erode_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.dilate_, 
     tool->dilate_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.mask_,
+    tool->mask_state_ );  
+  QtUtils::QtBridge::Connect( this->private_->ui_.mask_invert_,
+    tool->mask_invert_state_ ); 
+
   QtUtils::QtBridge::Connect( this->private_->ui_.replaceCheckBox, 
     tool->replace_state_ );
   QtUtils::QtBridge::Enable( this->private_->ui_.dilateButton,

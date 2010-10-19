@@ -127,8 +127,6 @@ namespace Seg3D
     " color: silver;"
     "}"
     "QPushButton#activate_button_:pressed{"
-//    " background-color:rgba(0, 0, 0, 0);"
-//    " border-color: rgba(0, 0, 0, 0);"
     " padding-left: 4px;"
     " border: none;"
     " color:  rgb(68, 68, 68);"
@@ -146,8 +144,6 @@ namespace Seg3D
     " color: silver;"
     "}"
     "QPushButton#activate_button_:pressed{"
-//    " background-color:rgba(0, 0, 0, 0);"
-//    " border-color: rgba(0, 0, 0, 0);"
     " padding-left: 4px;"
     " border: none;"
     " color:  rgb(68, 68, 68);"
@@ -234,6 +230,7 @@ namespace Seg3D
     " text-align: left;"
     " color: black;"
     " margin-right: 3px;"
+    "   selection-background-color: rgb( 222, 222, 100 ); "
     " background-color: rgba( 211, 211, 211, 255);"
     "}");
 
@@ -242,6 +239,7 @@ namespace Seg3D
     " text-align: left;"
     " color: black;"
     " margin-right: 3px;"
+    "   selection-background-color: rgb( 222, 222, 100 ); "
     " background-color: rgba( 193, 215, 255, 255 );"
     "}");
 
@@ -250,6 +248,7 @@ namespace Seg3D
     " text-align: left;"
     " color: black;"
     " margin-right: 3px;"
+    "   selection-background-color: rgb( 222, 222, 100 ); "
     " background-color: rgba( 193, 255, 255, 255 );"
     "}");
     
@@ -258,6 +257,7 @@ namespace Seg3D
     " text-align: left;"
     " color: black;"
     " margin-right: 3px;"
+    "   selection-background-color: rgb( 222, 222, 100 ); "
     " background-color: rgba( 193, 255, 215, 255 );"
     "}");   
         

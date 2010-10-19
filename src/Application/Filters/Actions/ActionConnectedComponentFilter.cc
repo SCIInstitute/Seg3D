@@ -290,7 +290,10 @@ bool ActionConnectedComponentFilter::run( Core::ActionContextHandle& context,
   
   if ( this->mask_.value().size() > 0 && this->mask_.value() != "<none>" )
   {
-    algo->find_layer( this->mask_.value(), algo->mask_layer_ );
+    if ( !( algo->find_layer( this->mask_.value(), algo->mask_layer_ ) ) )
+    {
+      return false;
+    }
     algo->lock_for_use( algo->mask_layer_ );
   }
   
