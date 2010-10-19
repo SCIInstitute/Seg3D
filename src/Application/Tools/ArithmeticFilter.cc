@@ -70,6 +70,9 @@ ArithmeticFilter::ArithmeticFilter( const std::string& toolid ) :
   
   this->add_connection( this->target_layer_state_->state_changed_signal_.connect( 
     boost::bind( &ArithmeticFilter::update_output_type, this ) ) );
+
+  // Make sure output type matches initial input type 
+  this->update_output_type();
 } 
 
 ArithmeticFilter::~ArithmeticFilter()
