@@ -237,14 +237,19 @@ bool ActionArithmeticFilterPrivate::validate_parser( Core::ActionContextHandle& 
     return false;
   }
 
-  if( this->preserve_data_format_.value() )
-  {
-    this->algo_->src_layer_ = layers[ 0 ];
-  }
-
   if ( replace )
   {
     this->algo_->dst_layer_ = layers[ 0 ];
+    // Make sure the dst layer type matches the output type
+    if( !( ( this->algo_->dst_layer_->type() == Core::VolumeType::MASK_E && 
+      this->output_type_.value() ==  ActionArithmeticFilter::MASK_C ) ||
+      ( this->algo_->dst_layer_->type() == Core::VolumeType::DATA_E && 
+      this->output_type_.value() ==  ActionArithmeticFilter::DATA_C ) ) )
+    {
+      context->report_error( 
+        std::string("Arithmetic Filter: Cannot replace first input -- input/output types don't match.") );
+      return false;
+    }
   }
   else if ( this->output_type_.value() == ActionArithmeticFilter::DATA_C )
   {
@@ -263,6 +268,11 @@ bool ActionArithmeticFilterPrivate::validate_parser( Core::ActionContextHandle& 
       this->algo_.reset();
       return false;   
     }
+  }
+
+  if( this->preserve_data_format_.value() )
+  {
+    this->algo_->src_layer_ = layers[ 0 ];
   }
 
   const Core::GridTransform& grid_trans = layers[ 0 ]->get_grid_transform();
