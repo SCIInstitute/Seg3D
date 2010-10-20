@@ -84,6 +84,9 @@ AppInterface::AppInterface()
   this->history_widget_ = new MessageWindow( this );
   this->history_widget_->hide();
   
+  this->keyboard_shortcuts_ = new AppShortcuts( this );
+  this->keyboard_shortcuts_->hide();
+  
   this->splash_interface_ = new AppSplash( this );
 
   // Define the main window viewer canvas
@@ -226,6 +229,12 @@ void AppInterface::closeEvent( QCloseEvent* event )
     this->history_widget_->deleteLater();
   }
   
+  if( this->keyboard_shortcuts_ )
+  {
+    this->keyboard_shortcuts_->close();
+    this->keyboard_shortcuts_->deleteLater();
+  }
+  
   if( this->history_dock_window_ )
   {
     this->history_dock_window_->close();
@@ -299,6 +308,7 @@ void AppInterface::add_windowids()
   InterfaceManager::Instance()->add_windowid( "tools" );
   InterfaceManager::Instance()->add_windowid( "measurement" );
   InterfaceManager::Instance()->add_windowid( "history_widget" );
+  InterfaceManager::Instance()->add_windowid( "keyboard_shortcuts" );
 }
 
 void AppInterface::show_window( const std::string& windowid )
@@ -365,6 +375,22 @@ void AppInterface::show_window( const std::string& windowid )
     }
     QRect rect = QApplication::desktop()->availableGeometry( this->history_widget_ );
     this->history_widget_->move(rect.center() - this->history_widget_->rect().center());
+  }
+  
+  else if( lower_windowid == "keyboard_shortcuts" )
+  {
+    if( this->keyboard_shortcuts_.isNull() )
+    {
+      this->keyboard_shortcuts_ = new AppShortcuts( this );
+      this->keyboard_shortcuts_->show();
+    }
+    else
+    {
+      this->keyboard_shortcuts_->show();
+      this->keyboard_shortcuts_->raise();
+    }
+    QRect rect = QApplication::desktop()->availableGeometry( this->keyboard_shortcuts_ );
+    this->keyboard_shortcuts_->move(rect.center() - this->keyboard_shortcuts_->rect().center());
   }
   
   else if( lower_windowid == "project" )
@@ -457,6 +483,10 @@ void AppInterface::close_window( const std::string& windowid )
   else if( lower_windowid == "history_widget" )
   {
     if( !( this->history_widget_.isNull() ) ) this->history_widget_->close();
+  }
+  else if( lower_windowid == "keyboard_shortcuts" )
+  {
+    if( !( this->keyboard_shortcuts_.isNull() ) ) this->keyboard_shortcuts_->close();
   }
   else if( lower_windowid == "project" )
   {

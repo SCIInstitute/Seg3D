@@ -50,6 +50,7 @@
 #include <Interface/AppInterface/ViewerInterface.h>
 #include <Interface/AppInterface/HistoryDockWidget.h>
 #include <Interface/AppInterface/MessageWindow.h>
+#include <Interface/AppInterface/AppShortcuts.h>
 #include <Interface/AppInterface/LayerManagerDockWidget.h>
 #include <Interface/AppInterface/MeasurementDockWidget.h>
 #include <Interface/AppInterface/ProgressWidget.h>
@@ -119,6 +120,7 @@ private:
   QPointer< AppController > controller_interface_;
   QPointer< AppPreferences > preferences_interface_;
   QPointer< MessageWindow > history_widget_;
+  QPointer< AppShortcuts > keyboard_shortcuts_;
   QPointer< AppSplash > splash_interface_;
 
   // The dock widgets

@@ -83,6 +83,10 @@ public:
   // GET_SHORTCUT_KEY:
   // The shortcut key for this tool
   std::string get_shortcut_key() const;
+  
+  // GET_HOTKEYS_AND_DEFINITIONS:
+  // The hotkeys for this tool
+  std::string get_hotkeys() const;
 
   // GET_URL:
   // Get the help url

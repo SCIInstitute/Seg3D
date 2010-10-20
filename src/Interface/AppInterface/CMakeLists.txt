@@ -37,13 +37,14 @@ SET(INTERFACE_APPINTERFACE_SRCS
   AppLayerIO.cc
   AppStatusBar.cc
   HistoryDockWidget.cc
-  MessageWindow.cc
+  AppShortcuts.cc
   LayerManagerWidget.cc
   LayerImporterWidget.cc
   LayerWidget.cc
   LayerGroupWidget.cc
   LayerManagerDockWidget.cc
   MeasurementDockWidget.cc
+  MessageWindow.cc
   ProgressWidget.cc
   ProjectDockWidget.cc
   PushDragButton.cc
@@ -63,13 +64,14 @@ SET(INTERFACE_APPINTERFACE_MOC_SRCS
   AppMenu.h
   AppStatusBar.h
   HistoryDockWidget.h
+  AppShortcuts.h
   LayerWidget.h
   LayerImporterWidget.h
   LayerGroupWidget.h
   LayerManagerWidget.h
   LayerManagerDockWidget.h
-  MessageWindow.h
   MeasurementDockWidget.h
+  MessageWindow.h
   ProgressWidget.h
   ProjectDockWidget.h
   PushDragButton.h
@@ -92,6 +94,7 @@ SET(INTERFACE_APPINTERFACE_NO_MOC_SRCS
 
 SET(INTERFACE_APPINTERFACE_UI_SRCS
   HistoryDockWidget.ui
+  AppShortcuts.ui
   LayerGroupWidget.ui
   LayerImporterWidget.ui
   LayerManagerDockWidget.ui

@@ -113,7 +113,7 @@ void AppMenu::create_file_menu( QMenu* qmenu )
 {
   QAction* qaction;
   qaction = qmenu->addAction( tr( "&New Project" ) );
-  qaction->setShortcut( tr( "Ctrl+P" ) );
+  qaction->setShortcut( tr( "Ctrl+N" ) );
   qaction->setToolTip( tr( "Start a new project." ) );
   connect( qaction, SIGNAL( triggered() ), this, SLOT( new_project_wizard() ) );
 
@@ -361,6 +361,9 @@ void AppMenu::create_window_menu( QMenu* qmenu )
     qaction = qmenu->addAction( tr( "&Keyboard Shortcuts" ) ); 
     qaction->setToolTip( QString( "List of the keyboard shortcuts or 'hotkeys' for " ) + 
       QString::fromStdString( Core::Application::GetApplicationNameAndVersion() ) );
+    qaction->setShortcut( tr( "Ctrl+ALT+K" ) );
+    QtUtils::QtBridge::Connect( qaction, boost::bind( &ActionShowWindow::Dispatch,
+      Core::Interface::GetWidgetActionContext(), std::string( "keyboard_shortcuts" ) ) );
 
   }
   

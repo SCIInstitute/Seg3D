@@ -34,6 +34,7 @@
 SET(QTUTILS_WIDGETS_SRCS
   QtColorBarWidget.cc
   QtColorButton.cc
+  QtNewColorButton.cc
   QtHistogramGraph.cc
   QtHistogramWidget.cc
   QtSliderDoubleCombo.cc
@@ -46,6 +47,7 @@ SET(QTUTILS_WIDGETS_SRCS
 SET(QTUTILS_WIDGETS_MOC_SRCS
   QtColorBarWidget.h
   QtColorButton.h
+  QtNewColorButton.h
   QtHistogramGraph.h
   QtHistogramWidget.h
   QtSliderDoubleCombo.h

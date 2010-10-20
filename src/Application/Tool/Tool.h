@@ -93,6 +93,10 @@ public:
   // Get the short cut key for this tool
   std::string get_shortcut_key() const;
   
+  // GET_HOTKEYS_AND_DESCRIPTIONS:
+  // Get the hotkeys for this tool
+  std::string get_hotkeys_and_descriptions() const;
+  
   // GET_URL:
   // Get the URL where more information on the tool can be found
   std::string get_url() const;
@@ -217,6 +221,9 @@ public:
 #define SEG3D_TOOL_SHORTCUT_KEY( key ) \
 "<shortcutkey>" key "</shortcutkey>"
 
+#define SEG3D_TOOL_HOTKEYS( hotkeys ) \
+"<hotkeys>" hotkeys "</hotkeys>"
+
 #define SEG3D_TOOL_VERSION( version ) \
 "<version>" version "</version>"
 
@@ -229,6 +236,7 @@ public: \
     static std::string Name() { return GetToolInfo()->get_name(); } \
     static std::string ShortcutKey() { return GetToolInfo()->get_shortcut_key(); } \
     static std::string Url() { return GetToolInfo()->get_url(); } \
+    static std::string HotKeys() { return GetToolInfo()->get_hotkeys(); } \
     static int Version() { return GetToolInfo()->get_version(); } \
   static Seg3D::ToolInfoHandle GetToolInfo() \
   {\

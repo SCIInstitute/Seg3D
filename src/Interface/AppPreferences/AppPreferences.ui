@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>766</width>
-    <height>662</height>
+    <height>493</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -54,7 +54,7 @@ border: 1px solid gray;
    <item>
     <widget class="QTabWidget" name="prefs_tabs_">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab_general_">
       <attribute name="title">
@@ -909,7 +909,7 @@ border: 1px solid gray;
                <property name="minimumSize">
                 <size>
                  <width>0</width>
-                 <height>40</height>
+                 <height>60</height>
                 </size>
                </property>
                <layout class="QHBoxLayout" name="color_h_layout_">

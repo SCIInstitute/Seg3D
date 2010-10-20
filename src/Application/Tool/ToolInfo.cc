@@ -51,6 +51,7 @@ class ToolInfoPrivate
     std::string menu_;
     std::string menu_label_;
     std::string shortcut_key_;
+    std::string hotkeys_and_descriptions_;
 
     std::string url_;
     
@@ -155,6 +156,15 @@ ToolInfo::ToolInfo( const std::string& definition ) :
       }           
       Core::ImportFromString( version, this->private_->version_ );
     }
+    else if ( type == "hotkeys" )
+    {
+      std::string hotkeys;
+      if( parameter_element->GetText() )
+      {
+        hotkeys = parameter_element->GetText();
+      }         
+      this->private_->hotkeys_and_descriptions_ = hotkeys;
+    }
 
   }
 
@@ -194,6 +204,11 @@ std::string ToolInfo::get_shortcut_key() const
   return this->private_->shortcut_key_;
 }
 
+std::string ToolInfo::get_hotkeys() const
+{
+  return this->private_->hotkeys_and_descriptions_;
+}
+
 std::string ToolInfo::get_url() const
 {
   return this->private_->url_;
@@ -211,5 +226,7 @@ ToolInfo::mutex_type& ToolInfo::GetMutex()
 {
   return mutex_;
 }
+
+
 
 } // end namespace Seg3D

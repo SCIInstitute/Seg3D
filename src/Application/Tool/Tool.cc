@@ -95,6 +95,11 @@ std::string Tool::get_shortcut_key() const
   return get_tool_info()->get_shortcut_key();
 }
 
+std::string Tool::get_hotkeys_and_descriptions() const
+{
+  return get_tool_info()->get_hotkeys();
+}
+
 std::string Tool::get_url() const
 {
   return get_tool_info()->get_url();
