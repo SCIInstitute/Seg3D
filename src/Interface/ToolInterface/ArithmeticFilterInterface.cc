@@ -26,6 +26,10 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+//Boost Includes
+#include <boost/lambda/lambda.hpp>
+#include <boost/lambda/bind.hpp>
+
 //QtUtils Includes
 #include <QtUtils/Bridge/QtBridge.h>
 
@@ -102,6 +106,20 @@ bool ArithmeticFilterInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Connect( this->private_->ui_.replace_, tool->replace_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.preserve_checkbox_, 
     tool->preserve_data_format_state_ );
+
+  // Only enable replace checkbox if input type == output type (data/mask)
+  QtUtils::QtBridge::Enable( this->private_->ui_.replace_, 
+    tool->input_matches_output_state_ );
+
+  // Only enable preserve data type checkbox if output is data and input type == output type
+  std::vector< Core::StateBaseHandle > enable_states( 2 );
+  enable_states[ 0 ] = tool->input_matches_output_state_;
+  enable_states[ 1 ] = tool->output_type_state_;
+  boost::function< bool () > condition = boost::lambda::bind( &Core::StateBool::get, 
+    tool->input_matches_output_state_.get() ) && boost::lambda::bind( &Core::StateBool::get,
+    tool->output_is_data_state_.get() );
+  
+  QtUtils::QtBridge::Enable( this->private_->ui_.preserve_checkbox_, enable_states, condition );
 
   for ( size_t j = 0; j < this->private_->predefined_.size(); j++ )
   {

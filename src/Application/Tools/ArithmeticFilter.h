@@ -53,6 +53,7 @@ public:
 
 private:
   void update_output_type();
+  void update_replace_options();
 
   // -- state --
 public:
@@ -65,6 +66,8 @@ public:
 
   Core::StateBoolHandle replace_state_;
   Core::StateBoolHandle preserve_data_format_state_;
+  Core::StateBoolHandle output_is_data_state_;
+  Core::StateBoolHandle input_matches_output_state_;
 
 };
 

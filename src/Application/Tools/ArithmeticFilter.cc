@@ -67,9 +67,14 @@ ArithmeticFilter::ArithmeticFilter( const std::string& toolid ) :
 
   this->add_state( "replace", this->replace_state_, false );
   this->add_state( "preserve_data_format", this->preserve_data_format_state_, false );
+  this->add_state( "output_is_data", this->output_is_data_state_, false );  
+  this->add_state( "input_matches_output", this->input_matches_output_state_, false );  
   
   this->add_connection( this->target_layer_state_->state_changed_signal_.connect( 
     boost::bind( &ArithmeticFilter::update_output_type, this ) ) );
+
+  this->add_connection( this->output_type_state_->state_changed_signal_.connect( 
+    boost::bind( &ArithmeticFilter::update_replace_options, this ) ) );
 
   // Make sure output type matches initial input type 
   this->update_output_type();
@@ -91,9 +96,39 @@ void ArithmeticFilter::update_output_type()
     }
     else
     {
-      this->output_type_state_->set( ActionArithmeticFilter::MASK_C );    
+      this->output_type_state_->set( ActionArithmeticFilter::MASK_C );  
     }
   }
+
+  // If output type didn't actually change, state_changed_signal won't be emitted, so this 
+  // function needs to be called manually
+  this->update_replace_options();
+}
+
+void ArithmeticFilter::update_replace_options()
+{
+  LayerHandle layer = LayerManager::Instance()->get_layer_by_id( this->target_layer_state_->get() );
+  if( layer )
+  {
+    if( ( layer->type() == Core::VolumeType::DATA_E && 
+      this->output_type_state_->get() == ActionArithmeticFilter::DATA_C ) ||
+      ( layer->type() == Core::VolumeType::MASK_E && 
+      this->output_type_state_->get() == ActionArithmeticFilter::MASK_C ) )
+    {
+      this->input_matches_output_state_->set( true );
+    }
+    else 
+    {
+      this->input_matches_output_state_->set( false );
+    }
+  }
+  else
+  {
+    this->input_matches_output_state_->set( false );
+  }
+
+  this->output_is_data_state_->set( 
+    this->output_type_state_->get() == ActionArithmeticFilter::DATA_C );
 }
 
 void ArithmeticFilter::execute( Core::ActionContextHandle context )
