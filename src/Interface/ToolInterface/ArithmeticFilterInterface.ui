@@ -292,7 +292,7 @@
          </size>
         </property>
         <property name="plainText">
-         <string>RESULT= </string>
+         <string></string>
         </property>
        </widget>
       </item>
