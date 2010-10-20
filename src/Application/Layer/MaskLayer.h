@@ -96,6 +96,10 @@ public:
   // Compute the isosurface for this layer using the given quality factor.
   // Quality factor must be one of: 1.0, 0.5, 0.25, 0.125
   void compute_isosurface( double quality_factor );
+  
+  // CALCULATE_VOLUME:
+  // function that is called by the calculate volume action that calculate the volume of the mask
+  void calculate_volume();
 
   void delete_isosurface();
 
@@ -121,6 +125,10 @@ public:
   
   // State that describes whether the iso surface has been generated
   Core::StateBoolHandle iso_generated_state_;
+  
+  // State that describes the calculated volume of the mask, as string because its connected to a 
+  // label that will show a non numeric value, when the volume has not been calculated.
+  Core::StateStringHandle calculated_volume_state_;
 
 protected:
   // PRE_SAVE_STATES:

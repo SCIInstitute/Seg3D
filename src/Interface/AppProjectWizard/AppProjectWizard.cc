@@ -58,6 +58,13 @@ void AppProjectWizard::accept()
     field("projectPath").toString().toStdString(),
     field("projectName").toString().toStdString() );
     QDialog::accept();
+    Q_EMIT this->finished();
+}
+
+void AppProjectWizard::reject()
+{
+  QDialog::reject();
+  Q_EMIT this->canceled();
 }
 
 ProjectInfoPage::ProjectInfoPage( QWidget *parent )

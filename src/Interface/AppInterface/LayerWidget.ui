@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>311</width>
-    <height>486</height>
+    <width>269</width>
+    <height>524</height>
    </rect>
   </property>
   <property name="mouseTracking">
@@ -1571,7 +1571,7 @@ QPushButton#activate_button_{
                 <number>0</number>
                </property>
                <item>
-                <widget class="QPushButton" name="pushButton">
+                <widget class="QPushButton" name="calculate_volume_button_">
                  <property name="text">
                   <string>Calculate</string>
                  </property>

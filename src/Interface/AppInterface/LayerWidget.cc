@@ -34,6 +34,7 @@
 //Core Includes - for logging
 #include <Core/Utils/Log.h>
 #include <Core/State/Actions/ActionSet.h>
+
 //QtUtils Includes
 #include <QtUtils/Bridge/QtBridge.h>
 #include <QtUtils/Widgets/QtColorBarWidget.h>
@@ -49,6 +50,7 @@
 #include <Application/LayerManager/Actions/ActionComputeIsosurface.h>
 #include <Application/LayerManager/Actions/ActionDeleteIsosurface.h>
 #include <Application/LayerManager/Actions/ActionMoveLayerAbove.h>
+#include <Application/LayerManager/Actions/ActionCalculateMaskVolume.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
 #include <Application/Filters/LayerResampler.h>
 
@@ -443,6 +445,13 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
             mask_layer->iso_generated_state_ );
           QtUtils::QtBridge::Enable( this->private_->ui_.delete_iso_surface_button_, 
             mask_layer->iso_generated_state_ );
+            
+          QtUtils::QtBridge::Connect( this->private_->ui_.mask_volume_label_, 
+            mask_layer->calculated_volume_state_ );
+            
+          QtUtils::QtBridge::Connect( this->private_->ui_.calculate_volume_button_,
+            boost::bind( &ActionCalculateMaskVolume::Dispatch, 
+            Core::Interface::GetWidgetActionContext(), this->get_layer_id() ) );
 
         
           this->set_mask_background_color( mask_layer->color_state_->get() );

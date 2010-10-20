@@ -52,7 +52,7 @@ class AppSplashPrivate
 public:
 
   Ui::AppSplash ui_;
-  bool ready_to_quit_;
+  //bool ready_to_quit_;
 
 };
 
@@ -93,8 +93,6 @@ AppSplash::AppSplash( QWidget *parent ) :
     this, SLOT( call_open_recent( QListWidgetItem* ) ) ); 
   
   connect( this, SIGNAL( dialog_closed() ), this->parentWidget(), SLOT( close() ) );
-  
-  this->private_->ready_to_quit_ = true;
 
 }
 
@@ -105,14 +103,20 @@ AppSplash::~AppSplash()
 void AppSplash::new_project()
 {
   this->new_project_wizard_ = new AppProjectWizard( this->parentWidget() );
+  connect( this->new_project_wizard_, SIGNAL( finished() ), this, SLOT( quit() ) );
+  connect( this->new_project_wizard_, SIGNAL( canceled() ), this, SLOT( unhide() ) );
   this->new_project_wizard_->show();
-  this->private_->ready_to_quit_ = false;
-  this->close();
+  this->hide();
 }
 
 void AppSplash::quit()
 {
   reinterpret_cast<QWidget*>( this->parent() )->close();
+}
+
+void AppSplash::unhide()
+{
+  this->show();
 }
   
 void AppSplash::open_existing()
@@ -131,10 +135,8 @@ void AppSplash::open_existing()
   if( boost::filesystem::exists( full_path ) )
   {
     ActionLoadProject::Dispatch( Core::Interface::GetWidgetActionContext(), path );
+    this->close();
   }
-
-  this->private_->ready_to_quit_ = false;
-  this->close();
 }
   
 void AppSplash::open_recent()
@@ -166,7 +168,6 @@ void AppSplash::open_recent()
       }
     }
   }
-  this->private_->ready_to_quit_ = false;
   this->close();
 }
 

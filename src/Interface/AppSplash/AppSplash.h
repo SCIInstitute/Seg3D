@@ -88,7 +88,8 @@ private Q_SLOTS:
   // ENABLE_LOAD_RECENT_BUTTON:
   // this function enables the load recent button if you select a recent project from the list
   void enable_load_recent_button( QListWidgetItem* item );
-  
+  void unhide();
+
 private:
   // Internals of the splash screen
   boost::shared_ptr< AppSplashPrivate > private_;

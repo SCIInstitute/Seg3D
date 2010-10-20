@@ -39,12 +39,17 @@ class AppProjectWizard : public QWizard
 {
 Q_OBJECT
 
+Q_SIGNALS:
+  void finished();
+  void canceled();
+
 public:
     AppProjectWizard( QWidget *parent = 0 );
     virtual ~AppProjectWizard();
 
 private:
     void accept();
+    void reject();
 
 
 };

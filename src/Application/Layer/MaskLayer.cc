@@ -34,6 +34,8 @@
 #include <Core/Application/Application.h>
 #include <Core/DataBlock/MaskDataBlockManager.h>
 #include <Core/Volume/MaskVolume.h>
+#include <Core/Utils/StringUtil.h>
+
 
 // Application includes
 #include <Application/Layer/MaskLayer.h>
@@ -187,6 +189,9 @@ void MaskLayer::initialize_states()
   
   // == Keep track of whether the iso surface has been generated
   this->add_state( "iso_generated", iso_generated_state_, false );
+  
+  // == Keep track of the calculated volume and put it in the UI
+  this->add_state( "calculated_volume", calculated_volume_state_, "N/A" );
 }
 
 bool MaskLayer::pre_save_states( Core::StateIO& state_io )
@@ -263,6 +268,7 @@ void MaskLayer::clean_up()
 
 void MaskLayer::handle_mask_data_changed()
 {
+  this->calculated_volume_state_->set( "N/A" );
   this->layer_updated_signal_();
 }
 
@@ -340,6 +346,29 @@ void MaskLayer::delete_isosurface()
   
   this->iso_generated_state_->set( false );
 }
+
+void MaskLayer::calculate_volume()
+{
+  Core::MaskDataBlockHandle mask_block = this->get_mask_volume()->
+    get_mask_data_block();
+    
+  size_t voxel_count = 0;
+  for( size_t j = 0; j < mask_block->get_size(); ++j )
+  {
+    if( mask_block->get_mask_at( j ) )
+    {
+      voxel_count++;
+    }
+  }
+  
+  double calculated_mask_volume = ( this->get_grid_transform().spacing_x() * 
+    this->get_grid_transform().spacing_y() * this->get_grid_transform().spacing_z() )
+    * voxel_count;
+    
+  this->calculated_volume_state_->set( Core::ExportToString( calculated_mask_volume, 10 ) );
+  
+}
+
 
 } // end namespace Seg3D
 
