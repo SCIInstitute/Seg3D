@@ -36,14 +36,6 @@ SET(CORE_ACTIONMANAGER_SRCS
   ActionManager.cc
   )
 
-SET(CORE_ACTIONMANAGER_ACTIONS_SRCS
-  Actions/ActionUndo.h
-  Actions/ActionUndo.cc
-  Actions/ActionRedo.h
-  Actions/ActionRedo.cc
-  )
-
-
 CORE_ADD_LIBRARY(Core_ActionManager 
             ${CORE_ACTIONMANAGER_SRCS}
             ${CORE_ACTIONMANAGER_ACTIONS_SRCS} )

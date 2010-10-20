@@ -30,11 +30,10 @@
 #include <Core/Interface/Interface.h>
 #include <Core/ActionManager/ActionManager.h>
 
-#include <Core/ActionManager/Actions/ActionUndo.h>
-#include <Core/ActionManager/Actions/ActionRedo.h>
-
 namespace Core
 {
+
+CORE_SINGLETON_IMPLEMENTATION( ActionManager );
 
 ActionManager::ActionManager()
 {

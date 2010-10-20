@@ -111,6 +111,12 @@ public:
   // Get the index of a certain key
   int get_key_index( const std::string& name ) const;
   
+  // -- query overloadable data ( from the action info if not overloaded ) --
+public:
+  // GET_CHANGES_DATA:
+  // Query whether the action changes the data
+  virtual bool get_changes_data() const;
+  
   // -- Run/Validate interface --
 public:
 
@@ -230,6 +236,9 @@ private:
 
 #define CORE_ACTION_KEY( name, default_value, description ) \
 "<key name=\"" name "\" default=\"" default_value "\"> " description "</key>"
+
+#define CORE_ACTION_CHANGES_DATA() \
+"<changesdata/>"
 
 #define CORE_ACTION(definition_string) \
 public: \

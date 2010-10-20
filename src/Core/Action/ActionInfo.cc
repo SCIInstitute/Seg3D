@@ -70,6 +70,9 @@ class ActionInfoPrivate
     // Test whether the action described was valid or not
     // NOTE: If not valid the program will not register the action
     bool valid_;
+    
+    // Whether the action will change the data of the program
+    bool changes_data_;
 };
 
 
@@ -82,6 +85,9 @@ ActionInfo::ActionInfo( const std::string& definition ) :
 
   // NOTE: We need to add an end line, otherwise tinyXML does not accept the xml string
   this->private_->definition_ = definition + "\n";
+  
+  // This is the default value
+  this->private_->changes_data_ = false;
 
   // Define a document
   TiXmlDocument doc;
@@ -190,6 +196,10 @@ ActionInfo::ActionInfo( const std::string& definition ) :
       this->private_->key_default_value_.push_back( default_value );
       this->private_->key_description_.push_back( description );    
     }
+    else if ( type == "changesdata" )
+    {
+      this->private_->changes_data_ = true;
+    }
   }
 
   if ( found_action == false )
@@ -245,6 +255,11 @@ size_t ActionInfo::get_num_arguments() const
 size_t ActionInfo::get_num_key_value_pairs() const
 {
   return this->private_->key_.size();
+}
+
+bool ActionInfo::get_changes_data() const
+{
+  return this->private_->changes_data_;
 }
   
 std::string ActionInfo::get_argument( size_t index ) const

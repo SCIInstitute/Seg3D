@@ -109,8 +109,12 @@ public:
   std::string get_key_description( size_t index ) const;
   
   // IS_VALID:
-  //Check the validity of the action description
+  // Check the validity of the action description
   bool is_valid() const;
+  
+  // GET_CHANGES_DATA:
+  // Check whether the action changes the data of the program
+  bool get_changes_data() const;
   
 private:
   // Private implementation of this class

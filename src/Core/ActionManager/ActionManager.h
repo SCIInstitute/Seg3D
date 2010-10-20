@@ -51,28 +51,14 @@ namespace Core
 class ActionManager;
 
 // Class definition
-class ActionManager : public Core::Singleton< ActionManager >
+class ActionManager : public boost::noncopyable
 {
+  CORE_SINGLETON( ActionManager );
 
   // -- Constructor --
-
 private:
-  friend class Core::Singleton< ActionManager >;
   ActionManager();
   virtual ~ActionManager();
-
-  // -- Signal/Slots --
-public:
-
-  // CONNECT_TAGS_CHANGED:
-  // This signal tells when a new undo/redo action was inserted or removed from
-  // the list.
-
-  boost::signals2::connection connect_undo_tags_changed(
-      ActionUndoBuffer::tags_changed_type::slot_type slot )
-  {
-    return ( ActionUndoBuffer::Instance()->tags_changed_.connect( slot ) );
-  }
 
 };
 
