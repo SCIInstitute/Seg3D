@@ -1188,8 +1188,8 @@ bool PaintTool::handle_mouse_release( ViewerHandle viewer,
   
   if ( this->private_->painting_ )
   {
-    if ( ( this->private_->erase_ && button == Core::MouseButton::RIGHT_BUTTON_E ) ||
-      ( !this->private_->erase_ && button == Core::MouseButton::LEFT_BUTTON_E ) )
+    if ( button == Core::MouseButton::RIGHT_BUTTON_E ||
+      button == Core::MouseButton::LEFT_BUTTON_E )
     {
       {
         PaintToolPrivate::lock_type lock( this->private_->get_mutex() );
