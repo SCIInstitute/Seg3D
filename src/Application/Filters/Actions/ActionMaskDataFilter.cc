@@ -255,7 +255,7 @@ public:
     }
       
     this->dispatch_insert_data_volume_into_layer( this->dst_layer_, output_data_volume, 
-      true, true );
+      true );
   }
   SCI_END_TYPED_RUN()
   

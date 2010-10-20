@@ -29,6 +29,7 @@
 // Core includes
 #include <Core/Volume/DataVolume.h>
 #include <Core/Volume/MaskVolume.h>
+#include <Core/DataBlock/MaskDataBlockManager.h>
 
 // Application includes
 #include <Application/Layer/DataLayer.h>
@@ -160,8 +161,8 @@ bool LayerImporter::import_layer( LayerImporterMode mode, std::vector< LayerHand
 
       Core::MaskDataBlockHandle maskdatablock;
 
-      if ( !( Core::MaskVolume::CreateMaskFromNonZeroData( 
-        canonical_vol, maskdatablock ) ) ) 
+      if ( !( Core::MaskDataBlockManager::CreateMaskFromNonZeroData( 
+        canonical_vol->get_data_block(), canonical_vol->get_grid_transform(), maskdatablock ) ) ) 
       {
         return false;
       }
@@ -181,8 +182,8 @@ bool LayerImporter::import_layer( LayerImporterMode mode, std::vector< LayerHand
 
       std::vector<Core::MaskDataBlockHandle> maskdatablocks;
 
-      if ( !( Core::MaskVolume::CreateMaskFromBitPlaneData( 
-        canonical_vol, maskdatablocks ) ) ) 
+      if ( !( Core::MaskDataBlockManager::CreateMaskFromBitPlaneData( 
+        canonical_vol->get_data_block(), canonical_vol->get_grid_transform(), maskdatablocks ) ) ) 
       {
         return false;
       }
@@ -205,8 +206,8 @@ bool LayerImporter::import_layer( LayerImporterMode mode, std::vector< LayerHand
 
       std::vector<Core::MaskDataBlockHandle> maskdatablocks;
 
-      if ( !( Core::MaskVolume::CreateMaskFromLabelData( 
-        canonical_vol, maskdatablocks ) ) ) 
+      if ( !( Core::MaskDataBlockManager::CreateMaskFromLabelData( 
+        canonical_vol->get_data_block(), canonical_vol->get_grid_transform(), maskdatablocks ) ) ) 
       {
         return false;
       }

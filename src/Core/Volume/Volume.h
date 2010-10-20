@@ -96,10 +96,15 @@ public:
 
   // IS_VALID:
   // Check whether the volume has a valid data block
-  bool is_valid() const
-  {
-    return this->get_generation() != -1;
-  }
+  virtual bool is_valid() const = 0;
+
+  // REGISTER_DATA:
+  // Register the underlying data with the DataBlockManager.
+  virtual DataBlock::generation_type register_data( DataBlock::generation_type generation = -1 ) = 0;
+
+  // UNREGISTER_DATA:
+  // Unregister the underlying data with DataBlockManager.
+  virtual void unregister_data() = 0;
 
   // GET_GRID_TRANSFORM:
   // Get the grid location

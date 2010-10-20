@@ -30,7 +30,6 @@
 #define CORE_VOLUME_MASKVOLUME_H
 
 #include <Core/DataBlock/MaskDataBlock.h>
-#include <Core/DataBlock/NrrdData.h>
 #include <Core/Volume/DataVolume.h>
 
 namespace Core
@@ -61,6 +60,10 @@ public:
   // Get the maximum value
   virtual double get_max() const;
 
+  // IS_VALID:
+  // Check whether the volume has a valid data block
+  virtual bool is_valid() const;
+
   // MASK_DATA_BLOCK:
   // Get the datablock that contains the mask
   MaskDataBlockHandle get_mask_data_block() const;
@@ -73,23 +76,16 @@ public:
   // Get the  generation number of the data volume
   virtual DataBlock::generation_type get_generation() const;
 
+  // REGISTER_DATA:
+  // Register the underlying data with the DataBlockManager.
+  virtual DataBlock::generation_type register_data( DataBlock::generation_type generation = -1 );
+
+  // UNREGISTER_DATA:
+  // Unregister the underlying data with DataBlockManager.
+  virtual void unregister_data();
+
   // -- functions for creating MaskVolumes --
 public: 
-
-  // CREATEMASKFROMNONZERODATA:
-  // Create a mask from the non zero data contained in a datablock
-  static bool CreateMaskFromNonZeroData( const DataVolumeHandle data, 
-    MaskDataBlockHandle& mask );
-
-  // CREATEMASKFROMBITPLANEDATA:
-  // Create a mask from each bitplane in integer data
-  static bool CreateMaskFromBitPlaneData( const DataVolumeHandle data, 
-    std::vector<MaskDataBlockHandle>& masks );
-
-  // CREATEMASKFROMLABELDATA:
-  // Create a mask from each label in integer data
-  static bool CreateMaskFromLabelData( const DataVolumeHandle data, 
-    std::vector<MaskDataBlockHandle>& masks, bool reuse_data = false );
 
   // CREATEEMPTYMASK:
   // Create an empty mask with given dimensions.
@@ -104,7 +100,7 @@ private:
   MaskDataBlockHandle mask_data_block_;
   
   // Mutex for a volume without a data block associated with it
-  // NOTE: This is use to set up a new layer that is still contructing its data
+  // NOTE: This is use to set up a new layer that is still constructing its data
   mutex_type invalid_mutex_;
   
 };

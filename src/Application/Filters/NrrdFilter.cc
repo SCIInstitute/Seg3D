@@ -128,7 +128,7 @@ bool NrrdFilter::insert_nrrd_into_layer( const LayerHandle& layer, Core::NrrdDat
           
     // NOTE: Do not need an update of the generation number as this volume 
     // was generated from scratch. But it will need a new histogram
-    this->dispatch_insert_data_volume_into_layer( data_layer, data_volume, false, true );
+    this->dispatch_insert_data_volume_into_layer( data_layer, data_volume, true );
     return true;
   }
   // If the layer is a mask layer
@@ -171,7 +171,7 @@ bool NrrdFilter::insert_nrrd_into_layer( const LayerHandle& layer, Core::NrrdDat
 
     // NOTE:Do not need an update of the generation number as this volume 
     // was generated from scratch.
-    this->dispatch_insert_mask_volume_into_layer( mask_layer, mask_volume, false );
+    this->dispatch_insert_mask_volume_into_layer( mask_layer, mask_volume );
     return true;
   }
   return false;

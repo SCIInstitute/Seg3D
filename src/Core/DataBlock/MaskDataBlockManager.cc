@@ -143,7 +143,6 @@ bool MaskDataBlockManager::create( GridTransform grid_transform, MaskDataBlockHa
 
   // Generate the new mask
   mask = MaskDataBlockHandle( new MaskDataBlock( data_block, mask_bit ) );
-  data_block->increase_generation();
   
   // Clear the mask before using it
   
@@ -202,7 +201,6 @@ bool MaskDataBlockManager::create( DataBlock::generation_type generation, unsign
   return false;
 }
 
-
 void MaskDataBlockManager::release(DataBlockHandle& datablock, unsigned int mask_bit)
 {
   lock_type lock( get_mutex() );
@@ -216,12 +214,12 @@ void MaskDataBlockManager::release(DataBlockHandle& datablock, unsigned int mask
     {
       mask_list[ j ].bits_used_[mask_bit] = 0;
       mask_list[ j ].data_masks_[mask_bit].reset();
-      datablock->increase_generation();
 
       // If the DataBlock is not used any more clear it
       if ( mask_list[ j ].bits_used_.count() == 0 )
       {
-        mask_list.erase( mask_list.begin() + j);
+        DataBlockManager::Instance()->unregister_datablock( datablock->get_generation() );
+        mask_list.erase( mask_list.begin() + j );
       }
 
       break;
@@ -271,6 +269,18 @@ bool MaskDataBlockManager::save_data_blocks( boost::filesystem::path path, bool 
   }
 
   return true;
+}
+
+void MaskDataBlockManager::clear()
+{
+  lock_type lock( this->get_mutex() );
+  MaskDataBlockManagerInternal::mask_list_type::iterator it = this->private_->mask_list_.begin();
+  while ( it != this->private_->mask_list_.end() )
+  {
+    DataBlockManager::Instance()->unregister_datablock( ( *it ).data_block_->get_generation() );
+    ++it;
+  }
+  this->private_->mask_list_.clear();
 }
 
 bool MaskDataBlockManager::Create( GridTransform grid_transform, MaskDataBlockHandle& mask )
@@ -397,8 +407,6 @@ bool ConvertLabelToMaskInternal( DataBlockHandle data, MaskDataBlockHandle& mask
   return true;
 }
 
-
-
 bool MaskDataBlockManager::ConvertLabel( DataBlockHandle data, 
   GridTransform grid_transform, MaskDataBlockHandle& mask, double label )
 {
@@ -499,16 +507,250 @@ bool MaskDataBlockManager::Convert( MaskDataBlockHandle mask, DataBlockHandle& d
   return false;
 }
 
-void MaskDataBlockManager::clear()
+template< class DATA >
+static bool CreateMaskFromNonZeroDataInternal( const DataBlockHandle& data, 
+                        const MaskDataBlockHandle& mask )
 {
-  lock_type lock( this->get_mutex() );
-  MaskDataBlockManagerInternal::mask_list_type::iterator it = this->private_->mask_list_.begin();
-  while ( it != this->private_->mask_list_.end() )
+  DATA* src   = reinterpret_cast<DATA*>( data->get_data() ); 
+  size_t size = mask->get_size();
+
+  unsigned char* mask_data  = mask->get_mask_data();
+  unsigned char  mask_value = mask->get_mask_value();
+  unsigned char  not_mask_value = ~( mask->get_mask_value() );
+
+  for ( size_t j = 0; j < size; j++ )
   {
-    DataBlockManager::Instance()->unregister_datablock( ( *it ).data_block_->get_generation() );
-    ++it;
+    if ( src[ j ] ) mask_data[ j ] |= mask_value;
+    else mask_data[ j ] &= not_mask_value;
   }
-  this->private_->mask_list_.clear();
+
+  return true;
+}
+
+bool MaskDataBlockManager::CreateMaskFromNonZeroData( const DataBlockHandle& data, 
+                           const GridTransform& grid_transform, 
+                           MaskDataBlockHandle& mask )
+{
+  // Ensure there is no valid pointer left in the handle
+  mask.reset();
+
+  // Check if there is any data
+  if ( !data ) return false;
+
+  // Create a new mask data block
+  if ( !( MaskDataBlockManager::Instance()->create( grid_transform, mask ) ) )
+  {
+    // Could not create a valid mask data block
+    return false;
+  }
+
+  // Lock the source data
+  DataBlock::shared_lock_type data_lock( data->get_mutex( ) );
+
+  // Lock the mask layer as it may contain additional masks that are currently in use
+  // Hence we need to have full access
+  MaskDataBlock::lock_type mask_lock( mask->get_mutex() );
+
+  switch( data->get_data_type() )
+  {
+  case DataType::CHAR_E:
+    return CreateMaskFromNonZeroDataInternal<signed char>( data, mask );
+  case DataType::UCHAR_E:
+    return CreateMaskFromNonZeroDataInternal<unsigned char>( data, mask );
+  case DataType::SHORT_E:
+    return CreateMaskFromNonZeroDataInternal<short>( data, mask );
+  case DataType::USHORT_E:
+    return CreateMaskFromNonZeroDataInternal<unsigned short>( data, mask );
+  case DataType::INT_E:
+    return CreateMaskFromNonZeroDataInternal<int>( data, mask );
+  case DataType::UINT_E:
+    return CreateMaskFromNonZeroDataInternal<unsigned int>( data, mask );
+  case DataType::FLOAT_E:
+    return CreateMaskFromNonZeroDataInternal<float>( data, mask );
+  case DataType::DOUBLE_E:
+    return CreateMaskFromNonZeroDataInternal<double>( data, mask );
+  default:
+    return false;
+  }
+}
+
+template< class DATA >
+static bool CreateMaskFromBitPlaneDataInternal( const DataBlockHandle& data, 
+                         const GridTransform& grid_transform, 
+                         std::vector<MaskDataBlockHandle>& masks )
+{
+  masks.clear();
+
+  DATA* src   = reinterpret_cast<DATA*>( data->get_data() ); 
+  size_t size = data->get_size();
+
+  DATA used_bits(0);
+
+  for ( size_t j = 0; j < size; j++ )
+  {
+    used_bits |= src[ j ];
+  }
+
+  std::bitset< sizeof( DATA ) * 8 > bits( used_bits );
+
+  for ( size_t k = 0; k < bits.size(); k++ )
+  {
+    if ( bits[ k ] )
+    {
+      MaskDataBlockHandle mask;
+      if ( ! ( MaskDataBlockManager::Instance()->create( grid_transform, mask ) ) )
+      {
+        masks.clear();
+        return false;
+      }
+
+      MaskDataBlock::lock_type lock( mask->get_mutex() );
+
+      unsigned char* mask_data  = mask->get_mask_data();
+      unsigned char  mask_value = mask->get_mask_value();
+      unsigned char  not_mask_value = ~( mask->get_mask_value() );
+
+      DATA test_value( 1 << k );
+
+      for ( size_t j = 0; j < size; j++ )
+      {
+        if ( src[ j ] & test_value ) mask_data[ j ] |= mask_value;
+        else mask_data[ j ] &= not_mask_value;
+      }
+
+      masks.push_back( mask );
+    }
+  }
+
+  return true;
+}
+
+bool MaskDataBlockManager::CreateMaskFromBitPlaneData( const DataBlockHandle& data, 
+                            const GridTransform& grid_transform, 
+                            std::vector<MaskDataBlockHandle>& masks )
+{
+  // Ensure there is no valid pointer left in the handle
+  masks.clear();
+
+  // Check if there is any data
+  if ( !data ) return false;
+
+  // Lock the source data
+  DataBlock::shared_lock_type lock( data->get_mutex( ) );
+
+  switch( data->get_data_type() )
+  {
+  case DataType::CHAR_E:
+    return CreateMaskFromBitPlaneDataInternal<signed char>( data, grid_transform, masks );
+  case DataType::UCHAR_E:
+    return CreateMaskFromBitPlaneDataInternal<unsigned char>( data, grid_transform, masks );
+  case DataType::SHORT_E:
+    return CreateMaskFromBitPlaneDataInternal<short>( data, grid_transform, masks );
+  case DataType::USHORT_E:
+    return CreateMaskFromBitPlaneDataInternal<unsigned short>( data, grid_transform, masks );
+  case DataType::INT_E:
+    return CreateMaskFromBitPlaneDataInternal<int>( data, grid_transform, masks );
+  case DataType::UINT_E:
+    return CreateMaskFromBitPlaneDataInternal<unsigned int>( data, grid_transform, masks );
+  default:
+    return false;
+  }
+}
+
+template< class DATA >
+static bool CreateMaskFromLabelDataInternal( const DataBlockHandle& data, 
+                      const GridTransform& grid_transform,
+                      std::vector<MaskDataBlockHandle>& masks )
+{
+  masks.clear();
+
+  DATA* src   = reinterpret_cast<DATA*>( data->get_data() ); 
+  size_t size = data->get_size();
+  DATA label( 0 );
+  DATA zero_label( 0 );
+
+  size_t next_label_index = 0;
+  while ( next_label_index < size && masks.size() < 32 )
+  {
+    // find the mask we are looking for
+    while ( next_label_index < size )
+    {
+      if ( src[ next_label_index ] != zero_label ) break;
+      next_label_index++;
+    }  
+
+    if ( next_label_index < size )
+    {
+      MaskDataBlockHandle mask;
+      if ( ! ( MaskDataBlockManager::Instance()->create( grid_transform, mask) ) )
+      {
+        masks.clear();
+        return false;
+      }
+
+      unsigned char* mask_data  = mask->get_mask_data();
+      unsigned char  mask_value = mask->get_mask_value();
+      unsigned char  not_mask_value = ~( mask->get_mask_value() );
+      label = src[ next_label_index ];
+
+      // Lock the mask layer as it may contain additional masks that are currently in use
+      // Hence we need to have full access
+      MaskDataBlock::lock_type mask_lock( mask->get_mutex() );
+
+      for ( size_t j = next_label_index; j < size; j++ )
+      {
+        if ( src[ j ] == label ) 
+        {
+          src[ j ] = zero_label;
+          mask_data[ j ] |= mask_value;
+        }
+        else
+        {
+          mask_data[ j ] &= not_mask_value;
+        }
+      }
+
+      masks.push_back( mask );    
+    }
+  }
+
+  return true;
+}
+
+bool MaskDataBlockManager::CreateMaskFromLabelData( const DataBlockHandle& data, 
+                           const GridTransform& grid_transform, 
+                           std::vector<MaskDataBlockHandle>& masks )
+{
+  // Ensure there is no valid pointer left in the handle
+  masks.clear();
+
+  // Check if there is any data
+  if ( !data ) return false;
+
+  // Lock the source data
+  DataBlock::shared_lock_type lock( data->get_mutex( ) );
+
+  switch( data->get_data_type() )
+  {
+  case DataType::CHAR_E:
+    return CreateMaskFromLabelDataInternal<signed char>( data, grid_transform, masks );
+  case DataType::UCHAR_E:
+    return CreateMaskFromLabelDataInternal<unsigned char>( data, grid_transform, masks );
+  case DataType::SHORT_E:
+    return CreateMaskFromLabelDataInternal<short>( data, grid_transform, masks );
+  case DataType::USHORT_E:
+    return CreateMaskFromLabelDataInternal<unsigned short>( data, grid_transform, masks );
+  case DataType::INT_E:
+    return CreateMaskFromLabelDataInternal<int>( data, grid_transform, masks );
+  case DataType::UINT_E:
+    return CreateMaskFromLabelDataInternal<unsigned int>( data, grid_transform, masks );
+  case DataType::FLOAT_E:
+    return CreateMaskFromLabelDataInternal<float>( data, grid_transform, masks );
+  case DataType::DOUBLE_E:
+    return CreateMaskFromLabelDataInternal<double>( data, grid_transform, masks );
+  default:
+    return false;
+  }
 }
 
 } // end namespace Core

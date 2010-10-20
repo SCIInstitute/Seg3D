@@ -31,6 +31,7 @@
 #include <Core/DataBlock/NrrdDataBlock.h>
 #include <Core/DataBlock/StdDataBlock.h>
 #include <Core/Volume/DataVolume.h>
+#include <Core/DataBlock/DataBlockManager.h>
 
 namespace Core
 {
@@ -118,6 +119,11 @@ DataBlock::generation_type DataVolume::get_generation() const
   }
 }
 
+bool DataVolume::is_valid() const
+{
+  return this->data_block_.get() != 0;
+}
+
 DataVolume::mutex_type& DataVolume::get_mutex()
 {
   if ( this->data_block_ )
@@ -130,6 +136,24 @@ DataVolume::mutex_type& DataVolume::get_mutex()
   }
 }
 
+DataBlock::generation_type DataVolume::register_data( DataBlock::generation_type generation )
+{
+  if ( this->data_block_ )
+  {
+    Core::DataBlockManager::Instance()->register_datablock( this->data_block_, generation );
+    return this->data_block_->get_generation();
+  }
+  return -1;
+}
+
+void DataVolume::unregister_data()
+{
+  if ( this->data_block_ && this->data_block_->get_generation() != -1 )
+  {
+    Core::DataBlockManager::Instance()->unregister_datablock( this->data_block_->get_generation() );
+  }
+}
+
 bool DataVolume::LoadDataVolume( const boost::filesystem::path& filename, 
                 DataVolumeHandle& volume, std::string& error )
 {
@@ -138,9 +162,7 @@ bool DataVolume::LoadDataVolume( const boost::filesystem::path& filename,
   NrrdDataHandle nrrd;
   if ( ! ( NrrdData::LoadNrrd( filename.string(), nrrd, error ) ) ) return false;
   
-  DataBlock::generation_type generation;
-  Core::ImportFromString( filename.stem(), generation );
-  Core::DataBlockHandle datablock( Core::NrrdDataBlock::New( nrrd, generation ) );
+  Core::DataBlockHandle datablock( Core::NrrdDataBlock::New( nrrd ) );
   
   // Load the datablock and trust any histogram recorded inside of it.
   datablock->set_histogram( nrrd->get_histogram( true ) );
@@ -149,7 +171,9 @@ bool DataVolume::LoadDataVolume( const boost::filesystem::path& filename,
   return true;
 }
 
-bool DataVolume::SaveDataVolume( const boost::filesystem::path& filepath, DataVolumeHandle& volume, std::string& error, bool compress, int level )
+bool DataVolume::SaveDataVolume( const boost::filesystem::path& filepath, 
+                DataVolumeHandle& volume, std::string& error, 
+                bool compress, int level )
 {
   if( !boost::filesystem::exists( filepath ) )
   {
@@ -206,6 +230,5 @@ void DataVolume::ConvertToCanonicalVolume( const DataVolumeHandle& src_volume,
 
   dst_volume.reset( new DataVolume( dst_transform, dst_data_block ) );
 }
-
 
 } // end namespace Core

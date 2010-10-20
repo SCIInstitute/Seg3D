@@ -83,7 +83,7 @@ public:
 
   // SET_DATA_VOLUME:
   // this function sets the data_volume
-  void set_data_volume( Core::DataVolumeHandle data_volume );
+  bool set_data_volume( Core::DataVolumeHandle data_volume );
   
   // -- state variables --
 public:

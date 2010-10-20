@@ -164,7 +164,7 @@ public:
     
     this->dispatch_insert_data_volume_into_layer( this->dst_layer_,
       Core::DataVolumeHandle( new Core::DataVolume( 
-      this->dst_layer_->get_grid_transform(), dst_data_block ) ), false, true );
+      this->dst_layer_->get_grid_transform(), dst_data_block ) ), true );
   }
   
   // GET_FITLER_NAME:

@@ -197,7 +197,7 @@ LayerGroup::LayerGroup( Core::GridTransform grid_transform ) :
 }
 
 LayerGroup::LayerGroup( const std::string& state_id ) :
-  StateHandler( state_id, false ),
+  StateHandler( state_id, true ),
   private_( new LayerGroupPrivate )
 {
   this->private_->layer_group_ = this;

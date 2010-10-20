@@ -38,7 +38,8 @@ DataBlock::DataBlock() :
   ny_( 0 ), 
   nz_( 0 ), 
   data_type_( DataType::UNKNOWN_E ), 
-  data_( 0 )
+  data_( 0 ),
+  generation_( -1 )
 {
 }
 

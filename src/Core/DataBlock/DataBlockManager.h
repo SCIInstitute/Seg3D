@@ -64,6 +64,10 @@ public:
   void register_datablock( DataBlockHandle data_block, 
     DataBlock::generation_type generation = -1 );
 
+  // UNREGISTER_DATABLOCK:
+  // Needed by DataBlock to remove its entry from the database.
+  void unregister_datablock( DataBlock::generation_type generation );
+
   // FIND_DATABLOCK:
   // Find a datablock with a specific generation number.
   bool find_datablock( DataBlock::generation_type generation, DataBlockHandle& datablock );
@@ -89,10 +93,6 @@ private:
   // count. 
   void set_generation_count( DataBlock::generation_type generation );
 
-  // UNREGISTER_DATABLOCK:
-  // Needed by DataBlock to remove its entry from the database.
-  void unregister_datablock( DataBlock::generation_type generation );
-  
   /// INCREMENT_GENERATION:
   // Generate a new generation number for a datablock. This function is called through the
   // DataBlock class whenever the data in a datablock is changed.

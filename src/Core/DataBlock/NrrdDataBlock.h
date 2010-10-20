@@ -60,7 +60,7 @@ private:
 public:
   // NEW: ( Factory constructor )
   // Constructs object and registers object with manager
-  static DataBlockHandle New( NrrdDataHandle nrrd_data, generation_type generation = -1 );
+  static DataBlockHandle New( NrrdDataHandle nrrd_data );
 };
 
 } // end namespace Core

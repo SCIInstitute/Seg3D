@@ -112,13 +112,11 @@ StdDataBlock::~StdDataBlock()
   }
 }
 
-DataBlockHandle StdDataBlock::New( size_t nx, size_t ny, size_t nz, DataType type, 
-    generation_type generation )
+DataBlockHandle StdDataBlock::New( size_t nx, size_t ny, size_t nz, DataType type )
 {
   try
   {
     DataBlockHandle data_block( new StdDataBlock( nx, ny, nz, type ) );
-    DataBlockManager::Instance()->register_datablock( data_block, generation );
     return data_block;
   }
   catch ( ... )
@@ -129,14 +127,12 @@ DataBlockHandle StdDataBlock::New( size_t nx, size_t ny, size_t nz, DataType typ
   }
 }
 
-DataBlockHandle StdDataBlock::New( GridTransform transform, DataType type, 
-    generation_type generation )
+DataBlockHandle StdDataBlock::New( GridTransform transform, DataType type )
 {
   try
   {
     DataBlockHandle data_block( new StdDataBlock( transform.get_nx(), 
       transform.get_ny(), transform.get_nz(), type ) );
-    DataBlockManager::Instance()->register_datablock( data_block, generation );
     return data_block;
   }
   catch ( ... )

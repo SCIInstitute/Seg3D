@@ -106,6 +106,9 @@ ViewerManager::ViewerManager() :
   this->add_connection( LayerManager::Instance()->layer_inserted_signal_.connect(
     boost::bind( &ViewerManager::update_volume_viewers, this ) ) );
 
+  this->add_connection( LayerManager::Instance()->layer_volume_changed_signal_.connect(
+    boost::bind( &ViewerManager::handle_layer_volume_changed, this, _1 ) ) );
+
   this->set_initializing( false );
 }
 
@@ -509,6 +512,22 @@ void ViewerManager::reset_cursor()
   for ( size_t i = 0; i < this->viewers_.size(); ++i )
   {
     this->viewers_[ i ]->set_cursor( Core::CursorShape::ARROW_E );
+  }
+}
+
+void ViewerManager::handle_layer_volume_changed( LayerHandle layer )
+{
+  for ( size_t i = 0; i < this->viewers_.size(); ++i )
+  {
+    this->viewers_[ i ]->update_slice_volume( layer );
+  }
+  
+  // NOTE: Redraw should only happen after all the viewers have been updated,
+  // otherwise when a volume viewer tries to render slices from some 2D viewer
+  // that hasn't received the new volume yet, the rendering would be inconsistent.
+  for ( size_t i = 0; i < this->viewers_.size(); ++i )
+  {
+    this->viewers_[ i ]->redraw();
   }
 }
 

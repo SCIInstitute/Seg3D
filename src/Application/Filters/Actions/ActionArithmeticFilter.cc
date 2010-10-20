@@ -107,7 +107,7 @@ void ArithmeticFilterAlgo::run()
         this->dst_layer_->get_grid_transform(), mask_data_block );
       this->dispatch_insert_mask_volume_into_layer( this->dst_layer_, Core::MaskVolumeHandle(
         new Core::MaskVolume( this->dst_layer_->get_grid_transform(), 
-        mask_data_block ) ), true );
+        mask_data_block ) ) );
     }
     else
     {
@@ -122,7 +122,7 @@ void ArithmeticFilterAlgo::run()
       }
       this->dispatch_insert_data_volume_into_layer( this->dst_layer_, Core::DataVolumeHandle(
         new Core::DataVolume( this->dst_layer_->get_grid_transform(), output_data_block ) ), 
-        false, true );
+        true );
     }
   }
 

@@ -384,7 +384,7 @@ void ResampleAlgo::resmaple_data_layer( DataLayerHandle input, DataLayerHandle o
     Core::DataBlockHandle data_block = Core::NrrdDataBlock::New( nrrd_data );
     Core::DataVolumeHandle data_volume( new Core::DataVolume( 
       nrrd_data->get_grid_transform(), data_block ) );
-    this->dispatch_insert_data_volume_into_layer( output, data_volume, false, true );
+    this->dispatch_insert_data_volume_into_layer( output, data_volume, true );
     output->update_progress_signal_( 1.0 );
     this->dispatch_unlock_layer( output );
     if ( this->replace_ )
@@ -430,7 +430,7 @@ void ResampleAlgo::resample_mask_layer( MaskLayerHandle input, MaskLayerHandle o
 
     Core::MaskVolumeHandle mask_volume( new Core::MaskVolume( 
       nrrd_data->get_grid_transform(), mask_data_block ) );
-    this->dispatch_insert_mask_volume_into_layer( output, mask_volume, true );
+    this->dispatch_insert_mask_volume_into_layer( output, mask_volume );
     output->update_progress_signal_( 1.0 );
     this->dispatch_unlock_layer( output );
     if ( this->replace_ )

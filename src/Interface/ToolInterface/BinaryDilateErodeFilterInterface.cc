@@ -29,16 +29,12 @@
 //QtUtils Includes
 #include <QtUtils/Bridge/QtBridge.h>
 
-//Interface Includes
-#include <Interface/ToolInterface/CustomWidgets/TargetComboBox.h>
-
 //Qt Gui Includes
 #include <Interface/ToolInterface/BinaryDilateErodeFilterInterface.h>
 #include "ui_BinaryDilateErodeFilterInterface.h"
 
 //Application Includes
 #include <Application/Tools/BinaryDilateErodeFilter.h>
-//#include <Application/Filters/Actions/ActionBinaryDilateErode.h>
 
 SCI_REGISTER_TOOLINTERFACE( Seg3D, BinaryDilateErodeFilterInterface )
 
@@ -95,43 +91,17 @@ bool BinaryDilateErodeFilterInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Enable( this->private_->ui_.dilateerodeButton,
     tool->valid_target_state_ );
 
-  // Step 4 - Qt connections
-  {
-    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-    this->private_->ui_.target_layer_->setDisabled( tool->use_active_layer_state_->get() );
-    this->connect( this->private_->ui_.use_active_layer_, SIGNAL( toggled( bool ) ),
-      this->private_->ui_.target_layer_, SLOT( setDisabled( bool ) ) );
-  }
+  QtUtils::QtBridge::Enable( this->private_->ui_.target_layer_, tool->use_active_layer_state_, true );
 
-  this->connect( this->private_->ui_.dilateerodeButton, 
-    SIGNAL( clicked() ), this, SLOT( dilateerode_filter() ) );
-
-  this->connect( this->private_->ui_.dilateButton, 
-    SIGNAL( clicked() ), this, SLOT( dilate_filter() ) );
-
-  this->connect( this->private_->ui_.erodeButton, 
-    SIGNAL( clicked() ), this, SLOT( erode_filter() ) );
+  QtUtils::QtBridge::Connect( this->private_->ui_.dilateerodeButton, boost::bind( 
+    &BinaryDilateErodeFilter::execute_dilateerode, tool, Core::Interface::GetWidgetActionContext() ) );
+  QtUtils::QtBridge::Connect( this->private_->ui_.dilateButton, boost::bind( 
+    &BinaryDilateErodeFilter::execute_dilate, tool, Core::Interface::GetWidgetActionContext() ) );
+  QtUtils::QtBridge::Connect( this->private_->ui_.erodeButton, boost::bind( 
+    &BinaryDilateErodeFilter::execute_erode, tool, Core::Interface::GetWidgetActionContext() ) );
   
   return true;
 
 } // end build_widget
-
-void BinaryDilateErodeFilterInterface::dilateerode_filter()
-{
-  BinaryDilateErodeFilter* typed_tool = dynamic_cast< BinaryDilateErodeFilter* > ( tool().get() );
-  typed_tool->execute_dilateerode( Core::Interface::GetWidgetActionContext() );
-}
-
-void BinaryDilateErodeFilterInterface::dilate_filter()
-{
-  BinaryDilateErodeFilter* typed_tool = dynamic_cast< BinaryDilateErodeFilter* > ( tool().get() );
-  typed_tool->execute_dilate( Core::Interface::GetWidgetActionContext() );
-}
-
-void BinaryDilateErodeFilterInterface::erode_filter()
-{
-  BinaryDilateErodeFilter* typed_tool = dynamic_cast< BinaryDilateErodeFilter* > ( tool().get() );
-  typed_tool->execute_erode( Core::Interface::GetWidgetActionContext() );
-}
 
 } // end namespace Seg3D

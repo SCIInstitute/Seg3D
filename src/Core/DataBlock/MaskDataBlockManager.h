@@ -133,6 +133,21 @@ public:
   // Convert a MaskDataBlock into a DataBlock
   static bool Convert( MaskDataBlockHandle mask, DataBlockHandle& data, 
     DataType data_type, bool invert = false );  
+
+  // CREATEMASKFROMNONZERODATA:
+  // Create a mask from the non zero data contained in a datablock
+  static bool CreateMaskFromNonZeroData( const DataBlockHandle& data, 
+    const GridTransform& grid_transform, MaskDataBlockHandle& mask );
+
+  // CREATEMASKFROMBITPLANEDATA:
+  // Create a mask from each bitplane in integer data
+  static bool CreateMaskFromBitPlaneData( const DataBlockHandle& data, 
+    const GridTransform& grid_transform, std::vector<MaskDataBlockHandle>& masks );
+
+  // CREATEMASKFROMLABELDATA:
+  // Create a mask from each label in integer data
+  static bool CreateMaskFromLabelData( const DataBlockHandle& data, 
+    const GridTransform& grid_transform, std::vector<MaskDataBlockHandle>& masks );
 };
 
 } // end namespace Core

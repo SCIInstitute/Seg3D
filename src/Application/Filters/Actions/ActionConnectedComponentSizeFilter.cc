@@ -183,7 +183,7 @@ public:
         
     this->dispatch_insert_data_volume_into_layer( this->dst_layer_,
       Core::DataVolumeHandle( new Core::DataVolume(
-      this->dst_layer_->get_grid_transform(), output_datablock ) ), true, true );
+      this->dst_layer_->get_grid_transform(), output_datablock ) ), true );
   }
   SCI_END_ITK_RUN()
 

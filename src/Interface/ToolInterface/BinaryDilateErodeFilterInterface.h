@@ -59,12 +59,6 @@ public:
   // This function builds the actual GUI
   virtual bool build_widget( QFrame* frame );
 
-// -- run filter --
-private Q_SLOTS:
-  void dilateerode_filter();
-  void dilate_filter();
-  void erode_filter();
-
 // -- filter internals --
 private:
     boost::shared_ptr< BinaryDilateErodeFilterInterfacePrivate > private_;

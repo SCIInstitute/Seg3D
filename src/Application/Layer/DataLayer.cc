@@ -101,6 +101,7 @@ DataLayer::DataLayer( const std::string& name, const Core::DataVolumeHandle& vol
   data_volume_( volume ),
   private_( new DataLayerPrivate )
 {
+  this->data_volume_->register_data();
   this->private_->layer_ = this;
   this->initialize_states();
 }
@@ -113,11 +114,14 @@ DataLayer::DataLayer( const std::string& state_id ) :
   this->initialize_states();
 }
 
-
 DataLayer::~DataLayer()
 {
   // Disconnect all current connections
-  disconnect_all();
+  this->disconnect_all();
+  if ( this->data_volume_ )
+  {
+    this->data_volume_->unregister_data();
+  }
 }
 
 void DataLayer::initialize_states()
@@ -200,19 +204,35 @@ Core::VolumeHandle DataLayer::get_volume() const
   return this->get_data_volume();
 }
 
-void DataLayer::set_data_volume( Core::DataVolumeHandle data_volume )
+bool DataLayer::set_data_volume( Core::DataVolumeHandle data_volume )
 { 
-  Layer::lock_type lock( Layer::GetMutex() );
-  
-  this->data_volume_ = data_volume; 
+  ASSERT_IS_APPLICATION_THREAD();
 
-  if ( this->data_volume_ )
+  // Only insert the volume if the layer is still valid
+  if ( !this->is_valid() )  return false;
+  
   {
-    this->generation_state_->set( this->data_volume_->get_generation() );
+    Layer::lock_type lock( Layer::GetMutex() );
+
+    if ( this->data_volume_ )
+    {
+      // Unregister the old volume
+      this->data_volume_->unregister_data();
+    }
+    
+    this->data_volume_ = data_volume; 
+
+    if ( this->data_volume_ )
+    {
+      // Register the new volume
+      this->data_volume_->register_data();
+      this->generation_state_->set( this->data_volume_->get_generation() );
+    }
+
+    this->private_->update_data_info();
   }
 
-  this->private_->update_data_info();
-  this->update_volume_signal_();
+  return true;
 } 
 
 bool DataLayer::pre_save_states( Core::StateIO& state_io )
@@ -253,6 +273,7 @@ bool DataLayer::post_load_states( const Core::StateIO& state_io )
     
     if( Core::DataVolume::LoadDataVolume( volume_path, this->data_volume_, error ) )
     {
+      this->data_volume_->register_data( this->generation_state_->get() );
       this->private_->update_data_info();
       return true;
     }
@@ -274,6 +295,7 @@ void DataLayer::clean_up()
     Layer::lock_type lock( Layer::GetMutex() );
     if ( this->data_volume_ ) 
     {
+      this->data_volume_->unregister_data();
       Core::DataVolume::CreateInvalidData( this->data_volume_->get_grid_transform(), 
         this->data_volume_ );
     }

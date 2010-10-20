@@ -29,16 +29,12 @@
 //QtUtils Includes
 #include <QtUtils/Bridge/QtBridge.h>
 
-//Interface Includes
-#include <Interface/ToolInterface/CustomWidgets/TargetComboBox.h>
-
 //Qt Gui Includes
 #include <Interface/ToolInterface/FillHolesFilterInterface.h>
 #include "ui_FillHolesFilterInterface.h"
 
 //Application Includes
 #include <Application/Tools/FillHolesFilter.h>
-//#include <Application/Filters/Actions/ActionFillHoles.h>
 
 SCI_REGISTER_TOOLINTERFACE( Seg3D, FillHolesFilterInterface )
 

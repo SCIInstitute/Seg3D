@@ -57,12 +57,11 @@ ITKDataBlock::~ITKDataBlock()
 {
 }
 
-DataBlockHandle ITKDataBlock::New( ITKImageDataHandle itk_data, generation_type generation )
+DataBlockHandle ITKDataBlock::New( ITKImageDataHandle itk_data )
 {
   try
   {
     DataBlockHandle data_block( new ITKDataBlock( itk_data ) );
-    DataBlockManager::Instance()->register_datablock( data_block, generation );
     return data_block;
   }
   catch ( ... )

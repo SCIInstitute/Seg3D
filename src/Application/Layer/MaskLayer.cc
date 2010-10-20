@@ -48,6 +48,7 @@ MaskLayer::MaskLayer( const std::string& name, const Core::MaskVolumeHandle& vol
   loading_( false ),
   mask_volume_( volume )
 {
+  this->mask_volume_->register_data();
   this->initialize_states();
   
   if (  volume->get_mask_data_block() )
@@ -69,6 +70,11 @@ MaskLayer::~MaskLayer()
 {
   // Disconnect all current connections
   this->disconnect_all();
+
+  if ( this->mask_volume_ )
+  {
+    this->mask_volume_->unregister_data();
+  }
 }
 
 Core::GridTransform MaskLayer::get_grid_transform() const 
@@ -116,26 +122,39 @@ Core::VolumeHandle MaskLayer::get_volume() const
   return this->get_mask_volume();
 }
 
-void MaskLayer::set_mask_volume( Core::MaskVolumeHandle volume )
+bool MaskLayer::set_mask_volume( Core::MaskVolumeHandle volume )
 {
-  Layer::lock_type lock( Layer::GetMutex() );
-    
-  this->mask_volume_.reset();
-  this->disconnect_all();
+  ASSERT_IS_APPLICATION_THREAD();
 
-  this->mask_volume_ = volume;
+  // Only insert the volume if the layer is still valid
+  if ( !this->is_valid() )  return false;
 
-  if ( this->mask_volume_ )
   {
-    this->generation_state_->set( this->mask_volume_->get_generation() );
-    this->bit_state_->set( static_cast< int >( 
-      volume->get_mask_data_block()->get_mask_bit() ) );
+    Layer::lock_type lock( Layer::GetMutex() );
+
+    if ( this->mask_volume_ )
+    {
+      // Unregister the old volume
+      this->mask_volume_->unregister_data();
+    }
     
-    this->add_connection( this->mask_volume_->get_mask_data_block()->mask_updated_signal_.
-      connect( boost::bind( &MaskLayer::handle_mask_data_changed, this ) ) );
+    this->disconnect_all();
+
+    this->mask_volume_ = volume;
+    if ( this->mask_volume_ )
+    {
+      // Register the new volume
+      this->mask_volume_->register_data();
+      this->generation_state_->set( this->mask_volume_->get_generation() );
+      this->bit_state_->set( static_cast< int >( 
+        volume->get_mask_data_block()->get_mask_bit() ) );
+
+      this->add_connection( this->mask_volume_->get_mask_data_block()->mask_updated_signal_.
+        connect( boost::bind( &MaskLayer::handle_mask_data_changed, this ) ) );
+    }
   }
 
-  this->update_volume_signal_();
+  return true;
 }
 
 // counter for generating new colors for each new mask
@@ -193,6 +212,7 @@ bool MaskLayer::post_load_states( const Core::StateIO& state_io )
 
     if( Core::DataVolume::LoadDataVolume( volume_path, data_volume, error ) )
     {
+      data_volume->register_data( generation );
       Core::MaskDataBlockManager::Instance()->register_data_block( 
         data_volume->get_data_block(), data_volume->get_grid_transform() );
       success = Core::MaskDataBlockManager::Instance()->
@@ -231,6 +251,7 @@ void MaskLayer::clean_up()
     Layer::lock_type lock( Layer::GetMutex() );
     if ( this->mask_volume_ )
     {
+      this->mask_volume_->unregister_data();
       Core::MaskVolume::CreateInvalidMask( this->mask_volume_->get_grid_transform(),
         this->mask_volume_ );
     }

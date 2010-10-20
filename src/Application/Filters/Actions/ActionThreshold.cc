@@ -204,7 +204,7 @@ public:
 
     this->dispatch_insert_mask_volume_into_layer( this->dst_layer_,
       Core::MaskVolumeHandle( new Core::MaskVolume( 
-      this->dst_layer_->get_grid_transform(), threshold_mask ) ), true );
+      this->dst_layer_->get_grid_transform(), threshold_mask ) ) );
   }
   
   // GET_FITLER_NAME:

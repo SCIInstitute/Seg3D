@@ -274,7 +274,7 @@ public:
       return;     
     } 
       
-    this->dispatch_insert_mask_volume_into_layer( this->dst_layer_, mask_volume, true );
+    this->dispatch_insert_mask_volume_into_layer( this->dst_layer_, mask_volume );
   }
   
   // GET_FITLER_NAME:

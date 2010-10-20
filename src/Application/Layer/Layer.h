@@ -115,15 +115,10 @@ public:
 
   // UPDATE_PROGRESS_SIGNAL:
   // When new information on progress is available this signal is triggered. If this signal is 
-  // triggered it should end with a value 1.0 indicating that progress reporting has finised.
+  // triggered it should end with a value 1.0 indicating that progress reporting has finished.
   // Progress is measured between 0.0 and 1.0.
   typedef boost::signals2::signal< void (double) > update_progress_signal_type;
   update_progress_signal_type update_progress_signal_;
-
-  // UPDATE_VOLUME_SIGNAL:
-  // When the data/mask volume is updated this signal is triggered.
-  typedef boost::signals2::signal< void () > update_volume_signal_type;
-  update_volume_signal_type update_volume_signal_;
 
   // LAYER_UPDATED_SIGNAL:
   // Triggered when the layer data has been modified.

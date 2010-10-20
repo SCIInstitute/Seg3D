@@ -63,11 +63,6 @@ SET(INTERFACE_TOOLINTERFACE_SRCS
   ClipboardToolInterface.cc
 )
 
-SET(INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_SRCS
-  CustomWidgets/TargetComboBox.cc
-  CustomWidgets/MaskComboBox.cc
-)
-
 SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
   CropToolInterface.h
   InvertToolInterface.h
@@ -98,11 +93,6 @@ SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
   FlipToolInterface.h
   TransformToolInterface.h
   ClipboardToolInterface.h
-)
-
-SET(INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_MOC_SRCS
-  CustomWidgets/TargetComboBox.h
-  CustomWidgets/MaskComboBox.h
 )
 
 SET(INTERFACE_TOOLINTERFACE_NO_MOC_SRCS
@@ -140,9 +130,6 @@ SET(INTERFACE_TOOLINTERFACE_UI_SRCS
   ClipboardToolInterface.ui
 )
 
-SET(INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_UI_SRCS
-)
-
 ##################################################
 # Get Icon files
 ##################################################
@@ -154,14 +141,12 @@ SET(INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_UI_SRCS
 ##################################################
 
 QT4_WRAP_UI(INTERFACE_TOOLINTERFACE_QT_UI_SRCS ${INTERFACE_TOOLINTERFACE_UI_SRCS})
-QT4_WRAP_UI(INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_QT_UI_SRCS ${INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_UI_SRCS})
 
 ##################################################
 # Wrap QT code to expand all the moc code
 ##################################################
 
 QT4_WRAP_CPP(INTERFACE_TOOLINTERFACE_QT_MOC_SRCS ${INTERFACE_TOOLINTERFACE_MOC_SRCS})
-QT4_WRAP_CPP(INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_QT_MOC_SRCS ${INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_MOC_SRCS})
 
 ##################################################
 # Ensure that we can find the files generated
@@ -179,11 +164,7 @@ CORE_ADD_LIBRARY(Interface_ToolInterface
             ${INTERFACE_TOOLINTERFACE_QT_UI_SRCS}
             ${INTERFACE_TOOLINTERFACE_QT_MOC_SRCS}
             ${INTERFACE_TOOLINTERFACE_NO_MOC_SRCS} 
-            ${INTERFACE_TOOLINTERFACE_MOC_SRCS}
-            ${INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_SRCS}
-            ${INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_QT_UI_SRCS}
-            ${INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_QT_MOC_SRCS}
-            ${INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_MOC_SRCS})      
+            ${INTERFACE_TOOLINTERFACE_MOC_SRCS})      
                       
 TARGET_LINK_LIBRARIES(Interface_ToolInterface
                       Core_Utils

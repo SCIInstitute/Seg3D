@@ -61,6 +61,10 @@ public:
   // Get the maximum value
   virtual double get_max() const;
 
+  // IS_VALID:
+  // Check whether the volume has a valid data block
+  virtual bool is_valid() const;
+
   // DATA_BLOCK:
   // Get the data block that contains the volume data
   DataBlockHandle get_data_block() const;
@@ -80,6 +84,14 @@ public:
   // GET_GENERATION:
   // Get the  generation number of the data volume
   virtual DataBlock::generation_type get_generation() const;
+
+  // REGISTER_DATA:
+  // Register the underlying data with the DataBlockManager.
+  virtual DataBlock::generation_type register_data( DataBlock::generation_type generation = -1 );
+
+  // UNREGISTER_DATA:
+  // Unregister the underlying data with DataBlockManager.
+  virtual void unregister_data();
 
 private:
   // Handle to where the volume data is really stored

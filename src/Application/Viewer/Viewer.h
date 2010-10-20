@@ -47,6 +47,9 @@
 #include <Core/Volume/VolumeSlice.h>
 #include <Core/State/State.h>
 
+// Application includes
+#include <Application/Layer/LayerFWD.h>
+
 namespace Seg3D
 {
 
@@ -66,6 +69,7 @@ class Viewer : public Core::AbstractViewer, public boost::enable_shared_from_thi
 public:
   friend class ViewManipulator;
   friend class ViewerPrivate;
+  friend class ViewerManager;
 
   Viewer( size_t viewer_id, bool visible = true, const std::string& mode = Viewer::AXIAL_C );
   virtual ~Viewer();
@@ -111,16 +115,20 @@ public:
   // Returns the volume slice that corresponds to the active layer.
   Core::VolumeSliceHandle get_active_volume_slice() const;
 
-  // MOVE_SLICE_TO:
-  // Move the slice to the given world coordinate. Used for picking.
-  void move_slice_to( const Core::Point& pt );
-
 private:
   friend class ActionOffsetSlice;
 
   // OFFSET_SLICE:
   // Offset the slice number by the given value.
   int offset_slice( int delta );
+
+  // MOVE_SLICE_TO:
+  // Move the slice to the given world coordinate. Used for picking.
+  void move_slice_to( const Core::Point& pt );
+
+  // UPDATE_SLICE_VOLUME:
+  // Update the volume associated with the layer slice.
+  void update_slice_volume( LayerHandle layer );
 
   // -- View information --
 public:

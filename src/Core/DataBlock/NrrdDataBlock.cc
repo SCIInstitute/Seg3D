@@ -61,12 +61,11 @@ NrrdDataBlock::~NrrdDataBlock()
 {
 }
 
-DataBlockHandle NrrdDataBlock::New( NrrdDataHandle nrrd_data, generation_type generation )
+DataBlockHandle NrrdDataBlock::New( NrrdDataHandle nrrd_data )
 {
   try
   {
     DataBlockHandle data_block( new NrrdDataBlock( nrrd_data ) );
-    DataBlockManager::Instance()->register_datablock( data_block, generation );
     return data_block;
   }
   catch ( ... )

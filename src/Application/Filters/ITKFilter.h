@@ -166,7 +166,7 @@ protected:
         
       // NOTE: Do not need an update of the generation number as this volume 
       // was generated from scratch. But it will need a new histogram
-      this->dispatch_insert_data_volume_into_layer( data_layer, data_volume, false, true );
+      this->dispatch_insert_data_volume_into_layer( data_layer, data_volume, true );
       return true;
     }
     // If the layer is a mask layer
@@ -196,7 +196,7 @@ protected:
       Core::MaskVolumeHandle mask_volume( new Core::MaskVolume( 
         mask_layer->get_grid_transform(), mask ) );
         
-      this->dispatch_insert_mask_volume_into_layer( mask_layer, mask_volume, true );
+      this->dispatch_insert_mask_volume_into_layer( mask_layer, mask_volume );
       return true;
     }
 
@@ -245,7 +245,7 @@ protected:
       Core::MaskVolumeHandle mask_volume( new Core::MaskVolume( 
         mask_layer->get_grid_transform(), mask ) );
         
-      this->dispatch_insert_mask_volume_into_layer( mask_layer, mask_volume, true );
+      this->dispatch_insert_mask_volume_into_layer( mask_layer, mask_volume );
       return true;
     }
     return false;
@@ -298,7 +298,7 @@ protected:
         
       // NOTE: Do not need an update of the generation number as this volume 
       // was generated from scratch. But it will need a new histogram
-      this->dispatch_insert_data_volume_into_layer( data_layer, data_volume, false, true );
+      this->dispatch_insert_data_volume_into_layer( data_layer, data_volume, true );
       return true;
     }
     // If the layer is a mask layer
@@ -334,7 +334,7 @@ protected:
       Core::MaskVolumeHandle mask_volume( new Core::MaskVolume( 
         mask_layer->get_grid_transform(), mask ) );
         
-      this->dispatch_insert_mask_volume_into_layer( mask_layer, mask_volume, true );
+      this->dispatch_insert_mask_volume_into_layer( mask_layer, mask_volume );
       return true;
     }
     
@@ -342,7 +342,7 @@ protected:
   }
 
   // OBSERVE_ITK_FILTER:
-  // Forward the progress an itk filter is making and check for the abort statud of the layer
+  // Forward the progress an itk filter is making and check for the abort status of the layer
   template< class T>
   void observe_itk_filter( T filter_pointer, const LayerHandle& layer, 
     float progress_start = 0.0, float progress_amount = 1.0 )

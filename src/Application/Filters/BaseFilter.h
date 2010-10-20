@@ -142,12 +142,12 @@ public:
   // DISPATCH_INSERT_DATA_VOLUME_INTO_LAYER:
   // Schedule a new data volume to be inserted into a layer
   bool dispatch_insert_data_volume_into_layer( LayerHandle layer, 
-    Core::DataVolumeHandle data, bool update_generation, bool update_histogram );
+    Core::DataVolumeHandle data, bool update_histogram );
     
   // DISPATCH_INSERT_MASK_VOLUME_INTO_LAYER:
   // Schedule a new mask volume to be inserted into a layer
   bool dispatch_insert_mask_volume_into_layer( LayerHandle layer, 
-    Core::MaskVolumeHandle mask, bool update_generation );
+    Core::MaskVolumeHandle mask );
 
   // -- filter specific information --
 public:

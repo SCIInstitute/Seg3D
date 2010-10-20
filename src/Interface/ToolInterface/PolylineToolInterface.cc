@@ -29,7 +29,6 @@
 
 //Interface Includes
 #include <QtUtils/Bridge/QtBridge.h>
-#include <Interface/ToolInterface/CustomWidgets/TargetComboBox.h>
 
 //Qt Gui Includes
 #include <Interface/ToolInterface/PolylineToolInterface.h>
@@ -37,7 +36,6 @@
 
 //Application Includes
 #include <Application/Tools/PolylineTool.h>
-//#include <Application/Filters/Actions/ActionPolyline.h>
 
 SCI_REGISTER_TOOLINTERFACE( Seg3D, PolylineToolInterface )
 
@@ -91,7 +89,7 @@ bool PolylineToolInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Enable( this->private_->ui_.fill_button_, tool->valid_target_state_ );
   QtUtils::QtBridge::Enable( this->private_->ui_.erase_button_, tool->valid_target_state_ );
 
-  //Send a message to the log that we have finised with building the Polyline Tool Interface
+  //Send a message to the log that we have finished with building the Polyline Tool Interface
   CORE_LOG_MESSAGE("Finished building a Polyline Tool Interface");
 
   return ( true );

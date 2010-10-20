@@ -327,7 +327,7 @@ bool BaseFilter::dispatch_delete_layer( LayerHandle layer )
 
 
 bool BaseFilter::dispatch_insert_data_volume_into_layer( LayerHandle layer, 
-  Core::DataVolumeHandle data, bool update_generation, bool update_histogram )
+  Core::DataVolumeHandle data, bool update_histogram )
 {
   // Check whether the layer is of the right type
   DataLayerHandle data_layer = boost::dynamic_pointer_cast<DataLayer>( layer );
@@ -336,9 +336,7 @@ bool BaseFilter::dispatch_insert_data_volume_into_layer( LayerHandle layer,
   // Update the data volume if needed.
   // NOTE: We assume that this data volume is not shared by any other thread yet
   // Hence we can update the histogram on the calling thread.
-  // NOTE: update generation is thread safe.
   if ( update_histogram ) data->get_data_block()->update_histogram();
-  if ( update_generation ) data->get_data_block()->increase_generation();
   
   // Ensure that the application thread will process this update.
   LayerManager::DispatchInsertDataVolumeIntoLayer( data_layer, data );
@@ -347,15 +345,11 @@ bool BaseFilter::dispatch_insert_data_volume_into_layer( LayerHandle layer,
 
 
 bool BaseFilter::dispatch_insert_mask_volume_into_layer( LayerHandle layer, 
-  Core::MaskVolumeHandle mask, bool update_generation )
+  Core::MaskVolumeHandle mask )
 { 
   // Check whether the layer is of the right type
   MaskLayerHandle mask_layer = boost::dynamic_pointer_cast<MaskLayer>( layer );
   if ( ! mask_layer ) return false;
-
-  // Update the data volume if needed
-  // NOTE: update generation is thread safe.
-  if ( update_generation ) mask->get_mask_data_block()->increase_generation();
 
   // Ensure that the application thread will process this update.
   LayerManager::DispatchInsertMaskVolumeIntoLayer( mask_layer, mask );

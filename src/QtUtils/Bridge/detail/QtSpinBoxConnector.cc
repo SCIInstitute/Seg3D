@@ -65,10 +65,12 @@ QtSpinBoxConnector::QtSpinBoxConnector( QSpinBox* parent,
 
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-    int min_val, max_val;
+    int min_val, max_val, step;
     state->get_range( min_val, max_val );
+    state->get_step( step );
     parent->setValue( state->get() );
     parent->setRange( min_val, max_val );
+    parent->setSingleStep( step );
     this->add_connection( state->value_changed_signal_.connect(
       boost::bind( &QtSpinBoxConnector::SetSpinBoxValue, qpointer, _1, _2 ) ) );
     this->add_connection( state->range_changed_signal_.connect( boost::bind(

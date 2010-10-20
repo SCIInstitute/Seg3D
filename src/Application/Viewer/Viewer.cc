@@ -81,7 +81,6 @@ public:
   void insert_layer( LayerHandle layer );
   void delete_layers( std::vector< LayerHandle > layers );
   void set_active_layer( LayerHandle layer );
-  void handle_layer_volume_updated( std::string layer_id );
   void set_viewer_labels();
   void reset();
 
@@ -243,10 +242,6 @@ void ViewerPrivate::insert_layer( LayerHandle layer )
   this->layer_connection_map_.insert( std::make_pair( layer->get_layer_id(),
     layer->layer_updated_signal_.connect( boost::bind(
     &ViewerPrivate::layer_state_changed, this, ViewModeType::ALL_E ) ) ) );
-
-  this->layer_connection_map_.insert( std::make_pair( layer->get_layer_id(),
-    layer->update_volume_signal_.connect( boost::bind(
-    &ViewerPrivate::handle_layer_volume_updated, this, layer->get_layer_id() ) ) ) );
 
   switch( layer->type() )
   {
@@ -440,15 +435,6 @@ void ViewerPrivate::set_active_layer( LayerHandle layer )
       }
     }
   }
-}
-
-void ViewerPrivate::handle_layer_volume_updated( std::string layer_id )
-{
-  Core::VolumeSliceHandle volume_slice = this->viewer_->get_volume_slice( layer_id );
-  assert( volume_slice );
-  LayerHandle layer = LayerManager::Instance()->get_layer_by_id( layer_id );
-  volume_slice->set_volume( layer->get_volume() );
-  this->viewer_->redraw();
 }
 
 void ViewerPrivate::change_view_mode( std::string mode, Core::ActionSource source )
@@ -1575,6 +1561,13 @@ void Viewer::snap_to_axis()
   view_3d.up( new_up );
 
   this->volume_view_state_->set( view_3d );
+}
+
+void Viewer::update_slice_volume( LayerHandle layer )
+{
+  Core::VolumeSliceHandle volume_slice = this->get_volume_slice( layer->get_layer_id() );
+  assert( volume_slice );
+  volume_slice->set_volume( layer->get_volume() );
 }
 
 } // end namespace Seg3D

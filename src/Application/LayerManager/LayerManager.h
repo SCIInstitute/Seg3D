@@ -260,6 +260,11 @@ public:
   // The first parameter is the layer ID, the second is the new name for that layer.
   boost::signals2::signal< void ( std::string, std::string ) > layer_name_changed_signal_;
 
+  // LAYER_VOLUME_CHANGED_SIGNAL_:
+  // Triggered when the volume of a layer has changed.
+  // The first parameter is the layer handle.
+  boost::signals2::signal< void ( LayerHandle ) > layer_volume_changed_signal_;
+
 protected:
   virtual bool pre_save_states( Core::StateIO& state_io );
 

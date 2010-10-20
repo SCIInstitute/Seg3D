@@ -86,7 +86,7 @@ public:
   
   // SET_MASK_VOLUME:
   // This function set the mask volume to a new mask.
-  void set_mask_volume( Core::MaskVolumeHandle volume );
+  bool set_mask_volume( Core::MaskVolumeHandle volume );
 
   // GET_ISOSURFACE:
   // Get the iso-surface associated with this layer

@@ -29,16 +29,12 @@
 //Interface Includes
 #include <QtUtils/Bridge/QtBridge.h>
 
-//QtUtils Includes
-#include <Interface/ToolInterface/CustomWidgets/TargetComboBox.h>
-
 //Qt Gui Includes
 #include <Interface/ToolInterface/InvertToolInterface.h>
 #include "ui_InvertToolInterface.h"
 
 //Application Includes
 #include <Application/Tools/InvertTool.h>
-//#include <Application/Filters/Actions/ActionInvert.h>
 
 SCI_REGISTER_TOOLINTERFACE( Seg3D, InvertToolInterface )
 

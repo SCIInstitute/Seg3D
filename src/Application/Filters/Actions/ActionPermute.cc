@@ -143,7 +143,7 @@ void PermuteAlgo::permute_data_layer( DataLayerHandle input, DataLayerHandle out
   {
     this->dispatch_insert_data_volume_into_layer( output, Core::DataVolumeHandle(
       new Core::DataVolume( output->get_grid_transform(), output_datablock ) ), 
-      false, true );
+      true );
     output->update_progress_signal_( 1.0 );
     this->dispatch_unlock_layer( output );
     if ( this->replace_ )
@@ -175,7 +175,7 @@ void PermuteAlgo::permute_mask_layer( MaskLayerHandle input, MaskLayerHandle out
       dst_mask_data_block );
     Core::MaskVolumeHandle mask_volume( new Core::MaskVolume(
       output->get_grid_transform(), dst_mask_data_block ) );
-    this->dispatch_insert_mask_volume_into_layer( output, mask_volume, true );
+    this->dispatch_insert_mask_volume_into_layer( output, mask_volume );
     output->update_progress_signal_( 1.0 );
     this->dispatch_unlock_layer( output );
     if ( this->replace_ )

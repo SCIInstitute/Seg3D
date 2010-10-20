@@ -66,7 +66,7 @@ void DataBlockManager::register_datablock( DataBlockHandle data_block,
   this->private_->generation_++;
   
   assert( this->private_->generation_map_.count( data_block->get_generation() ) == 0 );
-  this->private_->generation_map_[ data_block->get_generation() ] = DataBlockWeakHandle( data_block );
+  this->private_->generation_map_[ data_block->get_generation() ] = data_block;
 }
 
 bool DataBlockManager::find_datablock(  DataBlock::generation_type generation, 
@@ -75,7 +75,8 @@ bool DataBlockManager::find_datablock(  DataBlock::generation_type generation,
   lock_type lock( this->get_mutex() );
 
   datablock.reset();
-  DataBlockManagerPrivate::generation_map_type::const_iterator it = this->private_->generation_map_.find( generation );
+  DataBlockManagerPrivate::generation_map_type::const_iterator it = 
+    this->private_->generation_map_.find( generation );
   if ( it == this->private_->generation_map_.end() ) return false;
 
   datablock = ( *it ).second.lock();
@@ -87,6 +88,12 @@ bool DataBlockManager::find_datablock(  DataBlock::generation_type generation,
 void DataBlockManager::unregister_datablock( DataBlock::generation_type generation )
 {
   lock_type lock( this->get_mutex() );
+  DataBlockHandle datablock;
+  if ( this->find_datablock( generation, datablock ) )
+  {
+    datablock->set_generation( -1 );
+  }
+  
   this->private_->generation_map_.erase( generation );
 }
 
@@ -95,18 +102,19 @@ DataBlock::generation_type DataBlockManager::increment_generation(
 {
   lock_type lock( this->get_mutex() );
 
-  DataBlockHandle data_block = this->private_->generation_map_[ old_generation ].lock();
-  this->private_->generation_map_.erase( old_generation );
-
-  DataBlock::generation_type new_generation = this->private_->generation_;
-  this->private_->generation_++;
-  
-  if ( data_block )
+  // Only increase the generation number if the old generation number is valid
+  DataBlockHandle data_block;
+  if ( this->find_datablock( old_generation, data_block ) )
   {
+    this->private_->generation_map_.erase( old_generation );
+    DataBlock::generation_type new_generation = this->private_->generation_++;
     this->private_->generation_map_[ new_generation ] = data_block;
+    return new_generation;
   }
   
-  return new_generation;
+  // Shouldn't get here
+  assert( false );
+  return -1;
 }
 
 DataBlock::generation_type DataBlockManager::get_generation_count()
@@ -126,6 +134,17 @@ void DataBlockManager::set_generation_count( DataBlock::generation_type generati
 void DataBlockManager::clear()
 {
   lock_type lock( this->get_mutex() );
+  DataBlockManagerPrivate::generation_map_type::iterator it =
+    this->private_->generation_map_.begin();
+  while ( it != this->private_->generation_map_.end() )
+  {
+    DataBlockHandle datablock = ( *it ).second.lock();
+    if ( datablock )
+    {
+      datablock->set_generation( -1 );
+    }
+    ++it;
+  }
   this->private_->generation_map_.clear();  
   this->private_->generation_ = 0;
 }

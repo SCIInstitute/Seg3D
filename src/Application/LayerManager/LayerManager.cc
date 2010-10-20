@@ -490,6 +490,8 @@ void LayerManager::get_layers_in_group( LayerGroupHandle group ,
 
 void LayerManager::delete_layers( LayerGroupHandle group )
 {
+  if ( !group->is_valid() ) return;
+  
   bool active_layer_changed = false;
   bool group_deleted = false;
 
@@ -563,6 +565,8 @@ void LayerManager::delete_layers( LayerGroupHandle group )
 
 void LayerManager::delete_layer( LayerHandle layer )
 {
+  if ( !layer->is_valid() ) return;
+  
   bool active_layer_changed = false;
   bool group_deleted = false;
   
@@ -1215,8 +1219,11 @@ void LayerManager::DispatchInsertDataVolumeIntoLayer( DataLayerHandle layer,
     return;
   }
   
-  layer->set_data_volume( data );
-  LayerManager::Instance()->layers_changed_signal_();
+  if ( layer->set_data_volume( data ) )
+  {
+    LayerManager::Instance()->layer_volume_changed_signal_( layer );
+    LayerManager::Instance()->layers_changed_signal_();
+  }
 }
 
 void LayerManager::DispatchInsertMaskVolumeIntoLayer( MaskLayerHandle layer, 
@@ -1230,8 +1237,11 @@ void LayerManager::DispatchInsertMaskVolumeIntoLayer( MaskLayerHandle layer,
     return;
   }
   
-  layer->set_mask_volume( mask );
-  LayerManager::Instance()->layers_changed_signal_();
+  if ( layer->set_mask_volume( mask ) )
+  {
+    LayerManager::Instance()->layer_volume_changed_signal_( layer );
+    LayerManager::Instance()->layers_changed_signal_();
+  }
 }
 
 void LayerManager::DispatchCreateAndInsertDataLayer( std::string name, 
