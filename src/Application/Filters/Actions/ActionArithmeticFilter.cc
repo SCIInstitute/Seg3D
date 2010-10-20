@@ -203,6 +203,7 @@ bool ActionArithmeticFilterPrivate::validate_parser( Core::ActionContextHandle& 
       {
         if ( ! ( this->algo_->lock_for_processing( layers[ i ] ) ) )
         {
+          context->report_error( "Could not lock target layer." );
           this->algo_.reset();
           return false;
         }
@@ -223,6 +224,7 @@ bool ActionArithmeticFilterPrivate::validate_parser( Core::ActionContextHandle& 
         {
           if ( ! ( this->algo_->lock_for_use( layers[ i ] ) ) )
           {
+            context->report_error( "Could not lock layer." );
             this->algo_.reset();
             return false;       
           }
@@ -234,6 +236,7 @@ bool ActionArithmeticFilterPrivate::validate_parser( Core::ActionContextHandle& 
   // We must have a valid first input layer
   if( !layers[ 0 ] )
   {
+    context->report_error( "Invalid target layer." );
     return false;
   }
 
@@ -256,6 +259,7 @@ bool ActionArithmeticFilterPrivate::validate_parser( Core::ActionContextHandle& 
     if ( ! (this->algo_->create_and_lock_data_layer_from_layer( layers[ 0 ], 
       this->algo_->dst_layer_ ) ) )
     {
+      context->report_error( "Could not create output layer." );
       this->algo_.reset();
       return false;   
     }
@@ -265,6 +269,7 @@ bool ActionArithmeticFilterPrivate::validate_parser( Core::ActionContextHandle& 
     if ( ! ( this->algo_->create_and_lock_mask_layer_from_layer( layers[ 0 ], 
       this->algo_->dst_layer_ ) ) )
     {
+      context->report_error( "Could not create output layer." );
       this->algo_.reset();
       return false;   
     }
