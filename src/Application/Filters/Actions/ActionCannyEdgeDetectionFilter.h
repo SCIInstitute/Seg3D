@@ -45,6 +45,7 @@ CORE_ACTION(
   CORE_ACTION_KEY( "blurring_distance", "2.0", "The distance over which the filter blurs"
     " before computing the gradient." )
   CORE_ACTION_KEY( "threshold", "1.0", "Below this threshold the values are replaced with zero." )
+  CORE_ACTION_CHANGES_PROJECT_DATA()
 )
   
   // -- Constructor/Destructor --

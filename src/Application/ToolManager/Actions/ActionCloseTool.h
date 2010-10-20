@@ -40,6 +40,7 @@ class ActionCloseTool : public Core::Action
 CORE_ACTION( 
   CORE_ACTION_TYPE( "CloseTool", "Close a tool that was opened previously." )
   CORE_ACTION_ARGUMENT( "toolid", "Toolid of the tool." )
+  CORE_ACTION_CHANGES_PROJECT_DATA()
 )
 
   // -- Constructor/Destructor --

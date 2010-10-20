@@ -88,7 +88,7 @@ bool ActionCopy::validate( Core::ActionContextHandle& context )
     
     LayerHandle active_layer = LayerManager::Instance()->get_active_layer();
 
-    if ( !active_layer || active_layer->type() != Core::VolumeType::MASK_E )
+    if ( !active_layer || active_layer->get_type() != Core::VolumeType::MASK_E )
     {
       context->report_error( "Nothing to copy from" );
       return false;

@@ -205,7 +205,7 @@ void AppLayerIO::ExportLayer( QMainWindow* main_window )
   layer_handles.push_back( LayerManager::Instance()->get_active_layer() );
   if( !layer_handles[ 0 ] ) return;
 
-  if( layer_handles[ 0 ]->type() != Core::VolumeType::DATA_E )
+  if( layer_handles[ 0 ]->get_type() != Core::VolumeType::DATA_E )
   {
     std::string error_message = 
       std::string( "ERROR: A Data layer is not set as the active layer" );

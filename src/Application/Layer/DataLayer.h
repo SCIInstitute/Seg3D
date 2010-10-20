@@ -59,7 +59,7 @@ public:
 
   // TYPE:
   // this function returns the a Core::VolumeType indicating that this is a DataLayer 
-  virtual Core::VolumeType type() const { return Core::VolumeType::DATA_E; }
+  virtual Core::VolumeType get_type() const { return Core::VolumeType::DATA_E; }
 
   // GET_GRID_TRANSFORM:
   // this function returns the grid transform of the data volume

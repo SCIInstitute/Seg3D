@@ -299,6 +299,9 @@ ToolManager::ToolManager() :
   StateHandler( "toolmanager", false ),
   private_( new ToolManagerPrivate )
 {
+  // Mask the data contained in this manager as session data.
+  this->mark_as_project_data();
+
   this->add_state( "active_tool", this->active_tool_state_, "", "" );
   this->private_->tool_manager_ = this;
   this->private_->signal_block_count_ = 0;

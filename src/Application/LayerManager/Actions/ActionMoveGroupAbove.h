@@ -43,6 +43,7 @@ CORE_ACTION(
   CORE_ACTION_TYPE( "MoveGroupAbove", "Move a group to a new location in the layer manager." )
   CORE_ACTION_ARGUMENT( "groupid", "Group that needs to be moved." )
   CORE_ACTION_ARGUMENT( "target_group", "The groupid of the group slot above which to insert the group. ")
+  CORE_ACTION_CHANGES_PROJECT_DATA()
 ) 
   // -- Constructor/Destructor --
 public:

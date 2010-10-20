@@ -149,7 +149,7 @@ public:
 void ViewerPrivate::adjust_contrast_brightness( int dx, int dy )
 {
   LayerHandle active_layer = LayerManager::Instance()->get_active_layer();
-  if ( !active_layer || active_layer->type() != Core::VolumeType::DATA_E )
+  if ( !active_layer || active_layer->get_type() != Core::VolumeType::DATA_E )
   {
     return;
   }
@@ -243,7 +243,7 @@ void ViewerPrivate::insert_layer( LayerHandle layer )
     layer->layer_updated_signal_.connect( boost::bind(
     &ViewerPrivate::layer_state_changed, this, ViewModeType::ALL_E ) ) ) );
 
-  switch( layer->type() )
+  switch( layer->get_type() )
   {
   case Core::VolumeType::DATA_E:
     {
@@ -852,6 +852,9 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
   std::string coronal = CORONAL_C + "=" + PreferencesManager::Instance()->y_axis_label_state_->get();
   std::string axial = AXIAL_C + "=" + PreferencesManager::Instance()->z_axis_label_state_->get();
   
+  // Indicate that this statehandler contains data that is part of th project
+  this->mark_as_project_data();
+
   this->add_state( "view_mode", view_mode_state_, mode , sagittal + "|" + coronal 
      + "|" + axial + "|" + VOLUME_C + "=Volume" );
      

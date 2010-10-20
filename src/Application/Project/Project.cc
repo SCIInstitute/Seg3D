@@ -50,14 +50,14 @@ Project::Project( const std::string& project_name ) :
   valid_( false ),
   changed_( false )
 { 
-  add_state( "project_name", this->project_name_state_, project_name );
-  add_state( "save_custom_colors", this->save_custom_colors_state_, false );
+  this->add_state( "project_name", this->project_name_state_, project_name );
+  this->add_state( "save_custom_colors", this->save_custom_colors_state_, false );
   
   std::vector< std::string> empty_vector;
-  add_state( "sessions", this->sessions_state_, empty_vector );
-  add_state( "project_notes", this->project_notes_state_, empty_vector );
-  add_state( "project_file_size", this->project_file_size_state_, 0 );
-  add_state( "current_session_name", this->current_session_name_state_, "UnnamedSession" );
+  this->add_state( "sessions", this->sessions_state_, empty_vector );
+  this->add_state( "project_notes", this->project_notes_state_, empty_vector );
+  this->add_state( "project_file_size", this->project_file_size_state_, 0 );
+  this->add_state( "current_session_name", this->current_session_name_state_, "UnnamedSession" );
     
   this->color_states_.resize( 12 );
   for ( size_t j = 0; j < 12; j++ )
@@ -71,7 +71,7 @@ Project::Project( const std::string& project_name ) :
   this->data_manager_ = DataManagerHandle( new DataManager() );
 
   this->add_connection( Core::ActionDispatcher::Instance()->post_action_signal_.connect( 
-    boost::bind( &Project::set_changed, this, _1, _2 ) ) );
+    boost::bind( &Project::set_project_changed, this, _1, _2 ) ) );
 }
   
 Project::~Project()
@@ -79,24 +79,33 @@ Project::~Project()
   this->disconnect_all();
 }
 
-void Project::set_changed( Core::ActionHandle action, Core::ActionResultHandle result )
+void Project::set_project_changed( Core::ActionHandle action, Core::ActionResultHandle result )
 {
-  if ( action->get_type() !=  "SaveSession")
+  // NOTE: This is executed on the application thread, hence we do not need a lock to read
+  // the variable that is only changed on the same thread
+  
+  if ( action->changes_project_data() && this->changed_ == false )
   {
-    if ( this->changed_ == true ) return;
-    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    // NOTE: Changing the variable
+    Core::Application::lock_type lock( Core::Application::GetMutex() );
     this->changed_ = true;
     return;
   }
-  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+}
+
+void Project::reset_project_changed()
+{
+  Core::Application::lock_type lock( Core::Application::GetMutex() );
   this->changed_ = false;
 }
 
-bool Project::check_changed()
+bool Project::check_project_changed()
 {
-  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+  Core::Application::lock_type lock( Core::Application::GetMutex() );
   return changed_;
 }
+
+
 
 bool Project::initialize_from_file( const std::string& project_name )
 {
@@ -333,6 +342,7 @@ void Project::set_signal_block( bool on_off )
 {
   this->enable_signals( on_off );
 }
+
 
 
 } // end namespace Seg3D

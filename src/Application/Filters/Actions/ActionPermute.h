@@ -45,6 +45,7 @@ CORE_ACTION(
   CORE_ACTION_ARGUMENT( "layerids", "The layerids on which this tool needs to be run." )
   CORE_ACTION_ARGUMENT( "permutation", "The permutation array." )
   CORE_ACTION_KEY( "replace", "false", "Whether to delete the input layers afterwards." )
+  CORE_ACTION_CHANGES_PROJECT_DATA()
 )
   
   // -- Constructor/Destructor --

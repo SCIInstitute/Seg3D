@@ -48,6 +48,7 @@ CORE_ACTION(
   CORE_ACTION_KEY( "replace", "false", "Whether to replace the first input layer with the output" )
   CORE_ACTION_KEY( "preserve_data_format", "false", "Whether to use the same data type as the "
     "first input layer for the output" ) 
+  CORE_ACTION_CHANGES_PROJECT_DATA()
 )
   
   // -- Constructor/Destructor --

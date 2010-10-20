@@ -390,7 +390,7 @@ void AppMenu::new_project_wizard()
 {
   if ( ProjectManager::Instance()->current_project_ )
   {
-    if ( ProjectManager::Instance()->current_project_->check_changed() )
+    if ( ProjectManager::Instance()->current_project_->check_project_changed() )
     {
       // Check whether the users wants to save and whether the user wants to quit
       int ret = QMessageBox::warning( this->main_window_, "Create a new Project?",
@@ -425,7 +425,7 @@ void AppMenu::open_project_from_file()
 {
   if ( ProjectManager::Instance()->current_project_ )
   {
-    if ( ProjectManager::Instance()->current_project_->check_changed() )
+    if ( ProjectManager::Instance()->current_project_->check_project_changed() )
     {
       // Check whether the users wants to save and whether the user wants to quit
       int ret = QMessageBox::warning( this->main_window_, "Create a new Project?",
@@ -554,11 +554,11 @@ void AppMenu::enable_disable_layer_actions()
   LayerManager::Instance()->get_layers( layer_list );
   for( size_t i = 0; i < layer_list.size(); ++i )
   {
-    if( layer_list[ i ]->type() == Core::VolumeType::MASK_E )
+    if( layer_list[ i ]->get_type() == Core::VolumeType::MASK_E )
     {
       mask_layer_found = true;
     }
-    if( layer_list[ i ]->type() == Core::VolumeType::DATA_E)
+    if( layer_list[ i ]->get_type() == Core::VolumeType::DATA_E)
     {
       data_layer_found = true;
     }

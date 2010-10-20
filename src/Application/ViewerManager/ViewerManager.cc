@@ -51,10 +51,10 @@ ViewerManager::ViewerManager() :
   StateHandler( "view", false ),
   signal_block_count_( 0 )
 {
+  // Step (1)
   // Allow states to be set from outside of the application thread
   this->set_initializing( true );
 
-  // Step (1)
   // Set the default state of this element
   this->add_state( "layout", this->layout_state_, PreferencesManager::Instance()->
     default_viewer_mode_state_->export_to_string(), PreferencesManager::Instance()->

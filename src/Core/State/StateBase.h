@@ -122,6 +122,10 @@ protected:
   // Query whether the state variable and its parent are still being initialized.
   bool get_initializing();
   
+  // SET_IS_PROJECT_DATA:
+  // Set whether the data is part of the project data
+  void set_is_project_data( bool is_project_data );
+
   // -- session handling -- 
 public:
   enum 
@@ -144,6 +148,10 @@ public:
   // GET_STATEID:
   // Get the unique id assigned to the state variable
   std::string get_stateid() const;
+
+  // IS_PROJECT_DATA:
+  // Whether the data is tagged as project data that is saved in a session
+  bool is_project_data() const;
 
   // -- signal handling --
 public:

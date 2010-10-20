@@ -192,7 +192,7 @@ void ProjectDockWidget::load_session()
   {
     if ( ProjectManager::Instance()->current_project_ )
     {
-      if ( ProjectManager::Instance()->current_project_->check_changed() )
+      if ( ProjectManager::Instance()->current_project_->check_project_changed() )
       {
 
         // Check whether the users wants to save and whether the user wants to quit

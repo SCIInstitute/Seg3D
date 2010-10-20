@@ -44,6 +44,7 @@ class ActionPickPoint : public Core::Action
 CORE_ACTION(
   CORE_ACTION_TYPE( "Pick", "Pick a new point to align slices with." )
   CORE_ACTION_ARGUMENT( "point", "The new pick point." )
+  CORE_ACTION_CHANGES_PROJECT_DATA()
 )
 
 public:

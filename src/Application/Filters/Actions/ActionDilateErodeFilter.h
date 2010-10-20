@@ -47,6 +47,7 @@ CORE_ACTION(
   CORE_ACTION_KEY( "erode_radius", "1", "The distance in pixels over which the filter erodes a mask." )
   CORE_ACTION_KEY( "mask", "<none>", "Only modify data within the mask." )
   CORE_ACTION_KEY( "invert_mask", "false", "Whether the mask needs to be inverted." ) 
+  CORE_ACTION_CHANGES_PROJECT_DATA()
 )
   
   // -- Constructor/Destructor --

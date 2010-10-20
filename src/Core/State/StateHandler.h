@@ -182,6 +182,10 @@ public:
   // returns true if the function hasn't been invalidated
   bool is_valid();
 
+  // MARK_AS_PROJECT_DATA:
+  // Mask the states that are added to this state handler as project data
+  void mark_as_project_data();
+
 protected:
 
   // CLEAN_UP:

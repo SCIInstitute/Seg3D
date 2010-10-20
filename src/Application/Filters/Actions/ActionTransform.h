@@ -46,8 +46,9 @@ CORE_ACTION(
   CORE_ACTION_ARGUMENT( "origin", "The new origin." )
   CORE_ACTION_ARGUMENT( "spacing", "The new spacing." )
   CORE_ACTION_KEY( "replace", "false", "Whether to delete the input layers afterwards." )
+  CORE_ACTION_CHANGES_PROJECT_DATA()
 )
-  
+
   // -- Constructor/Destructor --
 public:
   ActionTransform();

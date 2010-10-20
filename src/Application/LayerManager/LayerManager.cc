@@ -147,6 +147,8 @@ LayerManager::LayerManager() :
   StateHandler( "layermanager", false ),
   private_( new LayerManagerPrivate )
 { 
+  this->mark_as_project_data();
+
   this->add_state( "active_layer", this->active_layer_state_, "", "" );
   this->private_->signal_block_count_ = 0;
   this->private_->layer_manager_ = this;
@@ -360,7 +362,7 @@ bool LayerManager::move_layer_below( LayerHandle layer_to_move, LayerHandle targ
 bool LayerManager::validate_layer_move( LayerHandle layer_above, LayerHandle layer_below )
 {
   // Validate the most common move
-  if( layer_above->type() == layer_below->type() )
+  if( layer_above->get_type() == layer_below->get_type() )
     return true;
   
   return false;
@@ -666,7 +668,7 @@ LayerSceneHandle LayerManager::compose_layer_scene( size_t viewer_id )
 
       LayerSceneItemHandle layer_scene_item;
 
-      switch( layer->type() )
+      switch( layer->get_type() )
       {
       case Core::VolumeType::DATA_E:
         {
@@ -744,7 +746,7 @@ void LayerManager::get_layer_names( std::vector< LayerIDNamePair >& layer_names,
     // NOTE: Only if a layer is valid do we save it in a session. An example of an invalid
     // layer is for instance a layer that was just created, but hasn't finished processing
     // its data.
-    if ( layers[ i ]->has_valid_data() && ( layers[ i ]->type() & type ) )
+    if ( layers[ i ]->has_valid_data() && ( layers[ i ]->get_type() & type ) )
     {
       layer_names.push_back( std::make_pair( layers[ i ]->get_layer_id(), 
         layers[ i ]->get_layer_name() ) );
@@ -765,7 +767,7 @@ void LayerManager::get_layer_names_from_group( LayerGroupHandle group,
     // NOTE: Only if a layer is valid do we save it in a session. An example of an invalid
     // layer is for instance a layer that was just created, but hasn't finished processing
     // its data.
-    if ( layers[ i ]->has_valid_data() && ( layers[ i ]->type() & type ) )
+    if ( layers[ i ]->has_valid_data() && ( layers[ i ]->get_type() & type ) )
     {
       layer_names.push_back( std::make_pair( layers[ i ]->get_layer_id(), 
         layers[ i ]->get_layer_name() ) );
@@ -921,7 +923,7 @@ bool LayerManager::CheckLayerExistanceAndType( const std::string& layer_id, Core
   }
 
   // Check whether the type of the layer is correct
-  if ( layer->type() != type )
+  if ( layer->get_type() != type )
   {
     if ( type == Core::VolumeType::DATA_E )
     {

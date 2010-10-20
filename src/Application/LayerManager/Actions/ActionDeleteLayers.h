@@ -46,6 +46,7 @@ class ActionDeleteLayers : public ActionLayer
 CORE_ACTION( 
   CORE_ACTION_TYPE( "DeleteLayers", "Delete selected layers from a group and the group if it will become empty.")
   CORE_ACTION_ARGUMENT( "groupid", "The groupid of the selected layers that needs to be deleted." )
+  CORE_ACTION_CHANGES_PROJECT_DATA()
 )
   
   // -- Constructor/Destructor --

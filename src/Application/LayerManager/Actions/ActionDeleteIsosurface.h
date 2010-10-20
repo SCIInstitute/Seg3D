@@ -46,6 +46,7 @@ class ActionDeleteIsosurface : public ActionLayer
 CORE_ACTION( 
   CORE_ACTION_TYPE( "DeleteIsosurface", "Delete isosurface for the selected layer.")
   CORE_ACTION_ARGUMENT( "layerid", "The layerid of the layer for which the isosurface should be deleted." )
+  CORE_ACTION_CHANGES_PROJECT_DATA()
 )
   
   // -- Constructor/Destructor --

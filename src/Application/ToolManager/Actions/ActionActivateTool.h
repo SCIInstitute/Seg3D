@@ -41,6 +41,7 @@ class ActionActivateTool : public Core::Action
 CORE_ACTION( 
   CORE_ACTION_TYPE( "ActivateTool", "Activate a tool so it becomes the active tool." )
   CORE_ACTION_ARGUMENT( "toolid", "Toolid of the tool that needs to be activated." )
+  CORE_ACTION_CHANGES_PROJECT_DATA()
 )
   // -- Constructor/Destructor --
 public:

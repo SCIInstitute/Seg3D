@@ -79,4 +79,21 @@ bool ActionTranslateView::run( ActionContextHandle& context, ActionResultHandle&
   return false;
 }
 
+bool ActionTranslateView::changes_project_data()
+{
+  StateBaseHandle state( state_weak_handle_.lock() );
+
+  // If not the state cannot be retrieved report an error
+  if ( !state )
+  {
+    if ( !( StateEngine::Instance()->get_state( stateid_.value(), state ) ) )
+    {
+      return false;
+    }
+  }
+
+  // Keep track of whether the state changes the data of the program
+  return state->is_project_data();
+}
+
 } // end namespace Core

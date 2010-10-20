@@ -41,6 +41,7 @@ class ActionOpenTool : public Core::Action
 CORE_ACTION( 
   CORE_ACTION_TYPE( "OpenTool", "Open a new tool of a certain type." )
   CORE_ACTION_ARGUMENT( "tooltype", "Type of the tool that needs to be opened.")
+  CORE_ACTION_CHANGES_PROJECT_DATA()
 )
 
   // -- Constructor/Destructor --

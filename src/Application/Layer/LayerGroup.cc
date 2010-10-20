@@ -257,14 +257,14 @@ void LayerGroup::insert_layer( LayerHandle new_layer )
 { 
   new_layer->set_layer_group( this->shared_from_this() );
 
-  if( new_layer->type() == Core::VolumeType::MASK_E )
+  if( new_layer->get_type() == Core::VolumeType::MASK_E )
   { 
     this->layer_list_.push_front( new_layer );
   }
   else
   {
     layer_list_type::iterator it = std::find_if( this->layer_list_.begin(), 
-      this->layer_list_.end(), boost::lambda::bind( &Layer::type, 
+      this->layer_list_.end(), boost::lambda::bind( &Layer::get_type, 
       boost::lambda::bind( &LayerHandle::get, boost::lambda::_1 ) ) 
       == Core::VolumeType::DATA_E );
     this->layer_list_.insert( it, new_layer );
@@ -311,7 +311,7 @@ void LayerGroup::get_layer_names( std::vector< LayerIDNamePair >& layer_names,
   layer_list_type::const_iterator it = this->layer_list_.begin();
   for ( ; it != this->layer_list_.end(); it++ )
   {
-    if ( ( *it )->type() & type )
+    if ( ( *it )->get_type() & type )
     {
       layer_names.push_back( std::make_pair( ( *it )->get_layer_id(),
         ( *it )->get_layer_name() ) );
@@ -327,7 +327,7 @@ void LayerGroup::get_layer_names( std::vector< LayerIDNamePair >& layer_names,
   layer_list_type::const_iterator it = this->layer_list_.begin();
   for ( ; it != this->layer_list_.end(); it++ )
   {
-    if ( *it != excluded_layer && ( ( *it )->type() & type ) )
+    if ( *it != excluded_layer && ( ( *it )->get_type() & type ) )
     {
       layer_names.push_back( std::make_pair( ( *it )->get_layer_id(),
         ( *it )->get_layer_name() ) );

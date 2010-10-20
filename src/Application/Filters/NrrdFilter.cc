@@ -65,7 +65,7 @@ bool NrrdFilter::get_nrrd_from_layer( const LayerHandle& layer, Core::NrrdDataHa
   Core::Transform transform;
   
   // If the layer is a data layer
-  if ( layer->type() == Core::VolumeType::DATA_E )
+  if ( layer->get_type() == Core::VolumeType::DATA_E )
   {
     DataLayerHandle data = boost::dynamic_pointer_cast<DataLayer>( layer );
     Core::DataVolumeHandle volume = data->get_data_volume();
@@ -74,7 +74,7 @@ bool NrrdFilter::get_nrrd_from_layer( const LayerHandle& layer, Core::NrrdDataHa
     transform = volume->get_transform();
   }
   // If the layer is a mask layer
-  else if ( layer->type() == Core::VolumeType::MASK_E )
+  else if ( layer->get_type() == Core::VolumeType::MASK_E )
   {
     MaskLayerHandle mask = boost::dynamic_pointer_cast<MaskLayer>( layer );
     Core::MaskVolumeHandle volume = mask->get_mask_volume();
@@ -112,7 +112,7 @@ bool NrrdFilter::create_nrrd( Core::NrrdDataHandle& nrrd_data )
 bool NrrdFilter::insert_nrrd_into_layer( const LayerHandle& layer, Core::NrrdDataHandle nrrd_data )
 {
   // If the layer is a data layer
-  if ( layer->type() == Core::VolumeType::DATA_E )
+  if ( layer->get_type() == Core::VolumeType::DATA_E )
   {
     DataLayerHandle data_layer = boost::dynamic_pointer_cast<DataLayer>( layer );
 
@@ -132,7 +132,7 @@ bool NrrdFilter::insert_nrrd_into_layer( const LayerHandle& layer, Core::NrrdDat
     return true;
   }
   // If the layer is a mask layer
-  else if ( layer->type() == Core::VolumeType::MASK_E )
+  else if ( layer->get_type() == Core::VolumeType::MASK_E )
   {
     MaskLayerHandle mask_layer = boost::dynamic_pointer_cast<MaskLayer>( layer );
         

@@ -46,6 +46,7 @@ CORE_ACTION(
   CORE_ACTION_KEY( "replace", "true", "Replace the old layer (true), or add an new mask layer (false)." )
   CORE_ACTION_KEY( "invert_mask", "false", "Whether the mask needs to be inverted." )
   CORE_ACTION_KEY( "replace_with", "zero", "What the not masked region should be replaced with." )
+  CORE_ACTION_CHANGES_PROJECT_DATA()
 )
   
   // -- Constructor/Destructor --

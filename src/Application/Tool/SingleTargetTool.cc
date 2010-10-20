@@ -128,7 +128,7 @@ void SingleTargetToolPrivate::handle_active_layer_changed( LayerHandle layer )
   }
   else
   {
-    this->tool_->valid_target_state_->set( ( layer->type() & this->target_type_ ) != 0 && 
+    this->tool_->valid_target_state_->set( ( layer->get_type() & this->target_type_ ) != 0 && 
       layer->has_valid_data() );
     this->tool_->target_layer_state_->set( this->tool_->valid_target_state_->get() ? 
       layer->get_layer_id() : Tool::NONE_OPTION_C );
@@ -143,7 +143,7 @@ void SingleTargetToolPrivate::handle_use_active_layer_changed( bool use_active_l
   {
     LayerHandle layer = LayerManager::Instance()->get_active_layer();
     this->tool_->valid_target_state_->set( layer && layer->has_valid_data() &&
-      ( layer->type() & this->target_type_ ) );
+      ( layer->get_type() & this->target_type_ ) );
     this->tool_->target_layer_state_->set( this->tool_->valid_target_state_->get() ? 
       layer->get_layer_id() : Tool::NONE_OPTION_C );
     this->update_dependent_layers();
@@ -155,7 +155,7 @@ void SingleTargetToolPrivate::handle_target_layer_changed( std::string layer_id 
   if ( this->tool_->use_active_layer_state_->get() )
   {
     LayerHandle active_layer = LayerManager::Instance()->get_active_layer();
-    if ( active_layer && ( active_layer->type() & this->target_type_ ) && 
+    if ( active_layer && ( active_layer->get_type() & this->target_type_ ) && 
       layer_id != active_layer->get_layer_id() )
     {
       this->tool_->target_layer_state_->set( active_layer->get_layer_id() );
@@ -164,7 +164,7 @@ void SingleTargetToolPrivate::handle_target_layer_changed( std::string layer_id 
       return;
     }
 
-    if ( !active_layer || ( active_layer && !(active_layer->type() & this->target_type_ ) 
+    if ( !active_layer || ( active_layer && !(active_layer->get_type() & this->target_type_ ) 
       && layer_id != Tool::NONE_OPTION_C ) )
     {
       this->tool_->target_layer_state_->set( Tool::NONE_OPTION_C );
@@ -192,7 +192,7 @@ void SingleTargetToolPrivate::handle_layers_changed()
 void SingleTargetToolPrivate::handle_layer_name_changed( std::string layer_id )
 {
   LayerHandle layer = LayerManager::Instance()->get_layer_by_id( layer_id );
-  if ( layer->type() & this->target_type_ )
+  if ( layer->get_type() & this->target_type_ )
   {
     this->handle_layers_changed();
     return;
@@ -200,7 +200,7 @@ void SingleTargetToolPrivate::handle_layer_name_changed( std::string layer_id )
   
   for ( size_t j = 0; j < this->dependent_layer_types_.size(); j++ )
   {
-    if ( layer->type() & this->dependent_layer_types_[ j ] )
+    if ( layer->get_type() & this->dependent_layer_types_[ j ] )
     {
       this->handle_layers_changed();
       return;

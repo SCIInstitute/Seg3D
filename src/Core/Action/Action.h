@@ -113,9 +113,9 @@ public:
   
   // -- query overloadable data ( from the action info if not overloaded ) --
 public:
-  // GET_CHANGES_DATA:
+  // CHANGES_PROJECT_DATA:
   // Query whether the action changes the data
-  virtual bool get_changes_data() const;
+  virtual bool changes_project_data();
   
   // -- Run/Validate interface --
 public:
@@ -237,8 +237,8 @@ private:
 #define CORE_ACTION_KEY( name, default_value, description ) \
 "<key name=\"" name "\" default=\"" default_value "\"> " description "</key>"
 
-#define CORE_ACTION_CHANGES_DATA() \
-"<changesdata/>"
+#define CORE_ACTION_CHANGES_PROJECT_DATA() \
+"<changes_project_data/>"
 
 #define CORE_ACTION(definition_string) \
 public: \

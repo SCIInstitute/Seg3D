@@ -60,7 +60,7 @@ public:
 
   // TYPE
   // Get the type of the layer
-  virtual Core::VolumeType type() const { return Core::VolumeType::LABEL_E; }
+  virtual Core::VolumeType get_type() const { return Core::VolumeType::LABEL_E; }
   
   // GET_GRID_TRANSFORM:
   // Get the transform of the layer

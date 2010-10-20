@@ -122,6 +122,10 @@ public:
   // function that returns whether or not the program  is currently in the process of saving
   bool is_saving() const;
 
+  // GET_CURRENT_PROJECT:
+  // Get the current project
+  ProjectHandle get_current_project() const;
+
 public:
   Core::StateStringVectorHandle recent_projects_state_;
   Core::StateStringHandle     current_project_path_state_;

@@ -41,6 +41,7 @@ class ActionSnap : public Core::Action
 CORE_ACTION( 
   CORE_ACTION_TYPE( "Snap", "Snap the camera to the closest axis." )
   CORE_ACTION_ARGUMENT( "viewerid", "The ID of the viewer to run this action on." )
+  CORE_ACTION_CHANGES_PROJECT_DATA()
 )
 
 public:

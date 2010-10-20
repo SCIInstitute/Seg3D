@@ -179,7 +179,7 @@ void SegmentationSelectionPage::initializePage()
       {
         group_with_active_layer = i;
       }
-      if( ( *it )->type() == Core::VolumeType::MASK_E )
+      if( ( *it )->get_type() == Core::VolumeType::MASK_E )
       {
         QTreeWidgetItem *mask = new QTreeWidgetItem( group );
         mask->setFlags( Qt::ItemIsUserCheckable | Qt::ItemIsEnabled );

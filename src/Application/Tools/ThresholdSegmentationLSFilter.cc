@@ -81,12 +81,12 @@ void ThresholdSegmentationLSFilter::handle_layers_changed()
   
   for( int i = 0; i < static_cast< int >( target_layers.size() ); ++i )
   {
-    if( ( this->target_layer_state_->get() == "<none>" ) && ( target_layers[i]->type() == 
+    if( ( this->target_layer_state_->get() == "<none>" ) && ( target_layers[i]->get_type() == 
                                  Core::VolumeType::DATA_E ) )
     {
       this->target_layer_state_->set( target_layers[i]->get_layer_name(), Core::ActionSource::NONE_E );
     }
-    if( ( this->mask_layer_state_->get() == "<none>" ) && ( target_layers[i]->type() == 
+    if( ( this->mask_layer_state_->get() == "<none>" ) && ( target_layers[i]->get_type() == 
                                  Core::VolumeType::MASK_E ) )
     {
       this->mask_layer_state_->set( target_layers[i]->get_layer_name(), Core::ActionSource::NONE_E );

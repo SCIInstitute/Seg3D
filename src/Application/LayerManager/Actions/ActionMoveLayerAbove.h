@@ -43,6 +43,7 @@ CORE_ACTION(
   CORE_ACTION_ARGUMENT( "layerid", "Layerid of the layer that needs to be moved." )
   CORE_ACTION_ARGUMENT( "slot_layerid", "Layerid of the layer above the layer needs to be inserted." )
   CORE_ACTION_KEY( "above", "true", "Whether the layer needs to inserted above or below the target layer.")
+  CORE_ACTION_CHANGES_PROJECT_DATA()
 )
   
   // -- Constructor/Destructor --

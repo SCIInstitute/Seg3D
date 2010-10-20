@@ -77,7 +77,7 @@ protected:
     Core::Transform transform;
     
     // If the layer is a data layer
-    if ( layer->type() == Core::VolumeType::DATA_E )
+    if ( layer->get_type() == Core::VolumeType::DATA_E )
     {
       DataLayerHandle data = boost::dynamic_pointer_cast<DataLayer>( layer );
       Core::DataVolumeHandle volume = data->get_data_volume();
@@ -103,7 +103,7 @@ protected:
       transform = volume->get_transform();
     }
     // If the layer is a mask layer
-    else if ( layer->type() == Core::VolumeType::MASK_E )
+    else if ( layer->get_type() == Core::VolumeType::MASK_E )
     {
       MaskLayerHandle mask = boost::dynamic_pointer_cast<MaskLayer>( layer );
       Core::MaskVolumeHandle volume = mask->get_mask_volume();
@@ -156,7 +156,7 @@ protected:
   {
   
     // If the layer is a data layer
-    if ( layer->type() == Core::VolumeType::DATA_E )
+    if ( layer->get_type() == Core::VolumeType::DATA_E )
     {
       DataLayerHandle data_layer = boost::dynamic_pointer_cast<DataLayer>( layer );
 
@@ -170,7 +170,7 @@ protected:
       return true;
     }
     // If the layer is a mask layer
-    else if ( layer->type() == Core::VolumeType::MASK_E )
+    else if ( layer->get_type() == Core::VolumeType::MASK_E )
     {
       MaskLayerHandle mask_layer = boost::dynamic_pointer_cast<MaskLayer>( layer );
           
@@ -220,7 +220,7 @@ protected:
   bool insert_itk_label_pointer_into_mask_layer( const LayerHandle& layer, 
     typename itk::Image<T,3>::Pointer itk_image, T label )
   {
-    if ( layer->type() == Core::VolumeType::MASK_E )
+    if ( layer->get_type() == Core::VolumeType::MASK_E )
     {
       MaskLayerHandle mask_layer = boost::dynamic_pointer_cast<MaskLayer>( layer );
           
@@ -270,7 +270,7 @@ protected:
   {
   
     // If the layer is a data layer
-    if ( layer->type() == Core::VolumeType::DATA_E )
+    if ( layer->get_type() == Core::VolumeType::DATA_E )
     {
       DataLayerHandle data_layer = boost::dynamic_pointer_cast<DataLayer>( layer );
 
@@ -302,7 +302,7 @@ protected:
       return true;
     }
     // If the layer is a mask layer
-    else if ( layer->type() == Core::VolumeType::MASK_E )
+    else if ( layer->get_type() == Core::VolumeType::MASK_E )
     {
       MaskLayerHandle mask_layer = boost::dynamic_pointer_cast<MaskLayer>( layer );
           

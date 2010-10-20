@@ -62,7 +62,7 @@ public:
 public:
   // TYPE:
   // This function returns the a Core::VolumeType indicating that this is a MaskLayer.
-  virtual Core::VolumeType type() const { return Core::VolumeType::MASK_E; }
+  virtual Core::VolumeType get_type() const { return Core::VolumeType::MASK_E; }
 
   // GET_GRID_TRANSFORM:
   // This function returns the grid transform of the mask volume.

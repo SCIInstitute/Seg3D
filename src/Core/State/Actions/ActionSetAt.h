@@ -55,8 +55,13 @@ public:
   } 
   virtual ~ActionSetAt() {}
 
+  // -- Functions that describe action --
   virtual bool validate( ActionContextHandle& context );
   virtual bool run( ActionContextHandle& context, ActionResultHandle& result );
+
+  // -- Function that describes whether the action changes the data of the program --
+  virtual bool changes_project_data();
+
 
 private:
   ActionParameter< std::string > stateid_;

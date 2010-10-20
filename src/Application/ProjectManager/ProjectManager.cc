@@ -58,10 +58,10 @@ ProjectManager::ProjectManager() :
   std::vector< std::string> projects;
   projects.resize( 20, "" );
 
-  add_state( "recent_projects", this->recent_projects_state_, projects );
-  add_state( "current_project_path", this->current_project_path_state_, 
+  this->add_state( "recent_projects", this->recent_projects_state_, projects );
+  this->add_state( "current_project_path", this->current_project_path_state_, 
     PreferencesManager::Instance()->project_path_state_->get() );
-  add_state( "default_project_name_counter", this->default_project_name_counter_state_, 0 );
+  this->add_state( "default_project_name_counter", this->default_project_name_counter_state_, 0 );
 
   try
   {
@@ -557,6 +557,12 @@ void ProjectManager::set_project_path( boost::filesystem::path path )
   this->current_project_->set_project_path( path );
   this->current_project_path_state_->set( path.parent_path().string() );
 }
+
+Seg3D::ProjectHandle ProjectManager::get_current_project() const
+{
+  return this->current_project_;
+}
+
 
 
 } // end namespace seg3D

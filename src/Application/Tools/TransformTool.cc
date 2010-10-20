@@ -511,7 +511,7 @@ void TransformTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
     if ( show_preview )
     {
       LayerHandle layer = LayerManager::Instance()->get_layer_by_id( preview_layer );
-      switch ( layer->type() )
+      switch ( layer->get_type() )
       {
       case Core::VolumeType::MASK_E:
         {

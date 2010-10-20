@@ -112,9 +112,9 @@ public:
   // Check the validity of the action description
   bool is_valid() const;
   
-  // GET_CHANGES_DATA:
+  // GET_CHANGES_PROJECT_DATA:
   // Check whether the action changes the data of the program
-  bool get_changes_data() const;
+  bool get_changes_project_data() const;
   
 private:
   // Private implementation of this class

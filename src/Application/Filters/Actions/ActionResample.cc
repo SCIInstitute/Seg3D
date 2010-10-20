@@ -267,7 +267,7 @@ bool ResampleAlgo::compute_output_grid_transform( const std::string& input_layer
   LayerHandle layer;
   this->find_layer( input_layerid, layer );
   Core::DataBlockHandle input_datablock;
-  switch ( layer->type() )
+  switch ( layer->get_type() )
   {
   case Core::VolumeType::DATA_E:
     input_datablock = static_cast< DataLayer* >( layer.get() )->
@@ -457,7 +457,7 @@ void ResampleAlgo::run()
   
   for ( size_t i = 0; i < this->src_layers_.size(); ++i )
   {
-    switch ( this->src_layers_[ i ]->type() )
+    switch ( this->src_layers_[ i ]->get_type() )
     {
     case Core::VolumeType::DATA_E:
       this->resmaple_data_layer(
@@ -644,7 +644,7 @@ bool ActionResample::run( Core::ActionContextHandle& context,
       algo->lock_for_use( algo->src_layers_[ i ] );
     }
 
-    switch ( algo->src_layers_[ i ]->type() )
+    switch ( algo->src_layers_[ i ]->get_type() )
     {
     case Core::VolumeType::DATA_E:
       algo->create_and_lock_data_layer( output_transform, 

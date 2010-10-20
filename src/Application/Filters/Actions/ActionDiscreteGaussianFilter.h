@@ -47,6 +47,7 @@ CORE_ACTION(
   CORE_ACTION_KEY( "preserve_data_format", "true", "ITK filters run in floating point percision,"
     " this option will convert the result back into the original format." )
   CORE_ACTION_KEY( "blurring_distance", "2.0", "The amount of blurring." )
+  CORE_ACTION_CHANGES_PROJECT_DATA()
 )
   
   // -- Constructor/Destructor --

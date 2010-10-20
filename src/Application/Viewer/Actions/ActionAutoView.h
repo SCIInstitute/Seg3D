@@ -41,6 +41,7 @@ class ActionAutoView : public Core::Action
 CORE_ACTION( 
   CORE_ACTION_TYPE( "AutoView", "Set camera of viewer to a reasonable default." )
   CORE_ACTION_ARGUMENT( "viewerid", "The viewerid of the viewer that needs auto view." )
+  CORE_ACTION_CHANGES_PROJECT_DATA()
 )
 
 public:

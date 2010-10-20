@@ -45,6 +45,9 @@ public:
 
   // The session saving/loading priority
   int session_priority_;
+
+  // Whether the data is part of the session data
+  bool is_project_data_;
 };
 
 StateBase::StateBase(const std::string& stateid) :
@@ -54,6 +57,7 @@ StateBase::StateBase(const std::string& stateid) :
   this->private_->signals_enabled_ = true;
   this->private_->initializing_ = false;
   this->private_->session_priority_ = DEFAULT_LOAD_E;
+  this->private_->is_project_data_ = false;
 }
 
 StateBase::~StateBase()
@@ -100,5 +104,17 @@ void StateBase::set_session_priority( int priority )
 void StateBase::invalidate()
 {
 }
+
+bool StateBase::is_project_data() const
+{
+  return this->private_->is_project_data_;
+}
+
+void StateBase::set_is_project_data( bool is_project_data )
+{
+  this->private_->is_project_data_ = is_project_data;
+}
+
+
 
 } // end namespace Core

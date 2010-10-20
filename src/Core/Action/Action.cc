@@ -76,9 +76,9 @@ int Action::get_key_index( const std::string& key ) const
   return this->get_action_info()->get_key_index( key );
 }
 
-bool Action::get_changes_data() const
+bool Action::changes_project_data()
 {
-  return this->get_action_info()->get_changes_data();
+  return this->get_action_info()->get_changes_project_data();
 }
 
 std::string Action::get_default_key_value( size_t index ) const

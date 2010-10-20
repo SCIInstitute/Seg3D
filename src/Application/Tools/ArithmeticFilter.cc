@@ -90,7 +90,7 @@ void ArithmeticFilter::update_output_type()
   LayerHandle layer = LayerManager::Instance()->get_layer_by_id( this->target_layer_state_->get() );
   if ( layer )
   {
-    if ( layer->type() == Core::VolumeType::DATA_E ) 
+    if ( layer->get_type() == Core::VolumeType::DATA_E ) 
     {
       this->output_type_state_->set( ActionArithmeticFilter::DATA_C );
     }
@@ -110,9 +110,9 @@ void ArithmeticFilter::update_replace_options()
   LayerHandle layer = LayerManager::Instance()->get_layer_by_id( this->target_layer_state_->get() );
   if( layer )
   {
-    if( ( layer->type() == Core::VolumeType::DATA_E && 
+    if( ( layer->get_type() == Core::VolumeType::DATA_E && 
       this->output_type_state_->get() == ActionArithmeticFilter::DATA_C ) ||
-      ( layer->type() == Core::VolumeType::MASK_E && 
+      ( layer->get_type() == Core::VolumeType::MASK_E && 
       this->output_type_state_->get() == ActionArithmeticFilter::MASK_C ) )
     {
       this->input_matches_output_state_->set( true );

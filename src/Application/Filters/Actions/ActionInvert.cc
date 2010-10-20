@@ -196,7 +196,7 @@ public:
   // when the thread is launched.
   virtual void run()
   {
-    switch ( this->src_layer_->type() )
+    switch ( this->src_layer_->get_type() )
     {
     case Core::VolumeType::MASK_E:
       this->invert_mask( boost::dynamic_pointer_cast< MaskLayer >( this->src_layer_ ),
@@ -273,7 +273,7 @@ bool ActionInvert::run( Core::ActionContextHandle& context,
     algo->lock_for_use( algo->src_layer_ );
     
     // Create the destination layer, which will show progress
-    switch ( algo->src_layer_->type() )
+    switch ( algo->src_layer_->get_type() )
     {
     case Core::VolumeType::MASK_E:
       algo->create_and_lock_mask_layer_from_layer( algo->src_layer_, algo->dst_layer_ );

@@ -154,6 +154,9 @@ void Layer::initialize_states( const std::string& name, bool creating )
 {
   // Step (1) : Build the layer specific state variables
 
+  // Ensure that the states are encoded as states that change the project
+  this->mark_as_project_data();
+  
   // == The name of the layer ==
   this->add_state( "name", name_state_, name );
 
@@ -220,7 +223,7 @@ bool Layer::post_save_states( Core::StateIO& state_io )
   TiXmlElement* layer_element = state_io.get_current_element();
   assert( this->get_statehandler_id() == layer_element->Value() );
   std::string layer_type;
-  switch ( this->type() )
+  switch ( this->get_type() )
   {
   case Core::VolumeType::DATA_E:
     layer_type = "data";

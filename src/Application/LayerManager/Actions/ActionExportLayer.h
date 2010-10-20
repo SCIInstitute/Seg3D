@@ -46,6 +46,7 @@ CORE_ACTION(
   CORE_ACTION_ARGUMENT( "file_path", "A path, including the name of the file where the layer should be exported to." )
   CORE_ACTION_KEY( "mode", "data", "The mode to use: data, single_mask, bitplane_mask, or label_mask.")
   CORE_ACTION_KEY( "exporter", "", "Optional name for a specific exporter." )
+  CORE_ACTION_CHANGES_PROJECT_DATA()
 )
 
   // -- Constructor/Destructor --

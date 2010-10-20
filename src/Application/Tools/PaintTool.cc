@@ -422,7 +422,7 @@ void PaintToolPrivate::handle_active_layer_changed( LayerHandle layer )
     return;
   }
 
-  this->paint_tool_->target_layer_state_->set( layer->type() == Core::VolumeType::MASK_E ? 
+  this->paint_tool_->target_layer_state_->set( layer->get_type() == Core::VolumeType::MASK_E ? 
     layer->get_layer_id() : Tool::NONE_OPTION_C );
 }
 
@@ -432,7 +432,7 @@ void PaintToolPrivate::handle_use_active_layer_changed( bool use_active_layer )
   {
     LayerHandle layer = LayerManager::Instance()->get_active_layer();
     this->paint_tool_->target_layer_state_->set( 
-      ( layer && layer->type() == Core::VolumeType::MASK_E ) ? 
+      ( layer && layer->get_type() == Core::VolumeType::MASK_E ) ? 
       layer->get_layer_id() : Tool::NONE_OPTION_C );
   }
 }
@@ -442,14 +442,14 @@ void PaintToolPrivate::handle_target_layer_changed( std::string layer_id )
   if ( this->paint_tool_->use_active_layer_state_->get() )
   {
     LayerHandle active_layer = LayerManager::Instance()->get_active_layer();
-    if ( active_layer && active_layer->type() == Core::VolumeType::MASK_E && 
+    if ( active_layer && active_layer->get_type() == Core::VolumeType::MASK_E && 
       layer_id != active_layer->get_layer_id() )
     {
       this->paint_tool_->target_layer_state_->set( active_layer->get_layer_id() );
       return;
     }
 
-    if ( !active_layer || ( active_layer && active_layer->type() != Core::VolumeType::MASK_E 
+    if ( !active_layer || ( active_layer && active_layer->get_type() != Core::VolumeType::MASK_E 
       && layer_id != Tool::NONE_OPTION_C ) )
     {
       this->paint_tool_->target_layer_state_->set( Tool::NONE_OPTION_C );
@@ -650,7 +650,7 @@ void PaintToolPrivate::handle_data_cstr_range_changed()
 void PaintToolPrivate::handle_layer_name_changed( std::string layer_id )
 {
   LayerHandle layer = LayerManager::Instance()->get_layer_by_id( layer_id );
-  if ( layer->type() == Core::VolumeType::MASK_E )
+  if ( layer->get_type() == Core::VolumeType::MASK_E )
   {
     this->handle_layers_changed();
   }
@@ -772,7 +772,7 @@ PaintTool::PaintTool( const std::string& toolid ) :
     boost::bind( &PaintToolPrivate::handle_use_active_layer_changed, this->private_.get(), _1 ) ) );
 
   LayerHandle active_layer = LayerManager::Instance()->get_active_layer();
-  if ( active_layer && active_layer->type() == Core::VolumeType::MASK_E )
+  if ( active_layer && active_layer->get_type() == Core::VolumeType::MASK_E )
   {
     this->target_layer_state_->set( active_layer->get_layer_id() );
   }

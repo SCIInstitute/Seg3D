@@ -44,7 +44,7 @@ bool ActionCalculateMaskVolume::validate( Core::ActionContextHandle& context )
   if ( LayerManager::Instance()->get_mask_layer_by_id( this->mask_name_.value() ) ) return true;
   
   if( LayerManager::Instance()->get_layer_by_name( 
-    this->mask_name_.value() )->type() == Core::VolumeType::MASK_E )
+    this->mask_name_.value() )->get_type() == Core::VolumeType::MASK_E )
   {
     // If they passed the name instead, then we'll take the opportunity to get the id instead.
     this->mask_name_.value() = LayerManager::Instance()->get_layer_by_name( 

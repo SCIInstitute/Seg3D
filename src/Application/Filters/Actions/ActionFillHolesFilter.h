@@ -44,6 +44,7 @@ CORE_ACTION(
   CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
   CORE_ACTION_ARGUMENT( "seeds", "The seed points in world space." )
   CORE_ACTION_KEY( "replace", "true", "Replace the old layer (true), or add an new layer (false)." )
+  CORE_ACTION_CHANGES_PROJECT_DATA()
 )
   
   // -- Constructor/Destructor --

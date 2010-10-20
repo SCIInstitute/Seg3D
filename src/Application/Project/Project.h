@@ -151,10 +151,10 @@ public:
   // that the project emits when it's state variables are changed
   void set_signal_block( bool on_off );
   
-  // CHECK_CHANGED:
+  // CHECK_PROJECT_CHANGED:
   // Check whether the project was changed
-  bool check_changed();
-  
+  bool check_project_changed();
+
 protected:
   // PRE_SAVE_STATES:
   // this function synchronizes the colors if they are set to be saved with the project
@@ -173,9 +173,14 @@ private:
   // this function cleans up sessions in the session list that have been deleted by the user
   void cleanup_session_list();
 
-  // SET_CHANGED:
+public:
+  // SET_PROJECT_CHANGED:
   // Set that the session has been modified
-  void set_changed( Core::ActionHandle action, Core::ActionResultHandle result );
+  void set_project_changed( Core::ActionHandle action, Core::ActionResultHandle result );
+
+  // RESET_PROJECT_CHANGED:
+  // Reset the flag that remembers that a session has changed
+  void reset_project_changed();
 
 private:
   // Session current using

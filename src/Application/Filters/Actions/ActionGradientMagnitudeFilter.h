@@ -46,6 +46,7 @@ CORE_ACTION(
   CORE_ACTION_KEY( "replace", "true", "Replace the old layer (true), or add an new layer (false)" )
   CORE_ACTION_KEY( "preserve_data_format", "true", "ITK filters run in floating point percision,"
     " this option will convert the result back into the original format." )
+  CORE_ACTION_CHANGES_PROJECT_DATA()
 )
   
   // -- Constructor/Destructor --

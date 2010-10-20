@@ -54,6 +54,7 @@ Tool::Tool( const std::string& tool_type ) :
   StateHandler( tool_type, true ),
   private_( new ToolPrivate )
 {
+  this->mark_as_project_data();
 }
 
 Tool::~Tool()

@@ -177,7 +177,7 @@ void GroupTargetToolPrivate::handle_layer_name_changed( std::string layer_id )
   LayerHandle layer = LayerManager::Instance()->get_layer_by_id( layer_id );
   LayerGroupHandle layer_group = layer->get_layer_group();
   if ( layer_group->get_group_id() == this->tool_->target_group_state_->get() &&
-    ( layer->type() & this->target_type_ ) )
+    ( layer->get_type() & this->target_type_ ) )
   {
     this->handle_layers_changed( layer_group );
   } 

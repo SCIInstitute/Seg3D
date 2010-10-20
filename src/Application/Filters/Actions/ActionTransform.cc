@@ -106,7 +106,7 @@ void TransformAlgo::run()
 {
   for ( size_t i = 0; i < this->src_layers_.size(); ++i )
   {
-    switch ( this->src_layers_[ i ]->type() )
+    switch ( this->src_layers_[ i ]->get_type() )
     {
     case Core::VolumeType::DATA_E:
       this->transform_data_layer(
@@ -329,7 +329,7 @@ bool ActionTransform::run( Core::ActionContextHandle& context,
       algo->lock_for_use( algo->src_layers_[ i ] );
     }
 
-    switch ( algo->src_layers_[ i ]->type() )
+    switch ( algo->src_layers_[ i ]->get_type() )
     {
     case Core::VolumeType::DATA_E:
       algo->create_and_lock_data_layer( this->private_->output_grid_trans_, 

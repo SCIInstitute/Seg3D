@@ -46,6 +46,7 @@ CORE_ACTION(
   CORE_ACTION_TYPE( "OffsetSlice", "Move the current slice to new location." )
   CORE_ACTION_ARGUMENT( "viewerid", "The viewerid of the viewer that needs a new location." )
   CORE_ACTION_ARGUMENT( "offset", "The offset by which to move the current slice." )
+  CORE_ACTION_CHANGES_PROJECT_DATA()
 )
 
 public:

@@ -100,7 +100,7 @@ void ArithmeticFilterAlgo::run()
   {
     Core::DataBlockHandle output_data_block;
     this->engine_.get_data_block( ActionArithmeticFilter::RESULT_C, output_data_block );
-    if ( this->dst_layer_->type() == Core::VolumeType::MASK_E )
+    if ( this->dst_layer_->get_type() == Core::VolumeType::MASK_E )
     {
       Core::MaskDataBlockHandle mask_data_block;
       Core::MaskDataBlockManager::Convert( output_data_block, 
@@ -166,7 +166,7 @@ bool ActionArithmeticFilterPrivate::validate_parser( Core::ActionContextHandle& 
     if ( this->algo_->find_layer( layer_ids[ i ], layers[ i ] ) )
     {
       Core::DataBlockHandle input_data_block;
-      switch ( layers[ i ]->type() )
+      switch ( layers[ i ]->get_type() )
       {
       case Core::VolumeType::MASK_E:
         if ( ! ( Core::MaskDataBlockManager::Convert( dynamic_cast< MaskLayer* >( 
@@ -244,9 +244,9 @@ bool ActionArithmeticFilterPrivate::validate_parser( Core::ActionContextHandle& 
   {
     this->algo_->dst_layer_ = layers[ 0 ];
     // Make sure the dst layer type matches the output type
-    if( !( ( this->algo_->dst_layer_->type() == Core::VolumeType::MASK_E && 
+    if( !( ( this->algo_->dst_layer_->get_type() == Core::VolumeType::MASK_E && 
       this->output_type_.value() ==  ActionArithmeticFilter::MASK_C ) ||
-      ( this->algo_->dst_layer_->type() == Core::VolumeType::DATA_E && 
+      ( this->algo_->dst_layer_->get_type() == Core::VolumeType::DATA_E && 
       this->output_type_.value() ==  ActionArithmeticFilter::DATA_C ) ) )
     {
       context->report_error( 
@@ -283,7 +283,7 @@ bool ActionArithmeticFilterPrivate::validate_parser( Core::ActionContextHandle& 
   const Core::GridTransform& grid_trans = layers[ 0 ]->get_grid_transform();
   std::string error;
 
-  if ( this->algo_->dst_layer_->type() == Core::VolumeType::MASK_E )
+  if ( this->algo_->dst_layer_->get_type() == Core::VolumeType::MASK_E )
   {
     if( !this->algo_->engine_.add_output_data_block( ActionArithmeticFilter::RESULT_C, 
       grid_trans.get_nx(), grid_trans.get_ny(), grid_trans.get_nz(), 

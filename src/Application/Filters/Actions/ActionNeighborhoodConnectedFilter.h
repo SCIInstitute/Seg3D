@@ -43,6 +43,7 @@ CORE_ACTION(
     "out pixels that are connected to the seeds and have values within threshold." )
   CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
   CORE_ACTION_ARGUMENT( "seeds", "The seed points in world space." )
+  CORE_ACTION_CHANGES_PROJECT_DATA()
 )
   
   // -- Constructor/Destructor --

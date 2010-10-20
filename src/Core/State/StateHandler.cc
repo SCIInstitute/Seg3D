@@ -62,16 +62,27 @@ public:
   
   // Keep track of which state was switched on
   bool signals_enabled_;
+
+  // Keep track of whether the statehandler is being initialized
   bool initializing_;
+
+  // Keep track whether mark as project data has been set
+  bool mark_as_project_data_;
 };
 
 
 StateHandler::StateHandler( const std::string& type_str, bool auto_id )
 {
+  // Initialize the private class
   this->private_ = new StateHandlerPrivate;
+
+  // Create a new state handler id
   this->private_->statehandler_id_ = StateEngine::Instance()->
     register_state_handler( type_str, this, auto_id );
     
+  // Get the current instantiation number of the state handler
+  // TODO: need to split this into its own function
+  // --JS
   this->private_->statehandler_id_number_ = 0;
   std::string::size_type loc = this->private_->statehandler_id_.size();
   while (  loc > 0 && this->private_->statehandler_id_[ loc - 1 ] >= '0' && 
@@ -87,9 +98,11 @@ StateHandler::StateHandler( const std::string& type_str, bool auto_id )
       this->private_->statehandler_id_number_ );
   }
   
+  // Set defaults for all the other fields in the private class
   this->private_->valid_ = true;
   this->private_->signals_enabled_ = true;
   this->private_->initializing_ = false;
+  this->private_->mark_as_project_data_ = false;
 }
 
 StateHandler::~StateHandler()
@@ -117,6 +130,11 @@ bool StateHandler::add_statebase( StateBaseHandle state )
   // Step (4): copy current state to state variable
   state->enable_signals( this->private_->signals_enabled_ );
   state->set_initializing( this->private_->initializing_ );
+
+  if ( this->private_->mark_as_project_data_ )
+  {
+    state->set_is_project_data( true );
+  }
 
   return true;
 }
@@ -412,6 +430,19 @@ void StateHandler::save_states( StateIO& state_io )
 
   this->post_save_states( state_io );
   state_io.pop_current_element();
+}
+
+void StateHandler::mark_as_project_data()
+{
+  this->private_->mark_as_project_data_ = true;
+  
+  state_map_type::iterator it_end = this->private_->state_map_.end();
+  state_map_type::iterator it = this->private_->state_map_.begin();
+  while ( it != it_end )
+  {
+    ( *it ).second->set_is_project_data( true );
+    it++;
+  }
 }
 
 } // end namespace Core

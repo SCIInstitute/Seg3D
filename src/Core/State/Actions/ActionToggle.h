@@ -62,6 +62,9 @@ public:
   virtual bool validate( ActionContextHandle& context );
   virtual bool run( ActionContextHandle& context, ActionResultHandle& result );
 
+  // -- Function that describes whether the action changes the data of the program --
+  virtual bool changes_project_data();
+
   // -- Action parameters --
 private:
   // This one describes where the state is located

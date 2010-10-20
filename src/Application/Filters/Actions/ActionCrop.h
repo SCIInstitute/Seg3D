@@ -46,6 +46,7 @@ CORE_ACTION(
   CORE_ACTION_ARGUMENT( "origin", "The origin of the crop box" )
   CORE_ACTION_ARGUMENT( "size",  "The size of the crop box" )
   CORE_ACTION_KEY( "replace", "false", "Whether to delete the input layers when done" )
+  CORE_ACTION_CHANGES_PROJECT_DATA()
 )
   
   // -- Constructor/Destructor --

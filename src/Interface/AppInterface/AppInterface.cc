@@ -174,7 +174,7 @@ AppInterface::~AppInterface()
 void AppInterface::closeEvent( QCloseEvent* event )
 {
   if ( ProjectManager::Instance()->current_project_->is_valid() && 
-    ProjectManager::Instance()->current_project_->check_changed() )
+    ProjectManager::Instance()->current_project_->check_project_changed() )
   {
 
     // Check whether the users wants to save and whether the user wants to quit

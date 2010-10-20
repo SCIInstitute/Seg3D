@@ -636,7 +636,7 @@ std::string LayerWidget::get_layer_id() const
 
 int LayerWidget::get_volume_type() const
 { 
-  return this->private_->layer_->type(); 
+  return this->private_->layer_->get_type(); 
 }
 
 void LayerWidget::set_mask_background_color( int color_index )
@@ -723,7 +723,7 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
   QMimeData *mimeData = new QMimeData;
 
   LayerHandle layer = this->private_->layer_;
-  switch ( layer->type() ) 
+  switch ( layer->get_type() ) 
   {
   case Core::VolumeType::DATA_E:
     mimeData->setText( QString::fromStdString( std::string("data|") + layer->get_layer_id() ) );

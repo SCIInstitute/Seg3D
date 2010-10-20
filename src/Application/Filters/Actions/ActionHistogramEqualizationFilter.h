@@ -44,8 +44,9 @@ CORE_ACTION(
   CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
   CORE_ACTION_KEY( "replace", "true", "Replace the old layer (true), or add an new layer (false)" )
   CORE_ACTION_KEY( "amount", "1.0", "Amount of equalization (between 0.0 and 1.0)." )
-  CORE_ACTION_KEY( "bins", "3000", "Number of bins to use for histogram equalization.")
-  CORE_ACTION_KEY( "ignore", "1", "Number of bins to ignore for histogram equalization.")
+  CORE_ACTION_KEY( "bins", "3000", "Number of bins to use for histogram equalization." )
+  CORE_ACTION_KEY( "ignore", "1", "Number of bins to ignore for histogram equalization." )
+  CORE_ACTION_CHANGES_PROJECT_DATA()
 )
   
   // -- Constructor/Destructor --

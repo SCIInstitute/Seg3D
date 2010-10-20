@@ -84,7 +84,7 @@ public:
 
   // TYPE
   // Get the type of the layer
-  virtual Core::VolumeType type() const = 0;
+  virtual Core::VolumeType get_type() const = 0;
 
   // GET_GRID_TRANSFORM:
   // Get the transform of the layer

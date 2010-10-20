@@ -48,6 +48,7 @@ CORE_ACTION(
   CORE_ACTION_KEY( "mode", "data", "The mode to use: data, single_mask, bitplane_mask, or label_mask.")
   CORE_ACTION_KEY( "importer", "", "Optional name for a specific importer." )
   CORE_ACTION_KEY( "series", "", "Optional bool to specify whether or not we are inserting a series." )
+  CORE_ACTION_CHANGES_PROJECT_DATA()
 )
 
   // -- Constructor/Destructor --

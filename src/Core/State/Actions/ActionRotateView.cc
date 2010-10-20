@@ -100,4 +100,21 @@ void ActionRotateView::Dispatch( ActionContextHandle context, StateView3DHandle&
   ActionDispatcher::PostAction( Create( view3d_state, axis, angle), context );
 }
 
+bool ActionRotateView::changes_project_data()
+{
+  StateBaseHandle state( view3d_state_.lock() );
+
+  // If not the state cannot be retrieved report an error
+  if ( !state )
+  {
+    if ( !( StateEngine::Instance()->get_state( stateid_.value(), state ) ) )
+    {
+      return false;
+    }
+  }
+
+  // Keep track of whether the state changes the data of the program
+  return state->is_project_data();
+}
+
 } // end namespace Core
