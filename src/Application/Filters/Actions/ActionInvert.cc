@@ -42,30 +42,6 @@ CORE_REGISTER_ACTION( Seg3D, Invert )
 namespace Seg3D
 {
 
-bool ActionInvert::validate( Core::ActionContextHandle& context )
-{
-  // Check for layer existence and type information
-  std::string error;
-  if ( ! LayerManager::CheckLayerExistanceAndType( this->layer_id_.value(), 
-    Core::VolumeType::DATA_E, error ) )
-  {
-    context->report_error( error );
-    return false;
-  }
-  
-  // Check for layer availability 
-  Core::NotifierHandle notifier;
-  if ( ! LayerManager::CheckLayerAvailability( this->layer_id_.value(), 
-    this->replace_.value(), notifier ) )
-  {
-    context->report_need_resource( notifier );
-    return false;
-  }
-  
-  // Validation successful
-  return true;
-}
-
 // ALGORITHM CLASS
 // This class does the actual work and is run on a separate thread.
 // NOTE: The separation of the algorithm into a private class is for the purpose of running the
@@ -75,25 +51,31 @@ class InvertFilterAlgo : public BaseFilter
 {
 
 public:
-  DataLayerHandle src_layer_;
-  DataLayerHandle dst_layer_;
+  LayerHandle src_layer_;
+  LayerHandle dst_layer_;
 
 public:
   template< class T >
-  void invert_data( Core::DataBlockHandle dst )
+  void invert_data( Core::DataBlockHandle src, DataLayerHandle dst )
   {
-    Core::DataBlockHandle src_data_block = this->src_layer_->
-      get_data_volume()->get_data_block();
-    const T* src_data = reinterpret_cast< T* >( src_data_block->get_data() );
-    T* dst_data = reinterpret_cast< T* >( dst->get_data() );
+    Core::DataBlockHandle dst_data_block = Core::StdDataBlock::New(
+      dst->get_grid_transform(), src->get_data_type() );
+    if ( !dst_data_block )  
+    {
+      this->report_error( "Could not allocate enough memory." );
+      return;
+    }
 
-    size_t z_plane_size = src_data_block->get_nx() * src_data_block->get_ny();
-    size_t nz = src_data_block->get_nz();
+    const T* src_data = reinterpret_cast< T* >( src->get_data() );
+    T* dst_data = reinterpret_cast< T* >( dst_data_block->get_data() );
+
+    size_t z_plane_size = src->get_nx() * src->get_ny();
+    size_t nz = src->get_nz();
     size_t tenth_nz = nz / 10;
 
-    Core::DataBlock::shared_lock_type lock( src_data_block->get_mutex() );
-    T min_val = static_cast< T >( src_data_block->get_min() );
-    T max_val = static_cast< T >( src_data_block->get_max() );
+    Core::DataBlock::shared_lock_type lock( src->get_mutex() );
+    T min_val = static_cast< T >( src->get_min() );
+    T max_val = static_cast< T >( src->get_max() );
     T bias = max_val + min_val;
     
     size_t index = 0;
@@ -109,10 +91,104 @@ public:
       }
       if ( z > 0 && z % tenth_nz == 0 )
       {
-        this->dst_layer_->update_progress_signal_( ( z * 1.0 ) / nz );
+        dst->update_progress_signal_( ( z * 1.0 ) / nz );
       }
     }
-    this->dst_layer_->update_progress_signal_( 1.0 );
+    dst->update_progress_signal_( 1.0 );
+
+    if ( this->check_abort() )
+    {
+      return;
+    }
+
+    this->dispatch_insert_data_volume_into_layer( dst,
+      Core::DataVolumeHandle( new Core::DataVolume( 
+      dst->get_grid_transform(), dst_data_block ) ), true );
+  }
+
+  void invert_mask( MaskLayerHandle input, MaskLayerHandle output )
+  {
+    Core::MaskDataBlockHandle mask_datablock = input->get_mask_volume()->
+      get_mask_data_block();
+    const unsigned char* src_data = mask_datablock->get_mask_data();
+    unsigned char mask_value = mask_datablock->get_mask_value();
+    Core::DataBlockHandle output_datablock = Core::StdDataBlock::New(
+      output->get_grid_transform(), Core::DataType::UCHAR_E );
+    if ( !output_datablock )
+    {
+      this->report_error( "Could not allocate enough memory." );
+      return;
+    }
+    
+    Core::MaskDataBlock::shared_lock_type lock( mask_datablock->get_mutex() );
+    unsigned char* dst_data = reinterpret_cast< unsigned char* >( output_datablock->get_data() );
+    size_t z_plane_size = mask_datablock->get_nx() * mask_datablock->get_ny();
+    size_t nz = mask_datablock->get_nz();
+    size_t tenth_nz = nz / 10;
+    size_t index = 0;
+    for ( size_t z = 0; z < nz; ++z )
+    {
+      for ( size_t i = 0; i < z_plane_size; ++i, ++index )
+      {
+        dst_data[ index ] = !( src_data[ index ] & mask_value );
+      }
+      if ( this->check_abort() )
+      {
+        return;
+      }
+      if ( z > 0 && z % tenth_nz == 0 )
+      {
+        output->update_progress_signal_( ( z * 1.0 ) / nz );
+      }
+    }
+    output->update_progress_signal_( 1.0 );
+
+    lock.unlock();
+
+    Core::MaskDataBlockHandle output_mask;
+    Core::MaskDataBlockManager::Convert( output_datablock, 
+      output->get_grid_transform(), output_mask );
+    if ( !output_mask )
+    {
+      this->report_error( "Could not allocate enough memory." );
+      return;
+    }
+    
+    this->dispatch_insert_mask_volume_into_layer( output, Core::MaskVolumeHandle( 
+      new Core::MaskVolume( output->get_grid_transform(), output_mask ) ) );
+  }
+
+  void invert_data( DataLayerHandle input, DataLayerHandle output )
+  {
+    Core::DataBlockHandle src_data_block = input->get_data_volume()->get_data_block();
+
+    switch ( input->get_data_type() )
+    {
+    case Core::DataType::CHAR_E:
+      this->invert_data< signed char >( src_data_block, output );
+      break;
+    case Core::DataType::UCHAR_E:
+      this->invert_data< unsigned char >( src_data_block, output );
+      break;
+    case Core::DataType::SHORT_E:
+      this->invert_data< short >( src_data_block, output );
+      break;
+    case Core::DataType::USHORT_E:
+      this->invert_data< unsigned short >( src_data_block, output );
+      break;
+    case Core::DataType::INT_E:
+      this->invert_data< int >( src_data_block, output );
+      break;
+    case Core::DataType::UINT_E:
+      this->invert_data< unsigned int >( src_data_block, output );
+      break;
+    case Core::DataType::FLOAT_E:
+      this->invert_data< float >( src_data_block, output );
+      break;
+    case Core::DataType::DOUBLE_E:
+      this->invert_data< double >( src_data_block, output );
+      break;
+    }
   }
 
   // RUN:
@@ -120,51 +196,17 @@ public:
   // when the thread is launched.
   virtual void run()
   {
-    Core::DataBlockHandle dst_data_block = Core::StdDataBlock::New(
-      this->src_layer_->get_grid_transform(), this->src_layer_->get_data_type() );
-      
-    if ( !dst_data_block )  
+    switch ( this->src_layer_->type() )
     {
-      this->report_error( "Could not allocate enough memory." );
-      return;
-    }   
-            
-    switch ( this->src_layer_->get_data_type() )
-    {
-    case Core::DataType::CHAR_E:
-      this->invert_data< signed char >( dst_data_block );
+    case Core::VolumeType::MASK_E:
+      this->invert_mask( boost::dynamic_pointer_cast< MaskLayer >( this->src_layer_ ),
+        boost::dynamic_pointer_cast< MaskLayer >( this->dst_layer_ ) );
       break;
-    case Core::DataType::UCHAR_E:
-      this->invert_data< unsigned char >( dst_data_block );
-      break;
-    case Core::DataType::SHORT_E:
-      this->invert_data< short >( dst_data_block );
-      break;
-    case Core::DataType::USHORT_E:
-      this->invert_data< unsigned short >( dst_data_block );
-      break;
-    case Core::DataType::INT_E:
-      this->invert_data< int >( dst_data_block );
-      break;
-    case Core::DataType::UINT_E:
-      this->invert_data< unsigned int >( dst_data_block );
-      break;
-    case Core::DataType::FLOAT_E:
-      this->invert_data< float >( dst_data_block );
-      break;
-    case Core::DataType::DOUBLE_E:
-      this->invert_data< double >( dst_data_block );
+    case Core::VolumeType::DATA_E:
+      this->invert_data( boost::dynamic_pointer_cast< DataLayer >( this->src_layer_ ),
+        boost::dynamic_pointer_cast< DataLayer >( this->dst_layer_ ) );
       break;
     }
-    
-    if ( this->check_abort() )
-    {
-      return;
-    }
-    
-    this->dispatch_insert_data_volume_into_layer( this->dst_layer_,
-      Core::DataVolumeHandle( new Core::DataVolume( 
-      this->dst_layer_->get_grid_transform(), dst_data_block ) ), true );
   }
   
   // GET_FITLER_NAME:
@@ -183,6 +225,28 @@ public:
   }
 };
 
+bool ActionInvert::validate( Core::ActionContextHandle& context )
+{
+  // Check for layer existence and type information
+  std::string error;
+  if ( ! LayerManager::CheckLayerExistance( this->layer_id_.value(), error ) )
+  {
+    context->report_error( error );
+    return false;
+  }
+
+  // Check for layer availability 
+  Core::NotifierHandle notifier;
+  if ( ! LayerManager::CheckLayerAvailability( this->layer_id_.value(), 
+    this->replace_.value(), notifier ) )
+  {
+    context->report_need_resource( notifier );
+    return false;
+  }
+
+  // Validation successful
+  return true;
+}
 
 bool ActionInvert::run( Core::ActionContextHandle& context, 
   Core::ActionResultHandle& result )
@@ -190,14 +254,11 @@ bool ActionInvert::run( Core::ActionContextHandle& context,
   // Create algorithm
   boost::shared_ptr< InvertFilterAlgo > algo( new InvertFilterAlgo );
 
-  // Find the handle to the layer
-  LayerHandle src_layer;
-  
-  if ( !( algo->find_layer( this->layer_id_.value(), src_layer ) ) )
+  // Find the handle to the layer 
+  if ( !( algo->find_layer( this->layer_id_.value(), algo->src_layer_ ) ) )
   {
     return false;
   }
-  algo->src_layer_ = boost::dynamic_pointer_cast< DataLayer >( src_layer );
 
   if ( this->replace_.value() )
   {
@@ -212,9 +273,17 @@ bool ActionInvert::run( Core::ActionContextHandle& context,
     algo->lock_for_use( algo->src_layer_ );
     
     // Create the destination layer, which will show progress
-    LayerHandle dst_layer;
-    algo->create_and_lock_data_layer_from_layer( algo->src_layer_, dst_layer );
-    algo->dst_layer_ = boost::dynamic_pointer_cast< DataLayer >( dst_layer );
+    switch ( algo->src_layer_->type() )
+    {
+    case Core::VolumeType::MASK_E:
+      algo->create_and_lock_mask_layer_from_layer( algo->src_layer_, algo->dst_layer_ );
+      break;
+    case Core::VolumeType::DATA_E:
+      algo->create_and_lock_data_layer_from_layer( algo->src_layer_, algo->dst_layer_ );
+      break;
+    default:
+      return false;
+    }
   }
 
   algo->connect_abort( algo->dst_layer_ );
