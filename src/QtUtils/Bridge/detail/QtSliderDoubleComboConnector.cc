@@ -57,6 +57,9 @@ QtSliderDoubleComboConnector::QtSliderDoubleComboConnector( QtSliderDoubleCombo*
       boost::bind( &QtSliderDoubleComboConnector::SetValue, qpointer, _1, _2 ) ) );
     this->add_connection( state->range_changed_signal_.connect(
       boost::bind( &QtSliderDoubleComboConnector::SetRange, qpointer, _1, _2, _3 ) ) );
+    this->add_connection( state->step_changed_signal_.connect(
+      boost::bind( &QtSliderDoubleComboConnector::SetStep, qpointer, _1, _2 ) ) );
+
   }
 
   this->connect( parent, SIGNAL( valueAdjusted( double ) ), SLOT( set_state_value( double ) ) );
@@ -115,6 +118,31 @@ void QtSliderDoubleComboConnector::SetRange( QPointer< QtSliderDoubleComboConnec
 
   qpointer->block();
   qpointer->parent_->setRange( min_val, max_val );
+  qpointer->unblock();
+}
+
+void QtSliderDoubleComboConnector::SetStep( QPointer< QtSliderDoubleComboConnector > qpointer, 
+                      double step, Core::ActionSource source )
+{
+  if ( source == Core::ActionSource::INTERFACE_WIDGET_E )
+  {
+    return;
+  }
+
+  if ( !Core::Interface::IsInterfaceThread() )
+  {
+    Core::Interface::PostEvent( boost::bind( &QtSliderDoubleComboConnector::SetStep,
+      qpointer, step, source ) );
+    return;
+  }
+
+  if ( qpointer.isNull() || QCoreApplication::closingDown() )
+  {
+    return;
+  }
+
+  qpointer->block();
+  qpointer->parent_->setStep( step );
   qpointer->unblock();
 }
 

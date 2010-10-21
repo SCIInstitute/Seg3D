@@ -277,6 +277,24 @@ public:
     }
   }
 
+  // SET_STEP:
+
+  void set_step( T step_value,
+    Core::ActionSource source = Core::ActionSource::NONE_E )
+  {
+    // NOTE: State variables can only be set from the application thread
+    ASSERT_IS_APPLICATION_THREAD_OR_INITIALIZING();
+
+    StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );  
+
+    this->step_value_ = step_value;
+    lock.unlock();
+    if ( this->signals_enabled() )
+    {
+      this->step_changed_signal_( step_value, source );
+    }
+  }
+
   // -- access value --
 public:
   // GET:
@@ -396,6 +414,11 @@ public:
   // This signal is triggered when the range of the state is changed
   typedef boost::signals2::signal< void( T, T, Core::ActionSource ) > range_changed_signal_type;
   range_changed_signal_type range_changed_signal_;
+
+  // STEP_CHANGED_SIGNAL:
+  // This signal is triggered when the step of the state is changed
+  typedef boost::signals2::signal< void( T, Core::ActionSource ) > step_changed_signal_type;
+  step_changed_signal_type step_changed_signal_;
 
   // -- internals of StateValue --
 private:

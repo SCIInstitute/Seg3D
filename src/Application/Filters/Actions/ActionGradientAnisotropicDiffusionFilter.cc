@@ -139,6 +139,11 @@ public:
     // are aborted. In that case we will relay a message to the status bar for information.
     try 
     { 
+      if ( this->check_abort() )
+      {
+        this->report_error( "Filter was aborted." );
+        return;
+      }
       filter->Update(); 
     } 
     catch ( ... ) 

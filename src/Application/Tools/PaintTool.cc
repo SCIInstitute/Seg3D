@@ -489,6 +489,10 @@ void PaintToolPrivate::handle_data_constraint_changed()
   double max_val = data_layer->get_data_volume()->get_data_block()->get_max();
   this->paint_tool_->lower_threshold_state_->set_range( min_val, max_val );
   this->paint_tool_->upper_threshold_state_->set_range( min_val, max_val );
+  double step = ( max_val - min_val ) / 100.0 ;
+  this->paint_tool_->lower_threshold_state_->set_step( step );
+  this->paint_tool_->upper_threshold_state_->set_step( step );
+
 }
 
 void PaintToolPrivate::update_target_options()

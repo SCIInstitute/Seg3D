@@ -57,6 +57,9 @@ private:
   static void SetRange( QPointer< QtSliderDoubleComboConnector > qpointer,
     double min_val, double max_val, Core::ActionSource source );
   
+  static void SetStep( QPointer< QtSliderDoubleComboConnector > qpointer,
+    double step, Core::ActionSource source );
+
   // -- slot functions for Qt signals --
 private Q_SLOTS:
   void set_state_value( double val );

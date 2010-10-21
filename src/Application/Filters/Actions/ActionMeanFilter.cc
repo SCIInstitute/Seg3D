@@ -130,7 +130,14 @@ public:
     } 
     catch ( ... ) 
     {
-      StatusBar::SetMessage( Core::LogMessageType::ERROR_E, "MeanFilter failed." );
+      if ( this->check_abort() )
+      {
+        this->report_error( "Filter was aborted." );
+        return;
+      }
+
+      this->report_error( "Could not allocate enough memory." );
+      return;
     }
 
     // As ITK filters generate an inconsistent abort behavior, we record our own abort flag

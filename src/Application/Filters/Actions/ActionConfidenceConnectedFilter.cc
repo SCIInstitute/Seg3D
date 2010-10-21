@@ -150,6 +150,12 @@ public:
     } 
     catch ( ... ) 
     {
+      if ( this->check_abort() )
+      {
+        this->report_error( "Filter was aborted." );
+        return;
+      }
+
       this->report_error( "Internal error." );
       return;
     }
