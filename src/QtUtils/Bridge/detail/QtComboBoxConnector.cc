@@ -52,7 +52,7 @@ QtComboBoxConnector::QtComboBoxConnector( QComboBox* parent,
     SLOT( set_state( QString ) ) );
 
   this->add_connection( state->value_changed_signal_.connect( boost::bind(
-    &QtComboBoxConnector::SetComboBoxIndexByText, qpointer, _1, _2 ) ) );
+    &QtComboBoxConnector::SetComboBoxIndexByText, qpointer, _2 ) ) );
   this->add_connection( state->optionlist_changed_signal_.connect( boost::bind(
     &QtComboBoxConnector::UpdateComboBoxItems, qpointer ) ) );
 }
@@ -74,7 +74,7 @@ QtComboBoxConnector::QtComboBoxConnector( QComboBox* parent,
     SLOT( set_state( QString ) ) );
 
   this->add_connection( state->value_changed_signal_.connect( boost::bind(
-    &QtComboBoxConnector::SetComboBoxIndexByData, qpointer, _2, _3 ) ) );
+    &QtComboBoxConnector::SetComboBoxIndexByData, qpointer, _3 ) ) );
   this->add_connection( state->optionlist_changed_signal_.connect( boost::bind(
     &QtComboBoxConnector::UpdateComboBoxItems, qpointer ) ) );
 }
@@ -95,7 +95,7 @@ void QtComboBoxConnector::set_state( const QString& value )
 
 void QtComboBoxConnector::SetComboBoxIndexByText( 
   QPointer< QtComboBoxConnector > qpointer,
-  std::string text, Core::ActionSource source )
+  Core::ActionSource source )
 {
   if ( source == Core::ActionSource::INTERFACE_WIDGET_E )
   {
@@ -105,7 +105,7 @@ void QtComboBoxConnector::SetComboBoxIndexByText(
   if ( !Core::Interface::IsInterfaceThread() )
   {
     Core::Interface::PostEvent( boost::bind( &QtComboBoxConnector::SetComboBoxIndexByText,
-      qpointer, text, source ) );
+      qpointer, source ) );
     return;
   }
 
@@ -119,6 +119,14 @@ void QtComboBoxConnector::SetComboBoxIndexByText(
 
   // set the current index in the combo box by searching for matching text
   QComboBox* combobox = qpointer->parent_;
+  std::string text;
+  {
+    // Get the current option state
+    // NOTE: Get the value from the state variable directly, the value pass by the signal
+    // might not be current.
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    text = dynamic_cast< Core::StateOption* >( qpointer->state_.get() )->get();
+  }
   int index = combobox->findText( QString( text.c_str() ) );
   if ( index != -1 )
   {
@@ -131,7 +139,7 @@ void QtComboBoxConnector::SetComboBoxIndexByText(
 
 void QtComboBoxConnector::SetComboBoxIndexByData( 
   QPointer< QtComboBoxConnector > qpointer,
-  std::string data, Core::ActionSource source )
+  Core::ActionSource source )
 {
   if ( source == Core::ActionSource::INTERFACE_WIDGET_E )
   {
@@ -141,7 +149,7 @@ void QtComboBoxConnector::SetComboBoxIndexByData(
   if ( !Core::Interface::IsInterfaceThread() )
   {
     Core::Interface::PostEvent( boost::bind( &QtComboBoxConnector::SetComboBoxIndexByData,
-      qpointer, data, source ) );
+      qpointer, source ) );
     return;
   }
 
@@ -155,10 +163,22 @@ void QtComboBoxConnector::SetComboBoxIndexByData(
 
   // set the current index in the combo box by searching for matching data
   QComboBox* combobox = qpointer->parent_;
+  std::string data;
+  {
+    // Get the current option state
+    // NOTE: Get the value from the state variable directly, the value pass by the signal
+    // might not be current.
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    data = dynamic_cast< Core::StateLabeledOption* >( qpointer->state_.get() )->get();
+  }
   int index = combobox->findData( QVariant( data.c_str() ) );
   if ( index != -1 )
   {
     combobox->setCurrentIndex( index );
+  }
+  else
+  {
+    assert( false );
   }
 
   // unblock signals
@@ -228,8 +248,8 @@ void QtComboBoxConnector::UpdateComboBoxItems( QPointer< QtComboBoxConnector > q
       combobox->clear();
       for ( int i = 0; i < num_items; i++ )
       {
-        combobox->addItem( QString( option_list[ i ].second.c_str() ),
-          QVariant( option_list[ i ].first.c_str() ) );
+        combobox->addItem( QString( option_list[ i ].second.c_str() ) );
+        combobox->setItemData( i, QVariant( option_list[ i ].first.c_str() ) );
       }
     }
     combobox->setCurrentIndex( state_labeled_option->index() );

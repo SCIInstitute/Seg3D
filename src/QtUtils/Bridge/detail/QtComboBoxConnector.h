@@ -58,10 +58,10 @@ public:
   // main Qt thread, when the Qt object pointed to by qpointer might no longer exist.
 private:
   static void SetComboBoxIndexByText( QPointer< QtComboBoxConnector > qpointer, 
-    std::string text, Core::ActionSource source );
+    Core::ActionSource source );
   
   static void SetComboBoxIndexByData( QPointer< QtComboBoxConnector > qpointer, 
-    std::string data, Core::ActionSource source );
+    Core::ActionSource source );
 
   static void UpdateComboBoxItems( QPointer< QtComboBoxConnector > qpointer );
 
