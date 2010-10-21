@@ -119,6 +119,7 @@ void ViewerWidgetPrivate::HandleViewModeChanged( ViewerWidgetQWeakHandle viewer_
     viewer_widget->private_->ui_.flip_horizontal_button_->setChecked( view2d_state->x_flipped() );
     viewer_widget->private_->ui_.flip_vertical_button_->setChecked( view2d_state->y_flipped() );
   }
+  viewer_widget->resize( viewer_widget->width(), viewer_widget->height() );
 }
 
 

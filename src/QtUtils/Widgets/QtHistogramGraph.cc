@@ -41,7 +41,8 @@ namespace QtUtils
 
 QtHistogramGraph::QtHistogramGraph( QWidget *parent )
     : QWidget( parent ),
-    logarithmic_( false )
+    logarithmic_( false ),
+    left_click_( false )
 {
     setBackgroundRole( QPalette::Base );
     setAutoFillBackground( true );
@@ -124,10 +125,12 @@ void QtHistogramGraph::mousePressEvent( QMouseEvent* e )
 {
   if( e->button() == Qt::LeftButton )
   {
+    this->left_click_ = true;
     Q_EMIT upper_position( e->pos().x() );
   }
   else if( e->button() == Qt::RightButton )
   {
+    this->left_click_ = false;
     Q_EMIT lower_position( e->pos().x() );
   }
 }
@@ -137,6 +140,19 @@ void QtHistogramGraph::switch_between_linear_log_histogram()
   this->logarithmic_ = !this->logarithmic_;
   this->repaint();
 }
+
+void QtHistogramGraph::mouseMoveEvent( QMouseEvent* e )
+{
+  if( this->left_click_ )
+  {
+    Q_EMIT upper_position( e->pos().x() );
+  }
+  else
+  {
+    Q_EMIT lower_position( e->pos().x() );
+  }
+}
+
 
 
 

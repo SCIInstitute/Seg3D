@@ -75,10 +75,13 @@ protected:
     virtual void paintEvent( QPaintEvent *event );
     
     virtual void mousePressEvent( QMouseEvent* e );
+    
+    virtual void mouseMoveEvent( QMouseEvent* e );
 
 private:
   Core::Histogram histogram_;
   bool logarithmic_;
+  bool left_click_;
   
 };
 

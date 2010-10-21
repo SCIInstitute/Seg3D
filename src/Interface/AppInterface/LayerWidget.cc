@@ -790,6 +790,7 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
   this->repaint();
 }
 
+
 void LayerWidget::set_drop_target( LayerWidget* target_layer )
 {
   this->private_->drop_layer_ = target_layer;
