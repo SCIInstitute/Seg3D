@@ -96,7 +96,7 @@ private:
   /// INCREMENT_GENERATION:
   // Generate a new generation number for a datablock. This function is called through the
   // DataBlock class whenever the data in a datablock is changed.
-  DataBlock::generation_type increment_generation( DataBlock::generation_type old_generation );
+  DataBlock::generation_type increase_generation( DataBlock::generation_type old_generation );
 
 private:
   DataBlockManagerPrivateHandle private_;

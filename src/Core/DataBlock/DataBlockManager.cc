@@ -53,6 +53,8 @@ void DataBlockManager::register_datablock( DataBlockHandle data_block,
 {
   lock_type lock( this->get_mutex() );
 
+  assert( data_block->get_generation() == -1 );
+
   if ( generation == -1 )
   {
     generation = this->private_->generation_; 
@@ -97,7 +99,7 @@ void DataBlockManager::unregister_datablock( DataBlock::generation_type generati
   this->private_->generation_map_.erase( generation );
 }
 
-DataBlock::generation_type DataBlockManager::increment_generation( 
+DataBlock::generation_type DataBlockManager::increase_generation( 
   DataBlock::generation_type old_generation )
 {
   lock_type lock( this->get_mutex() );

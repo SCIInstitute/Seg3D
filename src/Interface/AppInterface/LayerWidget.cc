@@ -384,9 +384,10 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
         this->private_->ui_.delete_iso_surface_button_->hide();
         this->private_->ui_.show_iso_surface_button_->hide();
         this->private_->ui_.iso_control_separator_line_->hide();
-        this->private_->ui_.border_fill_->hide();
+        this->private_->ui_.border_->hide();
+        this->private_->ui_.fill_->hide();
         this->private_->ui_.mask_volume_widget_->hide();
-        this->private_->color_widget_->hide();
+        this->private_->ui_.colors_->hide();
         
         // Add the layer specific connections
         DataLayer* data_layer = dynamic_cast< DataLayer* >( layer.get() );
@@ -402,7 +403,21 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
             data_layer->min_value_state_ );
           QtUtils::QtBridge::Connect( this->private_->ui_.max_label_,
             data_layer->max_value_state_ );
-          
+          QtUtils::QtBridge::Connect( this->private_->ui_.display_max_adjuster_,
+            data_layer->display_max_value_state_ );
+          QtUtils::QtBridge::Connect( this->private_->ui_.display_min_adjuster_,
+            data_layer->display_min_value_state_ );
+          QtUtils::QtBridge::Connect( this->private_->ui_.adjust_minmax_checkbox_,
+            data_layer->adjust_display_min_max_state_ );
+          QtUtils::QtBridge::Show( this->private_->ui_.brightness_, 
+            data_layer->adjust_display_min_max_state_, true );
+          QtUtils::QtBridge::Show( this->private_->ui_.contrast_, 
+            data_layer->adjust_display_min_max_state_, true );
+          QtUtils::QtBridge::Show( this->private_->ui_.display_max_, 
+            data_layer->adjust_display_min_max_state_ );
+          QtUtils::QtBridge::Show( this->private_->ui_.display_min_, 
+            data_layer->adjust_display_min_max_state_ );
+      
           connect( this->private_->ui_.reset_brightness_contrast_button_, 
             SIGNAL( clicked() ), this, SLOT( set_brightness_contrast_to_default() ) );
         }

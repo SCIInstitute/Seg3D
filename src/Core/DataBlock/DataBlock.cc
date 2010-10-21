@@ -45,8 +45,11 @@ DataBlock::DataBlock() :
 
 DataBlock::~DataBlock()
 {
-  // NOTE: We keep track of all the data blocks in the system and each one has a unique key
-  DataBlockManager::Instance()->unregister_datablock( this->generation_ );
+  // Unregister the data block if it's registered
+  if ( this->generation_ != -1 )
+  {
+    DataBlockManager::Instance()->unregister_datablock( this->generation_ );
+  }
 }
 
 double DataBlock::get_data_at( size_t index ) const
@@ -207,7 +210,7 @@ void DataBlock::clear()
 {
   lock_type lock( this->get_mutex() );
   memset( this->data_, 0, Core::GetSizeDataType( this->data_type_ ) * this->get_size() );
-  this->generation_ = DataBlockManager::Instance()->increment_generation( this->generation_ );
+  this->generation_ = DataBlockManager::Instance()->increase_generation( this->generation_ );
 }
 
 DataBlock::generation_type DataBlock::get_generation() const
@@ -225,7 +228,7 @@ void DataBlock::set_generation( generation_type generation )
 void DataBlock::increase_generation()
 {
   lock_type lock( this->get_mutex() );
-  this->generation_ = DataBlockManager::Instance()->increment_generation( this->generation_ );
+  this->generation_ = DataBlockManager::Instance()->increase_generation( this->generation_ );
 }
 
 bool DataBlock::update_histogram()

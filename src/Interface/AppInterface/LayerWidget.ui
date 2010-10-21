@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>269</width>
-    <height>524</height>
+    <height>614</height>
    </rect>
   </property>
   <property name="mouseTracking">
@@ -789,7 +789,7 @@ QPushButton#activate_button_{
           </widget>
          </item>
          <item>
-          <widget class="QWidget" name="border_fill_" native="true">
+          <widget class="QWidget" name="fill_" native="true">
            <property name="minimumSize">
             <size>
              <width>0</width>
@@ -851,43 +851,45 @@ QPushButton#activate_button_{
           </widget>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_12">
-           <property name="spacing">
-            <number>4</number>
-           </property>
-           <property name="leftMargin">
-            <number>9</number>
-           </property>
-           <item>
-            <widget class="QLabel" name="label_2">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>30</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>90</width>
-               <height>30</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>Border:</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QComboBox" name="border_selection_combo_">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>24</height>
-              </size>
-             </property>
-            </widget>
-           </item>
-          </layout>
+          <widget class="QWidget" name="border_" native="true">
+           <layout class="QHBoxLayout" name="horizontalLayout_12">
+            <property name="spacing">
+             <number>4</number>
+            </property>
+            <property name="leftMargin">
+             <number>9</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="label_2">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>90</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Border:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="border_selection_combo_">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>24</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
          </item>
          <item>
           <widget class="QWidget" name="bright_contrast_" native="true">
@@ -927,7 +929,7 @@ QPushButton#activate_button_{
              </widget>
             </item>
             <item>
-             <widget class="QWidget" name="constrast_" native="true">
+             <widget class="QWidget" name="contrast_" native="true">
               <layout class="QVBoxLayout" name="contrast_h_layout_">
                <property name="spacing">
                 <number>2</number>
@@ -964,6 +966,57 @@ QPushButton#activate_button_{
                 <widget class="QtUtils::QtSliderDoubleCombo" name="contrast_adjuster_" native="true"/>
                </item>
               </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QWidget" name="display_max_" native="true">
+              <layout class="QVBoxLayout" name="verticalLayout_14">
+               <property name="spacing">
+                <number>2</number>
+               </property>
+               <property name="margin">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="QLabel" name="label_4">
+                 <property name="text">
+                  <string>Max:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QtUtils::QtSliderDoubleCombo" name="display_max_adjuster_" native="true"/>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QWidget" name="display_min_" native="true">
+              <layout class="QVBoxLayout" name="verticalLayout_15">
+               <property name="spacing">
+                <number>2</number>
+               </property>
+               <property name="margin">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="QLabel" name="label_6">
+                 <property name="text">
+                  <string>Min:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QtUtils::QtSliderDoubleCombo" name="display_min_adjuster_" native="true"/>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="adjust_minmax_checkbox_">
+              <property name="text">
+               <string>Adjust Min/Max</string>
+              </property>
              </widget>
             </item>
             <item>

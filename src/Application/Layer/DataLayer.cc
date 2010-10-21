@@ -35,6 +35,7 @@
 // Core includes
 #include <Core/Application/Application.h>
 #include <Core/State/StateIO.h>
+#include <Core/Utils/ScopedCounter.h>
 
 // Application includes
 #include <Application/ProjectManager/ProjectManager.h>
@@ -48,8 +49,13 @@ class DataLayerPrivate
 {
 public:
   void update_data_info();
+  void update_display_value_range();
+
+  void handle_contrast_brightness_changed();
+  void handle_display_value_range_changed();
 
   DataLayer* layer_;
+  size_t signal_block_count_;
 };
 
 void DataLayerPrivate::update_data_info()
@@ -95,6 +101,70 @@ void DataLayerPrivate::update_data_info()
   this->layer_->max_value_state_->set( this->layer_->data_volume_->get_max() );
 }
 
+void DataLayerPrivate::update_display_value_range()
+{
+  if ( !this->layer_->has_valid_data() )  return;
+  
+  // Convert contrast to range ( 0, 1 ] and brightness to [ -1, 1 ]
+  double contrast = ( 1 - this->layer_->contrast_state_->get() / 101 );
+  double brightness = this->layer_->brightness_state_->get() / 50 - 1.0;
+
+  Core::ScopedCounter signal_block( this->signal_block_count_ );
+  double min_val = this->layer_->get_data_volume()->get_min();
+  double max_val = this->layer_->get_data_volume()->get_max();
+  this->layer_->display_min_value_state_->set_range( min_val, max_val );
+  this->layer_->display_max_value_state_->set_range( min_val, max_val );
+  double mid_val = min_val + ( brightness + 1 ) * 0.5 * ( max_val - min_val );
+  double window_size = ( max_val - min_val ) * contrast;
+  this->layer_->display_min_value_state_->set( mid_val - window_size * 0.5 );
+  this->layer_->display_max_value_state_->set( mid_val + window_size * 0.5 );
+}
+
+void DataLayerPrivate::handle_contrast_brightness_changed()
+{
+  if ( this->signal_block_count_ > 0 || !this->layer_->has_valid_data() )
+  {
+    return;
+  }
+  
+  Core::ScopedCounter signal_block( this->signal_block_count_ );
+
+  // Convert contrast to range ( 0, 1 ] and brightness to [ -1, 1 ]
+  double contrast = ( 1 - this->layer_->contrast_state_->get() / 101 );
+  double brightness = this->layer_->brightness_state_->get() / 50 - 1.0;
+
+  double min_val, max_val;
+  this->layer_->display_min_value_state_->get_range( min_val, max_val );
+  double mid_val = min_val + ( brightness + 1 ) * 0.5 * ( max_val - min_val );
+  double window_size = ( max_val - min_val ) * contrast;
+  this->layer_->display_min_value_state_->set( mid_val - window_size * 0.5 );
+  this->layer_->display_max_value_state_->set( mid_val + window_size * 0.5 );
+}
+
+void DataLayerPrivate::handle_display_value_range_changed()
+{
+  if ( this->signal_block_count_ > 0 || !this->layer_->has_valid_data() )
+  {
+    return;
+  }
+
+  Core::ScopedCounter signal_block( this->signal_block_count_ );
+
+  double min_val, max_val;
+  this->layer_->display_min_value_state_->get_range( min_val, max_val );
+  double display_min = this->layer_->display_min_value_state_->get();
+  double display_max = this->layer_->display_max_value_state_->get();
+  if ( display_min > display_max )
+  {
+    std::swap( display_min, display_max );
+  }
+  
+  double contrast = 1.0 - ( display_max - display_min ) / ( max_val - min_val );
+  double brightness = ( display_min + display_max - min_val * 2 ) / ( max_val - min_val );
+  this->layer_->contrast_state_->set( contrast * 100 );
+  this->layer_->brightness_state_->set( brightness * 50 );
+}
+
 
 DataLayer::DataLayer( const std::string& name, const Core::DataVolumeHandle& volume ) :
   Layer( name, !( volume->is_valid() ) ),
@@ -103,7 +173,9 @@ DataLayer::DataLayer( const std::string& name, const Core::DataVolumeHandle& vol
 {
   this->data_volume_->register_data();
   this->private_->layer_ = this;
+  this->private_->signal_block_count_ = 0;
   this->initialize_states();
+  this->private_->update_display_value_range();
 }
   
 DataLayer::DataLayer( const std::string& state_id ) :
@@ -111,6 +183,7 @@ DataLayer::DataLayer( const std::string& state_id ) :
   private_( new DataLayerPrivate )
 {
   this->private_->layer_ = this;
+  this->private_->signal_block_count_ = 0;
   this->initialize_states();
 }
 
@@ -135,6 +208,13 @@ void DataLayer::initialize_states()
   // == The contrast of the layer ==
   this->add_state( "contrast", contrast_state_, 0.0, 0.0, 100.0, 0.1 );
 
+  this->add_state( "display_min", this->display_min_value_state_, 0.0, 0.0, 1.0, 1.0 );
+  this->display_min_value_state_->set_session_priority( Core::StateBase::DO_NOT_LOAD_E );
+  this->add_state( "display_max", this->display_max_value_state_, 1.0, 0.0, 1.0, 1.0 );
+  this->display_max_value_state_->set_session_priority( Core::StateBase::DO_NOT_LOAD_E );
+
+  this->add_state( "adjust_minmax", this->adjust_display_min_max_state_, false );
+
   // == Is this volume rendered through the volume renderer ==
   this->add_state( "volume_rendered", volume_rendered_state_, false );
   
@@ -146,6 +226,15 @@ void DataLayer::initialize_states()
   this->add_state( "data_type", this->data_type_state_, "unknown" );
   this->add_state( "min", this->min_value_state_, std::numeric_limits< double >::quiet_NaN() );
   this->add_state( "max", this->max_value_state_, std::numeric_limits< double >::quiet_NaN() );
+
+  this->add_connection( this->contrast_state_->state_changed_signal_.connect( boost::bind(
+    &DataLayerPrivate::handle_contrast_brightness_changed, this->private_ ) ) );
+  this->add_connection( this->brightness_state_->state_changed_signal_.connect( boost::bind(
+    &DataLayerPrivate::handle_contrast_brightness_changed, this->private_ ) ) );
+  this->add_connection( this->display_min_value_state_->state_changed_signal_.connect( boost::bind(
+    &DataLayerPrivate::handle_display_value_range_changed, this->private_ ) ) );
+  this->add_connection( this->display_max_value_state_->state_changed_signal_.connect( boost::bind(
+    &DataLayerPrivate::handle_display_value_range_changed, this->private_ ) ) );
 
   this->private_->update_data_info();
 
@@ -230,6 +319,7 @@ bool DataLayer::set_data_volume( Core::DataVolumeHandle data_volume )
     }
 
     this->private_->update_data_info();
+    this->private_->update_display_value_range();
   }
 
   return true;
@@ -275,14 +365,13 @@ bool DataLayer::post_load_states( const Core::StateIO& state_io )
     {
       this->data_volume_->register_data( this->generation_state_->get() );
       this->private_->update_data_info();
+      this->private_->update_display_value_range();
       return true;
     }
-    
     CORE_LOG_ERROR( error );
-    return false;
   }
-  
-  return true;
+
+  return false;
 }
   
 void DataLayer::clean_up()
