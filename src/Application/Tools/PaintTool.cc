@@ -738,7 +738,7 @@ PaintTool::PaintTool( const std::string& toolid ) :
   this->add_state( "negative_data_constraint", this->negative_data_constraint_state_, false );
   this->add_state( "negative_mask_constraint1", this->negative_mask_constraint1_state_, false );
   this->add_state( "negative_mask_constraint2", this->negative_mask_constraint2_state_, false );
-  this->add_state( "show_data_constraint_bound", this->show_data_cstr_bound_state_, false );
+  this->add_state( "show_data_constraint_bound", this->show_data_cstr_bound_state_, true );
 
   this->add_state( "brush_radius", this->brush_radius_state_, 3, 0, 150, 1 );
   double inf = std::numeric_limits< double >::infinity();

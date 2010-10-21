@@ -59,7 +59,7 @@ ArithmeticFilter::ArithmeticFilter( const std::string& toolid ) :
   this->add_dependent_layer_input( this->input_d_state_, 
     Core::VolumeType::DATA_E|Core::VolumeType::MASK_E );
   
-  this->add_state( "expressions", this->expressions_state_, "RESULT = " );
+  this->add_state( "expressions", this->expressions_state_, "RESULT = A;" );
 
   this->add_state( "output_type", this->output_type_state_, ActionArithmeticFilter::DATA_C, 
     ActionArithmeticFilter::DATA_C + "=Data Layer|" + ActionArithmeticFilter::MASK_C + 
