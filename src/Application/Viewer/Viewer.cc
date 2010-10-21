@@ -223,13 +223,22 @@ void ViewerPrivate::insert_layer( LayerHandle layer )
     
   this->layer_connection_map_.insert( std::make_pair( layer->get_layer_id(),
     layer->visible_state_[ this->viewer_->get_viewer_id() ]->state_changed_signal_.connect(
+    boost::bind( &Viewer::redraw_overlay, this->viewer_, true ) ) ) );
+
+  this->layer_connection_map_.insert( std::make_pair( layer->get_layer_id(),
+    layer->visible_state_[ this->viewer_->get_viewer_id() ]->state_changed_signal_.connect(
     boost::bind( &ViewerPrivate::layer_state_changed, this, 
     ViewModeType::ALL_E ) ) ) );
     
   this->layer_connection_map_.insert( std::make_pair( layer->get_layer_id(),
     layer->master_visible_state_->state_changed_signal_.connect(
+    boost::bind( &Viewer::redraw_overlay, this->viewer_, true ) ) ) );
+
+  this->layer_connection_map_.insert( std::make_pair( layer->get_layer_id(),
+    layer->master_visible_state_->state_changed_signal_.connect(
     boost::bind( &ViewerPrivate::layer_state_changed, this, 
     ViewModeType::ALL_E ) ) ) );
+
 
   size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
   for ( size_t i = 0; i < num_of_viewers; ++i )

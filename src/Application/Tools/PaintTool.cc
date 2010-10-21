@@ -798,16 +798,13 @@ PaintTool::~PaintTool()
 
 void PaintTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 {
-  SeedPointsTool::redraw( viewer_id, proj_mat );
-
   ViewerHandle viewer = ViewerManager::Instance()->get_viewer( viewer_id );
   ViewerHandle current_viewer;
   double world_x, world_y;
   int radius;
-  bool brush_visible;
+  bool brush_visible = false;
   {
     PaintToolPrivate::lock_type private_lock( this->private_->get_mutex() );
-    brush_visible = this->private_->brush_visible_;
     current_viewer = this->private_->viewer_;
     world_x = this->private_->world_x_;
     world_y = this->private_->world_y_;
@@ -848,11 +845,10 @@ void PaintTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
         "' does not exist" );
     }
 
+    layer_visible = target_layer->has_valid_data() && target_layer->is_visible( viewer_id );
     if ( current_viewer )
     {
-      size_t current_viewer_id = current_viewer->get_viewer_id();
-      layer_visible = target_layer->is_visible( current_viewer_id ) && 
-        target_layer->has_valid_data() && target_layer->is_visible( viewer_id );
+      brush_visible = layer_visible && target_layer->is_visible( current_viewer->get_viewer_id() );
     }
     
     data_constraint_layer_id = this->data_constraint_layer_state_->get();
@@ -861,7 +857,6 @@ void PaintTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
     negative_data_constraint = this->negative_data_constraint_state_->get();
     show_data_cstr_bound = this->show_data_cstr_bound_state_->get();
   }
-
 
   Core::MaskVolumeSliceHandle target_slice = boost::dynamic_pointer_cast
     < Core::MaskVolumeSlice >( viewer->get_volume_slice( target_layer_id ) );
@@ -900,8 +895,8 @@ void PaintTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
   Core::Color color = PreferencesManager::Instance()->get_color( 
     target_mask_layer->color_state_->get() );
 
-  if ( data_constraint_layer_id != Tool::NONE_OPTION_C &&
-    show_data_cstr_bound )
+  if ( data_constraint_layer_id != Tool::NONE_OPTION_C && 
+    show_data_cstr_bound && layer_visible )
   {
     Core::DataVolumeSliceHandle data_constraint_slice = boost::dynamic_pointer_cast
       < Core::DataVolumeSlice >( viewer->get_volume_slice( data_constraint_layer_id ) );
@@ -947,8 +942,7 @@ void PaintTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
     data_constraint_tex->unbind();
   }
   
-  if ( current_viewer && brush_visible && layer_visible &&
-    current_viewer_mode == redraw_viewer_mode )
+  if ( brush_visible && current_viewer_mode == redraw_viewer_mode )
   {
     double left = target_slice->left() + ( i - radius - 0.5 ) * voxel_width;
     double right = target_slice->left() + ( i + radius + 0.5 ) * voxel_width;
@@ -991,6 +985,12 @@ void PaintTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
   this->private_->shader_->disable();
   glPopMatrix();
   glPopAttrib();
+
+  if ( layer_visible )
+  {
+    SeedPointsTool::redraw( viewer_id, proj_mat );
+  }
+  
   glFinish();
 }
 
@@ -1122,8 +1122,7 @@ bool PaintTool::handle_mouse_press( ViewerHandle viewer,
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
     erase = this->erase_state_->get();
-    if ( modifiers == Core::KeyModifier::NO_MODIFIER_E &&
-      this->target_layer_state_->get() != Tool::NONE_OPTION_C &&
+    if ( this->target_layer_state_->get() != Tool::NONE_OPTION_C &&
       !this->private_->painting_ )
     {
       size_t viewer_id = this->private_->viewer_->get_viewer_id();
@@ -1135,12 +1134,14 @@ bool PaintTool::handle_mouse_press( ViewerHandle viewer,
 
   if ( paintable )
   {
-    if ( button == Core::MouseButton::LEFT_BUTTON_E )
+    if ( modifiers == Core::KeyModifier::NO_MODIFIER_E &&
+      button == Core::MouseButton::LEFT_BUTTON_E )
     {
       this->private_->painting_ = true;
       this->private_->erase_ = erase;
     }
-    else if ( button == Core::MouseButton::RIGHT_BUTTON_E )
+    else if ( modifiers == Core::KeyModifier::NO_MODIFIER_E &&
+      button == Core::MouseButton::RIGHT_BUTTON_E )
     {
       this->private_->painting_ = true;
       this->private_->erase_ = true;
@@ -1173,7 +1174,12 @@ bool PaintTool::handle_mouse_press( ViewerHandle viewer,
     return true;
   }
 
-  return SeedPointsTool::handle_mouse_press( viewer, mouse_history, button, buttons, modifiers );
+  if ( paintable )
+  {
+    return SeedPointsTool::handle_mouse_press( viewer, mouse_history, button, buttons, modifiers );
+  }
+  
+  return false;
 }
 
 bool PaintTool::handle_mouse_release( ViewerHandle viewer,

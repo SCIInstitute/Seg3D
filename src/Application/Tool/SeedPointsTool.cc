@@ -154,9 +154,7 @@ bool SeedPointsTool::handle_mouse_press( ViewerHandle viewer,
       mouse_history.current_.y_, world_x, world_y );
   }
 
-  if ( modifiers == Core::KeyModifier::NO_MODIFIER_E &&
-    ( button == Core::MouseButton::LEFT_BUTTON_E ||
-    button == Core::MouseButton::MID_BUTTON_E ) )
+  if ( button == Core::MouseButton::LEFT_BUTTON_E )
   {
     int u, v;
     target_slice->world_to_index( world_x, world_y, u, v );
@@ -171,8 +169,7 @@ bool SeedPointsTool::handle_mouse_press( ViewerHandle viewer,
       return true;
     }
   }
-  else if ( modifiers == Core::KeyModifier::NO_MODIFIER_E &&
-    button == Core::MouseButton::RIGHT_BUTTON_E )
+  else if ( button == Core::MouseButton::RIGHT_BUTTON_E )
   {
     Core::Point pt;
     if ( this->private_->find_point( viewer, world_x, world_y, target_slice, pt ) )
