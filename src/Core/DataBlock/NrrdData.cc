@@ -505,16 +505,57 @@ bool NrrdData::SaveNrrd( const std::string& filename, NrrdDataHandle nrrddata, s
     return false;
   }
 
+  // Check whether the NRRD0005 format is needed for export, if not downgrade nrrd
+  Nrrd* nrrd = nrrddata->nrrd();
+
+  if ( nrrd->spaceDim > 0 && nrrd->spaceDim == nrrd->dim )
+  {
+    bool is_aligned_nrrd = true;
+    for ( size_t j = 0; j < static_cast<size_t>( nrrd->spaceDim ); j++ )
+    {
+      for ( size_t i = 0; i < static_cast<size_t>( nrrd->dim ); i++ )
+      {
+        if ( i != j && ( nrrd->axis[ i ].spaceDirection[ j ] != 0.0 &&
+          ! IsNan( nrrd->axis[ i ].spaceDirection[ j ] ) ) )
+        {
+          is_aligned_nrrd = false;
+        }
+      }
+    }
+
+    for ( size_t j = 0; j < static_cast<size_t>( nrrd->spaceDim ); j++ )
+    {
+      for ( size_t i = 0; i < static_cast<size_t>( nrrd->spaceDim ); i++ )
+      {
+        if ( i != j && ( nrrd->measurementFrame[ i ][ j ] != 0.0 &&
+          ! IsNan( nrrd->measurementFrame[ i ][ j ] ) ) )
+        {
+          is_aligned_nrrd = false;
+        }
+      }
+    }
+
+    if ( is_aligned_nrrd )
+    {
+      // Down grade nrrd
+      nrrdOrientationReduce( nrrd, nrrd, 1 );
+      for ( size_t i = 0; i < static_cast<size_t>( nrrd->dim ); i++ )
+      {
+        nrrd->axis[ i ].kind = nrrdKindUnknown; 
+      }
+    }
+  }
+
   NrrdIoState* nio = nrrdIoStateNew();
   nrrdIoStateSet( nio,  nrrdIoStateZlibLevel, level );
+
   // Turn on compression if the user wants it.
   if( compress )
   { 
-  
     nrrdIoStateEncodingSet( nio, nrrdEncodingGzip );
   }
   
-  if ( nrrdSave( filename.c_str(), nrrddata->nrrd(), nio ) )
+  if ( nrrdSave( filename.c_str(), nrrd, nio ) )
   {
     char *err = biffGet( NRRD );
     error = "Error writing file: " + filename + " : " + std::string( err );
