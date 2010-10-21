@@ -100,8 +100,8 @@ StatusBar::StatusBar() :
   this->add_connection( Core::Interface::GetKeyboardActionContext()->
     action_message_signal_.connect( boost::bind( &StatusBar::set_message, this, _1, _2 ) ) );
 
-  this->add_connection( Core::Log::Instance()->post_log_signal_.connect( 
-    boost::bind( &StatusBar::set_message, this, _1, _2 ) ) );
+//  this->add_connection( Core::Log::Instance()->post_log_signal_.connect( 
+//    boost::bind( &StatusBar::set_message, this, _1, _2 ) ) );
 }
 
 StatusBar::~StatusBar()
