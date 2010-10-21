@@ -380,7 +380,7 @@ void AppMenu::create_window_menu( QMenu* qmenu )
         "<p align=\"justify\">Seg3D is a free volume segmentation and image processing tool created by the "
         "NIH Center for Integrative Biomedical (CIBC) located at the Scientific Computing "
         "and Imaging Instititute (SCI) at the University of Utah and developed in "
-        "collaboration with Numira Biosciences ."
+        "collaboration with Numira Biosciences. "
           "Seg3D combines a flexible manual segmentation interface with powerful "
           "image processing and segmentation algorithms from the Insight "
           "Toolkit.</p>") );
