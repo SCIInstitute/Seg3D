@@ -42,7 +42,7 @@
 // Application includes
 #include <Application/Layer/DataLayer.h> 
 #include <Application/Layer/MaskLayer.h> 
-#include <Application/Layer/labelLayer.h> 
+#include <Application/Layer/LabelLayer.h> 
  
 namespace Seg3D
 {
