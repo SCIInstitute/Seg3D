@@ -74,6 +74,7 @@ protected:
   // Overloaded call that redraws the histogram plot
     virtual void paintEvent( QPaintEvent *event );
     
+public:
     virtual void mousePressEvent( QMouseEvent* e );
     
     virtual void mouseMoveEvent( QMouseEvent* e );

@@ -205,5 +205,17 @@ void QtHistogramWidget::set_histogram_view()
   }
 }
 
+void QtHistogramWidget::mousePressEvent( QMouseEvent* e )
+{
+  this->private_->histogram_graph_->mousePressEvent( e );
+}
+
+void QtHistogramWidget::mouseMoveEvent( QMouseEvent* e )
+{
+  this->private_->histogram_graph_->mouseMoveEvent( e );
+}
+
+
+
 
 } // end namespace QtUtils

@@ -119,7 +119,6 @@ void ViewerWidgetPrivate::HandleViewModeChanged( ViewerWidgetQWeakHandle viewer_
     viewer_widget->private_->ui_.flip_horizontal_button_->setChecked( view2d_state->x_flipped() );
     viewer_widget->private_->ui_.flip_vertical_button_->setChecked( view2d_state->y_flipped() );
   }
-  viewer_widget->resize( viewer_widget->width(), viewer_widget->height() );
 }
 
 
@@ -159,6 +158,10 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
   this->private_->ui_.buttonbar_->setMinimumSize( QSize( 170, 0 ) );
   this->private_->ui_.button_layout_->setStretchFactor( this->private_->ui_.common_tools_, 0 );
   this->private_->ui_.button_layout_->setStretchFactor( this->private_->ui_.less_common_tools_, 1 );
+  this->private_->ui_.button_layout_->setAlignment( Qt::AlignLeft );
+  this->private_->ui_.common_tools_layout_->setAlignment( Qt::AlignLeft );
+  this->private_->ui_.less_common_tools_layout_->setAlignment( Qt::AlignLeft );
+  this->private_->ui_.horizontalLayout->setAlignment( Qt::AlignLeft );
   
   // --------------------------------------
   // Generate the OpenGL part of the widget
@@ -268,11 +271,14 @@ ViewerWidget::~ViewerWidget()
 int ViewerWidget::get_minimum_size()
 {
   // We start with padding the minimum width by 1 because of the 1px margin on the left-hand side
-  int minimum_width = 1;
+  int minimum_width = 0;
+  if( this->private_->ui_.line_->isVisible() ) minimum_width += 3;
+  if( this->private_->ui_.sep_line_->isVisible() ) minimum_width += 3;
+  
   
   // Next we get the width of the viewer mode holder and we pad it by 2 for the left and right 
   // margins
-  int viewer_mode_width = this->private_->ui_.viewer_mode_->width() + 2;
+  int viewer_mode_width = this->private_->ui_.viewer_mode_->width();
   
   // Now we combine them.
   minimum_width = minimum_width + viewer_mode_width;
@@ -282,7 +288,7 @@ int ViewerWidget::get_minimum_size()
   { 
     if( this->private_->buttons_[ i ]->isVisible() ) 
     {
-      minimum_width = minimum_width + this->private_->buttons_[ i ]->minimumWidth() + 1;
+      minimum_width = minimum_width + this->private_->buttons_[ i ]->minimumWidth();// + 1;
     }
   }
   
@@ -298,18 +304,15 @@ void ViewerWidget::resizeEvent( QResizeEvent * event )
   {
     this->private_->minimum_toolbar_width_ = 300;
   }
+  
   else
   {
     this->private_->minimum_toolbar_width_ = this->get_minimum_size();
   }
-
   
-  int old_width = event->oldSize().width();
-  int new_width = event->size().width();
+  int new_width = ( event->size().width() - 6 );
   
-  if ( new_width <= this->private_->minimum_toolbar_width_ &&
-    ( old_width > this->private_->minimum_toolbar_width_ || 
-     ! this->private_->initialized_size_ ) )
+  if ( new_width <= this->private_->minimum_toolbar_width_ )
   {
     this->private_->ui_.sep_line_->hide();    
     this->private_->ui_.button_layout_->removeWidget( this->private_->ui_.less_common_tools_ );
@@ -317,9 +320,7 @@ void ViewerWidget::resizeEvent( QResizeEvent * event )
     
     this->update();
   }
-  else if ( new_width > this->private_->minimum_toolbar_width_ &&
-       ( old_width <= this->private_->minimum_toolbar_width_ || 
-        ! this->private_->initialized_size_ ) )
+  else if ( new_width > this->private_->minimum_toolbar_width_ )
   {
     this->private_->ui_.sep_line_->show();  
     this->private_->ui_.toolbar_layout_->removeWidget( this->private_->ui_.less_common_tools_ );

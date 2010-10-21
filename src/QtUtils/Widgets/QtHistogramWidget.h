@@ -80,6 +80,11 @@ public Q_SLOTS:
   // Invalidate the current histogram
   void reset_histogram();
   
+public:
+  virtual void mousePressEvent( QMouseEvent* e );
+
+  virtual void mouseMoveEvent( QMouseEvent* e );
+  
 private Q_SLOTS:
   void handle_right_button_click( int );
   void handle_left_button_click( int );
