@@ -67,8 +67,8 @@ QtHistogramWidget::QtHistogramWidget( QWidget *parent, QtSliderDoubleCombo* uppe
   connect( this->private_->histogram_graph_, SIGNAL( upper_position( int ) ), this, 
     SLOT( handle_left_button_click( int ) ) );
     
-  connect( this->private_->ui_.log_histogram_button_, SIGNAL( clicked() ), 
-    this, SLOT( set_histogram_view() ) );
+  connect( this->private_->ui_.log_histogram_combo_, SIGNAL( currentIndexChanged ( int ) ), 
+    this, SLOT( set_histogram_view( int ) ) );
     
   if( this->upper_threshold_ != 0 )
   {
@@ -132,6 +132,8 @@ void QtHistogramWidget::set_min( double min )
   
   double percentage = min / ( this->get_histogram_max() - this->get_histogram_min() );
   
+  int temp_width = this->private_->histogram_graph_->width();
+  
   double min_location = ( ( this->private_->histogram_graph_->width() - 5 ) * percentage ) + 4;
   this->min_bar_->setGeometry( min_location, 4 , 4, 129 );
   this->min_bar_->setStyleSheet( QString::fromUtf8( "border-left: 2px solid rgb( 237, 148, 31 );"
@@ -147,6 +149,8 @@ void QtHistogramWidget::set_max( double max )
   {
     max = max + Core::Abs( this->get_histogram_min() );
   }
+  
+  int temp_width = this->private_->histogram_graph_->width();
   
   double percentage = max / ( this->get_histogram_max() - this->get_histogram_min() );
   double max_location = ( ( this->private_->histogram_graph_->width() - 5 ) * percentage ) + 4;
@@ -192,17 +196,9 @@ double QtHistogramWidget::get_histogram_max()
   return this->private_->ui_.max->text().toDouble();
 }
 
-void QtHistogramWidget::set_histogram_view()
+void QtHistogramWidget::set_histogram_view( int mode )
 {
-  this->private_->histogram_graph_->switch_between_linear_log_histogram();
-  if( this->private_->histogram_graph_->get_logarithmic() )
-  {
-    this->private_->ui_.log_histogram_button_->setText( QString::fromUtf8( "Logarithmic" ) );
-  }
-  else
-  {
-    this->private_->ui_.log_histogram_button_->setText( QString::fromUtf8( "Linear" ) );
-  }
+  this->private_->histogram_graph_->switch_between_linear_log_histogram( mode );
 }
 
 void QtHistogramWidget::mousePressEvent( QMouseEvent* e )

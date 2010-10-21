@@ -129,6 +129,8 @@ public:
   // State that describes the calculated volume of the mask, as string because its connected to a 
   // label that will show a non numeric value, when the volume has not been calculated.
   Core::StateStringHandle calculated_volume_state_;
+  
+  Core::StateStringHandle counted_pixels_state_;
 
 protected:
   // PRE_SAVE_STATES:

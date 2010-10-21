@@ -464,6 +464,9 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
           QtUtils::QtBridge::Connect( this->private_->ui_.mask_volume_label_, 
             mask_layer->calculated_volume_state_ );
             
+          QtUtils::QtBridge::Connect( this->private_->ui_.mask_pixel_count_, 
+            mask_layer->counted_pixels_state_ );
+            
           QtUtils::QtBridge::Connect( this->private_->ui_.calculate_volume_button_,
             boost::bind( &ActionCalculateMaskVolume::Dispatch, 
             Core::Interface::GetWidgetActionContext(), this->get_layer_id() ) );

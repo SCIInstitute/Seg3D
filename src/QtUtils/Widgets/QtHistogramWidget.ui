@@ -195,7 +195,7 @@ QLabel#label_3{
              <height>30</height>
             </size>
            </property>
-           <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="3,4,3">
             <property name="spacing">
              <number>0</number>
             </property>
@@ -228,13 +228,17 @@ QLabel#label_3{
                 <number>0</number>
                </property>
                <item>
-                <widget class="QPushButton" name="log_histogram_button_">
-                 <property name="text">
-                  <string>Linear</string>
-                 </property>
-                 <property name="checkable">
-                  <bool>false</bool>
-                 </property>
+                <widget class="QComboBox" name="log_histogram_combo_">
+                 <item>
+                  <property name="text">
+                   <string>Linear</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Logarithmic</string>
+                  </property>
+                 </item>
                 </widget>
                </item>
               </layout>

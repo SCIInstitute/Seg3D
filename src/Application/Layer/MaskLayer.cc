@@ -172,26 +172,29 @@ void MaskLayer::initialize_states()
   ColorCount++;
 
     // == What border is used ==
-    this->add_state( "border", border_state_, PreferencesManager::Instance()->
+    this->add_state( "border", this->border_state_, PreferencesManager::Instance()->
     default_mask_border_state_->export_to_string(), PreferencesManager::Instance()->
     default_mask_border_state_->export_list_to_string() );
 
     // == How is the segmentation filled in ==
-    this->add_state( "fill", fill_state_, PreferencesManager::Instance()->
+    this->add_state( "fill", this->fill_state_, PreferencesManager::Instance()->
     default_mask_fill_state_->export_to_string(), PreferencesManager::Instance()->
     default_mask_fill_state_->export_list_to_string() );
 
     // == Whether the isosurface is shown in the volume display ==
-    this->add_state( "isosurface", show_isosurface_state_, false );
+    this->add_state( "isosurface", this->show_isosurface_state_, false );
 
   // == Internal information for keeping track of which bit we are using ==
   this->add_state( "bit", this->bit_state_, 0 );
   
   // == Keep track of whether the iso surface has been generated
-  this->add_state( "iso_generated", iso_generated_state_, false );
+  this->add_state( "iso_generated", this->iso_generated_state_, false );
   
   // == Keep track of the calculated volume and put it in the UI
-  this->add_state( "calculated_volume", calculated_volume_state_, "N/A" );
+  this->add_state( "calculated_volume", this->calculated_volume_state_, "N/A" );
+  
+  // == Keep track of the calculated volume and put it in the UI
+  this->add_state( "counted_pixels", this->counted_pixels_state_, "N/A" );
 }
 
 bool MaskLayer::pre_save_states( Core::StateIO& state_io )
@@ -269,6 +272,7 @@ void MaskLayer::clean_up()
 void MaskLayer::handle_mask_data_changed()
 {
   this->calculated_volume_state_->set( "N/A" );
+  this->counted_pixels_state_->set( "N/A" );
   this->layer_updated_signal_();
 }
 
@@ -366,6 +370,7 @@ void MaskLayer::calculate_volume()
     * voxel_count;
     
   this->calculated_volume_state_->set( Core::ExportToString( calculated_mask_volume, 10 ) );
+  this->counted_pixels_state_->set( Core::ExportToString( voxel_count ) );
   
 }
 

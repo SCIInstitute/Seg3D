@@ -67,7 +67,7 @@ public:
   bool get_logarithmic() const{ return this->logarithmic_; }
   
 public Q_SLOTS:
-  void switch_between_linear_log_histogram();
+  void switch_between_linear_log_histogram( int mode );
 
 protected:
   // PAINTEVENT:

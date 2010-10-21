@@ -793,7 +793,7 @@ QPushButton#activate_button_{
            <property name="minimumSize">
             <size>
              <width>0</width>
-             <height>32</height>
+             <height>30</height>
             </size>
            </property>
            <property name="maximumSize">
@@ -806,16 +806,7 @@ QPushButton#activate_button_{
             <property name="spacing">
              <number>4</number>
             </property>
-            <property name="leftMargin">
-             <number>9</number>
-            </property>
-            <property name="topMargin">
-             <number>0</number>
-            </property>
-            <property name="rightMargin">
-             <number>0</number>
-            </property>
-            <property name="bottomMargin">
+            <property name="margin">
              <number>0</number>
             </property>
             <item>
@@ -852,12 +843,18 @@ QPushButton#activate_button_{
          </item>
          <item>
           <widget class="QWidget" name="border_" native="true">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>30</height>
+            </size>
+           </property>
            <layout class="QHBoxLayout" name="horizontalLayout_12">
             <property name="spacing">
-             <number>4</number>
+             <number>0</number>
             </property>
-            <property name="leftMargin">
-             <number>9</number>
+            <property name="margin">
+             <number>0</number>
             </property>
             <item>
              <widget class="QLabel" name="label_2">
@@ -1557,13 +1554,7 @@ QPushButton#activate_button_{
          </item>
          <item>
           <widget class="QWidget" name="mask_volume_widget_" native="true">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>30</height>
-            </size>
-           </property>
-           <layout class="QHBoxLayout" name="horizontalLayout_11" stretch="2,1">
+           <layout class="QVBoxLayout" name="verticalLayout_16">
             <property name="spacing">
              <number>0</number>
             </property>
@@ -1571,8 +1562,14 @@ QPushButton#activate_button_{
              <number>0</number>
             </property>
             <item>
-             <widget class="QWidget" name="widget_6" native="true">
-              <layout class="QHBoxLayout" name="horizontalLayout_5">
+             <widget class="QWidget" name="widget_9" native="true">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>20</height>
+               </size>
+              </property>
+              <layout class="QHBoxLayout" name="horizontalLayout_21" stretch="6,5">
                <property name="spacing">
                 <number>0</number>
                </property>
@@ -1580,29 +1577,79 @@ QPushButton#activate_button_{
                 <number>0</number>
                </property>
                <item>
-                <widget class="QLabel" name="label_3">
-                 <property name="minimumSize">
-                  <size>
-                   <width>62</width>
-                   <height>0</height>
-                  </size>
-                 </property>
-                 <property name="maximumSize">
-                  <size>
-                   <width>62</width>
-                   <height>16777215</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>Volume:</string>
-                 </property>
+                <widget class="QWidget" name="widget_6" native="true">
+                 <layout class="QHBoxLayout" name="horizontalLayout_5">
+                  <property name="spacing">
+                   <number>0</number>
+                  </property>
+                  <property name="margin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QLabel" name="label_3">
+                    <property name="minimumSize">
+                     <size>
+                      <width>62</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>62</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>Volume:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="mask_volume_label_">
+                    <property name="text">
+                     <string>N/A</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
                 </widget>
                </item>
                <item>
-                <widget class="QLabel" name="mask_volume_label_">
-                 <property name="text">
-                  <string>N/A</string>
-                 </property>
+                <widget class="QWidget" name="widget_5" native="true">
+                 <layout class="QHBoxLayout" name="horizontalLayout_11">
+                  <property name="spacing">
+                   <number>0</number>
+                  </property>
+                  <property name="margin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QLabel" name="label_8">
+                    <property name="minimumSize">
+                     <size>
+                      <width>62</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>62</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>Pixels:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="mask_pixel_count_">
+                    <property name="text">
+                     <string>N/A</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
                 </widget>
                </item>
               </layout>

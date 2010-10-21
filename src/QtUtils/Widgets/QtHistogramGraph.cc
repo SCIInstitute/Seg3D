@@ -46,6 +46,7 @@ QtHistogramGraph::QtHistogramGraph( QWidget *parent )
 {
     setBackgroundRole( QPalette::Base );
     setAutoFillBackground( true );
+    this->setMinimumWidth( 250 );
 }
 
 QtHistogramGraph::~QtHistogramGraph()
@@ -135,9 +136,10 @@ void QtHistogramGraph::mousePressEvent( QMouseEvent* e )
   }
 }
 
-void QtHistogramGraph::switch_between_linear_log_histogram()
+void QtHistogramGraph::switch_between_linear_log_histogram( int mode )
 {
-  this->logarithmic_ = !this->logarithmic_;
+  if( mode == 0 ) this->logarithmic_ = false;
+  if( mode == 1 ) this->logarithmic_ = true;
   this->repaint();
 }
 
