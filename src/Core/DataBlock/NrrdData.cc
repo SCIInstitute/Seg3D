@@ -163,7 +163,7 @@ Transform NrrdData::get_transform() const
 
     if ( IsFinite( this->private_->nrrd_->axis[ p ].spacing ) )
     {
-      max[ p ] = this->private_->nrrd_->axis[ p ].spacing * size[ p ];
+      max[ p ] = this->private_->nrrd_->axis[ p ].spacing * ( size[ p ] - 1 ) + min[ p ];
     }
     else
     {
@@ -219,7 +219,7 @@ Transform NrrdData::get_transform() const
 
     transform.load_basis( Point( rmin[ 0 ], rmin[ 1 ], 0.0 ), v0, v1, v2 );
     transform.post_scale( Vector( 1.0 / static_cast< double > ( rsize[ 0 ] - 1 ), 1.0
-        / static_cast< double > ( rsize[ 1 ] - 1 ), 1.0 ) );
+      / static_cast< double > ( rsize[ 1 ] - 1 ), 1.0 ) );    
   }
   else if ( rdim > 2 )
   {
@@ -230,7 +230,7 @@ Transform NrrdData::get_transform() const
 
     transform.load_basis( Point( rmin[ 0 ], rmin[ 1 ], rmin[ 2 ] ), v0, v1, v2 );
     transform.post_scale( Vector( 1.0 / static_cast< double > ( rsize[ 0 ] - 1 ), 1.0
-        / static_cast< double > ( rsize[ 1 ] - 1 ), 1.0 / static_cast< double > ( rsize[ 2 ] - 1 ) ) );
+      / static_cast< double > ( rsize[ 1 ] - 1 ), 1.0 / static_cast< double > ( rsize[ 2 ] - 1 ) ) );   
   }
 
   if ( this->private_->nrrd_->spaceDim > 0 )
