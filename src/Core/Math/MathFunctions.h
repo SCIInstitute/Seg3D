@@ -206,14 +206,7 @@ inline T Interpolate( T value1, T value2, G weight )
 template< class T >
 inline T Fraction( T value )
 {
-  if ( value > T( 0 ) )
-  {
-    return static_cast< T > ( value - static_cast< int > ( value ) );
-  }
-  else
-  {
-    return static_cast< T > ( value - static_cast< int > ( value + T( 1 ) ) );
-  }
+  return static_cast< T > ( value - static_cast< int > ( value ) );
 }
 
 //-----------------------------------------

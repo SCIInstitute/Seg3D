@@ -102,6 +102,17 @@ public:
   bool resample_to_grid_;
   std::string padding_;
 
+  bool padding_only_;
+  int mapped_x_start_;
+  int mapped_y_start_;
+  int mapped_z_start_;
+  int overlap_x_start_;
+  int overlap_y_start_;
+  int overlap_z_start_;
+  int overlap_nx_;
+  int overlap_ny_;
+  int overlap_nz_;
+
   NrrdKernelSpec* mask_kernel_;
   NrrdKernelSpec* data_kernel_;
   NrrdResampleContext* rsmc_;
@@ -113,9 +124,14 @@ public:
   bool compute_output_grid_transform( const std::string& input_layerid, 
     Core::GridTransform& grid_transform );
 
+  void detect_padding_only();
+
   bool nrrd_resmaple( Nrrd* nin, Nrrd* nout, NrrdKernelSpec* unuk );
   void resmaple_data_layer( DataLayerHandle input, DataLayerHandle output );
   void resample_mask_layer( MaskLayerHandle input, MaskLayerHandle output );
+
+  void pad_and_crop_data_layer(  DataLayerHandle input, DataLayerHandle output );
+  void pad_and_crop_mask_layer( MaskLayerHandle input, MaskLayerHandle output );
 
   // RUN:
   // Implementation of run of the Runnable base class, this function is called 
@@ -140,6 +156,7 @@ public:
 
 ResampleAlgo::ResampleAlgo( const std::string& kernel, double param1, double param2 )
 {
+  this->padding_only_ = false;
   this->rsmc_ = nrrdResampleContextNew();
   this->rsmc_->verbose = 0;
   nrrdResampleDefaultCenterSet( this->rsmc_, nrrdCenterCell );
@@ -448,6 +465,7 @@ void ResampleAlgo::run()
 {
   if ( this->resample_to_grid_ )
   {
+    this->detect_padding_only();
     nrrdResampleBoundarySet( this->rsmc_, nrrdBoundaryPad );
   }
   else
@@ -473,12 +491,109 @@ void ResampleAlgo::run()
 
     if ( ! this->dst_layers_[ i ] )
     {
-      this->report_error( "Could not alocate enough memory." );
+      this->report_error( "Could not allocate enough memory." );
       return;
     }
     
     if ( this->check_abort() ) break;
   }
+}
+
+void ResampleAlgo::detect_padding_only()
+{
+  this->padding_only_ = false;
+  Core::GridTransform src_trans = this->src_layers_[ 0 ]->get_grid_transform();
+  Core::GridTransform dst_trans = this->dst_layers_[ 0 ]->get_grid_transform();
+  double epsilon = 1e-4;
+
+  // Compare spacing
+  Core::Vector src_spacing = src_trans * Core::Vector( 1.0, 1.0, 1.0 );
+  Core::Vector dst_spacing = dst_trans * Core::Vector( 1.0, 1.0, 1.0 );
+  if ( ( dst_spacing - src_spacing ).length2() > epsilon ) return;
+
+  // Check if source grid aligns with destination grid
+  Core::Point src_origin = src_trans * Core::Point( 0.0, 0.0, 0.0 );
+  Core::Transform inv_dst_trans = dst_trans.get_inverse();
+  Core::Point src_origin_to_dst_index = inv_dst_trans * src_origin;
+  if ( Core::Abs( Core::Fraction( src_origin_to_dst_index[ 0 ] ) ) > epsilon ||
+    Core::Abs( Core::Fraction( src_origin_to_dst_index[ 1 ] ) ) > epsilon ||
+    Core::Abs( Core::Fraction( src_origin_to_dst_index[ 2 ] ) ) > epsilon )
+  {
+    return;
+  }
+  
+  this->padding_only_ = true;
+
+  // Compute the range of the source volume mapped to the destination volume in index space
+  this->mapped_x_start_ = static_cast< int >( src_origin_to_dst_index[ 0 ] );
+  this->mapped_y_start_ = static_cast< int >( src_origin_to_dst_index[ 1 ] );
+  this->mapped_z_start_ = static_cast< int >( src_origin_to_dst_index[ 2 ] );
+  this->overlap_x_start_ = Core::Max( 0, this->mapped_x_start_ );
+  this->overlap_y_start_ = Core::Max( 0, this->mapped_y_start_ );
+  this->overlap_z_start_ = Core::Max( 0, this->mapped_z_start_ );
+  this->overlap_nx_ = Core::Max( Core::Min( this->mapped_x_start_ + 
+    static_cast< int >( src_trans.get_nx() ), 
+    static_cast< int >( dst_trans.get_nx() ) ) - 
+    this->overlap_x_start_, 0 );
+  this->overlap_ny_ = Core::Max( Core::Min( this->mapped_y_start_ + 
+    static_cast< int >( src_trans.get_ny() ),
+    static_cast< int >( dst_trans.get_ny() ) ) - 
+    this->overlap_y_start_, 0 );
+  this->overlap_nz_ = Core::Max( Core::Min( this->mapped_z_start_ + 
+    static_cast< int >( src_trans.get_nz() ),
+    static_cast< int >( dst_trans.get_nz() ) ) - 
+    this->overlap_z_start_, 0 );
+}
+
+void ResampleAlgo::pad_and_crop_data_layer( DataLayerHandle input, DataLayerHandle output )
+{
+//  Core::DataBlock::shared_lock_type data_lock( input->get_data_volume()->
+//    get_data_block()->get_mutex() );
+// 
+//  double padding_val;
+//  if ( this->padding_ == ActionResample::ZERO_C )
+//  {
+//    padding_val = 0.0;
+//  }
+//  else if ( this->padding_ == ActionResample::MIN_C )
+//  {
+//    padding_val = input->get_data_volume()->get_data_block()->get_min();
+//  }
+//  else
+//  {
+//    padding_val = input->get_data_volume()->get_data_block()->get_max();
+//  }
+// 
+//  output->update_progress_signal_( 0.1 );
+// 
+//  if ( !nrrd_resmaple( nrrd_in->nrrd(), nrrd_out, this->data_kernel_ ) )
+//  {
+//    nrrdNuke( nrrd_out );
+//    CORE_LOG_ERROR( "Failed to resample layer '" + input->get_layer_id() +"'" );
+//  }
+//  else if ( !this->check_abort() )
+//  {
+//    Core::NrrdDataHandle nrrd_data( new Core::NrrdData( nrrd_out ) );
+//    Core::DataBlockHandle data_block = Core::NrrdDataBlock::New( nrrd_data );
+//    Core::DataVolumeHandle data_volume( new Core::DataVolume( 
+//      nrrd_data->get_grid_transform(), data_block ) );
+//    this->dispatch_insert_data_volume_into_layer( output, data_volume, true );
+//    output->update_progress_signal_( 1.0 );
+//    this->dispatch_unlock_layer( output );
+//    if ( this->replace_ )
+//    {
+//      this->dispatch_delete_layer( input );
+//    }
+//    else
+//    {
+//      this->dispatch_unlock_layer( input );
+//    }
+//  }
+}
+
+void ResampleAlgo::pad_and_crop_mask_layer( MaskLayerHandle input, MaskLayerHandle output )
+{
+
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -774,7 +889,6 @@ void ActionResample::Dispatch( Core::ActionContextHandle context,
   action->private_->replace_.set_value( replace );
 
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
-
 }
 
 } // end namespace Seg3D
