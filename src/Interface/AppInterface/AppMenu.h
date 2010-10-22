@@ -93,6 +93,7 @@ private Q_SLOTS:
   void new_project_wizard();
   void open_project_from_file();
   void open_project_folder();
+  void save_as_wizard();
   void about();
 };
 

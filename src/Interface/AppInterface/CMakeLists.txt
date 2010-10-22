@@ -174,6 +174,7 @@ TARGET_LINK_LIBRARIES(Interface_AppInterface
             Interface_AppPreferences
                   Interface_AppSplash
                   Interface_AppProjectWizard
+                  Interface_AppSaveProjectAsWizard
                   Interface_AppProjectExportWizard
                   Interface_AppSegmentationExportWizard
                       ${QT_LIBRARIES} 

@@ -59,6 +59,7 @@
 #include <Interface/AppInterface/AppInterface.h>
 #include <Interface/AppInterface/ViewerInterface.h>
 #include <Interface/AppProjectWizard/AppProjectWizard.h>
+#include <Interface/AppSaveProjectAsWizard/AppSaveProjectAsWizard.h>
 
 
 namespace Seg3D
@@ -135,6 +136,11 @@ void AppMenu::create_file_menu( QMenu* qmenu )
   QtUtils::QtBridge::Connect( qaction, 
     boost::bind( &ActionSaveSession::Dispatch, 
     Core::Interface::GetWidgetActionContext(), false, "" ) );
+    
+  qaction = qmenu->addAction( tr( "&Save Project As..." ) );
+  qaction->setShortcut( tr( "Ctrl+SHIFT+S" ) );
+  qaction->setToolTip( tr( "Save the current project as..." ) );
+  connect( qaction, SIGNAL( triggered() ), this, SLOT( save_as_wizard() ) );
     
   qmenu->addSeparator();
 
@@ -576,5 +582,13 @@ void AppMenu::EnableDisableLayerActions( qpointer_type qpointer )
   Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
     &AppMenu::enable_disable_layer_actions, qpointer.data() ) ) );
 }
+
+void AppMenu::save_as_wizard()
+{
+  QPointer< AppSaveProjectAsWizard > save_project_as_wizard_ = 
+    new AppSaveProjectAsWizard( this->main_window_);
+  save_project_as_wizard_->show();
+}
+
 
 } // end namespace Seg3D

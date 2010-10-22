@@ -103,9 +103,15 @@ public:
   // this function will be called by the project manager to delete a session
   bool delete_session( const std::string& session_name );
 
-  // EXPORT:
+  // PROJECT_EXPORT:
   // this function will export the current project and the passed vector of session names to file
-  bool project_export( boost::filesystem::path path, const std::string& project_name, const std::string& session_name );
+  bool project_export( boost::filesystem::path path, const std::string& project_name, 
+    const std::string& session_name );
+  
+  // SAVE_AS:
+  // this function will save the current project as a new project
+  bool save_as( boost::filesystem::path path, const std::string& project_name );
+
   
   // NAME_IS_SET:
   // this function is set called to set the name_set_ toggle in the project so it knows if the name

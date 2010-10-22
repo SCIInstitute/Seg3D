@@ -343,6 +343,46 @@ void Project::set_signal_block( bool on_off )
   this->enable_signals( on_off );
 }
 
+bool Project::save_as( boost::filesystem::path path, const std::string& project_name )
+{
+  boost::filesystem::path data_path = this->project_path_ / "data";
+  boost::filesystem::directory_iterator data_dir_end;
+  for( boost::filesystem::directory_iterator data_dir_itr( data_path ); 
+    data_dir_itr != data_dir_end; ++data_dir_itr )
+  {
+    try
+    {
+      boost::filesystem::copy_file( ( data_path / data_dir_itr->filename() ),
+        ( path / project_name / "data" / data_dir_itr->filename() ) );
+    }
+    catch ( std::exception& e ) // any errors that we might get thrown
+    {
+      CORE_LOG_ERROR( e.what() );
+      return false;
+    }
+  }
+
+  boost::filesystem::path session_path = this->project_path_ / "sessions";
+  boost::filesystem::directory_iterator session_dir_end;
+  for( boost::filesystem::directory_iterator session_dir_itr( session_path ); 
+    session_dir_itr != session_dir_end; ++session_dir_itr )
+  {
+    try
+    {
+      boost::filesystem::copy_file( ( session_path / session_dir_itr->filename() ),
+        ( path / project_name / "sessions"/ session_dir_itr->filename() ) );
+    }
+    catch ( std::exception& e ) // any errors that we might get thrown
+    {
+      CORE_LOG_ERROR( e.what() );
+      return false;
+    }
+  }
+  return true;
+
+}
+
+
 
 
 } // end namespace Seg3D

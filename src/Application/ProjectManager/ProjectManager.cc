@@ -295,10 +295,8 @@ bool ProjectManager::export_project( const std::string& export_path, const std::
 
   this->create_project_folders( path, project_name );
   this->save_project_only( export_path, project_name );
-  this->current_project_->project_export( path, project_name, session_name );
+  return this->current_project_->project_export( path, project_name, session_name );
   
-  return true;
-
 }
   
 bool ProjectManager::save_project_session( bool autosave /*= false */, std::string session_name  )
@@ -562,6 +560,17 @@ Seg3D::ProjectHandle ProjectManager::get_current_project() const
 {
   return this->current_project_;
 }
+
+bool ProjectManager::project_save_as( const std::string& export_path, const std::string& project_name )
+{
+  boost::filesystem::path path = complete( boost::filesystem::path( export_path.c_str(), 
+    boost::filesystem::native ) );
+
+  this->create_project_folders( path, project_name );
+  this->save_project_only( export_path, project_name );
+  return this->current_project_->save_as( path, project_name );
+}
+
 
 
 

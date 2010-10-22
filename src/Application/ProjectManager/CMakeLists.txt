@@ -49,6 +49,8 @@ SET(APPLICATION_PROJECTMANAGER_ACTIONS_SRCS
     Actions/ActionLoadProject.cc
     Actions/ActionNewProject.h
     Actions/ActionNewProject.cc
+    Actions/ActionSaveProjectAs.h
+    Actions/ActionSaveProjectAs.cc
     Actions/ActionExportProject.h
     Actions/ActionExportProject.cc
 )

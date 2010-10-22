@@ -85,6 +85,10 @@ public:
   // save location 
   bool export_project( const std::string& export_path, const std::string& project_name, 
     const std::string& session_name );
+    
+  // PROJECT_SAVE_AS:
+  // this function saves the current project with the desired name and save location 
+  bool project_save_as( const std::string& export_path, const std::string& project_name );
   
   // SAVE_PROJECT_MANAGER_STATE:
   // this function calls save_states that writes the state values of ProjectManager to file
