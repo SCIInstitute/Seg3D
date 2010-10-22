@@ -747,6 +747,10 @@ bool Renderer::render()
 
     double znear, zfar;
     view3d.compute_clipping_planes( bbox, znear, zfar );
+    
+    CORE_LOG_DEBUG( std::string(" far = ") + Core::ExportToString( zfar ) );
+    CORE_LOG_DEBUG( std::string(" near = ") + Core::ExportToString( znear ) );
+
     gluPerspective( view3d.fov(), this->width_ / ( 1.0 * this->height_ ), znear, zfar );
     glMatrixMode( GL_MODELVIEW );
     glLoadIdentity();
