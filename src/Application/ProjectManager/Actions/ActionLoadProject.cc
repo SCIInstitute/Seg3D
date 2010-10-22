@@ -71,7 +71,10 @@ bool ActionLoadProject::run( Core::ActionContextHandle& context,
   
   progress->end_progress_reporting();
 
-  ProjectManager::Instance()->get_current_project()->reset_project_changed();
+  if ( ProjectManager::Instance()->get_current_project() )
+  {
+    ProjectManager::Instance()->get_current_project()->reset_project_changed();
+  }
 
   return true;
 }
