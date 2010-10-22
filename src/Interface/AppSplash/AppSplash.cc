@@ -103,7 +103,7 @@ AppSplash::~AppSplash()
 void AppSplash::new_project()
 {
   this->new_project_wizard_ = new AppProjectWizard( this->parentWidget() );
-  connect( this->new_project_wizard_, SIGNAL( finished() ), this, SLOT( quit() ) );
+//  connect( this->new_project_wizard_, SIGNAL( finished() ), this, SLOT( quit() ) );
   connect( this->new_project_wizard_, SIGNAL( canceled() ), this, SLOT( unhide() ) );
   this->new_project_wizard_->show();
   this->hide();
