@@ -330,15 +330,8 @@ void RendererBase::resize( int width, int height )
     this->private_->textures_[ 1 ]->set_image( width, height, GL_RGBA );
     this->private_->textures_[ 2 ]->set_image( width, height, GL_RGBA );
     this->private_->textures_[ 3 ]->set_image( width, height, GL_RGBA );
-    this->private_->depth_buffer_->set_storage( width, height, GL_DEPTH_COMPONENT24 );
-    
+    this->private_->depth_buffer_->set_storage( width, height, GL_DEPTH_COMPONENT24 );    
   }
-
-  GLint depth_size; 
-  this->private_->depth_buffer_->bind();
-  glGetRenderbufferParameterivEXT( GL_RENDERBUFFER_EXT, GL_RENDERBUFFER_DEPTH_SIZE_EXT, &depth_size );
-  CORE_LOG_MESSAGE( std::string(" depth buffer size = " ) + Core::ExportToString( depth_size ) );
-  this->private_->depth_buffer_->unbind();
 
   this->width_ = width;
   this->height_ = height;

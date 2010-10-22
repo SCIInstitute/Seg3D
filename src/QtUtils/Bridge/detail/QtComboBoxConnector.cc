@@ -176,10 +176,6 @@ void QtComboBoxConnector::SetComboBoxIndexByData(
   {
     combobox->setCurrentIndex( index );
   }
-  else
-  {
-    assert( false );
-  }
 
   // unblock signals
   qpointer->unblock();
