@@ -163,6 +163,9 @@ void PreferencesManager::initialize_states()
   add_state( "y_axis_label", this->y_axis_label_state_, "Coronal" );
   add_state( "z_axis_label", this->z_axis_label_state_, "Axial" );
   
+  add_state( "amount_volume_undo_buffers", this->amount_volume_undo_buffers_state_ , 1, 0, 10, 1 );
+  add_state( "amount_slice_undo_buffers", this->amount_slice_undo_buffers_state_ , 1, 0, 100, 1 );
+  
   //Viewer Preferences
   add_state( "default_viewer_mode", this->default_viewer_mode_state_, "1and3", 
     "single|1and1|1and2|1and3|2and2|2and3|3and3" );

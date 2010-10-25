@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>766</width>
-    <height>493</height>
+    <width>768</width>
+    <height>574</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -130,6 +130,9 @@ border: 1px solid gray;
               <widget class="QPushButton" name="change_directory_button_">
                <property name="text">
                 <string>Change</string>
+               </property>
+               <property name="autoDefault">
+                <bool>false</bool>
                </property>
               </widget>
              </item>
@@ -585,7 +588,7 @@ border: 1px solid gray;
        <item>
         <widget class="QGroupBox" name="groupBox_2">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -717,6 +720,89 @@ border: 1px solid gray;
             </layout>
            </widget>
           </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_6">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="title">
+          <string>Undo/Redo:</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_20">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_21">
+            <item>
+             <widget class="QLabel" name="label_21">
+              <property name="toolTip">
+               <string>The amount of full volume buffers that are kept in memory for undo. Keep in mind that these buffers are memory intensive.</string>
+              </property>
+              <property name="text">
+               <string>Amount of volume undo buffers</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="amount_volume_undo_buffers_">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>60</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>70</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="baseSize">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_22">
+              <property name="toolTip">
+               <string>Amount of slices to be stored in the undo buffer. This setting only applies to operations that modify one slice. These buffers are less expensive to keep in memory.</string>
+              </property>
+              <property name="text">
+               <string>Amount of slice undo buffers</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="amount_slice_undo_buffers_">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>60</width>
+                <height>16777215</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
           <item>
            <spacer name="verticalSpacer_2">
             <property name="orientation">
@@ -725,7 +811,7 @@ border: 1px solid gray;
             <property name="sizeHint" stdset="0">
              <size>
               <width>20</width>
-              <height>60</height>
+              <height>40</height>
              </size>
             </property>
            </spacer>
@@ -1189,6 +1275,9 @@ border: 1px solid gray;
           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_4">
+          <property name="spacing">
+           <number>30</number>
+          </property>
           <item>
            <widget class="QCheckBox" name="tools_filters_checkbox_">
             <property name="text">
@@ -1230,6 +1319,19 @@ border: 1px solid gray;
             </property>
            </widget>
           </item>
+          <item>
+           <spacer name="verticalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
          </layout>
         </widget>
        </item>
@@ -1239,7 +1341,7 @@ border: 1px solid gray;
           <bool>true</bool>
          </property>
          <property name="currentIndex">
-          <number>0</number>
+          <number>2</number>
          </property>
          <widget class="QWidget" name="tools_tab1_">
           <attribute name="title">

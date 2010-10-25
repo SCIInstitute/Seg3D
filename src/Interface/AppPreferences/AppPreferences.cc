@@ -157,6 +157,11 @@ void AppPreferences::setup_general_prefs()
   QtUtils::QtBridge::Connect( this->private_->ui_.z_lineedit_,
     PreferencesManager::Instance()->z_axis_label_state_ );
     
+  QtUtils::QtBridge::Connect( this->private_->ui_.amount_volume_undo_buffers_,
+    PreferencesManager::Instance()->amount_volume_undo_buffers_state_ );  
+  QtUtils::QtBridge::Connect( this->private_->ui_.amount_slice_undo_buffers_,
+    PreferencesManager::Instance()->amount_slice_undo_buffers_state_ );
+    
   QtUtils::QtBridge::Enable( this->private_->ui_.x_lineedit_, 
     PreferencesManager::Instance()->axis_labels_option_state_,
     boost::lambda::bind( &Core::StateLabeledOption::get, 

@@ -181,6 +181,9 @@ QPushButton#quit_seg3d_button_:pressed{
            <property name="text">
             <string>Quit Seg3D</string>
            </property>
+           <property name="autoDefault">
+            <bool>false</bool>
+           </property>
           </widget>
          </item>
         </layout>
