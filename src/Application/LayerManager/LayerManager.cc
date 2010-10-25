@@ -1075,7 +1075,7 @@ bool LayerManager::CheckLayerAvailability( const std::string& layer_id, bool rep
   }
 }
 
-bool LayerManager::LockForUse( LayerHandle layer )
+bool LayerManager::LockForUse( LayerHandle layer, data_processing_key_type key )
 {
   // NOTE: Security check to keep the program logic sane
   // Only the Application Thread guarantees that nothing is changed in the program
@@ -1085,13 +1085,17 @@ bool LayerManager::LockForUse( LayerHandle layer )
       " application thread." );
   }
   
+  // Check whether the layer is really available
   if ( layer->data_state_->get() != Layer::AVAILABLE_C ) return false;
 
+  // If it is available set it to processing and list the key used by the filter
   layer->data_state_->set( Layer::IN_USE_C );
+  layer->set_data_processing_key( key );
+
   return true;
 }
 
-bool LayerManager::LockForProcessing( LayerHandle layer )
+bool LayerManager::LockForProcessing( LayerHandle layer, data_processing_key_type key )
 {
   // NOTE: Security check to keep the program logic sane
   // Only the Application Thread guarantees that nothing is changed in the program
@@ -1100,15 +1104,19 @@ bool LayerManager::LockForProcessing( LayerHandle layer )
     CORE_THROW_LOGICERROR( "LockForProcessing can only be called from the"
       " application thread." );
   }
-  
+
+  // Check whether the layer is really available
   if ( layer->data_state_->get() != Layer::AVAILABLE_C ) return false;
 
+  // If it is available set it to processing and list the key used by the filter
   layer->data_state_->set( Layer::PROCESSING_C );
+  layer->set_data_processing_key( key );
+
   return true;
 }
 
 bool LayerManager::CreateAndLockMaskLayer( Core::GridTransform transform, const std::string& name, 
-    LayerHandle& layer )
+    LayerHandle& layer, data_processing_key_type key )
 {
   // NOTE: Security check to keep the program logic sane.
   // Only the Application Thread guarantees that nothing is changed in the program.
@@ -1128,6 +1136,9 @@ bool LayerManager::CreateAndLockMaskLayer( Core::GridTransform transform, const 
 
   // Wrap the Layer structure around the mask data.
   layer = LayerHandle( new MaskLayer( name, invalid_mask ) );
+
+  // Insert the key used to keep track of which process is using this layer
+  layer->set_data_processing_key( key );
   
   // Insert the layer into the layer manager.
   LayerManager::Instance()->insert_layer( layer );
@@ -1136,7 +1147,7 @@ bool LayerManager::CreateAndLockMaskLayer( Core::GridTransform transform, const 
 }
 
 bool LayerManager::CreateAndLockDataLayer( Core::GridTransform transform, const std::string& name, 
-    LayerHandle& layer )
+    LayerHandle& layer, data_processing_key_type key )
 {
   // NOTE: Security check to keep the program logic sane
   // Only the Application Thread guarantees that nothing is changed in the program
@@ -1156,130 +1167,122 @@ bool LayerManager::CreateAndLockDataLayer( Core::GridTransform transform, const 
   
   // Wrap the Layer structure around the volume data.
   layer = LayerHandle( new DataLayer( name, invalid_data ) );
-  
+
+  // Insert the key used to keep track of which process is using this layer
+  layer->set_data_processing_key( key );
+
   // Insert the layer into the layer manager.
   LayerManager::Instance()->insert_layer( layer );
   
   return true;
 }
 
-void LayerManager::DispatchDeleteLayer( LayerHandle layer )
+void LayerManager::DispatchDeleteLayer( LayerHandle layer, data_processing_key_type key )
 {
   // Move this request to the Application thread
   if ( !( Core::Application::IsApplicationThread() ) )
   {
-    Core::Application::PostEvent( boost::bind( &LayerManager::DispatchDeleteLayer, layer ) );
+    Core::Application::PostEvent( boost::bind( &LayerManager::DispatchDeleteLayer, 
+      layer, key ) );
     return;
   }
 
-  // Insert the layer into the layer manager.
-  LayerManager::Instance()->delete_layer( layer );
-}
-
-void LayerManager::DispatchUnlockLayer( LayerHandle layer )
-{
-  // Move this request to the Application thread
-  if ( !( Core::Application::IsApplicationThread() ) )
+  // Only do work if the unique key is a match
+  if ( layer->get_data_processing_key() == key )
   {
-    Core::Application::PostEvent( boost::bind( &LayerManager::DispatchUnlockLayer, layer) );
-    return;
-  }
-
-  layer->data_state_->set( Layer::AVAILABLE_C );
-}
-
-void LayerManager::DispatchUnlockOrDeleteLayer( LayerHandle layer )
-{
-  // Move this request to the Application thread
-  if ( !( Core::Application::IsApplicationThread() ) )
-  {
-    Core::Application::PostEvent( boost::bind( &LayerManager::DispatchUnlockOrDeleteLayer, layer) );
-    return;
-  }
-
-  // NOTE: We can only determine whether the layer is valid on the application thread.
-  // Other instructions to insert data into the layer may still be in the application thread
-  // queue, hence we need to process this at the end of the queue.
-  if( layer->has_valid_data() )
-  {
-    layer->data_state_->set( Layer::AVAILABLE_C );
-  }
-  else
-  {
+    // Insert the layer into the layer manager.
     LayerManager::Instance()->delete_layer( layer );
   }
 }
 
+void LayerManager::DispatchUnlockLayer( LayerHandle layer, data_processing_key_type key )
+{
+  // Move this request to the Application thread
+  if ( !( Core::Application::IsApplicationThread() ) )
+  {
+    Core::Application::PostEvent( boost::bind( &LayerManager::DispatchUnlockLayer, 
+      layer, key ) );
+    return;
+  }
+
+  // Only do work if the unique key is a match
+  if ( layer->get_data_processing_key() == key )
+  {
+    layer->data_state_->set( Layer::AVAILABLE_C );
+  }
+}
+
+void LayerManager::DispatchUnlockOrDeleteLayer( LayerHandle layer, data_processing_key_type key  )
+{
+  // Move this request to the Application thread
+  if ( !( Core::Application::IsApplicationThread() ) )
+  {
+    Core::Application::PostEvent( boost::bind( &LayerManager::DispatchUnlockOrDeleteLayer, 
+      layer, key ) );
+    return;
+  }
+
+  // Only do work if the unique key is a match
+  if ( layer->get_data_processing_key() == key )
+  {
+    // NOTE: We can only determine whether the layer is valid on the application thread.
+    // Other instructions to insert data into the layer may still be in the application thread
+    // queue, hence we need to process this at the end of the queue.
+    if( layer->has_valid_data() )
+    {
+      layer->data_state_->set( Layer::AVAILABLE_C );
+    }
+    else
+    {
+      LayerManager::Instance()->delete_layer( layer );
+  
+    }
+  }
+}
+
 void LayerManager::DispatchInsertDataVolumeIntoLayer( DataLayerHandle layer, 
-  Core::DataVolumeHandle data )
+  Core::DataVolumeHandle data, data_processing_key_type key )
 {
   // Move this request to the Application thread
   if ( !( Core::Application::IsApplicationThread() ) )
   {
     Core::Application::PostEvent( boost::bind( 
-      &LayerManager::DispatchInsertDataVolumeIntoLayer, layer, data ) );
+      &LayerManager::DispatchInsertDataVolumeIntoLayer, layer, data, key ) );
     return;
   }
   
-  if ( layer->set_data_volume( data ) )
+  // Only do work if the unique key is a match
+  if ( layer->get_data_processing_key() == key )
   {
-    LayerManager::Instance()->layer_volume_changed_signal_( layer );
-    LayerManager::Instance()->layers_changed_signal_();
+    if ( layer->set_data_volume( data ) )
+    {
+      LayerManager::Instance()->layer_volume_changed_signal_( layer );
+      LayerManager::Instance()->layers_changed_signal_();
+    }
   }
 }
 
 void LayerManager::DispatchInsertMaskVolumeIntoLayer( MaskLayerHandle layer, 
-  Core::MaskVolumeHandle mask )
+  Core::MaskVolumeHandle mask, data_processing_key_type key )
 {
   // Move this request to the Application thread
   if ( !( Core::Application::IsApplicationThread() ) )
   {
     Core::Application::PostEvent( boost::bind( 
-      &LayerManager::DispatchInsertMaskVolumeIntoLayer, layer, mask ) );
+      &LayerManager::DispatchInsertMaskVolumeIntoLayer, layer, mask, key ) );
     return;
   }
   
-  if ( layer->set_mask_volume( mask ) )
+  // Only do work if the unique key is a match
+  if ( layer->get_data_processing_key() == key )
   {
-    LayerManager::Instance()->layer_volume_changed_signal_( layer );
-    LayerManager::Instance()->layers_changed_signal_();
+    if ( layer->set_mask_volume( mask ) )
+    {
+      LayerManager::Instance()->layer_volume_changed_signal_( layer );
+      LayerManager::Instance()->layers_changed_signal_();
+    }
   }
 }
-
-void LayerManager::DispatchCreateAndInsertDataLayer( std::string name, 
-  Core::DataVolumeHandle data )
-{
-  // Move this request to the Application thread
-  if ( !( Core::Application::IsApplicationThread() ) )
-  {
-    Core::Application::PostEvent( boost::bind( 
-      &LayerManager::DispatchCreateAndInsertDataLayer, name, data ) );
-    return;
-  }
-
-  // Create the layer.
-  DataLayerHandle data_layer( new DataLayer( name, data ) );
-  // Insert the layer into the layer manager.
-  LayerManager::Instance()->insert_layer( data_layer );
-}
-
-void LayerManager::DispatchCreateAndInsertMaskLayer( std::string name, 
-  Core::MaskVolumeHandle mask )
-{
-  // Move this request to the Application thread
-  if ( !( Core::Application::IsApplicationThread() ) )
-  {
-    Core::Application::PostEvent( boost::bind( 
-      &LayerManager::DispatchCreateAndInsertMaskLayer, name, mask ) );
-    return;
-  }
-
-  // Create the layer.
-  MaskLayerHandle mask_layer( new MaskLayer( name, mask ) );
-  // Insert the layer into the layer manager.
-  LayerManager::Instance()->insert_layer( mask_layer );
-}
-
 
 void LayerManager::handle_layer_name_changed( std::string layer_id, std::string name )
 {

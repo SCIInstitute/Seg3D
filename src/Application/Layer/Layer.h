@@ -209,13 +209,25 @@ public:
   // Get the generation of the current data block
   Core::DataBlock::generation_type get_generation() const;
   
+  // DATA_PROCESSING_KEY:
+  // This is a unique key that is inserted when an asynchronous filter is running. 
+  // The asynchronous calls back to the layer are compared with the key, if they don't
+  // match the layer is not modified, at it is assumed that the filtering was aborted.
+  typedef long long data_processing_key_type;
+
+  // GET_DATA_PROCESSING_KEY:
+  // Get the current key set for what is being processed
+  data_processing_key_type get_data_processing_key() const;
+
+  // SET_DATA_PROCESSING_KEY:
+  // Set the current key for what is being processed
+  void set_data_processing_key( data_processing_key_type key );
+
 protected:
   virtual bool post_save_states( Core::StateIO& state_io );
 
+  // -- internals of class --
 private:  
-  // Handle to the layer group (this one needs to be weak to ensure objects are not persistent
-  // due to a circular dependency)
-  LayerGroupWeakHandle layer_group_;
 
   LayerPrivateHandle private_;
 
@@ -229,6 +241,10 @@ public:
   // Get the mutex of the state engine
   static mutex_type& GetMutex();
 
+  // -- data processing key generation --
+public:
+  static data_processing_key_type GenerateDataProcessingKey();
+
 public:
 
   // Options for the state of the data inside of the layer
@@ -236,6 +252,7 @@ public:
   const static std::string PROCESSING_C;
   const static std::string AVAILABLE_C;
   const static std::string IN_USE_C;
+
 };
 
 } // end namespace Seg3D

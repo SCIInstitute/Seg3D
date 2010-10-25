@@ -57,6 +57,13 @@ public:
   void handle_visible_state_changed( size_t viewer_id, bool visible );
 
   Layer* layer_;
+
+  // Handle to the layer group (this one needs to be weak to ensure objects are not persistent
+  // due to a circular dependency)
+  LayerGroupWeakHandle layer_group_;
+
+  // Identifier for keeping track which data_processing action is running. 
+  Layer::data_processing_key_type key_;
 };
 
 void LayerPrivate::handle_locked_state_changed( bool locked )
@@ -102,6 +109,7 @@ Layer::Layer( const std::string& name, bool creating ) :
   private_( new LayerPrivate )
 { 
   this->private_->layer_ = this;
+  this->private_->key_ = 0;
   this->initialize_states( name, creating );
 }
 
@@ -110,6 +118,7 @@ Layer::Layer( const std::string& name, const std::string& state_id, bool creatin
   private_( new LayerPrivate )
 {
   this->private_->layer_ = this;
+  this->private_->key_ = 0;
   this->initialize_states( name, creating );
 }
   
@@ -122,12 +131,12 @@ Layer::~Layer()
 
 LayerGroupHandle Layer::get_layer_group() 
 { 
-  return this->layer_group_.lock(); 
+  return this->private_->layer_group_.lock(); 
 }
   
 void Layer::set_layer_group( LayerGroupWeakHandle layer_group )
 {
-  this->layer_group_ = layer_group;
+  this->private_->layer_group_ = layer_group;
 }
 
 std::string Layer::get_layer_id() const
@@ -253,6 +262,25 @@ bool Layer::is_visible( size_t viewer_id ) const
   lock_type lock( Layer::GetMutex() );
 
   return this->master_visible_state_->get() && this->visible_state_[ viewer_id ]->get();
+}
+
+Layer::data_processing_key_type Layer::get_data_processing_key() const
+{
+  return this->private_->key_;
+}
+
+void Layer::set_data_processing_key( data_processing_key_type key )
+{
+  this->private_->key_ = key;
+}
+
+static boost::mutex GenerateDataProcessingKeyMutex;
+long long GenerateDataProcessingKeyCounter = 1;
+
+Layer::data_processing_key_type Layer::GenerateDataProcessingKey()
+{
+  boost::unique_lock<boost::mutex> lock( GenerateDataProcessingKeyMutex );
+  return GenerateDataProcessingKeyCounter++;
 }
 
 } // end namespace Seg3D

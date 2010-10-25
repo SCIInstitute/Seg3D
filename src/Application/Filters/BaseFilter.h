@@ -166,6 +166,10 @@ public:
   // Report an error to the user
   void report_error( const std::string& error );
 
+  // -- data processing key --
+public:
+  Layer::data_processing_key_type get_key();
+
   // -- internals --
 private:
   BaseFilterPrivateHandle private_;

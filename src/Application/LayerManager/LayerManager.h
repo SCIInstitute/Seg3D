@@ -349,30 +349,38 @@ public:
     Core::NotifierHandle& notifier ); 
     
   // == functions for creating and locking layers ==
-  
+public: 
+  // KEY_TYPE:
+  // When locking a layer a key is returned. This key keeps track of the asynchronous process
+  // and is needed to reinsert a volume into layer. The purpose of the key is to ensure that
+  // a volume is only inserted by the asynchronous process if the key matches the one generated
+  // when the layer was locked.
+  typedef Layer::data_processing_key_type data_processing_key_type;
+
+
   // These functions can only be called from the application thread
   
   // LOCKFORUSE:
   // Change the layer data_state to IN_USE_C.
   // NOTE: This function can *only* be called from the Application thread.
-  static bool LockForUse( LayerHandle layer );
+  static bool LockForUse( LayerHandle layer, data_processing_key_type key = 0 );
   
   // LOCKFORPROCESSING:
   // Change the layer data_state to PROCESSING_C.
   // NOTE: This function can *only* be called from the Application thread.
-  static bool LockForProcessing( LayerHandle layer );
+  static bool LockForProcessing( LayerHandle layer, data_processing_key_type key = 0 );
   
   // CREATEANDLOCKMASKLAYER:
   // Create a new mask layer and lock it into the CREATING_C mode.
   // NOTE: This function can *only* be called from the Application thread.
   static bool CreateAndLockMaskLayer( Core::GridTransform transform, const std::string& name, 
-    LayerHandle& layer );
+    LayerHandle& layer, data_processing_key_type key = 0 );
   
   // CREATEANDLOCKDATALAYER:
   // Create a new data layer and lock it into the CREATING_C mode.
   // NOTE: This function can *only* be called from the Application thread.
   static bool CreateAndLockDataLayer( Core::GridTransform, const std::string& name,
-    LayerHandle& layer );
+    LayerHandle& layer, data_processing_key_type key = 0 );
   
   // == functions for setting data and unlocking layers ==
 
@@ -381,41 +389,29 @@ public:
   // DISPATCHUNLOCKLAYER:
   // Change the layer data_state back to available. This function will relay a call to the 
   // Application thread if needed.
-  static void DispatchUnlockLayer( LayerHandle layer );
+  static void DispatchUnlockLayer( LayerHandle layer, data_processing_key_type key = 0 );
 
   // DISPATCHDELETELAYER:
   // Delete the layer. This function will relay a call to the 
   // Application thread if needed.
-  static void DispatchDeleteLayer( LayerHandle layer );
+  static void DispatchDeleteLayer( LayerHandle layer, data_processing_key_type key = 0 );
   
   // DISPATCHUNLOCKORDELETELAYER:
   // Unlock layer if valid, delete otherwise. This function will relay a call to the 
   // Application thread if needed.
-  static void DispatchUnlockOrDeleteLayer( LayerHandle layer );
+  static void DispatchUnlockOrDeleteLayer( LayerHandle layer, data_processing_key_type key = 0 );
 
   // DISPATCHINSERTDATAVOLUMEINTOLAYER:
-  // Insert a datavolume into a data layer. This function will relay a call to the 
+  // Insert a data volume into a data layer. This function will relay a call to the 
   // Application thread if needed.
   static void DispatchInsertDataVolumeIntoLayer( DataLayerHandle layer, 
-    Core::DataVolumeHandle data );
+    Core::DataVolumeHandle data, data_processing_key_type key = 0 );
 
   // DISPATCHINSERTMASKVOLUMEINTOLAYER:
-  // Insert a datavolume into a data layer. This function will relay a call to the 
+  // Insert a mask volume into a data layer. This function will relay a call to the 
   // Application thread if needed.
   static void DispatchInsertMaskVolumeIntoLayer( MaskLayerHandle layer, 
-    Core::MaskVolumeHandle mask );
-
-  // DISPATCHCREATEANDINSERTMASKLAYER:
-  // Create and insert the layer. This function will relay a call to the 
-  // Application thread if needed.
-  static void DispatchCreateAndInsertMaskLayer( std::string name, 
-    Core::MaskVolumeHandle mask );
-  
-  // DISPATCHCREATEANDINSERTMASKLAYER:
-  // Create and insert the layer. This function will relay a call to the 
-  // Application thread if needed.
-  static void DispatchCreateAndInsertDataLayer( std::string name, 
-    Core::DataVolumeHandle data );
+    Core::MaskVolumeHandle mask, data_processing_key_type key = 0 );
 
 };
 

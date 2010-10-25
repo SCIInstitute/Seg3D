@@ -55,6 +55,9 @@ public:
   // Mutex protecting abort status
   boost::mutex abort_mutex_;
 
+  // Key used for this filter
+  Layer::data_processing_key_type key_;
+
   // Function for handling abort
   void handle_abort();
 };
@@ -69,6 +72,7 @@ BaseFilter::BaseFilter() :
   private_( new BaseFilterPrivate )
 {
   this->private_->abort_ = false;
+  this->private_->key_ = Layer::GenerateDataProcessingKey();
 }
 
 BaseFilter::~BaseFilter()
@@ -77,7 +81,8 @@ BaseFilter::~BaseFilter()
 
   for ( size_t j = 0; j < this->private_->locked_layers_.size(); j++ )
   {
-    LayerManager::DispatchUnlockLayer( this->private_->locked_layers_[ j ] );
+    LayerManager::DispatchUnlockLayer( this->private_->locked_layers_[ j ],
+      this->private_->key_ );
   }
 
   boost::mutex::scoped_lock lock( this->private_->abort_mutex_ );
@@ -85,14 +90,16 @@ BaseFilter::~BaseFilter()
   {
     for ( size_t j = 0; j < this->private_->created_layers_.size(); j++ )
     {
-      LayerManager::DispatchDeleteLayer( this->private_->created_layers_[ j ] );
+      LayerManager::DispatchDeleteLayer( this->private_->created_layers_[ j ],
+        this->private_->key_ );
     }
   }
   else
   {
     for ( size_t j = 0; j < this->private_->created_layers_.size(); j++ )
     {
-      LayerManager::DispatchUnlockOrDeleteLayer( this->private_->created_layers_[ j ] );
+      LayerManager::DispatchUnlockOrDeleteLayer( this->private_->created_layers_[ j ],
+        this->private_->key_ );
     }
   }
   
@@ -143,7 +150,7 @@ bool BaseFilter::find_layer( const std::string& layer_id, LayerHandle& layer )
 
 bool BaseFilter::lock_for_use( LayerHandle layer )
 {
-  if ( !( LayerManager::LockForUse( layer ) ) ) 
+  if ( !( LayerManager::LockForUse( layer, this->private_->key_ ) ) ) 
   {
     this->report_error( "Could not lock '" + layer->get_layer_name() + "'." );
     return false;
@@ -154,7 +161,7 @@ bool BaseFilter::lock_for_use( LayerHandle layer )
 
 bool BaseFilter::lock_for_processing( LayerHandle layer )
 {
-  if ( !( LayerManager::LockForProcessing( layer ) ) )
+  if ( !( LayerManager::LockForProcessing( layer, this->private_->key_ ) ) )
   {
     this->report_error( "Could not lock '" + layer->get_layer_name() + "'." );
     return false;
@@ -171,7 +178,7 @@ bool BaseFilter::create_and_lock_data_layer_from_layer( LayerHandle src_layer,
 
   // Create the layer in creating mode
   if ( !( LayerManager::CreateAndLockDataLayer( src_layer->get_grid_transform(),
-    name, dst_layer ) ) )
+    name, dst_layer, this->private_->key_ ) ) )
   {
     dst_layer.reset();
     this->report_error( "Could not allocate enough memory." );
@@ -192,7 +199,8 @@ bool BaseFilter::create_and_lock_data_layer( const Core::GridTransform& grid_tra
   std::string name = this->get_layer_prefix() + "_" + src_layer->get_layer_name();
 
   // Create the layer in creating mode
-  if ( !( LayerManager::CreateAndLockDataLayer( grid_trans, name, dst_layer ) ) )
+  if ( !( LayerManager::CreateAndLockDataLayer( grid_trans, name, dst_layer,
+    this->private_->key_ ) ) )
   {
     dst_layer.reset();
     this->report_error( "Could not allocate enough memory." ); 
@@ -213,7 +221,7 @@ bool BaseFilter::create_and_lock_mask_layer_from_layer( LayerHandle src_layer, L
 
   // Create the layer in creating mode
   if ( !( LayerManager::CreateAndLockMaskLayer( src_layer->get_grid_transform(),
-    name, dst_layer ) ) )
+    name, dst_layer, this->private_->key_ ) ) )
   {
     dst_layer.reset();
     this->report_error( "Could not allocate enough memory." );
@@ -234,7 +242,8 @@ bool BaseFilter::create_and_lock_mask_layer( const Core::GridTransform& grid_tra
   std::string name = this->get_layer_prefix() + "_" + src_layer->get_layer_name();
 
   // Create the layer in creating mode
-  if ( !( LayerManager::CreateAndLockMaskLayer( grid_trans, name, dst_layer ) ) )
+  if ( !( LayerManager::CreateAndLockMaskLayer( grid_trans, name, dst_layer,
+    this->private_->key_ ) ) )
   {
     dst_layer.reset();
     this->report_error( "Could not allocate enough memory." );
@@ -282,7 +291,7 @@ bool BaseFilter::dispatch_unlock_layer( LayerHandle layer )
     return false;
   }
   // Send a request to the layer manager to unlock the layer.
-  LayerManager::DispatchUnlockLayer( layer );
+  LayerManager::DispatchUnlockLayer( layer, this->private_->key_ );
 
   // Done
   return true;
@@ -319,7 +328,7 @@ bool BaseFilter::dispatch_delete_layer( LayerHandle layer )
   }
 
   // Send a request to the layer manager to unlock the layer.
-  LayerManager::DispatchDeleteLayer( layer );
+  LayerManager::DispatchDeleteLayer( layer, this->private_->key_ );
 
   // Done
   return true;
@@ -339,7 +348,8 @@ bool BaseFilter::dispatch_insert_data_volume_into_layer( LayerHandle layer,
   if ( update_histogram ) data->get_data_block()->update_histogram();
   
   // Ensure that the application thread will process this update.
-  LayerManager::DispatchInsertDataVolumeIntoLayer( data_layer, data );
+  LayerManager::DispatchInsertDataVolumeIntoLayer( data_layer, data,
+     this->private_->key_ );
   return true;
 }
 
@@ -352,7 +362,8 @@ bool BaseFilter::dispatch_insert_mask_volume_into_layer( LayerHandle layer,
   if ( ! mask_layer ) return false;
 
   // Ensure that the application thread will process this update.
-  LayerManager::DispatchInsertMaskVolumeIntoLayer( mask_layer, mask );
+  LayerManager::DispatchInsertMaskVolumeIntoLayer( mask_layer, mask,
+    this->private_->key_ );
   return true;
 }
 
