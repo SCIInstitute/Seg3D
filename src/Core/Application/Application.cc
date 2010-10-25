@@ -375,4 +375,35 @@ void Application::Reset()
   Instance()->reset();
 }
 
+long long Application::get_total_virtual_memory()
+{
+  return 0;
+}
+
+
+long long Application::get_total_physical_memory()
+{
+  return 0;
+}
+
+long long Application::get_total_addressable_memory()
+{
+  return 0;
+}
+
+long long Application::get_my_virtual_memory_used()
+{
+  return 0;
+}
+
+long long Application::get_my_physical_memory_used()
+{
+  return 0;
+}
+
+long long Application::get_my_memory_used()
+{
+  return 0;
+}
+
 } // end namespace Core

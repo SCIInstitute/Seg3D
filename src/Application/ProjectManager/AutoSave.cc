@@ -146,7 +146,10 @@ bool AutoSave::needs_auto_save()
 
 void AutoSave::do_auto_save()
 {
-  ActionSaveSession::Dispatch( Core::Interface::GetWidgetActionContext(), true, "" );
+  if ( ProjectManager::Instance()->get_current_project()->check_project_changed() )
+  {
+    ActionSaveSession::Dispatch( Core::Interface::GetWidgetActionContext(), true, "" );
+  }
 }
 
 

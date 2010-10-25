@@ -124,6 +124,10 @@ void QtSliderIntCombo::setRange( int min, int max)
     this->private_->ui_.max_->setNum( max );
     
     int tick = (max - min)/10;
+  
+  // NOTE: Fix the cases where there are less than 10 options to choose from
+  if ( tick == 0 ) tick = 1;
+  
     this->private_->ui_.horizontalSlider->setTickInterval( tick );
     block_signals( false );
 }

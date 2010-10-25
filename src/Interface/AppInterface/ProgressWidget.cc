@@ -66,7 +66,8 @@ ProgressWidget::ProgressWidget( Core::ActionProgressHandle action_progress, QWid
   // Step (1): Prevent any import from other widgets while progress bar is shown
   setModal( true );
   setAttribute( Qt::WA_DeleteOnClose );
-
+  setAttribute( Qt::WA_ShowWithoutActivating );
+  
   // Step (2): Add the Ui children onto the QWidget
   this->private_->ui_.setupUi( this );
   

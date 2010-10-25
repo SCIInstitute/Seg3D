@@ -66,7 +66,7 @@ private:
   static void ShowActiveToolControls( QPointer< AppShortcuts > qpointer, ToolHandle tool );
   void show_active_tool_contols( ToolHandle tool );
   
-
+  void update_fonts_and_text();
 };
 
 } // end namespace

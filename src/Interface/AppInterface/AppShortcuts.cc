@@ -85,6 +85,9 @@ AppShortcuts::AppShortcuts( QWidget *parent ) :
   this->add_connection( ToolManager::Instance()->activate_tool_signal_.connect( 
     boost::bind( &AppShortcuts::ShowActiveToolControls, 
     QPointer< AppShortcuts >( this ), _1 ) ) );
+
+  // Update fonts and text
+  update_fonts_and_text();
 }
 
 AppShortcuts::~AppShortcuts()
@@ -165,6 +168,8 @@ void AppShortcuts::add_tool_shortcuts()
 
   }
 
+  // Update fonts and text
+  update_fonts_and_text();
 }
 
 void AppShortcuts::ShowActiveToolControls( QPointer< AppShortcuts > qpointer, ToolHandle tool )
@@ -246,11 +251,35 @@ void AppShortcuts::show_active_tool_contols( ToolHandle tool )
     
     new_verticalLayout_8->addWidget( tool_shortcut_widget_ );
   }
-  
     
+  // Update fonts and text
+  update_fonts_and_text();
 }
 
+void AppShortcuts::update_fonts_and_text()
+{
 
+// ShortCut keys on Mac are different: CTRL becomes command key and we need to fix the font size
+// on mac as it is too large. Default fonts on Mac and Windows are set differently.
+// This function fixes the appearance
+#ifdef __APPLE__
+  QList<QLabel*> children = findChildren< QLabel* >();
+  QList<QLabel*>::iterator it = children.begin();
+  QList<QLabel*>::iterator it_end = children.end();
+  
+  while( it != it_end )
+  {
+    std::string text = (*it)->text().toStdString();
+    boost::replace_all( text,  "CTRL", "COMMAND" );
+    (*it)->setText( QString::fromStdString( text ) );
+    QFont font = (*it)->font();
+    font.setPointSize( 11 );
+    (*it)->setFont( font );
+    ++it;
+  }
+#endif
+  
+}
 
 
 

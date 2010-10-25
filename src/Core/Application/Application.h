@@ -125,6 +125,32 @@ public:
   // Get the current username
   bool get_user_name( std::string& user_name );
 
+  // -- Memory information --
+public:
+  // GET_TOTAL_VIRTUAL_MEMORY:
+  // Get the total amount of virtual memory available
+  long long get_total_virtual_memory();
+
+  // GET_TOTAL_PHYSICAL_MEMORY:
+  // Get the total amount of physical memory available
+  long long get_total_physical_memory();
+  
+  // GET_TOTAL_ADDRESSABLE_MEMORY:
+  // Get the amount of addressable memory available
+  long long get_total_addressable_memory();
+  
+  // GET_MY_VIRTUAL_MEMORY_USED:
+  // Get the amount of virtual memory used by current process
+  long long get_my_virtual_memory_used();
+  
+  // GET_MY_PHYSICAL_MEMORY_USED:
+  // Get the amount of physical memory used by current process
+  long long get_my_physical_memory_used();
+
+  // GET_MY_MEMORY_USED:
+  // Get the amount of memory used by current process
+  long long get_my_memory_used();
+  
   // -- Signals --
 public:
   // RESET_SIGNAL_:

@@ -1331,7 +1331,7 @@ QPushButton#activate_button_{
              <widget class="QLabel" name="dimensions_label_">
               <property name="maximumSize">
                <size>
-                <width>62</width>
+                <width>80</width>
                 <height>16777215</height>
                </size>
               </property>
@@ -1375,7 +1375,7 @@ QPushButton#activate_button_{
              <widget class="QLabel" name="label_5">
               <property name="maximumSize">
                <size>
-                <width>62</width>
+                <width>80</width>
                 <height>16777215</height>
                </size>
               </property>
@@ -1419,7 +1419,7 @@ QPushButton#activate_button_{
              <widget class="QLabel" name="label_7">
               <property name="maximumSize">
                <size>
-                <width>62</width>
+                <width>80</width>
                 <height>16777215</height>
                </size>
               </property>
@@ -1478,7 +1478,7 @@ QPushButton#activate_button_{
                 <widget class="QLabel" name="label_9">
                  <property name="maximumSize">
                   <size>
-                   <width>62</width>
+                   <width>80</width>
                    <height>16777215</height>
                   </size>
                  </property>
