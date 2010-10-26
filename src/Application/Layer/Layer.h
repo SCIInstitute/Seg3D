@@ -223,6 +223,10 @@ public:
   // Set the current key for what is being processed
   void set_data_processing_key( data_processing_key_type key );
 
+  // RESET_DATA_PROCESSING_KEY:
+  // Reset the current key for what is being processed
+  void reset_data_processing_key();
+
 protected:
   virtual bool post_save_states( Core::StateIO& state_io );
 

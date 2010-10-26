@@ -122,11 +122,11 @@ public:
   bool invert_mask_;
   
 public:
-  // RUN:
+  // RUN_FILTER:
   // Implemtation of run of the Runnable base class, this function is called when the thread
   // is launched.
 
-  virtual void run()
+  virtual void run_filter()
   {
     MaskLayerHandle input_mask = boost::dynamic_pointer_cast<MaskLayer>( this->src_layer_ );
     Core::MaskVolumeHandle input_volume = input_mask->get_mask_volume();

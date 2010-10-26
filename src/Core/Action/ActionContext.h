@@ -40,10 +40,9 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 
-// Application includes
+// Core includes
 #include <Core/Utils/EnumClass.h>
 #include <Core/Utils/Notifier.h>
-
 #include <Core/Action/ActionResult.h>
 
 namespace Core

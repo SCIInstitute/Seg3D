@@ -274,6 +274,11 @@ void Layer::set_data_processing_key( data_processing_key_type key )
   this->private_->key_ = key;
 }
 
+void Layer::reset_data_processing_key()
+{
+  this->private_->key_ = 0;
+}
+
 static boost::mutex GenerateDataProcessingKeyMutex;
 long long GenerateDataProcessingKeyCounter = 1;
 

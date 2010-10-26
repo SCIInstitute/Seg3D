@@ -361,23 +361,23 @@ private:
 
 #define SCI_BEGIN_TYPED_ITK_RUN( DATATYPE ) \
 public:\
-  virtual void run()\
+  virtual void run_filter()\
   {\
     switch ( DATATYPE )\
     {\
-      case Core::DataType::CHAR_E: this->typed_run<signed char>(); break;\
-      case Core::DataType::UCHAR_E: this->typed_run<unsigned char>(); break;\
-      case Core::DataType::SHORT_E: this->typed_run<short>(); break;\
-      case Core::DataType::USHORT_E: this->typed_run<unsigned short>(); break;\
-      case Core::DataType::INT_E: this->typed_run<int>(); break;\
-      case Core::DataType::UINT_E: this->typed_run<unsigned int>(); break;\
-      case Core::DataType::FLOAT_E: this->typed_run<float>(); break;\
-      case Core::DataType::DOUBLE_E: this->typed_run<double>(); break;\
+      case Core::DataType::CHAR_E: this->typed_run_filter<signed char>(); break;\
+      case Core::DataType::UCHAR_E: this->typed_run_filter<unsigned char>(); break;\
+      case Core::DataType::SHORT_E: this->typed_run_filter<short>(); break;\
+      case Core::DataType::USHORT_E: this->typed_run_filter<unsigned short>(); break;\
+      case Core::DataType::INT_E: this->typed_run_filter<int>(); break;\
+      case Core::DataType::UINT_E: this->typed_run_filter<unsigned int>(); break;\
+      case Core::DataType::FLOAT_E: this->typed_run_filter<float>(); break;\
+      case Core::DataType::DOUBLE_E: this->typed_run_filter<double>(); break;\
     };\
   }\
 \
   template< class VALUE_TYPE>\
-  void typed_run()\
+  void typed_run_filter()\
   {\
     typedef itk::Image< unsigned short, 3> USHORT_IMAGE_TYPE; \
     typedef itk::Image< unsigned int, 3> UINT_IMAGE_TYPE; \
@@ -397,7 +397,7 @@ public:\
 
 #define SCI_BEGIN_ITK_RUN( ) \
 public:\
-  virtual void run()\
+  virtual void run_filter()\
   {\
     typedef itk::Image< unsigned short, 3> USHORT_IMAGE_TYPE; \
     typedef itk::Image< unsigned int, 3> UINT_IMAGE_TYPE; \

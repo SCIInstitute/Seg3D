@@ -65,10 +65,10 @@ public:
 
 public:
 
-  // RUN:
+  // RUN_FILTER:
   // Implementation of run of the Runnable base class, this function is called 
   // when the thread is launched.
-  virtual void run();
+  virtual void run_filter();
 
   // GET_FITLER_NAME:
   // The name of the filter, this information is used for generating new layer labels.
@@ -87,7 +87,7 @@ public:
 };
 
 
-void ArithmeticFilterAlgo::run()
+void ArithmeticFilterAlgo::run_filter()
 {
   std::string error;
   if ( !this->engine_.run( error ) )

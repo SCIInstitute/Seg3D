@@ -32,6 +32,7 @@
 // Application includes
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/Filters/BaseFilter.h>
+#include <Application/Filters/BaseFilterLock.h>
 #include <Application/StatusBar/StatusBar.h>
  
 namespace Seg3D
@@ -365,6 +366,23 @@ bool BaseFilter::dispatch_insert_mask_volume_into_layer( LayerHandle layer,
   LayerManager::DispatchInsertMaskVolumeIntoLayer( mask_layer, mask,
     this->private_->key_ );
   return true;
+}
+
+
+void BaseFilter::run()
+{
+  // Ensure that there not that many processes running in parallel
+  BaseFilterLock::Instance()->lock();
+  
+  try
+  {
+    this->run_filter();
+  }
+  catch( ... )
+  {
+  }
+  
+  BaseFilterLock::Instance()->unlock();
 }
 
 } // end namespace Seg3D

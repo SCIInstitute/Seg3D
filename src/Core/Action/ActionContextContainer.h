@@ -25,36 +25,60 @@
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
  */
- 
 
-#ifndef CORE_UTILS_RUNTHREAD_H
-#define CORE_UTILS_RUNTHREAD_H
+#ifndef CORE_ACTION_ACTIONCONTEXTCONTAINER_H
+#define CORE_ACTION_ACTIONCONTEXTCONTAINER_H
 
-#include <boost/smart_ptr.hpp>
-#include <boost/utility.hpp>
-  
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+# pragma once
+#endif 
+
+// Core includes
+#include <Core/Action/ActionContext.h>
+
 namespace Core
 {
 
-class Runnable;
-typedef boost::shared_ptr<Runnable> RunnableHandle;
 
-class Runnable : public boost::noncopyable {
+class ActionContextContainer : public ActionContext
+{
 
+  // -- Constructor/destructor --
 public:
-  virtual ~Runnable();
-  
+  // Wrap a context around an action
+  ActionContextContainer( ActionContextHandle context );
+
+  // Virtual destructor for memory management
+  virtual ~ActionContextContainer();
+
+  // -- Reporting functions --
+public:
+  virtual void report_error( const std::string& error );
+  virtual void report_warning( const std::string& warning );
+  virtual void report_message( const std::string& message );
+
+  // -- Report back status and results --
+public:
+  virtual void report_status( ActionStatus status );
+  virtual void report_result( const ActionResultHandle& result );
+  virtual void report_need_resource( NotifierHandle& notifier );
+
+  // -- Report that action was done --
+public:
+  virtual void report_done();
+
+  // -- Source/Status information --
+public:
+  virtual ActionStatus status() const;
+  virtual ActionSource source() const;
+
+  // -- Status information --
 protected:
-  friend void ExecuteRunnable( RunnableHandle runnable );
-  // RUN:
-  // The function that needs to run on a different thread
-  virtual void run() = 0;
-  
-public:
-  
-  static void Start( RunnableHandle runnable );
+
+  // The last status report from the action engine
+  ActionContextHandle context_;
 };
 
 } // end namespace Core
-  
+
 #endif

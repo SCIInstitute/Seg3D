@@ -36,6 +36,8 @@ SET(CORE_ACTION_SRCS
   Action.cc
   ActionContext.h
   ActionContext.cc
+  ActionContextContainer.h
+  ActionContextContainer.cc
   ActionParameter.h
   ActionParameter.cc
   ActionResult.h

@@ -133,10 +133,10 @@ public:
   void pad_and_crop_data_layer(  DataLayerHandle input, DataLayerHandle output );
   void pad_and_crop_mask_layer( MaskLayerHandle input, MaskLayerHandle output );
 
-  // RUN:
+  // RUN_FILTER:
   // Implementation of run of the Runnable base class, this function is called 
   // when the thread is launched.
-  virtual void run();
+  virtual void run_filter();
 
   // GET_FITLER_NAME:
   // The name of the filter, this information is used for generating new layer labels.
@@ -461,7 +461,7 @@ void ResampleAlgo::resample_mask_layer( MaskLayerHandle input, MaskLayerHandle o
   }
 }
 
-void ResampleAlgo::run()
+void ResampleAlgo::run_filter()
 {
   if ( this->resample_to_grid_ )
   {

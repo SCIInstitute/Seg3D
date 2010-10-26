@@ -191,10 +191,10 @@ public:
     }
   }
 
-  // RUN:
+  // RUN_FILTER:
   // Implementation of run of the Runnable base class, this function is called 
   // when the thread is launched.
-  virtual void run()
+  virtual void run_filter()
   {
     switch ( this->src_layer_->get_type() )
     {

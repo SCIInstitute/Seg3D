@@ -160,6 +160,15 @@ public:
   // when a new layer is generated. 
   virtual std::string get_layer_prefix() const = 0;
 
+protected:
+  // RUN_FILTER:
+  // run the filter
+  virtual void run_filter() = 0;
+
+  // RUN:
+  // The function called by runnable
+  virtual void run();
+
   // -- error handling --
 public:
   // REPORT_ERROR:
@@ -181,23 +190,23 @@ private:
 
 #define SCI_BEGIN_TYPED_RUN( DATATYPE ) \
 public:\
-  virtual void run()\
+  virtual void run_filter()\
   {\
     switch ( DATATYPE )\
     {\
-      case Core::DataType::CHAR_E: this->typed_run<signed char>(); break;\
-      case Core::DataType::UCHAR_E: this->typed_run<unsigned char>(); break;\
-      case Core::DataType::SHORT_E: this->typed_run<short>(); break;\
-      case Core::DataType::USHORT_E: this->typed_run<unsigned short>(); break;\
-      case Core::DataType::INT_E: this->typed_run<int>(); break;\
-      case Core::DataType::UINT_E: this->typed_run<unsigned int>(); break;\
-      case Core::DataType::FLOAT_E: this->typed_run<float>(); break;\
-      case Core::DataType::DOUBLE_E: this->typed_run<double>(); break;\
+      case Core::DataType::CHAR_E: this->typed_run_filter<signed char>(); break;\
+      case Core::DataType::UCHAR_E: this->typed_run_filter<unsigned char>(); break;\
+      case Core::DataType::SHORT_E: this->typed_run_filter<short>(); break;\
+      case Core::DataType::USHORT_E: this->typed_run_filter<unsigned short>(); break;\
+      case Core::DataType::INT_E: this->typed_run_filter<int>(); break;\
+      case Core::DataType::UINT_E: this->typed_run_filter<unsigned int>(); break;\
+      case Core::DataType::FLOAT_E: this->typed_run_filter<float>(); break;\
+      case Core::DataType::DOUBLE_E: this->typed_run_filter<double>(); break;\
     };\
   }\
 \
   template< class VALUE_TYPE>\
-  void typed_run()\
+  void typed_run_filter()\
   {\
   
 #define SCI_END_TYPED_RUN() \
@@ -206,7 +215,7 @@ public:\
 
 #define SCI_BEGIN_RUN( ) \
 public:\
-  virtual void run()\
+  virtual void run_filter()\
   {\
 
 #define SCI_END_RUN() \

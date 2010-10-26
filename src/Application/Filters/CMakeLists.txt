@@ -34,6 +34,8 @@
 SET(APPLICATION_FILTERS_SRCS
   BaseFilter.h
   BaseFilter.cc
+  BaseFilterLock.h
+  BaseFilterLock.cc
   ITKFilter.h
   ITKFilter.cc
   NrrdFilter.h

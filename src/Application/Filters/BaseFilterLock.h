@@ -26,35 +26,52 @@
  DEALINGS IN THE SOFTWARE.
  */
  
+#ifndef APPLICATION_FILTERS_BASEFILTERLOCK_H 
+#define APPLICATION_FILTERS_BASEFILTERLOCK_H
+ 
+// Boost includes
+#include <boost/smart_ptr.hpp> 
+#include <boost/utility.hpp> 
+#include <boost/thread/mutex.hpp> 
+#include <boost/thread/condition_variable.hpp> 
 
-#ifndef CORE_UTILS_RUNTHREAD_H
-#define CORE_UTILS_RUNTHREAD_H
+// Core includes
+#include <Core/Utils/Singleton.h>
 
-#include <boost/smart_ptr.hpp>
-#include <boost/utility.hpp>
-  
-namespace Core
+namespace Seg3D
 {
 
-class Runnable;
-typedef boost::shared_ptr<Runnable> RunnableHandle;
+// This class prevents too many filters running simultaneously by allowing only
+// a certain amount of the filters to run in parallel. If too many threads are started
+// some will have to wait until others are done.
 
-class Runnable : public boost::noncopyable {
+class BaseFilterLockPrivate;
+typedef boost::shared_ptr<BaseFilterLockPrivate> BaseFilterLockPrivateHandle;
 
+
+class BaseFilterLock : public boost::noncopyable
+{
+  CORE_SINGLETON( BaseFilterLock );
+
+  // -- Constructor/Destructor --
+private:
+  BaseFilterLock();
+  virtual ~BaseFilterLock();
+    
+  // -- interface --
 public:
-  virtual ~Runnable();
+  // Lock the resource. The function will continue if enough filter slots are available
+  void lock();
   
-protected:
-  friend void ExecuteRunnable( RunnableHandle runnable );
-  // RUN:
-  // The function that needs to run on a different thread
-  virtual void run() = 0;
+  // Unlock the resource.
+  void unlock();
   
-public:
-  
-  static void Start( RunnableHandle runnable );
+  // -- internals --
+private:
+  BaseFilterLockPrivateHandle private_;
+
 };
-
-} // end namespace Core
   
+} // end namespace Seg3D
+
 #endif

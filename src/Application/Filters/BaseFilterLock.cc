@@ -27,34 +27,51 @@
  */
  
 
-#ifndef CORE_UTILS_RUNTHREAD_H
-#define CORE_UTILS_RUNTHREAD_H
+// Application includes
+#include <Application/Filters/BaseFilterLock.h>
 
-#include <boost/smart_ptr.hpp>
-#include <boost/utility.hpp>
-  
-namespace Core
+namespace Seg3D
 {
 
-class Runnable;
-typedef boost::shared_ptr<Runnable> RunnableHandle;
+CORE_SINGLETON_IMPLEMENTATION( BaseFilterLock );
 
-class Runnable : public boost::noncopyable {
+class BaseFilterLockPrivate
+{
+public:
+  int max_filter_count_;
+  int current_filter_count_;
 
-public:
-  virtual ~Runnable();
-  
-protected:
-  friend void ExecuteRunnable( RunnableHandle runnable );
-  // RUN:
-  // The function that needs to run on a different thread
-  virtual void run() = 0;
-  
-public:
-  
-  static void Start( RunnableHandle runnable );
+  boost::mutex mutex_;
+  boost::condition_variable condition_variable_;
 };
 
-} // end namespace Core
+BaseFilterLock::BaseFilterLock() :
+  private_( new BaseFilterLockPrivate )
+{
+  this->private_->max_filter_count_ = 4;
+  this->private_->current_filter_count_ = 0;
+}
+
+BaseFilterLock::~BaseFilterLock()
+{
+}
+
+void BaseFilterLock::lock()
+{
+  boost::unique_lock<boost::mutex> lock( this->private_->mutex_ );
+  while ( this->private_->current_filter_count_ >=  this->private_->max_filter_count_ )
+  {
+    this->private_->condition_variable_.wait( lock );
+  }
   
-#endif
+  this->private_->current_filter_count_++;
+}
+
+void BaseFilterLock::unlock()
+{
+  boost::unique_lock<boost::mutex> lock( this->private_->mutex_ );
+  this->private_->current_filter_count_--;
+  this->private_->condition_variable_.notify_all();
+}
+
+} // end namespace Core

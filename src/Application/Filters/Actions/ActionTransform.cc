@@ -80,10 +80,10 @@ public:
   void transform_data_layer( DataLayerHandle input, DataLayerHandle output );
   void transform_mask_layer( MaskLayerHandle input, MaskLayerHandle output );
 
-  // RUN:
+  // RUN_FILTER:
   // Implementation of run of the Runnable base class, this function is called 
   // when the thread is launched.
-  virtual void run();
+  virtual void run_filter();
 
   // GET_FITLER_NAME:
   // This functions returns the name of the filter that is used in the error report.
@@ -102,7 +102,7 @@ public:
 
 };
 
-void TransformAlgo::run()
+void TransformAlgo::run_filter()
 {
   for ( size_t i = 0; i < this->src_layers_.size(); ++i )
   {

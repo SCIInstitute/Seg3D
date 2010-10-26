@@ -106,11 +106,11 @@ public:
   int ignore_bins_;
 
 public:
-  // RUN:
+  // RUN_FILTER:
   // Implemtation of run of the Runnable base class, this function is called when the thread
   // is launched.
 
-  virtual void run() 
+  virtual void run_filter() 
   {
     Core::NrrdDataHandle input_nrrd;
     Core::NrrdDataHandle output_nrrd;

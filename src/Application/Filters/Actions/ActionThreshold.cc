@@ -142,10 +142,10 @@ public:
     this->dst_layer_->update_progress_signal_( 0.5 );
   }
 
-  // RUN:
+  // RUN_FILTER:
   // Implementation of run of the Runnable base class, this function is called when the thread
   // is launched.
-  virtual void run()
+  virtual void run_filter()
   {
     Core::DataBlockHandle threshold_result = Core::StdDataBlock::New( 
       this->src_layer_->get_grid_transform(), 
