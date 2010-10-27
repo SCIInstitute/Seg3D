@@ -63,7 +63,7 @@ public:
   LayerGroupWeakHandle layer_group_;
 
   // Identifier for keeping track which data_processing action is running. 
-  Layer::data_processing_key_type key_;
+  std::set<Layer::filter_key_type> keys_;
 };
 
 void LayerPrivate::handle_locked_state_changed( bool locked )
@@ -109,7 +109,6 @@ Layer::Layer( const std::string& name, bool creating ) :
   private_( new LayerPrivate )
 { 
   this->private_->layer_ = this;
-  this->private_->key_ = 0;
   this->initialize_states( name, creating );
 }
 
@@ -118,7 +117,6 @@ Layer::Layer( const std::string& name, const std::string& state_id, bool creatin
   private_( new LayerPrivate )
 {
   this->private_->layer_ = this;
-  this->private_->key_ = 0;
   this->initialize_states( name, creating );
 }
   
@@ -264,28 +262,42 @@ bool Layer::is_visible( size_t viewer_id ) const
   return this->master_visible_state_->get() && this->visible_state_[ viewer_id ]->get();
 }
 
-Layer::data_processing_key_type Layer::get_data_processing_key() const
+bool Layer::check_filter_key( filter_key_type key ) const
 {
-  return this->private_->key_;
+  // key 0 is always assumed to be there
+  if ( key == 0 ) return true;
+  return ( this->private_->keys_.find( key ) != this->private_->keys_.end() );
 }
 
-void Layer::set_data_processing_key( data_processing_key_type key )
+void Layer::add_filter_key( filter_key_type key )
 {
-  this->private_->key_ = key;
+  if ( key == 0 ) return; 
+  this->private_->keys_.insert( key );
 }
 
-void Layer::reset_data_processing_key()
+void Layer::remove_filter_key( filter_key_type key )
 {
-  this->private_->key_ = 0;
+  if ( key == 0 ) return; 
+  this->private_->keys_.erase( key );
 }
 
-static boost::mutex GenerateDataProcessingKeyMutex;
-long long GenerateDataProcessingKeyCounter = 1;
-
-Layer::data_processing_key_type Layer::GenerateDataProcessingKey()
+void Layer::clear_filter_keys()
 {
-  boost::unique_lock<boost::mutex> lock( GenerateDataProcessingKeyMutex );
-  return GenerateDataProcessingKeyCounter++;
+  this->private_->keys_.clear();
+}
+
+size_t Layer::num_filter_keys() const
+{
+  return this->private_->keys_.size();
+}
+
+Layer::filter_key_type Layer::GenerateFilterKey()
+{
+  static boost::mutex filter_key_mutex;
+  static long long filter_key_count = 1;
+
+  boost::unique_lock<boost::mutex> lock( filter_key_mutex );
+  return filter_key_count++;
 }
 
 } // end namespace Seg3D

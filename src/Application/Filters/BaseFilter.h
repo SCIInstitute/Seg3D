@@ -53,6 +53,7 @@ namespace Seg3D
 
 class BaseFilter;
 typedef boost::shared_ptr<BaseFilter> BaseFilterHandle;
+typedef boost::weak_ptr<BaseFilter>   BaseFilterWeakHandle;
 
 class BaseFilterPrivate;
 typedef boost::shared_ptr<BaseFilterPrivate> BaseFilterPrivateHandle;
@@ -73,6 +74,13 @@ public:
   // CHECK_ABORT:
   // Check the abort flag
   bool check_abort(); 
+    
+  // WAIT_AND_FINALIZE_ABORT: 
+  // NOTE: When undoing asynchronous layer operations, one may need to wait until the filter
+  // can be aborted. If not the state of the program is unclear. Hence this function will ensure
+  // that the filter has finished processing and that all locks are cleared.
+  // NOTE: This function should be run on the application thread only
+  void wait_and_finalize_abort(); 
     
   // CONNECT_ABORT:
   // Monitor the abort flag of a layer
@@ -175,9 +183,9 @@ public:
   // Report an error to the user
   void report_error( const std::string& error );
 
-  // -- data processing key --
-public:
-  Layer::data_processing_key_type get_key();
+  // GET_KEY:
+  // Get the unique filter key
+  Layer::filter_key_type get_key()  const;
 
   // -- internals --
 private:

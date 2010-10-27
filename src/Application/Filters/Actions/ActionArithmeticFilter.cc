@@ -103,7 +103,7 @@ void ArithmeticFilterAlgo::run_filter()
     if ( this->dst_layer_->get_type() == Core::VolumeType::MASK_E )
     {
       Core::MaskDataBlockHandle mask_data_block;
-      Core::MaskDataBlockManager::Convert( output_data_block, 
+      Core::MaskDataBlockManager::ConvertLargerThan( output_data_block, 
         this->dst_layer_->get_grid_transform(), mask_data_block );
       this->dispatch_insert_mask_volume_into_layer( this->dst_layer_, Core::MaskVolumeHandle(
         new Core::MaskVolume( this->dst_layer_->get_grid_transform(), 

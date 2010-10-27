@@ -29,6 +29,10 @@
 // STL includes
 #include <vector> 
  
+// Boost includes
+#include <boost/thread/mutex.hpp> 
+#include <boost/thread/condition_variable.hpp> 
+ 
 // Application includes
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/Filters/BaseFilter.h>
@@ -40,6 +44,16 @@ namespace Seg3D
 
 class BaseFilterPrivate : public Core::ConnectionHandler
 {
+  // -- constructor --
+public:
+  BaseFilterPrivate() :
+    done_( false ),
+    abort_( false ),
+    key_( Layer::GenerateFilterKey() )
+  {
+  }
+
+
 public:
   // Keep track of errors
   std::string error_;
@@ -49,87 +63,135 @@ public:
   
   // Keep track of which layers were created.
   std::vector<LayerHandle> created_layers_;
+
+  // Keep track of whether the filter has finished
+  bool done_;
   
   // Keep track of abort status
   bool abort_;
   
   // Mutex protecting abort status
-  boost::mutex abort_mutex_;
+  boost::mutex mutex_;
+  
+  // Condition Variable signaling when filter is done
+  boost::condition_variable filter_done_;
 
   // Key used for this filter
-  Layer::data_processing_key_type key_;
+  Layer::filter_key_type key_;
 
+
+  // -- internal functions --
+public:
+  // HANDLE_ABORT:
   // Function for handling abort
   void handle_abort();
+  
+  // FINALIZE:
+  // Clean up all the filter components and release the locks on the layers and
+  // delete layers if the filter did not finish.
+  void finalize();
 };
+
 
 void BaseFilterPrivate::handle_abort()
 {
-  boost::mutex::scoped_lock lock( abort_mutex_ );
+  boost::mutex::scoped_lock lock( mutex_ );
   abort_ = true;
 }
 
-BaseFilter::BaseFilter() :
-  private_( new BaseFilterPrivate )
+void BaseFilterPrivate::finalize()
 {
-  this->private_->abort_ = false;
-  this->private_->key_ = Layer::GenerateDataProcessingKey();
-}
+  // Disconnect all the connections with the layer signals, i.e. the abort signal from target
+  // layers.
+  this->disconnect_all();
 
-BaseFilter::~BaseFilter()
-{
-  this->private_->disconnect_all();
-
-  for ( size_t j = 0; j < this->private_->locked_layers_.size(); j++ )
+  // Clean 
+  for ( size_t j = 0; j < this->locked_layers_.size(); j++ )
   {
-    LayerManager::DispatchUnlockLayer( this->private_->locked_layers_[ j ],
-      this->private_->key_ );
-  }
+    LayerManager::DispatchUnlockLayer( this->locked_layers_[ j ], this->key_ );
+  } 
 
-  boost::mutex::scoped_lock lock( this->private_->abort_mutex_ );
-  if ( this->private_->abort_ )
+  boost::mutex::scoped_lock lock( this->mutex_ );
+  if ( this->abort_ )
   {
-    for ( size_t j = 0; j < this->private_->created_layers_.size(); j++ )
+    for ( size_t j = 0; j < this->created_layers_.size(); j++ )
     {
-      LayerManager::DispatchDeleteLayer( this->private_->created_layers_[ j ],
-        this->private_->key_ );
+      LayerManager::DispatchDeleteLayer( this->created_layers_[ j ], this->key_ );
     }
   }
   else
   {
-    for ( size_t j = 0; j < this->private_->created_layers_.size(); j++ )
+    for ( size_t j = 0; j < this->created_layers_.size(); j++ )
     {
-      LayerManager::DispatchUnlockOrDeleteLayer( this->private_->created_layers_[ j ],
-        this->private_->key_ );
+      LayerManager::DispatchUnlockOrDeleteLayer( this->created_layers_[ j ], this->key_ );
     }
   }
   
-  
-  if ( this->private_->error_.size() )
+  if ( this->error_.size() )
   {
-    StatusBar::SetMessage( Core::LogMessageType::ERROR_E, this->private_->error_ ); 
+    StatusBar::SetMessage( Core::LogMessageType::ERROR_E, this->error_ ); 
   }
+
+  this->locked_layers_.clear();
+  this->created_layers_.clear();
 }
+
+
+
+BaseFilter::BaseFilter() :
+  private_( new BaseFilterPrivate )
+{
+}
+
+BaseFilter::~BaseFilter()
+{
+  this->private_->finalize();
+}
+
 
 void BaseFilter::raise_abort()
 {
-  boost::mutex::scoped_lock lock( this->private_->abort_mutex_ );
+  boost::mutex::scoped_lock lock( this->private_->mutex_ );
   this->private_->abort_ = true;
   this->report_error( "Processing was aborted." );
 }
 
+
 bool BaseFilter::check_abort()
 {
-  boost::mutex::scoped_lock lock( this->private_->abort_mutex_ );
+  boost::mutex::scoped_lock lock( this->private_->mutex_ );
   return this->private_->abort_;
 }
 
+
+void BaseFilter::wait_and_finalize_abort()
+{
+  if ( !( Core::Application::IsApplicationThread() ) )
+  {
+    CORE_THROW_LOGICERROR( "wait_and_finalize_abort can only be called from the"
+      " application thread." ); 
+  }
+  
+  // Raise the abort in case it wasn't raised.
+  this->raise_abort();
+  
+  boost::mutex::scoped_lock lock( this->private_->mutex_ ); 
+  while( this->private_->done_ == false )
+  {
+    this->private_->filter_done_.wait( lock );
+  }
+  
+  this->private_->finalize();
+}
+
+
 void BaseFilter::connect_abort( const  LayerHandle& layer )
 {
-  boost::mutex::scoped_lock lock( this->private_->abort_mutex_ );
+  boost::mutex::scoped_lock lock( this->private_->mutex_ );
   this->private_->add_connection( layer->abort_signal_.connect( boost::bind(
     &BaseFilterPrivate::handle_abort, this->private_ ) ) );
 }
+
 
 void BaseFilter::report_error( const std::string& error )
 {
@@ -371,7 +433,10 @@ bool BaseFilter::dispatch_insert_mask_volume_into_layer( LayerHandle layer,
 
 void BaseFilter::run()
 {
-  // Ensure that there not that many processes running in parallel
+  // NOTE: Running too many filters in parallel can cause a huge surge in memory
+  // hence we restrict the maximum number of filters can run simultaneously.
+
+  // If more filters are running wait until one of them finished computing
   BaseFilterLock::Instance()->lock();
   
   try
@@ -382,8 +447,22 @@ void BaseFilter::run()
   {
   }
   
+  // Release the lock so another filter can start
   BaseFilterLock::Instance()->unlock();
+  
+  // Notify if application thread if it is waiting for this to succeed in which case
+  // it will immediately finalize the filter.
+  boost::mutex::scoped_lock lock( this->private_->mutex_ ); 
+  this->private_->done_ = true;
+  this->private_->filter_done_.notify_all();
+  
 }
+
+Layer::filter_key_type BaseFilter::get_key() const
+{
+  return this->private_->key_;
+}
+
 
 } // end namespace Seg3D
 

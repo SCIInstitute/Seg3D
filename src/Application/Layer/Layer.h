@@ -209,23 +209,31 @@ public:
   // Get the generation of the current data block
   Core::DataBlock::generation_type get_generation() const;
   
-  // DATA_PROCESSING_KEY:
+  // FILTER_KEY:
   // This is a unique key that is inserted when an asynchronous filter is running. 
   // The asynchronous calls back to the layer are compared with the key, if they don't
   // match the layer is not modified, at it is assumed that the filtering was aborted.
-  typedef long long data_processing_key_type;
+  typedef long long filter_key_type;
 
-  // GET_DATA_PROCESSING_KEY:
-  // Get the current key set for what is being processed
-  data_processing_key_type get_data_processing_key() const;
+  // CHECK_FILTER_KEY:
+  // Check whether the current key is attached to the layer
+  bool check_filter_key( filter_key_type key ) const;
 
-  // SET_DATA_PROCESSING_KEY:
-  // Set the current key for what is being processed
-  void set_data_processing_key( data_processing_key_type key );
+  // ADD_FILTER_KEY:
+  // Add a filter key to the layer
+  void add_filter_key( filter_key_type key );
 
-  // RESET_DATA_PROCESSING_KEY:
+  // REMOVE_FILTER_KEY:
   // Reset the current key for what is being processed
-  void reset_data_processing_key();
+  void remove_filter_key( filter_key_type key );
+  
+  // CLEAR_FILTER_KEYS:
+  // Remove all filter keys
+  void clear_filter_keys();
+
+  // NUM_FILTER_KEYS:
+  // Get the number of filter keys
+  size_t num_filter_keys() const;
 
 protected:
   virtual bool post_save_states( Core::StateIO& state_io );
@@ -247,7 +255,7 @@ public:
 
   // -- data processing key generation --
 public:
-  static data_processing_key_type GenerateDataProcessingKey();
+  static filter_key_type GenerateFilterKey();
 
 public:
 

@@ -1075,7 +1075,7 @@ bool LayerManager::CheckLayerAvailability( const std::string& layer_id, bool rep
   }
 }
 
-bool LayerManager::LockForUse( LayerHandle layer, data_processing_key_type key )
+bool LayerManager::LockForUse( LayerHandle layer, filter_key_type key )
 {
   // NOTE: Security check to keep the program logic sane
   // Only the Application Thread guarantees that nothing is changed in the program
@@ -1086,16 +1086,22 @@ bool LayerManager::LockForUse( LayerHandle layer, data_processing_key_type key )
   }
   
   // Check whether the layer is really available
-  if ( layer->data_state_->get() != Layer::AVAILABLE_C ) return false;
+  if ( layer->data_state_->get() != Layer::AVAILABLE_C &&
+     layer->data_state_->get() != Layer::IN_USE_C ) return false;
 
   // If it is available set it to processing and list the key used by the filter
-  layer->data_state_->set( Layer::IN_USE_C );
-  layer->set_data_processing_key( key );
+  if ( layer->data_state_->get() != Layer::AVAILABLE_C )
+  {
+    layer->data_state_->set( Layer::IN_USE_C );
+  }
+  
+  // Add the key so we can could all the keys to see when the layer needs to be unlocked
+  layer->add_filter_key( key );
 
   return true;
 }
 
-bool LayerManager::LockForProcessing( LayerHandle layer, data_processing_key_type key )
+bool LayerManager::LockForProcessing( LayerHandle layer, filter_key_type key )
 {
   // NOTE: Security check to keep the program logic sane
   // Only the Application Thread guarantees that nothing is changed in the program
@@ -1110,13 +1116,13 @@ bool LayerManager::LockForProcessing( LayerHandle layer, data_processing_key_typ
 
   // If it is available set it to processing and list the key used by the filter
   layer->data_state_->set( Layer::PROCESSING_C );
-  layer->set_data_processing_key( key );
+  layer->add_filter_key( key );
 
   return true;
 }
 
 bool LayerManager::CreateAndLockMaskLayer( Core::GridTransform transform, const std::string& name, 
-    LayerHandle& layer, data_processing_key_type key )
+    LayerHandle& layer, filter_key_type key )
 {
   // NOTE: Security check to keep the program logic sane.
   // Only the Application Thread guarantees that nothing is changed in the program.
@@ -1138,7 +1144,7 @@ bool LayerManager::CreateAndLockMaskLayer( Core::GridTransform transform, const 
   layer = LayerHandle( new MaskLayer( name, invalid_mask ) );
 
   // Insert the key used to keep track of which process is using this layer
-  layer->set_data_processing_key( key );
+  layer->add_filter_key( key );
   
   // Insert the layer into the layer manager.
   LayerManager::Instance()->insert_layer( layer );
@@ -1147,7 +1153,7 @@ bool LayerManager::CreateAndLockMaskLayer( Core::GridTransform transform, const 
 }
 
 bool LayerManager::CreateAndLockDataLayer( Core::GridTransform transform, const std::string& name, 
-    LayerHandle& layer, data_processing_key_type key )
+    LayerHandle& layer, filter_key_type key )
 {
   // NOTE: Security check to keep the program logic sane
   // Only the Application Thread guarantees that nothing is changed in the program
@@ -1169,7 +1175,7 @@ bool LayerManager::CreateAndLockDataLayer( Core::GridTransform transform, const 
   layer = LayerHandle( new DataLayer( name, invalid_data ) );
 
   // Insert the key used to keep track of which process is using this layer
-  layer->set_data_processing_key( key );
+  layer->add_filter_key( key );
 
   // Insert the layer into the layer manager.
   LayerManager::Instance()->insert_layer( layer );
@@ -1177,7 +1183,7 @@ bool LayerManager::CreateAndLockDataLayer( Core::GridTransform transform, const 
   return true;
 }
 
-void LayerManager::DispatchDeleteLayer( LayerHandle layer, data_processing_key_type key )
+void LayerManager::DispatchDeleteLayer( LayerHandle layer, filter_key_type key )
 {
   // Move this request to the Application thread
   if ( !( Core::Application::IsApplicationThread() ) )
@@ -1188,14 +1194,24 @@ void LayerManager::DispatchDeleteLayer( LayerHandle layer, data_processing_key_t
   }
 
   // Only do work if the unique key is a match
-  if ( layer->get_data_processing_key() == key )
+  if ( layer->check_filter_key( key ) )
   {
-    // Insert the layer into the layer manager.
-    LayerManager::Instance()->delete_layer( layer );
+    // The filter should not have access to this one any more
+    layer->remove_filter_key( key );
+    
+    if ( layer->num_filter_keys() == 0 )
+    {
+      // Insert the layer into the layer manager.
+      LayerManager::Instance()->delete_layer( layer );
+    }
+    else
+    {
+      CORE_THROW_LOGICERROR( "Could not delete that is connected to another filter" );
+    }
   }
 }
 
-void LayerManager::DispatchUnlockLayer( LayerHandle layer, data_processing_key_type key )
+void LayerManager::DispatchUnlockLayer( LayerHandle layer, filter_key_type key )
 {
   // Move this request to the Application thread
   if ( !( Core::Application::IsApplicationThread() ) )
@@ -1206,13 +1222,19 @@ void LayerManager::DispatchUnlockLayer( LayerHandle layer, data_processing_key_t
   }
 
   // Only do work if the unique key is a match
-  if ( layer->get_data_processing_key() == key )
+  if ( layer->check_filter_key( key ) )
   {
-    layer->data_state_->set( Layer::AVAILABLE_C );
+    // The filter should not have access to this one any more
+    layer->remove_filter_key( key );
+    
+    if ( layer->num_filter_keys() == 0 )
+    {
+      layer->data_state_->set( Layer::AVAILABLE_C );
+    }
   }
 }
 
-void LayerManager::DispatchUnlockOrDeleteLayer( LayerHandle layer, data_processing_key_type key  )
+void LayerManager::DispatchUnlockOrDeleteLayer( LayerHandle layer, filter_key_type key  )
 {
   // Move this request to the Application thread
   if ( !( Core::Application::IsApplicationThread() ) )
@@ -1223,25 +1245,35 @@ void LayerManager::DispatchUnlockOrDeleteLayer( LayerHandle layer, data_processi
   }
 
   // Only do work if the unique key is a match
-  if ( layer->get_data_processing_key() == key )
+  if ( layer->check_filter_key( key ) )
   {
+    // The filter should not have access to this one any more
+    layer->remove_filter_key( key );
+      
     // NOTE: We can only determine whether the layer is valid on the application thread.
     // Other instructions to insert data into the layer may still be in the application thread
     // queue, hence we need to process this at the end of the queue.
     if( layer->has_valid_data() )
     {
-      layer->data_state_->set( Layer::AVAILABLE_C );
+      if ( layer->num_filter_keys() == 0 )
+      {
+        layer->data_state_->set( Layer::AVAILABLE_C );
+      }
     }
     else
     {
+      if ( layer->num_filter_keys() != 0 )
+      {
+        CORE_THROW_LOGICERROR( "Could not delete that is connected to another filter" );
+      }
       LayerManager::Instance()->delete_layer( layer );
-  
     }
+
   }
 }
 
 void LayerManager::DispatchInsertDataVolumeIntoLayer( DataLayerHandle layer, 
-  Core::DataVolumeHandle data, data_processing_key_type key )
+  Core::DataVolumeHandle data, filter_key_type key )
 {
   // Move this request to the Application thread
   if ( !( Core::Application::IsApplicationThread() ) )
@@ -1252,7 +1284,7 @@ void LayerManager::DispatchInsertDataVolumeIntoLayer( DataLayerHandle layer,
   }
   
   // Only do work if the unique key is a match
-  if ( layer->get_data_processing_key() == key )
+  if ( layer->check_filter_key( key ) )
   {
     if ( layer->set_data_volume( data ) )
     {
@@ -1263,7 +1295,7 @@ void LayerManager::DispatchInsertDataVolumeIntoLayer( DataLayerHandle layer,
 }
 
 void LayerManager::DispatchInsertMaskVolumeIntoLayer( MaskLayerHandle layer, 
-  Core::MaskVolumeHandle mask, data_processing_key_type key )
+  Core::MaskVolumeHandle mask, filter_key_type key )
 {
   // Move this request to the Application thread
   if ( !( Core::Application::IsApplicationThread() ) )
@@ -1274,7 +1306,7 @@ void LayerManager::DispatchInsertMaskVolumeIntoLayer( MaskLayerHandle layer,
   }
   
   // Only do work if the unique key is a match
-  if ( layer->get_data_processing_key() == key )
+  if ( layer->check_filter_key( key ) )
   {
     if ( layer->set_mask_volume( mask ) )
     {

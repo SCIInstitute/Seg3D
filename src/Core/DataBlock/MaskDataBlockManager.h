@@ -124,6 +124,11 @@ public:
   static bool Convert( DataBlockHandle data, GridTransform grid_transform, 
     MaskDataBlockHandle& mask, bool invert = false );
 
+  // CONVERTLARGERTHAN:
+  // Convert a DataBlock into a MaskDataBlock
+  static bool ConvertLargerThan( DataBlockHandle data, GridTransform grid_transform, 
+    MaskDataBlockHandle& mask, bool invert = false );
+
   // CONVERTLABEL:
   // Convert a DataBlock into a MaskDataBlock by checking for a certain value
   static bool ConvertLabel( DataBlockHandle data, GridTransform grid_transform, 

@@ -83,8 +83,8 @@ bool PolylineToolPrivate::find_vertex( ViewerHandle viewer, int x, int y, size_t
   viewer->window_to_world( x, y, world_x, world_y );
 
   // Step 3. Search for the first vertex that's within 2 pixels of current mouse position
-  double range_x = pixel_width * 2;
-  double range_y = pixel_height * 2;
+  double range_x = pixel_width * 4;
+  double range_y = pixel_height * 4;
   std::vector< Core::Point > vertices = this->tool_->vertices_state_->get();
   Core::VolumeSliceType slice_type( Core::VolumeSliceType::AXIAL_E );
   if ( viewer->view_mode_state_->get() == Viewer::CORONAL_C )
@@ -244,6 +244,49 @@ bool PolylineTool::handle_mouse_press( ViewerHandle viewer,
       active_slice->get_world_coord( world_x, world_y,  pt );
       Core::ActionAdd::Dispatch( Core::Interface::GetMouseActionContext(),
         this->vertices_state_, pt );
+
+      return true;
+    }
+  }
+  else if ( !( modifiers & Core::KeyModifier::SHIFT_MODIFIER_E ) &&
+    button == Core::MouseButton::LEFT_BUTTON_E )
+  {
+    Core::VolumeSliceHandle active_slice = viewer->get_active_volume_slice();
+    if ( active_slice && !active_slice->out_of_boundary() )
+    {
+      double world_x, world_y;
+      viewer->window_to_world( mouse_history.current_.x_, 
+        mouse_history.current_.y_, world_x, world_y );
+      Core::Point pt;
+      active_slice->get_world_coord( world_x, world_y,  pt );
+      
+      double dmin = DBL_MAX;
+      std::vector<Core::Point> points = this->vertices_state_->get();
+      
+      size_t idx = 0;
+      for ( size_t j = 0; j < points.size(); j++ )
+      {
+        size_t k = j + 1;
+        if ( k ==  points.size() ) k = 0;
+        
+        double alpha = Dot( points[ j ] - pt, points[ j ] - points[ k ] )/
+          Dot( points[ j ] - points[ k ], points[ j ] - points[ k ] );
+          
+        double dist = 0.0;
+        if ( alpha < 0.0 ) dist = ( points[ j ] - pt ).length2();
+        else if ( alpha > 1.0 ) dist = ( points[ k ] - pt ).length2();
+        else dist = ( ( points[ j ] - pt ) - alpha * ( points[ j ] - points[ k ] ) ).length2();
+        
+        if ( dist < dmin )
+        {
+          dmin = dist;
+          idx = k;
+        }
+      }
+      points.insert( points.begin() + idx, pt );
+      
+      Core::ActionSet::Dispatch( Core::Interface::GetMouseActionContext(),
+        this->vertices_state_, points );
 
       return true;
     }
