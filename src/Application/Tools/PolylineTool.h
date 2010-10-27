@@ -47,6 +47,9 @@ SEG3D_TOOL
   SEG3D_TOOL_MENU( "Tools" )
   SEG3D_TOOL_SHORTCUT_KEY( "Alt+Y" )
   SEG3D_TOOL_URL( "http://seg3d.org/" )
+  SEG3D_TOOL_HOTKEYS( "Add Point=Left Mouse Button|Move Point=Right Mouse Button"
+    "Add Point in Segment=ALT Left Mouse Button|Delete Point=ALT Right Mouse Button"
+    "|Paint Floodfill=F|Erase Floodfill=E" )  
 )
 
   // -- constructor/destructor --

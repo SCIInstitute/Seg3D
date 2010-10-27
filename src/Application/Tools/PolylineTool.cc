@@ -299,6 +299,42 @@ bool PolylineTool::handle_mouse_press( ViewerHandle viewer,
       this->private_->vertex_index_ );
     return this->private_->moving_vertex_;
   }
+
+  else if ( !( modifiers & Core::KeyModifier::SHIFT_MODIFIER_E ) &&
+    button == Core::MouseButton::RIGHT_BUTTON_E )
+  {
+    Core::VolumeSliceHandle active_slice = viewer->get_active_volume_slice();
+    if ( active_slice && !active_slice->out_of_boundary() )
+    {
+      double world_x, world_y;
+      viewer->window_to_world( mouse_history.current_.x_, 
+        mouse_history.current_.y_, world_x, world_y );
+      Core::Point pt;
+      active_slice->get_world_coord( world_x, world_y,  pt );
+      
+      double dmin = DBL_MAX;
+      std::vector<Core::Point> points = this->vertices_state_->get();
+      
+      size_t idx = 0;
+      for ( size_t j = 0; j < points.size(); j++ )
+      {
+        double dist = ( points[ j ] - pt ).length2();
+  
+        if ( dist < dmin )
+        {
+          dmin = dist;
+          idx = j;
+        }
+      }
+      points.erase( points.begin() + idx );
+      
+      Core::ActionSet::Dispatch( Core::Interface::GetMouseActionContext(),
+        this->vertices_state_, points );
+
+      return true;
+    }
+  }
+
   
   return false;
 }
