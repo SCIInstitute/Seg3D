@@ -32,6 +32,8 @@
 ##################################################
 
 SET(APPLICATION_LAYERMANAGER_SRCS
+  LayerAbstractFilter.h
+  LayerAbstractFilter.cc
   LayerAvailabilityNotifier.h
   LayerAvailabilityNotifier.cc
     LayerManager.h
