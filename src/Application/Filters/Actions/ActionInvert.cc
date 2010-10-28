@@ -31,7 +31,7 @@
 // Application includes
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/Filters/Actions/ActionInvert.h>
-#include <Application/Filters/BaseFilter.h>
+#include <Application/Filters/LayerFilter.h>
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
@@ -47,7 +47,7 @@ namespace Seg3D
 // NOTE: The separation of the algorithm into a private class is for the purpose of running the
 // filter on a separate thread.
 
-class InvertFilterAlgo : public BaseFilter
+class InvertFilterAlgo : public LayerFilter
 {
 
 public:

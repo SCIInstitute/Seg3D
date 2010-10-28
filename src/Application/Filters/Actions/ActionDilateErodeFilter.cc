@@ -29,7 +29,7 @@
 // Application includes
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/StatusBar/StatusBar.h>
-#include <Application/Filters/BaseFilter.h>
+#include <Application/Filters/LayerFilter.h>
 #include <Application/Filters/Actions/ActionDilateErodeFilter.h>
 
 // REGISTER ACTION:
@@ -121,7 +121,7 @@ bool ActionDilateErodeFilter::validate( Core::ActionContextHandle& context )
 // NOTE: The separation of the algorithm into a private class is for the purpose of running the
 // filter on a separate thread.
 
-class DilateErodeFilterAlgo : public BaseFilter
+class DilateErodeFilterAlgo : public LayerFilter
 {
 
 public:

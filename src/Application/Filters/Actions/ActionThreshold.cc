@@ -32,7 +32,7 @@
 // Application includes
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/StatusBar/StatusBar.h>
-#include <Application/Filters/BaseFilter.h>
+#include <Application/Filters/LayerFilter.h>
 #include <Application/Filters/Actions/ActionThreshold.h>
 
 // REGISTER ACTION:
@@ -98,7 +98,7 @@ bool ActionThreshold::validate( Core::ActionContextHandle& context )
 // NOTE: The separation of the algorithm into a private class is for the purpose of running the
 // filter on a separate thread.
 
-class ThresholdFilterAlgo : public BaseFilter
+class ThresholdFilterAlgo : public LayerFilter
 {
 
 public:

@@ -44,6 +44,8 @@
 #include <Application/Layer/MaskLayer.h> 
 #include <Application/Layer/LabelLayer.h> 
  
+#include <Application/Layer/LayerAbstractFilter.h>
+
 namespace Seg3D
 {
 
@@ -51,19 +53,19 @@ namespace Seg3D
 // This class provides the basic underlying framework for running filters in a separate thread
 // from the application thread. It provides a series of functions common to all the filters.
 
-class BaseFilter;
-typedef boost::shared_ptr<BaseFilter> BaseFilterHandle;
-typedef boost::weak_ptr<BaseFilter>   BaseFilterWeakHandle;
+class LayerFilter;
+typedef boost::shared_ptr<LayerFilter> LayerFilterHandle;
+typedef boost::weak_ptr<LayerFilter>   LayerFilterWeakHandle;
 
-class BaseFilterPrivate;
-typedef boost::shared_ptr<BaseFilterPrivate> BaseFilterPrivateHandle;
+class LayerFilterPrivate;
+typedef boost::shared_ptr<LayerFilterPrivate> LayerFilterPrivateHandle;
 
-class BaseFilter : public Core::Runnable
+class LayerFilter : public LayerAbstractFilter
 {
 
 public:
-  BaseFilter();
-  virtual ~BaseFilter();
+  LayerFilter();
+  virtual ~LayerFilter();
     
   // -- abort handling -- 
 public:   
@@ -75,12 +77,12 @@ public:
   // Check the abort flag
   bool check_abort(); 
     
-  // WAIT_AND_FINALIZE_ABORT: 
+  // ABORT_AND_WAIT:  
   // NOTE: When undoing asynchronous layer operations, one may need to wait until the filter
   // can be aborted. If not the state of the program is unclear. Hence this function will ensure
   // that the filter has finished processing and that all locks are cleared.
   // NOTE: This function should be run on the application thread only
-  void wait_and_finalize_abort(); 
+  virtual void abort_and_wait();  
     
   // CONNECT_ABORT:
   // Monitor the abort flag of a layer
@@ -189,7 +191,7 @@ public:
 
   // -- internals --
 private:
-  BaseFilterPrivateHandle private_;
+  LayerFilterPrivateHandle private_;
 
 };
 

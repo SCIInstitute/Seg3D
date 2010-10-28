@@ -45,7 +45,7 @@
 #include <Application/Layer/DataLayer.h> 
 #include <Application/Layer/MaskLayer.h> 
 
-#include <Application/Filters/BaseFilter.h>
+#include <Application/Filters/LayerFilter.h>
  
 namespace Seg3D
 {
@@ -55,7 +55,7 @@ class ITKFilterPrivate;
 typedef boost::shared_ptr<ITKFilterPrivate> ITKFilterPrivateHandle;
 
 
-class ITKFilter : public BaseFilter
+class ITKFilter : public LayerFilter
 {
 
 public:

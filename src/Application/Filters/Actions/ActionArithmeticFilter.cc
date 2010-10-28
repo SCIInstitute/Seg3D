@@ -34,7 +34,7 @@
 #include <Application/Layer/LayerGroup.h>
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/Filters/Actions/ActionArithmeticFilter.h>
-#include <Application/Filters/BaseFilter.h>
+#include <Application/Filters/LayerFilter.h>
 #include <Application/StatusBar/StatusBar.h>
 
 // REGISTER ACTION:
@@ -53,7 +53,7 @@ namespace Seg3D
 // filter on a separate thread.
 //////////////////////////////////////////////////////////////////////////
 
-class ArithmeticFilterAlgo : public BaseFilter
+class ArithmeticFilterAlgo : public LayerFilter
 {
 
 public:

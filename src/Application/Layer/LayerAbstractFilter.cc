@@ -26,52 +26,20 @@
  DEALINGS IN THE SOFTWARE.
  */
  
-
+ 
 // Application includes
-#include <Application/Filters/BaseFilterLock.h>
-
+#include <Application/Layer/LayerAbstractFilter.h>
+ 
 namespace Seg3D
 {
 
-CORE_SINGLETON_IMPLEMENTATION( BaseFilterLock );
-
-class BaseFilterLockPrivate
-{
-public:
-  int max_filter_count_;
-  int current_filter_count_;
-
-  boost::mutex mutex_;
-  boost::condition_variable condition_variable_;
-};
-
-BaseFilterLock::BaseFilterLock() :
-  private_( new BaseFilterLockPrivate )
-{
-  this->private_->max_filter_count_ = 4;
-  this->private_->current_filter_count_ = 0;
-}
-
-BaseFilterLock::~BaseFilterLock()
+LayerAbstractFilter::LayerAbstractFilter()
 {
 }
 
-void BaseFilterLock::lock()
+LayerAbstractFilter::~LayerAbstractFilter()
 {
-  boost::unique_lock<boost::mutex> lock( this->private_->mutex_ );
-  while ( this->private_->current_filter_count_ >=  this->private_->max_filter_count_ )
-  {
-    this->private_->condition_variable_.wait( lock );
-  }
-  
-  this->private_->current_filter_count_++;
 }
 
-void BaseFilterLock::unlock()
-{
-  boost::unique_lock<boost::mutex> lock( this->private_->mutex_ );
-  this->private_->current_filter_count_--;
-  this->private_->condition_variable_.notify_all();
-}
+} // end namespace Seg3D
 
-} // end namespace Core

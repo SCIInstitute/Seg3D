@@ -33,7 +33,7 @@
 #include <Application/Layer/LayerGroup.h>
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/Filters/Actions/ActionTransform.h>
-#include <Application/Filters/BaseFilter.h>
+#include <Application/Filters/LayerFilter.h>
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
@@ -66,7 +66,7 @@ public:
 // filter on a separate thread.
 //////////////////////////////////////////////////////////////////////////
 
-class TransformAlgo : public BaseFilter
+class TransformAlgo : public LayerFilter
 {
 
 public:

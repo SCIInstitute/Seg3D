@@ -35,7 +35,7 @@
 // Application includes
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/Filters/Actions/ActionResample.h>
-#include <Application/Filters/BaseFilter.h>
+#include <Application/Filters/LayerFilter.h>
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
@@ -89,7 +89,7 @@ public:
 // filter on a separate thread.
 //////////////////////////////////////////////////////////////////////////
 
-class ResampleAlgo : public BaseFilter
+class ResampleAlgo : public LayerFilter
 {
 
 public:

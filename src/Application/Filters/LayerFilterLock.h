@@ -26,39 +26,52 @@
  DEALINGS IN THE SOFTWARE.
  */
  
-#ifndef APPLICATION_LAYERMANAGER_LAYERABSTRACTFILTER_H 
-#define APPLICATION_LAYERMANAGER_LAYERABSTRACTFILTER_H 
+#ifndef APPLICATION_FILTERS_BASEFILTERLOCK_H 
+#define APPLICATION_FILTERS_BASEFILTERLOCK_H
  
 // Boost includes
 #include <boost/smart_ptr.hpp> 
 #include <boost/utility.hpp> 
- 
+#include <boost/thread/mutex.hpp> 
+#include <boost/thread/condition_variable.hpp> 
+
 // Core includes
-#include <Core/Utils/Runnable.h>
+#include <Core/Utils/Singleton.h>
 
 namespace Seg3D
 {
 
-// CLASS BASEFILTER:
-// This class provides the basic underlying framework for running filters in a separate thread
-// from the application thread. It provides a series of functions common to all the filters.
+// This class prevents too many filters running simultaneously by allowing only
+// a certain amount of the filters to run in parallel. If too many threads are started
+// some will have to wait until others are done.
 
-class LayerAbstractFilter;
-typedef boost::shared_ptr<LayerAbstractFilter> LayerAbstractFilterHandle;
-typedef boost::weak_ptr<LayerAbstractFilter>   LayerAbstractFilterWeakHandle;
+class LayerFilterLockPrivate;
+typedef boost::shared_ptr<LayerFilterLockPrivate> LayerFilterLockPrivateHandle;
 
-class LayerAbstractFilter : public Core::Runnable
+
+class LayerFilterLock : public boost::noncopyable
 {
+  CORE_SINGLETON( LayerFilterLock );
 
+  // -- Constructor/Destructor --
+private:
+  LayerFilterLock();
+  virtual ~LayerFilterLock();
+    
+  // -- interface --
 public:
-  LayerAbstractFilter();
-  virtual ~LayerAbstractFilter();
+  // Lock the resource. The function will continue if enough filter slots are available
+  void lock();
   
-  // -- abort handling -- 
-public:
-  virtual void wait_and_abort() = 0;
-};
+  // Unlock the resource.
+  void unlock();
+  
+  // -- internals --
+private:
+  LayerFilterLockPrivateHandle private_;
 
+};
+  
 } // end namespace Seg3D
 
 #endif

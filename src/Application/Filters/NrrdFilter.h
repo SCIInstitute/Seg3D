@@ -44,7 +44,7 @@
 // Application includes
 #include <Application/Layer/DataLayer.h> 
 #include <Application/Layer/MaskLayer.h> 
-#include <Application/Filters/BaseFilter.h>
+#include <Application/Filters/LayerFilter.h>
  
 namespace Seg3D
 {
@@ -52,7 +52,7 @@ namespace Seg3D
 class NrrdFilter;
 
 
-class NrrdFilter : public BaseFilter
+class NrrdFilter : public LayerFilter
 {
 
 public:

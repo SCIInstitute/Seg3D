@@ -32,10 +32,10 @@
 ##################################################
 
 SET(APPLICATION_FILTERS_SRCS
-  BaseFilter.h
-  BaseFilter.cc
-  BaseFilterLock.h
-  BaseFilterLock.cc
+  LayerFilter.h
+  LayerFilter.cc
+  LayerFilterLock.h
+  LayerFilterLock.cc
   ITKFilter.h
   ITKFilter.cc
   NrrdFilter.h

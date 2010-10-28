@@ -35,18 +35,18 @@
  
 // Application includes
 #include <Application/LayerManager/LayerManager.h>
-#include <Application/Filters/BaseFilter.h>
-#include <Application/Filters/BaseFilterLock.h>
+#include <Application/Filters/LayerFilter.h>
+#include <Application/Filters/LayerFilterLock.h>
 #include <Application/StatusBar/StatusBar.h>
  
 namespace Seg3D
 {
 
-class BaseFilterPrivate : public Core::ConnectionHandler
+class LayerFilterPrivate : public Core::ConnectionHandler
 {
   // -- constructor --
 public:
-  BaseFilterPrivate() :
+  LayerFilterPrivate() :
     done_( false ),
     abort_( false ),
     key_( Layer::GenerateFilterKey() )
@@ -93,13 +93,13 @@ public:
 };
 
 
-void BaseFilterPrivate::handle_abort()
+void LayerFilterPrivate::handle_abort()
 {
   boost::mutex::scoped_lock lock( mutex_ );
   abort_ = true;
 }
 
-void BaseFilterPrivate::finalize()
+void LayerFilterPrivate::finalize()
 {
   // Disconnect all the connections with the layer signals, i.e. the abort signal from target
   // layers.
@@ -138,18 +138,18 @@ void BaseFilterPrivate::finalize()
 
 
 
-BaseFilter::BaseFilter() :
-  private_( new BaseFilterPrivate )
+LayerFilter::LayerFilter() :
+  private_( new LayerFilterPrivate )
 {
 }
 
-BaseFilter::~BaseFilter()
+LayerFilter::~LayerFilter()
 {
   this->private_->finalize();
 }
 
 
-void BaseFilter::raise_abort()
+void LayerFilter::raise_abort()
 {
   boost::mutex::scoped_lock lock( this->private_->mutex_ );
   this->private_->abort_ = true;
@@ -157,14 +157,14 @@ void BaseFilter::raise_abort()
 }
 
 
-bool BaseFilter::check_abort()
+bool LayerFilter::check_abort()
 {
   boost::mutex::scoped_lock lock( this->private_->mutex_ );
   return this->private_->abort_;
 }
 
 
-void BaseFilter::wait_and_finalize_abort()
+void LayerFilter::abort_and_wait()
 {
   if ( !( Core::Application::IsApplicationThread() ) )
   {
@@ -185,20 +185,20 @@ void BaseFilter::wait_and_finalize_abort()
 }
 
 
-void BaseFilter::connect_abort( const  LayerHandle& layer )
+void LayerFilter::connect_abort( const  LayerHandle& layer )
 {
   boost::mutex::scoped_lock lock( this->private_->mutex_ );
   this->private_->add_connection( layer->abort_signal_.connect( boost::bind(
-    &BaseFilterPrivate::handle_abort, this->private_ ) ) );
+    &LayerFilterPrivate::handle_abort, this->private_ ) ) );
 }
 
 
-void BaseFilter::report_error( const std::string& error )
+void LayerFilter::report_error( const std::string& error )
 {
   this->private_->error_ = this->get_filter_name() +": " + error;
 }
 
-bool BaseFilter::find_layer( const std::string& layer_id, LayerHandle& layer )
+bool LayerFilter::find_layer( const std::string& layer_id, LayerHandle& layer )
 {
   layer = LayerManager::Instance()->get_layer_by_id( layer_id );
   if ( layer )
@@ -211,7 +211,7 @@ bool BaseFilter::find_layer( const std::string& layer_id, LayerHandle& layer )
   }
 }
 
-bool BaseFilter::lock_for_use( LayerHandle layer )
+bool LayerFilter::lock_for_use( LayerHandle layer )
 {
   if ( !( LayerManager::LockForUse( layer, this->private_->key_ ) ) ) 
   {
@@ -222,7 +222,7 @@ bool BaseFilter::lock_for_use( LayerHandle layer )
   return true;
 }
 
-bool BaseFilter::lock_for_processing( LayerHandle layer )
+bool LayerFilter::lock_for_processing( LayerHandle layer )
 {
   if ( !( LayerManager::LockForProcessing( layer, this->private_->key_ ) ) )
   {
@@ -233,7 +233,7 @@ bool BaseFilter::lock_for_processing( LayerHandle layer )
   return true;
 }
 
-bool BaseFilter::create_and_lock_data_layer_from_layer( LayerHandle src_layer, 
+bool LayerFilter::create_and_lock_data_layer_from_layer( LayerHandle src_layer, 
   LayerHandle& dst_layer )
 {
   // Generate a new name for the filter
@@ -255,7 +255,7 @@ bool BaseFilter::create_and_lock_data_layer_from_layer( LayerHandle src_layer,
   return true;
 }
 
-bool BaseFilter::create_and_lock_data_layer( const Core::GridTransform& grid_trans, 
+bool LayerFilter::create_and_lock_data_layer( const Core::GridTransform& grid_trans, 
                       LayerHandle src_layer, LayerHandle& dst_layer )
 {
   // Generate a new name for the filter
@@ -277,7 +277,7 @@ bool BaseFilter::create_and_lock_data_layer( const Core::GridTransform& grid_tra
   return true;
 }
 
-bool BaseFilter::create_and_lock_mask_layer_from_layer( LayerHandle src_layer, LayerHandle& dst_layer )
+bool LayerFilter::create_and_lock_mask_layer_from_layer( LayerHandle src_layer, LayerHandle& dst_layer )
 {
   // Generate a new name for the filter
   std::string name = this->get_layer_prefix() + "_" + src_layer->get_layer_name();
@@ -298,7 +298,7 @@ bool BaseFilter::create_and_lock_mask_layer_from_layer( LayerHandle src_layer, L
   return true;
 }
 
-bool BaseFilter::create_and_lock_mask_layer( const Core::GridTransform& grid_trans, 
+bool LayerFilter::create_and_lock_mask_layer( const Core::GridTransform& grid_trans, 
                       LayerHandle src_layer, LayerHandle& dst_layer )
 {
   // Generate a new name for the filter
@@ -320,7 +320,7 @@ bool BaseFilter::create_and_lock_mask_layer( const Core::GridTransform& grid_tra
   return true;
 }
 
-bool BaseFilter::dispatch_unlock_layer( LayerHandle layer )
+bool LayerFilter::dispatch_unlock_layer( LayerHandle layer )
 {
   bool found_layer = false;
   // Check whether the locked layer is still in the list of layers that this filter locked
@@ -360,7 +360,7 @@ bool BaseFilter::dispatch_unlock_layer( LayerHandle layer )
   return true;
 }
 
-bool BaseFilter::dispatch_delete_layer( LayerHandle layer )
+bool LayerFilter::dispatch_delete_layer( LayerHandle layer )
 {
   bool found_layer = false;
   
@@ -398,7 +398,7 @@ bool BaseFilter::dispatch_delete_layer( LayerHandle layer )
 }
 
 
-bool BaseFilter::dispatch_insert_data_volume_into_layer( LayerHandle layer, 
+bool LayerFilter::dispatch_insert_data_volume_into_layer( LayerHandle layer, 
   Core::DataVolumeHandle data, bool update_histogram )
 {
   // Check whether the layer is of the right type
@@ -417,7 +417,7 @@ bool BaseFilter::dispatch_insert_data_volume_into_layer( LayerHandle layer,
 }
 
 
-bool BaseFilter::dispatch_insert_mask_volume_into_layer( LayerHandle layer, 
+bool LayerFilter::dispatch_insert_mask_volume_into_layer( LayerHandle layer, 
   Core::MaskVolumeHandle mask )
 { 
   // Check whether the layer is of the right type
@@ -431,13 +431,13 @@ bool BaseFilter::dispatch_insert_mask_volume_into_layer( LayerHandle layer,
 }
 
 
-void BaseFilter::run()
+void LayerFilter::run()
 {
   // NOTE: Running too many filters in parallel can cause a huge surge in memory
   // hence we restrict the maximum number of filters can run simultaneously.
 
   // If more filters are running wait until one of them finished computing
-  BaseFilterLock::Instance()->lock();
+  LayerFilterLock::Instance()->lock();
   
   try
   {
@@ -448,7 +448,7 @@ void BaseFilter::run()
   }
   
   // Release the lock so another filter can start
-  BaseFilterLock::Instance()->unlock();
+  LayerFilterLock::Instance()->unlock();
   
   // Notify if application thread if it is waiting for this to succeed in which case
   // it will immediately finalize the filter.
@@ -458,11 +458,10 @@ void BaseFilter::run()
   
 }
 
-Layer::filter_key_type BaseFilter::get_key() const
+Layer::filter_key_type LayerFilter::get_key() const
 {
   return this->private_->key_;
 }
-
 
 } // end namespace Seg3D
 

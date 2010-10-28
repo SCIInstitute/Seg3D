@@ -37,6 +37,8 @@ SET(APPLICATION_LAYER_SRCS
   LayerGroup.cc
   Layer.h
   Layer.cc
+  LayerAbstractFilter.h
+  LayerAbstractFilter.cc
   DataLayer.h
   DataLayer.cc
   MaskLayer.h

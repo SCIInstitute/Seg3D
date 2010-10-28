@@ -36,7 +36,7 @@
 #include <Application/Layer/Layer.h>
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/StatusBar/StatusBar.h>
-#include <Application/Filters/BaseFilter.h>
+#include <Application/Filters/LayerFilter.h>
 #include <Application/Filters/Actions/ActionNeighborhoodConnectedFilter.h>
 
 // REGISTER ACTION:
@@ -83,7 +83,7 @@ bool ActionNeighborhoodConnectedFilter::validate( Core::ActionContextHandle& con
 // NOTE: The separation of the algorithm into a private class is for the purpose of running the
 // filter on a separate thread.
 
-class NeighborhoodConnectedFilterAlgo : public BaseFilter
+class NeighborhoodConnectedFilterAlgo : public LayerFilter
 {
 
 public:
