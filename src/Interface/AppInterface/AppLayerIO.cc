@@ -152,7 +152,7 @@ void AppLayerIO::ImportSeries( QMainWindow* main_window )
     message_box.exec();
     return;
   }
-  else
+  else if ( file_list.size() == 1 )
   {
     // If we are able to create an importer, we then need to figure out which files are part
     // of the series.
@@ -168,11 +168,14 @@ void AppLayerIO::ImportSeries( QMainWindow* main_window )
     // Step 3: now we want to see if we can figure out the file name pattern.  We will start by
     // checking to see if the sequence numbers are at the end of the file name.  
     std::string filename = boost::filesystem::basename( full_filename );
+    
     std::string numbers( "0123456789" );
     size_t length =  filename.find_last_not_of( numbers ) + 1;
 
     // we check to see if we have found a series number at the end. length == 0 if we haven't.
     if( length == 0 ) return;
+
+    std::vector< std::string > files1;
 
     // if length was > 0 then chances are that we found a sequence pattern
     std::string file_pattern = filename.substr( 0, length ); 
@@ -187,10 +190,25 @@ void AppLayerIO::ImportSeries( QMainWindow* main_window )
         std::string potential_match = dir_itr->filename().substr( 0, length );
         if( potential_match == file_pattern )
         {
-          files.push_back( dir_itr->string() );
+          files1.push_back( dir_itr->string() );
         }
       }
     }
+
+  }
+  else
+  {
+    QStringList::iterator it = file_list.begin();
+    QStringList::iterator it_end = file_list.end();
+    while ( it != it_end )
+    {
+      files.push_back( (*it).toStdString() );
+      ++it;
+    }
+    
+    std::sort( files.begin(), files.end() );
+    
+    importers.push_back( importer );
   }
 
   importers[ 0 ]->set_file_list( files );
