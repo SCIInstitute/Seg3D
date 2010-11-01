@@ -26,8 +26,15 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#ifdef _WIN32
+// Windows includes
+#include <windows.h>
+#else
 // STL includes
 #include <fstream>
+#endif
+
+
 
 // Boost Includes
 #include <boost/lexical_cast.hpp>
@@ -102,7 +109,7 @@ bool VFFLayerImporter::scan_vff()
   {
     if ( end_of_header == line ) 
     {
-      this->vff_end_of_header_ = file_data.tellg();
+      this->vff_end_of_header_ = 1 + static_cast<size_t>( file_data.tellg() );
       break;
     }
     std::getline( file_data, line );
@@ -157,10 +164,13 @@ bool VFFLayerImporter::import_vff()
     Core::Vector( 0.0, 0.0, boost::lexical_cast< double >( spacing_vector[ 2 ] ) ) );
 
 
+  size_t data_type_size = 1;
+
   // Step 4: now we instantiate a DataBlock based on the type of pixel that we expect
   if( this->pixel_type_ == Core::DataType::SHORT_E )
   {
     this->data_block_ = Core::StdDataBlock::New( nx, ny, nz, Core::DataType::SHORT_E );
+    data_type_size = 2;
   }
   else if( this->pixel_type_ == Core::DataType::UCHAR_E )
   {
@@ -172,28 +182,84 @@ bool VFFLayerImporter::import_vff()
   }
 
   // Step 4: now we read in the file
-  size_t length;
+#ifdef _WIN32
+  HANDLE file_desc = CreateFileA( this->get_filename().c_str(), GENERIC_READ,
+                             FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+  if ( file_desc == INVALID_HANDLE_VALUE ) return false;
+
+#else
   std::ifstream data_file( this->get_filename().c_str(), std::ios::in | std::ios::binary );
   if( !data_file ) return false;
+#endif
+
+
+  size_t length = this->data_block_->get_size() * data_type_size;
   
   // Step 4a: we start by getting the length of the entire file
+
+#ifdef _WIN32
+  LARGE_INTEGER offset; offset.QuadPart = 0;
+    SetFilePointerEx( file_desc, offset, NULL, FILE_END);
+#else
   data_file.seekg( 0, std::ios::end );
+#endif
 
   // Step 4b: next we compute the length of the data by subtracting the size of the header
-  length = data_file.tellg();
-  length = length - this->vff_end_of_header_;
 
+  // TODO: Need to make sure this does the right thing under 32bits
+  size_t file_size = 0;
+
+#ifdef _WIN32
+  offset.QuadPart = 0;
+    LARGE_INTEGER cur_pos;
+  SetFilePointerEx( file_desc, offset, &cur_pos, FILE_CURRENT );
+  file_size = cur_pos.QuadPart + 1; 
+#else
+  file_size = data_file.tellg() + 1;
+#endif
+  
+  if ( file_size - ( this->vff_end_of_header_ ) < length )
+  {
+    // CORRUPT FILE
+    return false;
+  }
+
+    
   // Step 4c: then, after we make place for the data, we move the reader's position back to the
   // front of the file and then to the start of the data;
-  char* data;
-  data = new char[ length ];
-  data_file.seekg( 0, std::ios::beg );
-  data_file.seekg( this->vff_end_of_header_ + 1 );// add one so that we begin at the right place 
+  char* data = reinterpret_cast<char *>( this->data_block_->get_data() );
+
+#ifdef _WIN32
+  offset.QuadPart = this->vff_end_of_header_;
+    SetFilePointerEx( file_desc, offset, NULL, FILE_BEGIN );
+#else
+  data_file.seekg( this->vff_end_of_header_, std::ios::beg );
+#endif
 
   // Step 4d: finally, we do the actual reading and then save the data to the data block.
+#ifdef _WIN32
+
+  char* data_ptr = data;
+    DWORD dwReadBytes;
+  size_t read_length = length;
+  size_t chunk = 1UL<<30;
+  while ( read_length > chunk )
+  {
+    ReadFile( file_desc, data_ptr, DWORD(chunk), &dwReadBytes, NULL );
+    read_length -= static_cast<size_t>( dwReadBytes );
+    data_ptr += static_cast<size_t>( dwReadBytes );
+  }
+  ReadFile( file_desc, data_ptr, DWORD( read_length ), &dwReadBytes, NULL );
+
+#else
   data_file.read( data, length );
-  this->data_block_->set_data( data );
+#endif
+  
+#ifdef _WIN32
+  CloseHandle( file_desc );
+#else
   data_file.close();
+#endif
 
   // Step 5: now we set our grid transform.
   this->grid_transform_ = Core::GridTransform( nx, ny, nz, transform );
