@@ -94,7 +94,7 @@ public:
   {
     // Define the type of filter that we use.
     typedef itk::ConnectedComponentImageFilter< 
-      UCHAR_IMAGE_TYPE, UINT_IMAGE_TYPE > filter_type;
+      UCHAR_IMAGE_TYPE, USHORT_IMAGE_TYPE > filter_type;
 
     // Retrieve the image as an itk image from the underlying data structure
     // NOTE: This only does wrapping and does not regenerate the data.
@@ -114,6 +114,9 @@ public:
     // Run the actual ITK filter.
     // This needs to be in a try/catch statement as certain filters throw exceptions when they
     // are aborted. In that case we will relay a message to the status bar for information.
+
+
+    bool need_32bits = false;
     try 
     { 
       filter->Update(); 
@@ -125,87 +128,220 @@ public:
         this->report_error( "Filter was aborted." );
         return;
       }
-      this->report_error( "Internal error." );
-      return;
+      if (  filter->GetObjectCount() > static_cast<unsigned long int>(
+        itk::NumericTraits<unsigned short>::max() ) )
+      {
+        need_32bits = true;
+      }
+      else
+      {
+        this->report_error("Could not allocate enough memory.");
+        return;
+      }
     }
+
+    Core::DataBlockHandle output_datablock;
 
     // As ITK filters generate an inconsistent abort behavior, we record our own abort flag
     // This one is set when the abort button is pressed and an abort is sent to ITK.
     if ( this->check_abort() ) return;
 
-    Core::DataBlockHandle output_datablock = Core::ITKDataBlock::New(
-      filter->GetOutput() );
-    
-    unsigned int max_label = filter->GetObjectCount();
-    std::vector<unsigned int> lut;
+    if ( need_32bits )
+    {
+      filter = 0;
+      // Define the type of filter that we use.
+      typedef itk::ConnectedComponentImageFilter< 
+        UCHAR_IMAGE_TYPE, UINT_IMAGE_TYPE > filter32_type;
 
-    try
-    {
-      lut.resize( max_label + 1, 1 );
-    }
-    catch( ... )
-    {
-      this->report_error( "Could not allocate enough memory." );
-      return;   
-    }
-    
-    Core::GridTransform grid = input_image->get_grid_transform();
-    Core::Transform trans = grid.get_inverse();
-    int nx = static_cast<int>( grid.get_nx() ); 
-    int ny = static_cast<int>( grid.get_ny() ); 
-    int nz = static_cast<int>( grid.get_nz() ); 
-    
-    unsigned int* data = reinterpret_cast<unsigned int*>( output_datablock->get_data() );
-    unsigned int val;
-    for ( size_t i = 0; i < this->seeds_.size(); ++i )
-    {   
-      Core::Point location = trans * seeds_[ i ];
-      int x = static_cast<int>( Core::Round( location.x() ) );
-      int y = static_cast<int>( Core::Round( location.y() ) );
-      int z = static_cast<int>( Core::Round( location.z() ) );
+      // Retrieve the image as an itk image from the underlying data structure
+      // NOTE: This only does wrapping and does not regenerate the data.
+      Core::ITKImageDataT<unsigned char>::Handle input_image; 
+      // NOTE: Get the invertedd version f the mask
+      this->get_itk_image_from_layer<unsigned char>( this->src_layer_, input_image, true );
+          
+      // Create a new ITK filter instantiation. 
+      filter32_type::Pointer filter32 = filter32_type::New();
+
+      // Relay abort and progress information to the layer that is executing the filter.
+      this->observe_itk_filter( filter32, this->dst_layer_, 0.0, 0.75 );
       
-      if ( x >= 0 && y >= 0 && z >= 0 && x < nx && y < ny && z < nz )
+      // Setup the filter parameters that we do not want to change.
+      filter32->SetInput( input_image->get_image() );
+
+      // Run the actual ITK filter.
+      // This needs to be in a try/catch statement as certain filters throw exceptions when they
+      // are aborted. In that case we will relay a message to the status bar for information.
+
+      try 
+      { 
+        filter->Update(); 
+      } 
+      catch ( ... ) 
       {
-        val = data[ output_datablock->to_index( static_cast<size_t>( x ), 
-          static_cast<size_t>( y ), static_cast<size_t>( z ) ) ];
-        if ( val ) lut[ val ] = 0;
+        if ( this->check_abort() )
+        {
+          this->report_error( "Filter was aborted." );
+          return;
+        }
+  
+        this->report_error("Could not allocate enough memory.");
+        return;
+      }
+
+      // As ITK filters generate an inconsistent abort behavior, we record our own abort flag
+      // This one is set when the abort button is pressed and an abort is sent to ITK.
+      if ( this->check_abort() ) return;
+
+
+      output_datablock = Core::ITKDataBlock::New( filter32->GetOutput() );
+      
+      unsigned int max_label = filter->GetObjectCount();
+      std::vector<unsigned int> lut;
+
+      try
+      {
+        lut.resize( max_label + 1, 1 );
+      }
+      catch( ... )
+      {
+        this->report_error( "Could not allocate enough memory." );
+        return;   
+      }
+      
+      Core::GridTransform grid = input_image->get_grid_transform();
+      Core::Transform trans = grid.get_inverse();
+      int nx = static_cast<int>( grid.get_nx() ); 
+      int ny = static_cast<int>( grid.get_ny() ); 
+      int nz = static_cast<int>( grid.get_nz() ); 
+      
+      unsigned int* data = reinterpret_cast<unsigned int*>( output_datablock->get_data() );
+      unsigned int val;
+      for ( size_t i = 0; i < this->seeds_.size(); ++i )
+      {   
+        Core::Point location = trans * seeds_[ i ];
+        int x = static_cast<int>( Core::Round( location.x() ) );
+        int y = static_cast<int>( Core::Round( location.y() ) );
+        int z = static_cast<int>( Core::Round( location.z() ) );
+        
+        if ( x >= 0 && y >= 0 && z >= 0 && x < nx && y < ny && z < nz )
+        {
+          val = data[ output_datablock->to_index( static_cast<size_t>( x ), 
+            static_cast<size_t>( y ), static_cast<size_t>( z ) ) ];
+          if ( val ) lut[ val ] = 0;
+        }
+      }
+
+      // Ensure that anything connected to the corners is not removed
+      val = data[ output_datablock->to_index( 0, 0, 0 ) ]; 
+      if ( val ) lut[ val ] = 0;
+      val = data[ output_datablock->to_index( static_cast<size_t>( nx -1 ), 0, 0 ) ];
+      if ( val ) lut[ val ] = 0;
+      val = data[ output_datablock->to_index( 0, static_cast<size_t>( ny -1 ), 0 ) ]; 
+      if ( val ) lut[ val ] = 0;
+      val = data[ output_datablock->to_index( static_cast<size_t>( nx -1 ), 
+        static_cast<size_t>( ny -1 ), 0 ) ];
+      if ( val ) lut[ val ] = 0;
+      val = data[ output_datablock->to_index( 0, 0, static_cast<size_t>( nz -1 ) ) ]; 
+      if ( val ) lut[ val ] = 0;
+      val = data[ output_datablock->to_index( static_cast<size_t>( nx -1 ), 0, 
+        static_cast<size_t>( nz -1 ) ) ];
+      if ( val ) lut[ val ] = 0;
+      val = data[ output_datablock->to_index( 0, static_cast<size_t>( ny -1 ), 
+        static_cast<size_t>( nz -1 ) ) ]; 
+      if ( val ) lut[ val ] = 0;
+      val = data[ output_datablock->to_index( static_cast<size_t>( nx -1 ), 
+        static_cast<size_t>( ny -1 ), static_cast<size_t>( nz -1 ) ) ];
+      if ( val ) lut[ val ] = 0;
+      
+      lut[ 0 ] = 1;
+      
+      this->dst_layer_->update_progress_signal_( 0.80 );
+      if ( this->check_abort() )
+      {
+        return;
+      }
+
+      size_t size = output_datablock->get_size();
+      for ( size_t j = 0; j < size; j++ )
+      {
+        data[ j ] = lut[ data[ j ] ];
       }
     }
-
-    // Ensure that anything connected to the corners is not removed
-    val = data[ output_datablock->to_index( 0, 0, 0 ) ]; 
-    if ( val ) lut[ val ] = 0;
-    val = data[ output_datablock->to_index( static_cast<size_t>( nx -1 ), 0, 0 ) ];
-    if ( val ) lut[ val ] = 0;
-    val = data[ output_datablock->to_index( 0, static_cast<size_t>( ny -1 ), 0 ) ]; 
-    if ( val ) lut[ val ] = 0;
-    val = data[ output_datablock->to_index( static_cast<size_t>( nx -1 ), 
-      static_cast<size_t>( ny -1 ), 0 ) ];
-    if ( val ) lut[ val ] = 0;
-    val = data[ output_datablock->to_index( 0, 0, static_cast<size_t>( nz -1 ) ) ]; 
-    if ( val ) lut[ val ] = 0;
-    val = data[ output_datablock->to_index( static_cast<size_t>( nx -1 ), 0, 
-      static_cast<size_t>( nz -1 ) ) ];
-    if ( val ) lut[ val ] = 0;
-    val = data[ output_datablock->to_index( 0, static_cast<size_t>( ny -1 ), 
-      static_cast<size_t>( nz -1 ) ) ]; 
-    if ( val ) lut[ val ] = 0;
-    val = data[ output_datablock->to_index( static_cast<size_t>( nx -1 ), 
-      static_cast<size_t>( ny -1 ), static_cast<size_t>( nz -1 ) ) ];
-    if ( val ) lut[ val ] = 0;
-    
-    lut[ 0 ] = 1;
-    
-    this->dst_layer_->update_progress_signal_( 0.80 );
-    if ( this->check_abort() )
+    else
     {
-      return;
-    }
+      output_datablock = Core::ITKDataBlock::New( filter->GetOutput() );
+      
+      unsigned int max_label = filter->GetObjectCount();
+      std::vector<unsigned short> lut;
 
-    size_t size = output_datablock->get_size();
-    for ( size_t j = 0; j < size; j++ )
-    {
-      data[ j ] = lut[ data[ j ] ];
+      try
+      {
+        lut.resize( max_label + 1, 1 );
+      }
+      catch( ... )
+      {
+        this->report_error( "Could not allocate enough memory." );
+        return;   
+      }
+      
+      Core::GridTransform grid = input_image->get_grid_transform();
+      Core::Transform trans = grid.get_inverse();
+      int nx = static_cast<int>( grid.get_nx() ); 
+      int ny = static_cast<int>( grid.get_ny() ); 
+      int nz = static_cast<int>( grid.get_nz() ); 
+      
+      unsigned short* data = reinterpret_cast<unsigned short*>( output_datablock->get_data() );
+      unsigned short val;
+      for ( size_t i = 0; i < this->seeds_.size(); ++i )
+      {   
+        Core::Point location = trans * seeds_[ i ];
+        int x = static_cast<int>( Core::Round( location.x() ) );
+        int y = static_cast<int>( Core::Round( location.y() ) );
+        int z = static_cast<int>( Core::Round( location.z() ) );
+        
+        if ( x >= 0 && y >= 0 && z >= 0 && x < nx && y < ny && z < nz )
+        {
+          val = data[ output_datablock->to_index( static_cast<size_t>( x ), 
+            static_cast<size_t>( y ), static_cast<size_t>( z ) ) ];
+          if ( val ) lut[ val ] = 0;
+        }
+      }
+
+      // Ensure that anything connected to the corners is not removed
+      val = data[ output_datablock->to_index( 0, 0, 0 ) ]; 
+      if ( val ) lut[ val ] = 0;
+      val = data[ output_datablock->to_index( static_cast<size_t>( nx -1 ), 0, 0 ) ];
+      if ( val ) lut[ val ] = 0;
+      val = data[ output_datablock->to_index( 0, static_cast<size_t>( ny -1 ), 0 ) ]; 
+      if ( val ) lut[ val ] = 0;
+      val = data[ output_datablock->to_index( static_cast<size_t>( nx -1 ), 
+        static_cast<size_t>( ny -1 ), 0 ) ];
+      if ( val ) lut[ val ] = 0;
+      val = data[ output_datablock->to_index( 0, 0, static_cast<size_t>( nz -1 ) ) ]; 
+      if ( val ) lut[ val ] = 0;
+      val = data[ output_datablock->to_index( static_cast<size_t>( nx -1 ), 0, 
+        static_cast<size_t>( nz -1 ) ) ];
+      if ( val ) lut[ val ] = 0;
+      val = data[ output_datablock->to_index( 0, static_cast<size_t>( ny -1 ), 
+        static_cast<size_t>( nz -1 ) ) ]; 
+      if ( val ) lut[ val ] = 0;
+      val = data[ output_datablock->to_index( static_cast<size_t>( nx -1 ), 
+        static_cast<size_t>( ny -1 ), static_cast<size_t>( nz -1 ) ) ];
+      if ( val ) lut[ val ] = 0;
+      
+      lut[ 0 ] = 1;
+      
+      this->dst_layer_->update_progress_signal_( 0.80 );
+      if ( this->check_abort() )
+      {
+        return;
+      }
+
+      size_t size = output_datablock->get_size();
+      for ( size_t j = 0; j < size; j++ )
+      {
+        data[ j ] = lut[ data[ j ] ];
+      }   
     }
 
     this->dst_layer_->update_progress_signal_( .90 );

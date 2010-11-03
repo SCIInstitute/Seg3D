@@ -177,6 +177,10 @@ public:
       }
     }
 
+    // As ITK filters generate an inconsistent abort behavior, we record our own abort flag
+    // This one is set when the abort button is pressed and an abort is sent to ITK.
+    if ( this->check_abort() ) return;
+
     Core::DataBlockHandle output_datablock;
 
     if ( need_32bits )

@@ -30,6 +30,7 @@
 #include <Application/Layer/Layer.h>
 #include <Application/Layer/LayerGroup.h>
 #include <Application/LayerManager/LayerManager.h>
+#include <Application/LayerManager/LayerUndoBuffer.h>
 #include <Application/LayerManager/Actions/ActionDeleteLayers.h>
 
 // REGISTER ACTION:
@@ -50,7 +51,33 @@ bool ActionDeleteLayers::validate( Core::ActionContextHandle& context )
 bool ActionDeleteLayers::run( Core::ActionContextHandle& context, 
   Core::ActionResultHandle& result )
 {
+  
+  // Create undo action
+  LayerUndoBufferItemHandle item( new LayerUndoBufferItem( "Delete layers" ) );
+
+  // TODO:
+  // To get this to work, I need to redo some of the invalidate pieces we do
+  // -JS
+  
+/*
+  layer_list_type layer_list = this->group_.handle()->get_layer_list();
+
+  item->set_redo_action( this->shared_from_this() );
+  layer_list_type::iterator it = layer_list.begin();
+  layer_list_type::iterator it_end = layer_list.end();
+  
+  while ( it != it_end )
+  {
+    if ( ( *it )->selected_state_->get() )
+    {
+      item->add_layer_to_add( *it );
+    }
+    ++it;
+  }
+  LayerUndoBuffer::Instance()->insert_undo_item( context, item );
+*/
   LayerManager::Instance()->delete_layers( this->group_.handle() );
+  
   return true;
 }
 

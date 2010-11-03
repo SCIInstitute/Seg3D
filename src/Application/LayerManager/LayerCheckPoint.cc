@@ -60,10 +60,7 @@ bool LayerCheckPoint::apply( LayerHandle layer ) const
   // If there is a full volume in the check point insert it into the layer
   if ( this->private_->volume_ )
   {
-    if ( layer->get_type() == Core::VolumeType::MASK_E )
-    {
-      LayerManager::DispatchInsertVolumeIntoLayer( layer, this->private_->volume_ );
-    }
+    LayerManager::DispatchInsertVolumeIntoLayer( layer, this->private_->volume_ );
   }
   
   return true;
