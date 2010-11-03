@@ -31,6 +31,7 @@
 #include <Application/Layer/LayerGroup.h>
 
 #include <Application/LayerManager/LayerManager.h>
+#include <Application/LayerManager/LayerUndoBuffer.h>
 #include <Application/LayerManager/Actions/ActionNewMaskLayer.h>
 
 // REGISTER ACTION:
@@ -63,6 +64,12 @@ bool ActionNewMaskLayer::run( Core::ActionContextHandle& context, Core::ActionRe
 
   // Register the new layer with the LayerManager. This will insert it into the right group.
   LayerManager::Instance()->insert_layer( new_mask_layer );
+
+  // Create an undo item for this action
+  LayerUndoBufferItemHandle item( new LayerUndoBufferItem( "New Mask" ) );
+  item->set_redo_action( this->shared_from_this() );
+  item->add_layer_to_delete( new_mask_layer );
+  LayerUndoBuffer::Instance()->insert_undo_item( context, item );
   
   return true;
 }

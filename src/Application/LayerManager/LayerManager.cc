@@ -1201,7 +1201,9 @@ void LayerManager::DispatchDeleteLayer( LayerHandle layer, filter_key_type key )
     
     if ( layer->num_filter_keys() == 0 )
     {
-      // Insert the layer into the layer manager.
+      layer->reset_filter_handle();
+
+      // Delete the layer from the layer manager.
       LayerManager::Instance()->delete_layer( layer );
     }
     else
@@ -1230,6 +1232,7 @@ void LayerManager::DispatchUnlockLayer( LayerHandle layer, filter_key_type key )
     if ( layer->num_filter_keys() == 0 )
     {
       layer->data_state_->set( Layer::AVAILABLE_C );
+      layer->reset_filter_handle();
     }
   }
 }
@@ -1258,6 +1261,7 @@ void LayerManager::DispatchUnlockOrDeleteLayer( LayerHandle layer, filter_key_ty
       if ( layer->num_filter_keys() == 0 )
       {
         layer->data_state_->set( Layer::AVAILABLE_C );
+        layer->reset_filter_handle();
       }
     }
     else
@@ -1266,6 +1270,7 @@ void LayerManager::DispatchUnlockOrDeleteLayer( LayerHandle layer, filter_key_ty
       {
         CORE_THROW_LOGICERROR( "Could not delete that is connected to another filter" );
       }
+      layer->reset_filter_handle();
       LayerManager::Instance()->delete_layer( layer );
     }
 
@@ -1312,6 +1317,29 @@ void LayerManager::DispatchInsertMaskVolumeIntoLayer( MaskLayerHandle layer,
     {
       LayerManager::Instance()->layer_volume_changed_signal_( layer );
       LayerManager::Instance()->layers_changed_signal_();
+    }
+  }
+}
+
+void LayerManager::DispatchInsertVolumeIntoLayer( LayerHandle layer, 
+  Core::VolumeHandle volume, filter_key_type key )
+{
+  if ( layer->get_type() == Core::VolumeType::MASK_E )
+  {
+    MaskLayerHandle mask = boost::shared_dynamic_cast<MaskLayer>( layer );
+    Core::MaskVolumeHandle mask_volume = boost::shared_dynamic_cast<Core::MaskVolume>( volume );
+    if ( mask && mask_volume )
+    {
+      DispatchInsertMaskVolumeIntoLayer( mask, mask_volume, key );
+    }
+  }
+  else if ( layer->get_type() == Core::VolumeType::DATA_E )
+  {
+    DataLayerHandle data = boost::shared_dynamic_cast<DataLayer>( layer );
+    Core::DataVolumeHandle data_volume = boost::shared_dynamic_cast<Core::DataVolume>( volume );
+    if ( data && data_volume )
+    {
+      DispatchInsertDataVolumeIntoLayer( data, data_volume, key );
     }
   }
 }

@@ -237,6 +237,7 @@ void RendererPrivate::draw_slices_3d( const Core::BBox& bbox,
   this->slice_shader_->enable();
   this->slice_shader_->set_lighting( with_lighting );
   size_t num_of_viewers = layer_scenes.size();
+  
   // for each visible 2D viewer
   for ( size_t i = 0; i < num_of_viewers; i++ )
   {
@@ -508,7 +509,7 @@ void RendererPrivate::draw_isosurfaces( const IsosurfaceArray& isosurfaces, bool
 {
   bool use_colormap = false;
   size_t num_of_isosurfaces = isosurfaces.size();
-  glEnable( GL_CULL_FACE );
+//  glEnable( GL_CULL_FACE );
   this->isosurface_shader_->enable();
   this->isosurface_shader_->set_lighting( with_lighting );
   this->isosurface_shader_->set_use_colormap( use_colormap  );
@@ -534,7 +535,7 @@ void RendererPrivate::draw_isosurfaces( const IsosurfaceArray& isosurfaces, bool
     CORE_CHECK_OPENGL_ERROR();
   }
   this->isosurface_shader_->disable();
-  glDisable( GL_CULL_FACE );
+//  glDisable( GL_CULL_FACE );
 }
 
 void RendererPrivate::draw_orientation_arrows( const Core::View3D& view_3d )
@@ -748,9 +749,6 @@ bool Renderer::render()
     double znear, zfar;
     view3d.compute_clipping_planes( bbox, znear, zfar );
     
-    CORE_LOG_DEBUG( std::string(" far = ") + Core::ExportToString( zfar ) );
-    CORE_LOG_DEBUG( std::string(" near = ") + Core::ExportToString( znear ) );
-
     gluPerspective( view3d.fov(), this->width_ / ( 1.0 * this->height_ ), znear, zfar );
     glMatrixMode( GL_MODELVIEW );
     glLoadIdentity();

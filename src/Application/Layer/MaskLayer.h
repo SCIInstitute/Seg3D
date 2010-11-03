@@ -60,9 +60,13 @@ public:
   virtual ~MaskLayer();
 
 public:
-  // TYPE:
+  // GET_TYPE:
   // This function returns the a Core::VolumeType indicating that this is a MaskLayer.
   virtual Core::VolumeType get_type() const { return Core::VolumeType::MASK_E; }
+
+  // GET_BYTE_SIZE:
+  // Get the size of the data contained in the layer in bytes
+  virtual size_t get_byte_size() const;
 
   // GET_GRID_TRANSFORM:
   // This function returns the grid transform of the mask volume.

@@ -370,10 +370,18 @@ void MaskLayer::calculate_volume()
     * voxel_count;
     
   this->calculated_volume_state_->set( Core::ExportToString( calculated_mask_volume, 10 ) );
-  this->counted_pixels_state_->set( Core::ExportToString( voxel_count ) );
-  
+  this->counted_pixels_state_->set( Core::ExportToString( voxel_count ) );  
 }
 
+size_t MaskLayer::get_byte_size() const
+{
+  Layer::lock_type lock( Layer::GetMutex() );
+  if ( this->mask_volume_ && this->mask_volume_->is_valid() )
+  {
+    return this->mask_volume_->get_mask_data_block()->get_byte_size();
+  }
+  return 0;
+}
 
 } // end namespace Seg3D
 

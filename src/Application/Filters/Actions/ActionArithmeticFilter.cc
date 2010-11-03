@@ -398,8 +398,6 @@ bool ActionArithmeticFilter::run( Core::ActionContextHandle& context,
   // Copy the parameters over to the algorithm that runs the filter
   this->private_->algo_->preserve_data_format_ = this->private_->preserve_data_format_.value();
 
-  this->private_->algo_->connect_abort( this->private_->algo_->dst_layer_ );
-
   // Connect ArrayMathEngine progress signal to output layer progress signal
   this->private_->algo_->engine_.update_progress_signal_.connect(
     boost::bind( &Layer::update_progress, this->private_->algo_->dst_layer_, _1, 0.0, 1.0 ) );
@@ -407,6 +405,9 @@ bool ActionArithmeticFilter::run( Core::ActionContextHandle& context,
   // Return the ids of the destination layer.
   result = Core::ActionResultHandle( 
     new Core::ActionResult( this->private_->algo_->dst_layer_->get_layer_id() ) );
+
+  // Create undo/redo record for this layer action
+  this->private_->algo_->create_undo_redo_record( context, this->shared_from_this() );
 
   // Start the filter.
   Core::Runnable::Start( this->private_->algo_ );

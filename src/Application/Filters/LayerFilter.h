@@ -108,7 +108,7 @@ public:
   // NOTE: This function can only be run from the application thread.
   // NOTE: The BaseFilter class records which layers are locked and will schedule an unlock
   // for each layer that was not unlocked by the time this class is destroyed.
-  bool lock_for_processing( LayerHandle layer );
+  bool lock_for_processing( LayerHandle layer, bool check_point_volume = true );
   
   // CREATE_AND_LOCK_DATA_LAYER_FROM_LAYER:
   // Create a new data layer with the same dimensions as another layer, the layer is immediately
@@ -143,11 +143,6 @@ public:
   // DISPATCH_DELETE_LAYER:
   // Schedule a layer to be deleted
   bool dispatch_delete_layer( LayerHandle layer );
-
-  // TODO:
-  // These next two functions need to atomically set the provenance information as well
-  // This is currently not yet implemented
-  // --JS
   
   // DISPATCH_INSERT_DATA_VOLUME_INTO_LAYER:
   // Schedule a new data volume to be inserted into a layer
@@ -158,6 +153,10 @@ public:
   // Schedule a new mask volume to be inserted into a layer
   bool dispatch_insert_mask_volume_into_layer( LayerHandle layer, 
     Core::MaskVolumeHandle mask );
+
+  // CREATE_UNDO_REDO_RECORD:
+  // Create an undo record and add it to the undo stack
+  bool create_undo_redo_record( Core::ActionContextHandle context, Core::ActionHandle redo_action );
 
   // -- filter specific information --
 public:

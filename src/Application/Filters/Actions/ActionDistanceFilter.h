@@ -48,6 +48,7 @@ CORE_ACTION(
   CORE_ACTION_KEY( "inside_positive", "false", "Whether the sign of the inside is positive and the"
     " outside negative or vice versa.")
   CORE_ACTION_CHANGES_PROJECT_DATA()
+  CORE_ACTION_IS_UNDOABLE()
 )
   
   // -- Constructor/Destructor --

@@ -250,12 +250,15 @@ public:
         }
         
         float progress = static_cast<float>( i *  nz + z ) * progress_multiplier;
-      
+
+        if ( this->check_abort() )
+        {
+          return;
+        }
         if ( current_progress + 0.02f < progress )
         {
           current_progress = progress;
           this->dst_layer_->update_progress( current_progress );
-          if ( this->check_abort() ) return;
         }
       }
       current_label++;
@@ -336,11 +339,14 @@ public:
         
         float progress = static_cast<float>( ( this->dilate_radius_ + i ) *  nz + z ) * progress_multiplier;
       
+        if ( this->check_abort() )
+        {
+          return;
+        }
         if ( current_progress + 0.02f < progress )
         {
           current_progress = progress;
           this->dst_layer_->update_progress( current_progress );
-          if ( this->check_abort() ) return;
         }
       }
       current_label++;
@@ -439,6 +445,9 @@ bool ActionDilateErodeFilter::run( Core::ActionContextHandle& context,
 
   // Return the id of the destination layer.
   result = Core::ActionResultHandle( new Core::ActionResult( algo->dst_layer_->get_layer_id() ) );
+
+  // Build the undo-redo record
+  algo->create_undo_redo_record( context, this->shared_from_this() );
 
   // Start the filter.
   Core::Runnable::Start( algo );

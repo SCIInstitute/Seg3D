@@ -57,10 +57,6 @@ SET(CORE_ACTION_SRCS
   ActionRecorder.cc
   ActionSocket.h
   ActionSocket.cc
-  ActionUndoItem.h
-  ActionUndoItem.cc
-  ActionUndoBuffer.h
-  ActionUndoBuffer.cc
   )
 
 CORE_ADD_LIBRARY(Core_Action ${CORE_ACTION_SRCS} )

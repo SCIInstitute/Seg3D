@@ -57,9 +57,13 @@ public:
   DataLayer( const std::string& state_id );
   virtual ~DataLayer();
 
-  // TYPE:
+  // GET_TYPE:
   // this function returns the a Core::VolumeType indicating that this is a DataLayer 
   virtual Core::VolumeType get_type() const { return Core::VolumeType::DATA_E; }
+
+  // GET_BYTE_SIZE:
+  // Get the size of the data contained in the layer in bytes
+  virtual size_t get_byte_size() const;
 
   // GET_GRID_TRANSFORM:
   // this function returns the grid transform of the data volume

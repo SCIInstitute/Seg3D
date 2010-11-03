@@ -55,7 +55,7 @@ class ITKLayerImporter : public LayerImporter
 {
   // The ITKLayerImporter is capable of importing DICOMS, tiffs, and pngs.  It assumes that
   // when a file name does not include an extension that it is a DICOM
-  SCI_IMPORTER_TYPE("ITK Importer", ".dcm;.tiff;.tif;.png;", 5)
+  SCI_IMPORTER_TYPE("ITK Importer", ".dcm;.DCM;.dicom;.DICOM;.tiff;.tif;.TIFF;.TIF;.png;.PNG", 5)
 
   // -- Constructor/Destructor --
 public:
@@ -272,6 +272,7 @@ private:
     boost::to_lower( this->extension_ );
   }
   
+  
 protected:
   // LOAD_DATA:
   // Load the data from the file(s).
@@ -284,6 +285,25 @@ protected:
   virtual std::string get_layer_name();
 
 private:
+  bool is_dicom() const
+  {
+    return ( ( this->extension_ == ".dcm" ) || ( this->extension_ == ".dicom" ) ||
+      ( this->extension_ == ".DCM" ) || ( this->extension_ == ".DICOM" ) || 
+      ( this->extension_ == "" ) );
+  }
+
+  bool is_png() const
+  {
+    return ( ( this->extension_ == ".png" ) || ( this->extension_ == ".PNG" ) );
+  }
+
+  bool is_tiff() const
+  {
+    return ( ( this->extension_ == ".tif" ) || ( this->extension_ == ".tiff" ) ||
+      ( this->extension_ == ".TIF" ) || ( this->extension_ == ".TIFF" ) );
+  }
+
+
   Core::ITKImageDataHandle        image_data_;
   Core::DataBlockHandle         data_block_;
   std::vector< std::string >        file_list_;

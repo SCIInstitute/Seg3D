@@ -112,6 +112,10 @@ public:
   // Check the validity of the action description
   bool is_valid() const;
   
+  // IS_UNDOABLE:
+  // Check whether an action is undoable 
+  bool is_undoable() const;
+  
   // GET_CHANGES_PROJECT_DATA:
   // Check whether the action changes the data of the program
   bool get_changes_project_data() const;

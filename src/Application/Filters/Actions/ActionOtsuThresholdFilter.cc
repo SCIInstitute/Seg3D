@@ -202,6 +202,9 @@ bool ActionOtsuThresholdFilter::run( Core::ActionContextHandle& context,
     result = Core::ActionResultHandle( new Core::ActionResult( algo->dst_layer_[ 0 ]->get_layer_id() ) );
   }
   
+  // Build the undo-redo record
+  algo->create_undo_redo_record( context, this->shared_from_this() );
+    
   // Start the filter on a separate thread.
   Core::Runnable::Start( algo );
 

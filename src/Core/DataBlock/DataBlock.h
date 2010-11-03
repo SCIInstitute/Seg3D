@@ -118,6 +118,17 @@ public:
     return this->nx_ * this->ny_ * this->nz_;
   }
 
+  // GET_ELEM_SIZE:
+  // Get the size of the data elements.
+  size_t get_elem_size() const;
+  
+  // GET_BYTE_SIZE:
+  // Get the size in bytes
+  size_t get_byte_size() const
+  {
+    return this->get_elem_size() * this->get_size();
+  }
+
   // TO_INDEX:
   // Compute the real index based on the coordinates in index space
   size_t to_index( size_t x, size_t y, size_t z ) const

@@ -59,7 +59,8 @@ namespace Core
 {
 
 class Action;
-typedef boost::intrusive_ptr< Action > ActionHandle;
+typedef boost::shared_ptr< Action > ActionHandle;
+typedef boost::weak_ptr< Action > ActionWeakHandle;
 typedef std::vector< ActionHandle > ActionHandleList;
 
 // CLASS ACTION:
@@ -67,7 +68,7 @@ typedef std::vector< ActionHandle > ActionHandleList;
 // An action is not copyable as that would invalidate 
 // the ActionParameter pointers used internally.
 
-class Action : public Core::IntrusiveBase
+class Action : public boost::enable_shared_from_this< Action >
 {
   // -- Constructor/Destructor --
 public:
@@ -110,6 +111,10 @@ public:
   // GET_KEY_INDEX:
   // Get the index of a certain key
   int get_key_index( const std::string& name ) const;
+  
+  // IS_UNDOABLE:
+  // Chekc whether the action is undoable
+  bool is_undoable() const;
   
   // -- query overloadable data ( from the action info if not overloaded ) --
 public:
@@ -239,6 +244,9 @@ private:
 
 #define CORE_ACTION_CHANGES_PROJECT_DATA() \
 "<changes_project_data/>"
+
+#define CORE_ACTION_IS_UNDOABLE() \
+"<undoable/>"
 
 #define CORE_ACTION(definition_string) \
 public: \

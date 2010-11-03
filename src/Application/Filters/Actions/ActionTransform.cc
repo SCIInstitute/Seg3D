@@ -322,7 +322,6 @@ bool ActionTransform::run( Core::ActionContextHandle& context,
     if ( algo->replace_ )
     {
       algo->lock_for_processing( algo->src_layers_[ i ] );
-      algo->connect_abort( algo->src_layers_[ i ] );
     }
     else
     {
@@ -344,12 +343,14 @@ bool ActionTransform::run( Core::ActionContextHandle& context,
     default:
       assert( false );
     }
-    algo->connect_abort( algo->dst_layers_[ i ] );
     dst_layer_ids[ i ] = algo->dst_layers_[ i ]->get_layer_id();
   }
   
   // Return the ids of the destination layer.
   result = Core::ActionResultHandle( new Core::ActionResult( dst_layer_ids ) );
+
+  // Build the undo-redo record
+  algo->create_undo_redo_record( context, this->shared_from_this() );
 
   // Start the filter.
   Core::Runnable::Start( algo );

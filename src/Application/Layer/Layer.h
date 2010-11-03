@@ -51,6 +51,7 @@
 
 // Application includes
 #include <Application/Layer/LayerFWD.h>
+#include <Application/Layer/LayerAbstractFilter.h>
 
 namespace Seg3D
 {
@@ -82,9 +83,13 @@ private:
   // -- Layer properties --
 public:
 
-  // TYPE
+  // GET_TYPE
   // Get the type of the layer
   virtual Core::VolumeType get_type() const = 0;
+
+  // GET_BYTE_SIZE:
+  // Get the size of the data contained in the layer in bytes
+  virtual size_t get_byte_size() const = 0;
 
   // GET_GRID_TRANSFORM:
   // Get the transform of the layer
@@ -234,6 +239,18 @@ public:
   // NUM_FILTER_KEYS:
   // Get the number of filter keys
   size_t num_filter_keys() const;
+
+  // SET_FILTER_HANDLE:
+  // Set the filter that is currently processing the data
+  void set_filter_handle( LayerAbstractFilterHandle layer );
+  
+  // RESET_FILTER_HANDLE:
+  // Reset the filter handle, indicating no filter it working on the data
+  void reset_filter_handle();
+
+  // GET_FITLER_HANDLE
+  // Get the current filter associated with the layer
+  LayerAbstractFilterHandle get_filter_handle();
 
 protected:
   virtual bool post_save_states( Core::StateIO& state_io );

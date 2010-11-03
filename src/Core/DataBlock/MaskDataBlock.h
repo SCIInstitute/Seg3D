@@ -98,6 +98,11 @@ public:
     return this->nx_ * this->ny_ * this->nz_;
   }
 
+  inline size_t get_byte_size() const
+  {
+    return ( this->get_size() >> 3 ) + 1;
+  }
+
   inline size_t to_index( size_t x, size_t y, size_t z ) const
   {
     return this->data_block_->to_index( x, y, z );

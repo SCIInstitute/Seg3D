@@ -82,8 +82,8 @@ public:
   Core::StateStringHandle x_axis_label_state_;
   Core::StateStringHandle y_axis_label_state_;
   Core::StateStringHandle z_axis_label_state_;
-  Core::StateRangedIntHandle amount_volume_undo_buffers_state_;
-  Core::StateRangedIntHandle amount_slice_undo_buffers_state_;
+  Core::StateBoolHandle enable_undo_state_;
+  Core::StateRangedDoubleHandle percent_of_memory_state_;
   
   //Viewers Preferences
   Core::StateOptionHandle default_viewer_mode_state_;

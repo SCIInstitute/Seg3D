@@ -48,6 +48,7 @@ CORE_ACTION(
     " this option will convert the result back into the original format." )
   CORE_ACTION_KEY( "blurring_distance", "2.0", "The amount of blurring." )
   CORE_ACTION_CHANGES_PROJECT_DATA()
+  CORE_ACTION_IS_UNDOABLE()
 )
   
   // -- Constructor/Destructor --

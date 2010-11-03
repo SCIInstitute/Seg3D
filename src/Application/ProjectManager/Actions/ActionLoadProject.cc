@@ -30,6 +30,7 @@
 #include <boost/filesystem.hpp>
 
 // Application includes
+#include <Application/LayerManager/LayerUndoBuffer.h>
 #include <Application/ProjectManager/ProjectManager.h>
 #include <Application/ProjectManager/Actions/ActionLoadProject.h>
 
@@ -75,6 +76,9 @@ bool ActionLoadProject::run( Core::ActionContextHandle& context,
   {
     ProjectManager::Instance()->get_current_project()->reset_project_changed();
   }
+
+  // Clear undo buffer
+  LayerUndoBuffer::Instance()->reset_undo_buffer();
 
   return true;
 }

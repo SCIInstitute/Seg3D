@@ -44,6 +44,7 @@ CORE_ACTION(
   CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
   CORE_ACTION_KEY( "amount", "2", "The amount of divisions to divide the image into" )
   CORE_ACTION_CHANGES_PROJECT_DATA()
+  CORE_ACTION_IS_UNDOABLE()
 )
   
   // -- Constructor/Destructor --

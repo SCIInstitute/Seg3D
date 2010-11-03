@@ -113,8 +113,6 @@ public:
   // a member variable of the algorithm class.
   SCI_BEGIN_TYPED_ITK_RUN( this->src_layer_->get_data_type() )
   {
-    this->connect_abort( this->src_layer_ );
-  
     // Discrete gaussian blur of the image first to reduce noise.
     // TODO:  Add median filter, no blur options.
     typedef itk::DiscreteGaussianImageFilter< TYPED_IMAGE_TYPE, FLOAT_IMAGE_TYPE > DGFilterType;
@@ -647,6 +645,9 @@ bool ActionIntensityCorrectionFilter::run( Core::ActionContextHandle& context,
 
   // Return the id of the destination layer.
   result = Core::ActionResultHandle( new Core::ActionResult( algo->dst_layer_->get_layer_id() ) );
+
+  // Build the undo-redo record
+  algo->create_undo_redo_record( context, this->shared_from_this() );
 
   // Start the filter.
   Core::Runnable::Start( algo );

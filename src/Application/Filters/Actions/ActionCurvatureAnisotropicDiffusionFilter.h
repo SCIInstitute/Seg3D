@@ -49,6 +49,7 @@ CORE_ACTION(
   CORE_ACTION_KEY( "iterations", "5", "Number of iterations to perform." )
   CORE_ACTION_KEY( "sensitivity", "0.1", "Weight for specifying how closely connected values are." )
   CORE_ACTION_CHANGES_PROJECT_DATA()
+  CORE_ACTION_IS_UNDOABLE()
 )
   
   // -- Constructor/Destructor --

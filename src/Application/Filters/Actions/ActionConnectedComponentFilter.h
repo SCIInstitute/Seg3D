@@ -46,7 +46,7 @@ CORE_ACTION(
   CORE_ACTION_KEY( "replace", "true", "Replace the old layer (true), or add an new layer (false)." )
   CORE_ACTION_KEY( "mask", "<none>", "Select segments connected to this mask." )
   CORE_ACTION_KEY( "invert_mask", "false", "Whether the mask needs to be inverted." )
-
+  CORE_ACTION_IS_UNDOABLE()
 )
   
   // -- Constructor/Destructor --

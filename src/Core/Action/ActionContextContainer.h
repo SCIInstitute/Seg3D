@@ -69,7 +69,6 @@ public:
 
   // -- Source/Status information --
 public:
-  virtual ActionStatus status() const;
   virtual ActionSource source() const;
 
   // -- Status information --

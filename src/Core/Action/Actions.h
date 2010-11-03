@@ -40,8 +40,6 @@
 #include <Core/Action/ActionContext.h>
 #include <Core/Action/ActionProgress.h>
 #include <Core/Action/ActionFactory.h>
-#include <Core/Action/ActionUndoItem.h>
-#include <Core/Action/ActionUndoBuffer.h>
 #include <Core/Action/ActionDispatcher.h>
 
 #endif

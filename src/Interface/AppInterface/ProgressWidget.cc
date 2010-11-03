@@ -64,9 +64,10 @@ ProgressWidget::ProgressWidget( Core::ActionProgressHandle action_progress, QWid
   this->private_->timer_ = 0;
 
   // Step (1): Prevent any import from other widgets while progress bar is shown
-  setModal( true );
-  setAttribute( Qt::WA_DeleteOnClose );
-  setAttribute( Qt::WA_ShowWithoutActivating );
+  this->setModal( true );
+  this->setAttribute( Qt::WA_DeleteOnClose );
+  this->setAttribute( Qt::WA_ShowWithoutActivating );
+  this->setWindowFlags( Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint );
   
   // Step (2): Add the Ui children onto the QWidget
   this->private_->ui_.setupUi( this );

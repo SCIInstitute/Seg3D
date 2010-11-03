@@ -37,6 +37,12 @@ SET(APPLICATION_LAYERMANAGER_SRCS
     LayerManager.h
     LayerManager.cc
   LayerScene.h
+    LayerCheckPoint.h
+    LayerCheckPoint.cc
+    LayerUndoBufferItem.h
+    LayerUndoBufferItem.cc
+    LayerUndoBuffer.h
+    LayerUndoBuffer.cc
   Actions/ActionLayer.h
   Actions/ActionLayer.cc
   )
@@ -62,6 +68,10 @@ SET(APPLICATION_LAYERMANAGER_ACTIONS_SRCS
   Actions/ActionMoveLayerAbove.cc
   Actions/ActionNewMaskLayer.h
   Actions/ActionNewMaskLayer.cc
+  Actions/ActionRedo.h
+  Actions/ActionRedo.cc
+  Actions/ActionUndo.h
+  Actions/ActionUndo.cc
 )
 
 

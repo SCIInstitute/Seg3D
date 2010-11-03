@@ -26,38 +26,66 @@
  DEALINGS IN THE SOFTWARE.
  */
  
-#ifndef APPLICATION_LAYERMANAGER_LAYERABSTRACTFILTER_H 
-#define APPLICATION_LAYERMANAGER_LAYERABSTRACTFILTER_H 
- 
+#ifndef APPLICATION_LAYERMANAGER_LAYERCHECKPOINT_H 
+#define APPLICATION_LAYERMANAGER_LAYERCHECKPOINT_H 
+
 // Boost includes
 #include <boost/smart_ptr.hpp> 
 #include <boost/utility.hpp> 
  
 // Core includes
-#include <Core/Utils/Runnable.h>
+#include <Core/Volume/VolumeSlice.h>
+
+// Application includes
+#include <Application/Layer/Layer.h>
+#include <Application/Layer/DataLayer.h>
+#include <Application/Layer/MaskLayer.h>
 
 namespace Seg3D
 {
 
-// CLASS BASEFILTER:
-// This class provides the basic underlying framework for running filters in a separate thread
-// from the application thread. It provides a series of functions common to all the filters.
+class LayerCheckPoint;
+class LayerCheckPointPrivate;
 
-class LayerAbstractFilter;
-typedef boost::shared_ptr<LayerAbstractFilter> LayerAbstractFilterHandle;
-typedef boost::weak_ptr<LayerAbstractFilter>   LayerAbstractFilterWeakHandle;
+typedef boost::shared_ptr<LayerCheckPoint> LayerCheckPointHandle;
+typedef boost::shared_ptr<LayerCheckPointPrivate> LayerCheckPointPrivateHandle;
 
-class LayerAbstractFilter : public Core::Runnable, 
-  public boost::enable_shared_from_this< LayerAbstractFilter >
+class LayerCheckPoint : public boost::noncopyable
 {
+  // -- constructor / destructor -- 
+public:
+  // Create a volume check point
+  LayerCheckPoint( LayerHandle layer );
 
-public:
-  LayerAbstractFilter();
-  virtual ~LayerAbstractFilter();
+  // Create a slice check point
+  LayerCheckPoint( LayerHandle layer, Core::VolumeSliceType slice_type, size_t idx );
+
+  // destructor
+  virtual ~LayerCheckPoint();
   
-  // -- abort handling -- 
+  // -- retrieving check points --
 public:
-  virtual void abort_and_wait() = 0;
+  // APPLY:
+  // Applies a check point to a layer
+  bool apply( LayerHandle layer ) const;
+  
+  // -- making check points --
+public:
+  // CREATE_VOLUME:
+  // Check point the full volume
+  bool create_volume( LayerHandle layer );
+  
+  // CREATE_SLICE:
+  // Check point a slice check point
+  bool create_slice( LayerHandle layer, Core::VolumeSliceType slice_type, size_t idx );
+  
+  // GET_BYTE_SIZE:
+  // Get the size of the check point
+  size_t get_byte_size() const;
+  
+  // -- internals --
+private:
+  LayerCheckPointPrivateHandle private_;  
 };
 
 } // end namespace Seg3D

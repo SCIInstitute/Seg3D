@@ -48,6 +48,7 @@ CORE_ACTION(
     " this option will convert the result back into the original format." )
   CORE_ACTION_KEY( "radius", "2", "The distance over which the filter computes the median." )
   CORE_ACTION_CHANGES_PROJECT_DATA()
+  CORE_ACTION_IS_UNDOABLE()
 )
   
   // -- Constructor/Destructor --

@@ -81,6 +81,11 @@ bool Action::changes_project_data()
   return this->get_action_info()->get_changes_project_data();
 }
 
+bool Action::is_undoable() const
+{
+  return this->get_action_info()->is_undoable();
+}
+
 std::string Action::get_default_key_value( size_t index ) const
 {
   return this->get_action_info()->get_default_key_value( index );

@@ -363,12 +363,12 @@ public:
   // LOCKFORUSE:
   // Change the layer data_state to IN_USE_C.
   // NOTE: This function can *only* be called from the Application thread.
-  static bool LockForUse( LayerHandle layer, filter_key_type key = 0 );
+  static bool LockForUse( LayerHandle layer, filter_key_type key = filter_key_type( 0 ) );
   
   // LOCKFORPROCESSING:
   // Change the layer data_state to PROCESSING_C.
   // NOTE: This function can *only* be called from the Application thread.
-  static bool LockForProcessing( LayerHandle layer, filter_key_type key = 0 );
+  static bool LockForProcessing( LayerHandle layer, filter_key_type key = filter_key_type( 0 ) );
   
   // CREATEANDLOCKMASKLAYER:
   // Create a new mask layer and lock it into the CREATING_C mode.
@@ -380,7 +380,7 @@ public:
   // Create a new data layer and lock it into the CREATING_C mode.
   // NOTE: This function can *only* be called from the Application thread.
   static bool CreateAndLockDataLayer( Core::GridTransform, const std::string& name,
-    LayerHandle& layer, filter_key_type key = 0 );
+    LayerHandle& layer, filter_key_type key = filter_key_type( 0 ) );
   
   // == functions for setting data and unlocking layers ==
 
@@ -389,30 +389,35 @@ public:
   // DISPATCHUNLOCKLAYER:
   // Change the layer data_state back to available. This function will relay a call to the 
   // Application thread if needed.
-  static void DispatchUnlockLayer( LayerHandle layer, filter_key_type key = 0 );
+  static void DispatchUnlockLayer( LayerHandle layer, filter_key_type key = filter_key_type( 0 ) );
 
   // DISPATCHDELETELAYER:
   // Delete the layer. This function will relay a call to the 
   // Application thread if needed.
-  static void DispatchDeleteLayer( LayerHandle layer, filter_key_type key = 0 );
+  static void DispatchDeleteLayer( LayerHandle layer, filter_key_type key = filter_key_type( 0 ) );
   
   // DISPATCHUNLOCKORDELETELAYER:
   // Unlock layer if valid, delete otherwise. This function will relay a call to the 
   // Application thread if needed.
-  static void DispatchUnlockOrDeleteLayer( LayerHandle layer, filter_key_type key = 0 );
+  static void DispatchUnlockOrDeleteLayer( LayerHandle layer, filter_key_type key = filter_key_type( 0 ) );
 
   // DISPATCHINSERTDATAVOLUMEINTOLAYER:
   // Insert a data volume into a data layer. This function will relay a call to the 
   // Application thread if needed.
   static void DispatchInsertDataVolumeIntoLayer( DataLayerHandle layer, 
-    Core::DataVolumeHandle data, filter_key_type key = 0 );
+    Core::DataVolumeHandle data, filter_key_type key = filter_key_type( 0 ) );
 
   // DISPATCHINSERTMASKVOLUMEINTOLAYER:
-  // Insert a mask volume into a data layer. This function will relay a call to the 
+  // Insert a mask volume into a mask layer. This function will relay a call to the 
   // Application thread if needed.
   static void DispatchInsertMaskVolumeIntoLayer( MaskLayerHandle layer, 
-    Core::MaskVolumeHandle mask, filter_key_type key = 0 );
+    Core::MaskVolumeHandle mask, filter_key_type key = filter_key_type( 0 ) );
 
+  // DISPATCHINSERTVOLUMEINTOLAYER:
+  // Insert a mask or data volume into a layer. This function will relay a call to the 
+  // Application thread if needed.
+  static void DispatchInsertVolumeIntoLayer( LayerHandle layer, 
+    Core::VolumeHandle mask, filter_key_type key = filter_key_type( 0 ) );
 };
 
 } // end namespace seg3D

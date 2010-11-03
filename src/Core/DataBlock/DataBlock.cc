@@ -263,6 +263,27 @@ void DataBlock::update_data_type( DataType type )
   this->data_type_ = type;
 }
 
+size_t DataBlock::get_elem_size() const
+{
+  switch( this->data_type_ )
+  {
+    case DataType::CHAR_E:
+    case DataType::UCHAR_E:
+      return sizeof( char );
+    case DataType::SHORT_E:
+    case DataType::USHORT_E:
+      return sizeof( short );
+    case DataType::INT_E:
+    case DataType::UINT_E:
+      return sizeof( int );
+    case DataType::FLOAT_E:
+      return sizeof( float );
+    case DataType::DOUBLE_E:
+      return sizeof( double );
+  }
+  return 0;
+}
+
 template<class DATA>
 static bool ConvertDataTypeInternal( DATA* src, DataBlockHandle& dst_data_block )
 {

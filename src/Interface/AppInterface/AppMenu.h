@@ -61,12 +61,21 @@ public:
 public:
   typedef QPointer< AppMenu > qpointer_type;
   
+  // SET_RECENT_FILE_LIST:
+  // populate the recent file list with these items
   void set_recent_file_list( std::vector< std::string > files );
-  static void SetRecentFileList( qpointer_type app_menu, 
-    std::vector< std::string > recent_projects, Core::ActionSource source );
-    
+
+  // ENABLE_DISABLE_LAYER_ACTIONS:
+  // Switch on/off export options depending on what is available
   void enable_disable_layer_actions();  
-  static void EnableDisableLayerActions( qpointer_type app_menu );
+
+  // UPDATE_UNDO_TAG:
+  // set the undo tag of what the next undo will actually do
+  void update_undo_tag( std::string tag );
+
+  // UPDATE_REDO_TAG:
+  // set the redo tag of what the next undo will actually do
+  void update_redo_tag( std::string tag );
 
   // -- functions for building menus --
 private:
@@ -77,15 +86,16 @@ private:
   void create_tool_menus( QMenuBar* menubar );
   void create_help_menu( QMenu* menu );
   
-  
-  
   QMenu* file_menu_recents_;
   QAction* export_segmentation_qaction_;
   QAction* export_active_data_layer_qaction_;
   
   QAction* copy_qaction_;
   QAction* paste_qaction_;
-    
+  
+  QAction* undo_action_;
+  QAction* redo_action_;
+  
   // Keep a pointer to the main window
   QMainWindow*  main_window_;
   
@@ -95,6 +105,26 @@ private Q_SLOTS:
   void open_project_folder();
   void save_as_wizard();
   void about();
+  
+public:
+
+  // SETRECENTFILELIST:
+  // This function is called when the recent file list is modified
+  static void SetRecentFileList( qpointer_type app_menu, 
+    std::vector< std::string > recent_projects, Core::ActionSource source );
+
+  // ENABLEDISABLELAYERACTIONS:
+  // This function is called when layers are updated
+  static void EnableDisableLayerActions( qpointer_type app_menu );
+
+  // UPDATEUNDOTAG
+  // This function is called when there is a new undo tag
+  static void UpdateUndoTag( qpointer_type qpointer, std::string tag );
+
+  // UPDATEREDOTAG
+  // This function is called when there is a new redo tag
+  static void UpdateRedoTag( qpointer_type qpointer, std::string tag );
+  
 };
 
 

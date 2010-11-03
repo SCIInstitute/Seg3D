@@ -62,16 +62,15 @@ ITKLayerImporter::ITKLayerImporter( const std::string& filename ) :
 
 bool ITKLayerImporter::import_header()
 {
-  if( ( this->extension_ == ".dcm" ) || ( this->extension_ == "" ) )
+  if( this->is_dicom() )
   {
     return this->scan_dicom();
   }
-  else if( this->extension_ == ".png" )
+  else if( this->is_png() )
   {
-    // This currently does nothing but return true;
     return this->scan_png();
   }
-  else if( ( this->extension_ == ".tiff" ) || ( this->extension_ == ".tif" ) )
+  else if( this->is_tiff() )
   {
     return this->scan_tiff();
   }
@@ -228,7 +227,7 @@ bool ITKLayerImporter::scan_tiff()
 bool ITKLayerImporter::load_data( Core::DataBlockHandle& data_block, 
                  Core::GridTransform& grid_trans )
 {
-  if( ( this->extension_ == ".dcm" ) || ( this->extension_ == "" ) )
+  if( this->is_dicom() )
   { 
     switch( this->pixel_type_ )
     {
@@ -254,7 +253,7 @@ bool ITKLayerImporter::load_data( Core::DataBlockHandle& data_block,
       break;
     }
   }
-  else if( this->extension_ == ".png" )
+  else if( this->is_png() )
   {
     switch( this->pixel_type_ )
     {
@@ -286,7 +285,7 @@ bool ITKLayerImporter::load_data( Core::DataBlockHandle& data_block,
       break;
     }
   }
-  else if( ( this->extension_ == ".tiff" ) || ( this->extension_ == ".tif" ) )
+  else if( this->is_tiff() )
   {
     switch( this->pixel_type_ )
     {

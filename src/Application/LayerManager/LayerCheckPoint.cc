@@ -26,53 +26,64 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_RENDERER_ISOSURFACESHADER_H
-#define APPLICATION_RENDERER_ISOSURFACESHADER_H
-
-#include <boost/shared_ptr.hpp>
-#include <boost/utility.hpp>
-
-#include <Core/Graphics/GLSLProgram.h>
-#include <Core/Utils/Lockable.h>
+#include <Application/LayerManager/LayerCheckPoint.h>
+#include <Application/LayerManager/LayerManager.h>
 
 namespace Seg3D
 {
 
-class IsosurfaceShader;
-typedef boost::shared_ptr< IsosurfaceShader > IsosurfaceShaderHandle;
-
-class IsosurfaceShader : public boost::noncopyable
+class LayerCheckPointPrivate : public boost::noncopyable
 {
 public:
-  IsosurfaceShader();
-  ~IsosurfaceShader();
-
-  bool initialize();
-  void enable();
-  void disable();
-  void set_lighting( bool enabled );
-  void set_use_colormap( bool enable );
-  void set_colormap_texture( int tex_unit );
-  void set_min_val( float min_val );
-  void set_val_range( float val_range );
-
-private:
-
-  bool valid_;
-
-  Core::GLSLProgramHandle glsl_prog_;
-  Core::GLSLShaderHandle glsl_frag_shader_;
-  Core::GLSLShaderHandle glsl_vert_shader_;
-
-  int enable_lighting_loc_;
-  int use_colormap_loc_;
-  int colormap_loc_;
-  int min_val_loc_;
-  int val_range_loc_;
-
-  const static char* VERT_SHADER_SOURCE_C[];
-  const static char* FRAG_SHADER_SOURCE_C[];
+    Core::VolumeHandle volume_;
 };
 
+
+LayerCheckPoint::LayerCheckPoint( LayerHandle layer ) :
+  private_( new LayerCheckPointPrivate )
+{
+  this->create_volume( layer );
+}
+
+LayerCheckPoint::LayerCheckPoint( LayerHandle layer, Core::VolumeSliceType slice_type, size_t idx ) :
+  private_( new LayerCheckPointPrivate )
+{
+  this->create_slice( layer, slice_type, idx );
+}
+
+LayerCheckPoint::~LayerCheckPoint()
+{
+}
+  
+bool LayerCheckPoint::apply( LayerHandle layer ) const
+{
+  // If there is a full volume in the check point insert it into the layer
+  if ( this->private_->volume_ )
+  {
+    if ( layer->get_type() == Core::VolumeType::MASK_E )
+    {
+      LayerManager::DispatchInsertVolumeIntoLayer( layer, this->private_->volume_ );
+    }
+  }
+  
+  return true;
+}
+  
+bool LayerCheckPoint::create_volume( LayerHandle layer )
+{
+  this->private_->volume_ = layer->get_volume();
+  return false;
+}
+
+bool LayerCheckPoint::create_slice( LayerHandle layer, Core::VolumeSliceType slice_type, size_t idx )
+{
+  return false;
+}
+
+size_t LayerCheckPoint::get_byte_size() const
+{
+  return 0;
+}
+
+  
 } // end namespace Seg3D
-#endif

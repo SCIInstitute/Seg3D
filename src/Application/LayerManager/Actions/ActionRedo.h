@@ -26,15 +26,51 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Core/Action/ActionUndoBuffer.h>
+#ifndef APPLICATION_LAYERMANAGER_ACTIONS_ACTIONREDO_H
+#define APPLICATION_LAYERMANAGER_ACTIONS_ACTIONREDO_H
 
-namespace Core
+#include <Core/Action/Actions.h>
+#include <Core/Interface/Interface.h>
+
+#include <Application/Layer/LayerFWD.h>
+
+namespace Seg3D
 {
 
-ActionUndoItem::ActionUndoItem( std::string& tag, ActionHandleList& undo_actions,
-    ActionHandle& redo_action ) :
-  tag_( tag ), undo_actions_( undo_actions ), redo_action_( redo_action )
+class ActionRedo : public Core::Action
 {
-}
+  
+CORE_ACTION(
+  CORE_ACTION_TYPE( "Redo", "Redo a layer action.")
+  CORE_ACTION_CHANGES_PROJECT_DATA()
+)
 
-} // end namespace Core
+  // -- Constructor/Destructor --
+public:
+  ActionRedo()
+  {
+  }
+
+  virtual ~ActionRedo()
+  {
+  }
+
+  // -- Functions that describe action --
+public:
+  virtual bool validate( Core::ActionContextHandle& context );
+  virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
+  
+public:
+  
+  // CREATE:
+  // Create an action that activates a layer
+  static Core::ActionHandle Create();
+
+  // DISPATCH:
+  // Dispatch an action that activates a layer
+  static void Dispatch( Core::ActionContextHandle context );
+};
+
+} // end namespace Seg3D
+
+#endif

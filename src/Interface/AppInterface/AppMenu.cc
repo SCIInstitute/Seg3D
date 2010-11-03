@@ -49,6 +49,9 @@
 #include <Application/ProjectManager/Actions/ActionLoadProject.h>
 #include <Application/Tools/Actions/ActionCopy.h>
 #include <Application/Tools/Actions/ActionPaste.h>
+#include <Application/LayerManager/Actions/ActionUndo.h>
+#include <Application/LayerManager/Actions/ActionRedo.h>
+#include <Application/LayerManager/LayerUndoBuffer.h>
 
 // QtUtils includes
 #include <QtUtils/Utils/QtPointer.h>
@@ -99,10 +102,11 @@ AppMenu::AppMenu( QMainWindow* parent ) :
     // Connect and update full screen state
     this->add_connection( ProjectManager::Instance()->recent_projects_state_->
       value_changed_signal_.connect( 
-      boost::bind( &AppMenu::SetRecentFileList,qpointer_type( this ), _1, _2 ) ) );
+      boost::bind( &AppMenu::SetRecentFileList, qpointer_type( this ), _1, _2 ) ) );
       
     this->add_connection( LayerManager::Instance()->layers_changed_signal_.connect( 
       boost::bind( &AppMenu::EnableDisableLayerActions, qpointer_type( this ) ) ) );
+      
   }
 }
 
@@ -187,6 +191,20 @@ void AppMenu::create_file_menu( QMenu* qmenu )
 
 void AppMenu::create_edit_menu( QMenu* qmenu )
 {
+  this->undo_action_ = qmenu->addAction( tr( "Undo" ) );
+  this->undo_action_->setShortcut( tr( "Ctrl+Z" ) );
+  this->undo_action_->setToolTip( tr( "Undo last action that modified the layers" ) );
+    QtUtils::QtBridge::Connect( this->undo_action_ , boost::bind(
+      &ActionUndo::Dispatch, Core::Interface::GetWidgetActionContext() ) );
+
+  this->redo_action_ = qmenu->addAction( tr( "Redo" ) );
+  this->redo_action_->setShortcut( tr( "Shift+Ctrl+Z" ) );
+  this->redo_action_->setToolTip( tr( "Redo last action that modified the layers" ) );
+  QtUtils::QtBridge::Connect( this->redo_action_ , boost::bind(
+      &ActionRedo::Dispatch, Core::Interface::GetWidgetActionContext() ) );
+
+  qmenu->addSeparator();
+
   this->copy_qaction_ = qmenu->addAction( tr( "Copy Mask Slice" ) );
   this->copy_qaction_->setShortcut( tr( "Ctrl+C" ) );
   this->copy_qaction_->setToolTip( tr( "Copy the current mask slice" ) );
@@ -200,6 +218,17 @@ void AppMenu::create_edit_menu( QMenu* qmenu )
   QtUtils::QtBridge::Connect( this->paste_qaction_, boost::bind( &ActionPaste::Dispatch,
     Core::Interface::GetWidgetActionContext() ) );
   this->paste_qaction_->setEnabled( false );
+
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+  this->update_undo_tag( LayerUndoBuffer::Instance()->get_undo_tag() );
+  this->update_redo_tag( LayerUndoBuffer::Instance()->get_redo_tag() );
+
+  this->add_connection( LayerUndoBuffer::Instance()->update_undo_tag_signal_.connect(
+    boost::bind( &AppMenu::UpdateUndoTag, qpointer_type( this ), _1 ) ) );  
+
+  this->add_connection( LayerUndoBuffer::Instance()->update_redo_tag_signal_.connect(
+    boost::bind( &AppMenu::UpdateRedoTag, qpointer_type( this ), _1 ) ) );  
+
 }
 
 void AppMenu::create_view_menu( QMenu* qmenu )
@@ -582,6 +611,49 @@ void AppMenu::EnableDisableLayerActions( qpointer_type qpointer )
   Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
     &AppMenu::enable_disable_layer_actions, qpointer.data() ) ) );
 }
+
+void AppMenu::UpdateUndoTag( qpointer_type qpointer, std::string tag )
+{
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
+    &AppMenu::update_undo_tag, qpointer.data(), tag ) ) );
+}
+
+void AppMenu::update_undo_tag( std::string tag )
+{
+  if ( tag == "" )
+  {
+    this->undo_action_->setEnabled( false );
+    this->undo_action_->setText( "Undo" );
+  }
+  else
+  {
+    this->undo_action_->setEnabled( true );
+    QString text = QString( "Undo " ) + QString::fromStdString( tag );
+    this->undo_action_->setText( text );    
+  }
+    
+}
+
+void AppMenu::UpdateRedoTag( qpointer_type qpointer, std::string tag )
+{
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
+    &AppMenu::update_redo_tag, qpointer.data(), tag ) ) );
+}
+
+void AppMenu::update_redo_tag( std::string tag )
+{
+  if ( tag == "" )
+  {
+    this->redo_action_->setEnabled( false );
+    this->redo_action_->setText( "Redo" );
+  }
+  else
+  {
+    this->redo_action_->setEnabled( true );
+    QString text = QString( "Redo " ) + QString::fromStdString( tag );
+    this->redo_action_->setText( text );    
+  }
+}   
 
 void AppMenu::save_as_wizard()
 {

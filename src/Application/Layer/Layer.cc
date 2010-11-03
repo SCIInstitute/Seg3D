@@ -64,6 +64,9 @@ public:
 
   // Identifier for keeping track which data_processing action is running. 
   std::set<Layer::filter_key_type> keys_;
+  
+  // WeakHandle to the algorithm that is currently creating or processing this layer
+  LayerAbstractFilterWeakHandle filter_;
 };
 
 void LayerPrivate::handle_locked_state_changed( bool locked )
@@ -289,6 +292,21 @@ void Layer::clear_filter_keys()
 size_t Layer::num_filter_keys() const
 {
   return this->private_->keys_.size();
+}
+
+void Layer::set_filter_handle( LayerAbstractFilterHandle layer )
+{
+  this->private_->filter_ = LayerAbstractFilterWeakHandle( layer );
+}
+  
+void Layer::reset_filter_handle()
+{
+  this->private_->filter_.reset();
+}
+
+LayerAbstractFilterHandle Layer::get_filter_handle()
+{
+  return this->private_->filter_.lock();
 }
 
 Layer::filter_key_type Layer::GenerateFilterKey()

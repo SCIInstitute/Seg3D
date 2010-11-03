@@ -43,8 +43,17 @@
 #include <tlhelp32.h>
 #include <windows.h>
 #include <LMCons.h>
+#include <psapi.h>
 #else
 #include <stdlib.h>
+#include <sys/types.h>
+#ifndef __APPLE__
+#include <sys/sysinfo.h>
+#else
+#include <sys/sysctl.h>
+#include <sys/param.h>
+#include <sys/mount.h>
+#endif
 #endif
 
 // Include CMake generated files
@@ -377,33 +386,116 @@ void Application::Reset()
 
 long long Application::get_total_virtual_memory()
 {
-  return 0;
+#ifdef WIN32_
+  MEMORYSTATUSEX info;
+    info.dwLength = sizeof( MEMORYSTATUSEX );
+    GlobalMemoryStatusEx( &info );
+    return info.ullTotalPageFile;
+#else
+#ifdef __APPLE__
+  struct statfs stats;
+  if ( statfs( "/", &stats ) == 0 )
+  {
+    return static_cast<long long>( stats.f_bsize * stats.f_bfree );
+  }
+  else
+  {
+    return 0;
+  }
+#else
+
+  struct sysinfo info;
+    sysinfo (&info);
+    long long total_virtual_memory = info.totalram;
+
+    total_virtual_memory += info.totalswap;
+    total_virtual_memory *= info.mem_unit;
+  return total_virtual_memory;
+#endif  
+#endif
 }
 
 
 long long Application::get_total_physical_memory()
 {
-  return 0;
+#ifdef WIN32_
+  MEMORYSTATUSEX memInfo;
+    memInfo.dwLength = sizeof( MEMORYSTATUSEX );
+    GlobalMemoryStatusEx( &memInfo );
+    return memInfo.ullTotalPhys;
+#else
+#ifdef __APPLE__
+  unsigned long long total_physical_memory;
+  int name[ 2 ];
+  name[ 0 ] = CTL_HW;
+  name[ 1 ] = HW_MEMSIZE;
+  size_t length = sizeof( unsigned long long );
+  sysctl( name, 2, &total_physical_memory, &length, NULL, 0);
+  return total_physical_memory;
+#else
+  struct sysinfo info;
+    
+    sysinfo (&info);
+    long long total_physical_memory = info.totalram;
+    total_physical_memory *= info.mem_unit;
+
+  return total_physical_memory;
+#endif
+#endif
 }
 
 long long Application::get_total_addressable_memory()
 {
-  return 0;
+#ifdef WIN32_
+  if ( sizeof ( void* ) == 8 )
+  {
+    return 1ULL<<62;
+  }
+  else
+  {
+    return 1ULL<<31;
+  }
+#else
+  if ( sizeof ( void* ) == 8 )
+  {
+    return 1ULL<<62;
+  }
+  else
+  {
+    return 1ULL<<32;
+  }
+#endif
 }
+
+long long Application::get_total_addressable_physical_memory()
+{
+  long long addressable = this->get_total_addressable_memory();
+  long long physical = this->get_total_physical_memory();
+  if ( physical > addressable ) return addressable; else return physical;
+}
+
 
 long long Application::get_my_virtual_memory_used()
 {
+#ifdef WIN32_
+  PROCESS_MEMORY_COUNTERS_EX pmc;
+    GetProcessMemoryInfo( GetCurrentProcess(), &pmc, sizeof( pmc ) );
+    return pmc.PrivateUsage;
+#else
   return 0;
+#endif
 }
 
 long long Application::get_my_physical_memory_used()
 {
+#ifdef WIN32_
+  PROCESS_MEMORY_COUNTERS_EX pmc;
+    GetProcessMemoryInfo( GetCurrentProcess(), &pmc, sizeof( pmc ) );
+    return pmc.WorkingSetSize;
+#else
   return 0;
+#endif
 }
 
-long long Application::get_my_memory_used()
-{
-  return 0;
-}
 
 } // end namespace Core

@@ -43,6 +43,7 @@ CORE_ACTION(
   CORE_ACTION_ARGUMENT( "lower_threshold", "The minimum value of the threshold range." )
   CORE_ACTION_ARGUMENT( "upper_threshold", "The maximum value of the threshold range." )
   CORE_ACTION_CHANGES_PROJECT_DATA()
+  CORE_ACTION_IS_UNDOABLE()
 )
   
   // -- Constructor/Destructor --

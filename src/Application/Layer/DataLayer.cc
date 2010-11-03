@@ -274,6 +274,16 @@ Core::DataVolumeHandle DataLayer::get_data_volume() const
   return this->data_volume_;
 }
 
+size_t DataLayer::get_byte_size() const
+{
+  Layer::lock_type lock( Layer::GetMutex() );
+  if ( this->data_volume_ && this->data_volume_->is_valid() )
+  {
+    return this->data_volume_->get_data_block()->get_byte_size();
+  }
+  return 0;
+}
+
 bool DataLayer::has_valid_data() const
 {
   Layer::lock_type lock( Layer::GetMutex() );

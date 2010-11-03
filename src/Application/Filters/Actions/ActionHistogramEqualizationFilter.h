@@ -47,6 +47,7 @@ CORE_ACTION(
   CORE_ACTION_KEY( "bins", "3000", "Number of bins to use for histogram equalization." )
   CORE_ACTION_KEY( "ignore", "1", "Number of bins to ignore for histogram equalization." )
   CORE_ACTION_CHANGES_PROJECT_DATA()
+  CORE_ACTION_IS_UNDOABLE()
 )
   
   // -- Constructor/Destructor --

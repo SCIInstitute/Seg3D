@@ -32,6 +32,7 @@
 // Application includes
 #include <Application/ProjectManager/ProjectManager.h>
 #include <Application/LayerManager/LayerManager.h>
+#include <Application/LayerManager/LayerUndoBuffer.h>
 #include <Application/ToolManager/ToolManager.h>
 #include <Application/ProjectManager/Actions/ActionNewProject.h>
 
@@ -70,6 +71,9 @@ bool ActionNewProject::run( Core::ActionContextHandle& context,
   {
     ProjectManager::Instance()->get_current_project()->reset_project_changed();
   }
+  
+  // Clear undo buffer
+  LayerUndoBuffer::Instance()->reset_undo_buffer();
   
   return true;
 }

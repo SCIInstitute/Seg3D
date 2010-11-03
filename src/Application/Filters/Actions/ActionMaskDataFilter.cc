@@ -85,8 +85,6 @@ bool ActionMaskDataFilter::validate( Core::ActionContextHandle& context )
     return false;
   }
   
-  
-  
   // If the number of iterations is lower than one, we cannot run the filter
   if( ! ( this->replace_with_.value() == "zero" || this->replace_with_.value() == "max_value" ||
     this->replace_with_.value() == "min_value" || this->replace_with_.value() == "new_max_value" ||
@@ -313,6 +311,9 @@ bool ActionMaskDataFilter::run( Core::ActionContextHandle& context,
 
   // Return the id of the destination layer.
   result = Core::ActionResultHandle( new Core::ActionResult( algo->dst_layer_->get_layer_id() ) );
+
+  // Build the undo-redo record
+  algo->create_undo_redo_record( context, this->shared_from_this() );
 
   // Start the filter.
   Core::Runnable::Start( algo );

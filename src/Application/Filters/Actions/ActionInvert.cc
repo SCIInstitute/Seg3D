@@ -292,6 +292,9 @@ bool ActionInvert::run( Core::ActionContextHandle& context,
   result = Core::ActionResultHandle( new Core::ActionResult( 
     algo->dst_layer_->get_layer_id() ) );
 
+  // Build the undo-redo record
+  algo->create_undo_redo_record( context, this->shared_from_this() );
+
   // Start the filter.
   Core::Runnable::Start( algo );
 

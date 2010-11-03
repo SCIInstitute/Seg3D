@@ -47,6 +47,7 @@ CORE_ACTION(
   CORE_ACTION_KEY( "iterations", "3", "The number of iterations." )
   CORE_ACTION_KEY( "multiplier", "2.5", "The confidence interval multipiler." )
   CORE_ACTION_CHANGES_PROJECT_DATA()
+  CORE_ACTION_IS_UNDOABLE()
 )
   
   // -- Constructor/Destructor --

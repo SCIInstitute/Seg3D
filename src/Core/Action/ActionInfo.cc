@@ -73,6 +73,9 @@ class ActionInfoPrivate
     
     // Whether the action will change the data of the program
     bool changes_project_data_;
+    
+    // Whether an action is undoable
+    bool undoable_;
 };
 
 
@@ -88,6 +91,7 @@ ActionInfo::ActionInfo( const std::string& definition ) :
   
   // This is the default value
   this->private_->changes_project_data_ = false;
+  this->private_->undoable_ = false;
 
   // Define a document
   TiXmlDocument doc;
@@ -200,7 +204,10 @@ ActionInfo::ActionInfo( const std::string& definition ) :
     {
       this->private_->changes_project_data_ = true;
     }
-  }
+    else if ( type == "undoable" )
+    {
+      this->private_->undoable_ = true;
+    } }
 
   if ( found_action == false )
   {
@@ -304,6 +311,11 @@ std::string ActionInfo::get_key_description( size_t index ) const
 bool ActionInfo::is_valid() const
 {
   return this->private_->valid_;
+}
+
+bool ActionInfo::is_undoable() const
+{
+  return this->private_->undoable_;
 }
 
 // Define a mutex that protects all of the ActionInfo classes

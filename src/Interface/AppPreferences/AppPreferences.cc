@@ -91,15 +91,11 @@ AppPreferences::AppPreferences( QWidget *parent ) :
   // connect the apply button to the save defaults function
   connect( this->private_->ui_.apply_button_, SIGNAL( clicked() ), 
     this, SLOT( save_settings() ) );
-
-
 }
 
 AppPreferences::~AppPreferences()
 {
 }
-      
-      
 
 void AppPreferences::change_project_directory()
 {
@@ -157,10 +153,10 @@ void AppPreferences::setup_general_prefs()
   QtUtils::QtBridge::Connect( this->private_->ui_.z_lineedit_,
     PreferencesManager::Instance()->z_axis_label_state_ );
     
-  QtUtils::QtBridge::Connect( this->private_->ui_.amount_volume_undo_buffers_,
-    PreferencesManager::Instance()->amount_volume_undo_buffers_state_ );  
-  QtUtils::QtBridge::Connect( this->private_->ui_.amount_slice_undo_buffers_,
-    PreferencesManager::Instance()->amount_slice_undo_buffers_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.enable_undo_,
+    PreferencesManager::Instance()->enable_undo_state_ ); 
+  QtUtils::QtBridge::Connect( this->private_->ui_.percent_of_memory_,
+    PreferencesManager::Instance()->percent_of_memory_state_ );
     
   QtUtils::QtBridge::Enable( this->private_->ui_.x_lineedit_, 
     PreferencesManager::Instance()->axis_labels_option_state_,
@@ -217,7 +213,7 @@ void AppPreferences::setup_layer_prefs()
   this->active_picker_ = this->private_->color_pickers_[ 0 ];
   this->private_->color_button_group_->button( 0 )->click();
   
-//Set Layers Preferences
+  //Set Layers Preferences
   //Connect Layers Preferences
   QtUtils::QtBridge::Connect( this->private_->ui_.opacity_adjuster_, 
     PreferencesManager::Instance()->default_layer_opacity_state_ );

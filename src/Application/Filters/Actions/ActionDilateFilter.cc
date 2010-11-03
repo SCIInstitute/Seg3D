@@ -336,10 +336,11 @@ bool ActionDilateFilter::run( Core::ActionContextHandle& context,
     algo->create_and_lock_mask_layer_from_layer( algo->src_layer_, algo->dst_layer_ );
   }
 
-
-
   // Return the id of the destination layer.
   result = Core::ActionResultHandle( new Core::ActionResult( algo->dst_layer_->get_layer_id() ) );
+
+  // Build the undo-redo record
+  algo->create_undo_redo_record( context, this->shared_from_this() );
 
   // Start the filter.
   Core::Runnable::Start( algo );

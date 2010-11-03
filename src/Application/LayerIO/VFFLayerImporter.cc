@@ -215,7 +215,7 @@ bool VFFLayerImporter::import_vff()
   SetFilePointerEx( file_desc, offset, &cur_pos, FILE_CURRENT );
   file_size = cur_pos.QuadPart + 1; 
 #else
-  file_size = data_file.tellg() + 1;
+  file_size = static_cast<size_t>( data_file.tellg() ) + 1;
 #endif
   
   if ( file_size - ( this->vff_end_of_header_ ) < length )

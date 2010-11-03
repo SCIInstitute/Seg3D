@@ -49,6 +49,7 @@ CORE_ACTION(
   CORE_ACTION_KEY( "order", "2", "Polynomial order that approximates the sensitivity field." )
   CORE_ACTION_KEY( "edge", "0.1", "The sensitivity to edges." )
   CORE_ACTION_CHANGES_PROJECT_DATA()
+  CORE_ACTION_IS_UNDOABLE()
 )
   
   // -- Constructor/Destructor --

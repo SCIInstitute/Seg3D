@@ -26,53 +26,45 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_RENDERER_ISOSURFACESHADER_H
-#define APPLICATION_RENDERER_ISOSURFACESHADER_H
+#include <Application/Layer/Layer.h>
+#include <Application/LayerManager/LayerManager.h>
+#include <Application/LayerManager/LayerUndoBuffer.h>
 
-#include <boost/shared_ptr.hpp>
-#include <boost/utility.hpp>
+#include <Application/LayerManager/Actions/ActionRedo.h>
 
-#include <Core/Graphics/GLSLProgram.h>
-#include <Core/Utils/Lockable.h>
+// REGISTER ACTION:
+// Define a function that registers the action. The action also needs to be
+// registered in the CMake file.
+CORE_REGISTER_ACTION( Seg3D, Redo )
 
 namespace Seg3D
 {
 
-class IsosurfaceShader;
-typedef boost::shared_ptr< IsosurfaceShader > IsosurfaceShaderHandle;
-
-class IsosurfaceShader : public boost::noncopyable
+bool ActionRedo::validate( Core::ActionContextHandle& context )
 {
-public:
-  IsosurfaceShader();
-  ~IsosurfaceShader();
+  if ( ! ( LayerUndoBuffer::Instance()->has_redo() ) )
+  {
+    context->report_error( "No action to redo " );
+    return false;
+  }
+  
+  return true; // validated
+}
 
-  bool initialize();
-  void enable();
-  void disable();
-  void set_lighting( bool enabled );
-  void set_use_colormap( bool enable );
-  void set_colormap_texture( int tex_unit );
-  void set_min_val( float min_val );
-  void set_val_range( float val_range );
+bool ActionRedo::run( Core::ActionContextHandle& context, 
+  Core::ActionResultHandle& result )
+{
+  return LayerUndoBuffer::Instance()->redo( context );
+}
 
-private:
+Core::ActionHandle ActionRedo::Create()
+{
+  return Core::ActionHandle( new ActionRedo );
+}
 
-  bool valid_;
-
-  Core::GLSLProgramHandle glsl_prog_;
-  Core::GLSLShaderHandle glsl_frag_shader_;
-  Core::GLSLShaderHandle glsl_vert_shader_;
-
-  int enable_lighting_loc_;
-  int use_colormap_loc_;
-  int colormap_loc_;
-  int min_val_loc_;
-  int val_range_loc_;
-
-  const static char* VERT_SHADER_SOURCE_C[];
-  const static char* FRAG_SHADER_SOURCE_C[];
-};
+void ActionRedo::Dispatch( Core::ActionContextHandle context )
+{
+  Core::ActionDispatcher::PostAction( Create(), context );
+}
 
 } // end namespace Seg3D
-#endif

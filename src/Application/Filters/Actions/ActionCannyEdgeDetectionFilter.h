@@ -46,6 +46,7 @@ CORE_ACTION(
     " before computing the gradient." )
   CORE_ACTION_KEY( "threshold", "1.0", "Below this threshold the values are replaced with zero." )
   CORE_ACTION_CHANGES_PROJECT_DATA()
+  CORE_ACTION_IS_UNDOABLE()
 )
   
   // -- Constructor/Destructor --
