@@ -67,35 +67,35 @@ std::string Log::header( const int line, const char* file ) const
 
 void Log::post_error( std::string message, const int line, const char* file )
 {
-  std::string str = header( line, file ) + std::string( " ERROR: " ) + message;
+  std::string str = this->header( line, file ) + std::string( " ERROR: " ) + message;
   post_log_signal_( LogMessageType::ERROR_E, str );
 }
 
 void Log::post_warning( std::string message, const int line, const char* file )
 {
-  std::string str = header( line, file ) + std::string( " WARNING: " ) + message;
+  std::string str = this->header( line, file ) + std::string( " WARNING: " ) + message;
   post_log_signal_( LogMessageType::WARNING_E, str );
 }
 
 void Log::post_message( std::string message, const int line, const char* file )
 {
-  std::string str = header( line, file ) + std::string( " MESSAGE: " ) + message;
+  std::string str = this->header( line, file ) + std::string( " MESSAGE: " ) + message;
   post_log_signal_( LogMessageType::MESSAGE_E, str );
 }
 
 void Log::post_debug( std::string message, const int line, const char* file )
 {
-  std::string str = header( line, file ) + std::string( " DEBUG: " ) + message;
+  std::string str = this->header( line, file ) + std::string( " DEBUG: " ) + message;
   post_log_signal_( LogMessageType::DEBUG_E, str );
 }
 
-class LogStreamerInternal
+class LogStreamerPrivate
 {
 
 public:
-LogStreamerInternal(unsigned int log_flags, std::ostream* stream);
+  LogStreamerPrivate( unsigned int log_flags, std::ostream* stream );
 
-void stream_message(unsigned int type, std::string message);
+  void stream_message( unsigned int type, std::string message );
 
 private:
   unsigned int log_flags_;
@@ -103,23 +103,24 @@ private:
   boost::mutex stream_mutex_;
 };
 
-LogStreamerInternal::LogStreamerInternal(unsigned int log_flags, std::ostream* stream) :
-log_flags_(log_flags),
-ostream_ptr_(stream)
+LogStreamerPrivate::LogStreamerPrivate( unsigned int log_flags, std::ostream* stream ) :
+  log_flags_( log_flags ),
+  ostream_ptr_( stream )
 {
 }
 
 void
-LogStreamerInternal::stream_message(unsigned int type, std::string message)
+LogStreamerPrivate::stream_message( unsigned int type, std::string message )
 {
-  boost::unique_lock<boost::mutex> lock(stream_mutex_);
-  if (type & log_flags_) (*ostream_ptr_) << message << std::endl;
+  boost::unique_lock< boost::mutex > lock( stream_mutex_ );
+  if ( type & log_flags_ ) ( *ostream_ptr_ ) << message << std::endl;
 }
 
-LogStreamer::LogStreamer(unsigned int log_flags, std::ostream* stream)
+LogStreamer::LogStreamer( unsigned int log_flags, std::ostream* stream )
 {
   // Use a shared pointer to register the internals of this class
-  internal_ = boost::shared_ptr<LogStreamerInternal>(new LogStreamerInternal(log_flags,stream));
+  this->private_ = boost::shared_ptr< LogStreamerPrivate >( 
+    new LogStreamerPrivate( log_flags,stream ) );
 
   // If the internals are detroyed, so should the connection:
   // we use the signals2 system to track the shared_ptr and destroy the connection
@@ -127,8 +128,8 @@ LogStreamer::LogStreamer(unsigned int log_flags, std::ostream* stream)
   // the shared_ptr is locked so that the object is not destroyed while the
   // call back is evaluated.
   Log::Instance()->post_log_signal_.connect(
-    Log::post_log_signal_type::slot_type(&LogStreamerInternal::stream_message,
-      internal_.get(),_1,_2).track(internal_));
+    Log::post_log_signal_type::slot_type(&LogStreamerPrivate::stream_message,
+      this->private_.get(), _1, _2 ).track( this->private_ ) );
 }
 
 } // end namespace

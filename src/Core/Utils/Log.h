@@ -135,16 +135,16 @@ Core::Log::Instance()->post_debug(message,__LINE__,__FILE__)
 // Class for streaming log messages to standard output channels
 
 // Internals are separated from the interface
-class LogStreamerInternal;
+class LogStreamerPrivate;
 
 class LogStreamer
 {
 
 public:
-LogStreamer(unsigned int log_flags, std::ostream* stream);
+  LogStreamer( unsigned int log_flags, std::ostream* stream );
 
 private:
-  boost::shared_ptr< LogStreamerInternal > internal_;
+  boost::shared_ptr< LogStreamerPrivate > private_;
 
 };
 

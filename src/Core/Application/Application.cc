@@ -497,5 +497,13 @@ long long Application::get_my_physical_memory_used()
 #endif
 }
 
+int Application::get_process_id()
+{
+#ifdef _WIN32
+  return GetCurrentProcessId();
+#else
+  return getpid();
+#endif 
+}
 
 } // end namespace Core

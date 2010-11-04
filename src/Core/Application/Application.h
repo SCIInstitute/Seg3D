@@ -33,6 +33,13 @@
 # pragma once
 #endif 
 
+// System includes -- for getting process id
+#ifdef _WIN32
+#include <Windows.h>
+#else
+#include <unistd.h>
+#endif
+
 // STL includes
 #include <map>
 
@@ -151,6 +158,12 @@ public:
   // Get the amount of physical memory used by current process
   long long get_my_physical_memory_used();
   
+  // -- Process information --
+public:
+  // GET_PROCESS_ID:
+  // Get the process id for the current process
+  int get_process_id();
+
   // -- Signals --
 public:
   // RESET_SIGNAL_:

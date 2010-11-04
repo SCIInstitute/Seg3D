@@ -1,3 +1,4 @@
+
 #
 #  For more information, please see: http://software.sci.utah.edu
 # 
@@ -26,23 +27,23 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
-ADD_SUBDIRECTORY(Action)
-ADD_SUBDIRECTORY(ActionManager)
-ADD_SUBDIRECTORY(Application)
-ADD_SUBDIRECTORY(DataBlock)
-ADD_SUBDIRECTORY(EventHandler)
-ADD_SUBDIRECTORY(Geometry)
-ADD_SUBDIRECTORY(Interface)
-ADD_SUBDIRECTORY(Isosurface)
-ADD_SUBDIRECTORY(Log)
-ADD_SUBDIRECTORY(Parser)
-ADD_SUBDIRECTORY(State)
-ADD_SUBDIRECTORY(TextRenderer)
-ADD_SUBDIRECTORY(Utils)
-ADD_SUBDIRECTORY(Viewer)
-ADD_SUBDIRECTORY(Volume)
+##################################################
+# Set sources
+##################################################
 
-# These next three depend on OpenGL and should only be compiled when the renderer is compiled
-ADD_SUBDIRECTORY(Graphics)
-ADD_SUBDIRECTORY(RenderResources)
-ADD_SUBDIRECTORY(Renderer)
+SET(CORE_LOG_SRCS
+  RolloverLogFile.h
+  RolloverLogFile.cc
+  )
+
+##################################################
+# Build static library
+##################################################
+
+CORE_ADD_LIBRARY(Core_Log ${CORE_LOG_SRCS} )
+            
+TARGET_LINK_LIBRARIES(Core_Log
+  Core_Utils
+  Core_Application
+  ${SCI_BOOST_LIBRARY})
+

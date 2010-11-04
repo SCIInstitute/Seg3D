@@ -37,6 +37,7 @@
 #include <Core/Interface/Interface.h>
 #include <Core/Action/ActionHistory.h>
 #include <Core/Action/ActionSocket.h>
+#include <Core/Log/RolloverLogFile.h>
 
 // QtUtils includes
 #include <QtUtils/Utils/QtApplication.h>
@@ -63,7 +64,10 @@ using namespace Seg3D;
 int main( int argc, char **argv )
 {
   // -- Stream messages to the console window --
-  Core::LogStreamer error_log( Core::LogMessageType::ALL_E, &( std::cerr ) );
+  //Core::LogStreamer error_log( Core::LogMessageType::ALL_E, &( std::cerr ) );
+  // -- Send message to revolving log file --
+  Core::RolloverLogFile event_log( Core::LogMessageType::ERROR_E | 
+    Core::LogMessageType::WARNING_E | Core::LogMessageType::MESSAGE_E );
 
   // -- Parse the command line parameters --
   Core::Application::Instance()->parse_command_line_parameters( argc, argv );
