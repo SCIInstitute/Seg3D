@@ -97,6 +97,10 @@ public:
   // The size of the item in memory ( approximately )
   size_t get_byte_size() const;
 
+  // COMPUTE_SIZE:
+  // Compute the size of the item
+  void compute_size();
+
   // GET_TAG:
   // Tag that appears in the menu for this item
   std::string get_tag() const;

@@ -378,7 +378,7 @@ size_t MaskLayer::get_byte_size() const
   Layer::lock_type lock( Layer::GetMutex() );
   if ( this->mask_volume_ && this->mask_volume_->is_valid() )
   {
-    return this->mask_volume_->get_mask_data_block()->get_byte_size();
+    return this->mask_volume_->get_byte_size();
   }
   return 0;
 }

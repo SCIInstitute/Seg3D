@@ -288,6 +288,15 @@ public:
   // Clone the data in a datablock by generating a new one and copying the data into it.
   static bool Clone( const DataBlockHandle& src_data_block, DataBlockHandle& dst_data_block ); 
   
+  // GETSLICE:
+  // Get a slice from the data set.
+  static bool GetSlice( const DataBlockHandle& volume_data_block, 
+    DataBlockHandle& slice_data_block, int slice, int axis );
+    
+  // PUTSLICE:
+  // Put a slice into a volume data set.  
+  static bool PutSlice( const DataBlockHandle& slice_data_block, 
+    const DataBlockHandle& volume_data_block, int slice, int axis );  
 };
 
 } // end namespace Core

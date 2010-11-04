@@ -266,12 +266,14 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
 
     QtUtils::QtBridge::Connect( this->private_->ui_.info_button_, 
       layer->show_information_state_ );
-    QtUtils::QtBridge::Show( this->private_->ui_.info_bar_, layer->show_information_state_ );
+    QtUtils::QtBridge::Show( this->private_->ui_.info_bar_, 
+      layer->show_information_state_ );
 
   
     QtUtils::QtBridge::Show( this->private_->ui_.progress_bar_bar_, 
       layer->show_progress_bar_state_ );
-    QtUtils::QtBridge::Show( this->private_->ui_.abort_bar_, layer->show_abort_message_state_ );
+    QtUtils::QtBridge::Show( this->private_->ui_.abort_bar_, 
+      layer->show_abort_message_state_ );
     
     // Connect all the buttons to the viewers
     QtUtils::QtBridge::Show( this->private_->ui_.viewer_0_button_, 
@@ -295,6 +297,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
     std::vector< Core::StateBaseHandle > enable_states( 2 );
     enable_states[ 0 ] = layer->locked_state_;
     enable_states[ 1 ] = layer->data_state_;
+    
     boost::function< bool () > condition = !boost::lambda::bind( &Core::StateBool::get, 
       layer->locked_state_.get() ) && boost::lambda::bind( &Core::StateOption::get,
       layer->data_state_.get() ) != Layer::CREATING_C;

@@ -231,4 +231,9 @@ void DataVolume::ConvertToCanonicalVolume( const DataVolumeHandle& src_volume,
   dst_volume.reset( new DataVolume( dst_transform, dst_data_block ) );
 }
 
+size_t DataVolume::get_byte_size() const
+{
+  return this->get_data_block()->get_byte_size();
+}
+
 } // end namespace Core

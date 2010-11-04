@@ -52,12 +52,16 @@ public:
 
   // An action can always be redone by executing the action again 
   Core::ActionHandle redo_action_;
+  
+  // Size of the item
+  size_t size_;
 };
 
 LayerUndoBufferItem::LayerUndoBufferItem( const std::string& tag ) :
   private_( new LayerUndoBufferItemPrivate )
 {
   this->private_->tag_ = tag;
+  this->private_->size_ = 0;
 }
 
 LayerUndoBufferItem::~LayerUndoBufferItem()
@@ -224,6 +228,11 @@ bool LayerUndoBufferItem::apply_and_clear_undo()
 
 size_t LayerUndoBufferItem::get_byte_size() const
 {
+  return this->private_->size_;
+}
+
+void LayerUndoBufferItem::compute_size()
+{
   size_t size = 0;
 
   for ( size_t j = 0; j < this->private_->layers_to_restore_.size(); j++ )
@@ -238,7 +247,7 @@ size_t LayerUndoBufferItem::get_byte_size() const
     size += this->private_->layers_to_add_[ j ]->get_byte_size();
   }
 
-  return size;
+  this->private_->size_ = size;
 }
 
 

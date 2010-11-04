@@ -117,6 +117,12 @@ void MaskVolume::unregister_data()
   // Do nothing
 }
 
+size_t MaskVolume::get_byte_size() const
+{
+  return this->get_mask_data_block()->get_byte_size();
+}
+
+
 bool MaskVolume::CreateEmptyMask( GridTransform grid_transform, MaskVolumeHandle& mask )
 {
   MaskDataBlockHandle mask_data_block;

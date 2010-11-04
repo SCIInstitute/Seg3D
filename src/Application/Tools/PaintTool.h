@@ -83,6 +83,7 @@ SEG3D_TOOL
   SEG3D_TOOL_HOTKEYS( "Increase Brush Size=Mouse Scroll Up|Decrease Brush Size=Mouse"
     "Scroll Down|Paint Floodfill=F|Erase Floodfill=E|Paint=Left Mouse Button|"
     "Erase=Right Mouse Button|Clear Seed Points=C" )
+  SEG3D_TOOL_VERSION( "1.0" )
 )
 
   // -- constructor/destructor --
@@ -175,8 +176,6 @@ public:
 private:
   PaintToolPrivateHandle private_;
 
-private:
-  const static size_t VERSION_NUMBER_C;
 };
 
 } // end namespace

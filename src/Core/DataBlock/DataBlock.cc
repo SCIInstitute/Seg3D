@@ -888,4 +888,266 @@ bool DataBlock::Clone( const DataBlockHandle& src_data_block,
   return true;
 }
 
+template<class T>
+bool GetSliceInternal( const DataBlockHandle& volume_data_block, 
+    DataBlockHandle& slice_data_block, int slice, int axis )
+{
+  size_t nx = volume_data_block->get_nx();
+  size_t ny = volume_data_block->get_ny();
+  size_t nz = volume_data_block->get_nz();
+  
+  switch( axis )
+  {
+    case 1:
+    {
+      if ( slice < 0 || slice >= static_cast<int>( nx ) ) return false;
+    
+      slice_data_block = StdDataBlock::New( 1, ny, nz, volume_data_block->get_data_type() );
+      if ( !slice_data_block ) return false;
+      
+      T* volume_ptr = reinterpret_cast<T*>( volume_data_block->get_data() );
+      T* slice_ptr = reinterpret_cast<T*>( slice_data_block->get_data() );
+      
+      size_t nxy = nx * ny;
+      size_t ny8 = ny & ~(0x7ULL);
+
+      for ( size_t z = 0; z < nz; z++ )
+      {
+        size_t y = 0;
+        for ( ; y < ny8; y += 8 )
+        {
+          size_t a = y + z * ny; 
+          size_t b = slice + y * nx + z * nxy;
+          slice_ptr[ a ] = volume_ptr[ b ]; a++; b+= nx;
+          slice_ptr[ a ] = volume_ptr[ b ]; a++; b+= nx;
+          slice_ptr[ a ] = volume_ptr[ b ]; a++; b+= nx;
+          slice_ptr[ a ] = volume_ptr[ b ]; a++; b+= nx;
+          slice_ptr[ a ] = volume_ptr[ b ]; a++; b+= nx;
+          slice_ptr[ a ] = volume_ptr[ b ]; a++; b+= nx;
+          slice_ptr[ a ] = volume_ptr[ b ]; a++; b+= nx;
+          slice_ptr[ a ] = volume_ptr[ b ]; a++; b+= nx;
+        }
+        for ( ; y < ny; y++ )
+        {
+          slice_ptr[ y + z * ny ] = volume_ptr[ slice + y * nx + z * nxy ];
+        }
+      }
+      return true;
+    }
+    break;
+    {
+      if ( slice < 0 || slice >= static_cast<int>( ny ) ) return false;
+    
+      slice_data_block = StdDataBlock::New( nx, 1, nz, volume_data_block->get_data_type() );
+      if ( !slice_data_block ) return false;
+      
+      T* volume_ptr = reinterpret_cast<T*>( volume_data_block->get_data() );
+      T* slice_ptr = reinterpret_cast<T*>( slice_data_block->get_data() );
+      
+      size_t nxy = nx * ny;
+      size_t nx8 = nx & ~(0x7ULL);
+
+      for ( size_t z = 0; z < nz; z++ )
+      {
+        size_t x = 0;
+        for ( ; x < nx8; x += 8 )
+        {
+          size_t a = x + z * ny; 
+          size_t b = x + slice * nx + z * nxy;
+          slice_ptr[ a ] = volume_ptr[ b ]; a++; b++;
+          slice_ptr[ a ] = volume_ptr[ b ]; a++; b++;
+          slice_ptr[ a ] = volume_ptr[ b ]; a++; b++;
+          slice_ptr[ a ] = volume_ptr[ b ]; a++; b++;
+          slice_ptr[ a ] = volume_ptr[ b ]; a++; b++;
+          slice_ptr[ a ] = volume_ptr[ b ]; a++; b++;
+          slice_ptr[ a ] = volume_ptr[ b ]; a++; b++;
+          slice_ptr[ a ] = volume_ptr[ b ]; a++; b++;
+        }
+        for ( ; x < nx; x++ )
+        {
+          slice_ptr[ x + z * ny ] = volume_ptr[ x + slice * nx + z * nxy ];
+        }
+      }
+      return true;
+    }
+    case 3:
+    {
+      if ( slice < 0 || slice >= static_cast<int>( ny ) ) return false;
+    
+      slice_data_block = StdDataBlock::New( nx, ny, 1, volume_data_block->get_data_type() );
+      
+      if ( !slice_data_block ) return false;
+      
+      T* volume_ptr = reinterpret_cast<T*>( volume_data_block->get_data() );
+      T* slice_ptr = reinterpret_cast<T*>( slice_data_block->get_data() );
+      
+      std::memcpy( slice_ptr, volume_ptr + slice * ( nx * ny ), nx * ny * sizeof( T ) );
+      return true;
+    }
+    default:
+    {
+      return false;
+    }
+  }
+}
+
+bool DataBlock::GetSlice( const DataBlockHandle& volume_data_block, 
+    DataBlockHandle& slice_data_block, int slice, int axis )
+{
+  if ( !volume_data_block ) return false;
+
+  DataBlock::shared_lock_type lock( volume_data_block->get_mutex() );
+
+  switch( volume_data_block->get_data_type() )
+  { 
+    case DataType::CHAR_E:
+      return GetSliceInternal<signed char>( volume_data_block, slice_data_block, slice, axis );
+    case DataType::UCHAR_E:
+      return GetSliceInternal<unsigned char>( volume_data_block, slice_data_block, slice, axis );
+    case DataType::SHORT_E:
+      return GetSliceInternal<short>( volume_data_block, slice_data_block, slice, axis );
+    case DataType::USHORT_E:
+      return GetSliceInternal<unsigned short>( volume_data_block, slice_data_block, slice, axis );
+    case DataType::INT_E:
+      return GetSliceInternal<int>( volume_data_block, slice_data_block, slice, axis );
+    case DataType::UINT_E:
+      return GetSliceInternal<unsigned int>( volume_data_block, slice_data_block, slice, axis );
+    case DataType::FLOAT_E:
+      return GetSliceInternal<float>( volume_data_block, slice_data_block, slice, axis );
+    case DataType::DOUBLE_E:
+      return GetSliceInternal<double>( volume_data_block, slice_data_block, slice, axis );
+    default:
+      return false;
+  }
+}
+
+template<class T>
+bool PutSliceInternal( const DataBlockHandle& volume_data_block, 
+    const DataBlockHandle& slice_data_block, int slice, int axis )
+{
+  size_t nx = volume_data_block->get_nx();
+  size_t ny = volume_data_block->get_ny();
+  size_t nz = volume_data_block->get_nz();
+  
+  switch( axis )
+  {
+    case 1:
+    {
+      if ( slice < 0 || slice >= static_cast<int>( nx ) ) return false;
+    
+      T* volume_ptr = reinterpret_cast<T*>( volume_data_block->get_data() );
+      T* slice_ptr = reinterpret_cast<T*>( slice_data_block->get_data() );
+      
+      size_t nxy = nx * ny;
+      size_t ny8 = ny & ~(0x7ULL);
+
+      for ( size_t z = 0; z < nz; z++ )
+      {
+        size_t y = 0;
+        for ( ; y < ny8; y += 8 )
+        {
+          size_t a = y + z * ny; 
+          size_t b = slice + y * nx + z * nxy;
+          volume_ptr[ a ] = slice_ptr[ b ]; a++; b+= nx;
+          volume_ptr[ a ] = slice_ptr[ b ]; a++; b+= nx;
+          volume_ptr[ a ] = slice_ptr[ b ]; a++; b+= nx;
+          volume_ptr[ a ] = slice_ptr[ b ]; a++; b+= nx;
+          volume_ptr[ a ] = slice_ptr[ b ]; a++; b+= nx;
+          volume_ptr[ a ] = slice_ptr[ b ]; a++; b+= nx;
+          volume_ptr[ a ] = slice_ptr[ b ]; a++; b+= nx;
+          volume_ptr[ a ] = slice_ptr[ b ]; a++; b+= nx;
+        }
+        for ( ; y < ny; y++ )
+        {
+          volume_ptr[ y + z * ny ] = slice_ptr[ slice + y * nx + z * nxy ];
+        }
+      }
+      return true;
+    }
+    case 2:
+    {
+      if ( slice < 0 || slice >= static_cast<int>( ny ) ) return false;
+            
+      T* volume_ptr = reinterpret_cast<T*>( volume_data_block->get_data() );
+      T* slice_ptr = reinterpret_cast<T*>( slice_data_block->get_data() );
+      
+      size_t nxy = nx * ny;
+      size_t nx8 = nx & ~(0x7ULL);
+
+      for ( size_t z = 0; z < nz; z++ )
+      {
+        size_t x = 0;
+        for ( ; x < nx8; x += 8 )
+        {
+          size_t a = x + z * ny; 
+          size_t b = x + slice * nx + z * nxy;
+          volume_ptr[ a ] = slice_ptr[ b ]; a++; b++;
+          volume_ptr[ a ] = slice_ptr[ b ]; a++; b++;
+          volume_ptr[ a ] = slice_ptr[ b ]; a++; b++;
+          volume_ptr[ a ] = slice_ptr[ b ]; a++; b++;
+          volume_ptr[ a ] = slice_ptr[ b ]; a++; b++;
+          volume_ptr[ a ] = slice_ptr[ b ]; a++; b++;
+          volume_ptr[ a ] = slice_ptr[ b ]; a++; b++;
+          volume_ptr[ a ] = slice_ptr[ b ]; a++; b++;
+        }
+        for ( ; x < nx; x++ )
+        {
+          volume_ptr[ x + z * ny ] = slice_ptr[ x + slice * nx + z * nxy ];
+        }
+      }
+      
+      return true;
+    }
+    case 3:
+    {
+      if ( slice < 0 || slice >= static_cast<int>( nz ) ) return false;
+          
+      T* volume_ptr = reinterpret_cast<T*>( volume_data_block->get_data() );
+      T* slice_ptr = reinterpret_cast<T*>( slice_data_block->get_data() );
+      
+      std::memcpy( volume_ptr, slice_ptr + slice * ( nx * ny ), nx * ny * sizeof( T ) );
+      
+      return true;
+    }
+    default:
+    {
+      return false;
+    }
+  }
+}
+
+
+bool DataBlock::PutSlice( const DataBlockHandle& slice_data_block, 
+  const DataBlockHandle& volume_data_block, int slice, int axis )
+{
+  if ( slice_data_block->get_data_type() != volume_data_block->get_data_type() ) return false;
+  if ( !slice_data_block || !volume_data_block ) return false;
+
+  DataBlock::lock_type lock( volume_data_block->get_mutex() );
+  DataBlock::shared_lock_type slock( slice_data_block->get_mutex() );
+
+  switch( volume_data_block->get_data_type() )
+  { 
+    case DataType::CHAR_E:
+      return PutSliceInternal<signed char>( volume_data_block, slice_data_block, slice, axis );
+    case DataType::UCHAR_E:
+      return PutSliceInternal<unsigned char>( volume_data_block, slice_data_block, slice, axis );
+    case DataType::SHORT_E:
+      return PutSliceInternal<short>( volume_data_block, slice_data_block, slice, axis );
+    case DataType::USHORT_E:
+      return PutSliceInternal<unsigned short>( volume_data_block, slice_data_block, slice, axis );
+    case DataType::INT_E:
+      return PutSliceInternal<int>( volume_data_block, slice_data_block, slice, axis );
+    case DataType::UINT_E:
+      return PutSliceInternal<unsigned int>( volume_data_block, slice_data_block, slice, axis );
+    case DataType::FLOAT_E:
+      return PutSliceInternal<float>( volume_data_block, slice_data_block, slice, axis );
+    case DataType::DOUBLE_E:
+      return PutSliceInternal<double>( volume_data_block, slice_data_block, slice, axis );
+    default:
+      return false;
+  }
+}
+
+
 } // end namespace Core

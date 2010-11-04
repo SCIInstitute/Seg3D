@@ -33,6 +33,8 @@
 #include <Application/Layer/MaskLayer.h>
 #include <Application/Layer/DataLayer.h>
 #include <Application/LayerManager/LayerManager.h>
+#include <Application/LayerManager/LayerUndoBuffer.h>
+#include <Application/LayerManager/LayerUndoBufferItem.h>
 
 CORE_REGISTER_ACTION( Seg3D, Paint )
 
@@ -232,6 +234,27 @@ bool ActionPaint::run( Core::ActionContextHandle& context, Core::ActionResultHan
   paint_info.erase_ = this->private_->erase_.value();
   paint_info.inclusive_ = ( context->source() != Core::ActionSource::INTERFACE_MOUSE_E ||
     ( paint_info.x0_ == paint_info.x1_ && paint_info.y0_ == paint_info.y1_ ) );
+
+
+  // Create undo for this action
+  LayerUndoBufferItemHandle item( new LayerUndoBufferItem( "Paint" ) );
+
+/*
+  int axis = 0;
+  if ( this->private_->slice_type_.value() == Core::VolumeSliceType::AXIAL_E ) axis = 3;
+  if ( this->private_->slice_type_.value() == Core::VolumeSliceType::CORONAL_E ) axis = 2;
+  if ( this->private_->slice_type_.value() == Core::VolumeSliceType::SAGITTAL_E ) axis = 1;
+  int slice = this->private_->slice_number_.value();
+  
+  LayerHandle layer = LayerManager::Instance()->get_layer_by_id( 
+    this->private_->target_layer_id_.value() );
+  LayerCheckPointHandle check_point( new LayerCheckPoint( layer, slice, axis ) );
+
+  item->set_redo_action( this->shared_from_this() );
+  item->add_layer_to_restore( layer, check_point );
+
+  LayerUndoBuffer::Instance()->insert_undo_item( context, item );
+*/
 
   bool success = paint_tool->paint( paint_info );
   if ( context->source() != Core::ActionSource::INTERFACE_MOUSE_E )

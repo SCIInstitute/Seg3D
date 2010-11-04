@@ -84,6 +84,10 @@ public:
   // Unregister the underlying data with DataBlockManager.
   virtual void unregister_data();
 
+  // GET_BYTE_SIZE:
+  // Get the size of the data in bytes
+  virtual size_t get_byte_size() const;
+  
   // -- functions for creating MaskVolumes --
 public: 
 

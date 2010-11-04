@@ -56,7 +56,8 @@ bool ActionDeleteLayers::run( Core::ActionContextHandle& context,
   LayerUndoBufferItemHandle item( new LayerUndoBufferItem( "Delete layers" ) );
 
   // TODO:
-  // To get this to work, I need to redo some of the invalidate pieces we do
+  // To get this to work, I need to redo some of the invalidate pieces to allow for
+  // a decent undo of this action. Hence for now we just clear the undo buffer.
   // -JS
   
 /*
@@ -76,6 +77,7 @@ bool ActionDeleteLayers::run( Core::ActionContextHandle& context,
   }
   LayerUndoBuffer::Instance()->insert_undo_item( context, item );
 */
+  LayerUndoBuffer::Instance()->reset_undo_buffer();
   LayerManager::Instance()->delete_layers( this->group_.handle() );
   
   return true;

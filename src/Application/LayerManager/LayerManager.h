@@ -423,4 +423,3 @@ public:
 } // end namespace seg3D
 
 #endif
-

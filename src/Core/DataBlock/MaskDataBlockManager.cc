@@ -848,4 +848,383 @@ bool MaskDataBlockManager::CreateMaskFromLabelData( const DataBlockHandle& data,
   }
 }
 
+template<class T>
+bool GetSliceInternal( const DataBlockHandle& volume_data_block, 
+    DataBlockHandle& slice_data_block, int slice, int axis )
+{
+
+}
+
+bool MaskDataBlockManager::GetSlice( const MaskDataBlockHandle& volume_mask_data_block, 
+    MaskDataBlockHandle& slice_mask_data_block, int slice, int axis )
+{
+  if ( !volume_mask_data_block ) return false;
+
+  size_t nx = volume_mask_data_block->get_nx();
+  size_t ny = volume_mask_data_block->get_ny();
+  size_t nz = volume_mask_data_block->get_nz();
+    
+  switch( axis )
+  {
+    case 1:
+    {
+      if ( slice < 0 || slice >= static_cast<int>( nx ) ) return false;
+    
+      if ( !MaskDataBlockManager::Instance()->create( GridTransform( 1, ny, nz ),
+        slice_mask_data_block ) )
+      {
+        return false;
+      }
+
+      MaskDataBlock::lock_type lock( slice_mask_data_block->get_mutex() );
+      MaskDataBlock::shared_lock_type slock( volume_mask_data_block->get_mutex() );
+
+      unsigned char volume_mask_value = volume_mask_data_block->get_mask_value();         
+      unsigned char slice_mask_value = slice_mask_data_block->get_mask_value();         
+      unsigned char volume_not_mask_value = ~( volume_mask_data_block->get_mask_value() );          
+      unsigned char slice_not_mask_value = ~( slice_mask_data_block->get_mask_value() );          
+      unsigned char* volume_ptr = volume_mask_data_block->get_mask_data();
+      unsigned char* slice_ptr = slice_mask_data_block->get_mask_data();
+      
+      size_t nxy = nx * ny;
+      size_t ny8 = ny & ~(0x7ULL);
+
+      for ( size_t z = 0; z < nz; z++ )
+      {
+        size_t y = 0;
+        for ( ; y < ny8; y += 8 )
+        {
+          size_t a = y + z * ny; 
+          size_t b = slice + y * nx + z * nxy;
+          
+          if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
+          else slice_ptr[ a ] &= slice_not_mask_value; a++; b+= nx;           
+          if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
+          else slice_ptr[ a ] &= slice_not_mask_value; a++; b+= nx;           
+          if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
+          else slice_ptr[ a ] &= slice_not_mask_value; a++; b+= nx;           
+          if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
+          else slice_ptr[ a ] &= slice_not_mask_value; a++; b+= nx;           
+          if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
+          else slice_ptr[ a ] &= slice_not_mask_value; a++; b+= nx;           
+          if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
+          else slice_ptr[ a ] &= slice_not_mask_value; a++; b+= nx;           
+          if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
+          else slice_ptr[ a ] &= slice_not_mask_value; a++; b+= nx;           
+          if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
+          else slice_ptr[ a ] &= slice_not_mask_value; a++; b+= nx;           
+        }
+        for ( ; y < ny; y++ )
+        {
+          size_t a = y + z * ny; 
+          size_t b = slice + y * nx + z * nxy;
+          if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
+          else slice_ptr[ a ] &= slice_not_mask_value;            
+        }
+      }
+      return true;
+    }
+    case 2:
+    {
+      if ( slice < 0 || slice >= static_cast<int>( ny ) ) return false;
+    
+      if ( !MaskDataBlockManager::Instance()->create( GridTransform( nx, 1, nz ),
+        slice_mask_data_block ) )
+      {
+        return false;
+      }
+
+      MaskDataBlock::lock_type lock( slice_mask_data_block->get_mutex() );
+      MaskDataBlock::shared_lock_type slock( volume_mask_data_block->get_mutex() );
+
+      unsigned char volume_mask_value = volume_mask_data_block->get_mask_value();         
+      unsigned char slice_mask_value = slice_mask_data_block->get_mask_value();         
+      unsigned char volume_not_mask_value = ~( volume_mask_data_block->get_mask_value() );          
+      unsigned char slice_not_mask_value = ~( slice_mask_data_block->get_mask_value() );          
+      unsigned char* volume_ptr = volume_mask_data_block->get_mask_data();
+      unsigned char* slice_ptr = slice_mask_data_block->get_mask_data();
+      
+      size_t nxy = nx * ny;
+      size_t nx8 = nx & ~(0x7ULL);
+
+      for ( size_t z = 0; z < nz; z++ )
+      {
+        size_t x = 0;
+        for ( ; x < nx8; x += 8 )
+        {
+          size_t a = x + z * ny; 
+          size_t b = x + slice * nx + z * nxy;
+          
+          if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
+          else slice_ptr[ a ] &= slice_not_mask_value; a++; b++;            
+          if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
+          else slice_ptr[ a ] &= slice_not_mask_value; a++; b++;            
+          if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
+          else slice_ptr[ a ] &= slice_not_mask_value; a++; b++;            
+          if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
+          else slice_ptr[ a ] &= slice_not_mask_value; a++; b++;            
+          if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
+          else slice_ptr[ a ] &= slice_not_mask_value; a++; b++;            
+          if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
+          else slice_ptr[ a ] &= slice_not_mask_value; a++; b++;            
+          if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
+          else slice_ptr[ a ] &= slice_not_mask_value; a++; b++;            
+          if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
+          else slice_ptr[ a ] &= slice_not_mask_value; a++; b++;            
+        }
+        for ( ; x < nx; x++ )
+        {
+          size_t a = x + z * ny; 
+          size_t b = x + slice * nx + z * nxy;
+          
+          if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
+          else slice_ptr[ a ] &= slice_not_mask_value;          
+        }
+      }
+      return true;
+    }
+    case 3:
+    {
+      if ( slice < 0 || slice >= static_cast<int>( nz ) ) return false;
+    
+      if ( !MaskDataBlockManager::Instance()->create( GridTransform( nx, ny, 1 ),
+        slice_mask_data_block ) )
+      {
+        return false;
+      }
+
+      MaskDataBlock::lock_type lock( slice_mask_data_block->get_mutex() );
+      MaskDataBlock::shared_lock_type slock( volume_mask_data_block->get_mutex() );
+
+      unsigned char volume_mask_value = volume_mask_data_block->get_mask_value();         
+      unsigned char slice_mask_value = slice_mask_data_block->get_mask_value();         
+      unsigned char volume_not_mask_value = ~( volume_mask_data_block->get_mask_value() );          
+      unsigned char slice_not_mask_value = ~( slice_mask_data_block->get_mask_value() );          
+      unsigned char* volume_ptr = volume_mask_data_block->get_mask_data();
+      unsigned char* slice_ptr = slice_mask_data_block->get_mask_data();
+      
+      size_t nxy = nx * ny;
+      size_t nx8 = nx & ~(0x7ULL);
+
+      for ( size_t y = 0; y < ny; y++ )
+      {
+        size_t x = 0;
+        for ( ; x < nx8; x += 8 )
+        {
+          size_t a = x + y * ny; 
+          size_t b = x + y* nx + slice * nxy;
+          
+          if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
+          else slice_ptr[ a ] &= slice_not_mask_value; a++; b++;            
+          if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
+          else slice_ptr[ a ] &= slice_not_mask_value; a++; b++;            
+          if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
+          else slice_ptr[ a ] &= slice_not_mask_value; a++; b++;            
+          if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
+          else slice_ptr[ a ] &= slice_not_mask_value; a++; b++;            
+          if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
+          else slice_ptr[ a ] &= slice_not_mask_value; a++; b++;            
+          if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
+          else slice_ptr[ a ] &= slice_not_mask_value; a++; b++;            
+          if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
+          else slice_ptr[ a ] &= slice_not_mask_value; a++; b++;            
+          if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
+          else slice_ptr[ a ] &= slice_not_mask_value; a++; b++;            
+        }
+        for ( ; x < nx; x++ )
+        {
+          size_t a = x + y * ny; 
+          size_t b = x + y* nx + slice * nxy;
+          
+          if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
+          else slice_ptr[ a ] &= slice_not_mask_value;          
+        }
+      }
+      return true;
+    }
+    default:
+    {
+      return false;
+    }
+  }
+}
+
+
+
+bool MaskDataBlockManager::PutSlice( const MaskDataBlockHandle& slice_mask_data_block, 
+  const MaskDataBlockHandle& volume_mask_data_block, int slice, int axis )
+{
+  if ( !volume_mask_data_block || !slice_mask_data_block ) return false;
+
+  size_t nx = volume_mask_data_block->get_nx();
+  size_t ny = volume_mask_data_block->get_ny();
+  size_t nz = volume_mask_data_block->get_nz();
+    
+  switch( axis )
+  {
+    case 1:
+    {
+      if ( slice < 0 || slice >= static_cast<int>( nx ) ) return false;
+    
+      MaskDataBlock::lock_type lock( volume_mask_data_block->get_mutex() );
+      MaskDataBlock::shared_lock_type slock( slice_mask_data_block->get_mutex() );
+
+      unsigned char volume_mask_value = volume_mask_data_block->get_mask_value();         
+      unsigned char slice_mask_value = slice_mask_data_block->get_mask_value();         
+      unsigned char volume_not_mask_value = ~( volume_mask_data_block->get_mask_value() );          
+      unsigned char slice_not_mask_value = ~( slice_mask_data_block->get_mask_value() );          
+      unsigned char* volume_ptr = volume_mask_data_block->get_mask_data();
+      unsigned char* slice_ptr = slice_mask_data_block->get_mask_data();
+      
+      size_t nxy = nx * ny;
+      size_t ny8 = ny & ~(0x7ULL);
+
+      for ( size_t z = 0; z < nz; z++ )
+      {
+        size_t y = 0;
+        for ( ; y < ny8; y += 8 )
+        {
+          size_t a = y + z * ny; 
+          size_t b = slice + y * nx + z * nxy;
+          
+          if (  slice_ptr[ b ] & slice_mask_value ) volume_ptr[ a ] |= volume_mask_value;
+          else volume_ptr[ a ] &= volume_not_mask_value; a++; b+= nx;           
+          if (  slice_ptr[ b ] & slice_mask_value ) volume_ptr[ a ] |= volume_mask_value;
+          else volume_ptr[ a ] &= volume_not_mask_value; a++; b+= nx;           
+          if (  slice_ptr[ b ] & slice_mask_value ) volume_ptr[ a ] |= volume_mask_value;
+          else volume_ptr[ a ] &= volume_not_mask_value; a++; b+= nx;           
+          if (  slice_ptr[ b ] & slice_mask_value ) volume_ptr[ a ] |= volume_mask_value;
+          else volume_ptr[ a ] &= volume_not_mask_value; a++; b+= nx;           
+          if (  slice_ptr[ b ] & slice_mask_value ) volume_ptr[ a ] |= volume_mask_value;
+          else volume_ptr[ a ] &= volume_not_mask_value; a++; b+= nx;           
+          if (  slice_ptr[ b ] & slice_mask_value ) volume_ptr[ a ] |= volume_mask_value;
+          else volume_ptr[ a ] &= volume_not_mask_value; a++; b+= nx;           
+          if (  slice_ptr[ b ] & slice_mask_value ) volume_ptr[ a ] |= volume_mask_value;
+          else volume_ptr[ a ] &= volume_not_mask_value; a++; b+= nx;           
+          if (  slice_ptr[ b ] & slice_mask_value ) volume_ptr[ a ] |= volume_mask_value;
+          else volume_ptr[ a ] &= volume_not_mask_value; a++; b+= nx;           
+        }
+        for ( ; y < ny; y++ )
+        {
+          size_t a = y + z * ny; 
+          size_t b = slice + y * nx + z * nxy;
+          if (  slice_ptr[ b ] & slice_mask_value ) volume_ptr[ a ] |= volume_mask_value;
+          else volume_ptr[ a ] &= volume_not_mask_value; a++; b+= nx;           
+        }
+      }
+      return true;
+    }
+    case 2:
+    {
+      if ( slice < 0 || slice >= static_cast<int>( ny ) ) return false;
+    
+      MaskDataBlock::lock_type lock( volume_mask_data_block->get_mutex() );
+      MaskDataBlock::shared_lock_type slock( slice_mask_data_block->get_mutex() );
+
+      unsigned char volume_mask_value = volume_mask_data_block->get_mask_value();         
+      unsigned char slice_mask_value = slice_mask_data_block->get_mask_value();         
+      unsigned char volume_not_mask_value = ~( volume_mask_data_block->get_mask_value() );          
+      unsigned char slice_not_mask_value = ~( slice_mask_data_block->get_mask_value() );          
+      unsigned char* volume_ptr = volume_mask_data_block->get_mask_data();
+      unsigned char* slice_ptr = slice_mask_data_block->get_mask_data();
+      
+      size_t nxy = nx * ny;
+      size_t nx8 = nx & ~(0x7ULL);
+
+      for ( size_t z = 0; z < nz; z++ )
+      {
+        size_t x = 0;
+        for ( ; x < nx8; x += 8 )
+        {
+          size_t a = x + z * ny; 
+          size_t b = x + slice * nx + z * nxy;
+          
+          if (  slice_ptr[ b ] & slice_mask_value ) volume_ptr[ a ] |= volume_mask_value;
+          else volume_ptr[ a ] &= volume_not_mask_value; a++; b++;            
+          if (  slice_ptr[ b ] & slice_mask_value ) volume_ptr[ a ] |= volume_mask_value;
+          else volume_ptr[ a ] &= volume_not_mask_value; a++; b++;            
+          if (  slice_ptr[ b ] & slice_mask_value ) volume_ptr[ a ] |= volume_mask_value;
+          else volume_ptr[ a ] &= volume_not_mask_value; a++; b++;            
+          if (  slice_ptr[ b ] & slice_mask_value ) volume_ptr[ a ] |= volume_mask_value;
+          else volume_ptr[ a ] &= volume_not_mask_value; a++; b++;            
+          if (  slice_ptr[ b ] & slice_mask_value ) volume_ptr[ a ] |= volume_mask_value;
+          else volume_ptr[ a ] &= volume_not_mask_value; a++; b++;            
+          if (  slice_ptr[ b ] & slice_mask_value ) volume_ptr[ a ] |= volume_mask_value;
+          else volume_ptr[ a ] &= volume_not_mask_value; a++; b++;            
+          if (  slice_ptr[ b ] & slice_mask_value ) volume_ptr[ a ] |= volume_mask_value;
+          else volume_ptr[ a ] &= volume_not_mask_value; a++; b++;            
+          if (  slice_ptr[ b ] & slice_mask_value ) volume_ptr[ a ] |= volume_mask_value;
+          else volume_ptr[ a ] &= volume_not_mask_value; a++; b++;            
+        }
+        for ( ; x < nx; x++ )
+        {
+          size_t a = x + z * ny; 
+          size_t b = x + slice * nx + z * nxy;
+          
+          if (  slice_ptr[ b ] & slice_mask_value ) volume_ptr[ a ] |= volume_mask_value;
+          else volume_ptr[ a ] &= volume_not_mask_value; a++; b+= nx;           
+        }
+      }
+      return true;
+    }
+    case 3:
+    {
+      if ( slice < 0 || slice >= static_cast<int>( nz ) ) return false;
+    
+      MaskDataBlock::lock_type lock( volume_mask_data_block->get_mutex() );
+      MaskDataBlock::shared_lock_type slock( slice_mask_data_block->get_mutex() );
+
+      unsigned char volume_mask_value = volume_mask_data_block->get_mask_value();         
+      unsigned char slice_mask_value = slice_mask_data_block->get_mask_value();         
+      unsigned char volume_not_mask_value = ~( volume_mask_data_block->get_mask_value() );          
+      unsigned char slice_not_mask_value = ~( slice_mask_data_block->get_mask_value() );          
+      unsigned char* volume_ptr = volume_mask_data_block->get_mask_data();
+      unsigned char* slice_ptr = slice_mask_data_block->get_mask_data();
+      
+      size_t nxy = nx * ny;
+      size_t nx8 = nx & ~(0x7ULL);
+
+      for ( size_t y = 0; y < ny; y++ )
+      {
+        size_t x = 0;
+        for ( ; x < nx8; x += 8 )
+        {
+          size_t a = x + y * ny; 
+          size_t b = x + y* nx + slice * nxy;
+          
+          if (  slice_ptr[ b ] & slice_mask_value ) volume_ptr[ a ] |= volume_mask_value;
+          else volume_ptr[ a ] &= volume_not_mask_value; a++; b++;            
+          if (  slice_ptr[ b ] & slice_mask_value ) volume_ptr[ a ] |= volume_mask_value;
+          else volume_ptr[ a ] &= volume_not_mask_value; a++; b++;            
+          if (  slice_ptr[ b ] & slice_mask_value ) volume_ptr[ a ] |= volume_mask_value;
+          else volume_ptr[ a ] &= volume_not_mask_value; a++; b++;            
+          if (  slice_ptr[ b ] & slice_mask_value ) volume_ptr[ a ] |= volume_mask_value;
+          else volume_ptr[ a ] &= volume_not_mask_value; a++; b++;            
+          if (  slice_ptr[ b ] & slice_mask_value ) volume_ptr[ a ] |= volume_mask_value;
+          else volume_ptr[ a ] &= volume_not_mask_value; a++; b++;            
+          if (  slice_ptr[ b ] & slice_mask_value ) volume_ptr[ a ] |= volume_mask_value;
+          else volume_ptr[ a ] &= volume_not_mask_value; a++; b++;            
+          if (  slice_ptr[ b ] & slice_mask_value ) volume_ptr[ a ] |= volume_mask_value;
+          else volume_ptr[ a ] &= volume_not_mask_value; a++; b++;            
+          if (  slice_ptr[ b ] & slice_mask_value ) volume_ptr[ a ] |= volume_mask_value;
+          else volume_ptr[ a ] &= volume_not_mask_value; a++; b++;            
+        }
+        for ( ; x < nx; x++ )
+        {
+          size_t a = x + y * ny; 
+          size_t b = x + y* nx + slice * nxy;
+          
+          if (  slice_ptr[ b ] & slice_mask_value ) volume_ptr[ a ] |= volume_mask_value;
+          else volume_ptr[ a ] &= volume_not_mask_value; a++; b++;            
+        }
+      }
+      return true;
+    }
+    default:
+    {
+      return false;
+    }
+  }
+}
+
 } // end namespace Core

@@ -279,7 +279,7 @@ size_t DataLayer::get_byte_size() const
   Layer::lock_type lock( Layer::GetMutex() );
   if ( this->data_volume_ && this->data_volume_->is_valid() )
   {
-    return this->data_volume_->get_data_block()->get_byte_size();
+    return this->data_volume_->get_byte_size();
   }
   return 0;
 }

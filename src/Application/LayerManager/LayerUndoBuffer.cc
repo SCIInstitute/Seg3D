@@ -108,6 +108,8 @@ LayerUndoBuffer::~LayerUndoBuffer()
 void LayerUndoBuffer::insert_undo_item( Core::ActionContextHandle context, 
   LayerUndoBufferItemHandle undo_item )
 {
+  undo_item->compute_size();
+
   if ( PreferencesManager::Instance()->enable_undo_state_->get() == false ) return;
 
   // Clear REDO buffer if a new item is added from anywhere else except the undo buffer itself
