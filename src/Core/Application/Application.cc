@@ -386,7 +386,7 @@ void Application::Reset()
 
 long long Application::get_total_virtual_memory()
 {
-#ifdef WIN32_
+#ifdef _WIN32
   MEMORYSTATUSEX info;
     info.dwLength = sizeof( MEMORYSTATUSEX );
     GlobalMemoryStatusEx( &info );
@@ -418,7 +418,7 @@ long long Application::get_total_virtual_memory()
 
 long long Application::get_total_physical_memory()
 {
-#ifdef WIN32_
+#ifdef _WIN32
   MEMORYSTATUSEX memInfo;
     memInfo.dwLength = sizeof( MEMORYSTATUSEX );
     GlobalMemoryStatusEx( &memInfo );
