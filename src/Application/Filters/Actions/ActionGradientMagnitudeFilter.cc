@@ -109,6 +109,9 @@ public:
     // Setup the filter parameters that we do not want to change.
     filter->SetInput( input_image->get_image() );
     filter->SetUseImageSpacingOff();
+    
+    // Ensure we will have some threads left for doing something else
+    this->limit_number_of_itk_threads( filter );
 
     // Run the actual ITK filter.
     // This needs to be in a try/catch statement as certain filters throw exceptions when they

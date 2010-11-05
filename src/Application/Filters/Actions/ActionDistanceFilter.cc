@@ -114,7 +114,10 @@ public:
     filter->SetSquaredDistance( false );
     filter->SetInsideIsPositive( this->inside_positive_ );
     filter->SetUseImageSpacing( ! this->use_index_space_ );
-    
+
+    // Ensure we will have some threads left for doing something else
+    this->limit_number_of_itk_threads( filter );
+        
     // Run the actual ITK filter.
     // This needs to be in a try/catch statement as certain filters throw exceptions when they
     // are aborted. In that case we will relay a message to the status bar for information.

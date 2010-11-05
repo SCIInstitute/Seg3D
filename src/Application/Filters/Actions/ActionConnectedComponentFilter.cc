@@ -149,6 +149,9 @@ public:
     // Setup the filter parameters that we do not want to change.
     filter->SetInput( input_image->get_image() );
 
+    // Ensure we will have some threads left for doing something else
+    this->limit_number_of_itk_threads( filter );
+
     // Run the actual ITK filter.
     // This needs to be in a try/catch statement as certain filters throw exceptions when they
     // are aborted. In that case we will relay a message to the status bar for information.
@@ -204,6 +207,9 @@ public:
       
       // Setup the filter parameters that we do not want to change.
       filter32->SetInput( input_image->get_image() );
+
+      // Ensure we will have some threads left for doing something else
+      this->limit_number_of_itk_threads( filter32 );
 
       // Run the actual ITK filter.
       // This needs to be in a try/catch statement as certain filters throw exceptions when they

@@ -132,6 +132,10 @@ public:
     filter->SetNumberOfIterations( this->iterations_ );
     filter->SetMultiplier( this->multiplier_ );
 
+    // Ensure we will have some threads left for doing something else
+    this->limit_number_of_itk_threads( filter );
+
+    // Add the seed points to itk
     for ( size_t i = 0; i < this->seeds_.size(); ++i )
     {
       filter_type::IndexType index;

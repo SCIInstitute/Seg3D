@@ -167,7 +167,6 @@ public:
 
   static void Show( QWidget* qwidget, std::vector< Core::StateBaseHandle >& states,
     boost::function< bool () > condition );
-
 };
 
 } // end namespace QtUtils

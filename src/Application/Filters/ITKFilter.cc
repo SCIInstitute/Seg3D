@@ -167,4 +167,15 @@ void ITKFilter::observe_itk_filter_internal( itk::ProcessObject::Pointer filter,
     &ITKFilterPrivate::handle_abort, this->private_ ) ) );
 } 
 
+void ITKFilter::limit_number_of_itk_threads_internal( itk::ProcessObject::Pointer filter )
+{
+  // Assume we will have a minimum of 2 threads. As we subtract one this will ensure that
+  // there is at least one thread doing the computation.
+  unsigned int max_threads = boost::thread::hardware_concurrency();
+  if ( max_threads < 2 ) max_threads = 2;
+  
+  filter->GetMultiThreader()->SetGlobalMaximumNumberOfThreads( max_threads - 1 );
+}
+
+
 } // end namespace Core

@@ -351,10 +351,23 @@ protected:
       progress_start, progress_amount );
   }
   
+  // LIMIT_NUMBER_OF_ITK_THREADS:
+  // Limit the number of itk threads so that at least one thread can be used to allow for
+  // interaction in the program.
+  // NOTE: If the host machine does not have multiple cores this function will not do anything
+  template< class T>
+  void limit_number_of_itk_threads( T filter_pointer )
+  {
+    this->limit_number_of_itk_threads_internal( itk::ProcessObject::Pointer( filter_pointer ) );
+  }
+  
 private:  
   // Internal function for setting up itk progress forwarding
   void observe_itk_filter_internal( itk::ProcessObject::Pointer filter, 
-    const LayerHandle& layer, float progress_start, float progress_amount );  
+    const LayerHandle& layer, float progress_start, float progress_amount );
+    
+  // Internal function for limiting the number of threads 
+  void limit_number_of_itk_threads_internal( itk::ProcessObject::Pointer filter );  
     
   ITKFilterPrivateHandle private_;
 };

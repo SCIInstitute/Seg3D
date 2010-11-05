@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
-
+ 
  The MIT License
-
+ 
  Copyright (c) 2009 Scientific Computing and Imaging Institute,
  University of Utah.
-
-
+ 
+ 
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
-
+ 
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
-
+ 
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -26,47 +26,38 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef QTUTILS_BRIDGE_DETAIL_QTABSTRACTBUTTONCONNECTOR_H
-#define QTUTILS_BRIDGE_DETAIL_QTABSTRACTBUTTONCONNECTOR_H
+#ifndef QTUTILS_WIDGETS_QTDOUBLECLICKPUSHBUTTON_H
+#define QTUTILS_WIDGETS_QTDOUBLECLICKPUSHBUTTON_H
 
-#include <QAbstractButton>
-#include <QPointer>
+// QT includes
+#include <QtGui/QPushButton>
 
-#include <Core/State/StateValue.h>
-
-#include <QtUtils/Bridge/detail/QtConnectorBase.h>
+// Core includes
+#include <boost/function.hpp>
 
 namespace QtUtils
 {
-
-class QtAbstractButtonConnector : public QtConnectorBase
+  
+class QtDoubleClickPushButton : public QPushButton
 {
   Q_OBJECT
 
 public:
-  QtAbstractButtonConnector( QAbstractButton* parent, Core::StateBoolHandle& state,
-    bool blocking = true );
+  // - Constructor / Destructor
+  QtDoubleClickPushButton( QWidget *parent = 0 ); 
+  virtual ~QtDoubleClickPushButton();
 
-  QtAbstractButtonConnector( QAbstractButton* parent, boost::function< void() > func );
+  // SET_DOUBLE_CLICK_FUNCTION:
+  // Set the function that needs to be called when double clicking on this button.
+  void set_double_click_function( boost::function< void() > function );
 
-  virtual ~QtAbstractButtonConnector();
-
-  // -- slot functions for boost signals --
-private:
-  static void SetButtonChecked( QPointer< QtAbstractButtonConnector > qpointer,
-    bool checked, Core::ActionSource source );
-  
-  // -- slot functions for Qt signals --
-private Q_SLOTS:
-  void set_state( bool value );
-  void call_func();
+protected:
+  virtual void mouseDoubleClickEvent( QMouseEvent *event );
 
 private:
-  QAbstractButton* parent_;
-  Core::StateBoolHandle state_;
-  boost::function< void () > func_;
+  boost::function< void() > function_;  
 };
-
-}
+  
+} // end namespace QtUtils
 
 #endif

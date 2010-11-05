@@ -38,6 +38,7 @@
 
 // QtUtils Includes
 #include <QtUtils/Bridge/QtBridge.h>
+#include <QtUtils/Widgets/QtDoubleClickPushButton.h>
 
 // Interface Includes
 #include <Interface/AppInterface/StyleSheet.h>
@@ -49,6 +50,9 @@
 namespace Seg3D
 {
 
+
+
+
 class LayerImporterWidgetPrivate
 {
 public:
@@ -59,11 +63,11 @@ public:
   
   Ui::LayerImporterWidget ui_;
   
-  QPushButton *data_volume_button;
-  QPushButton *mask_single_button;
-  QPushButton *mask_1234_button;
-  QPushButton *mask_1248_button;
-  QButtonGroup *type_button_group;
+  QtUtils::QtDoubleClickPushButton *data_volume_button_;
+  QtUtils::QtDoubleClickPushButton *mask_single_button_;
+  QtUtils::QtDoubleClickPushButton *mask_1234_button_;
+  QtUtils::QtDoubleClickPushButton *mask_1248_button_;
+  QButtonGroup *type_button_group_;
 
   QButtonGroup *itk_import_type_button_group_;
 
@@ -98,7 +102,7 @@ LayerImporterWidget::LayerImporterWidget( std::vector< LayerImporterHandle > imp
   
   this->private_->ui_.horizontalLayout_20->setAlignment( Qt::AlignCenter );
   this->private_->ui_.swap_x_y_spacing_widget_->hide();
-}
+  }
 
 
 LayerImporterWidget::~LayerImporterWidget()
@@ -118,8 +122,8 @@ void LayerImporterWidget::list_import_options()
   if( importer_modes & LayerImporterMode::LABEL_MASK_E )
   {
     this->private_->ui_.label_mask_->show();
-    this->private_->mask_1234_button->setMinimumSize( this->private_->ui_.bitplane_mask_->size() );
-    this->private_->mask_1234_button->setChecked( true );
+    this->private_->mask_1234_button_->setMinimumSize( this->private_->ui_.bitplane_mask_->size() );
+    this->private_->mask_1234_button_->setChecked( true );
     this->private_->mode_ = LayerImporterMode::LABEL_MASK_E;
   }
   else
@@ -130,8 +134,8 @@ void LayerImporterWidget::list_import_options()
   if( importer_modes & LayerImporterMode::BITPLANE_MASK_E )
   {
     this->private_->ui_.bitplane_mask_->show();
-    this->private_->mask_1248_button->setMinimumSize( this->private_->ui_.label_mask_->size());
-    this->private_->mask_1248_button->setChecked( true );
+    this->private_->mask_1248_button_->setMinimumSize( this->private_->ui_.label_mask_->size());
+    this->private_->mask_1248_button_->setChecked( true );
     this->private_->mode_ = LayerImporterMode::BITPLANE_MASK_E;
   }
   else
@@ -142,8 +146,8 @@ void LayerImporterWidget::list_import_options()
   if( importer_modes & LayerImporterMode::SINGLE_MASK_E )
   {
     this->private_->ui_.single_mask_->show();
-    this->private_->mask_single_button->setMinimumSize( this->private_->ui_.single_mask_->size() );
-    this->private_->mask_single_button->setChecked( true );
+    this->private_->mask_single_button_->setMinimumSize( this->private_->ui_.single_mask_->size() );
+    this->private_->mask_single_button_->setChecked( true );
     this->private_->mode_ = LayerImporterMode::SINGLE_MASK_E;
   }
   else
@@ -155,8 +159,8 @@ void LayerImporterWidget::list_import_options()
   if( importer_modes &  LayerImporterMode::DATA_E )
   {
     this->private_->ui_.data_->show();
-    this->private_->data_volume_button->setMinimumSize( this->private_->ui_.data_->size() );
-    this->private_->data_volume_button->setChecked( true );
+    this->private_->data_volume_button_->setMinimumSize( this->private_->ui_.data_->size() );
+    this->private_->data_volume_button_->setChecked( true );
     this->private_->mode_ = LayerImporterMode::DATA_E;
     std::string extension = boost::filesystem::path( this->private_->files_[ 0 ] ).extension();
     if( ( extension == ".dcm" ) || ( extension == "" ) )
@@ -185,11 +189,21 @@ void LayerImporterWidget::list_import_options()
   this->private_->ui_.file_name_table_->verticalHeader()->resizeSection( 0, 24 );
 
   // Step (4): connect the buttons
-  connect( this->private_->type_button_group, SIGNAL( buttonClicked( int ) ), 
+  connect( this->private_->type_button_group_, SIGNAL( buttonClicked( int ) ), 
     this, SLOT( set_type( int ) ) );
 
   connect( this->private_->ui_.import_button_, SIGNAL( clicked() ),
     this, SLOT( import() ) );
+    
+  this->private_->data_volume_button_->set_double_click_function( 
+    boost::bind( &LayerImporterWidget::import, this ) );
+  this->private_->mask_single_button_->set_double_click_function( 
+    boost::bind( &LayerImporterWidget::import, this ) );
+  this->private_->mask_1234_button_->set_double_click_function( 
+    boost::bind( &LayerImporterWidget::import, this ) );
+  this->private_->mask_1248_button_->set_double_click_function( 
+    boost::bind( &LayerImporterWidget::import, this ) );
+
 
   // Step (5): Swap out visuals to allow the user to select the right option
   this->resize( 10, 10 );
@@ -360,32 +374,32 @@ void LayerImporterWidget::setup_ui()
   this->private_->ui_.setupUi( this );
 
   // Step (3): Add the buttons
-  this->private_->type_button_group = new QButtonGroup( this );
-  this->private_->type_button_group->setExclusive( true );
+  this->private_->type_button_group_ = new QButtonGroup( this );
+  this->private_->type_button_group_->setExclusive( true );
 
-  this->private_->data_volume_button = new QPushButton( this->private_->ui_.data_ );
-  this->private_->data_volume_button->setObjectName( "data_volume_button" );
-  this->private_->data_volume_button->setFlat( true );
-  this->private_->data_volume_button->setCheckable( true );
-  this->private_->type_button_group->addButton( this->private_->data_volume_button, 0 );
+  this->private_->data_volume_button_ = new QtUtils::QtDoubleClickPushButton( this->private_->ui_.data_ );
+  this->private_->data_volume_button_->setObjectName( "data_volume_button" );
+  this->private_->data_volume_button_->setFlat( true );
+  this->private_->data_volume_button_->setCheckable( true );
+  this->private_->type_button_group_->addButton( this->private_->data_volume_button_, 0 );
 
-  this->private_->mask_single_button = new QPushButton( this->private_->ui_.single_mask_ );
-  this->private_->mask_single_button->setObjectName( "mask_single_button" );
-  this->private_->mask_single_button->setFlat( true );
-  this->private_->mask_single_button->setCheckable( true );
-  this->private_->type_button_group->addButton( this->private_->mask_single_button, 1 );
+  this->private_->mask_single_button_ = new QtUtils::QtDoubleClickPushButton( this->private_->ui_.single_mask_ );
+  this->private_->mask_single_button_->setObjectName( "mask_single_button" );
+  this->private_->mask_single_button_->setFlat( true );
+  this->private_->mask_single_button_->setCheckable( true );
+  this->private_->type_button_group_->addButton( this->private_->mask_single_button_, 1 );
 
-  this->private_->mask_1234_button = new QPushButton( this->private_->ui_.bitplane_mask_ );
-  this->private_->mask_1234_button->setObjectName( "mask_1234_button" );
-  this->private_->mask_1234_button->setFlat( true );
-  this->private_->mask_1234_button->setCheckable( true );
-  this->private_->type_button_group->addButton( this->private_->mask_1234_button, 2 );
+  this->private_->mask_1234_button_ = new QtUtils::QtDoubleClickPushButton( this->private_->ui_.bitplane_mask_ );
+  this->private_->mask_1234_button_->setObjectName( "mask_1234_button" );
+  this->private_->mask_1234_button_->setFlat( true );
+  this->private_->mask_1234_button_->setCheckable( true );
+  this->private_->type_button_group_->addButton( this->private_->mask_1234_button_, 2 );
 
-  this->private_->mask_1248_button = new QPushButton( this->private_->ui_.label_mask_ );
-  this->private_->mask_1248_button->setObjectName( "mask_1248_button" );
-  this->private_->mask_1248_button->setFlat( true );
-  this->private_->mask_1248_button->setCheckable( true );
-  this->private_->type_button_group->addButton( this->private_->mask_1248_button, 3 );
+  this->private_->mask_1248_button_ = new QtUtils::QtDoubleClickPushButton( this->private_->ui_.label_mask_ );
+  this->private_->mask_1248_button_->setObjectName( "mask_1248_button" );
+  this->private_->mask_1248_button_->setFlat( true );
+  this->private_->mask_1248_button_->setCheckable( true );
+  this->private_->type_button_group_->addButton( this->private_->mask_1248_button_, 3 );
 
   // Step (4): Hide the parts of the UI that cannot be used yet
   this->private_->ui_.importer_options_->hide();

@@ -99,8 +99,7 @@ QComboBox::icon{
       </size>
      </property>
      <property name="font">
-      <font>
-      </font>
+      <font/>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_8">
       <property name="spacing">
@@ -124,8 +123,7 @@ QComboBox::icon{
          </size>
         </property>
         <property name="font">
-         <font>
-         </font>
+         <font/>
         </property>
         <property name="text">
          <string/>
@@ -170,8 +168,7 @@ QComboBox::icon{
       </size>
      </property>
      <property name="font">
-      <font>
-      </font>
+      <font/>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_6">
       <property name="spacing">
@@ -347,8 +344,7 @@ QComboBox::icon{
       </size>
      </property>
      <property name="font">
-      <font>
-      </font>
+      <font/>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="0,4,4,4,5">
       <property name="spacing">
@@ -378,8 +374,7 @@ QComboBox::icon{
          </size>
         </property>
         <property name="font">
-         <font>
-         </font>
+         <font/>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_7">
          <property name="spacing">
@@ -403,8 +398,7 @@ QComboBox::icon{
             </size>
            </property>
            <property name="font">
-            <font>
-            </font>
+            <font/>
            </property>
            <property name="text">
             <string/>
@@ -443,8 +437,7 @@ QComboBox::icon{
          </size>
         </property>
         <property name="font">
-         <font>
-         </font>
+         <font/>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
          <property name="spacing">
@@ -502,8 +495,7 @@ QComboBox::icon{
             </size>
            </property>
            <property name="font">
-            <font>
-            </font>
+            <font/>
            </property>
            <property name="text">
             <string/>
@@ -528,8 +520,7 @@ QComboBox::icon{
          </size>
         </property>
         <property name="font">
-         <font>
-         </font>
+         <font/>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1">
          <property name="spacing">
@@ -587,8 +578,7 @@ QComboBox::icon{
             </size>
            </property>
            <property name="font">
-            <font>
-            </font>
+            <font/>
            </property>
            <property name="text">
             <string/>
@@ -613,8 +603,7 @@ QComboBox::icon{
          </size>
         </property>
         <property name="font">
-         <font>
-         </font>
+         <font/>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,1">
          <property name="spacing">
@@ -672,8 +661,7 @@ QComboBox::icon{
             </size>
            </property>
            <property name="font">
-            <font>
-            </font>
+            <font/>
            </property>
            <property name="text">
             <string/>
@@ -698,8 +686,7 @@ QComboBox::icon{
          </size>
         </property>
         <property name="font">
-         <font>
-         </font>
+         <font/>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,1">
          <property name="spacing">
@@ -757,8 +744,7 @@ QComboBox::icon{
             </size>
            </property>
            <property name="font">
-            <font>
-            </font>
+            <font/>
            </property>
            <property name="text">
             <string/>
@@ -781,19 +767,18 @@ QComboBox::icon{
      </property>
      <property name="minimumSize">
       <size>
-       <width>23</width>
+       <width>40</width>
        <height>20</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
-       <width>23</width>
+       <width>40</width>
        <height>20</height>
       </size>
      </property>
      <property name="font">
-      <font>
-      </font>
+      <font/>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_10">
       <property name="spacing">
@@ -831,13 +816,13 @@ QComboBox::icon{
        <widget class="QToolButton" name="swap_visibility_button_">
         <property name="minimumSize">
          <size>
-          <width>20</width>
+          <width>40</width>
           <height>20</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>20</width>
+          <width>40</width>
           <height>20</height>
          </size>
         </property>
@@ -846,11 +831,11 @@ QComboBox::icon{
         </property>
         <property name="icon">
          <iconset resource="../../Resources/QtResources.qrc">
-          <normaloff>:/Images/FlipVertOff.png</normaloff>:/Images/FlipVertOff.png</iconset>
+          <normaloff>:/Images/SwitchTool.png</normaloff>:/Images/SwitchTool.png</iconset>
         </property>
         <property name="iconSize">
          <size>
-          <width>16</width>
+          <width>32</width>
           <height>16</height>
          </size>
         </property>

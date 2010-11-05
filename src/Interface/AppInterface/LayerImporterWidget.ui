@@ -327,7 +327,7 @@ p, li { white-space: pre-wrap; }
              <number>0</number>
             </property>
             <item>
-             <widget class="QToolButton" name="data_button_">
+             <widget class="QtUtils::QtDoubleClickToolButton" name="data_button_">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                 <horstretch>0</horstretch>
@@ -430,7 +430,7 @@ p, li { white-space: pre-wrap; }
              <number>0</number>
             </property>
             <item>
-             <widget class="QToolButton" name="single_mask_button_">
+             <widget class="QtUtils::QtDoubleClickToolButton" name="single_mask_button_">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                 <horstretch>0</horstretch>
@@ -533,7 +533,7 @@ p, li { white-space: pre-wrap; }
              <number>0</number>
             </property>
             <item>
-             <widget class="QToolButton" name="series_1248_button_">
+             <widget class="QtUtils::QtDoubleClickToolButton" name="series_1248_button_">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                 <horstretch>0</horstretch>
@@ -636,7 +636,7 @@ p, li { white-space: pre-wrap; }
              <number>0</number>
             </property>
             <item>
-             <widget class="QToolButton" name="series_1234_button_">
+             <widget class="QtUtils::QtDoubleClickToolButton" name="series_1234_button_">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                 <horstretch>0</horstretch>
@@ -881,6 +881,13 @@ p, li { white-space: pre-wrap; }
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QtUtils::QtDoubleClickToolButton</class>
+   <extends>QToolButton</extends>
+   <header location="global">QtUtils/Widgets/QtDoubleClickToolButton.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../../Resources/QtResources.qrc"/>
  </resources>
