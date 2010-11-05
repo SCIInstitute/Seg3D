@@ -220,7 +220,7 @@ bool ArrayMathEngine::add_output_data_block( std::string name, size_t nx, size_t
   Core::DataType type, std::string& error )
 {
   size_t size = nx * ny * nz;
-  if ( this->private_->array_size_ != size )
+  if ( static_cast<size_t>( this->private_->array_size_ ) != size )
   {
     error = "The output field '" + name + 
       "' does not have the same number of elements as the other objects.";

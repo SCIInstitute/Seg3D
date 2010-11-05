@@ -1101,9 +1101,17 @@ bool Viewer::wheel_event( int delta, int x, int y, int buttons, int modifiers )
 
   if ( delta != 0 )
   {
-    ActionOffsetSlice::Dispatch( Core::Interface::GetMouseActionContext(),
-      this->shared_from_this(), -delta );
-
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    if ( PreferencesManager::Instance()->reverse_slice_navigation_->get() )
+    {
+      ActionOffsetSlice::Dispatch( Core::Interface::GetMouseActionContext(),
+        this->shared_from_this(), delta );    
+    }
+    else
+    {
+      ActionOffsetSlice::Dispatch( Core::Interface::GetMouseActionContext(),
+        this->shared_from_this(), -delta );
+    }
     // Update the status bar display.
     // 'update_status_bar' reposts itself to the application thread, so it's guaranteed that 
     // by the time it actually runs, the slice number has been updated.
@@ -1130,16 +1138,20 @@ bool Viewer::key_press_event( int key, int modifiers )
     case Core::Key::KEY_LEFT_E:
     case Core::Key::KEY_DOWN_E:
     {
+      Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+      int direction = 1.0;
+      if ( PreferencesManager::Instance()->reverse_slice_navigation_->get() ) direction = -1;
+    
       if ( modifiers & Core::KeyModifier::SHIFT_MODIFIER_E )
       {
         ActionOffsetSlice::Dispatch( Core::Interface::GetKeyboardActionContext(),
           this->shared_from_this(), 
-          -( PreferencesManager::Instance()->slice_step_multiplier_state_->get() ) );     
+          -direction*( PreferencesManager::Instance()->slice_step_multiplier_state_->get() ) );     
       }
       else
       {
         ActionOffsetSlice::Dispatch( Core::Interface::GetKeyboardActionContext(),
-          this->shared_from_this(), -1 );
+          this->shared_from_this(), -direction );
       }
       return true;    
     }
@@ -1149,16 +1161,20 @@ bool Viewer::key_press_event( int key, int modifiers )
     case Core::Key::KEY_RIGHT_E:
     case Core::Key::KEY_UP_E:
     {
+      Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+      int direction = 1.0;
+      if ( PreferencesManager::Instance()->reverse_slice_navigation_->get() ) direction = -1;
+
       if ( modifiers & Core::KeyModifier::SHIFT_MODIFIER_E )
       {
         ActionOffsetSlice::Dispatch( Core::Interface::GetKeyboardActionContext(),
           this->shared_from_this(), 
-          ( PreferencesManager::Instance()->slice_step_multiplier_state_->get() ) );        
+          direction * ( PreferencesManager::Instance()->slice_step_multiplier_state_->get() ) );        
       }
       else
       {   
         ActionOffsetSlice::Dispatch( Core::Interface::GetKeyboardActionContext(),
-          this->shared_from_this(), 1 );
+          this->shared_from_this(), direction );
       }
       return true;
     }

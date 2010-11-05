@@ -41,7 +41,7 @@ LayerManagerDockWidget::LayerManagerDockWidget( QWidget *parent ) :
 {
   this->setAllowedAreas( Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea );
   this->setWindowTitle( "Layer Manager" );
-  this->setMinimumSize( QSize( 280, 313 ) );
+  this->setMinimumSize( QSize( 296, 313 ) );
   this->setWidget( new LayerManagerWidget( this ) );
 }
 

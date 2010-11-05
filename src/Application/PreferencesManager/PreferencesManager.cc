@@ -166,6 +166,8 @@ void PreferencesManager::initialize_states()
   add_state( "enable_undo", this->enable_undo_state_, true );
   add_state( "percent_of_memory", this->percent_of_memory_state_ , 0.15, 0.0, 0.5, 0.01 );
   
+  add_state( "reverse_slice_navigation", this->reverse_slice_navigation_, false );
+  
   //Viewer Preferences
   add_state( "default_viewer_mode", this->default_viewer_mode_state_, "1and3", 
     "single|1and1|1and2|1and3|2and2|2and3|3and3" );

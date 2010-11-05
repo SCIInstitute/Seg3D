@@ -218,7 +218,6 @@ VolumeSlice::VolumeSlice( const VolumeHandle& volume,
              VolumeSliceType type, size_t slice_num ) :
   private_( new VolumeSlicePrivate( volume, type, slice_num ) )
 {
-  this->private_->slice_type_ = Core::VolumeSliceType::AXIAL_E;
   this->private_->slice_ = this;
   this->private_->update_dimension();
   this->private_->slice_number_ = Min( this->private_->slice_number_, 

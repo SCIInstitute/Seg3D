@@ -98,7 +98,8 @@ public:
   std::vector< Core::StateColorHandle > color_states_;
 
   //Interface Controls Preferences
-    
+  Core::StateBoolHandle reverse_slice_navigation_;
+      
   //Sidebars Preferences
   Core::StateBoolHandle show_tools_bar_state_;
   Core::StateBoolHandle show_layermanager_bar_state_;

@@ -222,7 +222,6 @@ bool ViewManipulator::compute_rotation( int x0, int y0, int x1, int y1, Core::Ve
 
 double ViewManipulator::compute_scaling( int x0, int y0, int x1, int y1 ) const
 {
-  double delta_x = static_cast< double > ( x1 - x0 ) / this->width_;
   double delta_y = static_cast< double > ( y1 - y0 ) / this->height_;
   if ( this->flip_y_ )
   {

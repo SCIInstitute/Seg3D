@@ -131,9 +131,7 @@ void QtHistogramWidget::set_min( double min )
   }
   
   double percentage = min / ( this->get_histogram_max() - this->get_histogram_min() );
-  
-  int temp_width = this->private_->histogram_graph_->width();
-  
+    
   double min_location = ( ( this->private_->histogram_graph_->width() - 5 ) * percentage ) + 4;
   this->min_bar_->setGeometry( min_location, 4 , 4, 129 );
   this->min_bar_->setStyleSheet( QString::fromUtf8( "border-left: 2px solid rgb( 237, 148, 31 );"
@@ -149,8 +147,6 @@ void QtHistogramWidget::set_max( double max )
   {
     max = max + Core::Abs( this->get_histogram_min() );
   }
-  
-  int temp_width = this->private_->histogram_graph_->width();
   
   double percentage = max / ( this->get_histogram_max() - this->get_histogram_min() );
   double max_location = ( ( this->private_->histogram_graph_->width() - 5 ) * percentage ) + 4;
@@ -210,8 +206,5 @@ void QtHistogramWidget::mouseMoveEvent( QMouseEvent* e )
 {
   this->private_->histogram_graph_->mouseMoveEvent( e );
 }
-
-
-
 
 } // end namespace QtUtils

@@ -47,6 +47,7 @@ CORE_ENUM_CLASS
   AXIAL_E = 0,
   CORONAL_E = 1,
   SAGITTAL_E = 2
+  
 )
 
 // Forward declaration
