@@ -246,7 +246,6 @@ void AppStatusBar::update_data_point_label()
 
 void AppStatusBar::set_message( int msg_type, std::string message )
 {
-  QColor color_ = QColor(255, 255, 255);
   std::string status_message = message;
   boost::char_separator< char > separater( " " );
   boost::tokenizer< boost::char_separator< char > > tok( message, separater );
@@ -257,30 +256,28 @@ void AppStatusBar::set_message( int msg_type, std::string message )
     status_message = status_message + " " + *beg;
   }
 
+/*
   switch( msg_type )
   {
   case Core::LogMessageType::ERROR_E:
     this->private_->ui_.status_report_label_->setStyleSheet( StyleSheet::STATUSBAR_ERROR_C );
-    color_ = QColor(121, 0, 0);
     break;
   case Core::LogMessageType::WARNING_E:
     this->private_->ui_.status_report_label_->setStyleSheet( StyleSheet::STATUSBAR_WARNING_C );
-    color_ = QColor(165, 161, 34);
     break;
   case Core::LogMessageType::MESSAGE_E:
     this->private_->ui_.status_report_label_->setStyleSheet( StyleSheet::STATUSBAR_MESSAGE_C );
-    color_ = QColor(3, 86, 2);
     break;
   case Core::LogMessageType::DEBUG_E:
     this->private_->ui_.status_report_label_->setStyleSheet( StyleSheet::STATUSBAR_DEBUG_C );
-    color_ = QColor("purple");
     break;
   default:
     break;
   }
+*/
 
+  this->private_->ui_.status_report_label_->setStyleSheet( StyleSheet::STATUSBAR_C );
   this->private_->ui_.status_report_label_->setText( QString::fromStdString( message ) );
-  //this->history_widget_->add_history_item( QString::fromStdString( message ), color_ );
 }
 
 void AppStatusBar::SetMessage( QPointer< AppStatusBar > qpointer, 
