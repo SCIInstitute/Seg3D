@@ -29,6 +29,14 @@
 #ifndef CORE_GRAPHICS_ALGORITHM_H
 #define CORE_GRAPHICS_ALGORITHM_H
 
+#ifdef min
+#undef min
+#endif
+
+#ifdef max
+#undef max
+#endif
+
 #include <vector>
 #include <utility>
 
