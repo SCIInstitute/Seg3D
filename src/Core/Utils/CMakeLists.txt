@@ -47,6 +47,8 @@ SET(CORE_UTILS_SRCS
   Log.cc
   LogHistory.h
   LogHistory.cc
+  LogStreamer.h
+  LogStreamer.cc
   Notifier.h
   Notifier.cc
   Parallel.h
