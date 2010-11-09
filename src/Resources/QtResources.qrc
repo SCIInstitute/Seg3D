@@ -134,5 +134,7 @@
         <file>Images/Fog.png</file>
         <file>Images/FogOff.png</file>
         <file>Images/SwitchTool.png</file>
+        <file>Images/Duplicate.png</file>
+        <file>Images/DuplicateOff.png</file>
     </qresource>
 </RCC>

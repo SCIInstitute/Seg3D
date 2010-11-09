@@ -898,7 +898,7 @@ bool GetSliceInternal( const DataBlockHandle& volume_data_block,
   
   switch( axis )
   {
-    case 1:
+    case 2:
     {
       if ( slice < 0 || slice >= static_cast<int>( nx ) ) return false;
     
@@ -934,7 +934,7 @@ bool GetSliceInternal( const DataBlockHandle& volume_data_block,
       }
       return true;
     }
-    break;
+    case 1:
     {
       if ( slice < 0 || slice >= static_cast<int>( ny ) ) return false;
     
@@ -970,7 +970,7 @@ bool GetSliceInternal( const DataBlockHandle& volume_data_block,
       }
       return true;
     }
-    case 3:
+    case 0:
     {
       if ( slice < 0 || slice >= static_cast<int>( ny ) ) return false;
     
@@ -1031,7 +1031,7 @@ bool PutSliceInternal( const DataBlockHandle& volume_data_block,
   
   switch( axis )
   {
-    case 1:
+    case 2:
     {
       if ( slice < 0 || slice >= static_cast<int>( nx ) ) return false;
     
@@ -1064,7 +1064,7 @@ bool PutSliceInternal( const DataBlockHandle& volume_data_block,
       }
       return true;
     }
-    case 2:
+    case 1:
     {
       if ( slice < 0 || slice >= static_cast<int>( ny ) ) return false;
             
@@ -1098,7 +1098,7 @@ bool PutSliceInternal( const DataBlockHandle& volume_data_block,
       
       return true;
     }
-    case 3:
+    case 0:
     {
       if ( slice < 0 || slice >= static_cast<int>( nz ) ) return false;
           

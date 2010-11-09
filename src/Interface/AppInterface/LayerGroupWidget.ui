@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>274</width>
-    <height>159</height>
+    <height>166</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -15,6 +15,9 @@
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
+  </property>
+  <property name="toolTip">
+   <string/>
   </property>
   <property name="styleSheet">
    <string notr="true">QTabWidget::pane{
@@ -76,6 +79,25 @@ QToolButton#group_new_button_:hover{
 }
 
 QToolButton#group_new_button_:pressed{
+  background-color: rgb(233, 111, 53);
+  border-radius: 3px;
+  border: 1px solid rgb(142, 67, 32);
+  margin: 0 0 0 0;
+  padding: 0 0 0 0;
+}
+
+
+QToolButton#duplicate_layer_{
+  background-color: rgba(0, 0, 0, 0);
+  border: 1px solid rgba(0, 0, 0, 0);
+  margin: 0 0 0 0;
+  padding: 0 0 0 0;
+}
+QToolButton#duplicate_layer_:hover{
+  background-color: rgba( 0, 0, 0, 30 ); border-radius: 3px;
+}
+
+QToolButton#duplicate_layer_:pressed{
   background-color: rgb(233, 111, 53);
   border-radius: 3px;
   border: 1px solid rgb(142, 67, 32);
@@ -454,7 +476,7 @@ QWidget#buttons_{
                 <height>27</height>
                </size>
               </property>
-              <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,0,1">
+              <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,0,0,1">
                <property name="spacing">
                 <number>4</number>
                </property>
@@ -484,6 +506,26 @@ QWidget#buttons_{
                 </spacer>
                </item>
                <item>
+                <widget class="QToolButton" name="duplicate_layer_">
+                 <property name="toolTip">
+                  <string>Duplicate a layer</string>
+                 </property>
+                 <property name="text">
+                  <string>...</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="../../Resources/QtResources.qrc">
+                   <normaloff>:/Images/DuplicateOff.png</normaloff>:/Images/DuplicateOff.png</iconset>
+                 </property>
+                 <property name="iconSize">
+                  <size>
+                   <width>35</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </widget>
+               </item>
+               <item>
                 <widget class="QToolButton" name="group_iso_button_">
                  <property name="minimumSize">
                   <size>
@@ -498,7 +540,7 @@ QWidget#buttons_{
                   </size>
                  </property>
                  <property name="toolTip">
-                  <string>Open the transform menu</string>
+                  <string>Open the iso surface configuration menu</string>
                  </property>
                  <property name="text">
                   <string/>
@@ -660,6 +702,9 @@ QWidget#buttons_{
                   </property>
                   <item>
                    <widget class="QRadioButton" name="radioButton_1_point_0">
+                    <property name="toolTip">
+                     <string>Full resolution isosurface</string>
+                    </property>
                     <property name="text">
                      <string>1</string>
                     </property>
@@ -670,6 +715,9 @@ QWidget#buttons_{
                   </item>
                   <item>
                    <widget class="QRadioButton" name="radioButton_point_5">
+                    <property name="toolTip">
+                     <string>50% resolution isosurface</string>
+                    </property>
                     <property name="text">
                      <string>.50</string>
                     </property>
@@ -677,6 +725,9 @@ QWidget#buttons_{
                   </item>
                   <item>
                    <widget class="QRadioButton" name="radioButton_point_25">
+                    <property name="toolTip">
+                     <string>25% resolution isosurface</string>
+                    </property>
                     <property name="text">
                      <string>.25</string>
                     </property>
@@ -684,6 +735,9 @@ QWidget#buttons_{
                   </item>
                   <item>
                    <widget class="QRadioButton" name="radioButton_point_125">
+                    <property name="toolTip">
+                     <string>12.5% resolution isosurface</string>
+                    </property>
                     <property name="text">
                      <string>.125</string>
                     </property>
@@ -751,6 +805,9 @@ QWidget#buttons_{
                          <height>16777215</height>
                         </size>
                        </property>
+                       <property name="toolTip">
+                        <string>Select all layers</string>
+                       </property>
                        <property name="text">
                         <string>Select All</string>
                        </property>
@@ -769,6 +826,9 @@ QWidget#buttons_{
                       <width>0</width>
                       <height>28</height>
                      </size>
+                    </property>
+                    <property name="toolTip">
+                     <string>Check this button to delete layers</string>
                     </property>
                     <property name="text">
                      <string>Delete</string>

@@ -37,6 +37,7 @@
 #include <Application/Tools/Actions/ActionFloodFill.h>
 #include <Application/Layer/MaskLayer.h>
 #include <Application/LayerManager/LayerManager.h>
+#include <Application/LayerManager/LayerUndoBuffer.h>
 
 CORE_REGISTER_ACTION( Seg3D, FloodFill )
 
@@ -264,6 +265,31 @@ bool ActionFloodFill::run( Core::ActionContextHandle& context, Core::ActionResul
   {
     this->private_->mask_cstr2_slice_.handle()->copy_slice_data( mask_cstr2,
       this->private_->negative_mask_cstr2_.value() );
+  }
+
+  {
+    // Build the undo/redo for this action
+    LayerUndoBufferItemHandle item( new LayerUndoBufferItem( "FloodFill" ) );
+
+    // Get the axis along which the flood fill works
+    int axis = this->private_->slice_type_.value();
+    
+    // Get the slice number
+    int slice = this->private_->slice_number_.value();
+    
+    // Get the layer on which this action operates
+    LayerHandle layer = LayerManager::Instance()->get_layer_by_id( 
+      this->private_->target_layer_id_.value() );
+    // Create a check point of the slice on which the flood fill will operate
+    LayerCheckPointHandle check_point( new LayerCheckPoint( layer, slice, axis ) );
+
+    // The redo action is the current one
+    item->set_redo_action( this->shared_from_this() );
+    // Tell the item which layer to restore with which check point for the undo action
+    item->add_layer_to_restore( layer, check_point );
+
+    // Now add the undo/redo action to undo buffer
+    LayerUndoBuffer::Instance()->insert_undo_item( context, item );
   }
 
   {

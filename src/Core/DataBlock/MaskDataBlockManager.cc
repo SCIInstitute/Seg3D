@@ -859,7 +859,8 @@ bool MaskDataBlockManager::GetSlice( const MaskDataBlockHandle& volume_mask_data
     
   switch( axis )
   {
-    case 1:
+    // AXIAL SLICE
+    case 2:
     {
       if ( slice < 0 || slice >= static_cast<int>( nx ) ) return false;
     
@@ -916,7 +917,8 @@ bool MaskDataBlockManager::GetSlice( const MaskDataBlockHandle& volume_mask_data
       }
       return true;
     }
-    case 2:
+    // SAGITTAL SLICE
+    case 1:
     {
       if ( slice < 0 || slice >= static_cast<int>( ny ) ) return false;
     
@@ -974,7 +976,8 @@ bool MaskDataBlockManager::GetSlice( const MaskDataBlockHandle& volume_mask_data
       }
       return true;
     }
-    case 3:
+    // CORONAL SLICE
+    case 0:
     {
       if ( slice < 0 || slice >= static_cast<int>( nz ) ) return false;
     
@@ -1052,7 +1055,8 @@ bool MaskDataBlockManager::PutSlice( const MaskDataBlockHandle& slice_mask_data_
     
   switch( axis )
   {
-    case 1:
+    // AXIAL SLICE
+    case 2:
     {
       if ( slice < 0 || slice >= static_cast<int>( nx ) ) return false;
     
@@ -1103,7 +1107,8 @@ bool MaskDataBlockManager::PutSlice( const MaskDataBlockHandle& slice_mask_data_
       }
       return true;
     }
-    case 2:
+    // SAGITTAL SLICE
+    case 1:
     {
       if ( slice < 0 || slice >= static_cast<int>( ny ) ) return false;
     
@@ -1155,7 +1160,8 @@ bool MaskDataBlockManager::PutSlice( const MaskDataBlockHandle& slice_mask_data_
       }
       return true;
     }
-    case 3:
+    // CORONAL SLICE
+    case 0:
     {
       if ( slice < 0 || slice >= static_cast<int>( nz ) ) return false;
     

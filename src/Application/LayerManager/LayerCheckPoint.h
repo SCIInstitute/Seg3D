@@ -60,6 +60,9 @@ public:
   // Create a slice check point
   LayerCheckPoint( LayerHandle layer, int slice, int axis );
 
+  // Create a slice check point
+  LayerCheckPoint( LayerHandle layer, int start, int end, int axis );
+
   // destructor
   virtual ~LayerCheckPoint();
   
@@ -78,6 +81,10 @@ public:
   // CREATE_SLICE:
   // Check point a slice check point
   bool create_slice( LayerHandle layer, int slice, int axis );
+
+  // CREATE_SLICE:
+  // Check point a slice check point
+  bool create_slice( LayerHandle layer, int start, int end, int axis );
   
   // GET_BYTE_SIZE:
   // Get the size of the check point

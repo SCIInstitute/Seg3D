@@ -194,7 +194,7 @@ void AppLayerIO::ImportSeries( QMainWindow* main_window )
         }
       }
     }
-
+    files = files1;
   }
   else
   {
