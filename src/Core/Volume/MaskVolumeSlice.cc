@@ -280,9 +280,9 @@ void MaskVolumeSlice::release_cached_data()
   {
     MaskDataBlock::lock_type volume_lock( this->mask_data_block_->get_mutex() );
     CopyCachedDataBack( this, &this->private_->cache_[ 0 ] );
+    this->mask_data_block_->increase_generation();
   }
   
-  this->mask_data_block_->increase_generation();
   this->private_->cache_.resize( 0 );
   this->private_->using_cache_ = false;
 
@@ -341,10 +341,10 @@ void MaskVolumeSlice::set_slice_data( const unsigned char* buffer, bool trigger_
     {
       MaskDataBlock::lock_type volume_lock( this->mask_data_block_->get_mutex() );
       CopyCachedDataBack( this, buffer );
-    }
-    if ( trigger_update )
-    {
-      this->mask_data_block_->increase_generation();
+      if ( trigger_update )
+      {
+        this->mask_data_block_->increase_generation();
+      }
     }
   }
 

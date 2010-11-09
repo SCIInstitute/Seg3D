@@ -211,6 +211,8 @@ public:
   
   // INCREASE_GENERATION:
   // Increase the generation number to a new unique number.
+  // NOTE: THis one does not lock the mutex as the mutex should
+  // protect both the data change and the update of the generation atomically.
   void increase_generation();
 
   // SET_HISTOGRAM:

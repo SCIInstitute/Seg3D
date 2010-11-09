@@ -61,10 +61,10 @@ public:
   Core::ActionParameter< bool > negative_mask_cstr2_;
   Core::ActionParameter< bool > erase_;
 
-  Core::ActionCachedHandle< Core::MaskVolumeSliceHandle > vol_slice_;
-  Core::ActionCachedHandle< Core::DataVolumeSliceHandle > data_cstr_slice_;
-  Core::ActionCachedHandle< Core::MaskVolumeSliceHandle > mask_cstr1_slice_;
-  Core::ActionCachedHandle< Core::MaskVolumeSliceHandle > mask_cstr2_slice_;
+  Core::MaskVolumeSliceHandle vol_slice_;
+  Core::DataVolumeSliceHandle data_cstr_slice_;
+  Core::MaskVolumeSliceHandle mask_cstr1_slice_;
+  Core::MaskVolumeSliceHandle mask_cstr2_slice_;
 
   std::vector< std::pair< int, int > > seeds_2d_;
 };
@@ -86,11 +86,6 @@ ActionFloodFill::ActionFloodFill() :
   this->add_key( this->private_->mask_cstr2_layer_id_ );
   this->add_key( this->private_->negative_mask_cstr2_ );
   this->add_key( this->private_->erase_ );
-
-  this->add_cachedhandle( this->private_->vol_slice_ );
-  this->add_cachedhandle( this->private_->data_cstr_slice_ );
-  this->add_cachedhandle( this->private_->mask_cstr1_slice_ );
-  this->add_cachedhandle( this->private_->mask_cstr2_slice_ );
 }
 
 ActionFloodFill::~ActionFloodFill()
@@ -99,6 +94,7 @@ ActionFloodFill::~ActionFloodFill()
 
 bool ActionFloodFill::validate( Core::ActionContextHandle& context )
 { 
+  // Check whether the target layer exists
   MaskLayerHandle target_layer = boost::dynamic_pointer_cast< MaskLayer >( 
     LayerManager::Instance()->get_layer_by_id( this->private_->target_layer_id_.value() ) );
   if ( !target_layer )
@@ -108,6 +104,7 @@ bool ActionFloodFill::validate( Core::ActionContextHandle& context )
     return false;
   }
 
+  // Check whether the target layer can be used for processing
   Core::NotifierHandle notifier;
   if ( !LayerManager::Instance()->CheckLayerAvailabilityForProcessing(
     this->private_->target_layer_id_.value(), notifier ) )
@@ -117,34 +114,39 @@ bool ActionFloodFill::validate( Core::ActionContextHandle& context )
     return false;
   }
   
+  // Check whether slice type has a valid 
+  Core::VolumeSliceType slice_type = static_cast< Core::VolumeSliceType::enum_type >(
+    this->private_->slice_type_.value() );
 
-  if ( this->private_->slice_type_.value() != Core::VolumeSliceType::AXIAL_E &&
-    this->private_->slice_type_.value() != Core::VolumeSliceType::CORONAL_E &&
-    this->private_->slice_type_.value() != Core::VolumeSliceType::SAGITTAL_E )
+  if ( slice_type != Core::VolumeSliceType::AXIAL_E &&
+    slice_type != Core::VolumeSliceType::CORONAL_E &&
+    slice_type != Core::VolumeSliceType::SAGITTAL_E )
   {
     context->report_error( "Invalid slice type" );
     return false;
   }
   
-  Core::VolumeSliceType slice_type = static_cast< Core::VolumeSliceType::enum_type >(
-    this->private_->slice_type_.value() );
-  Core::MaskVolumeSliceHandle volume_slice( new Core::MaskVolumeSlice(
-    target_layer->get_mask_volume(), slice_type ) );
-  if ( this->private_->slice_number_.value() >= volume_slice->number_of_slices() )
+
+  this->private_->vol_slice_.reset( new Core::MaskVolumeSlice( target_layer->get_mask_volume(), 
+    slice_type ) );
+  
+  if ( this->private_->slice_number_.value() >= this->private_->vol_slice_->number_of_slices() )
   {
     context->report_error( "Slice number is out of range." );
     return false;
   }
 
-  volume_slice->set_slice_number( this->private_->slice_number_.value() );
-  this->private_->vol_slice_.handle() = volume_slice;
+  this->private_->vol_slice_->set_slice_number( this->private_->slice_number_.value() );
 
   if ( this->private_->data_cstr_layer_id_.value() != "" &&
     this->private_->data_cstr_layer_id_.value() != "<none>" )
   {
     DataLayerHandle data_cstr_layer = boost::dynamic_pointer_cast< DataLayer >(
-      LayerManager::Instance()->get_layer_by_id( this->private_->data_cstr_layer_id_.value() ) );
-    if ( !data_cstr_layer || data_cstr_layer->get_layer_group() != target_layer->get_layer_group() )
+      LayerManager::Instance()->get_layer_by_id( 
+      this->private_->data_cstr_layer_id_.value() ) );
+
+    if ( !data_cstr_layer || 
+      data_cstr_layer->get_layer_group() != target_layer->get_layer_group() )
     {
       context->report_error( "Layer '" + this->private_->data_cstr_layer_id_.value() +
         "' is not a valid data constraint layer, will proceed as if no data constraint." );
@@ -157,8 +159,9 @@ bool ActionFloodFill::validate( Core::ActionContextHandle& context )
     }
     else
     {
-      this->private_->data_cstr_slice_.handle().reset( new Core::DataVolumeSlice(
-        data_cstr_layer->get_data_volume(), slice_type, this->private_->slice_number_.value() ) );
+      this->private_->data_cstr_slice_.reset( new Core::DataVolumeSlice( 
+        data_cstr_layer->get_data_volume(), slice_type, 
+        this->private_->slice_number_.value() ) );
     }
   }
   
@@ -166,8 +169,10 @@ bool ActionFloodFill::validate( Core::ActionContextHandle& context )
     this->private_->mask_cstr1_layer_id_.value() != "<none>" )
   {
     MaskLayerHandle mask_cstr1_layer = boost::dynamic_pointer_cast< MaskLayer >(
-      LayerManager::Instance()->get_layer_by_id( this->private_->mask_cstr1_layer_id_.value() ) );
-    if ( !mask_cstr1_layer || mask_cstr1_layer->get_layer_group() != target_layer->get_layer_group() )
+      LayerManager::Instance()->get_layer_by_id( 
+      this->private_->mask_cstr1_layer_id_.value() ) );
+    if ( !mask_cstr1_layer || 
+      mask_cstr1_layer->get_layer_group() != target_layer->get_layer_group() )
     {
       context->report_error( "Layer '" + this->private_->mask_cstr1_layer_id_.value() +
         "' is not a valid mask constraint layer, will proceed as if no mask constraint 1." );
@@ -180,8 +185,9 @@ bool ActionFloodFill::validate( Core::ActionContextHandle& context )
     }
     else
     {
-      this->private_->mask_cstr1_slice_.handle().reset( new Core::MaskVolumeSlice(
-        mask_cstr1_layer->get_mask_volume(), slice_type, this->private_->slice_number_.value() ) );
+      this->private_->mask_cstr1_slice_.reset( new Core::MaskVolumeSlice(
+        mask_cstr1_layer->get_mask_volume(), slice_type, 
+        this->private_->slice_number_.value() ) );
     }
   }
 
@@ -189,8 +195,10 @@ bool ActionFloodFill::validate( Core::ActionContextHandle& context )
     this->private_->mask_cstr2_layer_id_.value() != "<none>" )
   {
     MaskLayerHandle mask_cstr2_layer = boost::dynamic_pointer_cast< MaskLayer >(
-      LayerManager::Instance()->get_layer_by_id( this->private_->mask_cstr2_layer_id_.value() ) );
-    if ( !mask_cstr2_layer || mask_cstr2_layer->get_layer_group() != target_layer->get_layer_group() )
+      LayerManager::Instance()->get_layer_by_id( 
+        this->private_->mask_cstr2_layer_id_.value() ) );
+    if ( !mask_cstr2_layer || 
+      mask_cstr2_layer->get_layer_group() != target_layer->get_layer_group() )
     {
       context->report_error( "Layer '" + this->private_->mask_cstr2_layer_id_.value() +
         "' is not a valid mask constraint layer, will proceed as if no mask constraint 2." );
@@ -203,8 +211,9 @@ bool ActionFloodFill::validate( Core::ActionContextHandle& context )
     }
     else
     {
-      this->private_->mask_cstr2_slice_.handle().reset( new Core::MaskVolumeSlice(
-        mask_cstr2_layer->get_mask_volume(), slice_type, this->private_->slice_number_.value() ) );
+      this->private_->mask_cstr2_slice_.reset( new Core::MaskVolumeSlice(
+        mask_cstr2_layer->get_mask_volume(), slice_type, 
+        this->private_->slice_number_.value() ) );
     }
   }
 
@@ -215,15 +224,15 @@ bool ActionFloodFill::validate( Core::ActionContextHandle& context )
     return false;
   }
   
-  int nx = static_cast< int >( volume_slice->nx() );
-  int ny = static_cast< int >( volume_slice->ny() );
+  int nx = static_cast< int >( this->private_->vol_slice_->nx() );
+  int ny = static_cast< int >( this->private_->vol_slice_->ny() );
   this->private_->seeds_2d_.clear();
   for ( size_t i = 0; i < seeds.size(); ++i )
   {
     double world_x, world_y;
-    volume_slice->project_onto_slice( seeds[ i ], world_x, world_y );
+    this->private_->vol_slice_->project_onto_slice( seeds[ i ], world_x, world_y );
     int x, y;
-    volume_slice->world_to_index( world_x, world_y, x, y );
+    this->private_->vol_slice_->world_to_index( world_x, world_y, x, y );
     if ( x >= 0 && x < nx && y >= 0 && y < ny )
     {
       this->private_->seeds_2d_.push_back( std::make_pair( x, y ) );
@@ -241,7 +250,7 @@ bool ActionFloodFill::validate( Core::ActionContextHandle& context )
 
 bool ActionFloodFill::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
-  Core::MaskVolumeSliceHandle volume_slice = this->private_->vol_slice_.handle();
+  Core::MaskVolumeSliceHandle volume_slice = this->private_->vol_slice_;
   int nx = static_cast< int >( volume_slice->nx() );
   int ny = static_cast< int >( volume_slice->ny() );
   unsigned char mask_value = volume_slice->get_mask_data_block()->get_mask_value();
@@ -250,20 +259,20 @@ bool ActionFloodFill::run( Core::ActionContextHandle& context, Core::ActionResul
   std::vector< unsigned char > data_cstr( nx * ny, 1 );
   std::vector< unsigned char > mask_cstr1( nx * ny, 1 );
   std::vector< unsigned char > mask_cstr2( nx * ny, 1 );
-  if ( this->private_->data_cstr_slice_.handle() )
+  if ( this->private_->data_cstr_slice_ )
   {
-    this->private_->data_cstr_slice_.handle()->create_threshold_mask( data_cstr,
+    this->private_->data_cstr_slice_->create_threshold_mask( data_cstr,
       this->private_->min_val_.value(), this->private_->max_val_.value(), 
       this->private_->negative_data_cstr_.value() );
   }
-  if ( this->private_->mask_cstr1_slice_.handle() )
+  if ( this->private_->mask_cstr1_slice_ )
   {
-    this->private_->mask_cstr1_slice_.handle()->copy_slice_data( mask_cstr1,
+    this->private_->mask_cstr1_slice_->copy_slice_data( mask_cstr1,
       this->private_->negative_mask_cstr1_.value() );
   }
-  if ( this->private_->mask_cstr2_slice_.handle() )
+  if ( this->private_->mask_cstr2_slice_ )
   {
-    this->private_->mask_cstr2_slice_.handle()->copy_slice_data( mask_cstr2,
+    this->private_->mask_cstr2_slice_->copy_slice_data( mask_cstr2,
       this->private_->negative_mask_cstr2_.value() );
   }
 
@@ -303,9 +312,9 @@ bool ActionFloodFill::run( Core::ActionContextHandle& context, Core::ActionResul
 
     for ( size_t i = 0; i < this->private_->seeds_2d_.size(); ++i )
     {
-      if ( !this->private_->data_cstr_slice_.handle() &&
-        !this->private_->mask_cstr1_slice_.handle() &&
-        !this->private_->mask_cstr2_slice_.handle() )
+      if ( !this->private_->data_cstr_slice_ &&
+        !this->private_->mask_cstr1_slice_ &&
+        !this->private_->mask_cstr2_slice_ )
       {
         Core::FloodFill( slice_cache, nx, ny, this->private_->seeds_2d_[ i ].first,
           this->private_->seeds_2d_[ i ].second, fill_value );
@@ -327,6 +336,15 @@ bool ActionFloodFill::run( Core::ActionContextHandle& context, Core::ActionResul
   volume_slice->release_cached_data();
 
   return true;
+}
+
+void ActionFloodFill::clear_cache()
+{
+  this->private_->data_cstr_slice_.reset();
+  this->private_->mask_cstr1_slice_.reset();
+  this->private_->mask_cstr2_slice_.reset();
+  this->private_->vol_slice_.reset();
+  this->private_->seeds_2d_.clear();
 }
 
 void ActionFloodFill::Dispatch( Core::ActionContextHandle context, 

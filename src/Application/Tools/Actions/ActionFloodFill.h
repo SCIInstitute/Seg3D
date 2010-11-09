@@ -81,8 +81,17 @@ public:
   ActionFloodFill();
   virtual ~ActionFloodFill();
 
+  // VALIDATE:
+  // Validate the action
   virtual bool validate( Core::ActionContextHandle& context );
+
+  // RUN:
+  // Run the action
   virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
+
+  // CLEAR_CACHE:
+  // Clear any intermediate objects that were created between dispatch and run.
+  virtual void clear_cache();
 
 private:
   ActionFloodFillPrivateHandle private_;

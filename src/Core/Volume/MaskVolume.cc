@@ -99,6 +99,7 @@ DataBlock::generation_type MaskVolume::register_data( DataBlock::generation_type
   {
     if ( this->mask_data_block_->get_data_block()->get_generation() != -1 )
     {
+      MaskDataBlock::lock_type lock( this->mask_data_block_->get_mutex() );
       this->mask_data_block_->increase_generation();
     }
     else

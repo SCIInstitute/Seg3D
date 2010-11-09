@@ -196,7 +196,7 @@ public:
 
   // CLEAR_CACHE:
   // Clear any objects that were given as a short cut to improve performance.
-  void clear_cache();
+  virtual void clear_cache();
 
 private:
 
