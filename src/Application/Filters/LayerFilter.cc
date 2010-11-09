@@ -201,7 +201,9 @@ void LayerFilter::connect_abort( const  LayerHandle& layer )
 
 void LayerFilter::report_error( const std::string& error )
 {
-  this->private_->error_ = this->get_filter_name() +": " + error;
+  std::string filter_error = this->get_filter_name() +": " + error;
+  CORE_LOG_ERROR( filter_error );
+  this->private_->error_ = filter_error;
 }
 
 bool LayerFilter::find_layer( const std::string& layer_id, LayerHandle& layer )

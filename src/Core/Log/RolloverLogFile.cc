@@ -93,7 +93,6 @@ void RolloverLogFilePrivate::log_message( unsigned int type, std::string message
   }
 }
 
-// TODO: Examine code for threading and performance
 void RolloverLogFilePrivate::rollover_log_files()
 {
   lock_type lock( this->get_mutex() );
