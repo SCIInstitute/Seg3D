@@ -220,8 +220,6 @@ void ProjectManager::new_project( const std::string& project_name, const std::st
     path = path / project_name;
 
     std::vector< std::string > empty_vector;
-//    this->current_project_->set_project_path( path );
-//    this->current_project_path_state_->set( project_path );
     this->set_project_path( path );
     this->current_project_->sessions_state_->set( empty_vector );
     this->current_project_->project_notes_state_->set( empty_vector );
@@ -563,12 +561,31 @@ Seg3D::ProjectHandle ProjectManager::get_current_project() const
 
 bool ProjectManager::project_save_as( const std::string& export_path, const std::string& project_name )
 {
+  this->changing_projects_ = true;
+  
   boost::filesystem::path path = complete( boost::filesystem::path( export_path.c_str(), 
     boost::filesystem::native ) );
 
   this->create_project_folders( path, project_name );
   this->save_project_only( export_path, project_name );
-  return this->current_project_->save_as( path, project_name );
+  if( !this->current_project_->save_as( path, project_name ) ) return false;
+  
+  this->set_project_path( path / project_name );
+  this->current_project_->project_name_state_->set( project_name );
+  
+  this->set_last_saved_session_time_stamp();
+
+  StatusBar::Instance()->set_message( Core::LogMessageType::MESSAGE_E, 
+    "'Save As' has been successfully completed." );
+
+  this->set_last_saved_session_time_stamp();
+  AutoSave::Instance()->recompute_auto_save();
+  
+  this->changing_projects_ = true;
+  
+  this->add_to_recent_projects( export_path, project_name );
+  
+  return true;
 }
 
 
