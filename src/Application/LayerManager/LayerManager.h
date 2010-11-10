@@ -149,7 +149,7 @@ public:
 
   // MOVE_LAYER_BELOW:
   // this function returns true when it has successfully inserted a layer above another layer
-  bool move_layer_below(  LayerHandle layer_to_move, LayerHandle target_layer );
+  bool move_layer_below( const std::string& layer_id, const std::string& group_id );
 
   // DELETE_LAYERS:
   // this function deletes the selected layers in the group that is passed

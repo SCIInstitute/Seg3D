@@ -118,10 +118,14 @@ protected:
   // Inserts a layer in the correct position
   void insert_layer( LayerHandle new_layer );
 
-  // INSERT_LAYER_ABOVE:
+  // MOVE_LAYER_ABOVE:
   // Inserts a layer above a certain layer
     void move_layer_above( LayerHandle layer_above, LayerHandle layer_below );
-  
+    
+  // MOVE_LAYER_BELOW:
+  // Inserts a layer at the appropriate bottom-most position
+  void move_layer_below( LayerHandle layer );
+    
   // DELETE_LAYER:
   // Delete a layer from the list
   void delete_layer( LayerHandle layer );

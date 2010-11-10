@@ -64,6 +64,9 @@ bool ActionNewMaskLayer::run( Core::ActionContextHandle& context, Core::ActionRe
 
   // Register the new layer with the LayerManager. This will insert it into the right group.
   LayerManager::Instance()->insert_layer( new_mask_layer );
+  
+  // Now we make it active
+  LayerManager::Instance()->set_active_layer( new_mask_layer );
 
   // Create an undo item for this action
   LayerUndoBufferItemHandle item( new LayerUndoBufferItem( "New Mask" ) );

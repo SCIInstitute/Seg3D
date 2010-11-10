@@ -37,16 +37,34 @@ namespace Seg3D
 {
 
 OverlayWidget::OverlayWidget( QWidget *parent ) 
-  : QWidget( parent )
+  : QWidget( parent ),
+  color_( QColor( 0, 0, 0, 0 ) )
 {
-  setPalette( Qt::transparent );
   QSizePolicy size_policy( QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding );
   this->setSizePolicy( size_policy );
-  
 }
 
 OverlayWidget::~OverlayWidget()
 {
 }
-    
+
+void OverlayWidget::paintEvent( QPaintEvent * event )
+{
+  QPainter painter( this );
+  painter.fillRect( this->rect(), this->color_ );
+}
+
+void OverlayWidget::set_transparent( bool transparent )
+{
+  if( transparent )
+  {
+    this->color_ = QColor( 0, 0, 0, 0 );
+  }
+  else
+  {
+    this->color_ = QColor( 100, 100, 100, 150 );
+  }
+}
+
+
 } // end namespace Seg3D

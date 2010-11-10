@@ -94,6 +94,7 @@ AppSplash::AppSplash( QWidget *parent ) :
   
   connect( this, SIGNAL( dialog_closed() ), this->parentWidget(), SLOT( close() ) );
 
+  this->private_->ui_.new_project_button_->setFocus();
 }
 
 AppSplash::~AppSplash()

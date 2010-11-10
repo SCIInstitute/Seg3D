@@ -304,10 +304,7 @@ bool LayerManager::move_layer_above( LayerHandle layer_to_move, LayerHandle targ
     lock_type lock( this->get_mutex() );
       
     if( !layer_to_move || !target_layer ) return false;
-    
-    if ( !validate_layer_move( layer_to_move, target_layer ) )
-      return false;
-    
+
     group_above = layer_to_move->get_layer_group();
     group_below = target_layer->get_layer_group();
     
@@ -353,9 +350,66 @@ bool LayerManager::move_layer_above( LayerHandle layer_to_move, LayerHandle targ
   return true;  
 }
 
-bool LayerManager::move_layer_below( LayerHandle layer_to_move, LayerHandle target_layer )
+bool LayerManager::move_layer_below( const std::string& layer_id, const std::string& group_id )
 {
-  return true;  
+  // we will need to keep track of a few things outside of the locked scope
+  // This keeps track of whether or not we delete the group we are moving from
+  bool group_above_has_been_deleted = false;
+  bool layer_has_changed_groups = false;
+
+  // These handles will let us send signals after we make the moves
+  LayerGroupHandle from_group;
+  LayerGroupHandle to_group;
+  LayerHandle layer = this->get_layer_by_id( layer_id );
+
+  {
+    // Get the Lock
+    lock_type lock( this->get_mutex() );
+
+    from_group = this->get_layer_by_id( layer_id )->get_layer_group();
+    to_group = this->get_layer_group( group_id );
+
+    // First we Delete the Layer from its list of layers
+    from_group->delete_layer( layer );
+    
+    to_group->move_layer_below( layer );
+
+    // If they are in the same group ---
+    if( from_group != to_group )
+    {
+      // If the group we are removing the layer from is empty we remove it
+      //  from the list of groups and signal the GUI
+      if( from_group->get_layer_list().empty() )
+      {   
+        this->private_->group_list_.remove( from_group );
+        group_above_has_been_deleted = true;
+      }
+      // Set the weak handle in the layer we've inserted to the proper group
+      layer->set_layer_group( to_group );
+      layer_has_changed_groups = true;
+    }
+
+    if( layer_has_changed_groups )
+    {
+      this->group_internals_changed_signal_( from_group );
+      this->group_internals_changed_signal_( to_group );
+    }
+    else
+    {
+      this->group_internals_changed_signal_( from_group );
+    }
+
+    if( group_above_has_been_deleted )
+    {
+      group_deleted_signal_( from_group );
+      this->groups_changed_signal_();
+    } 
+  } // We release the lock  here.
+
+  this->layers_changed_signal_();
+  this->layers_reordered_signal_();
+
+  return true;    
 }
 
 // Here is the logic for inserting a layer

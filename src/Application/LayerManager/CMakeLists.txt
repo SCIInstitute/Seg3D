@@ -34,18 +34,18 @@
 SET(APPLICATION_LAYERMANAGER_SRCS
   LayerAvailabilityNotifier.h
   LayerAvailabilityNotifier.cc
-    LayerManager.h
-    LayerManager.cc
+  LayerManager.h
+  LayerManager.cc
   LayerScene.h
-    LayerCheckPoint.h
-    LayerCheckPoint.cc
-    LayerUndoBufferItem.h
-    LayerUndoBufferItem.cc
-    LayerUndoBuffer.h
-    LayerUndoBuffer.cc
+  LayerCheckPoint.h
+  LayerCheckPoint.cc
+  LayerUndoBufferItem.h
+  LayerUndoBufferItem.cc
+  LayerUndoBuffer.h
+  LayerUndoBuffer.cc
   Actions/ActionLayer.h
   Actions/ActionLayer.cc
-  )
+)
 
 SET(APPLICATION_LAYERMANAGER_ACTIONS_SRCS
   Actions/ActionActivateLayer.h
@@ -66,6 +66,8 @@ SET(APPLICATION_LAYERMANAGER_ACTIONS_SRCS
   Actions/ActionMoveGroupAbove.cc
   Actions/ActionMoveLayerAbove.h
   Actions/ActionMoveLayerAbove.cc
+  Actions/ActionMoveLayerBelow.h
+  Actions/ActionMoveLayerBelow.cc
   Actions/ActionNewMaskLayer.h
   Actions/ActionNewMaskLayer.cc
   Actions/ActionRedo.h

@@ -49,9 +49,11 @@
 #include <Application/Layer/DataLayer.h>
 #include <Application/Layer/MaskLayer.h>
 #include <Application/Layer/LayerGroup.h>
+#include <Application/LayerManager/LayerManager.h>
 #include <Application/LayerManager/Actions/ActionDeleteLayers.h>
 #include <Application/LayerManager/Actions/ActionNewMaskLayer.h>
 #include <Application/LayerManager/Actions/ActionMoveGroupAbove.h>
+#include <Application/LayerManager/Actions/ActionMoveLayerBelow.h>
 #include <Application/ViewerManager/ViewerManager.h>
 
 
@@ -66,9 +68,15 @@ public:
   
   Ui::LayerGroupWidget ui_;
   DropSpaceWidget* drop_space_;
+  DropSpaceWidget* layer_slot_;
   OverlayWidget* overlay_;
+  OverlayWidget* button_overlay_;
+  
+  std::string layer_to_drop_;
 
   int group_height;
+  LayerGroupWidget* drop_group_;
+  bool drop_group_set_;
 
   QButtonGroup* iso_quality_button_group_;
 };
@@ -77,14 +85,15 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   QWidget( parent ),
   private_( new LayerGroupWidgetPrivate ),
   group_menus_open_( false ),
-  picked_up_( false ),
-  drop_group_set_( false )
+  picked_up_( false )
 { 
     this->private_->group_ = group;
 
   this->private_->ui_.setupUi( this );
   
   this->group_id_ = this->private_->group_->get_group_id();
+  
+  this->private_->drop_group_set_ = false;
   
   // Set up the Drag and Drop
   this->setAcceptDrops( true );
@@ -103,8 +112,11 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
 
   this->private_->drop_space_ = new DropSpaceWidget( this, 105 );
   this->private_->ui_.verticalLayout_12->insertWidget( 0, this->private_->drop_space_ );
-  
   this->private_->drop_space_->hide();
+  
+  this->private_->layer_slot_ = new DropSpaceWidget( this );
+  this->private_->ui_.verticalLayout->insertWidget( 0, this->private_->layer_slot_ );
+  this->private_->layer_slot_->hide();
   
   // Add isosurface quality radio buttons to QButtonGroup so that QtButtonGroupConnector can be
   // used to connect the buttons directly to a state variable.
@@ -159,15 +171,16 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   this->private_->ui_.verticalLayout_10->setAlignment( Qt::AlignTop );
 
   this->private_->overlay_ = new OverlayWidget( this );
-  this->private_->overlay_->setStyleSheet( 
-    QString::fromUtf8( "background-color: rgba( 255, 0, 0, 200 )" ) );
-  this->private_->overlay_->hide(); 
+  this->private_->overlay_->hide();
+  
+  this->private_->button_overlay_ = new OverlayWidget( this->private_->ui_.widget );  
+  this->private_->button_overlay_->hide();
 
   this->private_->ui_.fake_widget_->setMinimumHeight( 0 );
   this->private_->ui_.fake_widget_->hide();
   
   this->private_->ui_.group_dummy_->hide();
-
+  
   this->private_->group_height = this->private_->ui_.tools_and_layers_widget_->height();
 }
 
@@ -190,7 +203,7 @@ void LayerGroupWidget::mousePressEvent( QMouseEvent *event )
 
   // Make up some mimedata containing the layer_id of the layer
   QMimeData *mimeData = new QMimeData;
-  mimeData->setText(QString::fromStdString( std::string( "group|" ) +  this->get_group_id() ) );
+  mimeData->setText( QString::fromStdString( this->get_group_id() ) );
 
   // Create a drag object and insert the hotspot
   QDrag *drag = new QDrag( this );
@@ -206,88 +219,87 @@ void LayerGroupWidget::mousePressEvent( QMouseEvent *event )
   Q_EMIT prep_groups_for_drag_and_drop_signal_( true );
   Q_EMIT picked_up_group_size_signal_( this->height() - 2 );
   
-  // Finally if our drag was aborted then we reset the layers styles to be visible
+  // If our drag was successful then we do stuff
   if( ( ( drag->exec( Qt::MoveAction, Qt::MoveAction ) ) == Qt::MoveAction ) 
-     && this->drop_group_set_ )
+    && ( this->private_->drop_group_set_ ) )
   {
     ActionMoveGroupAbove::Dispatch( Core::Interface::GetWidgetActionContext(), 
-      this->get_group_id(), this->drop_group_->get_group_id() );
+      this->get_group_id(), this->private_->drop_group_->get_group_id() );
   }
   else
   {
     this->seethrough( false );
   }
 
-  this->drop_group_set_ = false;
-  this->private_->overlay_->hide();
+  this->private_->drop_group_set_ = false;
+  this->enable_drop_space( false );
+  this->private_->layer_to_drop_ = "";
   
   Q_EMIT prep_groups_for_drag_and_drop_signal_( false );
 }
 
 void LayerGroupWidget::set_drop_target( LayerGroupWidget* target_group)
 {
-  this->drop_group_ = target_group;
-  this->drop_group_set_ = true;
+  this->private_->drop_group_ = target_group;
+  this->private_->drop_group_set_ = true;
 }
 
 void LayerGroupWidget::dropEvent( QDropEvent* event )
 {
-  std::vector<std::string> mime_data = 
-    Core::SplitString( event->mimeData()->text().toStdString(), "|" );
+  this->enable_drop_space( false );
+  this->private_->button_overlay_->hide();
   
-  if( mime_data.size() < 2 ) 
+  std::string drop_item_id = event->mimeData()->text().toStdString();
+  
+  if( ( this->get_group_id() != drop_item_id ) && ( LayerManager::Instance()->get_layer_group( drop_item_id ) ) ) 
   {
-    this->enable_drop_space( false );
+    dynamic_cast< LayerGroupWidget* >( event->source() )->set_drop_target( this ); 
+    event->setDropAction( Qt::MoveAction );
+    event->accept();
     return;
   }
-
-  if( ( this->get_group_id() == mime_data[ 1 ] ) || ( mime_data[ 0 ] != "group" ) )
+  else if ( LayerManager::Instance()->get_layer_by_id( drop_item_id ) )
   {
-    this->enable_drop_space( false );
-    event->ignore();
+    ActionMoveLayerBelow::Dispatch( Core::Interface::GetWidgetActionContext(), 
+      drop_item_id, this->get_group_id() );
+    this->private_->drop_space_->instant_hide();
+    event->setDropAction( Qt::MoveAction );
+    event->accept();
     return;
   }
-
-  if( this->group_menus_open_ )
-  {
-    this->enable_drop_space( false );
-    return;
-  }
-
-  this->private_->overlay_->hide();
-
-  dynamic_cast< LayerGroupWidget* >( event->source() )->set_drop_target( this ); 
-  event->setDropAction(Qt::MoveAction);
-  event->accept();
+  event->ignore();
 }
 
 void LayerGroupWidget::dragEnterEvent( QDragEnterEvent* event)
 {
-  this->private_->overlay_->show();
+  std::string drop_item_id = event->mimeData()->text().toStdString();
 
-  std::vector<std::string> mime_data = 
-    Core::SplitString( event->mimeData()->text().toStdString(), "|" );
-  
-  if( mime_data.size() < 2 ) return;
-
-  if( ( this->get_group_id() != mime_data[ 0 ] ) && ( mime_data[ 0 ] == "group" ) )
+  if( ( this->get_group_id() != drop_item_id ) && ( LayerManager::Instance()->get_layer_group( drop_item_id ) ) ) 
   {
     this->enable_drop_space( true );
-    event->setDropAction(Qt::MoveAction);
+    event->setDropAction( Qt::MoveAction );
     event->accept();
+    return;
   }
-  else
+  else if ( ( LayerManager::Instance()->get_layer_by_id( drop_item_id ) ) && (
+    ( this->private_->ui_.buttons_ == this->childAt( event->pos() ) ) || 
+    ( this->private_->button_overlay_ == this->childAt( event->pos() ) ) ) )
   {
-    this->enable_drop_space( false );
-    this->private_->overlay_->hide();
-    event->ignore();
+    this->private_->layer_slot_->show();
+    this->private_->button_overlay_->show();
+    event->accept();
+    return;
   }
+
+  this->enable_drop_space( false );
+  this->private_->button_overlay_->hide();
+  event->ignore();
+
 }
 
 void LayerGroupWidget::dragLeaveEvent( QDragLeaveEvent* event )
 {
   this->enable_drop_space( false );
-  this->private_->overlay_->hide();
 }
 
 void LayerGroupWidget::seethrough( bool see )
@@ -316,10 +328,14 @@ void LayerGroupWidget::enable_drop_space( bool drop )
   if( drop )
   {
     this->private_->drop_space_->show();
+    this->private_->overlay_->show();
   }
   else
   {
+    this->private_->layer_slot_->hide();
     this->private_->drop_space_->hide();
+    this->private_->overlay_->hide();
+    
   }
 } 
   
@@ -402,6 +418,7 @@ void LayerGroupWidget::hide_group()
 void LayerGroupWidget::resizeEvent( QResizeEvent *event )
 {
   this->private_->overlay_->resize( event->size() );
+  this->private_->button_overlay_->resize( this->private_->ui_.widget->size() );
   event->accept();
 }
   

@@ -28,20 +28,32 @@
 
 
 #include <Application/LayerManager/LayerManager.h>
-#include <Application/LayerManager/Actions/ActionMoveGroupAbove.h>
+#include <Application/LayerManager/Actions/ActionMoveLayerBelow.h>
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
-CORE_REGISTER_ACTION( Seg3D, MoveGroupAbove )
+CORE_REGISTER_ACTION( Seg3D, MoveLayerBelow )
 
 namespace Seg3D
 {
   
-bool ActionMoveGroupAbove::validate( Core::ActionContextHandle& context )
+bool ActionMoveLayerBelow::validate( Core::ActionContextHandle& context )
 {
-  if( !LayerManager::Instance()->get_layer_group( this->group_to_move_id_.value() ) ||
-    !LayerManager::Instance()->get_layer_group( this->group_below_id_.value() ) )
+  if( !LayerManager::Instance()->get_layer_by_id( this->layer_.value() ) )
+  {
+    if( LayerManager::Instance()->get_layer_by_name( this->layer_.value() ) )
+    {
+      this->layer_.value() = LayerManager::Instance()->get_layer_by_name( 
+        this->layer_.value() )->get_layer_id();
+    }
+    else
+    {
+      return false;
+    }
+  }
+
+  if( !LayerManager::Instance()->get_layer_group( this->group_id_.value() ) )
   {
     return false;
   }
@@ -49,32 +61,32 @@ bool ActionMoveGroupAbove::validate( Core::ActionContextHandle& context )
   return true;
 }
 
-bool ActionMoveGroupAbove::run( Core::ActionContextHandle& context, 
-                 Core::ActionResultHandle& result )
+bool ActionMoveLayerBelow::run( Core::ActionContextHandle& context, 
+  Core::ActionResultHandle& result )
 {
-  return LayerManager::Instance()->move_group_above( this->group_to_move_id_.value(),
-    this->group_below_id_.value() );
+  return LayerManager::Instance()->move_layer_below( this->layer_.value(),
+    this->group_id_.value() );
 }
 
-Core::ActionHandle ActionMoveGroupAbove::Create( const std::string& group_to_move_id, 
-  const std::string& group_below_id )
+Core::ActionHandle ActionMoveLayerBelow::Create( const std::string& layer, 
+  const std::string& group_id )
 {
   // Create new action
-  ActionMoveGroupAbove* action = new ActionMoveGroupAbove;
+  ActionMoveLayerBelow* action = new ActionMoveLayerBelow;
   
   // We need to fill in these to ensure the action can be replayed
-  action->group_below_id_.value() = group_below_id;
-  action->group_to_move_id_.value() = group_to_move_id;
+  action->layer_.value() = layer;
+  action->group_id_.value() = group_id;
   
   // Post the new action
   return Core::ActionHandle( action );
 }
 
 
-void ActionMoveGroupAbove::Dispatch( Core::ActionContextHandle context, 
-  const std::string& group_to_move_id, const std::string& group_below_id )
+void ActionMoveLayerBelow::Dispatch( Core::ActionContextHandle context, 
+  const std::string& layer, const std::string& group_id )
 {
-  Core::ActionDispatcher::PostAction( Create( group_to_move_id, group_below_id ), context );
+  Core::ActionDispatcher::PostAction( Create( layer, group_id ), context );
 }
   
 } // end namespace Seg3D

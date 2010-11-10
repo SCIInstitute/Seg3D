@@ -287,6 +287,26 @@ void LayerGroup::insert_layer( LayerHandle new_layer )
 
 void LayerGroup::move_layer_above( LayerHandle layer_above, LayerHandle layer_below )
 {
+  if( ( layer_above->get_type() == Core::VolumeType::DATA_E ) 
+    && ( layer_below->get_type() == Core::VolumeType::MASK_E ) )
+  {
+    for( layer_list_type::iterator i = this->layer_list_.begin(); 
+      i != this->layer_list_.end(); ++i )
+    {
+      if( ( *i )->get_type() == Core::VolumeType::DATA_E )
+      { 
+        this->layer_list_.insert( i, layer_above );
+        return;
+      }
+    }
+  }
+
+  if( layer_above->get_type() != layer_below->get_type() )
+  {
+    this->move_layer_below( layer_above );
+    return;
+  }
+
   for( layer_list_type::iterator i = this->layer_list_.begin(); 
     i != this->layer_list_.end(); ++i )
   {
@@ -295,6 +315,25 @@ void LayerGroup::move_layer_above( LayerHandle layer_above, LayerHandle layer_be
       this->layer_list_.insert( i, layer_above );
     }
   }
+}
+
+void LayerGroup::move_layer_below( LayerHandle layer )
+{
+  // if we are inserting a mask layer then we put it at the b
+  if( layer->get_type() == Core::VolumeType::MASK_E )
+  {
+    for( layer_list_type::iterator i = this->layer_list_.begin(); 
+      i != this->layer_list_.end(); ++i )
+    {
+      if( ( *i )->get_type() == Core::VolumeType::DATA_E )
+      { 
+        this->layer_list_.insert( i, layer);
+        return;
+      }
+    }
+  }
+
+  this->layer_list_.insert( this->layer_list_.end(), layer );
 }
 
 void LayerGroup::delete_layer( LayerHandle layer )

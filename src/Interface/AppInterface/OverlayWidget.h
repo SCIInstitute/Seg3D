@@ -42,6 +42,12 @@ class OverlayWidget : public QWidget
 public:
   OverlayWidget( QWidget *parent );
   virtual ~OverlayWidget();
+  
+  void set_transparent( bool transparent );
+  virtual void paintEvent( QPaintEvent * event );
+
+private:
+  QColor color_;
     
 };
   

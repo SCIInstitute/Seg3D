@@ -95,6 +95,7 @@ public:
   DropSpaceWidget* drop_space_;
   OverlayWidget* overlay_;
   LayerWidget* drop_layer_;
+  bool drop_layer_set_;
 
   // Local copy of state information 
   bool active_;
@@ -109,7 +110,6 @@ LayerWidgetPrivate::~LayerWidgetPrivate()
   this->disconnect_all();
 }
 
-
 LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   QWidget( parent ),
   private_( new LayerWidgetPrivate ),
@@ -122,6 +122,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   this->private_->active_ = false;
   this->private_->locked_ = false;
   this->private_->picked_up_ = false;
+  this->private_->drop_layer_set_ = false;
   
   // Store the icons in the private class, so they only need to be generated once
   this->private_->label_layer_icon_.addFile( QString::fromUtf8( ":/Images/LabelMapWhite.png" ),
@@ -731,7 +732,7 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
   if( ( event->modifiers() != Qt::ControlModifier ) && ( event->modifiers() != Qt::ShiftModifier ) )
   {
     ActionActivateLayer::Dispatch( Core::Interface::GetWidgetActionContext(),
-      LayerManager::Instance()->get_layer_by_id( this->get_layer_id() ) ); 
+      LayerManager::Instance()->get_layer_by_id( this->get_layer_id() ) );
     return;
   }
   
@@ -744,20 +745,7 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
   QMimeData *mimeData = new QMimeData;
 
   LayerHandle layer = this->private_->layer_;
-  switch ( layer->get_type() ) 
-  {
-  case Core::VolumeType::DATA_E:
-    mimeData->setText( QString::fromStdString( std::string("data|") + layer->get_layer_id() ) );
-    break;
-  case Core::VolumeType::MASK_E:
-    mimeData->setText( QString::fromStdString( std::string("mask|") + layer->get_layer_id() ) );
-    break;
-  case Core::VolumeType::LABEL_E:
-    mimeData->setText( QString::fromStdString( std::string("label|") + layer->get_layer_id() ) );
-    break;
-  default:
-    break;
-  }
+  mimeData->setText( QString::fromStdString( layer->get_layer_id() ) );
   
   // Create a drag object and insert the hotspot
   QDrag *drag = new QDrag( this );
@@ -775,10 +763,12 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
   Q_EMIT layer_size_signal_( this->height() - 2 );
   
   // Finally if our drag was aborted then we reset the layers styles to be visible
-  if( ( drag->exec(Qt::MoveAction, Qt::MoveAction) ) == Qt::MoveAction ) 
+  if( ( ( drag->exec(Qt::MoveAction, Qt::MoveAction) ) == Qt::MoveAction ) 
+    && ( this->private_->drop_layer_set_ ) )
   { 
     LayerGroupHandle dst_group = this->private_->drop_layer_->
       private_->layer_->get_layer_group();
+      
     if ( this->private_->layer_->get_layer_group() != dst_group )
     {
       this->seethrough( false );
@@ -806,7 +796,9 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
     this->seethrough( false );
   }
   
+  this->private_->drop_layer_set_ = false;
   Q_EMIT prep_for_drag_and_drop( false );
+  this->enable_drop_space( false );
   this->parentWidget()->setMinimumHeight( 0 );
   this->repaint();
 }
@@ -815,49 +807,37 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
 void LayerWidget::set_drop_target( LayerWidget* target_layer )
 {
   this->private_->drop_layer_ = target_layer;
+  this->private_->drop_layer_set_ = true;
 }
 
 void LayerWidget::dropEvent( QDropEvent* event )
 {
-  std::vector<std::string> mime_data = 
-    Core::SplitString( event->mimeData()->text().toStdString(), "|" );
-  if( mime_data.size() < 2 ) 
-  {
-    this->enable_drop_space( false );
-    return;
-  }
-
-  if( this->get_layer_id() == mime_data[ 1 ] )
+  if( !LayerManager::Instance()->get_layer_by_id( event->mimeData()->text().toStdString() ) )
   {
     this->enable_drop_space( false );
     event->ignore();
     return;
   }
-  
+
   dynamic_cast< LayerWidget* >( event->source() )->set_drop_target( this ); 
   event->setDropAction( Qt::MoveAction );
   event->accept();
+
 }
 
 void LayerWidget::dragEnterEvent( QDragEnterEvent* event)
 {
-  std::vector<std::string> mime_data = 
-    Core::SplitString( event->mimeData()->text().toStdString(), "|" );
-  if( mime_data.size() < 2 ) return;
+  std::string layer_id = event->mimeData()->text().toStdString();
 
-  if ( ( ( this->get_volume_type() == Core::VolumeType::DATA_E ) &&
-    ( mime_data[ 0 ] == "data" ) ) ||
-    ( ( this->get_volume_type() == Core::VolumeType::MASK_E || 
-      this->get_volume_type() == Core::VolumeType::LABEL_E ) &&
-    ( mime_data[ 0 ] == "mask" || mime_data[ 0 ] == "label" ) ) && 
-    ( this->get_layer_id() != mime_data[ 1 ] ) )
+  if( ( LayerManager::Instance()->get_layer_by_id( layer_id ) ) 
+    && ( this->get_layer_id() != layer_id ) )
+    //&& ( LayerManager::Instance()->get_layer_by_id( layer_id )->get_type() == this->get_volume_type() ) )
   {
     this->enable_drop_space( true );
-    event->setDropAction(Qt::MoveAction);
+    event->setDropAction( Qt::MoveAction );
     event->accept();
   }
-  else
-  {
+  else {
     this->enable_drop_space( false );
     event->ignore();
   }
@@ -872,17 +852,6 @@ void LayerWidget::dragLeaveEvent( QDragLeaveEvent* event )
 void LayerWidget::seethrough( bool see )
 {
   this->set_picked_up( see );
-  
-  if( see )
-  {
-
-    this->hide();
-  }
-  else
-  {
-    this->show();
-  }
-  //this->repaint();
 }
 
 void LayerWidget::set_picked_up( bool picked_up )
@@ -897,10 +866,12 @@ void LayerWidget::enable_drop_space( bool drop )
   
   if( this->private_->picked_up_ )
   {
-    this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_PICKED_UP_C );  
+    this->private_->overlay_->set_transparent( false );
+    this->private_->overlay_->show();
   }
   else if( drop )
   {
+    this->private_->overlay_->set_transparent( true );
     this->private_->overlay_->show();
     this->private_->drop_space_->show();
   }

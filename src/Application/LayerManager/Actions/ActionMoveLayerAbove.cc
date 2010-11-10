@@ -61,19 +61,19 @@ bool ActionMoveLayerAbove::validate( Core::ActionContextHandle& context )
 bool ActionMoveLayerAbove::run( Core::ActionContextHandle& context, 
                  Core::ActionResultHandle& result )
 {
-  if ( this->move_above_.value() )
-  { 
-    LayerManager::Instance()->move_layer_above( 
-      LayerManager::Instance()->get_layer_by_id( this->layer_to_move_id_.value() ),
-      LayerManager::Instance()->get_layer_by_id( this->target_layer_id_.value() ) );
-  }
-  else
-  {
-    LayerManager::Instance()->move_layer_below( 
-      LayerManager::Instance()->get_layer_by_id( this->layer_to_move_id_.value() ),
-      LayerManager::Instance()->get_layer_by_id( this->target_layer_id_.value() ) );  
-  }
-  return true;
+//  if ( this->move_above_.value() )
+//  { 
+  return LayerManager::Instance()->move_layer_above( 
+    LayerManager::Instance()->get_layer_by_id( this->layer_to_move_id_.value() ),
+    LayerManager::Instance()->get_layer_by_id( this->target_layer_id_.value() ) );
+/*  }*/
+//  else
+//  {
+//  return  LayerManager::Instance()->move_layer_below( 
+//      LayerManager::Instance()->get_layer_by_id( this->layer_to_move_id_.value() ),
+//      LayerManager::Instance()->get_layer_by_id( this->target_layer_id_.value() ) );  
+//  }
+//  return true;
 }
 
 Core::ActionHandle ActionMoveLayerAbove::Create( const std::string& layer_to_move_id, 
