@@ -63,6 +63,10 @@ Q_SIGNALS:
   // this function lets the LayerManagerWidget know what size the picked up layer is so that it
   // can notify the layers
   void layer_size_signal_( int );
+  
+  // SELECTION_BOX_CHANGED:
+  // this signal tells the group that the selection box's status has been changed
+  void selection_box_changed();
 
 // -- constructor/destructor --
 public:
@@ -147,6 +151,10 @@ public:
   // GET_LAYER_ID:
   // this function returns the id of the layer that the layerwidget represents
   std::string get_layer_id() const;
+  
+  // GET_SELECTED:
+  // funtion that returns whether or not the layer is selected.
+  bool get_selected() const;
 
 private:
     boost::shared_ptr< LayerWidgetPrivate > private_;

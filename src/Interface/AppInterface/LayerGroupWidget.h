@@ -168,7 +168,13 @@ private Q_SLOTS:
   // helper function for the show_layers function
   void hide_group();
   
+  // HIDE_SHOW_CHECKBOXES:
+  // hides or shows the checkboxes on the layers
   void hide_show_checkboxes();
+  
+  // ENABLE_DISABLE_DELETE_BUTTON:
+  // enables or disables the delete button based on whether or not there are any boxes selected
+  void enable_disable_delete_button();  
   
   
   

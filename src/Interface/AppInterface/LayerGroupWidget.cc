@@ -101,6 +101,8 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   // hide the tool bars 
   this->private_->ui_.iso_quality_->hide();
   this->private_->ui_.delete_->hide();
+  
+  this->private_->ui_.delete_button_->setEnabled( false );
 
 
   // set some values of the GUI
@@ -159,7 +161,7 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   
   QtUtils::QtBridge::Connect( this->private_->ui_.group_new_button_, 
     boost::bind( &ActionNewMaskLayer::Dispatch, 
-    Core::Interface::GetWidgetActionContext(), this->private_->group_ ) );
+    Core::Interface::GetWidgetActionContext(), this->private_->group_->get_group_id() ) );
 
   // --- ISOSURFACE---
   QtUtils::QtBridge::Connect( this->private_->iso_quality_button_group_, 
@@ -515,6 +517,9 @@ void LayerGroupWidget::handle_change()
         
       connect( new_layer_handle.data(), SIGNAL( layer_size_signal_( int ) ), 
         this, SIGNAL( picked_up_layer_size_signal_( int ) ) );
+        
+      connect( new_layer_handle.data(), SIGNAL( selection_box_changed() ),
+        this, SLOT( enable_disable_delete_button() ) );
       
     }
     index++;
@@ -559,6 +564,21 @@ void LayerGroupWidget::hide_show_checkboxes()
     ( *it ).second->set_check_selected( this->private_->ui_.select_all_button_->isChecked() );
   }
 }
+
+void LayerGroupWidget::enable_disable_delete_button()
+{
+  for( std::map< std::string, LayerWidgetQHandle >::iterator it = this->layer_map_.begin(); 
+    it != this->layer_map_.end(); ++it )
+  {
+    if( ( *it ).second->get_selected() )
+    {
+      this->private_->ui_.delete_button_->setEnabled( true );
+      return;
+    }
+  }
+  this->private_->ui_.delete_button_->setEnabled( false );
+}
+
 
 
 

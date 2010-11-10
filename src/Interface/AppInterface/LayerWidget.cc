@@ -236,6 +236,10 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
     QtUtils::QtBridge::Connect( this->private_->ui_.selection_checkbox_, 
       layer->selected_state_ );
       
+    // now connect it to a signal that 
+    connect( this->private_->ui_.selection_checkbox_, SIGNAL( stateChanged( int ) ), this, 
+      SIGNAL( selection_box_changed() ) );
+      
     // Connect the label to the layer name state variable 
     QtUtils::QtBridge::Connect( this->private_->ui_.label_, layer->name_state_ );
 
@@ -1036,6 +1040,11 @@ void LayerWidget::UpdateProgress( qpointer_type qpointer, double progress )
     qpointer->update_progress_bar( progress );
     qpointer->update();
   }
+}
+
+bool LayerWidget::get_selected() const
+{
+  return this->private_->ui_.selection_checkbox_->isChecked();
 }
 
 

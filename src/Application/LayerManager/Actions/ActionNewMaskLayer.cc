@@ -47,7 +47,8 @@ bool ActionNewMaskLayer::validate( Core::ActionContextHandle& context )
   // TODO: 
   // THis code needs updating, this is not up to standard
   // --JS
-  if ( !this->cache_group_handle( context, this->group_id_, this->group_ ) ) return false;
+  //if ( !this->cache_group_handle( context, this->group_id_, this->group_ ) ) return false;
+  if( !LayerManager::Instance()->get_layer_group( this->group_id_.value() ) ) return false; 
   
   return true; // validated
 }
@@ -56,8 +57,8 @@ bool ActionNewMaskLayer::run( Core::ActionContextHandle& context, Core::ActionRe
 { 
   // Create a new mask volume.
   Core::MaskVolumeHandle new_mask_volume;
-  Core::MaskVolume::CreateEmptyMask( this->group_.handle()->get_grid_transform(),
-    new_mask_volume );
+  Core::MaskVolume::CreateEmptyMask( LayerManager::Instance()->get_layer_group( 
+    this->group_id_.value() )->get_grid_transform(), new_mask_volume );
   
   // Create a new container to put it in.
   LayerHandle new_mask_layer( new MaskLayer( "MaskLayer", new_mask_volume ) );
@@ -77,19 +78,17 @@ bool ActionNewMaskLayer::run( Core::ActionContextHandle& context, Core::ActionRe
   return true;
 }
 
-Core::ActionHandle ActionNewMaskLayer::Create( LayerGroupHandle group )
+Core::ActionHandle ActionNewMaskLayer::Create( const std::string& group_id )
 {
   ActionNewMaskLayer* action = new ActionNewMaskLayer;
-  
-  action->group_.handle() = group;
-  action->group_id_.value() = group->get_group_id();
+  action->group_id_.value() = group_id;
   
   return Core::ActionHandle( action );
 }
 
-void ActionNewMaskLayer::Dispatch( Core::ActionContextHandle context, LayerGroupHandle group )
+void ActionNewMaskLayer::Dispatch( Core::ActionContextHandle context, const std::string& group_id )
 {
-  Core::ActionDispatcher::PostAction( Create( group ), context );
+  Core::ActionDispatcher::PostAction( Create( group_id ), context );
 }
 
 } // end namespace Seg3D

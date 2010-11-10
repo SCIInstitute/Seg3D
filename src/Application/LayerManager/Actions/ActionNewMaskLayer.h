@@ -54,7 +54,7 @@ public:
   ActionNewMaskLayer()
   {
     this->add_argument( group_id_);
-    this->add_cachedhandle( group_ );
+    //this->add_cachedhandle( group_ );
   }
   
   virtual ~ActionNewMaskLayer()
@@ -72,17 +72,17 @@ private:
   Core::ActionParameter< std::string > group_id_;
   
   //  A short cut to where the layer group
-  Core::ActionCachedHandle< LayerGroupHandle > group_;
+  //Core::ActionCachedHandle< LayerGroupHandle > group_;
 
   // -- Dispatch this action from the interface --
 public:
   // CREATE:
   // Create action that moves the layer above
-  static Core::ActionHandle Create( LayerGroupHandle group );
+  static Core::ActionHandle Create( const std::string& group_id );
   
   // DISPATCH:
   // Dispatch action that creates a new mask layer 
-  static void Dispatch( Core::ActionContextHandle context, LayerGroupHandle group );
+  static void Dispatch( Core::ActionContextHandle context, const std::string& group_id );
 };
   
 } // end namespace Seg3D
