@@ -282,14 +282,14 @@ public:
         {
           for ( size_t j = 0; j < size; j++ )
           {
-            if ( ! ( mask_data[ j ] & mask_value ) ) lut[ data[ j ] ] = 1;
+            if ( ! ( mask_data[ j ] & mask_value ) && data[ j ] ) lut[ data[ j ] ] = 1;
           }     
         }
         else
         {
           for ( size_t j = 0; j < size; j++ )
           {
-            if ( ( mask_data[ j ] & mask_value ) ) lut[ data[ j ] ] = 1;
+            if ( ( mask_data[ j ] & mask_value ) && data[ j ] ) lut[ data[ j ] ] = 1;
           }           
         
         }
@@ -361,14 +361,14 @@ public:
         {
           for ( size_t j = 0; j < size; j++ )
           {
-            if ( ! ( mask_data[ j ] & mask_value ) ) lut[ data[ j ] ] = 1;
+            if ( ! ( mask_data[ j ] & mask_value && data[ j ] ) ) lut[ data[ j ] ] = 1;
           }     
         }
         else
         {
           for ( size_t j = 0; j < size; j++ )
           {
-            if ( ( mask_data[ j ] & mask_value ) ) lut[ data[ j ] ] = 1;
+            if ( ( mask_data[ j ] & mask_value && data[ j ] ) ) lut[ data[ j ] ] = 1;
           }           
         
         }

@@ -88,6 +88,16 @@ public:
   // Get the size of the data in bytes
   virtual size_t get_byte_size() const;
   
+  // -- slice handling --
+public: 
+  // INSERT_SLICE:
+  // Insert a slice into the volume
+  bool insert_slice( const MaskDataSliceHandle slice );
+  
+  // EXTRACT_SLICE:
+  // Extract a slice from the volume
+  bool extract_slice( SliceType type, MaskDataBlock::index_type index, MaskDataSliceHandle& slice );
+    
   // -- functions for creating MaskVolumes --
 public: 
 

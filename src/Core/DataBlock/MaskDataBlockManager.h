@@ -153,16 +153,6 @@ public:
   // Create a mask from each label in integer data
   static bool CreateMaskFromLabelData( const DataBlockHandle& data, 
     const GridTransform& grid_transform, std::vector<MaskDataBlockHandle>& masks );
-    
-  // GETSLICE
-  // Get a slice from a mask data block
-  static bool GetSlice( const MaskDataBlockHandle& volume_data_block, 
-    MaskDataBlockHandle& slice_data_block, int slice, int axis );
-
-  // PUTSLICE:
-  // Put a slice into a volume data set.  
-  static bool PutSlice( const MaskDataBlockHandle& slice_data_block, 
-    const MaskDataBlockHandle& volume_data_block, int slice, int axis );
 
 };
 

@@ -1398,6 +1398,119 @@ void LayerManager::DispatchInsertVolumeIntoLayer( LayerHandle layer,
   }
 }
 
+void LayerManager::DispatchInsertDataSliceIntoLayer( DataLayerHandle layer,
+    Core::DataSliceHandle data,  filter_key_type key )
+{
+  // Move this request to the Application thread
+  if ( !( Core::Application::IsApplicationThread() ) )
+  {
+    Core::Application::PostEvent( boost::bind( 
+      &LayerManager::DispatchInsertDataSliceIntoLayer, layer, data, key ) );
+    return;
+  }
+  
+  // Only do work if the unique key is a match
+  if ( layer->check_filter_key( key ) )
+  {
+    Core::DataVolumeHandle data_volume = layer->get_data_volume();
+    if ( !data_volume ) return;
+
+    if ( data_volume->insert_slice( data ) )
+    {
+      LayerManager::Instance()->layer_volume_changed_signal_( layer );
+      LayerManager::Instance()->layers_changed_signal_();
+    }
+  }
+}
+
+void LayerManager::DispatchInsertDataSlicesIntoLayer( DataLayerHandle layer,
+    std::vector<Core::DataSliceHandle> data,  filter_key_type key )
+{
+  // Move this request to the Application thread
+  if ( !( Core::Application::IsApplicationThread() ) )
+  {
+    Core::Application::PostEvent( boost::bind( 
+      &LayerManager::DispatchInsertDataSlicesIntoLayer, layer, data, key ) );
+    return;
+  }
+  
+  // Only do work if the unique key is a match
+  if ( layer->check_filter_key( key ) )
+  {
+    Core::DataVolumeHandle data_volume = layer->get_data_volume();
+    if ( !data_volume ) return;
+
+    std::vector<Core::DataSliceHandle>::iterator it = data.begin();
+    std::vector<Core::DataSliceHandle>::iterator it_end = data.end();
+  
+    while( it != it_end )
+    {
+      data_volume->insert_slice( (*it) );
+      ++it; 
+    }
+  
+    LayerManager::Instance()->layer_volume_changed_signal_( layer );
+    LayerManager::Instance()->layers_changed_signal_();
+  }
+}
+
+
+void LayerManager::DispatchInsertMaskSliceIntoLayer(MaskLayerHandle layer,
+    Core::MaskDataSliceHandle mask,  filter_key_type key )
+{
+  // Move this request to the Application thread
+  if ( !( Core::Application::IsApplicationThread() ) )
+  {
+    Core::Application::PostEvent( boost::bind( 
+      &LayerManager::DispatchInsertMaskSliceIntoLayer, layer, mask, key ) );
+    return;
+  }
+  
+  // Only do work if the unique key is a match
+  if ( layer->check_filter_key( key ) )
+  {
+    Core::MaskVolumeHandle mask_volume = layer->get_mask_volume();
+    if ( !mask_volume ) return;
+  
+    if ( mask_volume->insert_slice( mask ) )
+    {
+      LayerManager::Instance()->layer_volume_changed_signal_( layer );
+      LayerManager::Instance()->layers_changed_signal_();
+    }
+  }
+}
+
+void LayerManager::DispatchInsertMaskSlicesIntoLayer( MaskLayerHandle layer,
+    std::vector<Core::MaskDataSliceHandle> mask,  filter_key_type key )
+{
+  // Move this request to the Application thread
+  if ( !( Core::Application::IsApplicationThread() ) )
+  {
+    Core::Application::PostEvent( boost::bind( 
+      &LayerManager::DispatchInsertMaskSlicesIntoLayer, layer, mask, key ) );
+    return;
+  }
+  
+  // Only do work if the unique key is a match
+  if ( layer->check_filter_key( key ) )
+  {
+    Core::MaskVolumeHandle mask_volume = layer->get_mask_volume();
+    if ( !mask_volume ) return;
+    
+    std::vector<Core::MaskDataSliceHandle>::iterator it = mask.begin();
+    std::vector<Core::MaskDataSliceHandle>::iterator it_end = mask.end();
+  
+    while( it != it_end )
+    {
+      mask_volume->insert_slice( (*it) );
+      ++it; 
+    }
+  
+    LayerManager::Instance()->layer_volume_changed_signal_( layer );
+    LayerManager::Instance()->layers_changed_signal_();
+  }
+}
+
 void LayerManager::handle_layer_name_changed( std::string layer_id, std::string name )
 {
   this->layer_name_changed_signal_( layer_id, name );

@@ -32,12 +32,15 @@
 ##################################################
 
 SET(CORE_DATABLOCK_SRCS
-  DataType.h
-  DataType.cc
   DataBlock.h
+  DataBlockFWD.h
   DataBlock.cc
   DataBlockManager.h
   DataBlockManager.cc
+  DataSlice.h
+  DataSlice.cc
+  DataType.h
+  DataType.cc
   Histogram.h
   Histogram.cc
   ITKDataBlock.h
@@ -48,10 +51,13 @@ SET(CORE_DATABLOCK_SRCS
   MaskDataBlock.cc
   MaskDataBlockManager.h
   MaskDataBlockManager.cc
+  MaskDataSlice.h
+  MaskDataSlice.cc
   NrrdData.h
   NrrdData.cc
   NrrdDataBlock.h
   NrrdDataBlock.cc
+  SliceType.h
   StdDataBlock.h
   StdDataBlock.cc
   )

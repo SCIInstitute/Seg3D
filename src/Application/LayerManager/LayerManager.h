@@ -418,6 +418,30 @@ public:
   // Application thread if needed.
   static void DispatchInsertVolumeIntoLayer( LayerHandle layer, 
     Core::VolumeHandle mask, filter_key_type key = filter_key_type( 0 ) );
+
+  // DISPATCHINSERTDATASLICEINTOLAYER:
+  // Insert a data slice into a data layer. 
+  static void DispatchInsertDataSliceIntoLayer( DataLayerHandle layer,
+    Core::DataSliceHandle data, filter_key_type key = filter_key_type( 0 ) );
+
+  // DISPATCHINSERTDATASLICEINTOLAYER:
+  // Insert a data slice into a data layer. 
+  static void DispatchInsertDataSlicesIntoLayer( DataLayerHandle layer,
+    std::vector<Core::DataSliceHandle> data, 
+    filter_key_type key = filter_key_type( 0 ) );
+
+  // DISPATCHINSERTMASKSLICEINTOLAYER:
+  // Insert a data slice into a data layer. 
+  static void DispatchInsertMaskSliceIntoLayer( MaskLayerHandle layer,
+    Core::MaskDataSliceHandle mask, filter_key_type key = filter_key_type( 0 ) );
+
+  // DISPATCHINSERTMASKSLICESINTOLAYER:
+  // Insert a data slice into a data layer. 
+  static void DispatchInsertMaskSlicesIntoLayer( MaskLayerHandle layer,
+    std::vector<Core::MaskDataSliceHandle> mask, 
+    filter_key_type key = filter_key_type( 0 ) );
+
+
 };
 
 } // end namespace seg3D

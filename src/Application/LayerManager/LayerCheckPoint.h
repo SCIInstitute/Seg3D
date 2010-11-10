@@ -58,10 +58,12 @@ public:
   LayerCheckPoint( LayerHandle layer );
 
   // Create a slice check point
-  LayerCheckPoint( LayerHandle layer, int slice, int axis );
+  LayerCheckPoint( LayerHandle layer, Core::SliceType type,
+    Core::DataBlock::index_type index );
 
   // Create a slice check point
-  LayerCheckPoint( LayerHandle layer, int start, int end, int axis );
+  LayerCheckPoint( LayerHandle layer, Core::SliceType type,
+    Core::DataBlock::index_type start, Core::DataBlock::index_type end );
 
   // destructor
   virtual ~LayerCheckPoint();
@@ -80,11 +82,13 @@ public:
   
   // CREATE_SLICE:
   // Check point a slice check point
-  bool create_slice( LayerHandle layer, int slice, int axis );
+  bool create_slice( LayerHandle layer, Core::SliceType type,
+    Core::DataBlock::index_type index );
 
   // CREATE_SLICE:
   // Check point a slice check point
-  bool create_slice( LayerHandle layer, int start, int end, int axis );
+  bool create_slice( LayerHandle layer, Core::SliceType type,
+    Core::DataBlock::index_type start, Core::DataBlock::index_type end );
   
   // GET_BYTE_SIZE:
   // Get the size of the check point

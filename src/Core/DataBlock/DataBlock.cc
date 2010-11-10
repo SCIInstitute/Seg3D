@@ -887,23 +887,31 @@ bool DataBlock::Clone( const DataBlockHandle& src_data_block,
   return true;
 }
 
+
+
 template<class T>
-bool GetSliceInternal( const DataBlockHandle& volume_data_block, 
-    DataBlockHandle& slice_data_block, int slice, int axis )
+bool ExtractSliceInternal( DataBlock* volume_data_block, 
+    DataSliceHandle& slice, SliceType type, DataBlock::index_type index )
 {
+  // Clear the handle so it does not refer to anything
+  slice.reset();
+  
+  // Create a datablock in which the slice is generated
+  DataBlockHandle slice_data_block;
+
   // Get the size of the data block
   size_t nx = volume_data_block->get_nx();
   size_t ny = volume_data_block->get_ny();
   size_t nz = volume_data_block->get_nz();
   
   // The algorithm is optimized for the axis type
-  switch( axis )
+  switch( type )
   {
     // SAGITTAL
-    case 2:
+    case SliceType::SAGITTAL_E:
     {
       // Check whether the slice is in range
-      if ( slice < 0 || slice >= static_cast<int>( nx ) ) return false;
+      if ( index < 0 || index >= static_cast<DataBlock::index_type>( nx ) ) return false;
     
       // Create a new datablock for this slice
       slice_data_block = StdDataBlock::New( 1, ny, nz, volume_data_block->get_data_type() );
@@ -926,7 +934,7 @@ bool GetSliceInternal( const DataBlockHandle& volume_data_block,
         {
           // Copy the data over
           size_t a = y + z * ny; 
-          size_t b = slice + y * nx + z * nxy;
+          size_t b = index + y * nx + z * nxy;
           slice_ptr[ a ] = volume_ptr[ b ]; a++; b+= nx;
           slice_ptr[ a ] = volume_ptr[ b ]; a++; b+= nx;
           slice_ptr[ a ] = volume_ptr[ b ]; a++; b+= nx;
@@ -939,16 +947,18 @@ bool GetSliceInternal( const DataBlockHandle& volume_data_block,
         // Finish the part that could not be unroled
         for ( ; y < ny; y++ )
         {
-          slice_ptr[ y + z * ny ] = volume_ptr[ slice + y * nx + z * nxy ];
+          slice_ptr[ y + z * ny ] = volume_ptr[ index + y * nx + z * nxy ];
         }
       }
+      
+      slice = DataSliceHandle( new DataSlice( slice_data_block, type, index ) );
       return true;
     }
     // CORONAL
-    case 1:
+    case SliceType::CORONAL_E:
     {
       // Check whether the slice is in range
-      if ( slice < 0 || slice >= static_cast<int>( ny ) ) return false;
+      if ( index < 0 || index >= static_cast<DataBlock::index_type>( ny ) ) return false;
     
       // Create a new datablock for this slice
       slice_data_block = StdDataBlock::New( nx, 1, nz, volume_data_block->get_data_type() );
@@ -971,7 +981,7 @@ bool GetSliceInternal( const DataBlockHandle& volume_data_block,
         {
           // Copy the data over
           size_t a = x + z * ny; 
-          size_t b = x + slice * nx + z * nxy;
+          size_t b = x + index * nx + z * nxy;
           slice_ptr[ a ] = volume_ptr[ b ]; a++; b++;
           slice_ptr[ a ] = volume_ptr[ b ]; a++; b++;
           slice_ptr[ a ] = volume_ptr[ b ]; a++; b++;
@@ -984,16 +994,18 @@ bool GetSliceInternal( const DataBlockHandle& volume_data_block,
         // Finish the part that could not be unroled
         for ( ; x < nx; x++ )
         {
-          slice_ptr[ x + z * ny ] = volume_ptr[ x + slice * nx + z * nxy ];
+          slice_ptr[ x + z * ny ] = volume_ptr[ x + index * nx + z * nxy ];
         }
       }
+
+      slice = DataSliceHandle( new DataSlice( slice_data_block, type, index ) );
       return true;
     }
     // AXIAL
-    case 0:
+    case SliceType::AXIAL_E:
     {
       // Check range of data
-      if ( slice < 0 || slice >= static_cast<int>( ny ) ) return false;
+      if ( index < 0 || index >= static_cast<DataBlock::index_type>( nz ) ) return false;
     
       // Create a new data block
       slice_data_block = StdDataBlock::New( nx, ny, 1, volume_data_block->get_data_type() );
@@ -1005,7 +1017,9 @@ bool GetSliceInternal( const DataBlockHandle& volume_data_block,
       
       // Copy the data as one block copy. As data is properly aligned in data, it can be
       // done in one copy, unlike the previous two
-      std::memcpy( slice_ptr, volume_ptr + slice * ( nx * ny ), nx * ny * sizeof( T ) );
+      std::memcpy( slice_ptr, volume_ptr + index * ( nx * ny ), nx * ny * sizeof( T ) );
+
+      slice = DataSliceHandle( new DataSlice( slice_data_block, type, index ) );
       return true;
     }
     default:
@@ -1015,62 +1029,62 @@ bool GetSliceInternal( const DataBlockHandle& volume_data_block,
   }
 }
 
-bool DataBlock::GetSlice( const DataBlockHandle& volume_data_block, 
-    DataBlockHandle& slice_data_block, int slice, int axis )
+bool DataBlock::extract_slice( SliceType type, index_type index, DataSliceHandle& slice  )
 {
-  // Check whether there is actually volume data
-  if ( !volume_data_block ) return false;
-
   // We need to lock the volume data so it does not get altered
-  DataBlock::shared_lock_type lock( volume_data_block->get_mutex() );
+  DataBlock::shared_lock_type lock( this->get_mutex() );
 
   // For each of the supported datatypes grab the slice using a templated function
-  switch( volume_data_block->get_data_type() )
+  switch( this->get_data_type() )
   { 
     case DataType::CHAR_E:
-      return GetSliceInternal<signed char>( volume_data_block, slice_data_block, slice, axis );
+      return ExtractSliceInternal<signed char>( this, slice, type, index );
     case DataType::UCHAR_E:
-      return GetSliceInternal<unsigned char>( volume_data_block, slice_data_block, slice, axis );
+      return ExtractSliceInternal<unsigned char>( this, slice, type, index );
     case DataType::SHORT_E:
-      return GetSliceInternal<short>( volume_data_block, slice_data_block, slice, axis );
+      return ExtractSliceInternal<short>( this, slice, type, index );
     case DataType::USHORT_E:
-      return GetSliceInternal<unsigned short>( volume_data_block, slice_data_block, slice, axis );
+      return ExtractSliceInternal<unsigned short>( this, slice, type, index );
     case DataType::INT_E:
-      return GetSliceInternal<int>( volume_data_block, slice_data_block, slice, axis );
+      return ExtractSliceInternal<int>( this, slice, type, index );
     case DataType::UINT_E:
-      return GetSliceInternal<unsigned int>( volume_data_block, slice_data_block, slice, axis );
+      return ExtractSliceInternal<unsigned int>( this, slice, type, index );
     case DataType::FLOAT_E:
-      return GetSliceInternal<float>( volume_data_block, slice_data_block, slice, axis );
+      return ExtractSliceInternal<float>( this, slice, type, index );
     case DataType::DOUBLE_E:
-      return GetSliceInternal<double>( volume_data_block, slice_data_block, slice, axis );
+      return ExtractSliceInternal<double>( this, slice, type, index );
     default:
       return false;
   }
 }
 
+
 template<class T>
-bool PutSliceInternal( const DataBlockHandle& volume_data_block, 
-    const DataBlockHandle& slice_data_block, int slice, int axis )
+bool InsertSliceInternal( DataBlock* volume_data_block, const DataSliceHandle& slice )
 {
   // Get the size of the data
   size_t nx = volume_data_block->get_nx();
   size_t ny = volume_data_block->get_ny();
   size_t nz = volume_data_block->get_nz();
   
+  // Get the slice DataBlock
+  DataBlockHandle slice_data_block = slice->get_data_block();
+  
   // Need to have a write lock for the volume
   // NOTE: once the data is altered, the generation number needs to be increased
   DataBlock::lock_type lock( volume_data_block->get_mutex() );
   // Need to have a read lock on the slice
   DataBlock::shared_lock_type slock( slice_data_block->get_mutex() );
-    
+  
+  DataBlock::index_type index = slice->get_index();   
   // For each axis there is an optimized algorithm
-  switch( axis )
+  switch( slice->get_slice_type() )
   {
     // SAGITTAL
-    case 2:
+    case SliceType::SAGITTAL_E:
     {
       // Check the range of the slice number
-      if ( slice < 0 || slice >= static_cast<int>( nx ) ) return false;
+      if ( index < 0 || index >= static_cast<DataBlock::index_type>( nx ) ) return false;
     
       // Get the pointers for source and destination
       T* volume_ptr = reinterpret_cast<T*>( volume_data_block->get_data() );
@@ -1088,7 +1102,7 @@ bool PutSliceInternal( const DataBlockHandle& volume_data_block,
         {
           // Copy data back
           size_t a = y + z * ny; 
-          size_t b = slice + y * nx + z * nxy;
+          size_t b = index + y * nx + z * nxy;
           volume_ptr[ b ] = slice_ptr[ a ]; a++; b+= nx;
           volume_ptr[ b ] = slice_ptr[ a ]; a++; b+= nx;
           volume_ptr[ b ] = slice_ptr[ a ]; a++; b+= nx;
@@ -1101,7 +1115,7 @@ bool PutSliceInternal( const DataBlockHandle& volume_data_block,
         // Finish part that could not be unroled
         for ( ; y < ny; y++ )
         {
-          volume_ptr[ slice + y * nx + z * nxy ] = slice_ptr[ y + z * ny ];
+          volume_ptr[ index + y * nx + z * nxy ] = slice_ptr[ y + z * ny ];
         }
       }
       
@@ -1109,10 +1123,10 @@ bool PutSliceInternal( const DataBlockHandle& volume_data_block,
 
       return true;
     }
-    case 1:
+    case SliceType::CORONAL_E:
     {
       // Check the range of the slice number
-      if ( slice < 0 || slice >= static_cast<int>( ny ) ) return false;
+      if ( index < 0 || index >= static_cast<DataBlock::index_type>( ny ) ) return false;
             
       // Get the pointers for source and destination
       T* volume_ptr = reinterpret_cast<T*>( volume_data_block->get_data() );
@@ -1130,7 +1144,7 @@ bool PutSliceInternal( const DataBlockHandle& volume_data_block,
         {
           // Copy data back
           size_t a = x + z * ny; 
-          size_t b = x + slice * nx + z * nxy;
+          size_t b = x + index * nx + z * nxy;
           volume_ptr[ b ] = slice_ptr[ a ]; a++; b++;
           volume_ptr[ b ] = slice_ptr[ a ]; a++; b++;
           volume_ptr[ b ] = slice_ptr[ a ]; a++; b++;
@@ -1143,7 +1157,7 @@ bool PutSliceInternal( const DataBlockHandle& volume_data_block,
         // Finish part that could not be unroled
         for ( ; x < nx; x++ )
         {
-          volume_ptr[ x + slice * nx + z * nxy ] = slice_ptr[ x + z * ny ];
+          volume_ptr[ x + index * nx + z * nxy ] = slice_ptr[ x + z * ny ];
         }
       }
 
@@ -1151,17 +1165,17 @@ bool PutSliceInternal( const DataBlockHandle& volume_data_block,
       
       return true;
     }
-    case 0:
+    case SliceType::AXIAL_E:
     {
       // Check the range of the slice number
-      if ( slice < 0 || slice >= static_cast<int>( nz ) ) return false;
+      if ( index < 0 || index >= static_cast<DataBlock::index_type>( nz ) ) return false;
           
       // Get the pointers for source and destination
       T* volume_ptr = reinterpret_cast<T*>( volume_data_block->get_data() );
       T* slice_ptr = reinterpret_cast<T*>( slice_data_block->get_data() );
       
       // Copy data as one memory block back
-      std::memcpy( volume_ptr + slice * ( nx * ny ), slice_ptr, nx * ny * sizeof( T ) );
+      std::memcpy( volume_ptr + index * ( nx * ny ), slice_ptr, nx * ny * sizeof( T ) );
       
       volume_data_block->increase_generation();
       
@@ -1174,33 +1188,31 @@ bool PutSliceInternal( const DataBlockHandle& volume_data_block,
   }
 }
 
-
-bool DataBlock::PutSlice( const DataBlockHandle& slice_data_block, 
-  const DataBlockHandle& volume_data_block, int slice, int axis )
+bool DataBlock::insert_slice( const DataSliceHandle slice )
 {
   // Check whether slice and volume actually have data
-  if ( slice_data_block->get_data_type() != volume_data_block->get_data_type() ) return false;
-  if ( !slice_data_block || !volume_data_block ) return false;
+  if ( slice->get_data_type() != this->get_data_type() ) return false;
+  if ( !slice ) return false;
 
   // Jump to the right algorithm for each data type
-  switch( volume_data_block->get_data_type() )
+  switch( this->get_data_type() )
   { 
     case DataType::CHAR_E:
-      return PutSliceInternal<signed char>( volume_data_block, slice_data_block, slice, axis );
+      return InsertSliceInternal<signed char>( this, slice );
     case DataType::UCHAR_E:
-      return PutSliceInternal<unsigned char>( volume_data_block, slice_data_block, slice, axis );
+      return InsertSliceInternal<unsigned char>( this, slice );
     case DataType::SHORT_E:
-      return PutSliceInternal<short>( volume_data_block, slice_data_block, slice, axis );
+      return InsertSliceInternal<short>( this, slice );
     case DataType::USHORT_E:
-      return PutSliceInternal<unsigned short>( volume_data_block, slice_data_block, slice, axis );
+      return InsertSliceInternal<unsigned short>( this, slice );
     case DataType::INT_E:
-      return PutSliceInternal<int>( volume_data_block, slice_data_block, slice, axis );
+      return InsertSliceInternal<int>( this, slice );
     case DataType::UINT_E:
-      return PutSliceInternal<unsigned int>( volume_data_block, slice_data_block, slice, axis );
+      return InsertSliceInternal<unsigned int>( this, slice );
     case DataType::FLOAT_E:
-      return PutSliceInternal<float>( volume_data_block, slice_data_block, slice, axis );
+      return InsertSliceInternal<float>( this, slice );
     case DataType::DOUBLE_E:
-      return PutSliceInternal<double>( volume_data_block, slice_data_block, slice, axis );
+      return InsertSliceInternal<double>( this, slice );
     default:
       return false;
   }

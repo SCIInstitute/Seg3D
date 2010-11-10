@@ -92,6 +92,8 @@ public:
   // This function set the mask volume to a new mask.
   bool set_mask_volume( Core::MaskVolumeHandle volume );
 
+  // -- iso surface handling --
+public:
   // GET_ISOSURFACE:
   // Get the iso-surface associated with this layer
   Core::IsosurfaceHandle get_isosurface();
@@ -105,8 +107,10 @@ public:
   // function that is called by the calculate volume action that calculate the volume of the mask
   void calculate_volume();
 
+  // DELETE_ISOSURFACE:
+  // Delete the isosurface associated with this layer
   void delete_isosurface();
-
+  
   // -- Signals --
 public:
   boost::signals2::signal< void () > isosurface_updated_signal_;

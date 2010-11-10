@@ -281,16 +281,17 @@ bool ActionFloodFill::run( Core::ActionContextHandle& context, Core::ActionResul
     LayerUndoBufferItemHandle item( new LayerUndoBufferItem( "FloodFill" ) );
 
     // Get the axis along which the flood fill works
-    int axis = this->private_->slice_type_.value();
+    Core::SliceType slice_type = static_cast< Core::SliceType::enum_type>(
+      this->private_->slice_type_.value() );
     
     // Get the slice number
-    int slice = this->private_->slice_number_.value();
+    size_t slice_number = this->private_->slice_number_.value();
     
     // Get the layer on which this action operates
     LayerHandle layer = LayerManager::Instance()->get_layer_by_id( 
       this->private_->target_layer_id_.value() );
     // Create a check point of the slice on which the flood fill will operate
-    LayerCheckPointHandle check_point( new LayerCheckPoint( layer, slice, axis ) );
+    LayerCheckPointHandle check_point( new LayerCheckPoint( layer, slice_type, slice_number ) );
 
     // The redo action is the current one
     item->set_redo_action( this->shared_from_this() );

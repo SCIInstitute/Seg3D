@@ -145,4 +145,24 @@ bool MaskVolume::CreateInvalidMask( GridTransform grid_transform, MaskVolumeHand
   return true;
 }
 
+bool MaskVolume::insert_slice( const MaskDataSliceHandle slice )
+{
+  if ( this->mask_data_block_ )
+  {
+    return this->mask_data_block_->insert_slice( slice );
+  }
+  return false;
+}
+
+bool MaskVolume::extract_slice( SliceType type, MaskDataBlock::index_type index, 
+  MaskDataSliceHandle& slice )
+{
+  if ( this->mask_data_block_ )
+  {
+    return this->mask_data_block_->extract_slice( type, index, slice );
+  }
+  return false;
+}
+
+
 } // end namespace Core

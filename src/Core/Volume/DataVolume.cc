@@ -236,4 +236,22 @@ size_t DataVolume::get_byte_size() const
   return this->get_data_block()->get_byte_size();
 }
 
+bool DataVolume::insert_slice( const DataSliceHandle slice )
+{
+  if ( this->data_block_ )
+  {
+    return this->data_block_->insert_slice( slice );
+  }
+  return false;
+}
+
+bool DataVolume::extract_slice( SliceType type, DataBlock::index_type index, DataSliceHandle& slice )
+{
+  if ( this->data_block_ )
+  {
+    return this->data_block_->extract_slice( type, index, slice );
+  }
+  return false;
+}
+
 } // end namespace Core

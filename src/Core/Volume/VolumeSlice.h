@@ -31,24 +31,18 @@
 
 #include <boost/shared_ptr.hpp>
 
+#include <Core/DataBlock/SliceType.h>
+#include <Core/Geometry/Point.h>
+#include <Core/Graphics/Texture.h>
 #include <Core/Utils/ConnectionHandler.h>
 #include <Core/Utils/EnumClass.h>
 #include <Core/Utils/Lockable.h>
-#include <Core/Geometry/Point.h>
-#include <Core/Graphics/Texture.h>
 #include <Core/Volume/Volume.h>
 
 namespace Core
 {
 
-CORE_ENUM_CLASS
-(
-  VolumeSliceType,
-  AXIAL_E = 0,
-  CORONAL_E = 1,
-  SAGITTAL_E = 2
-  
-)
+typedef SliceType VolumeSliceType;
 
 // Forward declaration
 class VolumeSlice;

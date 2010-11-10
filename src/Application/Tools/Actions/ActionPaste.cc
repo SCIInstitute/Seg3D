@@ -169,10 +169,11 @@ bool ActionPaste::run( Core::ActionContextHandle& context, Core::ActionResultHan
 {
   // Build the undo/redo for this action
   LayerUndoBufferItemHandle item( new LayerUndoBufferItem( "Paste" ) );
-  
-  // Get the axis along which the flood fill works
-  int axis = this->private_->slice_type_.value();
-  
+    
+  // Get slice type
+  Core::VolumeSliceType slice_type = static_cast< Core::VolumeSliceType::enum_type >(
+    this->private_->slice_type_.value() );
+    
   // Get the slice number
   size_t min_slice = this->private_->min_slice_.value();
   size_t max_slice = this->private_->max_slice_.value();
@@ -181,10 +182,12 @@ bool ActionPaste::run( Core::ActionContextHandle& context, Core::ActionResultHan
   LayerHandle layer = LayerManager::Instance()->get_layer_by_id( 
     this->private_->target_layer_id_.value() );
   // Create a check point of the slice on which the flood fill will operate
-  LayerCheckPointHandle check_point( new LayerCheckPoint( layer, min_slice, max_slice, axis ) );
+  LayerCheckPointHandle check_point( new LayerCheckPoint( layer, slice_type, 
+    min_slice, max_slice) );
 
   // The redo action is the current one
   item->set_redo_action( this->shared_from_this() );
+  
   // Tell the item which layer to restore with which check point for the undo action
   item->add_layer_to_restore( layer, check_point );
 

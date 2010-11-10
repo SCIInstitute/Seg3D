@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef CORE_DATABLOCK_SHAREDDATABLOCK_H
-#define CORE_DATABLOCK_SHAREDDATABLOCK_H
+#ifndef CORE_DATABLOCK_MASKDATABLOCK_H
+#define CORE_DATABLOCK_MASKDATABLOCK_H
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
@@ -38,6 +38,8 @@
 #include <boost/smart_ptr.hpp>
 
 // Core includes
+#include <Core/DataBlock/MaskDataBlockFWD.h>
+#include <Core/DataBlock/MaskDataSlice.h>
 #include <Core/DataBlock/DataBlock.h>
 
 namespace Core
@@ -51,11 +53,6 @@ namespace Core
 // the same dimensions exists with an unassigned bit and used if possible,
 // otherwise a new one is generated.
 
-// Forward Declaration
-class MaskDataBlock;
-typedef boost::shared_ptr< MaskDataBlock > MaskDataBlockHandle;
-typedef boost::weak_ptr< MaskDataBlock > MaskDataBlockWeakHandle;
-
 // Class definition
 class MaskDataBlock : public boost::noncopyable, 
   public boost::enable_shared_from_this< MaskDataBlock >
@@ -67,6 +64,8 @@ public:
   typedef DataBlock::mutex_type mutex_type;
   typedef DataBlock::lock_type lock_type;
   typedef DataBlock::shared_lock_type shared_lock_type;
+
+  typedef DataBlock::index_type index_type;
 
   // -- Constructor/destructor --
 public:
@@ -205,6 +204,16 @@ public:
   // Any object that makes change to the mask data is responsible for triggering
   // this signal after modification is done.
   boost::signals2::signal<void ()> mask_updated_signal_;
+
+  // -- extracting slices and inserting slices
+public:
+  // INSERT_SLICE:
+  // Insert slice into the datablock
+  bool insert_slice( const MaskDataSliceHandle slice );
+
+  // EXTRACT_SLICE:
+  // Extract a slice from the datablock
+  bool extract_slice( SliceType type, index_type index, MaskDataSliceHandle& slice  );
 
   // -- internals of the DataBlock --
 private:

@@ -97,6 +97,16 @@ public:
   // Get the size of the data in bytes
   virtual size_t get_byte_size() const;
   
+  // -- slice handling --
+public: 
+  // INSERT_SLICE:
+  // Insert a slice into the volume
+  bool insert_slice( const DataSliceHandle slice );
+  
+  // EXTRACT_SLICE:
+  // Extract a slice from the volume
+  bool extract_slice( SliceType type, DataBlock::index_type index, DataSliceHandle& slice );
+  
 private:
   // Handle to where the volume data is really stored
   DataBlockHandle data_block_;

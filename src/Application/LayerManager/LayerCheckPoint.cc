@@ -26,6 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#include <Core/DataBlock/DataSlice.h>
+#include <Core/DataBlock/MaskDataSlice.h>
 #include <Core/DataBlock/DataBlock.h>
 #include <Core/DataBlock/MaskDataBlock.h>
 #include <Core/DataBlock/MaskDataBlockManager.h>
@@ -36,38 +38,19 @@
 namespace Seg3D
 {
 
-class PartialCheckPoint;
-typedef boost::shared_ptr<PartialCheckPoint> PartialCheckPointHandle;
-
-
-class PartialCheckPoint
-{
-public:
-  // Which axis to use for the parial check point
-  int axis_;
-  
-  // Which slice is stored in this record
-  int slice_;
-  
-  // If it is a mask this pointer is used
-  Core::MaskDataBlockHandle mask_;
-
-  // If it is a data volume this pointer is used
-  Core::DataBlockHandle data_;
-  
-  // Byte size of this slice
-  size_t size_;
-};
 
 class LayerCheckPointPrivate : public boost::noncopyable
 {
 public:
-    // Check point consisting of a full volume
-    Core::VolumeHandle volume_;
-    
-    // Check point consisting of a slice
-    typedef std::list<PartialCheckPointHandle> slice_list_type;
-    slice_list_type slices_;
+  // Check point consisting of a full volume
+  Core::VolumeHandle volume_;
+  
+  // Check point consisting of a slice
+  typedef std::vector<Core::DataSliceHandle> data_slice_vector_type;
+  data_slice_vector_type data_slices_;
+
+  typedef std::vector<Core::MaskDataSliceHandle> mask_slice_vector_type;
+  mask_slice_vector_type mask_slices_;
 };
 
 
@@ -77,16 +60,18 @@ LayerCheckPoint::LayerCheckPoint( LayerHandle layer ) :
   this->create_volume( layer );
 }
 
-LayerCheckPoint::LayerCheckPoint( LayerHandle layer, int slice, int axis ) :
+LayerCheckPoint::LayerCheckPoint( LayerHandle layer, 
+  Core::SliceType type, Core::DataBlock::index_type index ) :
   private_( new LayerCheckPointPrivate )
 {
-  this->create_slice( layer, slice, axis );
+  this->create_slice( layer, type, index );
 }
 
-LayerCheckPoint::LayerCheckPoint( LayerHandle layer, int min_slice, int max_slice, int axis ) :
+LayerCheckPoint::LayerCheckPoint( LayerHandle layer, Core::SliceType type, 
+  Core::DataBlock::index_type start, Core::DataBlock::index_type end  ) :
   private_( new LayerCheckPointPrivate )
 {
-  this->create_slice( layer, min_slice, max_slice, axis );
+  this->create_slice( layer, type, start, end );
 }
 
 LayerCheckPoint::~LayerCheckPoint()
@@ -99,37 +84,30 @@ bool LayerCheckPoint::apply( LayerHandle layer ) const
   if ( this->private_->volume_ )
   {
     LayerManager::DispatchInsertVolumeIntoLayer( layer, this->private_->volume_ );
+    return true;
   }
   
-  LayerCheckPointPrivate::slice_list_type::iterator it = this->private_->slices_.begin();
-  LayerCheckPointPrivate::slice_list_type::iterator it_end = this->private_->slices_.end();
-  
-  while ( it != it_end )
+  if ( !( this->private_->data_slices_.empty() ) )
   {
-    if ( (*it)->mask_ && layer->get_type() == Core::VolumeType::MASK_E )
-    {
-      MaskLayerHandle mask = boost::shared_dynamic_cast<MaskLayer>( layer );
-      if ( mask && mask->has_valid_data() )
-      {
-        Core::MaskDataBlockManager::PutSlice( (*it)->mask_, 
-          mask->get_mask_volume()->get_mask_data_block(), (*it)->slice_,
-          (*it)->axis_ );
-      }
-    }
-    else if ( (*it)->data_ && layer->get_type() == Core::VolumeType::DATA_E )
-    {
-      DataLayerHandle data = boost::shared_dynamic_cast<DataLayer>( layer );
-      if ( data && data->has_valid_data() )
-      {
-        Core::DataBlock::PutSlice( (*it)->data_, 
-          data->get_data_volume()->get_data_block(), (*it)->slice_,
-          (*it)->axis_ );
-      }
-    }
-    
-    ++it;
-  } 
-  return true;
+    DataLayerHandle data_layer = boost::shared_dynamic_cast<DataLayer>( layer );
+    if ( ! data_layer ) return false;
+
+    LayerManager::DispatchInsertDataSlicesIntoLayer( data_layer, 
+      this->private_->data_slices_ );
+    return false;
+  }
+
+  if ( !( this->private_->mask_slices_.empty() ) )
+  {
+    MaskLayerHandle mask_layer = boost::shared_dynamic_cast<MaskLayer>( layer );
+    if ( ! mask_layer ) return false;
+
+    LayerManager::DispatchInsertMaskSlicesIntoLayer( mask_layer, 
+      this->private_->mask_slices_ );
+    return false;
+  }
+
+  return false;
 }
   
 bool LayerCheckPoint::create_volume( LayerHandle layer )
@@ -138,117 +116,97 @@ bool LayerCheckPoint::create_volume( LayerHandle layer )
   return false;
 }
 
-bool LayerCheckPoint::create_slice( LayerHandle layer, int slice, int axis )
+bool LayerCheckPoint::create_slice( LayerHandle layer, Core::SliceType type, 
+  Core::DataBlock::index_type index )
 {
   if ( layer->get_type() == Core::VolumeType::MASK_E )
   {
-    PartialCheckPointHandle partial_mask_check_point( new PartialCheckPoint );
-  
     MaskLayerHandle mask = boost::shared_dynamic_cast<MaskLayer>( layer );
     if ( ! mask->has_valid_data() ) return false;
     
-    if ( !( Core::MaskDataBlockManager::GetSlice( mask->get_mask_volume()->get_mask_data_block(),
-      partial_mask_check_point->mask_, slice, axis ) ) )
-    {
-      return false;
-    }
+    Core::MaskDataSliceHandle slice;
+    if ( !( mask->get_mask_volume()->extract_slice( type, index, slice ) ) ) return false;
     
-    partial_mask_check_point->slice_ = slice;
-    partial_mask_check_point->axis_ = axis;
-    partial_mask_check_point->size_ = partial_mask_check_point->mask_->get_byte_size();
-
-    this->private_->slices_.push_back( partial_mask_check_point );
+    this->private_->mask_slices_.push_back( slice );
     return true;
   }
   else if ( layer->get_type() == Core::VolumeType::DATA_E )
   {
-    PartialCheckPointHandle partial_data_check_point( new PartialCheckPoint );
-  
     DataLayerHandle data = boost::shared_dynamic_cast<DataLayer>( layer );
     if ( ! data->has_valid_data() ) return false;
     
-    if ( !( Core::DataBlock::GetSlice( data->get_data_volume()->get_data_block(),
-      partial_data_check_point->data_, slice, axis ) ) )
-    {
-      return false;
-    }
+    Core::DataSliceHandle slice;
+    if ( !( data->get_data_volume()->extract_slice( type, index, slice ) ) ) return false;
     
-    partial_data_check_point->slice_ = slice;
-    partial_data_check_point->axis_ = axis;
-    partial_data_check_point->size_ = partial_data_check_point->data_->get_byte_size();
-    this->private_->slices_.push_back( partial_data_check_point );
+    this->private_->data_slices_.push_back( slice );
     return true;
   }
   return false;
 }
 
 
-bool LayerCheckPoint::create_slice( LayerHandle layer, int start, int end, int axis )
+bool LayerCheckPoint::create_slice( LayerHandle layer, Core::SliceType type, 
+  Core::DataBlock::index_type start, Core::DataBlock::index_type end )
 {
   if ( layer->get_type() == Core::VolumeType::MASK_E )
   {
-    for ( int j = start; j < end; j++ )
+    for ( Core::DataBlock::index_type j = start; j < end; j++ )
     {
-      PartialCheckPointHandle partial_mask_check_point( new PartialCheckPoint );
-    
+
       MaskLayerHandle mask = boost::shared_dynamic_cast<MaskLayer>( layer );
       if ( ! mask->has_valid_data() ) return false;
       
-      if ( !( Core::MaskDataBlockManager::GetSlice( mask->get_mask_volume()->get_mask_data_block(),
-        partial_mask_check_point->mask_, j, axis ) ) )
-      {
-        return false;
-      }
+      Core::MaskDataSliceHandle slice;
+      if ( !( mask->get_mask_volume()->extract_slice( type, j, slice ) ) ) return false;
       
-      partial_mask_check_point->slice_ = j;
-      partial_mask_check_point->axis_ = axis;
-      partial_mask_check_point->size_ = partial_mask_check_point->mask_->get_byte_size();
-
-      this->private_->slices_.push_back( partial_mask_check_point );
+      this->private_->mask_slices_.push_back( slice );
     }
     return true;
   }
   else if ( layer->get_type() == Core::VolumeType::DATA_E )
   {
-    for ( int j = start; j < end; j++ )
+    for ( Core::DataBlock::index_type j = start; j < end; j++ )
     {
-      PartialCheckPointHandle partial_data_check_point( new PartialCheckPoint );
-    
       DataLayerHandle data = boost::shared_dynamic_cast<DataLayer>( layer );
       if ( ! data->has_valid_data() ) return false;
       
-      if ( !( Core::DataBlock::GetSlice( data->get_data_volume()->get_data_block(),
-        partial_data_check_point->data_, j, axis ) ) )
-      {
-        return false;
-      }
+      Core::DataSliceHandle slice;
+      if ( !( data->get_data_volume()->extract_slice( type, j, slice ) ) ) return false;
       
-      partial_data_check_point->slice_ = j;
-      partial_data_check_point->axis_ = axis;
-      partial_data_check_point->size_ = partial_data_check_point->data_->get_byte_size();
-      this->private_->slices_.push_back( partial_data_check_point );
+      this->private_->data_slices_.push_back( slice );
+      return true;
     }
     return true;
   }
   return false;
 }
-
-
 
 size_t LayerCheckPoint::get_byte_size() const
 {
   size_t size = 0;
   if ( this->private_->volume_ ) size += this->private_->volume_->get_byte_size();
 
-  LayerCheckPointPrivate::slice_list_type::iterator it = this->private_->slices_.begin();
-  LayerCheckPointPrivate::slice_list_type::iterator it_end = this->private_->slices_.end();
-
-  while ( it != it_end )
   {
-    size += (*it)->size_;
-    ++it;
-  }
+    LayerCheckPointPrivate::data_slice_vector_type::iterator it = this->private_->data_slices_.begin();
+    LayerCheckPointPrivate::data_slice_vector_type::iterator it_end = this->private_->data_slices_.end();
 
+    while ( it != it_end )
+    {
+      size += (*it)->get_byte_size();
+      ++it;
+    }
+  }
+  {
+    LayerCheckPointPrivate::mask_slice_vector_type::iterator it = this->private_->mask_slices_.begin();
+    LayerCheckPointPrivate::mask_slice_vector_type::iterator it_end = this->private_->mask_slices_.end();
+
+    while ( it != it_end )
+    {
+      size += (*it)->get_byte_size();
+      ++it;
+    }
+  }
+  
   return size;
 }
 

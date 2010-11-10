@@ -29,10 +29,6 @@
 #ifndef CORE_DATABLOCK_DATABLOCK_H
 #define CORE_DATABLOCK_DATABLOCK_H
 
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
-# pragma once
-#endif 
-
 // Boost includes
 #include <boost/signals2/signal.hpp>
 #include <boost/smart_ptr.hpp>
@@ -44,6 +40,8 @@
 #include <Core/Utils/Lockable.h>
 #include <Core/DataBlock/DataType.h>
 #include <Core/DataBlock/Histogram.h>
+#include <Core/DataBlock/DataBlockFWD.h>
+#include <Core/DataBlock/DataSlice.h>
 
 namespace Core
 {
@@ -56,11 +54,6 @@ namespace Core
 // NOTE: This is a base class that does not do any memory allocation, use one
 // of the derived classes to generate a datablock. The implementation in this
 // class is just the common access to the data.
-
-// Forward Declaration
-class DataBlock;
-typedef boost::shared_ptr< DataBlock > DataBlockHandle;
-typedef boost::weak_ptr< DataBlock > DataBlockWeakHandle;
 
 // Class definition
 class DataBlock : public SharedLockable
@@ -245,6 +238,16 @@ public:
   // DATA_CHANGED_SIGNAL
   // Triggered when data has been changed
   boost::signals2::signal<void ()> data_changed_signal_;
+
+  // -- extracting slices and inserting slices
+public:
+  // INSERT_SLICE:
+  // Insert slice into the datablock
+  bool insert_slice( const DataSliceHandle slice );
+
+  // EXTRACT_SLICE:
+  // Extract a slice from the datablock
+  bool extract_slice( SliceType type, index_type index, DataSliceHandle& slice  );
 
   // -- internals of the DataBlock --
 private:
