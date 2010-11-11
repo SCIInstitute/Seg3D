@@ -38,6 +38,9 @@
 
 namespace Seg3D
 {
+
+// TODO: We should split this in importfromfile and importfromseries
+// --JGS
   
 class ActionImportLayer : public Core::Action
 {
@@ -59,7 +62,6 @@ public:
     this->add_key( this->mode_ );
     this->add_key( this->importer_ );
     this->add_key( this->series_import_ );
-    this->add_cachedhandle( this->layer_importer_ );
   }
   
   virtual ~ActionImportLayer()
@@ -68,9 +70,21 @@ public:
   
   // -- Functions that describe action --
 public:
+  // VALIDATE:
+  // Each action needs to be validated just before it is posted. This way we
+  // enforce that every action that hits the main post_action signal will be
+  // a valid action to execute.
   virtual bool validate( Core::ActionContextHandle& context );
+
+  // RUN:
+  // Each action needs to have this piece implemented. It spells out how the
+  // action is run. It returns whether the action was successful or not.
   virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
-  
+
+  // CLEAR_CACHE:
+  // Clear any objects that were given as a short cut to improve performance.
+  virtual void clear_cache(); 
+    
   // -- Action parameters --
 private:
 
@@ -83,11 +97,12 @@ private:
   // Which type of importer should we use
   Core::ActionParameter< std::string > importer_;
 
+  // Whether the importer imports a series
   Core::ActionParameter< bool > series_import_;
   
   // Short cut to the layer importer that has already loaded the data if the file
   // was read through the GUI
-  Core::ActionCachedHandle<LayerImporterHandle> layer_importer_;
+  LayerImporterHandle layer_importer_;
   
   // -- Dispatch this action from the interface --
 public:

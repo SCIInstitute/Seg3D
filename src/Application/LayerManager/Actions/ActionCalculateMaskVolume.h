@@ -35,12 +35,12 @@
 
 // Application includes
 #include <Application/Layer/LayerFWD.h>
-#include <Application/LayerManager/Actions/ActionLayer.h>
+#include <Application/LayerManager/LayerManager.h>
 
 namespace Seg3D
 {
 
-class ActionCalculateMaskVolume : public ActionLayer
+class ActionCalculateMaskVolume : public Core::Action
 {
 
 CORE_ACTION( 

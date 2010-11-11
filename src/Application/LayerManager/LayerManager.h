@@ -292,10 +292,31 @@ public:
   
   // == functions for validation of an action ==
   
+  // FINDLAYER:
+  // Find a layer inside the layer manager
+  static LayerHandle FindLayer( const std::string& layer_id );
+
+  // FINDMASKLAYER:
+  // Find a mask layer inside the layer manager
+  static MaskLayerHandle FindMaskLayer( const std::string& layer_id );
+
+  // FINDDATALAYER:
+  // Find a data layer inside the layer manager
+  static DataLayerHandle FindDataLayer( const std::string& layer_id );
+
+  // FINDLAYERGROUP:
+  // Find a group inside the layer manager
+  static LayerGroupHandle FindLayerGroup( const std::string& group_id );
+
   // CHECKLAYEREXISTANCE:
   // Check whether a layer exists.
   // If it does not exist, the function returns false and an error is string is returned.
   static bool CheckLayerExistance( const std::string& layer_id, std::string& error );
+
+  // CHECKGROUPEXISTANCE:
+  // Check whether a group exists.
+  // If it does not exist, the function returns false and an error is string is returned.
+  static bool CheckGroupExistance( const std::string& layer_id, std::string& error );
   
   // CHECKLAYEREXISTANCEANDTYPE:
   // Check whether a layer exists and whether it is of the right type.
@@ -356,7 +377,6 @@ public:
   // a volume is only inserted by the asynchronous process if the key matches the one generated
   // when the layer was locked.
   typedef Layer::filter_key_type filter_key_type;
-
 
   // These functions can only be called from the application thread
   

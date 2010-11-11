@@ -29,7 +29,8 @@
 #ifndef APPLICATION_TOOLS_ACTIONS_ACTIOINCOPY_H
 #define APPLICATION_TOOLS_ACTIONS_ACTIOINCOPY_H
 
-#include <Application/LayerManager/Actions/ActionLayer.h>
+#include <Core/Action/Actions.h>
+#include <Application/LayerManager/LayerManager.h>
 
 namespace Seg3D
 {
@@ -37,7 +38,7 @@ namespace Seg3D
 class ActionCopyPrivate;
 typedef boost::shared_ptr< ActionCopyPrivate > ActionCopyPrivateHandle;
 
-class ActionCopy : public ActionLayer
+class ActionCopy : public Core::Action
 {
 
 CORE_ACTION
@@ -53,8 +54,22 @@ public:
   ActionCopy();
   virtual ~ActionCopy();
 
+  // -- Functions that describe action --
+public:
+  // VALIDATE:
+  // Each action needs to be validated just before it is posted. This way we
+  // enforce that every action that hits the main post_action signal will be
+  // a valid action to execute.
   virtual bool validate( Core::ActionContextHandle& context );
+
+  // RUN:
+  // Each action needs to have this piece implemented. It spells out how the
+  // action is run. It returns whether the action was successful or not.
   virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
+
+  // CLEAR_CACHE:
+  // Clear any objects that were given as a short cut to improve performance.
+  virtual void clear_cache(); 
 
 private:
   ActionCopyPrivateHandle private_;

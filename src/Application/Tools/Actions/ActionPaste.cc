@@ -51,8 +51,8 @@ public:
   Core::ActionParameter< size_t > max_slice_;
   Core::ActionParameter< size_t > slot_number_;
 
-  Core::ActionCachedHandle< Core::MaskLayerHandle > target_layer_;
-  Core::ActionCachedHandle< Core::MaskVolumeSliceHandle > vol_slice_;
+  Core::MaskLayerHandle target_layer_;
+  Core::MaskVolumeSliceHandle vol_slice_;
 
   bool deduce_params_;
 };
@@ -66,9 +66,6 @@ ActionPaste::ActionPaste() :
   this->add_argument( this->private_->max_slice_ );
 
   this->add_key( this->private_->slot_number_ );
-
-  this->add_cachedhandle( this->private_->target_layer_ );
-  this->add_cachedhandle( this->private_->vol_slice_ );
 
   this->private_->deduce_params_ = false;
 }
@@ -98,7 +95,7 @@ bool ActionPaste::validate( Core::ActionContextHandle& context )
     }
     
     Core::VolumeSliceHandle vol_slice = viewer->get_active_volume_slice();
-    this->private_->target_layer_.handle() = boost::dynamic_pointer_cast< MaskLayer >( active_layer );
+    this->private_->target_layer_ = boost::dynamic_pointer_cast< MaskLayer >( active_layer );
     this->private_->target_layer_id_.value() = active_layer->get_layer_id();
     this->private_->min_slice_.value() = vol_slice->get_slice_number();
     this->private_->max_slice_.value() = vol_slice->get_slice_number();
@@ -106,19 +103,24 @@ bool ActionPaste::validate( Core::ActionContextHandle& context )
     this->private_->slot_number_.value() = 0;
   }
   
-  if ( !this->cache_mask_layer_handle( context, this->private_->target_layer_id_,
-    this->private_->target_layer_ ) )
+  std::string error;
+  if ( !( LayerManager::CheckLayerExistanceAndType( this->private_->target_layer_id_.value(),
+    Core::VolumeType::MASK_E, error ) ) )
   {
+    context->report_error( error );
     return false;
   }
-
+  
   Core::NotifierHandle notifier;
-  if ( !LayerManager::Instance()->CheckLayerAvailabilityForProcessing(
+  if ( !LayerManager::CheckLayerAvailabilityForProcessing(
     this->private_->target_layer_id_.value(), notifier ) )
   {
-    context->report_error( "Mask layer '" + this->private_->target_layer_id_.value() + 
-      "' is not available for editing." );
+    context->report_need_resource( notifier );
+    return false;
   }
+  
+  this->private_->target_layer_ = LayerManager::FindMaskLayer(
+    this->private_->target_layer_id_.value() );
   
   if ( this->private_->slice_type_.value() != Core::VolumeSliceType::AXIAL_E &&
     this->private_->slice_type_.value() != Core::VolumeSliceType::CORONAL_E &&
@@ -136,7 +138,7 @@ bool ActionPaste::validate( Core::ActionContextHandle& context )
   Core::VolumeSliceType slice_type = static_cast< Core::VolumeSliceType::enum_type >(
     this->private_->slice_type_.value() );
   Core::MaskVolumeSliceHandle volume_slice( new Core::MaskVolumeSlice(
-    this->private_->target_layer_.handle()->get_mask_volume(), slice_type ) );
+    this->private_->target_layer_->get_mask_volume(), slice_type ) );
   if ( this->private_->min_slice_.value() >= volume_slice->number_of_slices() )
   {
     context->report_error( "Slice number is out of range." );
@@ -145,7 +147,7 @@ bool ActionPaste::validate( Core::ActionContextHandle& context )
 
   this->private_->max_slice_.value() = Core::Min( this->private_->max_slice_.value(),
     volume_slice->number_of_slices() - 1 );
-  this->private_->vol_slice_.handle() = volume_slice;
+  this->private_->vol_slice_ = volume_slice;
 
   ClipboardItemConstHandle clipboard_item = Clipboard::Instance()->get_item(
     this->private_->slot_number_.value() );
@@ -167,9 +169,16 @@ bool ActionPaste::validate( Core::ActionContextHandle& context )
 
 bool ActionPaste::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
+  // Get the layer on which this action operates
+  LayerHandle layer = LayerManager::Instance()->get_layer_by_id( 
+    this->private_->target_layer_id_.value() );
+    
   // Build the undo/redo for this action
   LayerUndoBufferItemHandle item( new LayerUndoBufferItem( "Paste" ) );
-    
+
+  // The redo action is the current one
+  item->set_redo_action( this->shared_from_this() );
+        
   // Get slice type
   Core::VolumeSliceType slice_type = static_cast< Core::VolumeSliceType::enum_type >(
     this->private_->slice_type_.value() );
@@ -177,24 +186,18 @@ bool ActionPaste::run( Core::ActionContextHandle& context, Core::ActionResultHan
   // Get the slice number
   size_t min_slice = this->private_->min_slice_.value();
   size_t max_slice = this->private_->max_slice_.value();
-  
-  // Get the layer on which this action operates
-  LayerHandle layer = LayerManager::Instance()->get_layer_by_id( 
-    this->private_->target_layer_id_.value() );
+    
   // Create a check point of the slice on which the flood fill will operate
   LayerCheckPointHandle check_point( new LayerCheckPoint( layer, slice_type, 
     min_slice, max_slice) );
 
-  // The redo action is the current one
-  item->set_redo_action( this->shared_from_this() );
-  
   // Tell the item which layer to restore with which check point for the undo action
   item->add_layer_to_restore( layer, check_point );
 
   // Now add the undo/redo action to undo buffer
   LayerUndoBuffer::Instance()->insert_undo_item( context, item );
 
-  Core::MaskVolumeSliceHandle volume_slice = this->private_->vol_slice_.handle();
+  Core::MaskVolumeSliceHandle volume_slice = this->private_->vol_slice_;
   ClipboardItemConstHandle clipboard_item = Clipboard::Instance()->get_item( 
     this->private_->slot_number_.value() );
   for ( size_t i = this->private_->min_slice_.value(); i < this->private_->max_slice_.value(); ++i )
@@ -208,6 +211,12 @@ bool ActionPaste::run( Core::ActionContextHandle& context, Core::ActionResultHan
     clipboard_item->get_buffer() ), true );
   
   return true;
+}
+
+void ActionPaste::clear_cache()
+{
+  this->private_->target_layer_.reset();
+  this->private_->vol_slice_.reset();
 }
 
 void ActionPaste::Dispatch( Core::ActionContextHandle context )
@@ -232,6 +241,5 @@ void ActionPaste::Dispatch( Core::ActionContextHandle context,
 
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }
-
 
 } // end namespace Seg3D

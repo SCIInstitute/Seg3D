@@ -35,12 +35,11 @@
 
 // Application includes
 #include <Application/Layer/LayerFWD.h>
-#include <Application/LayerManager/Actions/ActionLayer.h>
 
 namespace Seg3D
 {
 
-class ActionDeleteLayers : public ActionLayer
+class ActionDeleteLayers : public Core::Action
 {
 
 CORE_ACTION( 
@@ -54,7 +53,6 @@ public:
   ActionDeleteLayers()
   {
     this->add_argument( this->group_id_ );
-    this->add_cachedhandle( this->group_ );
   }
   
   virtual ~ActionDeleteLayers()
@@ -63,16 +61,20 @@ public:
   
 // -- Functions that describe action --
 public:
+  // VALIDATE:
+  // Each action needs to be validated just before it is posted. This way we
+  // enforce that every action that hits the main post_action signal will be
+  // a valid action to execute.
   virtual bool validate( Core::ActionContextHandle& context );
+
+  // RUN:
+  // Each action needs to have this piece implemented. It spells out how the
+  // action is run. It returns whether the action was successful or not.
   virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
 
 private:
   // This parameter contains the id of the layer group
   Core::ActionParameter< std::string > group_id_;
-  
-  // This cached handle contains a short cut to the layer group 
-  // from which layers need to be deleted
-  Core::ActionCachedHandle< LayerGroupHandle > group_;
 
   // -- Dispatch this action from the interface --
 public:

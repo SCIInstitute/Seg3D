@@ -109,8 +109,7 @@ bool ActionFloodFill::validate( Core::ActionContextHandle& context )
   if ( !LayerManager::Instance()->CheckLayerAvailabilityForProcessing(
     this->private_->target_layer_id_.value(), notifier ) )
   {
-    context->report_error( "Mask layer '" + this->private_->target_layer_id_.value() + 
-      "' is not available for editing." );
+    context->report_need_resource( notifier );
     return false;
   }
   

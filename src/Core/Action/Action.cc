@@ -102,21 +102,12 @@ void Action::add_key_ptr( ActionParameterBase* param )
   this->keys_.push_back( param );
 }
 
-void Action::add_cached_handle_ptr( ActionCachedHandleBase* handle )
-{
-  this->cached_handles_.push_back( handle );
-}
-
 void Action::clear_cache()
 {
-  cached_handle_vector_type::iterator it = cached_handles_.begin();
-  cached_handle_vector_type::iterator it_end = cached_handles_.end();
-  
-  while ( it != it_end )
-  {
-    (*it)->clear_cached_handle();
-    ++it;
-  }
+}
+
+void Action::clear_redo_cache( ActionContextHandle& context )
+{
 }
 
 std::string Action::export_to_string() const

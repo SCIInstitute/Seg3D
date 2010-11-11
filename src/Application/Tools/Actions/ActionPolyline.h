@@ -31,7 +31,7 @@
 
 #include <Core/Volume/VolumeSlice.h>
 
-#include <Application/LayerManager/Actions/ActionLayer.h>
+#include <Application/LayerManager/LayerManager.h>
 
 namespace Seg3D
 {
@@ -39,7 +39,7 @@ namespace Seg3D
 class ActionPolylinePrivate;
 typedef boost::shared_ptr< ActionPolylinePrivate > ActionPolylinePrivateHandle;
 
-class ActionPolyline : public ActionLayer
+class ActionPolyline : public Core::Action
 {
 
 CORE_ACTION
@@ -59,8 +59,20 @@ public:
   ActionPolyline();
   virtual ~ActionPolyline();
 
+  // VALIDATE:
+  // Each action needs to be validated just before it is posted. This way we
+  // enforce that every action that hits the main post_action signal will be
+  // a valid action to execute.
   virtual bool validate( Core::ActionContextHandle& context );
+
+  // RUN:
+  // Each action needs to have this piece implemented. It spells out how the
+  // action is run. It returns whether the action was successful or not.
   virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
+
+  // CLEAR_CACHE:
+  // Clear any objects that were given as a short cut to improve performance.
+  virtual void clear_cache();
 
 private:
   ActionPolylinePrivateHandle private_;

@@ -45,6 +45,7 @@ namespace Seg3D
 bool ActionImportLayer::validate( Core::ActionContextHandle& context )
 {
   boost::filesystem::path full_filename( filename_.value() );
+  
   if ( !( boost::filesystem::exists ( full_filename ) ) )
   {
     context->report_error( std::string( "File '" ) + this->filename_.value() +
@@ -52,10 +53,10 @@ bool ActionImportLayer::validate( Core::ActionContextHandle& context )
     return false;
   }
 
-  if ( !( this->layer_importer_.handle() ) )
+  if ( !( this->layer_importer_ ) )
   {
     if ( !( LayerIO::Instance()->create_importer( this->filename_.value(),  
-      this->layer_importer_.handle(), this->importer_.value() ) ) )
+      this->layer_importer_, this->importer_.value() ) ) )
     {
       context->report_error( std::string( "Could not create importer with name '" ) +
         this->importer_.value() + "' for file '" + this->filename_.value() + "'." );
@@ -71,7 +72,7 @@ bool ActionImportLayer::validate( Core::ActionContextHandle& context )
     return false;
   }
 
-  if ( !( this->layer_importer_.handle()->get_importer_modes() & mode ) )
+  if ( !( this->layer_importer_->get_importer_modes() & mode ) )
   {
     context->report_error( std::string( "Import mode '") +  this->mode_.value() + 
       "' is not available for this importer." );
@@ -87,11 +88,11 @@ bool ActionImportLayer::run( Core::ActionContextHandle& context, Core::ActionRes
   if( this->series_import_.value() == true )
   {
     file_or_folder_name = boost::filesystem::path( 
-      this->layer_importer_.handle()->get_filename() ).parent_path().filename();
+      this->layer_importer_->get_filename() ).parent_path().filename();
   }
   else
   {
-    file_or_folder_name = this->layer_importer_.handle()->get_filename();
+    file_or_folder_name = this->layer_importer_->get_filename();
   }
 
   std::string message = std::string("Importing '") + file_or_folder_name + std::string("'");
@@ -105,7 +106,7 @@ bool ActionImportLayer::run( Core::ActionContextHandle& context, Core::ActionRes
   ImportFromString( this->mode_.value(), mode );
 
   std::vector<LayerHandle> layers;
-  bool succeed = this->layer_importer_.handle()->import_layer( mode, layers );
+  bool succeed = this->layer_importer_->import_layer( mode, layers );
     
   for (size_t j = 0; j < layers.size(); j++)
   {
@@ -115,6 +116,11 @@ bool ActionImportLayer::run( Core::ActionContextHandle& context, Core::ActionRes
   progress->end_progress_reporting();
 
   return succeed;
+}
+
+void ActionImportLayer::clear_cache()
+{
+  this->layer_importer_.reset();
 }
 
 Core::ActionHandle ActionImportLayer::Create( const std::string& filename, 
@@ -140,7 +146,7 @@ Core::ActionHandle ActionImportLayer::Create( const LayerImporterHandle& importe
   ActionImportLayer* action = new ActionImportLayer;
   
   // Fill in the short cut so the data that was already read is not lost
-  action->layer_importer_.handle() = importer;
+  action->layer_importer_ = importer;
 
   // We need to fill in these to ensure the action can be replayed without the importer present
   action->filename_.value() = importer->get_filename();

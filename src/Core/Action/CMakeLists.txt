@@ -41,8 +41,6 @@ SET(CORE_ACTION_SRCS
   ActionParameter.h
   ActionParameter.cc
   ActionResult.h
-  ActionCachedHandle.h
-  ActionCachedHandle.cc
   ActionProgress.h
   ActionProgress.cc
   ActionDispatcher.h

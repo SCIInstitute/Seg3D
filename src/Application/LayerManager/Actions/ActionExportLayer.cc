@@ -61,7 +61,6 @@ bool ActionExportLayer::run( Core::ActionContextHandle& context, Core::ActionRes
   LayerExporterMode mode = LayerExporterMode::INVALID_E;
   ImportFromString( this->mode_.value(), mode );
 
-
   std::string message = std::string( "Exporting your selected layers." );
     
   Core::ActionProgressHandle progress = 
@@ -76,17 +75,17 @@ bool ActionExportLayer::run( Core::ActionContextHandle& context, Core::ActionRes
 
   if( mode == LayerExporterMode::SINGLE_MASK_E )
   {
-    this->layer_exporter_.handle()->export_layer( mode, 
+    // TODO:
+    // This does not work for scripts as layer_exporter has not been created yet
+    // --JGS
+    this->layer_exporter_->export_layer( mode, 
       filename_and_path.string(), "unused" );
   }
   else
   {
-    this->layer_exporter_.handle()->export_layer( mode, 
+    this->layer_exporter_->export_layer( mode, 
       filename_and_path.parent_path().string(), filename_without_extension );
   }
-
-  
-  //LayerManager::Instance()->export_layer( this->file_path_.value() );
 
   progress->end_progress_reporting();
 
@@ -99,12 +98,16 @@ Core::ActionHandle ActionExportLayer::Create( const LayerExporterHandle& exporte
   // Create new action
   ActionExportLayer* action = new ActionExportLayer;
   
-  action->layer_exporter_.handle() = exporter;
-  action->mode_.value()     = ExportToString(mode);
+  action->layer_exporter_ = exporter;
+  action->mode_.value() = ExportToString(mode);
   action->file_path_.value() = file_path;
   
   // Post the new action
   return Core::ActionHandle( action );
+}
+
+void ActionExportLayer::clear_cache()
+{
 }
 
 void ActionExportLayer::Dispatch( Core::ActionContextHandle context, 

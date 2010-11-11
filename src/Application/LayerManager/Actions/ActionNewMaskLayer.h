@@ -35,12 +35,12 @@
 
 // Application includes
 #include <Application/Layer/LayerFWD.h>
-#include <Application/LayerManager/Actions/ActionLayer.h>
+#include <Application/LayerManager/LayerAction.h>
 
 namespace Seg3D
 {
 
-class ActionNewMaskLayer : public ActionLayer
+class ActionNewMaskLayer : public LayerAction
 {
 
 CORE_ACTION( 
@@ -54,7 +54,6 @@ public:
   ActionNewMaskLayer()
   {
     this->add_argument( group_id_);
-    //this->add_cachedhandle( group_ );
   }
   
   virtual ~ActionNewMaskLayer()
@@ -71,9 +70,6 @@ private:
   // The name of the group where the mask needs to be added
   Core::ActionParameter< std::string > group_id_;
   
-  //  A short cut to where the layer group
-  //Core::ActionCachedHandle< LayerGroupHandle > group_;
-
   // -- Dispatch this action from the interface --
 public:
   // CREATE:

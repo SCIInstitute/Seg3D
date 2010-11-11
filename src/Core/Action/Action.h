@@ -52,7 +52,6 @@
 #include <Core/Action/ActionInfo.h>
 #include <Core/Action/ActionContext.h>
 #include <Core/Action/ActionParameter.h>
-#include <Core/Action/ActionCachedHandle.h>
 #include <Core/Action/ActionResult.h>
 
 namespace Core
@@ -78,16 +77,26 @@ public:
   // Virtual destructor for memory management of derived classes
   virtual ~Action(); // << NEEDS TO BE REIMPLEMENTED
 
-  // -- action definition --
+  // -- query information (from the action info) --
 public:
   // GET_ACTION_INFO:
   // Get the action information class that contains all the information about the
   // action.
-  // NOTE: this function is generated using the macro for each function
+  // NOTE: this function is generated using the macro for each function. Hence it does not need
+  // to be implemented
   virtual ActionInfoHandle get_action_info() const = 0;
 
-  // -- query information (from the action info) --
-public: 
+  // -- direct functions for querying information --
+  // NOTE: The following functions are implemented through get_action_info() and query the static
+  // information provided in the action.
+  
+  // NOTE: The reason for implementing ActionInfo in a separate class, is that it avoids 
+  // duplicating this information for each action and all the actions of the same type share all
+  // the information stored in memory. Hence although the interface allows querying the 
+  // information through member functions, this information is shared with the static functions
+  // provided for each sub class of this class. Hence that also explains why the get_action_info
+  // function is virtual. It accesses the record from the derived class.
+  
   // GET_DEFINTION:
   // Get the definition of the action (in XML format)
   std::string get_definition() const;
@@ -121,6 +130,12 @@ public:
   // CHANGES_PROJECT_DATA:
   // Query whether the action changes the data
   virtual bool changes_project_data();
+  
+  // NOTE: This function is overloadable from the default subclass definition. As certain 
+  // functions like Set, Add, etc, have this property depend on the actual object they operate
+  // on. For example setting a layer state variable should change this, whereas a interface
+  // variable should not. For these functions the default implementation that picks up this
+  // property from the macro can thence be overwritten.
   
   // -- Run/Validate interface --
 public:
@@ -171,15 +186,6 @@ public:
     this->add_key_ptr( &param );
   }
 
-  // ADD_CACHEDHANDLE:
-  // A cached handle needs to be registered so they can be deleted
-  // once the action has been completed.
-  template< class CACHEDHANDLE >
-  void add_cachedhandle( CACHEDHANDLE& handle )
-  {
-    this->add_cached_handle_ptr( &handle );
-  }
-
   // EXPORT_TO_STRING:
   // Export the action command into a string, so it can stored
   // The action factory can recreate the action from this string
@@ -196,7 +202,16 @@ public:
 
   // CLEAR_CACHE:
   // Clear any objects that were given as a short cut to improve performance.
+  // NOTE: An action should not contain any persistent handles, as actions may be kept
+  // for a provenance record.
   virtual void clear_cache();
+
+  // CLEAR_REDO_CACHE:
+  // Clear all the information that was recorded for redoing the action
+  // NOTE: This function is only implemented for actions that can be redone. Its main purpose is
+  // to ensure that when redoing actions it will generate the same unique identifiers.
+  // NOTE: The context is suppied to check whether the function is run from the undo buffer.
+  virtual void clear_redo_cache( ActionContextHandle& context );
 
 private:
 
@@ -205,21 +220,15 @@ private:
   // with references of the parameters for more convenience.
   void add_argument_ptr( ActionParameterBase* param );
   void add_key_ptr( ActionParameterBase* param );
-  void add_cached_handle_ptr( ActionCachedHandleBase* handle );
 
   // Typedefs
   typedef std::vector< ActionParameterBase* > parameter_list_type;
-  typedef std::vector< ActionCachedHandleBase* > cached_handle_vector_type;
 
   // Vector that stores the required arguments of the action.
   parameter_list_type arguments_;
 
   // Vector that stores the option key value pairs of the action.
   parameter_list_type keys_;
-  
-  // Vector that stores shared pointers to temporary objects
-  cached_handle_vector_type cached_handles_;
-
 };
 
 // CORE_ACTION:

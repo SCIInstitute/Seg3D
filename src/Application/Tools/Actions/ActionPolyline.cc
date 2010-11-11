@@ -48,8 +48,8 @@ public:
   Core::ActionParameter< bool > erase_;
   Core::ActionParameter< std::vector< ActionPolyline::VertexCoord > > vertices_;
 
-  Core::ActionCachedHandle< Core::MaskLayerHandle > target_layer_;
-  Core::ActionCachedHandle< Core::MaskVolumeSliceHandle > vol_slice_;
+  Core::MaskLayerHandle target_layer_;
+  Core::MaskVolumeSliceHandle vol_slice_;
 };
 
 ActionPolyline::ActionPolyline() :
@@ -60,8 +60,6 @@ ActionPolyline::ActionPolyline() :
   this->add_argument( this->private_->slice_number_ );
   this->add_argument( this->private_->erase_ );
   this->add_argument( this->private_->vertices_ );
-  this->add_cachedhandle( this->private_->target_layer_ );
-  this->add_cachedhandle( this->private_->vol_slice_ );
 }
 
 ActionPolyline::~ActionPolyline()
@@ -70,16 +68,22 @@ ActionPolyline::~ActionPolyline()
 
 bool ActionPolyline::validate( Core::ActionContextHandle& context )
 {
-  if ( !this->cache_mask_layer_handle( context, this->private_->target_layer_id_,
-    this->private_->target_layer_ ) )
+  // Check whether the target layer exists
+  MaskLayerHandle target_layer = boost::dynamic_pointer_cast< MaskLayer >( 
+    LayerManager::Instance()->get_layer_by_id( this->private_->target_layer_id_.value() ) );
+  if ( !target_layer )
   {
+    context->report_error( "Layer '" + this->private_->target_layer_id_.value() +
+      "' is not a valid mask layer." );
     return false;
   }
 
-  if ( !this->private_->target_layer_.handle()->has_valid_data() )
+  // Check whether the target layer can be used for processing
+  Core::NotifierHandle notifier;
+  if ( !LayerManager::Instance()->CheckLayerAvailabilityForProcessing(
+    this->private_->target_layer_id_.value(), notifier ) )
   {
-    context->report_error( "Mask layer '" + this->private_->target_layer_id_.value() + 
-      "' is invalid." );
+    context->report_need_resource( notifier );
     return false;
   }
   
@@ -94,14 +98,14 @@ bool ActionPolyline::validate( Core::ActionContextHandle& context )
   Core::VolumeSliceType slice_type = static_cast< Core::VolumeSliceType::enum_type >(
     this->private_->slice_type_.value() );
   Core::MaskVolumeSliceHandle volume_slice( new Core::MaskVolumeSlice(
-    this->private_->target_layer_.handle()->get_mask_volume(), slice_type ) );
+    this->private_->target_layer_->get_mask_volume(), slice_type ) );
   if ( this->private_->slice_number_.value() >= volume_slice->number_of_slices() )
   {
     context->report_error( "Slice number is out of range." );
     return false;
   }
   volume_slice->set_slice_number( this->private_->slice_number_.value() );
-  this->private_->vol_slice_.handle() = volume_slice;
+  this->private_->vol_slice_ = volume_slice;
   
   const std::vector< VertexCoord >& vertices = this->private_->vertices_.value();
   if ( vertices.size() <= 2 )
@@ -177,7 +181,7 @@ inline void ComputeIntersection( const ActionPolyline::VertexCoord& start,
 
 bool ActionPolyline::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
-  Core::MaskVolumeSliceHandle volume_slice = this->private_->vol_slice_.handle();
+  Core::MaskVolumeSliceHandle volume_slice = this->private_->vol_slice_;
   size_t nx = volume_slice->nx();
   size_t ny = volume_slice->ny();
 
@@ -271,6 +275,12 @@ bool ActionPolyline::run( Core::ActionContextHandle& context, Core::ActionResult
   mask_data_block->mask_updated_signal_();
 
   return true;
+}
+
+void ActionPolyline::clear_cache()
+{
+  this->private_->target_layer_.reset();
+  this->private_->vol_slice_.reset();
 }
 
 void ActionPolyline::Dispatch( Core::ActionContextHandle context, 

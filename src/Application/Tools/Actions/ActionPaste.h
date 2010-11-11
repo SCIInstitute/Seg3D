@@ -26,10 +26,11 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_TOOLS_ACTIONS_ACTIOINPASTE_H
-#define APPLICATION_TOOLS_ACTIONS_ACTIOINPASTE_H
+#ifndef APPLICATION_TOOLS_ACTIONS_ACTIONPASTE_H
+#define APPLICATION_TOOLS_ACTIONS_ACTIONPASTE_H
 
-#include <Application/LayerManager/Actions/ActionLayer.h>
+// Core includes
+#include <Core/Action/Actions.h>
 
 namespace Seg3D
 {
@@ -37,7 +38,7 @@ namespace Seg3D
 class ActionPastePrivate;
 typedef boost::shared_ptr< ActionPastePrivate > ActionPastePrivateHandle;
 
-class ActionPaste : public ActionLayer
+class ActionPaste : public Core::Action
 {
 
 CORE_ACTION
@@ -54,8 +55,20 @@ public:
   ActionPaste();
   virtual ~ActionPaste();
 
+  // VALIDATE:
+  // Each action needs to be validated just before it is posted. This way we
+  // enforce that every action that hits the main post_action signal will be
+  // a valid action to execute.
   virtual bool validate( Core::ActionContextHandle& context );
+
+  // RUN:
+  // Each action needs to have this piece implemented. It spells out how the
+  // action is run. It returns whether the action was successful or not.
   virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
+
+  // CLEAR_CACHE:
+  // Clear any objects that were given as a short cut to improve performance.
+  virtual void clear_cache();
 
 private:
   ActionPastePrivateHandle private_;

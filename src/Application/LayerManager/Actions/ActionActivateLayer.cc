@@ -40,8 +40,13 @@ namespace Seg3D
 
 bool ActionActivateLayer::validate( Core::ActionContextHandle& context )
 {
-  if ( ! this->cache_layer_handle( context, this->layer_id_, this->layer_ ) 
-    || !this->check_availability( context, this->layer_ ) ) return false;
+  std::string error;
+  
+  if ( !(LayerManager::Instance()->CheckLayerExistance( this->layer_id_.value(), error ) ) )
+  {
+    context->report_error( error );
+    return false;
+  }
 
   return true; // validated
 }
@@ -49,7 +54,8 @@ bool ActionActivateLayer::validate( Core::ActionContextHandle& context )
 bool ActionActivateLayer::run( Core::ActionContextHandle& context, 
   Core::ActionResultHandle& result )
 {
-  LayerManager::Instance()->set_active_layer( layer_.handle() );
+  LayerHandle layer = LayerManager::FindLayer( this->layer_id_.value() );
+  LayerManager::Instance()->set_active_layer( layer );
   return true;
 }
 
@@ -57,7 +63,6 @@ Core::ActionHandle ActionActivateLayer::Create( LayerHandle layer )
 {
   ActionActivateLayer* action = new ActionActivateLayer;
   
-  action->layer_.handle() = layer;
   action->layer_id_.value() = layer->get_layer_id();
   
   return Core::ActionHandle( action );
@@ -71,7 +76,6 @@ Core::ActionHandle ActionActivateLayer::Create( std::string layer_id )
 
   return Core::ActionHandle( action );
 }
-
 
 void ActionActivateLayer::Dispatch( Core::ActionContextHandle context, LayerHandle layer )
 {

@@ -83,6 +83,15 @@ public:
   // NUMBER_OF_STATES:
   // The number of state variables in the system
   size_t number_of_states();
+  
+  // GET_NEXT_STATEHANDLER_COUNT:
+  // Get the count for the next state handler
+  size_t get_next_statehandler_count( const std::string& stateid );
+  
+  // SET_NEXT_STATEHANDLER_COUNT:
+  // Reset the count to a certain number
+  // NOTE: This functionality is intended for redo
+  void set_next_statehandler_count( const std::string& stateid, size_t count);
 
 public:
   // LOAD_STATES:

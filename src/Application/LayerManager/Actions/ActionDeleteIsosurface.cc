@@ -29,6 +29,7 @@
 // Application includes
 #include <Application/Layer/MaskLayer.h>
 #include <Application/LayerManager/Actions/ActionDeleteIsosurface.h>
+#include <Application/LayerManager/LayerManager.h>
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
@@ -40,17 +41,18 @@ namespace Seg3D
 
 bool ActionDeleteIsosurface::validate( Core::ActionContextHandle& context )
 {
-  // Check for valid layer
-  if ( ! this->cache_mask_layer_handle( context, this->mask_layer_id_, this->mask_layer_ ) ) 
+  // Check whether the layer exists and is of the right type and return an
+  // error if not
+  std::string error;
+  if ( !( LayerManager::CheckLayerExistanceAndType( this->layer_id_.value(), 
+    Core::VolumeType::MASK_E, error ) ) )
   {
+    context->report_error( error );
     return false;
   }
-
-  // Check for valid mask data
-  if( !this->mask_layer_.handle()->has_valid_data() ) 
-  {
-    return false;
-  }
+  
+  // NOTE: We do not check whether the layer is locked. The isosurface that is presently there
+  // can still be deleted no matter what.
 
   return true; // validated
 }
@@ -58,7 +60,8 @@ bool ActionDeleteIsosurface::validate( Core::ActionContextHandle& context )
 bool ActionDeleteIsosurface::run( Core::ActionContextHandle& context, 
   Core::ActionResultHandle& result )
 {
-  this->mask_layer_.handle()->delete_isosurface();
+  MaskLayerHandle mask_layer = LayerManager::FindMaskLayer( this->layer_id_.value() );
+  mask_layer->delete_isosurface();
 
   return true;
 }
@@ -67,8 +70,7 @@ Core::ActionHandle ActionDeleteIsosurface::Create( MaskLayerHandle mask_layer )
 {
   ActionDeleteIsosurface* action = new ActionDeleteIsosurface;
 
-  action->mask_layer_.handle() = mask_layer;
-  action->mask_layer_id_.value() = mask_layer->get_layer_id();
+  action->layer_id_.value() = mask_layer->get_layer_id();
 
   return Core::ActionHandle( action );
 }

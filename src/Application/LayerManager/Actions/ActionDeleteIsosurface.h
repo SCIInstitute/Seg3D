@@ -35,12 +35,11 @@
 
 // Application includes
 #include <Application/Layer/LayerFWD.h>
-#include <Application/LayerManager/Actions/ActionLayer.h>
 
 namespace Seg3D
 {
 
-class ActionDeleteIsosurface : public ActionLayer
+class ActionDeleteIsosurface : public Core::Action
 {
 
 CORE_ACTION( 
@@ -53,8 +52,7 @@ CORE_ACTION(
 public:
   ActionDeleteIsosurface()
   {
-    this->add_argument( this->mask_layer_id_ );
-    this->add_cachedhandle( this->mask_layer_ );
+    this->add_argument( this->layer_id_ );
   }
   
   virtual ~ActionDeleteIsosurface()
@@ -68,12 +66,8 @@ public:
 
 private:
   // This parameter contains the id of the layer group
-  Core::ActionParameter< std::string > mask_layer_id_;
+  Core::ActionParameter< std::string > layer_id_;
   
-  // This cached handle contains a short cut to the layer for which the isosurface needs to be
-  // deleted
-  Core::ActionCachedHandle< MaskLayerHandle > mask_layer_;
-
   // -- Dispatch this action from the interface --
 public:
 

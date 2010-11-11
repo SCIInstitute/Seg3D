@@ -43,8 +43,8 @@ SET(APPLICATION_LAYERMANAGER_SRCS
   LayerUndoBufferItem.cc
   LayerUndoBuffer.h
   LayerUndoBuffer.cc
-  Actions/ActionLayer.h
-  Actions/ActionLayer.cc
+  LayerAction.h
+  LayerAction.cc
 )
 
 SET(APPLICATION_LAYERMANAGER_ACTIONS_SRCS

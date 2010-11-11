@@ -64,9 +64,21 @@ public:
   
   // -- Functions that describe action --
 public:
+  // VALIDATE:
+  // Each action needs to be validated just before it is posted. This way we
+  // enforce that every action that hits the main post_action signal will be
+  // a valid action to execute.
   virtual bool validate( Core::ActionContextHandle& context );
+
+  // RUN:
+  // Each action needs to have this piece implemented. It spells out how the
+  // action is run. It returns whether the action was successful or not.
   virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
   
+  // CLEAR_CACHE:
+  // Clear any objects that were given as a short cut to improve performance.
+  virtual void clear_cache(); 
+
   // -- Action parameters --
 private:
   // Where the layer should be exported
@@ -80,7 +92,7 @@ private:
   
   // Short cut to the layer exporter that has already loaded the data if the file
   // was read through the GUI
-  Core::ActionCachedHandle<LayerExporterHandle> layer_exporter_;
+  LayerExporterHandle layer_exporter_;
   
   // -- Dispatch this action from the interface --
 public:

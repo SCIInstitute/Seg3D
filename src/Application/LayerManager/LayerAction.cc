@@ -26,13 +26,12 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Core/Action/ActionCachedHandle.h>
+#include <Application/Layer/Layer.h>
+#include <Application/LayerManager/LayerManager.h>
+#include <Application/LayerManager/LayerAction.h>
 
-namespace Core
+namespace Seg3D
 {
 
-ActionCachedHandleBase::~ActionCachedHandleBase()
-{
-}
 
-} // namespace Core
+} // end namespace Seg3D

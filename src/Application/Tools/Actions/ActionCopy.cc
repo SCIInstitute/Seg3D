@@ -48,8 +48,8 @@ public:
   Core::ActionParameter< size_t > slice_number_;
   Core::ActionParameter< size_t > slot_number_;
 
-  Core::ActionCachedHandle< Core::MaskLayerHandle > target_layer_;
-  Core::ActionCachedHandle< Core::MaskVolumeSliceHandle > vol_slice_;
+  Core::MaskLayerHandle target_layer_;
+  Core::MaskVolumeSliceHandle vol_slice_;
 
   bool deduce_params_;
 };
@@ -62,9 +62,6 @@ ActionCopy::ActionCopy() :
   this->add_argument( this->private_->slice_number_ );
 
   this->add_key( this->private_->slot_number_ );
-
-  this->add_cachedhandle( this->private_->target_layer_ );
-  this->add_cachedhandle( this->private_->vol_slice_ );
 
   this->private_->deduce_params_ = false;
 }
@@ -95,25 +92,36 @@ bool ActionCopy::validate( Core::ActionContextHandle& context )
     }
     
     Core::VolumeSliceHandle vol_slice = viewer->get_active_volume_slice();
-    this->private_->target_layer_.handle() = boost::dynamic_pointer_cast< MaskLayer >( active_layer );
+    this->private_->target_layer_ = boost::dynamic_pointer_cast< MaskLayer >( active_layer );
     this->private_->target_layer_id_.value() = active_layer->get_layer_id();
     this->private_->slice_number_.value() = vol_slice->get_slice_number();
     this->private_->slice_type_.value() = vol_slice->get_slice_type();
     this->private_->slot_number_.value() = 0;
   }
   
-  if ( !this->cache_mask_layer_handle( context, this->private_->target_layer_id_,
-    this->private_->target_layer_ ) )
+  // Check whether the layer exists and is of the right type and return an
+  // error if not
+  std::string error;
+  if ( !( LayerManager::CheckLayerExistanceAndType(
+    this->private_->target_layer_id_.value(), Core::VolumeType::MASK_E, error ) ) )
   {
+    context->report_error( error );
     return false;
   }
 
-  if ( !this->private_->target_layer_.handle()->has_valid_data() )
+  // Check whether the layer is not locked for processing or creating, in which case the
+  // data is not data yet, hence we cannot compute an isosurface on it. The function returns
+  // a notifier when the action can be completed.
+  Core::NotifierHandle notifier;
+  if ( !( LayerManager::CheckLayerAvailabilityForProcessing( 
+    this->private_->target_layer_id_.value(), notifier ) ) )
   {
-    context->report_error( "Mask layer '" + this->private_->target_layer_id_.value() + 
-      "' is invalid." );
+    context->report_need_resource( notifier );
     return false;
   }
+  
+  this->private_->target_layer_ = 
+    LayerManager::FindMaskLayer( this->private_->target_layer_id_.value() );
   
   if ( this->private_->slice_type_.value() != Core::VolumeSliceType::AXIAL_E &&
     this->private_->slice_type_.value() != Core::VolumeSliceType::CORONAL_E &&
@@ -125,8 +133,9 @@ bool ActionCopy::validate( Core::ActionContextHandle& context )
   
   Core::VolumeSliceType slice_type = static_cast< Core::VolumeSliceType::enum_type >(
     this->private_->slice_type_.value() );
+    
   Core::MaskVolumeSliceHandle volume_slice( new Core::MaskVolumeSlice(
-    this->private_->target_layer_.handle()->get_mask_volume(), slice_type ) );
+    this->private_->target_layer_->get_mask_volume(), slice_type ) );
   if ( this->private_->slice_number_.value() >= volume_slice->number_of_slices() )
   {
     context->report_error( "Slice number is out of range." );
@@ -134,22 +143,28 @@ bool ActionCopy::validate( Core::ActionContextHandle& context )
   }
 
   volume_slice->set_slice_number( this->private_->slice_number_.value() );
-  this->private_->vol_slice_.handle() = volume_slice;
+  this->private_->vol_slice_ = volume_slice;
     
   return true;
 }
 
 bool ActionCopy::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
-  Core::MaskVolumeSliceHandle volume_slice = this->private_->vol_slice_.handle();
-  size_t nx = volume_slice->nx();
-  size_t ny = volume_slice->ny();
+  size_t nx = this->private_->vol_slice_->nx();
+  size_t ny = this->private_->vol_slice_->ny();
 
   ClipboardItemHandle clipboard_item = Clipboard::Instance()->get_item( nx, ny,
     Core::DataType::UCHAR_E, this->private_->slot_number_.value() );
-  volume_slice->copy_slice_data( reinterpret_cast< unsigned char* >( clipboard_item->get_buffer() ) );
+   this->private_->vol_slice_->copy_slice_data( reinterpret_cast< unsigned char* >( 
+    clipboard_item->get_buffer() ) );
 
   return true;
+}
+
+void ActionCopy::clear_cache()
+{
+  this->private_->target_layer_.reset();
+  this->private_->vol_slice_.reset();
 }
 
 void ActionCopy::Dispatch( Core::ActionContextHandle context )
@@ -172,6 +187,5 @@ void ActionCopy::Dispatch( Core::ActionContextHandle context,
 
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }
-
 
 } // end namespace Seg3D

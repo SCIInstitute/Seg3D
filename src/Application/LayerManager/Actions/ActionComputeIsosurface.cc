@@ -28,6 +28,7 @@
 
 // Application includes
 #include <Application/Layer/MaskLayer.h>
+#include <Application/LayerManager/LayerManager.h>
 #include <Application/LayerManager/Actions/ActionComputeIsosurface.h>
 
 // REGISTER ACTION:
@@ -40,18 +41,27 @@ namespace Seg3D
 
 bool ActionComputeIsosurface::validate( Core::ActionContextHandle& context )
 {
-  // Check for valid layer
-  if ( ! this->cache_mask_layer_handle( context, this->mask_layer_id_, this->mask_layer_ ) ) 
+  // Check whether the layer exists and is of the right type and return an
+  // error if not
+  std::string error;
+  if ( !( LayerManager::CheckLayerExistanceAndType( this->layer_id_.value(), 
+    Core::VolumeType::MASK_E, error ) ) )
   {
+    context->report_error( error );
     return false;
   }
-
-  // Check for valid mask data
-  if( !this->mask_layer_.handle()->has_valid_data() ) 
+  
+  // Check whether the layer is not locked for processing or creating, in which case the
+  // data is not data yet, hence we cannot compute an isosurface on it. The function returns
+  // a notifier when the action can be completed.
+  Core::NotifierHandle notifier;
+  if ( !( LayerManager::CheckLayerAvailabilityForUse( this->layer_id_.value(), 
+     notifier ) ) )
   {
+    context->report_need_resource( notifier );
     return false;
   }
-
+  
   // Check for valid quality factor
   double quality_factor = this->quality_factor_.value();
   if( !( quality_factor == 1.0 || quality_factor == 0.5 || 
@@ -66,7 +76,8 @@ bool ActionComputeIsosurface::validate( Core::ActionContextHandle& context )
 bool ActionComputeIsosurface::run( Core::ActionContextHandle& context, 
   Core::ActionResultHandle& result )
 {
-  this->mask_layer_.handle()->compute_isosurface( this->quality_factor_.value() );
+  MaskLayerHandle mask_layer = LayerManager::FindMaskLayer( this->layer_id_.value() );
+  mask_layer->compute_isosurface( this->quality_factor_.value() );
 
   return true;
 }
@@ -76,8 +87,7 @@ Core::ActionHandle ActionComputeIsosurface::Create( MaskLayerHandle mask_layer,
 {
   ActionComputeIsosurface* action = new ActionComputeIsosurface;
 
-  action->mask_layer_.handle() = mask_layer;
-  action->mask_layer_id_.value() = mask_layer->get_layer_id();
+  action->layer_id_.value() = mask_layer->get_layer_id();
   action->quality_factor_.value() = quality_factor;
 
   return Core::ActionHandle( action );

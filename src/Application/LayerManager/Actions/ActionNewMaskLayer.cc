@@ -44,10 +44,6 @@ namespace Seg3D
 
 bool ActionNewMaskLayer::validate( Core::ActionContextHandle& context )
 {
-  // TODO: 
-  // THis code needs updating, this is not up to standard
-  // --JS
-  //if ( !this->cache_group_handle( context, this->group_id_, this->group_ ) ) return false;
   if( !LayerManager::Instance()->get_layer_group( this->group_id_.value() ) ) return false; 
   
   return true; // validated

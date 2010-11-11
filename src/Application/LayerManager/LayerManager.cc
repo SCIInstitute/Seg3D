@@ -954,6 +954,31 @@ bool LayerManager::CheckLayerExistance( const std::string& layer_id, std::string
   return true;
 }
 
+
+bool LayerManager::CheckGroupExistance( const std::string& group_id, std::string& error )
+{
+  // NOTE: Security check to keep the program logic sane
+  // Only the Application Thread guarantees that nothing is changed in the program
+  if ( !( Core::Application::IsApplicationThread() ) )
+  {
+    CORE_THROW_LOGICERROR( "CheckGroupExistance can only be called from the"
+      " application thread." );
+  }
+  
+  // Clear error string
+  error = "";
+
+  // Check whether layer exists
+  if ( !( LayerManager::Instance()->get_layer_group( group_id ) ) )
+  {
+    error = std::string( "Incorrect groupid: group '") + group_id + "' does not exist.";
+    return false;
+  }
+
+  return true;
+}
+
+
 bool LayerManager::CheckLayerExistanceAndType( const std::string& layer_id, Core::VolumeType type, 
     std::string& error )
 {
@@ -1092,10 +1117,8 @@ bool LayerManager::CheckLayerAvailabilityForUse( const std::string& layer_id,
       "before availability" );
   }
 
-  // TODO: Need to implement the case that the layer is IN_USE_E, in which case we
-  // should allow the use of the layer.
   std::string layer_state = layer->data_state_->get();
-  if ( layer_state == Layer::AVAILABLE_C )
+  if ( layer_state == Layer::AVAILABLE_C || layer_state == Layer::IN_USE_C )
   {
     notifier.reset();
     return true;
@@ -1127,6 +1150,28 @@ bool LayerManager::CheckLayerAvailability( const std::string& layer_id, bool rep
   {
     return LayerManager::CheckLayerAvailabilityForUse( layer_id, notifier );  
   }
+}
+
+LayerHandle LayerManager::FindLayer( const std::string& layer_id )
+{
+  return LayerManager::Instance()->get_layer_by_id( layer_id );
+}
+
+MaskLayerHandle LayerManager::FindMaskLayer( const std::string& layer_id )
+{
+  return boost::shared_dynamic_cast<MaskLayer>(  
+    LayerManager::Instance()->get_layer_by_id( layer_id ) );
+}
+
+DataLayerHandle LayerManager::FindDataLayer( const std::string& layer_id )
+{
+  return boost::shared_dynamic_cast<DataLayer>(  
+    LayerManager::Instance()->get_layer_by_id( layer_id ) );
+}
+
+LayerGroupHandle LayerManager::FindLayerGroup( const std::string& group_id )
+{
+  return LayerManager::Instance()->get_layer_group( group_id );
 }
 
 bool LayerManager::LockForUse( LayerHandle layer, filter_key_type key )

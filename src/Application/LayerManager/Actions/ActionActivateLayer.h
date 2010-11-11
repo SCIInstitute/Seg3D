@@ -33,12 +33,11 @@
 #include <Core/Interface/Interface.h>
 
 #include <Application/Layer/LayerFWD.h>
-#include <Application/LayerManager/Actions/ActionLayer.h>
 
 namespace Seg3D
 {
 
-class ActionActivateLayer : public ActionLayer
+class ActionActivateLayer : public Core::Action
 {
   
 CORE_ACTION(
@@ -52,7 +51,6 @@ public:
   ActionActivateLayer()
   {
     this->add_argument( this->layer_id_ );
-    this->add_cachedhandle( this->layer_ );
   }
 
   virtual ~ActionActivateLayer()
@@ -67,9 +65,6 @@ public:
 private:
   // This parameter contains the id of the layer
   Core::ActionParameter< std::string > layer_id_;
-  
-  // This cached handle contains a short cut to the layer that needs activating
-  Core::ActionCachedHandle< LayerHandle > layer_;
 
   // -- Dispatch this action from the interface --
 public:

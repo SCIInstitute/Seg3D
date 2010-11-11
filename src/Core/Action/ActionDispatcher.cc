@@ -181,7 +181,15 @@ bool ActionDispatcher::is_busy()
 
 void ActionDispatcher::run_action( ActionHandle action, ActionContextHandle action_context )
 {
-  // Step (1): An action needs to be validated before it can be executed.
+  // Step (1): Empty redo buffers. These buffers record some parameters not recorded in the
+  // action such ids for output objects. To allow for accessing this information and updating it
+  // we call the reset_redo_cache() function. Which clears any information that was recorded
+  // for redoing the the function. Most actions will not do anything here.
+  // We supply the ActionContext as this operation may need to query whether it is run from a 
+  // script or from an undo buffer.
+  action->clear_redo_cache( action_context );
+
+  // Step (2): An action needs to be validated before it can be executed.
   // The validation is a separate step as invalid actions should not be
   // posted to the observers that record what the program does.
 
@@ -202,10 +210,10 @@ void ActionDispatcher::run_action( ActionHandle action, ActionContextHandle acti
   // NOTE: Observers that connect to this signal should not change the state of
   // the program as that may invalidate actions that were just run.
 
-  // Step (2): Tell observers what action has been executed
+  // Step (3): Tell observers what action has been executed
   pre_action_signal_( action );
 
-  // Step (3): Run action from the context that was provided. And if the action
+  // Step (4): Run action from the context that was provided. And if the action
   // was synchronous a done signal is triggered in the context, to inform the
   // program whether the action succeeded.
 
@@ -221,7 +229,7 @@ void ActionDispatcher::run_action( ActionHandle action, ActionContextHandle acti
     return;
   }
 
-  // Step (4): Set the action result if any was returned.
+  // Step (5): Set the action result if any was returned.
 
   if ( result.get() )
   {
@@ -237,7 +245,7 @@ void ActionDispatcher::run_action( ActionHandle action, ActionContextHandle acti
   // NOTE: Observers that connect to this signal should not change the state of
   // the program as that may invalidate actions that were just run.
 
-  // Step (5): Tell observers what action has been executed
+  // Step (6): Tell observers what action has been executed
   post_action_signal_( action, result );
 
   return;

@@ -43,7 +43,12 @@ namespace Seg3D
 
 bool ActionDeleteLayers::validate( Core::ActionContextHandle& context )
 {
-  if ( ! this->cache_group_handle( context, this->group_id_, this->group_ ) ) return false;
+  std::string error;
+  if ( !( LayerManager::CheckGroupExistance( this->group_id_.value(), error ) ) )
+  {
+    context->report_error( error );
+    return false;
+  }
 
   return true; // validated
 }
@@ -51,34 +56,13 @@ bool ActionDeleteLayers::validate( Core::ActionContextHandle& context )
 bool ActionDeleteLayers::run( Core::ActionContextHandle& context, 
   Core::ActionResultHandle& result )
 {
-  
-  // Create undo action
-  LayerUndoBufferItemHandle item( new LayerUndoBufferItem( "Delete layers" ) );
-
-  // TODO:
-  // To get this to work, I need to redo some of the invalidate pieces to allow for
-  // a decent undo of this action. Hence for now we just clear the undo buffer.
-  // -JS
-  
-/*
-  layer_list_type layer_list = this->group_.handle()->get_layer_list();
-
-  item->set_redo_action( this->shared_from_this() );
-  layer_list_type::iterator it = layer_list.begin();
-  layer_list_type::iterator it_end = layer_list.end();
-  
-  while ( it != it_end )
-  {
-    if ( ( *it )->selected_state_->get() )
-    {
-      item->add_layer_to_add( *it );
-    }
-    ++it;
-  }
-  LayerUndoBuffer::Instance()->insert_undo_item( context, item );
-*/
+  // NOTE: This action will reset the undo buffers as components needed for the undo may have been
+  // deleted.
+  // NOTE: Most programs assume when a user confirms a delete that one cannot undo there after.
   LayerUndoBuffer::Instance()->reset_undo_buffer();
-  LayerManager::Instance()->delete_layers( this->group_.handle() );
+  
+  LayerGroupHandle group = LayerManager::FindLayerGroup( this->group_id_.value() );
+  LayerManager::Instance()->delete_layers( group );
   
   return true;
 }
@@ -86,8 +70,6 @@ bool ActionDeleteLayers::run( Core::ActionContextHandle& context,
 Core::ActionHandle ActionDeleteLayers::Create( LayerGroupHandle group )
 {
   ActionDeleteLayers* action = new ActionDeleteLayers;
-
-  action->group_.handle() = group;
   action->group_id_.value() = group->get_group_id();
 
   return Core::ActionHandle( action );

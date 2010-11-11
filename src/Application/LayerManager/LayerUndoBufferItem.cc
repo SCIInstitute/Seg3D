@@ -96,16 +96,28 @@ void LayerUndoBufferItem::add_layer_to_restore( LayerHandle layer,
 
 bool LayerUndoBufferItem::apply_redo( Core::ActionContextHandle& context )
 {
+  // Clear the redo cache, which records the current identifier counters
+  this->private_->redo_action_->clear_redo_cache( context );
+
+  // Validate the action. It should validate, but if it doesn't it should fail
+  // gracefully. Hence we check anyway.
   if ( !( this->private_->redo_action_->validate( context ) ) )
   {
     return false;
   }
+  
+  // Run the action. Make the changes to the state engine.
+  // NOTE: We do not use the result yet
+  // TODO: Need to implent result handling 
+  // --JGS
   
   Core::ActionResultHandle result;
   if ( !( this->private_->redo_action_->run( context, result ) ) )
   {
     return false;
   }
+  
+  this->private_->redo_action_->clear_cache();
   
   return true;
 }

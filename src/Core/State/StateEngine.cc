@@ -232,6 +232,38 @@ bool StateEngine::get_state( const size_t idx, StateBaseHandle& state)
   return false;
 }
 
+size_t StateEngine::get_next_statehandler_count( const std::string& stateid )
+{
+  StateEnginePrivate::lock_type lock( this->private_->get_mutex() );
+
+  state_handler_counter_map_type::iterator it = 
+    this->private_->state_handler_counter_map_.find( stateid );
+
+  if ( it == this->private_->state_handler_counter_map_.end() ) return 0;
+  else return *( *it ).second;
+}
+
+void StateEngine::set_next_statehandler_count( const std::string& stateid, size_t count )
+{
+  StateEnginePrivate::lock_type lock( this->private_->get_mutex() );
+
+  state_handler_counter_map_type::iterator it = 
+    this->private_->state_handler_counter_map_.find( stateid );
+
+  if ( it == this->private_->state_handler_counter_map_.end() ) 
+  {
+    Core::AtomicCounterHandle state_handler_counter;
+    state_handler_counter = Core::AtomicCounterHandle( 
+      new Core::AtomicCounter( count ) );
+    this->private_->state_handler_counter_map_.insert( 
+      state_handler_counter_map_type::value_type( stateid, state_handler_counter  ) );
+  }
+  else
+  {
+    ( *it ).second = Core::AtomicCounterHandle( new Core::AtomicCounter( count ) );
+  }
+}
+
 
 std::string StateEngine::register_state_handler( const std::string &type_str, 
   Core::StateHandler* state_handler, bool auto_id )
