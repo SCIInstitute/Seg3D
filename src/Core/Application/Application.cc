@@ -289,8 +289,8 @@ bool Application::get_user_name( std::string& user_name )
 void Application::log_start()
 {
   CORE_LOG_MESSAGE( std::string( "Application: " ) + GetApplicationName() );
-  CORE_LOG_MESSAGE( std::string( "Version:" ) + GetVersion() );
-  CORE_LOG_MESSAGE( std::string( "64Bit:" )  + Core::ExportToString( Is64Bit() ) );
+  CORE_LOG_MESSAGE( std::string( "Version: " ) + GetVersion() + " " + GetReleaseName() );
+  CORE_LOG_MESSAGE( std::string( "64Bit: " )  + Core::ExportToString( Is64Bit() ) );
 }
 
 void Application::log_finish()

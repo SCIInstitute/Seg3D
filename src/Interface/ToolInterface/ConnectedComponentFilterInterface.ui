@@ -154,7 +154,7 @@
    <item>
     <widget class="QGroupBox" name="connected_to_mask_groupbox_">
      <property name="title">
-      <string>Extract components from mask:</string>
+      <string>Find components connected to mask:</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_5">
       <property name="leftMargin">
