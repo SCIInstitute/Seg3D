@@ -45,7 +45,7 @@ SEG3D_TOOL
   SEG3D_TOOL_NAME( "TransformTool", "Tool for transforming data" )
   SEG3D_TOOL_MENULABEL( "Transform" )
   SEG3D_TOOL_MENU( "Tools" )
-  SEG3D_TOOL_SHORTCUT_KEY( "Alt+Shift+T" )
+  SEG3D_TOOL_SHORTCUT_KEY( "Ctrl+Alt+9" )
   SEG3D_TOOL_URL( "http://seg3d.org/" )
 )
 

@@ -44,7 +44,7 @@ SEG3D_TOOL(
 SEG3D_TOOL_NAME( "GradientMagnitudeFilter", "Compute the norm of the gradient" )
 SEG3D_TOOL_MENULABEL( "Gradient Magnitude" )
 SEG3D_TOOL_MENU( "Advanced Filters" )
-SEG3D_TOOL_SHORTCUT_KEY( "Alt+G" )
+SEG3D_TOOL_SHORTCUT_KEY( "Ctrl+Alt+G" )
 SEG3D_TOOL_URL( "http://seg3d.org/" )
 SEG3D_TOOL_VERSION( "1" )
 )

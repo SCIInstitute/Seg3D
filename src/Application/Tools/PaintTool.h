@@ -78,7 +78,7 @@ SEG3D_TOOL
   SEG3D_TOOL_NAME( "PaintTool", "Tool for painting on masks" )
   SEG3D_TOOL_MENULABEL( "Paint Brush" )
   SEG3D_TOOL_MENU( "Tools" )
-  SEG3D_TOOL_SHORTCUT_KEY( "Alt+P" )
+  SEG3D_TOOL_SHORTCUT_KEY( "Ctrl+Alt+5" )
   SEG3D_TOOL_URL( "http://seg3d.org/" )
   SEG3D_TOOL_HOTKEYS( "Increase Brush Size=Mouse Scroll Up|Decrease Brush Size=Mouse"
     "Scroll Down|Paint Floodfill=F|Erase Floodfill=E|Paint=Left Mouse Button|"

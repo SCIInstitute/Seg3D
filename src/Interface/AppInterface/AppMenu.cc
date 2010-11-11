@@ -118,7 +118,7 @@ void AppMenu::create_file_menu( QMenu* qmenu )
 {
   QAction* qaction;
   qaction = qmenu->addAction( tr( "&New Project" ) );
-  qaction->setShortcut( tr( "Ctrl+N" ) );
+  /*qaction->setShortcut( tr( "Alt+N" ) );*/
   qaction->setToolTip( tr( "Start a new project." ) );
   connect( qaction, SIGNAL( triggered() ), this, SLOT( new_project_wizard() ) );
 
@@ -128,20 +128,20 @@ void AppMenu::create_file_menu( QMenu* qmenu )
   connect( qaction, SIGNAL( triggered() ), this, SLOT( open_project_from_file() ) );
   
 #if defined( _WIN32 ) || defined ( __APPLE__ )  
-  qaction = qmenu->addAction( tr( "&Show Project Folder" ) );
-  qaction->setShortcut( tr( "Ctrl+ALT+F" ) );
+  qaction = qmenu->addAction( tr( "Show Project Folder" ) );
+  qaction->setShortcut( tr( "Ctrl+Shift+F" ) );
   qaction->setToolTip( tr( "Open the current project folder" ) );
   connect( qaction, SIGNAL( triggered() ), this, SLOT( open_project_folder() ) );
 #endif
   
-  qaction = qmenu->addAction( tr( "&Save Project" ) );
+  qaction = qmenu->addAction( tr( "Save Project" ) );
   qaction->setShortcut( tr( "Ctrl+S" ) );
   qaction->setToolTip( tr( "Save the current project." ) );
   QtUtils::QtBridge::Connect( qaction, 
     boost::bind( &ActionSaveSession::Dispatch, 
     Core::Interface::GetWidgetActionContext(), false, "" ) );
     
-  qaction = qmenu->addAction( tr( "&Save Project As..." ) );
+  qaction = qmenu->addAction( tr( "Save Project As..." ) );
   qaction->setShortcut( tr( "Ctrl+Shift+S" ) );
   qaction->setToolTip( tr( "Save the current project as..." ) );
   connect( qaction, SIGNAL( triggered() ), this, SLOT( save_as_wizard() ) );
@@ -162,7 +162,7 @@ void AppMenu::create_file_menu( QMenu* qmenu )
 
   qmenu->addSeparator();
 
-  this->export_segmentation_qaction_ = qmenu->addAction( tr( "&Export Segmentation..." ) );
+  this->export_segmentation_qaction_ = qmenu->addAction( tr( "Export Segmentation..." ) );
   this->export_segmentation_qaction_->setShortcut( tr( "Ctrl+E" ) );
   this->export_segmentation_qaction_->setToolTip( tr( "Export masks as a segmentation." ) );
   QtUtils::QtBridge::Connect( this->export_segmentation_qaction_, 
@@ -170,7 +170,7 @@ void AppMenu::create_file_menu( QMenu* qmenu )
   this->export_segmentation_qaction_->setEnabled( false );
 
   this->export_active_data_layer_qaction_ = qmenu->addAction( tr( "Export Active Data Layer...") );
-  this->export_active_data_layer_qaction_->setShortcut( tr( "Ctrl+Shift+S" ) );
+  this->export_active_data_layer_qaction_->setShortcut( tr( "Ctrl+Shift+E" ) );
   this->export_active_data_layer_qaction_->setToolTip( tr( "Export the active data layer to file." ) );
   QtUtils::QtBridge::Connect( this->export_active_data_layer_qaction_, 
     boost::bind( &AppLayerIO::ExportLayer, this->main_window_ ) );
@@ -178,11 +178,11 @@ void AppMenu::create_file_menu( QMenu* qmenu )
     
   qmenu->addSeparator();
     
-  this->file_menu_recents_ = qmenu->addMenu( tr( "&Recent Projects" ) );
+  this->file_menu_recents_ = qmenu->addMenu( tr( "Recent Projects" ) );
   
   qmenu->addSeparator();
 
-  qaction = qmenu->addAction( tr( "&Quit" ) );
+  qaction = qmenu->addAction( tr( "Quit" ) );
   qaction->setShortcut( tr( "Ctrl+Q" ) );
   qaction->setToolTip( tr( "Open a file." ) );
   connect( qaction, SIGNAL( triggered() ), this->parent(), SLOT( close() ) );
@@ -311,7 +311,7 @@ void AppMenu::create_tool_menus( QMenuBar* qmenubar )
 
   while ( mit != mit_end )
   {
-    QMenu* qmenu = qmenubar->addMenu( QString::fromStdString( *mit ) );
+    QMenu* qmenu = qmenubar->addMenu( QString::fromUtf8( "&" ) + QString::fromStdString( *mit ) );
 
     ToolInfoList tool_types_list;
 
@@ -379,7 +379,7 @@ void AppMenu::create_window_menu( QMenu* qmenu )
 
   // Preferences Window
   qaction = qmenu->addAction( "Preferences Window" );
-  qaction->setShortcut( tr( "Ctrl+ALT+P" ) );
+  qaction->setShortcut( tr( "Ctrl+," ) );
   QtUtils::QtBridge::Connect( qaction, boost::bind( &ActionShowWindow::Dispatch,
     Core::Interface::GetWidgetActionContext(), std::string( "preferences" ) ) );
 }

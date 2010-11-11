@@ -41,7 +41,7 @@ SEG3D_TOOL(
 SEG3D_TOOL_NAME( "ThresholdSegmentationLSFilter", "Grow a mask region outwards based on the data, geometry and local edges" )
 SEG3D_TOOL_MENULABEL( "Segmentation Level Set" )
 SEG3D_TOOL_MENU( "Advanced Filters" )
-SEG3D_TOOL_SHORTCUT_KEY( "Alt+L" )
+SEG3D_TOOL_SHORTCUT_KEY( "Ctrl+Alt+L" )
 SEG3D_TOOL_URL( "http://seg3d.org/" )
 )
 

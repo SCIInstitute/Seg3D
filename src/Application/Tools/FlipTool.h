@@ -42,7 +42,7 @@ SEG3D_TOOL
   SEG3D_TOOL_NAME( "FlipTool", "Flip or Rotate a dataset" )
   SEG3D_TOOL_MENULABEL( "Flip/Rotate" )
   SEG3D_TOOL_MENU( "Tools" )
-  SEG3D_TOOL_SHORTCUT_KEY( "Alt+F" )
+  SEG3D_TOOL_SHORTCUT_KEY( "Ctrl+Alt+3" )
   SEG3D_TOOL_URL( "http://seg3d.org/" )
   SEG3D_TOOL_VERSION( "1" )
 )
