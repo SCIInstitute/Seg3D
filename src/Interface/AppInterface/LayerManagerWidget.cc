@@ -136,7 +136,7 @@ LayerManagerWidget::LayerManagerWidget( QWidget* parent ) :
   
   // Setup the spacing between the groups
   this->private_->group_layout_ = new QVBoxLayout;
-  this->private_->group_layout_->setSpacing( 0 );
+  this->private_->group_layout_->setSpacing( 2 );
   this->private_->group_layout_->setContentsMargins( 1, 1, 1, 1 );
   this->private_->group_layout_->setAlignment( Qt::AlignTop );
   

@@ -63,7 +63,6 @@ class AppStatusBarPrivate
 {
 public:
   Ui::StatusBar ui_;
-
 };
 
 AppStatusBar::AppStatusBar( QMainWindow* parent ) :
@@ -149,20 +148,6 @@ void AppStatusBar::set_status_report_label( std::string& status )
   this->private_->ui_.status_report_label_->setText( QString::fromUtf8( "Status: " ) + report );
 }
 
-void AppStatusBar::activate_history()
-{
-//  if( !this->history_widget_->isVisible() )
-//  {
-//    this->history_widget_->show();
-//  }
-//  else
-//  {
-//    this->history_widget_->hide();
-//  }
-  
-  
-}
-  
 void AppStatusBar::fix_icon_status()
 {
   this->private_->ui_.status_report_label_->setText( 
@@ -256,27 +241,16 @@ void AppStatusBar::set_message( int msg_type, std::string message )
     status_message = status_message + " " + *beg;
   }
 
-/*
-  switch( msg_type )
+  // Here we change the color of the text if we are reporting an error.
+  if( msg_type == Core::LogMessageType::ERROR_E )
   {
-  case Core::LogMessageType::ERROR_E:
     this->private_->ui_.status_report_label_->setStyleSheet( StyleSheet::STATUSBAR_ERROR_C );
-    break;
-  case Core::LogMessageType::WARNING_E:
-    this->private_->ui_.status_report_label_->setStyleSheet( StyleSheet::STATUSBAR_WARNING_C );
-    break;
-  case Core::LogMessageType::MESSAGE_E:
-    this->private_->ui_.status_report_label_->setStyleSheet( StyleSheet::STATUSBAR_MESSAGE_C );
-    break;
-  case Core::LogMessageType::DEBUG_E:
-    this->private_->ui_.status_report_label_->setStyleSheet( StyleSheet::STATUSBAR_DEBUG_C );
-    break;
-  default:
-    break;
   }
-*/
+  else
+  {
+    this->private_->ui_.status_report_label_->setStyleSheet( StyleSheet::STATUSBAR_C );
+  }
 
-  this->private_->ui_.status_report_label_->setStyleSheet( StyleSheet::STATUSBAR_C );
   this->private_->ui_.status_report_label_->setText( QString::fromStdString( message ) );
 }
 

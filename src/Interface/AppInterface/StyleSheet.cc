@@ -62,7 +62,7 @@ namespace Seg3D
   const QString StyleSheet::STATUSBAR_ERROR_C = QString::fromUtf8(
     "QLabel#status_report_label_{"
     " text-align: left;"
-    " color: rgb(121, 0, 0);"
+    " color: rgb(204, 0, 0);"
     " font: bold;"
     "}" );
   
