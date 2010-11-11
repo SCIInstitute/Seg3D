@@ -110,6 +110,7 @@ void QtSliderIntCombo::slider_signal( int value )
 void QtSliderIntCombo::setStep(int step)
 {
   block_signals( true );
+  this->private_->ui_.horizontalSlider->setPageStep( step );
     this->private_->ui_.horizontalSlider->setSingleStep( step );
     this->private_->ui_.spinBox->setSingleStep( step );
     block_signals( false );
