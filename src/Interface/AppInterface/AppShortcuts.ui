@@ -1445,7 +1445,7 @@ QWidget#scrollAreaWidgetContents_4{
                    <item>
                     <widget class="QLabel" name="label_22">
                      <property name="text">
-                      <string>CTRL+P</string>
+                      <string>CTRL+V</string>
                      </property>
                     </widget>
                    </item>
