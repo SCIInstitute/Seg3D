@@ -35,6 +35,7 @@
 // Application includes
 #include <Application/ProjectManager/ProjectManager.h>
 #include <Application/ProjectManager/Actions/ActionSaveProjectAs.h>
+#include <Application/ProjectManager/Actions/ActionSaveSession.h>
 
 // Interface includes
 #include <Interface/AppSaveProjectAsWizard/AppSaveProjectAsWizard.h>
@@ -44,11 +45,16 @@ namespace Seg3D
 {
 
 AppSaveProjectAsWizard::AppSaveProjectAsWizard( QWidget *parent ) :
-    QWizard( parent )
+    QWizard( parent ),
+    path_to_delete_( "" )
 {
     this->addPage( new SaveAsInfoPage );
     this->addPage( new SaveAsSummaryPage );
-
+    
+  connect( this->page( 0 ), SIGNAL( just_a_save() ), this, SLOT( finish_early() ) );
+  connect( this->page( 0 ), SIGNAL( need_to_set_delete_path( QString ) ), this, 
+    SLOT( set_delete_path( QString ) ) );
+  
   this->setPixmap( QWizard::BackgroundPixmap, QPixmap( QString::fromUtf8( 
     ":/Images/Symbol.png" ) ) );
   
@@ -61,11 +67,27 @@ AppSaveProjectAsWizard::~AppSaveProjectAsWizard()
 
 void AppSaveProjectAsWizard::accept()
 {
+  if( this->path_to_delete_ != "" )
+  {
+    boost::filesystem::remove_all( boost::filesystem::path( this->path_to_delete_ ) );
+  }
+
   ActionSaveProjectAs::Dispatch( Core::Interface::GetWidgetActionContext(), 
     field( "projectPath" ).toString().toStdString(),
     field( "projectName" ).toString().toStdString() );
     QDialog::accept();
 }
+
+void AppSaveProjectAsWizard::finish_early()
+{
+  this->close();
+}
+
+void AppSaveProjectAsWizard::set_delete_path( QString path )
+{
+  this->path_to_delete_ = path.toStdString();
+}
+
 
 SaveAsInfoPage::SaveAsInfoPage( QWidget *parent )
     : QWizardPage( parent )
@@ -99,6 +121,9 @@ SaveAsInfoPage::SaveAsInfoPage( QWidget *parent )
   
 void SaveAsInfoPage::initializePage()
 {
+  QString finishText = wizard()->buttonText( QWizard::FinishButton );
+  finishText.remove('&');
+
   boost::filesystem::path desktop_path;
   this->project_path_lineedit_->setText( QString::fromStdString( 
     ProjectManager::Instance()->current_project_path_state_->get() ) );
@@ -118,6 +143,46 @@ void SaveAsInfoPage::set_path()
     this->project_path_lineedit_->setText( project_directory_.canonicalPath() );
     registerField( "projectPath", this->project_path_lineedit_ );
 }
+
+bool SaveAsInfoPage::validatePage()
+{
+  // before we do anything we clear the delete path variable
+  Q_EMIT need_to_set_delete_path( "" );
+  
+  boost::filesystem::path new_path = 
+    boost::filesystem::path( this->project_path_lineedit_->text().toStdString() ) / 
+    boost::filesystem::path( this->project_name_lineedit_->text().toStdString() );
+    
+  if( boost::filesystem::exists( new_path ) )
+  {
+    if( ( ProjectManager::Instance()->current_project_->project_name_state_->get() == 
+      this->project_name_lineedit_->text().toStdString() ) && 
+      ( ProjectManager::Instance()->current_project_path_state_->get() == 
+      this->project_path_lineedit_->text().toStdString() ) )
+    {
+      ActionSaveSession::Dispatch( Core::Interface::GetWidgetActionContext(), false, "" );
+      Q_EMIT just_a_save();
+      return true;    
+    }
+  
+    int ret = QMessageBox::warning( this, 
+      "A project with this name already exists!",
+      "If you proceed the old project will be deleted and replaced.\n"
+      "Are you sure you would like to continue?",
+      QMessageBox::Yes | QMessageBox::No );
+
+    if( ret != QMessageBox::Yes )
+    {
+      return false;
+    }
+    
+    Q_EMIT need_to_set_delete_path( QString::fromStdString( new_path.string() ) );
+    //boost::filesystem::remove_all( new_path );
+  }
+  return true;
+}
+
+
 
 SaveAsSummaryPage::SaveAsSummaryPage( QWidget *parent )
     : QWizardPage( parent )

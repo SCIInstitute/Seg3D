@@ -45,12 +45,26 @@ public:
 
 private:
     void accept();
+    
+private Q_SLOTS:
+  void finish_early();
+  void set_delete_path( QString );
+  
+private:
+  std::string path_to_delete_;
+  
 };
 
 class SaveAsInfoPage : public QWizardPage
 {
 Q_OBJECT
 
+Q_SIGNALS:
+  // This signal is triggered when the user trys to do a save as without changing anything
+  void just_a_save();
+  
+  void need_to_set_delete_path( QString );
+  
 public:
     SaveAsInfoPage( QWidget *parent = 0 );
 
@@ -60,6 +74,11 @@ protected:
   // INITIALIZEPAGE:
   // function for preloading the page information for the info page
     void initializePage();
+    
+  // VALIDATEPAGE:
+  // function that is called right after the next button is clicked and used to process
+  // the entered data so it can be passed to the next page
+  virtual bool validatePage();
 
 private:
   QLabel *project_name_label_;
