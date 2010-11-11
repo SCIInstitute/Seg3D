@@ -142,7 +142,7 @@ void AppMenu::create_file_menu( QMenu* qmenu )
     Core::Interface::GetWidgetActionContext(), false, "" ) );
     
   qaction = qmenu->addAction( tr( "&Save Project As..." ) );
-  qaction->setShortcut( tr( "Ctrl+SHIFT+S" ) );
+  qaction->setShortcut( tr( "Ctrl+Shift+S" ) );
   qaction->setToolTip( tr( "Save the current project as..." ) );
   connect( qaction, SIGNAL( triggered() ), this, SLOT( save_as_wizard() ) );
     
