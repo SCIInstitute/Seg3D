@@ -125,6 +125,9 @@ public:
   // This function is called when there is a new redo tag
   static void UpdateRedoTag( qpointer_type qpointer, std::string tag );
   
+  
+  static void ConfirmRecentFileLoad( qpointer_type qpointer, const std::string& path );
+
 };
 
 

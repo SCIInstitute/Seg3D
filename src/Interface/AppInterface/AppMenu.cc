@@ -463,7 +463,7 @@ void AppMenu::open_project_from_file()
     if ( ProjectManager::Instance()->current_project_->check_project_changed() )
     {
       // Check whether the users wants to save and whether the user wants to quit
-      int ret = QMessageBox::warning( this->main_window_, "Create a new Project?",
+      int ret = QMessageBox::warning( this->main_window_, "Open a different Project?",
         "Your current session has not been saved.\n"
         "Do you want to save your changes?",
         QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel );
@@ -567,10 +567,36 @@ void AppMenu::set_recent_file_list( std::vector< std::string > recent_projects )
       boost::filesystem::path path = boost::filesystem::path( project_path.toStdString() ) /
         boost::filesystem::path( project_name.toStdString() );
       
-      QtUtils::QtBridge::Connect( qaction, boost::bind( &ActionLoadProject::Dispatch,
-        Core::Interface::GetWidgetActionContext(), path.string() ) );
+      QtUtils::QtBridge::Connect( qaction, boost::bind( &AppMenu::ConfirmRecentFileLoad,
+        qpointer_type( this ), path.string() ) );
 
     }
+  }
+}
+void AppMenu::ConfirmRecentFileLoad( qpointer_type qpointer, const std::string& path )
+{
+  if ( ProjectManager::Instance()->current_project_->check_project_changed() )
+  {
+    int ret = QMessageBox::warning( qpointer->main_window_, "Open a different Project?",
+      "Your current session has not been saved.\n"
+      "Do you want to save your changes?",
+      QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel );
+
+    if( ret == QMessageBox::Save )
+    {
+      Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+      ActionSaveSession::Dispatch( Core::Interface::GetWidgetActionContext(), false,  
+        ProjectManager::Instance()->current_project_->current_session_name_state_->get() );
+    }
+    
+    if( ret != QMessageBox::Cancel )
+    {
+      ActionLoadProject::Dispatch( Core::Interface::GetWidgetActionContext(), path );
+    }
+  }
+  else
+  {
+    ActionLoadProject::Dispatch( Core::Interface::GetWidgetActionContext(), path );
   }
 }
 
