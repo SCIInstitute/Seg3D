@@ -48,8 +48,17 @@
    <property name="spacing">
     <number>2</number>
    </property>
-   <property name="margin">
+   <property name="leftMargin">
     <number>4</number>
+   </property>
+   <property name="topMargin">
+    <number>4</number>
+   </property>
+   <property name="rightMargin">
+    <number>4</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
    </property>
    <item>
     <widget class="QGroupBox" name="target_groupbox_">
@@ -123,6 +132,11 @@
     </widget>
    </item>
    <item>
+    <widget class="QtUtils::QtHistogramWidget" name="histogram_" native="true">
+     <zorder>widget</zorder>
+    </widget>
+   </item>
+   <item>
     <widget class="QWidget" name="widget" native="true">
      <property name="minimumSize">
       <size>
@@ -155,9 +169,6 @@
       </item>
      </layout>
     </widget>
-   </item>
-   <item>
-    <widget class="QtUtils::QtHistogramWidget" name="histogram_" native="true"/>
    </item>
   </layout>
  </widget>
