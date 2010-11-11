@@ -151,14 +151,6 @@ AppController::~AppController()
 {
 }
 
-void AppController::closeEvent( QCloseEvent* event )
-{
-  QWidget::closeEvent( event );
-  if ( event->isAccepted() )
-  {
-    this->disconnect_all();
-  }
-}
 
 void AppController::post_action()
 {

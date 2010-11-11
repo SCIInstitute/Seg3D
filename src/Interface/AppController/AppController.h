@@ -71,9 +71,6 @@ public Q_SLOTS:
   void post_action_message( std::string message );
   void post_action_usage( std::string usage );
 
-protected:
-  virtual void closeEvent ( QCloseEvent* event );
-
 private:
   AppControllerPrivateHandle private_;
 

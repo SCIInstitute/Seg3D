@@ -84,6 +84,10 @@ public:
   virtual void mousePressEvent( QMouseEvent* e );
 
   virtual void mouseMoveEvent( QMouseEvent* e );
+
+  void set_thresholds( QtSliderDoubleCombo* upper_threshold, 
+    QtSliderDoubleCombo* lower_threshold );
+  
   
 private Q_SLOTS:
   void handle_right_button_click( int );

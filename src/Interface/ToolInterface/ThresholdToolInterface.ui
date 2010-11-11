@@ -221,7 +221,7 @@ QWidget#threshold_histogram_{
     </widget>
    </item>
    <item>
-    <widget class="QWidget" name="widget_5" native="true">
+    <widget class="QtUtils::QtHistogramWidget" name="histogram_" native="true">
      <property name="minimumSize">
       <size>
        <width>205</width>
@@ -245,6 +245,12 @@ QWidget#threshold_histogram_{
    <class>QtUtils::QtSliderDoubleCombo</class>
    <extends>QWidget</extends>
    <header location="global">QtUtils/Widgets/QtSliderDoubleCombo.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QtUtils::QtHistogramWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">QtUtils/Widgets/QtHistogramWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -177,7 +177,7 @@ bool SaveAsInfoPage::validatePage()
     }
     
     Q_EMIT need_to_set_delete_path( QString::fromStdString( new_path.string() ) );
-    //boost::filesystem::remove_all( new_path );
+
   }
   return true;
 }

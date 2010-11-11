@@ -207,4 +207,17 @@ void QtHistogramWidget::mouseMoveEvent( QMouseEvent* e )
   this->private_->histogram_graph_->mouseMoveEvent( e );
 }
 
+void QtHistogramWidget::set_thresholds( QtSliderDoubleCombo* upper_threshold, QtSliderDoubleCombo* lower_threshold )
+{ 
+  this->upper_threshold_ = upper_threshold;
+  this->lower_threshold_ = lower_threshold; 
+  
+  connect( this->upper_threshold_, SIGNAL( valueAdjusted( double ) ), 
+    this, SLOT( set_max( double ) ) );
+    
+  connect( this->lower_threshold_, SIGNAL( valueAdjusted( double ) ), 
+    this, SLOT( set_min( double ) ) );
+}
+
+
 } // end namespace QtUtils

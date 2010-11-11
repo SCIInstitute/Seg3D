@@ -54,40 +54,7 @@ class HistogramEqualizationFilterInterfacePrivate
 {
 public:
   Ui::HistogramEqualizationFilterInterface ui_;
-  
-public:
-  static void UpdateHistogram( QPointer<QtUtils::QtHistogramWidget> qpointer,
-    std::string old_layer_name, std::string layer_name, Core::ActionSource source );
 };
-
-void HistogramEqualizationFilterInterfacePrivate::UpdateHistogram( 
-  QPointer<QtUtils::QtHistogramWidget> qpointer, std::string old_layer_name, 
-  std::string layer_name, Core::ActionSource source )
-{
-  if ( ! Core::Interface::IsInterfaceThread() )
-  {
-    Core::Interface::PostEvent( boost::bind( 
-      &HistogramEqualizationFilterInterfacePrivate::UpdateHistogram,
-      qpointer, old_layer_name, layer_name, source ) );
-    return;
-  }
-
-  if ( ! qpointer.isNull() )
-  {
-    DataLayerHandle layer = boost::dynamic_pointer_cast<DataLayer>( LayerManager::Instance()->
-      get_layer_by_id( layer_name ) );
-    
-    if ( layer )
-    {
-      qpointer->set_histogram( layer->get_data_volume()->get_data_block()->get_histogram() );
-    }
-    else
-    {
-      qpointer->reset_histogram();
-    }
-  }
-}
-
 
 HistogramEqualizationFilterInterface::HistogramEqualizationFilterInterface() :
   private_( new HistogramEqualizationFilterInterfacePrivate )
@@ -108,8 +75,23 @@ bool HistogramEqualizationFilterInterface::build_widget( QFrame* frame )
   //Step 2 - get a pointer to the tool
   HistogramEqualizationFilter* tool = dynamic_cast< HistogramEqualizationFilter* >( 
     this->tool().get() );
+    
+  // Step 3 - Qt connections
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() ); 
+    this->private_->ui_.target_layer_->setDisabled( tool->use_active_layer_state_->get() );
 
-  //Step 3 - connect the gui to the tool through the QtBridge
+    this->connect( this->private_->ui_.use_active_layer_, SIGNAL( toggled( bool ) ),
+      this->private_->ui_.target_layer_, SLOT( setDisabled( bool ) ) );
+
+    this->connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), 
+      this, SLOT( run_filter() ) );
+
+    this->connect( this->private_->ui_.target_layer_, SIGNAL( currentIndexChanged( QString ) ), 
+      this, SLOT( refresh_histogram( QString ) ) ); 
+  } 
+
+  //Step 4 - connect the gui to the tool through the QtBridge
   QtUtils::QtBridge::Connect( this->private_->ui_.target_layer_, 
     tool->target_layer_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.use_active_layer_, 
@@ -125,32 +107,33 @@ bool HistogramEqualizationFilterInterface::build_widget( QFrame* frame )
     tool->ignore_bins_state_ );
   QtUtils::QtBridge::Enable( this->private_->ui_.runFilterButton,
     tool->valid_target_state_ );
-    
-  QPointer<QtUtils::QtHistogramWidget> qpointer( this->private_->ui_.histogram_ );
-  this->add_connection( tool->target_layer_state_->value_changed_signal_.connect( boost::bind(
-    &HistogramEqualizationFilterInterfacePrivate::UpdateHistogram, qpointer, _1, _2, _3 ) ) );
-  
-  // Step 4 - Qt connections
-  {
-    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() ); 
-    this->private_->ui_.target_layer_->setDisabled( tool->use_active_layer_state_->get() );
-    
-    this->connect( this->private_->ui_.use_active_layer_, SIGNAL( toggled( bool ) ),
-      this->private_->ui_.target_layer_, SLOT( setDisabled( bool ) ) );
-
-    this->connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), 
-      this, SLOT( run_filter() ) );
+  QtUtils::QtBridge::Enable( this->private_->ui_.histogram_, tool->valid_target_state_ );
       
-    HistogramEqualizationFilterInterfacePrivate::UpdateHistogram( 
-      qpointer, "", tool->target_layer_state_->get(), Core::ActionSource::COMMANDLINE_E );  
-  }
-  
   return true;
 } // end build_widget
   
 void HistogramEqualizationFilterInterface::run_filter()
 {
   tool()->execute( Core::Interface::GetWidgetActionContext() );
+}
+
+void HistogramEqualizationFilterInterface::refresh_histogram( QString layer_name )
+{
+  if( layer_name == "" || 
+    layer_name == Tool::NONE_OPTION_C.c_str() )
+  {
+    return;
+  }
+
+  DataLayerHandle data_layer = boost::dynamic_pointer_cast< DataLayer >(
+    LayerManager::Instance()->get_layer_by_name( layer_name.toStdString() ) );
+  if ( !data_layer )
+  {
+    return;
+  }
+
+  this->private_->ui_.histogram_->set_histogram( data_layer->get_data_volume()->
+    get_data_block()->get_histogram() );  
 }
 
 } // end namespace Seg3D
