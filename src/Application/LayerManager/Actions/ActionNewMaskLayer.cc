@@ -51,6 +51,10 @@ bool ActionNewMaskLayer::validate( Core::ActionContextHandle& context )
 
 bool ActionNewMaskLayer::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 { 
+  // Get the current counters for groups and layers, so we can undo the changes to those counters
+  // NOTE: This needs to be done before a new layer is created
+  LayerManager::id_count_type id_count = LayerManager::GetLayerIdCount();
+
   // Create a new mask volume.
   Core::MaskVolumeHandle new_mask_volume;
   Core::MaskVolume::CreateEmptyMask( LayerManager::Instance()->get_layer_group( 
@@ -67,8 +71,13 @@ bool ActionNewMaskLayer::run( Core::ActionContextHandle& context, Core::ActionRe
 
   // Create an undo item for this action
   LayerUndoBufferItemHandle item( new LayerUndoBufferItem( "New Mask" ) );
+  // Tell which action has to be re-executed to obtain the result
   item->set_redo_action( this->shared_from_this() );
+  // Tell which layer was added so undo can delete it
   item->add_layer_to_delete( new_mask_layer );
+  // Tell what the layer/group id counters are so we can undo those as well
+  item->add_id_count_to_restore( id_count );
+  // Add the complete record to the undo buffer
   LayerUndoBuffer::Instance()->insert_undo_item( context, item );
   
   return true;

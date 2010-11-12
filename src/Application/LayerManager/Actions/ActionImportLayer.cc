@@ -33,6 +33,7 @@
 #include <Application/LayerManager/Actions/ActionImportLayer.h>
 #include <Application/LayerIO/LayerIO.h>
 #include <Application/LayerManager/LayerManager.h>
+#include <Application/LayerManager/LayerUndoBuffer.h>
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
@@ -53,7 +54,7 @@ bool ActionImportLayer::validate( Core::ActionContextHandle& context )
     return false;
   }
 
-  if ( !( this->layer_importer_ ) )
+  if ( !this->layer_importer_ )
   {
     if ( !( LayerIO::Instance()->create_importer( this->filename_.value(),  
       this->layer_importer_, this->importer_.value() ) ) )
@@ -72,6 +73,13 @@ bool ActionImportLayer::validate( Core::ActionContextHandle& context )
     return false;
   }
 
+  if ( !( this->layer_importer_->import_header() ) )
+  {
+    context->report_error( std::string( "Could not interpret file '" +
+      this->filename_.value() + "' with importer '" + this->importer_.value() + "'" ) );
+    return false;
+  }
+  
   if ( !( this->layer_importer_->get_importer_modes() & mode ) )
   {
     context->report_error( std::string( "Import mode '") +  this->mode_.value() + 
@@ -84,6 +92,10 @@ bool ActionImportLayer::validate( Core::ActionContextHandle& context )
 
 bool ActionImportLayer::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
+  // Get the current counters for groups and layers, so we can undo the changes to those counters
+  // NOTE: This needs to be done before a new layer is created
+  LayerManager::id_count_type id_count = LayerManager::GetLayerIdCount();
+
   std::string file_or_folder_name;
   if( this->series_import_.value() == true )
   {
@@ -106,8 +118,12 @@ bool ActionImportLayer::run( Core::ActionContextHandle& context, Core::ActionRes
   ImportFromString( this->mode_.value(), mode );
 
   std::vector<LayerHandle> layers;
-  bool succeed = this->layer_importer_->import_layer( mode, layers );
-    
+  if ( !( this->layer_importer_->import_layer( mode, layers ) ) ) 
+  {
+    context->report_error( "Layer importer failed" );
+    return false;
+  }
+  
   for (size_t j = 0; j < layers.size(); j++)
   {
     if ( layers[ j ] ) LayerManager::Instance()->insert_layer( layers[ j ] );
@@ -115,7 +131,21 @@ bool ActionImportLayer::run( Core::ActionContextHandle& context, Core::ActionRes
 
   progress->end_progress_reporting();
 
-  return succeed;
+  // Create an undo item for this action
+  LayerUndoBufferItemHandle item( new LayerUndoBufferItem( "Import Layer" ) );
+  // Tell which action has to be re-executed to obtain the result
+  item->set_redo_action( this->shared_from_this() );
+  // Tell which layer was added so undo can delete it
+  for (size_t j = 0; j < layers.size(); j++)
+  {
+    item->add_layer_to_delete( layers[ j ] );
+  }
+  // Tell what the layer/group id counters are so we can undo those as well
+  item->add_id_count_to_restore( id_count );
+  // Add the complete record to the undo buffer
+  LayerUndoBuffer::Instance()->insert_undo_item( context, item );
+
+  return true;
 }
 
 void ActionImportLayer::clear_cache()
