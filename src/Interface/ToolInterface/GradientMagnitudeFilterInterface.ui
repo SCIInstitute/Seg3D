@@ -64,7 +64,7 @@
        <number>4</number>
       </property>
       <item>
-       <widget class="QComboBox" name="target_layer_">
+       <widget class="QtUtils::QtDropableComboBox" name="target_layer_">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -178,6 +178,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QtUtils::QtDropableComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">QtUtils/Widgets/QtDropableComboBox.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

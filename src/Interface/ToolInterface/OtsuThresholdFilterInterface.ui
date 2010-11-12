@@ -70,7 +70,7 @@
        <number>4</number>
       </property>
       <item>
-       <widget class="QComboBox" name="target_layer_">
+       <widget class="QtUtils::QtDropableComboBox" name="target_layer_">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -132,9 +132,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QtUtils::QtHistogramWidget" name="histogram_" native="true">
-     <zorder>widget</zorder>
-    </widget>
+    <widget class="QtUtils::QtHistogramWidget" name="histogram_" native="true"/>
    </item>
    <item>
     <widget class="QWidget" name="widget" native="true">
@@ -174,15 +172,20 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QtUtils::QtSliderIntCombo</class>
-   <extends>QWidget</extends>
-   <header location="global">QtUtils/Widgets/QtSliderIntCombo.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>QtUtils::QtHistogramWidget</class>
    <extends>QWidget</extends>
    <header location="global">QtUtils/Widgets/QtHistogramWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QtUtils::QtDropableComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">QtUtils/Widgets/QtDropableComboBox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QtUtils::QtSliderIntCombo</class>
+   <extends>QWidget</extends>
+   <header location="global">QtUtils/Widgets/QtSliderIntCombo.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

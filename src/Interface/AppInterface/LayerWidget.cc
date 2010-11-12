@@ -660,6 +660,11 @@ std::string LayerWidget::get_layer_id() const
   return this->private_->layer_->get_layer_id(); 
 }
 
+std::string LayerWidget::get_layer_name() const
+{
+  return this->private_->layer_->get_layer_name();
+}
+
 int LayerWidget::get_volume_type() const
 { 
   return this->private_->layer_->get_type(); 
@@ -749,7 +754,8 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
   QMimeData *mimeData = new QMimeData;
 
   LayerHandle layer = this->private_->layer_;
-  mimeData->setText( QString::fromStdString( layer->get_layer_id() ) );
+  //mimeData->setText( QString::fromStdString( layer->get_layer_id() ) );
+  mimeData->setText( QString::fromStdString( layer->get_layer_name() ) );
   
   // Create a drag object and insert the hotspot
   QDrag *drag = new QDrag( this );
@@ -816,7 +822,8 @@ void LayerWidget::set_drop_target( LayerWidget* target_layer )
 
 void LayerWidget::dropEvent( QDropEvent* event )
 {
-  if( !LayerManager::Instance()->get_layer_by_id( event->mimeData()->text().toStdString() ) )
+  //if( !LayerManager::Instance()->get_layer_by_id( event->mimeData()->text().toStdString() ) )
+  if( !LayerManager::Instance()->get_layer_by_name( event->mimeData()->text().toStdString() ) )
   {
     this->enable_drop_space( false );
     event->ignore();
@@ -831,11 +838,13 @@ void LayerWidget::dropEvent( QDropEvent* event )
 
 void LayerWidget::dragEnterEvent( QDragEnterEvent* event)
 {
-  std::string layer_id = event->mimeData()->text().toStdString();
+  //std::string layer_id = event->mimeData()->text().toStdString();
+  std::string layer_name = event->mimeData()->text().toStdString();
 
-  if( ( LayerManager::Instance()->get_layer_by_id( layer_id ) ) 
-    && ( this->get_layer_id() != layer_id ) )
-    //&& ( LayerManager::Instance()->get_layer_by_id( layer_id )->get_type() == this->get_volume_type() ) )
+//  if( ( LayerManager::Instance()->get_layer_by_id( layer_id ) ) 
+//    && ( this->get_layer_id() != layer_id ) )
+  if( ( LayerManager::Instance()->get_layer_by_name( layer_name ) ) 
+    && ( this->get_layer_name() != layer_name ) )
   {
     this->enable_drop_space( true );
     event->setDropAction( Qt::MoveAction );
@@ -1046,6 +1055,9 @@ bool LayerWidget::get_selected() const
 {
   return this->private_->ui_.selection_checkbox_->isChecked();
 }
+
+
+
 
 
 } //end namespace Seg3D

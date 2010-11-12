@@ -36,6 +36,7 @@ SET(QTUTILS_WIDGETS_SRCS
   QtColorButton.cc
   QtDoubleClickToolButton.cc
   QtDoubleClickPushButton.cc
+  QtDropableComboBox.cc
   QtHistogramGraph.cc
   QtHistogramWidget.cc
   QtSliderDoubleCombo.cc
@@ -50,6 +51,7 @@ SET(QTUTILS_WIDGETS_MOC_SRCS
   QtColorButton.h
   QtDoubleClickToolButton.h
   QtDoubleClickPushButton.h
+  QtDropableComboBox.h
   QtHistogramGraph.h
   QtHistogramWidget.h
   QtSliderDoubleCombo.h

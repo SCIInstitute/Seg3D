@@ -80,7 +80,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QComboBox" name="input_a_">
+          <widget class="QtUtils::QtDropableComboBox" name="input_a_">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -171,7 +171,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QComboBox" name="input_b_">
+             <widget class="QtUtils::QtDropableComboBox" name="input_b_">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -206,7 +206,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QComboBox" name="input_c_">
+             <widget class="QtUtils::QtDropableComboBox" name="input_c_">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -241,7 +241,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QComboBox" name="input_d_">
+             <widget class="QtUtils::QtDropableComboBox" name="input_d_">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -470,6 +470,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QtUtils::QtDropableComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">QtUtils/Widgets/QtDropableComboBox.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

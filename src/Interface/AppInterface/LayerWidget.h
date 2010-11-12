@@ -152,6 +152,10 @@ public:
   // this function returns the id of the layer that the layerwidget represents
   std::string get_layer_id() const;
   
+  // GET_LAYER_NAME:
+  // this function returns the id of the layer that the layerwidget represents
+  std::string get_layer_name() const;
+  
   // GET_SELECTED:
   // funtion that returns whether or not the layer is selected.
   bool get_selected() const;

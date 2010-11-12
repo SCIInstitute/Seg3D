@@ -260,11 +260,11 @@ void LayerGroupWidget::dropEvent( QDropEvent* event )
     event->accept();
     return;
   }
-  else if ( LayerManager::Instance()->get_layer_by_id( drop_item_id ) )
+  else if ( LayerManager::Instance()->get_layer_by_name( drop_item_id ) )
   {
     ActionMoveLayerBelow::Dispatch( Core::Interface::GetWidgetActionContext(), 
       drop_item_id, this->get_group_id() );
-    this->private_->drop_space_->instant_hide();
+    this->private_->layer_slot_->instant_hide();
     event->setDropAction( Qt::MoveAction );
     event->accept();
     return;
@@ -283,7 +283,7 @@ void LayerGroupWidget::dragEnterEvent( QDragEnterEvent* event)
     event->accept();
     return;
   }
-  else if ( ( LayerManager::Instance()->get_layer_by_id( drop_item_id ) ) && (
+  else if ( ( LayerManager::Instance()->get_layer_by_name( drop_item_id ) ) && (
     ( this->private_->ui_.buttons_ == this->childAt( event->pos() ) ) || 
     ( this->private_->button_overlay_ == this->childAt( event->pos() ) ) ) )
   {

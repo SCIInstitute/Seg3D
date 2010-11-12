@@ -43,7 +43,7 @@
        <number>4</number>
       </property>
       <item>
-       <widget class="QComboBox" name="target_layer_">
+       <widget class="QtUtils::QtDropableComboBox" name="target_layer_">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -217,6 +217,11 @@
    <extends>QWidget</extends>
    <header location="global">QtUtils/Widgets/QtSliderDoubleCombo.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QtUtils::QtDropableComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">QtUtils/Widgets/QtDropableComboBox.h</header>
   </customwidget>
   <customwidget>
    <class>QtUtils::QtLogSliderIntCombo</class>
