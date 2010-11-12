@@ -71,13 +71,7 @@
        </property>
        <item>
         <widget class="QWidget" name="widget_4" native="true">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>53</height>
-          </size>
-         </property>
-         <layout class="QVBoxLayout" name="verticalLayout_3">
+         <layout class="QHBoxLayout" name="horizontalLayout_7">
           <property name="spacing">
            <number>4</number>
           </property>
@@ -86,21 +80,33 @@
           </property>
           <item>
            <widget class="QLabel" name="label_2">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="text">
              <string>Project Name:</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="project_name_edit_">
-            <property name="focusPolicy">
-             <enum>Qt::ClickFocus</enum>
+           <widget class="QLabel" name="project_name_">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
             </property>
-            <property name="inputMask">
-             <string notr="true"/>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>20</height>
+             </size>
             </property>
             <property name="text">
-             <string notr="true">Example Project 23432.2</string>
+             <string>project_name_</string>
             </property>
            </widget>
           </item>

@@ -511,7 +511,7 @@ void ViewerManager::reset_cursor()
 {
   for ( size_t i = 0; i < this->viewers_.size(); ++i )
   {
-    this->viewers_[ i ]->set_cursor( Core::CursorShape::ARROW_E );
+    this->viewers_[ i ]->set_cursor( Core::CursorShape::CROSS_E );
   }
 }
 

@@ -36,7 +36,7 @@ namespace Core
 class AbstractViewerPrivate
 {
 public:
-  AbstractViewerPrivate() : cursor_( CursorShape::ARROW_E ) {}
+  AbstractViewerPrivate() : cursor_( CursorShape::CROSS_E ) {}
 
   // Handle with the renderer
   AbstractRendererHandle renderer_;

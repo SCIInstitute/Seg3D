@@ -789,6 +789,7 @@ PaintTool::PaintTool( const std::string& toolid ) :
 
   this->add_connection( this->brush_radius_state_->state_changed_signal_.connect(
     boost::bind( &PaintToolPrivate::handle_brush_radius_changed, this->private_ ) ) );
+    
 }
 
 PaintTool::~PaintTool()
@@ -1071,6 +1072,14 @@ bool PaintTool::handle_mouse_move( ViewerHandle viewer,
   if ( this->private_->brush_visible_ )
   {
     this->private_->update_same_mode_viewers();
+    if( PreferencesManager::Instance()->paint_cursor_invisibility_state_->get() )
+    {
+      this->private_->viewer_->set_cursor( Core::CursorShape::BLANK_E );
+    }
+    else
+    {
+      this->private_->viewer_->set_cursor( Core::CursorShape::CROSS_E );
+    }
   }
 
   if ( this->private_->painting_ )

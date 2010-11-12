@@ -58,8 +58,9 @@ void QtDropableComboBox::dropEvent( QDropEvent* event )
 
 void QtDropableComboBox::dragEnterEvent( QDragEnterEvent* event )
 {
-  if( this->isEnabled() )
+  if( this->isEnabled() && (  this->findText( event->mimeData()->text() ) != -1 ) )
   { 
+    this->setFocus();
     event->accept();
   }
   else
@@ -67,6 +68,14 @@ void QtDropableComboBox::dragEnterEvent( QDragEnterEvent* event )
     event->ignore();
   }
 }
+
+void QtDropableComboBox::dragLeaveEvent( QDragLeaveEvent* event )
+{
+  this->clearFocus();
+}
+
+
+
 
 
 

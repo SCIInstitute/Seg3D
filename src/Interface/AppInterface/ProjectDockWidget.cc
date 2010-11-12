@@ -83,7 +83,7 @@ ProjectDockWidget::ProjectDockWidget( QWidget *parent ) :
     QtUtils::QtBridge::Connect( this->private_->ui_.autosave_checkbox_,
       PreferencesManager::Instance()->auto_save_state_ );
 
-    QtUtils::QtBridge::Connect( this->private_->ui_.project_name_edit_, 
+    QtUtils::QtBridge::Connect( this->private_->ui_.project_name_, 
       ProjectManager::Instance()->current_project_->project_name_state_ );
     
     QtUtils::QtBridge::Connect( this->private_->ui_.custom_colors_checkbox_, 
@@ -120,8 +120,11 @@ ProjectDockWidget::ProjectDockWidget( QWidget *parent ) :
     connect( this->private_->ui_.delete_session_button_, SIGNAL( clicked() ),
       this, SLOT( delete_session() ) );
 
+//    connect( this->private_->ui_.sessions_list_, SIGNAL( cellDoubleClicked ( int, int ) ),
+//      this, SLOT( call_load_session( int, int ) ) );
+
     connect( this->private_->ui_.sessions_list_, SIGNAL( cellDoubleClicked ( int, int ) ),
-      this, SLOT( call_load_session( int, int ) ) );
+      this, SLOT( load_session() ) );
 
     connect( this->private_->ui_.save_note_button_, SIGNAL( clicked() ), 
       this, SLOT( save_note() ) );
@@ -662,6 +665,14 @@ void ProjectDockWidget::disable_load_delete_and_export_buttons()
   this->private_->ui_.export_project_button_->setEnabled( false );
   this->private_->ui_.load_session_button_->setEnabled( false );
   this->private_->ui_.delete_session_button_->setEnabled( false );
+  
+  for( int i = 0; i < this->private_->ui_.sessions_list_->columnCount(); ++i )
+  {
+    for( int j = 0; j < this->private_->ui_.sessions_list_->rowCount(); ++j )
+    {
+      this->private_->ui_.sessions_list_->itemAt( j, i )->setSelected( false );
+    }
+  }
 }
 
 

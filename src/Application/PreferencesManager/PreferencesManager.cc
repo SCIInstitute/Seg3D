@@ -150,6 +150,7 @@ void PreferencesManager::initialize_states()
   add_state( "auto_save_time", this->auto_save_time_state_, 15, 1, 120, 1 );
   add_state( "smart_save", this->smart_save_state_, true );
   add_state( "advanced_visibility_settings", this->advanced_visibility_settings_state_, false );
+  add_state( "paint_cursor_visibility", this->paint_cursor_invisibility_state_, false );
   add_state( "compression", this->compression_state_, true );
   add_state( "compression_level", this->compression_level_state_, 2, 0, 9, 1 );
   add_state( "slice_step_multiplier", this->slice_step_multiplier_state_, 8 );
