@@ -373,6 +373,7 @@ void LayerGroupWidget::verify_delete()
     ActionDeleteLayers::Dispatch( Core::Interface::GetWidgetActionContext(), 
       this->private_->group_ );
     this->private_->ui_.group_delete_button_->setChecked( false );
+    this->private_->ui_.select_all_button_->setChecked( false );
   }
 }
 
