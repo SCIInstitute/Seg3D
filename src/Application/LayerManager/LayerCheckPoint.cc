@@ -150,7 +150,7 @@ bool LayerCheckPoint::create_slice( LayerHandle layer, Core::SliceType type,
 {
   if ( layer->get_type() == Core::VolumeType::MASK_E )
   {
-    for ( Core::DataBlock::index_type j = start; j < end; j++ )
+    for ( Core::DataBlock::index_type j = start; j <= end; j++ )
     {
 
       MaskLayerHandle mask = boost::shared_dynamic_cast<MaskLayer>( layer );
@@ -165,7 +165,7 @@ bool LayerCheckPoint::create_slice( LayerHandle layer, Core::SliceType type,
   }
   else if ( layer->get_type() == Core::VolumeType::DATA_E )
   {
-    for ( Core::DataBlock::index_type j = start; j < end; j++ )
+    for ( Core::DataBlock::index_type j = start; j <= end; j++ )
     {
       DataLayerHandle data = boost::shared_dynamic_cast<DataLayer>( layer );
       if ( ! data->has_valid_data() ) return false;

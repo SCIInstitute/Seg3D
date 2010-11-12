@@ -94,6 +94,17 @@ bool ActionPaste::validate( Core::ActionContextHandle& context )
       return false;
     }
     
+    if ( !( active_layer->master_visible_state_->get() ) || 
+      !( active_layer->visible_state_[ active_viewer_id ]->get() ) )
+    {
+      if ( context->source() == Core::ActionSource::INTERFACE_WIDGET_E ||
+        context->source() == Core::ActionSource::INTERFACE_MENU_E  )
+      {
+        context->report_error( "Cannot paste into invisible layer" );
+        return false;
+      }
+    }
+    
     Core::VolumeSliceHandle vol_slice = viewer->get_active_volume_slice();
     this->private_->target_layer_ = boost::dynamic_pointer_cast< MaskLayer >( active_layer );
     this->private_->target_layer_id_.value() = active_layer->get_layer_id();
@@ -121,6 +132,7 @@ bool ActionPaste::validate( Core::ActionContextHandle& context )
   
   this->private_->target_layer_ = LayerManager::FindMaskLayer(
     this->private_->target_layer_id_.value() );
+  
   
   if ( this->private_->slice_type_.value() != Core::VolumeSliceType::AXIAL_E &&
     this->private_->slice_type_.value() != Core::VolumeSliceType::CORONAL_E &&
