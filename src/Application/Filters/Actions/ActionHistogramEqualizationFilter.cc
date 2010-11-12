@@ -123,8 +123,8 @@ public:
 
     // This teem filter should be thread safe
     // TODO: need to check this --JS
-    if ( ! ( nrrdHistoEq( output_nrrd->nrrd(), input_nrrd->nrrd(), 0, this->bins_, 
-      this->ignore_bins_, static_cast< float >( this->amount_ ) ) ) )
+    if ( nrrdHistoEq( output_nrrd->nrrd(), input_nrrd->nrrd(), 0, this->bins_, 
+      this->ignore_bins_, static_cast< float >( this->amount_ ) ) )
     {
       this->report_error( "Could not allocate enough memory." );
       return; 

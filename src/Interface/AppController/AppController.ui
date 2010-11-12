@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Seg3D 2.0 - Controller</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_5">
+  <layout class="QVBoxLayout" name="verticalLayout_2">
    <property name="spacing">
     <number>0</number>
    </property>
@@ -32,7 +32,7 @@
    <item>
     <widget class="QTabWidget" name="TW_CONTROLLER">
      <property name="currentIndex">
-      <number>1</number>
+      <number>3</number>
      </property>
      <property name="usesScrollButtons">
       <bool>false</bool>
@@ -336,6 +336,111 @@
         </widget>
        </item>
       </layout>
+     </widget>
+     <widget class="QWidget" name="tab">
+      <attribute name="title">
+       <string>Undo/Redo Buffer</string>
+      </attribute>
+      <widget class="QTableView" name="TV_UNDOBUFFER">
+       <property name="geometry">
+        <rect>
+         <x>4</x>
+         <y>24</y>
+         <width>888</width>
+         <height>252</height>
+        </rect>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Sunken</enum>
+       </property>
+       <property name="editTriggers">
+        <set>QAbstractItemView::NoEditTriggers</set>
+       </property>
+       <property name="alternatingRowColors">
+        <bool>true</bool>
+       </property>
+       <property name="selectionMode">
+        <enum>QAbstractItemView::NoSelection</enum>
+       </property>
+       <property name="showGrid">
+        <bool>false</bool>
+       </property>
+       <property name="cornerButtonEnabled">
+        <bool>false</bool>
+       </property>
+       <attribute name="verticalHeaderVisible">
+        <bool>false</bool>
+       </attribute>
+       <attribute name="verticalHeaderHighlightSections">
+        <bool>false</bool>
+       </attribute>
+       <attribute name="verticalHeaderMinimumSectionSize">
+        <number>12</number>
+       </attribute>
+      </widget>
+      <widget class="QLabel" name="label_2">
+       <property name="geometry">
+        <rect>
+         <x>7</x>
+         <y>3</y>
+         <width>179</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Undo Buffer:</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_5">
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>291</y>
+         <width>179</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Redo Buffer:</string>
+       </property>
+      </widget>
+      <widget class="QTableView" name="TV_REDOBUFFER">
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>317</y>
+         <width>888</width>
+         <height>252</height>
+        </rect>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Sunken</enum>
+       </property>
+       <property name="editTriggers">
+        <set>QAbstractItemView::NoEditTriggers</set>
+       </property>
+       <property name="alternatingRowColors">
+        <bool>true</bool>
+       </property>
+       <property name="selectionMode">
+        <enum>QAbstractItemView::NoSelection</enum>
+       </property>
+       <property name="showGrid">
+        <bool>false</bool>
+       </property>
+       <property name="cornerButtonEnabled">
+        <bool>false</bool>
+       </property>
+       <attribute name="verticalHeaderVisible">
+        <bool>false</bool>
+       </attribute>
+       <attribute name="verticalHeaderHighlightSections">
+        <bool>false</bool>
+       </attribute>
+       <attribute name="verticalHeaderMinimumSectionSize">
+        <number>12</number>
+       </attribute>
+      </widget>
      </widget>
     </widget>
    </item>

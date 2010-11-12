@@ -96,13 +96,18 @@ public:
   // Force the Controller to update its action history widget
   static void UpdateActionHistory( qpointer_type controller );
 
-  // UODATELOGHISTORY:
+  // UPDATELOGHISTORY:
   // Force the Controller to update its log history widget
   static void UpdateLogHistory( qpointer_type controller, bool relay, int message_type,
       std::string message );
 
+  // UPDATEUNDOBUFFER:
+  // Update the undo buffer
+  static void UpdateUndoBuffer( qpointer_type controller );
+
+
   // UPDATESTATEENGINE:
-  // Force the Contriller to update the state engine widget
+  // Force the Controller to update the state engine widget
   static void UpdateStateEngine( qpointer_type controller );
 
   // POSTACTIONMESSAGE:

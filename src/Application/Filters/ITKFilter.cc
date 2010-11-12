@@ -62,16 +62,6 @@ public:
   void handle_abort();
 };
 
-void ITKFilterPrivate::handle_abort()
-{
-  lock_type lock( this->get_mutex() );
-  
-  if ( this->base_ )
-  {
-    this->filter_->SetAbortGenerateData( true );
-    this->base_->raise_abort();
-  }
-}
 
 ITKFilter::ITKFilter() :
   private_( new ITKFilterPrivate )
@@ -164,7 +154,7 @@ void ITKFilter::observe_itk_filter_internal( itk::ProcessObject::Pointer filter,
   this->private_->disconnect_all();
   this->private_->filter_ = filter;
   this->private_->add_connection( layer->abort_signal_.connect( boost::bind(
-    &ITKFilterPrivate::handle_abort, this->private_ ) ) );
+    &ITKFilter::raise_abort, this ) ) );
 } 
 
 void ITKFilter::limit_number_of_itk_threads_internal( itk::ProcessObject::Pointer filter )
@@ -174,7 +164,12 @@ void ITKFilter::limit_number_of_itk_threads_internal( itk::ProcessObject::Pointe
   unsigned int max_threads = boost::thread::hardware_concurrency();
   if ( max_threads < 2 ) max_threads = 2;
   
-  filter->GetMultiThreader()->SetGlobalMaximumNumberOfThreads( max_threads - 1 );
+  filter->GetMultiThreader()->SetNumberOfThreads( max_threads - 1 );
+}
+
+void ITKFilter::handle_abort()
+{
+  this->private_->filter_->SetAbortGenerateData( true );
 }
 
 

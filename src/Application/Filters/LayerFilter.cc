@@ -51,7 +51,8 @@ public:
   LayerFilterPrivate() :
     done_( false ),
     abort_( false ),
-    key_( Layer::GenerateFilterKey() )
+    key_( Layer::GenerateFilterKey() ),
+    id_count_( LayerManager::GetLayerIdCount() )
   {
   }
 
@@ -84,28 +85,26 @@ public:
   // Key used for this filter
   Layer::filter_key_type key_;
 
-
+  // ID counts for layer and group, used for undo mechanism
+  LayerManager::id_count_type id_count_;
+  
   // -- internal functions --
 public:
-  // HANDLE_ABORT:
-  // Function for handling abort
-  void handle_abort();
-  
   // FINALIZE:
   // Clean up all the filter components and release the locks on the layers and
   // delete layers if the filter did not finish.
   void finalize();
 };
 
-
-void LayerFilterPrivate::handle_abort()
-{
-  boost::mutex::scoped_lock lock( mutex_ );
-  abort_ = true;
-}
-
 void LayerFilterPrivate::finalize()
 {
+  bool abort = false;
+  
+  {
+    boost::mutex::scoped_lock lock( this->mutex_ );
+    abort = this->abort_;
+  }
+  
   // Disconnect all the connections with the layer signals, i.e. the abort signal from target
   // layers.
   this->disconnect_all();
@@ -114,9 +113,8 @@ void LayerFilterPrivate::finalize()
   for ( size_t j = 0; j < this->locked_layers_.size(); j++ )
   {
     LayerManager::DispatchUnlockLayer( this->locked_layers_[ j ], this->key_ );
-  } 
+  }
 
-  boost::mutex::scoped_lock lock( this->mutex_ );
   if ( this->abort_ )
   {
     for ( size_t j = 0; j < this->created_layers_.size(); j++ )
@@ -160,6 +158,7 @@ void LayerFilter::raise_abort()
   boost::mutex::scoped_lock lock( this->private_->mutex_ );
   this->private_->abort_ = true;
   this->report_error( "Processing was aborted." );
+  this->handle_abort();
 }
 
 
@@ -181,10 +180,12 @@ void LayerFilter::abort_and_wait()
   // Raise the abort in case it wasn't raised.
   this->raise_abort();
   
-  boost::mutex::scoped_lock lock( this->private_->mutex_ ); 
-  while( this->private_->done_ == false )
   {
-    this->private_->filter_done_.wait( lock );
+    boost::mutex::scoped_lock lock( this->private_->mutex_ ); 
+    while( this->private_->done_ == false )
+    {
+      this->private_->filter_done_.wait( lock );
+    }
   }
   
   this->private_->finalize();
@@ -195,9 +196,12 @@ void LayerFilter::connect_abort( const  LayerHandle& layer )
 {
   boost::mutex::scoped_lock lock( this->private_->mutex_ );
   this->private_->add_connection( layer->abort_signal_.connect( boost::bind(
-    &LayerFilterPrivate::handle_abort, this->private_ ) ) );
+    &LayerFilter::raise_abort, this ) ) );
 }
 
+void LayerFilter::handle_abort()
+{
+}
 
 void LayerFilter::report_error( const std::string& error )
 {
@@ -557,6 +561,9 @@ bool LayerFilter::create_undo_redo_record( Core::ActionContextHandle context, Co
   // Add the redo action
   item->set_redo_action( redo_action );
 
+  // Add id count to restore 
+  item->add_id_count_to_restore( this->private_->id_count_ );
+  
   // Insert the record into the undo buffer
   LayerUndoBuffer::Instance()->insert_undo_item( context, item );
 

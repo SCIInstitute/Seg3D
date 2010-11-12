@@ -27,7 +27,7 @@
  */
 
 // STL includes
-#include <list>
+#include <deque>
 
 // Core includes
 #include <Core/Action/ActionContextContainer.h>
@@ -65,8 +65,8 @@ class LayerUndoBufferPrivate
 {
 
 public:
-  typedef std::list< LayerUndoBufferItemHandle > undo_list_type;
-  typedef std::list< LayerUndoBufferItemHandle > redo_list_type;
+  typedef std::deque< LayerUndoBufferItemHandle > undo_list_type;
+  typedef std::deque< LayerUndoBufferItemHandle > redo_list_type;
   
   // List of items on the undo stack
   undo_list_type undo_list_;
@@ -139,6 +139,7 @@ void LayerUndoBuffer::insert_undo_item( Core::ActionContextHandle context,
   this->private_->undo_list_.push_front( undo_item );
   
   this->update_undo_tag_signal_( undo_item->get_tag() );
+  this->buffer_changed_signal_();
 }
 
 bool LayerUndoBuffer::undo( Core::ActionContextHandle context )
@@ -169,6 +170,7 @@ bool LayerUndoBuffer::undo( Core::ActionContextHandle context )
   // Update the entries in the menu
   this->update_undo_tag_signal_( this->get_undo_tag() );
   this->update_redo_tag_signal_( this->get_redo_tag() );
+  this->buffer_changed_signal_();
 
   return true;
 }
@@ -192,6 +194,7 @@ bool LayerUndoBuffer::redo( Core::ActionContextHandle context )
 
   // Update the entries in the menu
   this->update_redo_tag_signal_( this->get_redo_tag() );
+  this->buffer_changed_signal_();
   
   // Applying the redo action should put a new undo check point onto the undo stack.
   return true;
@@ -204,19 +207,62 @@ void LayerUndoBuffer::reset_undo_buffer()
 
   this->update_redo_tag_signal_( this->get_redo_tag() );
   this->update_undo_tag_signal_( this->get_undo_tag() );
+  this->buffer_changed_signal_();
 }
 
-std::string LayerUndoBuffer::get_undo_tag() const
+std::string LayerUndoBuffer::get_undo_tag( size_t index ) const
 {
   // Extract the first item from the undo list and get its tag
-  if ( !( this->private_->undo_list_.empty() ) )
+  if ( index < this->private_->undo_list_.size() )
   {
-    return this->private_->undo_list_.front()->get_tag();
+    return this->private_->undo_list_[ index ]->get_tag();
   }
   else
   {
     // An empty string indicates that there is no undo action on the list
     return "";
+  }
+}
+
+std::string LayerUndoBuffer::get_redo_tag( size_t index ) const
+{
+  // Extract the first item from the undo list and get its tag
+  if ( index < this->private_->redo_list_.size() )
+  {
+    return this->private_->redo_list_[ index ]->get_tag();
+  }
+  else
+  {
+    // An empty string indicates that there is no undo action on the list
+    return "";
+  }
+}
+
+size_t LayerUndoBuffer::get_undo_byte_size( size_t index ) const
+{
+  // Extract the first item from the undo list and get its tag
+  if ( index < this->private_->undo_list_.size() )
+  {
+    return this->private_->undo_list_[ index ]->get_byte_size();
+  }
+  else
+  {
+    // An empty string indicates that there is no undo action on the list
+    return 0;
+  }
+}
+
+size_t LayerUndoBuffer::get_redo_byte_size( size_t index ) const
+{
+  // Extract the first item from the redo list and get its tag
+  if ( index < this->private_->redo_list_.size() )
+  {
+    return this->private_->redo_list_[ index ]->get_byte_size();
+  }
+  else
+  {
+    // An empty string indicates that there is no redo action on the list
+    return 0;
   }
 }
 
@@ -230,20 +276,16 @@ bool LayerUndoBuffer::has_redo() const
   return ! ( this->private_->redo_list_.empty() );
 }
 
-
-std::string LayerUndoBuffer::get_redo_tag() const
+size_t LayerUndoBuffer::num_undo_items()
 {
-  // Extract the first item from the redo list and get its tag
-  if ( !( this->private_->redo_list_.empty() ) )
-  {
-    return this->private_->redo_list_.front()->get_tag();
-  }
-  else
-  {
-    // An empty string indicates that there is no redo action on the list
-    return "";
-  }
+  return this->private_->undo_list_.size();
 }
+
+size_t LayerUndoBuffer::num_redo_items()
+{
+  return this->private_->redo_list_.size();
+}
+
 
 } // end namespace Seg3D
 

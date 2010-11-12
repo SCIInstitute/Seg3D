@@ -34,7 +34,10 @@
 #include <Core/Action/ActionHistory.h>
 #include <Core/Interface/Interface.h>
 
-// Interface bridging includes
+// Applications
+#include <Application/LayerManager/LayerUndoBuffer.h>
+
+// QtUtils includes
 #include <QtUtils/Bridge/QtBridge.h>
 
 // Interface includes
@@ -43,6 +46,8 @@
 #include <Interface/AppController/AppControllerActionHistory.h>
 #include <Interface/AppController/AppControllerStateEngine.h>
 #include <Interface/AppController/AppControllerLogHistory.h>
+#include <Interface/AppController/AppControllerUndoBuffer.h>
+#include <Interface/AppController/AppControllerRedoBuffer.h>
 
 // The interface from the designer
 #include "ui_AppController.h"
@@ -60,6 +65,8 @@ public:
   AppControllerActionHistory* action_history_model_;
   AppControllerStateEngine* state_engine_model_;
   AppControllerLogHistory* log_history_model_;
+  AppControllerUndoBuffer* undo_buffer_model_;
+  AppControllerRedoBuffer* redo_buffer_model_;
 
   // Action context for running the command line
   Core::ActionContextHandle context_;
@@ -85,9 +92,11 @@ AppController::AppController( QWidget* parent ) :
 
   // These next two are Qt objects and will be deleted when the parent object is
   // deleted
-  private_->action_history_model_ = new AppControllerActionHistory( this );
-  private_->state_engine_model_ = new AppControllerStateEngine( this );
-  private_->log_history_model_ = new AppControllerLogHistory( 1000, this );
+  this->private_->action_history_model_ = new AppControllerActionHistory( this );
+  this->private_->state_engine_model_ = new AppControllerStateEngine( this );
+  this->private_->log_history_model_ = new AppControllerLogHistory( 1000, this );
+  this->private_->undo_buffer_model_ = new AppControllerUndoBuffer( this );
+  this->private_->redo_buffer_model_ = new AppControllerRedoBuffer( this );
 
   // Step 2: Modify the widget
   qpointer_type controller( this );
@@ -110,6 +119,16 @@ AppController::AppController( QWidget* parent ) :
   this->private_->ui_.TV_LOG_HISTORY->setModel( private_->log_history_model_ );
   this->private_->ui_.TV_LOG_HISTORY->setColumnWidth( 0, 1000 );
   this->private_->ui_.TV_LOG_HISTORY->resizeRowsToContents();
+
+  this->private_->ui_.TV_UNDOBUFFER->setModel( this->private_->undo_buffer_model_ );
+  this->private_->ui_.TV_REDOBUFFER->setModel( this->private_->redo_buffer_model_ );
+  this->private_->ui_.TV_REDOBUFFER->setColumnWidth( 0, 600 );
+  this->private_->ui_.TV_REDOBUFFER->setColumnWidth( 1, 200 );
+  this->private_->ui_.TV_UNDOBUFFER->setColumnWidth( 0, 600 );
+  this->private_->ui_.TV_UNDOBUFFER->setColumnWidth( 1, 200 );
+  this->private_->ui_.TV_UNDOBUFFER->resizeRowsToContents();
+  this->private_->ui_.TV_REDOBUFFER->resizeRowsToContents();
+
 
   // Get the list of actions
   std::vector<std::string> action_list;
@@ -141,6 +160,9 @@ AppController::AppController( QWidget* parent ) :
   
   this->add_connection( Core::Log::Instance()->post_log_signal_.connect( 
     boost::bind( &AppController::UpdateLogHistory, controller, true, _1, _2 ) ) );
+
+  this->add_connection( LayerUndoBuffer::Instance()->buffer_changed_signal_.connect(
+    boost::bind( &AppController::UpdateUndoBuffer, controller ) ) );
 
   // Step 6: Qt connections
   // Connect the edit box to the slot that posts the action
@@ -222,6 +244,23 @@ void AppController::UpdateStateEngine( qpointer_type controller )
   }
 }
 
+void AppController::UpdateUndoBuffer( qpointer_type controller )
+{ 
+  // Ensure that this call gets relayed to the right thread
+  if ( !( Core::Interface::IsInterfaceThread() ) )
+  {
+    Core::Interface::PostEvent( boost::bind( &AppController::UpdateUndoBuffer, controller ) );
+    return;
+  }
+
+  // Protect controller pointer, so we do not execute if controller does not
+  // exist anymore
+  if ( controller.data() )
+  {
+    controller->private_->undo_buffer_model_->update();
+    controller->private_->redo_buffer_model_->update();
+  }
+}
 
 void AppController::UpdateLogHistory( qpointer_type controller, bool relay, int message_type,
     std::string message )

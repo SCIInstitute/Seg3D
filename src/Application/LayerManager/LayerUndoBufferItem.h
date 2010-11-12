@@ -34,6 +34,7 @@
 
 // Application includes
 #include <Application/Layer/Layer.h>
+#include <Application/LayerManager/LayerManager.h>
 #include <Application/LayerManager/LayerCheckPoint.h>
 
 namespace Seg3D
@@ -80,6 +81,11 @@ public:
   // ADD_LAYER_TO_RESTORE:
   // Add layer to restore list, layers are restored using check points.
   void add_layer_to_restore( LayerHandle layer, LayerCheckPointHandle checkpoint);
+
+  // ADD_ID_COUNT_TO_RESTORE:
+  // Cache the count of layer and group ids, so they can be roled back to the original ones
+  // NOTE: If they are set to -1, the function will query the current ones.
+  void add_id_count_to_restore( LayerManager::id_count_type id_count );
 
   // -- apply undo/redo action --
 public:

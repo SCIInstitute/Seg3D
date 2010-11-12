@@ -76,7 +76,7 @@ public:
   // CHECK_ABORT:
   // Check the abort flag
   bool check_abort(); 
-    
+  
   // ABORT_AND_WAIT:  
   // NOTE: When undoing asynchronous layer operations, one may need to wait until the filter
   // can be aborted. If not the state of the program is unclear. Hence this function will ensure
@@ -87,6 +87,11 @@ public:
   // CONNECT_ABORT:
   // Monitor the abort flag of a layer
   void connect_abort( const LayerHandle& layer ); 
+  
+protected:      
+  // HANDLE_ABORT:
+  // A virtual function that can be overloaded
+  virtual void handle_abort();    
     
   // -- shortcuts into the LayerManager --  
 public:

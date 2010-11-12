@@ -53,6 +53,9 @@ public:
   // An action can always be redone by executing the action again 
   Core::ActionHandle redo_action_;
   
+  // The count of the id of a layer, this one has to be roled back in case of undo
+  LayerManager::id_count_type id_count_;
+  
   // Size of the item
   size_t size_;
 };
@@ -62,6 +65,7 @@ LayerUndoBufferItem::LayerUndoBufferItem( const std::string& tag ) :
 {
   this->private_->tag_ = tag;
   this->private_->size_ = 0;
+  this->private_->id_count_ = LayerManager::GetLayerInvalidIdCount();
 }
 
 LayerUndoBufferItem::~LayerUndoBufferItem()
@@ -235,6 +239,12 @@ bool LayerUndoBufferItem::apply_and_clear_undo()
   // Remove the layers from the undo mechanism so the program can actually delete them afterwards
   this->private_->layers_to_add_.clear(); 
   
+  // The counters need to be roled back so when redo is done, it actually redos the same action
+  // resulting in the same counters. This only needs to be done if layers got created and deleted
+  // in the undo.
+  
+  LayerManager::SetLayerIdCount( this->private_->id_count_ );
+  
   return true;
 }
 
@@ -268,6 +278,10 @@ std::string LayerUndoBufferItem::get_tag() const
   return this->private_->tag_;
 }
 
+void LayerUndoBufferItem::add_id_count_to_restore( LayerManager::id_count_type id_count )
+{
+    this->private_->id_count_ = id_count;
+}
 
 
 } // end namespace Seg3D

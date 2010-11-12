@@ -225,7 +225,7 @@ void AppStatusBar::update_data_point_label()
       this->private_->ui_.z_->setText( QString( "%1" ).arg( index_z, 0, 'f', 0 ) );
     }
     this->private_->ui_.value_->setText( QString( "%1" ).arg( 
-      this->data_point_info_.value(), 0, 'f', 0 ) );
+      this->data_point_info_.value(), 0, 'f', 3 ) );
   }
 }
 

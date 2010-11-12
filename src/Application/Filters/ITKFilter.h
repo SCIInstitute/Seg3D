@@ -361,6 +361,11 @@ protected:
     this->limit_number_of_itk_threads_internal( itk::ProcessObject::Pointer( filter_pointer ) );
   }
   
+protected:      
+  // HANDLE_ABORT:
+  // A virtual function that can be overloaded
+  virtual void handle_abort();    
+  
 private:  
   // Internal function for setting up itk progress forwarding
   void observe_itk_filter_internal( itk::ProcessObject::Pointer filter, 

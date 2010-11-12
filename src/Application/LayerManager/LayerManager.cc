@@ -1556,6 +1556,34 @@ void LayerManager::DispatchInsertMaskSlicesIntoLayer( MaskLayerHandle layer,
   }
 }
 
+LayerManager::id_count_type LayerManager::GetLayerIdCount()
+{
+  int layer_count = static_cast<int>( 
+    Core::StateEngine::Instance()->get_next_statehandler_count( "layer" ) );
+
+  int group_count = static_cast<int>( 
+    Core::StateEngine::Instance()->get_next_statehandler_count( "group" ) );
+
+  return std::make_pair<int,int>( layer_count, group_count );
+}
+
+LayerManager::id_count_type LayerManager::GetLayerInvalidIdCount()
+{
+  return std::make_pair<int,int>( -1, -1 );
+}
+
+void LayerManager::SetLayerIdCount( id_count_type id_count )
+{
+  if ( id_count.first >= 0)
+  {
+    Core::StateEngine::Instance()->set_next_statehandler_count( "layer", id_count.first );
+  }
+  if ( id_count.second >= 0)
+  {
+    Core::StateEngine::Instance()->set_next_statehandler_count( "group", id_count.second );
+  }
+}
+
 void LayerManager::handle_layer_name_changed( std::string layer_id, std::string name )
 {
   this->layer_name_changed_signal_( layer_id, name );

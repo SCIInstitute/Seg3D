@@ -37,6 +37,8 @@ SET(INTERFACE_APPCONTROLLER_SRCS
   AppControllerActionHistory.cc
   AppControllerStateEngine.cc
   AppControllerLogHistory.cc
+  AppControllerUndoBuffer.cc
+  AppControllerRedoBuffer.cc
 )
 
 SET(INTERFACE_APPCONTROLLER_MOC_SRCS
@@ -44,6 +46,8 @@ SET(INTERFACE_APPCONTROLLER_MOC_SRCS
   AppControllerActionHistory.h
   AppControllerStateEngine.h
   AppControllerLogHistory.h
+  AppControllerUndoBuffer.h
+  AppControllerRedoBuffer.h
 )
 
 SET(INTERFACE_APPCONTROLLER_NO_MOC_SRCS

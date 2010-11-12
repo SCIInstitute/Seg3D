@@ -208,7 +208,7 @@ public:
 
 public:
   // TODO: There are too many signals in here, we should clean this up
-  // --JS
+  // --JGS
 
   // -- Signal/Slots --
   typedef boost::signals2::signal< void( LayerHandle ) > layer_signal_type;
@@ -461,6 +461,22 @@ public:
     std::vector<Core::MaskDataSliceHandle> mask, 
     filter_key_type key = filter_key_type( 0 ) );
 
+  // == function for obtaining the current layer and group id counters
+  
+  typedef std::pair<int,int> id_count_type;
+  
+  // GETLAYERIDCOUNT:
+  // Get the current count of the group and layer ids
+  static id_count_type GetLayerIdCount();
+
+  // GETLAYERINVALIDIDCOUNT:
+  // Get a default id count that has no valid ids.
+  static id_count_type GetLayerInvalidIdCount();
+  
+  // SETLAYERIDCOUNT:
+  // Set the current count of group and layer
+  // NOTE: This function should only be called by the undo buffer
+  static void SetLayerIdCount( id_count_type id_count );
 
 };
 
