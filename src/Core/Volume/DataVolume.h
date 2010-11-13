@@ -139,8 +139,13 @@ public:
   // CONVERTTOCANONICALVOLUME:
   // Convert the source volume to a canonical-axis-aligned volume.
   // Returns true if conversion is done, otherwise false.
-  static void ConvertToCanonicalVolume( const DataVolumeHandle& src_volume, 
+  static bool ConvertToCanonicalVolume( const DataVolumeHandle& src_volume, 
     DataVolumeHandle& dst_volume );
+    
+  // DUPLICATEVOLUME:
+  // Duplicate the data volume
+  static bool DuplicateVolume( const DataVolumeHandle& src_mask, 
+    DataVolumeHandle& dst_mask );   
 };
 
 } // end namespace Core

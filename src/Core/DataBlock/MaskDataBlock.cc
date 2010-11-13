@@ -91,6 +91,13 @@ bool MaskDataBlock::extract_slice( SliceType type,
       MaskDataBlock::lock_type lock( slice_mask_data_block->get_mutex() );
       MaskDataBlock::shared_lock_type slock( this->get_mutex() );
 
+      if ( this->get_data_block() != slice_mask_data_block->get_data_block() )
+      {
+        // Need a read lock for the slice mask
+        shared_lock_type read_lock( this->get_mutex() );
+        slock.swap( read_lock );
+      }
+
       unsigned char volume_mask_value = this->get_mask_value();         
       unsigned char slice_mask_value = slice_mask_data_block->get_mask_value();         
       unsigned char slice_not_mask_value = ~( slice_mask_data_block->get_mask_value() );          
@@ -98,7 +105,7 @@ bool MaskDataBlock::extract_slice( SliceType type,
       unsigned char* slice_ptr = slice_mask_data_block->get_mask_data();
       
       size_t nxy = nx * ny;
-      size_t ny8 = ny & ~(0x7ULL);
+      size_t ny8 = RemoveRemainder8( ny );
 
       for ( size_t z = 0; z < nz; z++ )
       {
@@ -151,6 +158,13 @@ bool MaskDataBlock::extract_slice( SliceType type,
       MaskDataBlock::lock_type lock( slice_mask_data_block->get_mutex() );
       MaskDataBlock::shared_lock_type slock( this->get_mutex() );
 
+      if ( this->get_data_block() != slice_mask_data_block->get_data_block() )
+      {
+        // Need a read lock for the slice mask
+        shared_lock_type read_lock( this->get_mutex() );
+        slock.swap( read_lock );
+      }
+
       unsigned char volume_mask_value = this->get_mask_value();         
       unsigned char slice_mask_value = slice_mask_data_block->get_mask_value();         
       unsigned char slice_not_mask_value = ~( slice_mask_data_block->get_mask_value() );          
@@ -158,7 +172,7 @@ bool MaskDataBlock::extract_slice( SliceType type,
       unsigned char* slice_ptr = slice_mask_data_block->get_mask_data();
       
       size_t nxy = nx * ny;
-      size_t nx8 = nx & ~(0x7ULL);
+      size_t nx8 = RemoveRemainder8( nx );
 
       for ( size_t z = 0; z < nz; z++ )
       {
@@ -212,6 +226,13 @@ bool MaskDataBlock::extract_slice( SliceType type,
       MaskDataBlock::lock_type lock( slice_mask_data_block->get_mutex() );
       MaskDataBlock::shared_lock_type slock( this->get_mutex() );
 
+      if ( this->get_data_block() != slice_mask_data_block->get_data_block() )
+      {
+        // Need a read lock for the slice mask
+        shared_lock_type read_lock( this->get_mutex() );
+        slock.swap( read_lock );
+      }
+
       unsigned char volume_mask_value = this->get_mask_value();         
       unsigned char slice_mask_value = slice_mask_data_block->get_mask_value();         
       unsigned char slice_not_mask_value = ~( slice_mask_data_block->get_mask_value() );          
@@ -219,7 +240,7 @@ bool MaskDataBlock::extract_slice( SliceType type,
       unsigned char* slice_ptr = slice_mask_data_block->get_mask_data();
       
       size_t nxy = nx * ny;
-      size_t nx8 = nx & ~(0x7ULL);
+      size_t nx8 = RemoveRemainder8( nx );
 
       for ( size_t y = 0; y < ny; y++ )
       {
@@ -281,10 +302,15 @@ bool MaskDataBlock::insert_slice( const MaskDataSliceHandle slice )
 
   // Need a write lock for the destination mask
   lock_type lock( this->get_mutex() );
+  shared_lock_type slock;
 
-  // Need a read lock for the slice mask
-  shared_lock_type slock( slice_mask_data_block->get_mutex() );
-
+  if ( this->get_data_block() != slice_mask_data_block->get_data_block() )
+  {
+    // Need a read lock for the slice mask
+    shared_lock_type read_lock( slice_mask_data_block->get_mutex() );
+    slock.swap( read_lock );
+  }
+  
   index_type index = slice->get_index();
 
   // For each orientation we have an optimized implementation 
@@ -309,7 +335,7 @@ bool MaskDataBlock::insert_slice( const MaskDataSliceHandle slice )
       size_t nxy = nx * ny;
 
       // Setup loop unrolement
-      size_t ny8 = ny & ~(0x7ULL);
+      size_t ny8 = RemoveRemainder8( ny );
 
       for ( size_t z = 0; z < nz; z++ )
       {
@@ -370,7 +396,7 @@ bool MaskDataBlock::insert_slice( const MaskDataSliceHandle slice )
       
       size_t nxy = nx * ny;
       // Setup loop unrolement
-      size_t nx8 = nx & ~(0x7ULL);
+      size_t nx8 = RemoveRemainder8( nx );
 
       for ( size_t z = 0; z < nz; z++ )
       {
@@ -434,7 +460,7 @@ bool MaskDataBlock::insert_slice( const MaskDataSliceHandle slice )
       size_t nxy = nx * ny;
 
       // Setup loop unrolement
-      size_t nx8 = nx & ~(0x7ULL);
+      size_t nx8 = RemoveRemainder8( nx );
 
       for ( size_t y = 0; y < ny; y++ )
       {

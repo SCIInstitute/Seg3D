@@ -107,6 +107,10 @@ public:
   // Check whether the layer has valid data
   virtual bool has_valid_data() const = 0;
     
+  // DUPLICATE_LAYER:
+  // Duplicate layer
+  virtual LayerHandle duplicate() const = 0;  
+    
   // UPDATE_PROGRESS:
   // Update the progress bar associated with this layer
   void update_progress( double amount, double progress_start = 0.0f, double progress_amount = 1.0f ); 
@@ -158,17 +162,8 @@ public:
 
   // State that stores the current layer state
   Core::StateOptionHandle data_state_;
-  
-
-protected:
-  // State that stores the generation of its datablock
-  Core::StateLongLongHandle generation_state_;
-  
-  // State that stores the last action that was played
-  Core::StateStringHandle last_action_state_;
 
   // -- GUI related states --
-public:
   // Whether to show the layer information
   Core::StateBoolHandle show_information_state_;
   
@@ -188,6 +183,12 @@ public:
   Core::StateBoolHandle show_abort_message_state_;
 
 protected:
+  // State that stores the generation of its datablock
+  Core::StateLongLongHandle generation_state_;
+  
+  // State that stores the last action that was played
+  Core::StateStringHandle last_action_state_;
+  
   // An exclusive group of boolean states that control the visibility of different parts
   Core::BooleanStateGroupHandle gui_state_group_;
 
@@ -213,7 +214,12 @@ public:
   // GET_GENERATION:
   // Get the generation of the current data block
   Core::DataBlock::generation_type get_generation() const;
-  
+
+protected:
+  virtual bool post_save_states( Core::StateIO& state_io );
+
+  // -- Filter keys --
+public: 
   // FILTER_KEY:
   // This is a unique key that is inserted when an asynchronous filter is running. 
   // The asynchronous calls back to the layer are compared with the key, if they don't
@@ -252,8 +258,6 @@ public:
   // Get the current filter associated with the layer
   LayerAbstractFilterHandle get_filter_handle();
 
-protected:
-  virtual bool post_save_states( Core::StateIO& state_io );
 
   // -- internals of class --
 private:  

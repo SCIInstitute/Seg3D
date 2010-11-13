@@ -485,6 +485,18 @@ inline float RadianToDegree( float radian )
   return radian * ( 180.0f / Pif() );
 }
 
+inline size_t RemoveRemainder8( size_t size )
+{
+  if ( sizeof (size_t) == 8 )
+  {
+    return size & ~(0x7ULL);
+  }
+  else
+  {
+    return size & ~(0x7UL);
+  }
+}
+
 } // End namespace Core
 
 #endif

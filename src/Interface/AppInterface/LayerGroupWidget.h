@@ -176,15 +176,11 @@ private Q_SLOTS:
   // enables or disables the delete button based on whether or not there are any boxes selected
   void enable_disable_delete_button();  
   
-  
-  
 private:
   // CLEANUP_REMOVED_WIDGETS:
+  // Cleanup any of the widgets that were removed
   void cleanup_removed_widgets();
   
-  
-  
-
   // -- widget internals --
 private:
     boost::shared_ptr< LayerGroupWidgetPrivate > private_;

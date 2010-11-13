@@ -108,6 +108,10 @@ public:
   // CREATEINVALIDMASK:
   // Create a mask with given dimensions, but no data container associated with it.
   static bool CreateInvalidMask( GridTransform grid_transform, MaskVolumeHandle& mask );
+  
+  // DUPLICATEMASK:
+  // Duplicate the mask volume
+  static bool DuplicateMask( const MaskVolumeHandle& src_mask, MaskVolumeHandle& dst_mask );
 
 private:
   // Handle to where the mask volume is really stored

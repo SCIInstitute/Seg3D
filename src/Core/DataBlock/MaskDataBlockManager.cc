@@ -602,6 +602,77 @@ bool MaskDataBlockManager::Convert( MaskDataBlockHandle mask, DataBlockHandle& d
   return false;
 }
 
+bool MaskDataBlockManager::Duplicate( MaskDataBlockHandle src_mask_data_block, 
+  const GridTransform& grid_transform, MaskDataBlockHandle& dst_mask_data_block )
+{
+  // Step (1): Create a new mask
+  // NOTE: The grid transform is only use to store the masks of similar dimensiosn in the
+  // same data block
+  if ( !( MaskDataBlockManager::Instance()->create( grid_transform, dst_mask_data_block ) ) )
+  {
+    return false;
+  }
+
+  // Step (2): Need to lock the source data
+  MaskDataBlock::lock_type lock( dst_mask_data_block->get_mutex( ) );
+  MaskDataBlock::shared_lock_type slock;
+  
+  // NOTE: Need to check if we not already locked this one. If the underlying datablocks are
+  // the same we do not need a read lock. In fact putting one would result in a deadlock
+  if ( src_mask_data_block->get_data_block( ) != dst_mask_data_block->get_data_block( ) )
+  {
+    MaskDataBlock::shared_lock_type read_lock( src_mask_data_block->get_mutex( ) );
+    slock.swap( read_lock );
+  }
+
+  // Step (3): Get the mask data pointer and which bit is used
+  unsigned char* src_mask_ptr = src_mask_data_block->get_mask_data();
+  unsigned char src_mask_value = src_mask_data_block->get_mask_value();
+  
+  
+  // Step (4): Security check
+  if ( src_mask_data_block->get_size() != dst_mask_data_block->get_size() )
+  {
+    return false;
+  }
+  
+  // Step (2): Get the mask data pointer and which bit is used
+  unsigned char* dst_mask_ptr = dst_mask_data_block->get_mask_data();
+  unsigned char dst_mask_value = dst_mask_data_block->get_mask_value(); 
+  unsigned char dst_not_mask_value = ~( dst_mask_data_block->get_mask_value() );  
+  
+  size_t size = dst_mask_data_block->get_size();
+  size_t size8 = RemoveRemainder8( size );
+
+  for ( size_t j = 0; j < size8; j+= 8 )
+  {
+    if ( src_mask_ptr[ j ] & src_mask_value ) 
+      dst_mask_ptr[ j ] |= dst_mask_value; else dst_mask_ptr[ j ] &= dst_not_mask_value;
+    if ( src_mask_ptr[ j + 1 ] & src_mask_value ) 
+      dst_mask_ptr[ j + 2 ] |= dst_mask_value; else dst_mask_ptr[ j + 1 ] &= dst_not_mask_value;
+    if ( src_mask_ptr[ j + 2 ] & src_mask_value ) 
+      dst_mask_ptr[ j + 2 ] |= dst_mask_value; else dst_mask_ptr[ j + 2 ] &= dst_not_mask_value;
+    if ( src_mask_ptr[ j + 3 ] & src_mask_value ) 
+      dst_mask_ptr[ j + 3 ] |= dst_mask_value; else dst_mask_ptr[ j + 3 ] &= dst_not_mask_value;
+    if ( src_mask_ptr[ j + 4 ] & src_mask_value )
+      dst_mask_ptr[ j + 4 ] |= dst_mask_value; else dst_mask_ptr[ j + 4 ] &= dst_not_mask_value;    
+    if ( src_mask_ptr[ j + 5 ] & src_mask_value )
+      dst_mask_ptr[ j + 5 ] |= dst_mask_value; else dst_mask_ptr[ j + 5 ] &= dst_not_mask_value;    
+    if ( src_mask_ptr[ j + 6 ] & src_mask_value )
+      dst_mask_ptr[ j + 6 ] |= dst_mask_value; else dst_mask_ptr[ j + 6 ] &= dst_not_mask_value;    
+    if ( src_mask_ptr[ j + 7 ] & src_mask_value )
+      dst_mask_ptr[ j + 7 ] |= dst_mask_value; else dst_mask_ptr[ j + 7 ] &= dst_not_mask_value;    
+  }
+  for ( size_t j = size8; j < size; j++ )
+  {
+    if ( src_mask_ptr[ j ] & src_mask_value ) 
+      dst_mask_ptr[ j ] |= dst_mask_value; else dst_mask_ptr[ j ] &= dst_not_mask_value;
+  }
+
+  return true;
+}
+
+
 template< class DATA >
 static bool CreateMaskFromNonZeroDataInternal( const DataBlockHandle& data, 
                         const MaskDataBlockHandle& mask )

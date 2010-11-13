@@ -52,10 +52,10 @@
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/LayerManager/Actions/ActionDeleteLayers.h>
 #include <Application/LayerManager/Actions/ActionNewMaskLayer.h>
+#include <Application/LayerManager/Actions/ActionDuplicateLayer.h>
 #include <Application/LayerManager/Actions/ActionMoveGroupAbove.h>
 #include <Application/LayerManager/Actions/ActionMoveLayerBelow.h>
 #include <Application/ViewerManager/ViewerManager.h>
-
 
 namespace Seg3D
 {
@@ -103,7 +103,6 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   this->private_->ui_.delete_->hide();
   
   this->private_->ui_.delete_button_->setEnabled( false );
-
 
   // set some values of the GUI
   std::string group_name = Core::ExportToString( 
@@ -162,6 +161,9 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   QtUtils::QtBridge::Connect( this->private_->ui_.group_new_button_, 
     boost::bind( &ActionNewMaskLayer::Dispatch, 
     Core::Interface::GetWidgetActionContext(), this->private_->group_->get_group_id() ) );
+
+  QtUtils::QtBridge::Connect( this->private_->ui_.duplicate_layer_button_,
+    boost::bind( &ActionDuplicateLayer::Dispatch, Core::Interface::GetWidgetActionContext() ) );
 
   // --- ISOSURFACE---
   QtUtils::QtBridge::Connect( this->private_->iso_quality_button_group_, 

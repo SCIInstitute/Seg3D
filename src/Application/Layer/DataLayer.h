@@ -81,6 +81,10 @@ public:
   // Get the underlying volume.
   virtual Core::VolumeHandle get_volume() const;
 
+  // DUPLICATE_LAYER:
+  // Duplicate layer
+  virtual LayerHandle duplicate() const;
+
   // GET_DATA_VOLUME:
   // this function returns the data volume
   Core::DataVolumeHandle get_data_volume() const;

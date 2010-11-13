@@ -404,5 +404,20 @@ void DataLayer::clean_up()
   this->disconnect_all();   
 }
 
+LayerHandle DataLayer::duplicate() const
+{
+  LayerHandle layer;
+
+  Core::DataVolumeHandle data_volume;
+  if ( !( Core::DataVolume::DuplicateVolume( this->get_data_volume(), data_volume ) ) )
+  {
+    // NOTE: return an empty handle
+    return layer;
+  }
+  
+  return DataLayerHandle( new DataLayer( this->get_layer_name(), data_volume ) );
+
+}
+
 } // end namespace Seg3D
 

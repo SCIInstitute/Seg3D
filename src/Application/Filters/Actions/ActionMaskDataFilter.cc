@@ -133,7 +133,7 @@ public:
     Core::MaskVolumeHandle input_mask_volume = input_mask_layer->get_mask_volume();
 
     Core::DataBlockHandle output_data_block;
-    if ( ! ( Core::DataBlock::Clone( input_data_volume->get_data_block(), output_data_block ) ) )
+    if ( ! ( Core::DataBlock::Duplicate( input_data_volume->get_data_block(), output_data_block ) ) )
     {
       this->report_error( "Could not allocate enough memory." );
       return;

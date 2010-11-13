@@ -209,7 +209,7 @@ bool DataVolume::CreateInvalidData( GridTransform grid_transform, DataVolumeHand
   return true;
 }
 
-void DataVolume::ConvertToCanonicalVolume( const DataVolumeHandle& src_volume, 
+bool DataVolume::ConvertToCanonicalVolume( const DataVolumeHandle& src_volume, 
                       DataVolumeHandle& dst_volume )
 {
   const GridTransform& src_transform = src_volume->get_grid_transform();
@@ -229,6 +229,28 @@ void DataVolume::ConvertToCanonicalVolume( const DataVolumeHandle& src_volume,
   }
 
   dst_volume.reset( new DataVolume( dst_transform, dst_data_block ) );
+  
+  return true;
+}
+
+
+bool DataVolume::DuplicateVolume( const DataVolumeHandle& src_data_volume, 
+    DataVolumeHandle& dst_data_volume )
+{
+  if ( !src_data_volume ) return false;
+  
+  DataBlockHandle dst_data_block;
+  
+  if ( !( DataBlock::Duplicate( src_data_volume->get_data_block(), dst_data_block ) ) )
+  {
+    return false;
+  }
+  
+  dst_data_volume = DataVolumeHandle( new DataVolume( 
+    src_data_volume->get_grid_transform(), dst_data_block ) );
+  
+  if ( !dst_data_volume ) return false;
+  return true;
 }
 
 size_t DataVolume::get_byte_size() const

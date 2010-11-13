@@ -383,5 +383,18 @@ size_t MaskLayer::get_byte_size() const
   return 0;
 }
 
-} // end namespace Seg3D
+LayerHandle MaskLayer::duplicate() const
+{
+  LayerHandle layer;
 
+  Core::MaskVolumeHandle mask_volume;
+  if ( !( Core::MaskVolume::DuplicateMask( this->get_mask_volume(), mask_volume ) ) )
+  {
+    // NOTE: return an empty handle
+    return layer;
+  }
+  
+  return MaskLayerHandle( new MaskLayer( this->get_layer_name(), mask_volume ) );
+}
+
+} // end namespace Seg3D

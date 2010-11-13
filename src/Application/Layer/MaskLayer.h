@@ -80,6 +80,10 @@ public:
   // Check whether the layer has valid data
   virtual bool has_valid_data() const;
   
+  // DUPLICATE_LAYER:
+  // Duplicate layer
+  virtual LayerHandle duplicate() const;  
+  
   // GET_VOLUME:
   // Get the underlying volume.
   virtual Core::VolumeHandle get_volume() const;
@@ -174,6 +178,7 @@ private:
   // Information about two components not included in the state manager.
   Core::MaskVolumeHandle mask_volume_;
   Core::IsosurfaceHandle isosurface_;
+  
 };
 
 } // end namespace Seg3D

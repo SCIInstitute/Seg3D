@@ -73,6 +73,12 @@ bool DistanceFilterInterface::build_widget( QFrame* frame )
     tool->target_layer_state_ );  QtUtils::QtBridge::Connect( this->private_->ui_.use_active_layer_, 
     tool->use_active_layer_state_ );
     
+  QtUtils::QtBridge::Connect( this->private_->ui_.index_space_,
+    tool->use_index_space_state_ );
+
+  QtUtils::QtBridge::Connect( this->private_->ui_.inside_positive_,
+    tool->inside_positive_state_ );
+    
   QtUtils::QtBridge::Connect( this->private_->ui_.replaceCheckBox, 
     tool->replace_state_ );
   QtUtils::QtBridge::Enable( this->private_->ui_.runFilterButton,

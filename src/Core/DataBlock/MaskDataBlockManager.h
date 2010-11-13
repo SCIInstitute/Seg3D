@@ -154,6 +154,10 @@ public:
   static bool CreateMaskFromLabelData( const DataBlockHandle& data, 
     const GridTransform& grid_transform, std::vector<MaskDataBlockHandle>& masks );
 
+  // DUPLICATE:
+  // Duplicate a MaskDataBlock into a DataBlock
+  static bool Duplicate( MaskDataBlockHandle src_mask_data_block, 
+    const GridTransform& grid_transform, MaskDataBlockHandle& dst_mask_data_block );
 };
 
 } // end namespace Core

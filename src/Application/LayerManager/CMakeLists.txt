@@ -70,6 +70,8 @@ SET(APPLICATION_LAYERMANAGER_ACTIONS_SRCS
   Actions/ActionMoveLayerBelow.cc
   Actions/ActionNewMaskLayer.h
   Actions/ActionNewMaskLayer.cc
+  Actions/ActionDuplicateLayer.h
+  Actions/ActionDuplicateLayer.cc
   Actions/ActionRedo.h
   Actions/ActionRedo.cc
   Actions/ActionUndo.h

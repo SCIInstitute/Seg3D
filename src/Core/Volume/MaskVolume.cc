@@ -145,6 +145,25 @@ bool MaskVolume::CreateInvalidMask( GridTransform grid_transform, MaskVolumeHand
   return true;
 }
 
+
+bool MaskVolume::DuplicateMask( const MaskVolumeHandle& src_mask, MaskVolumeHandle& dst_mask )
+{
+  if ( !src_mask ) return false;
+  
+  MaskDataBlockHandle dst_mask_data_block;
+  if ( !( MaskDataBlockManager::Duplicate( src_mask->get_mask_data_block(), 
+    src_mask->get_grid_transform(), dst_mask_data_block ) ) ) 
+  {
+    return false;
+  }
+  
+  dst_mask = MaskVolumeHandle( new MaskVolume( src_mask->get_grid_transform(), 
+    dst_mask_data_block ) );
+  
+  if ( !dst_mask ) return false;
+  return true;
+}
+
 bool MaskVolume::insert_slice( const MaskDataSliceHandle slice )
 {
   if ( this->mask_data_block_ )

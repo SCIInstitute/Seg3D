@@ -834,7 +834,7 @@ bool DataBlock::QuantizeData( const DataBlockHandle& src_data_block,
   }
 }
 
-bool DataBlock::Clone( const DataBlockHandle& src_data_block, 
+bool DataBlock::Duplicate( const DataBlockHandle& src_data_block, 
     DataBlockHandle& dst_data_block )
 {
   // Step (1) : Check whether there is a source data block
@@ -924,7 +924,7 @@ bool ExtractSliceInternal( DataBlock* volume_data_block,
       // Short cut so we do not need to recompute this one over and over again
       size_t nxy = nx * ny;
       // Size for loop unroling
-      size_t ny8 = ny & ~(0x7ULL);
+      size_t ny8 = RemoveRemainder8( ny );
 
       for ( size_t z = 0; z < nz; z++ )
       {
@@ -971,7 +971,7 @@ bool ExtractSliceInternal( DataBlock* volume_data_block,
       // Short cut so we do not need to recompute this one over and over again
       size_t nxy = nx * ny;
       // Size for loop unroling
-      size_t nx8 = nx & ~(0x7ULL);
+      size_t nx8 = RemoveRemainder8( nx );
 
       for ( size_t z = 0; z < nz; z++ )
       {
@@ -1092,7 +1092,7 @@ bool InsertSliceInternal( DataBlock* volume_data_block, const DataSliceHandle& s
       
       size_t nxy = nx * ny;
       // For loop unrolement 
-      size_t ny8 = ny & ~(0x7ULL);
+      size_t ny8 = RemoveRemainder8( ny );
 
       for ( size_t z = 0; z < nz; z++ )
       {
@@ -1134,7 +1134,7 @@ bool InsertSliceInternal( DataBlock* volume_data_block, const DataSliceHandle& s
       
       size_t nxy = nx * ny;
       // For loop unrolement 
-      size_t nx8 = nx & ~(0x7ULL);
+      size_t nx8 = RemoveRemainder8( nx );
 
       for ( size_t z = 0; z < nz; z++ )
       {
