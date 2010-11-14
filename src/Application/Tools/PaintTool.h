@@ -49,25 +49,33 @@ typedef boost::shared_ptr< PaintToolPrivate > PaintToolPrivateHandle;
 class PaintInfo
 {
 public:
+  // Slice we paint on
   std::string target_layer_id_;
   Core::MaskVolumeSliceHandle target_slice_;
+  
+  // Data constraint
   std::string data_constraint_layer_id_;
   Core::DataVolumeSliceHandle data_constraint_slice_;
   double min_val_;
   double max_val_;
   bool negative_data_constraint_;
+  
+  // Mask constraint 1
   std::string mask_constraint1_layer_id_;
   Core::MaskVolumeSliceHandle mask_constraint1_slice_;
   bool negative_mask_constraint1_;
+
+  // Mask constraint 2
   std::string mask_constraint2_layer_id_;
   Core::MaskVolumeSliceHandle mask_constraint2_slice_;
   bool negative_mask_constraint2_;
-  int x0_, y0_, x1_, y1_;
+
+  // Brush stroke
+  std::vector<int> x_;
+  std::vector<int> y_;
+  
   int brush_radius_;
   bool erase_;
-
-  // The following variables are set by ActionPaint when it's executed.
-  bool inclusive_;
 };
 
 class PaintTool : public SeedPointsTool, public boost::enable_shared_from_this< PaintTool >
@@ -145,6 +153,10 @@ private:
   friend class ActionPaint;
 
   bool paint( const PaintInfo& info );
+  
+  // HANDLEPAINT:
+  // THis function is called to relay the paint call to the application thread
+  static void HandlePaint( PaintToolWeakHandle tool, const PaintInfo& info );
 
 public:
   void flood_fill( Core::ActionContextHandle context, bool erase );

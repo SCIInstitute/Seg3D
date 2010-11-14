@@ -142,6 +142,9 @@ public:
   Core::Texture2DHandle brush_tex_;
   MaskShaderHandle shader_;
 
+  std::vector<int> x_;
+  std::vector<int> y_;
+
   const static int INVALID_VIEWER_C;
 };
 
@@ -386,8 +389,10 @@ void PaintToolPrivate::interpolated_paint( const PaintInfo& paint_info, int x0, 
 {
   int delta_x = Core::Abs( x1 - x0 );
   int delta_y = Core::Abs( y1 - y0 );
+  
   if ( delta_x == 0 && delta_y == 0 )
   {
+    this->paint( paint_info, x0, y0, paint_count );
     return;
   }
   
@@ -602,6 +607,8 @@ void PaintToolPrivate::stop_painting()
   this->mask_constraint1_slice_.reset();
   this->mask_constraint2_slice_.reset();
   this->data_constraint_slice_.reset();
+  this->x_.clear();
+  this->y_.clear();
 }
 
 void PaintToolPrivate::setup_paint_info( PaintInfo& paint_info, int x0, int y0, int x1, int y1 )
@@ -622,17 +629,25 @@ void PaintToolPrivate::setup_paint_info( PaintInfo& paint_info, int x0, int y0, 
   paint_info.brush_radius_ = this->paint_tool_->brush_radius_state_->get();
   paint_info.erase_ = this->erase_;
 
+  paint_info.x_.resize( 2 );
+  paint_info.y_.resize( 2 );
+
   double xpos, ypos;
   int slice_x, slice_y;
   this->viewer_->window_to_world( x0, y0, xpos, ypos );
   this->target_slice_->world_to_index( xpos, ypos, slice_x, slice_y );
-  paint_info.x0_ = slice_x;
-  paint_info.y0_ = slice_y;
+  
+  paint_info.x_[ 0 ] = slice_x;
+  paint_info.y_[ 0 ] = slice_y;
 
   this->viewer_->window_to_world( x1, y1, xpos, ypos );
   this->target_slice_->world_to_index( xpos, ypos, slice_x, slice_y );
-  paint_info.x1_ = slice_x;
-  paint_info.y1_ = slice_y;
+
+  paint_info.x_[ 1 ] = slice_x;
+  paint_info.y_[ 1 ] = slice_y;
+  
+  this->x_.push_back( slice_x );
+  this->y_.push_back( slice_y );
 }
 
 void PaintToolPrivate::handle_data_cstr_visibility_changed()
@@ -1028,16 +1043,22 @@ bool PaintTool::handle_mouse_move( ViewerHandle viewer,
                   const Core::MouseHistory& mouse_history, 
                   int button, int buttons, int modifiers )
 {
+  // NOTE: This function call is running on the interface thread
+  // Hence we need to lock as most of the paint tool runs on the Application thread.
   {
     PaintToolPrivate::lock_type lock( this->private_->get_mutex() );
     this->private_->viewer_ = viewer;
   }
 
+  // If it is a volume view we cannot do any painting
   if ( this->private_->viewer_->is_volume_view() )
   {
     return false;
   }
 
+  // Get a handle to the constraint layer
+  // NOTE: Again we need to lock the state engine as we are on the interface thread
+  // and not on the application thread.
   std::string data_constraint_layer;
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
@@ -1046,6 +1067,8 @@ bool PaintTool::handle_mouse_move( ViewerHandle viewer,
 
   if ( !this->private_->painting_ )
   {
+    // When mousing over data with a data constraint the data constraint value
+    // will be shown in the status bar
     if ( data_constraint_layer != Tool::NONE_OPTION_C )
     {
       this->private_->viewer_->update_status_bar( mouse_history.current_.x_,
@@ -1058,9 +1081,13 @@ bool PaintTool::handle_mouse_move( ViewerHandle viewer,
     }
   }
   
+  // Figure out where the mouse is in the window
   double world_x, world_y;
+  // Translate the coordinates
   this->private_->viewer_->window_to_world( mouse_history.current_.x_, 
     mouse_history.current_.y_, world_x, world_y );
+  
+  // Record the values into the paint tool
   {
     PaintToolPrivate::lock_type lock( this->private_->get_mutex() );
     this->private_->center_x_ = mouse_history.current_.x_;
@@ -1069,9 +1096,13 @@ bool PaintTool::handle_mouse_move( ViewerHandle viewer,
     this->private_->world_y_ = world_y;
   }
 
+  // If a brush is shown update all viewers that need the brush
   if ( this->private_->brush_visible_ )
   {
     this->private_->update_same_mode_viewers();
+    
+    // Depending on the preference of the segmenter a cross or no pointer is
+    // shown while segmenting data
     if( PreferencesManager::Instance()->paint_cursor_invisibility_state_->get() )
     {
       this->private_->viewer_->set_cursor( Core::CursorShape::BLANK_E );
@@ -1082,14 +1113,18 @@ bool PaintTool::handle_mouse_move( ViewerHandle viewer,
     }
   }
 
+  // If we are painting
   if ( this->private_->painting_ )
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
     PaintInfo paint_info;
+    
     this->private_->setup_paint_info( paint_info, mouse_history.previous_.x_, 
-      mouse_history.previous_.y_, mouse_history.current_.x_, mouse_history.current_.y_ );
-    ActionPaint::Dispatch( Core::Interface::GetMouseActionContext(), 
-      this->shared_from_this(), paint_info );
+      mouse_history.previous_.y_, mouse_history.current_.x_, 
+      mouse_history.current_.y_ );
+
+    PaintTool::HandlePaint( this->shared_from_this(), paint_info );
+    
     return true;
   }
   else if ( modifiers == Core::KeyModifier::NO_MODIFIER_E )
@@ -1165,9 +1200,10 @@ bool PaintTool::handle_mouse_press( ViewerHandle viewer,
         Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
         PaintInfo paint_info;
         this->private_->setup_paint_info( paint_info, mouse_history.current_.x_, 
-          mouse_history.current_.y_, mouse_history.current_.x_, mouse_history.current_.y_ );
-        ActionPaint::Dispatch( Core::Interface::GetMouseActionContext(), 
-          this->shared_from_this(), paint_info );
+          mouse_history.current_.y_, mouse_history.current_.x_, 
+          mouse_history.current_.y_ );
+
+        PaintTool::HandlePaint( this->shared_from_this(), paint_info );
         return true;
       }
     }
@@ -1211,6 +1247,23 @@ bool PaintTool::handle_mouse_release( ViewerHandle viewer,
       button == Core::MouseButton::LEFT_BUTTON_E )
     {
       {
+        {
+          Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+          PaintInfo paint_info;
+      
+          this->private_->setup_paint_info( paint_info, mouse_history.previous_.x_, 
+            mouse_history.previous_.y_, mouse_history.current_.x_, 
+            mouse_history.current_.y_ );
+
+          PaintTool::HandlePaint( this->shared_from_this(), paint_info );
+    
+          paint_info.x_ = this->private_->x_;
+          paint_info.y_ = this->private_->y_;
+          
+          // Create a record on the action queue
+          ActionPaint::Dispatch( Core::Interface::GetMouseActionContext(), paint_info );
+        }
+
         PaintToolPrivate::lock_type lock( this->private_->get_mutex() );
         this->private_->stop_painting();
       }
@@ -1279,12 +1332,14 @@ bool PaintTool::paint( const PaintInfo& paint_info )
   this->brush_radius_state_->set( paint_info.brush_radius_ );
   {
     Core::MaskVolumeSlice::lock_type cache_lock( paint_info.target_slice_->get_mutex() );
-    if ( paint_info.inclusive_ )
+
+    this->private_->paint( paint_info, paint_info.x_[ 0 ], paint_info.y_[ 0 ], paint_count );
+    for ( size_t j = 0; j < paint_info.x_.size() - 1; j++ )
     {
-      this->private_->paint( paint_info, paint_info.x0_, paint_info.y0_, paint_count );
+      this->private_->interpolated_paint( paint_info, 
+        paint_info.x_[ j ], paint_info.y_[ j ], 
+        paint_info.x_[ j + 1 ], paint_info.y_[ j + 1 ], paint_count );
     }
-    this->private_->interpolated_paint( paint_info, paint_info.x0_, paint_info.y0_, 
-      paint_info.x1_, paint_info.y1_, paint_count );
   }
 
   if ( paint_count > 0)
@@ -1295,6 +1350,21 @@ bool PaintTool::paint( const PaintInfo& paint_info )
 
   return false;
 }
+
+void PaintTool::HandlePaint( PaintToolWeakHandle tool, const PaintInfo& info )
+{
+  if ( !( Core::Application::IsApplicationThread() ) )
+  {
+    Core::Application::PostEvent( boost::bind( &PaintTool::HandlePaint, tool,
+    info ) );
+    
+    return;
+  }
+
+  PaintToolHandle tool_handle = tool.lock();
+  if ( tool_handle ) tool_handle->paint( info );
+}
+
 
 void PaintTool::flood_fill( Core::ActionContextHandle context, bool erase )
 {

@@ -47,10 +47,8 @@ public:
   Core::ActionParameter< std::string > target_layer_id_;
   Core::ActionParameter< int > slice_type_;
   Core::ActionParameter< size_t > slice_number_;
-  Core::ActionParameter< int > x0_;
-  Core::ActionParameter< int > y0_;
-  Core::ActionParameter< int > x1_;
-  Core::ActionParameter< int > y1_;
+  Core::ActionParameter< std::vector<int> > x_;
+  Core::ActionParameter< std::vector<int> > y_;
   Core::ActionParameter< int > brush_radius_;
 
   Core::ActionParameter< std::string > data_constraint_layer_id_;
@@ -76,10 +74,8 @@ ActionPaint::ActionPaint() :
   this->add_argument( this->private_->target_layer_id_ );
   this->add_argument( this->private_->slice_type_ );
   this->add_argument( this->private_->slice_number_ );
-  this->add_argument( this->private_->x0_ );
-  this->add_argument( this->private_->y0_ );
-  this->add_argument( this->private_->x1_ );
-  this->add_argument( this->private_->y1_ );
+  this->add_argument( this->private_->x_ );
+  this->add_argument( this->private_->y_ );
   this->add_argument( this->private_->brush_radius_ );
 
   this->add_key( this->private_->data_constraint_layer_id_ );
@@ -99,6 +95,9 @@ ActionPaint::~ActionPaint()
 
 bool ActionPaint::validate( Core::ActionContextHandle& context )
 {
+  // The paint interface will update the painting
+  if ( context->source() == Core::ActionSource::INTERFACE_MOUSE_E ) return true;
+
   if ( this->private_->brush_radius_.value() < 0 )
   {
     context->report_error( "Invalid brush size " + Core::ExportToString(
@@ -211,12 +210,28 @@ void ActionPaint::clear_cache()
 
 bool ActionPaint::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
-  PaintToolHandle paint_tool( this->private_->paint_tool_weak_handle_.lock() );
-  if ( !paint_tool )
-  {
-    static PaintToolHandle static_paint_tool_s( new PaintTool( "staticpainttool" ) );
-    paint_tool = static_paint_tool_s;
-  }
+  // Create a new undo item
+  LayerUndoBufferItemHandle item( new LayerUndoBufferItem( "Paint Stroke" ) );
+  
+  // Add redo information to undo item
+  item->set_redo_action( this->shared_from_this() );
+
+  // Add check point for the slice we are painting on
+  LayerHandle layer = LayerManager::Instance()->get_layer_by_id( 
+    this->private_->target_layer_id_.value() );
+  Core::SliceType slice_type = static_cast<Core::SliceType::enum_type>( 
+    this->private_->slice_type_.value() );
+  int index = this->private_->slice_number_.value();
+  
+  LayerCheckPointHandle check_point( new LayerCheckPoint( layer, slice_type, index ) );
+  item->add_layer_to_restore( layer, check_point );
+
+  LayerUndoBuffer::Instance()->insert_undo_item( context, item );
+
+  // Painting will already have been done by the interface
+  if ( context->source() == Core::ActionSource::INTERFACE_MOUSE_E ) return true;
+
+  static PaintToolHandle static_paint_tool( new PaintTool( "staticpainttool" ) );
 
   PaintInfo paint_info;
   paint_info.target_slice_ = this->private_->target_slice_;
@@ -228,47 +243,19 @@ bool ActionPaint::run( Core::ActionContextHandle& context, Core::ActionResultHan
   paint_info.negative_mask_constraint1_ = this->private_->negative_mask_constraint1_.value();
   paint_info.mask_constraint2_slice_ = this->private_->mask_constraint2_slice_;
   paint_info.negative_mask_constraint2_ = this->private_->negative_mask_constraint2_.value();
-  paint_info.x0_ = this->private_->x0_.value();
-  paint_info.y0_ = this->private_->y0_.value();
-  paint_info.x1_ = this->private_->x1_.value();
-  paint_info.y1_ = this->private_->y1_.value();
+
+  paint_info.x_ = this->private_->x_.value();
+  paint_info.y_ = this->private_->y_.value();
   paint_info.brush_radius_ = this->private_->brush_radius_.value();
   paint_info.erase_ = this->private_->erase_.value();
-  paint_info.inclusive_ = ( context->source() != Core::ActionSource::INTERFACE_MOUSE_E ||
-    ( paint_info.x0_ == paint_info.x1_ && paint_info.y0_ == paint_info.y1_ ) );
 
-
-  // Create undo for this action
-  LayerUndoBufferItemHandle item( new LayerUndoBufferItem( "Paint" ) );
-
-/*
-  int axis = 0;
-  if ( this->private_->slice_type_.value() == Core::VolumeSliceType::AXIAL_E ) axis = 3;
-  if ( this->private_->slice_type_.value() == Core::VolumeSliceType::CORONAL_E ) axis = 2;
-  if ( this->private_->slice_type_.value() == Core::VolumeSliceType::SAGITTAL_E ) axis = 1;
-  int slice = this->private_->slice_number_.value();
-  
-  LayerHandle layer = LayerManager::Instance()->get_layer_by_id( 
-    this->private_->target_layer_id_.value() );
-  LayerCheckPointHandle check_point( new LayerCheckPoint( layer, slice, axis ) );
-
-  item->set_redo_action( this->shared_from_this() );
-  item->add_layer_to_restore( layer, check_point );
-
-  LayerUndoBuffer::Instance()->insert_undo_item( context, item );
-*/
-
-  bool success = paint_tool->paint( paint_info );
-  if ( context->source() != Core::ActionSource::INTERFACE_MOUSE_E )
-  {
-    paint_info.target_slice_->release_cached_data();
-  }
+  bool success = static_paint_tool->paint( paint_info );
+  paint_info.target_slice_->release_cached_data();
   
   return success;
 }
 
-Core::ActionHandle ActionPaint::Create( const PaintToolHandle& paint_tool, 
-                     const PaintInfo& paint_info )
+Core::ActionHandle ActionPaint::Create( const PaintInfo& paint_info )
 {
   ActionPaint* action = new ActionPaint;
 
@@ -283,14 +270,11 @@ Core::ActionHandle ActionPaint::Create( const PaintToolHandle& paint_tool,
   action->private_->negative_mask_constraint1_.value() = paint_info.negative_mask_constraint1_;
   action->private_->mask_constraint2_layer_id_.value() = paint_info.mask_constraint2_layer_id_;
   action->private_->negative_mask_constraint2_.value() = paint_info.negative_mask_constraint2_;
-  action->private_->x0_.set_value( paint_info.x0_ );
-  action->private_->y0_.set_value( paint_info.y0_ );
-  action->private_->x1_.set_value( paint_info.x1_ );
-  action->private_->y1_.set_value( paint_info.y1_ );
+  action->private_->x_.set_value( paint_info.x_ );
+  action->private_->y_.set_value( paint_info.y_ );
   action->private_->brush_radius_.value() = paint_info.brush_radius_;
   action->private_->erase_.value() = paint_info.erase_;
 
-  action->private_->paint_tool_weak_handle_ = paint_tool;
   action->private_->target_slice_ = paint_info.target_slice_;
   action->private_->data_constraint_slice_ = paint_info.data_constraint_slice_;
   action->private_->mask_constraint1_slice_ = paint_info.mask_constraint1_slice_;
@@ -299,10 +283,9 @@ Core::ActionHandle ActionPaint::Create( const PaintToolHandle& paint_tool,
   return Core::ActionHandle( action );
 }
 
-void ActionPaint::Dispatch( Core::ActionContextHandle context, 
-               const PaintToolHandle& paint_tool, const PaintInfo& paint_info )
+void ActionPaint::Dispatch( Core::ActionContextHandle context, const PaintInfo& paint_info )
 {
-  Core::ActionDispatcher::PostAction( Create( paint_tool, paint_info ), context );
+  Core::ActionDispatcher::PostAction( Create( paint_info ), context );
 }
 
 } // end namespace Seg3D

@@ -46,10 +46,8 @@ class ActionPaint : public Core::Action
     CORE_ACTION_ARGUMENT( "target", "The ID of the target mask layer." )
     CORE_ACTION_ARGUMENT( "slice_type", "The slicing direction to be painted on." )
     CORE_ACTION_ARGUMENT( "slice_number", "The slice number to be painted on." )
-    CORE_ACTION_ARGUMENT( "x0", "X coordinate of the start position (in index space)." )
-    CORE_ACTION_ARGUMENT( "y0", "Y coordinate of the start position (in index space)." )
-    CORE_ACTION_ARGUMENT( "x1", "X coordinate of the end position (in index space)." )
-    CORE_ACTION_ARGUMENT( "y1", "Y coordinate of the end position (in index space)." )
+    CORE_ACTION_ARGUMENT( "x", "X coordinates of the brush stroke(in index space)." )
+    CORE_ACTION_ARGUMENT( "y", "Y coordinates of the brush stroke(in index space)." )
     CORE_ACTION_ARGUMENT( "brush_radius", "Radius of the paint brush." )
     CORE_ACTION_KEY( "data_constraint", "<none>", "The ID of data constraint layer." )
     CORE_ACTION_KEY( "min_value", "0", "The minimum data constraint value." )
@@ -85,11 +83,9 @@ private:
   ActionPaintPrivateHandle private_;
 
 public:
-  static Core::ActionHandle Create( const PaintToolHandle& paint_tool, 
-    const PaintInfo& paint_info );
+  static Core::ActionHandle Create( const PaintInfo& paint_info );
   
-  static void Dispatch( Core::ActionContextHandle context, 
-    const PaintToolHandle& paint_tool, const PaintInfo& paint_info );
+  static void Dispatch( Core::ActionContextHandle context, const PaintInfo& paint_info );
 };
 
 } // end namespace Seg3D
