@@ -178,6 +178,17 @@ private:
   // Information about two components not included in the state manager.
   Core::MaskVolumeHandle mask_volume_;
   Core::IsosurfaceHandle isosurface_;
+
+  // -- color functions --
+public:
+  
+  // GETCOLORCOUNT:
+  // Get the current count from which the next color is derived
+  static size_t GetColorCount();
+  
+  // SETCOLORCOUNT:
+  // Set the color count to a specific number
+  static void SetColorCount( size_t count );
   
 };
 

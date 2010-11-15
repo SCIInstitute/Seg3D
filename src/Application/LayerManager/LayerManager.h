@@ -463,7 +463,7 @@ public:
 
   // == function for obtaining the current layer and group id counters
   
-  typedef std::pair<int,int> id_count_type;
+  typedef std::vector<int> id_count_type;
   
   // GETLAYERIDCOUNT:
   // Get the current count of the group and layer ids

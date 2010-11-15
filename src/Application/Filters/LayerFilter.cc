@@ -61,6 +61,9 @@ public:
   // Keep track of errors
   std::string error_;
   
+  // Message that is relayed in case there is no error
+  std::string success_;
+    
   // Keep track of which layers were locked.
   std::vector<LayerHandle> locked_layers_;
   
@@ -133,6 +136,10 @@ void LayerFilterPrivate::finalize()
   if ( this->error_.size() )
   {
     StatusBar::SetMessage( Core::LogMessageType::ERROR_E, this->error_ ); 
+  }
+  else if ( this->success_.size() )
+  {
+    StatusBar::SetMessage( Core::LogMessageType::MESSAGE_E, this->success_ ); 
   }
 
   this->locked_layers_.clear();
@@ -516,6 +523,9 @@ void LayerFilter::run()
   
   // Release the lock so another filter can start
   LayerFilterLock::Instance()->unlock();
+
+  // Generate a message indicating that filter was terminated
+  this->private_->success_ = this->get_filter_name() + " finished processing";
   
   // Notify if application thread if it is waiting for this to succeed in which case
   // it will immediately finalize the filter.

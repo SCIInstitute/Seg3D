@@ -1132,7 +1132,9 @@ bool Viewer::key_press_event( int key, int modifiers )
   }
 
   if ( ( modifiers == Core::KeyModifier::SHIFT_MODIFIER_E ) || 
-    ( modifiers == Core::KeyModifier::NO_MODIFIER_E ) )
+     ( modifiers == Core::KeyModifier::NO_MODIFIER_E ) || 
+     ( key == Core::Key::KEY_LEFT_E ) || ( key == Core::Key::KEY_RIGHT_E ) ||
+     ( key == Core::Key::KEY_DOWN_E ) || ( key == Core::Key::KEY_UP_E ) )
   {
     switch ( key )
     {

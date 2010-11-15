@@ -1558,29 +1558,42 @@ void LayerManager::DispatchInsertMaskSlicesIntoLayer( MaskLayerHandle layer,
 
 LayerManager::id_count_type LayerManager::GetLayerIdCount()
 {
-  int layer_count = static_cast<int>( 
+  id_count_type id_count;
+  id_count.resize( 3 );
+
+  id_count[ 0 ] = static_cast<int>( 
     Core::StateEngine::Instance()->get_next_statehandler_count( "layer" ) );
 
-  int group_count = static_cast<int>( 
+  id_count[ 1 ] = static_cast<int>( 
     Core::StateEngine::Instance()->get_next_statehandler_count( "group" ) );
 
-  return std::make_pair<int,int>( layer_count, group_count );
+  id_count[ 2 ] = static_cast<int>(
+    MaskLayer::GetColorCount() );
+
+  return id_count;
 }
 
 LayerManager::id_count_type LayerManager::GetLayerInvalidIdCount()
 {
-  return std::make_pair<int,int>( -1, -1 );
+  id_count_type id_count;
+  id_count.resize( 3, -1 );
+
+  return id_count;
 }
 
 void LayerManager::SetLayerIdCount( id_count_type id_count )
 {
-  if ( id_count.first >= 0)
+  if ( id_count.size() > 0 && id_count[ 0 ] >= 0 )
   {
-    Core::StateEngine::Instance()->set_next_statehandler_count( "layer", id_count.first );
+    Core::StateEngine::Instance()->set_next_statehandler_count( "layer", id_count[ 0 ] );
   }
-  if ( id_count.second >= 0)
+  if ( id_count.size() > 1 && id_count[ 1 ] >= 0 )
   {
-    Core::StateEngine::Instance()->set_next_statehandler_count( "group", id_count.second );
+    Core::StateEngine::Instance()->set_next_statehandler_count( "group", id_count[ 1 ] );
+  }
+  if ( id_count.size() > 2 && id_count[ 2 ] >= 0 )
+  {
+    MaskLayer::SetColorCount( id_count[ 2 ] );
   }
 }
 

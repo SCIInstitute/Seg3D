@@ -649,7 +649,7 @@ bool MaskDataBlockManager::Duplicate( MaskDataBlockHandle src_mask_data_block,
     if ( src_mask_ptr[ j ] & src_mask_value ) 
       dst_mask_ptr[ j ] |= dst_mask_value; else dst_mask_ptr[ j ] &= dst_not_mask_value;
     if ( src_mask_ptr[ j + 1 ] & src_mask_value ) 
-      dst_mask_ptr[ j + 2 ] |= dst_mask_value; else dst_mask_ptr[ j + 1 ] &= dst_not_mask_value;
+      dst_mask_ptr[ j + 1 ] |= dst_mask_value; else dst_mask_ptr[ j + 1 ] &= dst_not_mask_value;
     if ( src_mask_ptr[ j + 2 ] & src_mask_value ) 
       dst_mask_ptr[ j + 2 ] |= dst_mask_value; else dst_mask_ptr[ j + 2 ] &= dst_not_mask_value;
     if ( src_mask_ptr[ j + 3 ] & src_mask_value ) 

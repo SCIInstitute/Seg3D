@@ -52,7 +52,7 @@ GradientAnisotropicDiffusionFilter::GradientAnisotropicDiffusionFilter( const st
   this->add_state( "replace", this->replace_state_, false );
   this->add_state( "preserve_data_format", this->preserve_data_format_state_, true );
   this->add_state( "iterations", this->iterations_state_, 5, 1, 100, 1 );
-  this->add_state( "sensitivity", this->sensitivity_state_, .1, .01, 1.0, .01 );
+  this->add_state( "sensitivity", this->sensitivity_state_, 0.1, .001, 1.0, .01 );
 }
 
 GradientAnisotropicDiffusionFilter::~GradientAnisotropicDiffusionFilter()

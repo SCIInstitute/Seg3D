@@ -326,7 +326,11 @@ bool PolylineTool::handle_mouse_press( ViewerHandle viewer,
           idx = j;
         }
       }
-      points.erase( points.begin() + idx );
+      
+      if ( points.size() )
+      {
+        points.erase( points.begin() + idx );
+      }
       
       Core::ActionSet::Dispatch( Core::Interface::GetMouseActionContext(),
         this->vertices_state_, points );

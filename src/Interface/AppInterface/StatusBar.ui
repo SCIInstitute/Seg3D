@@ -125,6 +125,9 @@ QComboBox::icon{
         <property name="font">
          <font/>
         </property>
+        <property name="toolTip">
+         <string>Open/close the message dialog window</string>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -399,6 +402,9 @@ QComboBox::icon{
            </property>
            <property name="font">
             <font/>
+           </property>
+           <property name="toolTip">
+            <string>Switch between world coordinates and index coordinates</string>
            </property>
            <property name="text">
             <string/>
@@ -825,6 +831,9 @@ QComboBox::icon{
           <width>40</width>
           <height>20</height>
          </size>
+        </property>
+        <property name="toolTip">
+         <string>Switch between tool short cuts and mouse location indicator</string>
         </property>
         <property name="text">
          <string/>

@@ -160,17 +160,21 @@ bool MaskLayer::set_mask_volume( Core::MaskVolumeHandle volume )
 }
 
 // counter for generating new colors for each new mask
-static Core::AtomicCounter ColorCount;
+size_t ColorCount = 0;
+boost::mutex ColorCountMutex;
 
 void MaskLayer::initialize_states()
 {
     // == Color of the layer ==
-  
+
+  {
+    boost::mutex::scoped_lock lock( ColorCountMutex );
     this->add_state( "color", color_state_, static_cast< int >( ColorCount % 
-    PreferencesManager::Instance()->color_states_.size() ) );
+      PreferencesManager::Instance()->color_states_.size() ) );
 
-  ColorCount++;
-
+    ColorCount++;
+  }
+  
     // == What border is used ==
     this->add_state( "border", this->border_state_, PreferencesManager::Instance()->
     default_mask_border_state_->export_to_string(), PreferencesManager::Instance()->
@@ -395,6 +399,19 @@ LayerHandle MaskLayer::duplicate() const
   }
   
   return MaskLayerHandle( new MaskLayer( this->get_layer_name(), mask_volume ) );
+}
+
+
+size_t MaskLayer::GetColorCount()
+{
+  boost::mutex::scoped_lock lock( ColorCountMutex );
+  return ColorCount;
+}
+
+void MaskLayer::SetColorCount( size_t count )
+{
+  boost::mutex::scoped_lock lock( ColorCountMutex );
+  ColorCount = count;
 }
 
 } // end namespace Seg3D

@@ -132,7 +132,7 @@ public:
     // different data set.
     double range = this->src_layer_->get_volume()->get_max() - 
       this->src_layer_->get_volume()->get_min();
-    filter->SetConductanceParameter( this->sensitivity_ * range );
+    filter->SetConductanceParameter( this->sensitivity_ * range * 0.01 );
 
     // Ensure we will have some threads left for doing something else
     this->limit_number_of_itk_threads( filter );
