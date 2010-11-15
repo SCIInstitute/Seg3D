@@ -215,6 +215,11 @@ private Q_SLOTS:
   // SET_BRIGHTNESS_CONTRAST_TO_DEFAULT:
   // dispatches actions that set the values of the brightness and contrast back to defaults
   void set_brightness_contrast_to_default();
+  
+  // ACTIVATE_FROM_LINEEDIT_FOCUS:
+  // dispatches an action that will set the layer to be active when the user edits the name of the 
+  // layer
+  void activate_from_lineedit_focus();
 
 protected:
   void resizeEvent( QResizeEvent *event );

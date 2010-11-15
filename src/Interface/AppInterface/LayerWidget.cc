@@ -231,6 +231,9 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
     QtUtils::QtBridge::Connect( this->private_->activate_button_, 
       boost::bind( static_cast<void (*) ( Core::ActionContextHandle, LayerHandle )>( 
       &ActionActivateLayer::Dispatch ), Core::Interface::GetWidgetActionContext(), layer ) );
+      
+    connect( this->private_->ui_.label_, SIGNAL( activate_layer_signal() ), this, 
+      SLOT( activate_from_lineedit_focus() ) );
     
     // Connect the selection box in front of the widget to its underlying state
     QtUtils::QtBridge::Connect( this->private_->ui_.selection_checkbox_, 
@@ -1055,6 +1058,12 @@ bool LayerWidget::get_selected() const
 {
   return this->private_->ui_.selection_checkbox_->isChecked();
 }
+
+void LayerWidget::activate_from_lineedit_focus()
+{
+  ActionActivateLayer::Dispatch( Core::Interface::GetWidgetActionContext(), this->private_->layer_ ) ;
+}
+
 
 
 

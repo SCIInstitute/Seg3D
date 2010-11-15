@@ -39,6 +39,7 @@ SET(QTUTILS_WIDGETS_SRCS
   QtDropableComboBox.cc
   QtHistogramGraph.cc
   QtHistogramWidget.cc
+  QtSignalFocusLineEdit.cc
   QtSliderDoubleCombo.cc
   QtSliderIntCombo.cc
   QtLogSliderIntCombo.cc
@@ -54,6 +55,7 @@ SET(QTUTILS_WIDGETS_MOC_SRCS
   QtDropableComboBox.h
   QtHistogramGraph.h
   QtHistogramWidget.h
+  QtSignalFocusLineEdit.h
   QtSliderDoubleCombo.h
   QtSliderIntCombo.h
   QtLogSliderIntCombo.h

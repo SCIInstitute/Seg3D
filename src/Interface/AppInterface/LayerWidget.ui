@@ -343,7 +343,7 @@ QPushButton#activate_button_{
              <number>0</number>
             </property>
             <item>
-             <widget class="QLineEdit" name="label_">
+             <widget class="QtUtils::QtSignalFocusLineEdit" name="label_">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -1825,6 +1825,11 @@ QPushButton#activate_button_{
    <extends>QWidget</extends>
    <header location="global">QtUtils/Widgets/QtSliderDoubleCombo.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QtUtils::QtSignalFocusLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">QtUtils/Widgets/QtSignalFocusLineEdit.h</header>
   </customwidget>
  </customwidgets>
  <resources>

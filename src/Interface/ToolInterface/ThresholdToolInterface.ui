@@ -228,14 +228,6 @@ QWidget#threshold_histogram_{
        <height>180</height>
       </size>
      </property>
-     <layout class="QHBoxLayout" name="histogramHLayout">
-      <property name="spacing">
-       <number>0</number>
-      </property>
-      <property name="margin">
-       <number>1</number>
-      </property>
-     </layout>
     </widget>
    </item>
   </layout>
