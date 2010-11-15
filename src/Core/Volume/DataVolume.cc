@@ -181,6 +181,8 @@ bool DataVolume::SaveDataVolume( const boost::filesystem::path& filepath,
       volume->data_block_, volume->get_grid_transform() ) );
 
     nrrd->set_histogram( volume->data_block_->get_histogram() );
+    
+    DataBlock::shared_lock_type slock( volume->data_block_->get_mutex() );
     if ( ! ( NrrdData::SaveNrrd( filepath.string(), nrrd, error, compress, level ) ) ) 
     {
       CORE_LOG_ERROR( error );

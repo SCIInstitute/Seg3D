@@ -260,6 +260,8 @@ bool MaskDataBlockManager::save_data_blocks( boost::filesystem::path path, bool 
 
       std::string error;
 
+      DataBlock::shared_lock_type slock( mask_list[ j ].data_block_->get_mutex() );
+      
       if ( ! ( NrrdData::SaveNrrd( volume_path.string(), nrrd, error, compress, level ) ) ) 
       {
         CORE_LOG_ERROR( error );
