@@ -58,6 +58,12 @@ public:
 public:
   void copy( Core::ActionContextHandle context );
   void paste( Core::ActionContextHandle context );
+  void set_slice_type_labels();
+  
+public:
+  const static std::string AXIAL_C;
+  const static std::string SAGITTAL_C;
+  const static std::string CORONAL_C;
 
   // -- State Variables --
 public:

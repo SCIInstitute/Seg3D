@@ -30,6 +30,7 @@
 #include <Core/Volume/MaskVolumeSlice.h>
 
 // Application includes
+#include <Application/PreferencesManager/PreferencesManager.h>
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/ClipboardTool.h>
 #include <Application/Tools/Actions/ActionCopy.h>
@@ -82,14 +83,31 @@ void ClipboardToolPrivate::update_slice_numbers()
 // Class ClipboardTool
 //////////////////////////////////////////////////////////////////////////
 
+const std::string ClipboardTool::AXIAL_C( "axial" );
+const std::string ClipboardTool::CORONAL_C( "coronal" );
+const std::string ClipboardTool::SAGITTAL_C( "sagittal" );
+
+
 ClipboardTool::ClipboardTool( const std::string& toolid ) :
   SingleTargetTool( Core::VolumeType::MASK_E, toolid ),
   private_( new ClipboardToolPrivate )
 {
   this->private_->tool_ = this;
+  
+  std::string sagittal = SAGITTAL_C + "=" + PreferencesManager::Instance()->x_axis_label_state_->get();
+  std::string coronal = CORONAL_C + "=" + PreferencesManager::Instance()->y_axis_label_state_->get();
+  std::string axial = AXIAL_C + "=" + PreferencesManager::Instance()->z_axis_label_state_->get();
 
-  this->add_state( "slice_type", this->slice_type_state_, "axial", "axial=Axial|"
-    "coronal=Coronal|sagittal=Sagittal" );
+  this->add_state( "slice_type", this->slice_type_state_, "axial",  sagittal + "|" + coronal 
+    + "|" + axial );
+    
+  this->add_connection( PreferencesManager::Instance()->x_axis_label_state_->state_changed_signal_.
+    connect( boost::bind( &ClipboardTool::set_slice_type_labels, this ) ) );
+  this->add_connection( PreferencesManager::Instance()->y_axis_label_state_->state_changed_signal_.
+    connect( boost::bind( &ClipboardTool::set_slice_type_labels, this ) ) );
+  this->add_connection( PreferencesManager::Instance()->z_axis_label_state_->state_changed_signal_.
+    connect( boost::bind( &ClipboardTool::set_slice_type_labels, this ) ) );  
+    
   this->add_state( "copy_slice", this->copy_slice_number_state_, 1, 1, 1, 1 );
   this->add_state( "paste_min_slice", this->paste_min_slice_number_state_, 1, 1, 1, 1 );
   this->add_state( "paste_max_slice", this->paste_max_slice_number_state_, 1, 1, 1, 1 );
@@ -105,6 +123,19 @@ ClipboardTool::ClipboardTool( const std::string& toolid ) :
 ClipboardTool::~ClipboardTool()
 {
   this->disconnect_all();
+}
+
+void ClipboardTool::set_slice_type_labels()
+{
+  Core::OptionLabelPairVector label_options;
+  label_options.push_back( std::make_pair( SAGITTAL_C, 
+    PreferencesManager::Instance()->x_axis_label_state_->get() ) );
+  label_options.push_back( std::make_pair( CORONAL_C, 
+    PreferencesManager::Instance()->y_axis_label_state_->get() ) );
+  label_options.push_back( std::make_pair( AXIAL_C, 
+    PreferencesManager::Instance()->z_axis_label_state_->get() ) );
+
+  this->slice_type_state_->set_option_list( label_options );
 }
 
 void ClipboardTool::copy( Core::ActionContextHandle context )
