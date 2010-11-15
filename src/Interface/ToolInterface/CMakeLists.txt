@@ -57,6 +57,9 @@ SET(INTERFACE_TOOLINTERFACE_SRCS
   MeanFilterInterface.cc
   NeighborhoodConnectedFilterInterface.cc
   OtsuThresholdFilterInterface.cc
+  AndFilterInterface.cc
+  OrFilterInterface.cc
+  XorFilterInterface.cc
   ThresholdSegmentationLSFilterInterface.cc
   FlipToolInterface.cc
   TransformToolInterface.cc
@@ -89,6 +92,9 @@ SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
   MeanFilterInterface.h
   NeighborhoodConnectedFilterInterface.h
   OtsuThresholdFilterInterface.h
+  AndFilterInterface.h
+  OrFilterInterface.h
+  XorFilterInterface.h
   ThresholdSegmentationLSFilterInterface.h
   FlipToolInterface.h
   TransformToolInterface.h
@@ -124,6 +130,9 @@ SET(INTERFACE_TOOLINTERFACE_UI_SRCS
   MeanFilterInterface.ui
   NeighborhoodConnectedFilterInterface.ui
   OtsuThresholdFilterInterface.ui
+  AndFilterInterface.ui
+  OrFilterInterface.ui
+  XorFilterInterface.ui
   ThresholdSegmentationLSFilterInterface.ui
   FlipToolInterface.ui
   TransformToolInterface.ui

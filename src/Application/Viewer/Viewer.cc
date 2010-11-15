@@ -1131,166 +1131,169 @@ bool Viewer::key_press_event( int key, int modifiers )
     }
   }
 
-  switch ( key )
+  if ( ( modifiers == Core::KeyModifier::SHIFT_MODIFIER_E ) || 
+    ( modifiers == Core::KeyModifier::NO_MODIFIER_E ) )
   {
-    case Core::Key::KEY_LESS_E:
-    case Core::Key::KEY_COMMA_E:
-    case Core::Key::KEY_LEFT_E:
-    case Core::Key::KEY_DOWN_E:
+    switch ( key )
     {
-      Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-      int direction = 1.0;
-      if ( PreferencesManager::Instance()->reverse_slice_navigation_->get() ) direction = -1;
-    
-      if ( modifiers & Core::KeyModifier::SHIFT_MODIFIER_E )
+      case Core::Key::KEY_LESS_E:
+      case Core::Key::KEY_COMMA_E:
+      case Core::Key::KEY_LEFT_E:
+      case Core::Key::KEY_DOWN_E:
       {
-        ActionOffsetSlice::Dispatch( Core::Interface::GetKeyboardActionContext(),
-          this->shared_from_this(), 
-          -direction*( PreferencesManager::Instance()->slice_step_multiplier_state_->get() ) );     
-      }
-      else
-      {
-        ActionOffsetSlice::Dispatch( Core::Interface::GetKeyboardActionContext(),
-          this->shared_from_this(), -direction );
-      }
-      return true;    
-    }
-    
-    case Core::Key::KEY_GREATER_E:
-    case Core::Key::KEY_PERIOD_E:
-    case Core::Key::KEY_RIGHT_E:
-    case Core::Key::KEY_UP_E:
-    {
-      Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-      int direction = 1.0;
-      if ( PreferencesManager::Instance()->reverse_slice_navigation_->get() ) direction = -1;
-
-      if ( modifiers & Core::KeyModifier::SHIFT_MODIFIER_E )
-      {
-        ActionOffsetSlice::Dispatch( Core::Interface::GetKeyboardActionContext(),
-          this->shared_from_this(), 
-          direction * ( PreferencesManager::Instance()->slice_step_multiplier_state_->get() ) );        
-      }
-      else
-      {   
-        ActionOffsetSlice::Dispatch( Core::Interface::GetKeyboardActionContext(),
-          this->shared_from_this(), direction );
-      }
-      return true;
-    }
-  
-    case Core::Key::KEY_G_E:
-    {
-      Core::ActionToggle::Dispatch( Core::Interface::GetKeyboardActionContext(),
-        this->slice_grid_state_ );
-      return true;
-    }
-  
-    case Core::Key::KEY_L_E:
-    {
-      Core::ActionToggle::Dispatch( Core::Interface::GetKeyboardActionContext(),
-        this->lock_state_ );
-      return true;
-    }
-  
-    case Core::Key::KEY_S_E:
-    {
-      // Need to lock the query into the state engine, as this function is called
-      // from a variety of threads
-      Core::StateEngine::lock_type( Core::StateEngine::Instance()->GetMutex() );
-      if ( this->view_mode_state_->get() == Viewer::VOLUME_C )
-      {
-        Core::ActionToggle::Dispatch( Core::Interface::GetKeyboardActionContext(),
-          this->volume_slices_visible_state_ ); 
-      }
-      else
-      {
-        Core::ActionToggle::Dispatch( Core::Interface::GetKeyboardActionContext(),
-          this->slice_visible_state_ );   
-      }
-      return true;
-    }
-  
-    case Core::Key::KEY_T_E:
-    {
-      Core::ActionToggle::Dispatch( Core::Interface::GetKeyboardActionContext(),
-        this->overlay_visible_state_ );   
-      return true;
-    }
-
-    case Core::Key::KEY_I_E:
-    {
-      Core::ActionToggle::Dispatch( Core::Interface::GetKeyboardActionContext(),
-        this->volume_isosurfaces_visible_state_ );    
-      return true;
-    }
-
-    case Core::Key::KEY_H_E:
-    {
-      Core::ActionToggle::Dispatch( Core::Interface::GetKeyboardActionContext(),
-        this->volume_light_visible_state_ );    
-      return true;
-    }
-
-    case Core::Key::KEY_P_E:
-    {
-      Core::ActionToggle::Dispatch( Core::Interface::GetKeyboardActionContext(),
-        this->slice_picking_visible_state_ );   
-      return true;
-    }
-
-    case Core::Key::KEY_0_E:
-    case Core::Key::KEY_A_E:
-    {
-      ActionAutoView::Dispatch( Core::Interface::GetKeyboardActionContext(), 
-        this->get_viewer_id() );  
-      return true;
-    }
+        Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+        int direction = 1.0;
+        if ( PreferencesManager::Instance()->reverse_slice_navigation_->get() ) direction = -1;
       
-    case Core::Key::KEY_SPACE_E:
-    {
-      LayerHandle layer = LayerManager::Instance()->get_active_layer();
-      if ( layer )
+        if ( modifiers & Core::KeyModifier::SHIFT_MODIFIER_E )
+        {
+          ActionOffsetSlice::Dispatch( Core::Interface::GetKeyboardActionContext(),
+            this->shared_from_this(), 
+            -direction*( PreferencesManager::Instance()->slice_step_multiplier_state_->get() ) );     
+        }
+        else
+        {
+          ActionOffsetSlice::Dispatch( Core::Interface::GetKeyboardActionContext(),
+            this->shared_from_this(), -direction );
+        }
+        return true;    
+      }
+      
+      case Core::Key::KEY_GREATER_E:
+      case Core::Key::KEY_PERIOD_E:
+      case Core::Key::KEY_RIGHT_E:
+      case Core::Key::KEY_UP_E:
       {
-        if ( this->get_viewer_id() < layer->visible_state_.size() )
+        Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+        int direction = 1.0;
+        if ( PreferencesManager::Instance()->reverse_slice_navigation_->get() ) direction = -1;
+
+        if ( modifiers & Core::KeyModifier::SHIFT_MODIFIER_E )
+        {
+          ActionOffsetSlice::Dispatch( Core::Interface::GetKeyboardActionContext(),
+            this->shared_from_this(), 
+            direction * ( PreferencesManager::Instance()->slice_step_multiplier_state_->get() ) );        
+        }
+        else
+        {   
+          ActionOffsetSlice::Dispatch( Core::Interface::GetKeyboardActionContext(),
+            this->shared_from_this(), direction );
+        }
+        return true;
+      }
+    
+      case Core::Key::KEY_G_E:
+      {
+        Core::ActionToggle::Dispatch( Core::Interface::GetKeyboardActionContext(),
+          this->slice_grid_state_ );
+        return true;
+      }
+    
+      case Core::Key::KEY_L_E:
+      {
+        Core::ActionToggle::Dispatch( Core::Interface::GetKeyboardActionContext(),
+          this->lock_state_ );
+        return true;
+      }
+    
+      case Core::Key::KEY_S_E:
+      {
+        // Need to lock the query into the state engine, as this function is called
+        // from a variety of threads
+        Core::StateEngine::lock_type( Core::StateEngine::Instance()->GetMutex() );
+        if ( this->view_mode_state_->get() == Viewer::VOLUME_C )
         {
           Core::ActionToggle::Dispatch( Core::Interface::GetKeyboardActionContext(),
-            layer->master_visible_state_ );
+            this->volume_slices_visible_state_ ); 
         }
+        else
+        {
+          Core::ActionToggle::Dispatch( Core::Interface::GetKeyboardActionContext(),
+            this->slice_visible_state_ );   
+        }
+        return true;
       }
-      return true;
+    
+      case Core::Key::KEY_T_E:
+      {
+        Core::ActionToggle::Dispatch( Core::Interface::GetKeyboardActionContext(),
+          this->overlay_visible_state_ );   
+        return true;
+      }
+
+      case Core::Key::KEY_I_E:
+      {
+        Core::ActionToggle::Dispatch( Core::Interface::GetKeyboardActionContext(),
+          this->volume_isosurfaces_visible_state_ );    
+        return true;
+      }
+
+      case Core::Key::KEY_H_E:
+      {
+        Core::ActionToggle::Dispatch( Core::Interface::GetKeyboardActionContext(),
+          this->volume_light_visible_state_ );    
+        return true;
+      }
+
+      case Core::Key::KEY_P_E:
+      {
+        Core::ActionToggle::Dispatch( Core::Interface::GetKeyboardActionContext(),
+          this->slice_picking_visible_state_ );   
+        return true;
+      }
+
+      case Core::Key::KEY_0_E:
+      case Core::Key::KEY_A_E:
+      {
+        ActionAutoView::Dispatch( Core::Interface::GetKeyboardActionContext(), 
+          this->get_viewer_id() );  
+        return true;
+      }
+        
+      case Core::Key::KEY_SPACE_E:
+      {
+        LayerHandle layer = LayerManager::Instance()->get_active_layer();
+        if ( layer )
+        {
+          if ( this->get_viewer_id() < layer->visible_state_.size() )
+          {
+            Core::ActionToggle::Dispatch( Core::Interface::GetKeyboardActionContext(),
+              layer->master_visible_state_ );
+          }
+        }
+        return true;
+      }
+
+      case Core::Key::KEY_V_E:
+      {
+        Core::ActionSet::Dispatch( Core::Interface::GetKeyboardActionContext(), 
+          this->view_mode_state_, Viewer::VOLUME_C ); 
+        return true;
+      }
+
+      case Core::Key::KEY_X_E:
+      {
+        Core::ActionSet::Dispatch( Core::Interface::GetKeyboardActionContext(), 
+          this->view_mode_state_, Viewer::SAGITTAL_C ); 
+        return true;
+      }
+
+      case Core::Key::KEY_Y_E:
+      {
+        Core::ActionSet::Dispatch( Core::Interface::GetKeyboardActionContext(), 
+          this->view_mode_state_, Viewer::CORONAL_C );  
+        return true;
+      }     
+
+      case Core::Key::KEY_Z_E:
+      {
+        Core::ActionSet::Dispatch( Core::Interface::GetKeyboardActionContext(), 
+          this->view_mode_state_, Viewer::AXIAL_C );  
+        return true;
+      }     
     }
-
-    case Core::Key::KEY_V_E:
-    {
-      Core::ActionSet::Dispatch( Core::Interface::GetKeyboardActionContext(), 
-        this->view_mode_state_, Viewer::VOLUME_C ); 
-      return true;
-    }
-
-    case Core::Key::KEY_X_E:
-    {
-      Core::ActionSet::Dispatch( Core::Interface::GetKeyboardActionContext(), 
-        this->view_mode_state_, Viewer::SAGITTAL_C ); 
-      return true;
-    }
-
-    case Core::Key::KEY_Y_E:
-    {
-      Core::ActionSet::Dispatch( Core::Interface::GetKeyboardActionContext(), 
-        this->view_mode_state_, Viewer::CORONAL_C );  
-      return true;
-    }     
-
-    case Core::Key::KEY_Z_E:
-    {
-      Core::ActionSet::Dispatch( Core::Interface::GetKeyboardActionContext(), 
-        this->view_mode_state_, Viewer::AXIAL_C );  
-      return true;
-    }     
-
   }
-  
+      
   // function wasn't handled, hence return false.
   return false;
 }

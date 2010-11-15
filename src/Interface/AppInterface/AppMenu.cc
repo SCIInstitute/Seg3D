@@ -396,7 +396,7 @@ void AppMenu::create_window_menu( QMenu* qmenu )
     qaction = qmenu->addAction( tr( "&Keyboard Shortcuts" ) ); 
     qaction->setToolTip( QString( "List of the keyboard shortcuts or 'hotkeys' for " ) + 
       QString::fromStdString( Core::Application::GetApplicationNameAndVersion() ) );
-    qaction->setShortcut( tr( "Ctrl+ALT+K" ) );
+    qaction->setShortcut( tr( "SHIFT+CTRL+ALT+K" ) );
     QtUtils::QtBridge::Connect( qaction, boost::bind( &ActionShowWindow::Dispatch,
       Core::Interface::GetWidgetActionContext(), std::string( "keyboard_shortcuts" ) ) );
 

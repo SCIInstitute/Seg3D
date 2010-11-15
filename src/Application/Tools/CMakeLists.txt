@@ -91,6 +91,12 @@ SET(APPLICATION_TOOLS_SRCS
   OtsuThresholdFilter.cc
   ThresholdSegmentationLSFilter.h
   ThresholdSegmentationLSFilter.cc
+  AndFilter.h
+  AndFilter.cc
+  OrFilter.h
+  OrFilter.cc
+  XorFilter.h
+  XorFilter.cc
   ResampleTool.h
   ResampleTool.cc
   CropTool.h

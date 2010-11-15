@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_TOOLS_HISTOGRAMEQUALIZATIONFILTER_H
-#define APPLICATION_TOOLS_HISTOGRAMEQUALIZATIONFILTER_H
+#ifndef APPLICATION_TOOLS_ANDFILTER_H
+#define APPLICATION_TOOLS_ANDFILTER_H
 
 // Application includes
 #include <Application/Tool/SingleTargetTool.h>
@@ -35,39 +35,35 @@
 namespace Seg3D
 {
 
-class HistogramEqualizationFilter : public SingleTargetTool
+class AndFilter : public SingleTargetTool
 {
+
 SEG3D_TOOL(
-SEG3D_TOOL_NAME( "HistogramEqualizationFilter", "Equalize the histgram" )
-SEG3D_TOOL_MENULABEL( "Histogram Equalization" )
-SEG3D_TOOL_MENU( "Advanced Filters" )
-SEG3D_TOOL_SHORTCUT_KEY( "Ctrl+Alt+Y" )
+SEG3D_TOOL_NAME( "AndFilter", "Boolean AND operation between two mask layers." )
+SEG3D_TOOL_MENULABEL( "Boolean AND" )
+SEG3D_TOOL_MENU( "Basic Filters" )
+SEG3D_TOOL_SHORTCUT_KEY( "Ctrl+Alt+Q" )
 SEG3D_TOOL_URL( "http://seg3d.org/" )
 SEG3D_TOOL_VERSION( "1" )
 )
 
+  // -- constructor/destructor --
 public:
-  HistogramEqualizationFilter( const std::string& toolid );
-  virtual ~HistogramEqualizationFilter();
+  AndFilter( const std::string& toolid );
+  virtual ~AndFilter();
 
   // -- state --
 public:
   // Whether the layer needs to be replaced
   Core::StateBoolHandle replace_state_;
 
-  // Alpha parameter
-  Core::StateRangedDoubleHandle amount_state_;
-
-  // Number of bins used to calculate histogram
-  Core::StateRangedIntHandle bins_state_;
-
-  // Number of bins ignored in equalization
-  Core::StateRangedIntHandle ignore_bins_state_;
-
+  // Layerid of the mask layer
+  Core::StateLabeledOptionHandle mask_state_;
   // -- execute --
 public:
   // Execute the tool and dispatch the action
   virtual void execute( Core::ActionContextHandle context );
+
 };
 
 } // end namespace

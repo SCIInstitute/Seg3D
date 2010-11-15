@@ -26,50 +26,47 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_TOOLS_HISTOGRAMEQUALIZATIONFILTER_H
-#define APPLICATION_TOOLS_HISTOGRAMEQUALIZATIONFILTER_H
+#ifndef INTERFACE_TOOLINTERFACE_ORFILTERINTERFACE_H
+#define INTERFACE_TOOLINTERFACE_ORFILTERINTERFACE_H
+
+// Core includes
+#include <Core/Utils/Log.h>
 
 // Application includes
-#include <Application/Tool/SingleTargetTool.h>
+#include <Application/Tool/ToolFactory.h>
+
+// Base class of the tool widget
+#include <Interface/AppInterface/ToolWidget.h>
 
 namespace Seg3D
 {
 
-class HistogramEqualizationFilter : public SingleTargetTool
+class OrFilterInterfacePrivate;
+
+class OrFilterInterface : public ToolWidget
 {
-SEG3D_TOOL(
-SEG3D_TOOL_NAME( "HistogramEqualizationFilter", "Equalize the histgram" )
-SEG3D_TOOL_MENULABEL( "Histogram Equalization" )
-SEG3D_TOOL_MENU( "Advanced Filters" )
-SEG3D_TOOL_SHORTCUT_KEY( "Ctrl+Alt+Y" )
-SEG3D_TOOL_URL( "http://seg3d.org/" )
-SEG3D_TOOL_VERSION( "1" )
-)
+Q_OBJECT
 
+// -- Constructor/destructor --
 public:
-  HistogramEqualizationFilter( const std::string& toolid );
-  virtual ~HistogramEqualizationFilter();
+  OrFilterInterface();
+  virtual ~OrFilterInterface();
 
-  // -- state --
+// -- create interface --
 public:
-  // Whether the layer needs to be replaced
-  Core::StateBoolHandle replace_state_;
+  // BUILD_WIDGET:
+  // This function builds the actual GUI
+  virtual bool build_widget( QFrame* frame );
+  
+// -- run filter --
+private Q_SLOTS:
+  void run_filter();
 
-  // Alpha parameter
-  Core::StateRangedDoubleHandle amount_state_;
+private:
+  boost::shared_ptr< OrFilterInterfacePrivate > private_;
 
-  // Number of bins used to calculate histogram
-  Core::StateRangedIntHandle bins_state_;
-
-  // Number of bins ignored in equalization
-  Core::StateRangedIntHandle ignore_bins_state_;
-
-  // -- execute --
-public:
-  // Execute the tool and dispatch the action
-  virtual void execute( Core::ActionContextHandle context );
 };
 
-} // end namespace
+} // namespace Seg3D
 
 #endif

@@ -150,7 +150,7 @@ bool MaskDataBlockManager::create( GridTransform grid_transform, MaskDataBlockHa
   unsigned char* data = mask->get_mask_data();
   unsigned char not_mask_value = ~( mask->get_mask_value() );
   
-  size_t data_size8 = data_size & ~(0x7);
+  size_t data_size8 =  RemoveRemainder8( data_size );
   size_t i = 0;
   for ( ; i< data_size8; i+=8 )
   {
