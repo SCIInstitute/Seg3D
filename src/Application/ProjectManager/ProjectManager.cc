@@ -264,11 +264,30 @@ void ProjectManager::save_project( bool autosave /*= false*/, std::string sessio
 {
   ASSERT_IS_APPLICATION_THREAD();
   this->session_saving_ = true;
-  if( this->save_project_session( autosave, session_name ) )
+  try
   {
-    this->save_project_only( this->current_project_path_state_->get(), 
-      this->current_project_->project_name_state_->get() );
+    if( this->save_project_session( autosave, session_name ) )
+    {
+      this->save_project_only( this->current_project_path_state_->get(), 
+        this->current_project_->project_name_state_->get() );
+    }
   }
+  catch( std::exception& exp )
+  {
+    StatusBar::Instance()->set_message( Core::LogMessageType::MESSAGE_E, 
+      "Autosave FAILED" );
+  } 
+  catch( Core::Exception& exp )
+  {
+    StatusBar::Instance()->set_message( Core::LogMessageType::MESSAGE_E, 
+      "Autosave FAILED" );
+  } 
+  catch( ... )
+  {
+    StatusBar::Instance()->set_message( Core::LogMessageType::MESSAGE_E, 
+      "Autosave FAILED" );
+  } 
+
   this->session_saving_ = false;
   
   if( autosave )

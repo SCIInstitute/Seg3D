@@ -388,7 +388,10 @@ bool LayerGroup::post_save_states( Core::StateIO& state_io )
   layer_list_type::reverse_iterator it = this->layer_list_.rbegin();
   for ( ; it != this->layer_list_.rend(); it++ )
   {
-    ( *it )->save_states( state_io );
+    if ( ( *it )->has_valid_data() )
+    {
+      ( *it )->save_states( state_io );
+    }
   }
   
   state_io.pop_current_element();
