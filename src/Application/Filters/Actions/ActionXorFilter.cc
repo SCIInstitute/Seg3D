@@ -178,21 +178,29 @@ public:
       size_t progress_count = 0;
       for ( size_t j = 0; j < size8; j+=8 )
       {
-        if ( ( mask1_data[ j ] & mask1_value ) ^ ( mask2_data[ j ] & mask2_value ) )
+        if ( ( ( mask1_data[ j ] & mask1_value ) && !( mask2_data[ j ] & mask2_value ) ) ||
+          ( !( mask1_data[ j ] & mask1_value ) && ( mask2_data[ j ] & mask2_value ) ) )
           mask_data[ j ] |= mask_value;
-        if ( ( mask1_data[ j + 1 ] & mask1_value ) ^ ( mask2_data[ j + 1 ] & mask2_value ) )
+        if ( ( ( mask1_data[ j + 1 ] & mask1_value ) && !( mask2_data[ j + 1 ] & mask2_value ) ) ||
+          ( !( mask1_data[ j + 1 ] & mask1_value ) && ( mask2_data[ j + 1 ] & mask2_value ) ) )
           mask_data[ j + 1 ] |= mask_value;
-        if ( ( mask1_data[ j + 2 ] & mask1_value ) ^ ( mask2_data[ j + 2 ] & mask2_value ) )
+        if ( ( ( mask1_data[ j + 2 ] & mask1_value ) && !( mask2_data[ j + 2 ] & mask2_value ) ) ||
+          ( !( mask1_data[ j + 2 ] & mask1_value ) && ( mask2_data[ j + 2 ] & mask2_value ) ) )
           mask_data[ j + 2 ] |= mask_value;
-        if ( ( mask1_data[ j + 3 ] & mask1_value ) ^ ( mask2_data[ j + 3 ] & mask2_value ) )
+        if ( ( ( mask1_data[ j + 3 ] & mask1_value ) && !( mask2_data[ j + 3 ] & mask2_value ) ) ||
+          ( !( mask1_data[ j + 3 ] & mask1_value ) && ( mask2_data[ j + 3 ] & mask2_value ) ) )
           mask_data[ j + 3 ] |= mask_value;
-        if ( ( mask1_data[ j + 4 ] & mask1_value ) ^ ( mask2_data[ j + 4 ] & mask2_value ) )
+        if ( ( ( mask1_data[ j + 4 ] & mask1_value ) && !( mask2_data[ j + 4 ] & mask2_value ) ) ||
+          ( !( mask1_data[ j + 4 ] & mask1_value ) && ( mask2_data[ j + 4 ] & mask2_value ) ) )
           mask_data[ j + 4 ] |= mask_value;
-        if ( ( mask1_data[ j + 5 ] & mask1_value ) ^ ( mask2_data[ j + 5 ] & mask2_value ) )
+        if ( ( ( mask1_data[ j + 5 ] & mask1_value ) && !( mask2_data[ j + 5 ] & mask2_value ) ) ||
+          ( !( mask1_data[ j + 5 ] & mask1_value ) && ( mask2_data[ j + 5 ] & mask2_value ) ) )
           mask_data[ j + 5 ] |= mask_value;
-        if ( ( mask1_data[ j + 6 ] & mask1_value ) ^ ( mask2_data[ j + 6 ] & mask2_value ) )
+        if ( ( ( mask1_data[ j + 6 ] & mask1_value ) && !( mask2_data[ j + 6 ] & mask2_value ) ) ||
+          ( !( mask1_data[ j + 6 ] & mask1_value ) && ( mask2_data[ j + 6 ] & mask2_value ) ) )
           mask_data[ j + 6 ] |= mask_value;
-        if ( ( mask1_data[ j + 7 ] & mask1_value ) ^ ( mask2_data[ j + 7 ] & mask2_value ) )
+        if ( ( ( mask1_data[ j + 7 ] & mask1_value ) && !( mask2_data[ j + 7 ] & mask2_value ) ) ||
+          ( !( mask1_data[ j + 7 ] & mask1_value ) && ( mask2_data[ j + 7 ] & mask2_value ) ) )
           mask_data[ j + 7 ] |= mask_value;
         progress_count++;
         if ( progress_count == 1000 )
@@ -206,7 +214,8 @@ public:
       
       for ( size_t j = size8; j < size; j++ )
       {
-        if ( ( mask1_data[ j ] & mask1_value ) ^ ( mask2_data[ j ] & mask2_value ) )
+        if ( ( ( mask1_data[ j ] & mask1_value ) && !( mask2_data[ j ] & mask2_value ) ) ||
+          ( !( mask1_data[ j ] & mask1_value ) && ( mask2_data[ j ] & mask2_value ) ) )
           mask_data[ j ] |= mask_value;     
       }     
 
