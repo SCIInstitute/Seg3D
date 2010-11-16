@@ -175,7 +175,12 @@ void CropAlgo::crop_data_layer( DataLayerHandle input, DataLayerHandle output )
   Core::DataBlockHandle input_datablock = input->get_data_volume()->get_data_block();
   Core::DataBlockHandle output_datablock = Core::StdDataBlock::New( 
     output->get_grid_transform(), input_datablock->get_data_type() );
-
+  if ( !output_datablock ) 
+  {
+    this->report_error( "Could not allocate enough memory" );
+    return;
+  }
+  
   Core::DataBlock::shared_lock_type data_lock( input_datablock->get_mutex() );
   switch ( input_datablock->get_data_type() )
   {
@@ -232,7 +237,12 @@ void CropAlgo::crop_mask_layer( MaskLayerHandle input, MaskLayerHandle output )
   Core::MaskDataBlockHandle input_mask = input->get_mask_volume()->get_mask_data_block();
   Core::DataBlockHandle output_mask = Core::StdDataBlock::New(
     output->get_grid_transform(), Core::DataType::UCHAR_E );
-
+  if ( !output_mask ) 
+  {
+    this->report_error( "Could not allocate enough memory" );
+    return;
+  }
+  
   Core::MaskDataBlock::shared_lock_type data_lock( input_mask->get_mutex() );
   const unsigned char* src_data = input_mask->get_mask_data();
   unsigned char* dst_data = reinterpret_cast< unsigned char* >( output_mask->get_data() );
@@ -264,8 +274,12 @@ void CropAlgo::crop_mask_layer( MaskLayerHandle input, MaskLayerHandle output )
   if ( !this->check_abort() )
   {
     Core::MaskDataBlockHandle dst_mask_data_block;
-    Core::MaskDataBlockManager::Convert( output_mask, output->get_grid_transform(),
-      dst_mask_data_block );
+    if ( !Core::MaskDataBlockManager::Convert( output_mask, output->get_grid_transform(),
+      dst_mask_data_block ) )
+    {
+      this->report_error( "Could not allocate enough memory." );
+      return;
+    }
     Core::MaskVolumeHandle mask_volume( new Core::MaskVolume(
       output->get_grid_transform(), dst_mask_data_block ) );
 

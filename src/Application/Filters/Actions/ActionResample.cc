@@ -30,6 +30,7 @@
 #include <teem/privateNrrd.h>
 
 #include <Core/DataBlock/NrrdDataBlock.h>
+#include <Core/DataBlock/StdDataBlock.h>
 #include <Core/DataBlock/MaskDataBlockManager.h>
 
 // Application includes
@@ -130,8 +131,14 @@ public:
   void resmaple_data_layer( DataLayerHandle input, DataLayerHandle output );
   void resample_mask_layer( MaskLayerHandle input, MaskLayerHandle output );
 
-  void pad_and_crop_data_layer(  DataLayerHandle input, DataLayerHandle output );
+  void pad_and_crop_data_layer( DataLayerHandle input, DataLayerHandle output );
+  
+  template< class T >
+  void pad_and_crop_typed_data( Core::DataBlockHandle src, Core::DataBlockHandle dst,
+                 DataLayerHandle output_layer );
+  
   void pad_and_crop_mask_layer( MaskLayerHandle input, MaskLayerHandle output );
+  
 
   // RUN_FILTER:
   // Implementation of run of the Runnable base class, this function is called 
@@ -365,6 +372,12 @@ bool ResampleAlgo::nrrd_resmaple( Nrrd* nin, Nrrd* nout, NrrdKernelSpec* unuk )
 
 void ResampleAlgo::resmaple_data_layer( DataLayerHandle input, DataLayerHandle output )
 {
+  if ( this->padding_only_ )
+  {
+    this->pad_and_crop_data_layer( input, output );
+    return;
+  }
+  
   Core::DataBlock::shared_lock_type data_lock( input->get_data_volume()->
     get_data_block()->get_mutex() );
 
@@ -417,6 +430,12 @@ void ResampleAlgo::resmaple_data_layer( DataLayerHandle input, DataLayerHandle o
 
 void ResampleAlgo::resample_mask_layer( MaskLayerHandle input, MaskLayerHandle output )
 {
+  if ( this->padding_only_ )
+  {
+    this->pad_and_crop_mask_layer( input, output );
+    return;
+  }
+  
   Core::DataBlockHandle input_data_block;
   Core::MaskDataBlockManager::Convert( input->get_mask_volume()->get_mask_data_block(),
     input_data_block, Core::DataType::UCHAR_E );
@@ -504,7 +523,7 @@ void ResampleAlgo::detect_padding_only()
   this->padding_only_ = false;
   Core::GridTransform src_trans = this->src_layers_[ 0 ]->get_grid_transform();
   Core::GridTransform dst_trans = this->dst_layers_[ 0 ]->get_grid_transform();
-  double epsilon = 1e-4;
+  double epsilon = 1e-2;
 
   // Compare spacing
   Core::Vector src_spacing = src_trans * Core::Vector( 1.0, 1.0, 1.0 );
@@ -545,55 +564,316 @@ void ResampleAlgo::detect_padding_only()
     this->overlap_z_start_, 0 );
 }
 
+template< class T >
+void ResampleAlgo::pad_and_crop_typed_data( Core::DataBlockHandle src, Core::DataBlockHandle dst,
+                       DataLayerHandle output_layer )
+{
+  Core::GridTransform src_trans = this->src_layers_[ 0 ]->get_grid_transform();
+  int src_nx = static_cast< int >( src_trans.get_nx() );
+  int src_ny = static_cast< int >( src_trans.get_ny() );
+  int src_nxy = src_nx * src_ny;
+
+  Core::GridTransform dst_trans = this->dst_layers_[ 0 ]->get_grid_transform();
+  int dst_nx = static_cast< int >( dst_trans.get_nx() );
+  int dst_ny = static_cast< int >( dst_trans.get_ny() );
+  int dst_nz = static_cast< int >( dst_trans.get_nz() );
+  int dst_nxy = dst_nx * dst_ny;
+  
+  const T* src_data = reinterpret_cast< T* >( src->get_data() );
+  T* dst_data = reinterpret_cast< T* >( dst->get_data() );
+  
+  T padding_val;
+  if ( this->padding_ == ActionResample::ZERO_C )
+  {
+    padding_val = T( 0 );
+  }
+  else if ( this->padding_ == ActionResample::MIN_C )
+  {
+    padding_val = static_cast< T >( src->get_min() );
+  }
+  else
+  {
+    padding_val = static_cast< T >( dst->get_max() );
+  }
+  
+  // Pad the non-overlapped part in Z-direction
+  for ( int z = 0; z < this->overlap_z_start_; ++z )
+  {
+    if ( this->check_abort() )  return;
+    
+    int start_index = z * dst_nxy;
+    for ( int i = 0; i < dst_nxy; ++i )
+    {
+      dst_data[ start_index + i ] = padding_val;
+    }
+  }
+  
+  output_layer->update_progress_signal_( this->overlap_z_start_ * 1.0 / dst_nz );
+  
+  // Process the overlapped part in Z-direction
+  for ( int z = this->overlap_z_start_; z < this->overlap_z_start_ + this->overlap_nz_; ++z )
+  {
+    if ( this->check_abort() )  return;
+
+    int offset_z = z * dst_nxy;
+    
+    // Pad the non-overlapped part in Y-direction
+    for ( int y = 0; y < this->overlap_y_start_; ++y )
+    {
+      int offset_y = y * dst_nx;
+      for ( int x = 0; x < dst_nx; ++x )
+      {
+        dst_data[ offset_z + offset_y + x ] = padding_val;
+      }
+    }
+    
+    // Process the overlapped part in Y-direction
+    for ( int y = this->overlap_y_start_; y < this->overlap_y_start_ + this->overlap_ny_; ++y )
+    {
+      int offset_y = y * dst_nx;
+      // Pad the non-overlapped part in X-direction
+      for ( int x = 0; x < this->overlap_x_start_; ++x )
+      {
+        dst_data[ offset_z + offset_y + x ] = padding_val;
+      }
+      // Copy over the overlapped part in X-direction
+      if ( this->overlap_nx_ > 0 )
+      {
+        memcpy( dst_data + offset_z + offset_y + this->overlap_x_start_,
+             src_data + ( z - this->mapped_z_start_ ) * src_nxy + 
+             ( y - this->mapped_y_start_ ) * src_nx + 
+             this->overlap_x_start_ - this->mapped_x_start_,
+             this->overlap_nx_ * sizeof( T ) );       
+      }
+      // Pad the non-overlapped part in X-direction
+      for ( int x = this->overlap_x_start_ + this->overlap_nx_; x < dst_nx; ++x )
+      {
+        dst_data[ offset_z + offset_y + x ] = padding_val;
+      }
+    }
+    
+    // Pad the non-overlapped part in Y-direction
+    for ( int y = this->overlap_y_start_ + this->overlap_ny_; y < dst_ny; ++y )
+    {
+      int offset_y = y * dst_nx;
+      for ( int x = 0; x < dst_nx; ++x )
+      {
+        dst_data[ offset_z + offset_y + x ] = padding_val;
+      }
+    }
+    
+    output_layer->update_progress_signal_( ( z + 1.0 ) / dst_nz );
+  }
+  
+  // Pad the non-overlapped part in Z-direction
+  for ( int z = this->overlap_z_start_ + this->overlap_nz_; z < dst_nz; ++z )
+  {
+    if ( this->check_abort() )  return;
+
+    int start_index = z * dst_nxy;
+    for ( int i = 0; i < dst_nxy; ++i )
+    {
+      dst_data[ start_index + i ] = padding_val;
+    }
+  }
+  
+  output_layer->update_progress_signal_( 1.0 );
+}
+
 void ResampleAlgo::pad_and_crop_data_layer( DataLayerHandle input, DataLayerHandle output )
 {
-//  Core::DataBlock::shared_lock_type data_lock( input->get_data_volume()->
-//    get_data_block()->get_mutex() );
-// 
-//  double padding_val;
-//  if ( this->padding_ == ActionResample::ZERO_C )
-//  {
-//    padding_val = 0.0;
-//  }
-//  else if ( this->padding_ == ActionResample::MIN_C )
-//  {
-//    padding_val = input->get_data_volume()->get_data_block()->get_min();
-//  }
-//  else
-//  {
-//    padding_val = input->get_data_volume()->get_data_block()->get_max();
-//  }
-// 
-//  output->update_progress_signal_( 0.1 );
-// 
-//  if ( !nrrd_resmaple( nrrd_in->nrrd(), nrrd_out, this->data_kernel_ ) )
-//  {
-//    nrrdNuke( nrrd_out );
-//    CORE_LOG_ERROR( "Failed to resample layer '" + input->get_layer_id() +"'" );
-//  }
-//  else if ( !this->check_abort() )
-//  {
-//    Core::NrrdDataHandle nrrd_data( new Core::NrrdData( nrrd_out ) );
-//    Core::DataBlockHandle data_block = Core::NrrdDataBlock::New( nrrd_data );
-//    Core::DataVolumeHandle data_volume( new Core::DataVolume( 
-//      nrrd_data->get_grid_transform(), data_block ) );
-//    this->dispatch_insert_data_volume_into_layer( output, data_volume, true );
-//    output->update_progress_signal_( 1.0 );
-//    this->dispatch_unlock_layer( output );
-//    if ( this->replace_ )
-//    {
-//      this->dispatch_delete_layer( input );
-//    }
-//    else
-//    {
-//      this->dispatch_unlock_layer( input );
-//    }
-//  }
+  Core::DataBlockHandle input_datablock = input->get_data_volume()->get_data_block();
+  Core::DataBlockHandle output_datablock = Core::StdDataBlock::New( 
+    output->get_grid_transform(), input_datablock->get_data_type() );
+  if ( !output_datablock ) 
+  {
+    this->report_error( "Could not allocate enough memory" );
+    return;
+  }
+  
+  Core::DataBlock::shared_lock_type data_lock( input_datablock->get_mutex() );
+  switch ( input_datablock->get_data_type() )
+  {
+  case Core::DataType::CHAR_E:
+    this->pad_and_crop_typed_data< signed char >( input_datablock, output_datablock, output );
+    break;
+  case Core::DataType::UCHAR_E:
+    this->pad_and_crop_typed_data< unsigned char >( input_datablock, output_datablock, output );
+    break;
+  case Core::DataType::SHORT_E:
+    this->pad_and_crop_typed_data< short >( input_datablock, output_datablock, output );
+    break;
+  case Core::DataType::USHORT_E:
+    this->pad_and_crop_typed_data< unsigned short >( input_datablock, output_datablock, output );
+    break;
+  case Core::DataType::INT_E:
+    this->pad_and_crop_typed_data< int >( input_datablock, output_datablock, output );
+    break;
+  case Core::DataType::UINT_E:
+    this->pad_and_crop_typed_data< unsigned int >( input_datablock, output_datablock, output );
+    break;
+  case Core::DataType::FLOAT_E:
+    this->pad_and_crop_typed_data< float >( input_datablock, output_datablock, output );
+    break;
+  case Core::DataType::DOUBLE_E:
+    this->pad_and_crop_typed_data< double >( input_datablock, output_datablock, output );
+    break;
+  default:
+    assert( false );
+  }
+  
+  data_lock.unlock();
+  
+  if ( !this->check_abort() )
+  {
+    this->dispatch_insert_data_volume_into_layer( output, Core::DataVolumeHandle(
+      new Core::DataVolume( output->get_grid_transform(), output_datablock ) ), true );
+    this->dispatch_unlock_layer( output );
+    if ( this->replace_ )
+    {
+      this->dispatch_delete_layer( input );
+    }
+    else
+    {
+      this->dispatch_unlock_layer( input );
+    }
+  }
 }
 
 void ResampleAlgo::pad_and_crop_mask_layer( MaskLayerHandle input, MaskLayerHandle output )
 {
-
+  Core::MaskDataBlockHandle input_mask = input->get_mask_volume()->get_mask_data_block();
+  Core::DataBlockHandle output_mask = Core::StdDataBlock::New(
+    output->get_grid_transform(), Core::DataType::UCHAR_E );
+  if ( !output_mask ) 
+  {
+    this->report_error( "Could not allocate enough memory" );
+    return;
+  }
+  
+  Core::MaskDataBlock::shared_lock_type data_lock( input_mask->get_mutex() );
+  const unsigned char* src_data = input_mask->get_mask_data();
+  unsigned char* dst_data = reinterpret_cast< unsigned char* >( output_mask->get_data() );
+  unsigned char mask_value = input_mask->get_mask_value();
+  
+  Core::GridTransform src_trans = input->get_grid_transform();
+  int src_nx = static_cast< int >( src_trans.get_nx() );
+  int src_ny = static_cast< int >( src_trans.get_ny() );
+  int src_nxy = src_nx * src_ny;
+  
+  Core::GridTransform dst_trans = output->get_grid_transform();
+  int dst_nx = static_cast< int >( dst_trans.get_nx() );
+  int dst_ny = static_cast< int >( dst_trans.get_ny() );
+  int dst_nz = static_cast< int >( dst_trans.get_nz() );
+  int dst_nxy = dst_nx * dst_ny;
+  
+  // Pad the non-overlapped part in Z-direction
+  for ( int z = 0; z < this->overlap_z_start_; ++z )
+  {
+    if ( this->check_abort() )  return;
+    
+    int start_index = z * dst_nxy;
+    for ( int i = 0; i < dst_nxy; ++i )
+    {
+      dst_data[ start_index + i ] = 0;
+    }
+  }
+  
+  output->update_progress_signal_( this->overlap_z_start_ * 1.0 / dst_nz );
+  
+  // Process the overlapped part in Z-direction
+  for ( int z = this->overlap_z_start_; z < this->overlap_z_start_ + this->overlap_nz_; ++z )
+  {
+    if ( this->check_abort() )  return;
+    
+    int offset_z = z * dst_nxy;
+    
+    // Pad the non-overlapped part in Y-direction
+    for ( int y = 0; y < this->overlap_y_start_; ++y )
+    {
+      int offset_y = y * dst_nx;
+      for ( int x = 0; x < dst_nx; ++x )
+      {
+        dst_data[ offset_z + offset_y + x ] = 0;
+      }
+    }
+    
+    // Process the overlapped part in Y-direction
+    for ( int y = this->overlap_y_start_; y < this->overlap_y_start_ + this->overlap_ny_; ++y )
+    {
+      int offset_y = y * dst_nx;
+      // Pad the non-overlapped part in X-direction
+      for ( int x = 0; x < this->overlap_x_start_; ++x )
+      {
+        dst_data[ offset_z + offset_y + x ] = 0;
+      }
+      // Copy over the overlapped part in X-direction
+      int src_z_offset = ( z - this->mapped_z_start_ ) * src_nxy;
+      int src_y_offset = ( y - this->mapped_y_start_ ) * src_nx;
+      for ( int x = this->overlap_x_start_; x < this->overlap_x_start_ + this->overlap_nx_; ++x )
+      {
+        dst_data[ offset_z + offset_y + x ] = src_data[ src_z_offset + src_y_offset + 
+          x - this->mapped_x_start_ ] & mask_value;
+      }
+      // Pad the non-overlapped part in X-direction
+      for ( int x = this->overlap_x_start_ + this->overlap_nx_; x < dst_nx; ++x )
+      {
+        dst_data[ offset_z + offset_y + x ] = 0;
+      }
+    }
+    
+    // Pad the non-overlapped part in Y-direction
+    for ( int y = this->overlap_y_start_ + this->overlap_ny_; y < dst_ny; ++y )
+    {
+      int offset_y = y * dst_nx;
+      for ( int x = 0; x < dst_nx; ++x )
+      {
+        dst_data[ offset_z + offset_y + x ] = 0;
+      }
+    }
+    
+    output->update_progress_signal_( ( z + 1.0 ) / dst_nz );
+  }
+  
+  // Pad the non-overlapped part in Z-direction
+  for ( int z = this->overlap_z_start_ + this->overlap_nz_; z < dst_nz; ++z )
+  {
+    if ( this->check_abort() )  return;
+    
+    int start_index = z * dst_nxy;
+    for ( int i = 0; i < dst_nxy; ++i )
+    {
+      dst_data[ start_index + i ] = 0;
+    }
+  }
+  
+  output->update_progress_signal_( 1.0 );
+  
+  data_lock.unlock();
+  
+  if ( !this->check_abort() )
+  {
+    Core::MaskDataBlockHandle dst_mask_data_block;
+    if ( !Core::MaskDataBlockManager::Convert( output_mask, output->get_grid_transform(),
+                          dst_mask_data_block ) )
+    {
+      this->report_error( "Could not allocate enough memory." );
+      return;
+    }
+    Core::MaskVolumeHandle mask_volume( new Core::MaskVolume(
+      output->get_grid_transform(), dst_mask_data_block ) );
+    
+    this->dispatch_insert_mask_volume_into_layer( output, mask_volume );
+    this->dispatch_unlock_layer( output );
+    if ( this->replace_ )
+    {
+      this->dispatch_delete_layer( input );
+    }
+    else
+    {
+      this->dispatch_unlock_layer( input );
+    }
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////

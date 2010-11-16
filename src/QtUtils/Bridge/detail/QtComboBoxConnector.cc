@@ -218,7 +218,7 @@ void QtComboBoxConnector::UpdateComboBoxItems( QPointer< QtComboBoxConnector > q
     else
     {
       combobox->clear();
-      for ( size_t i = 0; i < num_items; i++ )
+      for ( int i = 0; i < num_items; i++ )
       {
         combobox->addItem( QString( option_list[ i ].c_str() ) );
       }
