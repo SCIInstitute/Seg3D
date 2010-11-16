@@ -381,7 +381,7 @@ void AppMenu::create_window_menu( QMenu* qmenu )
 
   // Preferences Window
   qaction = qmenu->addAction( "Preferences Window" );
-  qaction->setShortcut( tr( "Ctrl+Alt+P," ) );
+  qaction->setShortcut( tr( "Ctrl+," ) );
   QtUtils::QtBridge::Connect( qaction, boost::bind( &ActionShowWindow::Dispatch,
     Core::Interface::GetWidgetActionContext(), std::string( "preferences" ) ) );
 }
