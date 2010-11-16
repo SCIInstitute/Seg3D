@@ -30,7 +30,7 @@
 #define INTERFACE_APPINTERFACE_STYLESHEET_H
 
 //Qt Includes
-#include <QtGui>
+#include <QtCore/QString>
 
 namespace Seg3D
 {

@@ -26,10 +26,6 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-
-// Qt includes
-#include <QStatusBar>
-
 // boost includes
 #include<boost/tokenizer.hpp>
 

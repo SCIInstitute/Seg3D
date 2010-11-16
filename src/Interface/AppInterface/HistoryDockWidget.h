@@ -30,7 +30,7 @@
 #define INTERFACE_APPINTERFACE_HISTORYDOCKWIDGET_H
 
 // QT includes
-#include <QtGui>
+#include <QtGui/QDockWidget>
 
 // STL includes
 #include <string>

@@ -29,6 +29,10 @@
 //Boost Includes
 #include <boost/lexical_cast.hpp>
 
+// Qt includes
+#include <QtGui/QMessageBox>
+#include <QtCore/QPropertyAnimation>
+
 //Core Includes - for logging
 #include <Core/Utils/Log.h>
 

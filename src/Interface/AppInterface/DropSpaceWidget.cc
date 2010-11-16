@@ -26,6 +26,9 @@
  DEALINGS IN THE SOFTWARE.
 */
 
+// Qt includes
+#include <QtCore/QPropertyAnimation>
+
 // Interface includes
 #include <Interface/AppInterface/DropSpaceWidget.h>
 #include <Interface/AppInterface/StyleSheet.h>

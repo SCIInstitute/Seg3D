@@ -37,7 +37,9 @@
 #include <string>
 
 // QT includes
-#include <QtGui>
+#include <QtCore/QAbstractTableModel>
+#include <QtCore/QObject>
+#include <QtCore/QVariant>
 
 namespace Seg3D
 {

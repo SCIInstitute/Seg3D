@@ -29,10 +29,13 @@
 // Boost includes
 #include <boost/filesystem.hpp>
 
+// Qt includes
+#include <QtCore/QVariant>
+#include <QtGui/QFileDialog>
+#include <QtGui/QMessageBox>
+
 // Interface includes
 #include <Interface/AppSegmentationExportWizard/AppSegmentationExportWizard.h>
-
-
 
 // Application includes
 #include <Application/LayerIO/LayerIO.h>

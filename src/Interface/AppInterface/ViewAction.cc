@@ -44,17 +44,17 @@ ViewAction::ViewAction( QAction* parent, bool true_or_false ) :
   QObject( parent )
 {
   state_ = true_or_false;
-connect(parent, SIGNAL(triggered(bool)), this, SLOT(slot(bool)));
+  connect( parent, SIGNAL( triggered( bool ) ), this, SLOT( slot( bool ) ) );
 }
 
 void ViewAction::slot()
 {
-Q_EMIT triggered(col1_,col2_);
+  Q_EMIT triggered( col1_, col2_ );
 }
 
-void ViewAction::slot(bool torf)
+void ViewAction::slot( bool torf )
 {
-//Q_EMIT trigaficated(state_);
+//Q_EMIT trigaficated( state_ );
 }
 
 ViewAction::~ViewAction()

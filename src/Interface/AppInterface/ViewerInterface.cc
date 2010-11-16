@@ -31,7 +31,8 @@
 #include <boost/lambda/bind.hpp>
 
 // QT includes
-#include <QtGui> 
+#include <QtGui/QSplitter>
+#include <QtGui/QVBoxLayout> 
 
 // Core includes
 #include <Core/Utils/Log.h>

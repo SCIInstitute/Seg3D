@@ -37,7 +37,15 @@
 #include <boost/shared_ptr.hpp>
 
 // QT includes
-#include <QtGui>
+#include <QtGui/QWidget>
+#include <QtCore/QPointer>
+#include <QtGui/QDialog>
+#include <QtGui/QTabWidget>
+#include <QtGui/QPushButton>
+#include <QtGui/QLineEdit>
+#include <QtGui/QLabel>
+#include <QtGui/QTableView>
+#include <QtCore/QPointer>
 
 // Core includes
 #include <Core/Utils/ConnectionHandler.h>

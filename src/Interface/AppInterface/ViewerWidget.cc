@@ -43,8 +43,7 @@
 #include <Application/ViewerManager/ViewerManager.h>
 
 // QT includes
-#include <QtGui>
-#include <QtOpenGL>
+/*#include <QtOpenGL>*/
 
 // Qt Interface support classes
 #include <QtUtils/Utils/QtApplication.h>

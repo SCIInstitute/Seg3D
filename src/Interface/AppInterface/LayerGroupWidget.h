@@ -30,7 +30,12 @@
 #define INTERFACE_APPINTERFACE_LAYERGROUPWIDGET_H
 
 // QT Includes
-#include <QtGui>
+#include <QtGui/QWidget>
+#include <QtGui/QMouseEvent>
+#include <QtGui/QDragEnterEvent>
+#include <QtGui/QDragLeaveEvent>
+#include <QtGui/QDropEvent>
+#include <QtCore/QPointer>
 
 // Application includes
 #include <Application/Layer/LayerGroup.h>

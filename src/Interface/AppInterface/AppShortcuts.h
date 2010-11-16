@@ -30,7 +30,9 @@
 #define INTERFACE_APPINTERFACE_KEYBOARDSHORTCUTS_H
 
 // QT includes
-#include <QtGui>
+#include <QtGui/QDialog>
+#include <QtGui/QWidget>
+#include <QtCore/QPointer>
 
 // STL includes
 #include <string>

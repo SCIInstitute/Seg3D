@@ -33,7 +33,8 @@
 #include <boost/shared_ptr.hpp>
 #include <Interface/AppPreferences/ColorPickerWidget.h>
 
-#include <QtGui>
+#include <QtGui/QDialog>
+#include <QtGui/QFileDialog>
 
 
 

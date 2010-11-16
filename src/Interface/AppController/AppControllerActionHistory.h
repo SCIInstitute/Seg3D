@@ -34,7 +34,9 @@
 #endif 
 
 // QT includes
-#include <QtGui>
+#include <QtCore/QVariant>
+#include <QtCore/QModelIndex>
+#include <QtCore/QObject>
 
 // Core includes
 // include all the headers associated with the action engine

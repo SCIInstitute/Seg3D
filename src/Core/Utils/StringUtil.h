@@ -71,6 +71,7 @@ std::string ExportToString( const double& value );
 
 std::string ExportToString( const float& value, int precision );
 std::string ExportToString( const double& value, int precision );
+std::string ExportToString( const double& value, size_t digits );
 
 std::string ExportToString( const std::string& value );
 
@@ -94,8 +95,8 @@ std::string ExportToString( const std::vector< unsigned long >& value);
 std::string ExportToString( const std::vector< float >& value );
 std::string ExportToString( const std::vector< double >& value );
 
-std::string ExportToString( const std::vector< float >& value, int percision );
-std::string ExportToString( const std::vector< double >& value, int percision );
+std::string ExportToString( const std::vector< float >& value, int precision );
+std::string ExportToString( const std::vector< double >& value, int precision );
   
 std::string ExportToString( const std::set< int >& value );
 

@@ -30,6 +30,10 @@
 #include <boost/filesystem.hpp>
 #include <boost/thread.hpp>
 
+// Qt includes
+#include <QtGui/QDesktopWidget>
+#include <QtGui/QMessageBox>
+
 // Core includes
 #include <Core/Utils/Log.h>
 

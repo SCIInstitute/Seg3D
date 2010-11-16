@@ -30,8 +30,10 @@
 #include <boost/filesystem.hpp>
 
 // Qt includes
-#include <QMenuBar>
-#include <QFileDialog>
+#include <QtGui/QMenuBar>
+#include <QtGui/QFileDialog>
+#include <QtGui/QMessageBox>
+#include <QtCore/QProcess>
 
 // Core includes
 #include <Core/State/State.h>
@@ -118,7 +120,7 @@ void AppMenu::create_file_menu( QMenu* qmenu )
 {
   QAction* qaction;
   qaction = qmenu->addAction( tr( "&New Project" ) );
-  /*qaction->setShortcut( tr( "Alt+N" ) );*/
+  qaction->setShortcut( tr( "Ctrl+N" ) );
   qaction->setToolTip( tr( "Start a new project." ) );
   connect( qaction, SIGNAL( triggered() ), this, SLOT( new_project_wizard() ) );
 
@@ -379,7 +381,7 @@ void AppMenu::create_window_menu( QMenu* qmenu )
 
   // Preferences Window
   qaction = qmenu->addAction( "Preferences Window" );
-  qaction->setShortcut( tr( "Ctrl+," ) );
+  qaction->setShortcut( tr( "Ctrl+Alt+P," ) );
   QtUtils::QtBridge::Connect( qaction, boost::bind( &ActionShowWindow::Dispatch,
     Core::Interface::GetWidgetActionContext(), std::string( "preferences" ) ) );
 }

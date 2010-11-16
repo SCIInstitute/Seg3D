@@ -26,13 +26,20 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-
+// STD includes
 #include <sstream>
 #include <iostream>
+
+// Boost includes
 #include <boost/lexical_cast.hpp>
 
+// Qt Includes
+#include <QtGui/QVBoxLayout>
+
+// Core includes
 #include <Core/Utils/Log.h>
 
+// QtUtils includes
 #include <QtUtils/Utils/QtPointer.h>
 
 //Application Includes

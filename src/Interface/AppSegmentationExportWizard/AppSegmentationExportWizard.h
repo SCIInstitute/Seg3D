@@ -29,8 +29,18 @@
 #ifndef INTERFACE_APPPROJECTWIZARD_APPSEGMENTATIONEXPORTWIZARD_H
 #define INTERFACE_APPPROJECTWIZARD_APPSEGMENTATIONEXPORTWIZARD_H
 
-// Qt includes
-#include <QtGui>
+//Qt includes
+#include <QtGui/QWizard>
+#include <QtGui/QLabel>
+#include <QtGui/QLineEdit>
+#include <QtGui/QPushButton>
+#include <QtGui/QCheckBox>
+#include <QtGui/QVBoxLayout>
+#include <QtGui/QHBoxLayout>
+#include <QtGui/QRadioButton>
+#include <QtGui/QButtonGroup>
+#include <QtGui/QTreeWidget>
+#include <QtGui/QScrollArea>
 
 // Interface Includes
 #include <Interface/AppSegmentationExportWizard/QtLayerListWidget.h>

@@ -28,8 +28,10 @@
 
 #include <cassert>
 
-#include <QtGui>
+// Qt includes
+#include <QtGui/QMouseEvent>
 
+// QtUtils includes
 #include <QtUtils/Widgets/SingleShotToolButton.h>
 
 namespace QtUtils

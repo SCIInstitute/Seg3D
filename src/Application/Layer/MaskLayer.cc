@@ -373,7 +373,7 @@ void MaskLayer::calculate_volume()
     this->get_grid_transform().spacing_y() * this->get_grid_transform().spacing_z() )
     * voxel_count;
     
-  this->calculated_volume_state_->set( Core::ExportToString( calculated_mask_volume, 10 ) );
+  this->calculated_volume_state_->set( Core::ExportToString( calculated_mask_volume, size_t( 3 ) ) );
   this->counted_pixels_state_->set( Core::ExportToString( voxel_count ) );  
 }
 

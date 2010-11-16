@@ -30,7 +30,11 @@
 #define INTERFACE_APPPROJECTEXPORTWIZARD_APPPROJECTEXPORTWIZARD_H
 
 //Qt includes
-#include <QtGui>
+#include <QtGui/QWizard>
+#include <QtGui/QLabel>
+#include <QtGui/QLineEdit>
+#include <QtGui/QPushButton>
+#include <QtGui/QCheckBox>
 
 namespace Seg3D
 {
@@ -82,7 +86,7 @@ class ExportSummaryPage : public QWizardPage
     Q_OBJECT
 
 public:
-    ExportSummaryPage(QWidget *parent = 0);
+    ExportSummaryPage( QWidget *parent = 0 );
 
 protected:
   // INITIALIZEPAGE:

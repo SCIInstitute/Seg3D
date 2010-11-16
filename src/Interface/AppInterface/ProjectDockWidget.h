@@ -30,8 +30,8 @@
 #define INTERFACE_APPINTERFACE_PROJECTDOCKWIDGET_H
 
 // QT includes
-#include <QtGui>
-#include <QDockWidget>
+#include <QtGui/QDockWidget>
+#include <QtCore/QPointer>
 
 // STL includes
 #include <string>

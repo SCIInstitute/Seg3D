@@ -30,7 +30,8 @@
 #define INTERFACE_APPINTERFACE_MESSAGEHISTORYWIDGET_H
 
 // QT includes
-#include <QtGui>
+#include <QtGui/QDialog>
+#include <QtCore/QPointer>
 
 // STL includes
 #include <string>

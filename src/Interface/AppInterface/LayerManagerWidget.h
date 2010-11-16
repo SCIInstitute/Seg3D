@@ -34,7 +34,8 @@
 #endif
 
 // Qt includes
-#include <QtGui>
+#include <QtGui/QWidget>
+#include <QtGui/QScrollArea>
 
 // Core includes
 #include <Core/Utils/EnumClass.h>

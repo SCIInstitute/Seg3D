@@ -29,6 +29,11 @@
 // Boost includes
 #include <boost/filesystem.hpp>
 
+// Qt includes
+#include <QtCore/QVariant>
+#include <QtGui/QGridLayout>
+#include <QtGui/QFileDialog>
+
 // Core includes
 #include <Core/Application/Application.h>
 

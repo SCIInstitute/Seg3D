@@ -31,6 +31,7 @@
 #include <limits>
 #include <sstream>
 #include <fstream>
+#include <iomanip>
 
 // Core includes
 #include <Core/Utils/Log.h>
@@ -142,7 +143,7 @@ inline std::string ToString( double val )
   return oss.str();
 }
 
-// Export a value to a string with percision control
+// Export a value to a string with precision control
 
 template< class T >
 std::string ToString( T val, int precision )
@@ -182,6 +183,22 @@ inline std::string ToString( double val, int precision )
   oss << val;
   return oss.str();
 }
+
+inline std::string ToString( double val, size_t digits )
+{
+  if ( IsNan( val ) ) return "NaN";
+  if ( IsInfinite( val ) )
+  {
+    if ( val > 0 ) return "INF";
+    return "-INF";
+  }
+  
+  std::ostringstream oss;
+  
+  oss << std::fixed << std::setprecision( digits ) << val;
+  return oss.str();
+}
+
 
 std::string StringToUpper( std::string str )
 {
@@ -447,14 +464,19 @@ std::string ExportToString( const double& value )
   return ToString( value );
 }
 
-std::string ExportToString( const float& value, int percision )
+std::string ExportToString( const float& value, int precision )
 {
-  return ToString( value, percision );
+  return ToString( value, precision );
 }
 
-std::string ExportToString( const double& value, int percision )
+std::string ExportToString( const double& value, int precision )
 {
-  return ToString( value, percision );
+  return ToString( value, precision );
+}
+
+std::string ExportToString( const double& value, size_t digits )
+{
+  return ToString( value, digits );
 }
 
 std::string ExportToString( const std::string& value )
@@ -583,20 +605,20 @@ std::string ExportToString( const std::vector< double >& value )
   return result;
 }
 
-std::string ExportToString( const std::vector< float >& value, int percision )
+std::string ExportToString( const std::vector< float >& value, int precision )
 {
   std::string result( 1, '[' );
   for ( size_t j = 0; j < value.size(); j++ )
-    result += ToString( value[ j ], percision ) + ' ';
+    result += ToString( value[ j ], precision ) + ' ';
   result[ result.size() - 1 ] = ']';
   return result;
 }
 
-std::string ExportToString( const std::vector< double >& value, int percision )
+std::string ExportToString( const std::vector< double >& value, int precision )
 {
   std::string result( 1, '[' );
   for ( size_t j = 0; j < value.size(); j++ )
-    result += ToString( value[ j ], percision ) + ' ';
+    result += ToString( value[ j ], precision ) + ' ';
   result[ result.size() - 1 ] = ']';
   return result;
 }

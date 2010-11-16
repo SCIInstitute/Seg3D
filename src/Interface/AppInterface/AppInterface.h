@@ -34,10 +34,10 @@
 #endif 
 
 // Qt includes
-#include <QtGui>
-#include <QMainWindow>
-#include <QDockWidget>
-#include <QPointer>
+#include <QtGui/QMainWindow>
+#include <QtGui/QDockWidget>
+#include <QtGui/QWidget>
+#include <QtCore/QPointer>
 
 // Boost includes
 #include <boost/thread/mutex.hpp>
@@ -137,11 +137,6 @@ private:
   // Application menu, statusbar
   QPointer< AppMenu > application_menu_;
   QPointer< AppStatusBar > status_bar_;
-
-public:
-  // OPEN_PROJECT_WIZARD:
-  // This function opens up the new project wizard
-  static void open_project_wizard();
 
   // -- Main Window management functions --
 public:

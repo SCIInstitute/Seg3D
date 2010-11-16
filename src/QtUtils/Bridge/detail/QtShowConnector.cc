@@ -44,6 +44,7 @@ QtShowConnector::QtShowConnector( QWidget* parent,
   Core::StateBoolHandle& state, bool opposite_logic ) :
   QObject( parent ),
   parent_( parent ),
+  state_( state ),
   opposite_logic_( opposite_logic )
 {
   QPointer< QtShowConnector > qpointer( this );
@@ -57,8 +58,8 @@ QtShowConnector::QtShowConnector( QWidget* parent,
 }
 
 QtShowConnector::QtShowConnector( QWidget* parent, 
-                 Core::StateBaseHandle state, 
-                 boost::function< bool () > condition ) :
+  Core::StateBaseHandle state, 
+  boost::function< bool () > condition ) :
   QObject( parent ),
   parent_( parent ),
   condition_( condition )
@@ -72,8 +73,8 @@ QtShowConnector::QtShowConnector( QWidget* parent,
 }
 
 QtShowConnector::QtShowConnector( QWidget* parent, 
-                 std::vector< Core::StateBaseHandle >& states, 
-                 boost::function< bool () > condition ) :
+  std::vector< Core::StateBaseHandle >& states, 
+  boost::function< bool () > condition ) :
   QObject( parent ),
   parent_( parent ),
   condition_( condition )

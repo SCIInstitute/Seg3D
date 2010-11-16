@@ -30,7 +30,9 @@
 #define INTERFACE_APPSPLASH_APPSPLASH_H
 
 // QT includes
-#include <QtGui>
+#include <QtCore/QPointer>
+#include <QtGui/QDialog>
+#include <QtGui/QListWidgetItem>
 
 // Boost includes
 #include <boost/shared_ptr.hpp>

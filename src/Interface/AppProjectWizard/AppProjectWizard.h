@@ -30,7 +30,11 @@
 #define INTERFACE_APPPROJECTWIZARD_APPPROJECTWIZARD_H
 
 //Qt includes
-#include <QtGui>
+#include <QtGui/QWizard>
+#include <QtGui/QLabel>
+#include <QtGui/QLineEdit>
+#include <QtGui/QPushButton>
+#include <QtGui/QCheckBox>
 
 namespace Seg3D
 {

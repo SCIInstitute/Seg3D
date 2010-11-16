@@ -29,6 +29,9 @@
 // Boost includes
 #include <boost/filesystem.hpp>
 
+// Qt includes
+#include <QtGui/QFileDialog>
+
 // Core indcludes
 #include <Core/Utils/Log.h>
 

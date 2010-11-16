@@ -49,4 +49,5 @@ LayerManagerDockWidget::~LayerManagerDockWidget()
 {
 }
 
+
 }  // end namespace Seg3D

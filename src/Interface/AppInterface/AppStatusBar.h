@@ -38,10 +38,10 @@
 #include <boost/bind.hpp>
 
 // QT includes
-#include <QtGui>
-
-// Interface includes
-//#include <Interface/AppInterface/MessageHistoryWidget.h>
+#include <QtCore/QObject>
+#include <QtGui/QMainWindow>
+#include <QtGui/QStatusBar>
+#include <QtCore/QPointer>
 
 // Core includes
 #include <Core/Utils/ConnectionHandler.h>
@@ -67,7 +67,6 @@ private Q_SLOTS:
 
   // -- build status bar widgets -- //
 private:
-  //MessageHistoryWidget* history_widget_;
   bool show_world_coord_;
   void update_data_point_info( DataPointInfoHandle data_point );
   void update_data_point_label();

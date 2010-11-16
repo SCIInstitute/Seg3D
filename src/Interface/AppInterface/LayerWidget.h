@@ -30,7 +30,14 @@
 #define INTERFACE_APPINTERFACE_LAYERWIDGET_H
 
 // QT Includes
-#include <QtGui>
+#include <QtGui/QWidget>
+#include <QtGui/QFrame>
+#include <QtGui/QMouseEvent>
+#include <QtGui/QDragEnterEvent>
+#include <QtGui/QDragLeaveEvent>
+#include <QtGui/QDropEvent>
+#include <QtCore/QPointer>
+
 
 // Application includes
 #include <Application/Layer/Layer.h>

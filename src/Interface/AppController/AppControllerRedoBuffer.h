@@ -38,7 +38,9 @@
 #include <deque>
 
 // QT includes
-#include <QtGui>
+#include <QtCore/QObject>
+#include <QtCore/QVariant>
+#include <QtCore/QModelIndex>
 
 // Core includes
 #include <Core/Utils/Log.h>

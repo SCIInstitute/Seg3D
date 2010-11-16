@@ -38,7 +38,9 @@
 #include <deque>
 
 // QT includes
-#include <QtGui>
+#include <QtCore/QAbstractTableModel>
+#include <QtCore/QObject>
+#include <QtCore/QVariant>
 
 // Core includes
 #include <Core/Utils/Log.h>

@@ -34,9 +34,8 @@
 #endif
 
 // Qt includes
-#include <QtCore>
-#include <QWidget>
-#include <QDialog>
+#include <QtCore/QPointer>
+#include <QtGui/QDialog>
 
 // boost includes
 #include <boost/smart_ptr.hpp>

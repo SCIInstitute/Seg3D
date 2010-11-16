@@ -33,6 +33,10 @@
 #include <Core/Utils/Log.h>
 #include <Core/Interface/Interface.h>
 
+// Qt includes
+#include <QtGui/QStandardItemModel>
+#include <QtGui/QMessageBox>
+
 //QtUtils Includes
 #include <QtUtils/Bridge/QtBridge.h>
 

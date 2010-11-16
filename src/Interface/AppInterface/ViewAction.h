@@ -33,7 +33,7 @@
 # pragma once
 #endif
 
-#include <QtGui>
+#include <QtCore/QObject>
 #include <QAction>
 
 namespace Seg3D
@@ -44,7 +44,7 @@ class ViewAction : public QObject
 Q_OBJECT
 
 Q_SIGNALS:
-void triggered(int,int);
+void triggered( int, int );
 
 public:
   ViewAction( QAction *parent, int column1, int column2 );

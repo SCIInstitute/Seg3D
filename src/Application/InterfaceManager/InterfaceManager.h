@@ -73,6 +73,18 @@ private:
 public:
   // Whether the view is in full screen mode
   Core::StateBoolHandle full_screen_state_;
+  
+  // Dock widget visibility states
+  Core::StateBoolHandle project_dockwidget_visibility_state_;
+  Core::StateBoolHandle toolmanager_dockwidget_visibility_state_;
+  Core::StateBoolHandle layermanager_dockwidget_visibility_state_;
+  Core::StateBoolHandle measurement_project_dockwidget_visibility_state_;
+  Core::StateBoolHandle history_dockwidget_visibility_state_;
+  
+  // Other widget visibilty state
+  Core::StateBoolHandle preferences_manager_visibility_state_;
+  Core::StateBoolHandle controller_visibility_state_;
+  Core::StateBoolHandle message_window_visibility_state_;
 
   // -- Signals --
 public:
@@ -86,7 +98,7 @@ public:
   // This signal is triggered after a window needs to be closed
   window_signal_type close_window_signal_;
 
-  // -- Access to toollist --
+  // -- Access to windowid_list_ --
 public:
   typedef std::set< std::string > windowid_list_type;
 
@@ -94,9 +106,14 @@ public:
   // Mark a windowid as available
   void add_windowid( const std::string& windowid ); // << THREAD-SAFE
 
-  // IS_WINDOWIS:
+  // IS_WINDOWID:
   // Check whether window id is valid
   bool is_windowid( const std::string& windowid ); // << THREAD-SAFE
+  
+private:
+  // INITIALIZE_STATES:
+  // This function is called by the constructor to initialize the state variables
+  void initialize_states();
 
 private:
   boost::mutex windowid_list_mutex_;

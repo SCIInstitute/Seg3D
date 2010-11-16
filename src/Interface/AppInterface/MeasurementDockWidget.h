@@ -30,7 +30,6 @@
 #define INTERFACE_APPINTERFACE_MEASUREMENTDOCKWIDGET_H
 
 // QT includes
-#include <QtGui>
 #include <QDockWidget>
 
 // STL includes

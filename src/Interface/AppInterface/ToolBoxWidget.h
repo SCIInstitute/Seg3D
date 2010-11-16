@@ -33,8 +33,10 @@
 # pragma once
 #endif
 
-#include <QtGui>
-#include <QSharedPointer>
+#include <QtGui/QScrollArea>
+#include <QtGui/QVBoxLayout>
+#include <QtGui/QIcon>
+#include <QtCore/QPointer>
 
 // Application includes
 #include <Application/Tool/ToolInterface.h>

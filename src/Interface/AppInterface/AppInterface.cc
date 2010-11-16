@@ -32,6 +32,11 @@
 // Boost include
 #include <boost/lexical_cast.hpp>
 
+#include <QtGui/QMessageBox>
+#include <QtGui/QDesktopWidget>
+#include <QtGui/QApplication>
+#include <QtGui/QCloseEvent>
+
 // Core includes
 #include <Core/Application/Application.h>
 #include <Core/Interface/Interface.h>
@@ -600,15 +605,6 @@ void AppInterface::SetProjectName( qpointer_type qpointer, std::string project_n
   Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
     &AppInterface::set_project_name, qpointer.data(), project_name ) ) );
 }
-
-
-void AppInterface::open_project_wizard()
-{
-  return;
-//  new_project_wizard_ = new AppProjectWizard();
-//  new_project_wizard_->show();
-}
-  
 
 
 

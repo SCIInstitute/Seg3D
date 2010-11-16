@@ -26,6 +26,10 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Qt includes
+#include <QtCore/QVariant>
+#include <QtGui/QGridLayout>
+#include <QtGui/QFileDialog>
 
 // Interface includes
 #include <Interface/AppProjectWizard/AppProjectWizard.h>
