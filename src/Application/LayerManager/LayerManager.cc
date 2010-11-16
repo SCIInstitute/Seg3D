@@ -634,8 +634,11 @@ void LayerManager::delete_layer( LayerHandle layer )
     CORE_LOG_MESSAGE( std::string( "Deleting Layer: " ) + layer->get_layer_id() );
     
     group = layer->get_layer_group();
-    group->delete_layer( layer );
+
+    // NOTE: Layer needs to be invalidated before it can be deleted
     layer->invalidate();
+
+    group->delete_layer( layer );
     
     if( group->is_empty() )
     {   

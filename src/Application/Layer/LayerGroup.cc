@@ -255,6 +255,10 @@ void LayerGroup::initialize_states()
 
 void LayerGroup::insert_layer( LayerHandle new_layer )
 { 
+  ASSERT_IS_APPLICATION_THREAD();
+
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
   new_layer->set_layer_group( this->shared_from_this() );
 
   if( new_layer->get_type() == Core::VolumeType::MASK_E )
@@ -287,6 +291,10 @@ void LayerGroup::insert_layer( LayerHandle new_layer )
 
 void LayerGroup::move_layer_above( LayerHandle layer_above, LayerHandle layer_below )
 {
+  ASSERT_IS_APPLICATION_THREAD();
+
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
   if( ( layer_above->get_type() == Core::VolumeType::DATA_E ) 
     && ( layer_below->get_type() == Core::VolumeType::MASK_E ) )
   {
@@ -319,6 +327,10 @@ void LayerGroup::move_layer_above( LayerHandle layer_above, LayerHandle layer_be
 
 void LayerGroup::move_layer_below( LayerHandle layer )
 {
+  ASSERT_IS_APPLICATION_THREAD();
+
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
   // if we are inserting a mask layer then we put it at the b
   if( layer->get_type() == Core::VolumeType::MASK_E )
   {
@@ -338,6 +350,10 @@ void LayerGroup::move_layer_below( LayerHandle layer )
 
 void LayerGroup::delete_layer( LayerHandle layer )
 {
+  ASSERT_IS_APPLICATION_THREAD();
+
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
   layer_list_.remove( layer );
   this->private_->update_layers_visible_state();
 }
@@ -454,6 +470,8 @@ bool LayerGroup::post_load_states( const Core::StateIO& state_io )
 
 void LayerGroup::clear()
 {
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
   std::for_each( this->layer_list_.begin(), this->layer_list_.end(), boost::lambda::bind( 
     &Layer::invalidate, boost::lambda::bind( &LayerHandle::get, boost::lambda::_1 ) ) );
   this->layer_list_.clear();
