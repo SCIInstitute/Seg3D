@@ -508,6 +508,7 @@ void RendererPrivate::process_isosurfaces( IsosurfaceArray& isosurfaces )
 void RendererPrivate::draw_isosurfaces( const IsosurfaceArray& isosurfaces, bool with_lighting )
 {
   bool use_colormap = false;
+
   size_t num_of_isosurfaces = isosurfaces.size();
 //  glEnable( GL_CULL_FACE );
   this->isosurface_shader_->enable();
@@ -523,15 +524,22 @@ void RendererPrivate::draw_isosurfaces( const IsosurfaceArray& isosurfaces, bool
     glColor3d( isosurfaces[ i ]->color_.r() / 255.0, isosurfaces[ i ]->color_.g() / 255.0, 
       isosurfaces[ i ]->color_.b() / 255.0 );
     Core::ColorMapHandle colormap = iso->get_color_map();
-    float lookup_min, lookup_max;
-    colormap->get_lookup_range( lookup_min, lookup_max );
-    this->isosurface_shader_->set_min_val( lookup_min );
-    this->isosurface_shader_->set_val_range( lookup_max - lookup_min );
-    Core::Texture1DHandle colormap_tex = colormap->get_texture();
-    Core::Texture::lock_type tex_lock( colormap_tex->get_mutex() );
-    colormap_tex->bind();
-    iso->redraw( use_colormap  );
-    colormap_tex->unbind();
+    if( use_colormap && iso->get_color_map().get() != 0 )
+    {
+      float lookup_min, lookup_max;
+      colormap->get_lookup_range( lookup_min, lookup_max );
+      this->isosurface_shader_->set_min_val( lookup_min );
+      this->isosurface_shader_->set_val_range( lookup_max - lookup_min );
+      Core::Texture1DHandle colormap_tex = colormap->get_texture();
+      Core::Texture::lock_type tex_lock( colormap_tex->get_mutex() );
+      colormap_tex->bind();
+      iso->redraw( true );
+      colormap_tex->unbind();
+    }
+    else
+    {
+      iso->redraw( false );
+    }
     CORE_CHECK_OPENGL_ERROR();
   }
   this->isosurface_shader_->disable();

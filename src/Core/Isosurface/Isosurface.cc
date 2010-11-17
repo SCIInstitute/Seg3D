@@ -26,6 +26,9 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// STL includes
+#include <fstream>
+
 // Core includes
 #include <Core/DataBlock/StdDataBlock.h>
 #include <Core/Isosurface/Isosurface.h>
@@ -1248,7 +1251,7 @@ Isosurface::Isosurface( const MaskVolumeHandle& mask_volume ) :
   this->private_->vbo_available_ = false;
 
   // Test code -- set default colormap
-  this->set_color_map( ColorMapHandle( new ColorMap() ) );
+  //this->private_->color_map_ = ColorMapHandle( new ColorMap() );
 }
 
 void Isosurface::compute( double quality_factor )
@@ -1286,13 +1289,13 @@ void Isosurface::compute( double quality_factor )
     return;
   }
 
-  // Test code
-  size_t num_points = this->private_->points_.size();
+  // Test code -- assign values to vertices in range [0, 1].  
+  /*size_t num_points = this->private_->points_.size();
   for( size_t i = 0; i < num_points; i++ )
   {
     float val = static_cast< float >( i ) / static_cast< float >( num_points );
     this->private_->values_.push_back( val );
-  }
+  }*/
 
   Parallel parallel_normals( boost::bind( &IsosurfacePrivate::parallel_compute_normals, 
     this->private_, _1, _2, _3 ) );
@@ -1370,11 +1373,19 @@ void Isosurface::compute( double quality_factor )
   this->private_->surface_changed_ = true;
 
   this->update_progress_signal_( 1.0 );
+
+  // Test code
+  //this->export_isosurface( "test_dir", "test3" );
 }
 
 const std::vector< PointF >& Isosurface::get_points() const
 {
   return this->private_->points_;
+}
+
+const std::vector< unsigned int >& Isosurface::get_faces() const
+{
+  return this->private_->faces_;
 }
 
 const std::vector< VectorF >& Isosurface::get_normals() const
@@ -1399,9 +1410,16 @@ bool Isosurface::set_values( const std::vector< float >& values )
 }
 
 
-const std::vector< unsigned int >& Isosurface::get_faces() const
+void Isosurface::set_color_map( ColorMapHandle color_map )
 {
-  return this->private_->faces_;
+  lock_type lock( this->get_mutex() );
+  this->private_->color_map_ = color_map;
+}
+
+Core::ColorMapHandle Isosurface::get_color_map() const
+{
+  lock_type lock( this->get_mutex() );
+  return this->private_->color_map_;
 }
 
 void Isosurface::redraw( bool use_colormap )
@@ -1418,6 +1436,19 @@ void Isosurface::redraw( bool use_colormap )
   size_t num_batches = this->private_->part_points_.size();
   bool has_values = this->private_->values_.size() == this->private_->points_.size();
   
+  // Error checking
+  if( use_colormap ) 
+  {
+    if( !has_values )
+    {
+      CORE_LOG_WARNING( "Isosurface colormap enabled, but no per-vertex values assigned." ); 
+    }
+    if( this->private_->color_map_.get() == 0 )
+    {
+      CORE_LOG_WARNING( "Isosurface colormap enabled, but no colormap assigned." ); 
+    }
+  }
+
   // Use the uploaded VBO for rendering if it's available
   if ( this->private_->vbo_available_ )
   {
@@ -1506,16 +1537,57 @@ void Isosurface::redraw( bool use_colormap )
   } 
 }
 
-void Isosurface::set_color_map( ColorMapHandle color_map )
+bool Isosurface::export_isosurface( const boost::filesystem::path& path, 
+  const std::string& file_prefix )
 {
-  lock_type lock( this->get_mutex() );
-  this->private_->color_map_ = color_map;
-}
+  // Write points to .pts file
+  boost::filesystem::path points_path = path / ( file_prefix + ".pts" );
+  std::ofstream pts_file( points_path.string().c_str() );
+  if( !pts_file.is_open() ) 
+  {
+    return false;
+  }
 
-Core::ColorMapHandle Isosurface::get_color_map() const
-{
-  lock_type lock( this->get_mutex() );
-  return this->private_->color_map_;
+  for( size_t i = 0; i < this->private_->points_.size(); i++ )
+  {
+    PointF pt = this->private_->points_[ i ];
+    pts_file << pt.x() << " " << pt.y() << " " << pt.z() << std::endl; 
+  }
+  pts_file.close();
+
+  // Write faces to .fac file
+  boost::filesystem::path faces_path = path / ( file_prefix + ".fac" );
+  std::ofstream fac_file( faces_path.string().c_str() );
+  if( !fac_file.is_open() ) 
+  {
+    return false;
+  }
+
+  for( size_t i = 0; i + 2 < this->private_->faces_.size(); i += 3 )
+  {
+    fac_file << this->private_->faces_[ i ] << " " << this->private_->faces_[ i + 1 ] << " " 
+      << this->private_->faces_[ i + 2 ] << std::endl; 
+  }
+  fac_file.close();
+
+  // Write values to .val file
+  if( this->private_->values_.size() > 0 )
+  {
+    boost::filesystem::path values_path = path / ( file_prefix + ".val" );
+    std::ofstream val_file( values_path.string().c_str() );
+    if( !val_file.is_open() ) 
+    {
+      return false;
+    }
+
+    for( size_t i = 0; i < this->private_->values_.size(); i++ )
+    {
+      val_file << this->private_->values_[ i ] << std::endl; 
+    }
+    val_file.close();
+  }
+
+  return true;
 }
 
 } // end namespace Core

@@ -129,7 +129,7 @@
       <item>
        <widget class="QCheckBox" name="inside_positive_">
         <property name="text">
-         <string>Inside mask is positive</string>
+         <string>Invert map</string>
         </property>
        </widget>
       </item>

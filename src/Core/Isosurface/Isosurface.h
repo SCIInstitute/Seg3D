@@ -60,11 +60,16 @@ public:
   Isosurface( const MaskVolumeHandle& mask_volume );  
 
   // COMPUTE:
+  // Compute isosurface.  quality_factor must be one of: {0.125, 0.25, 0.5, 1.0} 
   void compute( double quality_factor = 1.0 );
 
   // GET_POINTS:
   // Get 3D points for vertices, each stored only once
   const std::vector< PointF >& get_points() const;
+
+  // GET_FACES:
+  // Indices into vertices, 3 per face
+  const std::vector< unsigned int >& get_faces() const;
 
   // GET_NORMALS:
   // Get one normal per vertex, interpolated
@@ -79,16 +84,43 @@ public:
   // or empty.  Returns true on success, false on failure.
   bool set_values( const std::vector< float >& values );
 
-  // GET_FACES:
-  // Indices into vertices, 3 per face
-  const std::vector< unsigned int >& get_faces() const;
+  // SET_COLOR_MAP:
+  // Set mapping from vertex values to RGB colors
+  void set_color_map( ColorMapHandle color_map );
+
+  // GET_COLOR_MAP:
+  // Get mapping from vertex values to RGB colors
+  ColorMapHandle get_color_map() const;
 
   // REDRAW:
-  // Render the isosurface.
+  // Render the isosurface.  This function doesn't work in isolation -- it must be called from the 
+  // Seg3D Renderer. 
   void redraw( bool use_colormap );
 
-  void set_color_map( ColorMapHandle color_map );
-  ColorMapHandle get_color_map() const;
+  // EXPORT_ISOSURFACE:
+  // Write points to .pts file, faces to .fac file, and values (if assigned) to .val file.  
+  // Returns true on success, false on failure.
+  //
+  // path: Path to existing directory where files should be written.
+  // file_prefix: File prefix to use for output files (no extension).
+  // 
+  // Format for .pts:
+  // x y z
+  // x y z
+  // ...
+  // 
+  // Format for .fac:
+  // p1 p2 p3
+  // p1 p2 p3
+  // ...
+  //
+  // Format for .val:
+  // v1
+  // v2
+  // ...
+  //
+  // Note: can't call this function "export" because it is reserved by the Visual C++ compiler.
+  bool export_isosurface( const boost::filesystem::path& path, const std::string& file_prefix ); 
 
   typedef boost::signals2::signal< void (double) > update_progress_signal_type;
 
