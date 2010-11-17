@@ -116,28 +116,27 @@ bool MaskDataBlock::extract_slice( SliceType type,
           size_t b = index + y * nx + z * nxy;
           
           if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
-          else slice_ptr[ a ] &= slice_not_mask_value; a++; b+= nx;           
+          a++; b+= nx;            
           if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
-          else slice_ptr[ a ] &= slice_not_mask_value; a++; b+= nx;           
+          a++; b+= nx;            
           if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
-          else slice_ptr[ a ] &= slice_not_mask_value; a++; b+= nx;           
+          a++; b+= nx;            
           if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
-          else slice_ptr[ a ] &= slice_not_mask_value; a++; b+= nx;           
+          a++; b+= nx;            
           if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
-          else slice_ptr[ a ] &= slice_not_mask_value; a++; b+= nx;           
+          a++; b+= nx;            
           if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
-          else slice_ptr[ a ] &= slice_not_mask_value; a++; b+= nx;           
+          a++; b+= nx;            
           if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
-          else slice_ptr[ a ] &= slice_not_mask_value; a++; b+= nx;           
+          a++; b+= nx;            
           if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
-          else slice_ptr[ a ] &= slice_not_mask_value; a++; b+= nx;           
+          a++; b+= nx;            
         }
         for ( ; y < ny; y++ )
         {
           size_t a = y + z * ny; 
           size_t b = index + y * nx + z * nxy;
-          if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
-          else slice_ptr[ a ] &= slice_not_mask_value;            
+          if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;           
         }
       }
       
@@ -179,33 +178,32 @@ bool MaskDataBlock::extract_slice( SliceType type,
         size_t x = 0;
         for ( ; x < nx8; x += 8 )
         {
-          size_t a = x + z * ny; 
+          size_t a = x + z * nx; 
           size_t b = x + index * nx + z * nxy;
           
           if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
-          else slice_ptr[ a ] &= slice_not_mask_value; a++; b++;            
+          a++; b++;           
           if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
-          else slice_ptr[ a ] &= slice_not_mask_value; a++; b++;            
+          a++; b++;           
           if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
-          else slice_ptr[ a ] &= slice_not_mask_value; a++; b++;            
+          a++; b++;           
           if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
-          else slice_ptr[ a ] &= slice_not_mask_value; a++; b++;            
+          a++; b++;           
           if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
-          else slice_ptr[ a ] &= slice_not_mask_value; a++; b++;            
+          a++; b++;           
           if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
-          else slice_ptr[ a ] &= slice_not_mask_value; a++; b++;            
+          a++; b++;           
           if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
-          else slice_ptr[ a ] &= slice_not_mask_value; a++; b++;            
+          a++; b++;           
           if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
-          else slice_ptr[ a ] &= slice_not_mask_value; a++; b++;            
+          a++; b++;           
         }
         for ( ; x < nx; x++ )
         {
-          size_t a = x + z * ny; 
+          size_t a = x + z * nx; 
           size_t b = x + index * nx + z * nxy;
           
           if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
-          else slice_ptr[ a ] &= slice_not_mask_value;          
         }
       }
 
@@ -251,29 +249,28 @@ bool MaskDataBlock::extract_slice( SliceType type,
           size_t b = x + y * nx + index * nxy;
           
           if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
-          else slice_ptr[ a ] &= slice_not_mask_value; a++; b++;            
+          a++; b++;           
           if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
-          else slice_ptr[ a ] &= slice_not_mask_value; a++; b++;            
+          a++; b++;           
           if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
-          else slice_ptr[ a ] &= slice_not_mask_value; a++; b++;            
+          a++; b++;           
           if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
-          else slice_ptr[ a ] &= slice_not_mask_value; a++; b++;            
+          a++; b++;           
           if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
-          else slice_ptr[ a ] &= slice_not_mask_value; a++; b++;            
+          a++; b++;           
           if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
-          else slice_ptr[ a ] &= slice_not_mask_value; a++; b++;            
+          a++; b++;           
           if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
-          else slice_ptr[ a ] &= slice_not_mask_value; a++; b++;            
+          a++; b++;           
           if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
-          else slice_ptr[ a ] &= slice_not_mask_value; a++; b++;            
+          a++; b++;
         }
         for ( ; x < nx; x++ )
         {
           size_t a = x + y * nx; 
           size_t b = x + y * nx + index * nxy;
           
-          if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;
-          else slice_ptr[ a ] &= slice_not_mask_value;          
+          if (  volume_ptr[ b ] & volume_mask_value ) slice_ptr[ a ] |= slice_mask_value;         
         }
       }
 
@@ -405,7 +402,7 @@ bool MaskDataBlock::insert_slice( const MaskDataSliceHandle slice )
         for ( ; x < nx8; x += 8 )
         {
           // Copy data back into the mask
-          size_t a = x + z * ny; 
+          size_t a = x + z * nx; 
           size_t b = x + index * nx + z * nxy;
           
           if (  slice_ptr[ a ] & slice_mask_value ) volume_ptr[ b ] |= volume_mask_value;
@@ -428,7 +425,7 @@ bool MaskDataBlock::insert_slice( const MaskDataSliceHandle slice )
         // Finish loop unrolement
         for ( ; x < nx; x++ )
         {
-          size_t a = x + z * ny; 
+          size_t a = x + z * nx; 
           size_t b = x + index * nx + z * nxy;
           
           if (  slice_ptr[ a ] & slice_mask_value ) volume_ptr[ b ] |= volume_mask_value;

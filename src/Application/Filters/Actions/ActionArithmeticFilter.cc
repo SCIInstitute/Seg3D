@@ -287,7 +287,7 @@ bool ActionArithmeticFilterPrivate::validate_parser( Core::ActionContextHandle& 
   {
     if( !this->algo_->engine_.add_output_data_block( ActionArithmeticFilter::RESULT_C, 
       grid_trans.get_nx(), grid_trans.get_ny(), grid_trans.get_nz(), 
-      Core::DataType::UCHAR_E, error ) )
+      Core::DataType::CHAR_E, error ) )
     {
       context->report_error( error );
       this->algo_.reset();

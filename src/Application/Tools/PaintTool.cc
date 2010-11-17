@@ -92,6 +92,8 @@ public:
   void flood_fill( Core::ActionContextHandle context, bool erase, 
     ViewerHandle viewer = ViewerHandle() );
 
+  void update_cursors( Core::CursorShape shape );
+
   //PAINT:
   // Paint on the target layer with the brush centered at (x0, y0).
   void paint( const PaintInfo& paint_info, int xc, int yc, int& paint_count );
@@ -613,6 +615,8 @@ void PaintToolPrivate::stop_painting()
 
 void PaintToolPrivate::setup_paint_info( PaintInfo& paint_info, int x0, int y0, int x1, int y1 )
 {
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
   paint_info.target_layer_id_ = this->paint_tool_->target_layer_state_->get();
   paint_info.target_slice_ = this->target_slice_;
   paint_info.data_constraint_layer_id_ = this->paint_tool_->data_constraint_layer_state_->get();
@@ -727,6 +731,24 @@ void PaintToolPrivate::flood_fill( Core::ActionContextHandle context,
   }
 
   ActionFloodFill::Dispatch( context, ff_params );
+}
+
+
+void PaintToolPrivate::update_cursors( Core::CursorShape shape )
+{
+  size_t num_viewers = ViewerManager::Instance()->number_of_viewers();
+  for (size_t j = 0; j < num_viewers; j++ )
+  {
+    ViewerHandle viewer = ViewerManager::Instance()->get_viewer( j );
+    if ( viewer->view_mode_state_->get() != Viewer::VOLUME_C )
+    {
+      viewer->set_cursor( shape );
+    }
+    else
+    {
+      viewer->set_cursor( Core::CursorShape::ARROW_E );
+    }
+  } 
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -1039,6 +1061,26 @@ bool PaintTool::handle_mouse_leave( ViewerHandle viewer )
   return true;
 }
 
+void PaintTool::activate()
+{
+  bool cursor_invisible = 
+      PreferencesManager::Instance()->paint_cursor_invisibility_state_->get();
+      
+  if( cursor_invisible )
+  {
+    this->private_->update_cursors( Core::CursorShape::BLANK_E );
+  }
+  else
+  {
+    this->private_->update_cursors( Core::CursorShape::CROSS_E ); 
+  }
+}
+
+void PaintTool::deactivate()
+{
+  this->private_->update_cursors( Core::CursorShape::ARROW_E );
+}
+
 bool PaintTool::handle_mouse_move( ViewerHandle viewer, 
                   const Core::MouseHistory& mouse_history, 
                   int button, int buttons, int modifiers )
@@ -1100,23 +1142,11 @@ bool PaintTool::handle_mouse_move( ViewerHandle viewer,
   if ( this->private_->brush_visible_ )
   {
     this->private_->update_same_mode_viewers();
-    
-    // Depending on the preference of the segmenter a cross or no pointer is
-    // shown while segmenting data
-    if( PreferencesManager::Instance()->paint_cursor_invisibility_state_->get() )
-    {
-      this->private_->viewer_->set_cursor( Core::CursorShape::BLANK_E );
-    }
-    else
-    {
-      this->private_->viewer_->set_cursor( Core::CursorShape::CROSS_E );
-    }
   }
 
   // If we are painting
   if ( this->private_->painting_ )
   {
-    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
     PaintInfo paint_info;
     
     this->private_->setup_paint_info( paint_info, mouse_history.previous_.x_, 
@@ -1141,16 +1171,16 @@ bool PaintTool::handle_mouse_press( ViewerHandle viewer,
 {
   {
     PaintToolPrivate::lock_type lock( this->private_->get_mutex() );
-    this->private_->viewer_ = viewer;
+    this->private_->viewer_ = viewer;   
   }
-
-  if ( this->private_->viewer_->is_volume_view() )
+  
+  if ( viewer->is_volume_view() )
   {
     return false;
   }
 
   double world_x, world_y;
-  this->private_->viewer_->window_to_world( mouse_history.current_.x_, 
+  viewer->window_to_world( mouse_history.current_.x_, 
     mouse_history.current_.y_, world_x, world_y );
 
   {
@@ -1172,7 +1202,10 @@ bool PaintTool::handle_mouse_press( ViewerHandle viewer,
       size_t viewer_id = this->private_->viewer_->get_viewer_id();
       MaskLayerHandle layer = boost::dynamic_pointer_cast< Core::MaskLayer >(
         LayerManager::Instance()->get_layer_by_id( this->target_layer_state_->get() ) );
-      paintable = layer->is_visible( viewer_id ) && layer->has_valid_data();
+      if ( layer )
+      {
+        paintable = layer->is_visible( viewer_id ) && layer->has_valid_data();
+      }
     }
   }
 
@@ -1181,12 +1214,14 @@ bool PaintTool::handle_mouse_press( ViewerHandle viewer,
     if ( modifiers == Core::KeyModifier::NO_MODIFIER_E &&
       button == Core::MouseButton::LEFT_BUTTON_E )
     {
+      PaintToolPrivate::lock_type lock( this->private_->get_mutex() );
       this->private_->painting_ = true;
       this->private_->erase_ = erase;
     }
     else if ( modifiers == Core::KeyModifier::NO_MODIFIER_E &&
       button == Core::MouseButton::RIGHT_BUTTON_E )
     {
+      PaintToolPrivate::lock_type lock( this->private_->get_mutex() );
       this->private_->painting_ = true;
       this->private_->erase_ = true;
     }
@@ -1248,7 +1283,6 @@ bool PaintTool::handle_mouse_release( ViewerHandle viewer,
     {
       {
         {
-          Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
           PaintInfo paint_info;
       
           this->private_->setup_paint_info( paint_info, mouse_history.previous_.x_, 

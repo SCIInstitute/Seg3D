@@ -1107,12 +1107,12 @@ bool Viewer::wheel_event( int delta, int x, int y, int buttons, int modifiers )
     if ( PreferencesManager::Instance()->reverse_slice_navigation_->get() )
     {
       ActionOffsetSlice::Dispatch( Core::Interface::GetMouseActionContext(),
-        this->shared_from_this(), delta );    
+        this->shared_from_this(), -delta );   
     }
     else
     {
       ActionOffsetSlice::Dispatch( Core::Interface::GetMouseActionContext(),
-        this->shared_from_this(), -delta );
+        this->shared_from_this(), delta );
     }
     // Update the status bar display.
     // 'update_status_bar' reposts itself to the application thread, so it's guaranteed that 

@@ -100,13 +100,28 @@ bool to_data_block_s( Core::ArrayMathProgramCode& pc )
   float* data1_end = data1 + ( pc.get_size() );
   Core::index_type idx = pc.get_index();
 
-  while ( data1 != data1_end ) 
+  if ( data0.get_data_type() == Core::DataType::CHAR_E )
   {
-    data0.set_data_at( idx, *data1 ); 
-    idx++; 
-    data1++;
+    while ( data1 != data1_end ) 
+    {
+      float fdata = *data1;
+      if ( fdata > 127.0f ) fdata = 127.0f;
+      if ( fdata < -128.0f ) fdata = -128.0f;
+      data0.set_data_at( idx, *data1 ); 
+      idx++; 
+      data1++;
+    } 
   }
-
+  else
+  {
+    while ( data1 != data1_end ) 
+    {
+      data0.set_data_at( idx, *data1 ); 
+      idx++; 
+      data1++;
+    }
+  }
+  
   return true;
 }
 

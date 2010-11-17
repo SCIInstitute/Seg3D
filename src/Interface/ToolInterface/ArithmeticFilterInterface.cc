@@ -75,6 +75,8 @@ ArithmeticFilterInterface::ArithmeticFilterInterface() :
   this->private_->predefined_.push_back( std::pair< std::string, std::string >(
     "Boolean XOR Filter", " RESULT = xor( A, B );") );
   this->private_->predefined_.push_back( std::pair< std::string, std::string >(
+    "Boolean REMOVE Filter", " RESULT = A - B;") );
+  this->private_->predefined_.push_back( std::pair< std::string, std::string >(
     "Mask Data", " RESULT = A * B;") );
 }
 

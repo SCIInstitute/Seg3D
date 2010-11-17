@@ -980,7 +980,7 @@ bool ExtractSliceInternal( DataBlock* volume_data_block,
         for ( ; x < nx8; x += 8 )
         {
           // Copy the data over
-          size_t a = x + z * ny; 
+          size_t a = x + z * nx; 
           size_t b = x + index * nx + z * nxy;
           slice_ptr[ a ] = volume_ptr[ b ]; a++; b++;
           slice_ptr[ a ] = volume_ptr[ b ]; a++; b++;
@@ -994,7 +994,7 @@ bool ExtractSliceInternal( DataBlock* volume_data_block,
         // Finish the part that could not be unroled
         for ( ; x < nx; x++ )
         {
-          slice_ptr[ x + z * ny ] = volume_ptr[ x + index * nx + z * nxy ];
+          slice_ptr[ x + z * nx ] = volume_ptr[ x + index * nx + z * nxy ];
         }
       }
 
@@ -1143,7 +1143,7 @@ bool InsertSliceInternal( DataBlock* volume_data_block, const DataSliceHandle& s
         for ( ; x < nx8; x += 8 )
         {
           // Copy data back
-          size_t a = x + z * ny; 
+          size_t a = x + z * nx; 
           size_t b = x + index * nx + z * nxy;
           volume_ptr[ b ] = slice_ptr[ a ]; a++; b++;
           volume_ptr[ b ] = slice_ptr[ a ]; a++; b++;
@@ -1157,7 +1157,7 @@ bool InsertSliceInternal( DataBlock* volume_data_block, const DataSliceHandle& s
         // Finish part that could not be unroled
         for ( ; x < nx; x++ )
         {
-          volume_ptr[ x + index * nx + z * nxy ] = slice_ptr[ x + z * ny ];
+          volume_ptr[ x + index * nx + z * nxy ] = slice_ptr[ x + z * nx ];
         }
       }
 

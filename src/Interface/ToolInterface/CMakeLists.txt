@@ -58,6 +58,7 @@ SET(INTERFACE_TOOLINTERFACE_SRCS
   NeighborhoodConnectedFilterInterface.cc
   OtsuThresholdFilterInterface.cc
   AndFilterInterface.cc
+  RemoveFilterInterface.cc
   OrFilterInterface.cc
   XorFilterInterface.cc
   ThresholdSegmentationLSFilterInterface.cc
@@ -93,6 +94,7 @@ SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
   NeighborhoodConnectedFilterInterface.h
   OtsuThresholdFilterInterface.h
   AndFilterInterface.h
+  RemoveFilterInterface.h
   OrFilterInterface.h
   XorFilterInterface.h
   ThresholdSegmentationLSFilterInterface.h
@@ -131,6 +133,7 @@ SET(INTERFACE_TOOLINTERFACE_UI_SRCS
   NeighborhoodConnectedFilterInterface.ui
   OtsuThresholdFilterInterface.ui
   AndFilterInterface.ui
+  RemoveFilterInterface.ui
   OrFilterInterface.ui
   XorFilterInterface.ui
   ThresholdSegmentationLSFilterInterface.ui

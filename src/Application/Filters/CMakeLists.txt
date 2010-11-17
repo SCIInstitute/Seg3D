@@ -89,6 +89,8 @@ SET(APPLICATION_FILTERS_ACTIONS_SRCS
   Actions/ActionOtsuThresholdFilter.cc
   Actions/ActionAndFilter.h
   Actions/ActionAndFilter.cc
+  Actions/ActionRemoveFilter.h
+  Actions/ActionRemoveFilter.cc
   Actions/ActionOrFilter.h
   Actions/ActionOrFilter.cc
   Actions/ActionXorFilter.h

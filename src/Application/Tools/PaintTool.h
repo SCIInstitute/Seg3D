@@ -146,6 +146,16 @@ public:
   // The default implementation returns false.
   virtual bool has_2d_visual();
 
+  // ACTIVATE:
+  // Activate a tool: this tool is set as the active tool and hence it should
+  // setup the right mouse tools in the viewers.
+  virtual void activate();
+
+  // DEACTIVATE:
+  // Deactivate a tool. A tool is always deactivate before the next one is
+  // activated.
+  virtual void deactivate();
+
 protected:
   virtual bool post_load_states();
 

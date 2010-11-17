@@ -93,6 +93,8 @@ SET(APPLICATION_TOOLS_SRCS
   ThresholdSegmentationLSFilter.cc
   AndFilter.h
   AndFilter.cc
+  RemoveFilter.h
+  RemoveFilter.cc
   OrFilter.h
   OrFilter.cc
   XorFilter.h
