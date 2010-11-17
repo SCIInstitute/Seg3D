@@ -55,7 +55,7 @@ void AppLayerIO::ImportFiles( QMainWindow* main_window )
   QStringList filters;
   for ( size_t j = 0; j < importer_types.size(); j++ )
   {
-    filters << QString::fromStdString( importer_types[j] );
+    filters << QString::fromStdString( importer_types[ j ] );
   }
 
   // Step (2): Bring up the file dialog
@@ -112,7 +112,7 @@ void AppLayerIO::ImportFiles( QMainWindow* main_window )
 void AppLayerIO::ImportSeries( QMainWindow* main_window )
 {
   // Step (1): Get the importer list from the LayerIO system
-  LayerIO::importer_types_type importer_types = LayerIO::Instance()->get_importer_types();
+  LayerIO::importer_types_type importer_types = LayerIO::Instance()->get_series_importer_types();
 
   QStringList filters;
   for ( size_t j = 0; j < importer_types.size(); j++ )

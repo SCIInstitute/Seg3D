@@ -62,6 +62,20 @@ LayerIO::importer_types_type LayerIO::get_importer_types()
   return importer_types;
 }
 
+LayerIO::importer_types_type LayerIO::get_series_importer_types()
+{
+  lock_type lock( mutex_ ); 
+  std::vector<std::string> series_importer_types;
+  series_importer_types.push_back( "All Importers (*)" );
+
+  for ( size_t j = 0; j< this->series_importer_list_.size(); j++ )
+  {
+    series_importer_types.push_back( this->series_importer_list_[j]->file_type_string() );
+  }
+
+  return series_importer_types;
+}
+
 LayerIO::importer_types_type LayerIO::get_exporter_types()
 {
   lock_type lock( mutex_ ); 
@@ -75,6 +89,8 @@ LayerIO::importer_types_type LayerIO::get_exporter_types()
 
   return exporter_types;
 }
+
+
 
 bool LayerIO::create_importer( const std::string& filename, 
   LayerImporterHandle& importer,
@@ -157,6 +173,9 @@ bool LayerIO::create_exporter( LayerExporterHandle& exporter, std::vector< Layer
   }
   return false;
 }
+
+
+
 
 
 } // end namespace seg3D

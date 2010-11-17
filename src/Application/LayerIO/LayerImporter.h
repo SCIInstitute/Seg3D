@@ -137,11 +137,13 @@ public:
 public:
   // Name of the importer (to be listed in the file filter dialog)
   virtual std::string name() const = 0;
-  // The file types (extentions) that the importer handles
+  // The file types (extensions that the importer handles)
   virtual std::string file_types() const = 0;
   // Priority flag that resolves which importer needs to be used if multiple are available for
   // a similar file type
   virtual unsigned int priority() const = 0;
+  // flag for the series info ( 0 - not a series importer, 1 - a series importer, 2 - both )
+  virtual unsigned int series_flag() const = 0;
 
   // -- Filename handling --
 public:
@@ -239,15 +241,17 @@ private:
 // Note: one would expect to use virtual static functions, but those are not
 // allowed in C++, hence this macro ensures a consistent definition.
 
-#define SCI_IMPORTER_TYPE(importer_name,importer_file_types,importer_priority) \
+#define SCI_IMPORTER_TYPE(importer_name,importer_file_types,importer_priority,importer_series_flag) \
   public: \
     static std::string  Name()       { return importer_name; }\
     static std::string  FileTypes()  { return importer_file_types; }\
     static unsigned int Priority()   { return importer_priority; }\
+    static unsigned int SeriesFlag()   { return importer_series_flag; }\
     \
     virtual std::string  name() const       { return Name(); } \
     virtual std::string  file_types() const { return FileTypes(); } \
-    virtual unsigned int priority() const   { return Priority(); }
+    virtual unsigned int priority() const   { return Priority(); }\
+    virtual unsigned int series_flag() const   { return SeriesFlag(); }\
 
 } // end namespace seg3D
 

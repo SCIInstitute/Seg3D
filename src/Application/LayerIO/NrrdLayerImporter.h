@@ -46,7 +46,7 @@ namespace Seg3D
 
 class NrrdLayerImporter : public LayerImporter
 {
-  SCI_IMPORTER_TYPE( "Teem Importer", ".nrrd;.nhdr", 30 )
+  SCI_IMPORTER_TYPE( "Teem Importer", ".nrrd;.nhdr", 30, 0 )
 
   // -- Constructor/Destructor --
 public:

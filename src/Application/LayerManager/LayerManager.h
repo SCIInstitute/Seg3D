@@ -162,6 +162,14 @@ public:
   // SET_ACTIVE_LAYER:
   // this function sets the active layer
   void set_active_layer( LayerHandle layer );
+  
+  // SET_NEXT_LAYER_ACTIVE:
+  // this function sets the active layer
+  void set_next_layer_active();
+  
+  // SET_PREVIOUS_LAYER_ACTIVE:
+  // this function sets the active layer
+  void set_previous_layer_active();
 
 private:
   // VALIDATE_LAYER_MOVE:

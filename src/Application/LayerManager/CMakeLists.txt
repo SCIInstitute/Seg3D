@@ -48,6 +48,10 @@ SET(APPLICATION_LAYERMANAGER_SRCS
 SET(APPLICATION_LAYERMANAGER_ACTIONS_SRCS
   Actions/ActionActivateLayer.h
   Actions/ActionActivateLayer.cc
+  Actions/ActionActivateNextLayer.h
+  Actions/ActionActivateNextLayer.cc
+  Actions/ActionActivatePreviousLayer.h
+  Actions/ActionActivatePreviousLayer.cc
   Actions/ActionCalculateMaskVolume.h
   Actions/ActionCalculateMaskVolume.cc
   Actions/ActionComputeIsosurface.h

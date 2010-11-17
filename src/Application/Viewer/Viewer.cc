@@ -43,6 +43,8 @@
 #include <Application/Layer/MaskLayer.h>
 #include <Application/Layer/LayerGroup.h>
 #include <Application/LayerManager/LayerManager.h>
+#include <Application/LayerManager/Actions/ActionActivateNextLayer.h>
+#include <Application/LayerManager/Actions/ActionActivatePreviousLayer.h>
 #include <Application/StatusBar/StatusBar.h>
 #include <Application/Viewer/Viewer.h>
 #include <Application/Viewer/ViewManipulator.h>
@@ -1140,7 +1142,6 @@ bool Viewer::key_press_event( int key, int modifiers )
     {
       case Core::Key::KEY_LESS_E:
       case Core::Key::KEY_COMMA_E:
-      case Core::Key::KEY_LEFT_E:
       case Core::Key::KEY_DOWN_E:
       {
         Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
@@ -1160,10 +1161,20 @@ bool Viewer::key_press_event( int key, int modifiers )
         }
         return true;    
       }
-      
+      case Core::Key::KEY_LEFT_E:
+      {
+        Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+        ActionActivatePreviousLayer::Dispatch( Core::Interface::GetKeyboardActionContext() );
+        return true;
+      }
+      case Core::Key::KEY_RIGHT_E:
+      {
+        Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+        ActionActivateNextLayer::Dispatch( Core::Interface::GetKeyboardActionContext() );
+        return true;
+      }
       case Core::Key::KEY_GREATER_E:
       case Core::Key::KEY_PERIOD_E:
-      case Core::Key::KEY_RIGHT_E:
       case Core::Key::KEY_UP_E:
       {
         Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );

@@ -191,7 +191,7 @@ void AppPreferences::setup_layer_prefs()
   {
     // Step 1: create new buttons and add them to the button group
     this->private_->color_button_group_->addButton( new QtUtils::QtColorButton( 
-      this, i, PreferencesManager::Instance()->color_states_[ i ]->get(), 25, 25 ), i );
+      this, i, PreferencesManager::Instance()->color_states_[ i ]->get() ), i );
     this->private_->ui_.color_h_layout_->addWidget( this->private_->
       color_button_group_->button( i ) );
     
