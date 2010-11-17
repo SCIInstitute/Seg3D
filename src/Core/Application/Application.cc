@@ -446,7 +446,7 @@ long long Application::get_total_physical_memory()
 
 long long Application::get_total_addressable_memory()
 {
-#ifdef WIN32_
+#ifdef _WIN32
   if ( sizeof ( void* ) == 8 )
   {
     return 1ULL<<62;
@@ -477,7 +477,7 @@ long long Application::get_total_addressable_physical_memory()
 
 long long Application::get_my_virtual_memory_used()
 {
-#ifdef WIN32_
+#ifdef _WIN32
   PROCESS_MEMORY_COUNTERS_EX pmc;
     GetProcessMemoryInfo( GetCurrentProcess(), &pmc, sizeof( pmc ) );
     return pmc.PrivateUsage;
@@ -488,7 +488,7 @@ long long Application::get_my_virtual_memory_used()
 
 long long Application::get_my_physical_memory_used()
 {
-#ifdef WIN32_
+#ifdef _WIN32
   PROCESS_MEMORY_COUNTERS_EX pmc;
     GetProcessMemoryInfo( GetCurrentProcess(), &pmc, sizeof( pmc ) );
     return pmc.WorkingSetSize;
