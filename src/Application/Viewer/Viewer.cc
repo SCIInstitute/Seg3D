@@ -883,6 +883,8 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
     state_changed_signal_.connect( boost::bind( &Viewer::redraw, this, true ) ) );
   this->add_connection( PreferencesManager::Instance()->background_color_state_->
     state_changed_signal_.connect( boost::bind( &Viewer::redraw_overlay, this, false ) ) );
+  this->add_connection( PreferencesManager::Instance()->zero_based_slice_numbers_state_->
+    state_changed_signal_.connect( boost::bind( &Viewer::redraw_overlay, this, false ) ) );
   
   this->view_mode_state_->set_session_priority( Core::StateBase::DEFAULT_LOAD_E + 1 );
 
@@ -1104,7 +1106,7 @@ bool Viewer::wheel_event( int delta, int x, int y, int buttons, int modifiers )
   if ( delta != 0 )
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-    if ( PreferencesManager::Instance()->reverse_slice_navigation_->get() )
+    if ( PreferencesManager::Instance()->reverse_slice_navigation_state_->get() )
     {
       ActionOffsetSlice::Dispatch( Core::Interface::GetMouseActionContext(),
         this->shared_from_this(), -delta );   
@@ -1146,7 +1148,7 @@ bool Viewer::key_press_event( int key, int modifiers )
       {
         Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
         int direction = 1;
-        if ( PreferencesManager::Instance()->reverse_slice_navigation_->get() ) direction = -1;
+        if ( PreferencesManager::Instance()->reverse_slice_navigation_state_->get() ) direction = -1;
       
         if ( modifiers & Core::KeyModifier::SHIFT_MODIFIER_E )
         {
@@ -1179,7 +1181,7 @@ bool Viewer::key_press_event( int key, int modifiers )
       {
         Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
         int direction = 1;
-        if ( PreferencesManager::Instance()->reverse_slice_navigation_->get() ) direction = -1;
+        if ( PreferencesManager::Instance()->reverse_slice_navigation_state_->get() ) direction = -1;
 
         if ( modifiers & Core::KeyModifier::SHIFT_MODIFIER_E )
         {

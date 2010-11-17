@@ -49,6 +49,8 @@ CORE_ACTION
   CORE_ACTION_ARGUMENT( "min_slice", "The minimum slice number to paste onto." )
   CORE_ACTION_ARGUMENT( "max_slice", "The maximum slice number to paste onto." )
   CORE_ACTION_KEY( "slot", "0", "Which clipboard slot to use." )
+  CORE_ACTION_CHANGES_PROJECT_DATA()
+  CORE_ACTION_IS_UNDOABLE()
 )
 
 public:

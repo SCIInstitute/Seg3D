@@ -138,9 +138,11 @@ void AppPreferences::setup_general_prefs()
   QtUtils::QtBridge::Connect( this->private_->ui_.advanced_visibility_checkbox_,
     PreferencesManager::Instance()->advanced_visibility_settings_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.reverse_slice_navigation_checkbox_,
-    PreferencesManager::Instance()->reverse_slice_navigation_ );
+    PreferencesManager::Instance()->reverse_slice_navigation_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.cursor_visibility_checkbox_,
     PreferencesManager::Instance()->paint_cursor_invisibility_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.zero_based_slice_numbers_,
+    PreferencesManager::Instance()->zero_based_slice_numbers_state_ );
   
 
   QtUtils::QtBridge::Connect( this->private_->ui_.enable_compression_checkbox_,

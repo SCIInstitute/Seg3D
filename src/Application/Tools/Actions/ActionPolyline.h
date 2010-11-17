@@ -51,6 +51,8 @@ CORE_ACTION
   CORE_ACTION_ARGUMENT( "slice_number", "The slice number to be painted on." )
   CORE_ACTION_ARGUMENT( "erase", "Whether to erase." )
   CORE_ACTION_ARGUMENT( "vertices", "The 2D coordinates of polyline vertices." )
+  CORE_ACTION_CHANGES_PROJECT_DATA()
+  CORE_ACTION_IS_UNDOABLE()
 )
 
 typedef Core::PointF VertexCoord;

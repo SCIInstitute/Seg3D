@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>769</width>
-    <height>673</height>
+    <width>770</width>
+    <height>721</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -408,6 +408,13 @@ border: 1px solid gray;
                </property>
               </widget>
              </item>
+             <item row="2" column="2">
+              <widget class="QCheckBox" name="zero_based_slice_numbers_">
+               <property name="text">
+                <string>Use zero based slice indices</string>
+               </property>
+              </widget>
+             </item>
             </layout>
            </widget>
           </item>
@@ -502,7 +509,20 @@ border: 1px solid gray;
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLineEdit" name="x_lineedit_"/>
+                 <widget class="QLineEdit" name="x_lineedit_">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                  <property name="baseSize">
+                   <size>
+                    <width>0</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </widget>
                 </item>
                </layout>
               </widget>
@@ -524,7 +544,14 @@ border: 1px solid gray;
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLineEdit" name="y_lineedit_"/>
+                 <widget class="QLineEdit" name="y_lineedit_">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                 </widget>
                 </item>
                </layout>
               </widget>
@@ -546,7 +573,14 @@ border: 1px solid gray;
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLineEdit" name="z_lineedit_"/>
+                 <widget class="QLineEdit" name="z_lineedit_">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                 </widget>
                 </item>
                </layout>
               </widget>
@@ -569,9 +603,6 @@ border: 1px solid gray;
           <string>Autosave:</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout">
-          <property name="spacing">
-           <number>6</number>
-          </property>
           <property name="margin">
            <number>6</number>
           </property>

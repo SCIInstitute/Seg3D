@@ -854,6 +854,9 @@ bool Renderer::render_overlay()
     bool show_picking_lines = viewer->slice_picking_visible_state_->get();
     bool show_overlay = viewer->overlay_visible_state_->get();
     bool show_slice_num = PreferencesManager::Instance()->show_slice_number_state_->get();
+    bool zero_based_slice_numbers = PreferencesManager::Instance()->
+      zero_based_slice_numbers_state_->get();
+    
     int grid_spacing = PreferencesManager::Instance()->grid_size_state_->get();
     Core::Color bkg_color = PreferencesManager::Instance()->get_background_color();
     Core::View2D view2d( static_cast< Core::StateView2D* > ( 
@@ -873,7 +876,14 @@ bool Renderer::render_overlay()
       }
       else
       {
-        ss << active_slice->get_slice_number() + 1 << " / " << active_slice->number_of_slices();
+        if ( zero_based_slice_numbers )
+        {
+          ss << active_slice->get_slice_number() << " / " << active_slice->number_of_slices();        
+        }
+        else
+        {
+          ss << active_slice->get_slice_number() + 1 << " / " << active_slice->number_of_slices();
+        }
       }
       slice_str = ss.str();
     }

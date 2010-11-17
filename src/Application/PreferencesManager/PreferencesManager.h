@@ -91,6 +91,7 @@ public:
   Core::StateRangedIntHandle grid_size_state_;
   Core::StateLabeledOptionHandle background_color_state_;
   Core::StateBoolHandle show_slice_number_state_;
+  Core::StateBoolHandle zero_based_slice_numbers_state_;
 
   //Layers Preferences
   Core::StateRangedDoubleHandle default_layer_opacity_state_;
@@ -99,7 +100,7 @@ public:
   std::vector< Core::StateColorHandle > color_states_;
 
   //Interface Controls Preferences
-  Core::StateBoolHandle reverse_slice_navigation_;
+  Core::StateBoolHandle reverse_slice_navigation_state_;
       
   //Sidebars Preferences
   Core::StateBoolHandle show_tools_bar_state_;
