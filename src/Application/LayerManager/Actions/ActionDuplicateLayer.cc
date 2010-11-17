@@ -30,8 +30,9 @@
 #include <Application/Layer/MaskLayer.h>
 #include <Application/Layer/LayerGroup.h>
 
+#include <Application/UndoBuffer/UndoBuffer.h>
 #include <Application/LayerManager/LayerManager.h>
-#include <Application/LayerManager/LayerUndoBuffer.h>
+#include <Application/LayerManager/LayerUndoBufferItem.h>
 #include <Application/LayerManager/Actions/ActionDuplicateLayer.h>
 
 // REGISTER ACTION:
@@ -105,7 +106,7 @@ bool ActionDuplicateLayer::run( Core::ActionContextHandle& context, Core::Action
   // Tell what the layer/group id counters are so we can undo those as well
   item->add_id_count_to_restore( id_count );
   // Add the complete record to the undo buffer
-  LayerUndoBuffer::Instance()->insert_undo_item( context, item );
+  UndoBuffer::Instance()->insert_undo_item( context, item );
   
   return true;
 }

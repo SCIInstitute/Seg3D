@@ -1144,7 +1144,7 @@ bool Viewer::key_press_event( int key, int modifiers )
       case Core::Key::KEY_DOWN_E:
       {
         Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-        int direction = 1.0;
+        int direction = 1;
         if ( PreferencesManager::Instance()->reverse_slice_navigation_->get() ) direction = -1;
       
         if ( modifiers & Core::KeyModifier::SHIFT_MODIFIER_E )
@@ -1167,7 +1167,7 @@ bool Viewer::key_press_event( int key, int modifiers )
       case Core::Key::KEY_UP_E:
       {
         Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-        int direction = 1.0;
+        int direction = 1;
         if ( PreferencesManager::Instance()->reverse_slice_navigation_->get() ) direction = -1;
 
         if ( modifiers & Core::KeyModifier::SHIFT_MODIFIER_E )

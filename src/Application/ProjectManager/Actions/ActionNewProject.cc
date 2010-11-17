@@ -32,7 +32,7 @@
 // Application includes
 #include <Application/ProjectManager/ProjectManager.h>
 #include <Application/LayerManager/LayerManager.h>
-#include <Application/LayerManager/LayerUndoBuffer.h>
+#include <Application/UndoBuffer/UndoBuffer.h>
 #include <Application/ToolManager/ToolManager.h>
 #include <Application/ProjectManager/Actions/ActionNewProject.h>
 
@@ -73,7 +73,7 @@ bool ActionNewProject::run( Core::ActionContextHandle& context,
   }
   
   // Clear undo buffer
-  LayerUndoBuffer::Instance()->reset_undo_buffer();
+  UndoBuffer::Instance()->reset_undo_buffer();
   
   return true;
 }

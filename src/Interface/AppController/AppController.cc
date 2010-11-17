@@ -36,7 +36,7 @@
 #include <Core/Interface/Interface.h>
 
 // Applications
-#include <Application/LayerManager/LayerUndoBuffer.h>
+#include <Application/UndoBuffer/UndoBuffer.h>
 
 // QtUtils includes
 #include <QtUtils/Bridge/QtBridge.h>
@@ -162,7 +162,7 @@ AppController::AppController( QWidget* parent ) :
   this->add_connection( Core::Log::Instance()->post_log_signal_.connect( 
     boost::bind( &AppController::UpdateLogHistory, controller, true, _1, _2 ) ) );
 
-  this->add_connection( LayerUndoBuffer::Instance()->buffer_changed_signal_.connect(
+  this->add_connection( UndoBuffer::Instance()->buffer_changed_signal_.connect(
     boost::bind( &AppController::UpdateUndoBuffer, controller ) ) );
 
   // Step 6: Qt connections

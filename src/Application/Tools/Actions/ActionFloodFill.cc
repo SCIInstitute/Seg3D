@@ -37,7 +37,8 @@
 #include <Application/Tools/Actions/ActionFloodFill.h>
 #include <Application/Layer/MaskLayer.h>
 #include <Application/LayerManager/LayerManager.h>
-#include <Application/LayerManager/LayerUndoBuffer.h>
+#include <Application/UndoBuffer/UndoBuffer.h>
+#include <Application/LayerManager/LayerUndoBufferItem.h>
 
 CORE_REGISTER_ACTION( Seg3D, FloodFill )
 
@@ -298,7 +299,7 @@ bool ActionFloodFill::run( Core::ActionContextHandle& context, Core::ActionResul
     item->add_layer_to_restore( layer, check_point );
 
     // Now add the undo/redo action to undo buffer
-    LayerUndoBuffer::Instance()->insert_undo_item( context, item );
+    UndoBuffer::Instance()->insert_undo_item( context, item );
   }
 
   {

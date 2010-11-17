@@ -26,12 +26,10 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Application/Layer/Layer.h>
-#include <Application/LayerManager/LayerManager.h>
-#include <Application/LayerManager/LayerUndoBuffer.h>
+#include <Core/Action/ActionDispatcher.h>
 
-#include <Application/LayerManager/Actions/ActionUndo.h>
-
+#include <Application/UndoBuffer/UndoBuffer.h>
+#include <Application/UndoBuffer/Actions/ActionUndo.h>
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
@@ -43,7 +41,7 @@ namespace Seg3D
 
 bool ActionUndo::validate( Core::ActionContextHandle& context )
 {
-  if ( ! ( LayerUndoBuffer::Instance()->has_undo() ) )
+  if ( ! ( UndoBuffer::Instance()->has_undo() ) )
   {
     context->report_error( "No action to undo." );
     return false;
@@ -55,7 +53,7 @@ bool ActionUndo::validate( Core::ActionContextHandle& context )
 bool ActionUndo::run( Core::ActionContextHandle& context, 
   Core::ActionResultHandle& result )
 {
-  return LayerUndoBuffer::Instance()->undo( context );
+  return UndoBuffer::Instance()->undo( context );
 }
 
 Core::ActionHandle ActionUndo::Create()

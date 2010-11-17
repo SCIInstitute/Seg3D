@@ -51,9 +51,9 @@
 #include <Application/ProjectManager/Actions/ActionLoadProject.h>
 #include <Application/Tools/Actions/ActionCopy.h>
 #include <Application/Tools/Actions/ActionPaste.h>
-#include <Application/LayerManager/Actions/ActionUndo.h>
-#include <Application/LayerManager/Actions/ActionRedo.h>
-#include <Application/LayerManager/LayerUndoBuffer.h>
+#include <Application/UndoBuffer/UndoBuffer.h>
+#include <Application/UndoBuffer/Actions/ActionRedo.h>
+#include <Application/UndoBuffer/Actions/ActionUndo.h>
 
 // QtUtils includes
 #include <QtUtils/Utils/QtPointer.h>
@@ -222,13 +222,13 @@ void AppMenu::create_edit_menu( QMenu* qmenu )
   this->paste_qaction_->setEnabled( false );
 
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-  this->update_undo_tag( LayerUndoBuffer::Instance()->get_undo_tag() );
-  this->update_redo_tag( LayerUndoBuffer::Instance()->get_redo_tag() );
+  this->update_undo_tag( UndoBuffer::Instance()->get_undo_tag() );
+  this->update_redo_tag( UndoBuffer::Instance()->get_redo_tag() );
 
-  this->add_connection( LayerUndoBuffer::Instance()->update_undo_tag_signal_.connect(
+  this->add_connection( UndoBuffer::Instance()->update_undo_tag_signal_.connect(
     boost::bind( &AppMenu::UpdateUndoTag, qpointer_type( this ), _1 ) ) );  
 
-  this->add_connection( LayerUndoBuffer::Instance()->update_redo_tag_signal_.connect(
+  this->add_connection( UndoBuffer::Instance()->update_redo_tag_signal_.connect(
     boost::bind( &AppMenu::UpdateRedoTag, qpointer_type( this ), _1 ) ) );  
 
 }

@@ -26,30 +26,33 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_LAYERMANAGER_LAYERUNDOBUFFER_H
-#define APPLICATION_LAYERMANAGER_LAYERUNDOBUFFER_H
+#ifndef APPLICATION_UNDOBUFFER_UNDOBUFFER_H
+#define APPLICATION_UNDOBUFFER_UNDOBUFFER_H
+
+// Core includes
+#include <Core/Utils/ConnectionHandler.h>
 
 // Application includes
-#include <Application/LayerManager/LayerUndoBufferItem.h>
+#include <Application/UndoBuffer/UndoBufferItem.h>
 
 namespace Seg3D
 {
 
-// LayerUndoBuffer
+// UndoBuffer
 // This singleton class keeps a list of the actions that can be undone or redone.
 
-// Internals for the LayerUndoBuffer singleton
-class LayerUndoBufferPrivate;
-typedef boost::shared_ptr<LayerUndoBufferPrivate> LayerUndoBufferPrivateHandle;
+// Internals for the UndoBuffer singleton
+class UndoBufferPrivate;
+typedef boost::shared_ptr< UndoBufferPrivate > UndoBufferPrivateHandle;
 
-class LayerUndoBuffer : public Core::ConnectionHandler
+class UndoBuffer : private Core::ConnectionHandler
 {
-  CORE_SINGLETON( LayerUndoBuffer );
+  CORE_SINGLETON( UndoBuffer );
 
   // -- Constructor/Destructor --
 private:
-  LayerUndoBuffer();
-  virtual ~LayerUndoBuffer();
+  UndoBuffer();
+  virtual ~UndoBuffer();
 
   // -- undo interface --
 public:
@@ -59,7 +62,7 @@ public:
   // NOTE: The action context is needed to verify whether it is inserted from the undo buffer
   // itself or whether the undo item was created in a normal action.
   void insert_undo_item( Core::ActionContextHandle context, 
-    LayerUndoBufferItemHandle undo_item );
+    UndoBufferItemHandle undo_item );
 
   // UNDO:
   // Undo the top item of the stack
@@ -131,7 +134,7 @@ public:
   // -- internals --
 private:
   // Handle to internals
-  LayerUndoBufferPrivateHandle private_;
+  UndoBufferPrivateHandle private_;
 };
 
 } // end namespace Seg3D

@@ -62,6 +62,14 @@ ClipboardItem::~ClipboardItem()
 {
 }
 
+ClipboardItemHandle ClipboardItem::clone() const
+{
+  ClipboardItem* cpy = new ClipboardItem( this->private_->width_, 
+    this->private_->height_, this->private_->data_type_ );
+  cpy->private_->buffer_ = this->private_->buffer_;
+  return ClipboardItemHandle( cpy );
+}
+
 size_t ClipboardItem::get_width() const
 {
   return this->private_->width_;

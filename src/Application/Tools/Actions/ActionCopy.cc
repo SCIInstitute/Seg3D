@@ -30,9 +30,11 @@
 #include <Core/Volume/MaskVolumeSlice.h>
 
 #include <Application/Clipboard/Clipboard.h>
+#include <Application/Clipboard/ClipboardUndoBufferItem.h>
 #include <Application/Tools/Actions/ActionCopy.h>
 #include <Application/Layer/MaskLayer.h>
 #include <Application/LayerManager/LayerManager.h>
+#include <Application/UndoBuffer/UndoBuffer.h>
 #include <Application/ViewerManager/ViewerManager.h>
 
 CORE_REGISTER_ACTION( Seg3D, Copy )
@@ -150,6 +152,18 @@ bool ActionCopy::validate( Core::ActionContextHandle& context )
 
 bool ActionCopy::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
+  ClipboardItemConstHandle old_item = Clipboard::Instance()->get_item( 
+    this->private_->slot_number_.value() );
+  ClipboardItemHandle checkpoint;
+  if ( old_item )
+  {
+    checkpoint = old_item->clone();
+  }
+  ClipboardUndoBufferItemHandle undo_item( new ClipboardUndoBufferItem( "Copy",
+    checkpoint, this->private_->slot_number_.value() ) );
+  undo_item->set_redo_action( this->shared_from_this() );
+  UndoBuffer::Instance()->insert_undo_item( context, undo_item );
+  
   size_t nx = this->private_->vol_slice_->nx();
   size_t ny = this->private_->vol_slice_->ny();
 

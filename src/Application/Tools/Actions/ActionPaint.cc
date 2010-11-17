@@ -33,7 +33,7 @@
 #include <Application/Layer/MaskLayer.h>
 #include <Application/Layer/DataLayer.h>
 #include <Application/LayerManager/LayerManager.h>
-#include <Application/LayerManager/LayerUndoBuffer.h>
+#include <Application/UndoBuffer/UndoBuffer.h>
 #include <Application/LayerManager/LayerUndoBufferItem.h>
 
 CORE_REGISTER_ACTION( Seg3D, Paint )
@@ -221,12 +221,12 @@ bool ActionPaint::run( Core::ActionContextHandle& context, Core::ActionResultHan
     this->private_->target_layer_id_.value() );
   Core::SliceType slice_type = static_cast<Core::SliceType::enum_type>( 
     this->private_->slice_type_.value() );
-  int index = this->private_->slice_number_.value();
+  int index = static_cast< int >( this->private_->slice_number_.value() );
   
   LayerCheckPointHandle check_point( new LayerCheckPoint( layer, slice_type, index ) );
   item->add_layer_to_restore( layer, check_point );
 
-  LayerUndoBuffer::Instance()->insert_undo_item( context, item );
+  UndoBuffer::Instance()->insert_undo_item( context, item );
 
   // Painting will already have been done by the interface
   if ( context->source() == Core::ActionSource::INTERFACE_MOUSE_E ) return true;

@@ -33,9 +33,9 @@
 #include <Application/Tools/Actions/ActionPaste.h>
 #include <Application/Layer/MaskLayer.h>
 #include <Application/LayerManager/LayerManager.h>
-#include <Application/LayerManager/LayerUndoBuffer.h>
+#include <Application/LayerManager/LayerUndoBufferItem.h>
+#include <Application/UndoBuffer/UndoBuffer.h>
 #include <Application/ViewerManager/ViewerManager.h>
-
 
 CORE_REGISTER_ACTION( Seg3D, Paste )
 
@@ -207,7 +207,7 @@ bool ActionPaste::run( Core::ActionContextHandle& context, Core::ActionResultHan
   item->add_layer_to_restore( layer, check_point );
 
   // Now add the undo/redo action to undo buffer
-  LayerUndoBuffer::Instance()->insert_undo_item( context, item );
+  UndoBuffer::Instance()->insert_undo_item( context, item );
 
   Core::MaskVolumeSliceHandle volume_slice = this->private_->vol_slice_;
   ClipboardItemConstHandle clipboard_item = Clipboard::Instance()->get_item( 

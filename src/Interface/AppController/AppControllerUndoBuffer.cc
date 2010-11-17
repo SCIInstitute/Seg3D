@@ -27,7 +27,7 @@
  */
 
 // Application includes
-#include <Application/LayerManager/LayerUndoBuffer.h>
+#include <Application/UndoBuffer/UndoBuffer.h>
 
 // Interface includes
 #include <Interface/AppController/AppControllerUndoBuffer.h>
@@ -46,7 +46,7 @@ AppControllerUndoBuffer::~AppControllerUndoBuffer()
 
 int AppControllerUndoBuffer::rowCount( const QModelIndex& ) const
 {
-  return static_cast< int > ( LayerUndoBuffer::Instance()->num_undo_items() );
+  return static_cast< int > ( UndoBuffer::Instance()->num_undo_items() );
 }
 
 int AppControllerUndoBuffer::columnCount( const QModelIndex& ) const
@@ -64,17 +64,17 @@ QVariant AppControllerUndoBuffer::data( const QModelIndex& index, int role ) con
   }
   else if ( role == Qt::DisplayRole )
   {
-    int sz = static_cast< int > ( LayerUndoBuffer::Instance()->num_undo_items() );
+    int sz = static_cast< int > ( UndoBuffer::Instance()->num_undo_items() );
     if ( index.row() < sz )
     {
       if ( index.column() == 0 )
       {
-        return ( QString::fromStdString( LayerUndoBuffer::Instance()->
+        return ( QString::fromStdString( UndoBuffer::Instance()->
           get_undo_tag( index.row() ) ) );
       }
       else if ( index.column() == 1 )
       {
-        return ( QString::number( LayerUndoBuffer::Instance()->
+        return ( QString::number( UndoBuffer::Instance()->
           get_undo_byte_size( index.row() ) ) );
       }
     }

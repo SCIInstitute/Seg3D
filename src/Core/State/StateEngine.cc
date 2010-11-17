@@ -254,13 +254,14 @@ void StateEngine::set_next_statehandler_count( const std::string& stateid, size_
   {
     Core::AtomicCounterHandle state_handler_counter;
     state_handler_counter = Core::AtomicCounterHandle( 
-      new Core::AtomicCounter( count ) );
+      new Core::AtomicCounter( static_cast< long >( count ) ) );
     this->private_->state_handler_counter_map_.insert( 
       state_handler_counter_map_type::value_type( stateid, state_handler_counter  ) );
   }
   else
   {
-    ( *it ).second = Core::AtomicCounterHandle( new Core::AtomicCounter( count ) );
+    ( *it ).second = Core::AtomicCounterHandle( new Core::AtomicCounter( 
+      static_cast< long >( count ) ) );
   }
 }
 

@@ -56,6 +56,11 @@ public:
   ~ClipboardItem();
 
 public:
+
+  // CLONE:
+  // Make a copy of the item.
+  ClipboardItemHandle clone() const;
+
   // GET_WIDTH:
   // Returns the width of the buffer.
   size_t get_width() const;

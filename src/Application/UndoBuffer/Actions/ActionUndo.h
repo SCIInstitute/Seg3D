@@ -26,57 +26,46 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_CLIPBOARD_CLIPBOARD_H
-#define APPLICATION_CLIPBOARD_CLIPBOARD_H
+#ifndef APPLICATION_UNDOBUFFER_ACTIONS_ACTIONUNDO_H
+#define APPLICATION_UNDOBUFFER_ACTIONS_ACTIONUNDO_H
 
-#include <boost/utility.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/signals2.hpp>
-
-#include <Core/Utils/Singleton.h>
-
-#include <Application/Clipboard/ClipboardItem.h>
+#include <Core/Action/Actions.h>
 
 namespace Seg3D
 {
 
-// Forward declarations
-class ClipboardPrivate;
-typedef boost::shared_ptr< ClipboardPrivate > ClipboardPrivateHandle;
-
-class Clipboard : public boost::noncopyable
+class ActionUndo : public Core::Action
 {
-  CORE_SINGLETON( Clipboard );
   
-private:
-  Clipboard();
-  ~Clipboard();
+CORE_ACTION(
+  CORE_ACTION_TYPE( "Undo", "Undo a layer action." )
+  CORE_ACTION_CHANGES_PROJECT_DATA()
+)
 
+  // -- Constructor/Destructor --
 public:
-  // GET_ITEM:
-  // Get the current item stored at slot index.
-  ClipboardItemConstHandle get_item( size_t index = 0 );
+  ActionUndo()
+  {
+  }
 
-  // GET_ITEM:
-  // Create a new item with the specified width, height, and data type at the slot
-  // index, and return a handle to it.
-  ClipboardItemHandle get_item( size_t width, size_t height, 
-    Core::DataType data_type, size_t index = 0 );
+  virtual ~ActionUndo()
+  {
+  }
 
-  // NUMBER_OF_SLOTS:
-  // Return the number of storage slots in the clipboard.
-  size_t number_of_slots();
+  // -- Functions that describe action --
+public:
+  virtual bool validate( Core::ActionContextHandle& context );
+  virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
+  
+public:
+  
+  // CREATE:
+  // Create an action that activates a layer
+  static Core::ActionHandle Create();
 
-private:
-  friend class ClipboardUndoBufferItem;
-
-  // SET_ITEM:
-  // Set the item stored at the specified slot.
-  void set_item( ClipboardItemHandle item, size_t index = 0 );
-
-private:
-  ClipboardPrivateHandle private_;
-
+  // DISPATCH:
+  // Dispatch an action that activates a layer
+  static void Dispatch( Core::ActionContextHandle context );
 };
 
 } // end namespace Seg3D

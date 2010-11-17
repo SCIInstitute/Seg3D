@@ -41,8 +41,6 @@ SET(APPLICATION_LAYERMANAGER_SRCS
   LayerCheckPoint.cc
   LayerUndoBufferItem.h
   LayerUndoBufferItem.cc
-  LayerUndoBuffer.h
-  LayerUndoBuffer.cc
   LayerAction.h
   LayerAction.cc
 )
@@ -72,10 +70,6 @@ SET(APPLICATION_LAYERMANAGER_ACTIONS_SRCS
   Actions/ActionNewMaskLayer.cc
   Actions/ActionDuplicateLayer.h
   Actions/ActionDuplicateLayer.cc
-  Actions/ActionRedo.h
-  Actions/ActionRedo.cc
-  Actions/ActionUndo.h
-  Actions/ActionUndo.cc
 )
 
 
@@ -89,6 +83,7 @@ TARGET_LINK_LIBRARIES(Application_LayerManager
                       Core_Interface
                       Core_Action
                       Core_State
+            Application_UndoBuffer
                       Application_Layer
                       ${SCI_BOOST_LIBRARY})
 

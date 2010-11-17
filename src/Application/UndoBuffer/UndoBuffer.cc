@@ -33,27 +33,26 @@
 #include <Core/Action/ActionContextContainer.h>
 
 // Application includes
-#include <Application/LayerManager/LayerUndoBuffer.h>
-#include <Application/LayerManager/LayerManager.h>
+#include <Application/UndoBuffer/UndoBuffer.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
 
 namespace Seg3D
 {
 
-CORE_SINGLETON_IMPLEMENTATION( LayerUndoBuffer );
+CORE_SINGLETON_IMPLEMENTATION( UndoBuffer );
 
 // Container class for an action context that forwards every call except the call to the source
 // which is overloaded with a tag that the call is made from the undo buffer.
 
-class LayerUndoActionContext : public Core::ActionContextContainer
+class UndoActionContext : public Core::ActionContextContainer
 {
 public:
-  LayerUndoActionContext( Core::ActionContextHandle context ) :
+  UndoActionContext( Core::ActionContextHandle context ) :
     Core::ActionContextContainer( context )
   {
   }
   
-  virtual ~LayerUndoActionContext() {}
+  virtual ~UndoActionContext() {}
 
   virtual Core::ActionSource source() const
   {
@@ -61,12 +60,12 @@ public:
   }
 };
 
-class LayerUndoBufferPrivate
+class UndoBufferPrivate
 {
 
 public:
-  typedef std::deque< LayerUndoBufferItemHandle > undo_list_type;
-  typedef std::deque< LayerUndoBufferItemHandle > redo_list_type;
+  typedef std::deque< UndoBufferItemHandle > undo_list_type;
+  typedef std::deque< UndoBufferItemHandle > redo_list_type;
   
   // List of items on the undo stack
   undo_list_type undo_list_;
@@ -74,14 +73,14 @@ public:
   // List of items on the redo stack
   redo_list_type redo_list_;
   
-  LayerUndoBuffer* buffer_;
+  UndoBuffer* buffer_;
   long long max_mem_;
   
   void handle_enable( bool enable );
 };
 
 
-void LayerUndoBufferPrivate::handle_enable( bool enable )
+void UndoBufferPrivate::handle_enable( bool enable )
 {
   if ( enable == false )
   {
@@ -89,24 +88,25 @@ void LayerUndoBufferPrivate::handle_enable( bool enable )
   }
 }
 
-LayerUndoBuffer::LayerUndoBuffer() :
-  private_( new LayerUndoBufferPrivate )
+UndoBuffer::UndoBuffer() :
+  private_( new UndoBufferPrivate )
 {
   this->private_->buffer_ = this;
-  this->private_->max_mem_ = Core::Application::Instance()->get_total_addressable_physical_memory();
+  this->private_->max_mem_ = Core::Application::Instance()->
+    get_total_addressable_physical_memory();
   
   this->add_connection( PreferencesManager::Instance()->enable_undo_state_->
     value_changed_signal_.connect( boost::bind( 
-      &LayerUndoBufferPrivate::handle_enable, this->private_, _1 ) ) );
+    &UndoBufferPrivate::handle_enable, this->private_, _1 ) ) );
 }
 
-LayerUndoBuffer::~LayerUndoBuffer()
+UndoBuffer::~UndoBuffer()
 {
   this->disconnect_all();
 }
 
-void LayerUndoBuffer::insert_undo_item( Core::ActionContextHandle context, 
-  LayerUndoBufferItemHandle undo_item )
+void UndoBuffer::insert_undo_item( Core::ActionContextHandle context, 
+  UndoBufferItemHandle undo_item )
 {
   undo_item->compute_size();
 
@@ -125,8 +125,8 @@ void LayerUndoBuffer::insert_undo_item( Core::ActionContextHandle context,
   // Get the size of the element
   size_t size = undo_item->get_byte_size();
 
-  LayerUndoBufferPrivate::undo_list_type::iterator it = this->private_->undo_list_.begin();
-  LayerUndoBufferPrivate::undo_list_type::iterator it_end = this->private_->undo_list_.end();
+  UndoBufferPrivate::undo_list_type::iterator it = this->private_->undo_list_.begin();
+  UndoBufferPrivate::undo_list_type::iterator it_end = this->private_->undo_list_.end();
 
   while ( it != it_end )
   {
@@ -142,7 +142,7 @@ void LayerUndoBuffer::insert_undo_item( Core::ActionContextHandle context,
   this->buffer_changed_signal_();
 }
 
-bool LayerUndoBuffer::undo( Core::ActionContextHandle context )
+bool UndoBuffer::undo( Core::ActionContextHandle context )
 {
   if ( this->private_->undo_list_.empty() )
   {
@@ -152,7 +152,7 @@ bool LayerUndoBuffer::undo( Core::ActionContextHandle context )
 
   // This function removes the first item from the undo buffer
   // and reapplies it. 
-  LayerUndoBufferItemHandle undo_item;
+  UndoBufferItemHandle undo_item;
   undo_item = this->private_->undo_list_.front();
   this->private_->undo_list_.pop_front();
 
@@ -175,7 +175,7 @@ bool LayerUndoBuffer::undo( Core::ActionContextHandle context )
   return true;
 }
 
-bool LayerUndoBuffer::redo( Core::ActionContextHandle context )
+bool UndoBuffer::redo( Core::ActionContextHandle context )
 {
   if ( this->private_->redo_list_.empty() )
   {
@@ -185,11 +185,11 @@ bool LayerUndoBuffer::redo( Core::ActionContextHandle context )
   
   // This function removes the first item from the undo buffer
   // and reapplies it. 
-  LayerUndoBufferItemHandle redo_item;
+  UndoBufferItemHandle redo_item;
   redo_item = this->private_->redo_list_.front();
   this->private_->redo_list_.pop_front();
   
-  Core::ActionContextHandle undo_context( new LayerUndoActionContext( context ) );
+  Core::ActionContextHandle undo_context( new UndoActionContext( context ) );
   redo_item->apply_redo( undo_context );
 
   // Update the entries in the menu
@@ -200,7 +200,7 @@ bool LayerUndoBuffer::redo( Core::ActionContextHandle context )
   return true;
 }
 
-void LayerUndoBuffer::reset_undo_buffer()
+void UndoBuffer::reset_undo_buffer()
 {
   this->private_->redo_list_.clear();
   this->private_->undo_list_.clear();
@@ -210,7 +210,7 @@ void LayerUndoBuffer::reset_undo_buffer()
   this->buffer_changed_signal_();
 }
 
-std::string LayerUndoBuffer::get_undo_tag( size_t index ) const
+std::string UndoBuffer::get_undo_tag( size_t index ) const
 {
   // Extract the first item from the undo list and get its tag
   if ( index < this->private_->undo_list_.size() )
@@ -224,7 +224,7 @@ std::string LayerUndoBuffer::get_undo_tag( size_t index ) const
   }
 }
 
-std::string LayerUndoBuffer::get_redo_tag( size_t index ) const
+std::string UndoBuffer::get_redo_tag( size_t index ) const
 {
   // Extract the first item from the undo list and get its tag
   if ( index < this->private_->redo_list_.size() )
@@ -238,7 +238,7 @@ std::string LayerUndoBuffer::get_redo_tag( size_t index ) const
   }
 }
 
-size_t LayerUndoBuffer::get_undo_byte_size( size_t index ) const
+size_t UndoBuffer::get_undo_byte_size( size_t index ) const
 {
   // Extract the first item from the undo list and get its tag
   if ( index < this->private_->undo_list_.size() )
@@ -252,7 +252,7 @@ size_t LayerUndoBuffer::get_undo_byte_size( size_t index ) const
   }
 }
 
-size_t LayerUndoBuffer::get_redo_byte_size( size_t index ) const
+size_t UndoBuffer::get_redo_byte_size( size_t index ) const
 {
   // Extract the first item from the redo list and get its tag
   if ( index < this->private_->redo_list_.size() )
@@ -266,26 +266,25 @@ size_t LayerUndoBuffer::get_redo_byte_size( size_t index ) const
   }
 }
 
-bool LayerUndoBuffer::has_undo() const
+bool UndoBuffer::has_undo() const
 {
   return ! ( this->private_->undo_list_.empty() );
 }
 
-bool LayerUndoBuffer::has_redo() const
+bool UndoBuffer::has_redo() const
 {
   return ! ( this->private_->redo_list_.empty() );
 }
 
-size_t LayerUndoBuffer::num_undo_items()
+size_t UndoBuffer::num_undo_items()
 {
   return this->private_->undo_list_.size();
 }
 
-size_t LayerUndoBuffer::num_redo_items()
+size_t UndoBuffer::num_redo_items()
 {
   return this->private_->redo_list_.size();
 }
-
 
 } // end namespace Seg3D
 

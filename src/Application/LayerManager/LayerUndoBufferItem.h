@@ -33,6 +33,7 @@
 #include <Core/Action/Action.h>
 
 // Application includes
+#include <Application/UndoBuffer/UndoBufferItem.h>
 #include <Application/Layer/Layer.h>
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/LayerManager/LayerCheckPoint.h>
@@ -48,7 +49,7 @@ typedef boost::shared_ptr<LayerUndoBufferItemPrivate> LayerUndoBufferItemPrivate
 
 
 // Class that describes all the steps that need to be undertaken to undo a layer action.
-class LayerUndoBufferItem 
+class LayerUndoBufferItem : public UndoBufferItem
 {
 
   // -- constructor/destructor --
@@ -58,10 +59,6 @@ public:
 
   // -- creation of undo/redo action --
 public:
-  // SET_REDO_ACTION:
-  // Set a redo action for undoing the undo
-  // NOTE: This is general the action that inserts the undo step onto the queue
-  void set_redo_action( Core::ActionHandle action );
   
   // ADD_FILTER_TO_ABORT:
   // This adds a base filter weak handle to the process that will compute the
@@ -89,32 +86,24 @@ public:
 
   // -- apply undo/redo action --
 public:
-  // APPLY_REDO:
-  // Apply the redo information
-  bool apply_redo( Core::ActionContextHandle& context );
 
   // APPLY_AND_CLEAR_UNDO:
   // Apply the undo information
-  bool apply_and_clear_undo();
+  virtual bool apply_and_clear_undo();
 
   // -- size information --
 public:
   // GET_BYTE_SIZE:
   // The size of the item in memory ( approximately )
-  size_t get_byte_size() const;
+  virtual size_t get_byte_size() const;
 
   // COMPUTE_SIZE:
   // Compute the size of the item
-  void compute_size();
-
-  // GET_TAG:
-  // Tag that appears in the menu for this item
-  std::string get_tag() const;
+  virtual void compute_size();
 
   // -- internals --
 private:
   LayerUndoBufferItemPrivateHandle private_;
-  
 };
 
 } // end namespace Seg3D

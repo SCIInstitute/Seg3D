@@ -33,7 +33,8 @@
 #include <Application/Tools/Actions/ActionPolyline.h>
 #include <Application/Layer/MaskLayer.h>
 #include <Application/LayerManager/LayerManager.h>
-#include <Application/LayerManager/LayerUndoBuffer.h>
+#include <Application/LayerManager/LayerUndoBufferItem.h>
+#include <Application/UndoBuffer/UndoBuffer.h>
 
 CORE_REGISTER_ACTION( Seg3D, Polyline )
 
@@ -237,7 +238,7 @@ bool ActionPolyline::run( Core::ActionContextHandle& context, Core::ActionResult
     item->add_layer_to_restore( layer, check_point );
 
     // Now add the undo/redo action to undo buffer
-    LayerUndoBuffer::Instance()->insert_undo_item( context, item );
+    UndoBuffer::Instance()->insert_undo_item( context, item );
   }
 
   // Otherwise, do a scanline fill in the overlapped region

@@ -272,12 +272,12 @@ void ProjectManager::save_project( bool autosave /*= false*/, std::string sessio
         this->current_project_->project_name_state_->get() );
     }
   }
-  catch( std::exception& exp )
+  catch( std::exception& )
   {
     StatusBar::Instance()->set_message( Core::LogMessageType::MESSAGE_E, 
       "Autosave FAILED" );
   } 
-  catch( Core::Exception& exp )
+  catch( Core::Exception& )
   {
     StatusBar::Instance()->set_message( Core::LogMessageType::MESSAGE_E, 
       "Autosave FAILED" );

@@ -26,49 +26,53 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_LAYERMANAGER_ACTIONS_ACTIONUNDO_H
-#define APPLICATION_LAYERMANAGER_ACTIONS_ACTIONUNDO_H
+#ifndef APPLICATION_CLIPBOARD_CLIPBOARDUNDOBUFFERITEM_H
+#define APPLICATION_CLIPBOARD_CLIPBOARDUNDOBUFFERITEM_H
 
-#include <Core/Action/Actions.h>
-#include <Core/Interface/Interface.h>
-
-#include <Application/Layer/LayerFWD.h>
+// Application includes
+#include <Application/Clipboard/ClipboardItem.h>
+#include <Application/UndoBuffer/UndoBufferItem.h>
 
 namespace Seg3D
 {
 
-class ActionUndo : public Core::Action
+// Forward declarations
+class ClipboardUndoBufferItem;
+class ClipboardUndoBufferItemPrivate;
+typedef boost::shared_ptr<ClipboardUndoBufferItem> ClipboardUndoBufferItemHandle;
+typedef boost::shared_ptr<ClipboardUndoBufferItemPrivate> ClipboardUndoBufferItemPrivateHandle;
+
+
+// Class that describes all the steps that need to be undertaken to undo a clipboard action.
+class ClipboardUndoBufferItem : public UndoBufferItem
 {
-  
-CORE_ACTION(
-  CORE_ACTION_TYPE( "Undo", "Undo a layer action.")
-  CORE_ACTION_CHANGES_PROJECT_DATA()
-)
 
-  // -- Constructor/Destructor --
+  // -- constructor/destructor --
 public:
-  ActionUndo()
-  {
-  }
+  ClipboardUndoBufferItem( const std::string& tag, 
+    ClipboardItemHandle clipboard_item, size_t slot );
+  virtual ~ClipboardUndoBufferItem();
 
-  virtual ~ActionUndo()
-  {
-  }
-
-  // -- Functions that describe action --
+  // -- apply undo/redo action --
 public:
-  virtual bool validate( Core::ActionContextHandle& context );
-  virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
-  
-public:
-  
-  // CREATE:
-  // Create an action that activates a layer
-  static Core::ActionHandle Create();
 
-  // DISPATCH:
-  // Dispatch an action that activates a layer
-  static void Dispatch( Core::ActionContextHandle context );
+  // APPLY_AND_CLEAR_UNDO:
+  // Apply the undo information
+  virtual bool apply_and_clear_undo();
+
+  // -- size information --
+public:
+  // GET_BYTE_SIZE:
+  // The size of the item in memory ( approximately )
+  virtual size_t get_byte_size() const;
+
+  // COMPUTE_SIZE:
+  // Compute the size of the item
+  virtual void compute_size();
+
+  // -- internals --
+private:
+  ClipboardUndoBufferItemPrivateHandle private_;
 };
 
 } // end namespace Seg3D

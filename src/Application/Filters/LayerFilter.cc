@@ -35,7 +35,7 @@
  
 // Application includes
 #include <Application/LayerManager/LayerManager.h>
-#include <Application/LayerManager/LayerUndoBuffer.h>
+#include <Application/UndoBuffer/UndoBuffer.h>
 #include <Application/LayerManager/LayerUndoBufferItem.h>
 #include <Application/Filters/LayerFilter.h>
 #include <Application/Filters/LayerFilterLock.h>
@@ -575,7 +575,7 @@ bool LayerFilter::create_undo_redo_record( Core::ActionContextHandle context, Co
   item->add_id_count_to_restore( this->private_->id_count_ );
   
   // Insert the record into the undo buffer
-  LayerUndoBuffer::Instance()->insert_undo_item( context, item );
+  UndoBuffer::Instance()->insert_undo_item( context, item );
 
   return true;
 }

@@ -34,10 +34,7 @@ namespace Seg3D
 
 class LayerUndoBufferItemPrivate
 {
-public:
-  // -- tag for the menu --
-  std::string tag_;
-  
+public: 
   // -- Which filters need to be stopped --
   std::vector< LayerAbstractFilterWeakHandle > layer_filters_to_abort_;
   
@@ -49,9 +46,6 @@ public:
 
   // -- Which layers need to be restored --
   std::vector< std::pair<LayerHandle, LayerCheckPointHandle > > layers_to_restore_;
-
-  // An action can always be redone by executing the action again 
-  Core::ActionHandle redo_action_;
   
   // The count of the id of a layer, this one has to be roled back in case of undo
   LayerManager::id_count_type id_count_;
@@ -61,20 +55,15 @@ public:
 };
 
 LayerUndoBufferItem::LayerUndoBufferItem( const std::string& tag ) :
+  UndoBufferItem( tag ),
   private_( new LayerUndoBufferItemPrivate )
 {
-  this->private_->tag_ = tag;
   this->private_->size_ = 0;
   this->private_->id_count_ = LayerManager::GetLayerInvalidIdCount();
 }
 
 LayerUndoBufferItem::~LayerUndoBufferItem()
 {
-}
-
-void LayerUndoBufferItem::set_redo_action( Core::ActionHandle action )
-{
-  this->private_->redo_action_ = action;
 }
 
 void LayerUndoBufferItem::add_filter_to_abort( LayerAbstractFilterHandle filter )
@@ -96,34 +85,6 @@ void LayerUndoBufferItem::add_layer_to_restore( LayerHandle layer,
   LayerCheckPointHandle checkpoint )
 {
   this->private_->layers_to_restore_.push_back( std::make_pair( layer, checkpoint ) );
-}
-
-bool LayerUndoBufferItem::apply_redo( Core::ActionContextHandle& context )
-{
-  // Clear the redo cache, which records the current identifier counters
-  this->private_->redo_action_->clear_redo_cache( context );
-
-  // Validate the action. It should validate, but if it doesn't it should fail
-  // gracefully. Hence we check anyway.
-  if ( !( this->private_->redo_action_->validate( context ) ) )
-  {
-    return false;
-  }
-  
-  // Run the action. Make the changes to the state engine.
-  // NOTE: We do not use the result yet
-  // TODO: Need to implent result handling 
-  // --JGS
-  
-  Core::ActionResultHandle result;
-  if ( !( this->private_->redo_action_->run( context, result ) ) )
-  {
-    return false;
-  }
-  
-  this->private_->redo_action_->clear_cache();
-  
-  return true;
 }
 
 bool LayerUndoBufferItem::apply_and_clear_undo()
@@ -239,7 +200,7 @@ bool LayerUndoBufferItem::apply_and_clear_undo()
   // Remove the layers from the undo mechanism so the program can actually delete them afterwards
   this->private_->layers_to_add_.clear(); 
   
-  // The counters need to be roled back so when redo is done, it actually redos the same action
+  // The counters need to be rolled back so when redo is done, it actually redos the same action
   // resulting in the same counters. This only needs to be done if layers got created and deleted
   // in the undo.
   
@@ -272,16 +233,9 @@ void LayerUndoBufferItem::compute_size()
   this->private_->size_ = size;
 }
 
-
-std::string LayerUndoBufferItem::get_tag() const
-{
-  return this->private_->tag_;
-}
-
 void LayerUndoBufferItem::add_id_count_to_restore( LayerManager::id_count_type id_count )
 {
     this->private_->id_count_ = id_count;
 }
-
 
 } // end namespace Seg3D

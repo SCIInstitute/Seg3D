@@ -28,7 +28,7 @@
 
 #include <Application/ProjectManager/ProjectManager.h>
 #include <Application/ProjectManager/Actions/ActionLoadSession.h>
-#include <Application/LayerManager/LayerUndoBuffer.h>
+#include <Application/UndoBuffer/UndoBuffer.h>
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
@@ -74,7 +74,7 @@ bool ActionLoadSession::run( Core::ActionContextHandle& context,
   }
 
   // Clear undo buffer
-  LayerUndoBuffer::Instance()->reset_undo_buffer();
+  UndoBuffer::Instance()->reset_undo_buffer();
 
   return success;
 }

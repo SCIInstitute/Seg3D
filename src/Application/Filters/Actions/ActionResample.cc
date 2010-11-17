@@ -541,6 +541,7 @@ void ResampleAlgo::detect_padding_only()
     return;
   }
   
+  CORE_LOG_DEBUG( "Resample tool: padding only situation detected." );
   this->padding_only_ = true;
 
   // Compute the range of the source volume mapped to the destination volume in index space

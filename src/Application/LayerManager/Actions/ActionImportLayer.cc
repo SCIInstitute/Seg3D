@@ -33,7 +33,8 @@
 #include <Application/LayerManager/Actions/ActionImportLayer.h>
 #include <Application/LayerIO/LayerIO.h>
 #include <Application/LayerManager/LayerManager.h>
-#include <Application/LayerManager/LayerUndoBuffer.h>
+#include <Application/UndoBuffer/UndoBuffer.h>
+#include <Application/LayerManager/LayerUndoBufferItem.h>
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
@@ -143,7 +144,7 @@ bool ActionImportLayer::run( Core::ActionContextHandle& context, Core::ActionRes
   // Tell what the layer/group id counters are so we can undo those as well
   item->add_id_count_to_restore( id_count );
   // Add the complete record to the undo buffer
-  LayerUndoBuffer::Instance()->insert_undo_item( context, item );
+  UndoBuffer::Instance()->insert_undo_item( context, item );
 
   return true;
 }

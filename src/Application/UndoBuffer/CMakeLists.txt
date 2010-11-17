@@ -31,19 +31,30 @@
 # Set sources
 ##################################################
 
-SET(APPLICATION_CLIPBOARD_SRCS
-  Clipboard.h
-  Clipboard.cc
-  ClipboardItem.h
-  ClipboardItem.cc
-  ClipboardUndoBufferItem.h
-  ClipboardUndoBufferItem.cc
-  )
+SET(APPLICATION_UNDOBUFFER_SRCS
+  UndoBuffer.h
+  UndoBuffer.cc
+  UndoBufferItem.h
+  UndoBufferItem.cc
+)
 
-CORE_ADD_LIBRARY(Application_Clipboard ${APPLICATION_CLIPBOARD_SRCS} )
+SET(APPLICATION_UNDOBUFFER_ACTIONS_SRCS
+  Actions/ActionRedo.h
+  Actions/ActionRedo.cc
+  Actions/ActionUndo.h
+  Actions/ActionUndo.cc
+)
+
+CORE_ADD_LIBRARY(Application_UndoBuffer 
+      ${APPLICATION_UNDOBUFFER_SRCS}
+            ${APPLICATION_UNDOBUFFER_ACTIONS_SRCS})
             
-TARGET_LINK_LIBRARIES(Application_Clipboard
-                      Core_Application
+TARGET_LINK_LIBRARIES(Application_UndoBuffer
                       Core_Utils
+                      Core_Action
                       ${SCI_BOOST_LIBRARY})
+
+# Register action classes
+REGISTER_LIBRARY_AND_CLASSES(Application_UndoBuffer
+                    ${APPLICATION_UNDOBUFFER_ACTIONS_SRCS})
 

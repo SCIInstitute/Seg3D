@@ -26,51 +26,62 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_LAYERMANAGER_ACTIONS_ACTIONREDO_H
-#define APPLICATION_LAYERMANAGER_ACTIONS_ACTIONREDO_H
-
-#include <Core/Action/Actions.h>
-#include <Core/Interface/Interface.h>
-
-#include <Application/Layer/LayerFWD.h>
+#include <Application/Clipboard/Clipboard.h>
+#include <Application/Clipboard/ClipboardUndoBufferItem.h>
 
 namespace Seg3D
 {
 
-class ActionRedo : public Core::Action
+class ClipboardUndoBufferItemPrivate
 {
-  
-CORE_ACTION(
-  CORE_ACTION_TYPE( "Redo", "Redo a layer action.")
-  CORE_ACTION_CHANGES_PROJECT_DATA()
-)
+public: 
+  // Clipboard item checkpoint
+  ClipboardItemHandle clipboard_item_;
 
-  // -- Constructor/Destructor --
-public:
-  ActionRedo()
-  {
-  }
+  // The corresponding clipboard slot number of this undo item
+  size_t slot_;
 
-  virtual ~ActionRedo()
-  {
-  }
-
-  // -- Functions that describe action --
-public:
-  virtual bool validate( Core::ActionContextHandle& context );
-  virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
-  
-public:
-  
-  // CREATE:
-  // Create an action that activates a layer
-  static Core::ActionHandle Create();
-
-  // DISPATCH:
-  // Dispatch an action that activates a layer
-  static void Dispatch( Core::ActionContextHandle context );
+  // Size of the item
+  size_t size_;
 };
 
-} // end namespace Seg3D
+ClipboardUndoBufferItem::ClipboardUndoBufferItem( const std::string& tag,
+  ClipboardItemHandle clipboard_item, size_t slot) :
+  UndoBufferItem( tag ),
+  private_( new ClipboardUndoBufferItemPrivate )
+{
+  this->private_->size_ = 0;
+  this->private_->clipboard_item_ = clipboard_item;
+  this->private_->slot_ = slot;
+}
 
-#endif
+ClipboardUndoBufferItem::~ClipboardUndoBufferItem()
+{
+}
+
+bool ClipboardUndoBufferItem::apply_and_clear_undo()
+{
+  Clipboard::Instance()->set_item( this->private_->clipboard_item_, this->private_->slot_ );
+  // Clear the checkpoint
+  this->private_->clipboard_item_.reset();
+  return true;
+}
+
+size_t ClipboardUndoBufferItem::get_byte_size() const
+{
+  return this->private_->size_;
+}
+
+void ClipboardUndoBufferItem::compute_size()
+{
+  if ( this->private_->clipboard_item_ )
+  {
+    this->private_->size_ = this->private_->clipboard_item_->buffer_size();
+  }
+  else
+  {
+    this->private_->size_ = 0;
+  }
+}
+
+} // end namespace Seg3D

@@ -87,6 +87,14 @@ ClipboardItemHandle Clipboard::get_item( size_t width, size_t height,
   return item;
 }
 
+void Clipboard::set_item( ClipboardItemHandle item, size_t index )
+{
+  ASSERT_IS_APPLICATION_THREAD();
+  assert( index < this->private_->slots_.size() );
+
+  this->private_->slots_[ index ] = item;
+}
+
 size_t Clipboard::number_of_slots()
 {
   return this->private_->slots_.size();
