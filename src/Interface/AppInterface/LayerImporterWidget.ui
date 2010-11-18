@@ -234,7 +234,7 @@ QToolButton#series_1234_button_:pressed{
    <item>
     <widget class="QGroupBox" name="importer_options_">
      <property name="title">
-      <string>Select Type:</string>
+      <string>Select type:</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <property name="spacing">
@@ -722,7 +722,7 @@ p, li { white-space: pre-wrap; }
             </font>
            </property>
            <property name="text">
-            <string>Swap X and Y Spacing</string>
+            <string>Swap X and Y spacing</string>
            </property>
           </widget>
          </item>

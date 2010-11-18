@@ -1032,8 +1032,9 @@ void Viewer::mouse_press_event( const Core::MouseHistory& mouse_history, int but
     }
   }
 
-  if ( button == Core::MouseButton::RIGHT_BUTTON_E &&
-    modifiers == Core::KeyModifier::NO_MODIFIER_E &&
+  if ( button == Core::MouseButton::RIGHT_BUTTON_E && 
+    ( modifiers == Core::KeyModifier::NO_MODIFIER_E || 
+      modifiers & Core::KeyModifier::CONTROL_MODIFIER_E ) &&
     !( this->is_volume_view() ) && 
     this->slice_picking_visible_state_->get() &&
     this->overlay_visible_state_->get() )

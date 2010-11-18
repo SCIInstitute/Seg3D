@@ -47,6 +47,8 @@ CORE_ACTION(
   CORE_ACTION_KEY( "erode_radius", "1", "The distance in pixels over which the filter erodes a mask." )
   CORE_ACTION_KEY( "mask", "<none>", "Only modify data within the mask." )
   CORE_ACTION_KEY( "invert_mask", "false", "Whether the mask needs to be inverted." ) 
+  CORE_ACTION_KEY( "only2d", "false", "Whether the filter only works 2d." )
+  CORE_ACTION_KEY( "slice_type", "0", "The slice type for the 2d filter." )
   CORE_ACTION_CHANGES_PROJECT_DATA()
   CORE_ACTION_IS_UNDOABLE()
 )
@@ -66,6 +68,10 @@ public:
     // Constraint
     this->add_key( this->mask_layer_ );
     this->add_key( this->mask_invert_ );  
+    
+    // 2D constraint
+    this->add_key( this->only2d_ );
+    this->add_key( this->slice_type_ );
   }
   
   virtual ~ActionDilateErodeFilter()
@@ -87,7 +93,10 @@ private:
 
   Core::ActionParameter< std::string > mask_layer_;
   Core::ActionParameter< bool > mask_invert_;
-    
+
+  Core::ActionParameter< bool > only2d_;
+  Core::ActionParameter< int > slice_type_;
+      
   // -- Dispatch this action from the interface --
 public:
 
@@ -95,7 +104,8 @@ public:
   // Create and dispatch action that inserts the new layer 
   static void Dispatch( Core::ActionContextHandle context, 
     std::string target_layer, bool replace, int dilate_radius, int erode_radius,
-    std::string mask_layer, bool mask_invert );
+    std::string mask_layer, bool mask_invert, bool only2d,
+    int slice_type );
           
 };
   

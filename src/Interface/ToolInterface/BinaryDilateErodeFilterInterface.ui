@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>239</width>
-    <height>384</height>
+    <width>331</width>
+    <height>540</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -28,7 +28,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
    <property name="spacing">
-    <number>2</number>
+    <number>4</number>
    </property>
    <property name="margin">
     <number>4</number>
@@ -223,6 +223,50 @@
           <widget class="QtUtils::QtSliderIntCombo" name="erode_" native="true"/>
          </item>
         </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>2D Constraint</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_8">
+      <item>
+       <widget class="QCheckBox" name="only2d_">
+        <property name="text">
+         <string>2D erode/dilate only</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="sagittal_slice_">
+        <property name="text">
+         <string>In sagittal orientation only</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="coronal_slice_">
+        <property name="text">
+         <string>In coronal orientation only</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="axial_slice_">
+        <property name="text">
+         <string>In axial orientation only</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="active_slice_">
+        <property name="text">
+         <string>In active orientation only</string>
+        </property>
        </widget>
       </item>
      </layout>

@@ -66,6 +66,12 @@ public:
   // Whether mask should be inverted in this filter
   Core::StateBoolHandle mask_invert_state_;
   
+  // Whether the filters runs 2d or 3d
+  Core::StateBoolHandle only2d_state_;
+  
+  // If it runs 2d which orientation to use
+  Core::StateLabeledOptionHandle slice_type_state_;
+  
 public:
 
   // Execute the dilate -> erode action
@@ -76,6 +82,10 @@ public:
   
   // Execute the erode action
   void execute_erode( Core::ActionContextHandle context );
+
+private:
+  // Internal function for getting the slice type
+  int get_slice_type();
 };
 
 } // end namespace

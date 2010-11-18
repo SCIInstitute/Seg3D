@@ -128,10 +128,14 @@ void UndoBuffer::insert_undo_item( Core::ActionContextHandle context,
   UndoBufferPrivate::undo_list_type::iterator it = this->private_->undo_list_.begin();
   UndoBufferPrivate::undo_list_type::iterator it_end = this->private_->undo_list_.end();
 
+  size_t max_num_undos = 0;
+
   while ( it != it_end )
   {
     size += (*it)->get_byte_size();
+    max_num_undos++;
     if ( size > max_size ) break;
+    if ( max_num_undos >= 100 ) break;
     ++it;
   }
 

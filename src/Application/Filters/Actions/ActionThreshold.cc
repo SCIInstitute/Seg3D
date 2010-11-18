@@ -219,7 +219,8 @@ public:
   // when a new layer is generated. 
   virtual std::string get_layer_prefix() const
   {
-    return "Threshold"; 
+    return std::string( "Threshold" ) + Core::ExportToString( this->lower_threshold_ ) +
+        "TO" + Core::ExportToString( this->upper_threshold_ );
   }
 };
 

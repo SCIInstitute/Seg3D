@@ -91,6 +91,24 @@ bool BinaryDilateErodeFilterInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Enable( this->private_->ui_.dilateerodeButton,
     tool->valid_target_state_ );
 
+  QtUtils::QtBridge::Connect( this->private_->ui_.only2d_,
+    tool->only2d_state_ );
+
+  QButtonGroup* button_group = new QButtonGroup( this );
+  button_group->addButton( this->private_->ui_.active_slice_ );
+  button_group->addButton( this->private_->ui_.sagittal_slice_ );
+  button_group->addButton( this->private_->ui_.coronal_slice_ );
+  button_group->addButton( this->private_->ui_.axial_slice_ );
+
+  QtUtils::QtBridge::Connect( button_group, tool->slice_type_state_ );
+
+  QtUtils::QtBridge::Enable( this->private_->ui_.active_slice_, tool->only2d_state_ );  
+  QtUtils::QtBridge::Enable( this->private_->ui_.sagittal_slice_, tool->only2d_state_ );
+  QtUtils::QtBridge::Enable( this->private_->ui_.coronal_slice_, tool->only2d_state_ );
+  QtUtils::QtBridge::Enable( this->private_->ui_.axial_slice_, tool->only2d_state_ );
+
+
+
   QtUtils::QtBridge::Enable( this->private_->ui_.target_layer_, tool->use_active_layer_state_, true );
 
   QtUtils::QtBridge::Connect( this->private_->ui_.dilateerodeButton, boost::bind( 

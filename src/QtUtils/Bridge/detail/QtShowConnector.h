@@ -57,9 +57,9 @@ private:
   // -- internal variables --
 private:
   QWidget* parent_;
-  bool opposite_logic_;
   boost::function< bool () > condition_;
   Core::StateBoolHandle state_;
+  bool opposite_logic_;
 };
 
 } // end namespace QtUtils

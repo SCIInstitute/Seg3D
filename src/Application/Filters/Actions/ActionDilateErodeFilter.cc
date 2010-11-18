@@ -111,7 +111,15 @@ bool ActionDilateErodeFilter::validate( Core::ActionContextHandle& context )
     context->report_error( "The radius is too large." );
     return false;
   }
-  
+
+  if ( this->slice_type_.value() != Core::SliceType::AXIAL_E &&
+    this->slice_type_.value() != Core::SliceType::CORONAL_E &&
+    this->slice_type_.value() != Core::SliceType::SAGITTAL_E )
+  {
+    context->report_error( "Invalid slice type" );
+    return false;
+  }
+    
   // Validation successful
   return true;
 }
@@ -133,7 +141,10 @@ public:
   int erode_radius_;
 
   bool invert_mask_;
-
+  
+  bool only2d_;
+  int slice_type_;
+  
 public:
   // RUN_FILTER:
   // Implemtation of run of the Runnable base class, this function is called when the thread
@@ -161,19 +172,29 @@ public:
   
     std::vector< std::vector<Core::DataBlock::index_type> > neighbors;
     
+    Core::SliceType slice_type = static_cast<Core::SliceType::enum_type>( this->slice_type_ );
     try
     {
       neighbors.resize( 0x40 );
       for ( size_t k = 0; k < neighbors.size(); k++ )
       {
-        if ( ! ( k & 0x1 ) ) neighbors[ k ].push_back( -1 );
-        if ( ! ( k & 0x2 ) ) neighbors[ k ].push_back( 1 );
-
-        if ( ! ( k & 0x4 ) ) neighbors[ k ].push_back( -nx );
-        if ( ! ( k & 0x8 ) ) neighbors[ k ].push_back( nx );
-
-        if ( ! ( k & 0x10 ) ) neighbors[ k ].push_back( -nx * ny );
-        if ( ! ( k & 0x20 ) ) neighbors[ k ].push_back( nx * ny );
+        if ( !( this->only2d_ ) || ( slice_type != Core::SliceType::SAGITTAL_E ) )
+        {
+          if ( ! ( k & 0x1 ) ) neighbors[ k ].push_back( -1 );
+          if ( ! ( k & 0x2 ) ) neighbors[ k ].push_back( 1 );
+        }
+        
+        if ( !( this->only2d_ ) || ( slice_type != Core::SliceType::CORONAL_E ) )
+        {
+          if ( ! ( k & 0x4 ) ) neighbors[ k ].push_back( -nx );
+          if ( ! ( k & 0x8 ) ) neighbors[ k ].push_back( nx );
+        }
+        
+        if ( !( this->only2d_  ) || ( slice_type != Core::SliceType::AXIAL_E ) )
+        {
+          if ( ! ( k & 0x10 ) ) neighbors[ k ].push_back( -nx * ny );
+          if ( ! ( k & 0x20 ) ) neighbors[ k ].push_back( nx * ny );
+        }
       }
     }
     catch ( ... )
@@ -410,6 +431,9 @@ bool ActionDilateErodeFilter::run( Core::ActionContextHandle& context,
   algo->dilate_radius_ = this->dilate_radius_.value();
   algo->erode_radius_ = this->erode_radius_.value();
 
+  algo->only2d_ = this->only2d_.value();
+  algo->slice_type_ = this->slice_type_.value();
+  
   // Find the handle to the layer
   if ( !( algo->find_layer( this->target_layer_.value(), algo->src_layer_ ) ) )
   {
@@ -457,7 +481,7 @@ bool ActionDilateErodeFilter::run( Core::ActionContextHandle& context,
 
 void ActionDilateErodeFilter::Dispatch( Core::ActionContextHandle context, 
   std::string target_layer, bool replace, int dilate_radius, int erode_radius, 
-  std::string mask_layer, bool mask_invert )
+  std::string mask_layer, bool mask_invert, bool only2d, int slice_type  )
 { 
   // Create a new action
   ActionDilateErodeFilter* action = new ActionDilateErodeFilter;
@@ -469,7 +493,9 @@ void ActionDilateErodeFilter::Dispatch( Core::ActionContextHandle context,
   action->erode_radius_.value() = erode_radius;
   action->mask_layer_.value() = mask_layer;
   action->mask_invert_.value() = mask_invert;
-  
+  action->only2d_.value() = only2d;
+  action->slice_type_.value() = slice_type;
+    
   // Dispatch action to underlying engine
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }

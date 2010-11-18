@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>274</width>
-    <height>159</height>
+    <height>166</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -281,6 +281,9 @@ QWidget#buttons_{
                 <height>21</height>
                </size>
               </property>
+              <property name="toolTip">
+               <string>Click here to show or hide the contents of this group</string>
+              </property>
               <property name="text">
                <string/>
               </property>
@@ -368,6 +371,9 @@ QWidget#buttons_{
             </item>
             <item>
              <widget class="QLabel" name="group_dimensions_label_">
+              <property name="toolTip">
+               <string>Dimenions of the layers in this group</string>
+              </property>
               <property name="text">
                <string>TextLabel</string>
               </property>
@@ -538,7 +544,7 @@ QWidget#buttons_{
                      </size>
                     </property>
                     <property name="toolTip">
-                     <string>Open the transform menu</string>
+                     <string>Open the isosurface menu</string>
                     </property>
                     <property name="text">
                      <string/>
@@ -604,7 +610,7 @@ QWidget#buttons_{
                      </size>
                     </property>
                     <property name="toolTip">
-                     <string>Create a new layer</string>
+                     <string>Create a new mask layer</string>
                     </property>
                     <property name="text">
                      <string/>
@@ -790,6 +796,9 @@ QWidget#buttons_{
                             <width>76</width>
                             <height>16777215</height>
                            </size>
+                          </property>
+                          <property name="toolTip">
+                           <string>Select all layers in this group</string>
                           </property>
                           <property name="text">
                            <string>Select All</string>

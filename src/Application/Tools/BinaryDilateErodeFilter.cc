@@ -34,6 +34,7 @@
 #include <Application/Filters/Actions/ActionDilateFilter.h>
 #include <Application/Filters/Actions/ActionErodeFilter.h>
 #include <Application/Filters/Actions/ActionDilateErodeFilter.h>
+#include <Application/ViewerManager/ViewerManager.h>
 
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL( Seg3D, BinaryDilateErodeFilter )
@@ -59,11 +60,38 @@ BinaryDilateErodeFilter::BinaryDilateErodeFilter( const std::string& toolid ) :
 
   // Whether that mask should be inverted
   this->add_state( "invert_mask", this->mask_invert_state_, false );
+  
+  // Whether the filters runs 2d or 3d
+  this->add_state( "only2d", this->only2d_state_, false );
+  
+  std::vector< LayerIDNamePair > slice_option_list;
+  slice_option_list.push_back( std::make_pair<std::string,std::string>( "active", "active" ) );
+  slice_option_list.push_back( std::make_pair<std::string,std::string>( "sagittal", "sagittal" ) );
+  slice_option_list.push_back( std::make_pair<std::string,std::string>( "coronal", "coronal" ) );
+  slice_option_list.push_back( std::make_pair<std::string,std::string>( "axial", "axial" ) );
+
+  this->add_state( "slice_type", this->slice_type_state_, "active", slice_option_list );
 }
 
 BinaryDilateErodeFilter::~BinaryDilateErodeFilter()
 {
   disconnect_all();
+}
+
+int BinaryDilateErodeFilter::get_slice_type()
+{
+  std::string slice_type = this->slice_type_state_->get();
+  if ( slice_type == "sagittal" ) return Core::SliceType::SAGITTAL_E;
+  if ( slice_type == "coronal" ) return Core::SliceType::CORONAL_E;
+  if ( slice_type == "axial" ) return Core::SliceType::AXIAL_E;
+
+  std::string view_mode = ViewerManager::Instance()->get_active_viewer()->view_mode_state_->get();
+
+  if ( view_mode == Viewer::SAGITTAL_C ) return Core::SliceType::SAGITTAL_E;
+  if ( view_mode == Viewer::CORONAL_C ) return Core::SliceType::CORONAL_E;
+  if ( view_mode == Viewer::AXIAL_C ) return Core::SliceType::AXIAL_E;
+  
+  return -1;
 }
 
 void BinaryDilateErodeFilter::execute_dilateerode( Core::ActionContextHandle context )
@@ -74,7 +102,9 @@ void BinaryDilateErodeFilter::execute_dilateerode( Core::ActionContextHandle con
     this->dilate_state_->get(),
     this->erode_state_->get(),
     this->mask_state_->get(),
-    this->mask_invert_state_->get() );
+    this->mask_invert_state_->get(),
+    this->only2d_state_, 
+    this->get_slice_type() );
 }
 
 void BinaryDilateErodeFilter::execute_dilate( Core::ActionContextHandle context )
@@ -84,7 +114,9 @@ void BinaryDilateErodeFilter::execute_dilate( Core::ActionContextHandle context 
     this->replace_state_->get(),
     this->dilate_state_->get(),
     this->mask_state_->get(),
-    this->mask_invert_state_->get() );
+    this->mask_invert_state_->get(),
+    this->only2d_state_, 
+    this->get_slice_type() );
 }
 
 void BinaryDilateErodeFilter::execute_erode( Core::ActionContextHandle context )
@@ -94,7 +126,9 @@ void BinaryDilateErodeFilter::execute_erode( Core::ActionContextHandle context )
     this->replace_state_->get(),
     this->erode_state_->get(),
     this->mask_state_->get(),
-    this->mask_invert_state_->get() );
+    this->mask_invert_state_->get(),
+    this->only2d_state_, 
+    this->get_slice_type() );
 }
 
 } // end namespace Seg3D

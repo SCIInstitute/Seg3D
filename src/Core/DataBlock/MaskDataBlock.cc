@@ -100,7 +100,6 @@ bool MaskDataBlock::extract_slice( SliceType type,
 
       unsigned char volume_mask_value = this->get_mask_value();         
       unsigned char slice_mask_value = slice_mask_data_block->get_mask_value();         
-      unsigned char slice_not_mask_value = ~( slice_mask_data_block->get_mask_value() );          
       unsigned char* volume_ptr = this->get_mask_data();
       unsigned char* slice_ptr = slice_mask_data_block->get_mask_data();
       
@@ -166,7 +165,6 @@ bool MaskDataBlock::extract_slice( SliceType type,
 
       unsigned char volume_mask_value = this->get_mask_value();         
       unsigned char slice_mask_value = slice_mask_data_block->get_mask_value();         
-      unsigned char slice_not_mask_value = ~( slice_mask_data_block->get_mask_value() );          
       unsigned char* volume_ptr = this->get_mask_data();
       unsigned char* slice_ptr = slice_mask_data_block->get_mask_data();
       
@@ -233,7 +231,6 @@ bool MaskDataBlock::extract_slice( SliceType type,
 
       unsigned char volume_mask_value = this->get_mask_value();         
       unsigned char slice_mask_value = slice_mask_data_block->get_mask_value();         
-      unsigned char slice_not_mask_value = ~( slice_mask_data_block->get_mask_value() );          
       unsigned char* volume_ptr = this->get_mask_data();
       unsigned char* slice_ptr = slice_mask_data_block->get_mask_data();
       

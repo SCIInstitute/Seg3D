@@ -299,6 +299,9 @@ QPushButton#activate_button_{
               <property name="mouseTracking">
                <bool>true</bool>
               </property>
+              <property name="toolTip">
+               <string>Press shift to drag and drop this layer</string>
+              </property>
               <layout class="QHBoxLayout" name="horizontalLayout_9">
                <property name="spacing">
                 <number>0</number>
@@ -440,7 +443,7 @@ QPushButton#activate_button_{
                   </size>
                  </property>
                  <property name="toolTip">
-                  <string>Turn on or off this layer's visibility</string>
+                  <string>Turn on or off visibility</string>
                  </property>
                  <property name="text">
                   <string/>
@@ -473,7 +476,7 @@ QPushButton#activate_button_{
                   </size>
                  </property>
                  <property name="toolTip">
-                  <string>Open the advanced visibility menu.</string>
+                  <string>Open the advanced visibility menu</string>
                  </property>
                  <property name="text">
                   <string/>
@@ -503,7 +506,7 @@ QPushButton#activate_button_{
                   </size>
                  </property>
                  <property name="toolTip">
-                  <string>Open the layers info menu.</string>
+                  <string>Open the info menu</string>
                  </property>
                  <property name="text">
                   <string>...</string>
@@ -533,7 +536,7 @@ QPushButton#activate_button_{
                   </size>
                  </property>
                  <property name="toolTip">
-                  <string>Open the layers opacity menu.</string>
+                  <string>Open the opacity menu</string>
                  </property>
                  <property name="text">
                   <string/>
@@ -563,7 +566,7 @@ QPushButton#activate_button_{
                   </size>
                  </property>
                  <property name="toolTip">
-                  <string>Open the appearance menu.</string>
+                  <string>Open the appearance menu</string>
                  </property>
                  <property name="text">
                   <string/>
@@ -673,7 +676,7 @@ QPushButton#activate_button_{
                   </size>
                  </property>
                  <property name="toolTip">
-                  <string>Show or hide the iso-surface</string>
+                  <string>Show or hide the isosurface</string>
                  </property>
                  <property name="text">
                   <string>I</string>
@@ -703,7 +706,7 @@ QPushButton#activate_button_{
                   </size>
                  </property>
                  <property name="toolTip">
-                  <string>Compute the iso-surface</string>
+                  <string>Compute the isosurface</string>
                  </property>
                  <property name="text">
                   <string>C</string>
@@ -733,7 +736,7 @@ QPushButton#activate_button_{
                   </size>
                  </property>
                  <property name="toolTip">
-                  <string>Delete the iso-surface</string>
+                  <string>Delete the isosurface</string>
                  </property>
                  <property name="text">
                   <string/>
@@ -1011,6 +1014,9 @@ QPushButton#activate_button_{
             </item>
             <item>
              <widget class="QCheckBox" name="adjust_minmax_checkbox_">
+              <property name="toolTip">
+               <string>Adjust the contrast/brightness by setting the minimum and maximum gray value</string>
+              </property>
               <property name="text">
                <string>Adjust Min/Max</string>
               </property>
@@ -1033,6 +1039,9 @@ QPushButton#activate_button_{
                </property>
                <item>
                 <widget class="QPushButton" name="reset_brightness_contrast_button_">
+                 <property name="toolTip">
+                  <string>Reset contrast brightness to its default values</string>
+                 </property>
                  <property name="text">
                   <string>Reset Brightness/Contrast</string>
                  </property>
@@ -1103,6 +1112,9 @@ QPushButton#activate_button_{
                    <verstretch>0</verstretch>
                   </sizepolicy>
                  </property>
+                 <property name="toolTip">
+                  <string>Visibility of viewer 1</string>
+                 </property>
                  <property name="text">
                   <string/>
                  </property>
@@ -1123,6 +1135,9 @@ QPushButton#activate_button_{
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
+                 </property>
+                 <property name="toolTip">
+                  <string>Visibility of viewer 2</string>
                  </property>
                  <property name="text">
                   <string/>
@@ -1147,6 +1162,9 @@ QPushButton#activate_button_{
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
+                 </property>
+                 <property name="toolTip">
+                  <string>Visibility of viewer 3</string>
                  </property>
                  <property name="text">
                   <string/>
@@ -1181,6 +1199,9 @@ QPushButton#activate_button_{
                    <verstretch>0</verstretch>
                   </sizepolicy>
                  </property>
+                 <property name="toolTip">
+                  <string>Visibility of viewer 4</string>
+                 </property>
                  <property name="text">
                   <string/>
                  </property>
@@ -1202,6 +1223,9 @@ QPushButton#activate_button_{
                    <verstretch>0</verstretch>
                   </sizepolicy>
                  </property>
+                 <property name="toolTip">
+                  <string>Visibility of viewer 5</string>
+                 </property>
                  <property name="text">
                   <string/>
                  </property>
@@ -1222,6 +1246,9 @@ QPushButton#activate_button_{
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
+                 </property>
+                 <property name="toolTip">
+                  <string>Visibility of viewer 6</string>
                  </property>
                  <property name="text">
                   <string/>
@@ -1672,6 +1699,9 @@ QPushButton#activate_button_{
                </property>
                <item>
                 <widget class="QPushButton" name="calculate_volume_button_">
+                 <property name="toolTip">
+                  <string>Calculate the volume in world space and index space</string>
+                 </property>
                  <property name="text">
                   <string>Calculate</string>
                  </property>
@@ -1755,6 +1785,9 @@ QPushButton#activate_button_{
                 <height>16</height>
                </size>
               </property>
+              <property name="toolTip">
+               <string>Abort processing this layer</string>
+              </property>
               <property name="text">
                <string/>
               </property>
@@ -1789,6 +1822,9 @@ QPushButton#activate_button_{
                 <width>16777215</width>
                 <height>16</height>
                </size>
+              </property>
+              <property name="toolTip">
+               <string>Progress in processing this layer</string>
               </property>
               <property name="value">
                <number>0</number>

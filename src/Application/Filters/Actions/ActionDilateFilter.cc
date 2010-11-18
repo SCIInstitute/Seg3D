@@ -100,6 +100,14 @@ bool ActionDilateFilter::validate( Core::ActionContextHandle& context )
     return false;
   }
   
+  if ( this->slice_type_.value() != Core::SliceType::AXIAL_E &&
+    this->slice_type_.value() != Core::SliceType::CORONAL_E &&
+    this->slice_type_.value() != Core::SliceType::SAGITTAL_E )
+  {
+    context->report_error( "Invalid slice type" );
+    return false;
+  }
+  
   // Validation successful
   return true;
 }
@@ -119,6 +127,9 @@ public:
 
   int radius_;
   bool invert_mask_;
+  
+  bool only2d_;
+  int slice_type_;
 
 public:
   // RUN_FILTER:
@@ -145,6 +156,7 @@ public:
 
     unsigned char* data = reinterpret_cast<unsigned char*>( input_data_block->get_data() );
   
+    Core::SliceType slice_type = static_cast<Core::SliceType::enum_type>( this->slice_type_ );
     std::vector< std::vector<Core::DataBlock::index_type> > neighbors;
     try
     {
@@ -152,14 +164,23 @@ public:
 
       for ( size_t k = 0; k < neighbors.size(); k++ )
       {
-        if ( ! ( k & 0x1 ) ) neighbors[ k ].push_back( -1 );
-        if ( ! ( k & 0x2 ) ) neighbors[ k ].push_back( 1 );
-
-        if ( ! ( k & 0x4 ) ) neighbors[ k ].push_back( -nx );
-        if ( ! ( k & 0x8 ) ) neighbors[ k ].push_back( nx );
-
-        if ( ! ( k & 0x10 ) ) neighbors[ k ].push_back( -nx * ny );
-        if ( ! ( k & 0x20 ) ) neighbors[ k ].push_back( nx * ny );
+        if ( !( this->only2d_ ) || ( slice_type != Core::SliceType::SAGITTAL_E ) )
+        {
+          if ( ! ( k & 0x1 ) ) neighbors[ k ].push_back( -1 );
+          if ( ! ( k & 0x2 ) ) neighbors[ k ].push_back( 1 );
+        }
+        
+        if ( !( this->only2d_ ) || ( slice_type != Core::SliceType::CORONAL_E ) )
+        {
+          if ( ! ( k & 0x4 ) ) neighbors[ k ].push_back( -nx );
+          if ( ! ( k & 0x8 ) ) neighbors[ k ].push_back( nx );
+        }
+        
+        if ( !( this->only2d_  ) || ( slice_type != Core::SliceType::AXIAL_E ) )
+        {
+          if ( ! ( k & 0x10 ) ) neighbors[ k ].push_back( -nx * ny );
+          if ( ! ( k & 0x20 ) ) neighbors[ k ].push_back( nx * ny );
+        }
       }
     }
     catch ( ... )
@@ -302,6 +323,8 @@ bool ActionDilateFilter::run( Core::ActionContextHandle& context,
 
   // Copy the parameters over to the algorithm that runs the filter
   algo->radius_ = this->radius_.value();
+  algo->only2d_ = this->only2d_.value();
+  algo->slice_type_ = this->slice_type_.value();
 
   // Find the handle to the layer
   if ( !( algo->find_layer( this->target_layer_.value(), algo->src_layer_ ) ) )
@@ -350,7 +373,7 @@ bool ActionDilateFilter::run( Core::ActionContextHandle& context,
 
 void ActionDilateFilter::Dispatch( Core::ActionContextHandle context, 
   std::string target_layer, bool replace, int radius, std::string mask_layer,
-  bool mask_invert )
+  bool mask_invert, bool only2d, int slice_type )
 { 
   // Create a new action
   ActionDilateFilter* action = new ActionDilateFilter;
@@ -361,6 +384,8 @@ void ActionDilateFilter::Dispatch( Core::ActionContextHandle context,
   action->radius_.value() = radius;
   action->mask_layer_.value() = mask_layer;
   action->mask_invert_.value() = mask_invert;
+  action->only2d_.value() = only2d;
+  action->slice_type_.value() = slice_type;
 
   // Dispatch action to underlying engine
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );

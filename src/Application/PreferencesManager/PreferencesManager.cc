@@ -165,7 +165,11 @@ void PreferencesManager::initialize_states()
   add_state( "z_axis_label", this->z_axis_label_state_, "Axial" );
   
   add_state( "enable_undo", this->enable_undo_state_, true );
-  add_state( "percent_of_memory", this->percent_of_memory_state_ , 0.15, 0.0, 0.5, 0.01 );
+  
+  double percent_of_memory = 0.15;
+  if ( sizeof( void* ) == 4 ) percent_of_memory = 0.05;
+  
+  add_state( "percent_of_memory", this->percent_of_memory_state_ , percent_of_memory, 0.0, 0.5, 0.01 );
   
   add_state( "reverse_slice_navigation", this->reverse_slice_navigation_state_, false );
   add_state( "zero_based_slice_numbers", this->zero_based_slice_numbers_state_, false );
