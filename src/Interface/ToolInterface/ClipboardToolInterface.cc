@@ -68,7 +68,7 @@ bool ClipboardToolInterface::build_widget( QFrame* frame )
   //Step 1 - build the Qt GUI Widget
   this->private_->ui_.setupUi( frame );
   this->private_->ui_.horizontalLayout_2->setAlignment( Qt::AlignHCenter );
-
+  this->private_->ui_.horizontalLayout->setAlignment( Qt::AlignHCenter );
   
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
@@ -81,6 +81,8 @@ bool ClipboardToolInterface::build_widget( QFrame* frame )
     tool->use_active_layer_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.slice_type_, 
     tool->slice_type_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.use_active_viewer_,
+    tool->use_active_viewer_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.copy_slice_number_,
     tool->copy_slice_number_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.paste_slice_number_min_, 
@@ -90,21 +92,40 @@ bool ClipboardToolInterface::build_widget( QFrame* frame )
 
   QtUtils::QtBridge::Enable( this->private_->ui_.target_mask_,
     tool->use_active_layer_state_, true );
-    QtUtils::QtBridge::Enable( this->private_->ui_.copy_button_, 
+  QtUtils::QtBridge::Enable( this->private_->ui_.copy_button_, 
     tool->valid_target_state_ );
   QtUtils::QtBridge::Enable( this->private_->ui_.paste_button_,
-    tool->valid_target_state_ );
-  QtUtils::QtBridge::Enable( this->private_->ui_.copy_slice_number_,
     tool->valid_target_state_ );
   QtUtils::QtBridge::Enable( this->private_->ui_.paste_slice_number_min_,
     tool->valid_target_state_ );
   QtUtils::QtBridge::Enable( this->private_->ui_.paste_slice_number_max_,
     tool->valid_target_state_ );
-  
+  QtUtils::QtBridge::Enable( this->private_->ui_.use_active_layer_,
+    tool->use_active_viewer_state_, true );
+  QtUtils::QtBridge::Enable( this->private_->ui_.slice_type_,
+    tool->use_active_viewer_state_, true );
+
+  std::vector< Core::StateBaseHandle > states( 2 );
+  states[ 0 ] = tool->valid_target_state_;
+  states[ 1 ] = tool->use_active_viewer_state_;
+  QtUtils::QtBridge::Enable( this->private_->ui_.copy_slice_number_, states,
+    boost::lambda::bind( &Core::StateBool::get, tool->valid_target_state_.get() ) &&
+    !boost::lambda::bind( &Core::StateBool::get, tool->use_active_viewer_state_.get() ) );
+  QtUtils::QtBridge::Enable( this->private_->ui_.grab_min_slice_button_, states,
+    boost::lambda::bind( &Core::StateBool::get, tool->valid_target_state_.get() ) &&
+    boost::lambda::bind( &Core::StateBool::get, tool->use_active_viewer_state_.get() ) );
+  QtUtils::QtBridge::Enable( this->private_->ui_.grab_max_slice_button_, states,
+    boost::lambda::bind( &Core::StateBool::get, tool->valid_target_state_.get() ) &&
+    boost::lambda::bind( &Core::StateBool::get, tool->use_active_viewer_state_.get() ) );
+
   QtUtils::QtBridge::Connect( this->private_->ui_.copy_button_, boost::bind( 
     &ClipboardTool::copy, tool, Core::Interface::GetWidgetActionContext() ) );
   QtUtils::QtBridge::Connect( this->private_->ui_.paste_button_, boost::bind( 
     &ClipboardTool::paste, tool, Core::Interface::GetWidgetActionContext() ) );
+  QtUtils::QtBridge::Connect( this->private_->ui_.grab_min_slice_button_, 
+    boost::bind( &ClipboardTool::grab_min_paste_slice, tool ) );
+  QtUtils::QtBridge::Connect( this->private_->ui_.grab_max_slice_button_, 
+    boost::bind( &ClipboardTool::grab_max_paste_slice, tool ) );
 
   return true;
 } 

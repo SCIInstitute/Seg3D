@@ -58,7 +58,9 @@ public:
 public:
   void copy( Core::ActionContextHandle context );
   void paste( Core::ActionContextHandle context );
-  void set_slice_type_labels();
+
+  void grab_min_paste_slice();
+  void grab_max_paste_slice();
   
 public:
   const static std::string AXIAL_C;
@@ -71,6 +73,7 @@ public:
   Core::StateRangedIntHandle copy_slice_number_state_;
   Core::StateRangedIntHandle paste_min_slice_number_state_;
   Core::StateRangedIntHandle paste_max_slice_number_state_;
+  Core::StateBoolHandle use_active_viewer_state_;
 
 private:
   ClipboardToolPrivateHandle private_;
