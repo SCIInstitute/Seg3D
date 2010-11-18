@@ -478,9 +478,11 @@ long long Application::get_total_addressable_physical_memory()
 long long Application::get_my_virtual_memory_used()
 {
 #ifdef _WIN32
-  /*PROCESS_MEMORY_COUNTERS_EX pmc;
-    GetProcessMemoryInfo( GetCurrentProcess(), &pmc, sizeof( pmc ) );
-    return pmc.PrivateUsage;*/
+  PROCESS_MEMORY_COUNTERS_EX pmc;
+    GetProcessMemoryInfo( GetCurrentProcess(), 
+    reinterpret_cast< PPROCESS_MEMORY_COUNTERS >( &pmc ), 
+    sizeof( pmc ) );
+    return pmc.PrivateUsage;
   return 0;
 #else
   return 0;
@@ -490,9 +492,11 @@ long long Application::get_my_virtual_memory_used()
 long long Application::get_my_physical_memory_used()
 {
 #ifdef _WIN32
-  /*PROCESS_MEMORY_COUNTERS_EX pmc;
-    GetProcessMemoryInfo( GetCurrentProcess(), &pmc, sizeof( pmc ) );
-    return pmc.WorkingSetSize;*/
+  PROCESS_MEMORY_COUNTERS_EX pmc;
+    GetProcessMemoryInfo( GetCurrentProcess(), 
+    reinterpret_cast< PPROCESS_MEMORY_COUNTERS >( &pmc ), 
+    sizeof( pmc ) );
+    return pmc.WorkingSetSize;
   return 0;
 #else
   return 0;
