@@ -208,7 +208,7 @@ QComboBox::icon{
                 <widget class="QComboBox" name="viewer_mode_">
                  <property name="minimumSize">
                   <size>
-                   <width>100</width>
+                   <width>80</width>
                    <height>0</height>
                   </size>
                  </property>
@@ -568,7 +568,7 @@ QComboBox::icon{
                   </palette>
                  </property>
                  <property name="toolTip">
-                  <string>Select viewer mode.</string>
+                  <string>Select viewer mode</string>
                  </property>
                  <property name="currentIndex">
                   <number>0</number>
@@ -733,7 +733,7 @@ QComboBox::icon{
                   </size>
                  </property>
                  <property name="toolTip">
-                  <string>Lock navigation with the other locked viewers.</string>
+                  <string>Lock navigation with the other locked viewers of the same type</string>
                  </property>
                  <property name="icon">
                   <iconset resource="../../Resources/QtResources.qrc">
@@ -760,7 +760,7 @@ QComboBox::icon{
                   </size>
                  </property>
                  <property name="toolTip">
-                  <string>Show this slice in volume viewer.</string>
+                  <string>Show this slice in volume viewer</string>
                  </property>
                  <property name="icon">
                   <iconset resource="../../Resources/QtResources.qrc">
@@ -787,7 +787,7 @@ QComboBox::icon{
                   </size>
                  </property>
                  <property name="toolTip">
-                  <string>Snap the camera to the closest axis.</string>
+                  <string>Snap the camera to the closest axis</string>
                  </property>
                  <property name="text">
                   <string>...</string>
@@ -889,6 +889,9 @@ QComboBox::icon{
                    <height>20</height>
                   </size>
                  </property>
+                 <property name="toolTip">
+                  <string>Allow picking in other views to move slices in this view</string>
+                 </property>
                  <property name="text">
                   <string>...</string>
                  </property>
@@ -941,7 +944,7 @@ QComboBox::icon{
                   </size>
                  </property>
                  <property name="toolTip">
-                  <string>Flip the data visually horizontal.</string>
+                  <string>Flip the data visually horizontal</string>
                  </property>
                  <property name="icon">
                   <iconset resource="../../Resources/QtResources.qrc">
@@ -968,7 +971,7 @@ QComboBox::icon{
                   </size>
                  </property>
                  <property name="toolTip">
-                  <string>Flip the data visually vertical.</string>
+                  <string>Flip the data visually vertical</string>
                  </property>
                  <property name="icon">
                   <iconset resource="../../Resources/QtResources.qrc">
@@ -1076,7 +1079,7 @@ QComboBox::icon{
                   </size>
                  </property>
                  <property name="toolTip">
-                  <string>Show overlay.</string>
+                  <string>Show overlay</string>
                  </property>
                  <property name="text">
                   <string>...</string>
@@ -1106,7 +1109,7 @@ QComboBox::icon{
                   </size>
                  </property>
                  <property name="toolTip">
-                  <string>Show picking lines.</string>
+                  <string>Show picking lines</string>
                  </property>
                  <property name="text">
                   <string>...</string>
