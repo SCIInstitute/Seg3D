@@ -406,6 +406,9 @@ public:
   bool surface_changed_;
   bool values_changed_;
 
+  bool need_abort_;
+  boost::function< bool () > check_abort_;
+
   const static double COMPUTE_PERCENT_PROGRESS_C;
   const static double NORMAL_PERCENT_PROGRESS_C;
   const static double PARTITION_PERCENT_PROGRESS_C;
@@ -592,6 +595,8 @@ void IsosurfacePrivate::compute_setup( int num_threads )
 
   this->prev_point_min_ = 0;
   this->prev_point_max_ = 0;
+  
+  this->need_abort_ = false;
 
 }
 
@@ -1071,8 +1076,15 @@ void IsosurfacePrivate::parallel_compute_faces( int thread, int num_threads,
       this->max_face_index_[ z ] = static_cast<unsigned int>( this->faces_.size() );
     }
 
+    if ( thread == 0 )
+    {
+      if ( this->check_abort_() ) this->need_abort_ = true;
+    }
+
     barrier.wait();   
 
+    if ( this->need_abort_ ) return;
+    
     // Update progress based on number of z slices processed
     double compute_progress = 
       static_cast< double >( z + 1 ) / static_cast< double >( this->elem_nz_ );
@@ -1254,7 +1266,7 @@ Isosurface::Isosurface( const MaskVolumeHandle& mask_volume ) :
   //this->private_->color_map_ = ColorMapHandle( new ColorMap() );
 }
 
-void Isosurface::compute( double quality_factor )
+void Isosurface::compute( double quality_factor, boost::function< bool () > check_abort )
 {
   lock_type lock( this->get_mutex() );
 
@@ -1263,6 +1275,7 @@ void Isosurface::compute( double quality_factor )
   this->private_->faces_.clear();
   this->private_->values_.clear();
   this->private_->values_changed_ = false;
+  this->private_->check_abort_ = check_abort;
 
   {
     Core::MaskVolume::shared_lock_type vol_lock( this->private_->orig_mask_volume_->get_mutex() );
@@ -1283,6 +1296,15 @@ void Isosurface::compute( double quality_factor )
     parallel_faces.run();
   }
 
+  if ( check_abort() )
+  {
+    // leave it in a decent state
+    this->private_->points_.clear();
+    this->private_->normals_.clear();
+    this->private_->faces_.clear();
+    this->private_->values_.clear();
+    return;
+  }
   // Check for empty isosurface
   if( this->private_->points_.size() == 0 ) 
   {

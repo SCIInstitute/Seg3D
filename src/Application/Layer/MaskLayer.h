@@ -95,6 +95,7 @@ public:
   // SET_MASK_VOLUME:
   // This function set the mask volume to a new mask.
   bool set_mask_volume( Core::MaskVolumeHandle volume );
+  
 
   // -- iso surface handling --
 public:

@@ -311,7 +311,8 @@ void MaskLayer::compute_isosurface( double quality_factor )
   // Set data state to processing so that progress bar is displayed
   this->data_state_->set( Layer::PROCESSING_C );
 
-  iso->compute( quality_factor );
+  this->reset_abort();
+  iso->compute( quality_factor, boost::bind( &Layer::check_abort, this ) );
 
   this->data_state_->set( Layer::AVAILABLE_C );
 

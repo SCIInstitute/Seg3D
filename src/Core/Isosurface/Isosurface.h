@@ -61,27 +61,37 @@ public:
 
   // COMPUTE:
   // Compute isosurface.  quality_factor must be one of: {0.125, 0.25, 0.5, 1.0} 
-  void compute( double quality_factor = 1.0 );
+  void compute( double quality_factor, boost::function< bool () > check_abort );
 
   // GET_POINTS:
   // Get 3D points for vertices, each stored only once
+  // NOTE: This function is not thread-safe, make sure you have the mutex
+  // allocated before using this array (use get_mutex())
   const std::vector< PointF >& get_points() const;
 
   // GET_FACES:
   // Indices into vertices, 3 per face
+  // NOTE: This function is not thread-safe, make sure you have the mutex
+  // allocated before using this array (use get_mutex())
   const std::vector< unsigned int >& get_faces() const;
 
   // GET_NORMALS:
   // Get one normal per vertex, interpolated
+  // NOTE: This function is not thread-safe, make sure you have the mutex
+  // allocated before using this array (use get_mutex())
   const std::vector< VectorF >& get_normals() const;
 
   // GET_VALUES:
   // Get values per vertex.  Returns empty vector if use has not set values.
+  // NOTE: This function is not thread-safe, make sure you have the mutex
+  // allocated before using this array (use get_mutex())
   const std::vector< float >& get_values() const; 
 
   // SET_VALUES:
   // Set values for all vertices.  Vector must be same size as points and normals vectors 
   // or empty.  Returns true on success, false on failure.
+  // NOTE: This function is not thread-safe, make sure you have the mutex
+  // allocated before using this array (use get_mutex())
   bool set_values( const std::vector< float >& values );
 
   // SET_COLOR_MAP:

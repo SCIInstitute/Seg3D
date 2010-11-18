@@ -215,6 +215,15 @@ public:
   // Get the generation of the current data block
   Core::DataBlock::generation_type get_generation() const;
 
+  // -- abort handling --
+public:
+
+  void handle_abort();
+  
+  bool check_abort();
+
+  void reset_abort();
+
 protected:
   virtual bool post_save_states( Core::StateIO& state_io );
 

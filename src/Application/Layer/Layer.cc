@@ -67,6 +67,9 @@ public:
   
   // WeakHandle to the algorithm that is currently creating or processing this layer
   LayerAbstractFilterWeakHandle filter_;
+  
+  // Abort flag
+  bool abort_;
 };
 
 void LayerPrivate::handle_locked_state_changed( bool locked )
@@ -111,7 +114,6 @@ Layer::Layer( const std::string& name, bool creating ) :
   StateHandler( "layer",  true ),
   private_( new LayerPrivate )
 { 
-  this->private_->layer_ = this;
   this->initialize_states( name, creating );
 }
 
@@ -119,7 +121,6 @@ Layer::Layer( const std::string& name, const std::string& state_id, bool creatin
   StateHandler( state_id, true ),
   private_( new LayerPrivate )
 {
-  this->private_->layer_ = this;
   this->initialize_states( name, creating );
 }
   
@@ -162,7 +163,15 @@ Layer::mutex_type& Layer::GetMutex()
 
 void Layer::initialize_states( const std::string& name, bool creating )
 {
-  // Step (1) : Build the layer specific state variables
+  // Setup the default values for private class
+  this->private_->layer_ = this;
+  this->private_->abort_ = false;
+  
+  // Make suer handle_abort is called when the signal is triggered
+  this->add_connection( this->abort_signal_.connect( boost::bind(
+    &Layer::handle_abort, this ) ) );
+
+  //  Build the layer specific state variables
 
   // Ensure that the states are encoded as states that change the project
   this->mark_as_project_data();
@@ -317,5 +326,25 @@ Layer::filter_key_type Layer::GenerateFilterKey()
   boost::unique_lock<boost::mutex> lock( filter_key_mutex );
   return filter_key_count++;
 }
+
+
+void Layer::handle_abort()
+{
+  lock_type lock( GetMutex() );
+  this->private_->abort_ = true;
+}
+
+void Layer::reset_abort()
+{
+  lock_type lock( GetMutex() );
+  this->private_->abort_ = false;
+}
+
+bool Layer::check_abort()
+{
+  lock_type lock( GetMutex() );
+  return this->private_->abort_;
+}
+
 
 } // end namespace Seg3D
