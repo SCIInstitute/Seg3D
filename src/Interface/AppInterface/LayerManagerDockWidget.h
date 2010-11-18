@@ -44,9 +44,6 @@ public:
   LayerManagerDockWidget( QWidget *parent = 0 );
   virtual ~LayerManagerDockWidget();
   
-  // KEYPRESSEVENT:
-  // This function is called by Qt when a key is pressed
-  void keyPressEvent( QKeyEvent* event );
 };
 
 } // end namespace Seg3D

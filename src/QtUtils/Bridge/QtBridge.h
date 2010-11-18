@@ -50,6 +50,7 @@
 #include <QtUtils/Widgets/QtTristateToolButton.h>
 #include <QtUtils/Widgets/QtCustomDockWidget.h>
 #include <QtUtils/Widgets/QtCustomDialog.h>
+#include <QtUtils/Widgets/QtHistogramWidget.h>
 
 // Core includes
 #include <Core/State/StateLabeledOption.h>
@@ -154,6 +155,7 @@ public:
 
   // Enable / Disable a button from state engine
   static void Enable( QWidget* qwidget, Core::StateBoolHandle& state, bool opposite_logic = false );
+  static void Enable( QtHistogramWidget* histogram, Core::StateBoolHandle& state, bool opposite_logic = false );
 
   static void Enable( QWidget* qwidget, Core::StateBaseHandle state,
     boost::function< bool () > condition );

@@ -120,6 +120,7 @@ void QtHistogramGraph::paintEvent(QPaintEvent * event )
     }
     
   }
+  
 }
 
 void QtHistogramGraph::mousePressEvent( QMouseEvent* e )

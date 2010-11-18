@@ -30,7 +30,7 @@
    <item>
     <widget class="QGroupBox" name="input_groupbox_">
      <property name="title">
-      <string>Input layers</string>
+      <string>Input Layers</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <property name="spacing">
@@ -116,7 +116,7 @@
             </size>
            </property>
            <property name="text">
-            <string>Always Use Active Layer</string>
+            <string>Always use active layer</string>
            </property>
           </widget>
          </item>
@@ -373,7 +373,7 @@
          <item>
           <widget class="QLabel" name="label_3">
            <property name="text">
-            <string>Output Type:</string>
+            <string>Output type:</string>
            </property>
           </widget>
          </item>
@@ -408,7 +408,7 @@
          <item>
           <widget class="QCheckBox" name="replace_">
            <property name="text">
-            <string>Replace First Input</string>
+            <string>Replace first input</string>
            </property>
           </widget>
          </item>
@@ -433,7 +433,7 @@
          <item>
           <widget class="QCheckBox" name="preserve_checkbox_">
            <property name="text">
-            <string>Preserve Data Format</string>
+            <string>Preserve data format</string>
            </property>
           </widget>
          </item>

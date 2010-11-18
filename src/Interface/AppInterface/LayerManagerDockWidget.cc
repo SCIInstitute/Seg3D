@@ -49,11 +49,5 @@ LayerManagerDockWidget::~LayerManagerDockWidget()
 {
 }
 
-void LayerManagerDockWidget::keyPressEvent( QKeyEvent* event )
-{
-  int s=0;
-}
-
-
 
 }  // end namespace Seg3D

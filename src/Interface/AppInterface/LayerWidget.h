@@ -183,19 +183,23 @@ private:
 
   // MOUSEPRESSEVENT:
   // this function is overloaded to enable drag and drop
-  void mousePressEvent( QMouseEvent* event );
+  virtual void mousePressEvent( QMouseEvent* event );
 
   // DROPEVENT:
   // this function is called when the user drops another layer onto this one
-  void dropEvent( QDropEvent* event );
+  virtual void dropEvent( QDropEvent* event );
 
   // DRAGENTEREVENT:
   // this function is called when the user drags another layer over the top of this one
-  void dragEnterEvent( QDragEnterEvent* event );
+  virtual void dragEnterEvent( QDragEnterEvent* event );
 
   // DRAGLEAVEEVENT:
   // this function is called when the user drags another layer off of the top of this one
-  void dragLeaveEvent( QDragLeaveEvent* event );
+  virtual void dragLeaveEvent( QDragLeaveEvent* event );
+  
+  // KEYPRESSEVENT:
+  // This function is called by Qt when a key is pressed
+  virtual void keyPressEvent( QKeyEvent* event );
     
 private Q_SLOTS:
 

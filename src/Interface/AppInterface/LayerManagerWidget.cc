@@ -355,4 +355,10 @@ void LayerManagerWidget::reset()
   this->private_->group_map_.clear();
 }
 
+void LayerManagerWidget::keyPressEvent( QKeyEvent* event )
+{
+  event->ignore();
+}
+
+
 }  // end namespace Seg3D

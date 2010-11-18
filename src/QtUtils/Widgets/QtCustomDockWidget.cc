@@ -57,7 +57,7 @@ void QtCustomDockWidget::closeEvent( QCloseEvent* event )
 }
 
 void QtCustomDockWidget::keyPressEvent( QKeyEvent* event )
-{
+{ 
   int e = 0;
   if( event->key() == Core::Key::KEY_LEFT_E )
   {
@@ -74,5 +74,11 @@ void QtCustomDockWidget::keyPressEvent( QKeyEvent* event )
     QWidget::keyPressEvent( event );
   }
 }
+
+void QtCustomDockWidget::mousePressEvent( QMouseEvent * event )
+{
+  this->setFocus();
+}
+
 
 } // end namespace QtUtils

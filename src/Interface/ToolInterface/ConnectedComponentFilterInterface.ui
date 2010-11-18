@@ -79,7 +79,7 @@
          <item>
           <widget class="QCheckBox" name="use_active_layer_">
            <property name="text">
-            <string>Always Use Active Layer</string>
+            <string>Always use active layer</string>
            </property>
           </widget>
          </item>
@@ -154,7 +154,7 @@
    <item>
     <widget class="QGroupBox" name="connected_to_mask_groupbox_">
      <property name="title">
-      <string>Find components connected to mask:</string>
+      <string>Find Components Connected To Mask:</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_5">
       <property name="leftMargin">

@@ -78,7 +78,7 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string>Always Use Active Layer</string>
+            <string>Always use active layer</string>
            </property>
           </widget>
          </item>
@@ -128,7 +128,7 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string>Negative Constraint</string>
+            <string>Negative constraint</string>
            </property>
           </widget>
          </item>
@@ -178,7 +178,7 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string>Negative Constraint</string>
+            <string>Negative constraint</string>
            </property>
           </widget>
          </item>
@@ -249,7 +249,7 @@
          <item>
           <widget class="QCheckBox" name="negative_data_constraint_">
            <property name="text">
-            <string>Negative Constraint</string>
+            <string>Negative constraint</string>
            </property>
           </widget>
          </item>
@@ -277,7 +277,7 @@
          <item>
           <widget class="QCheckBox" name="show_boundary_">
            <property name="text">
-            <string>Show Boundary</string>
+            <string>Show boundary</string>
            </property>
           </widget>
          </item>

@@ -124,7 +124,7 @@
          <item>
           <widget class="QCheckBox" name="use_active_group_">
            <property name="text">
-            <string>Always Use Active Group</string>
+            <string>Always use active group</string>
            </property>
           </widget>
          </item>

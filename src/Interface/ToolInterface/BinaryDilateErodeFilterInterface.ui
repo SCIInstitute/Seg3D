@@ -91,7 +91,7 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string>Always Use Active Layer</string>
+            <string>Always use active layer</string>
            </property>
           </widget>
          </item>
@@ -141,7 +141,7 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string>Negative Constraint</string>
+            <string>Negative constraint</string>
            </property>
           </widget>
          </item>
@@ -275,7 +275,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>Run filter</string>
+      <string>Run Filter</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,2">
       <property name="spacing">

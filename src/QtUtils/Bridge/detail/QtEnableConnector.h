@@ -33,6 +33,7 @@
 #include <QPointer>
 
 #include <Core/Utils/ConnectionHandler.h>
+#include <QtUtils/Widgets/QtHistogramWidget.h>
 #include <Core/State/State.h>
 
 namespace QtUtils
@@ -43,6 +44,7 @@ class QtEnableConnector : public QObject, protected Core::ConnectionHandler
   Q_OBJECT
 public:
   QtEnableConnector( QWidget* parent, Core::StateBoolHandle& state, bool opposite_logic );
+  QtEnableConnector( QtHistogramWidget* histogram, Core::StateBoolHandle& state, bool opposite_logic );
   QtEnableConnector( QWidget* parent, Core::StateBaseHandle state,
     boost::function< bool () > condition );
   QtEnableConnector( QWidget* parent, std::vector< Core::StateBaseHandle >& states,
@@ -58,6 +60,7 @@ private:
 private:
   QWidget* parent_;
   bool opposite_logic_;
+  bool histogram_widget_;
   boost::function< bool () > condition_;
 };
 

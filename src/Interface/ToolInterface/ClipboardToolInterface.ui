@@ -155,7 +155,7 @@
       <item>
        <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>Slice Number:</string>
+         <string>Slice number:</string>
         </property>
        </widget>
       </item>
@@ -229,7 +229,7 @@
       <item>
        <widget class="QLabel" name="label_3">
         <property name="text">
-         <string>Min Slice Number:</string>
+         <string>Min slice number:</string>
         </property>
        </widget>
       </item>
@@ -269,7 +269,7 @@
       <item>
        <widget class="QLabel" name="label_4">
         <property name="text">
-         <string>Max Slice Number:</string>
+         <string>Max slice number:</string>
         </property>
        </widget>
       </item>

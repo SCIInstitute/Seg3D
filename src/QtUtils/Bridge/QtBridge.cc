@@ -211,6 +211,11 @@ void QtBridge::Enable( QWidget* qwidget, Core::StateBoolHandle& state, bool oppo
   new QtEnableConnector( qwidget, state, opposite_logic );
 }
 
+void QtBridge::Enable( QtHistogramWidget* histogram, Core::StateBoolHandle& state, bool opposite_logic /*= false */ )
+{
+  new QtEnableConnector( histogram, state, opposite_logic );
+}
+
 void QtBridge::Enable( QWidget* qwidget, std::vector< Core::StateBaseHandle >& states,
             boost::function< bool () > condition )
 {

@@ -41,8 +41,17 @@ QWidget#threshold_histogram_{
    <property name="spacing">
     <number>2</number>
    </property>
-   <property name="margin">
+   <property name="leftMargin">
     <number>4</number>
+   </property>
+   <property name="topMargin">
+    <number>4</number>
+   </property>
+   <property name="rightMargin">
+    <number>4</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
    </property>
    <item>
     <widget class="QGroupBox" name="target_groupbox_">
@@ -81,7 +90,7 @@ QWidget#threshold_histogram_{
          <item>
           <widget class="QCheckBox" name="use_active_layer_">
            <property name="text">
-            <string>Always Use Active Layer</string>
+            <string>Always use active layer</string>
            </property>
           </widget>
          </item>
@@ -139,44 +148,7 @@ QWidget#threshold_histogram_{
       <item>
        <widget class="QCheckBox" name="show_preview_checkbox_">
         <property name="text">
-         <string>Show Preview</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QWidget" name="widget_4" native="true">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>32</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>32</height>
-      </size>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <property name="spacing">
-       <number>0</number>
-      </property>
-      <property name="margin">
-       <number>0</number>
-      </property>
-      <item>
-       <widget class="QPushButton" name="run_button_">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Create Threshold Layer</string>
+         <string>Show preview</string>
         </property>
        </widget>
       </item>
@@ -228,6 +200,43 @@ QWidget#threshold_histogram_{
        <height>180</height>
       </size>
      </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QWidget" name="widget_4" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>32</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>32</height>
+      </size>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="margin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QPushButton" name="run_button_">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Create Threshold Layer</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
   </layout>

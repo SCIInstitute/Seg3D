@@ -1064,6 +1064,12 @@ void LayerWidget::activate_from_lineedit_focus()
   ActionActivateLayer::Dispatch( Core::Interface::GetWidgetActionContext(), this->private_->layer_ ) ;
 }
 
+void LayerWidget::keyPressEvent( QKeyEvent* event )
+{
+  event->ignore();
+}
+
+
 
 
 

@@ -139,7 +139,7 @@
          <item>
           <widget class="QCheckBox" name="use_active_group_">
            <property name="text">
-            <string>Always Use Active Group</string>
+            <string>Always use active group</string>
            </property>
           </widget>
          </item>
@@ -600,7 +600,7 @@
       <item>
        <widget class="QCheckBox" name="keep_aspect_ratio_checkbox_">
         <property name="text">
-         <string>Keep Aspect Ratio</string>
+         <string>Keep aspect ratio</string>
         </property>
        </widget>
       </item>
@@ -653,7 +653,7 @@
         <item>
          <widget class="QLabel" name="label_7">
           <property name="text">
-           <string>Preview Layer:</string>
+           <string>Preview layer:</string>
           </property>
          </widget>
         </item>
@@ -693,14 +693,14 @@
          <item>
           <widget class="QCheckBox" name="show_preview_checkbox_">
            <property name="text">
-            <string>Show Preview</string>
+            <string>Show preview</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QCheckBox" name="show_border_checkbox_">
            <property name="text">
-            <string>Show Border</string>
+            <string>Show border</string>
            </property>
           </widget>
          </item>

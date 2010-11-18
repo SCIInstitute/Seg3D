@@ -132,7 +132,11 @@ protected:
   // RESIZEEVENT:
   // this is an overloaded function to keep the size of the overlay widget in sync with the 
   // size of the LayerGroupWidget
-  void resizeEvent( QResizeEvent *event );
+  virtual void resizeEvent( QResizeEvent *event );
+  
+  // KEYPRESSEVENT:
+  // This function is called by Qt when a key is pressed
+  virtual void keyPressEvent( QKeyEvent* event );
   
 private Q_SLOTS:
   // UNCHECK_DELETE_CONFIRM:
@@ -151,19 +155,19 @@ private Q_SLOTS:
 
   // MOUSEPRESSEVENT:
   // Overloaded function that is triggered when a user clicks on the group
-  void mousePressEvent( QMouseEvent* event );
+  virtual void mousePressEvent( QMouseEvent* event );
 
   // DROPEVENT:
   // Overloaded function that is triggered when a drop occurs on the group
-  void dropEvent( QDropEvent* event );
+  virtual void dropEvent( QDropEvent* event );
 
   // DRAGENTEREVENT:
   // Overloaded function that is triggered when a drag even enters the group
-  void dragEnterEvent( QDragEnterEvent* event );
+  virtual void dragEnterEvent( QDragEnterEvent* event );
   
   // DRAGLEAVEEVENT:
   // Overloaded function that is triggered when a drag even leaves the group
-  void dragLeaveEvent( QDragLeaveEvent* event );
+  virtual void dragLeaveEvent( QDragLeaveEvent* event );
 
   // SHOW_GROUP:
   // helper function for the show_layers function that shows the group
