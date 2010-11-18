@@ -31,11 +31,13 @@
 
 // QT includes
 #include <QtCore/QPointer>
-#include <QtGui/QDialog>
 #include <QtGui/QListWidgetItem>
 
 // Boost includes
 #include <boost/shared_ptr.hpp>
+
+// QtUtils includes
+#include <QtUtils/Widgets/QtCustomDialog.h>
 
 // Interface includes
 #include <Interface/AppProjectWizard/AppProjectWizard.h>
@@ -45,7 +47,7 @@ namespace Seg3D
 
 class AppSplashPrivate;
 
-class AppSplash : public QDialog
+class AppSplash : public QtUtils::QtCustomDialog
 {
 Q_OBJECT
   

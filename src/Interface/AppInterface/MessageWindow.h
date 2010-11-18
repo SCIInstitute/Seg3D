@@ -30,7 +30,6 @@
 #define INTERFACE_APPINTERFACE_MESSAGEHISTORYWIDGET_H
 
 // QT includes
-#include <QtGui/QDialog>
 #include <QtCore/QPointer>
 
 // STL includes
@@ -38,6 +37,9 @@
 
 // Boost includes
 #include <boost/shared_ptr.hpp>
+
+// QtUtils includes
+#include <QtUtils/Widgets/QtCustomDialog.h>
 
 // Core includes
 #include <Core/Utils/ConnectionHandler.h>
@@ -47,7 +49,7 @@ namespace Seg3D
 
 class MessageWindowPrivate;
 
-class MessageWindow : public QDialog, private Core::ConnectionHandler
+class MessageWindow : public QtUtils::QtCustomDialog, private Core::ConnectionHandler
 {
 Q_OBJECT
   

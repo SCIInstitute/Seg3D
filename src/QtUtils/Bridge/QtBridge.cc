@@ -228,6 +228,17 @@ void QtBridge::Show( QWidget* qwidget, Core::StateBoolHandle& state, bool opposi
   new QtShowConnector( qwidget, state, opposite_logic );
 }
 
+void QtBridge::Show( QtCustomDockWidget* dockwidget, Core::StateBoolHandle& state, bool opposite_logic /*= false */ )
+{
+  new QtShowConnector( dockwidget, state, opposite_logic );
+}
+
+void QtBridge::Show( QtCustomDialog* dialog, Core::StateBoolHandle& state, bool opposite_logic /*= false */ )
+{
+  new QtShowConnector( dialog, state, opposite_logic );
+}
+
+
 void QtBridge::Show( QWidget* qwidget, std::vector< Core::StateBaseHandle >& states, 
           boost::function< bool () > condition )
 {
@@ -239,6 +250,12 @@ void QtBridge::Show( QWidget* qwidget, Core::StateBaseHandle state,
 {
   new QtShowConnector( qwidget, state, condition );
 }
+
+
+
+
+
+
 
 
 

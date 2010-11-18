@@ -60,7 +60,7 @@ public:
 };
 
 AppShortcuts::AppShortcuts( QWidget *parent ) :
-  QDialog( parent ),
+  QtUtils::QtCustomDialog( parent ),
   private_( new AppShortcutsPrivate ) 
 {
   // Set up the private internals of the MessageWindow class

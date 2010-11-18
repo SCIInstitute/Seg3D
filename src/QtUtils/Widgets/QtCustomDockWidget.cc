@@ -26,35 +26,53 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_APPINTERFACE_MEASUREMENTDOCKWIDGET_H
-#define INTERFACE_APPINTERFACE_MEASUREMENTDOCKWIDGET_H
-
-// Boost includes
-#include <boost/shared_ptr.hpp>
+// Core includes
+#include <Core/Viewer/Mouse.h>
+#include <Core/State/StateEngine.h>
 
 // QtUtils includes
 #include <QtUtils/Widgets/QtCustomDockWidget.h>
 
-namespace Seg3D
+// Application includes
+#include <Application/LayerManager/Actions/ActionActivateNextLayer.h>
+#include <Application/LayerManager/Actions/ActionActivatePreviousLayer.h>
+#include <Application/InterfaceManager/InterfaceManager.h>
+
+namespace QtUtils
 {
-
-class MeasurementDockWidgetPrivate;
-
-class MeasurementDockWidget : public QtUtils::QtCustomDockWidget
+  
+QtCustomDockWidget::QtCustomDockWidget( QWidget *parent ) :
+  QDockWidget( parent )
 {
+}
+  
+QtCustomDockWidget::~QtCustomDockWidget()
+{
+}
 
-Q_OBJECT
+void QtCustomDockWidget::closeEvent( QCloseEvent* event )
+{
+  Q_EMIT closed();
+  event->accept();
+}
 
-public:
-  MeasurementDockWidget( QWidget *parent = 0 );
-  ~MeasurementDockWidget();
+void QtCustomDockWidget::keyPressEvent( QKeyEvent* event )
+{
+  int e = 0;
+  if( event->key() == Core::Key::KEY_LEFT_E )
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    Seg3D::ActionActivatePreviousLayer::Dispatch( Core::Interface::GetKeyboardActionContext() );
+  }
+  else if( event->key() == Core::Key::KEY_RIGHT_E )
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    Seg3D::ActionActivateNextLayer::Dispatch( Core::Interface::GetKeyboardActionContext() );
+  }
+  else
+  {
+    QWidget::keyPressEvent( event );
+  }
+}
 
-private:
-
-  boost::shared_ptr< MeasurementDockWidgetPrivate > private_;
-
-};
-
-} // end namespace
-
-#endif // MEASUREMENTDOCKWIDGET_H
+} // end namespace QtUtils

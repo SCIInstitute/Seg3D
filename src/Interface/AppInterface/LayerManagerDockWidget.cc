@@ -37,7 +37,7 @@ namespace Seg3D
 {
 
 LayerManagerDockWidget::LayerManagerDockWidget( QWidget *parent ) :
-  QDockWidget( "LayerManagerDockWidget", parent )
+  QtUtils::QtCustomDockWidget( parent )
 {
   this->setAllowedAreas( Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea );
   this->setWindowTitle( "Layer Manager" );
@@ -48,6 +48,12 @@ LayerManagerDockWidget::LayerManagerDockWidget( QWidget *parent ) :
 LayerManagerDockWidget::~LayerManagerDockWidget()
 {
 }
+
+void LayerManagerDockWidget::keyPressEvent( QKeyEvent* event )
+{
+  int s=0;
+}
+
 
 
 }  // end namespace Seg3D

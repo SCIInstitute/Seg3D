@@ -29,13 +29,13 @@
 #ifndef INTERFACE_APPINTERFACE_LAYERMANAGERDOCKWIDGET_H
 #define INTERFACE_APPINTERFACE_LAYERMANAGERDOCKWIDGET_H
 
-// QT includes
-#include <QDockWidget>
+// QtUtils includes
+#include <QtUtils/Widgets/QtCustomDockWidget.h>
 
 namespace Seg3D
 {
 
-class LayerManagerDockWidget : public QDockWidget
+class LayerManagerDockWidget : public QtUtils::QtCustomDockWidget
 {
 Q_OBJECT
 
@@ -43,6 +43,10 @@ Q_OBJECT
 public:
   LayerManagerDockWidget( QWidget *parent = 0 );
   virtual ~LayerManagerDockWidget();
+  
+  // KEYPRESSEVENT:
+  // This function is called by Qt when a key is pressed
+  void keyPressEvent( QKeyEvent* event );
 };
 
 } // end namespace Seg3D

@@ -85,39 +85,13 @@ public:
   Core::StateBoolHandle preferences_manager_visibility_state_;
   Core::StateBoolHandle controller_visibility_state_;
   Core::StateBoolHandle message_window_visibility_state_;
-
-  // -- Signals --
-public:
-  typedef boost::signals2::signal< void( std::string ) > window_signal_type;
-
-  // OPEN_WINDOW_SIGNAL:
-  // This signal is triggered after a window needs to be opened
-  window_signal_type show_window_signal_;
-
-  // CLOSE_WINDOW_SIGNAL:
-  // This signal is triggered after a window needs to be closed
-  window_signal_type close_window_signal_;
-
-  // -- Access to windowid_list_ --
-public:
-  typedef std::set< std::string > windowid_list_type;
-
-  // ADD_WINDOWID:
-  // Mark a windowid as available
-  void add_windowid( const std::string& windowid ); // << THREAD-SAFE
-
-  // IS_WINDOWID:
-  // Check whether window id is valid
-  bool is_windowid( const std::string& windowid ); // << THREAD-SAFE
+  Core::StateBoolHandle splash_screen_visibility_state_;
+  Core::StateBoolHandle keyboard_shortcut_visibility_state_;
   
 private:
   // INITIALIZE_STATES:
   // This function is called by the constructor to initialize the state variables
   void initialize_states();
-
-private:
-  boost::mutex windowid_list_mutex_;
-  windowid_list_type windowid_list_;
 
 };
 

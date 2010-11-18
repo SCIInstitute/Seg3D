@@ -33,6 +33,7 @@
 
 // Core includes
 #include <Core/Interface/Interface.h>
+#include <Core/State/Actions/ActionSet.h>
 
 // QtUtils includes
 #include <QtUtils/Bridge/detail/QtShowConnector.h>
@@ -41,10 +42,9 @@ namespace QtUtils
 {
 
 QtShowConnector::QtShowConnector( QWidget* parent, 
-  Core::StateBoolHandle& state, bool opposite_logic ) :
-  QObject( parent ),
+  Core::StateBoolHandle& state, bool opposite_logic, bool blocking ) :
+  QtConnectorBase( parent, blocking ),
   parent_( parent ),
-  state_( state ),
   opposite_logic_( opposite_logic )
 {
   QPointer< QtShowConnector > qpointer( this );
@@ -57,10 +57,48 @@ QtShowConnector::QtShowConnector( QWidget* parent,
   }
 }
 
+QtShowConnector::QtShowConnector( QtCustomDockWidget* parent, 
+  Core::StateBoolHandle& state, bool opposite_logic, bool blocking ) :
+  QtConnectorBase( parent, blocking ),
+  parent_( parent ),
+  state_( state ),
+  opposite_logic_( opposite_logic )
+{
+  QPointer< QtShowConnector > qpointer( this );
+
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    parent->setVisible( state->get() ^ this->opposite_logic_ );
+    this->add_connection( state->value_changed_signal_.connect(
+      boost::bind( &QtShowConnector::ShowWidget, qpointer, _1 ) ) );
+  }
+  
+  this->connect( parent, SIGNAL( closed() ), SLOT( set_state() ) );
+}
+
+QtShowConnector::QtShowConnector( QtCustomDialog* parent, 
+  Core::StateBoolHandle& state, bool opposite_logic, bool blocking ) :
+  QtConnectorBase( parent, blocking ),
+  parent_( parent ),
+  state_( state ),
+  opposite_logic_( opposite_logic )
+{
+  QPointer< QtShowConnector > qpointer( this );
+
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    parent->setVisible( state->get() ^ this->opposite_logic_ );
+    this->add_connection( state->value_changed_signal_.connect(
+      boost::bind( &QtShowConnector::ShowWidget, qpointer, _1 ) ) );
+  }
+
+  this->connect( parent, SIGNAL( closed() ), SLOT( set_state() ) );
+}
+
 QtShowConnector::QtShowConnector( QWidget* parent, 
   Core::StateBaseHandle state, 
-  boost::function< bool () > condition ) :
-  QObject( parent ),
+  boost::function< bool () > condition, bool blocking ) :
+  QtConnectorBase( parent, blocking ),
   parent_( parent ),
   condition_( condition )
 {
@@ -74,8 +112,8 @@ QtShowConnector::QtShowConnector( QWidget* parent,
 
 QtShowConnector::QtShowConnector( QWidget* parent, 
   std::vector< Core::StateBaseHandle >& states, 
-  boost::function< bool () > condition ) :
-  QObject( parent ),
+  boost::function< bool () > condition, bool blocking ) :
+  QtConnectorBase( parent, blocking ),
   parent_( parent ),
   condition_( condition )
 {
@@ -132,5 +170,13 @@ void QtShowConnector::ShowWidget( QPointer< QtShowConnector > qpointer )
   qpointer->parent_->setVisible( qpointer->condition_() );
 }
 
+
+void QtShowConnector::set_state()
+{
+  if ( !this->is_blocked() )
+  {
+    Core::ActionSet::Dispatch( Core::Interface::GetMouseActionContext(), this->state_, false );
+  }
+}
 
 } // end namespace QtUtils

@@ -60,7 +60,7 @@ public:
 };
 
 AppSplash::AppSplash( QWidget *parent ) :
-  QDialog( parent ),
+  QtUtils::QtCustomDialog( parent ),
   private_( new AppSplashPrivate )
 {
   this->setAttribute( Qt::WA_DeleteOnClose, true );

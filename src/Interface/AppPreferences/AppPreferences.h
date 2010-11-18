@@ -31,10 +31,16 @@
 
 // Boost includes
 #include <boost/shared_ptr.hpp>
+
+// Qt includes
+#include <QtGui/QFileDialog>
+
+// Interface includes
 #include <Interface/AppPreferences/ColorPickerWidget.h>
 
-#include <QtGui/QDialog>
-#include <QtGui/QFileDialog>
+// QtUtils includes
+#include <QtUtils/Widgets/QtCustomDialog.h>
+
 
 
 
@@ -43,7 +49,7 @@ namespace Seg3D
 
 class AppPreferencesPrivate;
 
-class AppPreferences : public QDialog
+class AppPreferences : public QtUtils::QtCustomDialog
 {
     Q_OBJECT
 public:

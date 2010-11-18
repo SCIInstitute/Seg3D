@@ -50,7 +50,7 @@ namespace Seg3D
 {
 
 ToolsDockWidget::ToolsDockWidget( QWidget *parent ) :
-  QDockWidget( parent )
+  QtUtils::QtCustomDockWidget( parent )
 {
   // Update the title and where this window can be docked
   setAllowedAreas( Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea );

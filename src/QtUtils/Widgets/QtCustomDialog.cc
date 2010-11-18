@@ -25,36 +25,29 @@
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
  */
-
-#ifndef INTERFACE_APPINTERFACE_MEASUREMENTDOCKWIDGET_H
-#define INTERFACE_APPINTERFACE_MEASUREMENTDOCKWIDGET_H
-
-// Boost includes
-#include <boost/shared_ptr.hpp>
-
+ 
 // QtUtils includes
-#include <QtUtils/Widgets/QtCustomDockWidget.h>
+#include <QtUtils/Widgets/QtCustomDialog.h>
 
-namespace Seg3D
+
+
+namespace QtUtils
 {
-
-class MeasurementDockWidgetPrivate;
-
-class MeasurementDockWidget : public QtUtils::QtCustomDockWidget
+  
+QtCustomDialog::QtCustomDialog( QWidget *parent ) :
+  QDialog( parent )
 {
+}
+  
+QtCustomDialog::~QtCustomDialog()
+{
+}
 
-Q_OBJECT
+void QtCustomDialog::closeEvent( QCloseEvent* event )
+{
+  Q_EMIT closed();
+  event->accept();
+}
 
-public:
-  MeasurementDockWidget( QWidget *parent = 0 );
-  ~MeasurementDockWidget();
 
-private:
-
-  boost::shared_ptr< MeasurementDockWidgetPrivate > private_;
-
-};
-
-} // end namespace
-
-#endif // MEASUREMENTDOCKWIDGET_H
+} // end namespace QtUtils

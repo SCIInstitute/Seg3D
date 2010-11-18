@@ -38,7 +38,7 @@ namespace QtUtils
 {
 
 QtSliderIntComboConnector::QtSliderIntComboConnector( QtSliderIntCombo* parent, 
-    Core::StateRangedIntHandle& state, bool blocking ) :
+  Core::StateRangedIntHandle& state, bool blocking ) :
   QtConnectorBase( parent, blocking ),
   parent_( parent ),
   state_( state )

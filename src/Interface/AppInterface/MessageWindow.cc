@@ -57,7 +57,7 @@ public:
 };
 
 MessageWindow::MessageWindow( QWidget *parent ) :
-  QDialog( parent ),
+  QtUtils::QtCustomDialog( parent ),
   private_( new MessageWindowPrivate )  
 {
   // Set up the private internals of the MessageWindow class

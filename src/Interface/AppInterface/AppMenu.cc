@@ -45,7 +45,6 @@
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/ProjectManager/ProjectManager.h>
 #include <Application/ToolManager/Actions/ActionOpenTool.h>
-#include <Application/InterfaceManager/Actions/ActionShowWindow.h>
 #include <Application/ViewerManager/ViewerManager.h>
 #include <Application/ProjectManager/Actions/ActionSaveSession.h>
 #include <Application/ProjectManager/Actions/ActionLoadProject.h>
@@ -344,85 +343,96 @@ void AppMenu::create_window_menu( QMenu* qmenu )
   // Project Window
   qaction = qmenu->addAction( "Project Window" );
   qaction->setShortcut( tr( "Ctrl+Shift+P" ) );
-  QtUtils::QtBridge::Connect( qaction, boost::bind( &ActionShowWindow::Dispatch, 
-    Core::Interface::GetWidgetActionContext(), std::string( "project" ) ) );
+  qaction->setCheckable( true );
+  QtUtils::QtBridge::Connect( qaction, 
+    InterfaceManager::Instance()->project_dockwidget_visibility_state_ );
 
-//  // History Window
-//  qaction = qmenu->addAction( "History Window" );
+//  // History Widget
+//  qaction = qmenu->addAction( "History Widget" );
 //  qaction->setShortcut( tr( "Ctrl+Shift+H" ) );
-//  QtUtils::QtBridge::Connect( qaction, boost::bind( &ActionShowWindow::Dispatch, 
-//    Core::Interface::GetWidgetActionContext(), std::string( "history" ) ) );
+//  qaction->setCheckable( true );
+//  QtUtils::QtBridge::Connect( qaction, 
+//    InterfaceManager::Instance()->history_dockwidget_visibility_state_ );
 
   //Tools Window
   qaction = qmenu->addAction( "Tools Window" );
   qaction->setShortcut( tr( "Ctrl+Shift+T" ) );
-  QtUtils::QtBridge::Connect( qaction, boost::bind( &ActionShowWindow::Dispatch, 
-    Core::Interface::GetWidgetActionContext(), std::string( "tools" ) ) );
+  qaction->setCheckable( true );
+  QtUtils::QtBridge::Connect( qaction, 
+    InterfaceManager::Instance()->toolmanager_dockwidget_visibility_state_ );
 
   // Layer Manager Window
   qaction = qmenu->addAction( "Layer Manager Window" );
+  qaction->setCheckable( true );
   qaction->setShortcut( tr( "Ctrl+Shift+L" ) );
-  QtUtils::QtBridge::Connect( qaction, boost::bind( &ActionShowWindow::Dispatch, 
-    Core::Interface::GetWidgetActionContext(), std::string( "layermanager" ) ) );
+  QtUtils::QtBridge::Connect( qaction, 
+    InterfaceManager::Instance()->layermanager_dockwidget_visibility_state_ );
+  
+//  boost::bind( &ActionShowWindow::Dispatch, 
+//    Core::Interface::GetWidgetActionContext(), std::string( "layermanager" ) ) );
 
 //  // Measurement Window
 //  qaction = qmenu->addAction( "Measurement Window" );
 //  qaction->setShortcut( tr( "Ctrl+Shift+M" ) );
-//  QtUtils::QtBridge::Connect( qaction, boost::bind( &ActionShowWindow::Dispatch, 
-//    Core::Interface::GetWidgetActionContext(), std::string( "measurement" ) ) );
+//  qaction->setCheckable( true );
+//  QtUtils::QtBridge::Connect( qaction, 
+//    InterfaceManager::Instance()->measurement_project_dockwidget_visibility_state_ );
 
   qmenu->addSeparator();
 
   // Controller Window
   qaction = qmenu->addAction( "Controller Window" );
   qaction->setShortcut( tr( "Ctrl+Shift+C" ) );
-  QtUtils::QtBridge::Connect( qaction, boost::bind( &ActionShowWindow::Dispatch,
-      Core::Interface::GetWidgetActionContext(), std::string( "controller" ) ) );
+  qaction->setCheckable( true );
+  QtUtils::QtBridge::Connect( qaction, 
+    InterfaceManager::Instance()->controller_visibility_state_ );
 
   // Preferences Window
   qaction = qmenu->addAction( "Preferences Window" );
   qaction->setShortcut( tr( "Ctrl+," ) );
-  QtUtils::QtBridge::Connect( qaction, boost::bind( &ActionShowWindow::Dispatch,
-    Core::Interface::GetWidgetActionContext(), std::string( "preferences" ) ) );
+  qaction->setCheckable( true );
+  QtUtils::QtBridge::Connect( qaction, 
+    InterfaceManager::Instance()->preferences_manager_visibility_state_ );
 }
   
-  void AppMenu::create_help_menu( QMenu* qmenu )
-  {
-    QAction* qaction = 0;
-    qaction = qmenu->addAction( tr( "&About" ) );
-    std::string about = std::string( "About " ) + 
-      Core::Application::GetApplicationNameAndVersion();
-    qaction->setToolTip( QString::fromStdString( about ) );
-    connect( qaction, SIGNAL( triggered() ), this, SLOT( about() ) );
-    
-    qaction = qmenu->addAction( tr( "&Keyboard Shortcuts" ) ); 
-    qaction->setToolTip( QString( "List of the keyboard shortcuts or 'hotkeys' for " ) + 
-      QString::fromStdString( Core::Application::GetApplicationNameAndVersion() ) );
-    qaction->setShortcut( tr( "SHIFT+CTRL+ALT+K" ) );
-    QtUtils::QtBridge::Connect( qaction, boost::bind( &ActionShowWindow::Dispatch,
-      Core::Interface::GetWidgetActionContext(), std::string( "keyboard_shortcuts" ) ) );
-
-  }
+void AppMenu::create_help_menu( QMenu* qmenu )
+{
+  QAction* qaction = 0;
+  qaction = qmenu->addAction( tr( "&About" ) );
+  std::string about = std::string( "About " ) + 
+    Core::Application::GetApplicationNameAndVersion();
+  qaction->setToolTip( QString::fromStdString( about ) );
+  connect( qaction, SIGNAL( triggered() ), this, SLOT( about() ) );
   
-  void AppMenu::about()
-  {
-    std::string about = std::string( "About " ) + 
-      Core::Application::GetApplicationNameAndVersion();
+  qaction = qmenu->addAction( tr( "&Keyboard Shortcuts" ) ); 
+  qaction->setToolTip( QString( "List of the keyboard shortcuts or 'hotkeys' for " ) + 
+    QString::fromStdString( Core::Application::GetApplicationNameAndVersion() ) );
+  qaction->setShortcut( tr( "SHIFT+CTRL+ALT+K" ) );
+  qaction->setCheckable( true );
+  QtUtils::QtBridge::Connect( qaction, 
+    InterfaceManager::Instance()->keyboard_shortcut_visibility_state_ );
 
-    QMessageBox::about( this->main_window_, QString::fromStdString( about ), 
-      QString( "<h3>" ) + 
-      QString::fromStdString( Core::Application::GetApplicationNameAndVersion() ) +
-      QString( "</h3>" ) +
-      QString(
-        "<p align=\"justify\">Seg3D is a free volume segmentation and image processing tool created by the "
-        "NIH Center for Integrative Biomedical (CIBC) located at the Scientific Computing "
-        "and Imaging Instititute (SCI) at the University of Utah and developed in "
-        "collaboration with Numira Biosciences. "
-          "Seg3D combines a flexible manual segmentation interface with powerful "
-          "image processing and segmentation algorithms from the Insight "
-          "Toolkit.</p>") );
-  }
+}
   
+void AppMenu::about()
+{
+  std::string about = std::string( "About " ) + 
+    Core::Application::GetApplicationNameAndVersion();
+
+  QMessageBox::about( this->main_window_, QString::fromStdString( about ), 
+    QString( "<h3>" ) + 
+    QString::fromStdString( Core::Application::GetApplicationNameAndVersion() ) +
+    QString( "</h3>" ) +
+    QString(
+      "<p align=\"justify\">Seg3D is a free volume segmentation and image processing tool created by the "
+      "NIH Center for Integrative Biomedical (CIBC) located at the Scientific Computing "
+      "and Imaging Instititute (SCI) at the University of Utah and developed in "
+      "collaboration with Numira Biosciences. "
+        "Seg3D combines a flexible manual segmentation interface with powerful "
+        "image processing and segmentation algorithms from the Insight "
+        "Toolkit.</p>") );
+}
+
 void AppMenu::new_project_wizard()
 {
   if ( ProjectManager::Instance()->current_project_ )

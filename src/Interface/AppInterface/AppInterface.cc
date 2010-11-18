@@ -48,6 +48,7 @@
 
 // QtUtils includes
 #include <QtUtils/Utils/QtPointer.h>
+#include <QtUtils/Bridge/QtBridge.h>
 
 // Resource includes
 #include <Resources/QtResources.h>
@@ -64,74 +65,88 @@ AppInterface::AppInterface()
   InitQtResources();
 
   // Set the window information and set the version numbers
-  setWindowTitle( QString::fromStdString( Core::Application::GetApplicationNameAndVersion() ) );
-  setWindowIconText( QString::fromStdString( Core::Application::GetApplicationName() ) );
+  this->setWindowTitle( QString::fromStdString( Core::Application::GetApplicationNameAndVersion() ) );
+  this->setWindowIconText( QString::fromStdString( Core::Application::GetApplicationName() ) );
 
   // TODO: Do we need this one?
-  setDocumentMode( true );
+  this->setDocumentMode( true );
 
   // Tell Qt what size to start up in
-  resize( 1280, 720 );
+  this->resize( 1280, 720 );
   
   // Tell Qt where to dock the toolbars
-  setCorner( Qt::TopLeftCorner, Qt::LeftDockWidgetArea );
-  setCorner( Qt::TopRightCorner, Qt::RightDockWidgetArea );
-  setCorner( Qt::BottomLeftCorner, Qt::LeftDockWidgetArea );
-  setCorner( Qt::BottomRightCorner, Qt::RightDockWidgetArea );
+  this->setCorner( Qt::TopLeftCorner, Qt::LeftDockWidgetArea );
+  this->setCorner( Qt::TopRightCorner, Qt::RightDockWidgetArea );
+  this->setCorner( Qt::BottomLeftCorner, Qt::LeftDockWidgetArea );
+  this->setCorner( Qt::BottomRightCorner, Qt::RightDockWidgetArea );
 
-  
-  this->preferences_interface_ = new AppPreferences( this );
-  this->preferences_interface_->hide();
-  
-  this->controller_interface_ = new AppController( this );
-  this->controller_interface_->hide();
-  
-  this->history_widget_ = new MessageWindow( this );
-  this->history_widget_->hide();
-  
-  this->keyboard_shortcuts_ = new AppShortcuts( this );
-  this->keyboard_shortcuts_->hide();
-  
-  this->splash_interface_ = new AppSplash( this );
 
   // Define the main window viewer canvas
   this->viewer_interface_ = new ViewerInterface( this );
-
-  // Setup the dock widgets
-  add_windowids();
-
-  {
-    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-
-    // Show the Windows that are specified in the PreferencesManager
-    if( PreferencesManager::Instance()->show_history_bar_state_->get() )
-      show_window( "history" );
-
-    if( PreferencesManager::Instance()->show_projectmanager_bar_state_->get() )
-      show_window( "project" );
-
-    if( PreferencesManager::Instance()->show_tools_bar_state_->get() )
-      show_window( "tools" );
-
-    if( PreferencesManager::Instance()->show_measurement_bar_state_->get() )
-      show_window( "measurement" );
-
-    if( PreferencesManager::Instance()->show_layermanager_bar_state_->get() )
-      show_window( "layermanager" );
-  }
-
-  setCentralWidget( this->viewer_interface_ );
-
+  this->setCentralWidget( this->viewer_interface_ );
+  
+  // Setup the menubar and statusbar
   this->application_menu_ = new AppMenu( this );
   this->status_bar_ = new AppStatusBar( this );
+  
+  // Instantiate the peripheral windows
+  this->preferences_interface_ = new AppPreferences( this );
+  this->controller_interface_ = new AppController( this );
+  this->message_widget_ = new MessageWindow( this );
+  this->keyboard_shortcuts_ = new AppShortcuts( this );
+  this->splash_interface_ = new AppSplash( this );
+  
+  // Instantiate the dock widgets
+  this->layer_manager_dock_window_ = new LayerManagerDockWidget( this );
+  this->addDockWidget( Qt::RightDockWidgetArea, this->layer_manager_dock_window_ );
+  
+  this->project_dock_window_ = new ProjectDockWidget( this );
+  this->addDockWidget( Qt::LeftDockWidgetArea, this->project_dock_window_ );
+  
+  this->history_dock_window_ = new HistoryDockWidget( this );
+  this->addDockWidget( Qt::LeftDockWidgetArea, this->history_dock_window_ );
+  
+  this->tools_dock_window_ = new ToolsDockWidget( this );
+  this->addDockWidget( Qt::LeftDockWidgetArea, this->tools_dock_window_ );
+  
+  this->measurement_dock_window_ = new MeasurementDockWidget( this );
+  this->addDockWidget( Qt::RightDockWidgetArea, this->measurement_dock_window_ );
+  
+  
+  // Connect the windows and widgets to their visibility states
+  QtUtils::QtBridge::Show( this->layer_manager_dock_window_, 
+    InterfaceManager::Instance()->layermanager_dockwidget_visibility_state_ );
 
+  QtUtils::QtBridge::Show( this->tools_dock_window_, 
+    InterfaceManager::Instance()->toolmanager_dockwidget_visibility_state_ );
 
-  this->add_connection( InterfaceManager::Instance()->show_window_signal_.connect( 
-    boost::bind( &AppInterface::HandleShowWindow, qpointer_type( this ), _1 ) ) );
+  QtUtils::QtBridge::Show( this->project_dock_window_, 
+    InterfaceManager::Instance()->project_dockwidget_visibility_state_ );
 
-  this->add_connection( InterfaceManager::Instance()->close_window_signal_.connect( 
-    boost::bind( &AppInterface::HandleCloseWindow, qpointer_type( this ), _1 ) ) );
+  QtUtils::QtBridge::Show( this->measurement_dock_window_, 
+    InterfaceManager::Instance()->measurement_project_dockwidget_visibility_state_ );
 
+  QtUtils::QtBridge::Show( this->history_dock_window_, 
+    InterfaceManager::Instance()->history_dockwidget_visibility_state_ );
+  
+  QtUtils::QtBridge::Show( this->splash_interface_, 
+    InterfaceManager::Instance()->splash_screen_visibility_state_ );
+  this->center_seg3d_gui_on_screen( this->splash_interface_ );
+  
+  QtUtils::QtBridge::Show( this->preferences_interface_, 
+    InterfaceManager::Instance()->preferences_manager_visibility_state_ );
+    
+  QtUtils::QtBridge::Show( this->controller_interface_, 
+    InterfaceManager::Instance()->controller_visibility_state_ );
+    
+  QtUtils::QtBridge::Show( this->message_widget_, 
+    InterfaceManager::Instance()->message_window_visibility_state_ );
+    
+  QtUtils::QtBridge::Show( this->keyboard_shortcuts_, 
+    InterfaceManager::Instance()->keyboard_shortcut_visibility_state_ );  
+    
+  
+  
   this->add_connection( Core::ActionDispatcher::Instance()->begin_progress_signal_.connect( 
     boost::bind( &AppInterface::HandleBeginProgress, qpointer_type( this ), _1 ) ) );
 
@@ -141,7 +156,7 @@ AppInterface::AppInterface()
   this->add_connection( Core::ActionDispatcher::Instance()->report_progress_signal_.connect( 
     boost::bind( &AppInterface::HandleReportProgress, qpointer_type( this ), _1 ) ) );
     
-
+  
   // NOTE: Connect state and reflect the current state (needs to be atomic, hence the lock)
   {
     // NOTE: State Engine is locked so the application thread cannot make
@@ -166,8 +181,6 @@ AppInterface::AppInterface()
   {
     this->center_seg3d_gui_on_screen( this );
   }
-  this->show_window( "splash" );
-  
 }
 
   
@@ -228,10 +241,10 @@ void AppInterface::closeEvent( QCloseEvent* event )
     this->splash_interface_->deleteLater();
   }
   
-  if( this->history_widget_ )
+  if( this->message_widget_ )
   {
-    this->history_widget_->close();
-    this->history_widget_->deleteLater();
+    this->message_widget_->close();
+    this->message_widget_->deleteLater();
   }
   
   if( this->keyboard_shortcuts_ )
@@ -302,219 +315,6 @@ void AppInterface::set_project_name( std::string project_name )
     " - " + QString::fromStdString( project_name ) );
 }
 
-void AppInterface::add_windowids()
-{
-  InterfaceManager::Instance()->add_windowid( "controller" );
-  InterfaceManager::Instance()->add_windowid( "preferences" );
-  InterfaceManager::Instance()->add_windowid( "splash" );
-  InterfaceManager::Instance()->add_windowid( "project" );
-  InterfaceManager::Instance()->add_windowid( "history" );
-  InterfaceManager::Instance()->add_windowid( "layermanager" );
-  InterfaceManager::Instance()->add_windowid( "tools" );
-  InterfaceManager::Instance()->add_windowid( "measurement" );
-  InterfaceManager::Instance()->add_windowid( "history_widget" );
-  InterfaceManager::Instance()->add_windowid( "keyboard_shortcuts" );
-}
-
-void AppInterface::show_window( const std::string& windowid )
-{
-  std::string lower_windowid = Core::StringToLower( windowid );
-  if( lower_windowid == "controller" )
-  {
-    if( this->controller_interface_.isNull() )
-    {
-      this->controller_interface_ = new AppController( this );
-      this->controller_interface_->show();
-    }
-    else
-    {
-      this->controller_interface_->show();
-      this->controller_interface_->raise();
-    }
-    QRect rect = QApplication::desktop()->availableGeometry( this->controller_interface_ );
-    this->controller_interface_->move(rect.center() - this->controller_interface_->rect().center());
-  }
-  else if( lower_windowid == "preferences" )
-  {
-    if( this->preferences_interface_.isNull() )
-    {
-      this->preferences_interface_ = new AppPreferences( this );
-      this->preferences_interface_->show();
-    }
-    else
-    {
-      this->preferences_interface_->show();
-      this->preferences_interface_->raise();
-    }
-    QRect rect = QApplication::desktop()->availableGeometry( this->preferences_interface_ );
-    this->preferences_interface_->move(rect.center() - this->preferences_interface_->rect().center());
-  }
-  
-  else if( lower_windowid == "splash" )
-  {
-    if( this->splash_interface_.isNull() )
-    {
-      this->splash_interface_ = new AppSplash( this );
-      this->splash_interface_->show();
-    }
-    else
-    {
-      this->splash_interface_->show();
-      this->splash_interface_->raise();
-    }
-    QRect rect = QApplication::desktop()->availableGeometry( this->splash_interface_ );
-    this->splash_interface_->move(rect.center() - this->splash_interface_->rect().center());
-  }
-  
-  else if( lower_windowid == "history_widget" )
-  {
-    if( this->history_widget_.isNull() )
-    {
-      this->history_widget_ = new MessageWindow( this );
-      this->history_widget_->show();
-    }
-    else
-    {
-      this->history_widget_->show();
-      this->history_widget_->raise();
-    }
-    QRect rect = QApplication::desktop()->availableGeometry( this->history_widget_ );
-    this->history_widget_->move(rect.center() - this->history_widget_->rect().center());
-  }
-  
-  else if( lower_windowid == "keyboard_shortcuts" )
-  {
-    if( this->keyboard_shortcuts_.isNull() )
-    {
-      this->keyboard_shortcuts_ = new AppShortcuts( this );
-      this->keyboard_shortcuts_->show();
-    }
-    else
-    {
-      this->keyboard_shortcuts_->show();
-      this->keyboard_shortcuts_->raise();
-    }
-    QRect rect = QApplication::desktop()->availableGeometry( this->keyboard_shortcuts_ );
-    this->keyboard_shortcuts_->move(rect.center() - this->keyboard_shortcuts_->rect().center());
-  }
-  
-  else if( lower_windowid == "project" )
-  {
-    if( project_dock_window_.isNull() )
-    {
-      this->project_dock_window_ = new ProjectDockWidget( this );
-      addDockWidget( Qt::LeftDockWidgetArea, this->project_dock_window_ );
-      this->project_dock_window_->show();
-    }
-    else
-    {
-      this->project_dock_window_->show();
-      this->project_dock_window_->raise();
-    }
-  }
-  else if( lower_windowid == "layermanager" )
-  {
-    if( this->layer_manager_dock_window_.isNull() )
-    {
-      this->layer_manager_dock_window_ = new LayerManagerDockWidget( this );
-      addDockWidget( Qt::RightDockWidgetArea, this->layer_manager_dock_window_ );
-      this->layer_manager_dock_window_->show();
-    }
-    else
-    {
-      this->layer_manager_dock_window_->show();
-      this->layer_manager_dock_window_->raise();
-    }
-  }
-  else if( lower_windowid == "history" )
-  {
-    if( this->history_dock_window_.isNull() )
-    {
-      this->history_dock_window_ = new HistoryDockWidget( this );
-      addDockWidget( Qt::LeftDockWidgetArea, this->history_dock_window_ );
-      this->history_dock_window_->show();
-    }
-    else
-    {
-      this->history_dock_window_->show();
-      this->history_dock_window_->raise();
-    }
-  }
-  else if( lower_windowid == "tools" )
-  {
-    if( this->tools_dock_window_.isNull() )
-    {
-      this->tools_dock_window_ = new ToolsDockWidget( this );
-      this->addDockWidget( Qt::LeftDockWidgetArea, this->tools_dock_window_ );
-      tools_dock_window_->show();
-    }
-    else
-    {
-      this->tools_dock_window_->show();
-      this->tools_dock_window_->raise();
-    }
-  }
-  else if( lower_windowid == "measurement" )
-  {
-    if( this->measurement_dock_window_.isNull() )
-    {
-      this->measurement_dock_window_ = new MeasurementDockWidget( this );
-      addDockWidget( Qt::RightDockWidgetArea, this->measurement_dock_window_ );
-      this->measurement_dock_window_->show();
-    }
-    else
-    {
-      this->measurement_dock_window_->show();
-      this->measurement_dock_window_->raise();
-    }
-  }
-}
-
-void AppInterface::close_window( const std::string& windowid )
-{
-  std::string lower_windowid = Core::StringToLower( windowid );
-  if( lower_windowid == "controller" )
-  {
-    if( !( this->controller_interface_.isNull() ) ) this->controller_interface_->close();
-  }
-  else if( lower_windowid == "preferences" )
-  {
-    if( !( this->preferences_interface_.isNull() ) ) this->preferences_interface_->close();
-  }
-  else if( lower_windowid == "splash" )
-  {
-    if( !( this->splash_interface_.isNull() ) ) this->splash_interface_->close();
-  }
-  else if( lower_windowid == "history_widget" )
-  {
-    if( !( this->history_widget_.isNull() ) ) this->history_widget_->close();
-  }
-  else if( lower_windowid == "keyboard_shortcuts" )
-  {
-    if( !( this->keyboard_shortcuts_.isNull() ) ) this->keyboard_shortcuts_->close();
-  }
-  else if( lower_windowid == "project" )
-  {
-    if( !( this->project_dock_window_.isNull() ) ) this->project_dock_window_->close();
-  }
-  else if( lower_windowid == "layermanager" )
-  {
-    if( !( this->layer_manager_dock_window_.isNull() ) ) this->layer_manager_dock_window_->close();
-  }
-  else if( lower_windowid == "history" )
-  {
-    if( !( this->history_dock_window_.isNull() ) ) this->history_dock_window_->close();
-  }
-  else if( lower_windowid == "tools" )
-  {
-    if( !( this->tools_dock_window_.isNull() ) ) this->tools_dock_window_->close();
-  }
-  else if( lower_windowid == "measurement" )
-  {
-    if( !( this->measurement_dock_window_.isNull() ) ) this->measurement_dock_window_->close();
-  }
-}
-
 void AppInterface::begin_progress( Core::ActionProgressHandle handle )
 {
 
@@ -528,11 +328,14 @@ void AppInterface::begin_progress( Core::ActionProgressHandle handle )
   CORE_LOG_DEBUG( "-- Start progress widget --" );
   this->progress_ = new ProgressWidget( handle, this );
   this->progress_->show();
+  this->setEnabled( false );
+  this->progress_->setEnabled( true );
 }
 
 void AppInterface::end_progress( Core::ActionProgressHandle /*handle*/ )
 {
   CORE_LOG_DEBUG( "-- Finish progress widget --" );
+  this->setEnabled( true );
 
   if( this->progress_.data() ) 
   {
@@ -564,18 +367,6 @@ void AppInterface::addDockWidget( Qt::DockWidgetArea area, QDockWidget* dock_wid
   }
 }
 
-void AppInterface::HandleShowWindow( qpointer_type qpointer, std::string windowid )
-{
-  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, 
-    boost::bind( &AppInterface::show_window, qpointer.data(), windowid ) ) );
-}
-
-void AppInterface::HandleCloseWindow( qpointer_type qpointer, std::string windowid )
-{
-  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, 
-    boost::bind( &AppInterface::close_window, qpointer.data(), windowid ) ) );
-}
-
 void AppInterface::HandleBeginProgress( qpointer_type qpointer, Core::ActionProgressHandle handle )
 {
   Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, 
@@ -605,7 +396,5 @@ void AppInterface::SetProjectName( qpointer_type qpointer, std::string project_n
   Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
     &AppInterface::set_project_name, qpointer.data(), project_name ) ) );
 }
-
-
 
 } // end namespace Seg3D

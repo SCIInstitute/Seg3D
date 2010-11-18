@@ -40,9 +40,6 @@
 #include <Interface/AppInterface/AppStatusBar.h>
 #include <Interface/AppInterface/StyleSheet.h>
 
-// Application includes
-#include <Application/InterfaceManager/Actions/ActionShowWindow.h>
-
 //UI Includes
 #include "ui_StatusBar.h"
 
@@ -50,6 +47,7 @@
 #include <Application/Tool/ToolFactory.h>
 #include <Application/ToolManager/ToolManager.h>
 #include <Application/LayerManager/LayerManager.h>
+#include <Application/InterfaceManager/InterfaceManager.h>
 
 
 namespace Seg3D
@@ -81,9 +79,11 @@ AppStatusBar::AppStatusBar( QMainWindow* parent ) :
   connect( this->private_->ui_.swap_visibility_button_, 
     SIGNAL( clicked() ), this, SLOT( swap_bars() ) );
     
-  QtUtils::QtBridge::Connect( this->private_->ui_.info_button_, boost::bind( &ActionShowWindow::Dispatch, 
-    Core::Interface::GetWidgetActionContext(), std::string( "history_widget" ) ) );
-  
+//  QtUtils::QtBridge::Connect( this->private_->ui_.info_button_, boost::bind( &ActionShowWindow::Dispatch, 
+//    Core::Interface::GetWidgetActionContext(), std::string( "history_widget" ) ) );
+    
+  QtUtils::QtBridge::Connect( this->private_->ui_.info_button_, 
+    InterfaceManager::Instance()->message_window_visibility_state_ );
   
   connect( this->private_->ui_.world_button_, 
     SIGNAL( clicked( bool ) ), this, SLOT( set_coordinates_mode( bool ) ) );

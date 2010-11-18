@@ -30,7 +30,6 @@
 #define INTERFACE_APPINTERFACE_TOOLSDOCKWIDGET_H
 
 // QT includes
-#include <QtGui/QDockWidget>
 #include <QtCore/QPointer>
 
 // STL includes
@@ -46,6 +45,9 @@
 // Core includes
 #include <Core/Utils/ConnectionHandler.h>
 
+// QtUtils includes
+#include <QtUtils/Widgets/QtCustomDockWidget.h>
+
 // Application includes
 #include <Application/ToolManager/ToolManager.h>
 
@@ -60,7 +62,7 @@ namespace Seg3D
 class ToolsDockWidget;
 
 // Class definition
-class ToolsDockWidget : public QDockWidget, private Core::ConnectionHandler
+class ToolsDockWidget : public QtUtils::QtCustomDockWidget, private Core::ConnectionHandler
 {
 Q_OBJECT
 

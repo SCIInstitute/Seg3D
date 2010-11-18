@@ -46,7 +46,7 @@ public:
 };
 
 HistoryDockWidget::HistoryDockWidget( QWidget *parent ) :
-  QDockWidget( "HistoryDockWidget", parent ),
+  QtUtils::QtCustomDockWidget( parent ),
   private_( new HistoryDockWidgetPrivate )
 {
   // Set up the private internals of the LayerManagerInterface class

@@ -41,35 +41,20 @@ InterfaceManager::InterfaceManager() :
   StateHandler( "interface", false )
 {
   // set up state variables
-  this->add_state( "fullscreen", full_screen_state_, 
-    PreferencesManager::Instance()->full_screen_on_startup_state_->get() );
+  this->initialize_states();
 
 }
 
 InterfaceManager::~InterfaceManager()
 {
-  disconnect_all();
-}
-
-void InterfaceManager::add_windowid( const std::string& windowid )
-{
-  std::string lower_windowid = Core::StringToLower( windowid );
-  boost::unique_lock< boost::mutex > lock( windowid_list_mutex_ );
-  if ( windowid_list_.find( lower_windowid ) == windowid_list_.end() )
-  {
-    windowid_list_.insert( lower_windowid );
-  }
-}
-
-bool InterfaceManager::is_windowid( const std::string& windowid )
-{
-  std::string lower_windowid = Core::StringToLower( windowid );
-  boost::unique_lock< boost::mutex > lock( windowid_list_mutex_ );
-  return ( windowid_list_.find( lower_windowid ) != windowid_list_.end() );
 }
 
 void InterfaceManager::initialize_states()
 {
+  // set up state variables
+  this->add_state( "fullscreen", full_screen_state_, 
+    PreferencesManager::Instance()->full_screen_on_startup_state_->get() );
+
   add_state( "project_dockwidget_visibility", this->project_dockwidget_visibility_state_, 
     PreferencesManager::Instance()->show_projectmanager_bar_state_->get() );
   add_state( "toolmanager_dockwidget_visibility", this->toolmanager_dockwidget_visibility_state_, 
@@ -77,13 +62,15 @@ void InterfaceManager::initialize_states()
   add_state( "layermanager_dockwidget_visibility", this->layermanager_dockwidget_visibility_state_, 
     PreferencesManager::Instance()->show_layermanager_bar_state_->get() );
   add_state( "measurement_project_dockwidget_visibility", this->measurement_project_dockwidget_visibility_state_, 
-    PreferencesManager::Instance()->show_projectmanager_bar_state_->get() );
+    PreferencesManager::Instance()->show_measurement_bar_state_->get() );
   add_state( "history_dockwidget_visibility", this->history_dockwidget_visibility_state_, 
     PreferencesManager::Instance()->show_history_bar_state_->get() );
   
   add_state( "preferences_manager_visibility", this->preferences_manager_visibility_state_, false );
   add_state( "controller_visibility", this->controller_visibility_state_, false );
   add_state( "message_window_visibility", this->message_window_visibility_state_, false );
+  add_state( "splash_screen_visibility", this->splash_screen_visibility_state_, true );
+  add_state( "keyboard_shortcut_visibility", this->keyboard_shortcut_visibility_state_, false );
   
 }
 

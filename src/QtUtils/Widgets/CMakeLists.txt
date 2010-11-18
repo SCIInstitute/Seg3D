@@ -34,6 +34,8 @@
 SET(QTUTILS_WIDGETS_SRCS
   QtColorBarWidget.cc
   QtColorButton.cc
+  QtCustomDialog.cc
+  QtCustomDockWidget.cc
   QtDoubleClickToolButton.cc
   QtDoubleClickPushButton.cc
   QtDropableComboBox.cc
@@ -50,6 +52,8 @@ SET(QTUTILS_WIDGETS_SRCS
 SET(QTUTILS_WIDGETS_MOC_SRCS
   QtColorBarWidget.h
   QtColorButton.h
+  QtCustomDialog.h
+  QtCustomDockWidget.h
   QtDoubleClickToolButton.h
   QtDoubleClickPushButton.h
   QtDropableComboBox.h

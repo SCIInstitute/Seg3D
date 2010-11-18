@@ -29,30 +29,42 @@
 #ifndef QTUTILS_BRIDGE_DETAIL_QTSHOWCONNECTOR_H
 #define QTUTILS_BRIDGE_DETAIL_QTSHOWCONNECTOR_H
 
+// Qt includes
 #include <QObject>
 #include <QPointer>
 
+// QtUtils includes
+#include <QtUtils/Widgets/QtCustomDockWidget.h>
+#include <QtUtils/Widgets/QtCustomDialog.h>
+#include <QtUtils/Bridge/detail/QtConnectorBase.h>
+
+// Core includes
 #include <Core/Utils/ConnectionHandler.h>
 #include <Core/State/StateValue.h>
 
 namespace QtUtils
 {
 
-class QtShowConnector : public QObject, protected Core::ConnectionHandler
+class QtShowConnector : public QtConnectorBase
 {
   Q_OBJECT
 public:
-  QtShowConnector( QWidget* parent, Core::StateBoolHandle& state, bool opposite_logic );
+  QtShowConnector( QWidget* parent, Core::StateBoolHandle& state, bool opposite_logic, bool blocking = false );
+  QtShowConnector( QtCustomDockWidget* parent, Core::StateBoolHandle& state, bool opposite_logic, bool blocking = true );
+  QtShowConnector( QtCustomDialog* parent, Core::StateBoolHandle& state, bool opposite_logic, bool blocking = true );
   QtShowConnector( QWidget* parent, Core::StateBaseHandle state, 
-    boost::function< bool () > condition );
+    boost::function< bool () > condition, bool blocking = false );
   QtShowConnector( QWidget* parent, std::vector< Core::StateBaseHandle >& states,
-    boost::function< bool () > condition );
+    boost::function< bool () > condition, bool blocking = false );
   virtual ~QtShowConnector();
 
   // -- slot functions for boost signals --
 private:
   static void ShowWidget( QPointer< QtShowConnector > qpointer, bool visible );
   static void ShowWidget( QPointer< QtShowConnector > qpointer );
+  
+private Q_SLOTS:
+  void set_state();
 
   // -- internal variables --
 private:

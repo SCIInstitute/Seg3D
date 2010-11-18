@@ -30,8 +30,6 @@
 #define INTERFACE_APPINTERFACE_KEYBOARDSHORTCUTS_H
 
 // QT includes
-#include <QtGui/QDialog>
-#include <QtGui/QWidget>
 #include <QtCore/QPointer>
 
 // STL includes
@@ -39,6 +37,9 @@
 
 // Boost includes
 #include <boost/shared_ptr.hpp>
+
+// QtUtils includes
+#include <QtUtils/Widgets/QtCustomDialog.h>
 
 // Application includes
 #include <Application/Tool/ToolFWD.h>
@@ -51,7 +52,7 @@ namespace Seg3D
 
 class AppShortcutsPrivate;
 
-class AppShortcuts : public QDialog, private Core::ConnectionHandler
+class AppShortcuts : public QtUtils::QtCustomDialog, private Core::ConnectionHandler
 {
 Q_OBJECT
   

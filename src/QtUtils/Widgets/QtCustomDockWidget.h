@@ -26,35 +26,40 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_APPINTERFACE_MEASUREMENTDOCKWIDGET_H
-#define INTERFACE_APPINTERFACE_MEASUREMENTDOCKWIDGET_H
+#ifndef QTUTILS_WIDGETS_QTCUSTOMDOCKWIDGET_H
+#define QTUTILS_WIDGETS_QTCUSTOMDOCKWIDGET_H
 
-// Boost includes
-#include <boost/shared_ptr.hpp>
+// QT includes
+#include <QtGui/QDockWidget>
+#include <QtGui/QCloseEvent>
+#include <QtGui/QKeyEvent>
 
-// QtUtils includes
-#include <QtUtils/Widgets/QtCustomDockWidget.h>
-
-namespace Seg3D
+namespace QtUtils
 {
-
-class MeasurementDockWidgetPrivate;
-
-class MeasurementDockWidget : public QtUtils::QtCustomDockWidget
+  
+class QtCustomDockWidget : public QDockWidget
 {
-
 Q_OBJECT
-
+  
+Q_SIGNALS:
+  void closed();
+  
 public:
-  MeasurementDockWidget( QWidget *parent = 0 );
-  ~MeasurementDockWidget();
+  // - Constructor / Destructor
+  QtCustomDockWidget( QWidget *parent = 0 );
+  virtual ~QtCustomDockWidget();
 
-private:
-
-  boost::shared_ptr< MeasurementDockWidgetPrivate > private_;
-
+  // HIDEEVENT:
+  // This function is called by Qt to deliver an event that tells that the
+  // widget is being hidden. 
+  virtual void closeEvent( QCloseEvent* event );
+  
+  // KEYPRESSEVENT:
+  // This function is called by Qt when a key is pressed
+  virtual void keyPressEvent( QKeyEvent* event );
+  
 };
+  
+} // end namespace QtUtils
 
-} // end namespace
-
-#endif // MEASUREMENTDOCKWIDGET_H
+#endif

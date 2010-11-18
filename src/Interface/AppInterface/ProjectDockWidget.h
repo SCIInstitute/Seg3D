@@ -30,7 +30,6 @@
 #define INTERFACE_APPINTERFACE_PROJECTDOCKWIDGET_H
 
 // QT includes
-#include <QtGui/QDockWidget>
 #include <QtCore/QPointer>
 
 // STL includes
@@ -38,6 +37,9 @@
 
 // Core includes
 #include <Core/Utils/ConnectionHandler.h>
+
+// QtUtils includes
+#include <QtUtils/Widgets/QtCustomDockWidget.h>
 
 // Boost includes
 #include <boost/thread/mutex.hpp>
@@ -49,9 +51,8 @@ namespace Seg3D
   
 class ProjectDockWidgetPrivate;
 
-class ProjectDockWidget : public QDockWidget, public Core::ConnectionHandler
+class ProjectDockWidget : public QtUtils::QtCustomDockWidget, public Core::ConnectionHandler
 {
-  
   Q_OBJECT
   
 public:

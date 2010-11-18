@@ -48,6 +48,8 @@
 #include <QtUtils/Widgets/QtColorButton.h>
 #include <QtUtils/Widgets/QtColorBarWidget.h>
 #include <QtUtils/Widgets/QtTristateToolButton.h>
+#include <QtUtils/Widgets/QtCustomDockWidget.h>
+#include <QtUtils/Widgets/QtCustomDialog.h>
 
 // Core includes
 #include <Core/State/StateLabeledOption.h>
@@ -161,10 +163,18 @@ public:
 
   // Connect the visibility of the QWidget to a StateBool
   static void Show( QWidget* qwidget, Core::StateBoolHandle& state, bool opposite_logic = false );
+  
+  // Connect the visibility of the QtCustomDockWidget to a StateBool
+  static void Show( QtCustomDockWidget* dockwidget, Core::StateBoolHandle& state, bool opposite_logic = false );
+  
+  // Connect the visibility of the QtCustomDialog to a StateBool
+  static void Show( QtCustomDialog* dialog, Core::StateBoolHandle& state, bool opposite_logic = false );
 
+  // Connect the visibility of the QWidget to a Statebase
   static void Show( QWidget* qwidget, Core::StateBaseHandle state,
     boost::function< bool () > condition );
 
+  // Connect the visibility of the QWidget to a StateBool
   static void Show( QWidget* qwidget, std::vector< Core::StateBaseHandle >& states,
     boost::function< bool () > condition );
 };

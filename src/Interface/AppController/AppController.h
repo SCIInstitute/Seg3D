@@ -37,9 +37,8 @@
 #include <boost/shared_ptr.hpp>
 
 // QT includes
-#include <QtGui/QWidget>
 #include <QtCore/QPointer>
-#include <QtGui/QDialog>
+#include <QtUtils/Widgets/QtCustomDialog.h>
 #include <QtGui/QTabWidget>
 #include <QtGui/QPushButton>
 #include <QtGui/QLineEdit>
@@ -62,7 +61,7 @@ typedef boost::shared_ptr< AppControllerPrivate > AppControllerPrivateHandle;
 class AppController;
 
 // Class definition
-class AppController : public QDialog, private Core::ConnectionHandler
+class AppController : public QtUtils::QtCustomDialog, private Core::ConnectionHandler
 {
 Q_OBJECT
 

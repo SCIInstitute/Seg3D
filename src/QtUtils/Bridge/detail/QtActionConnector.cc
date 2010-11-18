@@ -56,7 +56,7 @@ QtActionConnector::QtActionConnector( QAction* parent,
 }
 
 QtActionConnector::QtActionConnector( QAction* parent, 
-                           boost::function< void() > func ) :
+  boost::function< void() > func ) :
   QtConnectorBase( parent ),
   parent_( parent ),
   func_( func )

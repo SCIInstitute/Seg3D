@@ -64,7 +64,7 @@ public:
 };
 
 AppPreferences::AppPreferences( QWidget *parent ) :
-    QDialog( parent ),
+    QtUtils::QtCustomDialog( parent ),
     private_( new AppPreferencesPrivate )
 {
   InitQtResources();

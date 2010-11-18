@@ -37,10 +37,10 @@ SET(APPLICATION_INTERFACEMANAGER_SRCS
   )
 
 SET(APPLICATION_INTERFACEMANAGER_ACTIONS_SRCS
-  Actions/ActionShowWindow.h
-  Actions/ActionShowWindow.cc
-  Actions/ActionCloseWindow.h
-  Actions/ActionCloseWindow.cc
+#  Actions/ActionShowWindow.h
+#  Actions/ActionShowWindow.cc
+#  Actions/ActionCloseWindow.h
+#  Actions/ActionCloseWindow.cc
   )
 
 CORE_ADD_LIBRARY(Application_InterfaceManager ${APPLICATION_INTERFACEMANAGER_SRCS}

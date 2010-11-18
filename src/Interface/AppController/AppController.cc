@@ -74,7 +74,7 @@ public:
 };
 
 AppController::AppController( QWidget* parent ) :
-  QDialog( parent ), 
+  QtUtils::QtCustomDialog( parent ), 
   private_( new AppControllerPrivate )
 {
 

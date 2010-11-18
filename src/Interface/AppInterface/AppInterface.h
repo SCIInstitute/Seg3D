@@ -96,10 +96,6 @@ public:
   void set_project_name( std::string project_name );
 
 private:
-  void add_windowids();
-  void show_window( const std::string& windowid );
-  void close_window( const std::string& windowid );
-  
   void begin_progress( Core::ActionProgressHandle handle );
   void end_progress( Core::ActionProgressHandle handle );
   void report_progress( Core::ActionProgressHandle handle );
@@ -119,7 +115,7 @@ private:
   // Pointers to dialog widgets
   QPointer< AppController > controller_interface_;
   QPointer< AppPreferences > preferences_interface_;
-  QPointer< MessageWindow > history_widget_;
+  QPointer< MessageWindow > message_widget_;
   QPointer< AppShortcuts > keyboard_shortcuts_;
   QPointer< AppSplash > splash_interface_;
 
@@ -146,14 +142,6 @@ public:
   // for the signal/slot mechanism. As the main interface may be closed while
   // there are still function callbacks in the loop, these functions test for
   // the existence of the interface before executing.
-
-  // HANDLESHOWWINDOW:
-  // Reopen a specific window after the user has closed it
-  static void HandleShowWindow( qpointer_type qpointer, std::string windowid );
-
-  // HANDLECLOSEWINDOW:
-  // Close a dock or a window
-  static void HandleCloseWindow( qpointer_type qpointer, std::string windowid );
 
   // HANDLEBEGINPROGRESS:
   // Open a modal window showing progress
