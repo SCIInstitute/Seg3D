@@ -39,6 +39,7 @@
 
 // Application includes
 #include <Application/LayerManager/Actions/ActionImportLayer.h>
+#include <Application/LayerManager/Actions/ActionImportSeries.h>
 
 // QtUtils Includes
 #include <QtUtils/Bridge/QtBridge.h>
@@ -284,23 +285,32 @@ void LayerImporterWidget::import()
 
   this->repaint();
 
-
-  for( size_t i = 1; i < this->private_->importers_.size(); ++i )
-  {
-    boost::filesystem::path full_filename( this->private_->importers_[ i ]->get_filename() );
-    this->private_->ui_.file_name_label_->setText( QString::fromUtf8( "Scanning: " ) +
-      QString::fromStdString( full_filename.leaf() ) );
-    this->repaint();
-    this->private_->importers_[ i ]->import_header();
-    
-  }
+  // if it is a series, we use the series importer and then exit
   
   for( size_t i = 0; i < this->private_->importers_.size(); ++i )
   {
+    if( i > 0 )
+    {
+      boost::filesystem::path full_filename( this->private_->importers_[ i ]->get_filename() );
+      this->private_->ui_.file_name_label_->setText( QString::fromUtf8( "Scanning: " ) +
+        QString::fromStdString( full_filename.leaf() ) );
+      this->repaint();
+      this->private_->importers_[ i ]->import_header();
+    }
+    
     this->private_->importers_[ i ]->set_swap_xy_spacing( 
       this->private_->ui_.swap_spacing_checkbox_->isChecked() );
-    ActionImportLayer::Dispatch( Core::Interface::GetWidgetActionContext(), 
-      this->private_->importers_[ i ], this->private_->mode_, this->private_->series_ );
+    
+    if( this->private_->series_ )
+    {
+      ActionImportSeries::Dispatch( Core::Interface::GetWidgetActionContext(), 
+        this->private_->importers_[ i ], this->private_->mode_ );
+    }
+    else
+    {
+      ActionImportLayer::Dispatch( Core::Interface::GetWidgetActionContext(), 
+        this->private_->importers_[ i ], this->private_->mode_ );
+    } 
   }
   accept();
 }

@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_LAYERMANAGER_ACTIONS_ACTIONIMPORTLAYER_H
-#define APPLICATION_LAYERMANAGER_ACTIONS_ACTIONIMPORTLAYER_H
+#ifndef APPLICATION_LAYERMANAGER_ACTIONS_ACTIONIMPORTSERIES_H
+#define APPLICATION_LAYERMANAGER_ACTIONS_ACTIONIMPORTSERIES_H
 
 // Core includes
 #include <Core/Action/Actions.h>
@@ -42,27 +42,28 @@ namespace Seg3D
 // TODO: We should split this in importfromfile and importfromseries
 // --JGS
   
-class ActionImportLayer : public Core::Action
+class ActionImportSeries : public Core::Action
 {
 
 CORE_ACTION( 
-  CORE_ACTION_TYPE( "ImportLayer", "This action imports a layer into the layer manager.")
+  CORE_ACTION_TYPE( "ImportSeries", "This action imports a series into the layer manager.")
   CORE_ACTION_ARGUMENT( "filename", "The name of the file to load." )
   CORE_ACTION_KEY( "mode", "data", "The mode to use: data, single_mask, bitplane_mask, or label_mask.")
   CORE_ACTION_KEY( "importer", "", "Optional name for a specific importer." )
+  
   CORE_ACTION_CHANGES_PROJECT_DATA()
 )
 
   // -- Constructor/Destructor --
 public:
-  ActionImportLayer()
+  ActionImportSeries()
   {
     this->add_argument( this->filename_ );
     this->add_key( this->mode_ );
     this->add_key( this->importer_ );
   }
   
-  virtual ~ActionImportLayer()
+  virtual ~ActionImportSeries()
   {
   }
   

@@ -30,7 +30,7 @@
 #include <boost/filesystem.hpp>
 
 // Application includes
-#include <Application/LayerManager/Actions/ActionImportLayer.h>
+#include <Application/LayerManager/Actions/ActionImportSeries.h>
 #include <Application/LayerIO/LayerIO.h>
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/UndoBuffer/UndoBuffer.h>
@@ -39,12 +39,12 @@
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
-CORE_REGISTER_ACTION( Seg3D, ImportLayer )
+CORE_REGISTER_ACTION( Seg3D, ImportSeries )
 
 namespace Seg3D
 {
 
-bool ActionImportLayer::validate( Core::ActionContextHandle& context )
+bool ActionImportSeries::validate( Core::ActionContextHandle& context )
 {
   boost::filesystem::path full_filename( filename_.value() );
   
@@ -91,14 +91,15 @@ bool ActionImportLayer::validate( Core::ActionContextHandle& context )
   return true; // validated
 }
 
-bool ActionImportLayer::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
+bool ActionImportSeries::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
   // Get the current counters for groups and layers, so we can undo the changes to those counters
   // NOTE: This needs to be done before a new layer is created
   LayerManager::id_count_type id_count = LayerManager::GetLayerIdCount();
 
   std::string file_or_folder_name;
-  file_or_folder_name = this->layer_importer_->get_filename();
+  file_or_folder_name = boost::filesystem::path( 
+    this->layer_importer_->get_filename() ).parent_path().filename();
 
   std::string message = std::string("Importing '") + file_or_folder_name + std::string("'");
     
@@ -141,31 +142,31 @@ bool ActionImportLayer::run( Core::ActionContextHandle& context, Core::ActionRes
   return true;
 }
 
-void ActionImportLayer::clear_cache()
+void ActionImportSeries::clear_cache()
 {
   this->layer_importer_.reset();
 }
 
-Core::ActionHandle ActionImportLayer::Create( const std::string& filename, 
+Core::ActionHandle ActionImportSeries::Create( const std::string& filename, 
   const std::string& mode, const std::string importer )
 {
   // Create new action
-  ActionImportLayer* action = new ActionImportLayer;
+  ActionImportSeries* action = new ActionImportSeries;
   
   // Set action parameters
   action->filename_.value() = filename;
   action->mode_.value()   = mode;
   action->importer_.value() = importer;
-  
+    
   // Post the new action
   return Core::ActionHandle( action );
 }
 
-Core::ActionHandle ActionImportLayer::Create( const LayerImporterHandle& importer, 
+Core::ActionHandle ActionImportSeries::Create( const LayerImporterHandle& importer, 
   LayerImporterMode mode )
 {
   // Create new action
-  ActionImportLayer* action = new ActionImportLayer;
+  ActionImportSeries* action = new ActionImportSeries;
   
   // Fill in the short cut so the data that was already read is not lost
   action->layer_importer_ = importer;
@@ -174,18 +175,18 @@ Core::ActionHandle ActionImportLayer::Create( const LayerImporterHandle& importe
   action->filename_.value() = importer->get_filename();
   action->mode_.value()     = ExportToString(mode);
   action->importer_.value() = importer->name();
-  
+
   // Post the new action
   return Core::ActionHandle( action );
 }
 
-void ActionImportLayer::Dispatch( Core::ActionContextHandle context, const std::string& filename, 
+void ActionImportSeries::Dispatch( Core::ActionContextHandle context, const std::string& filename, 
   const std::string& mode, const std::string importer )
 {
   Core::ActionDispatcher::PostAction( Create( filename, mode, importer ), context );
 }
 
-void ActionImportLayer::Dispatch( Core::ActionContextHandle context, 
+void ActionImportSeries::Dispatch( Core::ActionContextHandle context, 
   const LayerImporterHandle& importer, LayerImporterMode mode )
 {
   Core::ActionDispatcher::PostAction( Create( importer, mode ), context );

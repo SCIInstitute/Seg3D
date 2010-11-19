@@ -64,6 +64,8 @@ SET(APPLICATION_LAYERMANAGER_ACTIONS_SRCS
   Actions/ActionExportLayer.cc
   Actions/ActionImportLayer.h
   Actions/ActionImportLayer.cc
+  Actions/ActionImportSeries.h
+  Actions/ActionImportSeries.cc
   Actions/ActionMoveGroupAbove.h
   Actions/ActionMoveGroupAbove.cc
   Actions/ActionMoveLayerAbove.h
