@@ -31,6 +31,10 @@
 #include <boost/lambda/bind.hpp>
 #include <boost/lexical_cast.hpp>
 
+// Qt includes
+#include <QtGui/QMessageBox>
+#include <QtGui/QMenu>
+
 //Core Includes - for logging
 #include <Core/Utils/Log.h>
 #include <Core/State/Actions/ActionSet.h>
@@ -49,8 +53,10 @@
 #include <Application/LayerManager/Actions/ActionActivateLayer.h>
 #include <Application/LayerManager/Actions/ActionComputeIsosurface.h>
 #include <Application/LayerManager/Actions/ActionDeleteIsosurface.h>
+#include <Application/LayerManager/Actions/ActionDeleteLayers.h>
 #include <Application/LayerManager/Actions/ActionMoveLayerAbove.h>
 #include <Application/LayerManager/Actions/ActionCalculateMaskVolume.h>
+#include <Application/LayerManager/Actions/ActionDuplicateLayer.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
 #include <Application/Filters/LayerResampler.h>
 
@@ -1063,5 +1069,39 @@ void LayerWidget::activate_from_lineedit_focus()
 {
   ActionActivateLayer::Dispatch( Core::Interface::GetWidgetActionContext(), this->private_->layer_ ) ;
 }
+
+void LayerWidget::contextMenuEvent( QContextMenuEvent * event )
+{
+  QMenu menu( this );
+  QAction* qaction;
+  qaction = menu.addAction( tr( "Duplicate Layer" ) );
+  QtUtils::QtBridge::Connect( qaction,
+    boost::bind( &ActionDuplicateLayer::Dispatch, Core::Interface::GetWidgetActionContext(), 
+    this->private_->layer_->get_layer_id() ) );
+  
+  qaction = menu.addAction( tr( "Delete Layer" ) );
+  connect( qaction, SIGNAL( triggered() ), this, SLOT( delete_layer_from_context_menu() ) );  
+  
+  menu.exec( event->globalPos() );
+  
+}
+
+void LayerWidget::delete_layer_from_context_menu()
+{ 
+  // Check whether the users wants to save and whether the user wants to quit
+  int ret = QMessageBox::warning( this, "Delete Warning",
+    "Are you sure, you want to delete this layer? This action cannot be undone.",
+    QMessageBox::Yes | QMessageBox::No, QMessageBox::No  );
+
+  if( ret == QMessageBox::Yes )
+  {
+
+    this->private_->ui_.selection_checkbox_->setChecked( true );
+    ActionDeleteLayers::Dispatch( Core::Interface::GetWidgetActionContext(), 
+      this->private_->layer_->get_layer_group() );
+  }
+}
+
+
 
 } //end namespace Seg3D

@@ -54,12 +54,7 @@ public:
   // widget is being hidden. 
   virtual void closeEvent( QCloseEvent* event );
   
-//  // KEYPRESSEVENT:
-//  // This function is called by Qt when a key is pressed
-//  virtual void keyPressEvent( QKeyEvent* event );
-//  
-//  virtual void mousePressEvent( QMouseEvent * event );
-  
+
 };
   
 } // end namespace QtUtils

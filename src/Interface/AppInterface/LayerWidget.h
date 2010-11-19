@@ -197,6 +197,8 @@ private:
   // this function is called when the user drags another layer off of the top of this one
   virtual void dragLeaveEvent( QDragLeaveEvent* event );
   
+  virtual void contextMenuEvent( QContextMenuEvent * event );
+  
 private Q_SLOTS:
 
   // SET_MASK_BACKGROUND_COLOR:
@@ -227,6 +229,10 @@ private Q_SLOTS:
   // dispatches an action that will set the layer to be active when the user edits the name of the 
   // layer
   void activate_from_lineedit_focus();
+  
+  // DELETE_LAYER_FROM_CONTEXT_MENU:
+  // dispatches an action that deletes the layer
+  void delete_layer_from_context_menu();
 
 protected:
   void resizeEvent( QResizeEvent *event );

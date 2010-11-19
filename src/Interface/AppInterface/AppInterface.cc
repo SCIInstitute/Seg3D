@@ -327,6 +327,7 @@ void AppInterface::begin_progress( Core::ActionProgressHandle handle )
   
   CORE_LOG_DEBUG( "-- Start progress widget --" );
   this->progress_ = new ProgressWidget( handle, this );
+  this->center_seg3d_gui_on_screen( this->progress_ );
   this->progress_->show();
   this->setEnabled( false );
   this->progress_->setEnabled( true );

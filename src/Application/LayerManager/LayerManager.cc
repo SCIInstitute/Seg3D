@@ -477,20 +477,27 @@ void LayerManager::set_next_layer_active()
         
         if( ( temp_j ) != ( *i )->layer_list_.end() )
         {
-          this->private_->active_layer_ = *( temp_j );
+          this->set_active_layer( *( temp_j ) );
+          return;
+        
+//          this->private_->active_layer_ = *( temp_j );
         }
         else if( ( temp_i ) != this->private_->group_list_.end() )
         {
-          this->private_->active_layer_ = ( *( *temp_i )->layer_list_.begin() );
+          this->set_active_layer( ( *( *temp_i )->layer_list_.begin() ) );
+          return;
+//          this->private_->active_layer_ = ( *( *temp_i )->layer_list_.begin() );
         }
         else
         {
-          this->private_->active_layer_ = 
-            *( ( *this->private_->group_list_.begin() )->layer_list_.begin() );
+          this->set_active_layer( *( ( *this->private_->group_list_.begin() )->layer_list_.begin() ) );
+          return;
+//          this->private_->active_layer_ = 
+//            *( ( *this->private_->group_list_.begin() )->layer_list_.begin() );
         }
-        this->private_->handle_active_layer_changed();
-        this->active_layer_changed_signal_( this->private_->active_layer_ );
-        return;
+//        this->private_->handle_active_layer_changed();
+//        this->active_layer_changed_signal_( this->private_->active_layer_ );
+//        return;
       }
     }
   }
@@ -518,20 +525,26 @@ void LayerManager::set_previous_layer_active()
 
         if( ( temp_j ) != ( *i )->layer_list_.rend() )
         {
-          this->private_->active_layer_ = *( temp_j );
+          this->set_active_layer( *( temp_j ) );
+          return;
+//          this->private_->active_layer_ = *( temp_j );
         }
         else if( ( temp_i ) != this->private_->group_list_.rend() )
         {
-          this->private_->active_layer_ = ( *( *temp_i )->layer_list_.rbegin() );
+          this->set_active_layer( ( *( *temp_i )->layer_list_.rbegin() ) );
+          return;
+//          this->private_->active_layer_ = ( *( *temp_i )->layer_list_.rbegin() );
         }
         else
         {
-          this->private_->active_layer_ = 
-            *( ( *this->private_->group_list_.rbegin() )->layer_list_.rbegin() );
+          this->set_active_layer( *( ( *this->private_->group_list_.rbegin() )->layer_list_.rbegin() ) );
+          return;
+//          this->private_->active_layer_ = 
+//            *( ( *this->private_->group_list_.rbegin() )->layer_list_.rbegin() );
         }
-        this->private_->handle_active_layer_changed();
-        this->active_layer_changed_signal_( this->private_->active_layer_ );
-        return;
+//        this->private_->handle_active_layer_changed();
+//        this->active_layer_changed_signal_( this->private_->active_layer_ );
+//        return;
       }
     }
   }

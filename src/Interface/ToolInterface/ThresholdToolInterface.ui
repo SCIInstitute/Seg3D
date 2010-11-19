@@ -231,6 +231,9 @@ QWidget#threshold_histogram_{
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="toolTip">
+         <string>If this button is disabled its because you haven't set a valid Target Layer </string>
+        </property>
         <property name="text">
          <string>Create Threshold Layer</string>
         </property>
