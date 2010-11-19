@@ -48,6 +48,8 @@
 #include <Application/ViewerManager/ViewerManager.h>
 #include <Application/ProjectManager/Actions/ActionSaveSession.h>
 #include <Application/ProjectManager/Actions/ActionLoadProject.h>
+#include <Application/LayerManager/Actions/ActionActivateNextLayer.h>
+#include <Application/LayerManager/Actions/ActionActivatePreviousLayer.h>
 #include <Application/Tools/Actions/ActionCopy.h>
 #include <Application/Tools/Actions/ActionPaste.h>
 #include <Application/UndoBuffer/UndoBuffer.h>
@@ -203,6 +205,21 @@ void AppMenu::create_edit_menu( QMenu* qmenu )
   this->redo_action_->setToolTip( tr( "Redo last action that modified the layers" ) );
   QtUtils::QtBridge::Connect( this->redo_action_ , boost::bind(
       &ActionRedo::Dispatch, Core::Interface::GetWidgetActionContext() ) );
+      
+  qmenu->addSeparator();    
+  
+  QAction* qaction;
+  qaction = qmenu->addAction( tr( "Activate Next Layer" ) );
+  qaction->setShortcut( Qt::Key_Right );
+  qaction->setToolTip( tr( "Change the active layer to the one below the one that is currently active." ) );
+  QtUtils::QtBridge::Connect( qaction , boost::bind(
+    ActionActivateNextLayer::Dispatch, Core::Interface::GetKeyboardActionContext() ) );
+  
+  qaction = qmenu->addAction( tr( "Activate Previous Layer" ) );
+  qaction->setShortcut( Qt::Key_Left );
+  qaction->setToolTip( tr( "Change the active layer to the one above the one that is currently active." ) );
+  QtUtils::QtBridge::Connect( qaction , boost::bind(
+    ActionActivatePreviousLayer::Dispatch, Core::Interface::GetKeyboardActionContext() ) );
 
   qmenu->addSeparator();
 

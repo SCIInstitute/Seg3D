@@ -178,6 +178,18 @@ bool LayerManager::insert_layer( LayerHandle layer )
     lock_type lock( this->get_mutex() );
     
     CORE_LOG_MESSAGE( std::string("Insert New Layer: ") + layer->get_layer_id());
+    
+    // if its a mask, lets reset its color to one that doesn't exist if possible
+    if( layer->get_type() == Core::VolumeType::MASK_E ) 
+    {
+      int mask_color = this->find_free_color();
+      if( mask_color != -1 )
+      { 
+        boost::dynamic_pointer_cast< MaskLayer >( layer )->color_state_->set( mask_color );
+      } 
+    }
+    
+    
         
     for ( group_list_type::iterator it = this->private_->group_list_.begin(); 
        it != this->private_->group_list_.end(); ++it )
@@ -1689,6 +1701,32 @@ void LayerManager::handle_layer_name_changed( std::string layer_id, std::string 
 {
   this->layer_name_changed_signal_( layer_id, name );
 }
+
+int LayerManager::find_free_color()
+{
+  std::set< int > used_colors;
+  for( group_list_type::iterator i = this->private_->group_list_.begin(); 
+    i != this->private_->group_list_.end(); ++i )
+  {
+    for( layer_list_type::iterator j = ( *i )->layer_list_.begin(); 
+      j != ( *i )->layer_list_.end(); ++j )
+    {
+      if( ( *j )->get_type() == Core::VolumeType::MASK_E )
+      {
+        used_colors.insert( boost::dynamic_pointer_cast< MaskLayer >( ( *j ) )->color_state_->get() );
+      }
+    }
+  }
+  for( int i = 0; i < 12; ++i )
+  {
+    if( used_colors.find( i ) == used_colors.end() )
+    {
+      return i;
+    }
+  }
+  return -1;
+}
+
 
 
 

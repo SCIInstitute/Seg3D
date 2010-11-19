@@ -197,10 +197,6 @@ private:
   // this function is called when the user drags another layer off of the top of this one
   virtual void dragLeaveEvent( QDragLeaveEvent* event );
   
-  // KEYPRESSEVENT:
-  // This function is called by Qt when a key is pressed
-  virtual void keyPressEvent( QKeyEvent* event );
-    
 private Q_SLOTS:
 
   // SET_MASK_BACKGROUND_COLOR:

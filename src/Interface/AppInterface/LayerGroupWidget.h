@@ -134,10 +134,6 @@ protected:
   // size of the LayerGroupWidget
   virtual void resizeEvent( QResizeEvent *event );
   
-  // KEYPRESSEVENT:
-  // This function is called by Qt when a key is pressed
-  virtual void keyPressEvent( QKeyEvent* event );
-  
 private Q_SLOTS:
   // UNCHECK_DELETE_CONFIRM:
   // this is a simple helper function that unchecks the delete confirmation checkbox

@@ -586,14 +586,5 @@ void LayerGroupWidget::enable_disable_delete_button()
   this->private_->ui_.delete_button_->setEnabled( false );
 }
 
-void LayerGroupWidget::keyPressEvent( QKeyEvent* event )
-{
-  event->ignore();
-}
-
-
-
-
-
 
 }  //end namespace Seg3D

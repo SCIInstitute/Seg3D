@@ -199,6 +199,8 @@ private:
   // This function is connected to the value_changed_signal_ of all the layers and relays
   // it to the layer_name_changed_signal_ of LayerManager.
   void handle_layer_name_changed( std::string layer_id, std::string name );
+  
+  int find_free_color();
 
   // Typedef's for the Mutex
 public: 

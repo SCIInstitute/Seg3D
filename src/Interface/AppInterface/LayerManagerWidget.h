@@ -92,11 +92,7 @@ private:
   // function that creates a new group to put layers into. 
   LayerGroupWidget* make_new_group( LayerGroupHandle group );
   
-  // KEYPRESSEVENT:
-  // This function is called by Qt when a key is pressed
-  virtual void keyPressEvent( QKeyEvent* event );
-
-    
+  
 private Q_SLOTS:
   // PREP_LAYERS_FOR_DRAG_AND_DROP:
   // this function tells the groups to prepare their layers for drag and drop

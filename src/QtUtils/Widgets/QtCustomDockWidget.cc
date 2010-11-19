@@ -33,11 +33,6 @@
 // QtUtils includes
 #include <QtUtils/Widgets/QtCustomDockWidget.h>
 
-// Application includes
-#include <Application/LayerManager/Actions/ActionActivateNextLayer.h>
-#include <Application/LayerManager/Actions/ActionActivatePreviousLayer.h>
-#include <Application/InterfaceManager/InterfaceManager.h>
-
 namespace QtUtils
 {
   
@@ -56,29 +51,6 @@ void QtCustomDockWidget::closeEvent( QCloseEvent* event )
   event->accept();
 }
 
-void QtCustomDockWidget::keyPressEvent( QKeyEvent* event )
-{ 
-  int e = 0;
-  if( event->key() == Core::Key::KEY_LEFT_E )
-  {
-    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-    Seg3D::ActionActivatePreviousLayer::Dispatch( Core::Interface::GetKeyboardActionContext() );
-  }
-  else if( event->key() == Core::Key::KEY_RIGHT_E )
-  {
-    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-    Seg3D::ActionActivateNextLayer::Dispatch( Core::Interface::GetKeyboardActionContext() );
-  }
-  else
-  {
-    QWidget::keyPressEvent( event );
-  }
-}
-
-void QtCustomDockWidget::mousePressEvent( QMouseEvent * event )
-{
-  this->setFocus();
-}
 
 
 } // end namespace QtUtils
