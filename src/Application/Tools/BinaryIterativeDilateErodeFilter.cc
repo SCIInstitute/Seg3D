@@ -28,21 +28,21 @@
 
 // Application includes
 #include <Application/Tool/ToolFactory.h>
-#include <Application/Tools/BinaryDilateErodeFilter.h>
+#include <Application/Tools/BinaryIterativeDilateErodeFilter.h>
 #include <Application/Layer/Layer.h>
 #include <Application/LayerManager/LayerManager.h>
-#include <Application/Filters/Actions/ActionDilateFilter.h>
-#include <Application/Filters/Actions/ActionErodeFilter.h>
-#include <Application/Filters/Actions/ActionDilateErodeFilter.h>
+#include <Application/Filters/Actions/ActionIterativeDilateFilter.h>
+#include <Application/Filters/Actions/ActionIterativeErodeFilter.h>
+#include <Application/Filters/Actions/ActionIterativeDilateErodeFilter.h>
 #include <Application/ViewerManager/ViewerManager.h>
 
 // Register the tool into the tool factory
-SCI_REGISTER_TOOL( Seg3D, BinaryDilateErodeFilter )
+SCI_REGISTER_TOOL( Seg3D, BinaryIterativeDilateErodeFilter )
 
 namespace Seg3D
 {
 
-BinaryDilateErodeFilter::BinaryDilateErodeFilter( const std::string& toolid ) :
+BinaryIterativeDilateErodeFilter::BinaryIterativeDilateErodeFilter( const std::string& toolid ) :
   SingleTargetTool( Core::VolumeType::MASK_E, toolid )
 {
   // Create an empty list of label options
@@ -73,12 +73,12 @@ BinaryDilateErodeFilter::BinaryDilateErodeFilter( const std::string& toolid ) :
   this->add_state( "slice_type", this->slice_type_state_, "active", slice_option_list );
 }
 
-BinaryDilateErodeFilter::~BinaryDilateErodeFilter()
+BinaryIterativeDilateErodeFilter::~BinaryIterativeDilateErodeFilter()
 {
   disconnect_all();
 }
 
-int BinaryDilateErodeFilter::get_slice_type()
+int BinaryIterativeDilateErodeFilter::get_slice_type()
 {
   std::string slice_type = this->slice_type_state_->get();
   if ( slice_type == "sagittal" ) return Core::SliceType::SAGITTAL_E;
@@ -94,9 +94,9 @@ int BinaryDilateErodeFilter::get_slice_type()
   return -1;
 }
 
-void BinaryDilateErodeFilter::execute_dilateerode( Core::ActionContextHandle context )
+void BinaryIterativeDilateErodeFilter::execute_dilateerode( Core::ActionContextHandle context )
 {
-  ActionDilateErodeFilter::Dispatch( context,
+  ActionIterativeDilateErodeFilter::Dispatch( context,
     this->target_layer_state_->get(),
     this->replace_state_->get(),
     this->dilate_state_->get(),
@@ -107,9 +107,9 @@ void BinaryDilateErodeFilter::execute_dilateerode( Core::ActionContextHandle con
     this->get_slice_type() );
 }
 
-void BinaryDilateErodeFilter::execute_dilate( Core::ActionContextHandle context )
+void BinaryIterativeDilateErodeFilter::execute_dilate( Core::ActionContextHandle context )
 {
-  ActionDilateFilter::Dispatch( context,
+  ActionIterativeDilateFilter::Dispatch( context,
     this->target_layer_state_->get(),
     this->replace_state_->get(),
     this->dilate_state_->get(),
@@ -119,9 +119,9 @@ void BinaryDilateErodeFilter::execute_dilate( Core::ActionContextHandle context 
     this->get_slice_type() );
 }
 
-void BinaryDilateErodeFilter::execute_erode( Core::ActionContextHandle context )
+void BinaryIterativeDilateErodeFilter::execute_erode( Core::ActionContextHandle context )
 {
-  ActionErodeFilter::Dispatch( context,
+  ActionIterativeErodeFilter::Dispatch( context,
     this->target_layer_state_->get(),
     this->replace_state_->get(),
     this->erode_state_->get(),

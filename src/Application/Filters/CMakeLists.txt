@@ -59,14 +59,20 @@ SET(APPLICATION_FILTERS_ACTIONS_SRCS
   Actions/ActionCurvatureAnisotropicDiffusionFilter.cc
   Actions/ActionDilateFilter.h
   Actions/ActionDilateFilter.cc
+  Actions/ActionIterativeDilateFilter.h
+  Actions/ActionIterativeDilateFilter.cc
   Actions/ActionDilateErodeFilter.h
   Actions/ActionDilateErodeFilter.cc
+  Actions/ActionIterativeDilateErodeFilter.h
+  Actions/ActionIterativeDilateErodeFilter.cc
   Actions/ActionDiscreteGaussianFilter.h
   Actions/ActionDiscreteGaussianFilter.cc
   Actions/ActionDistanceFilter.h
   Actions/ActionDistanceFilter.cc
   Actions/ActionErodeFilter.h
   Actions/ActionErodeFilter.cc
+  Actions/ActionIterativeErodeFilter.h
+  Actions/ActionIterativeErodeFilter.cc
   Actions/ActionGradientAnisotropicDiffusionFilter.h
   Actions/ActionGradientAnisotropicDiffusionFilter.cc
   Actions/ActionGradientMagnitudeFilter.h

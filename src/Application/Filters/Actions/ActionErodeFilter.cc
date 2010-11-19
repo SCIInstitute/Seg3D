@@ -26,6 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Core includes
+#include <Core/DataBlock/StdDataBlock.h>
 
 // Application includes
 #include <Application/LayerManager/LayerManager.h>
@@ -153,6 +155,7 @@ public:
     Core::DataBlock::index_type nx = input_data_block->get_nx();
     Core::DataBlock::index_type ny = input_data_block->get_ny();
     Core::DataBlock::index_type nz = input_data_block->get_nz();
+    Core::DataBlock::index_type nxy = nx * ny;
     Core::DataBlock::index_type size = input_data_block->get_size();
     
     unsigned char* data = reinterpret_cast<unsigned char*>( input_data_block->get_data() );
@@ -162,6 +165,7 @@ public:
     try
     {
       neighbors.resize( 0x40 );
+      Core::DataBlock::index_type nxy = nx * ny;
 
       for ( size_t k = 0; k < neighbors.size(); k++ )
       {
@@ -179,8 +183,8 @@ public:
         
         if ( !( this->only2d_  ) || ( slice_type != Core::SliceType::AXIAL_E ) )
         {
-          if ( ! ( k & 0x10 ) ) neighbors[ k ].push_back( -nx * ny );
-          if ( ! ( k & 0x20 ) ) neighbors[ k ].push_back( nx * ny );
+          if ( ! ( k & 0x10 ) ) neighbors[ k ].push_back( -nxy );
+          if ( ! ( k & 0x20 ) ) neighbors[ k ].push_back( nxy );
         }
       }
     }
@@ -221,54 +225,145 @@ public:
       }
     }
       
-    unsigned char current_label = 2;
-    unsigned char previous_label = 1;
+      
+    // Detect Edge
     float current_progress = 0.0f;
-    float progress_multiplier = 1.0f / static_cast<float>( this->radius_ * nz );
-    
-    for ( int i = 0; i < this->radius_; i++)
+    float progress_multiplier = 0.1f / static_cast<float>( nz );
+
+    size_t k = 0;
+    int border = 0;   
+    for ( Core::DataBlock::index_type z = 0; z < nz; z++ )
     {
-      int border = 0;
-      Core::DataBlock::index_type k = 0;
-      for ( Core::DataBlock::index_type z = 0; z < nz; z++ )
+      if ( z == 0 ) border |= 0x10; else border &= ~( 0x10 );
+      if ( z == nz - 1 ) border |= 0x20; else border &= ~( 0x20 );
+      
+      for ( Core::DataBlock::index_type y = 0; y < ny; y++ )
       {
-        if ( z == 0 ) border |= 0x10; else border &= ~( 0x10 );
-        if ( z == nz - 1 ) border |= 0x20; else border &= ~( 0x20 );
-        
-        for ( Core::DataBlock::index_type y = 0; y < ny; y++ )
+        if ( y == 0 ) border |= 0x04; else border &= ~( 0x04 );
+        if ( y == ny - 1 ) border |= 0x08; else border &= ~( 0x08 );
+
+        for ( Core::DataBlock::index_type x = 0; x < nx; x++, k++ )
         {
-          if ( y == 0 ) border |= 0x04; else border &= ~( 0x04 );
-          if ( y == ny - 1 ) border |= 0x08; else border &= ~( 0x08 );
+          if ( data[ k ] == 0 || data[ k ] == 2 ) continue;
+          
+          int border_x = border;
+          if ( x == 0 ) border_x |= 0x1;
+          if ( x == nx - 1 ) border_x |= 0x2;
 
-          for ( Core::DataBlock::index_type x = 0; x < nx; x++, k++ )
+          const std::vector<Core::DataBlock::index_type>& neigh = neighbors[ border_x ];
+          for ( size_t m = 0; m < neigh.size(); m++ )
           {
-            if ( data[ k ] != 1 ) continue;
-            
-            int border_x = border;
-            if ( x == 0 ) border_x |= 0x1;
-            if ( x == nx - 1 ) border_x |= 0x2;
+            Core::DataBlock::index_type index = k + neigh[ m ];
+            if ( data[ index ] == 0 ) data[ index ] = 2;
+          }
+        }
+      }
+      
+      float progress = static_cast<float>( z ) * progress_multiplier;
+    
+      if ( current_progress + 0.02f < progress )
+      {
+        current_progress = progress;
+        this->dst_layer_->update_progress( current_progress );
+        if ( this->check_abort() ) return;
+      }
+    }
+    
+    // Build pattern
+    Core::DataBlock::index_type xr = this->radius_;
+    Core::DataBlock::index_type yr = this->radius_;
+    Core::DataBlock::index_type zr = this->radius_;
+    
+    if ( this->only2d_ )
+    {
+      if ( this->slice_type_ == Core::SliceType::AXIAL_E ) zr = 0;
+      if ( this->slice_type_ == Core::SliceType::CORONAL_E ) yr = 0;
+      if ( this->slice_type_ == Core::SliceType::SAGITTAL_E ) xr = 0;
+    }
+    
+    Core::DataBlock::index_type xs = 2 * xr + 1;
+    Core::DataBlock::index_type ys = 2 * yr + 1;
+    Core::DataBlock::index_type zs = 2 * zr + 1;
 
-            const std::vector<Core::DataBlock::index_type>& neigh = neighbors[ border_x ];
-            for ( size_t m = 0; m < neigh.size(); m++ )
+    Core::DataBlockHandle pattern = 
+      Core::StdDataBlock::New( xs, ys, zs, Core::DataType::UCHAR_E );
+    
+    if ( !pattern )
+    {
+      this->report_error( "Could not allocate enough memory." );
+      return;
+    }   
+    
+    unsigned char* pdata = reinterpret_cast<unsigned char *>( pattern->get_data() );
+    
+    k = 0;
+    for ( Core::DataBlock::index_type z = -zr; z <= zr; z++ )
+    {
+      for ( Core::DataBlock::index_type y = -yr; y <= yr; y++ )
+      {
+        for ( Core::DataBlock::index_type x = -xr; x <= xr; x++, k++ )
+        {
+          if ( sqrt( static_cast<double>( x*x + y*y + z*z ) ) <= this->radius_ ) 
+          {
+            pdata[ k ] = 1;
+          }
+          else
+          {
+            pdata[ k ] = 0;
+          } 
+        }
+      }
+    }     
+      
+
+    // Fill in erosion
+    
+    progress_multiplier = 0.9f / static_cast<float>( nz );    
+    
+    Core::DataBlock::index_type idx = 0;
+    for ( Core::DataBlock::index_type z = 0; z < nz; z++ )
+    {     
+      for ( Core::DataBlock::index_type y = 0; y < ny; y++ )
+      {
+        for ( Core::DataBlock::index_type x = 0; x < nx; x++, idx++ )
+        {
+          if ( data[ idx ] != 2 ) continue;
+          
+          Core::DataBlock::index_type idx2 = 0;
+          for ( Core::DataBlock::index_type zz = -zr; zz <= zr; zz++ )
+          {
+            for ( Core::DataBlock::index_type yy = -yr; yy <= yr; yy++ )
             {
-              Core::DataBlock::index_type index = k + neigh[ m ];
-              if ( data[ index ] == 255 || data[ index ] == 1  || data[ index ] == current_label ) continue;
-              data[ k ] = current_label;
+              for ( Core::DataBlock::index_type xx = -xr; xx <= xr; xx++, idx2++ )
+              {         
+                if ( pdata[ idx2 ] )
+                {
+                  Core::DataBlock::index_type px = x - xx;
+                  if ( px < 0 || px >= nx ) continue;
+                  Core::DataBlock::index_type py = y - yy;
+                  if ( py < 0 || py >= ny ) continue;
+                  Core::DataBlock::index_type pz = z - zz;
+                  if ( pz < 0 || pz >= nz ) continue;
+                  Core::DataBlock::index_type fidx = px + py * nx + pz * nxy;
+                  if ( data[ fidx ] == 1 )
+                  {
+                    data[ fidx ] = 0;
+                  }
+                }
+              }
             }
           }
         }
-        
-        float progress = static_cast<float>( i *  nz + z ) * progress_multiplier;
-      
-        if ( current_progress + 0.02f < progress )
-        {
-          current_progress = progress;
-          this->dst_layer_->update_progress( current_progress );
-          if ( this->check_abort() ) return;
-        }
       }
-      current_label++;
-      previous_label++;
+        
+      float progress = static_cast<float>( z ) * progress_multiplier + 0.1f;
+      
+      if ( current_progress + 0.02f < progress )
+      {
+        current_progress = progress;
+        this->dst_layer_->update_progress( current_progress );
+        if ( this->check_abort() ) return;
+      }
     }
 
     if ( this->mask_layer_ )

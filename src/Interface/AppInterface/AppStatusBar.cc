@@ -48,15 +48,17 @@
 #include <Application/ToolManager/ToolManager.h>
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/InterfaceManager/InterfaceManager.h>
+#include <Application/PreferencesManager/PreferencesManager.h>
 
 
 namespace Seg3D
 {
 
-class AppStatusBarPrivate
+class AppStatusBarPrivate : public Core::RecursiveLockable
 {
 public:
   Ui::StatusBar ui_;
+  
 };
 
 AppStatusBar::AppStatusBar( QMainWindow* parent ) :
@@ -165,6 +167,13 @@ void AppStatusBar::update_data_point_info( DataPointInfoHandle data_point )
   
 void AppStatusBar::update_data_point_label()
 {
+  bool zero_based_slice_numbers = false;
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    zero_based_slice_numbers = PreferencesManager::Instance()->
+      zero_based_slice_numbers_state_->get();
+  }
+  
   
   // get some local copies of the data
   double world_x = this->data_point_info_.world_coord().x();
@@ -174,6 +183,14 @@ void AppStatusBar::update_data_point_label()
   double index_x = this->data_point_info_.index_coord().x();
   double index_y = this->data_point_info_.index_coord().y();
   double index_z = this->data_point_info_.index_coord().z();
+  
+  if ( !zero_based_slice_numbers )
+  {
+    // Correct to one based indexing
+    index_x += 1.0;
+    index_y += 1.0;
+    index_z += 1.0;
+  }
   
   // In the case that all the coordinates are 0 then show nice 0's.
   if( ( world_x == 0 ) && ( world_y == 0 ) && ( world_z == 0 ) && 
@@ -199,8 +216,8 @@ void AppStatusBar::update_data_point_label()
     else
     {
       this->private_->ui_.x_->setText( QString( "%1" ).arg( index_x, 0, 'e', 0 ) );
-      this->private_->ui_.y_->setText( QString( "%1" ).arg( index_x, 0, 'e', 0 ) );
-      this->private_->ui_.z_->setText( QString( "%1" ).arg( index_x, 0, 'e', 0 ) );
+      this->private_->ui_.y_->setText( QString( "%1" ).arg( index_y, 0, 'e', 0 ) );
+      this->private_->ui_.z_->setText( QString( "%1" ).arg( index_z, 0, 'e', 0 ) );
     }
     this->private_->ui_.value_->setText( QString( "%1" ).arg( 
       this->data_point_info_.value(), 0, 'e', 3 ) );

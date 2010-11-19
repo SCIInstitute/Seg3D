@@ -79,6 +79,8 @@ SET(APPLICATION_TOOLS_SRCS
   HistogramEqualizationFilter.cc
   IntensityCorrectionFilter.h
   IntensityCorrectionFilter.cc
+  BinaryIterativeDilateErodeFilter.h
+  BinaryIterativeDilateErodeFilter.cc
   MaskDataFilter.h
   MaskDataFilter.cc
   MedianFilter.h
