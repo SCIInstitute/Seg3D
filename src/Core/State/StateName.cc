@@ -147,10 +147,10 @@ public:
   static const boost::regex REGEX_C;
 };
 
-const std::string StateName::REGEX_VALIDATOR_C( "[\\w\\s]*" );
+const std::string StateName::REGEX_VALIDATOR_C( "[\\w\\s\\.\\-]*" );
 StateNamePrivate::name_set_type StateNamePrivate::NameSet;
 StateNamePrivate::mutex_type StateNamePrivate::NameSetMutex;
-const boost::regex StateNamePrivate::REGEX_C( "[^\\w^\\.\\-\\s]" );
+const boost::regex StateNamePrivate::REGEX_C( "[^\\w\\s\\.\\-]" );
 
 StateName::StateName( const std::string& stateid, const std::string& value ) :
   StateBase( stateid )
