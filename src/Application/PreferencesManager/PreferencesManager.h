@@ -70,6 +70,7 @@ private:
 public:
   //General Preferences
   Core::StateStringHandle project_path_state_;
+  Core::StateStringHandle export_path_state_;
   Core::StateBoolHandle full_screen_on_startup_state_;
   Core::StateBoolHandle auto_save_state_;
   Core::StateRangedIntHandle auto_save_time_state_;
@@ -85,6 +86,7 @@ public:
   Core::StateStringHandle z_axis_label_state_;
   Core::StateBoolHandle enable_undo_state_;
   Core::StateRangedDoubleHandle percent_of_memory_state_;
+  
   
   //Viewers Preferences
   Core::StateOptionHandle default_viewer_mode_state_;

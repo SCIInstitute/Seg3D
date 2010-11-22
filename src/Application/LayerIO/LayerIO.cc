@@ -163,11 +163,11 @@ bool LayerIO::create_exporter( LayerExporterHandle& exporter, std::vector< Layer
 {
   for (size_t j = 0; j < this->exporter_list_.size(); j ++ )
   {
-    if ( ( this->exporter_list_[j]->name() == importername ||
-      this->exporter_list_[j]->file_type_string() == importername ) &&
-      this->exporter_list_[j]->converts_file_type( extension ) )
+    if ( ( this->exporter_list_[ j ]->name() == importername ||
+      this->exporter_list_[ j ]->file_type_string() == importername ) &&
+      this->exporter_list_[ j ]->converts_file_type( extension ) )
     {
-      exporter = this->exporter_list_[j]->build( layers );
+      exporter = this->exporter_list_[ j ]->build( layers );
       return true;
     }
   }

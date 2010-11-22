@@ -62,6 +62,8 @@ SET(APPLICATION_LAYERMANAGER_ACTIONS_SRCS
   Actions/ActionDeleteLayers.cc
   Actions/ActionExportLayer.h
   Actions/ActionExportLayer.cc
+  Actions/ActionExportSegmentation.h
+  Actions/ActionExportSegmentation.cc
   Actions/ActionImportLayer.h
   Actions/ActionImportLayer.cc
   Actions/ActionImportSeries.h

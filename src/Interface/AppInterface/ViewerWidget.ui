@@ -208,7 +208,7 @@ QComboBox::icon{
                 <widget class="QComboBox" name="viewer_mode_">
                  <property name="minimumSize">
                   <size>
-                   <width>80</width>
+                   <width>82</width>
                    <height>0</height>
                   </size>
                  </property>
@@ -590,12 +590,8 @@ QComboBox::icon{
                    <string notr="true">Sagittal</string>
                   </property>
                   <property name="icon">
-                   <iconset>
-                    <normalon>:/Images/Xview.png</normalon>
-                    <disabledoff>:/Images/Xview.png</disabledoff>
-                    <activeoff>:/Images/Xview.png</activeoff>
-                    <selectedoff>:/Images/Xview.png</selectedoff>
-                   </iconset>
+                   <iconset resource="../../Resources/QtResources.qrc">
+                    <normaloff>:/Images/Xview.png</normaloff>:/Images/Xview.png</iconset>
                   </property>
                  </item>
                  <item>

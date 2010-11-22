@@ -34,6 +34,9 @@
 #include <QtGui/QFileDialog>
 #include <QtGui/QMessageBox>
 
+// Core includes
+#include <Core/State/Actions/ActionSet.h>
+
 // Interface includes
 #include <Interface/AppSegmentationExportWizard/AppSegmentationExportWizard.h>
 
@@ -41,7 +44,8 @@
 #include <Application/LayerIO/LayerIO.h>
 #include <Application/Layer/LayerGroup.h>
 #include <Application/LayerManager/LayerManager.h>
-#include <Application/LayerManager/Actions/ActionExportLayer.h>
+#include <Application/LayerManager/Actions/ActionExportSegmentation.h>
+#include <Application/PreferencesManager/PreferencesManager.h>
 
 
 namespace Seg3D
@@ -140,7 +144,6 @@ SegmentationSelectionPage::SegmentationSelectionPage( QWidget *parent )
   this->horizontalLayout_1->addWidget( this->multiple_files_widget_ );
 
   this->main_layout_->addWidget( this->single_or_multiple_files_widget_ );
-  
 
   registerField( "maskList", this->mask_list_ );
   registerField( "segmentationPath", this->file_name_lineedit_ );
@@ -238,14 +241,23 @@ bool SegmentationSelectionPage::validatePage()
   if( this->single_file_radio_button_->isChecked() )
   {
     filename = QFileDialog::getSaveFileName( this, "Export Segmentation As... ",
-      QString::fromStdString( desktop_path.string() ),"NRRD files (*.nrrd)" );
+      QString::fromStdString( PreferencesManager::Instance()->export_path_state_->get() ),
+      "NRRD files (*.nrrd)" );
+      
+    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
+      PreferencesManager::Instance()->export_path_state_, 
+      boost::filesystem::path( filename.toStdString() ).parent_path().string() );
   }
   else
   {
     filename = QFileDialog::getExistingDirectory( this, tr( "Choose Directory for Export..." ),
-      QString::fromStdString( desktop_path.string() ),
+      QString::fromStdString( PreferencesManager::Instance()->export_path_state_->get() ),
       QFileDialog::ShowDirsOnly
       | QFileDialog::DontResolveSymlinks );
+
+    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
+      PreferencesManager::Instance()->export_path_state_, 
+      boost::filesystem::path( filename.toStdString() ).string() );
   }
   
   if( !boost::filesystem::exists( boost::filesystem::path( filename.toStdString() ).parent_path() ) )
@@ -401,12 +413,12 @@ bool SegmentationSummaryPage::validatePage()
   if( single_file )
   { 
     exporter->set_label_layer_values( values );
-    ActionExportLayer::Dispatch( Core::Interface::GetWidgetActionContext(), exporter,
+    ActionExportSegmentation::Dispatch( Core::Interface::GetWidgetActionContext(), exporter,
       LayerExporterMode::LABEL_MASK_E, file_name_and_path.string() );
   }
   else
   {
-    ActionExportLayer::Dispatch( Core::Interface::GetWidgetActionContext(), exporter,
+    ActionExportSegmentation::Dispatch( Core::Interface::GetWidgetActionContext(), exporter,
       LayerExporterMode::SINGLE_MASK_E, file_name_and_path.string() );
   }
     

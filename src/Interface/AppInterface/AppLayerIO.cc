@@ -34,10 +34,14 @@
 #include <QFileDialog>
 #include <QPointer>
 
+// Core includes
+#include <Core/State/Actions/ActionSet.h>
+
 // Application includes
 #include <Application/LayerIO/LayerIO.h>
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/LayerManager/Actions/ActionExportLayer.h>
+#include <Application/PreferencesManager/PreferencesManager.h>
 
 // Interface includes
 #include <Interface/AppInterface/LayerImporterWidget.h>
@@ -237,21 +241,26 @@ void AppLayerIO::ExportLayer( QMainWindow* main_window )
     return;
   }
 
-  boost::filesystem::path desktop_path;
-  Core::Application::Instance()->get_user_desktop_directory( desktop_path );
-  
   QString filename = QFileDialog::getSaveFileName( main_window, "Export Data Layer As... ",
-    QString::fromStdString( desktop_path.string() ),"NRRD files (*.nrrd);;DICOM files (*.dcm)" );
+    QString::fromStdString( PreferencesManager::Instance()->export_path_state_->get() ),
+    "NRRD files (*.nrrd);;DICOM files (*.dcm)" );
+    
+  if( boost::filesystem::exists( boost::filesystem::path( filename.toStdString() ).parent_path() ) )
+  {
+    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
+      PreferencesManager::Instance()->export_path_state_, 
+      boost::filesystem::path( filename.toStdString() ).parent_path().string() );
+  }
     
   std::string extension = boost::filesystem::path( filename.toStdString() ).extension(); 
-  std::string importername;
+  std::string exportername;
   
-  if( extension == ".nrrd" ) importername = "NRRD Exporter";
-  else if( extension == ".dcm" ) importername = "ITK Exporter";
+  if( extension == ".nrrd" ) exportername = "NRRD Exporter";
+  else if( extension == ".dcm" ) exportername = "ITK Exporter";
   else return;
     
   LayerExporterHandle exporter;
-  if( ! ( LayerIO::Instance()->create_exporter( exporter, layer_handles, importername, extension ) ) )
+  if( ! ( LayerIO::Instance()->create_exporter( exporter, layer_handles, exportername, extension ) ) )
   {
     std::string error_message = std::string("ERROR: No exporter is available for file '") + 
       filename.toStdString() + std::string("'.");
@@ -266,7 +275,7 @@ void AppLayerIO::ExportLayer( QMainWindow* main_window )
   }
     
   ActionExportLayer::Dispatch( Core::Interface::GetWidgetActionContext(), exporter,
-    LayerExporterMode::DATA_E, filename.toStdString() );
+    filename.toStdString() );
 }
 
 void AppLayerIO::ExportSegmentation( QMainWindow* main_window )

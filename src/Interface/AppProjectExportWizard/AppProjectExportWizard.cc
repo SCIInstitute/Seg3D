@@ -35,11 +35,13 @@
 #include <QtGui/QFileDialog>
 
 // Core includes
+#include <Core/State/Actions/ActionSet.h>
 #include <Core/Application/Application.h>
 
 // Application includes
 #include <Application/ProjectManager/ProjectManager.h>
 #include <Application/ProjectManager/Actions/ActionExportProject.h>
+#include <Application/PreferencesManager/PreferencesManager.h>
 
 // Interface includes
 #include <Interface/AppProjectExportWizard/AppProjectExportWizard.h>
@@ -107,17 +109,22 @@ ExportInfoPage::ExportInfoPage( QWidget *parent )
   
 void ExportInfoPage::initializePage()
 {
-  boost::filesystem::path desktop_path;
-  Core::Application::Instance()->get_user_desktop_directory( desktop_path );
-  this->project_path_lineedit_->setText( QString::fromStdString( desktop_path.string() ) );
+  QString export_path = QString::fromStdString( 
+    PreferencesManager::Instance()->export_path_state_->get() );
+
+  this->project_path_lineedit_->setText( export_path );
   registerField( "projectPath", this->project_path_lineedit_ );
 }
   
 void ExportInfoPage::set_path()
 {
     QDir project_directory_;
-  QString path = QFileDialog::getExistingDirectory ( this, "Directory",
-    this->project_path_lineedit_->text() );
+    
+  QString export_path = QString::fromStdString( 
+    PreferencesManager::Instance()->export_path_state_->get() );
+    
+  QString path = QFileDialog::getExistingDirectory ( this, tr( "Choose Directory for Export..." ),
+    export_path, QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks );
   
     if ( path.isNull() == false )
     {
@@ -151,13 +158,18 @@ ExportSummaryPage::ExportSummaryPage( QWidget *parent )
 
 void ExportSummaryPage::initializePage()
 {
-    QString finishText = wizard()->buttonText(QWizard::FinishButton);
+    QString finishText = wizard()->buttonText( QWizard::FinishButton );
     finishText.remove('&');
 
     this->project_name_->setText( 
     QString::fromUtf8( "Project Name: " ) + field("projectName").toString() );
     this->project_path_->setText( 
     QString::fromUtf8( "Project Path: " ) + field("projectPath").toString() );
+    
+  Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
+    PreferencesManager::Instance()->export_path_state_, 
+    boost::filesystem::path( this->project_path_->text().toStdString() ).string() );
+
   
 }
 

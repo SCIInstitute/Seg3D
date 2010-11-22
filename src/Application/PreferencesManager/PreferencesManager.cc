@@ -142,9 +142,14 @@ void PreferencesManager::initialize_states()
   boost::filesystem::path user_path;
   Core::Application::Instance()->get_user_directory( user_path );
   user_path = user_path / "Seg3D-Projects";
+  
+  boost::filesystem::path desktop_path;
+  Core::Application::Instance()->get_user_desktop_directory( desktop_path );
 
   //General Preferences
   add_state( "project_path", this->project_path_state_, user_path.string() );
+  add_state( "export_path", this->export_path_state_, desktop_path.string() );
+  
   add_state( "full_screen_on_startup", this->full_screen_on_startup_state_, false );
   add_state( "auto_save", this->auto_save_state_, true );
   add_state( "auto_save_time", this->auto_save_time_state_, 10, 1, 120, 1 );

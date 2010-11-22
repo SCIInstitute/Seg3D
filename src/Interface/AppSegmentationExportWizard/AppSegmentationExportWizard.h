@@ -99,6 +99,8 @@ private:
   QHBoxLayout *horizontalLayout_5;
   QRadioButton *individual_files_radio_button_;
   QButtonGroup *radio_button_group_;
+  
+  QLabel *hidden_path_label_;
 
 };
 

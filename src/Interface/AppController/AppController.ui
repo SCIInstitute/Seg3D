@@ -32,7 +32,7 @@
    <item>
     <widget class="QTabWidget" name="TW_CONTROLLER">
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <property name="usesScrollButtons">
       <bool>false</bool>
@@ -90,7 +90,7 @@
              <bool>true</bool>
             </property>
             <property name="selectionMode">
-             <enum>QAbstractItemView::NoSelection</enum>
+             <enum>QAbstractItemView::SingleSelection</enum>
             </property>
             <property name="showGrid">
              <bool>false</bool>
@@ -161,6 +161,16 @@
               <number>4</number>
              </property>
              <item>
+              <widget class="QPushButton" name="TB_ACTION">
+               <property name="focusPolicy">
+                <enum>Qt::ClickFocus</enum>
+               </property>
+               <property name="text">
+                <string>Action</string>
+               </property>
+              </widget>
+             </item>
+             <item>
               <widget class="QLabel" name="label">
                <property name="minimumSize">
                 <size>
@@ -175,13 +185,6 @@
              </item>
              <item>
               <widget class="QLineEdit" name="LE_EDIT_ACTION"/>
-             </item>
-             <item>
-              <widget class="QPushButton" name="TB_ACTION">
-               <property name="text">
-                <string>Action</string>
-               </property>
-              </widget>
              </item>
             </layout>
            </widget>
@@ -278,7 +281,7 @@
           <bool>true</bool>
          </property>
          <property name="selectionMode">
-          <enum>QAbstractItemView::NoSelection</enum>
+          <enum>QAbstractItemView::SingleSelection</enum>
          </property>
          <property name="showGrid">
           <bool>false</bool>
@@ -286,6 +289,9 @@
          <property name="gridStyle">
           <enum>Qt::NoPen</enum>
          </property>
+         <attribute name="horizontalHeaderStretchLastSection">
+          <bool>true</bool>
+         </attribute>
          <attribute name="verticalHeaderVisible">
           <bool>false</bool>
          </attribute>
@@ -324,6 +330,9 @@
          <property name="cornerButtonEnabled">
           <bool>false</bool>
          </property>
+         <attribute name="horizontalHeaderStretchLastSection">
+          <bool>true</bool>
+         </attribute>
          <attribute name="verticalHeaderVisible">
           <bool>false</bool>
          </attribute>
@@ -360,7 +369,7 @@
         <bool>true</bool>
        </property>
        <property name="selectionMode">
-        <enum>QAbstractItemView::NoSelection</enum>
+        <enum>QAbstractItemView::SingleSelection</enum>
        </property>
        <property name="showGrid">
         <bool>false</bool>
@@ -368,6 +377,9 @@
        <property name="cornerButtonEnabled">
         <bool>false</bool>
        </property>
+       <attribute name="horizontalHeaderStretchLastSection">
+        <bool>true</bool>
+       </attribute>
        <attribute name="verticalHeaderVisible">
         <bool>false</bool>
        </attribute>
@@ -423,7 +435,7 @@
         <bool>true</bool>
        </property>
        <property name="selectionMode">
-        <enum>QAbstractItemView::NoSelection</enum>
+        <enum>QAbstractItemView::SingleSelection</enum>
        </property>
        <property name="showGrid">
         <bool>false</bool>
@@ -431,6 +443,9 @@
        <property name="cornerButtonEnabled">
         <bool>false</bool>
        </property>
+       <attribute name="horizontalHeaderStretchLastSection">
+        <bool>true</bool>
+       </attribute>
        <attribute name="verticalHeaderVisible">
         <bool>false</bool>
        </attribute>
