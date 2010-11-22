@@ -79,6 +79,22 @@ bool ActionComputeIsosurface::run( Core::ActionContextHandle& context,
   MaskLayerHandle mask_layer = LayerManager::FindMaskLayer( this->layer_id_.value() );
   mask_layer->compute_isosurface( this->quality_factor_.value() );
 
+  /*
+  Hide the abort message (if aborted).  This is a workaround for the fact that this action is
+  not run on a separate algorithm thread, so the LayerWidget::trigger_abort() posts an action to
+  show the abort message and this event is put on the event queue and not processed until this
+  run function returns.  The problem is that the last event processed is the one showing the 
+  abort message, so the abort message never goes away.  We work around this by posting our own
+  hide abort message event (via the Action dispatch mechanism) that will get placed in the queue
+  after the show message.  
+
+  Put another way, normally the "Waiting for process to abort message" is displayed while we wait
+  for the filter algorithm thread to abort.  In this case there is no separate algorithm thread
+  to wait for because the isosurface computation is done directly on the application thread.
+  */
+  Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
+    mask_layer->show_abort_message_state_, false );
+
   return true;
 }
 

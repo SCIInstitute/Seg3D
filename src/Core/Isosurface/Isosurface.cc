@@ -349,6 +349,8 @@ public:
   // UPLOAD_TO_VERTEX_BUFFER:
   void upload_to_vertex_buffer();
 
+  void reset();
+
   // Pointer to public Isosurface -- needed to give access to public signals
   Isosurface* isosurface_;
 
@@ -544,6 +546,21 @@ void IsosurfacePrivate::parallel_downsample_mask( int thread, int num_threads,
         }
         target_index++;
       }
+    }
+
+    if ( thread == 0 )
+    {
+      if ( this->check_abort_() ) 
+      {
+        this->need_abort_ = true;
+      }
+    }
+
+    barrier.wait();   
+
+    if ( this->need_abort_ ) 
+    {
+      return;
     }
   }
 }
@@ -1078,12 +1095,18 @@ void IsosurfacePrivate::parallel_compute_faces( int thread, int num_threads,
 
     if ( thread == 0 )
     {
-      if ( this->check_abort_() ) this->need_abort_ = true;
+      if ( this->check_abort_() ) 
+      {
+        this->need_abort_ = true;
+      }
     }
 
     barrier.wait();   
 
-    if ( this->need_abort_ ) return;
+    if ( this->need_abort_ ) 
+    {
+      return;
+    }
     
     // Update progress based on number of z slices processed
     double compute_progress = 
@@ -1252,6 +1275,14 @@ void IsosurfacePrivate::upload_to_vertex_buffer()
   this->vbo_available_ = true;
 }
 
+void IsosurfacePrivate::reset()
+{
+  this->points_.clear();
+  this->normals_.clear();
+  this->faces_.clear();
+  this->values_.clear();
+}
+
 Isosurface::Isosurface( const MaskVolumeHandle& mask_volume ) :
   private_( new IsosurfacePrivate )
 {
@@ -1291,20 +1322,25 @@ void Isosurface::compute( double quality_factor, boost::function< bool () > chec
       parallel_downsample.run();
     }
 
+    if ( check_abort() )
+    {
+      // leave it in a decent state
+      this->private_->reset();
+      return;
+    }
+
     Parallel parallel_faces( boost::bind( &IsosurfacePrivate::parallel_compute_faces, 
       this->private_, _1, _2, _3 ) );
     parallel_faces.run();
+
+    if ( check_abort() )
+    {
+      // leave it in a decent state
+      this->private_->reset();
+      return;
+    }
   }
 
-  if ( check_abort() )
-  {
-    // leave it in a decent state
-    this->private_->points_.clear();
-    this->private_->normals_.clear();
-    this->private_->faces_.clear();
-    this->private_->values_.clear();
-    return;
-  }
   // Check for empty isosurface
   if( this->private_->points_.size() == 0 ) 
   {
@@ -1322,6 +1358,13 @@ void Isosurface::compute( double quality_factor, boost::function< bool () > chec
   Parallel parallel_normals( boost::bind( &IsosurfacePrivate::parallel_compute_normals, 
     this->private_, _1, _2, _3 ) );
   parallel_normals.run();
+
+  if ( check_abort() )
+  {
+    // leave it in a decent state
+    this->private_->reset();
+    return;
+  }
 
   this->update_progress_signal_( IsosurfacePrivate::COMPUTE_PERCENT_PROGRESS_C + 
     IsosurfacePrivate::NORMAL_PERCENT_PROGRESS_C );
@@ -1361,6 +1404,13 @@ void Isosurface::compute( double quality_factor, boost::function< bool () > chec
       num_faces = 0;
     }
 
+    if ( check_abort() )
+    {
+      // leave it in a decent state
+      this->private_->reset();
+      return;
+    }
+
     // Update progress
     double partition_progress = 
       static_cast< double >( j + 1 ) / static_cast< double >( this->private_->min_point_index_.size() ); 
@@ -1393,6 +1443,13 @@ void Isosurface::compute( double quality_factor, boost::function< bool () > chec
   this->private_->max_face_index_.clear();
 
   this->private_->surface_changed_ = true;
+
+  if ( check_abort() )
+  {
+    // leave it in a decent state
+    this->private_->reset();
+    return;
+  }
 
   this->update_progress_signal_( 1.0 );
 
