@@ -95,7 +95,9 @@ public:
   bool set_values( const std::vector< float >& values );
 
   // SET_COLOR_MAP:
-  // Set mapping from vertex values to RGB colors
+  // Set mapping from vertex values to RGB colors.  
+  // NOTE: This function is not thread-safe. Passing handle since colormap is unlikely
+  // to be modified after creation. 
   void set_color_map( ColorMapHandle color_map );
 
   // GET_COLOR_MAP:

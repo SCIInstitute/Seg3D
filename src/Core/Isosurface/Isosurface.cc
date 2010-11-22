@@ -602,7 +602,7 @@ void IsosurfacePrivate::compute_setup( int num_threads )
 
 /*
 Basic ideas:
-- Move through volume two slices at a time.  Back and front refer to these two slices.
+- Move through volume two slices at a time along z axis.  Back and front refer to these two slices.
 - Points are shared by multiple triangles in the isosurface.  We don't want to store a copy of a
   point for each triangle.  In order to avoid duplicates, we go through edges in one direction at a 
   time, looking at edges that need to be split.  This way we encounter each edge only once.
@@ -612,8 +612,8 @@ Basic ideas:
   - front_buffer_x - Edges along the x direction on the front buffer (slice)
   - front_buffer_y - Edges along the y direction on the front buffer (slice)
   - side_buffer - Edges along the sides between the back and front buffers (slices)
-- Number points as you encounter split edges.
 - These are tables of split edges with indices into a points vector of actual points.
+- Number points as you encounter split edges.
 - After edge tables are built, go back to type list, use configurations to lookup into the tables.
 - Tables are built in parallel using relative indices per thread.
 - Parallel point lists are merged together at the end.
@@ -1397,7 +1397,7 @@ void Isosurface::compute( double quality_factor, boost::function< bool () > chec
   this->update_progress_signal_( 1.0 );
 
   // Test code
-  //this->export_isosurface( "test_dir", "test3" );
+  //this->export_isosurface( "", "test_isosurface" );
 }
 
 const std::vector< PointF >& Isosurface::get_points() const
@@ -1562,6 +1562,8 @@ void Isosurface::redraw( bool use_colormap )
 bool Isosurface::export_isosurface( const boost::filesystem::path& path, 
   const std::string& file_prefix )
 {
+  lock_type lock( this->get_mutex() );
+
   // Write points to .pts file
   boost::filesystem::path points_path = path / ( file_prefix + ".pts" );
   std::ofstream pts_file( points_path.string().c_str() );
