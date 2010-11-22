@@ -34,6 +34,7 @@
 // Qt includes
 #include <QtGui/QMessageBox>
 #include <QtGui/QMenu>
+#include <QtGui/QFileDialog>
 
 //Core Includes - for logging
 #include <Core/Utils/Log.h>
@@ -57,6 +58,7 @@
 #include <Application/LayerManager/Actions/ActionMoveLayerAbove.h>
 #include <Application/LayerManager/Actions/ActionCalculateMaskVolume.h>
 #include <Application/LayerManager/Actions/ActionDuplicateLayer.h>
+#include <Application/LayerManager/Actions/ActionExportLayer.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
 #include <Application/Filters/LayerResampler.h>
 
@@ -1080,7 +1082,13 @@ void LayerWidget::contextMenuEvent( QContextMenuEvent * event )
     this->private_->layer_->get_layer_id() ) );
   
   qaction = menu.addAction( tr( "Delete Layer" ) );
-  connect( qaction, SIGNAL( triggered() ), this, SLOT( delete_layer_from_context_menu() ) );  
+  connect( qaction, SIGNAL( triggered() ), this, SLOT( delete_layer_from_context_menu() ) );
+  
+  if( this->private_->layer_->get_type() == Core::VolumeType::DATA_E )
+  {
+    qaction = menu.addAction( tr( "Export Data" ) );
+    connect( qaction, SIGNAL( triggered() ), this, SLOT( export_data() ) );
+  } 
   
   menu.exec( event->globalPos() );
   
@@ -1101,6 +1109,25 @@ void LayerWidget::delete_layer_from_context_menu()
       this->private_->layer_->get_layer_group() );
   }
 }
+
+void LayerWidget::export_data()
+{
+  QString filename = QFileDialog::getSaveFileName( this, "Export Data Layer As... ",
+    QString::fromStdString( PreferencesManager::Instance()->export_path_state_->get() ),
+    "NRRD files (*.nrrd);;DICOM files (*.dcm)" );
+
+  if( boost::filesystem::exists( boost::filesystem::path( filename.toStdString() ).parent_path() ) )
+  {
+    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
+      PreferencesManager::Instance()->export_path_state_, 
+      boost::filesystem::path( filename.toStdString() ).parent_path().string() );
+  }
+  
+  ActionExportLayer::Dispatch( Core::Interface::GetWidgetActionContext(), 
+    this->private_->layer_->get_layer_name(), filename.toStdString() );
+  
+}
+
 
 
 

@@ -100,11 +100,16 @@ public:
   // Create action that exports a segmentation
   static Core::ActionHandle Create( const LayerExporterHandle& exporter,
     const std::string& file_path );
+    
+  static Core::ActionHandle Create( const std::string& layer, const std::string& file_path );
 
   // DISPATCH:
   // To avoid reading a file twice, this action has a special option, so it can take an
   // importer that has already loaded the file. This prevents it from being read twice
   static void Dispatch( Core::ActionContextHandle context, const LayerExporterHandle& exporter, 
+    const std::string& file_path );
+    
+  static void Dispatch( Core::ActionContextHandle context, const std::string& layer, 
     const std::string& file_path );
     
   

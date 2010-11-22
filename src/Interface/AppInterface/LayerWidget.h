@@ -233,6 +233,10 @@ private Q_SLOTS:
   // DELETE_LAYER_FROM_CONTEXT_MENU:
   // dispatches an action that deletes the layer
   void delete_layer_from_context_menu();
+  
+  // EXPORT_DATA:
+  // dispatches an action that exports the data
+  void export_data();
 
 protected:
   void resizeEvent( QResizeEvent *event );

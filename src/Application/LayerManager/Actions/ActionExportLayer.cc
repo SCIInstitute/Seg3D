@@ -54,6 +54,12 @@ bool ActionExportLayer::validate( Core::ActionContextHandle& context )
   
     std::string extension = boost::filesystem::path( this->file_path_.value() ).extension(); 
     
+    if( this->exporter_.value() == "" )
+    {
+      if( extension == ".nrrd" ) this->exporter_.value() = "NRRD Exporter";
+      else if( extension == ".dcm" ) this->exporter_.value() = "ITK Exporter";
+    }
+    
     if( ! ( LayerIO::Instance()->create_exporter( this->layer_exporter_, layer_handles, this->exporter_.value(), extension ) ) )
     {
       return false;
@@ -107,6 +113,19 @@ Core::ActionHandle ActionExportLayer::Create( const LayerExporterHandle& exporte
   return Core::ActionHandle( action );
 }
 
+Core::ActionHandle ActionExportLayer::Create( const std::string& layer, 
+  const std::string& file_path  )
+{
+  // Create new action
+  ActionExportLayer* action = new ActionExportLayer;
+
+  action->layer_.value() = layer;
+  action->file_path_.value() = file_path;
+
+  // Post the new action
+  return Core::ActionHandle( action );
+}
+
 void ActionExportLayer::clear_cache()
 {
 }
@@ -116,5 +135,11 @@ void ActionExportLayer::Dispatch( Core::ActionContextHandle context,
 {
   Core::ActionDispatcher::PostAction( Create( exporter, file_path ), context );
 }
+
+void ActionExportLayer::Dispatch( Core::ActionContextHandle context, const std::string& layer, const std::string& file_path )
+{
+  Core::ActionDispatcher::PostAction( Create( layer, file_path ), context );
+}
+
 
 } // end namespace Seg3D
