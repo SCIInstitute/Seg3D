@@ -163,7 +163,7 @@
              <item>
               <widget class="QPushButton" name="TB_ACTION">
                <property name="focusPolicy">
-                <enum>Qt::ClickFocus</enum>
+                <enum>Qt::NoFocus</enum>
                </property>
                <property name="text">
                 <string>Action</string>

@@ -43,7 +43,8 @@ PushDragButton::~PushDragButton()
 
 void PushDragButton::mousePressEvent( QMouseEvent *event )
 {
-  if( ( event->modifiers() == Qt::ControlModifier ) || ( event->modifiers() == Qt::ShiftModifier ) )
+  if( ( event->modifiers() == Qt::ControlModifier ) || ( event->modifiers() == Qt::ShiftModifier )
+    || ( event->button() == Qt::RightButton ) )
     event->ignore();
   else
     Q_EMIT clicked();

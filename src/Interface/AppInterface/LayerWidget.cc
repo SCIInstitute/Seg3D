@@ -746,6 +746,7 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
   // Exit immediately if they are no longer holding the button the press event isn't valid
   if( event->button() != Qt::LeftButton )
   { 
+    event->ignore();
     return;
   }
   
@@ -753,6 +754,7 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
   {
     ActionActivateLayer::Dispatch( Core::Interface::GetWidgetActionContext(),
       LayerManager::Instance()->get_layer_by_id( this->get_layer_id() ) );
+    event->ignore();
     return;
   }
   
@@ -1091,7 +1093,6 @@ void LayerWidget::contextMenuEvent( QContextMenuEvent * event )
   } 
   
   menu.exec( event->globalPos() );
-  
 }
 
 void LayerWidget::delete_layer_from_context_menu()
