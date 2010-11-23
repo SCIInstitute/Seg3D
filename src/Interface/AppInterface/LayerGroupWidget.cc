@@ -105,8 +105,10 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   // hide the tool bars 
   this->private_->ui_.iso_quality_->hide();
   this->private_->ui_.delete_->hide();
+  this->private_->ui_.duplicate_layers_->hide();
   
   this->private_->ui_.delete_button_->setEnabled( false );
+  this->private_->ui_.duplicate_button_->setEnabled( false );
 
   // set some values of the GUI
   std::string group_name = Core::ExportToString( 
@@ -137,8 +139,12 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
     SLOT( show_layers( bool )) );
   connect( this->private_->ui_.delete_button_, SIGNAL( clicked() ), this, 
     SLOT( verify_delete() ) );
+  connect( this->private_->ui_.duplicate_button_, SIGNAL( clicked() ), this,
+    SLOT( duplicate_checked_layers() ) );
   connect( this->private_->ui_.select_all_button_, SIGNAL( released() ), this, 
-    SLOT( hide_show_checkboxes() ) );
+    SLOT( check_uncheck_for_delete() ) );
+  connect( this->private_->ui_.select_all_for_duplication_button_, SIGNAL( released() ), this, 
+      SLOT( check_uncheck_for_duplicate() ) );
   
   // Set the icons for the group visibility button
   QIcon none_visible_icon;
@@ -158,16 +164,19 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
     group->show_iso_menu_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.group_delete_button_, 
     group->show_delete_menu_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.duplicate_layer_button_, 
+    group->show_duplicate_menu_state_ );
 
   QtUtils::QtBridge::Show( this->private_->ui_.iso_quality_, group->show_iso_menu_state_ ); 
   QtUtils::QtBridge::Show( this->private_->ui_.delete_, group->show_delete_menu_state_ );
+  QtUtils::QtBridge::Show( this->private_->ui_.duplicate_layers_, group->show_duplicate_menu_state_ );
   
   QtUtils::QtBridge::Connect( this->private_->ui_.group_new_button_, 
     boost::bind( &ActionNewMaskLayer::Dispatch, 
     Core::Interface::GetWidgetActionContext(), this->private_->group_->get_group_id() ) );
 
-  QtUtils::QtBridge::Connect( this->private_->ui_.duplicate_layer_button_,
-    boost::bind( &ActionDuplicateLayer::Dispatch, Core::Interface::GetWidgetActionContext() ) );
+  //QtUtils::QtBridge::Connect( this->private_->ui_.duplicate_layer_button_,
+//    boost::bind( &ActionDuplicateLayer::Dispatch, Core::Interface::GetWidgetActionContext() ) );
 
   // --- ISOSURFACE---
   QtUtils::QtBridge::Connect( this->private_->iso_quality_button_group_, 
@@ -528,6 +537,9 @@ void LayerGroupWidget::handle_change()
       connect( new_layer_handle.data(), SIGNAL( selection_box_changed() ),
         this, SLOT( enable_disable_delete_button() ) );
       
+      connect( new_layer_handle.data(), SIGNAL( selection_box_changed() ),
+          this, SLOT( enable_disable_duplicate_button() ) );
+      
     }
     index++;
   }
@@ -562,8 +574,26 @@ void LayerGroupWidget::notify_picked_up_layer_size( int layer_size )
     ( *it ).second->set_picked_up_layer_size( layer_size );
   }
 }
+  
+void LayerGroupWidget::duplicate_checked_layers()
+{
+  this->private_->ui_.duplicate_layer_button_->setChecked( false );
+  this->private_->ui_.select_all_for_duplication_button_->setChecked( false );
+  
+  for( std::map< std::string, LayerWidgetQHandle >::iterator it = this->layer_map_.begin(); 
+    it != this->layer_map_.end(); ++it )
+  {
+    if( ( *it ).second->get_selected() )
+    {
+      ActionDuplicateLayer::Dispatch( Core::Interface::GetWidgetActionContext(), 
+        ( *it ).second->get_layer_id() );
+      ( *it ).second->set_check_selected( false );
+      
+    }
+  }
+}
 
-void LayerGroupWidget::hide_show_checkboxes()
+void LayerGroupWidget::check_uncheck_for_delete()
 {
   for( std::map< std::string, LayerWidgetQHandle >::iterator it = this->layer_map_.begin(); 
     it != this->layer_map_.end(); ++it )
@@ -571,6 +601,15 @@ void LayerGroupWidget::hide_show_checkboxes()
     ( *it ).second->set_check_selected( this->private_->ui_.select_all_button_->isChecked() );
   }
 }
+  
+void LayerGroupWidget::check_uncheck_for_duplicate()
+{
+  for( std::map< std::string, LayerWidgetQHandle >::iterator it = this->layer_map_.begin(); 
+    it != this->layer_map_.end(); ++it )
+  {
+    ( *it ).second->set_check_selected( this->private_->ui_.select_all_for_duplication_button_->isChecked() );
+  }
+} 
 
 void LayerGroupWidget::enable_disable_delete_button()
 {
@@ -584,6 +623,20 @@ void LayerGroupWidget::enable_disable_delete_button()
     }
   }
   this->private_->ui_.delete_button_->setEnabled( false );
+}
+  
+void LayerGroupWidget::enable_disable_duplicate_button()
+{
+  for( std::map< std::string, LayerWidgetQHandle >::iterator it = this->layer_map_.begin(); 
+    it != this->layer_map_.end(); ++it )
+  {
+    if( ( *it ).second->get_selected() )
+    {
+      this->private_->ui_.duplicate_button_->setEnabled( true );
+      return;
+    }
+  }
+  this->private_->ui_.duplicate_button_->setEnabled( false );
 }
 
 

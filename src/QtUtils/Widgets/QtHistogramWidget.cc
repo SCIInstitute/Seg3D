@@ -87,7 +87,6 @@ QtHistogramWidget::QtHistogramWidget( QWidget *parent, QtSliderDoubleCombo* uppe
   this->min_bar_->hide();
   this->max_bar_->hide();
 
-  this->setMinimumHeight( 170 );
   this->private_->ui_.label_3->setAlignment( Qt::AlignHCenter | Qt::AlignVCenter );
 }
 
@@ -132,7 +131,7 @@ void QtHistogramWidget::set_min( double min )
   
   double percentage = min / ( this->get_histogram_max() - this->get_histogram_min() );
     
-  double min_location = ( ( this->private_->histogram_graph_->width() - 5 ) * percentage ) + 4;
+  double min_location = ( ( this->private_->histogram_graph_->width() - 4 ) * percentage ) + 4;
   this->min_bar_->setGeometry( min_location, 4 , 4, 129 );
   this->min_bar_->setStyleSheet( QString::fromUtf8( "border-left: 2px solid rgb( 237, 148, 31 );"
     "border-bottom: 2px solid rgb( 237, 148, 31 );"
@@ -149,7 +148,7 @@ void QtHistogramWidget::set_max( double max )
   }
   
   double percentage = max / ( this->get_histogram_max() - this->get_histogram_min() );
-  double max_location = ( ( this->private_->histogram_graph_->width() - 5 ) * percentage ) + 4;
+  double max_location = ( ( this->private_->histogram_graph_->width() - 4 ) * percentage ) + 4;
   this->max_bar_->setGeometry( max_location, 4, 4, 129 );
   this->max_bar_->setStyleSheet( QString::fromUtf8( "border-right: 2px solid rgb( 237, 148, 31 );"
     "border-bottom: 2px solid rgb( 237, 148, 31 );"

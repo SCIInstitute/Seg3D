@@ -7,19 +7,13 @@
     <x>0</x>
     <y>0</y>
     <width>263</width>
-    <height>185</height>
+    <height>188</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>0</width>
-    <height>185</height>
-   </size>
-  </property>
-  <property name="maximumSize">
-   <size>
-    <width>16777215</width>
-    <height>185</height>
+    <height>188</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -63,12 +57,6 @@ QLabel#label_3{
         <property name="minimumSize">
          <size>
           <width>259</width>
-          <height>133</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
           <height>133</height>
          </size>
         </property>

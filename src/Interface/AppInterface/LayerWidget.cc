@@ -364,7 +364,14 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
       !boost::lambda::bind( &Core::StateBool::get, layer->locked_state_.get() ) &&
       boost::lambda::bind( &Core::StateBool::get, 
       layer_group->show_delete_menu_state_.get() ) );
-
+    
+    
+    enable_states[ 1 ] = layer_group->show_duplicate_menu_state_;
+    QtUtils::QtBridge::Show( this->private_->ui_.checkbox_widget_, enable_states,
+      !boost::lambda::bind( &Core::StateBool::get, layer->locked_state_.get() ) &&
+      boost::lambda::bind( &Core::StateBool::get, 
+      layer_group->show_duplicate_menu_state_.get() ) );
+    
     // Control the enable/disable state of the visibility_button_
     enable_states.clear();
     size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();

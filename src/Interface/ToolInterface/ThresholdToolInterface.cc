@@ -108,7 +108,7 @@ bool ThresholdToolInterface::build_widget( QFrame* frame )
     tool->target_layer_state_, condition );
 
   //Send a message to the log that we have finished with building the Threshold Tool Interface
-  CORE_LOG_DEBUG("Finished building a Threshold Tool Interface");
+  CORE_LOG_DEBUG( "Finished building a Threshold Tool Interface" );
 
   return ( true );
 } 

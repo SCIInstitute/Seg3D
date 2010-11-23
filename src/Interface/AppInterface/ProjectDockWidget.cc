@@ -32,6 +32,7 @@
 // Core includes
 #include <Core/Utils/Log.h>
 #include <Core/Interface/Interface.h>
+#include <Core/State/Actions/ActionSet.h>
 
 // Qt includes
 #include <QtGui/QStandardItemModel>
@@ -83,9 +84,12 @@ ProjectDockWidget::ProjectDockWidget( QWidget *parent ) :
 
     int minutes = PreferencesManager::Instance()->auto_save_time_state_->get();
     this->private_->ui_.minutes_label_->setText( QString::number( minutes ) );
-
-    QtUtils::QtBridge::Connect( this->private_->ui_.autosave_checkbox_,
-      PreferencesManager::Instance()->auto_save_state_ );
+  
+    this->private_->ui_.autosave_checkbox_->setChecked( 
+      PreferencesManager::Instance()->auto_save_state_->get() );
+    
+    connect( this->private_->ui_.autosave_checkbox_, SIGNAL( clicked( bool ) ), this,
+      SLOT( set_autosave_checked_state( bool ) ) ); 
 
     QtUtils::QtBridge::Connect( this->private_->ui_.project_name_, 
       ProjectManager::Instance()->current_project_->project_name_state_ );
@@ -677,6 +681,12 @@ void ProjectDockWidget::disable_load_delete_and_export_buttons()
   }
 }
 
+void ProjectDockWidget::set_autosave_checked_state( bool state )
+{
+  Core::ActionSet::Dispatch( Core::Interface::GetMouseActionContext(),
+    PreferencesManager::Instance()->auto_save_state_, state );
+
+}
 
 
 

@@ -236,10 +236,12 @@ void LayerGroup::initialize_states()
 
   this->add_state( "show_iso_menu", this->show_iso_menu_state_, false );
   this->add_state( "show_delete_menu", this->show_delete_menu_state_, false );
+  this->add_state( "show_duplicate_menu", this->show_duplicate_menu_state_, false );
 
   this->gui_state_group_.reset( new Core::BooleanStateGroup );
   this->gui_state_group_->add_boolean_state( this->show_delete_menu_state_ );
   this->gui_state_group_->add_boolean_state( this->show_iso_menu_state_ );
+  this->gui_state_group_->add_boolean_state( this->show_duplicate_menu_state_ );
 
   size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
   for ( size_t i = 0; i < num_of_viewers; ++i )

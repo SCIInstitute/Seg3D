@@ -147,6 +147,10 @@ private Q_SLOTS:
   // this function disables the load, export and delete buttons for when a session is not selected
   void disable_load_delete_and_export_buttons();
   
+  // SET_AUTOSAVE_CHECKED_STATE:
+  // this function dispatches a function that sets the autosave checked state
+  void set_autosave_checked_state( bool state );
+  
 
 private:
   boost::shared_ptr< ProjectDockWidgetPrivate > private_;

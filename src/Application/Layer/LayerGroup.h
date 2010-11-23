@@ -105,6 +105,9 @@ public:
   // Whether to show the delete layers menu
   Core::StateBoolHandle show_delete_menu_state_;
   
+  // Whether to show the duplicate layers menu
+  Core::StateBoolHandle show_duplicate_menu_state_;
+  
   Core::StateStringHandle group_widget_layer_label_state_;
   
   // -- Layers contained within group --

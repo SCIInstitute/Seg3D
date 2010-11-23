@@ -174,12 +174,24 @@ private Q_SLOTS:
   void hide_group();
   
   // HIDE_SHOW_CHECKBOXES:
-  // hides or shows the checkboxes on the layers
-  void hide_show_checkboxes();
+  // checks or unchecks all the checkboxes on all the layers
+  void check_uncheck_for_delete();
+  
+  // CHECK_UNCHECK_FOR_DUPLICATE:
+  // checks or unchecks all the checkboxes on all the layers
+  void check_uncheck_for_duplicate();
   
   // ENABLE_DISABLE_DELETE_BUTTON:
   // enables or disables the delete button based on whether or not there are any boxes selected
-  void enable_disable_delete_button();  
+  void enable_disable_delete_button();
+  
+  // ENABLE_DISABLE_DUPLICATE_BUTTON:
+  // enables or disables the duplicate button based on whether or not there are any boxes selected
+  void enable_disable_duplicate_button();
+  
+  // DUPLICATE_CHECKED_LAYERS:
+  // dispatches actions for duplicating checked layers.
+  void duplicate_checked_layers();
   
 private:
   // CLEANUP_REMOVED_WIDGETS:
