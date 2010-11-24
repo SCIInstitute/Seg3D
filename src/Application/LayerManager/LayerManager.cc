@@ -477,7 +477,7 @@ void LayerManager::set_next_layer_active()
   
   int potential_next_active = -1;
     
-  for( int i = layers.size()-1; i >= 0; --i )
+  for( int i = static_cast< int >( layers.size() ) - 1; i >= 0; --i )
   {
     if( layers[ i ] != this->private_->active_layer_ )
     {
@@ -508,7 +508,7 @@ void LayerManager::set_previous_layer_active()
   
   int potential_previous_active = -1;
   
-  for( int i = 0; i < layers.size(); ++i )
+  for( int i = 0; i < static_cast< int >( layers.size() ); ++i )
   {
     if( layers[ i ] != this->private_->active_layer_ )
     {
