@@ -454,104 +454,83 @@ void LayerManager::set_active_layer( LayerHandle layer )
   this->private_->handle_active_layer_changed();
   this->active_layer_changed_signal_( layer );  
 }
-
-void LayerManager::set_next_layer_active()
-{
-  lock_type lock( this->get_mutex() );
   
-  if( !this->private_->active_layer_ ) return;
-
+void LayerManager::get_layers_in_order( std::vector< LayerHandle >& vector_of_layers )
+{
+  lock_type lock( this->get_mutex() ); 
+  
   for( group_list_type::iterator i = this->private_->group_list_.begin(); 
     i != this->private_->group_list_.end(); ++i )
   {
     for( layer_list_type::iterator j = ( *i )->layer_list_.begin(); 
       j != ( *i )->layer_list_.end(); ++j )
     {
-      if( ( *j ) == this->private_->active_layer_ )
-      {
-        layer_list_type::iterator temp_j = j;
-        ++temp_j;
-        
-        group_list_type::iterator temp_i = i;
-        ++temp_i;
-        
-        if( ( temp_j ) != ( *i )->layer_list_.end() )
-        {
-          this->set_active_layer( *( temp_j ) );
-          return;
-        
-//          this->private_->active_layer_ = *( temp_j );
-        }
-        else if( ( temp_i ) != this->private_->group_list_.end() )
-        {
-          this->set_active_layer( ( *( *temp_i )->layer_list_.begin() ) );
-          return;
-//          this->private_->active_layer_ = ( *( *temp_i )->layer_list_.begin() );
-        }
-        else
-        {
-          this->set_active_layer( *( ( *this->private_->group_list_.begin() )->layer_list_.begin() ) );
-          return;
-//          this->private_->active_layer_ = 
-//            *( ( *this->private_->group_list_.begin() )->layer_list_.begin() );
-        }
-//        this->private_->handle_active_layer_changed();
-//        this->active_layer_changed_signal_( this->private_->active_layer_ );
-//        return;
-      }
+      vector_of_layers.push_back( *j );
     }
   }
 }
 
+void LayerManager::set_next_layer_active()
+{
+  std::vector< LayerHandle > layers;
+  this->get_layers_in_order( layers );
+  
+  int potential_next_active = -1;
+    
+  for( int i = layers.size()-1; i >= 0; --i )
+  {
+    if( layers[ i ] != this->private_->active_layer_ )
+    {
+      if( layers[ i ]->get_layer_group()->group_widget_expanded_state_->get() )
+      {
+        potential_next_active = i;
+      }
+    }
+    else if( potential_next_active != -1 )
+    {
+      this->set_active_layer( layers[ potential_next_active ] );
+      return;
+    }
+  }
+  
+  if( potential_next_active != -1 )
+  {
+    this->set_active_layer( layers[ potential_next_active ] );
+    return;
+  }
+}
+
+  
 void LayerManager::set_previous_layer_active()
 {
-  lock_type lock( this->get_mutex() );
-
-  if( !this->private_->active_layer_ ) return;
-
-  for( group_list_type::reverse_iterator i = this->private_->group_list_.rbegin(); 
-    i != this->private_->group_list_.rend(); ++i )
+  std::vector< LayerHandle > layers;
+  this->get_layers_in_order( layers );
+  
+  int potential_previous_active = -1;
+  
+  for( int i = 0; i < layers.size(); ++i )
   {
-    for( layer_list_type::reverse_iterator j = ( *i )->layer_list_.rbegin(); 
-      j != ( *i )->layer_list_.rend(); ++j )
+    if( layers[ i ] != this->private_->active_layer_ )
     {
-      if( ( *j ) == this->private_->active_layer_ )
+      if( layers[ i ]->get_layer_group()->group_widget_expanded_state_->get() )
       {
-        layer_list_type::reverse_iterator temp_j = j;
-        ++temp_j;
-
-        group_list_type::reverse_iterator temp_i = i;
-        ++temp_i;
-
-        if( ( temp_j ) != ( *i )->layer_list_.rend() )
-        {
-          this->set_active_layer( *( temp_j ) );
-          return;
-//          this->private_->active_layer_ = *( temp_j );
-        }
-        else if( ( temp_i ) != this->private_->group_list_.rend() )
-        {
-          this->set_active_layer( ( *( *temp_i )->layer_list_.rbegin() ) );
-          return;
-//          this->private_->active_layer_ = ( *( *temp_i )->layer_list_.rbegin() );
-        }
-        else
-        {
-          this->set_active_layer( *( ( *this->private_->group_list_.rbegin() )->layer_list_.rbegin() ) );
-          return;
-//          this->private_->active_layer_ = 
-//            *( ( *this->private_->group_list_.rbegin() )->layer_list_.rbegin() );
-        }
-//        this->private_->handle_active_layer_changed();
-//        this->active_layer_changed_signal_( this->private_->active_layer_ );
-//        return;
+        potential_previous_active = i;
       }
     }
+    else if( potential_previous_active != -1 )
+    {
+      this->set_active_layer( layers[ potential_previous_active ] );
+      return;
+    }
   }
+  
+  if( potential_previous_active != -1 )
+  {
+    this->set_active_layer( layers[ potential_previous_active ] );
+    return;
+  }
+  
 }
-
-
-
 
 LayerGroupHandle LayerManager::get_layer_group( std::string group_id )
 {

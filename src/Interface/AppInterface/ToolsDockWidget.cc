@@ -36,6 +36,7 @@
 
 // QtUtils includes
 #include <QtUtils/Utils/QtPointer.h>
+#include <QtUtils/Bridge/QtBridge.h>
 
 // Application includes
 #include <Application/Tool/ToolFactory.h>
@@ -56,16 +57,47 @@ ToolsDockWidget::ToolsDockWidget( QWidget *parent ) :
   setAllowedAreas( Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea );
   setWindowTitle( "Tools/Filters" );
 
-  QSizePolicy sizePolicy( QSizePolicy::Fixed, QSizePolicy::Preferred );
-  sizePolicy.setHorizontalStretch( 0 );
-  sizePolicy.setVerticalStretch( 0 );
-  setSizePolicy( sizePolicy );
-  setMinimumSize( QSize( 300, 300 ) );
-    //setMaximumSize( QSize( 524287, 524287 ) );
+  this->setMinimumSize( QSize( 300, 300 ) );
+  this->tool_dock_widget_contents_ = new QWidget();
     
   // Create a new ToolBoxWidget that encapsulates all the tool widgets
-  toolbox_ = new ToolBoxWidget( this );
-  setWidget( toolbox_ );
+  this->v_layout_ = new QVBoxLayout( this->tool_dock_widget_contents_ );
+  this->v_layout_->setSpacing( 0 );
+  this->v_layout_->setContentsMargins( 0, 0, 0, 0 );
+  this->v_layout_->setObjectName( QString::fromUtf8( "v_layout_" ) );
+  this->v_layout_->setAlignment( Qt::AlignTop );
+  
+  this->disable_tools_widget_ = new QWidget( this->tool_dock_widget_contents_ );
+  this->disable_tools_widget_->setObjectName( QString::fromUtf8( "disable_tools_widget_" ) );
+  this->disable_tools_widget_->setMinimumSize( QSize( 0, 32 ) );
+  this->disable_tools_widget_->setMaximumSize( QSize( 16777215, 32 ) );
+  
+  this->h_layout_ = new QHBoxLayout( this->disable_tools_widget_ );
+  this->h_layout_->setSpacing( 0 );
+  this->h_layout_->setContentsMargins( 0, 0, 0, 0 );
+  this->h_layout_->setObjectName( QString::fromUtf8( "h_layout_" ) );
+  
+  this->disable_tools_button_ = new QPushButton( this->disable_tools_widget_ );
+  this->disable_tools_button_->setObjectName( QString::fromUtf8( "disable_tools_button_" ) );
+  this->disable_tools_button_->setText( QString::fromUtf8( "Disable Tools" ) );
+  this->disable_tools_button_->setCheckable( true );
+  
+  this->h_layout_->addWidget( this->disable_tools_button_ );
+  
+  this->v_layout_->addWidget( this->disable_tools_widget_ );
+  
+  this->toolbox_ = new ToolBoxWidget( this );
+  this->v_layout_->addWidget( this->toolbox_ );
+  
+  // This functionality is not required currently so we will hide it
+  this->disable_tools_widget_->hide();
+  
+  setWidget( this->tool_dock_widget_contents_ );
+  
+  
+  QtUtils::QtBridge::Connect( this->disable_tools_button_, ToolManager::Instance()->disable_tools_state_ );
+  QtUtils::QtBridge::Enable( this->toolbox_, ToolManager::Instance()->disable_tools_state_, true );
+  
 
   // NOTE: Ensure no changes are made to list while the GUI is hooked up
   // This needs to be done atomically, otherwise we may miss a message

@@ -147,6 +147,16 @@ QToolButton#group_visibility_button_:hover{
   background-color: rgba( 0, 0, 0, 30 ); border-radius: 3px;
 }
 
+QToolButton#group_iso_visibility_button_{
+  background-color: rgba(0, 0, 0, 0);
+  border: 1px solid rgba(0, 0, 0, 0);
+  margin: 0 0 0 0;
+  padding: 0 0 0 0;
+}
+QToolButton#group_iso_visibility_button_:hover{
+  background-color: rgba( 0, 0, 0, 30 ); border-radius: 3px;
+}
+
 QFrame#group_frame_{
   background-color: rgba(0, 0, 0, 0);
   border: none;
@@ -257,7 +267,7 @@ QWidget#buttons_{
              <height>21</height>
             </size>
            </property>
-           <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0">
+           <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0,0">
             <property name="spacing">
              <number>0</number>
             </property>
@@ -360,6 +370,39 @@ QWidget#buttons_{
                 <number>0</number>
                </property>
               </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QToolButton" name="group_iso_visibility_button_">
+              <property name="minimumSize">
+               <size>
+                <width>21</width>
+                <height>21</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>21</width>
+                <height>21</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Click to hide/show computed iso surfaces for this group</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="../../Resources/QtResources.qrc">
+                <normaloff>:/Images/IsosurfaceVisibleOff.png</normaloff>
+                <normalon>:/Images/IsosurfaceVisibleOn.png</normalon>:/Images/IsosurfaceVisibleOff.png</iconset>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
              </widget>
             </item>
             <item>

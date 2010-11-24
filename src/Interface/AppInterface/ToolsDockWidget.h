@@ -31,6 +31,7 @@
 
 // QT includes
 #include <QtCore/QPointer>
+#include <QtGui/QPushButton>
 
 // STL includes
 #include <string>
@@ -99,6 +100,11 @@ private:
 
   // Pointer to the ToolBox Widget
   ToolBoxWidget* toolbox_;
+  QWidget* tool_dock_widget_contents_;
+  QWidget* disable_tools_widget_;
+  QPushButton* disable_tools_button_;
+  QVBoxLayout* v_layout_;
+  QHBoxLayout* h_layout_;
 
   // -- static functions for callbacks into this widget --
 private:

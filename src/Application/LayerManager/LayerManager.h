@@ -92,6 +92,8 @@ public:
   // this function copies the layers into the vector that is passed
   void get_layers( std::vector< LayerHandle >& vector_of_layers );
   
+  void get_layers_in_order( std::vector< LayerHandle >& vector_of_layers );
+  
   // GET_LAYERS_IN_GROUP:
   // this function copies the layers into the vector that is passed
   void get_layers_in_group( LayerGroupHandle group, std::vector< LayerHandle > &vector_of_layers);

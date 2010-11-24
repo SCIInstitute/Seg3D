@@ -149,6 +149,10 @@ public:
   // funtion that sets whether all the layer checkboxes are selected or not when you press the 
   // select all button
   void set_check_selected( bool selected );
+  
+  // SET_ISO_SURFACE_VISIBILITY:
+  // function that sets the state of the iso surface visibility button, triggered from the layergroupwidget
+  void set_iso_surface_visibility( bool visibility );
 
 public:
   // GET_VOLUME_TYPE:

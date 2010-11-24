@@ -110,6 +110,8 @@ public:
   
   Core::StateStringHandle group_widget_layer_label_state_;
   
+  Core::StateBoolHandle group_widget_expanded_state_;
+  
   // -- Layers contained within group --
 protected:
   // NOTE: Only the layer manager groups the layers, this is all done

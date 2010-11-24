@@ -233,6 +233,9 @@ void LayerGroup::initialize_states()
   spacing = this->grid_transform_ * spacing;
   this->add_state( "spacing", this->spacing_state_, Core::Point( spacing ) );
   this->spacing_state_->set_session_priority( Core::StateBase::DO_NOT_LOAD_E );
+  
+  this->add_state( "group_widget_expanded", this->group_widget_expanded_state_, true );
+  
 
   this->add_state( "show_iso_menu", this->show_iso_menu_state_, false );
   this->add_state( "show_delete_menu", this->show_delete_menu_state_, false );

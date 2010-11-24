@@ -193,6 +193,8 @@ private Q_SLOTS:
   // dispatches actions for duplicating checked layers.
   void duplicate_checked_layers();
   
+  void set_iso_surface_visibility( bool visible );
+  
 private:
   // CLEANUP_REMOVED_WIDGETS:
   // Cleanup any of the widgets that were removed

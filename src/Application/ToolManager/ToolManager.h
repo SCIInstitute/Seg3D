@@ -152,6 +152,7 @@ public:
 
 public:
   Core::StateLabeledOptionHandle active_tool_state_;
+  Core::StateBoolHandle disable_tools_state_;
 
 private:
   ToolManagerPrivateHandle private_;

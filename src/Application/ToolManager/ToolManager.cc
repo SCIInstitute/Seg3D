@@ -303,6 +303,10 @@ ToolManager::ToolManager() :
   this->mark_as_project_data();
 
   this->add_state( "active_tool", this->active_tool_state_, "", "" );
+  
+  // this state variable is currently not being used.
+  this->add_state( "disable_tools", this->disable_tools_state_, false );
+  
   this->private_->tool_manager_ = this;
   this->private_->signal_block_count_ = 0;
 

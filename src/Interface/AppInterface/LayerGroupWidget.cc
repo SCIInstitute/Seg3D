@@ -137,6 +137,10 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   //  connect the gui signals and slots
   connect( this->private_->ui_.open_button_, SIGNAL( toggled( bool ) ), this, 
     SLOT( show_layers( bool )) );
+  
+  QtUtils::QtBridge::Connect( this->private_->ui_.open_button_, 
+    this->private_->group_->group_widget_expanded_state_ );
+  
   connect( this->private_->ui_.delete_button_, SIGNAL( clicked() ), this, 
     SLOT( verify_delete() ) );
   connect( this->private_->ui_.duplicate_button_, SIGNAL( clicked() ), this,
@@ -144,7 +148,11 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   connect( this->private_->ui_.select_all_button_, SIGNAL( released() ), this, 
     SLOT( check_uncheck_for_delete() ) );
   connect( this->private_->ui_.select_all_for_duplication_button_, SIGNAL( released() ), this, 
-      SLOT( check_uncheck_for_duplicate() ) );
+    SLOT( check_uncheck_for_duplicate() ) );
+  
+  connect( this->private_->ui_.group_iso_visibility_button_, SIGNAL( toggled( bool ) ), this, 
+    SLOT( set_iso_surface_visibility( bool )) );
+
   
   // Set the icons for the group visibility button
   QIcon none_visible_icon;
@@ -174,9 +182,6 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   QtUtils::QtBridge::Connect( this->private_->ui_.group_new_button_, 
     boost::bind( &ActionNewMaskLayer::Dispatch, 
     Core::Interface::GetWidgetActionContext(), this->private_->group_->get_group_id() ) );
-
-  //QtUtils::QtBridge::Connect( this->private_->ui_.duplicate_layer_button_,
-//    boost::bind( &ActionDuplicateLayer::Dispatch, Core::Interface::GetWidgetActionContext() ) );
 
   // --- ISOSURFACE---
   QtUtils::QtBridge::Connect( this->private_->iso_quality_button_group_, 
@@ -638,6 +643,15 @@ void LayerGroupWidget::enable_disable_duplicate_button()
   }
   this->private_->ui_.duplicate_button_->setEnabled( false );
 }
+  
+  void LayerGroupWidget::set_iso_surface_visibility( bool visible )
+  {
+    for( std::map< std::string, LayerWidgetQHandle >::iterator it = this->layer_map_.begin(); 
+      it != this->layer_map_.end(); ++it )
+    {
+      ( *it ).second->set_iso_surface_visibility( visible );
+    }
+  }
 
 
 }  //end namespace Seg3D
