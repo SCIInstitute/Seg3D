@@ -42,7 +42,7 @@ SEG3D_TOOL(
 SEG3D_TOOL_NAME( "OrFilter", "Boolean OR operation between two mask layers." )
 SEG3D_TOOL_MENULABEL( "Boolean OR" )
 SEG3D_TOOL_MENU( "Basic Filters" )
-SEG3D_TOOL_SHORTCUT_KEY( "Ctrl+Alt+W" )
+SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+W" )
 SEG3D_TOOL_URL( "http://seg3d.org/" )
 SEG3D_TOOL_VERSION( "1" )
 )

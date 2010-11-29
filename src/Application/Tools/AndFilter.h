@@ -42,7 +42,7 @@ SEG3D_TOOL(
 SEG3D_TOOL_NAME( "AndFilter", "Boolean AND operation between two mask layers." )
 SEG3D_TOOL_MENULABEL( "Boolean AND" )
 SEG3D_TOOL_MENU( "Basic Filters" )
-SEG3D_TOOL_SHORTCUT_KEY( "Ctrl+Alt+Q" )
+SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+Q" )
 SEG3D_TOOL_URL( "http://seg3d.org/" )
 SEG3D_TOOL_VERSION( "1" )
 )

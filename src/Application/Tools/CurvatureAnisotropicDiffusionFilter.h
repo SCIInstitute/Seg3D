@@ -41,7 +41,7 @@ SEG3D_TOOL(
 SEG3D_TOOL_NAME( "CurvatureAnisotropicDiffusionFilter", "Filter for smoothing data" )
 SEG3D_TOOL_MENULABEL( "Curvature AnisoDiff. Filter" )
 SEG3D_TOOL_MENU( "Advanced Filters" )
-SEG3D_TOOL_SHORTCUT_KEY( "Ctrl+Alt+V" )
+SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+V" )
 SEG3D_TOOL_URL( "http://seg3d.org/" )
 SEG3D_TOOL_VERSION( "1" )
 )

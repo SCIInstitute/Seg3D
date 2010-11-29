@@ -40,7 +40,7 @@ SEG3D_TOOL(
 SEG3D_TOOL_NAME( "DiscreteGaussianFilter", "Filter for smoothing data" )
 SEG3D_TOOL_MENULABEL( "Gaussian Blur" )
 SEG3D_TOOL_MENU( "Basic Filters" )
-SEG3D_TOOL_SHORTCUT_KEY( "Ctrl+Alt+D" )
+SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+D" )
 SEG3D_TOOL_URL( "http://seg3d.org/" )
 SEG3D_TOOL_VERSION( "1" )
 )

@@ -55,7 +55,11 @@ class ITKLayerImporter : public LayerImporter
 {
   // The ITKLayerImporter is capable of importing DICOMS, tiffs, and pngs.  It assumes that
   // when a file name does not include an extension that it is a DICOM
-  SCI_IMPORTER_TYPE( "ITK Importer", ".dcm;.DCM;.dicom;.DICOM;.tiff;.tif;.TIFF;.TIF;.png;.PNG", 5, 2 )
+  SCI_IMPORTER_TYPE( "ITK Importer",  ".dcm;.DCM;.dicom;.DICOM;"
+                    ".tiff;.tif;.TIFF;.TIF;"
+                    ".png;.PNG;"
+                    ".jpg;.jpeg;.JPG;.JPEG;"
+                    ".bmp;.BMP", 5, 2 )
 
   // -- Constructor/Destructor --
 public:
@@ -107,16 +111,6 @@ private:
   // data type to use for the import
   bool scan_dicom();
 
-  // SCAN_PNG:
-  // this function is called by import_header to scan a single png and determine what kind of 
-  // data type to use for the import
-  bool scan_png();
-
-  // SCAN_TIFF:
-  //  this function is called by import_header to scan a single tiff and determine what kind of 
-  // data type to use for the import
-  bool scan_tiff();
-  
   // SET_PIXEL_TYPE:
   // function that sets the pixel type, used for the png and tiff scanner's only
   bool set_pixel_type( std::string& type );
@@ -174,22 +168,20 @@ private:
     }
   }
 
-  // IMPORT_PNG_SERIES:
-  // Templated function for importing a series of PNG's
-  template< class PixelType >
-  bool import_png_series()
+  // Templated function for importing any simple itk importer type
+  template< class PixelType, class ItkImporterType >
+  bool import_simple_series()
   {
     const unsigned int dimension = 3;
-    
     typedef itk::Image< PixelType, dimension > ImageType;
- 
+    
     typedef itk::ImageSeriesReader< ImageType > ReaderType;
     typename ReaderType::Pointer reader = ReaderType::New();
     
-    typedef itk::PNGImageIO ImageIOType;
-    typename ImageIOType::Pointer pngIO = ImageIOType::New();
- 
-    reader->SetImageIO( pngIO );
+    typedef ItkImporterType ImageIOType;
+    typename ImageIOType::Pointer IO = ImageIOType::New();
+    
+    reader->SetImageIO( IO );
     reader->SetFileNames( this->file_list_ );
     
     try
@@ -203,10 +195,10 @@ private:
     
     this->data_block_ = Core::ITKDataBlock::New< PixelType >( 
       typename itk::Image< PixelType, 3 >::Pointer( reader->GetOutput() ) );
- 
+    
     this->image_data_ = typename Core::ITKImageDataT< PixelType >::Handle( 
       new typename Core::ITKImageDataT< PixelType >( reader->GetOutput() ) );
- 
+    
     if( this->image_data_ && this->data_block_ )
     {
       return true;
@@ -216,24 +208,20 @@ private:
       return false;
     }
   }
-
-  // IMPORT_PNG_SERIES: // HASNT BEEN TESTED! NEED PNG's
-  // Templated function for importing a series of PNG's
-  template< class PixelType >
-  bool import_tiff_series()
-  {
-    const unsigned int dimension = 3;
-    typedef itk::Image< PixelType, dimension > ImageType;
-
-    typedef itk::ImageSeriesReader< ImageType > ReaderType;
-    typename ReaderType::Pointer reader = ReaderType::New();
-    
-    typedef itk::TIFFImageIO ImageIOType;
-    typename ImageIOType::Pointer tiffIO = ImageIOType::New();
   
-    reader->SetImageIO( tiffIO );
-    reader->SetFileNames( this->file_list_ );
-
+  // templated function for scanning any itk supported type 
+  template< class ItkImporterType >
+  bool scan_simple_series()
+  {
+    typedef itk::ImageFileReader< itk::Image< unsigned short, 2 > > ReaderType;
+    typename ReaderType::Pointer reader = ReaderType::New();
+    
+    typedef ItkImporterType ImageIOType;
+    typename ImageIOType::Pointer IO = ImageIOType::New();
+    
+    reader->SetImageIO( IO );
+    reader->SetFileName( this->file_list_[ 0 ] );
+    
     try
     {
       reader->Update();
@@ -242,24 +230,11 @@ private:
     {
       return false;
     }
-
-    this->data_block_ = Core::ITKDataBlock::New< PixelType >( 
-      typename itk::Image< PixelType, 3 >::Pointer( reader->GetOutput() ) );
-
-    this->image_data_ = typename Core::ITKImageDataT< PixelType >::Handle( 
-      new typename Core::ITKImageDataT< PixelType >( reader->GetOutput() ) );
-      
-//    std::string type = tiffIO->GetComponentTypeAsString( tiffIO->GetComponentType() );
-
-    if( this->image_data_ && this->data_block_ )
-    {
-      return true;
-    }
-    else
-    {
-      return false;
-    }
+    
+    std::string type = IO->GetComponentTypeAsString( IO->GetComponentType() );
+    return this->set_pixel_type( type );
   }
+  
 
   // SET_EXTENSION:
   // we need to know which type of file we are dealing with, this function provides that ability,
@@ -296,11 +271,22 @@ private:
   {
     return ( ( this->extension_ == ".png" ) || ( this->extension_ == ".PNG" ) );
   }
+  
+  bool is_bmp() const
+  {
+    return ( ( this->extension_ == ".bmp" ) || ( this->extension_ == ".BMP" ) );
+  }
 
   bool is_tiff() const
   {
     return ( ( this->extension_ == ".tif" ) || ( this->extension_ == ".tiff" ) ||
       ( this->extension_ == ".TIF" ) || ( this->extension_ == ".TIFF" ) );
+  }
+  
+  bool is_jpeg() const
+  {
+    return ( ( this->extension_ == ".jpg" ) || ( this->extension_ == ".JPG" ) ||
+      ( this->extension_ == ".jpeg" ) || ( this->extension_ == ".JPEG" ) );
   }
 
 

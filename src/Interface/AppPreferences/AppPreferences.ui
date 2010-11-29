@@ -1539,7 +1539,7 @@ border: 1px solid gray;
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>30</height>
+       <height>32</height>
       </size>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
@@ -1566,7 +1566,7 @@ border: 1px solid gray;
        <widget class="QPushButton" name="apply_button_">
         <property name="minimumSize">
          <size>
-          <width>150</width>
+          <width>175</width>
           <height>0</height>
          </size>
         </property>

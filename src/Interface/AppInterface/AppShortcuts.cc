@@ -269,12 +269,13 @@ void AppShortcuts::update_fonts_and_text()
   
   while( it != it_end )
   {
-    std::string text = (*it)->text().toStdString();
-    boost::replace_all( text,  "CTRL", "COMMAND" );
-    (*it)->setText( QString::fromStdString( text ) );
-    QFont font = (*it)->font();
+    QString text_temp = ( *it )->text();
+    text_temp.replace( QString::fromUtf8( "CTRL" ), QString::fromUtf8( "COMMAND" ), 
+      Qt::CaseInsensitive );
+    ( *it )->setText( text_temp );
+    QFont font = ( *it )->font();
     font.setPointSize( 11 );
-    (*it)->setFont( font );
+    ( *it )->setFont( font );
     ++it;
   }
 #endif

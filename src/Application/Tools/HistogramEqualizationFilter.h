@@ -41,7 +41,7 @@ SEG3D_TOOL(
 SEG3D_TOOL_NAME( "HistogramEqualizationFilter", "Equalize the histgram" )
 SEG3D_TOOL_MENULABEL( "Histogram Equalization" )
 SEG3D_TOOL_MENU( "Advanced Filters" )
-SEG3D_TOOL_SHORTCUT_KEY( "Ctrl+Alt+Y" )
+SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+Y" )
 SEG3D_TOOL_URL( "http://seg3d.org/" )
 SEG3D_TOOL_VERSION( "1" )
 )

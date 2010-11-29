@@ -29,6 +29,8 @@
 // ITK Includes
 #include "itkRGBPixel.h"
 #include "itkPNGImageIO.h"
+#include "itkBMPImageIO.h"
+#include "itkJPEGImageIO.h"
 #include "itkGDCMImageIO.h"
 #include "itkGDCMSeriesFileNames.h"
 #include "itkImageSeriesReader.h"
@@ -68,11 +70,19 @@ bool ITKLayerImporter::import_header()
   }
   else if( this->is_png() )
   {
-    return this->scan_png();
+    return this->scan_simple_series< itk::PNGImageIO >();
   }
   else if( this->is_tiff() )
   {
-    return this->scan_tiff();
+    return this->scan_simple_series< itk::TIFFImageIO >();
+  }
+  else if( this->is_jpeg() )
+  {
+    return this->scan_simple_series< itk::JPEGImageIO >();
+  }
+  else if( this->is_bmp() )
+  {
+    return this->scan_simple_series< itk::BMPImageIO >();
   }
 
   return false; 
@@ -173,59 +183,9 @@ bool ITKLayerImporter::scan_dicom()
   }
   return true;
 }
-
-bool ITKLayerImporter::scan_png()
-{
-  typedef itk::ImageFileReader< itk::Image< signed short, 2 > > ReaderType;
-  ReaderType::Pointer reader = ReaderType::New();
-
-  typedef itk::PNGImageIO ImageIOType;
-  ImageIOType::Pointer pngIO = ImageIOType::New();
-
-  reader->SetImageIO( pngIO );
-  reader->SetFileName( this->file_list_[ 0 ] );
-
-  try
-  {
-    reader->Update();
-  }
-  catch( ... )
-  {
-    return false;
-  }
-
-  std::string type = pngIO->GetComponentTypeAsString( pngIO->GetComponentType() );
-  return this->set_pixel_type( type );
-}
-
-bool ITKLayerImporter::scan_tiff()
-{
-  typedef itk::ImageFileReader< itk::Image< signed short, 2 > > ReaderType;
-  ReaderType::Pointer reader = ReaderType::New();
-
-  typedef itk::TIFFImageIO ImageIOType;
-  ImageIOType::Pointer tiffIO = ImageIOType::New();
-
-  reader->SetImageIO( tiffIO );
-  reader->SetFileName( this->file_list_[ 0 ] );
-
-  try
-  {
-    reader->Update();
-  }
-  catch( ... )
-  {
-    return false;
-  }
-
-  std::string type = tiffIO->GetComponentTypeAsString( tiffIO->GetComponentType() );
-  return this->set_pixel_type( type );
-}
-
-
-
+  
 bool ITKLayerImporter::load_data( Core::DataBlockHandle& data_block, 
-                 Core::GridTransform& grid_trans )
+  Core::GridTransform& grid_trans )
 {
   if( this->is_dicom() )
   { 
@@ -257,64 +217,128 @@ bool ITKLayerImporter::load_data( Core::DataBlockHandle& data_block,
   {
     switch( this->pixel_type_ )
     {
-    case Core::DataType::UCHAR_E:
-      if( !this->import_png_series< unsigned char >() ) return false;
-      break;
-    case Core::DataType::CHAR_E:
-      if( !this->import_png_series< signed char >() ) return false;
-      break;
-    case Core::DataType::USHORT_E:
-      if( !this->import_png_series< unsigned short >() ) return false;
-      break;
-    case Core::DataType::SHORT_E:
-      if( !this->import_png_series< signed short >() ) return false;
-      break;
-    case Core::DataType::UINT_E:
-      if( !this->import_png_series< signed int >() ) return false;
-      break;
-    case Core::DataType::INT_E:
-      if( !this->import_png_series< unsigned int >() ) return false;
-      break;
-    case Core::DataType::FLOAT_E:
-      if( !this->import_png_series< float >() ) return false;
-      break;
-    case Core::DataType::DOUBLE_E:
-      if( !this->import_png_series< double >() ) return false;
-      break;
-    default:
-      break;
+      case Core::DataType::UCHAR_E:
+        if( !this->import_simple_series< unsigned char, itk::PNGImageIO >() ) return false;
+        break;
+      case Core::DataType::CHAR_E:
+        if( !this->import_simple_series< signed char, itk::PNGImageIO >() ) return false;
+        break;
+      case Core::DataType::USHORT_E:
+        if( !this->import_simple_series< unsigned short, itk::PNGImageIO >() ) return false;
+        break;
+      case Core::DataType::SHORT_E:
+        if( !this->import_simple_series< signed short, itk::PNGImageIO >() ) return false;
+        break;
+      case Core::DataType::UINT_E:
+        if( !this->import_simple_series< signed int, itk::PNGImageIO >() ) return false;
+        break;
+      case Core::DataType::INT_E:
+        if( !this->import_simple_series< unsigned int, itk::PNGImageIO >() ) return false;
+        break;
+      case Core::DataType::FLOAT_E:
+        if( !this->import_simple_series< float, itk::PNGImageIO >() ) return false;
+        break;
+      case Core::DataType::DOUBLE_E:
+        if( !this->import_simple_series< double, itk::PNGImageIO >() ) return false;
+        break;
+      default:
+        break;    
     }
   }
   else if( this->is_tiff() )
   {
     switch( this->pixel_type_ )
     {
-    case Core::DataType::UCHAR_E:
-      if( !this->import_tiff_series< unsigned char >() ) return false;
-      break;
-    case Core::DataType::CHAR_E:
-      if( !this->import_tiff_series< signed char >() ) return false;
-      break;
-    case Core::DataType::USHORT_E:
-      if( !this->import_tiff_series< unsigned short >() ) return false;
-      break;
-    case Core::DataType::SHORT_E:
-      if( !this->import_tiff_series< signed short >() ) return false;
-      break;
-    case Core::DataType::UINT_E:
-      if( !this->import_tiff_series< signed int >() ) return false;
-      break;
-    case Core::DataType::INT_E:
-      if( !this->import_tiff_series< unsigned int >() ) return false;
-      break;
-    case Core::DataType::FLOAT_E:
-      if( !this->import_tiff_series< float >() ) return false;
-      break;
-    case Core::DataType::DOUBLE_E:
-      if( !this->import_tiff_series< double >() ) return false;
-      break;
-    default:
-      break;
+      case Core::DataType::UCHAR_E:
+        if( !this->import_simple_series< unsigned char, itk::TIFFImageIO >() ) return false;
+        break;
+      case Core::DataType::CHAR_E:
+        if( !this->import_simple_series< signed char, itk::TIFFImageIO >() ) return false;
+        break;
+      case Core::DataType::USHORT_E:
+        if( !this->import_simple_series< unsigned short, itk::TIFFImageIO >() ) return false;
+        break;
+      case Core::DataType::SHORT_E:
+        if( !this->import_simple_series< signed short, itk::TIFFImageIO >() ) return false;
+        break;
+      case Core::DataType::UINT_E:
+        if( !this->import_simple_series< signed int, itk::TIFFImageIO >() ) return false;
+        break;
+      case Core::DataType::INT_E:
+        if( !this->import_simple_series< unsigned int, itk::TIFFImageIO >() ) return false;
+        break;
+      case Core::DataType::FLOAT_E:
+        if( !this->import_simple_series< float, itk::TIFFImageIO >() ) return false;
+        break;
+      case Core::DataType::DOUBLE_E:
+        if( !this->import_simple_series< double, itk::TIFFImageIO >() ) return false;
+        break;
+      default:
+        break;
+    }
+  }
+  else if( this->is_jpeg() )
+  { 
+    switch( this->pixel_type_ )
+    {
+      case Core::DataType::UCHAR_E:
+        if( !this->import_simple_series< unsigned char, itk::JPEGImageIO >() ) return false;
+        break;
+      case Core::DataType::CHAR_E:
+        if( !this->import_simple_series< signed char, itk::JPEGImageIO >() ) return false;
+        break;
+      case Core::DataType::USHORT_E:
+        if( !this->import_simple_series< unsigned short, itk::JPEGImageIO >() ) return false;
+        break;
+      case Core::DataType::SHORT_E:
+        if( !this->import_simple_series< signed short, itk::JPEGImageIO >() ) return false;
+        break;
+      case Core::DataType::UINT_E:
+        if( !this->import_simple_series< signed int, itk::JPEGImageIO >() ) return false;
+        break;
+      case Core::DataType::INT_E:
+        if( !this->import_simple_series< unsigned int, itk::JPEGImageIO >() ) return false;
+        break;
+      case Core::DataType::FLOAT_E:
+        if( !this->import_simple_series< float, itk::JPEGImageIO >() ) return false;
+        break;
+      case Core::DataType::DOUBLE_E:
+        if( !this->import_simple_series< double, itk::JPEGImageIO >() ) return false;
+        break;
+      default:
+        break;  
+    }
+  }
+  else if( this->is_bmp() )
+  {
+    switch( this->pixel_type_ )
+    {
+      case Core::DataType::UCHAR_E:
+        if( !this->import_simple_series< unsigned char, itk::BMPImageIO >() ) return false;
+        break;
+      case Core::DataType::CHAR_E:
+        if( !this->import_simple_series< signed char, itk::BMPImageIO >() ) return false;
+        break;
+      case Core::DataType::USHORT_E:
+        if( !this->import_simple_series< unsigned short, itk::BMPImageIO >() ) return false;
+        break;
+      case Core::DataType::SHORT_E:
+        if( !this->import_simple_series< signed short, itk::BMPImageIO >() ) return false;
+        break;
+      case Core::DataType::UINT_E:
+        if( !this->import_simple_series< signed int, itk::BMPImageIO >() ) return false;
+        break;
+      case Core::DataType::INT_E:
+        if( !this->import_simple_series< unsigned int, itk::BMPImageIO >() ) return false;
+        break;
+      case Core::DataType::FLOAT_E:
+        if( !this->import_simple_series< float, itk::BMPImageIO >() ) return false;
+        break;
+      case Core::DataType::DOUBLE_E:
+        if( !this->import_simple_series< double, itk::BMPImageIO >() ) return false;
+        break;
+      default:
+        break;
     }
   }
   else
@@ -329,6 +353,7 @@ bool ITKLayerImporter::load_data( Core::DataBlockHandle& data_block,
 
   return true;
 }
+  
 
 std::string ITKLayerImporter::get_layer_name()
 {

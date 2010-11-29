@@ -43,7 +43,7 @@ SEG3D_TOOL_NAME( "OtsuThresholdFilter",
   "Separate the data in different regions based on the histogram." )
 SEG3D_TOOL_MENULABEL( "Otsu Threshold" )
 SEG3D_TOOL_MENU( "Basic Filters" )
-SEG3D_TOOL_SHORTCUT_KEY( "Ctrl+Alt+O" )
+SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+O" )
 SEG3D_TOOL_URL( "http://seg3d.org/" )
 )
 

@@ -45,7 +45,7 @@ SEG3D_TOOL
   SEG3D_TOOL_NAME( "ClipboardTool", "Tool for copy/paste mask slices" )
   SEG3D_TOOL_MENULABEL( "Copy/Paste" )
   SEG3D_TOOL_MENU( "Tools" )
-  SEG3D_TOOL_SHORTCUT_KEY( "Ctrl+Alt+1" )
+  SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+1" )
   SEG3D_TOOL_URL( "http://seg3d.org/" )
 )
 

@@ -42,7 +42,7 @@ SEG3D_TOOL(
 SEG3D_TOOL_NAME( "IntensityCorrectionFilter", "Correct for gradual intensity changes" )
 SEG3D_TOOL_MENULABEL( "Intensity Correction" )
 SEG3D_TOOL_MENU( "Advanced Filters" )
-SEG3D_TOOL_SHORTCUT_KEY( "Ctrl+Alt+I" )
+SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+I" )
 SEG3D_TOOL_URL( "http://seg3d.org/" )
 SEG3D_TOOL_VERSION( "1" )
 )

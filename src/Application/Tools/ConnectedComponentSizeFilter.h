@@ -43,7 +43,7 @@ SEG3D_TOOL(
 SEG3D_TOOL_NAME( "ConnectedComponentSizeFilter", "Compute the size of connected components." )
 SEG3D_TOOL_MENULABEL( "Connected Component Size" )
 SEG3D_TOOL_MENU( "Basic Filters" )
-SEG3D_TOOL_SHORTCUT_KEY( "Ctrl+Alt+S" )
+SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+S" )
 SEG3D_TOOL_URL( "http://seg3d.org/" )
 SEG3D_TOOL_VERSION( "1" )
 )

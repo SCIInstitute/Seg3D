@@ -40,7 +40,7 @@ SEG3D_TOOL(
 SEG3D_TOOL_NAME( "MedianFilter", "Filter for smoothing data." )
 SEG3D_TOOL_MENULABEL( "Median" )
 SEG3D_TOOL_MENU( "Basic Filters" )
-SEG3D_TOOL_SHORTCUT_KEY( "Ctrl+Alt+M" )
+SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+M" )
 SEG3D_TOOL_URL( "http://seg3d.org/" )
 SEG3D_TOOL_VERSION( "1" )
 )

@@ -41,7 +41,7 @@ SEG3D_TOOL(
 SEG3D_TOOL_NAME( "BinaryDilateErodeFilter", "Grow and Shrink segmentations" )
 SEG3D_TOOL_MENULABEL( "Binary Dilate -> Erode" )
 SEG3D_TOOL_MENU( "Basic Filters" )
-SEG3D_TOOL_SHORTCUT_KEY( "Ctrl+Alt+B" )
+SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+B" )
 SEG3D_TOOL_URL( "http://seg3d.org/" )
 )
 

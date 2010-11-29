@@ -42,7 +42,7 @@ SEG3D_TOOL
   SEG3D_TOOL_NAME( "InvertTool", "Tool for inverting masks" )
   SEG3D_TOOL_MENULABEL( "Invert" )
   SEG3D_TOOL_MENU( "Tools" )
-  SEG3D_TOOL_SHORTCUT_KEY( "Ctrl+Alt+4" )
+  SEG3D_TOOL_SHORTCUT_KEY( "Ctrl+ALT+4" )
   SEG3D_TOOL_URL( "http://seg3d.org/" )
 )
 
