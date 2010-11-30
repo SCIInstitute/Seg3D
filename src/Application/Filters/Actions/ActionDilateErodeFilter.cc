@@ -596,7 +596,7 @@ public:
   // The name of the filter, this information is used for generating new layer labels.
   virtual std::string get_filter_name() const
   {
-    return "DilateErode Filter";
+    return "FastDilateErode Filter";
   }
 
   // GET_LAYER_PREFIX:
@@ -604,7 +604,7 @@ public:
   // when a new layer is generated. 
   virtual std::string get_layer_prefix() const
   {
-    return "DilateErode"; 
+    return "FastDilateErode"; 
   }
 };
 

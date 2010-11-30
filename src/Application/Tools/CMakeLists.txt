@@ -55,6 +55,10 @@ SET(APPLICATION_TOOLS_SRCS
   ArithmeticFilter.cc
   BinaryDilateErodeFilter.h
   BinaryDilateErodeFilter.cc
+  BinaryIterativeDilateErodeFilter.h
+  BinaryIterativeDilateErodeFilter.cc
+  BinarySmoothDilateErodeFilter.h
+  BinarySmoothDilateErodeFilter.cc
   CannyEdgeDetectionFilter.h
   CannyEdgeDetectionFilter.cc
   ConfidenceConnectedFilter.h
@@ -79,8 +83,6 @@ SET(APPLICATION_TOOLS_SRCS
   HistogramEqualizationFilter.cc
   IntensityCorrectionFilter.h
   IntensityCorrectionFilter.cc
-  BinaryIterativeDilateErodeFilter.h
-  BinaryIterativeDilateErodeFilter.cc
   MaskDataFilter.h
   MaskDataFilter.cc
   MedianFilter.h

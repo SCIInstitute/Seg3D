@@ -47,6 +47,7 @@ SET(APPLICATION_FILTERS_SRCS
 SET(APPLICATION_FILTERS_ACTIONS_SRCS
   Actions/ActionResample.h
   Actions/ActionResample.cc
+  
   Actions/ActionCannyEdgeDetectionFilter.h
   Actions/ActionCannyEdgeDetectionFilter.cc
   Actions/ActionConfidenceConnectedFilter.h
@@ -61,10 +62,14 @@ SET(APPLICATION_FILTERS_ACTIONS_SRCS
   Actions/ActionDilateFilter.cc
   Actions/ActionIterativeDilateFilter.h
   Actions/ActionIterativeDilateFilter.cc
+  Actions/ActionSmoothDilateFilter.h
+  Actions/ActionSmoothDilateFilter.cc
   Actions/ActionDilateErodeFilter.h
   Actions/ActionDilateErodeFilter.cc
   Actions/ActionIterativeDilateErodeFilter.h
   Actions/ActionIterativeDilateErodeFilter.cc
+  Actions/ActionSmoothDilateErodeFilter.h
+  Actions/ActionSmoothDilateErodeFilter.cc
   Actions/ActionDiscreteGaussianFilter.h
   Actions/ActionDiscreteGaussianFilter.cc
   Actions/ActionDistanceFilter.h
@@ -73,6 +78,8 @@ SET(APPLICATION_FILTERS_ACTIONS_SRCS
   Actions/ActionErodeFilter.cc
   Actions/ActionIterativeErodeFilter.h
   Actions/ActionIterativeErodeFilter.cc
+  Actions/ActionSmoothErodeFilter.h
+  Actions/ActionSmoothErodeFilter.cc
   Actions/ActionGradientAnisotropicDiffusionFilter.h
   Actions/ActionGradientAnisotropicDiffusionFilter.cc
   Actions/ActionGradientMagnitudeFilter.h

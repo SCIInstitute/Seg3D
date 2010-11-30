@@ -26,28 +26,28 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_TOOLS_BINARYDILATEERODEFILTER_H
-#define APPLICATION_TOOLS_BINARYDILATEERODEFILTER_H
+#ifndef APPLICATION_TOOLS_BINARYSMOOTHDILATEERODEFILTER_H
+#define APPLICATION_TOOLS_BINARYSMOOTHDILATEERODEFILTER_H
 
 #include <Application/Tool/SingleTargetTool.h>
 
 namespace Seg3D
 {
 
-class BinaryDilateErodeFilter : public SingleTargetTool
+class BinarySmoothDilateErodeFilter : public SingleTargetTool
 {
 
 SEG3D_TOOL(
-SEG3D_TOOL_NAME( "BinaryDilateErodeFilter", "Grow and Shrink segmentations" )
-SEG3D_TOOL_MENULABEL( "Fast Binary Dilate -> Erode" )
+SEG3D_TOOL_NAME( "BinarySmoothDilateErodeFilter", "Grow and Shrink segmentations" )
+SEG3D_TOOL_MENULABEL( "Smooth Binary Dilate -> Erode" )
 SEG3D_TOOL_MENU( "Basic Filters" )
-SEG3D_TOOL_SHORTCUT_KEY( "Ctrl+Alt+H" )
+SEG3D_TOOL_SHORTCUT_KEY( "Ctrl+Alt+B" )
 SEG3D_TOOL_URL( "http://seg3d.org/" )
 )
 
 public:
-  BinaryDilateErodeFilter( const std::string& toolid );
-  virtual ~BinaryDilateErodeFilter();
+  BinarySmoothDilateErodeFilter( const std::string& toolid );
+  virtual ~BinarySmoothDilateErodeFilter();
 
   // -- state --
 public:

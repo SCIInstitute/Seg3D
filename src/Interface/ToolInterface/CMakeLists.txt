@@ -40,7 +40,8 @@ SET(INTERFACE_TOOLINTERFACE_SRCS
   ThresholdToolInterface.cc
   ArithmeticFilterInterface.cc
   BinaryDilateErodeFilterInterface.cc
-  BinaryIterativeDilateErodeFilterInterface.cc
+  #BinaryIterativeDilateErodeFilterInterface.cc
+  BinarySmoothDilateErodeFilterInterface.cc
   CannyEdgeDetectionFilterInterface.cc
   ConfidenceConnectedFilterInterface.cc
   ConnectedComponentFilterInterface.cc
@@ -77,7 +78,8 @@ SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
   ThresholdToolInterface.h
   ArithmeticFilterInterface.h
   BinaryDilateErodeFilterInterface.h
-  BinaryIterativeDilateErodeFilterInterface.h
+  #BinaryIterativeDilateErodeFilterInterface.h
+  BinarySmoothDilateErodeFilterInterface.h
   CannyEdgeDetectionFilterInterface.h
   ConfidenceConnectedFilterInterface.h
   ConnectedComponentFilterInterface.h
@@ -117,7 +119,8 @@ SET(INTERFACE_TOOLINTERFACE_UI_SRCS
   ResampleToolInterface.ui  
   ArithmeticFilterInterface.ui
   BinaryDilateErodeFilterInterface.ui
-  BinaryIterativeDilateErodeFilterInterface.ui
+  #BinaryIterativeDilateErodeFilterInterface.ui
+  BinarySmoothDilateErodeFilterInterface.ui
   CannyEdgeDetectionFilterInterface.ui  
   ConfidenceConnectedFilterInterface.ui
   ConnectedComponentFilterInterface.ui
