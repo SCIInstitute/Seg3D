@@ -111,6 +111,11 @@ public:
   bool in_use_;
   bool picked_up_;
   int picked_up_layer_size_;
+  
+  // these member variables are for keeping track of the states of the layers so that they can
+  // be represented properly in the gui
+  bool layer_menus_open_;
+  bool group_menus_open_;
 };
 
 LayerWidgetPrivate::~LayerWidgetPrivate()
@@ -120,12 +125,12 @@ LayerWidgetPrivate::~LayerWidgetPrivate()
 
 LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   QWidget( parent ),
-  private_( new LayerWidgetPrivate ),
-  layer_menus_open_( false ),
-  group_menus_open_( false ) 
+  private_( new LayerWidgetPrivate )
 {
   // Store the layer in the private class
   this->private_->layer_ = layer;
+  this->private_->layer_menus_open_ = false;
+  this->private_->group_menus_open_ = false;
   
   this->private_->active_ = false;
   this->private_->locked_ = false;
@@ -737,7 +742,7 @@ void LayerWidget::trigger_abort()
 
 void LayerWidget::set_group_menu_status( bool status )
 {
-  this->group_menus_open_ = status;
+  this->private_->group_menus_open_ = status;
 }
 
 void LayerWidget::set_brightness_contrast_to_default()
@@ -765,9 +770,6 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
     return;
   }
   
-  if( this->group_menus_open_ || this->layer_menus_open_ )
-    return;
-
   QPoint hotSpot = event->pos();
   
   // Make up some mimedata containing the layer_id of the layer

@@ -59,7 +59,8 @@ class ITKLayerImporter : public LayerImporter
                     ".tiff;.tif;.TIFF;.TIF;"
                     ".png;.PNG;"
                     ".jpg;.jpeg;.JPG;.JPEG;"
-                    ".bmp;.BMP", 5, 2 )
+                    ".bmp;.BMP;"
+                    ".vtk;.VTK", 5, 2 )
 
   // -- Constructor/Destructor --
 public:
@@ -209,19 +210,24 @@ private:
     }
   }
   
-  // templated function for scanning any itk supported type 
-  template< class ItkImporterType >
-  bool scan_simple_series()
+  template< class PixelType, class ItkImporterType >
+  bool import_simple_volume()
   {
-    typedef itk::ImageFileReader< itk::Image< unsigned short, 2 > > ReaderType;
+//    const unsigned int dimension = 3;
+//    typedef itk::Image< PixelType, dimension > ImageType;
+
+    typedef itk::ImageFileReader< itk::Image< PixelType, 3 > > ReaderType;
     typename ReaderType::Pointer reader = ReaderType::New();
-    
+
+//    typedef itk::ImageSeriesReader< ImageType > ReaderType;
+//    typename ReaderType::Pointer reader = ReaderType::New();
+
     typedef ItkImporterType ImageIOType;
     typename ImageIOType::Pointer IO = ImageIOType::New();
-    
+
     reader->SetImageIO( IO );
-    reader->SetFileName( this->file_list_[ 0 ] );
-    
+    reader->SetFileName( this->get_filename() );
+
     try
     {
       reader->Update();
@@ -230,10 +236,79 @@ private:
     {
       return false;
     }
+
+    this->data_block_ = Core::ITKDataBlock::New< PixelType >( 
+      typename itk::Image< PixelType, 3 >::Pointer( reader->GetOutput() ) );
+
+    this->image_data_ = typename Core::ITKImageDataT< PixelType >::Handle( 
+      new typename Core::ITKImageDataT< PixelType >( reader->GetOutput() ) );
+
+    if( this->image_data_ && this->data_block_ )
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
+  
+  // templated function for scanning any itk supported type 
+  template< class ItkImporterType >
+  bool scan_simple_volume()
+  {
+    typedef itk::ImageFileReader< itk::Image< float, 3 > > ReaderType;
+    typename ReaderType::Pointer reader = ReaderType::New();
     
+    typedef ItkImporterType ImageIOType;
+    typename ImageIOType::Pointer IO = ImageIOType::New();
+    
+    reader->SetImageIO( IO );
+    reader->SetFileName( this->get_filename() );
+    
+    std::string name = this->get_filename();
+  
+    try
+    {
+      reader->Update();
+    }
+    catch( ... )
+    {
+      //return false;
+    }
+    
+    std::string type = IO->GetComponentTypeAsString( IO->GetComponentType() );
+    
+    if( type == "" ) return false;
+    
+    return this->set_pixel_type( type );
+  }
+  
+  template< class ItkImporterType >
+  bool scan_simple_series()
+  {
+    typedef itk::ImageFileReader< itk::Image< unsigned short, 2 > > ReaderType;
+    typename ReaderType::Pointer reader = ReaderType::New();
+
+    typedef ItkImporterType ImageIOType;
+    typename ImageIOType::Pointer IO = ImageIOType::New();
+
+    reader->SetImageIO( IO );
+    reader->SetFileName( this->get_filename() );
+
+    try
+    {
+      reader->Update();
+    }
+    catch( ... )
+    {
+      return false;
+    }
+
     std::string type = IO->GetComponentTypeAsString( IO->GetComponentType() );
     return this->set_pixel_type( type );
   }
+
   
 
   // SET_EXTENSION:
@@ -275,6 +350,11 @@ private:
   bool is_bmp() const
   {
     return ( ( this->extension_ == ".bmp" ) || ( this->extension_ == ".BMP" ) );
+  }
+  
+  bool is_vtk() const
+  {
+    return ( ( this->extension_ == ".vtk" ) || ( this->extension_ == ".VTK" ) );
   }
 
   bool is_tiff() const

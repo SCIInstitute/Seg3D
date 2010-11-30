@@ -319,13 +319,9 @@ void LayerImporterWidget::ScanFile( qpointer_type qpointer, LayerImporterHandle 
 {
   // Step (1) : Import the file header or in some cases the full file
   bool success = importer->import_header();
-
-  // Step (1a): If import was a success but no import modes are available we cannot proceed
-  // hence success of scanning is false.
-  if( importer->get_importer_modes() == 0) success = false;
-  
+    
   // Step (2) : Update the widget if it still exists
-  if( success )
+  if( success && ( importer->get_importer_modes() != 0 ) )
   {
     if( ( qpointer->private_->files_.size() > 1 ) &&
       ( importer->set_file_list( qpointer->private_->files_ ) ) )

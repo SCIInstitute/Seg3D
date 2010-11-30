@@ -68,7 +68,7 @@ ProgressWidget::ProgressWidget( Core::ActionProgressHandle action_progress, QWid
   this->setAttribute( Qt::WA_DeleteOnClose );
   this->setAttribute( Qt::WA_ShowWithoutActivating );
   //this->setWindowFlags( Qt::CustomizeWindowHint | Qt::WindowTitleHint );
-  this->setWindowFlags( Qt::Popup | Qt::CustomizeWindowHint | Qt::WindowTitleHint );
+  this->setWindowFlags( Qt::FramelessWindowHint | Qt::CustomizeWindowHint | Qt::WindowTitleHint );
   
   // Step (2): Add the Ui children onto the QWidget
   this->private_->ui_.setupUi( this );

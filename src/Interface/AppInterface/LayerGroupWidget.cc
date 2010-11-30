@@ -484,6 +484,7 @@ void LayerGroupWidget::handle_change()
   layer_list_type layer_list = this->private_->group_->get_layer_list();
   int index = 0;
   bool layer_widget_deleted = false;
+  this->private_->button_overlay_->hide();
   
   this->setUpdatesEnabled( false );
   
@@ -495,6 +496,11 @@ void LayerGroupWidget::handle_change()
     ( *it ).second->seethrough( false );
     ( *it ).second->instant_hide_drop_space();
     ( *it ).second->hide_overlay();
+    if( this->private_->group_->show_delete_menu_state_->get() || 
+      this->private_->group_->show_duplicate_menu_state_->get() )
+    {
+      ( *it ).second->show_selection_checkbox( true );
+    }
     
     bool found = false;
     for( layer_list_type::iterator i = layer_list.begin(); i != layer_list.end(); ++i )

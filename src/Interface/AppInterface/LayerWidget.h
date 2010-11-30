@@ -176,11 +176,6 @@ private:
 
 // FUNCTIONS FOR HANDLING DRAG AND DROP
 private:
-  // these member variables are for keeping track of the states of the layers so that they can
-  // be represented properly in the gui
-  bool layer_menus_open_;
-  bool group_menus_open_;
-
   // SET_DROP_TARGET:
   // this function is for keeping track of which layer the drop is going to happen on
   void set_drop_target( LayerWidget* target_layer );

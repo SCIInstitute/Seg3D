@@ -84,7 +84,11 @@ bool ITKLayerImporter::import_header()
   {
     return this->scan_simple_series< itk::BMPImageIO >();
   }
-
+  else if( this->is_vtk() )
+  {
+    return this->scan_simple_volume< itk::VTKImageIO >();
+  }
+  
   return false; 
 }
 
@@ -341,6 +345,39 @@ bool ITKLayerImporter::load_data( Core::DataBlockHandle& data_block,
         break;
     }
   }
+  
+  else if( this->is_vtk() )
+  {
+    switch( this->pixel_type_ )
+    {
+    case Core::DataType::UCHAR_E:
+      if( !this->import_simple_volume< unsigned char, itk::VTKImageIO >() ) return false;
+      break;
+    case Core::DataType::CHAR_E:
+      if( !this->import_simple_volume< signed char, itk::VTKImageIO >() ) return false;
+      break;
+    case Core::DataType::USHORT_E:
+      if( !this->import_simple_volume< unsigned short, itk::VTKImageIO >() ) return false;
+      break;
+    case Core::DataType::SHORT_E:
+      if( !this->import_simple_volume< signed short, itk::VTKImageIO >() ) return false;
+      break;
+    case Core::DataType::UINT_E:
+      if( !this->import_simple_volume< signed int, itk::VTKImageIO >() ) return false;
+      break;
+    case Core::DataType::INT_E:
+      if( !this->import_simple_volume< unsigned int, itk::VTKImageIO >() ) return false;
+      break;
+    case Core::DataType::FLOAT_E:
+      if( !this->import_simple_volume< float, itk::VTKImageIO >() ) return false;
+      break;
+    case Core::DataType::DOUBLE_E:
+      if( !this->import_simple_volume< double, itk::VTKImageIO >() ) return false;
+      break;
+    default:
+      break;
+    }
+  }
   else
   {
     return false;
@@ -400,6 +437,11 @@ bool ITKLayerImporter::set_pixel_type( std::string& type )
   else if( type == "double" )
   {
     this->pixel_type_ = Core::DataType::DOUBLE_E;
+    return true;
+  }
+  else if( type == "unknown" )
+  {
+    this->pixel_type_ = Core::DataType::FLOAT_E;
     return true;
   }
   else

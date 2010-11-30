@@ -327,15 +327,19 @@ void AppInterface::begin_progress( Core::ActionProgressHandle handle )
   
   CORE_LOG_DEBUG( "-- Start progress widget --" );
   this->progress_ = new ProgressWidget( handle, this );
-  this->center_seg3d_gui_on_screen( this->progress_ );
   this->progress_->show();
+  
+  CORE_LOG_DEBUG( "-- Disabling the AppInterface --" );
   this->setEnabled( false );
-  this->progress_->setEnabled( true );
+  if( !this->isEnabled() ) this->progress_->setEnabled( true );
+  
+  this->center_seg3d_gui_on_screen( this->progress_ );
 }
 
 void AppInterface::end_progress( Core::ActionProgressHandle /*handle*/ )
 {
   CORE_LOG_DEBUG( "-- Finish progress widget --" );
+  CORE_LOG_DEBUG( "-- Enabling the AppInterface --" );
   this->setEnabled( true );
 
   if( this->progress_.data() ) 
