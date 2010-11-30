@@ -47,6 +47,7 @@ CORE_ACTION(
   CORE_ACTION_TYPE( "NewMaskLayer", "Add a new mask to the top of a group." )
   CORE_ACTION_ARGUMENT( "groupid", "The groupid of the group in which to insert the new mask.")
   CORE_ACTION_CHANGES_PROJECT_DATA()
+  CORE_ACTION_IS_UNDOABLE()
 )
   
   // -- Constructor/Destructor --

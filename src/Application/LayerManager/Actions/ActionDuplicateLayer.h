@@ -47,6 +47,7 @@ CORE_ACTION(
   CORE_ACTION_TYPE( "DuplicateLayer", "Duplicate a layer" )
   CORE_ACTION_ARGUMENT( "layerid", "The layerid of the layer that needs to be duplicated.")
   CORE_ACTION_CHANGES_PROJECT_DATA()
+  CORE_ACTION_IS_UNDOABLE()
 )
   
   // -- Constructor/Destructor --
