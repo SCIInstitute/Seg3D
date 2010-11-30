@@ -421,11 +421,6 @@ const double IsosurfacePrivate::COMPUTE_PERCENT_PROGRESS_C = 0.8;
 const double IsosurfacePrivate::NORMAL_PERCENT_PROGRESS_C = 0.05;
 const double IsosurfacePrivate::PARTITION_PERCENT_PROGRESS_C = 0.15; 
 
-/*
-Allow downsampling by only half, quarter, and eighth.  When downsampling by half, a 2x2x2 
-neighborhood of nodes is downsampled to a single node.  If at least one neighborhood node is "on", 
-result is "on".  This method was chosen to prevent holes in the downsampled data.
-*/
 void IsosurfacePrivate::downsample_setup( int num_threads, double quality_factor )
 {
   this->nx_ = this->orig_mask_volume_->get_mask_data_block()->get_nx();
@@ -478,6 +473,11 @@ void IsosurfacePrivate::downsample_setup( int num_threads, double quality_factor
   this->total_neighborhoods_ = x_neighborhoods * y_neighborhoods * z_neighborhoods;
 }
 
+/*
+Allow downsampling by only half, quarter, and eighth.  When downsampling by half, a 2x2x2 
+neighborhood of nodes is downsampled to a single node.  If at least one neighborhood node is "on", 
+result is "on".  This method was chosen to prevent holes in the downsampled data.
+*/
 void IsosurfacePrivate::parallel_downsample_mask( int thread, int num_threads, 
   boost::barrier& barrier, double quality_factor )
 {
@@ -490,6 +490,8 @@ void IsosurfacePrivate::parallel_downsample_mask( int thread, int num_threads,
   // All threads must wait for setup to complete
   barrier.wait();
 
+  // Different thread process slabs along the z axis.  Each slab contains one or more 
+  // neighborhoods to be downsampled.
   // [nzstart, nzend) 
   size_t nzstart = thread * this->zsize_;
   size_t nzend = ( thread + 1 ) * this->zsize_;
@@ -548,7 +550,7 @@ void IsosurfacePrivate::parallel_downsample_mask( int thread, int num_threads,
       }
     }
 
-    if ( thread == 0 )
+    /*if ( thread == 0 )
     {
       if ( this->check_abort_() ) 
       {
@@ -561,7 +563,7 @@ void IsosurfacePrivate::parallel_downsample_mask( int thread, int num_threads,
     if ( this->need_abort_ ) 
     {
       return;
-    }
+    }*/
   }
 }
 
