@@ -167,10 +167,6 @@ void Layer::initialize_states( const std::string& name, bool creating )
   this->private_->layer_ = this;
   this->private_->abort_ = false;
   
-  // Make suer handle_abort is called when the signal is triggered
-  this->add_connection( this->abort_signal_.connect( boost::bind(
-    &Layer::handle_abort, this ) ) );
-
   //  Build the layer specific state variables
 
   // Ensure that the states are encoded as states that change the project
@@ -222,6 +218,10 @@ void Layer::initialize_states( const std::string& name, bool creating )
     boost::bind( &LayerPrivate::handle_locked_state_changed, this->private_, _1 ) ) );
   this->private_->add_connection( this->data_state_->value_changed_signal_.connect( 
     boost::bind( &LayerPrivate::handle_data_state_changed, this->private_, _1 ) ) );
+
+  // Make suer handle_abort is called when the signal is triggered
+  this->private_->add_connection( this->abort_signal_.connect( boost::bind(
+    &Layer::handle_abort, this ) ) );
 
   size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
   for ( size_t i = 0; i < num_of_viewers; ++i )
