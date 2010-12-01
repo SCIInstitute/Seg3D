@@ -47,22 +47,6 @@
 // Application Interface components. 
 #include <Application/InterfaceManager/InterfaceManager.h>
 
-#include <Interface/AppInterface/ViewerInterface.h>
-#include <Interface/AppInterface/HistoryDockWidget.h>
-#include <Interface/AppInterface/MessageWindow.h>
-#include <Interface/AppInterface/AppShortcuts.h>
-#include <Interface/AppInterface/LayerManagerDockWidget.h>
-#include <Interface/AppInterface/MeasurementDockWidget.h>
-#include <Interface/AppInterface/ProgressWidget.h>
-#include <Interface/AppInterface/ProjectDockWidget.h>
-#include <Interface/AppInterface/ToolsDockWidget.h>
-
-#include <Interface/AppInterface/AppMenu.h>
-#include <Interface/AppInterface/AppStatusBar.h>
-#include <Interface/AppController/AppController.h>
-#include <Interface/AppPreferences/AppPreferences.h>
-#include <Interface/AppSplash/AppSplash.h>
-
 #include <Core/Action/Actions.h>
 #include <Core/Utils/ConnectionHandler.h>
 
@@ -77,6 +61,10 @@ namespace Seg3D
 
 // Although there is only one instance of this class
 // in the program 
+  
+  
+class AppInterfacePrivate;
+
 
 class AppInterface : public QMainWindow, private Core::ConnectionHandler
 {
@@ -107,32 +95,11 @@ private:
   
 protected:
   virtual void closeEvent ( QCloseEvent* event );
+  virtual void resizeEvent( QResizeEvent *event );
 
-private:
-  // Pointer to the main canvas of the main window
-  QPointer< ViewerInterface > viewer_interface_;
-  
-  // Pointers to dialog widgets
-  QPointer< AppController > controller_interface_;
-  QPointer< AppPreferences > preferences_interface_;
-  QPointer< MessageWindow > message_widget_;
-  QPointer< AppShortcuts > keyboard_shortcuts_;
-  QPointer< AppSplash > splash_interface_;
+private:  
+  boost::shared_ptr< AppInterfacePrivate > private_;
 
-  // The dock widgets
-  QPointer< HistoryDockWidget > history_dock_window_;
-  QPointer< ProjectDockWidget > project_dock_window_;
-  QPointer< ToolsDockWidget > tools_dock_window_;
-  QPointer< LayerManagerDockWidget > layer_manager_dock_window_;
-  QPointer< MeasurementDockWidget > measurement_dock_window_;
-  QPointer< ProgressWidget > progress_;
-  
-  // Pointer to the new project wizard
-  static QPointer< AppProjectWizard > new_project_wizard_;
-
-  // Application menu, statusbar
-  QPointer< AppMenu > application_menu_;
-  QPointer< AppStatusBar > status_bar_;
 
   // -- Main Window management functions --
 public:

@@ -67,6 +67,8 @@ public:
 
   // -- Setting widget state --
   void set_layout( const std::string& layout );
+  
+  void set_pic_mode( bool pic_mode );
 
 public Q_SLOTS:
   void set_active_viewer( int viewer_id );

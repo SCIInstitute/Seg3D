@@ -32,7 +32,8 @@
 
 // QT includes
 #include <QtGui/QSplitter>
-#include <QtGui/QVBoxLayout> 
+#include <QtGui/QVBoxLayout>
+#include <QtGui/QLabel>
 
 // Core includes
 #include <Core/Utils/Log.h>
@@ -67,6 +68,7 @@ public:
   // Add a layout that allows a small widget to be entered beneath the
   // the viewers
   QVBoxLayout* layout_;
+  QLabel* facade_widget_;
 
   // Splitters
   // Horizontal splitter separates the left and right set of viewers
@@ -136,7 +138,13 @@ void ViewerInterfacePrivate::setup_ui( QWidget* parent )
   vert_splitter2_->setOpaqueResize( false );
 
   this->layout_->addWidget( this->horiz_splitter_ );
-  parent->setLayout( layout_ );
+  
+  
+  this->facade_widget_ = new QLabel( parent );
+  this->layout_->addWidget( this->facade_widget_ );
+  this->facade_widget_->hide();
+  
+  parent->setLayout( this->layout_ );
 
 }
 
@@ -170,6 +178,22 @@ ViewerInterface::ViewerInterface( QWidget *parent ) :
 ViewerInterface::~ViewerInterface()
 {
 }
+  
+  void ViewerInterface::set_pic_mode( bool pic_mode )
+  {
+    if( pic_mode )
+    {
+      this->private_->facade_widget_->setMinimumSize( this->private_->horiz_splitter_->size() );
+      this->private_->facade_widget_->setPixmap( QPixmap::grabWidget( this->private_->horiz_splitter_ ) );
+      this->private_->horiz_splitter_->hide();
+      this->private_->facade_widget_->show();
+    }
+    else
+    {
+      this->private_->facade_widget_->hide();
+      this->private_->horiz_splitter_->show();
+    } 
+  }
 
 void ViewerInterface::set_active_viewer( int viewer_id )
 {

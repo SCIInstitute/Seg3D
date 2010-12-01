@@ -51,27 +51,22 @@ public:
   QPixmap running_pixmap_[18];
   int running_count_;
   Core::Timer* timer_;
+  
+  Core::ActionProgressHandle action_progress_;
 
   static void UpdateRunning( ProgressWidget::qpointer_type qpointer );
 
 };
 
-ProgressWidget::ProgressWidget( Core::ActionProgressHandle action_progress, QWidget *parent ) :
-  QDialog( parent ),
-  action_progress_( action_progress ),
+ProgressWidget::ProgressWidget( QWidget *parent ) :
+  QWidget( parent ),
   private_( new ProgressWidgetPrivate )
 {
-  this->private_->timer_ = 0;
-
-  // Step (1): Prevent any import from other widgets while progress bar is shown
-  this->setModal( true );
-  this->setAttribute( Qt::WA_DeleteOnClose );
-  this->setAttribute( Qt::WA_ShowWithoutActivating );
-  //this->setWindowFlags( Qt::CustomizeWindowHint | Qt::WindowTitleHint );
-  this->setWindowFlags( Qt::FramelessWindowHint | Qt::CustomizeWindowHint | Qt::WindowTitleHint );
-  
-  // Step (2): Add the Ui children onto the QWidget
+    // Step (2): Add the Ui children onto the QWidget
   this->private_->ui_.setupUi( this );
+  
+  this->private_->timer_ = 0;
+  this->private_->running_count_ = 0;
   
   // Step (3): Setup pixmaps for animation
   for (size_t j = 0; j < 18; j++)
@@ -81,41 +76,8 @@ ProgressWidget::ProgressWidget( Core::ActionProgressHandle action_progress, QWid
     this->private_->running_pixmap_[ j ].load( QString::fromStdString( pixmap_name ) ); 
   }
   
-  this->private_->running_count_ = 0;
-  
-  // Step (4): Insert message
-  this->private_->ui_.message_->setText( QString::fromStdString( action_progress_->get_message() ) );
+  this->hide();
 
-  // Step (5): Setup cancel button
-  if( !( this->action_progress_->is_interruptable() ) )
-  {
-    this->private_->ui_.cancel_button_->hide();
-    this->private_->ui_.running_->setPixmap( this->private_->running_pixmap_[ 0 ] );
-  }
-
-  // Step (6): Setup progress bar or waiting animation
-  if( !( this->action_progress_->has_progress_updates() ) )
-  {
-    this->private_->ui_.progress_bar_->hide();
-    this->private_->ui_.line_->hide();
-
-    this->private_->timer_ = new Core::Timer( 100 );
-    qpointer_type qpointer( this );
-     
-    this->private_->timer_->timeout_signal_.connect( 
-        boost::bind( &ProgressWidgetPrivate::UpdateRunning, qpointer ) );
-    
-    this->private_->timer_->start();
-  }
-  else
-  {
-    this->private_->ui_.running_->hide();
-    this->private_->ui_.progress_bar_->setMinimum( 0 );
-    this->private_->ui_.progress_bar_->setMaximum( 100 );
-  }
-
-  // Step (7): Connect cancel button
-  connect( this->private_->ui_.cancel_button_, SIGNAL( clicked() ), this, SLOT( interrupt() ) );
 }
 
 ProgressWidget::~ProgressWidget()
@@ -125,6 +87,59 @@ ProgressWidget::~ProgressWidget()
     delete this->private_->timer_;
   }
 }
+  
+  void ProgressWidget::setup_progress_widget( Core::ActionProgressHandle action_progress )
+  {
+    if( this->private_->action_progress_ ) this->private_->action_progress_.reset();
+    this->private_->action_progress_ = action_progress;
+    
+    // Step (4): Insert message
+    this->private_->ui_.message_->setText( QString::fromStdString( this->private_->action_progress_->get_message() ) );
+    
+    // Step (5): Setup cancel button
+    if( !( this->private_->action_progress_->is_interruptable() ) )
+    {
+      this->private_->ui_.cancel_button_->hide();
+      this->private_->ui_.running_->setPixmap( this->private_->running_pixmap_[ 0 ] );
+    }
+    
+    // Step (6): Setup progress bar or waiting animation
+    if( !( this->private_->action_progress_->has_progress_updates() ) )
+    {
+      this->private_->ui_.progress_bar_->hide();
+      this->private_->ui_.line_->hide();
+      
+      this->private_->timer_ = new Core::Timer( 100 );
+      qpointer_type qpointer( this );
+      
+      this->private_->timer_->timeout_signal_.connect( 
+        boost::bind( &ProgressWidgetPrivate::UpdateRunning, qpointer ) );
+      
+      this->private_->timer_->start();
+    }
+    else
+    {
+      this->private_->ui_.running_->hide();
+      this->private_->ui_.progress_bar_->setMinimum( 0 );
+      this->private_->ui_.progress_bar_->setMaximum( 100 );
+    }
+    
+    // Step (7): Connect cancel button
+    connect( this->private_->ui_.cancel_button_, SIGNAL( clicked() ), this, SLOT( interrupt() ) );
+    
+    this->show();
+    this->raise();
+
+  }
+  
+  void ProgressWidget::cleanup_progress_widget()
+  {
+    this->hide();
+    this->private_->timer_ = 0;
+    this->private_->running_count_ = 0;
+    this->private_->ui_.message_->setText( QString::fromUtf8( "" ) );
+    this->disconnect();
+  }
 
 void ProgressWidget::update_running()
 {
@@ -134,6 +149,7 @@ void ProgressWidget::update_running()
   this->private_->ui_.running_->setPixmap( 
     this->private_->running_pixmap_[ this->private_->running_count_ ] );
   this->repaint();
+  QSize my_size = this->size();
 }
 
 void ProgressWidgetPrivate::UpdateRunning( ProgressWidget::qpointer_type qpointer )
@@ -154,12 +170,12 @@ void ProgressWidget::update_progress( )
 {
   // Update the progress bar
   this->private_->ui_.progress_bar_->setValue( static_cast<int>( 
-    this->action_progress_->get_progress()*100.0 ) );
+    this->private_->action_progress_->get_progress()*100.0 ) );
 }
 
 void ProgressWidget::interrupt()
 {
-  this->action_progress_->set_interrupt( true );
+  this->private_->action_progress_->set_interrupt( true );
 }
 
 

@@ -55,11 +55,58 @@
 
 // Interface includes
 #include <Interface/AppInterface/AppInterface.h>
+#include <Interface/AppInterface/ViewerInterface.h>
+#include <Interface/AppInterface/HistoryDockWidget.h>
+#include <Interface/AppInterface/MessageWindow.h>
+#include <Interface/AppInterface/AppShortcuts.h>
+#include <Interface/AppInterface/LayerManagerDockWidget.h>
+#include <Interface/AppInterface/MeasurementDockWidget.h>
+#include <Interface/AppInterface/ProjectDockWidget.h>
+#include <Interface/AppInterface/ToolsDockWidget.h>
+
+#include <Interface/AppInterface/AppMenu.h>
+#include <Interface/AppInterface/AppStatusBar.h>
+#include <Interface/AppController/AppController.h>
+#include <Interface/AppPreferences/AppPreferences.h>
+#include <Interface/AppSplash/AppSplash.h>
+
+#include <Interface/AppInterface/ProgressWidget.h>
 
 namespace Seg3D
 {
+  
+  class AppInterfacePrivate {
+  
+  public:
+    // Pointer to the main canvas of the main window
+    QPointer< ViewerInterface > viewer_interface_;
+    
+    // Pointers to dialog widgets
+    QPointer< AppController > controller_interface_;
+    QPointer< AppPreferences > preferences_interface_;
+    QPointer< MessageWindow > message_widget_;
+    QPointer< AppShortcuts > keyboard_shortcuts_;
+    QPointer< AppSplash > splash_interface_;
+    
+    // The dock widgets
+    QPointer< HistoryDockWidget > history_dock_window_;
+    QPointer< ProjectDockWidget > project_dock_window_;
+    QPointer< ToolsDockWidget > tools_dock_window_;
+    QPointer< LayerManagerDockWidget > layer_manager_dock_window_;
+    QPointer< MeasurementDockWidget > measurement_dock_window_;
+    QPointer< ProgressWidget > progress_;
+    
+    // Pointer to the new project wizard
+    static QPointer< AppProjectWizard > new_project_wizard_;
+    
+    // Application menu, statusbar
+    QPointer< AppMenu > application_menu_;
+    QPointer< AppStatusBar > status_bar_;
+  
+  };
 
-AppInterface::AppInterface()
+AppInterface::AppInterface() :
+  private_( new AppInterfacePrivate )
 {
   // Ensure that resources are available
   InitQtResources();
@@ -82,67 +129,67 @@ AppInterface::AppInterface()
 
 
   // Define the main window viewer canvas
-  this->viewer_interface_ = new ViewerInterface( this );
-  this->setCentralWidget( this->viewer_interface_ );
+  this->private_->viewer_interface_ = new ViewerInterface( this );
+  this->setCentralWidget( this->private_->viewer_interface_ );
   
   // Setup the menubar and statusbar
-  this->application_menu_ = new AppMenu( this );
-  this->status_bar_ = new AppStatusBar( this );
+  this->private_->application_menu_ = new AppMenu( this );
+  this->private_->status_bar_ = new AppStatusBar( this );
   
   // Instantiate the peripheral windows
-  this->preferences_interface_ = new AppPreferences( this );
-  this->controller_interface_ = new AppController( this );
-  this->message_widget_ = new MessageWindow( this );
-  this->keyboard_shortcuts_ = new AppShortcuts( this );
-  this->splash_interface_ = new AppSplash( this );
+  this->private_->preferences_interface_ = new AppPreferences( this );
+  this->private_->controller_interface_ = new AppController( this );
+  this->private_->message_widget_ = new MessageWindow( this );
+  this->private_->keyboard_shortcuts_ = new AppShortcuts( this );
+  this->private_->splash_interface_ = new AppSplash( this );
   
   // Instantiate the dock widgets
-  this->layer_manager_dock_window_ = new LayerManagerDockWidget( this );
-  this->addDockWidget( Qt::RightDockWidgetArea, this->layer_manager_dock_window_ );
+  this->private_->layer_manager_dock_window_ = new LayerManagerDockWidget( this );
+  this->addDockWidget( Qt::RightDockWidgetArea, this->private_->layer_manager_dock_window_ );
   
-  this->project_dock_window_ = new ProjectDockWidget( this );
-  this->addDockWidget( Qt::LeftDockWidgetArea, this->project_dock_window_ );
+  this->private_->project_dock_window_ = new ProjectDockWidget( this );
+  this->addDockWidget( Qt::LeftDockWidgetArea, this->private_->project_dock_window_ );
   
-  this->history_dock_window_ = new HistoryDockWidget( this );
-  this->addDockWidget( Qt::LeftDockWidgetArea, this->history_dock_window_ );
+  this->private_->history_dock_window_ = new HistoryDockWidget( this );
+  this->addDockWidget( Qt::LeftDockWidgetArea, this->private_->history_dock_window_ );
   
-  this->tools_dock_window_ = new ToolsDockWidget( this );
-  this->addDockWidget( Qt::LeftDockWidgetArea, this->tools_dock_window_ );
+  this->private_->tools_dock_window_ = new ToolsDockWidget( this );
+  this->addDockWidget( Qt::LeftDockWidgetArea, this->private_->tools_dock_window_ );
   
-  this->measurement_dock_window_ = new MeasurementDockWidget( this );
-  this->addDockWidget( Qt::RightDockWidgetArea, this->measurement_dock_window_ );
+  this->private_->measurement_dock_window_ = new MeasurementDockWidget( this );
+  this->addDockWidget( Qt::RightDockWidgetArea, this->private_->measurement_dock_window_ );
   
   
   // Connect the windows and widgets to their visibility states
-  QtUtils::QtBridge::Show( this->layer_manager_dock_window_, 
+  QtUtils::QtBridge::Show( this->private_->layer_manager_dock_window_, 
     InterfaceManager::Instance()->layermanager_dockwidget_visibility_state_ );
 
-  QtUtils::QtBridge::Show( this->tools_dock_window_, 
+  QtUtils::QtBridge::Show( this->private_->tools_dock_window_, 
     InterfaceManager::Instance()->toolmanager_dockwidget_visibility_state_ );
 
-  QtUtils::QtBridge::Show( this->project_dock_window_, 
+  QtUtils::QtBridge::Show( this->private_->project_dock_window_, 
     InterfaceManager::Instance()->project_dockwidget_visibility_state_ );
 
-  QtUtils::QtBridge::Show( this->measurement_dock_window_, 
+  QtUtils::QtBridge::Show( this->private_->measurement_dock_window_, 
     InterfaceManager::Instance()->measurement_project_dockwidget_visibility_state_ );
 
-  QtUtils::QtBridge::Show( this->history_dock_window_, 
+  QtUtils::QtBridge::Show( this->private_->history_dock_window_, 
     InterfaceManager::Instance()->history_dockwidget_visibility_state_ );
   
-  QtUtils::QtBridge::Show( this->splash_interface_, 
+  QtUtils::QtBridge::Show( this->private_->splash_interface_, 
     InterfaceManager::Instance()->splash_screen_visibility_state_ );
-  this->center_seg3d_gui_on_screen( this->splash_interface_ );
+  this->center_seg3d_gui_on_screen( this->private_->splash_interface_ );
   
-  QtUtils::QtBridge::Show( this->preferences_interface_, 
+  QtUtils::QtBridge::Show( this->private_->preferences_interface_, 
     InterfaceManager::Instance()->preferences_manager_visibility_state_ );
     
-  QtUtils::QtBridge::Show( this->controller_interface_, 
+  QtUtils::QtBridge::Show( this->private_->controller_interface_, 
     InterfaceManager::Instance()->controller_visibility_state_ );
     
-  QtUtils::QtBridge::Show( this->message_widget_, 
+  QtUtils::QtBridge::Show( this->private_->message_widget_, 
     InterfaceManager::Instance()->message_window_visibility_state_ );
     
-  QtUtils::QtBridge::Show( this->keyboard_shortcuts_, 
+  QtUtils::QtBridge::Show( this->private_->keyboard_shortcuts_, 
     InterfaceManager::Instance()->keyboard_shortcut_visibility_state_ );  
     
   
@@ -181,6 +228,10 @@ AppInterface::AppInterface()
   {
     this->center_seg3d_gui_on_screen( this );
   }
+  
+  this->private_->progress_ = new ProgressWidget( this->private_->viewer_interface_->parentWidget() );
+  
+  
 }
 
   
@@ -217,81 +268,86 @@ void AppInterface::closeEvent( QCloseEvent* event )
   
   this->disconnect_all();
 
-  if( this->viewer_interface_ )
+  if( this->private_->viewer_interface_ )
   {
-    this->viewer_interface_->close();
-    this->viewer_interface_->deleteLater();
+    this->private_->viewer_interface_->close();
+    this->private_->viewer_interface_->deleteLater();
   }
 
-  if( this->controller_interface_ )
+  if( this->private_->controller_interface_ )
   {
-    this->controller_interface_->close();
-    this->controller_interface_->deleteLater();
+    this->private_->controller_interface_->close();
+    this->private_->controller_interface_->deleteLater();
   }
   
-  if( this->preferences_interface_ )
+  if( this->private_->preferences_interface_ )
   {
-    this->preferences_interface_->close();
-    this->preferences_interface_->deleteLater();
+    this->private_->preferences_interface_->close();
+    this->private_->preferences_interface_->deleteLater();
   }
   
-  if( this->splash_interface_ )
+  if( this->private_->splash_interface_ )
   {
-    this->splash_interface_->close();
-    this->splash_interface_->deleteLater();
+    this->private_->splash_interface_->close();
+    this->private_->splash_interface_->deleteLater();
   }
   
-  if( this->message_widget_ )
+  if( this->private_->message_widget_ )
   {
-    this->message_widget_->close();
-    this->message_widget_->deleteLater();
+    this->private_->message_widget_->close();
+    this->private_->message_widget_->deleteLater();
   }
   
-  if( this->keyboard_shortcuts_ )
+  if( this->private_->keyboard_shortcuts_ )
   {
-    this->keyboard_shortcuts_->close();
-    this->keyboard_shortcuts_->deleteLater();
+    this->private_->keyboard_shortcuts_->close();
+    this->private_->keyboard_shortcuts_->deleteLater();
   }
   
-  if( this->history_dock_window_ )
+  if( this->private_->history_dock_window_ )
   {
-    this->history_dock_window_->close();
-    this->history_dock_window_->deleteLater();
+    this->private_->history_dock_window_->close();
+    this->private_->history_dock_window_->deleteLater();
   }
   
-  if( this->project_dock_window_ )
+  if( this->private_->project_dock_window_ )
   {
-    this->project_dock_window_->close();
-    this->project_dock_window_->deleteLater();
+    this->private_->project_dock_window_->close();
+    this->private_->project_dock_window_->deleteLater();
   }
   
-  if( this->tools_dock_window_ )
+  if( this->private_->tools_dock_window_ )
   {
-    this->tools_dock_window_->close();
-    this->tools_dock_window_->deleteLater();
+    this->private_->tools_dock_window_->close();
+    this->private_->tools_dock_window_->deleteLater();
   }
   
-  if( this->layer_manager_dock_window_ )
+  if( this->private_->layer_manager_dock_window_ )
   {
-    this->layer_manager_dock_window_->close();
-    this->layer_manager_dock_window_->deleteLater();
+    this->private_->layer_manager_dock_window_->close();
+    this->private_->layer_manager_dock_window_->deleteLater();
   }
   
-  if( this->measurement_dock_window_ )
+  if( this->private_->measurement_dock_window_ )
   {
-    this->measurement_dock_window_->close();
-    this->measurement_dock_window_->deleteLater();
-  }
-  
-  if( this->progress_ )
-  {
-    this->progress_->close();
-    this->progress_->deleteLater();
+    this->private_->measurement_dock_window_->close();
+    this->private_->measurement_dock_window_->deleteLater();
   }
 
   event->accept();
 }
 
+  void AppInterface::resizeEvent( QResizeEvent *event )
+  {
+    if( this->private_->progress_->isVisible() )
+    {
+      this->private_->progress_->resize( event->size() );
+    }
+    
+    event->accept();
+  }
+  
+  
 void AppInterface::center_seg3d_gui_on_screen( QWidget *widget ) 
 {
   QRect rect = QApplication::desktop()->availableGeometry();
@@ -317,41 +373,30 @@ void AppInterface::set_project_name( std::string project_name )
 
 void AppInterface::begin_progress( Core::ActionProgressHandle handle )
 {
-
-  // Step (1): delete any out standing progress messages
-  if( this->progress_.data() )
-  {
-    this->progress_->done( 0 );
-    this->progress_->deleteLater(); 
-  }
+  CORE_LOG_DEBUG( "-- Picturizing the Viewer Interface --" );
+  this->private_->viewer_interface_->set_pic_mode( true );
   
   CORE_LOG_DEBUG( "-- Start progress widget --" );
-  this->progress_ = new ProgressWidget( handle, this );
-  this->progress_->show();
-  
-  CORE_LOG_DEBUG( "-- Disabling the AppInterface --" );
-  this->setEnabled( false );
-  if( !this->isEnabled() ) this->progress_->setEnabled( true );
-  
-  this->center_seg3d_gui_on_screen( this->progress_ );
+  this->private_->progress_->setup_progress_widget( handle );
+  this->private_->progress_->resize( this->size() );
+  this->menuBar()->setEnabled( false );
+
 }
 
 void AppInterface::end_progress( Core::ActionProgressHandle /*handle*/ )
 {
+  
   CORE_LOG_DEBUG( "-- Finish progress widget --" );
-  CORE_LOG_DEBUG( "-- Enabling the AppInterface --" );
-  this->setEnabled( true );
+  this->private_->progress_->cleanup_progress_widget();
+  this->menuBar()->setEnabled( true );
+  CORE_LOG_DEBUG( "-- Unpicturizing the Viewer Interface --" );
+  this->private_->viewer_interface_->set_pic_mode( false );
 
-  if( this->progress_.data() ) 
-  {
-    this->progress_->done( 0 );
-    this->progress_->deleteLater(); 
-  }
 }
 
 void AppInterface::report_progress( Core::ActionProgressHandle handle )
 {
-  if( this->progress_.data() ) progress_->update_progress();
+  if( this->private_->progress_.data() ) this->private_->progress_->update_progress();
 }
 
 void AppInterface::addDockWidget( Qt::DockWidgetArea area, QDockWidget* dock_widget )

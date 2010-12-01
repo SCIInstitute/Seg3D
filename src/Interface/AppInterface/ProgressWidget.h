@@ -35,7 +35,6 @@
 
 // Qt includes
 #include <QWidget>
-#include <QDialog>
 #include <QPointer>
 
 // boost includes
@@ -50,7 +49,7 @@ namespace Seg3D
 class ProgressWidgetPrivate;
 typedef boost::shared_ptr< ProgressWidgetPrivate > ProgressWidgetPrivateHandle;
 
-class ProgressWidget : public QDialog
+class ProgressWidget : public QWidget
 {
   // Needed to make it a Qt object
 Q_OBJECT
@@ -59,7 +58,7 @@ Q_OBJECT
 public:
   typedef QPointer< ProgressWidget > qpointer_type;
 
-  ProgressWidget( Core::ActionProgressHandle action_progress, QWidget *parent = 0 );
+  ProgressWidget( QWidget *parent = 0 );
   virtual ~ProgressWidget();
 
   // -- Update widget --
@@ -68,6 +67,9 @@ public:
   // UPDATE_PROGRESS:
   // Update the progress in this dialog
   void update_progress();
+  
+  void setup_progress_widget( Core::ActionProgressHandle action_progress );
+  void cleanup_progress_widget();
 
   // -- Slots --
 public Q_SLOTS:
@@ -82,8 +84,6 @@ public Q_SLOTS:
   
   // -- Internals --
 private:
-  Core::ActionProgressHandle action_progress_;
-  
   ProgressWidgetPrivateHandle private_;
 };
 

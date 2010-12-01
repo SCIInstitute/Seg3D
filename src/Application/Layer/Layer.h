@@ -216,10 +216,10 @@ public:
   Core::DataBlock::generation_type get_generation() const;
 
   // -- abort handling --
-public:
-
+private:
   void handle_abort();
-  
+
+public:
   bool check_abort();
 
   void reset_abort();

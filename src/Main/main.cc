@@ -42,6 +42,9 @@
 // QtUtils includes
 #include <QtUtils/Utils/QtApplication.h>
 
+// Application includes
+#include <Application/Tool/ToolFactory.h>
+
 // Interface includes
 #include <Interface/AppInterface/AppInterface.h>
 
