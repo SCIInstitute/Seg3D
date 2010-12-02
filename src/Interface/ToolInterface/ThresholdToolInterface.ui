@@ -264,7 +264,7 @@ QWidget#message_alert_{
       <item>
        <widget class="QLabel" name="message_">
         <property name="text">
-         <string>Select a data layer to activate the tool.</string>
+         <string>Select a data layer to activate this tool.</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
@@ -281,15 +281,15 @@ QWidget#message_alert_{
  </widget>
  <customwidgets>
   <customwidget>
+   <class>QtUtils::QtDropableComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">QtUtils/Widgets/QtDropableComboBox.h</header>
+  </customwidget>
+  <customwidget>
    <class>QtUtils::QtSliderDoubleCombo</class>
    <extends>QWidget</extends>
    <header location="global">QtUtils/Widgets/QtSliderDoubleCombo.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QtUtils::QtDropableComboBox</class>
-   <extends>QComboBox</extends>
-   <header location="global">QtUtils/Widgets/QtDropableComboBox.h</header>
   </customwidget>
   <customwidget>
    <class>QtUtils::QtHistogramWidget</class>

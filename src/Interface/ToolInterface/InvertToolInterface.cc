@@ -76,6 +76,7 @@ bool InvertToolInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Connect( this->private_->ui_.execute_button_, boost::bind(
     &InvertTool::execute, tool, Core::Interface::GetWidgetActionContext() ) );
   QtUtils::QtBridge::Enable( this->private_->ui_.execute_button_, tool->valid_target_state_ );
+  QtUtils::QtBridge::Show( this->private_->ui_.message_alert_, tool->valid_target_state_, true );
   QtUtils::QtBridge::Enable( this->private_->ui_.target_layer_, 
     tool->use_active_layer_state_, true ); 
 

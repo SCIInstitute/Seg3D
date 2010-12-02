@@ -96,6 +96,7 @@ bool ClipboardToolInterface::build_widget( QFrame* frame )
     tool->valid_target_state_ );
   QtUtils::QtBridge::Enable( this->private_->ui_.paste_button_,
     tool->valid_target_state_ );
+  QtUtils::QtBridge::Show( this->private_->ui_.message_alert_, tool->valid_target_state_, true );
   QtUtils::QtBridge::Enable( this->private_->ui_.paste_slice_number_min_,
     tool->valid_target_state_ );
   QtUtils::QtBridge::Enable( this->private_->ui_.paste_slice_number_max_,

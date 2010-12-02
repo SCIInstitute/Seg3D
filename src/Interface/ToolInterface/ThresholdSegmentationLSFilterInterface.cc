@@ -80,6 +80,7 @@ bool ThresholdSegmentationLSFilterInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.runFilterButton, 
     boost::bind( &Tool::execute, tool, Core::Interface::GetWidgetActionContext() ) );
+  //QtUtils::QtBridge::Show( this->private_->ui_.message_alert_, tool->valid_target_state_, true );
   
   //Send a message to the log that we have finished with building the Segmentation Level Set Filter Interface
   CORE_LOG_DEBUG("Finished building a Segmentation Level Set Filter Interface");

@@ -100,9 +100,13 @@ bool OtsuThresholdFilterInterface::build_widget( QFrame* frame )
     tool->target_layer_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.use_active_layer_, 
     tool->use_active_layer_state_ );
-      
   QtUtils::QtBridge::Connect( this->private_->ui_.amount_, 
     tool->amount_state_ );
+  
+  QtUtils::QtBridge::Enable( this->private_->ui_.runFilterButton,
+    tool->valid_target_state_ );
+  
+  QtUtils::QtBridge::Show( this->private_->ui_.message_alert_, tool->valid_target_state_, true );
     
   QtUtils::QtBridge::Enable( this->private_->ui_.histogram_, tool->valid_target_state_ );
 

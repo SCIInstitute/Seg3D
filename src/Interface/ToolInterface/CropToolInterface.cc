@@ -97,6 +97,7 @@ bool CropToolInterface::build_widget( QFrame* frame )
     boost::bind( &CropTool::reset, tool ) );
 
   QtUtils::QtBridge::Enable( this->private_->ui_.crop_button_, tool->valid_target_state_ );
+  QtUtils::QtBridge::Show( this->private_->ui_.message_alert_, tool->valid_target_state_, true );
   QtUtils::QtBridge::Enable( this->private_->ui_.target_group_, 
     tool->use_active_group_state_, true ); 
 

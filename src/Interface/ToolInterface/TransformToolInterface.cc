@@ -99,6 +99,7 @@ bool TransformToolInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Enable( this->private_->ui_.target_group_, 
     tool->use_active_group_state_, true ); 
   QtUtils::QtBridge::Enable( this->private_->ui_.execute_button_, tool->valid_target_state_ );
+  QtUtils::QtBridge::Show( this->private_->ui_.message_alert_, tool->valid_target_state_, true );
 
   //Send a message to the log that we have finished with building the Flip Tool Interface
   CORE_LOG_DEBUG( "Finished building a Transform Tool Interface" );

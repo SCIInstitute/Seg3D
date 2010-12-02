@@ -80,7 +80,8 @@ bool ConfidenceConnectedFilterInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Connect( this->private_->ui_.run_button_, boost::bind(
     &Tool::execute, tool, Core::Interface::GetWidgetActionContext() ) );
   QtUtils::QtBridge::Enable( this->private_->ui_.target_layer_, tool->use_active_layer_state_, true );
-  QtUtils::QtBridge::Enable( this->private_->ui_.run_button_, tool->valid_target_state_ );
+  QtUtils::QtBridge::Enable( this->private_->ui_.run_button_,tool->valid_target_state_ );
+  QtUtils::QtBridge::Show( this->private_->ui_.message_alert_, tool->valid_target_state_, true );
   
   //Send a message to the log that we have finished with building the Confidence Connected Filter Interface
   CORE_LOG_DEBUG("Finished building a Confidence Connected Filter Interface");

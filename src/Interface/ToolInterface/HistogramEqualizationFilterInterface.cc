@@ -105,8 +105,8 @@ bool HistogramEqualizationFilterInterface::build_widget( QFrame* frame )
     tool->bins_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.ignore_bins_, 
     tool->ignore_bins_state_ );
-  QtUtils::QtBridge::Enable( this->private_->ui_.runFilterButton,
-    tool->valid_target_state_ );
+  QtUtils::QtBridge::Enable( this->private_->ui_.runFilterButton, tool->valid_target_state_ );
+  QtUtils::QtBridge::Show( this->private_->ui_.message_alert_, tool->valid_target_state_, true );
   QtUtils::QtBridge::Enable( this->private_->ui_.histogram_, tool->valid_target_state_ );
       
   return true;

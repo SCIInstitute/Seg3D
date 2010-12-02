@@ -79,6 +79,8 @@ bool NeighborhoodConnectedFilterInterface::build_widget( QFrame* frame )
     &Tool::execute, tool, Core::Interface::GetWidgetActionContext() ) );
   QtUtils::QtBridge::Enable( this->private_->ui_.target_layer_, tool->use_active_layer_state_, true );
   QtUtils::QtBridge::Enable( this->private_->ui_.run_filter_button_, tool->valid_target_state_ );
+  
+  QtUtils::QtBridge::Show( this->private_->ui_.message_alert_, tool->valid_target_state_, true );
 
   //Send a message to the log that we have finised with building the Neighborhood Connected Filter Interface
   CORE_LOG_DEBUG("Finished building an Neighborhood Connected Filter Interface");

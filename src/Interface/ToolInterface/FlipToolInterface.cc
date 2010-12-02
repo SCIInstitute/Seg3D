@@ -107,6 +107,8 @@ bool FlipToolInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Enable( this->private_->ui_.rotate_coronal_cw_button_, tool->valid_target_state_ );
   QtUtils::QtBridge::Enable( this->private_->ui_.rotate_sagittal_ccw_button_, tool->valid_target_state_ );
   QtUtils::QtBridge::Enable( this->private_->ui_.rotate_sagittal_cw_button_, tool->valid_target_state_ );
+  
+  QtUtils::QtBridge::Show( this->private_->ui_.message_alert_, tool->valid_target_state_, true );
 
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );

@@ -90,6 +90,8 @@ bool BinarySmoothDilateErodeFilterInterface::build_widget( QFrame* frame )
     tool->valid_target_state_ );
   QtUtils::QtBridge::Enable( this->private_->ui_.dilateerodeButton,
     tool->valid_target_state_ );
+  
+  QtUtils::QtBridge::Show( this->private_->ui_.message_alert_, tool->valid_target_state_, true );
 
   QtUtils::QtBridge::Connect( this->private_->ui_.only2d_,
     tool->only2d_state_ );

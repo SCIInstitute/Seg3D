@@ -115,6 +115,10 @@ bool PaintToolInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Connect( this->private_->ui_.clear_seeds_button_, boost::bind(
     &SeedPointsTool::clear, tool, Core::Interface::GetWidgetActionContext() ) );
   
+
+  QtUtils::QtBridge::Show( this->private_->ui_.message_alert_, tool->valid_target_state_, true );
+  
+  
   boost::function< bool () > condition = boost::lambda::bind( &Core::StateLabeledOption::get, 
     tool->data_constraint_layer_state_.get() ) != Tool::NONE_OPTION_C;
   QtUtils::QtBridge::Enable( this->private_->ui_.upper_threshold_, 

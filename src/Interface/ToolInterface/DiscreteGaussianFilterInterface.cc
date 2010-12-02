@@ -82,6 +82,11 @@ bool DiscreteGaussianFilterInterface::build_widget( QFrame* frame )
 
   QtUtils::QtBridge::Connect( this->private_->ui_.blurring_distance_, 
     tool->blurring_distance_state_ );
+  
+  QtUtils::QtBridge::Enable( this->private_->ui_.runFilterButton,
+    tool->valid_target_state_ );
+  
+  QtUtils::QtBridge::Show( this->private_->ui_.message_alert_, tool->valid_target_state_, true );
 
   // Step 4 - Qt connections
   {

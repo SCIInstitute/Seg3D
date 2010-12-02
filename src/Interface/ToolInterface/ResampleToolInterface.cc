@@ -115,6 +115,8 @@ bool ResampleToolInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Enable( this->private_->ui_.run_button_, execution_related_states,
     boost::lambda::bind( &Core::StateBool::get, tool->valid_target_state_.get() ) &&
     boost::lambda::bind( &Core::StateBool::get, tool->valid_size_state_.get() ) );
+  
+  QtUtils::QtBridge::Show( this->private_->ui_.message_alert_, tool->valid_target_state_, true );
 
   QtUtils::QtBridge::Enable( this->private_->ui_.target_group_, 
     tool->use_active_group_state_, true ); 

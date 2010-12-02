@@ -122,6 +122,9 @@ bool ArithmeticFilterInterface::build_widget( QFrame* frame )
     tool->output_is_data_state_.get() );
   
   QtUtils::QtBridge::Enable( this->private_->ui_.preserve_checkbox_, enable_states, condition );
+  
+  QtUtils::QtBridge::Enable( this->private_->ui_.runFilterButton,tool->valid_target_state_ );
+  QtUtils::QtBridge::Show( this->private_->ui_.message_alert_, tool->valid_target_state_, true );
 
   for ( size_t j = 0; j < this->private_->predefined_.size(); j++ )
   {

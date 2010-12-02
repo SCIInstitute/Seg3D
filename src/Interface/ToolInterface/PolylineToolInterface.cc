@@ -88,6 +88,7 @@ bool PolylineToolInterface::build_widget( QFrame* frame )
 //  boost::function< bool () > condition = 
   QtUtils::QtBridge::Enable( this->private_->ui_.fill_button_, tool->valid_target_state_ );
   QtUtils::QtBridge::Enable( this->private_->ui_.erase_button_, tool->valid_target_state_ );
+  QtUtils::QtBridge::Show( this->private_->ui_.message_alert_, tool->valid_target_state_, true );
 
   //Send a message to the log that we have finished with building the Polyline Tool Interface
   CORE_LOG_MESSAGE("Finished building a Polyline Tool Interface");
