@@ -208,20 +208,20 @@ void AppMenu::create_edit_menu( QMenu* qmenu )
       
   qmenu->addSeparator();    
   
-  QAction* qaction;
-  qaction = qmenu->addAction( tr( "Activate Next Layer" ) );
-  qaction->setShortcut( Qt::Key_Right );
-  qaction->setToolTip( tr( "Change the active layer to the one below the one that is currently active." ) );
-  QtUtils::QtBridge::Connect( qaction , boost::bind(
-    ActionActivateNextLayer::Dispatch, Core::Interface::GetKeyboardActionContext() ) );
-  
-  qaction = qmenu->addAction( tr( "Activate Previous Layer" ) );
-  qaction->setShortcut( Qt::Key_Left );
-  qaction->setToolTip( tr( "Change the active layer to the one above the one that is currently active." ) );
-  QtUtils::QtBridge::Connect( qaction , boost::bind(
-    ActionActivatePreviousLayer::Dispatch, Core::Interface::GetKeyboardActionContext() ) );
-
-  qmenu->addSeparator();
+//  QAction* qaction;
+//  qaction = qmenu->addAction( tr( "Activate Next Layer" ) );
+//  qaction->setShortcut( Qt::Key_Right );
+//  qaction->setToolTip( tr( "Change the active layer to the one below the one that is currently active." ) );
+//  QtUtils::QtBridge::Connect( qaction , boost::bind(
+//    ActionActivateNextLayer::Dispatch, Core::Interface::GetKeyboardActionContext() ) );
+//  
+//  qaction = qmenu->addAction( tr( "Activate Previous Layer" ) );
+//  qaction->setShortcut( Qt::Key_Left );
+//  qaction->setToolTip( tr( "Change the active layer to the one above the one that is currently active." ) );
+//  QtUtils::QtBridge::Connect( qaction , boost::bind(
+//    ActionActivatePreviousLayer::Dispatch, Core::Interface::GetKeyboardActionContext() ) );
+//
+//  qmenu->addSeparator();
 
   this->copy_qaction_ = qmenu->addAction( tr( "Copy Mask Slice" ) );
   this->copy_qaction_->setShortcut( tr( "Ctrl+C" ) );
