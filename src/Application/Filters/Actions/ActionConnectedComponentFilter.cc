@@ -242,7 +242,7 @@ public:
         return;
       }
       
-      unsigned int max_label = filter->GetObjectCount();
+      unsigned int max_label = filter32->GetObjectCount();
       std::vector<unsigned int> lut( max_label + 1, 0 );
       
       Core::GridTransform grid = input_image->get_grid_transform();
