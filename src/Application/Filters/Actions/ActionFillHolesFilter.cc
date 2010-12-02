@@ -178,7 +178,7 @@ public:
       // are aborted. In that case we will relay a message to the status bar for information.
       try 
       { 
-        filter->Update(); 
+        filter32->Update(); 
       } 
       catch ( ... ) 
       {
@@ -199,7 +199,7 @@ public:
 
       output_datablock = Core::ITKDataBlock::New( filter32->GetOutput() );
       
-      unsigned int max_label = filter->GetObjectCount();
+      unsigned int max_label = filter32->GetObjectCount();
       std::vector<unsigned int> lut;
 
       try
