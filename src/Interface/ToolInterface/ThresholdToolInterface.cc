@@ -73,6 +73,7 @@ bool ThresholdToolInterface::build_widget( QFrame* frame )
   this->private_->ui_.setupUi( frame );
   this->private_->ui_.horizontalLayout_2->setAlignment( Qt::AlignHCenter );
   this->private_->ui_.horizontalLayout_3->setAlignment( Qt::AlignHCenter );
+  this->private_->ui_.verticalLayout_5->setAlignment( Qt::AlignTop );
   this->private_->ui_.histogram_->set_thresholds( this->private_->ui_.upper_threshold_, 
     this->private_->ui_.lower_threshold_ );
   
@@ -95,6 +96,7 @@ bool ThresholdToolInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Connect( this->private_->ui_.run_button_, boost::bind(
     &ThresholdTool::execute, tool, Core::Interface::GetWidgetActionContext() ) );
   QtUtils::QtBridge::Enable( this->private_->ui_.run_button_, tool->valid_target_state_ );
+  QtUtils::QtBridge::Show( this->private_->ui_.message_alert_, tool->valid_target_state_, true );
   QtUtils::QtBridge::Enable( this->private_->ui_.target_layer_, 
     tool->use_active_layer_state_, true ); 
   
