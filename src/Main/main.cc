@@ -26,6 +26,11 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#ifdef BUILD_WITH_PYTHON
+#include <Python.h>
+#include <Application/PythonModule/PythonInterpreter.h>
+#endif
+
 // STL includes
 #include <iostream>
 #include <string>
@@ -127,6 +132,13 @@ int main( int argc, char **argv )
   QMessageBox::information( 0, 
     QString::fromStdString( Core::Application::GetApplicationNameAndVersion() ), 
     QString::fromStdString( warning )  );
+#ifdef BUILD_WITH_PYTHON
+  size_t name_len = strlen( argv[ 0 ] );
+  std::vector< wchar_t > program_name( name_len + 1 );
+  mbstowcs( &program_name[ 0 ], argv[ 0 ], name_len + 1 );
+  Seg3D::PythonInterpreter::Instance()->initialize( &program_name[ 0 ] );
+  //Seg3D::PythonInterpreter::Instance()->start_terminal();
+#endif
 
   // -- Setup Application Interface Window --
   AppInterface* app_interface = new AppInterface;
