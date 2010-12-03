@@ -142,7 +142,7 @@ private Q_SLOTS:
   // SET_PICKED_UP:
   // this sets the local member variable picked_up_ to indicate whether the current LayerWidget 
   // has been picked up.  This is useful when we are representing drag and drop visually
-    void set_picked_up( bool up ){ this->picked_up_ = up; }
+    void set_picked_up( bool up );
 
   // SET_DROP_TARGET:
   // this function stores a local copy of the widget that is going to be dropped onto
@@ -175,11 +175,11 @@ private Q_SLOTS:
   
   // HIDE_SHOW_CHECKBOXES:
   // checks or unchecks all the checkboxes on all the layers
-  void check_uncheck_for_delete();
+  void check_uncheck_for_delete( bool checked );
   
   // CHECK_UNCHECK_FOR_DUPLICATE:
   // checks or unchecks all the checkboxes on all the layers
-  void check_uncheck_for_duplicate();
+  void check_uncheck_for_duplicate( bool checked );
   
   // ENABLE_DISABLE_DELETE_BUTTON:
   // enables or disables the delete button based on whether or not there are any boxes selected
@@ -206,14 +206,6 @@ private:
     QVector< LayerWidgetQHandle > layer_list_;
   std::map< std::string, LayerWidgetQHandle > layer_map_;
     
-private:
-  std::string group_id_;
-  int picked_up_group_height_;
-  int current_height_;
-  int current_width_;
-  int current_depth_;
-  bool group_menus_open_;
-  bool picked_up_;
 };
     
 

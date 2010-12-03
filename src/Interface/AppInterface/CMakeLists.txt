@@ -33,18 +33,22 @@
 
 SET(INTERFACE_APPINTERFACE_SRCS
   AppInterface.cc
-  AppMenu.cc
   AppLayerIO.cc
-  AppStatusBar.cc
-  HistoryDockWidget.cc
+  AppMenu.cc
   AppShortcuts.cc
-  LayerManagerWidget.cc
+  AppStatusBar.cc
+  DropSpaceWidget.cc
+  GroupButtonMenu.cc
+  HistoryDockWidget.cc
   LayerImporterWidget.cc
-  LayerWidget.cc
   LayerGroupWidget.cc
   LayerManagerDockWidget.cc
+  LayerManagerWidget.cc
+  LayerResamplerDialog.cc
+  LayerWidget.cc
   MeasurementDockWidget.cc
   MessageWindow.cc
+  OverlayWidget.cc
   ProgressWidget.cc
   ProjectDockWidget.cc
   PushDragButton.cc
@@ -54,24 +58,26 @@ SET(INTERFACE_APPINTERFACE_SRCS
   ViewAction.cc
   ViewerInterface.cc
   ViewerWidget.cc
-  DropSpaceWidget.cc
-  OverlayWidget.cc
-  LayerResamplerDialog.cc
 )
 
 SET(INTERFACE_APPINTERFACE_MOC_SRCS
   AppInterface.h
+  AppLayerIO.h
   AppMenu.h
-  AppStatusBar.h
-  HistoryDockWidget.h
   AppShortcuts.h
-  LayerWidget.h
+  AppStatusBar.h
+  DropSpaceWidget.h
+  GroupButtonMenu.h
+  HistoryDockWidget.h
   LayerImporterWidget.h
   LayerGroupWidget.h
-  LayerManagerWidget.h
   LayerManagerDockWidget.h
+  LayerManagerWidget.h
+  LayerResamplerDialog.h
+  LayerWidget.h
   MeasurementDockWidget.h
   MessageWindow.h
+  OverlayWidget.h
   ProgressWidget.h
   ProjectDockWidget.h
   PushDragButton.h
@@ -81,9 +87,6 @@ SET(INTERFACE_APPINTERFACE_MOC_SRCS
   ViewAction.h
   ViewerInterface.h
   ViewerWidget.h
-  DropSpaceWidget.h
-  OverlayWidget.h
-  LayerResamplerDialog.h
 )
 
 
@@ -93,21 +96,23 @@ SET(INTERFACE_APPINTERFACE_NO_MOC_SRCS
 )
 
 SET(INTERFACE_APPINTERFACE_UI_SRCS
-  HistoryDockWidget.ui
+  
   AppShortcuts.ui
+  GroupButtonMenu.ui
+  HistoryDockWidget.ui
   LayerGroupWidget.ui
   LayerImporterWidget.ui
   LayerManagerDockWidget.ui
+  LayerResamplerDialog.ui
   LayerWidget.ui
   MeasurementDockWidget.ui
   MessageWindow.ui
   ProjectDockWidget.ui
   ProgressWidget.ui
+  StatusBar.ui
   ToolBoxPageWidget.ui
   ViewerInterface.ui
   ViewerWidget.ui
-  StatusBar.ui
-  LayerResamplerDialog.ui
 )
 
 SET(INTERFACE_APPINTERFACE_RCC_SRCS

@@ -45,6 +45,7 @@
 #include <Interface/AppInterface/DropSpaceWidget.h>
 #include <Interface/AppInterface/OverlayWidget.h>
 #include <Interface/AppInterface/PushDragButton.h>
+#include <Interface/AppInterface/GroupButtonMenu.h>
 
 //UI Includes
 #include "ui_LayerGroupWidget.h"
@@ -52,7 +53,6 @@
 //Application Includes
 #include <Application/Layer/DataLayer.h>
 #include <Application/Layer/MaskLayer.h>
-#include <Application/Layer/LayerGroup.h>
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/LayerManager/Actions/ActionDeleteLayers.h>
 #include <Application/LayerManager/Actions/ActionNewMaskLayer.h>
@@ -67,48 +67,35 @@ namespace Seg3D
 class LayerGroupWidgetPrivate
 {
 public:
-  
   LayerGroupHandle group_;
-  
   Ui::LayerGroupWidget ui_;
   DropSpaceWidget* drop_space_;
-  DropSpaceWidget* layer_slot_;
   OverlayWidget* overlay_;
-  OverlayWidget* button_overlay_;
-  
   std::string layer_to_drop_;
-
   int group_height;
   LayerGroupWidget* drop_group_;
-  //bool drop_group_set_;
+  GroupButtonMenu* button_menu_;
 
-  QButtonGroup* iso_quality_button_group_;
+  std::string group_id_;
+  int picked_up_group_height_;
+  bool group_menus_open_;
+  bool picked_up_;
 };
   
 LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   QWidget( parent ),
-  private_( new LayerGroupWidgetPrivate ),
-  group_menus_open_( false ),
-  picked_up_( false )
+  private_( new LayerGroupWidgetPrivate )
 { 
     this->private_->group_ = group;
-
   this->private_->ui_.setupUi( this );
-  
-  this->group_id_ = this->private_->group_->get_group_id();
-  
-  //this->private_->drop_group_set_ = false;
+  this->private_->group_id_ = group->get_group_id();
+  this->private_->group_menus_open_ = false;
+  this->private_->picked_up_ = false;
+  this->private_->button_menu_ = new GroupButtonMenu( this, group );
+  this->private_->ui_.tools_and_layers_layout_->addWidget( this->private_->button_menu_ );
   
   // Set up the Drag and Drop
   this->setAcceptDrops( true );
-
-  // hide the tool bars 
-  this->private_->ui_.iso_quality_->hide();
-  this->private_->ui_.delete_->hide();
-  this->private_->ui_.duplicate_layers_->hide();
-  
-  this->private_->ui_.delete_button_->setEnabled( false );
-  this->private_->ui_.duplicate_button_->setEnabled( false );
 
   // set some values of the GUI
   std::string group_name = Core::ExportToString( 
@@ -121,19 +108,6 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   this->private_->ui_.verticalLayout_12->insertWidget( 0, this->private_->drop_space_ );
   this->private_->drop_space_->hide();
   
-  this->private_->layer_slot_ = new DropSpaceWidget( this );
-  this->private_->ui_.verticalLayout->insertWidget( 0, this->private_->layer_slot_ );
-  this->private_->layer_slot_->hide();
-  
-  // Add isosurface quality radio buttons to QButtonGroup so that QtButtonGroupConnector can be
-  // used to connect the buttons directly to a state variable.
-  this->private_->iso_quality_button_group_ = new QButtonGroup( this );
-  this->private_->iso_quality_button_group_->setExclusive( true );
-  this->private_->iso_quality_button_group_->addButton( this->private_->ui_.radioButton_1_point_0 );
-  this->private_->iso_quality_button_group_->addButton( this->private_->ui_.radioButton_point_5 );
-  this->private_->iso_quality_button_group_->addButton( this->private_->ui_.radioButton_point_25 );
-  this->private_->iso_quality_button_group_->addButton( this->private_->ui_.radioButton_point_125 );
-  
   //  connect the gui signals and slots
   connect( this->private_->ui_.open_button_, SIGNAL( toggled( bool ) ), this, 
     SLOT( show_layers( bool )) );
@@ -141,13 +115,13 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   QtUtils::QtBridge::Connect( this->private_->ui_.open_button_, 
     this->private_->group_->group_widget_expanded_state_ );
   
-  connect( this->private_->ui_.delete_button_, SIGNAL( clicked() ), this, 
+  connect( this->private_->button_menu_, SIGNAL( delete_pressed() ), this, 
     SLOT( verify_delete() ) );
-  connect( this->private_->ui_.duplicate_button_, SIGNAL( clicked() ), this,
+  connect( this->private_->button_menu_, SIGNAL( duplicate_pressed() ), this,
     SLOT( duplicate_checked_layers() ) );
-  connect( this->private_->ui_.select_all_button_, SIGNAL( released() ), this, 
+  connect( this->private_->button_menu_, SIGNAL( duplicate_select_all_pressed( bool ) ), this, 
     SLOT( check_uncheck_for_delete() ) );
-  connect( this->private_->ui_.select_all_for_duplication_button_, SIGNAL( released() ), this, 
+  connect( this->private_->button_menu_, SIGNAL( delete_select_all_pressed( bool ) ), this, 
     SLOT( check_uncheck_for_duplicate() ) );
   
   connect( this->private_->ui_.group_iso_visibility_button_, SIGNAL( toggled( bool ) ), this, 
@@ -166,38 +140,14 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   QtUtils::QtBridge::Connect( this->private_->ui_.group_visibility_button_, 
     group->layers_visible_state_ );
 
-  //Set the default values for the Group UI and make the connections to the state engine
-      // --- GENERAL ---
-  QtUtils::QtBridge::Connect( this->private_->ui_.group_iso_button_, 
-    group->show_iso_menu_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.group_delete_button_, 
-    group->show_delete_menu_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.duplicate_layer_button_, 
-    group->show_duplicate_menu_state_ );
-
-  QtUtils::QtBridge::Show( this->private_->ui_.iso_quality_, group->show_iso_menu_state_ ); 
-  QtUtils::QtBridge::Show( this->private_->ui_.delete_, group->show_delete_menu_state_ );
-  QtUtils::QtBridge::Show( this->private_->ui_.duplicate_layers_, group->show_duplicate_menu_state_ );
-  
-  QtUtils::QtBridge::Connect( this->private_->ui_.group_new_button_, 
-    boost::bind( &ActionNewMaskLayer::Dispatch, 
-    Core::Interface::GetWidgetActionContext(), this->private_->group_->get_group_id() ) );
-
-  // --- ISOSURFACE---
-  QtUtils::QtBridge::Connect( this->private_->iso_quality_button_group_, 
-    this->private_->group_->isosurface_quality_state_ );
 
   this->private_->ui_.group_frame_layout_->setAlignment( Qt::AlignTop );
   this->private_->ui_.group_frame_layout_->setSpacing( 1 );
   this->private_->ui_.verticalLayout_13->setAlignment( Qt::AlignTop );
-  this->private_->ui_.verticalLayout_10->setAlignment( Qt::AlignTop );
 
   this->private_->overlay_ = new OverlayWidget( this );
   this->private_->overlay_->hide();
   
-  this->private_->button_overlay_ = new OverlayWidget( this->private_->ui_.widget );  
-  this->private_->button_overlay_->hide();
-
   this->private_->ui_.fake_widget_->setMinimumHeight( 0 );
   this->private_->ui_.fake_widget_->hide();
   
@@ -219,7 +169,7 @@ void LayerGroupWidget::mousePressEvent( QMouseEvent *event )
     return;
   }
 
-  if( this->group_menus_open_ )
+  if( this->private_->group_menus_open_ )
   {
     event->setAccepted( true );
     return;
@@ -283,13 +233,7 @@ void LayerGroupWidget::dropEvent( QDropEvent* event )
     return;
 
   }
-  else if ( LayerManager::Instance()->get_layer_by_name( drop_item_id ) )
-  {
-    ActionMoveLayerBelow::Dispatch( Core::Interface::GetWidgetActionContext(), 
-      drop_item_id, this->get_group_id() );
-    this->private_->layer_slot_->instant_hide();
-  }
-  
+
   event->setDropAction( Qt::IgnoreAction );
 }
 
@@ -301,15 +245,6 @@ void LayerGroupWidget::dragEnterEvent( QDragEnterEvent* event)
   {
     this->enable_drop_space( true );
   }
-  else if ( ( LayerManager::Instance()->get_layer_by_name( drop_item_id ) ) && (
-    ( this->private_->ui_.buttons_ == this->childAt( event->pos() ) ) || 
-    ( this->private_->button_overlay_ == this->childAt( event->pos() ) ) ) )
-  {
-    CORE_LOG_DEBUG( "Entering the group with a layer" );
-    this->private_->button_overlay_->show();
-    this->private_->layer_slot_->show();
-  }
-
   event->setAccepted( true );
 }
 
@@ -336,9 +271,9 @@ void LayerGroupWidget::seethrough( bool see )
 
 void LayerGroupWidget::enable_drop_space( bool drop )
 {
-  this->private_->drop_space_->set_height( this->picked_up_group_height_ + 4 );
+  this->private_->drop_space_->set_height( this->private_->picked_up_group_height_ + 4 );
   
-  if( this->picked_up_ )
+  if( this->private_->picked_up_ )
   {
     return;
   }
@@ -350,9 +285,7 @@ void LayerGroupWidget::enable_drop_space( bool drop )
   }
   else
   {
-    this->private_->layer_slot_->hide();
     this->private_->drop_space_->hide();
-    this->private_->button_overlay_->hide();
     this->private_->overlay_->hide();
   }
 } 
@@ -373,7 +306,7 @@ LayerWidgetQWeakHandle LayerGroupWidget::set_active_layer( LayerHandle layer )
 
 const std::string& LayerGroupWidget::get_group_id()
 {
-  return this->group_id_;
+  return this->private_->group_id_;
 }
 
 void LayerGroupWidget::verify_delete()
@@ -388,8 +321,8 @@ void LayerGroupWidget::verify_delete()
   {
     ActionDeleteLayers::Dispatch( Core::Interface::GetWidgetActionContext(), 
       this->private_->group_ );
-    this->private_->ui_.group_delete_button_->setChecked( false );
-    this->private_->ui_.select_all_button_->setChecked( false );
+    this->private_->button_menu_->uncheck_delete_menu_button();
+    this->private_->button_menu_->uncheck_delete_button();
   }
 }
 
@@ -437,18 +370,6 @@ void LayerGroupWidget::hide_group()
 void LayerGroupWidget::resizeEvent( QResizeEvent *event )
 {
   this->private_->overlay_->resize( event->size() );
-  this->private_->button_overlay_->resize( this->private_->ui_.widget->size() );
-  CORE_LOG_DEBUG( "overlay size - height: " + 
-    QString::number( this->private_->button_overlay_->size().height() ).toStdString() + " width: " + 
-    QString::number( this->private_->button_overlay_->size().width() ).toStdString());
-  if( this->private_->button_overlay_->isHidden() )
-  {
-    CORE_LOG_DEBUG( "button_overlay_ is hidden" );
-  }
-  else
-  {
-    CORE_LOG_DEBUG( "button_overlay_ is visible" );
-  }
   event->setAccepted( true );
 }
   
@@ -463,7 +384,7 @@ void LayerGroupWidget::prep_layers_for_drag_and_drop( bool move_time )
 
 void LayerGroupWidget::prep_for_animation( bool move_time )
 {
-  if( this->picked_up_ )
+  if( this->private_->picked_up_ )
     return;
   
   if( move_time )
@@ -483,7 +404,7 @@ void LayerGroupWidget::prep_for_animation( bool move_time )
   
 void LayerGroupWidget::set_picked_up_group_size( int group_height )
 {
-  this->picked_up_group_height_ = group_height;
+  this->private_->picked_up_group_height_ = group_height;
 }
   
 void LayerGroupWidget::handle_change()
@@ -491,8 +412,6 @@ void LayerGroupWidget::handle_change()
   layer_list_type layer_list = this->private_->group_->get_layer_list();
   int index = 0;
   bool layer_widget_deleted = false;
-  this->private_->button_overlay_->hide();
-  
   this->setUpdatesEnabled( false );
   
   // First we remove the LayerWidgets that arent needed any more.
@@ -595,8 +514,8 @@ void LayerGroupWidget::notify_picked_up_layer_size( int layer_size )
   
 void LayerGroupWidget::duplicate_checked_layers()
 {
-  this->private_->ui_.duplicate_layer_button_->setChecked( false );
-  this->private_->ui_.select_all_for_duplication_button_->setChecked( false );
+  this->private_->button_menu_->uncheck_delete_button();
+  this->private_->button_menu_->uncheck_duplicate_button();
   
   for( std::map< std::string, LayerWidgetQHandle >::iterator it = this->layer_map_.begin(); 
     it != this->layer_map_.end(); ++it )
@@ -611,21 +530,21 @@ void LayerGroupWidget::duplicate_checked_layers()
   }
 }
 
-void LayerGroupWidget::check_uncheck_for_delete()
+void LayerGroupWidget::check_uncheck_for_delete( bool checked )
 {
   for( std::map< std::string, LayerWidgetQHandle >::iterator it = this->layer_map_.begin(); 
     it != this->layer_map_.end(); ++it )
   {
-    ( *it ).second->set_check_selected( this->private_->ui_.select_all_button_->isChecked() );
+    ( *it ).second->set_check_selected( checked );
   }
 }
   
-void LayerGroupWidget::check_uncheck_for_duplicate()
+void LayerGroupWidget::check_uncheck_for_duplicate( bool checked )
 {
   for( std::map< std::string, LayerWidgetQHandle >::iterator it = this->layer_map_.begin(); 
     it != this->layer_map_.end(); ++it )
   {
-    ( *it ).second->set_check_selected( this->private_->ui_.select_all_for_duplication_button_->isChecked() );
+    ( *it ).second->set_check_selected( checked );
   }
 } 
 
@@ -636,11 +555,11 @@ void LayerGroupWidget::enable_disable_delete_button()
   {
     if( ( *it ).second->get_selected() )
     {
-      this->private_->ui_.delete_button_->setEnabled( true );
+      this->private_->button_menu_->set_delete_enabled( true );
       return;
     }
   }
-  this->private_->ui_.delete_button_->setEnabled( false );
+  this->private_->button_menu_->set_delete_enabled( false );
 }
   
 void LayerGroupWidget::enable_disable_duplicate_button()
@@ -650,11 +569,11 @@ void LayerGroupWidget::enable_disable_duplicate_button()
   {
     if( ( *it ).second->get_selected() )
     {
-      this->private_->ui_.duplicate_button_->setEnabled( true );
+      this->private_->button_menu_->set_duplicate_enabled( true );
       return;
     }
   }
-  this->private_->ui_.duplicate_button_->setEnabled( false );
+  this->private_->button_menu_->set_duplicate_enabled( false );
 }
   
   void LayerGroupWidget::set_iso_surface_visibility( bool visible )
@@ -665,6 +584,12 @@ void LayerGroupWidget::enable_disable_duplicate_button()
       ( *it ).second->set_iso_surface_visibility( visible );
     }
   }
+
+  void LayerGroupWidget::set_picked_up( bool up )
+  {
+    this->private_->picked_up_ = up; 
+  }
+
 
 
 }  //end namespace Seg3D
