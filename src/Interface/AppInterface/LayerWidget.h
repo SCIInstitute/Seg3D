@@ -122,11 +122,6 @@ public:
   // that we dont have multiple enter and exit events
   void hide_overlay();
 
-  // SEETHROUGH:
-  // this function is called when the user clicks on a layer to drag it.  It sets the stylesheet
-  // on the layer to make it look like it has been picked up
-  void seethrough( bool see );
-
   // SET_GROUP_MENU_STATUS:
   // this function is called by the group to let the layers know that a group menu has been opened
   void set_group_menu_status( bool status );

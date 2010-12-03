@@ -66,5 +66,4 @@ void OverlayWidget::set_transparent( bool transparent )
   }
 }
 
-
 } // end namespace Seg3D

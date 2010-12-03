@@ -758,7 +758,7 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
   // Exit immediately if they are no longer holding the button the press event isn't valid
   if( event->button() != Qt::LeftButton )
   { 
-    event->ignore();
+    event->setAccepted( true );
     return;
   }
   
@@ -766,7 +766,7 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
   {
     ActionActivateLayer::Dispatch( Core::Interface::GetWidgetActionContext(),
       LayerManager::Instance()->get_layer_by_id( this->get_layer_id() ) );
-    event->ignore();
+    event->setAccepted( true );
     return;
   }
   
@@ -789,8 +789,9 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
 
   // Next we hide the LayerWidget that we are going to be dragging.
   this->parentWidget()->setMinimumHeight( this->parentWidget()->height() );
-  this->seethrough( true );
-
+  this->set_picked_up( true );
+  this->enable_drop_space( true );
+  
   Q_EMIT prep_for_drag_and_drop( true );
   Q_EMIT layer_size_signal_( this->height() - 2 );
   
@@ -803,7 +804,7 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
       
     if ( this->private_->layer_->get_layer_group() != dst_group )
     {
-      this->seethrough( false );
+      this->set_picked_up( false );
       LayerResamplerHandle layer_resampler( new LayerResampler(
         this->private_->layer_, this->private_->drop_layer_->private_->layer_ ) );
       LayerResamplerDialog* dialog = new LayerResamplerDialog( layer_resampler, this );
@@ -825,7 +826,7 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
   }
   else
   {
-    this->seethrough( false );
+    this->set_picked_up( false );
   }
   
   this->private_->drop_layer_set_ = false;
@@ -833,6 +834,7 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
   this->enable_drop_space( false );
   this->parentWidget()->setMinimumHeight( 0 );
   this->repaint();
+  event->setAccepted( true );
 }
 
 
@@ -844,49 +846,36 @@ void LayerWidget::set_drop_target( LayerWidget* target_layer )
 
 void LayerWidget::dropEvent( QDropEvent* event )
 {
-  //if( !LayerManager::Instance()->get_layer_by_id( event->mimeData()->text().toStdString() ) )
-  if( !LayerManager::Instance()->get_layer_by_name( event->mimeData()->text().toStdString() ) )
+  this->enable_drop_space( false );
+  event->setAccepted( true );
+  
+  if( LayerManager::Instance()->get_layer_by_name( event->mimeData()->text().toStdString() )
+  && ( this->get_layer_name() != event->mimeData()->text().toStdString() ) )
   {
-    this->enable_drop_space( false );
-    event->ignore();
+    dynamic_cast< LayerWidget* >( event->source() )->set_drop_target( this ); 
+    event->setDropAction( Qt::MoveAction );
     return;
   }
-
-  dynamic_cast< LayerWidget* >( event->source() )->set_drop_target( this ); 
-  event->setDropAction( Qt::MoveAction );
-  event->accept();
-
+  
+  event->setDropAction( Qt::IgnoreAction );
 }
 
 void LayerWidget::dragEnterEvent( QDragEnterEvent* event)
 {
-  //std::string layer_id = event->mimeData()->text().toStdString();
   std::string layer_name = event->mimeData()->text().toStdString();
-
-//  if( ( LayerManager::Instance()->get_layer_by_id( layer_id ) ) 
-//    && ( this->get_layer_id() != layer_id ) )
   if( ( LayerManager::Instance()->get_layer_by_name( layer_name ) ) 
     && ( this->get_layer_name() != layer_name ) )
   {
     this->enable_drop_space( true );
-    event->setDropAction( Qt::MoveAction );
-    event->accept();
+/*    event->setDropAction( Qt::MoveAction );*/
   }
-  else {
-    this->enable_drop_space( false );
-    event->ignore();
-  }
+  event->setAccepted( true );
 }
 
 void LayerWidget::dragLeaveEvent( QDragLeaveEvent* event )
 {
   this->enable_drop_space( false );
-  event->accept();
-}
-
-void LayerWidget::seethrough( bool see )
-{
-  this->set_picked_up( see );
+  event->setAccepted( true );
 }
 
 void LayerWidget::set_picked_up( bool picked_up )

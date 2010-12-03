@@ -80,7 +80,7 @@ public:
 
   int group_height;
   LayerGroupWidget* drop_group_;
-  bool drop_group_set_;
+  //bool drop_group_set_;
 
   QButtonGroup* iso_quality_button_group_;
 };
@@ -97,7 +97,7 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   
   this->group_id_ = this->private_->group_->get_group_id();
   
-  this->private_->drop_group_set_ = false;
+  //this->private_->drop_group_set_ = false;
   
   // Set up the Drag and Drop
   this->setAcceptDrops( true );
@@ -212,15 +212,18 @@ LayerGroupWidget::~LayerGroupWidget()
 
 void LayerGroupWidget::mousePressEvent( QMouseEvent *event )
 {
-  // Exit immediately if they are no longer holding the button the press event isnt valid
-  if( event->button() != Qt::LeftButton )
+  // Exit immediately if they are no longer holding the button the press event isn't valid
+  if( ( event->button() != Qt::LeftButton )|| ( event->modifiers() != Qt::ShiftModifier ) )
   { 
+    event->setAccepted( true );
     return;
   }
 
   if( this->group_menus_open_ )
+  {
+    event->setAccepted( true );
     return;
-
+  }
   QPoint hotSpot = event->pos();
 
   // Make up some mimedata containing the layer_id of the layer
@@ -242,8 +245,8 @@ void LayerGroupWidget::mousePressEvent( QMouseEvent *event )
   Q_EMIT picked_up_group_size_signal_( this->height() - 2 );
   
   // If our drag was successful then we do stuff
-  if( ( ( drag->exec( Qt::MoveAction, Qt::MoveAction ) ) == Qt::MoveAction ) 
-    && ( this->private_->drop_group_set_ ) )
+  if( ( drag->exec( Qt::MoveAction, Qt::MoveAction ) ) == Qt::MoveAction ) 
+    //&& ( this->private_->drop_group_set_ ) )
   {
     ActionMoveGroupAbove::Dispatch( Core::Interface::GetWidgetActionContext(), 
       this->get_group_id(), this->private_->drop_group_->get_group_id() );
@@ -253,23 +256,23 @@ void LayerGroupWidget::mousePressEvent( QMouseEvent *event )
     this->seethrough( false );
   }
 
-  this->private_->drop_group_set_ = false;
+/*  this->private_->drop_group_set_ = false;*/
   this->enable_drop_space( false );
   this->private_->layer_to_drop_ = "";
   
   Q_EMIT prep_groups_for_drag_and_drop_signal_( false );
+  event->setAccepted( true );
 }
 
 void LayerGroupWidget::set_drop_target( LayerGroupWidget* target_group)
 {
   this->private_->drop_group_ = target_group;
-  this->private_->drop_group_set_ = true;
 }
 
 void LayerGroupWidget::dropEvent( QDropEvent* event )
 {
   this->enable_drop_space( false );
-  this->private_->button_overlay_->hide();
+  event->setAccepted( true );
   
   std::string drop_item_id = event->mimeData()->text().toStdString();
   
@@ -277,19 +280,17 @@ void LayerGroupWidget::dropEvent( QDropEvent* event )
   {
     dynamic_cast< LayerGroupWidget* >( event->source() )->set_drop_target( this ); 
     event->setDropAction( Qt::MoveAction );
-    event->accept();
     return;
+
   }
   else if ( LayerManager::Instance()->get_layer_by_name( drop_item_id ) )
   {
     ActionMoveLayerBelow::Dispatch( Core::Interface::GetWidgetActionContext(), 
       drop_item_id, this->get_group_id() );
     this->private_->layer_slot_->instant_hide();
-    event->setDropAction( Qt::MoveAction );
-    event->accept();
-    return;
   }
-  event->ignore();
+  
+  event->setDropAction( Qt::IgnoreAction );
 }
 
 void LayerGroupWidget::dragEnterEvent( QDragEnterEvent* event)
@@ -299,29 +300,24 @@ void LayerGroupWidget::dragEnterEvent( QDragEnterEvent* event)
   if( ( this->get_group_id() != drop_item_id ) && ( LayerManager::Instance()->get_layer_group( drop_item_id ) ) ) 
   {
     this->enable_drop_space( true );
-    event->setDropAction( Qt::MoveAction );
-    event->accept();
-    return;
   }
   else if ( ( LayerManager::Instance()->get_layer_by_name( drop_item_id ) ) && (
     ( this->private_->ui_.buttons_ == this->childAt( event->pos() ) ) || 
     ( this->private_->button_overlay_ == this->childAt( event->pos() ) ) ) )
   {
-    this->private_->layer_slot_->show();
+    CORE_LOG_DEBUG( "Entering the group with a layer" );
     this->private_->button_overlay_->show();
-    event->accept();
-    return;
+    this->private_->layer_slot_->show();
   }
 
-  this->enable_drop_space( false );
-  this->private_->button_overlay_->hide();
-  event->ignore();
-
+  event->setAccepted( true );
 }
 
 void LayerGroupWidget::dragLeaveEvent( QDragLeaveEvent* event )
 {
+  CORE_LOG_DEBUG( "Leaving the group" );
   this->enable_drop_space( false );
+  event->setAccepted( true );
 }
 
 void LayerGroupWidget::seethrough( bool see )
@@ -356,8 +352,8 @@ void LayerGroupWidget::enable_drop_space( bool drop )
   {
     this->private_->layer_slot_->hide();
     this->private_->drop_space_->hide();
+    this->private_->button_overlay_->hide();
     this->private_->overlay_->hide();
-    
   }
 } 
   
@@ -442,7 +438,18 @@ void LayerGroupWidget::resizeEvent( QResizeEvent *event )
 {
   this->private_->overlay_->resize( event->size() );
   this->private_->button_overlay_->resize( this->private_->ui_.widget->size() );
-  event->accept();
+  CORE_LOG_DEBUG( "overlay size - height: " + 
+    QString::number( this->private_->button_overlay_->size().height() ).toStdString() + " width: " + 
+    QString::number( this->private_->button_overlay_->size().width() ).toStdString());
+  if( this->private_->button_overlay_->isHidden() )
+  {
+    CORE_LOG_DEBUG( "button_overlay_ is hidden" );
+  }
+  else
+  {
+    CORE_LOG_DEBUG( "button_overlay_ is visible" );
+  }
+  event->setAccepted( true );
 }
   
 void LayerGroupWidget::prep_layers_for_drag_and_drop( bool move_time )
@@ -493,7 +500,7 @@ void LayerGroupWidget::handle_change()
     it != this->layer_map_.end(); ++it )
   {
     // we are also going to take the opportunity to turn off all the drag and drop settings
-    ( *it ).second->seethrough( false );
+    ( *it ).second->set_picked_up( false );
     ( *it ).second->instant_hide_drop_space();
     ( *it ).second->hide_overlay();
     if( this->private_->group_->show_delete_menu_state_->get() || 
