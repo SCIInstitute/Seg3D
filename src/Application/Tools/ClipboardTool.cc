@@ -72,6 +72,8 @@ void ClipboardToolPrivate::update_slice_numbers()
   {
     return;
   }
+
+  bool zero_based = PreferencesManager::Instance()->zero_based_slice_numbers_state_->get();
   
   Core::VolumeSliceType slice_type( Core::VolumeSliceType::AXIAL_E );
   std::string slice_type_str = this->tool_->slice_type_state_->get();
@@ -88,19 +90,21 @@ void ClipboardToolPrivate::update_slice_numbers()
     LayerManager::Instance()->get_layer_by_id( this->tool_->target_layer_state_->get() ) );
   Core::MaskVolumeSliceHandle vol_slice( new Core::MaskVolumeSlice( 
     layer->get_mask_volume(), slice_type ) );
-  this->tool_->copy_slice_number_state_->set_range( 1, static_cast< int >(
-    vol_slice->number_of_slices() ) );
-  this->tool_->paste_min_slice_number_state_->set_range( 1, static_cast< int >(
-    vol_slice->number_of_slices() ) );
-  this->tool_->paste_max_slice_number_state_->set_range( 1, static_cast< int >(
-    vol_slice->number_of_slices() ) );
+  int min_slice = zero_based ? 0 : 1;
+  int max_slice = static_cast< int >( vol_slice->number_of_slices() );
+  if ( zero_based ) max_slice -= 1;
+  this->tool_->copy_slice_number_state_->set_range( min_slice, max_slice );
+  this->tool_->paste_min_slice_number_state_->set_range( min_slice, max_slice );
+  this->tool_->paste_max_slice_number_state_->set_range( min_slice, max_slice );
 
   if ( this->tool_->use_active_viewer_state_->get() )
   {
     ViewerHandle viewer = ViewerManager::Instance()->get_active_viewer();
     if ( !viewer->is_volume_view() )
     {
-      this->tool_->copy_slice_number_state_->set( viewer->slice_number_state_->get() + 1 );
+      int slice_num = viewer->slice_number_state_->get();
+      if ( !zero_based )  slice_num += 1;
+      this->tool_->copy_slice_number_state_->set( slice_num );
     }
   }
 }
@@ -176,7 +180,11 @@ void ClipboardToolPrivate::handle_viewer_slice_changed( size_t viewer_id, int sl
     return;
   }
 
-  this->tool_->copy_slice_number_state_->set( slice_num + 1 );
+  if ( !PreferencesManager::Instance()->zero_based_slice_numbers_state_->get() )
+  {
+    slice_num += 1;
+  }
+  this->tool_->copy_slice_number_state_->set( slice_num );
 }
 
 void ClipboardToolPrivate::handle_use_active_viewer_changed( bool use_active_viewer )
@@ -232,6 +240,9 @@ ClipboardTool::ClipboardTool( const std::string& toolid ) :
   this->private_->update_slice_numbers();
   this->private_->handle_use_active_viewer_changed( true );
 
+  this->add_connection( PreferencesManager::Instance()->zero_based_slice_numbers_state_->
+    state_changed_signal_.connect( boost::bind( &ClipboardToolPrivate::update_slice_numbers,
+    this->private_ ) ) );
   this->add_connection( this->target_layer_state_->state_changed_signal_.connect(
     boost::bind( &ClipboardToolPrivate::update_slice_numbers, this->private_ ) ) );
   this->add_connection( this->slice_type_state_->state_changed_signal_.connect(
@@ -261,29 +272,53 @@ ClipboardTool::~ClipboardTool()
 
 void ClipboardTool::copy( Core::ActionContextHandle context )
 {
-  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+  // NOTE: Post to the application thread to avoid sync issues
+  if ( !Core::Application::IsApplicationThread() )
+  {
+    Core::Application::PostEvent( boost::bind( &ClipboardTool::copy, this, context ) );
+    return;
+  }
+  
   const std::string& layer_id = this->target_layer_state_->get();
   if ( layer_id == Tool::NONE_OPTION_C )
   {
     return;
   }
   
+  int slice_num = this->copy_slice_number_state_->get();
+  if ( !PreferencesManager::Instance()->zero_based_slice_numbers_state_->get() )
+  {
+    slice_num -= 1;
+  }
+  
   ActionCopy::Dispatch( context, layer_id, this->slice_type_state_->index(),
-    static_cast< size_t >( this->copy_slice_number_state_->get() - 1 ) );
+    static_cast< size_t >( slice_num ) );
 }
 
 void ClipboardTool::paste( Core::ActionContextHandle context )
 {
-  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+  // NOTE: Post to the application thread to avoid sync issues
+  if ( !Core::Application::IsApplicationThread() )
+  {
+    Core::Application::PostEvent( boost::bind( &ClipboardTool::paste, this, context ) );
+    return;
+  }
+
   const std::string& layer_id = this->target_layer_state_->get();
   if ( layer_id == Tool::NONE_OPTION_C )
   {
     return;
   }
 
+  int min_slice_num = this->paste_min_slice_number_state_->get();
+  int max_slice_num = this->paste_max_slice_number_state_->get();
+  if ( !PreferencesManager::Instance()->zero_based_slice_numbers_state_->get() )
+  {
+    min_slice_num -= 1;
+    max_slice_num -= 1;
+  }
   ActionPaste::Dispatch( context, layer_id, this->slice_type_state_->index(),
-    static_cast< size_t >( this->paste_min_slice_number_state_->get() - 1 ),
-    static_cast< size_t >( this->paste_max_slice_number_state_->get() - 1 ) );
+    static_cast< size_t >( min_slice_num ), static_cast< size_t >( max_slice_num ) );
 }
 
 void ClipboardTool::grab_min_paste_slice()
@@ -300,8 +335,13 @@ void ClipboardTool::grab_min_paste_slice()
     StatusBar::SetMessage( Core::LogMessageType::ERROR_E, "Active viewer not in 2D view." );
     return;
   }
-  
-  this->paste_min_slice_number_state_->set( viewer->slice_number_state_->get() + 1 );
+
+  int slice_num = viewer->slice_number_state_->get();
+  if ( !PreferencesManager::Instance()->zero_based_slice_numbers_state_->get() )
+  {
+    slice_num += 1;
+  }
+  this->paste_min_slice_number_state_->set( slice_num );
 }
 
 void ClipboardTool::grab_max_paste_slice()
@@ -319,7 +359,12 @@ void ClipboardTool::grab_max_paste_slice()
     return;
   }
 
-  this->paste_max_slice_number_state_->set( viewer->slice_number_state_->get() + 1 );
+  int slice_num = viewer->slice_number_state_->get();
+  if ( !PreferencesManager::Instance()->zero_based_slice_numbers_state_->get() )
+  {
+    slice_num += 1;
+  }
+  this->paste_max_slice_number_state_->set( slice_num );
 }
 
 } // end namespace Seg3D
