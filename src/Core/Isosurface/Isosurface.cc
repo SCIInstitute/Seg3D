@@ -342,6 +342,13 @@ public:
   // Parallelized isosurface computation algorithm 
   void parallel_compute_faces( int thread, int num_threads, boost::barrier& barrier );
 
+  // COMPUTE_CAP_FACES:
+  // Compute the "cap" faces at the boundary of the mask volume to handle the case where the 
+  // mask goes all the way to the boundary.  Otherwise, we end up with holes in the 
+  // isosurface at the boundary.  The cap faces are computed as separate geometry so that they can 
+  // be turned on/off independently from the rest of the isosurface.
+  void compute_cap_faces();
+
   // PARALLEL_COMPUTE_NORMALS:
   // Parallelized isosurface normal computation algorithm 
   void parallel_compute_normals( int thread, int num_threads,  boost::barrier& barrier );
@@ -1123,6 +1130,133 @@ void IsosurfacePrivate::parallel_compute_faces( int thread, int num_threads,
   }   
 
   barrier.wait();
+}
+
+/*
+Basic ideas:
+- Marching cubes:
+  - Each "cube" has a configuration of on/off nodes that can be represented as and 8-bit bitmask.
+    The bitmask can be used as an index into a 256 (2^8) entry lookup table of predefined, generic
+    facet combinations.
+  - A naive implementation of marching cubes would just process each cube 
+    independently and add all the faces (points and indices) for that cube.  The problem with this 
+    approach is that points end up in the points list multiple times (more GPU memory) and edges get 
+    evaluated multiple times (once for each cube they belong to, up to 4).  To avoid this we process edges 
+    one at a time by running through them horizontally and vertically.  For each edge that is split,
+    we add a point to the points list.  At this point we have a list of points as well as a generic facet
+    combination for each cube.  We want to build triangles.  What we need is a way to map the canonical edge indices in the facet 
+    combination to indices of actual points in the points list.  So while we are examining edges we 
+    build a translation table to keep track of what canonical index an split edge point belongs to for 
+    each adjacent cube.  For each cube we can look up the point index for each canonical index in that 
+    cube's facet combination.  This 2D array looks like 
+    cubes[cube_index][canonical_edge_index] = point_index.  
+  Size: cubes[num cubes][12 (edges per cube)]
+  We're translating this data:
+    cube type -> facet combo -> canonical edge index -> actual point index -> point
+  - Normally in marching cubes the edge points are interpolation between the vertex values, but for
+  for binary images we always place the edge points in the middle of the edge.
+- Isosurface capping
+  - Generating isosurface geometry for the 6 border faces of the volume is a 2D operation since each
+    of the 6 faces is a 2D image.  Therefore, instead of calling the elements "cubes," we call them 
+    "cells."
+  - We need a different facet combo type table for border faces.
+  - For border faces, both nodes and edges can potentially be added to the list of points.  This is 
+    because there would be edge points between the border faces and the imaginary outside padding, but
+    these points get clamped to the nodes on the border.  In fact, all border nodes that are "on" are
+    included as points because they are all adjacent to the imaginary padding that is "off."  This
+  means that the canonical point indices must include both nodes and edge points, amounting to 
+  8 canonical indices for a cell (4 nodes, 4 edge points).
+*/
+void IsosurfacePrivate::compute_cap_faces()
+{
+  // TODO Create lookup table for border cells.  Size = 2^4 = 16
+  // How are facet combos stored?
+  // type_table
+  // TODO Figure out how to handle x/y/z indices for border faces so that code doesn't have to
+  // be duplicated for each face
+    // x, y, z = 0
+    // x, y, z = nz - 1
+    // x, z, y = 0
+    // x, z, y = ny - 1
+    // y, z, x = 0
+    // y, z, x = nx - 1
+  // Solution A: have function that translates (i, j) to (x, y, z).  Try this first.
+  // Solution B (faster): Have (i, j, k) Vector offsets based on face.  Add at end of loops.
+
+  // Process 6 border faces independently.  A most this will duplicate volume edges nodes twice.
+  // For each of 6 border faces
+
+    // STEP 1: Find cell types
+
+    // Since each cell has 4 nodes, we only need a char to represent the type.  Only using bits
+    // 0 - 3.
+    // Create an array of type per index
+    // unsigned char cell_types[ num_cells = ( ni - 1 ) * ( nj - 1 ) ]
+    // Loop through all 2D cells 
+    // cell_index = 0;
+    // for( j = 0; j < nj - 1; j++ )
+      // for( i = 0; i < ni - 1; i++ )
+        // Build type
+        // char cell_type = 0;
+        // Check each of 4 nodes in cell to see if they are "on" on mask.  If so, turn on bit.
+        // Add the type to a vector of chars, one for each cell index
+        // cell_types[ cell_index ] = cell_type;
+        // cell_index++ 
+
+    // STEP 2: Add nodes to points list and translation table
+
+    // Create translation table (2D matrix storing indices into actual points vector)
+    // size_t point_trans_table[num cells = (nx - 1) * (ny - 1)][8 canonical indices (4 nodes, 4 edge points)]
+
+    // All border nodes that are "on" are included as points because they are all adjacent to 
+    // the imaginary padding that is "off." 
+    // Loop over i & j 
+      // Translate (i, j) to (x, y, z) for this face
+      // Look up mask value at (x, y, z)
+      // If mask value on
+        // Transform point by mask transform
+        // node_point = grid_transform.project( Point( x, y, z);
+        // Add node to the points list.
+        // this->points_.push_back( node_point );
+        // Add the relevant canonical coordinates to the translation table for adjacent cells.
+
+    // STEP 3: Find edge nodes, add to points list and translation table
+
+    // Check horizontal edges
+      // If edge is "split" (one endpoint node is on and the other is off)
+        // Transform point by mask transform
+        // edge_point = grid_transform.project( Point( x, y, z);
+        // Add edge to the points list.
+        // this->points_.push_back( edge_point );
+        // Add the relevant canonical coordinates to the translation table for adjacent cells.
+    // Check vertical edges
+      // If edge is "split" (one endpoint node is on and the other is off)
+        // Transform point by mask transform
+        // edge_point = grid_transform.project( Point( x, y, z);
+        // Add edge to the points list.
+        // this->points_.push_back( edge_point );
+        // Add the relevant canonical coordinates to the translation table for adjacent cells.
+
+    // STEP 4: Create face geometry (points + triangle indices)
+
+    // Add points list to existing vertex list
+    // For each cell
+    // for( cell_index = 0; cell_index < ( ni - 1 ) * ( nj - 1 ); cell_index++ )
+      // Lookup cell type (already stored in a 1D vector)
+      // unsigned char cell_type = cell_types[ cell_index ];
+      
+      // Couldn't I just look up type on the fly here?  Or does that make parallelization harder?
+      // Look up the facet combo for this type
+      // tesselation = type_table[ cell_type ]
+      // For each face in the facet combo for this type
+      // OR For each triangle in the tesselation for this type
+      // for( triangle_index = 0; triangle_index < test.num_tri_; triangle_index++ )
+        // For each canonical index in the face
+          // Look up the point index in the translation table for this cell 
+          // point_index = point_trans_table[ cell_index ][ canonical index ]
+          // Add this point index to the faces list
+          // this->faces_.push_back( point_index );
+  
 }
 
 void IsosurfacePrivate::parallel_compute_normals( int thread, int num_threads, 
