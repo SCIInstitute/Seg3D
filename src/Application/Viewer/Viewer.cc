@@ -1126,7 +1126,7 @@ bool Viewer::wheel_event( int delta, int x, int y, int buttons, int modifiers )
   return true;
 }
 
-bool Viewer::key_press_event( int key, int modifiers )
+bool Viewer::key_press_event( int key, int modifiers, int x, int y )
 {
   if ( !this->private_->key_press_event_handler_.empty() )
   {
@@ -1135,7 +1135,9 @@ bool Viewer::key_press_event( int key, int modifiers )
       return true;
     }
   }
-
+  
+  bool handled_successfully = false;
+  
   if ( ( modifiers == Core::KeyModifier::SHIFT_MODIFIER_E ) || 
      ( modifiers == Core::KeyModifier::NO_MODIFIER_E ) || 
      ( key == Core::Key::KEY_LEFT_E ) || ( key == Core::Key::KEY_RIGHT_E ) ||
@@ -1162,7 +1164,8 @@ bool Viewer::key_press_event( int key, int modifiers )
           ActionOffsetSlice::Dispatch( Core::Interface::GetKeyboardActionContext(),
             this->shared_from_this(), -direction );
         }
-        return true;    
+        handled_successfully = true;
+        break;    
       }
       case Core::Key::KEY_GREATER_E:
       case Core::Key::KEY_PERIOD_E:
@@ -1183,33 +1186,38 @@ bool Viewer::key_press_event( int key, int modifiers )
           ActionOffsetSlice::Dispatch( Core::Interface::GetKeyboardActionContext(),
             this->shared_from_this(), direction );
         }
-        return true;
+        handled_successfully = true;
+        break;
       }
         
       case Core::Key::KEY_LEFT_E:
       {
         ActionActivatePreviousLayer::Dispatch( Core::Interface::GetKeyboardActionContext() );
-        return true;
+        handled_successfully = true;
+        break;
       }
         
       case Core::Key::KEY_RIGHT_E:
       {
         ActionActivateNextLayer::Dispatch( Core::Interface::GetKeyboardActionContext() );
-        return true;
+        handled_successfully = true;
+        break;
       }
     
       case Core::Key::KEY_G_E:
       {
         Core::ActionToggle::Dispatch( Core::Interface::GetKeyboardActionContext(),
           this->slice_grid_state_ );
-        return true;
+        handled_successfully = true;
+        break;
       }
     
       case Core::Key::KEY_L_E:
       {
         Core::ActionToggle::Dispatch( Core::Interface::GetKeyboardActionContext(),
           this->lock_state_ );
-        return true;
+        handled_successfully = true;
+        break;
       }
     
       case Core::Key::KEY_S_E:
@@ -1227,35 +1235,40 @@ bool Viewer::key_press_event( int key, int modifiers )
           Core::ActionToggle::Dispatch( Core::Interface::GetKeyboardActionContext(),
             this->slice_visible_state_ );   
         }
-        return true;
+        handled_successfully = true;
+        break;
       }
-    
+      
       case Core::Key::KEY_T_E:
       {
         Core::ActionToggle::Dispatch( Core::Interface::GetKeyboardActionContext(),
           this->overlay_visible_state_ );   
-        return true;
+        handled_successfully = true;
+        break;
       }
 
       case Core::Key::KEY_I_E:
       {
         Core::ActionToggle::Dispatch( Core::Interface::GetKeyboardActionContext(),
           this->volume_isosurfaces_visible_state_ );    
-        return true;
+        handled_successfully = true;
+        break;
       }
 
       case Core::Key::KEY_H_E:
       {
         Core::ActionToggle::Dispatch( Core::Interface::GetKeyboardActionContext(),
           this->volume_light_visible_state_ );    
-        return true;
+        handled_successfully = true;
+        break;
       }
 
       case Core::Key::KEY_P_E:
       {
         Core::ActionToggle::Dispatch( Core::Interface::GetKeyboardActionContext(),
           this->slice_picking_visible_state_ );   
-        return true;
+        handled_successfully = true;
+        break;
       }
 
       case Core::Key::KEY_0_E:
@@ -1263,7 +1276,8 @@ bool Viewer::key_press_event( int key, int modifiers )
       {
         ActionAutoView::Dispatch( Core::Interface::GetKeyboardActionContext(), 
           this->get_viewer_id() );  
-        return true;
+        handled_successfully = true;
+        break;
       }
         
       case Core::Key::KEY_SPACE_E:
@@ -1277,37 +1291,49 @@ bool Viewer::key_press_event( int key, int modifiers )
               layer->master_visible_state_ );
           }
         }
-        return true;
+        handled_successfully = true;
+        break;
       }
 
       case Core::Key::KEY_V_E:
       {
         Core::ActionSet::Dispatch( Core::Interface::GetKeyboardActionContext(), 
           this->view_mode_state_, Viewer::VOLUME_C ); 
-        return true;
+        handled_successfully = true;
+        break;
       }
 
       case Core::Key::KEY_X_E:
       {
         Core::ActionSet::Dispatch( Core::Interface::GetKeyboardActionContext(), 
           this->view_mode_state_, Viewer::SAGITTAL_C ); 
-        return true;
+        handled_successfully = true;
+        break;
       }
 
       case Core::Key::KEY_Y_E:
       {
         Core::ActionSet::Dispatch( Core::Interface::GetKeyboardActionContext(), 
           this->view_mode_state_, Viewer::CORONAL_C );  
-        return true;
+        handled_successfully = true;
+        break;
       }     
 
       case Core::Key::KEY_Z_E:
       {
         Core::ActionSet::Dispatch( Core::Interface::GetKeyboardActionContext(), 
           this->view_mode_state_, Viewer::AXIAL_C );  
-        return true;
-      }     
+        handled_successfully = true;
+        break;
+      }       
     }
+    
+    if( handled_successfully ) 
+    {
+      this->update_status_bar( x, y );
+      return true;
+    }
+    
   }
       
   // function wasn't handled, hence return false.

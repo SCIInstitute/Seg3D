@@ -81,9 +81,6 @@ AppStatusBar::AppStatusBar( QMainWindow* parent ) :
   connect( this->private_->ui_.swap_visibility_button_, 
     SIGNAL( clicked() ), this, SLOT( swap_bars() ) );
     
-//  QtUtils::QtBridge::Connect( this->private_->ui_.info_button_, boost::bind( &ActionShowWindow::Dispatch, 
-//    Core::Interface::GetWidgetActionContext(), std::string( "history_widget" ) ) );
-    
   QtUtils::QtBridge::Connect( this->private_->ui_.info_button_, 
     InterfaceManager::Instance()->message_window_visibility_state_ );
   

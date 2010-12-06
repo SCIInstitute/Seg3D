@@ -32,6 +32,9 @@
 // Glew includes
 #include <GL/glew.h>
 
+// Qt includes
+
+
 // Core includes
 #include <Core/Interface/Interface.h>
 #include <Core/State/Actions/ActionSet.h>
@@ -292,8 +295,12 @@ void QtRenderWidget::wheelEvent( QWheelEvent* event )
 void QtRenderWidget::keyPressEvent( QKeyEvent* event )
 {
   this->activate_signal_();
-
-  if ( this->private_->viewer_->key_press_event( event->key(), event->modifiers() ) )
+  
+  QPoint cursor_pos = this->mapFromGlobal( QCursor::pos() );
+  int x = cursor_pos.x();
+  int y = cursor_pos.y();
+  
+  if ( this->private_->viewer_->key_press_event( event->key(), event->modifiers(), x, y ) )
   {
   }
   else

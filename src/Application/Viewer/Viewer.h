@@ -94,7 +94,7 @@ public:
   virtual void mouse_leave_event();
   virtual bool wheel_event( int delta, int x, int y, int buttons, int modifiers );
 
-  virtual bool key_press_event( int key, int modifiers );
+  virtual bool key_press_event( int key, int modifiers, int x, int y );
 
   void set_mouse_move_handler( mouse_event_handler_type func );
   void set_mouse_press_handler( mouse_event_handler_type func );

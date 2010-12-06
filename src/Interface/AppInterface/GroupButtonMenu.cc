@@ -89,19 +89,23 @@ GroupButtonMenu::GroupButtonMenu( QWidget* parent, LayerGroupHandle group ) :
   // used to connect the buttons directly to a state variable.
   this->private_->iso_quality_button_group_ = new QButtonGroup( this );
   this->private_->iso_quality_button_group_->setExclusive( true );
-  this->private_->iso_quality_button_group_->addButton( this->private_->ui_.radioButton_1_point_0 );
-  this->private_->iso_quality_button_group_->addButton( this->private_->ui_.radioButton_point_5 );
-  this->private_->iso_quality_button_group_->addButton( this->private_->ui_.radioButton_point_25 );
-  this->private_->iso_quality_button_group_->addButton( this->private_->ui_.radioButton_point_125 );
+  this->private_->iso_quality_button_group_->addButton( 
+    this->private_->ui_.radioButton_1_point_0 );
+  this->private_->iso_quality_button_group_->addButton( 
+    this->private_->ui_.radioButton_point_5 );
+  this->private_->iso_quality_button_group_->addButton( 
+    this->private_->ui_.radioButton_point_25 );
+  this->private_->iso_quality_button_group_->addButton( 
+    this->private_->ui_.radioButton_point_125 );
 
-  connect( this->private_->ui_.delete_button_, SIGNAL( clicked() ), this, 
-    SIGNAL( delete_pressed() ) );
-  connect( this->private_->ui_.duplicate_button_, SIGNAL( clicked() ), this,
-    SIGNAL( duplicate_pressed() ) );
-  connect( this->private_->ui_.select_all_button_, SIGNAL( toggled( bool ) ), this, 
-    SIGNAL( delete_select_all_pressed( bool ) ) );
-  connect( this->private_->ui_.select_all_for_duplication_button_, SIGNAL( toggled( bool ) ), this, 
-    SIGNAL( duplicate_select_all_pressed( bool ) ) );
+  connect( this->private_->ui_.delete_button_, SIGNAL( clicked() ),
+    this, SIGNAL( delete_pressed() ) );
+  connect( this->private_->ui_.duplicate_button_, SIGNAL( clicked() ),
+    this, SIGNAL( duplicate_pressed() ) );
+  connect( this->private_->ui_.select_all_button_, SIGNAL( toggled( bool ) ),
+    this, SIGNAL( delete_select_all_pressed( bool ) ) );
+  connect( this->private_->ui_.select_all_for_duplication_button_, SIGNAL( toggled( bool ) ),
+    this, SIGNAL( duplicate_select_all_pressed( bool ) ) );
 
   //Set the default values for the Group UI and make the connections to the state engine
       // --- GENERAL ---
@@ -114,7 +118,8 @@ GroupButtonMenu::GroupButtonMenu( QWidget* parent, LayerGroupHandle group ) :
 
   QtUtils::QtBridge::Show( this->private_->ui_.iso_quality_, group->show_iso_menu_state_ ); 
   QtUtils::QtBridge::Show( this->private_->ui_.delete_, group->show_delete_menu_state_ );
-  QtUtils::QtBridge::Show( this->private_->ui_.duplicate_layers_, group->show_duplicate_menu_state_ );
+  QtUtils::QtBridge::Show( this->private_->ui_.duplicate_layers_,
+    group->show_duplicate_menu_state_ );
   
   QtUtils::QtBridge::Connect( this->private_->ui_.group_new_mask_button_, 
     boost::bind( &ActionNewMaskLayer::Dispatch, 
@@ -198,7 +203,8 @@ void GroupButtonMenu::prep_for_animation( bool move_time )
   {
     this->private_->ui_.facade_->setMinimumHeight( this->private_->ui_.group_tools_->height() );
     this->private_->ui_.facade_->setMinimumWidth( this->private_->ui_.group_tools_->width() );
-    this->private_->ui_.facade_->setPixmap( QPixmap::grabWidget( this->private_->ui_.group_tools_ ) );
+    this->private_->ui_.facade_->setPixmap( 
+      QPixmap::grabWidget( this->private_->ui_.group_tools_ ) );
     this->private_->ui_.group_tools_->hide();
     this->private_->ui_.facade_->show();
   }

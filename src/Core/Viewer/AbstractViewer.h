@@ -101,7 +101,7 @@ public:
 
   // KEY_EVENT:
   // This function is called when a key is pressed while hovering over the render widget
-  virtual bool key_press_event( int key, int modifiers );
+  virtual bool key_press_event( int key, int modifiers, int x, int y );
 
   // RESIZE:
   // This function is called when the viewer is resized by the render widget.

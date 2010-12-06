@@ -264,12 +264,18 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
       layer->master_visible_state_ );
       
     // Connect the visibility buttons in the advanced viewer menu to their respective state 
-    QtUtils::QtBridge::Connect( this->private_->ui_.viewer_0_button_, layer->visible_state_[ 0 ] );
-    QtUtils::QtBridge::Connect( this->private_->ui_.viewer_1_button_, layer->visible_state_[ 1 ] );
-    QtUtils::QtBridge::Connect( this->private_->ui_.viewer_2_button_, layer->visible_state_[ 2 ] );
-    QtUtils::QtBridge::Connect( this->private_->ui_.viewer_3_button_, layer->visible_state_[ 3 ] );
-    QtUtils::QtBridge::Connect( this->private_->ui_.viewer_4_button_, layer->visible_state_[ 4 ] );
-    QtUtils::QtBridge::Connect( this->private_->ui_.viewer_5_button_, layer->visible_state_[ 5 ] );
+    QtUtils::QtBridge::Connect( this->private_->ui_.viewer_0_button_, 
+      layer->visible_state_[ 0 ] );
+    QtUtils::QtBridge::Connect( this->private_->ui_.viewer_1_button_,
+      layer->visible_state_[ 1 ] );
+    QtUtils::QtBridge::Connect( this->private_->ui_.viewer_2_button_,
+      layer->visible_state_[ 2 ] );
+    QtUtils::QtBridge::Connect( this->private_->ui_.viewer_3_button_,
+      layer->visible_state_[ 3 ] );
+    QtUtils::QtBridge::Connect( this->private_->ui_.viewer_4_button_, 
+      layer->visible_state_[ 4 ] );
+    QtUtils::QtBridge::Connect( this->private_->ui_.viewer_5_button_,
+      layer->visible_state_[ 5 ] );
 
     // Connect the opacity state to its state variable
     QtUtils::QtBridge::Connect( this->private_->ui_.opacity_adjuster_, layer->opacity_state_ );
@@ -712,9 +718,12 @@ void LayerWidget::set_mask_background_color( int color_index )
 
 void LayerWidget::set_mask_background_color_from_preference_change( int color_index )
 {
-  if( dynamic_cast< MaskLayer* >( this->private_->layer_.get()  )->color_state_->get() != color_index )
+  if( dynamic_cast< MaskLayer* >( this->private_->layer_.get()  )->color_state_->get() != 
+    color_index )
+  {
     return;
-
+  }
+  
   Core::Color color = PreferencesManager::Instance()->color_states_[ color_index ]->get();
 
   int r = static_cast< int >( color.r() );
@@ -940,7 +949,8 @@ void LayerWidget::prep_for_animation( bool move_time )
   {
     this->private_->ui_.facade_widget_->setMinimumHeight( this->private_->ui_.base_->height() );
     this->private_->ui_.facade_widget_->setMinimumWidth( this->private_->ui_.base_->width() );
-    this->private_->ui_.facade_widget_->setPixmap( QPixmap::grabWidget( this->private_->ui_.base_ ) );
+    this->private_->ui_.facade_widget_->setPixmap( 
+      QPixmap::grabWidget( this->private_->ui_.base_ ) );
     this->private_->ui_.base_->hide();
     this->private_->ui_.facade_widget_->show();
   }
@@ -1011,7 +1021,8 @@ void LayerWidget::UpdateState( qpointer_type qpointer )
   // Hand it off to the right thread
   if( !( Core::Interface::IsInterfaceThread() ) )
   {
-    Core::Interface::Instance()->post_event( boost::bind( &LayerWidget::UpdateState, qpointer) );
+    Core::Interface::Instance()->post_event( 
+      boost::bind( &LayerWidget::UpdateState, qpointer) );
     return; 
   }
 
@@ -1069,7 +1080,8 @@ bool LayerWidget::get_selected() const
 
 void LayerWidget::activate_from_lineedit_focus()
 {
-  ActionActivateLayer::Dispatch( Core::Interface::GetWidgetActionContext(), this->private_->layer_ ) ;
+  ActionActivateLayer::Dispatch( Core::Interface::GetWidgetActionContext(), 
+    this->private_->layer_ ) ;
 }
 
 void LayerWidget::contextMenuEvent( QContextMenuEvent * event )
@@ -1115,7 +1127,8 @@ void LayerWidget::export_data()
     QString::fromStdString( PreferencesManager::Instance()->export_path_state_->get() ),
     "NRRD files (*.nrrd);;DICOM files (*.dcm)" );
 
-  if( boost::filesystem::exists( boost::filesystem::path( filename.toStdString() ).parent_path() ) )
+  if( boost::filesystem::exists( boost::filesystem::path( 
+    filename.toStdString() ).parent_path() ) )
   {
     Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
       PreferencesManager::Instance()->export_path_state_, 
@@ -1131,7 +1144,8 @@ void LayerWidget::set_iso_surface_visibility( bool visibility )
 {
   if( this->private_->layer_->get_type() == Core::VolumeType::MASK_E )
   { 
-    MaskLayerHandle mask_layer = boost::dynamic_pointer_cast< MaskLayer >( this->private_->layer_ );
+    MaskLayerHandle mask_layer = boost::dynamic_pointer_cast< MaskLayer >( 
+      this->private_->layer_ );
     if( mask_layer->iso_generated_state_->get() )
     {
       this->private_->ui_.show_iso_surface_button_->setChecked( visibility );

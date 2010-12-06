@@ -157,7 +157,7 @@ bool AbstractViewer::wheel_event( int delta, int x, int y, int buttons, int modi
   return false;
 }
 
-bool AbstractViewer::key_press_event( int key, int modifiers )
+bool AbstractViewer::key_press_event( int key, int modifiers, int x, int y )
 {
   // do nothing
   return false;
