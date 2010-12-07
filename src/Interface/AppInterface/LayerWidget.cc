@@ -35,6 +35,7 @@
 #include <QtGui/QMessageBox>
 #include <QtGui/QMenu>
 #include <QtGui/QFileDialog>
+#include <QtGui/QBitmap>
 
 //Core Includes - for logging
 #include <Core/Utils/Log.h>
@@ -127,6 +128,11 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   QWidget( parent ),
   private_( new LayerWidgetPrivate )
 {
+  
+  this->setAttribute( Qt::WA_TranslucentBackground, true );
+  
+  
+  
   // Store the layer in the private class
   this->private_->layer_ = layer;
   this->private_->layer_menus_open_ = false;
@@ -147,7 +153,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
 
   // Update the style sheet of this widget
   this->setObjectName( QString::fromUtf8( "LayerWidget" ) );
-  this->setStyleSheet( StyleSheet::LAYERWIDGET_C );
+  this->setAutoFillBackground( true );
 
   // Add the Ui children onto the QWidget
   this->private_->ui_.setupUi( this );
@@ -620,27 +626,35 @@ void LayerWidget::update_appearance( bool locked, bool active, bool in_use, bool
   if ( locked )
   {
     this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_LOCKED_C );
-    this->private_->ui_.label_->setStyleSheet( StyleSheet::LAYER_WIDGET_LABEL_LOCKED_C ); 
+    //this->private_->ui_.label_->setStyleSheet( StyleSheet::LAYER_WIDGET_LABEL_LOCKED_C ); 
   }
   else if( active && !in_use )
   {
     this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_ACTIVE_C );  
-    this->private_->ui_.label_->setStyleSheet( StyleSheet::LAYER_WIDGET_LABEL_ACTIVE_C );
+    //this->private_->ui_.label_->setStyleSheet( StyleSheet::LAYER_WIDGET_LABEL_ACTIVE_C );
+    if( this->private_->layer_->gui_state_group_->get_enabled() )
+      this->private_->ui_.header_->setStyleSheet( StyleSheet::LAYER_WIDGET_HEADER_ACTIVE_C );
   }
   else if( active && in_use )
   {
     this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_ACTIVE_IN_USE_C );  
-    this->private_->ui_.label_->setStyleSheet( StyleSheet::LAYER_WIDGET_LABEL_ACTIVE_IN_USE_C );
+    //this->private_->ui_.label_->setStyleSheet( StyleSheet::LAYER_WIDGET_LABEL_ACTIVE_IN_USE_C );
+    if( this->private_->layer_->gui_state_group_->get_enabled() )
+      this->private_->ui_.header_->setStyleSheet( StyleSheet::LAYER_WIDGET_HEADER_ACTIVE_IN_USE_C );
   }
   else if ( in_use )
   {
     this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_IN_USE_C );  
-    this->private_->ui_.label_->setStyleSheet( StyleSheet::LAYER_WIDGET_LABEL_IN_USE_C ); 
+    //this->private_->ui_.label_->setStyleSheet( StyleSheet::LAYER_WIDGET_LABEL_IN_USE_C );
+    if( this->private_->layer_->gui_state_group_->get_enabled() )
+      this->private_->ui_.header_->setStyleSheet( StyleSheet::LAYER_WIDGET_HEADER_IN_USE_C );
   }
   else
   {
     this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_INACTIVE_C );
-    this->private_->ui_.label_->setStyleSheet( StyleSheet::LAYER_WIDGET_LABEL_INACTIVE_C );
+    //this->private_->ui_.label_->setStyleSheet( StyleSheet::LAYER_WIDGET_LABEL_INACTIVE_C );
+    if( this->private_->layer_->gui_state_group_->get_enabled() )
+      this->private_->ui_.header_->setStyleSheet( StyleSheet::LAYER_WIDGET_HEADER_INACTIVE_C );
   }
 }
 
@@ -785,7 +799,6 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
   QMimeData *mimeData = new QMimeData;
 
   LayerHandle layer = this->private_->layer_;
-  //mimeData->setText( QString::fromStdString( layer->get_layer_id() ) );
   mimeData->setText( QString::fromStdString( layer->get_layer_name() ) );
   
   // Create a drag object and insert the hotspot
@@ -793,7 +806,10 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
   drag->setMimeData( mimeData );
   
   // here we add basically a screenshot of the widget
-  drag->setPixmap( QPixmap::grabWidget( this ));
+  QImage temp_image( this->private_->ui_.base_->size(), QImage::Format_ARGB32 );
+  temp_image.fill( 0 );
+  this->private_->ui_.base_->render( &temp_image, QPoint(), this->private_->ui_.base_->rect(), QWidget::DrawChildren );
+  drag->setPixmap( QPixmap::fromImage( temp_image ) );
   drag->setHotSpot( hotSpot );
 
   // Next we hide the LayerWidget that we are going to be dragging.
@@ -876,7 +892,6 @@ void LayerWidget::dragEnterEvent( QDragEnterEvent* event)
     && ( this->get_layer_name() != layer_name ) )
   {
     this->enable_drop_space( true );
-/*    event->setDropAction( Qt::MoveAction );*/
   }
   event->setAccepted( true );
 }
@@ -945,12 +960,20 @@ void LayerWidget::resizeEvent( QResizeEvent *event )
 
 void LayerWidget::prep_for_animation( bool move_time )
 {
+  if( this->private_->picked_up_ )
+    return;
+  
+  //this->setUpdatesEnabled( false );
+  
   if( move_time )
   {
-    this->private_->ui_.facade_widget_->setMinimumHeight( this->private_->ui_.base_->height() );
-    this->private_->ui_.facade_widget_->setMinimumWidth( this->private_->ui_.base_->width() );
-    this->private_->ui_.facade_widget_->setPixmap( 
-      QPixmap::grabWidget( this->private_->ui_.base_ ) );
+    this->private_->ui_.facade_widget_->setMinimumSize( this->private_->ui_.base_->size() );
+    
+    //QImage temp_image( this->private_->ui_.base_->size(), QImage::Format_ARGB32 );
+//    temp_image.fill( 0 );
+//    this->private_->ui_.base_->render( &temp_image, QPoint(), this->private_->ui_.base_->rect(), QWidget::DrawChildren );
+    
+    this->private_->ui_.facade_widget_->setPixmap( QPixmap::grabWidget( this ) );
     this->private_->ui_.base_->hide();
     this->private_->ui_.facade_widget_->show();
   }
@@ -958,7 +981,9 @@ void LayerWidget::prep_for_animation( bool move_time )
   {
     this->private_->ui_.facade_widget_->hide();
     this->private_->ui_.base_->show();
-  } 
+  }
+  
+  //this->setUpdatesEnabled( true );
 }
 
 void LayerWidget::instant_hide_drop_space()

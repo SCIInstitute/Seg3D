@@ -213,14 +213,8 @@ private:
   template< class PixelType, class ItkImporterType >
   bool import_simple_volume()
   {
-//    const unsigned int dimension = 3;
-//    typedef itk::Image< PixelType, dimension > ImageType;
-
     typedef itk::ImageFileReader< itk::Image< PixelType, 3 > > ReaderType;
     typename ReaderType::Pointer reader = ReaderType::New();
-
-//    typedef itk::ImageSeriesReader< ImageType > ReaderType;
-//    typename ReaderType::Pointer reader = ReaderType::New();
 
     typedef ItkImporterType ImageIOType;
     typename ImageIOType::Pointer IO = ImageIOType::New();

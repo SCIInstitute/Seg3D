@@ -41,6 +41,7 @@
 #include <Application/Layer/MaskLayer.h>
 #include <Application/Layer/LayerGroup.h>
 #include <Application/ViewerManager/ViewerManager.h>
+#include <Application/LayerManager/Actions/ActionComputeIsosurface.h>
 
 
 namespace Seg3D
@@ -458,6 +459,21 @@ bool LayerGroup::post_load_states( const Core::StateIO& state_io )
         this->grid_transform_ = layer->get_grid_transform();
       }
       this->insert_layer( layer );
+      
+      // Here we do any post loading processing that requires both the group and layer info
+      
+      // Now, if the mask had its ISO surface generated we dispatch an action to do it again
+      if( layer_type == "mask" ) 
+      {
+        MaskLayerHandle temp_mask_handle = boost::dynamic_pointer_cast< MaskLayer >( layer );
+        if( temp_mask_handle->iso_generated_state_->get() ) 
+        {
+          double quality = 1.0;
+          Core::ImportFromString( this->isosurface_quality_state_->get(), quality );
+          ActionComputeIsosurface::Dispatch( Core::Interface::GetWidgetActionContext(), 
+            temp_mask_handle, quality );
+        }
+      }
     }
     else
     {

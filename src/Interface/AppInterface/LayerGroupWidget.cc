@@ -67,7 +67,7 @@ namespace Seg3D
 class LayerGroupWidgetPrivate
 {
 public:
-  LayerGroupHandle group_;
+//  LayerGroupHandle group_;
   Ui::LayerGroupWidget ui_;
   DropSpaceWidget* drop_space_;
   OverlayWidget* overlay_;
@@ -86,7 +86,6 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   QWidget( parent ),
   private_( new LayerGroupWidgetPrivate )
 { 
-    this->private_->group_ = group;
   this->private_->ui_.setupUi( this );
   this->private_->group_id_ = group->get_group_id();
   this->private_->group_menus_open_ = false;
@@ -99,9 +98,9 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
 
   // set some values of the GUI
   std::string group_name = Core::ExportToString( 
-    this->private_->group_->get_grid_transform().get_nx() ) + " x " +
-    Core::ExportToString( this->private_->group_->get_grid_transform().get_ny() ) + " x " +
-    Core::ExportToString( this->private_->group_->get_grid_transform().get_nz() );
+    group->get_grid_transform().get_nx() ) + " x " +
+    Core::ExportToString( group->get_grid_transform().get_ny() ) + " x " +
+    Core::ExportToString( group->get_grid_transform().get_nz() );
   this->private_->ui_.group_dimensions_label_->setText( QString::fromStdString( group_name ) );
 
   this->private_->drop_space_ = new DropSpaceWidget( this, 105 );
@@ -113,16 +112,16 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
     SLOT( show_layers( bool )) );
   
   QtUtils::QtBridge::Connect( this->private_->ui_.open_button_, 
-    this->private_->group_->group_widget_expanded_state_ );
+    group->group_widget_expanded_state_ );
   
   connect( this->private_->button_menu_, SIGNAL( delete_pressed() ), this, 
     SLOT( verify_delete() ) );
   connect( this->private_->button_menu_, SIGNAL( duplicate_pressed() ), this,
     SLOT( duplicate_checked_layers() ) );
   connect( this->private_->button_menu_, SIGNAL( duplicate_select_all_pressed( bool ) ), this, 
-    SLOT( check_uncheck_for_delete() ) );
+    SLOT( check_uncheck_for_delete( bool ) ) );
   connect( this->private_->button_menu_, SIGNAL( delete_select_all_pressed( bool ) ), this, 
-    SLOT( check_uncheck_for_duplicate() ) );
+    SLOT( check_uncheck_for_duplicate( bool ) ) );
   
   connect( this->private_->ui_.group_iso_visibility_button_, SIGNAL( toggled( bool ) ), this, 
     SLOT( set_iso_surface_visibility( bool )) );
@@ -185,7 +184,10 @@ void LayerGroupWidget::mousePressEvent( QMouseEvent *event )
   drag->setMimeData( mimeData );
 
   // here we add basically a screenshot of the widget
-  drag->setPixmap( QPixmap::grabWidget( this ));
+  QImage temp_image( this->private_->ui_.base_->size(), QImage::Format_ARGB32 );
+  temp_image.fill( 0 );
+  this->private_->ui_.base_->render( &temp_image, QPoint(), this->private_->ui_.base_->rect(), QWidget::DrawChildren );
+  drag->setPixmap( QPixmap::fromImage( temp_image ) );
   drag->setHotSpot( hotSpot );
 
   // Next we hide the LayerWidget that we are going to be dragging.
@@ -196,7 +198,6 @@ void LayerGroupWidget::mousePressEvent( QMouseEvent *event )
   
   // If our drag was successful then we do stuff
   if( ( drag->exec( Qt::MoveAction, Qt::MoveAction ) ) == Qt::MoveAction ) 
-    //&& ( this->private_->drop_group_set_ ) )
   {
     ActionMoveGroupAbove::Dispatch( Core::Interface::GetWidgetActionContext(), 
       this->get_group_id(), this->private_->drop_group_->get_group_id() );
@@ -206,7 +207,6 @@ void LayerGroupWidget::mousePressEvent( QMouseEvent *event )
     this->seethrough( false );
   }
 
-/*  this->private_->drop_group_set_ = false;*/
   this->enable_drop_space( false );
   this->private_->layer_to_drop_ = "";
   
@@ -261,11 +261,11 @@ void LayerGroupWidget::seethrough( bool see )
 
   if( see )
   {
-    this->hide();
+    this->private_->ui_.base_->hide();
   }
   else
   { 
-    this->show();
+    this->private_->ui_.base_->show();
   }
 }
 
@@ -320,7 +320,8 @@ void LayerGroupWidget::verify_delete()
   if( ret == QMessageBox::Yes )
   {
     ActionDeleteLayers::Dispatch( Core::Interface::GetWidgetActionContext(), 
-      this->private_->group_ );
+      LayerManager::Instance()->FindLayerGroup( this->private_->group_id_ ) );
+    
     this->private_->button_menu_->uncheck_delete_menu_button();
     this->private_->button_menu_->uncheck_delete_button();
   }
@@ -360,11 +361,13 @@ void LayerGroupWidget::show_group()
 {
   this->private_->ui_.fake_widget_->hide();
   this->private_->ui_.tools_and_layers_widget_->show();
+  this->private_->ui_.group_background_->setStyleSheet( StyleSheet::GROUP_WIDGET_BACKGROUND_ACTIVE_C );
 }
 
 void LayerGroupWidget::hide_group()
 {
   this->private_->ui_.fake_widget_->hide();
+  this->private_->ui_.group_background_->setStyleSheet( StyleSheet::GROUP_WIDGET_BACKGROUND_INACTIVE_C );
 }
   
 void LayerGroupWidget::resizeEvent( QResizeEvent *event )
@@ -387,11 +390,16 @@ void LayerGroupWidget::prep_for_animation( bool move_time )
   if( this->private_->picked_up_ )
     return;
   
+  //this->setUpdatesEnabled( false );
+  
   if( move_time )
   {
-    this->private_->ui_.group_dummy_->setMinimumHeight( this->private_->ui_.base_->height() );
-    this->private_->ui_.group_dummy_->setMinimumWidth( this->private_->ui_.base_->width() );
-    this->private_->ui_.group_dummy_->setPixmap( QPixmap::grabWidget( this->private_->ui_.base_ ) );
+    this->private_->ui_.group_dummy_->setMinimumSize( this->private_->ui_.base_->size() );
+    QImage temp_image( this->private_->ui_.base_->size(), QImage::Format_ARGB32 );
+    temp_image.fill( 0 );
+    this->private_->ui_.base_->render( &temp_image, QPoint(), this->private_->ui_.base_->rect(), QWidget::DrawChildren );
+    this->private_->ui_.group_dummy_->setPixmap( QPixmap::fromImage( temp_image ) );
+    
     this->private_->ui_.base_->hide();
     this->private_->ui_.group_dummy_->show();
   }
@@ -400,6 +408,8 @@ void LayerGroupWidget::prep_for_animation( bool move_time )
     this->private_->ui_.group_dummy_->hide();
     this->private_->ui_.base_->show();
   }
+  
+  //this->setUpdatesEnabled( true );
 }
   
 void LayerGroupWidget::set_picked_up_group_size( int group_height )
@@ -409,7 +419,9 @@ void LayerGroupWidget::set_picked_up_group_size( int group_height )
   
 void LayerGroupWidget::handle_change()
 {
-  layer_list_type layer_list = this->private_->group_->get_layer_list();
+  LayerGroupHandle this_group = LayerManager::Instance()->FindLayerGroup( this->private_->group_id_ );
+  layer_list_type layer_list = this_group->get_layer_list();
+  
   int index = 0;
   bool layer_widget_deleted = false;
   this->setUpdatesEnabled( false );
@@ -422,8 +434,8 @@ void LayerGroupWidget::handle_change()
     ( *it ).second->set_picked_up( false );
     ( *it ).second->instant_hide_drop_space();
     ( *it ).second->hide_overlay();
-    if( this->private_->group_->show_delete_menu_state_->get() || 
-      this->private_->group_->show_duplicate_menu_state_->get() )
+    if( this_group->show_delete_menu_state_->get() || 
+       this_group->show_duplicate_menu_state_->get() )
     {
       ( *it ).second->show_selection_checkbox( true );
     }

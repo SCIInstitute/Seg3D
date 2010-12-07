@@ -42,6 +42,7 @@
 #include <Application/PreferencesManager/PreferencesManager.h>
 #include <Application/ProjectManager/ProjectManager.h>
 
+
 namespace Seg3D
 {
 
@@ -238,16 +239,6 @@ bool MaskLayer::post_load_states( const Core::StateIO& state_io )
       grid_transform, mask_data_block ) );
     this->add_connection( this->mask_volume_->get_mask_data_block()->mask_updated_signal_.
       connect( boost::bind( &MaskLayer::handle_mask_data_changed, this ) ) );
-    
-    // Now if the iso was generated in the saved state, we will regenerate it now that we have
-    // finished loading the saved state
-    if( this->iso_generated_state_->get() )
-    {
-      this->loading_ = true;
-      // TODO Load saved quality factor
-      this->compute_isosurface( 1.0 );
-      this->loading_ = false;
-    }
   }
   
   return success;

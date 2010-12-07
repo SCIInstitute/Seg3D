@@ -40,6 +40,7 @@
 
 // Application includes
 #include <Application/Layer/Layer.h>
+#include <Application/Layer/LayerGroup.h>
 
 namespace Seg3D
 {

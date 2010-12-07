@@ -29,11 +29,16 @@
 #ifndef INTERFACE_APPINTERFACE_OVERLAYWIDGET_H
 #define INTERFACE_APPINTERFACE_OVERLAYWIDGET_H
 
+// Boost includes
+#include <boost/shared_ptr.hpp>
 
+// Qt includes
 #include <QtGui/QWidget>
 
 namespace Seg3D
 {
+  
+class OverlayWidgetPrivate; 
   
 class OverlayWidget : public QWidget 
 {
@@ -43,11 +48,16 @@ public:
   OverlayWidget( QWidget *parent );
   virtual ~OverlayWidget();
   
+  // SET_TRANSPARENT:
+  //
   void set_transparent( bool transparent );
+  
+  // PAINTEVENT
+  // 
   virtual void paintEvent( QPaintEvent * event );
 
 private:
-  QColor color_;
+  boost::shared_ptr< OverlayWidgetPrivate > private_;
     
 };
   

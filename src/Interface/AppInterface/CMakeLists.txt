@@ -62,7 +62,7 @@ SET(INTERFACE_APPINTERFACE_SRCS
 
 SET(INTERFACE_APPINTERFACE_MOC_SRCS
   AppInterface.h
-  AppLayerIO.h
+#  AppLayerIO.h
   AppMenu.h
   AppShortcuts.h
   AppStatusBar.h

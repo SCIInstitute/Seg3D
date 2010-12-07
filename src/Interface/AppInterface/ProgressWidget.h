@@ -68,7 +68,12 @@ public:
   // Update the progress in this dialog
   void update_progress();
   
+  // SETUP_PROGRESS_WIDGET:
+  // this will setup the widget and make all the connections
   void setup_progress_widget( Core::ActionProgressHandle action_progress );
+  
+  // CLEANUP_PROGRESS_WIDGET:
+  // this will cleanup the progress widget, disconnect the connections etc.
   void cleanup_progress_widget();
 
   // -- Slots --

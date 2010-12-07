@@ -163,7 +163,6 @@ bool VFFLayerImporter::import_vff()
     Core::Vector( 0.0, boost::lexical_cast< double >( spacing_vector[ 1 ] ), 0.0 ), 
     Core::Vector( 0.0, 0.0, boost::lexical_cast< double >( spacing_vector[ 2 ] ) ) );
 
-
   size_t data_type_size = 1;
 
   // Step 4: now we instantiate a DataBlock based on the type of pixel that we expect
@@ -175,6 +174,7 @@ bool VFFLayerImporter::import_vff()
   else if( this->pixel_type_ == Core::DataType::UCHAR_E )
   {
     this->data_block_ = Core::StdDataBlock::New( nx, ny, nz, Core::DataType::UCHAR_E );
+
   }
   else
   {

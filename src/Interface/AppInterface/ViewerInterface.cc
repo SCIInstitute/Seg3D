@@ -140,9 +140,9 @@ void ViewerInterfacePrivate::setup_ui( QWidget* parent )
   this->layout_->addWidget( this->horiz_splitter_ );
   
   
-  this->facade_widget_ = new QLabel( parent );
-  this->layout_->addWidget( this->facade_widget_ );
-  this->facade_widget_->hide();
+  //this->facade_widget_ = new QLabel( parent );
+//  this->layout_->addWidget( this->facade_widget_ );
+//  this->facade_widget_->hide();
   
   parent->setLayout( this->layout_ );
 
@@ -181,18 +181,17 @@ ViewerInterface::~ViewerInterface()
   
   void ViewerInterface::set_pic_mode( bool pic_mode )
   {
-    if( pic_mode )
+
+    for ( size_t j = 0; j < 6; j++ )
     {
-      this->private_->facade_widget_->setMinimumSize( this->private_->horiz_splitter_->size() );
-      this->private_->facade_widget_->setPixmap( QPixmap::grabWidget( this->private_->horiz_splitter_ ) );
-      this->private_->horiz_splitter_->hide();
-      this->private_->facade_widget_->show();
+      this->private_->viewer_[ j ]->image_mode( pic_mode );
     }
-    else
-    {
-      this->private_->facade_widget_->hide();
-      this->private_->horiz_splitter_->show();
-    } 
+      
+      //this->private_->facade_widget_->setMinimumSize( this->private_->horiz_splitter_->size() );      
+//      this->private_->facade_widget_->setPixmap( QPixmap::grabWidget( this->private_->horiz_splitter_ ) );
+//      this->private_->horiz_splitter_->hide();
+//      this->private_->facade_widget_->show();
+
   }
 
 void ViewerInterface::set_active_viewer( int viewer_id )

@@ -63,7 +63,7 @@ Core::DataType ITKLayerExporter::get_data_type()
 int ITKLayerExporter::get_exporter_modes()
 {
   int exporter_modes = 0;
-  exporter_modes |= LayerExporterMode::DATA_E;
+  exporter_modes |= LayerExporterMode::DATA_E | LayerImporterMode::SINGLE_MASK_E;
   return exporter_modes;
 }
 

@@ -57,6 +57,10 @@ public:
 public:
   void add_boolean_state( StateBoolHandle state );
   void clear_selection();
+  
+  // GET_ENABLED:
+  // returns true if one of the group is true returns false if not
+  bool get_enabled() const;
 
 private:
   BooleanStateGroupPrivateHandle private_;

@@ -94,13 +94,13 @@ void LayerManagerWidgetPrivate::HandleGroupInternalChanged( qpointer_type qpoint
                           LayerGroupHandle &group )
 {
   Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind( 
-      &LayerManagerWidget::handle_group_internals_change, qpointer.data(), group ) ) );
+    &LayerManagerWidget::handle_group_internals_change, qpointer.data(), group ) ) );
 }
 
 void LayerManagerWidgetPrivate::HandleGroupsChanged( qpointer_type qpointer )
 {
   Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind( 
-      &LayerManagerWidget::handle_groups_changed, qpointer.data() ) ) );
+    &LayerManagerWidget::handle_groups_changed, qpointer.data() ) ) );
 }
 
 void LayerManagerWidgetPrivate::PreLoadStates( qpointer_type qpointer )
@@ -292,13 +292,13 @@ LayerGroupWidget* LayerManagerWidget::make_new_group( LayerGroupHandle group )
   LayerGroupWidget* new_group = new LayerGroupWidget( this, group );
   
   connect( new_group, SIGNAL( prep_layers_for_drag_and_drop_signal_( bool ) ), 
-      this, SLOT( prep_layers_for_drag_and_drop( bool ) ) );
+    this, SLOT( prep_layers_for_drag_and_drop( bool ) ) );
   
   connect( new_group, SIGNAL( prep_groups_for_drag_and_drop_signal_( bool ) ), 
-      this, SLOT( prep_groups_for_drag_and_drop( bool ) ) );
+    this, SLOT( prep_groups_for_drag_and_drop( bool ) ) );
   
   connect( new_group, SIGNAL( picked_up_group_size_signal_( int ) ), 
-      this, SLOT( notify_picked_up_group_size( int ) ) );
+    this, SLOT( notify_picked_up_group_size( int ) ) );
       
   connect( new_group, SIGNAL( picked_up_layer_size_signal_( int ) ), 
     this, SLOT( notify_groups_of_picked_up_layer_size( int ) ) );
@@ -312,9 +312,12 @@ void LayerManagerWidget::prep_layers_for_drag_and_drop( bool move_time )
   for( LayerManagerWidgetPrivate::group_widget_map_type::iterator it = 
     this->private_->group_map_.begin(); it != this->private_->group_map_.end(); ++it )
   {
-    ( *it ).second->prep_layers_for_drag_and_drop( move_time );
+    if( ( LayerManager::Instance()->get_layer_group( ( *it ).second->get_group_id() ) )->
+       group_widget_expanded_state_->get() )
+    { 
+      ( *it ).second->prep_layers_for_drag_and_drop( move_time );
+    }
   }
-  
 }
 
 void LayerManagerWidget::prep_groups_for_drag_and_drop( bool move_time )
@@ -324,7 +327,6 @@ void LayerManagerWidget::prep_groups_for_drag_and_drop( bool move_time )
   {
     ( *it ).second->prep_for_animation( move_time );
   }
-  
 }
   
 void LayerManagerWidget::notify_picked_up_group_size( int group_size )

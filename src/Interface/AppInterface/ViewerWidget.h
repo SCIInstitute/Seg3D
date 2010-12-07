@@ -86,6 +86,9 @@ public Q_SLOTS:
   // FLIP_VIEW_VERT:
   // Flip the view vertically.
   void flip_view_vert();
+  
+public:
+  void image_mode( bool picture );
 
 protected:
 

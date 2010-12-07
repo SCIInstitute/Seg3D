@@ -151,8 +151,13 @@ void GroupButtonMenu::dropEvent( QDropEvent* event )
     ActionMoveLayerBelow::Dispatch( Core::Interface::GetWidgetActionContext(), 
       layer_name_, this->private_->group_id_ );
     this->private_->layer_slot_->instant_hide();
+    event->accept();
   }
-  event->ignore();
+  else
+  {
+    event->ignore();
+  }
+
   event->setDropAction( Qt::IgnoreAction );
 }
 
@@ -201,8 +206,7 @@ void GroupButtonMenu::prep_for_animation( bool move_time )
 {
   if( move_time )
   {
-    this->private_->ui_.facade_->setMinimumHeight( this->private_->ui_.group_tools_->height() );
-    this->private_->ui_.facade_->setMinimumWidth( this->private_->ui_.group_tools_->width() );
+    this->private_->ui_.facade_->setMinimumSize( this->private_->ui_.group_tools_->size() );
     this->private_->ui_.facade_->setPixmap( 
       QPixmap::grabWidget( this->private_->ui_.group_tools_ ) );
     this->private_->ui_.group_tools_->hide();

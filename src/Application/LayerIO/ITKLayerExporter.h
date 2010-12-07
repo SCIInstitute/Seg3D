@@ -39,6 +39,7 @@
 // ITK includes
 #include "itkImageSeriesWriter.h"
 #include "itkGDCMImageIO.h"
+#include "itkBMPImageIO.h"
 #include "itkNumericSeriesFileNames.h"
 
 // Boost includes
@@ -59,7 +60,7 @@ namespace Seg3D
 
 class ITKLayerExporter : public LayerExporter
 {
-  SCI_EXPORTER_TYPE("ITK Exporter", ".dcm")
+  SCI_EXPORTER_TYPE("ITK Exporter", ".dcm;.bmp")
 
   // -- Constructor/Destructor --
 public:
@@ -172,6 +173,85 @@ private:
   
     return true;
   }
+  
+  
+  template< class InputPixelType, class OutputPixelType >
+  bool export_bmp_series( const std::string& file_path, const std::string& file_name )
+  {
+    MaskLayer* temp_handle = dynamic_cast< MaskLayer* >( 
+      this->layers_[ 0 ].get() );
+    
+    typedef itk::BMPImageIO ImageIOType;
+    typedef itk::NumericSeriesFileNames NamesGeneratorType;
+    
+    ImageIOType::Pointer bmp_io = ImageIOType::New();
+    NamesGeneratorType::Pointer names_generator = NamesGeneratorType::New();
+    
+    typedef itk::Image< InputPixelType, 3 > ImageType;
+    typedef itk::Image< OutputPixelType, 2 > OutputImageType;
+    typedef itk::ImageSeriesWriter< ImageType, OutputImageType > WriterType;
+    typename WriterType::Pointer writer = WriterType::New();
+    
+    Core::ITKImageDataHandle image_data = typename Core::ITKImageDataT< InputPixelType >::Handle( 
+      new Core::ITKImageDataT< InputPixelType >( temp_handle->get_mask_volume()->get_mask_data_block(), 
+      temp_handle->get_grid_transform() ) );
+    
+    ImageType* itk_image = dynamic_cast< ImageType* >( 
+      image_data->get_base_image().GetPointer() );
+    
+    typename ImageType::RegionType region = itk_image->GetLargestPossibleRegion();
+    typename ImageType::IndexType start = region.GetIndex();
+    typename ImageType::SizeType size = region.GetSize();
+    
+    unsigned int first_slice = start[ 2 ];
+    unsigned int last_slice = start[ 2 ] + size[ 2 ] - 1;
+    
+    boost::filesystem::path path = boost::filesystem::path( file_path );
+    
+    std::string filename_without_extension = file_name;
+    filename_without_extension = filename_without_extension.substr( 0, 
+      filename_without_extension.find_last_of( "." ) );
+    boost::filesystem::path filename_path = path / filename_without_extension;
+    
+    if( size[ 2 ] < 100 )
+    {
+      names_generator->SetSeriesFormat( filename_path.string() + "-%02d.bmp" );
+    }
+    else if ( size[ 2 ] < 1000 )
+    {
+      names_generator->SetSeriesFormat( filename_path.string() + "-%03d.bmp" );
+    }
+    else if ( size[ 2 ] < 10000 )
+    {
+      names_generator->SetSeriesFormat( filename_path.string() + "-%04d.bmp" );
+    }
+    else
+    {
+      names_generator->SetSeriesFormat( filename_path.string() + "-%10d.bmp" );
+    }
+    
+    names_generator->SetStartIndex( first_slice );
+    names_generator->SetEndIndex( last_slice );
+    names_generator->SetIncrementIndex( 1 );
+    
+    writer->SetInput( itk_image );
+    writer->SetImageIO( bmp_io );
+    writer->SetFileNames( names_generator->GetFileNames() );
+    
+    try
+    {
+      writer->Update();
+    }
+    catch ( itk::ExceptionObject &err )
+    {
+      std::string itk_error = err.GetDescription();
+      return false;
+    }
+    
+    return true;
+  }
+  
+  
 private:
   Core::DataType pixel_type_;
 

@@ -90,5 +90,14 @@ void BooleanStateGroup::clear_selection()
     this->private_->states_[ i ]->set( false );
   }
 }
+  
+bool BooleanStateGroup::get_enabled() const
+{
+  for ( size_t i = 0; i < this->private_->states_.size(); ++i )
+  {
+    if( this->private_->states_[ i ]->get() ) return true;
+  }
+  return false;
+}
 
 } // end namespace Core

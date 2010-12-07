@@ -154,7 +154,7 @@ namespace Seg3D
   // - LayerWidget - //
   const QString StyleSheet::LAYERWIDGET_C = QString::fromUtf8(
     "QWidget#LayerWidget{"
-    " background-color: rgba( 0, 0, 0, 0 );"
+    " background-color: rgb( 255, 0, 0 );"
     " border-radius: 3px;"
     "}");
   
@@ -174,42 +174,30 @@ namespace Seg3D
   // - ACTIVE - //
   const QString StyleSheet::LAYER_WIDGET_BASE_ACTIVE_C = QString::fromUtf8(
     "QWidget#base_{"
-    " border-radius: 4px;"
     " border:2px solid rgb(73, 111, 160);"
     " background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1,"
     "   stop:0 rgba(193, 215, 255, 255),"
     "   stop:0.353234 rgba(204, 222, 255, 255),"
     "   stop:1 rgba(164, 196, 255, 255));"
-    "}"                                  
-    "QWidget#header_{"
-    " border-bottom: 1px solid rgb(73, 111, 160);"
     "}");
 
   const QString StyleSheet::LAYER_WIDGET_BASE_ACTIVE_IN_USE_C = QString::fromUtf8(
     "QWidget#base_{"
-    " border-radius:4px;"
     " border:2px solid rgb(73, 111, 160);"
     " background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1,"
     "   stop:0 rgba(193, 255, 255, 255),"
     "   stop:0.353234 rgba(204, 255, 255, 255),"
     "   stop:1 rgba(164, 255, 255, 255));"
-    "}"                                  
-    "QWidget#header_{"
-    " border-bottom: 1px solid rgb(73, 111, 160);"
     "}");
 
   const QString StyleSheet::LAYER_WIDGET_BASE_IN_USE_C = QString::fromUtf8(
     "QWidget#base_{"
-    " border-radius: 4px;"
     " border: 2px solid rgb(73, 111, 160);"
     " background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1,"
     "   stop:0 rgba(193, 255, 215, 255),"
     "   stop:0.353234 rgba(204, 255, 222, 255),"
     "   stop:1 rgba(164, 255, 196, 255));"
-    "}"                                  
-      "QWidget#header_{"
-      " border-bottom: 1px solid rgb(73, 111, 160);"
-      "}");
+    "}");
   
   // - INACTIVE - //
   const QString StyleSheet::LAYER_WIDGET_BASE_INACTIVE_C = QString::fromUtf8(
@@ -218,18 +206,38 @@ namespace Seg3D
     "   stop:0 rgba(211, 211, 211, 255),"
     "   stop:0.155779 rgba(225, 225, 225, 255),"
     "   stop:1 rgba(194, 194, 194, 255));"
-    " border-radius: 3px;"
     " border: 1px solid rgb(80, 80, 80);"
+    "}");
+  
+
+  const QString StyleSheet::LAYER_WIDGET_HEADER_ACTIVE_C = QString::fromUtf8(
+    "QWidget#header_{"
+    " border-bottom: 1px solid rgb(73, 111, 160);"
     "}"
+    );
+
+  const QString StyleSheet::LAYER_WIDGET_HEADER_ACTIVE_IN_USE_C = QString::fromUtf8(
+    "QWidget#header_{"
+    " border-bottom: 1px solid rgb(73, 111, 160);"
+    "}"
+  );  
+
+  const QString StyleSheet::LAYER_WIDGET_HEADER_IN_USE_C = QString::fromUtf8(
+    "QWidget#header_{"
+    " border-bottom: 1px solid rgb(73, 111, 160);"
+    "}"
+  );
+  
+  const QString StyleSheet::LAYER_WIDGET_HEADER_INACTIVE_C = QString::fromUtf8(
       "QWidget#header_{"
       " border-bottom: 1px solid rgb(80, 80, 80);"
-      "}");
+      "}"
+  );
   
   const QString StyleSheet::LAYER_WIDGET_LABEL_INACTIVE_C = QString::fromUtf8(
     "QLineEdit#label_{"
     " text-align: left;"
     " color: black;"
-    " margin-right: 3px;"
     "   selection-background-color: rgb( 222, 222, 100 ); "
     " background-color: rgba( 211, 211, 211, 255);"
     "}");
@@ -238,7 +246,6 @@ namespace Seg3D
     "QLineEdit#label_{"
     " text-align: left;"
     " color: black;"
-    " margin-right: 3px;"
     "   selection-background-color: rgb( 222, 222, 100 ); "
     " background-color: rgba( 193, 215, 255, 255 );"
     "}");
@@ -247,7 +254,6 @@ namespace Seg3D
     "QLineEdit#label_{"
     " text-align: left;"
     " color: black;"
-    " margin-right: 3px;"
     "   selection-background-color: rgb( 222, 222, 100 ); "
     " background-color: rgba( 193, 255, 255, 255 );"
     "}");
@@ -256,7 +262,6 @@ namespace Seg3D
     "QLineEdit#label_{"
     " text-align: left;"
     " color: black;"
-    " margin-right: 3px;"
     "   selection-background-color: rgb( 222, 222, 100 ); "
     " background-color: rgba( 193, 255, 215, 255 );"
     "}");   
@@ -307,18 +312,14 @@ namespace Seg3D
   // - ACTIVE - //
   const QString StyleSheet::GROUP_WIDGET_BASE_ACTIVE_C = QString::fromUtf8(
     "QWidget#base_{"
-    " background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1,"
-    "   stop:0 rgba(120, 120, 120, 255),"
-    "   stop:0.35 rgba(100, 100, 100, 255)," 
-    "   stop:0.65 rgba(100, 100, 100, 255),"
-    "   stop:1 rgba(120, 120, 120, 255));"
-    " border-radius:3px;"
+    " background-color: rgb( 90, 90, 90 );"
+    " border-radius:4px;"
     " border: 1px solid rgb( 60, 60, 60 );"
     " color: rgb(90,90,90);"
     "}");
   const QString StyleSheet::GROUP_WIDGET_BACKGROUND_ACTIVE_C = QString::fromUtf8(  
     "QWidget#group_background_{"
-    " background-color: rgb(237, 149, 31);"
+    " background-color: rgb(232, 145, 32);"
     " border: 1px solid rgb(90, 90, 90);"
     " border-radius: 3px;"
     " color: white;"
@@ -340,7 +341,7 @@ namespace Seg3D
   const QString StyleSheet::GROUP_WIDGET_BASE_INACTIVE_C = QString::fromUtf8(
     "QWidget#base_{"
     " background-color: rgb( 110, 110, 110 );"
-    " border-radius:3px;"
+    " border-radius:4px;"
     " border: 1px solid rgb( 60, 60,60 );"
     "}");
   const QString StyleSheet::GROUP_WIDGET_BACKGROUND_INACTIVE_C = QString::fromUtf8(  
@@ -348,6 +349,7 @@ namespace Seg3D
     " background-color: rgb( 200, 200, 200 );"
     " border: 1px solid rgb( 60, 60, 60 );"
     " border-radius: 3px;"
+    " color: gray;"
     "}");
   const QString StyleSheet::GROUP_WIDGET_ACTIVATE_BUTTON_INACTIVE_C = QString::fromUtf8(
     "QPushButton#activate_button_{"

@@ -181,6 +181,9 @@ public:
 
   // Whether to show the abort message
   Core::StateBoolHandle show_abort_message_state_;
+  
+  // An exclusive group of boolean states that control the visibility of different parts
+  Core::BooleanStateGroupHandle gui_state_group_;
 
 protected:
   // State that stores the generation of its datablock
@@ -188,9 +191,6 @@ protected:
   
   // State that stores the last action that was played
   Core::StateStringHandle last_action_state_;
-  
-  // An exclusive group of boolean states that control the visibility of different parts
-  Core::BooleanStateGroupHandle gui_state_group_;
 
   // -- Accessors --
 public:

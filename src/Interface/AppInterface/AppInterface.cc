@@ -373,11 +373,12 @@ void AppInterface::set_project_name( std::string project_name )
 
 void AppInterface::begin_progress( Core::ActionProgressHandle handle )
 {
-  CORE_LOG_DEBUG( "-- Picturizing the Viewer Interface --" );
-  this->private_->viewer_interface_->set_pic_mode( true );
+  
   
   CORE_LOG_DEBUG( "-- Start progress widget --" );
   this->private_->progress_->setup_progress_widget( handle );
+  CORE_LOG_DEBUG( "-- Picturizing the Viewer Interface --" );
+  this->private_->viewer_interface_->set_pic_mode( true );
   this->private_->progress_->resize( this->size() );
   this->menuBar()->setEnabled( false );
 

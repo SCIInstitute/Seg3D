@@ -35,11 +35,19 @@
 
 namespace Seg3D
 {
+  
+class OverlayWidgetPrivate {
+
+  public:
+    QColor color_;
+  
+};
 
 OverlayWidget::OverlayWidget( QWidget *parent ) 
   : QWidget( parent ),
-  color_( QColor( 0, 0, 0, 0 ) )
+  private_( new OverlayWidgetPrivate )
 {
+  this->private_->color_ = QColor( 0, 0, 0, 0 );
   QSizePolicy size_policy( QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding );
   this->setSizePolicy( size_policy );
 }
@@ -51,18 +59,18 @@ OverlayWidget::~OverlayWidget()
 void OverlayWidget::paintEvent( QPaintEvent * event )
 {
   QPainter painter( this );
-  painter.fillRect( this->rect(), this->color_ );
+  painter.fillRect( this->rect(), this->private_->color_ );
 }
 
 void OverlayWidget::set_transparent( bool transparent )
 {
   if( transparent )
   {
-    this->color_ = QColor( 0, 0, 0, 0 );
+    this->private_->color_ = QColor( 0, 0, 0, 0 );
   }
   else
   {
-    this->color_ = QColor( 100, 100, 100, 150 );
+    this->private_->color_ = QColor( 100, 100, 100, 150 );
   }
 }
 

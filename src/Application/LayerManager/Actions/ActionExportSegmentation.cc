@@ -59,7 +59,8 @@ bool ActionExportSegmentation::validate( Core::ActionContextHandle& context )
       else layer_handles.push_back( temp_handle );
     }
 
-    if( ! LayerIO::Instance()->create_exporter( this->layer_exporter_, layer_handles, "NRRD Exporter", ".nrrd" ) )
+    if( ! LayerIO::Instance()->create_exporter( this->layer_exporter_, layer_handles, 
+      "NRRD Exporter", ".nrrd" ) )
     {
       return false;
     }
@@ -101,11 +102,7 @@ bool ActionExportSegmentation::run( Core::ActionContextHandle& context, Core::Ac
 
   if( mode == LayerExporterMode::SINGLE_MASK_E )
   {
-    // TODO:
-    // This does not work for scripts as layer_exporter has not been created yet
-    // --JGS
-    this->layer_exporter_->export_layer( mode, 
-      filename_and_path.string(), "unused" );
+    this->layer_exporter_->export_layer( mode, filename_and_path.string(), "unused" );
   }
   else
   {

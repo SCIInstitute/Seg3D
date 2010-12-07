@@ -75,6 +75,7 @@ public:
 
   int minimum_toolbar_width_; 
   bool initialized_size_;
+  QLabel *facade_widget_;
 
   // Handle to the underlying Viewer structure
   ViewerHandle viewer_;
@@ -260,12 +261,32 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
     this->add_connection( this->private_->viewer_->view_mode_state_->state_changed_signal_.
       connect( boost::bind( &ViewerWidgetPrivate::HandleViewModeChanged, viewer_widget ) ) );
   }
+  
+  this->private_->facade_widget_ = new QLabel( this->private_->ui_.border_ );
+  this->private_->ui_.border_layout_->insertWidget( 0, this->private_->facade_widget_ );
+  this->private_->facade_widget_->hide();
 }
 
 ViewerWidget::~ViewerWidget()
 {
   this->disconnect_all();
 }
+
+  void ViewerWidget::image_mode( bool picture )
+  {
+    if( picture )
+    {
+      this->private_->facade_widget_->setMinimumSize( this->private_->render_widget_->size() );
+      this->private_->facade_widget_->setPixmap( QPixmap::fromImage( this->private_->render_widget_->grabFrameBuffer() ) );
+      this->private_->render_widget_->hide();
+      this->private_->facade_widget_->show();
+    }
+    else
+    {
+      this->private_->facade_widget_->hide();
+      this->private_->render_widget_->show();
+    }   
+  }
   
 int ViewerWidget::get_minimum_size()
 {

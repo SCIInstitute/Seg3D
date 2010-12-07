@@ -106,6 +106,8 @@ private Q_SLOTS:
   // this function will notify all the groups of what size the currently picked up group is
   void notify_picked_up_group_size( int group_size );
   
+  // NOTIFY_GROUPS_OF_PICKED_UP_LAYER_SIZE:
+  // this function will notify the groups of the picked up layer size
   void notify_groups_of_picked_up_layer_size( int layer_size );
   
   // -- internals of this class --

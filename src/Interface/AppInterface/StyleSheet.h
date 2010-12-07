@@ -75,11 +75,21 @@ public:
     const static QString MASK_VOLUME_COLOR_C;
     const static QString LABEL_VOLUME_COLOR_C;
     // - ACTIVE - //
+  
+//
     const static QString LAYER_WIDGET_BASE_ACTIVE_C;
+    const static QString LAYER_WIDGET_HEADER_ACTIVE_C;
+  
     const static QString LAYER_WIDGET_BASE_ACTIVE_IN_USE_C;
+    const static QString LAYER_WIDGET_HEADER_ACTIVE_IN_USE_C;
+  
     const static QString LAYER_WIDGET_BASE_IN_USE_C;
-    // - INACTIVE - //
+    const static QString LAYER_WIDGET_HEADER_IN_USE_C;
+  
+  // - INACTIVE - //
     const static QString LAYER_WIDGET_BASE_INACTIVE_C;
+    const static QString LAYER_WIDGET_HEADER_INACTIVE_C;
+//
     const static QString LAYER_WIDGET_LABEL_INACTIVE_C;
     // - DROP - //
     const static QString LAYER_WIDGET_BASE_DROP_C;
