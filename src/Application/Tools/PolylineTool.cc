@@ -26,11 +26,13 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Core includes
 #include <Core/Volume/VolumeSlice.h>
 #include <Core/Volume/MaskVolumeSlice.h>
 #include <Core/State/Actions/ActionAdd.h>
 #include <Core/State/Actions/ActionClear.h>
 #include <Core/State/Actions/ActionSetAt.h>
+#include <Core/State/Actions/ActionRemove.h>
 
 // Application includes
 #include <Application/Tool/ToolFactory.h>
@@ -55,13 +57,13 @@ class PolylineToolPrivate
 {
 public:
   void handle_vertices_changed();
-  bool find_vertex( ViewerHandle viewer, int x, int y, size_t& index );
+  bool find_vertex( ViewerHandle viewer, int x, int y, int& index );
   void execute( Core::ActionContextHandle context, bool erase, 
     ViewerHandle viewer = ViewerHandle() );
 
   PolylineTool* tool_;
   bool moving_vertex_;
-  size_t vertex_index_;
+  int vertex_index_;
 };
 
 void PolylineToolPrivate::handle_vertices_changed()
@@ -69,7 +71,7 @@ void PolylineToolPrivate::handle_vertices_changed()
   ViewerManager::Instance()->update_2d_viewers_overlay();
 }
 
-bool PolylineToolPrivate::find_vertex( ViewerHandle viewer, int x, int y, size_t& index )
+bool PolylineToolPrivate::find_vertex( ViewerHandle viewer, int x, int y, int& index )
 {
   // Step 1. Compute the size of a pixel in world space
   double x0, y0, x1, y1;
@@ -103,11 +105,12 @@ bool PolylineToolPrivate::find_vertex( ViewerHandle viewer, int x, int y, size_t
     if ( Core::Abs( pt_x - world_x ) <= range_x &&
       Core::Abs( pt_y - world_y ) <= range_y )
     {
-      index = i;
+      index = static_cast< int >( i );
       return true;
     }
   }
 
+  index = -1;
   return false;
 }
 
@@ -231,22 +234,13 @@ bool PolylineTool::handle_mouse_press( ViewerHandle viewer,
     return false;
   }
 
-  if ( modifiers == Core::KeyModifier::NO_MODIFIER_E &&
-    button == Core::MouseButton::LEFT_BUTTON_E )
+  if ( button == Core::MouseButton::LEFT_BUTTON_E &&
+    ( modifiers == Core::KeyModifier::NO_MODIFIER_E ||
+    modifiers == Core::KeyModifier::SHIFT_MODIFIER_E ) &&
+    this->private_->vertex_index_ != -1 )
   {
-    Core::VolumeSliceHandle active_slice = viewer->get_active_volume_slice();
-    if ( active_slice && !active_slice->out_of_boundary() )
-    {
-      double world_x, world_y;
-      viewer->window_to_world( mouse_history.current_.x_, 
-        mouse_history.current_.y_, world_x, world_y );
-      Core::Point pt;
-      active_slice->get_world_coord( world_x, world_y,  pt );
-      Core::ActionAdd::Dispatch( Core::Interface::GetMouseActionContext(),
-        this->vertices_state_, pt );
-
-      return true;
-    }
+    this->private_->moving_vertex_ = true;
+    return true;
   }
   else if ( !( modifiers & Core::KeyModifier::SHIFT_MODIFIER_E ) &&
     button == Core::MouseButton::LEFT_BUTTON_E )
@@ -292,16 +286,7 @@ bool PolylineTool::handle_mouse_press( ViewerHandle viewer,
     }
   }
   else if ( modifiers == Core::KeyModifier::NO_MODIFIER_E &&
-    button == Core::MouseButton::RIGHT_BUTTON_E )
-  {
-    this->private_->moving_vertex_ = this->private_->find_vertex( viewer, 
-      mouse_history.current_.x_, mouse_history.current_.y_, 
-      this->private_->vertex_index_ );
-    return this->private_->moving_vertex_;
-  }
-
-  else if ( !( modifiers & Core::KeyModifier::SHIFT_MODIFIER_E ) &&
-    button == Core::MouseButton::RIGHT_BUTTON_E )
+    button == Core::MouseButton::LEFT_BUTTON_E )
   {
     Core::VolumeSliceHandle active_slice = viewer->get_active_volume_slice();
     if ( active_slice && !active_slice->out_of_boundary() )
@@ -311,35 +296,24 @@ bool PolylineTool::handle_mouse_press( ViewerHandle viewer,
         mouse_history.current_.y_, world_x, world_y );
       Core::Point pt;
       active_slice->get_world_coord( world_x, world_y,  pt );
-      
-      double dmin = DBL_MAX;
-      std::vector<Core::Point> points = this->vertices_state_->get();
-      
-      size_t idx = 0;
-      for ( size_t j = 0; j < points.size(); j++ )
-      {
-        double dist = ( points[ j ] - pt ).length2();
-  
-        if ( dist < dmin )
-        {
-          dmin = dist;
-          idx = j;
-        }
-      }
-      
-      if ( points.size() )
-      {
-        points.erase( points.begin() + idx );
-      }
-      
-      Core::ActionSet::Dispatch( Core::Interface::GetMouseActionContext(),
-        this->vertices_state_, points );
+      Core::ActionAdd::Dispatch( Core::Interface::GetMouseActionContext(),
+        this->vertices_state_, pt );
 
       return true;
     }
   }
+  else if ( modifiers == Core::KeyModifier::NO_MODIFIER_E &&
+    button == Core::MouseButton::RIGHT_BUTTON_E )
+  {
+    if ( this->private_->vertex_index_ != -1 )
+    {
+      Core::Point pt = this->vertices_state_->get()[ this->private_->vertex_index_ ];
+      Core::ActionRemove::Dispatch( Core::Interface::GetMouseActionContext(),
+        this->vertices_state_, pt );
+      return true;
+    }   
+  }
 
-  
   return false;
 }
 
@@ -347,7 +321,7 @@ bool PolylineTool::handle_mouse_release( ViewerHandle viewer,
                     const Core::MouseHistory& mouse_history, 
                     int button, int buttons, int modifiers )
 {
-  if ( this->private_->moving_vertex_ && button == Core::MouseButton::RIGHT_BUTTON_E )
+  if ( this->private_->moving_vertex_ && button == Core::MouseButton::LEFT_BUTTON_E )
   {
     this->private_->moving_vertex_ = false;
     return true;
@@ -360,30 +334,43 @@ bool PolylineTool::handle_mouse_move( ViewerHandle viewer,
                    const Core::MouseHistory& mouse_history, 
                    int button, int buttons, int modifiers )
 {
+  if ( buttons == Core::MouseButton::NO_BUTTON_E )
+  {
+    this->private_->find_vertex( viewer, mouse_history.current_.x_, 
+      mouse_history.current_.y_, this->private_->vertex_index_ );
+    viewer->set_cursor( this->private_->vertex_index_ != -1 ? 
+      Core::CursorShape::SIZE_ALL_E : Core::CursorShape::ARROW_E );
+  }
+
   if ( this->private_->moving_vertex_ )
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-    Core::Point pt = this->vertices_state_->get()[ this->private_->vertex_index_ ];
+    std::vector< Core::Point > vertices = this->vertices_state_->get();
     std::string view_mode = viewer->view_mode_state_->get();
-    double world_x, world_y;
+    double offset_x, offset_y, world_x0, world_y0, world_x1, world_y1;
+    viewer->window_to_world( mouse_history.previous_.x_,
+      mouse_history.previous_.y_, world_x0, world_y0 );
     viewer->window_to_world( mouse_history.current_.x_,
-      mouse_history.current_.y_, world_x, world_y );
+      mouse_history.current_.y_, world_x1, world_y1 );
+    offset_x = world_x1 - world_x0;
+    offset_y = world_y1 - world_y0;
     lock.unlock();
 
+    Core::Point pt_offset( 0.0, 0.0, 0.0 );
     if ( view_mode == Viewer::AXIAL_C )
     {
-      pt[ 0 ] = world_x;
-      pt[ 1 ] = world_y;
+      pt_offset[ 0 ] = offset_x;
+      pt_offset[ 1 ] = offset_y;
     }
     else if ( view_mode == Viewer::CORONAL_C )
     {
-      pt[ 0 ] = world_x;
-      pt[ 2 ] = world_y;
+      pt_offset[ 0 ] = offset_x;
+      pt_offset[ 2 ] = offset_y;
     }
     else if ( view_mode == Viewer::SAGITTAL_C )
     {
-      pt[ 1 ] = world_x;
-      pt[ 2 ] = world_y;
+      pt_offset[ 1 ] = offset_x;
+      pt_offset[ 2 ] = offset_y;
     }
     else
     {
@@ -391,8 +378,22 @@ bool PolylineTool::handle_mouse_move( ViewerHandle viewer,
       return false;
     }
 
-    Core::ActionSetAt::Dispatch( Core::Interface::GetMouseActionContext(),
-      this->vertices_state_, this->private_->vertex_index_, pt );
+    if ( modifiers == Core::KeyModifier::SHIFT_MODIFIER_E )
+    {
+      for ( size_t i = 0; i < vertices.size(); ++i )
+      {
+        vertices[ i ] += pt_offset;
+      }
+      Core::ActionSet::Dispatch( Core::Interface::GetMouseActionContext(),
+        this->vertices_state_, vertices );
+    }
+    else
+    {
+      Core::Point pt = vertices[ this->private_->vertex_index_ ];
+      pt += pt_offset;
+      Core::ActionSetAt::Dispatch( Core::Interface::GetMouseActionContext(),
+        this->vertices_state_, this->private_->vertex_index_, pt );
+    }
     return true;
   }
   
