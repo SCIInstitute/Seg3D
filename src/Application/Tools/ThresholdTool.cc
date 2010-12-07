@@ -207,7 +207,8 @@ void ThresholdTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
     return;
   }
   
-  if ( show_preview )
+  // Only show the preview if the target layer is visible in the viewer
+  if ( show_preview && target_layer->is_visible( viewer_id ) )
   {
     this->private_->initialize_gl();
 
