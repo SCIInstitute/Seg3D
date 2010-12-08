@@ -34,6 +34,10 @@
 
 // Qt includes
 #include <QtGui/QFileDialog>
+#include <QtCore/QPointer>
+
+// Core includes
+#include <Core/Utils/ConnectionHandler.h>
 
 // Interface includes
 #include <Interface/AppPreferences/ColorPickerWidget.h>
@@ -49,7 +53,7 @@ namespace Seg3D
 
 class AppPreferencesPrivate;
 
-class AppPreferences : public QtUtils::QtCustomDialog
+class AppPreferences : public QtUtils::QtCustomDialog, public Core::ConnectionHandler
 {
     Q_OBJECT
 public:
@@ -78,6 +82,12 @@ private:
   void setup_interface_controls_prefs();
   
   
+  void set_autosave_checkbox( bool state );
+  
+  typedef QPointer< AppPreferences > qpointer_type;
+  
+  static void HandleAutosaveStateChanged( qpointer_type qpointer, bool state );
+  
 private Q_SLOTS:
   // HIDE_THE_OTHERS
   // This function will hide the inactive colorpickers
@@ -91,6 +101,8 @@ private Q_SLOTS:
   // this function will be called when the user clicks the button to change the default location
   // of the project
   void change_project_directory();
+  
+  void set_autosave_checked_state( bool state );
 
 private:
   boost::shared_ptr< AppPreferencesPrivate > private_;

@@ -40,6 +40,7 @@
 
 //QtUtils Includes
 #include <QtUtils/Bridge/QtBridge.h>
+#include <QtUtils/Utils/QtPointer.h>
 
 //Application includes
 #include <Application/ProjectManager/ProjectManager.h>
@@ -89,7 +90,11 @@ ProjectDockWidget::ProjectDockWidget( QWidget *parent ) :
       PreferencesManager::Instance()->auto_save_state_->get() );
     
     connect( this->private_->ui_.autosave_checkbox_, SIGNAL( clicked( bool ) ), this,
-      SLOT( set_autosave_checked_state( bool ) ) ); 
+      SLOT( set_autosave_checked_state( bool ) ) );
+    
+    add_connection( PreferencesManager::Instance()->auto_save_state_->
+       value_changed_signal_.connect( boost::bind( 
+      &ProjectDockWidget::HandleAutosaveStateChanged, project_dock_widget, _1 ) ) );
 
     QtUtils::QtBridge::Connect( this->private_->ui_.project_name_, 
       ProjectManager::Instance()->current_project_->project_name_state_ );
@@ -687,7 +692,20 @@ void ProjectDockWidget::set_autosave_checked_state( bool state )
     PreferencesManager::Instance()->auto_save_state_, state );
 
 }
+             
+void ProjectDockWidget::set_autosave_checkbox( bool state )
+{
+   this->private_->ui_.autosave_checkbox_->blockSignals( true );
+   this->private_->ui_.autosave_checkbox_->setChecked( state );
+   this->private_->ui_.autosave_checkbox_->blockSignals( false );
+}
 
+void ProjectDockWidget::HandleAutosaveStateChanged( qpointer_type qpointer, bool state )
+{
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, 
+    boost::bind( &ProjectDockWidget::set_autosave_checkbox, qpointer.data(), state ) ) );
+   
+}
 
 
 } // end namespace Seg3D

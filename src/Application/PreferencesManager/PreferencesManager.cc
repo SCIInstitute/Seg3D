@@ -251,6 +251,7 @@ const std::vector< Core::Color >& PreferencesManager::get_default_colors() const
 {
   return this->private_->default_colors_;
 }
+  
 
 
 } // end namespace seg3D

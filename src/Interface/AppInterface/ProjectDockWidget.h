@@ -82,6 +82,8 @@ private:
   // HANDLEFILESIZECHANGED:
   // this function handles the signal that the file size has changed and sets the ui to reflect it
   static void HandleFileSizeChanged( qpointer_type qpointer, long long file_size );
+  
+  static void HandleAutosaveStateChanged( qpointer_type qpointer, bool state );
 
 private:
   // SET_AUTO_SAVE_LABEL:
@@ -99,6 +101,8 @@ private:
   // SET_FILE_SIZE_LABEL:
   // function that actually sets the label to reflect the file size change
   void set_file_size_label( long long file_size );
+  
+  void set_autosave_checkbox( bool state );
   
 private Q_SLOTS:
   // ENABLE_LOAD_DELETE_AND_EXPORT_BUTTONS:

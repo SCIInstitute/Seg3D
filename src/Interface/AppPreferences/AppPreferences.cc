@@ -41,6 +41,7 @@
 
 // QtUtils includes
 #include <QtUtils/Bridge/QtBridge.h>
+#include <QtUtils/Utils/QtPointer.h>
 
 // Interface includes
 #include <Interface/AppPreferences/AppPreferences.h>
@@ -124,8 +125,19 @@ void AppPreferences::setup_general_prefs()
 
   QtUtils::QtBridge::Connect( this->private_->ui_.full_screen_on_startup_checkbox_, 
     PreferencesManager::Instance()->full_screen_on_startup_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.auto_save_checkbox_,
-    PreferencesManager::Instance()->auto_save_state_ );
+//  QtUtils::QtBridge::Connect( this->private_->ui_.auto_save_checkbox_,
+//    PreferencesManager::Instance()->auto_save_state_ );
+  
+  this->private_->ui_.auto_save_checkbox_->setChecked( 
+    PreferencesManager::Instance()->auto_save_state_->get() );
+  connect( this->private_->ui_.auto_save_checkbox_, SIGNAL( toggled( bool ) ),
+    this, SLOT( set_autosave_checked_state( bool ) ) );
+  
+  add_connection( PreferencesManager::Instance()->auto_save_state_->
+    value_changed_signal_.connect( boost::bind( 
+    &AppPreferences::HandleAutosaveStateChanged, qpointer_type( this ), _1 ) ) );
+  
+  
   QtUtils::QtBridge::Connect( this->private_->ui_.smart_save_checkbox_,
     PreferencesManager::Instance()->smart_save_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.auto_save_timer_adjuster_,
@@ -319,6 +331,25 @@ void AppPreferences::setup_sidebar_prefs()
 void AppPreferences::setup_interface_controls_prefs()
 {
   //Interface Controls Preferences  
+}
+  
+void AppPreferences::set_autosave_checked_state( bool state )
+{
+  Core::ActionSet::Dispatch( Core::Interface::GetKeyboardActionContext(),
+    PreferencesManager::Instance()->auto_save_state_, state );
+}
+  
+void AppPreferences::set_autosave_checkbox( bool state )
+{
+  this->private_->ui_.auto_save_checkbox_->blockSignals( true );
+  this->private_->ui_.auto_save_checkbox_->setChecked( state );
+  this->private_->ui_.auto_save_checkbox_->blockSignals( false );
+}
+
+void AppPreferences::HandleAutosaveStateChanged( qpointer_type qpointer, bool state )
+{
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, 
+    boost::bind( &AppPreferences::set_autosave_checkbox, qpointer.data(), state ) ) );
 }
 
 
