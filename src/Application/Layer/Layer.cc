@@ -184,9 +184,11 @@ void Layer::initialize_states( const std::string& name, bool creating )
   }
 
   this->add_state( "visible", this->master_visible_state_, true );
+  this->master_visible_state_->set_is_project_data( false );
 
   // == The state of the lock ==
-  this->add_state( "visual_lock", locked_state_, false );
+  this->add_state( "visual_lock", this->locked_state_, false );
+  this->locked_state_->set_is_project_data( false );
 
   // == The opacity of the layer ==
   this->add_state( "opacity", opacity_state_, 
@@ -205,12 +207,22 @@ void Layer::initialize_states( const std::string& name, bool creating )
   this->add_state( "data", this->data_state_,  creating ? CREATING_C : AVAILABLE_C  , 
     AVAILABLE_C + "|" + CREATING_C + "|" + PROCESSING_C + "|" + IN_USE_C );
   
+  this->data_state_->set_is_project_data( false );
+  
   this->add_state( "show_info", this->show_information_state_, false );
   this->add_state( "show_advanced_visibility", this->show_advanced_visibility_state_, false );
   this->add_state( "show_opacity", this->show_opacity_state_, false );
   this->add_state( "show_appearance", this->show_appearance_state_, false );
   this->add_state( "show_progress", this->show_progress_bar_state_, creating );
   this->add_state( "show_abort", this->show_abort_message_state_, false );
+  
+  this->show_information_state_->set_is_project_data( false );
+  this->show_advanced_visibility_state_->set_is_project_data( false );
+  this->show_opacity_state_->set_is_project_data( false );
+  this->show_appearance_state_->set_is_project_data( false );
+  this->show_progress_bar_state_->set_is_project_data( false );
+  this->show_abort_message_state_->set_is_project_data( false );
+
 
   // NOTE: Use the private class to keep track of the connections so they won't
   // be accidentally deleted by subclasses.

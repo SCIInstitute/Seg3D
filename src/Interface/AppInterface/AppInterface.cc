@@ -43,6 +43,7 @@
 
 // Application includes
 #include <Application/PreferencesManager/PreferencesManager.h>
+#include <Application/PreferencesManager/Actions/ActionSavePreferences.h>
 #include <Application/ProjectManager/ProjectManager.h>
 #include <Application/ProjectManager/Actions/ActionSaveSession.h>
 
@@ -182,6 +183,10 @@ AppInterface::AppInterface() :
   
   QtUtils::QtBridge::Show( this->private_->preferences_interface_, 
     InterfaceManager::Instance()->preferences_manager_visibility_state_ );
+  
+  this->add_connection( InterfaceManager::Instance()->preferences_manager_visibility_state_->
+    value_changed_signal_.connect( boost::bind( &AppInterface::HandlePreferencesManagerSave, 
+    qpointer_type( this ), _1 ) ) );
     
   QtUtils::QtBridge::Show( this->private_->controller_interface_, 
     InterfaceManager::Instance()->controller_visibility_state_ );
@@ -242,6 +247,9 @@ AppInterface::~AppInterface()
 
 void AppInterface::closeEvent( QCloseEvent* event )
 {
+  // We are going to save the PreferencesManager when we exit
+  ActionSavePreferences::Dispatch( Core::Interface::GetWidgetActionContext() );
+  
   if ( ProjectManager::Instance()->current_project_->is_valid() && 
     ProjectManager::Instance()->current_project_->check_project_changed() )
   {
@@ -418,6 +426,20 @@ void AppInterface::addDockWidget( Qt::DockWidgetArea area, QDockWidget* dock_wid
   }
 }
 
+void AppInterface::save_preferences( bool visible )
+{
+  if( !visible )
+  {
+    ActionSavePreferences::Dispatch( Core::Interface::GetWidgetActionContext() );
+  }
+}
+  
+void AppInterface::HandlePreferencesManagerSave( qpointer_type qpointer, bool visible )
+{
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, 
+    boost::bind( &AppInterface::save_preferences, qpointer.data(), visible ) ) );
+}
+  
 void AppInterface::HandleBeginProgress( qpointer_type qpointer, Core::ActionProgressHandle handle )
 {
   Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, 

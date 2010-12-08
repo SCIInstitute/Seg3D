@@ -87,7 +87,12 @@ private:
   void begin_progress( Core::ActionProgressHandle handle );
   void end_progress( Core::ActionProgressHandle handle );
   void report_progress( Core::ActionProgressHandle handle );
-  void center_seg3d_gui_on_screen( QWidget *widget ); 
+  void center_seg3d_gui_on_screen( QWidget *widget );
+  
+  // SAVE_PREFERENCES:
+  // this function is called when the visibility of the PreferencesManager is changed and when it
+  // is changed to false, the preferences are saved
+  void save_preferences( bool visibility );
 
   // Overload the default addDockWidget and upgrade it, so docks are added
   // on top of each other
@@ -121,6 +126,8 @@ public:
   // HANDLEREPORTPROGRESS
   // Report progress to the modal window
   static void HandleReportProgress( qpointer_type qpointer, Core::ActionProgressHandle handle);
+  
+  static void HandlePreferencesManagerSave( qpointer_type qpointer, bool visible );
 
   // SETFULLSCREEN:
   // Set full screen mode of the Main Window

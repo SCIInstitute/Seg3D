@@ -36,9 +36,8 @@
 
 // Application includes
 #include <Application/PreferencesManager/PreferencesManager.h>
-#include <Application/PreferencesManager/Actions/ActionSavePreferences.h>
 #include <Application/Tool/ToolFactory.h>
-#include <Application/Tool/Actions/ActionSaveToolPreferences.h>
+
 
 // QtUtils includes
 #include <QtUtils/Bridge/QtBridge.h>
@@ -87,10 +86,6 @@ AppPreferences::AppPreferences( QWidget *parent ) :
 
   //Hide the interface controls since they arent connected yet
   this->private_->ui_.prefs_tabs_->removeTab( 2 );
-  
-  // connect the apply button to the save defaults function
-  connect( this->private_->ui_.apply_button_, SIGNAL( clicked() ), 
-    this, SLOT( save_settings() ) );
 }
 
 AppPreferences::~AppPreferences()
@@ -343,12 +338,6 @@ void AppPreferences::hide_the_others( int active )
   this->active_picker_->hide();
   this->active_picker_ = this->private_->color_pickers_[ active ];
   this->active_picker_->show();
-}
-
-void AppPreferences::save_settings()
-{
-  ActionSavePreferences::Dispatch( Core::Interface::GetWidgetActionContext() );
-  ActionSaveToolPreferences::Dispatch( Core::Interface::GetWidgetActionContext() );
 }
 
 } // end namespace Seg3D

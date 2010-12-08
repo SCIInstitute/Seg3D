@@ -864,7 +864,7 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
   std::string axial = AXIAL_C + "=" + PreferencesManager::Instance()->z_axis_label_state_->get();
   
   // Indicate that this statehandler contains data that is part of th project
-  this->mark_as_project_data();
+  //this->mark_as_project_data();
 
   this->add_state( "view_mode", view_mode_state_, mode, sagittal + "|" + coronal 
      + "|" + axial + "|" + VOLUME_C + "=Volume" );

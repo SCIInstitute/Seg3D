@@ -33,6 +33,7 @@
 #include <Application/UndoBuffer/UndoBuffer.h>
 #include <Application/ProjectManager/ProjectManager.h>
 #include <Application/ProjectManager/Actions/ActionLoadProject.h>
+#include <Application/ProjectManager/Actions/ActionResetChangesMade.h>
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
@@ -74,7 +75,7 @@ bool ActionLoadProject::run( Core::ActionContextHandle& context,
 
   if ( ProjectManager::Instance()->get_current_project() )
   {
-    ProjectManager::Instance()->get_current_project()->reset_project_changed();
+    ActionResetChangesMade::Dispatch( Core::Interface::GetWidgetActionContext() );
   }
 
   // Clear undo buffer

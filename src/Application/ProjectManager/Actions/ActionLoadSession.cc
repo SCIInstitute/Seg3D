@@ -28,6 +28,7 @@
 
 #include <Application/ProjectManager/ProjectManager.h>
 #include <Application/ProjectManager/Actions/ActionLoadSession.h>
+#include <Application/ProjectManager/Actions/ActionResetChangesMade.h>
 #include <Application/UndoBuffer/UndoBuffer.h>
 
 // REGISTER ACTION:
@@ -70,7 +71,7 @@ bool ActionLoadSession::run( Core::ActionContextHandle& context,
 
   if ( ProjectManager::Instance()->get_current_project() )
   {
-    ProjectManager::Instance()->get_current_project()->reset_project_changed();
+    ActionResetChangesMade::Dispatch( Core::Interface::GetWidgetActionContext() );
   }
 
   // Clear undo buffer

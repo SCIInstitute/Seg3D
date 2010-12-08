@@ -76,6 +76,10 @@ public:
   // Set the State from a string
   virtual bool import_from_string( const std::string& str, Core::ActionSource source =
     Core::ActionSource::NONE_E ) = 0;
+  
+  // SET_IS_PROJECT_DATA:
+  // Set whether the data is part of the project data
+  void set_is_project_data( bool is_project_data );
 
 protected:
   friend class ActionSet;
@@ -122,9 +126,6 @@ protected:
   // Query whether the state variable and its parent are still being initialized.
   bool get_initializing();
   
-  // SET_IS_PROJECT_DATA:
-  // Set whether the data is part of the project data
-  void set_is_project_data( bool is_project_data );
 
   // -- session handling -- 
 public:

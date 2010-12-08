@@ -26,35 +26,56 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-// Application Includes
-#include <Application/Tool/ToolFactory.h>
-#include <Application/Tool/Actions/ActionSaveToolPreferences.h>
+#ifndef APPLICATION_PROJECTMANAGER_ACTIONS_ACTIONRESETCHANGESMADE_H
+#define APPLICATION_PROJECTMANAGER_ACTIONS_ACTIONRESETCHANGESMADE_H
 
-// REGISTER ACTION:
-// Define a function that registers the action. The action also needs to be
-// registered in the CMake file.
-CORE_REGISTER_ACTION( Seg3D, SaveToolPreferences )
+
+// Boost includes
+#include <boost/date_time.hpp>
+
+// Core includes
+#include <Core/Action/Action.h> 
+#include <Core/Interface/Interface.h>
+
+
 
 namespace Seg3D
 {
 
-bool ActionSaveToolPreferences::validate( Core::ActionContextHandle& context )
+class ActionResetChangesMade : public Core::Action
 {
-  return true;
-}
+  
+CORE_ACTION(
+  CORE_ACTION_TYPE( "ResetChangesMade", "Reset whether changes have been made to the project data." )
+)
 
-bool ActionSaveToolPreferences::run( Core::ActionContextHandle& context, 
-  Core::ActionResultHandle& result )
-{
-  ToolFactory::Instance()->save_settings();
+  // -- Constructor/Destructor --
+public:
+  ActionResetChangesMade()
+  {
+  }
 
-  return true;
-}
+  virtual ~ActionResetChangesMade()
+  {
+  }
 
-void ActionSaveToolPreferences::Dispatch( Core::ActionContextHandle context )
-{
-  ActionSaveToolPreferences* action = new ActionSaveToolPreferences;
-  Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
-}
+  // -- Functions that describe action --
+public:
+  virtual bool validate( Core::ActionContextHandle& context );
+  virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
+  
+  // -- Dispatch this action from the interface --
+public:
+  
+  // CREATE:
+  // Create an action that resets whether changes have been made to a project
+  static Core::ActionHandle Create();
+  
+  // DISPATCH:
+  // Dispatch an action that resets whether changes have been made to a project
+  static void Dispatch( Core::ActionContextHandle context);
+};
 
 } // end namespace Seg3D
+
+#endif  //ACTIONSAVESESSION_H

@@ -32,27 +32,29 @@
 ##################################################
 
 SET(APPLICATION_PROJECTMANAGER_SRCS
-    ProjectManager.h
-    ProjectManager.cc
     AutoSave.h
     AutoSave.cc
+    ProjectManager.h
+    ProjectManager.cc
 )
 
 SET(APPLICATION_PROJECTMANAGER_ACTIONS_SRCS
-    Actions/ActionSaveSession.h
-    Actions/ActionSaveSession.cc
-    Actions/ActionLoadSession.h
-    Actions/ActionLoadSession.cc
     Actions/ActionDeleteSession.h
     Actions/ActionDeleteSession.cc
-    Actions/ActionLoadProject.h
-    Actions/ActionLoadProject.cc
-    Actions/ActionNewProject.h
-    Actions/ActionNewProject.cc
-    Actions/ActionSaveProjectAs.h
-    Actions/ActionSaveProjectAs.cc
     Actions/ActionExportProject.h
     Actions/ActionExportProject.cc
+    Actions/ActionLoadProject.h
+    Actions/ActionLoadProject.cc
+    Actions/ActionLoadSession.h
+    Actions/ActionLoadSession.cc
+    Actions/ActionNewProject.h
+    Actions/ActionNewProject.cc
+    Actions/ActionResetChangesMade.h
+    Actions/ActionResetChangesMade.cc
+    Actions/ActionSaveProjectAs.h
+    Actions/ActionSaveProjectAs.cc
+    Actions/ActionSaveSession.h
+    Actions/ActionSaveSession.cc
 )
 
 

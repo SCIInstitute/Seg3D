@@ -26,49 +26,36 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-// Application Includes
-#include <Application/PreferencesManager/PreferencesManager.h>
-#include <Application/PreferencesManager/Actions/ActionSavePreferences.h>
-#include <Application/Tool/Actions/ActionSaveToolPreferences.h>
+#include <Application/ProjectManager/ProjectManager.h>
+#include <Application/ProjectManager/Actions/ActionResetChangesMade.h>
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
-CORE_REGISTER_ACTION( Seg3D, SavePreferences )
+CORE_REGISTER_ACTION( Seg3D, ResetChangesMade )
 
 namespace Seg3D
 {
 
-bool ActionSavePreferences::validate( Core::ActionContextHandle& context )
+bool ActionResetChangesMade::validate( Core::ActionContextHandle& context )
 {
   return true; // validated
 }
 
-bool ActionSavePreferences::run( Core::ActionContextHandle& context, 
+bool ActionResetChangesMade::run( Core::ActionContextHandle& context, 
   Core::ActionResultHandle& result )
 {
-//  std::string message = std::string("Please wait, while your preferences are being saved...");
-//
-//  Core::ActionProgressHandle progress = 
-//    Core::ActionProgressHandle( new Core::ActionProgress( message ) );
-//
-//  progress->begin_progress_reporting();
-
-  PreferencesManager::Instance()->save_state();
-  ActionSaveToolPreferences::Dispatch( Core::Interface::GetWidgetActionContext() );
-
-//  progress->end_progress_reporting();
-
+  ProjectManager::Instance()->get_current_project()->reset_project_changed();
   return true;
 }
-
-Core::ActionHandle ActionSavePreferences::Create()
+  
+Core::ActionHandle ActionResetChangesMade::Create()
 {
-  ActionSavePreferences* action = new ActionSavePreferences;
+  ActionResetChangesMade* action = new ActionResetChangesMade;
   return Core::ActionHandle( action );
 }
 
-void ActionSavePreferences::Dispatch( Core::ActionContextHandle context )
+void ActionResetChangesMade::Dispatch( Core::ActionContextHandle context )
 {
   Core::ActionDispatcher::PostAction( Create(), context );
 }
