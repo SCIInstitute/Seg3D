@@ -104,7 +104,6 @@ TARGET_LINK_LIBRARIES(Interface_AppController
                       Core_EventHandler
                       Core_Action
                       Core_Interface
-                      Core_ActionManager
                       Application_Tool
                       Application_Tools
                       QtUtils_Utils

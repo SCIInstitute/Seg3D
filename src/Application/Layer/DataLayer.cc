@@ -415,7 +415,7 @@ LayerHandle DataLayer::duplicate() const
     return layer;
   }
   
-  return DataLayerHandle( new DataLayer( "Copy-" + this->get_layer_name(), data_volume ) );
+  return DataLayerHandle( new DataLayer( "Copy_" + this->get_layer_name(), data_volume ) );
 
 }
 

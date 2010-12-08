@@ -212,6 +212,10 @@ public:
   // Set the histogram of the dataset
   void set_histogram( const Histogram& histogram );
 
+  // SWAP_ENDIAN:
+  // Swap the endianess of the data
+  void swap_endian();
+
 private:
   friend class DataBlockManager;
   void set_generation( generation_type generation );
@@ -292,6 +296,7 @@ public:
   // DUPLICATE:
   // Clone the data in a datablock by generating a new one and copying the data into it.
   static bool Duplicate( const DataBlockHandle& src_data_block, DataBlockHandle& dst_data_block ); 
+
 };
 
 } // end namespace Core

@@ -328,8 +328,6 @@ bool StateHandler::post_save_states( StateIO& state_io )
 void StateHandler::handle_state_changed()
 {
   // Trigger the signal in the state engine
-  CORE_LOG_DEBUG("Triggering state changed signal");
-
   StateEngine::Instance()->state_changed_signal_();
   
   // Call the local function of this state engine that handles the specifics of the derived

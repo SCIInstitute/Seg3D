@@ -86,7 +86,6 @@ TARGET_LINK_LIBRARIES(Interface_AppProjectWizard
                       Core_EventHandler
                       Core_Action
                       Core_Interface
-                      Core_ActionManager
                   Application_ProjectManager
                       ${QT_LIBRARIES} 
                       ${SCI_BOOST_LIBRARY})

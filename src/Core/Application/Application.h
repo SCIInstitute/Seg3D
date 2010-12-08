@@ -111,7 +111,7 @@ public:
   void log_start();
 
   // LOG_FINISH:
-  // Log an end tag mentioning that the program has finished
+  // Log an end tag mentioning that the program has finished successfully
   void log_finish();
 
   // -- Directory information --

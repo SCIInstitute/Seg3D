@@ -203,8 +203,16 @@ protected:
 
 public:
 
+  // TODO:
+  // These should be private and only the StateEngine should have access as a friend of this class
+  // --JGS
+
+  // LOAD_STATES:
+  // Load the states into the StateIO variable
   bool load_states( const StateIO& state_io );
 
+  // SAVE_STATES:
+  // Save the states into the StateIO variable
   void save_states( StateIO& state_io );
 
 protected:

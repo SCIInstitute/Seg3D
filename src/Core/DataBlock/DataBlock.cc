@@ -283,6 +283,177 @@ size_t DataBlock::get_elem_size() const
   return 0;
 }
 
+
+void SwapEndian( void* data, size_t size, size_t elem_size )
+{
+  unsigned char* udata = reinterpret_cast<unsigned char*>( data );
+  switch( elem_size )
+  {
+    case 1:
+      return;
+
+    case 2:
+    {
+      unsigned char tmp;
+    
+      size_t size8 = size & ~(0x7);
+      size_t j = 0;
+      for ( ; j < size8; j+=8 )
+      {
+        tmp = udata[ 0 ]; udata[ 0 ] = udata[ 1 ]; udata[ 1 ] = tmp;
+        udata += 2;
+        tmp = udata[ 0 ]; udata[ 0 ] = udata[ 1 ]; udata[ 1 ] = tmp;
+        udata += 2;
+        tmp = udata[ 0 ]; udata[ 0 ] = udata[ 1 ]; udata[ 1 ] = tmp;
+        udata += 2;
+        tmp = udata[ 0 ]; udata[ 0 ] = udata[ 1 ]; udata[ 1 ] = tmp;
+        udata += 2;
+        
+        tmp = udata[ 0 ]; udata[ 0 ] = udata[ 1 ]; udata[ 1 ] = tmp;
+        udata += 2;
+        tmp = udata[ 0 ]; udata[ 0 ] = udata[ 1 ]; udata[ 1 ] = tmp;
+        udata += 2;
+        tmp = udata[ 0 ]; udata[ 0 ] = udata[ 1 ]; udata[ 1 ] = tmp;
+        udata += 2;
+        tmp = udata[ 0 ]; udata[ 0 ] = udata[ 1 ]; udata[ 1 ] = tmp;
+        udata += 2;
+      }
+                  
+      for( ;  j < size; j++ )
+      {
+        tmp = udata[ 0 ]; udata[ 0 ] = udata[ 1 ]; udata[ 1 ] = tmp;
+        udata += 2;
+      }
+      return;
+    }
+    case 4:
+    {
+      size_t size8 = size & ~(0x7);
+      size_t j = 0;
+      unsigned char tmp;
+
+      for ( ; j < size8; j+=8 )
+      {
+        tmp = udata[ 0 ]; udata[ 0 ] = udata[ 3 ]; udata[ 3 ] = tmp;
+        tmp = udata[ 1 ]; udata[ 1 ] = udata[ 2 ]; udata[ 2 ] = tmp;
+        udata += 4;     
+        tmp = udata[ 0 ]; udata[ 0 ] = udata[ 3 ]; udata[ 3 ] = tmp;
+        tmp = udata[ 1 ]; udata[ 1 ] = udata[ 2 ]; udata[ 2 ] = tmp;
+        udata += 4;     
+        tmp = udata[ 0 ]; udata[ 0 ] = udata[ 3 ]; udata[ 3 ] = tmp;
+        tmp = udata[ 1 ]; udata[ 1 ] = udata[ 2 ]; udata[ 2 ] = tmp;
+        udata += 4;     
+        tmp = udata[ 0 ]; udata[ 0 ] = udata[ 3 ]; udata[ 3 ] = tmp;
+        tmp = udata[ 1 ]; udata[ 1 ] = udata[ 2 ]; udata[ 2 ] = tmp;
+        udata += 4;     
+
+        tmp = udata[ 0 ]; udata[ 0 ] = udata[ 3 ]; udata[ 3 ] = tmp;
+        tmp = udata[ 1 ]; udata[ 1 ] = udata[ 2 ]; udata[ 2 ] = tmp;
+        udata += 4;     
+        tmp = udata[ 0 ]; udata[ 0 ] = udata[ 3 ]; udata[ 3 ] = tmp;
+        tmp = udata[ 1 ]; udata[ 1 ] = udata[ 2 ]; udata[ 2 ] = tmp;
+        udata += 4;     
+        tmp = udata[ 0 ]; udata[ 0 ] = udata[ 3 ]; udata[ 3 ] = tmp;
+        tmp = udata[ 1 ]; udata[ 1 ] = udata[ 2 ]; udata[ 2 ] = tmp;
+        udata += 4;     
+        tmp = udata[ 0 ]; udata[ 0 ] = udata[ 3 ]; udata[ 3 ] = tmp;
+        tmp = udata[ 1 ]; udata[ 1 ] = udata[ 2 ]; udata[ 2 ] = tmp;
+        udata += 4;     
+      }
+      for( ;  j < size; j++ )
+      {
+        tmp = udata[ 0 ]; udata[ 0 ] = udata[ 3 ]; udata[ 3 ] = tmp;
+        tmp = udata[ 1 ]; udata[ 1 ] = udata[ 2 ]; udata[ 2 ] = tmp;
+        udata += 4;
+      }
+      return;
+    
+    } 
+    case 8:
+    {
+      size_t size8 = size & ~(0x7);
+      size_t j = 0;
+      unsigned char tmp;
+
+      for ( ; j < size8; j+=8 )
+      {
+        tmp = udata[ 0 ]; udata[ 0 ] = udata[ 7 ]; udata[ 7 ] = tmp;
+        tmp = udata[ 1 ]; udata[ 1 ] = udata[ 6 ]; udata[ 6 ] = tmp;
+        tmp = udata[ 2 ]; udata[ 2 ] = udata[ 5 ]; udata[ 5 ] = tmp;
+        tmp = udata[ 3 ]; udata[ 3 ] = udata[ 4 ]; udata[ 4 ] = tmp;
+        udata += 8;
+        tmp = udata[ 0 ]; udata[ 0 ] = udata[ 7 ]; udata[ 7 ] = tmp;
+        tmp = udata[ 1 ]; udata[ 1 ] = udata[ 6 ]; udata[ 6 ] = tmp;
+        tmp = udata[ 2 ]; udata[ 2 ] = udata[ 5 ]; udata[ 5 ] = tmp;
+        tmp = udata[ 3 ]; udata[ 3 ] = udata[ 4 ]; udata[ 4 ] = tmp;
+        udata += 8;
+        tmp = udata[ 0 ]; udata[ 0 ] = udata[ 7 ]; udata[ 7 ] = tmp;
+        tmp = udata[ 1 ]; udata[ 1 ] = udata[ 6 ]; udata[ 6 ] = tmp;
+        tmp = udata[ 2 ]; udata[ 2 ] = udata[ 5 ]; udata[ 5 ] = tmp;
+        tmp = udata[ 3 ]; udata[ 3 ] = udata[ 4 ]; udata[ 4 ] = tmp;
+        udata += 8;
+        tmp = udata[ 0 ]; udata[ 0 ] = udata[ 7 ]; udata[ 7 ] = tmp;
+        tmp = udata[ 1 ]; udata[ 1 ] = udata[ 6 ]; udata[ 6 ] = tmp;
+        tmp = udata[ 2 ]; udata[ 2 ] = udata[ 5 ]; udata[ 5 ] = tmp;
+        tmp = udata[ 3 ]; udata[ 3 ] = udata[ 4 ]; udata[ 4 ] = tmp;
+        udata += 8;
+
+        tmp = udata[ 0 ]; udata[ 0 ] = udata[ 7 ]; udata[ 7 ] = tmp;
+        tmp = udata[ 1 ]; udata[ 1 ] = udata[ 6 ]; udata[ 6 ] = tmp;
+        tmp = udata[ 2 ]; udata[ 2 ] = udata[ 5 ]; udata[ 5 ] = tmp;
+        tmp = udata[ 3 ]; udata[ 3 ] = udata[ 4 ]; udata[ 4 ] = tmp;
+        udata += 8;
+        tmp = udata[ 0 ]; udata[ 0 ] = udata[ 7 ]; udata[ 7 ] = tmp;
+        tmp = udata[ 1 ]; udata[ 1 ] = udata[ 6 ]; udata[ 6 ] = tmp;
+        tmp = udata[ 2 ]; udata[ 2 ] = udata[ 5 ]; udata[ 5 ] = tmp;
+        tmp = udata[ 3 ]; udata[ 3 ] = udata[ 4 ]; udata[ 4 ] = tmp;
+        udata += 8;
+        tmp = udata[ 0 ]; udata[ 0 ] = udata[ 7 ]; udata[ 7 ] = tmp;
+        tmp = udata[ 1 ]; udata[ 1 ] = udata[ 6 ]; udata[ 6 ] = tmp;
+        tmp = udata[ 2 ]; udata[ 2 ] = udata[ 5 ]; udata[ 5 ] = tmp;
+        tmp = udata[ 3 ]; udata[ 3 ] = udata[ 4 ]; udata[ 4 ] = tmp;
+        udata += 8;
+        tmp = udata[ 0 ]; udata[ 0 ] = udata[ 7 ]; udata[ 7 ] = tmp;
+        tmp = udata[ 1 ]; udata[ 1 ] = udata[ 6 ]; udata[ 6 ] = tmp;
+        tmp = udata[ 2 ]; udata[ 2 ] = udata[ 5 ]; udata[ 5 ] = tmp;
+        tmp = udata[ 3 ]; udata[ 3 ] = udata[ 4 ]; udata[ 4 ] = tmp;
+        udata += 8;     
+      }
+      for( ;  j < size; j++ )
+      {
+        tmp = udata[ 0 ]; udata[ 0 ] = udata[ 7 ]; udata[ 7 ] = tmp;
+        tmp = udata[ 1 ]; udata[ 1 ] = udata[ 6 ]; udata[ 6 ] = tmp;
+        tmp = udata[ 2 ]; udata[ 2 ] = udata[ 5 ]; udata[ 5 ] = tmp;
+        tmp = udata[ 3 ]; udata[ 3 ] = udata[ 4 ]; udata[ 4 ] = tmp;
+        udata += 8;
+      }
+      return; 
+    }
+  }
+}
+
+void DataBlock::swap_endian()
+{
+  lock_type lock( this->get_mutex() );
+
+  switch( this->data_type_ )
+  {
+    case DataType::CHAR_E: 
+    case DataType::UCHAR_E:
+      SwapEndian( get_data(), get_size(), 1 );
+    case DataType::SHORT_E:
+    case DataType::USHORT_E:
+      SwapEndian( get_data(), get_size(), 2 );
+    case DataType::INT_E:
+    case DataType::UINT_E:
+    case DataType::FLOAT_E:
+      SwapEndian( get_data(), get_size(), 4 );
+    case DataType::DOUBLE_E:
+      SwapEndian( get_data(), get_size(), 8 );
+  }
+}
+
+
 template<class DATA>
 static bool ConvertDataTypeInternal( DATA* src, DataBlockHandle& dst_data_block )
 {
@@ -886,8 +1057,6 @@ bool DataBlock::Duplicate( const DataBlockHandle& src_data_block,
 
   return true;
 }
-
-
 
 template<class T>
 bool ExtractSliceInternal( DataBlock* volume_data_block, 

@@ -162,7 +162,6 @@ TARGET_LINK_LIBRARIES(Interface_AppInterface
                       Core_EventHandler
                       Core_Action
                       Core_Interface
-                      Core_ActionManager
                       Core_State
             Application_Project
             Application_ProjectManager

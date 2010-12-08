@@ -92,7 +92,6 @@ TARGET_LINK_LIBRARIES(Interface_AppPreferences
                       Core_EventHandler
                       Core_Action
                       Core_Interface
-                      Core_ActionManager
                       QtUtils_Utils
                       QtUtils_Widgets
             QtUtils_Bridge

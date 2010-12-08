@@ -390,7 +390,7 @@ LayerHandle MaskLayer::duplicate() const
     return layer;
   }
   
-  return MaskLayerHandle( new MaskLayer( "Copy-" + this->get_layer_name(), mask_volume ) );
+  return MaskLayerHandle( new MaskLayer( "Copy_" + this->get_layer_name(), mask_volume ) );
 }
 
 

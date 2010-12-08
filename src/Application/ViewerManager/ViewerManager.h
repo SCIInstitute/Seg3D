@@ -123,7 +123,7 @@ public:
   // -- State information --
 public:
 
-  // Which layout is used to display the data
+  // Which layout is used to display the data (single, 1and1, 1and2, 1and3, 2and2, 3and3 )
   Core::StateOptionHandle layout_state_;
   
   // Number of the viewer that is the active viewer
@@ -138,8 +138,11 @@ public:
   // Whether slice number is shown
   Core::StateBoolHandle show_slice_number_state_;
 
+  // Preferences of names for the axes
   Core::StateOptionHandle naming_convention_state_;
 
+  // TODO: The next ones should not be state variables
+  // --JGS
   // Number of the viewer that is the active axial viewer ( for picking )
   Core::StateIntHandle active_axial_viewer_;
   

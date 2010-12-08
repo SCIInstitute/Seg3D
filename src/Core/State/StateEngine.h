@@ -120,6 +120,8 @@ private:
   
   // -- Signals --
 public:
+  // STATE_CHANGED_SIGNAL:
+  // This signal is triggered when a state in the state engine is changed
   typedef boost::signals2::signal<void ()> state_changed_signal_type;
   state_changed_signal_type state_changed_signal_;
 

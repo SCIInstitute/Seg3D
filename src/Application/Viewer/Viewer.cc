@@ -867,7 +867,7 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
   std::string coronal = CORONAL_C + "=" + PreferencesManager::Instance()->y_axis_label_state_->get();
   std::string axial = AXIAL_C + "=" + PreferencesManager::Instance()->z_axis_label_state_->get();
   
-  // Indicate that this statehandler contains data that is part of th project
+  // Indicate that this statehandler contains data that is part of the project
   //this->mark_as_project_data();
 
   this->add_state( "view_mode", view_mode_state_, mode, sagittal + "|" + coronal 

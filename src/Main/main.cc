@@ -71,28 +71,26 @@ using namespace Seg3D;
 
 int main( int argc, char **argv )
 {
-  // -- Stream messages to the console window --
-  //Core::LogStreamer error_log( Core::LogMessageType::ALL_E, &( std::cerr ) );
-  // -- Send message to revolving log file --
-  Core::RolloverLogFile event_log( Core::LogMessageType::ERROR_E | 
-    Core::LogMessageType::WARNING_E | Core::LogMessageType::MESSAGE_E );
-
   // -- Parse the command line parameters --
   Core::Application::Instance()->parse_command_line_parameters( argc, argv );
   
   // -- Check whether the user requested a version / revision number
   if ( Core::Application::Instance()->is_command_line_parameter( "revision") )
   {
-    std::cout << Seg3D_REVISIONINFO << std::endl;
+    std::cout << SEG3D_REVISIONINFO << std::endl;
     return 0;
   }
 
   if ( Core::Application::Instance()->is_command_line_parameter( "version") )
   {
     std::cout << Core::Application::Instance()->GetApplicationName() << " version: " <<  
+      Core::Application::Instance()->GetReleaseName() << " " <<
       Core::Application::Instance()->GetVersion() << std::endl;
     return 0;
   }
+
+  // -- Send message to revolving log file --
+  Core::RolloverLogFile event_log( Core::LogMessageType::NODEBUG_E );
 
   // -- Log application information --
   Core::Application::Instance()->log_start();
@@ -132,6 +130,7 @@ int main( int argc, char **argv )
   QMessageBox::information( 0, 
     QString::fromStdString( Core::Application::GetApplicationNameAndVersion() ), 
     QString::fromStdString( warning )  );
+
 #ifdef BUILD_WITH_PYTHON
   size_t name_len = strlen( argv[ 0 ] );
   std::vector< wchar_t > program_name( name_len + 1 );
@@ -163,4 +162,3 @@ int main( int argc, char **argv )
   Core::Application::Instance()->log_finish();
   return ( 0 );
 }
-

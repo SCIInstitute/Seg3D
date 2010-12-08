@@ -92,7 +92,6 @@ TARGET_LINK_LIBRARIES(Interface_AppSplash
                       Core_EventHandler
                       Core_Action
                       Core_Interface
-                      Core_ActionManager
             Application_ProjectManager
             Resources_QtResources
                       ${QT_LIBRARIES} 

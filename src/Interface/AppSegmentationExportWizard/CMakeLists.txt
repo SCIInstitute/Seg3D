@@ -95,7 +95,6 @@ TARGET_LINK_LIBRARIES(Interface_AppSegmentationExportWizard
                       Core_EventHandler
                       Core_Action
                       Core_Interface
-                      Core_ActionManager
                       Interface_AppInterface
                       Application_ProjectManager
                       Application_LayerIO

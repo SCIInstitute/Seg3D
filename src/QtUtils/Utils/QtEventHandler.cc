@@ -124,7 +124,7 @@ void QtEventHandlerContext::post_and_wait_event( Core::EventHandle& event )
     this->events_.push( event );
   }
 
-  //Post a user event to the QT event loop
+  // Post a user event to the QT event loop
   QCoreApplication::postEvent( qapplication_, new QEvent( QEvent::User ) );
 
   // Wait for QT to handle the event

@@ -62,11 +62,30 @@ bool ActionLoadSession::run( Core::ActionContextHandle& context,
 
   progress->begin_progress_reporting();
 
-  if( ProjectManager::Instance()->load_project_session( this->session_name_.value() ) )
+  // -- For now add logging of exceptions if session cannot be loaded correctly --
+  try
   {
-    success = true;
+    if( ProjectManager::Instance()->load_project_session( this->session_name_.value() ) )
+    {
+      success = true;
+    }
   }
-
+  catch ( std::exception& exp )
+  {
+    CORE_LOG_ERROR( exp.what() );
+    success = false;
+  }
+  catch( Core::Exception& exp )
+  {
+    CORE_LOG_ERROR( exp.what() ); 
+    success = false;
+  }
+  catch( ... )
+  {
+    CORE_LOG_ERROR( "Caught an unknown exception." ); 
+    success = false;  
+  }
+  
   progress->end_progress_reporting();
 
   if ( ProjectManager::Instance()->get_current_project() )
