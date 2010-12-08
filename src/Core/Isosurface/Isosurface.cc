@@ -364,10 +364,8 @@ public:
   // Downsample params
   MaskVolumeHandle downsample_mask_volume_;
   int neighborhood_size_;
-  size_t ysize_;
-  size_t downsampled_nx_;
-  size_t downsampled_ny_;
-  size_t downsampled_nz_;
+  size_t zsize_;
+  size_t total_neighborhoods_;
 
   // Input to isosurface computation, not downsampled
   MaskVolumeHandle orig_mask_volume_; 
@@ -444,16 +442,16 @@ void IsosurfacePrivate::downsample_setup( int num_threads, double quality_factor
 
   // Create downsampled mask to store results 
   this->neighborhood_size_ = static_cast< int >( 1.0 / quality_factor );
-  this->downsampled_nx_ = this->nx_ / this->neighborhood_size_;
-  this->downsampled_ny_ = this->ny_ / this->neighborhood_size_;
-  this->downsampled_nz_ = this->nz_ / this->neighborhood_size_;
+  size_t downsampled_nx = this->nx_ / this->neighborhood_size_;
+  size_t downsampled_ny = this->ny_ / this->neighborhood_size_;
+  size_t downsampled_nz = this->nz_ / this->neighborhood_size_;
 
   // Normally MaskDataBlocks should be registered with the MathDataBlockManager, but in this
   // case we are only using this as a temporary object and do not want to share the mask with
   // other masks since we would then have to carefully lock/unlock it during use.
   MaskDataBlockHandle mask_data_block( new MaskDataBlock( 
-    StdDataBlock::New( this->downsampled_nx_, this->downsampled_ny_, this->downsampled_nz_, 
-    DataType::UCHAR_E ), this->orig_mask_volume_->get_mask_data_block()->get_mask_bit() ) );
+    StdDataBlock::New( downsampled_nx, downsampled_ny, downsampled_nz, DataType::UCHAR_E ), 
+    this->orig_mask_volume_->get_mask_data_block()->get_mask_bit() ) );
 
   // Downsampled mask needs to be scaled up to fill the same geometric space as the original
   // mask.
@@ -467,14 +465,19 @@ void IsosurfacePrivate::downsample_setup( int num_threads, double quality_factor
   // Point to downsampled mask rather than original mask
   this->compute_mask_volume_ = this->downsample_mask_volume_;
 
-  // For parallelization, divide mask into slabs along y.  No synchronization is needed.
-  this->ysize_ = static_cast< size_t >( this->ny_ / num_threads );
-  int remainder = this->ysize_ % this->neighborhood_size_;
+  // For parallelization, divide mask into slabs along z.  No synchronization is needed.
+  this->zsize_ = static_cast< size_t >( this->nz_ / num_threads );
+  int remainder = this->zsize_ % this->neighborhood_size_;
   // Round up to the next neighborhood increment -- leaves least work for last thread
   if( remainder != 0 )
   {
-    this->ysize_ += ( this->neighborhood_size_ - remainder );
+    this->zsize_ += ( this->neighborhood_size_ - remainder );
   }
+
+  size_t x_neighborhoods = this->nx_ / this->neighborhood_size_;
+  size_t y_neighborhoods = this->ny_ / this->neighborhood_size_;
+  size_t z_neighborhoods = this->zsize_ / this->neighborhood_size_;
+  this->total_neighborhoods_ = x_neighborhoods * y_neighborhoods * z_neighborhoods;
 }
 
 /*
@@ -494,45 +497,36 @@ void IsosurfacePrivate::parallel_downsample_mask( int thread, int num_threads,
   // All threads must wait for setup to complete
   barrier.wait();
 
-  // Different thread process horizontal slabs along the y axis.  Each slab contains one or more 
+  // Different thread process slabs along the z axis.  Each slab contains one or more 
   // neighborhoods to be downsampled.
   // [nzstart, nzend) 
-  size_t nystart = thread * this->ysize_;
-  size_t nyend = ( thread + 1 ) * this->ysize_;
-  if ( nyend > this->ny_ ) 
+  size_t nzstart = thread * this->zsize_;
+  size_t nzend = ( thread + 1 ) * this->zsize_;
+  if ( nzend > this->nz_ ) 
   {
-    nyend = this->ny_;
+    nzend = this->nz_;
   }
 
   unsigned char* downsampled_data = 
     this->downsample_mask_volume_->get_mask_data_block()->get_mask_data();
 
-  // Pre-calculate some values used in the loop
-  size_t downsampled_z_offset = this->downsampled_nx_ * this->downsampled_ny_;
   size_t z_offset = this->nx_ * this->ny_;
   unsigned char not_mask_value = ~( this->mask_value_ );
 
+  size_t target_index = thread * this->total_neighborhoods_;
   size_t x_start_end = this->nx_ - this->neighborhood_size_ + 1;
-  size_t y_start_end = nyend - this->neighborhood_size_ + 1;
-  size_t z_start_end = this->nz_ - this->neighborhood_size_ + 1;
+  size_t y_start_end = this->ny_ - this->neighborhood_size_ + 1;
+  size_t z_start_end = nzend - this->neighborhood_size_ + 1;
 
   // Loop over neighborhoods, chop off border values
-  for ( size_t z_start = 0; z_start < z_start_end; z_start += this->neighborhood_size_ ) 
+  for ( size_t z_start = nzstart; z_start < z_start_end; z_start += this->neighborhood_size_ ) 
   {
-    for ( size_t y_start = nystart; y_start < y_start_end; y_start += this->neighborhood_size_ ) 
+    for ( size_t y_start = 0; y_start < y_start_end; y_start += this->neighborhood_size_ ) 
     {
       for ( size_t x_start = 0; x_start < x_start_end; x_start += this->neighborhood_size_ ) 
       {
-        size_t downsampled_x = x_start / this->neighborhood_size_;
-        size_t downsampled_y = y_start / this->neighborhood_size_;
-        size_t downsampled_z = z_start / this->neighborhood_size_;
-
-        size_t downsampled_target_index = 
-          ( ( downsampled_z_offset ) * downsampled_z ) + 
-          ( this->downsampled_nx_ * downsampled_y ) + downsampled_x;  
-
         // Clear entry initially
-        downsampled_data[ downsampled_target_index ] &= not_mask_value;
+        downsampled_data[ target_index ] &= not_mask_value;
         
         bool stop = false;
         size_t x_end = x_start + this->neighborhood_size_;
@@ -552,29 +546,15 @@ void IsosurfacePrivate::parallel_downsample_mask( int thread, int num_threads,
               if ( this->data_[ index ] & this->mask_value_ ) // Node "on"    
               {
                 // Turn on mask value
-                downsampled_data[ downsampled_target_index ] |= this->mask_value_;
+                downsampled_data[ target_index ] |= this->mask_value_;
                 // Short-circuit
                 stop = true;
               }
             }
           }
         }
+        target_index++;
       }
-    }
-
-    if ( thread == 0 )
-    {
-      if ( this->check_abort_() ) 
-      {
-        this->need_abort_ = true;
-      }
-    }
-
-    barrier.wait();   
-
-    if ( this->need_abort_ ) 
-    {
-      return;
     }
   }
 }
