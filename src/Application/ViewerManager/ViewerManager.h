@@ -116,6 +116,10 @@ public:
   // Reset the cursors of all the viewers to default.
   void reset_cursor();
 
+  // IS_BUSY:
+  // Returns true if the mouse is pressed in any viewer, otherwise false.
+  bool is_busy();
+
   // -- State information --
 public:
 

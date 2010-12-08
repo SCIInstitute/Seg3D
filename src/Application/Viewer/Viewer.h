@@ -105,6 +105,10 @@ public:
   void set_key_press_event_handler( key_press_event_handler_type func );
   void reset_mouse_handlers();
 
+  // IS_BUSY:
+  // Returns true if the mouse is pressed, otherwise false.
+  bool is_busy();
+
   // -- Slice operations --
 public:
   // GET_VOLUME_SLICE:

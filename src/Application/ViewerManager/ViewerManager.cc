@@ -515,6 +515,18 @@ void ViewerManager::reset_cursor()
   }
 }
 
+bool ViewerManager::is_busy()
+{
+  for ( size_t i = 0; i < this->viewers_.size(); ++i )
+  {
+    if( this->viewers_[ i ]->is_busy() )
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
 void ViewerManager::handle_layer_volume_changed( LayerHandle layer )
 {
   for ( size_t i = 0; i < this->viewers_.size(); ++i )

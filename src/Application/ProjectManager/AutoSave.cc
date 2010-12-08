@@ -33,6 +33,7 @@
 #include <Application/ProjectManager/ProjectManager.h>
 #include <Application/ProjectManager/Actions/ActionSaveSession.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
+#include <Application/ViewerManager/ViewerManager.h>
 
 
 namespace Seg3D
@@ -73,8 +74,15 @@ void AutoSave::run()
       {
         while( true )
         {
-          if( !Core::ActionDispatcher::Instance()->is_busy() )
+          // A paint stroke involving potentially many mouse translations is treated as a 
+          // single action, so we have to check to see if the ViewerManager is busy 
+          // (mouse pressed) in addition to checking the ActionDispatcher. We never want
+          // to do an autosave if the mouse is pressed.
+          if( !Core::ActionDispatcher::Instance()->is_busy() && 
+            !ViewerManager::Instance()->is_busy() ) 
           {
+            // When the paint action finishes the timestamp will be recorded in the
+            // action, so this timer code should work for painting.
             boost::posix_time::ptime last_action_completed = 
               Core::ActionDispatcher::Instance()->last_action_completed();
             boost::posix_time::ptime current_time = 

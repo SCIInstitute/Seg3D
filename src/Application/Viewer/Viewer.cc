@@ -34,6 +34,7 @@
 #include <Core/State/Actions/ActionOffset.h>
 #include <Core/State/Actions/ActionToggle.h>
 #include <Core/State/Actions/ActionSet.h>
+#include <Core/Utils/AtomicCounter.h>
 #include <Core/Volume/DataVolumeSlice.h>
 #include <Core/Volume/MaskVolumeSlice.h>
 
@@ -146,6 +147,9 @@ public:
   Viewer::key_press_event_handler_type key_press_event_handler_;
 
   ViewManipulatorHandle view_manipulator_;
+
+  // We're treating this as a boolean.  We use AtomicCounter because it provides thread safety.
+  Core::AtomicCounter mouse_pressed_;
 };
 
 void ViewerPrivate::adjust_contrast_brightness( int dx, int dy )
@@ -1022,6 +1026,8 @@ void Viewer::mouse_move_event( const Core::MouseHistory& mouse_history, int butt
 void Viewer::mouse_press_event( const Core::MouseHistory& mouse_history, int button, int buttons,
     int modifiers )
 {
+  ++this->private_->mouse_pressed_;
+  
   if ( !this->private_->mouse_press_handler_.empty() )
   {
     // if the registered handler handled the event, no further process needed
@@ -1058,6 +1064,8 @@ void Viewer::mouse_press_event( const Core::MouseHistory& mouse_history, int but
 void Viewer::mouse_release_event( const Core::MouseHistory& mouse_history, int button, int buttons,
     int modifiers )
 {
+  --this->private_->mouse_pressed_;
+  
   if ( !this->private_->mouse_release_handler_.empty() )
   {
     // if the registered handler handled the event, no further process needed
@@ -1384,6 +1392,11 @@ void Viewer::reset_mouse_handlers()
   this->private_->mouse_leave_handler_ = 0;
   this->private_->wheel_event_handler_ = 0;
   this->private_->key_press_event_handler_ = 0;
+}
+
+bool Viewer::is_busy()
+{
+  return this->private_->mouse_pressed_ > 0;
 }
 
 void Viewer::update_status_bar( int x, int y, const std::string& layer_id )
