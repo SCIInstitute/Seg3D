@@ -125,6 +125,19 @@ bool PaintToolInterface::build_widget( QFrame* frame )
     tool->data_constraint_layer_state_, condition );
   QtUtils::QtBridge::Enable( this->private_->ui_.lower_threshold_,
     tool->data_constraint_layer_state_, condition );
+  QtUtils::QtBridge::Show( this->private_->ui_.data_constraint_widget_, 
+    tool->data_constraint_layer_state_, condition );
+  
+  condition = boost::lambda::bind( &Core::StateLabeledOption::get, 
+    tool->mask_constraint1_layer_state_.get() ) != Tool::NONE_OPTION_C;
+  QtUtils::QtBridge::Show( this->private_->ui_.mask_constraint_1_widget_, 
+    tool->mask_constraint1_layer_state_, condition );
+  
+  condition = boost::lambda::bind( &Core::StateLabeledOption::get, 
+    tool->mask_constraint2_layer_state_.get() ) != Tool::NONE_OPTION_C;
+  QtUtils::QtBridge::Show( this->private_->ui_.mask_constraint_2_widget_, 
+    tool->mask_constraint2_layer_state_, condition );
+  
   
   return true;
 } 
