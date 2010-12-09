@@ -47,6 +47,7 @@ SET(QTUTILS_WIDGETS_SRCS
   QtLogSliderIntCombo.cc
   QtTristateToolButton.cc
   SingleShotToolButton.cc
+  QtWarningMessageWidget.cc
 )
 
 SET(QTUTILS_WIDGETS_MOC_SRCS
@@ -65,6 +66,7 @@ SET(QTUTILS_WIDGETS_MOC_SRCS
   QtLogSliderIntCombo.h
   QtTristateToolButton.h
   SingleShotToolButton.h
+  QtWarningMessageWidget.h
 )
 
 SET(QTUTILS_WIDGETS_NO_MOC_SRCS
@@ -75,6 +77,7 @@ SET(QTUTILS_WIDGETS_UI_SRCS
   QtHistogramWidget.ui
   QtSliderDoubleCombo.ui
   QtSliderIntCombo.ui
+  QtWarningMessageWidget.ui
 )
 
 ##################################################

@@ -116,13 +116,16 @@ bool PaintToolInterface::build_widget( QFrame* frame )
     &SeedPointsTool::clear, tool, Core::Interface::GetWidgetActionContext() ) );
   
 
+  //this->private_->ui_.message_alert_->set_warning_message( "Select a mask layer to activate this tool." );
   QtUtils::QtBridge::Show( this->private_->ui_.message_alert_, tool->valid_target_state_, true );
-  
   
   boost::function< bool () > condition = boost::lambda::bind( &Core::StateLabeledOption::get, 
     tool->data_constraint_layer_state_.get() ) != Tool::NONE_OPTION_C;
+  
+  
   QtUtils::QtBridge::Enable( this->private_->ui_.upper_threshold_, 
     tool->data_constraint_layer_state_, condition );
+  
   QtUtils::QtBridge::Enable( this->private_->ui_.lower_threshold_,
     tool->data_constraint_layer_state_, condition );
   QtUtils::QtBridge::Show( this->private_->ui_.data_constraint_widget_, 

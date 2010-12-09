@@ -71,6 +71,8 @@ private:
   void update_data_point_info( DataPointInfoHandle data_point );
   void update_data_point_label();
   void set_message( int msg_type, std::string message );
+  void check_time();
+  
 
 private:
   QStatusBar* statusbar_;
@@ -81,10 +83,16 @@ private:
 private Q_SLOTS:
   void fix_icon_status();
   void swap_bars();
+  void clear_label();
+  void slide_in();
+  void slide_out();
+  void slide_out_then_in();
 
 private:
-  static void SetMessage( QPointer< AppStatusBar > qpointer, 
-    int msg_type, std::string message );
+  typedef QPointer< AppStatusBar > qpointer_type;
+  static void SetMessage( qpointer_type qpointer, int msg_type, std::string message );
+  static void HandleActionEvent( qpointer_type qpointer );
+
 };
 
 } // end namespace Seg3D

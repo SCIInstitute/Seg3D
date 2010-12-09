@@ -968,11 +968,6 @@ void LayerWidget::prep_for_animation( bool move_time )
   if( move_time )
   {
     this->private_->ui_.facade_widget_->setMinimumSize( this->private_->ui_.base_->size() );
-    
-    //QImage temp_image( this->private_->ui_.base_->size(), QImage::Format_ARGB32 );
-//    temp_image.fill( 0 );
-//    this->private_->ui_.base_->render( &temp_image, QPoint(), this->private_->ui_.base_->rect(), QWidget::DrawChildren );
-    
     this->private_->ui_.facade_widget_->setPixmap( QPixmap::grabWidget( this ) );
     this->private_->ui_.base_->hide();
     this->private_->ui_.facade_widget_->show();

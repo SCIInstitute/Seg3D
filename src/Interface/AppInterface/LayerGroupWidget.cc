@@ -134,11 +134,12 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   some_visible_icon.addFile( QString::fromUtf8( ":/Images/VisibleGray.png" ), QSize(), QIcon::Normal );
   QIcon all_visible_icon;
   all_visible_icon.addFile( QString::fromUtf8( ":/Images/VisibleWhite.png" ), QSize(), QIcon::Normal );
+  
   this->private_->ui_.group_visibility_button_->set_icons( none_visible_icon, 
     some_visible_icon, all_visible_icon );
+  
   QtUtils::QtBridge::Connect( this->private_->ui_.group_visibility_button_, 
     group->layers_visible_state_ );
-
 
   this->private_->ui_.group_frame_layout_->setAlignment( Qt::AlignTop );
   this->private_->ui_.group_frame_layout_->setSpacing( 1 );

@@ -27,14 +27,18 @@
  */
 
 // boost includes
-#include<boost/tokenizer.hpp>
+#include <boost/tokenizer.hpp>
 
-//Core Includes - for logging
+// Qt includes
+#include <QtCore/QPropertyAnimation>
+
+// Core Includes - for logging
 #include <Core/Utils/Log.h>
 #include <Core/Interface/Interface.h>
 
 // QtUtils includes
 #include <QtUtils/Bridge/QtBridge.h>
+#include <QtUtils/Utils/QtPointer.h>
 
 // Interface includes
 #include <Interface/AppInterface/AppStatusBar.h>
@@ -58,6 +62,9 @@ class AppStatusBarPrivate : public Core::RecursiveLockable
 {
 public:
   Ui::StatusBar ui_;
+  boost::posix_time::ptime last_message_time_;
+  QString current_message_;
+  int message_type_;
   
 };
 
@@ -94,8 +101,22 @@ AppStatusBar::AppStatusBar( QMainWindow* parent ) :
 
   this->add_connection( StatusBar::Instance()->data_point_info_updated_signal_.connect( 
     boost::bind( &AppStatusBar::update_data_point_info, this, _1 ) ) );
+  
   this->add_connection( StatusBar::Instance()->message_updated_signal_.connect( 
-    boost::bind( &AppStatusBar::SetMessage, QPointer< AppStatusBar >( this ), _1, _2 ) ) );
+    boost::bind( &AppStatusBar::SetMessage, qpointer_type( this ), _1, _2 ) ) );
+  
+  this->add_connection( Core::ActionDispatcher::Instance()->post_action_signal_.connect( 
+    boost::bind( &AppStatusBar::HandleActionEvent, qpointer_type( this ) ) ) );
+  
+  this->private_->ui_.status_report_label_->setGeometry( QRect( 0, 
+    -this->private_->ui_.status_report_label_->height(), 
+    this->private_->ui_.status_report_label_->width(), 
+    this->private_->ui_.status_report_label_->height() ) );
+  
+  this->private_->ui_.status_report_label_->hide();
+  
+  this->private_->last_message_time_ = boost::posix_time::second_clock::local_time();
+  
 }
 
 AppStatusBar::~AppStatusBar()
@@ -241,31 +262,33 @@ void AppStatusBar::update_data_point_label()
 
 void AppStatusBar::set_message( int msg_type, std::string message )
 {
-  std::string status_message = message;
-  boost::char_separator< char > separater( " " );
-  boost::tokenizer< boost::char_separator< char > > tok( message, separater );
-
-  for ( boost::tokenizer< boost::char_separator< char > >::iterator beg = ++tok.begin(); beg
-      != tok.end(); ++beg )
+//  std::string status_message = message;
+//  boost::char_separator< char > separater( " " );
+//  boost::tokenizer< boost::char_separator< char > > tok( message, separater );
+//
+//  for ( boost::tokenizer< boost::char_separator< char > >::iterator beg = ++tok.begin(); beg
+//      != tok.end(); ++beg )
+//  {
+//    status_message = status_message + " " + *beg;
+//  }
+  
+  this->private_->message_type_ = msg_type;
+  this->private_->current_message_ = QString::fromStdString( message );
+  
+  if( this->private_->ui_.status_report_label_->text() == "" )
   {
-    status_message = status_message + " " + *beg;
-  }
-
-  // Here we change the color of the text if we are reporting an error.
-  if( msg_type == Core::LogMessageType::ERROR_E )
-  {
-    this->private_->ui_.status_report_label_->setStyleSheet( StyleSheet::STATUSBAR_ERROR_C );
+    this->slide_in();
   }
   else
   {
-    this->private_->ui_.status_report_label_->setStyleSheet( StyleSheet::STATUSBAR_C );
+    this->slide_out_then_in();
   }
-
-  this->private_->ui_.status_report_label_->setText( QString::fromStdString( message ) );
+  
+  // Last thing we do is reset the last message time.
+  this->private_->last_message_time_ = boost::posix_time::second_clock::local_time();
 }
 
-void AppStatusBar::SetMessage( QPointer< AppStatusBar > qpointer, 
-                int msg_type, std::string message )
+void AppStatusBar::SetMessage( qpointer_type qpointer, int msg_type, std::string message )
 {
   if ( !Core::Interface::IsInterfaceThread() )
   {
@@ -279,5 +302,106 @@ void AppStatusBar::SetMessage( QPointer< AppStatusBar > qpointer,
     qpointer->set_message( msg_type, message );
   }
 }
+  
+  
+  void AppStatusBar::HandleActionEvent( qpointer_type qpointer )
+  {
+    Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, 
+      boost::bind( &AppStatusBar::check_time, qpointer.data() ) ) );
+  }
+  
+  void AppStatusBar::check_time()
+  {
+    boost::posix_time::ptime current_time = boost::posix_time::second_clock::local_time();
+    boost::posix_time::time_duration duration = current_time - this->private_->last_message_time_;
+    
+    double time_since_last_message = static_cast< double >
+    ( duration.total_milliseconds() ) * 0.001;
+    
+    if( ( time_since_last_message > 10 ) && ( this->private_->ui_.status_report_label_->text() != "" ) )
+    {
+      this->slide_out();
+    }
+  }
+  
+  void AppStatusBar::slide_in()
+  {
+    
+    if( this->private_->ui_.status_report_label_->isVisible() )
+    {
+      this->private_->ui_.status_report_label_->hide();
+    }
+    
+    this->private_->ui_.status_report_label_->setGeometry( QRect( 0, 
+       -this->private_->ui_.status_report_label_->height(), 
+       this->private_->ui_.status_report_label_->width(), 
+       this->private_->ui_.status_report_label_->height() ) );
+    
+    // Here we create the animation that will slide the message into the task bar
+    QPropertyAnimation *animation = new QPropertyAnimation( this->private_->ui_.status_report_label_, "geometry" );
+    
+    // Here we change the color of the text if we are reporting an error.
+    if( this->private_->message_type_ == Core::LogMessageType::ERROR_E )
+    {
+      this->private_->ui_.status_report_label_->setStyleSheet( StyleSheet::STATUSBAR_ERROR_C );
+      animation->setDuration( 300 );
+    }
+    else
+    {
+      this->private_->ui_.status_report_label_->setStyleSheet( StyleSheet::STATUSBAR_C );
+      animation->setDuration( 1000 );
+    }
+    
+    this->private_->ui_.status_report_label_->setText( this->private_->current_message_ );
+    
+    this->private_->ui_.status_report_label_->show();
+    
+    animation->setStartValue( QRect( 0, -this->private_->ui_.status_report_label_->height(), 
+      this->private_->ui_.status_report_label_->width(), 
+      this->private_->ui_.status_report_label_->height() ) );
+    animation->setEndValue( QRect( 0, 0, this->private_->ui_.status_report_label_->width(), 
+      this->private_->ui_.status_report_label_->height() ) );
+    animation->start();
+  }
+  
+  void AppStatusBar::slide_out_then_in()
+  {
+    QPropertyAnimation *animation = new QPropertyAnimation( this->private_->ui_.status_report_label_, "geometry" );
+    animation->setDuration( 1000 );
+    animation->setStartValue( QRect( 0, 0, this->private_->ui_.status_report_label_->width(), 
+      this->private_->ui_.status_report_label_->height() ) );
+    animation->setEndValue( QRect( 0, this->private_->ui_.status_report_label_->height(), 
+      this->private_->ui_.status_report_label_->width(), 
+      this->private_->ui_.status_report_label_->height() ) );
+    //connect( animation, SIGNAL( finished() ), this, SLOT( clear_label() ) );
+    connect( animation, SIGNAL( finished() ), this, SLOT( slide_in() ) );
+    animation->start();
+  }
+  
+  
+  
+  void AppStatusBar::slide_out()
+  {
+    QPropertyAnimation *animation = new QPropertyAnimation( this->private_->ui_.status_report_label_, "geometry" );
+    animation->setDuration( 1000 );
+    animation->setStartValue( QRect( 0, 0, this->private_->ui_.status_report_label_->width(), 
+      this->private_->ui_.status_report_label_->height() ) );
+    animation->setEndValue( QRect( 0, this->private_->ui_.status_report_label_->height(), 
+      this->private_->ui_.status_report_label_->width(), 
+      this->private_->ui_.status_report_label_->height() ) );
+    connect( animation, SIGNAL( finished() ), this, SLOT( clear_label() ) );
+    animation->start();
+  }
+  
+  void AppStatusBar::clear_label()
+  {
+    this->private_->ui_.status_report_label_->setText( QString::fromUtf8( "" ) );
+    this->private_->ui_.status_report_label_->hide();
+    this->private_->current_message_ = QString::fromUtf8( "" );
+  }
+  
+  
 
 } // end namespace Seg3D
+
+
