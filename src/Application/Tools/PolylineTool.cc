@@ -349,7 +349,7 @@ bool PolylineTool::handle_mouse_move( ViewerHandle viewer,
     this->private_->find_vertex( viewer, mouse_history.current_.x_, 
       mouse_history.current_.y_, this->private_->vertex_index_ );
     viewer->set_cursor( this->private_->vertex_index_ != -1 ? 
-      Core::CursorShape::SIZE_ALL_E : Core::CursorShape::ARROW_E );
+      Core::CursorShape::SIZE_ALL_E : Core::CursorShape::CROSS_E );
   }
 
   if ( this->private_->moving_vertex_ )

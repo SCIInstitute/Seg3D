@@ -87,6 +87,8 @@ public:
   void update_target_options();
   void update_constraint_options();
 
+  bool check_paintable( ViewerHandle viewer );
+
   bool start_painting();
   void stop_painting();
   void flood_fill( Core::ActionContextHandle context, bool erase, 
@@ -113,6 +115,7 @@ public:
   bool painting_;
   bool erase_;
   bool brush_visible_;
+  bool paintable_;
   size_t signal_block_count_;
 
   bool has_data_constraint_;
@@ -751,6 +754,29 @@ void PaintToolPrivate::update_cursors( Core::CursorShape shape )
   } 
 }
 
+bool PaintToolPrivate::check_paintable( ViewerHandle viewer )
+{
+  bool paintable = false;
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    std::string layer_id = this->paint_tool_->target_layer_state_->get();
+    if ( layer_id != Tool::NONE_OPTION_C )
+    {
+      size_t viewer_id = viewer->get_viewer_id();
+      MaskLayerHandle layer = boost::dynamic_pointer_cast< Core::MaskLayer >(
+        LayerManager::Instance()->get_layer_by_id( layer_id ) );
+      if ( layer )
+      {
+        paintable = layer->is_visible( viewer_id ) && layer->has_valid_data();
+      }
+    }
+  }
+
+  lock_type lock(  this->get_mutex() );
+  this->paintable_ = paintable;
+  return paintable;
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Implementation of class PaintTool
 //////////////////////////////////////////////////////////////////////////
@@ -764,6 +790,7 @@ PaintTool::PaintTool( const std::string& toolid ) :
   this->private_->brush_mask_changed_ = true;
   this->private_->painting_ = false;
   this->private_->brush_visible_ = true;
+  this->private_->paintable_ = false;
   this->private_->signal_block_count_ = 0;
 
   std::vector< LayerIDNamePair > empty_names( 1, 
@@ -1063,22 +1090,11 @@ bool PaintTool::handle_mouse_leave( ViewerHandle viewer )
 
 void PaintTool::activate()
 {
-  bool cursor_invisible = 
-      PreferencesManager::Instance()->paint_cursor_invisibility_state_->get();
-      
-  if( cursor_invisible )
-  {
-    this->private_->update_cursors( Core::CursorShape::BLANK_E );
-  }
-  else
-  {
-    this->private_->update_cursors( Core::CursorShape::CROSS_E ); 
-  }
 }
 
 void PaintTool::deactivate()
 {
-  this->private_->update_cursors( Core::CursorShape::ARROW_E );
+  ViewerManager::Instance()->reset_cursor();
 }
 
 bool PaintTool::handle_mouse_move( ViewerHandle viewer, 
@@ -1095,6 +1111,7 @@ bool PaintTool::handle_mouse_move( ViewerHandle viewer,
   // If it is a volume view we cannot do any painting
   if ( this->private_->viewer_->is_volume_view() )
   {
+    viewer->set_cursor( Core::CursorShape::ARROW_E );
     return false;
   }
 
@@ -1102,13 +1119,24 @@ bool PaintTool::handle_mouse_move( ViewerHandle viewer,
   // NOTE: Again we need to lock the state engine as we are on the interface thread
   // and not on the application thread.
   std::string data_constraint_layer;
+  bool cursor_invisible;
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
     data_constraint_layer = this->data_constraint_layer_state_->get();
+    cursor_invisible = PreferencesManager::Instance()->paint_cursor_invisibility_state_->get();
   }
 
   if ( !this->private_->painting_ )
   {
+    if ( this->private_->check_paintable( viewer ) && cursor_invisible )
+    {
+      viewer->set_cursor( Core::CursorShape::BLANK_E );
+    }
+    else
+    {
+      viewer->set_cursor( Core::CursorShape::CROSS_E );
+    }
+
     // When mousing over data with a data constraint the data constraint value
     // will be shown in the status bar
     if ( data_constraint_layer != Tool::NONE_OPTION_C )

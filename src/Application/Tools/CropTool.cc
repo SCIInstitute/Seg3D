@@ -345,7 +345,7 @@ void CropToolPrivate::update_cursor( ViewerHandle viewer )
     viewer->set_cursor( Core::CursorShape::SIZE_VER_E );
     break;
   default:
-    viewer->set_cursor( Core::CursorShape::ARROW_E );
+    viewer->set_cursor( Core::CursorShape::CROSS_E );
     break;
   }
 }
