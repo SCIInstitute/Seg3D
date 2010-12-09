@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/" >
+    <qresource prefix="/">
         <file>Images/VisibleGray.png</file>
         <file>Images/IsosurfaceMenu.png</file>
         <file>Images/IsosurfaceMenuOff.png</file>
@@ -137,5 +137,6 @@
         <file>Images/SwitchTool.png</file>
         <file>Images/Duplicate.png</file>
         <file>Images/DuplicateOff.png</file>
+        <file>Images/TextOffError.png</file>
     </qresource>
 </RCC>

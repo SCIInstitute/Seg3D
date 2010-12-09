@@ -347,7 +347,7 @@ void AppInterface::closeEvent( QCloseEvent* event )
 
   void AppInterface::resizeEvent( QResizeEvent *event )
   {
-    if( this->private_->progress_->isVisible() )
+    if( this->private_->progress_ && this->private_->progress_->isVisible() )
     {
       this->private_->progress_->resize( event->size() );
     }

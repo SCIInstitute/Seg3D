@@ -65,6 +65,9 @@ public:
   boost::posix_time::ptime last_message_time_;
   QString current_message_;
   int message_type_;
+  bool error_icon_set_;
+  QIcon normal_message_icon_;
+  QIcon error_message_icon_;
   
 };
 
@@ -90,6 +93,9 @@ AppStatusBar::AppStatusBar( QMainWindow* parent ) :
     
   QtUtils::QtBridge::Connect( this->private_->ui_.info_button_, 
     InterfaceManager::Instance()->message_window_visibility_state_ );
+  
+  connect( this->private_->ui_.info_button_, SIGNAL( toggled( bool ) ), this,
+    SLOT( reset_icon( bool ) ) ); 
   
   connect( this->private_->ui_.world_button_, 
     SIGNAL( clicked( bool ) ), this, SLOT( set_coordinates_mode( bool ) ) );
@@ -117,12 +123,25 @@ AppStatusBar::AppStatusBar( QMainWindow* parent ) :
   
   this->private_->last_message_time_ = boost::posix_time::second_clock::local_time();
   
+  this->private_->normal_message_icon_.addFile( QString::fromUtf8( ":/Images/TextOff.png" ), QSize(), QIcon::Normal );
+  this->private_->error_message_icon_.addFile( QString::fromUtf8( ":/Images/TextOffError.png" ), QSize(), QIcon::Normal );
+  this->private_->error_icon_set_ = false;
+  
 }
 
 AppStatusBar::~AppStatusBar()
 {
   this->disconnect_all();
 }
+  
+  void AppStatusBar::reset_icon( bool show_errors )
+  {
+    if( show_errors && this->private_->error_icon_set_ )
+    {
+      this->private_->ui_.info_button_->setIcon( this->private_->normal_message_icon_ );
+      this->private_->error_icon_set_ = false;
+    }
+  }
 
 
 // -- private slots -- //
@@ -344,12 +363,16 @@ void AppStatusBar::SetMessage( qpointer_type qpointer, int msg_type, std::string
     if( this->private_->message_type_ == Core::LogMessageType::ERROR_E )
     {
       this->private_->ui_.status_report_label_->setStyleSheet( StyleSheet::STATUSBAR_ERROR_C );
-      animation->setDuration( 300 );
+      this->private_->ui_.info_button_->setIcon( this->private_->error_message_icon_ );
+      this->private_->error_icon_set_ = true;
+      animation->setDuration( 2000 );
+      animation->setEasingCurve( QEasingCurve::OutBounce );
     }
     else
     {
       this->private_->ui_.status_report_label_->setStyleSheet( StyleSheet::STATUSBAR_C );
       animation->setDuration( 1000 );
+      animation->setEasingCurve( QEasingCurve::InOutQuad );
     }
     
     this->private_->ui_.status_report_label_->setText( this->private_->current_message_ );
@@ -361,6 +384,7 @@ void AppStatusBar::SetMessage( qpointer_type qpointer, int msg_type, std::string
       this->private_->ui_.status_report_label_->height() ) );
     animation->setEndValue( QRect( 0, 0, this->private_->ui_.status_report_label_->width(), 
       this->private_->ui_.status_report_label_->height() ) );
+    
     animation->start();
   }
   
@@ -373,8 +397,8 @@ void AppStatusBar::SetMessage( qpointer_type qpointer, int msg_type, std::string
     animation->setEndValue( QRect( 0, this->private_->ui_.status_report_label_->height(), 
       this->private_->ui_.status_report_label_->width(), 
       this->private_->ui_.status_report_label_->height() ) );
-    //connect( animation, SIGNAL( finished() ), this, SLOT( clear_label() ) );
     connect( animation, SIGNAL( finished() ), this, SLOT( slide_in() ) );
+    animation->setEasingCurve( QEasingCurve::OutInQuad );
     animation->start();
   }
   
@@ -390,6 +414,7 @@ void AppStatusBar::SetMessage( qpointer_type qpointer, int msg_type, std::string
       this->private_->ui_.status_report_label_->width(), 
       this->private_->ui_.status_report_label_->height() ) );
     connect( animation, SIGNAL( finished() ), this, SLOT( clear_label() ) );
+    animation->setEasingCurve( QEasingCurve::OutInQuad );
     animation->start();
   }
   

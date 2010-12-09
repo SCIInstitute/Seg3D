@@ -64,6 +64,7 @@ public:
 private Q_SLOTS:
   void set_coordinates_mode( bool is_world );
   void set_status_report_label( std::string& report );
+  void reset_icon( bool show_errors );
 
   // -- build status bar widgets -- //
 private:
