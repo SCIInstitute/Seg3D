@@ -88,6 +88,11 @@ bool ActionComputeIsosurface::run( Core::ActionContextHandle& context,
   hide abort message event (via the Action dispatch mechanism) that will get placed in the queue
   after the show message.  
 
+  Normally for other filters the abort message is hidden when the layer's data_state_ changes, 
+  e.g. from PROCESSING_C to AVAILABLE_C.  That state change does happen in 
+  MaskLayer::compute_isosurface(), but then the action to show the abort message 
+  gets processed afterward due to the scenario described above.
+
   Put another way, normally the "Waiting for process to abort message" is displayed while we wait
   for the filter algorithm thread to abort.  In this case there is no separate algorithm thread
   to wait for because the isosurface computation is done directly on the application thread.

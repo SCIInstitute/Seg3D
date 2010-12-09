@@ -282,6 +282,10 @@ bool PolylineTool::handle_mouse_press( ViewerHandle viewer,
       Core::ActionSet::Dispatch( Core::Interface::GetMouseActionContext(),
         this->vertices_state_, points );
 
+      // Set to "hovered over" state since the mouse is hovering over the new point
+      viewer->set_cursor( Core::CursorShape::SIZE_ALL_E );
+      this->private_->vertex_index_ = static_cast< int >( idx );
+
       return true;
     }
   }
@@ -298,7 +302,6 @@ bool PolylineTool::handle_mouse_press( ViewerHandle viewer,
       active_slice->get_world_coord( world_x, world_y,  pt );
       Core::ActionAdd::Dispatch( Core::Interface::GetMouseActionContext(),
         this->vertices_state_, pt );
-
       return true;
     }
   }
@@ -310,6 +313,11 @@ bool PolylineTool::handle_mouse_press( ViewerHandle viewer,
       Core::Point pt = this->vertices_state_->get()[ this->private_->vertex_index_ ];
       Core::ActionRemove::Dispatch( Core::Interface::GetMouseActionContext(),
         this->vertices_state_, pt );
+
+      // Set to "not hovered over" state since the point no longer exists
+      viewer->set_cursor( Core::CursorShape::CROSS_E );
+      this->private_->vertex_index_ = -1;
+
       return true;
     }   
   }
