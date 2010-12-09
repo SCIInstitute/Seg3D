@@ -51,8 +51,6 @@ SET(CORE_ACTION_SRCS
   ActionHistory.cc
   ActionInfo.h
   ActionInfo.cc
-  ActionRecorder.h
-  ActionRecorder.cc
   ActionSocket.h
   ActionSocket.cc
   )

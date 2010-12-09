@@ -58,8 +58,6 @@ void UndoBufferItem::set_redo_action( Core::ActionHandle action )
 
 bool UndoBufferItem::apply_redo( Core::ActionContextHandle& context )
 {
-  // Clear the redo cache, which records the current identifier counters
-  this->private_->redo_action_->clear_redo_cache( context );
 
   // Validate the action. It should validate, but if it doesn't it should fail
   // gracefully. Hence we check anyway.

@@ -59,6 +59,9 @@ namespace Core
 // Application is the thread that processes all the actions in the program.
 
 class Application;
+class ApplicationPrivate;
+typedef boost::shared_ptr<ApplicationPrivate> ApplicationPrivateHandle;
+
 
 class Application : public EventHandler, public RecursiveLockable
 {
@@ -132,6 +135,14 @@ public:
   // Get the current username
   bool get_user_name( std::string& user_name );
 
+  // GET_APPLICACTION_FILEPATH:
+  // The directory from which the application was launched
+  bool get_application_filepath( boost::filesystem::path& app_filepath );
+  
+  // GET_APPLICACTION_FILENAME:
+  // The directory from which the application was launched plus the name of the executable
+  bool get_application_filename( boost::filesystem::path& app_filename );
+
   // -- Memory information --
 public:
   // GET_TOTAL_VIRTUAL_MEMORY:
@@ -170,6 +181,11 @@ public:
   // This signal is triggered by calling the reset function.
   // WARNING: Do NOT trigger this signal directly. Call the reset function instead.
   boost::signals2::signal< void () > reset_signal_;
+
+  // -- internals --
+private:
+  // internals of this class
+  ApplicationPrivateHandle private_;
 
   // -- Application thread --
 public:
@@ -231,6 +247,7 @@ public:
   // GETAPPLICATIONNAMEANDVERSION
   // Get the name of the application and its version
   static std::string GetApplicationNameAndVersion();
+  
 };
 
 } // end namespace Core

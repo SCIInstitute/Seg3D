@@ -137,6 +137,17 @@ void AppMenu::create_file_menu( QMenu* qmenu )
   connect( qaction, SIGNAL( triggered() ), this, SLOT( open_project_folder() ) );
 #endif
   
+#if defined( __APPLE__ )  
+  boost::filesystem::path app_filepath;
+  Core::Application::Instance()->get_application_filepath( app_filepath );
+
+  boost::filesystem::path app_filename;
+  Core::Application::Instance()->get_application_filename( app_filename );
+  
+  CORE_LOG_DEBUG( std::string("Application path = ") + app_filepath.string() );
+  CORE_LOG_DEBUG( std::string("Application name = ") + app_filename.string() );
+#endif
+  
   qaction = qmenu->addAction( tr( "Save Project" ) );
   qaction->setShortcut( tr( "Ctrl+S" ) );
   qaction->setToolTip( tr( "Save the current project." ) );

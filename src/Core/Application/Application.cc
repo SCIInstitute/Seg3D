@@ -62,10 +62,19 @@
 namespace Core
 {
 
+class ApplicationPrivate
+{
+public:
+  boost::filesystem::path app_filepath_;
+  boost::filesystem::path app_filename_;  
+};
+
 CORE_SINGLETON_IMPLEMENTATION( Application );
 
-Application::Application()
+Application::Application() :
+  private_( new ApplicationPrivate )
 {
+  this->private_->app_filepath_ = boost::filesystem::current_path();
 }
 
 Application::~Application()
@@ -110,6 +119,9 @@ void Application::set_command_line_parameter( const std::string& key, const std:
 void Application::parse_command_line_parameters( int argc, char **argv )
 {
   lock_type lock( get_mutex() );
+
+  boost::filesystem::path path( argv[0] );
+  this->private_->app_filename_ = this->private_->app_filepath_ / path.filename();
 
   typedef boost::tokenizer< boost::char_separator< char > > tokenizer;
   boost::char_separator< char > seperator( ":-=|;" );
@@ -511,5 +523,18 @@ int Application::get_process_id()
   return getpid();
 #endif 
 }
+
+bool Application::get_application_filepath( boost::filesystem::path& app_filepath )
+{
+  app_filepath = this->private_->app_filepath_;
+  return true;
+}
+
+bool Application::get_application_filename( boost::filesystem::path& app_filename )
+{
+  app_filename = this->private_->app_filename_;
+  return true;
+}
+
 
 } // end namespace Core

@@ -106,10 +106,6 @@ void Action::clear_cache()
 {
 }
 
-void Action::clear_redo_cache( ActionContextHandle& context )
-{
-}
-
 std::string Action::export_to_string() const
 {
   // Add action name to string

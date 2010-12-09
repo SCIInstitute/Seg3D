@@ -206,13 +206,6 @@ public:
   // for a provenance record.
   virtual void clear_cache();
 
-  // CLEAR_REDO_CACHE:
-  // Clear all the information that was recorded for redoing the action
-  // NOTE: This function is only implemented for actions that can be redone. Its main purpose is
-  // to ensure that when redoing actions it will generate the same unique identifiers.
-  // NOTE: The context is suppied to check whether the function is run from the undo buffer.
-  virtual void clear_redo_cache( ActionContextHandle& context );
-
 private:
 
   // IMPLEMENTATION OF ADD_PARAMETER, ADD_ARGUMENT AND ADD_CACHEDHANDLE:

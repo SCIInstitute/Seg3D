@@ -137,6 +137,9 @@
         <file>Images/SwitchTool.png</file>
         <file>Images/Duplicate.png</file>
         <file>Images/DuplicateOff.png</file>
+        <file>Images/XviewRed.png</file>
+        <file>Images/YviewGreen.png</file>
+        <file>Images/ZviewBlue.png</file>
         <file>Images/TextOffError.png</file>
     </qresource>
 </RCC>
