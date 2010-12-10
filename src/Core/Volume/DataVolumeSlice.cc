@@ -68,13 +68,14 @@ DataVolumeSlice::~DataVolumeSlice()
 template<class TYPE1, class TYPE2>
 void CopyTypedData( DataVolumeSlice* slice, TYPE1* buffer, DataBlock* data_block )
 {
-  const TYPE1 numeric_min = std::numeric_limits< TYPE1 >::min();
-  const TYPE1 numeric_max = std::numeric_limits< TYPE1 >::max();
-  const TYPE1 numeric_range = numeric_max - numeric_min;
+  const double numeric_min = static_cast<double>( std::numeric_limits< TYPE1 >::min() );
+  const double numeric_max = static_cast<double>( std::numeric_limits< TYPE1 >::max() );
   const double value_min = data_block->get_min();
   const double value_max = data_block->get_max();
   const double value_range = value_max - value_min;
-  const double inv_value_range = 1.0 / value_range;
+  const double inv_value_range = ( numeric_max - numeric_min ) / value_range;
+
+  const TYPE2 typed_value_min = static_cast<TYPE2>( value_min );
 
   size_t current_index = slice->to_index( 0, 0 );
 
@@ -92,8 +93,12 @@ void CopyTypedData( DataVolumeSlice* slice, TYPE1* buffer, DataBlock* data_block
     current_index = row_start;
     for ( size_t i = 0; i < nx; i++ )
     {
-      buffer[ j * nx + i ] = static_cast<TYPE1>(  ( data[ current_index ] - value_min ) 
-        * inv_value_range * numeric_range + numeric_min );
+      // NOTE: removed unnecessary addition for unsigned texture types
+      // buffer[ j * nx + i ] = static_cast<TYPE1>(   ( data[ current_index ] - typed_value_min ) 
+      //  * inv_value_range + numeric_min );
+      buffer[ j * nx + i ] = static_cast<TYPE1>(  
+        ( data[ current_index ] - typed_value_min ) * inv_value_range );
+
       current_index += x_stride;
     }
     row_start += y_stride;

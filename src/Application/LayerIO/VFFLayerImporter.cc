@@ -109,7 +109,7 @@ bool VFFLayerImporter::scan_vff()
   {
     if ( end_of_header == line ) 
     {
-      this->vff_end_of_header_ = 1 + static_cast<size_t>( file_data.tellg() );
+      this->vff_end_of_header_ = static_cast<size_t>( file_data.tellg() );
       break;
     }
     std::getline( file_data, line );
@@ -260,6 +260,13 @@ bool VFFLayerImporter::import_vff()
 #else
   data_file.close();
 #endif
+
+  // VFF data is always stored as big endian data
+  // Hence we need to swap
+  if ( Core::DataBlock::IsLittleEndian() )
+  {
+    this->data_block_->swap_endian();
+  }
 
   // Step 5: now we set our grid transform.
   this->grid_transform_ = Core::GridTransform( nx, ny, nz, transform );

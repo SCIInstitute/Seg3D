@@ -441,15 +441,19 @@ void DataBlock::swap_endian()
     case DataType::CHAR_E: 
     case DataType::UCHAR_E:
       SwapEndian( get_data(), get_size(), 1 );
+      break;
     case DataType::SHORT_E:
     case DataType::USHORT_E:
       SwapEndian( get_data(), get_size(), 2 );
+      break;
     case DataType::INT_E:
     case DataType::UINT_E:
     case DataType::FLOAT_E:
       SwapEndian( get_data(), get_size(), 4 );
+      break;
     case DataType::DOUBLE_E:
       SwapEndian( get_data(), get_size(), 8 );
+      break;
   }
 }
 
@@ -1385,6 +1389,20 @@ bool DataBlock::insert_slice( const DataSliceHandle slice )
     default:
       return false;
   }
+}
+
+bool DataBlock::IsBigEndian()
+{
+  unsigned short test = 0xFF;
+  unsigned char* test_ptr = reinterpret_cast<unsigned char*>( &test );
+  if ( test_ptr[ 0 ] ) return false; else return true;
+}
+
+bool DataBlock::IsLittleEndian()
+{
+  unsigned short test = 0xFF;
+  unsigned char* test_ptr = reinterpret_cast<unsigned char*>( &test );
+  if ( test_ptr[ 0 ] ) return true; else return false;
 }
 
 

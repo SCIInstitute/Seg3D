@@ -296,7 +296,15 @@ public:
   // DUPLICATE:
   // Clone the data in a datablock by generating a new one and copying the data into it.
   static bool Duplicate( const DataBlockHandle& src_data_block, DataBlockHandle& dst_data_block ); 
-
+  
+  // ISBIGENDIAN
+  // Check whether current architecture is big endian
+  static bool IsBigEndian();
+  
+  // ISLITTLEENDIAN
+  // Check whether current architecture is little endian
+  static bool IsLittleEndian();
+  
 };
 
 } // end namespace Core
