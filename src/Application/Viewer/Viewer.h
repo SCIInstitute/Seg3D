@@ -175,26 +175,17 @@ public:
   // -- Rendering --
 public:
   
-  // REDRAW:
-  // Emits redraw_signal_.
-  void redraw( bool delay_update = false );
+  // REDRAW_SCENE:
+  // Emits redraw_scene_signal_.
+  void redraw_scene();
 
   // REDRAW_OVERLAY:
   // Emits redraw_overlay_signal_.
-  void redraw_overlay( bool delay_update = false );
-
-  // -- Signals --
-public:
-
-  typedef boost::signals2::signal< void( bool ) > redraw_signal_type;
-
-  // REDRAW_SIGNAL:
-  // Signals that the scene needs to be redrawn.
-  redraw_signal_type redraw_signal_;
-
-  // REDRAW_OVERLAY_SIGNAL_:
-  // Signals that the overlay needs to be redrawn.
-  redraw_signal_type redraw_overlay_signal_;
+  void redraw_overlay();
+  
+  // REDRAW_ALL:
+  // Emits both redraw_scene_signal_ and redraw_overlay_signal_
+  void redraw_all();
 
   // SLICE_CHANGED_SIGNAL_:
   // Triggered when slice number or viewer visibility is changed.

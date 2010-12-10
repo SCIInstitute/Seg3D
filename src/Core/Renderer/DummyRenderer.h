@@ -53,9 +53,11 @@ public:
 
   virtual void resize( int width, int height ) {}
 
-  virtual void redraw( bool delay_update = false ) {}
+  virtual void redraw_scene() {}
 
-  virtual void redraw_overlay( bool delay_update = false ) {}
+  virtual void redraw_overlay() {}
+
+  virtual void redraw_all() {}
 
   virtual void activate() {}
 

@@ -229,7 +229,7 @@ void ViewerPrivate::insert_layer( LayerHandle layer )
     
   this->layer_connection_map_.insert( std::make_pair( layer->get_layer_id(),
     layer->visible_state_[ this->viewer_->get_viewer_id() ]->state_changed_signal_.connect(
-    boost::bind( &Viewer::redraw_overlay, this->viewer_, true ) ) ) );
+    boost::bind( &Viewer::redraw_overlay, this->viewer_ ) ) ) );
 
   this->layer_connection_map_.insert( std::make_pair( layer->get_layer_id(),
     layer->visible_state_[ this->viewer_->get_viewer_id() ]->state_changed_signal_.connect(
@@ -238,7 +238,7 @@ void ViewerPrivate::insert_layer( LayerHandle layer )
     
   this->layer_connection_map_.insert( std::make_pair( layer->get_layer_id(),
     layer->master_visible_state_->state_changed_signal_.connect(
-    boost::bind( &Viewer::redraw_overlay, this->viewer_, true ) ) ) );
+    boost::bind( &Viewer::redraw_overlay, this->viewer_ ) ) ) );
 
   this->layer_connection_map_.insert( std::make_pair( layer->get_layer_id(),
     layer->master_visible_state_->state_changed_signal_.connect(
@@ -293,7 +293,7 @@ void ViewerPrivate::insert_layer( LayerHandle layer )
 
       this->layer_connection_map_.insert( std::make_pair( layer->get_layer_id(),
         mask_layer->color_state_->state_changed_signal_.connect(
-        boost::bind( &Viewer::redraw_overlay, this->viewer_, false ) ) ) );
+        boost::bind( &Viewer::redraw_overlay, this->viewer_ ) ) ) );
 
       this->layer_connection_map_.insert( std::make_pair( layer->get_layer_id(),
         mask_layer->border_state_->state_changed_signal_.connect(
@@ -341,7 +341,7 @@ void ViewerPrivate::insert_layer( LayerHandle layer )
 
   if ( !this->viewer_->is_volume_view() && layer->has_valid_data() )
   {
-    this->viewer_->redraw( false );
+    this->viewer_->redraw_scene();
   }
 }
 
@@ -376,12 +376,11 @@ void ViewerPrivate::delete_layers( std::vector< LayerHandle > layers )
 
   if ( !LayerManager::Instance()->get_active_layer() )
   {
-    this->viewer_->redraw( true );
-    this->viewer_->redraw_overlay( false );
+    this->viewer_->redraw_all();
   }
   else
   {
-    this->viewer_->redraw( false );
+    this->viewer_->redraw_scene();
   }
 }
 
@@ -395,7 +394,7 @@ void ViewerPrivate::set_active_layer( LayerHandle layer )
   {
     if ( !this->viewer_->is_volume_view() )
     {
-      this->viewer_->redraw_overlay( false );
+      this->viewer_->redraw_overlay();
       if ( this->viewer_->viewer_visible_state_->get() )
       {
         this->viewer_->slice_changed_signal_( this->viewer_->get_viewer_id() );
@@ -440,14 +439,17 @@ void ViewerPrivate::set_active_layer( LayerHandle layer )
       }
     }
 
-    this->viewer_->redraw_overlay( needs_redraw );
     if ( needs_redraw )
     {
-      this->viewer_->redraw( false );
+      this->viewer_->redraw_all();
       if ( this->viewer_->viewer_visible_state_->get() )
       {
         this->viewer_->slice_changed_signal_( this->viewer_->get_viewer_id() );
       }
+    }
+    else
+    {
+      this->viewer_->redraw_overlay();
     }
   }
 }
@@ -587,8 +589,7 @@ void ViewerPrivate::change_visibility( bool visible )
       this->reset_active_slice();
     }
     this->viewer_->get_renderer()->activate();
-    this->viewer_->redraw( true );
-    this->viewer_->redraw_overlay( false );
+    this->viewer_->redraw_all();
   }
   else
   {
@@ -615,7 +616,7 @@ void ViewerPrivate::layer_state_changed( int affected_view_modes )
     ( !this->viewer_->is_volume_view() && 
     ( affected_view_modes & ViewModeType::NON_VOLUME_E ) != 0 ) )
   {
-    this->viewer_->redraw( false );
+    this->viewer_->redraw_scene();
   }
 }
 
@@ -787,8 +788,7 @@ void ViewerPrivate::move_slice_by( double depth_offset )
     }
   }
 
-  this->viewer_->redraw( true );
-  this->viewer_->redraw_overlay( false );
+  this->viewer_->redraw_all();
 
   // NOTE: No need to trigger slice_changed_signal_ here because the viewer that caused
   // the slice change will trigger it.
@@ -808,7 +808,7 @@ void ViewerPrivate::reset_active_slice()
       static_cast< size_t >( this->viewer_->slice_number_state_->get() ) )
     {
       this->set_slice_number( this->viewer_->slice_number_state_->get() );
-      this->viewer_->redraw( false );
+      this->viewer_->redraw_scene();
     }
     else
     {
@@ -840,8 +840,7 @@ void ViewerPrivate::reset()
   this->volume_slices_.clear();
   this->layer_connection_map_.clear();
   this->active_layer_slice_.reset();
-  this->viewer_->redraw( true );
-  this->viewer_->redraw_overlay( false );
+  this->viewer_->redraw_all();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -880,15 +879,14 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
   this->add_connection( PreferencesManager::Instance()->z_axis_label_state_->state_changed_signal_.
     connect( boost::bind( &ViewerPrivate::set_viewer_labels, this->private_ ) ) );
   this->add_connection( PreferencesManager::Instance()->grid_size_state_->state_changed_signal_.
-    connect( boost::bind( &Viewer::redraw_overlay, this, false ) ) );
+    connect( boost::bind( &Viewer::redraw_overlay, this ) ) );
+
   this->add_connection( PreferencesManager::Instance()->show_slice_number_state_->
-    state_changed_signal_.connect( boost::bind( &Viewer::redraw_overlay, this, false ) ) );
+    state_changed_signal_.connect( boost::bind( &Viewer::redraw_overlay, this ) ) );
   this->add_connection( PreferencesManager::Instance()->background_color_state_->
-    state_changed_signal_.connect( boost::bind( &Viewer::redraw, this, true ) ) );
-  this->add_connection( PreferencesManager::Instance()->background_color_state_->
-    state_changed_signal_.connect( boost::bind( &Viewer::redraw_overlay, this, false ) ) );
+    state_changed_signal_.connect( boost::bind( &Viewer::redraw_all, this ) ) );
   this->add_connection( PreferencesManager::Instance()->zero_based_slice_numbers_state_->
-    state_changed_signal_.connect( boost::bind( &Viewer::redraw_overlay, this, false ) ) );
+    state_changed_signal_.connect( boost::bind( &Viewer::redraw_overlay, this ) ) );
   
   this->view_mode_state_->set_session_priority( Core::StateBase::DEFAULT_LOAD_E + 1 );
 
@@ -927,7 +925,7 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
   this->add_connection( LayerManager::Instance()->active_layer_changed_signal_.connect(
     boost::bind( &ViewerPrivate::set_active_layer, this->private_, _1 ) ) );
   this->add_connection( LayerManager::Instance()->layers_reordered_signal_.connect(
-    boost::bind( &Viewer::redraw, this, false ) ) );
+    boost::bind( &Viewer::redraw_scene, this ) ) );
 
   this->add_connection( this->view_mode_state_->value_changed_signal_.connect(
     boost::bind( &ViewerPrivate::change_view_mode, this->private_, _2, _3 ) ) );
@@ -944,42 +942,33 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
   // NOTE: For those state variables that will trigger both redraw and redraw_overlay, 
   // "delay_update" is set to true for redraw.
   this->add_connection( this->view_mode_state_->state_changed_signal_.connect(
-    boost::bind( &Viewer::redraw, this, true ) ) );
+    boost::bind( &Viewer::redraw_all, this ) ) );
   this->add_connection( this->axial_view_state_->state_changed_signal_.connect(
-    boost::bind( &Viewer::redraw, this, true ) ) );
+    boost::bind( &Viewer::redraw_all, this ) ) );
   this->add_connection( this->coronal_view_state_->state_changed_signal_.connect(
-    boost::bind( &Viewer::redraw, this, true ) ) );
+    boost::bind( &Viewer::redraw_all, this ) ) );
   this->add_connection( this->sagittal_view_state_->state_changed_signal_.connect(
-    boost::bind( &Viewer::redraw, this, true ) ) );
+    boost::bind( &Viewer::redraw_all, this) ) );
   this->add_connection( this->slice_number_state_->state_changed_signal_.connect(
-    boost::bind( &Viewer::redraw, this, true ) ) );
+    boost::bind( &Viewer::redraw_all, this ) ) );
+    
   // NOTE: This one is false as it is not updated by the next list
   this->add_connection( this->volume_view_state_->state_changed_signal_.connect(
-    boost::bind( &Viewer::redraw, this, false ) ) );
+    boost::bind( &Viewer::redraw_scene, this ) ) );
   this->add_connection( this->volume_light_visible_state_->state_changed_signal_.connect(
-    boost::bind( &Viewer::redraw, this, false ) ) );
+    boost::bind( &Viewer::redraw_scene, this ) ) );
   this->add_connection( this->volume_slices_visible_state_->state_changed_signal_.connect(
-    boost::bind( &Viewer::redraw, this, false ) ) );
+    boost::bind( &Viewer::redraw_scene, this ) ) );
   this->add_connection( this->volume_isosurfaces_visible_state_->state_changed_signal_.
-    connect( boost::bind( &Viewer::redraw, this, false ) ) );
+    connect( boost::bind( &Viewer::redraw_scene, this ) ) );
 
   // Connect state variables that should trigger redraw_overlay
-  this->add_connection( this->view_mode_state_->state_changed_signal_.connect(
-    boost::bind( &Viewer::redraw_overlay, this, false ) ) );
-  this->add_connection( this->axial_view_state_->state_changed_signal_.connect(
-    boost::bind( &Viewer::redraw_overlay, this, false ) ) );
-  this->add_connection( this->coronal_view_state_->state_changed_signal_.connect(
-    boost::bind( &Viewer::redraw_overlay, this, false ) ) );
-  this->add_connection( this->sagittal_view_state_->state_changed_signal_.connect(
-    boost::bind( &Viewer::redraw_overlay, this, false ) ) );
   this->add_connection( this->slice_grid_state_->state_changed_signal_.connect(
-    boost::bind( &Viewer::redraw_overlay, this, false ) ) );
-  this->add_connection( this->slice_number_state_->state_changed_signal_.connect(
-    boost::bind( &Viewer::redraw_overlay, this, false ) ) );
+    boost::bind( &Viewer::redraw_overlay, this) ) );
   this->add_connection( this->slice_picking_visible_state_->state_changed_signal_.connect(
-    boost::bind( &Viewer::redraw_overlay, this, false ) ) );
+    boost::bind( &Viewer::redraw_overlay, this ) ) );
   this->add_connection( this->overlay_visible_state_->state_changed_signal_.connect(
-    boost::bind( &Viewer::redraw_overlay, this, false ) ) );
+    boost::bind( &Viewer::redraw_overlay, this ) ) );
 
   this->add_connection( Core::Application::Instance()->reset_signal_.connect(
     boost::bind( &ViewerPrivate::reset, this->private_ ) ) );
@@ -1480,35 +1469,51 @@ Core::VolumeSliceHandle Viewer::get_volume_slice( const std::string& layer_id )
   return Core::VolumeSliceHandle();
 }
 
-void Viewer::redraw( bool delay_update )
+void Viewer::redraw_scene()
 {
   if ( !Core::Application::IsApplicationThread() )
   {
-    Core::Application::PostEvent( boost::bind( &Viewer::redraw, this, delay_update ) );
+    Core::Application::PostEvent( boost::bind( &Viewer::redraw_scene, this ) );
     return;
   }
   
   if ( this->private_->signals_block_count_ == 0 &&
     this->viewer_visible_state_->get() )
   {
-    this->redraw_signal_( delay_update );
+    this->redraw_scene_signal_();
   }
 }
 
-void Viewer::redraw_overlay( bool delay_update )
+void Viewer::redraw_overlay()
 {
   if ( !Core::Application::IsApplicationThread() )
   {
-    Core::Application::PostEvent( boost::bind( &Viewer::redraw_overlay, this, delay_update ) );
+    Core::Application::PostEvent( boost::bind( &Viewer::redraw_overlay, this ) );
     return;
   }
 
   if ( this->private_->signals_block_count_ == 0 &&
     this->viewer_visible_state_->get() )
   {
-    this->redraw_overlay_signal_( delay_update );
+    this->redraw_overlay_signal_();
   }
 }
+
+void Viewer::redraw_all()
+{
+  if ( !Core::Application::IsApplicationThread() )
+  {
+    Core::Application::PostEvent( boost::bind( &Viewer::redraw_all, this ) );
+    return;
+  }
+
+  if ( this->private_->signals_block_count_ == 0 &&
+    this->viewer_visible_state_->get() )
+  {
+    this->redraw_all_signal_();
+  }
+}
+
 
 void Viewer::auto_view()
 {
@@ -1521,8 +1526,8 @@ void Viewer::auto_view()
     Core::ScopedCounter block_counter( this->private_->signals_block_count_ );
     this->private_->adjust_view( this->private_->active_layer_slice_ );
   }
-  this->redraw( true );
-  this->redraw_overlay( false );
+  
+  this->redraw_all();
 }
 
 void Viewer::move_slice_to( const Core::Point& pt )

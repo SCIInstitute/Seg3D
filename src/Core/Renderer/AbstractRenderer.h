@@ -62,15 +62,18 @@ public:
   // resize the renderer.
   virtual void resize( int width, int height ) = 0;
 
-  // REDRAW:
+  // REDRAW_SCENE:
   // It triggers the "redraw_completed_signal_" at the end.
-  // "delay_update" indicates whether the UI should delay the update on receiving
-  // the new texture.
-  virtual void redraw( bool delay_update = false ) = 0;
+  virtual void redraw_scene() = 0;
 
   // REDRAW_OVERLAY:
   // It triggers the "redraw_overlay_completed_signal_" at the end.
-  virtual void redraw_overlay( bool delay_update = false ) = 0;
+  virtual void redraw_overlay() = 0;
+
+  // REDRAW_ALL:
+  // It triggers the "redraw_overlay_completed_signal_" and
+  // "redraw_completed_signal_" at the end.
+  virtual void redraw_all() = 0;
 
   // ACTIVATE:
   // Activate the renderer

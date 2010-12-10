@@ -227,7 +227,7 @@ void ToolManagerPrivate::update_viewers( bool redraw_2d, bool redraw_3d )
     {
       if ( redraw_3d )
       {
-        viewer->redraw();
+        viewer->redraw_scene();
       }
     }
     else if ( redraw_2d )

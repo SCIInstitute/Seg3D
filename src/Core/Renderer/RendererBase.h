@@ -62,17 +62,20 @@ public:
   // resize the renderer.
   virtual void resize( int width, int height );
 
-  // REDRAW:
-  // Calls the "render" function to render onto the FBO.
+  // REDRAW_SCENE:
+  // Calls the "render" function to render into the FBO.
   // It triggers the "redraw_completed_signal_" at the end.
-  // "delay_update" indicates whether the UI should delay the update on receiving
-  // the new texture.
-  virtual void redraw( bool delay_update = false );
+  virtual void redraw_scene();
 
   // REDRAW_OVERLAY:
-  // Calls the "render_overlay" function to render the overlay onto the FBO.
+  // Calls the "render_overlay" function to render the overlay into the FBO.
   // It triggers the "redraw_overlay_completed_signal_" at the end.
-  virtual void redraw_overlay( bool delay_update = false );
+  virtual void redraw_overlay();
+
+  // REDRAW_ALL:
+  // Calls the "render" and "render_overlay" function to render everything into the FBO.
+  // It triggers the "redraw_overlay_completed_signal_" at the end.
+  virtual void redraw_all();
 
   // Activate the renderer
   virtual void activate();

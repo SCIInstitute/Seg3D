@@ -188,7 +188,7 @@ void RendererPrivate::viewer_slice_changed( size_t viewer_id )
   {
     if ( self_viewer->is_volume_view() )
     {
-      this->renderer_->redraw();
+      this->renderer_->redraw_scene();
     }
     else
     {
@@ -203,7 +203,7 @@ void RendererPrivate::viewer_mode_changed( size_t viewer_id )
   {
     if ( ViewerManager::Instance()->get_viewer( this->viewer_id_ )->is_volume_view() )
     {
-      this->renderer_->redraw();
+      this->renderer_->redraw_scene();
     }
     else
     {
@@ -478,8 +478,7 @@ void RendererPrivate::enable_rendering( bool enable )
   {
     this->renderer_->set_redraw_needed();
     this->renderer_->set_redraw_overlay_needed();
-    this->renderer_->redraw( true );
-    this->renderer_->redraw_overlay( false );
+    this->renderer_->redraw_all();
   }
 }
 
@@ -657,10 +656,14 @@ void Renderer::post_initialize()
   Core::Texture::SetActiveTextureUnit( 0 );
 
   ViewerHandle viewer = ViewerManager::Instance()->get_viewer( this->private_->viewer_id_ );
-  this->add_connection( viewer->redraw_signal_.connect( 
-    boost::bind( &Renderer::redraw, this, _1 ) ) );
+
+  this->add_connection( viewer->redraw_scene_signal_.connect( 
+    boost::bind( &Renderer::redraw_scene, this ) ) );
   this->add_connection( viewer->redraw_overlay_signal_.connect( 
-    boost::bind( &Renderer::redraw_overlay, this, _1 ) ) );
+    boost::bind( &Renderer::redraw_overlay, this ) ) );
+  this->add_connection( viewer->redraw_all_signal_.connect( 
+    boost::bind( &Renderer::redraw_all, this ) ) );
+
 
   size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
   for ( size_t i = 0; i < num_of_viewers; i++ )

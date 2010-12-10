@@ -53,8 +53,12 @@ namespace Core
 class RendererBasePrivate : public Lockable
 {
 public:
-  void redraw( bool delay_update );
-  void redraw_overlay( bool delay_update );
+  bool render_scene();
+  bool render_overlay();
+
+  void redraw_scene();
+  void redraw_overlay();
+  void redraw_all();
 
   RendererBase * renderer_;
 
@@ -71,14 +75,85 @@ public:
   bool active_;
 };
 
-void RendererBasePrivate::redraw( bool delay_update )
+
+void RendererBasePrivate::redraw_scene()
 {
+  // Migrate to the right thread
   if ( !this->renderer_->is_renderer_thread() )
   {
-    this->renderer_->post_renderer_event( boost::bind( &RendererBasePrivate::redraw, 
-      this, delay_update ) );
+    this->renderer_->post_renderer_event( boost::bind( &RendererBasePrivate::redraw_scene, 
+      this) );
     return;
   }
+
+  if ( this->render_scene() )
+  {
+    // signal rendering completed
+    this->renderer_->redraw_completed_signal_( 
+      this->textures_[ this->active_render_texture_ ], false );
+
+    // swap render textures 
+    this->active_render_texture_ = ( ~this->active_render_texture_ ) & 1;
+  }
+}
+
+void RendererBasePrivate::redraw_overlay()
+{
+  // Migrate to the right thread
+  if ( !this->renderer_->is_renderer_thread() )
+  {
+    this->renderer_->post_renderer_event( boost::bind( &RendererBasePrivate::redraw_overlay, 
+      this) );
+    return;
+  }
+
+  if ( this->render_overlay() )
+  {
+    // signal rendering completed
+    this->renderer_->redraw_overlay_completed_signal_( 
+      this->textures_[ this->active_overlay_texture_ ], false );
+
+    // swap render textures 
+    this->active_overlay_texture_ = ( ~( this->active_overlay_texture_ - 2 ) ) & 1 + 2;
+  }
+}
+
+void RendererBasePrivate::redraw_all()
+{
+  // Migrate to the right thread
+  if ( !this->renderer_->is_renderer_thread() )
+  {
+    this->renderer_->post_renderer_event( boost::bind( &RendererBasePrivate::redraw_all, 
+      this) );
+    return;
+  }
+
+  bool render_scene_success = this->render_scene();
+  bool render_overlay_success = this->render_overlay();
+
+  if ( render_scene_success )
+  {
+    // signal scene rendering completed
+    this->renderer_->redraw_completed_signal_( 
+      this->textures_[ this->active_render_texture_ ], render_overlay_success );
+      
+    // swap render textures 
+    this->active_render_texture_ = ( ~this->active_render_texture_ ) & 1; 
+  }
+
+  if ( render_overlay_success )
+  {
+    // signal overlay rendering completed
+    this->renderer_->redraw_overlay_completed_signal_( 
+      this->textures_[ this->active_overlay_texture_ ], false );  
+        
+    // swap render textures 
+    this->active_overlay_texture_ = ( ~( this->active_overlay_texture_ - 2 ) ) & 1 + 2;
+  }
+}
+
+bool RendererBasePrivate::render_scene()
+{
 
 #if !MULTITHREADED_RENDERING
   RenderContextBindingHandle context_binding( new RenderContextBinding( this->context_ ) );
@@ -88,14 +163,14 @@ void RendererBasePrivate::redraw( bool delay_update )
     this->renderer_->width_ == 0 || 
     this->renderer_->height_ == 0 )
   {
-    return;
+    return false;
   }
 
   {
     lock_type lock( this->get_mutex() );
     if ( !this->redraw_needed_ )
     {
-      return;
+      return false;
     }
     this->redraw_needed_ = false;
   }
@@ -112,12 +187,13 @@ void RendererBasePrivate::redraw( bool delay_update )
   if ( !this->frame_buffer_->check_status() )
   {
     this->frame_buffer_->disable();
-    return;
+    return false;
   }
 
   if ( !this->renderer_->render() )
   {
-    return;
+    CORE_LOG_DEBUG( "Rendering of the Scene failed" );
+    return false;
   }
 
   // Synchronization call for multi threaded rendering
@@ -135,22 +211,11 @@ void RendererBasePrivate::redraw( bool delay_update )
   context_binding.reset();
 #endif
 
-  // signal rendering completed
-  this->renderer_->redraw_completed_signal_( 
-    this->textures_[ this->active_render_texture_ ], delay_update );
-
-  // swap render textures 
-  this->active_render_texture_ = ( ~this->active_render_texture_ ) & 1;
+  return true;
 }
 
-void RendererBasePrivate::redraw_overlay( bool delay_update )
+bool RendererBasePrivate::render_overlay()
 {
-  if ( !this->renderer_->is_renderer_thread() )
-  {
-    this->renderer_->post_renderer_event( boost::bind( 
-      &RendererBasePrivate::redraw_overlay, this, delay_update ) );
-    return;
-  }
 
 #if !MULTITHREADED_RENDERING
   RenderContextBindingHandle context_binding( new RenderContextBinding( this->context_ ) );
@@ -160,14 +225,14 @@ void RendererBasePrivate::redraw_overlay( bool delay_update )
     this->renderer_->width_ == 0 || 
     this->renderer_->height_ == 0 )
   {
-    return;
+    return false;
   }
 
   {
     lock_type lock( this->get_mutex() );
     if ( !this->redraw_overlay_needed_ )
     {
-      return;
+      return false;
     }
     this->redraw_overlay_needed_ = false;
   }
@@ -185,12 +250,13 @@ void RendererBasePrivate::redraw_overlay( bool delay_update )
   if ( !this->frame_buffer_->check_status() )
   {
     this->frame_buffer_->disable();
-    return;
+    return false;
   }
 
   if ( !this->renderer_->render_overlay() )
   {
-    return;
+    CORE_LOG_DEBUG( "Rendering of the Overlay failed" );
+    return false;
   }
   glFinish();
 
@@ -206,12 +272,7 @@ void RendererBasePrivate::redraw_overlay( bool delay_update )
   context_binding.reset();
 #endif
 
-  // signal rendering completed
-  this->renderer_->redraw_overlay_completed_signal_( 
-    this->textures_[ this->active_overlay_texture_ ], delay_update );
-
-  // swap render textures 
-  this->active_overlay_texture_ = ( ~( this->active_overlay_texture_ - 2 ) ) & 1 + 2;
+  return true;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -291,16 +352,26 @@ void RendererBase::initialize()
 #endif
 }
 
-void RendererBase::redraw( bool delay_update )
+void RendererBase::redraw_scene()
 {
   this->set_redraw_needed();
-  this->private_->redraw( delay_update );
+
+  this->private_->redraw_scene();
 }
 
-void RendererBase::redraw_overlay( bool delay_update )
+void RendererBase::redraw_overlay()
 {
   this->set_redraw_overlay_needed();
-  this->private_->redraw_overlay( delay_update );
+
+  this->private_->redraw_overlay();
+}
+
+void RendererBase::redraw_all()
+{
+  this->set_redraw_overlay_needed();
+  this->set_redraw_needed();
+
+  this->private_->redraw_all();
 }
 
 void RendererBase::resize( int width, int height )
@@ -344,8 +415,7 @@ void RendererBase::resize( int width, int height )
   context_binding.reset();
 #endif
 
-  this->redraw( true );
-  this->redraw_overlay();
+  this->redraw_all();
 }
 
 void RendererBase::post_initialize()

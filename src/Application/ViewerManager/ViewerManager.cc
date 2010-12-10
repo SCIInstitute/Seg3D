@@ -285,7 +285,7 @@ void ViewerManager::update_volume_viewers()
 
     if ( viewer->view_mode_state_->get() == Viewer::VOLUME_C )
     {
-      viewer->redraw();
+      viewer->redraw_all();
     }
   }
 }
@@ -539,7 +539,7 @@ void ViewerManager::handle_layer_volume_changed( LayerHandle layer )
   // that hasn't received the new volume yet, the rendering would be inconsistent.
   for ( size_t i = 0; i < this->viewers_.size(); ++i )
   {
-    this->viewers_[ i ]->redraw();
+    this->viewers_[ i ]->redraw_scene();
   }
 }
 

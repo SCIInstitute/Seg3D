@@ -114,10 +114,25 @@ public:
 
   // -- Signals and Slots --
 public:
+  // Types of signals
+  typedef boost::signals2::signal< void () > update_display_signal_type;
+  typedef boost::signals2::signal< void() > redraw_signal_type;
+
   // UPDATE_DISPLAY_SIGNAL_:
   // Triggered when new texture is received, or a different cursor shape is set.
-  typedef boost::signals2::signal< void () > update_display_signal_type;
   update_display_signal_type update_display_signal_;
+
+  // REDRAW_SCENE_SIGNAL:
+  // Signals that the scene needs to be redrawn.
+  redraw_signal_type redraw_scene_signal_;
+
+  // REDRAW_OVERLAY_SIGNAL_:
+  // Signals that the overlay needs to be redrawn.
+  redraw_signal_type redraw_overlay_signal_;
+
+  // REDRAW_ALL_SIGNAL:
+  // Signals that the scene needs to be redrawn.
+  redraw_signal_type redraw_all_signal_;
 
   // -- renderer/texture access --
 public:
