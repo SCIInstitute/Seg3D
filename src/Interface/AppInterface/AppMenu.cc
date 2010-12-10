@@ -138,14 +138,16 @@ void AppMenu::create_file_menu( QMenu* qmenu )
 #endif
   
 #if defined( __APPLE__ )  
-  boost::filesystem::path app_filepath;
-  Core::Application::Instance()->get_application_filepath( app_filepath );
 
-  boost::filesystem::path app_filename;
-  Core::Application::Instance()->get_application_filename( app_filename );
-  
-  CORE_LOG_DEBUG( std::string("Application path = ") + app_filepath.string() );
-  CORE_LOG_DEBUG( std::string("Application name = ") + app_filename.string() );
+  std::string menu_label = std::string( "Launch Another Copy Of " ) + 
+    Core::Application::GetApplicationName();
+  std::string menu_tooltip = std::string( "Open another copy of " ) +
+    Core::Application::GetApplicationName();
+    
+  qaction = qmenu->addAction( QString::fromStdString( menu_label ) );
+  qaction->setToolTip( QString::fromStdString( menu_tooltip ) );
+  connect( qaction, SIGNAL( triggered() ), this, SLOT( mac_open_another_version() ) );
+
 #endif
   
   qaction = qmenu->addAction( tr( "Save Project" ) );
@@ -726,6 +728,20 @@ void AppMenu::save_as_wizard()
   QPointer< AppSaveProjectAsWizard > save_project_as_wizard_ = 
     new AppSaveProjectAsWizard( this->main_window_);
   save_project_as_wizard_->show();
+}
+
+void AppMenu::mac_open_another_version()
+{
+#if defined( __APPLE__ )
+  boost::filesystem::path app_filepath;
+  Core::Application::Instance()->get_application_filepath( app_filepath );
+
+  std::string command = std::string( "open -n " ) + 
+    app_filepath.parent_path().parent_path().string() + " &";
+  
+  system( command.c_str() );
+
+#endif
 }
 
 

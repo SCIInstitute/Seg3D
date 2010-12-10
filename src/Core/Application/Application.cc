@@ -120,8 +120,8 @@ void Application::parse_command_line_parameters( int argc, char **argv )
 {
   lock_type lock( get_mutex() );
 
-  boost::filesystem::path path( argv[0] );
-  this->private_->app_filename_ = this->private_->app_filepath_ / path.filename();
+  this->private_->app_filename_ = boost::filesystem::path( argv[0] );
+  this->private_->app_filepath_ = this->private_->app_filename_.parent_path();
 
   typedef boost::tokenizer< boost::char_separator< char > > tokenizer;
   boost::char_separator< char > seperator( ":-=|;" );

@@ -105,6 +105,7 @@ private Q_SLOTS:
   void open_project_folder();
   void save_as_wizard();
   void about();
+  void mac_open_another_version();
   
 public:
 
@@ -125,7 +126,7 @@ public:
   // This function is called when there is a new redo tag
   static void UpdateRedoTag( qpointer_type qpointer, std::string tag );
   
-  
+  // CONFIRMRECENTFILELOAD:
   static void ConfirmRecentFileLoad( qpointer_type qpointer, const std::string& path );
 
 };
