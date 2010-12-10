@@ -223,6 +223,10 @@ void Layer::initialize_states( const std::string& name, bool creating )
   this->show_progress_bar_state_->set_is_project_data( false );
   this->show_abort_message_state_->set_is_project_data( false );
 
+  // These states do not need to be loaded from file -- just reset to defaults.
+  this->data_state_->set_session_priority( Core::StateBase::DO_NOT_LOAD_E );
+  this->show_abort_message_state_->set_session_priority( Core::StateBase::DO_NOT_LOAD_E );
+  this->show_progress_bar_state_->set_session_priority( Core::StateBase::DO_NOT_LOAD_E );
 
   // NOTE: Use the private class to keep track of the connections so they won't
   // be accidentally deleted by subclasses.
