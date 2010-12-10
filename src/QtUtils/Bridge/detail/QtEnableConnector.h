@@ -59,8 +59,8 @@ private:
   // -- internal variables --
 private:
   QWidget* parent_;
-  bool opposite_logic_;
   bool histogram_widget_;
+  bool opposite_logic_;
   boost::function< bool () > condition_;
 };
 

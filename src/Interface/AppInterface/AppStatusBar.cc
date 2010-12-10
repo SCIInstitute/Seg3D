@@ -398,7 +398,7 @@ void AppStatusBar::SetMessage( qpointer_type qpointer, int msg_type, std::string
       this->private_->ui_.status_report_label_->width(), 
       this->private_->ui_.status_report_label_->height() ) );
     connect( animation, SIGNAL( finished() ), this, SLOT( slide_in() ) );
-    animation->setEasingCurve( QEasingCurve::OutInQuad );
+    animation->setEasingCurve( QEasingCurve::OutQuad );
     animation->start();
   }
   
@@ -414,7 +414,7 @@ void AppStatusBar::SetMessage( qpointer_type qpointer, int msg_type, std::string
       this->private_->ui_.status_report_label_->width(), 
       this->private_->ui_.status_report_label_->height() ) );
     connect( animation, SIGNAL( finished() ), this, SLOT( clear_label() ) );
-    animation->setEasingCurve( QEasingCurve::OutInQuad );
+    animation->setEasingCurve( QEasingCurve::OutQuad );
     animation->start();
   }
   
