@@ -133,7 +133,7 @@ bool ImportFromString( const std::string& str, View2D& value )
 {
   std::vector< double > values;
   ImportFromString( str, values );
-  if ( values.size() == 16 )
+  if ( values.size() == 5 )
   {
     value = View2D( Point( values[ 0 ], values[ 1 ], values[ 2 ] ), values[ 3 ], values[ 4 ] );
     return ( true );

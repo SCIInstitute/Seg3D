@@ -175,6 +175,7 @@ AppController::AppController( QWidget* parent ) :
 
 AppController::~AppController()
 {
+  this->disconnect_all();
 }
 
 

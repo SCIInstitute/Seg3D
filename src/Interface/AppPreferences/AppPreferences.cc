@@ -91,6 +91,7 @@ AppPreferences::AppPreferences( QWidget *parent ) :
 
 AppPreferences::~AppPreferences()
 {
+  this->disconnect_all();
 }
 
 void AppPreferences::change_project_directory()
