@@ -149,8 +149,8 @@ SegmentationSelectionPage::SegmentationSelectionPage( AppSegmentationPrivateHand
   this->private_->radio_button_group_ = new QButtonGroup( this );
   this->private_->radio_button_group_->setExclusive( true );
 
-  this->private_->single_or_multiple_files_widget_->setMinimumSize( QSize( 0, 20 ) );
-  this->private_->single_or_multiple_files_widget_->setMaximumSize( QSize( 16777215, 20 ) );
+  this->private_->single_or_multiple_files_widget_->setMinimumSize( QSize( 0, 24 ) );
+  this->private_->single_or_multiple_files_widget_->setMaximumSize( QSize( 16777215, 24 ) );
   this->private_->horizontalLayout_1 = new QHBoxLayout( this->private_->single_or_multiple_files_widget_ );
   this->private_->horizontalLayout_1->setSpacing( 0 );
   this->private_->horizontalLayout_1->setContentsMargins( 0, 0, 0, 0 );
@@ -192,8 +192,8 @@ SegmentationSelectionPage::SegmentationSelectionPage( AppSegmentationPrivateHand
   this->private_->horizontalLayout_1->addWidget( this->private_->multiple_files_widget_ );
   
   this->private_->bitmap_widget_ = new QWidget( this );
-  this->private_->bitmap_widget_->setMinimumSize( QSize( 0, 20 ) );
-  this->private_->bitmap_widget_->setMaximumSize( QSize( 16777215, 20 ) );
+  this->private_->bitmap_widget_->setMinimumSize( QSize( 0, 24) );
+  this->private_->bitmap_widget_->setMaximumSize( QSize( 16777215, 24 ) );
   this->private_->bitmap_layout_ = new QHBoxLayout( this->private_->bitmap_widget_ );
   this->private_->bitmap_layout_->setSpacing( 0 );
   this->private_->bitmap_layout_->setContentsMargins( 4, 4, 4, 4 );
