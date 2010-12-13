@@ -467,6 +467,11 @@ void IsosurfacePrivate::downsample_setup( int num_threads, double quality_factor
 
   // For parallelization, divide mask into slabs along z.  No synchronization is needed.
   this->zsize_ = static_cast< size_t >( this->nz_ / num_threads );
+  // Make sure this zsize will cover all the data
+  if ( this->zsize_ * num_threads < this->nz_ ) 
+  {
+    this->zsize_++;
+  }
   int remainder = this->zsize_ % this->neighborhood_size_;
   // Round up to the next neighborhood increment -- leaves least work for last thread
   if( remainder != 0 )
