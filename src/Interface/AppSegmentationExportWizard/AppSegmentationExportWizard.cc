@@ -104,6 +104,7 @@ AppSegmentationExportWizard::AppSegmentationExportWizard( QWidget *parent ) :
     QWizard( parent ),
   private_( new AppSegmentationPrivate )
 {
+  this->setMinimumSize( 660, 400 );
   this->addPage( new SegmentationSelectionPage( private_, this ) );
     this->addPage( new SegmentationSummaryPage( private_, this ) );
   this->setPixmap( QWizard::BackgroundPixmap, QPixmap( QString::fromUtf8( 
@@ -198,7 +199,7 @@ SegmentationSelectionPage::SegmentationSelectionPage( AppSegmentationPrivateHand
   this->private_->bitmap_layout_->setContentsMargins( 4, 4, 4, 4 );
   
   this->private_->bitmap_checkbox_ = new QCheckBox( this->private_->bitmap_widget_ );
-  this->private_->bitmap_checkbox_->setText( QString::fromUtf8( "Export slices as bitmaps" ) );
+  this->private_->bitmap_checkbox_->setText( QString::fromUtf8( "Export slices as a bitmap series instead of a single NRRD" ) );
   this->private_->bitmap_checkbox_->setEnabled( false );
   this->private_->bitmap_layout_->addWidget( this->private_->bitmap_checkbox_ );
   
