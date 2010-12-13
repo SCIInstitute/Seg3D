@@ -60,6 +60,7 @@
 #include <Application/LayerManager/Actions/ActionCalculateMaskVolume.h>
 #include <Application/LayerManager/Actions/ActionDuplicateLayer.h>
 #include <Application/LayerManager/Actions/ActionExportLayer.h>
+#include <Application/LayerManager/Actions/ActionExportSegmentation.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
 #include <Application/Filters/LayerResampler.h>
 
@@ -1120,10 +1121,19 @@ void LayerWidget::contextMenuEvent( QContextMenuEvent * event )
   {
     qaction = menu.addAction( tr( "Export Data" ) );
     connect( qaction, SIGNAL( triggered() ), this, SLOT( export_data() ) );
-  } 
+  }
+  else
+  {
+    qaction = menu.addAction( tr( "Export Mask as NRRD" ) );
+    connect( qaction, SIGNAL( triggered() ), this, SLOT( export_nrrd() ) );
+    qaction = menu.addAction( tr( "Export Mask as Bitmap Series" ) );
+    connect( qaction, SIGNAL( triggered() ), this, SLOT( export_bmp() ) );
+  }
   
   menu.exec( event->globalPos() );
 }
+  
+  
 
 void LayerWidget::delete_layer_from_context_menu()
 { 
@@ -1159,6 +1169,45 @@ void LayerWidget::export_data()
     this->private_->layer_->get_layer_name(), filename.toStdString() );
   
 }
+
+void LayerWidget::export_bmp()
+{
+  QString filename = QFileDialog::getExistingDirectory( this, tr( "Choose Directory for Export..." ),
+    QString::fromStdString( PreferencesManager::Instance()->export_path_state_->get() ),
+    QFileDialog::ShowDirsOnly
+    | QFileDialog::DontResolveSymlinks );
+  
+  if( boost::filesystem::exists( boost::filesystem::path( filename.toStdString() ) ) )
+  {
+    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
+      PreferencesManager::Instance()->export_path_state_, 
+      boost::filesystem::path( filename.toStdString() ).string() );
+  }
+
+  ActionExportSegmentation::Dispatch( Core::Interface::GetWidgetActionContext(), 
+    this->private_->layer_->get_layer_name(), LayerExporterMode::SINGLE_MASK_E, filename.toStdString(), true );
+  
+}
+  
+void LayerWidget::export_nrrd()
+{
+  QString filename = QFileDialog::getExistingDirectory( this, tr( "Choose Directory for Export..." ),
+    QString::fromStdString( PreferencesManager::Instance()->export_path_state_->get() ),
+    QFileDialog::ShowDirsOnly
+    | QFileDialog::DontResolveSymlinks );
+  
+  if( boost::filesystem::exists( boost::filesystem::path( filename.toStdString() ) ) )
+  {
+    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
+      PreferencesManager::Instance()->export_path_state_, 
+      boost::filesystem::path( filename.toStdString() ).string() );
+  }
+  
+  ActionExportSegmentation::Dispatch( Core::Interface::GetWidgetActionContext(), 
+    this->private_->layer_->get_layer_name(), LayerExporterMode::SINGLE_MASK_E, filename.toStdString() );
+  
+}
+  
 
 void LayerWidget::set_iso_surface_visibility( bool visibility )
 {

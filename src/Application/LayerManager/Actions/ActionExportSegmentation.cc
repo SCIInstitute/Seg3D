@@ -45,6 +45,20 @@ namespace Seg3D
 bool ActionExportSegmentation::validate( Core::ActionContextHandle& context )
 {
   
+  if( ( ( this->mode_.value() == ExportToString( LayerExporterMode::LABEL_MASK_E ) )
+     || ( this->mode_.value() == ExportToString( LayerExporterMode::DATA_E ) ) ) && 
+     ( this->export_as_bitmap_.value() ) )
+  {
+    context->report_error( std::string( "You cannot export that data type as a bitmap." ) );
+    return false;
+  }
+  
+  if( this->mode_.value() == ExportToString( LayerExporterMode::DATA_E ) )
+  {
+    context->report_error( std::string( "You cannot export data as a segmention." ) );
+      return false;
+  } 
+  
   if( this->layers_.value() != "" )
   {
     
@@ -59,19 +73,24 @@ bool ActionExportSegmentation::validate( Core::ActionContextHandle& context )
       else layer_handles.push_back( temp_handle );
     }
 
-    if( ! LayerIO::Instance()->create_exporter( this->layer_exporter_, layer_handles, 
-      "NRRD Exporter", ".nrrd" ) )
+    if( !this->export_as_bitmap_.value() )
     {
-      return false;
+      if( ! LayerIO::Instance()->create_exporter( this->layer_exporter_, layer_handles, 
+        "NRRD Exporter", ".nrrd" ) )
+      {
+        return false;
+      }
+    }
+    else
+    {
+      if( ! LayerIO::Instance()->create_exporter( this->layer_exporter_, layer_handles, 
+        "ITK Exporter", ".bmp" ) )
+      {
+        return false;
+      }
     }
   } 
 
-  if( this->mode_.value() == ExportToString( LayerExporterMode::DATA_E ) )
-  {
-    return false;
-  } 
-
-  // first we validate the path for saving the segmentation
   boost::filesystem::path segmentation_path( this->file_path_.value() );
   if ( !( boost::filesystem::exists ( segmentation_path.parent_path() ) ) )
   {
@@ -116,12 +135,28 @@ bool ActionExportSegmentation::run( Core::ActionContextHandle& context, Core::Ac
 }
 
 Core::ActionHandle ActionExportSegmentation::Create( const LayerExporterHandle& exporter, 
-  LayerExporterMode mode, const std::string& file_path  )
+  LayerExporterMode mode, const std::string& file_path, bool as_bitmap  )
 {
   // Create new action
   ActionExportSegmentation* action = new ActionExportSegmentation;
   
+  action->export_as_bitmap_.value() = as_bitmap;
   action->layer_exporter_ = exporter;
+  action->mode_.value() = ExportToString( mode );
+  action->file_path_.value() = file_path;
+  
+  // Post the new action
+  return Core::ActionHandle( action );
+}
+  
+Core::ActionHandle ActionExportSegmentation::Create( const std::string& layer_id, 
+  LayerExporterMode mode, const std::string& file_path, bool as_bitmap  )
+{
+  // Create new action
+  ActionExportSegmentation* action = new ActionExportSegmentation;
+  
+  action->export_as_bitmap_.value() = as_bitmap;
+  action->layers_.value() = layer_id;
   action->mode_.value() = ExportToString( mode );
   action->file_path_.value() = file_path;
   
@@ -134,9 +169,17 @@ void ActionExportSegmentation::clear_cache()
 }
 
 void ActionExportSegmentation::Dispatch( Core::ActionContextHandle context, 
-  const LayerExporterHandle& exporter, LayerExporterMode mode, const std::string& file_path )
+  const LayerExporterHandle& exporter, LayerExporterMode mode, const std::string& file_path, 
+  bool as_bitmap )
 {
-  Core::ActionDispatcher::PostAction( Create( exporter, mode, file_path ), context );
+  Core::ActionDispatcher::PostAction( Create( exporter, mode, file_path, as_bitmap ), context );
 }
+
+void ActionExportSegmentation::Dispatch( Core::ActionContextHandle context, const std::string& layer_id, 
+  LayerExporterMode mode, const std::string& file_path, bool as_bitmap )
+{
+  Core::ActionDispatcher::PostAction( Create( layer_id, mode, file_path, as_bitmap ), context );
+}
+
 
 } // end namespace Seg3D

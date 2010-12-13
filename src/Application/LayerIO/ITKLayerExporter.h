@@ -39,7 +39,6 @@
 // ITK includes
 #include "itkImageSeriesWriter.h"
 #include "itkGDCMImageIO.h"
-#include "itkBMPImageIO.h"
 #include "itkNumericSeriesFileNames.h"
 
 // Boost includes
@@ -60,7 +59,7 @@ namespace Seg3D
 
 class ITKLayerExporter : public LayerExporter
 {
-  SCI_EXPORTER_TYPE("ITK Exporter", ".dcm;.bmp")
+  SCI_EXPORTER_TYPE( "ITK Exporter", ".dcm;.bmp" )
 
   // -- Constructor/Destructor --
 public:
@@ -95,6 +94,10 @@ public:
     const std::string& name );
     
 private:
+  bool export_data_series( const std::string& file_path, const std::string& name );
+  bool export_bmp_mask_series( const std::string& file_path );
+  
+private:
   // EXPORT_DICOM_SERIES:
   // Export the data as a series of DICOMS
   template< class InputPixelType, class OutputPixelType >
@@ -104,11 +107,8 @@ private:
       this->layers_[ 0 ].get() );
   
     typedef itk::GDCMImageIO ImageIOType;
-    typedef itk::NumericSeriesFileNames NamesGeneratorType;
-
     ImageIOType::Pointer dicom_io = ImageIOType::New();
-    NamesGeneratorType::Pointer names_generator = NamesGeneratorType::New();
-
+    
     typedef itk::Image< InputPixelType, 3 > ImageType;
     typedef itk::Image< OutputPixelType, 2 > OutputImageType;
     typedef itk::ImageSeriesWriter< ImageType, OutputImageType > WriterType;
@@ -128,29 +128,9 @@ private:
     unsigned int first_slice = start[ 2 ];
     unsigned int last_slice = start[ 2 ] + size[ 2 ] - 1;
     
-    boost::filesystem::path path = boost::filesystem::path( file_path );
-
-    std::string filename_without_extension = file_name;
-    filename_without_extension = filename_without_extension.substr( 0, 
-      filename_without_extension.find_last_of( "." ) );
-    boost::filesystem::path filename_path = path / filename_without_extension;
-
-    if( size[ 2 ] < 100 )
-    {
-      names_generator->SetSeriesFormat( filename_path.string() + "-%02d.dcm" );
-    }
-    else if ( size[ 2 ] < 1000 )
-    {
-      names_generator->SetSeriesFormat( filename_path.string() + "-%03d.dcm" );
-    }
-    else if ( size[ 2 ] < 10000 )
-    {
-      names_generator->SetSeriesFormat( filename_path.string() + "-%04d.dcm" );
-    }
-    else
-    {
-      names_generator->SetSeriesFormat( filename_path.string() + "-%10d.dcm" );
-    }
+    typedef itk::NumericSeriesFileNames NamesGeneratorType;
+    NamesGeneratorType::Pointer names_generator = NamesGeneratorType::New();
+    this->set_name_series( names_generator, file_path, file_name, size[ 2 ] );
     
     names_generator->SetStartIndex( first_slice );
     names_generator->SetEndIndex( last_slice );
@@ -174,26 +154,19 @@ private:
     return true;
   }
   
+  void set_name_series( itk::NumericSeriesFileNames::Pointer& name_series_generator, 
+    const std::string& file_path, const std::string& file_name, const size_t size );
   
   template< class InputPixelType, class OutputPixelType >
-  bool export_bmp_series( const std::string& file_path, const std::string& file_name )
+  bool export_bmp_series( const std::string& file_path, const std::string& file_name, MaskLayer* temp_handle )
   {
-    MaskLayer* temp_handle = dynamic_cast< MaskLayer* >( 
-      this->layers_[ 0 ].get() );
-    
-    typedef itk::BMPImageIO ImageIOType;
-    typedef itk::NumericSeriesFileNames NamesGeneratorType;
-    
-    ImageIOType::Pointer bmp_io = ImageIOType::New();
-    NamesGeneratorType::Pointer names_generator = NamesGeneratorType::New();
-    
     typedef itk::Image< InputPixelType, 3 > ImageType;
     typedef itk::Image< OutputPixelType, 2 > OutputImageType;
     typedef itk::ImageSeriesWriter< ImageType, OutputImageType > WriterType;
     typename WriterType::Pointer writer = WriterType::New();
     
     Core::ITKImageDataHandle image_data = typename Core::ITKImageDataT< InputPixelType >::Handle( 
-      new Core::ITKImageDataT< InputPixelType >( temp_handle->get_mask_volume()->get_mask_data_block(), 
+      new Core::ITKImageDataT< InputPixelType >( temp_handle->get_mask_volume()->get_mask_data_block()->get_data_block(), 
       temp_handle->get_grid_transform() ) );
     
     ImageType* itk_image = dynamic_cast< ImageType* >( 
@@ -206,36 +179,16 @@ private:
     unsigned int first_slice = start[ 2 ];
     unsigned int last_slice = start[ 2 ] + size[ 2 ] - 1;
     
-    boost::filesystem::path path = boost::filesystem::path( file_path );
-    
-    std::string filename_without_extension = file_name;
-    filename_without_extension = filename_without_extension.substr( 0, 
-      filename_without_extension.find_last_of( "." ) );
-    boost::filesystem::path filename_path = path / filename_without_extension;
-    
-    if( size[ 2 ] < 100 )
-    {
-      names_generator->SetSeriesFormat( filename_path.string() + "-%02d.bmp" );
-    }
-    else if ( size[ 2 ] < 1000 )
-    {
-      names_generator->SetSeriesFormat( filename_path.string() + "-%03d.bmp" );
-    }
-    else if ( size[ 2 ] < 10000 )
-    {
-      names_generator->SetSeriesFormat( filename_path.string() + "-%04d.bmp" );
-    }
-    else
-    {
-      names_generator->SetSeriesFormat( filename_path.string() + "-%10d.bmp" );
-    }
+
+    typedef itk::NumericSeriesFileNames NamesGeneratorType;
+    NamesGeneratorType::Pointer names_generator = NamesGeneratorType::New();
+    this->set_name_series( names_generator, file_path, file_name, size[ 2 ] );
     
     names_generator->SetStartIndex( first_slice );
     names_generator->SetEndIndex( last_slice );
     names_generator->SetIncrementIndex( 1 );
     
     writer->SetInput( itk_image );
-    writer->SetImageIO( bmp_io );
     writer->SetFileNames( names_generator->GetFileNames() );
     
     try

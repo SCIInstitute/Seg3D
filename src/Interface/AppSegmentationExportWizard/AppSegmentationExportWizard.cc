@@ -33,6 +33,16 @@
 #include <QtCore/QVariant>
 #include <QtGui/QFileDialog>
 #include <QtGui/QMessageBox>
+#include <QtGui/QLabel>
+#include <QtGui/QLineEdit>
+#include <QtGui/QPushButton>
+#include <QtGui/QCheckBox>
+#include <QtGui/QVBoxLayout>
+#include <QtGui/QHBoxLayout>
+#include <QtGui/QRadioButton>
+#include <QtGui/QButtonGroup>
+#include <QtGui/QTreeWidget>
+#include <QtGui/QScrollArea>
 
 // Core includes
 #include <Core/State/Actions/ActionSet.h>
@@ -50,15 +60,54 @@
 
 namespace Seg3D
 {
+  
+  class AppSegmentationPrivate{
+  public:
+    QVector< QtLayerListWidget* > masks_;
+    QWidget* bitmap_widget_;
+    QCheckBox* bitmap_checkbox_;
+    QHBoxLayout* bitmap_layout_;
+    
+    
+    // SegmentationSelectionPage
+    QVBoxLayout *selection_main_layout_;
+    QWidget *segmentation_top_widget_;
+    QVBoxLayout *verticalLayout;
+    QWidget *segmentation_name_widget_;
+    QHBoxLayout *horizontalLayout;
+    QLabel *segmentation_name_label_;
+    QTreeWidget *group_with_masks_tree_;
+
+    std::string file_name_;
+    
+    QWidget *single_or_multiple_files_widget_;
+    QHBoxLayout *horizontalLayout_1;
+    QWidget *single_file_widget_;
+    QHBoxLayout *horizontalLayout_4;
+    QRadioButton *single_file_radio_button_;
+    QWidget *multiple_files_widget_;
+    QHBoxLayout *horizontalLayout_5;
+    QRadioButton *individual_files_radio_button_;
+    QButtonGroup *radio_button_group_;
+    
+    //SegmentationSummaryPage
+    QLabel *description_;
+    QVBoxLayout *summary_main_layout_;
+    QScrollArea *mask_scroll_area_;
+    QWidget *layers_;
+    QVBoxLayout *masks_layout_;
+    
+  };
+  
 
 AppSegmentationExportWizard::AppSegmentationExportWizard( QWidget *parent ) :
-    QWizard( parent )
+    QWizard( parent ),
+  private_( new AppSegmentationPrivate )
 {
-  this->addPage( new SegmentationSelectionPage( this ) );
-    this->addPage( new SegmentationSummaryPage( this ) );
+  this->addPage( new SegmentationSelectionPage( private_, this ) );
+    this->addPage( new SegmentationSummaryPage( private_, this ) );
   this->setPixmap( QWizard::BackgroundPixmap, QPixmap( QString::fromUtf8( 
     ":/Images/Symbol.png" ) ) );
-  
   this->setWindowTitle( tr( "Segmentation Export Wizard" ) );
 }
 
@@ -71,84 +120,109 @@ void AppSegmentationExportWizard::accept()
     QDialog::accept();
 }
 
-SegmentationSelectionPage::SegmentationSelectionPage( QWidget *parent )
+SegmentationSelectionPage::SegmentationSelectionPage( AppSegmentationPrivateHandle private_handle, QWidget *parent )
     : QWizardPage( parent )
 {
+  this->private_ = private_handle;
     this->setSubTitle( "Choose the layers that you would like to export as a segmentation." );
 
-  file_name_lineedit_ = new QLineEdit( this );
-  file_name_lineedit_->hide();
+  this->private_->selection_main_layout_ = new QVBoxLayout( this );
+  this->private_->selection_main_layout_->setContentsMargins(6, 6, 26, 6);
+  this->private_->selection_main_layout_->setObjectName( QString::fromUtf8( "selection_main_layout_" ) );
+
+  this->private_->group_with_masks_tree_ = new QTreeWidget( this );
+  this->private_->group_with_masks_tree_->setObjectName( QString::fromUtf8( "group_with_masks_tree_" ) );
+  this->private_->group_with_masks_tree_->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+  this->private_->group_with_masks_tree_->setProperty( "showDropIndicator", QVariant( false ) );
+  this->private_->group_with_masks_tree_->setAlternatingRowColors( true );
+  this->private_->group_with_masks_tree_->setIndentation( 15 );
+  this->private_->group_with_masks_tree_->setItemsExpandable( true );
+  this->private_->group_with_masks_tree_->setHeaderHidden( true );
+
+  this->private_->selection_main_layout_->addWidget( this->private_->group_with_masks_tree_ );
   
-  this->mask_list_ = new QLineEdit( this );
-  this->mask_list_->hide();
-
-  this->main_layout_ = new QVBoxLayout( this );
-  this->main_layout_->setContentsMargins(6, 6, 26, 6);
-  this->main_layout_->setObjectName( QString::fromUtf8( "main_layout_" ) );
-
-  this->group_with_masks_tree_ = new QTreeWidget( this );
-  this->group_with_masks_tree_->setObjectName( QString::fromUtf8( "group_with_masks_tree_" ) );
-  this->group_with_masks_tree_->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-  this->group_with_masks_tree_->setProperty( "showDropIndicator", QVariant( false ) );
-  this->group_with_masks_tree_->setAlternatingRowColors( true );
-  this->group_with_masks_tree_->setIndentation( 15 );
-  this->group_with_masks_tree_->setItemsExpandable( true );
-  this->group_with_masks_tree_->setHeaderHidden( true );
-
-  this->main_layout_->addWidget( group_with_masks_tree_ );
-  
-  this->single_or_multiple_files_widget_ = new QWidget( this );
-  this->single_or_multiple_files_widget_->setObjectName( 
+  this->private_->single_or_multiple_files_widget_ = new QWidget( this );
+  this->private_->single_or_multiple_files_widget_->setObjectName( 
     QString::fromUtf8( "single_or_multiple_files_widget_" ) );
 
-  this->radio_button_group_ = new QButtonGroup( this );
-  this->radio_button_group_->setExclusive( true );
+  this->private_->radio_button_group_ = new QButtonGroup( this );
+  this->private_->radio_button_group_->setExclusive( true );
 
-  this->single_or_multiple_files_widget_->setMinimumSize( QSize( 0, 32 ) );
-  this->single_or_multiple_files_widget_->setMaximumSize( QSize( 16777215, 32) );
-  this->horizontalLayout_1 = new QHBoxLayout( this->single_or_multiple_files_widget_ );
-  this->horizontalLayout_1->setSpacing( 0 );
-  this->horizontalLayout_1->setContentsMargins( 0, 0, 0, 0 );
-  this->horizontalLayout_1->setObjectName( QString::fromUtf8( "horizontalLayout" ) );
-  this->single_file_widget_ = new QWidget( this->single_or_multiple_files_widget_ );
-  this->single_file_widget_->setObjectName( QString::fromUtf8( "single_file_widget_" ) );
-  this->horizontalLayout_4 = new QHBoxLayout( this->single_file_widget_ );
-  this->horizontalLayout_4->setSpacing( 0 );
-  this->horizontalLayout_4->setContentsMargins( 4, 4, 4, 4 );
-  this->horizontalLayout_4->setObjectName( QString::fromUtf8( "horizontalLayout_2" ) );
-  this->single_file_radio_button_ = new QRadioButton( this->single_file_widget_ );
-  this->single_file_radio_button_->setObjectName( 
+  this->private_->single_or_multiple_files_widget_->setMinimumSize( QSize( 0, 20 ) );
+  this->private_->single_or_multiple_files_widget_->setMaximumSize( QSize( 16777215, 20 ) );
+  this->private_->horizontalLayout_1 = new QHBoxLayout( this->private_->single_or_multiple_files_widget_ );
+  this->private_->horizontalLayout_1->setSpacing( 0 );
+  this->private_->horizontalLayout_1->setContentsMargins( 0, 0, 0, 0 );
+  this->private_->horizontalLayout_1->setObjectName( QString::fromUtf8( "horizontalLayout" ) );
+  this->private_->single_file_widget_ = new QWidget( this->private_->single_or_multiple_files_widget_ );
+  this->private_->single_file_widget_->setObjectName( QString::fromUtf8( "single_file_widget_" ) );
+  this->private_->horizontalLayout_4 = new QHBoxLayout( this->private_->single_file_widget_ );
+  this->private_->horizontalLayout_4->setSpacing( 0 );
+  this->private_->horizontalLayout_4->setContentsMargins( 4, 4, 4, 4 );
+  this->private_->horizontalLayout_4->setObjectName( QString::fromUtf8( "horizontalLayout_2" ) );
+  this->private_->single_file_radio_button_ = new QRadioButton( this->private_->single_file_widget_ );
+  this->private_->single_file_radio_button_->setObjectName( 
     QString::fromUtf8( "single_file_radio_button_" ) );
-  this->single_file_radio_button_->setText( QString::fromUtf8( "Save masks as a single file" ) );
-  this->single_file_radio_button_->setChecked( true );
-  this->radio_button_group_->addButton( this->single_file_radio_button_, 0 );
+  this->private_->single_file_radio_button_->setText( QString::fromUtf8( "Save masks as a single file" ) );
+  this->private_->single_file_radio_button_->setChecked( true );
+  this->private_->radio_button_group_->addButton( this->private_->single_file_radio_button_, 0 );
 
-  this->horizontalLayout_4->addWidget( this->single_file_radio_button_ );
-  this->horizontalLayout_1->addWidget( this->single_file_widget_ );
+  this->private_->horizontalLayout_4->addWidget( this->private_->single_file_radio_button_ );
+  this->private_->horizontalLayout_1->addWidget( this->private_->single_file_widget_ );
 
-  this->multiple_files_widget_ = new QWidget( this->single_or_multiple_files_widget_ );
-  this->multiple_files_widget_->setObjectName( QString::fromUtf8( "multiple_files_widget_" ) );
+  this->private_->multiple_files_widget_ = new QWidget( this->private_->single_or_multiple_files_widget_ );
+  this->private_->multiple_files_widget_->setObjectName( QString::fromUtf8( "multiple_files_widget_" ) );
 
-  this->horizontalLayout_5 = new QHBoxLayout( this->multiple_files_widget_ );
-  this->horizontalLayout_5->setSpacing( 0);
-  this->horizontalLayout_5->setContentsMargins( 4, 4, 4, 4 );
-  this->horizontalLayout_5->setObjectName( QString::fromUtf8( "horizontalLayout_3" ) );
-  this->individual_files_radio_button_ = new QRadioButton( this->multiple_files_widget_ );
-  this->individual_files_radio_button_->setObjectName( 
+  this->private_->horizontalLayout_5 = new QHBoxLayout( this->private_->multiple_files_widget_ );
+  this->private_->horizontalLayout_5->setSpacing( 0);
+  this->private_->horizontalLayout_5->setContentsMargins( 4, 4, 4, 4 );
+  this->private_->horizontalLayout_5->setObjectName( QString::fromUtf8( "horizontalLayout_3" ) );
+  this->private_->individual_files_radio_button_ = new QRadioButton( this->private_->multiple_files_widget_ );
+  this->private_->individual_files_radio_button_->setObjectName( 
     QString::fromUtf8( "individual_files_radio_button_" ) );
-  this->individual_files_radio_button_->setText( 
+  this->private_->individual_files_radio_button_->setText( 
     QString::fromUtf8( "Save masks as individual files" ) );
-  this->radio_button_group_->addButton( this->individual_files_radio_button_, 1 );
+  this->private_->radio_button_group_->addButton( this->private_->individual_files_radio_button_, 1 );
+  
+  connect( this->private_->radio_button_group_, SIGNAL( buttonClicked( int ) ), this, 
+    SLOT( enable_disable_bitmap_button( int ) ) );
 
-  this->horizontalLayout_5->addWidget( this->individual_files_radio_button_ );
-  this->horizontalLayout_1->addWidget( this->multiple_files_widget_ );
+  this->private_->horizontalLayout_5->addWidget( this->private_->individual_files_radio_button_ );
+  this->private_->horizontalLayout_1->addWidget( this->private_->multiple_files_widget_ );
+  
+  this->private_->bitmap_widget_ = new QWidget( this );
+  this->private_->bitmap_widget_->setMinimumSize( QSize( 0, 20 ) );
+  this->private_->bitmap_widget_->setMaximumSize( QSize( 16777215, 20 ) );
+  this->private_->bitmap_layout_ = new QHBoxLayout( this->private_->bitmap_widget_ );
+  this->private_->bitmap_layout_->setSpacing( 0 );
+  this->private_->bitmap_layout_->setContentsMargins( 4, 4, 4, 4 );
+  
+  this->private_->bitmap_checkbox_ = new QCheckBox( this->private_->bitmap_widget_ );
+  this->private_->bitmap_checkbox_->setText( QString::fromUtf8( "Export slices as bitmaps" ) );
+  this->private_->bitmap_checkbox_->setEnabled( false );
+  this->private_->bitmap_layout_->addWidget( this->private_->bitmap_checkbox_ );
+  
 
-  this->main_layout_->addWidget( this->single_or_multiple_files_widget_ );
+  this->private_->selection_main_layout_->addWidget( this->private_->single_or_multiple_files_widget_ );
+  this->private_->selection_main_layout_->addWidget( this->private_->bitmap_widget_ );
 
-  registerField( "maskList", this->mask_list_ );
-  registerField( "segmentationPath", this->file_name_lineedit_ );
-  registerField( "singleFile", this->single_file_radio_button_ );
+  
+  this->private_->single_file_radio_button_->setChecked( true );
+  
 
+}
+  
+void SegmentationSelectionPage::enable_disable_bitmap_button( int button_id )
+{
+  if( button_id == 0 )
+  {
+    this->private_->bitmap_checkbox_->setChecked( false );
+    this->private_->bitmap_checkbox_->setEnabled( false );
+  }
+  else
+  {
+    this->private_->bitmap_checkbox_->setEnabled( true );
+  }
 }
   
 void SegmentationSelectionPage::initializePage()
@@ -164,7 +238,7 @@ void SegmentationSelectionPage::initializePage()
   {
     bool mask_found = false;
 
-    QTreeWidgetItem *group = new QTreeWidgetItem( this->group_with_masks_tree_ );
+    QTreeWidgetItem *group = new QTreeWidgetItem( this->private_->group_with_masks_tree_ );
     group->setFlags( Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsTristate );
     group->setCheckState( 0, Qt::Checked );
     group->setCheckState( 0, Qt::Unchecked );
@@ -205,45 +279,38 @@ void SegmentationSelectionPage::initializePage()
     }
   }
   
-  this->group_with_masks_tree_->topLevelItem( group_with_active_layer )->
+  this->private_->group_with_masks_tree_->topLevelItem( group_with_active_layer )->
     setCheckState( 0, Qt::Checked );
   
 }
 
 bool SegmentationSelectionPage::validatePage()
 {
-  QString selected_masks = "";
-  for( int i = 0; i < this->group_with_masks_tree_->topLevelItemCount(); ++i )
+  this->private_->masks_.clear();
+  for( int i = 0; i < this->private_->group_with_masks_tree_->topLevelItemCount(); ++i )
   {
-    QTreeWidgetItem* group = this->group_with_masks_tree_->topLevelItem( i );
+    QTreeWidgetItem* group = this->private_->group_with_masks_tree_->topLevelItem( i );
     for( int j = 0; j < group->childCount(); ++j )
     {
       QTreeWidgetItem* mask = group->child( j );
       if( mask->checkState( 0 ) == Qt::Checked )
       {
-        if( selected_masks == "" )
-        {
-          selected_masks = mask->text( 0 );
-        }
-        else
-        {
-          selected_masks = selected_masks + QString::fromUtf8( "|" ) + mask->text( 0 );
-        }
+        QtLayerListWidget* new_mask = new QtLayerListWidget();
+        new_mask->set_mask_name( mask->text( 0 ).toStdString() );
+        new_mask->set_mask_index( 0 );
+        this->private_->masks_.push_front( new_mask );
       }
     }
   }
   
-  boost::filesystem::path desktop_path;
-  Core::Application::Instance()->get_user_desktop_directory( desktop_path );
-  
   QString filename;
   
-  if( this->single_file_radio_button_->isChecked() )
+  if( this->private_->single_file_radio_button_->isChecked() )
   {
     filename = QFileDialog::getSaveFileName( this, "Export Segmentation As... ",
       QString::fromStdString( PreferencesManager::Instance()->export_path_state_->get() ),
-      "NRRD files (*.nrrd)" );
-      
+      "NRRD File (*.nrrd)" );
+
     Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
       PreferencesManager::Instance()->export_path_state_, 
       boost::filesystem::path( filename.toStdString() ).parent_path().string() );
@@ -265,46 +332,44 @@ bool SegmentationSelectionPage::validatePage()
     return false;
   }
   
-  this->file_name_lineedit_->setText( filename );
-  
-  setField( "maskList", selected_masks );
-  setField( "segmentationPath", this->file_name_lineedit_->text() );
-  setField( "singleFile", this->single_file_radio_button_->isChecked() );
+  this->private_->file_name_ = filename.toStdString();
+
   return true;
 }
 
-SegmentationSummaryPage::SegmentationSummaryPage( QWidget *parent )
+SegmentationSummaryPage::SegmentationSummaryPage( AppSegmentationPrivateHandle private_handle, QWidget *parent )
     : QWizardPage( parent )
 {
+  this->private_ = private_handle;
     this->setTitle( "Export to Segmentation Summary" );
 
   this->setFinalPage( true );
-  this->main_layout_ = new QVBoxLayout( this );
-  this->main_layout_->setContentsMargins( 6, 6, 26, 6 );
-  this->main_layout_->setSpacing( 6 );
-  this->main_layout_->setObjectName( QString::fromUtf8( "main_layout_" ) );
+  this->private_->summary_main_layout_ = new QVBoxLayout( this );
+  this->private_->summary_main_layout_->setContentsMargins( 6, 6, 26, 6 );
+  this->private_->summary_main_layout_->setSpacing( 6 );
+  this->private_->summary_main_layout_->setObjectName( QString::fromUtf8( "summary_main_layout_" ) );
 
-  this->description_ = new QLabel( this );
-  this->description_->setWordWrap( true );
-  this->main_layout_->addWidget( this->description_ );
+  this->private_->description_ = new QLabel( this );
+  this->private_->description_->setWordWrap( true );
+  this->private_->summary_main_layout_->addWidget( this->private_->description_ );
 
-  this->mask_scroll_area_ = new QScrollArea( this );
-  this->mask_scroll_area_->setObjectName( QString::fromUtf8( "mask_scroll_area_" ) );
-  this->mask_scroll_area_->setWidgetResizable( true );
-  this->mask_scroll_area_->setAlignment( Qt::AlignLeading | Qt::AlignLeft | Qt::AlignTop );
-  this->mask_scroll_area_->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
-  this->mask_scroll_area_->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+  this->private_->mask_scroll_area_ = new QScrollArea( this );
+  this->private_->mask_scroll_area_->setObjectName( QString::fromUtf8( "mask_scroll_area_" ) );
+  this->private_->mask_scroll_area_->setWidgetResizable( true );
+  this->private_->mask_scroll_area_->setAlignment( Qt::AlignLeading | Qt::AlignLeft | Qt::AlignTop );
+  this->private_->mask_scroll_area_->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
+  this->private_->mask_scroll_area_->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
   
-  this->layers_ = new QWidget();
-  this->layers_->setObjectName( QString::fromUtf8( "layers_" ) );
-  this->layers_->setStyleSheet( QString::fromUtf8( "background-color: white;" ) );
-  this->masks_layout_ = new QVBoxLayout( this->layers_ );
-  this->masks_layout_->setObjectName( QString::fromUtf8( "masks_layout_" ) );
-  this->mask_scroll_area_->setWidget( this->layers_ );
+  this->private_->layers_ = new QWidget();
+  this->private_->layers_->setObjectName( QString::fromUtf8( "layers_" ) );
+  this->private_->layers_->setStyleSheet( QString::fromUtf8( "background-color: white;" ) );
+  this->private_->masks_layout_ = new QVBoxLayout( this->private_->layers_ );
+  this->private_->masks_layout_->setObjectName( QString::fromUtf8( "masks_layout_" ) );
+  this->private_->mask_scroll_area_->setWidget( this->private_->layers_ );
 
-  this->main_layout_->addWidget( this->mask_scroll_area_ );
+  this->private_->summary_main_layout_->addWidget( this->private_->mask_scroll_area_ );
 
-  this->setLayout( this->main_layout_ );
+  this->setLayout( this->private_->summary_main_layout_ );
 
   
 }
@@ -314,50 +379,40 @@ void SegmentationSummaryPage::initializePage()
     QString finishText = wizard()->buttonText(QWizard::FinishButton);
     finishText.remove('&');
     
-  this->masks_.clear();
-    this->layers_->deleteLater();
+    this->private_->layers_->deleteLater();
   
-  QString masks = field( "maskList" ).toString();
-  std::vector< std::string > selected_masks_vector = 
-    Core::SplitString( masks.toStdString(), "|" );
+  this->private_->layers_ = new QWidget();
+  this->private_->layers_->setObjectName( QString::fromUtf8( "layers_" ) );
+  this->private_->layers_->setStyleSheet( QString::fromUtf8( "background-color: white;" ) );
     
-  this->layers_ = new QWidget();
-  this->layers_->setObjectName( QString::fromUtf8( "layers_" ) );
-  this->layers_->setStyleSheet( QString::fromUtf8( "background-color: white;" ) );
-    
-  this->masks_layout_ = new QVBoxLayout( this->layers_ );
-  this->masks_layout_->setObjectName( QString::fromUtf8( "masks_layout_" ) );
-  this->masks_layout_->setContentsMargins( 0, 0, 0, 0 );
-  this->masks_layout_->setSpacing( 0 );
-  this->masks_layout_->setAlignment( Qt::AlignTop );
-  this->mask_scroll_area_->setWidget( this->layers_ );
+  this->private_->masks_layout_ = new QVBoxLayout( this->private_->layers_ );
+  this->private_->masks_layout_->setObjectName( QString::fromUtf8( "masks_layout_" ) );
+  this->private_->masks_layout_->setContentsMargins( 0, 0, 0, 0 );
+  this->private_->masks_layout_->setSpacing( 0 );
+  this->private_->masks_layout_->setAlignment( Qt::AlignTop );
+  this->private_->mask_scroll_area_->setWidget( this->private_->layers_ );
   
-  bool single_file = ( field( "singleFile" ).toString().toStdString() == "true" );
+  bool save_as_single_file = this->private_->single_file_radio_button_->isChecked();
   
   // insert the background layer settings
-  if( single_file )
+  if( save_as_single_file )
   {
-    QtLayerListWidget* new_mask = new QtLayerListWidget( this->layers_ );
+    QtLayerListWidget* new_mask = new QtLayerListWidget( this->private_->layers_ );
     new_mask->set_mask_name( "Background" );
-    new_mask->set_mask_index( 0 );
-    this->masks_layout_->addWidget( new_mask );
-    this->masks_.push_back( new_mask );
-    
+    this->private_->masks_layout_->addWidget( new_mask );
+    this->private_->masks_.push_front( new_mask );
     connect( new_mask, SIGNAL( index_changed_signal() ), this, SIGNAL( completeChanged() ) ); 
   }
   
-  for( int i = 0; i < static_cast< int >( selected_masks_vector.size() ); ++i )
+  for( int i = 0; i < static_cast< int >( this->private_->masks_.size() ); ++i )
   {
-    QtLayerListWidget* new_mask = new QtLayerListWidget( this->layers_ );
-    new_mask->set_mask_name( selected_masks_vector[ i ] );
-    new_mask->set_mask_index( i + 1 );
-    new_mask->hide_counter( !single_file );
-    this->masks_layout_->addWidget( new_mask );
-    this->masks_.push_back( new_mask );
-    connect( new_mask, SIGNAL( index_changed_signal() ), this, SIGNAL( completeChanged() ) ); 
+    this->private_->masks_[ i ]->set_mask_index( i );
+    this->private_->masks_[ i ]->hide_counter( !save_as_single_file );
+    this->private_->masks_layout_->addWidget( this->private_->masks_[ i ] );
+    connect( this->private_->masks_[ i ], SIGNAL( index_changed_signal() ), this, SIGNAL( completeChanged() ) ); 
   }
 
-  this->description_->setText(  QString::fromUtf8( "Please verify that you want to export the "
+  this->private_->description_->setText(  QString::fromUtf8( "Please verify that you want to export the "
     "following mask layers as a segmentation " ) );
     
 }
@@ -365,40 +420,45 @@ void SegmentationSummaryPage::initializePage()
 bool SegmentationSummaryPage::validatePage()
 {
   QString selected_masks = "";
-  for( int i = 0; i < this->masks_.size(); ++i )
+  for( int i = 0; i < this->private_->masks_.size(); ++i )
   {
     if( selected_masks == "" )
     {
-      selected_masks = this->masks_[ i ]->get_label() + QString::fromUtf8( "," ) + 
-        QString::number( this->masks_[ i ]->get_value() );
+      selected_masks = this->private_->masks_[ i ]->get_label() + QString::fromUtf8( "," ) + 
+        QString::number( this->private_->masks_[ i ]->get_value() );
     }
     else
     {
       selected_masks = selected_masks + QString::fromUtf8( "|" ) + 
-        this->masks_[ i ]->get_label() + QString::fromUtf8( "," ) + 
-        QString::number( this->masks_[ i ]->get_value() );
+        this->private_->masks_[ i ]->get_label() + QString::fromUtf8( "," ) + 
+        QString::number( this->private_->masks_[ i ]->get_value() );
     }
   }
   
-  bool single_file = ( field( "singleFile" ).toString().toStdString() == "true" ); 
-  
-  boost::filesystem::path file_name_and_path = 
-    field( "segmentationPath" ).toString().toStdString();
-  
   std::vector< LayerHandle > layers;
   std::vector< double > values;
-  for( int i = 0; i < this->masks_.size(); ++i )
+  for( int i = 0; i < this->private_->masks_.size(); ++i )
   {
     layers.push_back( LayerManager::Instance()->get_layer_by_name( 
-      this->masks_[ i ]->get_label().toStdString() ) );
-    values.push_back( this->masks_[ i ]->get_value() );
+      this->private_->masks_[ i ]->get_label().toStdString() ) );
+    values.push_back( this->private_->masks_[ i ]->get_value() );
   }
   
   LayerExporterHandle exporter;
-  if( ! ( LayerIO::Instance()->create_exporter( exporter, layers, "NRRD Exporter", ".nrrd" ) ) )
+  bool result = false;
+  if( !this->private_->bitmap_checkbox_->isChecked() )
+  {
+    result = LayerIO::Instance()->create_exporter( exporter, layers, "NRRD Exporter", ".nrrd" );
+  }
+  else
+  {
+    result = LayerIO::Instance()->create_exporter( exporter, layers, "ITK Exporter", ".bmp" );
+  }
+  
+  if( !result )
   {
     std::string error_message = std::string("ERROR: No importer is available for file '") + 
-      file_name_and_path.string() + std::string("'.");
+      this->private_->file_name_ + std::string("'.");
 
     QMessageBox message_box( this );
     message_box.setWindowTitle( "Import Layer..." );
@@ -410,16 +470,16 @@ bool SegmentationSummaryPage::validatePage()
   
   }
 
-  if( single_file )
+  if( this->private_->single_file_radio_button_->isChecked() )
   { 
     exporter->set_label_layer_values( values );
     ActionExportSegmentation::Dispatch( Core::Interface::GetWidgetActionContext(), exporter,
-      LayerExporterMode::LABEL_MASK_E, file_name_and_path.string() );
+      LayerExporterMode::LABEL_MASK_E, this->private_->file_name_ );
   }
   else
   {
     ActionExportSegmentation::Dispatch( Core::Interface::GetWidgetActionContext(), exporter,
-      LayerExporterMode::SINGLE_MASK_E, file_name_and_path.string() );
+      LayerExporterMode::SINGLE_MASK_E, this->private_->file_name_ );
   }
     
   return true;
@@ -428,13 +488,13 @@ bool SegmentationSummaryPage::validatePage()
 bool SegmentationSummaryPage::isComplete() const
 {
   bool valid = true;
-  for( int i = 0; i < this->masks_.size(); ++i )
+  for( int i = 0; i < this->private_->masks_.size(); ++i )
   {
     bool found = false;
-    for( int j = 0; j < this->masks_.size(); ++j )
+    for( int j = 0; j < this->private_->masks_.size(); ++j )
     {
       if( i == j ) continue;
-      if( this->masks_[ i ]->get_value() == this->masks_[ j ]->get_value() )
+      if( this->private_->masks_[ i ]->get_value() == this->private_->masks_[ j ]->get_value() )
       {
         found = true;
         break;
@@ -442,10 +502,10 @@ bool SegmentationSummaryPage::isComplete() const
     }
     if( found ) 
     {
-      this->masks_[ i ]->set_validity( false );
+      this->private_->masks_[ i ]->set_validity( false );
       valid = false;
     }
-    else this->masks_[ i ]->set_validity( true );
+    else this->private_->masks_[ i ]->set_validity( true );
   }
   return valid;
 }

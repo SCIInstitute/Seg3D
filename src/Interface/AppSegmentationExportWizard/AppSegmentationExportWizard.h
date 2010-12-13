@@ -29,18 +29,10 @@
 #ifndef INTERFACE_APPPROJECTWIZARD_APPSEGMENTATIONEXPORTWIZARD_H
 #define INTERFACE_APPPROJECTWIZARD_APPSEGMENTATIONEXPORTWIZARD_H
 
+#include <boost/shared_ptr.hpp>
+
 //Qt includes
 #include <QtGui/QWizard>
-#include <QtGui/QLabel>
-#include <QtGui/QLineEdit>
-#include <QtGui/QPushButton>
-#include <QtGui/QCheckBox>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QRadioButton>
-#include <QtGui/QButtonGroup>
-#include <QtGui/QTreeWidget>
-#include <QtGui/QScrollArea>
 
 // Interface Includes
 #include <Interface/AppSegmentationExportWizard/QtLayerListWidget.h>
@@ -48,6 +40,9 @@
 namespace Seg3D
 {
 
+class AppSegmentationPrivate;
+typedef boost::shared_ptr< AppSegmentationPrivate > AppSegmentationPrivateHandle;
+  
 class AppSegmentationExportWizard : public QWizard
 {
 Q_OBJECT
@@ -58,6 +53,7 @@ public:
     
 private:
     void accept();
+  AppSegmentationPrivateHandle private_;
 
 };
 
@@ -66,7 +62,7 @@ class SegmentationSelectionPage : public QWizardPage
 Q_OBJECT
 
 public:
-  SegmentationSelectionPage( QWidget *parent = 0 );
+  SegmentationSelectionPage( AppSegmentationPrivateHandle private_handle, QWidget *parent = 0 );
   
 protected:
   // INITIALIZEPAGE:
@@ -78,29 +74,12 @@ protected:
   // function that is called right after the next button is clicked and used to process
   // the entered data so it can be passed to the next page
   virtual bool validatePage();
-
+  
+private Q_SLOTS:
+  void enable_disable_bitmap_button( int button_id );
+  
 private:
-  QVBoxLayout *main_layout_;
-  QWidget *segmentation_top_widget_;
-  QVBoxLayout *verticalLayout;
-  QWidget *segmentation_name_widget_;
-  QHBoxLayout *horizontalLayout;
-  QLabel *segmentation_name_label_;
-  QTreeWidget *group_with_masks_tree_;
-  QLineEdit *mask_list_;
-  QLineEdit *file_name_lineedit_;
-  
-  QWidget *single_or_multiple_files_widget_;
-  QHBoxLayout *horizontalLayout_1;
-  QWidget *single_file_widget_;
-  QHBoxLayout *horizontalLayout_4;
-  QRadioButton *single_file_radio_button_;
-  QWidget *multiple_files_widget_;
-  QHBoxLayout *horizontalLayout_5;
-  QRadioButton *individual_files_radio_button_;
-  QButtonGroup *radio_button_group_;
-  
-  QLabel *hidden_path_label_;
+  AppSegmentationPrivateHandle private_;
 
 };
 
@@ -109,7 +88,7 @@ class SegmentationSummaryPage : public QWizardPage
     Q_OBJECT
 
 public:
-    SegmentationSummaryPage( QWidget *parent = 0 );
+    SegmentationSummaryPage( AppSegmentationPrivateHandle private_handle, QWidget *parent = 0 );
 
 protected:
   // INITIALIZEPAGE:
@@ -126,15 +105,10 @@ protected:
   // This function is actually called after "isComplete" is called and in this case we use it to
   // validate the information on the summary page and dispatch the actions
   virtual bool validatePage();
-  
+
 private:
-  QLabel *description_;
-  QVBoxLayout *main_layout_;
-  QScrollArea *mask_scroll_area_;
-  QWidget *layers_;
-  QVBoxLayout *masks_layout_;
-  QTreeWidget *group_with_masks_tree_;
-  QVector< QtLayerListWidget* > masks_;
+  AppSegmentationPrivateHandle private_;
+
 };
 
 } // end namespace Seg3D

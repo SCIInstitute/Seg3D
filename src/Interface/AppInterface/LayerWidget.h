@@ -231,6 +231,14 @@ private Q_SLOTS:
   // EXPORT_DATA:
   // dispatches an action that exports the data
   void export_data();
+  
+  // EXPORT_BMP:
+  // dispatches an action that exports the layer as a segmentation
+  void export_bmp();
+  
+  // EXPORT_NRRD:
+  // dispatches an action that exports the layer as a segmentation
+  void export_nrrd();
 
 protected:
   void resizeEvent( QResizeEvent *event );
