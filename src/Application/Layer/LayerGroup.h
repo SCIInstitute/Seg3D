@@ -178,6 +178,8 @@ public:
   {
     return layer_list_.empty();
   }
+  
+  bool has_a_valid_layer() const;
 
   void get_layer_names( std::vector< LayerIDNamePair >& layer_names, 
     Core::VolumeType type ) const;

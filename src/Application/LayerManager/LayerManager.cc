@@ -940,7 +940,10 @@ bool LayerManager::post_save_states( Core::StateIO& state_io )
   for( group_list_type::reverse_iterator i = this->private_->group_list_.rbegin(); 
     i != this->private_->group_list_.rend(); ++i )
   {
-    ( *i )->save_states( state_io );
+    if( ( *i )->has_a_valid_layer() )
+    {
+      ( *i )->save_states( state_io );
+    }
   }
 
   state_io.pop_current_element();

@@ -419,6 +419,22 @@ bool LayerGroup::post_save_states( Core::StateIO& state_io )
   state_io.pop_current_element();
   return true;
 }
+  
+bool LayerGroup::has_a_valid_layer() const
+{
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+  
+  layer_list_type::const_iterator it = this->layer_list_.begin();
+  for ( ; it != this->layer_list_.end(); it++ )
+  {
+    if ( ( *it )->has_valid_data() )
+    {
+      return true;
+    }
+  }
+  
+  return false;
+}
 
 bool LayerGroup::post_load_states( const Core::StateIO& state_io )
 {

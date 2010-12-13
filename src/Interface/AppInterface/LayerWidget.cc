@@ -1151,8 +1151,7 @@ void LayerWidget::delete_layer_from_context_menu()
   }
 }
 
-void LayerWidget::export_data()
-{
+void LayerWidget::export_data(){
   QString filename = QFileDialog::getSaveFileName( this, "Export Data Layer As... ",
     QString::fromStdString( PreferencesManager::Instance()->export_path_state_->get() ),
     "NRRD files (*.nrrd);;DICOM files (*.dcm)" );
