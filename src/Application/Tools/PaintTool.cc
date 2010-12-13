@@ -706,6 +706,7 @@ void PaintToolPrivate::flood_fill( Core::ActionContextHandle context,
       context->report_error( "Can't flood fill in the volume view." );
       return;
     }
+
     Core::VolumeSliceHandle vol_slice = viewer->get_volume_slice( ff_params.target_layer_id_ );
     if ( vol_slice->out_of_boundary() )
     {
@@ -719,6 +720,12 @@ void PaintToolPrivate::flood_fill( Core::ActionContextHandle context,
       context->report_error( "Layer not visible in the active viewer" );
       return;
     }
+    if ( layer->locked_state_->get() )
+    {
+      context->report_error( "Layer is locked" );
+      return;
+    }
+    
 
     ff_params.slice_type_ = vol_slice->get_slice_type();
     ff_params.slice_number_ = vol_slice->get_slice_number();
@@ -767,7 +774,8 @@ bool PaintToolPrivate::check_paintable( ViewerHandle viewer )
         LayerManager::Instance()->get_layer_by_id( layer_id ) );
       if ( layer )
       {
-        paintable = layer->is_visible( viewer_id ) && layer->has_valid_data();
+        paintable = layer->is_visible( viewer_id ) && layer->has_valid_data() &&
+          !layer->locked_state_->get();
       }
     }
   }
@@ -913,7 +921,8 @@ void PaintTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
     layer_visible = target_layer->has_valid_data() && target_layer->is_visible( viewer_id );
     if ( current_viewer )
     {
-      brush_visible = layer_visible && target_layer->is_visible( current_viewer->get_viewer_id() );
+      brush_visible = layer_visible && target_layer->is_visible( current_viewer->get_viewer_id() ) &&
+        !target_layer->locked_state_->get();
     }
     
     data_constraint_layer_id = this->data_constraint_layer_state_->get();
@@ -1232,7 +1241,8 @@ bool PaintTool::handle_mouse_press( ViewerHandle viewer,
         LayerManager::Instance()->get_layer_by_id( this->target_layer_state_->get() ) );
       if ( layer )
       {
-        paintable = layer->is_visible( viewer_id ) && layer->has_valid_data();
+        paintable = layer->is_visible( viewer_id ) && layer->has_valid_data() && 
+          !layer->locked_state_->get();
       }
     }
   }

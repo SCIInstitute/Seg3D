@@ -105,6 +105,13 @@ bool ActionFloodFill::validate( Core::ActionContextHandle& context )
     return false;
   }
 
+  if ( target_layer->locked_state_->get() )
+  {
+    context->report_error( "Layer '" + this->private_->target_layer_id_.value() +
+      "' is locked." );
+    return false;
+  }
+  
   // Check whether the target layer can be used for processing
   Core::NotifierHandle notifier;
   if ( !LayerManager::Instance()->CheckLayerAvailabilityForProcessing(
