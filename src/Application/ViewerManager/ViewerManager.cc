@@ -543,6 +543,20 @@ bool ViewerManager::post_save_states( Core::StateIO& state_io )
   return true;
 }
 
+bool ViewerManager::pre_load_states( const Core::StateIO& state_io )
+{
+  // Load states of all the viewers before loading ViewerManager states.
+  // NOTE: The reason for doing this is that some of the ViewerManager states are affected
+  // by certain states of viewers, and we don't want the loaded states to be overwritten.
+
+  for ( size_t i = 0; i < this->number_of_viewers(); i++ )
+  {
+    this->private_->viewers_[ i ]->load_states( state_io );
+  }
+
+  return true;
+}
+
 bool ViewerManager::post_load_states( const Core::StateIO& state_io )
 {
   // Block signals
@@ -576,26 +590,13 @@ bool ViewerManager::post_load_states( const Core::StateIO& state_io )
       is_picking_target_state_->set( true ); 
   }
   
+  this->reset_cursor();
   return true;
 }
 
 int ViewerManager::get_session_priority()
 {
   return SessionPriority::VIEWER_MANAGER_PRIORITY_E;
-}
-
-bool ViewerManager::pre_load_states( const Core::StateIO& state_io )
-{
-  // Load states of all the viewers before loading ViewerManager states.
-  // NOTE: The reason for doing this is that some of the ViewerManager states are affected
-  // by certain states of viewers, and we don't want the loaded states to be overwritten.
-
-  for ( size_t i = 0; i < this->number_of_viewers(); i++ )
-  {
-    this->private_->viewers_[ i ]->load_states( state_io );
-  }
-
-  return true;
 }
 
 void ViewerManager::update_viewers_overlay( const std::string& view_mode )
@@ -650,7 +651,9 @@ void ViewerManager::reset_cursor()
 {
   for ( size_t i = 0; i < this->private_->viewers_.size(); ++i )
   {
-    this->private_->viewers_[ i ]->set_cursor( Core::CursorShape::CROSS_E );
+    ViewerHandle viewer = this->private_->viewers_[ i ];
+    viewer->set_cursor( viewer->is_volume_view() ? Core::CursorShape::ARROW_E : 
+      Core::CursorShape::CROSS_E );
   }
 }
 

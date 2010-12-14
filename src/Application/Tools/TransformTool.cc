@@ -338,7 +338,7 @@ void TransformToolPrivate::update_cursor( ViewerHandle viewer )
     viewer->set_cursor( Core::CursorShape::SIZE_VER_E );
     break;
   default:
-    viewer->set_cursor( Core::CursorShape::ARROW_E );
+    viewer->set_cursor( Core::CursorShape::CROSS_E );
     break;
   }
 }
@@ -630,6 +630,12 @@ bool TransformTool::handle_mouse_move( ViewerHandle viewer,
                  const Core::MouseHistory& mouse_history, 
                  int button, int buttons, int modifiers )
 { 
+  if ( viewer->is_volume_view() )
+  {
+    this->private_->hit_pos_ = Core::HitPosition::NONE_E;
+    return false;
+  }
+
   if ( buttons == Core::MouseButton::NO_BUTTON_E &&
     modifiers == Core::KeyModifier::NO_MODIFIER_E )
   {

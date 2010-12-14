@@ -45,7 +45,7 @@ class QtSliderIntComboConnector : public QtConnectorBase
 
 public:
   QtSliderIntComboConnector( QtSliderIntCombo* parent, 
-    Core::StateRangedIntHandle& state, bool blocking = false );
+    Core::StateRangedIntHandle& state, bool blocking = true );
 
   virtual ~QtSliderIntComboConnector();
 

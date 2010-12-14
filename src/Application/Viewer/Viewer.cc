@@ -464,9 +464,12 @@ void ViewerPrivate::change_view_mode( std::string mode, Core::ActionSource sourc
   }
 
   if ( mode == Viewer::VOLUME_C )
-  {   
+  {
+    this->viewer_->set_cursor( Core::CursorShape::ARROW_E );
     return;
   }
+
+  this->viewer_->set_cursor( Core::CursorShape::CROSS_E );
 
   Core::VolumeSliceType slice_type( Core::VolumeSliceType::AXIAL_E );
   if ( mode == Viewer::CORONAL_C )
