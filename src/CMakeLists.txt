@@ -275,9 +275,14 @@ INCLUDE(CMake/RegisterClass.cmake)
 #  Resources - Icons, images, etc.
 ###########################################
 
+MESSAGE(STATUS "Configuring Seg3D Core")
 ADD_SUBDIRECTORY(Core)
+
+MESSAGE(STATUS "Configuring Seg3D Application")
 ADD_SUBDIRECTORY(Application)
 
+
+MESSAGE(STATUS "Configuring Seg3D Interface")
 IF(SEG3D_BUILD_INTERFACE)
   ADD_SUBDIRECTORY(Resources)
   ADD_SUBDIRECTORY(QtUtils)
@@ -293,6 +298,19 @@ ENDIF(SEG3D_BUILD_INTERFACE)
 # factories.
 ###########################################
 
+MESSAGE(STATUS "Configuring Seg3D Plugins")
+FILE(GLOB PLUGIN_DIRS "Plugins/*" )
+
+INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/Plugins")
+
+FOREACH(DIR ${PLUGIN_DIRS})
+  IF(NOT ${DIR} MATCHES "Plugins/.svn")
+  IF(IS_DIRECTORY ${DIR}) 
+      ADD_SUBDIRECTORY(${DIR})
+  ENDIF(IS_DIRECTORY ${DIR}) 
+  ENDIF(NOT ${DIR} MATCHES "Plugins/.svn")
+ENDFOREACH(DIR ${PLUGIN_DIRS})
+
 ###########################################
 # Main:
 # Main needs to be included after custom 
@@ -301,6 +319,7 @@ ENDIF(SEG3D_BUILD_INTERFACE)
 
 
 IF(SEG3D_BUILD_INTERFACE)
+  MESSAGE(STATUS "Configuring Seg3D main")
   ADD_SUBDIRECTORY(Main)
 ENDIF(SEG3D_BUILD_INTERFACE)
 
@@ -312,6 +331,7 @@ ENDIF(SEG3D_BUILD_INTERFACE)
 # factories
 ###########################################
 
+MESSAGE(STATUS "Configuring Seg3D registered functions")
 GENERATE_REGISTRATION_FILES()
 
 ###########################################
@@ -327,6 +347,8 @@ ADD_SUBDIRECTORY(Bootstrap)
 # This part sets up the packager using
 # CPack.
 ###########################################
+
+MESSAGE(STATUS "Configuring Seg3D packaging")
 
 INCLUDE(InstallRequiredSystemLibraries)
 

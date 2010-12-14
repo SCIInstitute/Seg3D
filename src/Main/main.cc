@@ -89,8 +89,8 @@ int main( int argc, char **argv )
     return 0;
   }
 
-  // -- Send message to revolving log file --
-  Core::RolloverLogFile event_log( Core::LogMessageType::NODEBUG_E );
+  // -- Send message to revolving log file -- 
+  Core::RolloverLogFile event_log( Core::LogMessageType::ALL_E );
 
   // -- Log application information --
   Core::Application::Instance()->log_start();

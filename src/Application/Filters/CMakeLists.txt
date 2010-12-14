@@ -47,7 +47,6 @@ SET(APPLICATION_FILTERS_SRCS
 SET(APPLICATION_FILTERS_ACTIONS_SRCS
   Actions/ActionResample.h
   Actions/ActionResample.cc
-  
   Actions/ActionCannyEdgeDetectionFilter.h
   Actions/ActionCannyEdgeDetectionFilter.cc
   Actions/ActionConfidenceConnectedFilter.h

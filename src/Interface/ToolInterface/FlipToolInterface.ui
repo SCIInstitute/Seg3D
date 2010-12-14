@@ -133,11 +133,6 @@
       </item>
       <item>
        <widget class="QGroupBox" name="groupBox">
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
         <property name="title">
          <string>Layers</string>
         </property>

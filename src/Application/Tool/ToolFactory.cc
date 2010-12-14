@@ -93,29 +93,32 @@ ToolFactory::~ToolFactory()
 {
 }
 
-void ToolFactory::register_tool( ToolBuilderBase* builder, ToolInfoHandle info )
+void ToolFactory::register_tool( ToolBuilderBase* builder, ToolInfoHandle info, 
+  std::string tool_name )
 {
+  tool_name = Core::StringToLower( tool_name );
+
   lock_type lock( this->get_mutex() );
 
   // Test is tool was registered before.
-  if ( this->private_->tools_.find( info->get_name() ) != this->private_->tools_.end() )
+  if ( this->private_->tools_.find( tool_name ) != this->private_->tools_.end() )
   {
     // Actions that are registered twice, will cause problems
     // Hence the program will throw an exception.
     // As registration is done on startup, this will cause a
     // faulty program to fail always on startup.
-    CORE_THROW_LOGICERROR( std::string( "Tool '" ) + info->get_name() + "' is registered twice" );
+    CORE_THROW_LOGICERROR( std::string( "Tool '" ) + tool_name + "' is registered twice" );
   }
 
   // Register the action and set its properties 
   ToolEntry entry;
   entry.builder_ = builder;
   entry.info_ = info;
-  this->private_->tools_[ info->get_name() ] = entry;
+  this->private_->tools_[ tool_name ] = entry;
 
   this->private_->tool_menus_.insert( info->get_menu() );
   
-  CORE_LOG_DEBUG( std::string( "Registering tool : " ) + info->get_name() );
+  CORE_LOG_DEBUG( std::string( "Registering tool : " ) + tool_name );
 }
 
 void ToolFactory::register_toolinterface( ToolInterfaceBuilderBase* builder,

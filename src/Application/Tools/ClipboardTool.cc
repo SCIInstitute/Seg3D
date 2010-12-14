@@ -247,12 +247,14 @@ ClipboardTool::ClipboardTool( const std::string& toolid ) :
     boost::bind( &ClipboardToolPrivate::update_slice_numbers, this->private_ ) ) );
   this->add_connection( this->slice_type_state_->state_changed_signal_.connect(
     boost::bind( &ClipboardToolPrivate::update_slice_numbers, this->private_ ) ) );
+    
   this->add_connection( this->use_active_viewer_state_->value_changed_signal_.connect( 
     boost::bind( &ClipboardToolPrivate::handle_use_active_viewer_changed, this->private_, _1 ) ) );
   this->add_connection( ViewerManager::Instance()->active_viewer_state_->value_changed_signal_.
     connect( boost::bind( &ClipboardToolPrivate::handle_active_viewer_changed, 
     this->private_, _1 ) ) );
   size_t num_of_viewrs = ViewerManager::Instance()->number_of_viewers();
+  
   for ( size_t i = 0; i < num_of_viewrs; ++i )
   {
     ViewerHandle viewer = ViewerManager::Instance()->get_viewer( i );

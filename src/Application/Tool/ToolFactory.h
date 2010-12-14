@@ -157,7 +157,8 @@ public:
   // REGISTER_TOOL:
   // Register a tool so that it can be automatically built in the tool
   // factory.
-  void register_tool( ToolBuilderBase* builder, ToolInfoHandle tool_info );
+  void register_tool( ToolBuilderBase* builder, ToolInfoHandle tool_info,
+    std::string tool_name );
 
   // REGISTER_TOOLINTERFACE:
   // Register a tool so that it can be automatically build in the tool
@@ -221,7 +222,7 @@ namespace Core\
   using namespace namesp;\
   void register_##name()\
   {\
-    ToolFactory::Instance()->register_tool( new ToolBuilder<name>, name::GetToolInfo() );\
+    Seg3D::ToolFactory::Instance()->register_tool( new Seg3D::ToolBuilder<name>, name::GetToolInfo(), #name );\
   } \
 }
 
@@ -231,7 +232,7 @@ namespace Core\
   using namespace namesp;\
   void register_##name()\
   {\
-    ToolFactory::Instance()->register_toolinterface( new ToolInterfaceBuilder<name>, #name);\
+    Seg3D::ToolFactory::Instance()->register_toolinterface( new Seg3D::ToolInterfaceBuilder<name>, #name);\
   }\
 }
 
