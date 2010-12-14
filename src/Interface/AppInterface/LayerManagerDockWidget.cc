@@ -35,7 +35,7 @@
 
 namespace Seg3D
 {
-
+  
 LayerManagerDockWidget::LayerManagerDockWidget( QWidget *parent ) :
   QtUtils::QtCustomDockWidget( parent )
 {
@@ -43,6 +43,7 @@ LayerManagerDockWidget::LayerManagerDockWidget( QWidget *parent ) :
   this->setWindowTitle( "Layer Manager" );
   this->setMinimumSize( QSize( 296, 313 ) );
   this->setWidget( new LayerManagerWidget( this ) );
+
 }
 
 LayerManagerDockWidget::~LayerManagerDockWidget()

@@ -29,6 +29,11 @@
 #ifndef QTUTILS_WIDGETS_QTCUSTOMDOCKWIDGET_H
 #define QTUTILS_WIDGETS_QTCUSTOMDOCKWIDGET_H
 
+
+// Boost includes
+#include <boost/shared_ptr.hpp>
+
+
 // QT includes
 #include <QtGui/QDockWidget>
 #include <QtGui/QCloseEvent>
@@ -36,6 +41,8 @@
 
 namespace QtUtils
 {
+  
+class QtCustomDockWidgetPrivate;
   
 class QtCustomDockWidget : public QDockWidget
 {
@@ -49,10 +56,20 @@ public:
   QtCustomDockWidget( QWidget *parent = 0 );
   virtual ~QtCustomDockWidget();
 
-  // HIDEEVENT:
+  // CLOSEEVENT:
   // This function is called by Qt to deliver an event that tells that the
   // widget is being hidden. 
   virtual void closeEvent( QCloseEvent* event );
+  
+  virtual void resizeEvent( QResizeEvent *event );
+  
+public:
+  void set_enabled( bool enabled );
+  
+
+  
+private:
+  boost::shared_ptr< QtCustomDockWidgetPrivate > private_;
   
 
 };

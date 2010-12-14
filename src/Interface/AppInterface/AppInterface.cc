@@ -345,15 +345,15 @@ void AppInterface::closeEvent( QCloseEvent* event )
   event->accept();
 }
 
-  void AppInterface::resizeEvent( QResizeEvent *event )
+void AppInterface::resizeEvent( QResizeEvent *event )
+{
+  if( this->private_->progress_ && this->private_->progress_->isVisible() )
   {
-    if( this->private_->progress_ && this->private_->progress_->isVisible() )
-    {
-      this->private_->progress_->resize( event->size() );
-    }
-    
-    event->accept();
+    this->private_->progress_->resize( event->size() );
   }
+  
+  event->accept();
+}
   
   
 void AppInterface::center_seg3d_gui_on_screen( QWidget *widget ) 
@@ -388,6 +388,15 @@ void AppInterface::begin_progress( Core::ActionProgressHandle handle )
   CORE_LOG_DEBUG( "-- Picturizing the Viewer Interface --" );
   this->private_->viewer_interface_->set_pic_mode( true );
   this->private_->progress_->resize( this->size() );
+  
+  // "Disable" all the dock windows if they are floating
+  this->private_->layer_manager_dock_window_->set_enabled( false );
+  this->private_->tools_dock_window_->set_enabled( false );
+  this->private_->project_dock_window_->set_enabled( false );
+  this->private_->measurement_dock_window_->set_enabled( false );
+  this->private_->history_dock_window_->set_enabled( false );
+  
+  
   this->menuBar()->setEnabled( false );
 
 }
@@ -398,6 +407,14 @@ void AppInterface::end_progress( Core::ActionProgressHandle /*handle*/ )
   CORE_LOG_DEBUG( "-- Finish progress widget --" );
   this->private_->progress_->cleanup_progress_widget();
   this->menuBar()->setEnabled( true );
+  
+  // Now re-enable the dock widgets
+  this->private_->layer_manager_dock_window_->set_enabled( true );
+  this->private_->tools_dock_window_->set_enabled( true );
+  this->private_->project_dock_window_->set_enabled( true );
+  this->private_->measurement_dock_window_->set_enabled( true );
+  this->private_->history_dock_window_->set_enabled( true );
+  
   CORE_LOG_DEBUG( "-- Unpicturizing the Viewer Interface --" );
   this->private_->viewer_interface_->set_pic_mode( false );
 

@@ -29,12 +29,15 @@
 #ifndef INTERFACE_APPINTERFACE_LAYERMANAGERDOCKWIDGET_H
 #define INTERFACE_APPINTERFACE_LAYERMANAGERDOCKWIDGET_H
 
+
 // QtUtils includes
 #include <QtUtils/Widgets/QtCustomDockWidget.h>
 
 namespace Seg3D
 {
 
+
+  
 class LayerManagerDockWidget : public QtUtils::QtCustomDockWidget
 {
 Q_OBJECT
@@ -43,7 +46,7 @@ Q_OBJECT
 public:
   LayerManagerDockWidget( QWidget *parent = 0 );
   virtual ~LayerManagerDockWidget();
-  
+
 };
 
 } // end namespace Seg3D

@@ -66,6 +66,7 @@ public:
   QString current_message_;
   int message_type_;
   bool error_icon_set_;
+  bool animating_;
   QIcon normal_message_icon_;
   QIcon error_message_icon_;
   
@@ -126,6 +127,7 @@ AppStatusBar::AppStatusBar( QMainWindow* parent ) :
   this->private_->normal_message_icon_.addFile( QString::fromUtf8( ":/Images/TextOff.png" ), QSize(), QIcon::Normal );
   this->private_->error_message_icon_.addFile( QString::fromUtf8( ":/Images/TextOffError.png" ), QSize(), QIcon::Normal );
   this->private_->error_icon_set_ = false;
+  this->private_->animating_ = false;
   
 }
 
@@ -281,16 +283,6 @@ void AppStatusBar::update_data_point_label()
 
 void AppStatusBar::set_message( int msg_type, std::string message )
 {
-//  std::string status_message = message;
-//  boost::char_separator< char > separater( " " );
-//  boost::tokenizer< boost::char_separator< char > > tok( message, separater );
-//
-//  for ( boost::tokenizer< boost::char_separator< char > >::iterator beg = ++tok.begin(); beg
-//      != tok.end(); ++beg )
-//  {
-//    status_message = status_message + " " + *beg;
-//  }
-  
   this->private_->message_type_ = msg_type;
   this->private_->current_message_ = QString::fromStdString( message );
   
@@ -384,12 +376,15 @@ void AppStatusBar::SetMessage( qpointer_type qpointer, int msg_type, std::string
       this->private_->ui_.status_report_label_->height() ) );
     animation->setEndValue( QRect( 0, 0, this->private_->ui_.status_report_label_->width(), 
       this->private_->ui_.status_report_label_->height() ) );
-    
+    connect( animation, SIGNAL( finished() ), this, SLOT( set_finished_animating() ) );
     animation->start();
+    this->private_->animating_ = true;
   }
   
   void AppStatusBar::slide_out_then_in()
   {
+    if( this->private_->animating_ ) return;
+    
     QPropertyAnimation *animation = new QPropertyAnimation( this->private_->ui_.status_report_label_, "geometry" );
     animation->setDuration( 1000 );
     animation->setStartValue( QRect( 0, 0, this->private_->ui_.status_report_label_->width(), 
@@ -406,6 +401,8 @@ void AppStatusBar::SetMessage( qpointer_type qpointer, int msg_type, std::string
   
   void AppStatusBar::slide_out()
   {
+    if( this->private_->animating_ ) return;
+    
     QPropertyAnimation *animation = new QPropertyAnimation( this->private_->ui_.status_report_label_, "geometry" );
     animation->setDuration( 1000 );
     animation->setStartValue( QRect( 0, 0, this->private_->ui_.status_report_label_->width(), 
@@ -416,6 +413,7 @@ void AppStatusBar::SetMessage( qpointer_type qpointer, int msg_type, std::string
     connect( animation, SIGNAL( finished() ), this, SLOT( clear_label() ) );
     animation->setEasingCurve( QEasingCurve::OutQuad );
     animation->start();
+    this->private_->animating_ = true;
   }
   
   void AppStatusBar::clear_label()
@@ -423,9 +421,13 @@ void AppStatusBar::SetMessage( qpointer_type qpointer, int msg_type, std::string
     this->private_->ui_.status_report_label_->setText( QString::fromUtf8( "" ) );
     this->private_->ui_.status_report_label_->hide();
     this->private_->current_message_ = QString::fromUtf8( "" );
+    this->set_finished_animating();
   }
   
-  
+  void AppStatusBar::set_finished_animating()
+  {
+    this->private_->animating_ = false;
+  }
 
 } // end namespace Seg3D
 

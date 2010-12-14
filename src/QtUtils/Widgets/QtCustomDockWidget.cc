@@ -36,9 +36,23 @@
 namespace QtUtils
 {
   
-QtCustomDockWidget::QtCustomDockWidget( QWidget *parent ) :
-  QDockWidget( parent )
+class QtCustomDockWidgetPrivate
 {
+public:
+  QWidget* overlay_;
+  
+};
+  
+QtCustomDockWidget::QtCustomDockWidget( QWidget *parent ) :
+  QDockWidget( parent ),
+  private_( new QtCustomDockWidgetPrivate )
+{
+  this->private_->overlay_ = new QWidget( this );
+  this->private_->overlay_->setObjectName( QString::fromUtf8( "overlay_" ) );
+  this->private_->overlay_->setStyleSheet( QString::fromUtf8( "QWidget#overlay_{"
+    " background-color: rgba(211, 211, 211, 212);"
+    "}" ) );
+  this->private_->overlay_->hide();
 }
   
 QtCustomDockWidget::~QtCustomDockWidget()
@@ -51,6 +65,29 @@ void QtCustomDockWidget::closeEvent( QCloseEvent* event )
   event->accept();
 }
 
+void QtCustomDockWidget::resizeEvent( QResizeEvent *event )
+{
+  if( this->isFloating() && this->private_->overlay_->isVisible() )
+  {
+    this->private_->overlay_->resize( event->size() );
+  }
+  
+}
+
+void QtCustomDockWidget::set_enabled( bool enabled )
+{
+  if( !this->isFloating() ) return;
+  
+  if( enabled )
+  {
+    this->private_->overlay_->hide();
+  }
+  else
+  {
+    this->private_->overlay_->show();
+    this->private_->overlay_->resize( this->size() );
+  }
+}
 
 
 } // end namespace QtUtils

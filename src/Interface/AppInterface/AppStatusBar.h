@@ -88,6 +88,7 @@ private Q_SLOTS:
   void slide_in();
   void slide_out();
   void slide_out_then_in();
+  void set_finished_animating();
 
 private:
   typedef QPointer< AppStatusBar > qpointer_type;

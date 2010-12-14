@@ -72,7 +72,6 @@ public:
   group_widget_map_type group_map_;
 
   bool loading_states_;
-
   // -- static functions for callbacks into this widget --
 public:
   typedef QPointer< LayerManagerWidget > qpointer_type;
@@ -139,16 +138,16 @@ LayerManagerWidget::LayerManagerWidget( QWidget* parent ) :
 
   // Define a new central widget inside the scroll area
   this->private_->main_ = new QWidget( parent );
-  setWidget( this->private_->main_ );
+  this->setWidget( this->private_->main_ );
   
   // Setup the spacing between the groups
-  this->private_->group_layout_ = new QVBoxLayout;
+  this->private_->group_layout_ = new QVBoxLayout( this->private_->main_ );
   this->private_->group_layout_->setSpacing( 2 );
   this->private_->group_layout_->setContentsMargins( 1, 1, 1, 1 );
   this->private_->group_layout_->setAlignment( Qt::AlignTop );
   
   // Link the layout to the main widget
-  this->private_->main_->setLayout( this->private_->group_layout_ );
+//  this->private_->main_->setLayout( this->private_->group_layout_ );
   this->private_->main_->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Preferred );
   this->private_->main_->setAcceptDrops( true );
 
@@ -177,7 +176,9 @@ LayerManagerWidget::~LayerManagerWidget()
 {
   this->disconnect_all();
 }
+  
 
+  
 // Functions for handling Layer or LayerGroup changes from the LayerManager
 void LayerManagerWidget::handle_groups_changed()
 {

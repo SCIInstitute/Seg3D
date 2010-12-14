@@ -275,6 +275,7 @@ void SegmentationSelectionPage::initializePage()
 
     if( !mask_found )
     {
+      group->setCheckState( 0, Qt::Checked );
       group->setCheckState( 0, Qt::Unchecked );
       group->setDisabled( true );
     }
