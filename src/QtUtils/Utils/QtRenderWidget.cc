@@ -309,24 +309,6 @@ void QtRenderWidget::keyPressEvent( QKeyEvent* event )
   }
 }
 
-void QtRenderWidget::hideEvent( QHideEvent* event )
-{
-  if ( !event->spontaneous() )
-  {
-    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
-      this->private_->viewer_->viewer_visible_state_, false );
-  }
-}
-
-void QtRenderWidget::showEvent( QShowEvent* event )
-{
-  if ( !event->spontaneous() )
-  {
-    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
-      this->private_->viewer_->viewer_visible_state_, true );
-  }
-}
-
 void QtRenderWidget::enterEvent( QEvent* event )
 {
   event->accept();

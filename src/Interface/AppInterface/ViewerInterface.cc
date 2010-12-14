@@ -42,6 +42,9 @@
 #include <Core/Renderer/DummyRenderer.h>
 #include <Core/RenderResources/RenderResources.h>
 
+// QtUtils includes
+#include <QtUtils/Bridge/QtBridge.h>
+
 // Application
 #include <Application/Renderer/Renderer.h>
 #include <Application/ViewerManager/ViewerManager.h>
@@ -125,6 +128,7 @@ void ViewerInterfacePrivate::setup_ui( QWidget* parent )
     }
     // Step 3: Generate the widget
     this->viewer_[ j ] = new ViewerWidget( viewer, parent );
+    QtUtils::QtBridge::Show( this->viewer_[ j ], viewer->viewer_visible_state_ );
   }
   
   this->vert_splitter1_->addWidget( this->viewer_[ 0 ] );
@@ -196,14 +200,8 @@ void ViewerInterface::set_active_viewer( int viewer_id )
 
 void ViewerInterface::set_layout( const std::string& layout )
 {
-  if( layout == "single" )
+  if( layout == ViewerManager::SINGLE_C )
   {
-    private_->viewer_[ 0 ]->show();
-    private_->viewer_[ 1 ]->hide();
-    private_->viewer_[ 2 ]->hide();
-    private_->viewer_[ 3 ]->hide();
-    private_->viewer_[ 4 ]->hide();
-    private_->viewer_[ 5 ]->hide();
     private_->vert_splitter1_->show();
     private_->vert_splitter2_->hide();
 
@@ -213,14 +211,8 @@ void ViewerInterface::set_layout( const std::string& layout )
     private_->horiz_splitter_->setSizes( sizes );
     private_->horiz_splitter_->repaint();
   }
-  else if( layout == "1and1" )
+  else if( layout == ViewerManager::_1AND1_C )
   {
-    private_->viewer_[ 0 ]->show();
-    private_->viewer_[ 1 ]->hide();
-    private_->viewer_[ 2 ]->hide();
-    private_->viewer_[ 3 ]->show();
-    private_->viewer_[ 4 ]->hide();
-    private_->viewer_[ 5 ]->hide();
     private_->vert_splitter1_->show();
     private_->vert_splitter2_->show();
 
@@ -230,14 +222,8 @@ void ViewerInterface::set_layout( const std::string& layout )
     private_->horiz_splitter_->setSizes( sizes );
     private_->horiz_splitter_->repaint();
   }
-  else if( layout == "1and2" )
+  else if( layout == ViewerManager::_1AND2_C )
   {
-    private_->viewer_[ 0 ]->show();
-    private_->viewer_[ 1 ]->hide();
-    private_->viewer_[ 2 ]->hide();
-    private_->viewer_[ 3 ]->show();
-    private_->viewer_[ 4 ]->show();
-    private_->viewer_[ 5 ]->hide();
     private_->vert_splitter1_->show();
     private_->vert_splitter2_->show();
 
@@ -253,14 +239,8 @@ void ViewerInterface::set_layout( const std::string& layout )
     private_->vert_splitter2_->setSizes( vsizes );
     private_->horiz_splitter_->repaint();
   }
-  else if( layout == "1and3" )
+  else if( layout == ViewerManager::_1AND3_C )
   {
-    private_->viewer_[ 0 ]->show();
-    private_->viewer_[ 1 ]->hide();
-    private_->viewer_[ 2 ]->hide();
-    private_->viewer_[ 3 ]->show();
-    private_->viewer_[ 4 ]->show();
-    private_->viewer_[ 5 ]->show();
     private_->vert_splitter1_->show();
     private_->vert_splitter2_->show();
 
@@ -276,14 +256,8 @@ void ViewerInterface::set_layout( const std::string& layout )
     private_->vert_splitter2_->setSizes( vsizes );
     private_->horiz_splitter_->repaint();
   }
-  else if( layout == "2and2" )
+  else if( layout == ViewerManager::_2AND2_C )
   {
-    private_->viewer_[ 0 ]->show();
-    private_->viewer_[ 1 ]->show();
-    private_->viewer_[ 2 ]->hide();
-    private_->viewer_[ 3 ]->show();
-    private_->viewer_[ 4 ]->show();
-    private_->viewer_[ 5 ]->hide();
     private_->vert_splitter1_->show();
     private_->vert_splitter2_->show();
 
@@ -300,14 +274,8 @@ void ViewerInterface::set_layout( const std::string& layout )
     private_->vert_splitter2_->setSizes( vsizes );
     private_->horiz_splitter_->repaint();
   }
-  else if( layout == "2and3" )
+  else if( layout == ViewerManager::_2AND3_C )
   {
-    private_->viewer_[ 0 ]->show();
-    private_->viewer_[ 1 ]->show();
-    private_->viewer_[ 2 ]->hide();
-    private_->viewer_[ 3 ]->show();
-    private_->viewer_[ 4 ]->show();
-    private_->viewer_[ 5 ]->show();
     private_->vert_splitter1_->show();
     private_->vert_splitter2_->show();
 
@@ -325,14 +293,8 @@ void ViewerInterface::set_layout( const std::string& layout )
     private_->vert_splitter2_->setSizes( vsizes );
     private_->horiz_splitter_->repaint();
   }
-  else if( layout == "3and3" )
+  else if( layout == ViewerManager::_3AND3_C )
   {
-    private_->viewer_[ 0 ]->show();
-    private_->viewer_[ 1 ]->show();
-    private_->viewer_[ 2 ]->show();
-    private_->viewer_[ 3 ]->show();
-    private_->viewer_[ 4 ]->show();
-    private_->viewer_[ 5 ]->show();
     private_->vert_splitter1_->show();
     private_->vert_splitter2_->show();
 

@@ -103,20 +103,6 @@ protected:
   // to the GUI.  
   virtual void wheelEvent( QWheelEvent* event );
 
-  // HIDEEVENT:
-  // This function is called by Qt to deliver an event that tells that the
-  // widget is being hidden. 
-  // NOTE: This is called when the user changes the number of viewers in the
-  // main display
-  virtual void hideEvent( QHideEvent* event );
-
-  // SHOWEVENT:
-  // This function is called by Qt to deliver an event that tells that the
-  // widget is being shown
-  // NOTE: This is called when the user changes the number of viewers in the
-  // main display
-  virtual void showEvent( QShowEvent* event );
-
   // ENTEREVENT:
   // This function is called by Qt when the mouse starts to hover over the widget
   virtual void enterEvent ( QEvent* event );

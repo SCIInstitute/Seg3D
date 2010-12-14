@@ -57,9 +57,11 @@ namespace Seg3D
 
 // Forward declarations
 class ViewerManager;
+class ViewerManagerPrivate;
 class ViewerInfo;
 typedef boost::shared_ptr< ViewerInfo > ViewerInfoHandle;
 typedef std::vector< ViewerInfoHandle > ViewerInfoList;
+typedef boost::shared_ptr< ViewerManagerPrivate > ViewerManagerPrivateHandle;
 
 class ViewerInfo
 {
@@ -152,15 +154,6 @@ public:
   // Number of the viewer that is the active  sagittal viewer ( for picking )
   Core::StateIntHandle active_sagittal_viewer_;
 
-  // -- Signals and slots --
-private:
-  void viewer_mode_changed( size_t viewer_id );
-  void viewer_visibility_changed( size_t viewer_id );
-  void viewer_became_picking_target( size_t viewer_id );
-  void viewer_lock_state_changed( size_t viewer_id );
-  void update_picking_targets();
-  void handle_layer_volume_changed( LayerHandle layer );
-
 public:
   typedef boost::signals2::signal< void ( size_t ) > picking_target_changed_signal_type;
   picking_target_changed_signal_type picking_target_changed_signal_;
@@ -185,10 +178,17 @@ public:
 
   // -- Viewer information --
 private:
+  ViewerManagerPrivateHandle private_;
 
-  std::vector< ViewerHandle > viewers_;
-  std::vector< size_t > locked_viewers_[ 4 ];
-  size_t signal_block_count_;
+  // -- Layout options --
+public:
+  static const std::string SINGLE_C;
+  static const std::string _1AND1_C;
+  static const std::string _1AND2_C;
+  static const std::string _1AND3_C;
+  static const std::string _2AND2_C;
+  static const std::string _2AND3_C;
+  static const std::string _3AND3_C;
 
 }; // class ViewerManager
 

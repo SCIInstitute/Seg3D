@@ -718,12 +718,14 @@ bool Renderer::render()
     bool with_lighting = viewer->volume_light_visible_state_->get();
     bool draw_slices = viewer->volume_slices_visible_state_->get();
     bool draw_isosurfaces = viewer->volume_isosurfaces_visible_state_->get();
+    bool show_invisilbe_slices = viewer->volume_show_invisible_slices_state_->get();
     size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
     for ( size_t i = 0; i < num_of_viewers && draw_slices; i++ )
     {
       ViewerHandle other_viewer = ViewerManager::Instance()->get_viewer( i );
       if ( !other_viewer->slice_visible_state_->get() || 
-        other_viewer->is_volume_view() )
+        other_viewer->is_volume_view() ||
+        ( !show_invisilbe_slices && !other_viewer->viewer_visible_state_->get() ) )
       {
         continue;
       }

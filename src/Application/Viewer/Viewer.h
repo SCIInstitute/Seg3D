@@ -70,6 +70,7 @@ public:
   friend class ViewManipulator;
   friend class ViewerPrivate;
   friend class ViewerManager;
+  friend class ViewerManagerPrivate;
 
   Viewer( size_t viewer_id, bool visible = true, const std::string& mode = Viewer::AXIAL_C );
   virtual ~Viewer();
@@ -193,6 +194,17 @@ public:
   typedef boost::signals2::signal< void ( size_t ) > slice_changed_signal_type;
   slice_changed_signal_type slice_changed_signal_;
 
+  // -- State handling --
+protected:
+  // PRE_LOAD_STATES:
+  // This virtual function is called by StateHandler::load_states before loading any states.
+  virtual bool pre_load_states( const Core::StateIO& state_io );
+
+  // POST_LOAD_STATES:
+  // This function is called by StateHandler::load_states once the initial state 
+  // loading has finished.
+  virtual bool post_load_states( const Core::StateIO& state_io );
+
   // -- State information --
 public:
 
@@ -214,6 +226,7 @@ public:
   Core::StateBoolHandle volume_isosurfaces_visible_state_;
   Core::StateBoolHandle volume_volume_rendering_visible_state_;
   Core::StateBoolHandle volume_light_visible_state_;
+  Core::StateBoolHandle volume_show_invisible_slices_state_;
 
   Core::StateBoolHandle lock_state_;
   Core::StateBoolHandle overlay_visible_state_;

@@ -420,7 +420,7 @@ void ViewerPrivate::set_active_layer( LayerHandle layer )
       {
         Core::ScopedCounter slice_lock_counter( this->slice_lock_count_ );
         this->viewer_->slice_number_state_->set_range(
-          0, static_cast< int >( this->active_layer_slice_->number_of_slices() - 1 ) );
+          0, static_cast< int >( this->active_layer_slice_->number_of_slices() ) - 1 );
       }
       Core::StateView2D* view2d_state = dynamic_cast< Core::StateView2D* >( 
         this->viewer_->get_active_view_state().get() );
@@ -456,6 +456,8 @@ void ViewerPrivate::set_active_layer( LayerHandle layer )
 
 void ViewerPrivate::change_view_mode( std::string mode, Core::ActionSource source )
 {
+  if ( this->signals_block_count_ > 0 ) return;
+  
   {
     Core::ScopedCounter block_counter( this->signals_block_count_ );
     this->viewer_->lock_state_->set( false );
@@ -494,7 +496,7 @@ void ViewerPrivate::change_view_mode( std::string mode, Core::ActionSource sourc
     {
       Core::ScopedCounter slice_lock_counter( this->slice_lock_count_ );
       this->viewer_->slice_number_state_->set_range(
-        0, static_cast< int >( this->active_layer_slice_->number_of_slices() - 1 ) );
+        0, static_cast< int >( this->active_layer_slice_->number_of_slices() ) - 1 );
     }
 
     Core::StateView2D* view2d_state = dynamic_cast< Core::StateView2D* >( 
@@ -518,6 +520,8 @@ void ViewerPrivate::change_view_mode( std::string mode, Core::ActionSource sourc
 
 void ViewerPrivate::set_slice_number( int num, Core::ActionSource source )
 {
+  if ( this->signals_block_count_ > 0 ) return;
+
   const std::string& view_mode = this->viewer_->view_mode_state_->get();
 
   if ( this->slice_lock_count_ > 0 || 
@@ -575,6 +579,8 @@ void ViewerPrivate::set_slice_number( int num, Core::ActionSource source )
 
 void ViewerPrivate::change_visibility( bool visible )
 {
+  if ( this->signals_block_count_ > 0 ) return;
+
   if ( !visible && this->viewer_->lock_state_->get() )
   {
     Core::ScopedCounter block_counter( this->signals_block_count_ );
@@ -584,16 +590,8 @@ void ViewerPrivate::change_visibility( bool visible )
 
   if ( visible)
   {
-    {
-      Core::ScopedCounter block_counter( this->signals_block_count_ );
-      this->reset_active_slice();
-    }
-    this->viewer_->get_renderer()->activate();
-    this->viewer_->redraw_all();
-  }
-  else
-  {
-    this->viewer_->get_renderer()->deactivate();
+    Core::ScopedCounter block_counter( this->signals_block_count_ );
+    this->reset_active_slice();
   }
 
   this->viewer_->slice_changed_signal_( this->viewer_->get_viewer_id() );
@@ -901,7 +899,7 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
   this->private_->view_states_[ 3 ] = this->volume_view_state_;
 
   this->add_state( "slice_number", this->slice_number_state_, 0, 0, 0, 1 );
-  this->slice_number_state_->set_session_priority( Core::StateBase::DEFAULT_LOAD_E - 1 );
+  this->slice_number_state_->set_session_priority( Core::StateBase::DO_NOT_LOAD_E );
   this->add_state( "slice_grid", this->slice_grid_state_, false );
   this->add_state( "slice_visible", this->slice_visible_state_, visible);
   this->add_state( "slice_picking_visible", this->slice_picking_visible_state_, true );
@@ -910,7 +908,8 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
   this->add_state( "volume_isosurfaces_visible", this->volume_isosurfaces_visible_state_, true );
   this->add_state( "volume_volume_rendering_visible", 
     this->volume_volume_rendering_visible_state_, false );
-  this->add_state( "volume_light_visible", this->volume_light_visible_state_, true ); 
+  this->add_state( "volume_light_visible", this->volume_light_visible_state_, true );
+  this->add_state( "volume_show_invisible_slices", this->volume_show_invisible_slices_state_, true );
 
   this->add_state( "lock", this->lock_state_, false );
   this->add_state( "overlay_visible", this->overlay_visible_state_, true );
@@ -960,6 +959,8 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
   this->add_connection( this->volume_slices_visible_state_->state_changed_signal_.connect(
     boost::bind( &Viewer::redraw_scene, this ) ) );
   this->add_connection( this->volume_isosurfaces_visible_state_->state_changed_signal_.
+    connect( boost::bind( &Viewer::redraw_scene, this ) ) );
+  this->add_connection( this->volume_show_invisible_slices_state_->state_changed_signal_.
     connect( boost::bind( &Viewer::redraw_scene, this ) ) );
 
   // Connect state variables that should trigger redraw_overlay
@@ -1659,6 +1660,52 @@ void Viewer::update_slice_volume( LayerHandle layer )
   Core::VolumeSliceHandle volume_slice = this->get_volume_slice( layer->get_layer_id() );
   assert( volume_slice );
   volume_slice->set_volume( layer->get_volume() );
+}
+
+bool Viewer::pre_load_states( const Core::StateIO& state_io )
+{
+  // Increase the signal block count the intermediate state changes during session
+  // loading wouldn't cause any updates.
+  this->private_->signals_block_count_++;
+  return true;
+}
+
+bool Viewer::post_load_states( const Core::StateIO& state_io )
+{
+  // Update all the slices
+  if ( !this->is_volume_view() && this->private_->active_layer_slice_ )
+  {
+    const std::string& mode = this->view_mode_state_->get();
+    Core::StateView2DHandle view2d_state = this->axial_view_state_;
+    Core::VolumeSliceType slice_type( Core::VolumeSliceType::AXIAL_E );
+    if ( mode == Viewer::CORONAL_C )
+    {
+      slice_type = Core::VolumeSliceType::CORONAL_E;
+      view2d_state = this->coronal_view_state_;
+    }
+    else if ( mode == Viewer::SAGITTAL_C )
+    {
+      slice_type =  Core::VolumeSliceType::SAGITTAL_E;
+      view2d_state = this->sagittal_view_state_;
+    }
+    double depth = view2d_state->get().center().z();
+
+    ViewerPrivate::volume_slice_map_type::const_iterator it = this->private_->volume_slices_.begin();
+    while ( it != this->private_->volume_slices_.end() )
+    {
+      Core::VolumeSliceHandle vol_slice = ( *it++ ).second;
+      vol_slice->set_slice_type( slice_type );
+      vol_slice->move_slice_to( depth, vol_slice == this->private_->active_layer_slice_ );
+    }
+    this->slice_number_state_->set_range( 0, static_cast< int >( 
+      this->private_->active_layer_slice_->number_of_slices() ) - 1 );
+    this->slice_number_state_->set( static_cast< int >( 
+      this->private_->active_layer_slice_->get_slice_number() ) );
+  }
+
+  assert( this->private_->signals_block_count_ > 0 );
+  this->private_->signals_block_count_--;
+  return true;
 }
 
 } // end namespace Seg3D

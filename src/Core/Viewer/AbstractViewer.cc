@@ -33,6 +33,10 @@
 namespace Core
 {
 
+//////////////////////////////////////////////////////////////////////////
+// class AbstractViewerPrivate
+//////////////////////////////////////////////////////////////////////////
+
 class AbstractViewerPrivate
 {
 public:
@@ -62,6 +66,10 @@ public:
   // Connected to the redraw_overlay_completed_signal_ of the renderer.
   void set_overlay_texture( Texture2DHandle texture, bool delay_update );
 
+  // HANDLE_VISIBILITY_CHANGED:
+  // Called when the viewer_visible_state_ has changed.
+  void handle_visibility_changed( bool visible );
+
 };
 
 void AbstractViewerPrivate::set_texture( Texture2DHandle texture, bool delay_update )
@@ -89,6 +97,23 @@ void AbstractViewerPrivate::set_overlay_texture( Texture2DHandle texture, bool d
     this->viewer_->update_display_signal_();
   }
 }
+
+void AbstractViewerPrivate::handle_visibility_changed( bool visible )
+{
+  if ( visible )
+  {
+    this->renderer_->activate();
+    this->renderer_->redraw_all();
+  }
+  else
+  {
+    this->renderer_->deactivate();
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////
+// Class AbstractViewer
+//////////////////////////////////////////////////////////////////////////
 
 AbstractViewer::AbstractViewer( size_t viewer_id ) :
   StateHandler( std::string( "viewer" ) + Core::ExportToString( viewer_id ), false ),
@@ -168,6 +193,11 @@ void AbstractViewer::install_renderer( AbstractRendererHandle renderer )
   {
     lock_type lock( this->get_mutex() );
 
+    if ( !renderer )
+    {
+      CORE_THROW_LOGICERROR( "Invalid renderer given" );
+    }
+    
     if ( this->private_->renderer_ )
     {
       CORE_THROW_LOGICERROR( "Cannot install renderer twice into viewer" );
@@ -176,11 +206,19 @@ void AbstractViewer::install_renderer( AbstractRendererHandle renderer )
     this->private_->renderer_ = renderer;
   }
   
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    this->private_->handle_visibility_changed( this->viewer_visible_state_->get() );
+  }
+
   this->add_connection( this->private_->renderer_->redraw_completed_signal_.connect(
     boost::bind( &AbstractViewerPrivate::set_texture, this->private_, _1, _2 ) ) );
   
   this->add_connection( this->private_->renderer_->redraw_overlay_completed_signal_.connect(
     boost::bind( &AbstractViewerPrivate::set_overlay_texture, this->private_, _1, _2 ) ) );
+
+  this->add_connection( this->viewer_visible_state_->value_changed_signal_.connect(
+    boost::bind( &AbstractViewerPrivate::handle_visibility_changed, this->private_, _1 ) ) );
 }
 
 AbstractRendererHandle AbstractViewer::get_renderer()
