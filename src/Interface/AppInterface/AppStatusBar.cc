@@ -136,14 +136,14 @@ AppStatusBar::~AppStatusBar()
   this->disconnect_all();
 }
   
-  void AppStatusBar::reset_icon( bool show_errors )
+void AppStatusBar::reset_icon( bool show_errors )
+{
+  if( show_errors && this->private_->error_icon_set_ )
   {
-    if( show_errors && this->private_->error_icon_set_ )
-    {
-      this->private_->ui_.info_button_->setIcon( this->private_->normal_message_icon_ );
-      this->private_->error_icon_set_ = false;
-    }
+    this->private_->ui_.info_button_->setIcon( this->private_->normal_message_icon_ );
+    this->private_->error_icon_set_ = false;
   }
+}
 
 
 // -- private slots -- //
@@ -286,6 +286,12 @@ void AppStatusBar::set_message( int msg_type, std::string message )
   this->private_->message_type_ = msg_type;
   this->private_->current_message_ = QString::fromStdString( message );
   
+  if( this->private_->message_type_ == Core::LogMessageType::ERROR_E )
+  {
+    this->private_->ui_.info_button_->setIcon( this->private_->error_message_icon_ );
+    this->private_->error_icon_set_ = true;
+  }
+  
   if( this->private_->ui_.status_report_label_->text() == "" )
   {
     this->slide_in();
@@ -355,15 +361,13 @@ void AppStatusBar::SetMessage( qpointer_type qpointer, int msg_type, std::string
     if( this->private_->message_type_ == Core::LogMessageType::ERROR_E )
     {
       this->private_->ui_.status_report_label_->setStyleSheet( StyleSheet::STATUSBAR_ERROR_C );
-      this->private_->ui_.info_button_->setIcon( this->private_->error_message_icon_ );
-      this->private_->error_icon_set_ = true;
       animation->setDuration( 2000 );
       animation->setEasingCurve( QEasingCurve::OutBounce );
     }
     else
     {
       this->private_->ui_.status_report_label_->setStyleSheet( StyleSheet::STATUSBAR_C );
-      animation->setDuration( 1000 );
+      animation->setDuration( 500 );
       animation->setEasingCurve( QEasingCurve::InOutQuad );
     }
     

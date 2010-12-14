@@ -406,6 +406,7 @@ void AppInterface::end_progress( Core::ActionProgressHandle /*handle*/ )
   
   CORE_LOG_DEBUG( "-- Finish progress widget --" );
   this->private_->progress_->cleanup_progress_widget();
+  this->repaint();
   this->menuBar()->setEnabled( true );
   
   // Now re-enable the dock widgets

@@ -287,46 +287,41 @@ void AppPreferences::setup_sidebar_prefs()
   
   ToolMenuList tool_menus;
   ToolFactory::Instance()->list_menus( tool_menus );
-  if ( tool_menus.size() >= 1 )
+  
+  for( int i = 0; i < tool_menus.size(); ++i )
   {
-    this->private_->ui_.tools_tab_widget_->setTabText( 0, 
-      QString::fromStdString( tool_menus[ 0 ] ) );
-    QtUtils::QtBridge::Connect( this->private_->ui_.tools_list1_,
-      ToolFactory::Instance()->startup_tools_state_[ tool_menus[ 0 ] ] );
-    this->private_->ui_.tools_label1_->setText( QString::fromStdString( "Select which " +
-      Core::StringToLower( tool_menus[ 0 ] ) + " are active on startup" ) );
-  }
-  if ( tool_menus.size() >= 2 )
-  {
-    this->private_->ui_.tools_tab_widget_->setTabText( 1, 
-      QString::fromStdString( tool_menus[ 1 ] ) );
-    QtUtils::QtBridge::Connect( this->private_->ui_.tools_list2_,
-      ToolFactory::Instance()->startup_tools_state_[ tool_menus[ 1 ] ] );
-    this->private_->ui_.tools_label2_->setText( QString::fromStdString( "Select which " +
-      Core::StringToLower( tool_menus[ 1 ] ) + " are active on startup" ) );
-  }
-  if ( tool_menus.size() >= 3 )
-  {
-    this->private_->ui_.tools_tab_widget_->setTabText( 2, 
-      QString::fromStdString( tool_menus[ 2 ] ) );
-    QtUtils::QtBridge::Connect( this->private_->ui_.tools_list3_,
-      ToolFactory::Instance()->startup_tools_state_[ tool_menus[ 2 ] ] );
-    this->private_->ui_.tools_label3_->setText( QString::fromStdString( "Select which " +
-      Core::StringToLower( tool_menus[ 2 ] ) + " are active on startup" ) );
-  }
+    QWidget* tools_tab = new QWidget();
+    
+    QVBoxLayout* verticalLayout = new QVBoxLayout( tools_tab );
+    verticalLayout->setSpacing( 0 );
+    verticalLayout->setContentsMargins( 11, 11, 11, 11 );
+    verticalLayout->setContentsMargins( 4, 5, 4, 4 );
+    
+    QListWidget* tools_list = new QListWidget( tools_tab );
+    tools_list->setEditTriggers( QAbstractItemView::NoEditTriggers );
+    tools_list->setAlternatingRowColors( true );
+    tools_list->setSelectionMode( QAbstractItemView::MultiSelection );
+    QtUtils::QtBridge::Connect( tools_list,
+      ToolFactory::Instance()->startup_tools_state_[ tool_menus[ i ] ] );
+    
+    verticalLayout->addWidget( tools_list );
+      
+    QWidget* widget = new QWidget( tools_tab );
+    widget->setMinimumSize( QSize( 0, 28 ) );
+    QHBoxLayout* horizontalLayout = new QHBoxLayout( widget );
+    horizontalLayout->setSpacing( 0 );
+    horizontalLayout->setContentsMargins( 4, 4, 4, 4 );
+    QLabel* tools_label = new QLabel( widget );
+    tools_label->setText( QString::fromStdString( "Select which " +
+      Core::StringToLower( tool_menus[ i ] ) + " are active on startup." ) );
+    horizontalLayout->addWidget( tools_label );
 
-  if ( tool_menus.size() < 3 )
-  {
-    this->private_->ui_.tools_tab_widget_->removeTab( 2 );
+    verticalLayout->addWidget( widget );
+
+    this->private_->ui_.tools_tab_widget_->addTab( tools_tab, 
+      QString::fromStdString( tool_menus[ i ] ) );
   }
-  if ( tool_menus.size() < 2 )
-  {
-    this->private_->ui_.tools_tab_widget_->removeTab( 1 );
-  }
-  if ( tool_menus.size() < 1 )
-  {
-    this->private_->ui_.tools_tab_widget_->removeTab( 0 );
-  }
+  
 }
   
 void AppPreferences::setup_interface_controls_prefs()
