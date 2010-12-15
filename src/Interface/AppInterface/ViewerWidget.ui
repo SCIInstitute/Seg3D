@@ -208,7 +208,7 @@ QComboBox::icon{
                 <widget class="QComboBox" name="viewer_mode_">
                  <property name="minimumSize">
                   <size>
-                   <width>82</width>
+                   <width>100</width>
                    <height>0</height>
                   </size>
                  </property>
@@ -1046,6 +1046,9 @@ QComboBox::icon{
                    <width>20</width>
                    <height>20</height>
                   </size>
+                 </property>
+                 <property name="toolTip">
+                  <string>Toggle the visiblity of hidden viewers</string>
                  </property>
                  <property name="text">
                   <string>...</string>
