@@ -381,35 +381,28 @@ void AppInterface::set_project_name( std::string project_name )
 
 void AppInterface::begin_progress( Core::ActionProgressHandle handle )
 {
-  
-  
-  CORE_LOG_DEBUG( "-- Start progress widget --" );
-  this->private_->progress_->setup_progress_widget( handle );
+  CORE_LOG_DEBUG( "-- Disabling the menubar --" );
+  this->menuBar()->setEnabled( false );
+
   CORE_LOG_DEBUG( "-- Picturizing the Viewer Interface --" );
   this->private_->viewer_interface_->set_pic_mode( true );
-  this->private_->progress_->resize( this->size() );
   
-  // "Disable" all the dock windows if they are floating
+  CORE_LOG_DEBUG( "-- Putting overlays over all the floating dock widgets --" );
   this->private_->layer_manager_dock_window_->set_enabled( false );
   this->private_->tools_dock_window_->set_enabled( false );
   this->private_->project_dock_window_->set_enabled( false );
   this->private_->measurement_dock_window_->set_enabled( false );
   this->private_->history_dock_window_->set_enabled( false );
   
+  CORE_LOG_DEBUG( "-- Start progress widget --" );
+  this->private_->progress_->setup_progress_widget( handle );
+  this->private_->progress_->resize( this->size() );
   
-  this->menuBar()->setEnabled( false );
-
 }
 
 void AppInterface::end_progress( Core::ActionProgressHandle /*handle*/ )
 {
-  
-  CORE_LOG_DEBUG( "-- Finish progress widget --" );
-  this->private_->progress_->cleanup_progress_widget();
-  this->repaint();
-  this->menuBar()->setEnabled( true );
-  
-  // Now re-enable the dock widgets
+  CORE_LOG_DEBUG( "-- Removing overlays from all the floating dock widgets --" );
   this->private_->layer_manager_dock_window_->set_enabled( true );
   this->private_->tools_dock_window_->set_enabled( true );
   this->private_->project_dock_window_->set_enabled( true );
@@ -418,7 +411,12 @@ void AppInterface::end_progress( Core::ActionProgressHandle /*handle*/ )
   
   CORE_LOG_DEBUG( "-- Unpicturizing the Viewer Interface --" );
   this->private_->viewer_interface_->set_pic_mode( false );
-
+  
+  CORE_LOG_DEBUG( "-- Enabling the menubar --" );
+  this->menuBar()->setEnabled( true );
+  
+  CORE_LOG_DEBUG( "-- Finish progress widget --" );
+  this->private_->progress_->cleanup_progress_widget();
 }
 
 void AppInterface::report_progress( Core::ActionProgressHandle handle )

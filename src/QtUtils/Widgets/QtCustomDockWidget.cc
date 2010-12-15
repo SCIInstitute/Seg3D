@@ -85,7 +85,12 @@ void QtCustomDockWidget::set_enabled( bool enabled )
   else
   {
     this->private_->overlay_->show();
+    this->private_->overlay_->raise();
+    this->private_->overlay_->setStyleSheet( QString::fromUtf8( "QWidget#overlay_{"
+      " background-color: rgba( 211, 211, 211, 212 );"
+      "}" ) );
     this->private_->overlay_->resize( this->size() );
+    this->repaint();
   }
 }
 

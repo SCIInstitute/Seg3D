@@ -67,7 +67,11 @@ public:
 
   // ENABLE_DISABLE_LAYER_ACTIONS:
   // Switch on/off export options depending on what is available
-  void enable_disable_layer_actions();  
+  void enable_disable_mask_actions(); 
+  
+  // ENABLE_DISABLE_DATA_LAYER_ACTIONS:
+  // switches off the export options based on whether or not the active layer is a data layer
+  void enable_disable_data_layer_actions();
 
   // UPDATE_UNDO_TAG:
   // set the undo tag of what the next undo will actually do
@@ -116,7 +120,11 @@ public:
 
   // ENABLEDISABLELAYERACTIONS:
   // This function is called when layers are updated
-  static void EnableDisableLayerActions( qpointer_type app_menu );
+  static void EnableDisableMaskActions( qpointer_type app_menu );
+  
+  // ENABLEDISABLEDATALAYERACTIONS:
+  // this function is called when the active layer is changed
+  static void EnableDisableDataLayerActions( qpointer_type qpointer );
 
   // UPDATEUNDOTAG
   // This function is called when there is a new undo tag
@@ -128,6 +136,7 @@ public:
   
   // CONFIRMRECENTFILELOAD:
   static void ConfirmRecentFileLoad( qpointer_type qpointer, const std::string& path );
+
 
 };
 

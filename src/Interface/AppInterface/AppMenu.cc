@@ -108,7 +108,10 @@ AppMenu::AppMenu( QMainWindow* parent ) :
       boost::bind( &AppMenu::SetRecentFileList, qpointer_type( this ), _1, _2 ) ) );
       
     this->add_connection( LayerManager::Instance()->layers_changed_signal_.connect( 
-      boost::bind( &AppMenu::EnableDisableLayerActions, qpointer_type( this ) ) ) );
+      boost::bind( &AppMenu::EnableDisableMaskActions, qpointer_type( this ) ) ) );
+      
+    this->add_connection( LayerManager::Instance()->active_layer_changed_signal_.connect( 
+      boost::bind( &AppMenu::EnableDisableDataLayerActions, qpointer_type( this ) ) ) );
       
   }
 }
@@ -649,10 +652,9 @@ void AppMenu::SetRecentFileList( qpointer_type qpointer,
     &AppMenu::set_recent_file_list, qpointer.data(), recent_projects ) ) );
 }
 
-void AppMenu::enable_disable_layer_actions()
+void AppMenu::enable_disable_mask_actions()
 {
   bool mask_layer_found = false;
-  bool data_layer_found = false;
   std::vector< LayerHandle > layer_list;
   LayerManager::Instance()->get_layers( layer_list );
   for( size_t i = 0; i < layer_list.size(); ++i )
@@ -661,23 +663,40 @@ void AppMenu::enable_disable_layer_actions()
     {
       mask_layer_found = true;
     }
-    if( layer_list[ i ]->get_type() == Core::VolumeType::DATA_E)
-    {
-      data_layer_found = true;
-    }
   }
   
   this->export_segmentation_qaction_->setEnabled( mask_layer_found );
-  this->export_active_data_layer_qaction_->setEnabled( data_layer_found );
   
   this->copy_qaction_->setEnabled( mask_layer_found );
   this->paste_qaction_->setEnabled( mask_layer_found );
 }
 
-void AppMenu::EnableDisableLayerActions( qpointer_type qpointer )
+void AppMenu::enable_disable_data_layer_actions()
+{
+  bool data_layer_found = false;
+  std::vector< LayerHandle > layer_list;
+  LayerManager::Instance()->get_layers( layer_list );
+  for( size_t i = 0; i < layer_list.size(); ++i )
+  {
+    if( ( layer_list[ i ]->get_type() == Core::VolumeType::DATA_E ) &&
+      (  layer_list[ i ] == LayerManager::Instance()->get_active_layer() ) )
+    {
+      data_layer_found = true;
+    }
+  }
+  this->export_active_data_layer_qaction_->setEnabled( data_layer_found );
+}
+
+void AppMenu::EnableDisableMaskActions( qpointer_type qpointer )
 {
   Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
-    &AppMenu::enable_disable_layer_actions, qpointer.data() ) ) );
+    &AppMenu::enable_disable_mask_actions, qpointer.data() ) ) );
+}
+
+void AppMenu::EnableDisableDataLayerActions( qpointer_type qpointer )
+{
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
+    &AppMenu::enable_disable_data_layer_actions, qpointer.data() ) ) );
 }
 
 void AppMenu::UpdateUndoTag( qpointer_type qpointer, std::string tag )
