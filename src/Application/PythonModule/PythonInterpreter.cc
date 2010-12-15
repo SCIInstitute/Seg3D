@@ -36,6 +36,10 @@
 #include <Application/PythonModule/ActionModule.h>
 #include <Application/PythonModule/PythonInterpreter.h>
 
+// Py_IgnoreEnvironmentFlag
+// defined in pythonrun.c
+extern int Py_IgnoreEnvironmentFlag;
+
 namespace Seg3D
 {
 
@@ -76,6 +80,7 @@ void PythonInterpreter::initialize_eventhandler()
   PythonInterpreterPrivate::lock_type lock( this->private_->get_mutex() );
   PyImport_AppendInittab( "seg3d", PyInit_seg3d );
   Py_SetProgramName( this->private_->program_name_ );
+  Py_IgnoreEnvironmentFlag = 1;
   Py_Initialize();
   PyRun_SimpleString( "import seg3d\n"
     "from seg3d import *\n" );
