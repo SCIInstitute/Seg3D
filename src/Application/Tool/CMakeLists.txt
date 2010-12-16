@@ -32,20 +32,20 @@
 ##################################################
 
 SET(APPLICATION_TOOL_SRCS
-  SingleTargetTool.h
-  SingleTargetTool.cc
   GroupTargetTool.h
   GroupTargetTool.cc
   SeedPointsTool.h
   SeedPointsTool.cc
+  SingleTargetTool.h
+  SingleTargetTool.cc
   Tool.h
   Tool.cc
+  ToolFactory.h
+  ToolFactory.cc
   ToolInfo.h
   ToolInfo.cc
   ToolInterface.h
   ToolInterface.cc
-  ToolFactory.h
-  ToolFactory.cc
   )
 
 SET(APPLICATION_TOOL_ACTIONS_SRCS

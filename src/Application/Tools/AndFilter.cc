@@ -55,7 +55,7 @@ AndFilter::AndFilter( const std::string& toolid ) :
 
   // Whether we use a mask to find which components to use
   this->add_state( "mask", this->mask_state_, Tool::NONE_OPTION_C, empty_list );
-  this->add_dependent_layer_input( this->mask_state_, Core::VolumeType::MASK_E );
+  this->add_dependent_layer_input( this->mask_state_, Core::VolumeType::MASK_E, true );
 }
   
 AndFilter::~AndFilter()
