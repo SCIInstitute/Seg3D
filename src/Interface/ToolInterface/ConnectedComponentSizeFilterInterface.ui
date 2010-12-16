@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>292</width>
-    <height>222</height>
+    <height>193</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -15,12 +15,6 @@
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
-  </property>
-  <property name="maximumSize">
-   <size>
-    <width>16777215</width>
-    <height>16777215</height>
-   </size>
   </property>
   <property name="windowTitle">
    <string>Connected Components Size Filter Interface</string>
@@ -41,6 +35,18 @@
    </property>
    <item>
     <widget class="QGroupBox" name="target_groupbox_">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>70</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>70</height>
+      </size>
+     </property>
      <property name="title">
       <string>Target Layer</string>
      </property>
@@ -88,6 +94,18 @@
    </item>
    <item>
     <widget class="QGroupBox" name="groupBox">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>45</height>
+      </size>
+     </property>
      <property name="title">
       <string>Output Scale</string>
      </property>
@@ -96,7 +114,7 @@
        <number>4</number>
       </property>
       <property name="topMargin">
-       <number>2</number>
+       <number>0</number>
       </property>
       <property name="rightMargin">
        <number>4</number>
@@ -193,6 +211,12 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
+       <height>32</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
        <height>32</height>
       </size>
      </property>

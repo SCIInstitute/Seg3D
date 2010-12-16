@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>288</width>
-    <height>564</height>
+    <height>536</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -35,6 +35,18 @@
    </property>
    <item>
     <widget class="QGroupBox" name="target_groupbox_">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>70</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>70</height>
+      </size>
+     </property>
      <property name="title">
       <string>Target Layer</string>
      </property>
@@ -103,6 +115,18 @@
    </item>
    <item>
     <widget class="QGroupBox" name="mask_constraint_groupbox_">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>70</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>70</height>
+      </size>
+     </property>
      <property name="title">
       <string>Constraint Mask</string>
      </property>
@@ -407,6 +431,12 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
+       <height>32</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
        <height>32</height>
       </size>
      </property>

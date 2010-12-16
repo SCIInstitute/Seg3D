@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>248</width>
-    <height>220</height>
+    <width>274</width>
+    <height>210</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -47,6 +47,18 @@
    </property>
    <item>
     <widget class="QGroupBox" name="target_groupbox_">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>70</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>70</height>
+      </size>
+     </property>
      <property name="title">
       <string>Target Layer</string>
      </property>
@@ -191,6 +203,12 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
+       <height>32</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
        <height>32</height>
       </size>
      </property>
