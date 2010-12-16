@@ -320,11 +320,26 @@ void LayerGroupWidget::verify_delete()
         
   if( ret == QMessageBox::Yes )
   {
+    std::vector< std::string > layers;
+    this->get_selected_layer_ids( layers );
     ActionDeleteLayers::Dispatch( Core::Interface::GetWidgetActionContext(), 
-      LayerManager::Instance()->FindLayerGroup( this->private_->group_id_ ) );
+      layers );
     
     this->private_->button_menu_->uncheck_delete_menu_button();
     this->private_->button_menu_->uncheck_delete_button();
+  }
+}
+
+void LayerGroupWidget::get_selected_layer_ids( std::vector< std::string >& layers )
+{
+  for( std::map< std::string, LayerWidgetQHandle>::iterator it = this->layer_map_.begin(); 
+    it != this->layer_map_.end(); ++it )
+  {
+    if( ( *it ).second->get_selected() )
+    {
+      layers.push_back( ( *it ).first );
+      ( *it ).second->set_check_selected( false );
+    }
   }
 }
 

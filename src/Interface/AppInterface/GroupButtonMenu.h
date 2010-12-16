@@ -52,7 +52,7 @@ Q_SIGNALS:
   void duplicate_select_all_pressed( bool );
   void duplicate_pressed();
   void delete_pressed();
-  
+
   // -- constructor/destructor --
 public:
   GroupButtonMenu( QWidget* parent, LayerGroupHandle group );
@@ -86,6 +86,10 @@ protected:
 private:
   void enable_drop_space( bool drop );
   void prep_for_animation( bool move_time );
+
+private Q_SLOTS:
+  void handle_delete_menu_changed( bool visibility_status );
+  void handle_duplicate_menu_changed( bool visibility_status );
   // -- widget internals --
 private:
     boost::shared_ptr< GroupButtonMenuPrivate > private_;

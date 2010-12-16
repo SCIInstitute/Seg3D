@@ -199,7 +199,8 @@ private:
   // CLEANUP_REMOVED_WIDGETS:
   // Cleanup any of the widgets that were removed
   void cleanup_removed_widgets();
-  
+  void get_selected_layer_ids( std::vector< std::string >& layers );
+
   // -- widget internals --
 private:
     boost::shared_ptr< LayerGroupWidgetPrivate > private_;

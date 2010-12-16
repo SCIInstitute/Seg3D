@@ -381,6 +381,8 @@ void AppInterface::set_project_name( std::string project_name )
 
 void AppInterface::begin_progress( Core::ActionProgressHandle handle )
 {
+  this->setUpdatesEnabled( false );
+
   CORE_LOG_DEBUG( "-- Disabling the menubar --" );
   this->menuBar()->setEnabled( false );
 
@@ -398,10 +400,13 @@ void AppInterface::begin_progress( Core::ActionProgressHandle handle )
   this->private_->progress_->setup_progress_widget( handle );
   this->private_->progress_->resize( this->size() );
   
+  this->setUpdatesEnabled( true );
 }
 
 void AppInterface::end_progress( Core::ActionProgressHandle /*handle*/ )
 {
+  this->setUpdatesEnabled( false );
+
   CORE_LOG_DEBUG( "-- Removing overlays from all the floating dock widgets --" );
   this->private_->layer_manager_dock_window_->set_enabled( true );
   this->private_->tools_dock_window_->set_enabled( true );
@@ -417,6 +422,8 @@ void AppInterface::end_progress( Core::ActionProgressHandle /*handle*/ )
   
   CORE_LOG_DEBUG( "-- Finish progress widget --" );
   this->private_->progress_->cleanup_progress_widget();
+  
+  this->setUpdatesEnabled( true );
 }
 
 void AppInterface::report_progress( Core::ActionProgressHandle handle )

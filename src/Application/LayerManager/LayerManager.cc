@@ -633,79 +633,13 @@ void LayerManager::get_layers_in_group( LayerGroupHandle group ,
   }
 }
 
-void LayerManager::delete_layers( LayerGroupHandle group )
+void LayerManager::delete_layers( std::vector< std::string > layers )
 {
-  if ( !group->is_valid() ) return;
-  
-  bool active_layer_changed = false;
-  bool group_deleted = false;
-
-  std::vector< LayerHandle > layer_vector;
-  
-  { // start the lock scope
-    lock_type lock( get_mutex() );  
-    
-    // get a temporary copy of the list of layers
-    layer_list_type layer_list = group->get_layer_list();
-    
-    bool active_layer_deleted = false;
-    for( layer_list_type::iterator it = layer_list.begin(); it != layer_list.end(); ++it )
-    {
-      if( ( *it )->selected_state_->get() )
-      {   
-        CORE_LOG_MESSAGE( std::string("Deleting Layer: ") + ( *it )->get_layer_id() );
-        
-        layer_vector.push_back( *it );
-        group->delete_layer( *it );
-        ( *it )->invalidate();
-        
-        if ( *it == this->private_->active_layer_ )
-        {
-          active_layer_deleted = true;
-        }
-      }
-    }
-    
-    if( group->is_empty() )
-    {   
-      group->invalidate();
-      this->private_->group_list_.remove( group );
-    }
-
-    if ( active_layer_deleted )
-    {
-      this->private_->active_layer_.reset();
-      if ( this->private_->group_list_.size() > 0 )
-      {
-        this->private_->active_layer_ = this->private_->group_list_.front()->layer_list_.back();
-        active_layer_changed = true;
-      }
-    }
-
-    if ( group->is_empty() ) group_deleted = true;
-
-  } // Unlocked from here:
-
-  //signal the listeners
-  if( group_deleted )
-  {   
-      this->group_deleted_signal_( group );
-    this->groups_changed_signal_();
-  }
-  else
+  for( size_t i = 0; i < layers.size(); ++i )
   {
-    group->gui_state_group_->clear_selection();
-    this->group_internals_changed_signal_( group );
+    LayerHandle temp_handle_ = this->get_layer_by_id( layers[ i ] );
+    if( temp_handle_ ) this->delete_layer( temp_handle_ );
   }
-
-  this->layers_deleted_signal_( layer_vector );
-  this->layers_changed_signal_();
-  
-  if ( active_layer_changed )
-  {
-    this->active_layer_changed_signal_( this->private_->active_layer_ );
-  }
-  
 } // end delete_layer
 
 void LayerManager::delete_layer( LayerHandle layer )

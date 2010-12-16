@@ -155,7 +155,7 @@ public:
 
   // DELETE_LAYERS:
   // this function deletes the selected layers in the group that is passed
-  void delete_layers( LayerGroupHandle group );
+  void delete_layers( std::vector< std::string > layers );
 
   // DELETE_LAYER:
   // this function deletes the layer

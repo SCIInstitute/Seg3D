@@ -44,7 +44,7 @@ class ActionDeleteLayers : public Core::Action
 
 CORE_ACTION( 
   CORE_ACTION_TYPE( "DeleteLayers", "Delete selected layers from a group and the group if it will become empty.")
-  CORE_ACTION_ARGUMENT( "groupid", "The groupid of the selected layers that needs to be deleted." )
+  CORE_ACTION_ARGUMENT( "layers", "A Pipe delimited list of layers to delete." )
   CORE_ACTION_CHANGES_PROJECT_DATA()
 )
   
@@ -52,7 +52,7 @@ CORE_ACTION(
 public:
   ActionDeleteLayers()
   {
-    this->add_argument( this->group_id_ );
+    this->add_argument( this->layers_ );
   }
   
   virtual ~ActionDeleteLayers()
@@ -74,18 +74,20 @@ public:
 
 private:
   // This parameter contains the id of the layer group
-  Core::ActionParameter< std::string > group_id_;
+  Core::ActionParameter< std::string > layers_;
+  std::vector< std::string > layers_vector_;
+  
 
   // -- Dispatch this action from the interface --
 public:
 
   // CREATE:
   // Create an action that deletes the selected layers
-  static Core::ActionHandle Create( LayerGroupHandle layer );
+  static Core::ActionHandle Create( std::vector< std::string > layers );
 
   // DISPATCH
   // Create and dispatch action that deletes the selected layers
-  static void Dispatch( Core::ActionContextHandle context, LayerGroupHandle group );  
+  static void Dispatch( Core::ActionContextHandle context, std::vector< std::string > layers ); 
 };
   
 } // end namespace Seg3D

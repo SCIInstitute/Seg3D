@@ -106,6 +106,11 @@ GroupButtonMenu::GroupButtonMenu( QWidget* parent, LayerGroupHandle group ) :
     this, SIGNAL( delete_select_all_pressed( bool ) ) );
   connect( this->private_->ui_.select_all_for_duplication_button_, SIGNAL( toggled( bool ) ),
     this, SIGNAL( duplicate_select_all_pressed( bool ) ) );
+    
+  connect( this->private_->ui_.group_delete_button_, SIGNAL( toggled( bool ) ), 
+    this, SLOT(  handle_delete_menu_changed( bool ) ) );
+  connect( this->private_->ui_.duplicate_layer_button_, SIGNAL( toggled( bool ) ), 
+    this, SLOT(  handle_duplicate_menu_changed( bool ) ) );
 
   //Set the default values for the Group UI and make the connections to the state engine
       // --- GENERAL ---
@@ -115,6 +120,7 @@ GroupButtonMenu::GroupButtonMenu( QWidget* parent, LayerGroupHandle group ) :
     group->show_delete_menu_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.duplicate_layer_button_, 
     group->show_duplicate_menu_state_ );
+    
 
   QtUtils::QtBridge::Show( this->private_->ui_.iso_quality_, group->show_iso_menu_state_ ); 
   QtUtils::QtBridge::Show( this->private_->ui_.delete_, group->show_delete_menu_state_ );
@@ -244,11 +250,20 @@ void GroupButtonMenu::uncheck_delete_menu_button()
   this->private_->ui_.group_delete_button_->setChecked( false );
 }
 
+void GroupButtonMenu::handle_delete_menu_changed( bool visibility_status )
+{
+  if( !visibility_status ) 
+  {
+    this->uncheck_delete_button();
+  }
+}
 
-
-
-
-
-
+void GroupButtonMenu::handle_duplicate_menu_changed( bool visibility_status )
+{
+  if( !visibility_status ) 
+  {
+    this->uncheck_duplicate_button();
+  }
+}
 
 }  //end namespace Seg3D

@@ -43,12 +43,12 @@ namespace Seg3D
 
 bool ActionDeleteLayers::validate( Core::ActionContextHandle& context )
 {
-  std::string error;
-  if ( !( LayerManager::CheckGroupExistance( this->group_id_.value(), error ) ) )
+  if( this->layers_.value() != "" )
   {
-    context->report_error( error );
-    return false;
+    this->layers_vector_ = Core::SplitString( this->layers_.value(), "|" );
   }
+  
+  if( this->layers_vector_.size() == 0 ) return false;
 
   return true; // validated
 }
@@ -60,25 +60,24 @@ bool ActionDeleteLayers::run( Core::ActionContextHandle& context,
   // deleted.
   // NOTE: Most programs assume when a user confirms a delete that one cannot undo there after.
   UndoBuffer::Instance()->reset_undo_buffer();
-  
-  LayerGroupHandle group = LayerManager::FindLayerGroup( this->group_id_.value() );
-  LayerManager::Instance()->delete_layers( group );
+
+  LayerManager::Instance()->delete_layers( this->layers_vector_ );
   
   return true;
 }
 
-Core::ActionHandle ActionDeleteLayers::Create( LayerGroupHandle group )
+Core::ActionHandle ActionDeleteLayers::Create( std::vector< std::string > layers )
 {
   ActionDeleteLayers* action = new ActionDeleteLayers;
-  action->group_id_.value() = group->get_group_id();
+  action->layers_vector_ = layers;
 
   return Core::ActionHandle( action );
 }
 
 
-void ActionDeleteLayers::Dispatch( Core::ActionContextHandle context, LayerGroupHandle group )
+void ActionDeleteLayers::Dispatch( Core::ActionContextHandle context, std::vector< std::string > layers )
 {
-  Core::ActionDispatcher::PostAction( Create( group ), context );
+  Core::ActionDispatcher::PostAction( Create( layers ), context );
 }
 
 } // end namespace Seg3D

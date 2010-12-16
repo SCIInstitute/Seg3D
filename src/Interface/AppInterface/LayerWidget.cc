@@ -1144,10 +1144,10 @@ void LayerWidget::delete_layer_from_context_menu()
 
   if( ret == QMessageBox::Yes )
   {
-
-    this->private_->ui_.selection_checkbox_->setChecked( true );
+    std::vector< std::string > layer;
+    layer.push_back( this->get_layer_id() );
     ActionDeleteLayers::Dispatch( Core::Interface::GetWidgetActionContext(), 
-      this->private_->layer_->get_layer_group() );
+      layer );
   }
 }
 
