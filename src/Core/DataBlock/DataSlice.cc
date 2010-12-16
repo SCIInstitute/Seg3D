@@ -101,10 +101,21 @@ DataBlockHandle DataSlice::get_data_block() const
 {
   return this->slice_;
 }
+
+void* DataSlice::get_data() const
+{
+  if ( this->slice_ ) return this->slice_->get_data();
+  return 0;
+}
   
 DataSlice::index_type DataSlice::get_index() const
 {
   return this->index_;
+} 
+
+void DataSlice::set_index( DataSlice::index_type index)
+{
+  this->index_ = index;
 } 
   
 } // end namespace Core

@@ -32,6 +32,7 @@
 // Core includes
 #include <Core/DataBlock/DataBlock.h>
 #include <Core/DataBlock/ITKImageData.h>
+#include <Core/DataBlock/ITKImage2DData.h>
 
 namespace Core
 {
@@ -48,7 +49,11 @@ class ITKDataBlock : public DataBlock
 {
   // -- Constructor/destructor --
 private:
+  // NOTE: These are private because the New function will enforce that the object is
+  // constructed using a handle.
   ITKDataBlock( ITKImageDataHandle itk_data );
+  ITKDataBlock( ITKImage2DDataHandle itk_data, SliceType slice = SliceType::AXIAL_E  );
+  
 public: 
   virtual ~ITKDataBlock();
 
@@ -59,8 +64,19 @@ private:
 public: 
   // NEW:
   // Constructor of a new data block using the ITKImageData wrapper class.
+  // Version with 3D data
   static DataBlockHandle New( ITKImageDataHandle itk_data );
 
+  // NEW:
+  // Constructor of a new data block using the ITKImageData wrapper class.
+  // Version with 2D data
+  static DataBlockHandle New( ITKImage2DDataHandle itk_data, SliceType slice = SliceType::AXIAL_E );
+
+  // -----------------------------
+  // Templated versions that take in itk objects directly and wrap the ITKDataImageT<T>
+  // class around it. That class is just a wrapper class exposing a different interface to
+  // the underlying class.
+  
   // NEW:
   // Constructor of a new data block using an itk image pointer.
   template< class T >
@@ -76,6 +92,19 @@ public:
   // NEW:
   // Constructor of a new data block using an itk image pointer.
   template< class T >
+  static DataBlockHandle New( typename itk::Image<T,2>::Pointer itk_image, 
+    SliceType slice = SliceType::AXIAL_E )
+  {
+    // Create a wrapper class.
+    typename ITKImage2DDataT<T>::Handle itk_data = 
+      typename ITKImage2DDataT<T>::Handle( new ITKImage2DDataT<T>( itk_image) );
+    // Use the wrapper class to generate the data block.
+    return New( itk_data, slice );
+  }
+
+  // NEW:
+  // Constructor of a new data block using an itk image pointer.
+  template< class T >
   static DataBlockHandle New( typename itk::Image<T,3>* itk_image )
   {
     // Create a wrapper class.
@@ -85,6 +114,21 @@ public:
           typename itk::Image<T,3>::Pointer( itk_image) ) );
     // Use the wrapper class to generate the data block.
     return New( itk_data );
+  }
+
+  // NEW:
+  // Constructor of a new data block using an itk image pointer.
+  template< class T >
+  static DataBlockHandle New( typename itk::Image<T,2>* itk_image,
+    SliceType slice = SliceType::AXIAL_E )
+  {
+    // Create a wrapper class.
+    typename ITKImage2DDataT<T>::Handle itk_data = 
+      typename ITKImage2DDataT<T>::Handle( 
+        new ITKImage2DDataT<T>( 
+          typename itk::Image<T,3>::Pointer( itk_image) ) );
+    // Use the wrapper class to generate the data block.
+    return New( itk_data, slice );
   }
 };
 

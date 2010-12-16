@@ -38,6 +38,7 @@ class ITKDataBlockPrivate : public boost::noncopyable
 public:
   // Location where the original nrrd is stored
   ITKImageDataHandle itk_image_data_;
+  ITKImage2DDataHandle itk_image2d_data_;
 };
 
 
@@ -49,6 +50,34 @@ ITKDataBlock::ITKDataBlock( ITKImageDataHandle itk_image_data ) :
   set_nx( itk_image_data->get_nx() );
   set_ny( itk_image_data->get_ny() );
   set_nz( itk_image_data->get_nz() );
+  set_type( itk_image_data->get_data_type() );
+  set_data( itk_image_data->get_data() );
+}
+
+ITKDataBlock::ITKDataBlock( ITKImage2DDataHandle itk_image_data, SliceType slice ) :
+  private_( new ITKDataBlockPrivate )
+{
+  this->private_->itk_image2d_data_ = itk_image_data;
+
+  if ( slice == SliceType::AXIAL_E )
+  {
+    set_nx( itk_image_data->get_nx() );
+    set_ny( itk_image_data->get_ny() );
+    set_nz( 1 );
+  }
+  else if ( slice == SliceType::CORONAL_E )
+  {
+    set_nx( 1 );
+    set_ny( itk_image_data->get_nx() );
+    set_nz( itk_image_data->get_ny() ); 
+  }
+  else
+  {
+    set_nx( itk_image_data->get_nx() );
+    set_ny( 1 );
+    set_nz( itk_image_data->get_ny() );   
+  }
+  
   set_type( itk_image_data->get_data_type() );
   set_data( itk_image_data->get_data() );
 }
@@ -71,5 +100,21 @@ DataBlockHandle ITKDataBlock::New( ITKImageDataHandle itk_data )
     return data_block;
   }
 }
+
+DataBlockHandle ITKDataBlock::New( ITKImage2DDataHandle itk_data, SliceType slice )
+{
+  try
+  {
+    DataBlockHandle data_block( new ITKDataBlock( itk_data, slice ) );
+    return data_block;
+  }
+  catch ( ... )
+  {
+    // Return an empty handle
+    DataBlockHandle data_block;
+    return data_block;
+  }
+}
+
 
 } // end namespace Core

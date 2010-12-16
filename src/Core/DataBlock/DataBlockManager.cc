@@ -114,8 +114,6 @@ DataBlock::generation_type DataBlockManager::increase_generation(
     return new_generation;
   }
   
-  // Shouldn't get here
-  assert( false );
   return -1;
 }
 

@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/">
+    <qresource prefix="/" >
         <file>Images/VisibleGray.png</file>
         <file>Images/IsosurfaceMenu.png</file>
         <file>Images/IsosurfaceMenuOff.png</file>
@@ -141,5 +141,7 @@
         <file>Images/YviewGreen.png</file>
         <file>Images/ZviewBlue.png</file>
         <file>Images/TextOffError.png</file>
+        <file>Images/InvisibleSlicesVisible.png</file>
+        <file>Images/InvisibleSlicesVisibleOff.png</file>
     </qresource>
 </RCC>

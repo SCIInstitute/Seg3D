@@ -165,7 +165,7 @@ bool import_dicom_series( Core::ITKImageDataHandle& image_data,
 
 
 template< class ItkImporterType >
-bool scan_simple_series( std::string& filename, Core::DataType& pixel_type )
+bool scan_simple_series( const std::string& filename, Core::DataType& pixel_type )
 {
   typedef itk::ImageFileReader< itk::Image< unsigned short, 2 > > ReaderType;
   typename ReaderType::Pointer reader = ReaderType::New();
@@ -193,7 +193,7 @@ bool scan_simple_series( std::string& filename, Core::DataType& pixel_type )
 
 // templated function for scanning any itk supported type 
 template< class ItkImporterType >
-bool scan_simple_volume( std::string& filename, Core::DataType& pixel_type )
+bool scan_simple_volume( const std::string& filename, Core::DataType& pixel_type )
 {
   typedef itk::ImageFileReader< itk::Image< float, 3 > > ReaderType;
   typename ReaderType::Pointer reader = ReaderType::New();
@@ -221,7 +221,7 @@ bool scan_simple_volume( std::string& filename, Core::DataType& pixel_type )
 
 template< class PixelType, class ItkImporterType >
 bool import_simple_volume( Core::ITKImageDataHandle& image_data, 
-  Core::DataBlockHandle& data_block, std::string& file_name )
+  Core::DataBlockHandle& data_block, const std::string& file_name )
 {
   typedef itk::ImageFileReader< itk::Image< PixelType, 3 > > ReaderType;
   typename ReaderType::Pointer reader = ReaderType::New();

@@ -47,6 +47,8 @@ SET(CORE_DATABLOCK_SRCS
   ITKDataBlock.cc
   ITKImageData.h
   ITKImageData.cc
+  ITKImage2DData.h
+  ITKImage2DData.cc
   MaskDataBlock.h
   MaskDataBlock.cc
   MaskDataBlockManager.h

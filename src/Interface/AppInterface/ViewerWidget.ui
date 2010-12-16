@@ -1053,6 +1053,11 @@ QComboBox::icon{
                  <property name="text">
                   <string>...</string>
                  </property>
+                 <property name="icon">
+                  <iconset resource="../../Resources/QtResources.qrc">
+                   <normaloff>:/Images/InvisibleSlicesVisibleOff.png</normaloff>
+                   <normalon>:/Images/InvisibleSlicesVisible.png</normalon>:/Images/InvisibleSlicesVisibleOff.png</iconset>
+                 </property>
                 </widget>
                </item>
                <item>

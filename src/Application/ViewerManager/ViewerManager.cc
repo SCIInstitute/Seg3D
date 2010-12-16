@@ -380,8 +380,8 @@ ViewerManager::ViewerManager() :
   this->private_->viewers_[ 1 ] = ViewerHandle( new Viewer( 1, false, Viewer::AXIAL_C ) );
   this->private_->viewers_[ 2 ] = ViewerHandle( new Viewer( 2, false, Viewer::AXIAL_C ) );
   this->private_->viewers_[ 3 ] = ViewerHandle( new Viewer( 3, true, Viewer::AXIAL_C ) );
-  this->private_->viewers_[ 4 ] = ViewerHandle( new Viewer( 4, true, Viewer::SAGITTAL_C ) );
-  this->private_->viewers_[ 5 ] = ViewerHandle( new Viewer( 5, true, Viewer::CORONAL_C ) );
+  this->private_->viewers_[ 4 ] = ViewerHandle( new Viewer( 4, true, Viewer::CORONAL_C ) );
+  this->private_->viewers_[ 5 ] = ViewerHandle( new Viewer( 5, true, Viewer::SAGITTAL_C ) );
 
   for ( size_t j = 0; j < this->private_->viewers_.size(); j++ )
   {

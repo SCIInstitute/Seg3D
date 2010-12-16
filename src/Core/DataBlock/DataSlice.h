@@ -112,9 +112,17 @@ public:
   // Get the underlying data block that contains the data of the slice
   DataBlockHandle get_data_block() const;
   
+  // GET_DATA:
+  // Get the pointer of the data in the dat block underlying this class
+  void* get_data() const;
+  
   // GET_INDEX:
   // Get the index of the slice
   index_type get_index() const;
+  
+  // SET_INDEX:
+  // Set the index of the slice
+  void set_index( index_type );
   
   // -- internals of the DataBlock --
 private:
