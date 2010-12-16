@@ -1048,7 +1048,7 @@ QComboBox::icon{
                   </size>
                  </property>
                  <property name="toolTip">
-                  <string>Toggle the visiblity of hidden viewers</string>
+                  <string>Show slice planes for hidden viewers</string>
                  </property>
                  <property name="text">
                   <string>...</string>
