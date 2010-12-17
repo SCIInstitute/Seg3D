@@ -220,7 +220,7 @@ bool ITKLayerExporter::export_data_series( const std::string& file_path, const s
     default:
       return false;
   }
-  
+  return false;
 }
   
 bool ITKLayerExporter::export_bmp_mask_series( const std::string& file_path )

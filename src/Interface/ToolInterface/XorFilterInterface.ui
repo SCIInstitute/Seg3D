@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>288</width>
-    <height>194</height>
+    <width>286</width>
+    <height>202</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -50,13 +50,13 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>70</height>
+       <height>76</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>70</height>
+       <height>76</height>
       </size>
      </property>
      <property name="title">
@@ -69,7 +69,19 @@
       <bool>false</bool>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_4">
-      <property name="margin">
+      <property name="spacing">
+       <number>6</number>
+      </property>
+      <property name="leftMargin">
+       <number>4</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>4</number>
+      </property>
+      <property name="bottomMargin">
        <number>4</number>
       </property>
       <item>
@@ -115,13 +127,13 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>45</height>
+       <height>52</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>45</height>
+       <height>52</height>
       </size>
      </property>
      <property name="title">
@@ -131,6 +143,9 @@
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_5">
+      <property name="spacing">
+       <number>0</number>
+      </property>
       <property name="leftMargin">
        <number>4</number>
       </property>
@@ -211,12 +226,6 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>32</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
        <height>32</height>
       </size>
      </property>

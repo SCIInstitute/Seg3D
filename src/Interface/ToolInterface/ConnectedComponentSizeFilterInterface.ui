@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>292</width>
-    <height>193</height>
+    <height>204</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -38,20 +38,32 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>70</height>
+       <height>76</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>70</height>
+       <height>76</height>
       </size>
      </property>
      <property name="title">
       <string>Target Layer</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_4">
-      <property name="margin">
+      <property name="spacing">
+       <number>6</number>
+      </property>
+      <property name="leftMargin">
+       <number>4</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>4</number>
+      </property>
+      <property name="bottomMargin">
        <number>4</number>
       </property>
       <item>
@@ -97,29 +109,23 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>45</height>
+       <height>50</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>45</height>
+       <height>50</height>
       </size>
      </property>
      <property name="title">
       <string>Output Scale</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
-      <property name="leftMargin">
-       <number>4</number>
-      </property>
-      <property name="topMargin">
+      <property name="spacing">
        <number>0</number>
       </property>
-      <property name="rightMargin">
-       <number>4</number>
-      </property>
-      <property name="bottomMargin">
+      <property name="margin">
        <number>4</number>
       </property>
       <item>
@@ -201,12 +207,6 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>32</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
        <height>32</height>
       </size>
      </property>

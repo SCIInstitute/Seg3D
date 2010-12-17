@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>282</width>
-    <height>432</height>
+    <width>276</width>
+    <height>439</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -48,11 +48,29 @@ QWidget#threshold_histogram_{
    </property>
    <item>
     <widget class="QGroupBox" name="target_groupbox_">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>76</height>
+      </size>
+     </property>
      <property name="title">
       <string>Target Layer</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_4">
-      <property name="margin">
+      <property name="spacing">
+       <number>6</number>
+      </property>
+      <property name="leftMargin">
+       <number>4</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>4</number>
+      </property>
+      <property name="bottomMargin">
        <number>4</number>
       </property>
       <item>
@@ -240,12 +258,6 @@ QWidget#threshold_histogram_{
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>32</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
        <height>32</height>
       </size>
      </property>

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>276</width>
-    <height>421</height>
+    <width>277</width>
+    <height>454</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -32,20 +32,32 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>70</height>
+       <height>76</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>70</height>
+       <height>76</height>
       </size>
      </property>
      <property name="title">
       <string>Target Layer</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_8">
-      <property name="margin">
+      <property name="spacing">
+       <number>6</number>
+      </property>
+      <property name="leftMargin">
+       <number>4</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>4</number>
+      </property>
+      <property name="bottomMargin">
        <number>4</number>
       </property>
       <item>
@@ -91,24 +103,27 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>45</height>
+       <height>52</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>45</height>
+       <height>52</height>
       </size>
      </property>
      <property name="title">
       <string>Mask Layer</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <property name="spacing">
+       <number>0</number>
+      </property>
       <property name="leftMargin">
        <number>4</number>
       </property>
       <property name="topMargin">
-       <number>2</number>
+       <number>0</number>
       </property>
       <property name="rightMargin">
        <number>4</number>
@@ -405,12 +420,6 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>32</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
        <height>32</height>
       </size>
      </property>

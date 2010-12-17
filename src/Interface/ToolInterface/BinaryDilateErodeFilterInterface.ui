@@ -38,13 +38,13 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>70</height>
+       <height>76</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>70</height>
+       <height>76</height>
       </size>
      </property>
      <property name="title">
@@ -55,13 +55,13 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_4">
       <property name="spacing">
-       <number>4</number>
+       <number>6</number>
       </property>
       <property name="leftMargin">
        <number>4</number>
       </property>
       <property name="topMargin">
-       <number>2</number>
+       <number>0</number>
       </property>
       <property name="rightMargin">
        <number>4</number>
@@ -118,13 +118,13 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>70</height>
+       <height>76</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>70</height>
+       <height>76</height>
       </size>
      </property>
      <property name="title">
@@ -132,9 +132,18 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_7">
       <property name="spacing">
+       <number>6</number>
+      </property>
+      <property name="leftMargin">
        <number>4</number>
       </property>
-      <property name="margin">
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>4</number>
+      </property>
+      <property name="bottomMargin">
        <number>4</number>
       </property>
       <item>
@@ -258,6 +267,12 @@
       <string>2D Constraint</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_8">
+      <property name="spacing">
+       <number>6</number>
+      </property>
+      <property name="topMargin">
+       <number>6</number>
+      </property>
       <item>
        <widget class="QCheckBox" name="only2d_">
         <property name="text">
@@ -431,12 +446,6 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>32</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
        <height>32</height>
       </size>
      </property>
