@@ -528,8 +528,13 @@ void ResampleAlgo::detect_padding_only()
   // Compare spacing
   Core::Vector src_spacing = src_trans * Core::Vector( 1.0, 1.0, 1.0 );
   Core::Vector dst_spacing = dst_trans * Core::Vector( 1.0, 1.0, 1.0 );
-  if ( ( dst_spacing - src_spacing ).length2() > epsilon ) return;
-
+  if ( Core::Abs( src_spacing[ 0 ] - dst_spacing[ 0 ] ) > epsilon * src_spacing[ 0 ] ||
+    Core::Abs( src_spacing[ 1 ] - dst_spacing[ 1 ] ) > epsilon * src_spacing[ 1 ] ||
+    Core::Abs( src_spacing[ 2 ] - dst_spacing[ 2 ] ) > epsilon * src_spacing[ 2 ] )
+  {
+    return;
+  }
+  
   // Check if source grid aligns with destination grid
   Core::Point src_origin = src_trans * Core::Point( 0.0, 0.0, 0.0 );
   Core::Transform inv_dst_trans = dst_trans.get_inverse();
