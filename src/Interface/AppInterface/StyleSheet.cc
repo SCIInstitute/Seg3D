@@ -238,36 +238,36 @@ namespace Seg3D
     "QLineEdit#label_{"
     " text-align: left;"
     " color: black;"
-    "   selection-background-color: rgb( 222, 222, 100 ); "
-    "   selection-color: rgb( 222, 55, 5 ); "
-    " background-color: rgba( 219, 219, 219, 255);"
+    "   selection-background-color: rgb( 255, 255, 255 ); "
+    "   selection-color: rgb( 80, 80, 80 ); "
+    " background-color: rgba( 255, 255, 255, 0 );"
     "}");
 
   const QString StyleSheet::LAYER_WIDGET_LABEL_ACTIVE_C = QString::fromUtf8(
     "QLineEdit#label_{"
     " text-align: left;"
     " color: black;"
-    "   selection-background-color: rgb( 222, 222, 100 ); "
-    "   selection-color: rgb( 222, 55, 5 ); "
-    " background-color: rgba( 197, 218, 255, 255 );"
+    "   selection-background-color: rgb( 255, 255, 255 ); "
+    "   selection-color: rgb( 80, 80, 80 ); "
+    " background-color: rgba( 255, 255, 255, 0 );"
     "}");
 
   const QString StyleSheet::LAYER_WIDGET_LABEL_ACTIVE_IN_USE_C = QString::fromUtf8(
     "QLineEdit#label_{"
     " text-align: left;"
     " color: black;"
-    "   selection-background-color: rgb( 222, 222, 100 ); "
-    "   selection-color: rgb( 222, 55, 5 ); "
-    " background-color: rgba( 193, 255, 255, 255 );"
+    "   selection-background-color: rgb( 255, 255, 255 ); "
+    "   selection-color: rgb( 80, 80, 80 ); "
+    " background-color: rgba( 255, 255, 255, 0 );"
     "}");
     
   const QString StyleSheet::LAYER_WIDGET_LABEL_IN_USE_C = QString::fromUtf8(
     "QLineEdit#label_{"
     " text-align: left;"
     " color: black;"
-    "   selection-background-color: rgb( 222, 222, 100 ); "
-    "   selection-color: rgb( 222, 55, 5 ); "
-    " background-color: rgba( 193, 255, 215, 255 );"
+    "   selection-background-color: rgb( 255, 255, 255 ); "
+    "   selection-color: rgb( 80, 80, 80 ); "
+    " background-color: rgba( 255, 255, 255, 0 );"
     "}");   
         
   // - DROP - //
