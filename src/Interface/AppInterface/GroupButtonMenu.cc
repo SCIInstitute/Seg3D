@@ -227,11 +227,13 @@ void GroupButtonMenu::prep_for_animation( bool move_time )
   
 void GroupButtonMenu::uncheck_delete_button()
 {
+  this->private_->ui_.select_all_button_->setChecked( true );
   this->private_->ui_.select_all_button_->setChecked( false );
 }
 
 void GroupButtonMenu::uncheck_duplicate_button()
 {
+  this->private_->ui_.select_all_for_duplication_button_->setChecked( true );
   this->private_->ui_.select_all_for_duplication_button_->setChecked( false );
 }
 
@@ -253,7 +255,7 @@ void GroupButtonMenu::uncheck_delete_menu_button()
 void GroupButtonMenu::handle_delete_menu_changed( bool visibility_status )
 {
   if( !visibility_status ) 
-  {
+  { 
     this->uncheck_delete_button();
   }
 }

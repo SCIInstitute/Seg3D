@@ -997,7 +997,7 @@ void LayerWidget::set_picked_up_layer_size( int size )
   this->private_->picked_up_layer_size_ = size;
 }
 
-void LayerWidget::set_check_selected( bool selected )
+void LayerWidget::set_selected( bool selected )
 {
   this->private_->ui_.selection_checkbox_->setChecked( selected );
 }

@@ -325,8 +325,10 @@ void LayerGroupWidget::verify_delete()
     ActionDeleteLayers::Dispatch( Core::Interface::GetWidgetActionContext(), 
       layers );
     
+    this->private_->button_menu_->blockSignals( true );
     this->private_->button_menu_->uncheck_delete_menu_button();
     this->private_->button_menu_->uncheck_delete_button();
+    this->private_->button_menu_->blockSignals( false );
   }
 }
 
@@ -338,7 +340,6 @@ void LayerGroupWidget::get_selected_layer_ids( std::vector< std::string >& layer
     if( ( *it ).second->get_selected() )
     {
       layers.push_back( ( *it ).first );
-      ( *it ).second->set_check_selected( false );
     }
   }
 }
@@ -406,8 +407,6 @@ void LayerGroupWidget::prep_for_animation( bool move_time )
   if( this->private_->picked_up_ )
     return;
   
-  //this->setUpdatesEnabled( false );
-  
   if( move_time )
   {
     this->private_->ui_.group_dummy_->setMinimumSize( this->private_->ui_.base_->size() );
@@ -423,9 +422,7 @@ void LayerGroupWidget::prep_for_animation( bool move_time )
   {
     this->private_->ui_.group_dummy_->hide();
     this->private_->ui_.base_->show();
-  }
-  
-  //this->setUpdatesEnabled( true );
+  } 
 }
   
 void LayerGroupWidget::set_picked_up_group_size( int group_height )
@@ -450,6 +447,7 @@ void LayerGroupWidget::handle_change()
     ( *it ).second->set_picked_up( false );
     ( *it ).second->instant_hide_drop_space();
     ( *it ).second->hide_overlay();
+    ( *it ).second->set_selected( false );
     if( this_group->show_delete_menu_state_->get() || 
        this_group->show_duplicate_menu_state_->get() )
     {
@@ -542,8 +540,10 @@ void LayerGroupWidget::notify_picked_up_layer_size( int layer_size )
   
 void LayerGroupWidget::duplicate_checked_layers()
 {
+  this->private_->button_menu_->blockSignals( true );
   this->private_->button_menu_->uncheck_delete_button();
   this->private_->button_menu_->uncheck_duplicate_button();
+  this->private_->button_menu_->blockSignals( false );
   
   for( std::map< std::string, LayerWidgetQHandle >::iterator it = this->layer_map_.begin(); 
     it != this->layer_map_.end(); ++it )
@@ -552,8 +552,6 @@ void LayerGroupWidget::duplicate_checked_layers()
     {
       ActionDuplicateLayer::Dispatch( Core::Interface::GetWidgetActionContext(), 
         ( *it ).second->get_layer_id() );
-      ( *it ).second->set_check_selected( false );
-      
     }
   }
 }
@@ -563,7 +561,7 @@ void LayerGroupWidget::check_uncheck_for_delete( bool checked )
   for( std::map< std::string, LayerWidgetQHandle >::iterator it = this->layer_map_.begin(); 
     it != this->layer_map_.end(); ++it )
   {
-    ( *it ).second->set_check_selected( checked );
+    ( *it ).second->set_selected( checked );
   }
 }
   
@@ -572,7 +570,7 @@ void LayerGroupWidget::check_uncheck_for_duplicate( bool checked )
   for( std::map< std::string, LayerWidgetQHandle >::iterator it = this->layer_map_.begin(); 
     it != this->layer_map_.end(); ++it )
   {
-    ( *it ).second->set_check_selected( checked );
+    ( *it ).second->set_selected( checked );
   }
 } 
 
@@ -604,19 +602,19 @@ void LayerGroupWidget::enable_disable_duplicate_button()
   this->private_->button_menu_->set_duplicate_enabled( false );
 }
   
-  void LayerGroupWidget::set_iso_surface_visibility( bool visible )
+void LayerGroupWidget::set_iso_surface_visibility( bool visible )
+{
+  for( std::map< std::string, LayerWidgetQHandle >::iterator it = this->layer_map_.begin(); 
+    it != this->layer_map_.end(); ++it )
   {
-    for( std::map< std::string, LayerWidgetQHandle >::iterator it = this->layer_map_.begin(); 
-      it != this->layer_map_.end(); ++it )
-    {
-      ( *it ).second->set_iso_surface_visibility( visible );
-    }
+    ( *it ).second->set_iso_surface_visibility( visible );
   }
+}
 
-  void LayerGroupWidget::set_picked_up( bool up )
-  {
-    this->private_->picked_up_ = up; 
-  }
+void LayerGroupWidget::set_picked_up( bool up )
+{
+  this->private_->picked_up_ = up; 
+}
 
 
 

@@ -155,7 +155,9 @@ bool LayerUndoBufferItem::apply_and_clear_undo()
     LayerHandle layer = this->private_->layers_to_delete_[ j ];
 
     // Delete the layer from the layer manager
-    LayerManager::Instance()->delete_layer( layer );
+    std::vector< std::string > layer_vector;
+    layer_vector.push_back( layer->get_layer_id() );
+    LayerManager::Instance()->delete_layers( layer_vector );
   } 
   
   // Remove the layers from the undo mechanism so the program can actually delete them

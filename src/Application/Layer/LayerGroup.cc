@@ -56,7 +56,10 @@ class LayerGroupPrivate
 public:
   void update_layers_visible_state();
   void update_grid_information();
-
+  
+  void update_iso_surface_visible_state();
+  
+  void handle_iso_surface_visible_state_changed( std::string state );
   void handle_layers_visible_state_changed( std::string state );
 
   LayerGroup* layer_group_;

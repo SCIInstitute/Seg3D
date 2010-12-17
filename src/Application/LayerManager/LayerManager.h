@@ -157,10 +157,6 @@ public:
   // this function deletes the selected layers in the group that is passed
   void delete_layers( std::vector< std::string > layers );
 
-  // DELETE_LAYER:
-  // this function deletes the layer
-  void delete_layer( LayerHandle layer );
-
   // SET_ACTIVE_LAYER:
   // this function sets the active layer
   void set_active_layer( LayerHandle layer );

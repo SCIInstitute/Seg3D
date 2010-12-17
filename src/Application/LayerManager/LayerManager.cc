@@ -633,53 +633,53 @@ void LayerManager::get_layers_in_group( LayerGroupHandle group ,
   }
 }
 
-void LayerManager::delete_layers( std::vector< std::string > layers )
+void LayerManager::delete_layers(  std::vector< std::string > layers  )
 {
-  for( size_t i = 0; i < layers.size(); ++i )
-  {
-    LayerHandle temp_handle_ = this->get_layer_by_id( layers[ i ] );
-    if( temp_handle_ ) this->delete_layer( temp_handle_ );
-  }
-} // end delete_layer
-
-void LayerManager::delete_layer( LayerHandle layer )
-{
-  if ( !layer->is_valid() ) return;
+  if ( layers.empty() ) return;
   
   bool active_layer_changed = false;
   bool group_deleted = false;
+  
+  std::vector<LayerHandle> layer_vector;
   
   LayerGroupHandle group;
   
   { // start the lock scope
     lock_type lock( this->get_mutex() );  
-
-    CORE_LOG_MESSAGE( std::string( "Deleting Layer: " ) + layer->get_layer_id() );
     
-    group = layer->get_layer_group();
-
-    // NOTE: Layer needs to be invalidated before it can be deleted
-    layer->invalidate();
-
-    group->delete_layer( layer );
-    
-    if( group->is_empty() )
-    {   
-      group->invalidate();
-      this->private_->group_list_.remove( group );
-    }
-
-    if ( this->private_->active_layer_ == layer )
+    for( size_t i = 0; i < layers.size(); ++i )
     {
-      this->private_->active_layer_.reset();
-      if ( this->private_->group_list_.size() > 0 )
-      {
-        this->private_->active_layer_ = this->private_->group_list_.front()->layer_list_.back();
-        active_layer_changed = true;
+      LayerHandle layer = this->get_layer_by_id( layers[ i ] );
+      if( !layer ) return;
+      layer_vector.push_back( layer );
+      
+      CORE_LOG_MESSAGE( std::string( "Deleting Layer: " ) + layer->get_layer_id() );
+
+      group = layer->get_layer_group();
+
+      // NOTE: Layer needs to be invalidated before it can be deleted
+      layer->invalidate();
+
+      group->delete_layer( layer );
+      
+      if( group->is_empty() )
+      {   
+        group->invalidate();
+        this->private_->group_list_.remove( group );
       }
+
+      if ( this->private_->active_layer_ == layer )
+      {
+        this->private_->active_layer_.reset();
+        if ( this->private_->group_list_.size() > 0 )
+        {
+          this->private_->active_layer_ = this->private_->group_list_.front()->layer_list_.back();
+          active_layer_changed = true;
+        }
+      }
+      
+      if ( group->is_empty() ) group_deleted = true;
     }
-    
-    if ( group->is_empty() ) group_deleted = true;
   } 
   
   // signal the listeners
@@ -694,8 +694,8 @@ void LayerManager::delete_layer( LayerHandle layer )
     this->group_internals_changed_signal_( group );
   }
   
-  std::vector<LayerHandle> layer_vector( 1 );
-  layer_vector[ 0 ] = layer;
+//  std::vector<LayerHandle> layer_vector( 1 );
+//  layer_vector[ 0 ] = layer;
   this->layers_deleted_signal_( layer_vector );
   this->layers_changed_signal_();
   
@@ -1332,7 +1332,10 @@ void LayerManager::DispatchDeleteLayer( LayerHandle layer, filter_key_type key )
       layer->reset_filter_handle();
 
       // Delete the layer from the layer manager.
-      LayerManager::Instance()->delete_layer( layer );
+      std::vector< std::string > layer_vector;
+      layer_vector.push_back( layer->get_layer_id() );
+      LayerManager::Instance()->delete_layers( layer_vector );
+      //LayerManager::Instance()->delete_layer( layer );
     }
     else
     {
@@ -1399,7 +1402,10 @@ void LayerManager::DispatchUnlockOrDeleteLayer( LayerHandle layer, filter_key_ty
         CORE_THROW_LOGICERROR( "Could not delete that is connected to another filter" );
       }
       layer->reset_filter_handle();
-      LayerManager::Instance()->delete_layer( layer );
+      std::vector< std::string > layer_vector;
+      layer_vector.push_back( layer->get_layer_id() );
+      LayerManager::Instance()->delete_layers( layer_vector );
+      //LayerManager::Instance()->delete_layer( layer );
     }
 
   }
