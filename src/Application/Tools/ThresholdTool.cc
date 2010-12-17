@@ -30,6 +30,8 @@
 #include <Core/Volume/DataVolumeSlice.h>
 #include <Core/RenderResources/RenderResources.h>
 
+#include <Core/State/Actions/ActionToggle.h>
+
 // Application includes
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/ThresholdTool.h>
@@ -341,6 +343,18 @@ void ThresholdTool::handle_seed_points_changed()
   }
 
   this->private_->update_viewers();
+}
+
+bool ThresholdTool::handle_key_press( ViewerHandle viewer, int key, int modifiers )
+{
+  if ( key == Core::Key::KEY_M_E )
+  {
+    Core::ActionToggle::Dispatch( Core::Interface::GetKeyboardActionContext(),
+          this->show_preview_state_ );    
+    return true;
+  }
+  
+  return SeedPointsTool::handle_key_press( viewer, key, modifiers );
 }
 
 } // end namespace Seg3D

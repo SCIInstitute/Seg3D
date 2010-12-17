@@ -47,6 +47,7 @@ SEG3D_TOOL
   SEG3D_TOOL_MENU( "Tools" )
   SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+8" )
   SEG3D_TOOL_URL( "http://seg3d.org/" )
+  SEG3D_TOOL_HOTKEYS( "M=Toggle visibility of the preview mask." )  
 )
 
   // -- constructor/destructor --
@@ -67,6 +68,10 @@ public:
   // HANDLE_SEED_POINTS_CHANGED:
   // Called when the seed points have changed.
   virtual void handle_seed_points_changed();
+
+  // HANDLE_KEY_PRESS:
+  // Called when a key is pressed.
+  virtual bool handle_key_press( ViewerHandle viewer, int key, int modifiers );
 
   // -- state --
 public:
