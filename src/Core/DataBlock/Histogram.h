@@ -75,6 +75,10 @@ public:
   // Get the maximum value of the data
   double get_max() const;
   
+  // GET_CUM_VALUE:
+  // Get the value that has a certain fraction of the data be smaller values
+  double get_cum_value( double fraction ) const;
+  
   // GET_MIN_BIN:
   // Get the minimum size of a histogram bar
   size_t get_min_bin() const;

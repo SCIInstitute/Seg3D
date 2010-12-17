@@ -672,6 +672,32 @@ double Histogram::get_max() const
   return this->max_; 
 }
 
+double Histogram::get_cum_value( double fraction ) const
+{
+  size_t tot_hist = 0;
+  for ( size_t j = 0; j < this->histogram_.size(); j++ )
+  {
+    tot_hist += this->histogram_[ j ];
+  }
+
+  double multiplier = 1.0 / static_cast<double>( tot_hist );
+  double jj = 0.0;
+  size_t cur_hist = 0;
+
+  for ( size_t j = 0; j < this->histogram_.size(); j++ )
+  {
+    double frac_start = static_cast<double>( cur_hist ) * multiplier;
+    cur_hist += this->histogram_[ j ];
+    size_t frac_end = static_cast<double>( cur_hist ) * multiplier;
+    if ( fraction > frac_start && fraction <= frac_end )
+    {
+      jj = static_cast<double>( j ) + ( frac_end - fraction )/( frac_end - frac_start );
+    }
+  }
+  
+  return this->bin_start_ + ( jj * this->bin_size_ );
+}
+
 size_t Histogram::get_max_bin() const
 { 
   return this->max_bin_;

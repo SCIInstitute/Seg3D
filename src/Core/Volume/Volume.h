@@ -94,6 +94,10 @@ public:
   // Get the maximum value
   virtual double get_max() const = 0;
 
+  // GET_CUM_VALUE:
+  // Get the value at a specific point in the histogram
+  virtual double get_cum_value( double fraction ) const = 0;
+
   // IS_VALID:
   // Check whether the volume has a valid data block
   virtual bool is_valid() const = 0;

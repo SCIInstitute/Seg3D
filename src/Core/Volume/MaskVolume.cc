@@ -59,6 +59,11 @@ double MaskVolume::get_max() const
   return 1.0;
 }
 
+double MaskVolume::get_cum_value( double fraction ) const
+{
+  return 0.0;
+}
+
 DataBlock::generation_type MaskVolume::get_generation() const
 {
   if ( this->mask_data_block_ )

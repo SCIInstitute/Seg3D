@@ -88,6 +88,18 @@ double DataVolume::get_max() const
   }
 }
 
+double DataVolume::get_cum_value( double fraction ) const
+{
+  if ( this->data_block_ )
+  {
+    return this->data_block_->get_histogram().get_cum_value( fraction );
+  }
+  else
+  {
+    return 0.0;
+  }
+}
+
 VolumeType DataVolume::get_type() const
 {
   return VolumeType::DATA_E;
