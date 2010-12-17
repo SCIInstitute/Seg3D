@@ -1114,7 +1114,8 @@ bool LayerManager::CheckLayerAvailabilityForProcessing( const std::string& layer
   }
 
   std::string layer_state = layer->data_state_->get();
-  if ( layer_state == Layer::AVAILABLE_C )
+  bool lock_state = layer->locked_state_->get();
+  if ( layer_state == Layer::AVAILABLE_C && lock_state == false)
   {
     notifier.reset();
     return true;
@@ -1147,7 +1148,10 @@ bool LayerManager::CheckLayerAvailabilityForUse( const std::string& layer_id,
   }
 
   std::string layer_state = layer->data_state_->get();
-  if ( layer_state == Layer::AVAILABLE_C || layer_state == Layer::IN_USE_C )
+  bool lock_state = layer->locked_state_->get();
+
+  if ( ( layer_state == Layer::AVAILABLE_C || layer_state == Layer::IN_USE_C ) 
+    && ( lock_state == false ) )
   {
     notifier.reset();
     return true;

@@ -87,7 +87,7 @@ void LayerAvailabilityNotifier::trigger()
   if ( layer )
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-    if ( layer->data_state_->get() == Layer::AVAILABLE_C )
+    if ( layer->data_state_->get() == Layer::AVAILABLE_C && layer->locked_state_->get() == false )
     {
       // Layer has become available, so trigger waiting thread
       boost::mutex::scoped_lock lock( this->notifier_mutex_ );
