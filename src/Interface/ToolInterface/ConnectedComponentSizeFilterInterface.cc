@@ -79,9 +79,6 @@ bool ConnectedComponentSizeFilterInterface::build_widget( QFrame* frame )
     tool->use_active_layer_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.log_scale_, 
     tool->log_scale_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.replaceCheckBox, 
-    tool->replace_state_ );
-  
   
   QtUtils::QtBridge::Enable( this->private_->ui_.runFilterButton,
     tool->valid_target_state_ );

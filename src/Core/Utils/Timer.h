@@ -36,6 +36,9 @@
 namespace Core
 {
 
+class Timer;
+typedef boost::shared_ptr<Timer> TimerHandle;
+
 class TimerPrivate;
 typedef boost::shared_ptr< TimerPrivate > TimerPrivateHandle;
 

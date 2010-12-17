@@ -50,7 +50,7 @@ public:
   
   QPixmap running_pixmap_[18];
   int running_count_;
-  Core::Timer* timer_;
+  Core::TimerHandle timer_;
   
   Core::ActionProgressHandle action_progress_;
 
@@ -65,7 +65,7 @@ ProgressWidget::ProgressWidget( QWidget *parent ) :
     // Step (2): Add the Ui children onto the QWidget
   this->private_->ui_.setupUi( this );
   
-  this->private_->timer_ = 0;
+  this->private_->timer_;
   this->private_->running_count_ = 0;
   
   // Step (3): Setup pixmaps for animation
@@ -82,10 +82,6 @@ ProgressWidget::ProgressWidget( QWidget *parent ) :
 
 ProgressWidget::~ProgressWidget()
 {
-  if ( this->private_->timer_ != 0 )
-  {
-    delete this->private_->timer_;
-  }
 }
   
 void ProgressWidget::setup_progress_widget( Core::ActionProgressHandle action_progress )
@@ -109,7 +105,7 @@ void ProgressWidget::setup_progress_widget( Core::ActionProgressHandle action_pr
     this->private_->ui_.progress_bar_->hide();
     this->private_->ui_.line_->hide();
     
-    this->private_->timer_ = new Core::Timer( 100 );
+    this->private_->timer_ = Core::TimerHandle( new Core::Timer( 100 ) );
     qpointer_type qpointer( this );
     
     this->private_->timer_->timeout_signal_.connect( 
@@ -132,14 +128,14 @@ void ProgressWidget::setup_progress_widget( Core::ActionProgressHandle action_pr
 
 }
   
-  void ProgressWidget::cleanup_progress_widget()
-  {
-    this->hide();
-    this->private_->timer_ = 0;
-    this->private_->running_count_ = 0;
-    this->private_->ui_.message_->setText( QString::fromUtf8( "" ) );
-    this->disconnect();
-  }
+void ProgressWidget::cleanup_progress_widget()
+{
+  this->hide();
+  this->private_->timer_.reset();
+  this->private_->running_count_ = 0;
+  this->private_->ui_.message_->setText( QString::fromUtf8( "" ) );
+  this->disconnect();
+}
 
 void ProgressWidget::update_running()
 {

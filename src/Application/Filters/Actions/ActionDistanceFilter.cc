@@ -57,8 +57,7 @@ bool ActionDistanceFilter::validate( Core::ActionContextHandle& context )
   
   // Check for layer availability 
   Core::NotifierHandle notifier;
-  if ( ! LayerManager::CheckLayerAvailability( this->target_layer_.value(), 
-    this->replace_.value(), notifier ) )
+  if ( ! LayerManager::CheckLayerAvailability( this->target_layer_.value(), false, notifier ) )
   {
     context->report_need_resource( notifier );
     return false;
@@ -177,21 +176,11 @@ bool ActionDistanceFilter::run( Core::ActionContextHandle& context,
     return false;
   }
 
-  if ( this->replace_.value() )
-  {
-    // Copy the handles as destination and source will be the same
-    algo->dst_layer_ = algo->src_layer_;
-    // Mark the layer for processing.
-    algo->lock_for_processing( algo->dst_layer_ );  
-  }
-  else
-  {
-    // Lock the src layer, so it cannot be used else where
-    algo->lock_for_use( algo->src_layer_ );
-    
-    // Create the destination layer, which will show progress
-    algo->create_and_lock_data_layer_from_layer( algo->src_layer_, algo->dst_layer_ );
-  }
+  // Lock the src layer, so it cannot be used else where
+  algo->lock_for_use( algo->src_layer_ );
+  
+  // Create the destination layer, which will show progress
+  algo->create_and_lock_data_layer_from_layer( algo->src_layer_, algo->dst_layer_ );
 
   // Return the id of the destination layer.
   result = Core::ActionResultHandle( new Core::ActionResult( algo->dst_layer_->get_layer_id() ) );
@@ -207,15 +196,13 @@ bool ActionDistanceFilter::run( Core::ActionContextHandle& context,
 
 
 void ActionDistanceFilter::Dispatch( Core::ActionContextHandle context, 
-  std::string target_layer, bool replace, 
-  bool use_index_space, bool inside_positive )
+  std::string target_layer, bool use_index_space, bool inside_positive )
 { 
   // Create a new action
   ActionDistanceFilter* action = new ActionDistanceFilter;
 
   // Setup the parameters
   action->target_layer_.value() = target_layer;
-  action->replace_.value() = replace;
   action->use_index_space_.value() = use_index_space;
   action->inside_positive_.value() = inside_positive;
 

@@ -48,9 +48,6 @@ ConnectedComponentSizeFilter::ConnectedComponentSizeFilter( const std::string& t
   SingleTargetTool( Core::VolumeType::MASK_E, toolid )
 { 
   this->add_state( "log_scale", this->log_scale_state_, true );
-  
-  // Need to set ranges and default values for all parameters
-  this->add_state( "replace", this->replace_state_, false );
 }
 
 ConnectedComponentSizeFilter::~ConnectedComponentSizeFilter()

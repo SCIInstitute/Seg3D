@@ -268,13 +268,15 @@ void AppInterface::closeEvent( QCloseEvent* event )
     
     if ( ret == QMessageBox::Save )
     {
+      this->disconnect_all();
+
       Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
       ActionSaveSession::Dispatch( Core::Interface::GetWidgetActionContext(), false, 
         ProjectManager::Instance()->current_project_->current_session_name_state_->get() );   
     }
   }
-  
   this->disconnect_all();
+  
 
   if( this->private_->viewer_interface_ )
   {

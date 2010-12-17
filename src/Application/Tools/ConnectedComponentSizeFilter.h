@@ -56,9 +56,6 @@ public:
   // -- state --
 public:
   Core::StateBoolHandle log_scale_state_;
-  
-  // Whether the layer needs to be replaced
-  Core::StateBoolHandle replace_state_;
 
   // -- execute --
 public:

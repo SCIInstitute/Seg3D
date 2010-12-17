@@ -81,6 +81,7 @@ void QtEventHandlerObject::cleanup()
 QtEventHandlerContext::QtEventHandlerContext( QApplication* qapplication ) :
   EventHandlerContext(),
   eventhandler_started_( false ),
+  eventhandler_stopped_( false ),
   qapplication_( qapplication ), 
   interface_thread_id_( boost::this_thread::get_id() )
 {
@@ -96,6 +97,7 @@ void QtEventHandlerContext::post_event( Core::EventHandle& event )
   {
     {
       lock_type lock( this->mutex_ );
+      if ( this->eventhandler_stopped_ ) return;
       this->events_.push( event );
     }
     // Generate an empty Qt user event and insert it to the Qt main event loop.
@@ -121,6 +123,7 @@ void QtEventHandlerContext::post_and_wait_event( Core::EventHandle& event )
   // Add the event to the queue
   {
     lock_type lock( this->mutex_ );
+    if ( this->eventhandler_stopped_ ) return;
     this->events_.push( event );
   }
 
@@ -229,6 +232,8 @@ void QtEventHandlerContext::empty_event_queue()
   {
     this->events_.pop();
   }
+  
+  this->eventhandler_stopped_ = true;
 }
 
 } // end namespace QtUtils

@@ -55,9 +55,6 @@ public:
 
   // -- state --
 public:
-  // Whether the layer needs to be replaced
-  Core::StateBoolHandle replace_state_;
-
   // Whether to use index space for the computation
   Core::StateBoolHandle use_index_space_state_;
 

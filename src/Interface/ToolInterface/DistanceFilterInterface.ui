@@ -162,7 +162,7 @@
        <height>32</height>
       </size>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,1">
+     <layout class="QHBoxLayout" name="horizontalLayout" stretch="1">
       <property name="spacing">
        <number>0</number>
       </property>
@@ -178,16 +178,6 @@
       <property name="bottomMargin">
        <number>0</number>
       </property>
-      <item>
-       <widget class="QCheckBox" name="replaceCheckBox">
-        <property name="text">
-         <string>Replace</string>
-        </property>
-        <property name="checked">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
       <item>
        <widget class="QPushButton" name="runFilterButton">
         <property name="text">

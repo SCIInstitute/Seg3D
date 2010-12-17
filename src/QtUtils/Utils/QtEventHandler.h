@@ -151,6 +151,8 @@ private:
   // Keep track of when the event filter is installed
   bool eventhandler_started_;
 
+  bool eventhandler_stopped_;
+
   // A pointer to the main Qt application class
   QApplication* qapplication_;
 

@@ -47,7 +47,6 @@ DistanceFilter::DistanceFilter( const std::string& toolid ) :
   SingleTargetTool( Core::VolumeType::MASK_E, toolid )
 {
   // Need to set ranges and default values for all parameters
-  this->add_state( "replace", this->replace_state_, false );
   this->add_state( "use_index_space", this->use_index_space_state_, false );
   this->add_state( "inside_positive", this->inside_positive_state_, false );
 }
@@ -61,7 +60,6 @@ void DistanceFilter::execute( Core::ActionContextHandle context )
 {
   ActionDistanceFilter::Dispatch( context,
     this->target_layer_state_->get(),
-    this->replace_state_->get(),
     this->use_index_space_state_->get(),
     this->inside_positive_state_->get() );
 }

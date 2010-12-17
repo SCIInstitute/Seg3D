@@ -42,7 +42,6 @@ class ActionDistanceFilter : public Core::Action
 CORE_ACTION( 
   CORE_ACTION_TYPE( "DistanceFilter", "Compute the signed distance to a mask." )
   CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
-  CORE_ACTION_KEY( "replace", "true", "Replace the old layer (true), or add an new layer (false)" )
   CORE_ACTION_KEY( "use_index_space", "false", "Whether to use index or world coordinates for"
     "computing the distance." )
   CORE_ACTION_KEY( "inside_positive", "false", "Whether the sign of the inside is positive and the"
@@ -59,7 +58,6 @@ public:
     this->add_argument( this->target_layer_ );
     
     // Action options
-    this->add_key( this->replace_ );
     this->add_key( this->use_index_space_ );
     this->add_key( this->inside_positive_ );
   }
@@ -77,7 +75,6 @@ public:
 private:
 
   Core::ActionParameter< std::string > target_layer_;
-  Core::ActionParameter< bool > replace_;
   Core::ActionParameter< bool > use_index_space_;
   Core::ActionParameter< bool > inside_positive_;
     
@@ -91,7 +88,7 @@ public:
   // DISPATCH
   // Create and dispatch action that inserts the new layer 
   static void Dispatch( Core::ActionContextHandle context, std::string target_layer,
-    bool replace, bool use_index_space, bool inside_positive );
+    bool use_index_space, bool inside_positive );
   
 };
   

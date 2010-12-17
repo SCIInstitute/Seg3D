@@ -124,8 +124,7 @@ int main( int argc, char **argv )
 
   std::string warning = std::string( "<h3>" ) +
     Core::Application::GetApplicationNameAndVersion() + 
-    "</h3><p align=\"left\">NOTE: This version of Seg3D is for Testing and Evaluation Only! "
-    "Compatibility with future releases of is NOT yet guaranteed.</p>";
+    "</h3><p align=\"left\">NOTE: This version of Seg3D is for Testing and Evaluation Only!</p>";
   
   QMessageBox::information( 0, 
     QString::fromStdString( Core::Application::GetApplicationNameAndVersion() ), 

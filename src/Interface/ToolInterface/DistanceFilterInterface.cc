@@ -78,7 +78,6 @@ bool DistanceFilterInterface::build_widget( QFrame* frame )
 
   QtUtils::QtBridge::Connect( this->private_->ui_.inside_positive_, tool->inside_positive_state_ );
     
-  QtUtils::QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
   QtUtils::QtBridge::Enable( this->private_->ui_.runFilterButton, tool->valid_target_state_ );
   QtUtils::QtBridge::Show( this->private_->ui_.message_alert_, tool->valid_target_state_, true );
       

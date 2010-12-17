@@ -239,7 +239,8 @@ namespace Seg3D
     " text-align: left;"
     " color: black;"
     "   selection-background-color: rgb( 222, 222, 100 ); "
-    " background-color: rgba( 211, 211, 211, 255);"
+    "   selection-color: rgb( 222, 55, 5 ); "
+    " background-color: rgba( 219, 219, 219, 255);"
     "}");
 
   const QString StyleSheet::LAYER_WIDGET_LABEL_ACTIVE_C = QString::fromUtf8(
@@ -247,7 +248,8 @@ namespace Seg3D
     " text-align: left;"
     " color: black;"
     "   selection-background-color: rgb( 222, 222, 100 ); "
-    " background-color: rgba( 193, 215, 255, 255 );"
+    "   selection-color: rgb( 222, 55, 5 ); "
+    " background-color: rgba( 197, 218, 255, 255 );"
     "}");
 
   const QString StyleSheet::LAYER_WIDGET_LABEL_ACTIVE_IN_USE_C = QString::fromUtf8(
@@ -255,6 +257,7 @@ namespace Seg3D
     " text-align: left;"
     " color: black;"
     "   selection-background-color: rgb( 222, 222, 100 ); "
+    "   selection-color: rgb( 222, 55, 5 ); "
     " background-color: rgba( 193, 255, 255, 255 );"
     "}");
     
@@ -263,6 +266,7 @@ namespace Seg3D
     " text-align: left;"
     " color: black;"
     "   selection-background-color: rgb( 222, 222, 100 ); "
+    "   selection-color: rgb( 222, 55, 5 ); "
     " background-color: rgba( 193, 255, 215, 255 );"
     "}");   
         
