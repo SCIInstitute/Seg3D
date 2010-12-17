@@ -288,7 +288,7 @@ void AppPreferences::setup_sidebar_prefs()
   ToolMenuList tool_menus;
   ToolFactory::Instance()->list_menus( tool_menus );
   
-  for( int i = 0; i < tool_menus.size(); ++i )
+  for( size_t i = 0; i < tool_menus.size(); ++i )
   {
     QWidget* tools_tab = new QWidget();
     
