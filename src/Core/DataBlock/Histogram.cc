@@ -688,10 +688,11 @@ double Histogram::get_cum_value( double fraction ) const
   {
     double frac_start = static_cast<double>( cur_hist ) * multiplier;
     cur_hist += this->histogram_[ j ];
-    size_t frac_end = static_cast<double>( cur_hist ) * multiplier;
+    double frac_end = static_cast<double>( cur_hist ) * multiplier;
     if ( fraction > frac_start && fraction <= frac_end )
     {
       jj = static_cast<double>( j ) + ( frac_end - fraction )/( frac_end - frac_start );
+      break;
     }
   }
   

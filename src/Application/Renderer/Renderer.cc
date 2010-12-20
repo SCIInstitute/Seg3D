@@ -489,7 +489,8 @@ void RendererPrivate::process_isosurfaces( IsosurfaceArray& isosurfaces )
   size_t num_of_layers = layers.size();
   for ( size_t i = 0; i < num_of_layers; ++i )
   {
-    if ( layers[ i ]->get_type() == Core::VolumeType::MASK_E )
+    if ( layers[ i ]->get_type() == Core::VolumeType::MASK_E 
+      && layers[ i ]->is_visible( this->viewer_id_ )  )
     {
       MaskLayer* mask_layer = static_cast< MaskLayer* >( layers[ i ].get() );
       if ( mask_layer->show_isosurface_state_->get() )
@@ -718,14 +719,14 @@ bool Renderer::render()
     bool with_lighting = viewer->volume_light_visible_state_->get();
     bool draw_slices = viewer->volume_slices_visible_state_->get();
     bool draw_isosurfaces = viewer->volume_isosurfaces_visible_state_->get();
-    bool show_invisilbe_slices = viewer->volume_show_invisible_slices_state_->get();
+    bool show_invisible_slices = viewer->volume_show_invisible_slices_state_->get();
     size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
     for ( size_t i = 0; i < num_of_viewers && draw_slices; i++ )
     {
       ViewerHandle other_viewer = ViewerManager::Instance()->get_viewer( i );
       if ( !other_viewer->slice_visible_state_->get() || 
         other_viewer->is_volume_view() ||
-        ( !show_invisilbe_slices && !other_viewer->viewer_visible_state_->get() ) )
+        ( !show_invisible_slices && !other_viewer->viewer_visible_state_->get() ) )
       {
         continue;
       }
