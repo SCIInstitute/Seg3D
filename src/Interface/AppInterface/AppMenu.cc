@@ -250,8 +250,15 @@ void AppMenu::create_edit_menu( QMenu* qmenu )
   this->paste_qaction_->setShortcut( tr( "Ctrl+V" ) );
   this->paste_qaction_->setToolTip( tr( "Paste to the current mask slice" ) );
   QtUtils::QtBridge::Connect( this->paste_qaction_, boost::bind( &ActionPaste::Dispatch,
-    Core::Interface::GetWidgetActionContext() ) );
+    Core::Interface::GetWidgetActionContext(), false ) );
   this->paste_qaction_->setEnabled( false );
+
+  this->punch_qaction_ = qmenu->addAction( tr( "Punch Through Volume" ) );
+  this->punch_qaction_->setShortcut( tr( "Ctrl+P" ) );
+  this->punch_qaction_->setToolTip( tr( "Punch the copied mask slice through the volume" ) );
+  QtUtils::QtBridge::Connect( this->punch_qaction_, boost::bind( &ActionPaste::Dispatch,
+    Core::Interface::GetWidgetActionContext(), true ) );
+  this->punch_qaction_->setEnabled( false );
 
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
   this->update_undo_tag( UndoBuffer::Instance()->get_undo_tag() );
@@ -669,6 +676,7 @@ void AppMenu::enable_disable_mask_actions()
   
   this->copy_qaction_->setEnabled( mask_layer_found );
   this->paste_qaction_->setEnabled( mask_layer_found );
+  this->punch_qaction_->setEnabled( mask_layer_found );
 }
 
 void AppMenu::enable_disable_data_layer_actions()

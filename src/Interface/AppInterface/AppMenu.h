@@ -96,6 +96,7 @@ private:
   
   QAction* copy_qaction_;
   QAction* paste_qaction_;
+  QAction* punch_qaction_;
   
   QAction* undo_action_;
   QAction* redo_action_;

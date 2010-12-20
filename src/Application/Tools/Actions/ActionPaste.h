@@ -80,7 +80,7 @@ public:
   // Dispatch the action.
   // This version should only be called from the menu. It will deduce the parameters
   // from the current active viewer and active layer.
-  static void Dispatch( Core::ActionContextHandle context );
+  static void Dispatch( Core::ActionContextHandle context, bool punch_through = false );
 
   // DISPATCH:
   // Dispatch the action.

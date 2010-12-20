@@ -55,6 +55,7 @@ public:
   Core::MaskVolumeSliceHandle vol_slice_;
 
   bool deduce_params_;
+  bool punch_through_;
 };
 
 ActionPaste::ActionPaste() :
@@ -68,6 +69,7 @@ ActionPaste::ActionPaste() :
   this->add_key( this->private_->slot_number_ );
 
   this->private_->deduce_params_ = false;
+  this->private_->punch_through_ = false;
 }
 
 ActionPaste::~ActionPaste()
@@ -108,10 +110,18 @@ bool ActionPaste::validate( Core::ActionContextHandle& context )
     Core::VolumeSliceHandle vol_slice = viewer->get_active_volume_slice();
     this->private_->target_layer_ = boost::dynamic_pointer_cast< MaskLayer >( active_layer );
     this->private_->target_layer_id_.value() = active_layer->get_layer_id();
-    this->private_->min_slice_.value() = vol_slice->get_slice_number();
-    this->private_->max_slice_.value() = vol_slice->get_slice_number();
     this->private_->slice_type_.value() = vol_slice->get_slice_type();
     this->private_->slot_number_.value() = 0;
+    if ( this->private_->punch_through_ )
+    {
+      this->private_->min_slice_.value() = 0;
+      this->private_->max_slice_.value() = vol_slice->number_of_slices() - 1;
+    }
+    else
+    {
+      this->private_->min_slice_.value() = vol_slice->get_slice_number();
+      this->private_->max_slice_.value() = vol_slice->get_slice_number();
+    }
   }
   
   std::string error;
@@ -231,10 +241,11 @@ void ActionPaste::clear_cache()
   this->private_->vol_slice_.reset();
 }
 
-void ActionPaste::Dispatch( Core::ActionContextHandle context )
+void ActionPaste::Dispatch( Core::ActionContextHandle context, bool punch_through )
 {
   ActionPaste* action = new ActionPaste;
   action->private_->deduce_params_ = true;
+  action->private_->punch_through_ = punch_through;
 
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }

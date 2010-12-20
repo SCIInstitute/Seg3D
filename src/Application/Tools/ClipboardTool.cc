@@ -95,7 +95,9 @@ void ClipboardToolPrivate::update_slice_numbers()
   if ( zero_based ) max_slice -= 1;
   this->tool_->copy_slice_number_state_->set_range( min_slice, max_slice );
   this->tool_->paste_min_slice_number_state_->set_range( min_slice, max_slice );
+  this->tool_->paste_min_slice_number_state_->set( min_slice );
   this->tool_->paste_max_slice_number_state_->set_range( min_slice, max_slice );
+  this->tool_->paste_max_slice_number_state_->set( max_slice );
 
   if ( this->tool_->use_active_viewer_state_->get() )
   {
