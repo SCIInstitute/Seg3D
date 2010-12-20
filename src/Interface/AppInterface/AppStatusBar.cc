@@ -240,44 +240,73 @@ void AppStatusBar::update_data_point_label()
     this->private_->ui_.z_->setText( QString::fromUtf8("0.000") );
     this->private_->ui_.value_->setText( QString::fromUtf8("0.000") );
   }
+
   // In the case that the coordinates are outside of .0001-1000.00,
   // format them with scientific notation.
-  else if( ( world_x > 1000 ) || ( world_x > 0.0 && world_x < 0.0001 ) ||
-    ( world_y > 1000 ) || ( world_y > 0.0 && world_y < 0.0001 ) ||
-    ( world_z > 1000 ) || ( world_z > 0.0 && world_z < 0.0001 ) )
+  if( this->show_world_coord_ ) // World coordinates
   {
-    if( this->show_world_coord_ )
+    if( ( 0.0 < world_x && world_x < 0.0001 ) || 1000 < world_x ) // Use scientific notation
     {
       this->private_->ui_.x_->setText( QString( "%1" ).arg( world_x, 0, 'e', 3 ) );
+    }
+    else // Format normally
+    {
+      this->private_->ui_.x_->setText( QString( "%1" ).arg( world_x, 0, 'f', 0 ) );
+    }
+    if( ( 0.0 < world_y && world_y < 0.0001 ) || 1000 < world_y ) // Use scientific notation
+    {
       this->private_->ui_.y_->setText( QString( "%1" ).arg( world_y, 0, 'e', 3 ) );
+    }
+    else // Format normally
+    {
+      this->private_->ui_.y_->setText( QString( "%1" ).arg( world_y, 0, 'f', 0 ) );
+    }
+    if( ( 0.0 < world_z && world_z < 0.0001 ) || 1000 < world_z ) // Use scientific notation
+    {
       this->private_->ui_.z_->setText( QString( "%1" ).arg( world_z, 0, 'e', 3 ) );
     }
-    else
+    else // Format normally
     {
-      this->private_->ui_.x_->setText( QString( "%1" ).arg( index_x, 0, 'f', 0 ) );
-      this->private_->ui_.y_->setText( QString( "%1" ).arg( index_y, 0, 'f', 0 ) );
-      this->private_->ui_.z_->setText( QString( "%1" ).arg( index_z, 0, 'f', 0 ) );
+      this->private_->ui_.z_->setText( QString( "%1" ).arg( world_z, 0, 'f', 0 ) );
     }
-    this->private_->ui_.value_->setText( QString( "%1" ).arg( 
-      this->data_point_info_.value(), 0, 'e', 3 ) );
   }
-  // Otherwise format them normally.
-  else
-  { 
-    if( this->show_world_coord_ )
+  else // Index coordinates
+  {
+    if( 10000 < index_x ) // Use scientific notation
     {
-      this->private_->ui_.x_->setText( QString( "%1" ).arg( world_x, 0, 'f', 3 ) );
-      this->private_->ui_.y_->setText( QString( "%1" ).arg( world_y, 0, 'f', 3 ) );
-      this->private_->ui_.z_->setText( QString( "%1" ).arg( world_z, 0, 'f', 3 ) );
+      this->private_->ui_.x_->setText( QString( "%1" ).arg( index_x, 0, 'e', 3 ) );
     }
-    else
+    else // Format normally
     {
       this->private_->ui_.x_->setText( QString( "%1" ).arg( index_x, 0, 'f', 0 ) );
+    }
+    if( 10000 < index_y ) // Use scientific notation
+    {
+      this->private_->ui_.y_->setText( QString( "%1" ).arg( index_y, 0, 'e', 3 ) );
+    }
+    else // Format normally
+    {
       this->private_->ui_.y_->setText( QString( "%1" ).arg( index_y, 0, 'f', 0 ) );
+    }
+    if( 10000 < index_z ) // Use scientific notation
+    {
+      this->private_->ui_.z_->setText( QString( "%1" ).arg( index_z, 0, 'e', 3 ) );
+    }
+    else // Format normally
+    {
       this->private_->ui_.z_->setText( QString( "%1" ).arg( index_z, 0, 'f', 0 ) );
     }
-    this->private_->ui_.value_->setText( QString( "%1" ).arg( 
-      this->data_point_info_.value(), 0, 'f', 3 ) );
+  }
+
+  // Value 
+  double val = this->data_point_info_.value();
+  if( ( 0.0 < val && val < 0.0001 ) || 1000 < val ) // Use scientific notation
+  {
+    this->private_->ui_.value_->setText( QString( "%1" ).arg( val, 0, 'e', 3 ) );
+  }
+  else // Format normally
+  {
+    this->private_->ui_.value_->setText( QString( "%1" ).arg( val, 0, 'f', 3 ) );
   }
 }
 
