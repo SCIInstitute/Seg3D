@@ -150,6 +150,9 @@ public:
 
   // We're treating this as a boolean.  We use AtomicCounter because it provides thread safety.
   Core::AtomicCounter mouse_pressed_;
+
+  // This flag is set before loading states of the viewer.
+  bool loading_;
 };
 
 void ViewerPrivate::adjust_contrast_brightness( int dx, int dy )
@@ -386,6 +389,12 @@ void ViewerPrivate::delete_layers( std::vector< LayerHandle > layers )
 
 void ViewerPrivate::set_active_layer( LayerHandle layer )
 {
+  if ( !layer )
+  {
+    this->active_layer_slice_.reset();
+    return;
+  }
+  
   Core::VolumeSliceHandle new_active_slice = this->viewer_->
     get_volume_slice( layer->get_layer_id() );
   assert( new_active_slice );
@@ -456,7 +465,7 @@ void ViewerPrivate::set_active_layer( LayerHandle layer )
 
 void ViewerPrivate::change_view_mode( std::string mode, Core::ActionSource source )
 {
-  if ( this->signals_block_count_ > 0 ) return;
+  if ( this->signals_block_count_ > 0 || this->loading_ ) return;
   
   {
     Core::ScopedCounter block_counter( this->signals_block_count_ );
@@ -523,7 +532,7 @@ void ViewerPrivate::change_view_mode( std::string mode, Core::ActionSource sourc
 
 void ViewerPrivate::set_slice_number( int num, Core::ActionSource source )
 {
-  if ( this->signals_block_count_ > 0 ) return;
+  if ( this->loading_ ) return;
 
   const std::string& view_mode = this->viewer_->view_mode_state_->get();
 
@@ -582,7 +591,7 @@ void ViewerPrivate::set_slice_number( int num, Core::ActionSource source )
 
 void ViewerPrivate::change_visibility( bool visible )
 {
-  if ( this->signals_block_count_ > 0 ) return;
+  if ( this->signals_block_count_ > 0 || this->loading_ ) return;
 
   if ( !visible && this->viewer_->lock_state_->get() )
   {
@@ -602,7 +611,7 @@ void ViewerPrivate::change_visibility( bool visible )
 
 void ViewerPrivate::viewer_lock_state_changed( bool locked )
 {
-  if ( this->signals_block_count_ > 0 || locked )
+  if ( this->signals_block_count_ > 0 || this->loading_ || locked )
   {
     return;
   }
@@ -858,6 +867,7 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
   private_( new ViewerPrivate )
 {
   this->private_->viewer_ = this;
+  this->private_->loading_ = false;
   this->private_->signals_block_count_ = 0;
   this->private_->adjusting_contrast_brightness_ = false;
   this->private_->slice_lock_count_ = 0;
@@ -1665,9 +1675,9 @@ void Viewer::update_slice_volume( LayerHandle layer )
 
 bool Viewer::pre_load_states( const Core::StateIO& state_io )
 {
-  // Increase the signal block count the intermediate state changes during session
+  // Set the loading flag so the intermediate state changes during session
   // loading wouldn't cause any updates.
-  this->private_->signals_block_count_++;
+  this->private_->loading_ = true;
   return true;
 }
 
@@ -1704,8 +1714,7 @@ bool Viewer::post_load_states( const Core::StateIO& state_io )
       this->private_->active_layer_slice_->get_slice_number() ) );
   }
 
-  assert( this->private_->signals_block_count_ > 0 );
-  this->private_->signals_block_count_--;
+  this->private_->loading_ = false;
   return true;
 }
 
