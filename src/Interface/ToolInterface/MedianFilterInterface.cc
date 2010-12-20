@@ -92,16 +92,11 @@ bool MedianFilterInterface::build_widget( QFrame* frame )
   
   QtUtils::QtBridge::Show( this->private_->ui_.message_alert_, tool->valid_target_state_, true );
   
-  this->connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), 
-    this, SLOT( run_filter() ) );
+  QtUtils::QtBridge::Connect( this->private_->ui_.runFilterButton, boost::bind(
+    &Tool::execute, tool, Core::Interface::GetWidgetActionContext() ) );
 
   return true;
 
 } // end build_widget
   
-void MedianFilterInterface::run_filter()
-{
-  tool()->execute( Core::Interface::GetWidgetActionContext() );
-}
-
 } // end namespace Seg3D

@@ -82,15 +82,6 @@ bool OtsuThresholdFilterInterface::build_widget( QFrame* frame )
   
   // Step 3 - Qt connections
   {
-    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() ); 
-    this->private_->ui_.target_layer_->setDisabled( tool->use_active_layer_state_->get() );
-
-    this->connect( this->private_->ui_.use_active_layer_, SIGNAL( toggled( bool ) ),
-      this->private_->ui_.target_layer_, SLOT( setDisabled( bool ) ) );
-
-    this->connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), 
-      this, SLOT( run_filter() ) );
-
     this->connect( this->private_->ui_.target_layer_, SIGNAL( currentIndexChanged( QString ) ), 
       this, SLOT( refresh_histogram( QString ) ) );
   }
@@ -110,14 +101,14 @@ bool OtsuThresholdFilterInterface::build_widget( QFrame* frame )
     
   QtUtils::QtBridge::Enable( this->private_->ui_.histogram_, tool->valid_target_state_ );
 
+  QtUtils::QtBridge::Enable( this->private_->ui_.target_layer_, 
+    tool->use_active_layer_state_, true );
+  QtUtils::QtBridge::Connect( this->private_->ui_.runFilterButton, boost::bind(
+    &Tool::execute, tool, Core::Interface::GetWidgetActionContext() ) );
+
   return true;
   
 } // end build_widget
-  
-void OtsuThresholdFilterInterface::run_filter()
-{
-  tool()->execute( Core::Interface::GetWidgetActionContext() );
-}
 
 void OtsuThresholdFilterInterface::refresh_histogram( QString layer_name )
 {

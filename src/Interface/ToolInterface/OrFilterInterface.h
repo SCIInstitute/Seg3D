@@ -58,10 +58,6 @@ public:
   // This function builds the actual GUI
   virtual bool build_widget( QFrame* frame );
   
-// -- run filter --
-private Q_SLOTS:
-  void run_filter();
-
 private:
   boost::shared_ptr< OrFilterInterfacePrivate > private_;
 

@@ -60,8 +60,6 @@ public:
   
 // -- run filter --
 private Q_SLOTS:
-  void run_filter();
-  
   void refresh_histogram( QString layer_name );
 
 // -- filter internals --
