@@ -685,6 +685,7 @@ void LayerManager::delete_layers(  std::vector< std::string > layers  )
   // signal the listeners
   if( group_deleted )
   {   
+    if( active_layer_changed ) this->private_->active_layer_ = LayerHandle();
       this->group_deleted_signal_( group );
     this->groups_changed_signal_();
   }
@@ -694,12 +695,10 @@ void LayerManager::delete_layers(  std::vector< std::string > layers  )
     this->group_internals_changed_signal_( group );
   }
   
-//  std::vector<LayerHandle> layer_vector( 1 );
-//  layer_vector[ 0 ] = layer;
   this->layers_deleted_signal_( layer_vector );
   this->layers_changed_signal_();
   
-  if ( active_layer_changed )
+  if ( active_layer_changed && this->private_->active_layer_ )
   {
     this->active_layer_changed_signal_( this->private_->active_layer_ );
   }
