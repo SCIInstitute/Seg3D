@@ -135,7 +135,7 @@ int main( int argc, char **argv )
   std::vector< wchar_t > program_name( name_len + 1 );
   mbstowcs( &program_name[ 0 ], argv[ 0 ], name_len + 1 );
   Seg3D::PythonInterpreter::Instance()->initialize( &program_name[ 0 ] );
-  //Seg3D::PythonInterpreter::Instance()->start_terminal();
+  Seg3D::PythonInterpreter::Instance()->start_terminal();
 #endif
 
   // -- Setup Application Interface Window --

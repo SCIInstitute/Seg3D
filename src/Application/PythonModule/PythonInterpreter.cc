@@ -27,7 +27,7 @@
  */
 
 #include <Python.h>
-
+#include <boost/python.hpp>
 #include <boost/thread/mutex.hpp>
 
 #include <Core/Utils/Exception.h>
@@ -35,10 +35,74 @@
 
 #include <Application/PythonModule/ActionModule.h>
 #include <Application/PythonModule/PythonInterpreter.h>
+#include <Application/PythonModule/AbstractPythonTerminalInterface.h>
 
-// Py_IgnoreEnvironmentFlag
-// defined in pythonrun.c
+//////////////////////////////////////////////////////////////////////////
+// Python flags defined in pythonrun.c
+//////////////////////////////////////////////////////////////////////////
+
+// Py_IgnoreEnvironmentFlag:
+// Set this flag to tell python to ignore environment variables.
 extern int Py_IgnoreEnvironmentFlag;
+
+// Py_InteractiveFlag:
+// Set this flag to run the interpreter in interactive mode when Py_Main is called.
+extern int Py_InteractiveFlag;
+
+// Py_InspectFlag:
+// Set this flag so the program won't exit at SystemError
+extern int Py_InspectFlag;
+
+//////////////////////////////////////////////////////////////////////////
+// Class PythonTerminal
+//////////////////////////////////////////////////////////////////////////
+class PythonTerminal
+{
+public:
+
+  void install_interface( Seg3D::AbstractPythonTerminalInterfaceHandle interface )
+  {
+    this->terminal_interface_ = interface;
+  }
+
+  boost::python::object read( int n )
+  {
+    if ( !this->terminal_interface_ )
+    {
+      CORE_THROW_LOGICERROR( "No Python terminal interface has been installed" );
+    }
+
+    std::string data = this->terminal_interface_->read( n );
+    boost::python::str pystr( data.c_str() );
+    return pystr.encode();
+  }
+
+  std::string readline()
+  {
+    return this->terminal_interface_->read( -1 );
+  }
+
+  int write( std::string data )
+  {
+    if ( !this->terminal_interface_ )
+    {
+      CORE_THROW_LOGICERROR( "No Python terminal interface has been installed" );
+    }
+
+    //std::string str_data = boost::python::extract< std::string >( data.attr( "decode" )() );
+    return this->terminal_interface_->write( data );
+  }
+
+  Seg3D::AbstractPythonTerminalInterfaceHandle terminal_interface_;
+};
+
+BOOST_PYTHON_MODULE( interpreter )
+{
+  boost::python::class_< PythonTerminal >( "terminal" )
+    .def( "read", &PythonTerminal::read )
+    .def( "read", &PythonTerminal::readline )
+    .def( "write", &PythonTerminal::write );
+}
 
 namespace Seg3D
 {
@@ -72,18 +136,52 @@ PythonInterpreter::PythonInterpreter() :
 
 PythonInterpreter::~PythonInterpreter()
 {
-  Py_Finalize();
+  // NOTE: Boost.Python requires that we don't call Py_Finalize
+  //Py_Finalize();
 }
 
 void PythonInterpreter::initialize_eventhandler()
 {
+  using namespace boost::python;
+
   PythonInterpreterPrivate::lock_type lock( this->private_->get_mutex() );
   PyImport_AppendInittab( "seg3d", PyInit_seg3d );
+  PyImport_AppendInittab( "interpreter", PyInit_interpreter );
   Py_SetProgramName( this->private_->program_name_ );
   Py_IgnoreEnvironmentFlag = 1;
+  Py_InspectFlag = 1;
+  Py_InteractiveFlag = 1;
   Py_Initialize();
   PyRun_SimpleString( "import seg3d\n"
     "from seg3d import *\n" );
+  PyRun_SimpleString( "import interpreter\n" );
+  PyRun_SimpleString( "term = interpreter.terminal()\n" );
+  boost::python::object main_module = boost::python::import( "__main__" );
+  boost::python::object main_namespace = main_module.attr( "__dict__" );
+  boost::python::dict main_dict = boost::python::extract< dict >( main_namespace );
+  boost::python::extract< PythonTerminal& > X( main_dict[ "term" ] );
+  if ( X.check() )
+  {
+    PythonTerminal& pyterm = X();
+    pyterm.install_interface( AbstractPythonTerminalInterfaceHandle( new AbstractPythonTerminalInterface ) );
+  }
+  PyRun_SimpleString( "import sys\n" 
+    "sys.stdin = term\n"
+    "sys.stdout = term\n"
+    "sys.stderr = term\n" );
+
+  object sys_module = import( "sys" );
+  object sys_stdin = sys_module.attr( "stdin" );
+  extract< FILE* > stdin_extractor( sys_stdin );
+  if ( stdin_extractor.check() )
+  {
+    FILE* fp = stdin_extractor();
+  }
+
+  PyRun_SimpleString( "term.write('hello')\n" );
+  PyRun_SimpleString( "cmd = sys.stdin.read()\n" 
+    "print(cmd)\n" );
+
   this->private_->thread_condition_variable_.notify_one();
 }
 
@@ -177,11 +275,11 @@ void PythonInterpreter::start_terminal()
   //Py_DECREF(sys);
   //Py_DECREF(io);
   //Py_DECREF(pystdout);
-  //wchar_t** argv = new wchar_t*[ 2 ];
-  //argv[ 0 ] = this->private_->program_name_;
-  //argv[ 1 ] = L"";
-  //Py_Main( 1, argv );
-  //delete[] argv;
+  wchar_t** argv = new wchar_t*[ 2 ];
+  argv[ 0 ] = this->private_->program_name_;
+  argv[ 1 ] = 0;
+  Py_Main( 1, argv );
+  delete[] argv;
   
   lock.lock();
   this->private_->terminal_running_ = false;

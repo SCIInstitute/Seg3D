@@ -38,10 +38,16 @@ SET(APPLICATION_PYTHONMODULE_SRCS
   PythonInterpreter.cc
   PythonActionContext.h
   PythonActionContext.cc
+  AbstractPythonTerminalInterface.h
+  AbstractPythonTerminalInterface.cc
 )
 
 CORE_ADD_LIBRARY(Application_PythonModule 
       ${APPLICATION_PYTHONMODULE_SRCS})
+      
+SET_TARGET_PROPERTIES(Application_PythonModule
+                      PROPERTIES
+                      COMPILE_DEFINITIONS "BOOST_PYTHON_STATIC_MODULE")
             
 TARGET_LINK_LIBRARIES(Application_PythonModule
                       Core_Utils

@@ -169,6 +169,8 @@ OPTION(BUILD_WITH_PYTHON "Build with python support." OFF)
 IF(BUILD_WITH_PYTHON)
   ADD_DEFINITIONS(-DBUILD_WITH_PYTHON 
           -DPy_NO_ENABLE_SHARED 
+          -DBOOST_PYTHON_STATIC_MODULE
+          -DBOOST_PYTHON_STATIC_LIB 
           -DLANDMARK=L"lib\\\\pythonlib.zip"
           -DPYTHONPATH=L".\\\\lib\\\\pythonlib.zip")
   FILE(COPY Externals/python/pythonlib.zip DESTINATION ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG})
