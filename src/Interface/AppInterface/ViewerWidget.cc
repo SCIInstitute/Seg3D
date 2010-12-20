@@ -297,8 +297,8 @@ int ViewerWidget::get_minimum_size()
 {
   // We start with padding the minimum width by 1 because of the 1px margin on the left-hand side
   int minimum_width = 0;
-  if( this->private_->ui_.line_->isVisible() ) minimum_width += 3;
-  if( this->private_->ui_.sep_line_->isVisible() ) minimum_width += 3;
+  if( !this->private_->ui_.line_->isHidden() ) minimum_width += 3;
+  if( !this->private_->ui_.sep_line_->isHidden() ) minimum_width += 3;
   
   
   // Next we get the width of the viewer mode holder and we pad it by 2 for the left and right 
@@ -307,11 +307,11 @@ int ViewerWidget::get_minimum_size()
   
   // Now we combine them.
   minimum_width = minimum_width + viewer_mode_width;
-  
+
   // Now we add the sizes of the visible buttons plus a 1px padding for the right hand margin
   for( int i = 0; i < this->private_->buttons_.size(); ++i )
   { 
-    if( this->private_->buttons_[ i ]->isVisible() ) 
+    if( !this->private_->buttons_[ i ]->isHidden() ) 
     {
       minimum_width = minimum_width + this->private_->buttons_[ i ]->minimumWidth();// + 1;
     }
