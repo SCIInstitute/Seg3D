@@ -150,6 +150,10 @@ public:
   // Called when a key is pressed
   virtual bool handle_key_press( ViewerHandle viewer, int key, int modifiers );
 
+  // HANDLE_UPDATE_CURSOR:
+  // Called when a viewer requires an update to its cursor.
+  virtual bool handle_update_cursor( ViewerHandle viewer );
+
 public:
   // REDRAW:
   // Draw the tool in the specified viewer. Default implementation does nothing.

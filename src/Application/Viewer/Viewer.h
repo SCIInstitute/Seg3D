@@ -84,6 +84,7 @@ public:
   typedef boost::function< bool( ViewerHandle ) > leave_event_handler_type;
   typedef boost::function< bool( ViewerHandle, int, int, int, int, int ) > wheel_event_handler_type;
   typedef boost::function< bool( ViewerHandle, int, int ) > key_press_event_handler_type;
+  typedef boost::function< bool( ViewerHandle ) > cursor_handler_type;
 
   virtual void mouse_move_event( const Core::MouseHistory& mouse_history, 
     int button, int buttons, int modifiers );
@@ -104,6 +105,7 @@ public:
   void set_mouse_leave_handler( leave_event_handler_type func );
   void set_wheel_event_handler( wheel_event_handler_type func );
   void set_key_press_event_handler( key_press_event_handler_type func );
+  void set_cursor_handler( cursor_handler_type func );
   void reset_mouse_handlers();
 
   // IS_BUSY:

@@ -94,8 +94,6 @@ public:
   void flood_fill( Core::ActionContextHandle context, bool erase, 
     ViewerHandle viewer = ViewerHandle() );
 
-  void update_cursors( Core::CursorShape shape );
-
   //PAINT:
   // Paint on the target layer with the brush centered at (x0, y0).
   void paint( const PaintInfo& paint_info, int xc, int yc, int& paint_count );
@@ -136,8 +134,6 @@ public:
   PaintTool* paint_tool_;
   int center_x_;
   int center_y_;
-  double world_x_;
-  double world_y_;
 
   // The radius used to build the mask. It might be different from the value stored in the 
   // state variable.
@@ -743,24 +739,6 @@ void PaintToolPrivate::flood_fill( Core::ActionContextHandle context,
   ActionFloodFill::Dispatch( context, ff_params );
 }
 
-
-void PaintToolPrivate::update_cursors( Core::CursorShape shape )
-{
-  size_t num_viewers = ViewerManager::Instance()->number_of_viewers();
-  for (size_t j = 0; j < num_viewers; j++ )
-  {
-    ViewerHandle viewer = ViewerManager::Instance()->get_viewer( j );
-    if ( viewer->view_mode_state_->get() != Viewer::VOLUME_C )
-    {
-      viewer->set_cursor( shape );
-    }
-    else
-    {
-      viewer->set_cursor( Core::CursorShape::ARROW_E );
-    }
-  } 
-}
-
 bool PaintToolPrivate::check_paintable( ViewerHandle viewer )
 {
   bool paintable = false;
@@ -879,9 +857,12 @@ void PaintTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
   {
     PaintToolPrivate::lock_type private_lock( this->private_->get_mutex() );
     current_viewer = this->private_->viewer_;
-    world_x = this->private_->world_x_;
-    world_y = this->private_->world_y_;
-
+    if ( current_viewer && !current_viewer->is_volume_view() )
+    {
+      current_viewer->window_to_world( this->private_->center_x_, this->private_->center_y_,
+        world_x, world_y );
+    }
+    
     this->private_->initialize();
     this->private_->upload_mask_texture();
     radius = this->private_->radius_;
@@ -941,11 +922,7 @@ void PaintTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
   
   float opacity = 1.0f;
 
-  // Compute the position of the brush in world space
-  // NOTE: The size of the brush needs to be extended by half of the voxel size in each
-  // direction in order to visually align with the target mask layer.
-  int i, j;
-  target_slice->world_to_index( world_x, world_y, i, j );
+
   double voxel_width = ( target_slice->right() - target_slice->left() ) / 
     ( target_slice->nx() - 1 );
   double voxel_height = ( target_slice->top() - target_slice->bottom() ) /
@@ -1018,6 +995,11 @@ void PaintTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
   
   if ( brush_visible && current_viewer_mode == redraw_viewer_mode )
   {
+    // Compute the position of the brush in world space
+    // NOTE: The size of the brush needs to be extended by half of the voxel size in each
+    // direction in order to visually align with the target mask layer.
+    int i, j;
+    target_slice->world_to_index( world_x, world_y, i, j );
     double left = target_slice->left() + ( i - radius - 0.5 ) * voxel_width;
     double right = target_slice->left() + ( i + radius + 0.5 ) * voxel_width;
     double bottom = target_slice->bottom() + ( j - radius - 0.5 ) * voxel_height;
@@ -1077,8 +1059,6 @@ bool PaintTool::handle_mouse_enter( ViewerHandle viewer, int x, int y )
     this->private_->brush_visible_ = true;
     this->private_->center_x_ = x;
     this->private_->center_y_ = y;
-    this->private_->viewer_->window_to_world( x, y, 
-      this->private_->world_x_, this->private_->world_y_ );
   }
 
   return true;
@@ -1115,6 +1095,8 @@ bool PaintTool::handle_mouse_move( ViewerHandle viewer,
   {
     PaintToolPrivate::lock_type lock( this->private_->get_mutex() );
     this->private_->viewer_ = viewer;
+    this->private_->center_x_ = mouse_history.current_.x_;
+    this->private_->center_y_ = mouse_history.current_.y_;
   }
 
   // If it is a volume view we cannot do any painting
@@ -1159,22 +1141,7 @@ bool PaintTool::handle_mouse_move( ViewerHandle viewer,
         mouse_history.current_.y_ );
     }
   }
-  
-  // Figure out where the mouse is in the window
-  double world_x, world_y;
-  // Translate the coordinates
-  this->private_->viewer_->window_to_world( mouse_history.current_.x_, 
-    mouse_history.current_.y_, world_x, world_y );
-  
-  // Record the values into the paint tool
-  {
-    PaintToolPrivate::lock_type lock( this->private_->get_mutex() );
-    this->private_->center_x_ = mouse_history.current_.x_;
-    this->private_->center_y_ = mouse_history.current_.y_;
-    this->private_->world_x_ = world_x;
-    this->private_->world_y_ = world_y;
-  }
-
+    
   // If a brush is shown update all viewers that need the brush
   if ( this->private_->brush_visible_ )
   {
@@ -1224,8 +1191,6 @@ bool PaintTool::handle_mouse_press( ViewerHandle viewer,
     PaintToolPrivate::lock_type lock( this->private_->get_mutex() );
     this->private_->center_x_ = mouse_history.current_.x_;
     this->private_->center_y_ = mouse_history.current_.y_;
-    this->private_->world_x_ = world_x;
-    this->private_->world_y_ = world_y;
   }
 
   bool paintable = false;
@@ -1386,6 +1351,42 @@ bool PaintTool::handle_wheel( ViewerHandle viewer, int delta,
   return false;
 }
 
+bool PaintTool::handle_update_cursor( ViewerHandle viewer )
+{
+  {
+    PaintToolPrivate::lock_type lock( this->private_->get_mutex() );
+    // Only need to update the cursor for the viewer that currently have focus
+    if ( this->private_->viewer_ != viewer || this->private_->painting_ ) 
+    {
+      return false;
+    }
+  }
+
+  bool cursor_invisible;
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    cursor_invisible = PreferencesManager::Instance()->paint_cursor_invisibility_state_->get();
+  }
+
+  if ( viewer->is_volume_view() )
+  {
+    viewer->set_cursor( Core::CursorShape::ARROW_E );
+  }
+  else
+  {
+    if ( this->private_->check_paintable( viewer ) && cursor_invisible )
+    {
+      viewer->set_cursor( Core::CursorShape::BLANK_E );
+    }
+    else
+    {
+      viewer->set_cursor( Core::CursorShape::CROSS_E );
+    }
+  }
+
+  return true;
+}
+
 bool PaintTool::post_load_states()
 {
   this->private_->handle_layers_changed();
@@ -1423,7 +1424,7 @@ bool PaintTool::paint( const PaintInfo& paint_info )
   return false;
 }
 
-void PaintTool::HandlePaint( PaintToolWeakHandle tool, const PaintInfo& info )
+void PaintTool::HandlePaint( PaintToolWeakHandle tool, const PaintInfo info )
 {
   if ( !( Core::Application::IsApplicationThread() ) )
   {
@@ -1445,6 +1446,11 @@ void PaintTool::flood_fill( Core::ActionContextHandle context, bool erase )
 
 bool PaintTool::handle_key_press( ViewerHandle viewer, int key, int modifiers )
 {
+  if ( this->private_->painting_ )
+  {
+    return true;
+  }
+  
   if ( key == Core::Key::KEY_F_E )
   {
     this->private_->flood_fill( Core::Interface::GetKeyboardActionContext(), false, viewer );

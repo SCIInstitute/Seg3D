@@ -136,6 +136,10 @@ public:
   // HANDLE_KEY_PRESS:
   // Called when a key is pressed.
   virtual bool handle_key_press( ViewerHandle viewer, int key, int modifiers );
+
+  // HANDLE_UPDATE_CURSOR:
+  // Called when a viewer requires an update to its cursor.
+  virtual bool handle_update_cursor( ViewerHandle viewer );
   
   // REDRAW:
   // Draw the paint tool in the specified viewer.
@@ -167,7 +171,7 @@ private:
   
   // HANDLEPAINT:
   // THis function is called to relay the paint call to the application thread
-  static void HandlePaint( PaintToolWeakHandle tool, const PaintInfo& info );
+  static void HandlePaint( PaintToolWeakHandle tool, const PaintInfo info );
 
 public:
   void flood_fill( Core::ActionContextHandle context, bool erase );

@@ -145,6 +145,7 @@ public:
   Viewer::leave_event_handler_type mouse_leave_handler_;
   Viewer::wheel_event_handler_type wheel_event_handler_;
   Viewer::key_press_event_handler_type key_press_event_handler_;
+  Viewer::cursor_handler_type cursor_handler_;
 
   ViewManipulatorHandle view_manipulator_;
 
@@ -472,13 +473,17 @@ void ViewerPrivate::change_view_mode( std::string mode, Core::ActionSource sourc
     this->viewer_->lock_state_->set( false );
   }
 
+
+  if ( !this->cursor_handler_ || !this->cursor_handler_( this->viewer_->shared_from_this() ) )
+  {
+    this->viewer_->set_cursor( mode == Viewer::VOLUME_C ? Core::CursorShape::ARROW_E : 
+      Core::CursorShape::CROSS_E );
+  }
+  
   if ( mode == Viewer::VOLUME_C )
   {
-    this->viewer_->set_cursor( Core::CursorShape::ARROW_E );
     return;
   }
-
-  this->viewer_->set_cursor( Core::CursorShape::CROSS_E );
 
   Core::VolumeSliceType slice_type( Core::VolumeSliceType::AXIAL_E );
   if ( mode == Viewer::CORONAL_C )
@@ -621,9 +626,18 @@ void ViewerPrivate::viewer_lock_state_changed( bool locked )
 
 void ViewerPrivate::layer_state_changed( int affected_view_modes )
 {
-  if ( ( this->viewer_->is_volume_view() && 
+  bool volume_view = this->viewer_->is_volume_view();
+
+  // NOTE: Normally layer state changes wouldn't require cursor updates,
+  // so we only let the handler do what's necessary.
+  if ( this->cursor_handler_ )
+  {
+    this->cursor_handler_( this->viewer_->shared_from_this() );
+  }
+
+  if ( ( volume_view && 
     ( affected_view_modes & ViewModeType::VOLUME_E ) != 0 ) ||
-    ( !this->viewer_->is_volume_view() && 
+    ( !volume_view && 
     ( affected_view_modes & ViewModeType::NON_VOLUME_E ) != 0 ) )
   {
     this->viewer_->redraw_scene();
@@ -1384,6 +1398,11 @@ void Viewer::set_key_press_event_handler( key_press_event_handler_type func )
   this->private_->key_press_event_handler_ = func;
 }
 
+void Viewer::set_cursor_handler( cursor_handler_type func )
+{
+  this->private_->cursor_handler_ = func;
+}
+
 void Viewer::reset_mouse_handlers()
 {
   this->private_->mouse_move_handler_ = 0;
@@ -1393,6 +1412,7 @@ void Viewer::reset_mouse_handlers()
   this->private_->mouse_leave_handler_ = 0;
   this->private_->wheel_event_handler_ = 0;
   this->private_->key_press_event_handler_ = 0;
+  this->private_->cursor_handler_ = 0;
 }
 
 bool Viewer::is_busy()

@@ -171,6 +171,12 @@ bool Tool::handle_key_press( ViewerHandle viewer, int key, int modifiers )
   return false;
 }
 
+bool Tool::handle_update_cursor( ViewerHandle viewer )
+{
+  // Default implementation doesn't handle this event
+  return false;
+}
+
 void Tool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 {
 }
