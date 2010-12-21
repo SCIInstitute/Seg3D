@@ -404,6 +404,20 @@ IF(WIN32 AND NOT UNIX)
   SET(CPACK_NSIS_CONTACT "seg3d-users@sci.utah.edu")
   SET(CPACK_NSIS_MODIFY_PATH ON)
   SET(CPACK_PACKAGE_EXECUTABLES "Seg3D2" "Seg3D2")
+  SET(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "
+  WriteRegStr HKCR '.nrrd' '' 'Seg3D2'
+  WriteRegStr HKCR 'Seg3D2' '' 'Seg3D2 Data File'
+  WriteRegStr HKCR 'Seg3D2\\\\shell' '' 'open'
+  WriteRegStr HKCR 'Seg3D2\\\\DefaultIcon' '' '$INSTDIR\\\\bin\\\\Seg3D2.exe,0'
+  WriteRegStr HKCR 'Seg3D2\\\\shell\\\\open\\\\command' '' '$INSTDIR\\\\bin\\\\Seg3D2.exe \\\"%1\\\"'
+  WriteRegStr HKCR 'Seg3D2\\\\shell\\\\edit' '' 'Edit Seg3D2 Data File'
+  WriteRegStr HKCR 'Seg3D2\\\\shell\\\\edit\\\\command' '' '$INSTDIR\\\\bin\\\\Seg3D2.exe \\\"%1\\\"'
+  System::Call 'Shell32::SHChangeNotify( i 0x800000, i 0, i 0, i 0)'
+  ")
+  SET(CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS "
+  DeleteRegKey HKCR '.nrrd'
+  DeleteRegKey HKCR 'Seg3D2'
+  ")
 ELSE(WIN32 AND NOT UNIX)
   IF(APPLE)
     SET(CPACK_PACKAGE_DEFAULT_LOCATION "/Applications/")
