@@ -147,7 +147,8 @@ ProjectDockWidget::ProjectDockWidget( QWidget *parent ) :
 
     connect( this->private_->ui_.sessions_list_, SIGNAL( cellClicked ( int, int ) ), 
       this, SLOT( enable_load_delete_and_export_buttons( int, int ) ) );
-
+    
+    QtUtils::QtBridge::Enable( this, ProjectManager::Instance()->project_saved_state_ );
     
     QStringList headers;
     headers << "Time:" << "Session Name:";
@@ -156,8 +157,9 @@ ProjectDockWidget::ProjectDockWidget( QWidget *parent ) :
     this->private_->ui_.horizontalLayout_2->setAlignment( Qt::AlignHCenter );
 
     this->disable_load_delete_and_export_buttons();
-  
+
   }
+
 }
 
 ProjectDockWidget::~ProjectDockWidget()

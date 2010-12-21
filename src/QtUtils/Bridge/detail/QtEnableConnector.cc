@@ -58,6 +58,23 @@ QtEnableConnector::QtEnableConnector( QWidget* parent,
   }
 
 }
+  
+  QtEnableConnector::QtEnableConnector( QAction* action_parent, 
+    Core::StateBoolHandle& state, bool opposite_logic ) :
+    action_parent_( action_parent ),
+    opposite_logic_( opposite_logic )
+  {
+    QPointer< QtEnableConnector > qpointer( this );
+    
+    {
+      Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+      action_parent->setEnabled( state->get() ^ this->opposite_logic_ );
+      
+      this->add_connection( state->value_changed_signal_.connect(
+        boost::bind( &QtEnableConnector::EnableAction, qpointer, _1 ) ) );
+    }
+    
+  }
 
 QtEnableConnector::QtEnableConnector( QtHistogramWidget* histogram, 
   Core::StateBoolHandle& state, bool opposite_logic ) :
@@ -163,6 +180,25 @@ void QtEnableConnector::EnableWidget( QPointer< QtEnableConnector > qpointer )
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
   qpointer->parent_->setEnabled( qpointer->condition_() );
 }
+  
+  void QtEnableConnector::EnableAction( 
+     QPointer< QtEnableConnector > qpointer, 
+     bool enabled )
+  {
+    if ( !Core::Interface::IsInterfaceThread() )
+    {
+      Core::Interface::PostEvent( boost::bind( &QtEnableConnector::EnableAction,
+        qpointer, enabled ) );
+      return;
+    }
+    
+    if ( qpointer.isNull() || QCoreApplication::closingDown() )
+    {
+      return;
+    }
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    qpointer->action_parent_->setEnabled( enabled ^ qpointer->opposite_logic_ );
+  }
 
 
 } // end namespace QtUtils

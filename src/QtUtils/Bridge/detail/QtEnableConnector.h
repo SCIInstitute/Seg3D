@@ -31,6 +31,7 @@
 
 #include <QObject>
 #include <QPointer>
+#include <QAction>
 
 #include <Core/Utils/ConnectionHandler.h>
 #include <QtUtils/Widgets/QtHistogramWidget.h>
@@ -44,6 +45,7 @@ class QtEnableConnector : public QObject, protected Core::ConnectionHandler
   Q_OBJECT
 public:
   QtEnableConnector( QWidget* parent, Core::StateBoolHandle& state, bool opposite_logic );
+  QtEnableConnector( QAction* action_parent, Core::StateBoolHandle& state, bool opposite_logic );
   QtEnableConnector( QtHistogramWidget* histogram, Core::StateBoolHandle& state, bool opposite_logic );
   QtEnableConnector( QWidget* parent, Core::StateBaseHandle state,
     boost::function< bool () > condition );
@@ -54,11 +56,13 @@ public:
   // -- slot functions for boost signals --
 private:
   static void EnableWidget( QPointer< QtEnableConnector > qpointer, bool enabled );
+  static void EnableAction( QPointer< QtEnableConnector > qpointer, bool enabled );
   static void EnableWidget( QPointer< QtEnableConnector > qpointer );
 
   // -- internal variables --
 private:
   QWidget* parent_;
+  QAction* action_parent_;
   bool histogram_widget_;
   bool opposite_logic_;
   boost::function< bool () > condition_;

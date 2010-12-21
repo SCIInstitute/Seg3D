@@ -154,6 +154,7 @@ public:
   static void Connect( QListWidget* qwidget, Core::StateStringVectorHandle& state );
 
   // Enable / Disable a button from state engine
+  static void Enable( QAction* qaction, Core::StateBoolHandle& state, bool opposite_logic = false );
   static void Enable( QWidget* qwidget, Core::StateBoolHandle& state, bool opposite_logic = false );
   static void Enable( QtHistogramWidget* histogram, Core::StateBoolHandle& state, bool opposite_logic = false );
 

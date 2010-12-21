@@ -62,6 +62,7 @@ ProjectManager::ProjectManager() :
   this->add_state( "current_project_path", this->current_project_path_state_, 
     PreferencesManager::Instance()->project_path_state_->get() );
   this->add_state( "default_project_name_counter", this->default_project_name_counter_state_, 0 );
+  this->add_state( "project_saved", this->project_saved_state_, false );
 
   try
   {
@@ -89,7 +90,7 @@ ProjectManager::ProjectManager() :
 
   this->set_initializing( false );
     
-  this->current_project_ = ProjectHandle( new Project( "default_project" ) );
+  this->current_project_ = ProjectHandle( new Project( "untitled_project" ) );
 
   // Connect the signals from the LayerManager to the GUI
   this->add_connection( this->current_project_->project_name_state_->value_changed_signal_.connect( 
@@ -197,42 +198,53 @@ void ProjectManager::rename_project( const std::string& new_name, Core::ActionSo
   
 }
 
-void ProjectManager::new_project( const std::string& project_name, const std::string& project_path )
+void ProjectManager::new_project( const std::string& project_name, const std::string& project_path, bool save_on_creation )
 {
   // Reset the application.
   Core::Application::Reset();
-
+  
+  this->project_saved_state_->set( false );
   this->changing_projects_ = true;
-  this->current_project_->project_name_state_->set( project_name );
 
-  boost::filesystem::path path = complete( boost::filesystem::path( project_path, 
-    boost::filesystem::native ) );
-
-  if( this->create_project_folders( path, this->current_project_->project_name_state_->get() ) )
+  std::vector< std::string > empty_vector;
+  this->current_project_->sessions_state_->set( empty_vector );
+  this->current_project_->project_notes_state_->set( empty_vector );
+  this->current_project_->save_custom_colors_state_->set( false );
+  this->current_project_->clear_datamanager_list();
+  ToolManager::Instance()->open_default_tools();
+  
+  if( save_on_creation )
   {
+    this->current_project_->project_name_state_->set( project_name );
+    
     if( project_name.compare( 0, 11, "New Project" ) == 0 )
     {
       this->default_project_name_counter_state_->set( 
         this->default_project_name_counter_state_->get() + 1 ); 
     }
     
-    boost::filesystem::path path = project_path;
-    path = path / project_name;
+    boost::filesystem::path path = complete( boost::filesystem::path( project_path, 
+      boost::filesystem::native ) );
 
-    std::vector< std::string > empty_vector;
-    this->set_project_path( path );
-    this->current_project_->sessions_state_->set( empty_vector );
-    this->current_project_->project_notes_state_->set( empty_vector );
-    this->current_project_->save_custom_colors_state_->set( false );
-    this->current_project_->clear_datamanager_list();
-    ToolManager::Instance()->open_default_tools();
-    this->save_project( true );
+    if( this->create_project_folders( path, this->current_project_->project_name_state_->get() ) )
+    {
+      boost::filesystem::path path = project_path;
+      path = path / project_name;
+
+      this->set_project_path( path );
+      this->save_project( true );
+      this->set_last_saved_session_time_stamp();
+      AutoSave::Instance()->recompute_auto_save();
+      this->project_saved_state_->set( true );
+    }
+  }
+  else
+  {
+    PreferencesManager::Instance()->auto_save_state_->set( false );
   }
 
   this->changing_projects_ = false;
-  
-  this->set_last_saved_session_time_stamp();
-  AutoSave::Instance()->recompute_auto_save();
+
 }
   
 void ProjectManager::open_project( const std::string& project_path )
@@ -586,12 +598,24 @@ bool ProjectManager::project_save_as( const std::string& export_path, const std:
     boost::filesystem::native ) );
 
   this->create_project_folders( path, project_name );
-  this->save_project_only( export_path, project_name );
-  if( !this->current_project_->save_as( path, project_name ) ) return false;
   
-  this->set_project_path( path / project_name );
-  this->current_project_->project_name_state_->set( project_name );
   
+  if( this->project_saved_state_->get() == true )
+  {
+    this->save_project_only( export_path, project_name );
+    
+    if( !this->current_project_->save_as( path, project_name ) ) return false;
+    this->set_project_path( path / project_name );
+    this->current_project_->project_name_state_->set( project_name );
+  }
+  else
+  {
+    this->set_project_path( path / project_name );
+    this->current_project_->project_name_state_->set( project_name );
+    this->save_project( true );
+    this->project_saved_state_->set( true );
+  }
+
   this->set_last_saved_session_time_stamp();
 
   StatusBar::Instance()->set_message( Core::LogMessageType::MESSAGE_E, 

@@ -69,7 +69,8 @@ private:
 public:
   // NEW_PROJECT:
   // this function sets the state values of the current project to reflect the desired values
-  void new_project( const std::string& project_name, const std::string& project_path );
+  void new_project( const std::string& project_name = "", const std::string& project_path = "", 
+    bool save_on_creation = true );
   
   // OPEN_PROJECT:
   // this function takes the path to the desired project and loads the values from the file 
@@ -134,6 +135,7 @@ public:
   Core::StateStringVectorHandle recent_projects_state_;
   Core::StateStringHandle     current_project_path_state_;
   Core::StateIntHandle      default_project_name_counter_state_;
+  Core::StateBoolHandle     project_saved_state_;
   ProjectHandle         current_project_;
 
 private:
@@ -179,7 +181,6 @@ private:
 
   bool            session_saving_;
   bool            changing_projects_;
-
 
 };
 

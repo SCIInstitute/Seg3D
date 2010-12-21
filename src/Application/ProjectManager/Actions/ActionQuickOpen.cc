@@ -31,68 +31,50 @@
 
 // Application includes
 #include <Application/ProjectManager/ProjectManager.h>
-#include <Application/ProjectManager/Actions/ActionSaveProjectAs.h>
+#include <Application/LayerManager/LayerManager.h>
+#include <Application/UndoBuffer/UndoBuffer.h>
+#include <Application/ToolManager/ToolManager.h>
+#include <Application/ProjectManager/Actions/ActionQuickOpen.h>
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
-CORE_REGISTER_ACTION( Seg3D, SaveProjectAs )
+CORE_REGISTER_ACTION( Seg3D, QuickOpen )
 
 namespace Seg3D
 {
 
-bool ActionSaveProjectAs::validate( Core::ActionContextHandle& context )
+bool ActionQuickOpen::validate( Core::ActionContextHandle& context )
 {
-  boost::filesystem::path path = complete( boost::filesystem::path( 
-    this->export_path_.value().c_str(), boost::filesystem::native ) );
+  return true;
 
-  if( !boost::filesystem::exists( path ) )
+}
+
+bool ActionQuickOpen::run( Core::ActionContextHandle& context, 
+  Core::ActionResultHandle& result )
+{
+
+  ProjectManager::Instance()->new_project( "", "", false );
+  if ( ProjectManager::Instance()->get_current_project() )
   {
-    return false;
+    ProjectManager::Instance()->get_current_project()->reset_project_changed();
   }
-
+  
+  // Clear undo buffer
+  UndoBuffer::Instance()->reset_undo_buffer();
+  
   return true;
 }
 
-bool ActionSaveProjectAs::run( Core::ActionContextHandle& context, 
-  Core::ActionResultHandle& result )
+Core::ActionHandle ActionQuickOpen::Create()
 {
-  bool success = false;
-
-  std::string message = std::string( "Saving project as: '" ) + this->project_name_.value()
-    + std::string( "'" );
-
-  Core::ActionProgressHandle progress = 
-    Core::ActionProgressHandle( new Core::ActionProgress( message ) );
-
-  progress->begin_progress_reporting();
-
-  if( ProjectManager::Instance()->project_save_as( this->export_path_.value(),
-    this->project_name_.value() ) )
-  {
-    success = true;
-  }
-
-  progress->end_progress_reporting();
-
-  return success;
-}
-
-Core::ActionHandle ActionSaveProjectAs::Create( const std::string& export_path, 
-  const std::string& project_name )
-{
-  ActionSaveProjectAs* action = new ActionSaveProjectAs;
-  
-  action->export_path_.value() = export_path;
-  action->project_name_.value() = project_name;
-  
+  ActionQuickOpen* action = new ActionQuickOpen;
   return Core::ActionHandle( action );
 }
 
-void ActionSaveProjectAs::Dispatch( Core::ActionContextHandle context, 
-  const std::string& export_path, const std::string& project_name )
+void ActionQuickOpen::Dispatch( Core::ActionContextHandle context )
 {
-  Core::ActionDispatcher::PostAction( Create( export_path, project_name ), context );
+  Core::ActionDispatcher::PostAction( Create(), context );
 }
 
 } // end namespace Seg3D

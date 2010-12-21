@@ -95,6 +95,7 @@ void QtActionConnector::SetActionChecked(
   qpointer->unblock();
 }
 
+  
 void QtActionConnector::set_state( bool value )
 {
   if ( !this->is_blocked() )

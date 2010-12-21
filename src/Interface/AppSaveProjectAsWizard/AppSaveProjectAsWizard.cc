@@ -104,8 +104,15 @@ SaveAsInfoPage::SaveAsInfoPage( QWidget *parent )
     this->project_name_label_ = new QLabel( "Project name:" );
 
   this->project_name_lineedit_ = new QLineEdit();
-  this->project_name_lineedit_->setText(  QString::fromStdString( ProjectManager::Instance()->
-    current_project_->project_name_state_->get() ) );
+  std::string project_name = ProjectManager::Instance()->
+    current_project_->project_name_state_->get();
+  
+  if( project_name == "untitled_project" )
+  {
+    project_name = "";
+  }
+    
+  this->project_name_lineedit_->setText(  QString::fromStdString( project_name ) );
 
     this->project_path_label_ = new QLabel( "Project Path:" );
     this->project_path_lineedit_ = new QLineEdit;

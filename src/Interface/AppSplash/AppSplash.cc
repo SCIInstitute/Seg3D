@@ -37,10 +37,12 @@
 
 // Interface includes
 #include <Interface/AppSplash/AppSplash.h>
+#include <Interface/AppInterface/AppLayerIO.h>
 
 // Application includes
 #include <Application/ProjectManager/ProjectManager.h>
 #include <Application/ProjectManager/Actions/ActionLoadProject.h>
+#include <Application/ProjectManager/Actions/ActionQuickOpen.h>
 
 // Resources includes
 #include <Resources/QtResources.h>
@@ -53,9 +55,7 @@ namespace Seg3D
 class AppSplashPrivate
 {
 public:
-
   Ui::AppSplash ui_;
-  //bool ready_to_quit_;
 
 };
 
@@ -87,13 +87,16 @@ AppSplash::AppSplash( QWidget *parent ) :
 
   connect( this->private_->ui_.quit_seg3d_button_, SIGNAL( clicked() ), 
     this, SLOT( quit() ) );
-      
+  
+  connect( this->private_->ui_.quick_open_button_, SIGNAL( clicked() ), 
+      this, SLOT( quick_open_file() ) );
+  
   connect( this->private_->ui_.recent_project_listwidget_, SIGNAL( itemPressed( QListWidgetItem* ) ),
     this, SLOT( enable_load_recent_button( QListWidgetItem* ) ) );  
 
   connect( this->private_->ui_.recent_project_listwidget_, 
     SIGNAL( itemDoubleClicked ( QListWidgetItem* ) ),
-    this, SLOT( call_open_recent( QListWidgetItem* ) ) ); 
+    this, SLOT( open_recent() ) );  
   
   connect( this, SIGNAL( dialog_closed() ), this->parentWidget(), SLOT( close() ) );
 
@@ -107,7 +110,6 @@ AppSplash::~AppSplash()
 void AppSplash::new_project()
 {
   this->new_project_wizard_ = new AppProjectWizard( this->parentWidget() );
-//  connect( this->new_project_wizard_, SIGNAL( finished() ), this, SLOT( quit() ) );
   connect( this->new_project_wizard_, SIGNAL( canceled() ), this, SLOT( unhide() ) );
   this->new_project_wizard_->show();
   this->hide();
@@ -175,10 +177,15 @@ void AppSplash::open_recent()
   this->close();
 }
 
-void AppSplash::call_open_recent( QListWidgetItem* item )
+void AppSplash::quick_open_file()
 {
-  this->open_recent();
+  ActionQuickOpen::Dispatch( Core::Interface::GetWidgetActionContext() );
+  this->hide();
+  AppLayerIO::ImportFiles( dynamic_cast< QMainWindow* >( this->parentWidget() ) );
+  
 }
+  
+  
   
 void AppSplash::populate_recent_projects()
 {
@@ -190,11 +197,12 @@ void AppSplash::populate_recent_projects()
     {
       QListWidgetItem *new_item;
       new_item = new QListWidgetItem( QString::fromStdString( ( Core::SplitString( 
-        this->recent_project_list_[ i ], "|" ) )[ 1 ] ) + "  -  " +
-        QString::fromStdString( ( Core::SplitString( 
-        this->recent_project_list_[ i ], "|" ) )[ 2 ] ) );
+        this->recent_project_list_[ i ], "|" ) )[ 1 ] ) );
 
-      new_item->setToolTip( QString::fromUtf8( "This project is located at: " ) 
+      new_item->setToolTip( QString::fromUtf8( "This project was created on: " ) +
+        QString::fromStdString( ( Core::SplitString( 
+        this->recent_project_list_[ i ], "|" ) )[ 2 ] ) 
+        + QString::fromUtf8( " and is located at: " ) 
         + QString::fromStdString( ( Core::SplitString( 
         this->recent_project_list_[ i ], "|" ) )[ 0 ] ) );
 

@@ -85,9 +85,9 @@ private Q_SLOTS:
   // this function close the application
   void quit();
 
-  // CALL_OPEN_RECENT:
-  // this function is called when someone clicks the open recent button 
-  void call_open_recent( QListWidgetItem* item );
+  // QUICK_OPEN_FILE:
+  // this function is called when someone clicks the quick open file button 
+  void quick_open_file();
   
   // ENABLE_LOAD_RECENT_BUTTON:
   // this function enables the load recent button if you select a recent project from the list

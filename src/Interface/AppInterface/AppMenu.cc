@@ -159,6 +159,8 @@ void AppMenu::create_file_menu( QMenu* qmenu )
   QtUtils::QtBridge::Connect( qaction, 
     boost::bind( &ActionSaveSession::Dispatch, 
     Core::Interface::GetWidgetActionContext(), false, "" ) );
+  
+  QtUtils::QtBridge::Enable( qaction, ProjectManager::Instance()->project_saved_state_ );
     
   qaction = qmenu->addAction( tr( "Save Project As..." ) );
   qaction->setShortcut( tr( "Ctrl+Shift+S" ) );
@@ -651,7 +653,7 @@ void AppMenu::ConfirmRecentFileLoad( qpointer_type qpointer, const std::string& 
     ActionLoadProject::Dispatch( Core::Interface::GetWidgetActionContext(), path );
   }
 }
-
+  
 void AppMenu::SetRecentFileList( qpointer_type qpointer, 
   std::vector< std::string > recent_projects, Core::ActionSource source )
 {

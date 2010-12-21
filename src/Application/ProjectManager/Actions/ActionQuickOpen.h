@@ -26,46 +26,50 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef QTUTILS_BRIDGE_DETAIL_QTACTIONCONNECTOR_H
-#define QTUTILS_BRIDGE_DETAIL_QTACTIONCONNECTOR_H
+#ifndef APPLICATION_PROJECTMANAGER_ACTIONS_ACTIONQUICKOPEN_H
+#define APPLICATION_PROJECTMANAGER_ACTIONS_ACTIONQUICKOPEN_H
 
-#include <QAction>
-#include <QPointer>
+#include <Core/Action/Action.h> 
+#include <Core/Interface/Interface.h>
 
-#include <Core/State/StateValue.h>
 
-#include <QtUtils/Bridge/detail/QtConnectorBase.h>
-
-namespace QtUtils
+namespace Seg3D
 {
 
-class QtActionConnector : public QtConnectorBase
+class ActionQuickOpen : public Core::Action
 {
-  Q_OBJECT
+  
+CORE_ACTION( 
+  CORE_ACTION_TYPE( "QuickOpen", "View a supported file." )
+)
 
+  // -- Constructor/Destructor --
 public:
-  QtActionConnector( QAction* parent, Core::StateBoolHandle& state,
-    bool blocking = true );
-  QtActionConnector( QAction* parent, boost::function< void() > func );
+  ActionQuickOpen()
+  {
+  }
 
-  virtual ~QtActionConnector();
+  virtual ~ActionQuickOpen()
+  {
+  }
 
-  // -- slot functions for boost signals --
-private:
-  static void SetActionChecked( QPointer< QtActionConnector > qpointer,
-    bool checked, Core::ActionSource source );
-
-  // -- slot functions for Qt signals --
-private Q_SLOTS:
-  void set_state( bool value );
-  void call_func();
-
-private:
-  QAction* parent_;
-  Core::StateBoolHandle state_;
-  boost::function< void () > func_;
+  // -- Functions that describe action --
+public:
+  virtual bool validate( Core::ActionContextHandle& context );
+  virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
+  
+  // -- Dispatch this action from the interface --
+public:
+  
+  // CREATE:
+  // Create an action that loads a session
+  static Core::ActionHandle Create();
+  
+  // DISPATCH:
+  // Dispatch an action loads a session
+  static void Dispatch( Core::ActionContextHandle context );
 };
 
-}
+} // end namespace Seg3D
 
-#endif
+#endif  //ACTIONNEWPROJECT_H

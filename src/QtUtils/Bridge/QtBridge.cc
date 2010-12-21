@@ -205,6 +205,11 @@ void QtBridge::Connect( QtTristateToolButton* tristate_button, Core::StateOption
 {
   new QtTristateToolButtonConnector( tristate_button, state );
 }
+  
+  void QtBridge::Enable( QAction* qaction, Core::StateBoolHandle& state, bool opposite_logic )
+  {
+    new QtEnableConnector( qaction, state, opposite_logic );
+  } 
 
 void QtBridge::Enable( QWidget* qwidget, Core::StateBoolHandle& state, bool opposite_logic )
 {
