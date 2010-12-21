@@ -418,6 +418,7 @@ IF(WIN32 AND NOT UNIX)
   DeleteRegKey HKCR '.nrrd'
   DeleteRegKey HKCR 'Seg3D2'
   ")
+  SET(CPACK_BUNDLE_PLIST "${CMAKE_SOURCE_DIR}/Resources\\\\info.plist")
 ELSE(WIN32 AND NOT UNIX)
   IF(APPLE)
     SET(CPACK_PACKAGE_DEFAULT_LOCATION "/Applications/")

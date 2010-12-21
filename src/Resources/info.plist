@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>nrrd</string>
+				<string>nrd</string>
+				<string>NRRD</string>
+				<string>NRD</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>Seg3D.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>Nearly Raw Raster Data</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>NRRD</string>
+				<string>NRD</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSTypeIsPackage</key>
+			<false/>
+			<key>NSDocumentClass</key>
+			<string>Seg3DDataFile</string>
+		</dict>
+	</array>
+	<key>CFBundleExecutable</key>
+	<string>Seg3D2</string>
+	<key>CFBundleGetInfoString</key>
+	<string>Seg3D 2.0.0 - MIT License</string>
+	<key>CFBundleIconFile</key>
+	<string>Seg3D.icns</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>Seg3D2</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>0.1.9</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string></string>
+	<key>CSResourcesFileMapped</key>
+	<true/>
+	<key>LSRequiresCarbon</key>
+	<true/>
+	<key>NSHumanReadableCopyright</key>
+	<string></string>
+</dict>
+</plist>
