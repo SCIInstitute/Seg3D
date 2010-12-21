@@ -38,6 +38,8 @@ SET(APPLICATION_TOOL_SRCS
   SeedPointsTool.cc
   SingleTargetTool.h
   SingleTargetTool.cc
+  SliceTargetTool.h
+  SliceTargetTool.cc
   Tool.h
   Tool.cc
   ToolFactory.h

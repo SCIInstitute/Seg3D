@@ -54,10 +54,8 @@ class ClipboardToolPrivate
 {
 public:
   void update_slice_numbers();
-  void update_slice_type_labels();
 
   void handle_active_viewer_changed( int active_viewer );
-  void handle_viewer_mode_changed( size_t viewer_id, std::string mode );
   void handle_viewer_slice_changed( size_t viewer_id, int slice_num );
   void handle_use_active_viewer_changed( bool use_active_viewer );
 
@@ -111,19 +109,6 @@ void ClipboardToolPrivate::update_slice_numbers()
   }
 }
 
-void ClipboardToolPrivate::update_slice_type_labels()
-{
-  Core::OptionLabelPairVector label_options;
-  label_options.push_back( std::make_pair( ClipboardTool::AXIAL_C, 
-    PreferencesManager::Instance()->z_axis_label_state_->get() ) );
-  label_options.push_back( std::make_pair( ClipboardTool::CORONAL_C, 
-    PreferencesManager::Instance()->y_axis_label_state_->get() ) );
-  label_options.push_back( std::make_pair( ClipboardTool::SAGITTAL_C, 
-    PreferencesManager::Instance()->x_axis_label_state_->get() ) );
-
-  this->tool_->slice_type_state_->set_option_list( label_options );
-}
-
 void ClipboardToolPrivate::handle_active_viewer_changed( int active_viewer )
 {
   if ( !this->tool_->use_active_viewer_state_->get() )
@@ -135,36 +120,7 @@ void ClipboardToolPrivate::handle_active_viewer_changed( int active_viewer )
   ViewerHandle viewer = ViewerManager::Instance()->get_viewer( viewer_id );
   if ( !viewer->is_volume_view() )
   {
-    this->handle_viewer_mode_changed( viewer_id, viewer->view_mode_state_->get() );
     this->handle_viewer_slice_changed( viewer_id, viewer->slice_number_state_->get() );
-  }
-}
-
-void ClipboardToolPrivate::handle_viewer_mode_changed( size_t viewer_id, std::string mode )
-{
-  if ( !this->tool_->use_active_viewer_state_->get() )
-  {
-    return;
-  }
-  
-  size_t active_viewer = static_cast< size_t >( ViewerManager::Instance()->
-    active_viewer_state_->get() );
-  if ( viewer_id != active_viewer )
-  {
-    return;
-  }
-  
-  if ( mode == Viewer::AXIAL_C )
-  {
-    this->tool_->slice_type_state_->set( ClipboardTool::AXIAL_C );
-  }
-  else if ( mode == Viewer::CORONAL_C )
-  {
-    this->tool_->slice_type_state_->set( ClipboardTool::CORONAL_C );
-  }
-  else if ( mode == Viewer::SAGITTAL_C )
-  {
-    this->tool_->slice_type_state_->set( ClipboardTool::SAGITTAL_C );
   }
 }
 
@@ -200,7 +156,6 @@ void ClipboardToolPrivate::handle_use_active_viewer_changed( bool use_active_vie
   ViewerHandle viewer = ViewerManager::Instance()->get_active_viewer();
   if ( !viewer->is_volume_view() )
   {
-    this->handle_viewer_mode_changed( viewer->get_viewer_id(), viewer->view_mode_state_->get() );
     this->handle_viewer_slice_changed( viewer->get_viewer_id(), viewer->slice_number_state_->get() );
   }
 }
@@ -209,38 +164,18 @@ void ClipboardToolPrivate::handle_use_active_viewer_changed( bool use_active_vie
 // Class ClipboardTool
 //////////////////////////////////////////////////////////////////////////
 
-const std::string ClipboardTool::AXIAL_C( "axial" );
-const std::string ClipboardTool::CORONAL_C( "coronal" );
-const std::string ClipboardTool::SAGITTAL_C( "sagittal" );
-
-
 ClipboardTool::ClipboardTool( const std::string& toolid ) :
-  SingleTargetTool( Core::VolumeType::MASK_E, toolid ),
+  SliceTargetTool( Core::VolumeType::MASK_E, toolid ),
   private_( new ClipboardToolPrivate )
 {
   this->private_->tool_ = this;
-  
-  std::string sagittal = SAGITTAL_C + "=" + PreferencesManager::Instance()->x_axis_label_state_->get();
-  std::string coronal = CORONAL_C + "=" + PreferencesManager::Instance()->y_axis_label_state_->get();
-  std::string axial = AXIAL_C + "=" + PreferencesManager::Instance()->z_axis_label_state_->get();
-
-  this->add_state( "slice_type", this->slice_type_state_, AXIAL_C,  axial + "|" + coronal 
-    + "|" + sagittal );
-    
-  this->add_connection( PreferencesManager::Instance()->x_axis_label_state_->state_changed_signal_.
-    connect( boost::bind( &ClipboardToolPrivate::update_slice_type_labels, this->private_ ) ) );
-  this->add_connection( PreferencesManager::Instance()->y_axis_label_state_->state_changed_signal_.
-    connect( boost::bind( &ClipboardToolPrivate::update_slice_type_labels, this->private_ ) ) );
-  this->add_connection( PreferencesManager::Instance()->z_axis_label_state_->state_changed_signal_.
-    connect( boost::bind( &ClipboardToolPrivate::update_slice_type_labels, this->private_ ) ) );  
-    
+      
   this->add_state( "copy_slice", this->copy_slice_number_state_, 1, 1, 1, 1 );
   this->add_state( "paste_min_slice", this->paste_min_slice_number_state_, 1, 1, 1, 1 );
   this->add_state( "paste_max_slice", this->paste_max_slice_number_state_, 1, 1, 1, 1 );
-  this->add_state( "use_active_viewer", this->use_active_viewer_state_, true );
 
   this->private_->update_slice_numbers();
-  this->private_->handle_use_active_viewer_changed( true );
+  this->private_->handle_use_active_viewer_changed( this->use_active_layer_state_->get() );
 
   this->add_connection( PreferencesManager::Instance()->zero_based_slice_numbers_state_->
     state_changed_signal_.connect( boost::bind( &ClipboardToolPrivate::update_slice_numbers,
@@ -260,9 +195,6 @@ ClipboardTool::ClipboardTool( const std::string& toolid ) :
   for ( size_t i = 0; i < num_of_viewrs; ++i )
   {
     ViewerHandle viewer = ViewerManager::Instance()->get_viewer( i );
-    this->add_connection( viewer->view_mode_state_->value_changed_signal_.connect( 
-      boost::bind( &ClipboardToolPrivate::handle_viewer_mode_changed, 
-      this->private_, i, _2 ) ) );
     this->add_connection( viewer->slice_number_state_->value_changed_signal_.connect(
       boost::bind( &ClipboardToolPrivate::handle_viewer_slice_changed,
       this->private_, i, _1 ) ) );

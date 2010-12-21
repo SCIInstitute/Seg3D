@@ -26,6 +26,10 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Boost includes
+#include <boost/lambda/bind.hpp>
+#include <boost/lambda/lambda.hpp>
+
 //QtUtils Includes
 #include <QtUtils/Bridge/QtBridge.h>
 
@@ -93,23 +97,18 @@ bool BinarySmoothDilateErodeFilterInterface::build_widget( QFrame* frame )
   
   QtUtils::QtBridge::Show( this->private_->ui_.message_alert_, tool->valid_target_state_, true );
 
-  QtUtils::QtBridge::Connect( this->private_->ui_.only2d_,
-    tool->only2d_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.only2d_, tool->only2d_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.slice_type_, tool->slice_type_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.use_active_viewer_, tool->use_active_viewer_state_ );
 
-  QButtonGroup* button_group = new QButtonGroup( this );
-  button_group->addButton( this->private_->ui_.active_slice_ );
-  button_group->addButton( this->private_->ui_.sagittal_slice_ );
-  button_group->addButton( this->private_->ui_.coronal_slice_ );
-  button_group->addButton( this->private_->ui_.axial_slice_ );
+  QtUtils::QtBridge::Enable( this->private_->ui_.use_active_viewer_, tool->only2d_state_ );
 
-  QtUtils::QtBridge::Connect( button_group, tool->slice_type_state_ );
-
-  QtUtils::QtBridge::Enable( this->private_->ui_.active_slice_, tool->only2d_state_ );  
-  QtUtils::QtBridge::Enable( this->private_->ui_.sagittal_slice_, tool->only2d_state_ );
-  QtUtils::QtBridge::Enable( this->private_->ui_.coronal_slice_, tool->only2d_state_ );
-  QtUtils::QtBridge::Enable( this->private_->ui_.axial_slice_, tool->only2d_state_ );
-
-
+  std::vector< Core::StateBaseHandle > states;
+  states.push_back( tool->only2d_state_ );
+  states.push_back( tool->use_active_viewer_state_ );
+  QtUtils::QtBridge::Enable( this->private_->ui_.slice_type_, states, 
+    boost::lambda::bind( &Core::StateBool::get, tool->only2d_state_.get() ) &&
+    !boost::lambda::bind( &Core::StateBool::get, tool->use_active_viewer_state_.get() ) );
 
   QtUtils::QtBridge::Enable( this->private_->ui_.target_layer_, tool->use_active_layer_state_, true );
 

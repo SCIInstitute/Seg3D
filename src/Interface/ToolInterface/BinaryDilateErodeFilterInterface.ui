@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>290</width>
-    <height>564</height>
+    <height>485</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -268,10 +268,19 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_8">
       <property name="spacing">
-       <number>6</number>
+       <number>0</number>
+      </property>
+      <property name="leftMargin">
+       <number>4</number>
       </property>
       <property name="topMargin">
-       <number>6</number>
+       <number>2</number>
+      </property>
+      <property name="rightMargin">
+       <number>4</number>
+      </property>
+      <property name="bottomMargin">
+       <number>4</number>
       </property>
       <item>
        <widget class="QCheckBox" name="only2d_">
@@ -281,30 +290,23 @@
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="sagittal_slice_">
-        <property name="text">
-         <string>In sagittal orientation only</string>
-        </property>
-       </widget>
+       <layout class="QHBoxLayout" name="horizontalLayout_6">
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Slice Type:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="slice_type_"/>
+        </item>
+       </layout>
       </item>
       <item>
-       <widget class="QRadioButton" name="coronal_slice_">
+       <widget class="QCheckBox" name="use_active_viewer_">
         <property name="text">
-         <string>In coronal orientation only</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="axial_slice_">
-        <property name="text">
-         <string>In axial orientation only</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="active_slice_">
-        <property name="text">
-         <string>In active orientation only</string>
+         <string>Use slice from active viewer</string>
         </property>
        </widget>
       </item>

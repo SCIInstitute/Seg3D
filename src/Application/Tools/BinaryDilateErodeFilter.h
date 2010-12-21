@@ -29,12 +29,12 @@
 #ifndef APPLICATION_TOOLS_BINARYDILATEERODEFILTER_H
 #define APPLICATION_TOOLS_BINARYDILATEERODEFILTER_H
 
-#include <Application/Tool/SingleTargetTool.h>
+#include <Application/Tool/SliceTargetTool.h>
 
 namespace Seg3D
 {
 
-class BinaryDilateErodeFilter : public SingleTargetTool
+class BinaryDilateErodeFilter : public SliceTargetTool
 {
 
 SEG3D_TOOL(
@@ -68,10 +68,7 @@ public:
   
   // Whether the filters runs 2d or 3d
   Core::StateBoolHandle only2d_state_;
-  
-  // If it runs 2d which orientation to use
-  Core::StateLabeledOptionHandle slice_type_state_;
-  
+
 public:
 
   // Execute the dilate -> erode action

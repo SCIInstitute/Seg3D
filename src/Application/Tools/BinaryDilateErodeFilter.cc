@@ -43,7 +43,7 @@ namespace Seg3D
 {
 
 BinaryDilateErodeFilter::BinaryDilateErodeFilter( const std::string& toolid ) :
-  SingleTargetTool( Core::VolumeType::MASK_E, toolid )
+  SliceTargetTool( Core::VolumeType::MASK_E, toolid )
 {
   // Create an empty list of label options
   std::vector< LayerIDNamePair > empty_list( 1, 
@@ -63,39 +63,28 @@ BinaryDilateErodeFilter::BinaryDilateErodeFilter( const std::string& toolid ) :
   
   // Whether the filters runs 2d or 3d
   this->add_state( "only2d", this->only2d_state_, false );
-  
-  std::vector< LayerIDNamePair > slice_option_list;
-  slice_option_list.push_back( std::make_pair<std::string,std::string>( "active", "active" ) );
-  slice_option_list.push_back( std::make_pair<std::string,std::string>( "sagittal", "sagittal" ) );
-  slice_option_list.push_back( std::make_pair<std::string,std::string>( "coronal", "coronal" ) );
-  slice_option_list.push_back( std::make_pair<std::string,std::string>( "axial", "axial" ) );
-
-  this->add_state( "slice_type", this->slice_type_state_, "active", slice_option_list );
 }
 
 BinaryDilateErodeFilter::~BinaryDilateErodeFilter()
 {
-  disconnect_all();
+  this->disconnect_all();
 }
 
 int BinaryDilateErodeFilter::get_slice_type()
 {
   std::string slice_type = this->slice_type_state_->get();
-  if ( slice_type == "sagittal" ) return Core::SliceType::SAGITTAL_E;
-  if ( slice_type == "coronal" ) return Core::SliceType::CORONAL_E;
-  if ( slice_type == "axial" ) return Core::SliceType::AXIAL_E;
+  if ( slice_type == SliceTargetTool::SAGITTAL_C ) return Core::SliceType::SAGITTAL_E;
+  if ( slice_type == SliceTargetTool::CORONAL_C ) return Core::SliceType::CORONAL_E;
+  if ( slice_type == SliceTargetTool::AXIAL_C ) return Core::SliceType::AXIAL_E;
 
-  std::string view_mode = ViewerManager::Instance()->get_active_viewer()->view_mode_state_->get();
+  CORE_THROW_LOGICERROR( "Invalid slice type" );
 
-  if ( view_mode == Viewer::SAGITTAL_C ) return Core::SliceType::SAGITTAL_E;
-  if ( view_mode == Viewer::CORONAL_C ) return Core::SliceType::CORONAL_E;
-  if ( view_mode == Viewer::AXIAL_C ) return Core::SliceType::AXIAL_E;
-  
   return -1;
 }
 
 void BinaryDilateErodeFilter::execute_dilateerode( Core::ActionContextHandle context )
 {
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
   ActionDilateErodeFilter::Dispatch( context,
     this->target_layer_state_->get(),
     this->replace_state_->get(),
@@ -109,6 +98,7 @@ void BinaryDilateErodeFilter::execute_dilateerode( Core::ActionContextHandle con
 
 void BinaryDilateErodeFilter::execute_dilate( Core::ActionContextHandle context )
 {
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
   ActionDilateFilter::Dispatch( context,
     this->target_layer_state_->get(),
     this->replace_state_->get(),
@@ -121,6 +111,7 @@ void BinaryDilateErodeFilter::execute_dilate( Core::ActionContextHandle context 
 
 void BinaryDilateErodeFilter::execute_erode( Core::ActionContextHandle context )
 {
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
   ActionErodeFilter::Dispatch( context,
     this->target_layer_state_->get(),
     this->replace_state_->get(),

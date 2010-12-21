@@ -26,52 +26,42 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_TOOLS_CLIPBOARDTOOL_H
-#define APPLICATION_TOOLS_CLIPBOARDTOOL_H
+#ifndef APPLICATION_TOOL_SLICETARGETTOOL_H
+#define APPLICATION_TOOL_SLICETARGETTOOL_H
 
-#include <Application/Tool/SliceTargetTool.h>
+// Application includes
+#include <Application/Tool/SingleTargetTool.h>
 
 namespace Seg3D
 {
 
-class ClipboardToolPrivate;
-typedef boost::shared_ptr< ClipboardToolPrivate > ClipboardToolPrivateHandle;
+// Forward declaration
+class SliceTargetToolPrivate;
+typedef boost::shared_ptr< SliceTargetToolPrivate > SliceTargetToolPrivateHandle;
 
-class ClipboardTool : public SliceTargetTool
+// Class definition
+class SliceTargetTool : public SingleTargetTool
 {
-
-SEG3D_TOOL
-(
-  SEG3D_TOOL_NAME( "ClipboardTool", "Tool for copy/paste mask slices" )
-  SEG3D_TOOL_MENULABEL( "Copy/Paste" )
-  SEG3D_TOOL_MENU( "Tools" )
-  SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+1" )
-  SEG3D_TOOL_URL( "http://seg3d.org/" )
-)
 
   // -- constructor/destructor --
 public:
-  ClipboardTool( const std::string& toolid );
-  virtual ~ClipboardTool();
+  SliceTargetTool( int target_volume_type, const std::string& tool_type );  
+  virtual ~SliceTargetTool();
 
-  // -- dispatch functions --
+  // -- state --
 public:
-  void copy( Core::ActionContextHandle context );
-  void paste( Core::ActionContextHandle context );
-
-  void grab_min_paste_slice();
-  void grab_max_paste_slice();
-  
-  // -- State Variables --
-public:
-  Core::StateRangedIntHandle copy_slice_number_state_;
-  Core::StateRangedIntHandle paste_min_slice_number_state_;
-  Core::StateRangedIntHandle paste_max_slice_number_state_;
+  Core::StateLabeledOptionHandle slice_type_state_;
+  Core::StateBoolHandle use_active_viewer_state_;
 
 private:
-  ClipboardToolPrivateHandle private_;
+  SliceTargetToolPrivateHandle private_;
+
+public:
+  const static std::string AXIAL_C;
+  const static std::string SAGITTAL_C;
+  const static std::string CORONAL_C;
 };
 
-} // end namespace
+} // end namespace Seg3D
 
 #endif
