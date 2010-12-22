@@ -125,10 +125,19 @@ void Application::parse_command_line_parameters( int argc, char **argv )
 
   typedef boost::tokenizer< boost::char_separator< char > > tokenizer;
   boost::char_separator< char > seperator( ":-=|;" );
+  
+  int count = 1;
+  
+  if( ( argc > 1 ) && ( boost::filesystem::exists( boost::filesystem::path( argv[ 1 ] ) ) ) )
+  {
+    std::string key = "file_to_open_on_start";
+    this->parameters_[ key ] = std::string( argv[ 1 ] );
+    count++;
+  }
 
   // parse through the command line arguments
 
-  for ( int count = 1; count < argc; count++ )
+  for ( ; count < argc; count++ )
   {
     std::string arg( argv[ count ] );
     tokenizer tokens( arg, seperator );

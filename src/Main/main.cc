@@ -97,7 +97,7 @@ int main( int argc, char **argv )
 
   // -- Checking for the socket parameter --
   std::string port_number_string;
-  if ( Core::Application::Instance()->check_command_line_parameter( "socket", port_number_string ) )
+  if( Core::Application::Instance()->check_command_line_parameter( "socket", port_number_string ) )
   {
     int port_number;
     if ( Core::ImportFromString( port_number_string, port_number) )
@@ -107,7 +107,7 @@ int main( int argc, char **argv )
       Core::ActionSocket::Instance()->start( port_number );
     }
   }
-  
+    
   // -- Add plugins into the architecture  
   Core::RegisterClasses();
 
@@ -121,10 +121,13 @@ int main( int argc, char **argv )
   if ( !( QtUtils::QtApplication::Instance()->setup( argc, argv ) ) ) return ( -1 );
 
   // -- Warn user about being an alpha version --
+  
+  std::string file_to_view = "";
+  Core::Application::Instance()->check_command_line_parameter( "file_to_open_on_start", file_to_view );
 
   std::string warning = std::string( "<h3>" ) +
     Core::Application::GetApplicationNameAndVersion() + 
-    "</h3><p align=\"left\">NOTE: This version of Seg3D is for Testing and Evaluation Only!</p>";
+    "</h3><p align=\"left\">NOTE: This version of Seg3D is for Testing and Evaluation Only!</p> <p>file to open: " + file_to_view + "</p>";
   
   QMessageBox::information( 0, 
     QString::fromStdString( Core::Application::GetApplicationNameAndVersion() ), 
@@ -139,7 +142,10 @@ int main( int argc, char **argv )
 #endif
 
   // -- Setup Application Interface Window --
-  AppInterface* app_interface = new AppInterface;
+//  std::string file_to_view = "";
+//  Core::Application::Instance()->check_command_line_parameter( "file_to_open_on_start", file_to_view );
+  
+  AppInterface* app_interface = new AppInterface( file_to_view );
 
   // Show the full interface
   app_interface->show();

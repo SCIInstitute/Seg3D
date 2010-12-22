@@ -40,12 +40,14 @@
 // Core includes
 #include <Core/Application/Application.h>
 #include <Core/Interface/Interface.h>
+#include <Core/State/Actions/ActionSet.h>
 
 // Application includes
 #include <Application/PreferencesManager/PreferencesManager.h>
 #include <Application/PreferencesManager/Actions/ActionSavePreferences.h>
 #include <Application/ProjectManager/ProjectManager.h>
 #include <Application/ProjectManager/Actions/ActionSaveSession.h>
+#include <Application/ProjectManager/Actions/ActionQuickOpen.h>
 
 // QtUtils includes
 #include <QtUtils/Utils/QtPointer.h>
@@ -103,12 +105,16 @@ namespace Seg3D
     // Application menu, statusbar
     QPointer< AppMenu > application_menu_;
     QPointer< AppStatusBar > status_bar_;
+    
+    std::string file_to_open_;
   
   };
 
-AppInterface::AppInterface() :
+AppInterface::AppInterface( std::string file_to_view_on_open ) :
   private_( new AppInterfacePrivate )
 {
+  this->private_->file_to_open_ = file_to_view_on_open;
+  
   // Ensure that resources are available
   InitQtResources();
 
@@ -143,6 +149,12 @@ AppInterface::AppInterface() :
   this->private_->message_widget_ = new MessageWindow( this );
   this->private_->keyboard_shortcuts_ = new AppShortcuts( this );
   this->private_->splash_interface_ = new AppSplash( this );
+  
+  if( this->private_->file_to_open_ != "" )
+  {
+    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
+      InterfaceManager::Instance()->splash_screen_visibility_state_, false );
+  }
   
   // Instantiate the dock widgets
   this->private_->layer_manager_dock_window_ = new LayerManagerDockWidget( this );
@@ -236,7 +248,11 @@ AppInterface::AppInterface() :
   
   this->private_->progress_ = new ProgressWidget( this->private_->viewer_interface_->parentWidget() );
   
-  
+  if( this->private_->file_to_open_ != "" )
+  {
+    ActionQuickOpen::Dispatch( Core::Interface::GetWidgetActionContext() );
+    AppLayerIO::ImportFiles( this, this->private_->file_to_open_ );
+  }
 }
 
   

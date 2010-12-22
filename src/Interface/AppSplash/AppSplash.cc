@@ -181,7 +181,7 @@ void AppSplash::quick_open_file()
 {
   ActionQuickOpen::Dispatch( Core::Interface::GetWidgetActionContext() );
   this->hide();
-  AppLayerIO::ImportFiles( dynamic_cast< QMainWindow* >( this->parentWidget() ) );
+  AppLayerIO::ImportFiles( dynamic_cast< QMainWindow* >( this->parentWidget() ), "" );
   
 }
   

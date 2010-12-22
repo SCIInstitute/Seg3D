@@ -51,31 +51,41 @@
 namespace Seg3D
 {
 
-void AppLayerIO::ImportFiles( QMainWindow* main_window )
+void AppLayerIO::ImportFiles( QMainWindow* main_window, std::string file_to_open )
 {
-  // Step (1): Get the importer list from the LayerIO system
-  LayerIO::importer_types_type importer_types = LayerIO::Instance()->get_importer_types();
-  
-  QStringList filters;
-  for ( size_t j = 0; j < importer_types.size(); j++ )
+  QStringList file_list;
+  std::string filtername;
+  if( file_to_open != "" )
   {
-    filters << QString::fromStdString( importer_types[ j ] );
+    file_list << QString::fromStdString( file_to_open );
+    filtername = "All Importers (*)";
+  }
+  else
+  {
+    // Step (1): Get the importer list from the LayerIO system
+    LayerIO::importer_types_type importer_types = LayerIO::Instance()->get_importer_types();
+    
+    QStringList filters;
+    for ( size_t j = 0; j < importer_types.size(); j++ )
+    {
+      filters << QString::fromStdString( importer_types[ j ] );
+    }
+
+    // Step (2): Bring up the file dialog
+    QFileDialog import_dialog( main_window, QString( "Import Layer(s)... " ) );
+
+    import_dialog.setNameFilters( filters );
+    import_dialog.setAcceptMode( QFileDialog::AcceptOpen );
+    import_dialog.setFileMode( QFileDialog::ExistingFiles );
+    import_dialog.setViewMode( QFileDialog::Detail );
+    import_dialog.exec();
+    
+    // Step (3): Get the selected filename and name filter
+    file_list = import_dialog.selectedFiles();
+    if( file_list.size() == 0) return;
+    filtername = import_dialog.selectedNameFilter().toStdString();
   }
 
-  // Step (2): Bring up the file dialog
-  QFileDialog import_dialog( main_window, QString( "Import Layer(s)... " ) );
-
-  import_dialog.setNameFilters( filters );
-  import_dialog.setAcceptMode( QFileDialog::AcceptOpen );
-  import_dialog.setFileMode( QFileDialog::ExistingFiles );
-  import_dialog.setViewMode( QFileDialog::Detail );
-  import_dialog.exec();
-  
-  // Step (3): Get the selected filename and name filter
-  QStringList file_list = import_dialog.selectedFiles();
-  if( file_list.size() == 0) return;
-  std::string filtername = import_dialog.selectedNameFilter().toStdString();
-  
   std::vector< LayerImporterHandle > importers;
   std::vector< std::string > files;
 

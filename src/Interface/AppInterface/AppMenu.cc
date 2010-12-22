@@ -173,7 +173,7 @@ void AppMenu::create_file_menu( QMenu* qmenu )
   qaction->setShortcut( tr( "Ctrl+Shift+O" ) );
   qaction->setToolTip( tr( "Import new layer(s) into the layer manager from a file(s)." ) );
   QtUtils::QtBridge::Connect( qaction, 
-    boost::bind( &AppLayerIO::ImportFiles,  this->main_window_ ) );
+    boost::bind( &AppLayerIO::ImportFiles,  this->main_window_, "" ) );
 
   qaction = qmenu->addAction( tr( "Import Layer From Image Series... ") );
   qaction->setShortcut( tr( "Ctrl+Shift+I" ) );

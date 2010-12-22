@@ -73,7 +73,7 @@ Q_OBJECT
 // -- constructor/destructor --
 public:
   // Constructor
-  AppInterface();
+  AppInterface( std::string file_to_view_on_open = "" );
 
   // virtual constructor needed by Qt to destroy this object
   virtual ~AppInterface();

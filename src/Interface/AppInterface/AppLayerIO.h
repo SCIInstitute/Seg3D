@@ -43,7 +43,7 @@ class AppLayerIO
 public:
   // IMPORTSINGLEFILE:
   // Import a layer into the LayerManager from a single file
-  static void ImportFiles( QMainWindow* main_window );
+  static void ImportFiles( QMainWindow* main_window, std::string file_to_open );
 
   // IMPORTSERIES:
   // Import a data volume from a series of files using the ITK importer.
