@@ -126,7 +126,7 @@ IF(APPLE)
        COMMAND [ ! -d Debug ] || install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore Debug/bin/Seg3D2.app/Contents/MacOS/Seg3D2
        COMMAND [ ! -d Debug ] || install_name_tool -change QtOpenGL.framework/Versions/4/QtOpenGL @executable_path/QtOpenGL Debug/bin/Seg3D2.app/Contents/MacOS/Seg3D2
        COMMAND [ ! -d Debug ] || cp "-rf" "${QT_QTGUI_LIBRARY_RELEASE}/Versions/Current/Resources" "Debug/bin/Seg3D2.app/Contents"
-       COMMAND [ ! -d Debug ] || [ -d Debug/Seg3D2.app/Contents/MacOS/plugins ] || mkdir Debug/bin/Seg3D2.app/Contents/MacOS/plugins
+       COMMAND [ ! -d Debug ] || [ -d Debug/bin/Seg3D2.app/Contents/MacOS/plugins ] || mkdir Debug/bin/Seg3D2.app/Contents/MacOS/plugins
        COMMAND [ ! -d Debug ] || cp -rf "${CMAKE_SOURCE_DIR}/CMake/qt.conf" Debug/bin/Seg3D2.app/Contents/Resources
 
        COMMAND [ ! -d Release ] || cp -rf "${QT_QTCORE_LIBRARY_RELEASE}/Versions/4/QtCore" "Release/bin/Seg3D2.app/Contents/MacOS/" 
@@ -142,7 +142,7 @@ IF(APPLE)
        COMMAND [ ! -d Release ] || install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore Release/bin/Seg3D2.app/Contents/MacOS/Seg3D2
        COMMAND [ ! -d Release ] || install_name_tool -change QtOpenGL.framework/Versions/4/QtOpenGL @executable_path/QtOpenGL Release/bin/Seg3D2.app/Contents/MacOS/Seg3D2
        COMMAND [ ! -d Release ] || cp "-rf" "${QT_QTGUI_LIBRARY_RELEASE}/Versions/Current/Resources" "Release/bin/Seg3D2.app/Contents"
-       COMMAND [ ! -d Release ] || [ -d Release/Seg3D2.app/Contents/MacOS/plugins ] || mkdir Release/bin/Seg3D2.app/Contents/MacOS/plugins
+       COMMAND [ ! -d Release ] || [ -d Release/bin/Seg3D2.app/Contents/MacOS/plugins ] || mkdir Release/bin/Seg3D2.app/Contents/MacOS/plugins
        COMMAND [ ! -d Release ] || cp -rf "${CMAKE_SOURCE_DIR}/CMake/qt.conf" Release/bin/Seg3D2.app/Contents/Resources
 
        WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})

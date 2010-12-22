@@ -280,6 +280,10 @@ INCLUDE(CMake/Core.cmake)
 INCLUDE(CMake/RegisterClass.cmake)
 
 ###########################################
+
+SET(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake/Modules")
+
+###########################################
 # Application layers:
 #  Core - Core functionality
 #  Application - All pieces need for the
@@ -430,7 +434,6 @@ ELSE(WIN32 AND NOT UNIX)
     SET(CPACK_STRIP_FILES TRUE)
     SET(CPACK_SOURCE_STRIP_FILES TRUE)
     SET(CPACK_PACKAGE_EXECUTABLES "Seg3D2.app" "Seg3D2")
-  SET(CPACK_BUNDLE_PLIST "${CMAKE_SOURCE_DIR}/Resources\\\\info.plist")
   ELSE(APPLE)
     SET(CPACK_STRIP_FILES TRUE)
     SET(CPACK_SOURCE_STRIP_FILES TRUE)
