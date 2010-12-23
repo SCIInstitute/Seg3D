@@ -32,6 +32,18 @@
 namespace Seg3D
 {
 
+class LayerDeletionUndoRecord
+{
+public:
+  // The layer group from which layers have been deleted
+  LayerGroupHandle layer_group_;
+
+  // A map of deleted layers keyed by their position
+  std::map< size_t, LayerHandle > layer_pos_map_;
+};
+
+typedef boost::shared_ptr< LayerDeletionUndoRecord > LayerDeletionUndoRecordHandle;
+
 class LayerUndoBufferItemPrivate
 {
 public: 
@@ -42,12 +54,12 @@ public:
   std::vector<LayerHandle> layers_to_delete_;
 
   // -- Which layers need to be added in again --
-  std::vector<LayerHandle> layers_to_add_;
+  std::map< size_t, LayerDeletionUndoRecordHandle > layers_to_add_;
 
   // -- Which layers need to be restored --
   std::vector< std::pair<LayerHandle, LayerCheckPointHandle > > layers_to_restore_;
   
-  // The count of the id of a layer, this one has to be roled back in case of undo
+  // The count of the id of a layer, this one has to be rolled back in case of undo
   LayerManager::id_count_type id_count_;
   
   // Size of the item
@@ -64,6 +76,26 @@ LayerUndoBufferItem::LayerUndoBufferItem( const std::string& tag ) :
 
 LayerUndoBufferItem::~LayerUndoBufferItem()
 {
+  ASSERT_IS_APPLICATION_THREAD();
+
+  // Invalidates all the deleted layers cached for undelete
+  std::map< size_t, LayerDeletionUndoRecordHandle >::iterator group_it = 
+    this->private_->layers_to_add_.begin();
+  while ( group_it != this->private_->layers_to_add_.end() )
+  {
+    LayerDeletionUndoRecordHandle record = ( *group_it ).second;
+    if ( record->layer_group_->is_empty() )
+    {
+      record->layer_group_->invalidate();
+    }
+    std::map< size_t, LayerHandle >::iterator layer_it = record->layer_pos_map_.begin();
+    while ( layer_it != record->layer_pos_map_.end() )
+    {
+      ( *layer_it ).second->invalidate();
+      ++layer_it;
+    }
+    ++group_it;
+  }
 }
 
 void LayerUndoBufferItem::add_filter_to_abort( LayerAbstractFilterHandle filter )
@@ -78,7 +110,31 @@ void LayerUndoBufferItem::add_layer_to_delete( LayerHandle layer )
 
 void LayerUndoBufferItem::add_layer_to_add( LayerHandle layer )
 {
-  this->private_->layers_to_add_.push_back( layer );
+  if ( !layer->has_valid_data() )
+  {
+    return;
+  }
+  
+  LayerGroupHandle layer_group = layer->get_layer_group();
+  size_t group_pos = LayerManager::Instance()->get_group_position( layer_group );
+  size_t layer_pos = layer_group->get_layer_position( layer );
+  std::map< size_t, LayerDeletionUndoRecordHandle >::iterator group_it =
+    this->private_->layers_to_add_.find( group_pos );
+  LayerDeletionUndoRecordHandle undo_record;
+  if ( group_it != this->private_->layers_to_add_.end() )
+  {
+    undo_record = ( *group_it ).second;
+    assert( undo_record->layer_group_ == layer_group );
+  }
+  else
+  {
+    undo_record.reset( new LayerDeletionUndoRecord );
+    undo_record->layer_group_ = layer_group;
+    this->private_->layers_to_add_[ group_pos ] = undo_record;
+  }
+
+  assert( undo_record->layer_pos_map_.count( layer_pos ) == 0 );
+  undo_record->layer_pos_map_[ layer_pos ] = layer;
 }
 
 void LayerUndoBufferItem::add_layer_to_restore( LayerHandle layer, 
@@ -166,38 +222,51 @@ bool LayerUndoBufferItem::apply_and_clear_undo()
   // Step 4:
   // A delete action can have deleted layers. Hence we need to restore layers that may have been
   // deleted.
-  
-  for ( size_t j = 0; j < this->private_->layers_to_add_.size(); j++ )
+
+  std::vector< LayerHandle > layers;
+  std::vector< size_t > group_positions;
+  std::vector< size_t > layer_positions;
+
+  std::map< size_t, LayerDeletionUndoRecordHandle >::const_iterator group_it = 
+    this->private_->layers_to_add_.begin();
+  while ( group_it != this->private_->layers_to_add_.end() )
   {
-    LayerHandle layer = this->private_->layers_to_add_[ j ];
-    if ( layer->data_state_->get() == Layer::CREATING_C ||  
-      layer->data_state_->get() == Layer::PROCESSING_C )
+    LayerDeletionUndoRecordHandle undo_record = ( *group_it ).second;
+    size_t group_pos = ( *group_it ).first;
+    std::map< size_t, LayerHandle >::const_iterator layer_it = undo_record->layer_pos_map_.begin();
+    while ( layer_it != undo_record->layer_pos_map_.end() )
     {
+      LayerHandle layer = ( *layer_it ).second;
+      size_t layer_pos = ( *layer_it ).first;
+      
       LayerAbstractFilterHandle filter = layer->get_filter_handle();
       if ( filter ) 
       {
         // Notify the user that undoing an asynchronous filter may take a bit of time
         std::string message = std::string( "Undoing delete layer" );
-    
+
         // Create application wide progress bar, that blocks the full program
-        Core::ActionProgressHandle progress = 
-        Core::ActionProgressHandle( new Core::ActionProgress( message ) );      
+        Core::ActionProgressHandle progress( new Core::ActionProgress( message ) );     
 
         // Start the spinning wheel
         progress->begin_progress_reporting();
-            
+
         filter->abort_and_wait();
 
         // Start the spinning wheel
         progress->end_progress_reporting();
       }
+
+      layers.push_back( layer );
+      group_positions.push_back( group_pos );
+      layer_positions.push_back( layer_pos );
+
+      ++layer_it;
     }
-  
-    if ( !( LayerManager::Instance()->insert_layer( this->private_->layers_to_add_[ j ] ) ) )
-    {
-      return false;
-    }
-  } 
+    ++group_it;
+  }
+  // Undelete layers
+  LayerManager::Instance()->undelete_layers( layers, group_positions, layer_positions );
   
   // Remove the layers from the undo mechanism so the program can actually delete them afterwards
   this->private_->layers_to_add_.clear(); 
@@ -227,10 +296,10 @@ void LayerUndoBufferItem::compute_size()
     size += this->private_->layers_to_restore_[ j ].second->get_byte_size();
   }
     
-  for ( size_t j = 0; j < this->private_->layers_to_add_.size(); j++ )
-  {   
-    size += this->private_->layers_to_add_[ j ]->get_byte_size();
-  }
+  //for ( size_t j = 0; j < this->private_->layers_to_add_.size(); j++ )
+  //{   
+  //  size += this->private_->layers_to_add_[ j ]->get_byte_size();
+  //}
 
   this->private_->size_ = size;
 }

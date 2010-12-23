@@ -98,6 +98,8 @@ UndoBuffer::UndoBuffer() :
   this->add_connection( PreferencesManager::Instance()->enable_undo_state_->
     value_changed_signal_.connect( boost::bind( 
     &UndoBufferPrivate::handle_enable, this->private_, _1 ) ) );
+  this->add_connection( Core::Application::Instance()->reset_signal_.connect( boost::bind(
+    &UndoBuffer::reset_undo_buffer, this ) ) );
 }
 
 UndoBuffer::~UndoBuffer()

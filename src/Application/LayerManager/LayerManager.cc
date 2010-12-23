@@ -657,14 +657,16 @@ void LayerManager::delete_layers(  std::vector< std::string > layers  )
 
       group = layer->get_layer_group();
 
-      // NOTE: Layer needs to be invalidated before it can be deleted
-      layer->invalidate();
+      // NOTE: Layer invalidation has been moved to the LayerUndoBufferItem.
+      // A layer will only be invalidated when the corresponding undo buffer item has been deleted.
+      // This also applies to layer groups.
+      //layer->invalidate();
 
       group->delete_layer( layer );
       
       if( group->is_empty() )
       {   
-        group->invalidate();
+        //group->invalidate();
         this->private_->group_list_.remove( group );
       }
 
@@ -1665,7 +1667,77 @@ int LayerManager::find_free_color()
   return -1;
 }
 
+size_t LayerManager::get_group_position( LayerGroupHandle group )
+{
+  ASSERT_IS_APPLICATION_THREAD();
 
+  group_list_type::const_iterator it =  this->private_->group_list_.begin();
+  group_list_type::const_iterator it_end = this->private_->group_list_.end();
+  size_t position = 0;
+  while ( it != it_end && ( *it ) != group )
+  {
+    ++it;
+    ++position;
+  }
+
+  if ( it == it_end )
+  {
+    assert( false );
+    CORE_THROW_LOGICERROR( "Group no longer exists in LayerManager" );
+  }
+  
+  return position;
+}
+
+void LayerManager::undelete_layers( const std::vector< LayerHandle >& layers, 
+                   const std::vector< size_t >& group_pos, 
+                   const std::vector< size_t >& layer_pos )
+{
+  ASSERT_IS_APPLICATION_THREAD();
+  assert( layers.size() == group_pos.size() && layers.size() == layer_pos.size() );
+
+  bool new_active_layer = false;
+
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
+    for ( size_t i = 0; i < layers.size(); ++i )
+    {
+      LayerHandle layer = layers[ i ];
+      LayerGroupHandle layer_group = layer->get_layer_group();
+      group_list_type::iterator group_it = std::find( this->private_->group_list_.begin(),
+        this->private_->group_list_.end(), layer_group );
+      if ( group_it == this->private_->group_list_.end() )
+      {
+        if ( this->private_->group_list_.size() > group_pos[ i ] )
+        {
+          group_it = this->private_->group_list_.begin();
+          std::advance( group_it, group_pos[ i ] );
+        }
+        this->private_->group_list_.insert( group_it, layer_group );
+      }
+
+      layer_group->insert_layer( layer, layer_pos[ i ] );
+    }
+
+    if ( !this->private_->active_layer_ )
+    {
+      this->private_->active_layer_ = layers[ 0 ];
+      new_active_layer = true;
+    }
+  }
+  
+  this->groups_changed_signal_();
+  this->layers_changed_signal_();
+  for ( size_t i = 0; i < layers.size(); ++i )
+  {
+    this->layer_inserted_signal_( layers[ i ] );
+  }
+  if ( new_active_layer )
+  {
+    this->active_layer_changed_signal_( layers[ 0 ] );
+  }
+}
 
 
 } // end namespace seg3D

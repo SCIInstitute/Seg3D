@@ -32,6 +32,7 @@
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/UndoBuffer/UndoBuffer.h>
 #include <Application/LayerManager/Actions/ActionDeleteLayers.h>
+#include <Application/LayerManager/LayerUndoBufferItem.h>
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
@@ -56,10 +57,18 @@ bool ActionDeleteLayers::validate( Core::ActionContextHandle& context )
 bool ActionDeleteLayers::run( Core::ActionContextHandle& context, 
   Core::ActionResultHandle& result )
 {
-  // NOTE: This action will reset the undo buffers as components needed for the undo may have been
-  // deleted.
-  // NOTE: Most programs assume when a user confirms a delete that one cannot undo there after.
-  UndoBuffer::Instance()->reset_undo_buffer();
+  // Create an undo item for this action
+  LayerUndoBufferItemHandle item( new LayerUndoBufferItem( "Delete layer(s)" ) );
+  // Tell which action has to be re-executed to obtain the result
+  item->set_redo_action( this->shared_from_this() );
+  // Tell which layers are to be deleted so they can be added back 
+  for ( size_t i = 0; i < this->layers_vector_.size(); ++i )
+  {
+    LayerHandle layer = LayerManager::Instance()->get_layer_by_id( this->layers_vector_[ i ] );
+    item->add_layer_to_add( layer );
+  }
+  // Add the complete record to the undo buffer
+  UndoBuffer::Instance()->insert_undo_item( context, item );
 
   LayerManager::Instance()->delete_layers( this->layers_vector_ );
   

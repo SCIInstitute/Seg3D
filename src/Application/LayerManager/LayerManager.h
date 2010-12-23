@@ -139,6 +139,10 @@ public:
     std::vector< LayerIDNamePair >& layer_names, 
     int type = Core::VolumeType::ALL_E );
 
+  // GET_GROUP_POSITION:
+  // Returns the position of the given group.
+  size_t get_group_position( LayerGroupHandle group );
+
   // Layer Action Functions
 public:
   // INSERT_LAYER:
@@ -168,6 +172,15 @@ public:
   // SET_PREVIOUS_LAYER_ACTIVE:
   // this function sets the active layer
   void set_previous_layer_active();
+
+  // UNDELETE_LAYERS:
+  // Add the deleted layers back.
+  // The first parameter contains a vector of the layers, the second parameter contains
+  // the original position of the group that contained the layer, the third parameter
+  // contains the original position of the layer within its group.
+  // NOTE: The three parameters must have the same number of elements.
+  void undelete_layers( const std::vector< LayerHandle >& layers, 
+    const std::vector< size_t >& group_pos, const std::vector< size_t >& layer_pos );
 
 private:
   // VALIDATE_LAYER_MOVE:

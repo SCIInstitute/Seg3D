@@ -123,6 +123,10 @@ protected:
   // Inserts a layer in the correct position
   void insert_layer( LayerHandle new_layer );
 
+  // INSERT_LAYER:
+  // Insert a layer at the specified position
+  void insert_layer( LayerHandle new_layer, size_t pos );
+
   // MOVE_LAYER_ABOVE:
   // Inserts a layer above a certain layer
     void move_layer_above( LayerHandle layer_above, LayerHandle layer_below );
@@ -185,6 +189,10 @@ public:
     Core::VolumeType type ) const;
   void get_layer_names( std::vector< LayerIDNamePair >& layer_names, 
     Core::VolumeType type, LayerHandle excluded_layer ) const;
+
+  // GET_LAYER_POSITION:
+  // Returns the position of the given layer within the group.
+  size_t get_layer_position( LayerHandle layer );
 
 private:
   

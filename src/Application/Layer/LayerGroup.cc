@@ -297,6 +297,25 @@ void LayerGroup::insert_layer( LayerHandle new_layer )
   this->private_->update_layers_visible_state();
 }
 
+void LayerGroup::insert_layer( LayerHandle new_layer, size_t pos )
+{
+  ASSERT_IS_APPLICATION_THREAD();
+
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+  layer_list_type::iterator layer_it;
+  if ( this->layer_list_.size() > pos )
+  {
+    layer_it = this->layer_list_.begin();
+    std::advance( layer_it, pos );
+  }
+  else
+  {
+    layer_it = this->layer_list_.end();
+  }
+
+  this->layer_list_.insert( layer_it, new_layer );
+  this->private_->update_layers_visible_state();
+}
 
 void LayerGroup::move_layer_above( LayerHandle layer_above, LayerHandle layer_below )
 {
@@ -515,6 +534,28 @@ void LayerGroup::clear()
   std::for_each( this->layer_list_.begin(), this->layer_list_.end(), boost::lambda::bind( 
     &Layer::invalidate, boost::lambda::bind( &LayerHandle::get, boost::lambda::_1 ) ) );
   this->layer_list_.clear();
+}
+
+size_t LayerGroup::get_layer_position( LayerHandle layer )
+{
+  ASSERT_IS_APPLICATION_THREAD();
+
+  layer_list_type::const_iterator it =  this->layer_list_.begin();
+  layer_list_type::const_iterator it_end = this->layer_list_.end();
+  size_t position = 0;
+  while ( it != it_end && ( *it ) != layer )
+  {
+    ++it;
+    ++position;
+  }
+
+  if ( it == it_end )
+  {
+    assert( false );
+    CORE_THROW_LOGICERROR( "Layer no longer exists in LayerManager" );
+  }
+
+  return position;
 }
 
 } // end namespace Seg3D
