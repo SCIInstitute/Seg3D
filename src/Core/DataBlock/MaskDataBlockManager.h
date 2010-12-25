@@ -118,6 +118,12 @@ public:
   // CREATE:
   // Create a new MaskDataBlock with a given GridTransform
   static bool Create( GridTransform grid_transform, MaskDataBlockHandle& mask );
+
+  // INSCRIBE:
+  // Inscribe a mask into a datablock with a certain label value. Both mask and data need
+  // to have been created before.
+  static bool Inscribe( MaskDataBlockHandle mask, DataBlockHandle data, double label, 
+    bool invert = false );
    
   // CONVERT:
   // Convert a DataBlock into a MaskDataBlock
@@ -126,6 +132,7 @@ public:
 
   // CONVERTLARGERTHAN:
   // Convert a DataBlock into a MaskDataBlock
+  // Only values larger than zero are considered part of the mask.
   static bool ConvertLargerThan( DataBlockHandle data, GridTransform grid_transform, 
     MaskDataBlockHandle& mask, bool invert = false );
 

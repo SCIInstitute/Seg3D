@@ -135,6 +135,12 @@ private:
   
   // The index of the slice in the original data block
   index_type index_;
+  
+public:
+
+  // DUPLICATE:
+  // Clone the data in a datablock by generating a new one and copying the data into it.
+  static bool Duplicate( const DataSliceHandle& src_data_slice, DataSliceHandle& dst_data_slice );  
 };
 
 } // end namespace Core

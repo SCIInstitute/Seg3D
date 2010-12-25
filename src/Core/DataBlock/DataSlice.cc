@@ -118,4 +118,14 @@ void DataSlice::set_index( DataSlice::index_type index)
   this->index_ = index;
 } 
   
+bool DataSlice::Duplicate( const DataSliceHandle& src_data_slice, DataSliceHandle& dst_data_slice )
+{
+  Core::DataBlockHandle dst_slice;
+  Core::DataBlock::Duplicate( src_data_slice->slice_, dst_slice );
+  dst_data_slice = Core::DataSliceHandle( new Core::DataSlice( dst_slice, src_data_slice->type_,
+    src_data_slice->index_ ) );
+  
+  return dst_data_slice;
+} 
+  
 } // end namespace Core

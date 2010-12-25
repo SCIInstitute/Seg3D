@@ -921,4 +921,97 @@ bool MaskDataBlockManager::CreateMaskFromLabelData( const DataBlockHandle& data,
   }
 }
 
+template< class T>
+bool InscribeInternal( MaskDataBlockHandle mask, DataBlockHandle data, double label, bool invert )
+{
+  MaskDataBlock::shared_lock_type lock( mask->get_mutex( ) );
+
+  unsigned char* mask_ptr = mask->get_mask_data();
+  unsigned char mask_value = mask->get_mask_value();
+  
+  T* data_ptr = reinterpret_cast< T* >( data->get_data() );
+  
+  const T label_value = static_cast<T>( label );
+  size_t size = data->get_size();
+  size_t size8 = size & ~(0x7);
+
+  if ( invert )
+  {
+    for ( size_t j = 0; j < size8; j+= 8 )
+    {
+      if ( !( mask_ptr[ j ] & mask_value ) ) data_ptr[ j ] = label_value;
+      if ( !( mask_ptr[ j + 1 ] & mask_value ) ) data_ptr[ j + 1 ] = label_value;
+      if ( !( mask_ptr[ j + 2 ] & mask_value ) ) data_ptr[ j + 2 ] = label_value;
+      if ( !( mask_ptr[ j + 3 ] & mask_value ) ) data_ptr[ j + 3 ] = label_value;
+      if ( !( mask_ptr[ j + 4 ] & mask_value ) ) data_ptr[ j + 4 ] = label_value;
+      if ( !( mask_ptr[ j + 5 ] & mask_value ) ) data_ptr[ j + 5 ] = label_value;
+      if ( !( mask_ptr[ j + 6 ] & mask_value ) ) data_ptr[ j + 6 ] = label_value;
+      if ( !( mask_ptr[ j + 7 ] & mask_value ) ) data_ptr[ j + 7 ] = label_value;
+    }
+    for ( size_t j = size8; j < size; j++ )
+    {
+      if ( !( mask_ptr[ j ] & mask_value ) ) data_ptr[ j ] = label_value;
+    } 
+  }
+  else
+  {
+    for ( size_t j = 0; j < size8; j+= 8 )
+    {
+      if ( mask_ptr[ j ] & mask_value ) data_ptr[ j ] = label_value;
+      if ( mask_ptr[ j + 1 ] & mask_value ) data_ptr[ j + 1 ] = label_value;
+      if ( mask_ptr[ j + 2 ] & mask_value ) data_ptr[ j + 2 ] = label_value;
+      if ( mask_ptr[ j + 3 ] & mask_value ) data_ptr[ j + 3 ] = label_value;
+      if ( mask_ptr[ j + 4 ] & mask_value ) data_ptr[ j + 4 ] = label_value;
+      if ( mask_ptr[ j + 5 ] & mask_value ) data_ptr[ j + 5 ] = label_value;
+      if ( mask_ptr[ j + 6 ] & mask_value ) data_ptr[ j + 6 ] = label_value;
+      if ( mask_ptr[ j + 7 ] & mask_value ) data_ptr[ j + 7 ] = label_value;
+    }
+    for ( size_t j = size8; j < size; j++ )
+    {
+      if ( mask_ptr[ j ] & mask_value ) data_ptr[ j ] = label_value;
+    }
+  }
+  
+  return true;
+}
+
+bool MaskDataBlockManager::Inscribe( MaskDataBlockHandle mask, DataBlockHandle data, double label, 
+    bool invert )
+{
+  // Check if there is any data
+  if ( !data || !mask ) return false;
+
+  // Check dimensions and do not continue if dimensions do not match.
+  if ( data->get_nx() != mask->get_nx() || data->get_ny() != mask->get_ny() ||
+    data->get_nz() != mask->get_nz() )
+  {
+    return false;
+  }
+
+  // Lock the source data
+  DataBlock::shared_lock_type lock( data->get_mutex( ) );
+
+  switch( data->get_data_type() )
+  {
+  case DataType::CHAR_E:
+    return InscribeInternal<signed char>( mask, data, label, invert );
+  case DataType::UCHAR_E:
+    return InscribeInternal<unsigned char>( mask, data, label, invert );
+  case DataType::SHORT_E:
+    return InscribeInternal<short>( mask, data, label, invert );
+  case DataType::USHORT_E:
+    return InscribeInternal<unsigned short>( mask, data, label, invert );
+  case DataType::INT_E:
+    return InscribeInternal<int>( mask, data, label, invert );
+  case DataType::UINT_E:
+    return InscribeInternal<unsigned int>( mask, data, label, invert );
+  case DataType::FLOAT_E:
+    return InscribeInternal<float>( mask, data, label, invert );
+  case DataType::DOUBLE_E:
+    return InscribeInternal<double>( mask, data, label, invert );
+  default:
+    return false;
+  }
+}
+
 } // end namespace Core
