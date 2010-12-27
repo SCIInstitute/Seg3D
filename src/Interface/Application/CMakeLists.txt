@@ -33,6 +33,14 @@
 
 SET(INTERFACE_APPLICATION_SRCS
   ApplicationInterface.cc
+  ColorPickerWidget.cc
+  ControllerInterface.cc
+  ControllerContext.cc
+  ControllerActionHistory.cc
+  ControllerStateEngine.cc
+  ControllerLogHistory.cc
+  ControllerUndoBuffer.cc
+  ControllerRedoBuffer.cc
   DropSpaceWidget.cc
   GroupButtonMenu.cc
   HistoryDockWidget.cc
@@ -47,6 +55,7 @@ SET(INTERFACE_APPLICATION_SRCS
   MessageWindow.cc
   OverlayWidget.cc
   ProgressWidget.cc
+  PreferencesInterface.cc
   ProjectDockWidget.cc
   ProjectExportWizard.cc
   ProjectWizard.cc
@@ -55,6 +64,7 @@ SET(INTERFACE_APPLICATION_SRCS
   SaveProjectAsWizard.cc
   SegmentationExportWizard.cc
   ShortcutsInterface.cc
+  SplashScreen.cc
   StatusBarWidget.cc
   ToolBoxWidget.cc
   ToolsDockWidget.cc
@@ -66,6 +76,14 @@ SET(INTERFACE_APPLICATION_SRCS
 
 SET(INTERFACE_APPLICATION_MOC_SRCS
   ApplicationInterface.h
+  ColorPickerWidget.h
+  ControllerInterface.h
+  ControllerContext.h
+  ControllerActionHistory.h
+  ControllerStateEngine.h
+  ControllerLogHistory.h
+  ControllerUndoBuffer.h
+  ControllerRedoBuffer.h
   DropSpaceWidget.h
   GroupButtonMenu.h
   HistoryDockWidget.h
@@ -79,6 +97,7 @@ SET(INTERFACE_APPLICATION_MOC_SRCS
   Menu.h
   MessageWindow.h
   OverlayWidget.h
+  PreferencesInterface.h
   ProgressWidget.h
   ProjectDockWidget.h
   ProjectExportWizard.h
@@ -88,6 +107,7 @@ SET(INTERFACE_APPLICATION_MOC_SRCS
   SaveProjectAsWizard.h
   SegmentationExportWizard.h 
   ShortcutsInterface.h
+  SplashScreen.h
   StatusBarWidget.h
   ToolBoxWidget.h
   ToolsDockWidget.h
@@ -106,6 +126,8 @@ SET(INTERFACE_APPLICATION_NO_MOC_SRCS
 )
 
 SET(INTERFACE_APPLICATION_UI_SRCS
+  ColorPickerWidget.ui
+  ControllerInterface.ui
   GroupButtonMenu.ui
   HistoryDockWidget.ui
   LayerGroupWidget.ui
@@ -115,11 +137,13 @@ SET(INTERFACE_APPLICATION_UI_SRCS
   LayerWidget.ui
   MeasurementDockWidget.ui
   MessageWindow.ui
+  PreferencesInterface.ui
   ProjectDockWidget.ui
   ProgressWidget.ui
   QtLayerListWidget.ui
   StatusBarWidget.ui
   ShortcutsInterface.ui
+  SplashScreen.ui
   ToolBoxPageWidget.ui
   ViewerInterface.ui
   ViewerWidget.ui
@@ -184,8 +208,5 @@ TARGET_LINK_LIBRARIES(Interface_Application
                       QtUtils_Widgets
             QtUtils_Bridge
             Resources_QtResources
-                      Interface_AppController
-            Interface_AppPreferences
-                  Interface_AppSplash
                       ${QT_LIBRARIES} 
                       ${SCI_BOOST_LIBRARY})

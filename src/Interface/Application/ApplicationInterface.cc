@@ -58,21 +58,21 @@
 
 // Interface includes
 #include <Interface/Application/ApplicationInterface.h>
+#include <Interface/Application/ControllerInterface.h>
 #include <Interface/Application/HistoryDockWidget.h>
 #include <Interface/Application/LayerIOFunctions.h>
 #include <Interface/Application/LayerManagerDockWidget.h>
 #include <Interface/Application/Menu.h>
 #include <Interface/Application/MessageWindow.h>
 #include <Interface/Application/MeasurementDockWidget.h>
+#include <Interface/Application/PreferencesInterface.h>
 #include <Interface/Application/ProjectDockWidget.h>
 #include <Interface/Application/ShortcutsInterface.h>
+#include <Interface/Application/SplashScreen.h>
 #include <Interface/Application/StatusBarWidget.h>
 #include <Interface/Application/ToolsDockWidget.h>
 #include <Interface/Application/ViewerInterface.h>
 
-#include <Interface/AppController/AppController.h>
-#include <Interface/AppPreferences/AppPreferences.h>
-#include <Interface/AppSplash/AppSplash.h>
 
 #include <Interface/Application/ProgressWidget.h>
 
@@ -86,11 +86,11 @@ namespace Seg3D
     QPointer< ViewerInterface > viewer_interface_;
     
     // Pointers to dialog widgets
-    QPointer< AppController > controller_interface_;
-    QPointer< AppPreferences > preferences_interface_;
+    QPointer< ControllerInterface > controller_interface_;
+    QPointer< PreferencesInterface > preferences_interface_;
     QPointer< MessageWindow > message_widget_;
     QPointer< ShortcutsInterface > keyboard_shortcuts_;
-    QPointer< AppSplash > splash_interface_;
+    QPointer< SplashScreen > splash_screen_;
     
     // The dock widgets
     QPointer< HistoryDockWidget > history_dock_window_;
@@ -145,11 +145,11 @@ ApplicationInterface::ApplicationInterface( std::string file_to_view_on_open ) :
   this->private_->status_bar_ = new StatusBarWidget( this );
   
   // Instantiate the peripheral windows
-  this->private_->preferences_interface_ = new AppPreferences( this );
-  this->private_->controller_interface_ = new AppController( this );
+  this->private_->preferences_interface_ = new PreferencesInterface( this );
+  this->private_->controller_interface_ = new ControllerInterface( this );
   this->private_->keyboard_shortcuts_ = new ShortcutsInterface( this );
   this->private_->message_widget_ = new MessageWindow( this );
-  this->private_->splash_interface_ = new AppSplash( this );
+  this->private_->splash_screen_ = new SplashScreen( this );
   
   if( this->private_->file_to_open_ != "" )
   {
@@ -189,9 +189,9 @@ ApplicationInterface::ApplicationInterface( std::string file_to_view_on_open ) :
   QtUtils::QtBridge::Show( this->private_->history_dock_window_, 
     InterfaceManager::Instance()->history_dockwidget_visibility_state_ );
   
-  QtUtils::QtBridge::Show( this->private_->splash_interface_, 
+  QtUtils::QtBridge::Show( this->private_->splash_screen_, 
     InterfaceManager::Instance()->splash_screen_visibility_state_ );
-  this->center_seg3d_gui_on_screen( this->private_->splash_interface_ );
+  this->center_seg3d_gui_on_screen( this->private_->splash_screen_ );
   
   QtUtils::QtBridge::Show( this->private_->preferences_interface_, 
     InterfaceManager::Instance()->preferences_manager_visibility_state_ );
@@ -309,10 +309,10 @@ void ApplicationInterface::closeEvent( QCloseEvent* event )
     this->private_->preferences_interface_->deleteLater();
   }
   
-  if( this->private_->splash_interface_ )
+  if( this->private_->splash_screen_ )
   {
-    this->private_->splash_interface_->close();
-    this->private_->splash_interface_->deleteLater();
+    this->private_->splash_screen_->close();
+    this->private_->splash_screen_->deleteLater();
   }
   
   if( this->private_->message_widget_ )

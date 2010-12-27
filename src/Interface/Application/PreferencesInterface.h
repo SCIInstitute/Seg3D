@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_APPPREFERENCES_APPPREFERENCES_H
-#define INTERFACE_APPPREFERENCES_APPPREFERENCES_H
+#ifndef INTERFACE_APPLICATION_PREFERENCESINTERFACE_H
+#define INTERFACE_APPLICATION_PREFERENCESINTERFACE_H
 
 // Boost includes
 #include <boost/shared_ptr.hpp>
@@ -40,25 +40,22 @@
 #include <Core/Utils/ConnectionHandler.h>
 
 // Interface includes
-#include <Interface/AppPreferences/ColorPickerWidget.h>
+#include <Interface/Application/ColorPickerWidget.h>
 
 // QtUtils includes
 #include <QtUtils/Widgets/QtCustomDialog.h>
 
-
-
-
 namespace Seg3D
 {
 
-class AppPreferencesPrivate;
+class PreferencesInterfacePrivate;
 
-class AppPreferences : public QtUtils::QtCustomDialog, public Core::ConnectionHandler
+class PreferencesInterface : public QtUtils::QtCustomDialog, public Core::ConnectionHandler
 {
     Q_OBJECT
 public:
-    AppPreferences( QWidget *parent = 0 );
-    virtual ~AppPreferences();
+    PreferencesInterface( QWidget *parent = 0 );
+    virtual ~PreferencesInterface();
   
 private:
   // SETUP_GENERAL_PREFS:
@@ -84,7 +81,7 @@ private:
   
   void set_autosave_checkbox( bool state );
   
-  typedef QPointer< AppPreferences > qpointer_type;
+  typedef QPointer< PreferencesInterface > qpointer_type;
   
   static void HandleAutosaveStateChanged( qpointer_type qpointer, bool state );
   
@@ -105,12 +102,12 @@ private Q_SLOTS:
   void set_autosave_checked_state( bool state );
 
 private:
-  boost::shared_ptr< AppPreferencesPrivate > private_;
+  boost::shared_ptr< PreferencesInterfacePrivate > private_;
   ColorPickerWidget* active_picker_;
   QDir project_directory_;
   
 };
 
-}
+} // end namespace Seg3D
 
-#endif // INTERFACE_APPPREFERENCES_APPPREFERENCES_H
+#endif

@@ -26,49 +26,52 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_APPCONTROLLER_APPREDOBUFFER_H
-#define INTERFACE_APPCONTROLLER_APPREDOBUFFER_H
+#include <Core/Interface/Interface.h>
 
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
-# pragma once
-#endif 
-
-// STL includes
-#include <string>
-#include <deque>
-
-// QT includes
-#include <QtCore/QObject>
-#include <QtCore/QVariant>
-#include <QtCore/QModelIndex>
-
-// Core includes
-#include <Core/Utils/Log.h>
+#include <Interface/Application/ControllerContext.h>
 
 namespace Seg3D
 {
 
-class AppControllerRedoBuffer : public QAbstractTableModel
+ControllerContext::ControllerContext( ControllerInterface* controller ) :
+  controller_( controller )
 {
+}
 
-Q_OBJECT
+ControllerContext::~ControllerContext()
+{
+}
 
-public:
-  AppControllerRedoBuffer( QObject* parent = 0 );
+void ControllerContext::report_error( const std::string& error )
+{
+  ControllerInterface::PostActionMessage( controller_, error );
+}
 
-  virtual ~AppControllerRedoBuffer();
+void ControllerContext::report_warning( const std::string& warning )
+{
+  ControllerInterface::PostActionMessage( controller_, warning );
+}
 
-  int rowCount( const QModelIndex &index ) const;
-  int columnCount( const QModelIndex &index ) const;
+void ControllerContext::report_message( const std::string& message )
+{
+  ControllerInterface::PostActionMessage( controller_, message );
+}
 
-  QVariant data( const QModelIndex& index, int role ) const;
-  QVariant headerData( int section, Qt::Orientation orientation, int role ) const;
+void ControllerContext::report_need_resource( const Core::NotifierHandle& notifier )
+{
+  std::string message = std::string( "'" ) + notifier->get_name() + std::string(
+      "' is currently unavailable" );
+  ControllerInterface::PostActionMessage( controller_, message );
+}
 
-  void add_log_entry( int message_type, std::string& message );
+void ControllerContext::report_done()
+{
+  if ( is_success() ) ControllerInterface::PostActionMessage( controller_, "" );
+}
 
-  void update() { reset(); }
-};
+Core::ActionSource ControllerContext::source() const
+{
+  return Core::ActionSource::COMMANDLINE_E;
+}
 
-} // end namespace Seg3D
-
-#endif
+} //end namespace Seg3D

@@ -27,34 +27,35 @@
  */
 
 // Application includes
-#include <Application/UndoBuffer/UndoBuffer.h>
+#include <Core/State/StateEngine.h>
 
 // Interface includes
-#include <Interface/AppController/AppControllerRedoBuffer.h>
+#include <Interface/Application/ControllerStateEngine.h>
+
 
 namespace Seg3D
 {
 
-AppControllerRedoBuffer::AppControllerRedoBuffer( QObject* parent ) :
+ControllerStateEngine::ControllerStateEngine(QObject* parent ) :
   QAbstractTableModel( parent )
 {
 }
 
-AppControllerRedoBuffer::~AppControllerRedoBuffer()
+ControllerStateEngine::~ControllerStateEngine()
 {
 }
 
-int AppControllerRedoBuffer::rowCount( const QModelIndex& ) const
+int ControllerStateEngine::rowCount( const QModelIndex& ) const
 {
-  return static_cast< int > ( UndoBuffer::Instance()->num_redo_items() );
+  return ( static_cast< int > ( Core::StateEngine::Instance()->number_of_states() ) );
 }
 
-int AppControllerRedoBuffer::columnCount( const QModelIndex& ) const
+int ControllerStateEngine::columnCount( const QModelIndex& ) const
 {
-  return 2;
+  return ( 2 );
 }
 
-QVariant AppControllerRedoBuffer::data( const QModelIndex& index, int role ) const
+QVariant ControllerStateEngine::data( const QModelIndex& index, int role ) const
 {
   if ( !index.isValid() ) return QVariant();
 
@@ -64,38 +65,32 @@ QVariant AppControllerRedoBuffer::data( const QModelIndex& index, int role ) con
   }
   else if ( role == Qt::DisplayRole )
   {
-    int sz = static_cast< int > ( UndoBuffer::Instance()->num_redo_items() );
-    if ( index.row() < sz )
+    Core::StateBaseHandle state;
+    if ( Core::StateEngine::Instance()->get_state( index.row(), state ))
     {
       if ( index.column() == 0 )
       {
-        return ( QString::fromStdString(  UndoBuffer::Instance()->
-          get_redo_tag( index.row() ) ) );
+        return ( QString::fromStdString( state->get_stateid() ) );
       }
-      else if ( index.column() == 1 )
+      else
       {
-        return ( QString::number( UndoBuffer::Instance()->
-          get_redo_byte_size( index.row() ) ) );
+        return ( QString::fromStdString( state->export_to_string() ) );     
       }
-    }
-    else
-    {
-      return QVariant();
     }
   }
-  
+
   return QVariant();
 }
 
-QVariant AppControllerRedoBuffer::headerData( int section, Qt::Orientation orientation, int role ) const
+QVariant ControllerStateEngine::headerData( int section, Qt::Orientation orientation, int role ) const
 {
   if ( role != Qt::DisplayRole || orientation == Qt::Vertical )
   {
     return QVariant();
   }
 
-  if ( section == 0 ) return QString( "Redo Tag" );
-  if ( section == 1 ) return QString( "Undo Byte Size" );
+  if ( section == 0 ) return QString( "State Entry" );
+  else if ( section == 1 ) return QString( "State Value" );
   else return QVariant();
 }
 

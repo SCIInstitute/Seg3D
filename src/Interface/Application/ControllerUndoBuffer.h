@@ -26,57 +26,49 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_APPPREFERENCES_COLORPICKERWIDGET_H
-#define INTERFACE_APPPREFERENCES_COLORPICKERWIDGET_H
+#ifndef INTERFACE_APPLICATION_UNDOBUFFER_H
+#define INTERFACE_APPLICATION_UNDOBUFFER_H
 
-// Boost includes
-#include <boost/shared_ptr.hpp>
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+# pragma once
+#endif 
+
+// STL includes
+#include <string>
+#include <deque>
+
+// QT includes
+#include <QtCore/QAbstractTableModel>
+#include <QtCore/QObject>
+#include <QtCore/QVariant>
 
 // Core includes
-#include <Core/Geometry/Color.h>
-
-#include <QtGui/QWidget>
-
-
+#include <Core/Utils/Log.h>
 
 namespace Seg3D
 {
 
-class ColorPickerWidgetPrivate;
+class ControllerUndoBuffer : public QAbstractTableModel
+{
 
-class ColorPickerWidget : public QWidget {
-    Q_OBJECT
+Q_OBJECT
 
 public:
-    ColorPickerWidget( QWidget *parent = 0 );
-    virtual ~ColorPickerWidget();
+  ControllerUndoBuffer( QObject* parent = 0 );
 
-Q_SIGNALS:
-  void color_changed();
-  void color_set( Core::Color );
-  
-public Q_SLOTS:
-  void set_color();
-  void hide_show( Core::Color color, bool show );
+  virtual ~ControllerUndoBuffer();
 
-  
-private:
-  int r_;
-  int g_;
-  int b_;
-  
-private Q_SLOTS:
-  void set_r( int );
-  void set_g( int );
-  void set_b( int );
-  void signal_color_set();
-    
+  int rowCount( const QModelIndex &index ) const;
+  int columnCount( const QModelIndex &index ) const;
 
-private:
-  boost::shared_ptr< ColorPickerWidgetPrivate > private_;
+  QVariant data( const QModelIndex& index, int role ) const;
+  QVariant headerData( int section, Qt::Orientation orientation, int role ) const;
 
+  void add_log_entry( int message_type, std::string& message );
+
+  void update() { reset(); }
 };
 
-}
+} // end namespace Seg3D
 
-#endif // INTERFACE_APPPREFERENCES_COLORPICKERWIDGET_H
+#endif

@@ -26,49 +26,53 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_APPCONTROLLER_APPCONTROLLERACTIONHISTORY_H
-#define INTERFACE_APPCONTROLLER_APPCONTROLLERACTIONHISTORY_H
+#ifndef INTERFACE_APPCLICATION_CONTROLLERCONTEXT_H
+#define INTERFACE_APPCLICATION_CONTROLLERCONTEXT_H
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
 #endif 
 
-// QT includes
-#include <QtCore/QVariant>
-#include <QtCore/QModelIndex>
-#include <QtCore/QObject>
-
-// Core includes
-// include all the headers associated with the action engine
+// Include all action related classes
 #include <Core/Action/Actions.h>
-#include <Core/Action/ActionHistory.h>
+
+// Include interface code
+#include <Interface/Application/ControllerInterface.h>
 
 namespace Seg3D
 {
 
-class AppControllerActionHistory : public QAbstractTableModel
+class ControllerContext;
+typedef boost::shared_ptr< ControllerContext > ControllerContextHandle;
+
+class ControllerContext : public Core::ActionContext
 {
 
-Q_OBJECT
-
+  // -- Constructor/destructor --
 public:
-  AppControllerActionHistory( QObject* parent = 0 );
+  ControllerContext( ControllerInterface* controller );
+  virtual ~ControllerContext();
 
-  virtual ~AppControllerActionHistory();
+  // -- Reporting functions --
+public:
+  virtual void report_error( const std::string& error );
+  virtual void report_warning( const std::string& warning );
+  virtual void report_message( const std::string& message );
+  virtual void report_need_resource( const Core::NotifierHandle& resource );
 
-  int rowCount( const QModelIndex &index ) const;
-  int columnCount( const QModelIndex &index ) const;
+  // -- Report that action was done --
+public:
+  virtual void report_done();
 
-  QVariant data( const QModelIndex& index, int role ) const;
-  QVariant headerData( int section, Qt::Orientation orientation, int role ) const;
-
-  void update() { reset(); }
+  // -- Source/Status information --
+public:
+  virtual Core::ActionSource source() const;
 
 private:
-  // Short cut to where the history is stored
-  Core::ActionHistory* history_;
+  // To which controller does the action information need to be relayed
+  ControllerInterface::qpointer_type controller_;
 };
 
-} // end namespace Seg3D
+} //end namespace Seg3D
 
 #endif

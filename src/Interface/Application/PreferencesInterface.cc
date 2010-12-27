@@ -44,28 +44,28 @@
 #include <QtUtils/Utils/QtPointer.h>
 
 // Interface includes
-#include <Interface/AppPreferences/AppPreferences.h>
+#include <Interface/Application/PreferencesInterface.h>
 
 // Resource includes
 #include <Resources/QtResources.h>
 
 // The interface from the designer
-#include "ui_AppPreferences.h"
+#include "ui_PreferencesInterface.h"
 
 namespace Seg3D
 {
 
-class AppPreferencesPrivate
+class PreferencesInterfacePrivate
 {
 public:
-    Ui::AppPreferences ui_;
+    Ui::PreferencesInterface ui_;
   QButtonGroup* color_button_group_;
   QVector< ColorPickerWidget* > color_pickers_;
 };
 
-AppPreferences::AppPreferences( QWidget *parent ) :
+PreferencesInterface::PreferencesInterface( QWidget *parent ) :
     QtUtils::QtCustomDialog( parent ),
-    private_( new AppPreferencesPrivate )
+    private_( new PreferencesInterfacePrivate )
 {
   InitQtResources();
 
@@ -89,12 +89,12 @@ AppPreferences::AppPreferences( QWidget *parent ) :
   this->private_->ui_.prefs_tabs_->removeTab( 2 );
 }
 
-AppPreferences::~AppPreferences()
+PreferencesInterface::~PreferencesInterface()
 {
   this->disconnect_all();
 }
 
-void AppPreferences::change_project_directory()
+void PreferencesInterface::change_project_directory()
 {
   QString path = QFileDialog::getExistingDirectory ( this, tr( "Directory" ), 
     project_directory_.path() );
@@ -107,7 +107,7 @@ void AppPreferences::change_project_directory()
   }
 }
 
-void AppPreferences::setup_general_prefs()
+void PreferencesInterface::setup_general_prefs()
 {
   //Set Layers Preferences
   this->project_directory_.setPath( QString::fromStdString( PreferencesManager::Instance()->
@@ -136,7 +136,7 @@ void AppPreferences::setup_general_prefs()
   
   add_connection( PreferencesManager::Instance()->auto_save_state_->
     value_changed_signal_.connect( boost::bind( 
-    &AppPreferences::HandleAutosaveStateChanged, qpointer_type( this ), _1 ) ) );
+    &PreferencesInterface::HandleAutosaveStateChanged, qpointer_type( this ), _1 ) ) );
   
   
   QtUtils::QtBridge::Connect( this->private_->ui_.smart_save_checkbox_,
@@ -192,7 +192,7 @@ void AppPreferences::setup_general_prefs()
 
 }
 
-void AppPreferences::setup_layer_prefs()
+void PreferencesInterface::setup_layer_prefs()
 {
   // Initialize the QButtonGroup
   this->private_->color_button_group_ = new QButtonGroup( this );
@@ -242,9 +242,7 @@ void AppPreferences::setup_layer_prefs()
     this, SLOT( set_buttons_to_default_colors () ) );
 }
   
-
-
-void AppPreferences::setup_viewer_prefs()
+void PreferencesInterface::setup_viewer_prefs()
 {
   //Connect Viewer Preferences
 
@@ -258,9 +256,9 @@ void AppPreferences::setup_viewer_prefs()
     PreferencesManager::Instance()->show_slice_number_state_ );
 }
 
-void AppPreferences::setup_sidebar_prefs()
+void PreferencesInterface::setup_sidebar_prefs()
 {
-//Set Sidebars Preferences
+  // Set Sidebars Preferences
   this->private_->ui_.tools_filters_checkbox_->setChecked( 
     PreferencesManager::Instance()->show_tools_bar_state_->get() );
   this->private_->ui_.layer_manager_checkbox_->setChecked( 
@@ -272,7 +270,7 @@ void AppPreferences::setup_sidebar_prefs()
   this->private_->ui_.history_checkbox_->setChecked( 
     PreferencesManager::Instance()->show_history_bar_state_->get() );
   
-//Connect Sidebars Preferences
+  // Connect Sidebars Preferences
   QtUtils::QtBridge::Connect( this->private_->ui_.tools_filters_checkbox_, 
     PreferencesManager::Instance()->show_tools_bar_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.layer_manager_checkbox_, 
@@ -324,32 +322,31 @@ void AppPreferences::setup_sidebar_prefs()
   
 }
   
-void AppPreferences::setup_interface_controls_prefs()
+void PreferencesInterface::setup_interface_controls_prefs()
 {
   //Interface Controls Preferences  
 }
   
-void AppPreferences::set_autosave_checked_state( bool state )
+void PreferencesInterface::set_autosave_checked_state( bool state )
 {
   Core::ActionSet::Dispatch( Core::Interface::GetKeyboardActionContext(),
     PreferencesManager::Instance()->auto_save_state_, state );
 }
   
-void AppPreferences::set_autosave_checkbox( bool state )
+void PreferencesInterface::set_autosave_checkbox( bool state )
 {
   this->private_->ui_.auto_save_checkbox_->blockSignals( true );
   this->private_->ui_.auto_save_checkbox_->setChecked( state );
   this->private_->ui_.auto_save_checkbox_->blockSignals( false );
 }
 
-void AppPreferences::HandleAutosaveStateChanged( qpointer_type qpointer, bool state )
+void PreferencesInterface::HandleAutosaveStateChanged( qpointer_type qpointer, bool state )
 {
   Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, 
-    boost::bind( &AppPreferences::set_autosave_checkbox, qpointer.data(), state ) ) );
+    boost::bind( &PreferencesInterface::set_autosave_checkbox, qpointer.data(), state ) ) );
 }
 
-
-void AppPreferences::set_buttons_to_default_colors()
+void PreferencesInterface::set_buttons_to_default_colors()
 {
   std::vector< Core::Color > temp_color_list = PreferencesManager::Instance()->
   get_default_colors();
@@ -360,7 +357,7 @@ void AppPreferences::set_buttons_to_default_colors()
   }
 }
 
-void AppPreferences::hide_the_others( int active )
+void PreferencesInterface::hide_the_others( int active )
 {
   this->active_picker_->hide();
   this->active_picker_ = this->private_->color_pickers_[ active ];

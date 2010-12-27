@@ -26,54 +26,57 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_APPCONTROLLER_APPCONTROLLERCONTEXT_H
-#define INTERFACE_APPCONTROLLER_APPCONTROLLERCONTEXT_H
+#ifndef INTERFACE_APPLICATION_COLORPICKERWIDGET_H
+#define INTERFACE_APPLICATION_COLORPICKERWIDGET_H
 
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
-# pragma once
-#endif 
+// Boost includes
+#include <boost/shared_ptr.hpp>
 
-// Include all action related classes
-#include <Core/Action/Actions.h>
+// Core includes
+#include <Core/Geometry/Color.h>
 
-// Include interface code
-#include <Interface/AppController/AppController.h>
+#include <QtGui/QWidget>
+
+
 
 namespace Seg3D
 {
 
-class AppControllerContext;
-typedef boost::shared_ptr< AppControllerContext > AppControllerContextHandle;
+class ColorPickerWidgetPrivate;
 
-class AppControllerContext : public Core::ActionContext
-{
+class ColorPickerWidget : public QWidget {
+    Q_OBJECT
 
-  // -- Constructor/destructor --
 public:
-  AppControllerContext( AppController* controller );
-  virtual ~AppControllerContext();
+    ColorPickerWidget( QWidget *parent = 0 );
+    virtual ~ColorPickerWidget();
 
-  // -- Reporting functions --
-public:
-  virtual void report_error( const std::string& error );
-  virtual void report_warning( const std::string& warning );
-  virtual void report_message( const std::string& message );
-  virtual void report_need_resource( const Core::NotifierHandle& resource );
+Q_SIGNALS:
+  void color_changed();
+  void color_set( Core::Color );
+  
+public Q_SLOTS:
+  void set_color();
+  void hide_show( Core::Color color, bool show );
 
-  // -- Report that action was done --
-public:
-  virtual void report_done();
-
-  // -- Source/Status information --
-public:
-  virtual Core::ActionSource source() const;
+  
+private:
+  int r_;
+  int g_;
+  int b_;
+  
+private Q_SLOTS:
+  void set_r( int );
+  void set_g( int );
+  void set_b( int );
+  void signal_color_set();
+    
 
 private:
-  // To which controller does the action information need to be relayed
-  AppController::qpointer_type controller_;
+  boost::shared_ptr< ColorPickerWidgetPrivate > private_;
 
 };
 
-} //end namespace Seg3D
+} // end namespace Seg3D
 
 #endif

@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_APPCONTROLLER_APPCONTROLLER_H
-#define INTERFACE_APPCONTROLLER_APPCONTROLLER_H
+#ifndef INTERFACE_APPLICATION_CONTROLLERINTERFACE_H
+#define INTERFACE_APPLICATION_CONTROLLERINTERFACE_H
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
@@ -54,22 +54,22 @@
 namespace Seg3D
 {
 
-class AppControllerPrivate;
-typedef boost::shared_ptr< AppControllerPrivate > AppControllerPrivateHandle;
+class ControllerInterfacePrivate;
+typedef boost::shared_ptr< ControllerInterfacePrivate > ControllerInterfacePrivateHandle;
 
 // Forward declaration
-class AppController;
+class ControllerInterface;
 
 // Class definition
-class AppController : public QtUtils::QtCustomDialog, private Core::ConnectionHandler
+class ControllerInterface : public QtUtils::QtCustomDialog, private Core::ConnectionHandler
 {
 Q_OBJECT
 
 // -- constructor/destructor --
 
 public:
-  AppController( QWidget* parent = 0 );
-  virtual ~AppController();
+  ControllerInterface( QWidget* parent = 0 );
+  virtual ~ControllerInterface();
 
   // -- qt slots --
 public Q_SLOTS:
@@ -79,7 +79,7 @@ public Q_SLOTS:
   void post_action_usage( std::string usage );
 
 private:
-  AppControllerPrivateHandle private_;
+  ControllerInterfacePrivateHandle private_;
 
   QTabWidget* tw_controller_;
   QPushButton* tb_action_;
@@ -92,7 +92,7 @@ private:
   QTableView* tv_log_history_;
 
 public:
-  typedef QPointer< AppController > qpointer_type;
+  typedef QPointer< ControllerInterface > qpointer_type;
 
   // These functions are static as they are called from the callback stack
   // and as they may be delay, it is not clear whether the AppController

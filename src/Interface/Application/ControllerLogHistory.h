@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_APPCONTROLLER_APPCONTROLLERSTATEENGINE_H
-#define INTERFACE_APPCONTROLLER_APPCONTROLLERSTATEENGINE_H
+#ifndef INTERFACE_APPLICATION_CONTROLLERLOGHISTORY_H
+#define INTERFACE_APPLICATION_CONTROLLERLOGHISTORY_H
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
@@ -35,24 +35,28 @@
 
 // STL includes
 #include <string>
+#include <deque>
 
 // QT includes
-#include <QtCore/QAbstractTableModel>
 #include <QtCore/QObject>
 #include <QtCore/QVariant>
+#include <QtCore/QModelIndex>
+
+// Core includes
+#include <Core/Utils/Log.h>
 
 namespace Seg3D
 {
 
-class AppControllerStateEngine : public QAbstractTableModel
+class ControllerLogHistory : public QAbstractTableModel
 {
 
 Q_OBJECT
 
 public:
-  AppControllerStateEngine( QObject* parent = 0 );
+  ControllerLogHistory( size_t log_size, QObject* parent = 0 );
 
-  virtual ~AppControllerStateEngine();
+  virtual ~ControllerLogHistory();
 
   int rowCount( const QModelIndex &index ) const;
   int columnCount( const QModelIndex &index ) const;
@@ -60,7 +64,15 @@ public:
   QVariant data( const QModelIndex& index, int role ) const;
   QVariant headerData( int section, Qt::Orientation orientation, int role ) const;
 
-  void update() { reset(); }
+  void add_log_entry( int message_type, std::string& message );
+
+private:
+  // Classes needed for storing the recent log history
+  typedef std::pair< int, std::string > log_entry_type;
+  typedef std::deque< log_entry_type > log_history_type;
+
+  log_history_type log_history_;
+  size_t log_history_size_;
 };
 
 } // end namespace Seg3D

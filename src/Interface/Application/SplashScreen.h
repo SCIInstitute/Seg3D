@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_APPSPLASH_APPSPLASH_H
-#define INTERFACE_APPSPLASH_APPSPLASH_H
+#ifndef INTERFACE_APPLICATION_SPLASHSCREEN_H
+#define INTERFACE_APPLICATION_SPLASHSCREEN_H
 
 // QT includes
 #include <QtCore/QPointer>
@@ -45,9 +45,9 @@
 namespace Seg3D
 {
 
-class AppSplashPrivate;
+class SplashScreenPrivate;
 
-class AppSplash : public QtUtils::QtCustomDialog
+class SplashScreen : public QtUtils::QtCustomDialog
 {
 Q_OBJECT
   
@@ -55,8 +55,8 @@ Q_SIGNALS:
   void dialog_closed();
 
 public:
-  AppSplash( QWidget* parent = 0 );
-  virtual ~AppSplash();
+  SplashScreen( QWidget* parent = 0 );
+  virtual ~SplashScreen();
   
 private:
   
@@ -96,8 +96,9 @@ private Q_SLOTS:
 
 private:
   // Internals of the splash screen
-  boost::shared_ptr< AppSplashPrivate > private_;
+  boost::shared_ptr< SplashScreenPrivate > private_;
   
+  // TODO: need to move this into the private class
   std::vector< std::string > recent_project_list_;
   QPointer< ProjectWizard > new_project_wizard_;
 };

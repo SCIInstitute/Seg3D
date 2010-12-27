@@ -29,31 +29,31 @@
 #include <QtGui/QColor>
 #include <QtGui/QBrush>
 
-#include <Interface/AppController/AppControllerLogHistory.h>
+#include <Interface/Application/ControllerLogHistory.h>
 
 namespace Seg3D
 {
 
-AppControllerLogHistory::AppControllerLogHistory( size_t log_history_size, QObject* parent ) :
+ControllerLogHistory::ControllerLogHistory( size_t log_history_size, QObject* parent ) :
   QAbstractTableModel( parent ), log_history_size_( log_history_size )
 {
 }
 
-AppControllerLogHistory::~AppControllerLogHistory()
+ControllerLogHistory::~ControllerLogHistory()
 {
 }
 
-int AppControllerLogHistory::rowCount( const QModelIndex& ) const
+int ControllerLogHistory::rowCount( const QModelIndex& ) const
 {
   return ( static_cast< int > ( log_history_.size() ) );
 }
 
-int AppControllerLogHistory::columnCount( const QModelIndex& ) const
+int ControllerLogHistory::columnCount( const QModelIndex& ) const
 {
   return ( 1 );
 }
 
-QVariant AppControllerLogHistory::data( const QModelIndex& index, int role ) const
+QVariant ControllerLogHistory::data( const QModelIndex& index, int role ) const
 {
   if ( !index.isValid() ) return QVariant();
 
@@ -107,7 +107,7 @@ QVariant AppControllerLogHistory::data( const QModelIndex& index, int role ) con
   return QVariant();
 }
 
-QVariant AppControllerLogHistory::headerData( int section, Qt::Orientation orientation, int role ) const
+QVariant ControllerLogHistory::headerData( int section, Qt::Orientation orientation, int role ) const
 {
   if ( role != Qt::DisplayRole || orientation == Qt::Vertical )
   {
@@ -118,7 +118,7 @@ QVariant AppControllerLogHistory::headerData( int section, Qt::Orientation orien
   else return QVariant();
 }
 
-void AppControllerLogHistory::add_log_entry( int message_type, std::string& message )
+void ControllerLogHistory::add_log_entry( int message_type, std::string& message )
 {
   log_entry_type entry = std::make_pair( message_type, message );
 

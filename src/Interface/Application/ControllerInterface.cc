@@ -45,45 +45,45 @@
 #include <QtUtils/Bridge/QtBridge.h>
 
 // Interface includes
-#include <Interface/AppController/AppController.h>
-#include <Interface/AppController/AppControllerContext.h>
-#include <Interface/AppController/AppControllerActionHistory.h>
-#include <Interface/AppController/AppControllerStateEngine.h>
-#include <Interface/AppController/AppControllerLogHistory.h>
-#include <Interface/AppController/AppControllerUndoBuffer.h>
-#include <Interface/AppController/AppControllerRedoBuffer.h>
+#include <Interface/Application/ControllerInterface.h>
+#include <Interface/Application/ControllerContext.h>
+#include <Interface/Application/ControllerActionHistory.h>
+#include <Interface/Application/ControllerStateEngine.h>
+#include <Interface/Application/ControllerLogHistory.h>
+#include <Interface/Application/ControllerUndoBuffer.h>
+#include <Interface/Application/ControllerRedoBuffer.h>
 
 // The interface from the designer
-#include "ui_AppController.h"
+#include "ui_ControllerInterface.h"
 
 namespace Seg3D
 {
 
-class AppControllerPrivate
+class ControllerInterfacePrivate
 {
 public:
   // The User Inrterface from the designer
   Ui::F_CONTROLLER ui_;
 
   // Local classes that are only of interest for this class
-  AppControllerActionHistory* action_history_model_;
-  AppControllerStateEngine* state_engine_model_;
-  AppControllerLogHistory* log_history_model_;
-  AppControllerUndoBuffer* undo_buffer_model_;
-  AppControllerRedoBuffer* redo_buffer_model_;
+  ControllerActionHistory* action_history_model_;
+  ControllerStateEngine* state_engine_model_;
+  ControllerLogHistory* log_history_model_;
+  ControllerUndoBuffer* undo_buffer_model_;
+  ControllerRedoBuffer* redo_buffer_model_;
 
   // Action context for running the command line
   Core::ActionContextHandle context_;
 };
 
-AppController::AppController( QWidget* parent ) :
+ControllerInterface::ControllerInterface( QWidget* parent ) :
   QtUtils::QtCustomDialog( parent ), 
-  private_( new AppControllerPrivate )
+  private_( new ControllerInterfacePrivate )
 {
 
   // Step 1: Setup the private structure and allocate all the needed structures
   private_->ui_.setupUi( this );
-  private_->context_ = Core::ActionContextHandle( new AppControllerContext( this ) );
+  private_->context_ = Core::ActionContextHandle( new ControllerContext( this ) );
   
   // Step 1.5: Remove the help button and set the icon because removing the button can occasionaly
   // cause problems with it
@@ -96,11 +96,11 @@ AppController::AppController( QWidget* parent ) :
 
   // These next two are Qt objects and will be deleted when the parent object is
   // deleted
-  this->private_->action_history_model_ = new AppControllerActionHistory( this );
-  this->private_->state_engine_model_ = new AppControllerStateEngine( this );
-  this->private_->log_history_model_ = new AppControllerLogHistory( 1000, this );
-  this->private_->undo_buffer_model_ = new AppControllerUndoBuffer( this );
-  this->private_->redo_buffer_model_ = new AppControllerRedoBuffer( this );
+  this->private_->action_history_model_ = new ControllerActionHistory( this );
+  this->private_->state_engine_model_ = new ControllerStateEngine( this );
+  this->private_->log_history_model_ = new ControllerLogHistory( 1000, this );
+  this->private_->undo_buffer_model_ = new ControllerUndoBuffer( this );
+  this->private_->redo_buffer_model_ = new ControllerRedoBuffer( this );
 
   // Step 2: Modify the widget
   qpointer_type controller( this );
@@ -146,7 +146,7 @@ AppController::AppController( QWidget* parent ) :
   while ( it != it_end )
   {
     QAction* action_item = action_menu->addAction( QString::fromStdString( *it ) );
-    QtUtils::QtBridge::Connect( action_item, boost::bind( &AppController::SetActionType, 
+    QtUtils::QtBridge::Connect( action_item, boost::bind( &ControllerInterface::SetActionType, 
       controller, ( *it ) ) );
     ++it;
   }
@@ -157,29 +157,29 @@ AppController::AppController( QWidget* parent ) :
   // automatically using the signal/slot system
 
   this->add_connection( Core::ActionHistory::Instance()->history_changed_signal_.connect( 
-    boost::bind( &AppController::UpdateActionHistory, controller ) ) );
+    boost::bind( &ControllerInterface::UpdateActionHistory, controller ) ) );
 
   this->add_connection( Core::StateEngine::Instance()->state_changed_signal_.connect( 
-    boost::bind( &AppController::UpdateStateEngine, controller ) ) );
+    boost::bind( &ControllerInterface::UpdateStateEngine, controller ) ) );
   
   this->add_connection( Core::Log::Instance()->post_log_signal_.connect( 
-    boost::bind( &AppController::UpdateLogHistory, controller, true, _1, _2 ) ) );
+    boost::bind( &ControllerInterface::UpdateLogHistory, controller, true, _1, _2 ) ) );
 
   this->add_connection( UndoBuffer::Instance()->buffer_changed_signal_.connect(
-    boost::bind( &AppController::UpdateUndoBuffer, controller ) ) );
+    boost::bind( &ControllerInterface::UpdateUndoBuffer, controller ) ) );
 
   // Step 6: Qt connections
   // Connect the edit box to the slot that posts the action
   this->connect( this->private_->ui_.LE_EDIT_ACTION, SIGNAL( returnPressed() ), this, SLOT( post_action() ) );
 }
 
-AppController::~AppController()
+ControllerInterface::~ControllerInterface()
 {
   this->disconnect_all();
 }
 
 
-void AppController::post_action()
+void ControllerInterface::post_action()
 {
   // Clear usage string
   this->private_->ui_.L_ACTION_USAGE->setText( "" );
@@ -196,8 +196,8 @@ void AppController::post_action()
   if ( !( Core::ActionFactory::CreateAction( action_string, action, action_error, action_usage ) ) )
   {
     qpointer_type controller( this );
-    AppController::PostActionMessage( controller, action_error );
-    AppController::PostActionUsage( controller, action_usage );
+    ControllerInterface::PostActionMessage( controller, action_error );
+    ControllerInterface::PostActionUsage( controller, action_usage );
   }
   else
   {
@@ -206,22 +206,23 @@ void AppController::post_action()
 #endif
 }
 
-void AppController::post_action_message( std::string message )
+void ControllerInterface::post_action_message( std::string message )
 {
   this->private_->ui_.L_ACTION_STATUS->setText( QString::fromStdString( message ) );
 }
 
-void AppController::post_action_usage( std::string usage )
+void ControllerInterface::post_action_usage( std::string usage )
 {
   this->private_->ui_.L_ACTION_USAGE->setText( QString::fromStdString( usage ) );
 }
 
-void AppController::UpdateActionHistory( qpointer_type controller )
+void ControllerInterface::UpdateActionHistory( qpointer_type controller )
 {
   // Ensure that this call gets relayed to the right thread
   if ( !( Core::Interface::IsInterfaceThread() ) )
   {
-    Core::Interface::PostEvent( boost::bind( &AppController::UpdateActionHistory, controller ) );
+    Core::Interface::PostEvent( boost::bind( 
+      &ControllerInterface::UpdateActionHistory, controller ) );
     return;
   }
 
@@ -236,12 +237,13 @@ void AppController::UpdateActionHistory( qpointer_type controller )
   }
 }
 
-void AppController::UpdateStateEngine( qpointer_type controller )
+void ControllerInterface::UpdateStateEngine( qpointer_type controller )
 { 
   // Ensure that this call gets relayed to the right thread
   if ( !( Core::Interface::IsInterfaceThread() ) )
   {
-    Core::Interface::PostEvent( boost::bind( &AppController::UpdateStateEngine, controller ) );
+    Core::Interface::PostEvent( boost::bind( 
+      &ControllerInterface::UpdateStateEngine, controller ) );
     return;
   }
 
@@ -253,12 +255,13 @@ void AppController::UpdateStateEngine( qpointer_type controller )
   }
 }
 
-void AppController::UpdateUndoBuffer( qpointer_type controller )
+void ControllerInterface::UpdateUndoBuffer( qpointer_type controller )
 { 
   // Ensure that this call gets relayed to the right thread
   if ( !( Core::Interface::IsInterfaceThread() ) )
   {
-    Core::Interface::PostEvent( boost::bind( &AppController::UpdateUndoBuffer, controller ) );
+    Core::Interface::PostEvent( boost::bind( 
+      &ControllerInterface::UpdateUndoBuffer, controller ) );
     return;
   }
 
@@ -271,14 +274,14 @@ void AppController::UpdateUndoBuffer( qpointer_type controller )
   }
 }
 
-void AppController::UpdateLogHistory( qpointer_type controller, bool relay, int message_type,
+void ControllerInterface::UpdateLogHistory( qpointer_type controller, bool relay, int message_type,
     std::string message )
 {
   // Ensure that this call gets relayed to the right thread
   if ( relay )
   {
-    Core::Interface::PostEvent( boost::bind( &AppController::UpdateLogHistory, controller, false,
-        message_type, message ) );
+    Core::Interface::PostEvent( boost::bind( 
+      &ControllerInterface::UpdateLogHistory, controller, false, message_type, message ) );
     return;
   }
 
@@ -294,12 +297,13 @@ void AppController::UpdateLogHistory( qpointer_type controller, bool relay, int 
   }
 }
 
-void AppController::PostActionMessage( qpointer_type controller, std::string message )
+void ControllerInterface::PostActionMessage( qpointer_type controller, std::string message )
 {
   // Ensure that this call gets relayed to the right thread
   if ( !( Core::Interface::IsInterfaceThread() ) )
   {
-    Core::Interface::PostEvent( boost::bind( &AppController::PostActionMessage, controller, message ) );
+    Core::Interface::PostEvent( boost::bind( &ControllerInterface::PostActionMessage, 
+      controller, message ) );
   }
 
   // Protect controller pointer, so we do not execute if controller does not
@@ -310,12 +314,13 @@ void AppController::PostActionMessage( qpointer_type controller, std::string mes
   }
 }
 
-void AppController::PostActionUsage( qpointer_type controller, std::string usage )
+void ControllerInterface::PostActionUsage( qpointer_type controller, std::string usage )
 {
   // Ensure that this call gets relayed to the right thread
   if ( !( Core::Interface::IsInterfaceThread() ) )
   {
-    Core::Interface::PostEvent( boost::bind( &AppController::PostActionUsage, controller, usage ) );
+    Core::Interface::PostEvent( boost::bind( &ControllerInterface::PostActionUsage, 
+      controller, usage ) );
   }
 
   // Protect controller pointer, so we do not execute if controller does not
@@ -326,7 +331,7 @@ void AppController::PostActionUsage( qpointer_type controller, std::string usage
   }
 }
 
-void AppController::SetActionType( qpointer_type controller, std::string action_type )
+void ControllerInterface::SetActionType( qpointer_type controller, std::string action_type )
 {
   // Protect controller pointer, so we do not execute if controller does not
   // exist anymore
@@ -337,4 +342,3 @@ void AppController::SetActionType( qpointer_type controller, std::string action_
 }
 
 } // end namespace Seg3D
-

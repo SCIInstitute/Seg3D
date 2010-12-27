@@ -33,7 +33,7 @@
 #include <QtUtils/Bridge/QtBridge.h>
 
 // Interface includes
-#include <Interface/AppPreferences/ColorPickerWidget.h>
+#include <Interface/Application/ColorPickerWidget.h>
 
 // The interface from the designer
 #include "ui_ColorPickerWidget.h"

@@ -36,7 +36,7 @@
 #include <Core/Utils/Log.h>
 
 // Interface includes
-#include <Interface/AppSplash/AppSplash.h>
+#include <Interface/Application/SplashScreen.h>
 #include <Interface/Application/LayerIOFunctions.h>
 
 // Application includes
@@ -47,21 +47,21 @@
 // Resources includes
 #include <Resources/QtResources.h>
 
-#include "ui_AppSplash.h"
+#include "ui_SplashScreen.h"
 
 namespace Seg3D
 {
 
-class AppSplashPrivate
+class SplashScreenPrivate
 {
 public:
-  Ui::AppSplash ui_;
+  Ui::SplashScreen ui_;
 
 };
 
-AppSplash::AppSplash( QWidget *parent ) :
+SplashScreen::SplashScreen( QWidget *parent ) :
   QtUtils::QtCustomDialog( parent ),
-  private_( new AppSplashPrivate )
+  private_( new SplashScreenPrivate )
 {
   this->setAttribute( Qt::WA_DeleteOnClose, true );
   
@@ -103,11 +103,11 @@ AppSplash::AppSplash( QWidget *parent ) :
   this->private_->ui_.new_project_button_->setFocus();
 }
 
-AppSplash::~AppSplash()
+SplashScreen::~SplashScreen()
 {
 }
   
-void AppSplash::new_project()
+void SplashScreen::new_project()
 {
   this->new_project_wizard_ = new ProjectWizard( this->parentWidget() );
   connect( this->new_project_wizard_, SIGNAL( canceled() ), this, SLOT( unhide() ) );
@@ -115,17 +115,17 @@ void AppSplash::new_project()
   this->hide();
 }
 
-void AppSplash::quit()
+void SplashScreen::quit()
 {
   reinterpret_cast<QWidget*>( this->parent() )->close();
 }
 
-void AppSplash::unhide()
+void SplashScreen::unhide()
 {
   this->show();
 }
   
-void AppSplash::open_existing()
+void SplashScreen::open_existing()
 {
   boost::filesystem::path current_projects_path = complete( 
     boost::filesystem::path( ProjectManager::Instance()->
@@ -145,7 +145,7 @@ void AppSplash::open_existing()
   }
 }
   
-void AppSplash::open_recent()
+void SplashScreen::open_recent()
 {
   if( this->private_->ui_.recent_project_listwidget_->currentItem()->text() != "" )
   {
@@ -177,7 +177,7 @@ void AppSplash::open_recent()
   this->close();
 }
 
-void AppSplash::quick_open_file()
+void SplashScreen::quick_open_file()
 {
   ActionQuickOpen::Dispatch( Core::Interface::GetWidgetActionContext() );
   this->hide();
@@ -185,7 +185,7 @@ void AppSplash::quick_open_file()
   
 }
   
-void AppSplash::populate_recent_projects()
+void SplashScreen::populate_recent_projects()
 {
   this->recent_project_list_ = ProjectManager::Instance()->
     recent_projects_state_->get();
@@ -210,7 +210,7 @@ void AppSplash::populate_recent_projects()
   }
 }
   
-void AppSplash::enable_load_recent_button( QListWidgetItem* not_used )
+void SplashScreen::enable_load_recent_button( QListWidgetItem* not_used )
 {
   this->private_->ui_.load_recent_button_->setEnabled( true );
 }

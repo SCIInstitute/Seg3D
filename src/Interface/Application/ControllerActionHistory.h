@@ -26,37 +26,34 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_APPCONTROLLER_APPUNDOBUFFER_H
-#define INTERFACE_APPCONTROLLER_APPUNDOBUFFER_H
+#ifndef INTERFACE_APPLICTION_CONTROLLERACTIONHISTORY_H
+#define INTERFACE_APPLICTION_CONTROLLERACTIONHISTORY_H 
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
 #endif 
 
-// STL includes
-#include <string>
-#include <deque>
-
 // QT includes
-#include <QtCore/QAbstractTableModel>
-#include <QtCore/QObject>
 #include <QtCore/QVariant>
+#include <QtCore/QModelIndex>
+#include <QtCore/QObject>
 
 // Core includes
-#include <Core/Utils/Log.h>
+// include all the headers associated with the action engine
+#include <Core/Action/Actions.h>
+#include <Core/Action/ActionHistory.h>
 
 namespace Seg3D
 {
 
-class AppControllerUndoBuffer : public QAbstractTableModel
+class ControllerActionHistory : public QAbstractTableModel
 {
-
 Q_OBJECT
 
 public:
-  AppControllerUndoBuffer( QObject* parent = 0 );
+  ControllerActionHistory( QObject* parent = 0 );
 
-  virtual ~AppControllerUndoBuffer();
+  virtual ~ControllerActionHistory();
 
   int rowCount( const QModelIndex &index ) const;
   int columnCount( const QModelIndex &index ) const;
@@ -64,9 +61,11 @@ public:
   QVariant data( const QModelIndex& index, int role ) const;
   QVariant headerData( int section, Qt::Orientation orientation, int role ) const;
 
-  void add_log_entry( int message_type, std::string& message );
-
   void update() { reset(); }
+
+private:
+  // Short cut to where the history is stored
+  Core::ActionHistory* history_;
 };
 
 } // end namespace Seg3D

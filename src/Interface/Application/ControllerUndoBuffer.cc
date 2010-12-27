@@ -30,31 +30,31 @@
 #include <Application/UndoBuffer/UndoBuffer.h>
 
 // Interface includes
-#include <Interface/AppController/AppControllerUndoBuffer.h>
+#include <Interface/Application/ControllerUndoBuffer.h>
 
 namespace Seg3D
 {
 
-AppControllerUndoBuffer::AppControllerUndoBuffer( QObject* parent ) :
+ControllerUndoBuffer::ControllerUndoBuffer( QObject* parent ) :
   QAbstractTableModel( parent )
 {
 }
 
-AppControllerUndoBuffer::~AppControllerUndoBuffer()
+ControllerUndoBuffer::~ControllerUndoBuffer()
 {
 }
 
-int AppControllerUndoBuffer::rowCount( const QModelIndex& ) const
+int ControllerUndoBuffer::rowCount( const QModelIndex& ) const
 {
   return static_cast< int > ( UndoBuffer::Instance()->num_undo_items() );
 }
 
-int AppControllerUndoBuffer::columnCount( const QModelIndex& ) const
+int ControllerUndoBuffer::columnCount( const QModelIndex& ) const
 {
   return 2;
 }
 
-QVariant AppControllerUndoBuffer::data( const QModelIndex& index, int role ) const
+QVariant ControllerUndoBuffer::data( const QModelIndex& index, int role ) const
 {
   if ( !index.isValid() ) return QVariant();
 
@@ -87,7 +87,7 @@ QVariant AppControllerUndoBuffer::data( const QModelIndex& index, int role ) con
   return QVariant();
 }
 
-QVariant AppControllerUndoBuffer::headerData( int section, Qt::Orientation orientation, int role ) const
+QVariant ControllerUndoBuffer::headerData( int section, Qt::Orientation orientation, int role ) const
 {
   if ( role != Qt::DisplayRole || orientation == Qt::Vertical )
   {

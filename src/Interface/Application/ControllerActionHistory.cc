@@ -28,31 +28,31 @@
  
 #include <QtCore/QSize>
 
-#include <Interface/AppController/AppControllerActionHistory.h>
+#include <Interface/Application/ControllerActionHistory.h>
 
 namespace Seg3D
 {
 
-AppControllerActionHistory::AppControllerActionHistory( QObject* parent ) :
+ControllerActionHistory::ControllerActionHistory( QObject* parent ) :
   QAbstractTableModel( parent ), history_( Core::ActionHistory::Instance() )
 {
 }
 
-AppControllerActionHistory::~AppControllerActionHistory()
+ControllerActionHistory::~ControllerActionHistory()
 {
 }
 
-int AppControllerActionHistory::rowCount( const QModelIndex& /*index*/) const
+int ControllerActionHistory::rowCount( const QModelIndex& /*index*/) const
 {
   return ( static_cast< int > ( history_->history_size() ) );
 }
 
-int AppControllerActionHistory::columnCount( const QModelIndex& /*index*/) const
+int ControllerActionHistory::columnCount( const QModelIndex& /*index*/) const
 {
   return ( 2 );
 }
 
-QVariant AppControllerActionHistory::data( const QModelIndex& index, int role ) const
+QVariant ControllerActionHistory::data( const QModelIndex& index, int role ) const
 {
   if ( !index.isValid() ) return QVariant();
 
@@ -94,7 +94,7 @@ QVariant AppControllerActionHistory::data( const QModelIndex& index, int role ) 
   }
 }
 
-QVariant AppControllerActionHistory::headerData( int section, Qt::Orientation orientation, int role ) const
+QVariant ControllerActionHistory::headerData( int section, Qt::Orientation orientation, int role ) const
 {
   if ( role != Qt::DisplayRole || orientation == Qt::Vertical )
   {

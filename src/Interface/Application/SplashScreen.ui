@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>AppSplash</class>
- <widget class="QDialog" name="AppSplash">
+ <class>SplashScreen</class>
+ <widget class="QDialog" name="SplashScreen">
   <property name="windowModality">
    <enum>Qt::ApplicationModal</enum>
   </property>
@@ -47,7 +47,7 @@
     <normaloff>../../Resources/Icons/Seg3DLarge.png</normaloff>../../Resources/Icons/Seg3DLarge.png</iconset>
   </property>
   <property name="styleSheet">
-   <string notr="true">QDialog#Splash {
+   <string notr="true">QDialog#SplashScreen {
   background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(221, 221, 221, 255), stop:0.155779 rgba(228, 228, 228, 255), stop:1 rgba(202, 204, 204, 255));
 }
 
