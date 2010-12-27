@@ -245,7 +245,6 @@ void LayerManagerWidget::handle_groups_changed()
     else
     {
       group_widget = ( *it ).second.data();
-      group_widget->handle_change();
     }
 
     this->private_->group_layout_->insertWidget( static_cast< int >( i ), group_widget );

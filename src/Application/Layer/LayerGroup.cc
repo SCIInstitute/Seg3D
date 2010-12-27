@@ -302,6 +302,14 @@ void LayerGroup::insert_layer( LayerHandle new_layer, size_t pos )
   ASSERT_IS_APPLICATION_THREAD();
 
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
+  // If the layer already exists, do nothing
+  if ( std::find( this->layer_list_.begin(), this->layer_list_.end(), new_layer ) !=
+    this->layer_list_.end() )
+  {
+    return;
+  }
+  
   layer_list_type::iterator layer_it;
   if ( this->layer_list_.size() > pos )
   {

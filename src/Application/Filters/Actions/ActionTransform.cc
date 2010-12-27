@@ -321,7 +321,7 @@ bool ActionTransform::run( Core::ActionContextHandle& context,
     algo->find_layer( layer_ids[ i ], algo->src_layers_[ i ] );
     if ( algo->replace_ )
     {
-      algo->lock_for_processing( algo->src_layers_[ i ] );
+      algo->lock_for_processing( algo->src_layers_[ i ], false );
     }
     else
     {

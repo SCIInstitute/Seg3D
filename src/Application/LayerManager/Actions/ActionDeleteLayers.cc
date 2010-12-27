@@ -65,6 +65,7 @@ bool ActionDeleteLayers::run( Core::ActionContextHandle& context,
   for ( size_t i = 0; i < this->layers_vector_.size(); ++i )
   {
     LayerHandle layer = LayerManager::Instance()->get_layer_by_id( this->layers_vector_[ i ] );
+    layer->abort_signal_();
     item->add_layer_to_add( layer );
   }
   // Add the complete record to the undo buffer

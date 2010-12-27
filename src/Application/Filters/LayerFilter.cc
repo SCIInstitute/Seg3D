@@ -30,6 +30,8 @@
 #include <vector> 
  
 // Boost includes
+#include <boost/lambda/bind.hpp>
+#include <boost/lambda/lambda.hpp>
 #include <boost/thread/mutex.hpp> 
 #include <boost/thread/condition_variable.hpp> 
  
@@ -65,13 +67,16 @@ public:
   std::string success_;
     
   // Keep track of which layers were locked.
-  std::vector<LayerHandle> locked_layers_;
+  std::vector< LayerHandle > locked_layers_;
   
   // Keep track of which layers were created.
-  std::vector<LayerHandle> created_layers_;
+  std::vector< LayerHandle > created_layers_;
   
   // Keep track of which layers to create volume checkpoints for
-  std::vector<LayerHandle> volume_check_point_layers_;
+  std::vector< LayerHandle > volume_check_point_layers_;
+
+  // Keep track of which layers will be deleted
+  std::vector< LayerHandle > deleted_layers_;
 
   // Keep track of whether the filter has finished
   bool done_;
@@ -180,7 +185,7 @@ void LayerFilter::abort_and_wait()
 {
   if ( !( Core::Application::IsApplicationThread() ) )
   {
-    CORE_THROW_LOGICERROR( "wait_and_finalize_abort can only be called from the"
+    CORE_THROW_LOGICERROR( "abort_and_wait can only be called from the"
       " application thread." ); 
   }
   
@@ -261,7 +266,14 @@ bool LayerFilter::lock_for_processing( LayerHandle layer, bool check_point_volum
   layer->set_filter_handle( this->shared_from_this() );
   
   this->private_->locked_layers_.push_back( layer );
-  if ( check_point_volume ) this->private_->volume_check_point_layers_.push_back( layer );
+  if ( check_point_volume ) 
+  {
+    this->private_->volume_check_point_layers_.push_back( layer );
+  }
+  else
+  {
+    this->private_->deleted_layers_.push_back( layer );
+  }
   
   // Hook up the abort signal from the layer
   this->connect_abort( layer );
@@ -419,6 +431,7 @@ bool LayerFilter::dispatch_unlock_layer( LayerHandle layer )
     this->report_error( "Internal error in filter logic." );
     return false;
   }
+
   // Send a request to the layer manager to unlock the layer.
   LayerManager::DispatchUnlockLayer( layer, this->private_->key_ );
 
@@ -449,13 +462,20 @@ bool LayerFilter::dispatch_delete_layer( LayerHandle layer )
     found_layer = true;
   }
 
+  it = std::find( this->private_->deleted_layers_.begin(),
+    this->private_->deleted_layers_.end(), layer );
+  if ( it != this->private_->deleted_layers_.end() )
+  {
+    this->private_->deleted_layers_.erase( it );
+    found_layer = true;
+  }
+  
   it = std::find( this->private_->volume_check_point_layers_.begin(), 
     this->private_->volume_check_point_layers_.end(), layer );
   if ( it != this->private_->volume_check_point_layers_.end() )
   {
     this->private_->volume_check_point_layers_.erase( it );
   }
-  
   
   // If we did not find the layer return false, as we did not lock it in the first place.
   if ( ! found_layer ) 
@@ -567,6 +587,10 @@ bool LayerFilter::create_undo_redo_record( Core::ActionContextHandle context, Co
     item->add_layer_to_restore( *it, LayerCheckPointHandle( new LayerCheckPoint( *it ) ) );
     ++it;
   }
+
+  // Figure out which layers need to be added
+  std::for_each( this->private_->deleted_layers_.begin(), this->private_->deleted_layers_.end(),
+    boost::lambda::bind( &LayerUndoBufferItem::add_layer_to_add, item.get(), boost::lambda::_1 ) );
   
   // Add the redo action
   item->set_redo_action( redo_action );

@@ -259,15 +259,7 @@ public:
   // LAYERS_DELETED_SIGNAL:
   // This signal is triggered after layers have been deleted and passes a vector of layerhandles
   layers_signal_type layers_deleted_signal_;
-  
-  // GROUP_INSERTED_SIGNAL:
-  // This signal is triggered when a group has changed its order int the group list
-  group_signal_type group_inserted_signal_; 
-  
-  // GROUP_DELETED_SIGNAL:
-  // This signal is triggered when a group has been deleted from the layer manager
-  group_signal_type group_deleted_signal_;
-  
+    
   // LAYERS_CHANGED_SIGNAL:
   // This gets signaled when layers are inserted, deleted, or reordered.
   layers_changed_signal_type layers_changed_signal_;

@@ -203,23 +203,6 @@ bool LayerUndoBufferItem::apply_and_clear_undo()
   this->private_->layers_to_restore_.clear();
 
   // Step 3:
-  // Delete the layers that were created by the action.
-
-  // For layers that were created by the action, delete them again.
-  for ( size_t j = 0; j < this->private_->layers_to_delete_.size(); j++ )
-  {
-    LayerHandle layer = this->private_->layers_to_delete_[ j ];
-
-    // Delete the layer from the layer manager
-    std::vector< std::string > layer_vector;
-    layer_vector.push_back( layer->get_layer_id() );
-    LayerManager::Instance()->delete_layers( layer_vector );
-  } 
-  
-  // Remove the layers from the undo mechanism so the program can actually delete them
-  this->private_->layers_to_delete_.clear();
-  
-  // Step 4:
   // A delete action can have deleted layers. Hence we need to restore layers that may have been
   // deleted.
 
@@ -238,7 +221,7 @@ bool LayerUndoBufferItem::apply_and_clear_undo()
     {
       LayerHandle layer = ( *layer_it ).second;
       size_t layer_pos = ( *layer_it ).first;
-      
+
       LayerAbstractFilterHandle filter = layer->get_filter_handle();
       if ( filter ) 
       {
@@ -267,9 +250,28 @@ bool LayerUndoBufferItem::apply_and_clear_undo()
   }
   // Undelete layers
   LayerManager::Instance()->undelete_layers( layers, group_positions, layer_positions );
-  
+
   // Remove the layers from the undo mechanism so the program can actually delete them afterwards
   this->private_->layers_to_add_.clear(); 
+
+  // Step 4:
+  // Delete the layers that were created by the action.
+
+  // For layers that were created by the action, delete them again.
+  for ( size_t j = 0; j < this->private_->layers_to_delete_.size(); j++ )
+  {
+    LayerHandle layer = this->private_->layers_to_delete_[ j ];
+    // Invalidate the layer so the layer ID can be reused
+    layer->invalidate();
+
+    // Delete the layer from the layer manager
+    std::vector< std::string > layer_vector;
+    layer_vector.push_back( layer->get_layer_id() );
+    LayerManager::Instance()->delete_layers( layer_vector );
+  } 
+  
+  // Remove the layers from the undo mechanism so the program can actually delete them
+  this->private_->layers_to_delete_.clear();
   
   // The counters need to be rolled back so when redo is done, it actually redos the same action
   // resulting in the same counters. This only needs to be done if layers got created and deleted

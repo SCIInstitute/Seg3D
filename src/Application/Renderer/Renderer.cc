@@ -151,7 +151,7 @@ void RendererPrivate::process_slices( LayerSceneHandle& layer_scene, ViewerHandl
       Core::VolumeSliceHandle volume_slice = 
         viewer->get_volume_slice( layer_item->layer_id_ );
 
-      if ( volume_slice && !volume_slice->out_of_boundary() )
+      if ( volume_slice && volume_slice->is_valid() )
       {
         volume_slice->initialize_texture();
         volume_slice->upload_texture();

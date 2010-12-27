@@ -233,7 +233,6 @@ bool LayerManager::insert_layer( LayerHandle layer )
 
   if ( new_group )
   {
-    this->group_inserted_signal_( group_handle );
     this->groups_changed_signal_();
   }
   else
@@ -301,61 +300,25 @@ void LayerManager::insert_group( LayerGroupHandle group_above, LayerGroupHandle 
 
 bool LayerManager::move_layer_above( LayerHandle layer_to_move, LayerHandle target_layer )
 {
-  // we will need to keep track of a few things outside of the locked scope
-  // This keeps track of whether or not we delete the group we are moving from
-  bool group_above_has_been_deleted = false;
-  
-  bool layer_has_changed_groups = false;
-    
-  // These handles will let us send signals after we make the moves
-  LayerGroupHandle group_above;
-  LayerGroupHandle group_below;
-  
+  if( !layer_to_move || !target_layer ) return false;
+  LayerGroupHandle layer_group = layer_to_move->get_layer_group();
+  if ( layer_group != target_layer->get_layer_group() )
+  {
+    assert( false );
+    CORE_LOG_ERROR( "Can't move layer between groups. Resampling required!" );
+    return false;
+  }
+
   {
     // Get the Lock
     lock_type lock( this->get_mutex() );
       
-    if( !layer_to_move || !target_layer ) return false;
-
-    group_above = layer_to_move->get_layer_group();
-    group_below = target_layer->get_layer_group();
-    
     // First we Delete the Layer from its list of layers
-    group_above->delete_layer( layer_to_move );
-    group_below->move_layer_above( layer_to_move, target_layer );
-    
-    // If they are in the same group ---
-    if( group_above != group_below )
-    {
-      // If the group we are removing the layer from is empty we remove it
-      //  from the list of groups and signal the GUI
-      if( group_above->get_layer_list().empty() )
-      {   
-        this->private_->group_list_.remove( group_above );
-        group_above_has_been_deleted = true;
-      }
-      // Set the weak handle in the layer we've inserted to the proper group
-      layer_to_move->set_layer_group( group_below );
-      layer_has_changed_groups = true;
-    }
-  
-    if( layer_has_changed_groups )
-    {
-      this->group_internals_changed_signal_( group_above );
-      this->group_internals_changed_signal_( group_below );
-    }
-    else
-    {
-      this->group_internals_changed_signal_( group_above );
-    }
-
-    if( group_above_has_been_deleted )
-    {
-      group_deleted_signal_( group_above );
-      this->groups_changed_signal_();
-    } 
+    layer_group->delete_layer( layer_to_move );
+    layer_group->move_layer_above( layer_to_move, target_layer );
   } // We release the lock  here.
 
+  this->group_internals_changed_signal_( layer_group );
   this->layers_changed_signal_();
   this->layers_reordered_signal_();
   
@@ -413,7 +376,6 @@ bool LayerManager::move_layer_below( const std::string& layer_id, const std::str
 
     if( group_above_has_been_deleted )
     {
-      group_deleted_signal_( from_group );
       this->groups_changed_signal_();
     } 
   } // We release the lock  here.
@@ -650,7 +612,7 @@ void LayerManager::delete_layers(  std::vector< std::string > layers  )
     for( size_t i = 0; i < layers.size(); ++i )
     {
       LayerHandle layer = this->get_layer_by_id( layers[ i ] );
-      if( !layer ) return;
+      if( !layer ) continue;
       layer_vector.push_back( layer );
       
       CORE_LOG_MESSAGE( std::string( "Deleting Layer: " ) + layer->get_layer_id() );
@@ -661,7 +623,7 @@ void LayerManager::delete_layers(  std::vector< std::string > layers  )
       //layer->invalidate();
 
       // Abort any filter that might be running on the layer
-      layer->abort_signal_();
+      //layer->abort_signal_();
 
       group = layer->get_layer_group();
       group->delete_layer( layer );
@@ -675,22 +637,21 @@ void LayerManager::delete_layers(  std::vector< std::string > layers  )
       if ( this->private_->active_layer_ == layer )
       {
         this->private_->active_layer_.reset();
-        if ( this->private_->group_list_.size() > 0 )
-        {
-          this->private_->active_layer_ = this->private_->group_list_.front()->layer_list_.back();
-          active_layer_changed = true;
-        }
+        active_layer_changed = true;
       }
       
       if ( group->is_empty() ) group_deleted = true;
+    }
+
+    if ( active_layer_changed && this->private_->group_list_.size() > 0 )
+    {
+      this->private_->active_layer_ = this->private_->group_list_.front()->layer_list_.back();
     }
   } 
   
   // signal the listeners
   if( group_deleted )
   {   
-    if( active_layer_changed ) this->private_->active_layer_ = LayerHandle();
-      this->group_deleted_signal_( group );
     this->groups_changed_signal_();
   }
   else
@@ -706,7 +667,6 @@ void LayerManager::delete_layers(  std::vector< std::string > layers  )
   {
     this->active_layer_changed_signal_( this->private_->active_layer_ );
   }
-  
 } // end delete_layer
 
 LayerHandle LayerManager::get_active_layer()
@@ -917,7 +877,6 @@ bool LayerManager::pre_load_states( const Core::StateIO& state_io )
     if ( group->load_states( state_io ) )
     {
       this->private_->group_list_.push_front( group );
-      this->group_inserted_signal_( group );
 
       layer_list_type layer_list = group->get_layer_list();
       layer_list_type::iterator it = layer_list.begin();
@@ -1337,12 +1296,12 @@ void LayerManager::DispatchDeleteLayer( LayerHandle layer, filter_key_type key )
     if ( layer->num_filter_keys() == 0 )
     {
       layer->reset_filter_handle();
-
+      // Unlock the layer before deleting it, so when it's undeleted the data state is correct
+      layer->data_state_->set( Layer::AVAILABLE_C );
       // Delete the layer from the layer manager.
       std::vector< std::string > layer_vector;
       layer_vector.push_back( layer->get_layer_id() );
       LayerManager::Instance()->delete_layers( layer_vector );
-      //LayerManager::Instance()->delete_layer( layer );
     }
     else
     {
@@ -1412,7 +1371,6 @@ void LayerManager::DispatchUnlockOrDeleteLayer( LayerHandle layer, filter_key_ty
       std::vector< std::string > layer_vector;
       layer_vector.push_back( layer->get_layer_id() );
       LayerManager::Instance()->delete_layers( layer_vector );
-      //LayerManager::Instance()->delete_layer( layer );
     }
 
   }
@@ -1699,6 +1657,8 @@ void LayerManager::undelete_layers( const std::vector< LayerHandle >& layers,
   assert( layers.size() == group_pos.size() && layers.size() == layer_pos.size() );
 
   bool new_active_layer = false;
+  std::set< LayerGroupHandle > new_groups;
+  std::set< LayerGroupHandle > changed_groups;
 
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
@@ -1717,8 +1677,13 @@ void LayerManager::undelete_layers( const std::vector< LayerHandle >& layers,
           std::advance( group_it, group_pos[ i ] );
         }
         this->private_->group_list_.insert( group_it, layer_group );
+        new_groups.insert( layer_group );
       }
-
+      else if ( new_groups.find( layer_group ) == new_groups.end() )
+      {
+        changed_groups.insert( layer_group );
+      }
+      
       layer_group->insert_layer( layer, layer_pos[ i ] );
     }
 
@@ -1729,7 +1694,17 @@ void LayerManager::undelete_layers( const std::vector< LayerHandle >& layers,
     }
   }
   
-  this->groups_changed_signal_();
+  if ( new_groups.size() > 0 )
+  {
+    this->groups_changed_signal_();
+  }
+
+  std::set< LayerGroupHandle >::iterator it = changed_groups.begin();
+  for ( ; it != changed_groups.end(); ++it )
+  {
+    this->group_internals_changed_signal_( *it );
+  }
+  
   this->layers_changed_signal_();
   for ( size_t i = 0; i < layers.size(); ++i )
   {

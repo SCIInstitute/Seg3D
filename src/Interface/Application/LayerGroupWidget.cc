@@ -433,13 +433,19 @@ void LayerGroupWidget::set_picked_up_group_size( int group_height )
 void LayerGroupWidget::handle_change()
 {
   LayerGroupHandle this_group = LayerManager::Instance()->FindLayerGroup( this->private_->group_id_ );
+  if ( !this_group )
+  {
+    // Group has been deleted, ignore
+    return;
+  }
+  
   layer_list_type layer_list = this_group->get_layer_list();
   
   int index = 0;
   bool layer_widget_deleted = false;
   this->setUpdatesEnabled( false );
   
-  // First we remove the LayerWidgets that arent needed any more.
+  // First we remove the LayerWidgets that aren't needed any more.
   for( std::map< std::string, LayerWidgetQHandle>::iterator it = this->layer_map_.begin(); 
     it != this->layer_map_.end(); ++it )
   {
