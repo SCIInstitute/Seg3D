@@ -225,33 +225,31 @@ bool ActionFloodFill::validate( Core::ActionContextHandle& context )
   }
 
   const std::vector< Core::Point >& seeds = this->private_->seeds_.value();
-  if ( seeds.size() == 0 )
-  {
-    context->report_error( "No seed points provided." );
-    return false;
-  }
-  
   int nx = static_cast< int >( this->private_->vol_slice_->nx() );
   int ny = static_cast< int >( this->private_->vol_slice_->ny() );
   this->private_->seeds_2d_.clear();
-  for ( size_t i = 0; i < seeds.size(); ++i )
+
+  if ( seeds.size() > 0 )
   {
-    double world_x, world_y;
-    this->private_->vol_slice_->project_onto_slice( seeds[ i ], world_x, world_y );
-    int x, y;
-    this->private_->vol_slice_->world_to_index( world_x, world_y, x, y );
-    if ( x >= 0 && x < nx && y >= 0 && y < ny )
+    for ( size_t i = 0; i < seeds.size(); ++i )
     {
-      this->private_->seeds_2d_.push_back( std::make_pair( x, y ) );
+      double world_x, world_y;
+      this->private_->vol_slice_->project_onto_slice( seeds[ i ], world_x, world_y );
+      int x, y;
+      this->private_->vol_slice_->world_to_index( world_x, world_y, x, y );
+      if ( x >= 0 && x < nx && y >= 0 && y < ny )
+      {
+        this->private_->seeds_2d_.push_back( std::make_pair( x, y ) );
+      }
+    }
+
+    if ( this->private_->seeds_2d_.size() == 0 )
+    {
+      context->report_error( "All seed points are outside the boundary of the slice." );
+      return false;
     }
   }
   
-  if ( this->private_->seeds_2d_.size() == 0 )
-  {
-    context->report_error( "All seed points are outside the boundary of the slice." );
-    return false;
-  }
-
   return true;
 }
 
@@ -318,25 +316,34 @@ bool ActionFloodFill::run( Core::ActionContextHandle& context, Core::ActionResul
       fill_value = 0;
     }
 
-    for ( size_t i = 0; i < this->private_->seeds_2d_.size(); ++i )
+    // If there is no seed point specified, fill or erase the entire slice
+    if ( this->private_->seeds_2d_.size() == 0 )
     {
-      if ( !this->private_->data_cstr_slice_ &&
-        !this->private_->mask_cstr1_slice_ &&
-        !this->private_->mask_cstr2_slice_ )
+      memset( slice_cache, fill_value, static_cast< size_t >( nx * ny ) );
+    }
+    // Else do a normal flood fill
+    else
+    {
+      for ( size_t i = 0; i < this->private_->seeds_2d_.size(); ++i )
       {
-        Core::FloodFill( slice_cache, nx, ny, this->private_->seeds_2d_[ i ].first,
-          this->private_->seeds_2d_[ i ].second, fill_value );
-      }
-      else
-      {
-        Core::FloodFill( slice_cache, nx, ny, this->private_->seeds_2d_[ i ].first, 
-          this->private_->seeds_2d_[ i ].second, fill_value,
-          ( *( boost::lambda::constant( &data_cstr[ 0 ] ) + 
-          boost::lambda::_2 * nx + boost::lambda::_1 ) != 0 &&
-          *( boost::lambda::constant( &mask_cstr1[ 0 ] ) + 
-          boost::lambda::_2 * nx + boost::lambda::_1 ) != 0 &&
-          *( boost::lambda::constant( &mask_cstr2[ 0 ] ) + 
-          boost::lambda::_2 * nx + boost::lambda::_1 ) != 0 ) );
+        if ( !this->private_->data_cstr_slice_ &&
+          !this->private_->mask_cstr1_slice_ &&
+          !this->private_->mask_cstr2_slice_ )
+        {
+          Core::FloodFill( slice_cache, nx, ny, this->private_->seeds_2d_[ i ].first,
+            this->private_->seeds_2d_[ i ].second, fill_value );
+        }
+        else
+        {
+          Core::FloodFill( slice_cache, nx, ny, this->private_->seeds_2d_[ i ].first, 
+            this->private_->seeds_2d_[ i ].second, fill_value,
+            ( *( boost::lambda::constant( &data_cstr[ 0 ] ) + 
+            boost::lambda::_2 * nx + boost::lambda::_1 ) != 0 &&
+            *( boost::lambda::constant( &mask_cstr1[ 0 ] ) + 
+            boost::lambda::_2 * nx + boost::lambda::_1 ) != 0 &&
+            *( boost::lambda::constant( &mask_cstr2[ 0 ] ) + 
+            boost::lambda::_2 * nx + boost::lambda::_1 ) != 0 ) );
+        }
       }
     }
   }
