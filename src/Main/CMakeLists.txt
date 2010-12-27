@@ -81,9 +81,6 @@ TARGET_LINK_LIBRARIES(Seg3D2
   QtUtils_Widgets
   QtUtils_Bridge
   Interface_Application
-  Interface_AppController
-  Interface_AppPreferences
-  Interface_AppSplash
   Interface_ToolInterface
 )
 

@@ -78,7 +78,6 @@ SET(INTERFACE_APPLICATION_MOC_SRCS
   ApplicationInterface.h
   ColorPickerWidget.h
   ControllerInterface.h
-  ControllerContext.h
   ControllerActionHistory.h
   ControllerStateEngine.h
   ControllerLogHistory.h
@@ -119,6 +118,7 @@ SET(INTERFACE_APPLICATION_MOC_SRCS
 
 
 SET(INTERFACE_APPLICATION_NO_MOC_SRCS
+  ControllerContext.h
   LayerIOFunctions.h
   LayerIOFunctions.cc
   StyleSheet.h
