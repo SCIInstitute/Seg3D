@@ -81,13 +81,13 @@ CORE_ADD_LIBRARY(Interface_AppSaveProjectAsWizard
 
             
 TARGET_LINK_LIBRARIES(Interface_AppSaveProjectAsWizard
-                      Interface_AppInterface
                       Core_Utils
                       Core_Application
                       Core_EventHandler
                       Core_Action
                       Core_Interface
             Application_ProjectManager
+            Interface_Application
                       ${QT_LIBRARIES} 
                       ${SCI_BOOST_LIBRARY})
 

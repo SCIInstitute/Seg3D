@@ -29,10 +29,11 @@
 #ifndef INTERFACE_TOOLINTERFACE_ARITHMETICFILTERINTERFACE_H
 #define INTERFACE_TOOLINTERFACE_ARITHMETICFILTERINTERFACE_H
 
+// Qt includes
 #include <QListWidgetItem>
 
 // Base class of the tool widget
-#include <Interface/AppInterface/ToolWidget.h>
+#include <Interface/Application/ToolWidget.h>
 
 namespace Seg3D
 {

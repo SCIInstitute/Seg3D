@@ -113,8 +113,5 @@ QToolButton#color_button_12_{
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="Resources/AppInterface.qrc"/>
- </resources>
  <connections/>
 </ui>

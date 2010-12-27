@@ -81,12 +81,12 @@ CORE_ADD_LIBRARY(Interface_AppProjectWizard
 
             
 TARGET_LINK_LIBRARIES(Interface_AppProjectWizard
-            Interface_AppInterface
                       Core_Utils
                       Core_EventHandler
                       Core_Action
                       Core_Interface
                   Application_ProjectManager
+            Interface_Application
                       ${QT_LIBRARIES} 
                       ${SCI_BOOST_LIBRARY})
 

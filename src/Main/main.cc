@@ -51,7 +51,7 @@
 #include <Application/Tool/ToolFactory.h>
 
 // Interface includes
-#include <Interface/AppInterface/AppInterface.h>
+#include <Interface/Application/ApplicationInterface.h>
 
 // Resource includes
 #include <Resources/QtResources.h>
@@ -77,12 +77,15 @@ int main( int argc, char **argv )
   // -- Check whether the user requested a version / revision number
   if ( Core::Application::Instance()->is_command_line_parameter( "revision") )
   {
+    // NOTE: The revision information is gathered by cmake from svn. Hence if the local tree
+    // contains modifications this information is not up-to-date
     std::cout << SEG3D_REVISIONINFO << std::endl;
     return 0;
   }
 
   if ( Core::Application::Instance()->is_command_line_parameter( "version") )
   {
+    // NOTE: This information is gathered by cmake from the main cmake file.
     std::cout << Core::Application::Instance()->GetApplicationName() << " version: " <<  
       Core::Application::Instance()->GetReleaseName() << " " <<
       Core::Application::Instance()->GetVersion() << std::endl;
@@ -127,7 +130,8 @@ int main( int argc, char **argv )
 
   std::string warning = std::string( "<h3>" ) +
     Core::Application::GetApplicationNameAndVersion() + 
-    "</h3><p align=\"left\">NOTE: This version of Seg3D is for Testing and Evaluation Only!</p> <p>file to open: " + file_to_view + "</p>";
+    "</h3><p align=\"left\">NOTE: This version of Seg3D is for Testing and Evaluation"
+    " Only!</p>";
   
   QMessageBox::information( 0, 
     QString::fromStdString( Core::Application::GetApplicationNameAndVersion() ), 
@@ -145,7 +149,7 @@ int main( int argc, char **argv )
 //  std::string file_to_view = "";
 //  Core::Application::Instance()->check_command_line_parameter( "file_to_open_on_start", file_to_view );
   
-  AppInterface* app_interface = new AppInterface( file_to_view );
+  ApplicationInterface* app_interface = new ApplicationInterface( file_to_view );
 
   // Show the full interface
   app_interface->show();

@@ -33,6 +33,10 @@
 #include <QCoreApplication>
 #include <QPointer>
 
+// Boost includes
+#include <boost/function.hpp>
+#include <boost/bind.hpp>
+
 namespace QtUtils
 {
 

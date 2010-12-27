@@ -90,15 +90,14 @@ CORE_ADD_LIBRARY(Interface_AppSegmentationExportWizard
 
             
 TARGET_LINK_LIBRARIES(Interface_AppSegmentationExportWizard
-            Interface_AppInterface
                       Core_Utils
                       Core_EventHandler
                       Core_Action
                       Core_Interface
-                      Interface_AppInterface
                       Application_ProjectManager
                       Application_LayerIO
                   Application_LayerManager
+                      Interface_Application
                       ${QT_LIBRARIES} 
                       ${SCI_BOOST_LIBRARY})
 

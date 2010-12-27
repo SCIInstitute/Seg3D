@@ -91,4 +91,3 @@ bool AndFilterInterface::build_widget( QFrame* frame )
 }
   
 } // end namespace Seg3D
-

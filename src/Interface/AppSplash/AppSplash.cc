@@ -37,7 +37,7 @@
 
 // Interface includes
 #include <Interface/AppSplash/AppSplash.h>
-#include <Interface/AppInterface/AppLayerIO.h>
+#include <Interface/Application/LayerIOFunctions.h>
 
 // Application includes
 #include <Application/ProjectManager/ProjectManager.h>
@@ -181,7 +181,7 @@ void AppSplash::quick_open_file()
 {
   ActionQuickOpen::Dispatch( Core::Interface::GetWidgetActionContext() );
   this->hide();
-  AppLayerIO::ImportFiles( dynamic_cast< QMainWindow* >( this->parentWidget() ), "" );
+  LayerIOFunctions::ImportFiles( dynamic_cast< QMainWindow* >( this->parentWidget() ), "" );
   
 }
   

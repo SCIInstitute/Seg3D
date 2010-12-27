@@ -27,7 +27,7 @@
 #
 
 ADD_SUBDIRECTORY(AppController)
-ADD_SUBDIRECTORY(AppInterface)
+ADD_SUBDIRECTORY(Application)
 ADD_SUBDIRECTORY(AppPreferences)
 ADD_SUBDIRECTORY(AppProjectExportWizard)
 ADD_SUBDIRECTORY(AppProjectWizard)

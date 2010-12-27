@@ -194,8 +194,8 @@ TARGET_LINK_LIBRARIES(Interface_ToolInterface
             QtUtils_Utils
                       QtUtils_Widgets
             QtUtils_Bridge
+            Interface_Application
             Resources_QtResources
-            Interface_AppInterface
                       ${QT_LIBRARIES} 
                       ${SCI_BOOST_LIBRARY})
 

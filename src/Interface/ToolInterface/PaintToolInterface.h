@@ -29,15 +29,8 @@
 #ifndef INTERFACE_TOOLINTERFACE_PAINTTOOLINTERFACE_H
 #define INTERFACE_TOOLINTERFACE_PAINTTOOLINTERFACE_H
 
-// Core includes
-#include <Core/Utils/Log.h>
-
-// Application includes
-#include <Application/Tool/ToolFactory.h>
-
 // Base class of the tool widget include
-#include <Interface/AppInterface/ToolWidget.h>
-
+#include <Interface/Application/ToolWidget.h>
 
 namespace Seg3D
 {
