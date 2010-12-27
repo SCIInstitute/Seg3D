@@ -655,13 +655,15 @@ void LayerManager::delete_layers(  std::vector< std::string > layers  )
       
       CORE_LOG_MESSAGE( std::string( "Deleting Layer: " ) + layer->get_layer_id() );
 
-      group = layer->get_layer_group();
-
       // NOTE: Layer invalidation has been moved to the LayerUndoBufferItem.
       // A layer will only be invalidated when the corresponding undo buffer item has been deleted.
       // This also applies to layer groups.
       //layer->invalidate();
 
+      // Abort any filter that might be running on the layer
+      layer->abort_signal_();
+
+      group = layer->get_layer_group();
       group->delete_layer( layer );
       
       if( group->is_empty() )

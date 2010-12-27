@@ -110,7 +110,7 @@ void LayerUndoBufferItem::add_layer_to_delete( LayerHandle layer )
 
 void LayerUndoBufferItem::add_layer_to_add( LayerHandle layer )
 {
-  if ( !layer->has_valid_data() )
+  if ( !layer || !layer->has_valid_data() )
   {
     return;
   }
@@ -296,10 +296,27 @@ void LayerUndoBufferItem::compute_size()
     size += this->private_->layers_to_restore_[ j ].second->get_byte_size();
   }
     
-  //for ( size_t j = 0; j < this->private_->layers_to_add_.size(); j++ )
-  //{   
-  //  size += this->private_->layers_to_add_[ j ]->get_byte_size();
-  //}
+  std::map< size_t, LayerDeletionUndoRecordHandle >::iterator group_it = 
+    this->private_->layers_to_add_.begin();
+  while ( group_it != this->private_->layers_to_add_.end() )
+  {
+    LayerDeletionUndoRecordHandle record = ( *group_it ).second;
+    std::map< size_t, LayerHandle >::iterator layer_it = record->layer_pos_map_.begin();
+    while ( layer_it != record->layer_pos_map_.end() )
+    {
+      if ( ( *layer_it ).second->get_type() == Core::VolumeType::MASK_E )
+      {
+        // NOTE: Mask volumes only use 1 bit out of a byte
+        size += ( *layer_it ).second->get_byte_size() / 8;
+      }
+      else
+      {
+        size += ( *layer_it ).second->get_byte_size();
+      }
+      ++layer_it;
+    }
+    ++group_it;
+  }
 
   this->private_->size_ = size;
 }
