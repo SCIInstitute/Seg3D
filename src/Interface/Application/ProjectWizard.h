@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_APPPROJECTEXPORTWIZARD_APPPROJECTEXPORTWIZARD_H
-#define INTERFACE_APPPROJECTEXPORTWIZARD_APPPROJECTEXPORTWIZARD_H
+#ifndef INTERFACE_APPLICATION_PROJECTWIZARD_H
+#define INTERFACE_APPLICATION_PROJECTWIZARD_H
 
 //Qt includes
 #include <QtGui/QWizard>
@@ -39,67 +39,61 @@
 namespace Seg3D
 {
 
-class AppProjectExportWizard : public QWizard
+class ProjectWizard : public QWizard
 {
 Q_OBJECT
 
+Q_SIGNALS:
+  void finished();
+  void canceled();
+
 public:
-  AppProjectExportWizard( const std::string& session_name, QWidget *parent = 0 );
-    virtual ~AppProjectExportWizard();
+    ProjectWizard( QWidget *parent = 0 );
+    virtual ~ProjectWizard();
 
 private:
     void accept();
-  QString session_name_;
+    void reject();
 };
 
-class ExportInfoPage : public QWizardPage
+class ProjectInfoPage : public QWizardPage
 {
 Q_OBJECT
 
 public:
-    ExportInfoPage( QWidget *parent = 0 );
-
-public:
-  QString session_name_;
+    ProjectInfoPage( QWidget *parent = 0 );
   
 protected:
-  // INITIALIZEPAGE:
-  // function for preloading the page information for the info page
     void initializePage();
 
 private:
-  QLabel *project_name_label_;
+    QLabel *project_name_label_;
     QLabel *project_path_label_;
     QLineEdit *project_name_lineedit_;
     QLineEdit *project_path_lineedit_;
     QPushButton *project_path_change_button_;
-    QCheckBox *automatically_consolidate_checkbox_;
 
 private Q_SLOTS:
-  // SETPATH:
-  // helper function for setting the path for project export
     void set_path();
 };
 
-class ExportSummaryPage : public QWizardPage
+class SummaryPage : public QWizardPage
 {
     Q_OBJECT
 
 public:
-    ExportSummaryPage( QWidget *parent = 0 );
+    SummaryPage(QWidget *parent = 0);
 
 protected:
-  // INITIALIZEPAGE:
-  // function for preloading the page information for the summary page
     void initializePage();
 
 private:
   QLabel *description_;
     QLabel *project_name_;
     QLabel *project_path_;
-  QLabel *consolidate_;
+
 };
 
 } // end namespace Seg3D
-#endif // APPPROJECTWIZARD_H
 
+#endif

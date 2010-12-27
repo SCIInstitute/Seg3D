@@ -47,9 +47,6 @@
 // Core includes
 #include <Core/State/Actions/ActionSet.h>
 
-// Interface includes
-#include <Interface/AppSegmentationExportWizard/AppSegmentationExportWizard.h>
-
 // Application includes
 #include <Application/LayerIO/LayerIO.h>
 #include <Application/Layer/LayerGroup.h>
@@ -57,11 +54,13 @@
 #include <Application/LayerManager/Actions/ActionExportSegmentation.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
 
+// Interface includes
+#include <Interface/Application/SegmentationExportWizard.h>
 
 namespace Seg3D
 {
   
-  class AppSegmentationPrivate{
+  class SegmentationPrivate{
   public:
     QVector< QtLayerListWidget* > masks_;
     QWidget* bitmap_widget_;
@@ -100,9 +99,9 @@ namespace Seg3D
   };
   
 
-AppSegmentationExportWizard::AppSegmentationExportWizard( QWidget *parent ) :
+SegmentationExportWizard::SegmentationExportWizard( QWidget *parent ) :
     QWizard( parent ),
-  private_( new AppSegmentationPrivate )
+  private_( new SegmentationPrivate )
 {
   this->setMinimumSize( 660, 400 );
   this->addPage( new SegmentationSelectionPage( private_, this ) );
@@ -112,16 +111,16 @@ AppSegmentationExportWizard::AppSegmentationExportWizard( QWidget *parent ) :
   this->setWindowTitle( tr( "Segmentation Export Wizard" ) );
 }
 
-AppSegmentationExportWizard::~AppSegmentationExportWizard()
+SegmentationExportWizard::~SegmentationExportWizard()
 {
 }
 
-void AppSegmentationExportWizard::accept()
+void SegmentationExportWizard::accept()
 {
     QDialog::accept();
 }
 
-SegmentationSelectionPage::SegmentationSelectionPage( AppSegmentationPrivateHandle private_handle, QWidget *parent )
+SegmentationSelectionPage::SegmentationSelectionPage( SegmentationPrivateHandle private_handle, QWidget *parent )
     : QWizardPage( parent )
 {
   this->private_ = private_handle;
@@ -203,14 +202,10 @@ SegmentationSelectionPage::SegmentationSelectionPage( AppSegmentationPrivateHand
   this->private_->bitmap_checkbox_->setEnabled( false );
   this->private_->bitmap_layout_->addWidget( this->private_->bitmap_checkbox_ );
   
-
   this->private_->selection_main_layout_->addWidget( this->private_->single_or_multiple_files_widget_ );
   this->private_->selection_main_layout_->addWidget( this->private_->bitmap_widget_ );
 
-  
   this->private_->single_file_radio_button_->setChecked( true );
-  
-
 }
   
 void SegmentationSelectionPage::enable_disable_bitmap_button( int button_id )
@@ -339,7 +334,7 @@ bool SegmentationSelectionPage::validatePage()
   return true;
 }
 
-SegmentationSummaryPage::SegmentationSummaryPage( AppSegmentationPrivateHandle private_handle, QWidget *parent )
+SegmentationSummaryPage::SegmentationSummaryPage( SegmentationPrivateHandle private_handle, QWidget *parent )
     : QWizardPage( parent )
 {
   this->private_ = private_handle;
@@ -372,8 +367,6 @@ SegmentationSummaryPage::SegmentationSummaryPage( AppSegmentationPrivateHandle p
   this->private_->summary_main_layout_->addWidget( this->private_->mask_scroll_area_ );
 
   this->setLayout( this->private_->summary_main_layout_ );
-
-  
 }
 
 void SegmentationSummaryPage::initializePage()

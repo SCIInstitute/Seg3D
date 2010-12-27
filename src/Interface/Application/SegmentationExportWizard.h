@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_APPPROJECTWIZARD_APPSEGMENTATIONEXPORTWIZARD_H
-#define INTERFACE_APPPROJECTWIZARD_APPSEGMENTATIONEXPORTWIZARD_H
+#ifndef INTERFACE_APPLICATION_SEGMENTATIONEXPORTWIZARD_H
+#define INTERFACE_APPLICATION_SEGMENTATIONEXPORTWIZARD_H
 
 #include <boost/shared_ptr.hpp>
 
@@ -35,26 +35,25 @@
 #include <QtGui/QWizard>
 
 // Interface Includes
-#include <Interface/AppSegmentationExportWizard/QtLayerListWidget.h>
+#include <Interface/Application/QtLayerListWidget.h>
 
 namespace Seg3D
 {
 
-class AppSegmentationPrivate;
-typedef boost::shared_ptr< AppSegmentationPrivate > AppSegmentationPrivateHandle;
+class SegmentationPrivate;
+typedef boost::shared_ptr< SegmentationPrivate > SegmentationPrivateHandle;
   
-class AppSegmentationExportWizard : public QWizard
+class SegmentationExportWizard : public QWizard
 {
 Q_OBJECT
 
 public:
-  AppSegmentationExportWizard( QWidget *parent = 0 );
-    virtual ~AppSegmentationExportWizard();
+  SegmentationExportWizard( QWidget *parent = 0 );
+    virtual ~SegmentationExportWizard();
     
 private:
     void accept();
-  AppSegmentationPrivateHandle private_;
-
+  SegmentationPrivateHandle private_;
 };
 
 class SegmentationSelectionPage : public QWizardPage
@@ -62,7 +61,7 @@ class SegmentationSelectionPage : public QWizardPage
 Q_OBJECT
 
 public:
-  SegmentationSelectionPage( AppSegmentationPrivateHandle private_handle, QWidget *parent = 0 );
+  SegmentationSelectionPage( SegmentationPrivateHandle private_handle, QWidget *parent = 0 );
   
 protected:
   // INITIALIZEPAGE:
@@ -79,7 +78,7 @@ private Q_SLOTS:
   void enable_disable_bitmap_button( int button_id );
   
 private:
-  AppSegmentationPrivateHandle private_;
+  SegmentationPrivateHandle private_;
 
 };
 
@@ -88,7 +87,7 @@ class SegmentationSummaryPage : public QWizardPage
     Q_OBJECT
 
 public:
-    SegmentationSummaryPage( AppSegmentationPrivateHandle private_handle, QWidget *parent = 0 );
+    SegmentationSummaryPage( SegmentationPrivateHandle private_handle, QWidget *parent = 0 );
 
 protected:
   // INITIALIZEPAGE:
@@ -107,10 +106,10 @@ protected:
   virtual bool validatePage();
 
 private:
-  AppSegmentationPrivateHandle private_;
+  SegmentationPrivateHandle private_;
 
 };
 
 } // end namespace Seg3D
-#endif // APPSEGMENTATIONEXPORTWIZARD_H
 
+#endif

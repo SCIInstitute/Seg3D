@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_APPPROJECTWIZARD_APPPROJECTWIZARD_H
-#define INTERFACE_APPPROJECTWIZARD_APPPROJECTWIZARD_H
+#ifndef INTERFACE_APPLICATION_SAVEPROJECTASWIZARD_H
+#define INTERFACE_APPLICATION_SAVEPROJECTASWIZARD_H
 
 //Qt includes
 #include <QtGui/QWizard>
@@ -36,67 +36,86 @@
 #include <QtGui/QPushButton>
 #include <QtGui/QCheckBox>
 
+
 namespace Seg3D
 {
 
-class AppProjectWizard : public QWizard
+class SaveProjectAsWizard : public QWizard
+{
+Q_OBJECT
+
+public:
+  SaveProjectAsWizard( QWidget *parent = 0 );
+    virtual ~SaveProjectAsWizard();
+
+private:
+    void accept();
+    
+private Q_SLOTS:
+  void finish_early();
+  void set_delete_path( QString );
+  
+private:
+  std::string path_to_delete_;
+  
+};
+
+class SaveAsInfoPage : public QWizardPage
 {
 Q_OBJECT
 
 Q_SIGNALS:
-  void finished();
-  void canceled();
+  // This signal is triggered when the user trys to do a save as without changing anything
+  void just_a_save();
+  
+  void need_to_set_delete_path( QString );
+  
+public:
+    SaveAsInfoPage( QWidget *parent = 0 );
 
 public:
-    AppProjectWizard( QWidget *parent = 0 );
-    virtual ~AppProjectWizard();
-
-private:
-    void accept();
-    void reject();
-
-
-};
-
-class ProjectInfoPage : public QWizardPage
-{
-Q_OBJECT
-
-public:
-    ProjectInfoPage( QWidget *parent = 0 );
   
 protected:
+  // INITIALIZEPAGE:
+  // function for preloading the page information for the info page
     void initializePage();
+    
+  // VALIDATEPAGE:
+  // function that is called right after the next button is clicked and used to process
+  // the entered data so it can be passed to the next page
+  virtual bool validatePage();
 
 private:
-    QLabel *project_name_label_;
+  QLabel *project_name_label_;
     QLabel *project_path_label_;
     QLineEdit *project_name_lineedit_;
     QLineEdit *project_path_lineedit_;
     QPushButton *project_path_change_button_;
 
 private Q_SLOTS:
+  // SETPATH:
+  // helper function for setting the path for project export
     void set_path();
 };
 
-class SummaryPage : public QWizardPage
+class SaveAsSummaryPage : public QWizardPage
 {
     Q_OBJECT
 
 public:
-    SummaryPage(QWidget *parent = 0);
+    SaveAsSummaryPage(QWidget *parent = 0);
 
 protected:
+  // INITIALIZEPAGE:
+  // function for preloading the page information for the summary page
     void initializePage();
 
 private:
   QLabel *description_;
     QLabel *project_name_;
     QLabel *project_path_;
-
 };
 
-
 } // end namespace Seg3D
-#endif // APPPROJECTWIZARD_H
 
+#endif

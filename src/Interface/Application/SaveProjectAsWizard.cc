@@ -44,13 +44,12 @@
 #include <Application/ProjectManager/Actions/ActionSaveSession.h>
 
 // Interface includes
-#include <Interface/AppSaveProjectAsWizard/AppSaveProjectAsWizard.h>
-
+#include <Interface/Application/SaveProjectAsWizard.h>
 
 namespace Seg3D
 {
 
-AppSaveProjectAsWizard::AppSaveProjectAsWizard( QWidget *parent ) :
+SaveProjectAsWizard::SaveProjectAsWizard( QWidget *parent ) :
     QWizard( parent ),
     path_to_delete_( "" )
 {
@@ -67,11 +66,11 @@ AppSaveProjectAsWizard::AppSaveProjectAsWizard( QWidget *parent ) :
   this->setWindowTitle( tr( "Save Project As Wizard" ) );
 }
 
-AppSaveProjectAsWizard::~AppSaveProjectAsWizard()
+SaveProjectAsWizard::~SaveProjectAsWizard()
 {
 }
 
-void AppSaveProjectAsWizard::accept()
+void SaveProjectAsWizard::accept()
 {
   if( this->path_to_delete_ != "" )
   {
@@ -84,12 +83,12 @@ void AppSaveProjectAsWizard::accept()
     QDialog::accept();
 }
 
-void AppSaveProjectAsWizard::finish_early()
+void SaveProjectAsWizard::finish_early()
 {
   this->close();
 }
 
-void AppSaveProjectAsWizard::set_delete_path( QString path )
+void SaveProjectAsWizard::set_delete_path( QString path )
 {
   this->path_to_delete_ = path.toStdString();
 }
@@ -195,8 +194,6 @@ bool SaveAsInfoPage::validatePage()
   return true;
 }
 
-
-
 SaveAsSummaryPage::SaveAsSummaryPage( QWidget *parent )
     : QWizardPage( parent )
 {
@@ -227,8 +224,7 @@ void SaveAsSummaryPage::initializePage()
     this->project_name_->setText( 
     QString::fromUtf8( "Project Name: " ) + field("projectName").toString() );
     this->project_path_->setText( 
-    QString::fromUtf8( "Project Path: " ) + field("projectPath").toString() );
-  
+    QString::fromUtf8( "Project Path: " ) + field("projectPath").toString() );  
 }
 
 } // end namespace Seg3D

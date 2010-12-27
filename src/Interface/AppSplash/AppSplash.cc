@@ -109,7 +109,7 @@ AppSplash::~AppSplash()
   
 void AppSplash::new_project()
 {
-  this->new_project_wizard_ = new AppProjectWizard( this->parentWidget() );
+  this->new_project_wizard_ = new ProjectWizard( this->parentWidget() );
   connect( this->new_project_wizard_, SIGNAL( canceled() ), this, SLOT( unhide() ) );
   this->new_project_wizard_->show();
   this->hide();
@@ -184,8 +184,6 @@ void AppSplash::quick_open_file()
   LayerIOFunctions::ImportFiles( dynamic_cast< QMainWindow* >( this->parentWidget() ), "" );
   
 }
-  
-  
   
 void AppSplash::populate_recent_projects()
 {

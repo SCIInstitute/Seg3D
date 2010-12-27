@@ -48,7 +48,12 @@ SET(INTERFACE_APPLICATION_SRCS
   OverlayWidget.cc
   ProgressWidget.cc
   ProjectDockWidget.cc
+  ProjectExportWizard.cc
+  ProjectWizard.cc
   PushDragButton.cc
+  QtLayerListWidget.cc
+  SaveProjectAsWizard.cc
+  SegmentationExportWizard.cc
   ShortcutsInterface.cc
   StatusBarWidget.cc
   ToolBoxWidget.cc
@@ -76,7 +81,12 @@ SET(INTERFACE_APPLICATION_MOC_SRCS
   OverlayWidget.h
   ProgressWidget.h
   ProjectDockWidget.h
+  ProjectExportWizard.h
+  ProjectWizard.h
   PushDragButton.h
+  QtLayerListWidget.h
+  SaveProjectAsWizard.h
+  SegmentationExportWizard.h 
   ShortcutsInterface.h
   StatusBarWidget.h
   ToolBoxWidget.h
@@ -107,6 +117,7 @@ SET(INTERFACE_APPLICATION_UI_SRCS
   MessageWindow.ui
   ProjectDockWidget.ui
   ProgressWidget.ui
+  QtLayerListWidget.ui
   StatusBarWidget.ui
   ShortcutsInterface.ui
   ToolBoxPageWidget.ui
@@ -176,9 +187,5 @@ TARGET_LINK_LIBRARIES(Interface_Application
                       Interface_AppController
             Interface_AppPreferences
                   Interface_AppSplash
-                  Interface_AppProjectWizard
-                  Interface_AppSaveProjectAsWizard
-                  Interface_AppProjectExportWizard
-                  Interface_AppSegmentationExportWizard
                       ${QT_LIBRARIES} 
                       ${SCI_BOOST_LIBRARY})

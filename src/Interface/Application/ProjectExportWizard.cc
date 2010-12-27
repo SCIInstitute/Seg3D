@@ -26,71 +26,69 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Boost includes
+#include <boost/filesystem.hpp>
+
 // Qt includes
 #include <QtCore/QVariant>
 #include <QtGui/QGridLayout>
 #include <QtGui/QFileDialog>
 
-// Interface includes
-#include <Interface/AppProjectWizard/AppProjectWizard.h>
+// Core includes
+#include <Core/State/Actions/ActionSet.h>
+#include <Core/Application/Application.h>
+
+// Application includes
 #include <Application/ProjectManager/ProjectManager.h>
-#include <Application/ProjectManager/Actions/ActionNewProject.h>
+#include <Application/ProjectManager/Actions/ActionExportProject.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
+
+// Interface includes
+#include <Interface/Application/ProjectExportWizard.h>
+
 
 namespace Seg3D
 {
 
-AppProjectWizard::AppProjectWizard( QWidget *parent ) :
+ProjectExportWizard::ProjectExportWizard( const std::string& session_name, QWidget *parent ) :
     QWizard( parent )
 {
-    this->addPage( new ProjectInfoPage );
-    this->addPage( new SummaryPage );
-  
+    this->addPage( new ExportInfoPage );
+    this->addPage( new ExportSummaryPage );
+
   this->setPixmap( QWizard::BackgroundPixmap, QPixmap( QString::fromUtf8( 
     ":/Images/Symbol.png" ) ) );
+
+  this->session_name_ = QString::fromStdString( session_name );
   
-  this->setWindowTitle(tr("New Project Wizard"));
+  this->setWindowTitle( tr( "Export Project Wizard" ) );
 }
 
-AppProjectWizard::~AppProjectWizard()
+ProjectExportWizard::~ProjectExportWizard()
 {
 }
 
-void AppProjectWizard::accept()
+void ProjectExportWizard::accept()
 {
-  ActionNewProject::Dispatch( Core::Interface::GetWidgetActionContext(),
-    field("projectPath").toString().toStdString(),
-    field("projectName").toString().toStdString() );
+  ActionExportProject::Dispatch( Core::Interface::GetWidgetActionContext(), 
+    field( "projectPath" ).toString().toStdString(),
+    field( "projectName" ).toString().toStdString(),
+    this->session_name_.toStdString() );
     QDialog::accept();
-    Q_EMIT this->finished();
 }
 
-void AppProjectWizard::reject()
-{
-  QDialog::reject();
-  Q_EMIT this->canceled();
-}
-
-ProjectInfoPage::ProjectInfoPage( QWidget *parent )
+ExportInfoPage::ExportInfoPage( QWidget *parent )
     : QWizardPage( parent )
 {
-    this->setTitle( "Project Information" );
-    this->setSubTitle( "Specify basic information about the project for which you "
-                   "want to create." );
+    this->setTitle( "Export Project Information" );
+    this->setSubTitle( "You are exporting the current project with the following settings: " );
 
     this->project_name_label_ = new QLabel( "Project name:" );
 
-  QString default_name_count = QString::number( ProjectManager::Instance()->
-    default_project_name_counter_state_->get() );
+  this->project_name_lineedit_ = new QLineEdit();
+  this->project_name_lineedit_->setText(  QString::fromStdString( ProjectManager::Instance()->
+    current_project_->project_name_state_->get() ) );
 
-  if( default_name_count == "0" )
-    this->project_name_lineedit_ = new QLineEdit( "New Project" );
-  else
-  {
-    this->project_name_lineedit_ = new QLineEdit();
-    this->project_name_lineedit_->setText(  "New Project " + default_name_count );
-  }
-  
     this->project_path_label_ = new QLabel( "Project Path:" );
     this->project_path_lineedit_ = new QLineEdit;
     
@@ -107,21 +105,26 @@ ProjectInfoPage::ProjectInfoPage( QWidget *parent )
     layout->addWidget( this->project_path_lineedit_, 1, 1 );
     layout->addWidget( this->project_path_change_button_, 2, 1, 1, 2 );
     setLayout( layout );
-
 }
   
-void ProjectInfoPage::initializePage()
+void ExportInfoPage::initializePage()
 {
-  this->project_path_lineedit_->setText( QString::fromStdString( PreferencesManager::Instance()->project_path_state_->get() ) );
+  QString export_path = QString::fromStdString( 
+    PreferencesManager::Instance()->export_path_state_->get() );
+
+  this->project_path_lineedit_->setText( export_path );
   registerField( "projectPath", this->project_path_lineedit_ );
 }
   
-
-void ProjectInfoPage::set_path()
+void ExportInfoPage::set_path()
 {
     QDir project_directory_;
-  QString path = QFileDialog::getExistingDirectory ( this, "Directory",
-    this->project_path_lineedit_->text() );
+    
+  QString export_path = QString::fromStdString( 
+    PreferencesManager::Instance()->export_path_state_->get() );
+    
+  QString path = QFileDialog::getExistingDirectory ( this, tr( "Choose Directory for Export..." ),
+    export_path, QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks );
   
     if ( path.isNull() == false )
     {
@@ -131,7 +134,7 @@ void ProjectInfoPage::set_path()
     registerField( "projectPath", this->project_path_lineedit_ );
 }
 
-SummaryPage::SummaryPage( QWidget *parent )
+ExportSummaryPage::ExportSummaryPage( QWidget *parent )
     : QWizardPage( parent )
 {
     this->setTitle( "Summary" );
@@ -151,17 +154,21 @@ SummaryPage::SummaryPage( QWidget *parent )
     layout->addWidget( this->project_name_ );
     layout->addWidget( this->project_path_ );
     this->setLayout( layout );
-
 }
 
-void SummaryPage::initializePage()
+void ExportSummaryPage::initializePage()
 {
-    QString finishText = wizard()->buttonText(QWizard::FinishButton);
+    QString finishText = wizard()->buttonText( QWizard::FinishButton );
     finishText.remove('&');
 
-    this->project_name_->setText( QString::fromUtf8( "Project Name: " ) + field("projectName").toString() );
-    this->project_path_->setText( QString::fromUtf8( "Project Path: " ) + field("projectPath").toString() );
-  
+    this->project_name_->setText( 
+    QString::fromUtf8( "Project Name: " ) + field("projectName").toString() );
+    this->project_path_->setText( 
+    QString::fromUtf8( "Project Path: " ) + field("projectPath").toString() );
+    
+  Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
+    PreferencesManager::Instance()->export_path_state_, 
+    boost::filesystem::path( this->project_path_->text().toStdString() ).string() );
 }
 
 } // end namespace Seg3D

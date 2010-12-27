@@ -64,10 +64,10 @@
 #include <Interface/Application/ApplicationInterface.h>
 #include <Interface/Application/LayerIOFunctions.h>
 #include <Interface/Application/Menu.h>
+#include <Interface/Application/ProjectWizard.h>
+#include <Interface/Application/SaveProjectAsWizard.h>
 #include <Interface/Application/ViewAction.h>
 #include <Interface/Application/ViewerInterface.h>
-#include <Interface/AppProjectWizard/AppProjectWizard.h>
-#include <Interface/AppSaveProjectAsWizard/AppSaveProjectAsWizard.h>
 
 
 namespace Seg3D
@@ -498,15 +498,15 @@ void Menu::new_project_wizard()
 
       if ( ret != QMessageBox::Cancel )
       {
-        QPointer< AppProjectWizard > new_project_wizard_ = 
-          new AppProjectWizard( this->main_window_);
+        QPointer< ProjectWizard > new_project_wizard_ = 
+          new ProjectWizard( this->main_window_);
         new_project_wizard_->show();
       }
     }
     else
     {
-      QPointer< AppProjectWizard > new_project_wizard_ = 
-        new AppProjectWizard( this->main_window_);
+      QPointer< ProjectWizard > new_project_wizard_ = 
+        new ProjectWizard( this->main_window_);
       new_project_wizard_->show();
     }
   }
@@ -756,8 +756,8 @@ void Menu::update_redo_tag( std::string tag )
 
 void Menu::save_as_wizard()
 {
-  QPointer< AppSaveProjectAsWizard > save_project_as_wizard_ = 
-    new AppSaveProjectAsWizard( this->main_window_);
+  QPointer< SaveProjectAsWizard > save_project_as_wizard_ = 
+    new SaveProjectAsWizard( this->main_window_);
   save_project_as_wizard_->show();
 }
 

@@ -46,7 +46,7 @@
 // Interface includes
 #include <Interface/Application/LayerImporterWidget.h>
 #include <Interface/Application/LayerIOFunctions.h>
-#include <Interface/AppSegmentationExportWizard/AppSegmentationExportWizard.h>
+#include <Interface/Application/SegmentationExportWizard.h>
 
 namespace Seg3D
 {
@@ -290,8 +290,8 @@ void LayerIOFunctions::ExportLayer( QMainWindow* main_window )
 
 void LayerIOFunctions::ExportSegmentation( QMainWindow* main_window )
 {
-  QPointer< AppSegmentationExportWizard > export_segmentation_wizard_ = 
-    new AppSegmentationExportWizard( main_window );
+  QPointer< SegmentationExportWizard > export_segmentation_wizard_ = 
+    new SegmentationExportWizard( main_window );
   export_segmentation_wizard_->show();
 }
 

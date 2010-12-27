@@ -101,7 +101,7 @@ namespace Seg3D
     QPointer< ProgressWidget > progress_;
     
     // Pointer to the new project wizard
-    static QPointer< AppProjectWizard > new_project_wizard_;
+    static QPointer< ProjectWizard > new_project_wizard_;
     
     // Application menu, statusbar
     QPointer< Menu > menu_;

@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_APPPROJECTWIZARD_QTLAYERLISTWIDGET_H
-#define INTERFACE_APPPROJECTWIZARD_QTLAYERLISTWIDGET_H
+#ifndef INTERFACE_APPLICATION_QTLAYERLISTWIDGET_H
+#define INTERFACE_APPLICATION_QTLAYERLISTWIDGET_H
 
 // QT Includes
 #include <QWidget>
@@ -92,6 +92,6 @@ private:
     
 };
 
-}  // end namespace QtUtils
+}  // end namespace Seg3D
 
 #endif

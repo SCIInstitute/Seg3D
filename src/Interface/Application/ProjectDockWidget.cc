@@ -52,7 +52,7 @@
 
 // Interface includes
 #include <Interface/Application/ProjectDockWidget.h>
-#include <Interface/AppProjectExportWizard/AppProjectExportWizard.h>
+#include <Interface/Application/ProjectExportWizard.h>
 #include "ui_ProjectDockWidget.h"
 
 namespace Seg3D
@@ -655,8 +655,8 @@ void ProjectDockWidget::export_project()
     sessions_state_->get();
   std::string session_name = sessions[ row ];
 
-  QPointer< AppProjectExportWizard > project_export_wizard_ = 
-    new AppProjectExportWizard( session_name, this );
+  QPointer< ProjectExportWizard > project_export_wizard_ = 
+    new ProjectExportWizard( session_name, this );
   project_export_wizard_->show();
 
   this->disable_load_delete_and_export_buttons();

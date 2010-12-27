@@ -26,12 +26,11 @@
  DEALINGS IN THE SOFTWARE.
 */
 
-
 // UI includes
 #include "ui_QtLayerListWidget.h"
 
 // QtUtils includes
-#include <Interface/AppSegmentationExportWizard/QtLayerListWidget.h>
+#include <Interface/Application/QtLayerListWidget.h>
 
 namespace Seg3D
 {
@@ -106,19 +105,4 @@ void QtLayerListWidget::hide_counter( bool hide )
   }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-}  // end namespace QtUtils
+}  // end namespace Seg3D

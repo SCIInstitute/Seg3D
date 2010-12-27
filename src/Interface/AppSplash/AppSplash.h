@@ -40,7 +40,7 @@
 #include <QtUtils/Widgets/QtCustomDialog.h>
 
 // Interface includes
-#include <Interface/AppProjectWizard/AppProjectWizard.h>
+#include <Interface/Application/ProjectWizard.h>
 
 namespace Seg3D
 {
@@ -99,11 +99,9 @@ private:
   boost::shared_ptr< AppSplashPrivate > private_;
   
   std::vector< std::string > recent_project_list_;
-  QPointer< AppProjectWizard > new_project_wizard_;
-  
-
+  QPointer< ProjectWizard > new_project_wizard_;
 };
 
 } // end namespace
 
-#endif // APPSPLASH_H
+#endif
