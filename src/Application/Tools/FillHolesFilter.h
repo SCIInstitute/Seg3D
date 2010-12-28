@@ -47,7 +47,7 @@ SEG3D_TOOL_NAME( "FillHolesFilter", "Fill all the holes not marked with a seed p
 SEG3D_TOOL_MENULABEL( "Fill Holes" )
 SEG3D_TOOL_MENU( "Basic Filters" )
 SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+F" )
-SEG3D_TOOL_URL( "http://seg3d.org/" )
+SEG3D_TOOL_URL( "http://www.sci.utah.edu/SCIRunDocs/index.php/CIBC:Seg3D2:FillHolesFilter:1" )
 )
 
   // -- constructor/destructor --

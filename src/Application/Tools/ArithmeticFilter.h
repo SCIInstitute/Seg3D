@@ -41,7 +41,7 @@ SEG3D_TOOL_NAME( "ArithmeticFilter", "Filter for evaluating an expression on dat
 SEG3D_TOOL_MENULABEL( "Arithmetic" )
 SEG3D_TOOL_MENU( "Basic Filters" )
 SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+A" )
-SEG3D_TOOL_URL( "http://seg3d.org/" )
+SEG3D_TOOL_URL( "http://www.sci.utah.edu/SCIRunDocs/index.php/CIBC:Seg3D2:ArithmeticFilter:1" )
 )
 
 public:

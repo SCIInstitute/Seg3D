@@ -42,7 +42,7 @@ SEG3D_TOOL_NAME( "ThresholdSegmentationLSFilter", "Grow a mask region outwards b
 SEG3D_TOOL_MENULABEL( "Segmentation Level Set" )
 SEG3D_TOOL_MENU( "Advanced Filters" )
 SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+L" )
-SEG3D_TOOL_URL( "http://seg3d.org/" )
+SEG3D_TOOL_URL( "http://www.sci.utah.edu/SCIRunDocs/index.php/CIBC:Seg3D2:ThresholdLevelSetFilter:1" )
 )
 
 

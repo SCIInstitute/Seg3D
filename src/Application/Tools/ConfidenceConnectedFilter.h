@@ -42,7 +42,7 @@ SEG3D_TOOL(
   SEG3D_TOOL_MENULABEL( "Confidence Connected" )
   SEG3D_TOOL_MENU( "Advanced Filters" )
   SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+Z" )
-  SEG3D_TOOL_URL( "http://seg3d.org/" )
+  SEG3D_TOOL_URL( "http://www.sci.utah.edu/SCIRunDocs/index.php/CIBC:Seg3D2:ConfidenceConnectedFilter:1" )
 )
 
 public:

@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_TOOLS_ANISOTROPICDIFFUSIONFILTER_H
-#define APPLICATION_TOOLS_ANISOTROPICDIFFUSIONFILTER_H
+#ifndef APPLICATION_TOOLS_CURVATUREANISOTROPICDIFFUSIONFILTER_H
+#define APPLICATION_TOOLS_CURVATUREANISOTROPICDIFFUSIONFILTER_H
 
 // Application includes
 #include <Application/Tool/SingleTargetTool.h>
@@ -42,7 +42,7 @@ SEG3D_TOOL_NAME( "CurvatureAnisotropicDiffusionFilter", "Filter for smoothing da
 SEG3D_TOOL_MENULABEL( "Curvature AnisoDiff. Filter" )
 SEG3D_TOOL_MENU( "Advanced Filters" )
 SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+V" )
-SEG3D_TOOL_URL( "http://seg3d.org/" )
+SEG3D_TOOL_URL( "http://www.sci.utah.edu/SCIRunDocs/index.php/CIBC:Seg3D2:CurvatureAnistropicDiffusionFilter:1" )
 SEG3D_TOOL_VERSION( "1" )
 )
 

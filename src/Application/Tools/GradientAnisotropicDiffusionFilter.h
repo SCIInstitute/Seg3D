@@ -42,7 +42,7 @@ SEG3D_TOOL_NAME( "GradientAnisotropicDiffusionFilter", "Filter for smoothing dat
 SEG3D_TOOL_MENULABEL( "Gradient AnisoDiff. Filter" )
 SEG3D_TOOL_MENU( "Advanced Filters" )
 SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+U" )
-SEG3D_TOOL_URL( "http://seg3d.org/" )
+SEG3D_TOOL_URL( "http://www.sci.utah.edu/SCIRunDocs/index.php/CIBC:Seg3D2:GradientAnisotropicDiffusionFilter:1" )
 SEG3D_TOOL_VERSION( "1" )
 )
 
