@@ -667,8 +667,15 @@ void ProjectDockWidget::enable_load_delete_and_export_buttons( int row, int colu
 {
   if( row >= 0 )
   {
+    if( this->private_->ui_.sessions_list_->selectedItems().size() <= 2 )
+    {
+      this->private_->ui_.load_session_button_->setEnabled( true );
+    }
+    else
+    {
+      this->private_->ui_.load_session_button_->setEnabled( false );
+    }
     this->private_->ui_.export_project_button_->setEnabled( true );
-    this->private_->ui_.load_session_button_->setEnabled( true );
     this->private_->ui_.delete_session_button_->setEnabled( true );
   }
 }
