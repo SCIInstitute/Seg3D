@@ -250,39 +250,40 @@ void ProjectDockWidget::load_session()
 
 void ProjectDockWidget::delete_session()
 { 
-  int row = this->private_->ui_.sessions_list_->currentRow();
-
-  if( ( row < 0 ) || ( row > this->private_->ui_.sessions_list_->rowCount() ) )
+  std::vector< int > session_indices_to_delete;
+    
+  for( int i = 0; i < this->private_->ui_.sessions_list_->rowCount(); ++i ) 
   {
-    return;
+    if( this->private_->ui_.sessions_list_->item( i, 0 )->isSelected() )
+    {
+      session_indices_to_delete.push_back( i );
+    }
   }
 
-  if( !this->private_->ui_.sessions_list_->item( row , 1 ) )
-  {
-    return;
-  }
-
-  std::string row_time= this->private_->ui_.sessions_list_->item( row, 0 )->text().toStdString();
-
-  if( row_time != "" )
+  if( session_indices_to_delete.size() > 0 )
   {
     QMessageBox message_box;
-    message_box.setText( QString::fromUtf8( "WARNING: You cannot recover a deleted session.") );
+    message_box.setText( QString::fromUtf8( "WARNING: You cannot recover deleted sessions.") );
     message_box.setInformativeText( QString::fromUtf8( "Are you sure you want to do this?" ) );
     message_box.setStandardButtons( QMessageBox::Yes | QMessageBox::No );
     message_box.setDefaultButton( QMessageBox::No );
     if( QMessageBox::Yes == message_box.exec() )
     {
+      std::vector< std::string > sessions_to_delete;
       std::vector< std::string > sessions = ProjectManager::Instance()->current_project_->
         sessions_state_->get();
-
-      std::string session_name = sessions[ row ];
-      ActionDeleteSession::Dispatch( Core::Interface::GetWidgetActionContext(), 
-        session_name );
+      for( size_t i = 0; i < session_indices_to_delete.size(); ++i )
+      {
+        sessions_to_delete.push_back( sessions[ session_indices_to_delete[ i ] ] ); 
+      }
+      for( size_t i = 0; i < sessions_to_delete.size(); ++i )
+      {
+        ActionDeleteSession::Dispatch( Core::Interface::GetWidgetActionContext(), 
+          sessions_to_delete[ i ] );
+      } 
+      
     }
   }
-
-  this->populate_session_list();
   this->disable_load_delete_and_export_buttons();
 }
 

@@ -49,6 +49,15 @@ QtColorButton::QtColorButton( QWidget *parent, int index, Core::Color button_col
     this->setMinimumWidth( width );
     this->setMaximumWidth( width );
   }
+  
+  if( !height && !width )
+  {
+    QSizePolicy sizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
+    sizePolicy.setHorizontalStretch( 0 );
+    sizePolicy.setVerticalStretch( 0 );
+    sizePolicy.setHeightForWidth( this->sizePolicy().hasHeightForWidth() );
+    this->setSizePolicy( sizePolicy );
+  }
 
   connect( this, SIGNAL( toggled ( bool ) ), this, SLOT( trigger_signal( bool ) ) );
 }
