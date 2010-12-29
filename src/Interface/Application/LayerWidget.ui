@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>267</width>
+    <width>269</width>
     <height>635</height>
    </rect>
   </property>
@@ -88,17 +88,6 @@ QToolButton#viewer_5_button_:checked{
 }
 
 
-
-
-QLineEdit#label_{
-  text-align: left;
-  color: black;
-  background-color: rgba(255, 255, 255, 0);
-}
-/*QLineEdit#label_:focus{
-  background-color: rgb(255, 255, 255);
-}*/
-
 QWidget#type_{
   background-color: rgb(255, 128, 0);
   border-radius: 3px;
@@ -110,6 +99,16 @@ QWidget#typeGradient_{
   background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(0, 0, 0, 25), stop:0.258706 rgba(40, 40, 40, 0), stop:1 rgba(0, 0, 0, 30));
 }
 
+QLineEdit#label_{
+  text-align: left;
+  color: black;
+  selection-background-color: rgb( 237, 148, 31 );
+  selection-color: rgb( 255, 255, 255 );
+  background-color: rgba( 255, 255, 255, 0 );
+}
+QLineEdit#label_:focus{
+  background-color: rgba( 255, 255, 255, 100 );
+}
 
 /* Buttons */
 

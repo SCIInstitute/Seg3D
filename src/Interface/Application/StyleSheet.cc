@@ -239,36 +239,48 @@ const QString StyleSheet::LAYER_WIDGET_LABEL_INACTIVE_C = QString::fromUtf8(
   "QLineEdit#label_{"
   " text-align: left;"
   " color: black;"
-  "   selection-background-color: rgb( 255, 255, 255 ); "
-  "   selection-color: rgb( 80, 80, 80 ); "
+  "   selection-background-color: rgb( 237, 148, 31 ); "
+  "   selection-color: rgb( 255, 255, 255 ); "
   " background-color: rgba( 255, 255, 255, 0 );"
+  "}"
+  "QLineEdit#label_:focus{"
+  " background-color: rgb( 255, 255, 255 );"
   "}");
 
 const QString StyleSheet::LAYER_WIDGET_LABEL_ACTIVE_C = QString::fromUtf8(
   "QLineEdit#label_{"
   " text-align: left;"
   " color: black;"
-  "   selection-background-color: rgb( 255, 255, 255 ); "
-  "   selection-color: rgb( 80, 80, 80 ); "
+  "   selection-background-color: rgb( 237, 148, 31 ); "
+  "   selection-color: rgb( 255, 255, 255 ); "
   " background-color: rgba( 255, 255, 255, 0 );"
+  "}"
+  "QLineEdit#label_:focus{"
+  " background-color: rgb( 255, 255, 255 );"
   "}");
 
 const QString StyleSheet::LAYER_WIDGET_LABEL_ACTIVE_IN_USE_C = QString::fromUtf8(
   "QLineEdit#label_{"
   " text-align: left;"
   " color: black;"
-  "   selection-background-color: rgb( 255, 255, 255 ); "
-  "   selection-color: rgb( 80, 80, 80 ); "
+  "   selection-background-color: rgb( 237, 148, 31 ); "
+  "   selection-color: rgb( 255, 255, 255 ); "
   " background-color: rgba( 255, 255, 255, 0 );"
+  "}"
+  "QLineEdit#label_:focus{"
+  " background-color: rgb( 255, 255, 255 );"
   "}");
   
 const QString StyleSheet::LAYER_WIDGET_LABEL_IN_USE_C = QString::fromUtf8(
   "QLineEdit#label_{"
   " text-align: left;"
   " color: black;"
-  "   selection-background-color: rgb( 255, 255, 255 ); "
-  "   selection-color: rgb( 80, 80, 80 ); "
+  "   selection-background-color: rgb( 237, 148, 31 ); "
+  "   selection-color: rgb( 255, 255, 255 ); "
   " background-color: rgba( 255, 255, 255, 0 );"
+  "}"
+  "QLineEdit#label_:focus{"
+  " background-color: rgb( 255, 255, 255 );"
   "}");   
       
 // - DROP - //

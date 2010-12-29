@@ -44,7 +44,7 @@ QtSignalFocusLineEdit::~QtSignalFocusLineEdit()
 void QtSignalFocusLineEdit::focusInEvent( QFocusEvent* event )
 {
   Q_EMIT activate_layer_signal();
-  event->accept();
+  QLineEdit::focusInEvent( event );
 }
 
 
