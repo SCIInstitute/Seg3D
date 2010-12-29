@@ -63,6 +63,7 @@ ProjectManager::ProjectManager() :
     PreferencesManager::Instance()->project_path_state_->get() );
   this->add_state( "default_project_name_counter", this->default_project_name_counter_state_, 0 );
   this->add_state( "project_saved", this->project_saved_state_, false );
+  this->project_saved_state_->set_session_priority( Core::StateBase::DO_NOT_LOAD_E );
 
   try
   {
