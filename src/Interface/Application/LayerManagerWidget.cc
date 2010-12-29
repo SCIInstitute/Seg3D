@@ -269,7 +269,7 @@ void LayerManagerWidget::handle_group_internals_change( LayerGroupHandle group )
   }
   else
   {
-    CORE_THROW_LOGICERROR( "Group has not been created yet" );
+    CORE_LOG_ERROR( "Group has not been created yet or has been deleted" );
   }
 }
 
