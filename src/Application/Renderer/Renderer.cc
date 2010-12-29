@@ -490,7 +490,7 @@ void RendererPrivate::process_isosurfaces( IsosurfaceArray& isosurfaces )
   for ( size_t i = 0; i < num_of_layers; ++i )
   {
     if ( layers[ i ]->get_type() == Core::VolumeType::MASK_E 
-      && layers[ i ]->is_visible( this->viewer_id_ )  )
+      && layers[ i ]->visible_state_[ this->viewer_id_ ]->get() )
     {
       MaskLayer* mask_layer = static_cast< MaskLayer* >( layers[ i ].get() );
       if ( mask_layer->show_isosurface_state_->get() )
