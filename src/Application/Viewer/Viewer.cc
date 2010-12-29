@@ -936,6 +936,7 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
   this->add_state( "volume_volume_rendering_visible", 
     this->volume_volume_rendering_visible_state_, false );
   this->add_state( "volume_light_visible", this->volume_light_visible_state_, true );
+  this->add_state( "volume_enable_fog", this->volume_enable_fog_state_, false );
   this->add_state( "volume_show_invisible_slices", this->volume_show_invisible_slices_state_, true );
 
   this->add_state( "lock", this->lock_state_, false );
@@ -982,6 +983,8 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
   this->add_connection( this->volume_view_state_->state_changed_signal_.connect(
     boost::bind( &Viewer::redraw_scene, this ) ) );
   this->add_connection( this->volume_light_visible_state_->state_changed_signal_.connect(
+    boost::bind( &Viewer::redraw_scene, this ) ) );
+  this->add_connection( this->volume_enable_fog_state_->state_changed_signal_.connect(
     boost::bind( &Viewer::redraw_scene, this ) ) );
   this->add_connection( this->volume_slices_visible_state_->state_changed_signal_.connect(
     boost::bind( &Viewer::redraw_scene, this ) ) );

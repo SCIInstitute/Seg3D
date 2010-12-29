@@ -22,6 +22,7 @@ uniform int border_width; // width of the mask border
 uniform vec2 pixel_size; // pixel size in texture space
 
 uniform bool enable_lighting;
+uniform bool enable_fog;
 
 vec4 shade_data_slice()
 {
@@ -110,6 +111,7 @@ vec4 shade_mask_slice()
 }
 
 vec4 compute_lighting();
+float compute_fog_factor();
 
 void main()
 {
@@ -136,6 +138,11 @@ void main()
   if ( enable_lighting )
   {
     slice_color.rgb = ( slice_color * compute_lighting() ).rgb;
+  }
+
+  if ( enable_fog )
+  {
+    slice_color = mix( gl_Fog.color, slice_color, compute_fog_factor() );
   }
 
   gl_FragColor = slice_color;

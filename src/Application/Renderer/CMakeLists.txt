@@ -34,6 +34,7 @@
 SET(APPLICATION_RENDERER_SHADER_SRCS
   Lighting.vert
   Lighting.frag
+  Fog.frag
   SliceShader.frag
   SliceShader.vert
   IsosurfaceShader.frag

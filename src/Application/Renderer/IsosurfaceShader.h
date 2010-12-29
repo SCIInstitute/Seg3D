@@ -55,6 +55,7 @@ public:
   void set_colormap_texture( int tex_unit );
   void set_min_val( float min_val );
   void set_val_range( float val_range );
+  void set_fog( bool enabled );
 
 private:
 
@@ -69,6 +70,7 @@ private:
   int colormap_loc_;
   int min_val_loc_;
   int val_range_loc_;
+  int enable_fog_loc_;
 
   const static char* VERT_SHADER_SOURCE_C[];
   const static char* FRAG_SHADER_SOURCE_C[];

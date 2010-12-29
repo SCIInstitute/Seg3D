@@ -37,6 +37,7 @@ const char* IsosurfaceShader::FRAG_SHADER_SOURCE_C[] =
 {
 #include "IsosurfaceShader_frag"
 #include "Lighting_frag"
+#include "Fog_frag"
 };
 
 const char* IsosurfaceShader::VERT_SHADER_SOURCE_C[] =
@@ -101,6 +102,7 @@ bool IsosurfaceShader::initialize()
   this->colormap_loc_ = this->glsl_prog_->get_uniform_location( "colormap" );
   this->min_val_loc_ = this->glsl_prog_->get_uniform_location( "min_val" );
   this->val_range_loc_ = this->glsl_prog_->get_uniform_location( "val_range" );
+  this->enable_fog_loc_ = this->glsl_prog_->get_uniform_location( "enable_fog" );
   this->glsl_prog_->disable();
 
   this->valid_ = true;
@@ -142,6 +144,11 @@ void IsosurfaceShader::set_val_range( float val_range )
 void IsosurfaceShader::set_colormap_texture( int tex_unit )
 {
   glUniform1i( this->colormap_loc_, tex_unit );
+}
+
+void IsosurfaceShader::set_fog( bool enabled )
+{
+  glUniform1i( this->enable_fog_loc_, enabled );
 }
 
 } // end namespace Seg3D

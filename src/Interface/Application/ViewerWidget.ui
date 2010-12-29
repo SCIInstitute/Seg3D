@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>402</width>
+    <width>422</width>
     <height>279</height>
    </rect>
   </property>
@@ -208,7 +208,7 @@ QComboBox::icon{
                 <widget class="QComboBox" name="viewer_mode_">
                  <property name="minimumSize">
                   <size>
-                   <width>100</width>
+                   <width>82</width>
                    <height>0</height>
                   </size>
                  </property>
@@ -871,6 +871,33 @@ QComboBox::icon{
                <property name="margin">
                 <number>0</number>
                </property>
+               <item>
+                <widget class="QToolButton" name="fog_button_">
+                 <property name="minimumSize">
+                  <size>
+                   <width>20</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>20</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>...</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="../../Resources/QtResources.qrc">
+                   <normaloff>:/Images/FogOff.png</normaloff>
+                   <normalon>:/Images/Fog.png</normalon>:/Images/FogOff.png</iconset>
+                 </property>
+                 <property name="checkable">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
                <item>
                 <widget class="QtUtils::SingleShotToolButton" name="picking_button_">
                  <property name="minimumSize">

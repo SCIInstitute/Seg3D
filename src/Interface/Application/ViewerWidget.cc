@@ -138,6 +138,7 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
   this->private_->buttons_.push_back( this->private_->ui_.slice_visible_button_ );
   this->private_->buttons_.push_back( this->private_->ui_.snap_to_axis_button_ );
   this->private_->buttons_.push_back( this->private_->ui_.light_visible_button_ );
+  this->private_->buttons_.push_back( this->private_->ui_.fog_button_ );
   this->private_->buttons_.push_back( this->private_->ui_.grid_button_ );
   this->private_->buttons_.push_back( this->private_->ui_.flip_horizontal_button_ );
   this->private_->buttons_.push_back( this->private_->ui_.flip_vertical_button_ );
@@ -207,6 +208,8 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
       this->private_->viewer_->overlay_visible_state_ );
     QtUtils::QtBridge::Connect( this->private_->ui_.light_visible_button_,
       this->private_->viewer_->volume_light_visible_state_ );
+    QtUtils::QtBridge::Connect( this->private_->ui_.fog_button_,
+      this->private_->viewer_->volume_enable_fog_state_ );
     QtUtils::QtBridge::Connect( this->private_->ui_.isosurfaces_visible_button_,
       this->private_->viewer_->volume_isosurfaces_visible_state_ );
     QtUtils::QtBridge::Connect( this->private_->ui_.volume_rendering_visible_button_,
@@ -249,6 +252,8 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
       viewer->view_mode_state_, show_buttons_condition );
     QtUtils::QtBridge::Show( this->private_->ui_.light_visible_button_, 
       viewer->view_mode_state_, show_buttons_condition );
+    QtUtils::QtBridge::Show( this->private_->ui_.fog_button_, 
+      viewer->view_mode_state_, show_buttons_condition );
     QtUtils::QtBridge::Show( this->private_->ui_.isosurfaces_visible_button_, 
       viewer->view_mode_state_, show_buttons_condition );
     QtUtils::QtBridge::Show( this->private_->ui_.snap_to_axis_button_, 
@@ -274,21 +279,21 @@ ViewerWidget::~ViewerWidget()
   this->disconnect_all();
 }
 
-  void ViewerWidget::image_mode( bool picture )
+void ViewerWidget::image_mode( bool picture )
+{
+  if( picture )
   {
-    if( picture )
-    {
-      this->private_->facade_widget_->setMinimumSize( this->private_->render_widget_->size() );
-      this->private_->facade_widget_->setPixmap( QPixmap::fromImage( this->private_->render_widget_->grabFrameBuffer() ) );
-      this->private_->render_widget_->hide();
-      this->private_->facade_widget_->show();
-    }
-    else
-    {
-      this->private_->facade_widget_->hide();
-      this->private_->render_widget_->show();
-    }   
+    this->private_->facade_widget_->setMinimumSize( this->private_->render_widget_->size() );
+    this->private_->facade_widget_->setPixmap( QPixmap::fromImage( this->private_->render_widget_->grabFrameBuffer() ) );
+    this->private_->render_widget_->hide();
+    this->private_->facade_widget_->show();
   }
+  else
+  {
+    this->private_->facade_widget_->hide();
+    this->private_->render_widget_->show();
+  }   
+}
   
 int ViewerWidget::get_minimum_size()
 {

@@ -112,12 +112,11 @@ public:
   void draw_slices_3d( const Core::BBox& bbox, 
     const std::vector< LayerSceneHandle >& layer_scenes, 
     const std::vector< double >& depths,
-    const std::vector< std::string >& view_modes,
-    bool with_lighting );
+    const std::vector< std::string >& view_modes );
   void draw_slice( LayerSceneItemHandle layer_item, const Core::Matrix& proj_mat,
     ProxyRectangleHandle rect = ProxyRectangleHandle() );
   void process_isosurfaces( IsosurfaceArray& isosurfaces );
-  void draw_isosurfaces( const IsosurfaceArray& isosurfaces, bool with_lighting );
+  void draw_isosurfaces( const IsosurfaceArray& isosurfaces );
   void draw_orientation_arrows( const Core::View3D& view_3d );
 
   // -- Signals handling --
@@ -231,11 +230,8 @@ void RendererPrivate::picking_target_changed( size_t viewer_id )
 void RendererPrivate::draw_slices_3d( const Core::BBox& bbox, 
                 const std::vector< LayerSceneHandle >& layer_scenes, 
                 const std::vector< double >& depths,
-                const std::vector< std::string >& view_modes,
-                bool with_lighting )
+                const std::vector< std::string >& view_modes )
 {
-  this->slice_shader_->enable();
-  this->slice_shader_->set_lighting( with_lighting );
   size_t num_of_viewers = layer_scenes.size();
   
   // for each visible 2D viewer
@@ -319,7 +315,6 @@ void RendererPrivate::draw_slices_3d( const Core::BBox& bbox,
     } // end for
 
   } // end for each viewer
-  this->slice_shader_->disable();
 }
 
 void RendererPrivate::draw_slice( LayerSceneItemHandle layer_item, 
@@ -505,15 +500,14 @@ void RendererPrivate::process_isosurfaces( IsosurfaceArray& isosurfaces )
   }
 }
 
-void RendererPrivate::draw_isosurfaces( const IsosurfaceArray& isosurfaces, bool with_lighting )
+void RendererPrivate::draw_isosurfaces( const IsosurfaceArray& isosurfaces )
 {
   bool use_colormap = false;
 
-  size_t num_of_isosurfaces = isosurfaces.size();
-//  glEnable( GL_CULL_FACE );
-  this->isosurface_shader_->enable();
-  this->isosurface_shader_->set_lighting( with_lighting );
   this->isosurface_shader_->set_use_colormap( use_colormap  );
+//  glEnable( GL_CULL_FACE );
+
+  size_t num_of_isosurfaces = isosurfaces.size();
   for ( size_t i = 0; i < num_of_isosurfaces; ++i )
   {
     Core::IsosurfaceHandle iso = isosurfaces[ i ]->isosurface_;
@@ -642,6 +636,7 @@ void Renderer::post_initialize()
   this->private_->slice_shader_->set_slice_texture( 0 );
   this->private_->slice_shader_->set_pattern_texture( 1 );
   this->private_->slice_shader_->set_lighting( false );
+  this->private_->slice_shader_->set_fog( false );
   this->private_->slice_shader_->disable();
 
   this->private_->isosurface_shader_->enable();
@@ -717,6 +712,7 @@ bool Renderer::render()
     std::vector< double > depths;
     std::vector< std::string > view_modes;
     bool with_lighting = viewer->volume_light_visible_state_->get();
+    bool with_fog = viewer->volume_enable_fog_state_->get();
     bool draw_slices = viewer->volume_slices_visible_state_->get();
     bool draw_isosurfaces = viewer->volume_isosurfaces_visible_state_->get();
     bool show_invisible_slices = viewer->volume_show_invisible_slices_state_->get();
@@ -769,13 +765,25 @@ bool Renderer::render()
     gluLookAt( view3d.eyep().x(), view3d.eyep().y(), view3d.eyep().z(), view3d.lookat().x(),
         view3d.lookat().y(), view3d.lookat().z(), view3d.up().x(), view3d.up().y(), view3d.up().z() );
 
+    GLfloat fog_color[] = { bkg_color.r(), bkg_color.g(), bkg_color.b(), 1.0f };
+    glFogfv( GL_FOG_COLOR, fog_color );
+    glFogf( GL_FOG_DENSITY, static_cast< float >( 1.0 / bbox.diagonal().length() ) );
+
     if ( draw_slices )
     {
-      this->private_->draw_slices_3d( bbox, layer_scenes, depths, view_modes, with_lighting );
+      this->private_->slice_shader_->enable();
+      this->private_->slice_shader_->set_lighting( with_lighting );
+      this->private_->slice_shader_->set_fog( with_fog );
+      this->private_->draw_slices_3d( bbox, layer_scenes, depths, view_modes );
+      this->private_->slice_shader_->disable();
     }
     if ( draw_isosurfaces)
     {
-      this->private_->draw_isosurfaces( isosurfaces, with_lighting );
+      this->private_->isosurface_shader_->enable();
+      this->private_->isosurface_shader_->set_lighting( with_lighting );
+      this->private_->isosurface_shader_->set_fog( with_fog );
+      this->private_->draw_isosurfaces( isosurfaces );
+      this->private_->isosurface_shader_->disable();
     }
 
     // NOTE: The orientation axes should be drawn the last, because it clears the depth buffer.
@@ -813,6 +821,7 @@ bool Renderer::render()
 
     this->private_->slice_shader_->enable();
     this->private_->slice_shader_->set_lighting( false );
+    this->private_->slice_shader_->set_fog( false );
 
     for ( size_t layer_num = 0; layer_num < layer_scene->size(); layer_num++ )
     {

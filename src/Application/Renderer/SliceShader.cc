@@ -37,6 +37,7 @@ const char* SliceShader::FRAG_SHADER_SOURCE_C[] =
 {
 #include "SliceShader_frag"
 #include "Lighting_frag"
+#include "Fog_frag"
 };
 
 const char* SliceShader::VERT_SHADER_SOURCE_C[] =
@@ -103,6 +104,7 @@ bool SliceShader::initialize()
   this->volume_type_loc_ = this->glsl_prog_->get_uniform_location( "volume_type" );
   this->mask_color_loc_ = this->glsl_prog_->get_uniform_location( "mask_color" );
   this->enable_lighting_loc_ = this->glsl_prog_->get_uniform_location( "enable_lighting" );
+  this->enable_fog_loc_ = this->glsl_prog_->get_uniform_location( "enable_fog" );
   this->glsl_prog_->disable();
 
   this->valid_ = true;
@@ -171,5 +173,9 @@ void SliceShader::set_lighting( bool enabled )
   glUniform1i( this->enable_lighting_loc_, enabled );
 }
 
+void SliceShader::set_fog( bool enabled )
+{
+  glUniform1i( this->enable_fog_loc_, enabled );
+}
 
 } // end namespace Seg3D
