@@ -269,7 +269,8 @@ void ProjectManager::open_project( const std::string& project_path )
   
   this->set_last_saved_session_time_stamp();
   AutoSave::Instance()->recompute_auto_save();
-  
+
+  this->project_saved_state_->set( true );
 }
   
 void ProjectManager::save_project( bool autosave /*= false*/, std::string session_name )

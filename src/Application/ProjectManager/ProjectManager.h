@@ -136,6 +136,7 @@ public:
   Core::StateStringHandle     current_project_path_state_;
   Core::StateIntHandle      default_project_name_counter_state_;
   Core::StateBoolHandle     project_saved_state_;
+  
   ProjectHandle         current_project_;
 
 private:
