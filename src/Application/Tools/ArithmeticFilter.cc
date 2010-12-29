@@ -133,6 +133,7 @@ void ArithmeticFilter::update_replace_options()
 
 void ArithmeticFilter::execute( Core::ActionContextHandle context )
 {
+  // NOTE: Need to lock state engine as this function is run from the interface thread
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
 
   // Get action inputs from state engine

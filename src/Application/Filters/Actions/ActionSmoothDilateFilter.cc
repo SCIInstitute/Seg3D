@@ -166,7 +166,8 @@ public:
     typename filter_type::Pointer filter = filter_type::New();
 
     // Relay abort and progress information to the layer that is executing the filter.
-    this->observe_itk_filter( filter, this->dst_layer_ );
+    this->forward_abort_to_filter( filter, this->dst_layer_ );
+    this->observe_itk_progress( filter, this->dst_layer_ );
 
     // Setup the filter parameters that we do not want to change.
     filter->SetInput( input_image->get_image() );

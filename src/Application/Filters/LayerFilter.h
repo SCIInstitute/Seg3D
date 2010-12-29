@@ -67,7 +67,7 @@ public:
   LayerFilter();
   virtual ~LayerFilter();
     
-  // -- abort handling -- 
+  // -- abort/stop handling --  
 public:   
   // RAISE_ABORT:
   // Raise the abort flag
@@ -76,7 +76,15 @@ public:
   // CHECK_ABORT:
   // Check the abort flag
   bool check_abort(); 
-  
+
+  // RAISE_STOP:
+  // Raise the stop flag
+  void raise_stop();
+    
+  // CHECK_STOP:
+  // Check the stop flag
+  bool check_stop();  
+
   // ABORT_AND_WAIT:  
   // NOTE: When undoing asynchronous layer operations, one may need to wait until the filter
   // can be aborted. If not the state of the program is unclear. Hence this function will ensure
@@ -87,11 +95,19 @@ public:
   // CONNECT_ABORT:
   // Monitor the abort flag of a layer
   void connect_abort( const LayerHandle& layer ); 
+
+  // CONNECT_STOP:
+  // Monitor the stop flag of a layer
+  void connect_stop( const LayerHandle& layer );  
   
 protected:      
   // HANDLE_ABORT:
   // A virtual function that can be overloaded
   virtual void handle_abort();    
+
+  // HANDLE_STOP:
+  // A virtual function that can be overloaded
+  virtual void handle_stop(); 
     
   // -- shortcuts into the LayerManager --  
 public:

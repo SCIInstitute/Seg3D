@@ -138,7 +138,12 @@ public:
   // Trigger an abort signal for the current filter
   typedef boost::signals2::signal< void() > abort_signal_type;
   abort_signal_type abort_signal_;
-  
+
+  // STOP_SIGNAL:
+  // Trigger a stop filtering signal for the current filter
+  typedef boost::signals2::signal< void() > stop_signal_type;
+  stop_signal_type stop_signal_;
+
   // -- State variables --
 public:
   
@@ -182,6 +187,9 @@ public:
   // Whether to show the abort message
   Core::StateBoolHandle show_abort_message_state_;
   
+  // Whether to show the stop button
+  Core::StateBoolHandle show_stop_button_state_;
+  
   // An exclusive group of boolean states that control the visibility of different parts
   Core::BooleanStateGroupHandle gui_state_group_;
 
@@ -215,14 +223,29 @@ public:
   // Get the generation of the current data block
   Core::DataBlock::generation_type get_generation() const;
 
-  // -- abort handling --
-private:
-  void handle_abort();
-
+  // -- abort/stop processing handling --
 public:
+  // CHECK_ABORT:
+  // Check whether the abort flag was set.
+  // NOTE: By default the default flag is set to false. However when the abort signal of the
+  // layer is triggered the abort flag is set. It can only be unset by calling reset_abort().
   bool check_abort();
-
+  
+  // RESET_ABORT:
+  // Reset the abort flag to false.
+  // NOTE: Call this function before running the filter that will trigger the abort_signal
   void reset_abort();
+
+  // CHECK_STOP:
+  // Check whether the stop flag was set.
+  // NOTE: By default the default flag is set to false. However when the stop signal of the
+  // layer is triggered the stop flag is set. It can only be unset by calling reset_stop().
+  bool check_stop();
+  
+  // RESET_STOP:
+  // Reset the stop flag to false.
+  // NOTE: Call this function before running the filter that will trigger the stop_signal
+  void reset_stop();
 
 protected:
   virtual bool post_save_states( Core::StateIO& state_io );
@@ -263,10 +286,19 @@ public:
   // Reset the filter handle, indicating no filter it working on the data
   void reset_filter_handle();
 
-  // GET_FITLER_HANDLE
+  // GET_FITLER_HANDLE:
   // Get the current filter associated with the layer
   LayerAbstractFilterHandle get_filter_handle();
 
+  // -- filter termination --
+public: 
+  // SET_ALLOW_STOP:
+  // Allow stopping the filter on the next iteration
+  void set_allow_stop();
+
+  // RESET_ALLOW_STOP:
+  // Reset the flag that allows stopping the filter
+  void reset_allow_stop();
 
   // -- internals of class --
 private:  

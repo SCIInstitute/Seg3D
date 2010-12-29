@@ -89,6 +89,9 @@ ConnectedComponentFilter::~ConnectedComponentFilter()
 
 void ConnectedComponentFilter::execute( Core::ActionContextHandle context )
 {
+  // NOTE: Need to lock state engine as this function is run from the interface thread
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+  
   std::vector< Core::Point > seeds = this->seed_points_state_->get();
   if ( ! this->use_seeds_state_->get() ) seeds.clear();
   

@@ -26,15 +26,18 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-//QtUtils Includes
-#include <QtUtils/Bridge/QtBridge.h>
-
-//Interface Includes
-#include <Interface/ToolInterface/ThresholdSegmentationLSFilterInterface.h>
+// QtGui includes
 #include "ui_ThresholdSegmentationLSFilterInterface.h"
 
 //Application Includes
 #include <Application/Tools/ThresholdSegmentationLSFilter.h>
+
+// QtUtils includes
+#include <QtUtils/Bridge/QtBridge.h>
+
+//Interface Includes
+#include <Interface/ToolInterface/ThresholdSegmentationLSFilterInterface.h>
+
 
 SCI_REGISTER_TOOLINTERFACE( Seg3D, ThresholdSegmentationLSFilterInterface )
 
@@ -63,29 +66,35 @@ bool ThresholdSegmentationLSFilterInterface::build_widget( QFrame* frame )
 {
   //Step 1 - build the Qt GUI Widget
   this->private_->ui_.setupUi( frame );
-  this->private_->ui_.horizontalLayout_5->setAlignment( Qt::AlignHCenter );
 
   //Step 2 - get a pointer to the tool
-  ToolHandle base_tool_ = tool();
-  ThresholdSegmentationLSFilter* tool =
-      dynamic_cast< ThresholdSegmentationLSFilter* > ( base_tool_.get() );
+  ThresholdSegmentationLSFilter* tool = dynamic_cast< ThresholdSegmentationLSFilter* > (
+    this->tool().get() );
       
   //Step 3 - connect the gui to the tool through the QtBridge
+  QtUtils::QtBridge::Connect( this->private_->ui_.target_layer_, 
+    tool->target_layer_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.use_active_layer_, 
+    tool->use_active_layer_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.mask_layer_, tool->seed_mask_state_ );
+  
   QtUtils::QtBridge::Connect( this->private_->ui_.iterations_, tool->iterations_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.upper_threshold_, tool->upper_threshold_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.lower_threshold_, tool->lower_threshold_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.curvature_, tool->curvature_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.edge_, tool->propagation_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.propagation_, tool->edge_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.runFilterButton, 
-    boost::bind( &Tool::execute, tool, Core::Interface::GetWidgetActionContext() ) );
-  //QtUtils::QtBridge::Show( this->private_->ui_.message_alert_, tool->valid_target_state_, true );
-  
-  //Send a message to the log that we have finished with building the Segmentation Level Set Filter Interface
-  CORE_LOG_DEBUG("Finished building a Segmentation Level Set Filter Interface");
-  return ( true );
+  QtUtils::QtBridge::Connect( this->private_->ui_.propagation_, tool->propagation_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.edge_, tool->edge_state_ );
 
-} // end build_widget
+  QtUtils::QtBridge::Connect( this->private_->ui_.runFilterButton, boost::bind(
+    &Tool::execute, tool, Core::Interface::GetWidgetActionContext() ) );
+  QtUtils::QtBridge::Show( this->private_->ui_.message_alert_, tool->valid_target_state_, true );
+  QtUtils::QtBridge::Enable( this->private_->ui_.runFilterButton, tool->valid_target_state_ );
+  QtUtils::QtBridge::Enable( this->private_->ui_.target_layer_, tool->use_active_layer_state_, true );
+
+  QtUtils::QtBridge::Enable( this->private_->ui_.upper_threshold_, tool->valid_target_state_ );
+  QtUtils::QtBridge::Enable( this->private_->ui_.lower_threshold_, tool->valid_target_state_ );
+
+  return true;
+}
   
 } // end namespace Seg3D

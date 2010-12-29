@@ -26,25 +26,28 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Boost
+#include <boost/timer.hpp>
+
 // ITK includes
-#include <itkGradientAnisotropicDiffusionImageFilter.h>
+#include <itkThresholdSegmentationLevelSetImageFilter.h>
 
 // Application includes
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/StatusBar/StatusBar.h>
 #include <Application/Filters/ITKFilter.h>
-#include <Application/Filters/Actions/ActionGradientAnisotropicDiffusionFilter.h>
+#include <Application/Filters/Actions/ActionThresholdSegmentationLSFilter.h>
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
 // NOTE: Registration needs to be done outside of any namespace
-CORE_REGISTER_ACTION( Seg3D, GradientAnisotropicDiffusionFilter )
+CORE_REGISTER_ACTION( Seg3D, ThresholdSegmentationLSFilter )
 
 namespace Seg3D
 {
 
-bool ActionGradientAnisotropicDiffusionFilter::validate( Core::ActionContextHandle& context )
+bool ActionThresholdSegmentationLSFilter::validate( Core::ActionContextHandle& context )
 {
   // Check for layer existance and type information
   std::string error;
@@ -55,26 +58,40 @@ bool ActionGradientAnisotropicDiffusionFilter::validate( Core::ActionContextHand
     return false;
   }
   
+  if ( ! LayerManager::CheckLayerExistanceAndType( this->mask_.value(), 
+    Core::VolumeType::MASK_E, error ) )
+  {
+    context->report_error( error );
+    return false;
+  }   
+
+  if ( ! LayerManager::CheckLayerSize( this->layer_id_.value(), this->mask_.value(), 
+    error ) )
+  {
+    context->report_error( error );
+    return false;
+  }   
+  
   // Check for layer availability 
   Core::NotifierHandle notifier;
   if ( ! LayerManager::CheckLayerAvailability( this->layer_id_.value(), 
-    this->replace_.value(), notifier ) )
+    false, notifier ) )
   {
     context->report_need_resource( notifier );
     return false;
   }
-    
+  
+  if ( ! LayerManager::CheckLayerAvailability( this->mask_.value(), 
+    false, notifier ) )
+  {
+    context->report_need_resource( notifier );
+    return false;
+  }     
+        
   // If the number of iterations is lower than one, we cannot run the filter
   if( this->iterations_.value() < 1 )
   {
     context->report_error( "The number of iterations needs to be larger than zero." );
-    return false;
-  }
-  
-  // Conductance needs to be a positive number
-  if( this->sensitivity_.value() < 0.0 )
-  {
-    context->report_error( "The sensitivity needs to be larger than zero." );
     return false;
   }
   
@@ -87,54 +104,71 @@ bool ActionGradientAnisotropicDiffusionFilter::validate( Core::ActionContextHand
 // NOTE: The separation of the algorithm into a private class is for the purpose of running the
 // filter on a separate thread.
 
-class GradientAnisotropicDiffusionFilterAlgo : public ITKFilter
+class ThresholdSegmentationLSFilterAlgo : public ITKFilter
 {
 
 public:
-  LayerHandle src_layer_;
+  LayerHandle data_layer_;
+  LayerHandle mask_layer_;
   LayerHandle dst_layer_;
   
   int iterations_;
-  double sensitivity_;
-  bool preserve_data_format_;
+  
+  double upper_threshold_;
+  double lower_threshold_;
+  double curvature_;
+  double propagation_;
+  double edge_;
 
 public:
+  typedef itk::ThresholdSegmentationLevelSetImageFilter< 
+      FLOAT_IMAGE_TYPE, FLOAT_IMAGE_TYPE > filter_type;
+      
   // RUN:
   // Implemtation of run of the Runnable base class, this function is called when the thread
   // is launched.
 
   // NOTE: The macro needs a data type to select which version to run. This needs to be
   // a member variable of the algorithm class.
-  SCI_BEGIN_TYPED_ITK_RUN( this->src_layer_->get_data_type() )
+  SCI_BEGIN_ITK_RUN()
   {
     // Define the type of filter that we use.
-    typedef itk::GradientAnisotropicDiffusionImageFilter< 
-      TYPED_IMAGE_TYPE, FLOAT_IMAGE_TYPE > filter_type;
 
     // Retrieve the image as an itk image from the underlying data structure
     // NOTE: This only does wrapping and does not regenerate the data.
-    typename Core::ITKImageDataT<VALUE_TYPE>::Handle input_image; 
-    this->get_itk_image_from_layer<VALUE_TYPE>( this->src_layer_, input_image );
+    Core::ITKFloatImageDataHandle feature_image; 
+    this->get_itk_image_from_layer<float>( this->data_layer_, feature_image );
+
+    Core::ITKFloatImageDataHandle seed_image; 
+    this->get_itk_image_from_mask_layer<float>( this->mask_layer_, seed_image, 1000.0 );
         
     // Create a new ITK filter instantiation. 
-    typename filter_type::Pointer filter = filter_type::New();
+    filter_type::Pointer filter = filter_type::New();
     
     // Relay abort and progress information to the layer that is executing the filter.
     this->forward_abort_to_filter( filter, this->dst_layer_ );
-    this->observe_itk_progress( filter, this->dst_layer_, 0.0, 0.75 );
+    this->observe_itk_progress( filter, this->dst_layer_ );
+    this->observe_itk_iterations( filter, boost::bind( 
+      &ThresholdSegmentationLSFilterAlgo::update_iteration, this, _1, this->dst_layer_ ) );
 
     // Setup the filter parameters that we do not want to change.
-    filter->SetInput( input_image->get_image() );
-    filter->SetInPlace( false );
+    filter->SetInput( seed_image->get_image() );
+    filter->SetFeatureImage( feature_image->get_image() );
+    
     filter->SetNumberOfIterations( this->iterations_ );
     
-    // We changed the behavior of this parameter to be more intuitive. It is now relative to
-    // the dynamic range of the data. So a similar setting will behave similarly on a
-    // different data set.
-    double range = this->src_layer_->get_volume()->get_cum_value( 0.99) - 
-      this->src_layer_->get_volume()->get_cum_value( 0.01 );
-    filter->SetConductanceParameter( this->sensitivity_ * range * 0.01 );
-
+    filter->SetUpperThreshold( this->upper_threshold_ );
+    filter->SetLowerThreshold( this->lower_threshold_ );
+    filter->SetCurvatureScaling( this->curvature_ );
+    filter->SetPropagationScaling( this->propagation_ );
+    filter->SetEdgeWeight( this->edge_ );
+    filter->SetSmoothingIterations( 0 );
+    filter->SetSmoothingTimeStep( 0.0 );
+    filter->SetSmoothingConductance( 0.0 );
+    filter->SetIsoSurfaceValue( 0.5 );
+    filter->SetMaximumRMSError( 0.0 );
+    filter->ReverseExpansionDirectionOn();
+    
     // Ensure we will have some threads left for doing something else
     this->limit_number_of_itk_threads( filter );
 
@@ -143,43 +177,46 @@ public:
     // are aborted. In that case we will relay a message to the status bar for information.
     try 
     { 
+      filter->Update(); 
+    } 
+    catch ( ... ) 
+    {
+      if ( this->check_stop() )
+      {
+        return;
+      }
+      
       if ( this->check_abort() )
       {
         this->report_error( "Filter was aborted." );
         return;
       }
-      filter->Update(); 
-    } 
-    catch ( ... ) 
-    {
+      
       this->report_error("Could not allocate enough memory.");
       return;
     }
 
     // As ITK filters generate an inconsistent abort behavior, we record our own abort flag
     // This one is set when the abort button is pressed and an abort is sent to ITK.
-    if ( this->check_abort() ) return;
+    if ( this->check_abort() ) 
+    {
+      // ADD function that makes mask invalid
+      return;
+    }
     
     // If we want to preserve the data type we convert the data before inserting it back.
     // NOTE: Conversion is done on the filter thread and insertion is done on the application
     // thread.
-    if ( this->preserve_data_format_ )
-    {
-      this->convert_and_insert_itk_image_into_layer( this->dst_layer_, 
-        filter->GetOutput(), this->src_layer_->get_data_type() );       
-    }
-    else
-    {
-      this->insert_itk_image_into_layer( this->dst_layer_, filter->GetOutput() ); 
-    }
+
+    this->insert_itk_positive_labels_into_mask_layer( this->dst_layer_, filter->GetOutput() );  
   }
-  SCI_END_TYPED_ITK_RUN()
+  SCI_END_ITK_RUN()
   
   // GET_FITLER_NAME:
   // The name of the filter, this information is used for generating new layer labels.
   virtual std::string get_filter_name() const
   {
-    return "Gradient AnisotropicDiffusion Filter";
+    return "ThresholdSegmentationLevelSet Filter";
   }
   
   // GET_LAYER_PREFIX:
@@ -187,48 +224,70 @@ public:
   // when a new layer is generated. 
   virtual std::string get_layer_prefix() const
   {
-    return "GradAnisoDiff"; 
+    return "TSLevelSet";  
   } 
+  
+
+private:
+
+  // UPDATE_ITERATION:
+  // At regular intervals update the results to the user
+  void update_iteration( itk::Object* itk_object, LayerHandle layer )
+  {
+    if ( update_timer_.elapsed() > 1.0 )
+    {
+      update_timer_.restart();
+      filter_type* filter = dynamic_cast<filter_type* >( itk_object );
+      if ( filter )
+      {
+        this->insert_itk_positive_labels_into_mask_layer( layer, filter->GetOutput() ); 
+      }
+    }
+  }
+
+  boost::timer update_timer_;
 };
 
 
-bool ActionGradientAnisotropicDiffusionFilter::run( Core::ActionContextHandle& context, 
+bool ActionThresholdSegmentationLSFilter::run( Core::ActionContextHandle& context, 
   Core::ActionResultHandle& result )
 {
   // Create algorithm
-  boost::shared_ptr<GradientAnisotropicDiffusionFilterAlgo> algo(
-    new GradientAnisotropicDiffusionFilterAlgo );
+  boost::shared_ptr<ThresholdSegmentationLSFilterAlgo> algo(
+    new ThresholdSegmentationLSFilterAlgo );
 
   // Copy the parameters over to the algorithm that runs the filter
   algo->iterations_ = this->iterations_.value();
-  algo->sensitivity_ = this->sensitivity_.value();
-  algo->preserve_data_format_ = this->preserve_data_format_.value();
+  algo->upper_threshold_ = this->upper_threshold_.value();
+  algo->lower_threshold_ = this->lower_threshold_.value();
+  algo->curvature_ = this->curvature_.value();
+  algo->propagation_ = this->propagation_.value();
+  algo->edge_ = this->edge_.value();
 
   // Find the handle to the layer
-  if ( !( algo->find_layer( this->layer_id_.value(), algo->src_layer_ ) ) )
+  if ( !( algo->find_layer( this->layer_id_.value(), algo->data_layer_ ) ) )
   {
     return false;
   }
 
-  if ( this->replace_.value() )
+  if ( !( algo->find_layer( this->mask_.value(), algo->mask_layer_ ) ) )
   {
-    // Copy the handles as destination and source will be the same
-    algo->dst_layer_ = algo->src_layer_;
-    // Mark the layer for processing.
-    algo->lock_for_processing( algo->dst_layer_ );  
+    return false;
   }
-  else
-  {
-    // Lock the src layer, so it cannot be used else where
-    algo->lock_for_use( algo->src_layer_ );
-    
-    // Create the destination layer, which will show progress
-    algo->create_and_lock_data_layer_from_layer( algo->src_layer_, algo->dst_layer_ );
-  }
+
+  // Lock the src layer, so it cannot be used else where
+  algo->lock_for_use( algo->data_layer_ );
+  algo->lock_for_use( algo->mask_layer_ );
+  
+  // Create the destination layer, which will show progress
+  algo->create_and_lock_mask_layer_from_layer( algo->mask_layer_, algo->dst_layer_ );
+  // Tell the new layer to enable the stop button which can trigger a stop signal and stop
+  // the filter.
+  algo->dst_layer_->set_allow_stop();
 
   // Return the id of the destination layer.
   result = Core::ActionResultHandle( new Core::ActionResult( algo->dst_layer_->get_layer_id() ) );
-
+  
   // Build the undo-redo record
   algo->create_undo_redo_record( context, this->shared_from_this() );
 
@@ -238,21 +297,23 @@ bool ActionGradientAnisotropicDiffusionFilter::run( Core::ActionContextHandle& c
   return true;
 }
 
-
-void ActionGradientAnisotropicDiffusionFilter::Dispatch( Core::ActionContextHandle context, 
-  std::string layer_id, int iterations, double sensitivity, 
-  bool preserve_data_format, bool replace )
+void ActionThresholdSegmentationLSFilter::Dispatch(  Core::ActionContextHandle context, std::string layer_id, 
+    std::string mask, int iterations, double upper_threshold, double lower_threshold,
+    double curvature, double propagation, double edge  )
 { 
   // Create a new action
-  ActionGradientAnisotropicDiffusionFilter* action = 
-    new ActionGradientAnisotropicDiffusionFilter;
+  ActionThresholdSegmentationLSFilter* action = 
+    new ActionThresholdSegmentationLSFilter;
 
   // Setup the parameters
   action->layer_id_.value() = layer_id;
+  action->mask_.value() = mask;
   action->iterations_.value() = iterations;
-  action->sensitivity_.value() = sensitivity;
-  action->preserve_data_format_.value() = preserve_data_format;
-  action->replace_.value() = replace;
+  action->upper_threshold_.value() = upper_threshold;
+  action->lower_threshold_.value() = lower_threshold;
+  action->curvature_.value() = curvature;
+  action->propagation_.value() = propagation;
+  action->edge_.value() = edge;
 
   // Dispatch action to underlying engine
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );

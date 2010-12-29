@@ -204,13 +204,12 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   this->private_->color_widget_ = new QtUtils::QtColorBarWidget( this );
   this->private_->ui_.horizontalLayout_14->addWidget( this->private_->color_widget_ );
   this->private_->color_widget_->setObjectName( QString::fromUtf8( "color_widget_" ) );
-  
-  // Text for when the abort button has been pressed
-  this->private_->ui_.abort_text_->setText( "Waiting for process to abort ..." );
         
   this->connect( this->private_->ui_.abort_button_,
     SIGNAL ( pressed() ), this, SLOT( trigger_abort() ) );
-      
+
+  this->connect( this->private_->ui_.stop_button_,
+    SIGNAL ( pressed() ), this, SLOT( trigger_stop() ) );
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
   
@@ -303,12 +302,14 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
     QtUtils::QtBridge::Show( this->private_->ui_.info_bar_, 
       layer->show_information_state_ );
 
-  
     QtUtils::QtBridge::Show( this->private_->ui_.progress_bar_bar_, 
       layer->show_progress_bar_state_ );
     QtUtils::QtBridge::Show( this->private_->ui_.abort_bar_, 
       layer->show_abort_message_state_ );
-    
+
+    QtUtils::QtBridge::Show( this->private_->ui_.stop_button_, 
+      layer->show_stop_button_state_ );
+
     // Connect all the buttons to the viewers
     QtUtils::QtBridge::Show( this->private_->ui_.viewer_0_button_, 
       ViewerManager::Instance()->get_viewer( 0 )->viewer_visible_state_ );
@@ -761,7 +762,21 @@ void LayerWidget::trigger_abort()
   Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
     this->private_->layer_->show_abort_message_state_, true );
 
+  // Text for when the abort button has been pressed
+  this->private_->ui_.abort_text_->setText( "Waiting for process to abort ..." );
   this->private_->layer_->abort_signal_();
+}
+
+void LayerWidget::trigger_stop()
+{
+  Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
+    this->private_->layer_->show_progress_bar_state_, false );
+  Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
+    this->private_->layer_->show_abort_message_state_, true );
+
+  // Text for when the abort button has been pressed
+  this->private_->ui_.abort_text_->setText( "Waiting for process to stop ..." );
+  this->private_->layer_->stop_signal_();
 }
 
 void LayerWidget::set_group_menu_status( bool status )

@@ -59,11 +59,11 @@ public:
 
   // Layerid of the mask layer
   Core::StateLabeledOptionHandle mask_state_;
+
   // -- execute --
 public:
   // Execute the tool and dispatch the action
   virtual void execute( Core::ActionContextHandle context );
-
 };
 
 } // end namespace

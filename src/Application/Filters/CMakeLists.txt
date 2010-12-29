@@ -107,6 +107,8 @@ SET(APPLICATION_FILTERS_ACTIONS_SRCS
   Actions/ActionOrFilter.cc
   Actions/ActionXorFilter.h
   Actions/ActionXorFilter.cc
+  Actions/ActionThresholdSegmentationLSFilter.h
+  Actions/ActionThresholdSegmentationLSFilter.cc
   Actions/ActionThreshold.h
   Actions/ActionThreshold.cc
   Actions/ActionInvert.h

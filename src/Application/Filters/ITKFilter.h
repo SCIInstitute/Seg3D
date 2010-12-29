@@ -30,6 +30,7 @@
 #define APPLICATION_FILTERS_ITKFILTER_H
  
 // Boost includes
+#include <boost/function.hpp>
 #include <boost/smart_ptr.hpp> 
 #include <boost/utility.hpp> 
  
@@ -57,6 +58,16 @@ typedef boost::shared_ptr<ITKFilterPrivate> ITKFilterPrivateHandle;
 
 class ITKFilter : public LayerFilter
 {
+
+public:
+  typedef itk::Image< unsigned short, 3> USHORT_IMAGE_TYPE;
+  typedef itk::Image< unsigned int, 3> UINT_IMAGE_TYPE;
+  typedef itk::Image< float, 3> FLOAT_IMAGE_TYPE;
+  typedef itk::Image< unsigned char, 3> UCHAR_IMAGE_TYPE;
+  typedef Core::ITKImageDataT<float> FLOAT_CONTAINER_TYPE;
+  typedef Core::ITKImageDataT<unsigned int> UINT_CONTAINER_TYPE;
+  typedef Core::ITKImageDataT<unsigned short> USHORT_CONTAINER_TYPE;
+  typedef Core::ITKImageDataT<unsigned char> UCHAR_CONTAINER_TYPE;
 
 public:
   ITKFilter();
@@ -138,6 +149,55 @@ protected:
     return true;
   }
 
+
+  // GET_ITK_IMAGE_FROM_MASK_LAYER:
+  // Retrieve an itk image from a data or mask layer
+  template <class T>
+  bool get_itk_image_from_mask_layer( const LayerHandle& layer, 
+    typename Core::ITKImageDataT<T>::Handle& image, double label = 1.0 )
+  {
+    // Clear the handle
+    image.reset();
+
+    Core::DataBlockHandle data_block;
+    Core::Transform transform;
+    
+    
+    // If the layer is a mask layer
+    if ( layer->get_type() != Core::VolumeType::MASK_E )
+    {
+      return false;
+    }
+
+    MaskLayerHandle mask = boost::dynamic_pointer_cast<MaskLayer>( layer );
+    Core::MaskVolumeHandle volume = mask->get_mask_volume();
+
+    // We always need to convert the data, ITK does not support the compressed way of
+    // dealing with bitplanes
+    if ( ! ( Core::MaskDataBlockManager::ConvertLabel( volume->get_mask_data_block(), 
+      data_block, Core::GetDataType( reinterpret_cast<T*>( 0 ) ), label ) ) )
+    {
+      this->report_error( "Could not allocate enough memory." );
+      return false;
+    }
+      
+    transform = volume->get_transform();
+
+    // Create a new ITK Image wrapper
+    image = typename Core::ITKImageDataT<T>::Handle( 
+      new Core::ITKImageDataT<T>( data_block, transform ) );
+      
+    if ( !image )
+    {
+      this->report_error( "Could not allocate enough memory." );
+      return false;
+    }
+    
+    // Success
+    return true;
+  }
+
+
   // INSERT_ITK_IMAGE_INTO_LAYER:
   // Insert an itk image back into a layer
   template< class T >
@@ -204,7 +264,55 @@ protected:
     return false;
   }
 
-  // INSERT_ITK_IMAGE_INTO_LAYER:
+  // INSERT_ITK_POSITIVE_LABELS_INTO_MASK_LAYER:
+  // Insert an itk image back into a layer
+  template< class T >
+  bool insert_itk_positive_labels_into_mask_layer( const LayerHandle& layer, 
+    typename itk::Image<T,3>* itk_image, bool invert = false )
+  {
+    typename itk::Image<T,3>::Pointer pointer = itk_image;
+    return insert_itk_positive_labels_pointer_into_mask_layer<T>( layer, pointer, invert );
+  }
+
+  // INSERT_ITK_POSITIVE_LABELS_POINTER_INTO_MASK_LAYER:
+  // Insert an itk image back into a layer
+  template< class T >
+  bool insert_itk_positive_labels_pointer_into_mask_layer( const LayerHandle& layer, 
+    typename itk::Image<T,3>::Pointer itk_image, bool invert = false )
+  {
+    if ( layer->get_type() == Core::VolumeType::MASK_E )
+    {
+      MaskLayerHandle mask_layer = boost::dynamic_pointer_cast<MaskLayer>( layer );
+          
+      // Need to make an intermediate representation as a datablock of the data
+      // before it can be uploaded into the mask.
+      // NOTE: This only generates a wrapper, no new data is generated
+      Core::DataBlockHandle data_block = Core::ITKDataBlock::New<T>( itk_image );
+      
+      // NOTE: The only reason we need the transform here, is that data blocks are
+      // sorted by grid transform so we can use the nrrd library to save them, the
+      // latter only allows storing one transform per data block, and since 8 masks
+      // share one datablock, they are required for now to have the same transform.
+      Core::MaskDataBlockHandle mask;
+
+      if (!( Core::MaskDataBlockManager::ConvertLargerThan( data_block, 
+        mask_layer->get_grid_transform(), mask, invert ) ) )
+      {
+        this->report_error( "Could not allocate enough memory." );
+        return false;
+      }
+      
+      Core::MaskVolumeHandle mask_volume( new Core::MaskVolume( 
+        mask_layer->get_grid_transform(), mask ) );
+        
+      this->dispatch_insert_mask_volume_into_layer( mask_layer, mask_volume );
+      return true;
+    }
+    return false;
+  }
+
+
+  // INSERT_ITK_LABEL_INTO_MASK_LAYER:
   // Insert an itk image back into a layer
   template< class T >
   bool insert_itk_label_into_mask_layer( const LayerHandle& layer, 
@@ -341,16 +449,34 @@ protected:
     return false;
   }
 
-  // OBSERVE_ITK_FILTER:
+  // FORWARD_ABORT_TO_FILTER:
+  // Forward a Seg3D abort to an itk filter
+  template< class T >
+  void forward_abort_to_filter( T filter_pointer, LayerHandle layer )
+  {
+    this->forward_abort_to_filter_internal( itk::ProcessObject::Pointer( filter_pointer ), 
+      layer );
+  }
+
+  // OBSERVE_ITK_PROGRESS:
   // Forward the progress an itk filter is making and check for the abort status of the layer
-  template< class T>
-  void observe_itk_filter( T filter_pointer, const LayerHandle& layer, 
+  template< class T >
+  void observe_itk_progress( T filter_pointer, const LayerHandle& layer, 
     float progress_start = 0.0, float progress_amount = 1.0 )
   {
-    this->observe_itk_filter_internal( itk::ProcessObject::Pointer( filter_pointer ), layer,
+    this->observe_itk_progress_internal( itk::ProcessObject::Pointer( filter_pointer ), layer,
       progress_start, progress_amount );
   }
-  
+
+  // OBSERVE_ITK_ITERATIONS:
+  // Forward progess on iterations to a user specified function
+  template< class T >
+  void observe_itk_iterations( T filter_pointer, boost::function< void( itk::Object* ) > iteration_fcn )
+  {
+    this->observe_itk_iterations_internal( itk::ProcessObject::Pointer( filter_pointer ),
+      iteration_fcn );
+  }
+
   // LIMIT_NUMBER_OF_ITK_THREADS:
   // Limit the number of itk threads so that at least one thread can be used to allow for
   // interaction in the program.
@@ -365,11 +491,22 @@ protected:
   // HANDLE_ABORT:
   // A virtual function that can be overloaded
   virtual void handle_abort();    
+
+  // HANDLE_STOP:
+  // A virtual function that can be overloaded
+  virtual void handle_stop();   
   
-private:  
+private:
   // Internal function for setting up itk progress forwarding
-  void observe_itk_filter_internal( itk::ProcessObject::Pointer filter, 
+  void observe_itk_progress_internal( itk::ProcessObject::Pointer filter, 
     const LayerHandle& layer, float progress_start, float progress_amount );
+
+  // Internal function for setting up itk iteration forwarding
+  void observe_itk_iterations_internal( itk::ProcessObject::Pointer filter, 
+    boost::function< void( itk::Object* ) > iteration_fcn );
+    
+  // Internal function for setting up abort handling
+  void forward_abort_to_filter_internal( itk::ProcessObject::Pointer filter, LayerHandle layer );
     
   // Internal function for limiting the number of threads 
   void limit_number_of_itk_threads_internal( itk::ProcessObject::Pointer filter );  
@@ -397,16 +534,8 @@ public:\
   template< class VALUE_TYPE>\
   void typed_run_filter()\
   {\
-    typedef itk::Image< unsigned short, 3> USHORT_IMAGE_TYPE; \
-    typedef itk::Image< unsigned int, 3> UINT_IMAGE_TYPE; \
-    typedef itk::Image< float, 3> FLOAT_IMAGE_TYPE; \
-    typedef itk::Image< unsigned char, 3> UCHAR_IMAGE_TYPE; \
     typedef itk::Image< VALUE_TYPE, 3> TYPED_IMAGE_TYPE; \
-    typedef Core::ITKImageDataT<unsigned int> UINT_CONTAINER_TYPE; \
-    typedef Core::ITKImageDataT<unsigned short> USHORT_CONTAINER_TYPE; \
     typedef Core::ITKImageDataT<VALUE_TYPE> TYPED_CONTAINER_TYPE; \
-    typedef Core::ITKImageDataT<float> FLOAT_CONTAINER_TYPE; \
-    typedef Core::ITKImageDataT<unsigned char> UCHAR_CONTAINER_TYPE;
   
 
 #define SCI_END_TYPED_ITK_RUN() \
@@ -417,14 +546,7 @@ public:\
 public:\
   virtual void run_filter()\
   {\
-    typedef itk::Image< unsigned short, 3> USHORT_IMAGE_TYPE; \
-    typedef itk::Image< unsigned int, 3> UINT_IMAGE_TYPE; \
-    typedef itk::Image< float, 3> FLOAT_IMAGE_TYPE; \
-    typedef itk::Image< unsigned char, 3> UCHAR_IMAGE_TYPE; \
-    typedef Core::ITKImageDataT<float> FLOAT_CONTAINER_TYPE; \
-    typedef Core::ITKImageDataT<unsigned int> UINT_CONTAINER_TYPE; \
-    typedef Core::ITKImageDataT<unsigned short> USHORT_CONTAINER_TYPE; \
-    typedef Core::ITKImageDataT<unsigned char> UCHAR_CONTAINER_TYPE;
+
 
 #define SCI_END_ITK_RUN() \
   }

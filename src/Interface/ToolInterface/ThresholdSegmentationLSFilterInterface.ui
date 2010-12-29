@@ -113,7 +113,7 @@
       </size>
      </property>
      <property name="title">
-      <string>Mask Layer</string>
+      <string>Seed Mask Layer</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
       <property name="spacing">
@@ -163,7 +163,7 @@
        <number>4</number>
       </property>
       <item>
-       <widget class="QtUtils::QtSliderIntCombo" name="iterations_" native="true"/>
+       <widget class="QtUtils::QtLogSliderIntCombo" name="iterations_" native="true"/>
       </item>
      </layout>
     </widget>
@@ -379,7 +379,7 @@
        <height>32</height>
       </size>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,1">
+     <layout class="QHBoxLayout" name="horizontalLayout" stretch="1">
       <property name="spacing">
        <number>0</number>
       </property>
@@ -395,16 +395,6 @@
       <property name="bottomMargin">
        <number>0</number>
       </property>
-      <item>
-       <widget class="QCheckBox" name="replaceCheckBox">
-        <property name="text">
-         <string>Replace</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
       <item>
        <widget class="QPushButton" name="runFilterButton">
         <property name="text">
@@ -444,7 +434,7 @@ QWidget#message_alert_{
       <item>
        <widget class="QLabel" name="message_">
         <property name="text">
-         <string>Select a data layer to activate this filter.</string>
+         <string>Select a data layer and mask layer to activate this filter.</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
@@ -461,20 +451,20 @@ QWidget#message_alert_{
  </widget>
  <customwidgets>
   <customwidget>
+   <class>QtUtils::QtSliderDoubleCombo</class>
+   <extends>QWidget</extends>
+   <header location="global">QtUtils/Widgets/QtSliderDoubleCombo.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>QtUtils::QtDropableComboBox</class>
    <extends>QComboBox</extends>
    <header location="global">QtUtils/Widgets/QtDropableComboBox.h</header>
   </customwidget>
   <customwidget>
-   <class>QtUtils::QtSliderIntCombo</class>
+   <class>QtUtils::QtLogSliderIntCombo</class>
    <extends>QWidget</extends>
-   <header location="global">QtUtils/Widgets/QtSliderIntCombo.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QtUtils::QtSliderDoubleCombo</class>
-   <extends>QWidget</extends>
-   <header location="global">QtUtils/Widgets/QtSliderDoubleCombo.h</header>
+   <header location="global">QtUtils/Widgets/QtLogSliderIntCombo.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -213,6 +213,10 @@ private Q_SLOTS:
   // TRIGGER_ABORT:
   // Trigger the abort signal of the layer
   void trigger_abort();
+
+  // TRIGGER_STOP:
+  // Trigger the stop signal of the layer
+  void trigger_stop();
   
   // SET_BRIGHTNESS_CONTRAST_TO_DEFAULT:
   // dispatches actions that set the values of the brightness and contrast back to defaults

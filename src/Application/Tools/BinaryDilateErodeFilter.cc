@@ -84,7 +84,9 @@ int BinaryDilateErodeFilter::get_slice_type()
 
 void BinaryDilateErodeFilter::execute_dilateerode( Core::ActionContextHandle context )
 {
+  // NOTE: Need to lock state engine as this function is run from the interface thread
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
   ActionDilateErodeFilter::Dispatch( context,
     this->target_layer_state_->get(),
     this->replace_state_->get(),
@@ -98,7 +100,9 @@ void BinaryDilateErodeFilter::execute_dilateerode( Core::ActionContextHandle con
 
 void BinaryDilateErodeFilter::execute_dilate( Core::ActionContextHandle context )
 {
+  // NOTE: Need to lock state engine as this function is run from the interface thread
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
   ActionDilateFilter::Dispatch( context,
     this->target_layer_state_->get(),
     this->replace_state_->get(),
@@ -111,7 +115,9 @@ void BinaryDilateErodeFilter::execute_dilate( Core::ActionContextHandle context 
 
 void BinaryDilateErodeFilter::execute_erode( Core::ActionContextHandle context )
 {
+  // NOTE: Need to lock state engine as this function is run from the interface thread
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
   ActionErodeFilter::Dispatch( context,
     this->target_layer_state_->get(),
     this->replace_state_->get(),

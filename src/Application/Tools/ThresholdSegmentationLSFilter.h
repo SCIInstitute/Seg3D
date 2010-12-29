@@ -29,62 +29,59 @@
 #ifndef APPLICATION_TOOLS_THRESHOLDSEGMENTATIONLSFILTER_H
 #define APPLICATION_TOOLS_THRESHOLDSEGMENTATIONLSFILTER_H
 
-#include <Application/Tool/Tool.h>
+#include <Application/Tool/SingleTargetTool.h>
 
 namespace Seg3D
 {
 
-class ThresholdSegmentationLSFilter : public Tool
+class ThresholdSegmentationLSFilter;
+class ThresholdSegmentationLSFilterPrivate;
+typedef boost::shared_ptr<ThresholdSegmentationLSFilterPrivate> ThresholdSegmentationLSFilterPrivateHandle;
+
+class ThresholdSegmentationLSFilter : public SingleTargetTool
 {
-
 SEG3D_TOOL(
-SEG3D_TOOL_NAME( "ThresholdSegmentationLSFilter", "Grow a mask region outwards based on the data, geometry and local edges" )
-SEG3D_TOOL_MENULABEL( "Segmentation Level Set" )
-SEG3D_TOOL_MENU( "Advanced Filters" )
-SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+L" )
-SEG3D_TOOL_URL( "http://www.sci.utah.edu/SCIRunDocs/index.php/CIBC:Seg3D2:ThresholdLevelSetFilter:1" )
+  SEG3D_TOOL_NAME( "ThresholdSegmentationLSFilter", "Grow a mask region outwards based on the"
+    " data, geometry and local edges" )
+  SEG3D_TOOL_MENULABEL( "Segmentation Level Set" )
+  SEG3D_TOOL_MENU( "Advanced Filters" )
+  SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+L" )
+  SEG3D_TOOL_URL( "http://www.sci.utah.edu/SCIRunDocs/index.php/CIBC:Seg3D2:ThresholdLevelSetFilter:1" )
 )
-
 
 public:
   ThresholdSegmentationLSFilter( const std::string& toolid );
   virtual ~ThresholdSegmentationLSFilter();
 
-  // -- constraint parameters --
-
-  // Constrain viewer to right painting tool when layer is selected
-  void target_constraint( std::string layerid );
-
-  // -- activate/deactivate tool --
-
-  virtual void activate();
-  virtual void deactivate();
-  
-private:
-  // -- handle updates from layermanager --
-  void handle_layers_changed();
-
   // -- state --
 public:
-  // Layerid of the target layer
-  Core::StateStringHandle target_layer_state_;
+  // Mask that is used as seed points for this filter
+  Core::StateLabeledOptionHandle seed_mask_state_;
 
-  Core::StateStringHandle mask_layer_state_;
-
+  // Number of iterations
   Core::StateRangedIntHandle iterations_state_;
 
+  // Upper threshold for the data that needs segmentation
   Core::StateRangedDoubleHandle upper_threshold_state_;
 
+  // Lower threshold for the data that needs segmentation
   Core::StateRangedDoubleHandle lower_threshold_state_;
-
+  
+  // Curvature weight
   Core::StateRangedDoubleHandle curvature_state_;
 
   Core::StateRangedDoubleHandle propagation_state_;
 
   Core::StateRangedDoubleHandle edge_state_;
 
-  Core::StateBoolHandle replace_state_;
+  // -- execute --
+public:
+  // Execute the tool and dispatch the action
+  virtual void execute( Core::ActionContextHandle context );
 
+  // -- internals --
+private:
+  ThresholdSegmentationLSFilterPrivateHandle private_;
 };
 
 } // end namespace

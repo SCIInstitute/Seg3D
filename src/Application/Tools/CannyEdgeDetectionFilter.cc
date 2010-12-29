@@ -60,6 +60,9 @@ CannyEdgeDetectionFilter::~CannyEdgeDetectionFilter()
   
 void CannyEdgeDetectionFilter::execute( Core::ActionContextHandle context )
 {
+  // NOTE: Need to lock state engine as this function is run from the interface thread
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
   ActionCannyEdgeDetectionFilter::Dispatch( context,
     this->target_layer_state_->get(),
     this->blurring_distance_state_->get(),

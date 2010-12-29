@@ -59,6 +59,9 @@ MedianFilter::~MedianFilter()
   
 void MedianFilter::execute( Core::ActionContextHandle context )
 {
+  // NOTE: Need to lock state engine as this function is run from the interface thread
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
   ActionMedianFilter::Dispatch( context,
     this->target_layer_state_->get(),
     this->replace_state_->get(),

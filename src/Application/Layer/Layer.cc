@@ -70,6 +70,15 @@ public:
   
   // Abort flag
   bool abort_;
+
+  // Stop processing flag
+  bool stop_;
+  
+  // Function for setting abort flag
+  void handle_abort();
+  
+  // Function for setting stop flag
+  void handle_stop();
 };
 
 void LayerPrivate::handle_locked_state_changed( bool locked )
@@ -99,6 +108,18 @@ void LayerPrivate::handle_visible_state_changed( size_t viewer_id, bool visible 
   {
     this->layer_->master_visible_state_->set( true );
   }
+}
+
+void LayerPrivate::handle_abort()
+{
+  Layer::lock_type lock( Layer::GetMutex() );
+  this->abort_ = true;
+}
+
+void LayerPrivate::handle_stop()
+{
+  Layer::lock_type lock( Layer::GetMutex() );
+  this->stop_ = true;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -165,7 +186,9 @@ void Layer::initialize_states( const std::string& name, bool creating )
 {
   // Setup the default values for private class
   this->private_->layer_ = this;
+
   this->private_->abort_ = false;
+  this->private_->stop_ = false;
   
   //  Build the layer specific state variables
 
@@ -215,6 +238,7 @@ void Layer::initialize_states( const std::string& name, bool creating )
   this->add_state( "show_appearance", this->show_appearance_state_, false );
   this->add_state( "show_progress", this->show_progress_bar_state_, creating );
   this->add_state( "show_abort", this->show_abort_message_state_, false );
+  this->add_state( "show_stop_button", this->show_stop_button_state_, false );
   
   this->show_information_state_->set_is_project_data( false );
   this->show_advanced_visibility_state_->set_is_project_data( false );
@@ -222,6 +246,7 @@ void Layer::initialize_states( const std::string& name, bool creating )
   this->show_appearance_state_->set_is_project_data( false );
   this->show_progress_bar_state_->set_is_project_data( false );
   this->show_abort_message_state_->set_is_project_data( false );
+  this->show_stop_button_state_->set_is_project_data( false );
 
   // These states do not need to be loaded from file -- just reset to defaults.
   this->data_state_->set_session_priority( Core::StateBase::DO_NOT_LOAD_E );
@@ -237,7 +262,10 @@ void Layer::initialize_states( const std::string& name, bool creating )
 
   // Make suer handle_abort is called when the signal is triggered
   this->private_->add_connection( this->abort_signal_.connect( boost::bind(
-    &Layer::handle_abort, this ) ) );
+    &LayerPrivate::handle_abort, this->private_ ) ) );
+
+  this->private_->add_connection( this->stop_signal_.connect( boost::bind(
+    &LayerPrivate::handle_stop, this->private_ ) ) );
 
   size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
   for ( size_t i = 0; i < num_of_viewers; ++i )
@@ -343,13 +371,6 @@ Layer::filter_key_type Layer::GenerateFilterKey()
   return filter_key_count++;
 }
 
-
-void Layer::handle_abort()
-{
-  lock_type lock( GetMutex() );
-  this->private_->abort_ = true;
-}
-
 void Layer::reset_abort()
 {
   lock_type lock( GetMutex() );
@@ -362,5 +383,26 @@ bool Layer::check_abort()
   return this->private_->abort_;
 }
 
+void Layer::reset_stop()
+{
+  lock_type lock( GetMutex() );
+  this->private_->stop_ = false;
+}
+
+bool Layer::check_stop()
+{
+  lock_type lock( GetMutex() );
+  return this->private_->stop_;
+}
+
+void Layer::set_allow_stop()
+{
+  this->show_stop_button_state_->set( true );
+}
+
+void Layer::reset_allow_stop()
+{
+  this->show_stop_button_state_->set( false );
+}
 
 } // end namespace Seg3D

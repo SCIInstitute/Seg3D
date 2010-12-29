@@ -58,6 +58,9 @@ DistanceFilter::~DistanceFilter()
 
 void DistanceFilter::execute( Core::ActionContextHandle context )
 {
+  // NOTE: Need to lock state engine as this function is run from the interface thread
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+  
   ActionDistanceFilter::Dispatch( context,
     this->target_layer_state_->get(),
     this->use_index_space_state_->get(),

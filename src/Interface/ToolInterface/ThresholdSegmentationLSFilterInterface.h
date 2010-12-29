@@ -41,9 +41,15 @@ class ThresholdSegmentationLSFilterInterface : public ToolWidget
 {
 Q_OBJECT
 
+// -- Constructor/destructor --
 public:
   ThresholdSegmentationLSFilterInterface();
   virtual ~ThresholdSegmentationLSFilterInterface();
+
+// -- create interface --
+public:
+  // BUILD_WIDGET:
+  // This function builds the actual GUI
   virtual bool build_widget( QFrame* frame );
 
 private:

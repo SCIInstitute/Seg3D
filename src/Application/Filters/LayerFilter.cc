@@ -84,6 +84,9 @@ public:
   // Keep track of abort status
   bool abort_;
   
+  // Keep track of stop status
+  bool stop_;
+  
   // Mutex protecting abort status
   boost::mutex mutex_;
   
@@ -173,6 +176,12 @@ void LayerFilter::raise_abort()
   this->handle_abort();
 }
 
+void LayerFilter::raise_stop()
+{
+  boost::mutex::scoped_lock lock( this->private_->mutex_ );
+  this->private_->stop_ = true;
+  this->handle_stop();
+}
 
 bool LayerFilter::check_abort()
 {
@@ -180,6 +189,11 @@ bool LayerFilter::check_abort()
   return this->private_->abort_;
 }
 
+bool LayerFilter::check_stop()
+{
+  boost::mutex::scoped_lock lock( this->private_->mutex_ );
+  return this->private_->stop_;
+}
 
 void LayerFilter::abort_and_wait()
 {
@@ -211,7 +225,18 @@ void LayerFilter::connect_abort( const  LayerHandle& layer )
     &LayerFilter::raise_abort, this ) ) );
 }
 
+void LayerFilter::connect_stop( const  LayerHandle& layer )
+{
+  boost::mutex::scoped_lock lock( this->private_->mutex_ );
+  this->private_->add_connection( layer->stop_signal_.connect( boost::bind(
+    &LayerFilter::raise_stop, this ) ) );
+}
+
 void LayerFilter::handle_abort()
+{
+}
+
+void LayerFilter::handle_stop()
 {
 }
 

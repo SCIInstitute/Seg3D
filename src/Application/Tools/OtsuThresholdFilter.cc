@@ -57,6 +57,9 @@ OtsuThresholdFilter::~OtsuThresholdFilter()
 
 void OtsuThresholdFilter::execute( Core::ActionContextHandle context )
 { 
+  // NOTE: Need to lock state engine as this function is run from the interface thread
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
   ActionOtsuThresholdFilter::Dispatch( context,
     this->target_layer_state_->get(),
     this->amount_state_->get() );

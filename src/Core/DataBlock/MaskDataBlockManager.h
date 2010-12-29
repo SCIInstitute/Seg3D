@@ -124,7 +124,17 @@ public:
   // to have been created before.
   static bool Inscribe( MaskDataBlockHandle mask, DataBlockHandle data, double label, 
     bool invert = false );
-   
+
+  // CONVERT:
+  // Convert a MaskDataBlock into a DataBlock
+  static bool Convert( MaskDataBlockHandle mask, DataBlockHandle& data, 
+    DataType data_type, bool invert = false );  
+
+  // CONVERTLABEL:
+  // Convert a MaskDataBlock into a DataBlock
+  static bool ConvertLabel( MaskDataBlockHandle mask, DataBlockHandle& data, 
+    DataType data_type, double label = 1.0 ); 
+
   // CONVERT:
   // Convert a DataBlock into a MaskDataBlock
   static bool Convert( DataBlockHandle data, GridTransform grid_transform, 
@@ -141,10 +151,6 @@ public:
   static bool ConvertLabel( DataBlockHandle data, GridTransform grid_transform, 
     MaskDataBlockHandle& mask, double label );
   
-  // CONVERT:
-  // Convert a MaskDataBlock into a DataBlock
-  static bool Convert( MaskDataBlockHandle mask, DataBlockHandle& data, 
-    DataType data_type, bool invert = false );  
 
   // CREATEMASKFROMNONZERODATA:
   // Create a mask from the non zero data contained in a datablock

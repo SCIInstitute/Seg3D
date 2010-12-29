@@ -138,7 +138,8 @@ public:
     dgfilter->SetMaximumKernelWidth(8);
     dgfilter->SetUseImageSpacingOff();
     
-    this->observe_itk_filter( dgfilter, this->dst_layer_, 0.0f, 0.05f );
+    this->forward_abort_to_filter( dgfilter, this->dst_layer_ );
+    this->observe_itk_progress( dgfilter, this->dst_layer_, 0.0, 0.05 );
 
     try
     {
@@ -189,8 +190,9 @@ public:
     
     gmag_filter->SetInput( dg_image->get_image() );
     
-    this->observe_itk_filter( gmag_filter, this->dst_layer_, 0.1f, 0.05f );
-  
+    this->forward_abort_to_filter( gmag_filter, this->dst_layer_ );
+    this->observe_itk_progress( gmag_filter, this->dst_layer_, 0.1, 0.05 );
+
     try
     {
       gmag_filter->Update();
@@ -243,7 +245,8 @@ public:
   
     gradient_filter->SetInput( gmag_image->get_image() );
 
-    this->observe_itk_filter( gradient_filter, this->dst_layer_, 0.2f, 0.05f );
+    this->forward_abort_to_filter( gradient_filter, this->dst_layer_ );
+    this->observe_itk_progress( gradient_filter, this->dst_layer_, 0.2, 0.05 );
 
     try
     {
