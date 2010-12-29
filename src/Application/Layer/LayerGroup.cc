@@ -57,10 +57,10 @@ public:
   void update_layers_visible_state();
   void update_grid_information();
   
-  void update_iso_surface_visible_state();
-  
-  void handle_iso_surface_visible_state_changed( std::string state );
+  void update_layers_iso_visible_state();
+
   void handle_layers_visible_state_changed( std::string state );
+  void handle_layers_iso_visible_state_changed( std::string state );
 
   LayerGroup* layer_group_;
   size_t signal_block_count_;
@@ -130,6 +130,58 @@ void LayerGroupPrivate::update_layers_visible_state()
   }
 }
 
+void LayerGroupPrivate::update_layers_iso_visible_state()
+{
+  ASSERT_IS_APPLICATION_THREAD();
+
+  if ( this->signal_block_count_ > 0 )
+  {
+    return;
+  }
+
+  size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
+  size_t total_effective_layers = 0;
+  size_t total_visible_layers = 0;
+
+  layer_list_type::iterator it = this->layer_group_->layer_list_.begin();
+  while ( it != this->layer_group_->layer_list_.end() )
+  {
+    LayerHandle layer = *it;
+
+    if( ( layer->get_type() == Core::VolumeType::MASK_E ) && //( layer_visible ) && 
+      ( boost::dynamic_pointer_cast< MaskLayer >( layer )->iso_generated_state_->get() ) )
+    {
+      ++total_effective_layers;
+      if ( boost::dynamic_pointer_cast< MaskLayer >( layer )->
+        show_isosurface_state_->get() )
+      {
+        ++total_visible_layers;
+      }
+    }
+
+    ++it;
+  }
+  
+  std::string state;
+  if ( total_visible_layers == 0 )
+  {
+    state = "none";
+  }
+  else if ( total_visible_layers == total_effective_layers )
+  {
+    state = "all";
+  }
+  else
+  {
+    state = "some";
+  }
+
+  {
+    Core::ScopedCounter signal_block( this->signal_block_count_ );
+    this->layer_group_->layers_iso_visible_state_->set( state );
+  }
+}
+
 void LayerGroupPrivate::handle_layers_visible_state_changed( std::string state )
 {
   if ( this->signal_block_count_ > 0 || state == "some" )
@@ -164,6 +216,34 @@ void LayerGroupPrivate::handle_layers_visible_state_changed( std::string state )
     if ( layer_visible )
     {
       layer->master_visible_state_->set( visible );
+    }
+
+    ++it;
+  }
+}
+
+void LayerGroupPrivate::handle_layers_iso_visible_state_changed( std::string state )
+{
+  if ( this->signal_block_count_ > 0 || state == "some" )
+  {
+    return;
+  }
+
+  bool visible = state ==  "all";
+
+  Core::ScopedCounter signal_block( this->signal_block_count_ );
+
+  size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
+  layer_list_type::iterator it = this->layer_group_->layer_list_.begin();
+  while ( it != this->layer_group_->layer_list_.end() )
+  {
+    LayerHandle layer = *it;
+
+    if( ( layer->get_type() == Core::VolumeType::MASK_E ) && //( layer_visible ) && 
+      ( boost::dynamic_pointer_cast< MaskLayer >( layer )->iso_generated_state_->get() ) )
+    {
+      boost::dynamic_pointer_cast< MaskLayer >( layer )->
+        show_isosurface_state_->set( visible );
     }
 
     ++it;
@@ -223,7 +303,8 @@ void LayerGroup::initialize_states()
     "1.0", "1.0|0.5|0.25|0.125" );
 
   this->add_state( "layers_visible", this->layers_visible_state_, "all", "none|some|all" );
-
+  this->add_state( "layers_iso_visible", this->layers_iso_visible_state_, "all", "none|some|all" );
+  
   Core::Point dimensions( static_cast< double>( this->grid_transform_.get_nx() ), 
     static_cast< double>( this->grid_transform_.get_ny() ), 
     static_cast< double>( this->grid_transform_.get_nz() ) );
@@ -259,6 +340,9 @@ void LayerGroup::initialize_states()
   }
   this->add_connection( this->layers_visible_state_->value_changed_signal_.connect(
     boost::bind( &LayerGroupPrivate::handle_layers_visible_state_changed, this->private_, _1 ) ) );
+    
+  this->add_connection( this->layers_iso_visible_state_->value_changed_signal_.connect(
+    boost::bind( &LayerGroupPrivate::handle_layers_iso_visible_state_changed, this->private_, _1 ) ) );
 }
 
 
@@ -273,6 +357,9 @@ void LayerGroup::insert_layer( LayerHandle new_layer )
   if( new_layer->get_type() == Core::VolumeType::MASK_E )
   { 
     this->layer_list_.push_front( new_layer );
+    boost::dynamic_pointer_cast< MaskLayer >( new_layer )->show_isosurface_state_->
+      state_changed_signal_.connect( boost::bind(
+      &LayerGroupPrivate::update_layers_iso_visible_state, this->private_ ) );
   }
   else
   {
@@ -295,6 +382,7 @@ void LayerGroup::insert_layer( LayerHandle new_layer )
   }
 
   this->private_->update_layers_visible_state();
+  this->private_->update_layers_iso_visible_state();
 }
 
 void LayerGroup::insert_layer( LayerHandle new_layer, size_t pos )
@@ -323,6 +411,7 @@ void LayerGroup::insert_layer( LayerHandle new_layer, size_t pos )
 
   this->layer_list_.insert( layer_it, new_layer );
   this->private_->update_layers_visible_state();
+  this->private_->update_layers_iso_visible_state();
 }
 
 void LayerGroup::move_layer_above( LayerHandle layer_above, LayerHandle layer_below )
@@ -392,6 +481,7 @@ void LayerGroup::delete_layer( LayerHandle layer )
 
   layer_list_.remove( layer );
   this->private_->update_layers_visible_state();
+  this->private_->update_layers_iso_visible_state();
 }
 
 void LayerGroup::get_layer_names( std::vector< LayerIDNamePair >& layer_names, 

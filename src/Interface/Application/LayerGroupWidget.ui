@@ -200,13 +200,7 @@ QWidget#tools_and_layers_widget_{
              </widget>
             </item>
             <item>
-             <widget class="QtUtils::QtTristateToolButton" name="group_visibility_button_" native="true">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
+             <widget class="QtUtils::QtTristateToolButton" name="group_visibility_button_">
               <property name="minimumSize">
                <size>
                 <width>21</width>
@@ -219,44 +213,13 @@ QWidget#tools_and_layers_widget_{
                 <height>21</height>
                </size>
               </property>
-              <property name="toolTip">
-               <string>Turn on or off the group's visibility</string>
-              </property>
-              <property name="text" stdset="0">
+              <property name="text">
                <string/>
               </property>
-              <property name="icon" stdset="0">
-               <iconset resource="../../Resources/QtResources.qrc">
-                <normaloff>:/Images/VisibleOff.png</normaloff>
-                <normalon>:/Images/VisibleWhite.png</normalon>:/Images/VisibleOff.png</iconset>
-              </property>
-              <property name="iconSize" stdset="0">
-               <size>
-                <width>20</width>
-                <height>20</height>
-               </size>
-              </property>
-              <layout class="QHBoxLayout" name="horizontalLayout_3">
-               <property name="spacing">
-                <number>0</number>
-               </property>
-               <property name="leftMargin">
-                <number>0</number>
-               </property>
-               <property name="topMargin">
-                <number>0</number>
-               </property>
-               <property name="rightMargin">
-                <number>5</number>
-               </property>
-               <property name="bottomMargin">
-                <number>0</number>
-               </property>
-              </layout>
              </widget>
             </item>
             <item>
-             <widget class="QToolButton" name="group_iso_visibility_button_">
+             <widget class="QtUtils::QtTristateToolButton" name="group_iso_visibility_button_">
               <property name="minimumSize">
                <size>
                 <width>21</width>
@@ -274,11 +237,6 @@ QWidget#tools_and_layers_widget_{
               </property>
               <property name="text">
                <string/>
-              </property>
-              <property name="icon">
-               <iconset resource="../../Resources/QtResources.qrc">
-                <normaloff>:/Images/IsosurfaceVisibleOff.png</normaloff>
-                <normalon>:/Images/IsosurfaceVisibleOn.png</normalon>:/Images/IsosurfaceVisibleOff.png</iconset>
               </property>
               <property name="checkable">
                <bool>true</bool>
@@ -400,7 +358,7 @@ QWidget#tools_and_layers_widget_{
  <customwidgets>
   <customwidget>
    <class>QtUtils::QtTristateToolButton</class>
-   <extends>QWidget</extends>
+   <extends>QToolButton</extends>
    <header location="global">QtUtils/Widgets/QtTristateToolButton.h</header>
   </customwidget>
  </customwidgets>

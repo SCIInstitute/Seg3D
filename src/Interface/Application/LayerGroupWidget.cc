@@ -123,10 +123,6 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   connect( this->private_->button_menu_, SIGNAL( delete_select_all_pressed( bool ) ), this, 
     SLOT( check_uncheck_for_duplicate( bool ) ) );
   
-  connect( this->private_->ui_.group_iso_visibility_button_, SIGNAL( toggled( bool ) ), this, 
-    SLOT( set_iso_surface_visibility( bool )) );
-
-  
   // Set the icons for the group visibility button
   QIcon none_visible_icon;
   none_visible_icon.addFile( QString::fromUtf8( ":/Images/VisibleOff.png" ), QSize(), QIcon::Normal );
@@ -137,9 +133,22 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   
   this->private_->ui_.group_visibility_button_->set_icons( none_visible_icon, 
     some_visible_icon, all_visible_icon );
-  
+    
   QtUtils::QtBridge::Connect( this->private_->ui_.group_visibility_button_, 
     group->layers_visible_state_ );
+  
+  QIcon no_iso_visible_icon;
+  no_iso_visible_icon.addFile( QString::fromUtf8( ":/Images/IsosurfaceVisibleOff.png" ), QSize(), QIcon::Normal );
+  QIcon some_iso_visible_icon;
+  some_iso_visible_icon.addFile( QString::fromUtf8( ":/Images/IsosurfaceVisibleGrey.png" ), QSize(), QIcon::Normal );
+  QIcon all_iso_visible_icon;
+  all_iso_visible_icon.addFile( QString::fromUtf8( ":/Images/IsosurfaceVisibleOn.png" ), QSize(), QIcon::Normal );
+  
+  this->private_->ui_.group_iso_visibility_button_->set_icons( no_iso_visible_icon, 
+    some_iso_visible_icon, all_iso_visible_icon );
+  
+  QtUtils::QtBridge::Connect( this->private_->ui_.group_iso_visibility_button_, 
+    group->layers_iso_visible_state_ );
 
   this->private_->ui_.group_frame_layout_->setAlignment( Qt::AlignTop );
   this->private_->ui_.group_frame_layout_->setSpacing( 1 );

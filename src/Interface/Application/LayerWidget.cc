@@ -414,7 +414,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
       ( boost::lambda::bind( &Core::StateBool::get, viewer_visible_states[ 5 ].get() ) &&
       boost::lambda::bind( &Core::StateBool::get, layer->visible_state_[ 5 ].get() ) );
     QtUtils::QtBridge::Enable( this->private_->ui_.visibility_button_, enable_states, condition );
-
+    
     switch( this->get_volume_type() )
     {
       // This if for the Data Layers
@@ -1124,9 +1124,9 @@ void LayerWidget::contextMenuEvent( QContextMenuEvent * event )
   }
   else
   {
-    qaction = menu.addAction( tr( "Export Mask as NRRD" ) );
+    qaction = menu.addAction( tr( "Export Segmentation as NRRD" ) );
     connect( qaction, SIGNAL( triggered() ), this, SLOT( export_nrrd() ) );
-    qaction = menu.addAction( tr( "Export Mask as Bitmap Series" ) );
+    qaction = menu.addAction( tr( "Export Segmentation as Bitmap Series" ) );
     connect( qaction, SIGNAL( triggered() ), this, SLOT( export_bmp() ) );
   }
   

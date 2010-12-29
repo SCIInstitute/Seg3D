@@ -96,6 +96,8 @@ public:
   Core::StatePointHandle spacing_state_;
 
   Core::StateOptionHandle layers_visible_state_;
+  
+  Core::StateOptionHandle layers_iso_visible_state_;
 
   // -- GUI related states --
 public:
@@ -110,6 +112,7 @@ public:
   
   Core::StateStringHandle group_widget_layer_label_state_;
   
+  // Whether the group is expanded or not
   Core::StateBoolHandle group_widget_expanded_state_;
   
   // -- Layers contained within group --

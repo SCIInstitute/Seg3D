@@ -68,6 +68,7 @@
         <file>Images/IsosurfaceDeleteOff.png</file>
         <file>Images/IsosurfaceVisible.png</file>
         <file>Images/IsosurfaceVisibleOff.png</file>
+		<file>Images/IsosurfaceVisibleGrey.png</file>
         <file>Images/IsosurfaceVisibleOn.png</file>
         <file>Images/LabelMap.png</file>
         <file>Images/LabelMask.png</file>
