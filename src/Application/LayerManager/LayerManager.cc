@@ -660,8 +660,8 @@ void LayerManager::delete_layers(  std::vector< std::string > layers  )
     this->group_internals_changed_signal_( group );
   }
   
-  this->layers_deleted_signal_( layer_vector );
   this->layers_changed_signal_();
+  this->layers_deleted_signal_( layer_vector );
   
   if ( active_layer_changed && this->private_->active_layer_ )
   {

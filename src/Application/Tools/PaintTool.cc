@@ -895,8 +895,13 @@ void PaintTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
     target_layer = LayerManager::Instance()->get_layer_by_id( target_layer_id );
     if ( !target_layer )
     {
-      CORE_THROW_LOGICERROR( "Layer with ID '" + this->target_layer_state_->get() +
+      // NOTE: Since the rendering is happening on a different thread, occasionally
+      // when a layer is deleted, the state variables of the paint tool may have not
+      // been updated yet, and thus the target layer might be invalid. We should just
+      // ignore this kind of errors. Log it in case it's caused by something else.
+      CORE_LOG_ERROR( "Layer with ID '" + this->target_layer_state_->get() +
         "' does not exist" );
+      return;
     }
 
     layer_visible = target_layer->has_valid_data() && target_layer->is_visible( viewer_id );
