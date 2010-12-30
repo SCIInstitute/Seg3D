@@ -35,6 +35,7 @@
 
 // STL includes
 #include <string>
+#include <stdexcept>
 
 namespace Core
 {
@@ -50,14 +51,14 @@ namespace Core
 
 // Hence it is recommended to use the macros for throwing the exceptions
 
-class Exception
+class Exception 
 {
 
 public:
   // Constructor/destructor
   Exception( std::string message, unsigned int line, const char* file );
 
-  virtual ~Exception();
+  virtual ~Exception() ;
 
   // Description of the type of exception
   virtual std::string what() const;

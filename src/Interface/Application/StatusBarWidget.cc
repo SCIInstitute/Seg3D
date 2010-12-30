@@ -245,7 +245,7 @@ void StatusBarWidget::update_data_point_label()
   {
     if( ( 0.0 < world_x && world_x < 0.0001 ) || 1000 < world_x ) // Use scientific notation
     {
-      this->private_->ui_.x_->setText( QString( "%1" ).arg( world_x, 0, 'e', 3 ) );
+      this->private_->ui_.x_->setText( QString( "%1" ).arg( world_x, 0, 'e', 2 ) );
     }
     else // Format normally
     {
@@ -253,7 +253,7 @@ void StatusBarWidget::update_data_point_label()
     }
     if( ( 0.0 < world_y && world_y < 0.0001 ) || 1000 < world_y ) // Use scientific notation
     {
-      this->private_->ui_.y_->setText( QString( "%1" ).arg( world_y, 0, 'e', 3 ) );
+      this->private_->ui_.y_->setText( QString( "%1" ).arg( world_y, 0, 'e', 2 ) );
     }
     else // Format normally
     {
@@ -261,7 +261,7 @@ void StatusBarWidget::update_data_point_label()
     }
     if( ( 0.0 < world_z && world_z < 0.0001 ) || 1000 < world_z ) // Use scientific notation
     {
-      this->private_->ui_.z_->setText( QString( "%1" ).arg( world_z, 0, 'e', 3 ) );
+      this->private_->ui_.z_->setText( QString( "%1" ).arg( world_z, 0, 'e', 2 ) );
     }
     else // Format normally
     {
@@ -272,7 +272,7 @@ void StatusBarWidget::update_data_point_label()
   {
     if( 10000 < index_x ) // Use scientific notation
     {
-      this->private_->ui_.x_->setText( QString( "%1" ).arg( index_x, 0, 'e', 3 ) );
+      this->private_->ui_.x_->setText( QString( "%1" ).arg( index_x, 0, 'e', 2 ) );
     }
     else // Format normally
     {
@@ -280,7 +280,7 @@ void StatusBarWidget::update_data_point_label()
     }
     if( 10000 < index_y ) // Use scientific notation
     {
-      this->private_->ui_.y_->setText( QString( "%1" ).arg( index_y, 0, 'e', 3 ) );
+      this->private_->ui_.y_->setText( QString( "%1" ).arg( index_y, 0, 'e', 2 ) );
     }
     else // Format normally
     {
@@ -288,7 +288,7 @@ void StatusBarWidget::update_data_point_label()
     }
     if( 10000 < index_z ) // Use scientific notation
     {
-      this->private_->ui_.z_->setText( QString( "%1" ).arg( index_z, 0, 'e', 3 ) );
+      this->private_->ui_.z_->setText( QString( "%1" ).arg( index_z, 0, 'e', 2 ) );
     }
     else // Format normally
     {
@@ -300,7 +300,7 @@ void StatusBarWidget::update_data_point_label()
   double val = this->data_point_info_.value();
   if( ( 0.0 < val && val < 0.0001 ) || 1000 < val ) // Use scientific notation
   {
-    this->private_->ui_.value_->setText( QString( "%1" ).arg( val, 0, 'e', 3 ) );
+    this->private_->ui_.value_->setText( QString( "%1" ).arg( val, 0, 'e', 2 ) );
   }
   else // Format normally
   {

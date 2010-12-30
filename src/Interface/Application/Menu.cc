@@ -468,12 +468,12 @@ void Menu::about()
     QString::fromStdString( Core::Application::GetApplicationNameAndVersion() ) +
     QString( "</h3>" ) +
     QString(
-      "<p align=\"justify\">Seg3D is a free volume segmentation and image processing tool created by the "
-      "NIH Center for Integrative Biomedical (CIBC) located at the Scientific Computing "
-      "and Imaging Instititute (SCI) at the University of Utah and developed in "
-      "collaboration with Numira Biosciences. "
+      "<p align=\"justify\">Seg3D is a free volume segmentation and image processing tool"
+      " that was created by the NIH NCRR Center for Integrative Biomedical (CIBC) located "
+      "at the Scientific Computing and Imaging Instititute (SCI) at the University of Utah"
+      " and was developed in collaboration with Numira Biosciences. "
         "Seg3D combines a flexible manual segmentation interface with powerful "
-        "image processing and segmentation algorithms from the Insight "
+        "image processing and segmentation tools from the Insight "
         "Toolkit.</p>") );
 }
 

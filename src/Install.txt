@@ -1,0 +1,64 @@
+Installation Guide
+==================
+
+This document is intended for people who like to build Seg3D for Linux or build Seg3D from source. 
+If you use Windows or Mac OS X, please download the prepackaged installers, which will guide you
+through the installation process.
+
+
+Installing Seg3D from source
+============================
+
+Compiler Requirements:
+----------------------
+
+Windows XP, Vista, and 7: The current source code was optimized for use with Visual Studio (VS2008 
+or higher). The code should compile fine using the Visual Studio Express versions as well. The code
+has not been tested under Cygwin or MinGW compilers.
+
+OS X: The source code base was using under Xcode as well as using make/gcc and works for both 
+environments.  
+
+LINUX: The code base has been tested for use with GCC and this is the recommended compiler for
+linux.
+
+
+Dependencies:
+-------------
+
+Before building Seg3D, please make sure that Qt 4.7 or higher has been installed on your system. For
+windows a Visual Studio binary build is available that can be installed on a windows system. To our
+knowledge the Windows Visual Studio development libraries are only available in 32bits. In case of a
+64bit version, you would have to build Qt under Visual Studio from scratch. This can be done easily
+by downloading the source code version, configuring it as described on the Qt webpage and compiling
+the code from scratch. For Mac OS X, there Qt binaries as well, there is a Carbon (32bit) and Cocao
+(64bit) build available on the Qt website. At the time of writing these instructions the 64bit 
+version is not the default download, but it is available on the download page after choosing to 
+download the Mac OS X version. Both the 32bit and 64bit version will work with Seg3D. As OS X 10.5 
+and 10.6 by default will build 64bit programs, one should want to install the 64bit version of Qt.
+For Linux Qt is available in most package managers. Most likely Qt was already installed on your 
+system, however it is likely to be an older version than Qt 4.7. Hence download and compile the
+Qt 4.7 development package using your favorite package manager if you wish to install Seg3D on your
+Linux system.
+
+
+Compiling Seg3D:
+----------------
+
+Once you have obtained a compatible compiler and installed Qt 4.7 on your system, you need to 
+download and install Cmake ( www.cmake.org ) to actually build the software. CMake is a platform
+independent configuring system that is used for generating makefiles, Visual Studio project files,
+or Xcode project files. Once CMake has been installed you need to point CMake at the master 
+CMakeLists.txt file in the src directory and specify a bin directory in which the program should be
+build. Once the input directory (src) and the output directory (bin) have been specified, please 
+configure the project. At this stage you may be prompted to specify your location of the Qt 4.7
+installation. If you installed Qt in the default location, it should find Qt automatically. After
+configuration is done, generate the make files for your favorite development environment and run
+the make system.
+
+
+That should be all. For questions and issues regarding building the software from source, 
+please email our support list:  Seg3D-develop@sci.utah.edu
+
+
+The Seg3D 2.0 Team
