@@ -123,8 +123,7 @@ int main( int argc, char **argv )
   // -- Setup the QT Interface Layer --
   if ( !( QtUtils::QtApplication::Instance()->setup( argc, argv ) ) ) return ( -1 );
 
-  // -- Warn user about being an alpha version --
-  
+  // -- Warn user about being an alpha/beta version --
   std::string file_to_view = "";
   Core::Application::Instance()->check_command_line_parameter( "file_to_open_on_start", file_to_view );
 

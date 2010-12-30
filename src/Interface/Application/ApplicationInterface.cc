@@ -48,6 +48,7 @@
 #include <Application/ProjectManager/ProjectManager.h>
 #include <Application/ProjectManager/Actions/ActionSaveSession.h>
 #include <Application/ProjectManager/Actions/ActionQuickOpen.h>
+#include <Application/ProjectManager/Actions/ActionLoadProject.h>
 
 // QtUtils includes
 #include <QtUtils/Utils/QtPointer.h>
@@ -106,16 +107,12 @@ namespace Seg3D
     // Application menu, statusbar
     QPointer< Menu > menu_;
     QPointer< StatusBarWidget > status_bar_;
-    
-    std::string file_to_open_;
   
   };
 
 ApplicationInterface::ApplicationInterface( std::string file_to_view_on_open ) :
   private_( new ApplicationInterfacePrivate )
 {
-  this->private_->file_to_open_ = file_to_view_on_open;
-  
   // Ensure that resources are available
   // This function ensures that all the images are available
   InitQtResources();
@@ -151,8 +148,10 @@ ApplicationInterface::ApplicationInterface( std::string file_to_view_on_open ) :
   this->private_->message_widget_ = new MessageWindow( this );
   this->private_->splash_screen_ = new SplashScreen( this );
   
-  if( this->private_->file_to_open_ != "" )
+  std::string extension = "";
+  if( file_to_view_on_open != "" )
   {
+    extension = boost::filesystem::extension( boost::filesystem::path( file_to_view_on_open ) );
     Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
       InterfaceManager::Instance()->splash_screen_visibility_state_, false );
   }
@@ -246,10 +245,14 @@ ApplicationInterface::ApplicationInterface( std::string file_to_view_on_open ) :
   
   this->private_->progress_ = new ProgressWidget( this->private_->viewer_interface_->parentWidget() );
   
-  if( this->private_->file_to_open_ != "" )
+  if( ( file_to_view_on_open != "" ) && ( ( extension == ".nrrd" ) || ( extension == ".nhdr" ) ) )
   {
     ActionQuickOpen::Dispatch( Core::Interface::GetWidgetActionContext() );
-    LayerIOFunctions::ImportFiles( this, this->private_->file_to_open_ );
+    LayerIOFunctions::ImportFiles( this, file_to_view_on_open );
+  }
+  else if( ( file_to_view_on_open != "" ) && ( extension == ".s3d" ) )
+  {
+    ActionLoadProject::Dispatch( Core::Interface::GetWidgetActionContext(), file_to_view_on_open ); 
   }
 }
 

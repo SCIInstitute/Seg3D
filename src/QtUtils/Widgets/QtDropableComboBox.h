@@ -33,6 +33,9 @@
 #include <QtGui/QComboBox>
 #include <QtGui/QDropEvent>
 
+// Core includes
+#include <Core/Geometry/Color.h>
+
 namespace QtUtils
 {
   
@@ -46,7 +49,8 @@ public:
   QtDropableComboBox( QWidget *parent = 0 );
   virtual ~QtDropableComboBox();
   
-public Q_SLOTS:
+public:
+  void add_color_icon( Core::Color button_color, int index );
   
   
 private Q_SLOTS:

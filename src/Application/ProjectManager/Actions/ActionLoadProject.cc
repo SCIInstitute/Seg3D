@@ -45,8 +45,18 @@ namespace Seg3D
 
 bool ActionLoadProject::validate( Core::ActionContextHandle& context )
 {
-  boost::filesystem::path full_filename( project_path_.value() );
-  full_filename = full_filename / ( full_filename.leaf() + ".s3d" );
+  std::string extension = "";
+  boost::filesystem::path full_filename( this->project_path_.value() );
+  extension = boost::filesystem::extension( full_filename );
+  if( extension == ".s3d" )
+  {
+    this->project_path_.value() = full_filename.parent_path().string();
+  }
+  else
+  {
+    full_filename = full_filename / ( full_filename.leaf() + ".s3d" );
+  }
+  
   if ( !( boost::filesystem::exists ( full_filename ) ) )
   {
     context->report_error( std::string( "File '" ) + this->project_path_.value() +

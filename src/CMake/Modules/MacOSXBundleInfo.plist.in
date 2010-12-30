@@ -39,8 +39,10 @@
       <array>
         <string>nrrd</string>
         <string>nrd</string>
+        <string>nhdr</string>
         <string>NRRD</string>
         <string>NRD</string>
+        <string>NHDR</string>
       </array>
       <key>CFBundleTypeIconFile</key>
       <string>Seg3D.icns</string>
@@ -50,6 +52,7 @@
       <array>
         <string>NRRD</string>
         <string>NRD</string>
+        <string>NHDR</string>
       </array>
       <key>CFBundleTypeRole</key>
       <string>Viewer</string>
@@ -58,7 +61,27 @@
       <key>NSDocumentClass</key>
       <string>Seg3DDataFile</string>
     </dict>
+    <dict>
+      <key>CFBundleTypeExtensions</key>
+      <array>
+        <string>s3d</string>
+        <string>S3D</string>
+      </array>
+      <key>CFBundleTypeIconFile</key>
+      <string>Seg3D.icns</string>
+      <key>CFBundleTypeName</key>
+      <string>Seg3D 2.0 Project File</string>
+      <key>CFBundleTypeOSTypes</key>
+      <array>
+        <string>s3d</string>
+      </array>
+      <key>CFBundleTypeRole</key>
+      <string>Viewer</string>
+      <key>LSTypeIsPackage</key>
+      <false/>
+      <key>NSDocumentClass</key>
+      <string>Seg3DProjectFile</string>
+    </dict>
   </array>
-
 </dict>
 </plist>

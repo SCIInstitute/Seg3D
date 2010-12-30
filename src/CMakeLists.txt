@@ -42,20 +42,20 @@ MESSAGE( STATUS "${CMAKE_ROOT}")
 
 SET(SEG3D_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}) # Needed by ITK
-SET(CMAKE_BUNDLE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
-SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
-SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tmp)
+#SET(CMAKE_BUNDLE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+#SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+#SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+#SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tmp)
 
-SET(CMAKE_BUNDLE_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/${CMAKE_CFG_INTDIR})
-SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/${CMAKE_CFG_INTDIR}/lib)
-SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/${CMAKE_CFG_INTDIR})
-SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/${CMAKE_CFG_INTDIR}/tmp)
+#SET(CMAKE_BUNDLE_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/${CMAKE_CFG_INTDIR})
+#SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/${CMAKE_CFG_INTDIR}/lib)
+#SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/${CMAKE_CFG_INTDIR})
+#SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/${CMAKE_CFG_INTDIR}/tmp)
 
-SET(CMAKE_BUNDLE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/${CMAKE_CFG_INTDIR})
-SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/${CMAKE_CFG_INTDIR}/lib)
-SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/${CMAKE_CFG_INTDIR})
-SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/${CMAKE_CFG_INTDIR}/tmp)
+#SET(CMAKE_BUNDLE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/${CMAKE_CFG_INTDIR})
+#SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/${CMAKE_CFG_INTDIR}/lib)
+#SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/${CMAKE_CFG_INTDIR})
+#SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/${CMAKE_CFG_INTDIR}/tmp)
 
 ###########################################
 # COMPILE OPTIONS
@@ -398,7 +398,7 @@ SET(CPACK_PACKAGE_INSTALL_DIRECTORY
     
 IF(WIN32 AND NOT UNIX)
   # There is a bug in NSIS that does not handle full unix paths properly. Make
-  # sure there is at least one set of four (4) backlasshes.
+  # sure there is at least one set of four (4) backslashes.
   SET(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/Resources/Icons\\\\Seg3D.bmp")
     IF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
       SET(CPACK_INSTALL_PREFIX "/" CACHE PATH "Install path prefix, prepended onto install directories." FORCE)
@@ -413,17 +413,35 @@ IF(WIN32 AND NOT UNIX)
   SET(CPACK_NSIS_MODIFY_PATH ON)
   SET(CPACK_PACKAGE_EXECUTABLES "Seg3D2" "Seg3D2")
   SET(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "
-  WriteRegStr HKCR '.nrrd' '' 'Seg3D2'
-  WriteRegStr HKCR 'Seg3D2' '' 'Seg3D2 Data File'
+  WriteRegStr HKCR '.nrrd' '' 'Seg3D2-nrrd'
+  WriteRegStr HKCR 'Seg3D2-nrrd' '' 'Seg3D2 NRRD File'
+  WriteRegStr HKCR 'Seg3D2-nrrd\\\\shell' '' 'open'
+  WriteRegStr HKCR 'Seg3D2-nrrd\\\\DefaultIcon' '' '$INSTDIR\\\\bin\\\\Seg3D2.exe,0'
+  WriteRegStr HKCR 'Seg3D2-nrrd\\\\shell\\\\open\\\\command' '' '$INSTDIR\\\\bin\\\\Seg3D2.exe \\\"%1\\\"'
+  WriteRegStr HKCR 'Seg3D2-nrrd\\\\shell\\\\edit' '' 'Open NRRD Data File'
+  WriteRegStr HKCR 'Seg3D2-nrrd\\\\shell\\\\edit\\\\command' '' '$INSTDIR\\\\bin\\\\Seg3D2.exe \\\"%1\\\"'
+  #System::Call 'Shell32::SHChangeNotify( i 0x800000, i 0, i 0, i 0)'
+  WriteRegStr HKCR '.nhdr' '' 'Seg3D2-nhdr'
+  WriteRegStr HKCR 'Seg3D2-nhdr' '' 'Seg3D2 NHDR File'
+  WriteRegStr HKCR 'Seg3D2-nhdr\\\\shell' '' 'open'
+  WriteRegStr HKCR 'Seg3D2-nhdr\\\\DefaultIcon' '' '$INSTDIR\\\\bin\\\\Seg3D2.exe,0'
+  WriteRegStr HKCR 'Seg3D2-nhdr\\\\shell\\\\open\\\\command' '' '$INSTDIR\\\\bin\\\\Seg3D2.exe \\\"%1\\\"'
+  WriteRegStr HKCR 'Seg3D2-nhdr\\\\shell\\\\edit' '' 'Open NHDR Data File'
+  WriteRegStr HKCR 'Seg3D2-nhdr\\\\shell\\\\edit\\\\command' '' '$INSTDIR\\\\bin\\\\Seg3D2.exe \\\"%1\\\"'
+  #System::Call 'Shell32::SHChangeNotify( i 0x800000, i 0, i 0, i 0)'
+  WriteRegStr HKCR '.s3d' '' 'Seg3D2'
+  WriteRegStr HKCR 'Seg3D2' '' 'Seg3D2 Project File'
   WriteRegStr HKCR 'Seg3D2\\\\shell' '' 'open'
   WriteRegStr HKCR 'Seg3D2\\\\DefaultIcon' '' '$INSTDIR\\\\bin\\\\Seg3D2.exe,0'
   WriteRegStr HKCR 'Seg3D2\\\\shell\\\\open\\\\command' '' '$INSTDIR\\\\bin\\\\Seg3D2.exe \\\"%1\\\"'
-  WriteRegStr HKCR 'Seg3D2\\\\shell\\\\edit' '' 'Edit Seg3D2 Data File'
+  WriteRegStr HKCR 'Seg3D2\\\\shell\\\\edit' '' 'Open Seg3D2 Project File'
   WriteRegStr HKCR 'Seg3D2\\\\shell\\\\edit\\\\command' '' '$INSTDIR\\\\bin\\\\Seg3D2.exe \\\"%1\\\"'
   System::Call 'Shell32::SHChangeNotify( i 0x800000, i 0, i 0, i 0)'
   ")
   SET(CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS "
   DeleteRegKey HKCR '.nrrd'
+  DeleteRegKey HKCR '.nhdr'
+  DeleteRegKey HKCR '.s3d'
   DeleteRegKey HKCR 'Seg3D2'
   ")
 ELSE(WIN32 AND NOT UNIX)
