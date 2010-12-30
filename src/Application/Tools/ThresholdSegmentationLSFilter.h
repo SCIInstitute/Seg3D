@@ -35,8 +35,6 @@ namespace Seg3D
 {
 
 class ThresholdSegmentationLSFilter;
-class ThresholdSegmentationLSFilterPrivate;
-typedef boost::shared_ptr<ThresholdSegmentationLSFilterPrivate> ThresholdSegmentationLSFilterPrivateHandle;
 
 class ThresholdSegmentationLSFilter : public SingleTargetTool
 {
@@ -62,10 +60,7 @@ public:
   Core::StateRangedIntHandle iterations_state_;
 
   // Upper threshold for the data that needs segmentation
-  Core::StateRangedDoubleHandle upper_threshold_state_;
-
-  // Lower threshold for the data that needs segmentation
-  Core::StateRangedDoubleHandle lower_threshold_state_;
+  Core::StateRangedDoubleHandle threshold_range_state_;
   
   // Curvature weight
   Core::StateRangedDoubleHandle curvature_state_;
@@ -79,9 +74,6 @@ public:
   // Execute the tool and dispatch the action
   virtual void execute( Core::ActionContextHandle context );
 
-  // -- internals --
-private:
-  ThresholdSegmentationLSFilterPrivateHandle private_;
 };
 
 } // end namespace

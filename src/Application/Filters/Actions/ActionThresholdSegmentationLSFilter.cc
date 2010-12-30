@@ -114,11 +114,12 @@ public:
   
   int iterations_;
   
-  double upper_threshold_;
-  double lower_threshold_;
+  double threshold_range_;
   double curvature_;
   double propagation_;
   double edge_;
+  
+  Core::ActionHandle action_;
 
 public:
   typedef itk::ThresholdSegmentationLevelSetImageFilter< 
@@ -141,6 +142,40 @@ public:
 
     Core::ITKFloatImageDataHandle seed_image; 
     this->get_itk_image_from_mask_layer<float>( this->mask_layer_, seed_image, 1000.0 );
+    
+        
+    // Calculate mean and std deviation
+    Core::DataBlockHandle seed_data_block = Core::ITKDataBlock::New( seed_image );    
+    Core::DataBlockHandle feature_data_block = Core::ITKDataBlock::New( feature_image );
+    
+    size_t size = seed_data_block->get_size();
+    float* seed_data = reinterpret_cast< float* >( seed_data_block->get_data() );
+    float* feature_data = reinterpret_cast< float* >( feature_data_block->get_data() );
+
+    float x = 0.0;
+    float x2 = 0.0;
+    size_t n = 0;
+
+    for ( size_t j = 0; j < size; j++ )
+    {
+      if ( seed_data[ j ] )
+      {
+        float val = feature_data[ j ];
+        x += val;
+        x2 += val * val;
+        n++;
+      }
+    }
+        
+    float mean = 0.0;   
+    float var = 0.0;
+    
+    if ( n > 1 )
+    {
+      float fn = static_cast<float>( n );
+      mean = x / fn;
+      var = ( x2 - 2.0f * x * mean + fn * mean * mean ) / ( fn - 1.0f );
+    }
         
     // Create a new ITK filter instantiation. 
     filter_type::Pointer filter = filter_type::New();
@@ -149,7 +184,8 @@ public:
     this->forward_abort_to_filter( filter, this->dst_layer_ );
     this->observe_itk_progress( filter, this->dst_layer_ );
     this->observe_itk_iterations( filter, boost::bind( 
-      &ThresholdSegmentationLSFilterAlgo::update_iteration, this, _1, this->dst_layer_ ) );
+      &ThresholdSegmentationLSFilterAlgo::update_iteration, this, _1, 
+      this->dst_layer_, this->action_ ) );
 
     // Setup the filter parameters that we do not want to change.
     filter->SetInput( seed_image->get_image() );
@@ -157,8 +193,8 @@ public:
     
     filter->SetNumberOfIterations( this->iterations_ );
     
-    filter->SetUpperThreshold( this->upper_threshold_ );
-    filter->SetLowerThreshold( this->lower_threshold_ );
+    filter->SetUpperThreshold( mean + this->threshold_range_ * sqrt( var ) );
+    filter->SetLowerThreshold( mean - this->threshold_range_ * sqrt( var ) );
     filter->SetCurvatureScaling( this->curvature_ );
     filter->SetPropagationScaling( this->propagation_ );
     filter->SetEdgeWeight( this->edge_ );
@@ -232,7 +268,7 @@ private:
 
   // UPDATE_ITERATION:
   // At regular intervals update the results to the user
-  void update_iteration( itk::Object* itk_object, LayerHandle layer )
+  void update_iteration( itk::Object* itk_object, LayerHandle layer, Core::ActionHandle action )
   {
     if ( update_timer_.elapsed() > 1.0 )
     {
@@ -240,7 +276,10 @@ private:
       filter_type* filter = dynamic_cast<filter_type* >( itk_object );
       if ( filter )
       {
-        this->insert_itk_positive_labels_into_mask_layer( layer, filter->GetOutput() ); 
+        this->insert_itk_positive_labels_into_mask_layer( layer, filter->GetOutput() );
+        ActionThresholdSegmentationLSFilter* action_ptr =
+          dynamic_cast< ActionThresholdSegmentationLSFilter* >( action.get() );
+        action_ptr->set_iterations( filter->GetElapsedIterations() );
       }
     }
   }
@@ -258,11 +297,12 @@ bool ActionThresholdSegmentationLSFilter::run( Core::ActionContextHandle& contex
 
   // Copy the parameters over to the algorithm that runs the filter
   algo->iterations_ = this->iterations_.value();
-  algo->upper_threshold_ = this->upper_threshold_.value();
-  algo->lower_threshold_ = this->lower_threshold_.value();
+  algo->threshold_range_ = this->threshold_range_.value();
   algo->curvature_ = this->curvature_.value();
   algo->propagation_ = this->propagation_.value();
   algo->edge_ = this->edge_.value();
+  
+  algo->action_ = this->shared_from_this();
 
   // Find the handle to the layer
   if ( !( algo->find_layer( this->layer_id_.value(), algo->data_layer_ ) ) )
@@ -297,8 +337,8 @@ bool ActionThresholdSegmentationLSFilter::run( Core::ActionContextHandle& contex
   return true;
 }
 
-void ActionThresholdSegmentationLSFilter::Dispatch(  Core::ActionContextHandle context, std::string layer_id, 
-    std::string mask, int iterations, double upper_threshold, double lower_threshold,
+void ActionThresholdSegmentationLSFilter::Dispatch(  Core::ActionContextHandle context, 
+    std::string layer_id, std::string mask, int iterations, double threshold_range, 
     double curvature, double propagation, double edge  )
 { 
   // Create a new action
@@ -309,8 +349,7 @@ void ActionThresholdSegmentationLSFilter::Dispatch(  Core::ActionContextHandle c
   action->layer_id_.value() = layer_id;
   action->mask_.value() = mask;
   action->iterations_.value() = iterations;
-  action->upper_threshold_.value() = upper_threshold;
-  action->lower_threshold_.value() = lower_threshold;
+  action->threshold_range_.value() = threshold_range;
   action->curvature_.value() = curvature;
   action->propagation_.value() = propagation;
   action->edge_.value() = edge;

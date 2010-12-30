@@ -44,8 +44,8 @@ CORE_ACTION(
   CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
   CORE_ACTION_ARGUMENT( "mask", "The layerid on which this filter needs to be run." )
   CORE_ACTION_KEY( "iterations", "50", "Number of iterations to perform." )
-  CORE_ACTION_KEY( "upper_threshold", "1", "The upper threshold of what data is considered part of the segmentation." )
-  CORE_ACTION_KEY( "lower_threshold", "0", "The lower threshold of what data is considered part of the segmentation." )
+  CORE_ACTION_KEY( "threshold_range", "2.5", "Range in variance of initially segmented data of"
+    " what is considered part of the segmentation target." )
   CORE_ACTION_KEY( "curvature", "1.0", "Curvature weight." )
   CORE_ACTION_KEY( "propagation", "1.0", "Propagation weight." )
   CORE_ACTION_KEY( "edge", "0.0", "Edge weight." )  
@@ -63,8 +63,7 @@ public:
     
     // Action options
     this->add_key( this->iterations_ );
-    this->add_key( this->upper_threshold_ );
-    this->add_key( this->lower_threshold_ );
+    this->add_key( this->threshold_range_ );
     this->add_key( this->curvature_ );
     this->add_key( this->propagation_ );
     this->add_key( this->edge_ );
@@ -79,6 +78,7 @@ public:
   virtual bool validate( Core::ActionContextHandle& context );
   virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
   
+  void set_iterations( int iterations ) { this->iterations_.value() = iterations; }
   // -- Action parameters --
 private:
 
@@ -86,8 +86,7 @@ private:
   Core::ActionParameter< std::string > mask_;
   
   Core::ActionParameter< int > iterations_;
-  Core::ActionParameter< double > upper_threshold_;
-  Core::ActionParameter< double > lower_threshold_;
+  Core::ActionParameter< double > threshold_range_;
   Core::ActionParameter< double > curvature_;
   Core::ActionParameter< double > propagation_;
   Core::ActionParameter< double > edge_;
@@ -98,7 +97,7 @@ public:
   // DISPATCH:
   // Create and dispatch action that inserts the new layer 
   static void Dispatch( Core::ActionContextHandle context, std::string layer_id, 
-    std::string mask, int iterations, double upper_threshold, double lower_threshold,
+    std::string mask, int iterations, double threshold_range, 
     double curvature, double propagation, double edge );  
 };
   

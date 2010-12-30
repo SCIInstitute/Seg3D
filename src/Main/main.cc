@@ -128,14 +128,14 @@ int main( int argc, char **argv )
   std::string file_to_view = "";
   Core::Application::Instance()->check_command_line_parameter( "file_to_open_on_start", file_to_view );
 
-  std::string warning = std::string( "<h3>" ) +
-    Core::Application::GetApplicationNameAndVersion() + 
-    "</h3><p align=\"left\">NOTE: This version of Seg3D is for Testing and Evaluation"
-    " Only!</p>";
+//  std::string warning = std::string( "<h3>" ) +
+//    Core::Application::GetApplicationNameAndVersion() + 
+//    "</h3><p align=\"left\">NOTE: This version of Seg3D is for Testing and Evaluation"
+//    " Only!</p>";
   
-  QMessageBox::information( 0, 
-    QString::fromStdString( Core::Application::GetApplicationNameAndVersion() ), 
-    QString::fromStdString( warning )  );
+//  QMessageBox::information( 0, 
+//    QString::fromStdString( Core::Application::GetApplicationNameAndVersion() ), 
+//    QString::fromStdString( warning )  );
 
 #ifdef BUILD_WITH_PYTHON
   size_t name_len = strlen( argv[ 0 ] );

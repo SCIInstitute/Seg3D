@@ -79,8 +79,7 @@ bool ThresholdSegmentationLSFilterInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Connect( this->private_->ui_.mask_layer_, tool->seed_mask_state_ );
   
   QtUtils::QtBridge::Connect( this->private_->ui_.iterations_, tool->iterations_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.upper_threshold_, tool->upper_threshold_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.lower_threshold_, tool->lower_threshold_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.threshold_range_, tool->threshold_range_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.curvature_, tool->curvature_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.propagation_, tool->propagation_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.edge_, tool->edge_state_ );
@@ -90,9 +89,6 @@ bool ThresholdSegmentationLSFilterInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Show( this->private_->ui_.message_alert_, tool->valid_target_state_, true );
   QtUtils::QtBridge::Enable( this->private_->ui_.runFilterButton, tool->valid_target_state_ );
   QtUtils::QtBridge::Enable( this->private_->ui_.target_layer_, tool->use_active_layer_state_, true );
-
-  QtUtils::QtBridge::Enable( this->private_->ui_.upper_threshold_, tool->valid_target_state_ );
-  QtUtils::QtBridge::Enable( this->private_->ui_.lower_threshold_, tool->valid_target_state_ );
 
   return true;
 }
