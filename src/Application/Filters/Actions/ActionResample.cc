@@ -306,7 +306,7 @@ bool ResampleAlgo::compute_output_grid_transform( const std::string& input_layer
   }
   
   Core::NrrdDataHandle nrrd_in( new Core::NrrdData( input_datablock, 
-    layer->get_grid_transform().transform() ) );
+    layer->get_grid_transform() ) );
   Nrrd* nout = nrrdNew();
 
   int error = 0;
@@ -383,7 +383,7 @@ void ResampleAlgo::resmaple_data_layer( DataLayerHandle input, DataLayerHandle o
 
   Core::NrrdDataHandle nrrd_in( new Core::NrrdData( 
     input->get_data_volume()->get_data_block(),
-    input->get_grid_transform().transform() ) );
+    input->get_grid_transform() ) );
   Nrrd* nrrd_out = nrrdNew();
   if ( this->resample_to_grid_ )
   {
@@ -440,7 +440,7 @@ void ResampleAlgo::resample_mask_layer( MaskLayerHandle input, MaskLayerHandle o
   Core::MaskDataBlockManager::Convert( input->get_mask_volume()->get_mask_data_block(),
     input_data_block, Core::DataType::UCHAR_E );
   Core::NrrdDataHandle nrrd_in( new Core::NrrdData( input_data_block,
-    input->get_grid_transform().transform() ) );
+    input->get_grid_transform() ) );
   Nrrd* nrrd_out = nrrdNew();
   if ( this->resample_to_grid_ )
   {

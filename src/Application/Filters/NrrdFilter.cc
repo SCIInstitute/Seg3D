@@ -62,7 +62,7 @@ bool NrrdFilter::get_nrrd_from_layer( const LayerHandle& layer, Core::NrrdDataHa
   nrrd_data.reset();
 
   Core::DataBlockHandle data_block;
-  Core::Transform transform;
+  Core::GridTransform transform;
   
   // If the layer is a data layer
   if ( layer->get_type() == Core::VolumeType::DATA_E )
@@ -71,7 +71,7 @@ bool NrrdFilter::get_nrrd_from_layer( const LayerHandle& layer, Core::NrrdDataHa
     Core::DataVolumeHandle volume = data->get_data_volume();
     
     data_block = volume->get_data_block();      
-    transform = volume->get_transform();
+    transform = volume->get_grid_transform();
   }
   // If the layer is a mask layer
   else if ( layer->get_type() == Core::VolumeType::MASK_E )
@@ -87,7 +87,7 @@ bool NrrdFilter::get_nrrd_from_layer( const LayerHandle& layer, Core::NrrdDataHa
       this->report_error( "Could not allocate enough memory." );
       return false;
     }   
-    transform = volume->get_transform();
+    transform = volume->get_grid_transform();
   }
   else
   {

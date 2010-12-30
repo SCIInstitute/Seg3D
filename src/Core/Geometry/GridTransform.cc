@@ -34,40 +34,53 @@
 namespace Core
 {
 
+// By default, assume data is node-centered unless otherwise indicated.  Intended to match 
+// unu resample behavior.
+const bool GridTransform::DEFAULT_NODE_CENTERED_C = true;
+
 GridTransform::GridTransform() :
-  nx_( 0 ), ny_( 0 ), nz_( 0 )
+  nx_( 0 ), ny_( 0 ), nz_( 0 ), originally_node_centered_( DEFAULT_NODE_CENTERED_C )
 {
 }
 
 GridTransform::GridTransform( const GridTransform& copy ) :
-  Transform( copy.transform() ), nx_( copy.nx_ ), ny_( copy.ny_ ), nz_( copy.nz_ )
+  Transform( copy.transform() ), nx_( copy.nx_ ), ny_( copy.ny_ ), nz_( copy.nz_ ), 
+  originally_node_centered_( copy.originally_node_centered_ )
 {
 }
 
 GridTransform& GridTransform::operator=( const GridTransform& copy )
 {
-  mat_ = copy.mat_;
-  nx_ = copy.nx_;
-  ny_ = copy.ny_;
-  nz_ = copy.nz_;
+  this->mat_ = copy.mat_;
+  this->nx_ = copy.nx_;
+  this->ny_ = copy.ny_;
+  this->nz_ = copy.nz_;
+  this->originally_node_centered_ = copy.originally_node_centered_;
 
   return ( *this );
 }
 
 GridTransform::GridTransform( size_t nx, size_t ny, size_t nz, const Point& p, const Vector& i,
     const Vector& j, const Vector& k ) :
-  nx_( nx ), ny_( ny ), nz_( nz )
+  nx_( nx ), ny_( ny ), nz_( nz ), originally_node_centered_( DEFAULT_NODE_CENTERED_C )
 {
   load_basis( p, i, j, k );
 }
 
 GridTransform::GridTransform( size_t nx, size_t ny, size_t nz, const Transform& transform ) :
-  Transform( transform ), nx_( nx ), ny_( ny ), nz_( nz )
+  Transform( transform ), nx_( nx ), ny_( ny ), nz_( nz ), 
+  originally_node_centered_( DEFAULT_NODE_CENTERED_C )
+{
+}
+
+GridTransform::GridTransform( size_t nx, size_t ny, size_t nz, const Transform& transform, 
+  bool node_centered ) :
+  Transform( transform ), nx_( nx ), ny_( ny ), nz_( nz ), originally_node_centered_( node_centered )
 {
 }
 
 GridTransform::GridTransform( size_t nx, size_t ny, size_t nz ) :
-  nx_( nx ), ny_( ny ), nz_( nz )
+  nx_( nx ), ny_( ny ), nz_( nz ), originally_node_centered_( DEFAULT_NODE_CENTERED_C )
 {
   load_identity();
 }
@@ -90,7 +103,7 @@ bool GridTransform::operator!=( const GridTransform& gt ) const
 }
 
 void GridTransform::AlignToCanonicalCoordinates( const GridTransform& src_transform, 
-                        std::vector< int >& permutation, GridTransform& dst_transform )
+  std::vector< int >& permutation, GridTransform& dst_transform )
 {
   // Step 1. Align the transformation frame to axes
   Vector axes[ 3 ];
@@ -151,6 +164,8 @@ void GridTransform::AlignToCanonicalCoordinates( const GridTransform& src_transf
   dst_transform.set_nx( dst_size[ 0 ] );
   dst_transform.set_ny( dst_size[ 1 ] );
   dst_transform.set_nz( dst_size[ 2 ] );
+
+  dst_transform.set_originally_node_centered( src_transform.get_originally_node_centered() );
 }
 
 Point operator*( const GridTransform& gt, const Point& d )

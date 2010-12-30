@@ -109,7 +109,7 @@ NrrdDataHandle DataVolume::convert_to_nrrd()
 {
   if ( this->data_block_ )
   {
-    NrrdDataHandle nrrd_data( new NrrdData( this->data_block_, get_grid_transform().transform() ) );
+    NrrdDataHandle nrrd_data( new NrrdData( this->data_block_, get_grid_transform() ) );
     return nrrd_data;
   }
   else

@@ -80,7 +80,7 @@ NrrdData::NrrdData( DataBlockHandle data_block ) :
 }
 
 
-NrrdData::NrrdData( DataBlockHandle data_block, Transform transform ) :
+NrrdData::NrrdData( DataBlockHandle data_block, GridTransform transform ) :
   private_( new  NrrdDataPrivate )
 {
   if ( !data_block )
@@ -134,181 +134,111 @@ bool NrrdData::own_data() const
   return this->private_->own_data_;
 }
 
+// Represents grid transform using Teem's concept of space origin and space direction.  This 
+// representation is independent of the cell- versus node-centering of the data 
+// (http://teem.sourceforge.net/nrrd/format.html#spaceorigin).  However, the the 
+// cell- versus node-centering of the data does affect the values used for space
+// origin and space direction in the case where axis mins and/or axis maxs are used 
+// (http://teem.sourceforge.net/nrrd/format.html#centers)
 Transform NrrdData::get_transform() const
 {
   Transform transform;
   transform.load_identity();
 
-  if ( this->private_->nrrd_ == 0 ) return transform;
+  // Step 1: Find domain axes
+  unsigned int axis_idx_array[ NRRD_DIM_MAX ];
+  unsigned int axis_idx_num = nrrdDomainAxesGet( this->private_->nrrd_, axis_idx_array );
+  // We assume at most 3 axes in the following code
+  const unsigned int max_dim = 3;
+  axis_idx_num = Min( axis_idx_num, max_dim );
+  
+  // Step 2: Calculate space directions for all axes
+  std::vector< Vector > space_directions; // Space direction per axis
+  space_directions.push_back( Vector( 1, 0, 0 ) );
+  space_directions.push_back( Vector( 0, 1, 0 ) );
+  space_directions.push_back( Vector( 0, 0, 1 ) );
 
-  size_t dim = this->private_->nrrd_->dim;
-
-  // Ensure min and max are of the proper size and are initialized
-  std::vector< double > min( dim, 0.0 ), max( dim, 0.0 );
-  std::vector< size_t > size( dim, 0 );
-
-  // Extract info of oldest versions of nrrds
-  for ( size_t p = 0; p < dim; p++ )
+  if( this->private_->nrrd_->spaceDim > 0 ) // We have the space direction info already
   {
-    size[ p ] = this->private_->nrrd_->axis[ p ].size;
-
-    if ( IsFinite( this->private_->nrrd_->axis[ p ].min ) )
+    // For each axis
+    for( size_t axis_lookup = 0; axis_lookup < axis_idx_num; axis_lookup++ )
     {
-      min[ p ] = this->private_->nrrd_->axis[ p ].min;
+      // Find the space direction
+      for( size_t space_dir_idx = 0; 
+        space_dir_idx < Min( this->private_->nrrd_->spaceDim, max_dim ); space_dir_idx++ )
+      {
+        size_t axis_idx = axis_idx_array[ axis_lookup ];
+        space_directions[ axis_lookup ][ space_dir_idx ] = 
+          this->private_->nrrd_->axis[ axis_idx ].spaceDirection[ space_dir_idx ];
+      }
+    }
+  }
+  else // If possible, calculate spacing from mins, maxs, spacing
+  {
+    // For each axis
+    for( size_t axis_lookup = 0; axis_lookup < axis_idx_num; axis_lookup++ )
+    {
+      size_t axis_idx = axis_idx_array[ axis_lookup ];
+      NrrdAxisInfo nrrd_axis_info = this->private_->nrrd_->axis[ axis_idx ];
+      double spacing = nrrdDefaultSpacing; 
+      if( IsFinite( nrrd_axis_info.spacing ) ) // Spacing
+      {
+        spacing = nrrd_axis_info.spacing;
+      }
+      else if( IsFinite( nrrd_axis_info.min ) && IsFinite( nrrd_axis_info.max ) ) // Min & max
+      {
+        spacing = NRRD_SPACING( nrrd_axis_info.center, nrrd_axis_info.min, 
+          nrrd_axis_info.max, nrrd_axis_info.size );
+      }
+      space_directions[ axis_lookup ] *= spacing;
+    }
+  }
+
+  // Step 3: Calculate space origin
+  Point space_origin( 0, 0, 0 );
+  if( this->private_->nrrd_->spaceDim > 0 ) // We have the space origin info already
+  {
+    for( size_t i = 0; i < Min( this->private_->nrrd_->spaceDim, max_dim ); i++ )
+    {
+      space_origin[ i ] = this->private_->nrrd_->spaceOrigin[ i ];
+    }
+  }
+  else // If possible, calculate space origin from mins, maxs, spacing
+  {
+    double origin_array[ NRRD_DIM_MAX ];
+    unsigned int ret_val = nrrdOriginCalculate( this->private_->nrrd_, axis_idx_array, 
+      axis_idx_num, nrrdCenterNode, origin_array );
+    if( ret_val == nrrdOriginStatusOkay )
+    {
+      for( size_t axis_lookup = 0; axis_lookup < axis_idx_num; axis_lookup++ )
+      {
+        space_origin[ axis_lookup ] = origin_array[ axis_lookup ];
+      }
     }
     else
     {
-      min[ p ] = 0.0;
-    }
-
-    if ( IsFinite( this->private_->nrrd_->axis[ p ].spacing ) )
-    {
-      max[ p ] = this->private_->nrrd_->axis[ p ].spacing * ( size[ p ] - 1 ) + min[ p ];
-    }
-    else
-    {
-      if ( IsFinite( this->private_->nrrd_->axis[ p ].max ) )
+      // There is no origin information, so just put min at (0, 0, 0)
+      for( size_t axis_lookup = 0; axis_lookup < axis_idx_num; axis_lookup++ )
       {
-        max[ p ] = this->private_->nrrd_->axis[ p ].max;
-      }
-      else
-      {
-        max[ p ] = static_cast< double > ( size[ p ] - 1 );
-      }
-    }
-  }
-
-  // Remove empty dimensions
-  size_t k = 0;
-  for ( size_t p = 0; p < dim; p++ )
-  {
-    if ( size[ p ] == 1 ) continue;
-    k++;
-  }
-  size_t rdim = k;
-
-  std::vector< double > rmin( rdim ), rmax( rdim );
-  std::vector< int > rsize( rdim );
-
-  k = 0;
-  for ( size_t p = 0; p < dim; p++ )
-  {
-    if ( size[ p ] == 1 ) continue;
-    rmin[ k ] = min[ p ];
-    rmax[ k ] = max[ p ];
-    rsize[ k ] = static_cast<int>( size[ p ] );
-    k++;
-  }
-
-  if ( rdim == 1 )
-  {
-    Vector v0, v1, v2;
-    v0 = Point( rmax[ 0 ], 0.0, 0.0 ) - Point( rmin[ 0 ], 0.0, 0.0 );
-    v0.find_orthogonal( v1, v2 );
-
-    transform.load_basis( Point( rmin[ 0 ], 0.0, 0.0 ), v0, v1, v2 );
-    transform.post_scale( Vector( 1.0 / static_cast< double > ( rsize[ 0 ] - 1 ), 1.0, 1.0 ) );
-  }
-  else if ( rdim == 2 )
-  {
-    Vector v0, v1, v2;
-    v0 = Point( rmax[ 0 ], 0.0, 0.0 ) - Point( rmin[ 0 ], 0.0, 0.0 );
-    v1 = Point( 0.0, rmax[ 1 ], 0.0 ) - Point( 0.0, rmin[ 1 ], 0.0 );
-    v2 = Cross( v0, v1 );
-    v2.normalize();
-
-    transform.load_basis( Point( rmin[ 0 ], rmin[ 1 ], 0.0 ), v0, v1, v2 );
-    transform.post_scale( Vector( 1.0 / static_cast< double > ( rsize[ 0 ] - 1 ), 1.0
-      / static_cast< double > ( rsize[ 1 ] - 1 ), 1.0 ) );    
-  }
-  else if ( rdim > 2 )
-  {
-    Vector v0, v1, v2;
-    v0 = Point( rmax[ 0 ], 0.0, 0.0 ) - Point( rmin[ 0 ], 0.0, 0.0 );
-    v1 = Point( 0.0, rmax[ 1 ], 0.0 ) - Point( 0.0, rmin[ 1 ], 0.0 );
-    v2 = Point( 0.0, 0.0, rmax[ 2 ] ) - Point( 0.0, 0.0, rmin[ 2 ] );
-
-    transform.load_basis( Point( rmin[ 0 ], rmin[ 1 ], rmin[ 2 ] ), v0, v1, v2 );
-    transform.post_scale( Vector( 1.0 / static_cast< double > ( rsize[ 0 ] - 1 ), 1.0
-      / static_cast< double > ( rsize[ 1 ] - 1 ), 1.0 / static_cast< double > ( rsize[ 2 ] - 1 ) ) );   
-  }
-
-  if ( this->private_->nrrd_->spaceDim > 0 )
-  {
-    Vector Origin;
-    std::vector< Vector > SpaceDir( 3 );
-
-    for ( size_t p = 0; p < rdim; p++ )
-    {
-      rmin[ p ] = 0.0;
-      rmax[ p ] = static_cast< double > ( rsize[ p ] );
-//      if ( nrrd_->axis[ p ].center == nrrdCenterCell )
-//      {
-//        double cor = ( rmax[ p ] - rmin[ p ] ) / ( 2 * rsize[ p ] );
-//        rmin[ p ] -= cor;
-//        rmax[ p ] -= cor;
-//      }
-    }
-
-    if ( this->private_->nrrd_->spaceDim > 0 )
-    {
-      if ( IsFinite( this->private_->nrrd_->spaceOrigin[ 0 ] ) )
-      {
-        Origin.x( this->private_->nrrd_->spaceOrigin[ 0 ] );
-      }
-
-      for ( size_t p = 0; p < rdim && p < 3; p++ )
-      {
-        if ( IsFinite( this->private_->nrrd_->axis[ p ].spaceDirection[ 0 ] ) )
+        size_t axis_idx = axis_idx_array[ axis_lookup ];
+        if( this->private_->nrrd_->axis[ axis_idx ].center == nrrdCenterCell )
         {
-          SpaceDir[ p ].x( this->private_->nrrd_->axis[ p ].spaceDirection[ 0 ] );
+          // Assume that if no space origin was specified, then no space directions were
+          // specified and we are axis-aligned.
+          double spacing = space_directions[ axis_lookup ].length();
+          space_origin[ axis_lookup ] = spacing / 2.0;
+        }
+        else // Node-centered or unknown
+        {
+          space_origin[ axis_lookup ] = 0.0;
         }
       }
     }
-
-    if ( this->private_->nrrd_->spaceDim > 1 )
-    {
-      if ( IsFinite( this->private_->nrrd_->spaceOrigin[ 1 ] ) )
-      {
-        Origin.y( this->private_->nrrd_->spaceOrigin[ 1 ] );
-      }
-      for ( size_t p = 0; p < rdim && p < 3; p++ )
-      {
-        if ( IsFinite( this->private_->nrrd_->axis[ p ].spaceDirection[ 1 ] ) )
-        {
-          SpaceDir[ p ].y( this->private_->nrrd_->axis[ p ].spaceDirection[ 1 ] );
-        }
-      }
-    }
-
-    if ( this->private_->nrrd_->spaceDim > 2 )
-    {
-      if ( IsFinite( this->private_->nrrd_->spaceOrigin[ 2 ] ) )
-      {
-        Origin.z( this->private_->nrrd_->spaceOrigin[ 2 ] );
-      }
-      for ( size_t p = 0; p < rdim && p < 3; p++ )
-      {
-        if ( IsFinite( this->private_->nrrd_->axis[ p ].spaceDirection[ 2 ] ) )
-        {
-          SpaceDir[ p ].z( this->private_->nrrd_->axis[ p ].spaceDirection[ 2 ] );
-        }
-      }
-    }
-
-    if ( dim == 1 )
-    {
-      SpaceDir[ 0 ].find_orthogonal( SpaceDir[ 1 ], SpaceDir[ 2 ] );
-    }
-    else if ( dim == 2 )
-    {
-      SpaceDir[ 2 ] = Cross( SpaceDir[ 0 ], SpaceDir[ 1 ] );
-    }
-
-    Transform space_transform;
-    space_transform.load_basis( Point( Origin ), SpaceDir[ 0 ], SpaceDir[ 1 ], SpaceDir[ 2 ] );
-    transform.pre_transform( space_transform );
   }
+
+  // Step 4: Build transform from space origin and space directions
+  transform.load_basis( space_origin, space_directions[ 0 ], space_directions[ 1 ], 
+    space_directions[ 2 ] );
 
   return transform;
 }
@@ -316,17 +246,22 @@ Transform NrrdData::get_transform() const
 
 GridTransform NrrdData::get_grid_transform() const
 {
-  Core::GridTransform grid_transform( get_nx(), get_ny(), get_nz(), get_transform() );
+  Core::GridTransform grid_transform( this->get_nx(), this->get_ny(), this->get_nz(), 
+    this->get_transform(), this->get_originally_node_centered() );
   return grid_transform;
 }
 
-void NrrdData::set_transform( Transform& transform )
+void NrrdData::set_transform( GridTransform& transform )
 {
   if ( !this->private_->nrrd_ ) return;
+
+  // Restore original centering
   int centerdata[ NRRD_DIM_MAX ];
+  unsigned int centering = 
+    transform.get_originally_node_centered() ? nrrdCenterNode : nrrdCenterCell;
   for ( int p = 0; p < NRRD_DIM_MAX; p++ )
   {
-    centerdata[ p ] = nrrdCenterCell;
+    centerdata[ p ] = centering;
   }
 
   nrrdAxisInfoSet_nva( this->private_->nrrd_, nrrdAxisInfoCenter, centerdata );
@@ -337,10 +272,10 @@ void NrrdData::set_transform( Transform& transform )
   }
   nrrdAxisInfoSet_nva( this->private_->nrrd_, nrrdAxisInfoKind, kind );
 
+  // Set space origin and space direction
   this->private_->nrrd_->spaceDim = 3;
 
   double Trans[ 16 ];
-
   transform.get( Trans );
   for ( int p = 0; p < 3; p++ )
   {
@@ -360,6 +295,68 @@ void NrrdData::set_transform( Transform& transform )
 
   this->private_->nrrd_->space = nrrdSpace3DRightHanded;
 
+  // Check whether the NRRD0005 format is needed for export, if not downgrade nrrd.
+  // Downgrade nrrd in case where grid transform is axis-aligned.
+  // Downgraded nrrd uses axis mins and spacing instead of space origin and space direction.
+  Nrrd* nrrd = this->private_->nrrd_;
+
+  if ( nrrd->spaceDim > 0 && nrrd->spaceDim == nrrd->dim )
+  {
+    bool is_aligned_nrrd = true;
+    for ( size_t j = 0; j < static_cast<size_t>( nrrd->spaceDim ); j++ )
+    {
+      for ( size_t i = 0; i < static_cast<size_t>( nrrd->dim ); i++ )
+      {
+        if ( i != j && ( nrrd->axis[ i ].spaceDirection[ j ] != 0.0 &&
+          ! IsNan( nrrd->axis[ i ].spaceDirection[ j ] ) ) )
+        {
+          is_aligned_nrrd = false;
+        }
+      }
+    }
+
+    for ( size_t j = 0; j < static_cast<size_t>( nrrd->spaceDim ); j++ )
+    {
+      for ( size_t i = 0; i < static_cast<size_t>( nrrd->spaceDim ); i++ )
+      {
+        if ( i != j && ( nrrd->measurementFrame[ i ][ j ] != 0.0 &&
+          ! IsNan( nrrd->measurementFrame[ i ][ j ] ) ) )
+        {
+          is_aligned_nrrd = false;
+        }
+      }
+    }
+
+    if ( is_aligned_nrrd )
+    {
+      // Down grade nrrd
+      nrrdOrientationReduce( nrrd, nrrd, 1 );
+
+      // Get domain axes
+      unsigned int axis_idx_array[ NRRD_DIM_MAX ];
+      unsigned int axis_idx_num = nrrdDomainAxesGet( nrrd, axis_idx_array );
+      
+      // nrrdOrientationReduce doesn't handle centering properly (or at all).  It puts the 
+      // min at the origin regardless of centering.  If cell-centered, need to adjust min.
+      for( size_t axis_lookup = 0; axis_lookup < axis_idx_num; axis_lookup++ )
+      {
+        size_t axis_idx = axis_idx_array[ axis_lookup ];
+        if( nrrd->axis[ axis_idx ].center == nrrdCenterCell )
+        {
+          if( IsFinite( nrrd->axis[ axis_idx ].min ) && 
+            IsFinite( nrrd->axis[ axis_idx ].spacing ) )
+          {
+            nrrd->axis[ axis_idx ].min -= ( nrrd->axis[ axis_idx ].spacing / 2.0 ); 
+          }
+        }
+      }
+
+      for ( size_t i = 0; i < static_cast<size_t>( nrrd->dim ); i++ )
+      {
+        nrrd->axis[ i ].kind = nrrdKindUnknown; 
+      }
+    }
+  }
 }
 
 void NrrdData::set_histogram( const Histogram& histogram )
@@ -469,6 +466,17 @@ DataType NrrdData::get_data_type() const
   }
 }
 
+bool NrrdData::get_originally_node_centered() const
+{
+  if ( this->private_->nrrd_ && this->private_->nrrd_->dim > 0 ) 
+  {
+    // unknown = node-centered to match unu resample
+    return ( this->private_->nrrd_->axis[ 0 ].center != nrrdCenterCell );
+  }
+  return true;
+}
+
+
 bool NrrdData::LoadNrrd( const std::string& filename, NrrdDataHandle& nrrddata, std::string& error )
 {
   // Lock down the Teem library
@@ -505,47 +513,6 @@ bool NrrdData::SaveNrrd( const std::string& filename, NrrdDataHandle nrrddata, s
     return false;
   }
 
-  // Check whether the NRRD0005 format is needed for export, if not downgrade nrrd
-  Nrrd* nrrd = nrrddata->nrrd();
-
-  if ( nrrd->spaceDim > 0 && nrrd->spaceDim == nrrd->dim )
-  {
-    bool is_aligned_nrrd = true;
-    for ( size_t j = 0; j < static_cast<size_t>( nrrd->spaceDim ); j++ )
-    {
-      for ( size_t i = 0; i < static_cast<size_t>( nrrd->dim ); i++ )
-      {
-        if ( i != j && ( nrrd->axis[ i ].spaceDirection[ j ] != 0.0 &&
-          ! IsNan( nrrd->axis[ i ].spaceDirection[ j ] ) ) )
-        {
-          is_aligned_nrrd = false;
-        }
-      }
-    }
-
-    for ( size_t j = 0; j < static_cast<size_t>( nrrd->spaceDim ); j++ )
-    {
-      for ( size_t i = 0; i < static_cast<size_t>( nrrd->spaceDim ); i++ )
-      {
-        if ( i != j && ( nrrd->measurementFrame[ i ][ j ] != 0.0 &&
-          ! IsNan( nrrd->measurementFrame[ i ][ j ] ) ) )
-        {
-          is_aligned_nrrd = false;
-        }
-      }
-    }
-
-    if ( is_aligned_nrrd )
-    {
-      // Down grade nrrd
-      nrrdOrientationReduce( nrrd, nrrd, 1 );
-      for ( size_t i = 0; i < static_cast<size_t>( nrrd->dim ); i++ )
-      {
-        nrrd->axis[ i ].kind = nrrdKindUnknown; 
-      }
-    }
-  }
-
   NrrdIoState* nio = nrrdIoStateNew();
   nrrdIoStateSet( nio,  nrrdIoStateZlibLevel, level );
 
@@ -555,7 +522,7 @@ bool NrrdData::SaveNrrd( const std::string& filename, NrrdDataHandle nrrddata, s
     nrrdIoStateEncodingSet( nio, nrrdEncodingGzip );
   }
   
-  if ( nrrdSave( filename.c_str(), nrrd, nio ) )
+  if ( nrrdSave( filename.c_str(), nrrddata->nrrd(), nio ) )
   {
     char *err = biffGet( NRRD );
     error = "Error writing file: " + filename + " : " + std::string( err );

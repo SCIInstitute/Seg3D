@@ -62,6 +62,8 @@ public:
 
   GridTransform( size_t nx, size_t ny, size_t nz, const Transform& transform );
 
+  GridTransform( size_t nx, size_t ny, size_t nz, const Transform& transform, bool node_centered );
+
   GridTransform( size_t nx, size_t ny, size_t nz );
 
   GridTransform& operator=( const GridTransform& copy );
@@ -124,6 +126,17 @@ public:
   // Get the underlying transform
   Transform transform() const;
 
+  // This is needed when this value needs to be copied from one grid transform to another
+  void set_originally_node_centered( bool originally_node_centered )
+  {
+    this->originally_node_centered_ = originally_node_centered;
+  }
+
+  bool get_originally_node_centered() const
+  {
+    return this->originally_node_centered_;
+  }
+
   // -- internal representation --
 private:
 
@@ -131,6 +144,10 @@ private:
   size_t nx_;
   size_t ny_;
   size_t nz_;
+
+  // Centering
+  bool originally_node_centered_;
+  static const bool DEFAULT_NODE_CENTERED_C;
 
 public:
   static void AlignToCanonicalCoordinates( const GridTransform& src_transform,

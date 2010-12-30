@@ -83,7 +83,7 @@ public:
   // The datablock handle will be stored internally until the object is deleted
   // and the memory with the data is shared between the object and the nrrd object.
   NrrdData( DataBlockHandle data_block );
-  NrrdData( DataBlockHandle data_block, Transform transform );
+  NrrdData( DataBlockHandle data_block, GridTransform transform );
 
   virtual ~NrrdData();
 
@@ -106,12 +106,12 @@ public:
   GridTransform get_grid_transform() const;
 
   // TRANSFORM:
-  // Extract the transform from the nrrd
+  // Extract the cell-centered transform from the nrrd 
   Transform get_transform() const;
 
   // SET_TRANSFORM:
   // Set the transfrom in the nrrd data
-  void set_transform( Transform& transform );
+  void set_transform( GridTransform& transform );
 
   // GET_HISTOGRAM:
   // Get the histogram from the nrrd
@@ -136,6 +136,13 @@ public:
   // GET_DATA_TYPE:
   // Get the data type of the nrrd
   DataType get_data_type() const;
+
+  // GET_ORIGINALLY_NODE_CENTERED:
+  // Get whether the nrrd was originally node-centered  
+  // Internally Seg3D converts the transform to be cell-centered, but we keep track of what the 
+  // original centering was so that the transform can be converted back to be node-centered on 
+  // export.
+  bool get_originally_node_centered() const;
 
   // -- Internals of this class --
 private:
