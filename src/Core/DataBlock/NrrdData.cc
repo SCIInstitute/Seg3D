@@ -146,26 +146,29 @@ Transform NrrdData::get_transform() const
   transform.load_identity();
 
   // Step 1: Find domain axes
+  // Note: nrrdDomainAxesGet is based on the per-axis "kind" field.  If this field is not set then 
+  // the axis is assumed to be a domain axis, even if it is in fact a 3-component color value,
+  // for example.
   unsigned int axis_idx_array[ NRRD_DIM_MAX ];
   unsigned int axis_idx_num = nrrdDomainAxesGet( this->private_->nrrd_, axis_idx_array );
   // We assume at most 3 axes in the following code
   const unsigned int max_dim = 3;
   axis_idx_num = Min( axis_idx_num, max_dim );
-  
+  unsigned int space_dim = Min( this->private_->nrrd_->spaceDim, max_dim );
+
   // Step 2: Calculate space directions for all axes
   std::vector< Vector > space_directions; // Space direction per axis
   space_directions.push_back( Vector( 1, 0, 0 ) );
   space_directions.push_back( Vector( 0, 1, 0 ) );
   space_directions.push_back( Vector( 0, 0, 1 ) );
 
-  if( this->private_->nrrd_->spaceDim > 0 ) // We have the space direction info already
+  if( space_dim > 0 ) // We have the space direction info already
   {
     // For each axis
     for( size_t axis_lookup = 0; axis_lookup < axis_idx_num; axis_lookup++ )
     {
       // Find the space direction
-      for( size_t space_dir_idx = 0; 
-        space_dir_idx < Min( this->private_->nrrd_->spaceDim, max_dim ); space_dir_idx++ )
+      for( size_t space_dir_idx = 0; space_dir_idx < space_dim; space_dir_idx++ )
       {
         size_t axis_idx = axis_idx_array[ axis_lookup ];
         space_directions[ axis_lookup ][ space_dir_idx ] = 
@@ -196,11 +199,12 @@ Transform NrrdData::get_transform() const
 
   // Step 3: Calculate space origin
   Point space_origin( 0, 0, 0 );
-  if( this->private_->nrrd_->spaceDim > 0 ) // We have the space origin info already
+  if( space_dim > 0 ) // We have the space origin info already
   {
-    for( size_t i = 0; i < Min( this->private_->nrrd_->spaceDim, max_dim ); i++ )
+    for( size_t space_origin_idx = 0; space_origin_idx < space_dim; space_origin_idx++ )
     {
-      space_origin[ i ] = this->private_->nrrd_->spaceOrigin[ i ];
+      space_origin[ space_origin_idx ] = 
+        this->private_->nrrd_->spaceOrigin[ space_origin_idx ];
     }
   }
   else // If possible, calculate space origin from mins, maxs, spacing
