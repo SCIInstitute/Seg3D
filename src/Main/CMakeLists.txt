@@ -155,7 +155,7 @@ IF(APPLE)
        COMMAND install_name_tool -id QtOpenGL Seg3D2.app/Contents/MacOS/QtOpenGL
        COMMAND install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore Seg3D2.app/Contents/MacOS/QtGui
        COMMAND install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore Seg3D2.app/Contents/MacOS/QtOpenGL
-       COMMAND install_name_tool -change QtGui.framework/Versions/4/QtGui @executable_path/QtGui   Seg3D2.app/Contents/MacOS/QtOpenGL
+       COMMAND install_name_tool -change QtGui.framework/Versions/4/QtGui @executable_path/QtGui Seg3D2.app/Contents/MacOS/QtOpenGL
        COMMAND install_name_tool -change QtGui.framework/Versions/4/QtGui @executable_path/QtGui Seg3D2.app/Contents/MacOS/Seg3D2
        COMMAND install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore Seg3D2.app/Contents/MacOS/Seg3D2
        COMMAND install_name_tool -change QtOpenGL.framework/Versions/4/QtOpenGL @executable_path/QtOpenGL Seg3D2.app/Contents/MacOS/Seg3D2
@@ -186,13 +186,24 @@ ELSE(APPLE)
     ${QT_BINARY_DIR}/${QTGUINAME}.dll 
     ${QT_BINARY_DIR}/${QTOPENGLNAME}.dll
       DESTINATION bin )
+    
+  INSTALL(FILES 
+    ${CMAKE_SOURCE_DIR}\ReleaseNotes.txt 
+    DESTINATION bin )
+    
   ELSE(WIN32)
     INSTALL(TARGETS Seg3D2 
         RUNTIME DESTINATION bin )
+    
     INSTALL(FILES 
     ${QT_QTCORE_LIBRARY_RELEASE}.${QT_VERSION} 
     ${QT_QTGUI_LIBRARY_RELEASE}.${QT_VERSION} 
     ${QT_QTOPENGL_LIBRARY_RELEASE}.${QT_VERSION} 
-    DESTINATION lib)
+    DESTINATION lib )
+
+  INSTALL(FILES 
+    ${CMAKE_SOURCE_DIR}\ReleaseNotes.txt 
+    DESTINATION bin )
+    
   ENDIF(WIN32)
 ENDIF(APPLE)

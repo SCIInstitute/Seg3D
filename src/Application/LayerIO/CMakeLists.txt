@@ -50,6 +50,8 @@ SET(APPLICATION_LAYERIO_ACTIONS_SRCS
 SET(APPLICATION_LAYERIO_IMPORTERS_SRCS
   ITKLayerImporter.h
   ITKLayerImporter.cc
+  ITKSeriesLayerImporter.h
+  ITKSeriesLayerImporter.cc
   MatlabLayerImporter.h
   MatlabLayerImporter.cc
   NrrdLayerImporter.h

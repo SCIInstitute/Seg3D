@@ -50,7 +50,9 @@ namespace Seg3D
 
 class VFFLayerImporter : public LayerImporter
 {
-  SCI_IMPORTER_TYPE( "VFF Importer", ".vff", 6, 0 )
+  SCI_IMPORTER_TYPE( "VFF Importer", 
+             ".vff", 15,
+             LayerImporterType::SINGLE_FILE_E )
 
   // -- Constructor/Destructor --
 public:

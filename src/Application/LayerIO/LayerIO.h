@@ -82,19 +82,10 @@ public:
     // Generate a new information class
     LayerImporterInfoHandle info( new LayerImporterInfo( 
       LayerImporterBuilderBaseHandle( new LayerImporterBuilder< IMPORTER > ),
-      IMPORTER::Name(), IMPORTER::FileTypes(), IMPORTER::Priority(), IMPORTER::SeriesFlag() ) );
+      IMPORTER::Name(), IMPORTER::FileTypes(), IMPORTER::Priority(), IMPORTER::ImporterType() ) );
 
     // Insert the information block into the correct importer list
-    if( ( IMPORTER::SeriesFlag() == 0 ) || ( IMPORTER::SeriesFlag() == 2 ) )
-    {
-      this->importer_list_.push_back( info );
-    }
-    
-    if( ( IMPORTER::SeriesFlag() == 1 ) || ( IMPORTER::SeriesFlag() == 2 ) )
-    {
-      this->series_importer_list_.push_back( info );
-    }
-      
+    this->importer_list_.push_back( info );
   }
   
   // REGISTER_EXPORTER:
@@ -127,9 +118,6 @@ private:
   // The internal list of importers
   typedef std::vector< LayerImporterInfoHandle > importer_list_type;
   importer_list_type importer_list_;
-  
-  // The internal list of files series importers
-  importer_list_type series_importer_list_;
   
   // The internal list of exporters
   typedef std::vector< LayerExporterInfoHandle > exporter_list_type;

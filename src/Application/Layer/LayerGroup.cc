@@ -139,7 +139,7 @@ void LayerGroupPrivate::update_layers_iso_visible_state()
     return;
   }
 
-  size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
+//  size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
   size_t total_effective_layers = 0;
   size_t total_visible_layers = 0;
 

@@ -39,16 +39,14 @@ namespace Seg3D
 {
 
 LayerImporterInfo::LayerImporterInfo( LayerImporterBuilderBaseHandle builder,
-  const std::string name, 
-  const std::string file_type_string,
-  const unsigned int priority,
-  const unsigned int series_flag ) :
-  builder_( builder ),
-  name_( name ),
-  file_types_( Core::SplitString( file_type_string, ";" ) ),
-  any_type_(false),
-  priority_( priority ),
-  series_flag_( series_flag )
+  std::string name, std::string file_type_string,
+  int priority, LayerImporterType importer_type ) :
+    builder_( builder ),
+    name_( name ),
+    file_types_( Core::SplitString( file_type_string, ";" ) ),
+    any_type_(false),
+    priority_( priority ),
+    importer_type_( importer_type )
 {
   if (file_types_.size() > 0)
   {
@@ -97,15 +95,14 @@ std::string LayerImporterInfo::file_type_string() const
   return file_type_string_;
 }
 
-unsigned int LayerImporterInfo::priority() const
+int LayerImporterInfo::priority() const
 {
   return priority_;
 }
 
-unsigned int LayerImporterInfo::series_flag() const
+LayerImporterType LayerImporterInfo::type() const
 {
-  return series_flag_;
+  return importer_type_;
 }
-
 
 } // end namespace seg3D

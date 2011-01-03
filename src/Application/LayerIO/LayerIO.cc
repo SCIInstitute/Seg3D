@@ -56,7 +56,10 @@ LayerIO::importer_types_type LayerIO::get_importer_types()
 
   for ( size_t j = 0; j< this->importer_list_.size(); j++ )
   {
-    importer_types.push_back( this->importer_list_[j]->file_type_string() );
+    if ( this->importer_list_[j]->type() == LayerImporterType::SINGLE_FILE_E )
+    {
+      importer_types.push_back( this->importer_list_[j]->file_type_string() );
+    }
   }
   
   return importer_types;
@@ -68,9 +71,12 @@ LayerIO::importer_types_type LayerIO::get_series_importer_types()
   std::vector<std::string> series_importer_types;
   series_importer_types.push_back( "All Importers (*)" );
 
-  for ( size_t j = 0; j< this->series_importer_list_.size(); j++ )
+  for ( size_t j = 0; j< this->importer_list_.size(); j++ )
   {
-    series_importer_types.push_back( this->series_importer_list_[j]->file_type_string() );
+    if ( this->importer_list_[j]->type() == LayerImporterType::FILE_SERIES_E )
+    {
+      series_importer_types.push_back( this->importer_list_[j]->file_type_string() );
+    }
   }
 
   return series_importer_types;
@@ -94,10 +100,12 @@ LayerIO::importer_types_type LayerIO::get_exporter_types()
 
 bool LayerIO::create_importer( const std::string& filename, 
   LayerImporterHandle& importer,
-  const std::string importername )
+  const std::string full_importername )
 {
   // Step (1): clear out old results
   importer.reset();
+
+  std::string importername = full_importername.substr( 0, full_importername.find( " (" ) );
 
   // Step (2): determine the file extension  
   boost::filesystem::path full_filename( filename );
@@ -115,9 +123,9 @@ bool LayerIO::create_importer( const std::string& filename,
   // If no name was given, the most appriopriate is used by
   // searching the list for the importer that deals with this
   // file type and has the highest priority
-  if ( importername == "" || importername == "All Importers (*)" )
+  if ( importername == "" || importername == "All Importers" )
   {
-    unsigned int priority = 0;
+    int priority = 0;
     
     // Search the list for an approriate importer
     for (size_t j = 0; j < this->importer_list_.size(); j ++ )
@@ -157,7 +165,6 @@ bool LayerIO::create_importer( const std::string& filename,
   else return false;
 }
 
-
 bool LayerIO::create_exporter( LayerExporterHandle& exporter, std::vector< LayerHandle >& layers, 
   const std::string importername /*= ""*/, const std::string extension /*= "" */ )
 {
@@ -173,9 +180,5 @@ bool LayerIO::create_exporter( LayerExporterHandle& exporter, std::vector< Layer
   }
   return false;
 }
-
-
-
-
 
 } // end namespace seg3D

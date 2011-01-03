@@ -85,6 +85,13 @@ CORE_ENUM_CLASS
   LABEL_MASK_E = 0x0008 
 )
 
+CORE_ENUM_CLASS
+(
+  LayerImporterType,
+  SINGLE_FILE_E = 1,
+  FILE_SERIES_E = 2
+)
+
 
 std::string ExportToString( LayerImporterMode mode );
 bool ImportFromString( const std::string& import_type_string, LayerImporterMode& mode );
@@ -110,13 +117,14 @@ bool ImportFromString( const std::string& import_type_string, LayerImporterMode&
 
 
 
-// forward declaration
+// forward declarations
 class LayerImporter;
 typedef boost::shared_ptr< LayerImporter > LayerImporterHandle;
 typedef boost::weak_ptr< LayerImporter > LayerImporterWeakHandle;
 
 class LayerImporterPrivate;
 typedef boost::shared_ptr< LayerImporterPrivate > LayerImporterPrivateHandle;
+
 
 // class definition
 class LayerImporter : public boost::noncopyable
@@ -141,9 +149,9 @@ public:
   virtual std::string file_types() const = 0;
   // Priority flag that resolves which importer needs to be used if multiple are available for
   // a similar file type
-  virtual unsigned int priority() const = 0;
+  virtual int priority() const = 0;
   // flag for the series info ( 0 - not a series importer, 1 - a series importer, 2 - both )
-  virtual unsigned int series_flag() const = 0;
+  virtual LayerImporterType type() const = 0;
 
   // -- Filename handling --
 public:
@@ -241,17 +249,17 @@ private:
 // Note: one would expect to use virtual static functions, but those are not
 // allowed in C++, hence this macro ensures a consistent definition.
 
-#define SCI_IMPORTER_TYPE(importer_name,importer_file_types,importer_priority,importer_series_flag) \
+#define SCI_IMPORTER_TYPE(importer_name,importer_file_types,importer_priority,importer_type) \
   public: \
-    static std::string  Name()       { return importer_name; }\
-    static std::string  FileTypes()  { return importer_file_types; }\
-    static unsigned int Priority()   { return importer_priority; }\
-    static unsigned int SeriesFlag()   { return importer_series_flag; }\
+    static std::string Name()         { return importer_name; }\
+    static std::string FileTypes()        { return importer_file_types; }\
+    static int Priority()           { return importer_priority; }\
+    static LayerImporterType ImporterType()   { return importer_type; }\
     \
     virtual std::string  name() const       { return Name(); } \
-    virtual std::string  file_types() const { return FileTypes(); } \
-    virtual unsigned int priority() const   { return Priority(); }\
-    virtual unsigned int series_flag() const   { return SeriesFlag(); }\
+    virtual std::string  file_types() const     { return FileTypes(); } \
+    virtual int priority() const            { return Priority(); }\
+    virtual LayerImporterType type() const { return ImporterType(); }\
 
 } // end namespace seg3D
 

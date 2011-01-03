@@ -26,19 +26,22 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-// ITK Includes
+// ITK includes
 #include "itkRGBPixel.h"
-#include "itkPNGImageIO.h"
-#include "itkBMPImageIO.h"
-#include "itkJPEGImageIO.h"
+#include "itkTIFFImageIO.h"
+#include "itkVTKImageIO.h"
+#include "itkLSMImageIO.h"
 #include "itkGDCMImageIO.h"
 #include "itkGDCMSeriesFileNames.h"
+#include "itkAnalyzeImageIO.h"
+#include "itkNiftiImageIO.h"
 #include "itkImageSeriesReader.h"
 #include "gdcmException.h"
 
+// Teem includes
 #include <teem/nrrd.h>
 
-// Boost Includes
+// Boost includes
 #include <boost/lexical_cast.hpp>
 
 // Core includes
@@ -51,59 +54,100 @@
 #include <Application/Layer/DataLayer.h> 
 #include <Application/LayerManager/LayerManager.h>
 
+
 SCI_REGISTER_IMPORTER( Seg3D, ITKLayerImporter );
 
 namespace Seg3D
 {
 
+class ITKLayerImporterPrivate
+{
 
-//////////////////////////////////////////////////////////////////////////////////////
-/////////////////////// - templated files and their helpers - ////////////////////////  
-bool set_pixel_type( std::string& type, Core::DataType& pixel_type )
+public:
+  ITKLayerImporterPrivate() :
+    data_type_( Core::DataType::UCHAR_E )
+  {
+  }
+
+public: 
+  // SET_DATA_TYPE:
+  // Copy the data type we get from itk and convert to a Seg3D enum type
+  bool set_data_type( std::string& type );
+
+  // SCAN_SIMPLE_VOLUME:
+  // Scan the data file
+  template< class ItkImporterType >
+  bool scan_simple_volume();
+  
+  // IMPORT_SIMPLE_TYPED_VOLUME:
+  // Read the data in its final format
+  template< class DataType, class ItkImporterType >
+  bool import_simple_typed_volume();
+
+  // IMPORT_SIMPLE_VOLUME:
+  // Import the volume in its final format by choosing the right format
+  template< class ItkImporterType >
+  bool import_simple_volume();  
+  
+public:
+  // The type of the file we are importing
+  std::string extension_;
+
+  // The data type of the data we are importing
+  Core::DataType data_type_;
+
+  // The file name of the file we are reading
+  std::string file_name_;
+
+  Core::ITKImageDataHandle image_data_;
+  Core::DataBlockHandle data_block_;
+};
+
+bool ITKLayerImporterPrivate::set_data_type( std::string& type )
 {
   if( type == "unsigned_char" )
   {
-    pixel_type = Core::DataType::UCHAR_E;
+    this->data_type_ = Core::DataType::UCHAR_E;
     return true;
   }
   else if( type == "char" )
   {
-    pixel_type = Core::DataType::CHAR_E;
+    this->data_type_ = Core::DataType::CHAR_E;
     return true;
   }
   else if( type == "unsigned_short" )
   {
-    pixel_type = Core::DataType::USHORT_E;
+    this->data_type_ = Core::DataType::USHORT_E;
     return true;
   }
   else if( type == "short" )
   {
-    pixel_type = Core::DataType::SHORT_E;
+    this->data_type_ = Core::DataType::SHORT_E;
     return true;
   }
   else if( type == "unsigned_int" )
   {
-    pixel_type = Core::DataType::UINT_E;
+    this->data_type_ = Core::DataType::UINT_E;
     return true;
   }
   else if( type == "int" )
   {
-    pixel_type = Core::DataType::INT_E;
+    this->data_type_ = Core::DataType::INT_E;
     return true;
   }
   else if( type == "float" )
   {
-    pixel_type = Core::DataType::FLOAT_E;
+    this->data_type_ = Core::DataType::FLOAT_E;
     return true;
   }
   else if( type == "double" )
   {
-    pixel_type = Core::DataType::DOUBLE_E;
+    this->data_type_ = Core::DataType::DOUBLE_E;
     return true;
   }
   else if( type == "unknown" )
   {
-    pixel_type = Core::DataType::FLOAT_E;
+    this->data_type_ = Core::DataType::FLOAT_E;
     return true;
   }
   else
@@ -112,88 +156,8 @@ bool set_pixel_type( std::string& type, Core::DataType& pixel_type )
   }
 }
 
-template< class PixelType >
-bool import_dicom_series( Core::ITKImageDataHandle& image_data, 
-  Core::DataBlockHandle& data_block, std::vector< std::string >& file_list )
-{
-  // Step 1: setup the image type
-  const unsigned int dimension = 3;
-  typedef itk::Image< PixelType, dimension > ImageType;
-
-  // Step 2: using the image type, create a ITK reader
-  typedef itk::ImageSeriesReader< ImageType > ReaderType;
-  typename ReaderType::Pointer reader = ReaderType::New();
-
-  // Step 3: now because we are importing dicoms we create a GDCM IO object
-  typedef itk::GDCMImageIO ImageIOType;
-  ImageIOType::Pointer dicom_io = ImageIOType::New();
-
-  // Step 4: now we set the io and the file list in the reader
-  reader->SetImageIO( dicom_io );
-  reader->SetFileNames( file_list );
-
-  // Step 5: now we attempt to actually read in the file and catch potential errors
-  try
-  {
-    reader->Update();
-  }
-  catch( ... )
-  {
-    return false;
-  }
-
-  // Step 6: here we instantiate a new DataBlock using the output from the reader
-  data_block = Core::ITKDataBlock::New< PixelType >( 
-    typename itk::Image< PixelType, 3 >::Pointer( reader->GetOutput() ) );
-
-  // Step 6: here we instantiate a new ITKImageData using the output from the reader
-  image_data = typename Core::ITKImageDataT< PixelType >::Handle( 
-    new typename Core::ITKImageDataT< PixelType >( reader->GetOutput() ) );
-
-  // Step 7: now we check to see if we were successful creating our datablock and image
-  // if we were then we set the grid transform.
-  if( image_data && data_block )
-  {
-    return true;
-  }
-  else
-  {
-    // otherwise we return false
-    return false;
-  }
-}
-
-
 template< class ItkImporterType >
-bool scan_simple_series( const std::string& filename, Core::DataType& pixel_type )
-{
-  typedef itk::ImageFileReader< itk::Image< unsigned short, 2 > > ReaderType;
-  typename ReaderType::Pointer reader = ReaderType::New();
-
-  typedef ItkImporterType ImageIOType;
-  typename ImageIOType::Pointer IO = ImageIOType::New();
-
-  reader->SetImageIO( IO );
-  reader->SetFileName( filename );
-
-  try
-  {
-    reader->Update();
-  }
-  catch( ... )
-  {
-    return false;
-  }
-
-  std::string type_string = IO->GetComponentTypeAsString( IO->GetComponentType() );
-  if( type_string == "" ) return false;
-  
-  return set_pixel_type( type_string, pixel_type );
-}
-
-// templated function for scanning any itk supported type 
-template< class ItkImporterType >
-bool scan_simple_volume( const std::string& filename, Core::DataType& pixel_type )
+bool ITKLayerImporterPrivate::scan_simple_volume()
 {
   typedef itk::ImageFileReader< itk::Image< float, 3 > > ReaderType;
   typename ReaderType::Pointer reader = ReaderType::New();
@@ -202,7 +166,7 @@ bool scan_simple_volume( const std::string& filename, Core::DataType& pixel_type
   typename ImageIOType::Pointer IO = ImageIOType::New();
 
   reader->SetImageIO( IO );
-  reader->SetFileName( filename );
+  reader->SetFileName( this->file_name_ );
 
   try
   {
@@ -210,27 +174,24 @@ bool scan_simple_volume( const std::string& filename, Core::DataType& pixel_type
   }
   catch( ... )
   {
-    //return false;
+    return false;
   }
 
   std::string type_string = IO->GetComponentTypeAsString( IO->GetComponentType() );
-  if( type_string == "" ) return false;
-
-  return set_pixel_type( type_string, pixel_type );
+  return this->set_data_type( type_string );
 }
 
-template< class PixelType, class ItkImporterType >
-bool import_simple_volume( Core::ITKImageDataHandle& image_data, 
-  Core::DataBlockHandle& data_block, const std::string& file_name )
+template< class DataType, class ItkImporterType >
+bool ITKLayerImporterPrivate::import_simple_typed_volume()
 {
-  typedef itk::ImageFileReader< itk::Image< PixelType, 3 > > ReaderType;
+  typedef itk::ImageFileReader< itk::Image< DataType, 3 > > ReaderType;
   typename ReaderType::Pointer reader = ReaderType::New();
 
   typedef ItkImporterType ImageIOType;
   typename ImageIOType::Pointer IO = ImageIOType::New();
 
   reader->SetImageIO( IO );
-  reader->SetFileName( file_name );
+  reader->SetFileName( this->file_name_ );
 
   try
   {
@@ -241,13 +202,13 @@ bool import_simple_volume( Core::ITKImageDataHandle& image_data,
     return false;
   }
 
-  data_block = Core::ITKDataBlock::New< PixelType >( 
-    typename itk::Image< PixelType, 3 >::Pointer( reader->GetOutput() ) );
+  this->data_block_ = Core::ITKDataBlock::New< DataType >( 
+    typename itk::Image< DataType, 3 >::Pointer( reader->GetOutput() ) );
 
-  image_data = typename Core::ITKImageDataT< PixelType >::Handle( 
-    new typename Core::ITKImageDataT< PixelType >( reader->GetOutput() ) );
+  this->image_data_ = typename Core::ITKImageDataT< DataType >::Handle( 
+    new typename Core::ITKImageDataT< DataType >( reader->GetOutput() ) );
 
-  if( image_data && data_block )
+  if( this->image_data_ && this->data_block_ )
   {
     return true;
   }
@@ -257,47 +218,32 @@ bool import_simple_volume( Core::ITKImageDataHandle& image_data,
   }
 }
 
-// Templated function for importing any simple itk importer type
-template< class PixelType, class ItkImporterType >
-bool import_simple_series( Core::ITKImageDataHandle& image_data, 
-  Core::DataBlockHandle& data_block, std::vector< std::string >& file_list )
+template< class ItkImporterType >
+bool ITKLayerImporterPrivate::import_simple_volume()
 {
-  const unsigned int dimension = 3;
-  typedef itk::Image< PixelType, dimension > ImageType;
-
-  typedef itk::ImageSeriesReader< ImageType > ReaderType;
-  typename ReaderType::Pointer reader = ReaderType::New();
-
-  typedef ItkImporterType ImageIOType;
-  typename ImageIOType::Pointer IO = ImageIOType::New();
-
-  reader->SetImageIO( IO );
-  reader->SetFileNames( file_list );
-
-  try
+  switch( this->data_type_ )
   {
-    reader->Update();
-  }
-  catch( ... )
-  {
-    return false;
-  }
-
-  data_block = Core::ITKDataBlock::New< PixelType >( 
-    typename itk::Image< PixelType, 3 >::Pointer( reader->GetOutput() ) );
-
-  image_data = typename Core::ITKImageDataT< PixelType >::Handle( 
-    new typename Core::ITKImageDataT< PixelType >( reader->GetOutput() ) );
-
-  if( image_data && data_block )
-  {
-    return true;
-  }
-  else
-  {
-    return false;
+    case Core::DataType::UCHAR_E:
+      return this->import_simple_typed_volume< unsigned char, ItkImporterType >();
+    case Core::DataType::CHAR_E:
+      return this->import_simple_typed_volume< signed char, ItkImporterType >();
+    case Core::DataType::USHORT_E:
+      return this->import_simple_typed_volume< unsigned short, ItkImporterType >();
+    case Core::DataType::SHORT_E:
+      return this->import_simple_typed_volume< signed short, ItkImporterType >();
+    case Core::DataType::UINT_E:
+      return this->import_simple_typed_volume< unsigned int, ItkImporterType >();
+    case Core::DataType::INT_E:
+      return this->import_simple_typed_volume< int, ItkImporterType >();
+    case Core::DataType::FLOAT_E:
+      return this->import_simple_typed_volume< float, ItkImporterType >();
+    case Core::DataType::DOUBLE_E:
+      return this->import_simple_typed_volume< double, ItkImporterType >();
+    default:
+      return false;   
   }
 }
+
 
 //////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////
@@ -305,49 +251,67 @@ bool import_simple_series( Core::ITKImageDataHandle& image_data,
 
 ITKLayerImporter::ITKLayerImporter( const std::string& filename ) :
   LayerImporter( filename ),
-  pixel_type_( Core::DataType::UCHAR_E )
+  private_( new ITKLayerImporterPrivate )
 {
+}
+
+bool ITKLayerImporter::set_file_list( const std::vector< std::string >& file_list )
+{
+  if ( file_list.size() )
+  {
+    std::string extension = boost::filesystem::path( file_list[ 0 ] ).extension();;
+    boost::to_lower( extension );
+
+    this->private_->file_name_ = file_list[ 0 ];
+    this->private_->extension_ = extension;
+    return true;
+  }
+  else
+  {
+    return false;
+  }
 }
 
 bool ITKLayerImporter::import_header()
 {
-  if( this->is_dicom() )
+  if ( this->private_->extension_ == ".tif" || this->private_->extension_ == ".tiff" 
+    || this->private_->extension_ == ".stk" )
   {
-    return this->scan_dicom();
+    return this->private_->scan_simple_volume< itk::TIFFImageIO >();
   }
-  else if( this->is_png() )
+
+  if( this->private_->extension_ == ".vtk"  )
   {
-    return scan_simple_series< itk::PNGImageIO >( this->get_filename(), this->pixel_type_ );
+    return this->private_->scan_simple_volume< itk::VTKImageIO >();
   }
-  else if( this->is_tiff() )
+
+  if( this->private_->extension_ == ".lsm"  )
   {
-    return scan_simple_series< itk::TIFFImageIO >( this->get_filename(), this->pixel_type_ );
+    return this->private_->scan_simple_volume< itk::LSMImageIO >();
   }
-  else if( this->is_jpeg() )
+
+  if( this->private_->extension_ == ".img" || this->private_->extension_ == ".hdr" )
   {
-    return scan_simple_series< itk::JPEGImageIO >( this->get_filename(), this->pixel_type_ );
-  }
-  else if( this->is_bmp() )
+    return this->private_->scan_simple_volume< itk::AnalyzeImageIO >();
+  } 
+
+  if( this->private_->extension_ == ".nii" )
   {
-    return scan_simple_series< itk::BMPImageIO >( this->get_filename(), this->pixel_type_ );
-  }
-  else if( this->is_vtk() )
-  {
-    return scan_simple_volume< itk::VTKImageIO >( this->get_filename(), this->pixel_type_ );
-  }
+    return this->private_->scan_simple_volume< itk::NiftiImageIO >();
+  } 
   
   return false; 
 }
 
 Core::GridTransform ITKLayerImporter::get_grid_transform()
 {
-  if( this->image_data_ ) return this->image_data_->get_grid_transform();
+  if( this->private_->image_data_ ) return this->private_->image_data_->get_grid_transform();
   return Core::GridTransform( 1, 1, 1 );
 }
 
 Core::DataType ITKLayerImporter::get_data_type()
 {
-  if( this->image_data_ ) return this->image_data_->get_data_type();
+  if( this->private_->image_data_ ) return this->private_->image_data_->get_data_type();
   return Core::DataType::UNKNOWN_E;
 }
 
@@ -355,342 +319,47 @@ int ITKLayerImporter::get_importer_modes()
 {
   return LayerImporterMode::DATA_E;
 }
-
-bool ITKLayerImporter::scan_dicom()
-{
-  typedef itk::ImageFileReader< itk::Image< signed short, 2 > > ReaderType;
-  ReaderType::Pointer reader = ReaderType::New();
-  typedef itk::GDCMImageIO ImageIOType;
-  ImageIOType::Pointer dicomIO = ImageIOType::New();
-
-  reader->SetImageIO( dicomIO );
-  reader->SetFileName( this->file_list_[ 0 ] );
-
-  try
-  {
-    reader->Update();
-  }
-  catch( ... )
-  {
-    return false;
-  }
-
-  typedef itk::MetaDataDictionary DictionaryType;
-  typedef itk::MetaDataObject< std::string > MetaDataStringType;
-  const DictionaryType & dictionary = dicomIO->GetMetaDataDictionary();
-
-  MetaDataStringType::Pointer bits_allocated_entry =
-    dynamic_cast<MetaDataStringType *>( dictionary.Find( "0028|0100")->second.GetPointer() ) ;
-
-  MetaDataStringType::Pointer bits_stored_entry =
-    dynamic_cast<MetaDataStringType *>( dictionary.Find( "0028|0101")->second.GetPointer() ) ;
-
-  MetaDataStringType::Pointer high_bit_entry =
-    dynamic_cast<MetaDataStringType *>( dictionary.Find( "0028|0102")->second.GetPointer() ) ;
-
-  if( bits_allocated_entry && bits_stored_entry && high_bit_entry )
-  {
-    this->bits_ = boost::lexical_cast< int >( bits_allocated_entry->GetMetaDataObjectValue() );
-    int bits_stored = boost::lexical_cast< int >( bits_stored_entry->GetMetaDataObjectValue() );
-    int high_bit = boost::lexical_cast< int >( high_bit_entry->GetMetaDataObjectValue() );
-
-    if( bits_stored > high_bit )
-    {
-      this->signed_data_ = true;
-    }
-    else
-    {
-      this->signed_data_ = false;
-    }
-
-    if( ( this->bits_ == 8 ) && ( this->signed_data_ == false ) )
-    {
-      this->pixel_type_ = Core::DataType::UCHAR_E;
-    }
-    if( ( this->bits_ == 8 ) && ( this->signed_data_ == true ) )
-    {
-      this->pixel_type_ = Core::DataType::CHAR_E;
-    }
-    if( ( this->bits_ == 16 ) && ( this->signed_data_ == false ) )
-    {
-      this->pixel_type_ = Core::DataType::USHORT_E;
-    }
-    if( ( this->bits_ == 16 ) && ( this->signed_data_ == true ) )
-    {
-      this->pixel_type_ = Core::DataType::SHORT_E;
-    }
-    if( ( this->bits_ == 32 ) && ( this->signed_data_ == false ) )
-    {
-      this->pixel_type_ = Core::DataType::UINT_E;
-    }
-    if( ( this->bits_ == 32 ) && ( this->signed_data_ == true ) )
-    {
-      this->pixel_type_ = Core::DataType::INT_E;
-    }
-  }
-  else
-  {
-    this->pixel_type_ = Core::DataType::FLOAT_E;
-  }
-  return true;
-}
   
 bool ITKLayerImporter::load_data( Core::DataBlockHandle& data_block, 
   Core::GridTransform& grid_trans )
 {
-  if( this->is_dicom() )
-  { 
-    switch( this->pixel_type_ )
-    {
-    case Core::DataType::UCHAR_E:
-      if( !import_dicom_series< unsigned char >( this->image_data_, 
-        this->data_block_, this->file_list_ ) ) return false;
-      break;
-    case Core::DataType::CHAR_E:
-      if( !import_dicom_series< signed char >( this->image_data_, 
-        this->data_block_, this->file_list_ ) ) return false;
-      break;
-    case Core::DataType::USHORT_E:
-      if( !import_dicom_series< unsigned short >( this->image_data_, 
-        this->data_block_, this->file_list_ ) ) return false;
-      break;
-    case Core::DataType::SHORT_E:
-      if( !import_dicom_series< signed short >( this->image_data_, 
-        this->data_block_, this->file_list_ ) ) return false;
-      break;
-    case Core::DataType::UINT_E:
-      if( !import_dicom_series< signed int >( this->image_data_, 
-        this->data_block_, this->file_list_ ) ) return false;
-      break;
-    case Core::DataType::INT_E:
-      if( !import_dicom_series< unsigned int >( this->image_data_, 
-        this->data_block_, this->file_list_ ) ) return false;
-      break;
-    default:
-      break;
-    }
-  }
-  else if( this->is_png() )
+  if( this->private_->extension_ == ".tif" || this->private_->extension_ == ".tiff" ||
+    this->private_->extension_ == ".stk" )
   {
-    switch( this->pixel_type_ )
-    {
-      case Core::DataType::UCHAR_E:
-        if( !import_simple_series< unsigned char, itk::PNGImageIO >( this->image_data_, 
-          this->data_block_, this->file_list_ ) ) return false;
-        break;
-      case Core::DataType::CHAR_E:
-        if( !import_simple_series< signed char, itk::PNGImageIO >( this->image_data_, 
-          this->data_block_, this->file_list_ ) ) return false;
-        break;
-      case Core::DataType::USHORT_E:
-        if( !import_simple_series< unsigned short, itk::PNGImageIO >( this->image_data_, 
-          this->data_block_, this->file_list_ ) ) return false;
-        break;
-      case Core::DataType::SHORT_E:
-        if( !import_simple_series< signed short, itk::PNGImageIO >( this->image_data_, 
-          this->data_block_, this->file_list_ ) ) return false;
-        break;
-      case Core::DataType::UINT_E:
-        if( !import_simple_series< signed int, itk::PNGImageIO >( this->image_data_, 
-          this->data_block_, this->file_list_ ) ) return false;
-        break;
-      case Core::DataType::INT_E:
-        if( !import_simple_series< unsigned int, itk::PNGImageIO >( this->image_data_, 
-          this->data_block_, this->file_list_ ) ) return false;
-        break;
-      case Core::DataType::FLOAT_E:
-        if( !import_simple_series< float, itk::PNGImageIO >( this->image_data_, 
-          this->data_block_, this->file_list_ ) ) return false;
-        break;
-      case Core::DataType::DOUBLE_E:
-        if( !import_simple_series< double, itk::PNGImageIO >( this->image_data_, 
-          this->data_block_, this->file_list_ ) ) return false;
-        break;
-      default:
-        break;    
-    }
+    this->private_->import_simple_volume<itk::TIFFImageIO >();
   }
-  else if( this->is_tiff() )
+  else if( this->private_->extension_ == ".vtk"  )
   {
-    switch( this->pixel_type_ )
-    {
-      case Core::DataType::UCHAR_E:
-        if( !import_simple_series< unsigned char, itk::TIFFImageIO >( this->image_data_, 
-          this->data_block_, this->file_list_ ) ) return false;
-        break;
-      case Core::DataType::CHAR_E:
-        if( !import_simple_series< signed char, itk::TIFFImageIO >( this->image_data_, 
-          this->data_block_, this->file_list_ ) ) return false;
-        break;
-      case Core::DataType::USHORT_E:
-        if( !import_simple_series< unsigned short, itk::TIFFImageIO >( this->image_data_, 
-          this->data_block_, this->file_list_ ) ) return false;
-        break;
-      case Core::DataType::SHORT_E:
-        if( !import_simple_series< signed short, itk::TIFFImageIO >( this->image_data_, 
-          this->data_block_, this->file_list_ ) ) return false;
-        break;
-      case Core::DataType::UINT_E:
-        if( !import_simple_series< signed int, itk::TIFFImageIO >( this->image_data_, 
-          this->data_block_, this->file_list_ ) ) return false;
-        break;
-      case Core::DataType::INT_E:
-        if( !import_simple_series< unsigned int, itk::TIFFImageIO >( this->image_data_, 
-          this->data_block_, this->file_list_ ) ) return false;
-        break;
-      case Core::DataType::FLOAT_E:
-        if( !import_simple_series< float, itk::TIFFImageIO >( this->image_data_, 
-          this->data_block_, this->file_list_ ) ) return false;
-        break;
-      case Core::DataType::DOUBLE_E:
-        if( !import_simple_series< double, itk::TIFFImageIO >( this->image_data_, 
-          this->data_block_, this->file_list_ ) ) return false;
-        break;
-      default:
-        break;
-    }
-  }
-  else if( this->is_jpeg() )
-  { 
-    switch( this->pixel_type_ )
-    {
-      case Core::DataType::UCHAR_E:
-        if( !import_simple_series< unsigned char, itk::JPEGImageIO >( this->image_data_, 
-          this->data_block_, this->file_list_ ) ) return false;
-        break;
-      case Core::DataType::CHAR_E:
-        if( !import_simple_series< signed char, itk::JPEGImageIO >( this->image_data_, 
-          this->data_block_, this->file_list_ ) ) return false;
-        break;
-      case Core::DataType::USHORT_E:
-        if( !import_simple_series< unsigned short, itk::JPEGImageIO >( this->image_data_, 
-          this->data_block_, this->file_list_ ) ) return false;
-        break;
-      case Core::DataType::SHORT_E:
-        if( !import_simple_series< signed short, itk::JPEGImageIO >( this->image_data_, 
-          this->data_block_, this->file_list_ ) ) return false;
-        break;
-      case Core::DataType::UINT_E:
-        if( !import_simple_series< signed int, itk::JPEGImageIO >( this->image_data_, 
-          this->data_block_, this->file_list_ ) ) return false;
-        break;
-      case Core::DataType::INT_E:
-        if( !import_simple_series< unsigned int, itk::JPEGImageIO >( this->image_data_, 
-          this->data_block_, this->file_list_ ) ) return false;
-        break;
-      case Core::DataType::FLOAT_E:
-        if( !import_simple_series< float, itk::JPEGImageIO >( this->image_data_, 
-          this->data_block_, this->file_list_ ) ) return false;
-        break;
-      case Core::DataType::DOUBLE_E:
-        if( !import_simple_series< double, itk::JPEGImageIO >( this->image_data_, 
-          this->data_block_, this->file_list_ ) ) return false;
-        break;
-      default:
-        break;  
-    }
-  }
-  else if( this->is_bmp() )
+    this->private_->import_simple_volume<itk::VTKImageIO >();
+  } 
+  else if( this->private_->extension_ == ".lsm"  )  
   {
-    switch( this->pixel_type_ )
-    {
-      case Core::DataType::UCHAR_E:
-        if( !import_simple_series< unsigned char, itk::BMPImageIO >( this->image_data_, 
-          this->data_block_, this->file_list_ ) ) return false;
-        break;
-      case Core::DataType::CHAR_E:
-        if( !import_simple_series< signed char, itk::BMPImageIO >( this->image_data_, 
-          this->data_block_, this->file_list_ ) ) return false;
-        break;
-      case Core::DataType::USHORT_E:
-        if( !import_simple_series< unsigned short, itk::BMPImageIO >( this->image_data_, 
-          this->data_block_, this->file_list_ ) ) return false;
-        break;
-      case Core::DataType::SHORT_E:
-        if( !import_simple_series< signed short, itk::BMPImageIO >( this->image_data_, 
-          this->data_block_, this->file_list_ ) ) return false;
-        break;
-      case Core::DataType::UINT_E:
-        if( !import_simple_series< signed int, itk::BMPImageIO >( this->image_data_, 
-          this->data_block_, this->file_list_ ) ) return false;
-        break;
-      case Core::DataType::INT_E:
-        if( !import_simple_series< unsigned int, itk::BMPImageIO >( this->image_data_, 
-          this->data_block_, this->file_list_ ) ) return false;
-        break;
-      case Core::DataType::FLOAT_E:
-        if( !import_simple_series< float, itk::BMPImageIO >( this->image_data_, 
-          this->data_block_, this->file_list_ ) ) return false;
-        break;
-      case Core::DataType::DOUBLE_E:
-        if( !import_simple_series< double, itk::BMPImageIO >( this->image_data_, 
-          this->data_block_, this->file_list_ ) ) return false;
-        break;
-      default:
-        break;
-    }
-  }
-  
-  else if( this->is_vtk() )
+    this->private_->import_simple_volume<itk::LSMImageIO >();
+  } 
+  else if( this->private_->extension_ == ".img"  || this->private_->extension_ == ".hdr" )  
   {
-    switch( this->pixel_type_ )
-    {
-    case Core::DataType::UCHAR_E:
-      if( !import_simple_volume< unsigned char, itk::VTKImageIO >( this->image_data_, 
-        this->data_block_, this->get_filename() ) ) return false;
-      break;
-    case Core::DataType::CHAR_E:
-      if( !import_simple_volume< signed char, itk::VTKImageIO >( this->image_data_, 
-        this->data_block_, this->get_filename() ) ) return false;
-      break;
-    case Core::DataType::USHORT_E:
-      if( !import_simple_volume< unsigned short, itk::VTKImageIO >( this->image_data_, 
-        this->data_block_, this->get_filename() ) ) return false;
-      break;
-    case Core::DataType::SHORT_E:
-      if( !import_simple_volume< signed short, itk::VTKImageIO >( this->image_data_, 
-        this->data_block_, this->get_filename() ) ) return false;
-      break;
-    case Core::DataType::UINT_E:
-      if( !import_simple_volume< signed int, itk::VTKImageIO >( this->image_data_, 
-        this->data_block_, this->get_filename() ) ) return false;
-      break;
-    case Core::DataType::INT_E:
-      if( !import_simple_volume< unsigned int, itk::VTKImageIO >( this->image_data_, 
-        this->data_block_, this->get_filename() ) ) return false;
-      break;
-    case Core::DataType::FLOAT_E:
-      if( !import_simple_volume< float, itk::VTKImageIO >( this->image_data_, 
-        this->data_block_, this->get_filename() ) ) return false;
-      break;
-    case Core::DataType::DOUBLE_E:
-      if( !import_simple_volume< double, itk::VTKImageIO >( this->image_data_, 
-        this->data_block_, this->get_filename() ) ) return false;
-      break;
-    default:
-      break;
-    }
-  }
+    this->private_->import_simple_volume<itk::AnalyzeImageIO >();
+  } 
+  else if( this->private_->extension_ == ".nii" ) 
+  {
+    this->private_->import_simple_volume<itk::NiftiImageIO >();
+  } 
   else
   {
     return false;
   }
 
-  if( ( !this->data_block_ ) || ( !this->image_data_ ) ) return false;
+  if( ( !this->private_->data_block_ ) || ( !this->private_->image_data_ ) ) return false;
 
-  data_block = this->data_block_;
-  grid_trans = this->image_data_->get_grid_transform();
+  data_block = this->private_->data_block_;
+  grid_trans = this->private_->image_data_->get_grid_transform();
 
   return true;
 }
-  
 
 std::string ITKLayerImporter::get_layer_name()
 {
   return boost::filesystem::path( this->get_filename() ).parent_path().filename();
 }
-
-
-
 
 } // end namespace seg3D

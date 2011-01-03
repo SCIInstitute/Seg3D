@@ -90,10 +90,8 @@ class LayerImporterInfo
   // -- constructor/destructor --
 public:
   LayerImporterInfo( LayerImporterBuilderBaseHandle builder,
-    const std::string name, 
-    const std::string file_type_string,
-    const unsigned int priority,
-    const unsigned int series_flag );
+    std::string name, std::string file_type_string,
+    int priority, LayerImporterType type );
   
   ~LayerImporterInfo();
 
@@ -115,11 +113,11 @@ public:
   
   // PRIORITY:
   // Get the priority of the importer
-  unsigned int priority() const;
+  int priority() const;
   
-  // SERIES_FLAG:
-  // Get the series flag of the importer
-  unsigned int series_flag() const;
+  // IMPORTER_TYPE:
+  // Whether the importer is for a series of files or for a single file
+  LayerImporterType type() const;
 
 private:
   // Object that knows how to build the importer
@@ -138,10 +136,10 @@ private:
   bool any_type_;
   
   // The priority of the importer
-  unsigned int priority_;
+  int priority_;
   
-  // The the series flag for the importer ( 0 - not a series importer, 1 - a series importer, 2 - both )
-  unsigned int series_flag_;
+  // The type of the importer
+  LayerImporterType importer_type_;
 };
 
 } // end namespace seg3D

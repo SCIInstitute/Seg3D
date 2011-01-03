@@ -33,11 +33,6 @@
 # pragma once
 #endif 
 
-// ITK includes
-#include "itkRGBPixel.h"
-#include "itkTIFFImageIO.h"
-#include "itkVTKImageIO.h"
-
 // Boost includes 
 #include <boost/filesystem.hpp>
 
@@ -51,16 +46,21 @@
 namespace Seg3D
 {
 
+class ITKLayerImporter;
+class ITKLayerImporterPrivate;
+typedef boost::shared_ptr<ITKLayerImporterPrivate> ITKLayerImporterPrivateHandle;
+
+
 class ITKLayerImporter : public LayerImporter
 {
   // The ITKLayerImporter is capable of importing DICOMS, tiffs, and pngs.  It assumes that
   // when a file name does not include an extension that it is a DICOM
-  SCI_IMPORTER_TYPE( "ITK Importer",  ".dcm;.DCM;.dicom;.DICOM;"
-                    ".tiff;.tif;.TIFF;.TIF;"
-                    ".png;.PNG;"
-                    ".jpg;.jpeg;.JPG;.JPEG;"
-                    ".bmp;.BMP;"
-                    ".vtk;.VTK", 5, 2 )
+  
+  SCI_IMPORTER_TYPE( "ITK Importer",  ".lsm;.LSM;"
+                    ".tiff;.tif;.TIFF;.TIF;.stk;.STK;"
+                    ".nii;.img;.hdr;"
+                    ".vtk;.VTK", 5, 
+                    LayerImporterType::SINGLE_FILE_E )
 
   // -- Constructor/Destructor --
 public:
@@ -99,32 +99,12 @@ public:
   // SET_FILE_LIST:
   // we need a list of files to import, this function provides the list, the list must be set 
   // before import_layer is called.
-  virtual bool set_file_list( const std::vector< std::string >& file_list )
-  {
-    this->file_list_ = file_list;
-    this->set_extension();
-    return true;
-  }
+  virtual bool set_file_list( const std::vector< std::string >& file_list );
   
+  // -- internals of the class --
 private:
-  // SCAN_DICOM:
-  // this function is called by import_header to scan a single dicom and determine what kind of 
-  // data type to use for the import
-  bool scan_dicom();
+  ITKLayerImporterPrivateHandle private_;
 
-
-  // SET_EXTENSION:
-  // we need to know which type of file we are dealing with, this function provides that ability,
-  // the extension must be set before import_layer is called.
-  void set_extension()
-  {
-    this->extension_ = boost::filesystem::path( this->file_list_[ 0 ] ).extension();
-    
-    // now we force it to be lower case, just to be safe.
-    boost::to_lower( this->extension_ );
-  }
-  
-  
 protected:
   // LOAD_DATA:
   // Load the data from the file(s).
@@ -135,50 +115,6 @@ protected:
   // GET_LAYER_NAME:
   // Return the string that will be used to name the layers.
   virtual std::string get_layer_name();
-
-private:
-  bool is_dicom() const
-  {
-    return ( ( this->extension_ == ".dcm" ) || ( this->extension_ == ".dicom" ) ||
-      ( this->extension_ == ".DCM" ) || ( this->extension_ == ".DICOM" ) || 
-      ( this->extension_ == "" ) );
-  }
-
-  bool is_png() const
-  {
-    return ( ( this->extension_ == ".png" ) || ( this->extension_ == ".PNG" ) );
-  }
-  
-  bool is_bmp() const
-  {
-    return ( ( this->extension_ == ".bmp" ) || ( this->extension_ == ".BMP" ) );
-  }
-  
-  bool is_vtk() const
-  {
-    return ( ( this->extension_ == ".vtk" ) || ( this->extension_ == ".VTK" ) );
-  }
-
-  bool is_tiff() const
-  {
-    return ( ( this->extension_ == ".tif" ) || ( this->extension_ == ".tiff" ) ||
-      ( this->extension_ == ".TIF" ) || ( this->extension_ == ".TIFF" ) );
-  }
-  
-  bool is_jpeg() const
-  {
-    return ( ( this->extension_ == ".jpg" ) || ( this->extension_ == ".JPG" ) ||
-      ( this->extension_ == ".jpeg" ) || ( this->extension_ == ".JPEG" ) );
-  }
-
-
-  Core::ITKImageDataHandle        image_data_;
-  Core::DataBlockHandle         data_block_;
-  std::vector< std::string >        file_list_;
-  size_t                  bits_;
-  bool                  signed_data_;
-  Core::DataType              pixel_type_;
-  std::string               extension_;
 };
 
 } // end namespace seg3D

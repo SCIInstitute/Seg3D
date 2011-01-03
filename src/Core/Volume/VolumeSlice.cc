@@ -92,7 +92,7 @@ public:
 
   size_t to_index( size_t x, size_t y, size_t z )
   {
-    assert( x < this->grid_nx_ && y < this->grid_ny_ && z < this->grid_nz_ );
+//    assert( x < this->grid_nx_ && y < this->grid_ny_ && z < this->grid_nz_ );
     return z * this->grid_ny_ * this->grid_nx_ + y * this->grid_nx_ + x;
   }
 
