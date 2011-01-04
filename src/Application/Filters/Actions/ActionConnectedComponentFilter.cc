@@ -176,7 +176,7 @@ public:
       }
       else
       {
-        this->report_error("Could not allocate enough memory.");
+        this->report_error( "ITK filter failed to complete." );
         return;
       }
     }
@@ -228,7 +228,7 @@ public:
           this->report_error( "Filter was aborted." );
           return;
         }
-        this->report_error("Could not allocate enough memory.");
+        this->report_error( "ITK filter failed to complete." );
         return;
       }
     

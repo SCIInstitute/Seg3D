@@ -161,7 +161,7 @@ public:
         return;
       }
 
-      this->report_error( "Internal error." );
+      this->report_error( "ITK filter failed to complete." );
       return;
     }
 

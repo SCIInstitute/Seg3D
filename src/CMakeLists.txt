@@ -113,6 +113,8 @@ ADD_DEFINITIONS(-DQT_NO_KEYWORDS)
 ADD_DEFINITIONS(-DTIXML_USE_STL)
   
 SET(ITK_BUILD_SHARED_LIBS "STATIC")
+SET(ITK_USE_REVIEW TRUE CACHE BOOLEAN "Seg3D requires the ITK Review directory for proper filter operations." FORCE)
+SET(ITK_USE_REVIEW_STATISTICS TRUE CACHE BOOLEAN "Seg3D requires the ITK Review directory for proper filter operations." FORCE)
 
 ###########################################
 # Flags for Microsoft Compiler

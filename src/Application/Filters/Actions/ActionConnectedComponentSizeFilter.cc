@@ -123,7 +123,7 @@ public:
     } 
     catch ( ... ) 
     {
-      this->report_error( "Internal error in filter." );
+      this->report_error( "ITK filter failed to complete." );
       return;
     }
 
@@ -148,7 +148,7 @@ public:
     }
     catch( ... )
     {
-      this->report_error("Could not allocate enough memory.");
+      this->report_error( "Could not allocate enough memory." );
       return;   
     }
     

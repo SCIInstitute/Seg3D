@@ -137,7 +137,7 @@ public:
         this->report_error( "Filter was aborted." );
         return;
       }
-      this->report_error( "Encountered an internal error." );
+      this->report_error( "ITK filter failed to complete." );
       return;   
     }
 

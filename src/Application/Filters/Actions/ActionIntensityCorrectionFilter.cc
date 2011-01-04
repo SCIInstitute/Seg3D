@@ -152,7 +152,7 @@ public:
         this->report_error( "Filter was aborted." );
         return;
       }
-      this->report_error( "Internal error." );
+      this->report_error( "ITK filter failed to complete." );
       return; 
     }
 
@@ -204,7 +204,7 @@ public:
         this->report_error( "Filter was aborted." );
         return;
       }
-      this->report_error( "Internal error." );
+      this->report_error( "ITK filter failed to complete." );
       return; 
     }
 
@@ -259,7 +259,7 @@ public:
         this->report_error( "Filter was aborted." );
         return;
       }
-      this->report_error( "Internal error." );
+      this->report_error( "ITK filter failed to complete." );
       return;       
     }
 
