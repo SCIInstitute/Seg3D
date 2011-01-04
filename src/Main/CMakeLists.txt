@@ -202,7 +202,7 @@ ELSE(APPLE)
     DESTINATION lib )
 
   INSTALL(FILES 
-    ${CMAKE_SOURCE_DIR}\ReleaseNotes.txt 
+    ${CMAKE_SOURCE_DIR}/ReleaseNotes.txt 
     DESTINATION bin )
     
   ENDIF(WIN32)
