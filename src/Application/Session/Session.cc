@@ -63,7 +63,7 @@ bool Session::load( boost::filesystem::path path, const std::string& session_nam
 bool Session::save( boost::filesystem::path path, const std::string& session_name )
 {
   Core::StateIO state_io;
-  state_io.initialize( "Seg3D2" );
+  state_io.initialize();
   path = path / "sessions";
   if ( Core::StateEngine::Instance()->save_states( state_io ) )
   {

@@ -107,7 +107,7 @@ ProjectManager::~ProjectManager()
 void ProjectManager::save_projectmanager_state()
 {
   Core::StateIO stateio;
-  stateio.initialize( "Seg3D2" );
+  stateio.initialize();
   this->save_states( stateio );
   stateio.export_to_file( this->local_projectmanager_path_ / "projectmanager.xml" );
 }
@@ -554,7 +554,7 @@ bool ProjectManager::save_project_only( const std::string& project_path_string, 
   project_path = project_path / project_name / ( project_name + ".s3d" );
 
   Core::StateIO stateio;
-  stateio.initialize( "Seg3D2" );
+  stateio.initialize();
   this->current_project_->save_states( stateio );
   stateio.export_to_file( project_path );
   

@@ -497,25 +497,25 @@ std::string ExportToString( const std::string& value )
 
 std::string ExportToString( const std::vector< char >& value )
 {
-  std::string result( 1, '[' );
+  std::string result( "[ " );
   for ( size_t j = 0; j < value.size(); j++ )
     result += ToString( value[ j ] ) + ' ';
   result[ result.size() - 1 ] = ']';
   return result;
 }
   
-  std::string ExportToString( const std::vector< std::string >& value )
-  {
-    std::string result( 1, '[' );
-    for ( size_t j = 0; j < value.size(); j++ )
-      result += ExportToString(value[ j ]) + ' ';
-    result[ result.size() - 1 ] = ']';
-    return result;
-  } 
+std::string ExportToString( const std::vector< std::string >& value )
+{
+  std::string result( "[ " );
+  for ( size_t j = 0; j < value.size(); j++ )
+    result += ExportToString(value[ j ]) + ' ';
+  result[ result.size() - 1 ] = ']';
+  return result;
+}
 
 std::string ExportToString(const std::vector< unsigned char >& value)
 {
-  std::string result(1,'[');
+  std::string result( "[ " );
   for (size_t j=0;j<value.size();j++) result += ToString(value[j])+' ';
   result[result.size()-1] = ']';
   return result;
@@ -523,7 +523,7 @@ std::string ExportToString(const std::vector< unsigned char >& value)
 
 std::string ExportToString( const std::vector< short >& value )
 {
-  std::string result( 1, '[' );
+  std::string result( "[ " );
   for ( size_t j = 0; j < value.size(); j++ )
     result += ToString( value[ j ] ) + ' ';
   result[ result.size() - 1 ] = ']';
@@ -532,7 +532,7 @@ std::string ExportToString( const std::vector< short >& value )
 
 std::string ExportToString( const std::vector< unsigned short >& value )
 {
-  std::string result(1,'[');
+  std::string result( "[ " );
   for (size_t j=0;j<value.size();j++) result += ToString(value[j])+' ';
   result[result.size()-1] = ']';
   return result;
@@ -540,7 +540,7 @@ std::string ExportToString( const std::vector< unsigned short >& value )
 
 std::string ExportToString( const std::vector< int >& value )
 {
-  std::string result( 1, '[' );
+  std::string result( "[ " );
   for ( size_t j = 0; j < value.size(); j++ )
     result += ToString( value[ j ] ) + ' ';
   result[ result.size() - 1 ] = ']';
@@ -549,7 +549,7 @@ std::string ExportToString( const std::vector< int >& value )
 
 std::string ExportToString( const std::vector< unsigned int >& value)
 {
-  std::string result(1,'[');
+  std::string result( "[ " );
   for (size_t j=0;j<value.size();j++) result += ToString(value[j])+' ';
   result[result.size()-1] = ']';
   return result;
@@ -557,7 +557,7 @@ std::string ExportToString( const std::vector< unsigned int >& value)
 
 std::string ExportToString( const std::vector< long >& value )
 {
-  std::string result(1,'[');
+  std::string result( "[ " );
   for (size_t j=0;j<value.size();j++) result += ToString(value[j])+' ';
   result[result.size()-1] = ']';
   return result;
@@ -565,7 +565,7 @@ std::string ExportToString( const std::vector< long >& value )
 
 std::string ExportToString( const std::vector< unsigned long >& value )
 {
-  std::string result(1,'[');
+  std::string result( "[ " );
   for (size_t j=0;j<value.size();j++) result += ToString(value[j])+' ';
   result[result.size()-1] = ']';
   return result;
@@ -573,7 +573,7 @@ std::string ExportToString( const std::vector< unsigned long >& value )
 
 std::string ExportToString( const std::vector< long long >& value )
 {
-  std::string result(1,'[');
+  std::string result( "[ " );
   for (size_t j=0;j<value.size();j++) result += ToString(value[j])+' ';
   result[result.size()-1] = ']';
   return result;
@@ -581,7 +581,7 @@ std::string ExportToString( const std::vector< long long >& value )
 
 std::string ExportToString( const std::vector< unsigned long long >& value )
 {
-  std::string result(1,'[');
+  std::string result( "[ " );
   for (size_t j=0;j<value.size();j++) result += ToString(value[j])+' ';
   result[result.size()-1] = ']';
   return result;
@@ -589,7 +589,7 @@ std::string ExportToString( const std::vector< unsigned long long >& value )
 
 std::string ExportToString( const std::vector< float >& value )
 {
-  std::string result( 1, '[' );
+  std::string result( "[ " );
   for ( size_t j = 0; j < value.size(); j++ )
     result += ToString( value[ j ] ) + ' ';
   result[ result.size() - 1 ] = ']';
@@ -598,7 +598,7 @@ std::string ExportToString( const std::vector< float >& value )
 
 std::string ExportToString( const std::vector< double >& value )
 {
-  std::string result( 1, '[' );
+  std::string result( "[ " );
   for ( size_t j = 0; j < value.size(); j++ )
     result += ToString( value[ j ] ) + ' ';
   result[ result.size() - 1 ] = ']';
@@ -607,7 +607,7 @@ std::string ExportToString( const std::vector< double >& value )
 
 std::string ExportToString( const std::vector< float >& value, int precision )
 {
-  std::string result( 1, '[' );
+  std::string result( "[ " );
   for ( size_t j = 0; j < value.size(); j++ )
     result += ToString( value[ j ], precision ) + ' ';
   result[ result.size() - 1 ] = ']';
@@ -616,7 +616,7 @@ std::string ExportToString( const std::vector< float >& value, int precision )
 
 std::string ExportToString( const std::vector< double >& value, int precision )
 {
-  std::string result( 1, '[' );
+  std::string result( "[ " );
   for ( size_t j = 0; j < value.size(); j++ )
     result += ToString( value[ j ], precision ) + ' ';
   result[ result.size() - 1 ] = ']';
@@ -625,7 +625,7 @@ std::string ExportToString( const std::vector< double >& value, int precision )
 
 std::string ExportToString( const std::set< int >& value )
 {
-  std::string result( 1, '[' );
+  std::string result( "[ " );
   std::set< int >::const_iterator it = value.begin();
   while ( it != value.end() )
   {

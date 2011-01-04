@@ -30,6 +30,7 @@
 // Core includes
 #include <Core/State/StateIO.h>
 #include <Core/Utils/StringUtil.h>
+#include <Core/Application/Application.h>
 
 namespace Core
 {
@@ -38,6 +39,9 @@ class StateIOPrivate
 {
 public:
   TiXmlDocument xml_doc_;
+  int major_version_;
+  int minor_version_;
+  int patch_version_;
 
   mutable TiXmlElement* current_element_;
   mutable std::stack< TiXmlElement* > current_element_stack_;
@@ -47,6 +51,9 @@ StateIO::StateIO() :
   private_( new StateIOPrivate )
 {
   this->private_->current_element_ = 0;
+  this->private_->major_version_ = 0;
+  this->private_->minor_version_ = 0;
+  this->private_->patch_version_ = 0;
 }
 
 StateIO::~StateIO()
@@ -70,6 +77,19 @@ bool StateIO::import_from_file( const boost::filesystem::path& path )
   {
     return false;
   }
+
+  const std::string& name = this->private_->current_element_->ValueStr();
+  if ( name != "Seg3D" && name != "Seg3D2" )
+  {
+    return false;
+  }
+
+  this->private_->current_element_->QueryIntAttribute( "major_version", 
+    &this->private_->major_version_ );
+  this->private_->current_element_->QueryIntAttribute( "minor_version", 
+    &this->private_->minor_version_ );
+  this->private_->current_element_->QueryIntAttribute( "patch_version", 
+    &this->private_->patch_version_ );
   
   return true;
 }
@@ -78,7 +98,13 @@ void StateIO::initialize( const std::string& root_name )
 {
   this->private_->xml_doc_.LinkEndChild( new TiXmlDeclaration( "1.0", "", "" ) );  
 
-  this->private_->current_element_ = new TiXmlElement( root_name );  
+  this->private_->current_element_ = new TiXmlElement( root_name );
+  this->private_->current_element_->SetAttribute( "major_version", 
+    Core::Application::GetMajorVersion() );
+  this->private_->current_element_->SetAttribute( "minor_version", 
+    Core::Application::GetMinorVersion() );
+  this->private_->current_element_->SetAttribute( "patch_version", 
+    Core::Application::GetPatchVersion() );
   this->private_->xml_doc_.LinkEndChild( this->private_->current_element_ );  
 }
 
@@ -110,6 +136,21 @@ void StateIO::pop_current_element() const
     this->private_->current_element_ = this->private_->current_element_stack_.top();
     this->private_->current_element_stack_.pop();
   }
+}
+
+int StateIO::get_major_version() const
+{
+  return this->private_->major_version_;
+}
+
+int StateIO::get_minor_version() const
+{
+  return this->private_->minor_version_;
+}
+
+int StateIO::get_patch_version() const
+{
+  return this->private_->patch_version_;
 }
 
 } // end namespace Core

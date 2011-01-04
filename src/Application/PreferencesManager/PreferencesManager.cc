@@ -126,7 +126,7 @@ void PreferencesManager::initialize()
 void PreferencesManager::save_state()
 {
   Core::StateIO state_io;
-  state_io.initialize( "Seg3D2" );
+  state_io.initialize();
   this->save_states( state_io );
   state_io.export_to_file( this->private_->local_config_path_ / "preferences.xml" );
 }

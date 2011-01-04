@@ -53,7 +53,7 @@ public:
 
 public:
 
-  void initialize( const std::string& root_name );
+  void initialize( const std::string& root_name = "Seg3D2" );
 
   const TiXmlElement* get_current_element() const;
   TiXmlElement* get_current_element();
@@ -64,6 +64,10 @@ public:
   void push_current_element() const;
   void pop_current_element() const;
   void set_current_element( const TiXmlElement* element ) const;
+
+  int get_major_version() const;
+  int get_minor_version() const;
+  int get_patch_version() const;
 
 private:
   StateIOPrivateHandle private_;
