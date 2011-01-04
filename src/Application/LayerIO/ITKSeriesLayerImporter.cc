@@ -63,7 +63,8 @@ class ITKSeriesLayerImporterPrivate
 
 public:
   ITKSeriesLayerImporterPrivate() :
-    data_type_( Core::DataType::UCHAR_E )
+    data_type_( Core::DataType::UCHAR_E ),
+    read_header_( false )
   {
   }
 
@@ -112,6 +113,8 @@ public:
 
   Core::ITKImageDataHandle image_data_;
   Core::DataBlockHandle data_block_;
+  
+  bool read_header_;
 };
 
 bool ITKSeriesLayerImporterPrivate::set_data_type( std::string& type )
@@ -247,6 +250,7 @@ bool ITKSeriesLayerImporterPrivate::scan_dicom()
     this->data_type_ = Core::DataType::FLOAT_E;
   }
   
+  this->read_header_ = true;
   return true;
 }
 
@@ -347,7 +351,10 @@ bool ITKSeriesLayerImporterPrivate::scan_simple_series()
   }
 
   std::string type_string = IO->GetComponentTypeAsString( IO->GetComponentType() );
-  return this->set_data_type( type_string );
+  if ( ! this->set_data_type( type_string ) ) return false;
+  
+  this->read_header_ = true;
+  return true;
 }
 
 
@@ -444,6 +451,8 @@ bool ITKSeriesLayerImporter::set_file_list( const std::vector< std::string >& fi
 
 bool ITKSeriesLayerImporter::import_header()
 {
+  if ( this->private_->read_header_ ) return true;
+
   if ( this->private_->extension_ == ".dcm" || 
     this->private_->extension_ == ".dicom" ||
     this->private_->extension_ == "" )

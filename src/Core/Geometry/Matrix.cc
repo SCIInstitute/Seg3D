@@ -185,7 +185,7 @@ bool Matrix::Invert( const Matrix& mat, Matrix& inverse_mat )
   double det = A( 1, 1 ) * A( 2, 2 ) * A( 3, 3 ) /  A( 0, 0 );
   if ( Abs( det ) < 1e-7 )
   {
-    return false;
+//    return false;
   }
 
   try
@@ -373,7 +373,7 @@ bool MatrixF::Invert( const MatrixF& mat, MatrixF& inverse_mat )
   float det = A( 1, 1 ) * A( 2, 2 ) * A( 3, 3 ) /  A( 0, 0 );
   if ( Abs( det ) < 1e-7f )
   {
-    return false;
+//    return false;
   }
 
   boost::numeric::ublas::lu_substitute( A, pm, inverse );

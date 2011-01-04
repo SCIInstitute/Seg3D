@@ -40,6 +40,10 @@
 namespace Seg3D
 {
 
+class MatlabLayerImporter;
+class MatlabLayerImporterPrivate;
+typedef boost::shared_ptr<MatlabLayerImporterPrivate> MatlabLayerImporterPrivateHandle;
+
 class MatlabLayerImporter : public LayerImporter
 {
   SCI_IMPORTER_TYPE( "Matlab Importer", 
@@ -49,15 +53,10 @@ class MatlabLayerImporter : public LayerImporter
   // -- Constructor/Destructor --
 public:
   // Construct a new layer file importer
-  MatlabLayerImporter(const std::string& filename) :
-    LayerImporter(filename)
-  {
-  }
-
+  MatlabLayerImporter( const std::string& filename );
+  
   // Virtual destructor for memory management of derived classes
-  virtual ~MatlabLayerImporter()
-  {
-  }
+  virtual ~MatlabLayerImporter();
 
   // -- Import a file information --
 public:
@@ -86,6 +85,9 @@ protected:
   // NOTE: This function is called by import_layer internally.
   virtual bool load_data( Core::DataBlockHandle& data_block, 
     Core::GridTransform& grid_trans );
+
+private:
+  MatlabLayerImporterPrivateHandle private_;
 
 };
 

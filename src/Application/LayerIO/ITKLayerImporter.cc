@@ -65,7 +65,8 @@ class ITKLayerImporterPrivate
 
 public:
   ITKLayerImporterPrivate() :
-    data_type_( Core::DataType::UCHAR_E )
+    data_type_( Core::DataType::UCHAR_E ),
+    read_header_( false )
   {
   }
 
@@ -99,8 +100,13 @@ public:
   // The file name of the file we are reading
   std::string file_name_;
 
+  // The data that was read from the file
   Core::ITKImageDataHandle image_data_;
   Core::DataBlockHandle data_block_;
+  
+  // Whether the header was read
+  bool read_header_;
+  
 };
 
 bool ITKLayerImporterPrivate::set_data_type( std::string& type )
@@ -178,7 +184,10 @@ bool ITKLayerImporterPrivate::scan_simple_volume()
   }
 
   std::string type_string = IO->GetComponentTypeAsString( IO->GetComponentType() );
-  return this->set_data_type( type_string );
+  if ( ! this->set_data_type( type_string ) ) return false;
+  
+  this->read_header_ = true;
+  return true;
 }
 
 template< class DataType, class ItkImporterType >
@@ -274,6 +283,8 @@ bool ITKLayerImporter::set_file_list( const std::vector< std::string >& file_lis
 
 bool ITKLayerImporter::import_header()
 {
+  if ( this->private_->read_header_ ) return true;
+
   if ( this->private_->extension_ == ".tif" || this->private_->extension_ == ".tiff" 
     || this->private_->extension_ == ".stk" )
   {

@@ -85,7 +85,8 @@ TARGET_LINK_LIBRARIES(Application_LayerIO
           Application_InterfaceManager
           Application_Layer
           ${SCI_BOOST_LIBRARY}
-          ${SCI_GDCM_LIBRARY})
+          ${SCI_GDCM_LIBRARY}
+          ${SCI_MATLABIO_LIBRARY})
 
 # Register actions and importers
 REGISTER_LIBRARY_AND_CLASSES(Application_LayerIO 
