@@ -46,7 +46,7 @@ CORE_ACTION(
   CORE_ACTION_ARGUMENT( "layers", "A '|' delimited list of layers that are to be exported." )
   CORE_ACTION_ARGUMENT( "file_path", "A path, including the name of the file where the layer should be exported to." )
   CORE_ACTION_KEY( "mode", "data", "The mode to use: data, single_mask, bitplane_mask, or label_mask.")
-  CORE_ACTION_KEY( "bitmap_flag", "false", "A flag that needs to be set false unless you want to export as a series of bitmaps." )
+  CORE_ACTION_KEY( "extension", ".nrrd", "Optional extension for a specific exporter. (default is .nrrd)" )
   CORE_ACTION_KEY( "exporter", "", "Optional name for a specific exporter." )
   CORE_ACTION_CHANGES_PROJECT_DATA()
 )
@@ -58,7 +58,7 @@ public:
     add_argument( this->layers_ );
     add_argument( this->file_path_ );
     add_key( this->mode_ );
-    add_key( this->export_as_bitmap_ );
+    add_key( this->extension_ );
     add_key( this->exporter_ );
   }
   
@@ -97,7 +97,7 @@ private:
   // The layers to be exported
   Core::ActionParameter< std::string > layers_;
   
-  Core::ActionParameter< bool > export_as_bitmap_;
+  Core::ActionParameter< std::string > extension_;
   
   // Short cut to the layer exporter that has already loaded the data if the file
   // was read through the GUI
@@ -109,19 +109,19 @@ public:
   // CREATE:
   // Create action that exports a segmentation
   static Core::ActionHandle Create( const LayerExporterHandle& exporter, LayerExporterMode mode,
-    const std::string& file_path, bool as_bitmap_ = false );
+    const std::string& file_path, std::string extension );
   
   static Core::ActionHandle Create( const std::string& layer_id, LayerExporterMode mode,
-    const std::string& file_path, bool as_bitmap_ = false );
+    const std::string& file_path, std::string extension );
     
   // DISPATCH:
   // To avoid reading a file twice, this action has a special option, so it can take an
   // importer that has already loaded the file. This prevents it from being read twice
   static void Dispatch( Core::ActionContextHandle context, const LayerExporterHandle& exporter, 
-    LayerExporterMode mode, const std::string& file_path, bool as_bitmap_ = false );
+    LayerExporterMode mode, const std::string& file_path, std::string extension = ".nrrd" );
   
   static void Dispatch( Core::ActionContextHandle context, const std::string& layer_id, 
-    LayerExporterMode mode, const std::string& file_path, bool as_bitmap_ = false );
+    LayerExporterMode mode, const std::string& file_path, std::string extension = ".nrrd" );
       
 };
   

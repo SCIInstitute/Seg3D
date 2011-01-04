@@ -84,7 +84,7 @@ public:
 };
 
 LayerImporterWidget::LayerImporterWidget( std::vector< LayerImporterHandle > importers, 
-  std::vector< std::string > files, QWidget *parent ) :
+  std::vector< std::string > files, QWidget *parent, bool from_series /* = false */ ) :
   QDialog( parent ),
   private_( new LayerImporterWidgetPrivate )
 {
@@ -103,7 +103,10 @@ LayerImporterWidget::LayerImporterWidget( std::vector< LayerImporterHandle > imp
   
   this->private_->ui_.horizontalLayout_20->setAlignment( Qt::AlignCenter );
   this->private_->ui_.swap_x_y_spacing_widget_->hide();
-  }
+
+  this->private_->ui_.series_warning_widget_->setVisible( ( from_series && ( files.size() == 1 ) ) );
+  
+}
 
 
 LayerImporterWidget::~LayerImporterWidget()

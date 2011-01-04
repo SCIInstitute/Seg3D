@@ -175,6 +175,7 @@ bool LayerIO::create_exporter( LayerExporterHandle& exporter, std::vector< Layer
       this->exporter_list_[ j ]->converts_file_type( extension ) )
     {
       exporter = this->exporter_list_[ j ]->build( layers );
+      exporter->set_extension( extension );
       return true;
     }
   }

@@ -26,50 +26,61 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_LAYERIO_NRRDLAYEREXPORTER_H
-#define APPLICATION_LAYERIO_NRRDLAYEREXPORTER_H
+#ifndef APPLICATION_LAYERIO_ITKLAYEREXPORTER_H
+#define APPLICATION_LAYERIO_ITKLAYEREXPORTER_H
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
 #endif 
 
+// ITK includes
+#include "itkImageSeriesWriter.h"
+#include "itkNumericSeriesFileNames.h"
+
+// Boost includes
 #include <boost/filesystem.hpp>
 
+// Core includes
+#include <Core/DataBlock/ITKImageData.h>
+#include <Core/DataBlock/ITKDataBlock.h>
 
 // Application includes
+#include <Application/Layer/MaskLayer.h>
 #include <Application/LayerIO/LayerExporter.h>
 #include <Application/LayerIO/LayerIO.h>
 
 namespace Seg3D
 {
 
-class NrrdLayerExporter : public LayerExporter
+class ITKMaskLayerExporter : public LayerExporter
 {
-  SCI_EXPORTER_TYPE( "NRRD Exporter", ".nrrd" )
+  SCI_EXPORTER_TYPE( "ITK Mask Exporter", ".tiff;.bmp;.png" )
 
   // -- Constructor/Destructor --
 public:
-  // Construct a new layer file importer
-  NrrdLayerExporter( std::vector< LayerHandle >& layers );
+  // Construct a new layer file exporter
+  ITKMaskLayerExporter( std::vector< LayerHandle >& layers );
 
   // Virtual destructor for memory management of derived classes
-  virtual ~NrrdLayerExporter()
+  virtual ~ITKMaskLayerExporter()
   {
   }
 
   // -- Import a file information --
 public:
   // GET_GRID_TRANSFORM:
-  // Get the grid transform of the grid that we are importing
+  // Get the grid transform of the grid that we are exporting
   virtual Core::GridTransform get_grid_transform();
 
   // GET_DATA_TYPE:
-  // Get the type of data that is being imported
+  // Get the type of data that is being exported
   virtual Core::DataType get_data_type();
 
   // GET_IMPORTER_MODES
-  // Get then supported importer modes
+  // Get then supported exporter modes
   virtual int get_exporter_modes();
+  
+  virtual void set_extension( std::string extension ){ this->extension_ = extension; }
   
   // --Import the data as a specific type --  
 public: 
@@ -78,19 +89,11 @@ public:
   // Export the layer to file
   virtual bool export_layer( LayerExporterMode mode, const std::string& file_path, 
     const std::string& name );
-    
-  virtual void set_label_layer_values( std::vector< double > values )
-  { 
-    this->label_values_ = values;
-  }
-    
+
 private:
-  bool export_nrrd( const std::string& file_path );
-  bool export_single_masks( const std::string& file_path );
-  bool export_mask_label( const std::string& file_path );
-  
-private:
-  std::vector< double > label_values_;
+  Core::DataType pixel_type_;
+  std::string extension_;
+
 };
 
 } // end namespace seg3D

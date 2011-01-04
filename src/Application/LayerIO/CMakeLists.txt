@@ -62,8 +62,10 @@ SET(APPLICATION_LAYERIO_IMPORTERS_SRCS
   GDCMLayerImporter.cc
 )
 SET(APPLICATION_LAYERIO_EXPORTERS_SRCS
-  ITKLayerExporter.h
-  ITKLayerExporter.cc
+  ITKDataLayerExporter.h
+  ITKDataLayerExporter.cc
+  ITKMaskLayerExporter.h
+  ITKMaskLayerExporter.cc
   NrrdLayerExporter.h
   NrrdLayerExporter.cc
 )

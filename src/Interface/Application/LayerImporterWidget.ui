@@ -7,19 +7,13 @@
     <x>0</x>
     <y>0</y>
     <width>445</width>
-    <height>495</height>
+    <height>458</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>445</width>
     <height>0</height>
-   </size>
-  </property>
-  <property name="maximumSize">
-   <size>
-    <width>445</width>
-    <height>16777215</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -171,6 +165,40 @@ QToolButton#series_1234_button_:pressed{
    <property name="margin">
     <number>4</number>
    </property>
+   <item>
+    <widget class="QWidget" name="series_warning_widget_" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>32</height>
+      </size>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_13">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="margin">
+       <number>6</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="font">
+         <font>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>WARNING: You have selected the import series option but only one file has been found, if you meant to import a series, cancel this import, and try again, this time selecting all the files in the series.</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
    <item>
     <widget class="QTableWidget" name="file_name_table_">
      <property name="horizontalScrollBarPolicy">

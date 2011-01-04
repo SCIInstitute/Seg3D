@@ -94,6 +94,8 @@ private:
   // was read through the GUI
   LayerExporterHandle layer_exporter_;
   
+  std::string extension_;
+  
   // -- Dispatch this action from the interface --
 public:
   // CREATE:
@@ -101,7 +103,8 @@ public:
   static Core::ActionHandle Create( const LayerExporterHandle& exporter,
     const std::string& file_path );
     
-  static Core::ActionHandle Create( const std::string& layer, const std::string& file_path );
+  static Core::ActionHandle Create( const std::string& layer, const std::string& file_path,
+    const std::string extension );
 
   // DISPATCH:
   // To avoid reading a file twice, this action has a special option, so it can take an
@@ -110,7 +113,7 @@ public:
     const std::string& file_path );
     
   static void Dispatch( Core::ActionContextHandle context, const std::string& layer, 
-    const std::string& file_path );
+    const std::string& file_path, const std::string extension = "" );
     
   
 };

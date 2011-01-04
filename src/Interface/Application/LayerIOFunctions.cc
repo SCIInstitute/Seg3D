@@ -227,7 +227,7 @@ void LayerIOFunctions::ImportSeries( QMainWindow* main_window )
 
   importers[ 0 ]->set_file_list( files );
 
-  LayerImporterWidget layer_import_dialog( importers, files, main_window );
+  LayerImporterWidget layer_import_dialog( importers, files, main_window, true );
   layer_import_dialog.exec();
 }
   
@@ -253,8 +253,10 @@ void LayerIOFunctions::ExportLayer( QMainWindow* main_window )
 
   QString filename = QFileDialog::getSaveFileName( main_window, "Export Data Layer As... ",
     QString::fromStdString( PreferencesManager::Instance()->export_path_state_->get() ),
-    "NRRD files (*.nrrd);;DICOM files (*.dcm)" );
-    
+    "NRRD files (*.nrrd);;DICOM files (*.dcm);;TIFF files (*.tiff);;PNG files (*.png);;BMP files (*.bmp)" );
+  
+  if( filename == "" ) return;
+  
   if( boost::filesystem::exists( boost::filesystem::path( filename.toStdString() ).parent_path() ) )
   {
     Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
@@ -266,8 +268,7 @@ void LayerIOFunctions::ExportLayer( QMainWindow* main_window )
   std::string exportername;
   
   if( extension == ".nrrd" ) exportername = "NRRD Exporter";
-  else if( extension == ".dcm" ) exportername = "ITK Exporter";
-  else return;
+  else if( extension != "" ) exportername = "ITK Data Exporter";
     
   LayerExporterHandle exporter;
   if( ! ( LayerIO::Instance()->create_exporter( exporter, layer_handles, exportername, extension ) ) )

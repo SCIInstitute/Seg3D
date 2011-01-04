@@ -1132,23 +1132,35 @@ void LayerWidget::contextMenuEvent( QContextMenuEvent * event )
   qaction = menu.addAction( tr( "Delete Layer" ) );
   connect( qaction, SIGNAL( triggered() ), this, SLOT( delete_layer_from_context_menu() ) );
   
+  QMenu* export_menu;
+  export_menu = new QMenu( this );
   if( this->private_->layer_->get_type() == Core::VolumeType::DATA_E )
   {
-    qaction = menu.addAction( tr( "Export Data" ) );
-    connect( qaction, SIGNAL( triggered() ), this, SLOT( export_data() ) );
+    export_menu->setTitle( tr( "Export data as:" ) );
+    qaction = export_menu->addAction( tr( "DICOM" ) );
+    connect( qaction, SIGNAL( triggered() ), this, SLOT( export_dicom() ) );
   }
   else
   {
-    qaction = menu.addAction( tr( "Export Segmentation as NRRD" ) );
-    connect( qaction, SIGNAL( triggered() ), this, SLOT( export_nrrd() ) );
-    qaction = menu.addAction( tr( "Export Segmentation as Bitmap Series" ) );
-    connect( qaction, SIGNAL( triggered() ), this, SLOT( export_bmp() ) );
+    export_menu->setTitle( tr( "Export Segmentation as:" ) );
   }
+  
+  qaction = export_menu->addAction( tr( "NRRD" ) );
+  connect( qaction, SIGNAL( triggered() ), this, SLOT( export_nrrd() ) );
+  
+  qaction = export_menu->addAction( tr( "PNG" ) );
+  connect( qaction, SIGNAL( triggered() ), this, SLOT( export_png() ) );
+  
+  qaction = export_menu->addAction( tr( "BITMAP" ) );
+  connect( qaction, SIGNAL( triggered() ), this, SLOT( export_bitmap() ) );
+  
+  qaction = export_menu->addAction( tr( "TIFF" ) );
+  connect( qaction, SIGNAL( triggered() ), this, SLOT( export_tiff() ) );
+  
+  menu.addMenu( export_menu );
   
   menu.exec( event->globalPos() );
 }
-  
-  
 
 void LayerWidget::delete_layer_from_context_menu()
 { 
@@ -1166,62 +1178,61 @@ void LayerWidget::delete_layer_from_context_menu()
   }
 }
 
-void LayerWidget::export_data(){
-  QString filename = QFileDialog::getSaveFileName( this, "Export Data Layer As... ",
-    QString::fromStdString( PreferencesManager::Instance()->export_path_state_->get() ),
-    "NRRD files (*.nrrd);;DICOM files (*.dcm)" );
-
-  if( boost::filesystem::exists( boost::filesystem::path( 
-    filename.toStdString() ).parent_path() ) )
-  {
-    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
-      PreferencesManager::Instance()->export_path_state_, 
-      boost::filesystem::path( filename.toStdString() ).parent_path().string() );
-  }
-  
-  ActionExportLayer::Dispatch( Core::Interface::GetWidgetActionContext(), 
-    this->private_->layer_->get_layer_name(), filename.toStdString() );
-  
-}
-
-void LayerWidget::export_bmp()
+void LayerWidget::export_layer( const std::string& type_extension )
 {
-  QString filename = QFileDialog::getExistingDirectory( this, tr( "Choose Directory for Export..." ),
+  QString filepath = QFileDialog::getExistingDirectory( this, tr( "Choose Directory for Export..." ),
     QString::fromStdString( PreferencesManager::Instance()->export_path_state_->get() ),
-    QFileDialog::ShowDirsOnly
-    | QFileDialog::DontResolveSymlinks );
+    QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks );
   
-  if( boost::filesystem::exists( boost::filesystem::path( filename.toStdString() ) ) )
+  if( LayerManager::Instance()->get_layer_by_id( this->get_layer_id() )->get_type() == 
+    Core::VolumeType::MASK_E )
   {
-    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
-      PreferencesManager::Instance()->export_path_state_, 
-      boost::filesystem::path( filename.toStdString() ).string() );
+    ActionExportSegmentation::Dispatch( Core::Interface::GetWidgetActionContext(), 
+      this->private_->layer_->get_layer_name(), LayerExporterMode::SINGLE_MASK_E, 
+      filepath.toStdString(), type_extension );
   }
+  else if( LayerManager::Instance()->get_layer_by_id( this->get_layer_id() )->get_type() == 
+    Core::VolumeType::DATA_E )
+  { 
+    std::string file_name = ( boost::filesystem::path( filepath.toStdString() ) / 
+      this->private_->layer_->get_layer_name() ).string();
 
-  ActionExportSegmentation::Dispatch( Core::Interface::GetWidgetActionContext(), 
-    this->private_->layer_->get_layer_name(), LayerExporterMode::SINGLE_MASK_E, filename.toStdString(), true );
+    ActionExportLayer::Dispatch( Core::Interface::GetWidgetActionContext(), 
+      this->private_->layer_->get_layer_name(), file_name, type_extension );
+  }
   
+  if( filepath != "" )
+  {
+    Core::ActionSet::Dispatch(  Core::Interface::GetWidgetActionContext(), 
+      PreferencesManager::Instance()->export_path_state_, filepath.toStdString() );
+  }
 }
-  
+
 void LayerWidget::export_nrrd()
 {
-  QString filename = QFileDialog::getExistingDirectory( this, tr( "Choose Directory for Export..." ),
-    QString::fromStdString( PreferencesManager::Instance()->export_path_state_->get() ),
-    QFileDialog::ShowDirsOnly
-    | QFileDialog::DontResolveSymlinks );
-  
-  if( boost::filesystem::exists( boost::filesystem::path( filename.toStdString() ) ) )
-  {
-    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
-      PreferencesManager::Instance()->export_path_state_, 
-      boost::filesystem::path( filename.toStdString() ).string() );
-  }
-  
-  ActionExportSegmentation::Dispatch( Core::Interface::GetWidgetActionContext(), 
-    this->private_->layer_->get_layer_name(), LayerExporterMode::SINGLE_MASK_E, filename.toStdString() );
-  
+  this->export_layer( ".nrrd" );
 }
-  
+
+void LayerWidget::export_dicom()
+{
+  this->export_layer( ".dcm" );
+}
+
+void LayerWidget::export_tiff()
+{
+  this->export_layer( ".tiff" );
+}
+
+void LayerWidget::export_bitmap()
+{
+  this->export_layer( ".bmp" );
+}
+
+void LayerWidget::export_png()
+{
+  this->export_layer( ".png" );
+}
+
 void LayerWidget::set_iso_surface_visibility( bool visibility )
 {
   if( this->private_->layer_->get_type() == Core::VolumeType::MASK_E )

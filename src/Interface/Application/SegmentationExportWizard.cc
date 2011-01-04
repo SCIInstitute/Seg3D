@@ -40,6 +40,7 @@
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QRadioButton>
+#include <QtGui/QComboBox>
 #include <QtGui/QButtonGroup>
 #include <QtGui/QTreeWidget>
 #include <QtGui/QScrollArea>
@@ -64,7 +65,8 @@ namespace Seg3D
   public:
     QVector< QtLayerListWidget* > masks_;
     QWidget* bitmap_widget_;
-    QCheckBox* bitmap_checkbox_;
+    QLabel* export_label_;
+    QComboBox* export_selector_;
     QHBoxLayout* bitmap_layout_;
     
     
@@ -194,13 +196,19 @@ SegmentationSelectionPage::SegmentationSelectionPage( SegmentationPrivateHandle 
   this->private_->bitmap_widget_->setMinimumSize( QSize( 0, 24) );
   this->private_->bitmap_widget_->setMaximumSize( QSize( 16777215, 24 ) );
   this->private_->bitmap_layout_ = new QHBoxLayout( this->private_->bitmap_widget_ );
-  this->private_->bitmap_layout_->setSpacing( 0 );
+  this->private_->bitmap_layout_->setSpacing( 6 );
   this->private_->bitmap_layout_->setContentsMargins( 4, 4, 4, 4 );
   
-  this->private_->bitmap_checkbox_ = new QCheckBox( this->private_->bitmap_widget_ );
-  this->private_->bitmap_checkbox_->setText( QString::fromUtf8( "Export slices as a bitmap series instead of a single NRRD" ) );
-  this->private_->bitmap_checkbox_->setEnabled( false );
-  this->private_->bitmap_layout_->addWidget( this->private_->bitmap_checkbox_ );
+  this->private_->export_label_ = new QLabel( QString::fromUtf8( "Export masks as a series of: " ), 
+    this->private_->bitmap_widget_ );
+  this->private_->bitmap_layout_->addWidget( this->private_->export_label_ );
+  
+  this->private_->export_selector_ = new QComboBox( this->private_->bitmap_widget_ );
+  this->private_->export_selector_->addItem( QString::fromUtf8( ".tiff" ) );
+  this->private_->export_selector_->addItem( QString::fromUtf8( ".bmp" ) );
+  this->private_->export_selector_->addItem( QString::fromUtf8( ".png" ) );
+  this->private_->export_selector_->setEnabled( false );
+  this->private_->bitmap_layout_->addWidget( this->private_->export_selector_ );
   
   this->private_->selection_main_layout_->addWidget( this->private_->single_or_multiple_files_widget_ );
   this->private_->selection_main_layout_->addWidget( this->private_->bitmap_widget_ );
@@ -212,12 +220,11 @@ void SegmentationSelectionPage::enable_disable_bitmap_button( int button_id )
 {
   if( button_id == 0 )
   {
-    this->private_->bitmap_checkbox_->setChecked( false );
-    this->private_->bitmap_checkbox_->setEnabled( false );
+    this->private_->export_selector_->setEnabled( false );
   }
   else
   {
-    this->private_->bitmap_checkbox_->setEnabled( true );
+    this->private_->export_selector_->setEnabled( true );
   }
 }
   
@@ -316,8 +323,7 @@ bool SegmentationSelectionPage::validatePage()
   {
     filename = QFileDialog::getExistingDirectory( this, tr( "Choose Directory for Export..." ),
       QString::fromStdString( PreferencesManager::Instance()->export_path_state_->get() ),
-      QFileDialog::ShowDirsOnly
-      | QFileDialog::DontResolveSymlinks );
+      QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks );
 
     Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
       PreferencesManager::Instance()->export_path_state_, 
@@ -441,13 +447,15 @@ bool SegmentationSummaryPage::validatePage()
   
   LayerExporterHandle exporter;
   bool result = false;
-  if( !this->private_->bitmap_checkbox_->isChecked() )
+  std::string extension = ".nrrd";
+  if( this->private_->single_file_radio_button_->isChecked() )
   {
-    result = LayerIO::Instance()->create_exporter( exporter, layers, "NRRD Exporter", ".nrrd" );
+    result = LayerIO::Instance()->create_exporter( exporter, layers, "NRRD Exporter", extension );
   }
   else
   {
-    result = LayerIO::Instance()->create_exporter( exporter, layers, "ITK Exporter", ".bmp" );
+    extension = this->private_->export_selector_->currentText().toStdString();
+    result = LayerIO::Instance()->create_exporter( exporter, layers, "ITK Mask Exporter", extension );
   }
   
   if( !result )
@@ -469,12 +477,12 @@ bool SegmentationSummaryPage::validatePage()
   { 
     exporter->set_label_layer_values( values );
     ActionExportSegmentation::Dispatch( Core::Interface::GetWidgetActionContext(), exporter,
-      LayerExporterMode::LABEL_MASK_E, this->private_->file_name_ );
+      LayerExporterMode::LABEL_MASK_E, this->private_->file_name_, extension );
   }
   else
   {
     ActionExportSegmentation::Dispatch( Core::Interface::GetWidgetActionContext(), exporter,
-      LayerExporterMode::SINGLE_MASK_E, this->private_->file_name_ );
+      LayerExporterMode::SINGLE_MASK_E, this->private_->file_name_, extension );
   }
     
   return true;
