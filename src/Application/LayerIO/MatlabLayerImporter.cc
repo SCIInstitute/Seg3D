@@ -398,9 +398,9 @@ bool MatlabLayerImporterPrivate::import_mat_array( MatlabIO::matlabarray &mlarra
               if ( read_min && read_max )
               {
                 spacing = Core::Vector( 
-                  ( max.x() - min.x() ) / Core::Max( 1.0, nx ),
-                  ( max.y() - min.y() ) / Core::Max( 1.0, ny ),
-                  ( max.z() - min.z() ) / Core::Max( 1.0, nz ) );
+                  ( max.x() - min.x() ) / Core::Max( 1.0f, nx ),
+                  ( max.y() - min.y() ) / Core::Max( 1.0f, ny ),
+                  ( max.z() - min.z() ) / Core::Max( 1.0f, nz ) );
               }
               else
               {
