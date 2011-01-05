@@ -1143,6 +1143,9 @@ void LayerWidget::contextMenuEvent( QContextMenuEvent * event )
   else
   {
     export_menu->setTitle( tr( "Export Segmentation as:" ) );
+    
+    qaction = export_menu->addAction( tr( "BITMAP" ) );
+    connect( qaction, SIGNAL( triggered() ), this, SLOT( export_bitmap() ) );
   }
   
   qaction = export_menu->addAction( tr( "NRRD" ) );
@@ -1150,9 +1153,6 @@ void LayerWidget::contextMenuEvent( QContextMenuEvent * event )
   
   qaction = export_menu->addAction( tr( "PNG" ) );
   connect( qaction, SIGNAL( triggered() ), this, SLOT( export_png() ) );
-  
-  qaction = export_menu->addAction( tr( "BITMAP" ) );
-  connect( qaction, SIGNAL( triggered() ), this, SLOT( export_bitmap() ) );
   
   qaction = export_menu->addAction( tr( "TIFF" ) );
   connect( qaction, SIGNAL( triggered() ), this, SLOT( export_tiff() ) );

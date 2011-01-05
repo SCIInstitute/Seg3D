@@ -279,11 +279,11 @@ bool ITKDataLayerExporter::export_itk_series( const std::string& file_path )
       ( temp_handle->get_layer_name() + this->extension_ ), temp_handle, this->extension_ );
     break;
   case Core::DataType::FLOAT_E:
-    return export_nondicom_series< float, float >( file_path, 
+    return export_nondicom_series< float, unsigned short >( file_path, 
       ( temp_handle->get_layer_name() + this->extension_ ), temp_handle, this->extension_ );
     break;
   case Core::DataType::DOUBLE_E:
-    return export_nondicom_series< double, double >( file_path, 
+    return export_nondicom_series< double, unsigned short >( file_path, 
       ( temp_handle->get_layer_name() + this->extension_ ), temp_handle, this->extension_ );
     break;
   default:
