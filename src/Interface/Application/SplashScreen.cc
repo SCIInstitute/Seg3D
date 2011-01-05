@@ -142,7 +142,7 @@ void SplashScreen::open_existing()
   if( boost::filesystem::exists( full_path ) )
   {
     if ( ! ProjectManager::Instance()->check_if_file_is_valid_project( 
-      ( full_path / ( full_path.leaf() + ".s3d" ) ) ) )
+      full_path ) )
     {
       QMessageBox::critical( 0, 
         "Error reading project file",
