@@ -131,10 +131,21 @@ public:
   // Get the current project
   ProjectHandle get_current_project() const;
 
+  // CHECK_IF_FILE_IS_VALID_PROJECT:
+  // Check if a file is a valid project
+  bool check_if_file_is_valid_project( const boost::filesystem::path& path );
+
 public:
+  // List of the projects that were recently loaded
   Core::StateStringVectorHandle recent_projects_state_;
+
+  // Path of the current project
   Core::StateStringHandle     current_project_path_state_;
+
+  // Counter for making new project names
   Core::StateIntHandle      default_project_name_counter_state_;
+
+  // Whether the current project has been saved or not
   Core::StateBoolHandle     project_saved_state_;
   
   ProjectHandle         current_project_;

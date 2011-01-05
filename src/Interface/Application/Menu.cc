@@ -543,8 +543,18 @@ void Menu::open_project_from_file()
 
         std::string path = full_path.parent_path().string();
 
+
         if( boost::filesystem::exists( full_path ) )
         { 
+          if ( ! ProjectManager::Instance()->check_if_file_is_valid_project( full_path ) )
+          {
+            QMessageBox::critical( this->main_window_, 
+              "Error reading project file",
+              "Error reading project file:\n"
+              "The project file was saved with newer version of Seg3D" );
+            return;
+          }
+
           ActionLoadProject::Dispatch( Core::Interface::GetWidgetActionContext(), path );
         }
       }
@@ -563,6 +573,15 @@ void Menu::open_project_from_file()
 
       if( boost::filesystem::exists( full_path ) )
       { 
+        if ( ! ProjectManager::Instance()->check_if_file_is_valid_project( full_path ) )
+        {
+          QMessageBox::critical( this->main_window_, 
+            "Error reading project file",
+            "Error reading project file:\n"
+            "The project file was saved with newer version of Seg3D" );
+          return;
+        }
+
         ActionLoadProject::Dispatch( Core::Interface::GetWidgetActionContext(), path );
       }
     }

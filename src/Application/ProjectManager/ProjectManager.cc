@@ -103,6 +103,31 @@ ProjectManager::ProjectManager() :
 ProjectManager::~ProjectManager()
 {
 }
+
+bool ProjectManager::check_if_file_is_valid_project( const boost::filesystem::path& path )
+{
+  Core::StateIO stateio;
+  // Check whether the XML file can be imported
+  if ( ! stateio.import_from_file( path ) ) return false;
+  
+  // Check whether the version is equal or lower to the program version
+  if ( stateio.get_major_version() > Core::Application::GetMajorVersion() )
+  {
+    return false;
+  }
+  
+  // Check the minor version
+  if ( stateio.get_major_version() == Core::Application::GetMajorVersion() )
+  {
+    if ( stateio.get_minor_version() > Core::Application::GetMinorVersion() )
+    {
+      return false;
+    }
+  }
+
+  // Everything seems OK
+  return true;
+}
   
 void ProjectManager::save_projectmanager_state()
 {
@@ -199,7 +224,8 @@ void ProjectManager::rename_project( const std::string& new_name, Core::ActionSo
   
 }
 
-void ProjectManager::new_project( const std::string& project_name, const std::string& project_path, bool save_on_creation )
+void ProjectManager::new_project( const std::string& project_name, const std::string& project_path, 
+  bool save_on_creation )
 {
   // Reset the application.
   Core::Application::Reset();
@@ -250,6 +276,8 @@ void ProjectManager::new_project( const std::string& project_name, const std::st
   
 void ProjectManager::open_project( const std::string& project_path )
 { 
+  ASSERT_IS_APPLICATION_THREAD();
+
   // Reset the application.
   Core::Application::Reset();
   

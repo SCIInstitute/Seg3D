@@ -31,6 +31,7 @@
 
 // Qt includes
 #include <QtGui/QFileDialog>
+#include <QtGui/QMessageBox>
 
 // Core indcludes
 #include <Core/Utils/Log.h>
@@ -140,6 +141,16 @@ void SplashScreen::open_existing()
 
   if( boost::filesystem::exists( full_path ) )
   {
+    if ( ! ProjectManager::Instance()->check_if_file_is_valid_project( 
+      ( full_path / ( full_path.leaf() + ".s3d" ) ) ) )
+    {
+      QMessageBox::critical( 0, 
+        "Error reading project file",
+        "Error reading project file:\n"
+        "The project file was saved with newer version of Seg3D" );
+      return;
+    }   
+  
     ActionLoadProject::Dispatch( Core::Interface::GetWidgetActionContext(), path );
     this->close();
   }
@@ -164,7 +175,17 @@ void SplashScreen::open_recent()
           Core::SplitString( this->recent_project_list_[ i ], "|" );
         boost::filesystem::path path = project_entry[ 0 ];
         path = path / project_entry[ 1 ];
-        
+
+        if ( ! ProjectManager::Instance()->check_if_file_is_valid_project( 
+          ( path / ( path.leaf() + ".s3d" ) ) ) )
+        {
+          QMessageBox::critical( 0, 
+            "Error reading project file",
+            "Error reading project file:\n"
+            "The project file was saved with newer version of Seg3D" );
+          return;
+        }   
+                
         if( boost::filesystem::exists( path ) )
         { 
           ActionLoadProject::Dispatch( Core::Interface::GetWidgetActionContext(),
