@@ -632,6 +632,9 @@ void Menu::set_recent_file_list( std::vector< std::string > recent_projects )
     {
       QString project_path = QString::fromStdString( ( Core::SplitString( 
         recent_projects[ i ], "|" ) )[ 0 ] );
+      
+      std::string filepath;
+      Core::ImportFromString( recent_projects[ 0 ], filepath );
         
       QString project_name = QString::fromStdString( ( Core::SplitString( 
         recent_projects[ i ], "|" ) )[ 1 ] );
@@ -639,7 +642,7 @@ void Menu::set_recent_file_list( std::vector< std::string > recent_projects )
       qaction = file_menu_recents_->addAction( project_name );
       qaction->setToolTip( tr( "Load this recent project" ) );
       
-      boost::filesystem::path path = boost::filesystem::path( project_path.toStdString() ) /
+      boost::filesystem::path path = boost::filesystem::path( filepath ) /
         boost::filesystem::path( project_name.toStdString() );
       
       QtUtils::QtBridge::Connect( qaction, boost::bind( &Menu::ConfirmRecentFileLoad,
