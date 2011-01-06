@@ -634,7 +634,7 @@ void Menu::set_recent_file_list( std::vector< std::string > recent_projects )
         recent_projects[ i ], "|" ) )[ 0 ] );
       
       std::string filepath;
-      Core::ImportFromString( recent_projects[ 0 ], filepath );
+      Core::ImportFromString( project_path.toStdString(), filepath );
         
       QString project_name = QString::fromStdString( ( Core::SplitString( 
         recent_projects[ i ], "|" ) )[ 1 ] );
