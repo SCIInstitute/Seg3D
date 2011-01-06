@@ -498,6 +498,35 @@ bool NrrdData::LoadNrrd( const std::string& filename, NrrdDataHandle& nrrddata, 
     return false;
   }
 
+  // Fix a problem with nrrds with stub axes
+  // In the old Seg3D this was once fashionable to add a dormant axis that would tell that the
+  // data is scalar. Of course none of this made sense, but we need to handle it for case that
+  // were saved in the past using this feature.
+  if ( nrrd->dim > 3 && nrrd->spaceDim == 0 )
+  {
+    // Squeeze empty dimensions
+    for ( unsigned int j = 0; j < nrrd->dim; j++ )
+    {
+      if ( nrrd->axis[ j ].size == 1 )
+      {
+        if ( nrrd->axis[ j ].label )
+        {
+          free( nrrd->axis[ j ].label );
+        }
+        if ( nrrd->axis[ j ].units )
+        {
+          free( nrrd->axis[ j ].units );
+        }
+      
+        for ( unsigned int k = j + 1; k < nrrd->dim; k++ )
+        {
+          nrrd->axis[ k - 1 ] = nrrd->axis[ k ];
+        }
+        nrrd->dim--;
+      }
+    }
+  }
+  
   error = "";
   nrrddata = NrrdDataHandle( new NrrdData( nrrd ) );
   return true;
