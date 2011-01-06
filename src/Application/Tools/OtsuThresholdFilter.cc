@@ -47,7 +47,7 @@ OtsuThresholdFilter::OtsuThresholdFilter( const std::string& toolid ) :
   SingleTargetTool( Core::VolumeType::DATA_E, toolid )
 {
   // Need to set ranges and default values for all parameters
-  add_state( "amount", this->amount_state_, 1, 1, 6, 1 );
+  add_state( "amount", this->amount_state_, 1, 1, 4, 1 );
 }
 
 OtsuThresholdFilter::~OtsuThresholdFilter()
