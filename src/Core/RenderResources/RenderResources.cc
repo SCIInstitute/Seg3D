@@ -116,19 +116,19 @@ void RenderResourcesPrivate::query_video_memory_size()
   if ( RegOpenKeyEx( HKEY_LOCAL_MACHINE, HARDWARE_DEVICEMAP_VIDEO_C, 0, 
     KEY_READ, &video_devicemap_key ) == ERROR_SUCCESS )
   {
-    DWORD type;
-    DWORD max_object_number;
+    DWORD type = REG_DWORD;
+    DWORD max_object_number = 0;
     DWORD buffer_size = sizeof( DWORD );
     if ( RegQueryValueEx( video_devicemap_key, MAX_OBJECT_NUMBER_C, NULL, &type, 
       reinterpret_cast< LPBYTE >( &max_object_number ), &buffer_size ) 
-      == ERROR_SUCCESS && type == REG_DWORD )
+      == ERROR_SUCCESS )
     {
       for ( DWORD i = 0; i <= max_object_number && this->vram_size_ == 0; ++i )
       {
+        DWORD type = REG_SZ;
         std::string video_device_name = "\\Device\\Video" + ExportToString( i );
         if ( RegQueryValueEx( video_devicemap_key, video_device_name.c_str(), NULL, 
-          &type, NULL, &buffer_size ) != ERROR_SUCCESS ||
-          type != REG_SZ )
+          &type, NULL, &buffer_size ) != ERROR_SUCCESS )
         {
           continue;
         }
@@ -153,11 +153,12 @@ void RenderResourcesPrivate::query_video_memory_size()
         {
           continue;
         }
-        DWORD vram_size;
+        DWORD vram_size = 0;
         buffer_size = sizeof( DWORD );
+        type = REG_BINARY;
+        
         if ( RegQueryValueEx( video_device_key, HARDWAREINFO_MEMSIZE, NULL, &type, 
-          reinterpret_cast< LPBYTE >( &vram_size ), &buffer_size ) == ERROR_SUCCESS &&
-          type == REG_DWORD )
+          reinterpret_cast< LPBYTE >( &vram_size ), &buffer_size ) == ERROR_SUCCESS )
         {
           this->vram_size_ = vram_size;
         }
