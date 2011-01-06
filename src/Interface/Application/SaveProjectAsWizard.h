@@ -114,6 +114,7 @@ private:
   QLabel *description_;
     QLabel *project_name_;
     QLabel *project_path_;
+  QCheckBox *autosave_checkbox_;
 };
 
 } // end namespace Seg3D

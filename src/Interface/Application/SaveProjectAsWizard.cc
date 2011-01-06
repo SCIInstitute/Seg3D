@@ -39,6 +39,7 @@
 #include <Core/Application/Application.h>
 
 // Application includes
+#include <Application/PreferencesManager/PreferencesManager.h>
 #include <Application/ProjectManager/ProjectManager.h>
 #include <Application/ProjectManager/Actions/ActionSaveProjectAs.h>
 #include <Application/ProjectManager/Actions/ActionSaveSession.h>
@@ -76,10 +77,17 @@ void SaveProjectAsWizard::accept()
   {
     boost::filesystem::remove_all( boost::filesystem::path( this->path_to_delete_ ) );
   }
-
+  
   ActionSaveProjectAs::Dispatch( Core::Interface::GetWidgetActionContext(), 
     field( "projectPath" ).toString().toStdString(),
     field( "projectName" ).toString().toStdString() );
+  
+  if( field( "autosave" ).toBool() )
+  {
+    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
+      PreferencesManager::Instance()->auto_save_state_, true );
+  }
+  
     QDialog::accept();
 }
 
@@ -209,11 +217,19 @@ SaveAsSummaryPage::SaveAsSummaryPage( QWidget *parent )
     this->project_path_ = new QLabel;
     this->project_path_->setWordWrap( true );
   
+  this->autosave_checkbox_ = new QCheckBox();
+  this->autosave_checkbox_->setObjectName(QString::fromUtf8("autosave_checkbox_"));
+  this->autosave_checkbox_->setChecked(true);
+  this->autosave_checkbox_->setText( QString::fromUtf8( "Enable Autosave" ) );
+  
     QVBoxLayout *layout = new QVBoxLayout;
   layout->addWidget( this->description_ );
     layout->addWidget( this->project_name_ );
     layout->addWidget( this->project_path_ );
+  layout->addWidget( this->autosave_checkbox_ );
     this->setLayout( layout );
+  
+  registerField( "autosave", this->autosave_checkbox_ );
 }
 
 void SaveAsSummaryPage::initializePage()
