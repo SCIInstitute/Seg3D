@@ -193,12 +193,14 @@ void RenderResourcesPrivate::query_video_memory_size()
   
   if ( this->vram_size_ == 0 ) 
   {
-    CORE_LOG_ERROR( "Failed to query video memory size" );
+    CORE_LOG_WARNING( "Failed to query video memory size." );
+    CORE_LOG_WARNING( "Assuming system has at least 128 MB of graphics memory." );
+    this->vram_size_ = 128;
   }
   else 
   {
     CORE_LOG_MESSAGE( "Video Memory Size: " + 
-             ExportToString( this->vram_size_ >> 20 ) + "MB" );
+             ExportToString( this->vram_size_ >> 20 ) + "MB." );
   }
 }
 
