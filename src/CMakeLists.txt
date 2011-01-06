@@ -166,7 +166,7 @@ IF (QT_FOUND)
   SET(QT_USE_QTOPENGL 1)
   INCLUDE(${QT_USE_FILE})
 ELSE (QT_FOUND)
-  MESSAGE(SEND_ERROR "QT 4.6.0 or later is required for building Seg3D")
+  MESSAGE(FATAL_ERROR "QT 4.6.0 or later is required for building Seg3D")
 ENDIF (QT_FOUND)
 
 ENDIF(SEG3D_BUILD_INTERFACE)
