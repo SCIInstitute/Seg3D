@@ -96,7 +96,8 @@ ProjectManager::ProjectManager() :
   // Connect the signals from the LayerManager to the GUI
   this->add_connection( this->current_project_->project_name_state_->value_changed_signal_.connect( 
     boost::bind( &ProjectManager::rename_project, this, _1, _2 ) ) );
-
+  
+  this->set_last_saved_session_time_stamp();
   AutoSave::Instance()->start();
 }
 
@@ -257,7 +258,6 @@ void ProjectManager::new_project( const std::string& project_name, const std::st
     {
       boost::filesystem::path path = project_path;
       path = path / project_name;
-
       this->set_project_path( path );
       this->save_project( true );
       this->set_last_saved_session_time_stamp();
@@ -270,6 +270,7 @@ void ProjectManager::new_project( const std::string& project_name, const std::st
     PreferencesManager::Instance()->auto_save_state_->set( false );
   }
 
+  
   this->changing_projects_ = false;
 
 }

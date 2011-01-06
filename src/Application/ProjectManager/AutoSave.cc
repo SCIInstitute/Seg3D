@@ -125,6 +125,11 @@ void AutoSave::recompute_auto_save()
 double AutoSave::compute_timeout()
 {
   Core::StateEngine::lock_type state_engine_lock( Core::StateEngine::GetMutex() );
+  if( PreferencesManager::Instance()->auto_save_state_->get() == false ) 
+  {
+    return 60.0;
+  }
+  
   double time_remaining = PreferencesManager::Instance()->auto_save_time_state_->get() * 60;
 
   time_remaining = time_remaining - ProjectManager::Instance()->
