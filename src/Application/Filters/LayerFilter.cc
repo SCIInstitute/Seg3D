@@ -35,6 +35,9 @@
 #include <boost/thread/mutex.hpp> 
 #include <boost/thread/condition_variable.hpp> 
  
+// Core includes
+#include <Core/Utils/Log.h>
+
 // Application includes
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/UndoBuffer/UndoBuffer.h>
@@ -143,11 +146,11 @@ void LayerFilterPrivate::finalize()
   
   if ( this->error_.size() )
   {
-    StatusBar::SetMessage( Core::LogMessageType::ERROR_E, this->error_ ); 
+    CORE_LOG_ERROR( this->error_ ); 
   }
   else if ( this->success_.size() )
   {
-    StatusBar::SetMessage( Core::LogMessageType::MESSAGE_E, this->success_ ); 
+    CORE_LOG_SUCCESS( this->success_ ); 
   }
 
   this->locked_layers_.clear();

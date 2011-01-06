@@ -75,6 +75,8 @@ private:
 
 public:
   void set_data_point_info( DataPointInfoHandle data_point );
+
+private:
   void set_message( int msg_type, std::string message );
 
 public:
@@ -83,9 +85,6 @@ public:
 
 private:
   StatusBarPrivateHandle private_;
-
-public:
-  static void SetMessage( int msg_type, std::string message );
 
 };
 

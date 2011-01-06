@@ -160,7 +160,7 @@ bool Project::delete_session( const std::string& session_name )
   }
   catch(  std::exception& e ) 
   {
-    CORE_LOG_ERROR( e.what() );
+    CORE_LOG_WARNING( e.what() );
     return false;
   }
   

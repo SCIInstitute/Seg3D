@@ -144,6 +144,7 @@ bool StateEngine::save_states( StateIO& state_io )
     }
   }
 
+  bool success = true;
   while ( !state_handlers.empty() )
   {
     std::string statehandler_id = state_handlers.top().second;
@@ -155,11 +156,11 @@ bool StateEngine::save_states( StateIO& state_io )
     if ( it != this->private_->state_handler_map_.end() )
     {
       lock.unlock();
-      ( *it ).second->save_states( state_io );
+      if( !( *it ).second->save_states( state_io ) ) success = false;
     }
   }
 
-  return true;
+  return success;
 }
 
 bool StateEngine::get_state( const std::string& state_id, StateBaseHandle& state )

@@ -214,12 +214,11 @@ void ProjectManager::rename_project( const std::string& new_name, Core::ActionSo
     //this->current_project_->set_project_path( path / new_name );
     this->set_project_path( path / new_name );
 
-    StatusBar::Instance()->set_message( Core::LogMessageType::MESSAGE_E, 
-      "The project name has been successfully changed to: '" + new_name  + "'" );
+    CORE_LOG_SUCCESS( "The project name has been successfully changed to: '" + new_name  + "'" );
   }
   else
   {
-    StatusBar::Instance()->set_message( Core::LogMessageType::ERROR_E, 
+    CORE_LOG_ERROR(  
       "There has been a problem setting the name of the project to: '" + new_name  + "'" );
   }
   
@@ -293,8 +292,7 @@ void ProjectManager::open_project( const std::string& project_path )
   this->set_last_saved_session_time_stamp();
   this->changing_projects_ = false;
 
-  StatusBar::Instance()->set_message( Core::LogMessageType::MESSAGE_E, 
-     "Project: '" + this->current_project_->project_name_state_->get()
+  CORE_LOG_SUCCESS( "Project: '" + this->current_project_->project_name_state_->get()
      + "' has been successfully opened." );
   
   this->set_last_saved_session_time_stamp();
@@ -303,49 +301,56 @@ void ProjectManager::open_project( const std::string& project_path )
   this->project_saved_state_->set( true );
 }
   
-void ProjectManager::save_project( bool autosave /*= false*/, std::string session_name )
+bool ProjectManager::save_project( bool autosave /*= false*/, std::string session_name /*= "" */ )
 {
   ASSERT_IS_APPLICATION_THREAD();
   this->session_saving_ = true;
+  bool save_success = false;
   try
   {
     if( this->save_project_session( autosave, session_name ) )
     {
-      this->save_project_only( this->current_project_path_state_->get(), 
-        this->current_project_->project_name_state_->get() );
+      if( this->save_project_only( this->current_project_path_state_->get(), 
+        this->current_project_->project_name_state_->get() ) )
+      {
+        save_success = true;
+      }
     }
   }
-  catch( std::exception& )
-  {
-    StatusBar::Instance()->set_message( Core::LogMessageType::MESSAGE_E, 
-      "Autosave FAILED" );
-  } 
-  catch( Core::Exception& )
-  {
-    StatusBar::Instance()->set_message( Core::LogMessageType::MESSAGE_E, 
-      "Autosave FAILED" );
-  } 
   catch( ... )
   {
-    StatusBar::Instance()->set_message( Core::LogMessageType::MESSAGE_E, 
-      "Autosave FAILED" );
+    save_success = false;
   } 
 
   this->session_saving_ = false;
   
-  if( autosave )
+  if( save_success )
   {
-    StatusBar::Instance()->set_message( Core::LogMessageType::MESSAGE_E, 
-      "Autosave completed successfully for project: '" 
-      +  this->current_project_->project_name_state_->get() + "'" );
+    if( autosave )
+    {
+      CORE_LOG_SUCCESS( "Autosave completed successfully for project: '" 
+        +  this->current_project_->project_name_state_->get() + "'" );
+    }
+    else
+    {
+      CORE_LOG_SUCCESS( "Project: '" + this->current_project_->project_name_state_->get() 
+        + "' has been successfully saved" );
+    }
   }
   else
   {
-    StatusBar::Instance()->set_message( Core::LogMessageType::MESSAGE_E, 
-      "Project: '" + this->current_project_->project_name_state_->get() 
-      + "' has been successfully saved" );
+    if( autosave )
+    {
+      CORE_LOG_ERROR( "Autosave FAILED for project: '" 
+        +  this->current_project_->project_name_state_->get() + "'" );
+    }
+    else
+    {
+      CORE_LOG_ERROR( "Save FAILED for project: '" 
+        +  this->current_project_->project_name_state_->get() + "'" );
+    }
   }
-
+  return save_success;
 }
   
 bool ProjectManager::export_project( const std::string& export_path, const std::string& project_name, const std::string& session_name )
@@ -649,8 +654,7 @@ bool ProjectManager::project_save_as( const std::string& export_path, const std:
 
   this->set_last_saved_session_time_stamp();
 
-  StatusBar::Instance()->set_message( Core::LogMessageType::MESSAGE_E, 
-    "'Save As' has been successfully completed." );
+  CORE_LOG_SUCCESS( "'Save As' has been successfully completed." );
 
   this->set_last_saved_session_time_stamp();
   AutoSave::Instance()->recompute_auto_save();

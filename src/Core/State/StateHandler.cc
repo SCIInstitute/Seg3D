@@ -402,7 +402,7 @@ void StateHandler::clean_up()
   // does nothing by default.
 }
 
-void StateHandler::save_states( StateIO& state_io )
+bool StateHandler::save_states( StateIO& state_io )
 {
   TiXmlElement* sh_element = new TiXmlElement( this->get_statehandler_id() );
   state_io.get_current_element()->LinkEndChild( sh_element );
@@ -410,7 +410,8 @@ void StateHandler::save_states( StateIO& state_io )
   
   state_io.push_current_element();
   state_io.set_current_element( sh_element );
-  this->pre_save_states( state_io );
+  bool success = true;
+  if( !this->pre_save_states( state_io ) ) success = false;
 
   state_map_type::iterator it = this->private_->state_map_.begin();
   state_map_type::iterator it_end = this->private_->state_map_.end();
@@ -426,8 +427,9 @@ void StateHandler::save_states( StateIO& state_io )
     ++it;
   }
 
-  this->post_save_states( state_io );
+  if( !this->post_save_states( state_io ) ) success = false;
   state_io.pop_current_element();
+  return success;
 }
 
 void StateHandler::mark_as_project_data()

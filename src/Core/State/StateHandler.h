@@ -213,7 +213,7 @@ public:
 
   // SAVE_STATES:
   // Save the states into the StateIO variable
-  void save_states( StateIO& state_io );
+  bool save_states( StateIO& state_io );
 
 protected:
   // PRE_LOAD_STATES:

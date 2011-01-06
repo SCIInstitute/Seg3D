@@ -909,7 +909,7 @@ bool LayerManager::post_load_states( const Core::StateIO& state_io )
     LayerHandle active_layer = this->get_layer_by_id( this->active_layer_state_->get() );
     if ( !active_layer )
     {
-      CORE_LOG_ERROR( "Incorrect active layer state loaded from session" );
+      CORE_LOG_WARNING( "Incorrect active layer state loaded from session" );
       active_layer = this->private_->group_list_.front()->layer_list_.back(); 
     }
     Core::ScopedCounter signal_block( this->private_->signal_block_count_ );

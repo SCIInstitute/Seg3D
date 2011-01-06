@@ -136,7 +136,7 @@ void DataManager::prep_for_save( const boost::filesystem::path& project_path,
         }
         catch(  std::exception& e ) 
         {
-          CORE_LOG_ERROR( e.what() );
+          CORE_LOG_WARNING( e.what() );
         }
       }
       else

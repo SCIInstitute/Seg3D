@@ -29,6 +29,7 @@
 // Core includes
 #include <Core/DataBlock/MaskDataBlockManager.h>
 #include <Core/Parser/ArrayMathEngine.h>
+#include <Core/Utils/Log.h>
 
 // Application includes
 #include <Application/Layer/LayerGroup.h>
@@ -92,7 +93,7 @@ void ArithmeticFilterAlgo::run_filter()
   std::string error;
   if ( !this->engine_.run( error ) )
   {
-    StatusBar::SetMessage( Core::LogMessageType::ERROR_E, error );
+    CORE_LOG_ERROR( error );
     return;
   }
 

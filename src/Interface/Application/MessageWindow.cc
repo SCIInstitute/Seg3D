@@ -110,6 +110,9 @@ void MessageWindow::add_message( int msg_type, std::string message )
     case Core::LogMessageType::MESSAGE_E:
       color_ = QColor(3, 86, 2);
       break;
+    case Core::LogMessageType::SUCCESS_E:
+      color_ = QColor(3, 86, 2);
+      break;
     case Core::LogMessageType::DEBUG_E:
       color_ = QColor("purple");
       break;

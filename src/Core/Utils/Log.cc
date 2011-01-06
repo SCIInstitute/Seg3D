@@ -69,6 +69,7 @@ void Log::post_error( std::string message, const int line, const char* file )
 {
   std::string str = this->header( line, file ) + std::string( " ERROR: " ) + message;
   post_log_signal_( LogMessageType::ERROR_E, str );
+  post_status_signal_( LogMessageType::ERROR_E, message );
 }
 
 void Log::post_warning( std::string message, const int line, const char* file )
@@ -81,6 +82,13 @@ void Log::post_message( std::string message, const int line, const char* file )
 {
   std::string str = this->header( line, file ) + std::string( " MESSAGE: " ) + message;
   post_log_signal_( LogMessageType::MESSAGE_E, str );
+}
+
+void Log::post_success( std::string message, const int line, const char* file )
+{
+  std::string str = this->header( line, file ) + std::string( " SUCCESS: " ) + message;
+  post_log_signal_( LogMessageType::SUCCESS_E, str );
+  post_status_signal_( LogMessageType::SUCCESS_E, message );
 }
 
 void Log::post_debug( std::string message, const int line, const char* file )

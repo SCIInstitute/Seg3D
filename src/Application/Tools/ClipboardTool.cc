@@ -268,7 +268,7 @@ void ClipboardTool::grab_min_paste_slice()
   ViewerHandle viewer = ViewerManager::Instance()->get_active_viewer();
   if ( viewer->is_volume_view() )
   {
-    StatusBar::SetMessage( Core::LogMessageType::ERROR_E, "Active viewer not in 2D view." );
+    CORE_LOG_ERROR( "Active viewer not in 2D view." );
     return;
   }
 
@@ -291,7 +291,7 @@ void ClipboardTool::grab_max_paste_slice()
   ViewerHandle viewer = ViewerManager::Instance()->get_active_viewer();
   if ( viewer->is_volume_view() )
   {
-    StatusBar::SetMessage( Core::LogMessageType::ERROR_E, "Active viewer not in 2D view." );
+    CORE_LOG_ERROR( "Active viewer not in 2D view." );
     return;
   }
 

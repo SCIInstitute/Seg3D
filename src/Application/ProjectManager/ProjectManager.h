@@ -79,7 +79,7 @@ public:
   
   // SAVE_PROJECT:
   // this function saves the values in current_project_ to the current save location
-  void save_project( bool autosave = false, std::string session_name = "" );
+  bool save_project( bool autosave = false, std::string session_name = "" );
   
   // EXPORT_PROJECT:
   // this function saves the value in current_project_, and the selected session to the desired

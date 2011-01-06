@@ -62,8 +62,10 @@ CORE_ENUM_CLASS
   WARNING_E = 0x02, 
   MESSAGE_E = 0x04, 
   DEBUG_E = 0x08, 
+  SUCCESS_E = 0x16,
   NODEBUG_E = ERROR_E | WARNING_E | MESSAGE_E,
-  ALL_E = ERROR_E | WARNING_E | MESSAGE_E | DEBUG_E
+  ALL_E = ERROR_E | WARNING_E | MESSAGE_E | DEBUG_E,
+  STATUS_BAR_E = ERROR_E | SUCCESS_E
  )
 
 // Class definition
@@ -92,6 +94,11 @@ public:
 
   void post_message( std::string message, const int line, const char* file );
 
+  // POST_SUCCESS:
+  // Post a message onto the log signal
+
+  void post_success( std::string message, const int line, const char* file );
+
   // POST_DEBUG:
   // Post debug information onto the log signal
 
@@ -107,9 +114,12 @@ public:
   typedef boost::signals2::signal< void( unsigned int, std::string ) > post_log_signal_type;
 
   // POST_LOG_SIGNAL
-  // Signal indicating that the history changed
-
+  // Signal indicating that a message needs to be written to the log file
   post_log_signal_type post_log_signal_;
+
+  // POST_STATUS_SIGNAL
+  // Signal indicating that a message needs to be written to the status bar
+  post_log_signal_type post_status_signal_;
 
 };
 
@@ -124,6 +134,9 @@ Core::Log::Instance()->post_warning(message,__LINE__,__FILE__)
 
 #define CORE_LOG_MESSAGE(message)\
 Core::Log::Instance()->post_message(message,__LINE__,__FILE__)
+
+#define CORE_LOG_SUCCESS(message)\
+  Core::Log::Instance()->post_success(message,__LINE__,__FILE__)
 
 #ifdef NDEBUG
 #define CORE_LOG_DEBUG(message)

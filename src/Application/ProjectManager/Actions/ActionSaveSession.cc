@@ -67,13 +67,18 @@ bool ActionSaveSession::run( Core::ActionContextHandle& context,
 
   progress->begin_progress_reporting();
 
-  ProjectManager::Instance()->save_project( this->is_autosave_.value(), this->session_name_.value() );
+  bool save_success = 
+    ProjectManager::Instance()->save_project( this->is_autosave_.value(), 
+    this->session_name_.value() );
 
   progress->end_progress_reporting();
 
-  ProjectManager::Instance()->get_current_project()->reset_project_changed();
+  if( save_success )
+  {
+    ProjectManager::Instance()->get_current_project()->reset_project_changed();
+  }
 
-  return true;
+  return save_success;
 }
 
 Core::ActionHandle ActionSaveSession::Create( bool is_autosave, const std::string& session_name )
