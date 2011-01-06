@@ -173,7 +173,10 @@ void SplashScreen::open_recent()
       {
         std::vector<std::string> project_entry = 
           Core::SplitString( this->recent_project_list_[ i ], "|" );
-        boost::filesystem::path path = project_entry[ 0 ];
+                std::string filepath;
+                Core::ImportFromString( project_entry[ 0 ], filepath );
+
+        boost::filesystem::path path = filepath;
         path = path / project_entry[ 1 ];
 
         if ( ! ProjectManager::Instance()->check_if_file_is_valid_project( 

@@ -469,9 +469,12 @@ void ProjectManager::cleanup_projects_list()
     {
       std::vector< std::string > single_project_vector = 
         Core::SplitString( projects_vector[ i ], "|" );
+            
+            std::string filepath;
+            Core::ImportFromString( single_project_vector[ 0 ], filepath );
 
       boost::filesystem::path path = complete( boost::filesystem::path( 
-        single_project_vector[ 0 ].c_str(), boost::filesystem::native ) );
+        filepath.c_str(), boost::filesystem::native ) );
 
       boost::filesystem::path project_path = path / single_project_vector[ 1 ] 
         / ( single_project_vector[ 1 ] + ".s3d" );
