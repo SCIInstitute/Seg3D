@@ -1703,11 +1703,23 @@ void Isosurface::redraw( bool use_colormap )
     
     vertex_buffer->set_buffer_data( vertex_size, 0, GL_STREAM_DRAW );
     void* buffer = vertex_buffer->map_buffer( GL_WRITE_ONLY );
+    if ( buffer == 0 )
+    {
+      CORE_LOG_ERROR( "Failed to map OpenGL buffer, isosurface rendering will"
+        " be incomplete!" );
+      return;
+    }
     memcpy( buffer, &this->private_->points_[ this->private_->part_points_[ i ].first ], vertex_size );
     vertex_buffer->unmap_buffer();
     
     normal_buffer->set_buffer_data( normal_size, 0, GL_STREAM_DRAW );
     buffer = normal_buffer->map_buffer( GL_WRITE_ONLY );
+    if ( buffer == 0 )
+    {
+      CORE_LOG_ERROR( "Failed to map OpenGL buffer, isosurface rendering will"
+        " be incomplete!" );
+      return;
+    }
     memcpy( buffer, &this->private_->normals_[ this->private_->part_points_[ i ].first ], normal_size );
     normal_buffer->unmap_buffer();
     
@@ -1715,12 +1727,24 @@ void Isosurface::redraw( bool use_colormap )
     {
       value_buffer->set_buffer_data( value_size, 0, GL_STREAM_DRAW );
       buffer = value_buffer->map_buffer( GL_WRITE_ONLY );
+      if ( buffer == 0 )
+      {
+        CORE_LOG_ERROR( "Failed to map OpenGL buffer, isosurface rendering will"
+          " be incomplete!" );
+        return;
+      }
       memcpy( buffer, &this->private_->values_[ this->private_->part_points_[ i ].first ], value_size );
       value_buffer->unmap_buffer();
     }
 
     face_buffer->set_buffer_data( face_size, 0, GL_STREAM_DRAW );
     buffer = face_buffer->map_buffer( GL_WRITE_ONLY );
+    if ( buffer == 0 )
+    {
+      CORE_LOG_ERROR( "Failed to map OpenGL buffer, isosurface rendering will"
+        " be incomplete!" );
+      return;
+    }
     memcpy( buffer, &this->private_->part_indices_[ i ][ 0 ], face_size );
     face_buffer->unmap_buffer();
 

@@ -139,6 +139,7 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
   this->private_->buttons_.push_back( this->private_->ui_.snap_to_axis_button_ );
   this->private_->buttons_.push_back( this->private_->ui_.light_visible_button_ );
   this->private_->buttons_.push_back( this->private_->ui_.fog_button_ );
+  this->private_->buttons_.push_back( this->private_->ui_.enable_clipping_button_ );
   this->private_->buttons_.push_back( this->private_->ui_.grid_button_ );
   this->private_->buttons_.push_back( this->private_->ui_.flip_horizontal_button_ );
   this->private_->buttons_.push_back( this->private_->ui_.flip_vertical_button_ );
@@ -210,6 +211,8 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
       this->private_->viewer_->volume_light_visible_state_ );
     QtUtils::QtBridge::Connect( this->private_->ui_.fog_button_,
       this->private_->viewer_->volume_enable_fog_state_ );
+    QtUtils::QtBridge::Connect( this->private_->ui_.enable_clipping_button_,
+      this->private_->viewer_->volume_enable_clipping_state_ );
     QtUtils::QtBridge::Connect( this->private_->ui_.isosurfaces_visible_button_,
       this->private_->viewer_->volume_isosurfaces_visible_state_ );
     QtUtils::QtBridge::Connect( this->private_->ui_.volume_rendering_visible_button_,
@@ -253,6 +256,8 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
     QtUtils::QtBridge::Show( this->private_->ui_.light_visible_button_, 
       viewer->view_mode_state_, show_buttons_condition );
     QtUtils::QtBridge::Show( this->private_->ui_.fog_button_, 
+      viewer->view_mode_state_, show_buttons_condition );
+    QtUtils::QtBridge::Show( this->private_->ui_.enable_clipping_button_,
       viewer->view_mode_state_, show_buttons_condition );
     QtUtils::QtBridge::Show( this->private_->ui_.isosurfaces_visible_button_, 
       viewer->view_mode_state_, show_buttons_condition );

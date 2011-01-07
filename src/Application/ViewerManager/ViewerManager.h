@@ -131,17 +131,29 @@ public:
   // Number of the viewer that is the active viewer
   Core::StateIntHandle active_viewer_state_;
   
-  // Size of the grid
-  Core::StateIntHandle grid_size_state_;
+  // The density of the fog in 3D view
+  Core::StateRangedDoubleHandle fog_density_state_;
 
-  // Background color in the viewer windows
-  Core::StateOptionHandle background_color_state_;
+  // Clipping planes enabled state
+  Core::StateBoolHandle enable_clip_plane_state_[ 6 ];
 
-  // Whether slice number is shown
-  Core::StateBoolHandle show_slice_number_state_;
+  // Zenith angle (theta) of the clipping planes
+  Core::StateRangedDoubleHandle clip_plane_theta_state_[ 6 ];
 
-  // Preferences of names for the axes
-  Core::StateOptionHandle naming_convention_state_;
+  // Azimuth angle (phi) of the clipping planes
+  Core::StateRangedDoubleHandle clip_plane_phi_state_[ 6 ];
+
+  // Distance of the clipping planes
+  Core::StateRangedDoubleHandle clip_plane_distance_state_[ 6 ];
+
+  // Whether to reverse the normal of clipping planes
+  Core::StateBoolHandle clip_plane_reverse_norm_state_[ 6 ];
+
+  // Whether to show controls for fog
+  Core::StateBoolHandle show_fog_control_state_;
+
+  // Whether to show controls for clipping
+  Core::StateBoolHandle show_clipping_control_state_;
 
   // TODO: The next ones should not be state variables
   // --JGS

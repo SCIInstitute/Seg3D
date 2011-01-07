@@ -412,8 +412,12 @@ void Menu::create_window_menu( QMenu* qmenu )
   QtUtils::QtBridge::Connect( qaction, 
     InterfaceManager::Instance()->layermanager_dockwidget_visibility_state_ );
   
-//  boost::bind( &ActionShowWindow::Dispatch, 
-//    Core::Interface::GetWidgetActionContext(), std::string( "layermanager" ) ) );
+  // 3D Window
+  qaction = qmenu->addAction( "3D Window");
+  qaction->setCheckable( true );
+  qaction->setShortcut( tr( "Ctrl+Shift+V" ) );
+  QtUtils::QtBridge::Connect( qaction,
+    InterfaceManager::Instance()->rendering_dockwidget_visibility_state_ );
 
 //  // Measurement Window
 //  qaction = qmenu->addAction( "Measurement Window" );

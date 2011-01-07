@@ -63,6 +63,7 @@
 #include <Interface/Application/HistoryDockWidget.h>
 #include <Interface/Application/LayerIOFunctions.h>
 #include <Interface/Application/LayerManagerDockWidget.h>
+#include <Interface/Application/RenderingDockWidget.h>
 #include <Interface/Application/Menu.h>
 #include <Interface/Application/MessageWindow.h>
 #include <Interface/Application/MeasurementDockWidget.h>
@@ -98,6 +99,7 @@ namespace Seg3D
     QPointer< ProjectDockWidget > project_dock_window_;
     QPointer< ToolsDockWidget > tools_dock_window_;
     QPointer< LayerManagerDockWidget > layer_manager_dock_window_;
+    QPointer< RenderingDockWidget > rendering_dock_window_;
     QPointer< MeasurementDockWidget > measurement_dock_window_;
     QPointer< ProgressWidget > progress_;
     
@@ -157,9 +159,12 @@ ApplicationInterface::ApplicationInterface( std::string file_to_view_on_open ) :
   }
   
   // Instantiate the dock widgets
+  this->private_->rendering_dock_window_ = new RenderingDockWidget( this );
+  this->addDockWidget( Qt::RightDockWidgetArea, this->private_->rendering_dock_window_ );
+
   this->private_->layer_manager_dock_window_ = new LayerManagerDockWidget( this );
   this->addDockWidget( Qt::RightDockWidgetArea, this->private_->layer_manager_dock_window_ );
-  
+
   this->private_->project_dock_window_ = new ProjectDockWidget( this );
   this->addDockWidget( Qt::LeftDockWidgetArea, this->private_->project_dock_window_ );
   
@@ -173,6 +178,9 @@ ApplicationInterface::ApplicationInterface( std::string file_to_view_on_open ) :
   this->addDockWidget( Qt::RightDockWidgetArea, this->private_->measurement_dock_window_ );
   
   // Connect the windows and widgets to their visibility states
+  QtUtils::QtBridge::Show( this->private_->rendering_dock_window_,
+    InterfaceManager::Instance()->rendering_dockwidget_visibility_state_ );
+
   QtUtils::QtBridge::Show( this->private_->layer_manager_dock_window_, 
     InterfaceManager::Instance()->layermanager_dockwidget_visibility_state_ );
 
@@ -353,6 +361,12 @@ void ApplicationInterface::closeEvent( QCloseEvent* event )
     this->private_->layer_manager_dock_window_->close();
     this->private_->layer_manager_dock_window_->deleteLater();
   }
+
+  if ( this->private_->rendering_dock_window_ )
+  {
+    this->private_->rendering_dock_window_->close();
+    this->private_->rendering_dock_window_->deleteLater();
+  }
   
   if( this->private_->measurement_dock_window_ )
   {
@@ -413,6 +427,7 @@ void ApplicationInterface::begin_progress( Core::ActionProgressHandle handle )
   // Put overlays on all floating widgets.
   CORE_LOG_DEBUG( "-- Putting overlays over all the floating dock widgets --" );
   this->private_->layer_manager_dock_window_->set_enabled( false );
+  this->private_->rendering_dock_window_->set_enabled( false );
   this->private_->tools_dock_window_->set_enabled( false );
   this->private_->project_dock_window_->set_enabled( false );
   this->private_->measurement_dock_window_->set_enabled( false );
@@ -433,6 +448,7 @@ void ApplicationInterface::end_progress( Core::ActionProgressHandle /*handle*/ )
 
   CORE_LOG_DEBUG( "-- Removing overlays from all the floating dock widgets --" );
   this->private_->layer_manager_dock_window_->set_enabled( true );
+  this->private_->rendering_dock_window_->set_enabled( true );
   this->private_->tools_dock_window_->set_enabled( true );
   this->private_->project_dock_window_->set_enabled( true );
   this->private_->measurement_dock_window_->set_enabled( true );

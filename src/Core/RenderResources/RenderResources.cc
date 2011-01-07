@@ -282,10 +282,14 @@ bool RenderResources::valid_render_resources()
 
 void RenderResources::delete_texture( unsigned int texture_id )
 {
-  if ( ! (is_eventhandler_thread() ) )
+  // If the calling thread doesn't have a valid OpenGL context, 
+  // repost the delete operation to the default RenderResources thread.
+  // Otherwise, delete the object immediately.
+  if ( !this->is_eventhandler_thread() && !this->get_current_context() )
   {
-    post_event( boost::bind( &RenderResources::delete_texture, this, texture_id ) );
-    return;
+    this->post_event( boost::bind( &RenderResources::delete_texture, this, 
+      texture_id ) );
+    return;     
   }
   
   lock_type lock( RenderResources::GetMutex() );
@@ -295,11 +299,14 @@ void RenderResources::delete_texture( unsigned int texture_id )
 
 void RenderResources::delete_renderbuffer( unsigned int renderbuffer_id )
 {
-  if ( ! (is_eventhandler_thread() ) )
+  // If the calling thread doesn't have a valid OpenGL context, 
+  // repost the delete operation to the default RenderResources thread.
+  // Otherwise, delete the object immediately.
+  if ( !this->is_eventhandler_thread() && !this->get_current_context() )
   {
-    post_event( boost::bind( &RenderResources::delete_renderbuffer, this, 
+    this->post_event( boost::bind( &RenderResources::delete_renderbuffer, this, 
       renderbuffer_id ) );
-    return;
+    return;     
   }
   
   lock_type lock( RenderResources::GetMutex() );
@@ -309,11 +316,14 @@ void RenderResources::delete_renderbuffer( unsigned int renderbuffer_id )
 
 void RenderResources::delete_buffer_object( unsigned int buffer_object_id )
 {
-  if ( ! (is_eventhandler_thread() ) )
+  // If the calling thread doesn't have a valid OpenGL context, 
+  // repost the delete operation to the default RenderResources thread.
+  // Otherwise, delete the object immediately.
+  if ( !this->is_eventhandler_thread() && !this->get_current_context() )
   {
-    post_event( boost::bind( &RenderResources::delete_buffer_object, this, 
+    this->post_event( boost::bind( &RenderResources::delete_buffer_object, this, 
       buffer_object_id ) );
-    return;
+    return;     
   }
   
   lock_type lock( RenderResources::GetMutex() );
@@ -323,11 +333,14 @@ void RenderResources::delete_buffer_object( unsigned int buffer_object_id )
 
 void RenderResources::delete_framebuffer_object( unsigned int framebuffer_object_id )
 {
-  if ( ! (is_eventhandler_thread() ) )
+  // If the calling thread doesn't have a valid OpenGL context, 
+  // repost the delete operation to the default RenderResources thread.
+  // Otherwise, delete the object immediately.
+  if ( !this->is_eventhandler_thread() && !this->get_current_context() )
   {
-    post_event( boost::bind( &RenderResources::delete_framebuffer_object, this, 
+    this->post_event( boost::bind( &RenderResources::delete_framebuffer_object, this, 
       framebuffer_object_id ) );
-    return;
+    return;     
   }
   
   lock_type lock( RenderResources::GetMutex() );
@@ -337,11 +350,14 @@ void RenderResources::delete_framebuffer_object( unsigned int framebuffer_object
 
 void RenderResources::delete_program( unsigned int program_id )
 {
-  if ( ! (is_eventhandler_thread() ) )
+  // If the calling thread doesn't have a valid OpenGL context, 
+  // repost the delete operation to the default RenderResources thread.
+  // Otherwise, delete the object immediately.
+  if ( !this->is_eventhandler_thread() && !this->get_current_context() )
   {
-    post_event( boost::bind( &RenderResources::delete_program, this, 
+    this->post_event( boost::bind( &RenderResources::delete_program, this, 
       program_id ) );
-    return;
+    return;     
   }
 
   lock_type lock( RenderResources::GetMutex() );
@@ -351,11 +367,14 @@ void RenderResources::delete_program( unsigned int program_id )
 
 void RenderResources::delete_shader( unsigned int shader_id )
 {
-  if ( ! (is_eventhandler_thread() ) )
+  // If the calling thread doesn't have a valid OpenGL context, 
+  // repost the delete operation to the default RenderResources thread.
+  // Otherwise, delete the object immediately.
+  if ( !this->is_eventhandler_thread() && !this->get_current_context() )
   {
-    post_event( boost::bind( &RenderResources::delete_shader, this, 
+    this->post_event( boost::bind( &RenderResources::delete_shader, this, 
       shader_id ) );
-    return;
+    return;     
   }
 
   lock_type lock( RenderResources::GetMutex() );

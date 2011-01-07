@@ -72,6 +72,7 @@ SET(INTERFACE_APPLICATION_SRCS
   ViewAction.cc
   ViewerInterface.cc
   ViewerWidget.cc
+  RenderingDockWidget.cc
 )
 
 SET(INTERFACE_APPLICATION_MOC_SRCS
@@ -114,6 +115,7 @@ SET(INTERFACE_APPLICATION_MOC_SRCS
   ViewAction.h
   ViewerInterface.h
   ViewerWidget.h
+  RenderingDockWidget.h
 )
 
 
@@ -147,6 +149,7 @@ SET(INTERFACE_APPLICATION_UI_SRCS
   ToolBoxPageWidget.ui
   ViewerInterface.ui
   ViewerWidget.ui
+  RenderingDockWidget.ui
 )
 
 SET(INTERFACE_APPLICATION_RCC_SRCS

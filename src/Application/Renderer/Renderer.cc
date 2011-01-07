@@ -392,12 +392,19 @@ void RendererPrivate::draw_slice( LayerSceneItemHandle layer_item,
   Core::Texture::lock_type slice_tex_lock( slice_tex->get_mutex() );
   slice_tex->bind();
 
+  double texel_width = slice_width / ( volume_slice->nx() - 1 );
+  double texel_height = slice_height / ( volume_slice->ny() - 1 );
+
   if ( rect )
   {
-    double tex_left = ( rect->left - volume_slice->left() ) / slice_width;
-    double tex_right = ( rect->right - volume_slice->right() ) / slice_width + 1.0;
-    double tex_bottom = ( rect->bottom - volume_slice->bottom() ) / slice_height;
-    double tex_top = ( rect->top - volume_slice->top() ) / slice_height + 1.0;
+    double tex_left = ( rect->left - volume_slice->left() + texel_width * 0.5 ) / 
+      ( slice_width + texel_width );
+    double tex_right = ( rect->right - volume_slice->right() - texel_width * 0.5 ) / 
+      ( slice_width + texel_width ) + 1.0;
+    double tex_bottom = ( rect->bottom - volume_slice->bottom() + texel_height * 0.5 ) / 
+      ( slice_height + texel_height );
+    double tex_top = ( rect->top - volume_slice->top() - texel_height * 0.5 ) / 
+      ( slice_height + texel_height ) + 1.0;
     glBegin( GL_QUADS );
     glNormal3dv( &rect->normal[ 0 ] );
     glMultiTexCoord2d( GL_TEXTURE0, tex_left, tex_bottom );
@@ -415,14 +422,10 @@ void RendererPrivate::draw_slice( LayerSceneItemHandle layer_item,
     // NOTE: Extend the size of the slice by half voxel size in each direction. 
     // This is to compensate the difference between node centering and cell centering.
     // The volume data uses node centering, but OpenGL texture uses cell centering.
-    double voxel_width = ( volume_slice->right() - volume_slice->left() ) 
-      / ( volume_slice->nx() - 1 );
-    double voxel_height = ( volume_slice->top() - volume_slice->bottom() )
-      / ( volume_slice->ny() - 1 );
-    double left = volume_slice->left() - 0.5 * voxel_width;
-    double right = volume_slice->right() + 0.5 * voxel_width;
-    double bottom = volume_slice->bottom() - 0.5 * voxel_height;
-    double top = volume_slice->top() + 0.5 * voxel_height;
+    double left = volume_slice->left() - 0.5 * texel_width;
+    double right = volume_slice->right() + 0.5 * texel_width;
+    double bottom = volume_slice->bottom() - 0.5 * texel_height;
+    double top = volume_slice->top() + 0.5 * texel_height;
     slice_width = right - left;
     slice_height = top - bottom;
 
@@ -713,6 +716,7 @@ bool Renderer::render()
     std::vector< std::string > view_modes;
     bool with_lighting = viewer->volume_light_visible_state_->get();
     bool with_fog = viewer->volume_enable_fog_state_->get();
+    bool enable_clipping = viewer->volume_enable_clipping_state_->get();
     bool draw_slices = viewer->volume_slices_visible_state_->get();
     bool draw_isosurfaces = viewer->volume_isosurfaces_visible_state_->get();
     bool show_invisible_slices = viewer->volume_show_invisible_slices_state_->get();
@@ -747,8 +751,27 @@ bool Renderer::render()
     if ( draw_isosurfaces )
     {
       this->private_->process_isosurfaces( isosurfaces );
-    }   
+    }
 
+    double fog_density = ViewerManager::Instance()->fog_density_state_->get();
+    bool clip_plane_enable[ 6 ];
+    double clip_plane_theta[ 6 ];
+    double clip_plane_phi[ 6 ];
+    double clip_plane_distance[ 6 ];
+    bool clip_plane_reverse_normal[ 6 ];
+    if ( enable_clipping )
+    {
+      for ( size_t i = 0; i < 6; ++i )
+      {
+        clip_plane_enable[ i ] = ViewerManager::Instance()->enable_clip_plane_state_[ i ]->get();
+        clip_plane_theta[ i ] = ViewerManager::Instance()->clip_plane_theta_state_[ i ]->get();
+        clip_plane_phi[ i ] = ViewerManager::Instance()->clip_plane_phi_state_[ i ]->get();
+        clip_plane_distance[ i ] = ViewerManager::Instance()->clip_plane_distance_state_[ i ]->get();
+        clip_plane_reverse_normal[ i ] = 
+          ViewerManager::Instance()->clip_plane_reverse_norm_state_[ i ]->get();
+      }
+    }
+    
     // We have got everything we want from the state engine, unlock before we do any rendering
     state_lock.unlock();
 
@@ -767,7 +790,32 @@ bool Renderer::render()
 
     GLfloat fog_color[] = { bkg_color.r(), bkg_color.g(), bkg_color.b(), 1.0f };
     glFogfv( GL_FOG_COLOR, fog_color );
-    glFogf( GL_FOG_DENSITY, static_cast< float >( 1.0 / bbox.diagonal().length() ) );
+    glFogf( GL_FOG_DENSITY, static_cast< float >( fog_density / bbox.diagonal().length() ) );
+
+    if ( enable_clipping )
+    {
+      glPushMatrix();
+      glTranslated( bbox.center().x(), bbox.center().y(), bbox.center().z() );
+      glPushAttrib( GL_ENABLE_BIT );
+
+      for ( int i = 0; i < 6; ++i )
+      {
+        if ( !clip_plane_enable[ i ] )
+        {
+          continue;
+        }
+        double theta = Core::DegreeToRadian( clip_plane_theta[ i ] );
+        double phi = Core::DegreeToRadian( clip_plane_phi[ i ] );
+        int sign = clip_plane_reverse_normal[ i ] ? -1 : 1;
+        double sin_theta = sin( theta );
+        GLdouble eqn[ 4 ] = { sign * sin_theta * cos( phi ), sign * sin_theta * sin( phi ),
+          sign * cos( theta ), -sign * clip_plane_distance[ i ] };
+        glClipPlane( GL_CLIP_PLANE0 + i, eqn );
+        glEnable( GL_CLIP_PLANE0 + i );
+      }
+
+      glPopMatrix();
+    }
 
     if ( draw_slices )
     {
@@ -784,6 +832,11 @@ bool Renderer::render()
       this->private_->isosurface_shader_->set_fog( with_fog );
       this->private_->draw_isosurfaces( isosurfaces );
       this->private_->isosurface_shader_->disable();
+    }
+
+    if ( enable_clipping )
+    {
+      glPopAttrib();
     }
 
     // NOTE: The orientation axes should be drawn the last, because it clears the depth buffer.

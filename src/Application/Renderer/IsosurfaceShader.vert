@@ -25,5 +25,6 @@ void main()
   {
     normalized_value = ( value - min_val ) / val_range;
   }
+  gl_ClipVertex = gl_ModelViewMatrix * gl_Vertex;
   gl_Position = ftransform();
 } 

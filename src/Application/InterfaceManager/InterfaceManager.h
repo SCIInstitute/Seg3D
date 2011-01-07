@@ -78,10 +78,11 @@ public:
   Core::StateBoolHandle project_dockwidget_visibility_state_;
   Core::StateBoolHandle toolmanager_dockwidget_visibility_state_;
   Core::StateBoolHandle layermanager_dockwidget_visibility_state_;
+  Core::StateBoolHandle rendering_dockwidget_visibility_state_;
   Core::StateBoolHandle measurement_project_dockwidget_visibility_state_;
   Core::StateBoolHandle history_dockwidget_visibility_state_;
   
-  // Other widget visibilty state
+  // Other widget visibility state
   Core::StateBoolHandle preferences_manager_visibility_state_;
   Core::StateBoolHandle controller_visibility_state_;
   Core::StateBoolHandle message_window_visibility_state_;

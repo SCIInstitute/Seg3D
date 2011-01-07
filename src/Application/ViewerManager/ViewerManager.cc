@@ -38,6 +38,7 @@
 #include <Application/Session/Session.h>
 
 // Core includes
+#include <Core/Utils/StringUtil.h>
 #include <Core/Utils/ScopedCounter.h>
 #include <Core/Interface/Interface.h>
 #include <Core/State/StateIO.h>
@@ -59,6 +60,11 @@ public:
   void update_picking_targets();
   void handle_layer_volume_changed( LayerHandle layer );
   void change_layout( std::string layout );
+  void handle_fog_density_changed();
+  void update_clipping_range();
+  void update_clipping_range( size_t index );
+  void handle_clipping_plane_changed( size_t index );
+  void handle_clipping_plane_enabled( size_t index, bool enable );
 
 public:
   ViewerManager* vm_;
@@ -66,6 +72,7 @@ public:
   std::vector< ViewerHandle > viewers_;
   std::vector< size_t > locked_viewers_[ 4 ];
   size_t signal_block_count_;
+  Core::BooleanStateGroup visibility_group_;
 };
 
 void ViewerManagerPrivate::viewer_mode_changed( size_t viewer_id )
@@ -329,6 +336,94 @@ void ViewerManagerPrivate::change_layout( std::string layout )
   }
 }
 
+void ViewerManagerPrivate::update_clipping_range()
+{
+  for ( size_t i = 0; i < 6; ++i )
+  {
+    this->update_clipping_range( i );
+  }
+}
+
+void ViewerManagerPrivate::update_clipping_range( size_t index )
+{
+  if ( !this->vm_->enable_clip_plane_state_[ index ]->get() )
+  {
+    return;
+  }
+  
+  Core::BBox bbox = LayerManager::Instance()->get_layers_bbox();
+  if ( !bbox.valid() )  return;
+  
+  double theta = Core::DegreeToRadian( this->vm_->clip_plane_theta_state_[ index ]->get() );
+  double phi = Core::DegreeToRadian( this->vm_->clip_plane_phi_state_[ index ]->get() );
+  double sin_theta = sin( theta );
+  Core::Vector norm( sin_theta * cos( phi ), sin_theta * sin( phi ), cos( theta ) );
+  Core::Point corners[ 2 ] = { bbox.min(), bbox.max() };
+  Core::Point center = bbox.center();
+  double max_d = 0.0;
+  for ( size_t i = 0; i < 2; ++i )
+  {
+    for ( size_t j = 0; j < 2; ++j )
+    {
+      for ( size_t k = 0; k < 2; ++k )
+      {
+        Core::Point vertex( corners[ i ].x(), corners[ j ].y(), corners[ k ].z() );
+        Core::Vector dir = vertex - center;       
+        max_d = Core::Max( max_d, Core::Dot( dir, norm ) );
+      }
+    }
+  }
+  
+  Core::ScopedCounter signal_block( this->signal_block_count_ );
+  this->vm_->clip_plane_distance_state_[ index ]->set_range( -max_d, max_d );
+  this->vm_->clip_plane_distance_state_[ index ]->set_step( max_d / 50 );
+}
+
+void ViewerManagerPrivate::handle_clipping_plane_changed( size_t index )
+{
+  if ( this->signal_block_count_ > 0 ||
+    !this->vm_->enable_clip_plane_state_[ index ]->get() )
+  {
+    return;
+  }
+  
+  for ( size_t i = 0; i < 6; ++i )
+  {
+    if ( this->viewers_[ i ]->is_volume_view() )
+    {
+      this->viewers_[ i ]->redraw_scene();
+    }
+  }
+}
+
+void ViewerManagerPrivate::handle_clipping_plane_enabled( size_t index, bool enable )
+{
+  if ( enable )
+  {
+    this->update_clipping_range( index );
+  }
+  
+  for ( size_t i = 0; i < 6; ++i )
+  {
+    if ( this->viewers_[ i ]->is_volume_view() )
+    {
+      this->viewers_[ i ]->redraw_scene();
+    }
+  }
+}
+
+void ViewerManagerPrivate::handle_fog_density_changed()
+{
+  for ( size_t i = 0; i < 6; ++i )
+  {
+    if ( this->viewers_[ i ]->is_volume_view() &&
+      this->viewers_[ i ]->volume_enable_fog_state_->get() )
+    {
+      this->viewers_[ i ]->redraw_scene();
+    }
+  }
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Class ViewerManager
 //////////////////////////////////////////////////////////////////////////
@@ -361,6 +456,63 @@ ViewerManager::ViewerManager() :
   this->layout_state_->set_session_priority( Core::StateBase::DEFAULT_LOAD_E + 1 );
 
   this->add_state( "active_viewer", this->active_viewer_state_, 0 );
+
+  this->add_state( "fog_density", this->fog_density_state_, 1.0, 0.1, 5.0, 0.1 );
+  this->add_connection( this->fog_density_state_->state_changed_signal_.connect(
+    boost::bind( &ViewerManagerPrivate::handle_fog_density_changed, this->private_ ) ) );
+
+  for ( size_t i = 0; i < 6; ++i )
+  {
+    std::string cp_name = "cp" + Core::ExportToString( i + 1 );
+    this->add_state( cp_name + "_enable", this->enable_clip_plane_state_[ i ], false );
+    this->add_state( cp_name + "_theta", this->clip_plane_theta_state_[ i ], 90.0, 0.0, 180.0, 0.1 );
+    this->add_state( cp_name + "_phi", this->clip_plane_phi_state_[ i ], 0.0, 0.0, 360.0, 0.1 );
+    this->add_state( cp_name + "_distance", this->clip_plane_distance_state_[ i ], 0.0, -1.0, 1.0, 0.1 );
+    this->add_state( cp_name + "_reverse_norm", this->clip_plane_reverse_norm_state_[ i ], true );
+
+    this->add_connection( this->enable_clip_plane_state_[ i ]->value_changed_signal_.connect(
+      boost::bind( &ViewerManagerPrivate::handle_clipping_plane_enabled, this->private_, i, _1 ) ) );
+    this->add_connection( this->clip_plane_theta_state_[ i ]->value_changed_signal_.connect(
+      boost::bind( &ViewerManagerPrivate::update_clipping_range, this->private_, i ) ) );
+    this->add_connection( this->clip_plane_phi_state_[ i ]->value_changed_signal_.connect(
+      boost::bind( &ViewerManagerPrivate::update_clipping_range, this->private_, i ) ) );
+    this->add_connection( this->clip_plane_theta_state_[ i ]->value_changed_signal_.connect(
+      boost::bind( &ViewerManagerPrivate::handle_clipping_plane_changed, this->private_, i ) ) );
+    this->add_connection( this->clip_plane_phi_state_[ i ]->value_changed_signal_.connect(
+      boost::bind( &ViewerManagerPrivate::handle_clipping_plane_changed, this->private_, i ) ) );
+    this->add_connection( this->clip_plane_distance_state_[ i ]->value_changed_signal_.connect(
+      boost::bind( &ViewerManagerPrivate::handle_clipping_plane_changed, this->private_, i ) ) );
+    this->add_connection( this->clip_plane_reverse_norm_state_[ i ]->value_changed_signal_.connect(
+      boost::bind( &ViewerManagerPrivate::handle_clipping_plane_changed, this->private_, i ) ) );
+  }
+
+  {
+    Core::ScopedCounter signal_block( this->private_->signal_block_count_ );
+    // Clipping Plane 1 +x
+    
+    // Clipping Plane 4 -x
+    this->clip_plane_phi_state_[ 3 ]->set( 180.0 );
+
+    // Clipping Plane 2 +y
+    this->clip_plane_phi_state_[ 1 ]->set( 90.0 );
+
+    // Clipping Plane 5 -y
+    this->clip_plane_phi_state_[ 4 ]->set( 270.0 );
+
+    // Clipping Plane 3 +z
+    this->clip_plane_theta_state_[ 2 ]->set( 0.0 );
+
+    // Clipping Plane 6 -z
+    this->clip_plane_theta_state_[ 5 ]->set( 180.0 );
+  }
+
+  this->add_connection( LayerManager::Instance()->layers_changed_signal_.connect(
+    boost::bind( &ViewerManagerPrivate::update_clipping_range, this->private_ ) ) );
+
+  this->add_state( "show_fog_control", this->show_fog_control_state_, false );
+  this->add_state( "show_clipping_control", this->show_clipping_control_state_, false );
+  this->private_->visibility_group_.add_boolean_state( this->show_fog_control_state_ );
+  this->private_->visibility_group_.add_boolean_state( this->show_clipping_control_state_ );
 
   // No viewer will be the active viewer for picking
   // NOTE: The interface will set this up

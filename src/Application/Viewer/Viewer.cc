@@ -664,43 +664,52 @@ void ViewerPrivate::adjust_view( Core::VolumeSliceHandle target_slice )
   }
   double scale, scalex, scaley;
   Core::Point center;
+  double slice_width, slice_height;
 
   volume_slice->set_slice_type( Core::VolumeSliceType::AXIAL_E );
+  slice_width = volume_slice->nx() > 1 ? ( volume_slice->right() - volume_slice->left() ) * 
+      volume_slice->nx() / ( volume_slice->nx() - 1 ) : 0;
+  slice_height = volume_slice->ny() > 1 ? ( volume_slice->top() - volume_slice->bottom() ) * 
+    volume_slice->ny() / ( volume_slice->ny() - 1 ) : 0;
   center = Core::Point( ( volume_slice->left() + volume_slice->right() ) * 0.5, 
     ( volume_slice->bottom() + volume_slice->top() ) * 0.5, 
     this->viewer_->axial_view_state_->get().center().z() );
-
-  scale = 1.0 / Core::Max( Core::Abs( volume_slice->top() - volume_slice->bottom() ),
-    Core::Abs( volume_slice->right() - volume_slice->left() ) / aspect );
+  scale = 1.0 / Core::Max( Core::Abs( slice_height ), Core::Abs( slice_width ) / aspect );
   scalex = scale * Core::Sign( this->viewer_->axial_view_state_->get().scalex() );
   scaley = scale * Core::Sign( this->viewer_->axial_view_state_->get().scaley() );
   this->viewer_->axial_view_state_->set( Core::View2D( center, scalex, scaley ) );
 
   volume_slice->set_slice_type( Core::VolumeSliceType::CORONAL_E );
+  slice_width = volume_slice->nx() > 1 ? ( volume_slice->right() - volume_slice->left() ) * 
+    volume_slice->nx() / ( volume_slice->nx() - 1 ) : 0;
+  slice_height = volume_slice->ny() > 1 ? ( volume_slice->top() - volume_slice->bottom() ) * 
+    volume_slice->ny() / ( volume_slice->ny() - 1 ) : 0;
   center = Core::Point( ( volume_slice->left() + volume_slice->right() ) * 0.5, 
     ( volume_slice->bottom() + volume_slice->top() ) * 0.5, 
     this->viewer_->coronal_view_state_->get().center().z() );
-  scale = 1.0 / Core::Max( Core::Abs( volume_slice->top() - volume_slice->bottom() ),
-    Core::Abs( volume_slice->right() - volume_slice->left() ) / aspect );
+  scale = 1.0 / Core::Max( Core::Abs( slice_height ), Core::Abs( slice_width ) / aspect );
   scalex = scale * Core::Sign( this->viewer_->coronal_view_state_->get().scalex() );
   scaley = scale * Core::Sign( this->viewer_->coronal_view_state_->get().scaley() );
   this->viewer_->coronal_view_state_->set( Core::View2D( center, scalex, scaley ) );
 
   volume_slice->set_slice_type( Core::VolumeSliceType::SAGITTAL_E );
+  slice_width = volume_slice->nx() > 1 ? ( volume_slice->right() - volume_slice->left() ) * 
+    volume_slice->nx() / ( volume_slice->nx() - 1 ) : 0;
+  slice_height = volume_slice->ny() > 1 ? ( volume_slice->top() - volume_slice->bottom() ) * 
+    volume_slice->ny() / ( volume_slice->ny() - 1 ) : 0;
   center = Core::Point( ( volume_slice->left() + volume_slice->right() ) * 0.5, 
     ( volume_slice->bottom() + volume_slice->top() ) * 0.5, 
     this->viewer_->sagittal_view_state_->get().center().z() );
-  scale = 1.0 / Core::Max( Core::Abs( volume_slice->top() - volume_slice->bottom() ),
-    Core::Abs( volume_slice->right() - volume_slice->left() ) / aspect );
+  scale = 1.0 / Core::Max( Core::Abs( slice_height ), Core::Abs( slice_width ) / aspect );
   scalex = scale * Core::Sign( this->viewer_->sagittal_view_state_->get().scalex() );
   scaley = scale * Core::Sign( this->viewer_->sagittal_view_state_->get().scaley() );
   this->viewer_->sagittal_view_state_->set( Core::View2D( center, scalex, scaley ) );
 
   Core::VolumeHandle volume = volume_slice->get_volume();
-  Core::Point corner1 = volume->apply_grid_transform( Core::Point( 0.0, 0.0, 0.0 ) );
+  Core::Point corner1 = volume->apply_grid_transform( Core::Point( -0.5, -0.5, -0.5 ) );
   Core::Point corner2 = volume->apply_grid_transform(
-    Core::Point( static_cast< double >( volume->get_nx() - 1 ), 
-    static_cast< double >( volume->get_ny() - 1 ), static_cast< double >( volume->get_nz() - 1 ) ) );
+    Core::Point( static_cast< double >( volume->get_nx() - 0.5 ), 
+    static_cast< double >( volume->get_ny() - 0.5 ), static_cast< double >( volume->get_nz() - 0.5 ) ) );
   Core::View3D view3d( this->viewer_->volume_view_state_->get() );
   center = Core::Point( ( corner1 + corner2 ) * 0.5 );
   view3d.translate( view3d.lookat() - center );
@@ -938,6 +947,7 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
     this->volume_volume_rendering_visible_state_, false );
   this->add_state( "volume_light_visible", this->volume_light_visible_state_, true );
   this->add_state( "volume_enable_fog", this->volume_enable_fog_state_, false );
+  this->add_state( "volume_enable_clipping", this->volume_enable_clipping_state_, false );
   this->add_state( "volume_show_invisible_slices", this->volume_show_invisible_slices_state_, true );
 
   this->add_state( "lock", this->lock_state_, false );
@@ -986,6 +996,8 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
   this->add_connection( this->volume_light_visible_state_->state_changed_signal_.connect(
     boost::bind( &Viewer::redraw_scene, this ) ) );
   this->add_connection( this->volume_enable_fog_state_->state_changed_signal_.connect(
+    boost::bind( &Viewer::redraw_scene, this ) ) );
+  this->add_connection( this->volume_enable_clipping_state_->state_changed_signal_.connect(
     boost::bind( &Viewer::redraw_scene, this ) ) );
   this->add_connection( this->volume_slices_visible_state_->state_changed_signal_.connect(
     boost::bind( &Viewer::redraw_scene, this ) ) );
