@@ -233,7 +233,6 @@ void LayerGroupPrivate::handle_layers_iso_visible_state_changed( std::string sta
 
   Core::ScopedCounter signal_block( this->signal_block_count_ );
 
-  size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
   layer_list_type::iterator it = this->layer_group_->layer_list_.begin();
   while ( it != this->layer_group_->layer_list_.end() )
   {
