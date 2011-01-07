@@ -199,16 +199,22 @@ SegmentationSelectionPage::SegmentationSelectionPage( SegmentationPrivateHandle 
   this->private_->bitmap_layout_->setSpacing( 6 );
   this->private_->bitmap_layout_->setContentsMargins( 4, 4, 4, 4 );
   
-  this->private_->export_label_ = new QLabel( QString::fromUtf8( "Export masks as a series of: " ), 
+  this->private_->export_label_ = new QLabel( QString::fromUtf8( "Export masks as: " ), 
     this->private_->bitmap_widget_ );
   this->private_->bitmap_layout_->addWidget( this->private_->export_label_ );
   
   this->private_->export_selector_ = new QComboBox( this->private_->bitmap_widget_ );
+  this->private_->export_selector_->addItem( QString::fromUtf8( ".nrrd" ) );
   this->private_->export_selector_->addItem( QString::fromUtf8( ".tiff" ) );
   this->private_->export_selector_->addItem( QString::fromUtf8( ".bmp" ) );
   this->private_->export_selector_->addItem( QString::fromUtf8( ".png" ) );
+  this->private_->export_selector_->setCurrentIndex( 0 );
   this->private_->export_selector_->setEnabled( false );
   this->private_->bitmap_layout_->addWidget( this->private_->export_selector_ );
+  
+  connect( this->private_->export_selector_, SIGNAL( currentIndexChanged( int ) ), this,
+    SLOT( change_type_text( int ) ) );
+  
   
   this->private_->selection_main_layout_->addWidget( this->private_->single_or_multiple_files_widget_ );
   this->private_->selection_main_layout_->addWidget( this->private_->bitmap_widget_ );
@@ -225,6 +231,18 @@ void SegmentationSelectionPage::enable_disable_bitmap_button( int button_id )
   else
   {
     this->private_->export_selector_->setEnabled( true );
+  }
+}
+  
+void SegmentationSelectionPage::change_type_text( int index )
+{
+  if( index == 0 ) 
+  {
+    this->private_->export_label_->setText( QString::fromUtf8( "Export masks as: " ) );
+  }
+  else
+  {
+    this->private_->export_label_->setText( QString::fromUtf8( "Export masks as a series of: " ) );
   }
 }
   
@@ -447,14 +465,17 @@ bool SegmentationSummaryPage::validatePage()
   
   LayerExporterHandle exporter;
   bool result = false;
-  std::string extension = ".nrrd";
+  std::string extension = this->private_->export_selector_->currentText().toStdString();
   if( this->private_->single_file_radio_button_->isChecked() )
+  {
+    result = LayerIO::Instance()->create_exporter( exporter, layers, "NRRD Exporter", ".nrrd" );
+  }
+  else if( extension == ".nrrd" )
   {
     result = LayerIO::Instance()->create_exporter( exporter, layers, "NRRD Exporter", extension );
   }
   else
   {
-    extension = this->private_->export_selector_->currentText().toStdString();
     result = LayerIO::Instance()->create_exporter( exporter, layers, "ITK Mask Exporter", extension );
   }
   
