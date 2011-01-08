@@ -477,7 +477,14 @@ void LayerGroup::delete_layer( LayerHandle layer )
   ASSERT_IS_APPLICATION_THREAD();
 
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-
+  if( layer->get_type() ==  Core::VolumeType::MASK_E )
+  {
+    MaskLayerHandle temp_mask_handle = boost::dynamic_pointer_cast< MaskLayer >( layer );
+    if( temp_mask_handle->iso_generated_state_->get() )
+    {
+      temp_mask_handle->delete_isosurface();
+    }
+  }
   layer_list_.remove( layer );
   this->private_->update_layers_visible_state();
   this->private_->update_layers_iso_visible_state();

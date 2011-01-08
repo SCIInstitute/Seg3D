@@ -331,13 +331,14 @@ void LayerGroupWidget::verify_delete()
   {
     std::vector< std::string > layers;
     this->get_selected_layer_ids( layers );
-    ActionDeleteLayers::Dispatch( Core::Interface::GetWidgetActionContext(), 
-      layers );
     
     this->private_->button_menu_->blockSignals( true );
     this->private_->button_menu_->uncheck_delete_menu_button();
     this->private_->button_menu_->uncheck_delete_button();
     this->private_->button_menu_->blockSignals( false );
+    
+    ActionDeleteLayers::Dispatch( Core::Interface::GetWidgetActionContext(), 
+      layers );
   }
 }
 
