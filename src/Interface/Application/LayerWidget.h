@@ -190,10 +190,12 @@ private:
   // this function is called when the user drags another layer off of the top of this one
   virtual void dragLeaveEvent( QDragLeaveEvent* event );
   
+  // CONTEXTMENUEVENT:
+  // this function is the overloaded qt function that creates and connects actions to a context event
   virtual void contextMenuEvent( QContextMenuEvent * event );
 
   // EXPORT_LAYER:
-  // funtcion that checks the type of the layer and calls the appropriate function to export the layer  
+  // function that checks the type of the layer and calls the appropriate function to export the layer  
   void export_layer( const std::string& type_extension );
   
 private Q_SLOTS:

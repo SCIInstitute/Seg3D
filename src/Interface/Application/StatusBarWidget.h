@@ -63,38 +63,75 @@ public:
   StatusBarWidget( QMainWindow* parent = 0 );
   virtual ~StatusBarWidget();
 
-private Q_SLOTS:
-  void set_coordinates_mode( bool is_world );
-  void set_status_report_label( std::string& report );
-  void reset_icon( bool show_errors );
-
-  // -- build status bar widgets -- //
 private:
-  bool show_world_coord_;
+  // UPDATE_DATA_POINT_INFO:
+  //
   void update_data_point_info( DataPointInfoHandle data_point );
+  
+  // UPDATE_DATA_POINT_LABEL:
+  //
   void update_data_point_label();
+  
+  // SET_MESSAGE:
+  // 
   void set_message( int msg_type, std::string message );
+  
+  // CHECK_TIME:
+  // 
   void check_time();
+
+private Q_SLOTS:
+  // SET_COORDINATES_MODE:
+  // function that sets which mode the status bar is showing the coordinates in
+  void set_coordinates_mode( bool is_world );
+
+  // SET_STATUS_REPORT_LABEL:
+  // function that actually sets the message on the status bar
+  void set_status_report_label( std::string& report );
+
+  // RESET_ICON:
+  // function that resets the icon after an error has been viewed in the message window
+  void reset_icon( bool show_errors );
+  
+  // FIX_ICON_STATUS:
+  // function that sets the status report label back to true
+  //void fix_icon_status();
+  
+  // SWAP_BARS:
+  // function that swaps between the coordinates bar and the active tools/layer bar
+  void swap_bars();
+  
+  // CLEAR_LABEL:
+  // function that clears the message that is on the status bar
+  void clear_label();
+  
+  // SLIDE_IN:
+  // function that animates the status message in
+  void slide_in();
+  
+  // SLIDE_OUT:
+  // function that animates the status message out
+  void slide_out();
+  
+  // SLIDE_OUT_THEN_IN:
+  // function that animates the status message out then in
+  void slide_out_then_in();
+  
+  // SET_FINISHED_ANIMATING:
+  // function that sets the animating status to done;
+  void set_finished_animating();
   
 private:
-  QStatusBar* statusbar_;
-  QWidget *statusbar_widget_;
-  boost::shared_ptr< StatusBarWidgetPrivate > private_;
-  DataPointInfo data_point_info_;
-
-private Q_SLOTS:
-  void fix_icon_status();
-  void swap_bars();
-  void clear_label();
-  void slide_in();
-  void slide_out();
-  void slide_out_then_in();
-  void set_finished_animating();
-
-private:
   typedef QPointer< StatusBarWidget > qpointer_type;
+  boost::shared_ptr< StatusBarWidgetPrivate > private_;
+  
+private:
   static void SetMessage( qpointer_type qpointer, int msg_type, std::string message );
   static void HandleActionEvent( qpointer_type qpointer );
+
+
+  
+  
 
 };
 

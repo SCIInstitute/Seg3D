@@ -69,24 +69,30 @@ public:
   QIcon normal_message_icon_;
   QIcon error_message_icon_;
   
+  QStatusBar* statusbar_;
+  QWidget *statusbar_widget_;
+  
+  bool show_world_coord_;
+  DataPointInfo data_point_info_;
+  
 };
 
 StatusBarWidget::StatusBarWidget( QMainWindow* parent ) :
   QObject( parent ), 
-  show_world_coord_( false ), 
   private_( new StatusBarWidgetPrivate )
 {
-  this->statusbar_ = parent->statusBar();
-  this->statusbar_widget_ = new QWidget( this->statusbar_ );
+  this->private_->show_world_coord_ = false;
+  this->private_->statusbar_ = parent->statusBar();
+  this->private_->statusbar_widget_ = new QWidget( this->private_->statusbar_ );
   
-  this->private_->ui_.setupUi( this->statusbar_widget_ );
+  this->private_->ui_.setupUi( this->private_->statusbar_widget_ );
   this->private_->ui_.actives_->hide();
 
-  this->statusbar_->setContentsMargins( 0, 0, 0, 0 );
+  this->private_->statusbar_->setContentsMargins( 0, 0, 0, 0 );
 
-  this->statusbar_->addWidget( this->statusbar_widget_, 1 );
+  this->private_->statusbar_->addWidget( this->private_->statusbar_widget_, 1 );
   
-  this->statusbar_->setStyleSheet( StyleSheet::STATUSBAR_C );
+  this->private_->statusbar_->setStyleSheet( StyleSheet::STATUSBAR_C );
   
   connect( this->private_->ui_.swap_visibility_button_, 
     SIGNAL( clicked() ), this, SLOT( swap_bars() ) );
@@ -173,7 +179,7 @@ void StatusBarWidget::set_coordinates_mode( bool is_world )
         "Coordinate mode is set to Global, click to toggle to Local" ) );
   }
 
-  this->show_world_coord_ = is_world;
+  this->private_->show_world_coord_ = is_world;
   this->update_data_point_label();
 }
 
@@ -183,11 +189,11 @@ void StatusBarWidget::set_status_report_label( std::string& status )
   this->private_->ui_.status_report_label_->setText( QString::fromUtf8( "Status: " ) + report );
 }
 
-void StatusBarWidget::fix_icon_status()
-{
-  this->private_->ui_.status_report_label_->setText( 
-    QString::fromUtf8( "Status = true " ) );
-}
+// void StatusBarWidget::fix_icon_status()
+// {
+//  this->private_->ui_.status_report_label_->setText( 
+//    QString::fromUtf8( "Status = true " ) );
+// }
 
 void StatusBarWidget::update_data_point_info( DataPointInfoHandle data_point )
 {
@@ -198,7 +204,7 @@ void StatusBarWidget::update_data_point_info( DataPointInfoHandle data_point )
     return;
   }
 
-  this->data_point_info_ = *data_point;
+  this->private_->data_point_info_ = *data_point;
   this->update_data_point_label();
 }
   
@@ -213,13 +219,13 @@ void StatusBarWidget::update_data_point_label()
   
   
   // get some local copies of the data
-  double world_x = this->data_point_info_.world_coord().x();
-  double world_y = this->data_point_info_.world_coord().y();
-  double world_z = this->data_point_info_.world_coord().z();
+  double world_x = this->private_->data_point_info_.world_coord().x();
+  double world_y = this->private_->data_point_info_.world_coord().y();
+  double world_z = this->private_->data_point_info_.world_coord().z();
   
-  double index_x = this->data_point_info_.index_coord().x();
-  double index_y = this->data_point_info_.index_coord().y();
-  double index_z = this->data_point_info_.index_coord().z();
+  double index_x = this->private_->data_point_info_.index_coord().x();
+  double index_y = this->private_->data_point_info_.index_coord().y();
+  double index_z = this->private_->data_point_info_.index_coord().z();
   
   if ( !zero_based_slice_numbers )
   {
@@ -231,7 +237,7 @@ void StatusBarWidget::update_data_point_label()
   
   // In the case that all the coordinates are 0 then show nice 0's.
   if( ( world_x == 0 ) && ( world_y == 0 ) && ( world_z == 0 ) && 
-    ( this->data_point_info_.value() == 0 ) )
+    ( this->private_->data_point_info_.value() == 0 ) )
   { 
     this->private_->ui_.x_->setText( QString::fromUtf8("0.000") );
     this->private_->ui_.y_->setText( QString::fromUtf8("0.000") );
@@ -241,7 +247,7 @@ void StatusBarWidget::update_data_point_label()
 
   // In the case that the coordinates are outside of .0001-1000.00,
   // format them with scientific notation.
-  if( this->show_world_coord_ ) // World coordinates
+  if( this->private_->show_world_coord_ ) // World coordinates
   {
     if( ( 0.0 < world_x && world_x < 0.0001 ) || 1000 < world_x ) // Use scientific notation
     {
@@ -297,7 +303,7 @@ void StatusBarWidget::update_data_point_label()
   }
 
   // Value 
-  double val = this->data_point_info_.value();
+  double val = this->private_->data_point_info_.value();
   if( ( 0.0 < val && val < 0.0001 ) || 1000 < val ) // Use scientific notation
   {
     this->private_->ui_.value_->setText( QString( "%1" ).arg( val, 0, 'e', 2 ) );

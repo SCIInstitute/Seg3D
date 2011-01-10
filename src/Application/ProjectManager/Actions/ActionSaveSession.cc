@@ -39,6 +39,18 @@ namespace Seg3D
 
 bool ActionSaveSession::validate( Core::ActionContextHandle& context )
 {
+  boost::filesystem::path current_project_path = boost::filesystem::path( 
+    ProjectManager::Instance()->current_project_path_state_->get() ) /
+    ProjectManager::Instance()->current_project_->project_name_state_->get() /
+    ( ProjectManager::Instance()->current_project_->project_name_state_->get() + ".s3d" );
+
+  if( !boost::filesystem::exists( current_project_path ) && ProjectManager::Instance()->project_saved_state_->get() )
+  {
+    CORE_LOG_ERROR( "Your project could not be found at the place it was last saved!" );
+    ProjectManager::Instance()->project_saved_state_->set( false );
+  }
+
+
   if( this->is_autosave_.value() )
   {
     boost::posix_time::ptime time_stamp = ProjectManager::Instance()->get_last_saved_session_time_stamp();

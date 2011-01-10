@@ -45,6 +45,17 @@ bool ActionSaveProjectAs::validate( Core::ActionContextHandle& context )
 {
   boost::filesystem::path path = complete( boost::filesystem::path( 
     this->export_path_.value().c_str(), boost::filesystem::native ) );
+    
+  boost::filesystem::path current_project_path = boost::filesystem::path( 
+    ProjectManager::Instance()->current_project_path_state_->get() ) /
+    ProjectManager::Instance()->current_project_->project_name_state_->get() /
+    ( ProjectManager::Instance()->current_project_->project_name_state_->get() + ".s3d" );
+    
+  if( !boost::filesystem::exists( current_project_path ) && ProjectManager::Instance()->project_saved_state_->get() )
+  {
+    CORE_LOG_ERROR( "Your project could not be found at the place it was last saved!" );
+    ProjectManager::Instance()->project_saved_state_->set( false );
+  }
 
   if( !boost::filesystem::exists( path ) )
   {
