@@ -718,8 +718,14 @@ LayerSceneHandle LayerManager::compose_layer_scene( size_t viewer_id )
           DataLayer* data_layer = dynamic_cast< DataLayer* >( layer.get() );
           DataLayerSceneItem* data_layer_scene_item = new DataLayerSceneItem;
           layer_scene_item = LayerSceneItemHandle( data_layer_scene_item );
-          data_layer_scene_item->contrast_ = data_layer->contrast_state_->get();
-          data_layer_scene_item->brightness_ = data_layer->brightness_state_->get();
+          data_layer_scene_item->data_min_ = data_layer->min_value_state_->get();
+          data_layer_scene_item->data_max_ = data_layer->max_value_state_->get();
+          data_layer_scene_item->display_min_ = data_layer->display_min_value_state_->get();
+          data_layer_scene_item->display_max_ = data_layer->display_max_value_state_->get();
+          if ( data_layer_scene_item->display_min_ > data_layer_scene_item->display_max_ )
+          {
+            std::swap( data_layer_scene_item->display_min_, data_layer_scene_item->display_max_ );
+          }
           data_layer_scene_item->volume_rendered_ = data_layer->
             volume_rendered_state_->get();
         }

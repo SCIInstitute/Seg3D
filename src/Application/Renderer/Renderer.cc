@@ -330,23 +330,12 @@ void RendererPrivate::draw_slice( LayerSceneItemHandle layer_item,
     {
       DataLayerSceneItem* data_layer_item = 
         dynamic_cast< DataLayerSceneItem* >( layer_item.get() );
-
-      // Convert contrast to range ( 0, 1 ] and brightness to [ -1, 1 ]
-      double contrast = ( 1 - data_layer_item->contrast_ / 101 );
-      double brightness = data_layer_item->brightness_ / 50 - 1.0;
-
-      // NOTE: The equations for computing scale and bias are as follows:
-      //
-      // double scale = numeric_range / ( contrast * value_range );
-      // double window_max = -brightness * ( value_max - value_min ) + value_max;
-      // double bias = ( numeric_max - window_max * scale ) / numeric_max;
-      //
-      // However, since we always rescale the data to unsigned short when uploading
-      // textures, numeric_range and value_range are the same, 
-      // and thus the computation can be simplified.
-
-      double scale = 1.0 / contrast;
-      double bias = 1.0 - ( 1.0 - brightness ) * scale;
+      double data_range = data_layer_item->data_max_ - data_layer_item->data_min_;
+      double window_size = data_layer_item->display_max_ - data_layer_item->display_min_;
+      window_size = Core::Max( 0.01 * data_range, window_size );
+      double scale = data_range > 0 ? data_range / window_size : 1.0;
+      double bias = data_range > 0 ? 1.0 - ( scale * data_layer_item->display_max_ 
+        - data_layer_item->data_min_ ) / data_range : 0.0;
       this->slice_shader_->set_scale_bias( static_cast< float >( scale ), 
         static_cast< float >( bias ) );
     }

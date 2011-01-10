@@ -70,8 +70,10 @@ public:
   }
 
 public:
-  double contrast_;
-  double brightness_;
+  double data_min_;
+  double data_max_;
+  double display_min_;
+  double display_max_;
   bool volume_rendered_;
 };
 

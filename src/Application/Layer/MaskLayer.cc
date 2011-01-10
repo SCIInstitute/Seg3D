@@ -258,6 +258,8 @@ void MaskLayer::clean_up()
       Core::MaskVolume::CreateInvalidMask( this->mask_volume_->get_grid_transform(),
         this->mask_volume_ );
     }
+    this->isosurface_.reset();
+    this->iso_generated_state_->set( false );
   }
 
   // Remove all the connections
