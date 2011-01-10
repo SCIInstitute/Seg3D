@@ -34,7 +34,13 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 PROJECT(Seg3D)
 
-MESSAGE( STATUS "${CMAKE_ROOT}")
+###########################################
+#
+###########################################
+
+IF( ${CMAKE_BINARY_DIR} MATCHES ${CMAKE_SOURCE_DIR} )
+  MESSAGE( FATAL_ERROR "Please build Seg3D in the binary directory. Run 'cmake ../src' from the binary directory." )
+ENDIF( ${CMAKE_BINARY_DIR} MATCHES ${CMAKE_SOURCE_DIR} )
 
 ###########################################
 # WHERE TO COMPILE EXECUTABLES
