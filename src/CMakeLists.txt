@@ -39,7 +39,7 @@ PROJECT(Seg3D)
 ###########################################
 
 IF( ${CMAKE_BINARY_DIR} MATCHES ${CMAKE_SOURCE_DIR} )
-  MESSAGE( FATAL_ERROR "Please build Seg3D in the binary directory. Run 'cmake ../src' from the binary directory." )
+  MESSAGE( FATAL_ERROR "Please delete the CMakeCache.txt from the src directory and build Seg3D in the bin directory. Run 'rm CMakeCache.txt; cd ../bin; cmake ../src' from the binary directory." )
 ENDIF( ${CMAKE_BINARY_DIR} MATCHES ${CMAKE_SOURCE_DIR} )
 
 ###########################################
