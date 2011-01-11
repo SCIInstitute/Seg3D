@@ -129,6 +129,12 @@ SaveAsInfoPage::SaveAsInfoPage( QWidget *parent )
   this->project_path_change_button_->setFocusPolicy( Qt::NoFocus );
 
     registerField( "projectName", this->project_name_lineedit_ );
+    
+  this->warning_message_ = new QLabel( QString::fromUtf8( "This location does not exist, please chose a valid location." ) );
+  this->warning_message_->setObjectName( QString::fromUtf8( "warning_message_" ) );
+  this->warning_message_->setWordWrap( true );
+  this->warning_message_->setStyleSheet(QString::fromUtf8( "QLabel#warning_message_{ color: red; } " ) );
+  this->warning_message_->hide();
 
     QGridLayout *layout = new QGridLayout;
     layout->addWidget( this->project_name_label_, 0, 0 );
@@ -136,6 +142,8 @@ SaveAsInfoPage::SaveAsInfoPage( QWidget *parent )
     layout->addWidget( this->project_path_label_, 1, 0 );
     layout->addWidget( this->project_path_lineedit_, 1, 1 );
     layout->addWidget( this->project_path_change_button_, 2, 1, 1, 2 );
+    layout->addWidget( this->warning_message_, 3, 1, 1, 2 );
+    
     setLayout( layout );
 }
   
@@ -156,11 +164,15 @@ void SaveAsInfoPage::set_path()
   QString path = QFileDialog::getExistingDirectory ( this, "Directory",
     this->project_path_lineedit_->text() );
   
-    if ( path.isNull() == false )
+  if ( boost::filesystem::exists( boost::filesystem::path( path.toStdString() ) ) )
     {
-        project_directory_.setPath( path );
+       this->project_path_lineedit_->setText( project_directory_.canonicalPath() );
     }
-    this->project_path_lineedit_->setText( project_directory_.canonicalPath() );
+    else
+    {
+    this->project_path_lineedit_->setText( "" );
+    }
+    
     registerField( "projectPath", this->project_path_lineedit_ );
 }
 
@@ -199,6 +211,13 @@ bool SaveAsInfoPage::validatePage()
     Q_EMIT need_to_set_delete_path( QString::fromStdString( new_path.string() ) );
 
   }
+  
+  if( !boost::filesystem::exists( new_path.parent_path() ) )
+  {
+    this->warning_message_->show();
+    return false;
+  }
+  this->warning_message_->hide();
   return true;
 }
 

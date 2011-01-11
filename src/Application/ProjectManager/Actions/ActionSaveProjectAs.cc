@@ -59,6 +59,7 @@ bool ActionSaveProjectAs::validate( Core::ActionContextHandle& context )
 
   if( !boost::filesystem::exists( path ) )
   {
+    CORE_LOG_ERROR( "Project saving FAILED! The location specified does not exist." );
     return false;
   }
 

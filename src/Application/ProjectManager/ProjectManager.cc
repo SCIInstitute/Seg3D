@@ -649,6 +649,8 @@ bool ProjectManager::project_save_as( const std::string& export_path, const std:
   }
   else
   {
+    std::vector< std::string > empty_vector;
+    this->current_project_->sessions_state_->set( empty_vector );
     this->set_project_path( path / project_name );
     this->current_project_->project_name_state_->set( project_name );
     this->save_project( true );

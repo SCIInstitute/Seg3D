@@ -91,6 +91,7 @@ private:
     QLineEdit *project_name_lineedit_;
     QLineEdit *project_path_lineedit_;
     QPushButton *project_path_change_button_;
+    QLabel *warning_message_;
 
 private Q_SLOTS:
   // SETPATH:
