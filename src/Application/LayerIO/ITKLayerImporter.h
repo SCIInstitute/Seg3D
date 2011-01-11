@@ -59,7 +59,8 @@ class ITKLayerImporter : public LayerImporter
   SCI_IMPORTER_TYPE( "ITK Importer",  ".lsm;.LSM;"
                     ".tiff;.tif;.TIFF;.TIF;.stk;.STK;"
                     ".nii;.img;.hdr;"
-                    ".vtk;.VTK", 5, 
+                    ".vtk;.VTK;"
+                    ".mha", 5, 
                     LayerImporterType::SINGLE_FILE_E )
 
   // -- Constructor/Destructor --

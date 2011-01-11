@@ -35,6 +35,7 @@
 #include "itkGDCMSeriesFileNames.h"
 #include "itkAnalyzeImageIO.h"
 #include "itkNiftiImageIO.h"
+#include "itkMetaImageIO.h"
 #include "itkImageSeriesReader.h"
 #include "gdcmException.h"
 
@@ -305,11 +306,16 @@ bool ITKLayerImporter::import_header()
   {
     return this->private_->scan_simple_volume< itk::AnalyzeImageIO >();
   } 
-
+  
   if( this->private_->extension_ == ".nii" )
   {
     return this->private_->scan_simple_volume< itk::NiftiImageIO >();
   } 
+  
+  if( this->private_->extension_ == ".mha" )
+  {
+    return this->private_->scan_simple_volume< itk::MetaImageIO >();
+  }   
   
   return false; 
 }
@@ -337,24 +343,28 @@ bool ITKLayerImporter::load_data( Core::DataBlockHandle& data_block,
   if( this->private_->extension_ == ".tif" || this->private_->extension_ == ".tiff" ||
     this->private_->extension_ == ".stk" )
   {
-    this->private_->import_simple_volume<itk::TIFFImageIO >();
+    this->private_->import_simple_volume<itk::TIFFImageIO>();
   }
   else if( this->private_->extension_ == ".vtk"  )
   {
-    this->private_->import_simple_volume<itk::VTKImageIO >();
+    this->private_->import_simple_volume<itk::VTKImageIO>();
   } 
   else if( this->private_->extension_ == ".lsm"  )  
   {
-    this->private_->import_simple_volume<itk::LSMImageIO >();
+    this->private_->import_simple_volume<itk::LSMImageIO>();
   } 
   else if( this->private_->extension_ == ".img"  || this->private_->extension_ == ".hdr" )  
   {
-    this->private_->import_simple_volume<itk::AnalyzeImageIO >();
+    this->private_->import_simple_volume<itk::AnalyzeImageIO>();
   } 
   else if( this->private_->extension_ == ".nii" ) 
   {
-    this->private_->import_simple_volume<itk::NiftiImageIO >();
+    this->private_->import_simple_volume<itk::NiftiImageIO>();
   } 
+  else if( this->private_->extension_ == ".mha" )
+  {
+    this->private_->import_simple_volume<itk::MetaImageIO>();   
+  }
   else
   {
     return false;
