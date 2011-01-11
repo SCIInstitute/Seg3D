@@ -356,8 +356,8 @@ void ViewerManagerPrivate::update_clipping_range( size_t index )
   
   double theta = Core::DegreeToRadian( this->vm_->clip_plane_theta_state_[ index ]->get() );
   double phi = Core::DegreeToRadian( this->vm_->clip_plane_phi_state_[ index ]->get() );
-  double sin_theta = sin( theta );
-  Core::Vector norm( sin_theta * cos( phi ), sin_theta * sin( phi ), cos( theta ) );
+  double cos_theta = cos( theta );
+  Core::Vector norm( cos_theta * cos( phi ), cos_theta * sin( phi ), sin( theta ) );
   Core::Point corners[ 2 ] = { bbox.min(), bbox.max() };
   Core::Point center = bbox.center();
   double max_d = 0.0;
@@ -465,7 +465,7 @@ ViewerManager::ViewerManager() :
   {
     std::string cp_name = "cp" + Core::ExportToString( i + 1 );
     this->add_state( cp_name + "_enable", this->enable_clip_plane_state_[ i ], false );
-    this->add_state( cp_name + "_theta", this->clip_plane_theta_state_[ i ], 90.0, 0.0, 180.0, 0.1 );
+    this->add_state( cp_name + "_theta", this->clip_plane_theta_state_[ i ], 0.0, -90.0, 90.0, 0.1 );
     this->add_state( cp_name + "_phi", this->clip_plane_phi_state_[ i ], 0.0, 0.0, 360.0, 0.1 );
     this->add_state( cp_name + "_distance", this->clip_plane_distance_state_[ i ], 0.0, -1.0, 1.0, 0.1 );
     this->add_state( cp_name + "_reverse_norm", this->clip_plane_reverse_norm_state_[ i ], true );
@@ -500,10 +500,10 @@ ViewerManager::ViewerManager() :
     this->clip_plane_phi_state_[ 4 ]->set( 270.0 );
 
     // Clipping Plane 3 +z
-    this->clip_plane_theta_state_[ 2 ]->set( 0.0 );
+    this->clip_plane_theta_state_[ 2 ]->set( 90.0 );
 
     // Clipping Plane 6 -z
-    this->clip_plane_theta_state_[ 5 ]->set( 180.0 );
+    this->clip_plane_theta_state_[ 5 ]->set( -90.0 );
   }
 
   this->add_connection( LayerManager::Instance()->layers_changed_signal_.connect(

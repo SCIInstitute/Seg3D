@@ -796,9 +796,9 @@ bool Renderer::render()
         double theta = Core::DegreeToRadian( clip_plane_theta[ i ] );
         double phi = Core::DegreeToRadian( clip_plane_phi[ i ] );
         int sign = clip_plane_reverse_normal[ i ] ? -1 : 1;
-        double sin_theta = sin( theta );
-        GLdouble eqn[ 4 ] = { sign * sin_theta * cos( phi ), sign * sin_theta * sin( phi ),
-          sign * cos( theta ), -sign * clip_plane_distance[ i ] };
+        double cos_theta = cos( theta );
+        GLdouble eqn[ 4 ] = { sign * cos_theta * cos( phi ), sign * cos_theta * sin( phi ),
+          sign * sin( theta ), -sign * clip_plane_distance[ i ] };
         glClipPlane( GL_CLIP_PLANE0 + i, eqn );
         glEnable( GL_CLIP_PLANE0 + i );
       }
