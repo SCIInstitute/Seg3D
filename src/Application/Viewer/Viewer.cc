@@ -1059,6 +1059,8 @@ void Viewer::mouse_move_event( const Core::MouseHistory& mouse_history, int butt
 void Viewer::mouse_press_event( const Core::MouseHistory& mouse_history, int button, int buttons,
     int modifiers )
 {
+  CORE_LOG_MESSAGE( "Viewer " + Core::ExportToString( this->get_viewer_id() ) + " mouse_press_event" );
+
   {
     boost::mutex::scoped_lock lock( this->private_->mouse_pressed_mutex_ );
     this->private_->mouse_pressed_ = true;
@@ -1098,6 +1100,8 @@ void Viewer::mouse_press_event( const Core::MouseHistory& mouse_history, int but
 void Viewer::mouse_release_event( const Core::MouseHistory& mouse_history, int button, int buttons,
     int modifiers )
 {
+  //CORE_LOG_MESSAGE( "Viewer " + Core::ExportToString( this->get_viewer_id() ) + " mouse_release_event" );
+  
   {
     boost::mutex::scoped_lock lock( this->private_->mouse_pressed_mutex_ );
     this->private_->mouse_pressed_ = false;
@@ -1124,6 +1128,8 @@ void Viewer::mouse_release_event( const Core::MouseHistory& mouse_history, int b
 
 void Viewer::mouse_enter_event( int x, int y )
 {
+  //CORE_LOG_MESSAGE( "Viewer " + Core::ExportToString( this->get_viewer_id() ) + " mouse_enter_event" );
+
   if ( this->private_->mouse_enter_handler_ )
   {
     this->private_->mouse_enter_handler_( this->shared_from_this(), x, y );
@@ -1132,8 +1138,12 @@ void Viewer::mouse_enter_event( int x, int y )
 
 void Viewer::mouse_leave_event()
 {
+  //CORE_LOG_MESSAGE( "Viewer " + Core::ExportToString( this->get_viewer_id() ) + " mouse_leave_event" );
+
 #ifdef __APPLE__
-  // Mac doesn't give matching mouse release event if I leave the window with the mouse pressed.  
+  // Apparently on some versions of the Mac OS (though not 10.5.6), mouse move events are no longer 
+  // sent to the window after a mouse leave event.  To handle this, painting is stopped when
+  // a mouse leave event occurs on the Mac.
   {
     boost::mutex::scoped_lock lock( this->private_->mouse_pressed_mutex_ );
     this->private_->mouse_pressed_ = false;
