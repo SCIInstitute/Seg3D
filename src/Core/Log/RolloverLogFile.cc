@@ -113,8 +113,9 @@ void RolloverLogFilePrivate::rollover_log_files()
     }
 
     // Remove all logs older than max age
-    std::vector< boost::filesystem::path > log_files;
+    std::vector< std::pair< boost::filesystem::path, std::time_t > > log_files;
     boost::filesystem::directory_iterator end_itr; // default construction yields past-the-end
+    // Iterator represents no particular order of files
     for ( boost::filesystem::directory_iterator itr( this->log_dir_ ); itr != end_itr; ++itr )
     {
       if ( boost::filesystem::is_regular_file( itr->status() ) )
@@ -133,7 +134,7 @@ void RolloverLogFilePrivate::rollover_log_files()
           }
           else
           {
-            log_files.push_back( itr->path() );
+            log_files.push_back( std::make_pair( itr->path(), file_write_time ) );
           }
         }
       }
@@ -142,12 +143,14 @@ void RolloverLogFilePrivate::rollover_log_files()
     // If num log files exceeds (or will exceed) max log files, remove oldest logs 
     if( log_files.size() >= static_cast< size_t >( this->max_files_ ) )
     {
-      // Sort files by date.  Because the date is stored in the filename, we can sort by name.
-      std::sort( log_files.begin(), log_files.end() );
+      // Sort files by date
+      std::sort(  log_files.begin(), log_files.end(),
+        boost::bind( &std::pair< boost::filesystem::path, std::time_t >::second, _1 ) <
+        boost::bind( &std::pair< boost::filesystem::path, std::time_t >::second, _2 ) );
 
       for( size_t i = 0; i < log_files.size() - this->max_files_ + 1; i++ )
       {
-        boost::filesystem::remove( log_files[ i ] );
+        boost::filesystem::remove( log_files[ i ].first );
       }
     }
   }
@@ -221,8 +224,12 @@ RolloverLogFile::RolloverLogFile( unsigned int log_flags ) :
   boost::algorithm::replace_all( release_name, "(", "" );
   boost::algorithm::replace_all( release_name, ")", "" );
   boost::algorithm::replace_all( release_name, " ", "" );
+  if( release_name != "" )
+  {
+    release_name += "_";
+  }
 
-  this->private_->log_file_prefix_ = Application::GetApplicationName() + "_" + release_name  + "_" 
+  this->private_->log_file_prefix_ = Application::GetApplicationName() + "_" + release_name  
     + Application::GetVersion();
 
   // Rollover log files if needed, and create new log file
