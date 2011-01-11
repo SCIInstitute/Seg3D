@@ -1059,7 +1059,7 @@ void Viewer::mouse_move_event( const Core::MouseHistory& mouse_history, int butt
 void Viewer::mouse_press_event( const Core::MouseHistory& mouse_history, int button, int buttons,
     int modifiers )
 {
-  CORE_LOG_MESSAGE( "Viewer " + Core::ExportToString( this->get_viewer_id() ) + " mouse_press_event" );
+  //CORE_LOG_MESSAGE( "Viewer " + Core::ExportToString( this->get_viewer_id() ) + " mouse_press_event" );
 
   {
     boost::mutex::scoped_lock lock( this->private_->mouse_pressed_mutex_ );
