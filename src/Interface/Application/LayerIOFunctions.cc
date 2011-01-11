@@ -253,8 +253,11 @@ void LayerIOFunctions::ExportLayer( QMainWindow* main_window )
     return;
   }
 
+  boost::filesystem::path file_path = boost::filesystem::path( 
+    PreferencesManager::Instance()->export_path_state_->get() ) / layer_handles[ 0 ]->get_layer_name();
+
   QString filename = QFileDialog::getSaveFileName( main_window, "Export Data Layer As... ",
-    QString::fromStdString( PreferencesManager::Instance()->export_path_state_->get() ),
+    QString::fromStdString( file_path.string() ),
     "NRRD files (*.nrrd);;DICOM files (*.dcm);;TIFF files (*.tiff);;PNG files (*.png)" );
   
   if( filename == "" ) return;
