@@ -62,6 +62,7 @@ void Texture::disable()
 void Texture::bind()
 {
   glBindTexture( this->target_, this->texture_id_ );
+  CORE_CHECK_OPENGL_ERROR();
 }
 
 void Texture::unbind()
@@ -162,6 +163,7 @@ void Texture1D::set_image( int width, int internal_format, const void *pixels,
   this->safe_bind();
   glTexImage1D( this->target_, level, internal_format, width, 0, format, type, pixels );
   this->safe_unbind();
+  CORE_CHECK_OPENGL_ERROR();
 }
 
 void Texture1D::set_sub_image( int xoffset, int width, const void* data, 
@@ -170,6 +172,7 @@ void Texture1D::set_sub_image( int xoffset, int width, const void* data,
   this->safe_bind();
   glTexSubImage1D( this->target_, level, xoffset, width, format, type, data );
   this->safe_unbind();
+  CORE_CHECK_OPENGL_ERROR();
 }
 
 Texture2D::Texture2D() :
@@ -190,6 +193,7 @@ void Texture2D::set_image(int width, int height, int internal_format, const void
   this->safe_bind();
   glTexImage2D(target_, level, internal_format, width, height, 0, format, type, pixels);
   this->safe_unbind();
+  CORE_CHECK_OPENGL_ERROR();
 }
 
 void Texture2D::set_sub_image( int xoffset, int yoffset, int width, int height, 
@@ -198,6 +202,7 @@ void Texture2D::set_sub_image( int xoffset, int yoffset, int width, int height,
   this->safe_bind();
   glTexSubImage2D( this->target_, level, xoffset, yoffset, width, height, format, type, data );
   this->safe_unbind();
+  CORE_CHECK_OPENGL_ERROR();
 }
 
 Texture3D::Texture3D() :
@@ -219,6 +224,7 @@ void Texture3D::set_image(int width, int height, int depth, int internal_format,
   this->safe_bind();
   glTexImage3D(target_, level, internal_format, width, height, depth, 0, format, type, pixels);
   this->safe_unbind();
+  CORE_CHECK_OPENGL_ERROR();
 }
 
 void Texture3D::set_sub_image( int xoffset, int yoffset, int zoffset, int width, int height, int depth, 
@@ -227,6 +233,7 @@ void Texture3D::set_sub_image( int xoffset, int yoffset, int zoffset, int width,
   this->safe_bind();
   glTexSubImage3D( this->target_, level, xoffset, yoffset, zoffset, width, height, depth, format, type, data );
   this->safe_unbind();
+  CORE_CHECK_OPENGL_ERROR();
 }
 
 } // end namespace Core

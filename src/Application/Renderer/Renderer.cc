@@ -966,11 +966,14 @@ bool Renderer::render_overlay()
     glMatrixMode( GL_MODELVIEW );
     glLoadIdentity();
 
+    CORE_CHECK_OPENGL_ERROR();
+
     // Render the active tool
     ToolHandle tool = ToolManager::Instance()->get_active_tool();
     if ( tool )
     {
       tool->redraw( this->private_->viewer_id_, proj_mat );
+      CORE_CHECK_OPENGL_ERROR();
     }
 
     // Render the grid
@@ -1001,6 +1004,7 @@ bool Renderer::render_overlay()
         glVertex2i( this->width_, center_y + grid_spacing * i );
       }
       glEnd();
+      CORE_CHECK_OPENGL_ERROR();
     } // end if ( show_grid )
     
     // Render the positions of slices in other viewers
@@ -1074,6 +1078,7 @@ bool Renderer::render_overlay()
         glEnd();
       }
       glDisable( GL_LINE_STIPPLE );
+      CORE_CHECK_OPENGL_ERROR();
     } // end if ( show_picking_lines )
 
     // Render the slice number text
@@ -1102,6 +1107,7 @@ bool Renderer::render_overlay()
       glVertex2i( 0, this->height_ - 1 );
       glEnd();
       this->private_->text_texture_->disable();
+      CORE_CHECK_OPENGL_ERROR();
     } // end rendering text
 
     glDisable( GL_BLEND );

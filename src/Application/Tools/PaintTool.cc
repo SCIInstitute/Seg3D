@@ -946,6 +946,8 @@ void PaintTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
   glPushMatrix();
   glLoadIdentity();
   glMultMatrixd( proj_mat.data() );
+
+  CORE_CHECK_OPENGL_ERROR();
   
   MaskLayer* target_mask_layer = static_cast< MaskLayer* >( target_layer.get() );
   Core::Color color = PreferencesManager::Instance()->get_color( 
@@ -996,6 +998,7 @@ void PaintTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
       glVertex2d( left, top );
     glEnd();
     data_constraint_tex->unbind();
+    CORE_CHECK_OPENGL_ERROR();
   }
   
   if ( brush_visible && current_viewer_mode == redraw_viewer_mode )
@@ -1040,6 +1043,7 @@ void PaintTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
     glEnd();
 
     this->private_->brush_tex_->unbind();
+    CORE_CHECK_OPENGL_ERROR();
   }
   
   Core::Texture::SetActiveTextureUnit( old_tex_unit );
@@ -1050,6 +1054,7 @@ void PaintTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
   if ( layer_visible )
   {
     SeedPointsTool::redraw( viewer_id, proj_mat );
+    CORE_CHECK_OPENGL_ERROR();
   }
   
   glFinish();
