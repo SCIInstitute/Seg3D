@@ -144,5 +144,7 @@
         <file>Images/TextOffError.png</file>
         <file>Images/InvisibleSlicesVisible.png</file>
         <file>Images/InvisibleSlicesVisibleOff.png</file>
+        <file>Images/Clip.png</file>
+        <file>Images/ClipOff.png</file>
     </qresource>
 </RCC>

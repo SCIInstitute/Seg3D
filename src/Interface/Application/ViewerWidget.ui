@@ -208,7 +208,7 @@ QComboBox::icon{
                 <widget class="QComboBox" name="viewer_mode_">
                  <property name="minimumSize">
                   <size>
-                   <width>82</width>
+                   <width>100</width>
                    <height>0</height>
                   </size>
                  </property>
@@ -920,6 +920,11 @@ QComboBox::icon{
                  </property>
                  <property name="text">
                   <string>...</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="../../Resources/QtResources.qrc">
+                   <normaloff>:/Images/ClipOff.png</normaloff>
+                   <normalon>:/Images/Clip.png</normalon>:/Images/ClipOff.png</iconset>
                  </property>
                 </widget>
                </item>
