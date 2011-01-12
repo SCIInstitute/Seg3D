@@ -95,6 +95,11 @@ public:
   // Get the transform of the layer
   virtual Core::GridTransform get_grid_transform() const = 0;
 
+  // SET_GRID_TRANSFORM:
+  // Set the transform of the layer
+  virtual void set_grid_transform( const Core::GridTransform& grid_transform, 
+    bool preserve_centering ) = 0;
+
   // GET_DATA_TYPE:
   // Get the data type of the underlying data
   virtual Core::DataType get_data_type() const = 0;

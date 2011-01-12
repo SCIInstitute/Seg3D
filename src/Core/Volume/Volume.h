@@ -121,6 +121,10 @@ public:
     return this->grid_transform_;
   }
 
+  // SET_GRID_TRANSFORM:
+  // Set the grid location
+  void set_grid_transform( const GridTransform& grid_transform, bool preserve_centering );
+
   // GET_TRANSFORM:
   // Get the transform of the data
   Transform get_transform() const

@@ -255,6 +255,17 @@ Core::GridTransform DataLayer::get_grid_transform() const
   }
 }
 
+void DataLayer::set_grid_transform( const Core::GridTransform& grid_transform, 
+  bool preserve_centering )
+{
+  Layer::lock_type lock( Layer::GetMutex() );
+
+  if ( this->data_volume_ )
+  {
+    this->data_volume_->set_grid_transform( grid_transform, preserve_centering ); 
+  }
+}
+
 Core::DataType DataLayer::get_data_type() const
 {
   Layer::lock_type lock( Layer::GetMutex() );

@@ -73,6 +73,11 @@ public:
   // This function returns the grid transform of the mask volume.
   virtual Core::GridTransform get_grid_transform() const;
 
+  // SET_GRID_TRANSFORM:
+  // Set the grid transform of the mask volume.
+  virtual void set_grid_transform( const Core::GridTransform& grid_transform, 
+    bool preserve_centering );
+
   // GET_DATA_TYPE:
   // Get the data type of the underlying data
   virtual Core::DataType get_data_type() const;

@@ -1121,31 +1121,31 @@ void IsosurfacePrivate::parallel_compute_faces( int thread, int num_threads,
 Basic ideas:
 - Marching cubes:
   - Each "cube" has a configuration of on/off nodes that can be represented as and 8-bit bitmask.
-    The bitmask can be used as an index into a 256 (2^8) entry lookup table of predefined, generic
+    The bitmask can be used as an index into a 256 (2^8) entry lookup table of predefined, canonical
     facet combinations.
   - A naive implementation of marching cubes would just process each cube 
     independently and add all the faces (points and indices) for that cube.  The problem with this 
     approach is that points end up in the points list multiple times (more GPU memory) and edges get 
     evaluated multiple times (once for each cube they belong to, up to 4).  To avoid this we process edges 
-    one at a time by running through them horizontally and vertically.  For each edge that is split,
-    we add a point to the points list.  At this point we have a list of points as well as a generic facet
+    one at a time by running through them horizontally and vertically.  For each edge that is split (one vertex is "on" and the other is "off"),
+    we add a point to the points list.  At this point we have a list of points as well as a canonical facet
     combination for each cube.  We want to build triangles.  What we need is a way to map the canonical edge indices in the facet 
     combination to indices of actual points in the points list.  So while we are examining edges we 
     build a translation table to keep track of what canonical index an split edge point belongs to for 
-    each adjacent cube.  For each cube we can look up the point index for each canonical index in that 
+    each cube adjacent to the edge.  For each cube we can look up the point index for each canonical index in that 
     cube's facet combination.  This 2D array looks like 
     cubes[cube_index][canonical_edge_index] = point_index.  
   Size: cubes[num cubes][12 (edges per cube)]
   We're translating this data:
     cube type -> facet combo -> canonical edge index -> actual point index -> point
-  - Normally in marching cubes the edge points are interpolation between the vertex values, but for
+  - Normally in marching cubes the edge points are linearly interpolated between the vertex values, but for
   for binary images we always place the edge points in the middle of the edge.
 - Isosurface capping
   - Generating isosurface geometry for the 6 border faces of the volume is a 2D operation since each
     of the 6 faces is a 2D image.  Therefore, instead of calling the elements "cubes," we call them 
     "cells."
   - We need a different facet combo type table for border faces.
-  - For border faces, both nodes and edges can potentially be added to the list of points.  This is 
+  - For border faces, both nodes and edge center-points can potentially be added to the list of points.  This is 
     because there would be edge points between the border faces and the imaginary outside padding, but
     these points get clamped to the nodes on the border.  In fact, all border nodes that are "on" are
     included as points because they are all adjacent to the imaginary padding that is "off."  This

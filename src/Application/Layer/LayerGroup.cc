@@ -598,7 +598,22 @@ bool LayerGroup::post_load_states( const Core::StateIO& state_io )
     {
       if( this->layer_list_.empty() )
       {
+        // Use the first grid transform as the grid transform for the entire group
         this->grid_transform_ = layer->get_grid_transform();
+      }
+      else
+      {
+        // In order to provide backward compatibility, we need to force all layers in a 
+        // group to have the same grid transform (space origin and space direction).  
+        // Otherwise it is possible for a session file to have a layer group with a mix of 
+        // cell-centered and node-centered layers that, when correctly processed, have 
+        // slightly different grid transforms.
+
+        // We are supposed to preserve the original centering (node vs. cell) when exporting 
+        // nrrds, so we only change the matrix portion of the grid transform and leave the
+        // original centering alone.
+        bool preserve_centering = true;
+        layer->set_grid_transform( this->grid_transform_, preserve_centering );
       }
       this->insert_layer( layer );
       

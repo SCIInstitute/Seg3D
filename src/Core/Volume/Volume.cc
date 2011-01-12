@@ -58,5 +58,15 @@ Point Volume::apply_inverse_grid_transform( const Point& pt ) const
   return this->inverse_transform_ * pt;
 }
 
+void Volume::set_grid_transform( const GridTransform& grid_transform, bool preserve_centering )
+{
+  bool originally_node_centered = this->grid_transform_.get_originally_node_centered();
+  this->grid_transform_ = grid_transform;
+  if( preserve_centering )
+  {
+    this->grid_transform_.set_originally_node_centered( originally_node_centered );
+  }
+}
+
 } // end namespace Core
 
