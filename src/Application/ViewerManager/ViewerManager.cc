@@ -267,6 +267,13 @@ void ViewerManagerPrivate::handle_layer_volume_changed( LayerHandle layer )
 
 void ViewerManagerPrivate::change_layout( std::string layout )
 {
+  if ( !Core::Application::IsApplicationThread() )
+  {
+    Core::Application::PostEvent( boost::bind( &ViewerManagerPrivate::change_layout,
+      this, layout ) );
+    return;
+  }
+  
   if( layout == ViewerManager::SINGLE_C )
   {
     this->viewers_[ 0 ]->viewer_visible_state_->set( true );
@@ -537,16 +544,10 @@ ViewerManager::ViewerManager() :
   this->private_->viewers_[ 4 ] = ViewerHandle( new Viewer( 4, true, Viewer::CORONAL_C ) );
   this->private_->viewers_[ 5 ] = ViewerHandle( new Viewer( 5, true, Viewer::SAGITTAL_C ) );
 
-  for ( size_t j = 0; j < this->private_->viewers_.size(); j++ )
-  {
-    this->private_->viewers_[ j ]->set_initializing( true );
-  }
   this->private_->change_layout( this->layout_state_->get() );
 
   for ( size_t j = 0; j < this->private_->viewers_.size(); j++ )
   {
-    this->private_->viewers_[ j ]->set_initializing( false );
-
     // NOTE: ViewerManager needs to process these signals first
     this->add_connection( this->private_->viewers_[ j ]->view_mode_state_->value_changed_signal_.
       connect( boost::bind( &ViewerManagerPrivate::viewer_mode_changed, this->private_, j ), 

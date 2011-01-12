@@ -75,18 +75,6 @@ public:
   // "redraw_completed_signal_" at the end.
   virtual void redraw_all() = 0;
 
-  // ACTIVATE:
-  // Activate the renderer
-  virtual void activate() = 0;
-
-  // DEACTIVATE:
-  // Deactivate the renderer
-  virtual void deactivate() = 0;  
-
-  // IS_ACTIVE:
-  // Return the status of the renderer
-  virtual bool is_active() = 0;
-
   // REDRAW_COMPLETED_SIGNAL_
   // Triggered when redraw is done. The first parameter is a handle to the texture
   // containing the redraw result, the second indicates whether the update should be
@@ -99,6 +87,22 @@ public:
   // Triggered when redraw_overlay is done.
   // The parameter is a handle to the texture containing the overlay.
   redraw_completed_signal_type redraw_overlay_completed_signal_;
+
+protected:
+  friend class AbstractViewer;
+  friend class AbstractViewerPrivate;
+
+  // ACTIVATE:
+  // Activate the renderer
+  virtual void activate() = 0;
+
+  // DEACTIVATE:
+  // Deactivate the renderer
+  virtual void deactivate() = 0;  
+
+  // IS_ACTIVE:
+  // Return the status of the renderer
+  virtual bool is_active() = 0;
 
 };
 

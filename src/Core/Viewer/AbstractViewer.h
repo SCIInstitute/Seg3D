@@ -164,11 +164,6 @@ public:
   // Get the shape of the cursor in the viewer.
   CursorShape get_cursor() const;
 
-protected:
-  // GET_RENDERER:
-   // Get the renderer base class that is associated with this viewer
-  AbstractRendererHandle get_renderer();
-
   // -- internals of the abstract renderer --
 private:
   friend class AbstractViewerPrivate;

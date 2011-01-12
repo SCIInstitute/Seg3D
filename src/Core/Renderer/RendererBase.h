@@ -77,6 +77,9 @@ public:
   // It triggers the "redraw_overlay_completed_signal_" at the end.
   virtual void redraw_all();
 
+protected:
+  friend class RendererBasePrivate;
+
   // Activate the renderer
   virtual void activate();
 
@@ -85,9 +88,6 @@ public:
 
   // Return the status of the renderer
   virtual bool is_active();
-
-protected:
-  friend class RendererBasePrivate;
 
   // POST_INITIALIZE:
   // Called at the end of "initialize". The default implementation does not do anything.

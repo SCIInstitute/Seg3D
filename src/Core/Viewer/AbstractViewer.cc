@@ -208,7 +208,10 @@ void AbstractViewer::install_renderer( AbstractRendererHandle renderer )
   
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
     this->private_->handle_visibility_changed( this->viewer_visible_state_->get() );
+    this->add_connection( this->viewer_visible_state_->value_changed_signal_.connect(
+      boost::bind( &AbstractViewerPrivate::handle_visibility_changed, this->private_, _1 ) ) );
   }
 
   this->add_connection( this->private_->renderer_->redraw_completed_signal_.connect(
@@ -216,15 +219,6 @@ void AbstractViewer::install_renderer( AbstractRendererHandle renderer )
   
   this->add_connection( this->private_->renderer_->redraw_overlay_completed_signal_.connect(
     boost::bind( &AbstractViewerPrivate::set_overlay_texture, this->private_, _1, _2 ) ) );
-
-  this->add_connection( this->viewer_visible_state_->value_changed_signal_.connect(
-    boost::bind( &AbstractViewerPrivate::handle_visibility_changed, this->private_, _1 ) ) );
-}
-
-AbstractRendererHandle AbstractViewer::get_renderer()
-{
-  lock_type lock( this->get_mutex() );
-  return this->private_->renderer_;
 }
 
 Texture2DHandle AbstractViewer::get_texture()
