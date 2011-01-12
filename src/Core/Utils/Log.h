@@ -63,9 +63,10 @@ CORE_ENUM_CLASS
   MESSAGE_E = 0x04, 
   DEBUG_E = 0x08, 
   SUCCESS_E = 0x16,
+  CRITICAL_ERROR_E = 0x32,
   NODEBUG_E = ERROR_E | WARNING_E | MESSAGE_E,
   ALL_E = ERROR_E | WARNING_E | MESSAGE_E | DEBUG_E,
-  STATUS_BAR_E = ERROR_E | SUCCESS_E
+  STATUS_BAR_E = ERROR_E | SUCCESS_E | CRITICAL_ERROR_E
  )
 
 // Class definition
@@ -79,29 +80,28 @@ private:
   // -- functions for logging --
 public:
 
+  // POST_CRITICAL_ERROR:
+  // Post an error onto the log signal !!THIS WILL CAUSE AN ERROR DIALOG TO DISPLAY FOR THE USER!!
+  void post_critical_error( std::string message, const int line, const char* file );
+
   // POST_ERROR:
   // Post an error onto the log signal
-
   void post_error( std::string message, const int line, const char* file );
 
   // POST_WARNING:
   // Post a warning onto the log signal
-
   void post_warning( std::string message, const int line, const char* file );
 
   // POST_MESSAGE:
   // Post a message onto the log signal
-
   void post_message( std::string message, const int line, const char* file );
 
   // POST_SUCCESS:
   // Post a message onto the log signal
-
   void post_success( std::string message, const int line, const char* file );
 
   // POST_DEBUG:
   // Post debug information onto the log signal
-
   void post_debug( std::string message, const int line, const char* file );
 
 private:
@@ -120,11 +120,18 @@ public:
   // POST_STATUS_SIGNAL
   // Signal indicating that a message needs to be written to the status bar
   post_log_signal_type post_status_signal_;
+  
+  // POST_CRITICAL_SIGNAL
+  // Signal indicating that a message needs to be written to the status bar
+  post_log_signal_type post_critical_signal_;
 
 };
 
 // MACROS FOR AUTOMATICALLY INCLUDING LINE NUMBER AND FILE IN THE
 // LOG FILE 
+
+#define CORE_LOG_CRITICAL_ERROR(message)\
+  Core::Log::Instance()->post_critical_error(message,__LINE__,__FILE__)
 
 #define CORE_LOG_ERROR(message)\
 Core::Log::Instance()->post_error(message,__LINE__,__FILE__)

@@ -217,6 +217,11 @@ bool SaveAsInfoPage::validatePage()
     this->warning_message_->show();
     return false;
   }
+  else
+  {
+     boost::filesystem::file_status fs = boost::filesystem::status( new_path.parent_path() );
+  }
+  
   this->warning_message_->hide();
   return true;
 }

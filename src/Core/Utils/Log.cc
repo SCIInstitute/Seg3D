@@ -65,6 +65,14 @@ std::string Log::header( const int line, const char* file ) const
   return header_string;
 }
 
+void Log::post_critical_error( std::string message, const int line, const char* file )
+{
+  std::string str = this->header( line, file ) + std::string( " ERROR: " ) + message;
+  post_log_signal_( LogMessageType::ERROR_E, str );
+  post_status_signal_( LogMessageType::ERROR_E, message );
+  post_critical_signal_( LogMessageType::CRITICAL_ERROR_E, message );
+}
+
 void Log::post_error( std::string message, const int line, const char* file )
 {
   std::string str = this->header( line, file ) + std::string( " ERROR: " ) + message;

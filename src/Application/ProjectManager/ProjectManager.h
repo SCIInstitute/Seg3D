@@ -161,9 +161,9 @@ private:
   // this will try and create the project folders and if is successfull return true 
   bool create_project_folders( boost::filesystem::path& path, const std::string& project_name );
   
-  // RENAME_PROJECT_FOLDER
-  // this function is triggered when a user changes the folder name
-  void rename_project( const std::string& new_name, Core::ActionSource source );
+//  // RENAME_PROJECT_FOLDER
+//  // this function is triggered when a user changes the folder name
+//  void rename_project( const std::string& new_name, Core::ActionSource source );
 
   // SAVE_PROJECT_ONLY:
   // this function saves only the project and is used internally only. It returns if it was 

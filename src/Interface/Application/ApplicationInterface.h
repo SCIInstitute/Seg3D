@@ -100,6 +100,9 @@ private:
   // on top of each other
   void addDockWidget( Qt::DockWidgetArea area, QDockWidget* dock_widget );
   
+  // RAISE_ERROR_MESSAGEBOX:
+  void raise_error_messagebox( int msg_type, std::string message );
+  
   // NOTE:
   // We need to override these events for the progress widget that draws an transparent layer
   // over the full GUI.
@@ -139,6 +142,8 @@ public:
   static void HandleReportProgress( qpointer_type qpointer, Core::ActionProgressHandle handle);
   
   static void HandlePreferencesManagerSave( qpointer_type qpointer, bool visible );
+  
+  static void HandleCriticalErrorMessage(  qpointer_type qpointer, int msg_type, std::string message );
 
   // SETFULLSCREEN:
   // Set full screen mode of the Main Window

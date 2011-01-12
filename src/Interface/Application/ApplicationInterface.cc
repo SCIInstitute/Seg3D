@@ -225,6 +225,9 @@ ApplicationInterface::ApplicationInterface( std::string file_to_view_on_open ) :
   this->add_connection( Core::ActionDispatcher::Instance()->report_progress_signal_.connect( 
     boost::bind( &ApplicationInterface::HandleReportProgress, qpointer_type( this ), _1 ) ) );
     
+  this->add_connection( Core::Log::Instance()->post_critical_signal_.connect( 
+    boost::bind( &ApplicationInterface::HandleCriticalErrorMessage, qpointer_type( this ), _1, _2 ) ) );
+    
   
   // NOTE: Connect state and reflect the current state (needs to be atomic, hence the lock)
   {
@@ -534,5 +537,24 @@ void ApplicationInterface::SetProjectName( qpointer_type qpointer, std::string p
   Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
     &ApplicationInterface::set_project_name, qpointer.data(), project_name ) ) );
 }
+
+void ApplicationInterface::raise_error_messagebox( int msg_type, std::string message )
+{
+  int ret = QMessageBox::critical( this, "CRITICAL ERROR!!",
+    QString::fromStdString( message ) );
+
+//  if( ret == QMessageBox::Ok )
+//  {
+// 
+//  }
+}
+
+void ApplicationInterface::HandleCriticalErrorMessage( qpointer_type qpointer, int msg_type, std::string message )
+{
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, 
+    boost::bind( &ApplicationInterface::raise_error_messagebox, qpointer.data(), msg_type, message ) ) );
+}
+
+
 
 } // end namespace Seg3D

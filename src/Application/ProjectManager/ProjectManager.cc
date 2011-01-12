@@ -93,9 +93,9 @@ ProjectManager::ProjectManager() :
     
   this->current_project_ = ProjectHandle( new Project( "untitled_project" ) );
 
-  // Connect the signals from the LayerManager to the GUI
-  this->add_connection( this->current_project_->project_name_state_->value_changed_signal_.connect( 
-    boost::bind( &ProjectManager::rename_project, this, _1, _2 ) ) );
+//  // Connect the signals from the LayerManager to the GUI
+//  this->add_connection( this->current_project_->project_name_state_->value_changed_signal_.connect( 
+//    boost::bind( &ProjectManager::rename_project, this, _1, _2 ) ) );
   
   this->set_last_saved_session_time_stamp();
   AutoSave::Instance()->start();
@@ -138,91 +138,91 @@ void ProjectManager::save_projectmanager_state()
   stateio.export_to_file( this->local_projectmanager_path_ / "projectmanager.xml" );
 }
   
-void ProjectManager::rename_project( const std::string& new_name, Core::ActionSource source )
-{
-
-  // If this is the first time the name has been set, then we set it, and return
-  if( !this->current_project_->is_valid() )
-  {
-    this->current_project_->set_valid( true );
-    return;
-  }
-
-  // return if rename gets called while we are in the middle of changing a project
-  if( changing_projects_ )
-  {
-    return;
-  }
-  
-  std::vector< std::string > old_name_vector = 
-    Core::SplitString( this->recent_projects_state_->get()[ 0 ], "|" );
-  
-  // If the vector made from the old name, is less than 2, then we return
-  if( old_name_vector.size() < 2 )
-    return;
-
-  std::string old_name = old_name_vector[ 1 ];
-
-  // If the new name is the same as the old name we return
-  if( old_name == new_name )
-    return;
-  
-  // If the old name is empty then something is wrong and we return
-  if( old_name == "" )
-  {
-    return;
-  }
-  
-  boost::filesystem::path path = complete( boost::filesystem::path( this->
-    current_project_path_state_->get().c_str(), boost::filesystem::native ) );
-  try
-  {
-    boost::filesystem::rename( ( path / old_name ), ( path / new_name ) );
-    boost::filesystem::rename( ( path / new_name / ( old_name + ".s3d" ) ), 
-      ( path / new_name / ( new_name + ".s3d" ) ) );
-  }
-  catch ( std::exception& e ) 
-  {
-    CORE_LOG_ERROR( e.what() );
-  }
-  
-  this->current_project_->project_name_state_->set( new_name );
-  
-  std::vector< std::string > temp_projects_vector = this->recent_projects_state_->get();
-
-  // first we are going to remove this project from the list if its in there.
-  for( size_t i = 0; i < temp_projects_vector.size(); ++i )
-  {
-    if( temp_projects_vector[ i ] != "" )
-    {
-      std::string from_project_list = ( ( Core::SplitString( temp_projects_vector[ i ], "|" ) )[ 0 ] 
-        + "|" + ( Core::SplitString( temp_projects_vector[ i ], "|" ) )[ 1 ] );
-      std::string from_path_and_name = ( path.string() + "|" + old_name );
-      
-      if( from_project_list == from_path_and_name )
-      {
-        temp_projects_vector.erase( temp_projects_vector.begin() + i );
-      }
-    }
-  }
-  this->recent_projects_state_->set( temp_projects_vector );
-  
-  if( this->save_project_only( this->current_project_path_state_->get(), new_name ) )
-  {
-    this->add_to_recent_projects( this->current_project_path_state_->get(), new_name );
-    
-    //this->current_project_->set_project_path( path / new_name );
-    this->set_project_path( path / new_name );
-
-    CORE_LOG_SUCCESS( "The project name has been successfully changed to: '" + new_name  + "'" );
-  }
-  else
-  {
-    CORE_LOG_ERROR(  
-      "There has been a problem setting the name of the project to: '" + new_name  + "'" );
-  }
-  
-}
+// void ProjectManager::rename_project( const std::string& new_name, Core::ActionSource source )
+// {
+// 
+//  // If this is the first time the name has been set, then we set it, and return
+//  if( !this->current_project_->is_valid() )
+//  {
+//    this->current_project_->set_valid( true );
+//    return;
+//  }
+// 
+//  // return if rename gets called while we are in the middle of changing a project
+//  if( changing_projects_ )
+//  {
+//    return;
+//  }
+//  
+//  std::vector< std::string > old_name_vector = 
+//    Core::SplitString( this->recent_projects_state_->get()[ 0 ], "|" );
+//  
+//  // If the vector made from the old name, is less than 2, then we return
+//  if( old_name_vector.size() < 2 )
+//    return;
+// 
+//  std::string old_name = old_name_vector[ 1 ];
+// 
+//  // If the new name is the same as the old name we return
+//  if( old_name == new_name )
+//    return;
+//  
+//  // If the old name is empty then something is wrong and we return
+//  if( old_name == "" )
+//  {
+//    return;
+//  }
+//  
+//  boost::filesystem::path path = complete( boost::filesystem::path( this->
+//    current_project_path_state_->get().c_str(), boost::filesystem::native ) );
+//  try
+//  {
+//    boost::filesystem::rename( ( path / old_name ), ( path / new_name ) );
+//    boost::filesystem::rename( ( path / new_name / ( old_name + ".s3d" ) ), 
+//      ( path / new_name / ( new_name + ".s3d" ) ) );
+//  }
+//  catch ( std::exception& e ) 
+//  {
+//    CORE_LOG_ERROR( e.what() );
+//  }
+//  
+//  this->current_project_->project_name_state_->set( new_name );
+//  
+//  std::vector< std::string > temp_projects_vector = this->recent_projects_state_->get();
+// 
+//  // first we are going to remove this project from the list if its in there.
+//  for( size_t i = 0; i < temp_projects_vector.size(); ++i )
+//  {
+//    if( temp_projects_vector[ i ] != "" )
+//    {
+//      std::string from_project_list = ( ( Core::SplitString( temp_projects_vector[ i ], "|" ) )[ 0 ] 
+//        + "|" + ( Core::SplitString( temp_projects_vector[ i ], "|" ) )[ 1 ] );
+//      std::string from_path_and_name = ( path.string() + "|" + old_name );
+//      
+//      if( from_project_list == from_path_and_name )
+//      {
+//        temp_projects_vector.erase( temp_projects_vector.begin() + i );
+//      }
+//    }
+//  }
+//  this->recent_projects_state_->set( temp_projects_vector );
+//  
+//  if( this->save_project_only( this->current_project_path_state_->get(), new_name ) )
+//  {
+//    this->add_to_recent_projects( this->current_project_path_state_->get(), new_name );
+//    
+//    //this->current_project_->set_project_path( path / new_name );
+//    this->set_project_path( path / new_name );
+// 
+//    CORE_LOG_SUCCESS( "The project name has been successfully changed to: '" + new_name  + "'" );
+//  }
+//  else
+//  {
+//    CORE_LOG_ERROR(  
+//      "There has been a problem setting the name of the project to: '" + new_name  + "'" );
+//  }
+//  
+// }
 
 void ProjectManager::new_project( const std::string& project_name, const std::string& project_path, 
   bool save_on_creation )
@@ -341,13 +341,15 @@ bool ProjectManager::save_project( bool autosave /*= false*/, std::string sessio
   {
     if( autosave )
     {
-      CORE_LOG_ERROR( "Autosave FAILED for project: '" 
-        +  this->current_project_->project_name_state_->get() + "'" );
+      CORE_LOG_CRITICAL_ERROR( "Autosave FAILED for project: '" 
+        +  this->current_project_->project_name_state_->get() + "'. Please perform a "
+        "'Save As' as soon as possible to preserve your data." );
     }
     else
     {
-      CORE_LOG_ERROR( "Save FAILED for project: '" 
-        +  this->current_project_->project_name_state_->get() + "'" );
+      CORE_LOG_CRITICAL_ERROR( "Save FAILED for project: '" 
+        +  this->current_project_->project_name_state_->get() + "'. Please perform a "
+        "'Save As' as soon as possible to preserve your data." );
     }
   }
   return save_success;
@@ -623,6 +625,7 @@ void ProjectManager::set_project_path( boost::filesystem::path path )
   this->current_project_->set_project_path( path );
   this->current_project_path_state_->set( path.parent_path().string() );
 }
+
 
 Seg3D::ProjectHandle ProjectManager::get_current_project() const
 {
