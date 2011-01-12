@@ -949,6 +949,7 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
   this->add_state( "volume_enable_fog", this->volume_enable_fog_state_, false );
   this->add_state( "volume_enable_clipping", this->volume_enable_clipping_state_, false );
   this->add_state( "volume_show_invisible_slices", this->volume_show_invisible_slices_state_, true );
+  this->add_state( "volume_show_bounding_box", this->volume_show_bounding_box_state_, true );
 
   this->add_state( "lock", this->lock_state_, false );
   this->add_state( "overlay_visible", this->overlay_visible_state_, true );
@@ -976,9 +977,7 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
   this->add_connection( this->lock_state_->value_changed_signal_.connect(
     boost::bind( &ViewerPrivate::viewer_lock_state_changed, this->private_, _1 ) ) );
 
-  // Connect state variables that should trigger redraw.
-  // NOTE: For those state variables that will trigger both redraw and redraw_overlay, 
-  // "delay_update" is set to true for redraw.
+  // Connect state variables that should trigger redraw_all.
   this->add_connection( this->view_mode_state_->state_changed_signal_.connect(
     boost::bind( &Viewer::redraw_all, this ) ) );
   this->add_connection( this->axial_view_state_->state_changed_signal_.connect(
@@ -989,10 +988,10 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
     boost::bind( &Viewer::redraw_all, this) ) );
   this->add_connection( this->slice_number_state_->state_changed_signal_.connect(
     boost::bind( &Viewer::redraw_all, this ) ) );
-    
-  // NOTE: This one is false as it is not updated by the next list
   this->add_connection( this->volume_view_state_->state_changed_signal_.connect(
-    boost::bind( &Viewer::redraw_scene, this ) ) );
+    boost::bind( &Viewer::redraw_all, this ) ) );
+    
+  // Connect state variables that should trigger redraw_scene.
   this->add_connection( this->volume_light_visible_state_->state_changed_signal_.connect(
     boost::bind( &Viewer::redraw_scene, this ) ) );
   this->add_connection( this->volume_enable_fog_state_->state_changed_signal_.connect(
@@ -1005,6 +1004,8 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
     connect( boost::bind( &Viewer::redraw_scene, this ) ) );
   this->add_connection( this->volume_show_invisible_slices_state_->state_changed_signal_.
     connect( boost::bind( &Viewer::redraw_scene, this ) ) );
+  this->add_connection( this->volume_show_bounding_box_state_->state_changed_signal_.connect(
+    boost::bind( &Viewer::redraw_scene, this ) ) );
 
   // Connect state variables that should trigger redraw_overlay
   this->add_connection( this->slice_grid_state_->state_changed_signal_.connect(

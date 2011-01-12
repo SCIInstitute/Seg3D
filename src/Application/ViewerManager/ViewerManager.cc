@@ -373,6 +373,8 @@ void ViewerManagerPrivate::update_clipping_range( size_t index )
       }
     }
   }
+  // Extend the clipping range by a small amount so it can clip out the whole volume
+  max_d *= 1.01;
   
   Core::ScopedCounter signal_block( this->signal_block_count_ );
   this->vm_->clip_plane_distance_state_[ index ]->set_range( -max_d, max_d );

@@ -146,6 +146,7 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
   this->private_->buttons_.push_back( this->private_->ui_.isosurfaces_visible_button_ );
   this->private_->buttons_.push_back( this->private_->ui_.slices_visible_button_ );
   this->private_->buttons_.push_back( this->private_->ui_.show_invisible_slices_button_ );
+  this->private_->buttons_.push_back( this->private_->ui_.show_bounding_box_button_ );
   this->private_->buttons_.push_back( this->private_->ui_.volume_rendering_visible_button_ );
   this->private_->buttons_.push_back( this->private_->ui_.overlay_visible_button_ );
   this->private_->buttons_.push_back( this->private_->ui_.picking_lines_visible_button_ );
@@ -203,6 +204,8 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
       this->private_->viewer_->volume_slices_visible_state_ );
     QtUtils::QtBridge::Connect( this->private_->ui_.show_invisible_slices_button_,
       this->private_->viewer_->volume_show_invisible_slices_state_ );
+    QtUtils::QtBridge::Connect( this->private_->ui_.show_bounding_box_button_,
+      this->private_->viewer_->volume_show_bounding_box_state_ );
     QtUtils::QtBridge::Connect( this->private_->ui_.picking_lines_visible_button_,
       this->private_->viewer_->slice_picking_visible_state_ );
     QtUtils::QtBridge::Connect( this->private_->ui_.overlay_visible_button_,
@@ -244,8 +247,6 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
       viewer->view_mode_state_, show_buttons_condition );
     QtUtils::QtBridge::Show( this->private_->ui_.picking_button_, 
       viewer->view_mode_state_, show_buttons_condition );
-    QtUtils::QtBridge::Show( this->private_->ui_.overlay_visible_button_, 
-      viewer->view_mode_state_, show_buttons_condition );
 
     // Show the following buttons when it's volume view
     show_buttons_condition = boost::lambda::bind( 
@@ -264,6 +265,8 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
     QtUtils::QtBridge::Show( this->private_->ui_.snap_to_axis_button_, 
       viewer->view_mode_state_, show_buttons_condition );
     QtUtils::QtBridge::Show( this->private_->ui_.show_invisible_slices_button_,
+      viewer->view_mode_state_, show_buttons_condition );
+    QtUtils::QtBridge::Show( this->private_->ui_.show_bounding_box_button_,
       viewer->view_mode_state_, show_buttons_condition );
 
     // When view mode changes, we need to rearrange the toolbar and update the flip buttons

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>442</width>
+    <width>463</width>
     <height>279</height>
    </rect>
   </property>
@@ -1136,6 +1136,28 @@ QComboBox::icon{
                   <iconset resource="../../Resources/QtResources.qrc">
                    <normaloff>:/Images/VolumeVisibleOff.png</normaloff>
                    <normalon>:/Images/VolumeVisible.png</normalon>:/Images/VolumeVisibleOff.png</iconset>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QToolButton" name="show_bounding_box_button_">
+                 <property name="minimumSize">
+                  <size>
+                   <width>21</width>
+                   <height>21</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>21</width>
+                   <height>21</height>
+                  </size>
+                 </property>
+                 <property name="toolTip">
+                  <string>Show bounding box</string>
+                 </property>
+                 <property name="text">
+                  <string>...</string>
                  </property>
                 </widget>
                </item>

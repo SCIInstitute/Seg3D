@@ -231,6 +231,7 @@ public:
   Core::StateBoolHandle volume_enable_fog_state_;
   Core::StateBoolHandle volume_enable_clipping_state_;
   Core::StateBoolHandle volume_show_invisible_slices_state_;
+  Core::StateBoolHandle volume_show_bounding_box_state_;
 
   Core::StateBoolHandle lock_state_;
   Core::StateBoolHandle overlay_visible_state_;

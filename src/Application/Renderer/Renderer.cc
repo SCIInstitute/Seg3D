@@ -542,9 +542,6 @@ void RendererPrivate::draw_orientation_arrows( const Core::View3D& view_3d )
   glViewport( this->renderer_->width_ - dimension, 
     this->renderer_->height_ - dimension, dimension, dimension );
 
-  // NOTE: Clear the depth buffer so the axes will not be occluded.
-  glClear( GL_DEPTH_BUFFER_BIT );
-
   // Compute the orientation of the axes
   Core::Vector eye_dir = view_3d.eyep() - view_3d.lookat();
   eye_dir.normalize();
@@ -708,6 +705,7 @@ bool Renderer::render()
     bool enable_clipping = viewer->volume_enable_clipping_state_->get();
     bool draw_slices = viewer->volume_slices_visible_state_->get();
     bool draw_isosurfaces = viewer->volume_isosurfaces_visible_state_->get();
+    bool draw_bbox = viewer->volume_show_bounding_box_state_->get();
     bool show_invisible_slices = viewer->volume_show_invisible_slices_state_->get();
     size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
     for ( size_t i = 0; i < num_of_viewers && draw_slices; i++ )
@@ -814,6 +812,7 @@ bool Renderer::render()
       this->private_->draw_slices_3d( bbox, layer_scenes, depths, view_modes );
       this->private_->slice_shader_->disable();
     }
+
     if ( draw_isosurfaces)
     {
       this->private_->isosurface_shader_->enable();
@@ -823,13 +822,41 @@ bool Renderer::render()
       this->private_->isosurface_shader_->disable();
     }
 
+    if ( draw_bbox )
+    {
+      glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+      glColor4f( 1.0, 1.0, 1.0, 1.0 );
+      Core::Point corner1 = bbox.min();
+      Core::Point corner2 = bbox.max();
+      glBegin( GL_QUAD_STRIP );
+      glVertex3d( corner1[ 0 ], corner1[ 1 ], corner1[ 2 ] );
+      glVertex3d( corner1[ 0 ], corner1[ 1 ], corner2[ 2 ] );
+      glVertex3d( corner2[ 0 ], corner1[ 1 ], corner1[ 2 ] );
+      glVertex3d( corner2[ 0 ], corner1[ 1 ], corner2[ 2 ] );
+      glVertex3d( corner2[ 0 ], corner2[ 1 ], corner1[ 2 ] );
+      glVertex3d( corner2[ 0 ], corner2[ 1 ], corner2[ 2 ] );
+      glVertex3d( corner1[ 0 ], corner2[ 1 ], corner1[ 2 ] );
+      glVertex3d( corner1[ 0 ], corner2[ 1 ], corner2[ 2 ] );
+      glVertex3d( corner1[ 0 ], corner1[ 1 ], corner1[ 2 ] );
+      glVertex3d( corner1[ 0 ], corner1[ 1 ], corner2[ 2 ] );
+      glEnd();
+      glBegin( GL_QUADS );
+      glVertex3d( corner1[ 0 ], corner1[ 1 ], corner1[ 2 ] );
+      glVertex3d( corner2[ 0 ], corner1[ 1 ], corner1[ 2 ] );
+      glVertex3d( corner2[ 0 ], corner2[ 1 ], corner1[ 2 ] );
+      glVertex3d( corner1[ 0 ], corner2[ 1 ], corner1[ 2 ] );
+      glVertex3d( corner1[ 0 ], corner1[ 1 ], corner2[ 2 ] );
+      glVertex3d( corner2[ 0 ], corner1[ 1 ], corner2[ 2 ] );
+      glVertex3d( corner2[ 0 ], corner2[ 1 ], corner2[ 2 ] );
+      glVertex3d( corner1[ 0 ], corner2[ 1 ], corner2[ 2 ] );
+      glEnd();
+      glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+    }
+    
     if ( enable_clipping )
     {
       glPopAttrib();
     }
-
-    // NOTE: The orientation axes should be drawn the last, because it clears the depth buffer.
-    this->private_->draw_orientation_arrows( view3d );
     
     glDisable( GL_BLEND );
   }
@@ -893,6 +920,13 @@ bool Renderer::render_overlay()
   CORE_LOG_DEBUG( std::string("Renderer ") + Core::ExportToString( 
     this->private_->viewer_id_ ) + ": starting redraw overlay" );
 
+  // Enable blending
+  glEnable( GL_BLEND );
+  // NOTE: The result of the following blend function is that, color channels contains
+  // colors modulated by alpha, alpha channel stores the value of "1-alpha"
+  glBlendFuncSeparate( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA , 
+    GL_ZERO, GL_ONE_MINUS_SRC_ALPHA  );
+
   glMatrixMode( GL_PROJECTION );
   glLoadIdentity();
 
@@ -900,16 +934,23 @@ bool Renderer::render_overlay()
   Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
 
   ViewerHandle viewer = ViewerManager::Instance()->get_viewer( this->private_->viewer_id_ );
+  bool show_overlay = viewer->overlay_visible_state_->get();
 
   if ( viewer->is_volume_view() )
   {
+    Core::View3D view3d( viewer->volume_view_state_->get() );
     state_lock.unlock();
+
+    if ( show_overlay )
+    {
+      glEnable( GL_DEPTH_TEST );
+      this->private_->draw_orientation_arrows( view3d );  
+    }
   }
   else
   {
     bool show_grid = viewer->slice_grid_state_->get();
     bool show_picking_lines = viewer->slice_picking_visible_state_->get();
-    bool show_overlay = viewer->overlay_visible_state_->get();
     bool show_slice_num = PreferencesManager::Instance()->show_slice_number_state_->get();
     bool zero_based_slice_numbers = PreferencesManager::Instance()->
       zero_based_slice_numbers_state_->get();
@@ -955,12 +996,6 @@ bool Renderer::render_overlay()
     Core::Transform::BuildOrtho2DMatrix( proj_mat, left, right, bottom, top );
 
     glDisable( GL_DEPTH_TEST );
-    // Enable blending
-    glEnable( GL_BLEND );
-    // NOTE: The result of the following blend function is that, color channels contains
-    // colors modulated by alpha, alpha channel stores the value of "1-alpha"
-    glBlendFuncSeparate( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA , 
-      GL_ZERO, GL_ONE_MINUS_SRC_ALPHA  );
 
     gluOrtho2D( 0, this->width_ - 1, 0, this->height_ - 1 );
     glMatrixMode( GL_MODELVIEW );
@@ -1109,9 +1144,9 @@ bool Renderer::render_overlay()
       this->private_->text_texture_->disable();
       CORE_CHECK_OPENGL_ERROR();
     } // end rendering text
-
-    glDisable( GL_BLEND );
   }
+
+  glDisable( GL_BLEND );
 
   CORE_LOG_DEBUG( std::string("Renderer ") + Core::ExportToString( 
     this->private_->viewer_id_ ) + ": done redraw overlay" );
