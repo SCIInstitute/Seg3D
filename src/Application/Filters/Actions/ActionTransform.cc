@@ -168,8 +168,13 @@ void TransformAlgo::transform_data_layer( DataLayerHandle input, DataLayerHandle
 
   if ( !this->check_abort() )
   {
+    // Centering should be preserved for each layer
+    Core::GridTransform output_grid_transform = output->get_grid_transform();
+    output_grid_transform.set_originally_node_centered( 
+      input->get_grid_transform().get_originally_node_centered() );
+
     this->dispatch_insert_data_volume_into_layer( output, Core::DataVolumeHandle(
-      new Core::DataVolume( output->get_grid_transform(), output_datablock ) ), 
+      new Core::DataVolume( output_grid_transform, output_datablock ) ), 
       true );
     output->update_progress_signal_( 1.0 );
     this->dispatch_unlock_layer( output );
@@ -327,10 +332,6 @@ bool ActionTransform::run( Core::ActionContextHandle& context,
     {
       algo->lock_for_use( algo->src_layers_[ i ] );
     }
-
-    // Centering should be preserved for each layer
-    this->private_->output_grid_trans_.set_originally_node_centered( 
-      algo->src_layers_[ i ]->get_grid_transform().get_originally_node_centered() );
 
     switch ( algo->src_layers_[ i ]->get_type() )
     { 
