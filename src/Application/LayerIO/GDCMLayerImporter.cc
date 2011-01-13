@@ -182,6 +182,9 @@ bool GDCMLayerImporter::import_header()
     return false;
   }
   
+  gdcm::ImageHelper::SetForcePixelSpacing( true );
+  gdcm::ImageHelper::SetForceRescaleInterceptSlope( true );
+  
   const gdcm::Image &image = reader.GetImage();
   const gdcm::File &f = reader.GetFile();
   const gdcm::DataSet &ds = f.GetDataSet();
