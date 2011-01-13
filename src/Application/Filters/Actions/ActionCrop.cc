@@ -406,6 +406,8 @@ bool ActionCrop::validate( Core::ActionContextHandle& context )
     this->private_->end_y_ - this->private_->start_y_ + 1 ) );
   this->private_->output_grid_trans_.set_nz( static_cast< size_t >( 
     this->private_->end_z_ - this->private_->start_z_ + 1 ) );
+  this->private_->output_grid_trans_.set_originally_node_centered(
+    grid_trans.get_originally_node_centered() );
 
   // Validation successful
   return true;

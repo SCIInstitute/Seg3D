@@ -295,6 +295,8 @@ bool ActionTransform::validate( Core::ActionContextHandle& context )
   this->private_->output_grid_trans_.load_basis( this->private_->origin_.value(), 
     Core::Vector( spacing[ 0 ], 0, 0 ), Core::Vector( 0, spacing[ 1 ], 0 ), 
     Core::Vector( 0, 0, spacing[ 2 ] ) );
+  this->private_->output_grid_trans_.set_originally_node_centered(
+    src_grid_trans.get_originally_node_centered() );
 
   // Validation successful
   return true;

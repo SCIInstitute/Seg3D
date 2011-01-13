@@ -732,8 +732,11 @@ void ResampleAlgo::pad_and_crop_data_layer( DataLayerHandle input, DataLayerHand
   
   if ( !this->check_abort() )
   {
+    Core::GridTransform output_grid_transform = output->get_grid_transform();
+    output_grid_transform.set_originally_node_centered( 
+      input->get_grid_transform().get_originally_node_centered() );
     this->dispatch_insert_data_volume_into_layer( output, Core::DataVolumeHandle(
-      new Core::DataVolume( output->get_grid_transform(), output_datablock ) ), true );
+      new Core::DataVolume( output_grid_transform, output_datablock ) ), true );
     this->dispatch_unlock_layer( output );
     if ( this->replace_ )
     {
@@ -866,9 +869,11 @@ void ResampleAlgo::pad_and_crop_mask_layer( MaskLayerHandle input, MaskLayerHand
       this->report_error( "Could not allocate enough memory." );
       return;
     }
+    Core::GridTransform output_grid_transform = output->get_grid_transform();
+    output_grid_transform.set_originally_node_centered( 
+      input->get_grid_transform().get_originally_node_centered() );
     Core::MaskVolumeHandle mask_volume( new Core::MaskVolume(
-      output->get_grid_transform(), dst_mask_data_block ) );
-    
+      output_grid_transform, dst_mask_data_block ) );
     this->dispatch_insert_mask_volume_into_layer( output, mask_volume );
     this->dispatch_unlock_layer( output );
     if ( this->replace_ )
@@ -1081,11 +1086,12 @@ bool ActionResample::run( Core::ActionContextHandle& context,
     Core::Transform inverse_src_trans = algo->src_layers_[ 0 ]->
       get_grid_transform().get_inverse();
     // Compute the range of the destination grid in world space
-    // NOTE: Since we assume cell centering, the actual range of the grid should be
+    // NOTE: If the destination grid is cell centered, the actual range of the grid should be
     // extended by half a voxel in each direction
-    Core::Point start( -0.5, -0.5, -0.5 );
-    Core::Point end( algo->dimesions_[ 0 ] - 0.5, algo->dimesions_[ 1 ] - 0.5, 
-      algo->dimesions_[ 2 ] - 0.5 );
+    double offset = this->private_->grid_transform_.get_originally_node_centered() ? 0.0 : 0.5;
+    Core::Point start( -offset, -offset, -offset );
+    Core::Point end( algo->dimesions_[ 0 ] - 1 + offset, algo->dimesions_[ 1 ] - 1 + offset, 
+      algo->dimesions_[ 2 ] - 1 + offset );
     start = this->private_->grid_transform_ * start;
     end = this->private_->grid_transform_ * end;
 
