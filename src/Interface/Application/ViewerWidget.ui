@@ -1139,8 +1139,8 @@ QComboBox::icon{
                  </property>
                  <property name="icon">
                   <iconset resource="../../Resources/QtResources.qrc">
-                   <normaloff>:/Images/VolumeVisibleOff.png</normaloff>
-                   <normalon>:/Images/VolumeVisible.png</normalon>:/Images/VolumeVisibleOff.png</iconset>
+                   <normaloff>:/Images/DataVolumeOff.png</normaloff>
+                   <normalon>:/Images/DataVolume.png</normalon>:/Images/DataVolumeOff.png</iconset>
                  </property>
                 </widget>
                </item>
@@ -1163,6 +1163,11 @@ QComboBox::icon{
                  </property>
                  <property name="text">
                   <string>...</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="../../Resources/QtResources.qrc">
+                   <normaloff>:/Images/VolumeVisibleOff.png</normaloff>
+                   <normalon>:/Images/VolumeVisible.png</normalon>:/Images/VolumeVisibleOff.png</iconset>
                  </property>
                 </widget>
                </item>

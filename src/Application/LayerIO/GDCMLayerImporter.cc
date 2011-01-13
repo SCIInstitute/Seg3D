@@ -103,6 +103,8 @@ double GDCMLayerImporterPrivate::get_slice_thickness( const gdcm::DataSet& ds )
     }
   }
 
+  
+
   return 1.0;
 }
 
@@ -174,6 +176,9 @@ GDCMLayerImporter::GDCMLayerImporter( const std::string& filename ) :
 
 bool GDCMLayerImporter::import_header()
 {
+  gdcm::ImageHelper::SetForcePixelSpacing( true );
+  gdcm::ImageHelper::SetForceRescaleInterceptSlope( true );
+
   gdcm::ImageReader reader;
   reader.SetFileName( this->private_->file_list_[ 0 ].c_str() );
   if ( !reader.Read() )
@@ -181,9 +186,6 @@ bool GDCMLayerImporter::import_header()
     this->set_error( "Can't read file " + this->private_->file_list_[ 0 ] );
     return false;
   }
-  
-  gdcm::ImageHelper::SetForcePixelSpacing( true );
-  gdcm::ImageHelper::SetForceRescaleInterceptSlope( true );
   
   const gdcm::Image &image = reader.GetImage();
   const gdcm::File &f = reader.GetFile();
@@ -291,7 +293,46 @@ bool GDCMLayerImporter::import_header()
   
   if ( spacing[ 2 ] == 1.0 )
   {
-    this->private_->z_spacing_ = this->private_->get_slice_thickness( ds );
+    gdcm::Tag slice_thickness_tag( 0x0018,0x0050 );
+
+    bool found_thickness = false;
+    
+    if( ds.FindDataElement( slice_thickness_tag ) ) // Slice Thickness
+    {
+      const gdcm::DataElement& de = ds.GetDataElement( slice_thickness_tag );
+      if ( ! de.IsEmpty() )
+      {
+        gdcm::Attribute< 0x0018, 0x0050 > slice_thickness;
+        slice_thickness.SetFromDataElement( de );
+        double thickness = slice_thickness.GetValue( 0 );
+        if ( thickness > 0.0 )
+        {
+          this->private_->z_spacing_ = thickness;
+          found_thickness = true;
+        }
+      }
+    }
+    
+    if ( found_thickness == false && this->private_->file_list_.size() > 1 )
+    {
+      gdcm::ImageReader reader2;
+      reader2.SetFileName( this->private_->file_list_[ 1 ].c_str() );
+      if ( !reader2.Read() )
+      {
+        this->set_error( "Can't read file " + this->private_->file_list_[ 1 ] );
+        return false;
+      }
+      
+      const gdcm::Image &image2 = reader2.GetImage();
+      const double* origin2 = image2.GetOrigin();
+      
+      double spacing = Core::Abs( origin[ 2 ] - origin2[ 2 ] );
+      if ( spacing > 0.0 ) this->private_->z_spacing_ = spacing; else spacing = 1.0;
+    }
+    else
+    {
+      this->private_->z_spacing_ = 1.0;
+    }
   }
   else
   {
