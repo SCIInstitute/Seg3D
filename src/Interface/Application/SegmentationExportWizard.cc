@@ -348,10 +348,13 @@ bool SegmentationSelectionPage::validatePage()
       boost::filesystem::path( filename.toStdString() ).string() );
   }
   
+  QDir file_path = QDir( filename );
+  
   if( !boost::filesystem::exists( boost::filesystem::path( filename.toStdString() ).parent_path() ) )
   {
     return false;
   }
+
   
   this->private_->file_name_ = filename.toStdString();
 

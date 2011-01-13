@@ -194,6 +194,8 @@ bool ITKMaskLayerExporter::export_layer( LayerExporterMode mode, const std::stri
       return false;
     }
   }
+  
+  CORE_LOG_SUCCESS( "Segmentation export has been successfully completed." );
   // If we have successfully gone through all the layers return true
   return true;
 }

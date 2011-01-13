@@ -62,27 +62,23 @@ const QString StyleSheet::STATUSBAR_C = QString::fromUtf8(
 
 const QString StyleSheet::STATUSBAR_ERROR_C = QString::fromUtf8(
   "QLabel#status_report_label_{"
-  " text-align: left;"
   " color: rgb(204, 0, 0);"
   " font: bold;"
   "}" );
 
 const QString StyleSheet::STATUSBAR_WARNING_C = QString::fromUtf8(
   "QLabel#status_report_label_{"
-  " text-align: left;"
   " color: rgb(165, 161, 34);"
   " font: bold;"
   "}" );
   
 const QString StyleSheet::STATUSBAR_MESSAGE_C = QString::fromUtf8(
   "QLabel#status_report_label_{"
-  " text-align: left;"
   " color: rgb(3, 86, 2);"
   " font: bold;"
   "}" );
 const QString StyleSheet::STATUSBAR_DEBUG_C = QString::fromUtf8(
   "QLabel#status_report_label_{"
-  " text-align: left;"
   " color: purple;"
   " font: bold;"
   "}" );

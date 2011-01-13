@@ -124,6 +124,7 @@ bool export_dicom_series( const std::string& file_path, const std::string& file_
   writer->SetInput( itk_image );
   writer->SetImageIO( dicom_io );
   writer->SetFileNames( names_generator->GetFileNames() );
+  
   gdcm::ImageHelper::SetForcePixelSpacing( true );
 
   try
@@ -205,13 +206,15 @@ bool ITKDataLayerExporter::export_layer( LayerExporterMode mode, const std::stri
 {
   if( this->extension_ == ".dcm" )
   {
-    return this->export_dcm_series( file_path, name );
+    if( !this->export_dcm_series( file_path, name ) ) return false;
   }
   else if( this->extension_ != "" )
   {
-    return this->export_itk_series( file_path );
+    if( !this->export_itk_series( file_path ) ) return false;
   }
-  return false;
+  
+  CORE_LOG_SUCCESS( "Data export has been successfully completed." );
+  return true;
 }
   
 bool ITKDataLayerExporter::export_dcm_series( const std::string& file_path, const std::string& name )

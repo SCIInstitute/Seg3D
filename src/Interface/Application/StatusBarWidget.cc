@@ -120,12 +120,12 @@ StatusBarWidget::StatusBarWidget( QMainWindow* parent ) :
   this->add_connection( Core::ActionDispatcher::Instance()->post_action_signal_.connect( 
     boost::bind( &StatusBarWidget::HandleActionEvent, qpointer_type( this ) ) ) );
   
-  this->private_->ui_.status_report_label_->setGeometry( QRect( 0, 
-    -this->private_->ui_.status_report_label_->height(), 
-    this->private_->ui_.status_report_label_->width(), 
-    this->private_->ui_.status_report_label_->height() ) );
+  this->private_->ui_.status_report_widget_->setGeometry( QRect( 0, 
+    -this->private_->ui_.status_report_widget_->height(), 
+    this->private_->ui_.status_report_widget_->width(), 
+    this->private_->ui_.status_report_widget_->height() ) );
   
-  this->private_->ui_.status_report_label_->hide();
+  this->private_->ui_.status_report_widget_->hide();
   
   this->private_->last_message_time_ = boost::posix_time::second_clock::local_time();
   
@@ -188,12 +188,6 @@ void StatusBarWidget::set_status_report_label( std::string& status )
   QString report = QString::fromStdString( status );
   this->private_->ui_.status_report_label_->setText( QString::fromUtf8( "Status: " ) + report );
 }
-
-// void StatusBarWidget::fix_icon_status()
-// {
-//  this->private_->ui_.status_report_label_->setText( 
-//    QString::fromUtf8( "Status = true " ) );
-// }
 
 void StatusBarWidget::update_data_point_info( DataPointInfoHandle data_point )
 {
@@ -376,21 +370,22 @@ void StatusBarWidget::check_time()
 void StatusBarWidget::slide_in()
 {
   
-  if( this->private_->ui_.status_report_label_->isVisible() )
+  if( this->private_->ui_.status_report_widget_->isVisible() )
   {
-    this->private_->ui_.status_report_label_->hide();
+    this->private_->ui_.status_report_widget_->hide();
   }
   
-  this->private_->ui_.status_report_label_->setGeometry( QRect( 0, 
-     -this->private_->ui_.status_report_label_->height(), 
-     this->private_->ui_.status_report_label_->width(), 
-     this->private_->ui_.status_report_label_->height() ) );
+  this->private_->ui_.status_report_widget_->setGeometry( QRect( 0, 
+     -this->private_->ui_.status_report_widget_->height(), 
+     this->private_->ui_.status_report_widget_->width(), 
+     this->private_->ui_.status_report_widget_->height() ) );
   
   // Here we create the animation that will slide the message into the task bar
-  QPropertyAnimation *animation = new QPropertyAnimation( this->private_->ui_.status_report_label_, "geometry" );
+  QPropertyAnimation *animation = new QPropertyAnimation( this->private_->ui_.status_report_widget_, "geometry" );
   
   // Here we change the color of the text if we are reporting an error.
-  if( this->private_->message_type_ == Core::LogMessageType::ERROR_E )
+  if( ( this->private_->message_type_ == Core::LogMessageType::ERROR_E ) ||
+    ( this->private_->message_type_ == Core::LogMessageType::CRITICAL_ERROR_E ) )
   {
     this->private_->ui_.status_report_label_->setStyleSheet( StyleSheet::STATUSBAR_ERROR_C );
     animation->setDuration( 2000 );
@@ -405,13 +400,13 @@ void StatusBarWidget::slide_in()
   
   this->private_->ui_.status_report_label_->setText( this->private_->current_message_ );
   
-  this->private_->ui_.status_report_label_->show();
+  this->private_->ui_.status_report_widget_->show();
   
-  animation->setStartValue( QRect( 0, -this->private_->ui_.status_report_label_->height(), 
-    this->private_->ui_.status_report_label_->width(), 
-    this->private_->ui_.status_report_label_->height() ) );
-  animation->setEndValue( QRect( 0, 0, this->private_->ui_.status_report_label_->width(), 
-    this->private_->ui_.status_report_label_->height() ) );
+  animation->setStartValue( QRect( 0, -this->private_->ui_.status_report_widget_->height(), 
+    this->private_->ui_.status_report_widget_->width(), 
+    this->private_->ui_.status_report_widget_->height() ) );
+  animation->setEndValue( QRect( 0, 0, this->private_->ui_.status_report_widget_->width(), 
+    this->private_->ui_.status_report_widget_->height() ) );
   connect( animation, SIGNAL( finished() ), this, SLOT( set_finished_animating() ) );
   animation->start();
   this->private_->animating_ = true;
@@ -421,13 +416,13 @@ void StatusBarWidget::slide_out_then_in()
 {
   if( this->private_->animating_ ) return;
   
-  QPropertyAnimation *animation = new QPropertyAnimation( this->private_->ui_.status_report_label_, "geometry" );
+  QPropertyAnimation *animation = new QPropertyAnimation( this->private_->ui_.status_report_widget_, "geometry" );
   animation->setDuration( 1000 );
-  animation->setStartValue( QRect( 0, 0, this->private_->ui_.status_report_label_->width(), 
-    this->private_->ui_.status_report_label_->height() ) );
-  animation->setEndValue( QRect( 0, this->private_->ui_.status_report_label_->height(), 
-    this->private_->ui_.status_report_label_->width(), 
-    this->private_->ui_.status_report_label_->height() ) );
+  animation->setStartValue( QRect( 0, 0, this->private_->ui_.status_report_widget_->width(), 
+    this->private_->ui_.status_report_widget_->height() ) );
+  animation->setEndValue( QRect( 0, this->private_->ui_.status_report_widget_->height(), 
+    this->private_->ui_.status_report_widget_->width(), 
+    this->private_->ui_.status_report_widget_->height() ) );
   connect( animation, SIGNAL( finished() ), this, SLOT( slide_in() ) );
   animation->setEasingCurve( QEasingCurve::OutQuad );
   animation->start();
@@ -437,13 +432,13 @@ void StatusBarWidget::slide_out()
 {
   if( this->private_->animating_ ) return;
   
-  QPropertyAnimation *animation = new QPropertyAnimation( this->private_->ui_.status_report_label_, "geometry" );
+  QPropertyAnimation *animation = new QPropertyAnimation( this->private_->ui_.status_report_widget_, "geometry" );
   animation->setDuration( 1000 );
-  animation->setStartValue( QRect( 0, 0, this->private_->ui_.status_report_label_->width(), 
-    this->private_->ui_.status_report_label_->height() ) );
-  animation->setEndValue( QRect( 0, this->private_->ui_.status_report_label_->height(), 
-    this->private_->ui_.status_report_label_->width(), 
-    this->private_->ui_.status_report_label_->height() ) );
+  animation->setStartValue( QRect( 0, 0, this->private_->ui_.status_report_widget_->width(), 
+    this->private_->ui_.status_report_widget_->height() ) );
+  animation->setEndValue( QRect( 0, this->private_->ui_.status_report_widget_->height(), 
+    this->private_->ui_.status_report_widget_->width(), 
+    this->private_->ui_.status_report_widget_->height() ) );
   connect( animation, SIGNAL( finished() ), this, SLOT( clear_label() ) );
   animation->setEasingCurve( QEasingCurve::OutQuad );
   animation->start();
@@ -453,7 +448,7 @@ void StatusBarWidget::slide_out()
 void StatusBarWidget::clear_label()
 {
   this->private_->ui_.status_report_label_->setText( QString::fromUtf8( "" ) );
-  this->private_->ui_.status_report_label_->hide();
+  this->private_->ui_.status_report_widget_->hide();
   this->private_->current_message_ = QString::fromUtf8( "" );
   this->set_finished_animating();
 }

@@ -1180,32 +1180,38 @@ void LayerWidget::delete_layer_from_context_menu()
 
 void LayerWidget::export_layer( const std::string& type_extension )
 {
-  QString filepath = QFileDialog::getExistingDirectory( this, tr( "Choose Directory for Export..." ),
+  QString export_path = QFileDialog::getExistingDirectory( this, tr( "Choose Directory for Export..." ),
     QString::fromStdString( PreferencesManager::Instance()->export_path_state_->get() ),
     QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks );
+  
+  if( export_path == "" ) return;
+  
+  if( !QFileInfo( export_path ).exists() )
+  {
+    CORE_LOG_ERROR( "The layer could not be exported to that location. Please try another location." );
+    return;
+  }
   
   if( LayerManager::Instance()->get_layer_by_id( this->get_layer_id() )->get_type() == 
     Core::VolumeType::MASK_E )
   {
     ActionExportSegmentation::Dispatch( Core::Interface::GetWidgetActionContext(), 
       this->private_->layer_->get_layer_name(), LayerExporterMode::SINGLE_MASK_E, 
-      filepath.toStdString(), type_extension );
+      export_path.toStdString(), type_extension );
   }
   else if( LayerManager::Instance()->get_layer_by_id( this->get_layer_id() )->get_type() == 
     Core::VolumeType::DATA_E )
   { 
-    std::string file_name = ( boost::filesystem::path( filepath.toStdString() ) / 
+    std::string file_name = ( boost::filesystem::path( export_path.toStdString() ) / 
       this->private_->layer_->get_layer_name() ).string();
 
     ActionExportLayer::Dispatch( Core::Interface::GetWidgetActionContext(), 
       this->private_->layer_->get_layer_name(), file_name, type_extension );
   }
   
-  if( filepath != "" )
-  {
-    Core::ActionSet::Dispatch(  Core::Interface::GetWidgetActionContext(), 
-      PreferencesManager::Instance()->export_path_state_, filepath.toStdString() );
-  }
+  Core::ActionSet::Dispatch(  Core::Interface::GetWidgetActionContext(), 
+    PreferencesManager::Instance()->export_path_state_, export_path.toStdString() );
+
 }
 
 void LayerWidget::export_nrrd()

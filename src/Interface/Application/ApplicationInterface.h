@@ -77,12 +77,8 @@ public:
 
   // virtual constructor needed by Qt to destroy this object
   virtual ~ApplicationInterface();
-
-  // -- functions to handle the properties of the interface --
-public:
-  void set_full_screen( bool full_screen );
-  void set_project_name( std::string project_name );
-
+// 
+//  // -- functions to handle the properties of the interface --
 private:
   // TODO:
   // This functions need to go to the private interface
@@ -96,12 +92,19 @@ private:
   // is changed to false, the preferences are saved
   void save_preferences( bool visibility );
 
+  // ADDDOCKWIDGET:
   // Overload the default addDockWidget and upgrade it, so docks are added
   // on top of each other
   void addDockWidget( Qt::DockWidgetArea area, QDockWidget* dock_widget );
   
   // RAISE_ERROR_MESSAGEBOX:
+  // is called by the function that handles critical error signals, pops up a critical error 
+  // messagebox
   void raise_error_messagebox( int msg_type, std::string message );
+  
+  void set_full_screen( bool full_screen );
+  
+  void set_project_name( std::string project_name );
   
   // NOTE:
   // We need to override these events for the progress widget that draws an transparent layer
@@ -137,12 +140,16 @@ public:
   // Close the modal window reporting on progress
   static void HandleEndProgress( qpointer_type qpointer, Core::ActionProgressHandle handle);
 
-  // HANDLEREPORTPROGRESS
+  // HANDLEREPORTPROGRESS:
   // Report progress to the modal window
   static void HandleReportProgress( qpointer_type qpointer, Core::ActionProgressHandle handle);
   
+  // HANDLEPREFERENCESMANAGERSAVE:
+  // Dispatches the SavePreferences action
   static void HandlePreferencesManagerSave( qpointer_type qpointer, bool visible );
   
+  // HANDLECRITICALERROR:
+  // handles critical error signals and passes them to a function that pops up an error message
   static void HandleCriticalErrorMessage(  qpointer_type qpointer, int msg_type, std::string message );
 
   // SETFULLSCREEN:
@@ -150,6 +157,8 @@ public:
   static void SetFullScreen( qpointer_type app_interface, 
     bool full_screen, Core::ActionSource source );
     
+  // SETPROJECTNAME:
+  // handles signals that the project name needs to change  
   static void SetProjectName( qpointer_type app_interface, 
     std::string project_name, Core::ActionSource source );
 };

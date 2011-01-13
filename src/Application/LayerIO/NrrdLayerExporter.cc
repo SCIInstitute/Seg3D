@@ -72,26 +72,28 @@ bool NrrdLayerExporter::export_layer( LayerExporterMode mode, const std::string&
   const std::string& name )
 {
   boost::filesystem::path path = boost::filesystem::path( file_path ) / ( name + ".nrrd" );
-
+  bool success;
+  
   switch ( mode )
   {
   case LayerExporterMode::DATA_E:
-    return this->export_nrrd( path.string() );
+    success = this->export_nrrd( path.string() );
     break;
     
   case LayerExporterMode::SINGLE_MASK_E:
-    return this->export_single_masks( file_path );
+    success = this->export_single_masks( file_path );
     break;
     
   case LayerExporterMode::LABEL_MASK_E:
-    return this->export_mask_label( path.string() );
+    success = this->export_mask_label( path.string() );
     break;
     
   default:
     return false;
   
   }
-  return false;
+  if( success ) CORE_LOG_SUCCESS( "NRRD export has been successfully completed." );
+  return success;
 }
 
 bool NrrdLayerExporter::export_nrrd( const std::string& file_path )

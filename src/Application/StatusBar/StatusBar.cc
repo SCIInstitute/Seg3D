@@ -116,6 +116,11 @@ void StatusBar::set_data_point_info( DataPointInfoHandle data_point )
 
 void StatusBar::set_message( int msg_type, std::string message )
 {
+  size_t found;
+  found = message.find_last_not_of( " \t\f\v\n\r" );
+  if( found != std::string::npos )
+    message.erase( found + 1 );
+    
   if ( msg_type & Core::LogMessageType::STATUS_BAR_E )
   {
     this->message_updated_signal_( msg_type, message );
