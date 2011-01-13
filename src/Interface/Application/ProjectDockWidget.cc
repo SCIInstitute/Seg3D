@@ -384,8 +384,11 @@ void ProjectDockWidget::populate_session_list()
 
 void ProjectDockWidget::populate_notes_list()
 {
-  std::vector< std::string > notes = ProjectManager::Instance()->current_project_->
-    project_notes_state_->get();
+  std::vector< std::string > notes;
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    notes = ProjectManager::Instance()->current_project_->project_notes_state_->get();
+  }
   
   // Clear out the treewidget
   this->private_->ui_.notes_tree_->clear();
