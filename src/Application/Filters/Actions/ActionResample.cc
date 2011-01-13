@@ -118,6 +118,8 @@ public:
   NrrdKernelSpec* data_kernel_;
   NrrdResampleContext* rsmc_;
 
+  Core::GridTransform output_transform_;
+
 public:
   ResampleAlgo( const std::string& kernel, double param1, double param2 );
   virtual ~ResampleAlgo();
@@ -307,6 +309,24 @@ bool ResampleAlgo::compute_output_grid_transform( const std::string& input_layer
   
   Core::NrrdDataHandle nrrd_in( new Core::NrrdData( input_datablock, 
     layer->get_grid_transform() ) );
+  for ( unsigned int axis = 0; axis < nrrd_in->nrrd()->dim; ++axis )
+  {
+    // Make sure both min and max are set since UpdateNrrdAxisInfo relies on this.  NrrdData
+    // creates nrrds with only min and spacing.
+    // Is there a Teem function for doing this?  nrrdAxisInfoMinMaxSet always sets min to 0.
+    NrrdAxisInfo nrrd_axis_info = nrrd_in->nrrd()->axis[ axis ];
+    if( nrrd_axis_info.center == nrrdCenterCell )
+    {
+      nrrd_in->nrrd()->axis[ axis ].max = nrrd_axis_info.min + 
+        ( nrrd_axis_info.size * nrrd_axis_info.spacing );
+    }
+    else // Assume node-centering
+    {
+      nrrd_in->nrrd()->axis[ axis ].max = nrrd_axis_info.min + 
+        ( (nrrd_axis_info.size - 1 ) * nrrd_axis_info.spacing );
+    }
+  }
+
   Nrrd* nout = nrrdNew();
 
   int error = 0;
@@ -364,6 +384,8 @@ bool ResampleAlgo::nrrd_resmaple( Nrrd* nin, Nrrd* nout, NrrdKernelSpec* unuk )
   }
   if ( !error )
   {
+    // For some reason the grid transform of nout isn't set (no min, max, or origin info)
+    // unu resample works, so maybe we're doing something wrong?  Working around this for now.
     error |= nrrdResampleExecute( this->rsmc_, nout );
   }
 
@@ -413,7 +435,7 @@ void ResampleAlgo::resmaple_data_layer( DataLayerHandle input, DataLayerHandle o
     Core::NrrdDataHandle nrrd_data( new Core::NrrdData( nrrd_out ) );
     Core::DataBlockHandle data_block = Core::NrrdDataBlock::New( nrrd_data );
     Core::DataVolumeHandle data_volume( new Core::DataVolume( 
-      nrrd_data->get_grid_transform(), data_block ) );
+      this->output_transform_, data_block ) );
     this->dispatch_insert_data_volume_into_layer( output, data_volume, true );
     output->update_progress_signal_( 1.0 );
     this->dispatch_unlock_layer( output );
@@ -465,7 +487,7 @@ void ResampleAlgo::resample_mask_layer( MaskLayerHandle input, MaskLayerHandle o
     }
 
     Core::MaskVolumeHandle mask_volume( new Core::MaskVolume( 
-      nrrd_data->get_grid_transform(), mask_data_block ) );
+      this->output_transform_, mask_data_block ) );
     this->dispatch_insert_mask_volume_into_layer( output, mask_volume );
     output->update_progress_signal_( 1.0 );
     this->dispatch_unlock_layer( output );
@@ -1021,14 +1043,13 @@ bool ActionResample::run( Core::ActionContextHandle& context,
 
   // Compute grid transform for the output layers
   const std::vector< std::string >& layer_ids = this->private_->layer_ids_.value();
-  Core::GridTransform output_transform;
   if ( this->private_->resample_to_grid_ || this->private_->resample_to_layer_ )
   {
-    output_transform = this->private_->grid_transform_;
+    algo->output_transform_ = this->private_->grid_transform_;
   }
   else
   {
-    algo->compute_output_grid_transform( layer_ids[ 0 ], output_transform );
+    algo->compute_output_grid_transform( layer_ids[ 0 ], algo->output_transform_ );
   }
 
   // Set up input and output layers
@@ -1052,11 +1073,11 @@ bool ActionResample::run( Core::ActionContextHandle& context,
     switch ( algo->src_layers_[ i ]->get_type() )
     {
     case Core::VolumeType::DATA_E:
-      algo->create_and_lock_data_layer( output_transform, 
+      algo->create_and_lock_data_layer( algo->output_transform_, 
         algo->src_layers_[ i ], algo->dst_layers_[ i ] );
       break;
     case Core::VolumeType::MASK_E:
-      algo->create_and_lock_mask_layer( output_transform,
+      algo->create_and_lock_mask_layer( algo->output_transform_,
         algo->src_layers_[ i ], algo->dst_layers_[ i ] );
       static_cast< MaskLayer* >( algo->dst_layers_[ i ].get() )->color_state_->set(
         static_cast< MaskLayer* >( algo->src_layers_[ i ].get() )->color_state_->get() );
