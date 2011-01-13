@@ -295,9 +295,7 @@ bool ActionTransform::validate( Core::ActionContextHandle& context )
   this->private_->output_grid_trans_.load_basis( this->private_->origin_.value(), 
     Core::Vector( spacing[ 0 ], 0, 0 ), Core::Vector( 0, spacing[ 1 ], 0 ), 
     Core::Vector( 0, 0, spacing[ 2 ] ) );
-  this->private_->output_grid_trans_.set_originally_node_centered(
-    src_grid_trans.get_originally_node_centered() );
-
+  
   // Validation successful
   return true;
 }
@@ -330,20 +328,24 @@ bool ActionTransform::run( Core::ActionContextHandle& context,
       algo->lock_for_use( algo->src_layers_[ i ] );
     }
 
+    // Centering should be preserved for each layer
+    this->private_->output_grid_trans_.set_originally_node_centered( 
+      algo->src_layers_[ i ]->get_grid_transform().get_originally_node_centered() );
+
     switch ( algo->src_layers_[ i ]->get_type() )
-    {
-    case Core::VolumeType::DATA_E:
-      algo->create_and_lock_data_layer( this->private_->output_grid_trans_, 
-        algo->src_layers_[ i ], algo->dst_layers_[ i ] );
-      break;
-    case Core::VolumeType::MASK_E:
-      algo->create_and_lock_mask_layer( this->private_->output_grid_trans_,
-        algo->src_layers_[ i ], algo->dst_layers_[ i ] );
-      static_cast< MaskLayer* >( algo->dst_layers_[ i ].get() )->color_state_->set(
-        static_cast< MaskLayer* >( algo->src_layers_[ i ].get() )->color_state_->get() );
-      break;
-    default:
-      assert( false );
+    { 
+      case Core::VolumeType::DATA_E:
+        algo->create_and_lock_data_layer( this->private_->output_grid_trans_, 
+          algo->src_layers_[ i ], algo->dst_layers_[ i ] );
+        break;
+      case Core::VolumeType::MASK_E:
+        algo->create_and_lock_mask_layer( this->private_->output_grid_trans_,
+          algo->src_layers_[ i ], algo->dst_layers_[ i ] );
+        static_cast< MaskLayer* >( algo->dst_layers_[ i ].get() )->color_state_->set(
+          static_cast< MaskLayer* >( algo->src_layers_[ i ].get() )->color_state_->get() );
+        break;
+      default:
+        assert( false );
     }
     dst_layer_ids[ i ] = algo->dst_layers_[ i ]->get_layer_id();
   }
