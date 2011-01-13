@@ -289,8 +289,11 @@ void ProjectDockWidget::delete_session()
 
 void ProjectDockWidget::populate_session_list()
 {
-  std::vector< std::string > sessions = ProjectManager::Instance()->current_project_->
-    sessions_state_->get();
+  std::vector< std::string > sessions;
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    sessions = ProjectManager::Instance()->current_project_->sessions_state_->get();
+  }
 
   this->private_->ui_.sessions_list_->verticalHeader()->setUpdatesEnabled( false );
 
