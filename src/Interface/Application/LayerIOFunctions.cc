@@ -26,8 +26,15 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// STL includes
+#include <algorithm>
+#include <utility>
+#include <vector>
+#include <set>
+
 // Boost includes
 #include <boost/filesystem.hpp>
+#include <boost/algorithm/minmax_element.hpp>
 
 // Qt includes
 #include <QMessageBox>
@@ -185,44 +192,210 @@ void LayerIOFunctions::ImportSeries( QMainWindow* main_window )
     // checking to see if the sequence numbers are at the end of the file name.  
     std::string filename = boost::filesystem::basename( full_filename );
     
-    std::string numbers( "0123456789" );
-    size_t length =  filename.find_last_not_of( numbers ) + 1;
-
-    // we check to see if we have found a series number at the end. length == 0 if we haven't.
-    if( length == 0 ) return;
-
-    std::vector< std::string > files1;
-
-    // if length was > 0 then chances are that we found a sequence pattern
-    std::string file_pattern = filename.substr( 0, length ); 
-
-    // Step 4: parse through the directory
+    std::vector<std::pair<size_t,size_t> > numbers;
+    
+    size_t j = 0;
+    while ( j < filename.size() )
+    {
+      size_t start, end;
+      while ( j < filename.size() && ( filename[ j ] < '0' || filename[ j ] > '9' ) ) j++;
+      start = j;
+      while ( j < filename.size() && ( filename[ j ] >= '0' && filename[ j ] <= '9' ) ) j++;
+      end = j;
+      
+      if ( start != end ) numbers.push_back( std::make_pair<size_t,size_t>( start, end ) );
+    }
+    
+    std::vector<std::string> dir_files;
+    std::vector< boost::filesystem::path > dir_full_filenames;
     if( boost::filesystem::exists( full_filename.parent_path() ) )
     {
       boost::filesystem::directory_iterator dir_end;
       for( boost::filesystem::directory_iterator dir_itr( full_filename.parent_path() ); 
         dir_itr != dir_end; ++dir_itr )
       {
-        std::string potential_match = dir_itr->filename().substr( 0, length );
-        if( potential_match == file_pattern )
-        {
-          files1.push_back( dir_itr->string() );
-        }
+        dir_full_filenames.push_back( *dir_itr );
+        dir_files.push_back( boost::filesystem::basename( dir_itr->filename() ) );
       }
     }
-    files = files1;
+
+    size_t index = 0;
+    size_t num_files = 0;
+
+    for ( size_t j = 0; j < numbers.size(); j++ )
+    {
+      size_t start = numbers[ j ].first;
+      size_t end = filename.size() - numbers[ j ].second;
+      
+      std::string filename_prefix = filename.substr( 0, start );
+      std::string filename_postfix = filename.substr( filename.size() - end );
+      
+      std::set<size_t> indices;
+      
+      for ( size_t k = 0; k < dir_files.size(); k++ )
+      {
+        if ( dir_files[ k ].substr( 0, start ) == filename_prefix && 
+          dir_files[ k ].substr( dir_files[ k ].size() - end ) == filename_postfix )
+        {
+          size_t val;
+          if ( Core::ImportFromString( dir_files[ k ].substr( start, 
+            dir_files[ k ].size() - end - start ), val ) )
+          {
+            indices.insert( val );
+          }
+        }
+      }
+      
+      if ( num_files < indices.size() )
+      {
+        index = j;
+        num_files = indices.size();
+      }
+    }
+
+    if ( numbers.size() && num_files ) 
+    {
+      std::vector<std::pair<size_t,size_t> > order( num_files );
+      
+      size_t start = numbers[ index ].first;
+      size_t end = filename.size() - numbers[ index ].second;
+      
+      std::string filename_prefix = filename.substr( 0, start );
+      std::string filename_postfix = filename.substr( filename.size() - end );
+      
+      size_t  j = 0;
+      
+      for ( size_t k = 0; k < dir_files.size(); k++ )
+      {
+        if ( dir_files[ k ].substr( 0, start ) == filename_prefix && 
+          dir_files[ k ].substr( dir_files[ k ].size() - end ) == filename_postfix )
+        {
+          size_t val;
+          if ( Core::ImportFromString( dir_files[ k ].substr( start, 
+            dir_files[ k ].size() - end - start ), val ) )
+          {
+            order[ j ].first = val;
+            order[ j ].second = j;
+            j++;
+            files.push_back( dir_full_filenames[ k ].string() );
+          }
+        }
+      }
+    
+      std::sort( order.begin(), order.end() );
+      
+      std::vector<std::string> old_files = files;
+      for ( size_t j = 0; j < order.size(); j++ )
+      {
+        files[ j ] = old_files[ order[ j ].second ];
+      }   
+    }
+    else
+    {
+      files.push_back( full_filename.string() );
+    }
+    
   }
   else
   {
     QStringList::iterator it = file_list.begin();
     QStringList::iterator it_end = file_list.end();
+    
+    std::vector<std::vector<size_t> > file_numbers;
     while ( it != it_end )
     {
-      files.push_back( (*it).toStdString() );
+      std::string filename = (*it).toStdString();
+      files.push_back( filename );
+      
+      for ( size_t j = 0; j < filename.size(); j++ )
+      {
+        if ( filename[ j ] < '0' || filename[ j ] > '9' ) filename[ j ] = ' ';
+      }
+
+      std::vector<size_t> filename_numbers;
+      Core::ImportFromString( filename, filename_numbers );
+      file_numbers.push_back( filename_numbers );
       ++it;
     }
     
-    std::sort( files.begin(), files.end() );
+    size_t max_size = 0;
+    for ( size_t j = 0; j < file_numbers.size(); j++ )
+    {
+      if ( file_numbers[ j ].size() > max_size ) max_size = file_numbers[ j ].size();
+    }
+
+    if ( max_size )
+    {
+      std::vector<std::set<size_t> > numbers( 2*max_size );
+      
+      for ( size_t j = 0; j < file_numbers.size(); j++ )
+      {
+        for ( size_t k = 0; k < file_numbers[ j ].size(); k++ )
+        {
+          numbers[ k ].insert( file_numbers[ j ][ k ] );
+          numbers[ max_size + file_numbers[ j ].size() - 1 - k ].insert( file_numbers[ j ][ k ] );
+        }
+      }
+
+      size_t index = 0;
+      std::pair< std::set<size_t>::iterator, std::set<size_t>::iterator > min_max = 
+        boost::minmax_element( numbers[ 0 ].begin(), numbers[ 0 ].end() );
+      size_t index_range = (*min_max.second) - (*min_max.first);
+      size_t index_size = numbers[ 0 ].size();
+      
+      for ( size_t j = 0; j < numbers.size(); j++ )
+      {
+        min_max = boost::minmax_element( numbers[ j ].begin(), numbers[ j ].end() );
+        size_t range = (*min_max.second) - (*min_max.first);
+        size_t size = numbers[ j ].size();
+        
+        if ( ( size > index_size ) || ( size == index_size && range < index_range ) )
+        {
+          index = j;
+          index_size = size;
+          index_range = range;
+        }
+      }
+      
+      if ( index_size != files.size() )
+      {
+        // Not enough for sorting, use alphabetical order
+        std::sort( files.begin(), files.end() );
+      }
+      else
+      {
+        std::vector<std::pair<size_t,size_t> > order( files.size() );
+        if ( index < max_size )
+        {
+          for ( size_t j = 0; j < order.size(); j++ )
+          {
+            order[ j ].second = j;
+            order[ j ].first = file_numbers[ j ][ index ];
+          }
+        }
+        else
+        {
+          for ( size_t j = 0; j < order.size(); j++ )
+          {
+            order[ j ].second = j;
+            order[ j ].first = file_numbers[ j ][ file_numbers[ j ].size() - 1 - ( index - max_size ) ];
+          }
+        }
+        
+        std::sort( order.begin(), order.end() );
+        
+        std::vector<std::string> old_files = files;
+        for ( size_t j = 0; j < order.size(); j++ )
+        {
+          files[ j ] = old_files[ order[ j ].second ];
+        }
+      }
+    }
+    else
+    {
+      // no numbers for sorting use alphabetical order
+      std::sort( files.begin(), files.end() );
+    }
     
     importers.push_back( importer );
   }

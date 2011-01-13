@@ -28,6 +28,7 @@
 
 // STL includes
 #include <vector>
+#include <limits>
 
 // Boost includes
 #include <boost/algorithm/minmax_element.hpp>
@@ -550,13 +551,26 @@ bool Histogram::compute( const float* data, size_t size )
 
   try
   {
-    float float_min = data[ 0 ];
-    float float_max = data[ 0 ];
+    float float_min = std::numeric_limits<float>::max();
+    float float_max = std::numeric_limits<float>::min();
 
-    for ( size_t j = 1 ; j < size ; j++ )
+    for ( size_t j = 0 ; j < size ; j++ )
     {
-      if ( data[ j ] < float_min ) float_min = data[ j ];
-      if ( data[ j ] > float_max ) float_max = data[ j ];
+      float val = data[ j ];
+      if ( ! Core::IsFinite( val ) ) continue;
+      if ( val < float_min ) float_min = val;
+      if ( val > float_max ) float_max = val;
+    }
+    
+    if ( float_min > float_max )
+    {
+      // Most likely all the data is NaN
+      this->min_ = Core::Nan();
+      this->max_ = Core::Nan();
+      this->bin_start_ = Core::Nan();
+      this->bin_size_ = Core::Nan();
+      this->histogram_.resize( 0 );
+      return false;   
     }
     
     this->min_ = static_cast<double>( float_min );
@@ -579,8 +593,12 @@ bool Histogram::compute( const float* data, size_t size )
     float inv_bin_size = static_cast< float >( 1.0f / this->bin_size_ );
     for ( size_t j = 1 ; j < size ; j++ )
     {
-      size_t idx = static_cast<size_t>( ( data[j] - float_min ) * inv_bin_size );
-      this->histogram_[ idx ]++;
+      float val = data[ j ];
+      if ( Core::IsFinite( val ) )
+      {
+        size_t idx = static_cast<size_t>( ( val - float_min ) * inv_bin_size );
+        this->histogram_[ idx ]++;
+      }
     }
 
     std::pair< std::vector<size_t>::iterator, std::vector<size_t>::iterator > min_max = 
@@ -613,15 +631,28 @@ bool Histogram::compute( const double* data, size_t size )
 
   try
   {
-    this->min_ = data[ 0 ];
-    this->max_ = data[ 0 ];
+    this->min_ = std::numeric_limits<double>::max();
+    this->max_ = std::numeric_limits<double>::min();
 
-    for ( size_t j = 1 ; j < size ; j++ )
+    for ( size_t j = 0 ; j < size ; j++ )
     {
-      if ( data[ j ] < this->min_ ) this->min_ = data[ j ];
-      if ( data[ j ] > this->max_ ) this->max_ = data[ j ];
+      double val = data[ j ];
+      if ( ! Core::IsFinite( val ) ) continue;
+      if ( val < this->min_ ) this->min_ = val;
+      if ( val > this->max_ ) this->max_ = val;
     }
     
+    if ( this->min_ > this->max_ )
+    {
+      // Most likely all the data is NaN
+      this->min_ = Core::Nan();
+      this->max_ = Core::Nan();
+      this->bin_start_ = Core::Nan();
+      this->bin_size_ = Core::Nan();
+      this->histogram_.resize( 0 );
+      return false;   
+    }
+      
     if ( this->min_ == this->max_ )
     {
       this->bin_size_  = 1.0;
@@ -637,11 +668,16 @@ bool Histogram::compute( const double* data, size_t size )
     }
 
     double inv_bin_size = 1.0 / bin_size_;
+
+
     for ( size_t j = 1 ; j < size ; j++ )
     {
-      size_t idx = static_cast<size_t>( ( static_cast<double>( data[j] ) - this->min_ ) *
-        inv_bin_size );
-      this->histogram_[ idx ]++;
+      double val = data[ j ];
+      if ( Core::IsFinite( val ) )
+      {
+        size_t idx = static_cast<size_t>( ( val - this->min_ ) * inv_bin_size );
+        this->histogram_[ idx ]++;
+      }   
     }
     
     std::pair< std::vector<size_t>::iterator, std::vector<size_t>::iterator > min_max = 
