@@ -358,6 +358,21 @@ bool SegmentationSelectionPage::validatePage()
       this->private_->warning_message_->show();
       return false;
     }
+    try
+    {
+      boost::filesystem::create_directory( boost::filesystem::path( filename.toStdString() ) 
+        / "delete_me" );
+    }
+    catch( ... ) // if the create fails then we are not in a writable directory
+    {
+      this->private_->warning_message_->setText( QString::fromUtf8( 
+        "This location is not writable, please chose a valid location." ) );
+      this->private_->warning_message_->show();
+      return false;
+    }
+    // if we've made it here then we need to remove the folder we created
+    boost::filesystem::remove( boost::filesystem::path( filename.toStdString() ) 
+      / "delete_me" );
 
     Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
       PreferencesManager::Instance()->export_path_state_, 
