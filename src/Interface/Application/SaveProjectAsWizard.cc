@@ -186,6 +186,7 @@ bool SaveAsInfoPage::validatePage()
     boost::filesystem::path( this->project_path_lineedit_->text().toStdString() ) / 
     boost::filesystem::path( this->project_name_lineedit_->text().toStdString() );
     
+  // We check to see if the path they are choosing already exists
   if( boost::filesystem::exists( new_path ) )
   {
     if( ( ProjectManager::Instance()->current_project_->project_name_state_->get() == 
@@ -217,6 +218,7 @@ bool SaveAsInfoPage::validatePage()
     return true;
   }
   
+  // Check to see if the directory that we are trying to save in exists
   if( !boost::filesystem::exists( new_path.parent_path() ) )
   {
     this->warning_message_->setText( QString::fromUtf8( 
@@ -224,12 +226,26 @@ bool SaveAsInfoPage::validatePage()
     this->warning_message_->show();
     return false;
   }
-  
+
+  // Finally we check to see if we can write to that directory
+  try // to create a project sessions folder
+  {
+    boost::filesystem::create_directory( new_path );
+  }
+  catch ( ... ) // any errors that we might get thrown would indicate that we cant write here
+  {
+    this->warning_message_->setText( QString::fromUtf8( 
+      "This location is not writable, please chose a valid location." ) );
+    this->warning_message_->show();
+    return false;
+  }
+
   this->warning_message_->hide();
-  
+
   Core::ActionSet::Dispatch(  Core::Interface::GetWidgetActionContext(), 
     PreferencesManager::Instance()->export_path_state_, new_path.parent_path().string() );
-    
+  
+
   return true;
 }
 

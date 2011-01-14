@@ -540,13 +540,9 @@ void ApplicationInterface::SetProjectName( qpointer_type qpointer, std::string p
 
 void ApplicationInterface::raise_error_messagebox( int msg_type, std::string message )
 {
-  int ret = QMessageBox::critical( this, "CRITICAL ERROR!!",
+  QMessageBox::critical( this, "CRITICAL ERROR!!",
     QString::fromStdString( message ) );
 
-//  if( ret == QMessageBox::Ok )
-//  {
-// 
-//  }
 }
 
 void ApplicationInterface::HandleCriticalErrorMessage( qpointer_type qpointer, int msg_type, std::string message )

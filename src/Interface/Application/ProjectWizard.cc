@@ -101,6 +101,12 @@ ProjectInfoPage::ProjectInfoPage( QWidget *parent )
   this->project_path_change_button_->setFocusPolicy( Qt::NoFocus );
 
     registerField( "projectName", this->project_name_lineedit_ );
+    
+  this->warning_message_ = new QLabel( QString::fromUtf8( "This location does not exist, please chose a valid location." ) );
+  this->warning_message_->setObjectName( QString::fromUtf8( "warning_message_" ) );
+  this->warning_message_->setWordWrap( true );
+  this->warning_message_->setStyleSheet(QString::fromUtf8( "QLabel#warning_message_{ color: red; } " ) );
+  this->warning_message_->hide();
 
     QGridLayout *layout = new QGridLayout;
     layout->addWidget( this->project_name_label_, 0, 0 );
@@ -108,6 +114,7 @@ ProjectInfoPage::ProjectInfoPage( QWidget *parent )
     layout->addWidget( this->project_path_label_, 1, 0 );
     layout->addWidget( this->project_path_lineedit_, 1, 1 );
     layout->addWidget( this->project_path_change_button_, 2, 1, 1, 2 );
+    layout->addWidget( this->warning_message_, 3, 1, 1, 2 );
     setLayout( layout );
 
 }
@@ -121,17 +128,57 @@ void ProjectInfoPage::initializePage()
 
 void ProjectInfoPage::set_path()
 {
-    QDir project_directory_;
-  QString path = QFileDialog::getExistingDirectory ( this, "Directory",
-    this->project_path_lineedit_->text() );
+  this->warning_message_->hide();
   
-    if ( path.isNull() == false )
+    QDir project_directory_ = QDir( QFileDialog::getExistingDirectory ( this, "Choose Directory...",
+    this->project_path_lineedit_->text(), 
+    QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks ) );
+  
+    if ( project_directory_.exists() )
     {
-        project_directory_.setPath( path );
+        this->project_path_lineedit_->setText( project_directory_.canonicalPath() );
     }
-    this->project_path_lineedit_->setText( project_directory_.canonicalPath() );
+    else
+    {
+    this->project_path_lineedit_->setText( "" );
+  }
     registerField( "projectPath", this->project_path_lineedit_ );
 }
+
+bool ProjectInfoPage::validatePage()
+{
+  boost::filesystem::path new_path = 
+    boost::filesystem::path( this->project_path_lineedit_->text().toStdString() ) / 
+    boost::filesystem::path( this->project_name_lineedit_->text().toStdString() );
+
+  if( !boost::filesystem::exists( new_path.parent_path() ) )
+  {
+    this->warning_message_->setText( QString::fromUtf8( 
+      "This location does not exist, please chose a valid location." ) );
+    this->warning_message_->show();
+    return false;
+  }
+
+  try // to create a project sessions folder
+  {
+    boost::filesystem::create_directory( new_path );
+  }
+  catch ( ... ) // any errors that we might get thrown would indicate that we cant write here
+  {
+    this->warning_message_->setText( QString::fromUtf8( 
+      "This location is not writable, please chose a valid location." ) );
+    this->warning_message_->show();
+    return false;
+  }
+
+  this->warning_message_->hide();
+
+  Core::ActionSet::Dispatch(  Core::Interface::GetWidgetActionContext(), 
+    PreferencesManager::Instance()->export_path_state_, new_path.parent_path().string() );
+
+  return true;
+}
+
 
 SummaryPage::SummaryPage( QWidget *parent )
     : QWizardPage( parent )

@@ -1191,6 +1191,19 @@ void LayerWidget::export_layer( const std::string& type_extension )
     CORE_LOG_ERROR( "The layer could not be exported to that location. Please try another location." );
     return;
   }
+  try
+  {
+    boost::filesystem::create_directory( boost::filesystem::path( export_path.toStdString() ) / "delete_me" );
+  }
+  catch( ... ) // if the create fails then we are not in a writable directory
+  {
+    CORE_LOG_ERROR( "The layer could not be exported to that location. Please try another location." );
+    return;
+  }
+  
+  // if we've made it here then we've created a folder and we need to delete it.
+  boost::filesystem::remove(  boost::filesystem::path( export_path.toStdString() ) / "delete_me" );
+  
   
   if( LayerManager::Instance()->get_layer_by_id( this->get_layer_id() )->get_type() == 
     Core::VolumeType::MASK_E )

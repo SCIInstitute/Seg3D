@@ -65,6 +65,11 @@ public:
   
 protected:
     void initializePage();
+    
+  // VALIDATEPAGE:
+  // function that is called right after the next button is clicked and used to process
+  // the entered data so it can be passed to the next page
+  virtual bool validatePage();
 
 private:
     QLabel *project_name_label_;
@@ -72,6 +77,7 @@ private:
     QLineEdit *project_name_lineedit_;
     QLineEdit *project_path_lineedit_;
     QPushButton *project_path_change_button_;
+    QLabel *warning_message_;
 
 private Q_SLOTS:
     void set_path();

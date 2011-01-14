@@ -78,6 +78,7 @@ namespace Seg3D
     QHBoxLayout *horizontalLayout;
     QLabel *segmentation_name_label_;
     QTreeWidget *group_with_masks_tree_;
+    QLabel *warning_message_;
 
     std::string file_name_;
     
@@ -215,8 +216,14 @@ SegmentationSelectionPage::SegmentationSelectionPage( SegmentationPrivateHandle 
   connect( this->private_->export_selector_, SIGNAL( currentIndexChanged( int ) ), this,
     SLOT( change_type_text( int ) ) );
   
+  this->private_->warning_message_ = new QLabel( QString::fromUtf8( "This location does not exist, please chose a valid location." ) );
+  this->private_->warning_message_->setObjectName( QString::fromUtf8( "warning_message_" ) );
+  this->private_->warning_message_->setWordWrap( true );
+  this->private_->warning_message_->setStyleSheet(QString::fromUtf8( "QLabel#warning_message_{ color: red; } " ) );
+  this->private_->warning_message_->hide();
   
   this->private_->selection_main_layout_->addWidget( this->private_->single_or_multiple_files_widget_ );
+  this->private_->selection_main_layout_->addWidget( this->private_->warning_message_ );
   this->private_->selection_main_layout_->addWidget( this->private_->bitmap_widget_ );
 
   this->private_->single_file_radio_button_->setChecked( true );
@@ -308,6 +315,7 @@ void SegmentationSelectionPage::initializePage()
 
 bool SegmentationSelectionPage::validatePage()
 {
+  this->private_->warning_message_->hide();
   this->private_->masks_.clear();
   for( int i = 0; i < this->private_->group_with_masks_tree_->topLevelItemCount(); ++i )
   {
@@ -342,6 +350,14 @@ bool SegmentationSelectionPage::validatePage()
     filename = QFileDialog::getExistingDirectory( this, tr( "Choose Directory for Export..." ),
       QString::fromStdString( PreferencesManager::Instance()->export_path_state_->get() ),
       QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks );
+      
+    if( !QFileInfo( filename ).exists() )
+    {
+      this->private_->warning_message_->setText( QString::fromUtf8( 
+        "This location does not exist, please chose a valid location." ) );
+      this->private_->warning_message_->show();
+      return false;
+    }
 
     Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
       PreferencesManager::Instance()->export_path_state_, 

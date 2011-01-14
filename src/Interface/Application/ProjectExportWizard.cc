@@ -155,6 +155,18 @@ bool ExportInfoPage::validatePage()
     this->warning_message_->show();
     return false;
   }
+  
+  try // to create a project sessions folder
+  {
+    boost::filesystem::create_directory( new_path );
+  }
+  catch ( ... ) // any errors that we might get thrown would indicate that we cant write here
+  {
+    this->warning_message_->setText( QString::fromUtf8( 
+      "This location is not writable, please chose a valid location." ) );
+    this->warning_message_->show();
+    return false;
+  }
 
   this->warning_message_->hide();
   
