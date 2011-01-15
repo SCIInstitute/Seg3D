@@ -86,16 +86,39 @@ public:
   typedef boost::function< bool( ViewerHandle, int, int ) > key_press_event_handler_type;
   typedef boost::function< bool( ViewerHandle ) > cursor_handler_type;
 
+  // MOUSE_MOVE_EVENT:
+  // This function is called by the render widget when a mouse move event has occurred.
+  // This function needs to be overloaded to record mouse movements.
   virtual void mouse_move_event( const Core::MouseHistory& mouse_history, 
     int button, int buttons, int modifiers );
+
+  // MOUSE_PRESS_EVENT:
+  // This function is called by the render widget when a mouse button press event has occurred.
+  // This function needs to be overloaded to record mouse buttons being pressed.
   virtual void mouse_press_event( const Core::MouseHistory& mouse_history, 
     int button, int buttons, int modifiers );
+
+  // MOUSE_RELEASE_EVENT:
+  // This function is called by the render widget when a mouse button release event has occurred.
+  // This function needs to be overloaded to record mouse buttons being released.
   virtual void mouse_release_event( const Core::MouseHistory& mouse_history, 
     int button, int buttons, int modifiers );
+
+  // MOUSE_ENTER_EVENT:
+  // This function is called by the render widget when a mouse enter event has occurred.
   virtual void mouse_enter_event( int x, int y );
+
+  // MOUSE_LEAVE_EVENT:
+  // This function is called by the render widget when a mouse leave event has occurred.
   virtual void mouse_leave_event();
+
+  // WHEEL_EVENT:
+  // This function is called by the render widget when a mouse wheel event has occurred.
+  // This function needs to be overloaded to track mouse wheel events. 
   virtual bool wheel_event( int delta, int x, int y, int buttons, int modifiers );
 
+  // KEY_EVENT:
+  // This function is called when a key is pressed while hovering over the render widget
   virtual bool key_press_event( int key, int modifiers, int x, int y );
 
   void set_mouse_move_handler( mouse_event_handler_type func );

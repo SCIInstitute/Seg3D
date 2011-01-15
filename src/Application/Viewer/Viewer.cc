@@ -906,6 +906,7 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
 
   this->add_state( "view_mode", view_mode_state_, mode, sagittal + "|" + coronal 
      + "|" + axial + "|" + VOLUME_C + "=Volume" );
+  this->view_mode_state_->set_session_priority( Core::StateBase::DEFAULT_LOAD_E + 1 );
      
   this->add_connection( PreferencesManager::Instance()->x_axis_label_state_->state_changed_signal_.
     connect( boost::bind( &ViewerPrivate::set_viewer_labels, this->private_ ) ) );
@@ -913,9 +914,9 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
     connect( boost::bind( &ViewerPrivate::set_viewer_labels, this->private_ ) ) );
   this->add_connection( PreferencesManager::Instance()->z_axis_label_state_->state_changed_signal_.
     connect( boost::bind( &ViewerPrivate::set_viewer_labels, this->private_ ) ) );
+
   this->add_connection( PreferencesManager::Instance()->grid_size_state_->state_changed_signal_.
     connect( boost::bind( &Viewer::redraw_overlay, this ) ) );
-
   this->add_connection( PreferencesManager::Instance()->show_slice_number_state_->
     state_changed_signal_.connect( boost::bind( &Viewer::redraw_overlay, this ) ) );
   this->add_connection( PreferencesManager::Instance()->background_color_state_->
@@ -923,8 +924,13 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
   this->add_connection( PreferencesManager::Instance()->zero_based_slice_numbers_state_->
     state_changed_signal_.connect( boost::bind( &Viewer::redraw_overlay, this ) ) );
   
-  this->view_mode_state_->set_session_priority( Core::StateBase::DEFAULT_LOAD_E + 1 );
-
+  const std::vector< Core::StateColorHandle >& color_states = PreferencesManager::Instance()->color_states_;
+  for ( size_t i = 0; i < color_states.size(); ++i )
+  {
+    this->add_connection( color_states[ i ]->state_changed_signal_.connect( 
+      boost::bind( &Viewer::redraw_scene, this ) ) );
+  }
+  
   this->add_state( "axial_view", axial_view_state_ );
   this->add_state( "coronal_view", coronal_view_state_ );
   this->add_state( "sagittal_view", sagittal_view_state_ );
@@ -947,7 +953,7 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
     this->volume_volume_rendering_visible_state_, false );
   this->add_state( "volume_light_visible", this->volume_light_visible_state_, true );
   this->add_state( "volume_enable_fog", this->volume_enable_fog_state_, false );
-  this->add_state( "volume_enable_clipping", this->volume_enable_clipping_state_, false );
+  this->add_state( "volume_enable_clipping", this->volume_enable_clipping_state_, true );
   this->add_state( "volume_show_invisible_slices", this->volume_show_invisible_slices_state_, true );
   this->add_state( "volume_show_bounding_box", this->volume_show_bounding_box_state_, true );
 
