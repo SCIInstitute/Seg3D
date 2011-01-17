@@ -240,6 +240,9 @@ bool SaveAsInfoPage::validatePage()
     return false;
   }
 
+  // if we have made it to here we have created a new directory lets remove it.
+  boost::filesystem::remove( new_path );
+  
   this->warning_message_->hide();
 
   Core::ActionSet::Dispatch(  Core::Interface::GetWidgetActionContext(), 

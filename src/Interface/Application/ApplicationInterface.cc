@@ -109,6 +109,8 @@ namespace Seg3D
     // Application menu, statusbar
     QPointer< Menu > menu_;
     QPointer< StatusBarWidget > status_bar_;
+    
+    bool critical_message_active_;
   
   };
 
@@ -157,6 +159,8 @@ ApplicationInterface::ApplicationInterface( std::string file_to_view_on_open ) :
     Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
       InterfaceManager::Instance()->splash_screen_visibility_state_, false );
   }
+  
+  this->private_->critical_message_active_ = false;
   
   // Instantiate the dock widgets
   this->private_->rendering_dock_window_ = new RenderingDockWidget( this );
@@ -540,9 +544,19 @@ void ApplicationInterface::SetProjectName( qpointer_type qpointer, std::string p
 
 void ApplicationInterface::raise_error_messagebox( int msg_type, std::string message )
 {
-  QMessageBox::critical( this, "CRITICAL ERROR!!",
-    QString::fromStdString( message ) );
-
+  
+  if( this->private_->critical_message_active_ ) return;
+    
+  this->private_->critical_message_active_ = true;
+  
+  int return_value = QMessageBox::critical( this, "CRITICAL ERROR!!",
+    QString::fromStdString( "CRITICAL ERROR!!\n\n" + message ) );
+  
+  if( return_value )
+  {
+    this->private_->critical_message_active_ = false;
+  }
+  
 }
 
 void ApplicationInterface::HandleCriticalErrorMessage( qpointer_type qpointer, int msg_type, std::string message )
