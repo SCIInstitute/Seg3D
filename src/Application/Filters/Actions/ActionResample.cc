@@ -1074,6 +1074,8 @@ bool ActionResample::run( Core::ActionContextHandle& context,
     if ( this->private_->resample_to_grid_ || this->private_->resample_to_layer_ )
     {
       algo->output_transforms_[ i ] = this->private_->grid_transform_;
+      algo->output_transforms_[ i ].set_originally_node_centered( 
+        algo->src_layers_[ i ]->get_grid_transform().get_originally_node_centered() );
     }
     else
     {
