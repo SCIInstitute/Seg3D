@@ -126,12 +126,16 @@ public:
   // Get the underlying transform
   Transform transform() const;
 
+  // SET_ORIGINALLY_NODE_CENTERED:
   // This is needed when this value needs to be copied from one grid transform to another
   void set_originally_node_centered( bool originally_node_centered )
   {
     this->originally_node_centered_ = originally_node_centered;
   }
 
+  // GET_ORIGINALLY_NODE_CENTERED:
+  // Returns true if the volume was originally node-centered or unknown.  Returns true if the 
+  // volume was originally specified as cell-centered.
   bool get_originally_node_centered() const
   {
     return this->originally_node_centered_;
