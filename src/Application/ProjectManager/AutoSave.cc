@@ -41,7 +41,8 @@ namespace Seg3D
 
 CORE_SINGLETON_IMPLEMENTATION( AutoSave );
 
-AutoSave::AutoSave()
+AutoSave::AutoSave() :
+  auto_save_smart_save_timer_( 5 )
 {
 }
 
@@ -93,12 +94,13 @@ void AutoSave::run()
             double time_since_last_action = static_cast< double >
               ( duration.total_milliseconds() ) * 0.001;
 
-            if( time_since_last_action > 5  )
+            if( time_since_last_action > this->get_smart_auto_save_timeout() )
             {
               break;
             }
           }
-          boost::posix_time::milliseconds action_wait_time( static_cast< int >( 5000.0 ) );
+          boost::posix_time::milliseconds action_wait_time( 
+            static_cast< int >( 1000.0 * this->get_smart_auto_save_timeout() ) );
           recompute_auto_save_.timed_wait( lock, action_wait_time );
         }
       }
@@ -162,6 +164,18 @@ void AutoSave::do_auto_save()
   if ( ProjectManager::Instance()->get_current_project()->check_project_changed() )
   {
     ActionSaveSession::Dispatch( Core::Interface::GetWidgetActionContext(), true, "" );
+  }
+}
+  
+int AutoSave::get_smart_auto_save_timeout() const
+{
+  if( ProjectManager::Instance()->successful_save_ )
+  {
+    return 5;
+  }
+  else
+  {
+    return 150;
   }
 }
 

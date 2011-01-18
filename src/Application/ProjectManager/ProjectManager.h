@@ -148,7 +148,11 @@ public:
   // Whether the current project has been saved or not
   Core::StateBoolHandle     project_saved_state_;
   
+  // public handle to the current project
   ProjectHandle         current_project_;
+  
+  // whether the save was successful or not
+  bool              successful_save_;
 
 private:
   

@@ -79,12 +79,15 @@ private:
   // COMPUTE_TIMEOUT:
   // function that computes the timeout
   double compute_timeout();
+  
+  int get_smart_auto_save_timeout() const;
 
 
 private:
   boost::thread auto_save_thread_;
   boost::condition_variable recompute_auto_save_;
   boost::condition_variable auto_save_done_;
+  int auto_save_smart_save_timer_;
 
 };
 

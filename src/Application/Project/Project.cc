@@ -102,7 +102,7 @@ void Project::reset_project_changed()
 bool Project::check_project_changed()
 {
   Core::Application::lock_type lock( Core::Application::GetMutex() );
-  return changed_;
+  return this->changed_;
 }
 
 bool Project::initialize_from_file( const std::string& project_name )
