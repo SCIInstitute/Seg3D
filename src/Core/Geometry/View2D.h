@@ -39,13 +39,6 @@ namespace Core
 // Forward declaration
 class View2D;
 
-CORE_ENUM_CLASS
-(
-  FlipDirectionType,
-  HORIZONTAL_E = 0, 
-  VERTICAL_E = 1
-)
-
 class View2D
 {
 public:
@@ -77,6 +70,7 @@ public:
   {
     return scalex_;
   }
+
   inline void scalex( double scalex )
   {
     scalex_ = scalex;
@@ -86,24 +80,15 @@ public:
   {
     return scaley_;
   }
+
   inline void scaley( double scaley )
   {
     scaley_ = scaley;
   }
 
-  inline bool x_flipped() const
-  {
-    return this->scalex_ < 0;
-  }
-  inline bool y_flipped() const
-  {
-    return this->scaley_ < 0;
-  }
-
   void scale( double ratio );
   void translate( const Vector& offset );
   void dolly( double dz );
-  void flip( FlipDirectionType direction );
   void compute_clipping_planes( double aspect, double& left, double& right, 
     double& bottom, double& top ) const;
 

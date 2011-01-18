@@ -111,32 +111,6 @@ void StateView2D::dolly( double dz )
   }
 }
 
-void StateView2D::flip( Core::FlipDirectionType direction )
-{
-  // NOTE: State variables can only be set from the application thread
-  ASSERT_IS_APPLICATION_THREAD_OR_INITIALIZING();
-
-  {
-    StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
-    this->value_.flip( direction );
-  }
-  
-  if ( this->signals_enabled() )
-  {
-    this->state_changed_signal_();
-  }
-}
-
-bool StateView2D::x_flipped() const
-{
-  return this->value_.x_flipped();
-}
-
-bool StateView2D::y_flipped() const
-{
-  return this->value_.y_flipped();
-}
-
 bool StateView2D::set( const Core::View2D& value, ActionSource source )
 {
   // NOTE: State variables can only be set from the application thread

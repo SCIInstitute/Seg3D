@@ -241,6 +241,11 @@ public:
   Core::StateView3DHandle volume_view_state_;
   Core::StateRangedIntHandle slice_number_state_;
 
+  // Whether to flip the 2D view horizontally
+  Core::StateBoolHandle flip_horizontal_state_;
+  // Whether to flip the 2D view vertically
+  Core::StateBoolHandle flip_vertical_state_;
+
   // 2D viewer state
   Core::StateBoolHandle slice_grid_state_;
   Core::StateBoolHandle slice_visible_state_;

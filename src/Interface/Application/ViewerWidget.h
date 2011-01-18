@@ -77,15 +77,7 @@ public Q_SLOTS:
   // DESELECT:
   // This slot is triggered if another viewer is activated and this one needs to be deselected.
   void deselect();
-  
-  // FLIP_VIEW_HORIZ:
-  // Flip the view horizontally.
-  void flip_view_horiz();
-
-  // FLIP_VIEW_VERT:
-  // Flip the view vertically.
-  void flip_view_vert();
-  
+    
 public:
   void image_mode( bool picture );
 

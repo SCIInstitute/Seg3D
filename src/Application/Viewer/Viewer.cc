@@ -85,6 +85,8 @@ public:
   void delete_layers( std::vector< LayerHandle > layers );
   void set_active_layer( LayerHandle layer );
   void set_viewer_labels();
+  void handle_flip_horizontal_changed( bool flip );
+  void handle_flip_vertical_changed( bool flip );
   void reset();
 
   // -- Helper functions --
@@ -473,7 +475,6 @@ void ViewerPrivate::change_view_mode( std::string mode, Core::ActionSource sourc
     this->viewer_->lock_state_->set( false );
   }
 
-
   if ( !this->cursor_handler_ || !this->cursor_handler_( this->viewer_->shared_from_this() ) )
   {
     this->viewer_->set_cursor( mode == Viewer::VOLUME_C ? Core::CursorShape::ARROW_E : 
@@ -486,13 +487,22 @@ void ViewerPrivate::change_view_mode( std::string mode, Core::ActionSource sourc
   }
 
   Core::VolumeSliceType slice_type( Core::VolumeSliceType::AXIAL_E );
+  Core::StateView2DHandle view2d = this->viewer_->axial_view_state_;
   if ( mode == Viewer::CORONAL_C )
   {
     slice_type = Core::VolumeSliceType::CORONAL_E;
+    view2d = this->viewer_->coronal_view_state_;
   }
   else if ( mode == Viewer::SAGITTAL_C )
   {
     slice_type =  Core::VolumeSliceType::SAGITTAL_E;
+    view2d = this->viewer_->sagittal_view_state_;
+  }
+
+  {
+    Core::ScopedCounter block_counter( this->signals_block_count_ );
+    this->viewer_->flip_horizontal_state_->set( view2d->get().scalex() < 0.0 );
+    this->viewer_->flip_vertical_state_->set( view2d->get().scaley() < 0.0 );
   }
 
   volume_slice_map_type::iterator it = this->volume_slices_.begin();
@@ -876,6 +886,42 @@ void ViewerPrivate::reset()
   this->viewer_->redraw_all();
 }
 
+void ViewerPrivate::handle_flip_horizontal_changed( bool flip )
+{
+  if ( this->signals_block_count_ > 0 || this->loading_ )
+  {
+    return;
+  }
+  
+  Core::StateView2DHandle view2d_state = boost::dynamic_pointer_cast< Core::StateView2D >(
+    this->viewer_->get_active_view_state() );
+  if ( view2d_state )
+  {
+    Core::View2D view2d = view2d_state->get();
+    double abs_scalex = Core::Abs( view2d.scalex() );
+    view2d.scalex( flip ? -abs_scalex : abs_scalex );
+    view2d_state->set( view2d );
+  }
+}
+
+void ViewerPrivate::handle_flip_vertical_changed( bool flip )
+{
+  if ( this->signals_block_count_ > 0 || this->loading_ )
+  {
+    return;
+  }
+
+  Core::StateView2DHandle view2d_state = boost::dynamic_pointer_cast< Core::StateView2D >(
+    this->viewer_->get_active_view_state() );
+  if ( view2d_state )
+  {
+    Core::View2D view2d = view2d_state->get();
+    double abs_scaley = Core::Abs( view2d.scaley() );
+    view2d.scaley( flip ? -abs_scaley : abs_scaley );
+    view2d_state->set( view2d );
+  }
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Implementation of class Viewer
 //////////////////////////////////////////////////////////////////////////
@@ -935,6 +981,16 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
   this->add_state( "coronal_view", coronal_view_state_ );
   this->add_state( "sagittal_view", sagittal_view_state_ );
   this->add_state( "volume_view", volume_view_state_ );
+
+  this->add_state( "flip_horizontal", this->flip_horizontal_state_, false );
+  this->flip_horizontal_state_->set_session_priority( Core::StateBase::DO_NOT_LOAD_E );
+  this->add_state( "flip_vertical", this->flip_vertical_state_, false );
+  this->flip_vertical_state_->set_session_priority( Core::StateBase::DO_NOT_LOAD_E );
+
+  this->add_connection( this->flip_horizontal_state_->value_changed_signal_.connect( boost::bind(
+    &ViewerPrivate::handle_flip_horizontal_changed, this->private_, _1 ) ) );
+  this->add_connection( this->flip_vertical_state_->value_changed_signal_.connect( boost::bind(
+    &ViewerPrivate::handle_flip_vertical_changed, this->private_, _1 ) ) );
 
   this->private_->view_states_[ 0 ] = this->sagittal_view_state_;
   this->private_->view_states_[ 1 ] = this->coronal_view_state_;
@@ -1780,6 +1836,15 @@ bool Viewer::post_load_states( const Core::StateIO& state_io )
       this->private_->active_layer_slice_->number_of_slices() ) - 1 );
     this->slice_number_state_->set( static_cast< int >( 
       this->private_->active_layer_slice_->get_slice_number() ) );
+  }
+
+  // Set the view flip states
+  Core::StateView2DHandle view2d = boost::dynamic_pointer_cast< Core::StateView2D >( 
+    this->get_active_view_state() );
+  if ( view2d )
+  {
+    this->flip_horizontal_state_->set( view2d->get().scalex() < 0.0 );
+    this->flip_vertical_state_->set( view2d->get().scaley() < 0.0 );
   }
 
   this->private_->loading_ = false;

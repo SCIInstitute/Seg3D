@@ -68,8 +68,6 @@ SET(CORE_STATE_ACTIONS_SRCS
   Actions/ActionAdd.cc
   Actions/ActionClear.h
   Actions/ActionClear.cc
-  Actions/ActionFlip.h
-  Actions/ActionFlip.cc
   Actions/ActionGet.h
   Actions/ActionGet.cc
   Actions/ActionOffset.h

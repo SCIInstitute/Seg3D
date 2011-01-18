@@ -100,18 +100,6 @@ void View2D::dolly( double dz )
   this->center_[ 2 ] += dz;
 }
 
-void View2D::flip(FlipDirectionType direction)
-{
-  if (direction == FlipDirectionType::HORIZONTAL_E)
-  {
-    this->scalex_ = -this->scalex_;
-  }
-  else
-  {
-    this->scaley_ = -this->scaley_;
-  }
-}
-
 void View2D::compute_clipping_planes( double aspect, double& left, double& right, 
   double& bottom, double& top ) const
 {

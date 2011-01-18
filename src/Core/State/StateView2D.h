@@ -89,12 +89,6 @@ public:
   
   void dolly( double dz );
 
-  void flip( Core::FlipDirectionType direction );
-
-  bool x_flipped() const;
-
-  bool y_flipped() const;
-
 protected:
   // EXPORT_TO_VARIANT
   // Export the state data to a variant parameter
