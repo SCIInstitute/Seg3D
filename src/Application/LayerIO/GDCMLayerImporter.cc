@@ -103,8 +103,6 @@ double GDCMLayerImporterPrivate::get_slice_thickness( const gdcm::DataSet& ds )
     }
   }
 
-  
-
   return 1.0;
 }
 
@@ -328,8 +326,10 @@ bool GDCMLayerImporter::import_header()
       
       double spacing = Core::Abs( origin[ 2 ] - origin2[ 2 ] );
       if ( spacing > 0.0 ) this->private_->z_spacing_ = spacing; else spacing = 1.0;
+      found_thickness = true;
     }
-    else
+    
+    if ( found_thickness == false )
     {
       this->private_->z_spacing_ = 1.0;
     }

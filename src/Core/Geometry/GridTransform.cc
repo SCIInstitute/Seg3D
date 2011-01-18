@@ -92,14 +92,20 @@ Transform GridTransform::transform() const
 
 bool GridTransform::operator==( const GridTransform& gt ) const
 {
-  return ( nx_ == gt.nx_ && ny_ == gt.ny_ && nz_ == gt.nz_ && 
+  return ( this->nx_ == gt.nx_ && this->ny_ == gt.ny_ && this->nz_ == gt.nz_ && 
     Transform::operator==( gt ) );
 }
 
 bool GridTransform::operator!=( const GridTransform& gt ) const
 {
-  return ( nx_ != gt.nx_ || ny_ != gt.ny_ || nz_ != gt.nz_ || 
+  return ( this->nx_ != gt.nx_ || this->ny_ != gt.ny_ || this->nz_ != gt.nz_ || 
     Transform::operator!=( gt ) );
+}
+
+double GridTransform::get_diagonal_length() const
+{
+  return project( Vector( static_cast<double>( this->nx_ ), static_cast<double>( this->ny_ ), 
+     static_cast<double>( this->nz_ ) ) ).length();
 }
 
 void GridTransform::AlignToCanonicalCoordinates( const GridTransform& src_transform, 

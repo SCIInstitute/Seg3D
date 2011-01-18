@@ -122,10 +122,11 @@ public:
     nz_ = nz;
   }
   
-  // TRANSFORM:
+  // TRANSFORM
   // Get the underlying transform
   Transform transform() const;
-
+  
+  // SET_ORIGINALLY_NODE_CENTERED
   // SET_ORIGINALLY_NODE_CENTERED:
   // This is needed when this value needs to be copied from one grid transform to another
   void set_originally_node_centered( bool originally_node_centered )
@@ -140,6 +141,10 @@ public:
   {
     return this->originally_node_centered_;
   }
+
+  // GET_DIAGONAL_LENGTH
+  // Get the length of the diagonal
+  double get_diagonal_length() const;
 
   // -- internal representation --
 private:
