@@ -742,8 +742,7 @@ bool Renderer::render()
 
     double fog_density = ViewerManager::Instance()->fog_density_state_->get();
     bool clip_plane_enable[ 6 ];
-    double clip_plane_theta[ 6 ];
-    double clip_plane_phi[ 6 ];
+    Core::Vector clip_plane_normal[ 6 ];
     double clip_plane_distance[ 6 ];
     bool clip_plane_reverse_normal[ 6 ];
     if ( enable_clipping )
@@ -751,8 +750,9 @@ bool Renderer::render()
       for ( size_t i = 0; i < 6; ++i )
       {
         clip_plane_enable[ i ] = ViewerManager::Instance()->enable_clip_plane_state_[ i ]->get();
-        clip_plane_theta[ i ] = ViewerManager::Instance()->clip_plane_theta_state_[ i ]->get();
-        clip_plane_phi[ i ] = ViewerManager::Instance()->clip_plane_phi_state_[ i ]->get();
+        clip_plane_normal[ i ].x( ViewerManager::Instance()->clip_plane_x_state_[ i ]->get() );
+        clip_plane_normal[ i ].y( ViewerManager::Instance()->clip_plane_y_state_[ i ]->get() );
+        clip_plane_normal[ i ].z( ViewerManager::Instance()->clip_plane_z_state_[ i ]->get() );
         clip_plane_distance[ i ] = ViewerManager::Instance()->clip_plane_distance_state_[ i ]->get();
         clip_plane_reverse_normal[ i ] = 
           ViewerManager::Instance()->clip_plane_reverse_norm_state_[ i ]->get();
@@ -787,16 +787,13 @@ bool Renderer::render()
 
       for ( int i = 0; i < 6; ++i )
       {
-        if ( !clip_plane_enable[ i ] )
+        if ( !clip_plane_enable[ i ] || clip_plane_normal[ i ].normalize() == 0.0 )
         {
           continue;
         }
-        double theta = Core::DegreeToRadian( clip_plane_theta[ i ] );
-        double phi = Core::DegreeToRadian( clip_plane_phi[ i ] );
         int sign = clip_plane_reverse_normal[ i ] ? -1 : 1;
-        double cos_theta = cos( theta );
-        GLdouble eqn[ 4 ] = { sign * cos_theta * cos( phi ), sign * cos_theta * sin( phi ),
-          sign * sin( theta ), -sign * clip_plane_distance[ i ] };
+        GLdouble eqn[ 4 ] = { sign * clip_plane_normal[ i ].x(), sign * clip_plane_normal[ i ].y(),
+          sign * clip_plane_normal[ i ].z(), -sign * clip_plane_distance[ i ] };
         glClipPlane( GL_CLIP_PLANE0 + i, eqn );
         glEnable( GL_CLIP_PLANE0 + i );
       }

@@ -77,10 +77,12 @@ RenderingDockWidget::RenderingDockWidget( QWidget *parent ) :
 
   QtUtils::QtBridge::Connect( this->private_->ui_.enable_cp1_, 
     ViewerManager::Instance()->enable_clip_plane_state_[ 0 ] );
-  QtUtils::QtBridge::Connect( this->private_->ui_.cp1_theta_,
-    ViewerManager::Instance()->clip_plane_theta_state_[ 0 ] );
-  QtUtils::QtBridge::Connect( this->private_->ui_.cp1_phi_,
-    ViewerManager::Instance()->clip_plane_phi_state_[ 0 ] );
+  QtUtils::QtBridge::Connect( this->private_->ui_.cp1_x_,
+    ViewerManager::Instance()->clip_plane_x_state_[ 0 ] );
+  QtUtils::QtBridge::Connect( this->private_->ui_.cp1_y_,
+    ViewerManager::Instance()->clip_plane_y_state_[ 0 ] );
+  QtUtils::QtBridge::Connect( this->private_->ui_.cp1_z_,
+    ViewerManager::Instance()->clip_plane_z_state_[ 0 ] );
   QtUtils::QtBridge::Connect( this->private_->ui_.cp1_d_,
     ViewerManager::Instance()->clip_plane_distance_state_[ 0 ] );
   QtUtils::QtBridge::Connect( this->private_->ui_.cp1_reverse_norm_,
@@ -90,10 +92,12 @@ RenderingDockWidget::RenderingDockWidget( QWidget *parent ) :
 
   QtUtils::QtBridge::Connect( this->private_->ui_.enable_cp2_, 
     ViewerManager::Instance()->enable_clip_plane_state_[ 1 ] );
-  QtUtils::QtBridge::Connect( this->private_->ui_.cp2_theta_,
-    ViewerManager::Instance()->clip_plane_theta_state_[ 1 ] );
-  QtUtils::QtBridge::Connect( this->private_->ui_.cp2_phi_,
-    ViewerManager::Instance()->clip_plane_phi_state_[ 1 ] );
+  QtUtils::QtBridge::Connect( this->private_->ui_.cp2_x_,
+    ViewerManager::Instance()->clip_plane_x_state_[ 1 ] );
+  QtUtils::QtBridge::Connect( this->private_->ui_.cp2_y_,
+    ViewerManager::Instance()->clip_plane_y_state_[ 1 ] );
+  QtUtils::QtBridge::Connect( this->private_->ui_.cp2_z_,
+    ViewerManager::Instance()->clip_plane_z_state_[ 1 ] );
   QtUtils::QtBridge::Connect( this->private_->ui_.cp2_d_,
     ViewerManager::Instance()->clip_plane_distance_state_[ 1 ] );
   QtUtils::QtBridge::Connect( this->private_->ui_.cp2_reverse_norm_,
@@ -103,10 +107,12 @@ RenderingDockWidget::RenderingDockWidget( QWidget *parent ) :
 
   QtUtils::QtBridge::Connect( this->private_->ui_.enable_cp3_, 
     ViewerManager::Instance()->enable_clip_plane_state_[ 2 ] );
-  QtUtils::QtBridge::Connect( this->private_->ui_.cp3_theta_,
-    ViewerManager::Instance()->clip_plane_theta_state_[ 2 ] );
-  QtUtils::QtBridge::Connect( this->private_->ui_.cp3_phi_,
-    ViewerManager::Instance()->clip_plane_phi_state_[ 2 ] );
+  QtUtils::QtBridge::Connect( this->private_->ui_.cp3_x_,
+    ViewerManager::Instance()->clip_plane_x_state_[ 2 ] );
+  QtUtils::QtBridge::Connect( this->private_->ui_.cp3_y_,
+    ViewerManager::Instance()->clip_plane_y_state_[ 2 ] );
+  QtUtils::QtBridge::Connect( this->private_->ui_.cp3_z_,
+    ViewerManager::Instance()->clip_plane_z_state_[ 2 ] );
   QtUtils::QtBridge::Connect( this->private_->ui_.cp3_d_,
     ViewerManager::Instance()->clip_plane_distance_state_[ 2 ] );
   QtUtils::QtBridge::Connect( this->private_->ui_.cp3_reverse_norm_,
@@ -116,10 +122,12 @@ RenderingDockWidget::RenderingDockWidget( QWidget *parent ) :
 
   QtUtils::QtBridge::Connect( this->private_->ui_.enable_cp4_, 
     ViewerManager::Instance()->enable_clip_plane_state_[ 3 ] );
-  QtUtils::QtBridge::Connect( this->private_->ui_.cp4_theta_,
-    ViewerManager::Instance()->clip_plane_theta_state_[ 3 ] );
-  QtUtils::QtBridge::Connect( this->private_->ui_.cp4_phi_,
-    ViewerManager::Instance()->clip_plane_phi_state_[ 3 ] );
+  QtUtils::QtBridge::Connect( this->private_->ui_.cp4_x_,
+    ViewerManager::Instance()->clip_plane_x_state_[ 3 ] );
+  QtUtils::QtBridge::Connect( this->private_->ui_.cp4_y_,
+    ViewerManager::Instance()->clip_plane_y_state_[ 3 ] );
+  QtUtils::QtBridge::Connect( this->private_->ui_.cp4_z_,
+    ViewerManager::Instance()->clip_plane_z_state_[ 3 ] );
   QtUtils::QtBridge::Connect( this->private_->ui_.cp4_d_,
     ViewerManager::Instance()->clip_plane_distance_state_[ 3 ] );
   QtUtils::QtBridge::Connect( this->private_->ui_.cp4_reverse_norm_,
@@ -129,10 +137,12 @@ RenderingDockWidget::RenderingDockWidget( QWidget *parent ) :
 
   QtUtils::QtBridge::Connect( this->private_->ui_.enable_cp5_, 
     ViewerManager::Instance()->enable_clip_plane_state_[ 4 ] );
-  QtUtils::QtBridge::Connect( this->private_->ui_.cp5_theta_,
-    ViewerManager::Instance()->clip_plane_theta_state_[ 4 ] );
-  QtUtils::QtBridge::Connect( this->private_->ui_.cp5_phi_,
-    ViewerManager::Instance()->clip_plane_phi_state_[ 4 ] );
+  QtUtils::QtBridge::Connect( this->private_->ui_.cp5_x_,
+    ViewerManager::Instance()->clip_plane_x_state_[ 4 ] );
+  QtUtils::QtBridge::Connect( this->private_->ui_.cp5_y_,
+    ViewerManager::Instance()->clip_plane_y_state_[ 4 ] );
+  QtUtils::QtBridge::Connect( this->private_->ui_.cp5_z_,
+    ViewerManager::Instance()->clip_plane_z_state_[ 4 ] );
   QtUtils::QtBridge::Connect( this->private_->ui_.cp5_d_,
     ViewerManager::Instance()->clip_plane_distance_state_[ 4 ] );
   QtUtils::QtBridge::Connect( this->private_->ui_.cp5_reverse_norm_,
@@ -142,10 +152,12 @@ RenderingDockWidget::RenderingDockWidget( QWidget *parent ) :
 
   QtUtils::QtBridge::Connect( this->private_->ui_.enable_cp6_, 
     ViewerManager::Instance()->enable_clip_plane_state_[ 5 ] );
-  QtUtils::QtBridge::Connect( this->private_->ui_.cp6_theta_,
-    ViewerManager::Instance()->clip_plane_theta_state_[ 5 ] );
-  QtUtils::QtBridge::Connect( this->private_->ui_.cp6_phi_,
-    ViewerManager::Instance()->clip_plane_phi_state_[ 5 ] );
+  QtUtils::QtBridge::Connect( this->private_->ui_.cp6_x_,
+    ViewerManager::Instance()->clip_plane_x_state_[ 5 ] );
+  QtUtils::QtBridge::Connect( this->private_->ui_.cp6_y_,
+    ViewerManager::Instance()->clip_plane_y_state_[ 5 ] );
+  QtUtils::QtBridge::Connect( this->private_->ui_.cp6_z_,
+    ViewerManager::Instance()->clip_plane_z_state_[ 5 ] );
   QtUtils::QtBridge::Connect( this->private_->ui_.cp6_d_,
     ViewerManager::Instance()->clip_plane_distance_state_[ 5 ] );
   QtUtils::QtBridge::Connect( this->private_->ui_.cp6_reverse_norm_,

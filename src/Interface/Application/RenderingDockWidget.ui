@@ -19,7 +19,7 @@
   <property name="minimumSize">
    <size>
     <width>243</width>
-    <height>392</height>
+    <height>429</height>
    </size>
   </property>
   <property name="styleSheet">
@@ -426,12 +426,12 @@ QWidget#clipping_content_{
                  <item>
                   <widget class="QLabel" name="label_2">
                    <property name="text">
-                    <string>Zenith Angle:</string>
+                    <string>X:</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QtUtils::QtSliderDoubleCombo" name="cp1_theta_" native="true">
+                  <widget class="QtUtils::QtSliderDoubleCombo" name="cp1_x_" native="true">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                      <horstretch>0</horstretch>
@@ -449,12 +449,35 @@ QWidget#clipping_content_{
                  <item>
                   <widget class="QLabel" name="label_3">
                    <property name="text">
-                    <string>Azimuth Angle:</string>
+                    <string>Y:</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QtUtils::QtSliderDoubleCombo" name="cp1_phi_" native="true">
+                  <widget class="QtUtils::QtSliderDoubleCombo" name="cp1_y_" native="true">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>35</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="label_20">
+                   <property name="text">
+                    <string>Z:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QtUtils::QtSliderDoubleCombo" name="cp1_z_" native="true">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                      <horstretch>0</horstretch>
@@ -549,12 +572,12 @@ QWidget#clipping_content_{
                  <item>
                   <widget class="QLabel" name="label_5">
                    <property name="text">
-                    <string>Zenith Angle:</string>
+                    <string>X:</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QtUtils::QtSliderDoubleCombo" name="cp2_theta_" native="true">
+                  <widget class="QtUtils::QtSliderDoubleCombo" name="cp2_x_" native="true">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                      <horstretch>0</horstretch>
@@ -572,18 +595,35 @@ QWidget#clipping_content_{
                  <item>
                   <widget class="QLabel" name="label_6">
                    <property name="text">
-                    <string>Azimuth Angle:</string>
+                    <string>Y:</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QtUtils::QtSliderDoubleCombo" name="cp2_phi_" native="true">
+                  <widget class="QtUtils::QtSliderDoubleCombo" name="cp2_y_" native="true">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                      <horstretch>0</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>35</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="label_21">
+                   <property name="text">
+                    <string>Z:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QtUtils::QtSliderDoubleCombo" name="cp2_z_" native="true">
                    <property name="minimumSize">
                     <size>
                      <width>0</width>
@@ -672,12 +712,12 @@ QWidget#clipping_content_{
                  <item>
                   <widget class="QLabel" name="label_8">
                    <property name="text">
-                    <string>Zenith Angle:</string>
+                    <string>X:</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QtUtils::QtSliderDoubleCombo" name="cp3_theta_" native="true">
+                  <widget class="QtUtils::QtSliderDoubleCombo" name="cp3_x_" native="true">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                      <horstretch>0</horstretch>
@@ -695,12 +735,12 @@ QWidget#clipping_content_{
                  <item>
                   <widget class="QLabel" name="label_9">
                    <property name="text">
-                    <string>Azimuth Angle:</string>
+                    <string>Y:</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QtUtils::QtSliderDoubleCombo" name="cp3_phi_" native="true">
+                  <widget class="QtUtils::QtSliderDoubleCombo" name="cp3_y_" native="true">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                      <horstretch>0</horstretch>
@@ -714,6 +754,16 @@ QWidget#clipping_content_{
                     </size>
                    </property>
                   </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="label_22">
+                   <property name="text">
+                    <string>Z:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QtUtils::QtSliderDoubleCombo" name="cp3_z_" native="true"/>
                  </item>
                  <item>
                   <widget class="QLabel" name="label_10">
@@ -795,12 +845,12 @@ QWidget#clipping_content_{
                  <item>
                   <widget class="QLabel" name="label_11">
                    <property name="text">
-                    <string>Zenith Angle:</string>
+                    <string>X:</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QtUtils::QtSliderDoubleCombo" name="cp4_theta_" native="true">
+                  <widget class="QtUtils::QtSliderDoubleCombo" name="cp4_x_" native="true">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                      <horstretch>0</horstretch>
@@ -818,12 +868,12 @@ QWidget#clipping_content_{
                  <item>
                   <widget class="QLabel" name="label_12">
                    <property name="text">
-                    <string>Azimuth Angle:</string>
+                    <string>Y:</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QtUtils::QtSliderDoubleCombo" name="cp4_phi_" native="true">
+                  <widget class="QtUtils::QtSliderDoubleCombo" name="cp4_y_" native="true">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                      <horstretch>0</horstretch>
@@ -837,6 +887,16 @@ QWidget#clipping_content_{
                     </size>
                    </property>
                   </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="label_23">
+                   <property name="text">
+                    <string>Z:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QtUtils::QtSliderDoubleCombo" name="cp4_z_" native="true"/>
                  </item>
                  <item>
                   <widget class="QLabel" name="label_13">
@@ -918,12 +978,12 @@ QWidget#clipping_content_{
                  <item>
                   <widget class="QLabel" name="label_14">
                    <property name="text">
-                    <string>Zenith Angle:</string>
+                    <string>X:</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QtUtils::QtSliderDoubleCombo" name="cp5_theta_" native="true">
+                  <widget class="QtUtils::QtSliderDoubleCombo" name="cp5_x_" native="true">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                      <horstretch>0</horstretch>
@@ -941,12 +1001,12 @@ QWidget#clipping_content_{
                  <item>
                   <widget class="QLabel" name="label_15">
                    <property name="text">
-                    <string>Azimuth Angle:</string>
+                    <string>Y:</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QtUtils::QtSliderDoubleCombo" name="cp5_phi_" native="true">
+                  <widget class="QtUtils::QtSliderDoubleCombo" name="cp5_y_" native="true">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                      <horstretch>0</horstretch>
@@ -960,6 +1020,16 @@ QWidget#clipping_content_{
                     </size>
                    </property>
                   </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="label_24">
+                   <property name="text">
+                    <string>Z:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QtUtils::QtSliderDoubleCombo" name="cp5_z_" native="true"/>
                  </item>
                  <item>
                   <widget class="QLabel" name="label_16">
@@ -1041,12 +1111,12 @@ QWidget#clipping_content_{
                  <item>
                   <widget class="QLabel" name="label_17">
                    <property name="text">
-                    <string>Zenith Angle:</string>
+                    <string>X:</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QtUtils::QtSliderDoubleCombo" name="cp6_theta_" native="true">
+                  <widget class="QtUtils::QtSliderDoubleCombo" name="cp6_x_" native="true">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                      <horstretch>0</horstretch>
@@ -1064,12 +1134,12 @@ QWidget#clipping_content_{
                  <item>
                   <widget class="QLabel" name="label_18">
                    <property name="text">
-                    <string>Azimuth Angle:</string>
+                    <string>Y:</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QtUtils::QtSliderDoubleCombo" name="cp6_phi_" native="true">
+                  <widget class="QtUtils::QtSliderDoubleCombo" name="cp6_y_" native="true">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                      <horstretch>0</horstretch>
@@ -1083,6 +1153,16 @@ QWidget#clipping_content_{
                     </size>
                    </property>
                   </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="label_25">
+                   <property name="text">
+                    <string>Z:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QtUtils::QtSliderDoubleCombo" name="cp6_z_" native="true"/>
                  </item>
                  <item>
                   <widget class="QLabel" name="label_19">

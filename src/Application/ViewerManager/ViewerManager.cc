@@ -361,10 +361,15 @@ void ViewerManagerPrivate::update_clipping_range( size_t index )
   Core::BBox bbox = LayerManager::Instance()->get_layers_bbox();
   if ( !bbox.valid() )  return;
   
-  double theta = Core::DegreeToRadian( this->vm_->clip_plane_theta_state_[ index ]->get() );
-  double phi = Core::DegreeToRadian( this->vm_->clip_plane_phi_state_[ index ]->get() );
-  double cos_theta = cos( theta );
-  Core::Vector norm( cos_theta * cos( phi ), cos_theta * sin( phi ), sin( theta ) );
+  Core::Vector norm( this->vm_->clip_plane_x_state_[ index ]->get(),
+    this->vm_->clip_plane_y_state_[ index ]->get(),
+    this->vm_->clip_plane_z_state_[ index ]->get() );
+  // Normalize the direction vector and ignore if it has length 0
+  if ( norm.normalize() == 0.0 )
+  {
+    return;
+  }
+  
   Core::Point corners[ 2 ] = { bbox.min(), bbox.max() };
   Core::Point center = bbox.center();
   double max_d = 0.0;
@@ -474,20 +479,25 @@ ViewerManager::ViewerManager() :
   {
     std::string cp_name = "cp" + Core::ExportToString( i + 1 );
     this->add_state( cp_name + "_enable", this->enable_clip_plane_state_[ i ], false );
-    this->add_state( cp_name + "_theta", this->clip_plane_theta_state_[ i ], 0.0, -90.0, 90.0, 0.1 );
-    this->add_state( cp_name + "_phi", this->clip_plane_phi_state_[ i ], 0.0, 0.0, 360.0, 0.1 );
+    this->add_state( cp_name + "_x", this->clip_plane_x_state_[ i ], 0.0, -1.0, 1.0, 0.01 );
+    this->add_state( cp_name + "_y", this->clip_plane_y_state_[ i ], 0.0, -1.0, 1.0, 0.01 );
+    this->add_state( cp_name + "_z", this->clip_plane_z_state_[ i ], 0.0, -1.0, 1.0, 0.01 );
     this->add_state( cp_name + "_distance", this->clip_plane_distance_state_[ i ], 0.0, -1.0, 1.0, 0.1 );
     this->add_state( cp_name + "_reverse_norm", this->clip_plane_reverse_norm_state_[ i ], true );
 
     this->add_connection( this->enable_clip_plane_state_[ i ]->value_changed_signal_.connect(
       boost::bind( &ViewerManagerPrivate::handle_clipping_plane_enabled, this->private_, i, _1 ) ) );
-    this->add_connection( this->clip_plane_theta_state_[ i ]->value_changed_signal_.connect(
+    this->add_connection( this->clip_plane_x_state_[ i ]->value_changed_signal_.connect(
       boost::bind( &ViewerManagerPrivate::update_clipping_range, this->private_, i ) ) );
-    this->add_connection( this->clip_plane_phi_state_[ i ]->value_changed_signal_.connect(
+    this->add_connection( this->clip_plane_y_state_[ i ]->value_changed_signal_.connect(
       boost::bind( &ViewerManagerPrivate::update_clipping_range, this->private_, i ) ) );
-    this->add_connection( this->clip_plane_theta_state_[ i ]->value_changed_signal_.connect(
+    this->add_connection( this->clip_plane_z_state_[ i ]->value_changed_signal_.connect(
+      boost::bind( &ViewerManagerPrivate::update_clipping_range, this->private_, i ) ) );
+    this->add_connection( this->clip_plane_x_state_[ i ]->value_changed_signal_.connect(
       boost::bind( &ViewerManagerPrivate::handle_clipping_plane_changed, this->private_, i ) ) );
-    this->add_connection( this->clip_plane_phi_state_[ i ]->value_changed_signal_.connect(
+    this->add_connection( this->clip_plane_y_state_[ i ]->value_changed_signal_.connect(
+      boost::bind( &ViewerManagerPrivate::handle_clipping_plane_changed, this->private_, i ) ) );
+    this->add_connection( this->clip_plane_z_state_[ i ]->value_changed_signal_.connect(
       boost::bind( &ViewerManagerPrivate::handle_clipping_plane_changed, this->private_, i ) ) );
     this->add_connection( this->clip_plane_distance_state_[ i ]->value_changed_signal_.connect(
       boost::bind( &ViewerManagerPrivate::handle_clipping_plane_changed, this->private_, i ) ) );
@@ -498,21 +508,22 @@ ViewerManager::ViewerManager() :
   {
     Core::ScopedCounter signal_block( this->private_->signal_block_count_ );
     // Clipping Plane 1 +x
-    
+    this->clip_plane_x_state_[ 0 ]->set( 1.0 );
+
     // Clipping Plane 4 -x
-    this->clip_plane_phi_state_[ 3 ]->set( 180.0 );
+    this->clip_plane_x_state_[ 3 ]->set( -1.0 );
 
     // Clipping Plane 2 +y
-    this->clip_plane_phi_state_[ 1 ]->set( 90.0 );
+    this->clip_plane_y_state_[ 1 ]->set( 1.0 );
 
     // Clipping Plane 5 -y
-    this->clip_plane_phi_state_[ 4 ]->set( 270.0 );
+    this->clip_plane_y_state_[ 4 ]->set( -1.0 );
 
     // Clipping Plane 3 +z
-    this->clip_plane_theta_state_[ 2 ]->set( 90.0 );
+    this->clip_plane_z_state_[ 2 ]->set( 1.0 );
 
     // Clipping Plane 6 -z
-    this->clip_plane_theta_state_[ 5 ]->set( -90.0 );
+    this->clip_plane_z_state_[ 5 ]->set( -1.0 );
   }
 
   this->add_connection( LayerManager::Instance()->layers_changed_signal_.connect(
