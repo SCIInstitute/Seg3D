@@ -421,7 +421,7 @@ void RendererPrivate::draw_slice( LayerSceneItemHandle layer_item,
     // Compute the size of the slice on screen
     Core::Vector slice_x( slice_width, 0.0, 0.0 );
     slice_x = proj_mat * slice_x;
-    double slice_screen_width = slice_x.x() / 2.0 * this->renderer_->width_;
+    double slice_screen_width = Core::Abs( slice_x.x() ) / 2.0 * this->renderer_->width_;
     double slice_screen_height = slice_height / slice_width * slice_screen_width;
     float pattern_repeats_x = static_cast< float >( slice_screen_width / PATTERN_SIZE_C );
     float pattern_repeats_y = static_cast< float >( slice_screen_height / PATTERN_SIZE_C );
