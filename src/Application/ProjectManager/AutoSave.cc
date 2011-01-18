@@ -169,13 +169,13 @@ void AutoSave::do_auto_save()
   
 int AutoSave::get_smart_auto_save_timeout() const
 {
-  if( ProjectManager::Instance()->successful_save_ )
+  if( ProjectManager::Instance()->project_saved_state_->get() )
   {
     return 5;
   }
   else
   {
-    return 150;
+    return 30;
   }
 }
 

@@ -150,9 +150,6 @@ public:
   
   // public handle to the current project
   ProjectHandle         current_project_;
-  
-  // whether the save was successful or not
-  bool              successful_save_;
 
 private:
   

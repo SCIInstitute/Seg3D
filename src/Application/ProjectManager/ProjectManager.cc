@@ -50,7 +50,6 @@ CORE_SINGLETON_IMPLEMENTATION( ProjectManager );
 
 ProjectManager::ProjectManager() :
   StateHandler( "projectmanager", false ),
-  successful_save_( true ),
   session_saving_( false ),
   changing_projects_( false )
 { 
@@ -312,7 +311,7 @@ bool ProjectManager::save_project_session( bool autosave /*= false */, std::stri
   }
   else
   {
-    this->successful_save_ = false;
+    this->project_saved_state_->set( false );
   }
 
   AutoSave::Instance()->recompute_auto_save();
