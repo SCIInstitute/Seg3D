@@ -36,14 +36,16 @@
 // Core includes
 #include <Core/Isosurface/Isosurface.h>
 #include <Core/Volume/MaskVolume.h>
-#include <Core/Utils/AtomicCounter.h>
 
 // Application includes
 #include <Application/Layer/Layer.h>
-#include <Application/Layer/LayerGroup.h>
 
 namespace Seg3D
 {
+
+// Hide header includes, private interface and implementation
+class MaskLayerPrivate;
+typedef boost::shared_ptr< MaskLayerPrivate > MaskLayerPrivateHandle;
 
 // CLASS MaskLayer
 
@@ -165,29 +167,6 @@ protected:
   // this function cleans up the mask volume for when you are deleting the mask and reloading 
   virtual void clean_up();
 
-  // -- internal functions --
-private:
-  void initialize_states();
-  void handle_mask_data_changed();
-  void handle_isosurface_update_progress( double progress );
-  
-private:
-  // bool to enable a different behavior when the iso surface is being generated after a session
-  // load.
-  bool loading_;
-  
-  // Extra private state information
-  // NOTE: This used for saving the bit that is used in a mask to a session file. As the state
-  // variables are read first, this will allow for reconstructing which data block and which bit
-  // need to be loaded.
-  Core::StateIntHandle   bit_state_;
-  
-  // Information about two components not included in the state manager.
-  Core::MaskVolumeHandle mask_volume_;
-  Core::IsosurfaceHandle isosurface_;
-
-  void update_mask_info();
-
   // -- color functions --
 public:
   
@@ -199,6 +178,8 @@ public:
   // Set the color count to a specific number
   static void SetColorCount( size_t count );
   
+private:
+  MaskLayerPrivateHandle private_;
 };
 
 } // end namespace Seg3D

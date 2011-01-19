@@ -26,6 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Application includes
+#include <Application/Layer/LayerGroup.h>
 #include <Application/LayerManager/LayerUndoBufferItem.h>
 #include <Application/LayerManager/LayerManager.h>
 
