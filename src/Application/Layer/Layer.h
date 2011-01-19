@@ -198,6 +198,9 @@ public:
   // An exclusive group of boolean states that control the visibility of different parts
   Core::BooleanStateGroupHandle gui_state_group_;
 
+  // Centering (node vs. cell) is stored per layer for all layers (mask and data)
+  Core::StateStringHandle centering_state_;
+
 protected:
   // State that stores the generation of its datablock
   Core::StateLongLongHandle generation_state_;

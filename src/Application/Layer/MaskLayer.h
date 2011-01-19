@@ -186,6 +186,8 @@ private:
   Core::MaskVolumeHandle mask_volume_;
   Core::IsosurfaceHandle isosurface_;
 
+  void update_mask_info();
+
   // -- color functions --
 public:
   

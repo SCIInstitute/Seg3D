@@ -69,6 +69,9 @@ void DataLayerPrivate::update_data_info()
     return;
   }
   
+  this->layer_->centering_state_->set( 
+    this->layer_->get_grid_transform().get_originally_node_centered() ? "node" : "cell" );
+
   switch ( this->layer_->get_data_type() )
   {
   case Core::DataType::CHAR_E:

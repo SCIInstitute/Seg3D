@@ -296,6 +296,8 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
       layer_group->origin_state_ );
     QtUtils::QtBridge::Connect( this->private_->ui_.spacing_label_,
       layer_group->spacing_state_ );
+    QtUtils::QtBridge::Connect( this->private_->ui_.centering_label_,
+      layer->centering_state_ );
 
     QtUtils::QtBridge::Connect( this->private_->ui_.info_button_, 
       layer->show_information_state_ );

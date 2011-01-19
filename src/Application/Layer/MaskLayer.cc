@@ -166,6 +166,8 @@ bool MaskLayer::set_mask_volume( Core::MaskVolumeHandle volume )
       this->add_connection( this->mask_volume_->get_mask_data_block()->mask_updated_signal_.
         connect( boost::bind( &MaskLayer::handle_mask_data_changed, this ) ) );
     }
+
+    this->update_mask_info();
   }
 
   return true;
@@ -211,6 +213,8 @@ void MaskLayer::initialize_states()
   
   // == Keep track of the calculated volume and put it in the UI
   this->add_state( "counted_pixels", this->counted_pixels_state_, "N/A" );
+
+  this->update_mask_info();
 }
 
 bool MaskLayer::pre_save_states( Core::StateIO& state_io )
@@ -417,6 +421,12 @@ void MaskLayer::SetColorCount( size_t count )
 {
   boost::mutex::scoped_lock lock( ColorCountMutex );
   ColorCount = count;
+}
+
+void MaskLayer::update_mask_info()
+{
+  this->centering_state_->set( 
+    this->get_grid_transform().get_originally_node_centered() ? "node" : "cell" );
 }
 
 } // end namespace Seg3D

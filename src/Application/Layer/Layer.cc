@@ -229,9 +229,12 @@ void Layer::initialize_states( const std::string& name, bool creating )
   // == The layer state indicating whether data is bein processed ==
   this->add_state( "data", this->data_state_,  creating ? CREATING_C : AVAILABLE_C  , 
     AVAILABLE_C + "|" + CREATING_C + "|" + PROCESSING_C + "|" + IN_USE_C );
-  
   this->data_state_->set_is_project_data( false );
   
+  // == Centering (node vs. cell) ==
+  this->add_state( "centering", this->centering_state_, "node" );
+  this->centering_state_->set_is_project_data( false );
+
   this->add_state( "show_info", this->show_information_state_, false );
   this->add_state( "show_advanced_visibility", this->show_advanced_visibility_state_, false );
   this->add_state( "show_opacity", this->show_opacity_state_, false );
