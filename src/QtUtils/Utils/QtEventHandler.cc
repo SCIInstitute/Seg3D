@@ -164,7 +164,7 @@ bool QtEventHandlerContext::process_events()
 
       CORE_LOG_ERROR( error_message );
       QMessageBox::critical( 0, QString( "Fatal Error" ), 
-        QString::fromStdString( error_message) );
+        QString::fromStdString( "Fatal Error:\n\n" + error_message ) );
       QCoreApplication::exit( -1 );
     }
     catch ( std::exception& except )
@@ -175,8 +175,8 @@ bool QtEventHandlerContext::process_events()
         except.what();
 
       CORE_LOG_ERROR( error_message );
-      QMessageBox::critical( 0, QString( "Fatal Error" ),  
-        QString::fromStdString( error_message) );
+      QMessageBox::critical( 0, QString( "Fatal Error" ), 
+        QString::fromStdString( "Fatal Error:\n\n" + error_message ) );
       QCoreApplication::exit( -1 );
     }
     catch ( ... )
@@ -186,8 +186,8 @@ bool QtEventHandlerContext::process_events()
         std::string( "Interface event loop crashed by throwing an unknown exception" );
 
       CORE_LOG_ERROR( error_message );
-      QMessageBox::critical( 0, QString( "Fatal Error" ),  
-        QString::fromStdString( error_message) );
+      QMessageBox::critical( 0, QString( "Fatal Error" ),
+        QString::fromStdString( "Fatal Error:\n\n" + error_message ) );
       QCoreApplication::exit( -1 );
     }
   }

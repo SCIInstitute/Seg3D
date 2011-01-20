@@ -201,6 +201,7 @@ bool SaveAsInfoPage::validatePage()
   
     int ret = QMessageBox::warning( this, 
       "A project with this name already exists!",
+      "A project with this name already exists!\n"
       "If you proceed the old project will be deleted and replaced.\n"
       "Are you sure you would like to continue?",
       QMessageBox::Yes | QMessageBox::No );

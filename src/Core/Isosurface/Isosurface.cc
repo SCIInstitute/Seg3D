@@ -45,7 +45,7 @@ namespace Core
 
 typedef struct {
   int edges_[15]; // Vertex indices for at most 5 triangles
-  int num_triangles_; 
+  int num_triangles_; // Last number in each table entry
 } MarchingCubesTableType;
 
 // Precalculated array of 256 possible polygon configurations (2^8 = 256) within the cube
@@ -311,6 +311,35 @@ const MarchingCubesTableType MARCHING_CUBES_TABLE_C[] = {
   {{ 0,  8,  3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}, 1},
   {{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}, 0}};
 
+typedef struct {
+  int points_[12]; // Vertex indices for at most 4 triangles
+  int num_triangles_; // Last number in each table entry
+} CappingTableType;
+
+// Precalculated array of 16 possible polygon configurations (2^4 = 16) within the cell.
+// 16x13 table of integer values, which are used as indices for the array of 8 points (4 vertices, 4 edges) of 
+// intersection. It defines the right order to connect the intersected edges to form triangles. 
+// The process for one cell stops when index of -1 is returned from the table, forming a maximum of 
+// 4 triangles. 
+// For example: {{tri1.p1, tri1.p2, tri1.p3, tri2.p1, tri2.p2, tri2.p3, tri3.p1, tri3.p2, tri3.p3, 
+// tri4.p1, tri4,p2, tri4.p3}, num_tri}
+const CappingTableType CAPPING_TABLE_C[] = {
+  {{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}, 0},
+  {{0, 4, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1}, 1},
+  {{4, 1, 5, -1, -1, -1, -1, -1, -1, -1, -1, -1}, 1},
+  {{0, 1, 7, 7, 1, 5, -1, -1, -1, -1, -1, -1}, 2},
+  {{6, 5, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1}, 1},
+  {{0, 4, 7, 7, 4, 5, 7, 5, 6, 6, 5, 2}, 4},
+  {{4, 1, 6, 6, 1, 2, -1, -1, -1, -1, -1, -1}, 2},
+  {{0, 6, 7, 0, 1, 6, 6, 1, 2, -1, -1, -1}, 3},
+  {{7, 6, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1}, 1},
+  {{0, 4, 3, 3, 4, 6, -1, -1, -1, -1, -1, -1}, 2},
+  {{7, 6, 3, 7, 4, 6, 4, 5, 6, 4, 1, 5}, 4},
+  {{0, 6, 3, 0, 5, 6, 0, 1, 5, -1, -1, -1}, 3},
+  {{7, 5, 3, 3, 5, 2, -1, -1, -1, -1, -1, -1}, 2},
+  {{0, 5, 3, 0, 4, 5, 3, 5, 2, -1, -1, -1}, 3},
+  {{7, 4, 3, 3, 4, 2, 4, 1, 2, -1, -1, -1}, 3},
+  {{0, 1, 3, 3, 1, 2, -1, -1, -1, -1, -1, -1}, 2}};
 
 class VertexBufferBatch
 {
@@ -341,6 +370,8 @@ public:
   // PARALLEL_COMPUTE_FACES:
   // Parallelized isosurface computation algorithm 
   void parallel_compute_faces( int thread, int num_threads, boost::barrier& barrier );
+
+  void translate_border_index( int border_face_num, size_t i, size_t j, size_t& x, size_t& y, size_t& z );
 
   // COMPUTE_CAP_FACES:
   // Compute the "cap" faces at the boundary of the mask volume to handle the case where the 
@@ -1117,10 +1148,56 @@ void IsosurfacePrivate::parallel_compute_faces( int thread, int num_threads,
   barrier.wait();
 }
 
+//  Translates border face index (i, j) to volume index (x, y, z).  
+void IsosurfacePrivate::translate_border_index( int border_face_num, size_t i, size_t j, 
+  size_t& x, size_t& y, size_t& z )
+{
+  size_t nx = this->orig_mask_volume_->get_mask_data_block()->get_nx();
+  size_t ny = this->orig_mask_volume_->get_mask_data_block()->get_ny();
+  size_t nz = this->orig_mask_volume_->get_mask_data_block()->get_nz();
+
+  switch( border_face_num )
+  {
+    case 0: // x, y, z = 0 (front)
+      x = i;
+      y = j;
+      z = 0;
+      break;
+    case 1: // x, z, y = 0  (top) 
+      x = i;
+      y = 0;
+      z = j;
+      break;
+    case 2: // y, z, x = 0 (left)
+      x = 0;
+      y = i;
+      z = j;
+      break;
+    case 3: // x, y, z = nz - 1 (back)
+      x = i;
+      y = j;
+      z = nz - 1;
+      break;
+    case 4: // x, z, y = ny - 1 (bottom)
+      x = i;
+      y = ny - 1;
+      z = j;
+      break;
+    case 5: // y, z, x = nx - 1 (right)
+      x = nx - 1;
+      y = i;
+      z = j;
+      break;
+    default:
+      x = y = z = 0;
+      break;
+  }
+}
+
 /*
 Basic ideas:
 - Marching cubes:
-  - Each "cube" has a configuration of on/off nodes that can be represented as and 8-bit bitmask.
+  - Each "cube" has a configuration of on/off nodes that can be represented as an 8-bit bitmask.
     The bitmask can be used as an index into a 256 (2^8) entry lookup table of predefined, canonical
     facet combinations.
   - A naive implementation of marching cubes would just process each cube 
@@ -1131,7 +1208,7 @@ Basic ideas:
     we add a point to the points list.  At this point we have a list of points as well as a canonical facet
     combination for each cube.  We want to build triangles.  What we need is a way to map the canonical edge indices in the facet 
     combination to indices of actual points in the points list.  So while we are examining edges we 
-    build a translation table to keep track of what canonical index an split edge point belongs to for 
+    build a translation table to keep track of what canonical index a split edge point belongs to for 
     each cube adjacent to the edge.  For each cube we can look up the point index for each canonical index in that 
     cube's facet combination.  This 2D array looks like 
     cubes[cube_index][canonical_edge_index] = point_index.  
@@ -1154,39 +1231,50 @@ Basic ideas:
 */
 void IsosurfacePrivate::compute_cap_faces()
 {
-  // TODO Create lookup table for border cells.  Size = 2^4 = 16
-  // How are facet combos stored?
-  // type_table
+  // type_table = CAPPING_TABLE_C 
   // TODO Figure out how to handle x/y/z indices for border faces so that code doesn't have to
   // be duplicated for each face
-    // x, y, z = 0
-    // x, y, z = nz - 1
-    // x, z, y = 0
-    // x, z, y = ny - 1
-    // y, z, x = 0
-    // y, z, x = nx - 1
+    
   // Solution A: have function that translates (i, j) to (x, y, z).  Try this first.
   // Solution B (faster): Have (i, j, k) Vector offsets based on face.  Add at end of loops.
 
-  // Process 6 border faces independently.  A most this will duplicate volume edges nodes twice.
+  // Process 6 border faces independently.  At most this will duplicate volume edge nodes twice.
   // For each of 6 border faces
+  size_t nx = this->orig_mask_volume_->get_mask_data_block()->get_nx();
+  size_t ny = this->orig_mask_volume_->get_mask_data_block()->get_ny();
+  size_t nz = this->orig_mask_volume_->get_mask_data_block()->get_nz();
+  std::vector< std::pair< int, int > > border_face_dimensions;
+  border_face_dimensions.push_back( std::make_pair( nx, ny ) ); // front and back faces
+  border_face_dimensions.push_back( std::make_pair( nx, nz ) ); // top and bottom faces
+  border_face_dimensions.push_back( std::make_pair( ny, nz ) ); // left and right side faces
 
+  for( size_t border_face_num = 0; border_face_num < 6; border_face_num++ )
+  {
     // STEP 1: Find cell types
+
+    // Calculate ni, nj for this face
+    size_t ni = border_face_dimensions[ border_face_num % 3 ].first;
+    size_t nj = border_face_dimensions[ border_face_num % 3 ].second;
 
     // Since each cell has 4 nodes, we only need a char to represent the type.  Only using bits
     // 0 - 3.
     // Create an array of type per index
-    // unsigned char cell_types[ num_cells = ( ni - 1 ) * ( nj - 1 ) ]
+    size_t num_cells = ( ni - 1 )* ( nj - 1 );
+    std::vector< unsigned char > cell_types( num_cells );
     // Loop through all 2D cells 
-    // cell_index = 0;
-    // for( j = 0; j < nj - 1; j++ )
-      // for( i = 0; i < ni - 1; i++ )
+    size_t cell_index = 0;
+    for( size_t j = 0; j < nj - 1; j++ )
+    {
+      for( size_t i = 0; i < ni - 1; i++ )
+      {
         // Build type
-        // char cell_type = 0;
+        unsigned char cell_type = 0;
         // Check each of 4 nodes in cell to see if they are "on" on mask.  If so, turn on bit.
         // Add the type to a vector of chars, one for each cell index
-        // cell_types[ cell_index ] = cell_type;
-        // cell_index++ 
+        cell_types[ cell_index ] = cell_type;
+        cell_index++; 
+      }
+    }
 
     // STEP 2: Add nodes to points list and translation table
 
@@ -1241,6 +1329,7 @@ void IsosurfacePrivate::compute_cap_faces()
           // point_index = point_trans_table[ cell_index ][ canonical index ]
           // Add this point index to the faces list
           // this->faces_.push_back( point_index );
+  }
   
 }
 
