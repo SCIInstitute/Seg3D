@@ -158,47 +158,36 @@ void SplashScreen::open_existing()
   
 void SplashScreen::open_recent()
 {
-  if( this->private_->ui_.recent_project_listwidget_->currentItem()->text() != "" )
+  std::vector< RecentProject > recent_projects;
+  ProjectManager::Instance()->get_recent_projects_from_database( recent_projects );
+
+  int index = this->private_->ui_.recent_project_listwidget_->currentRow();
+
+  if( recent_projects[ index ].name_ == 
+    ( this->private_->ui_.recent_project_listwidget_->currentItem()->text() ).toStdString() )
   {
-    for( size_t i = 0; i < this->recent_project_list_.size(); ++i )
+    boost::filesystem::path path = 
+      recent_projects[ index ].path_;
+    
+    path = path / recent_projects[ index ].name_ / ( recent_projects[ index ].name_ + ".s3d" );
+    
+    if( !boost::filesystem::exists( path ) ) return;
+    
+    if ( ! ProjectManager::Instance()->check_if_file_is_valid_project( path ) )
     {
-      std::string recent_project = ( Core::SplitString( 
-        this->recent_project_list_[ i ], "|" ) )[ 1 ];
-      std::string list_item = ( this->private_->ui_.recent_project_listwidget_->
-        currentItem()->text() ).toStdString();
-
-      list_item = Core::SplitString( list_item, "  -  " )[ 0 ];
-      
-      if( recent_project == list_item )
-      {
-        std::vector<std::string> project_entry = 
-          Core::SplitString( this->recent_project_list_[ i ], "|" );
-                std::string filepath;
-                Core::ImportFromString( project_entry[ 0 ], filepath );
-
-        boost::filesystem::path path = filepath;
-        path = path / project_entry[ 1 ];
-
-        if ( ! ProjectManager::Instance()->check_if_file_is_valid_project( 
-          ( path / ( path.leaf() + ".s3d" ) ) ) )
-        {
-          QMessageBox::critical( 0, 
-            "Error reading project file",
-            "Error reading project file:\n"
-            "The project file was saved with newer version of Seg3D" );
-          return;
-        }   
-                
-        if( boost::filesystem::exists( path ) )
-        { 
-          ActionLoadProject::Dispatch( Core::Interface::GetWidgetActionContext(),
-            path.string() );
-          break;
-        }
-      }
+      QMessageBox::critical( 0, 
+        "Error reading project file",
+        "Error reading project file:\n"
+        "The project file was saved with newer version of Seg3D" );
+      return;
     }
-  }
+
+    ActionLoadProject::Dispatch( Core::Interface::GetWidgetActionContext(),
+      path.string() );
+  
   this->close();
+  
+  }
 }
 
 void SplashScreen::quick_open_file()
@@ -211,27 +200,24 @@ void SplashScreen::quick_open_file()
   
 void SplashScreen::populate_recent_projects()
 {
-  this->recent_project_list_ = ProjectManager::Instance()->
-    recent_projects_state_->get();
-  for( size_t i = 0; i < this->recent_project_list_.size(); ++i )
+  std::vector< RecentProject > recent_projects;
+  ProjectManager::Instance()->get_recent_projects_from_database( recent_projects );
+
+  for( size_t i = 0; i < recent_projects.size(); ++i )
   {
-    if( this->recent_project_list_[ i ] != "" )
+    if( recent_projects[ i ].name_ != "" )
     {
       QListWidgetItem *new_item;
-      new_item = new QListWidgetItem( QString::fromStdString( ( Core::SplitString( 
-        this->recent_project_list_[ i ], "|" ) )[ 1 ] ) );
-
+      new_item = new QListWidgetItem( QString::fromStdString( recent_projects[ i ].name_ ) );
       new_item->setToolTip( QString::fromUtf8( "This project was created on: " ) +
-        QString::fromStdString( ( Core::SplitString( 
-        this->recent_project_list_[ i ], "|" ) )[ 2 ] ) 
+        QString::fromStdString( recent_projects[ i ].date_ )
         + QString::fromUtf8( " and is located at: " ) 
-        + QString::fromStdString( ( Core::SplitString( 
-        this->recent_project_list_[ i ], "|" ) )[ 0 ] ) );
-
+        + QString::fromStdString( recent_projects[ i ].path_ ) );
       this->private_->ui_.recent_project_listwidget_->addItem( new_item );
 
     }
   }
+    
 }
   
 void SplashScreen::enable_load_recent_button( QListWidgetItem* not_used )

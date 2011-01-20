@@ -105,9 +105,8 @@ Menu::Menu( QMainWindow* parent ) :
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
 
     // Connect and update full screen state
-    this->add_connection( ProjectManager::Instance()->recent_projects_state_->
-      value_changed_signal_.connect( 
-      boost::bind( &Menu::SetRecentFileList, qpointer_type( this ), _1, _2 ) ) );
+    this->add_connection( ProjectManager::Instance()->recent_projects_changed_signal_.connect( 
+      boost::bind( &Menu::SetRecentFileList, qpointer_type( this ) ) ) );
       
     this->add_connection( LayerManager::Instance()->layers_changed_signal_.connect( 
       boost::bind( &Menu::EnableDisableMaskActions, qpointer_type( this ) ) ) );
@@ -625,29 +624,25 @@ void Menu::open_project_folder()
   CORE_LOG_ERROR( "There current project path seems to be invalid." );
 }
 
-void Menu::set_recent_file_list( std::vector< std::string > recent_projects )
+void Menu::set_recent_file_list()
 {
   QAction* qaction = 0;
   this->file_menu_recents_->clear();
+  
+  std::vector< RecentProject > recent_projects;
+  ProjectManager::Instance()->get_recent_projects_from_database( recent_projects );
 
   for( size_t i = 0; i < recent_projects.size(); ++i )
   {
-    if( recent_projects[ i ] != "" )
+    if( recent_projects[ i ].name_ != "" )
     {
-      QString project_path = QString::fromStdString( ( Core::SplitString( 
-        recent_projects[ i ], "|" ) )[ 0 ] );
-      
-      std::string filepath;
-      Core::ImportFromString( project_path.toStdString(), filepath );
+      qaction = file_menu_recents_->addAction(
+        QString::fromStdString( recent_projects[ i ].name_ ) );
         
-      QString project_name = QString::fromStdString( ( Core::SplitString( 
-        recent_projects[ i ], "|" ) )[ 1 ] );
-      
-      qaction = file_menu_recents_->addAction( project_name );
       qaction->setToolTip( tr( "Load this recent project" ) );
       
-      boost::filesystem::path path = boost::filesystem::path( filepath ) /
-        boost::filesystem::path( project_name.toStdString() );
+      boost::filesystem::path path = boost::filesystem::path( recent_projects[ i ].path_ ) /
+        boost::filesystem::path( recent_projects[ i ].name_ );
       
       QtUtils::QtBridge::Connect( qaction, boost::bind( &Menu::ConfirmRecentFileLoad,
         qpointer_type( this ), path.string() ) );
@@ -682,11 +677,10 @@ void Menu::ConfirmRecentFileLoad( qpointer_type qpointer, const std::string& pat
   }
 }
   
-void Menu::SetRecentFileList( qpointer_type qpointer, 
-  std::vector< std::string > recent_projects, Core::ActionSource source )
+void Menu::SetRecentFileList( qpointer_type qpointer )
 {
   Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
-    &Menu::set_recent_file_list, qpointer.data(), recent_projects ) ) );
+    &Menu::set_recent_file_list, qpointer.data() ) ) );
 }
 
 void Menu::enable_disable_mask_actions()

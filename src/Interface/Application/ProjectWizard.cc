@@ -170,6 +170,8 @@ bool ProjectInfoPage::validatePage()
     this->warning_message_->show();
     return false;
   }
+  
+  boost::filesystem::remove( new_path );
 
   this->warning_message_->hide();
 

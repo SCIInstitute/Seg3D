@@ -71,6 +71,7 @@ TARGET_LINK_LIBRARIES(Application_ProjectManager
                       Core_Action
                       Core_State
                       Application_Project
+            ${SCI_SQLITE_LIBRARY}
                       ${SCI_BOOST_LIBRARY})
 
 # Register action classes

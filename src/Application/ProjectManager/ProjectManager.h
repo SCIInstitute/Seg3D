@@ -38,12 +38,16 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/thread/recursive_mutex.hpp>
+
+#include <Externals/sqlite/sqlite3.h>
 
 // Core includes
 #include <Core/Utils/StringUtil.h>
 #include <Core/Utils/Singleton.h>
 #include <Core/Utils/Log.h>
 #include <Core/Utils/Exception.h>
+#include <Core/Utils/Lockable.h>
 
 // Application includes
 #include <Core/State/StateHandler.h>
@@ -54,10 +58,28 @@ namespace Seg3D
 
 // Forward declaration
 class ProjectManager;
-  
+
+class RecentProject
+{
+public:
+RecentProject::RecentProject( std::string name, std::string path, std::string date, std::string id ) :
+  name_( name ),
+  path_( path ),
+  date_( date ),
+  id_( id )
+{
+}
+virtual ~RecentProject(){}
+
+public:
+  std::string path_;
+  std::string name_;
+  std::string date_;
+  std::string id_;
+};  
 
 // Class definition
-class ProjectManager : public Core::StateHandler
+class ProjectManager : public Core::StateHandler, public Core::RecursiveLockable 
 {
   CORE_SINGLETON( ProjectManager );
 
@@ -134,11 +156,16 @@ public:
   // CHECK_IF_FILE_IS_VALID_PROJECT:
   // Check if a file is a valid project
   bool check_if_file_is_valid_project( const boost::filesystem::path& path );
-
+  
+  // Get a vector of recent projects of recent
+  bool get_recent_projects_from_database( std::vector< RecentProject >& recent_projects );
+  
 public:
-  // List of the projects that were recently loaded
-  Core::StateStringVectorHandle recent_projects_state_;
+  typedef boost::signals2::signal< void() > recent_project_signal_type;
 
+  recent_project_signal_type recent_projects_changed_signal_;
+  
+public:
   // Path of the current project
   Core::StateStringHandle     current_project_path_state_;
 
@@ -162,10 +189,6 @@ private:
   // this will try and create the project folders and if is successfull return true 
   bool create_project_folders( boost::filesystem::path& path, const std::string& project_name );
   
-//  // RENAME_PROJECT_FOLDER
-//  // this function is triggered when a user changes the folder name
-//  void rename_project( const std::string& new_name, Core::ActionSource source );
-
   // SAVE_PROJECT_ONLY:
   // this function saves only the project and is used internally only. It returns if it was 
   // successful.
@@ -181,19 +204,33 @@ private:
   // this function is called when you need a timestamp as a string
   std::string get_timestamp();
 
+// 
+
   // CLEANUP_PROJECTS_LIST:
   // this function cleans up projects from the recent projects list that don't exist.
-  void cleanup_projects_list();
+  void cleanup_recent_projects_database();
    
   void set_project_path( boost::filesystem::path path );
+  
+  void create_database_scheme();
+  
+  bool insert_recent_projects_entry( const std::string& project_name, 
+    const std::string& project_path, const std::string& project_date );
+    
+  bool delete_recent_projects_entry( const std::string& project_name, 
+    const std::string& project_path, const std::string& project_date );
+    
+  
 
 private:
-  boost::posix_time::ptime  last_saved_session_time_stamp_;
-  std::vector< Core::Color >  project_colors_;
-  boost::filesystem::path   local_projectmanager_path_;
+  boost::posix_time::ptime      last_saved_session_time_stamp_;
+  std::vector< Core::Color >      project_colors_;
+  boost::filesystem::path       local_projectmanager_path_;
+  boost::filesystem::path       recent_projects_database_path_;
 
-  bool            session_saving_;
-  bool            changing_projects_;
+  bool                session_saving_;
+  bool                changing_projects_;
+  sqlite3 *             recent_projects_database_;
 
 };
 

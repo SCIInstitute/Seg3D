@@ -135,9 +135,16 @@ LayerManagerWidget::LayerManagerWidget( QWidget* parent ) :
   setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded );
   setContentsMargins( 1, 1, 1, 1 );
   setWidgetResizable( true );
+  
+  this->setStyleSheet(
+    QString::fromUtf8( "QWidget { background-color: none; }" ) );
+
 
   // Define a new central widget inside the scroll area
   this->private_->main_ = new QWidget( parent );
+  this->private_->main_->setObjectName( QString::fromUtf8( "main_" ) );
+  this->private_->main_->setStyleSheet( 
+    QString::fromUtf8( "QWidget#main_{ background-color: none; }" ) );
   this->setWidget( this->private_->main_ );
   
   // Setup the spacing between the groups

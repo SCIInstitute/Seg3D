@@ -61,7 +61,7 @@ public:
   
   // SET_RECENT_FILE_LIST:
   // populate the recent file list with these items
-  void set_recent_file_list( std::vector< std::string > files );
+  void set_recent_file_list();
 
   // ENABLE_DISABLE_LAYER_ACTIONS:
   // Switch on/off export options depending on what is available
@@ -114,8 +114,7 @@ public:
 
   // SETRECENTFILELIST:
   // This function is called when the recent file list is modified
-  static void SetRecentFileList( qpointer_type app_menu, 
-    std::vector< std::string > recent_projects, Core::ActionSource source );
+  static void SetRecentFileList( qpointer_type app_menu );
 
   // ENABLEDISABLELAYERACTIONS:
   // This function is called when layers are updated
