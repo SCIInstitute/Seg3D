@@ -51,14 +51,24 @@ public:
     ProjectWizard( QWidget *parent = 0 );
     virtual ~ProjectWizard();
 
+private Q_SLOTS:
+  void set_delete_path( QString );
+
 private:
     void accept();
     void reject();
+    
+private:
+  std::string path_to_delete_;
+  
 };
 
 class ProjectInfoPage : public QWizardPage
 {
 Q_OBJECT
+
+Q_SIGNALS:
+  void need_to_set_delete_path( QString );;
 
 public:
     ProjectInfoPage( QWidget *parent = 0 );

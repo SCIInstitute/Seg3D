@@ -30,6 +30,7 @@
 #include <QtCore/QVariant>
 #include <QtGui/QGridLayout>
 #include <QtGui/QFileDialog>
+#include <QtGui/QMessageBox>
 
 // Application includs
 #include <Application/ProjectManager/ProjectManager.h>
@@ -43,13 +44,17 @@ namespace Seg3D
 {
 
 ProjectWizard::ProjectWizard( QWidget *parent ) :
-    QWizard( parent )
+  QWizard( parent ),
+  path_to_delete_( "" )
 {
     this->addPage( new ProjectInfoPage );
     this->addPage( new SummaryPage );
   
   this->setPixmap( QWizard::BackgroundPixmap, QPixmap( QString::fromUtf8( 
     ":/Images/Symbol.png" ) ) );
+    
+  connect( this->page( 0 ), SIGNAL( need_to_set_delete_path( QString ) ), this, 
+    SLOT( set_delete_path( QString ) ) );
   
   this->setWindowTitle(tr("New Project Wizard"));
 }
@@ -58,8 +63,18 @@ ProjectWizard::~ProjectWizard()
 {
 }
 
+void ProjectWizard::set_delete_path( QString path )
+{
+  this->path_to_delete_ = path.toStdString();
+}
+
 void ProjectWizard::accept()
 {
+  if( this->path_to_delete_ != "" )
+  {
+    boost::filesystem::remove_all( boost::filesystem::path( this->path_to_delete_ ) );
+  }
+
   ActionNewProject::Dispatch( Core::Interface::GetWidgetActionContext(),
     field("projectPath").toString().toStdString(),
     field("projectName").toString().toStdString() );
@@ -150,6 +165,28 @@ bool ProjectInfoPage::validatePage()
   boost::filesystem::path new_path = 
     boost::filesystem::path( this->project_path_lineedit_->text().toStdString() ) / 
     boost::filesystem::path( this->project_name_lineedit_->text().toStdString() );
+    
+  if( boost::filesystem::exists( new_path ) )
+  {
+    int ret = QMessageBox::warning( this, 
+      "A project with this name already exists!",
+      "If you proceed the old project will be deleted and replaced.\n"
+      "Are you sure you would like to continue?",
+      QMessageBox::Yes | QMessageBox::No );
+
+    if( ret != QMessageBox::Yes )
+    {
+      return false;
+    }
+
+    Q_EMIT need_to_set_delete_path( QString::fromStdString( new_path.string() ) );
+
+    Core::ActionSet::Dispatch(  Core::Interface::GetWidgetActionContext(), 
+      PreferencesManager::Instance()->export_path_state_, new_path.parent_path().string() );
+
+    return true;
+  } 
+  
 
   if( !boost::filesystem::exists( new_path.parent_path() ) )
   {
