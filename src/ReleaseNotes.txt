@@ -1,7 +1,29 @@
 Release Notes
 =============
 
+Version 2.0.1
+-------------
+
+This version addresses a few minor problems that were encountered by users and affects mostly file io. This version also adds fog controls and clipping planes to the visual interface.
+
+* Upgraded dicom support to better deal with file names and spacing.
+
+* Improved checking of existance of project files and will prompt for new directories when files are deleted or network connectivity is lost.
+
+* Clipping plane support and fog control.
+
+* Cleanup of node vs cell centered data management.
+
+* Recent file list is now kept in a database.
+
+* Added database support.
+
+* Cleanup of dialog windows to better support Mac OS X.
+
+
+
 Version: 2.0
+------------
 
 This new version of Seg3D represents a major rewrite from the original Seg3D 1.x versions. This version maintains the workflow of the previous versions, but has been reengineered from scratch in order to address major flaws in the original design of the code. This release is the first release based on the new code base, that includes most of the tools from previous release and many new features. There are however a few tools that have not yet been ported to the new architecture, and most of that functionality will follow in version 2.1. 
 
