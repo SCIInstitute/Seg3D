@@ -302,6 +302,7 @@ bool MatlabLayerImporterPrivate::import_mat_array( MatlabIO::matlabarray &mlarra
         
         this->grid_transform_ = Core::GridTransform( this->data_block_->get_nx(),
           this->data_block_->get_ny(), this->data_block_->get_nz() );
+        this->grid_transform_.set_originally_node_centered( false );
         
         return true;
       }
@@ -423,6 +424,7 @@ bool MatlabLayerImporterPrivate::import_mat_array( MatlabIO::matlabarray &mlarra
               Origin, spacing.x() * Core::Vector( 1.0, 0.0, 0.0 ), 
               spacing.y() * Core::Vector( 0.0, 1.0, 0.0 ),
               spacing.z() * Core::Vector( 0.0, 0.0, 1.0 ) );
+            this->grid_transform_.set_originally_node_centered( false );
           }
         }
         return true;        

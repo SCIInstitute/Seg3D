@@ -270,6 +270,7 @@ bool VFFLayerImporter::import_vff()
 
   // Step 5: now we set our grid transform.
   this->grid_transform_ = Core::GridTransform( nx, ny, nz, transform );
+  this->grid_transform_.set_originally_node_centered( false );
   return true;
 }
 

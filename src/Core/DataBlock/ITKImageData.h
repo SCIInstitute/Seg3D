@@ -329,7 +329,9 @@ template<class T>
 GridTransform ITKImageDataT<T>::get_grid_transform() const
 {
   typename image_type::RegionType::SizeType size = itk_image_->GetBufferedRegion().GetSize();
-  return GridTransform( size[ 0 ], size[ 1 ], size[ 2 ], get_transform() );
+  GridTransform gt( size[ 0 ], size[ 1 ], size[ 2 ], get_transform() );
+  gt.set_originally_node_centered( false );
+  return gt;
 }
   
 template<class T>
