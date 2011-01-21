@@ -108,19 +108,15 @@ void DataLayerPrivate::update_display_value_range()
 {
   if ( !this->layer_->has_valid_data() )  return;
   
-  // Convert contrast to range ( 0, 1 ] and brightness to [ -1, 1 ]
-  double contrast = ( 1 - this->layer_->contrast_state_->get() / 101 );
-  double brightness = this->layer_->brightness_state_->get() / 50 - 1.0;
+  {
+    Core::ScopedCounter signal_block( this->signal_block_count_ );
+    double min_val = this->layer_->get_data_volume()->get_min();
+    double max_val = this->layer_->get_data_volume()->get_max();
+    this->layer_->display_min_value_state_->set_range( min_val, max_val );
+    this->layer_->display_max_value_state_->set_range( min_val, max_val );
+  }
 
-  Core::ScopedCounter signal_block( this->signal_block_count_ );
-  double min_val = this->layer_->get_data_volume()->get_min();
-  double max_val = this->layer_->get_data_volume()->get_max();
-  this->layer_->display_min_value_state_->set_range( min_val, max_val );
-  this->layer_->display_max_value_state_->set_range( min_val, max_val );
-  double mid_val = min_val + ( brightness + 1 ) * 0.5 * ( max_val - min_val );
-  double window_size = ( max_val - min_val ) * contrast;
-  this->layer_->display_min_value_state_->set( mid_val - window_size * 0.5 );
-  this->layer_->display_max_value_state_->set( mid_val + window_size * 0.5 );
+  this->handle_contrast_brightness_changed();
 }
 
 void DataLayerPrivate::handle_contrast_brightness_changed()

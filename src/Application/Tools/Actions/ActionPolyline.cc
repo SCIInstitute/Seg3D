@@ -36,6 +36,14 @@
 #include <Application/LayerManager/LayerUndoBufferItem.h>
 #include <Application/UndoBuffer/UndoBuffer.h>
 
+#ifdef min
+#undef min
+#endif
+
+#ifdef max
+#undef max
+#endif
+
 CORE_REGISTER_ACTION( Seg3D, Polyline )
 
 namespace Seg3D

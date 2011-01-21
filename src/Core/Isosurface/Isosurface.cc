@@ -1243,7 +1243,7 @@ void IsosurfacePrivate::compute_cap_faces()
   size_t nx = this->orig_mask_volume_->get_mask_data_block()->get_nx();
   size_t ny = this->orig_mask_volume_->get_mask_data_block()->get_ny();
   size_t nz = this->orig_mask_volume_->get_mask_data_block()->get_nz();
-  std::vector< std::pair< int, int > > border_face_dimensions;
+  std::vector< std::pair< size_t, size_t > > border_face_dimensions;
   border_face_dimensions.push_back( std::make_pair( nx, ny ) ); // front and back faces
   border_face_dimensions.push_back( std::make_pair( nx, nz ) ); // top and bottom faces
   border_face_dimensions.push_back( std::make_pair( ny, nz ) ); // left and right side faces

@@ -41,6 +41,14 @@
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/ViewerManager/ViewerManager.h>
 
+#ifdef min
+#undef min
+#endif
+
+#ifdef max
+#undef max
+#endif
+
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL( Seg3D, ThresholdTool )
 

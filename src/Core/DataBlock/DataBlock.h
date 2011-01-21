@@ -124,9 +124,8 @@ public:
 
   // TO_INDEX:
   // Compute the real index based on the coordinates in index space
-  size_t to_index( index_type x, index_type y, index_type z ) const
+  index_type to_index( index_type x, index_type y, index_type z ) const
   {
-    assert( x < this->nx_ && y < this->ny_ && z < this->nz_ );
     return z * this->nx_ * this->ny_ + y * this->nx_ + x;
   }
   
