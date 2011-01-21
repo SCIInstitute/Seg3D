@@ -45,7 +45,7 @@ typedef boost::shared_ptr< GDCMLayerImporterPrivate > GDCMLayerImporterPrivateHa
 class GDCMLayerImporter : public LayerImporter
 {
   SCI_IMPORTER_TYPE( "GDCM Importer", 
-             ".dcm;.DCM;.dicom;.DICOM;", 
+             ".dcm;.DCM;.dicom;.DICOM;.ima;.IMA", 
              15,
              LayerImporterType::FILE_SERIES_E )
 

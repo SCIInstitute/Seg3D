@@ -454,6 +454,7 @@ bool ITKSeriesLayerImporter::import_header()
   if ( this->private_->read_header_ ) return true;
 
   if ( this->private_->extension_ == ".dcm" || 
+    this->private_->extension_ == ".ima" || 
     this->private_->extension_ == ".dicom" ||
     this->private_->extension_ == "" )
   {
@@ -507,7 +508,8 @@ int ITKSeriesLayerImporter::get_importer_modes()
 bool ITKSeriesLayerImporter::load_data( Core::DataBlockHandle& data_block, 
   Core::GridTransform& grid_trans )
 {
-  if ( this->private_->extension_ == ".dcm" || 
+  if ( this->private_->extension_ == ".dcm" ||
+    this->private_->extension_ == ".ima" || 
     this->private_->extension_ == ".dicom" ||
     this->private_->extension_ == "" )
   {
