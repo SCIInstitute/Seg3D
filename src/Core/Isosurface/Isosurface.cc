@@ -371,7 +371,7 @@ public:
   // Parallelized isosurface computation algorithm 
   void parallel_compute_faces( int thread, int num_threads, boost::barrier& barrier );
 
-  void translate_border_index( int border_face_num, size_t i, size_t j, size_t& x, size_t& y, size_t& z );
+  void translate_border_coords( int border_face_num, size_t i, size_t j, size_t& x, size_t& y, size_t& z );
 
   // COMPUTE_CAP_FACES:
   // Compute the "cap" faces at the boundary of the mask volume to handle the case where the 
@@ -1148,8 +1148,8 @@ void IsosurfacePrivate::parallel_compute_faces( int thread, int num_threads,
   barrier.wait();
 }
 
-//  Translates border face index (i, j) to volume index (x, y, z).  
-void IsosurfacePrivate::translate_border_index( int border_face_num, size_t i, size_t j, 
+//  Translates border face coords (i, j) to volume coords (x, y, z).  
+void IsosurfacePrivate::translate_border_coords( int border_face_num, size_t i, size_t j, 
   size_t& x, size_t& y, size_t& z )
 {
   size_t nx = this->orig_mask_volume_->get_mask_data_block()->get_nx();
@@ -1248,7 +1248,7 @@ void IsosurfacePrivate::compute_cap_faces()
   border_face_dimensions.push_back( std::make_pair( nx, nz ) ); // top and bottom faces
   border_face_dimensions.push_back( std::make_pair( ny, nz ) ); // left and right side faces
 
-  for( size_t border_face_num = 0; border_face_num < 6; border_face_num++ )
+  for( int border_face_num = 0; border_face_num < 6; border_face_num++ )
   {
     // STEP 1: Find cell types
 
@@ -1268,9 +1268,28 @@ void IsosurfacePrivate::compute_cap_faces()
       for( size_t i = 0; i < ni - 1; i++ )
       {
         // Build type
+        // type = index into polygonal configuration table
         unsigned char cell_type = 0;
-        // Check each of 4 nodes in cell to see if they are "on" on mask.  If so, turn on bit.
-        // Add the type to a vector of chars, one for each cell index
+
+        // A 4 bit index is formed where each bit corresponds to a vertex 
+        // Bit on if vertex is inside surface, off otherwise
+        size_t x, y, z;
+        this->translate_border_coords( border_face_num, i, j, x, y, z ); 
+        size_t data_index = ( z * nx * ny ) + ( y * nx ) + x;
+        if ( this->data_[ data_index ] & this->mask_value_ )  cell_type |= 0x1;
+        
+        this->translate_border_coords( border_face_num, i + 1, j, x, y, z ); 
+        data_index = ( z * nx * ny ) + ( y * nx ) + x;
+        if ( this->data_[ data_index ] & this->mask_value_ )  cell_type |= 0x2;
+
+        this->translate_border_coords( border_face_num, i + 1, j + 1, x, y, z ); 
+        data_index = ( z * nx * ny ) + ( y * nx ) + x;
+        if ( this->data_[ data_index ] & this->mask_value_ )  cell_type |= 0x4;
+
+        this->translate_border_coords( border_face_num, i, j + 1, x, y, z ); 
+        data_index = ( z * nx * ny ) + ( y * nx ) + x;
+        if ( this->data_[ data_index ] & this->mask_value_ )  cell_type |= 0x8;
+
         cell_types[ cell_index ] = cell_type;
         cell_index++; 
       }
@@ -1280,18 +1299,33 @@ void IsosurfacePrivate::compute_cap_faces()
 
     // Create translation table (2D matrix storing indices into actual points vector)
     // size_t point_trans_table[num cells = (nx - 1) * (ny - 1)][8 canonical indices (4 nodes, 4 edge points)]
+    std::vector< std::vector< size_t > > point_trans_table( num_cells, std::vector< size_t >( 8 ) );
 
     // All border nodes that are "on" are included as points because they are all adjacent to 
     // the imaginary padding that is "off." 
-    // Loop over i & j 
-      // Translate (i, j) to (x, y, z) for this face
-      // Look up mask value at (x, y, z)
-      // If mask value on
-        // Transform point by mask transform
-        // node_point = grid_transform.project( Point( x, y, z);
-        // Add node to the points list.
-        // this->points_.push_back( node_point );
-        // Add the relevant canonical coordinates to the translation table for adjacent cells.
+    // Loop through all 2D cells 
+    for( size_t j = 0; j < nj - 1; j++ )
+    {
+      for( size_t i = 0; i < ni - 1; i++ )
+      {
+        // Translate (i, j) to (x, y, z) for this face
+        size_t x, y, z;
+        this->translate_border_coords( border_face_num, i, j, x, y, z ); 
+
+        // Look up mask value at (x, y, z)
+        size_t data_index = ( z * nx * ny ) + ( y * nx ) + x;
+          
+        // If mask value on
+        if ( this->data_[ data_index ] & this->mask_value_ )
+        {
+          // Transform point by mask transform
+          // node_point = grid_transform.project( Point( x, y, z);
+          // Add node to the points list.
+          // this->points_.push_back( node_point );
+          // Add the relevant canonical coordinates to the translation table for adjacent cells.
+        }
+      }
+    }
 
     // STEP 3: Find edge nodes, add to points list and translation table
 
@@ -1554,6 +1588,9 @@ void Isosurface::compute( double quality_factor, boost::function< bool () > chec
       this->private_->reset();
       return;
     }
+
+    // Test code
+    //this->private_->compute_cap_faces();
   }
 
   // Check for empty isosurface
