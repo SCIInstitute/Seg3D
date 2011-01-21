@@ -83,7 +83,11 @@ public:
   // DISPATCH
   // Create and dispatch action that computes the isosurface for the selected layer
   static void Dispatch( Core::ActionContextHandle context, MaskLayerHandle mask_layer, 
-    double quality_factor );  
+    double quality_factor );
+
+  // DISPATCH:
+  // Create and dispatch action that computes the isosurface for the active layer.
+  static void Dispatch( Core::ActionContextHandle context );
 };
   
 } // end namespace Seg3D

@@ -28,6 +28,7 @@
 
 // Application includes
 #include <Application/Layer/MaskLayer.h>
+#include <Application/Layer/LayerGroup.h>
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/LayerManager/Actions/ActionComputeIsosurface.h>
 
@@ -118,6 +119,22 @@ void ActionComputeIsosurface::Dispatch( Core::ActionContextHandle context,
   MaskLayerHandle mask_layer, double quality_factor )
 {
   Core::ActionDispatcher::PostAction( Create( mask_layer, quality_factor ), context );
+}
+
+void ActionComputeIsosurface::Dispatch( Core::ActionContextHandle context )
+{
+  LayerHandle active_layer = LayerManager::Instance()->get_active_layer();
+  if ( !active_layer || active_layer->get_type() != Core::VolumeType::MASK_E )
+  {
+    return;
+  }
+  
+  double quality;
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    Core::ImportFromString( active_layer->get_layer_group()->isosurface_quality_state_->get(), quality );
+  }
+  Dispatch( context, boost::dynamic_pointer_cast< MaskLayer >( active_layer ), quality );
 }
 
 } // end namespace Seg3D

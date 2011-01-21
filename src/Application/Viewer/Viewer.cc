@@ -53,6 +53,7 @@
 #include <Application/Viewer/Actions/ActionAutoView.h>
 #include <Application/ViewerManager/Actions/ActionPickPoint.h>
 #include <Application/ViewerManager/ViewerManager.h>
+#include <Application/LayerManager/Actions/ActionComputeIsosurface.h>
 
 namespace Seg3D
 {
@@ -1451,7 +1452,7 @@ bool Viewer::key_press_event( int key, int modifiers, int x, int y )
           this->view_mode_state_, Viewer::AXIAL_C );  
         handled_successfully = true;
         break;
-      }       
+      } 
     }
     
     if( handled_successfully ) 
@@ -1461,7 +1462,14 @@ bool Viewer::key_press_event( int key, int modifiers, int x, int y )
     }
     
   }
-      
+
+  if ( modifiers == Core::KeyModifier::NO_MODIFIER_E &&
+    key == Core::Key::KEY_O_E )
+  {
+    ActionComputeIsosurface::Dispatch( Core::Interface::GetKeyboardActionContext() );
+    return true;
+  }
+  
   // function wasn't handled, hence return false.
   return false;
 }
