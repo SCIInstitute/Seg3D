@@ -140,6 +140,7 @@ void GridTransform::AlignToCanonicalCoordinates( const GridTransform& src_transf
   }
   
   Point src_origin = src_transform.project( Point( 0, 0, 0 ) );
+  
   std::vector< size_t > src_size( 3 );
   src_size[ 0 ] = src_transform.get_nx();
   src_size[ 1 ] = src_transform.get_ny();
@@ -162,6 +163,24 @@ void GridTransform::AlignToCanonicalCoordinates( const GridTransform& src_transf
         dst_size[ i ] = src_size[ j ];
         break;
       }     
+    }
+  }
+  
+
+  for ( int i = 0; i < 3; i++ )
+  {
+    if ( permutation[ i ] < 0 )
+    {
+      if ( src_transform.get_originally_node_centered() )
+      {
+        dst_origin[ i ] = dst_origin[ i ] - 
+          static_cast<double> ( dst_size[ i ] ) * spacing[ i ];
+      }
+      else
+      {
+        dst_origin[ i ] = dst_origin[ i ] - 
+          static_cast<double> ( dst_size[ i ] - 1 ) * spacing[ i ];
+      }
     }
   }
   

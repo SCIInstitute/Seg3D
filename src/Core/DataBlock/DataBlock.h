@@ -124,12 +124,20 @@ public:
 
   // TO_INDEX:
   // Compute the real index based on the coordinates in index space
-  size_t to_index( size_t x, size_t y, size_t z ) const
+  size_t to_index( index_type x, index_type y, index_type z ) const
   {
     assert( x < this->nx_ && y < this->ny_ && z < this->nz_ );
     return z * this->nx_ * this->ny_ + y * this->nx_ + x;
   }
-
+  
+  // FROM_INDEX:
+  // Compute the index components from the actual index
+  void from_index( index_type index, index_type& x, index_type& y, index_type& z ) const 
+  {
+    x = index % this->nx_; index_type yz = index / this->nx_;
+    y = yz % this->ny_; z = yz / this->ny_;     
+  }
+  
   // GET_TYPE:
   // The type of the data
   DataType get_data_type() const
@@ -146,25 +154,25 @@ public:
 
   // GET_DATA_AT:
   // Get data at a certain location in the data block
-  inline double get_data_at( size_t x, size_t y, size_t z ) const
+  inline double get_data_at( index_type x, index_type y, index_type z ) const
   {
     return get_data_at( this->to_index( x, y, z ) );
   }
   
   // GET_DATA_AT:
   // Get data at a certain index location in the data block
-  double get_data_at( size_t index ) const;
+  double get_data_at( index_type index ) const;
   
   // SET_DATA_AT:
   // Set data at a certain location in the data block
-  inline void set_data_at( size_t x, size_t y, size_t z, double value )
+  inline void set_data_at( index_type x, index_type y, index_type z, double value )
   {
     set_data_at( this->to_index( x, y, z ), value );
   }
 
   // SET_DATA_AT:
   // Set data at a certain index location in the data block
-  void set_data_at( size_t index, double value );
+  void set_data_at( index_type index, double value );
 
   // CLEAR:
   // Clear the data inside the data block
