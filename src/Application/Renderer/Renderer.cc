@@ -821,16 +821,16 @@ bool Renderer::render()
       this->private_->isosurface_shader_->disable();
     }
 
-    if ( render_volume )
-    {
-      LayerHandle layer = LayerManager::Instance()->get_active_layer();
-      if ( layer && layer->get_type() == Core::VolumeType::DATA_E )
-      {
-        DataLayer* data_layer = static_cast< DataLayer* >( layer.get() );
-        Core::VolumeRenderer vol_renderer;
-        vol_renderer.render( data_layer->get_data_volume(), view3d, 2 );
-      }
-    }
+    //if ( render_volume )
+    //{
+    //  LayerHandle layer = LayerManager::Instance()->get_active_layer();
+    //  if ( layer && layer->get_type() == Core::VolumeType::DATA_E )
+    //  {
+    //    DataLayer* data_layer = static_cast< DataLayer* >( layer.get() );
+    //    Core::VolumeRenderer vol_renderer;
+    //    vol_renderer.render( data_layer->get_data_volume(), view3d, 2 );
+    //  }
+    //}
 
     if ( draw_bbox )
     {
