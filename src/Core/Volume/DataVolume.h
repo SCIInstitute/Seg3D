@@ -35,6 +35,7 @@
 #include <Core/DataBlock/NrrdData.h>
 #include <Core/Geometry/GridTransform.h>
 #include <Core/Volume/Volume.h>
+#include <Core/Volume/DataVolumeBrick.h>
 
 namespace Core
 {
@@ -42,6 +43,9 @@ namespace Core
 class DataVolume;
 typedef boost::shared_ptr< DataVolume > DataVolumeHandle;
 typedef boost::weak_ptr< DataVolume > DataVolumeWeakHandle;
+
+class DataVolumePrivate;
+typedef boost::shared_ptr< DataVolumePrivate > DataVolumePrivateHandle;
 
 class DataVolume : public Volume
 {
@@ -100,6 +104,10 @@ public:
   // GET_BYTE_SIZE:
   // Get the size of the data in bytes
   virtual size_t get_byte_size() const;
+
+  // GET_BRICKS:
+  // Split the volume into small bricks if not yet generated, and return a vector of the bricks.
+  void get_bricks( std::vector< DataVolumeBrickHandle >& bricks );
   
   // -- slice handling --
 public: 
@@ -112,12 +120,11 @@ public:
   bool extract_slice( SliceType type, DataBlock::index_type index, DataSliceHandle& slice );
   
 private:
-  // Handle to where the volume data is really stored
-  DataBlockHandle data_block_;
-
   // Mutex for a volume without a data block associated with it
   // NOTE: This is used to set up a new layer that is still constructing its data
   mutex_type invalid_mutex_;
+
+  DataVolumePrivateHandle private_;
 
   // -- functions for creating DataVolumes --
 public:

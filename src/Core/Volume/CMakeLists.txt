@@ -44,6 +44,8 @@ SET(CORE_VOLUME_SRCS
   MaskVolumeSlice.cc
   DataVolumeSlice.h
   DataVolumeSlice.cc
+  DataVolumeBrick.h
+  DataVolumeBrick.cc
   )
 
 CORE_ADD_LIBRARY(Core_Volume ${CORE_VOLUME_SRCS} )

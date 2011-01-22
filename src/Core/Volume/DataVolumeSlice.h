@@ -87,10 +87,6 @@ private:
   // An array of GLenum's for GL internal texture formats, indexed by data_type values.
   // These formats are picked to best match the data type.
   const static unsigned int TEXTURE_FORMAT_C;
-
-public:
-
-  const static texture_data_type TEXTURE_VALUE_MAX_C;
 };
 
 } // end namespace Core

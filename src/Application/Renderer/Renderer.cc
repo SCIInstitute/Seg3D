@@ -40,6 +40,7 @@
 #include <Core/Graphics/UnitCube.h>
 #include <Core/TextRenderer/TextRenderer.h>
 #include <Core/Graphics/ColorMap.h>
+#include <Core/VolumeRenderer/VolumeRenderer.h>
 
 // Application includes
 #include <Application/Layer/DataLayer.h>
@@ -705,6 +706,7 @@ bool Renderer::render()
     bool enable_clipping = viewer->volume_enable_clipping_state_->get();
     bool draw_slices = viewer->volume_slices_visible_state_->get();
     bool draw_isosurfaces = viewer->volume_isosurfaces_visible_state_->get();
+    bool render_volume = true;
     bool draw_bbox = viewer->volume_show_bounding_box_state_->get();
     bool show_invisible_slices = viewer->volume_show_invisible_slices_state_->get();
     size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
@@ -817,6 +819,17 @@ bool Renderer::render()
       this->private_->isosurface_shader_->set_fog( with_fog );
       this->private_->draw_isosurfaces( isosurfaces );
       this->private_->isosurface_shader_->disable();
+    }
+
+    if ( render_volume )
+    {
+      LayerHandle layer = LayerManager::Instance()->get_active_layer();
+      if ( layer && layer->get_type() == Core::VolumeType::DATA_E )
+      {
+        DataLayer* data_layer = static_cast< DataLayer* >( layer.get() );
+        Core::VolumeRenderer vol_renderer;
+        vol_renderer.render( data_layer->get_data_volume(), view3d, 2 );
+      }
     }
 
     if ( draw_bbox )

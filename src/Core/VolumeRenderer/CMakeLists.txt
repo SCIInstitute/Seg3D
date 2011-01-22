@@ -28,54 +28,36 @@
 #
 
 ##################################################
-# Import shaders into source files
-##################################################
-
-SET(APPLICATION_RENDERER_SHADER_SRCS
-  Lighting.vert
-  Lighting.frag
-  Fog.frag
-  SliceShader.frag
-  SliceShader.vert
-  IsosurfaceShader.frag
-  IsosurfaceShader.vert
-  OrientationArrowsShader.vert
-  OrientationArrowsShader.frag
-  )
-  
-CORE_IMPORT_SHADER(APPLICATION_RENDERER_SHADER_STRING_SRCS
-          ${APPLICATION_RENDERER_SHADER_SRCS})
-          
-##################################################
 # Set sources
 ##################################################
 
-SET(APPLICATION_RENDERER_SRCS
-  Renderer.h
-  Renderer.cc
-  SliceShader.h
-  SliceShader.cc
-  IsosurfaceShader.h
-  IsosurfaceShader.cc
-  OrientationArrows.h
-  OrientationArrows.cc
-  OrientationArrowsShader.h
-  OrientationArrowsShader.cc
+SET(CORE_VOLUMERENDERER_SHADER_SRCS
+  Fog.frag
+  VolumeShader.frag
+  VolumeShader.vert
   )
   
-CORE_ADD_LIBRARY(Application_Renderer ${APPLICATION_RENDERER_SRCS}
-      ${APPLICATION_RENDERER_SHADER_SRCS}
-      ${APPLICATION_RENDERER_SHADER_STRING_SRCS})
+CORE_IMPORT_SHADER(CORE_VOLUMERENDERER_SHADER_STRING_SRCS
+          ${CORE_VOLUMERENDERER_SHADER_SRCS})
+
+SET(CORE_VOLUMERENDERER_SRCS
+  VolumeRenderer.h
+  VolumeRenderer.cc
+  VolumeShader.h
+  VolumeShader.cc
+  )
+  
+CORE_ADD_LIBRARY(Core_VolumeRenderer 
+        ${CORE_VOLUMERENDERER_SRCS}
+        ${CORE_VOLUMERENDERER_SHADER_SRCS}
+        ${CORE_VOLUMERENDERER_SHADER_STRING_SRCS})
             
-TARGET_LINK_LIBRARIES(Application_Renderer
+TARGET_LINK_LIBRARIES(Core_VolumeRenderer
                       Core_Utils
-                      Core_EventHandler
-            Core_TextRenderer
+                      Core_Geometry
             Core_Graphics
             Core_RenderResources
-            Core_Renderer
-            Core_VolumeRenderer
-                      Application_Viewer
+            Core_Volume
                       ${SCI_GLEW_LIBRARY}
                       ${SCI_BOOST_LIBRARY})
 

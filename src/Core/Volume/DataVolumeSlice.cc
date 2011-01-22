@@ -39,9 +39,6 @@ const unsigned int DataVolumeSlice::TEXTURE_DATA_TYPE_C = GL_UNSIGNED_SHORT;
 
 const unsigned int DataVolumeSlice::TEXTURE_FORMAT_C = GL_LUMINANCE16;
 
-const DataVolumeSlice::texture_data_type DataVolumeSlice::TEXTURE_VALUE_MAX_C =
-  std::numeric_limits< DataVolumeSlice::texture_data_type >::max();
-
 DataVolumeSlice::DataVolumeSlice( const DataVolumeHandle& data_volume, 
                  VolumeSliceType type, size_t slice_num ) :
   VolumeSlice( data_volume, type, slice_num )
