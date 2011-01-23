@@ -199,10 +199,10 @@ void LayerIOFunctions::ImportSeries( QMainWindow* main_window )
     {
       size_t start, end;
       while ( j < filename.size() && ( filename[ j ] < '0' || filename[ j ] > '9' ) ) j++;
+      if ( j == filename.size() ) break;
       start = j;
       while ( j < filename.size() && ( filename[ j ] >= '0' && filename[ j ] <= '9' ) ) j++;
-      end = j;
-      
+      end = j;      
       if ( start != end ) numbers.push_back( std::make_pair<size_t,size_t>( start, end ) );
     }
     
@@ -233,13 +233,14 @@ void LayerIOFunctions::ImportSeries( QMainWindow* main_window )
       std::set<size_t> indices;
       
       for ( size_t k = 0; k < dir_files.size(); k++ )
-      {
-        if ( dir_files[ k ].substr( 0, start ) == filename_prefix && 
+      {       
+        if ( dir_files[ k ].substr( 0, start ) == filename_prefix && ( dir_files[ k ].size() >= end ) &&
           dir_files[ k ].substr( dir_files[ k ].size() - end ) == filename_postfix )
         {
           size_t val;
-          if ( Core::ImportFromString( dir_files[ k ].substr( start, 
-            dir_files[ k ].size() - end - start ), val ) )
+          if ( dir_files[ k ].size() >= end + start  && 
+            Core::ImportFromString( dir_files[ k ].substr( start, 
+              dir_files[ k ].size() - end - start ), val ) )
           {
             indices.insert( val );
           }
@@ -268,10 +269,12 @@ void LayerIOFunctions::ImportSeries( QMainWindow* main_window )
       for ( size_t k = 0; k < dir_files.size(); k++ )
       {
         if ( dir_files[ k ].substr( 0, start ) == filename_prefix && 
+          dir_files[ k ].size() >= end &&
           dir_files[ k ].substr( dir_files[ k ].size() - end ) == filename_postfix )
         {
           size_t val;
-          if ( Core::ImportFromString( dir_files[ k ].substr( start, 
+          if ( dir_files[ k ].size() >= end + start &&  
+            Core::ImportFromString( dir_files[ k ].substr( start, 
             dir_files[ k ].size() - end - start ), val ) )
           {
             order[ j ].first = val;
