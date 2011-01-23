@@ -2,8 +2,8 @@
 #version 110
 
 uniform bool enable_lighting;
-uniform vec3 tex_bbox_min;
-uniform vec3 tex_bbox_size;
+uniform vec3 tex_bbox_min; // Minimum values of texture position in world space
+uniform vec3 tex_bbox_size; // Size of texture in world space
 
 varying vec4 diffuse, ambient_global, ambient; // Light components.
 varying vec3 light_dir; // Light direction
@@ -29,7 +29,7 @@ void main()
     ambient_global = gl_LightModel.ambient * gl_FrontMaterial.ambient;
   }
   
-  gl_TexCoord[0].stp = (gl_Vertex - tex_bbox_min)/tex_bbox_size;
+  gl_TexCoord[0].stp = (gl_Vertex.xyz - tex_bbox_min)/tex_bbox_size;
   gl_ClipVertex = gl_ModelViewMatrix * gl_Vertex;
   gl_Position = ftransform();
 } 

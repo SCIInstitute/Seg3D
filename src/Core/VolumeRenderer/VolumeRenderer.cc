@@ -33,6 +33,7 @@
 #include <Core/Volume/DataVolumeBrick.h>
 #include <Core/VolumeRenderer/VolumeRenderer.h>
 #include <Core/Graphics/PixelBufferObject.h>
+#include <Core/VolumeRenderer/VolumeShader.h>
 
 namespace Core
 {
@@ -386,7 +387,8 @@ class VolumeRendererPrivate
 public:
   void analyze_volume( DataVolumeHandle volume, double sample_rate );
   void process_bricks( const std::vector< DataVolumeBrickHandle >& bricks,
-    std::priority_queue< BrickEntry >& sorted_bricks );
+    std::priority_queue< BrickEntry >& sorted_bricks, 
+    const Point& eyep, bool orthographic );
   void render_brick( DataVolumeBrickHandle brick );
 
   // The viewing direction
@@ -399,15 +401,18 @@ public:
   double sample_distance_;
   // The start position for sampling
   double sample_start_;
+  // The size of the voxel in world space
+  Vector voxel_size_;
+
+  VolumeShaderHandle volume_shader_;
 };
 
 void VolumeRendererPrivate::analyze_volume( DataVolumeHandle volume, double sample_rate )
 {
   GridTransform grid_trans = volume->get_grid_transform();
-  Vector voxel_size( 1.0, 1.0, 1.0 );
-  voxel_size = grid_trans * voxel_size;
+  this->voxel_size_ = grid_trans * Vector( 1.0, 1.0, 1.0 );
   Point voxel_min( 0.0, 0.0, 0.0 );
-  Point voxel_max( voxel_size );
+  Point voxel_max( this->voxel_size_ );
   Point corners[ 2 ] = { voxel_min, voxel_max };
   double min_dist = std::numeric_limits< double >::max();
   double max_dist = std::numeric_limits< double >::min();
@@ -453,7 +458,8 @@ void VolumeRendererPrivate::analyze_volume( DataVolumeHandle volume, double samp
 }
 
 void VolumeRendererPrivate::process_bricks( const std::vector< DataVolumeBrickHandle >& bricks,
-                       std::priority_queue< BrickEntry >& sorted_bricks )
+                       std::priority_queue< BrickEntry >& sorted_bricks,
+                       const Point& eyep, bool orthographic )
 {
   size_t num_bricks = bricks.size();
   for ( size_t i = 0; i < num_bricks; ++i )
@@ -462,10 +468,39 @@ void VolumeRendererPrivate::process_bricks( const std::vector< DataVolumeBrickHa
     brick_entry.brick_ = bricks[ i ];
     BBox brick_bbox = brick_entry.brick_->get_brick_bbox();
     Point corners[] = { brick_bbox.min(), brick_bbox.max() };
-    Vector vertex( corners[ ( this->front_vertex_ & 0x1 ) > 0 ? 1 : 0 ].x(),
-      corners[ ( this->front_vertex_ & 0x2 ) > 0 ? 1 : 0 ].y(),
-      corners[ ( this->front_vertex_ & 0x4 ) > 0 ? 1 : 0 ].z() );
-    brick_entry.distance_ = Dot( vertex, this->view_dir_ );
+
+    // orthographic: sort bricks based on distance to the view plane
+    if ( orthographic )
+    {
+      Vector vertex( corners[ ( this->front_vertex_ & 0x1 ) > 0 ? 1 : 0 ].x(),
+        corners[ ( this->front_vertex_ & 0x2 ) > 0 ? 1 : 0 ].y(),
+        corners[ ( this->front_vertex_ & 0x4 ) > 0 ? 1 : 0 ].z() );
+      brick_entry.distance_ = Dot( vertex, this->view_dir_ );
+    }
+    // perspective: sort bricks based on distance to the eye point
+    else
+    {
+      // Coordinates of 8 brick vertices
+      Point vertex_pos[ 8 ] =
+      {
+        corners[ 0 ],
+        Point( corners[ 1 ].x(), corners[ 0 ].y(), corners[ 0 ].z() ),
+        Point( corners[ 1 ].x(), corners[ 1 ].y(), corners[ 0 ].z() ),
+        Point( corners[ 0 ].x(), corners[ 1 ].y(), corners[ 0 ].z() ),
+        Point( corners[ 0 ].x(), corners[ 0 ].y(), corners[ 1 ].z() ),
+        Point( corners[ 1 ].x(), corners[ 0 ].y(), corners[ 1 ].z() ),
+        Point( corners[ 1 ].x(), corners[ 1 ].y(), corners[ 1 ].z() ),
+        Point( corners[ 0 ].x(), corners[ 1 ].y(), corners[ 1 ].z() ),
+      };
+
+      brick_entry.distance_ = std::numeric_limits< double >::min();
+      for ( int i = 0; i < 8; ++i )
+      {
+        double dist = ( vertex_pos[ i ] - eyep ).length();
+        brick_entry.distance_ = Max( brick_entry.distance_, dist );
+      }
+    }
+    
     sorted_bricks.push( brick_entry );
   }
 }
@@ -543,12 +578,26 @@ void VolumeRendererPrivate::render_brick( DataVolumeBrickHandle brick )
 
     sample_pos -= this->sample_distance_;
   }
-  
+
+  BBox texture_bbox = brick->get_texture_bbox();
+  Texture3DHandle brick_texture = brick->get_texture();
+  VectorF texel_size( brick->get_texel_size() );
+  VectorF texture_size( texture_bbox.diagonal() );
+  this->volume_shader_->set_texture_bbox_min( static_cast< float >( texture_bbox.min().x() ),
+    static_cast< float >( texture_bbox.min().y() ), static_cast< float >( texture_bbox.min().z() ) );
+  this->volume_shader_->set_texture_bbox_size( texture_size[ 0 ], texture_size[ 1 ], texture_size[ 2 ] );
+  this->volume_shader_->set_texel_size( texel_size[ 0 ], texel_size[ 1 ], texel_size[ 2 ] );
+
+  Texture::lock_type tex_lock( brick_texture->get_mutex() );
+  brick_texture->bind();
+
   glEnableClientState( GL_VERTEX_ARRAY );
   glVertexPointer( 3, GL_FLOAT, 0, &polygon_vertices[ 0 ][ 0 ] );
   glMultiDrawArrays( GL_POLYGON, &first_vec[ 0 ], &count_vec[ 0 ], 
     static_cast< GLsizei >( count_vec.size() ) );
   glDisableClientState( GL_VERTEX_ARRAY );
+
+  brick_texture->unbind();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -566,10 +615,16 @@ VolumeRenderer::~VolumeRenderer()
 
 void VolumeRenderer::initialize()
 {
-
+  this->private_->volume_shader_.reset( new VolumeShader );
+  this->private_->volume_shader_->initialize();
+  this->private_->volume_shader_->enable();
+  this->private_->volume_shader_->set_volume_texture( 0 );
+  this->private_->volume_shader_->disable();
 }
 
-void VolumeRenderer::render( DataVolumeHandle volume, const View3D& view, double sample_rate )
+void VolumeRenderer::render( DataVolumeHandle volume, const View3D& view, 
+              double sample_rate, bool enable_lighting, bool enable_fog, 
+              bool one_brick, bool orthographic )
 {
   std::vector< DataVolumeBrickHandle > bricks;
   volume->get_bricks( bricks );
@@ -584,21 +639,35 @@ void VolumeRenderer::render( DataVolumeHandle volume, const View3D& view, double
   this->private_->analyze_volume( volume, sample_rate );
 
   std::priority_queue< BrickEntry > brick_queue;
-  this->private_->process_bricks( bricks, brick_queue );
+  this->private_->process_bricks( bricks, brick_queue, view.eyep(), orthographic );
 
   glPushAttrib( GL_DEPTH_BUFFER_BIT | GL_POLYGON_BIT );
   glEnable( GL_DEPTH_TEST );
   glDepthMask( GL_FALSE );
   glDisable( GL_CULL_FACE );
-  glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-  glColor3f( 1.0, 1.0, 1.0 );
+  unsigned int old_tex_unit = Texture::GetActiveTextureUnit();
+  Texture::SetActiveTextureUnit( 0 );
+  this->private_->volume_shader_->enable();
+  this->private_->volume_shader_->set_voxel_size( 
+    static_cast< float >( this->private_->voxel_size_[ 0 ] ),
+    static_cast< float >( this->private_->voxel_size_[ 1 ] ),
+    static_cast< float >( this->private_->voxel_size_[ 2 ] ) );
+  this->private_->volume_shader_->set_lighting( enable_lighting );
+  this->private_->volume_shader_->set_fog( enable_fog );
 
   while ( !brick_queue.empty() )
   {
     this->private_->render_brick( brick_queue.top().brick_ );
     brick_queue.pop();
+    if ( one_brick )
+    {
+      break;
+    }
+    
   }
 
+  this->private_->volume_shader_->disable();
+  Texture::SetActiveTextureUnit( old_tex_unit );
   glPopAttrib();
 }
 

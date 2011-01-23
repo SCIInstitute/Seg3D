@@ -3,7 +3,7 @@
 
 uniform sampler3D vol_tex;
 
-uniform vec3 texel_size; // voxel size in texture space
+uniform vec3 texel_size; // texel size in texture space
 uniform vec3 voxel_size; // voxel size in world space
 
 uniform bool enable_lighting;
@@ -23,7 +23,12 @@ vec4 compute_lighting( vec3 normal )
   float n_dot_l, n_dot_hv;
   vec4 color = ambient_global;
   
-  n_dot_l = max( dot ( normal, normalize( light_dir ) ), 0.0 );
+  n_dot_l = dot ( normal, normalize( light_dir ) );
+  if ( n_dot_l < 0.0 )
+  {
+    n_dot_l = -n_dot_l;
+    normal = -normal;
+  }
 
   if ( n_dot_l > 0.0 ) 
   {
@@ -40,7 +45,8 @@ vec4 compute_lighting( vec3 normal )
 
 void main()
 {
-  vec4 voxel_color( texture3D( vol_tex, gl_TexCoord[0].stp ).a );
+  float voxel_val = texture3D( vol_tex, gl_TexCoord[0].stp ).a;
+  vec4 voxel_color = vec4( voxel_val );
 
   if ( enable_lighting )
   {
@@ -52,13 +58,13 @@ void main()
     gradient.z = ( texture3D( vol_tex, gl_TexCoord[0].stp + vec3( 0.0, 0.0, texel_size.z ) ).a -
       texture3D( vol_tex, gl_TexCoord[0].stp - vec3( 0.0, 0.0, texel_size.z ) ).a ) / ( 2.0 * voxel_size.z );
     gradient = normalize( gradient );
-    voxel_color.rgb = ( slice_color * compute_lighting( gradient ) ).rgb;
+    voxel_color.rgb = ( voxel_color * compute_lighting( gradient ) ).rgb;
   }
 
   if ( enable_fog )
   {
-    voxel_color = mix( gl_Fog.color, voxel_color, compute_fog_factor() );
+    voxel_color.rgb = mix( gl_Fog.color, voxel_color, compute_fog_factor() ).rgb;
   }
 
-  gl_FragColor = slice_color;
+  gl_FragColor = voxel_color;
 }

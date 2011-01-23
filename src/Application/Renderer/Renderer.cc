@@ -135,6 +135,7 @@ public:
   Core::Texture2DHandle pattern_texture_;
   Core::TextRendererHandle text_renderer_;
   Core::Texture2DHandle text_texture_;
+  Core::VolumeRendererHandle volume_renderer_;
 
   size_t viewer_id_;
   bool rendering_enabled_;
@@ -583,6 +584,7 @@ Renderer::Renderer( size_t viewer_id ) :
   this->private_->slice_shader_.reset( new SliceShader );
   this->private_->isosurface_shader_.reset( new IsosurfaceShader );
   this->private_->text_renderer_.reset( new Core::TextRenderer );
+  this->private_->volume_renderer_.reset( new Core::VolumeRenderer );
   this->private_->viewer_id_ = viewer_id;
 }
 
@@ -615,6 +617,7 @@ void Renderer::post_initialize()
 
     this->private_->slice_shader_->initialize();
     this->private_->isosurface_shader_->initialize();
+    this->private_->volume_renderer_->initialize();
     this->private_->pattern_texture_.reset( new Core::Texture2D );
     this->private_->pattern_texture_->set_image( PATTERN_SIZE_C, PATTERN_SIZE_C, 
       GL_ALPHA, MASK_PATTERNS_C, GL_ALPHA, GL_UNSIGNED_BYTE );
@@ -827,8 +830,8 @@ bool Renderer::render()
     //  if ( layer && layer->get_type() == Core::VolumeType::DATA_E )
     //  {
     //    DataLayer* data_layer = static_cast< DataLayer* >( layer.get() );
-    //    Core::VolumeRenderer vol_renderer;
-    //    vol_renderer.render( data_layer->get_data_volume(), view3d, 2 );
+    //    this->private_->volume_renderer_->render( data_layer->get_data_volume(), 
+    //      view3d, 5, with_lighting, with_fog, draw_bbox );
     //  }
     //}
 

@@ -91,17 +91,13 @@ bool VolumeShader::initialize()
   }
 
   this->glsl_prog_->enable();
-  this->slice_tex_loc_ = this->glsl_prog_->get_uniform_location( "slice_tex" );
-  this->pattern_tex_loc_ = this->glsl_prog_->get_uniform_location( "pattern_tex" );
-  this->opacity_loc_ = this->glsl_prog_->get_uniform_location( "opacity" );
-  this->mask_mode_loc_ = this->glsl_prog_->get_uniform_location( "mask_mode" );
-  this->scale_bias_loc_ = this->glsl_prog_->get_uniform_location( "scale_bias" );
-  this->pixel_size_loc_ = this->glsl_prog_->get_uniform_location( "pixel_size" );
-  this->border_width_loc_ = this->glsl_prog_->get_uniform_location( "border_width" );
-  this->volume_type_loc_ = this->glsl_prog_->get_uniform_location( "volume_type" );
-  this->mask_color_loc_ = this->glsl_prog_->get_uniform_location( "mask_color" );
+  this->vol_tex_loc_ = this->glsl_prog_->get_uniform_location( "vol_tex" );
   this->enable_lighting_loc_ = this->glsl_prog_->get_uniform_location( "enable_lighting" );
   this->enable_fog_loc_ = this->glsl_prog_->get_uniform_location( "enable_fog" );
+  this->tex_bbox_min_loc_ = this->glsl_prog_->get_uniform_location( "tex_bbox_min" );
+  this->tex_bbox_size_loc_ = this->glsl_prog_->get_uniform_location( "tex_bbox_size" );
+  this->texel_size_loc_ = this->glsl_prog_->get_uniform_location( "texel_size" );
+  this->voxel_size_loc_ = this->glsl_prog_->get_uniform_location( "voxel_size" );
   this->glsl_prog_->disable();
 
   this->valid_ = true;
@@ -120,49 +116,9 @@ void VolumeShader::disable()
   this->glsl_prog_->disable();
 }
 
-void VolumeShader::set_slice_texture( int tex_unit )
+void VolumeShader::set_volume_texture( int tex_unit )
 {
-  glUniform1i( this->slice_tex_loc_, tex_unit );
-}
-
-void VolumeShader::set_pattern_texture( int tex_unit )
-{
-  glUniform1i( this->pattern_tex_loc_, tex_unit );
-}
-
-void VolumeShader::set_opacity( float opacity )
-{
-  glUniform1f( this->opacity_loc_, opacity );
-}
-
-void VolumeShader::set_mask_mode( int mask_mode )
-{
-  glUniform1i( this->mask_mode_loc_, mask_mode );
-}
-
-void VolumeShader::set_scale_bias( float scale, float bias )
-{
-  glUniform2f( this->scale_bias_loc_, scale, bias );
-}
-
-void VolumeShader::set_pixel_size( float width, float height )
-{
-  glUniform2f( this->pixel_size_loc_, width, height );
-}
-
-void VolumeShader::set_border_width( int width )
-{
-  glUniform1i( this->border_width_loc_, width );
-}
-
-void VolumeShader::set_volume_type( int volume_type )
-{
-  glUniform1i( this->volume_type_loc_, volume_type );
-}
-
-void VolumeShader::set_mask_color( float r, float g, float b )
-{
-  glUniform3f( this->mask_color_loc_, r, g, b );
+  glUniform1i( this->vol_tex_loc_, tex_unit );
 }
 
 void VolumeShader::set_lighting( bool enabled )
@@ -173,6 +129,26 @@ void VolumeShader::set_lighting( bool enabled )
 void VolumeShader::set_fog( bool enabled )
 {
   glUniform1i( this->enable_fog_loc_, enabled );
+}
+
+void VolumeShader::set_texture_bbox_min( float x, float y, float z )
+{
+  glUniform3f( this->tex_bbox_min_loc_, x, y, z );
+}
+
+void VolumeShader::set_texture_bbox_size( float x, float y, float z )
+{
+  glUniform3f( this->tex_bbox_size_loc_, x, y, z );
+}
+
+void VolumeShader::set_texel_size( float x, float y, float z )
+{
+  glUniform3f( this->texel_size_loc_, x, y, z );
+}
+
+void VolumeShader::set_voxel_size( float x, float y, float z )
+{
+  glUniform3f( this->voxel_size_loc_, x, y, z );
 }
 
 } // end namespace Seg3D

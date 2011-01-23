@@ -68,7 +68,7 @@ public:
   const static unsigned int OVERLAP_SIZE_C;
 };
 
-const unsigned int DataVolumePrivate::BRICK_SIZE_C = 128;
+const unsigned int DataVolumePrivate::BRICK_SIZE_C = 256;
 const unsigned int DataVolumePrivate::OVERLAP_SIZE_C = 1;
 
 template< class DST_TYPE, class SRC_TYPE >
@@ -224,9 +224,9 @@ bool DataVolumePrivate::generate_bricks()
         tex->bind();
         tex->set_mag_filter( GL_LINEAR );
         tex->set_min_filter( GL_LINEAR );
-        tex->set_wrap_s( GL_CLAMP_TO_EDGE );
-        tex->set_wrap_t( GL_CLAMP_TO_EDGE );
-        tex->set_wrap_r( GL_CLAMP_TO_EDGE );
+        tex->set_wrap_s( GL_CLAMP );
+        tex->set_wrap_t( GL_CLAMP );
+        tex->set_wrap_r( GL_CLAMP );
         tex->set_image( static_cast< int >( data_nx ), static_cast< int >( data_ny ), 
           static_cast< int >( data_nz ), DataVolumeBrick::TEXTURE_FORMAT_C,
           0, GL_ALPHA, DataVolumeBrick::TEXTURE_DATA_TYPE_C );

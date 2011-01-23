@@ -49,15 +49,14 @@ public:
   bool initialize();
   void enable();
   void disable();
-  void set_slice_texture( int tex_unit );
-  void set_pattern_texture( int tex_unit );
-  void set_mask_mode( int mask_mode );
-  void set_volume_type( int volume_type );
-  void set_mask_color( float r, float g, float b );
-  void set_opacity( float opacity );
-  void set_scale_bias( float scale, float bias );
-  void set_pixel_size( float width, float height );
-  void set_border_width( int width );
+
+  void set_texture_bbox_min( float x, float y, float z );
+  void set_texture_bbox_size( float x, float y, float z );
+  void set_texel_size( float x, float y, float z );
+  void set_voxel_size( float x, float y, float z );
+
+  void set_volume_texture( int tex_unit );
+
   void set_lighting( bool enabled );
   void set_fog( bool enabled );
 
@@ -69,17 +68,13 @@ private:
   Core::GLSLShaderHandle glsl_frag_shader_;
   Core::GLSLShaderHandle glsl_vert_shader_;
 
-  int slice_tex_loc_;
-  int pattern_tex_loc_;
-  int mask_mode_loc_;
-  int volume_type_loc_;
-  int mask_color_loc_;
-  int opacity_loc_;
-  int scale_bias_loc_;
-  int border_width_loc_;
-  int pixel_size_loc_;
+  int vol_tex_loc_;
   int enable_lighting_loc_;
   int enable_fog_loc_;
+  int tex_bbox_min_loc_;
+  int tex_bbox_size_loc_;
+  int texel_size_loc_;
+  int voxel_size_loc_;
 
   const static char* VERT_SHADER_SOURCE_C[];
   const static char* FRAG_SHADER_SOURCE_C[];
