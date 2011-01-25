@@ -75,6 +75,13 @@ RenderingDockWidget::RenderingDockWidget( QWidget *parent ) :
   QtUtils::QtBridge::Connect( this->private_->ui_.fog_density_, 
     ViewerManager::Instance()->fog_density_state_ );
 
+  QtUtils::QtBridge::Connect( this->private_->ui_.vr_open_button_,
+    ViewerManager::Instance()->show_volume_rendering_control_state_ );
+  QtUtils::QtBridge::Show( this->private_->ui_.vr_content_,
+    ViewerManager::Instance()->show_volume_rendering_control_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.vr_sample_rate_,
+    ViewerManager::Instance()->volume_sample_rate_state_ );
+
   QtUtils::QtBridge::Connect( this->private_->ui_.enable_cp1_, 
     ViewerManager::Instance()->enable_clip_plane_state_[ 0 ] );
   QtUtils::QtBridge::Connect( this->private_->ui_.cp1_x_,

@@ -34,6 +34,7 @@
 #include <Core/VolumeRenderer/VolumeRenderer.h>
 #include <Core/Graphics/PixelBufferObject.h>
 #include <Core/VolumeRenderer/VolumeShader.h>
+#include <Core/Geometry/Algorithm.h>
 
 namespace Core
 {
@@ -442,7 +443,8 @@ void VolumeRendererPrivate::analyze_volume( DataVolumeHandle volume, double samp
   this->back_vertex_ = ( ~this->front_vertex_ ) & 0x7;
   assert( this->front_vertex_ >= 0 && this->front_vertex_ <= 7 && 
     this->back_vertex_ >= 0 && this->back_vertex_ <= 7 );
-  this->sample_distance_ = ( max_dist - min_dist ) / sample_rate;
+  //this->sample_distance_ = ( max_dist - min_dist ) / sample_rate;
+  this->sample_distance_ = ( voxel_max - voxel_min ).length() / sample_rate;
 
   // Compute the start sampling position for the volume (in back to front order)
   Point vol_bbox_min( -0.5, -0.5, -0.5 );
@@ -455,6 +457,60 @@ void VolumeRendererPrivate::analyze_volume( DataVolumeHandle volume, double samp
     corners[ ( this->back_vertex_ & 0x2 ) > 0 ? 1 : 0 ].y(),
     corners[ ( this->back_vertex_ & 0x4 ) > 0 ? 1 : 0 ].z() );
   this->sample_start_ = Dot( far_vertex, this->view_dir_ ) - this->sample_distance_;
+}
+
+// EYETOBOXDISTANCE:
+// Compute the distance from eye to the given box.
+static double EyeToBoxDistance( const Point& eyep, const Vector& view_dir, const BBox& bbox )
+{
+  if ( bbox.inside( eyep ) )
+  {
+    return 0;
+  }
+
+  Point corners[] = { bbox.min(), bbox.max() };
+
+  // Front facing surface in X-direction
+  int front_face = view_dir.x() > 0 ? 0 : 1;
+  Point A( corners[ front_face ].x(), corners[ 0 ].y(), corners[ 1 ].z() );
+  Point B( corners[ front_face ].x(), corners[ 0 ].y(), corners[ 0 ].z() );
+  Point C( corners[ front_face ].x(), corners[ 1 ].y(), corners[ 1 ].z() );
+  Point closest_p;
+  ClosestPointOnTriangle( closest_p, eyep, A, B, C );
+  Vector pvec = closest_p - eyep;
+  double dist = pvec.length();
+  A = Point( corners[ front_face ].x(), corners[ 1 ].y(), corners[ 0 ].z() );
+  ClosestPointOnTriangle( closest_p, eyep, A, B, C );
+  pvec = closest_p - eyep;
+  dist = Min( dist, pvec.length() );
+
+  // Front facing surface in Y-direction
+  front_face = view_dir.y() > 0 ? 0 : 1;
+  A = Point( corners[ 0 ].x(), corners[ front_face ].y(), corners[ 1 ].z() );
+  B = Point( corners[ 0 ].x(), corners[ front_face ].y(), corners[ 0 ].z() );
+  C = Point( corners[ 1 ].x(), corners[ front_face ].y(), corners[ 1 ].z() );
+  ClosestPointOnTriangle( closest_p, eyep, A, B, C );
+  pvec = closest_p - eyep;
+  dist = Min( dist, pvec.length() );
+  A = Point( corners[ 1 ].x(), corners[ front_face ].y(), corners[ 0 ].z() );
+  ClosestPointOnTriangle( closest_p, eyep, A, B, C );
+  pvec = closest_p - eyep;
+  dist = Min( dist, pvec.length() );
+
+  // Front facing surface in Z-direction
+  front_face = view_dir.z() > 0 ? 0 : 1;
+  A = Point( corners[ 0 ].x(), corners[ 1 ].y(), corners[ front_face ].z() );
+  B = Point( corners[ 0 ].x(), corners[ 0 ].y(), corners[ front_face ].z() );
+  C = Point( corners[ 1 ].x(), corners[ 1 ].y(), corners[ front_face ].z() );
+  ClosestPointOnTriangle( closest_p, eyep, A, B, C );
+  pvec = closest_p - eyep;
+  dist = Min( dist, pvec.length() );
+  A = Point( corners[ 1 ].x(), corners[ 0 ].y(), corners[ front_face ].z() );
+  ClosestPointOnTriangle( closest_p, eyep, A, B, C );
+  pvec = closest_p - eyep;
+  dist = Min( dist, pvec.length() );
+
+  return dist;
 }
 
 void VolumeRendererPrivate::process_bricks( const std::vector< DataVolumeBrickHandle >& bricks,
@@ -480,25 +536,7 @@ void VolumeRendererPrivate::process_bricks( const std::vector< DataVolumeBrickHa
     // perspective: sort bricks based on distance to the eye point
     else
     {
-      // Coordinates of 8 brick vertices
-      Point vertex_pos[ 8 ] =
-      {
-        corners[ 0 ],
-        Point( corners[ 1 ].x(), corners[ 0 ].y(), corners[ 0 ].z() ),
-        Point( corners[ 1 ].x(), corners[ 1 ].y(), corners[ 0 ].z() ),
-        Point( corners[ 0 ].x(), corners[ 1 ].y(), corners[ 0 ].z() ),
-        Point( corners[ 0 ].x(), corners[ 0 ].y(), corners[ 1 ].z() ),
-        Point( corners[ 1 ].x(), corners[ 0 ].y(), corners[ 1 ].z() ),
-        Point( corners[ 1 ].x(), corners[ 1 ].y(), corners[ 1 ].z() ),
-        Point( corners[ 0 ].x(), corners[ 1 ].y(), corners[ 1 ].z() ),
-      };
-
-      brick_entry.distance_ = std::numeric_limits< double >::min();
-      for ( int i = 0; i < 8; ++i )
-      {
-        double dist = ( vertex_pos[ i ] - eyep ).length();
-        brick_entry.distance_ = Max( brick_entry.distance_, dist );
-      }
+      brick_entry.distance_ = EyeToBoxDistance( eyep, this->view_dir_, brick_bbox );
     }
     
     sorted_bricks.push( brick_entry );
@@ -624,7 +662,7 @@ void VolumeRenderer::initialize()
 
 void VolumeRenderer::render( DataVolumeHandle volume, const View3D& view, 
               double sample_rate, bool enable_lighting, bool enable_fog, 
-              bool one_brick, bool orthographic )
+              double scale, double bias, bool orthographic )
 {
   std::vector< DataVolumeBrickHandle > bricks;
   volume->get_bricks( bricks );
@@ -654,16 +692,13 @@ void VolumeRenderer::render( DataVolumeHandle volume, const View3D& view,
     static_cast< float >( this->private_->voxel_size_[ 2 ] ) );
   this->private_->volume_shader_->set_lighting( enable_lighting );
   this->private_->volume_shader_->set_fog( enable_fog );
+  this->private_->volume_shader_->set_scale_bias( static_cast< float >( scale ), 
+    static_cast< float >( bias ) );
 
   while ( !brick_queue.empty() )
   {
     this->private_->render_brick( brick_queue.top().brick_ );
     brick_queue.pop();
-    if ( one_brick )
-    {
-      break;
-    }
-    
   }
 
   this->private_->volume_shader_->disable();

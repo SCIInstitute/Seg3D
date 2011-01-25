@@ -709,7 +709,8 @@ bool Renderer::render()
     bool enable_clipping = viewer->volume_enable_clipping_state_->get();
     bool draw_slices = viewer->volume_slices_visible_state_->get();
     bool draw_isosurfaces = viewer->volume_isosurfaces_visible_state_->get();
-    bool render_volume = true;
+    bool render_volume = viewer->volume_volume_rendering_visible_state_->get();
+    double sample_rate = ViewerManager::Instance()->volume_sample_rate_state_->get();
     bool draw_bbox = viewer->volume_show_bounding_box_state_->get();
     bool show_invisible_slices = viewer->volume_show_invisible_slices_state_->get();
     size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
@@ -824,16 +825,24 @@ bool Renderer::render()
       this->private_->isosurface_shader_->disable();
     }
 
-    //if ( render_volume )
-    //{
-    //  LayerHandle layer = LayerManager::Instance()->get_active_layer();
-    //  if ( layer && layer->get_type() == Core::VolumeType::DATA_E )
-    //  {
-    //    DataLayer* data_layer = static_cast< DataLayer* >( layer.get() );
-    //    this->private_->volume_renderer_->render( data_layer->get_data_volume(), 
-    //      view3d, 5, with_lighting, with_fog, draw_bbox );
-    //  }
-    //}
+    if ( render_volume )
+    {
+      LayerHandle layer = LayerManager::Instance()->get_active_layer();
+      if ( layer && layer->get_type() == Core::VolumeType::DATA_E )
+      {
+        DataLayer* data_layer = static_cast< DataLayer* >( layer.get() );
+        double data_min = data_layer->min_value_state_->get();
+        double data_range = data_layer->max_value_state_->get() - data_min;
+        double display_max = data_layer->display_max_value_state_->get();
+        double window_size = display_max - data_layer->display_min_value_state_->get();
+        window_size = Core::Max( 0.01 * data_range, window_size );
+        double scale = data_range > 0 ? data_range / window_size : 1.0;
+        double bias = data_range > 0 ? 1.0 - ( scale * display_max
+          - data_min ) / data_range : 0.0;
+        this->private_->volume_renderer_->render( data_layer->get_data_volume(), 
+          view3d, sample_rate, with_lighting, with_fog, scale, bias );
+      }
+    }
 
     if ( draw_bbox )
     {

@@ -61,6 +61,8 @@ public:
   void handle_layer_volume_changed( LayerHandle layer );
   void change_layout( std::string layout );
   void handle_fog_density_changed();
+  void handle_sample_rate_changed();
+
   void update_clipping_range();
   void update_clipping_range( size_t index );
   void handle_clipping_plane_changed( size_t index );
@@ -438,6 +440,18 @@ void ViewerManagerPrivate::handle_fog_density_changed()
   }
 }
 
+void ViewerManagerPrivate::handle_sample_rate_changed()
+{
+  for ( size_t i = 0; i < 6; ++i )
+  {
+    if ( this->viewers_[ i ]->is_volume_view() &&
+      this->viewers_[ i ]->volume_volume_rendering_visible_state_->get() )
+    {
+      this->viewers_[ i ]->redraw_scene();
+    }
+  }
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Class ViewerManager
 //////////////////////////////////////////////////////////////////////////
@@ -474,6 +488,10 @@ ViewerManager::ViewerManager() :
   this->add_state( "fog_density", this->fog_density_state_, 1.0, 0.1, 5.0, 0.1 );
   this->add_connection( this->fog_density_state_->state_changed_signal_.connect(
     boost::bind( &ViewerManagerPrivate::handle_fog_density_changed, this->private_ ) ) );
+
+  this->add_state( "sample_rate", this->volume_sample_rate_state_, 1.0, 0.1, 100.0, 0.1 );
+  this->add_connection( this->volume_sample_rate_state_->state_changed_signal_.connect(
+    boost::bind( &ViewerManagerPrivate::handle_sample_rate_changed, this->private_ ) ) );
 
   for ( size_t i = 0; i < 6; ++i )
   {
@@ -531,8 +549,10 @@ ViewerManager::ViewerManager() :
 
   this->add_state( "show_fog_control", this->show_fog_control_state_, false );
   this->add_state( "show_clipping_control", this->show_clipping_control_state_, false );
+  this->add_state( "show_vr_control", this->show_volume_rendering_control_state_, false );
   this->private_->visibility_group_.add_boolean_state( this->show_fog_control_state_ );
   this->private_->visibility_group_.add_boolean_state( this->show_clipping_control_state_ );
+  this->private_->visibility_group_.add_boolean_state( this->show_volume_rendering_control_state_ );
 
   // No viewer will be the active viewer for picking
   // NOTE: The interface will set this up

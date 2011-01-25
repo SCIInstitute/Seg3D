@@ -51,7 +51,8 @@ public:
 
   void initialize();
   void render( DataVolumeHandle volume, const View3D& view, double sample_rate,
-    bool enable_lighting, bool enable_fog, bool one_brick, bool orthographic = false ); 
+    bool enable_lighting, bool enable_fog, double scale, double bias, 
+    bool orthographic = false ); 
 
 private:
   VolumeRendererPrivateHandle private_;

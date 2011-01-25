@@ -1065,6 +1065,8 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
     boost::bind( &Viewer::redraw_scene, this ) ) );
   this->add_connection( this->volume_isosurfaces_visible_state_->state_changed_signal_.
     connect( boost::bind( &Viewer::redraw_scene, this ) ) );
+  this->add_connection( this->volume_volume_rendering_visible_state_->state_changed_signal_.
+    connect( boost::bind( &Viewer::redraw_scene, this ) ) );
   this->add_connection( this->volume_show_invisible_slices_state_->state_changed_signal_.
     connect( boost::bind( &Viewer::redraw_scene, this ) ) );
   this->add_connection( this->volume_show_bounding_box_state_->state_changed_signal_.connect(

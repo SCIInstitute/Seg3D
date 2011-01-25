@@ -134,6 +134,9 @@ public:
   // The density of the fog in 3D view
   Core::StateRangedDoubleHandle fog_density_state_;
 
+  // The sampling rate of volume rendering
+  Core::StateRangedDoubleHandle volume_sample_rate_state_;
+
   // Clipping planes enabled state
   Core::StateBoolHandle enable_clip_plane_state_[ 6 ];
 
@@ -157,6 +160,9 @@ public:
 
   // Whether to show controls for clipping
   Core::StateBoolHandle show_clipping_control_state_;
+
+  // Whether to show controls for volume rendering
+  Core::StateBoolHandle show_volume_rendering_control_state_;
 
   // TODO: The next ones should not be state variables
   // --JGS

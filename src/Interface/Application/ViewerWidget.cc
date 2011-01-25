@@ -164,9 +164,6 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
   this->private_->render_widget_->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
   this->private_->ui_.viewer_layout_->addWidget( this->private_->render_widget_ );
   
-  // Hide the buttons we don't use yet
-  this->private_->ui_.volume_rendering_visible_button_->hide();
-
   // Update state of the widget to reflect current state
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
@@ -253,6 +250,8 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
     QtUtils::QtBridge::Show( this->private_->ui_.show_invisible_slices_button_,
       viewer->view_mode_state_, show_buttons_condition );
     QtUtils::QtBridge::Show( this->private_->ui_.show_bounding_box_button_,
+      viewer->view_mode_state_, show_buttons_condition );
+    QtUtils::QtBridge::Show( this->private_->ui_.volume_rendering_visible_button_,
       viewer->view_mode_state_, show_buttons_condition );
 
     // When view mode changes, we need to rearrange the toolbar and update the flip buttons

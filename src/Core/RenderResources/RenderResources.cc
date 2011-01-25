@@ -378,7 +378,10 @@ void RenderResources::delete_shader( unsigned int shader_id )
   }
 
   lock_type lock( RenderResources::GetMutex() );
-  glDeleteShader( shader_id );
+  if ( glIsShader( shader_id ) )
+  {
+    glDeleteShader( shader_id );
+  }
   CORE_CHECK_OPENGL_ERROR();
 }
 

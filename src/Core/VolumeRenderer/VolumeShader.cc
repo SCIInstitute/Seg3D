@@ -98,6 +98,7 @@ bool VolumeShader::initialize()
   this->tex_bbox_size_loc_ = this->glsl_prog_->get_uniform_location( "tex_bbox_size" );
   this->texel_size_loc_ = this->glsl_prog_->get_uniform_location( "texel_size" );
   this->voxel_size_loc_ = this->glsl_prog_->get_uniform_location( "voxel_size" );
+  this->scale_bias_loc_ = this->glsl_prog_->get_uniform_location( "scale_bias" );
   this->glsl_prog_->disable();
 
   this->valid_ = true;
@@ -149,6 +150,11 @@ void VolumeShader::set_texel_size( float x, float y, float z )
 void VolumeShader::set_voxel_size( float x, float y, float z )
 {
   glUniform3f( this->voxel_size_loc_, x, y, z );
+}
+
+void VolumeShader::set_scale_bias( float scale, float bias )
+{
+  glUniform2f( this->scale_bias_loc_, scale, bias );
 }
 
 } // end namespace Seg3D

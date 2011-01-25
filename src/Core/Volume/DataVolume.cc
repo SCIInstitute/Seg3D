@@ -69,7 +69,7 @@ public:
 };
 
 const unsigned int DataVolumePrivate::BRICK_SIZE_C = 256;
-const unsigned int DataVolumePrivate::OVERLAP_SIZE_C = 1;
+const unsigned int DataVolumePrivate::OVERLAP_SIZE_C = 2;
 
 template< class DST_TYPE, class SRC_TYPE >
 void DataVolumePrivate::copy_typed_data( DST_TYPE* buffer, size_t x_start, size_t x_end, 

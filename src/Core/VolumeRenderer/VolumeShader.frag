@@ -5,6 +5,7 @@ uniform sampler3D vol_tex;
 
 uniform vec3 texel_size; // texel size in texture space
 uniform vec3 voxel_size; // voxel size in world space
+uniform vec2 scale_bias;
 
 uniform bool enable_lighting;
 uniform bool enable_fog;
@@ -34,29 +35,36 @@ vec4 compute_lighting( vec3 normal )
   {
     color += ( diffuse * n_dot_l + ambient );
     
-    half_v = normalize(half_vector);
-    n_dot_hv = max( dot ( normal, half_v ), 0.0 );
-    color += gl_FrontMaterial.specular * gl_LightSource[0].specular * 
-            pow( n_dot_hv, gl_FrontMaterial.shininess );
+    //half_v = normalize(half_vector);
+    //n_dot_hv = max( dot ( normal, half_v ), 0.0 );
+    //color += gl_FrontMaterial.specular * gl_LightSource[0].specular * 
+    //        pow( n_dot_hv, gl_FrontMaterial.shininess );
   }
 
   return color;
 }
 
+float texture_lookup( vec3 tex_coord )
+{
+  float val = texture3D( vol_tex, tex_coord ).a;
+  val = val * scale_bias[0] + scale_bias[1];
+  return val;
+}
+
 void main()
 {
-  float voxel_val = texture3D( vol_tex, gl_TexCoord[0].stp ).a;
-  vec4 voxel_color = vec4( voxel_val );
+  float voxel_val = texture_lookup( gl_TexCoord[0].stp );
+  vec4 voxel_color = vec4( 1.0, 1.0, 1.0, voxel_val );
 
   if ( enable_lighting )
   {
     vec3 gradient;
-    gradient.x = ( texture3D( vol_tex, gl_TexCoord[0].stp + vec3( texel_size.x, 0.0, 0.0 ) ).a -
-      texture3D( vol_tex, gl_TexCoord[0].stp - vec3( texel_size.x, 0.0, 0.0 ) ).a ) / ( 2.0 * voxel_size.x );
-    gradient.y = ( texture3D( vol_tex, gl_TexCoord[0].stp + vec3( 0.0, texel_size.y, 0.0 ) ).a -
-      texture3D( vol_tex, gl_TexCoord[0].stp - vec3( 0.0, texel_size.y, 0.0 ) ).a ) / ( 2.0 * voxel_size.y );
-    gradient.z = ( texture3D( vol_tex, gl_TexCoord[0].stp + vec3( 0.0, 0.0, texel_size.z ) ).a -
-      texture3D( vol_tex, gl_TexCoord[0].stp - vec3( 0.0, 0.0, texel_size.z ) ).a ) / ( 2.0 * voxel_size.z );
+    gradient.x = ( texture_lookup( gl_TexCoord[0].stp + vec3( texel_size.x, 0.0, 0.0 ) ) -
+      texture_lookup( gl_TexCoord[0].stp - vec3( texel_size.x, 0.0, 0.0 ) ) ) / ( 2.0 * voxel_size.x );
+    gradient.y = ( texture_lookup( gl_TexCoord[0].stp + vec3( 0.0, texel_size.y, 0.0 ) ) -
+      texture_lookup( gl_TexCoord[0].stp - vec3( 0.0, texel_size.y, 0.0 ) ) ) / ( 2.0 * voxel_size.y );
+    gradient.z = ( texture_lookup( gl_TexCoord[0].stp + vec3( 0.0, 0.0, texel_size.z ) ) -
+      texture_lookup( gl_TexCoord[0].stp - vec3( 0.0, 0.0, texel_size.z ) ) ) / ( 2.0 * voxel_size.z );
     gradient = normalize( gradient );
     voxel_color.rgb = ( voxel_color * compute_lighting( gradient ) ).rgb;
   }
