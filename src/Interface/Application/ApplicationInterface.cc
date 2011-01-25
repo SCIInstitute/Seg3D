@@ -281,8 +281,7 @@ void ApplicationInterface::closeEvent( QCloseEvent* event )
   // We are going to save the PreferencesManager when we exit
   ActionSavePreferences::Dispatch( Core::Interface::GetWidgetActionContext() );
   
-  if ( ProjectManager::Instance()->current_project_->is_valid() && 
-    ProjectManager::Instance()->current_project_->check_project_changed() )
+  if ( ProjectManager::Instance()->current_project_->check_project_changed() )
   {
 
     // Check whether the users wants to save and whether the user wants to quit

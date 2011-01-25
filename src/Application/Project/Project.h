@@ -112,24 +112,6 @@ public:
   // this function will save the current project as a new project
   bool save_as( boost::filesystem::path path, const std::string& project_name );
 
-  
-  // NAME_IS_SET:
-  // this function is set called to set the name_set_ toggle in the project so it knows if the name
-  // has actually been set.
-  void set_valid( bool set )
-  { 
-    this->valid_ = set; 
-  }
-  
-  // NAME_STATUS:
-  // this function is called to check the status of the project name.  This is because we get a 
-  // signal that the project name has changed the first time it gets set.  This is a temporary 
-  // stopgap until we can implement signal blocking
-  bool is_valid()
-  {
-    return this->valid_; 
-  }
-
   // GET_SESSION_NAME:
   // this function gets the name of a session at an index of the projects session list, this is 
   // used for display what session you are loading when you load a session.
@@ -191,9 +173,6 @@ public:
 private:
   // Session current using
   SessionHandle current_session_;
-
-  // whether a name has been assigned
-  bool valid_;
   
   // Where to save the project
   boost::filesystem::path project_path_;

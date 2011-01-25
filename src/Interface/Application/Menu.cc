@@ -621,7 +621,7 @@ void Menu::open_project_folder()
     } 
     return;
   }
-  CORE_LOG_ERROR( "There current project path seems to be invalid." );
+  CORE_LOG_ERROR( "The current project path seems to be invalid." );
 }
 
 void Menu::set_recent_file_list()
