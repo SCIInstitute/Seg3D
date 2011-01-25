@@ -371,7 +371,7 @@ public:
   // Parallelized isosurface computation algorithm 
   void parallel_compute_faces( int thread, int num_threads, boost::barrier& barrier );
 
-  void translate_border_coords( int border_face_num, size_t i, size_t j, size_t& x, size_t& y, size_t& z );
+  void translate_border_coords( int border_face_num, float i, float j, float& x, float& y, float& z );
 
   // COMPUTE_CAP_FACES:
   // Compute the "cap" faces at the boundary of the mask volume to handle the case where the 
@@ -1149,8 +1149,10 @@ void IsosurfacePrivate::parallel_compute_faces( int thread, int num_threads,
 }
 
 //  Translates border face coords (i, j) to volume coords (x, y, z).  
-void IsosurfacePrivate::translate_border_coords( int border_face_num, size_t i, size_t j, 
-  size_t& x, size_t& y, size_t& z )
+
+
+void IsosurfacePrivate::translate_border_coords( int border_face_num, float i, float j, 
+  float& x, float& y, float& z )
 {
   size_t nx = this->orig_mask_volume_->get_mask_data_block()->get_nx();
   size_t ny = this->orig_mask_volume_->get_mask_data_block()->get_ny();
@@ -1176,15 +1178,15 @@ void IsosurfacePrivate::translate_border_coords( int border_face_num, size_t i, 
     case 3: // x, y, z = nz - 1 (back)
       x = i;
       y = j;
-      z = nz - 1;
+      z = static_cast< float >( nz - 1 );
       break;
     case 4: // x, z, y = ny - 1 (bottom)
       x = i;
-      y = ny - 1;
+      y = static_cast< float >( ny - 1 );
       z = j;
       break;
     case 5: // y, z, x = nx - 1 (right)
-      x = nx - 1;
+      x = static_cast< float >( nx - 1 );
       y = i;
       z = j;
       break;
@@ -1229,6 +1231,7 @@ Basic ideas:
   means that the canonical point indices must include both nodes and edge points, amounting to 
   8 canonical indices for a cell (4 nodes, 4 edge points).
 */
+// Naive implementation -- needs to be optimized!
 void IsosurfacePrivate::compute_cap_faces()
 {
   // type_table = CAPPING_TABLE_C 
@@ -1263,9 +1266,9 @@ void IsosurfacePrivate::compute_cap_faces()
     std::vector< unsigned char > cell_types( num_cells );
     // Loop through all 2D cells 
     size_t cell_index = 0;
-    for( size_t j = 0; j < nj - 1; j++ )
+    for( float j = 0; j < nj - 1; j++ )
     {
-      for( size_t i = 0; i < ni - 1; i++ )
+      for( float i = 0; i < ni - 1; i++ )
       {
         // Build type
         // type = index into polygonal configuration table
@@ -1273,21 +1276,21 @@ void IsosurfacePrivate::compute_cap_faces()
 
         // A 4 bit index is formed where each bit corresponds to a vertex 
         // Bit on if vertex is inside surface, off otherwise
-        size_t x, y, z;
+        float x, y, z;
         this->translate_border_coords( border_face_num, i, j, x, y, z ); 
-        size_t data_index = ( z * nx * ny ) + ( y * nx ) + x;
+        size_t data_index = static_cast< size_t >( ( z * nx * ny ) + ( y * nx ) + x );
         if ( this->data_[ data_index ] & this->mask_value_ )  cell_type |= 0x1;
         
         this->translate_border_coords( border_face_num, i + 1, j, x, y, z ); 
-        data_index = ( z * nx * ny ) + ( y * nx ) + x;
+        data_index = static_cast< size_t >( ( z * nx * ny ) + ( y * nx ) + x );
         if ( this->data_[ data_index ] & this->mask_value_ )  cell_type |= 0x2;
 
         this->translate_border_coords( border_face_num, i + 1, j + 1, x, y, z ); 
-        data_index = ( z * nx * ny ) + ( y * nx ) + x;
+        data_index = static_cast< size_t >( ( z * nx * ny ) + ( y * nx ) + x );
         if ( this->data_[ data_index ] & this->mask_value_ )  cell_type |= 0x4;
 
         this->translate_border_coords( border_face_num, i, j + 1, x, y, z ); 
-        data_index = ( z * nx * ny ) + ( y * nx ) + x;
+        data_index = static_cast< size_t >( ( z * nx * ny ) + ( y * nx ) + x );
         if ( this->data_[ data_index ] & this->mask_value_ )  cell_type |= 0x8;
 
         cell_types[ cell_index ] = cell_type;
@@ -1299,70 +1302,217 @@ void IsosurfacePrivate::compute_cap_faces()
 
     // Create translation table (2D matrix storing indices into actual points vector)
     // size_t point_trans_table[num cells = (nx - 1) * (ny - 1)][8 canonical indices (4 nodes, 4 edge points)]
-    std::vector< std::vector< size_t > > point_trans_table( num_cells, std::vector< size_t >( 8 ) );
+    std::vector< std::vector< unsigned int > > 
+      point_trans_table( num_cells, std::vector< unsigned int >( 8 ) );
+
+    // Get mask transform from MaskVolume 
+    GridTransform grid_transform = this->compute_mask_volume_->get_grid_transform();
 
     // All border nodes that are "on" are included as points because they are all adjacent to 
     // the imaginary padding that is "off." 
-    // Loop through all 2D cells 
-    for( size_t j = 0; j < nj - 1; j++ )
+    // Loop through all nodes
+    for( float j = 0; j < nj; j++ )
     {
-      for( size_t i = 0; i < ni - 1; i++ )
+      for( float i = 0; i < ni; i++ )
       {
         // Translate (i, j) to (x, y, z) for this face
-        size_t x, y, z;
+        float x, y, z;
         this->translate_border_coords( border_face_num, i, j, x, y, z ); 
 
         // Look up mask value at (x, y, z)
-        size_t data_index = ( z * nx * ny ) + ( y * nx ) + x;
+        size_t data_index = static_cast< size_t >( ( z * nx * ny ) + ( y * nx ) + x );
           
         // If mask value on
         if ( this->data_[ data_index ] & this->mask_value_ )
         {
           // Transform point by mask transform
-          // node_point = grid_transform.project( Point( x, y, z);
+          PointF node_point = grid_transform.project( PointF( x, y, z ) );
           // Add node to the points list.
-          // this->points_.push_back( node_point );
-          // Add the relevant canonical coordinates to the translation table for adjacent cells.
+          this->points_.push_back( node_point );
+          unsigned int point_index = 
+            static_cast< unsigned int >( this->points_.size() - 1 );
+
+          // Add relevant canonical coordinates to translation table for adjacent cells.
+          // Find indices and canonical coordinates of 1-4 adjacent cells
+
+          // Lower right cell index
+          if( i < ni - 1 && j < nj - 1 )
+          {
+            size_t cell_index = static_cast< size_t >( ( j * ( ni - 1 ) ) + i ); 
+            size_t canonical_coordinate = 0; 
+            point_trans_table[ cell_index ][ canonical_coordinate ] = point_index;
+          }
+          
+          // Lower left cell index
+          if( i > 0 && j < nj - 1 )
+          {
+            size_t cell_index = static_cast< size_t >( ( j * ( ni - 1 ) ) + i - 1 ); 
+            size_t canonical_coordinate = 1; 
+            point_trans_table[ cell_index ][ canonical_coordinate ] = point_index;
+          }
+          
+          // Upper left cell index
+          if( i > 0 && j > 0 )
+          {
+            size_t cell_index = 
+              static_cast< size_t >( ( ( j - 1 ) * ( ni - 1 ) ) + i - 1 ); 
+            size_t canonical_coordinate = 2; 
+            point_trans_table[ cell_index ][ canonical_coordinate ] = point_index;
+          }
+          
+          // Upper right cell index
+          if( i < ni - 1 && j > 0 )
+          {
+            size_t cell_index = static_cast< size_t >( ( ( j - 1 ) * ( ni - 1 ) ) + i ); 
+            size_t canonical_coordinate = 3; 
+            point_trans_table[ cell_index ][ canonical_coordinate ] = point_index;
+          }
         }
       }
     }
 
     // STEP 3: Find edge nodes, add to points list and translation table
 
-    // Check horizontal edges
-      // If edge is "split" (one endpoint node is on and the other is off)
-        // Transform point by mask transform
-        // edge_point = grid_transform.project( Point( x, y, z);
-        // Add edge to the points list.
-        // this->points_.push_back( edge_point );
-        // Add the relevant canonical coordinates to the translation table for adjacent cells.
     // Check vertical edges
-      // If edge is "split" (one endpoint node is on and the other is off)
-        // Transform point by mask transform
-        // edge_point = grid_transform.project( Point( x, y, z);
-        // Add edge to the points list.
-        // this->points_.push_back( edge_point );
-        // Add the relevant canonical coordinates to the translation table for adjacent cells.
+    for( float j = 0; j < nj - 1; j++ )
+    {
+      for( float i = 0; i < ni; i++ )
+      {
+        // Find endpoint nodes
+        float start_x, start_y, start_z;
+        this->translate_border_coords( border_face_num, i, j, start_x, start_y, start_z ); 
+        float end_x, end_y, end_z;
+        this->translate_border_coords( border_face_num, i, j + 1, end_x, end_y, end_z ); 
 
+        size_t start_data_index = 
+          static_cast< size_t >( ( start_z * nx * ny ) + ( start_y * nx ) + start_x );
+        size_t end_data_index = 
+          static_cast< size_t >( ( end_z * nx * ny ) + ( end_y * nx ) + end_x );
+
+        // If edge is "split" (one endpoint node is on and the other is off)
+        unsigned char start_bit = this->data_[ start_data_index ] & this->mask_value_;
+        unsigned char end_bit = this->data_[ end_data_index ] & this->mask_value_;
+        if ( start_bit != end_bit )
+        {
+          // Find edge point
+          float edge_x, edge_y, edge_z;
+          this->translate_border_coords( border_face_num, i, j + 0.5f, 
+            edge_x, edge_y, edge_z ); 
+
+          // Transform point by mask transform
+          PointF edge_point = grid_transform.project( PointF( edge_x, edge_y, edge_z) );
+          // Add edge to the points list.
+          this->points_.push_back( edge_point );
+          unsigned int point_index = 
+            static_cast< unsigned int >( this->points_.size() - 1 );
+
+          // Add the relevant canonical coordinates to the translation table for adjacent 1-2 cells.
+
+          // Left cell index
+          if( i > 0 )
+          {
+            size_t cell_index = static_cast< size_t >( ( j * ( ni - 1 ) ) + i - 1 ); 
+            size_t canonical_coordinate = 5; 
+            point_trans_table[ cell_index ][ canonical_coordinate ] = point_index;
+          }
+
+          // Right cell index
+          if( i < ni - 1 )
+          {
+            size_t cell_index = static_cast< size_t >( ( j * ( ni - 1 ) ) + i ); 
+            size_t canonical_coordinate = 7; 
+            point_trans_table[ cell_index ][ canonical_coordinate ] = point_index;
+          }
+        }
+      }
+    }
+
+    // Check horizontal edges
+    for( float j = 0; j < nj; j++ )
+    {
+      for( float i = 0; i < ni - 1; i++ )
+      {
+        // Find endpoint nodes
+        float start_x, start_y, start_z;
+        this->translate_border_coords( border_face_num, i, j, start_x, start_y, start_z ); 
+        float end_x, end_y, end_z;
+        this->translate_border_coords( border_face_num, i + 1, j, end_x, end_y, end_z ); 
+
+        size_t start_data_index = 
+          static_cast< size_t >( ( start_z * nx * ny ) + ( start_y * nx ) + start_x );
+        size_t end_data_index = 
+          static_cast< size_t >( ( end_z * nx * ny ) + ( end_y * nx ) + end_x );
+
+        // If edge is "split" (one endpoint node is on and the other is off)
+        unsigned char start_bit = this->data_[ start_data_index ] & this->mask_value_;
+        unsigned char end_bit = this->data_[ end_data_index ] & this->mask_value_;
+        if ( start_bit != end_bit )
+        {
+          // Find edge point
+          float edge_x, edge_y, edge_z;
+          this->translate_border_coords( border_face_num, i + 0.5f, j, 
+            edge_x, edge_y, edge_z ); 
+
+          // Transform point by mask transform
+          PointF edge_point = grid_transform.project( PointF( edge_x, edge_y, edge_z) );
+          // Add edge to the points list.
+          this->points_.push_back( edge_point );
+          unsigned int point_index = 
+            static_cast< unsigned int >( this->points_.size() - 1 );
+
+          // Add the relevant canonical coordinates to the translation table for adjacent 1-2 cells.
+
+          // Upper cell index
+          if( j > 0 )
+          {
+            size_t cell_index = static_cast< size_t >( ( ( j - 1 ) * ( ni - 1 ) ) + i ); 
+            size_t canonical_coordinate = 6; 
+            point_trans_table[ cell_index ][ canonical_coordinate ] = point_index;
+          }
+
+          // Lower cell index
+          if( j < nj - 1 )
+          {
+            size_t cell_index = static_cast< size_t >( ( j * ( ni - 1 ) ) + i ); 
+            size_t canonical_coordinate = 4; 
+            point_trans_table[ cell_index ][ canonical_coordinate ] = point_index;
+          }
+        }
+      }
+    }
+    
     // STEP 4: Create face geometry (points + triangle indices)
 
     // Add points list to existing vertex list
     // For each cell
-    // for( cell_index = 0; cell_index < ( ni - 1 ) * ( nj - 1 ); cell_index++ )
+    for( size_t cell_index = 0; cell_index < num_cells; cell_index++ )
+    {
       // Lookup cell type (already stored in a 1D vector)
-      // unsigned char cell_type = cell_types[ cell_index ];
+      unsigned char cell_type = cell_types[ cell_index ];
       
       // Couldn't I just look up type on the fly here?  Or does that make parallelization harder?
       // Look up the facet combo for this type
-      // tesselation = type_table[ cell_type ]
-      // For each face in the facet combo for this type
-      // OR For each triangle in the tesselation for this type
-      // for( triangle_index = 0; triangle_index < test.num_tri_; triangle_index++ )
-        // For each canonical index in the face
-          // Look up the point index in the translation table for this cell 
-          // point_index = point_trans_table[ cell_index ][ canonical index ]
-          // Add this point index to the faces list
-          // this->faces_.push_back( point_index );
+      const CappingTableType& tesselation = CAPPING_TABLE_C[ cell_type ];
+
+      // For each triangle in the tesselation for this type
+      for( int triangle_index = 0; triangle_index < tesselation.num_triangles_; triangle_index++ )
+      {
+        // Find each canonical index in the triangle
+        int canonical_index1 = tesselation.points_[ 3 * triangle_index ];
+        int canonical_index2 = tesselation.points_[ 3 * triangle_index + 1 ];
+        int canonical_index3 = tesselation.points_[ 3 * triangle_index + 2 ];
+
+        // Look up the point index in the translation table for this cell 
+        unsigned int point_index1 = point_trans_table[ cell_index ][ canonical_index1 ];
+        unsigned int point_index2 = point_trans_table[ cell_index ][ canonical_index2 ];
+        unsigned int point_index3 = point_trans_table[ cell_index ][ canonical_index3 ];
+
+        // Add point index to the faces list
+        this->faces_.push_back( point_index1 );
+        this->faces_.push_back( point_index2 );
+        this->faces_.push_back( point_index3 );
+      }
+    }
   }
   
 }
