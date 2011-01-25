@@ -89,6 +89,8 @@ SET(APPLICATION_TOOLS_SRCS
   MedianFilter.cc
   MeanFilter.h
   MeanFilter.cc
+  MeasureTool.h
+  MeasureTool.cc
   NeighborhoodConnectedFilter.h
   NeighborhoodConnectedFilter.cc
   OtsuThresholdFilter.h

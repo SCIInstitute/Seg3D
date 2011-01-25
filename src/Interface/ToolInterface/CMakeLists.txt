@@ -67,6 +67,7 @@ SET(INTERFACE_TOOLINTERFACE_SRCS
   FlipToolInterface.cc
   TransformToolInterface.cc
   ClipboardToolInterface.cc
+  MeasureToolInterface.cc
 )
 
 SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
@@ -105,6 +106,7 @@ SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
   FlipToolInterface.h
   TransformToolInterface.h
   ClipboardToolInterface.h
+  MeasureToolInterface.h
 )
 
 SET(INTERFACE_TOOLINTERFACE_NO_MOC_SRCS
@@ -146,6 +148,7 @@ SET(INTERFACE_TOOLINTERFACE_UI_SRCS
   FlipToolInterface.ui
   TransformToolInterface.ui
   ClipboardToolInterface.ui
+  MeasureToolInterface.ui
 )
 
 ##################################################
