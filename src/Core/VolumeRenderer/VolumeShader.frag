@@ -35,10 +35,10 @@ vec4 compute_lighting( vec3 normal )
   {
     color += ( diffuse * n_dot_l + ambient );
     
-    //half_v = normalize(half_vector);
-    //n_dot_hv = max( dot ( normal, half_v ), 0.0 );
-    //color += gl_FrontMaterial.specular * gl_LightSource[0].specular * 
-    //        pow( n_dot_hv, gl_FrontMaterial.shininess );
+    half_v = normalize(half_vector);
+    n_dot_hv = max( dot ( normal, half_v ), 0.0 );
+    color += gl_FrontMaterial.specular * gl_LightSource[0].specular * 
+            pow( n_dot_hv, gl_FrontMaterial.shininess );
   }
 
   return color;
@@ -54,7 +54,7 @@ float texture_lookup( vec3 tex_coord )
 void main()
 {
   float voxel_val = texture_lookup( gl_TexCoord[0].stp );
-  vec4 voxel_color = vec4( 1.0, 1.0, 1.0, voxel_val );
+  vec4 voxel_color = vec4( voxel_val );
 
   if ( enable_lighting )
   {
