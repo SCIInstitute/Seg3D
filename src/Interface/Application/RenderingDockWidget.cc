@@ -171,11 +171,41 @@ RenderingDockWidget::RenderingDockWidget( QWidget *parent ) :
     ViewerManager::Instance()->clip_plane_reverse_norm_state_[ 5 ] );
   QtUtils::QtBridge::Enable( this->private_->ui_.cp6_params_widget_,
     ViewerManager::Instance()->enable_clip_plane_state_[ 5 ] );
+    
+  connect( this->private_->ui_.enable_cp1_, SIGNAL( clicked( bool ) ), 
+    this, SLOT( set_enabled_tab_appearance( bool ) ) );
+  connect( this->private_->ui_.enable_cp2_, SIGNAL( clicked( bool ) ), 
+    this, SLOT( set_enabled_tab_appearance( bool ) ) );
+  connect( this->private_->ui_.enable_cp3_, SIGNAL( clicked( bool ) ), 
+    this, SLOT( set_enabled_tab_appearance( bool ) ) );
+  connect( this->private_->ui_.enable_cp4_, SIGNAL( clicked( bool ) ), 
+    this, SLOT( set_enabled_tab_appearance( bool ) ) );
+  connect( this->private_->ui_.enable_cp5_, SIGNAL( clicked( bool ) ), 
+    this, SLOT( set_enabled_tab_appearance( bool ) ) );
+  connect( this->private_->ui_.enable_cp6_, SIGNAL( clicked( bool ) ), 
+    this, SLOT( set_enabled_tab_appearance( bool ) ) );
 }
 
 RenderingDockWidget::~RenderingDockWidget()
 {
 
 }
+
+void RenderingDockWidget::set_enabled_tab_appearance( bool enabled )
+{
+  int index = this->private_->ui_.clipping_tabwidget_->currentIndex();
+  
+  if( enabled )
+  {
+    this->private_->ui_.clipping_tabwidget_->
+      setTabText( index, ( "=" + QString::number( index + 1 ) + "=" ) );
+  }
+  else
+  {
+    this->private_->ui_.clipping_tabwidget_->
+      setTabText( index, QString::number( index + 1 ) );
+  }
+}
+
 
 } // end namespace Seg3D

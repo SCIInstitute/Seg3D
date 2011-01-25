@@ -48,6 +48,9 @@ Q_OBJECT
 public:
   RenderingDockWidget( QWidget *parent = 0 );
   ~RenderingDockWidget();
+  
+private Q_SLOTS:
+  void set_enabled_tab_appearance( bool enabled );
 
 private:
   boost::shared_ptr< RenderingDockWidgetPrivate > private_;
