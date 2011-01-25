@@ -6,6 +6,7 @@ uniform sampler3D vol_tex;
 uniform vec3 texel_size; // texel size in texture space
 uniform vec3 voxel_size; // voxel size in world space
 uniform vec2 scale_bias;
+uniform float sample_rate; // Number of samples per voxel
 
 uniform bool enable_lighting;
 uniform bool enable_fog;
@@ -54,7 +55,7 @@ float texture_lookup( vec3 tex_coord )
 void main()
 {
   float voxel_val = texture_lookup( gl_TexCoord[0].stp );
-  vec4 voxel_color = vec4( voxel_val );
+  vec4 voxel_color = vec4( voxel_val, voxel_val, voxel_val, voxel_val/sample_rate );
 
   if ( enable_lighting )
   {

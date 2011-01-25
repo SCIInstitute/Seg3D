@@ -99,6 +99,7 @@ bool VolumeShader::initialize()
   this->texel_size_loc_ = this->glsl_prog_->get_uniform_location( "texel_size" );
   this->voxel_size_loc_ = this->glsl_prog_->get_uniform_location( "voxel_size" );
   this->scale_bias_loc_ = this->glsl_prog_->get_uniform_location( "scale_bias" );
+  this->sample_rate_loc_ = this->glsl_prog_->get_uniform_location( "sample_rate" );
   this->glsl_prog_->disable();
 
   this->valid_ = true;
@@ -155,6 +156,11 @@ void VolumeShader::set_voxel_size( float x, float y, float z )
 void VolumeShader::set_scale_bias( float scale, float bias )
 {
   glUniform2f( this->scale_bias_loc_, scale, bias );
+}
+
+void VolumeShader::set_sample_rate( float sample_rate )
+{
+  glUniform1f( this->sample_rate_loc_, sample_rate );
 }
 
 } // end namespace Seg3D

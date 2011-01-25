@@ -694,6 +694,7 @@ void VolumeRenderer::render( DataVolumeHandle volume, const View3D& view,
   this->private_->volume_shader_->set_fog( enable_fog );
   this->private_->volume_shader_->set_scale_bias( static_cast< float >( scale ), 
     static_cast< float >( bias ) );
+  this->private_->volume_shader_->set_sample_rate( static_cast< float >( sample_rate ) );
 
   while ( !brick_queue.empty() )
   {

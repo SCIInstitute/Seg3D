@@ -55,6 +55,7 @@ public:
   void set_texel_size( float x, float y, float z );
   void set_voxel_size( float x, float y, float z );
   void set_scale_bias( float scale, float bias );
+  void set_sample_rate( float sample_rate );
 
   void set_volume_texture( int tex_unit );
 
@@ -77,6 +78,7 @@ private:
   int texel_size_loc_;
   int voxel_size_loc_;
   int scale_bias_loc_;
+  int sample_rate_loc_;
 
   const static char* VERT_SHADER_SOURCE_C[];
   const static char* FRAG_SHADER_SOURCE_C[];
