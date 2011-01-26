@@ -371,7 +371,7 @@ public:
   // Parallelized isosurface computation algorithm 
   void parallel_compute_faces( int thread, int num_threads, boost::barrier& barrier );
 
-  void translate_border_coords( int border_face_num, float i, float j, float& x, float& y, float& z );
+  void translate_cap_coords( int cap_num, float i, float j, float& x, float& y, float& z );
 
   // COMPUTE_CAP_FACES:
   // Compute the "cap" faces at the boundary of the mask volume to handle the case where the 
@@ -1151,14 +1151,14 @@ void IsosurfacePrivate::parallel_compute_faces( int thread, int num_threads,
 //  Translates border face coords (i, j) to volume coords (x, y, z).  
 
 
-void IsosurfacePrivate::translate_border_coords( int border_face_num, float i, float j, 
+void IsosurfacePrivate::translate_cap_coords( int cap_num, float i, float j, 
   float& x, float& y, float& z )
 {
   size_t nx = this->orig_mask_volume_->get_mask_data_block()->get_nx();
   size_t ny = this->orig_mask_volume_->get_mask_data_block()->get_ny();
   size_t nz = this->orig_mask_volume_->get_mask_data_block()->get_nz();
 
-  switch( border_face_num )
+  switch( cap_num )
   {
     case 0: // x, y, z = 0 (front)
       x = i;
@@ -1220,12 +1220,12 @@ Basic ideas:
   - Normally in marching cubes the edge points are linearly interpolated between the vertex values, but for
   for binary images we always place the edge points in the middle of the edge.
 - Isosurface capping
-  - Generating isosurface geometry for the 6 border faces of the volume is a 2D operation since each
+  - Generating isosurface geometry for the 6 caps of the volume is a 2D operation since each
     of the 6 faces is a 2D image.  Therefore, instead of calling the elements "cubes," we call them 
     "cells."
-  - We need a different facet combo type table for border faces.
-  - For border faces, both nodes and edge center-points can potentially be added to the list of points.  This is 
-    because there would be edge points between the border faces and the imaginary outside padding, but
+  - We need a different facet combo type table for caps.
+  - For caps, both nodes and edge center-points can potentially be added to the list of points.  This is 
+    because there would be edge points between the caps and the imaginary outside padding, but
     these points get clamped to the nodes on the border.  In fact, all border nodes that are "on" are
     included as points because they are all adjacent to the imaginary padding that is "off."  This
   means that the canonical point indices must include both nodes and edge points, amounting to 
@@ -1235,29 +1235,36 @@ Basic ideas:
 void IsosurfacePrivate::compute_cap_faces()
 {
   // type_table = CAPPING_TABLE_C 
-  // TODO Figure out how to handle x/y/z indices for border faces so that code doesn't have to
-  // be duplicated for each face
+  // TODO Figure out how to handle x/y/z indices for caps so that code doesn't have to
+  // be duplicated for each cap
     
   // Solution A: have function that translates (i, j) to (x, y, z).  Try this first.
-  // Solution B (faster): Have (i, j, k) Vector offsets based on face.  Add at end of loops.
+  // Solution B (faster): Have (i, j, k) Vector offsets based on cap.  Add at end of loops.
 
-  // Process 6 border faces independently.  At most this will duplicate volume edge nodes twice.
-  // For each of 6 border faces
+  // Process 6 caps independently.  At most this will duplicate volume edge nodes twice.
+  // For each of 6 caps
   size_t nx = this->orig_mask_volume_->get_mask_data_block()->get_nx();
   size_t ny = this->orig_mask_volume_->get_mask_data_block()->get_ny();
   size_t nz = this->orig_mask_volume_->get_mask_data_block()->get_nz();
-  std::vector< std::pair< size_t, size_t > > border_face_dimensions;
-  border_face_dimensions.push_back( std::make_pair( nx, ny ) ); // front and back faces
-  border_face_dimensions.push_back( std::make_pair( nx, nz ) ); // top and bottom faces
-  border_face_dimensions.push_back( std::make_pair( ny, nz ) ); // left and right side faces
+  std::vector< std::pair< size_t, size_t > > cap_dimensions;
+  cap_dimensions.push_back( std::make_pair( nx, ny ) ); // front and back caps
+  cap_dimensions.push_back( std::make_pair( nx, nz ) ); // top and bottom caps
+  cap_dimensions.push_back( std::make_pair( ny, nz ) ); // left and right side caps
 
-  for( int border_face_num = 0; border_face_num < 6; border_face_num++ )
+  // TODO Create a patch for each cap 
+  /*this->private_->part_points_.push_back( std::make_pair<unsigned int, unsigned int>(
+    min_point_index, this->private_->max_point_index_[ j ] ) );
+  this->private_->part_faces_.push_back( std::make_pair<unsigned int, unsigned int>(
+    min_face_index, this->private_->max_face_index_[ j ] ) );*/
+
+  for( int cap_num = 0; cap_num < 6; cap_num++ )
   {
+    // Each 
     // STEP 1: Find cell types
 
     // Calculate ni, nj for this face
-    size_t ni = border_face_dimensions[ border_face_num % 3 ].first;
-    size_t nj = border_face_dimensions[ border_face_num % 3 ].second;
+    size_t ni = cap_dimensions[ cap_num % 3 ].first;
+    size_t nj = cap_dimensions[ cap_num % 3 ].second;
 
     // Since each cell has 4 nodes, we only need a char to represent the type.  Only using bits
     // 0 - 3.
@@ -1277,19 +1284,19 @@ void IsosurfacePrivate::compute_cap_faces()
         // A 4 bit index is formed where each bit corresponds to a vertex 
         // Bit on if vertex is inside surface, off otherwise
         float x, y, z;
-        this->translate_border_coords( border_face_num, i, j, x, y, z ); 
+        this->translate_cap_coords( cap_num, i, j, x, y, z ); 
         size_t data_index = static_cast< size_t >( ( z * nx * ny ) + ( y * nx ) + x );
         if ( this->data_[ data_index ] & this->mask_value_ )  cell_type |= 0x1;
         
-        this->translate_border_coords( border_face_num, i + 1, j, x, y, z ); 
+        this->translate_cap_coords( cap_num, i + 1, j, x, y, z ); 
         data_index = static_cast< size_t >( ( z * nx * ny ) + ( y * nx ) + x );
         if ( this->data_[ data_index ] & this->mask_value_ )  cell_type |= 0x2;
 
-        this->translate_border_coords( border_face_num, i + 1, j + 1, x, y, z ); 
+        this->translate_cap_coords( cap_num, i + 1, j + 1, x, y, z ); 
         data_index = static_cast< size_t >( ( z * nx * ny ) + ( y * nx ) + x );
         if ( this->data_[ data_index ] & this->mask_value_ )  cell_type |= 0x4;
 
-        this->translate_border_coords( border_face_num, i, j + 1, x, y, z ); 
+        this->translate_cap_coords( cap_num, i, j + 1, x, y, z ); 
         data_index = static_cast< size_t >( ( z * nx * ny ) + ( y * nx ) + x );
         if ( this->data_[ data_index ] & this->mask_value_ )  cell_type |= 0x8;
 
@@ -1315,9 +1322,9 @@ void IsosurfacePrivate::compute_cap_faces()
     {
       for( float i = 0; i < ni; i++ )
       {
-        // Translate (i, j) to (x, y, z) for this face
+        // Translate (i, j) to (x, y, z) for this cap
         float x, y, z;
-        this->translate_border_coords( border_face_num, i, j, x, y, z ); 
+        this->translate_cap_coords( cap_num, i, j, x, y, z ); 
 
         // Look up mask value at (x, y, z)
         size_t data_index = static_cast< size_t >( ( z * nx * ny ) + ( y * nx ) + x );
@@ -1380,9 +1387,9 @@ void IsosurfacePrivate::compute_cap_faces()
       {
         // Find endpoint nodes
         float start_x, start_y, start_z;
-        this->translate_border_coords( border_face_num, i, j, start_x, start_y, start_z ); 
+        this->translate_cap_coords( cap_num, i, j, start_x, start_y, start_z ); 
         float end_x, end_y, end_z;
-        this->translate_border_coords( border_face_num, i, j + 1, end_x, end_y, end_z ); 
+        this->translate_cap_coords( cap_num, i, j + 1, end_x, end_y, end_z ); 
 
         size_t start_data_index = 
           static_cast< size_t >( ( start_z * nx * ny ) + ( start_y * nx ) + start_x );
@@ -1396,7 +1403,7 @@ void IsosurfacePrivate::compute_cap_faces()
         {
           // Find edge point
           float edge_x, edge_y, edge_z;
-          this->translate_border_coords( border_face_num, i, j + 0.5f, 
+          this->translate_cap_coords( cap_num, i, j + 0.5f, 
             edge_x, edge_y, edge_z ); 
 
           // Transform point by mask transform
@@ -1434,9 +1441,9 @@ void IsosurfacePrivate::compute_cap_faces()
       {
         // Find endpoint nodes
         float start_x, start_y, start_z;
-        this->translate_border_coords( border_face_num, i, j, start_x, start_y, start_z ); 
+        this->translate_cap_coords( cap_num, i, j, start_x, start_y, start_z ); 
         float end_x, end_y, end_z;
-        this->translate_border_coords( border_face_num, i + 1, j, end_x, end_y, end_z ); 
+        this->translate_cap_coords( cap_num, i + 1, j, end_x, end_y, end_z ); 
 
         size_t start_data_index = 
           static_cast< size_t >( ( start_z * nx * ny ) + ( start_y * nx ) + start_x );
@@ -1450,7 +1457,7 @@ void IsosurfacePrivate::compute_cap_faces()
         {
           // Find edge point
           float edge_x, edge_y, edge_z;
-          this->translate_border_coords( border_face_num, i + 0.5f, j, 
+          this->translate_cap_coords( cap_num, i + 0.5f, j, 
             edge_x, edge_y, edge_z ); 
 
           // Transform point by mask transform
