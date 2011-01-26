@@ -48,14 +48,15 @@ vec4 compute_lighting( vec3 normal )
 float texture_lookup( vec3 tex_coord )
 {
   float val = texture3D( vol_tex, tex_coord ).a;
-  val = val * scale_bias[0] + scale_bias[1];
+  val = clamp( val * scale_bias[0] + scale_bias[1], 0.0, 1.0 );
   return val;
 }
 
 void main()
 {
   float voxel_val = texture_lookup( gl_TexCoord[0].stp );
-  vec4 voxel_color = vec4( voxel_val, voxel_val, voxel_val, voxel_val/sample_rate );
+  vec4 voxel_color = vec4( voxel_val, voxel_val, voxel_val, 
+    1.0 - pow( 1.0- voxel_val, 1.0 / sample_rate ) );
 
   if ( enable_lighting )
   {

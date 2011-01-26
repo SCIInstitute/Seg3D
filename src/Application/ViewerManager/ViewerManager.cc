@@ -489,7 +489,7 @@ ViewerManager::ViewerManager() :
   this->add_connection( this->fog_density_state_->state_changed_signal_.connect(
     boost::bind( &ViewerManagerPrivate::handle_fog_density_changed, this->private_ ) ) );
 
-  this->add_state( "sample_rate", this->volume_sample_rate_state_, 1.0, 0.1, 100.0, 0.1 );
+  this->add_state( "sample_rate", this->volume_sample_rate_state_, 1.0, 0.1, 10.0, 0.1 );
   this->add_connection( this->volume_sample_rate_state_->state_changed_signal_.connect(
     boost::bind( &ViewerManagerPrivate::handle_sample_rate_changed, this->private_ ) ) );
 

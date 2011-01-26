@@ -443,8 +443,7 @@ void VolumeRendererPrivate::analyze_volume( DataVolumeHandle volume, double samp
   this->back_vertex_ = ( ~this->front_vertex_ ) & 0x7;
   assert( this->front_vertex_ >= 0 && this->front_vertex_ <= 7 && 
     this->back_vertex_ >= 0 && this->back_vertex_ <= 7 );
-  //this->sample_distance_ = ( max_dist - min_dist ) / sample_rate;
-  this->sample_distance_ = ( voxel_max - voxel_min ).length() / sample_rate;
+  this->sample_distance_ = ( max_dist - min_dist ) / sample_rate;
 
   // Compute the start sampling position for the volume (in back to front order)
   Point vol_bbox_min( -0.5, -0.5, -0.5 );
