@@ -33,6 +33,7 @@
 #include <QtCore/QVariant>
 #include <QtGui/QGridLayout>
 #include <QtGui/QFileDialog>
+#include <QtGui/QMessageBox>
 
 // Core includes
 #include <Core/State/Actions/ActionSet.h>
@@ -147,6 +148,18 @@ bool ExportInfoPage::validatePage()
   boost::filesystem::path new_path = 
     boost::filesystem::path( this->project_path_lineedit_->text().toStdString() ) / 
     boost::filesystem::path( this->project_name_lineedit_->text().toStdString() );
+
+  if( boost::filesystem::exists( new_path ) )
+  {
+    int ret = QMessageBox::critical( this, 
+      "A project with this name already exists!",
+      "A project with this name already exists!\n"
+      "You cannot export onto an existing project.\n"
+      "Choose a different export location",
+      QMessageBox::Ok );
+
+    return false;
+  }
 
   if( !boost::filesystem::exists( new_path.parent_path() ) )
   {

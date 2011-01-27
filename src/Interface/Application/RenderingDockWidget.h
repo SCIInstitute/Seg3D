@@ -32,6 +32,12 @@
 // Boost includes
 #include <boost/shared_ptr.hpp>
 
+// QT includes
+#include <QtCore/QPointer>
+
+// Core includes
+#include <Core/Utils/ConnectionHandler.h>
+
 // QtUtils includes
 #include <QtUtils/Widgets/QtCustomDockWidget.h>
 
@@ -40,7 +46,7 @@ namespace Seg3D
 
 class RenderingDockWidgetPrivate;
 
-class RenderingDockWidget : public QtUtils::QtCustomDockWidget
+class RenderingDockWidget : public QtUtils::QtCustomDockWidget, public Core::ConnectionHandler
 {
 
 Q_OBJECT
@@ -50,10 +56,15 @@ public:
   ~RenderingDockWidget();
   
 private Q_SLOTS:
-  void set_enabled_tab_appearance( bool enabled );
+  void set_enabled_tab_appearance( bool enabled, int index  );
 
 private:
   boost::shared_ptr< RenderingDockWidgetPrivate > private_;
+  
+private:
+  typedef QPointer< RenderingDockWidget > qpointer_type;
+
+  static void HandleClippingPlanesStateChanged( qpointer_type qpointer, bool state, int index );
 
 };
 

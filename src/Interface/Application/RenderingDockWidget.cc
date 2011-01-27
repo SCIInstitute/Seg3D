@@ -35,6 +35,7 @@
 
 // QtUtils includes
 #include <QtUtils/Bridge/QtBridge.h>
+#include <QtUtils/Utils/QtPointer.h>
 
 // Application includes
 #include <Application/ViewerManager/ViewerManager.h>
@@ -52,6 +53,7 @@ class RenderingDockWidgetPrivate
 {
 public:
   Ui::RenderingDockWidget ui_;
+  QButtonGroup* enable_clipping_planes_checkboxes_;
 };
 
 RenderingDockWidget::RenderingDockWidget( QWidget *parent ) :
@@ -61,7 +63,7 @@ RenderingDockWidget::RenderingDockWidget( QWidget *parent ) :
   // Set up the private internals of the LayerManagerInterface class
   this->private_->ui_.setupUi( this );
   this->private_->ui_.dock_widget_layout_->setAlignment( Qt::AlignTop );
-
+  
   QtUtils::QtBridge::Connect( this->private_->ui_.fog_open_button_,
     ViewerManager::Instance()->show_fog_control_state_ );
   QtUtils::QtBridge::Show( this->private_->ui_.fog_content_,
@@ -81,6 +83,21 @@ RenderingDockWidget::RenderingDockWidget( QWidget *parent ) :
     ViewerManager::Instance()->show_volume_rendering_control_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.vr_sample_rate_,
     ViewerManager::Instance()->volume_sample_rate_state_ );
+  
+//  this->private_->enable_clipping_planes_checkboxes_ = new QButtonGroup();
+//  this->private_->enable_clipping_planes_checkboxes_->addButton(
+//    this->private_->ui_.enable_cp1_, 1 );
+//  this->private_->enable_clipping_planes_checkboxes_->addButton(
+//    this->private_->ui_.enable_cp2_, 2 );
+//  this->private_->enable_clipping_planes_checkboxes_->addButton(
+//    this->private_->ui_.enable_cp3_, 3 );
+//  this->private_->enable_clipping_planes_checkboxes_->addButton(
+//    this->private_->ui_.enable_cp4_, 4 );
+//  this->private_->enable_clipping_planes_checkboxes_->addButton(
+//    this->private_->ui_.enable_cp5_, 5 );
+//  this->private_->enable_clipping_planes_checkboxes_->addButton(
+//    this->private_->ui_.enable_cp6_, 6 );
+
 
   QtUtils::QtBridge::Connect( this->private_->ui_.enable_cp1_, 
     ViewerManager::Instance()->enable_clip_plane_state_[ 0 ] );
@@ -171,19 +188,26 @@ RenderingDockWidget::RenderingDockWidget( QWidget *parent ) :
     ViewerManager::Instance()->clip_plane_reverse_norm_state_[ 5 ] );
   QtUtils::QtBridge::Enable( this->private_->ui_.cp6_params_widget_,
     ViewerManager::Instance()->enable_clip_plane_state_[ 5 ] );
+  
+  add_connection( ViewerManager::Instance()->enable_clip_plane_state_[ 0 ]->
+    value_changed_signal_.connect( boost::bind( 
+    &RenderingDockWidget::HandleClippingPlanesStateChanged, qpointer_type( this ), _1, 0 ) ) );
+  add_connection( ViewerManager::Instance()->enable_clip_plane_state_[ 1 ]->
+    value_changed_signal_.connect( boost::bind( 
+    &RenderingDockWidget::HandleClippingPlanesStateChanged, qpointer_type( this ), _1, 1 ) ) );
+  add_connection( ViewerManager::Instance()->enable_clip_plane_state_[ 2 ]->
+    value_changed_signal_.connect( boost::bind( 
+    &RenderingDockWidget::HandleClippingPlanesStateChanged, qpointer_type( this ), _1, 2 ) ) );
+  add_connection( ViewerManager::Instance()->enable_clip_plane_state_[ 3 ]->
+    value_changed_signal_.connect( boost::bind( 
+    &RenderingDockWidget::HandleClippingPlanesStateChanged, qpointer_type( this ), _1, 3 ) ) );
+  add_connection( ViewerManager::Instance()->enable_clip_plane_state_[ 4 ]->
+    value_changed_signal_.connect( boost::bind( 
+    &RenderingDockWidget::HandleClippingPlanesStateChanged, qpointer_type( this ), _1, 4 ) ) );
+  add_connection( ViewerManager::Instance()->enable_clip_plane_state_[ 5 ]->
+    value_changed_signal_.connect( boost::bind( 
+    &RenderingDockWidget::HandleClippingPlanesStateChanged, qpointer_type( this ), _1, 5 ) ) ); 
     
-  connect( this->private_->ui_.enable_cp1_, SIGNAL( clicked( bool ) ), 
-    this, SLOT( set_enabled_tab_appearance( bool ) ) );
-  connect( this->private_->ui_.enable_cp2_, SIGNAL( clicked( bool ) ), 
-    this, SLOT( set_enabled_tab_appearance( bool ) ) );
-  connect( this->private_->ui_.enable_cp3_, SIGNAL( clicked( bool ) ), 
-    this, SLOT( set_enabled_tab_appearance( bool ) ) );
-  connect( this->private_->ui_.enable_cp4_, SIGNAL( clicked( bool ) ), 
-    this, SLOT( set_enabled_tab_appearance( bool ) ) );
-  connect( this->private_->ui_.enable_cp5_, SIGNAL( clicked( bool ) ), 
-    this, SLOT( set_enabled_tab_appearance( bool ) ) );
-  connect( this->private_->ui_.enable_cp6_, SIGNAL( clicked( bool ) ), 
-    this, SLOT( set_enabled_tab_appearance( bool ) ) );
 }
 
 RenderingDockWidget::~RenderingDockWidget()
@@ -191,9 +215,9 @@ RenderingDockWidget::~RenderingDockWidget()
 
 }
 
-void RenderingDockWidget::set_enabled_tab_appearance( bool enabled )
+void RenderingDockWidget::set_enabled_tab_appearance( bool enabled, int index )
 {
-  int index = this->private_->ui_.clipping_tabwidget_->currentIndex();
+  //*int index = this->private_->ui_.clipping_tabwidget_->currentIndex();*/
   
   if( enabled )
   {
@@ -206,6 +230,13 @@ void RenderingDockWidget::set_enabled_tab_appearance( bool enabled )
       setTabText( index, QString::number( index + 1 ) );
   }
 }
+
+void RenderingDockWidget::HandleClippingPlanesStateChanged( qpointer_type qpointer, bool state, int index )
+{
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, 
+    boost::bind( &RenderingDockWidget::set_enabled_tab_appearance, qpointer.data(), state, index ) ) );
+}
+
 
 
 } // end namespace Seg3D

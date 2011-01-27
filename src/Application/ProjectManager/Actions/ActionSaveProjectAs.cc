@@ -78,8 +78,11 @@ bool ActionSaveProjectAs::run( Core::ActionContextHandle& context,
     Core::ActionProgressHandle( new Core::ActionProgress( message ) );
 
   progress->begin_progress_reporting();
+  
+  boost::filesystem::path path = complete( boost::filesystem::path( 
+    this->export_path_.value().c_str(), boost::filesystem::native ) );
 
-  if( ProjectManager::Instance()->project_save_as( this->export_path_.value(),
+  if( ProjectManager::Instance()->project_save_as( path,
     this->project_name_.value() ) )
   {
     success = true;

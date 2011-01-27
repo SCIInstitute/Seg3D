@@ -101,7 +101,7 @@ public:
   // OPEN_PROJECT:
   // this function takes the path to the desired project and loads the values from the file 
   // located at that location
-  void open_project( const std::string& project_path );
+  void open_project( const boost::filesystem::path& project_path );
   
   // SAVE_PROJECT:
   // this function saves the values in current_project_ to the current save location
@@ -115,7 +115,7 @@ public:
     
   // PROJECT_SAVE_AS:
   // this function saves the current project with the desired name and save location 
-  bool project_save_as( const std::string& export_path, const std::string& project_name );
+  bool project_save_as( const boost::filesystem::path& export_path, const std::string& project_name );
   
   // SAVE_PROJECT_MANAGER_STATE:
   // this function calls save_states that writes the state values of ProjectManager to file
@@ -186,12 +186,12 @@ private:
   
   // ADD_TO_RECENT_PROJECTS:
   // this function adds the latest project to the list of recent projects
-  void add_to_recent_projects( const std::string& project_path, 
+  void add_to_recent_projects( const boost::filesystem::path& project_path, 
     const std::string& project_name = "" );
   
   // CREATE_PROJECT_FOLDERS:
   // this will try and create the project folders and if is successfull return true 
-  bool create_project_folders( boost::filesystem::path& path, const std::string& project_name );
+  bool create_project_folders( const boost::filesystem::path& path, const std::string& project_name );
   
   // SAVE_PROJECT_ONLY:
   // this function saves only the project and is used internally only. It returns if it was 

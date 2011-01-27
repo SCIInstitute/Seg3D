@@ -76,6 +76,11 @@ void QtBridge::Connect( QAbstractButton* qbutton, boost::function< void() > func
   new QtAbstractButtonConnector( qbutton, function );
 }
 
+void QtBridge::ConnectBoolean( QAbstractButton* qbutton, boost::function< void( bool ) > function )
+{
+  new QtAbstractButtonConnector( qbutton, function );
+}
+
 void QtBridge::Connect( QAbstractButton* qbutton, 
              std::vector<Core::StateBoolHandle>& state,
              Core::StateIntSetHandle& index)

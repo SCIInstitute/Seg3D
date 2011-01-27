@@ -49,6 +49,9 @@ public:
 
   QtAbstractButtonConnector( QAbstractButton* parent, boost::function< void() > func );
 
+  QtAbstractButtonConnector( QAbstractButton* parent, boost::function< void( bool ) > func );
+
+
   virtual ~QtAbstractButtonConnector();
 
   // -- slot functions for boost signals --
@@ -60,11 +63,14 @@ private:
 private Q_SLOTS:
   void set_state( bool value );
   void call_func();
+  void call_func( bool button_value );
+  
 
 private:
   QAbstractButton* parent_;
   Core::StateBoolHandle state_;
   boost::function< void () > func_;
+  boost::function< void ( bool ) > bool_func_;
 };
 
 }

@@ -78,6 +78,8 @@ public:
   static void Connect( QAbstractButton* qbutton, Core::StateBoolHandle& state );
   
   static void Connect( QAbstractButton* qbutton, boost::function< void() > function );
+  
+  static void ConnectBoolean( QAbstractButton* qbutton, boost::function< void( bool ) > function );
     
   // Connect vector of bools to one button controlled by an index
   static void Connect(  QAbstractButton* qbutton, 

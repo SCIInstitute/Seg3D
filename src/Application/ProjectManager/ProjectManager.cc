@@ -197,7 +197,7 @@ void ProjectManager::new_project( const std::string& project_name, const std::st
 
 }
   
-void ProjectManager::open_project( const std::string& project_path )
+void ProjectManager::open_project( const boost::filesystem::path& project_path )
 { 
   ASSERT_IS_APPLICATION_THREAD();
 
@@ -205,13 +205,12 @@ void ProjectManager::open_project( const std::string& project_path )
   Core::Application::Reset();
   
   this->changing_projects_ = true;
-  boost::filesystem::path path = project_path;
   
-  this->set_project_path( path );
+  this->set_project_path( project_path );
     
-  this->current_project_->initialize_from_file( path.leaf() );
-  this->add_to_recent_projects( path.parent_path().string(), path.leaf() );
-
+  this->current_project_->initialize_from_file( project_path.leaf() );
+  this->add_to_recent_projects( project_path.parent_path().string(), project_path.leaf() );
+  
   this->set_last_saved_session_time_stamp();
   this->changing_projects_ = false;
 
@@ -220,6 +219,8 @@ void ProjectManager::open_project( const std::string& project_path )
   
   this->set_last_saved_session_time_stamp();
   AutoSave::Instance()->recompute_auto_save();
+  
+  PreferencesManager::Instance()->export_path_state_->set( project_path.parent_path().string() );
 
   this->project_saved_state_->set( true );
 }
@@ -359,15 +360,16 @@ bool ProjectManager::delete_project_session( const std::string& session_name )
 
 }
   
-void ProjectManager::add_to_recent_projects( const std::string& project_path, 
+void ProjectManager::add_to_recent_projects( const boost::filesystem::path& project_path, 
   const std::string& project_name )
 {
-  this->insert_recent_projects_entry( project_name, project_path, this->get_timestamp() );
+  this->insert_recent_projects_entry( project_name, project_path.string(), this->get_timestamp() );
   this->save_projectmanager_state();
 }
 
 
-bool ProjectManager::create_project_folders( boost::filesystem::path& path, const std::string& project_name )
+bool ProjectManager::create_project_folders( const boost::filesystem::path& path, 
+  const std::string& project_name )
 {
   try // to create a project folder
   {
@@ -507,35 +509,26 @@ Seg3D::ProjectHandle ProjectManager::get_current_project() const
   return this->current_project_;
 }
 
-bool ProjectManager::project_save_as( const std::string& export_path, const std::string& project_name )
+bool ProjectManager::project_save_as( const boost::filesystem::path& export_path, 
+  const std::string& project_name )
 {
-  if( !this->save_project( true ) )
-  {
-    CORE_LOG_CRITICAL_ERROR( "'Save As' could not be successfully completed." );
-    return false;
-  }
-
   this->changing_projects_ = true;
-  
-  boost::filesystem::path path = complete( boost::filesystem::path( export_path.c_str(), 
-    boost::filesystem::native ) );
 
-  this->create_project_folders( path, project_name );
-  
-  
+  this->create_project_folders( export_path, project_name );
+
   if( this->project_saved_state_->get() == true )
   {
-    this->save_project_only( export_path, project_name );
+    this->save_project_only( export_path.string(), project_name );
     
-    if( !this->current_project_->save_as( path, project_name ) ) return false;
-    this->set_project_path( path / project_name );
+    if( !this->current_project_->save_as( export_path, project_name ) ) return false;
+    this->set_project_path( export_path / project_name );
     this->current_project_->project_name_state_->set( project_name );
   }
   else
   {
     std::vector< std::string > empty_vector;
     this->current_project_->sessions_state_->set( empty_vector );
-    this->set_project_path( path / project_name );
+    this->set_project_path( export_path / project_name );
     this->current_project_->project_name_state_->set( project_name );
     this->save_project( true );
     this->project_saved_state_->set( true );
@@ -551,6 +544,12 @@ bool ProjectManager::project_save_as( const std::string& export_path, const std:
   this->changing_projects_ = true;
   
   this->add_to_recent_projects( export_path, project_name );
+  
+  if( !this->save_project( true ) )
+  {
+    CORE_LOG_CRITICAL_ERROR( "'Save As' could not be successfully completed." );
+    return false;
+  }
   
   return true;
 }

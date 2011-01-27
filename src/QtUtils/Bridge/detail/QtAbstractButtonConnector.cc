@@ -57,13 +57,23 @@ QtAbstractButtonConnector::QtAbstractButtonConnector( QAbstractButton* parent,
 }
 
 QtAbstractButtonConnector::QtAbstractButtonConnector( QAbstractButton* parent, 
-                           boost::function< void() > func ) :
+  boost::function< void() > func ) :
   QtConnectorBase( parent ),
   parent_( parent ),
   func_( func )
 {
   this->connect( parent, SIGNAL( clicked() ), SLOT( call_func() ) );
 }
+
+QtAbstractButtonConnector::QtAbstractButtonConnector( QAbstractButton* parent, 
+  boost::function< void( bool ) > func ) :
+  QtConnectorBase( parent ),
+  parent_( parent ),
+  bool_func_( func )
+{
+  this->connect( parent, SIGNAL( clicked( bool ) ), SLOT( call_func( bool ) ) );
+}
+
 
 QtAbstractButtonConnector::~QtAbstractButtonConnector()
 {
@@ -108,5 +118,11 @@ void QtAbstractButtonConnector::call_func()
 {
   this->func_();
 }
+
+void QtAbstractButtonConnector::call_func( bool value )
+{
+  this->bool_func_( value );
+}
+
     
 } // end namespace QtUtils
