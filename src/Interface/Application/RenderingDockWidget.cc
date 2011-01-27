@@ -83,21 +83,6 @@ RenderingDockWidget::RenderingDockWidget( QWidget *parent ) :
     ViewerManager::Instance()->show_volume_rendering_control_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.vr_sample_rate_,
     ViewerManager::Instance()->volume_sample_rate_state_ );
-  
-//  this->private_->enable_clipping_planes_checkboxes_ = new QButtonGroup();
-//  this->private_->enable_clipping_planes_checkboxes_->addButton(
-//    this->private_->ui_.enable_cp1_, 1 );
-//  this->private_->enable_clipping_planes_checkboxes_->addButton(
-//    this->private_->ui_.enable_cp2_, 2 );
-//  this->private_->enable_clipping_planes_checkboxes_->addButton(
-//    this->private_->ui_.enable_cp3_, 3 );
-//  this->private_->enable_clipping_planes_checkboxes_->addButton(
-//    this->private_->ui_.enable_cp4_, 4 );
-//  this->private_->enable_clipping_planes_checkboxes_->addButton(
-//    this->private_->ui_.enable_cp5_, 5 );
-//  this->private_->enable_clipping_planes_checkboxes_->addButton(
-//    this->private_->ui_.enable_cp6_, 6 );
-
 
   QtUtils::QtBridge::Connect( this->private_->ui_.enable_cp1_, 
     ViewerManager::Instance()->enable_clip_plane_state_[ 0 ] );
@@ -217,8 +202,6 @@ RenderingDockWidget::~RenderingDockWidget()
 
 void RenderingDockWidget::set_enabled_tab_appearance( bool enabled, int index )
 {
-  //*int index = this->private_->ui_.clipping_tabwidget_->currentIndex();*/
-  
   if( enabled )
   {
     this->private_->ui_.clipping_tabwidget_->
