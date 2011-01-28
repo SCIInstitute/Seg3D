@@ -513,6 +513,7 @@ bool ProjectManager::project_save_as( const boost::filesystem::path& export_path
   const std::string& project_name )
 {
   this->changing_projects_ = true;
+  this->session_saving_ = true;
 
   this->create_project_folders( export_path, project_name );
 
@@ -520,9 +521,15 @@ bool ProjectManager::project_save_as( const boost::filesystem::path& export_path
   {
     this->save_project_only( export_path.string(), project_name );
     
+    // first we copy everything over to the new place
     if( !this->current_project_->save_as( export_path, project_name ) ) return false;
     this->set_project_path( export_path / project_name );
     this->current_project_->project_name_state_->set( project_name );
+    if( !this->save_project( true ) )
+    {
+      CORE_LOG_CRITICAL_ERROR( "'Save As' could not be successfully completed." );
+      return false;
+    }
   }
   else
   {
@@ -541,15 +548,12 @@ bool ProjectManager::project_save_as( const boost::filesystem::path& export_path
   this->set_last_saved_session_time_stamp();
   AutoSave::Instance()->recompute_auto_save();
   
-  this->changing_projects_ = true;
+  this->changing_projects_ = false;
+  this->session_saving_ = false;
   
   this->add_to_recent_projects( export_path, project_name );
   
-  if( !this->save_project( true ) )
-  {
-    CORE_LOG_CRITICAL_ERROR( "'Save As' could not be successfully completed." );
-    return false;
-  }
+  
   
   return true;
 }
