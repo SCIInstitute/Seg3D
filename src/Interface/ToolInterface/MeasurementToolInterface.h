@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
-
+ 
  The MIT License
-
+ 
  Copyright (c) 2009 Scientific Computing and Imaging Institute,
  University of Utah.
-
-
+ 
+ 
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
-
+ 
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
-
+ 
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -26,32 +26,31 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-// Application includes
-#include <Application/Tool/ToolFactory.h>
-#include <Application/Tools/MeasureTool.h>
-//#include <Application/Filters/Actions/ActionInvert.h>
-#include <Application/Layer/Layer.h>
-#include <Application/LayerManager/LayerManager.h>
+#ifndef INTERFACE_TOOLINTERFACE_MeasurementToolINTERFACE_H
+#define INTERFACE_TOOLINTERFACE_MeasurementToolINTERFACE_H
 
-// Register the tool into the tool factory
-SCI_REGISTER_TOOL( Seg3D, MeasureTool )
+// Base class of the tool widget include
+#include <Interface/Application/ToolWidget.h>
 
 namespace Seg3D
 {
 
-MeasureTool::MeasureTool( const std::string& toolid ) :
-  Tool( toolid )
-{
-}
+class MeasurementToolInterfacePrivate;
 
-MeasureTool::~MeasureTool()
+class MeasurementToolInterface : public ToolWidget
 {
-  this->disconnect_all();
-}
+Q_OBJECT
 
-void MeasureTool::execute( Core::ActionContextHandle context )
-{
-  //ActionInvert::Dispatch( context );
-}
+// Constructor/destructor
+public:
+  MeasurementToolInterface();
+  virtual ~MeasurementToolInterface();
+  virtual bool build_widget( QFrame* frame );
+
+private:
+    boost::shared_ptr< MeasurementToolInterfacePrivate > private_;
+};
 
 } // end namespace Seg3D
+
+#endif
