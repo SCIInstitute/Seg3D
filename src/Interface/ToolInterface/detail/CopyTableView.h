@@ -26,32 +26,35 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-// Application includes
-//#include <Application/Filters/Actions/ActionMeasure.h>
-#include <Application/Layer/Layer.h>
-#include <Application/LayerManager/LayerManager.h>
-#include <Application/Tool/ToolFactory.h>
-#include <Application/Tools/MeasurementTool.h>
+#ifndef INTERFACE_TOOLINTERFACE_COPYTABLEVIEW_H
+#define INTERFACE_TOOLINTERFACE_COPYTABLEVIEW_H
 
-// Register the tool into the tool factory
-SCI_REGISTER_TOOL( Seg3D, MeasurementTool )
+// Qt includes
+#include <QtGUI/QTableView>
 
 namespace Seg3D
 {
 
-MeasurementTool::MeasurementTool( const std::string& toolid ) :
-  Tool( toolid )
-{
-}
+// QTableView with support for copy with CTRL-C 
+class CopyTableView : public QTableView 
+{ 
+  Q_OBJECT
+public: 
+  CopyTableView( QWidget* parent );
 
-MeasurementTool::~MeasurementTool()
-{
-  this->disconnect_all();
-}
+protected: 
+  virtual void keyPressEvent( QKeyEvent* event ); 
 
-void MeasurementTool::execute( Core::ActionContextHandle context )
-{
-  //ActionInvert::Dispatch( context );
-}
+private: 
+  void copy() const;
+
+protected:
+  QAction* triggered_action_;
+
+private:
+  QAction* copy_action_;
+}; 
 
 } // end namespace Seg3D
+
+#endif 

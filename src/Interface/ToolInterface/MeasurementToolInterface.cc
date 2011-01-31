@@ -26,14 +26,14 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-//Interface Includes
+// Interface Includes
 #include <QtUtils/Bridge/QtBridge.h>
 
-//Qt Gui Includes
+// Qt Gui Includes
 #include <Interface/ToolInterface/MeasurementToolInterface.h>
 #include "ui_MeasurementToolInterface.h"
 
-//Application Includes
+// Application Includes
 #include <Application/Tools/MeasurementTool.h>
 
 SCI_REGISTER_TOOLINTERFACE( Seg3D, MeasurementToolInterface )

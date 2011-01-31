@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_TOOLINTERFACE_MeasurementToolINTERFACE_H
-#define INTERFACE_TOOLINTERFACE_MeasurementToolINTERFACE_H
+#ifndef INTERFACE_TOOLINTERFACE_MEASUREMENTTOOLINTERFACE_H
+#define INTERFACE_TOOLINTERFACE_MEASUREMENTTOOLINTERFACE_H
 
 // Base class of the tool widget include
 #include <Interface/Application/ToolWidget.h>
@@ -36,6 +36,7 @@ namespace Seg3D
 {
 
 class MeasurementToolInterfacePrivate;
+typedef boost::shared_ptr< MeasurementToolInterfacePrivate > MeasurementToolInterfacePrivateHandle;
 
 class MeasurementToolInterface : public ToolWidget
 {
@@ -48,7 +49,7 @@ public:
   virtual bool build_widget( QFrame* frame );
 
 private:
-    boost::shared_ptr< MeasurementToolInterfacePrivate > private_;
+    MeasurementToolInterfacePrivateHandle private_;
 };
 
 } // end namespace Seg3D

@@ -26,32 +26,56 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-// Application includes
-//#include <Application/Filters/Actions/ActionMeasure.h>
-#include <Application/Layer/Layer.h>
-#include <Application/LayerManager/LayerManager.h>
-#include <Application/Tool/ToolFactory.h>
-#include <Application/Tools/MeasurementTool.h>
+#ifndef INTERFACE_TOOLINTERFACE_MEASUREMENTTABLEVIEW_H
+#define INTERFACE_TOOLINTERFACE_MEASUREMENTTABLEVIEW_H
 
-// Register the tool into the tool factory
-SCI_REGISTER_TOOL( Seg3D, MeasurementTool )
+// Qt includes
+#include <QtGui/QHeaderView>
+#include <QtGui/QScrollBar>
+
+// Interface includes
+#include <Interface/ToolInterface/detail/CopyTableView.h>
 
 namespace Seg3D
 {
 
-MeasurementTool::MeasurementTool( const std::string& toolid ) :
-  Tool( toolid )
-{
-}
+class DeleteMeasurementDialog;
 
-MeasurementTool::~MeasurementTool()
-{
-  this->disconnect_all();
-}
+// QTableView with support for copyable measurements
+class MeasurementTableView : public CopyTableView
+{ 
+  Q_OBJECT
+public: 
+  MeasurementTableView( QWidget* parent );
 
-void MeasurementTool::execute( Core::ActionContextHandle context )
+  //
+  // Extended functions
+  //
+
+  void get_deletion_candidates( std::vector< int >& deletion_candidates ) const;  
+
+Q_SIGNALS:
+  void delete_table_measurements();
+
+private Q_SLOTS:
+  void handle_model_reset();
+  void scroll_to_active_index();
+
+private:
+  QAction* delete_action_;
+}; 
+
+// Derived scroll bar that accepts all wheelEvent events rather than passing them on to the 
+// parent when scrollbar is at min/max.
+class MeasurementScrollBar : public QScrollBar
 {
-  //ActionInvert::Dispatch( context );
-}
+public:
+  MeasurementScrollBar( QWidget * parent = 0 ) :
+    QScrollBar( parent ) {}
+
+  void wheelEvent( QWheelEvent * e );
+};
 
 } // end namespace Seg3D
+
+#endif 

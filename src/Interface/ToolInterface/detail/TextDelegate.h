@@ -26,32 +26,36 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-// Application includes
-//#include <Application/Filters/Actions/ActionMeasure.h>
-#include <Application/Layer/Layer.h>
-#include <Application/LayerManager/LayerManager.h>
-#include <Application/Tool/ToolFactory.h>
-#include <Application/Tools/MeasurementTool.h>
+#ifndef INTERFACE_TOOLINTERFACE_TEXTDELEGATE_H
+#define INTERFACE_TOOLINTERFACE_TEXTDELEGATE_H
 
-// Register the tool into the tool factory
-SCI_REGISTER_TOOL( Seg3D, MeasurementTool )
+// Qt includes
+#include <QtGui/QItemDelegate>
 
 namespace Seg3D
 {
 
-MeasurementTool::MeasurementTool( const std::string& toolid ) :
-  Tool( toolid )
+class TextDelegate : public QItemDelegate
 {
-}
+  Q_OBJECT
 
-MeasurementTool::~MeasurementTool()
-{
-  this->disconnect_all();
-}
+public:
+  TextDelegate( int text_column, QObject * parent = 0 );
 
-void MeasurementTool::execute( Core::ActionContextHandle context )
-{
-  //ActionInvert::Dispatch( context );
-}
+  void paint( QPainter *painter, const QStyleOptionViewItem &option, 
+    const QModelIndex &index ) const;
+  QWidget* createEditor( QWidget *parent, const QStyleOptionViewItem &option, 
+    const QModelIndex &index ) const;
+  void setEditorData( QWidget *editor, const QModelIndex &index ) const ;
+  void setModelData( QWidget *editor, QAbstractItemModel *model, const QModelIndex &index ) const;
+
+private Q_SLOTS:
+  void commit_editor();
+
+private:
+  int text_column_;
+};
 
 } // end namespace Seg3D
+
+#endif 
