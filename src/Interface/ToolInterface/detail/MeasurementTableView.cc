@@ -28,6 +28,8 @@
 
 // Qt includes
 #include <QtGui/QAction>
+#include <QtGui/QApplication>
+#include <QtGui/QClipboard>
 #include <QtGui/QContextMenuEvent>
 #include <QtGui/QMenu>
 
@@ -40,7 +42,7 @@ namespace Seg3D
 {
 
 MeasurementTableView::MeasurementTableView( QWidget* parent ) : 
-  CopyTableView( parent )
+  QTableView( parent )
 {
   MeasurementTableModel* measurement_model = new MeasurementTableModel( this );
   this->setModel( measurement_model );
@@ -122,6 +124,59 @@ void MeasurementTableView::get_deletion_candidates( std::vector< int >& deletion
     }
   }
 
+}
+
+void MeasurementTableView::copy() const
+{
+  QItemSelectionModel* selection = this->selectionModel(); 
+  QModelIndexList indexes = selection->selectedIndexes();
+
+  if( indexes.size() < 1 ) return; 
+
+  // QModelIndex::operator < sorts first by row, then by column.  
+  // this is what we need 
+  std::sort( indexes.begin(), indexes.end() ); 
+
+  // You need a pair of indexes to find the row changes 
+  QModelIndex previous = indexes.first(); 
+  indexes.removeFirst(); 
+  QString selected_text; 
+  QModelIndex current; 
+  Q_FOREACH( current, indexes ) 
+  { 
+    // If this is the first column and this row is selected, append the row header to the string
+    if ( previous.column() == 0 )
+    {
+      if( selection->isRowSelected( previous.row(), QModelIndex() ) )
+      {
+        QString header_text = 
+          this->model()->headerData( previous.row(), Qt::Vertical ).toString();
+        selected_text.append( header_text );
+      }
+    }
+
+    QVariant data = this->model()->data( previous ); 
+    QString text = data.toString(); 
+    // At this point `text` contains the text in one cell 
+    selected_text.append( text ); 
+    // If you are at the start of the row the row number of the previous index 
+    // isn't the same.  Text is followed by a row separator, which is a newline. 
+    if ( current.row() != previous.row() ) 
+    { 
+      selected_text.append( QLatin1Char('\n') ); 
+    } 
+    // Otherwise it's the same row, so append a column separator, which is a tab. 
+    else 
+    { 
+      selected_text.append( QLatin1Char('\t') ); 
+    } 
+    previous = current; 
+  } 
+
+  // add last element 
+  selected_text.append( model()->data( previous ).toString() ); 
+  selected_text.append( QLatin1Char('\n') ); 
+  qApp->clipboard()->setText( selected_text );
 }
 
 void MeasurementScrollBar::wheelEvent( QWheelEvent * e )

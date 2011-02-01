@@ -32,9 +32,9 @@
 // Qt includes
 #include <QtGui/QHeaderView>
 #include <QtGui/QScrollBar>
+#include <QtGUI/QTableView>
 
 // Interface includes
-#include <Interface/ToolInterface/detail/CopyTableView.h>
 
 namespace Seg3D
 {
@@ -42,7 +42,7 @@ namespace Seg3D
 class DeleteMeasurementDialog;
 
 // QTableView with support for copyable measurements
-class MeasurementTableView : public CopyTableView
+class MeasurementTableView : public QTableView 
 { 
   Q_OBJECT
 public: 
@@ -53,6 +53,7 @@ public:
   //
 
   void get_deletion_candidates( std::vector< int >& deletion_candidates ) const;  
+  void copy() const;
 
 Q_SIGNALS:
   void delete_table_measurements();

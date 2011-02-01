@@ -74,16 +74,21 @@ bool MeasurementToolInterface::build_widget( QFrame* frame )
   ToolHandle base_tool_ = tool();
   MeasurementTool* tool = dynamic_cast< MeasurementTool* > ( base_tool_.get() );
   
+  // Get convenience pointers to measurement table view and model
+  this->private_->table_view_ = this->private_->ui_.table_view_;
+  this->private_->table_model_ = 
+    qobject_cast< MeasurementTableModel* >( this->private_->table_view_->model() );
+
   //Step 3 - connect the gui to the tool through the QtBridge
+  QtUtils::QtBridge::Connect( this->private_->ui_.copy_button_, boost::bind(
+    &MeasurementTableView::copy, this->private_->table_view_ ) );
 
   //Send a message to the log that we have finished with building the Measure Tool Interface
   CORE_LOG_MESSAGE( "Finished building an Measure Tool Interface" );
 
   MeasurementList::Instance()->clear();
 
-  this->private_->table_view_ = this->private_->ui_.table_view_;
-  this->private_->table_model_ = 
-  qobject_cast< MeasurementTableModel* >( this->private_->table_view_->model() );
+  
   this->private_->table_model_->update();
 
   return ( true );
