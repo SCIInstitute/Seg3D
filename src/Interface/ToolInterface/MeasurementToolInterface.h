@@ -48,6 +48,12 @@ public:
   virtual ~MeasurementToolInterface();
   virtual bool build_widget( QFrame* frame );
 
+private Q_SLOTS:
+  // Update measurement note text box in response to measurement model change
+  void set_measurement_note_box( const QString & note );
+  // Update note in measurement model in response to measurement text box change
+  void update_measurement_note_model();
+
 private:
     MeasurementToolInterfacePrivateHandle private_;
 };

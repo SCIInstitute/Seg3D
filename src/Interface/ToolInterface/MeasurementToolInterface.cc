@@ -44,7 +44,7 @@ SCI_REGISTER_TOOLINTERFACE( Seg3D, MeasurementToolInterface )
 namespace Seg3D
 {
 
-class MeasurementToolInterfacePrivate
+class MeasurementToolInterfacePrivate 
 {
 public:
   Ui::MeasurementToolInterface ui_;
@@ -83,15 +83,39 @@ bool MeasurementToolInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Connect( this->private_->ui_.copy_button_, boost::bind(
     &MeasurementTableView::copy, this->private_->table_view_ ) );
 
+  // Connect note column and text box using Qt signals/slots since currently can't hook up two
+  // widgets to same state object.
+  QObject::connect( this->private_->table_model_, SIGNAL( active_note_changed( QString ) ), 
+    this, SLOT( set_measurement_note_box( QString ) ) );
+  QObject::connect( this->private_->ui_.note_textbox_, SIGNAL( textChanged() ), 
+    this, SLOT( update_measurement_note_model() ) );
+
   //Send a message to the log that we have finished with building the Measure Tool Interface
   CORE_LOG_MESSAGE( "Finished building an Measure Tool Interface" );
 
+  // Test code
   MeasurementList::Instance()->clear();
 
-  
   this->private_->table_model_->update();
 
   return ( true );
 } // end build_widget 
+
+void MeasurementToolInterface::set_measurement_note_box( const QString & note )
+{
+  // If text edit has focus, this is a circular update from the model -- don't modify text
+  if( !this->private_->ui_.note_textbox_->hasFocus() )
+  {
+    this->private_->ui_.note_textbox_->blockSignals( true );
+    this->private_->ui_.note_textbox_->setText( note );
+    this->private_->ui_.note_textbox_->blockSignals( false );
+  } 
+}
+
+void MeasurementToolInterface::update_measurement_note_model()
+{
+  this->private_->table_model_->set_active_note( 
+    this->private_->ui_.note_textbox_->document()->toPlainText() );
+}
 
 } // end namespace Seg3D
