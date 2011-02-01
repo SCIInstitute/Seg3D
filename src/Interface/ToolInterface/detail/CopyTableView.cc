@@ -42,11 +42,8 @@ namespace Seg3D
 {
 
 CopyTableView::CopyTableView( QWidget* parent ) : 
-  QTableView( parent ),
-  triggered_action_( 0 )
+  QTableView( parent )
 {
-  this->copy_action_ = new QAction( tr( "&Copy" ), this ) ;
-  //this->copy_action_->setIcon( QIcon( ":/trolltech/styles/commonstyle/images/up-128.png" ) ); 
 }
 
 void CopyTableView::copy() const

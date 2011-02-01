@@ -26,15 +26,18 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-// Interface Includes
+// Qt Gui Includes
 #include <QtUtils/Bridge/QtBridge.h>
 
-// Qt Gui Includes
+// Interface Includes
 #include <Interface/ToolInterface/MeasurementToolInterface.h>
+#include <Interface/ToolInterface/detail/MeasurementTableModel.h>
+#include <Interface/ToolInterface/detail/MeasurementTableView.h>
 #include "ui_MeasurementToolInterface.h"
 
 // Application Includes
 #include <Application/Tools/MeasurementTool.h>
+#include <Application/Tools/detail/Measurement.h>
 
 SCI_REGISTER_TOOLINTERFACE( Seg3D, MeasurementToolInterface )
 
@@ -45,6 +48,9 @@ class MeasurementToolInterfacePrivate
 {
 public:
   Ui::MeasurementToolInterface ui_;
+
+  MeasurementTableModel*  table_model_;
+  MeasurementTableView* table_view_;
 };
 
 // constructor
@@ -72,6 +78,13 @@ bool MeasurementToolInterface::build_widget( QFrame* frame )
 
   //Send a message to the log that we have finished with building the Measure Tool Interface
   CORE_LOG_MESSAGE( "Finished building an Measure Tool Interface" );
+
+  MeasurementList::Instance()->clear();
+
+  this->private_->table_view_ = this->private_->ui_.table_view_;
+  this->private_->table_model_ = 
+  qobject_cast< MeasurementTableModel* >( this->private_->table_view_->model() );
+  this->private_->table_model_->update();
 
   return ( true );
 } // end build_widget 

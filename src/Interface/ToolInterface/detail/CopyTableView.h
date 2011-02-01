@@ -47,12 +47,6 @@ protected:
 
 private: 
   void copy() const;
-
-protected:
-  QAction* triggered_action_;
-
-private:
-  QAction* copy_action_;
 }; 
 
 } // end namespace Seg3D

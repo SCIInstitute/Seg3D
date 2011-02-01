@@ -71,11 +71,11 @@ QVariant MeasurementTableModel::data( const QModelIndex& index, int role ) const
     {
       if( ( *MeasurementList::Instance() )[ index.row() ].get_visible() )
       {
-        return QIcon( ":/images/visible.png" );
+        return QIcon( QString::fromUtf8( ":/Images/Visible.png" ) );
       }
       else
       { 
-        return QIcon( ":/images/hidden.png" );
+        return QIcon( QString::fromUtf8( ":/Images/VisibleOff.png" ) );
       }
     }
   }

@@ -41,7 +41,7 @@ class MeasurementTool : public Tool
 SEG3D_TOOL
 (
   SEG3D_TOOL_NAME( "MeasurementTool", "Tool for creating measurements in slices" )
-  SEG3D_TOOL_MENULABEL( "Measure" )
+  SEG3D_TOOL_MENULABEL( "Measure --TEST--" )
   SEG3D_TOOL_MENU( "Tools" )
   SEG3D_TOOL_SHORTCUT_KEY( "Ctrl+ALT+0" )
   SEG3D_TOOL_URL( "http://www.sci.utah.edu/SCIRunDocs/index.php/CIBC:Seg3D2:MeasurementTool:1" )
