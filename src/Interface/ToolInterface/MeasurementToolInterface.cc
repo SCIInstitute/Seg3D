@@ -37,7 +37,6 @@
 
 // Application Includes
 #include <Application/Tools/MeasurementTool.h>
-#include <Application/Tools/detail/Measurement.h>
 
 SCI_REGISTER_TOOLINTERFACE( Seg3D, MeasurementToolInterface )
 
@@ -62,24 +61,31 @@ MeasurementToolInterface::MeasurementToolInterface() :
 // destructor
 MeasurementToolInterface::~MeasurementToolInterface()
 {
+  this->disconnect_all();
 }
 
 // build the interface and connect it to the state manager
 bool MeasurementToolInterface::build_widget( QFrame* frame )
 {
-  //Step 1 - build the Qt GUI Widget
+  // Build the Qt GUI Widget
   this->private_->ui_.setupUi( frame );
 
-  //Step 2 - get a pointer to the tool
-  ToolHandle base_tool_ = tool();
-  MeasurementTool* tool = dynamic_cast< MeasurementTool* > ( base_tool_.get() );
-  
-  // Get convenience pointers to measurement table view and model
+  // Create table model with tool, set table model in table view
+  MeasurementToolHandle tool_handle = boost::dynamic_pointer_cast< MeasurementTool >( tool() );
+  this->private_->table_model_ = new MeasurementTableModel( tool_handle, this );
   this->private_->table_view_ = this->private_->ui_.table_view_;
-  this->private_->table_model_ = 
-    qobject_cast< MeasurementTableModel* >( this->private_->table_view_->model() );
+  this->private_->table_view_->set_measurement_model( this->private_->table_model_ );
+  this->private_->table_model_->update_table();
 
-  //Step 3 - connect the gui to the tool through the QtBridge
+  /* Normally Qt syncs the model and the view without us having to worry about it.  But that 
+  relies on everything being on Qt thread, which is not true in our case.  So instead the 
+  MeasurementToolInterface calls update on the model when the measurements state is modified.  
+  The model in turn gets its data from the measurements state. */ 
+  qpointer_type measurement_interface( this );
+  this->add_connection( tool_handle->measurements_state_->state_changed_signal_.connect( 
+    boost::bind( &MeasurementToolInterface::UpdateMeasurementModel, measurement_interface ) ) );
+
+  // Connect the gui to the tool through the QtBridge
   QtUtils::QtBridge::Connect( this->private_->ui_.copy_button_, boost::bind(
     &MeasurementTableView::copy, this->private_->table_view_ ) );
 
@@ -92,11 +98,6 @@ bool MeasurementToolInterface::build_widget( QFrame* frame )
 
   //Send a message to the log that we have finished with building the Measure Tool Interface
   CORE_LOG_MESSAGE( "Finished building an Measure Tool Interface" );
-
-  // Test code
-  MeasurementList::Instance()->clear();
-
-  this->private_->table_model_->update();
 
   return ( true );
 } // end build_widget 
@@ -117,5 +118,40 @@ void MeasurementToolInterface::update_measurement_note_model()
   this->private_->table_model_->set_active_note( 
     this->private_->ui_.note_textbox_->document()->toPlainText() );
 }
+
+void MeasurementToolInterface::UpdateMeasurementModel( qpointer_type measurement_interface )
+{   
+  // Ensure that this call gets relayed to the right thread
+  if ( !( Core::Interface::IsInterfaceThread() ) )
+  {
+    Core::Interface::PostEvent( boost::bind( 
+      &MeasurementToolInterface::UpdateMeasurementModel, measurement_interface ) );
+    return;
+  }
+
+  // Protect interface pointer, so we do not execute if interface does not exist anymore
+  if ( measurement_interface.data() )
+  {
+    /* If the user is editing a note in the table and the entire table is updated with 
+    update_table(), the editor is closed.  This is not desirable.  Therefore if the table is 
+    the active window, we assume that the change has originated from the user editing in the 
+    window and we update only the data, not then entire table.  If the table size has changed 
+    (measurements added or removed), then the table is not the active window, so 
+    do a full table update.
+
+    We do it this way since the state_changed_signal_ doesn't tell us anything about whether 
+    the size of the measurements vector changed, or just the contents.
+    */
+    if( measurement_interface->private_->table_view_->isActiveWindow() )
+    {
+      measurement_interface->private_->table_model_->update_data();
+    }
+    else
+    {
+      measurement_interface->private_->table_model_->update_table();
+    }
+  }
+}
+
 
 } // end namespace Seg3D

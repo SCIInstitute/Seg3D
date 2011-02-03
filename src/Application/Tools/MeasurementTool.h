@@ -29,14 +29,26 @@
 #ifndef APPLICATION_TOOLS_MEASUREMENTTOOL_H
 #define APPLICATION_TOOLS_MEASUREMENTTOOL_H
 
+// Application includes
+#include <Application/Tool/Tool.h>
+
+
+// Core includes
+#include <Core/Geometry/Measurement.h>
+#include <Core/State/StateVector.h>
+
 namespace Seg3D
 {
+
+class MeasurementTool;
+typedef boost::shared_ptr< MeasurementTool > MeasurementToolHandle;
 
 class MeasurementToolPrivate;
 typedef boost::shared_ptr< MeasurementToolPrivate > MeasurementToolPrivateHandle;
 
 class MeasurementTool : public Tool
 {
+friend class MeasurementTableModel;
 
 SEG3D_TOOL
 (
@@ -56,8 +68,19 @@ public:
   // Fire off the action that executes the filter
   virtual void execute( Core::ActionContextHandle context );
 
+  std::vector< Core::Measurement > get_measurements() const;
+  void set_measurement( size_t index, const Core::Measurement& measurement );
+
+  int get_active_index() const;
+  void set_active_index( int active_index );
+
   // -- state --
 public:
+  Core::StateMeasurementVectorHandle measurements_state_;
+  Core::StateIntHandle active_index_state_;
+
+public:
+  static const int INVALID_ACTIVE_INDEX_C;
 
 private:
   MeasurementToolPrivateHandle private_;

@@ -44,10 +44,31 @@ namespace Seg3D
 MeasurementTableView::MeasurementTableView( QWidget* parent ) : 
   QTableView( parent )
 {
-  MeasurementTableModel* measurement_model = new MeasurementTableModel( this );
-  this->setModel( measurement_model );
+  //MeasurementTableModel* measurement_model = new MeasurementTableModel( this );
+  //this->setModel( measurement_model );
   this->setItemDelegate( new TextDelegate( MEASUREMENT_NOTE_E ) ); // Custom text editor for note column
   this->horizontalHeader()->setStretchLastSection( true ); // Stretch note section
+
+  /*QObject::connect( measurement_model, SIGNAL( modelReset() ), 
+    this, SLOT( handle_model_reset() ) );
+  QObject::connect( this, SIGNAL( clicked( QModelIndex ) ), 
+    measurement_model, SLOT( handle_click( QModelIndex ) ) );
+  QObject::connect( this->selectionModel(), 
+    SIGNAL( selectionChanged( QItemSelection, QItemSelection ) ), 
+    measurement_model, SLOT( handle_selected( QItemSelection) ) );
+  QObject::connect( measurement_model, SIGNAL( rowsRemoved( QModelIndex, int, int ) ), 
+    this, SLOT( scroll_to_active_index() ) );
+  QObject::connect( measurement_model, SIGNAL( rowsInserted( QModelIndex, int, int ) ), 
+    this, SLOT( scroll_to_active_index() ) );*/
+
+  this->delete_action_ = new QAction( tr( "&Delete" ), this );
+  
+  this->setVerticalScrollBar( new MeasurementScrollBar( this ) );
+}
+
+void MeasurementTableView::set_measurement_model( MeasurementTableModel* measurement_model )
+{
+  this->setModel( measurement_model );
 
   QObject::connect( measurement_model, SIGNAL( modelReset() ), 
     this, SLOT( handle_model_reset() ) );
@@ -60,10 +81,6 @@ MeasurementTableView::MeasurementTableView( QWidget* parent ) :
     this, SLOT( scroll_to_active_index() ) );
   QObject::connect( measurement_model, SIGNAL( rowsInserted( QModelIndex, int, int ) ), 
     this, SLOT( scroll_to_active_index() ) );
-
-  this->delete_action_ = new QAction( tr( "&Delete" ), this );
-  
-  this->setVerticalScrollBar( new MeasurementScrollBar( this ) );
 }
 
 void MeasurementTableView::handle_model_reset()
@@ -88,13 +105,13 @@ void MeasurementTableView::handle_model_reset()
 
 void MeasurementTableView::scroll_to_active_index()
 {
-  MeasurementTableModel* model = 
+  /*MeasurementTableModel* model = 
     qobject_cast< MeasurementTableModel* >( this->model() );
   int active_index = model->get_active_index();
-  if( active_index != MeasurementList::INVALID_ACTIVE_INDEX_C )
+  if( active_index != Core::MeasurementList::INVALID_ACTIVE_INDEX_C )
   {
     this->scrollTo( model->index( active_index, 0 ) );
-  }
+  }*/
 }
 
 void MeasurementTableView::get_deletion_candidates( std::vector< int >& deletion_candidates ) const
@@ -115,14 +132,14 @@ void MeasurementTableView::get_deletion_candidates( std::vector< int >& deletion
     }
     std::sort( deletion_candidates.begin(), deletion_candidates.end() );
   }
-  else // No rows are selected -- delete active measurement
-  {
-    int active_index = model->get_active_index();
-    if( active_index != MeasurementList::INVALID_ACTIVE_INDEX_C )
-    {
-      deletion_candidates.push_back( active_index );
-    }
-  }
+  //else // No rows are selected -- delete active measurement
+  //{
+  //  int active_index = model->get_active_index();
+  //  if( active_index != Core::MeasurementList::INVALID_ACTIVE_INDEX_C )
+  //  {
+  //    deletion_candidates.push_back( active_index );
+  //  }
+  //}
 
 }
 

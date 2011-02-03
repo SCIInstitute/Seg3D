@@ -197,7 +197,7 @@ RenderingDockWidget::RenderingDockWidget( QWidget *parent ) :
 
 RenderingDockWidget::~RenderingDockWidget()
 {
-
+  this->disconnect_all();
 }
 
 void RenderingDockWidget::set_enabled_tab_appearance( bool enabled, int index )

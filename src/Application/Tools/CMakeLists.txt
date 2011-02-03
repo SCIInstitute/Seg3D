@@ -120,8 +120,6 @@ SET(APPLICATION_TOOLS_SRCS
 SET(APPLICATION_TOOLS_NOREGISTER_SRCS
   detail/MaskShader.h
   detail/MaskShader.cc
-  detail/Measurement.h
-  detail/Measurement.cc
   )
   
 SET(APPLICATION_TOOLS_ACTIONS_SRCS

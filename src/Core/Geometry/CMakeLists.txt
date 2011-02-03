@@ -56,6 +56,8 @@ SET(CORE_GEOMETRY_SRCS
   Matrix.cc
   Algorithm.h
   Algorithm.cc
+  Measurement.h
+  Measurement.cc
 )
 
 ##################################################

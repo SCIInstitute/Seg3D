@@ -26,7 +26,7 @@
    <size>
     <width>16777215</width>
     <height>16777215</height>
-   </size>
+   </size> 
   </property>
   <property name="windowTitle">
    <string>Measurement Tool</string>

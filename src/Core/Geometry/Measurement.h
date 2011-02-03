@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_TOOLS_DETAIL_MEASUREMENT_H
-#define APPLICATION_TOOLS_DETAIL_MEASUREMENT_H
+#ifndef CORE_GEOMETRY_MEASUREMENT_H
+#define CORE_GEOMETRY_MEASUREMENT_H
 
 // System includes
 #include <string>
@@ -41,7 +41,7 @@
 #include <Core/Geometry/Point.h>
 #include <Core/Utils/Singleton.h>
 
-namespace Seg3D
+namespace Core
 {
 
 enum ViewAxis {
@@ -111,6 +111,9 @@ public:
   int       get_slice_thickness() const { return slice_thickness_; } 
   void      set_slice_thickness( int slice_thickness ) { slice_thickness_ = slice_thickness; }
 
+  inline bool operator==( const Measurement& ) const;
+  inline bool operator!=( const Measurement& ) const;
+
 private:
   bool      visible_;
   std::string   label_; // Unique ID
@@ -123,64 +126,22 @@ private:
   int       slice_thickness_;
 };
 
-//=============================================================================
-// Class: MeasurementList
-//=============================================================================
-
-class MeasurementList : public boost::noncopyable
+inline bool Measurement::operator==( const Measurement& m ) const
 {
-  CORE_SINGLETON( MeasurementList );
+  return ( this->p1_ == m.p1_ && this->p2_ == m.p2_ && this->view_axis_ == m.view_axis_ );
+}
 
-protected:
-  MeasurementList();
+inline bool Measurement::operator!=( const Measurement& m ) const
+{
+  return ( this->p1_ != m.p1_ || this->p2_ != m.p2_ || this->view_axis_ != m.view_axis_ );
+}
 
-  // DESIGN NOTE: Originally I made a virtual destructor out of habit.  But since this is not
-  // designed to be a base class, should not make destructor virtual in order to avoid cost of
-  // vtable.  Because this class contains no dynamically allocated memory, don't need destructor.
+std::string ExportToString( const Measurement& value );
+std::string ExportToString( const std::vector< Measurement >& value );
 
-public:
-  // DESIGN NOTE: Need const and non-const versions so that const code can use this.
-  // DESIGN NOTE: Debated about returning a reference or a copy.  Reference requires less memory,
-  // but requires that the member data persists.  Using a reference because in this case the 
-  // member data does persist and I often use this operator without wanting/needing a copy.  
-  // STL vector also returns reference in this case.
-  Measurement& operator[]( int idx );
-  const Measurement& operator[]( int idx ) const;
+bool ImportFromString( const std::string& str, Measurement& value );
+bool ImportFromString( const std::string& str, std::vector< Measurement >& value );
 
-  void      clear();
-  // DESIGN NOTE: size_t should be used when representing virtual address space.
-  size_t      size() const;
-  // DESIGN NOTE: Use const ref to avoid overhead of creating a copy
-  void      push_back( const Measurement& measurement );
-  // Erase range of elements [start_index, end_index)
-  bool      erase( size_t start_index, size_t end_index );
-  int       get_active_index() const;
-  void      set_active_index( int index );
-  bool      get_highlight_active_measurement();
-  void      set_highlight_active_measurement( bool highlight );
-  void      get_standard_view_measurements( 
-            std::vector< int >& standard_view_measurements ) const;
-
-  typedef boost::recursive_mutex mutex_type;
-  typedef boost::unique_lock< mutex_type > lock_type;
-
-private:
-  void      update_active_index();
-  mutex_type&   get_mutex() const;
-
-  // DESIGN NOTE: Originally used size_t since that represents addressable memory, but
-  // needed to use -1 to signify an invalid value.  Don't imagine ever having more than 2^31
-  // measurements.
-  int               active_index_; // Index of active measurement
-  bool              highlight_active_measurement_;
-  std::vector< Measurement >    measurements_; // List of measurements
-  // Has to be mutable so that member functions can be const
-  mutable mutex_type        mutex_;
-
-public:
-  static const int INVALID_ACTIVE_INDEX_C;
-};
-
-} // end namespace Seg3D
+} // end namespace Core
 
 #endif 

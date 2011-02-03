@@ -44,6 +44,7 @@
 #include <Core/State/StateBase.h>
 #include <Core/State/StateEngine.h>
 #include <Core/Geometry/Color.h>
+#include <Core/Geometry/Measurement.h>
 #include <Core/Geometry/Point.h>
 
 namespace Core
@@ -70,6 +71,10 @@ typedef boost::shared_ptr< StatePointVector > StatePointVectorHandle;
 //class Color;
 typedef StateVector< Color > StateColorVector;
 typedef boost::shared_ptr< StateColorVector > StateColorVectorHandle;
+
+//class Measurement
+typedef Core::StateVector< Measurement > StateMeasurementVector;
+typedef boost::shared_ptr< StateMeasurementVector > StateMeasurementVectorHandle;
 
 typedef StateVector< bool > StateBoolVector;
 typedef boost::shared_ptr< StateBoolVector > StateBoolVectorHandle;
