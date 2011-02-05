@@ -51,6 +51,8 @@
 #include <QtUtils/Widgets/QtCustomDockWidget.h>
 #include <QtUtils/Widgets/QtCustomDialog.h>
 #include <QtUtils/Widgets/QtHistogramWidget.h>
+#include <QtUtils/Widgets/QtTransferFunctionScene.h>
+#include <QtUtils/Widgets/QtTransferFunctionCurve.h>
 
 // Core includes
 #include <Core/State/StateLabeledOption.h>
@@ -61,6 +63,8 @@
 #include <Core/State/StateVector.h>
 #include <Core/State/StateRangedValue.h>
 #include <Core/State/StateSet.h>
+#include <Core/VolumeRenderer/TransferFunction.h>
+#include <Core/VolumeRenderer/TransferFunctionFeature.h>
 
 namespace QtUtils
 {
@@ -154,6 +158,12 @@ public:
   static void Connect( QListWidget* qlistwidget, Core::StateLabeledMultiOptionHandle& state );
 
   static void Connect( QListWidget* qwidget, Core::StateStringVectorHandle& state );
+
+  // Connect QtTransferFunctionScene and TransferFunction
+  static void Connect( QtTransferFunctionScene* tf_scene, Core::TransferFunctionHandle& tf );
+
+  // Connect QtTransferFunctionCurve and TransferFunctionFeature
+  static void Connect( QtTransferFunctionCurve* tf_curve, Core::TransferFunctionFeatureHandle& feature );
 
   // Enable / Disable a button from state engine
   static void Enable( QAction* qaction, Core::StateBoolHandle& state, bool opposite_logic = false );

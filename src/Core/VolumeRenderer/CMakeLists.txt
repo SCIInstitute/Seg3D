@@ -45,6 +45,12 @@ SET(CORE_VOLUMERENDERER_SRCS
   VolumeRenderer.cc
   VolumeShader.h
   VolumeShader.cc
+  TransferFunctionFeature.h
+  TransferFunctionFeature.cc
+  TransferFunctionControlPoint.h
+  TransferFunctionControlPoint.cc
+  TransferFunction.h
+  TransferFunction.cc
   )
   
 CORE_ADD_LIBRARY(Core_VolumeRenderer 

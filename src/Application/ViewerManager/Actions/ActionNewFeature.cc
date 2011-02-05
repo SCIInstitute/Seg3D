@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
- 
+
  The MIT License
- 
+
  Copyright (c) 2009 Scientific Computing and Imaging Institute,
  University of Utah.
- 
- 
+
+
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -26,66 +26,39 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef QTUTILS_WIDGETS_QTHISTOGRAMGRAPH_H
-#define QTUTILS_WIDGETS_QTHISTOGRAMGRAPH_H
+#include <Core/Interface/Interface.h>
+#include <Application/ViewerManager/Actions/ActionNewFeature.h>
+#include <Application/ViewerManager/ViewerManager.h>
 
-// STL includes
-#include <vector>
+CORE_REGISTER_ACTION( Seg3D, NewFeature )
 
-// Qt includes
-#include <QWidget>
-#include <QMouseEvent>
-#include <QPoint>
-
-// Core includes
-#include <Core/DataBlock/Histogram.h>
-
-namespace QtUtils
+namespace Seg3D
 {
 
-class QtHistogramGraph : public QWidget
+ActionNewFeature::ActionNewFeature()
 {
-    Q_OBJECT
-    
-Q_SIGNALS:
-  void lower_position( int );
-  void upper_position( int );
+}
 
-public:
-    QtHistogramGraph( QWidget *parent = 0 );
-    virtual ~QtHistogramGraph();
-    
-public:
-  // SET_HISTOGRAM:
-  // Set the histogram of the graph
-  void set_histogram( const Core::Histogram& histogram );
-    
-  // RESET_HISTOGRAM:
-  // Invalidate the current histogram
-  void reset_histogram();
-  
-  bool get_logarithmic() const{ return this->logarithmic_; }
-  
-public Q_SLOTS:
-  void set_logarithmic( bool logarithmic );
+ActionNewFeature::~ActionNewFeature()
+{
+}
 
-protected:
-  // PAINTEVENT:
-  // Overloaded call that redraws the histogram plot
-    virtual void paintEvent( QPaintEvent *event );
-    
-public:
-    virtual void mousePressEvent( QMouseEvent* e );
-    
-    virtual void mouseMoveEvent( QMouseEvent* e );
+bool ActionNewFeature::validate( Core::ActionContextHandle& context )
+{
+  return true;
+}
 
-private:
-  Core::Histogram histogram_;
-  bool logarithmic_;
-  bool left_click_;
-  
-};
+bool ActionNewFeature::run( Core::ActionContextHandle& context,
+              Core::ActionResultHandle& result )
+{
+  ViewerManager::Instance()->add_new_feature();
+  return true;
+}
 
-} // end namespace QtUtils
+void ActionNewFeature::Dispatch( Core::ActionContextHandle context )
+{
+  ActionNewFeature* action = new ActionNewFeature;
+  Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
+}
 
-#endif
+} // end namespace Seg3D

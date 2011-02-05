@@ -193,7 +193,7 @@ double QtHistogramWidget::get_histogram_max()
 
 void QtHistogramWidget::set_histogram_view( int mode )
 {
-  this->private_->histogram_graph_->switch_between_linear_log_histogram( mode );
+  this->private_->histogram_graph_->set_logarithmic( mode == 1 );
 }
 
 void QtHistogramWidget::mousePressEvent( QMouseEvent* e )

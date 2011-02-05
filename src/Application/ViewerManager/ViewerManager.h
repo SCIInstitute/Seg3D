@@ -44,13 +44,14 @@
 #include <boost/utility.hpp>
 #include <boost/thread/mutex.hpp>
 
-// Application includes
-#include <Application/Viewer/Viewer.h>
-
 // Core includes
 #include <Core/Utils/Singleton.h>
 #include <Core/State/State.h>
 #include <Core/State/StateSet.h>
+#include <Core/VolumeRenderer/TransferFunction.h>
+
+// Application includes
+#include <Application/Viewer/Viewer.h>
 
 namespace Seg3D
 {
@@ -94,12 +95,21 @@ public:
     return 6;
   }
 
+  // GET_VIEWER:
+  // Returns the specified viewer.
   ViewerHandle get_viewer( size_t idx );
   ViewerHandle get_viewer( const std::string viewer_name );
+
+  // GET_ACTIVE_VIEWER:
+  // Returns the active viewer.
   ViewerHandle get_active_viewer();
 
+  // GET_2D_VIEWERS_INFO:
+  // Get a snapshot of all the 2D viewers.
   void get_2d_viewers_info( ViewerInfoList viewers[ 3 ] );
-  void pick_point( size_t source_viewer, const Core::Point& pt );
+
+  // GET_LOCKED_VIEWERS:
+  // Returns the IDs of locked viewers in the specified view mode.
   std::vector< size_t > get_locked_viewers( int mode_index );
 
   // UPDATE_VIEWERS:
@@ -121,6 +131,28 @@ public:
   // IS_BUSY:
   // Returns true if the mouse is pressed in any viewer, otherwise false.
   bool is_busy();
+
+  // GET_TRANSFER_FUNCTION:
+  // Returns a const handle to the transfer function.
+  Core::TransferFunctionHandle get_transfer_function();
+
+private:
+  friend class ActionPickPoint;
+  friend class ActionNewFeature;
+  friend class ActionDeleteFeature;
+
+  // PICK_POINT:
+  // Move the 2D viewers that are currently set as picking targets to 
+  // the specified position in world space.
+  void pick_point( size_t source_viewer, const Core::Point& pt );
+
+  // ADD_NEW_FEATURE:
+  // Add a new transfer function feature.
+  void add_new_feature();
+
+  // DELETE_FEATURE:
+  // Delete the specified transfer function feature.
+  void delete_feature( const std::string& feature_id );
 
   // -- State information --
 public:

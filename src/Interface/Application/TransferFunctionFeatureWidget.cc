@@ -25,67 +25,45 @@
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
  */
-
-#ifndef QTUTILS_WIDGETS_QTHISTOGRAMGRAPH_H
-#define QTUTILS_WIDGETS_QTHISTOGRAMGRAPH_H
-
+ 
 // STL includes
-#include <vector>
+#include <sstream>
+#include <iostream>
 
-// Qt includes
-#include <QWidget>
-#include <QMouseEvent>
-#include <QPoint>
+// QtUtils includes
+#include <QtUtils/Bridge/QtBridge.h>
 
-// Core includes
-#include <Core/DataBlock/Histogram.h>
+// Interface includes
+#include <Interface/Application/TransferFunctionFeatureWidget.h>
 
-namespace QtUtils
+// Automatically generated UI file
+#include "ui_TransferFunctionFeatureWidget.h"
+
+namespace Seg3D
 {
 
-class QtHistogramGraph : public QWidget
+class TransferFunctionFeatureWidgetPrivate
 {
-    Q_OBJECT
-    
-Q_SIGNALS:
-  void lower_position( int );
-  void upper_position( int );
-
 public:
-    QtHistogramGraph( QWidget *parent = 0 );
-    virtual ~QtHistogramGraph();
-    
-public:
-  // SET_HISTOGRAM:
-  // Set the histogram of the graph
-  void set_histogram( const Core::Histogram& histogram );
-    
-  // RESET_HISTOGRAM:
-  // Invalidate the current histogram
-  void reset_histogram();
-  
-  bool get_logarithmic() const{ return this->logarithmic_; }
-  
-public Q_SLOTS:
-  void set_logarithmic( bool logarithmic );
-
-protected:
-  // PAINTEVENT:
-  // Overloaded call that redraws the histogram plot
-    virtual void paintEvent( QPaintEvent *event );
-    
-public:
-    virtual void mousePressEvent( QMouseEvent* e );
-    
-    virtual void mouseMoveEvent( QMouseEvent* e );
-
-private:
-  Core::Histogram histogram_;
-  bool logarithmic_;
-  bool left_click_;
-  
+  Ui::TransferFunctionFeatureWidget ui_;
 };
 
-} // end namespace QtUtils
+TransferFunctionFeatureWidget::TransferFunctionFeatureWidget(
+  Core::TransferFunctionFeatureHandle feature, QWidget *parent ) :
+  QWidget( parent ),
+  private_( new TransferFunctionFeatureWidgetPrivate )
+{
+  // Set up the private internals of the LayerManagerInterface class
+  this->private_->ui_.setupUi( this );
+  
+  QtUtils::QtBridge::Connect( this->private_->ui_.red_color_slider_, feature->red_color_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.green_color_slider_, feature->green_color_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.blue_color_slider_, feature->blue_color_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.shininess_slider_, feature->shininess_state_ );
+}
 
-#endif
+TransferFunctionFeatureWidget::~TransferFunctionFeatureWidget()
+{
+}
+
+} // end namespace Seg3D

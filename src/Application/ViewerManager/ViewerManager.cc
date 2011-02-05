@@ -75,6 +75,7 @@ public:
   std::vector< size_t > locked_viewers_[ 4 ];
   size_t signal_block_count_;
   Core::BooleanStateGroup visibility_group_;
+  Core::TransferFunctionHandle transfer_function_;
 };
 
 void ViewerManagerPrivate::viewer_mode_changed( size_t viewer_id )
@@ -472,6 +473,7 @@ ViewerManager::ViewerManager() :
 {
   this->private_->signal_block_count_ = 0;
   this->private_->vm_ = this;
+  this->private_->transfer_function_.reset( new Core::TransferFunction );
 
   // Step (1)
   // Allow states to be set from outside of the application thread
@@ -725,6 +727,8 @@ bool ViewerManager::post_save_states( Core::StateIO& state_io )
   {
     this->private_->viewers_[ i ]->save_states( state_io );
   }
+
+  this->private_->transfer_function_->save_states( state_io );
   
   return true;
 }
@@ -739,6 +743,8 @@ bool ViewerManager::pre_load_states( const Core::StateIO& state_io )
   {
     this->private_->viewers_[ i ]->load_states( state_io );
   }
+
+  this->private_->transfer_function_->load_states( state_io );
 
   return true;
 }
@@ -853,6 +859,21 @@ bool ViewerManager::is_busy()
     }
   }
   return false;
+}
+
+Core::TransferFunctionHandle ViewerManager::get_transfer_function()
+{
+  return this->private_->transfer_function_;
+}
+
+void ViewerManager::add_new_feature()
+{
+  this->private_->transfer_function_->create_feature();
+}
+
+void ViewerManager::delete_feature( const std::string& feature_id )
+{
+  this->private_->transfer_function_->delete_feature( feature_id );
 }
 
 } // end namespace Seg3D

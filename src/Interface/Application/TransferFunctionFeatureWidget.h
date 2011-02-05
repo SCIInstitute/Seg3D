@@ -26,50 +26,32 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_APLICATION_RENDERINGDOCKWIDGET_H
-#define INTERFACE_APLICATION_RENDERINGDOCKWIDGET_H
+#ifndef INTERFACE_APLICATION_TRANSFERFUNCTIONFEATUREWIDGET_H
+#define INTERFACE_APLICATION_TRANSFERFUNCTIONFEATUREWIDGET_H
 
 // Boost includes
 #include <boost/shared_ptr.hpp>
 
-// QT includes
-#include <QtCore/QPointer>
+#include <QWidget>
 
-// Core includes
-#include <Core/Utils/ConnectionHandler.h>
 #include <Core/VolumeRenderer/TransferFunctionFeature.h>
-
-// QtUtils includes
-#include <QtUtils/Widgets/QtCustomDockWidget.h>
 
 namespace Seg3D
 {
 
-class RenderingDockWidgetPrivate;
+class TransferFunctionFeatureWidgetPrivate;
 
-class RenderingDockWidget : public QtUtils::QtCustomDockWidget, private Core::ConnectionHandler
+class TransferFunctionFeatureWidget : public QWidget, private Core::ConnectionHandler
 {
-
-Q_OBJECT
+  Q_OBJECT
 
 public:
-  RenderingDockWidget( QWidget *parent = 0 );
-  ~RenderingDockWidget();
+  TransferFunctionFeatureWidget( Core::TransferFunctionFeatureHandle feature, 
+    QWidget *parent = 0 );
+  ~TransferFunctionFeatureWidget();
   
 private:
-  void update_tab_appearance( bool enabled, int index  );
-  void handle_feature_added( Core::TransferFunctionFeatureHandle feature );
-  void handle_feature_deleted( Core::TransferFunctionFeatureHandle feature );
-
-private:
-  boost::shared_ptr< RenderingDockWidgetPrivate > private_;
-  
-private:
-  typedef QPointer< RenderingDockWidget > qpointer_type;
-
-  static void HandleClippingPlanesStateChanged( qpointer_type qpointer, bool state, int index );
-  static void HandleFeatureAdded( qpointer_type qpointer, Core::TransferFunctionFeatureHandle feature );
-  static void HandleFeatureDeleted( qpointer_type qpointer, Core::TransferFunctionFeatureHandle feature );
+  boost::shared_ptr< TransferFunctionFeatureWidgetPrivate > private_;
 };
 
 } // end namespace Seg3D

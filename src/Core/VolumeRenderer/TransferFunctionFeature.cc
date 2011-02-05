@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
- 
+
  The MIT License
- 
+
  Copyright (c) 2009 Scientific Computing and Imaging Institute,
  University of Utah.
- 
- 
+
+
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -26,66 +26,40 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef QTUTILS_WIDGETS_QTHISTOGRAMGRAPH_H
-#define QTUTILS_WIDGETS_QTHISTOGRAMGRAPH_H
+#include <Core/VolumeRenderer/TransferFunctionFeature.h>
 
-// STL includes
-#include <vector>
-
-// Qt includes
-#include <QWidget>
-#include <QMouseEvent>
-#include <QPoint>
-
-// Core includes
-#include <Core/DataBlock/Histogram.h>
-
-namespace QtUtils
+namespace Core
 {
 
-class QtHistogramGraph : public QWidget
+TransferFunctionFeature::TransferFunctionFeature() :
+  StateHandler( "tffeature", true )
 {
-    Q_OBJECT
-    
-Q_SIGNALS:
-  void lower_position( int );
-  void upper_position( int );
+  this->initialize_states();
+}
 
-public:
-    QtHistogramGraph( QWidget *parent = 0 );
-    virtual ~QtHistogramGraph();
-    
-public:
-  // SET_HISTOGRAM:
-  // Set the histogram of the graph
-  void set_histogram( const Core::Histogram& histogram );
-    
-  // RESET_HISTOGRAM:
-  // Invalidate the current histogram
-  void reset_histogram();
-  
-  bool get_logarithmic() const{ return this->logarithmic_; }
-  
-public Q_SLOTS:
-  void set_logarithmic( bool logarithmic );
+TransferFunctionFeature::TransferFunctionFeature( const std::string& feature_id ) :
+  StateHandler( feature_id, true )
+{
+  this->initialize_states();
+}
 
-protected:
-  // PAINTEVENT:
-  // Overloaded call that redraws the histogram plot
-    virtual void paintEvent( QPaintEvent *event );
-    
-public:
-    virtual void mousePressEvent( QMouseEvent* e );
-    
-    virtual void mouseMoveEvent( QMouseEvent* e );
+TransferFunctionFeature::~TransferFunctionFeature()
+{
 
-private:
-  Core::Histogram histogram_;
-  bool logarithmic_;
-  bool left_click_;
-  
-};
+}
 
-} // end namespace QtUtils
+const std::string& TransferFunctionFeature::get_feature_id() const
+{
+  return this->get_statehandler_id();
+}
 
-#endif
+void TransferFunctionFeature::initialize_states()
+{
+  this->add_state( "control_points", this->control_points_state_ );
+  this->add_state( "red", this->red_color_state_, 128, 0, 255, 1 );
+  this->add_state( "green", this->green_color_state_, 128, 0, 255, 1 );
+  this->add_state( "blue", this->blue_color_state_, 128, 0, 255, 1 );
+  this->add_state( "shininess", this->shininess_state_, 0, 0, 128, 1 );
+}
+
+} // end namespace Core

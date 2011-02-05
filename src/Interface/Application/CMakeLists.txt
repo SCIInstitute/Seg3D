@@ -73,6 +73,7 @@ SET(INTERFACE_APPLICATION_SRCS
   ViewerInterface.cc
   ViewerWidget.cc
   RenderingDockWidget.cc
+  TransferFunctionFeatureWidget.cc
 )
 
 SET(INTERFACE_APPLICATION_MOC_SRCS
@@ -116,6 +117,7 @@ SET(INTERFACE_APPLICATION_MOC_SRCS
   ViewerInterface.h
   ViewerWidget.h
   RenderingDockWidget.h
+  TransferFunctionFeatureWidget.h
 )
 
 
@@ -150,6 +152,7 @@ SET(INTERFACE_APPLICATION_UI_SRCS
   ViewerInterface.ui
   ViewerWidget.ui
   RenderingDockWidget.ui
+  TransferFunctionFeatureWidget.ui
 )
 
 SET(INTERFACE_APPLICATION_RCC_SRCS

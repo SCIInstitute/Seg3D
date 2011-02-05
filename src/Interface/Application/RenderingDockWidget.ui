@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>258</width>
-    <height>686</height>
+    <width>278</width>
+    <height>789</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -15,12 +15,6 @@
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
-  </property>
-  <property name="minimumSize">
-   <size>
-    <width>255</width>
-    <height>529</height>
-   </size>
   </property>
   <property name="styleSheet">
    <string notr="true">QLabel#fog_label_{
@@ -1252,7 +1246,7 @@ QWidget#vr_content_{
     <item>
      <widget class="QWidget" name="vr_widget_" native="true">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
@@ -1266,6 +1260,12 @@ QWidget#vr_content_{
        </property>
        <item>
         <widget class="QWidget" name="vr_header_bkg_" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <layout class="QVBoxLayout" name="verticalLayout_20">
           <property name="spacing">
            <number>0</number>
@@ -1333,6 +1333,12 @@ QWidget#vr_content_{
        </item>
        <item>
         <widget class="QWidget" name="vr_content_" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <layout class="QVBoxLayout" name="verticalLayout_21">
           <property name="spacing">
            <number>2</number>
@@ -1341,7 +1347,39 @@ QWidget#vr_content_{
            <number>4</number>
           </property>
           <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="label_27">
+              <property name="maximumSize">
+               <size>
+                <width>60</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Target:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="comboBox"/>
+            </item>
+           </layout>
+          </item>
+          <item>
            <widget class="QLabel" name="label_26">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="text">
              <string>Sampling Rate:</string>
             </property>
@@ -1363,6 +1401,74 @@ QWidget#vr_content_{
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="QGroupBox" name="groupBox">
+            <property name="title">
+             <string>Transfer Function</string>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_22">
+             <property name="spacing">
+              <number>2</number>
+             </property>
+             <property name="margin">
+              <number>4</number>
+             </property>
+             <item>
+              <widget class="QtUtils::QtHistogramGraph" name="histogram_" native="true">
+               <layout class="QVBoxLayout" name="verticalLayout_23">
+                <property name="spacing">
+                 <number>0</number>
+                </property>
+                <property name="margin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="QtUtils::QtTransferFunctionView" name="tf_view_">
+                  <property name="renderHints">
+                   <set>QPainter::Antialiasing|QPainter::TextAntialiasing</set>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_5">
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
+               <item>
+                <spacer name="horizontalSpacer">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QPushButton" name="add_feature_button_">
+                 <property name="text">
+                  <string>Add Feature</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QVBoxLayout" name="feature_control_layout_">
+               <property name="spacing">
+                <number>4</number>
+               </property>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
@@ -1378,6 +1484,17 @@ QWidget#vr_content_{
    <extends>QWidget</extends>
    <header location="global">QtUtils/Widgets/QtSliderDoubleCombo.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QtUtils::QtHistogramGraph</class>
+   <extends>QWidget</extends>
+   <header location="global">QtUtils/Widgets/QtHistogramGraph.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QtUtils::QtTransferFunctionView</class>
+   <extends>QGraphicsView</extends>
+   <header location="global">QtUtils/Widgets/QtTransferFunctionView.h</header>
   </customwidget>
  </customwidgets>
  <resources>

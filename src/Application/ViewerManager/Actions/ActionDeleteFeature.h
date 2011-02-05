@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
- 
+
  The MIT License
- 
+
  Copyright (c) 2009 Scientific Computing and Imaging Institute,
  University of Utah.
- 
- 
+
+
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -26,50 +26,35 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_APLICATION_RENDERINGDOCKWIDGET_H
-#define INTERFACE_APLICATION_RENDERINGDOCKWIDGET_H
+#ifndef APPLICATION_VIEWERMANAGER_ACTIONS_ACTIONNEWFEATURE_H
+#define APPLICATION_VIEWERMANAGER_ACTIONS_ACTIONNEWFEATURE_H
 
-// Boost includes
-#include <boost/shared_ptr.hpp>
-
-// QT includes
-#include <QtCore/QPointer>
-
-// Core includes
-#include <Core/Utils/ConnectionHandler.h>
-#include <Core/VolumeRenderer/TransferFunctionFeature.h>
-
-// QtUtils includes
-#include <QtUtils/Widgets/QtCustomDockWidget.h>
+#include <Core/Action/Action.h>
 
 namespace Seg3D
 {
 
-class RenderingDockWidgetPrivate;
-
-class RenderingDockWidget : public QtUtils::QtCustomDockWidget, private Core::ConnectionHandler
+class ActionDeleteFeature : public Core::Action
 {
 
-Q_OBJECT
+CORE_ACTION(
+  CORE_ACTION_TYPE( "DeleteFeature", "Delete a transfer function feature." )
+  CORE_ACTION_ARGUMENT( "feature_id", "The string ID of the feature to be deleted." )
+  CORE_ACTION_CHANGES_PROJECT_DATA()
+)
 
 public:
-  RenderingDockWidget( QWidget *parent = 0 );
-  ~RenderingDockWidget();
-  
-private:
-  void update_tab_appearance( bool enabled, int index  );
-  void handle_feature_added( Core::TransferFunctionFeatureHandle feature );
-  void handle_feature_deleted( Core::TransferFunctionFeatureHandle feature );
+  ActionDeleteFeature();
+  virtual ~ActionDeleteFeature();
+
+  virtual bool validate( Core::ActionContextHandle& context );
+  virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
 
 private:
-  boost::shared_ptr< RenderingDockWidgetPrivate > private_;
-  
-private:
-  typedef QPointer< RenderingDockWidget > qpointer_type;
+  Core::ActionParameter< std::string > feature_id_;
 
-  static void HandleClippingPlanesStateChanged( qpointer_type qpointer, bool state, int index );
-  static void HandleFeatureAdded( qpointer_type qpointer, Core::TransferFunctionFeatureHandle feature );
-  static void HandleFeatureDeleted( qpointer_type qpointer, Core::TransferFunctionFeatureHandle feature );
+public:
+  static void Dispatch( Core::ActionContextHandle context, const std::string& feature_id );
 };
 
 } // end namespace Seg3D

@@ -62,6 +62,8 @@
 #include <QtUtils/Bridge/detail/QtLabelConnector.h>
 #include <QtUtils/Bridge/detail/QtPlainTextEditConnector.h>
 #include <QtUtils/Bridge/detail/QtTristateToolButtonConnector.h>
+#include <QtUtils/Bridge/detail/QtTransferFunctionSceneConnector.h>
+#include <QtUtils/Bridge/detail/QtTransferFunctionCurveConnector.h>
 
 namespace QtUtils
 {
@@ -210,11 +212,21 @@ void QtBridge::Connect( QtTristateToolButton* tristate_button, Core::StateOption
 {
   new QtTristateToolButtonConnector( tristate_button, state );
 }
-  
-  void QtBridge::Enable( QAction* qaction, Core::StateBoolHandle& state, bool opposite_logic )
-  {
-    new QtEnableConnector( qaction, state, opposite_logic );
-  } 
+
+void QtBridge::Connect( QtTransferFunctionScene* tf_scene, Core::TransferFunctionHandle& tf )
+{
+  new QtTransferFunctionSceneConnector( tf_scene, tf );
+}
+
+void QtBridge::Connect( QtTransferFunctionCurve* tf_curve, Core::TransferFunctionFeatureHandle& feature )
+{
+  new QtTransferFunctionCurveConnector( tf_curve, feature );
+}
+
+void QtBridge::Enable( QAction* qaction, Core::StateBoolHandle& state, bool opposite_logic )
+{
+  new QtEnableConnector( qaction, state, opposite_logic );
+} 
 
 void QtBridge::Enable( QWidget* qwidget, Core::StateBoolHandle& state, bool opposite_logic )
 {

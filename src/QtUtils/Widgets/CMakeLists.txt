@@ -48,6 +48,10 @@ SET(QTUTILS_WIDGETS_SRCS
   QtTristateToolButton.cc
   SingleShotToolButton.cc
   QtWarningMessageWidget.cc
+  QtTransferFunctionControlPoint.cc
+  QtTransferFunctionCurve.cc
+  QtTransferFunctionScene.cc
+  QtTransferFunctionView.cc
 )
 
 SET(QTUTILS_WIDGETS_MOC_SRCS
@@ -67,6 +71,10 @@ SET(QTUTILS_WIDGETS_MOC_SRCS
   QtTristateToolButton.h
   SingleShotToolButton.h
   QtWarningMessageWidget.h
+  QtTransferFunctionControlPoint.h
+  QtTransferFunctionCurve.h
+  QtTransferFunctionScene.h
+  QtTransferFunctionView.h
 )
 
 SET(QTUTILS_WIDGETS_NO_MOC_SRCS
