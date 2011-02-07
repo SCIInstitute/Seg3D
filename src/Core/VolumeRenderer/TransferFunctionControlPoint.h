@@ -31,16 +31,12 @@
 
 #include <vector>
 
-#include <Core/State/StateVector.h>
 
 namespace Core
 {
 
 class TransferFunctionControlPoint;
 typedef std::vector< TransferFunctionControlPoint > TransferFunctionControlPointVector;
-typedef StateVector< TransferFunctionControlPoint > StateTransferFunctionControlPointVector;
-typedef boost::shared_ptr< StateTransferFunctionControlPointVector > 
-  StateTransferFunctionControlPointVectorHandle;
 
 class TransferFunctionControlPoint
 {
@@ -113,5 +109,16 @@ std::string ExportToString( const TransferFunctionControlPoint& control_point );
 bool ImportFromString( const std::string& str, TransferFunctionControlPoint& control_point );
 
 } // end namespace Core
+
+#include <Core/State/StateVector.h>
+
+namespace Core 
+{
+  
+typedef StateVector< TransferFunctionControlPoint > StateTransferFunctionControlPointVector;
+typedef boost::shared_ptr< StateTransferFunctionControlPointVector > 
+StateTransferFunctionControlPointVectorHandle;
+
+}
 
 #endif

@@ -29,9 +29,9 @@
 #ifndef CORE_VOLUMERENDERER_TRANSFERFUNCTIONFEATURE_H
 #define CORE_VOLUMERENDERER_TRANSFERFUNCTIONFEATURE_H
 
+#include <Core/VolumeRenderer/TransferFunctionControlPoint.h>
 #include <Core/State/StateHandler.h>
 #include <Core/State/StateRangedValue.h>
-#include <Core/VolumeRenderer/TransferFunctionControlPoint.h>
 
 namespace Core
 {

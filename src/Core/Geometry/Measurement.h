@@ -120,10 +120,10 @@ private:
   std::string   note_;
   Core::Point   p1_; // 3D world coordinate of 1st point
   Core::Point   p2_; // 3D world coordinate of 2nd point
-  int       slice_num_;
   ViewAxis    view_axis_;
-  std::string   oblique_name_; // In case ViewAxis = OBLIQUE
+  int       slice_num_;
   int       slice_thickness_;
+  std::string   oblique_name_; // In case ViewAxis = OBLIQUE
 };
 
 inline bool Measurement::operator==( const Measurement& m ) const
