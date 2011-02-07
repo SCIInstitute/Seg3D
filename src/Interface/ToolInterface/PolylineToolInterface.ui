@@ -190,7 +190,7 @@ QWidget#message_alert_{
       <item>
        <widget class="QLabel" name="message_">
         <property name="text">
-         <string>Select a data layer to activate this tool.</string>
+         <string>Select a mask layer to activate this tool.</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
