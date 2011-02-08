@@ -109,12 +109,14 @@ SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
   MeasurementToolInterface.h 
   detail/MeasurementTableView.h
   detail/MeasurementTableModel.h
+  detail/MeasurementTextEdit.h
   detail/TextDelegate.h
 )
 
 SET(INTERFACE_TOOLINTERFACE_NO_MOC_SRCS
   detail/MeasurementTableView.cc
   detail/MeasurementTableModel.cc
+  detail/MeasurementTextEdit.cc
   detail/TextDelegate.cc
 )
 

@@ -34,6 +34,7 @@
 #include <Application/Tools/MeasurementTool.h>
 
 // Core includes
+#include <Core/State/Actions/ActionRemove.h>
 #include <Core/State/Actions/ActionSetAt.h>
 
 // Register the tool into the tool factory
@@ -122,5 +123,19 @@ void MeasurementTool::set_active_index( int active_index )
   Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
     this->active_index_state_, active_index );
 }
+
+bool MeasurementTool::remove_measurement( size_t index )
+{
+  std::vector< Core::Measurement > measurements = this->get_measurements();
+  if( index >= measurements.size() ) return false;
+
+  Core::Measurement measurement = measurements[ index ];
+
+  // Ensure that state is changed on application thread
+  Core::ActionRemove::Dispatch( Core::Interface::GetWidgetActionContext(), 
+    this->measurements_state_, measurement );
+  return true;
+}
+
 
 } // end namespace Seg3D

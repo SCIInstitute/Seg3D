@@ -26,61 +26,21 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_TOOLINTERFACE_MEASUREMENTTABLEVIEW_H
-#define INTERFACE_TOOLINTERFACE_MEASUREMENTTABLEVIEW_H
-
-// Qt includes
-#include <QtGui/QHeaderView>
-#include <QtGui/QScrollBar>
-#include <QtGUI/QTableView>
-
 // Interface includes
+#include <Interface/ToolInterface/detail/MeasurementTextEdit.h>
 
 namespace Seg3D
 {
 
-// Forward declarations
-class DeleteMeasurementDialog;
-class MeasurementTableModel;
-
-// QTableView with support for copyable measurements
-class MeasurementTableView : public QTableView 
+MeasurementTextEdit::MeasurementTextEdit( QWidget * parent ) :
+  QTextEdit( parent )
 { 
-  Q_OBJECT
-public: 
-  MeasurementTableView( QWidget* parent );
+}
 
-  //
-  // Extended functions
-  //
-
-  void set_measurement_model( MeasurementTableModel* measurement_model );
-  void get_deletion_candidates( std::vector< int >& deletion_candidates ) const;  
-  void delete_selected_measurements();
-  void copy() const;
-
-Q_SIGNALS:
-  void delete_table_measurements();
-
-private Q_SLOTS:
-  void handle_model_reset();
-  void scroll_to_active_index();
-
-private:
-  QAction* delete_action_;
-}; 
-
-// Derived scroll bar that accepts all wheelEvent events rather than passing them on to the 
-// parent when scrollbar is at min/max.
-class MeasurementScrollBar : public QScrollBar
+void MeasurementTextEdit::focusOutEvent( QFocusEvent * e )
 {
-public:
-  MeasurementScrollBar( QWidget * parent = 0 ) :
-    QScrollBar( parent ) {}
-
-  void wheelEvent( QWheelEvent * e );
-};
+  QTextEdit::focusOutEvent( e );
+  Q_EMIT this->editing_finished();
+}
 
 } // end namespace Seg3D
-
-#endif 

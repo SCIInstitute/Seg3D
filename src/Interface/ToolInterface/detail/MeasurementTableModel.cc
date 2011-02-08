@@ -40,7 +40,9 @@ namespace Seg3D
 MeasurementTableModel::MeasurementTableModel( MeasurementToolHandle measurement_tool, 
   QObject* parent ) :
   QAbstractTableModel( parent ),
-  measurement_tool_( measurement_tool )
+  measurement_tool_( measurement_tool ),
+  cached_active_note_( "" ),
+  use_cached_active_note_( false )
 {
 }
 
@@ -100,7 +102,15 @@ QVariant MeasurementTableModel::data( const QModelIndex& index, int role ) const
         }
         else if ( index.column() == MEASUREMENT_NOTE_E ) 
         {
-          return QString::fromStdString( measurement.get_note() );
+          if( index.row() == this->get_active_index() && this->use_cached_active_note_ )
+          {
+            return QString::fromStdString( this->cached_active_note_ );
+          }
+          else
+          {
+            return QString::fromStdString( measurement.get_note() );
+          }
+          
         }
       }
     }
@@ -173,18 +183,26 @@ bool MeasurementTableModel::setData( const QModelIndex &index, const QVariant &v
     }
     else if( index.column() == MEASUREMENT_NOTE_E ) 
     {
-      measurement.set_note( value.toString().toStdString() );
-      this->measurement_tool_->set_measurement( index.row(), measurement );
+      // Don't save note to state variable yet because we don't want to trigger a full update
+      // for every character typed.  A full update interrupts editing so we're never
+      // able to type more than one character before losing edit focus.  Instead, wait until 
+      // the note editing is finished to save the state.  In the meantime save and use a 
+      // cached copy of the note.
+      this->cached_active_note_ = value.toString().toStdString();
+      this->use_cached_active_note_ = true;
 
       // If we are editing this cell then it is by definition the active measurement
       Q_EMIT active_note_changed( value.toString() ); 
+
+      // The note can only be modified on the Interface thread, so it is safe to update
+      // the table view here.  Need to emit dataChanged so that table updates if 
+      // user is editing note in text box. 
+      Q_EMIT dataChanged( index, index ); 
     }
     else
     {
       return false;
-    }
-
-//    Q_EMIT dataChanged( index, index ); 
+    } 
     return true;
   }
   return false;
@@ -252,22 +270,25 @@ int MeasurementTableModel::get_active_index() const
 
 bool MeasurementTableModel::removeRows( int row, int count, const QModelIndex & /* parent */ )
 {
-  //if( row < 0 || row + count > this->rowCount( QModelIndex() ) ) return false;
+  if( row < 0 || row + count > this->rowCount( QModelIndex() ) ) return false;
 
-  //// Remove rows from measurement list
-  //bool ok = Core::MeasurementList::Instance()->erase( row, row + count );
+  // Remove rows from measurement list
+  bool ok = true;
+  for( int row_index = row + count - 1; row_index >= row; row_index-- )
+  {
+    ok = ok && this->measurement_tool_->remove_measurement( row_index );
+  }
 
-  //if( ok ) 
-  //{
-  //  // Send signal to update note in text box
-  //  Q_EMIT active_note_changed( this->get_active_note() ); 
+  if( ok ) 
+  {
+    // Send signal to update note in text box
+    Q_EMIT active_note_changed( this->get_active_note() ); 
 
-  //  // Update model
-  //  update();
-  //}
+    // Update model
+    //update();
+  }
 
-  //return ok;
-  return true;
+  return ok;
 }
 
 void MeasurementTableModel::set_active_index( int active_index )
@@ -320,6 +341,16 @@ void MeasurementTableModel::remove_rows( const std::vector< int >& rows )
   {
     this->removeRow( *reverse_iter );
   }
+}
+
+void MeasurementTableModel::save_active_note() 
+{
+  Core::Measurement measurement = 
+    this->measurement_tool_->get_measurements()[ this->get_active_index() ];
+  measurement.set_note( this->cached_active_note_ );
+  this->measurement_tool_->set_measurement( this->get_active_index(), measurement );
+
+  this->use_cached_active_note_ = false;
 }
 
 } // end namespace Seg3D

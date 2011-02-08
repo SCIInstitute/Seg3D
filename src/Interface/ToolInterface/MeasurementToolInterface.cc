@@ -88,6 +88,8 @@ bool MeasurementToolInterface::build_widget( QFrame* frame )
   // Connect the gui to the tool through the QtBridge
   QtUtils::QtBridge::Connect( this->private_->ui_.copy_button_, boost::bind(
     &MeasurementTableView::copy, this->private_->table_view_ ) );
+  //QtUtils::QtBridge::Connect( this->private_->ui_.delete_button_, boost::bind(
+  //  &MeasurementTableView::delete_selected_measurements, this->private_->table_view_ ) );
 
   // Connect note column and text box using Qt signals/slots since currently can't hook up two
   // widgets to same state object.
@@ -95,6 +97,8 @@ bool MeasurementToolInterface::build_widget( QFrame* frame )
     this, SLOT( set_measurement_note_box( QString ) ) );
   QObject::connect( this->private_->ui_.note_textbox_, SIGNAL( textChanged() ), 
     this, SLOT( update_measurement_note_model() ) );
+  QObject::connect( this->private_->ui_.note_textbox_, SIGNAL( editing_finished() ), 
+    this->private_->table_model_, SLOT( save_active_note() ) );
 
   //Send a message to the log that we have finished with building the Measure Tool Interface
   CORE_LOG_MESSAGE( "Finished building an Measure Tool Interface" );
@@ -132,24 +136,7 @@ void MeasurementToolInterface::UpdateMeasurementModel( qpointer_type measurement
   // Protect interface pointer, so we do not execute if interface does not exist anymore
   if ( measurement_interface.data() )
   {
-    /* If the user is editing a note in the table and the entire table is updated with 
-    update_table(), the editor is closed.  This is not desirable.  Therefore if the table is 
-    the active window, we assume that the change has originated from the user editing in the 
-    window and we update only the data, not then entire table.  If the table size has changed 
-    (measurements added or removed), then the table is not the active window, so 
-    do a full table update.
-
-    We do it this way since the state_changed_signal_ doesn't tell us anything about whether 
-    the size of the measurements vector changed, or just the contents.
-    */
-    if( measurement_interface->private_->table_view_->isActiveWindow() )
-    {
-      measurement_interface->private_->table_model_->update_data();
-    }
-    else
-    {
-      measurement_interface->private_->table_model_->update_table();
-    }
+    measurement_interface->private_->table_model_->update_table();
   }
 }
 

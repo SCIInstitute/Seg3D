@@ -44,22 +44,8 @@ namespace Seg3D
 MeasurementTableView::MeasurementTableView( QWidget* parent ) : 
   QTableView( parent )
 {
-  //MeasurementTableModel* measurement_model = new MeasurementTableModel( this );
-  //this->setModel( measurement_model );
   this->setItemDelegate( new TextDelegate( MEASUREMENT_NOTE_E ) ); // Custom text editor for note column
   this->horizontalHeader()->setStretchLastSection( true ); // Stretch note section
-
-  /*QObject::connect( measurement_model, SIGNAL( modelReset() ), 
-    this, SLOT( handle_model_reset() ) );
-  QObject::connect( this, SIGNAL( clicked( QModelIndex ) ), 
-    measurement_model, SLOT( handle_click( QModelIndex ) ) );
-  QObject::connect( this->selectionModel(), 
-    SIGNAL( selectionChanged( QItemSelection, QItemSelection ) ), 
-    measurement_model, SLOT( handle_selected( QItemSelection) ) );
-  QObject::connect( measurement_model, SIGNAL( rowsRemoved( QModelIndex, int, int ) ), 
-    this, SLOT( scroll_to_active_index() ) );
-  QObject::connect( measurement_model, SIGNAL( rowsInserted( QModelIndex, int, int ) ), 
-    this, SLOT( scroll_to_active_index() ) );*/
 
   this->delete_action_ = new QAction( tr( "&Delete" ), this );
   
@@ -81,6 +67,12 @@ void MeasurementTableView::set_measurement_model( MeasurementTableModel* measure
     this, SLOT( scroll_to_active_index() ) );
   QObject::connect( measurement_model, SIGNAL( rowsInserted( QModelIndex, int, int ) ), 
     this, SLOT( scroll_to_active_index() ) );
+
+  // Wait until text editing is finished to save the note for the active measurement.  This 
+  // way we avoid updating the model for every keystroke.
+  QAbstractItemDelegate* text_delegate = this->itemDelegate();
+  QObject::connect( text_delegate, SIGNAL( closeEditor( QWidget* ) ), measurement_model, 
+    SLOT( save_active_note() ) );
 }
 
 void MeasurementTableView::handle_model_reset()
@@ -132,15 +124,14 @@ void MeasurementTableView::get_deletion_candidates( std::vector< int >& deletion
     }
     std::sort( deletion_candidates.begin(), deletion_candidates.end() );
   }
-  //else // No rows are selected -- delete active measurement
-  //{
-  //  int active_index = model->get_active_index();
-  //  if( active_index != Core::MeasurementList::INVALID_ACTIVE_INDEX_C )
-  //  {
-  //    deletion_candidates.push_back( active_index );
-  //  }
-  //}
-
+  else // No rows are selected -- delete active measurement
+  {
+    int active_index = model->get_active_index();
+    if( active_index != MeasurementTool::INVALID_ACTIVE_INDEX_C )
+    {
+      deletion_candidates.push_back( active_index );
+    }
+  }
 }
 
 void MeasurementTableView::copy() const
@@ -194,6 +185,40 @@ void MeasurementTableView::copy() const
   selected_text.append( model()->data( previous ).toString() ); 
   selected_text.append( QLatin1Char('\n') ); 
   qApp->clipboard()->setText( selected_text );
+}
+
+void MeasurementTableView::delete_selected_measurements()
+{
+  std::vector< int > deletion_candidates;
+  this->get_deletion_candidates( deletion_candidates );
+  if( deletion_candidates.size() == 0 ) 
+  {
+    return;
+  }
+
+  /*
+  QString measurement_list = this->build_measurement_string( deletion_candidates );
+
+  bool delete_confirmed = true;
+  if( this->delete_measure_dialog_->always_show() )
+  {
+    // Launch dialog allowing the user to confirm/cancel deletion
+    this->delete_measure_dialog_->set_measurement_list( measurement_list );
+    this->delete_measure_dialog_->exec();
+
+    delete_confirmed = ( this->delete_measure_dialog_->result() == QDialog::Accepted );
+  }
+
+  if ( delete_confirmed )
+  {
+    // Delete selected/active measurements
+    this->table_model_->remove_rows( deletion_candidates );
+  }
+  */
+  // Delete selected/active measurements
+  MeasurementTableModel* measurement_model = 
+    dynamic_cast< MeasurementTableModel* >( this->model() );
+  measurement_model->remove_rows( deletion_candidates );
 }
 
 void MeasurementScrollBar::wheelEvent( QWheelEvent * e )

@@ -73,7 +73,13 @@ public:
   // Extended functions
   //
 
+  // UPDATE_TABLE:
+  // Update entire table.  Useful when table dimensions (rows or columns) may have changed.
+  // Stops any editing that the user may be doing on the table.
   void update_table();
+
+  // UPDATE_DATA:
+  // Update only data in the table.  Doesn't stop editing user may be doing on table.
   void update_data();
 
   void remove_rows( const std::vector< int >& rows );
@@ -89,10 +95,13 @@ Q_SIGNALS:
 private Q_SLOTS:
   void handle_click( const QModelIndex & index );
   void handle_selected( const QItemSelection & selected );
-  
+  void save_active_note();
+
 private:
   void set_active_index( int active_index );
 
+  std::string cached_active_note_;
+  bool use_cached_active_note_;
   MeasurementToolHandle measurement_tool_;
 };
 

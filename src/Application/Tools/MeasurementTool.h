@@ -70,6 +70,7 @@ public:
 
   std::vector< Core::Measurement > get_measurements() const;
   void set_measurement( size_t index, const Core::Measurement& measurement );
+  bool remove_measurement( size_t index );
 
   int get_active_index() const;
   void set_active_index( int active_index );
