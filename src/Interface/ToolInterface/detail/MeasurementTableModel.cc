@@ -74,7 +74,7 @@ QVariant MeasurementTableModel::data( const QModelIndex& index, int role ) const
     if ( index.column() == MEASUREMENT_VISIBLE_E ) 
     {
       std::vector< Core::Measurement > measurements = this->measurement_tool_->get_measurements();
-      if( measurements.size() > index.row() )
+      if( index.row() < measurements.size() )
       {
         if( measurements[ index.row() ].get_visible() )
         {
@@ -93,7 +93,7 @@ QVariant MeasurementTableModel::data( const QModelIndex& index, int role ) const
     if ( index.row() < sz )
     {
       std::vector< Core::Measurement > measurements = this->measurement_tool_->get_measurements();
-      if( measurements.size() > index.row() )
+      if( index.row() < measurements.size() )
       {
         Core::Measurement measurement = measurements[ index.row() ];
         if ( index.column() == MEASUREMENT_LENGTH_E ) 
@@ -138,8 +138,9 @@ QVariant MeasurementTableModel::headerData( int section, Qt::Orientation orienta
   {
     if( section < this->rowCount( QModelIndex() ) )
     {
-      std::vector< Core::Measurement > measurements = this->measurement_tool_->get_measurements();
-      if( measurements.size() > section )
+      std::vector< Core::Measurement > measurements = 
+        this->measurement_tool_->get_measurements();
+      if( section < measurements.size() )
       { 
         Core::Measurement measurement = measurements[ section ];
         return QString::fromStdString( measurement.get_label() );
@@ -175,35 +176,38 @@ bool MeasurementTableModel::setData( const QModelIndex &index, const QVariant &v
   if ( index.isValid() && role == Qt::EditRole ) 
   { 
     std::vector< Core::Measurement > measurements = this->measurement_tool_->get_measurements();
-    Core::Measurement measurement = measurements[ index.row() ];
-    if ( index.column() == MEASUREMENT_VISIBLE_E ) 
+    if( index.row() < measurements.size() ) 
     {
-      measurement.set_visible( value.toBool() );
-      this->measurement_tool_->set_measurement( index.row(), measurement );
-    }
-    else if( index.column() == MEASUREMENT_NOTE_E ) 
-    {
-      // Don't save note to state variable yet because we don't want to trigger a full update
-      // for every character typed.  A full update interrupts editing so we're never
-      // able to type more than one character before losing edit focus.  Instead, wait until 
-      // the note editing is finished to save the state.  In the meantime save and use a 
-      // cached copy of the note.
-      this->cached_active_note_ = value.toString().toStdString();
-      this->use_cached_active_note_ = true;
+      Core::Measurement measurement = measurements[ index.row() ];
+      if ( index.column() == MEASUREMENT_VISIBLE_E ) 
+      {
+        measurement.set_visible( value.toBool() );
+        this->measurement_tool_->set_measurement( index.row(), measurement );
+      }
+      else if( index.column() == MEASUREMENT_NOTE_E ) 
+      {
+        // Don't save note to state variable yet because we don't want to trigger a full update
+        // for every character typed.  A full update interrupts editing so we're never
+        // able to type more than one character before losing edit focus.  Instead, wait until 
+        // the note editing is finished to save the state.  In the meantime save and use a 
+        // cached copy of the note.
+        this->cached_active_note_ = value.toString().toStdString();
+        this->use_cached_active_note_ = true;
 
-      // If we are editing this cell then it is by definition the active measurement
-      Q_EMIT active_note_changed( value.toString() ); 
+        // If we are editing this cell then it is by definition the active measurement
+        Q_EMIT active_note_changed( value.toString() ); 
 
-      // The note can only be modified on the Interface thread, so it is safe to update
-      // the table view here.  Need to emit dataChanged so that table updates if 
-      // user is editing note in text box. 
-      Q_EMIT dataChanged( index, index ); 
+        // The note can only be modified on the Interface thread, so it is safe to update
+        // the table view here.  Need to emit dataChanged so that table updates if 
+        // user is editing note in text box. 
+        Q_EMIT dataChanged( index, index ); 
+      }
+      else
+      {
+        return false;
+      } 
+      return true;
     }
-    else
-    {
-      return false;
-    } 
-    return true;
   }
   return false;
 }
@@ -224,7 +228,7 @@ void MeasurementTableModel::handle_click( const QModelIndex & index )
   if ( index.column() == MEASUREMENT_VISIBLE_E ) 
   {
     std::vector< Core::Measurement > measurements = this->measurement_tool_->get_measurements();
-    if( measurements.size() > index.row() )
+    if( index.row() < measurements.size() )
     { 
       // Toggle visible
       bool visible = !( measurements[ index.row() ].get_visible() ); 
@@ -233,31 +237,19 @@ void MeasurementTableModel::handle_click( const QModelIndex & index )
   } 
 }
 
-void MeasurementTableModel::update_table()
+void MeasurementTableModel::update()
 {
   QAbstractTableModel::reset();
-}
-
-void MeasurementTableModel::update_data()
-{
-  int rows = this->rowCount( QModelIndex() );
-  int columns = this->columnCount( QModelIndex() );
-  QModelIndex top_left = this->index( 0, 0 );
-  QModelIndex bottom_right = this->index( rows - 1, columns - 1 );
-  Q_EMIT dataChanged( top_left, bottom_right );
-
-  //this->reset();
-
-  Q_EMIT active_note_changed( this->get_active_note() ); 
 }
 
 QString MeasurementTableModel::get_active_note() const
 {
   int active_index = this->get_active_index();
-  if( active_index != MeasurementTool::INVALID_ACTIVE_INDEX_C ) 
+  std::vector< Core::Measurement > measurements = this->measurement_tool_->get_measurements();
+  if( active_index != MeasurementTool::INVALID_ACTIVE_INDEX_C && 
+    active_index < measurements.size() ) 
   {
-    return QString::fromStdString( 
-      this->measurement_tool_->get_measurements()[ active_index ].get_note() );
+    return QString::fromStdString( measurements[ active_index ].get_note() );
   }
   return "";
 }
@@ -272,20 +264,22 @@ bool MeasurementTableModel::removeRows( int row, int count, const QModelIndex & 
 {
   if( row < 0 || row + count > this->rowCount( QModelIndex() ) ) return false;
 
-  // Remove rows from measurement list
-  bool ok = true;
-  for( int row_index = row + count - 1; row_index >= row; row_index-- )
+  // Get all the measurements to be removed first, before indices change
+  std::vector< Core::Measurement > measurements = this->measurement_tool_->get_measurements();
+  std::vector< Core::Measurement > remove_measurements;
+  for( int row_index = row; row_index < row + count; row_index++ )
   {
-    ok = ok && this->measurement_tool_->remove_measurement( row_index );
+    if( row_index < measurements.size() )
+    {
+      remove_measurements.push_back( measurements[ row_index ] );
+    }
   }
 
-  if( ok ) 
+  // Remove rows from measurement list
+  bool ok = true;
+  for( size_t i = 0; i < remove_measurements.size(); i++ )
   {
-    // Send signal to update note in text box
-    Q_EMIT active_note_changed( this->get_active_note() ); 
-
-    // Update model
-    //update();
+    ok = ok && this->measurement_tool_->remove_measurement( remove_measurements[ i ] );
   }
 
   return ok;
@@ -308,9 +302,12 @@ void MeasurementTableModel::set_active_index( int active_index )
 
   // Send signal to update note in text box
   // Can't use get_active_note() because active note is set on application thread asynchronously
-  QString active_note = QString::fromStdString( 
-    this->measurement_tool_->get_measurements()[ new_active_index ].get_note() );
-  Q_EMIT active_note_changed( active_note ); 
+  std::vector< Core::Measurement > measurements = this->measurement_tool_->get_measurements();
+  if( new_active_index < measurements.size() )
+  {
+    QString active_note = QString::fromStdString( measurements[ new_active_index ].get_note() );
+    Q_EMIT active_note_changed( active_note ); 
+  }
 
   // Send signal highlight only active row
   int num_columns = this->columnCount( QModelIndex() );
@@ -345,11 +342,16 @@ void MeasurementTableModel::remove_rows( const std::vector< int >& rows )
 
 void MeasurementTableModel::save_active_note() 
 {
-  Core::Measurement measurement = 
-    this->measurement_tool_->get_measurements()[ this->get_active_index() ];
-  measurement.set_note( this->cached_active_note_ );
-  this->measurement_tool_->set_measurement( this->get_active_index(), measurement );
-
+  int active_index = this->get_active_index();
+  std::vector< Core::Measurement > measurements = this->measurement_tool_->get_measurements();
+  if( active_index != MeasurementTool::INVALID_ACTIVE_INDEX_C && 
+    active_index < measurements.size() )
+  {
+    Core::Measurement measurement = measurements[ active_index ];
+    measurement.set_note( this->cached_active_note_ );
+    this->measurement_tool_->set_measurement( active_index, measurement );
+  }
+  
   this->use_cached_active_note_ = false;
 }
 

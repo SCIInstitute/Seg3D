@@ -57,13 +57,14 @@ public:
   virtual ~MeasurementToolInterface();
   virtual bool build_widget( QFrame* frame );
 
-  
-
 private Q_SLOTS:
+  // SET_MEASUREMENT_NOTE_BOX:
   // Update measurement note text box in response to measurement model change
   void set_measurement_note_box( const QString & note );
+
+  // SET_MEASUREMENT_NOTE_TABLE:
   // Update note in measurement model in response to measurement text box change
-  void update_measurement_note_model();
+  void set_measurement_note_table();
 
 private:
     MeasurementToolInterfacePrivateHandle private_;
@@ -74,6 +75,10 @@ public:
   // UPDATEMEASUREMENTMODEL:
   // Force the interface to update the measurement model
   static void UpdateMeasurementModel( qpointer_type measurement_interface );
+
+  // UPDATEMEASUREMENTNOTE:
+  // Update the note in the text box
+  static void UpdateMeasurementNote( qpointer_type measurement_interface );
 };
 
 } // end namespace Seg3D

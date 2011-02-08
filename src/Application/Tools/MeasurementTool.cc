@@ -43,6 +43,41 @@ SCI_REGISTER_TOOL( Seg3D, MeasurementTool )
 namespace Seg3D
 {
 
+class MeasurementToolPrivate {
+public:
+  void set_tool( MeasurementTool* tool );
+  void update_active_index();
+
+  MeasurementTool* tool_;
+};
+
+void MeasurementToolPrivate::set_tool( MeasurementTool* tool )
+{
+  this->tool_ = tool;
+}
+
+void MeasurementToolPrivate::update_active_index()
+{
+  ASSERT_IS_APPLICATION_THREAD();
+
+  size_t num_measurements = this->tool_->get_measurements().size();
+  
+  if( num_measurements > 0 )
+  {
+    // If the active index isn't in the valid range, set to end of list
+    int active_index = this->tool_->get_active_index();
+    if( active_index == MeasurementTool::INVALID_ACTIVE_INDEX_C || 
+      active_index >= num_measurements )
+    {
+      this->tool_->set_active_index( static_cast< int >( num_measurements ) - 1 );
+    }
+  }
+  else
+  {
+    this->tool_->set_active_index( MeasurementTool::INVALID_ACTIVE_INDEX_C );
+  }
+}
+
 const int MeasurementTool::INVALID_ACTIVE_INDEX_C = -1;
 
 void create_test_data( std::vector< Core::Measurement >& measurements )
@@ -75,8 +110,11 @@ void create_test_data( std::vector< Core::Measurement >& measurements )
 }
 
 MeasurementTool::MeasurementTool( const std::string& toolid ) :
-  Tool( toolid )
+  Tool( toolid ),
+  private_( new MeasurementToolPrivate )
 {
+  this->private_->set_tool( this );
+
   // Test code
   std::vector< Core::Measurement > measurements;
   create_test_data( measurements );
@@ -84,6 +122,9 @@ MeasurementTool::MeasurementTool( const std::string& toolid ) :
   // State variable gets allocated here
   this->add_state( "measurements", this->measurements_state_, measurements );
   this->add_state( "active_index", this->active_index_state_, INVALID_ACTIVE_INDEX_C );
+
+  this->add_connection( this->measurements_state_->state_changed_signal_.connect( 
+    boost::bind( &MeasurementToolPrivate::update_active_index, this->private_ ) ) );
 }
 
 MeasurementTool::~MeasurementTool()
@@ -124,18 +165,21 @@ void MeasurementTool::set_active_index( int active_index )
     this->active_index_state_, active_index );
 }
 
-bool MeasurementTool::remove_measurement( size_t index )
+bool MeasurementTool::remove_measurement( const Core::Measurement& measurement )
 {
-  std::vector< Core::Measurement > measurements = this->get_measurements();
-  if( index >= measurements.size() ) return false;
+  // Set active index to the end of the list 
+  size_t num_measurements = this->get_measurements().size();
+  if( num_measurements > 1 )
+  {
+    this->set_active_index( static_cast< int >( num_measurements ) - 1 );
+  }
 
-  Core::Measurement measurement = measurements[ index ];
-
+  // Remove measurements
   // Ensure that state is changed on application thread
   Core::ActionRemove::Dispatch( Core::Interface::GetWidgetActionContext(), 
     this->measurements_state_, measurement );
+
   return true;
 }
-
 
 } // end namespace Seg3D
