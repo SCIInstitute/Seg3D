@@ -1,3 +1,4 @@
+
 /*
  For more information, please see: http://software.sci.utah.edu
 
@@ -133,7 +134,6 @@ bool ProjectManager::check_if_file_is_valid_project( const boost::filesystem::pa
       return false;
     }
   }
-
   // Everything seems OK
   return true;
 }
@@ -210,7 +210,7 @@ void ProjectManager::open_project( const boost::filesystem::path& project_path )
     
   this->current_project_->initialize_from_file( project_path.leaf() );
   this->add_to_recent_projects( project_path.parent_path().string(), project_path.leaf() );
-  
+
   this->set_last_saved_session_time_stamp();
   this->changing_projects_ = false;
 
@@ -219,7 +219,7 @@ void ProjectManager::open_project( const boost::filesystem::path& project_path )
   
   this->set_last_saved_session_time_stamp();
   AutoSave::Instance()->recompute_auto_save();
-  
+
   PreferencesManager::Instance()->export_path_state_->set( project_path.parent_path().string() );
 
   this->project_saved_state_->set( true );
@@ -514,7 +514,7 @@ bool ProjectManager::project_save_as( const boost::filesystem::path& export_path
 {
   this->changing_projects_ = true;
   this->session_saving_ = true;
-
+  
   this->create_project_folders( export_path, project_name );
 
   if( this->project_saved_state_->get() == true )
@@ -529,7 +529,7 @@ bool ProjectManager::project_save_as( const boost::filesystem::path& export_path
     {
       CORE_LOG_CRITICAL_ERROR( "'Save As' could not be successfully completed." );
       return false;
-    }
+  }
   }
   else
   {

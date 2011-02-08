@@ -76,9 +76,7 @@ public:
   // Remove all the data blocks.
   void clear();
 
-private:
-  friend class DataBlock;
-  friend class MaskDataBlockManager;
+public:
   
   // GET_GENERATION_COUNT:
   // Get the most recent generation number

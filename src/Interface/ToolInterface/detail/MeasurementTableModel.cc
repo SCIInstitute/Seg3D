@@ -315,7 +315,7 @@ void MeasurementTableModel::remove_rows( const std::vector< int >& rows )
   std::sort( sorted_rows.begin(), sorted_rows.end() );
   
   // Must delete in reverse since row numbers are adjusted during removal
-  std::vector< int >::const_reverse_iterator reverse_iter;
+  std::vector< int >::reverse_iterator reverse_iter;
   for ( reverse_iter = sorted_rows.rbegin(); reverse_iter != sorted_rows.rend(); ++reverse_iter )  
   {
     this->removeRow( *reverse_iter );

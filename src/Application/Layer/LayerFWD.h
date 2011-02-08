@@ -62,6 +62,8 @@ typedef boost::shared_ptr< LayerSceneItem > LayerSceneItemHandle;
 typedef std::vector< LayerSceneItemHandle > LayerScene;
 typedef boost::shared_ptr< LayerScene > LayerSceneHandle;
 
+typedef long long MetaDataID;
+
 } // end namespace Seg3D
 
 #endif

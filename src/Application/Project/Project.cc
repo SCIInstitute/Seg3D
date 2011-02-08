@@ -37,6 +37,8 @@
 #include <Core/State/StateIO.h>
 #include <Core/Utils/StringUtil.h>
 #include <Core/Utils/Log.h>
+#include <Core/DataBlock/DataBlockManager.h>
+
 
 // Application includes
 #include <Application/Project/Project.h>
@@ -65,6 +67,8 @@ Project::Project( const std::string& project_name ) :
     this->add_state( stateid, this->color_states_[ j ], 
       PreferencesManager::Instance()->get_default_colors()[ j ] );
   }
+
+  this->add_state( "generation_count", this->generation_count_state_, -1 );
 
   this->current_session_ = SessionHandle( new Session( "default_session" ) );
   this->data_manager_ = DataManagerHandle( new DataManager() );
@@ -226,6 +230,9 @@ bool Project::pre_save_states( Core::StateIO& state_io )
         PreferencesManager::Instance()->color_states_[ j ]->get() );
     }
   }
+  
+  this->generation_count_state_->set( Core::DataBlockManager::Instance()->get_generation_count() );
+
   return true;
 }
 
@@ -243,6 +250,44 @@ bool Project::post_load_states( const Core::StateIO& state_io )
   }
 
   this->data_manager_->initialize( this->project_path_ );
+
+  // NOTE: Because an earlier version mistakenly did not save this number, it may be initialized
+  // to -1, in that case we need to derive it from the actual generation numbers stored in
+  // the data directory.
+  Core::DataBlock::generation_type generation = this->generation_count_state_->get();
+  
+  /////////////////////////////////////////////////////////////////////////
+  // NOTE: This correction is for backwards compatibility
+  if ( generation == -1 )
+  {
+    boost::filesystem::path data_path = this->project_path_ / "data";
+    if( boost::filesystem::exists( data_path ) );
+    {
+      boost::filesystem::directory_iterator dir_end;
+      for( boost::filesystem::directory_iterator dir_itr( data_path ); 
+        dir_itr != dir_end; ++dir_itr )
+      {
+        if ( boost::filesystem::extension( *dir_itr ) == ".nrrd" )
+        {
+          Core::DataBlock::generation_type file_generation = -1;
+          if ( Core::ImportFromString( boost::filesystem::basename( dir_itr->filename() ),
+            file_generation ) )
+          {
+            if ( file_generation > generation ) generation = file_generation;
+          }
+        }
+      }
+    }
+
+    // Ensure the counter will have at least 0
+    if ( generation == -1 ) generation = 0;
+    generation++;
+  }
+  /////////////////////////////////////////////////////////////////////////
+  
+  Core::DataBlockManager::Instance()->set_generation_count( generation );
+  this->generation_count_state_->set( generation );
+
   // Once we have loaded the state of the sessions_list, we need to validate that the files exist
   this->cleanup_session_list();
 

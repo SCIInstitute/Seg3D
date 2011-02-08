@@ -81,6 +81,10 @@ public:
   Core::StateStringHandle current_session_name_state_;
   std::vector< Core::StateColorHandle > color_states_;
   
+  // Generation counter state, this one is filled out when the project is saved
+  // So the generation state can be restored 
+  Core::StateLongLongHandle generation_count_state_;
+  
   
 public:
   typedef boost::signals2::signal< void( std::string ) > session_deleted_signal_type;
