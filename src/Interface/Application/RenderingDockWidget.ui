@@ -1415,6 +1415,12 @@ QWidget#vr_content_{
              </property>
              <item>
               <widget class="QtUtils::QtHistogramGraph" name="histogram_" native="true">
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>256</height>
+                </size>
+               </property>
                <layout class="QVBoxLayout" name="verticalLayout_23">
                 <property name="spacing">
                  <number>0</number>
@@ -1424,6 +1430,12 @@ QWidget#vr_content_{
                 </property>
                 <item>
                  <widget class="QtUtils::QtTransferFunctionView" name="tf_view_">
+                  <property name="maximumSize">
+                   <size>
+                    <width>16777215</width>
+                    <height>256</height>
+                   </size>
+                  </property>
                   <property name="renderHints">
                    <set>QPainter::Antialiasing|QPainter::TextAntialiasing</set>
                   </property>

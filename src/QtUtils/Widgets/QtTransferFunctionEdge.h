@@ -26,42 +26,32 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef QTUTILS_WIDGETS_QTTRANSFERFUNCTIONSCENE_H
-#define QTUTILS_WIDGETS_QTTRANSFERFUNCTIONSCENE_H
+#ifndef QTUTILS_WIDGETS_QTTRANSFERFUNCTIONEDGE_H
+#define QTUTILS_WIDGETS_QTTRANSFERFUNCTIONEDGE_H
 
-#include <QGraphicsScene>
+#include <QObject>
+#include <QGraphicsLineItem>
 
 namespace QtUtils
 {
 
-class QtTransferFunctionScenePrivate;
 class QtTransferFunctionCurve;
+class QtTransferFunctionEdgePrivate;
 
-class QtTransferFunctionScene : public QGraphicsScene
+class QtTransferFunctionEdge : public QObject, public QGraphicsLineItem
 {
-  Q_OBJECT
+    Q_OBJECT
 public:
-  explicit QtTransferFunctionScene( QObject *parent = 0 );
-  ~QtTransferFunctionScene();
+  explicit QtTransferFunctionEdge( QtTransferFunctionCurve* curve );
+  ~QtTransferFunctionEdge();
 
-  void add_curve( QtTransferFunctionCurve* curve );
-  void delete_curve( const std::string& feature_id );
-  QtTransferFunctionCurve* get_active_curve();
-  QtTransferFunctionCurve* get_curve( const std::string& feature_id );
-
-protected:
-  virtual void mousePressEvent( QGraphicsSceneMouseEvent* mouseEvent );
-
-Q_SIGNALS:
-
-public Q_SLOTS:
-  void set_view_transform( const QTransform& matrix );
+  QtTransferFunctionCurve* get_curve() const;
 
 private:
-  QtTransferFunctionScenePrivate* private_;
+  QtTransferFunctionEdgePrivate* private_;
 
 };
 
 } // end namespace QtUtils
 
-#endif // QTTRANSFERFUNCTIONSCENE_H
+#endif // QTTRANSFERFUNCTIONCONTROLPOINT_H

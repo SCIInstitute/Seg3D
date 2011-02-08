@@ -65,7 +65,7 @@ QtTransferFunctionCurveConnector::QtTransferFunctionCurveConnector(
 
   this->connect( parent, SIGNAL( control_points_changed( 
     const Core::TransferFunctionControlPointVector& ) ), 
-    SLOT( set_state( const Core::TransferFunctionControlPointVector& ) ) );
+    SLOT( set_control_points_state( const Core::TransferFunctionControlPointVector& ) ) );
 }
 
 QtTransferFunctionCurveConnector::~QtTransferFunctionCurveConnector()

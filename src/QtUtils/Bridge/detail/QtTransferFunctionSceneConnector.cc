@@ -79,8 +79,8 @@ void QtTransferFunctionSceneConnector::AddCurve(
 
   QtTransferFunctionScene* scene = qpointer->parent_;
   QtTransferFunctionCurve* curve = new QtTransferFunctionCurve( feature->get_feature_id(), scene );
-  QtUtils::QtBridge::Connect( curve, feature );
   scene->add_curve( curve );
+  QtUtils::QtBridge::Connect( curve, feature );
 }
 
 void QtTransferFunctionSceneConnector::DeleteCurve( 

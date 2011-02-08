@@ -26,42 +26,34 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef QTUTILS_WIDGETS_QTTRANSFERFUNCTIONSCENE_H
-#define QTUTILS_WIDGETS_QTTRANSFERFUNCTIONSCENE_H
-
-#include <QGraphicsScene>
+#include <QtUtils/Widgets/QtTransferFunctionEdge.h>
+#include <QtUtils/Widgets/QtTransferFunctionCurve.h>
 
 namespace QtUtils
 {
 
-class QtTransferFunctionScenePrivate;
-class QtTransferFunctionCurve;
-
-class QtTransferFunctionScene : public QGraphicsScene
+class QtTransferFunctionEdgePrivate
 {
-  Q_OBJECT
 public:
-  explicit QtTransferFunctionScene( QObject *parent = 0 );
-  ~QtTransferFunctionScene();
-
-  void add_curve( QtTransferFunctionCurve* curve );
-  void delete_curve( const std::string& feature_id );
-  QtTransferFunctionCurve* get_active_curve();
-  QtTransferFunctionCurve* get_curve( const std::string& feature_id );
-
-protected:
-  virtual void mousePressEvent( QGraphicsSceneMouseEvent* mouseEvent );
-
-Q_SIGNALS:
-
-public Q_SLOTS:
-  void set_view_transform( const QTransform& matrix );
-
-private:
-  QtTransferFunctionScenePrivate* private_;
-
+  QtTransferFunctionCurve* curve_;
 };
 
-} // end namespace QtUtils
+QtTransferFunctionEdge::QtTransferFunctionEdge( QtTransferFunctionCurve* curve ) :
+  QObject( curve ),
+  QGraphicsLineItem( 0 ),
+  private_( new QtTransferFunctionEdgePrivate )
+{
+  this->private_->curve_ = curve;
+}
 
-#endif // QTTRANSFERFUNCTIONSCENE_H
+QtTransferFunctionEdge::~QtTransferFunctionEdge()
+{
+  delete this->private_;
+}
+
+QtTransferFunctionCurve* QtTransferFunctionEdge::get_curve() const
+{
+  return this->private_->curve_;
+}
+
+} // end namespace QtUtils

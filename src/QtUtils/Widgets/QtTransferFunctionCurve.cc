@@ -35,12 +35,13 @@
 
 #include <QtUtils/Widgets/QtTransferFunctionCurve.h>
 #include <QtUtils/Widgets/QtTransferFunctionControlPoint.h>
+#include <QtUtils/Widgets/QtTransferFunctionEdge.h>
 
 namespace QtUtils
 {
 
 typedef std::list< QtTransferFunctionControlPoint* > control_point_list_type;
-typedef std::vector< QGraphicsLineItem* > edge_list_type;
+typedef std::vector< QtTransferFunctionEdge* > edge_list_type;
 
 //////////////////////////////////////////////////////////////////////////
 // Class QtTransferFunctionCurvePrivate
@@ -61,6 +62,7 @@ public:
   bool active_;
   QColor color_;
   std::string feature_id_;
+  QtTransferFunctionCurve* curve_;
 };
 
 bool CompareControlPoints( const QtTransferFunctionControlPoint* const lhs,
@@ -79,10 +81,11 @@ void QtTransferFunctionCurvePrivate::update_edges()
     control_point_list_type::const_iterator first_it = second_it++;
     while ( second_it != this->control_points_.end() )
     {
-      QGraphicsLineItem* edge = 0;
+      QtTransferFunctionEdge* edge = 0;
       if ( edge_index >= this->edges_.size() )
       {
-        edge = new QGraphicsLineItem( 0, this->scene_ );
+        edge = new QtTransferFunctionEdge( this->curve_ );
+        this->scene_->addItem( edge );
         this->edges_.push_back( edge );
         edge->setZValue( -1 );
       }
@@ -99,7 +102,7 @@ void QtTransferFunctionCurvePrivate::update_edges()
   while ( this->edges_.size() > 0 &&
     this->edges_.size() + 1 > this->control_points_.size() )
   {
-    QGraphicsLineItem* extra_edge = this->edges_.back();
+    QtTransferFunctionEdge* extra_edge = this->edges_.back();
     this->scene_->removeItem( extra_edge );
     delete extra_edge;
     this->edges_.pop_back();
@@ -108,12 +111,12 @@ void QtTransferFunctionCurvePrivate::update_edges()
 
 qreal QtTransferFunctionCurvePrivate::get_edge_width()
 {
-  return this->active_ ? 3.0 : 2.0;
+  return this->active_ ? 3.5 : 1.5;
 }
 
 qreal QtTransferFunctionCurvePrivate::get_point_radius()
 {
-  return this->active_ ? 7.0 : 5.0;
+  return this->active_ ? 5.0 : 5.0;
 }
 
 void QtTransferFunctionCurvePrivate::update_curve_appearance()
@@ -165,6 +168,7 @@ QtTransferFunctionCurve::QtTransferFunctionCurve( const std::string& feature_id,
   private_( new QtTransferFunctionCurvePrivate )
 {
   this->private_->scene_ = parent;
+  this->private_->curve_ = this;
   this->private_->active_ = false;
   this->private_->color_ = QColor( 255, 255, 255 );
   this->private_->feature_id_ = feature_id;
@@ -172,21 +176,6 @@ QtTransferFunctionCurve::QtTransferFunctionCurve( const std::string& feature_id,
 
 QtTransferFunctionCurve::~QtTransferFunctionCurve()
 {
-  if ( !QCoreApplication::closingDown() )
-  {
-    BOOST_FOREACH( QtTransferFunctionControlPoint* control_point, this->private_->control_points_ )
-    {
-      this->private_->scene_->removeItem( control_point );
-      delete control_point;
-    }
-
-    BOOST_FOREACH( QGraphicsLineItem* line_item, this->private_->edges_ )
-    {
-      this->private_->scene_->removeItem( line_item );
-      delete line_item;
-    }
-  }
-
   delete this->private_;
 }
 
@@ -228,6 +217,7 @@ void QtTransferFunctionCurve::set_control_points(
   while ( this->private_->control_points_.size() < num_pts )
   {
     QtTransferFunctionControlPoint* point_item = new QtTransferFunctionControlPoint( this );
+    point_item->blockSignals( true );
     this->private_->scene_->addItem( point_item );
     this->connect( point_item, SIGNAL( position_changed( QPointF ) ),
       SLOT( handle_control_point_moved() ) );
@@ -250,7 +240,9 @@ void QtTransferFunctionCurve::set_control_points(
       scene_rect.bottom() - scene_rect.height() * points[ i ].get_opacity() );
     pt_pos.setX( qMin( scene_rect.right(), qMax( pt_pos.x(), scene_rect.left() ) ) );
     pt_pos.setY( qMin( scene_rect.bottom(), qMax( pt_pos.y(), scene_rect.top() ) ) );
+    ( *item_it )->blockSignals( true );
     ( *item_it )->setPos( pt_pos );
+    ( *item_it )->blockSignals( false );
   }
 
   this->private_->update_edges();

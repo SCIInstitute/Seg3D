@@ -31,6 +31,7 @@
 #include <QtUtils/Widgets/QtTransferFunctionScene.h>
 #include <QtUtils/Widgets/QtTransferFunctionCurve.h>
 #include <QtUtils/Widgets/QtTransferFunctionControlPoint.h>
+#include <QtUtils/Widgets/QtTransferFunctionEdge.h>
 
 namespace QtUtils
 {
@@ -114,6 +115,14 @@ void QtTransferFunctionScene::mousePressEvent( QGraphicsSceneMouseEvent* mouseEv
         this->private_->set_active_curve( control_point->get_curve() );
       }
     }
+    else
+    {
+      QtTransferFunctionEdge* edge = dynamic_cast< QtTransferFunctionEdge* >( item );
+      if ( edge != 0 )
+      {
+        this->private_->set_active_curve( edge->get_curve() );
+      }
+    }
   }
 
   QGraphicsScene::mousePressEvent( mouseEvent );
@@ -165,6 +174,11 @@ QtTransferFunctionCurve* QtTransferFunctionScene::get_curve( const std::string& 
   }
 
   return 0;
+}
+
+QtTransferFunctionCurve* QtTransferFunctionScene::get_active_curve()
+{
+  return this->private_->active_curve_;
 }
 
 } // end namespace QtUtils
