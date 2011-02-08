@@ -75,13 +75,15 @@ bool MeasurementToolInterface::build_widget( QFrame* frame )
   this->private_->table_model_ = new MeasurementTableModel( tool_handle, this );
   this->private_->table_view_ = this->private_->ui_.table_view_;
   this->private_->table_view_->set_measurement_model( this->private_->table_model_ );
-  this->private_->table_model_->update();
+
+  qpointer_type measurement_interface( this );
+  UpdateMeasurementModel( measurement_interface );
 
   /* Normally Qt syncs the model and the view without us having to worry about it.  But that 
   relies on everything being on Qt thread, which is not true in our case.  So instead the 
   MeasurementToolInterface calls update on the model when the measurements state is modified.  
   The model in turn gets its data from the measurements state. */ 
-  qpointer_type measurement_interface( this );
+  
   this->add_connection( tool_handle->measurements_state_->state_changed_signal_.connect( 
     boost::bind( &MeasurementToolInterface::UpdateMeasurementModel, measurement_interface ) ) );
   this->add_connection( tool_handle->active_index_state_->state_changed_signal_.connect( 
@@ -140,6 +142,24 @@ void MeasurementToolInterface::UpdateMeasurementModel( qpointer_type measurement
   {
     // Updates table view
     measurement_interface->private_->table_model_->update();
+
+    // Enable widgets only if measurements exist and active index is valid
+    if( measurement_interface->private_->table_model_->rowCount( QModelIndex() ) > 0 &&
+      measurement_interface->private_->table_model_->get_active_index() != 
+      MeasurementTool::INVALID_ACTIVE_INDEX_C )
+    {
+      measurement_interface->private_->ui_.note_textbox_->setEnabled( true );
+      measurement_interface->private_->ui_.goto_button_->setEnabled( true );
+      measurement_interface->private_->ui_.copy_button_->setEnabled( true );
+      measurement_interface->private_->ui_.delete_button_->setEnabled( true );
+    }
+    else
+    {
+      measurement_interface->private_->ui_.note_textbox_->setEnabled( false );
+      measurement_interface->private_->ui_.goto_button_->setEnabled( false );
+      measurement_interface->private_->ui_.copy_button_->setEnabled( false );
+      measurement_interface->private_->ui_.delete_button_->setEnabled( false );
+    }
   }
 }
 

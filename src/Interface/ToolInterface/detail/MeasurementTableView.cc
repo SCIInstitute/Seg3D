@@ -32,6 +32,7 @@
 #include <QtGui/QClipboard>
 #include <QtGui/QContextMenuEvent>
 #include <QtGui/QMenu>
+#include <QtGui/QMessageBox>
 
 // Interface includes
 #include <Interface/ToolInterface/detail/MeasurementTableModel.h>
@@ -196,29 +197,23 @@ void MeasurementTableView::delete_selected_measurements()
     return;
   }
 
-  /*
-  QString measurement_list = this->build_measurement_string( deletion_candidates );
-
   bool delete_confirmed = true;
-  if( this->delete_measure_dialog_->always_show() )
+  if( deletion_candidates.size() > 1 )
   {
-    // Launch dialog allowing the user to confirm/cancel deletion
-    this->delete_measure_dialog_->set_measurement_list( measurement_list );
-    this->delete_measure_dialog_->exec();
+    int ret = QMessageBox::warning( this, "Delete Warning",
+      "Are you sure you want to delete these measurements?",
+      QMessageBox::Yes | QMessageBox::No, QMessageBox::No  );
 
-    delete_confirmed = ( this->delete_measure_dialog_->result() == QDialog::Accepted );
+    delete_confirmed = ( ret == QMessageBox::Yes );
   }
 
   if ( delete_confirmed )
   {
     // Delete selected/active measurements
-    this->table_model_->remove_rows( deletion_candidates );
+    MeasurementTableModel* measurement_model = 
+      dynamic_cast< MeasurementTableModel* >( this->model() );
+    measurement_model->remove_rows( deletion_candidates );
   }
-  */
-  // Delete selected/active measurements
-  MeasurementTableModel* measurement_model = 
-    dynamic_cast< MeasurementTableModel* >( this->model() );
-  measurement_model->remove_rows( deletion_candidates );
 }
 
 void MeasurementScrollBar::wheelEvent( QWheelEvent * e )

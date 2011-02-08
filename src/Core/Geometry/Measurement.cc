@@ -31,18 +31,6 @@
 namespace Core
 {
 
-std::string Measurement::get_view_name() const
-{
-  std::string view_axis_str = "";
-  if( this->view_axis_ == AXIAL_E ) view_axis_str = "AXIAL";
-  else if( this->view_axis_ == CORONAL_E ) view_axis_str = "CORONAL";
-  else if( this->view_axis_ == SAGITTAL_E ) view_axis_str = "SAGITTAL";
-  else if( this->view_axis_ == VOLUME_E ) view_axis_str = "VOLUME";
-  else if( this->view_axis_ == MIP_E ) view_axis_str = "MIP";
-  else if( this->view_axis_ == OBLIQUE_E ) view_axis_str = this->oblique_name_;
-  return view_axis_str;
-}
-
 std::string ExportToString( const Measurement& value )
 {
   return "";

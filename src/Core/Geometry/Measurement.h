@@ -71,19 +71,13 @@ public:
     note_( note ), 
     p1_( p1 ), 
     p2_( p2 ), 
-    view_axis_( view_axis ),
-    slice_num_( slice_num ), 
-    slice_thickness_( slice_thickness ),
-    oblique_name_( oblique_name )
+    view_axis_( view_axis )
   {}
   Measurement() :
     visible_( false ), 
     label_( "" ), 
     note_( "" ), 
-    view_axis_( NOVIEW_E ),
-    slice_num_( 0 ), 
-    slice_thickness_( 1 ),
-    oblique_name_( "" ) {}
+    view_axis_( NOVIEW_E ) {}
 
   // DESIGN NOTE: Originally I made a virtual destructor out of habit.  But since this is not
   // designed to be a base class, should not make destructor virtual in order to avoid cost of
@@ -102,14 +96,8 @@ public:
   void      set_point1( Core::Point p1 ) { p1_ = p1; }
   Core::Point   get_point2() const { return p2_; }
   void      set_point2( Core::Point p2 ) { p2_ = p2; } // P2 moves during measurement creation
-  int       get_slice_num() const { return slice_num_; } 
-  void      set_slice_num( int slice_num ) { slice_num_ = slice_num; } 
   ViewAxis    get_view_axis() const { return view_axis_; }
   void      set_view_axis( ViewAxis view_axis ) { view_axis_ = view_axis; }
-  std::string   get_view_name() const; 
-  void      set_oblique_name( std::string oblique_name ) { oblique_name_ = oblique_name; }
-  int       get_slice_thickness() const { return slice_thickness_; } 
-  void      set_slice_thickness( int slice_thickness ) { slice_thickness_ = slice_thickness; }
 
   inline bool operator==( const Measurement& ) const;
   inline bool operator!=( const Measurement& ) const;
@@ -121,9 +109,6 @@ private:
   Core::Point   p1_; // 3D world coordinate of 1st point
   Core::Point   p2_; // 3D world coordinate of 2nd point
   ViewAxis    view_axis_;
-  int       slice_num_;
-  int       slice_thickness_;
-  std::string   oblique_name_; // In case ViewAxis = OBLIQUE
 };
 
 inline bool Measurement::operator==( const Measurement& m ) const
