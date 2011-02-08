@@ -261,7 +261,7 @@ bool Project::post_load_states( const Core::StateIO& state_io )
   if ( generation == -1 )
   {
     boost::filesystem::path data_path = this->project_path_ / "data";
-    if( boost::filesystem::exists( data_path ) );
+    if( boost::filesystem::exists( data_path ) )
     {
       boost::filesystem::directory_iterator dir_end;
       for( boost::filesystem::directory_iterator dir_itr( data_path ); 
