@@ -95,7 +95,7 @@ int NrrdLayerImporter::get_importer_modes()
 }
 
 bool NrrdLayerImporter::load_data( Core::DataBlockHandle& data_block, 
-                  Core::GridTransform& grid_trans )
+  Core::GridTransform& grid_trans, LayerMetaData& meta_data  )
 {
   if ( !this->nrrd_data_ ) import_header();
 

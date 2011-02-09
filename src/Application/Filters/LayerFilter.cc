@@ -317,7 +317,7 @@ bool LayerFilter::create_and_lock_data_layer_from_layer( LayerHandle src_layer,
 
   // Create the layer in creating mode
   if ( !( LayerManager::CreateAndLockDataLayer( src_layer->get_grid_transform(),
-    name, dst_layer, this->private_->key_ ) ) )
+    name, dst_layer, src_layer->get_meta_data(), this->private_->key_ ) ) )
   {
     dst_layer.reset();
     this->report_error( "Could not allocate enough memory." );
@@ -344,7 +344,7 @@ bool LayerFilter::create_and_lock_data_layer( const Core::GridTransform& grid_tr
 
   // Create the layer in creating mode
   if ( !( LayerManager::CreateAndLockDataLayer( grid_trans, name, dst_layer,
-    this->private_->key_ ) ) )
+    src_layer->get_meta_data(), this->private_->key_ ) ) )
   {
     dst_layer.reset();
     this->report_error( "Could not allocate enough memory." ); 
@@ -370,7 +370,7 @@ bool LayerFilter::create_and_lock_mask_layer_from_layer( LayerHandle src_layer, 
 
   // Create the layer in creating mode
   if ( !( LayerManager::CreateAndLockMaskLayer( src_layer->get_grid_transform(),
-    name, dst_layer, this->private_->key_ ) ) )
+    name, dst_layer, src_layer->get_meta_data(), this->private_->key_ ) ) )
   {
     dst_layer.reset();
     this->report_error( "Could not allocate enough memory." );
@@ -397,7 +397,7 @@ bool LayerFilter::create_and_lock_mask_layer( const Core::GridTransform& grid_tr
 
   // Create the layer in creating mode
   if ( !( LayerManager::CreateAndLockMaskLayer( grid_trans, name, dst_layer,
-    this->private_->key_ ) ) )
+    src_layer->get_meta_data(), this->private_->key_ ) ) )
   {
     dst_layer.reset();
     this->report_error( "Could not allocate enough memory." );

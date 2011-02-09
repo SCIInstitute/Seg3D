@@ -275,7 +275,7 @@ bool VFFLayerImporter::import_vff()
 }
 
 bool VFFLayerImporter::load_data( Core::DataBlockHandle& data_block, 
-                 Core::GridTransform& grid_trans )
+  Core::GridTransform& grid_trans, LayerMetaData& meta_data )
 {
   if( this->extension_ == ".vff" )
   {

@@ -268,7 +268,7 @@ void LayerGroupPrivate::update_grid_information()
 // Class LayerGroup
 //////////////////////////////////////////////////////////////////////////
 
-LayerGroup::LayerGroup( Core::GridTransform grid_transform ) :
+LayerGroup::LayerGroup( Core::GridTransform grid_transform, const LayerMetaData& meta_data ) :
   StateHandler( "group", true ),
   private_( new LayerGroupPrivate )
 {
@@ -277,6 +277,9 @@ LayerGroup::LayerGroup( Core::GridTransform grid_transform ) :
   this->grid_transform_ = grid_transform;
   this->initialize_states();
   
+  // This is the layer that generated this group. Hence that is the dependent layer
+  // for new mask or other layers that are created in the group.
+  this->set_meta_data( meta_data );
 }
 
 LayerGroup::LayerGroup( const std::string& state_id ) :
@@ -304,6 +307,9 @@ void LayerGroup::initialize_states()
   this->add_state( "layers_visible", this->layers_visible_state_, "all", "none|some|all" );
   this->add_state( "layers_iso_visible", this->layers_iso_visible_state_, "all", "none|some|all" );
   
+  this->add_state( "meta_data", this->meta_data_state_, "" ); 
+  this->add_state( "meta_data_info", this->meta_data_info_state_, "" ); 
+    
   Core::Point dimensions( static_cast< double>( this->grid_transform_.get_nx() ), 
     static_cast< double>( this->grid_transform_.get_ny() ), 
     static_cast< double>( this->grid_transform_.get_nz() ) );
@@ -344,6 +350,19 @@ void LayerGroup::initialize_states()
     boost::bind( &LayerGroupPrivate::handle_layers_iso_visible_state_changed, this->private_, _1 ) ) );
 }
 
+LayerMetaData LayerGroup::get_meta_data() const
+{
+  LayerMetaData meta_data;
+  meta_data.meta_data_ = this->meta_data_state_->get();
+  meta_data.meta_data_info_ = this->meta_data_info_state_->get();
+  return meta_data;
+}
+
+void LayerGroup::set_meta_data( const LayerMetaData& meta_data )
+{
+  this->meta_data_state_->set( meta_data.meta_data_ );
+  this->meta_data_info_state_->set( meta_data.meta_data_info_ );
+}
 
 void LayerGroup::insert_layer( LayerHandle new_layer )
 { 

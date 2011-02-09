@@ -225,7 +225,8 @@ protected:
   // Load the data from the file(s).
   // NOTE: This function is called by import_layer internally.
   virtual bool load_data( Core::DataBlockHandle& data_block, 
-    Core::GridTransform& grid_trans ) = 0;
+    Core::GridTransform& grid_trans,
+    LayerMetaData& metadata ) = 0;
 
   // GET_LAYER_NAME:
   // Return the string that will be used to name the layers.

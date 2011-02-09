@@ -91,6 +91,8 @@ bool ActionDuplicateLayer::run( Core::ActionContextHandle& context, Core::Action
     return false;
   }
 
+  new_layer->set_meta_data( layer->get_meta_data() );
+
   // Step (4):
   // Register the new layer with the LayerManager. This will insert it into the right group.
   LayerManager::Instance()->insert_layer( new_layer );

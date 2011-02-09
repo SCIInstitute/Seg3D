@@ -132,7 +132,9 @@ bool LayerImporter::import_layer( LayerImporterMode mode, std::vector< LayerHand
 
   Core::DataBlockHandle data_block;
   Core::GridTransform grid_transform;
-  if ( !this->load_data( data_block, grid_transform ) )
+  LayerMetaData meta_data;
+
+  if ( !this->load_data( data_block, grid_transform, meta_data ) )
   {
     return false;
   }
@@ -151,6 +153,7 @@ bool LayerImporter::import_layer( LayerImporterMode mode, std::vector< LayerHand
 
       layers.resize( 1 );
       layers[0] = LayerHandle( new DataLayer( this->get_layer_name(), canonical_vol ) );
+      layers[ 0 ]->set_meta_data( meta_data );
 
       CORE_LOG_DEBUG( std::string( "Successfully imported: " ) + this->get_base_filename() );
       return true;
@@ -172,6 +175,7 @@ bool LayerImporter::import_layer( LayerImporterMode mode, std::vector< LayerHand
 
       layers.resize( 1 );
       layers[0] = LayerHandle( new MaskLayer( this->get_layer_name(), maskvolume ) );
+      layers[ 0 ]->set_meta_data( meta_data );
 
       CORE_LOG_DEBUG( std::string( "Successfully imported: " ) + this->get_base_filename() );
       return true;
@@ -195,6 +199,7 @@ bool LayerImporter::import_layer( LayerImporterMode mode, std::vector< LayerHand
         Core::MaskVolumeHandle maskvolume( new Core::MaskVolume( 
           canonical_vol->get_grid_transform(), maskdatablocks[ j ] ) );
         layers[ j ] = LayerHandle( new MaskLayer( this->get_layer_name(), maskvolume ) );
+        layers[ j ]->set_meta_data( meta_data );
       }
 
       CORE_LOG_DEBUG( std::string( "Successfully imported: " ) + this->get_base_filename() );
@@ -219,6 +224,7 @@ bool LayerImporter::import_layer( LayerImporterMode mode, std::vector< LayerHand
         Core::MaskVolumeHandle maskvolume( new Core::MaskVolume( 
           canonical_vol->get_grid_transform(), maskdatablocks[ j ] ) );
         layers[ j ] = LayerHandle( new MaskLayer( get_layer_name(), maskvolume ) );
+        layers[ j ]->set_meta_data( meta_data );        
       }
 
       CORE_LOG_DEBUG( std::string( "Successfully imported: " ) + get_base_filename() );

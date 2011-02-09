@@ -58,12 +58,15 @@ bool ActionNewMaskLayer::run( Core::ActionContextHandle& context, Core::ActionRe
 
   // Create a new mask volume.
   Core::MaskVolumeHandle new_mask_volume;
-  Core::MaskVolume::CreateEmptyMask( LayerManager::Instance()->get_layer_group( 
-    this->group_id_.value() )->get_grid_transform(), new_mask_volume );
+  LayerGroupHandle group = LayerManager::Instance()->get_layer_group( this->group_id_.value() );
+  Core::MaskVolume::CreateEmptyMask( group->get_grid_transform(), new_mask_volume );
   
   // Create a new container to put it in.
   LayerHandle new_mask_layer( new MaskLayer( "MaskLayer", new_mask_volume ) );
 
+  // new_mask_layer->provenance_id_state_
+  new_mask_layer->set_meta_data( group->get_meta_data() );
+  
   // Register the new layer with the LayerManager. This will insert it into the right group.
   LayerManager::Instance()->insert_layer( new_mask_layer );
   

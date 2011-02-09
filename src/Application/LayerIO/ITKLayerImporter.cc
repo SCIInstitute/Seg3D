@@ -338,7 +338,7 @@ int ITKLayerImporter::get_importer_modes()
 }
   
 bool ITKLayerImporter::load_data( Core::DataBlockHandle& data_block, 
-  Core::GridTransform& grid_trans )
+  Core::GridTransform& grid_trans, LayerMetaData& meta_data )
 {
   if( this->private_->extension_ == ".tif" || this->private_->extension_ == ".tiff" ||
     this->private_->extension_ == ".stk" )

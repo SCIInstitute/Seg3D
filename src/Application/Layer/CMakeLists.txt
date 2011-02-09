@@ -45,6 +45,7 @@ SET(APPLICATION_LAYER_SRCS
   MaskLayer.cc
   LabelLayer.h
   LabelLayer.cc
+  LayerMetaData.h
 )
 
 SET(APPLICATION_LAYER_ACTIONS_SRCS

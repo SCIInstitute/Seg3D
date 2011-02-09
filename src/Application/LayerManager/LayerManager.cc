@@ -208,7 +208,8 @@ bool LayerManager::insert_layer( LayerHandle layer )
     if ( !group_handle )  
     {
       new_group = true;
-      group_handle = LayerGroupHandle( new LayerGroup(  layer->get_grid_transform() ) );
+      group_handle = LayerGroupHandle( new LayerGroup(  layer->get_grid_transform(),
+        layer->get_meta_data() ) );
       this->private_->group_list_.push_front( group_handle );
       
       CORE_LOG_DEBUG( std::string( "Set Active Layer: " ) + layer->get_layer_id());
@@ -1222,7 +1223,7 @@ bool LayerManager::LockForProcessing( LayerHandle layer, filter_key_type key )
 }
 
 bool LayerManager::CreateAndLockMaskLayer( Core::GridTransform transform, const std::string& name, 
-    LayerHandle& layer, filter_key_type key )
+    LayerHandle& layer, const LayerMetaData& meta_data, filter_key_type key )
 {
   // NOTE: Security check to keep the program logic sane.
   // Only the Application Thread guarantees that nothing is changed in the program.
@@ -1245,7 +1246,10 @@ bool LayerManager::CreateAndLockMaskLayer( Core::GridTransform transform, const 
 
   // Insert the key used to keep track of which process is using this layer
   layer->add_filter_key( key );
-  
+
+  // Meta data id
+  layer->set_meta_data( meta_data );
+    
   // Insert the layer into the layer manager.
   LayerManager::Instance()->insert_layer( layer );
   
@@ -1253,7 +1257,7 @@ bool LayerManager::CreateAndLockMaskLayer( Core::GridTransform transform, const 
 }
 
 bool LayerManager::CreateAndLockDataLayer( Core::GridTransform transform, const std::string& name, 
-    LayerHandle& layer, filter_key_type key )
+    LayerHandle& layer, const LayerMetaData& meta_data, filter_key_type key )
 {
   // NOTE: Security check to keep the program logic sane
   // Only the Application Thread guarantees that nothing is changed in the program
@@ -1277,6 +1281,9 @@ bool LayerManager::CreateAndLockDataLayer( Core::GridTransform transform, const 
   // Insert the key used to keep track of which process is using this layer
   layer->add_filter_key( key );
 
+  // Meta data id
+  layer->set_meta_data( meta_data );
+  
   // Insert the layer into the layer manager.
   LayerManager::Instance()->insert_layer( layer );
   

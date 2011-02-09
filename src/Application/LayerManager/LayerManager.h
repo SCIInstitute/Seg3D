@@ -407,13 +407,13 @@ public:
   // Create a new mask layer and lock it into the CREATING_C mode.
   // NOTE: This function can *only* be called from the Application thread.
   static bool CreateAndLockMaskLayer( Core::GridTransform transform, const std::string& name, 
-    LayerHandle& layer, filter_key_type key = 0 );
+    LayerHandle& layer, const LayerMetaData& meta_data, filter_key_type key = 0 );
   
   // CREATEANDLOCKDATALAYER:
   // Create a new data layer and lock it into the CREATING_C mode.
   // NOTE: This function can *only* be called from the Application thread.
   static bool CreateAndLockDataLayer( Core::GridTransform, const std::string& name,
-    LayerHandle& layer, filter_key_type key = filter_key_type( 0 ) );
+    LayerHandle& layer, const LayerMetaData& meta_data, filter_key_type key = filter_key_type( 0 ) );
   
   // == functions for setting data and unlocking layers ==
 
