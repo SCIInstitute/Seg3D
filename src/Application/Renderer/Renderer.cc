@@ -714,6 +714,10 @@ bool Renderer::render()
     bool draw_bbox = viewer->volume_show_bounding_box_state_->get();
     bool show_invisible_slices = viewer->volume_show_invisible_slices_state_->get();
     size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
+    
+    // Clipping does not seem to work properly on OSX 10.5
+    if ( Core::Application::Instance()->is_osx_10_5_or_less() ) enable_clipping = false;
+    
     for ( size_t i = 0; i < num_of_viewers && draw_slices; i++ )
     {
       ViewerHandle other_viewer = ViewerManager::Instance()->get_viewer( i );

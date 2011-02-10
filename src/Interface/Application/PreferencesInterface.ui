@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>769</width>
-    <height>658</height>
+    <width>766</width>
+    <height>741</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -812,6 +812,37 @@ border: 1px solid gray;
                  <widget class="QtUtils::QtSliderDoubleCombo" name="percent_of_memory_" native="true"/>
                 </item>
                </layout>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_11">
+         <property name="title">
+          <string>Import/Export:</string>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <property name="margin">
+           <number>6</number>
+          </property>
+          <item>
+           <widget class="QWidget" name="widget" native="true">
+            <layout class="QHBoxLayout" name="horizontalLayout_7">
+             <property name="margin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QCheckBox" name="export_dicom_headers_">
+               <property name="toolTip">
+                <string>This feature adds the original dicom headers back into the dicom that are exported</string>
+               </property>
+               <property name="text">
+                <string>Export dicom headers</string>
+               </property>
               </widget>
              </item>
             </layout>

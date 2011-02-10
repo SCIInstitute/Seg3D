@@ -577,6 +577,16 @@ ViewerManager::ViewerManager() :
   this->private_->viewers_[ 4 ] = ViewerHandle( new Viewer( 4, true, Viewer::CORONAL_C ) );
   this->private_->viewers_[ 5 ] = ViewerHandle( new Viewer( 5, true, Viewer::SAGITTAL_C ) );
 
+  this->private_->viewers_[ 3 ]->set_initializing( true );
+  this->private_->viewers_[ 4 ]->set_initializing( true );
+  this->private_->viewers_[ 5 ]->set_initializing( true );
+  this->private_->viewers_[ 3 ]->is_picking_target_state_->set( true );
+  this->private_->viewers_[ 4 ]->is_picking_target_state_->set( true );
+  this->private_->viewers_[ 5 ]->is_picking_target_state_->set( true );
+  this->private_->viewers_[ 3 ]->set_initializing( false );
+  this->private_->viewers_[ 4 ]->set_initializing( false );
+  this->private_->viewers_[ 5 ]->set_initializing( false );
+
   this->private_->change_layout( this->layout_state_->get() );
 
   for ( size_t j = 0; j < this->private_->viewers_.size(); j++ )

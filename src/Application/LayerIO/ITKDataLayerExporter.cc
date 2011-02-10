@@ -41,6 +41,7 @@
 // Application includes
 #include <Application/LayerIO/ITKDataLayerExporter.h>
 #include <Application/Layer/DataLayer.h>
+#include <Application/PreferencesManager/PreferencesManager.h>
 
 SCI_REGISTER_EXPORTER( Seg3D, ITKDataLayerExporter );
 
@@ -138,26 +139,29 @@ bool export_dicom_series( const std::string& file_path, const std::string& file_
 
   LayerMetaData meta_data = temp_handle->get_meta_data();
   std::vector< std::string > header_files;
-  if ( meta_data.meta_data_info_ == "dicom_filename" )
+  if ( PreferencesManager::Instance()->export_dicom_headers_state_->get() )
   {
-    Core::ImportFromString( meta_data.meta_data_, header_files );
-    boost::filesystem::path file( header_files[ 0 ] ); 
-    has_header_file = true;
-    if ( header_files.size() == 0 )
+    if ( meta_data.meta_data_info_ == "dicom_filename" )
     {
-      has_header_file = false;    
-    }
-
-    for ( size_t j = 0; j < header_files.size(); j++ )
-    {
-      if ( ! boost::filesystem::exists( header_files[ j ] ) )
+      Core::ImportFromString( meta_data.meta_data_, header_files );
+      boost::filesystem::path file( header_files[ 0 ] ); 
+      has_header_file = true;
+      if ( header_files.size() == 0 )
       {
-        has_header_file = false;
-        break;
+        has_header_file = false;    
+      }
+
+      for ( size_t j = 0; j < header_files.size(); j++ )
+      {
+        if ( ! boost::filesystem::exists( header_files[ j ] ) )
+        {
+          has_header_file = false;
+          break;
+        }
       }
     }
   }
-
+  
   std::string l_extension = extension;
   boost::to_lower( l_extension );
   if ( l_extension == ".dcm" || l_extension == ".dicom" || l_extension == ".ima" )
@@ -210,9 +214,9 @@ bool export_dicom_series( const std::string& file_path, const std::string& file_
       // [Series Instance UID]
       itk::EncapsulateMetaData<std::string>( **dict_iter, "0020|000e", series_uid );
       // [SOP Instance UID]
-      itk::EncapsulateMetaData<std::string>( **dict_iter, "0008|0018", sop_uid );
+      // itk::EncapsulateMetaData<std::string>( **dict_iter, "0008|0018", sop_uid );
       // [Media Stored SOP Instance UID] 
-      itk::EncapsulateMetaData<std::string>( **dict_iter, "0002|0003", sop_uid );
+      // itk::EncapsulateMetaData<std::string>( **dict_iter, "0002|0003", sop_uid );
       // [ Window Center ]
       itk::EncapsulateMetaData<std::string>( **dict_iter, "0028|1050", data_center );
       // [ Window Width ]

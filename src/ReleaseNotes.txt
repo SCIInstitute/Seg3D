@@ -1,6 +1,22 @@
 Release Notes
 =============
 
+Version 2.0.2
+-------------
+
+This version address some major performance issues that were reported users for certain older graphics cards.
+
+* Changed the mask shading so it is a power of two, so older graphics drivers do not default to software rendering.
+
+* Disabled clipping for OS X 10.5 as bugs in the driver cause glitches in the rendering.
+
+* Added support for dicom files without extensions and added more heuristics for estimating slice distance.
+
+* Improved the selection of the right importer.
+
+* Fixed a bug in drag and drop that could cause the program to crash.
+
+
 Version 2.0.1
 -------------
 

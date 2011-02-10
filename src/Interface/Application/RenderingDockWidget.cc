@@ -32,6 +32,7 @@
 
 // Core includes
 #include <Core/Utils/Log.h>
+#include <Core/Application/Application.h>
 
 // QtUtils includes
 #include <QtUtils/Bridge/QtBridge.h>
@@ -82,6 +83,12 @@ RenderingDockWidget::RenderingDockWidget( QWidget *parent ) :
     ViewerManager::Instance()->fog_density_state_ );
 
   // Clipping widgets
+  if ( Core::Application::Instance()->is_osx_10_5_or_less() )
+  {
+    // NOTE: No clipping on this platform as driver are inconsistent
+    this->private_->ui_.clipping_widget_->hide();
+  }
+  
   QtUtils::QtBridge::Connect( this->private_->ui_.clipping_open_button_,
     ViewerManager::Instance()->show_clipping_control_state_ );
   QtUtils::QtBridge::Show( this->private_->ui_.clipping_content_,

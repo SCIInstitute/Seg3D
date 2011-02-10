@@ -126,7 +126,11 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
   this->private_->buttons_.push_back( this->private_->ui_.snap_to_axis_button_ );
   this->private_->buttons_.push_back( this->private_->ui_.light_visible_button_ );
   this->private_->buttons_.push_back( this->private_->ui_.fog_button_ );
-  this->private_->buttons_.push_back( this->private_->ui_.enable_clipping_button_ );
+  if ( !( Core::Application::Instance()->is_osx_10_5_or_less() ) )
+  {
+    // NOTE: No clipping on this platform as driver are inconsistent
+    this->private_->buttons_.push_back( this->private_->ui_.enable_clipping_button_ );
+  }
   this->private_->buttons_.push_back( this->private_->ui_.grid_button_ );
   this->private_->buttons_.push_back( this->private_->ui_.flip_horizontal_button_ );
   this->private_->buttons_.push_back( this->private_->ui_.flip_vertical_button_ );
@@ -265,6 +269,12 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
   this->private_->facade_widget_ = new QLabel( this->private_->ui_.border_ );
   this->private_->ui_.border_layout_->insertWidget( 0, this->private_->facade_widget_ );
   this->private_->facade_widget_->hide();
+  
+  if ( Core::Application::Instance()->is_osx_10_5_or_less() )
+  {
+    // NOTE: No clipping on this platform as driver are inconsistent
+    this->private_->ui_.enable_clipping_button_->hide();
+  } 
 }
 
 ViewerWidget::~ViewerWidget()

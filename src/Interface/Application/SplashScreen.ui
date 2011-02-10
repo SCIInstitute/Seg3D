@@ -142,7 +142,7 @@ QPushButton#quit_seg3d_button_:pressed{
       <string/>
      </property>
      <property name="pixmap">
-      <pixmap resource="../../Resources/QtResources.qrc">:/Images/Seg3DSplash2-0-1.png</pixmap>
+      <pixmap resource="../../Resources/QtResources.qrc">:/Images/Seg3DSplash.png</pixmap>
      </property>
     </widget>
    </item>

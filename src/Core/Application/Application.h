@@ -175,6 +175,10 @@ public:
   // Get the process id for the current process
   int get_process_id();
 
+  // -- OSX information --
+public:
+  bool is_osx_10_5_or_less();
+
   // -- Signals --
 public:
   // RESET_SIGNAL_:
