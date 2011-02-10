@@ -306,7 +306,7 @@
             <item>
              <widget class="QPushButton" name="copy_button_">
               <property name="text">
-               <string>Copy</string>
+               <string>Copy to Clipboard</string>
               </property>
              </widget>
             </item>

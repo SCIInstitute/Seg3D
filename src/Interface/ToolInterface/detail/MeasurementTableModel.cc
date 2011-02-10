@@ -245,7 +245,7 @@ void MeasurementTableModel::update_table()
   Q_EMIT active_note_changed( this->get_active_note() ); 
 }
 
-void MeasurementTableModel::update_data()
+void MeasurementTableModel::update_cells()
 {
   int rows = this->rowCount( QModelIndex() );
   int columns = this->columnCount( QModelIndex() );

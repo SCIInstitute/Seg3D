@@ -137,55 +137,80 @@ void MeasurementTableView::get_deletion_candidates( std::vector< int >& deletion
 
 void MeasurementTableView::copy() const
 {
+  MeasurementTableModel* model = qobject_cast< MeasurementTableModel* >( this->model() );
   QItemSelectionModel* selection = this->selectionModel(); 
   QModelIndexList indexes = selection->selectedIndexes();
 
-  if( indexes.size() < 1 ) return; 
+  QString selected_text;
+  if( indexes.size() > 0 ) // Cells are selected
+  {
+    // QModelIndex::operator < sorts first by row, then by column.  
+    // this is what we need 
+    std::sort( indexes.begin(), indexes.end() ); 
 
-  // QModelIndex::operator < sorts first by row, then by column.  
-  // this is what we need 
-  std::sort( indexes.begin(), indexes.end() ); 
-
-  // You need a pair of indexes to find the row changes 
-  QModelIndex previous = indexes.first(); 
-  indexes.removeFirst(); 
-  QString selected_text; 
-  QModelIndex current; 
-  Q_FOREACH( current, indexes ) 
-  { 
-    // If this is the first column and this row is selected, append the row header to the string
-    if ( previous.column() == 0 )
-    {
-      if( selection->isRowSelected( previous.row(), QModelIndex() ) )
+    // You need a pair of indexes to find the row changes 
+    QModelIndex previous = indexes.first(); 
+    indexes.removeFirst();  
+    QModelIndex current; 
+    Q_FOREACH( current, indexes ) 
+    { 
+      // If this is the first column and this row is selected, append the row header to the string
+      if ( previous.column() == 0 )
       {
-        QString header_text = 
-          this->model()->headerData( previous.row(), Qt::Vertical ).toString();
-        selected_text.append( header_text );
+        if( selection->isRowSelected( previous.row(), QModelIndex() ) )
+        {
+          QString header_text = model->headerData( 
+            previous.row(), Qt::Vertical, Qt::DisplayRole ).toString();
+          selected_text.append( header_text );
+        }
       }
-    }
 
-    QVariant data = this->model()->data( previous ); 
-    QString text = data.toString(); 
-    // At this point `text` contains the text in one cell 
-    selected_text.append( text ); 
-    // If you are at the start of the row the row number of the previous index 
-    // isn't the same.  Text is followed by a row separator, which is a newline. 
-    if ( current.row() != previous.row() ) 
-    { 
-      selected_text.append( QLatin1Char('\n') ); 
+      QString text = model->data( previous, Qt::DisplayRole ).toString(); 
+      
+      // At this point `text` contains the text in one cell 
+      selected_text.append( this->remove_line_breaks( text ) ); 
+      // If you are at the start of the row the row number of the previous index 
+      // isn't the same.  Text is followed by a row separator, which is a newline. 
+      if ( current.row() != previous.row() ) 
+      { 
+        selected_text.append( QLatin1Char('\n') ); 
+      } 
+      // Otherwise it's the same row, so append a column separator, which is a tab. 
+      else 
+      { 
+        selected_text.append( QLatin1Char('\t') ); 
+      } 
+      previous = current; 
     } 
-    // Otherwise it's the same row, so append a column separator, which is a tab. 
-    else 
-    { 
+
+    // add last element 
+    QString text = model->data( previous, Qt::DisplayRole ).toString();
+    selected_text.append( this->remove_line_breaks( text ) ); 
+    selected_text.append( QLatin1Char('\n') ); 
+  }
+  else // No cells are selected -- copy active measurement
+  {
+    int active_index = model->get_active_index();
+    if( active_index != MeasurementTool::INVALID_ACTIVE_INDEX_C )
+    {
+      QString header_text = 
+        model->headerData( active_index, Qt::Vertical, Qt::DisplayRole ).toString();
+      selected_text.append( header_text );
       selected_text.append( QLatin1Char('\t') ); 
+      selected_text.append( model->data( model->index( active_index, MEASUREMENT_LENGTH_E ), 
+        Qt::DisplayRole ).toString() ); 
+      selected_text.append( QLatin1Char('\t') ); 
+      QString note = model->data( model->index( active_index, MEASUREMENT_NOTE_E ), 
+        Qt::DisplayRole ).toString();
+      selected_text.append( this->remove_line_breaks( note ) ); 
+      selected_text.append( QLatin1Char('\n') );
     } 
-    previous = current; 
-  } 
+  }
 
-  // add last element 
-  selected_text.append( model()->data( previous ).toString() ); 
-  selected_text.append( QLatin1Char('\n') ); 
-  qApp->clipboard()->setText( selected_text );
+  if( !selected_text.isEmpty() )
+  {
+    qApp->clipboard()->setText( selected_text );
+  }
 }
 
 void MeasurementTableView::delete_selected_measurements()
@@ -215,6 +240,15 @@ void MeasurementTableView::delete_selected_measurements()
     measurement_model->remove_rows( deletion_candidates );
   }
 }
+
+QString MeasurementTableView::remove_line_breaks( QString str ) const
+{
+  std::string std_str = str.toStdString();
+  boost::replace_all( std_str, "\n", " " );
+  boost::replace_all( std_str, "\r", " " );
+  return QString::fromStdString( std_str );
+}
+
 
 void MeasurementScrollBar::wheelEvent( QWheelEvent * e )
 {

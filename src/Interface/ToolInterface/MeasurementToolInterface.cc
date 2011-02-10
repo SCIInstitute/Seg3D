@@ -177,7 +177,7 @@ void MeasurementToolInterface::UpdateMeasurementNote( qpointer_type measurement_
   {
     // Update only table cells, not table dimensions
     // Needed in order to update background color for active/non-active cells
-    measurement_interface->private_->table_model_->update_data();
+    measurement_interface->private_->table_model_->update_cells();
 
     // Updates table view
     measurement_interface->private_->ui_.note_textbox_->setText( 

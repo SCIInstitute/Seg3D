@@ -67,6 +67,7 @@ private Q_SLOTS:
   void scroll_to_active_index();
 
 private:
+  QString remove_line_breaks( QString str ) const;
   QAction* delete_action_;
 }; 
 
