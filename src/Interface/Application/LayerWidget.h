@@ -38,9 +38,11 @@
 #include <QtGui/QDropEvent>
 #include <QtCore/QPointer>
 
-
 // Application includes
 #include <Application/Layer/Layer.h>
+
+// Interface includes
+#include <Interface/Application/GroupButtonMenu.h>
 
 namespace Seg3D
 {
@@ -168,12 +170,17 @@ public:
 private:
     boost::shared_ptr< LayerWidgetPrivate > private_;
 
+public:
+  // SET_DROP_GROUP:
+  // this function is for keeping track of which group the drop is going to happen on
+  void set_drop_group( GroupButtonMenu* target_group );
+
 // FUNCTIONS FOR HANDLING DRAG AND DROP
 private:
   // SET_DROP_TARGET:
   // this function is for keeping track of which layer the drop is going to happen on
   void set_drop_target( LayerWidget* target_layer );
-
+  
   // MOUSEPRESSEVENT:
   // this function is overloaded to enable drag and drop
   virtual void mousePressEvent( QMouseEvent* event );

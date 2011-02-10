@@ -189,7 +189,17 @@ public:
   
   layer_list_type get_layer_list() const
   {
-    return layer_list_;
+    return this->layer_list_;
+  }
+  
+  LayerHandle first_layer() const
+  {
+    return this->layer_list_.front();
+  }
+
+  LayerHandle last_layer() const
+  {
+    return this->layer_list_.back();
   }
   
   size_t get_list_size() const

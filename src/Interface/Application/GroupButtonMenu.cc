@@ -44,6 +44,7 @@
 #include <Interface/Application/StyleSheet.h>
 #include <Interface/Application/DropSpaceWidget.h>
 #include <Interface/Application/OverlayWidget.h>
+#include <Interface/Application/LayerWidget.h>
 
 //Application Includes
 #include <Application/LayerManager/LayerManager.h>
@@ -64,6 +65,7 @@ public:
   OverlayWidget* overlay_;
   QButtonGroup* iso_quality_button_group_;
   std::string group_id_;
+  LayerGroupHandle group_;
 };
   
 GroupButtonMenu::GroupButtonMenu( QWidget* parent, LayerGroupHandle group ) :
@@ -77,6 +79,7 @@ GroupButtonMenu::GroupButtonMenu( QWidget* parent, LayerGroupHandle group ) :
 
   this->private_->ui_.facade_->hide();
   this->private_->group_id_ = group->get_group_id();
+  this->private_->group_ = group;
 
   this->private_->ui_.delete_button_->setEnabled( false );
   this->private_->ui_.duplicate_button_->setEnabled( false );
@@ -145,23 +148,27 @@ GroupButtonMenu::~GroupButtonMenu()
 {
 }
 
+LayerGroupHandle GroupButtonMenu::get_group() const
+{
+  return this->private_->group_;
+}
+
 void GroupButtonMenu::dropEvent( QDropEvent* event )
 {
   this->enable_drop_space( false );
+  event->setAccepted( true );
     
   std::string layer_name_ = event->mimeData()->text().toStdString();
   
   if ( LayerManager::Instance()->get_layer_by_name( layer_name_ ) )
   {
-    event->setAccepted( true );
-    ActionMoveLayerBelow::Dispatch( Core::Interface::GetWidgetActionContext(), 
-      layer_name_, this->private_->group_id_ );
-    this->private_->layer_slot_->instant_hide();
-    event->accept();
-  }
-  else
-  {
-    event->ignore();
+    LayerWidget* layer_widget = dynamic_cast< LayerWidget* >( event->source() );
+    if ( layer_widget )
+    {
+      layer_widget->set_drop_group( this ); 
+      event->setDropAction( Qt::MoveAction );
+      return;
+    } 
   }
 
   event->setDropAction( Qt::IgnoreAction );

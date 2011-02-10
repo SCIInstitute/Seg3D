@@ -63,6 +63,8 @@
 #include <Application/LayerManager/Actions/ActionExportSegmentation.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
 #include <Application/Filters/LayerResampler.h>
+#include <Application/LayerManager/Actions/ActionMoveLayerBelow.h>
+
 
 //Interface Includes
 #include <Interface/Application/LayerWidget.h>
@@ -71,6 +73,7 @@
 #include <Interface/Application/DropSpaceWidget.h>
 #include <Interface/Application/OverlayWidget.h>
 #include <Interface/Application/LayerResamplerDialog.h>
+#include <Interface/Application/GroupButtonMenu.h>
 
 //UI Includes
 #include "ui_LayerWidget.h"
@@ -104,8 +107,12 @@ public:
   PushDragButton* activate_button_;
   DropSpaceWidget* drop_space_;
   OverlayWidget* overlay_;
+  
   LayerWidget* drop_layer_;
   bool drop_layer_set_;
+  
+  GroupButtonMenu* drop_group_;
+  bool drop_group_set_;
 
   // Local copy of state information 
   bool active_;
@@ -143,6 +150,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   this->private_->locked_ = false;
   this->private_->picked_up_ = false;
   this->private_->drop_layer_set_ = false;
+  this->private_->drop_group_set_ = false;
   
   // Store the icons in the private class, so they only need to be generated once
   this->private_->label_layer_icon_.addFile( QString::fromUtf8( ":/Images/LabelMapWhite.png" ),
@@ -840,31 +848,69 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
   
   // Finally if our drag was aborted then we reset the layers styles to be visible
   if( ( ( drag->exec(Qt::MoveAction, Qt::MoveAction) ) == Qt::MoveAction ) 
-    && ( this->private_->drop_layer_set_ ) )
+    && ( this->private_->drop_layer_set_ || this->private_->drop_group_set_ ) )
   { 
-    LayerGroupHandle dst_group = this->private_->drop_layer_->
-      private_->layer_->get_layer_group();
-      
-    if ( this->private_->layer_->get_layer_group() != dst_group )
+    if ( this->private_->drop_layer_set_ )
     {
-      this->set_picked_up( false );
-      LayerResamplerHandle layer_resampler( new LayerResampler(
-        this->private_->layer_, this->private_->drop_layer_->private_->layer_ ) );
-      LayerResamplerDialog* dialog = new LayerResamplerDialog( layer_resampler, this );
-      if ( dialog->exec() == QDialog::Accepted )
+      LayerGroupHandle dst_group = this->private_->drop_layer_->
+        private_->layer_->get_layer_group();
+        
+      if ( this->private_->layer_->get_layer_group() != dst_group )
       {
-        layer_resampler->execute( Core::Interface::GetWidgetActionContext() );
+        this->set_picked_up( false );
+        LayerResamplerHandle layer_resampler( new LayerResampler(
+          this->private_->layer_, this->private_->drop_layer_->private_->layer_ ) );
+        LayerResamplerDialog* dialog = new LayerResamplerDialog( layer_resampler, this );
+        if ( dialog->exec() == QDialog::Accepted )
+        {
+          layer_resampler->execute( Core::Interface::GetWidgetActionContext() );
+        }
+        else
+        {
+          this->private_->drop_layer_->enable_drop_space( false );
+        }
+        dialog->deleteLater();
       }
       else
       {
-        this->private_->drop_layer_->enable_drop_space( false );
+        ActionMoveLayerAbove::Dispatch( Core::Interface::GetWidgetActionContext(),
+          this->get_layer_id(), this->private_->drop_layer_->get_layer_id() );
       }
-      dialog->deleteLater();
     }
-    else
+    else if ( this->private_->drop_group_set_ )
     {
-      ActionMoveLayerAbove::Dispatch( Core::Interface::GetWidgetActionContext(),
-        this->get_layer_id(), this->private_->drop_layer_->get_layer_id() );
+      LayerGroupHandle dst_group = this->private_->drop_group_->get_group();
+      if ( dst_group )
+      {
+        if ( this->private_->layer_->get_layer_group() != dst_group )
+        {
+          this->set_picked_up( false );
+          LayerHandle last_layer = dst_group->last_layer();
+          
+          if ( last_layer )
+          {
+            LayerResamplerHandle layer_resampler( new LayerResampler(
+              this->private_->layer_, last_layer ) );
+              
+            LayerResamplerDialog* dialog = new LayerResamplerDialog( layer_resampler, this );
+            if ( dialog->exec() == QDialog::Accepted )
+            {
+              layer_resampler->execute( Core::Interface::GetWidgetActionContext() );
+            }
+            else
+            {
+              this->private_->drop_group_->enable_drop_space( false );
+            }
+            dialog->deleteLater();
+          }
+        }
+        else
+        {
+          
+          ActionMoveLayerBelow::Dispatch( Core::Interface::GetWidgetActionContext(), 
+            this->get_layer_id(), dst_group->get_group_id() );
+        }
+      }
     }
   }
   else
@@ -873,6 +919,8 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
   }
   
   this->private_->drop_layer_set_ = false;
+  this->private_->drop_group_set_ = false;
+
   Q_EMIT prep_for_drag_and_drop( false );
   this->enable_drop_space( false );
   this->parentWidget()->setMinimumHeight( 0 );
@@ -887,17 +935,28 @@ void LayerWidget::set_drop_target( LayerWidget* target_layer )
   this->private_->drop_layer_set_ = true;
 }
 
+void LayerWidget::set_drop_group( GroupButtonMenu* target_group )
+{
+  this->private_->drop_group_ = target_group;
+  this->private_->drop_group_set_ = true;
+}
+
 void LayerWidget::dropEvent( QDropEvent* event )
 {
   this->enable_drop_space( false );
   event->setAccepted( true );
   
-  if( LayerManager::Instance()->get_layer_by_name( event->mimeData()->text().toStdString() )
-  && ( this->get_layer_name() != event->mimeData()->text().toStdString() ) )
+  std::string layer_name = event->mimeData()->text().toStdString();
+  if( LayerManager::Instance()->get_layer_by_name( layer_name )
+    && ( this->get_layer_name() != layer_name ) )
   {
-    dynamic_cast< LayerWidget* >( event->source() )->set_drop_target( this ); 
-    event->setDropAction( Qt::MoveAction );
-    return;
+    LayerWidget* layer_widget = dynamic_cast< LayerWidget* >( event->source() );
+    if ( layer_widget )
+    {
+      layer_widget->set_drop_target( this ); 
+      event->setDropAction( Qt::MoveAction );
+      return;
+    }
   }
   
   event->setDropAction( Qt::IgnoreAction );
