@@ -66,7 +66,6 @@
 #include <Interface/Application/RenderingDockWidget.h>
 #include <Interface/Application/Menu.h>
 #include <Interface/Application/MessageWindow.h>
-#include <Interface/Application/MeasurementDockWidget.h>
 #include <Interface/Application/PreferencesInterface.h>
 #include <Interface/Application/ProjectDockWidget.h>
 #include <Interface/Application/ShortcutsInterface.h>
@@ -95,12 +94,11 @@ namespace Seg3D
     QPointer< SplashScreen > splash_screen_;
     
     // The dock widgets
-    QPointer< HistoryDockWidget > history_dock_window_;
+    //QPointer< HistoryDockWidget > history_dock_window_;
     QPointer< ProjectDockWidget > project_dock_window_;
     QPointer< ToolsDockWidget > tools_dock_window_;
     QPointer< LayerManagerDockWidget > layer_manager_dock_window_;
     QPointer< RenderingDockWidget > rendering_dock_window_;
-    QPointer< MeasurementDockWidget > measurement_dock_window_;
     QPointer< ProgressWidget > progress_;
     
     // Pointer to the new project wizard
@@ -174,15 +172,13 @@ ApplicationInterface::ApplicationInterface( std::string file_to_view_on_open ) :
   this->private_->project_dock_window_ = new ProjectDockWidget( this );
   this->addDockWidget( Qt::LeftDockWidgetArea, this->private_->project_dock_window_ );
   
-  this->private_->history_dock_window_ = new HistoryDockWidget( this );
-  this->addDockWidget( Qt::LeftDockWidgetArea, this->private_->history_dock_window_ );
+//  this->private_->history_dock_window_ = new HistoryDockWidget( this );
+//  this->addDockWidget( Qt::LeftDockWidgetArea, this->private_->history_dock_window_ );
   
   this->private_->tools_dock_window_ = new ToolsDockWidget( this );
   this->addDockWidget( Qt::LeftDockWidgetArea, this->private_->tools_dock_window_ );
   
-  this->private_->measurement_dock_window_ = new MeasurementDockWidget( this );
-  this->addDockWidget( Qt::RightDockWidgetArea, this->private_->measurement_dock_window_ );
-  
+
   // Connect the windows and widgets to their visibility states
   QtUtils::QtBridge::Show( this->private_->rendering_dock_window_,
     InterfaceManager::Instance()->rendering_dockwidget_visibility_state_ );
@@ -196,11 +192,8 @@ ApplicationInterface::ApplicationInterface( std::string file_to_view_on_open ) :
   QtUtils::QtBridge::Show( this->private_->project_dock_window_, 
     InterfaceManager::Instance()->project_dockwidget_visibility_state_ );
 
-  QtUtils::QtBridge::Show( this->private_->measurement_dock_window_, 
-    InterfaceManager::Instance()->measurement_project_dockwidget_visibility_state_ );
-
-  QtUtils::QtBridge::Show( this->private_->history_dock_window_, 
-    InterfaceManager::Instance()->history_dockwidget_visibility_state_ );
+//  QtUtils::QtBridge::Show( this->private_->history_dock_window_, 
+//    InterfaceManager::Instance()->history_dockwidget_visibility_state_ );
   
   QtUtils::QtBridge::Show( this->private_->splash_screen_, 
     InterfaceManager::Instance()->splash_screen_visibility_state_ );
@@ -346,11 +339,11 @@ void ApplicationInterface::closeEvent( QCloseEvent* event )
     this->private_->keyboard_shortcuts_->deleteLater();
   }
   
-  if( this->private_->history_dock_window_ )
-  {
-    this->private_->history_dock_window_->close();
-    this->private_->history_dock_window_->deleteLater();
-  }
+//  if( this->private_->history_dock_window_ )
+//  {
+//    this->private_->history_dock_window_->close();
+//    this->private_->history_dock_window_->deleteLater();
+//  }
   
   if( this->private_->project_dock_window_ )
   {
@@ -374,12 +367,6 @@ void ApplicationInterface::closeEvent( QCloseEvent* event )
   {
     this->private_->rendering_dock_window_->close();
     this->private_->rendering_dock_window_->deleteLater();
-  }
-  
-  if( this->private_->measurement_dock_window_ )
-  {
-    this->private_->measurement_dock_window_->close();
-    this->private_->measurement_dock_window_->deleteLater();
   }
 
   event->accept();
@@ -440,8 +427,7 @@ void ApplicationInterface::begin_progress( Core::ActionProgressHandle handle )
   this->private_->rendering_dock_window_->set_enabled( false );
   this->private_->tools_dock_window_->set_enabled( false );
   this->private_->project_dock_window_->set_enabled( false );
-  this->private_->measurement_dock_window_->set_enabled( false );
-  this->private_->history_dock_window_->set_enabled( false );
+//  this->private_->history_dock_window_->set_enabled( false );
   
   // Draw the progress widget on top of everything.
   CORE_LOG_DEBUG( "-- Start progress widget --" );
@@ -461,8 +447,8 @@ void ApplicationInterface::end_progress( Core::ActionProgressHandle /*handle*/ )
   this->private_->rendering_dock_window_->set_enabled( true );
   this->private_->tools_dock_window_->set_enabled( true );
   this->private_->project_dock_window_->set_enabled( true );
-  this->private_->measurement_dock_window_->set_enabled( true );
-  this->private_->history_dock_window_->set_enabled( true );
+
+  //this->private_->history_dock_window_->set_enabled( true );
   
   CORE_LOG_DEBUG( "-- Unpicturizing the Viewer Interface --" );
   this->private_->viewer_interface_->set_pic_mode( false );

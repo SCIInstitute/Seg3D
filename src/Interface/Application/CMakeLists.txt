@@ -50,7 +50,6 @@ SET(INTERFACE_APPLICATION_SRCS
   LayerManagerWidget.cc
   LayerResamplerDialog.cc
   LayerWidget.cc
-  MeasurementDockWidget.cc
   Menu.cc
   MessageWindow.cc
   OverlayWidget.cc
@@ -94,7 +93,6 @@ SET(INTERFACE_APPLICATION_MOC_SRCS
   LayerManagerWidget.h
   LayerResamplerDialog.h
   LayerWidget.h
-  MeasurementDockWidget.h
   Menu.h
   MessageWindow.h
   OverlayWidget.h
@@ -139,7 +137,6 @@ SET(INTERFACE_APPLICATION_UI_SRCS
   LayerManagerDockWidget.ui
   LayerResamplerDialog.ui
   LayerWidget.ui
-  MeasurementDockWidget.ui
   MessageWindow.ui
   PreferencesInterface.ui
   ProjectDockWidget.ui

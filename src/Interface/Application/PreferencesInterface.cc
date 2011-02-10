@@ -262,10 +262,8 @@ void PreferencesInterface::setup_sidebar_prefs()
     PreferencesManager::Instance()->show_layermanager_bar_state_->get() );
   this->private_->ui_.project_manager_checkbox_->setChecked( 
     PreferencesManager::Instance()->show_projectmanager_bar_state_->get() );
-  this->private_->ui_.measurement_checkbox_->setChecked( 
-    PreferencesManager::Instance()->show_measurement_bar_state_->get() );
-  this->private_->ui_.history_checkbox_->setChecked( 
-    PreferencesManager::Instance()->show_history_bar_state_->get() );
+//  this->private_->ui_.history_checkbox_->setChecked( 
+//    PreferencesManager::Instance()->show_history_bar_state_->get() );
   
   // Connect Sidebars Preferences
   QtUtils::QtBridge::Connect( this->private_->ui_.tools_filters_checkbox_, 
@@ -274,10 +272,8 @@ void PreferencesInterface::setup_sidebar_prefs()
     PreferencesManager::Instance()->show_layermanager_bar_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.project_manager_checkbox_, 
     PreferencesManager::Instance()->show_projectmanager_bar_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.measurement_checkbox_, 
-    PreferencesManager::Instance()->show_measurement_bar_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.history_checkbox_, 
-    PreferencesManager::Instance()->show_history_bar_state_ );
+//  QtUtils::QtBridge::Connect( this->private_->ui_.history_checkbox_, 
+//    PreferencesManager::Instance()->show_history_bar_state_ );
   
   
   ToolMenuList tool_menus;

@@ -62,8 +62,6 @@ void InterfaceManager::initialize_states()
   add_state( "layermanager_dockwidget_visibility", this->layermanager_dockwidget_visibility_state_, 
     PreferencesManager::Instance()->show_layermanager_bar_state_->get() );
   this->add_state( "rendering_dockwidget_visible", this->rendering_dockwidget_visibility_state_, true );
-  add_state( "measurement_project_dockwidget_visibility", this->measurement_project_dockwidget_visibility_state_, 
-    PreferencesManager::Instance()->show_measurement_bar_state_->get() );
   add_state( "history_dockwidget_visibility", this->history_dockwidget_visibility_state_, 
     PreferencesManager::Instance()->show_history_bar_state_->get() );
   

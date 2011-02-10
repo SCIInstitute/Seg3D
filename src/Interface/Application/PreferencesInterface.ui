@@ -1324,16 +1324,6 @@ border: 1px solid gray;
            </widget>
           </item>
           <item>
-           <widget class="QCheckBox" name="history_checkbox_">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>History</string>
-            </property>
-           </widget>
-          </item>
-          <item>
            <spacer name="verticalSpacer_3">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
