@@ -140,7 +140,7 @@ void MeasurementToolInterface::UpdateMeasurementModel( qpointer_type measurement
   if ( measurement_interface.data() )
   {
     // Updates table view
-    measurement_interface->private_->table_model_->update();
+    measurement_interface->private_->table_model_->update_table();
 
     // Enable widgets only if measurements exist and active index is valid
     if( measurement_interface->private_->table_model_->rowCount( QModelIndex() ) > 0 &&
@@ -175,6 +175,10 @@ void MeasurementToolInterface::UpdateMeasurementNote( qpointer_type measurement_
   // Protect interface pointer, so we do not execute if interface does not exist anymore
   if ( measurement_interface.data() )
   {
+    // Update only table cells, not table dimensions
+    // Needed in order to update background color for active/non-active cells
+    measurement_interface->private_->table_model_->update_data();
+
     // Updates table view
     measurement_interface->private_->ui_.note_textbox_->setText( 
       measurement_interface->private_->table_model_->get_active_note() );

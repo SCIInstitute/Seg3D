@@ -49,7 +49,6 @@ std::string ExportToString( const Measurement& value )
     ' ' + '[' + value.get_note() + Measurement::NOTE_DELIMITER_C );
 }
 
-
 std::string ExportToString( const std::vector< Measurement >& value )
 {
   std::string export_string = "";

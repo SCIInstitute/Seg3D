@@ -237,9 +237,23 @@ void MeasurementTableModel::handle_click( const QModelIndex & index )
   } 
 }
 
-void MeasurementTableModel::update()
+void MeasurementTableModel::update_table()
 {
   QAbstractTableModel::reset();
+
+  // Needed for initial update after loading measurements from project file
+  Q_EMIT active_note_changed( this->get_active_note() ); 
+}
+
+void MeasurementTableModel::update_data()
+{
+  int rows = this->rowCount( QModelIndex() );
+  int columns = this->columnCount( QModelIndex() );
+  QModelIndex top_left = this->index( 0, 0 );
+  QModelIndex bottom_right = this->index( rows - 1, columns - 1 );
+  Q_EMIT dataChanged( top_left, bottom_right );
+
+  //this->reset();
 
   Q_EMIT active_note_changed( this->get_active_note() ); 
 }

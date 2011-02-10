@@ -73,9 +73,14 @@ public:
   // Extended functions
   //
 
-  // UPDATE:
-  // Update entire table.  Stops any editing that the user may be doing on the table.
-  void update();
+  // UPDATE_TABLE:
+  // Update entire table including dimensions.  
+  // Stops any editing that the user may be doing on the table.  Clears currently selected cells.
+  void update_table();
+
+  // UPDATE_DATA:
+  // Update only table cells, not table dimensions.
+  void update_data();
 
   void remove_rows( const std::vector< int >& rows );
   
