@@ -31,6 +31,9 @@
 #pragma warning( disable: 4267 )
 #endif
 
+// STL includes
+#include <limits>
+
 // GDCM Includes
 #include <gdcmImageReader.h>
 #include <gdcmImageHelper.h>
@@ -276,6 +279,8 @@ bool GDCMLayerImporter::import_header()
     return false; 
   }
 
+  double epsilon = std::numeric_limits<double>::epsilon() * 10.0;
+
   this->private_->slice_data_size_ = pixel_size * dims[ 0 ] * dims[ 1 ];
 
   // Compute the grid transform
@@ -298,6 +303,7 @@ bool GDCMLayerImporter::import_header()
   if ( spacing[ 2 ] == 1.0 )
   {
     gdcm::Tag slice_thickness_tag( 0x0018,0x0050 );
+    gdcm::Tag patient_position_tag( 0x0020, 0x0032 );
 
     bool found_thickness = false;
     
@@ -309,7 +315,7 @@ bool GDCMLayerImporter::import_header()
         gdcm::Attribute< 0x0018, 0x0050 > slice_thickness;
         slice_thickness.SetFromDataElement( de );
         double thickness = slice_thickness.GetValue( 0 );
-        if ( thickness > 0.0 )
+        if ( thickness > epsilon )
         {
           this->private_->z_spacing_ = thickness;
           this->private_->slice_direction_ = Core::Vector( 0.0, 0.0, 1.0 );
@@ -318,7 +324,7 @@ bool GDCMLayerImporter::import_header()
       }
     }
     
-    if ( this->private_->file_list_.size() > 1 )
+    if ( this->private_->file_list_.size() > 1 && ds.FindDataElement( patient_position_tag ) )
     {
       gdcm::ImageReader reader2;
       reader2.SetFileName( this->private_->file_list_[ 1 ].c_str() );
@@ -332,7 +338,14 @@ bool GDCMLayerImporter::import_header()
       const double* origin2 = image2.GetOrigin();
       
       double spacing = origin2[ 2 ] - origin[ 2 ];
-      if ( spacing != 0.0 ) this->private_->z_spacing_ = spacing; else spacing = 1.0;
+      if ( spacing < -epsilon || spacing > epsilon ) 
+      {
+        this->private_->z_spacing_ = spacing; 
+      }
+      else 
+      {
+        spacing = 1.0;
+      }
       this->private_->slice_direction_ = Core::Vector( 0.0, 0.0, 1.0 );
     }
     else if ( found_thickness == false )

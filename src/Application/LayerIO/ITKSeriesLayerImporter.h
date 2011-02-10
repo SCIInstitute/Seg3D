@@ -54,13 +54,10 @@ class ITKSeriesLayerImporter : public LayerImporter
 {
   // The ITKLayerImporter is capable of importing DICOMS, tiffs, and pngs.  It assumes that
   // when a file name does not include an extension that it is a DICOM
-  SCI_IMPORTER_TYPE( "ITK FileSeries Importer",
-            ".dcm;.DCM;.dicom;.DICOM;.ima;.IMA;"
-            ".tiff;.tif;.TIFF;.TIF;"
-            ".png;.PNG;"
-            ".jpg;.jpeg;.JPG;.JPEG;"
-            ".bmp;.BMP;"
-            ".vtk;.VTK", 5, 
+  // NOTE: Since this one accepts any type, the upper case version are ignored, as they
+  // do not fit on the line
+  SCI_IMPORTER_TYPE( "ITK FileSeries Importer","*;"
+            ".dcm;.dicom;.ima;.tiff;.tif;.png;.jpeg;.jpg;.bmp;.vtk", 5, 
             LayerImporterType::FILE_SERIES_E )
 
   // -- Constructor/Destructor --

@@ -122,6 +122,7 @@ void GridTransform::AlignToCanonicalCoordinates( const GridTransform& src_transf
   axes[ 2 ] = src_transform.project( canonical_axes[ 2 ] );
 
   // Find the closest axis to each vector
+  
   for ( int i = 0; i < 3; ++i )
   {
     double proj_len = 0;
@@ -135,11 +136,13 @@ void GridTransform::AlignToCanonicalCoordinates( const GridTransform& src_transf
         proj_len = dot_prod;
       }
     }
-    axes[ i ] = canonical_axes[ index ] * ( Sign( proj_len ) * axes[ i ].length() );
+    double length = axes[ i ].length();
+    if ( length == 0.0 ) length = 1.0;
+    axes[ i ] = canonical_axes[ index ] * ( Sign( proj_len ) * length );
     canonical_axes.erase( canonical_axes.begin() + index );
   }
   
-  Point src_origin = src_transform.project( Point( 0, 0, 0 ) );
+  Point src_origin = src_transform.project( Point( 0.0, 0.0, 0.0 ) );
   
   std::vector< size_t > src_size( 3 );
   src_size[ 0 ] = src_transform.get_nx();
@@ -165,7 +168,6 @@ void GridTransform::AlignToCanonicalCoordinates( const GridTransform& src_transf
       }     
     }
   }
-  
 
   for ( int i = 0; i < 3; i++ )
   {

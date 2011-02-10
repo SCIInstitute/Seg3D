@@ -55,7 +55,13 @@ LayerImporterInfo::LayerImporterInfo( LayerImporterBuilderBaseHandle builder,
 
   if ( any_type_ ) 
   {
-    file_type_string_ = name_ + std::string(" (*)");
+    file_type_string_ = name_ + std::string( " (* " );
+    for ( size_t j = 1; j < file_types_.size(); j++ )
+    {
+      file_type_string_ += std::string("*")+file_types_[j];
+      if ( j != ( file_types_.size() - 1 ) ) file_type_string_ += std::string( " " );
+    }
+    file_type_string_ += std::string( ")" );
   }
   else
   {
