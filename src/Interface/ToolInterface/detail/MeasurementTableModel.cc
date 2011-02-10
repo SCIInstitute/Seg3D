@@ -240,6 +240,8 @@ void MeasurementTableModel::handle_click( const QModelIndex & index )
 void MeasurementTableModel::update()
 {
   QAbstractTableModel::reset();
+
+  Q_EMIT active_note_changed( this->get_active_note() ); 
 }
 
 QString MeasurementTableModel::get_active_note() const

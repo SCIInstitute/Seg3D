@@ -76,14 +76,11 @@ bool MeasurementToolInterface::build_widget( QFrame* frame )
   this->private_->table_view_ = this->private_->ui_.table_view_;
   this->private_->table_view_->set_measurement_model( this->private_->table_model_ );
 
-  qpointer_type measurement_interface( this );
-  UpdateMeasurementModel( measurement_interface );
-
   /* Normally Qt syncs the model and the view without us having to worry about it.  But that 
   relies on everything being on Qt thread, which is not true in our case.  So instead the 
   MeasurementToolInterface calls update on the model when the measurements state is modified.  
   The model in turn gets its data from the measurements state. */ 
-  
+  qpointer_type measurement_interface( this );  
   this->add_connection( tool_handle->measurements_state_->state_changed_signal_.connect( 
     boost::bind( &MeasurementToolInterface::UpdateMeasurementModel, measurement_interface ) ) );
   this->add_connection( tool_handle->active_index_state_->state_changed_signal_.connect( 
@@ -103,6 +100,8 @@ bool MeasurementToolInterface::build_widget( QFrame* frame )
     this, SLOT( set_measurement_note_table() ) );
   QObject::connect( this->private_->ui_.note_textbox_, SIGNAL( editing_finished() ), 
     this->private_->table_model_, SLOT( save_active_note() ) );
+
+  UpdateMeasurementModel( measurement_interface );
 
   //Send a message to the log that we have finished with building the Measure Tool Interface
   CORE_LOG_MESSAGE( "Finished building an Measure Tool Interface" );

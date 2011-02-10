@@ -64,10 +64,10 @@ void MeasurementTableView::set_measurement_model( MeasurementTableModel* measure
   QObject::connect( this->selectionModel(), 
     SIGNAL( selectionChanged( QItemSelection, QItemSelection ) ), 
     measurement_model, SLOT( handle_selected( QItemSelection) ) );
-  QObject::connect( measurement_model, SIGNAL( rowsRemoved( QModelIndex, int, int ) ), 
-    this, SLOT( scroll_to_active_index() ) );
-  QObject::connect( measurement_model, SIGNAL( rowsInserted( QModelIndex, int, int ) ), 
-    this, SLOT( scroll_to_active_index() ) );
+  //QObject::connect( measurement_model, SIGNAL( rowsRemoved( QModelIndex, int, int ) ), 
+  //  this, SLOT( scroll_to_active_index() ) );
+  //QObject::connect( measurement_model, SIGNAL( rowsInserted( QModelIndex, int, int ) ), 
+  //  this, SLOT( scroll_to_active_index() ) );
 
   // Wait until text editing is finished to save the note for the active measurement.  This 
   // way we avoid updating the model for every keystroke.

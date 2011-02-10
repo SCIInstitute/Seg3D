@@ -109,6 +109,9 @@ private:
   Core::Point   p1_; // 3D world coordinate of 1st point
   Core::Point   p2_; // 3D world coordinate of 2nd point
   ViewAxis    view_axis_;
+
+public:
+  static const std::string NOTE_DELIMITER_C;
 };
 
 inline bool Measurement::operator==( const Measurement& m ) const
