@@ -196,11 +196,6 @@ bool MeasurementTableModel::setData( const QModelIndex &index, const QVariant &v
 
         // If we are editing this cell then it is by definition the active measurement
         Q_EMIT active_note_changed( value.toString() ); 
-
-        // The note can only be modified on the Interface thread, so it is safe to update
-        // the table view here.  Need to emit dataChanged so that table updates if 
-        // user is editing note in text box. 
-        Q_EMIT dataChanged( index, index ); 
       }
       else
       {
@@ -218,6 +213,13 @@ void MeasurementTableModel::set_active_note( const QString & note )
   if( active_index == MeasurementTool::INVALID_ACTIVE_INDEX_C ) return;
   QModelIndex index = this->index( active_index, MEASUREMENT_NOTE_E );
   this->setData( index, note, Qt::EditRole );
+
+  // The note can only be modified on the Interface thread, so it is safe to update
+  // the table view here.  Need to emit dataChanged so that table updates if 
+  // user is editing note in text box.  Moved this out of setData() because we don't want to 
+  // emit the signal if the note is being edited through the table since the cursor gets reset
+  // to the end of the line.  
+  Q_EMIT dataChanged( index, index ); 
 }
 
 void MeasurementTableModel::handle_click( const QModelIndex & index )

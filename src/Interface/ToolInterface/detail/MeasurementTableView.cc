@@ -64,10 +64,6 @@ void MeasurementTableView::set_measurement_model( MeasurementTableModel* measure
   QObject::connect( this->selectionModel(), 
     SIGNAL( selectionChanged( QItemSelection, QItemSelection ) ), 
     measurement_model, SLOT( handle_selected( QItemSelection) ) );
-  //QObject::connect( measurement_model, SIGNAL( rowsRemoved( QModelIndex, int, int ) ), 
-  //  this, SLOT( scroll_to_active_index() ) );
-  //QObject::connect( measurement_model, SIGNAL( rowsInserted( QModelIndex, int, int ) ), 
-  //  this, SLOT( scroll_to_active_index() ) );
 
   // Wait until text editing is finished to save the note for the active measurement.  This 
   // way we avoid updating the model for every keystroke.
@@ -98,13 +94,13 @@ void MeasurementTableView::handle_model_reset()
 
 void MeasurementTableView::scroll_to_active_index()
 {
-  /*MeasurementTableModel* model = 
+  MeasurementTableModel* model = 
     qobject_cast< MeasurementTableModel* >( this->model() );
   int active_index = model->get_active_index();
-  if( active_index != Core::MeasurementList::INVALID_ACTIVE_INDEX_C )
+  if( active_index != MeasurementTool::INVALID_ACTIVE_INDEX_C )
   {
     this->scrollTo( model->index( active_index, 0 ) );
-  }*/
+  }
 }
 
 void MeasurementTableView::get_deletion_candidates( std::vector< int >& deletion_candidates ) const
