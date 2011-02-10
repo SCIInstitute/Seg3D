@@ -105,7 +105,7 @@ public:
 
   // CONVERTS_FILE_TYPE:
   // Check whether this importer deals with a specific file type
-  bool converts_file_type( const std::string& file_type ) const;
+  bool converts_file_type( const std::string& file_type, bool strict = true ) const;
   
   // FILE_TYPES:
   // Get the string that defines the allowed file types

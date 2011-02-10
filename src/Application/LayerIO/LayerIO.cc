@@ -130,7 +130,7 @@ bool LayerIO::create_importer( const std::string& filename,
     // Search the list for an approriate importer
     for (size_t j = 0; j < this->importer_list_.size(); j ++ )
     {
-      if ( this->importer_list_[j]->converts_file_type( extension ) &&  
+      if ( this->importer_list_[j]->converts_file_type( extension, true ) &&  
          this->importer_list_[j]->priority() >= priority )
       {
         LayerImporterHandle new_importer = this->importer_list_[j]->build( filename );
@@ -141,6 +141,23 @@ bool LayerIO::create_importer( const std::string& filename,
         }
       }
     }   
+
+    if ( !importer )
+    {
+      for (size_t j = 0; j < this->importer_list_.size(); j ++ )
+      {
+        if ( this->importer_list_[j]->converts_file_type( extension, false ) &&  
+           this->importer_list_[j]->priority() >= priority )
+        {
+          LayerImporterHandle new_importer = this->importer_list_[j]->build( filename );
+          if ( new_importer->check_header() )
+          {
+            importer = new_importer;
+            priority = this->importer_list_[j]->priority();
+          }
+        }
+      }   
+    }
   }
   // Else find the specific importer, this can be either through the name (using the
   // script) or through the file type string ( from the GUI)  

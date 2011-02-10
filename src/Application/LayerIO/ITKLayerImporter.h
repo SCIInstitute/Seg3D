@@ -56,7 +56,8 @@ class ITKLayerImporter : public LayerImporter
   // The ITKLayerImporter is capable of importing DICOMS, tiffs, and pngs.  It assumes that
   // when a file name does not include an extension that it is a DICOM
   
-  SCI_IMPORTER_TYPE( "ITK Importer",  ".lsm;.LSM;"
+  SCI_IMPORTER_TYPE( "ITK Importer",  "*;"
+                    ".lsm;.LSM;"
                     ".tiff;.tif;.TIFF;.TIF;.stk;.STK;"
                     ".nii;.img;.hdr;"
                     ".vtk;.VTK;"
