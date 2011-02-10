@@ -37,7 +37,7 @@
 // Interface includes
 #include <Interface/ToolInterface/detail/MeasurementTableModel.h>
 #include <Interface/ToolInterface/detail/MeasurementTableView.h>
-#include <Interface/ToolInterface/detail/TextDelegate.h>
+#include <Interface/ToolInterface/detail/MeasurementTextDelegate.h>
 
 namespace Seg3D
 {
@@ -45,7 +45,7 @@ namespace Seg3D
 MeasurementTableView::MeasurementTableView( QWidget* parent ) : 
   QTableView( parent )
 {
-  this->setItemDelegate( new TextDelegate( MEASUREMENT_NOTE_E ) ); // Custom text editor for note column
+  this->setItemDelegate( new MeasurementTextDelegate( MEASUREMENT_NOTE_E ) ); // Custom text editor for note column
   this->horizontalHeader()->setStretchLastSection( true ); // Stretch note section
 
   this->delete_action_ = new QAction( tr( "&Delete" ), this );

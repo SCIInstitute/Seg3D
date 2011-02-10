@@ -358,17 +358,20 @@ void MeasurementTableModel::remove_rows( const std::vector< int >& rows )
 
 void MeasurementTableModel::save_active_note() 
 {
-  int active_index = this->get_active_index();
-  std::vector< Core::Measurement > measurements = this->measurement_tool_->get_measurements();
-  if( active_index != MeasurementTool::INVALID_ACTIVE_INDEX_C && 
-    active_index < measurements.size() )
+  if( this->use_cached_active_note_ )
   {
-    Core::Measurement measurement = measurements[ active_index ];
-    measurement.set_note( this->cached_active_note_ );
-    this->measurement_tool_->set_measurement( active_index, measurement );
+    int active_index = this->get_active_index();
+    std::vector< Core::Measurement > measurements = this->measurement_tool_->get_measurements();
+    if( active_index != MeasurementTool::INVALID_ACTIVE_INDEX_C && 
+      active_index < measurements.size() )
+    {
+      Core::Measurement measurement = measurements[ active_index ];
+      measurement.set_note( this->cached_active_note_ );
+      this->measurement_tool_->set_measurement( active_index, measurement );
+    }
+    
+    this->use_cached_active_note_ = false;
   }
-  
-  this->use_cached_active_note_ = false;
 }
 
 } // end namespace Seg3D

@@ -31,16 +31,36 @@
 #include <QtGui/QPainter>
 
 // Interface includes
-#include <Interface/ToolInterface/detail/TextDelegate.h>
+#include <Interface/ToolInterface/detail/MeasurementTextDelegate.h>
 
 namespace Seg3D
 {
 
-TextDelegate::TextDelegate( int text_column, QObject * parent /*= 0 */ ) : 
+MeasurementTextDelegate::MeasurementTextDelegate( int text_column, QObject * parent /*= 0 */ ) : 
   text_column_( text_column ),
   QItemDelegate( parent ) {}
 
-QWidget* TextDelegate::createEditor( QWidget *parent, const QStyleOptionViewItem &option, 
+  void MeasurementTextDelegate::paint( QPainter *painter, const QStyleOptionViewItem &option, 
+    const QModelIndex &index ) const
+  {
+    if ( index.column() == text_column_ )
+    { 
+      QString text = index.model()->data( index, Qt::DisplayRole ).toString();
+      painter->save();
+      painter->setBackgroundMode( Qt::OpaqueMode );
+      painter->setBackground( index.model()->data( index, Qt::BackgroundRole ).value<QBrush>() );
+      drawBackground( painter, option, index );
+      painter->restore();
+      drawDisplay( painter, option, option.rect, text );
+      drawFocus( painter, option, option.rect );
+    }
+    else
+    {
+      QItemDelegate::paint( painter, option, index );
+    }
+  }
+
+  QWidget* MeasurementTextDelegate::createEditor( QWidget *parent, const QStyleOptionViewItem &option, 
   const QModelIndex &index ) const
 {
   if ( index.column() == text_column_ )
@@ -55,7 +75,7 @@ QWidget* TextDelegate::createEditor( QWidget *parent, const QStyleOptionViewItem
   }
 }
 
-void TextDelegate::setEditorData( QWidget *editor, const QModelIndex &index ) const
+void MeasurementTextDelegate::setEditorData( QWidget *editor, const QModelIndex &index ) const
 {
   if ( index.column() == text_column_ )
   {
@@ -69,7 +89,8 @@ void TextDelegate::setEditorData( QWidget *editor, const QModelIndex &index ) co
   }
 }
 
-void TextDelegate::setModelData( QWidget *editor, QAbstractItemModel *model, const QModelIndex &index ) const
+void MeasurementTextDelegate::setModelData( QWidget *editor, QAbstractItemModel *model, 
+  const QModelIndex &index ) const
 {
   if ( index.column() == text_column_ )
   {
@@ -83,27 +104,17 @@ void TextDelegate::setModelData( QWidget *editor, QAbstractItemModel *model, con
   }
 }
 
-void TextDelegate::paint( QPainter *painter, const QStyleOptionViewItem &option, 
-  const QModelIndex &index ) const
+QSize MeasurementTextDelegate::sizeHint( const QStyleOptionViewItem & option, 
+  const QModelIndex & index ) const
 {
-  if ( index.column() == text_column_ )
-  { 
-    QString text = index.model()->data( index, Qt::DisplayRole ).toString();
-    painter->save();
-    painter->setBackgroundMode( Qt::OpaqueMode );
-    painter->setBackground( index.model()->data( index, Qt::BackgroundRole ).value<QBrush>() );
-    drawBackground( painter, option, index );
-    painter->restore();
-    drawDisplay( painter, option, option.rect, text );
-    drawFocus( painter, option, option.rect );
-  }
-  else
-  {
-    QItemDelegate::paint( painter, option, index );
-  }
+  QSize size_hint = QItemDelegate::sizeHint( option, index );
+  // We don't want a tall cell when the text has line breaks, so set height to 0 and rely 
+  // on other columns to set reasonable size.
+  size_hint.setHeight( 0 );
+  return size_hint;
 }
 
-void TextDelegate::commit_editor()
+void MeasurementTextDelegate::commit_editor()
 {
   QLineEdit* editor = qobject_cast<QLineEdit *>( sender() );
   Q_EMIT commitData( editor );
