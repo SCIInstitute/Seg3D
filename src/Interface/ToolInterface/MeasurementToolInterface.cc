@@ -147,6 +147,7 @@ void MeasurementToolInterface::UpdateMeasurementModel( qpointer_type measurement
       measurement_interface->private_->table_model_->get_active_index() != 
       MeasurementTool::INVALID_ACTIVE_INDEX_C )
     {
+      measurement_interface->private_->ui_.table_view_->setEnabled( true );
       measurement_interface->private_->ui_.note_textbox_->setEnabled( true );
       measurement_interface->private_->ui_.goto_button_->setEnabled( true );
       measurement_interface->private_->ui_.copy_button_->setEnabled( true );
@@ -154,6 +155,7 @@ void MeasurementToolInterface::UpdateMeasurementModel( qpointer_type measurement
     }
     else
     {
+      measurement_interface->private_->ui_.table_view_->setEnabled( false );
       measurement_interface->private_->ui_.note_textbox_->setEnabled( false );
       measurement_interface->private_->ui_.goto_button_->setEnabled( false );
       measurement_interface->private_->ui_.copy_button_->setEnabled( false );
