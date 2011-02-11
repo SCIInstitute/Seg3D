@@ -7,8 +7,8 @@ varying float fog_depth;
 
 float compute_fog_factor()
 {
-  float fog_factor = -gl_Fog.density * gl_Fog.density * fog_depth * fog_depth;
-  fog_factor = exp( fog_factor );
+  float z = fog_depth;
+  float fog_factor = exp( -gl_Fog.density * gl_Fog.density * z * z );
   fog_factor = clamp( fog_factor, 0.0, 1.0 );
   
   return fog_factor;

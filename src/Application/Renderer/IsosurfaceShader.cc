@@ -104,6 +104,7 @@ bool IsosurfaceShader::initialize()
   this->min_val_loc_ = this->glsl_prog_->get_uniform_location( "min_val" );
   this->val_range_loc_ = this->glsl_prog_->get_uniform_location( "val_range" );
   this->enable_fog_loc_ = this->glsl_prog_->get_uniform_location( "enable_fog" );
+  this->fog_range_loc_ = this->glsl_prog_->get_uniform_location( "fog_range" );
   this->glsl_prog_->disable();
 
   this->valid_ = true;
@@ -150,6 +151,11 @@ void IsosurfaceShader::set_colormap_texture( int tex_unit )
 void IsosurfaceShader::set_fog( bool enabled )
 {
   glUniform1i( this->enable_fog_loc_, enabled );
+}
+
+void IsosurfaceShader::set_fog_range( float znear, float zfar )
+{
+  glUniform2f( this->fog_range_loc_, znear, zfar );
 }
 
 } // end namespace Seg3D

@@ -61,6 +61,7 @@ public:
   void set_border_width( int width );
   void set_lighting( bool enabled );
   void set_fog( bool enabled );
+  void set_fog_range( float znear, float zfar );
 
 private:
 
@@ -81,6 +82,7 @@ private:
   int pixel_size_loc_;
   int enable_lighting_loc_;
   int enable_fog_loc_;
+  int fog_range_loc_;
 
   const static char* VERT_SHADER_SOURCE_C[];
   const static char* FRAG_SHADER_SOURCE_C[];

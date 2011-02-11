@@ -56,6 +56,7 @@ public:
   void set_min_val( float min_val );
   void set_val_range( float val_range );
   void set_fog( bool enabled );
+  void set_fog_range( float znear, float zfar );
 
 private:
 
@@ -71,6 +72,7 @@ private:
   int min_val_loc_;
   int val_range_loc_;
   int enable_fog_loc_;
+  int fog_range_loc_;
 
   const static char* VERT_SHADER_SOURCE_C[];
   const static char* FRAG_SHADER_SOURCE_C[];

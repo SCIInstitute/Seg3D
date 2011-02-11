@@ -66,6 +66,7 @@ bool SliceShader::initialize()
     std::string error_info = this->glsl_frag_shader_->get_info_log();
     CORE_LOG_ERROR( std::string( "Failed compiling SliceShader source: \n" ) + error_info );
     this->glsl_frag_shader_.reset();
+    assert( false );
     return false;
   }
 
@@ -78,6 +79,7 @@ bool SliceShader::initialize()
     CORE_LOG_ERROR( std::string( "Failed compiling SliceShader source: \n" ) + error_info );
     this->glsl_frag_shader_.reset();
     this->glsl_vert_shader_.reset();
+    assert( false );
     return false;
   }
   
@@ -91,6 +93,7 @@ bool SliceShader::initialize()
     this->glsl_vert_shader_.reset();
     this->glsl_frag_shader_.reset();
     this->glsl_prog_.reset();
+    assert( false );
     return false;
   }
 
@@ -106,6 +109,7 @@ bool SliceShader::initialize()
   this->mask_color_loc_ = this->glsl_prog_->get_uniform_location( "mask_color" );
   this->enable_lighting_loc_ = this->glsl_prog_->get_uniform_location( "enable_lighting" );
   this->enable_fog_loc_ = this->glsl_prog_->get_uniform_location( "enable_fog" );
+  this->fog_range_loc_ = this->glsl_prog_->get_uniform_location( "fog_range" );
   this->glsl_prog_->disable();
 
   this->valid_ = true;
@@ -177,6 +181,11 @@ void SliceShader::set_lighting( bool enabled )
 void SliceShader::set_fog( bool enabled )
 {
   glUniform1i( this->enable_fog_loc_, enabled );
+}
+
+void SliceShader::set_fog_range( float znear, float zfar )
+{
+  glUniform2f( this->fog_range_loc_, znear, zfar );
 }
 
 } // end namespace Seg3D

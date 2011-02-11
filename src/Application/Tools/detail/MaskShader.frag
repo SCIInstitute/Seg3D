@@ -1,5 +1,4 @@
 // GLSL fragment shader for rendering a slice
-#version 110
 
 uniform sampler2D tex;
 uniform vec3 color; // color of mask
