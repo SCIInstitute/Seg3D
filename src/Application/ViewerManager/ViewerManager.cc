@@ -558,9 +558,9 @@ ViewerManager::ViewerManager() :
 
   // No viewer will be the active viewer for picking
   // NOTE: The interface will set this up
-  this->add_state( "active_axial_viewer", active_axial_viewer_, -1 );
-  this->add_state( "active_coronal_viewer", active_coronal_viewer_, -1 );
-  this->add_state( "active_sagittal_viewer", active_sagittal_viewer_, -1 );
+  this->add_state( "active_axial_viewer", active_axial_viewer_, 3 );
+  this->add_state( "active_coronal_viewer", active_coronal_viewer_, 4 );
+  this->add_state( "active_sagittal_viewer", active_sagittal_viewer_, 5 );
 
   this->add_connection( this->layout_state_->value_changed_signal_.connect( boost::bind( 
     &ViewerManagerPrivate::change_layout, this->private_, _1 ) ) );
