@@ -1,5 +1,4 @@
 // GLSL vertex shader for rendering the orientation arrows
-#version 110
 
 void compute_lighting();
 

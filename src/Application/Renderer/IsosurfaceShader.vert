@@ -1,5 +1,4 @@
 // GLSL vertex shader for rendering an isosurface
-#version 110
 
 uniform bool enable_lighting;
 uniform bool enable_fog;
@@ -32,6 +31,8 @@ void main()
   {
     normalized_value = ( value - min_val ) / val_range;
   }
+#ifndef DISABLE_CLIPPING
   gl_ClipVertex = gl_ModelViewMatrix * gl_Vertex;
+#endif
   gl_Position = ftransform();
 } 

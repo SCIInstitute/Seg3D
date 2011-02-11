@@ -82,11 +82,13 @@ Application::Application() :
   this->private_->app_filepath_ = boost::filesystem::current_path();
   this->private_->is_osx_10_5_or_less_ = false;
   
-#ifdef __APPLE__
+#if defined( __APPLE__ )
   struct utsname os_name;
-  if ( uname( &os_name ) == 0 )
+  int res = uname( &os_name );
+  
+  if (  res == 0 )
   {
-    std::string os_version = os_name.version;
+    std::string os_version = os_name.release;
     int version;
     if ( Core::ImportFromString( os_version, version ) )
     {

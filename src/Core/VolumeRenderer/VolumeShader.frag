@@ -1,5 +1,4 @@
 // GLSL fragment shader for rendering a slice
-#version 110
 
 uniform sampler3D vol_tex;
 

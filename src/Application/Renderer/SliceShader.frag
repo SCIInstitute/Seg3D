@@ -1,5 +1,4 @@
 // GLSL fragment shader for rendering a slice
-#version 110
 
 uniform sampler2D slice_tex;
 uniform sampler2D pattern_tex;

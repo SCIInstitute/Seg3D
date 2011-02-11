@@ -1,5 +1,4 @@
 // GLSL vertex shader for rendering a slice
-#version 110
 
 uniform bool enable_lighting;
 uniform bool enable_fog;
@@ -21,6 +20,8 @@ void main()
   
   gl_TexCoord[0] = gl_MultiTexCoord0;
   gl_TexCoord[1] = gl_MultiTexCoord1;
+#ifndef DISABLE_CLIPPING
   gl_ClipVertex = gl_ModelViewMatrix * gl_Vertex;
+#endif
   gl_Position = ftransform();
 } 

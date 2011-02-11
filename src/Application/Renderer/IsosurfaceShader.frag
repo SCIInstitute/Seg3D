@@ -1,5 +1,4 @@
 // GLSL fragment shader for rendering an isosurface
-#version 110
 
 uniform bool enable_lighting;
 uniform bool use_colormap;

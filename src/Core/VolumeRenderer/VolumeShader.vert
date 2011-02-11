@@ -1,5 +1,4 @@
 // GLSL vertex shader for slice based volume rendering
-#version 110
 
 uniform bool enable_lighting;
 uniform vec3 tex_bbox_min; // Minimum values of texture position in world space

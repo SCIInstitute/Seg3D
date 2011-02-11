@@ -28,11 +28,14 @@
 
 #include <fstream>
 #include <string>
+#include <iostream>
 
 #include <boost/shared_array.hpp>
 
 #include <Core/Graphics/GLSLShader.h>
 #include <Core/RenderResources/RenderResources.h>
+
+#include <Core/Application/Application.h>
 
 namespace Core
 {
@@ -56,6 +59,13 @@ bool GLSLShader::set_source( const std::string& file_name )
   }
 
   std::string source_str;
+  
+  // NOTE: OSX 10.5 and less do not have proper support for clipping in the shader
+  if ( Core::Application::Instance()->is_osx_10_5_or_less() )
+  {
+    source_str += std::string( "#define DISABLE_CLIPPING\n" );
+  }
+  
   while ( !source_file.eof() )
   {
     std::string line;
@@ -65,15 +75,28 @@ bool GLSLShader::set_source( const std::string& file_name )
   source_file.close();
 
   const char* str = source_str.c_str();
-
   glShaderSource( this->shader_id_, 1, &str, NULL );
 
   return true;
 }
 
-void GLSLShader::set_source( GLsizei count, const char** str, const int* length )
+void GLSLShader::set_source( GLsizei count, const char** str )
 {
-  glShaderSource( this->shader_id_, count, str, length );
+  std::string source_str;
+  
+  // NOTE: OSX 10.5 and less do not have proper support for clipping in the shader
+  if ( Core::Application::Instance()->is_osx_10_5_or_less() )
+  {
+    source_str += std::string( "#define DISABLE_CLIPPING\n" );
+  }
+  
+  for ( GLsizei j = 0; j < count ; j++ )
+  {
+    source_str += std::string( str[ j ] );
+  }
+
+  const char* shader_str = source_str.c_str();
+  glShaderSource( this->shader_id_, 1, &shader_str, NULL );
 }
 
 bool GLSLShader::compile()
