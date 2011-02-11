@@ -44,6 +44,7 @@ const char* IsosurfaceShader::VERT_SHADER_SOURCE_C[] =
 {
 #include "IsosurfaceShader_vert"
 #include "Lighting_vert"
+#include "Fog_vert"
 };
 
 IsosurfaceShader::IsosurfaceShader() :

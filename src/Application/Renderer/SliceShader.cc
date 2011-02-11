@@ -44,6 +44,7 @@ const char* SliceShader::VERT_SHADER_SOURCE_C[] =
 {
 #include "SliceShader_vert"
 #include "Lighting_vert"
+#include "Fog_vert"
 };
 
 SliceShader::SliceShader() :

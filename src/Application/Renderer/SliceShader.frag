@@ -28,7 +28,8 @@ vec4 shade_data_slice()
 {
   float value = texture2D( slice_tex, gl_TexCoord[0].st ).r;
   value = value * scale_bias[0] + scale_bias[1];
-  return vec4( vec3( value ), opacity );
+  vec4 color = vec4( vec3( value ), opacity );
+  return color;
 }
 
 // Test for mask edges
@@ -82,32 +83,50 @@ bool edge_test()
 vec4 shade_mask_slice()
 {
   float mask = texture2D( slice_tex, gl_TexCoord[0].st ).a;
+  vec4 color;
+  
   if ( mask == 0.0 ) discard;
 
   if ( mask_mode == 1 ) // border + pattern
   {
+    bool on_edge = false;
     if ( border_width > 0 )
     {
-      if ( edge_test() )
-        return vec4( mask_color, opacity );
+      on_edge = edge_test();
     }
     
-    float pattern = texture2D( pattern_tex, gl_TexCoord[1].st ).a;
-    return vec4( mask_color, pattern * opacity );
+    if ( on_edge )
+    {
+      color = vec4( mask_color, opacity );
+    }
+    else
+    {
+      float pattern = texture2D( pattern_tex, gl_TexCoord[1].st ).a;
+      color = vec4( mask_color, pattern * opacity );
+    }
   }
   else if ( mask_mode == 0 ) // border only
   {
+    bool on_edge = false;
     if ( border_width > 0 )
     {
-      if ( edge_test() )
-        return vec4( mask_color, opacity );
+      on_edge = edge_test();
     }
-    discard;
+    if ( on_edge )
+    {
+      color = vec4( mask_color, opacity );
+    }
+    else
+    {
+      discard;
+    }
   }
   else // fill
   {
-    return vec4( mask_color, opacity );
+    color = vec4( mask_color, opacity );
   }
+  
+  return color;
 }
 
 vec4 compute_lighting();
@@ -117,13 +136,6 @@ void main()
 {
   // Discard the fragment if it's completely transparent
   if ( opacity == 0.0 ) discard;
-
-  // Discard if the slice texture is out of boundary
-  if ( gl_TexCoord[0].s < 0.0 ||
-    gl_TexCoord[0].s > 1.0 ||
-    gl_TexCoord[0].t < 0.0 ||
-    gl_TexCoord[0].t > 1.0 )
-    discard;
 
   vec4 slice_color;
   if ( volume_type == 2 )
@@ -137,12 +149,15 @@ void main()
 
   if ( enable_lighting )
   {
-    slice_color.rgb = ( slice_color * compute_lighting() ).rgb;
+    vec4 light_color = compute_lighting();
+    light_color = slice_color * light_color;
+    slice_color.rgb = light_color.rgb;
   }
 
   if ( enable_fog )
   {
-    slice_color = mix( gl_Fog.color, slice_color, compute_fog_factor() );
+    float fog_factor = compute_fog_factor();
+    slice_color = mix( gl_Fog.color, slice_color, fog_factor );
   }
 
   gl_FragColor = slice_color;

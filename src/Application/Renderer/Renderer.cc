@@ -93,16 +93,14 @@ typedef std::vector< IsosurfaceRecordHandle > IsosurfaceArray;
 // Implementation of class RendererPrivate
 //////////////////////////////////////////////////////////////////////////
 
-static const unsigned int PATTERN_SIZE_C = 6;
-static const unsigned char MAX_PATTERN_VAL_C = 150;
+static const unsigned int PATTERN_SIZE_C = 4;
+static const unsigned char MAX_PATTERN_VAL_C = 200;
 static const unsigned char MASK_PATTERNS_C[ PATTERN_SIZE_C ][ PATTERN_SIZE_C ] =
 {
-  { MAX_PATTERN_VAL_C, 0, 0, MAX_PATTERN_VAL_C, 0, 0 }, 
-  { 0, MAX_PATTERN_VAL_C, 0, 0, MAX_PATTERN_VAL_C, 0 }, 
-  { 0, 0, MAX_PATTERN_VAL_C, 0, 0, MAX_PATTERN_VAL_C }, 
-  { MAX_PATTERN_VAL_C, 0, 0, MAX_PATTERN_VAL_C, 0, 0 },
-  { 0, MAX_PATTERN_VAL_C, 0, 0, MAX_PATTERN_VAL_C, 0 }, 
-  { 0, 0, MAX_PATTERN_VAL_C, 0, 0, MAX_PATTERN_VAL_C }
+  { MAX_PATTERN_VAL_C, 0, 0, 0 }, 
+  { 0, MAX_PATTERN_VAL_C, 0, 0 }, 
+  { 0, 0, MAX_PATTERN_VAL_C, 0 }, 
+  { 0, 0, 0, MAX_PATTERN_VAL_C }
 };
 
 class RendererPrivate
