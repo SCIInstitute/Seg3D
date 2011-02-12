@@ -142,7 +142,7 @@ void MeasurementTableView::copy() const
   {
     // QModelIndex::operator < sorts first by row, then by column.  
     // this is what we need 
-    std::sort( indexes.begin(), indexes.end() ); 
+    qSort( indexes.begin(), indexes.end() ); 
 
     // You need a pair of indexes to find the row changes 
     QModelIndex previous = indexes.first(); 
