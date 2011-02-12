@@ -68,6 +68,8 @@ public:
   void handle_clipping_plane_changed( size_t index );
   void handle_clipping_plane_enabled( size_t index, bool enable );
 
+  void update_volume_rendering_targets();
+  void reset();
 public:
   ViewerManager* vm_;
 
@@ -453,6 +455,19 @@ void ViewerManagerPrivate::handle_sample_rate_changed()
   }
 }
 
+void ViewerManagerPrivate::update_volume_rendering_targets()
+{
+  std::vector< LayerIDNamePair > data_layers;
+  LayerManager::Instance()->get_layer_names( data_layers, Core::VolumeType::DATA_E );
+  this->vm_->volume_rendering_target_state_->set_option_list( data_layers );
+}
+
+void ViewerManagerPrivate::reset()
+{
+  std::vector< LayerIDNamePair > empty_list;
+  this->vm_->volume_rendering_target_state_->set_option_list( empty_list );
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Class ViewerManager
 //////////////////////////////////////////////////////////////////////////
@@ -494,6 +509,10 @@ ViewerManager::ViewerManager() :
   this->add_state( "sample_rate", this->volume_sample_rate_state_, 1.0, 0.1, 10.0, 0.1 );
   this->add_connection( this->volume_sample_rate_state_->state_changed_signal_.connect(
     boost::bind( &ViewerManagerPrivate::handle_sample_rate_changed, this->private_ ) ) );
+
+  this->add_state( "vr_target", this->volume_rendering_target_state_ );
+  this->add_connection( LayerManager::Instance()->layers_changed_signal_.connect(
+    boost::bind( &ViewerManagerPrivate::update_volume_rendering_targets, this->private_ ) ) );
 
   for ( size_t i = 0; i < 6; ++i )
   {
@@ -613,9 +632,11 @@ ViewerManager::ViewerManager() :
   // NOTE: ViewerManager needs to process these signals last  
   this->add_connection( LayerManager::Instance()->layer_inserted_signal_.connect(
     boost::bind( &ViewerManager::update_volume_viewers, this ) ) );
-
   this->add_connection( LayerManager::Instance()->layer_volume_changed_signal_.connect(
     boost::bind( &ViewerManagerPrivate::handle_layer_volume_changed, this->private_, _1 ) ) );
+
+  this->add_connection( Core::Application::Instance()->reset_signal_.connect( boost::bind(
+    &ViewerManagerPrivate::reset, this->private_ ) ) );
 
   this->set_initializing( false );
 }

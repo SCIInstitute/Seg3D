@@ -41,6 +41,7 @@ const char* VolumeShader::FRAG_SHADER_SOURCE_C[] =
 const char* VolumeShader::VERT_SHADER_SOURCE_C[] =
 {
 #include "VolumeShader_vert"
+#include "Fog_vert"
 };
 
 VolumeShader::VolumeShader() :
@@ -100,6 +101,7 @@ bool VolumeShader::initialize()
   this->voxel_size_loc_ = this->glsl_prog_->get_uniform_location( "voxel_size" );
   this->scale_bias_loc_ = this->glsl_prog_->get_uniform_location( "scale_bias" );
   this->sample_rate_loc_ = this->glsl_prog_->get_uniform_location( "sample_rate" );
+  this->fog_range_loc_ = this->glsl_prog_->get_uniform_location( "fog_range" );
   this->glsl_prog_->disable();
 
   this->valid_ = true;
@@ -161,6 +163,11 @@ void VolumeShader::set_scale_bias( float scale, float bias )
 void VolumeShader::set_sample_rate( float sample_rate )
 {
   glUniform1f( this->sample_rate_loc_, sample_rate );
+}
+
+void VolumeShader::set_fog_range( float znear, float zfar )
+{
+  glUniform2f( this->fog_range_loc_, znear, zfar );
 }
 
 } // end namespace Seg3D

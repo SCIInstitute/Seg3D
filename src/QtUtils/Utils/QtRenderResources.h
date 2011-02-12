@@ -44,8 +44,10 @@
 #include <Core/RenderResources/RenderResourcesContext.h>
 #include <Core/RenderResources/RenderContext.h>
 #include <Core/Viewer/AbstractViewer.h>
+#include <Core/VolumeRenderer/TransferFunction.h>
 
 #include <QtUtils/Utils/QtRenderWidget.h>
+#include <QtUtils/Utils/QtTransferFunctionWidget.h>
 
 namespace QtUtils
 {
@@ -75,9 +77,13 @@ public:
   virtual bool create_render_context( Core::RenderContextHandle& context );
 
   // CREATE_QT_RENDER_WIDGET:
-  // Get the Qt render context directly
-  // NOTE: The viewers access this directly
+  // Create a QtRenderWidget associated with the given viewer.
   QtRenderWidget* create_qt_render_widget( QWidget* parent, Core::AbstractViewerHandle viewer );
+
+  // CREATE_QT_TRANSFER_FUNCTION_WIDGET:
+  // Create a QtTransferFunctionWidget associated with the given transfer function.
+  QtTransferFunctionWidget* create_qt_transfer_function_widget( QWidget* parent,
+    Core::TransferFunctionHandle tf );
 
   // VALID_RENDER_RESOURCES:
   // Check whether valid render resources were installed

@@ -76,12 +76,25 @@ public:
     return ( Color( r_ * alpha, g_ * alpha, b_ * alpha ) );
   }
 
-  inline int operator==( const Color& color ) const
+  Color operator+( const Color& rhs ) const
+  {
+    return Color( this->r_ + rhs.r_, this->g_ + rhs.g_, this->b_ + rhs.b_ );
+  }
+
+  const Color& operator+=( const Color& rhs )
+  {
+    this->r_ += rhs.r_;
+    this->g_ += rhs.g_;
+    this->b_ += rhs.b_;
+    return *this;
+  }
+
+  bool operator==( const Color& color ) const
   {
     return ( ( r_ == color.r_ ) && ( g_ == color.g_ ) && ( b_ == color.b_ ) );
   }
 
-  inline int operator!=( const Color& color ) const
+  bool operator!=( const Color& color ) const
   {
     return ( ( r_ != color.r_ ) || ( g_ != color.g_ ) || ( b_ != color.b_ ) );
   }

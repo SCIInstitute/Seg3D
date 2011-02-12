@@ -50,6 +50,29 @@ public:
   ~TransferFunctionFeature();
 
   const std::string& get_feature_id() const;
+  
+  // Functions used by TransferFunction class to build the lookup table
+private:
+  friend class TransferFunction;
+  friend class TransferFunctionPrivate;
+
+  // TAKE_SNAPSHOT:
+  // Get a snapshot of all the states.
+  void take_snapshot();
+
+  // INTERPOLATE:
+  // Get the opacity corresponding to the given value by interpolating between
+  // control points. If value is outside the range defined by controls points, 
+  // 0 is returned.
+  float interpolate( float value );
+
+  // GET_COLOR:
+  // Returns the color of the feature. The values are normalized to [0, 1].
+  const Color& get_color();
+
+  // GET_SHININESS:
+  // Returns the shininess of the feature.
+  int get_shininess();
 
 private:
   void initialize_states();

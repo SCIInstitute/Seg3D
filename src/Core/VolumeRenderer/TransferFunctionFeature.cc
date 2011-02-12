@@ -31,14 +31,32 @@
 namespace Core
 {
 
+//////////////////////////////////////////////////////////////////////////
+// Class TransferFunctionFeaturePrivate
+//////////////////////////////////////////////////////////////////////////
+
+class TransferFunctionFeaturePrivate
+{
+public:
+  TransferFunctionControlPointVector control_points_;
+  Color color_;
+  int shininess_;
+};
+
+//////////////////////////////////////////////////////////////////////////
+// Class TransferFunctionFeature
+//////////////////////////////////////////////////////////////////////////
+
 TransferFunctionFeature::TransferFunctionFeature() :
-  StateHandler( "tffeature", true )
+  StateHandler( "tffeature", true ),
+  private_( new TransferFunctionFeaturePrivate )
 {
   this->initialize_states();
 }
 
 TransferFunctionFeature::TransferFunctionFeature( const std::string& feature_id ) :
-  StateHandler( feature_id, true )
+  StateHandler( feature_id, true ),
+  private_( new TransferFunctionFeaturePrivate )
 {
   this->initialize_states();
 }
@@ -55,11 +73,65 @@ const std::string& TransferFunctionFeature::get_feature_id() const
 
 void TransferFunctionFeature::initialize_states()
 {
-  this->add_state( "control_points", this->control_points_state_ );
+  TransferFunctionControlPointVector control_points;
+  control_points.push_back( TransferFunctionControlPoint( 0.0f, 0.5f ) );
+  control_points.push_back( TransferFunctionControlPoint( 1.0f, 0.5f ) );
+  this->add_state( "control_points", this->control_points_state_, control_points );
   this->add_state( "red", this->red_color_state_, 128, 0, 255, 1 );
   this->add_state( "green", this->green_color_state_, 128, 0, 255, 1 );
   this->add_state( "blue", this->blue_color_state_, 128, 0, 255, 1 );
   this->add_state( "shininess", this->shininess_state_, 0, 0, 128, 1 );
+}
+
+void TransferFunctionFeature::take_snapshot()
+{
+  this->private_->control_points_ = this->control_points_state_->get();
+  std::sort( this->private_->control_points_.begin(), this->private_->control_points_.end() );
+  this->private_->color_ = Color( this->red_color_state_->get() / 255.0f,
+    this->green_color_state_->get() / 255.0f, this->blue_color_state_->get() / 255.0f );
+  this->private_->shininess_ = this->shininess_state_->get();
+}
+
+float TransferFunctionFeature::interpolate( float value )
+{
+  const TransferFunctionControlPointVector& points = this->private_->control_points_;
+  const size_t num_pts = points.size();
+  if ( num_pts <= 1 ||
+    points.front().get_value() > value || 
+    points.back().get_value() < value )
+  {
+    return 0;
+  }
+
+  for ( size_t i = 0; i < num_pts - 1; ++i )
+  {
+    if ( points[ i ].get_value() <= value && points[ i + 1 ].get_value() >= value )
+    {
+      float interval = points[ i + 1 ].get_value() - points[ i ].get_value();
+      if ( interval < 1e-4 )
+      {
+        return ( points[ i ].get_opacity() + points[ i + 1 ].get_opacity() ) * 0.5f;
+      }
+      else
+      {
+        float t = ( value - points[ i ].get_value() ) / interval;
+        return points[ i ].get_opacity() * ( 1.0f - t ) + points[ i + 1 ].get_opacity() * t;
+      }
+    }
+  }
+
+  assert( false );
+  return 0;
+}
+
+const Color& TransferFunctionFeature::get_color()
+{
+  return this->private_->color_;
+}
+
+int TransferFunctionFeature::get_shininess()
+{
+  return this->private_->shininess_;
 }
 
 } // end namespace Core

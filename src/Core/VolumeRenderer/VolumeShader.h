@@ -61,6 +61,7 @@ public:
 
   void set_lighting( bool enabled );
   void set_fog( bool enabled );
+  void set_fog_range( float znear, float zfar );
 
 private:
 
@@ -79,6 +80,7 @@ private:
   int voxel_size_loc_;
   int scale_bias_loc_;
   int sample_rate_loc_;
+  int fog_range_loc_;
 
   const static char* VERT_SHADER_SOURCE_C[];
   const static char* FRAG_SHADER_SOURCE_C[];

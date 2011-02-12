@@ -36,11 +36,13 @@ SET(QTUTILS_UTILS_SRCS
   QtEventHandler.cc
   QtRenderResources.cc
   QtRenderWidget.cc
+  QtTransferFunctionWidget.cc
 )
 
 SET(QTUTILS_UTILS_MOC_SRCS
   QtEventHandler.h
   QtRenderWidget.h
+  QtTransferFunctionWidget.h
 )
 
 SET(QTUTILS_UTILS_NO_MOC_SRCS

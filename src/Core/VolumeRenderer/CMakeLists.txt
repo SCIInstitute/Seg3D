@@ -33,6 +33,7 @@
 
 SET(CORE_VOLUMERENDERER_SHADER_SRCS
   Fog.frag
+  Fog.vert
   VolumeShader.frag
   VolumeShader.vert
   )

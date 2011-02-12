@@ -198,6 +198,10 @@ void QtTransferFunctionCurve::add_control_point( const QPointF& pos )
 
 void QtTransferFunctionCurve::remove_control_point( QtTransferFunctionControlPoint* control_point )
 {
+  if ( this->private_->control_points_.size() <=2 )
+  {
+    return;
+  }
   control_point->disconnect( this );
   this->private_->scene_->removeItem( control_point );
   this->private_->control_points_.remove( control_point );

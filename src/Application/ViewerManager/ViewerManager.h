@@ -166,6 +166,9 @@ public:
   // The density of the fog in 3D view
   Core::StateRangedDoubleHandle fog_density_state_;
 
+  // The target data layer for volume rendering
+  Core::StateLabeledOptionHandle volume_rendering_target_state_;
+
   // The sampling rate of volume rendering
   Core::StateRangedDoubleHandle volume_sample_rate_state_;
 

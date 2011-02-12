@@ -68,6 +68,8 @@ public:
   StateLabeledOption( const std::string& stateid, const std::string& default_value,
     const std::vector< OptionLabelPair >& labeled_option_list );
 
+  StateLabeledOption( const std::string& stateid );
+
   virtual ~StateLabeledOption();
 
 public:
@@ -136,6 +138,8 @@ public:
 private:
   StateLabeledOptionPrivateHandle private_;
 
+public:
+  static const std::string EMPTY_OPTION_C;
 };
 
 } // end namespace Core

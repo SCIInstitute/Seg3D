@@ -30,6 +30,8 @@
 #include <sstream>
 #include <iostream>
 
+#include <boost/foreach.hpp>
+
 // Core includes
 #include <Core/Utils/Log.h>
 #include <Core/Application/Application.h>
@@ -37,11 +39,14 @@
 // QtUtils includes
 #include <QtUtils/Bridge/QtBridge.h>
 #include <QtUtils/Utils/QtPointer.h>
+#include <QtUtils/Utils/QtApplication.h>
 #include <QtUtils/Widgets/QtTransferFunctionCurve.h>
 
 // Application includes
 #include <Application/ViewerManager/ViewerManager.h>
 #include <Application/ViewerManager/Actions/ActionNewFeature.h>
+#include <Application/ViewerManager/Actions/ActionDeleteFeature.h>
+#include <Application/LayerManager/LayerManager.h>
 
 // Interface includes
 #include <Interface/Application/TransferFunctionFeatureWidget.h>
@@ -69,7 +74,12 @@ RenderingDockWidget::RenderingDockWidget( QWidget *parent ) :
   // Set up the private internals of the LayerManagerInterface class
   this->private_->ui_.setupUi( this );
   this->private_->ui_.dock_widget_layout_->setAlignment( Qt::AlignTop );
+  this->private_->ui_.scroll_area_layout_->setAlignment( Qt::AlignTop );
   this->private_->ui_.feature_control_layout_->setAlignment( Qt::AlignTop );
+  this->private_->ui_.tf_preview_layout_->addWidget( QtUtils::QtApplication::Instance()->
+    qt_renderresources_context()->create_qt_transfer_function_widget( 
+    this, ViewerManager::Instance()->get_transfer_function() ) );
+
   qpointer_type qpointer( this );
 
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
@@ -184,41 +194,38 @@ RenderingDockWidget::RenderingDockWidget( QWidget *parent ) :
   QtUtils::QtBridge::Enable( this->private_->ui_.cp6_params_widget_,
     ViewerManager::Instance()->enable_clip_plane_state_[ 5 ] );
 
+  for ( int i = 0; i < 6; ++i )
+  {
+    this->add_connection( ViewerManager::Instance()->enable_clip_plane_state_[ i ]->
+      value_changed_signal_.connect( boost::bind( 
+      &RenderingDockWidget::HandleClippingPlanesStateChanged, qpointer, _1, i ) ) );
+  }
+  
   // Volume rendering widgets
   Core::TransferFunctionHandle tf = ViewerManager::Instance()->get_transfer_function();
   QtUtils::QtBridge::Connect( this->private_->ui_.vr_open_button_,
     ViewerManager::Instance()->show_volume_rendering_control_state_ );
   QtUtils::QtBridge::Show( this->private_->ui_.vr_content_,
     ViewerManager::Instance()->show_volume_rendering_control_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.vr_target_, 
+    ViewerManager::Instance()->volume_rendering_target_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.vr_sample_rate_,
     ViewerManager::Instance()->volume_sample_rate_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.tf_view_->get_scene(), tf );
   QtUtils::QtBridge::Connect( this->private_->ui_.add_feature_button_, boost::bind(
     ActionNewFeature::Dispatch, Core::Interface::GetWidgetActionContext() ) );
+  this->connect( this->private_->ui_.delete_feature_button_, SIGNAL( clicked() ),
+    SLOT( delete_active_curve() ) );
+
   this->add_connection( tf->feature_added_signal_.connect( boost::bind( 
     &RenderingDockWidget::HandleFeatureAdded, qpointer, _1 ) ) );
   this->add_connection( tf->feature_deleted_signal_.connect( boost::bind(
     &RenderingDockWidget::HandleFeatureDeleted, qpointer, _1 ) ) );
-  
-  this->add_connection( ViewerManager::Instance()->enable_clip_plane_state_[ 0 ]->
+  this->add_connection( ViewerManager::Instance()->volume_rendering_target_state_->
     value_changed_signal_.connect( boost::bind( 
-    &RenderingDockWidget::HandleClippingPlanesStateChanged, qpointer, _1, 0 ) ) );
-  this->add_connection( ViewerManager::Instance()->enable_clip_plane_state_[ 1 ]->
-    value_changed_signal_.connect( boost::bind( 
-    &RenderingDockWidget::HandleClippingPlanesStateChanged, qpointer, _1, 1 ) ) );
-  this->add_connection( ViewerManager::Instance()->enable_clip_plane_state_[ 2 ]->
-    value_changed_signal_.connect( boost::bind( 
-    &RenderingDockWidget::HandleClippingPlanesStateChanged, qpointer, _1, 2 ) ) );
-  this->add_connection( ViewerManager::Instance()->enable_clip_plane_state_[ 3 ]->
-    value_changed_signal_.connect( boost::bind( 
-    &RenderingDockWidget::HandleClippingPlanesStateChanged, qpointer, _1, 3 ) ) );
-  this->add_connection( ViewerManager::Instance()->enable_clip_plane_state_[ 4 ]->
-    value_changed_signal_.connect( boost::bind( 
-    &RenderingDockWidget::HandleClippingPlanesStateChanged, qpointer, _1, 4 ) ) );
-  this->add_connection( ViewerManager::Instance()->enable_clip_plane_state_[ 5 ]->
-    value_changed_signal_.connect( boost::bind( 
-    &RenderingDockWidget::HandleClippingPlanesStateChanged, qpointer, _1, 5 ) ) );  
-    
+    &RenderingDockWidget::HandleVolumeRenderingTargetChanged, qpointer, _2 ) ) );
+  this->add_connection( Core::Application::Instance()->reset_signal_.connect( boost::bind(
+    &RenderingDockWidget::HandleReset, qpointer ) ) );
 }
 
 RenderingDockWidget::~RenderingDockWidget()
@@ -243,9 +250,11 @@ void RenderingDockWidget::update_tab_appearance( bool enabled, int index )
 void RenderingDockWidget::handle_feature_added( Core::TransferFunctionFeatureHandle feature )
 {
   TransferFunctionFeatureWidget* tf_feature_widget = 
-    new TransferFunctionFeatureWidget( feature, this );
+    new TransferFunctionFeatureWidget( this, feature );
   QtUtils::QtTransferFunctionCurve* tf_curve = this->private_->ui_.tf_view_->get_scene()->
     get_curve( feature->get_feature_id() );
+  this->private_->ui_.dummy_widget_->hide();
+  this->private_->ui_.delete_feature_button_->setEnabled( true );
   tf_feature_widget->setVisible( tf_curve->is_active() );
   this->private_->ui_.feature_control_layout_->addWidget( tf_feature_widget );
   this->private_->tf_widget_map_[ feature->get_feature_id() ] = tf_feature_widget;
@@ -260,6 +269,51 @@ void RenderingDockWidget::handle_feature_deleted( Core::TransferFunctionFeatureH
   this->private_->ui_.feature_control_layout_->removeWidget( tf_feature_widget );
   this->private_->tf_widget_map_.erase( it );
   tf_feature_widget->deleteLater();
+  if ( this->private_->tf_widget_map_.empty() )
+  {
+    this->private_->ui_.dummy_widget_->show();
+    this->private_->ui_.delete_feature_button_->setEnabled( false );
+  }
+}
+
+void RenderingDockWidget::handle_volume_rendering_target_changed( std::string target_id )
+{
+  if ( target_id != Core::StateLabeledOption::EMPTY_OPTION_C )
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    DataLayerHandle target_layer = LayerManager::Instance()->get_data_layer_by_id( target_id );
+    if ( target_layer && target_layer->has_valid_data() )
+    {
+      this->private_->ui_.histogram_->set_histogram( target_layer->get_data_volume()->
+        get_data_block()->get_histogram() );
+      return;
+    }
+  }
+
+  this->private_->ui_.histogram_->reset_histogram();
+}
+
+void RenderingDockWidget::delete_active_curve()
+{
+  QtUtils::QtTransferFunctionCurve* curve = this->private_->ui_.tf_view_->get_scene()->get_active_curve();
+  if ( curve != 0 )
+  {
+    ActionDeleteFeature::Dispatch( Core::Interface::GetWidgetActionContext(), curve->get_feature_id() );
+  }
+}
+
+void RenderingDockWidget::handle_reset()
+{
+  BOOST_FOREACH( tf_widget_map_type::value_type entry, this->private_->tf_widget_map_ )
+  {
+    TransferFunctionFeatureWidget* tf_feature_widget = entry.second;
+    this->private_->ui_.feature_control_layout_->removeWidget( tf_feature_widget );
+    delete tf_feature_widget;
+  }
+  this->private_->tf_widget_map_.clear();
+  this->private_->ui_.dummy_widget_->show();
+  this->private_->ui_.delete_feature_button_->setEnabled( false );
+  this->private_->ui_.histogram_->reset_histogram();
 }
 
 void RenderingDockWidget::HandleClippingPlanesStateChanged( 
@@ -281,6 +335,19 @@ void RenderingDockWidget::HandleFeatureDeleted( qpointer_type qpointer,
 {
   Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind( 
     &RenderingDockWidget::handle_feature_deleted, qpointer.data(), feature ) ) );
+}
+
+void RenderingDockWidget::HandleVolumeRenderingTargetChanged( qpointer_type qpointer, 
+                               std::string target_id )
+{
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind( 
+    &RenderingDockWidget::handle_volume_rendering_target_changed, qpointer.data(), target_id ) ) );
+}
+
+void RenderingDockWidget::HandleReset( qpointer_type qpointer )
+{
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind( 
+    &RenderingDockWidget::handle_reset, qpointer.data() ) ) );
 }
 
 } // end namespace Seg3D

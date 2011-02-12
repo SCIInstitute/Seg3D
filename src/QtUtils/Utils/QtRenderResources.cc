@@ -155,6 +155,13 @@ QtRenderWidget* QtRenderResourcesContext::create_qt_render_widget( QWidget* pare
     this->private_->shared_widget_, viewer );
 }
 
+QtTransferFunctionWidget* QtRenderResourcesContext::create_qt_transfer_function_widget( 
+  QWidget* parent, Core::TransferFunctionHandle tf )
+{
+  return new QtTransferFunctionWidget( this->private_->format_, parent,
+    this->private_->shared_widget_, tf );
+}
+
 bool QtRenderResourcesContext::valid_render_resources()
 {
   return this->private_->shared_widget_->isValid();

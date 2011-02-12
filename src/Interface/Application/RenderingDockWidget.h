@@ -60,6 +60,11 @@ private:
   void update_tab_appearance( bool enabled, int index  );
   void handle_feature_added( Core::TransferFunctionFeatureHandle feature );
   void handle_feature_deleted( Core::TransferFunctionFeatureHandle feature );
+  void handle_volume_rendering_target_changed( std::string target_id );
+  void handle_reset();
+
+public Q_SLOTS:
+  void delete_active_curve();
 
 private:
   boost::shared_ptr< RenderingDockWidgetPrivate > private_;
@@ -70,6 +75,8 @@ private:
   static void HandleClippingPlanesStateChanged( qpointer_type qpointer, bool state, int index );
   static void HandleFeatureAdded( qpointer_type qpointer, Core::TransferFunctionFeatureHandle feature );
   static void HandleFeatureDeleted( qpointer_type qpointer, Core::TransferFunctionFeatureHandle feature );
+  static void HandleVolumeRenderingTargetChanged( qpointer_type qpointer, std::string target_id );
+  static void HandleReset( qpointer_type qpointer );
 };
 
 } // end namespace Seg3D

@@ -34,6 +34,10 @@
 namespace Core
 {
 
+//////////////////////////////////////////////////////////////////////////
+// Class StateLabeledOptionPrivate
+//////////////////////////////////////////////////////////////////////////
+
 class StateLabeledOptionPrivate
 {
   // -- Constructors --
@@ -89,6 +93,12 @@ public:
     }
   }
 
+  StateLabeledOptionPrivate() :
+    value_( "" ),
+    index_( -1 )
+  {
+  }
+
 public:
 
   void import_options_from_string( const std::string& option_list )
@@ -137,6 +147,12 @@ public:
   std::vector< OptionLabelPair > option_list_;
 };
 
+//////////////////////////////////////////////////////////////////////////
+// Class StateLabeledOptionPrivate
+//////////////////////////////////////////////////////////////////////////
+
+const std::string StateLabeledOption::EMPTY_OPTION_C( "" );
+
 StateLabeledOption::StateLabeledOption( const std::string& stateid, 
   const std::string& default_value, const std::string& labeled_option_list ) :
   StateBase( stateid )
@@ -151,6 +167,12 @@ StateLabeledOption::StateLabeledOption( const std::string& stateid,
 {
   this->private_ = StateLabeledOptionPrivateHandle( new StateLabeledOptionPrivate(
     default_value, labeled_option_list ) );
+}
+
+StateLabeledOption::StateLabeledOption( const std::string& stateid ) :
+  StateBase( stateid ),
+  private_( new StateLabeledOptionPrivate )
+{
 }
 
 StateLabeledOption::~StateLabeledOption()
@@ -245,7 +267,7 @@ void StateLabeledOption::set_option_list(  const std::vector< OptionLabelPair >&
     }
     else
     {
-      this->private_->value_ = "";
+      this->private_->value_ = EMPTY_OPTION_C;
       this->private_->index_ = -1;
     }
   }

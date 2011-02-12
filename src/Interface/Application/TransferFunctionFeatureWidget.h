@@ -46,8 +46,8 @@ class TransferFunctionFeatureWidget : public QWidget, private Core::ConnectionHa
   Q_OBJECT
 
 public:
-  TransferFunctionFeatureWidget( Core::TransferFunctionFeatureHandle feature, 
-    QWidget *parent = 0 );
+  TransferFunctionFeatureWidget( QWidget *parent = 0,
+    Core::TransferFunctionFeatureHandle feature = Core::TransferFunctionFeatureHandle() );
   ~TransferFunctionFeatureWidget();
   
 private:
