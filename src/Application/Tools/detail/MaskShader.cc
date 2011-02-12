@@ -26,6 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#include <GL/glew.h>
+
 #include <Application/Tools/detail/MaskShader.h>
 
 #include <Core/Utils/Log.h>
@@ -33,13 +35,8 @@
 namespace Seg3D
 {
 
-const char* MaskShader::FRAG_SHADER_SOURCE_C[] =
-{
-#include "MaskShader_frag"
-};
-
 MaskShader::MaskShader() :
-  valid_( false )
+  ShaderBase()
 {
 }
 
@@ -47,52 +44,26 @@ MaskShader::~MaskShader()
 {
 }
 
-bool MaskShader::initialize()
+bool MaskShader::get_fragment_shader_source( std::string& source )
 {
-  this->glsl_frag_shader_ = Core::GLSLShaderHandle( new Core::GLSLFragmentShader );
-  this->glsl_frag_shader_->set_source( sizeof( FRAG_SHADER_SOURCE_C ) / sizeof( char* ),
-    FRAG_SHADER_SOURCE_C );
-  if ( !this->glsl_frag_shader_->compile() )
+  const char FRAG_SHADER_SOURCE_C[] =
   {
-    std::string error_info = this->glsl_frag_shader_->get_info_log();
-    CORE_LOG_ERROR( std::string( "Failed compiling MaskShader source: \n" ) + error_info );
-    this->glsl_frag_shader_.reset();
-    return false;
-  }
-
-  this->glsl_prog_ = Core::GLSLProgramHandle( new Core::GLSLProgram );
-  this->glsl_prog_->attach_shader( this->glsl_frag_shader_ );
-  if ( !this->glsl_prog_->link() )
-  {
-    std::string error_info = this->glsl_prog_->get_info_log();
-    CORE_LOG_ERROR( std::string( "Failed linking MaskShader program: \n" ) + error_info );
-    this->glsl_frag_shader_.reset();
-    this->glsl_prog_.reset();
-    return false;
-  }
-
-  this->glsl_prog_->enable();
-  this->tex_loc_ = this->glsl_prog_->get_uniform_location( "tex" );
-  this->opacity_loc_ = this->glsl_prog_->get_uniform_location( "opacity" );
-  this->pixel_size_loc_ = this->glsl_prog_->get_uniform_location( "pixel_size" );
-  this->border_width_loc_ = this->glsl_prog_->get_uniform_location( "border_width" );
-  this->color_loc_ = this->glsl_prog_->get_uniform_location( "color" );
-  this->glsl_prog_->disable();
-
-  this->valid_ = true;
+#include "MaskShader_frag"
+  };
+  source = std::string( FRAG_SHADER_SOURCE_C );
   return true;
 }
 
-void MaskShader::enable()
+bool MaskShader::post_initialize()
 {
-  assert( this->valid_ );
-  this->glsl_prog_->enable();
-}
-
-void MaskShader::disable()
-{
-  assert( this->valid_ );
-  this->glsl_prog_->disable();
+  this->enable();
+  this->tex_loc_ = this->get_uniform_location( "tex" );
+  this->opacity_loc_ = this->get_uniform_location( "opacity" );
+  this->pixel_size_loc_ = this->get_uniform_location( "pixel_size" );
+  this->border_width_loc_ = this->get_uniform_location( "border_width" );
+  this->color_loc_ = this->get_uniform_location( "color" );
+  this->disable();
+  return true;
 }
 
 void MaskShader::set_texture( int tex_unit )

@@ -26,30 +26,41 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_RENDERER_ORIENTATIONARROWSSHADER_H
-#define APPLICATION_RENDERER_ORIENTATIONARROWSSHADER_H
+#ifndef CORE_GRAPHICS_SHADERBASE_H
+#define CORE_GRAPHICS_SHADERBASE_H
 
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 
-#include <Core/Graphics/ShaderBase.h>
-
-namespace Seg3D
+namespace Core
 {
 
-class OrientationArrowsShader;
-typedef boost::shared_ptr< OrientationArrowsShader > OrientationArrowsShaderHandle;
+class ShaderBasePrivate;
+typedef boost::shared_ptr< ShaderBasePrivate > ShaderBasePrivateHandle;
 
-class OrientationArrowsShader : public Core::ShaderBase
+class ShaderBase : public boost::noncopyable
 {
 public:
-  OrientationArrowsShader();
-  virtual ~OrientationArrowsShader();
+  ShaderBase();
+  virtual ~ShaderBase();
+
+  bool initialize();
+  void enable();
+  void disable();
+  bool is_valid();
 
 protected:
   virtual bool get_vertex_shader_source( std::string& source );
   virtual bool get_fragment_shader_source( std::string& source );
+  virtual bool pre_link();
+  virtual bool post_initialize();
+
+  int get_uniform_location( const char* name );
+  void bind_attrib_location( unsigned int index, const char* name );
+
+private:
+  ShaderBasePrivateHandle private_;
 };
 
-} // end namespace Seg3D
+} // end namespace Core
 #endif

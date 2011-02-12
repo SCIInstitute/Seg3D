@@ -32,8 +32,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 
-#include <Core/Graphics/GLSLProgram.h>
-#include <Core/Utils/Lockable.h>
+#include <Core/Graphics/ShaderBase.h>
 
 namespace Seg3D
 {
@@ -41,15 +40,12 @@ namespace Seg3D
 class IsosurfaceShader;
 typedef boost::shared_ptr< IsosurfaceShader > IsosurfaceShaderHandle;
 
-class IsosurfaceShader : public boost::noncopyable
+class IsosurfaceShader : public Core::ShaderBase
 {
 public:
   IsosurfaceShader();
-  ~IsosurfaceShader();
+  virtual ~IsosurfaceShader();
 
-  bool initialize();
-  void enable();
-  void disable();
   void set_lighting( bool enabled );
   void set_use_colormap( bool enable );
   void set_colormap_texture( int tex_unit );
@@ -58,14 +54,13 @@ public:
   void set_fog( bool enabled );
   void set_fog_range( float znear, float zfar );
 
+protected:
+  virtual bool get_vertex_shader_source( std::string& source );
+  virtual bool get_fragment_shader_source( std::string& source );
+  virtual bool pre_link();
+  virtual bool post_initialize();
+
 private:
-
-  bool valid_;
-
-  Core::GLSLProgramHandle glsl_prog_;
-  Core::GLSLShaderHandle glsl_frag_shader_;
-  Core::GLSLShaderHandle glsl_vert_shader_;
-
   int enable_lighting_loc_;
   int use_colormap_loc_;
   int colormap_loc_;
@@ -73,9 +68,6 @@ private:
   int val_range_loc_;
   int enable_fog_loc_;
   int fog_range_loc_;
-
-  const static char* VERT_SHADER_SOURCE_C[];
-  const static char* FRAG_SHADER_SOURCE_C[];
 };
 
 } // end namespace Seg3D

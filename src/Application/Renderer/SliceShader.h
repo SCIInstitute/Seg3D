@@ -32,8 +32,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 
-#include <Core/Graphics/GLSLProgram.h>
-#include <Core/Utils/Lockable.h>
+#include <Core/Graphics/ShaderBase.h>
 
 namespace Seg3D
 {
@@ -41,15 +40,12 @@ namespace Seg3D
 class SliceShader;
 typedef boost::shared_ptr< SliceShader > SliceShaderHandle;
 
-class SliceShader : public boost::noncopyable
+class SliceShader : public Core::ShaderBase
 {
 public:
   SliceShader();
-  ~SliceShader();
+  virtual ~SliceShader();
 
-  bool initialize();
-  void enable();
-  void disable();
   void set_slice_texture( int tex_unit );
   void set_pattern_texture( int tex_unit );
   void set_mask_mode( int mask_mode );
@@ -63,14 +59,12 @@ public:
   void set_fog( bool enabled );
   void set_fog_range( float znear, float zfar );
 
+protected:
+  virtual bool get_vertex_shader_source( std::string& source );
+  virtual bool get_fragment_shader_source( std::string& source );
+  virtual bool post_initialize();
+
 private:
-
-  bool valid_;
-
-  Core::GLSLProgramHandle glsl_prog_;
-  Core::GLSLShaderHandle glsl_frag_shader_;
-  Core::GLSLShaderHandle glsl_vert_shader_;
-
   int slice_tex_loc_;
   int pattern_tex_loc_;
   int mask_mode_loc_;
@@ -83,9 +77,6 @@ private:
   int enable_lighting_loc_;
   int enable_fog_loc_;
   int fog_range_loc_;
-
-  const static char* VERT_SHADER_SOURCE_C[];
-  const static char* FRAG_SHADER_SOURCE_C[];
 };
 
 } // end namespace Seg3D

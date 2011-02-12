@@ -32,7 +32,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 
-#include <Core/Graphics/GLSLProgram.h>
+#include <Core/Graphics/ShaderBase.h>
 #include <Core/Utils/Lockable.h>
 
 namespace Seg3D
@@ -41,35 +41,28 @@ namespace Seg3D
 class MaskShader;
 typedef boost::shared_ptr< MaskShader > MaskShaderHandle;
 
-class MaskShader : public Core::Lockable
+class MaskShader : public Core::Lockable, public Core::ShaderBase
 {
 public:
   MaskShader();
-  ~MaskShader();
+  virtual ~MaskShader();
 
-  bool initialize();
-  void enable();
-  void disable();
   void set_texture( int tex_unit );
   void set_color( float r, float g, float b );
   void set_opacity( float opacity );
   void set_pixel_size( float width, float height );
   void set_border_width( int width );
 
+protected:
+  virtual bool get_fragment_shader_source( std::string& source );
+  virtual bool post_initialize();
+
 private:
-
-  bool valid_;
-
-  Core::GLSLProgramHandle glsl_prog_;
-  Core::GLSLShaderHandle glsl_frag_shader_;
-
   int tex_loc_;
   int color_loc_;
   int opacity_loc_;
   int border_width_loc_;
   int pixel_size_loc_;
-
-  const static char* FRAG_SHADER_SOURCE_C[];
 };
 
 } // end namespace Seg3D

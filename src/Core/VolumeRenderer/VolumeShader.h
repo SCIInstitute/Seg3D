@@ -32,7 +32,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 
-#include <Core/Graphics/GLSLProgram.h>
+#include <Core/Graphics/ShaderBase.h>
 
 namespace Core
 {
@@ -40,15 +40,11 @@ namespace Core
 class VolumeShader;
 typedef boost::shared_ptr< VolumeShader > VolumeShaderHandle;
 
-class VolumeShader : public boost::noncopyable
+class VolumeShader : public ShaderBase
 {
 public:
   VolumeShader();
-  ~VolumeShader();
-
-  bool initialize();
-  void enable();
-  void disable();
+  virtual ~VolumeShader();
 
   void set_texture_bbox_min( float x, float y, float z );
   void set_texture_bbox_size( float x, float y, float z );
@@ -56,21 +52,17 @@ public:
   void set_voxel_size( float x, float y, float z );
   void set_scale_bias( float scale, float bias );
   void set_sample_rate( float sample_rate );
-
   void set_volume_texture( int tex_unit );
-
   void set_lighting( bool enabled );
   void set_fog( bool enabled );
   void set_fog_range( float znear, float zfar );
 
+protected:
+  virtual bool get_vertex_shader_source( std::string& source );
+  virtual bool get_fragment_shader_source( std::string& source );
+  virtual bool post_initialize();
+
 private:
-
-  bool valid_;
-
-  Core::GLSLProgramHandle glsl_prog_;
-  Core::GLSLShaderHandle glsl_frag_shader_;
-  Core::GLSLShaderHandle glsl_vert_shader_;
-
   int vol_tex_loc_;
   int enable_lighting_loc_;
   int enable_fog_loc_;
@@ -81,9 +73,6 @@ private:
   int scale_bias_loc_;
   int sample_rate_loc_;
   int fog_range_loc_;
-
-  const static char* VERT_SHADER_SOURCE_C[];
-  const static char* FRAG_SHADER_SOURCE_C[];
 };
 
 } // end namespace Seg3D

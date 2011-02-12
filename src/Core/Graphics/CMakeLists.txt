@@ -53,6 +53,8 @@ SET(CORE_GRAPHICS_SRCS
   ColorMap.h
   ColorMap.cc
   Algorithm.h
+  ShaderBase.h
+  ShaderBase.cc
   )
 
 

@@ -49,8 +49,8 @@ protected:
   virtual ~GLSLShader();
 
 public:
-  bool set_source( const std::string& file_name );
-  void set_source( GLsizei count, const char** str );
+  bool set_source_file( const std::string& file_name );
+  void set_source( const std::string& source );
 
   // Compile the shader. Returns true if successful, otherwise false.
   // Additional information can be acquired by calling "get_info_log".

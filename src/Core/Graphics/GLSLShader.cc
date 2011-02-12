@@ -50,7 +50,7 @@ GLSLShader::~GLSLShader()
   RenderResources::Instance()->delete_shader( this->shader_id_ );
 }
 
-bool GLSLShader::set_source( const std::string& file_name )
+bool GLSLShader::set_source_file( const std::string& file_name )
 {
   std::ifstream source_file( file_name.c_str() );
   if ( !source_file )
@@ -80,7 +80,7 @@ bool GLSLShader::set_source( const std::string& file_name )
   return true;
 }
 
-void GLSLShader::set_source( GLsizei count, const char** str )
+void GLSLShader::set_source( const std::string& source )
 {
   std::string source_str;
   
@@ -90,10 +90,7 @@ void GLSLShader::set_source( GLsizei count, const char** str )
     source_str += std::string( "#define DISABLE_CLIPPING\n" );
   }
   
-  for ( GLsizei j = 0; j < count ; j++ )
-  {
-    source_str += std::string( str[ j ] );
-  }
+  source_str += source;
 
   const char* shader_str = source_str.c_str();
   glShaderSource( this->shader_id_, 1, &shader_str, NULL );

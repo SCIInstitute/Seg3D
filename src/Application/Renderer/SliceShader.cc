@@ -26,29 +26,18 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Application/Renderer/SliceShader.h>
+#include <GL/glew.h>
 
 #include <Core/Utils/Log.h>
+
+#include <Application/Renderer/SliceShader.h>
+
 
 namespace Seg3D
 {
 
-const char* SliceShader::FRAG_SHADER_SOURCE_C[] =
-{
-#include "SliceShader_frag"
-#include "Lighting_frag"
-#include "Fog_frag"
-};
-
-const char* SliceShader::VERT_SHADER_SOURCE_C[] =
-{
-#include "SliceShader_vert"
-#include "Lighting_vert"
-#include "Fog_vert"
-};
-
 SliceShader::SliceShader() :
-  valid_( false )
+  ShaderBase()
 {
 }
 
@@ -56,76 +45,48 @@ SliceShader::~SliceShader()
 {
 }
 
-bool SliceShader::initialize()
+bool SliceShader::get_vertex_shader_source( std::string& source )
 {
-  this->glsl_frag_shader_ = Core::GLSLShaderHandle( new Core::GLSLFragmentShader );
-  this->glsl_frag_shader_->set_source( sizeof( FRAG_SHADER_SOURCE_C ) / sizeof( char* ),
-    FRAG_SHADER_SOURCE_C );
-  if ( !this->glsl_frag_shader_->compile() )
+  const char VERT_SHADER_SOURCE_C[] =
   {
-    std::string error_info = this->glsl_frag_shader_->get_info_log();
-    CORE_LOG_ERROR( std::string( "Failed compiling SliceShader source: \n" ) + error_info );
-    this->glsl_frag_shader_.reset();
-    assert( false );
-    return false;
-  }
-
-  this->glsl_vert_shader_.reset( new Core::GLSLVertexShader );
-  this->glsl_vert_shader_->set_source( sizeof( VERT_SHADER_SOURCE_C ) / sizeof( char* ),
-    VERT_SHADER_SOURCE_C );
-  if ( !this->glsl_vert_shader_->compile() )
-  {
-    std::string error_info = this->glsl_vert_shader_->get_info_log();
-    CORE_LOG_ERROR( std::string( "Failed compiling SliceShader source: \n" ) + error_info );
-    this->glsl_frag_shader_.reset();
-    this->glsl_vert_shader_.reset();
-    assert( false );
-    return false;
-  }
-  
-  this->glsl_prog_ = Core::GLSLProgramHandle( new Core::GLSLProgram );
-  this->glsl_prog_->attach_shader( this->glsl_vert_shader_ );
-  this->glsl_prog_->attach_shader( this->glsl_frag_shader_ );
-  if ( !this->glsl_prog_->link() )
-  {
-    std::string error_info = this->glsl_prog_->get_info_log();
-    CORE_LOG_ERROR( std::string( "Failed linking SliceShader program: \n" ) + error_info );
-    this->glsl_vert_shader_.reset();
-    this->glsl_frag_shader_.reset();
-    this->glsl_prog_.reset();
-    assert( false );
-    return false;
-  }
-
-  this->glsl_prog_->enable();
-  this->slice_tex_loc_ = this->glsl_prog_->get_uniform_location( "slice_tex" );
-  this->pattern_tex_loc_ = this->glsl_prog_->get_uniform_location( "pattern_tex" );
-  this->opacity_loc_ = this->glsl_prog_->get_uniform_location( "opacity" );
-  this->mask_mode_loc_ = this->glsl_prog_->get_uniform_location( "mask_mode" );
-  this->scale_bias_loc_ = this->glsl_prog_->get_uniform_location( "scale_bias" );
-  this->pixel_size_loc_ = this->glsl_prog_->get_uniform_location( "pixel_size" );
-  this->border_width_loc_ = this->glsl_prog_->get_uniform_location( "border_width" );
-  this->volume_type_loc_ = this->glsl_prog_->get_uniform_location( "volume_type" );
-  this->mask_color_loc_ = this->glsl_prog_->get_uniform_location( "mask_color" );
-  this->enable_lighting_loc_ = this->glsl_prog_->get_uniform_location( "enable_lighting" );
-  this->enable_fog_loc_ = this->glsl_prog_->get_uniform_location( "enable_fog" );
-  this->fog_range_loc_ = this->glsl_prog_->get_uniform_location( "fog_range" );
-  this->glsl_prog_->disable();
-
-  this->valid_ = true;
+#include "SliceShader_vert"
+#include "Lighting_vert"
+#include "Fog_vert"
+  };
+  source = std::string( VERT_SHADER_SOURCE_C );
   return true;
 }
 
-void SliceShader::enable()
+bool SliceShader::get_fragment_shader_source( std::string& source )
 {
-  assert( this->valid_ );
-  this->glsl_prog_->enable();
+  const char FRAG_SHADER_SOURCE_C[] =
+  {
+#include "SliceShader_frag"
+#include "Lighting_frag"
+#include "Fog_frag"
+  };
+  source = std::string( FRAG_SHADER_SOURCE_C );
+  return true;
 }
 
-void SliceShader::disable()
+bool SliceShader::post_initialize()
 {
-  assert( this->valid_ );
-  this->glsl_prog_->disable();
+  this->enable();
+  this->slice_tex_loc_ = this->get_uniform_location( "slice_tex" );
+  this->pattern_tex_loc_ = this->get_uniform_location( "pattern_tex" );
+  this->opacity_loc_ = this->get_uniform_location( "opacity" );
+  this->mask_mode_loc_ = this->get_uniform_location( "mask_mode" );
+  this->scale_bias_loc_ = this->get_uniform_location( "scale_bias" );
+  this->pixel_size_loc_ = this->get_uniform_location( "pixel_size" );
+  this->border_width_loc_ = this->get_uniform_location( "border_width" );
+  this->volume_type_loc_ = this->get_uniform_location( "volume_type" );
+  this->mask_color_loc_ = this->get_uniform_location( "mask_color" );
+  this->enable_lighting_loc_ = this->get_uniform_location( "enable_lighting" );
+  this->enable_fog_loc_ = this->get_uniform_location( "enable_fog" );
+  this->fog_range_loc_ = this->get_uniform_location( "fog_range" );
+  this->disable();
+
+  return true;
 }
 
 void SliceShader::set_slice_texture( int tex_unit )

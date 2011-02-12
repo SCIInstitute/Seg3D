@@ -83,7 +83,7 @@ int main( int argc, char** argv )
         ofile << buffer[ i ];
       }
     }
-    ofile << "\\n\",\n";
+    ofile << "\\n\"\n";
   }
 
   return 0;

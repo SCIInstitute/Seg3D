@@ -26,26 +26,16 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#include <GL/glew.h>
+
 #include <Core/VolumeRenderer/VolumeShader.h>
 #include <Core/Utils/Log.h>
 
 namespace Core
 {
 
-const char* VolumeShader::FRAG_SHADER_SOURCE_C[] =
-{
-#include "VolumeShader_frag"
-#include "Fog_frag"
-};
-
-const char* VolumeShader::VERT_SHADER_SOURCE_C[] =
-{
-#include "VolumeShader_vert"
-#include "Fog_vert"
-};
-
 VolumeShader::VolumeShader() :
-  valid_( false )
+  ShaderBase()
 {
 }
 
@@ -53,71 +43,43 @@ VolumeShader::~VolumeShader()
 {
 }
 
-bool VolumeShader::initialize()
+bool VolumeShader::get_vertex_shader_source( std::string& source )
 {
-  this->glsl_frag_shader_ = Core::GLSLShaderHandle( new Core::GLSLFragmentShader );
-  this->glsl_frag_shader_->set_source( sizeof( FRAG_SHADER_SOURCE_C ) / sizeof( char* ),
-    FRAG_SHADER_SOURCE_C );
-  if ( !this->glsl_frag_shader_->compile() )
+  const char VERT_SHADER_SOURCE_C[] =
   {
-    std::string error_info = this->glsl_frag_shader_->get_info_log();
-    CORE_LOG_ERROR( std::string( "Failed compiling VolumeShader source: \n" ) + error_info );
-    this->glsl_frag_shader_.reset();
-    return false;
-  }
-
-  this->glsl_vert_shader_.reset( new Core::GLSLVertexShader );
-  this->glsl_vert_shader_->set_source( sizeof( VERT_SHADER_SOURCE_C ) / sizeof( char* ),
-    VERT_SHADER_SOURCE_C );
-  if ( !this->glsl_vert_shader_->compile() )
-  {
-    std::string error_info = this->glsl_vert_shader_->get_info_log();
-    CORE_LOG_ERROR( std::string( "Failed compiling VolumeShader source: \n" ) + error_info );
-    this->glsl_frag_shader_.reset();
-    this->glsl_vert_shader_.reset();
-    return false;
-  }
-  
-  this->glsl_prog_ = Core::GLSLProgramHandle( new Core::GLSLProgram );
-  this->glsl_prog_->attach_shader( this->glsl_vert_shader_ );
-  this->glsl_prog_->attach_shader( this->glsl_frag_shader_ );
-  if ( !this->glsl_prog_->link() )
-  {
-    std::string error_info = this->glsl_prog_->get_info_log();
-    CORE_LOG_ERROR( std::string( "Failed linking VolumeShader program: \n" ) + error_info );
-    this->glsl_vert_shader_.reset();
-    this->glsl_frag_shader_.reset();
-    this->glsl_prog_.reset();
-    return false;
-  }
-
-  this->glsl_prog_->enable();
-  this->vol_tex_loc_ = this->glsl_prog_->get_uniform_location( "vol_tex" );
-  this->enable_lighting_loc_ = this->glsl_prog_->get_uniform_location( "enable_lighting" );
-  this->enable_fog_loc_ = this->glsl_prog_->get_uniform_location( "enable_fog" );
-  this->tex_bbox_min_loc_ = this->glsl_prog_->get_uniform_location( "tex_bbox_min" );
-  this->tex_bbox_size_loc_ = this->glsl_prog_->get_uniform_location( "tex_bbox_size" );
-  this->texel_size_loc_ = this->glsl_prog_->get_uniform_location( "texel_size" );
-  this->voxel_size_loc_ = this->glsl_prog_->get_uniform_location( "voxel_size" );
-  this->scale_bias_loc_ = this->glsl_prog_->get_uniform_location( "scale_bias" );
-  this->sample_rate_loc_ = this->glsl_prog_->get_uniform_location( "sample_rate" );
-  this->fog_range_loc_ = this->glsl_prog_->get_uniform_location( "fog_range" );
-  this->glsl_prog_->disable();
-
-  this->valid_ = true;
+#include "VolumeShader_vert"
+#include "Fog_vert"
+  };
+  source = std::string( VERT_SHADER_SOURCE_C );
   return true;
 }
 
-void VolumeShader::enable()
+bool VolumeShader::get_fragment_shader_source( std::string& source )
 {
-  assert( this->valid_ );
-  this->glsl_prog_->enable();
+  const char FRAG_SHADER_SOURCE_C[] =
+  {
+#include "VolumeShader_frag"
+#include "Fog_frag"
+  };
+  source = std::string( FRAG_SHADER_SOURCE_C );
+  return true;
 }
 
-void VolumeShader::disable()
+bool VolumeShader::post_initialize()
 {
-  assert( this->valid_ );
-  this->glsl_prog_->disable();
+  this->enable();
+  this->vol_tex_loc_ = this->get_uniform_location( "vol_tex" );
+  this->enable_lighting_loc_ = this->get_uniform_location( "enable_lighting" );
+  this->enable_fog_loc_ = this->get_uniform_location( "enable_fog" );
+  this->tex_bbox_min_loc_ = this->get_uniform_location( "tex_bbox_min" );
+  this->tex_bbox_size_loc_ = this->get_uniform_location( "tex_bbox_size" );
+  this->texel_size_loc_ = this->get_uniform_location( "texel_size" );
+  this->voxel_size_loc_ = this->get_uniform_location( "voxel_size" );
+  this->scale_bias_loc_ = this->get_uniform_location( "scale_bias" );
+  this->sample_rate_loc_ = this->get_uniform_location( "sample_rate" );
+  this->fog_range_loc_ = this->get_uniform_location( "fog_range" );
+  this->disable();
+  return true;
 }
 
 void VolumeShader::set_volume_texture( int tex_unit )
