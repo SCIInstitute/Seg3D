@@ -45,12 +45,10 @@ ActionProgress::ActionProgress( const std::string& message,
   interrupt_( false ),
   progress_( 0.0 )
 {
-  CORE_LOG_DEBUG("Start reporting progress");
 }
 
 ActionProgress::~ActionProgress()
 {
-  CORE_LOG_DEBUG("Done reporting progress");
 }
 
 void ActionProgress::begin_progress_reporting()

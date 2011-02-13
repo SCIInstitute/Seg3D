@@ -93,7 +93,9 @@ LayerImporterHandle LayerImporterInfo::build( const std::string& filename ) cons
 bool LayerImporterInfo::converts_file_type( const std::string& file_type, bool strict ) const
 {
   if ( any_type_ && !strict) return true;
-  return ( std::find( file_types_.begin(), file_types_.end(), file_type ) != file_types_.end() );
+  std::string lower_file_type = file_type;
+  boost::to_lower( lower_file_type );
+  return ( std::find( file_types_.begin(), file_types_.end(), lower_file_type ) != file_types_.end() );
 }
 
 std::string LayerImporterInfo::file_type_string() const

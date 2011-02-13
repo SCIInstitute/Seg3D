@@ -114,6 +114,7 @@ bool ActionImportSeries::run( Core::ActionContextHandle& context, Core::ActionRe
   std::vector<LayerHandle> layers;
   if ( !( this->layer_importer_->import_layer( mode, layers ) ) ) 
   {
+    progress->end_progress_reporting();
     context->report_error( "Layer importer failed" );
     return false;
   }

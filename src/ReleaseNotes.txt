@@ -12,9 +12,11 @@ This version address some major performance issues that were reported users for 
 
 * Added support for dicom files without extensions and added more heuristics for estimating slice distance.
 
-* Improved the selection of the right importer.
+* Improved the selection of the importer.
 
 * Fixed a bug in drag and drop that could cause the program to crash.
+
+* Improved the fog computation.
 
 
 Version 2.0.1

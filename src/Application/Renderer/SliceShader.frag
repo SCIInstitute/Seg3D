@@ -136,6 +136,12 @@ void main()
   // Discard the fragment if it's completely transparent
   if ( opacity == 0.0 ) discard;
 
+  // Discard if the slice texture is out of boundary
+  if ( gl_TexCoord[0].s < 0.0 ) discard;
+  if ( gl_TexCoord[0].s > 1.0 ) discard;
+  if ( gl_TexCoord[0].t < 0.0 ) discard;
+  if ( gl_TexCoord[0].t > 1.0 ) discard;
+
   vec4 slice_color;
   if ( volume_type == 2 )
   {
