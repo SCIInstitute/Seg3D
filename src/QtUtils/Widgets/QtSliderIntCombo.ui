@@ -100,12 +100,6 @@ QWidget#widget_3{ border: 1px solid rgb(240, 240, 240); border-radius: 3px;}
       </property>
       <item>
        <widget class="QWidget" name="widget_2" native="true">
-        <property name="minimumSize">
-         <size>
-          <width>150</width>
-          <height>0</height>
-         </size>
-        </property>
         <layout class="QVBoxLayout" name="verticalLayout">
          <property name="spacing">
           <number>0</number>
@@ -116,7 +110,7 @@ QWidget#widget_3{ border: 1px solid rgb(240, 240, 240); border-radius: 3px;}
          <item>
           <widget class="QSlider" name="horizontalSlider">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
+            <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -139,7 +133,7 @@ QWidget#widget_3{ border: 1px solid rgb(240, 240, 240); border-radius: 3px;}
           <widget class="QWidget" name="range_" native="true">
            <property name="minimumSize">
             <size>
-             <width>150</width>
+             <width>0</width>
              <height>20</height>
             </size>
            </property>
@@ -249,11 +243,11 @@ QWidget#widget_3{ border: 1px solid rgb(240, 240, 240); border-radius: 3px;}
             </item>
             <item>
              <widget class="QLabel" name="max_">
-              <property name="layoutDirection">
-               <enum>Qt::RightToLeft</enum>
-              </property>
               <property name="text">
                <string>100</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
               </property>
              </widget>
             </item>
