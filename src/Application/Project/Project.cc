@@ -258,7 +258,7 @@ bool Project::post_load_states( const Core::StateIO& state_io )
   
   /////////////////////////////////////////////////////////////////////////
   // NOTE: This correction is for backwards compatibility
-  if ( generation == -1 )
+  //if ( generation == -1 )
   {
     boost::filesystem::path data_path = this->project_path_ / "data";
     if( boost::filesystem::exists( data_path ) )
