@@ -524,6 +524,7 @@ ViewerManager::ViewerManager() :
     this->add_state( cp_name + "_y", this->clip_plane_y_state_[ i ], 0.0, -1.0, 1.0, 0.01 );
     this->add_state( cp_name + "_z", this->clip_plane_z_state_[ i ], 0.0, -1.0, 1.0, 0.01 );
     this->add_state( cp_name + "_distance", this->clip_plane_distance_state_[ i ], 0.0, -1.0, 1.0, 0.1 );
+    this->clip_plane_distance_state_[ i ]->set_session_priority( Core::StateBase::DEFAULT_LOAD_E - 1 );
     this->add_state( cp_name + "_reverse_norm", this->clip_plane_reverse_norm_state_[ i ], true );
 
     this->add_connection( this->enable_clip_plane_state_[ i ]->value_changed_signal_.connect(

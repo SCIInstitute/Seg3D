@@ -293,8 +293,11 @@ void RenderResources::delete_texture( unsigned int texture_id )
   }
   
   lock_type lock( RenderResources::GetMutex() );
-  glDeleteTextures( 1, &texture_id );
-  CORE_CHECK_OPENGL_ERROR();
+  if ( glIsTexture( texture_id ) )
+  {
+    glDeleteTextures( 1, &texture_id );
+    CORE_CHECK_OPENGL_ERROR();
+  }
 }
 
 void RenderResources::delete_renderbuffer( unsigned int renderbuffer_id )
