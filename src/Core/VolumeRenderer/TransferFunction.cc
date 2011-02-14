@@ -92,14 +92,17 @@ void TransferFunctionPrivate::build_lookup_texture()
 
     BOOST_FOREACH( tf_feature_map_type::value_type feature_entry, this->tf_feature_map_ )
     {
-      float alpha = feature_entry.second->interpolate( s );
-      if ( alpha > 0 )
+      if ( feature_entry.second->is_enabled() )
       {
-        ++total_blended_features;
-        total_alpha += alpha;
-        diffuse_color += feature_entry.second->get_diffuse_color() * alpha;
-        specular_color += feature_entry.second->get_specular_color() * alpha;
-        shininess += feature_entry.second->get_shininess() * alpha;
+        float alpha = feature_entry.second->interpolate( s );
+        if ( alpha > 0 )
+        {
+          ++total_blended_features;
+          total_alpha += alpha;
+          diffuse_color += feature_entry.second->get_diffuse_color() * alpha;
+          specular_color += feature_entry.second->get_specular_color() * alpha;
+          shininess += feature_entry.second->get_shininess() * alpha;
+        }
       }
     }
 
@@ -223,13 +226,11 @@ Core::TransferFunctionFeatureHandle TransferFunction::create_feature()
     &TransferFunctionPrivate::handle_feature_changed, this->private_ ) );
   feature->diffuse_color_blue_state_->state_changed_signal_.connect( boost::bind(
     &TransferFunctionPrivate::handle_feature_changed, this->private_ ) );
-  feature->specular_color_red_state_->state_changed_signal_.connect( boost::bind(
-    &TransferFunctionPrivate::handle_feature_changed, this->private_ ) );
-  feature->specular_color_green_state_->state_changed_signal_.connect( boost::bind(
-    &TransferFunctionPrivate::handle_feature_changed, this->private_ ) );
-  feature->specular_color_blue_state_->state_changed_signal_.connect( boost::bind(
+  feature->specular_intensity_state_->state_changed_signal_.connect( boost::bind(
     &TransferFunctionPrivate::handle_feature_changed, this->private_ ) );
   feature->shininess_state_->state_changed_signal_.connect( boost::bind(
+    &TransferFunctionPrivate::handle_feature_changed, this->private_ ) );
+  feature->enabled_state_->state_changed_signal_.connect( boost::bind(
     &TransferFunctionPrivate::handle_feature_changed, this->private_ ) );
 
   this->private_->dirty_ = true;
@@ -307,13 +308,11 @@ bool TransferFunction::post_load_states( const StateIO& state_io )
         &TransferFunctionPrivate::handle_feature_changed, this->private_ ) );
       feature->diffuse_color_blue_state_->state_changed_signal_.connect( boost::bind(
         &TransferFunctionPrivate::handle_feature_changed, this->private_ ) );
-      feature->specular_color_red_state_->state_changed_signal_.connect( boost::bind(
-        &TransferFunctionPrivate::handle_feature_changed, this->private_ ) );
-      feature->specular_color_green_state_->state_changed_signal_.connect( boost::bind(
-        &TransferFunctionPrivate::handle_feature_changed, this->private_ ) );
-      feature->specular_color_blue_state_->state_changed_signal_.connect( boost::bind(
+      feature->specular_intensity_state_->state_changed_signal_.connect( boost::bind(
         &TransferFunctionPrivate::handle_feature_changed, this->private_ ) );
       feature->shininess_state_->state_changed_signal_.connect( boost::bind(
+        &TransferFunctionPrivate::handle_feature_changed, this->private_ ) );
+      feature->enabled_state_->state_changed_signal_.connect( boost::bind(
         &TransferFunctionPrivate::handle_feature_changed, this->private_ ) );
       this->feature_added_signal_( feature );
     }

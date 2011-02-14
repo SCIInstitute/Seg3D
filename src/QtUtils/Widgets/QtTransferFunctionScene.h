@@ -52,7 +52,9 @@ public:
   QtTransferFunctionCurve* get_curve( const std::string& feature_id );
 
 protected:
+  virtual void mouseMoveEvent( QGraphicsSceneMouseEvent* mouseEvent );
   virtual void mousePressEvent( QGraphicsSceneMouseEvent* mouseEvent );
+  virtual void mouseReleaseEvent( QGraphicsSceneMouseEvent* mouseEvent );
 
 public Q_SLOTS:
   void set_view_transform( const QTransform& matrix );

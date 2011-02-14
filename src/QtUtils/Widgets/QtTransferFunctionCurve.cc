@@ -291,4 +291,42 @@ bool QtTransferFunctionCurve::is_active() const
   return this->private_->active_;
 }
 
+void QtTransferFunctionCurve::move_curve( const QPointF& offset )
+{
+  QRectF rect = this->private_->scene_->sceneRect();
+  QPointF min_pos = rect.bottomRight();
+  QPointF max_pos = rect.topLeft();
+  BOOST_FOREACH( QtTransferFunctionControlPoint* control_point, this->private_->control_points_ )
+  {
+    QPointF pt_pos = control_point->scenePos();
+    min_pos.setX( Core::Min( min_pos.x(), pt_pos.x() ) );
+    min_pos.setY( Core::Min( min_pos.y(), pt_pos.y() ) );
+    max_pos.setX( Core::Max( max_pos.x(), pt_pos.x() ) );
+    max_pos.setY( Core::Max( max_pos.y(), pt_pos.y() ) );
+  }
+
+  QPointF actual_offset = offset;
+  actual_offset.setX( Core::Max( actual_offset.x(), rect.left() - min_pos.x() ) );
+  actual_offset.setX( Core::Min( actual_offset.x(), rect.right() - max_pos.x() ) );
+  actual_offset.setY( Core::Max( actual_offset.y(), rect.top() - min_pos.y() ) );
+  actual_offset.setY( Core::Min( actual_offset.y(), rect.bottom() - max_pos.y() ) );
+
+  if ( actual_offset.x() == 0.0f && actual_offset.y() == 0.0f )
+  {
+    return;
+  }
+
+  BOOST_FOREACH( QtTransferFunctionControlPoint* control_point, this->private_->control_points_ )
+  {
+    control_point->blockSignals( true );
+    control_point->setPos( control_point->scenePos() + actual_offset );
+    control_point->blockSignals( false );
+  }
+
+  this->private_->update_edges();
+  Core::TransferFunctionControlPointVector points;
+  this->private_->get_control_points( points );
+  Q_EMIT this->control_points_changed( points );
+}
+
 } // end namespace QtUtils

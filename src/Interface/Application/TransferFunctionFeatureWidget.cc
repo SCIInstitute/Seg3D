@@ -64,14 +64,12 @@ TransferFunctionFeatureWidget::TransferFunctionFeatureWidget(
       feature->diffuse_color_green_state_ );
     QtUtils::QtBridge::Connect( this->private_->ui_.diffuse_blue_slider_, 
       feature->diffuse_color_blue_state_ );
-    QtUtils::QtBridge::Connect( this->private_->ui_.specular_red_slider_,
-      feature->specular_color_red_state_ );
-    QtUtils::QtBridge::Connect( this->private_->ui_.specular_green_slider_,
-      feature->specular_color_green_state_ );
-    QtUtils::QtBridge::Connect( this->private_->ui_.specular_blue_slider_,
-      feature->specular_color_blue_state_ );
+    QtUtils::QtBridge::Connect( this->private_->ui_.specular_intensity_slider_,
+      feature->specular_intensity_state_ );
     QtUtils::QtBridge::Connect( this->private_->ui_.shininess_slider_, 
       feature->shininess_state_ );
+    QtUtils::QtBridge::Connect( this->private_->ui_.enable_checkbox_,
+      feature->enabled_state_ );
   }
 }
 

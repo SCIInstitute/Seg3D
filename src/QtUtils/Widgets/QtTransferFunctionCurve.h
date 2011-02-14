@@ -52,6 +52,7 @@ public:
   void remove_control_point( QtTransferFunctionControlPoint* control_point );
   void set_active( bool active );
   void set_color( const QColor& color );
+  void move_curve( const QPointF& offset );
 
   bool is_active() const;
   const std::string& get_feature_id() const;

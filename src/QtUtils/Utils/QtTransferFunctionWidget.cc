@@ -142,7 +142,7 @@ void QtTransferFunctionWidget::paintGL()
   int width = view_size.width();
   int height = view_size.height();
   float aspect_ratio = width * 1.0f / height;
-  float bkg_repeat_y = 2.0f;
+  float bkg_repeat_y = 1.0f;
   float bkg_repeat_x = bkg_repeat_y * aspect_ratio;
 
   glMatrixMode( GL_MODELVIEW );

@@ -65,6 +65,7 @@ private:
 
 public Q_SLOTS:
   void delete_active_curve();
+  void set_histogram_mode( int mode );
 
 private:
   boost::shared_ptr< RenderingDockWidgetPrivate > private_;

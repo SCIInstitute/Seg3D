@@ -28,6 +28,8 @@
 
 #include <queue>
 
+#include <boost/date_time.hpp>
+
 #include <Core/Math/MathFunctions.h>
 #include <Core/RenderResources/RenderResources.h>
 #include <Core/Volume/DataVolumeBrick.h>
@@ -673,6 +675,8 @@ void VolumeRenderer::render( DataVolumeHandle volume, const View3D& view,
               double znear, double zfar, double sample_rate, bool enable_lighting, 
               bool enable_fog, TransferFunctionHandle tf, bool orthographic )
 {
+  boost::posix_time::ptime start_time = boost::posix_time::microsec_clock::local_time();
+
   std::vector< DataVolumeBrickHandle > bricks;
   volume->get_bricks( bricks );
   if ( bricks.size() == 0 )
@@ -730,6 +734,11 @@ void VolumeRenderer::render( DataVolumeHandle volume, const View3D& view,
   diffuse_lut->unbind();
   Texture::SetActiveTextureUnit( old_tex_unit );
   glPopAttrib();
+
+  boost::posix_time::ptime end_time = boost::posix_time::microsec_clock::local_time();
+  boost::posix_time::time_duration vr_time = end_time - start_time;
+  CORE_LOG_DEBUG( "Volume rendering finished in " + 
+    ExportToString( vr_time.total_milliseconds() ) + " milliseconds." );
 }
 
 } // end namespace Core

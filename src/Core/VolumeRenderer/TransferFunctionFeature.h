@@ -78,6 +78,10 @@ private:
   // Returns the shininess of the feature.
   int get_shininess();
 
+  // IS_ENABLED:
+  // Returns true if the feature is enabled, otherwise false.
+  bool is_enabled();
+
 private:
   void initialize_states();
 
@@ -86,10 +90,9 @@ public:
   StateRangedIntHandle diffuse_color_red_state_;
   StateRangedIntHandle diffuse_color_green_state_;
   StateRangedIntHandle diffuse_color_blue_state_;
-  StateRangedIntHandle specular_color_red_state_;
-  StateRangedIntHandle specular_color_green_state_;
-  StateRangedIntHandle specular_color_blue_state_;
+  StateRangedDoubleHandle specular_intensity_state_;
   StateRangedIntHandle shininess_state_;
+  StateBoolHandle enabled_state_;
 
 private:
   TransferFunctionFeaturePrivateHandle private_;

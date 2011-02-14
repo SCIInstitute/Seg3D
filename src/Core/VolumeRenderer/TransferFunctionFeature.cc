@@ -42,6 +42,7 @@ public:
   Color diffuse_color_;
   Color specular_color_;
   int shininess_;
+  bool enabled_;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -75,16 +76,15 @@ const std::string& TransferFunctionFeature::get_feature_id() const
 void TransferFunctionFeature::initialize_states()
 {
   TransferFunctionControlPointVector control_points;
-  control_points.push_back( TransferFunctionControlPoint( 0.0f, 0.5f ) );
-  control_points.push_back( TransferFunctionControlPoint( 1.0f, 0.5f ) );
+  control_points.push_back( TransferFunctionControlPoint( 0.0f, 0.0f ) );
+  control_points.push_back( TransferFunctionControlPoint( 1.0f, 1.0f ) );
   this->add_state( "control_points", this->control_points_state_, control_points );
   this->add_state( "diffuse_red", this->diffuse_color_red_state_, 128, 0, 255, 1 );
   this->add_state( "diffuse_green", this->diffuse_color_green_state_, 128, 0, 255, 1 );
   this->add_state( "diffuse_blue", this->diffuse_color_blue_state_, 128, 0, 255, 1 );
-  this->add_state( "specular_red", this->specular_color_red_state_, 0, 0, 255, 1 );
-  this->add_state( "specular_green", this->specular_color_green_state_, 0, 0, 255, 1 );
-  this->add_state( "specular_blue", this->specular_color_blue_state_, 0, 0, 255, 1 );
+  this->add_state( "specular_intensity", this->specular_intensity_state_, 0.0, 0.0, 1.0, 0.01 );
   this->add_state( "shininess", this->shininess_state_, 128, 0, 128, 1 );
+  this->add_state( "enabled", this->enabled_state_, true );
 }
 
 void TransferFunctionFeature::take_snapshot()
@@ -94,10 +94,10 @@ void TransferFunctionFeature::take_snapshot()
   this->private_->diffuse_color_ = Color( this->diffuse_color_red_state_->get() / 255.0f,
     this->diffuse_color_green_state_->get() / 255.0f, 
     this->diffuse_color_blue_state_->get() / 255.0f );
-  this->private_->specular_color_ = Color( this->specular_color_red_state_->get() / 255.0f,
-    this->specular_color_green_state_->get() / 255.0f, 
-    this->specular_color_blue_state_->get() / 255.0f );
+  float specular_intensity = static_cast< float >( this->specular_intensity_state_->get() );
+  this->private_->specular_color_ = Color( specular_intensity, specular_intensity, specular_intensity );
   this->private_->shininess_ = this->shininess_state_->get();
+  this->private_->enabled_ = this->enabled_state_->get();
 }
 
 float TransferFunctionFeature::interpolate( float value )
@@ -146,4 +146,10 @@ const Color& TransferFunctionFeature::get_specular_color()
 {
   return this->private_->specular_color_;
 }
+
+bool TransferFunctionFeature::is_enabled()
+{
+  return this->private_->enabled_;
+}
+
 } // end namespace Core

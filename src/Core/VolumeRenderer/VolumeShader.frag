@@ -59,12 +59,13 @@ void main()
 {
   float voxel_val = volume_lookup( gl_TexCoord[0].stp );
   diffuse_color = texture1D( diffuse_lut, voxel_val );
-  specular_color = texture1D( specular_lut, voxel_val );
+  if ( diffuse_color.a == 0 ) discard;
   float alpha = 1.0 - pow( 1.0 - diffuse_color.a, 1.0 / sample_rate );
   vec4 voxel_color;
 
   if ( enable_lighting )
   {
+    specular_color = texture1D( specular_lut, voxel_val );
     vec3 gradient;
     gradient.x = ( volume_lookup( gl_TexCoord[0].stp + vec3( texel_size.x, 0.0, 0.0 ) ) -
       volume_lookup( gl_TexCoord[0].stp - vec3( texel_size.x, 0.0, 0.0 ) ) ) / ( 2.0 * voxel_size.x );

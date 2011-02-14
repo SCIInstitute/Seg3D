@@ -165,9 +165,9 @@ QWidget#vr_content_{
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>-139</y>
+         <y>-100</y>
          <width>228</width>
-         <height>792</height>
+         <height>754</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="scroll_area_layout_">
@@ -1342,12 +1342,6 @@ QWidget#vr_content_{
            </item>
            <item>
             <widget class="QWidget" name="vr_content_" native="true">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
              <layout class="QVBoxLayout" name="verticalLayout_21">
               <property name="spacing">
                <number>2</number>
@@ -1395,26 +1389,7 @@ QWidget#vr_content_{
                </widget>
               </item>
               <item>
-               <widget class="QtUtils::QtSliderDoubleCombo" name="vr_sample_rate_" native="true">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>40</height>
-                 </size>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>16777215</width>
-                  <height>40</height>
-                 </size>
-                </property>
-               </widget>
+               <widget class="QtUtils::QtSliderDoubleCombo" name="vr_sample_rate_" native="true"/>
               </item>
               <item>
                <widget class="QGroupBox" name="groupBox">
@@ -1435,7 +1410,56 @@ QWidget#vr_content_{
                   <number>4</number>
                  </property>
                  <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_6">
+                   <property name="spacing">
+                    <number>2</number>
+                   </property>
+                   <property name="topMargin">
+                    <number>0</number>
+                   </property>
+                   <item>
+                    <widget class="QLabel" name="label_28">
+                     <property name="text">
+                      <string>Histogram Scale:</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QComboBox" name="histogram_scale_combobox_">
+                     <item>
+                      <property name="text">
+                       <string>Linear</string>
+                      </property>
+                     </item>
+                     <item>
+                      <property name="text">
+                       <string>Logarithmic</string>
+                      </property>
+                     </item>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
                   <widget class="QWidget" name="widget_2" native="true">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>150</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>16777215</width>
+                     <height>150</height>
+                    </size>
+                   </property>
                    <property name="styleSheet">
                     <string notr="true">border: 1px solid gray</string>
                    </property>
@@ -1448,24 +1472,6 @@ QWidget#vr_content_{
                     </property>
                     <item>
                      <widget class="QtUtils::QtHistogramGraph" name="histogram_" native="true">
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="minimumSize">
-                       <size>
-                        <width>0</width>
-                        <height>180</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>16777215</width>
-                        <height>180</height>
-                       </size>
-                      </property>
                       <layout class="QVBoxLayout" name="verticalLayout_23">
                        <property name="spacing">
                         <number>0</number>
@@ -1480,12 +1486,6 @@ QWidget#vr_content_{
                            <horstretch>0</horstretch>
                            <verstretch>0</verstretch>
                           </sizepolicy>
-                         </property>
-                         <property name="maximumSize">
-                          <size>
-                           <width>16777215</width>
-                           <height>256</height>
-                          </size>
                          </property>
                          <property name="styleSheet">
                           <string notr="true">background: transparent;
@@ -1531,6 +1531,9 @@ border: 0px</string>
                  </item>
                  <item>
                   <layout class="QHBoxLayout" name="horizontalLayout_5">
+                   <property name="spacing">
+                    <number>2</number>
+                   </property>
                    <property name="bottomMargin">
                     <number>0</number>
                    </property>

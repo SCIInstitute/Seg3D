@@ -515,6 +515,8 @@ ViewerManager::ViewerManager() :
   this->add_state( "vr_target", this->volume_rendering_target_state_ );
   this->add_connection( LayerManager::Instance()->layers_changed_signal_.connect(
     boost::bind( &ViewerManagerPrivate::update_volume_rendering_targets, this->private_ ) ) );
+  this->add_connection( this->volume_rendering_target_state_->state_changed_signal_.connect(
+    boost::bind( &ViewerManagerPrivate::update_volume_rendering, this->private_ ) ) );
 
   for ( size_t i = 0; i < 6; ++i )
   {

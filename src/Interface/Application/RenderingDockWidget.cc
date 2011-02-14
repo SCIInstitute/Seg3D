@@ -216,6 +216,8 @@ RenderingDockWidget::RenderingDockWidget( QWidget *parent ) :
     ActionNewFeature::Dispatch, Core::Interface::GetWidgetActionContext() ) );
   this->connect( this->private_->ui_.delete_feature_button_, SIGNAL( clicked() ),
     SLOT( delete_active_curve() ) );
+  this->connect( this->private_->ui_.histogram_scale_combobox_, 
+    SIGNAL( currentIndexChanged( int ) ), SLOT( set_histogram_mode( int ) ) );
 
   this->add_connection( tf->feature_added_signal_.connect( boost::bind( 
     &RenderingDockWidget::HandleFeatureAdded, qpointer, _1 ) ) );
@@ -300,6 +302,11 @@ void RenderingDockWidget::delete_active_curve()
   {
     ActionDeleteFeature::Dispatch( Core::Interface::GetWidgetActionContext(), curve->get_feature_id() );
   }
+}
+
+void RenderingDockWidget::set_histogram_mode( int mode )
+{
+  this->private_->ui_.histogram_->set_logarithmic( mode == 1 );
 }
 
 void RenderingDockWidget::handle_reset()

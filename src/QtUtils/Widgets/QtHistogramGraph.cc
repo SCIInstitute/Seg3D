@@ -56,11 +56,13 @@ QtHistogramGraph::~QtHistogramGraph()
 void QtHistogramGraph::set_histogram( const Core::Histogram& histogram )
 {
   this->histogram_ = histogram;
+  this->update();
 }
 
 void QtHistogramGraph::reset_histogram( )
 {
   this->histogram_ = Core::Histogram();
+  this->update();
 }
 
 void QtHistogramGraph::paintEvent(QPaintEvent * event )
