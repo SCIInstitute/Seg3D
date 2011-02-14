@@ -223,10 +223,6 @@ void ExportSummaryPage::initializePage()
     QString::fromUtf8( "Project Name: " ) + field("projectName").toString() );
     this->project_path_->setText( 
     QString::fromUtf8( "Project Path: " ) + field("projectPath").toString() );
-    
-  Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
-    PreferencesManager::Instance()->export_path_state_, 
-    boost::filesystem::path( this->project_path_->text().toStdString() ).string() );
 }
 
 } // end namespace Seg3D
