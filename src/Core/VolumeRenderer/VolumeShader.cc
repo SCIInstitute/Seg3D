@@ -69,6 +69,8 @@ bool VolumeShader::post_initialize()
 {
   this->enable();
   this->vol_tex_loc_ = this->get_uniform_location( "vol_tex" );
+  this->diffuse_lut_loc_ = this->get_uniform_location( "diffuse_lut" );
+  this->specular_lut_loc_ = this->get_uniform_location( "specular_lut" );
   this->enable_lighting_loc_ = this->get_uniform_location( "enable_lighting" );
   this->enable_fog_loc_ = this->get_uniform_location( "enable_fog" );
   this->tex_bbox_min_loc_ = this->get_uniform_location( "tex_bbox_min" );
@@ -85,6 +87,16 @@ bool VolumeShader::post_initialize()
 void VolumeShader::set_volume_texture( int tex_unit )
 {
   glUniform1i( this->vol_tex_loc_, tex_unit );
+}
+
+void VolumeShader::set_diffuse_texture( int tex_unit )
+{
+  glUniform1i( this->diffuse_lut_loc_, tex_unit );
+}
+
+void VolumeShader::set_specular_texture( int tex_unit )
+{
+  glUniform1i( this->specular_lut_loc_, tex_unit );
 }
 
 void VolumeShader::set_lighting( bool enabled )

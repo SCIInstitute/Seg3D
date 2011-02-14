@@ -33,6 +33,7 @@
 
 #include <Core/Geometry/View3D.h>
 #include <Core/Volume/DataVolume.h>
+#include <Core/VolumeRenderer/TransferFunction.h>
 
 namespace Core
 {
@@ -50,8 +51,8 @@ public:
   ~VolumeRenderer();
 
   void initialize();
-  void render( DataVolumeHandle volume, const View3D& view, double sample_rate,
-    bool enable_lighting, bool enable_fog, double scale, double bias, 
+  void render( DataVolumeHandle volume, const View3D& view, double znear, double zfar,
+    double sample_rate, bool enable_lighting, bool enable_fog, TransferFunctionHandle tf, 
     bool orthographic = false ); 
 
 private:

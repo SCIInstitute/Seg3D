@@ -53,6 +53,8 @@ public:
   void set_scale_bias( float scale, float bias );
   void set_sample_rate( float sample_rate );
   void set_volume_texture( int tex_unit );
+  void set_diffuse_texture( int tex_unit );
+  void set_specular_texture( int tex_unit );
   void set_lighting( bool enabled );
   void set_fog( bool enabled );
   void set_fog_range( float znear, float zfar );
@@ -64,6 +66,8 @@ protected:
 
 private:
   int vol_tex_loc_;
+  int diffuse_lut_loc_;
+  int specular_lut_loc_;
   int enable_lighting_loc_;
   int enable_fog_loc_;
   int tex_bbox_min_loc_;

@@ -130,7 +130,7 @@ void QtTransferFunctionWidget::paintGL()
     return;
   }
   
-  Core::TextureHandle tf_texture = this->private_->transfer_function_->get_lookup_texture();
+  Core::TextureHandle tf_texture = this->private_->transfer_function_->get_diffuse_lut();
 
   if ( !this->private_->bkg_tex_ || !tf_texture )
   {
@@ -141,8 +141,9 @@ void QtTransferFunctionWidget::paintGL()
   QSize view_size = QWidget::size();
   int width = view_size.width();
   int height = view_size.height();
-  float bkg_repeat_x = width / 25.0f;
-  float bkg_repeat_y = height / 25.0f;
+  float aspect_ratio = width * 1.0f / height;
+  float bkg_repeat_y = 2.0f;
+  float bkg_repeat_x = bkg_repeat_y * aspect_ratio;
 
   glMatrixMode( GL_MODELVIEW );
   glLoadIdentity();

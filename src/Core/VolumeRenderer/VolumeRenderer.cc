@@ -36,6 +36,14 @@
 #include <Core/VolumeRenderer/VolumeShader.h>
 #include <Core/Geometry/Algorithm.h>
 
+#ifdef max
+#undef max
+#endif
+
+#ifdef min
+#undef min
+#endif
+
 namespace Core
 {
 
@@ -656,12 +664,14 @@ void VolumeRenderer::initialize()
   this->private_->volume_shader_->initialize();
   this->private_->volume_shader_->enable();
   this->private_->volume_shader_->set_volume_texture( 0 );
+  this->private_->volume_shader_->set_diffuse_texture( 1 );
+  this->private_->volume_shader_->set_specular_texture( 2 );
   this->private_->volume_shader_->disable();
 }
 
 void VolumeRenderer::render( DataVolumeHandle volume, const View3D& view, 
-              double sample_rate, bool enable_lighting, bool enable_fog, 
-              double scale, double bias, bool orthographic )
+              double znear, double zfar, double sample_rate, bool enable_lighting, 
+              bool enable_fog, TransferFunctionHandle tf, bool orthographic )
 {
   std::vector< DataVolumeBrickHandle > bricks;
   volume->get_bricks( bricks );
@@ -682,8 +692,18 @@ void VolumeRenderer::render( DataVolumeHandle volume, const View3D& view,
   glEnable( GL_DEPTH_TEST );
   glDepthMask( GL_FALSE );
   glDisable( GL_CULL_FACE );
+
   unsigned int old_tex_unit = Texture::GetActiveTextureUnit();
+  TextureHandle diffuse_lut = tf->get_diffuse_lut();
+  TextureHandle specular_lut = tf->get_specular_lut();
+  Texture::lock_type diffuse_lock( diffuse_lut->get_mutex() );
+  Texture::lock_type specular_lock( specular_lut->get_mutex() );
+  Texture::SetActiveTextureUnit( 1 );
+  diffuse_lut->bind();
+  Texture::SetActiveTextureUnit( 2 );
+  specular_lut->bind();
   Texture::SetActiveTextureUnit( 0 );
+  
   this->private_->volume_shader_->enable();
   this->private_->volume_shader_->set_voxel_size( 
     static_cast< float >( this->private_->voxel_size_[ 0 ] ),
@@ -691,9 +711,10 @@ void VolumeRenderer::render( DataVolumeHandle volume, const View3D& view,
     static_cast< float >( this->private_->voxel_size_[ 2 ] ) );
   this->private_->volume_shader_->set_lighting( enable_lighting );
   this->private_->volume_shader_->set_fog( enable_fog );
-  this->private_->volume_shader_->set_scale_bias( static_cast< float >( scale ), 
-    static_cast< float >( bias ) );
+  this->private_->volume_shader_->set_scale_bias( 1.0f, 0.0f );
   this->private_->volume_shader_->set_sample_rate( static_cast< float >( sample_rate ) );
+  this->private_->volume_shader_->set_fog_range( static_cast< float >( znear ), 
+    static_cast< float >( zfar ) );
 
   while ( !brick_queue.empty() )
   {
@@ -702,6 +723,11 @@ void VolumeRenderer::render( DataVolumeHandle volume, const View3D& view,
   }
 
   this->private_->volume_shader_->disable();
+
+  Texture::SetActiveTextureUnit( 1 );
+  diffuse_lut->unbind();
+  Texture::SetActiveTextureUnit( 2 );
+  diffuse_lut->unbind();
   Texture::SetActiveTextureUnit( old_tex_unit );
   glPopAttrib();
 }

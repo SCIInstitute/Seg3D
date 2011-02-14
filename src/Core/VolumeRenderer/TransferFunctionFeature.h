@@ -66,9 +66,13 @@ private:
   // 0 is returned.
   float interpolate( float value );
 
-  // GET_COLOR:
-  // Returns the color of the feature. The values are normalized to [0, 1].
-  const Color& get_color();
+  // GET_DIFFUSE_COLOR:
+  // Returns the diffuse color of the feature. The values are normalized to [0, 1].
+  const Color& get_diffuse_color();
+
+  // GET_SPECULAR_COLOR:
+  // Returns the specular color of the feature. The values are normalized to [0, 1].
+  const Color& get_specular_color();
 
   // GET_SHININESS:
   // Returns the shininess of the feature.
@@ -79,9 +83,12 @@ private:
 
 public:
   StateTransferFunctionControlPointVectorHandle control_points_state_;
-  StateRangedIntHandle red_color_state_;
-  StateRangedIntHandle green_color_state_;
-  StateRangedIntHandle blue_color_state_;
+  StateRangedIntHandle diffuse_color_red_state_;
+  StateRangedIntHandle diffuse_color_green_state_;
+  StateRangedIntHandle diffuse_color_blue_state_;
+  StateRangedIntHandle specular_color_red_state_;
+  StateRangedIntHandle specular_color_green_state_;
+  StateRangedIntHandle specular_color_blue_state_;
   StateRangedIntHandle shininess_state_;
 
 private:

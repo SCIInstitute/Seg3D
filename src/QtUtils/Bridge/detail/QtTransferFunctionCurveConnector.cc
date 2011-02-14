@@ -48,18 +48,18 @@ QtTransferFunctionCurveConnector::QtTransferFunctionCurveConnector(
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
     parent->set_control_points( tf_feature->control_points_state_->get() );
-    QColor color( tf_feature->red_color_state_->get(),
-      tf_feature->green_color_state_->get(),
-      tf_feature->blue_color_state_->get() );
+    QColor color( tf_feature->diffuse_color_red_state_->get(),
+      tf_feature->diffuse_color_green_state_->get(),
+      tf_feature->diffuse_color_blue_state_->get() );
     parent->set_color( color );
 
     this->add_connection( tf_feature->control_points_state_->value_changed_signal_.connect(
       boost::bind( &QtTransferFunctionCurveConnector::SetCurveControlPoints, qpointer, _1, _2 ) ) );
-    this->add_connection( tf_feature->red_color_state_->state_changed_signal_.connect(
+    this->add_connection( tf_feature->diffuse_color_red_state_->state_changed_signal_.connect(
       boost::bind( &QtTransferFunctionCurveConnector::UpdateCurveColor, qpointer ) ) );
-    this->add_connection( tf_feature->green_color_state_->state_changed_signal_.connect(
+    this->add_connection( tf_feature->diffuse_color_green_state_->state_changed_signal_.connect(
       boost::bind( &QtTransferFunctionCurveConnector::UpdateCurveColor, qpointer ) ) );
-    this->add_connection( tf_feature->blue_color_state_->state_changed_signal_.connect(
+    this->add_connection( tf_feature->diffuse_color_blue_state_->state_changed_signal_.connect(
       boost::bind( &QtTransferFunctionCurveConnector::UpdateCurveColor, qpointer ) ) );
   }
 
@@ -117,9 +117,9 @@ void QtTransferFunctionCurveConnector::UpdateCurveColor(
   }
 
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-  QColor color( qpointer->tf_feature_->red_color_state_->get(),
-    qpointer->tf_feature_->green_color_state_->get(),
-    qpointer->tf_feature_->blue_color_state_->get() );
+  QColor color( qpointer->tf_feature_->diffuse_color_red_state_->get(),
+    qpointer->tf_feature_->diffuse_color_green_state_->get(),
+    qpointer->tf_feature_->diffuse_color_blue_state_->get() );
   lock.unlock();
   qpointer->parent_->set_color( color );
 }

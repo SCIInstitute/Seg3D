@@ -55,7 +55,15 @@ public:
   void delete_feature( const std::string& feature_id );
   void clear();
 
-  TextureHandle get_lookup_texture() const;
+  // GET_DIFFUSE_LUT:
+  // Get the lookup texture of the diffuse color.
+  TextureHandle get_diffuse_lut() const;
+
+  // GET_SPECULAR_LUT:
+  // Get the lookup texture of the specular color.
+  // The alpha component contains the shininess value.
+  TextureHandle get_specular_lut() const;
+
   TransferFunctionFeatureHandle get_feature( const std::string& feature_id ) const;
 
 protected:

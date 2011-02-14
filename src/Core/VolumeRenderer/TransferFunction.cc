@@ -48,7 +48,8 @@ public:
 
   tf_feature_map_type tf_feature_map_;
   bool dirty_;
-  Texture1DHandle lut_;
+  Texture1DHandle diffuse_lut_;
+  Texture1DHandle specular_lut_;
   TransferFunction* tf_;
 };
 
@@ -64,6 +65,7 @@ void TransferFunctionPrivate::handle_feature_changed()
 void TransferFunctionPrivate::build_lookup_texture()
 {
   static const int LUT_SIZE_C = 256;
+  static const int SPECULAR_OFFSET_C = LUT_SIZE_C * 4;
   
   BOOST_FOREACH( tf_feature_map_type::value_type feature_entry, this->tf_feature_map_ )
   {
@@ -73,7 +75,7 @@ void TransferFunctionPrivate::build_lookup_texture()
   RenderResources::lock_type lock( RenderResources::GetMutex() );
   PixelBufferObjectHandle pbo( new PixelUnpackBuffer );
   pbo->bind();
-  pbo->set_buffer_data( LUT_SIZE_C * 4 * sizeof( unsigned char ),
+  pbo->set_buffer_data( LUT_SIZE_C * 4 * sizeof( unsigned char ) * 2,
     NULL, GL_STREAM_DRAW );
   unsigned char* buffer = reinterpret_cast< unsigned char* >(
     pbo->map_buffer( GL_WRITE_ONLY ) );
@@ -83,7 +85,9 @@ void TransferFunctionPrivate::build_lookup_texture()
     // NOTE: Texels are cell centered.
     float s = ( i + 0.5f ) / LUT_SIZE_C;
     float total_alpha = 0.0f;
-    Color texel_color( 0.0f, 0.0f, 0.0f );
+    Color diffuse_color( 0.0f, 0.0f, 0.0f );
+    Color specular_color( 0.0f, 0.0f, 0.0f );
+    float shininess = 0;
     int total_blended_features = 0;
 
     BOOST_FOREACH( tf_feature_map_type::value_type feature_entry, this->tf_feature_map_ )
@@ -93,7 +97,9 @@ void TransferFunctionPrivate::build_lookup_texture()
       {
         ++total_blended_features;
         total_alpha += alpha;
-        texel_color += feature_entry.second->get_color() * alpha;
+        diffuse_color += feature_entry.second->get_diffuse_color() * alpha;
+        specular_color += feature_entry.second->get_specular_color() * alpha;
+        shininess += feature_entry.second->get_shininess() * alpha;
       }
     }
 
@@ -101,34 +107,64 @@ void TransferFunctionPrivate::build_lookup_texture()
     {
       // The final color is the weighted average of all the features that
       // are defined at the texel.
-      texel_color = texel_color * ( 1.0f / total_alpha );
+      diffuse_color = diffuse_color * ( 1.0f / total_alpha );
+      specular_color = specular_color * ( 1.0f / total_alpha );
+      shininess /= total_alpha;
       // The final alpha is the average of all the features that are defined
       // at the texel.
       total_alpha /= total_blended_features;
     }
 
-    buffer[ i << 2 ] = static_cast< unsigned char >( Clamp( texel_color.r(), 0.0f, 1.0f ) * 255 );
-    buffer[ ( i << 2 ) + 1 ] = static_cast< unsigned char >( Clamp( texel_color.g(), 0.0f, 1.0f ) * 255 );
-    buffer[ ( i << 2 ) + 2 ] = static_cast< unsigned char >( Clamp( texel_color.b(), 0.0f, 1.0f ) * 255 );
+    buffer[ i << 2 ] = static_cast< unsigned char >( Clamp( diffuse_color.r(), 0.0f, 1.0f ) * 255 );
+    buffer[ ( i << 2 ) + 1 ] = static_cast< unsigned char >( Clamp( diffuse_color.g(), 0.0f, 1.0f ) * 255 );
+    buffer[ ( i << 2 ) + 2 ] = static_cast< unsigned char >( Clamp( diffuse_color.b(), 0.0f, 1.0f ) * 255 );
     buffer[ ( i << 2 ) + 3 ] = static_cast< unsigned char >( Clamp( total_alpha, 0.0f, 1.0f ) * 255 );
+    buffer[ SPECULAR_OFFSET_C + ( i << 2 ) ] = static_cast< unsigned char >( 
+      Clamp( specular_color.r(), 0.0f, 1.0f ) * 255 );
+    buffer[ SPECULAR_OFFSET_C + ( i << 2 ) + 1 ] = static_cast< unsigned char >( 
+      Clamp( specular_color.g(), 0.0f, 1.0f ) * 255 );
+    buffer[ SPECULAR_OFFSET_C + ( i << 2 ) + 2 ] = static_cast< unsigned char >( 
+      Clamp( specular_color.b(), 0.0f, 1.0f ) * 255 );
+    buffer[ SPECULAR_OFFSET_C + ( i << 2 ) + 3 ] = static_cast< unsigned char >( shininess );
   }
 
   pbo->unmap_buffer();
 
-  if ( !this->lut_ )
+  if ( !this->diffuse_lut_ )
   {
-    this->lut_.reset( new Texture1D );
-    this->lut_->bind();
-    this->lut_->set_mag_filter( GL_LINEAR );
-    this->lut_->set_min_filter( GL_LINEAR );
-    this->lut_->set_wrap_s( GL_CLAMP );
+    this->diffuse_lut_.reset( new Texture1D );
+    this->diffuse_lut_->bind();
+    this->diffuse_lut_->set_mag_filter( GL_LINEAR );
+    this->diffuse_lut_->set_min_filter( GL_LINEAR );
+    this->diffuse_lut_->set_wrap_s( GL_CLAMP );
   }
 
-  Texture::lock_type tex_lock( this->lut_->get_mutex() );
-  this->lut_->bind();
+  if ( !this->specular_lut_ )
+  {
+    this->specular_lut_.reset( new Texture1D );
+    this->specular_lut_->bind();
+    this->specular_lut_->set_mag_filter( GL_LINEAR );
+    this->specular_lut_->set_min_filter( GL_LINEAR );
+    this->specular_lut_->set_wrap_s( GL_CLAMP );
+  }
+
   glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
-  this->lut_->set_image( LUT_SIZE_C, GL_RGBA, 0, GL_RGBA, GL_UNSIGNED_BYTE );
-  this->lut_->unbind();
+  {
+    Texture::lock_type tex_lock( this->diffuse_lut_->get_mutex() );
+    this->diffuse_lut_->bind();
+    this->diffuse_lut_->set_image( LUT_SIZE_C, GL_RGBA, 0, GL_RGBA, GL_UNSIGNED_BYTE );
+    this->diffuse_lut_->unbind();
+  }
+
+  {
+    Texture::lock_type tex_lock( this->specular_lut_->get_mutex() );
+    this->specular_lut_->bind();
+    this->specular_lut_->set_image( LUT_SIZE_C, GL_RGBA, 
+      reinterpret_cast< const void* >( SPECULAR_OFFSET_C ), 
+      GL_RGBA, GL_UNSIGNED_BYTE );
+    this->specular_lut_->unbind();
+  }
+
   pbo->unbind();
 
   glFinish();
@@ -150,7 +186,7 @@ TransferFunction::~TransferFunction()
   this->disconnect_all();
 }
 
-TextureHandle TransferFunction::get_lookup_texture() const
+TextureHandle TransferFunction::get_diffuse_lut() const
 {
   StateEngine::lock_type lock( StateEngine::GetMutex() );
   if ( this->private_->dirty_ )
@@ -158,7 +194,18 @@ TextureHandle TransferFunction::get_lookup_texture() const
     this->private_->build_lookup_texture();
     this->private_->dirty_ = false;
   }
-  return this->private_->lut_;
+  return this->private_->diffuse_lut_;
+}
+
+TextureHandle TransferFunction::get_specular_lut() const
+{
+  StateEngine::lock_type lock( StateEngine::GetMutex() );
+  if ( this->private_->dirty_ )
+  {
+    this->private_->build_lookup_texture();
+    this->private_->dirty_ = false;
+  }
+  return this->private_->specular_lut_;
 }
 
 Core::TransferFunctionFeatureHandle TransferFunction::create_feature()
@@ -170,11 +217,17 @@ Core::TransferFunctionFeatureHandle TransferFunction::create_feature()
 
   feature->control_points_state_->state_changed_signal_.connect( boost::bind(
     &TransferFunctionPrivate::handle_feature_changed, this->private_ ) );
-  feature->red_color_state_->state_changed_signal_.connect( boost::bind(
+  feature->diffuse_color_red_state_->state_changed_signal_.connect( boost::bind(
     &TransferFunctionPrivate::handle_feature_changed, this->private_ ) );
-  feature->green_color_state_->state_changed_signal_.connect( boost::bind(
+  feature->diffuse_color_green_state_->state_changed_signal_.connect( boost::bind(
     &TransferFunctionPrivate::handle_feature_changed, this->private_ ) );
-  feature->blue_color_state_->state_changed_signal_.connect( boost::bind(
+  feature->diffuse_color_blue_state_->state_changed_signal_.connect( boost::bind(
+    &TransferFunctionPrivate::handle_feature_changed, this->private_ ) );
+  feature->specular_color_red_state_->state_changed_signal_.connect( boost::bind(
+    &TransferFunctionPrivate::handle_feature_changed, this->private_ ) );
+  feature->specular_color_green_state_->state_changed_signal_.connect( boost::bind(
+    &TransferFunctionPrivate::handle_feature_changed, this->private_ ) );
+  feature->specular_color_blue_state_->state_changed_signal_.connect( boost::bind(
     &TransferFunctionPrivate::handle_feature_changed, this->private_ ) );
   feature->shininess_state_->state_changed_signal_.connect( boost::bind(
     &TransferFunctionPrivate::handle_feature_changed, this->private_ ) );
@@ -248,11 +301,17 @@ bool TransferFunction::post_load_states( const StateIO& state_io )
       this->private_->tf_feature_map_[ feature_id ] = feature;
       feature->control_points_state_->state_changed_signal_.connect( boost::bind(
         &TransferFunctionPrivate::handle_feature_changed, this->private_ ) );
-      feature->red_color_state_->state_changed_signal_.connect( boost::bind(
+      feature->diffuse_color_red_state_->state_changed_signal_.connect( boost::bind(
         &TransferFunctionPrivate::handle_feature_changed, this->private_ ) );
-      feature->green_color_state_->state_changed_signal_.connect( boost::bind(
+      feature->diffuse_color_green_state_->state_changed_signal_.connect( boost::bind(
         &TransferFunctionPrivate::handle_feature_changed, this->private_ ) );
-      feature->blue_color_state_->state_changed_signal_.connect( boost::bind(
+      feature->diffuse_color_blue_state_->state_changed_signal_.connect( boost::bind(
+        &TransferFunctionPrivate::handle_feature_changed, this->private_ ) );
+      feature->specular_color_red_state_->state_changed_signal_.connect( boost::bind(
+        &TransferFunctionPrivate::handle_feature_changed, this->private_ ) );
+      feature->specular_color_green_state_->state_changed_signal_.connect( boost::bind(
+        &TransferFunctionPrivate::handle_feature_changed, this->private_ ) );
+      feature->specular_color_blue_state_->state_changed_signal_.connect( boost::bind(
         &TransferFunctionPrivate::handle_feature_changed, this->private_ ) );
       feature->shininess_state_->state_changed_signal_.connect( boost::bind(
         &TransferFunctionPrivate::handle_feature_changed, this->private_ ) );

@@ -61,7 +61,7 @@ public:
   void handle_layer_volume_changed( LayerHandle layer );
   void change_layout( std::string layout );
   void handle_fog_density_changed();
-  void handle_sample_rate_changed();
+  void update_volume_rendering();
 
   void update_clipping_range();
   void update_clipping_range( size_t index );
@@ -443,7 +443,7 @@ void ViewerManagerPrivate::handle_fog_density_changed()
   }
 }
 
-void ViewerManagerPrivate::handle_sample_rate_changed()
+void ViewerManagerPrivate::update_volume_rendering()
 {
   for ( size_t i = 0; i < 6; ++i )
   {
@@ -489,6 +489,8 @@ ViewerManager::ViewerManager() :
   this->private_->signal_block_count_ = 0;
   this->private_->vm_ = this;
   this->private_->transfer_function_.reset( new Core::TransferFunction );
+  this->add_connection( this->private_->transfer_function_->transfer_function_changed_signal_.
+    connect( boost::bind( &ViewerManagerPrivate::update_volume_rendering, this->private_ ) ) );
 
   // Step (1)
   // Allow states to be set from outside of the application thread
@@ -508,7 +510,7 @@ ViewerManager::ViewerManager() :
 
   this->add_state( "sample_rate", this->volume_sample_rate_state_, 1.0, 0.1, 10.0, 0.1 );
   this->add_connection( this->volume_sample_rate_state_->state_changed_signal_.connect(
-    boost::bind( &ViewerManagerPrivate::handle_sample_rate_changed, this->private_ ) ) );
+    boost::bind( &ViewerManagerPrivate::update_volume_rendering, this->private_ ) ) );
 
   this->add_state( "vr_target", this->volume_rendering_target_state_ );
   this->add_connection( LayerManager::Instance()->layers_changed_signal_.connect(
