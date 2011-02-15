@@ -148,6 +148,8 @@ void PreferencesInterface::setup_general_prefs()
     PreferencesManager::Instance()->paint_cursor_invisibility_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.zero_based_slice_numbers_,
     PreferencesManager::Instance()->zero_based_slice_numbers_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.active_layer_navigation_,
+    PreferencesManager::Instance()->active_layer_navigation_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.export_dicom_headers_,
     PreferencesManager::Instance()->export_dicom_headers_state_ );  
 

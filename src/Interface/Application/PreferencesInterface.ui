@@ -415,6 +415,13 @@ border: 1px solid gray;
                </property>
               </widget>
              </item>
+             <item row="3" column="0">
+              <widget class="QCheckBox" name="active_layer_navigation_">
+               <property name="text">
+                <string>Enable arrows for active layer navigation</string>
+               </property>
+              </widget>
+             </item>
             </layout>
            </widget>
           </item>

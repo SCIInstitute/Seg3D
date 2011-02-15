@@ -641,7 +641,9 @@ void Menu::set_recent_file_list()
         
       qaction->setToolTip( tr( "Load this recent project" ) );
       
-      boost::filesystem::path path = boost::filesystem::path( recent_projects[ i ].path_ ) /
+      std::string path_name;
+      Core::ImportFromString( recent_projects[ i ].path_, path_name );
+      boost::filesystem::path path = boost::filesystem::path( path_name ) /
         boost::filesystem::path( recent_projects[ i ].name_ );
       
       QtUtils::QtBridge::Connect( qaction, boost::bind( &Menu::ConfirmRecentFileLoad,
@@ -650,6 +652,7 @@ void Menu::set_recent_file_list()
     }
   }
 }
+
 void Menu::ConfirmRecentFileLoad( qpointer_type qpointer, const std::string& path )
 {
   if ( ProjectManager::Instance()->current_project_->check_project_changed() )

@@ -179,6 +179,7 @@ void PreferencesManager::initialize_states()
   
   add_state( "reverse_slice_navigation", this->reverse_slice_navigation_state_, false );
   add_state( "zero_based_slice_numbers", this->zero_based_slice_numbers_state_, false );
+  add_state( "active_layer_navigation", this->active_layer_navigation_state_, true );
   
   //Viewer Preferences
   add_state( "default_viewer_mode", this->default_viewer_mode_state_, "1and3", 

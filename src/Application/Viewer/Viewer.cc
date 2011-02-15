@@ -1321,14 +1321,20 @@ bool Viewer::key_press_event( int key, int modifiers, int x, int y )
         
       case Core::Key::KEY_LEFT_E:
       {
-        ActionActivatePreviousLayer::Dispatch( Core::Interface::GetKeyboardActionContext() );
+        if ( PreferencesManager::Instance()->active_layer_navigation_state_->get() )
+        {
+          ActionActivatePreviousLayer::Dispatch( Core::Interface::GetKeyboardActionContext() );
+        }
         handled_successfully = true;
         break;
       }
         
       case Core::Key::KEY_RIGHT_E:
       {
-        ActionActivateNextLayer::Dispatch( Core::Interface::GetKeyboardActionContext() );
+        if ( PreferencesManager::Instance()->active_layer_navigation_state_->get() )
+        {
+          ActionActivateNextLayer::Dispatch( Core::Interface::GetKeyboardActionContext() );
+        }
         handled_successfully = true;
         break;
       }

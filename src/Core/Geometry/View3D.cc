@@ -142,7 +142,7 @@ void View3D::compute_clipping_planes( const BBox& bbox, double& znear, double& z
   }
 
   // Offset the clipping planes by a small value
-  double range = zfar - znear;
+  double range = Core::Max( znear, zfar - znear );
   znear -= range * 0.001;
   zfar += range * 0.001;
   znear = Core::Max( znear, 1e-2 * zfar );

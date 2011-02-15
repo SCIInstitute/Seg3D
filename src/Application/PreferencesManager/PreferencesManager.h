@@ -94,6 +94,7 @@ public:
   Core::StateLabeledOptionHandle background_color_state_;
   Core::StateBoolHandle show_slice_number_state_;
   Core::StateBoolHandle zero_based_slice_numbers_state_;
+  Core::StateBoolHandle active_layer_navigation_state_;
 
   //Layers Preferences
   Core::StateRangedDoubleHandle default_layer_opacity_state_;
