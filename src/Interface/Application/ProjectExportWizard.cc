@@ -151,7 +151,7 @@ bool ExportInfoPage::validatePage()
 
   if( boost::filesystem::exists( new_path ) )
   {
-    int ret = QMessageBox::critical( this, 
+    QMessageBox::critical( this, 
       "A project with this name already exists!",
       "A project with this name already exists!\n"
       "You cannot export onto an existing project.\n"

@@ -667,7 +667,6 @@ bool ProjectManager::get_recent_projects_from_database( std::vector< RecentProje
     std::string select_statement = "SELECT * FROM recentprojects ORDER BY id DESC LIMIT 20";
     sqlite3_prepare_v2( this->recent_projects_database_, select_statement.c_str(), 
       static_cast< int >( select_statement.size() ), &statement, &tail );
-    int i = 0;
     while ( sqlite3_step( statement ) == SQLITE_ROW )
     {
       recent_projects.push_back( RecentProject( 

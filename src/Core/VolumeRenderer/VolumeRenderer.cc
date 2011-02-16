@@ -618,7 +618,7 @@ void VolumeRendererPrivate::render_brick( DataVolumeBrickHandle brick )
     const char* poly_code = POLY_TABLE_C[ c_code ];
     for ( ; poly_code[ n ] >= 0; ++n )
     {
-      polygon_vertices.push_back( PointF( intersect_pos[ poly_code[ n ] ] ) );
+      polygon_vertices.push_back( PointF( intersect_pos[ static_cast< int >( poly_code[ n ] ) ] ) );
     }
     assert(n < 7);
     count_vec.push_back( n );
