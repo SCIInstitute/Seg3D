@@ -65,7 +65,9 @@ bool ShaderBase::initialize()
     {
       std::string error_info = this->private_->glsl_vert_shader_->get_info_log();
       CORE_LOG_ERROR( std::string( "Failed to compile vertex shader: \n" ) + error_info );
+#ifdef _WIN32
       assert( false );
+#endif
       return false;
     }
 
@@ -81,7 +83,9 @@ bool ShaderBase::initialize()
     {
       std::string error_info = this->private_->glsl_frag_shader_->get_info_log();
       CORE_LOG_ERROR( std::string( "Failed to compile fragment shader: \n" ) + error_info );
+#ifdef _WIN32
       assert( false );
+#endif
       return false;
     }
 
@@ -97,7 +101,9 @@ bool ShaderBase::initialize()
   {
     std::string error_info = this->private_->glsl_prog_->get_info_log();
     CORE_LOG_ERROR( std::string( "Failed to link GLSL program: \n" ) + error_info );
+#ifdef _WIN32
     assert( false );
+#endif
     return false;
   }
 

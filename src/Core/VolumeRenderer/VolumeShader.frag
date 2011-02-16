@@ -42,7 +42,7 @@ vec4 compute_lighting( vec3 normal )
     half_v = normalize(half_vector);
     n_dot_hv = max( dot ( normal, half_v ), 0.0 );
     color += specular_color * gl_LightSource[0].specular * 
-            pow( n_dot_hv, specular_color.a * 255 );
+            pow( n_dot_hv, specular_color.a * 255.0 );
   }
 
   return color;
@@ -59,7 +59,7 @@ void main()
 {
   float voxel_val = volume_lookup( gl_TexCoord[0].stp );
   diffuse_color = texture1D( diffuse_lut, voxel_val );
-  if ( diffuse_color.a == 0 ) discard;
+  if ( diffuse_color.a == 0.0 ) discard;
   float alpha = 1.0 - pow( 1.0 - diffuse_color.a, 1.0 / sample_rate );
   vec4 voxel_color;
 
