@@ -285,6 +285,10 @@ RendererBase::RendererBase() :
   height_( 0 ),
   private_( new RendererBasePrivate )
 {
+  if ( !Core::RenderResources::Instance()->create_render_context( this->private_->context_ ) )
+  {
+    CORE_THROW_EXCEPTION( "Failed to create a valid rendering context" );
+  }
   this->private_->renderer_ = this;
   this->private_->active_render_texture_ = 0;
   this->private_->active_overlay_texture_ = 2;
@@ -321,11 +325,6 @@ void RendererBase::initialize()
   // Save old GL context so it can be restored at the end
   RenderContextHandle old_context = RenderResources::Instance()->get_current_context();
 #endif
-  
-  if ( !Core::RenderResources::Instance()->create_render_context( this->private_->context_ ) )
-  {
-    CORE_THROW_EXCEPTION( "Failed to create a valid rendering context" );
-  }
   
   // Make the GL context current. In multi-threaded rendering mode,
   // this call is only needed once.
