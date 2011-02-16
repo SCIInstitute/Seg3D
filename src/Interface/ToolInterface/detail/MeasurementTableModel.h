@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_TOOLINTERFACE_MEASUREMENTSTABLEMODEL_H
-#define INTERFACE_TOOLINTERFACE_MEASUREMENTSTABLEMODEL_H
+#ifndef INTERFACE_TOOLINTERFACE_MEASUREMENTTABLEMODEL_H
+#define INTERFACE_TOOLINTERFACE_MEASUREMENTTABLEMODEL_H
 
 // QT Includes
 #include <QtCore/QAbstractTableModel>
@@ -37,19 +37,29 @@
 // Application includes
 #include <Application/Tools/MeasurementTool.h>
 
+// Core includes
+#include <Core/Utils/EnumClass.h>
+
 namespace Seg3D
 {
 
-enum MeasurementColumns
-{
-  MEASUREMENT_VISIBLE_E, 
-  MEASUREMENT_LENGTH_E,
-  MEASUREMENT_NOTE_E
-};
+CORE_ENUM_CLASS 
+(
+  MeasurementColumns,
+  VISIBLE_E, 
+  LENGTH_E,
+  NOTE_E
+)
+
+// Hide header includes, private interface and implementation
+class MeasurementTableModelPrivate;
+typedef boost::shared_ptr< MeasurementTableModelPrivate > MeasurementTableModelPrivateHandle;
 
 class MeasurementTableModel : public QAbstractTableModel
 {
   Q_OBJECT
+
+  friend class MeasurementTableModelPrivate;
 
 public:
   MeasurementTableModel( MeasurementToolHandle measurement_tool, QObject* parent = 0 );
@@ -82,27 +92,44 @@ public:
   // Update only table cells, not table dimensions.
   void update_cells();
 
+  // REMOVE_ROWS:
+  // Remove measurements with specified row indices.
   void remove_rows( const std::vector< int >& rows );
   
+  // GET_ACTIVE_NOTE:
+  // Get note for active measurement.
   QString get_active_note() const;
+
+  // SET_ACTIVE_NOTE:
+  // Set note for active measurement.
   void set_active_note( const QString & note );
-  // Returns -1 if there are no measurements
+
+  // GET_ACTIVE_INDEX:
+  // Return row index of active measurement. Returns -1 if there are no measurements.
   int get_active_index() const; // Public because QTableView needs to scroll to this
   
 Q_SIGNALS:
+  // ACTIVE_NOTE_CHANGED:
+  // Note for active measurement changed.
   void active_note_changed( const QString & note ) const;
 
 private Q_SLOTS:
+
+  // HANDLE_CLICK:
+  // Handler for when table cells are clicked.
   void handle_click( const QModelIndex & index );
+
+  // HANDLE_SELECTED:
+  // Handler for when table cells are selected.
   void handle_selected( const QItemSelection & selected );
+
+  // SAVE_ACTIVE_NOTE:
+  // Save cached active note to state vector.  Avoids saving to state vector and triggering
+  // updates on every keystroke.
   void save_active_note();
 
 private:
-  void set_active_index( int active_index );
-
-  std::string cached_active_note_;
-  bool use_cached_active_note_;
-  MeasurementToolHandle measurement_tool_;
+  MeasurementTableModelPrivateHandle private_;
 };
 
 } // end namespace Seg3D

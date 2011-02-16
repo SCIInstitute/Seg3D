@@ -80,9 +80,6 @@ public:
   Core::StateMeasurementVectorHandle measurements_state_;
   Core::StateIntHandle active_index_state_;
 
-public:
-  static const int INVALID_ACTIVE_INDEX_C;
-
 private:
   MeasurementToolPrivateHandle private_;
 };

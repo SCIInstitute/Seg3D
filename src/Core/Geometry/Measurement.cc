@@ -39,6 +39,90 @@ namespace Core
 
 const std::string Measurement::NOTE_DELIMITER_C = " NOTE_END]]";
 
+Measurement::Measurement( bool visible, std::string label, std::string note, 
+  Core::Point p1, Core::Point p2, MeasureSliceType view_axis ) : 
+  visible_( visible ), 
+  label_( label ), 
+  note_( note ), 
+  p1_( p1 ), 
+  p2_( p2 ), 
+  slice_type_( view_axis )
+{
+}
+
+Measurement::Measurement() :
+  visible_( false ), 
+  label_( "" ), 
+  note_( "" ), 
+  slice_type_( MeasureSliceType::NOVIEW_E )
+{
+}
+
+bool Measurement::get_visible() const
+{
+  return this->visible_;
+}
+
+void Measurement::set_visible( bool visible )
+{
+  this->visible_ = visible;
+}
+
+std::string Measurement::get_label() const
+{
+  return this->label_;
+}
+
+void Measurement::set_label( std::string label )
+{
+  this->label_ = label;
+}
+
+double Measurement::get_length() const
+{
+  return ( this->p2_ - this->p1_ ).length();
+}
+
+std::string Measurement::get_note() const
+{
+  return this->note_;
+}
+
+void Measurement::set_note( std::string note )
+{
+  this->note_ = note;
+}
+
+Core::Point Measurement::get_point1() const
+{
+  return this->p1_;
+}
+
+void Measurement::set_point1( Core::Point p1 )
+{
+  this->p1_ = p1;
+}
+
+Core::Point Measurement::get_point2() const
+{
+  return this->p2_;
+}
+
+void Measurement::set_point2( Core::Point p2 )
+{
+  this->p2_ = p2;
+}
+
+MeasureSliceType Measurement::get_slice_type() const
+{
+  return this->slice_type_;
+}
+
+void Measurement::set_slice_type( MeasureSliceType view_axis )
+{
+  this->slice_type_ = view_axis;
+}
+
 std::string ExportToString( const Measurement& value )
 {
   // Need to use special delimiter for note since any characters are allowed in a note,
@@ -62,7 +146,18 @@ std::string ExportToString( const std::vector< Measurement >& value )
 bool ImportFromString( const std::string& str, Measurement& value )
 {
   // Example string: [true M1 [0 0 0] [1 1 1] [Knee NOTE_END]]
-  boost::regex reg( "(\\[)(\\w*)(\\s)(\\w*)(\\s)(\\[[^\\]]*])(\\s)(\\[[^\\]]*])(\\s)(\\[)(.*?)(\\sNOTE_END\\]\\])" );
+  std::string open_bracket_reg = "(\\[)";
+  std::string word_reg = "(\\w*)";
+  std::string visible_reg = word_reg;
+  std::string space_reg = "(\\s)";
+  std::string label_reg = word_reg;
+  std::string point_reg = "(\\[[^\\]]*])";
+  std::string note_reg = "(.*?)";
+  std::string note_end_reg = "(\\sNOTE_END\\]\\])";
+  std::string full_reg = open_bracket_reg + visible_reg + space_reg + label_reg + space_reg + 
+    point_reg + space_reg + point_reg + space_reg + open_bracket_reg + note_reg + 
+    note_end_reg;
+  boost::regex reg( full_reg );
   boost::smatch m;
   std::string matched_string = "";
   if( boost::regex_match( str, m, reg ) ) 
@@ -100,5 +195,6 @@ bool ImportFromString( const std::string& str, std::vector< Measurement >& value
   }
   return true;
 }
+
 
 } // end namespace Core

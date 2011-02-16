@@ -45,7 +45,7 @@ namespace Seg3D
 MeasurementTableView::MeasurementTableView( QWidget* parent ) : 
   QTableView( parent )
 {
-  this->setItemDelegate( new MeasurementTextDelegate( MEASUREMENT_NOTE_E ) ); // Custom text editor for note column
+  this->setItemDelegate( new MeasurementTextDelegate( MeasurementColumns::NOTE_E ) ); // Custom text editor for note column
   this->horizontalHeader()->setStretchLastSection( true ); // Stretch note section
 
   this->delete_action_ = new QAction( tr( "&Delete" ), this );
@@ -97,7 +97,7 @@ void MeasurementTableView::scroll_to_active_index()
   MeasurementTableModel* model = 
     qobject_cast< MeasurementTableModel* >( this->model() );
   int active_index = model->get_active_index();
-  if( active_index != MeasurementTool::INVALID_ACTIVE_INDEX_C )
+  if( active_index != -1 )
   {
     this->scrollTo( model->index( active_index, 0 ) );
   }
@@ -124,7 +124,7 @@ void MeasurementTableView::get_deletion_candidates( std::vector< int >& deletion
   else // No rows are selected -- delete active measurement
   {
     int active_index = model->get_active_index();
-    if( active_index != MeasurementTool::INVALID_ACTIVE_INDEX_C )
+    if( active_index != -1 )
     {
       deletion_candidates.push_back( active_index );
     }
@@ -187,16 +187,16 @@ void MeasurementTableView::copy() const
   else // No cells are selected -- copy active measurement
   {
     int active_index = model->get_active_index();
-    if( active_index != MeasurementTool::INVALID_ACTIVE_INDEX_C )
+    if( active_index != -1 )
     {
       QString header_text = 
         model->headerData( active_index, Qt::Vertical, Qt::DisplayRole ).toString();
       selected_text.append( header_text );
       selected_text.append( QLatin1Char('\t') ); 
-      selected_text.append( model->data( model->index( active_index, MEASUREMENT_LENGTH_E ), 
-        Qt::DisplayRole ).toString() ); 
+      selected_text.append( model->data( model->index( active_index, 
+        MeasurementColumns::LENGTH_E ), Qt::DisplayRole ).toString() ); 
       selected_text.append( QLatin1Char('\t') ); 
-      QString note = model->data( model->index( active_index, MEASUREMENT_NOTE_E ), 
+      QString note = model->data( model->index( active_index, MeasurementColumns::NOTE_E ), 
         Qt::DisplayRole ).toString();
       selected_text.append( this->remove_line_breaks( note ) ); 
       selected_text.append( QLatin1Char('\n') );

@@ -144,8 +144,7 @@ void MeasurementToolInterface::UpdateMeasurementModel( qpointer_type measurement
 
     // Enable widgets only if measurements exist and active index is valid
     if( measurement_interface->private_->table_model_->rowCount( QModelIndex() ) > 0 &&
-      measurement_interface->private_->table_model_->get_active_index() != 
-      MeasurementTool::INVALID_ACTIVE_INDEX_C )
+      measurement_interface->private_->table_model_->get_active_index() != -1 )
     {
       measurement_interface->private_->ui_.table_view_->setEnabled( true );
       measurement_interface->private_->ui_.note_textbox_->setEnabled( true );

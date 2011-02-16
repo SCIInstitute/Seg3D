@@ -66,19 +66,16 @@ void MeasurementToolPrivate::update_active_index()
   {
     // If the active index isn't in the valid range, set to end of list
     int active_index = this->tool_->get_active_index();
-    if( active_index == MeasurementTool::INVALID_ACTIVE_INDEX_C || 
-      active_index >= num_measurements )
+    if( active_index == -1 || active_index >= static_cast< int >( num_measurements ) )
     {
       this->tool_->set_active_index( static_cast< int >( num_measurements ) - 1 );
     }
   }
   else
   {
-    this->tool_->set_active_index( MeasurementTool::INVALID_ACTIVE_INDEX_C );
+    this->tool_->set_active_index( -1 );
   }
 }
-
-const int MeasurementTool::INVALID_ACTIVE_INDEX_C = -1;
 
 //void create_test_data( std::vector< Core::Measurement >& measurements )
 //{
@@ -117,7 +114,7 @@ MeasurementTool::MeasurementTool( const std::string& toolid ) :
 
   // State variable gets allocated here
   this->add_state( "measurements", this->measurements_state_ );
-  this->add_state( "active_index", this->active_index_state_, INVALID_ACTIVE_INDEX_C );
+  this->add_state( "active_index", this->active_index_state_, -1 );
 
   this->add_connection( this->measurements_state_->state_changed_signal_.connect( 
     boost::bind( &MeasurementToolPrivate::update_active_index, this->private_ ) ) );

@@ -33,82 +33,99 @@
 #include <string>
 #include <vector>
 
-// Boost includes
-#include <boost/thread.hpp>
-#include <boost/utility.hpp> // Needed for noncopyable
-
 // Core includes
 #include <Core/Geometry/Point.h>
-#include <Core/Utils/Singleton.h>
+#include <Core/Utils/EnumClass.h>
 
 namespace Core
 {
 
-enum ViewAxis {
+CORE_ENUM_CLASS 
+( 
+  MeasureSliceType,
   AXIAL_E,
   CORONAL_E,
   SAGITTAL_E,
-  VOLUME_E,
-  MIP_E,
-  OBLIQUE_E,
   NOVIEW_E
-};
+)
 
 //=============================================================================
 // Class: Measurement
 //=============================================================================
 
-// This class may need to be modified when we complete the state design across layers.  For now
-// this class stores test data for display in the Measurements tool panel.
 class Measurement 
 {
 public:
 
   Measurement( bool visible, std::string label, std::string note, Core::Point p1, Core::Point p2, 
-    ViewAxis view_axis, int slice_num, int slice_thickness, std::string oblique_name = "" ) : 
-    visible_( visible ), 
-    label_( label ), 
-    note_( note ), 
-    p1_( p1 ), 
-    p2_( p2 ), 
-    view_axis_( view_axis )
-  {}
-  Measurement() :
-    visible_( false ), 
-    label_( "" ), 
-    note_( "" ), 
-    view_axis_( NOVIEW_E ) {}
+    MeasureSliceType slice_type );
+  Measurement();
 
-  // DESIGN NOTE: Originally I made a virtual destructor out of habit.  But since this is not
-  // designed to be a base class, should not make destructor virtual in order to avoid cost of
-  // vtable.  Because this class contains no dynamically allocated memory, can use default 
-  // destructor.
+  // GET_VISIBLE:
+  // Get whether this measurement is visible.
+  bool get_visible() const;
 
-  // DESIGN NOTE: Using const for member functions that don't modify member data
-  bool      get_visible() const { return visible_; }
-  void      set_visible( bool visible ) { visible_ = visible; } // User-editable
-  std::string   get_label() const { return label_; } 
-  void      set_label( std::string label ) { label_ = label; }
-  double      get_length() const { return (p2_ - p1_).length(); }
-  std::string   get_note() const { return note_; }
-  void      set_note( std::string note ) { note_ = note; } // User-editable
-  Core::Point   get_point1() const { return p1_; }
-  void      set_point1( Core::Point p1 ) { p1_ = p1; }
-  Core::Point   get_point2() const { return p2_; }
-  void      set_point2( Core::Point p2 ) { p2_ = p2; } // P2 moves during measurement creation
-  ViewAxis    get_view_axis() const { return view_axis_; }
-  void      set_view_axis( ViewAxis view_axis ) { view_axis_ = view_axis; }
+  // SET_VISIBLE:
+  // Set whether this measurement is visible.  User-editable.
+  void set_visible( bool visible ); 
+
+  // GET_LABEL:
+  // Get short label to be rendered above measurement line.
+  std::string get_label() const; 
+
+  // SET_LABEL:
+  // Set short label to be rendered above measurement line.
+  void set_label( std::string label );
+
+  // GET_LENGTH:
+  // Get length of measurement
+  double get_length() const;
+
+  // GET_NOTE:
+  // Get user-editable description of measurement.  
+  // May contain any characters including line breaks.
+  std::string get_note() const;
+
+  // SET_NOTE:
+  // Set user-editable description of measurement.
+  // May contain any characters including line breaks.
+  void set_note( std::string note ); 
+
+  // GET_POINT1:
+  // Get 3D world coordinate of 1st point
+  Core::Point get_point1() const;
+
+  // SET_POINT1:
+  // Set 3D world coordinate of 1st point
+  void set_point1( Core::Point p1 );
+
+  // GET_POINT2:
+  // Get 3D world coordinate of 2nd point
+  Core::Point get_point2() const;
+
+  // SET_POINT2:
+  // Set 3D world coordinate of 2nd point
+  void set_point2( Core::Point p2 ); // P2 moves during measurement creation
+
+  // GET_VIEW_AXIS:
+  // Get type of slice (axial, sagittal, coronal) where measurement was made.  This is needed
+  // to facilitate jumping to the measurement.
+  MeasureSliceType get_slice_type() const;
+
+  // SET_VIEW_AXIS:
+  // Set type of slice (axial, sagittal, coronal) where measurement was made.
+  void set_slice_type( MeasureSliceType slice_type );
 
   inline bool operator==( const Measurement& ) const;
   inline bool operator!=( const Measurement& ) const;
 
 private:
-  bool      visible_;
-  std::string   label_; // Unique ID
-  std::string   note_;
-  Core::Point   p1_; // 3D world coordinate of 1st point
-  Core::Point   p2_; // 3D world coordinate of 2nd point
-  ViewAxis    view_axis_;
+  bool visible_;
+  std::string label_; // Unique ID
+  std::string note_;
+  Core::Point p1_; // 3D world coordinate of 1st point
+  Core::Point p2_; // 3D world coordinate of 2nd point
+  MeasureSliceType slice_type_;
 
 public:
   static const std::string NOTE_DELIMITER_C;
@@ -116,12 +133,12 @@ public:
 
 inline bool Measurement::operator==( const Measurement& m ) const
 {
-  return ( this->p1_ == m.p1_ && this->p2_ == m.p2_ && this->view_axis_ == m.view_axis_ );
+  return ( this->p1_ == m.p1_ && this->p2_ == m.p2_ && this->slice_type_ == m.slice_type_ );
 }
 
 inline bool Measurement::operator!=( const Measurement& m ) const
 {
-  return ( this->p1_ != m.p1_ || this->p2_ != m.p2_ || this->view_axis_ != m.view_axis_ );
+  return ( this->p1_ != m.p1_ || this->p2_ != m.p2_ || this->slice_type_ != m.slice_type_ );
 }
 
 std::string ExportToString( const Measurement& value );
