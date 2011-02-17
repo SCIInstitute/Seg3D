@@ -89,6 +89,18 @@ bool CropToolInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Connect( this->private_->ui_.crop_height_, tool->cropbox_size_state_[ 1 ] );
   QtUtils::QtBridge::Connect( this->private_->ui_.crop_depth_, tool->cropbox_size_state_[ 2 ] );
 
+  QtUtils::QtBridge::Connect( this->private_->ui_.crop_origin_index_x_, tool->cropbox_origin_index_state_[ 0 ] );
+  QtUtils::QtBridge::Connect( this->private_->ui_.crop_origin_index_y_, tool->cropbox_origin_index_state_[ 1 ] );
+  QtUtils::QtBridge::Connect( this->private_->ui_.crop_origin_index_z_, tool->cropbox_origin_index_state_[ 2 ] );
+
+  QtUtils::QtBridge::Connect( this->private_->ui_.crop_index_width_, tool->cropbox_size_index_state_[ 0 ] );
+  QtUtils::QtBridge::Connect( this->private_->ui_.crop_index_height_, tool->cropbox_size_index_state_[ 1 ] );
+  QtUtils::QtBridge::Connect( this->private_->ui_.crop_index_depth_, tool->cropbox_size_index_state_[ 2 ] );
+
+  QtUtils::QtBridge::Connect( this->private_->ui_.crop_index_checkbox_, tool->crop_in_index_space_state_ );
+  QtUtils::QtBridge::Show( this->private_->ui_.crop_world_widget_, tool->crop_in_index_space_state_, true );
+  QtUtils::QtBridge::Show( this->private_->ui_.crop_index_widget_, tool->crop_in_index_space_state_ );
+
   QtUtils::QtBridge::Connect( this->private_->ui_.replace_checkbox_, tool->replace_state_ );
 
   QtUtils::QtBridge::Connect( this->private_->ui_.crop_button_, boost::bind(

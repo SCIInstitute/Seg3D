@@ -57,7 +57,11 @@ public:
 
   void handle_target_group_changed();
   void handle_cropbox_origin_changed( int index, double value, Core::ActionSource source );
+  void handle_cropbox_size_changed( int index, double value );
   void handle_cropbox_changed( Core::ActionSource source );
+
+  void handle_cropbox_origin_index_changed( int index, int value );
+  void handle_cropbox_size_index_changed( int index, int value );
 
   void hit_test( ViewerHandle viewer, int x, int y );
   void update_cursor( ViewerHandle viewer );
@@ -110,6 +114,16 @@ void CropToolPrivate::handle_target_group_changed()
   this->tool_->cropbox_size_state_[ 2 ]->set_range( 0, 
     end[ 2 ] - this->tool_->cropbox_origin_state_[ 2 ]->get() );
 
+  this->tool_->cropbox_origin_index_state_[ 0 ]->set_range( 0, nx - 1 );
+  this->tool_->cropbox_origin_index_state_[ 1 ]->set_range( 0, ny - 1 );
+  this->tool_->cropbox_origin_index_state_[ 2 ]->set_range( 0, nz - 1 );
+  this->tool_->cropbox_size_index_state_[ 0 ]->set_range( 1,
+    nx - this->tool_->cropbox_origin_index_state_[ 0 ]->get() );
+  this->tool_->cropbox_size_index_state_[ 1 ]->set_range( 1,
+    ny - this->tool_->cropbox_origin_index_state_[ 1 ]->get() );
+  this->tool_->cropbox_size_index_state_[ 2 ]->set_range( 1,
+    nz - this->tool_->cropbox_origin_index_state_[ 2 ]->get() );
+
   state_lock.unlock();
   ViewerManager::Instance()->update_2d_viewers_overlay();
 }
@@ -130,22 +144,124 @@ void CropToolPrivate::handle_cropbox_origin_changed( int index, double value,
   {
     return;
   }
-  
+
   // NOTE: Lock the state engine because the following changes need to be atomic
   Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
+
+  const std::string& group_id = this->tool_->target_group_state_->get();
+  if ( group_id == "" || group_id == Tool::NONE_OPTION_C )
+  {
+    return;
+  }
+
+  LayerGroupHandle layer_group = LayerManager::Instance()->get_layer_group( group_id );
+  const Core::GridTransform& grid_trans = layer_group->get_grid_transform();
+  Core::Transform inv_trans = grid_trans.get_inverse();
+  Core::Point origin( 0, 0, 0 );
+  origin[ index ] = value;
+  Core::Point origin_index = inv_trans * origin;
+  int crop_index = Core::Round( origin_index[ index ] );
 
   Core::ScopedCounter signal_block( this->signal_block_count_ );
 
   double min_val, max_val;
   this->tool_->cropbox_origin_state_[ index ]->get_range( min_val, max_val );
-  double min_size, max_size, size;
+  double min_size, max_size;
   this->tool_->cropbox_size_state_[ index ]->get_range( min_size, max_size );
-  size = this->tool_->cropbox_size_state_[ index ]->get();
   this->tool_->cropbox_size_state_[ index ]->set_range( 0, max_val - value );
   if ( source == Core::ActionSource::INTERFACE_MOUSE_E )
   {
+    double size = this->tool_->cropbox_size_state_[ index ]->get();
     this->tool_->cropbox_size_state_[ index ]->set( size + max_val - value - max_size );  
   }
+
+  this->tool_->cropbox_origin_index_state_[ index ]->set( crop_index );
+  this->tool_->cropbox_size_index_state_[ index ]->set_range( 1,
+    this->tool_->input_dimensions_state_[ index ]->get() -
+    this->tool_->cropbox_origin_index_state_[ index ]->get() );
+  Core::Point end( 0, 0, 0 );
+  end[ index ] = value + this->tool_->cropbox_size_state_[ index ]->get();
+  end = inv_trans * end;
+  this->tool_->cropbox_size_index_state_[ index ]->set( Core::Round( end[ index ] ) - crop_index + 1 );
+}
+
+void CropToolPrivate::handle_cropbox_size_changed( int index, double value )
+{
+  if ( this->signal_block_count_ > 0 )
+  {
+    return;
+  }
+  
+  const std::string& group_id = this->tool_->target_group_state_->get();
+  if ( group_id == "" || group_id == Tool::NONE_OPTION_C )
+  {
+    return;
+  }
+
+  LayerGroupHandle layer_group = LayerManager::Instance()->get_layer_group( group_id );
+  const Core::GridTransform& grid_trans = layer_group->get_grid_transform();
+  Core::Transform inv_trans = grid_trans.get_inverse();
+  Core::Point end( 0, 0, 0 );
+  end[ index ] = this->tool_->cropbox_origin_state_[ index ]->get() + value;
+  end = inv_trans * end;
+
+  Core::ScopedCounter signal_block( this->signal_block_count_ );
+  this->tool_->cropbox_size_index_state_[ index ]->set( Core::Round( end[ index ] ) - 
+    this->tool_->cropbox_origin_index_state_[ index ]->get() + 1 );
+}
+
+void CropToolPrivate::handle_cropbox_origin_index_changed( int index, int value )
+{
+  if ( this->signal_block_count_ > 0 )
+  {
+    return;
+  }
+  
+  const std::string& group_id = this->tool_->target_group_state_->get();
+  if ( group_id == "" || group_id == Tool::NONE_OPTION_C )
+  {
+    return;
+  }
+
+  LayerGroupHandle layer_group = LayerManager::Instance()->get_layer_group( group_id );
+  const Core::GridTransform& grid_trans = layer_group->get_grid_transform();
+  Core::Point origin( 0, 0, 0 );
+  origin[ index ] = value;
+  origin = grid_trans * origin;
+
+  Core::ScopedCounter signal_block( this->signal_block_count_ );
+
+  this->tool_->cropbox_origin_state_[ index ]->set( origin[ index ] );
+  this->tool_->cropbox_size_index_state_[ index ]->set_range( 1,
+    this->tool_->input_dimensions_state_[ index ]->get() - value );
+
+  Core::Point end( 0, 0, 0 );
+  end[ index ] = value + this->tool_->cropbox_size_index_state_[ index ]->get() - 1;
+  end = grid_trans * end;
+  this->tool_->cropbox_size_state_[ index ]->set_range( 0, end[ index ] - origin[ index ] );
+}
+
+void CropToolPrivate::handle_cropbox_size_index_changed( int index, int value )
+{
+  if ( this->signal_block_count_ > 0 )
+  {
+    return;
+  }
+
+  const std::string& group_id = this->tool_->target_group_state_->get();
+  if ( group_id == "" || group_id == Tool::NONE_OPTION_C )
+  {
+    return;
+  }
+
+  LayerGroupHandle layer_group = LayerManager::Instance()->get_layer_group( group_id );
+  const Core::GridTransform& grid_trans = layer_group->get_grid_transform();
+  Core::Point end( 0, 0, 0 );
+  end[ index ] = this->tool_->cropbox_origin_index_state_[ index ]->get() + value - 1;
+  end = grid_trans * end;
+  Core::ScopedCounter signal_block( this->signal_block_count_ );
+  this->tool_->cropbox_size_state_[ index ]->set( end[ index ] -
+    this->tool_->cropbox_origin_state_[ index ]->get() );
 }
 
 void CropToolPrivate::hit_test( ViewerHandle viewer, int x, int y )
@@ -362,15 +478,24 @@ CropTool::CropTool( const std::string& toolid ) :
   this->private_->signal_block_count_ = 0;
   this->private_->resizing_ = false;
 
+  double inf = std::numeric_limits< double >::infinity();
+  int max_int = std::numeric_limits< int >::max();
   this->add_state( "input_x", this->input_dimensions_state_[ 0 ], 0 );
   this->add_state( "input_y", this->input_dimensions_state_[ 1 ], 0 );
   this->add_state( "input_z", this->input_dimensions_state_[ 2 ], 0 );
-  this->add_state( "crop_origin_x", this->cropbox_origin_state_[ 0 ], -1000.0, -1000.0, 1000.0, 0.01 );
-  this->add_state( "crop_origin_y", this->cropbox_origin_state_[ 1 ], -1000.0, -1000.0, 1000.0, 0.01 );
-  this->add_state( "crop_origin_z", this->cropbox_origin_state_[ 2 ], -1000.0, -1000.0, 1000.0, 0.01 );
-  this->add_state( "crop_width", this->cropbox_size_state_[ 0 ], 1000.0, 0.0, 1000.0, 0.01 );
-  this->add_state( "crop_height", this->cropbox_size_state_[ 1 ], 1000.0, 0.0, 1000.0, 0.01 );
-  this->add_state( "crop_depth", this->cropbox_size_state_[ 2 ], 1000.0, 0.0, 1000.0, 0.01 );
+  this->add_state( "crop_origin_x", this->cropbox_origin_state_[ 0 ], -inf, -inf, inf, 0.01 );
+  this->add_state( "crop_origin_y", this->cropbox_origin_state_[ 1 ], -inf, -inf, inf, 0.01 );
+  this->add_state( "crop_origin_z", this->cropbox_origin_state_[ 2 ], -inf, -inf, inf, 0.01 );
+  this->add_state( "crop_width", this->cropbox_size_state_[ 0 ], inf, 0.0, inf, 0.01 );
+  this->add_state( "crop_height", this->cropbox_size_state_[ 1 ], inf, 0.0, inf, 0.01 );
+  this->add_state( "crop_depth", this->cropbox_size_state_[ 2 ], inf, 0.0, inf, 0.01 );
+  this->add_state( "crop_origin_index_x", this->cropbox_origin_index_state_[ 0 ], 0, 0, max_int, 1 );
+  this->add_state( "crop_origin_index_y", this->cropbox_origin_index_state_[ 1 ], 0, 0, max_int, 1 );
+  this->add_state( "crop_origin_index_z", this->cropbox_origin_index_state_[ 2 ], 0, 0, max_int, 1 );
+  this->add_state( "crop_width_index", this->cropbox_size_index_state_[ 0 ], max_int, 1, max_int, 1 );
+  this->add_state( "crop_height_index", this->cropbox_size_index_state_[ 1 ], max_int, 1, max_int, 1 );
+  this->add_state( "crop_depth_index", this->cropbox_size_index_state_[ 2 ], max_int, 1, max_int, 1 );
+  this->add_state( "crop_in_index", this->crop_in_index_space_state_, true );
 
   this->add_state( "replace", this->replace_state_, false );
 
@@ -384,6 +509,16 @@ CropTool::CropTool( const std::string& toolid ) :
     this->add_connection( this->cropbox_origin_state_[ i ]->value_changed_signal_.connect(
       boost::bind( &CropToolPrivate::handle_cropbox_changed, this->private_, _2 ) ) );
     this->add_connection( this->cropbox_size_state_[ i ]->value_changed_signal_.connect(
+      boost::bind( &CropToolPrivate::handle_cropbox_size_changed, this->private_, i, _1 ) ) );
+    this->add_connection( this->cropbox_size_state_[ i ]->value_changed_signal_.connect(
+      boost::bind( &CropToolPrivate::handle_cropbox_changed, this->private_, _2 ) ) );
+    this->add_connection( this->cropbox_origin_index_state_[ i ]->value_changed_signal_.connect(
+      boost::bind( &CropToolPrivate::handle_cropbox_origin_index_changed, this->private_, i, _1 ) ) );
+    this->add_connection( this->cropbox_origin_index_state_[ i ]->value_changed_signal_.connect(
+      boost::bind( &CropToolPrivate::handle_cropbox_changed, this->private_, _2 ) ) );
+    this->add_connection( this->cropbox_size_index_state_[ i ]->value_changed_signal_.connect(
+      boost::bind( &CropToolPrivate::handle_cropbox_size_index_changed, this->private_, i, _1 ) ) );
+    this->add_connection( this->cropbox_size_index_state_[ i ]->value_changed_signal_.connect(
       boost::bind( &CropToolPrivate::handle_cropbox_changed, this->private_, _2 ) ) );
   }
   
@@ -571,6 +706,9 @@ void CropTool::reset()
     this->cropbox_origin_state_[ i ]->set( min_val );
     this->cropbox_size_state_[ i ]->set_range( 0, max_val - min_val );
     this->cropbox_size_state_[ i ]->set( max_val - min_val );
+    this->cropbox_origin_index_state_[ i ]->set( 0 );
+    this->cropbox_size_index_state_[ i ]->set_range( 1, this->input_dimensions_state_[ i ]->get() );
+    this->cropbox_size_index_state_[ i ]->set( this->input_dimensions_state_[ i ]->get() );
   }
 
   state_lock.unlock();

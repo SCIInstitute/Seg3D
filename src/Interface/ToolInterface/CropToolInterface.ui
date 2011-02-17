@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>248</width>
-    <height>424</height>
+    <height>624</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -307,7 +307,7 @@
        <number>4</number>
       </property>
       <item>
-       <widget class="QTabWidget" name="tab_widget_">
+       <widget class="QTabWidget" name="crop_world_widget_">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
           <horstretch>0</horstretch>
@@ -496,7 +496,179 @@
        </widget>
       </item>
       <item>
+       <widget class="QTabWidget" name="crop_index_widget_">
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <widget class="QWidget" name="tab_3">
+         <attribute name="title">
+          <string>Origin</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_16">
+          <property name="spacing">
+           <number>2</number>
+          </property>
+          <property name="margin">
+           <number>4</number>
+          </property>
+          <item>
+           <widget class="QWidget" name="widget_13" native="true">
+            <layout class="QVBoxLayout" name="verticalLayout_15">
+             <property name="spacing">
+              <number>2</number>
+             </property>
+             <property name="margin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="x_label_1">
+               <property name="text">
+                <string>X:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QtUtils::QtSliderIntCombo" name="crop_origin_index_x_" native="true"/>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QWidget" name="widget_4" native="true">
+            <layout class="QVBoxLayout" name="verticalLayout_14">
+             <property name="spacing">
+              <number>2</number>
+             </property>
+             <property name="margin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="y_label_1">
+               <property name="text">
+                <string>Y:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QtUtils::QtSliderIntCombo" name="crop_origin_index_y_" native="true"/>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QWidget" name="widget_12" native="true">
+            <layout class="QVBoxLayout" name="verticalLayout_13">
+             <property name="spacing">
+              <number>2</number>
+             </property>
+             <property name="margin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="z_label_1">
+               <property name="text">
+                <string>Z:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QtUtils::QtSliderIntCombo" name="crop_origin_index_z_" native="true"/>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tab_4">
+         <attribute name="title">
+          <string>Size</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_20">
+          <property name="spacing">
+           <number>2</number>
+          </property>
+          <property name="margin">
+           <number>4</number>
+          </property>
+          <item>
+           <widget class="QWidget" name="widget_17" native="true">
+            <layout class="QVBoxLayout" name="verticalLayout_19">
+             <property name="spacing">
+              <number>2</number>
+             </property>
+             <property name="margin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="width_label_1">
+               <property name="text">
+                <string>Width:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QtUtils::QtSliderIntCombo" name="crop_index_width_" native="true"/>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QWidget" name="widget_15" native="true">
+            <layout class="QVBoxLayout" name="verticalLayout_17">
+             <property name="spacing">
+              <number>2</number>
+             </property>
+             <property name="margin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="height_label_1">
+               <property name="text">
+                <string>Height:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QtUtils::QtSliderIntCombo" name="crop_index_height_" native="true"/>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QWidget" name="widget_16" native="true">
+            <layout class="QVBoxLayout" name="verticalLayout_18">
+             <property name="spacing">
+              <number>2</number>
+             </property>
+             <property name="margin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="depth_label_1">
+               <property name="text">
+                <string>Depth:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QtUtils::QtSliderIntCombo" name="crop_index_depth_" native="true"/>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+      </item>
+      <item>
        <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QCheckBox" name="crop_index_checkbox_">
+          <property name="text">
+           <string>Crop in index space</string>
+          </property>
+         </widget>
+        </item>
         <item>
          <spacer name="horizontalSpacer">
           <property name="orientation">
@@ -633,6 +805,12 @@ QWidget#message_alert_{
    <class>QtUtils::QtSliderDoubleCombo</class>
    <extends>QWidget</extends>
    <header location="global">QtUtils/Widgets/QtSliderDoubleCombo.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QtUtils::QtSliderIntCombo</class>
+   <extends>QWidget</extends>
+   <header location="global">QtUtils/Widgets/QtSliderIntCombo.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

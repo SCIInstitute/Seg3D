@@ -103,6 +103,9 @@ public:
   Core::StateIntHandle input_dimensions_state_[ 3 ];
   Core::StateRangedDoubleHandle cropbox_origin_state_[ 3 ];
   Core::StateRangedDoubleHandle cropbox_size_state_[ 3 ];
+  Core::StateRangedIntHandle cropbox_origin_index_state_[ 3 ];
+  Core::StateRangedIntHandle cropbox_size_index_state_[ 3 ];
+  Core::StateBoolHandle crop_in_index_space_state_;
   Core::StateBoolHandle replace_state_;
 
 private:
