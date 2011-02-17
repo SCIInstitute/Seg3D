@@ -300,7 +300,7 @@ bool GDCMLayerImporter::import_header()
   this->private_->x_spacing_ = spacing[ 0 ];
   this->private_->y_spacing_ = spacing[ 1 ];
   
-  if ( spacing[ 2 ] == 1.0 )
+//  if ( spacing[ 2 ] == 1.0 )
   {
     gdcm::Tag slice_thickness_tag( 0x0018,0x0050 );
     gdcm::Tag patient_position_tag( 0x0020, 0x0032 );
@@ -353,10 +353,10 @@ bool GDCMLayerImporter::import_header()
       this->private_->z_spacing_ = 1.0;
     }
   }
-  else
-  {
-    this->private_->z_spacing_ = spacing[ 2 ];
-  }
+//  else
+//  {
+//    this->private_->z_spacing_ = spacing[ 2 ];
+//  }
 
   return true;
 }

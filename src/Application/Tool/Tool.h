@@ -244,7 +244,7 @@ public: \
     static int Version() { return GetToolInfo()->get_version(); } \
   static Seg3D::ToolInfoHandle GetToolInfo() \
   {\
-    static bool initialized; \
+    static bool initialized = false; \
     static Seg3D::ToolInfoHandle info; \
     if ( !initialized ) \
     {\
