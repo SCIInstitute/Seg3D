@@ -46,22 +46,31 @@ namespace Seg3D
 
 bool ActionImportSeries::validate( Core::ActionContextHandle& context )
 {
-  boost::filesystem::path full_filename( filename_.value() );
-  
-  if ( !( boost::filesystem::exists ( full_filename ) ) )
+  if ( this->filenames_.value().size() == 0 )
   {
-    context->report_error( std::string( "File '" ) + this->filename_.value() +
-      "' does not exist." );
+    context->report_error( "No filenames provided" );
     return false;
   }
-
+  
+  boost::filesystem::path full_filename( filenames_.value()[ 0 ] );
+  
+  for ( size_t j = 0; j < this->filenames_.value().size(); j++ )
+  {
+    if ( !( boost::filesystem::exists ( full_filename ) ) )
+    {
+      context->report_error( std::string( "File '" ) + this->filenames_.value()[ j ] +
+        "' does not exist." );
+      return false;
+    }
+  }
+  
   if ( !this->layer_importer_ )
   {
-    if ( !( LayerIO::Instance()->create_importer( this->filename_.value(),  
+    if ( !( LayerIO::Instance()->create_importer( this->filenames_.value(),  
       this->layer_importer_, this->importer_.value() ) ) )
     {
       context->report_error( std::string( "Could not create importer with name '" ) +
-        this->importer_.value() + "' for file '" + this->filename_.value() + "'." );
+        this->importer_.value() + "." );
       return false;
     } 
   }
@@ -76,8 +85,8 @@ bool ActionImportSeries::validate( Core::ActionContextHandle& context )
 
   if ( !( this->layer_importer_->import_header() ) )
   {
-    context->report_error( std::string( "Could not interpret file '" +
-      this->filename_.value() + "' with importer '" + this->importer_.value() + "'" ) );
+    context->report_error( std::string( "Could not interpret files with importer '" 
+      + this->importer_.value() + "'" ) );
     return false;
   }
   
@@ -148,14 +157,14 @@ void ActionImportSeries::clear_cache()
   this->layer_importer_.reset();
 }
 
-Core::ActionHandle ActionImportSeries::Create( const std::string& filename, 
+Core::ActionHandle ActionImportSeries::Create( const std::vector<std::string>& filenames, 
   const std::string& mode, const std::string importer )
 {
   // Create new action
   ActionImportSeries* action = new ActionImportSeries;
   
   // Set action parameters
-  action->filename_.value() = filename;
+  action->filenames_.value() = filenames;
   action->mode_.value()   = mode;
   action->importer_.value() = importer;
     
@@ -173,7 +182,7 @@ Core::ActionHandle ActionImportSeries::Create( const LayerImporterHandle& import
   action->layer_importer_ = importer;
 
   // We need to fill in these to ensure the action can be replayed without the importer present
-  action->filename_.value() = importer->get_filename();
+  action->filenames_.value() = importer->get_file_list();
   action->mode_.value()     = ExportToString(mode);
   action->importer_.value() = importer->name();
 
@@ -181,8 +190,8 @@ Core::ActionHandle ActionImportSeries::Create( const LayerImporterHandle& import
   return Core::ActionHandle( action );
 }
 
-void ActionImportSeries::Dispatch( Core::ActionContextHandle context, const std::string& filename, 
-  const std::string& mode, const std::string importer )
+void ActionImportSeries::Dispatch( Core::ActionContextHandle context, 
+  const std::vector<std::string>& filename, const std::string& mode, const std::string importer )
 {
   Core::ActionDispatcher::PostAction( Create( filename, mode, importer ), context );
 }

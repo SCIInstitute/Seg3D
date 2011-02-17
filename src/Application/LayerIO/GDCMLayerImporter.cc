@@ -425,6 +425,11 @@ std::string GDCMLayerImporter::get_layer_name()
   return boost::filesystem::path( this->get_filename() ).parent_path().filename();
 }
 
+std::vector< std::string > GDCMLayerImporter::get_file_list()
+{
+  return this->private_->file_list_;
+}
+
 bool GDCMLayerImporter::set_file_list( const std::vector< std::string >& file_list )
 {
   this->private_->file_list_ = file_list;

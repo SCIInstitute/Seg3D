@@ -96,7 +96,27 @@ LayerIO::importer_types_type LayerIO::get_exporter_types()
   return exporter_types;
 }
 
-
+bool LayerIO::create_importer( const std::vector<std::string>& filenames, LayerImporterHandle& importer,
+    const std::string importername )
+{
+  // Step (1): clear out old results
+  importer.reset();
+  
+  if ( filenames.size() < 1 ) return false;
+  
+  if ( !this->create_importer( filenames[ 0 ], importer, importername ) )
+  {
+    return false;
+  }
+  
+  if ( ! importer->set_file_list( filenames ) )
+  {
+    importer.reset();
+    return false;
+  }
+  
+  return true;
+}
 
 bool LayerIO::create_importer( const std::string& filename, 
   LayerImporterHandle& importer,

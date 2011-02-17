@@ -432,6 +432,11 @@ ITKSeriesLayerImporter::ITKSeriesLayerImporter( const std::string& filename ) :
 {
 }
 
+std::vector< std::string > ITKSeriesLayerImporter::get_file_list()
+{
+  return this->private_->file_list_;
+}
+
 bool ITKSeriesLayerImporter::set_file_list( const std::vector< std::string >& file_list )
 {
   if ( file_list.size() )

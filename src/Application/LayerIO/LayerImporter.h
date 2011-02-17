@@ -201,8 +201,12 @@ public:
   // SET_FILE_LIST:
   // In the case where we are importing a series, this sets the list of files for the importer
   // to import.
-  virtual bool set_file_list( const std::vector< std::string >& file_list ){ return false; }
+  virtual bool set_file_list( const std::vector< std::string >& file_list );
 
+  // GET_FILE_LIST:
+  // Get the list stored in the importer.
+  virtual std::vector< std::string > get_file_list();
+  
   // -- Import the data as a specific type -- 
 public: 
   // IMPORT_LAYER

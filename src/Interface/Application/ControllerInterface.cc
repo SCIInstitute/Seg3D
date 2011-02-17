@@ -80,10 +80,14 @@ ControllerInterface::ControllerInterface( QWidget* parent ) :
   QtUtils::QtCustomDialog( parent ), 
   private_( new ControllerInterfacePrivate )
 {
-
   // Step 1: Setup the private structure and allocate all the needed structures
   private_->ui_.setupUi( this );
   private_->context_ = Core::ActionContextHandle( new ControllerContext( this ) );
+
+  // Update the title of the dialog
+  std::string title = std::string( "Controller - "  )
+    + Core::Application::GetApplicationNameAndVersion();
+  this->setWindowTitle( QString::fromStdString( title ) );
   
   // Step 1.5: Remove the help button and set the icon because removing the button can occasionaly
   // cause problems with it

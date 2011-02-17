@@ -88,6 +88,10 @@ public:
   // before import_layer is called.
   virtual bool set_file_list( const std::vector< std::string >& file_list );
 
+  // GET_FILE_LIST:
+  // Get the list stored in the importer.
+  virtual std::vector< std::string > get_file_list();
+
 protected:
   // LOAD_DATA:
   // Load the data from the file(s).

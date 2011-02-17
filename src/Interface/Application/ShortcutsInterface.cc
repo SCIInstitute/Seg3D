@@ -66,6 +66,11 @@ ShortcutsInterface::ShortcutsInterface( QWidget *parent ) :
   // Set up the private internals of the MessageWindow class
   this->private_->ui_.setupUi( this );
   
+  // Update the title of the dialog
+  std::string title = std::string( "Keyboard/Mouse Shortcuts - "  )
+    + Core::Application::GetApplicationNameAndVersion();
+  this->setWindowTitle( QString::fromStdString( title ) );
+    
   QIcon icon = windowIcon();
   Qt::WindowFlags flags = windowFlags();
   Qt::WindowFlags helpFlag = Qt::WindowContextHelpButtonHint;

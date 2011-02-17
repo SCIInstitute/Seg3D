@@ -143,6 +143,12 @@ public:
   // search to that specific name of importer
   bool create_importer( const std::string& filename, LayerImporterHandle& importer,
     const std::string importername = "");
+
+  // This function creates a new importer by checking the file extension and it will return
+  // the appropriate importer. If an importer name is given as well, it will restrain the 
+  // search to that specific name of importer
+  bool create_importer( const std::vector<std::string>& filenames, LayerImporterHandle& importer,
+    const std::string importername = "");
     
   // CREATE_EXPORTER:
   // This function creates a new exporter by checking the file extension and it will return

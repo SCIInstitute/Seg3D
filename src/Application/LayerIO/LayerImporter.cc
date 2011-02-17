@@ -240,6 +240,17 @@ std::string LayerImporter::get_layer_name()
   return this->get_base_filename();
 }
 
+bool LayerImporter::set_file_list( const std::vector< std::string >& file_list ) 
+{ 
+  return false; 
+}
+
+std::vector< std::string > LayerImporter::get_file_list()
+{
+  std::vector< std::string > empty_list;
+  return empty_list;
+}
+
 void LayerImporter::set_error( const std::string& error )
 {
   this->private_->error_ = error;

@@ -177,13 +177,15 @@ void ProjectDockWidget::save_note()
   std::string current_text = this->private_->ui_.note_edit_->toPlainText().toStdString();
   if( current_text == "Enter your note here." ) return;
 
-  ProjectManager::Instance()->save_note( current_text );
   this->private_->resetting_ = true;
   this->private_->ui_.note_edit_->setStyleSheet( 
     QString::fromUtf8( "QTextEdit#note_edit_{ color: light gray; }" ) );
   this->private_->ui_.note_edit_->setPlainText( 
     QString::fromUtf8( "Enter your note here." ) );
   this->private_->ui_.save_note_button_->setEnabled( false );
+
+  Core::Application::PostEvent( boost::bind( &ProjectManager::save_note,
+    ProjectManager::Instance(), current_text ) );
 }
   
 void ProjectDockWidget::load_session()
