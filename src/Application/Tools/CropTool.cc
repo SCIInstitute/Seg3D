@@ -236,7 +236,7 @@ void CropToolPrivate::handle_cropbox_origin_index_changed( int index, int value 
     this->tool_->input_dimensions_state_[ index ]->get() - value );
 
   Core::Point end( 0, 0, 0 );
-  end[ index ] = value + this->tool_->cropbox_size_index_state_[ index ]->get() - 1;
+  end[ index ] = this->tool_->input_dimensions_state_[ index ]->get() - 1;
   end = grid_trans * end;
   this->tool_->cropbox_size_state_[ index ]->set_range( 0, end[ index ] - origin[ index ] );
 }
