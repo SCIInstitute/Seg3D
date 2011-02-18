@@ -276,7 +276,7 @@ SingleTargetTool::SingleTargetTool(  int target_type, const std::string& tool_ty
     
   this->add_connection( LayerManager::Instance()->active_layer_changed_signal_.connect(
     boost::bind( &SingleTargetToolPrivate::handle_active_layer_changed, 
-    this->private_.get(), _1 ) ) );
+    this->private_.get(), _1 ), boost::signals2::at_front ) );
 
   this->add_connection( LayerManager::Instance()->layer_name_changed_signal_.connect(
     boost::bind( &SingleTargetToolPrivate::handle_layer_name_changed, 
@@ -302,6 +302,7 @@ SingleTargetTool::SingleTargetTool(  int target_type, const std::string& tool_ty
 
 SingleTargetTool::~SingleTargetTool()
 {
+  this->disconnect_all();
 }
 
 void SingleTargetTool::add_dependent_layer_input( 
