@@ -312,7 +312,7 @@ bool ITKLayerImporter::import_header()
     return this->private_->scan_simple_volume< itk::NiftiImageIO >();
   } 
   
-  if( this->private_->extension_ == ".mha" )
+  if( this->private_->extension_ == ".mha" || this->private_->extension_ == ".mhd" )
   {
     return this->private_->scan_simple_volume< itk::MetaImageIO >();
   }   
@@ -361,7 +361,7 @@ bool ITKLayerImporter::load_data( Core::DataBlockHandle& data_block,
   {
     this->private_->import_simple_volume<itk::NiftiImageIO>();
   } 
-  else if( this->private_->extension_ == ".mha" )
+  else if( this->private_->extension_ == ".mha" || this->private_->extension_ == ".mhd" )
   {
     this->private_->import_simple_volume<itk::MetaImageIO>();   
   }

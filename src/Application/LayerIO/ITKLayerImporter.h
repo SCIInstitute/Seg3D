@@ -61,7 +61,7 @@ class ITKLayerImporter : public LayerImporter
                     ".tiff;.tif;.TIFF;.TIF;.stk;.STK;"
                     ".nii;.img;.hdr;"
                     ".vtk;.VTK;"
-                    ".mha", 5, 
+                    ".mha;.mhd", 5, 
                     LayerImporterType::SINGLE_FILE_E )
 
   // -- Constructor/Destructor --
