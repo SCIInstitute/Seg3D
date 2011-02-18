@@ -335,18 +335,24 @@ bool GDCMLayerImporter::import_header()
       }
       
       const gdcm::Image &image2 = reader2.GetImage();
-      const double* origin2 = image2.GetOrigin();
       
-      double spacing = origin2[ 2 ] - origin[ 2 ];
+      const double* origin2 = image2.GetOrigin();
+      Core::Vector origin_vec( origin[ 0 ], origin[ 1 ], origin[ 2 ] );
+      Core::Vector origin_vec2( origin2[ 0 ], origin2[ 1 ], origin2[ 2 ] );
+      Core::Vector dir = origin_vec - origin_vec2;
+      
+      double spacing = dir.length();
       if ( spacing < -epsilon || spacing > epsilon ) 
       {
-        this->private_->z_spacing_ = spacing; 
+        this->private_->z_spacing_ = spacing;
+        dir.normalize();
+        this->private_->slice_direction_ = dir; 
       }
       else 
       {
         spacing = 1.0;
+        this->private_->slice_direction_ = Core::Vector( 0.0, 0.0, 1.0 );
       }
-      this->private_->slice_direction_ = Core::Vector( 0.0, 0.0, 1.0 );
     }
     else if ( found_thickness == false )
     {
