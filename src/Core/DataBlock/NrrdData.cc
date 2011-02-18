@@ -493,7 +493,15 @@ bool NrrdData::LoadNrrd( const std::string& filename, NrrdDataHandle& nrrddata, 
     error = std::string( "Could not open file: " ) + filename + " : " + std::string( err );
     free( err );
     biffDone( NRRD );
+    nrrdNuke( nrrd );
+    nrrddata.reset();
+    return false;
+  }
 
+  if ( nrrd->dim < 3 )
+  {
+    error = "Currently only 3D nrrd files are supported.";
+    nrrdNuke( nrrd );
     nrrddata.reset();
     return false;
   }
