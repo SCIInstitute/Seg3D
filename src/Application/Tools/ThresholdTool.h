@@ -85,6 +85,9 @@ public:
   // Whether to show the preview
   Core::StateBoolHandle show_preview_state_;
 
+  // The opacity of the preview
+  Core::StateRangedDoubleHandle preview_opacity_state_;
+
 private:
   ThresholdToolPrivateHandle private_;
 

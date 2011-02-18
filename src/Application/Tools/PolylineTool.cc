@@ -149,7 +149,7 @@ bool PolylineToolPrivate::find_closest_vertex( ViewerHandle viewer, int x, int y
     }
     else if ( distance < min_dist )
     {
-      closest_index = i;
+      closest_index = static_cast< int >( i );
       min_dist = distance;
     }
   }
