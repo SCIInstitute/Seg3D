@@ -319,6 +319,7 @@ bool PolylineTool::handle_mouse_press( ViewerHandle viewer,
       active_slice->get_world_coord( world_x, world_y,  pt );
       
       double dmin = DBL_MAX;
+      double proj_min = DBL_MAX;
       std::vector<Core::Point> points = this->vertices_state_->get();
       
       size_t idx = 0;
@@ -327,17 +328,35 @@ bool PolylineTool::handle_mouse_press( ViewerHandle viewer,
         size_t k = j + 1;
         if ( k ==  points.size() ) k = 0;
         
-        double alpha = Dot( points[ j ] - pt, points[ j ] - points[ k ] )/
-          Dot( points[ j ] - points[ k ], points[ j ] - points[ k ] );
+        Core::Vector edge_dir = points[ j ] - points[ k ];
+        double edge_length = edge_dir.normalize();
+        double alpha = Dot( points[ j ] - pt, points[ j ] - points[ k ] ) / 
+          ( edge_length * edge_length );
           
         double dist = 0.0;
-        if ( alpha < 0.0 ) dist = ( points[ j ] - pt ).length2();
-        else if ( alpha > 1.0 ) dist = ( points[ k ] - pt ).length2();
-        else dist = ( ( points[ j ] - pt ) - alpha * ( points[ j ] - points[ k ] ) ).length2();
+        double proj_len = 0.0;
+        if ( alpha < 0.0 ) 
+        {
+          Core::Vector dir = points[ j ] - pt;
+          dist = dir.length2();
+          proj_len = Core::Abs( Dot( edge_dir, dir ) );
+        }
+        else if ( alpha > 1.0 )
+        {
+          Core::Vector dir = points[ k ] - pt;
+          dist = dir.length2();
+          proj_len = Core::Abs( Dot( edge_dir, dir ) );
+        }
+        else 
+        {
+          dist = ( ( points[ j ] - pt ) - alpha * ( points[ j ] - points[ k ] ) ).length2();
+        }
         
-        if ( dist < dmin )
+        if ( dist < dmin ||
+          ( dist == dmin && proj_len < proj_min ) )
         {
           dmin = dist;
+          proj_min = proj_len;
           idx = k;
         }
       }
