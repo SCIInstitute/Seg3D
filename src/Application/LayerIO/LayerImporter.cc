@@ -152,7 +152,7 @@ bool LayerImporter::import_layer( LayerImporterMode mode, std::vector< LayerHand
       canonical_vol->get_data_block()->update_histogram();
 
       layers.resize( 1 );
-      layers[0] = LayerHandle( new DataLayer( this->get_layer_name(), canonical_vol ) );
+      layers[ 0 ] = LayerHandle( new DataLayer( this->get_layer_name(), canonical_vol ) );
       layers[ 0 ]->set_meta_data( meta_data );
 
       CORE_LOG_DEBUG( std::string( "Successfully imported: " ) + this->get_base_filename() );
@@ -174,7 +174,7 @@ bool LayerImporter::import_layer( LayerImporterMode mode, std::vector< LayerHand
         canonical_vol->get_grid_transform(), maskdatablock ) );
 
       layers.resize( 1 );
-      layers[0] = LayerHandle( new MaskLayer( this->get_layer_name(), maskvolume ) );
+      layers[ 0 ] = LayerHandle( new MaskLayer( this->get_layer_name(), maskvolume ) );
       layers[ 0 ]->set_meta_data( meta_data );
 
       CORE_LOG_DEBUG( std::string( "Successfully imported: " ) + this->get_base_filename() );

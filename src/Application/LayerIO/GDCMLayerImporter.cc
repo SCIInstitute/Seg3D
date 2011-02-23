@@ -339,7 +339,7 @@ bool GDCMLayerImporter::import_header()
       const double* origin2 = image2.GetOrigin();
       Core::Vector origin_vec( origin[ 0 ], origin[ 1 ], origin[ 2 ] );
       Core::Vector origin_vec2( origin2[ 0 ], origin2[ 1 ], origin2[ 2 ] );
-      Core::Vector dir = origin_vec - origin_vec2;
+      Core::Vector dir = origin_vec2 - origin_vec;
       
       double spacing = dir.length();
       if ( spacing < -epsilon || spacing > epsilon ) 
