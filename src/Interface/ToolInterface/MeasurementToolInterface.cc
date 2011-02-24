@@ -88,7 +88,7 @@ bool MeasurementToolInterface::build_widget( QFrame* frame )
 
   // Connect the gui to the tool through the QtBridge
   QtUtils::QtBridge::Connect( this->private_->ui_.copy_button_, boost::bind(
-    &MeasurementTableView::copy, this->private_->table_view_ ) );
+    &MeasurementTableView::copy_selected_cells, this->private_->table_view_ ) );
   QtUtils::QtBridge::Connect( this->private_->ui_.delete_button_, boost::bind(
     &MeasurementTableView::delete_selected_measurements, this->private_->table_view_ ) );
 

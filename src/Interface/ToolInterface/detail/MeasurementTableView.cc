@@ -31,8 +31,10 @@
 #include <QtGui/QApplication>
 #include <QtGui/QClipboard>
 #include <QtGui/QContextMenuEvent>
+#include <QtGui/QHeaderView>
 #include <QtGui/QMenu>
 #include <QtGui/QMessageBox>
+#include <QtGui/QScrollBar>
 
 // Interface includes
 #include <Interface/ToolInterface/detail/MeasurementTableModel.h>
@@ -42,14 +44,91 @@
 namespace Seg3D
 {
 
-MeasurementTableView::MeasurementTableView( QWidget* parent ) : 
-  QTableView( parent )
+// Derived scroll bar that accepts all wheelEvent events rather than passing them on to the 
+// parent when scrollbar is at min/max.
+class MeasurementScrollBar : public QScrollBar
 {
-  this->setItemDelegate( new MeasurementTextDelegate( MeasurementColumns::NOTE_E ) ); // Custom text editor for note column
-  this->horizontalHeader()->setStretchLastSection( true ); // Stretch note section
+public:
+  MeasurementScrollBar( QWidget * parent = 0 ) :
+    QScrollBar( parent ) {}
 
-  this->delete_action_ = new QAction( tr( "&Delete" ), this );
-  
+    void wheelEvent( QWheelEvent * e );
+};
+
+void MeasurementScrollBar::wheelEvent( QWheelEvent * e )
+{
+  QScrollBar::wheelEvent( e ); 
+  e->accept();
+}
+
+class MeasurementTableViewPrivate 
+{
+public:
+  QString remove_line_breaks( QString str ) const;
+  void get_deletion_candidates( std::vector< int >& deletion_candidates ) const;
+  void scroll_to_active_index();
+
+  MeasurementTableView * view_;
+  QAction* delete_action_;
+};
+
+QString MeasurementTableViewPrivate::remove_line_breaks( QString str ) const
+{
+  std::string std_str = str.toStdString();
+  boost::replace_all( std_str, "\n", " " );
+  boost::replace_all( std_str, "\r", " " );
+  return QString::fromStdString( std_str );
+}
+
+void MeasurementTableViewPrivate::get_deletion_candidates( std::vector< int >& deletion_candidates ) const
+{
+  MeasurementTableModel* model = qobject_cast< MeasurementTableModel* >( this->view_->model() );
+  if( model->rowCount( QModelIndex() ) == 0 ) return;
+
+  // Get selected indices from QTableView
+  QModelIndexList selected_rows_list = this->view_->selectionModel()->selectedRows();
+
+  // Make list of candidates for deletion
+  deletion_candidates.clear();
+  if( selected_rows_list.size() > 0 ) // Rows are selected
+  {
+    Q_FOREACH ( QModelIndex index, selected_rows_list )
+    {
+      deletion_candidates.push_back( index.row() );
+    }
+    std::sort( deletion_candidates.begin(), deletion_candidates.end() );
+  }
+  else // No rows are selected -- delete active measurement
+  {
+    int active_index = model->get_active_index();
+    if( active_index != -1 )
+    {
+      deletion_candidates.push_back( active_index );
+    }
+  }
+}
+
+void MeasurementTableViewPrivate::scroll_to_active_index()
+{
+  MeasurementTableModel* model = 
+    qobject_cast< MeasurementTableModel* >( this->view_->model() );
+  int active_index = model->get_active_index();
+  if( active_index != -1 )
+  {
+    this->view_->scrollTo( model->index( active_index, 0 ) );
+  }
+}
+
+MeasurementTableView::MeasurementTableView( QWidget* parent ) : 
+  QTableView( parent ),
+  private_( new MeasurementTableViewPrivate )
+{
+  this->private_->view_ = this;
+  this->private_->delete_action_ = new QAction( tr( "&Delete" ), this );
+
+  // Custom text editor for note column
+  this->setItemDelegate( new MeasurementTextDelegate( MeasurementColumns::NOTE_E ) ); 
+  this->horizontalHeader()->setStretchLastSection( true ); // Stretch note section
   this->setVerticalScrollBar( new MeasurementScrollBar( this ) );
 }
 
@@ -89,49 +168,10 @@ void MeasurementTableView::handle_model_reset()
   this->horizontalHeader()->setStretchLastSection( true ); // Stretch note section
 
   // Scroll to active measurement
-  this->scroll_to_active_index();
+  this->private_->scroll_to_active_index();
 }
 
-void MeasurementTableView::scroll_to_active_index()
-{
-  MeasurementTableModel* model = 
-    qobject_cast< MeasurementTableModel* >( this->model() );
-  int active_index = model->get_active_index();
-  if( active_index != -1 )
-  {
-    this->scrollTo( model->index( active_index, 0 ) );
-  }
-}
-
-void MeasurementTableView::get_deletion_candidates( std::vector< int >& deletion_candidates ) const
-{
-  MeasurementTableModel* model = qobject_cast< MeasurementTableModel* >( this->model() );
-  if( model->rowCount( QModelIndex() ) == 0 ) return;
-
-  // Get selected indices from QTableView
-  QModelIndexList selected_rows_list = this->selectionModel()->selectedRows();
-
-  // Make list of candidates for deletion
-  deletion_candidates.clear();
-  if( selected_rows_list.size() > 0 ) // Rows are selected
-  {
-    Q_FOREACH ( QModelIndex index, selected_rows_list )
-    {
-      deletion_candidates.push_back( index.row() );
-    }
-    std::sort( deletion_candidates.begin(), deletion_candidates.end() );
-  }
-  else // No rows are selected -- delete active measurement
-  {
-    int active_index = model->get_active_index();
-    if( active_index != -1 )
-    {
-      deletion_candidates.push_back( active_index );
-    }
-  }
-}
-
-void MeasurementTableView::copy() const
+void MeasurementTableView::copy_selected_cells() const
 {
   MeasurementTableModel* model = qobject_cast< MeasurementTableModel* >( this->model() );
   QItemSelectionModel* selection = this->selectionModel(); 
@@ -164,7 +204,7 @@ void MeasurementTableView::copy() const
       QString text = model->data( previous, Qt::DisplayRole ).toString(); 
       
       // At this point `text` contains the text in one cell 
-      selected_text.append( this->remove_line_breaks( text ) ); 
+      selected_text.append( this->private_->remove_line_breaks( text ) ); 
       // If you are at the start of the row the row number of the previous index 
       // isn't the same.  Text is followed by a row separator, which is a newline. 
       if ( current.row() != previous.row() ) 
@@ -181,7 +221,7 @@ void MeasurementTableView::copy() const
 
     // add last element 
     QString text = model->data( previous, Qt::DisplayRole ).toString();
-    selected_text.append( this->remove_line_breaks( text ) ); 
+    selected_text.append( this->private_->remove_line_breaks( text ) ); 
     selected_text.append( QLatin1Char('\n') ); 
   }
   else // No cells are selected -- copy active measurement
@@ -198,7 +238,7 @@ void MeasurementTableView::copy() const
       selected_text.append( QLatin1Char('\t') ); 
       QString note = model->data( model->index( active_index, MeasurementColumns::NOTE_E ), 
         Qt::DisplayRole ).toString();
-      selected_text.append( this->remove_line_breaks( note ) ); 
+      selected_text.append( this->private_->remove_line_breaks( note ) ); 
       selected_text.append( QLatin1Char('\n') );
     } 
   }
@@ -212,7 +252,7 @@ void MeasurementTableView::copy() const
 void MeasurementTableView::delete_selected_measurements()
 {
   std::vector< int > deletion_candidates;
-  this->get_deletion_candidates( deletion_candidates );
+  this->private_->get_deletion_candidates( deletion_candidates );
   if( deletion_candidates.size() == 0 ) 
   {
     return;
@@ -235,21 +275,6 @@ void MeasurementTableView::delete_selected_measurements()
       dynamic_cast< MeasurementTableModel* >( this->model() );
     measurement_model->remove_rows( deletion_candidates );
   }
-}
-
-QString MeasurementTableView::remove_line_breaks( QString str ) const
-{
-  std::string std_str = str.toStdString();
-  boost::replace_all( std_str, "\n", " " );
-  boost::replace_all( std_str, "\r", " " );
-  return QString::fromStdString( std_str );
-}
-
-
-void MeasurementScrollBar::wheelEvent( QWheelEvent * e )
-{
-  QScrollBar::wheelEvent( e ); 
-  e->accept();
 }
 
 } // end namespace Seg3D

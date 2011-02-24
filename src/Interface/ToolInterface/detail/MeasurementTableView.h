@@ -30,18 +30,20 @@
 #define INTERFACE_TOOLINTERFACE_MEASUREMENTTABLEVIEW_H
 
 // Qt includes
-#include <QtGui/QHeaderView>
-#include <QtGui/QScrollBar>
 #include <QtGUI/QTableView>
 
-// Interface includes
+// Boost includes
+#include <boost/shared_ptr.hpp>
 
 namespace Seg3D
 {
 
 // Forward declarations
-class DeleteMeasurementDialog;
 class MeasurementTableModel;
+
+// Hide header includes, private interface and implementation
+class MeasurementTableViewPrivate;
+typedef boost::shared_ptr< MeasurementTableViewPrivate > MeasurementTableViewPrivateHandle;
 
 // QTableView with support for copyable measurements
 class MeasurementTableView : public QTableView 
@@ -54,33 +56,26 @@ public:
   // Extended functions
   //
 
+  // SET_MEASUREMENT_MODEL:
+  // Set the measurement model.  Can't be set in constructor because table view is constructed
+  // by GUI prior to model creation.
   void set_measurement_model( MeasurementTableModel* measurement_model );
-  void get_deletion_candidates( std::vector< int >& deletion_candidates ) const;  
-  void delete_selected_measurements();
-  void copy() const;
 
-Q_SIGNALS:
-  void delete_table_measurements();
+  // DELETE_SELECTED_MEASUREMENTS:
+  // Delete all measurements that are selected or active measurement if none are selected. 
+  void delete_selected_measurements();
+
+  // COPY_SELECTED_CELLS:
+  // Copy selected cells to clipboard, or active measurement if no cells are selected.  
+  // Copied cells can be pasted directly into Excel spreadsheet.
+  void copy_selected_cells() const;
 
 private Q_SLOTS:
   void handle_model_reset();
-  void scroll_to_active_index();
 
 private:
-  QString remove_line_breaks( QString str ) const;
-  QAction* delete_action_;
+  MeasurementTableViewPrivateHandle private_;
 }; 
-
-// Derived scroll bar that accepts all wheelEvent events rather than passing them on to the 
-// parent when scrollbar is at min/max.
-class MeasurementScrollBar : public QScrollBar
-{
-public:
-  MeasurementScrollBar( QWidget * parent = 0 ) :
-    QScrollBar( parent ) {}
-
-  void wheelEvent( QWheelEvent * e );
-};
 
 } // end namespace Seg3D
 
