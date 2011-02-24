@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_TOOLINTERFACE_TEXTDELEGATE_H
-#define INTERFACE_TOOLINTERFACE_TEXTDELEGATE_H
+#ifndef INTERFACE_TOOLINTERFACE_DETIAL_TEXTDELEGATE_H
+#define INTERFACE_TOOLINTERFACE_DETIAL_TEXTDELEGATE_H
 
 // Qt includes
 #include <QtGui/QItemDelegate>
@@ -35,12 +35,17 @@
 namespace Seg3D
 {
 
+// Text edit delegate for note column in measurement table.
 class MeasurementTextDelegate : public QItemDelegate
 {
   Q_OBJECT
 
 public:
   MeasurementTextDelegate( int text_column, QObject * parent = 0 );
+
+  //
+  // Inherited functions
+  //
 
   void paint( QPainter *painter, const QStyleOptionViewItem &option, 
     const QModelIndex &index ) const;

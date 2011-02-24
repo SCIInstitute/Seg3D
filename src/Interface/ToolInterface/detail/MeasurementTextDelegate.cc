@@ -40,28 +40,28 @@ MeasurementTextDelegate::MeasurementTextDelegate( int text_column, QObject * par
   text_column_( text_column ),
   QItemDelegate( parent ) {}
 
-  void MeasurementTextDelegate::paint( QPainter *painter, const QStyleOptionViewItem &option, 
-    const QModelIndex &index ) const
-  {
-    if ( index.column() == text_column_ )
-    { 
-      QString text = index.model()->data( index, Qt::DisplayRole ).toString();
-      painter->save();
-      painter->setBackgroundMode( Qt::OpaqueMode );
-      painter->setBackground( index.model()->data( index, Qt::BackgroundRole ).value<QBrush>() );
-      drawBackground( painter, option, index );
-      painter->restore();
-      drawDisplay( painter, option, option.rect, text );
-      drawFocus( painter, option, option.rect );
-    }
-    else
-    {
-      QItemDelegate::paint( painter, option, index );
-    }
-  }
-
-  QWidget* MeasurementTextDelegate::createEditor( QWidget *parent, const QStyleOptionViewItem &option, 
+void MeasurementTextDelegate::paint( QPainter *painter, const QStyleOptionViewItem &option, 
   const QModelIndex &index ) const
+{
+  if ( index.column() == text_column_ )
+  { 
+    QString text = index.model()->data( index, Qt::DisplayRole ).toString();
+    painter->save();
+    painter->setBackgroundMode( Qt::OpaqueMode );
+    painter->setBackground( index.model()->data( index, Qt::BackgroundRole ).value<QBrush>() );
+    drawBackground( painter, option, index );
+    painter->restore();
+    drawDisplay( painter, option, option.rect, text );
+    drawFocus( painter, option, option.rect );
+  }
+  else
+  {
+    QItemDelegate::paint( painter, option, index );
+  }
+}
+
+QWidget* MeasurementTextDelegate::createEditor( QWidget *parent, const QStyleOptionViewItem &option, 
+const QModelIndex &index ) const
 {
   if ( index.column() == text_column_ )
   {

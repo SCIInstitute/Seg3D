@@ -43,7 +43,8 @@ SCI_REGISTER_TOOL( Seg3D, MeasurementTool )
 namespace Seg3D
 {
 
-class MeasurementToolPrivate {
+class MeasurementToolPrivate 
+{
 public:
   void set_tool( MeasurementTool* tool );
   void update_active_index();
@@ -127,7 +128,6 @@ MeasurementTool::~MeasurementTool()
 
 void MeasurementTool::execute( Core::ActionContextHandle context )
 {
-  //ActionInvert::Dispatch( context );
 }
 
 std::vector< Core::Measurement > MeasurementTool::get_measurements() const

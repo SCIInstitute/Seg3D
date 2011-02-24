@@ -68,11 +68,28 @@ public:
   // Fire off the action that executes the filter
   virtual void execute( Core::ActionContextHandle context );
 
+  // Note: All of the following functions ensure thread-safe access to state variables.
+
+  // GET_MEASUREMENTS:
+  // Get vector of all measurements
   std::vector< Core::Measurement > get_measurements() const;
+
+  // SET_MEASUREMENT:
+  // Set measurement at existing index.  Useful for modifying note or visibility of existing
+  // measurement.
   void set_measurement( size_t index, const Core::Measurement& measurement );
+
+  // REMOVE_MEASUREMENT:
+  // Remove measurement matching this one.  By not passing index, we avoid issues with indices
+  // changing as measurements are removed.
   bool remove_measurement( const Core::Measurement& measurement );
 
+  // GET_ACTIVE_INDEX:
+  // Get index of active measurement, or -1 if none.
   int get_active_index() const;
+
+  // SET_ACTIVE_INDEX:
+  // Set index indicating active measurement.
   void set_active_index( int active_index );
 
   // -- state --

@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_TOOLINTERFACE_MEASUREMENTTEXTEDIT_H
-#define INTERFACE_TOOLINTERFACE_MEASUREMENTTEXTEDIT_H
+#ifndef INTERFACE_TOOLINTERFACE_DETAIL_MEASUREMENTTEXTEDIT_H
+#define INTERFACE_TOOLINTERFACE_DETAIL_MEASUREMENTTEXTEDIT_H
 
 // Qt includes
 #include <QtGui/QTextEdit>
@@ -35,6 +35,9 @@
 namespace Seg3D
 {
 
+// Text editor for note text box in measurement tool.
+// Emits an editing_finished signal on a focusOutEvent so that observers know when editing is
+// finished.
 class MeasurementTextEdit : public QTextEdit
 {
   Q_OBJECT
@@ -47,6 +50,7 @@ protected:
   //
   // Inherited functions
   //
+
   void focusOutEvent( QFocusEvent * e );
 
 public:
