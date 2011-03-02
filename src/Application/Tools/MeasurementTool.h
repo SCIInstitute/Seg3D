@@ -64,10 +64,6 @@ public:
   MeasurementTool( const std::string& toolid );
   virtual ~MeasurementTool();
 
-  // EXECUTE:
-  // Fire off the action that executes the filter
-  virtual void execute( Core::ActionContextHandle context );
-
   // Note: All of the following functions ensure thread-safe access to state variables.
 
   // GET_MEASUREMENTS:
@@ -92,10 +88,26 @@ public:
   // Set index indicating active measurement.
   void set_active_index( int active_index );
 
+  // GET_SHOW_WORLD_UNITS:
+  // Get boolean indicating whether world units (true) or index units (false) should be displayed.
+  bool get_show_world_units() const;
+
+  // -- signals --
+public:
+  // UNITS_CHANGED_SIGNAL:
+  typedef boost::signals2::signal< void () > units_changed_signal_type;
+  units_changed_signal_type units_changed_signal_;
+
   // -- state --
 public:
   Core::StateMeasurementVectorHandle measurements_state_;
   Core::StateIntHandle active_index_state_;
+  Core::StateLabeledOptionHandle units_selection_state_; // Used for display purposes only
+  Core::StateBoolHandle show_world_units_state_; // Used for display purposes only
+
+public:
+  static const std::string INDEX_UNITS_C;
+  static const std::string WORLD_UNITS_C;
 
 private:
   MeasurementToolPrivateHandle private_;

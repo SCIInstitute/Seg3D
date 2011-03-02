@@ -36,7 +36,7 @@
 #include "ui_MeasurementToolInterface.h"
 
 // Application Includes
-#include <Application/Tools/MeasurementTool.h>
+#include <Application/LayerManager/LayerManager.h>
 
 SCI_REGISTER_TOOLINTERFACE( Seg3D, MeasurementToolInterface )
 
@@ -83,10 +83,19 @@ bool MeasurementToolInterface::build_widget( QFrame* frame )
   qpointer_type measurement_interface( this );  
   this->add_connection( tool_handle->measurements_state_->state_changed_signal_.connect( 
     boost::bind( &MeasurementToolInterface::UpdateMeasurementModel, measurement_interface ) ) );
+  this->add_connection( tool_handle->units_changed_signal_.connect(
+    boost::bind( &MeasurementToolInterface::UpdateMeasurementModel, measurement_interface ) ) );
+
   this->add_connection( tool_handle->active_index_state_->state_changed_signal_.connect( 
     boost::bind( &MeasurementToolInterface::UpdateMeasurementNote, measurement_interface ) ) );
+  
+  // Copied from resample tool
+  QButtonGroup* button_group = new QButtonGroup( this );
+  button_group->addButton( this->private_->ui_.rb_index_ );
+  button_group->addButton( this->private_->ui_.rb_world_ );
 
   // Connect the gui to the tool through the QtBridge
+  QtUtils::QtBridge::Connect( button_group, tool_handle->units_selection_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.copy_button_, boost::bind(
     &MeasurementTableView::copy_selected_cells, this->private_->table_view_ ) );
   QtUtils::QtBridge::Connect( this->private_->ui_.delete_button_, boost::bind(

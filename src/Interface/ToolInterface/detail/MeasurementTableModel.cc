@@ -34,6 +34,9 @@
 // Interface includes
 #include <Interface/ToolInterface/detail/MeasurementTableModel.h>
 
+// Application includes
+#include <Application/LayerManager/LayerManager.h>
+
 namespace Seg3D
 {
 
@@ -105,6 +108,8 @@ int MeasurementTableModel::columnCount( const QModelIndex& /*index*/) const
 
 QVariant MeasurementTableModel::data( const QModelIndex& index, int role ) const
 {
+  // TODO ASSERT_IS_INTERFACE_THREAD();
+
   if ( !index.isValid() ) return QVariant();
 
   if ( role == Qt::TextAlignmentRole )
@@ -140,9 +145,40 @@ QVariant MeasurementTableModel::data( const QModelIndex& index, int role ) const
       if( index.row() < static_cast< int >( measurements.size() ) )
       {
         Core::Measurement measurement = measurements[ index.row() ];
+
         if ( index.column() == MeasurementColumns::LENGTH_E ) 
         {
-          return QString( "%1 mm" ).arg( measurement.get_length(), 0, 'f', 3 );
+          if( this->private_->measurement_tool_->get_show_world_units() ) // World units
+          {
+            return QString( "%1" ).arg( measurement.get_length(), 0, 'f', 3 );
+          }
+          else // Index units
+          {
+            // Thread-safety: We get a handle to the active layer 
+            // (get_active_layer is thread-safe), so it can't be deleted out from under 
+            // us.
+            // Use grid transform from active layer
+            LayerHandle active_layer = LayerManager::Instance()->get_active_layer();
+            if( active_layer )
+            {
+              // Convert world units to index units
+              Core::GridTransform grid_transform = active_layer->get_grid_transform();
+
+              // Grid transfrom takes index coords to world coords, so we need inverse
+              Core::Transform inverse_transform = grid_transform.get_inverse();
+
+              Core::Vector measure_vec = 
+                measurement.get_point2() - measurement.get_point1();
+              measure_vec = inverse_transform.project( measure_vec );
+
+              return QString( "%1" ).arg( measure_vec.length(), 0, 'f', 3 );
+            }
+            else
+            {
+              // No active layer, just return world units
+              return QString( "%1" ).arg( measurement.get_length(), 0, 'f', 3 );
+            }
+          }
         }
         else if ( index.column() == MeasurementColumns::NOTE_E ) 
         {
