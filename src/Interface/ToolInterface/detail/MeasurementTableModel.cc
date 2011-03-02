@@ -148,35 +148,54 @@ QVariant MeasurementTableModel::data( const QModelIndex& index, int role ) const
 
         if ( index.column() == MeasurementColumns::LENGTH_E ) 
         {
-          if( this->private_->measurement_tool_->get_show_world_units() ) // World units
+          // Thread-safety: We get a handle to the active layer 
+          // (get_active_layer is thread-safe), so it can't be deleted out from under 
+          // us.
+          LayerHandle active_layer = LayerManager::Instance()->get_active_layer();
+
+          if( !this->private_->measurement_tool_->get_show_world_units() && active_layer ) 
           {
-            return QString( "%1" ).arg( measurement.get_length(), 0, 'f', 3 );
-          }
-          else // Index units
-          {
-            // Thread-safety: We get a handle to the active layer 
-            // (get_active_layer is thread-safe), so it can't be deleted out from under 
-            // us.
+            // Index units
+            
+            // Convert world units to index units
             // Use grid transform from active layer
-            LayerHandle active_layer = LayerManager::Instance()->get_active_layer();
-            if( active_layer )
+            Core::GridTransform grid_transform = active_layer->get_grid_transform();
+
+            // Grid transfrom takes index coords to world coords, so we need inverse
+            Core::Transform inverse_transform = grid_transform.get_inverse();
+
+            Core::Vector measure_vec = 
+              measurement.get_point2() - measurement.get_point1();
+            measure_vec = inverse_transform.project( measure_vec );
+            double index_length = measure_vec.length();
+
+            // Use same formatting policy as status bar for coordinates
+            if( 10000 < index_length ) 
             {
-              // Convert world units to index units
-              Core::GridTransform grid_transform = active_layer->get_grid_transform();
-
-              // Grid transfrom takes index coords to world coords, so we need inverse
-              Core::Transform inverse_transform = grid_transform.get_inverse();
-
-              Core::Vector measure_vec = 
-                measurement.get_point2() - measurement.get_point1();
-              measure_vec = inverse_transform.project( measure_vec );
-
-              return QString( "%1" ).arg( measure_vec.length(), 0, 'f', 3 );
+              // Use scientific notation
+              return QString( "%1" ).arg( index_length, 0, 'e', 2 );
             }
-            else
+            else 
             {
-              // No active layer, just return world units
-              return QString( "%1" ).arg( measurement.get_length(), 0, 'f', 3 );
+              // Format normally
+              return QString( "%1" ).arg( index_length, 0, 'f', 0 );
+            }
+          }
+          else
+          {
+            // World units
+            double world_length = measurement.get_length();
+
+            // Use same formatting policy as status bar for coordinates
+            if( ( 0.0 < world_length && world_length < 0.0001 ) || 1000 < world_length ) 
+            {
+              // Use scientific notation
+              return QString( "%1" ).arg( world_length, 0, 'e', 2 );
+            }
+            else 
+            {
+              // Format normally
+              return  QString( "%1" ).arg( world_length, 0, 'f', 3 );
             }
           }
         }

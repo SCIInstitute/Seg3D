@@ -85,7 +85,6 @@ bool MeasurementToolInterface::build_widget( QFrame* frame )
     boost::bind( &MeasurementToolInterface::UpdateMeasurementModel, measurement_interface ) ) );
   this->add_connection( tool_handle->units_changed_signal_.connect(
     boost::bind( &MeasurementToolInterface::UpdateMeasurementModel, measurement_interface ) ) );
-
   this->add_connection( tool_handle->active_index_state_->state_changed_signal_.connect( 
     boost::bind( &MeasurementToolInterface::UpdateMeasurementNote, measurement_interface ) ) );
   
