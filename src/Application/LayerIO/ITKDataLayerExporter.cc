@@ -109,9 +109,11 @@ bool export_dicom_series( const std::string& file_path, const std::string& file_
   typedef itk::ImageSeriesWriter< ImageType, OutputImageType > WriterType;
   typename WriterType::Pointer writer = WriterType::New();
 
+  Core::GridTransform grid_transform = temp_handle->get_grid_transform();
+
   Core::ITKImageDataHandle image_data = typename Core::ITKImageDataT< InputPixelType >::Handle( 
     new Core::ITKImageDataT< InputPixelType >( temp_handle->get_data_volume()->get_data_block(), 
-    temp_handle->get_grid_transform() ) );
+    grid_transform ) );
 
   ImageType* itk_image = dynamic_cast< ImageType* >( 
     image_data->get_base_image().GetPointer() );
@@ -169,6 +171,10 @@ bool export_dicom_series( const std::string& file_path, const std::string& file_
     is_dicom = true;
   } 
 
+  writer->SetInput( itk_image );
+  writer->SetImageIO( dicom_io );
+  writer->SetFileNames( names_generator->GetFileNames() );
+
   typedef typename itk::ImageSeriesReader< ImageType > ReaderType;
   typename ReaderType::Pointer reader;
   typename ReaderType::DictionaryArrayType dict_array;
@@ -206,6 +212,8 @@ bool export_dicom_series( const std::string& file_path, const std::string& file_
     std::string data_center = Core::ExportToString( 0.5 * ( min_value + max_value ) );
     std::string data_width = Core::ExportToString( max_value - min_value );
     
+    double z_offset = 0.0;
+    
     for ( typename ReaderType::DictionaryArrayType::iterator dict_iter = 
       dict_array.begin(); dict_iter != dict_array.end(); dict_iter++ )
     {
@@ -231,6 +239,34 @@ bool export_dicom_series( const std::string& file_path, const std::string& file_
       itk::EncapsulateMetaData<std::string>(**dict_iter, "0028|0102", "" );
       // [Pixel Representation]
       itk::EncapsulateMetaData<std::string>(**dict_iter, "0028|0103", "" ); 
+
+      Core::Point slice_origin = grid_transform.project( Core::Point( 0.0, 0.0, z_offset ) );
+      z_offset += 1.0;
+      std::string patient_location = Core::ExportToString( slice_origin.x() ) + "\\" +
+        Core::ExportToString( slice_origin.y() ) + "\\" + 
+        Core::ExportToString( slice_origin.z() );
+      itk::EncapsulateMetaData<std::string>( **dict_iter, "0020|0032", patient_location ); 
+  
+      double spacing_x = grid_transform.project( Core::Vector( 1.0, 0.0, 0.0 ) ).length();
+      double spacing_y = grid_transform.project( Core::Vector( 0.0, 1.0, 0.0 ) ).length();
+      double spacing_z = grid_transform.project( Core::Vector( 0.0, 0.0, 1.0 ) ).length();
+
+      std::string z_spacing = Core::ExportToString( spacing_z );
+      itk::EncapsulateMetaData<std::string>( **dict_iter, "0018|0050", z_spacing ); 
+      
+      typedef itk::Array< double > DoubleArrayType;
+      DoubleArrayType originArray( 3 );
+      DoubleArrayType spacingArray( 3 );
+      
+      originArray[ 0 ]  = slice_origin.x();
+      originArray[ 1 ]  = slice_origin.y();
+      originArray[ 2 ]  = slice_origin.z();
+      spacingArray[ 0 ] = spacing_x;
+      spacingArray[ 1 ] = spacing_y;
+      spacingArray[ 2 ] = spacing_z;
+
+      itk::EncapsulateMetaData< DoubleArrayType >( **dict_iter, itk::ITK_Origin, originArray );
+      itk::EncapsulateMetaData< DoubleArrayType >( **dict_iter, itk::ITK_Spacing, spacingArray );
     }
 
     // now tell the Dicom writer to use the provided UIDs
@@ -238,10 +274,6 @@ bool export_dicom_series( const std::string& file_path, const std::string& file_
     writer->SetMetaDataDictionaryArray( &dict_array );
   }
   ////////////////////////////////////////////////////////////////////////////
-
-  writer->SetInput( itk_image );
-  writer->SetImageIO( dicom_io );
-  writer->SetFileNames( names_generator->GetFileNames() );
   
   gdcm::ImageHelper::SetForcePixelSpacing( true );
 
