@@ -81,11 +81,11 @@ public:
   bool remove_measurement( const Core::Measurement& measurement );
 
   // GET_ACTIVE_INDEX:
-  // Get index of active measurement, or -1 if none.
+  // Get index of active measurement in table, or -1 if none.
   int get_active_index() const;
 
   // SET_ACTIVE_INDEX:
-  // Set index indicating active measurement.
+  // Set index indicating active measurement in table.
   void set_active_index( int active_index );
 
   // GET_SHOW_WORLD_UNITS:
@@ -100,10 +100,20 @@ public:
 
   // -- state --
 public:
+  // List of measurements
   Core::StateMeasurementVectorHandle measurements_state_;
+
+  // Index of active measurement in table
   Core::StateIntHandle active_index_state_;
-  Core::StateLabeledOptionHandle units_selection_state_; // Used for display purposes only
-  Core::StateBoolHandle show_world_units_state_; // Used for display purposes only
+
+  // Selection between display of index and world units.  Needed for radio button group.
+  Core::StateLabeledOptionHandle units_selection_state_; 
+
+  // Boolean indicating whether world units (true) or index units (false) should be displayed.
+  Core::StateBoolHandle show_world_units_state_; 
+  
+  // The opacity of all the measurements for this tool
+  Core::StateRangedDoubleHandle opacity_state_;
 
 public:
   static const std::string INDEX_UNITS_C;

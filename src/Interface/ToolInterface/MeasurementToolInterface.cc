@@ -99,6 +99,8 @@ bool MeasurementToolInterface::build_widget( QFrame* frame )
     &MeasurementTableView::copy_selected_cells, this->private_->table_view_ ) );
   QtUtils::QtBridge::Connect( this->private_->ui_.delete_button_, boost::bind(
     &MeasurementTableView::delete_selected_measurements, this->private_->table_view_ ) );
+  QtUtils::QtBridge::Connect( this->private_->ui_.measurement_opacity_slider_, 
+    tool_handle->opacity_state_ );
 
   // Connect note column and text box using Qt signals/slots since currently can't hook up two
   // widgets to same state object.

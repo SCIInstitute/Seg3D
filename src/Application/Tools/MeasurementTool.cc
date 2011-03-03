@@ -32,6 +32,7 @@
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/MeasurementTool.h>
+#include <Application/ViewerManager/ViewerManager.h>
 
 // Core includes
 #include <Core/State/Actions/ActionRemove.h>
@@ -50,6 +51,8 @@ public:
   void update_active_index();
   void handle_units_selection_changed( std::string units );
   void handle_active_layer_changed( LayerHandle active_layer );
+  void handle_opacity_changed();
+  void update_viewers();
 
   MeasurementTool* tool_;
   std::string active_group_id_;
@@ -136,6 +139,21 @@ void MeasurementToolPrivate::handle_active_layer_changed( LayerHandle active_lay
   }
 }
 
+void MeasurementToolPrivate::handle_opacity_changed()
+{
+  this->update_viewers();
+}
+
+void MeasurementToolPrivate::update_viewers()
+{
+  /*if ( this->signal_block_count_ > 0 )
+  {
+    return;
+  }*/
+
+  ViewerManager::Instance()->update_2d_viewers_overlay();
+}
+
 //void create_test_data( std::vector< Core::Measurement >& measurements )
 //{
 //  // Populate measurements list with test data
@@ -186,6 +204,7 @@ MeasurementTool::MeasurementTool( const std::string& toolid ) :
     INDEX_UNITS_C + "=Index Units|" +
     WORLD_UNITS_C + "=World Units" );
   this->add_state( "show_world_units", this->show_world_units_state_, true );
+  this->add_state( "opacity", this->opacity_state_, 0.5, 0.0, 1.0, 0.1 );
 
   LayerHandle active_layer = LayerManager::Instance()->get_active_layer();
   if( active_layer )
@@ -199,6 +218,8 @@ MeasurementTool::MeasurementTool( const std::string& toolid ) :
     boost::bind( &MeasurementToolPrivate::handle_units_selection_changed, this->private_, _2 ) ) );
   this->add_connection( LayerManager::Instance()->active_layer_changed_signal_.connect(
     boost::bind( &MeasurementToolPrivate::handle_active_layer_changed, this->private_, _1 ) ) );
+  this->add_connection( this->opacity_state_->state_changed_signal_.connect(
+    boost::bind( &MeasurementToolPrivate::handle_opacity_changed, this->private_ ) ) );
 }
 
 MeasurementTool::~MeasurementTool()

@@ -26,7 +26,7 @@
    <size>
     <width>16777215</width>
     <height>16777215</height>
-   </size> 
+   </size>
   </property>
   <property name="windowTitle">
    <string>Measurement Tool</string>
@@ -165,10 +165,6 @@
           </widget>
          </item>
         </layout>
-        <zorder>table_view_</zorder>
-        <zorder>table_widget_</zorder>
-        <zorder>label_widget_</zorder>
-        <zorder>textbox_widget_</zorder>
        </widget>
       </item>
       <item>
@@ -261,6 +257,30 @@
           </widget>
          </item>
          <item>
+          <widget class="QGroupBox" name="opacity_groupbox_">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>20</height>
+            </size>
+           </property>
+           <property name="title">
+            <string>Opacity</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_8">
+            <property name="spacing">
+             <number>2</number>
+            </property>
+            <property name="margin">
+             <number>4</number>
+            </property>
+            <item>
+             <widget class="QtUtils::QtSliderDoubleCombo" name="measurement_opacity_slider_" native="true"/>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
           <widget class="QWidget" name="button_widget_" native="true">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -329,6 +349,12 @@
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>QtUtils::QtSliderDoubleCombo</class>
+   <extends>QWidget</extends>
+   <header location="global">QtUtils/Widgets/QtSliderDoubleCombo.h</header>
+   <container>1</container>
+  </customwidget>
   <customwidget>
    <class>Seg3D::MeasurementTableView</class>
    <extends>QTableView</extends>
