@@ -133,12 +133,12 @@ public:
 
 inline bool Measurement::operator==( const Measurement& m ) const
 {
-  return ( this->p1_ == m.p1_ && this->p2_ == m.p2_ && this->slice_type_ == m.slice_type_ );
+  return ( this->label_ == m.label_ );
 }
 
 inline bool Measurement::operator!=( const Measurement& m ) const
 {
-  return ( this->p1_ != m.p1_ || this->p2_ != m.p2_ || this->slice_type_ != m.slice_type_ );
+  return ( this->label_ != m.label_ );
 }
 
 std::string ExportToString( const Measurement& value );

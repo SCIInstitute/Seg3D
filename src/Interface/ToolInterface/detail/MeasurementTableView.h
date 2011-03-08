@@ -72,6 +72,7 @@ public:
 
 private Q_SLOTS:
   void handle_model_reset();
+  void handle_selected();
 
 private:
   MeasurementTableViewPrivateHandle private_;

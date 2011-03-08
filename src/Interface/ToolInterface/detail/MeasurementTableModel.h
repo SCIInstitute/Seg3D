@@ -108,6 +108,10 @@ public:
   // Return row index of active measurement. Returns -1 if there are no measurements.
   int get_active_index() const; // Public because QTableView needs to scroll to this
   
+  // HANDLE_SELECTED:
+  // Handler for when table cells are selected.
+  void handle_selected( const QItemSelection & selected );
+
 Q_SIGNALS:
   // ACTIVE_NOTE_CHANGED:
   // Note for active measurement changed.
@@ -118,10 +122,6 @@ private Q_SLOTS:
   // HANDLE_CLICK:
   // Handler for when table cells are clicked.
   void handle_click( const QModelIndex & index );
-
-  // HANDLE_SELECTED:
-  // Handler for when table cells are selected.
-  void handle_selected( const QItemSelection & selected );
 
   // SAVE_ACTIVE_NOTE:
   // Save cached active note to state vector.  Avoids saving to state vector and triggering

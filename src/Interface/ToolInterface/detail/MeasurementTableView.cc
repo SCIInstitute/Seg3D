@@ -142,7 +142,7 @@ void MeasurementTableView::set_measurement_model( MeasurementTableModel* measure
     measurement_model, SLOT( handle_click( QModelIndex ) ) );
   QObject::connect( this->selectionModel(), 
     SIGNAL( selectionChanged( QItemSelection, QItemSelection ) ), 
-    measurement_model, SLOT( handle_selected( QItemSelection) ) );
+    this, SLOT( handle_selected() ) );
 
   // Wait until text editing is finished to save the note for the active measurement.  This 
   // way we avoid updating the model for every keystroke.
@@ -275,6 +275,15 @@ void MeasurementTableView::delete_selected_measurements()
       dynamic_cast< MeasurementTableModel* >( this->model() );
     measurement_model->remove_rows( deletion_candidates );
   }
+}
+
+void MeasurementTableView::handle_selected()
+{
+  // Work around the fact that for some reason QItemSelectionModel::selectionChanged() passes
+  // an empty list if you select a single row after having selected multiple rows.  Instead,
+  // just pass the current selection.
+  MeasurementTableModel* model = qobject_cast< MeasurementTableModel* >( this->model() );
+  model->handle_selected( this->selectionModel()->selection() );
 }
 
 } // end namespace Seg3D
