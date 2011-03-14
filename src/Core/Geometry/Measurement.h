@@ -40,15 +40,6 @@
 namespace Core
 {
 
-CORE_ENUM_CLASS 
-( 
-  MeasureSliceType,
-  AXIAL_E,
-  CORONAL_E,
-  SAGITTAL_E,
-  NOVIEW_E
-)
-
 //=============================================================================
 // Class: Measurement
 //=============================================================================
@@ -57,8 +48,7 @@ class Measurement
 {
 public:
 
-  Measurement( bool visible, std::string label, std::string note, Core::Point p1, Core::Point p2, 
-    MeasureSliceType slice_type );
+  Measurement( bool visible, std::string id, std::string note, Core::Point p0, Core::Point p1 );
   Measurement();
 
   // GET_VISIBLE:
@@ -71,11 +61,11 @@ public:
 
   // GET_LABEL:
   // Get short label to be rendered above measurement line.
-  std::string get_label() const; 
+  std::string get_id() const; 
 
   // SET_LABEL:
   // Set short label to be rendered above measurement line.
-  void set_label( std::string label );
+  void set_id( std::string id );
 
   // GET_LENGTH:
   // Get length of measurement
@@ -91,41 +81,24 @@ public:
   // May contain any characters including line breaks.
   void set_note( std::string note ); 
 
-  // GET_POINT1:
-  // Get 3D world coordinate of 1st point
-  Core::Point get_point1() const;
+  // GET_POINT:
+  // Get 3D world coordinate of point at given index (0 or 1)
+  bool get_point( int index, Point& pt ) const;
 
   // SET_POINT1:
-  // Set 3D world coordinate of 1st point
-  void set_point1( Core::Point p1 );
-
-  // GET_POINT2:
-  // Get 3D world coordinate of 2nd point
-  Core::Point get_point2() const;
-
-  // SET_POINT2:
-  // Set 3D world coordinate of 2nd point
-  void set_point2( Core::Point p2 ); // P2 moves during measurement creation
-
-  // GET_VIEW_AXIS:
-  // Get type of slice (axial, sagittal, coronal) where measurement was made.  This is needed
-  // to facilitate jumping to the measurement.
-  MeasureSliceType get_slice_type() const;
-
-  // SET_VIEW_AXIS:
-  // Set type of slice (axial, sagittal, coronal) where measurement was made.
-  void set_slice_type( MeasureSliceType slice_type );
+  // Set 3D world coordinate of point at given index (0 or 1)
+  bool set_point( int index, const Point& pt );
 
   inline bool operator==( const Measurement& ) const;
   inline bool operator!=( const Measurement& ) const;
 
 private:
   bool visible_;
-  std::string label_; // Unique ID
+  std::string id_; // Unique ID
   std::string note_;
-  Core::Point p1_; // 3D world coordinate of 1st point
-  Core::Point p2_; // 3D world coordinate of 2nd point
-  MeasureSliceType slice_type_;
+  // TODO: Convert to 2D array of points
+  Core::Point p0_; // 3D world coordinate of 1st point
+  Core::Point p1_; // 3D world coordinate of 2nd point
 
 public:
   static const std::string NOTE_DELIMITER_C;
@@ -133,12 +106,12 @@ public:
 
 inline bool Measurement::operator==( const Measurement& m ) const
 {
-  return ( this->label_ == m.label_ );
+  return ( this->id_ == m.id_ );
 }
 
 inline bool Measurement::operator!=( const Measurement& m ) const
 {
-  return ( this->label_ != m.label_ );
+  return ( this->id_ != m.id_ );
 }
 
 std::string ExportToString( const Measurement& value );

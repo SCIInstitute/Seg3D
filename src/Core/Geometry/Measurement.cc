@@ -40,21 +40,19 @@ namespace Core
 const std::string Measurement::NOTE_DELIMITER_C = " NOTE_END]]";
 
 Measurement::Measurement( bool visible, std::string label, std::string note, 
-  Core::Point p1, Core::Point p2, MeasureSliceType view_axis ) : 
+  Core::Point p0, Core::Point p1 ) : 
   visible_( visible ), 
-  label_( label ), 
+  id_( label ), 
   note_( note ), 
-  p1_( p1 ), 
-  p2_( p2 ), 
-  slice_type_( view_axis )
+  p0_( p0 ), 
+  p1_( p1 )
 {
 }
 
 Measurement::Measurement() :
   visible_( false ), 
-  label_( "" ), 
-  note_( "" ), 
-  slice_type_( MeasureSliceType::NOVIEW_E )
+  id_( "" ), 
+  note_( "" )
 {
 }
 
@@ -68,19 +66,19 @@ void Measurement::set_visible( bool visible )
   this->visible_ = visible;
 }
 
-std::string Measurement::get_label() const
+std::string Measurement::get_id() const
 {
-  return this->label_;
+  return this->id_;
 }
 
-void Measurement::set_label( std::string label )
+void Measurement::set_id( std::string id )
 {
-  this->label_ = label;
+  this->id_ = id;
 }
 
 double Measurement::get_length() const
 {
-  return ( this->p2_ - this->p1_ ).length();
+  return ( this->p1_ - this->p0_ ).length();
 }
 
 std::string Measurement::get_note() const
@@ -93,43 +91,48 @@ void Measurement::set_note( std::string note )
   this->note_ = note;
 }
 
-Core::Point Measurement::get_point1() const
+bool Measurement::get_point( int index, Point& pt ) const
 {
-  return this->p1_;
+  if( index == 0 )
+  {
+    pt = this->p0_;
+    return true;
+  }
+  else if( index == 1 )
+  {
+    pt = this->p1_;
+    return true;
+  }
+  return false;
 }
 
-void Measurement::set_point1( Core::Point p1 )
+bool Measurement::set_point( int index, const Point& pt )
 {
-  this->p1_ = p1;
+  if( index == 0 )
+  {
+    this->p0_ = pt;
+    return true;
+  }
+  else if( index == 1 )
+  {
+    this->p1_ = pt;
+    return true;
+  }
+  return false;
 }
 
-Core::Point Measurement::get_point2() const
-{
-  return this->p2_;
-}
-
-void Measurement::set_point2( Core::Point p2 )
-{
-  this->p2_ = p2;
-}
-
-MeasureSliceType Measurement::get_slice_type() const
-{
-  return this->slice_type_;
-}
-
-void Measurement::set_slice_type( MeasureSliceType view_axis )
-{
-  this->slice_type_ = view_axis;
-}
 
 std::string ExportToString( const Measurement& value )
 {
   // Need to use special delimiter for note since any characters are allowed in a note,
   // including ']'.  Put note at end so that it functions as both a note delimiter and 
   // measurement delimiter.
-  return ( std::string( 1, '[' ) + ExportToString( value.get_visible() ) + ' ' + value.get_label() 
-    + ' ' + ExportToString( value.get_point1() ) + ' ' + ExportToString( value.get_point2() ) + 
+  Point p0;
+  value.get_point( 0, p0 );
+  Point p1;
+  value.get_point( 1, p1 );
+  return ( std::string( 1, '[' ) + ExportToString( value.get_visible() ) + ' ' + value.get_id() 
+    + ' ' + ExportToString( p0 ) + ' ' + ExportToString( p1 ) + 
     ' ' + '[' + value.get_note() + Measurement::NOTE_DELIMITER_C );
 }
 
@@ -165,13 +168,13 @@ bool ImportFromString( const std::string& str, Measurement& value )
     bool visible = false;
     ImportFromString( m[ 2 ].str(), visible );
     value.set_visible( visible );
-    value.set_label( m[ 4 ].str() );
+    value.set_id( m[ 4 ].str() );
+    Point p0;
+    ImportFromString( m[ 6 ].str(), p0 );
+    value.set_point( 0, p0 );
     Point p1;
-    ImportFromString( m[ 6 ].str(), p1 );
-    value.set_point1( p1 );
-    Point p2;
-    ImportFromString( m[ 8 ].str(), p2 );
-    value.set_point2( p2 );
+    ImportFromString( m[ 8 ].str(), p1 );
+    value.set_point( 1, p1 );
     value.set_note( m[ 11 ].str() );
     return true;
   } 

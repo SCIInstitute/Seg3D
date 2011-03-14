@@ -75,10 +75,14 @@ public:
   // measurement.
   void set_measurement( size_t index, const Core::Measurement& measurement );
 
+  // ADD_MEASUREMENT:
+  // Adds new measurement to end of list
+  void add_measurement( const Core::Measurement& measurement );
+
   // REMOVE_MEASUREMENT:
   // Remove measurement matching this one.  By not passing index, we avoid issues with indices
   // changing as measurements are removed.
-  bool remove_measurement( const Core::Measurement& measurement );
+  void remove_measurement( const Core::Measurement& measurement );
 
   // GET_ACTIVE_INDEX:
   // Get index of active measurement in table, or -1 if none.
@@ -91,6 +95,44 @@ public:
   // GET_SHOW_WORLD_UNITS:
   // Get boolean indicating whether world units (true) or index units (false) should be displayed.
   bool get_show_world_units() const;
+
+  double get_opacity() const;
+
+  // GO_TO_ACTIVE_MEASUREMENT:
+  // Do picking on all pickable views so that they move to the indicated point (0 or 1) in the
+  // active measurement.
+  void go_to_active_measurement( int point_index );
+
+  // HANDLE_MOUSE_PRESS:
+  // Called when a mouse button has been pressed.
+  virtual bool handle_mouse_press( ViewerHandle viewer, 
+    const Core::MouseHistory& mouse_history, 
+    int button, int buttons, int modifiers );
+
+  // HANDLE_MOUSE_MOVE:
+  // Called when the mouse moves in a viewer.
+  virtual bool handle_mouse_move( ViewerHandle viewer, 
+    const Core::MouseHistory& mouse_history, 
+    int button, int buttons, int modifiers );
+
+  // HANDLE_MOUSE_LEAVE:
+  // Called when the mouse has left a viewer.
+  //virtual bool handle_mouse_leave( ViewerHandle viewer );
+
+  // HANDLE_WHEEL:
+  // Called when the mouse wheel has been rotated.
+  virtual bool handle_wheel( ViewerHandle viewer, int delta, 
+    int x, int y, int buttons, int modifiers );
+
+  // HANDLE_KEY_PRESS:
+  // Called when a key is pressed.
+  virtual bool handle_key_press( ViewerHandle viewer, int key, int modifiers );
+
+  // REDRAW:
+  // Draw seed points in the specified viewer.
+  // The function should only be called by the renderer, which has a valid GL context.
+  virtual void redraw( size_t viewer_id, const Core::Matrix& proj_mat );
+  virtual bool has_2d_visual();
 
   // -- signals --
 public:

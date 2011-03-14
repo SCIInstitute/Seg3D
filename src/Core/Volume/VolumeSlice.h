@@ -102,6 +102,9 @@ public:
   // Project a point in 3D space onto the plane of the slice.
   void project_onto_slice( const Point& pt, double& i_pos, double& j_pos ) const;
 
+  // Project a point in 3D space onto the plane of the slice.  Return depth by reference.
+  void project_onto_slice( const Point& pt, double& i_pos, double& j_pos, double& depth ) const;
+
   // Return the slice number that's closest to the point in 3D space.
   int get_closest_slice( const Point& pt ) const;
 

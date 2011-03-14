@@ -357,6 +357,11 @@ void VolumeSlice::project_onto_slice( const Point& pt, double& i_pos, double& j_
   VolumeSlice::ProjectOntoSlice( this->private_->slice_type_, pt, i_pos, j_pos );
 }
 
+void VolumeSlice::project_onto_slice( const Point& pt, double& i_pos, double& j_pos, double& depth ) const
+{
+  VolumeSlice::ProjectOntoSlice( this->private_->slice_type_, pt, i_pos, j_pos, depth );
+}
+
 void VolumeSlice::move_slice_to( const Point& pos, bool fail_safe )
 {
   int slice_num = this->get_closest_slice( pos );

@@ -164,8 +164,10 @@ QVariant MeasurementTableModel::data( const QModelIndex& index, int role ) const
             // Grid transfrom takes index coords to world coords, so we need inverse
             Core::Transform inverse_transform = grid_transform.get_inverse();
 
-            Core::Vector measure_vec = 
-              measurement.get_point2() - measurement.get_point1();
+            Core::Point p0, p1;
+            measurement.get_point( 0 , p0 );
+            measurement.get_point( 1 , p1 );
+            Core::Vector measure_vec = p1 - p0;
             measure_vec = inverse_transform.project( measure_vec );
             double index_length = measure_vec.length();
 
@@ -178,7 +180,7 @@ QVariant MeasurementTableModel::data( const QModelIndex& index, int role ) const
             else 
             {
               // Format normally
-              return QString( "%1" ).arg( index_length, 0, 'f', 0 );
+              return  QString( "%1" ).arg( index_length, 0, 'f', 3 );
             }
           }
           else
@@ -242,7 +244,7 @@ QVariant MeasurementTableModel::headerData( int section, Qt::Orientation orienta
       if( section < static_cast< int >( measurements.size() ) )
       { 
         Core::Measurement measurement = measurements[ section ];
-        return QString::fromStdString( measurement.get_label() );
+        return QString::fromStdString( measurement.get_id() );
       }
       
     }
@@ -394,13 +396,13 @@ bool MeasurementTableModel::removeRows( int row, int count, const QModelIndex & 
   }
 
   // Remove rows from measurement list
-  bool ok = true;
   for( size_t i = 0; i < remove_measurements.size(); i++ )
   {
-    ok = ok && this->private_->measurement_tool_->remove_measurement( remove_measurements[ i ] );
+    // Remove is done on application thread -- no way to know if it succeeds
+    this->private_->measurement_tool_->remove_measurement( remove_measurements[ i ] );
   }
 
-  return ok;
+  return true;
 }
 
 
