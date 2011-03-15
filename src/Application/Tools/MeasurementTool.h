@@ -115,19 +115,6 @@ public:
     const Core::MouseHistory& mouse_history, 
     int button, int buttons, int modifiers );
 
-  // HANDLE_MOUSE_LEAVE:
-  // Called when the mouse has left a viewer.
-  //virtual bool handle_mouse_leave( ViewerHandle viewer );
-
-  // HANDLE_WHEEL:
-  // Called when the mouse wheel has been rotated.
-  virtual bool handle_wheel( ViewerHandle viewer, int delta, 
-    int x, int y, int buttons, int modifiers );
-
-  // HANDLE_KEY_PRESS:
-  // Called when a key is pressed.
-  virtual bool handle_key_press( ViewerHandle viewer, int key, int modifiers );
-
   // REDRAW:
   // Draw seed points in the specified viewer.
   // The function should only be called by the renderer, which has a valid GL context.

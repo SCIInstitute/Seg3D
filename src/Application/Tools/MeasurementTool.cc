@@ -28,6 +28,7 @@
 
 // Boost includes
 #include <boost/foreach.hpp>
+#include <boost/regex.hpp>
 
 // Application includes
 #include <Application/Layer/Layer.h>
@@ -100,7 +101,12 @@ public:
 	void handle_units_selection_changed( std::string units );
 	void handle_active_layer_changed( LayerHandle active_layer );
 	void handle_opacity_changed();
-	
+	void handle_active_viewer_changed( int active_viewer );
+	void handle_viewer_slice_changed( size_t viewer_id, int slice_num );
+
+	void initialize_id_counter();
+	std::string get_next_measurement_id();
+
 	//
 	// Viewer 
 	//
@@ -245,6 +251,86 @@ void MeasurementToolPrivate::handle_active_layer_changed( LayerHandle active_lay
 void MeasurementToolPrivate::handle_opacity_changed()
 {
 	this->update_viewers();
+}
+
+void MeasurementToolPrivate::handle_active_viewer_changed( int active_viewer )
+{
+	size_t viewer_id = static_cast< size_t >( active_viewer );
+	ViewerHandle viewer = ViewerManager::Instance()->get_viewer( viewer_id );
+	if ( !viewer->is_volume_view() )
+	{
+		this->handle_viewer_slice_changed( viewer_id, viewer->slice_number_state_->get() );
+	}
+}
+
+void MeasurementToolPrivate::handle_viewer_slice_changed( size_t viewer_id, int slice_num )
+{
+	size_t active_viewer = static_cast< size_t >( ViewerManager::Instance()->
+		active_viewer_state_->get() );
+	if ( viewer_id != active_viewer )
+	{
+		return;
+	}
+
+	// Update hover point based on new slice
+	this->update_hover_point();
+}
+
+void MeasurementToolPrivate::initialize_id_counter()
+{
+	// Find highest ID in use
+	this->measurement_id_counter_ = 0;
+	std::vector< Core::Measurement > measurements = this->tool_->get_measurements();
+	BOOST_FOREACH( Core::Measurement m, measurements )
+	{
+		int measurement_id = 0;
+		boost::regex reg( "(M)(\\d*)" );
+		boost::smatch sub_matches;
+		// Note that we can't just pass m.get_id() directly into regex_match because the string will
+		// go out of scope and sub_matches contains iterators that point into the string.  
+		std::string str = m.get_id();
+		if( boost::regex_match( str, sub_matches, reg ) ) 
+		{
+			Core::ImportFromString( sub_matches[ 2 ].str(), measurement_id );
+
+			if( measurement_id >= this->measurement_id_counter_ )
+			{
+				this->measurement_id_counter_ = measurement_id + 1;
+			}
+		}
+	}
+}
+
+std::string MeasurementToolPrivate::get_next_measurement_id()
+{
+	if( this->measurement_id_counter_ == -1 )
+	{
+		this->initialize_id_counter();
+	}
+
+	// Find first id not already in use (may have been loaded from session file)
+	while( true )
+	{
+		std::string canditate_id = "M" + 
+			Core::ExportToString( this->measurement_id_counter_ );
+		this->measurement_id_counter_++;
+
+		// Make sure this ID isn't in use
+		bool in_use = false;
+		std::vector< Core::Measurement > measurements = this->tool_->get_measurements();
+		BOOST_FOREACH( Core::Measurement m, measurements )
+		{
+			if( canditate_id == m.get_id() )
+			{
+				in_use = true;
+				break;
+			}
+		}
+		if( !in_use )
+		{
+			return canditate_id;
+		}
+	}
 }
 
 void MeasurementToolPrivate::update_viewers()
@@ -505,7 +591,7 @@ MeasurementTool::MeasurementTool( const std::string& toolid ) :
 	this->private_->tool_ = this;
 	this->private_->active_group_id_ = "";
 	this->private_->editing_ = false;
-	this->private_->measurement_id_counter_ = 0;
+	this->private_->measurement_id_counter_ = -1;
 
 	// State variable gets allocated here
 	this->add_state( "measurements", this->measurements_state_ );
@@ -530,6 +616,19 @@ MeasurementTool::MeasurementTool( const std::string& toolid ) :
 		boost::bind( &MeasurementToolPrivate::handle_active_layer_changed, this->private_, _1 ) ) );
 	this->add_connection( this->opacity_state_->state_changed_signal_.connect(
 		boost::bind( &MeasurementToolPrivate::handle_opacity_changed, this->private_ ) ) );
+	this->add_connection( ViewerManager::Instance()->active_viewer_state_->value_changed_signal_.
+		connect( boost::bind( &MeasurementToolPrivate::handle_active_viewer_changed, 
+		this->private_, _1 ) ) );
+
+	size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
+
+	for ( size_t i = 0; i < num_of_viewers; ++i )
+	{
+		ViewerHandle viewer = ViewerManager::Instance()->get_viewer( i );
+		this->add_connection( viewer->slice_number_state_->value_changed_signal_.connect(
+			boost::bind( &MeasurementToolPrivate::handle_viewer_slice_changed,
+			this->private_, i, _1 ) ) );
+	}
 }
 
 MeasurementTool::~MeasurementTool()
@@ -638,7 +737,7 @@ bool MeasurementTool::handle_mouse_press( ViewerHandle viewer,
 	{
 		if( this->private_->editing_ ) 
 		{
-			// We were editing
+			// State: We were editing
 
 			// Done editing
 			this->private_->finish_editing();
@@ -653,22 +752,20 @@ bool MeasurementTool::handle_mouse_press( ViewerHandle viewer,
 			if( this->private_->get_hover_measurement( measurement_index, measurement, hover_point ) 
 				&& this->private_->in_slice( viewer, hover_point ) )
 			{
-				// Hovering over point that is in slice 
+				// State: Hovering over point that is in slice 
 
 				// Start editing
 				this->private_->start_editing();
 			}
 			else 
 			{
-				// Hovering over no point or point not in slice
+				// State: Hovering over no point or point not in slice
 
 				// Create new measurement 
 				Core::Measurement measurement;
 
 				// Need ID for measurement
-				// TODO Find id not already in use (may have been loaded from session file)
-				measurement.set_id( "M" + Core::ExportToString( this->private_->measurement_id_counter_ ) );
-				this->private_->measurement_id_counter_++;
+				measurement.set_id( this->private_->get_next_measurement_id() );
 
 				// Get 3D point from 2D mouse coords, create new measurement with P1 = P2, add to state vector using action.
 				Core::Point pt;
@@ -723,23 +820,6 @@ bool MeasurementTool::handle_mouse_press( ViewerHandle viewer,
 			return false;
 		}
 	}
-
-	return true;
-}
-
-bool MeasurementTool::handle_wheel( ViewerHandle viewer, int delta, int x, int y, int buttons, 
-	int modifiers )
-{	
-	// Update hover point based on new slice
-	this->private_->update_hover_point();
-
-	return true;
-}
-
-bool MeasurementTool::handle_key_press( ViewerHandle viewer, int key, int modifiers )
-{
-	// If changed view, update hover point based on new view
-	this->private_->update_hover_point();
 
 	return true;
 }

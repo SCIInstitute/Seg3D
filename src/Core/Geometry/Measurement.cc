@@ -162,7 +162,6 @@ bool ImportFromString( const std::string& str, Measurement& value )
     note_end_reg;
   boost::regex reg( full_reg );
   boost::smatch m;
-  std::string matched_string = "";
   if( boost::regex_match( str, m, reg ) ) 
   {
     bool visible = false;
