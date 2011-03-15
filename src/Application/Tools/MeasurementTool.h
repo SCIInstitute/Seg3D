@@ -103,15 +103,19 @@ public:
   // active measurement.
   void go_to_active_measurement( int point_index );
 
-  // HANDLE_MOUSE_PRESS:
-  // Called when a mouse button has been pressed.
-  virtual bool handle_mouse_press( ViewerHandle viewer, 
-    const Core::MouseHistory& mouse_history, 
-    int button, int buttons, int modifiers );
+  // HANDLE_MOUSE_LEAVE:
+  // Called when the mouse has left a viewer.
+  //virtual bool handle_mouse_leave( ViewerHandle viewer ); 
 
   // HANDLE_MOUSE_MOVE:
   // Called when the mouse moves in a viewer.
   virtual bool handle_mouse_move( ViewerHandle viewer, 
+    const Core::MouseHistory& mouse_history, 
+    int button, int buttons, int modifiers );
+
+  // HANDLE_MOUSE_PRESS:
+  // Called when a mouse button has been pressed.
+  virtual bool handle_mouse_press( ViewerHandle viewer, 
     const Core::MouseHistory& mouse_history, 
     int button, int buttons, int modifiers );
 

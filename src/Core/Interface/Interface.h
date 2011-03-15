@@ -121,6 +121,8 @@ public:
 
 };
 
+#define ASSERT_IS_INTERFACE_THREAD() assert( Core::Interface::IsInterfaceThread() )
+
 } // end namespace Core
 
 #endif

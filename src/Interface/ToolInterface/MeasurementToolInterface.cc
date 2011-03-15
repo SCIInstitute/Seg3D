@@ -47,15 +47,41 @@ class MeasurementToolInterfacePrivate
 {
 public:
   Ui::MeasurementToolInterface ui_;
+  MeasurementToolInterface* interface_;
 
   MeasurementTableModel*  table_model_;
   MeasurementTableView* table_view_;
+
+  int go_to_point_index_;
+
+  void handle_go_to_active_measurement();
 };
+
+void MeasurementToolInterfacePrivate::handle_go_to_active_measurement()
+{
+  // Go to active measurement
+  MeasurementToolHandle tool_handle = 
+    boost::dynamic_pointer_cast< MeasurementTool >( this->interface_->tool() );
+  tool_handle->go_to_active_measurement( this->go_to_point_index_ );
+
+  // Toggle point index
+  this->go_to_point_index_ = 1 - this->go_to_point_index_;
+  if( this->go_to_point_index_ == 0 )
+  {
+    this->ui_.goto_button_->setText( "Go To First Point" );
+  }
+  else
+  {
+    this->ui_.goto_button_->setText( "Go To Second Point" );
+  }
+}
 
 // constructor
 MeasurementToolInterface::MeasurementToolInterface() :
   private_( new MeasurementToolInterfacePrivate )
 {
+  this->private_->interface_ = this;
+  this->private_->go_to_point_index_ = 0;
 }
 
 // destructor
@@ -95,6 +121,8 @@ bool MeasurementToolInterface::build_widget( QFrame* frame )
 
   // Connect the gui to the tool through the QtBridge
   QtUtils::QtBridge::Connect( button_group, tool_handle->units_selection_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.goto_button_, boost::bind(
+    &MeasurementToolInterfacePrivate::handle_go_to_active_measurement, this->private_ ) );
   QtUtils::QtBridge::Connect( this->private_->ui_.copy_button_, boost::bind(
     &MeasurementTableView::copy_selected_cells, this->private_->table_view_ ) );
   QtUtils::QtBridge::Connect( this->private_->ui_.delete_button_, boost::bind(
