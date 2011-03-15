@@ -143,8 +143,13 @@ private:
 
   // PICK_POINT:
   // Move the 2D viewers that are currently set as picking targets to 
-  // the specified position in world space.
+  // the specified position in world space.  Exclude the source viewer.
   void pick_point( size_t source_viewer, const Core::Point& pt );
+
+  // PICK_POINT:
+  // Move the 2D viewers that are currently set as picking targets to 
+  // the specified position in world space.
+  void pick_point( const Core::Point& pt );
 
   // ADD_NEW_FEATURE:
   // Add a new transfer function feature.

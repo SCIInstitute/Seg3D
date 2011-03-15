@@ -60,6 +60,11 @@ bool ActionPickPoint::run( Core::ActionContextHandle& context,
       this->point_.value() );
     return true;
   }
+  else
+  { 
+    ViewerManager::Instance()->pick_point( this->point_.value() );
+    return true;
+  }
   return false;
 }
 

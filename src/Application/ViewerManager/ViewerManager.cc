@@ -752,6 +752,25 @@ void ViewerManager::pick_point( size_t source_viewer, const Core::Point& pt )
   }
 }
 
+void ViewerManager::pick_point( const Core::Point& pt )
+{
+  if ( this->active_axial_viewer_->get() >= 0 )
+  {
+    ViewerHandle viewer = this->private_->viewers_[ this->active_axial_viewer_->get() ];
+    viewer->move_slice_to( pt );
+  }
+  if ( this->active_coronal_viewer_->get() >= 0 )
+  {
+    ViewerHandle viewer = this->private_->viewers_[ this->active_coronal_viewer_->get() ];
+    viewer->move_slice_to( pt );
+  }
+  if ( this->active_sagittal_viewer_->get() >= 0 )
+  {
+    ViewerHandle viewer = this->private_->viewers_[ this->active_sagittal_viewer_->get() ];
+    viewer->move_slice_to( pt );
+  }
+}
+
 std::vector< size_t > ViewerManager::get_locked_viewers( int mode_index )
 {
   return this->private_->locked_viewers_[ mode_index ];

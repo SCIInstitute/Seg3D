@@ -776,20 +776,7 @@ void MeasurementTool::go_to_active_measurement( int point_index )
 		Core::Point pick_point;
 		measurements[ active_index ].get_point( point_index, pick_point );
 
-		ViewerHandle viewer = ViewerManager::Instance()->get_active_viewer();
-		ActionPickPoint::Dispatch( Core::Interface::GetWidgetActionContext(), 
-			viewer->get_viewer_id(), pick_point );
-
-		/*size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
-		for ( size_t i = 0; i < num_of_viewers; ++i )
-		{
-			ViewerHandle viewer = ViewerManager::Instance()->get_viewer( i );
-			if( !viewer->is_volume_view() )
-			{
-				ActionPickPoint::Dispatch( Core::Interface::GetWidgetActionContext(), 
-					viewer->get_viewer_id(), pick_point );
-			}
-		}	*/
+		ActionPickPoint::Dispatch( Core::Interface::GetWidgetActionContext(), -1, pick_point );
 	}
 }
 
