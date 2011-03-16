@@ -41,9 +41,11 @@
 
 // Core includes
 #include <Core/Geometry/Point.h>
+#include <Core/RenderResources/RenderResources.h>
 #include <Core/State/Actions/ActionAdd.h>
 #include <Core/State/Actions/ActionRemove.h>
 #include <Core/State/Actions/ActionSetAt.h>
+#include <Core/TextRenderer/TextRenderer.h>
 #include <Core/Utils/Lockable.h>
 #include <Core/Viewer/Mouse.h>
 
@@ -166,6 +168,11 @@ public:
 	int measurement_id_counter_; // Only accessed from interface thread
 
 	Core::MousePosition mouse_pos_; // Should be mutex-protected
+
+	//Core::TextRendererHandle text_renderer_;
+	//Core::Texture2DHandle text_texture_;
+
+	int saved_num_measurements_; // Only accessed from application thread
 };
 
 // Called in response to state changed signal
@@ -175,16 +182,21 @@ void MeasurementToolPrivate::handle_measurements_changed()
 	// under us.
 	ASSERT_IS_APPLICATION_THREAD();
 
-	// Measurements may have been added or removed, so update the active index
-	size_t num_measurements = this->tool_->get_measurements().size();
+	int num_measurements = static_cast< int >( this->tool_->get_measurements().size() );
 
 	if( num_measurements > 0 )
 	{
-		// If the active index isn't in the valid range, set to end of list
+		// Measurements may have been added or removed, so update the active index
+		bool num_measurements_changed = this->saved_num_measurements_ != -1 && 
+			num_measurements != saved_num_measurements_;
+
 		int active_index = this->tool_->get_active_index();
-		if( active_index == -1 || active_index >= static_cast< int >( num_measurements ) )
+		bool active_index_invalid = active_index == -1 || active_index >= num_measurements;
+
+		if( num_measurements_changed || active_index_invalid )
 		{
-			this->tool_->set_active_index( static_cast< int >( num_measurements ) - 1 );
+			// Set active index to end of list.
+			this->tool_->set_active_index( num_measurements - 1 );		
 		}
 	}
 	else
@@ -192,10 +204,11 @@ void MeasurementToolPrivate::handle_measurements_changed()
 		this->tool_->set_active_index( -1 );
 	}
 
+	this->saved_num_measurements_ = num_measurements;
+
 	// Need to redraw the overlay
 	this->update_viewers();
 }
-
 
 void MeasurementToolPrivate::handle_units_selection_changed( std::string units )
 {
@@ -641,6 +654,8 @@ MeasurementTool::MeasurementTool( const std::string& toolid ) :
 	this->private_->active_group_id_ = "";
 	this->private_->editing_ = false;
 	this->private_->measurement_id_counter_ = -1;
+	this->private_->saved_num_measurements_ = -1;
+	//this->private_->text_renderer_.reset( new Core::TextRenderer );
 
 	// State variable gets allocated here
 	this->add_state( "measurements", this->measurements_state_ );
@@ -718,13 +733,6 @@ void MeasurementTool::add_measurement( const Core::Measurement& measurement )
 
 void MeasurementTool::remove_measurement( const Core::Measurement& measurement )
 {
-	// Set active index to the end of the list 
-	size_t num_measurements = this->get_measurements().size();
-	if( num_measurements > 1 )
-	{
-		this->set_active_index( static_cast< int >( num_measurements ) - 1 );
-	}
-
 	// Remove measurement
 	// Ensure that state is changed on application thread
 	Core::ActionRemove::Dispatch( Core::Interface::GetWidgetActionContext(), 
@@ -829,8 +837,9 @@ bool MeasurementTool::handle_mouse_press( ViewerHandle viewer,
 				&& this->private_->in_slice( viewer, hover_point ) )
 			{
 				// State: Hovering over point that is in slice 
-
+				
 				// Start editing
+				this->set_active_index( static_cast< int >( measurement_index ) );
 				this->private_->start_editing();
 			}
 			else 
@@ -898,8 +907,17 @@ bool MeasurementTool::handle_mouse_press( ViewerHandle viewer,
 
 void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 {
+	// This function can be called from multiple rendering threads -- one per viewer
 	ViewerHandle viewer = ViewerManager::Instance()->get_viewer( viewer_id );
+	if ( viewer->is_volume_view() )
+	{
+		return;
+	}
 	Core::VolumeSliceHandle vol_slice = viewer->get_active_volume_slice();
+	if ( !vol_slice )
+	{
+		return;
+	}
 
 	// Apply opacity to color
 	double opacity = this->get_opacity();
@@ -980,11 +998,59 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 			}
 			glEnd();
 
-			// Render length above line, label below line -- HOW?
+			// Render length above line, label below line
+			// lock the shared render context
+			
+			//Core::RenderResources::lock_type render_lock( Core::RenderResources::GetMutex() );
+			//Core::TextRendererHandle text_renderer;
+			//text_renderer.reset( new Core::TextRenderer );
+			//Core::Texture2DHandle text_texture;
+			//text_texture.reset( new Core::Texture2D );
+			////this->private_->text_texture_->set_image( viewer->get_width(), viewer->get_height(), 
+			////	GL_ALPHA );
+			////text_texture->set_min_filter( GL_NEAREST );
+			////text_texture->set_mag_filter( GL_NEAREST );
+
+			//CORE_CHECK_OPENGL_ERROR();
+
+			//std::vector< unsigned char > buffer( viewer->get_width() * viewer->get_height(), 1 );
+			//text_renderer->render_aligned( "Test", &buffer[ 0 ], 
+			//	viewer->get_width(), viewer->get_height(), 14, Core::TextHAlignmentType::RIGHT_E, 
+			//	Core::TextVAlignmentType::TOP_E, 5, 5, 5, 5 );
+
+			//CORE_CHECK_OPENGL_ERROR();
+
+			//text_texture->enable();
+			//CORE_CHECK_OPENGL_ERROR();
+			//glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+			//CORE_CHECK_OPENGL_ERROR();
+			//text_texture->set_image( viewer->get_width(), viewer->get_height(),
+			//	GL_ALPHA, &buffer[ 0 ], GL_ALPHA, GL_UNSIGNED_BYTE );
+			//
+			//CORE_CHECK_OPENGL_ERROR();
+
+			//// Blend the text onto the framebuffer
+			//glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_ADD );
+			//glBegin( GL_QUADS );
+			//glColor4f( 1.0f, 0.6f, 0.1f, 0.75f );
+			//glTexCoord2f( 0.0f, 0.0f );
+			//glVertex2i( 0, 0 );
+			//glTexCoord2f( 1.0f, 0.0f );
+			//glVertex2i( viewer->get_width() - 1, 0 );
+			//glTexCoord2f( 1.0f, 1.0f );
+			//glVertex2i( viewer->get_width() - 1, viewer->get_height() - 1 );
+			//glTexCoord2f( 0.0f, 1.0f );
+			//glVertex2i( 0, viewer->get_height() - 1 );
+			//glEnd();
+			//text_texture->disable();
+			//glFinish();
+			//CORE_CHECK_OPENGL_ERROR();
 		}
 	}
 	glPopMatrix();
 	glPopAttrib();
+
+	//glFinish();
 }
 
 bool MeasurementTool::has_2d_visual()

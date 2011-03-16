@@ -72,9 +72,13 @@ private:
 public:
   typedef QPointer< MeasurementToolInterface > qpointer_type;
 
+  // UPDATEMEASUREMENTTABLE:
+  // Update entire table including dimensions.  Scroll to active index.  
+  static void UpdateMeasurementTable( qpointer_type measurement_interface );
+
   // UPDATEMEASUREMENTMODEL:
-  // Force the interface to update the measurement model
-  static void UpdateMeasurementModel( qpointer_type measurement_interface );
+  // Update only table cells, not table dimensions.
+  static void UpdateMeasurementCells( qpointer_type measurement_interface );
 
   // UPDATEMEASUREMENTNOTE:
   // Update the note in the text box

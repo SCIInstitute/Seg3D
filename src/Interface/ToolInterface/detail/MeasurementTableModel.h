@@ -84,7 +84,7 @@ public:
   //
 
   // UPDATE_TABLE:
-  // Update entire table including dimensions.  
+  // Update entire table including dimensions.  Scroll to active index.  
   // Stops any editing that the user may be doing on the table.  Clears currently selected cells.
   void update_table();
 

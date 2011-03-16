@@ -108,9 +108,13 @@ bool MeasurementToolInterface::build_widget( QFrame* frame )
   The model in turn gets its data from the measurements state. */ 
   qpointer_type measurement_interface( this );  
   this->add_connection( tool_handle->measurements_state_->state_changed_signal_.connect( 
-    boost::bind( &MeasurementToolInterface::UpdateMeasurementModel, measurement_interface ) ) );
+    boost::bind( &MeasurementToolInterface::UpdateMeasurementCells, measurement_interface ) ) );
   this->add_connection( tool_handle->units_changed_signal_.connect(
-    boost::bind( &MeasurementToolInterface::UpdateMeasurementModel, measurement_interface ) ) );
+    boost::bind( &MeasurementToolInterface::UpdateMeasurementCells, measurement_interface ) ) );
+  // Active index changing indicates that table size may have changed, and either way need to 
+  // scroll to active index.
+  this->add_connection( tool_handle->active_index_state_->state_changed_signal_.connect( 
+    boost::bind( &MeasurementToolInterface::UpdateMeasurementTable, measurement_interface ) ) );
   this->add_connection( tool_handle->active_index_state_->state_changed_signal_.connect( 
     boost::bind( &MeasurementToolInterface::UpdateMeasurementNote, measurement_interface ) ) );
   
@@ -139,7 +143,7 @@ bool MeasurementToolInterface::build_widget( QFrame* frame )
   QObject::connect( this->private_->ui_.note_textbox_, SIGNAL( editing_finished() ), 
     this->private_->table_model_, SLOT( save_active_note() ) );
 
-  UpdateMeasurementModel( measurement_interface );
+  UpdateMeasurementTable( measurement_interface );
 
   //Send a message to the log that we have finished with building the Measure Tool Interface
   CORE_LOG_MESSAGE( "Finished building an Measure Tool Interface" );
@@ -164,13 +168,13 @@ void MeasurementToolInterface::set_measurement_note_table()
     this->private_->ui_.note_textbox_->document()->toPlainText() );
 }
 
-void MeasurementToolInterface::UpdateMeasurementModel( qpointer_type measurement_interface )
+void MeasurementToolInterface::UpdateMeasurementTable( qpointer_type measurement_interface )
 {   
   // Ensure that this call gets relayed to the right thread
   if ( !( Core::Interface::IsInterfaceThread() ) )
   {
     Core::Interface::PostEvent( boost::bind( 
-      &MeasurementToolInterface::UpdateMeasurementModel, measurement_interface ) );
+      &MeasurementToolInterface::UpdateMeasurementTable, measurement_interface ) );
     return;
   }
 
@@ -201,6 +205,26 @@ void MeasurementToolInterface::UpdateMeasurementModel( qpointer_type measurement
   }
 }
 
+void MeasurementToolInterface::UpdateMeasurementCells( qpointer_type measurement_interface )
+{
+
+  // Ensure that this call gets relayed to the right thread
+  if ( !( Core::Interface::IsInterfaceThread() ) )
+  {
+    Core::Interface::PostEvent( boost::bind( 
+      &MeasurementToolInterface::UpdateMeasurementCells, measurement_interface ) );
+    return;
+  }
+
+  // Protect interface pointer, so we do not execute if interface does not exist anymore
+  if ( measurement_interface.data() )
+  {
+    // Update only table cells, not table dimensions
+    // Needed in order to update background color for active/non-active cells
+    measurement_interface->private_->table_model_->update_cells();
+  }
+}
+
 void MeasurementToolInterface::UpdateMeasurementNote( qpointer_type measurement_interface )
 {
   // Ensure that this call gets relayed to the right thread
@@ -214,10 +238,6 @@ void MeasurementToolInterface::UpdateMeasurementNote( qpointer_type measurement_
   // Protect interface pointer, so we do not execute if interface does not exist anymore
   if ( measurement_interface.data() )
   {
-    // Update only table cells, not table dimensions
-    // Needed in order to update background color for active/non-active cells
-    measurement_interface->private_->table_model_->update_cells();
-
     // Updates table view
     measurement_interface->private_->ui_.note_textbox_->setText( 
       measurement_interface->private_->table_model_->get_active_note() );
@@ -225,3 +245,4 @@ void MeasurementToolInterface::UpdateMeasurementNote( qpointer_type measurement_
 }
 
 } // end namespace Seg3D
+
