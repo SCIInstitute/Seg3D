@@ -73,10 +73,20 @@ public:
 private Q_SLOTS:
   void handle_model_reset();
   void handle_selected();
+  void handle_header_clicked( int index );
 
 private:
   MeasurementTableViewPrivateHandle private_;
 }; 
+
+// Derived vertical header that uses MeasurementTableView's context menu
+//class MeasurementHorizontalHeader : public QHeaderView
+//{
+//public:
+//  MeasurementHorizontalHeader( Qt::Orientation orientation, QWidget * parent = 0 );
+//
+//  void mousePressEvent( QMouseEvent * e );
+//};
 
 } // end namespace Seg3D
 

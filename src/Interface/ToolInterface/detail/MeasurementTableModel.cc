@@ -36,20 +36,32 @@
 
 // Application includes
 #include <Application/LayerManager/LayerManager.h>
+//#include <Application/Tools/Actions/ActionSaveActiveNote.h>
 
 namespace Seg3D
 {
+
+CORE_ENUM_CLASS 
+(
+  MeasurementVisibility,
+  ALL_VISIBLE_E, 
+  NONE_VISIBLE_E,
+  SOME_VISIBLE_E
+)
 
 class MeasurementTableModelPrivate 
 {
 public:
   void set_active_index( int active_index );
+  void update_visibility();
 
   std::string cached_active_note_;
   bool use_cached_active_note_;
   MeasurementToolHandle measurement_tool_;
 
   MeasurementTableModel * model_;
+
+  int visibility_; 
 };
 
 void MeasurementTableModelPrivate::set_active_index( int active_index )
@@ -80,6 +92,34 @@ void MeasurementTableModelPrivate::set_active_index( int active_index )
   int num_columns = this->model_->columnCount( QModelIndex() );
 }
 
+void MeasurementTableModelPrivate::update_visibility()
+{
+  ASSERT_IS_INTERFACE_THREAD();
+
+  std::vector< Core::Measurement > measurements = 
+    this->measurement_tool_->get_measurements();
+  size_t num_visible_measurements = 0;
+  for( size_t i = 0; i < measurements.size(); i++ )
+  {
+    if( measurements[ i ].get_visible() )
+    {
+      num_visible_measurements++;
+    }
+  }
+  if( num_visible_measurements == 0 )
+  {
+    this->visibility_ = MeasurementVisibility::NONE_VISIBLE_E;
+  }
+  else if( num_visible_measurements == measurements.size() )
+  {
+    this->visibility_ = MeasurementVisibility::ALL_VISIBLE_E;
+  }
+  else
+  {
+    this->visibility_ = MeasurementVisibility::SOME_VISIBLE_E;
+  }
+}
+
 MeasurementTableModel::MeasurementTableModel( MeasurementToolHandle measurement_tool, 
   QObject* parent ) :
   QAbstractTableModel( parent ),
@@ -89,6 +129,7 @@ MeasurementTableModel::MeasurementTableModel( MeasurementToolHandle measurement_
   this->private_->measurement_tool_ = measurement_tool;
   this->private_->cached_active_note_ = "";
   this->private_->use_cached_active_note_ = false;
+  this->private_->visibility_ = MeasurementVisibility::ALL_VISIBLE_E;
 }
 
 MeasurementTableModel::~MeasurementTableModel()
@@ -230,34 +271,55 @@ QVariant MeasurementTableModel::data( const QModelIndex& index, int role ) const
 
 QVariant MeasurementTableModel::headerData( int section, Qt::Orientation orientation, int role ) const
 {
-  if ( role != Qt::DisplayRole )
+  if( role == Qt::DecorationRole )
   {
-    return QVariant();
-  }
-
-  if( orientation == Qt::Vertical )
-  {
-    if( section < this->rowCount( QModelIndex() ) )
+    if( orientation == Qt::Horizontal )
     {
-      std::vector< Core::Measurement > measurements = 
-        this->private_->measurement_tool_->get_measurements();
-      if( section < static_cast< int >( measurements.size() ) )
-      { 
-        Core::Measurement measurement = measurements[ section ];
-        return QString::fromStdString( measurement.get_id() );
+      if( section == MeasurementColumns::VISIBLE_E )
+      {
+        if( this->private_->visibility_ == MeasurementVisibility::ALL_VISIBLE_E )
+        {
+          return QIcon( QString::fromUtf8( ":/Images/Visible.png" ) );
+        }
+        else if( this->private_->visibility_ == MeasurementVisibility::NONE_VISIBLE_E )
+        {
+          return QIcon( QString::fromUtf8( ":/Images/VisibleOff.png" ) );
+        }
+        else if( this->private_->visibility_ == MeasurementVisibility::SOME_VISIBLE_E )
+        {
+          return QIcon( QString::fromUtf8( ":/Images/VisibleGray.png" ) );
+        }
       }
-      
+    }
+  }
+  else if ( role == Qt::DisplayRole )
+  {   
+    if( orientation == Qt::Vertical )
+    {
+      if( section < this->rowCount( QModelIndex() ) )
+      {
+        std::vector< Core::Measurement > measurements = 
+          this->private_->measurement_tool_->get_measurements();
+        if( section < static_cast< int >( measurements.size() ) )
+        { 
+          Core::Measurement measurement = measurements[ section ];
+          return QString::fromStdString( measurement.get_id() );
+        }   
+      }
+    }
+    else if( orientation == Qt::Horizontal )
+    {
+      if ( section == MeasurementColumns::LENGTH_E ) 
+      {
+        return QString( "Length" );
+      }
+      else if ( section == MeasurementColumns::NOTE_E )
+      {
+        return QString( "Note" );
+      }
     }
   }
 
-  if ( section == MeasurementColumns::LENGTH_E ) 
-  {
-    return QString( "Length" );
-  }
-  else if ( section == MeasurementColumns::NOTE_E )
-  {
-    return QString( "Note" );
-  }
   return QVariant();
 }
 
@@ -344,6 +406,8 @@ void MeasurementTableModel::handle_click( const QModelIndex & index )
 
 void MeasurementTableModel::update_table()
 {
+  this->private_->update_visibility();
+
   QAbstractTableModel::reset();
 
   // Needed for initial update after loading measurements from project file
@@ -352,11 +416,14 @@ void MeasurementTableModel::update_table()
 
 void MeasurementTableModel::update_cells()
 {
+  this->private_->update_visibility();
+
   int rows = this->rowCount( QModelIndex() );
   int columns = this->columnCount( QModelIndex() );
   QModelIndex top_left = this->index( 0, 0 );
   QModelIndex bottom_right = this->index( rows - 1, columns - 1 );
   Q_EMIT dataChanged( top_left, bottom_right );
+  Q_EMIT headerDataChanged( Qt::Horizontal, 0, 0 );
 
   Q_EMIT active_note_changed( this->get_active_note() ); 
 }
@@ -429,7 +496,7 @@ void MeasurementTableModel::remove_rows( const std::vector< int >& rows )
   }
 }
 
-void MeasurementTableModel::save_active_note() 
+void MeasurementTableModel::save_cached_active_note() 
 {
   if( this->private_->use_cached_active_note_ )
   {
@@ -443,7 +510,28 @@ void MeasurementTableModel::save_active_note()
       this->private_->measurement_tool_->set_measurement( active_index, measurement );
     }
     
+    /*ActionSaveActiveNote::Dispatch( Core::Interface::GetWidgetActionContext(), 
+      this->private_->measurement_tool_->active_index_state_,
+      this->private_->measurement_tool_->measurements_state_, 
+      this->private_->cached_active_note_ );*/
+
     this->private_->use_cached_active_note_ = false;
+  }
+}
+
+void MeasurementTableModel::toggle_visible()
+{
+  // Run from interface thread
+  if( this->private_->visibility_ == MeasurementVisibility::ALL_VISIBLE_E )
+  {
+    //this->private_->visibility_ = MeasurementVisibility::NONE_VISIBLE_E;
+    this->private_->measurement_tool_->set_all_visible( false );
+  }
+  else if( this->private_->visibility_ == MeasurementVisibility::NONE_VISIBLE_E || 
+    this->private_->visibility_ == MeasurementVisibility::SOME_VISIBLE_E )
+  {
+    //this->private_->visibility_ = MeasurementVisibility::ALL_VISIBLE_E;
+    this->private_->measurement_tool_->set_all_visible( true );
   }
 }
 

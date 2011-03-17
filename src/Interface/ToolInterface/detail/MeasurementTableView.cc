@@ -127,8 +127,13 @@ MeasurementTableView::MeasurementTableView( QWidget* parent ) :
   this->private_->delete_action_ = new QAction( tr( "&Delete" ), this );
 
   // Custom text editor for note column
-  this->setItemDelegate( new MeasurementTextDelegate( MeasurementColumns::NOTE_E ) ); 
+  this->setItemDelegate( new MeasurementTextDelegate( MeasurementColumns::NOTE_E ) );
+  // Use derived horizontal header that provides a tri-state button for visibility
+  //this->setHorizontalHeaderHeader( new MeasurementHorizontalHeader( Qt::Horizontal, this ) );
+  this->horizontalHeader()->setClickable( true );
   this->horizontalHeader()->setStretchLastSection( true ); // Stretch note section
+  QObject::connect( this->horizontalHeader(), SIGNAL( sectionClicked( int ) ), 
+    this, SLOT( handle_header_clicked( int ) ) );
   this->setVerticalScrollBar( new MeasurementScrollBar( this ) );
 }
 
@@ -285,5 +290,44 @@ void MeasurementTableView::handle_selected()
   MeasurementTableModel* model = qobject_cast< MeasurementTableModel* >( this->model() );
   model->handle_selected( this->selectionModel()->selection() );
 }
+
+void MeasurementTableView::handle_header_clicked( int index )
+{
+  if( index == 0 )
+  {
+    MeasurementTableModel* model = qobject_cast< MeasurementTableModel* >( this->model() );
+    model->toggle_visible();
+  }
+
+  /*
+  model has toggle_visible
+  - Changes private var storing tri-state state
+  - That var used when returning icon
+  - Calls MeasurementTool::set_visible( true or false)
+  */
+}
+
+//MeasurementHorizontalHeader::MeasurementHorizontalHeader( Qt::Orientation orientation, 
+//                           QWidget * parent /*= 0 */ ) :
+//QHeaderView( orientation, parent )
+//{
+//  this->setClickable( true );
+//}
+//
+//void MeasurementHorizontalHeader::mousePressEvent( QMouseEvent * e )
+//{
+//  // Treat right-click the same as left-click
+//  if( e->button() == Qt::RightButton )
+//  {
+//    QMouseEvent* mouse_event = new QMouseEvent( QEvent::MouseButtonPress, e->pos(), 
+//      e->globalPos(), Qt::LeftButton, e->buttons(), e->modifiers() );
+//    QHeaderView::mousePressEvent( mouse_event );
+//  }
+//  else
+//  {
+//    QHeaderView::mousePressEvent( e );
+//  }
+//
+//}
 
 } // end namespace Seg3D

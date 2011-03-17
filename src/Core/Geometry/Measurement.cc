@@ -39,19 +39,19 @@ namespace Core
 
 const std::string Measurement::NOTE_DELIMITER_C = " NOTE_END]]";
 
-Measurement::Measurement( bool visible, std::string label, std::string note, 
+Measurement::Measurement( std::string id, bool visible, std::string note, 
   Core::Point p0, Core::Point p1 ) : 
-  visible_( visible ), 
-  id_( label ), 
-  note_( note ), 
-  p0_( p0 ), 
-  p1_( p1 )
+  id_( id ),
+  visible_( visible ),  
+  note_( note )
 {
+  this->points_[ 0 ] = p0;
+  this->points_[ 1 ] = p1;
 }
 
 Measurement::Measurement() :
-  visible_( false ), 
   id_( "" ), 
+  visible_( false ), 
   note_( "" )
 {
 }
@@ -78,7 +78,7 @@ void Measurement::set_id( std::string id )
 
 double Measurement::get_length() const
 {
-  return ( this->p1_ - this->p0_ ).length();
+  return ( this->points_[ 1 ] - this->points_[ 0 ] ).length();
 }
 
 std::string Measurement::get_note() const
@@ -93,34 +93,19 @@ void Measurement::set_note( std::string note )
 
 bool Measurement::get_point( int index, Point& pt ) const
 {
-  if( index == 0 )
-  {
-    pt = this->p0_;
-    return true;
-  }
-  else if( index == 1 )
-  {
-    pt = this->p1_;
-    return true;
-  }
-  return false;
+  if( !( index == 0 || index == 1 ) ) return false;
+
+  pt = this->points_[ index ];
+  return true;
 }
 
 bool Measurement::set_point( int index, const Point& pt )
 {
-  if( index == 0 )
-  {
-    this->p0_ = pt;
-    return true;
-  }
-  else if( index == 1 )
-  {
-    this->p1_ = pt;
-    return true;
-  }
-  return false;
-}
+  if( !( index == 0 || index == 1 ) ) return false;
 
+  this->points_[ index ] = pt;
+  return true;
+}
 
 std::string ExportToString( const Measurement& value )
 {

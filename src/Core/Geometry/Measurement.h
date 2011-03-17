@@ -35,7 +35,6 @@
 
 // Core includes
 #include <Core/Geometry/Point.h>
-#include <Core/Utils/EnumClass.h>
 
 namespace Core
 {
@@ -48,7 +47,7 @@ class Measurement
 {
 public:
 
-  Measurement( bool visible, std::string id, std::string note, Core::Point p0, Core::Point p1 );
+  Measurement( std::string id, bool visible, std::string note, Core::Point p0, Core::Point p1 );
   Measurement();
 
   // GET_VISIBLE:
@@ -85,7 +84,7 @@ public:
   // Get 3D world coordinate of point at given index (0 or 1)
   bool get_point( int index, Point& pt ) const;
 
-  // SET_POINT1:
+  // SET_POINT:
   // Set 3D world coordinate of point at given index (0 or 1)
   bool set_point( int index, const Point& pt );
 
@@ -93,25 +92,27 @@ public:
   inline bool operator!=( const Measurement& ) const;
 
 private:
-  bool visible_;
   std::string id_; // Unique ID
+  bool visible_;
   std::string note_;
-  // TODO: Convert to 2D array of points
-  Core::Point p0_; // 3D world coordinate of 1st point
-  Core::Point p1_; // 3D world coordinate of 2nd point
+  Core::Point points_[ 2 ]; // 3D world coordinates of end points
 
 public:
+  // User-defined notes can contain any character including line breaks, so we have to use our
+  // own delimiter to signify the end of a note for parsing.
   static const std::string NOTE_DELIMITER_C;
 };
 
 inline bool Measurement::operator==( const Measurement& m ) const
 {
-  return ( this->id_ == m.id_ );
+  return ( this->id_ == m.id_ && this->visible_ == m.visible_ && this->note_ == m.note_ &&
+    this->points_[ 0 ] == m.points_[ 0 ] && this->points_[ 1 ] == m.points_[ 1 ] );
 }
 
 inline bool Measurement::operator!=( const Measurement& m ) const
 {
-  return ( this->id_ != m.id_ );
+  return ( this->id_ != m.id_ || this->visible_ != m.visible_ || this->note_ != m.note_ ||
+    this->points_[ 0 ] != m.points_[ 0 ] || this->points_[ 1 ] != m.points_[ 1 ] );
 }
 
 std::string ExportToString( const Measurement& value );

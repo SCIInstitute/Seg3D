@@ -112,6 +112,10 @@ public:
   // Handler for when table cells are selected.
   void handle_selected( const QItemSelection & selected );
 
+  // TOGGLE_VISIBLE:
+  // Toggle tri-state button for visibility in horizontal header
+  void toggle_visible();
+
 Q_SIGNALS:
   // ACTIVE_NOTE_CHANGED:
   // Note for active measurement changed.
@@ -126,7 +130,7 @@ private Q_SLOTS:
   // SAVE_ACTIVE_NOTE:
   // Save cached active note to state vector.  Avoids saving to state vector and triggering
   // updates on every keystroke.
-  void save_active_note();
+  void save_cached_active_note();
 
 private:
   MeasurementTableModelPrivateHandle private_;

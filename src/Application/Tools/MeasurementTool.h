@@ -103,6 +103,10 @@ public:
   // active measurement.
   void go_to_active_measurement( int point_index );
 
+  // SET_ALL_VISIBLE:
+  // Hide or show all measurements
+  void set_all_visible( bool visible );
+
   // HANDLE_MOUSE_LEAVE:
   // Called when the mouse has left a viewer.
   //virtual bool handle_mouse_leave( ViewerHandle viewer ); 
@@ -124,7 +128,6 @@ public:
   // The function should only be called by the renderer, which has a valid GL context.
   virtual void redraw( size_t viewer_id, const Core::Matrix& proj_mat );
   virtual bool has_2d_visual();
-
   // -- signals --
 public:
   // UNITS_CHANGED_SIGNAL:

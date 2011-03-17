@@ -141,7 +141,7 @@ bool MeasurementToolInterface::build_widget( QFrame* frame )
   QObject::connect( this->private_->ui_.note_textbox_, SIGNAL( textChanged() ), 
     this, SLOT( set_measurement_note_table() ) );
   QObject::connect( this->private_->ui_.note_textbox_, SIGNAL( editing_finished() ), 
-    this->private_->table_model_, SLOT( save_active_note() ) );
+    this->private_->table_model_, SLOT( save_cached_active_note() ) );
 
   UpdateMeasurementTable( measurement_interface );
 

@@ -788,10 +788,19 @@ void MeasurementTool::go_to_active_measurement( int point_index )
 	}
 }
 
-//bool MeasurementTool::handle_mouse_leave( ViewerHandle viewer )
-//{
-//	
-//}
+void MeasurementTool::set_all_visible( bool visible )
+{
+	// May be called from interface thread
+	std::vector< Core::Measurement > measurements = this->get_measurements();
+	for( size_t i = 0; i < measurements.size(); i++ )
+	{
+		measurements[ i ].set_visible( visible );
+	}
+
+	// Ensure that state is changed on application thread
+	Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
+		this->measurements_state_, measurements );
+}
 
 bool MeasurementTool::handle_mouse_move( ViewerHandle viewer, 
 										const Core::MouseHistory& mouse_history, int button, int buttons, int modifiers )
@@ -941,40 +950,28 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 		if( m.get_visible() )
 		{
 			std::vector< Core::Point > vertices( 2 );
-
-			bool both_in_slice = true;
+			bool vertex_in_slice[ 2 ];
 
 			// TODO Visually represent point in front differently
-			// Draw points
+			// Project points, determine if they are "in slice"
 			for( size_t i = 0; i < vertices.size(); i++ )
 			{
 				Core::Point measurement_point;
 				m.get_point( static_cast< int >( i ), measurement_point );
 
-				// Set color based on in_slice
-				bool in_slice = this->private_->in_slice( viewer, measurement_point );
-				Core::Color color = in_slice ? in_slice_color : out_of_slice_color;
-			
-				if( !in_slice ) 
-				{
-					both_in_slice = false;
-				}
+				vertex_in_slice[ i ] = this->private_->in_slice( viewer, measurement_point );
 				
 				// Project 3D point onto slice
 				double x_pos, y_pos;
 				vol_slice->project_onto_slice( measurement_point, x_pos, y_pos );
 				vertices[ i ][ 0 ] = x_pos;
 				vertices[ i ][ 1 ] = y_pos;
-
-				// Render GL_POINT
-				glColor4f( color.r(), color.g(), color.b(), static_cast< float >( opacity ) );
-				glBegin( GL_POINTS );
-				glVertex2d( x_pos, y_pos );
-				glEnd();
 			}
 
-			// Draw line
+			// Draw line before points so that points are rendered on top (looks better in case 
+			// where one point is "in slice", the other is not)
 			MeasurementToolPrivate::lock_type lock( this->private_->get_mutex() );
+			bool both_in_slice = vertex_in_slice[ 0 ] && vertex_in_slice[ 1 ];
 			Core::Color color = both_in_slice ? in_slice_color : out_of_slice_color;
 			glColor4f( color.r(), color.g(), color.b(), static_cast< float >( opacity ) );
 
@@ -998,59 +995,67 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 			}
 			glEnd();
 
-			// Render length above line, label below line
-			// lock the shared render context
+			// Draw points
+			for( size_t i = 0; i < vertices.size(); i++ )
+			{
+				Core::Color color = vertex_in_slice[ i ] ? in_slice_color : out_of_slice_color;
 			
-			//Core::RenderResources::lock_type render_lock( Core::RenderResources::GetMutex() );
-			//Core::TextRendererHandle text_renderer;
-			//text_renderer.reset( new Core::TextRenderer );
-			//Core::Texture2DHandle text_texture;
-			//text_texture.reset( new Core::Texture2D );
-			////this->private_->text_texture_->set_image( viewer->get_width(), viewer->get_height(), 
-			////	GL_ALPHA );
-			////text_texture->set_min_filter( GL_NEAREST );
-			////text_texture->set_mag_filter( GL_NEAREST );
-
-			//CORE_CHECK_OPENGL_ERROR();
-
-			//std::vector< unsigned char > buffer( viewer->get_width() * viewer->get_height(), 1 );
-			//text_renderer->render_aligned( "Test", &buffer[ 0 ], 
-			//	viewer->get_width(), viewer->get_height(), 14, Core::TextHAlignmentType::RIGHT_E, 
-			//	Core::TextVAlignmentType::TOP_E, 5, 5, 5, 5 );
-
-			//CORE_CHECK_OPENGL_ERROR();
-
-			//text_texture->enable();
-			//CORE_CHECK_OPENGL_ERROR();
-			//glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
-			//CORE_CHECK_OPENGL_ERROR();
-			//text_texture->set_image( viewer->get_width(), viewer->get_height(),
-			//	GL_ALPHA, &buffer[ 0 ], GL_ALPHA, GL_UNSIGNED_BYTE );
-			//
-			//CORE_CHECK_OPENGL_ERROR();
-
-			//// Blend the text onto the framebuffer
-			//glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_ADD );
-			//glBegin( GL_QUADS );
-			//glColor4f( 1.0f, 0.6f, 0.1f, 0.75f );
-			//glTexCoord2f( 0.0f, 0.0f );
-			//glVertex2i( 0, 0 );
-			//glTexCoord2f( 1.0f, 0.0f );
-			//glVertex2i( viewer->get_width() - 1, 0 );
-			//glTexCoord2f( 1.0f, 1.0f );
-			//glVertex2i( viewer->get_width() - 1, viewer->get_height() - 1 );
-			//glTexCoord2f( 0.0f, 1.0f );
-			//glVertex2i( 0, viewer->get_height() - 1 );
-			//glEnd();
-			//text_texture->disable();
-			//glFinish();
-			//CORE_CHECK_OPENGL_ERROR();
+				// Render GL_POINT
+				glColor4f( color.r(), color.g(), color.b(), static_cast< float >( opacity ) );
+				glBegin( GL_POINTS );
+				glVertex2d( vertices[ i ].x(), vertices[ i ].y() );
+				glEnd();
+			}
 		}
 	}
-	glPopMatrix();
-	glPopAttrib();
 
-	//glFinish();
+	// Render length above line, label below line
+	// Different project matrix is required
+	glPopMatrix();
+
+	// Dealing with textures, so need to lock RenderResources
+	Core::RenderResources::lock_type render_lock( Core::RenderResources::GetMutex() );
+	Core::TextRendererHandle text_renderer;
+	text_renderer.reset( new Core::TextRenderer );
+	Core::Texture2DHandle text_texture;
+	text_texture.reset( new Core::Texture2D );
+	std::vector< unsigned char > buffer( viewer->get_width() * viewer->get_height(), 0 );
+	// NOTE: This loop is slow in debug mode, but not release mode
+	/*BOOST_FOREACH( Core::Measurement m, measurements )
+	{
+		if( m.get_visible() )
+		{*/
+			// TODO Find postion of label and length
+			text_renderer->render_aligned( "Test", &buffer[ 0 ], 
+				viewer->get_width(), viewer->get_height(), 14, Core::TextHAlignmentType::RIGHT_E, 
+				Core::TextVAlignmentType::TOP_E, 5, 5, 5, 5 );
+		//}
+	//}
+
+	text_texture->enable();
+	glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+	text_texture->set_image( viewer->get_width(), viewer->get_height(),
+		GL_ALPHA, &buffer[ 0 ], GL_ALPHA, GL_UNSIGNED_BYTE );
+
+	// Blend the text onto the framebuffer
+	glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_ADD );
+	glBegin( GL_QUADS );
+	glColor4f( 1.0f, 0.6f, 0.1f, 0.75f );
+	glTexCoord2f( 0.0f, 0.0f );
+	glVertex2i( 0, 0 );
+	glTexCoord2f( 1.0f, 0.0f );
+	glVertex2i( viewer->get_width() - 1, 0 );
+	glTexCoord2f( 1.0f, 1.0f );
+	glVertex2i( viewer->get_width() - 1, viewer->get_height() - 1 );
+	glTexCoord2f( 0.0f, 1.0f );
+	glVertex2i( 0, viewer->get_height() - 1 );
+	glEnd();
+	text_texture->disable();
+	
+	CORE_CHECK_OPENGL_ERROR();
+
+	glPopAttrib();
+	glFinish();
 }
 
 bool MeasurementTool::has_2d_visual()
