@@ -805,6 +805,11 @@ void MeasurementTool::set_all_visible( bool visible )
 bool MeasurementTool::handle_mouse_move( ViewerHandle viewer, 
 										const Core::MouseHistory& mouse_history, int button, int buttons, int modifiers )
 {
+	if( viewer->is_volume_view() ) 
+	{
+		return false;
+	}
+
 	MeasurementToolPrivate::lock_type lock( this->private_->get_mutex() );
 
 	this->private_->viewer_ = viewer;
@@ -818,6 +823,11 @@ bool MeasurementTool::handle_mouse_move( ViewerHandle viewer,
 bool MeasurementTool::handle_mouse_press( ViewerHandle viewer, 
 										 const Core::MouseHistory& mouse_history, int button, int buttons, int modifiers )
 {
+	if( viewer->is_volume_view() ) 
+	{
+		return false;
+	}
+
 	MeasurementToolPrivate::lock_type lock( this->private_->get_mutex() );
 	this->private_->viewer_ = viewer;
 
@@ -992,7 +1002,7 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 			for ( size_t i = 0; i < vertices.size(); i++ )
 			{
 				glVertex2d( vertices[ i ].x(), vertices[ i ].y() );
-			}
+			}   
 			glEnd();
 
 			// Draw points

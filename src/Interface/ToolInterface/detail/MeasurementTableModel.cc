@@ -36,7 +36,7 @@
 
 // Application includes
 #include <Application/LayerManager/LayerManager.h>
-//#include <Application/Tools/Actions/ActionSaveActiveNote.h>
+#include <Application/Tools/Actions/ActionSaveActiveNote.h>
 
 namespace Seg3D
 {
@@ -500,20 +500,10 @@ void MeasurementTableModel::save_cached_active_note()
 {
   if( this->private_->use_cached_active_note_ )
   {
-    int active_index = this->get_active_index();
-    std::vector< Core::Measurement > measurements = 
-      this->private_->measurement_tool_->get_measurements();
-    if( active_index != -1 && active_index < static_cast< int >( measurements.size() ) )
-    {
-      Core::Measurement measurement = measurements[ active_index ];
-      measurement.set_note( this->private_->cached_active_note_ );
-      this->private_->measurement_tool_->set_measurement( active_index, measurement );
-    }
-    
-    /*ActionSaveActiveNote::Dispatch( Core::Interface::GetWidgetActionContext(), 
-      this->private_->measurement_tool_->active_index_state_,
-      this->private_->measurement_tool_->measurements_state_, 
-      this->private_->cached_active_note_ );*/
+    ActionSaveActiveNote::Dispatch( Core::Interface::GetWidgetActionContext(), 
+      this->private_->measurement_tool_->measurements_state_,
+      this->private_->measurement_tool_->active_index_state_, 
+      this->private_->cached_active_note_ );
 
     this->private_->use_cached_active_note_ = false;
   }
@@ -536,3 +526,4 @@ void MeasurementTableModel::toggle_visible()
 }
 
 } // end namespace Seg3D
+
