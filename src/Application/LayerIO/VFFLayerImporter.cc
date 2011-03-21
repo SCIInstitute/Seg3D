@@ -252,7 +252,16 @@ bool VFFLayerImporter::import_vff()
   ReadFile( file_desc, data_ptr, DWORD( read_length ), &dwReadBytes, NULL );
 
 #else
-  data_file.read( data, length );
+  char* data_ptr = data;
+  size_t read_length = length;
+  size_t chunk = 1UL<<30;
+  while ( read_length > chunk )
+  {
+    data_file.read( data_ptr, chunk );
+    read_length -= chunk;
+    data_ptr += chunk;
+  }
+  data_file.read( data_ptr, read_length );
 #endif
   
 #ifdef _WIN32
