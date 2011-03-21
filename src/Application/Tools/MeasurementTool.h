@@ -64,52 +64,20 @@ public:
   MeasurementTool( const std::string& toolid );
   virtual ~MeasurementTool();
 
-  // Note: All of the following functions ensure thread-safe access to state variables.
+  // Note: The following get_* functions are convenience functions that ensure thread-safe access 
+  // to state variables.
 
   // GET_MEASUREMENTS:
   // Get vector of all measurements
   std::vector< Core::Measurement > get_measurements() const;
 
-  // SET_MEASUREMENT:
-  // Set measurement at existing index.  Useful for modifying note or visibility of existing
-  // measurement.
-  void set_measurement( size_t index, const Core::Measurement& measurement );
-
-  // ADD_MEASUREMENT:
-  // Adds new measurement to end of list
-  void add_measurement( const Core::Measurement& measurement );
-
-  // REMOVE_MEASUREMENT:
-  // Remove measurement matching this one.  By not passing index, we avoid issues with indices
-  // changing as measurements are removed.
-  void remove_measurement( const Core::Measurement& measurement );
-
-  // GET_ACTIVE_INDEX:
-  // Get index of active measurement in table, or -1 if none.
-  int get_active_index() const;
-
-  // SET_ACTIVE_INDEX:
-  // Set index indicating active measurement in table.
-  void set_active_index( int active_index );
-
   // GET_SHOW_WORLD_UNITS:
   // Get boolean indicating whether world units (true) or index units (false) should be displayed.
   bool get_show_world_units() const;
 
+  // GET_OPACITY:
+  // Get opacity [0, 1] applied to all measurements
   double get_opacity() const;
-
-  // GO_TO_ACTIVE_MEASUREMENT:
-  // Do picking on all pickable views so that they move to the indicated point (0 or 1) in the
-  // active measurement.
-  void go_to_active_measurement( int point_index );
-
-  // SET_ALL_VISIBLE:
-  // Hide or show all measurements
-  void set_all_visible( bool visible );
-
-  // HANDLE_MOUSE_LEAVE:
-  // Called when the mouse has left a viewer.
-  //virtual bool handle_mouse_leave( ViewerHandle viewer ); 
 
   // HANDLE_MOUSE_MOVE:
   // Called when the mouse moves in a viewer.

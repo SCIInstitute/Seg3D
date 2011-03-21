@@ -35,8 +35,9 @@
 #include <Application/Layer/LayerGroup.h>
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/Tool/ToolFactory.h>
+#include <Application/Tools/Actions/ActionSetMeasurementPoint.h>
+#include <Application/Tools/Actions/ActionSetMeasurementVisible.h>
 #include <Application/Tools/MeasurementTool.h>
-#include <Application/ViewerManager/Actions/ActionPickPoint.h>
 #include <Application/ViewerManager/ViewerManager.h>
 
 // Core includes
@@ -178,8 +179,8 @@ public:
 // Called in response to state changed signal
 void MeasurementToolPrivate::handle_measurements_changed()
 {
-	// Running on app thread, so measurements list and active index won't be changed out from 
-	// under us.
+	// Running on application thread, so measurements list and active index won't be changed out 
+	// from under us.
 	ASSERT_IS_APPLICATION_THREAD();
 
 	int num_measurements = static_cast< int >( this->tool_->get_measurements().size() );
@@ -190,18 +191,20 @@ void MeasurementToolPrivate::handle_measurements_changed()
 		bool num_measurements_changed = this->saved_num_measurements_ != -1 && 
 			num_measurements != saved_num_measurements_;
 
-		int active_index = this->tool_->get_active_index();
+		int active_index = this->tool_->active_index_state_->get();
 		bool active_index_invalid = active_index == -1 || active_index >= num_measurements;
 
 		if( num_measurements_changed || active_index_invalid )
 		{
-			// Set active index to end of list.
-			this->tool_->set_active_index( num_measurements - 1 );		
+			// Set active index to end of list.	
+			Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
+				this->tool_->active_index_state_, num_measurements - 1 );
 		}
 	}
 	else
 	{
-		this->tool_->set_active_index( -1 );
+		Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
+			this->tool_->active_index_state_, -1 );
 	}
 
 	this->saved_num_measurements_ = num_measurements;
@@ -440,16 +443,9 @@ void MeasurementToolPrivate::move_hover_point_to_mouse()
 		this->get_mouse_world_point( moved_pt );
 
 		// Update hover point
-		size_t measurement_index;
-		Core::Measurement edited_measurement;
-		Core::Point measurement_point;
-		// See get_measurement() for thread safety notes
-		if( this->get_hover_measurement( measurement_index, edited_measurement, measurement_point ) )
-		{
-			edited_measurement.set_point( this->hover_point_.point_index_, moved_pt );
-
-			this->tool_->set_measurement( measurement_index, edited_measurement );
-		}
+		ActionSetMeasurementPoint::Dispatch( Core::Interface::GetMouseActionContext(), 
+			this->tool_->measurements_state_, this->hover_point_.measurement_id_, 
+			this->hover_point_.point_index_, moved_pt );
 	}
 }
 
@@ -471,9 +467,11 @@ void MeasurementToolPrivate::snap_hover_point_to_slice()
 		active_slice->project_onto_slice( measurement_point, world_x, world_y );
 		Core::Point moved_pt;
 		active_slice->get_world_coord( world_x, world_y, moved_pt );
-		edited_measurement.set_point( this->hover_point_.point_index_, moved_pt );
 
-		this->tool_->set_measurement( measurement_index, edited_measurement );
+		// Update hover point
+		ActionSetMeasurementPoint::Dispatch( Core::Interface::GetMouseActionContext(), 
+			this->tool_->measurements_state_, this->hover_point_.measurement_id_, 
+			this->hover_point_.point_index_, moved_pt );
 	}
 }
 
@@ -716,43 +714,6 @@ std::vector< Core::Measurement > MeasurementTool::get_measurements() const
 	//Core::ActionGet::Dispatch( Core::Interface::GetWidgetActionContext(), this->measurements_state_ )
 }
 
-void MeasurementTool::set_measurement( size_t index, const Core::Measurement& measurement )
-{
-	// Ensure that state is changed on application thread
-	Core::ActionSetAt::Dispatch( Core::Interface::GetMouseActionContext(),
-		this->measurements_state_, index, measurement );
-}
-
-void MeasurementTool::add_measurement( const Core::Measurement& measurement )
-{
-	// Add measurement
-	// Ensure that state is changed on application thread
-	Core::ActionAdd::Dispatch( Core::Interface::GetWidgetActionContext(), 
-		this->measurements_state_, measurement );
-}
-
-void MeasurementTool::remove_measurement( const Core::Measurement& measurement )
-{
-	// Remove measurement
-	// Ensure that state is changed on application thread
-	Core::ActionRemove::Dispatch( Core::Interface::GetWidgetActionContext(), 
-		this->measurements_state_, measurement );
-}
-
-int MeasurementTool::get_active_index() const
-{
-	// NOTE: Need to lock state engine as this function is run from the interface thread
-	Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-	return this->active_index_state_->get();
-}
-
-void MeasurementTool::set_active_index( int active_index )
-{
-	// Ensure that state is changed on application thread
-	Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
-		this->active_index_state_, active_index );
-}
-
 bool MeasurementTool::get_show_world_units() const
 {
 	// NOTE: Need to lock state engine as this function may be run from the interface thread
@@ -765,41 +726,6 @@ double MeasurementTool::get_opacity() const
 	// NOTE: Need to lock state engine as this function may be run from the rendering thread
 	Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
 	return this->opacity_state_->get();
-}
-
-void MeasurementTool::go_to_active_measurement( int point_index )
-{
-	if( !( point_index == 0 || point_index == 1 ) ) return;
-
-	// Ensure that measurements list isn't modified between getting active index and getting list
-	Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-
-	// Find 3D point based on active measurement index and point index
-	// "Pick" this point
-	
-	int active_index = this->get_active_index();
-	std::vector< Core::Measurement > measurements = this->get_measurements();
-	if( active_index < static_cast< int >( measurements.size() ) )
-	{
-		Core::Point pick_point;
-		measurements[ active_index ].get_point( point_index, pick_point );
-
-		ActionPickPoint::Dispatch( Core::Interface::GetWidgetActionContext(), -1, pick_point );
-	}
-}
-
-void MeasurementTool::set_all_visible( bool visible )
-{
-	// May be called from interface thread
-	std::vector< Core::Measurement > measurements = this->get_measurements();
-	for( size_t i = 0; i < measurements.size(); i++ )
-	{
-		measurements[ i ].set_visible( visible );
-	}
-
-	// Ensure that state is changed on application thread
-	Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
-		this->measurements_state_, measurements );
 }
 
 bool MeasurementTool::handle_mouse_move( ViewerHandle viewer, 
@@ -858,7 +784,8 @@ bool MeasurementTool::handle_mouse_press( ViewerHandle viewer,
 				// State: Hovering over point that is in slice 
 				
 				// Start editing
-				this->set_active_index( static_cast< int >( measurement_index ) );
+				Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
+					this->active_index_state_, static_cast< int >( measurement_index ) );
 				this->private_->start_editing();
 			}
 			else 
@@ -879,7 +806,8 @@ bool MeasurementTool::handle_mouse_press( ViewerHandle viewer,
 				measurement.set_visible( true );
 
 				// Add measurement to state vector
-				this->add_measurement( measurement );
+				Core::ActionAdd::Dispatch( Core::Interface::GetMouseActionContext(), 
+					this->measurements_state_, measurement );
 
 				// Second point in measurement needs to be the hover point
 				this->private_->hover_point_.measurement_id_ = measurement.get_id();
@@ -911,7 +839,8 @@ bool MeasurementTool::handle_mouse_press( ViewerHandle viewer,
 			this->private_->in_slice( viewer, hover_point ) )
 		{
 			// Delete hovered measurement
-			this->remove_measurement( measurement );
+			Core::ActionRemove::Dispatch( Core::Interface::GetMouseActionContext(), 
+				this->measurements_state_, measurement );
 
 			// Ordering matters here
 			this->private_->hover_point_.invalidate();

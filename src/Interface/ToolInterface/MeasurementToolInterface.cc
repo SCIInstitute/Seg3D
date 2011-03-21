@@ -37,6 +37,7 @@
 
 // Application Includes
 #include <Application/LayerManager/LayerManager.h>
+#include <Application/ViewerManager/Actions/ActionPickPoint.h>
 
 SCI_REGISTER_TOOLINTERFACE( Seg3D, MeasurementToolInterface )
 
@@ -59,10 +60,28 @@ public:
 
 void MeasurementToolInterfacePrivate::handle_go_to_active_measurement()
 {
+  if( !( this->go_to_point_index_ == 0 || this->go_to_point_index_ == 1 ) ) return;
+
   // Go to active measurement
   MeasurementToolHandle tool_handle = 
     boost::dynamic_pointer_cast< MeasurementTool >( this->interface_->tool() );
-  tool_handle->go_to_active_measurement( this->go_to_point_index_ );
+
+  // Find 3D point based on active measurement index and point index
+  // "Pick" this point
+
+  // Lock state engine so measurements list doesn't change between getting active index
+  // and getting list.
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+  std::vector< Core::Measurement > measurements = tool_handle->measurements_state_->get();
+  size_t active_index = tool_handle->active_index_state_->get();
+
+  if( active_index < static_cast< int >( measurements.size() ) )
+  {
+    Core::Point pick_point;
+    measurements[ active_index ].get_point( this->go_to_point_index_, pick_point );
+
+    ActionPickPoint::Dispatch( Core::Interface::GetWidgetActionContext(), -1, pick_point );
+  }
 
   // Toggle point index
   this->go_to_point_index_ = 1 - this->go_to_point_index_;

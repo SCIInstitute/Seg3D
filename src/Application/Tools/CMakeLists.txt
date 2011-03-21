@@ -133,8 +133,12 @@ SET(APPLICATION_TOOLS_ACTIONS_SRCS
   Actions/ActionPaste.cc
   Actions/ActionFloodFill.h
   Actions/ActionFloodFill.cc
-  Actions/ActionSaveActiveNote.h
-  Actions/ActionSaveActiveNote.cc
+  Actions/ActionSetMeasurementNote.h
+  Actions/ActionSetMeasurementNote.cc
+  Actions/ActionSetMeasurementPoint.h
+  Actions/ActionSetMeasurementPoint.cc
+  Actions/ActionSetMeasurementVisible.h
+  Actions/ActionSetMeasurementVisible.cc
   )
 
 CORE_ADD_LIBRARY(Application_Tools 

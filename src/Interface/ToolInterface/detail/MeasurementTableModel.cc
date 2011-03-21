@@ -36,7 +36,11 @@
 
 // Application includes
 #include <Application/LayerManager/LayerManager.h>
-#include <Application/Tools/Actions/ActionSaveActiveNote.h>
+#include <Application/Tools/Actions/ActionSetMeasurementNote.h>
+#include <Application/Tools/Actions/ActionSetMeasurementVisible.h>
+
+// Core includes
+#include <Core/State/Actions/ActionRemove.h>
 
 namespace Seg3D
 {
@@ -55,6 +59,7 @@ public:
   void set_active_index( int active_index );
   void update_visibility();
 
+  //std::string cached_active_measurement_id_;
   std::string cached_active_note_;
   bool use_cached_active_note_;
   MeasurementToolHandle measurement_tool_;
@@ -77,7 +82,8 @@ void MeasurementTableModelPrivate::set_active_index( int active_index )
   int new_active_index = active_index;
 
   // Set the active index in the measurement list
-  this->measurement_tool_->set_active_index( new_active_index );
+  Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
+    this->measurement_tool_->active_index_state_, new_active_index );
 
   // Send signal to update note in text box
   // Can't use get_active_note() because active note is set on application thread asynchronously
@@ -127,6 +133,7 @@ MeasurementTableModel::MeasurementTableModel( MeasurementToolHandle measurement_
 {
   this->private_->model_ = this;
   this->private_->measurement_tool_ = measurement_tool;
+  //this->private_->cached_active_measurement_id_ = "";
   this->private_->cached_active_note_ = "";
   this->private_->use_cached_active_note_ = false;
   this->private_->visibility_ = MeasurementVisibility::ALL_VISIBLE_E;
@@ -345,8 +352,11 @@ bool MeasurementTableModel::setData( const QModelIndex &index, const QVariant &v
       Core::Measurement measurement = measurements[ index.row() ];
       if ( index.column() == MeasurementColumns::VISIBLE_E ) 
       {
-        measurement.set_visible( value.toBool() );
-        this->private_->measurement_tool_->set_measurement( index.row(), measurement );
+        //measurement.set_visible( value.toBool() );
+        //this->private_->measurement_tool_->set_measurement( index.row(), measurement );
+        ActionSetMeasurementVisible::Dispatch( Core::Interface::GetWidgetActionContext(),
+          this->private_->measurement_tool_->measurements_state_, measurement.get_id(), 
+          value.toBool() );
       }
       else if( index.column() == MeasurementColumns::NOTE_E ) 
       {
@@ -356,13 +366,17 @@ bool MeasurementTableModel::setData( const QModelIndex &index, const QVariant &v
         // the note editing is finished to save the state.  In the meantime save and use a 
         // cached copy of the note.
         this->private_->cached_active_note_ = value.toString().toStdString();
-        this->private_->use_cached_active_note_ = true;
-
+        if( !this->private_->use_cached_active_note_ )
+        {
+          //this->private_->cached_active_measurement_id_ = measurement.get_id();
+          this->private_->use_cached_active_note_ = true;
+        }
+        
         // If we are editing this cell then it is by definition the active measurement
         Q_EMIT active_note_changed( value.toString() ); 
       }
       else
-      {
+      { 
         return false;
       } 
       return true;
@@ -442,8 +456,8 @@ QString MeasurementTableModel::get_active_note() const
 
 int MeasurementTableModel::get_active_index() const
 {
-  return this->private_->measurement_tool_->get_active_index();
-  return 0;
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+  return this->private_->measurement_tool_->active_index_state_->get();
 }
 
 bool MeasurementTableModel::removeRows( int row, int count, const QModelIndex & /* parent */ )
@@ -466,7 +480,8 @@ bool MeasurementTableModel::removeRows( int row, int count, const QModelIndex & 
   for( size_t i = 0; i < remove_measurements.size(); i++ )
   {
     // Remove is done on application thread -- no way to know if it succeeds
-    this->private_->measurement_tool_->remove_measurement( remove_measurements[ i ] );
+    Core::ActionRemove::Dispatch( Core::Interface::GetWidgetActionContext(), 
+      this->private_->measurement_tool_->measurements_state_, remove_measurements[ i ] );
   }
 
   return true;
@@ -500,11 +515,23 @@ void MeasurementTableModel::save_cached_active_note()
 {
   if( this->private_->use_cached_active_note_ )
   {
-    ActionSaveActiveNote::Dispatch( Core::Interface::GetWidgetActionContext(), 
-      this->private_->measurement_tool_->measurements_state_,
-      this->private_->measurement_tool_->active_index_state_, 
-      this->private_->cached_active_note_ );
+    // Lock state engine so measurements list doesn't change between getting active index
+    // and getting list.
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    std::vector< Core::Measurement > measurements = 
+      this->private_->measurement_tool_->measurements_state_->get();
+    size_t active_index = this->private_->measurement_tool_->active_index_state_->get();
 
+    if( 0 <= active_index && active_index < measurements.size() )
+    {
+      std::string measurement_id = measurements[ active_index ].get_id();
+      ActionSetMeasurementNote::Dispatch( Core::Interface::GetWidgetActionContext(), 
+        this->private_->measurement_tool_->measurements_state_,
+        measurement_id, this->private_->cached_active_note_ );
+    }
+
+    //this->private_->cached_active_measurement_id_ = "";
+    this->private_->cached_active_note_ = "";
     this->private_->use_cached_active_note_ = false;
   }
 }
@@ -512,16 +539,24 @@ void MeasurementTableModel::save_cached_active_note()
 void MeasurementTableModel::toggle_visible()
 {
   // Run from interface thread
+  bool visible = true;
   if( this->private_->visibility_ == MeasurementVisibility::ALL_VISIBLE_E )
   {
-    //this->private_->visibility_ = MeasurementVisibility::NONE_VISIBLE_E;
-    this->private_->measurement_tool_->set_all_visible( false );
+    visible = false;
   }
   else if( this->private_->visibility_ == MeasurementVisibility::NONE_VISIBLE_E || 
     this->private_->visibility_ == MeasurementVisibility::SOME_VISIBLE_E )
   {
-    //this->private_->visibility_ = MeasurementVisibility::ALL_VISIBLE_E;
-    this->private_->measurement_tool_->set_all_visible( true );
+    visible = true;
+  }
+
+  std::vector< Core::Measurement > measurements = 
+    this->private_->measurement_tool_->get_measurements();
+  for( size_t i = 0; i < measurements.size(); i++ )
+  {
+    ActionSetMeasurementVisible::Dispatch( Core::Interface::GetWidgetActionContext(), 
+      this->private_->measurement_tool_->measurements_state_, measurements[ i ].get_id(), 
+      visible );
   }
 }
 
