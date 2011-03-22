@@ -880,16 +880,24 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 	glLineStipple(1, 0x00FF );
 
 	std::vector< Core::Measurement > measurements = this->get_measurements();
-	BOOST_FOREACH( Core::Measurement m, measurements )
+	// Projected vertices per measurement
+	std::vector< std::vector< Core::Point > > vertices( measurements.size() );
+	// Are both points in slice for each measurement
+	std::vector< bool > both_in_slice( measurements.size() );
+
+	// Draw lines and points
+	for( size_t m_idx = 0; m_idx < measurements.size(); m_idx++ )
 	{
+		Core::Measurement m = measurements[ m_idx ];
+		vertices[ m_idx ].resize( 2 );
 		if( m.get_visible() )
 		{
-			std::vector< Core::Point > vertices( 2 );
+			//std::vector< Core::Point > vertices( 2 );
 			bool vertex_in_slice[ 2 ];
 
 			// TODO Visually represent point in front differently
 			// Project points, determine if they are "in slice"
-			for( size_t i = 0; i < vertices.size(); i++ )
+			for( size_t i = 0; i < 2; i++ )
 			{
 				Core::Point measurement_point;
 				m.get_point( static_cast< int >( i ), measurement_point );
@@ -899,15 +907,15 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 				// Project 3D point onto slice
 				double x_pos, y_pos;
 				vol_slice->project_onto_slice( measurement_point, x_pos, y_pos );
-				vertices[ i ][ 0 ] = x_pos;
-				vertices[ i ][ 1 ] = y_pos;
+				vertices[ m_idx ][ i ][ 0 ] = x_pos;
+				vertices[ m_idx ][ i ][ 1 ] = y_pos;
 			}
 
 			// Draw line before points so that points are rendered on top (looks better in case 
 			// where one point is "in slice", the other is not)
 			MeasurementToolPrivate::lock_type lock( this->private_->get_mutex() );
-			bool both_in_slice = vertex_in_slice[ 0 ] && vertex_in_slice[ 1 ];
-			Core::Color color = both_in_slice ? in_slice_color : out_of_slice_color;
+			both_in_slice[ m_idx ] = vertex_in_slice[ 0 ] && vertex_in_slice[ 1 ];
+			Core::Color color = both_in_slice[ m_idx ] ? in_slice_color : out_of_slice_color;
 			glColor4f( color.r(), color.g(), color.b(), static_cast< float >( opacity ) );
 
 			// If editing this measurement
@@ -924,21 +932,21 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 			}
 
 			glBegin( GL_LINES );
-			for ( size_t i = 0; i < vertices.size(); i++ )
+			for ( size_t i = 0; i < 2; i++ )
 			{
-				glVertex2d( vertices[ i ].x(), vertices[ i ].y() );
+				glVertex2d( vertices[ m_idx ][ i ].x(), vertices[ m_idx ][ i ].y() );
 			}   
 			glEnd();
 
 			// Draw points
-			for( size_t i = 0; i < vertices.size(); i++ )
+			for( size_t i = 0; i < 2; i++ )
 			{
 				Core::Color color = vertex_in_slice[ i ] ? in_slice_color : out_of_slice_color;
 			
 				// Render GL_POINT
 				glColor4f( color.r(), color.g(), color.b(), static_cast< float >( opacity ) );
 				glBegin( GL_POINTS );
-				glVertex2d( vertices[ i ].x(), vertices[ i ].y() );
+				glVertex2d( vertices[ m_idx ][ i ].x(), vertices[ m_idx ][ i ].y() );
 				glEnd();
 			}
 		}
@@ -956,15 +964,20 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 	text_texture.reset( new Core::Texture2D );
 	std::vector< unsigned char > buffer( viewer->get_width() * viewer->get_height(), 0 );
 	// NOTE: This loop is slow in debug mode, but not release mode
-	/*BOOST_FOREACH( Core::Measurement m, measurements )
-	{
-		if( m.get_visible() )
-		{*/
-			// TODO Find postion of label and length
-			text_renderer->render_aligned( "Test", &buffer[ 0 ], 
-				viewer->get_width(), viewer->get_height(), 14, Core::TextHAlignmentType::RIGHT_E, 
-				Core::TextVAlignmentType::TOP_E, 5, 5, 5, 5 );
-		//}
+	//for( size_t m_idx = 0; m_idx < measurements.size(); m_idx++ )
+	//{
+	//	Core::Measurement m = measurements[ m_idx ];
+	//	if( m.get_visible() )
+	//	{
+	//		// Find position of label and length
+	//		Core::Point p0 = vertices[ m_idx ][ 0 ];
+	//		Core::Point p1 = vertices[ m_idx ][ 1 ];
+	//		Core::Point mid_point = p0 + ( ( p1 - p0 ) / 2.0 );
+	//		int x_offset, y_offset;
+	//		viewer->world_to_window( mid_point.x(), mid_point.y(), x_offset, y_offset );
+	//		text_renderer->render( m.get_id(), &buffer[ 0 ], 
+	//			viewer->get_width(), viewer->get_height(), x_offset, y_offset, 14, 0 );
+	//	}
 	//}
 
 	text_texture->enable();
@@ -989,6 +1002,7 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 	
 	CORE_CHECK_OPENGL_ERROR();
 
+	//glPopMatrix();
 	glPopAttrib();
 	glFinish();
 }
