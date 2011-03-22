@@ -66,7 +66,6 @@ class MeasurementTableViewPrivate
 public:
   QString remove_line_breaks( QString str ) const;
   void get_deletion_candidates( std::vector< int >& deletion_candidates ) const;
-  void scroll_to_active_index();
 
   MeasurementTableView * view_;
   QAction* delete_action_;
@@ -105,17 +104,6 @@ void MeasurementTableViewPrivate::get_deletion_candidates( std::vector< int >& d
     {
       deletion_candidates.push_back( active_index );
     }
-  }
-}
-
-void MeasurementTableViewPrivate::scroll_to_active_index()
-{
-  MeasurementTableModel* model = 
-    qobject_cast< MeasurementTableModel* >( this->view_->model() );
-  int active_index = model->get_active_index();
-  if( active_index != -1 )
-  {
-    this->view_->scrollTo( model->index( active_index, 0 ) );
   }
 }
 
@@ -173,7 +161,7 @@ void MeasurementTableView::handle_model_reset()
   this->horizontalHeader()->setStretchLastSection( true ); // Stretch note section
 
   // Scroll to active measurement
-  this->private_->scroll_to_active_index();
+  this->scroll_to_active_index();
 }
 
 void MeasurementTableView::copy_selected_cells() const
@@ -251,6 +239,17 @@ void MeasurementTableView::copy_selected_cells() const
   if( !selected_text.isEmpty() )
   {
     qApp->clipboard()->setText( selected_text );
+  }
+}
+
+void MeasurementTableView::scroll_to_active_index()
+{
+  MeasurementTableModel* model = 
+    qobject_cast< MeasurementTableModel* >( this->model() );
+  int active_index = model->get_active_index();
+  if( active_index != -1 )
+  {
+    this->scrollTo( model->index( active_index, 0 ) );
   }
 }
 

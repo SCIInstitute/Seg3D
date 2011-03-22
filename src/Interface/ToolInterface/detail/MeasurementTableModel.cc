@@ -71,6 +71,7 @@ public:
 
 void MeasurementTableModelPrivate::set_active_index( int active_index )
 {
+  // TODO: Lock state engine, get state directly
   // If this is already the active measurement, return
   if( active_index == this->model_->get_active_index() ) return;
 
@@ -78,19 +79,16 @@ void MeasurementTableModelPrivate::set_active_index( int active_index )
   int num_rows = this->model_->rowCount( QModelIndex() );
   if( active_index < 0 || active_index > num_rows - 1 ) return;
 
-  int old_active_index = this->model_->get_active_index();
-  int new_active_index = active_index;
-
   // Set the active index in the measurement list
   Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
-    this->measurement_tool_->active_index_state_, new_active_index );
+    this->measurement_tool_->active_index_state_, active_index );
 
   // Send signal to update note in text box
   // Can't use get_active_note() because active note is set on application thread asynchronously
   std::vector< Core::Measurement > measurements = this->measurement_tool_->get_measurements();
-  if( new_active_index < static_cast< int >( measurements.size() ) )
+  if( active_index < static_cast< int >( measurements.size() ) )
   {
-    QString active_note = QString::fromStdString( measurements[ new_active_index ].get_note() );
+    QString active_note = QString::fromStdString( measurements[ active_index ].get_note() );
     Q_EMIT this->model_->active_note_changed( active_note ); 
   }
 
@@ -201,7 +199,9 @@ QVariant MeasurementTableModel::data( const QModelIndex& index, int role ) const
           // us.
           LayerHandle active_layer = LayerManager::Instance()->get_active_layer();
 
-          if( !this->private_->measurement_tool_->get_show_world_units() && active_layer ) 
+          Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+          if( !this->private_->measurement_tool_->show_world_units_state_->get() && 
+            active_layer ) 
           {
             // Index units
             
@@ -444,9 +444,11 @@ void MeasurementTableModel::update_cells()
 
 QString MeasurementTableModel::get_active_note() const
 {
-  int active_index = this->get_active_index();
+  // Lock state engine so that active index can't change between getting active index and list
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+  int active_index = this->private_->measurement_tool_->active_index_state_->get();
   std::vector< Core::Measurement > measurements = 
-    this->private_->measurement_tool_->get_measurements();
+    this->private_->measurement_tool_->measurements_state_->get();
   if( active_index != -1 && active_index < static_cast< int >( measurements.size() ) ) 
   {
     return QString::fromStdString( measurements[ active_index ].get_note() );

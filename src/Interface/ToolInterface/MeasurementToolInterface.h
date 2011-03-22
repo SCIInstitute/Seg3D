@@ -75,6 +75,7 @@ public:
   // UPDATEMEASUREMENTTABLE:
   // Update entire table including dimensions.  Scroll to active index.  
   // Slower than UpdateMeasurementCells, so use only when needed. 
+  // De-selects selected rows.  
   // TODO: This may be slow due to resizeColumns[Rows]ToContents -- try hard-coding sizes.
   static void UpdateMeasurementTable( qpointer_type measurement_interface );
 
@@ -82,9 +83,9 @@ public:
   // Update only table cells, not table dimensions.  Does not scroll to active index.
   static void UpdateMeasurementCells( qpointer_type measurement_interface );
 
-  // UPDATEMEASUREMENTNOTE:
-  // Update the note in the text box
-  static void UpdateMeasurementNote( qpointer_type measurement_interface );
+  // UPDATEACTIVEINDEX:
+  // Update interface table and text box in response to changed active index.
+  static void UpdateActiveIndex( qpointer_type measurement_interface );
 };
 
 } // end namespace Seg3D

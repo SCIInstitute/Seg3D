@@ -126,16 +126,14 @@ bool MeasurementToolInterface::build_widget( QFrame* frame )
   MeasurementToolInterface calls update on the model when the measurements state is modified.  
   The model in turn gets its data from the measurements state. */ 
   qpointer_type measurement_interface( this );  
+  this->add_connection( tool_handle->num_measurements_changed_signal_.connect( 
+    boost::bind( &MeasurementToolInterface::UpdateMeasurementTable, measurement_interface ) ) );
   this->add_connection( tool_handle->measurements_state_->state_changed_signal_.connect( 
     boost::bind( &MeasurementToolInterface::UpdateMeasurementCells, measurement_interface ) ) );
   this->add_connection( tool_handle->units_changed_signal_.connect(
     boost::bind( &MeasurementToolInterface::UpdateMeasurementCells, measurement_interface ) ) );
-  // Active index changing indicates that table size may have changed, and either way need to 
-  // scroll to active index.
   this->add_connection( tool_handle->active_index_state_->state_changed_signal_.connect( 
-    boost::bind( &MeasurementToolInterface::UpdateMeasurementTable, measurement_interface ) ) );
-  this->add_connection( tool_handle->active_index_state_->state_changed_signal_.connect( 
-    boost::bind( &MeasurementToolInterface::UpdateMeasurementNote, measurement_interface ) ) );
+    boost::bind( &MeasurementToolInterface::UpdateActiveIndex, measurement_interface ) ) );
   
   // Copied from resample tool
   QButtonGroup* button_group = new QButtonGroup( this );
@@ -244,20 +242,27 @@ void MeasurementToolInterface::UpdateMeasurementCells( qpointer_type measurement
   }
 }
 
-void MeasurementToolInterface::UpdateMeasurementNote( qpointer_type measurement_interface )
+void MeasurementToolInterface::UpdateActiveIndex( qpointer_type measurement_interface )
 {
   // Ensure that this call gets relayed to the right thread
   if ( !( Core::Interface::IsInterfaceThread() ) )
   {
     Core::Interface::PostEvent( boost::bind( 
-      &MeasurementToolInterface::UpdateMeasurementNote, measurement_interface ) );
+      &MeasurementToolInterface::UpdateActiveIndex, measurement_interface ) );
     return;
   }
 
   // Protect interface pointer, so we do not execute if interface does not exist anymore
   if ( measurement_interface.data() )
   {
-    // Updates table view
+    // Update cells in order to highlight new active index
+    // Updating table causes selection to be deselected, which we don't want
+    measurement_interface->private_->table_model_->update_cells();
+
+    // Scroll to active index
+    measurement_interface->private_->table_view_->scroll_to_active_index();
+
+    // Update note in text box to correspond to active index
     measurement_interface->private_->ui_.note_textbox_->setText( 
       measurement_interface->private_->table_model_->get_active_note() );
   }

@@ -71,14 +71,6 @@ public:
   // Get vector of all measurements
   std::vector< Core::Measurement > get_measurements() const;
 
-  // GET_SHOW_WORLD_UNITS:
-  // Get boolean indicating whether world units (true) or index units (false) should be displayed.
-  bool get_show_world_units() const;
-
-  // GET_OPACITY:
-  // Get opacity [0, 1] applied to all measurements
-  double get_opacity() const;
-
   // HANDLE_MOUSE_MOVE:
   // Called when the mouse moves in a viewer.
   virtual bool handle_mouse_move( ViewerHandle viewer, 
@@ -101,6 +93,10 @@ public:
   // UNITS_CHANGED_SIGNAL:
   typedef boost::signals2::signal< void () > units_changed_signal_type;
   units_changed_signal_type units_changed_signal_;
+
+  // NUM_MEASUREMENTS_CHANGED_SIGNAL:
+  typedef boost::signals2::signal< void () > num_measurements_changed_signal_type;
+  units_changed_signal_type num_measurements_changed_signal_;
 
   // -- state --
 public:

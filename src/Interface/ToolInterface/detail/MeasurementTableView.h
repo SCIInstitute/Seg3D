@@ -70,6 +70,10 @@ public:
   // Copied cells can be pasted directly into Excel spreadsheet.
   void copy_selected_cells() const;
 
+  // SCROLL_TO_ACTIVE_INDEX:
+  // Ensure that active index is visible in table.
+  void scroll_to_active_index();
+
 private Q_SLOTS:
   void handle_model_reset();
   void handle_selected();

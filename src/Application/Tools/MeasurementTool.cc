@@ -191,6 +191,11 @@ void MeasurementToolPrivate::handle_measurements_changed()
 		bool num_measurements_changed = this->saved_num_measurements_ != -1 && 
 			num_measurements != saved_num_measurements_;
 
+		if( num_measurements_changed )
+		{
+			this->tool_->num_measurements_changed_signal_();
+		}
+
 		int active_index = this->tool_->active_index_state_->get();
 		bool active_index_invalid = active_index == -1 || active_index >= num_measurements;
 
@@ -714,20 +719,6 @@ std::vector< Core::Measurement > MeasurementTool::get_measurements() const
 	//Core::ActionGet::Dispatch( Core::Interface::GetWidgetActionContext(), this->measurements_state_ )
 }
 
-bool MeasurementTool::get_show_world_units() const
-{
-	// NOTE: Need to lock state engine as this function may be run from the interface thread
-	Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-	return this->show_world_units_state_->get();
-}
-
-double MeasurementTool::get_opacity() const
-{
-	// NOTE: Need to lock state engine as this function may be run from the rendering thread
-	Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-	return this->opacity_state_->get();
-}
-
 bool MeasurementTool::handle_mouse_move( ViewerHandle viewer, 
 										const Core::MouseHistory& mouse_history, int button, int buttons, int modifiers )
 {
@@ -868,7 +859,12 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 	}
 
 	// Apply opacity to color
-	double opacity = this->get_opacity();
+	double opacity = 1.0;
+	{
+		Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+		opacity = this->opacity_state_->get();
+	}
+	
 	Core::Color in_slice_color = Core::Color( 1.0f, 1.0f, 0.0f );
 	Core::Color out_of_slice_color = Core::Color( 0.6f, 0.6f, 0.0f );
 
