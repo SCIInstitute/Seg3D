@@ -543,11 +543,9 @@ void MeasurementToolPrivate::start_editing()
 	lock_type lock( this->get_mutex() );
 
 	this->editing_ = true;
-
-	// Change cursor to indicate that editing is happening	
-	//ViewerHandle viewer = ViewerManager::Instance()->get_active_viewer();
-	// TODO: Change this to something better
-	this->viewer_->set_cursor( Core::CursorShape::CLOSED_HAND_E );
+	
+	// Use blank cursor so that features of interest are not obscured
+	this->viewer_->set_cursor( Core::CursorShape::BLANK_E );
 
 	// Redraw so that measurement is drawn with dotted line instead of solid line
 	this->update_viewers();
