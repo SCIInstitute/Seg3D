@@ -89,7 +89,7 @@ bool MaskDataBlock::extract_slice( SliceType type,
       }
 
       MaskDataBlock::lock_type lock( slice_mask_data_block->get_mutex() );
-      MaskDataBlock::shared_lock_type slock( this->get_mutex() );
+      MaskDataBlock::shared_lock_type slock;
 
       if ( this->get_data_block() != slice_mask_data_block->get_data_block() )
       {
@@ -154,7 +154,7 @@ bool MaskDataBlock::extract_slice( SliceType type,
       }
 
       MaskDataBlock::lock_type lock( slice_mask_data_block->get_mutex() );
-      MaskDataBlock::shared_lock_type slock( this->get_mutex() );
+      MaskDataBlock::shared_lock_type slock;
 
       if ( this->get_data_block() != slice_mask_data_block->get_data_block() )
       {
@@ -162,6 +162,7 @@ bool MaskDataBlock::extract_slice( SliceType type,
         shared_lock_type read_lock( this->get_mutex() );
         slock.swap( read_lock );
       }
+
 
       unsigned char volume_mask_value = this->get_mask_value();         
       unsigned char slice_mask_value = slice_mask_data_block->get_mask_value();         
@@ -220,7 +221,7 @@ bool MaskDataBlock::extract_slice( SliceType type,
       }
 
       MaskDataBlock::lock_type lock( slice_mask_data_block->get_mutex() );
-      MaskDataBlock::shared_lock_type slock( this->get_mutex() );
+      MaskDataBlock::shared_lock_type slock;
 
       if ( this->get_data_block() != slice_mask_data_block->get_data_block() )
       {
