@@ -493,13 +493,10 @@ void MeasurementToolPrivate::update_hover_point()
 	}
 	else
 	{
-		//ViewerHandle viewer = ViewerManager::Instance()->get_active_viewer();
-
 		// Find the measurement point that the mouse is currently hovering over, if there is one
 		if( this->find_hover_point() )
 		{
-			// Set cross icon color to yellow to indicate that point could be selected (but isn’t)
-			// TODO: Change this to something better
+			// Set cursor to open hand to indicate that point could be selected (but isn’t)
 			this->viewer_->set_cursor( Core::CursorShape::OPEN_HAND_E );
 		}
 		else
@@ -565,7 +562,6 @@ void MeasurementToolPrivate::finish_editing()
 	
 	if( this->hover_point_.is_valid() )
 	{
-		// TODO: Change this to something better
 		this->viewer_->set_cursor( Core::CursorShape::OPEN_HAND_E );
 	}
 	else
