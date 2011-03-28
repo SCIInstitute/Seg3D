@@ -141,7 +141,7 @@ void MeasurementTableView::set_measurement_model( MeasurementTableModel* measure
   // way we avoid updating the model for every keystroke.
   QAbstractItemDelegate* text_delegate = this->itemDelegate();
   QObject::connect( text_delegate, SIGNAL( closeEditor( QWidget* ) ), measurement_model, 
-    SLOT( save_active_note() ) );
+    SLOT( save_cached_active_note() ) );
 }
 
 void MeasurementTableView::handle_model_reset()

@@ -191,7 +191,7 @@ public:
   // WORLD_TO_WINDOW:
   // Maps from world coordinates to window coordinates.
   // NOTE: Only call this function when the viewer is in one of the 2D modes.
-  //void world_to_window( double world_x, double world_y, int& x, int& y ) const;
+  void world_to_window( double world_x, double world_y, double& x, double& y ) const;
 
   // GET_PROJECTION_MATRIX:
   // Get the projection matrix of current view mode.

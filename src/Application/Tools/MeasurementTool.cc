@@ -956,6 +956,100 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 	// Different project matrix is required
 	glPopMatrix();
 
+	// Need to lock state engine, but can't lock it and RenderResources at same time or deadlock
+	// could occur.  So compute all text locations first, then do rendering.
+	std::vector< std::vector< Core::Point > > text_locations( measurements.size() );
+	std::vector< std::string > formatted_lengths( measurements.size() );
+
+	// NOTE: This loop is slow in debug mode, but not release mode
+	for( size_t m_idx = 0; m_idx < measurements.size(); m_idx++ )
+	{
+		Core::Measurement m = measurements[ m_idx ];
+		if( m.get_visible() )
+		{
+			// Find position of label and length
+			// NOTE: Y values increase from top to bottom of the window
+			
+			// Convert vertices to window coords
+			Core::Point p0 = vertices[ m_idx ][ 0 ];
+			Core::Point p1 = vertices[ m_idx ][ 1 ];
+			double p0_x, p0_y, p1_x, p1_y;
+			// Locks state engine!
+			viewer->world_to_window( p0.x(), p0.y(), p0_x, p0_y );
+			viewer->world_to_window( p1.x(), p1.y(), p1_x, p1_y );
+			Core::Point window_p0( p0_x, p0_y, 0.0 );
+			Core::Point window_p1( p1_x, p1_y, 0.0 );
+			
+			// Find mid point
+			Core::Point mid_point = window_p0 + ( ( window_p1 - window_p0 ) / 2.0 );
+
+			// Find perpendicular to line, normalize
+			Core::Vector measure_normal;
+			double dx = p1_x - p0_x;
+			double dy = p0_y - p1_y;
+			measure_normal = Core::Vector( dy, dx, 0 );
+			measure_normal.normalize();
+			int pixel_offset = 10;
+
+			// Put length on one side, label on other
+			bool flip_normal = measure_normal.y() < 0;
+			Core::Point label_point = mid_point + 
+				( measure_normal * pixel_offset * ( flip_normal ? -1 : 1 ) );
+			Core::Point length_point = mid_point + 
+				( measure_normal * pixel_offset * ( flip_normal ? 1 : -1 ) );
+		
+
+			// Find angle of line
+			double angle = ( dx == 0 ? 90 : ( atan( dy / dx ) ) * 180 / Core::Pi() );
+
+			//
+			// Label
+			//
+
+			double text_width = m.get_id().length() * 20.0;
+			double text_height = 20;
+			// Higher for more horizontal lines
+			double norm_angle = abs( angle ) / 90.0;
+			double x_offset = 0;
+			// Label to the left of line
+			if( angle < 0 )
+			{
+				x_offset = norm_angle * -0.5 * text_width; 
+			}
+			
+			// Shift to the left by some amount so that the label doesn't intersect the line or the 
+			// other text
+			label_point[ 0 ] = label_point.x() + x_offset;
+
+			double y_offset = 0.5 * text_height;
+			label_point[ 1 ] = label_point.y() + y_offset;
+
+			//
+			// Length
+			//
+
+			size_t digits = 3;
+			std::string length_string = Core::ExportToString( m.get_length(), digits );
+			formatted_lengths[ m_idx ] = length_string;
+
+			text_width = length_string.length() * 15.0;
+			x_offset = 0;
+			// Label to the left of line
+			if( angle > 0 )
+			{
+				x_offset = norm_angle * -0.5 * text_width; 
+			}
+
+			// Shift to the left by some amount so that the label doesn't intersect the line or the 
+			// other text
+			length_point[ 0 ] = length_point.x() + x_offset;
+
+			text_locations[ m_idx ].resize( 2 );
+			text_locations[ m_idx ][ 0 ] = label_point;
+			text_locations[ m_idx ][ 1 ] = length_point;
+		}
+	}
+
 	// Dealing with textures, so need to lock RenderResources
 	Core::RenderResources::lock_type render_lock( Core::RenderResources::GetMutex() );
 	Core::TextRendererHandle text_renderer;
@@ -963,22 +1057,25 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 	Core::Texture2DHandle text_texture;
 	text_texture.reset( new Core::Texture2D );
 	std::vector< unsigned char > buffer( viewer->get_width() * viewer->get_height(), 0 );
-	// NOTE: This loop is slow in debug mode, but not release mode
-	//for( size_t m_idx = 0; m_idx < measurements.size(); m_idx++ )
-	//{
-	//	Core::Measurement m = measurements[ m_idx ];
-	//	if( m.get_visible() )
-	//	{
-	//		// Find position of label and length
-	//		Core::Point p0 = vertices[ m_idx ][ 0 ];
-	//		Core::Point p1 = vertices[ m_idx ][ 1 ];
-	//		Core::Point mid_point = p0 + ( ( p1 - p0 ) / 2.0 );
-	//		int x_offset, y_offset;
-	//		viewer->world_to_window( mid_point.x(), mid_point.y(), x_offset, y_offset );
-	//		text_renderer->render( m.get_id(), &buffer[ 0 ], 
-	//			viewer->get_width(), viewer->get_height(), x_offset, y_offset, 14, 0 );
-	//	}
-	//}
+
+	for( size_t m_idx = 0; m_idx < measurements.size(); m_idx++ )
+	{
+		Core::Measurement m = measurements[ m_idx ];
+		if( m.get_visible() )
+		{
+			// Render label
+			Core::Point label_location = text_locations[ m_idx ][ 0 ];
+			text_renderer->render( m.get_id(), &buffer[ 0 ], 
+				viewer->get_width(), viewer->get_height(), static_cast< int >( label_location.x() ), 
+				viewer->get_height() - static_cast< int >( label_location.y() ), 14, 0 );
+
+			// Render length
+			Core::Point length_location = text_locations[ m_idx ][ 1 ];
+			text_renderer->render( formatted_lengths[ m_idx ], &buffer[ 0 ], 
+				viewer->get_width(), viewer->get_height(), static_cast< int >( length_location.x() ), 
+				viewer->get_height() - static_cast< int >( length_location.y() ), 14, 0 );
+		}
+	}
 
 	text_texture->enable();
 	glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
@@ -988,7 +1085,7 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 	// Blend the text onto the framebuffer
 	glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_ADD );
 	glBegin( GL_QUADS );
-	glColor4f( 1.0f, 0.6f, 0.1f, 0.75f );
+	glColor4f( 1.0f, 0.6f, 0.1f, 0.75f * static_cast< float >( opacity ) );
 	glTexCoord2f( 0.0f, 0.0f );
 	glVertex2i( 0, 0 );
 	glTexCoord2f( 1.0f, 0.0f );

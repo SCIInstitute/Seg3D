@@ -1745,29 +1745,29 @@ void Viewer::window_to_world( int x, int y, double& world_x, double& world_y ) c
   world_y = pos.y();
 }
 
-//void Viewer::world_to_window( double world_x, double world_y, int& x, int& y ) const
-//{
-//  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-//
-//  if ( this->is_volume_view() )
-//  {
-//    CORE_THROW_LOGICERROR( "Viewer is in volume mode");
-//  }
-//
-//  Core::Matrix proj;
-//  this->get_projection_matrix( proj );
-//
-//  Core::Point pos( world_x, world_y, 0 );
-//  pos = proj * pos;
-//
-//  // Now have mouse position in range [-1, 1]
-//  // Scale the mouse position to [0, nx|ny]
-//  double width =  static_cast<double>( this->get_width() );
-//  double height = static_cast<double>( this->get_height() );
-//  
-//  x = static_cast< int >( ( ( pos.x() + 1 ) * ( width - 1 ) ) / 2.0 ); 
-//  y = static_cast< int >( height - 1 - ( ( ( pos.y() + 1 ) * ( height - 1.0 ) ) / 2.0 ) ); 
-//}
+void Viewer::world_to_window( double world_x, double world_y, double& x, double& y ) const
+{
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
+  if ( this->is_volume_view() )
+  {
+    CORE_THROW_LOGICERROR( "Viewer is in volume mode");
+  }
+
+  Core::Matrix proj;
+  this->get_projection_matrix( proj );
+
+  Core::Point pos( world_x, world_y, 0 );
+  pos = proj * pos;
+
+  // Now have mouse position in range [-1, 1]
+  // Scale the mouse position to [0, nx|ny]
+  double width =  static_cast<double>( this->get_width() );
+  double height = static_cast<double>( this->get_height() );
+  
+  x = static_cast< int >( ( ( pos.x() + 1 ) * ( width - 1 ) ) / 2.0 ); 
+  y = static_cast< int >( height - 1 - ( ( ( pos.y() + 1 ) * ( height - 1.0 ) ) / 2.0 ) ); 
+}
 
 void Viewer::get_projection_matrix( Core::Matrix& proj_mat ) const
 {
