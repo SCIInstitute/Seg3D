@@ -106,7 +106,8 @@ public:
 
   // GET_ACTIVE_INDEX:
   // Return row index of active measurement. Returns -1 if there are no measurements.
-  int get_active_index() const; // Public because QTableView needs to scroll to this
+  // Needed by MeasurementTableView, which doesn't have direct access to MeasurementTool.
+  int get_active_index() const; 
   
   // HANDLE_SELECTED:
   // Handler for when table cells are selected.

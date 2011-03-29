@@ -72,10 +72,10 @@ void MeasurementToolInterfacePrivate::handle_go_to_active_measurement()
   // Lock state engine so measurements list doesn't change between getting active index
   // and getting list.
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-  std::vector< Core::Measurement > measurements = tool_handle->measurements_state_->get();
-  size_t active_index = tool_handle->active_index_state_->get();
+  const std::vector< Core::Measurement >& measurements = tool_handle->measurements_state_->get();
+  int active_index = tool_handle->active_index_state_->get();
 
-  if( active_index < static_cast< int >( measurements.size() ) )
+  if( 0 <= active_index && active_index < static_cast< int >( measurements.size() ) )
   {
     Core::Point pick_point;
     measurements[ active_index ].get_point( this->go_to_point_index_, pick_point );
@@ -201,24 +201,19 @@ void MeasurementToolInterface::UpdateMeasurementTable( qpointer_type measurement
     // Updates table view
     measurement_interface->private_->table_model_->update_table();
 
+    MeasurementToolHandle tool_handle = 
+      boost::dynamic_pointer_cast< MeasurementTool >( measurement_interface->tool() );
+
     // Enable widgets only if measurements exist and active index is valid
-    if( measurement_interface->private_->table_model_->rowCount( QModelIndex() ) > 0 &&
-      measurement_interface->private_->table_model_->get_active_index() != -1 )
-    {
-      measurement_interface->private_->ui_.table_view_->setEnabled( true );
-      measurement_interface->private_->ui_.note_textbox_->setEnabled( true );
-      measurement_interface->private_->ui_.goto_button_->setEnabled( true );
-      measurement_interface->private_->ui_.copy_button_->setEnabled( true );
-      measurement_interface->private_->ui_.delete_button_->setEnabled( true );
-    }
-    else
-    {
-      measurement_interface->private_->ui_.table_view_->setEnabled( false );
-      measurement_interface->private_->ui_.note_textbox_->setEnabled( false );
-      measurement_interface->private_->ui_.goto_button_->setEnabled( false );
-      measurement_interface->private_->ui_.copy_button_->setEnabled( false );
-      measurement_interface->private_->ui_.delete_button_->setEnabled( false );
-    }
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    bool enable_widgets = ( tool_handle->measurements_state_->get().size() > 0 &&
+      tool_handle->active_index_state_->get() != -1 );
+
+    measurement_interface->private_->ui_.table_view_->setEnabled( enable_widgets );
+    measurement_interface->private_->ui_.note_textbox_->setEnabled( enable_widgets );
+    measurement_interface->private_->ui_.goto_button_->setEnabled( enable_widgets );
+    measurement_interface->private_->ui_.copy_button_->setEnabled( enable_widgets );
+    measurement_interface->private_->ui_.delete_button_->setEnabled( enable_widgets );
   }
 }
 

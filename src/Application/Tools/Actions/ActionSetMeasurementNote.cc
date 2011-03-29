@@ -102,15 +102,15 @@ bool ActionSetMeasurementNote::run( Core::ActionContextHandle& context,
   if ( measurements_state )
   {
     // Get measurements
-    std::vector< Core::Measurement > measurements = measurements_state->get();
+    const std::vector< Core::Measurement >& measurements = measurements_state->get();
 
     // Find one with matching id
     for( size_t i = 0; i < measurements.size(); i++ )
     {
-      Core::Measurement m = measurements[ i ];
-      if( m.get_id() == this->private_->measurement_id_.value() )
+      if( measurements[ i ].get_id() == this->private_->measurement_id_.value() )
       {
         // Set note
+        Core::Measurement m = measurements[ i ];
         m.set_note( this->private_->note_.value() );
         measurements_state->set_at( i, m, context->source() );
         return true;

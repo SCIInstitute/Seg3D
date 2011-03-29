@@ -64,13 +64,6 @@ public:
   MeasurementTool( const std::string& toolid );
   virtual ~MeasurementTool();
 
-  // Note: The following get_* functions are convenience functions that ensure thread-safe access 
-  // to state variables.
-
-  // GET_MEASUREMENTS:
-  // Get vector of all measurements
-  std::vector< Core::Measurement > get_measurements() const;
-
   // HANDLE_MOUSE_MOVE:
   // Called when the mouse moves in a viewer.
   virtual bool handle_mouse_move( ViewerHandle viewer, 
@@ -88,6 +81,12 @@ public:
   // The function should only be called by the renderer, which has a valid GL context.
   virtual void redraw( size_t viewer_id, const Core::Matrix& proj_mat );
   virtual bool has_2d_visual();
+
+  // GET_LENGTH_STRING:
+  // Get length as formatted string, respecting index vs. world units.  Function is here so that
+  // both interface and rendering use consistent formatting of length.
+  std::string get_length_string( const Core::Measurement& measurement ) const;
+  
   // -- signals --
 public:
   // UNITS_CHANGED_SIGNAL:

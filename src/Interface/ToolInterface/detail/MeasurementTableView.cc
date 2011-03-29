@@ -99,6 +99,7 @@ void MeasurementTableViewPrivate::get_deletion_candidates( std::vector< int >& d
   }
   else // No rows are selected -- delete active measurement
   {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
     int active_index = model->get_active_index();
     if( active_index != -1 )
     {

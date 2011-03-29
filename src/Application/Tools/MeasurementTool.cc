@@ -183,7 +183,7 @@ void MeasurementToolPrivate::handle_measurements_changed()
 	// from under us.
 	ASSERT_IS_APPLICATION_THREAD();
 
-	int num_measurements = static_cast< int >( this->tool_->get_measurements().size() );
+	int num_measurements = static_cast< int >( this->tool_->measurements_state_->get().size() );
 
 	if( num_measurements > 0 )
 	{
@@ -238,6 +238,9 @@ void MeasurementToolPrivate::handle_units_selection_changed( std::string units )
 	if( old_show_world_units_state != this->tool_->show_world_units_state_->get() )
 	{
 		this->tool_->units_changed_signal_();
+
+		// Need to redraw the overlay since length is rendered with measurements
+		this->update_viewers();
 	}
 }
 
@@ -314,7 +317,8 @@ void MeasurementToolPrivate::initialize_id_counter()
 
 	// Find highest ID in use
 	this->measurement_id_counter_ = 0;
-	std::vector< Core::Measurement > measurements = this->tool_->get_measurements();
+	Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+	const std::vector< Core::Measurement >& measurements = this->tool_->measurements_state_->get();
 	BOOST_FOREACH( Core::Measurement m, measurements )
 	{
 		int measurement_id = 0;
@@ -353,7 +357,9 @@ std::string MeasurementToolPrivate::get_next_measurement_id()
 
 		// Make sure this ID isn't in use
 		bool in_use = false;
-		std::vector< Core::Measurement > measurements = this->tool_->get_measurements();
+		Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+		const std::vector< Core::Measurement >& measurements = 
+			this->tool_->measurements_state_->get();
 		BOOST_FOREACH( Core::Measurement m, measurements )
 		{
 			if( canditate_id == m.get_id() )
@@ -407,13 +413,14 @@ bool MeasurementToolPrivate::find_hover_point()
 
 	Core::VolumeSliceHandle volume_slice = this->viewer_->get_active_volume_slice();
 
-	std::vector< Core::Measurement > measurements = this->tool_->get_measurements();
+	Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
+	const std::vector< Core::Measurement >& measurements = this->tool_->measurements_state_->get();
 	BOOST_FOREACH( Core::Measurement m, measurements )
 	{
 		// Ignore hidden measurements
 		if( m.get_visible() )
 		{
-			// For each measurement point
+			// For each measurement point, project onto slice and check to see if in radius
 			for( int point_index = 0; point_index < 2; point_index++ )
 			{
 				Core::Point measurement_point;
@@ -516,16 +523,17 @@ bool MeasurementToolPrivate::get_hover_measurement( size_t& index, Core::Measure
 	if( this->hover_point_.is_valid() )
 	{
 		// Get measurements
-		std::vector< Core::Measurement> measurements = this->tool_->get_measurements();
+		Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+		const std::vector< Core::Measurement >& measurements = 
+			this->tool_->measurements_state_->get();
 
 		// Find one with matching id
 		for( size_t i = 0; i < measurements.size(); i++ )
 		{
-			Core::Measurement m = measurements[ i ];
-			if( m.get_id() == this->hover_point_.measurement_id_ )
+			if( measurements[ i ].get_id() == this->hover_point_.measurement_id_ )
 			{
 				index = i;
-				measurement = m;
+				measurement = measurements[ i ];
 				measurement.get_point( this->hover_point_.point_index_, world_point );
 				return true;
 			}
@@ -696,23 +704,6 @@ MeasurementTool::~MeasurementTool()
 	this->disconnect_all();
 }
 
-std::vector< Core::Measurement > MeasurementTool::get_measurements() const
-{
-	// NOTE: Need to lock state engine as this function is run from the interface thread
-	Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-	return this->measurements_state_->get();
-
-	// TODO:
-	// Because indices are used to modify the measurements list, we need to synchronize
-	// get and set so that indices don't become invalid in between.
-	// Scenario: 
-	// - ActionRemove posted by interface thread, but not yet processed on app thread
-	// - Interface thread locks state engine, gets measurements list and index of matching point, posts ActionSetAt
-	// - ActionRemove processed, index no longer valid (or at least incorrect)
-	// - ActionSetAt with wrong index
-	//Core::ActionGet::Dispatch( Core::Interface::GetWidgetActionContext(), this->measurements_state_ )
-}
-
 bool MeasurementTool::handle_mouse_move( ViewerHandle viewer, 
 										const Core::MouseHistory& mouse_history, int button, int buttons, int modifiers )
 {
@@ -850,14 +841,17 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 	if ( !vol_slice )
 	{
 		return;
-	}
+	} 
+	
+	// NOTE: The StateEngine and RenderResources should NEVER be locked
+	// at the same time because this will lead to deadlock.  So we get all the state we need up
+	// front, then unlock the StateEngine, then do the rendering.
+	Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
 
-	// Apply opacity to color
-	double opacity = 1.0;
-	{
-		Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-		opacity = this->opacity_state_->get();
-	}
+	std::vector< Core::Measurement > measurements = this->measurements_state_->get();
+	double opacity = this->opacity_state_->get();
+
+	lock.unlock();
 	
 	Core::Color in_slice_color = Core::Color( 1.0f, 1.0f, 0.0f );
 	Core::Color out_of_slice_color = Core::Color( 0.6f, 0.6f, 0.0f );
@@ -873,7 +867,6 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 	glEnable( GL_LINE_SMOOTH );
 	glLineStipple(1, 0x00FF );
 
-	std::vector< Core::Measurement > measurements = this->get_measurements();
 	// Projected vertices per measurement
 	std::vector< std::vector< Core::Point > > vertices( measurements.size() );
 	// Are both points in slice for each measurement
@@ -886,7 +879,6 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 		vertices[ m_idx ].resize( 2 );
 		if( m.get_visible() )
 		{
-			//std::vector< Core::Point > vertices( 2 );
 			bool vertex_in_slice[ 2 ];
 
 			// TODO Visually represent point in front differently
@@ -937,6 +929,13 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 			{
 				Core::Color color = vertex_in_slice[ i ] ? in_slice_color : out_of_slice_color;
 			
+				if( this->private_->editing_ && 
+					m.get_id() == this->private_->hover_point_.measurement_id_ &&
+					i == this->private_->hover_point_.point_index_ )
+				{
+					color = Core::Color( 1.0, 0.0, 0.0 );
+				}
+
 				// Render GL_POINT
 				glColor4f( color.r(), color.g(), color.b(), static_cast< float >( opacity ) );
 				glBegin( GL_POINTS );
@@ -947,100 +946,30 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 	}
 
 	// Render length above line, label below line
-	// Different project matrix is required
+	// Different projection matrix is required
 	glPopMatrix();
 
 	// Need to lock state engine, but can't lock it and RenderResources at same time or deadlock
-	// could occur.  So compute all text locations first, then do rendering.
-	std::vector< std::vector< Core::Point > > text_locations( measurements.size() );
-	std::vector< std::string > formatted_lengths( measurements.size() );
-
-	// NOTE: This loop is slow in debug mode, but not release mode
+	// could occur.  So do conversion to window coordinates first, then do rendering.
+	std::vector< std::vector< Core::Point > > window_vertices( measurements.size() );
 	for( size_t m_idx = 0; m_idx < measurements.size(); m_idx++ )
 	{
 		Core::Measurement m = measurements[ m_idx ];
 		if( m.get_visible() )
 		{
-			// Find position of label and length
 			// NOTE: Y values increase from top to bottom of the window
 			
 			// Convert vertices to window coords
 			Core::Point p0 = vertices[ m_idx ][ 0 ];
 			Core::Point p1 = vertices[ m_idx ][ 1 ];
 			double p0_x, p0_y, p1_x, p1_y;
-			// Locks state engine!
+			// NOTE: Locks state engine, so has to be called before RenderResources is locked
 			viewer->world_to_window( p0.x(), p0.y(), p0_x, p0_y );
 			viewer->world_to_window( p1.x(), p1.y(), p1_x, p1_y );
 			Core::Point window_p0( p0_x, p0_y, 0.0 );
 			Core::Point window_p1( p1_x, p1_y, 0.0 );
-			
-			// Find mid point
-			Core::Point mid_point = window_p0 + ( ( window_p1 - window_p0 ) / 2.0 );
-
-			// Find perpendicular to line, normalize
-			Core::Vector measure_normal;
-			double dx = p1_x - p0_x;
-			double dy = p0_y - p1_y;
-			measure_normal = Core::Vector( dy, dx, 0 );
-			measure_normal.normalize();
-			int pixel_offset = 10;
-
-			// Put length on one side, label on other
-			bool flip_normal = measure_normal.y() < 0;
-			Core::Point label_point = mid_point + 
-				( measure_normal * pixel_offset * ( flip_normal ? -1 : 1 ) );
-			Core::Point length_point = mid_point + 
-				( measure_normal * pixel_offset * ( flip_normal ? 1 : -1 ) );
-		
-
-			// Find angle of line
-			double angle = ( dx == 0 ? 90 : ( atan( dy / dx ) ) * 180 / Core::Pi() );
-
-			//
-			// Label
-			//
-
-			double text_width = m.get_id().length() * 20.0;
-			double text_height = 20;
-			// Higher for more horizontal lines
-			double norm_angle = abs( angle ) / 90.0;
-			double x_offset = 0;
-			// Label to the left of line
-			if( angle < 0 )
-			{
-				x_offset = norm_angle * -0.5 * text_width; 
-			}
-			
-			// Shift to the left by some amount so that the label doesn't intersect the line or the 
-			// other text
-			label_point[ 0 ] = label_point.x() + x_offset;
-
-			double y_offset = 0.5 * text_height;
-			label_point[ 1 ] = label_point.y() + y_offset;
-
-			//
-			// Length
-			//
-
-			size_t digits = 3;
-			std::string length_string = Core::ExportToString( m.get_length(), digits );
-			formatted_lengths[ m_idx ] = length_string;
-
-			text_width = length_string.length() * 15.0;
-			x_offset = 0;
-			// Label to the left of line
-			if( angle > 0 )
-			{
-				x_offset = norm_angle * -0.5 * text_width; 
-			}
-
-			// Shift to the left by some amount so that the label doesn't intersect the line or the 
-			// other text
-			length_point[ 0 ] = length_point.x() + x_offset;
-
-			text_locations[ m_idx ].resize( 2 );
-			text_locations[ m_idx ][ 0 ] = label_point;
-			text_locations[ m_idx ][ 1 ] = length_point;
+			window_vertices[ m_idx ].push_back( window_p0 );
+			window_vertices[ m_idx ].push_back( window_p1 );
 		}
 	}
 
@@ -1057,17 +986,83 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 		Core::Measurement m = measurements[ m_idx ];
 		if( m.get_visible() )
 		{
+			// Find position of label and length
+
+			Core::Point window_p0 = window_vertices[ m_idx ][ 0 ];
+			Core::Point window_p1 = window_vertices[ m_idx ][ 1 ];
+
+			// Find mid point
+			Core::Point mid_point = window_p0 + ( ( window_p1 - window_p0 ) / 2.0 );
+
+			// Find perpendicular to line, normalize
+			Core::Vector measure_normal;
+			double dx = window_p1.x() - window_p0.x();
+			double dy = window_p0.y() - window_p1.y();
+			measure_normal = Core::Vector( dy, dx, 0 );
+			measure_normal.normalize();
+			int pixel_offset = 10;
+
+			// Put length on one side, label on other
+			bool flip_normal = measure_normal.y() < 0;
+			Core::Point label_point = mid_point + 
+				( measure_normal * pixel_offset * ( flip_normal ? -1 : 1 ) );
+			Core::Point length_point = mid_point + 
+				( measure_normal * pixel_offset * ( flip_normal ? 1 : -1 ) );
+
+			// Find angle of line
+			double angle = ( dx == 0 ? 90 : ( atan( dy / dx ) ) * 180 / Core::Pi() );
+
+			//
+			// Label
+			//
+
+			int text_height = 20; // Heuristically determined -- computing actual size didn't work
+			int text_width = static_cast< int >( m.get_id().size() ) * text_height;
+
+			// Higher for more horizontal lines
+			double norm_angle = abs( angle ) / 90.0;
+			double x_offset = 0;
+			// Label to the left of line
+			if( angle < 0 )
+			{
+				x_offset = norm_angle * -0.5 * text_width; 
+			}
+
+			// Shift to the left by some amount so that the label doesn't intersect the line or the 
+			// other text
+			label_point[ 0 ] = label_point.x() + x_offset;
+
+			double y_offset = 0.5 * text_height;
+			label_point[ 1 ] = label_point.y() + y_offset;
+
 			// Render label
-			Core::Point label_location = text_locations[ m_idx ][ 0 ];
+			unsigned int font_size = 14; // Matches slice number font size
 			text_renderer->render( m.get_id(), &buffer[ 0 ], 
-				viewer->get_width(), viewer->get_height(), static_cast< int >( label_location.x() ), 
-				viewer->get_height() - static_cast< int >( label_location.y() ), 14, 0 );
+				viewer->get_width(), viewer->get_height(), static_cast< int >( label_point.x() ), 
+				viewer->get_height() - static_cast< int >( label_point.y() ), font_size, 0 );
+
+			//
+			// Length
+			//
+
+			std::string length_string = this->get_length_string( m );
+			text_width = static_cast< int >( length_string.size() ) * text_height;
+			
+			x_offset = 0;
+			// Label to the left of line
+			if( angle > 0 )
+			{
+				x_offset = norm_angle * -0.5 * text_width; 
+			}
+
+			// Shift to the left by some amount so that the label doesn't intersect the line or the 
+			// other text
+			length_point[ 0 ] = length_point.x() + x_offset;
 
 			// Render length
-			Core::Point length_location = text_locations[ m_idx ][ 1 ];
-			text_renderer->render( formatted_lengths[ m_idx ], &buffer[ 0 ], 
-				viewer->get_width(), viewer->get_height(), static_cast< int >( length_location.x() ), 
-				viewer->get_height() - static_cast< int >( length_location.y() ), 14, 0 );
+			text_renderer->render( length_string, &buffer[ 0 ], 
+				viewer->get_width(), viewer->get_height(), static_cast< int >( length_point.x() ), 
+				viewer->get_height() - static_cast< int >( length_point.y() ), font_size, 0 );
 		}
 	}
 
@@ -1079,7 +1074,8 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 	// Blend the text onto the framebuffer
 	glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_ADD );
 	glBegin( GL_QUADS );
-	glColor4f( 1.0f, 0.6f, 0.1f, 0.75f * static_cast< float >( opacity ) );
+	glColor4f( in_slice_color.r(), in_slice_color.g(), in_slice_color.b(), 
+		static_cast< float >( opacity ) );
 	glTexCoord2f( 0.0f, 0.0f );
 	glVertex2i( 0, 0 );
 	glTexCoord2f( 1.0f, 0.0f );
@@ -1093,7 +1089,6 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 	
 	CORE_CHECK_OPENGL_ERROR();
 
-	//glPopMatrix();
 	glPopAttrib();
 	glFinish();
 }
@@ -1101,6 +1096,78 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 bool MeasurementTool::has_2d_visual()
 {
 	return true;
+}
+
+std::string MeasurementTool::get_length_string( const Core::Measurement& measurement ) const
+{
+	// Thread-safety: We get a handle to the active layer 
+	// (get_active_layer is thread-safe), so it can't be deleted out from under 
+	// us.
+	LayerHandle active_layer = LayerManager::Instance()->get_active_layer();
+
+	double length = 0;
+	bool use_scientific = false;
+	Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+	if( !this->show_world_units_state_->get() && active_layer ) 
+	{
+		// Index units
+
+		// Convert world units to index units
+		// Use grid transform from active layer
+		Core::GridTransform grid_transform = active_layer->get_grid_transform();
+
+		// Grid transfrom takes index coords to world coords, so we need inverse
+		Core::Transform inverse_transform = grid_transform.get_inverse();
+
+		Core::Point p0, p1;
+		measurement.get_point( 0 , p0 );
+		measurement.get_point( 1 , p1 );
+		Core::Vector measure_vec = p1 - p0;
+		measure_vec = inverse_transform.project( measure_vec );
+		length = measure_vec.length();
+
+		// Use same formatting policy as status bar for coordinates
+		if( 10000 < length ) 
+		{
+			use_scientific = true;
+		}
+		else 
+		{
+			use_scientific = false;
+		}
+	}
+	else
+	{
+		// World units
+		length= measurement.get_length();
+
+		// Use same formatting policy as status bar for coordinates
+		if( ( 0.0 < length && length < 0.0001 ) || 1000 < length ) 
+		{
+			use_scientific = true;
+		}
+		else 
+		{
+			use_scientific = false;
+		}
+	}
+	
+	// Use same formatting policy as status bar for coordinates
+	std::ostringstream oss;
+	if( use_scientific ) 
+	{
+		// Use scientific notation
+		oss.precision( 2 );
+		oss << std::scientific << length;
+		return ( oss.str() );
+	}
+	else 
+	{
+		// Format normally
+		oss.precision( 3 );
+		oss << std::fixed << length;
+		return ( oss.str() );
+	}
 }
 
 } // end namespace Seg3D
