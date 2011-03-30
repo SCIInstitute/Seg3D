@@ -139,6 +139,7 @@ private:
 public:
   // GETMUTEX:
   // Get the shared mutex for the opengl resources
+  // NOTE: Do not lock the RenderResources while StateEngine is locked as this will cause deadlock
   static mutex_type& GetMutex();
 };
 

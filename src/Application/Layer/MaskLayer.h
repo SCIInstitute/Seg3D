@@ -73,6 +73,7 @@ public:
 
   // GET_GRID_TRANSFORM:
   // This function returns the grid transform of the mask volume.
+  // Locks: StateEngine
   virtual Core::GridTransform get_grid_transform() const;
 
   // SET_GRID_TRANSFORM:

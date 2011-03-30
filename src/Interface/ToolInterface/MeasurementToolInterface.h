@@ -51,8 +51,9 @@ class MeasurementToolInterface : public ToolWidget
 {
 Q_OBJECT
 
-// Constructor/destructor
+
 public:
+  // Constructor/destructor
   MeasurementToolInterface();
   virtual ~MeasurementToolInterface();
   virtual bool build_widget( QFrame* frame );
@@ -74,8 +75,7 @@ public:
 
   // UPDATEMEASUREMENTTABLE:
   // Update entire table including dimensions.  Scroll to active index.  
-  // Slower than UpdateMeasurementCells, so use only when needed. 
-  // De-selects selected rows.  
+  // Slower than UpdateMeasurementCells, so use only when needed. De-selects selected rows.  
   // TODO: This may be slow due to resizeColumns[Rows]ToContents -- try hard-coding sizes.
   static void UpdateMeasurementTable( qpointer_type measurement_interface );
 
@@ -85,6 +85,7 @@ public:
 
   // UPDATEACTIVEINDEX:
   // Update interface table and text box in response to changed active index.
+  // Locks: StateEngine
   static void UpdateActiveIndex( qpointer_type measurement_interface );
 };
 

@@ -59,7 +59,6 @@ public:
   void set_active_index( int active_index );
   void update_visibility();
 
-  //std::string cached_active_measurement_id_;
   std::string cached_active_note_;
   bool use_cached_active_note_;
   MeasurementToolHandle measurement_tool_;
@@ -81,6 +80,9 @@ void MeasurementTableModelPrivate::set_active_index( int active_index )
 
   // If this is already the active measurement, return
   if( active_index == this->measurement_tool_->active_index_state_->get() ) return;
+
+  // Active index has changed, so don't want to use cached note for old active index
+  this->use_cached_active_note_ = false;
 
   // Make sure index is in valid range
   const std::vector< Core::Measurement >& measurements = 
@@ -133,7 +135,6 @@ MeasurementTableModel::MeasurementTableModel( MeasurementToolHandle measurement_
 {
   this->private_->model_ = this;
   this->private_->measurement_tool_ = measurement_tool;
-  //this->private_->cached_active_measurement_id_ = "";
   this->private_->cached_active_note_ = "";
   this->private_->use_cached_active_note_ = false;
   this->private_->visibility_ = MeasurementVisibility::ALL_VISIBLE_E;
@@ -157,7 +158,7 @@ int MeasurementTableModel::columnCount( const QModelIndex& /*index*/) const
 
 QVariant MeasurementTableModel::data( const QModelIndex& index, int role ) const
 {
-  // TODO ASSERT_IS_INTERFACE_THREAD();
+  ASSERT_IS_INTERFACE_THREAD();
 
   if ( !index.isValid() ) return QVariant();
 
@@ -217,13 +218,6 @@ QVariant MeasurementTableModel::data( const QModelIndex& index, int role ) const
       }
     }
   }
-  else if ( role == Qt::BackgroundRole )
-  {
-    if ( index.row() == this->private_->measurement_tool_->active_index_state_->get() )
-    {
-      return QBrush( QColor( 225, 243, 252 ) ); // Light blue
-    }
-  }
   return QVariant(); 
   
 }
@@ -253,10 +247,7 @@ bool MeasurementTableModel::setData( const QModelIndex &index, const QVariant &v
         // the note editing is finished to save the state.  In the meantime save and use a 
         // cached copy of the note.
         this->private_->cached_active_note_ = value.toString().toStdString();
-        if( !this->private_->use_cached_active_note_ )
-        {
-          this->private_->use_cached_active_note_ = true;
-        }
+        this->private_->use_cached_active_note_ = true;
 
         // If we are editing this cell then it is by definition the active measurement
         Q_EMIT active_note_changed( value.toString() ); 
@@ -368,17 +359,18 @@ bool MeasurementTableModel::removeRows( int row, int count, const QModelIndex & 
 void MeasurementTableModel::update_table()
 {
   this->private_->update_visibility();
+  this->private_->use_cached_active_note_ = false;
 
   QAbstractTableModel::reset();
 
   // Needed for initial update after loading measurements from project file
   Q_EMIT active_note_changed( this->get_active_note() ); 
-  this->private_->use_cached_active_note_ = false;
 }
 
 void MeasurementTableModel::update_cells()
 {
   this->private_->update_visibility();
+  this->private_->use_cached_active_note_ = false;
 
   int rows = this->rowCount( QModelIndex() );
   int columns = this->columnCount( QModelIndex() );
@@ -388,7 +380,6 @@ void MeasurementTableModel::update_cells()
   Q_EMIT headerDataChanged( Qt::Horizontal, 0, 0 );
 
   Q_EMIT active_note_changed( this->get_active_note() ); 
-  this->private_->use_cached_active_note_ = false;
 }
 
 void MeasurementTableModel::remove_rows( const std::vector< int >& rows )

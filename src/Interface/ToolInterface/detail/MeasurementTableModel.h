@@ -107,6 +107,7 @@ public:
   // GET_ACTIVE_INDEX:
   // Return row index of active measurement. Returns -1 if there are no measurements.
   // Needed by MeasurementTableView, which doesn't have direct access to MeasurementTool.
+  // Locks: StateEngine
   int get_active_index() const; 
   
   // HANDLE_SELECTED:

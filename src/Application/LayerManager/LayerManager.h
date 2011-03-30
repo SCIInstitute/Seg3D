@@ -126,6 +126,7 @@ public:
 
   // GET_ACTIVE_LAYER:
   // This function returns a handle to the active layer
+  // Locks: StateEngine
   LayerHandle get_active_layer();
   
   // GET_LAYER_NAMES:

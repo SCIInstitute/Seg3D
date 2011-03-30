@@ -250,12 +250,8 @@ void MeasurementToolInterface::UpdateActiveIndex( qpointer_type measurement_inte
   // Protect interface pointer, so we do not execute if interface does not exist anymore
   if ( measurement_interface.data() )
   {
-    // Update cells in order to highlight new active index
-    // Updating table causes selection to be deselected, which we don't want
-    measurement_interface->private_->table_model_->update_cells();
-
-    // Scroll to active index
-    measurement_interface->private_->table_view_->scroll_to_active_index();
+    // Select active index and scroll to it
+    measurement_interface->private_->table_view_->update_active_index();
 
     // Update note in text box to correspond to active index
     measurement_interface->private_->ui_.note_textbox_->setText( 

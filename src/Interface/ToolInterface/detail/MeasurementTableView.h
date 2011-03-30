@@ -70,27 +70,23 @@ public:
   // Copied cells can be pasted directly into Excel spreadsheet.
   void copy_selected_cells() const;
 
-  // SCROLL_TO_ACTIVE_INDEX:
-  // Ensure that active index is visible in table.
-  void scroll_to_active_index();
+  // UPDATE_ACTIVE_INDEX:
+  // Select active index and ensure that active index is visible in table.
+  // Locks: StateEngine
+  void update_active_index();
 
 private Q_SLOTS:
+
+  // HANDLE_MODEL_RESET:
+  // Locks: StateEngine
   void handle_model_reset();
+
   void handle_selected();
   void handle_header_clicked( int index );
 
 private:
   MeasurementTableViewPrivateHandle private_;
 }; 
-
-// Derived vertical header that uses MeasurementTableView's context menu
-//class MeasurementHorizontalHeader : public QHeaderView
-//{
-//public:
-//  MeasurementHorizontalHeader( Qt::Orientation orientation, QWidget * parent = 0 );
-//
-//  void mousePressEvent( QMouseEvent * e );
-//};
 
 } // end namespace Seg3D
 

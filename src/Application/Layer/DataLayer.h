@@ -67,6 +67,7 @@ public:
 
   // GET_GRID_TRANSFORM:
   // this function returns the grid transform of the data volume
+  // Locks: StateEngine
   virtual Core::GridTransform get_grid_transform() const;
   
   // SET_GRID_TRANSFORM:

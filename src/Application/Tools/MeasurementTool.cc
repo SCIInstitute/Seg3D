@@ -134,6 +134,7 @@ public:
 	// Find or move the hover point, depending on whether user is editing or not.
 	void update_hover_point();
 
+	// Locks: StateEngine
 	bool get_hover_measurement( size_t& index, Core::Measurement& measurement, 
 		Core::Point& world_point ); 
 
@@ -170,9 +171,6 @@ public:
 
 	Core::MousePosition mouse_pos_; // Should be mutex-protected
 
-	//Core::TextRendererHandle text_renderer_;
-	//Core::Texture2DHandle text_texture_;
-
 	int saved_num_measurements_; // Only accessed from application thread
 };
 
@@ -188,8 +186,7 @@ void MeasurementToolPrivate::handle_measurements_changed()
 	if( num_measurements > 0 )
 	{
 		// Measurements may have been added or removed, so update the active index
-		bool num_measurements_changed = this->saved_num_measurements_ != -1 && 
-			num_measurements != saved_num_measurements_;
+		bool num_measurements_changed = num_measurements != saved_num_measurements_;
 
 		if( num_measurements_changed )
 		{
@@ -378,12 +375,6 @@ std::string MeasurementToolPrivate::get_next_measurement_id()
 void MeasurementToolPrivate::update_viewers()
 {
 	// May be called from application or interface thread
-
-	/*if ( this->signal_block_count_ > 0 )
-	{
-		return;
-	}*/
-
 	ViewerManager::Instance()->update_2d_viewers_overlay();
 }
 
@@ -396,7 +387,6 @@ bool MeasurementToolPrivate::find_hover_point()
 	// NOTE: Should we find closest point within radius instead?
 
 	// Compute the size of a pixel in world space
-	//ViewerHandle viewer = ViewerManager::Instance()->get_active_viewer();
 	double x0, y0, x1, y1;
 	this->viewer_->window_to_world( 0, 0, x0, y0 );
 	this->viewer_->window_to_world( 1, 1, x1, y1 );
@@ -470,7 +460,6 @@ void MeasurementToolPrivate::snap_hover_point_to_slice()
 	size_t measurement_index;
 	Core::Measurement edited_measurement;
 	Core::Point measurement_point;
-	// See get_measurement() for thread safety notes
 	if( this->get_hover_measurement( measurement_index, edited_measurement, measurement_point ) )
 	{
 		// Project hover point onto current slice, find world point
@@ -565,9 +554,7 @@ void MeasurementToolPrivate::finish_editing()
 
 	// No need to update measurement (interactively updated) 
 	// Change cursor to indicate that editing is not happening
-	// NOTE: Cursor has three states: editing, hovering, and normal
-	//ViewerHandle viewer = ViewerManager::Instance()->get_active_viewer();
-	
+	// NOTE: Cursor has three states: editing, hovering, and normal	
 	if( this->hover_point_.is_valid() )
 	{
 		this->viewer_->set_cursor( Core::CursorShape::OPEN_HAND_E );
@@ -589,7 +576,6 @@ void MeasurementToolPrivate::get_mouse_world_point( Core::Point& world_point )
 	// Make sure to use current viewer, slice, and mouse coordinates.  These aren't passed
 	// as parameters because we don't have this info in the case where the view has been changed
 	// by a key command.
-	//ViewerHandle viewer = ViewerManager::Instance()->get_active_viewer();
 	double world_x, world_y;
 	this->viewer_->window_to_world( this->mouse_pos_.x_, this->mouse_pos_.y_, world_x, world_y );
 	Core::VolumeSliceHandle active_slice = this->viewer_->get_active_volume_slice();
@@ -659,9 +645,8 @@ MeasurementTool::MeasurementTool( const std::string& toolid ) :
 	this->private_->active_group_id_ = "";
 	this->private_->editing_ = false;
 	this->private_->measurement_id_counter_ = -1;
-	this->private_->saved_num_measurements_ = -1;
-	//this->private_->text_renderer_.reset( new Core::TextRenderer );
-
+	this->private_->saved_num_measurements_ = 0;
+	
 	// State variable gets allocated here
 	this->add_state( "measurements", this->measurements_state_ );
 	this->add_state( "active_index", this->active_index_state_, -1 );
@@ -679,6 +664,8 @@ MeasurementTool::MeasurementTool( const std::string& toolid ) :
 
 	this->add_connection( this->measurements_state_->state_changed_signal_.connect(
 		boost::bind( &MeasurementToolPrivate::handle_measurements_changed, this->private_ ) ) );
+	this->add_connection( this->active_index_state_->state_changed_signal_.connect(
+		boost::bind( &MeasurementToolPrivate::update_viewers, this->private_ ) ) );
 	this->add_connection( this->units_selection_state_->value_changed_signal_.connect(
 		boost::bind( &MeasurementToolPrivate::handle_units_selection_changed, this->private_, _2 ) ) );
 	this->add_connection( LayerManager::Instance()->active_layer_changed_signal_.connect(
@@ -759,9 +746,11 @@ bool MeasurementTool::handle_mouse_press( ViewerHandle viewer,
 			{
 				// State: Hovering over point that is in slice 
 				
-				// Start editing
+				// Make hover measurement active
 				Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
 					this->active_index_state_, static_cast< int >( measurement_index ) );
+
+				// Start editing
 				this->private_->start_editing();
 			}
 			else 
@@ -802,7 +791,7 @@ bool MeasurementTool::handle_mouse_press( ViewerHandle viewer,
 			// Snap point to current slice
 			this->private_->snap_hover_point_to_slice();
 
-			// TODO Different icon for hovering but not in slice?  Confusing otherwise.
+			// TODO: Different icon for hovering but not in slice?  
 		}
 	}
 	else if( button == Core::MouseButton::RIGHT_BUTTON_E )
@@ -843,16 +832,36 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 		return;
 	} 
 	
+	//-------------- StateEngine locked  -------------------
+
 	// NOTE: The StateEngine and RenderResources should NEVER be locked
 	// at the same time because this will lead to deadlock.  So we get all the state we need up
 	// front, then unlock the StateEngine, then do the rendering.
 	Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
 
 	std::vector< Core::Measurement > measurements = this->measurements_state_->get();
+	int active_index = this->active_index_state_->get();
 	double opacity = this->opacity_state_->get();
+	
+	// Getting the length string requires locking the state engine because we need access to the
+	// show_world_units state and the LayerManager, which locks the state engine.
+	std::vector< std::string > length_strings( measurements.size() );
+	for( size_t m_idx = 0; m_idx < measurements.size(); m_idx++ )
+	{
+		if( measurements[ m_idx ].get_visible() ) 
+		{
+			length_strings[ m_idx ] = this->get_length_string( measurements[ m_idx ] ); 
+		}
+		else
+		{
+			length_strings[ m_idx ] = "";
+		}
+	}
 
 	lock.unlock();
 	
+	//-------------- StateEngine unlocked  -------------------
+
 	Core::Color in_slice_color = Core::Color( 1.0f, 1.0f, 0.0f );
 	Core::Color out_of_slice_color = Core::Color( 0.6f, 0.6f, 0.0f );
 
@@ -863,9 +872,7 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 	glMultMatrixd( proj_mat.data() );
 
 	glPointSize( 5.0f );
-	glLineWidth( 2.0f );
 	glEnable( GL_LINE_SMOOTH );
-	glLineStipple(1, 0x00FF );
 
 	// Projected vertices per measurement
 	std::vector< std::vector< Core::Point > > vertices( measurements.size() );
@@ -875,26 +882,27 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 	// Draw lines and points
 	for( size_t m_idx = 0; m_idx < measurements.size(); m_idx++ )
 	{
-		Core::Measurement m = measurements[ m_idx ];
-		vertices[ m_idx ].resize( 2 );
-		if( m.get_visible() )
+		if( measurements[ m_idx ].get_visible() )
 		{
+			Core::Measurement m = measurements[ m_idx ];
 			bool vertex_in_slice[ 2 ];
 
-			// TODO Visually represent point in front differently
+			// TODO: Visually represent point in front differently?
 			// Project points, determine if they are "in slice"
-			for( size_t i = 0; i < 2; i++ )
+			vertices[ m_idx ].resize( 2 );
+			for( size_t v_idx = 0; v_idx < 2; v_idx++ )
 			{
 				Core::Point measurement_point;
-				m.get_point( static_cast< int >( i ), measurement_point );
+				m.get_point( static_cast< int >( v_idx ), measurement_point );
 
-				vertex_in_slice[ i ] = this->private_->in_slice( viewer, measurement_point );
+				vertex_in_slice[ v_idx ] = this->private_->in_slice( viewer, measurement_point );
 				
 				// Project 3D point onto slice
 				double x_pos, y_pos;
 				vol_slice->project_onto_slice( measurement_point, x_pos, y_pos );
-				vertices[ m_idx ][ i ][ 0 ] = x_pos;
-				vertices[ m_idx ][ i ][ 1 ] = y_pos;
+				
+				vertices[ m_idx ][ v_idx ][ 0 ] = x_pos;
+				vertices[ m_idx ][ v_idx ][ 1 ] = y_pos;
 			}
 
 			// Draw line before points so that points are rendered on top (looks better in case 
@@ -908,13 +916,23 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 			if( this->private_->editing_ && 
 				m.get_id() == this->private_->hover_point_.measurement_id_ )
 			{
-				// Draw dotted line (GL_LINE)
+				// Draw coarsely dotted line 
+				glLineWidth( 2.0f );
+				glLineStipple(1, 0x00FF );
 				glEnable( GL_LINE_STIPPLE ); 
+			}
+			else if( m_idx == active_index )
+			{
+				// Draw solid line to indicate active measurement
+				glLineWidth( 2.0f );
+				glDisable( GL_LINE_STIPPLE );
 			}
 			else
 			{
-				// Draw regular line (GL_LINE)
-				glDisable( GL_LINE_STIPPLE );
+				// Draw finely dotted line
+				glLineWidth( 1.5f );
+				glLineStipple(1, 0xAAAA );
+				glEnable( GL_LINE_STIPPLE ); 
 			}
 
 			glBegin( GL_LINES );
@@ -925,13 +943,13 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 			glEnd();
 
 			// Draw points
-			for( size_t i = 0; i < 2; i++ )
+			for( size_t v_idx = 0; v_idx < 2; v_idx++ )
 			{
-				Core::Color color = vertex_in_slice[ i ] ? in_slice_color : out_of_slice_color;
+				Core::Color color = vertex_in_slice[ v_idx ] ? in_slice_color : out_of_slice_color;
 			
 				if( this->private_->editing_ && 
 					m.get_id() == this->private_->hover_point_.measurement_id_ &&
-					i == this->private_->hover_point_.point_index_ )
+					v_idx == this->private_->hover_point_.point_index_ )
 				{
 					color = Core::Color( 1.0, 0.0, 0.0 );
 				}
@@ -939,7 +957,7 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 				// Render GL_POINT
 				glColor4f( color.r(), color.g(), color.b(), static_cast< float >( opacity ) );
 				glBegin( GL_POINTS );
-				glVertex2d( vertices[ m_idx ][ i ].x(), vertices[ m_idx ][ i ].y() );
+				glVertex2d( vertices[ m_idx ][ v_idx ].x(), vertices[ m_idx ][ v_idx ].y() );
 				glEnd();
 			}
 		}
@@ -949,13 +967,14 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 	// Different projection matrix is required
 	glPopMatrix();
 
+	//-------------- StateEngine locked  -------------------
+
 	// Need to lock state engine, but can't lock it and RenderResources at same time or deadlock
 	// could occur.  So do conversion to window coordinates first, then do rendering.
 	std::vector< std::vector< Core::Point > > window_vertices( measurements.size() );
 	for( size_t m_idx = 0; m_idx < measurements.size(); m_idx++ )
 	{
-		Core::Measurement m = measurements[ m_idx ];
-		if( m.get_visible() )
+		if( measurements[ m_idx ].get_visible() )
 		{
 			// NOTE: Y values increase from top to bottom of the window
 			
@@ -973,8 +992,13 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 		}
 	}
 
+	//-------------- StateEngine unlocked  -------------------
+
+	//-------------- RenderResources locked  -------------------
+
 	// Dealing with textures, so need to lock RenderResources
 	Core::RenderResources::lock_type render_lock( Core::RenderResources::GetMutex() );
+	// Create local TextRenderer and Texture2D for each render thread to prevent contention 
 	Core::TextRendererHandle text_renderer;
 	text_renderer.reset( new Core::TextRenderer );
 	Core::Texture2DHandle text_texture;
@@ -983,9 +1007,10 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 
 	for( size_t m_idx = 0; m_idx < measurements.size(); m_idx++ )
 	{
-		Core::Measurement m = measurements[ m_idx ];
-		if( m.get_visible() )
+		if( measurements[ m_idx ].get_visible() )
 		{
+			Core::Measurement m = measurements[ m_idx ];
+
 			// Find position of label and length
 
 			Core::Point window_p0 = window_vertices[ m_idx ][ 0 ];
@@ -1045,7 +1070,7 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 			// Length
 			//
 
-			std::string length_string = this->get_length_string( m );
+			std::string length_string = length_strings[ m_idx ];
 			text_width = static_cast< int >( length_string.size() ) * text_height;
 			
 			x_offset = 0;
@@ -1091,6 +1116,8 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 
 	glPopAttrib();
 	glFinish();
+
+	//-------------- RenderResources unlocked  -------------------
 }
 
 bool MeasurementTool::has_2d_visual()
@@ -1100,14 +1127,19 @@ bool MeasurementTool::has_2d_visual()
 
 std::string MeasurementTool::get_length_string( const Core::Measurement& measurement ) const
 {
+	// NOTE: Do not call this function if RendererResources is locked.
+	// We need access to the show_world_units_state_, and several functions we call also lock
+	// the state engine.  
+	Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
 	// Thread-safety: We get a handle to the active layer 
 	// (get_active_layer is thread-safe), so it can't be deleted out from under 
-	// us.
+	// us.  
 	LayerHandle active_layer = LayerManager::Instance()->get_active_layer();
 
 	double length = 0;
 	bool use_scientific = false;
-	Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+	
 	if( !this->show_world_units_state_->get() && active_layer ) 
 	{
 		// Index units

@@ -94,7 +94,7 @@ public:
 private:
   std::string id_; // Unique ID
   bool visible_;
-  std::string note_;
+  std::string note_; // User-defined note
   Core::Point points_[ 2 ]; // 3D world coordinates of end points
 
 public:

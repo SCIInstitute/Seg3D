@@ -142,6 +142,7 @@ public:
 
   // GETMUTEX
   // Get the mutex of the state engine
+  // NOTE: Do not lock the StateEngine while RenderResources is locked as this will cause deadlock
   static mutex_type& GetMutex()
   {
     return Instance()->get_mutex();

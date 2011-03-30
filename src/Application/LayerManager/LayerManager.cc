@@ -672,6 +672,8 @@ void LayerManager::delete_layers(  std::vector< std::string > layers  )
 
 LayerHandle LayerManager::get_active_layer()
 {
+  // NOTE: This locks the state engine.  DO NOT call this if RenderResources is locked or a 
+  // deadlock will occur.
   lock_type lock( this->get_mutex() );  
   return this->private_->active_layer_;
 }

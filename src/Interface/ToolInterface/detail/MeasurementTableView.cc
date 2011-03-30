@@ -117,8 +117,6 @@ MeasurementTableView::MeasurementTableView( QWidget* parent ) :
 
   // Custom text editor for note column
   this->setItemDelegate( new MeasurementTextDelegate( MeasurementColumns::NOTE_E ) );
-  // Use derived horizontal header that provides a tri-state button for visibility
-  //this->setHorizontalHeaderHeader( new MeasurementHorizontalHeader( Qt::Horizontal, this ) );
   this->horizontalHeader()->setClickable( true );
   this->horizontalHeader()->setStretchLastSection( true ); // Stretch note section
   QObject::connect( this->horizontalHeader(), SIGNAL( sectionClicked( int ) ), 
@@ -159,10 +157,13 @@ void MeasurementTableView::handle_model_reset()
   this->resizeColumnsToContents();
   this->resizeRowsToContents();
   
+  // Hard-code length column width to size of largest possible string (e.g. "123e+002")
+  this->setColumnWidth( MeasurementColumns::LENGTH_E, 66 );
+
   this->horizontalHeader()->setStretchLastSection( true ); // Stretch note section
 
   // Scroll to active measurement
-  this->scroll_to_active_index();
+  this->update_active_index();
 }
 
 void MeasurementTableView::copy_selected_cells() const
@@ -174,8 +175,7 @@ void MeasurementTableView::copy_selected_cells() const
   QString selected_text;
   if( indexes.size() > 0 ) // Cells are selected
   {
-    // QModelIndex::operator < sorts first by row, then by column.  
-    // this is what we need 
+    // QModelIndex::operator < sorts first by row, then by column. This is what we need. 
     qSort( indexes.begin(), indexes.end() ); 
 
     // You need a pair of indexes to find the row changes 
@@ -243,13 +243,35 @@ void MeasurementTableView::copy_selected_cells() const
   }
 }
 
-void MeasurementTableView::scroll_to_active_index()
+void MeasurementTableView::update_active_index()
 {
+  ASSERT_IS_INTERFACE_THREAD();
+
+  // Lock StateEngine so that state doesn't change between access to active index and 
+  // measurements vector
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
   MeasurementTableModel* model = 
     qobject_cast< MeasurementTableModel* >( this->model() );
   int active_index = model->get_active_index();
-  if( active_index != -1 )
+  if( 0 <= active_index && active_index < model->rowCount( QModelIndex() ) )
   {
+    // If the active index isn't already selected, select it.  There may be multiple rows
+    // selected, in which case we don't want to select the active index because that would
+    // deselect everything else.
+    bool active_index_selected = false;
+    QModelIndexList selected_rows_list = this->selectionModel()->selectedRows();
+    Q_FOREACH ( QModelIndex index, selected_rows_list )
+    {
+      if( index.row() == active_index )
+      {
+        active_index_selected = true;
+      }
+    }
+    if( !active_index_selected )
+    {
+      this->selectRow( active_index );
+    }
+    
     this->scrollTo( model->index( active_index, 0 ) );
   }
 }
@@ -298,36 +320,6 @@ void MeasurementTableView::handle_header_clicked( int index )
     MeasurementTableModel* model = qobject_cast< MeasurementTableModel* >( this->model() );
     model->toggle_visible();
   }
-
-  /*
-  model has toggle_visible
-  - Changes private var storing tri-state state
-  - That var used when returning icon
-  - Calls MeasurementTool::set_visible( true or false)
-  */
 }
-
-//MeasurementHorizontalHeader::MeasurementHorizontalHeader( Qt::Orientation orientation, 
-//                           QWidget * parent /*= 0 */ ) :
-//QHeaderView( orientation, parent )
-//{
-//  this->setClickable( true );
-//}
-//
-//void MeasurementHorizontalHeader::mousePressEvent( QMouseEvent * e )
-//{
-//  // Treat right-click the same as left-click
-//  if( e->button() == Qt::RightButton )
-//  {
-//    QMouseEvent* mouse_event = new QMouseEvent( QEvent::MouseButtonPress, e->pos(), 
-//      e->globalPos(), Qt::LeftButton, e->buttons(), e->modifiers() );
-//    QHeaderView::mousePressEvent( mouse_event );
-//  }
-//  else
-//  {
-//    QHeaderView::mousePressEvent( e );
-//  }
-//
-//}
 
 } // end namespace Seg3D

@@ -94,6 +94,7 @@ public:
 
   // GET_GRID_TRANSFORM:
   // Get the transform of the layer
+  // Locks: StateEngine
   virtual Core::GridTransform get_grid_transform() const = 0;
 
   // SET_GRID_TRANSFORM:

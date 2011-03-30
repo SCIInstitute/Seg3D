@@ -186,11 +186,13 @@ public:
   // WINDOW_TO_WORLD:
   // Maps from window coordinates to world coordinates.
   // NOTE: Only call this function when the viewer is in one of the 2D modes.
+  // Locks: StateEngine
   void window_to_world( int x, int y, double& world_x, double& world_y ) const;
 
   // WORLD_TO_WINDOW:
   // Maps from world coordinates to window coordinates.
   // NOTE: Only call this function when the viewer is in one of the 2D modes.
+  // Locks: StateEngine
   void world_to_window( double world_x, double world_y, double& x, double& y ) const;
 
   // GET_PROJECTION_MATRIX:
