@@ -114,7 +114,7 @@ MeasurementTableView::MeasurementTableView( QWidget* parent ) :
 {
   this->private_->view_ = this;
   this->private_->delete_action_ = new QAction( tr( "&Delete" ), this );
-
+  
   // Custom text editor for note column
   this->setItemDelegate( new MeasurementTextDelegate( MeasurementColumns::NOTE_E ) );
   this->horizontalHeader()->setClickable( true );
@@ -156,9 +156,6 @@ void MeasurementTableView::handle_model_reset()
   // Have to resize rows/columns *after* model has been populated
   this->resizeColumnsToContents();
   this->resizeRowsToContents();
-  
-  // Hard-code length column width to size of largest possible string (e.g. "123e+002")
-  this->setColumnWidth( MeasurementColumns::LENGTH_E, 66 );
 
   this->horizontalHeader()->setStretchLastSection( true ); // Stretch note section
 
