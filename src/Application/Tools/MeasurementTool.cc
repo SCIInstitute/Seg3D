@@ -128,7 +128,7 @@ public:
 
 	// SNAP_HOVER_POINT_TO_SLICE:
 	// Snap the hover point to its projected position on the current slice.
-	void snap_hover_point_to_slice();
+	bool snap_hover_point_to_slice();
 
 	// UPDATE_HOVER_POINT:
 	// Find or move the hover point, depending on whether user is editing or not.
@@ -141,7 +141,7 @@ public:
 	void start_editing();
 	void finish_editing();
 
-	void get_mouse_world_point( Core::Point& world_point );
+	bool get_mouse_world_point( Core::Point& world_point );
 
 	// IN_SLICE:
 	// Return true if the point is in the current slice.  This is slightly different from seed 
@@ -287,7 +287,7 @@ void MeasurementToolPrivate::handle_active_viewer_changed( int active_viewer )
 
 	size_t viewer_id = static_cast< size_t >( active_viewer );
 	ViewerHandle viewer = ViewerManager::Instance()->get_viewer( viewer_id );
-	if ( !viewer->is_volume_view() )
+	if ( viewer && !viewer->is_volume_view() )
 	{
 		this->handle_viewer_slice_changed( viewer_id, viewer->slice_number_state_->get() );
 	}
@@ -386,6 +386,19 @@ bool MeasurementToolPrivate::find_hover_point()
 	// Need to find first point within radius.
 	// NOTE: Should we find closest point within radius instead?
 
+	if( !this->viewer_ ) 
+	{
+		this->hover_point_.invalidate();
+		return false;
+	}
+
+	Core::VolumeSliceHandle volume_slice = this->viewer_->get_active_volume_slice();
+	if( !volume_slice )
+	{
+		this->hover_point_.invalidate();
+		return false;
+	}
+
 	// Compute the size of a pixel in world space
 	double x0, y0, x1, y1;
 	this->viewer_->window_to_world( 0, 0, x0, y0 );
@@ -400,8 +413,6 @@ bool MeasurementToolPrivate::find_hover_point()
 	// Search for the first vertex that's within 2 pixels of current mouse position
 	double range_x = pixel_width * 4;
 	double range_y = pixel_height * 4;
-
-	Core::VolumeSliceHandle volume_slice = this->viewer_->get_active_volume_slice();
 
 	Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
 	const std::vector< Core::Measurement >& measurements = this->tool_->measurements_state_->get();
@@ -442,16 +453,17 @@ void MeasurementToolPrivate::move_hover_point_to_mouse()
 	{
 		// Convert current mouse coords to 3D world point
 		Core::Point moved_pt;
-		this->get_mouse_world_point( moved_pt );
-
-		// Update hover point
-		ActionSetMeasurementPoint::Dispatch( Core::Interface::GetMouseActionContext(), 
-			this->tool_->measurements_state_, this->hover_point_.measurement_id_, 
-			this->hover_point_.point_index_, moved_pt );
+		if( this->get_mouse_world_point( moved_pt ) )
+		{
+			// Update hover point
+			ActionSetMeasurementPoint::Dispatch( Core::Interface::GetMouseActionContext(), 
+				this->tool_->measurements_state_, this->hover_point_.measurement_id_, 
+				this->hover_point_.point_index_, moved_pt );
+		}
 	}
 }
 
-void MeasurementToolPrivate::snap_hover_point_to_slice()
+bool MeasurementToolPrivate::snap_hover_point_to_slice()
 {
 	ASSERT_IS_INTERFACE_THREAD();
 	lock_type lock( this->get_mutex() );
@@ -462,8 +474,18 @@ void MeasurementToolPrivate::snap_hover_point_to_slice()
 	Core::Point measurement_point;
 	if( this->get_hover_measurement( measurement_index, edited_measurement, measurement_point ) )
 	{
+		if( !this->viewer_ )
+		{
+			return false;
+		}
+
 		// Project hover point onto current slice, find world point
 		Core::VolumeSliceHandle active_slice = this->viewer_->get_active_volume_slice();
+		if( !active_slice )
+		{
+			return false;
+		}
+		
 		double world_x, world_y;
 		active_slice->project_onto_slice( measurement_point, world_x, world_y );
 		Core::Point moved_pt;
@@ -473,13 +495,20 @@ void MeasurementToolPrivate::snap_hover_point_to_slice()
 		ActionSetMeasurementPoint::Dispatch( Core::Interface::GetMouseActionContext(), 
 			this->tool_->measurements_state_, this->hover_point_.measurement_id_, 
 			this->hover_point_.point_index_, moved_pt );
+		return true;
 	}
+	return false;
 }
 
 void MeasurementToolPrivate::update_hover_point()
 {
 	// May be called from application (slice changed) or interface (mouse move) thread
 	lock_type lock( this->get_mutex() );
+
+	if( !this->viewer_ )
+	{
+		return;
+	}
 
 	if( this->editing_ )
 	{
@@ -488,7 +517,7 @@ void MeasurementToolPrivate::update_hover_point()
 		this->move_hover_point_to_mouse();
 	}
 	else
-	{
+	{	
 		// Find the measurement point that the mouse is currently hovering over, if there is one
 		if( this->find_hover_point() )
 		{
@@ -536,6 +565,11 @@ void MeasurementToolPrivate::start_editing()
 	ASSERT_IS_INTERFACE_THREAD();
 	lock_type lock( this->get_mutex() );
 
+	if( !this->viewer_ )
+	{
+		return;
+	}
+
 	this->editing_ = true;
 	
 	// Use blank cursor so that features of interest are not obscured
@@ -549,6 +583,11 @@ void MeasurementToolPrivate::finish_editing()
 {
 	ASSERT_IS_INTERFACE_THREAD();
 	lock_type lock( this->get_mutex() );
+
+	if( !this->viewer_ )
+	{
+		return;
+	}
 
 	this->editing_ = false;
 
@@ -568,10 +607,15 @@ void MeasurementToolPrivate::finish_editing()
 	this->update_viewers();
 }
 
-void MeasurementToolPrivate::get_mouse_world_point( Core::Point& world_point )
+bool MeasurementToolPrivate::get_mouse_world_point( Core::Point& world_point )
 {
 	// May be called from application or interface thread
 	lock_type lock( this->get_mutex() );
+
+	if( !this->viewer_ )
+	{
+		return false;
+	}
 
 	// Make sure to use current viewer, slice, and mouse coordinates.  These aren't passed
 	// as parameters because we don't have this info in the case where the view has been changed
@@ -579,7 +623,13 @@ void MeasurementToolPrivate::get_mouse_world_point( Core::Point& world_point )
 	double world_x, world_y;
 	this->viewer_->window_to_world( this->mouse_pos_.x_, this->mouse_pos_.y_, world_x, world_y );
 	Core::VolumeSliceHandle active_slice = this->viewer_->get_active_volume_slice();
-	active_slice->get_world_coord( world_x, world_y, world_point );
+	if( !active_slice )
+	{
+		return false;
+	}
+
+	active_slice->get_world_coord( world_x, world_y, world_point );	
+	return true;
 }
 
 bool MeasurementToolPrivate::in_slice( ViewerHandle viewer, const Core::Point& world_point )
@@ -589,6 +639,11 @@ bool MeasurementToolPrivate::in_slice( ViewerHandle viewer, const Core::Point& w
 	// Basically in_slice has to be within epsilon of this slice so that editing won't move the
 	// measurement points
 	Core::VolumeSliceHandle volume_slice = viewer->get_active_volume_slice();
+	if( !volume_slice )
+	{
+		return false;
+	}
+
 	double slice_depth = volume_slice->depth();
 	double point_depth;
 	double i_pos, j_pos;
@@ -692,7 +747,7 @@ MeasurementTool::~MeasurementTool()
 }
 
 bool MeasurementTool::handle_mouse_move( ViewerHandle viewer, 
-										const Core::MouseHistory& mouse_history, int button, int buttons, int modifiers )
+	const Core::MouseHistory& mouse_history, int button, int buttons, int modifiers )
 {
 	if( viewer->is_volume_view() ) 
 	{
@@ -706,11 +761,19 @@ bool MeasurementTool::handle_mouse_move( ViewerHandle viewer,
 	this->private_->mouse_pos_.y_ = mouse_history.current_.y_;
 	this->private_->update_hover_point();
 
+	// May have moved into new viewer, need to set its cursor if editing
+	if( this->private_->editing_ && this->private_->viewer_ )
+	{
+		// Use blank cursor so that features of interest are not obscured
+		this->private_->viewer_->set_cursor( Core::CursorShape::BLANK_E );
+	}
+
+	// Pass handling on to normal handler 
 	return false;
 }
 
 bool MeasurementTool::handle_mouse_press( ViewerHandle viewer, 
-										 const Core::MouseHistory& mouse_history, int button, int buttons, int modifiers )
+	const Core::MouseHistory& mouse_history, int button, int buttons, int modifiers )
 {
 	if( viewer->is_volume_view() ) 
 	{
@@ -757,28 +820,29 @@ bool MeasurementTool::handle_mouse_press( ViewerHandle viewer,
 			{
 				// State: Hovering over no point or point not in slice
 
-				// Create new measurement 
-				Core::Measurement measurement;
-
-				// Need ID for measurement
-				measurement.set_id( this->private_->get_next_measurement_id() );
-
 				// Get 3D point from 2D mouse coords, create new measurement with P1 = P2, add to state vector using action.
 				Core::Point pt;
-				this->private_->get_mouse_world_point( pt );
-				measurement.set_point( 0, pt );
-				measurement.set_point( 1, pt );
-				measurement.set_visible( true );
+				if( this->private_->get_mouse_world_point( pt ) )
+				{
+					// Create new measurement 
+					Core::Measurement measurement;
 
-				// Add measurement to state vector
-				Core::ActionAdd::Dispatch( Core::Interface::GetMouseActionContext(), 
-					this->measurements_state_, measurement );
+					// Need ID for measurement
+					measurement.set_id( this->private_->get_next_measurement_id() );
+					measurement.set_point( 0, pt );
+					measurement.set_point( 1, pt );
+					measurement.set_visible( true );
 
-				// Second point in measurement needs to be the hover point
-				this->private_->hover_point_.measurement_id_ = measurement.get_id();
-				this->private_->hover_point_.point_index_ = 1; // Editing second point
+					// Add measurement to state vector
+					Core::ActionAdd::Dispatch( Core::Interface::GetMouseActionContext(), 
+						this->measurements_state_, measurement );
 
-				this->private_->start_editing();
+					// Second point in measurement needs to be the hover point
+					this->private_->hover_point_.measurement_id_ = measurement.get_id();
+					this->private_->hover_point_.point_index_ = 1; // Editing second point
+
+					this->private_->start_editing();
+				}
 			}
 		}
 		return true;
@@ -858,6 +922,9 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 		}
 	}
 
+	size_t active_viewer = static_cast< size_t >( 
+		ViewerManager::Instance()->active_viewer_state_->get() );
+	
 	lock.unlock();
 	
 	//-------------- StateEngine unlocked  -------------------
@@ -947,7 +1014,10 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 			{
 				Core::Color color = vertex_in_slice[ v_idx ] ? in_slice_color : out_of_slice_color;
 			
-				if( this->private_->editing_ && 
+				// Make the moving point red in the current viewer (not necessarily active viewer)
+				if( this->private_->viewer_ && 
+					viewer_id == this->private_->viewer_->get_viewer_id() && 
+					this->private_->editing_ && 
 					m.get_id() == this->private_->hover_point_.measurement_id_ &&
 					v_idx == this->private_->hover_point_.point_index_ )
 				{
@@ -1035,8 +1105,23 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 				( measure_normal * pixel_offset * ( flip_normal ? 1 : -1 ) );
 
 			// Find angle of line
-			double angle = ( dx == 0 ? 90 : ( atan( dy / dx ) ) * 180 / Core::Pi() );
-
+			double angle = 0;
+			if( dx == 0 )
+			{
+				if( dy > 0 )
+				{
+					angle = 90;
+				}
+				else
+				{
+					angle = -90;
+				}
+			}
+			else
+			{
+				angle = ( atan( dy / dx ) ) * 180 / Core::Pi();
+			}
+		
 			//
 			// Label
 			//
