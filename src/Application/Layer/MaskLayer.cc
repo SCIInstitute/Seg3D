@@ -336,12 +336,12 @@ Core::IsosurfaceHandle MaskLayer::get_isosurface()
   return this->private_->isosurface_;
 }
 
-void MaskLayer::compute_isosurface( double quality_factor )
+void MaskLayer::compute_isosurface( double quality_factor, bool capping_enabled )
 {
   if ( !Core::Application::IsApplicationThread() )
   {
     Core::Application::PostEvent( boost::bind( &MaskLayer::compute_isosurface, 
-      this, quality_factor ) );
+      this, quality_factor, capping_enabled ) );
     return;
   }
   
@@ -357,7 +357,7 @@ void MaskLayer::compute_isosurface( double quality_factor )
   this->data_state_->set( Layer::PROCESSING_C );
 
   this->reset_abort();
-  iso->compute( quality_factor, boost::bind( &Layer::check_abort, this ) );
+  iso->compute( quality_factor, capping_enabled, boost::bind( &Layer::check_abort, this ) );
 
   this->data_state_->set( Layer::AVAILABLE_C );
 

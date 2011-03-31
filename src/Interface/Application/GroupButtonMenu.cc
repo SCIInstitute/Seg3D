@@ -126,6 +126,8 @@ GroupButtonMenu::GroupButtonMenu( QWidget* parent, LayerGroupHandle group ) :
     
 
   QtUtils::QtBridge::Show( this->private_->ui_.iso_quality_, group->show_iso_menu_state_ ); 
+  //QtUtils::QtBridge::Show( this->private_->ui_.iso_capping_, group->show_iso_menu_state_ ); 
+  this->private_->ui_.iso_capping_->hide();
   QtUtils::QtBridge::Show( this->private_->ui_.delete_, group->show_delete_menu_state_ );
   QtUtils::QtBridge::Show( this->private_->ui_.duplicate_layers_,
     group->show_duplicate_menu_state_ );
@@ -137,6 +139,8 @@ GroupButtonMenu::GroupButtonMenu( QWidget* parent, LayerGroupHandle group ) :
   // --- ISOSURFACE---
   QtUtils::QtBridge::Connect( this->private_->iso_quality_button_group_, 
     group->isosurface_quality_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.iso_capping_checkbox_, 
+    group->isosurface_capping_enabled_state_ );
 
   this->private_->ui_.verticalLayout_10->setAlignment( Qt::AlignTop );
   

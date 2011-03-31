@@ -566,16 +566,17 @@ void LayerWidget::compute_isosurface()
   LayerGroupHandle layer_group = this->private_->layer_->get_layer_group();
 
   double quality = 1.0;
-
+  bool capping_enabled;
   {
     Core::StateEngine::lock_type state_engine_lock( Core::StateEngine::GetMutex() );  
     Core::ImportFromString( layer_group->isosurface_quality_state_->get(), quality ); 
+    capping_enabled = layer_group->isosurface_capping_enabled_state_->get();
   }
 
   // Dispatch action to compute isosurface
   MaskLayerHandle mask_layer = boost::dynamic_pointer_cast< MaskLayer >( this->private_->layer_ );
   ActionComputeIsosurface::Dispatch( Core::Interface::GetWidgetActionContext(), mask_layer, 
-    quality );
+    quality, capping_enabled );
 }
 
 void LayerWidget::delete_isosurface()

@@ -55,6 +55,7 @@ public:
   {
     this->add_argument( this->layer_id_ );
     this->add_argument( this->quality_factor_ );
+    this->add_argument( this->capping_enabled_ );
   }
   
   virtual ~ActionComputeIsosurface()
@@ -70,20 +71,24 @@ private:
   // This parameter contains the id of the layer group
   Core::ActionParameter< std::string > layer_id_;
   
-  // This parameter describes the quality factor of the iso surface
+  // This parameter describes the quality factor of the isosurface
   Core::ActionParameter< double > quality_factor_;
+
+  // This parameter describes whether capping is enabled for the isosurface
+  Core::ActionParameter< double > capping_enabled_;
 
   // -- Dispatch this action from the interface --
 public:
 
   // CREATE:
   // Create an action that computes the isosurface for the selected layer
-  static Core::ActionHandle Create( MaskLayerHandle mask_layer, double quality_factor );
+  static Core::ActionHandle Create( MaskLayerHandle mask_layer, double quality_factor,
+    bool capping_enabled );
 
   // DISPATCH
   // Create and dispatch action that computes the isosurface for the selected layer
   static void Dispatch( Core::ActionContextHandle context, MaskLayerHandle mask_layer, 
-    double quality_factor );
+    double quality_factor, bool capping_enabled );
 
   // DISPATCH:
   // Create and dispatch action that computes the isosurface for the active layer.

@@ -416,7 +416,7 @@ public:
 
   // Algorithm data & buffers
   unsigned char* data_; // Mask data is stored in bit-plane (8 masks per data block)
-  size_t nx_, ny_, nz_; // Mask dimensions
+  size_t nx_, ny_, nz_; // Mask dimensions of original or downsampled volume depending on quality
   size_t elem_nx_, elem_ny_, elem_nz_; // Number of (marching) cubes
 
   std::vector<unsigned char> type_buffer_; 
@@ -1154,10 +1154,6 @@ void IsosurfacePrivate::parallel_compute_faces( int thread, int num_threads,
 void IsosurfacePrivate::translate_cap_coords( int cap_num, float i, float j, 
   float& x, float& y, float& z )
 {
-  size_t nx = this->orig_mask_volume_->get_mask_data_block()->get_nx();
-  size_t ny = this->orig_mask_volume_->get_mask_data_block()->get_ny();
-  size_t nz = this->orig_mask_volume_->get_mask_data_block()->get_nz();
-
   switch( cap_num )
   {
     case 0: // x, y, z = 0 (front)
@@ -1178,15 +1174,15 @@ void IsosurfacePrivate::translate_cap_coords( int cap_num, float i, float j,
     case 3: // x, y, z = nz - 1 (back)
       x = i;
       y = j;
-      z = static_cast< float >( nz - 1 );
+      z = static_cast< float >( this->nz_ - 1 );
       break;
     case 4: // x, z, y = ny - 1 (bottom)
       x = i;
-      y = static_cast< float >( ny - 1 );
+      y = static_cast< float >( this->ny_ - 1 );
       z = j;
       break;
     case 5: // y, z, x = nx - 1 (right)
-      x = static_cast< float >( nx - 1 );
+      x = static_cast< float >( this->nx_ - 1 );
       y = i;
       z = j;
       break;
@@ -1234,7 +1230,6 @@ Basic ideas:
 // Naive implementation -- needs to be optimized!
 void IsosurfacePrivate::compute_cap_faces()
 {
-  // type_table = CAPPING_TABLE_C 
   // TODO Figure out how to handle x/y/z indices for caps so that code doesn't have to
   // be duplicated for each cap
     
@@ -1242,23 +1237,21 @@ void IsosurfacePrivate::compute_cap_faces()
   // Solution B (faster): Have (i, j, k) Vector offsets based on cap.  Add at end of loops.
 
   // Process 6 caps independently.  At most this will duplicate volume edge nodes twice.
-  // For each of 6 caps
-  size_t nx = this->orig_mask_volume_->get_mask_data_block()->get_nx();
-  size_t ny = this->orig_mask_volume_->get_mask_data_block()->get_ny();
-  size_t nz = this->orig_mask_volume_->get_mask_data_block()->get_nz();
+  
+  size_t nx = this->nx_; // Store local copy just to make code more concise
+  size_t ny = this->ny_;
+  size_t nz = this->nz_;
   std::vector< std::pair< size_t, size_t > > cap_dimensions;
   cap_dimensions.push_back( std::make_pair( nx, ny ) ); // front and back caps
   cap_dimensions.push_back( std::make_pair( nx, nz ) ); // top and bottom caps
   cap_dimensions.push_back( std::make_pair( ny, nz ) ); // left and right side caps
 
-  // TODO Create a patch for each cap 
-  /*this->private_->part_points_.push_back( std::make_pair<unsigned int, unsigned int>(
-    min_point_index, this->private_->max_point_index_[ j ] ) );
-  this->private_->part_faces_.push_back( std::make_pair<unsigned int, unsigned int>(
-    min_face_index, this->private_->max_face_index_[ j ] ) );*/
-
+  // For each of 6 caps
   for( int cap_num = 0; cap_num < 6; cap_num++ )
   {
+    unsigned int min_point_index = static_cast< unsigned int >( this->points_.size() );
+    unsigned int min_face_index = static_cast< unsigned int >( this->faces_.size() );
+
     // Each 
     // STEP 1: Find cell types
 
@@ -1309,6 +1302,8 @@ void IsosurfacePrivate::compute_cap_faces()
 
     // Create translation table (2D matrix storing indices into actual points vector)
     // size_t point_trans_table[num cells = (nx - 1) * (ny - 1)][8 canonical indices (4 nodes, 4 edge points)]
+    // TODO: Store boost arrays of size 8 instead of using a vector.  Hangs on destruction
+    // for very large vectors.
     std::vector< std::vector< unsigned int > > 
       point_trans_table( num_cells, std::vector< unsigned int >( 8 ) );
 
@@ -1520,6 +1515,13 @@ void IsosurfacePrivate::compute_cap_faces()
         this->faces_.push_back( point_index3 );
       }
     }
+
+    // Create a patch for each cap 
+    this->min_point_index_.push_back( min_point_index );
+    this->max_point_index_.push_back( static_cast< unsigned int >( this->points_.size() ) );
+
+    this->min_face_index_.push_back( min_face_index );
+    this->max_face_index_.push_back( static_cast< unsigned int >( this->faces_.size() ) );
   }
   
 }
@@ -1703,7 +1705,8 @@ Isosurface::Isosurface( const MaskVolumeHandle& mask_volume ) :
   //this->private_->color_map_ = ColorMapHandle( new ColorMap() );
 }
 
-void Isosurface::compute( double quality_factor, boost::function< bool () > check_abort )
+void Isosurface::compute( double quality_factor, bool capping_enabled, 
+  boost::function< bool () > check_abort )
 {
   lock_type lock( this->get_mutex() );
 
@@ -1720,6 +1723,7 @@ void Isosurface::compute( double quality_factor, boost::function< bool () > chec
     // Initially assume we're computing the isosurface for the original volume (not downsampled)
     this->private_->compute_mask_volume_ = this->private_->orig_mask_volume_;
 
+    // Downsample mask if needed
     if( quality_factor != 1.0 )
     {
       assert( quality_factor == 0.5 || quality_factor == 0.25 || quality_factor == 0.125 );
@@ -1735,6 +1739,7 @@ void Isosurface::compute( double quality_factor, boost::function< bool () > chec
       return;
     }
 
+    // Compute isosurface without caps
     Parallel parallel_faces( boost::bind( &IsosurfacePrivate::parallel_compute_faces, 
       this->private_, _1, _2, _3 ) );
     parallel_faces.run();
@@ -1746,8 +1751,11 @@ void Isosurface::compute( double quality_factor, boost::function< bool () > chec
       return;
     }
 
-    // Test code
-    //this->private_->compute_cap_faces();
+    // Compute isosurface caps
+    if( capping_enabled )
+    {
+      this->private_->compute_cap_faces();
+    }
   }
 
   // Check for empty isosurface

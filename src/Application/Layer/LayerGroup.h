@@ -87,6 +87,7 @@ public:
 
   // = Isosurface state variables =
   Core::StateOptionHandle isosurface_quality_state_;
+  Core::StateBoolHandle isosurface_capping_enabled_state_;
 
   // = Group visibility =
   //std::vector< Core::StateBoolHandle > visibility_state_;

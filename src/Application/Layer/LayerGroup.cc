@@ -303,6 +303,7 @@ void LayerGroup::initialize_states()
 {
   this->add_state( "isosurface_quality", this->isosurface_quality_state_, 
     "1.0", "1.0|0.5|0.25|0.125" );
+  this->add_state( "isosurface_capping_enabled", this->isosurface_capping_enabled_state_, false );
 
   this->add_state( "layers_visible", this->layers_visible_state_, "all", "none|some|all" );
   this->add_state( "layers_iso_visible", this->layers_iso_visible_state_, "all", "none|some|all" );
@@ -646,8 +647,9 @@ bool LayerGroup::post_load_states( const Core::StateIO& state_io )
         {
           double quality = 1.0;
           Core::ImportFromString( this->isosurface_quality_state_->get(), quality );
+          bool capping_enabled = this->isosurface_capping_enabled_state_->get();
           ActionComputeIsosurface::Dispatch( Core::Interface::GetWidgetActionContext(), 
-            temp_mask_handle, quality );
+            temp_mask_handle, quality, capping_enabled );
         }
       }
     }

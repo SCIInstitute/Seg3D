@@ -115,7 +115,7 @@ public:
   // COMPUTE_ISOSURFACE
   // Compute the isosurface for this layer using the given quality factor.
   // Quality factor must be one of: 1.0, 0.5, 0.25, 0.125
-  void compute_isosurface( double quality_factor );
+  void compute_isosurface( double quality_factor, bool capping_enabled );
   
   // CALCULATE_VOLUME:
   // function that is called by the calculate volume action that calculate the volume of the mask

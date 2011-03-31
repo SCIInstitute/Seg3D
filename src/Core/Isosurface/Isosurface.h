@@ -61,7 +61,7 @@ public:
 
   // COMPUTE:
   // Compute isosurface.  quality_factor must be one of: {0.125, 0.25, 0.5, 1.0} 
-  void compute( double quality_factor, boost::function< bool () > check_abort );
+  void compute( double quality_factor, bool capping_enabled, boost::function< bool () > check_abort );
 
   // GET_POINTS:
   // Get 3D points for vertices, each stored only once
