@@ -92,6 +92,9 @@ PreferencesInterface::PreferencesInterface( QWidget *parent ) :
 
   //Hide the interface controls since they arent connected yet
   this->private_->ui_.prefs_tabs_->removeTab( 2 );
+  
+  //This will ensure that the first tab, the general settings tab, will always be active by default
+  this->private_->ui_.prefs_tabs_->setCurrentIndex( 0 );
 }
 
 PreferencesInterface::~PreferencesInterface()

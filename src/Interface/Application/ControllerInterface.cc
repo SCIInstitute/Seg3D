@@ -136,6 +136,8 @@ ControllerInterface::ControllerInterface( QWidget* parent ) :
   this->private_->ui_.TV_UNDOBUFFER->setColumnWidth( 1, 200 );
   this->private_->ui_.TV_UNDOBUFFER->resizeRowsToContents();
   this->private_->ui_.TV_REDOBUFFER->resizeRowsToContents();
+  
+  this->private_->ui_.TW_CONTROLLER->setCurrentIndex( 0 );
 
 
   // Get the list of actions

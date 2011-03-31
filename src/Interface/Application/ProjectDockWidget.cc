@@ -156,6 +156,9 @@ ProjectDockWidget::ProjectDockWidget( QWidget *parent ) :
     this->private_->ui_.horizontalLayout_2->setAlignment( Qt::AlignHCenter );
 
     this->disable_load_delete_and_export_buttons();
+    
+    // This will make sure that the starting active tab is always the sessions tab
+    this->private_->ui_.tabWidget->setCurrentIndex( this->private_->ui_.tabWidget->indexOf( this->private_->ui_.sessions_tab_ ) );
 
   }
 
