@@ -29,6 +29,9 @@
 // STL includes
 #include <fstream>
 
+// Boost includes
+#include <boost/array.hpp>
+
 // Core includes
 #include <Core/DataBlock/StdDataBlock.h>
 #include <Core/Isosurface/Isosurface.h>
@@ -1302,10 +1305,7 @@ void IsosurfacePrivate::compute_cap_faces()
 
     // Create translation table (2D matrix storing indices into actual points vector)
     // size_t point_trans_table[num cells = (nx - 1) * (ny - 1)][8 canonical indices (4 nodes, 4 edge points)]
-    // TODO: Store boost arrays of size 8 instead of using a vector.  Hangs on destruction
-    // for very large vectors.
-    std::vector< std::vector< unsigned int > > 
-      point_trans_table( num_cells, std::vector< unsigned int >( 8 ) );
+    std::vector< boost::array< unsigned int, 8 > > point_trans_table( num_cells );
 
     // Get mask transform from MaskVolume 
     GridTransform grid_transform = this->compute_mask_volume_->get_grid_transform();
@@ -1516,12 +1516,17 @@ void IsosurfacePrivate::compute_cap_faces()
       }
     }
 
-    // Create a patch for each cap 
-    this->min_point_index_.push_back( min_point_index );
-    this->max_point_index_.push_back( static_cast< unsigned int >( this->points_.size() ) );
+    // Create a rendering "patch" for each cap 
+    unsigned int max_point_index = static_cast< unsigned int >( this->points_.size() );
+    unsigned int max_face_index = static_cast< unsigned int >( this->faces_.size() );
+    if( min_point_index != max_point_index && min_face_index != max_face_index )
+    {
+      this->min_point_index_.push_back( min_point_index );
+      this->max_point_index_.push_back( max_point_index );
 
-    this->min_face_index_.push_back( min_face_index );
-    this->max_face_index_.push_back( static_cast< unsigned int >( this->faces_.size() ) );
+      this->min_face_index_.push_back( min_face_index );
+      this->max_face_index_.push_back( max_face_index );
+    }
   }
   
 }
