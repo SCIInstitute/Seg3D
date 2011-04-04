@@ -72,27 +72,26 @@ void LayerIOFunctions::ImportFiles( QMainWindow* main_window, std::string file_t
     // Step (1): Get the importer list from the LayerIO system
     LayerIO::importer_types_type importer_types = LayerIO::Instance()->get_importer_types();
     
-    QStringList filters;
+    QString filters = "";
     for ( size_t j = 0; j < importer_types.size(); j++ )
     {
-      filters << QString::fromStdString( importer_types[ j ] );
+      if( j == 0 )
+      {
+        filters = QString::fromStdString( importer_types[j] );
+        continue;
+      }
+      filters = filters + ";;" + QString::fromStdString( importer_types[j] );
     }
-
-    // Step (2): Bring up the file dialog
-    QFileDialog import_dialog( main_window, QString( "Import Layer(s)... " ) );
-
-    import_dialog.setNameFilters( filters );
-    import_dialog.setAcceptMode( QFileDialog::AcceptOpen );
-    import_dialog.setFileMode( QFileDialog::ExistingFiles );
-    import_dialog.setViewMode( QFileDialog::Detail );
-    if( !import_dialog.exec() ) return;
     
-    // Step (3): Get the selected filename and name filter
-    file_list = import_dialog.selectedFiles();
+    // Step (2): Bring up the file dialog
+    QString qs_filtername;
+    file_list = QFileDialog::getOpenFileNames( main_window, 
+      "Import Layer(s)... ", "/home", filters, &qs_filtername );
+    
     if( file_list.size() == 0) return;
-    filtername = import_dialog.selectedNameFilter().toStdString();
+    filtername = qs_filtername.toStdString();
   }
-
+  
   std::vector< LayerImporterHandle > importers;
   std::vector< std::string > files;
 
@@ -135,31 +134,30 @@ void LayerIOFunctions::ImportSeries( QMainWindow* main_window )
   // Step (1): Get the importer list from the LayerIO system
   LayerIO::importer_types_type importer_types = LayerIO::Instance()->get_series_importer_types();
 
-  QStringList filters;
+  QString filters = "";
   for ( size_t j = 0; j < importer_types.size(); j++ )
   {
-    filters << QString::fromStdString( importer_types[j] );
+    if( j == 0 )
+    {
+      filters = QString::fromStdString( importer_types[j] );
+      continue;
+    }
+    filters = filters + ";;" + QString::fromStdString( importer_types[j] );
   }
 
   // Step (2): Bring up the file dialog
-  QFileDialog import_dialog( main_window, QString( "Select a file from the series... " ) );
-
-  import_dialog.setNameFilters( filters );
-  import_dialog.setAcceptMode( QFileDialog::AcceptOpen );
-  import_dialog.setFileMode( QFileDialog::ExistingFiles );
-  import_dialog.setViewMode( QFileDialog::Detail );
-  if( !import_dialog.exec() ) return;
-
-  QStringList file_list = import_dialog.selectedFiles();
+  QString filtername;
+  QStringList file_list = QFileDialog::getOpenFileNames( main_window, 
+    "Select a file from the series... ", "/home", filters, &filtername );
+  
   if( file_list.size() == 0) return;
-  std::string filtername = import_dialog.selectedNameFilter().toStdString();
-
+  
   std::vector< LayerImporterHandle > importers;
   std::vector< std::string > files;
 
   LayerImporterHandle importer;
   if( ! ( LayerIO::Instance()->create_importer( file_list.at( 0 ).toStdString(), 
-    importer, filtername ) ) )
+    importer, filtername.toStdString() ) ) )
   {
     // IF we are unable to create an importer we pop up an error message box
     std::string error_message = std::string("ERROR: No importer is available for file '") + 
