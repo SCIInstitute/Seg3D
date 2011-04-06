@@ -243,29 +243,29 @@ void StatusBarWidget::update_data_point_label()
   // format them with scientific notation.
   if( this->private_->show_world_coord_ ) // World coordinates
   {
-    if( ( 0.0 < world_x && world_x < 0.0001 ) || 1000 < world_x ) // Use scientific notation
+    if( Core::Abs( world_x ) < 0.0001 || Core::Abs( world_x ) > 1000 ) // Use scientific notation
     {
       this->private_->ui_.x_->setText( QString( "%1" ).arg( world_x, 0, 'e', 2 ) );
     }
     else // Format normally
     {
-      this->private_->ui_.x_->setText( QString( "%1" ).arg( world_x, 0, 'f', 0 ) );
+      this->private_->ui_.x_->setText( QString( "%1" ).arg( world_x, 0, 'f', 2 ) );
     }
-    if( ( 0.0 < world_y && world_y < 0.0001 ) || 1000 < world_y ) // Use scientific notation
+    if( Core::Abs( world_y ) < 0.0001 || Core::Abs( world_y ) > 1000 ) // Use scientific notation
     {
       this->private_->ui_.y_->setText( QString( "%1" ).arg( world_y, 0, 'e', 2 ) );
     }
     else // Format normally
     {
-      this->private_->ui_.y_->setText( QString( "%1" ).arg( world_y, 0, 'f', 0 ) );
+      this->private_->ui_.y_->setText( QString( "%1" ).arg( world_y, 0, 'f', 2 ) );
     }
-    if( ( 0.0 < world_z && world_z < 0.0001 ) || 1000 < world_z ) // Use scientific notation
+    if( Core::Abs( world_z ) < 0.0001 || Core::Abs( world_z ) > 1000  ) // Use scientific notation
     {
       this->private_->ui_.z_->setText( QString( "%1" ).arg( world_z, 0, 'e', 2 ) );
     }
     else // Format normally
     {
-      this->private_->ui_.z_->setText( QString( "%1" ).arg( world_z, 0, 'f', 0 ) );
+      this->private_->ui_.z_->setText( QString( "%1" ).arg( world_z, 0, 'f', 2 ) );
     }
   }
   else // Index coordinates

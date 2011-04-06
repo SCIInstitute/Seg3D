@@ -372,13 +372,13 @@ QComboBox::icon{
      </property>
      <property name="minimumSize">
       <size>
-       <width>364</width>
+       <width>420</width>
        <height>20</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
-       <width>384</width>
+       <width>439</width>
        <height>20</height>
       </size>
      </property>
@@ -526,13 +526,13 @@ QComboBox::icon{
           <widget class="QLabel" name="x_">
            <property name="minimumSize">
             <size>
-             <width>58</width>
+             <width>80</width>
              <height>0</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>58</width>
+             <width>80</width>
              <height>16777215</height>
             </size>
            </property>
@@ -609,13 +609,13 @@ QComboBox::icon{
           <widget class="QLabel" name="y_">
            <property name="minimumSize">
             <size>
-             <width>58</width>
+             <width>80</width>
              <height>0</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>58</width>
+             <width>80</width>
              <height>16777215</height>
             </size>
            </property>
@@ -692,13 +692,13 @@ QComboBox::icon{
           <widget class="QLabel" name="z_">
            <property name="minimumSize">
             <size>
-             <width>58</width>
+             <width>80</width>
              <height>0</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>58</width>
+             <width>80</width>
              <height>16777215</height>
             </size>
            </property>
