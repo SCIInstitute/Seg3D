@@ -167,11 +167,13 @@ public:
 	// dotted line.
 	MeasurementPoint hover_point_; // Should be mutex-protected
 
-	int measurement_id_counter_; // Only accessed from interface thread
+	int measurement_id_counter_; // Should be mutex-protected
 
 	Core::MousePosition mouse_pos_; // Should be mutex-protected
 
 	int saved_num_measurements_; // Only accessed from application thread
+
+	bool handle_measurements_changed_blocked_; // Only accessed from application thread
 };
 
 // Called in response to state changed signal
@@ -181,18 +183,46 @@ void MeasurementToolPrivate::handle_measurements_changed()
 	// from under us.
 	ASSERT_IS_APPLICATION_THREAD();
 
-	int num_measurements = static_cast< int >( this->tool_->measurements_state_->get().size() );
+	// Prevent circular updates
+	if( this->handle_measurements_changed_blocked_ ) 
+	{
+		return;
+	}
+	this->handle_measurements_changed_blocked_ = true;
 
+	int num_measurements = static_cast< int >( this->tool_->measurements_state_->get().size() );
+	
+	bool num_measurements_changed = num_measurements != saved_num_measurements_;
+	if( num_measurements_changed )
+	{
+		this->tool_->num_measurements_changed_signal_();
+	}
+
+	// If measurements were deleted, renumber IDs
+	if( num_measurements < saved_num_measurements_ )
+	{
+		lock_type lock( this->get_mutex() );
+		this->measurement_id_counter_ = 0;
+
+		if( num_measurements > 0 )
+		{
+			std::vector< Core::Measurement > measurements = 
+				this->tool_->measurements_state_->get();
+
+			for( size_t m_idx = 0; m_idx < measurements.size(); m_idx++ )
+			{
+				std::string id = "M" + Core::ExportToString( this->measurement_id_counter_ );
+				measurements[ m_idx ].set_id( id );
+				this->measurement_id_counter_++;
+			}
+			// Do all measurement changes at once to minimize updates
+			this->tool_->measurements_state_->set( measurements );	
+		}
+	}
+
+	// Measurements may have been added or removed, so update the active index
 	if( num_measurements > 0 )
 	{
-		// Measurements may have been added or removed, so update the active index
-		bool num_measurements_changed = num_measurements != saved_num_measurements_;
-
-		if( num_measurements_changed )
-		{
-			this->tool_->num_measurements_changed_signal_();
-		}
-
 		int active_index = this->tool_->active_index_state_->get();
 		bool active_index_invalid = active_index == -1 || active_index >= num_measurements;
 
@@ -210,6 +240,7 @@ void MeasurementToolPrivate::handle_measurements_changed()
 	}
 
 	this->saved_num_measurements_ = num_measurements;
+	this->handle_measurements_changed_blocked_ = false;
 
 	// Need to redraw the overlay
 	this->update_viewers();
@@ -312,9 +343,11 @@ void MeasurementToolPrivate::initialize_id_counter()
 {
 	ASSERT_IS_INTERFACE_THREAD();
 
+	lock_type lock( this->get_mutex() );
+
 	// Find highest ID in use
 	this->measurement_id_counter_ = 0;
-	Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+	Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
 	const std::vector< Core::Measurement >& measurements = this->tool_->measurements_state_->get();
 	BOOST_FOREACH( Core::Measurement m, measurements )
 	{
@@ -339,6 +372,8 @@ void MeasurementToolPrivate::initialize_id_counter()
 std::string MeasurementToolPrivate::get_next_measurement_id()
 {
 	ASSERT_IS_INTERFACE_THREAD();
+
+	lock_type lock( this->get_mutex() );
 
 	if( this->measurement_id_counter_ == -1 )
 	{
@@ -701,6 +736,7 @@ MeasurementTool::MeasurementTool( const std::string& toolid ) :
 	this->private_->editing_ = false;
 	this->private_->measurement_id_counter_ = -1;
 	this->private_->saved_num_measurements_ = 0;
+	this->private_->handle_measurements_changed_blocked_ = false;
 	
 	// State variable gets allocated here
 	this->add_state( "measurements", this->measurements_state_ );
