@@ -147,6 +147,7 @@ void ToolBoxWidget::add_tool( QWidget * tool, const QString &label,
   connect( new_page.ui_.help_button_, SIGNAL( clicked() ), this, 
     SLOT( help_button_clicked() ) );
   QtUtils::QtBridge::Connect( new_page.ui_.activate_button_, activate_function );
+  QtUtils::QtBridge::Connect( new_page.ui_.spacer_, activate_function );
   QtUtils::QtBridge::Connect( new_page.ui_.close_button_, close_function );
 
   this->private_->page_list_.push_back( new_page );

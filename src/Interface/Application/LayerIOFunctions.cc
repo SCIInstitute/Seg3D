@@ -70,7 +70,8 @@ void LayerIOFunctions::ImportFiles( QMainWindow* main_window, std::string file_t
   else
   {
     // Step (1): Get the importer list from the LayerIO system
-    LayerIO::importer_types_type importer_types = LayerIO::Instance()->get_importer_types();
+    LayerIO::importer_types_type importer_types = 
+      LayerIO::Instance()->get_importer_types();
     
     QString filters = "";
     for ( size_t j = 0; j < importer_types.size(); j++ )
@@ -97,7 +98,6 @@ void LayerIOFunctions::ImportFiles( QMainWindow* main_window, std::string file_t
 
   for( int i = 0; i < file_list.size(); ++i )
   {
-
     LayerImporterHandle importer;
     if( ! ( LayerIO::Instance()->create_importer( file_list.at( i ).toStdString(), 
       importer, filtername ) ) )

@@ -74,8 +74,8 @@ QWidget#scrollAreaWidgetContents_4{
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>396</width>
-              <height>422</height>
+              <width>398</width>
+              <height>444</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_13">
@@ -407,7 +407,7 @@ QWidget#scrollAreaWidgetContents_4{
                    <item>
                     <widget class="QLabel" name="label_90">
                      <property name="text">
-                      <string>Make layer above active</string>
+                      <string>Make layer above active:</string>
                      </property>
                     </widget>
                    </item>
@@ -448,7 +448,7 @@ QWidget#scrollAreaWidgetContents_4{
                    <item>
                     <widget class="QLabel" name="label_92">
                      <property name="text">
-                      <string>Make layer below active</string>
+                      <string>Make layer below active:</string>
                      </property>
                     </widget>
                    </item>
@@ -456,6 +456,47 @@ QWidget#scrollAreaWidgetContents_4{
                     <widget class="QLabel" name="label_93">
                      <property name="text">
                       <string>→</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QWidget" name="widget_60" native="true">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                  <layout class="QHBoxLayout" name="horizontalLayout_56" stretch="2,1">
+                   <property name="spacing">
+                    <number>4</number>
+                   </property>
+                   <property name="leftMargin">
+                    <number>10</number>
+                   </property>
+                   <property name="topMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="rightMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="bottomMargin">
+                    <number>0</number>
+                   </property>
+                   <item>
+                    <widget class="QLabel" name="label_94">
+                     <property name="text">
+                      <string>Compute ISO Surface:</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="label_95">
+                     <property name="text">
+                      <string>O</string>
                      </property>
                     </widget>
                    </item>
@@ -771,7 +812,7 @@ QWidget#scrollAreaWidgetContents_4{
                    <item>
                     <widget class="QLabel" name="label_61">
                      <property name="text">
-                      <string>Toggle active layer visibility</string>
+                      <string>Toggle active layer visibility:</string>
                      </property>
                     </widget>
                    </item>
@@ -812,7 +853,7 @@ QWidget#scrollAreaWidgetContents_4{
                    <item>
                     <widget class="QLabel" name="label_63">
                      <property name="text">
-                      <string>Toggle volume lighting visibility</string>
+                      <string>Toggle volume lighting visibility:</string>
                      </property>
                     </widget>
                    </item>
@@ -853,7 +894,7 @@ QWidget#scrollAreaWidgetContents_4{
                    <item>
                     <widget class="QLabel" name="label_65">
                      <property name="text">
-                      <string>Toggle iso-surface visibility</string>
+                      <string>Toggle iso-surface visibility:</string>
                      </property>
                     </widget>
                    </item>
@@ -894,7 +935,7 @@ QWidget#scrollAreaWidgetContents_4{
                    <item>
                     <widget class="QLabel" name="label_67">
                      <property name="text">
-                      <string>Toggle overlay visibility</string>
+                      <string>Toggle overlay visibility:</string>
                      </property>
                     </widget>
                    </item>
@@ -935,7 +976,7 @@ QWidget#scrollAreaWidgetContents_4{
                    <item>
                     <widget class="QLabel" name="label_69">
                      <property name="text">
-                      <string>Toggle grid visibility</string>
+                      <string>Toggle grid visibility:</string>
                      </property>
                     </widget>
                    </item>
@@ -981,8 +1022,8 @@ QWidget#scrollAreaWidgetContents_4{
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>396</width>
-              <height>630</height>
+              <width>398</width>
+              <height>633</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -1496,7 +1537,7 @@ QWidget#scrollAreaWidgetContents_4{
                    <item>
                     <widget class="QLabel" name="label_86">
                      <property name="text">
-                      <string>Undo</string>
+                      <string>Undo:</string>
                      </property>
                     </widget>
                    </item>
@@ -1537,7 +1578,7 @@ QWidget#scrollAreaWidgetContents_4{
                    <item>
                     <widget class="QLabel" name="label_88">
                      <property name="text">
-                      <string>Redo</string>
+                      <string>Redo:</string>
                      </property>
                     </widget>
                    </item>
@@ -2328,8 +2369,8 @@ QWidget#scrollAreaWidgetContents_4{
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>411</width>
-              <height>391</height>
+              <width>415</width>
+              <height>400</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -2374,8 +2415,8 @@ QWidget#scrollAreaWidgetContents_4{
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>411</width>
-              <height>148</height>
+              <width>415</width>
+              <height>158</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_8">
