@@ -757,6 +757,8 @@ bool MeasurementToolPrivate::in_slice( ViewerHandle viewer, const Core::Point& w
 
 const std::string MeasurementTool::INDEX_UNITS_C( "index_units" );
 const std::string MeasurementTool::WORLD_UNITS_C( "world_units" );
+const std::string MeasurementTool::ID_LABEL_C( "id_label" );
+const std::string MeasurementTool::NOTE_LABEL_C( "note_label" );
 
 MeasurementTool::MeasurementTool( const std::string& toolid ) :
 	Tool( toolid ),
@@ -773,8 +775,11 @@ MeasurementTool::MeasurementTool( const std::string& toolid ) :
 	this->add_state( "measurements", this->measurements_state_ );
 	this->add_state( "active_index", this->active_index_state_, -1 );
 	this->add_state( "units_selection", this->units_selection_state_, WORLD_UNITS_C, 
-		INDEX_UNITS_C + "=Index Units|" +
-		WORLD_UNITS_C + "=World Units" );
+		INDEX_UNITS_C + "=Index|" +
+		WORLD_UNITS_C + "=World" );
+	this->add_state( "label_selection", this->label_selection_state_, ID_LABEL_C, 
+		ID_LABEL_C + "=ID|" +
+		NOTE_LABEL_C + "=Note" );
 	this->add_state( "show_world_units", this->show_world_units_state_, true );
 	this->add_state( "opacity", this->opacity_state_, 1.0, 0.0, 1.0, 0.1 );
 
@@ -790,6 +795,8 @@ MeasurementTool::MeasurementTool( const std::string& toolid ) :
 		boost::bind( &MeasurementToolPrivate::update_viewers, this->private_ ) ) );
 	this->add_connection( this->units_selection_state_->value_changed_signal_.connect(
 		boost::bind( &MeasurementToolPrivate::handle_units_selection_changed, this->private_, _2 ) ) );
+	this->add_connection( this->label_selection_state_->value_changed_signal_.connect(
+		boost::bind( &MeasurementToolPrivate::update_viewers, this->private_ ) ) );
 	this->add_connection( LayerManager::Instance()->active_layer_changed_signal_.connect(
 		boost::bind( &MeasurementToolPrivate::handle_active_layer_changed, this->private_, _1 ) ) );
 	this->add_connection( this->opacity_state_->state_changed_signal_.connect(
@@ -964,6 +971,7 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 	std::vector< Core::Measurement > measurements = this->measurements_state_->get();
 	int active_index = this->active_index_state_->get();
 	double opacity = this->opacity_state_->get();
+	std::string label_selection = this->label_selection_state_->get();
 	
 	// Getting the length string requires locking the state engine because we need access to the
 	// show_world_units state and the LayerManager, which locks the state engine.
@@ -1184,8 +1192,17 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 			// Label
 			//
 
+			std::string label = "";
+			if( label_selection == ID_LABEL_C )
+			{
+				label = m.get_id();
+			}
+			else if( label_selection == NOTE_LABEL_C )
+			{
+				label = m.get_note();
+			}
 			int text_height = 20; // Heuristically determined -- computing actual size didn't work
-			int text_width = static_cast< int >( m.get_id().size() ) * text_height;
+			int text_width = static_cast< int >( label.size() ) * text_height;
 
 			// Higher for more horizontal lines
 			double norm_angle = abs( angle ) / 90.0;
@@ -1205,7 +1222,7 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 
 			// Render label
 			unsigned int font_size = 14; // Matches slice number font size
-			text_renderer->render( m.get_id(), &buffer[ 0 ], 
+			text_renderer->render( label, &buffer[ 0 ], 
 				viewer->get_width(), viewer->get_height(), static_cast< int >( label_point.x() ), 
 				viewer->get_height() - static_cast< int >( label_point.y() ), font_size, 0 );
 

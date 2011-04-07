@@ -115,6 +115,9 @@ public:
   // Selection between display of index and world units.  Needed for radio button group.
   Core::StateLabeledOptionHandle units_selection_state_; 
 
+  // Selection between using ID or note as label in viewer.  Needed for radio button group.
+  Core::StateLabeledOptionHandle label_selection_state_; 
+
   // Boolean indicating whether world units (true) or index units (false) should be displayed.
   Core::StateBoolHandle show_world_units_state_; 
   
@@ -124,6 +127,8 @@ public:
 public:
   static const std::string INDEX_UNITS_C;
   static const std::string WORLD_UNITS_C;
+  static const std::string ID_LABEL_C;
+  static const std::string NOTE_LABEL_C;
 
 private:
   MeasurementToolPrivateHandle private_;

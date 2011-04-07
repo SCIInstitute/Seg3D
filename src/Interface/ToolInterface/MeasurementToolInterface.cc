@@ -122,12 +122,17 @@ bool MeasurementToolInterface::build_widget( QFrame* frame )
     boost::bind( &MeasurementToolInterface::UpdateActiveIndex, measurement_interface ) ) );
   
   // Copied from resample tool
-  QButtonGroup* button_group = new QButtonGroup( this );
-  button_group->addButton( this->private_->ui_.rb_index_ );
-  button_group->addButton( this->private_->ui_.rb_world_ );
+  QButtonGroup* units_button_group = new QButtonGroup( this );
+  units_button_group->addButton( this->private_->ui_.rb_index_ );
+  units_button_group->addButton( this->private_->ui_.rb_world_ );
+
+  QButtonGroup* label_button_group = new QButtonGroup( this );
+  label_button_group->addButton( this->private_->ui_.rb_id_ );
+  label_button_group->addButton( this->private_->ui_.rb_note_ );
 
   // Connect the gui to the tool through the QtBridge
-  QtUtils::QtBridge::Connect( button_group, tool_handle->units_selection_state_ );
+  QtUtils::QtBridge::Connect( units_button_group, tool_handle->units_selection_state_ );
+  QtUtils::QtBridge::Connect( label_button_group, tool_handle->label_selection_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.goto_first_button_, boost::bind(
     &MeasurementToolInterfacePrivate::handle_go_to_active_measurement, this->private_, 0 ) );
   QtUtils::QtBridge::Connect( this->private_->ui_.goto_second_button_, boost::bind(
