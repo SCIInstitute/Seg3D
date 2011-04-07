@@ -138,6 +138,10 @@ public:
 	bool get_hover_measurement( size_t& index, Core::Measurement& measurement, 
 		Core::Point& world_point ); 
 
+	// UPDATE_CURSOR:
+	// Set cursor based on current editing/hover state
+	void update_cursor();
+
 	void start_editing();
 	void finish_editing();
 
@@ -241,6 +245,9 @@ void MeasurementToolPrivate::handle_measurements_changed()
 
 	this->saved_num_measurements_ = num_measurements;
 	this->handle_measurements_changed_blocked_ = false;
+
+	// Need to update the cursor since hover measurement may have been affected by change
+	this->update_cursor();
 
 	// Need to redraw the overlay
 	this->update_viewers();
@@ -554,17 +561,9 @@ void MeasurementToolPrivate::update_hover_point()
 	else
 	{	
 		// Find the measurement point that the mouse is currently hovering over, if there is one
-		if( this->find_hover_point() )
-		{
-			// Set cursor to open hand to indicate that point could be selected (but isn’t)
-			this->viewer_->set_cursor( Core::CursorShape::OPEN_HAND_E );
-		}
-		else
-		{
-			// Set cross icon color to grey (normal)
-			this->viewer_->set_cursor( Core::CursorShape::CROSS_E );
-		}
+		this->find_hover_point();
 	}
+	this->update_cursor();
 }
 
 bool MeasurementToolPrivate::get_hover_measurement( size_t& index, Core::Measurement& measurement, 
@@ -595,6 +594,45 @@ bool MeasurementToolPrivate::get_hover_measurement( size_t& index, Core::Measure
 	return false;
 }
 
+void MeasurementToolPrivate::update_cursor()
+{
+	// May be called from application or interface thread
+	lock_type lock( this->get_mutex() );
+
+	if( !this->viewer_ ) return;
+
+	if( this->editing_ )
+	{
+		// Use blank cursor so that features of interest are not obscured
+		this->viewer_->set_cursor( Core::CursorShape::BLANK_E );
+	}
+	else 
+	{
+		// Find the measurement point that the mouse is currently hovering over, if there is one
+		size_t measurement_index;
+		Core::Measurement measurement;
+		Core::Point hover_point;
+		if( this->get_hover_measurement( measurement_index, measurement, hover_point ) )
+		{
+			if( this->in_slice( this->viewer_, hover_point ) )
+			{
+				// Set cursor to open hand to indicate that point could be selected (but isn’t)
+				this->viewer_->set_cursor( Core::CursorShape::OPEN_HAND_E );
+			}
+			else
+			{
+				// Out of slice -- can be snapped to slice but not edited otherwise
+				this->viewer_->set_cursor( Core::CursorShape::UP_ARROW_E );
+			}
+		}
+		else
+		{
+			// Set cross icon color to grey (normal)
+			this->viewer_->set_cursor( Core::CursorShape::CROSS_E );
+		}
+	}
+}
+
 void MeasurementToolPrivate::start_editing()
 {
 	ASSERT_IS_INTERFACE_THREAD();
@@ -608,7 +646,7 @@ void MeasurementToolPrivate::start_editing()
 	this->editing_ = true;
 	
 	// Use blank cursor so that features of interest are not obscured
-	this->viewer_->set_cursor( Core::CursorShape::BLANK_E );
+	this->update_cursor();
 
 	// Redraw so that measurement is drawn with dotted line instead of solid line
 	this->update_viewers();
@@ -627,16 +665,9 @@ void MeasurementToolPrivate::finish_editing()
 	this->editing_ = false;
 
 	// No need to update measurement (interactively updated) 
+
 	// Change cursor to indicate that editing is not happening
-	// NOTE: Cursor has three states: editing, hovering, and normal	
-	if( this->hover_point_.is_valid() )
-	{
-		this->viewer_->set_cursor( Core::CursorShape::OPEN_HAND_E );
-	}
-	else
-	{
-		this->viewer_->set_cursor( Core::CursorShape::CROSS_E );
-	}
+	this->update_cursor();
 	
 	// Redraw so that measurement is drawn with solid line instead of dotted line
 	this->update_viewers();
@@ -797,13 +828,6 @@ bool MeasurementTool::handle_mouse_move( ViewerHandle viewer,
 	this->private_->mouse_pos_.y_ = mouse_history.current_.y_;
 	this->private_->update_hover_point();
 
-	// May have moved into new viewer, need to set its cursor if editing
-	if( this->private_->editing_ && this->private_->viewer_ )
-	{
-		// Use blank cursor so that features of interest are not obscured
-		this->private_->viewer_->set_cursor( Core::CursorShape::BLANK_E );
-	}
-
 	// Pass handling on to normal handler 
 	return false;
 }
@@ -890,8 +914,6 @@ bool MeasurementTool::handle_mouse_press( ViewerHandle viewer,
 			// This point does not have to be in current slice
 			// Snap point to current slice
 			this->private_->snap_hover_point_to_slice();
-
-			// TODO: Different icon for hovering but not in slice?  
 		}
 	}
 	else if( button == Core::MouseButton::RIGHT_BUTTON_E )
