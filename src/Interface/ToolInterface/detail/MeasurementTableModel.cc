@@ -218,6 +218,15 @@ QVariant MeasurementTableModel::data( const QModelIndex& index, int role ) const
       }
     }
   }
+  else if ( role == Qt::BackgroundRole )
+  {
+    // The active index is always selected, but if one column is highlighted it may not be
+    // obvious which is the active index, so color it.
+    if ( index.row() == this->private_->measurement_tool_->active_index_state_->get() )
+    {
+      return QBrush( QColor( 225, 243, 252 ) ); // Light blue
+    }
+  }
   return QVariant(); 
   
 }
