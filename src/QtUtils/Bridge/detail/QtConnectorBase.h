@@ -40,16 +40,25 @@ class QtConnectorBase : public QObject, protected Core::ConnectionHandler
 {
   Q_OBJECT
 public:
-  QtConnectorBase( QObject* parent, bool blocking = true ) :
+  QtConnectorBase( QObject* parent = 0, bool blocking = true ) :
     QObject( parent ),
     blocking_( blocking ),
-    blocked_( false )
+    blocked_( false ),
+    disabled_( false )
   {
   }
 
   virtual ~QtConnectorBase()
   {
     this->disconnect_all();
+  }
+  
+  void disable()
+  {
+    // Remove all Qt connections
+    this->disconnect();
+    // Stop forwarding information to the parent widget
+    this->disabled_ = true;
   }
 
 protected:
@@ -75,12 +84,18 @@ protected:
 
   bool is_blocked() const
   {
-    return this->blocked_;
+    return this->blocked_ || this->disabled_;
   }
 
+
+
 private:
+  // Whether the connector has a blocking mode
   bool blocking_;
+  // Whether the connection is blocked
   bool blocked_;
+  // Whether the connection is disabled
+  bool disabled_;
 };
 
 } // end namespace QtUtils

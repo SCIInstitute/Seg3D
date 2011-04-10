@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>212</width>
+    <width>253</width>
     <height>50</height>
    </rect>
   </property>
@@ -49,45 +49,20 @@ QWidget#widget_2
   background-color: rgba(255, 255, 255, 0);
 }
 
-QPushButton#edit_button_
-{
-  background-color: rgba(255, 255, 255, 0);
-  border-color: rgba(255, 255, 255, 0);
-  
-  font: 7pt &quot;Arial&quot;;
+QLabel#description_{
+  color: rgb( 60,60,60 );
 }
 
-QPushButton#edit_button_:checked
-{
-  background-color: rgba(255, 255, 255, 0);
-  border: 1px solid rgba(255, 255, 255, 0);
-  
-  font: bold 8pt &quot;Arial&quot;;
-  color: rgb(85, 170, 255);
+QLabel#description_:disabled{
+  color: rgb( 140,140,140 );
 }
 
-QPushButton#edit_button_:pressed
-{
-  background-color: rgba(255, 255, 255, 0);
-  border: 1px solid rgba(255, 255, 255, 0);
-  
-  font: bold 8pt &quot;Arial&quot;;
-  color: rgb(85, 170, 255);
+QLabel#description_:enabled{
+  color: rgb( 60,60,60 );
 }
-
-QPushButton#increase_range_button_
-{
-  margin: 0px;
-  padding: 0px;
+QWidget#widget_3{ 
+  border: 1px solid rgb(240, 240, 240); border-radius: 3px;
 }
-
-QPushButton#decrease_range_button_
-{
-  margin: 0px;
-  padding: 0px;
-}
-
-QWidget#widget_3{ border: 1px solid rgb(240, 240, 240); border-radius: 3px;}
 
 </string>
      </property>
@@ -100,6 +75,12 @@ QWidget#widget_3{ border: 1px solid rgb(240, 240, 240); border-radius: 3px;}
       </property>
       <item>
        <widget class="QWidget" name="widget_2" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <layout class="QVBoxLayout" name="verticalLayout">
          <property name="spacing">
           <number>0</number>
@@ -116,7 +97,7 @@ QWidget#widget_3{ border: 1px solid rgb(240, 240, 240); border-radius: 3px;}
             </sizepolicy>
            </property>
            <property name="maximum">
-            <number>1000</number>
+            <number>100</number>
            </property>
            <property name="pageStep">
             <number>10</number>
@@ -126,6 +107,9 @@ QWidget#widget_3{ border: 1px solid rgb(240, 240, 240); border-radius: 3px;}
            </property>
            <property name="tickPosition">
             <enum>QSlider::TicksBelow</enum>
+           </property>
+           <property name="tickInterval">
+            <number>10</number>
            </property>
           </widget>
          </item>
@@ -143,7 +127,7 @@ QWidget#widget_3{ border: 1px solid rgb(240, 240, 240); border-radius: 3px;}
              <height>20</height>
             </size>
            </property>
-           <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0,0,0,1">
+           <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0,1">
             <property name="spacing">
              <number>1</number>
             </property>
@@ -167,77 +151,18 @@ QWidget#widget_3{ border: 1px solid rgb(240, 240, 240); border-radius: 3px;}
              </widget>
             </item>
             <item>
-             <widget class="QToolButton" name="decrease_range_button_">
-              <property name="maximumSize">
-               <size>
-                <width>18</width>
-                <height>18</height>
-               </size>
-              </property>
-              <property name="toolTip">
-               <string>Half the current range</string>
-              </property>
-              <property name="text">
-               <string>-</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="edit_button_">
-              <property name="minimumSize">
-               <size>
-                <width>50</width>
-                <height>0</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>50</width>
-                <height>16777215</height>
-               </size>
-              </property>
+             <widget class="QLabel" name="description_">
               <property name="font">
                <font>
-                <family>Arial</family>
-                <pointsize>7</pointsize>
-                <weight>50</weight>
-                <italic>false</italic>
-                <bold>false</bold>
+                <weight>75</weight>
+                <bold>true</bold>
                </font>
               </property>
-              <property name="toolTip">
-               <string>Click here to enable range editing</string>
-              </property>
               <property name="text">
-               <string>edit range</string>
+               <string/>
               </property>
-              <property name="checkable">
-               <bool>true</bool>
-              </property>
-              <property name="autoDefault">
-               <bool>false</bool>
-              </property>
-              <property name="default">
-               <bool>false</bool>
-              </property>
-              <property name="flat">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QToolButton" name="increase_range_button_">
-              <property name="maximumSize">
-               <size>
-                <width>18</width>
-                <height>18</height>
-               </size>
-              </property>
-              <property name="toolTip">
-               <string>Double the current range</string>
-              </property>
-              <property name="text">
-               <string>+</string>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
               </property>
              </widget>
             </item>

@@ -42,7 +42,7 @@ namespace QtUtils
 
 QtEnableConnector::QtEnableConnector( QWidget* parent, 
   Core::StateBoolHandle& state, bool opposite_logic ) :
-  QObject( static_cast<QObject*>( parent ) ),
+  QtConnectorBase( static_cast<QObject*>( parent ) ),
   parent_( parent ),
   histogram_widget_( false ),
   opposite_logic_( opposite_logic )
@@ -59,26 +59,26 @@ QtEnableConnector::QtEnableConnector( QWidget* parent,
 
 }
   
-  QtEnableConnector::QtEnableConnector( QAction* action_parent, 
-    Core::StateBoolHandle& state, bool opposite_logic ) :
-    action_parent_( action_parent ),
-    opposite_logic_( opposite_logic )
+QtEnableConnector::QtEnableConnector( QAction* action_parent, 
+  Core::StateBoolHandle& state, bool opposite_logic ) :
+  action_parent_( action_parent ),
+  opposite_logic_( opposite_logic )
+{
+  QPointer< QtEnableConnector > qpointer( this );
+  
   {
-    QPointer< QtEnableConnector > qpointer( this );
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    action_parent->setEnabled( state->get() ^ this->opposite_logic_ );
     
-    {
-      Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-      action_parent->setEnabled( state->get() ^ this->opposite_logic_ );
-      
-      this->add_connection( state->value_changed_signal_.connect(
-        boost::bind( &QtEnableConnector::EnableAction, qpointer, _1 ) ) );
-    }
-    
+    this->add_connection( state->value_changed_signal_.connect(
+      boost::bind( &QtEnableConnector::EnableAction, qpointer, _1 ) ) );
   }
+  
+}
 
 QtEnableConnector::QtEnableConnector( QtHistogramWidget* histogram, 
   Core::StateBoolHandle& state, bool opposite_logic ) :
-  QObject( static_cast<QObject*>( histogram ) ),
+  QtConnectorBase( static_cast<QObject*>( histogram ) ),
   parent_( histogram ),
   histogram_widget_( true ),
   opposite_logic_( opposite_logic )
@@ -97,7 +97,7 @@ QtEnableConnector::QtEnableConnector( QtHistogramWidget* histogram,
 QtEnableConnector::QtEnableConnector( QWidget* parent, 
   std::vector< Core::StateBaseHandle >& states, 
   boost::function< bool () > condition ) :
-  QObject( parent ),
+  QtConnectorBase( parent ),
   parent_( parent ),
   histogram_widget_( false ),
   condition_( condition )
@@ -120,7 +120,7 @@ QtEnableConnector::QtEnableConnector( QWidget* parent,
 QtEnableConnector::QtEnableConnector( QWidget* parent, 
   Core::StateBaseHandle state, 
   boost::function< bool () > condition ) :
-  QObject( parent ),
+  QtConnectorBase( parent ),
   parent_( parent ),
   histogram_widget_( false ),
   condition_( condition )
@@ -132,8 +132,6 @@ QtEnableConnector::QtEnableConnector( QWidget* parent,
     boost::bind( &QtEnableConnector::EnableWidget, qpointer ) ) );
   parent->setEnabled( condition() );
 }
-
-
 
 
 QtEnableConnector::~QtEnableConnector()
@@ -181,24 +179,24 @@ void QtEnableConnector::EnableWidget( QPointer< QtEnableConnector > qpointer )
   qpointer->parent_->setEnabled( qpointer->condition_() );
 }
   
-  void QtEnableConnector::EnableAction( 
-     QPointer< QtEnableConnector > qpointer, 
-     bool enabled )
+void QtEnableConnector::EnableAction( 
+   QPointer< QtEnableConnector > qpointer, 
+   bool enabled )
+{
+  if ( !Core::Interface::IsInterfaceThread() )
   {
-    if ( !Core::Interface::IsInterfaceThread() )
-    {
-      Core::Interface::PostEvent( boost::bind( &QtEnableConnector::EnableAction,
-        qpointer, enabled ) );
-      return;
-    }
-    
-    if ( qpointer.isNull() || QCoreApplication::closingDown() )
-    {
-      return;
-    }
-    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-    qpointer->action_parent_->setEnabled( enabled ^ qpointer->opposite_logic_ );
+    Core::Interface::PostEvent( boost::bind( &QtEnableConnector::EnableAction,
+      qpointer, enabled ) );
+    return;
   }
+  
+  if ( qpointer.isNull() || QCoreApplication::closingDown() )
+  {
+    return;
+  }
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+  qpointer->action_parent_->setEnabled( enabled ^ qpointer->opposite_logic_ );
+}
 
 
 } // end namespace QtUtils

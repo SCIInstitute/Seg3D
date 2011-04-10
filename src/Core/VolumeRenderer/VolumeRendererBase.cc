@@ -26,16 +26,9 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <queue>
-
-#include <boost/date_time.hpp>
-
 #include <Core/Math/MathFunctions.h>
 #include <Core/RenderResources/RenderResources.h>
-#include <Core/Volume/DataVolumeBrick.h>
-#include <Core/VolumeRenderer/VolumeRenderer.h>
-#include <Core/Graphics/PixelBufferObject.h>
-#include <Core/VolumeRenderer/VolumeShader.h>
+#include <Core/VolumeRenderer/VolumeRendererBase.h>
 #include <Core/Geometry/Algorithm.h>
 
 #ifdef max
@@ -368,23 +361,7 @@ static const unsigned int CORNER_INDEX_C[24] =
 };
 
 //////////////////////////////////////////////////////////////////////////
-// Class BrickEntry
-//////////////////////////////////////////////////////////////////////////
-
-class BrickEntry
-{
-public:
-  DataVolumeBrickHandle brick_;
-  double distance_;
-};
-
-bool operator<( const BrickEntry& lhs, const BrickEntry& rhs )
-{
-  return lhs.distance_ < rhs.distance_;
-}
-
-//////////////////////////////////////////////////////////////////////////
-// Class VolumeRendererPrivate
+// Class VolumeRendererBasePrivate
 //////////////////////////////////////////////////////////////////////////
 
 // NOTE: The Ordering of Vertices
@@ -393,15 +370,9 @@ bool operator<( const BrickEntry& lhs, const BrickEntry& rhs )
 // Then the vertices of a box can be numbered as
 // 000, 001, 010, 011, 100, 101, 110, 111.
   
-class VolumeRendererPrivate
+class VolumeRendererBasePrivate
 {
 public:
-  void analyze_volume( DataVolumeHandle volume, double sample_rate );
-  void process_bricks( const std::vector< DataVolumeBrickHandle >& bricks,
-    std::priority_queue< BrickEntry >& sorted_bricks, 
-    const Point& eyep, bool orthographic );
-  void render_brick( DataVolumeBrickHandle brick );
-
   // The viewing direction
   Vector view_dir_;
   // Index of the vertex closest to the eye
@@ -414,59 +385,11 @@ public:
   double sample_start_;
   // The size of the voxel in world space
   Vector voxel_size_;
-
-  VolumeShaderHandle volume_shader_;
+  // The normalized sampling distance
+  double normalized_sample_distance_;
+  // Whether to render the volume in front-to-back order.
+  bool front_to_back_;
 };
-
-void VolumeRendererPrivate::analyze_volume( DataVolumeHandle volume, double sample_rate )
-{
-  GridTransform grid_trans = volume->get_grid_transform();
-  this->voxel_size_ = grid_trans * Vector( 1.0, 1.0, 1.0 );
-  Point voxel_min( 0.0, 0.0, 0.0 );
-  Point voxel_max( this->voxel_size_ );
-  Point corners[ 2 ] = { voxel_min, voxel_max };
-  double min_dist = std::numeric_limits< double >::max();
-  double max_dist = std::numeric_limits< double >::min();
-
-  // Computing the sampling distance and front and back vertices
-  for ( int z = 0; z < 2; ++z )
-  {
-    for ( int y = 0; y < 2; ++y )
-    {
-      for ( int x = 0; x < 2; ++x )
-      {
-        Vector vertex( corners[ x ].x(), corners[ y ].y(), corners[ z ].z() );
-        double dist = Dot( vertex, this->view_dir_ );
-        if ( dist < min_dist )
-        {
-          min_dist = dist;
-          this->front_vertex_ = ( z << 2 ) + ( y << 1 ) + x;
-        }
-        if ( dist > max_dist )
-        {
-          max_dist = dist;
-        } 
-      }
-    }
-  }
-  // Make sure that the back vertex and the front vertex are on the opposite corners of the box
-  this->back_vertex_ = ( ~this->front_vertex_ ) & 0x7;
-  assert( this->front_vertex_ >= 0 && this->front_vertex_ <= 7 && 
-    this->back_vertex_ >= 0 && this->back_vertex_ <= 7 );
-  this->sample_distance_ = ( max_dist - min_dist ) / sample_rate;
-
-  // Compute the start sampling position for the volume (in back to front order)
-  Point vol_bbox_min( -0.5, -0.5, -0.5 );
-  corners[ 0 ] = grid_trans * vol_bbox_min;
-  Point vol_bbox_max( static_cast< double >( grid_trans.get_nx() ) - 0.5,
-    static_cast< double >( grid_trans.get_ny() ) - 0.5, 
-    static_cast< double >( grid_trans.get_nz() ) - 0.5 );
-  corners[ 1 ] = grid_trans * vol_bbox_max;
-  Vector far_vertex( corners[ ( this->back_vertex_ & 0x1 ) > 0 ? 1 : 0 ].x(),
-    corners[ ( this->back_vertex_ & 0x2 ) > 0 ? 1 : 0 ].y(),
-    corners[ ( this->back_vertex_ & 0x4 ) > 0 ? 1 : 0 ].z() );
-  this->sample_start_ = Dot( far_vertex, this->view_dir_ ) - this->sample_distance_;
-}
 
 // EYETOBOXDISTANCE:
 // Compute the distance from eye to the given box.
@@ -522,11 +445,102 @@ static double EyeToBoxDistance( const Point& eyep, const Vector& view_dir, const
   return dist;
 }
 
-void VolumeRendererPrivate::process_bricks( const std::vector< DataVolumeBrickHandle >& bricks,
-                       std::priority_queue< BrickEntry >& sorted_bricks,
-                       const Point& eyep, bool orthographic )
+//////////////////////////////////////////////////////////////////////////
+// Class VolumeRendererBase
+//////////////////////////////////////////////////////////////////////////
+
+VolumeRendererBase::VolumeRendererBase() :
+  private_( new VolumeRendererBasePrivate )
 {
+}
+
+VolumeRendererBase::~VolumeRendererBase()
+{
+}
+
+void VolumeRendererBase::initialize()
+{
+}
+
+static bool CompareBrickEntryAscend( const BrickEntry& brick1, const BrickEntry& brick2 )
+{
+  return brick1.distance_ < brick2.distance_;
+}
+
+static bool CompareBrickEntryDescend( const BrickEntry& brick1, const BrickEntry& brick2 )
+{
+  return brick1.distance_ > brick2.distance_;
+}
+
+void VolumeRendererBase::process_volume( DataVolumeHandle volume, 
+  double sample_rate, const View3D& view, bool orthographic, 
+  bool front_to_back, std::vector< BrickEntry >& sorted_bricks )
+{
+  std::vector< DataVolumeBrickHandle > bricks;
+  volume->get_bricks( bricks );
   size_t num_bricks = bricks.size();
+  if ( num_bricks == 0 )
+  {
+    return;
+  }
+
+  this->private_->view_dir_ = view.lookat() - view.eyep();
+  this->private_->view_dir_.normalize();
+  this->private_->front_to_back_ = front_to_back;
+
+  GridTransform grid_trans = volume->get_grid_transform();
+  this->private_->voxel_size_ = grid_trans * Vector( 1.0, 1.0, 1.0 );
+  Point voxel_min( 0.0, 0.0, 0.0 );
+  Point voxel_max( this->private_->voxel_size_ );
+  Point corners[ 2 ] = { voxel_min, voxel_max };
+  double min_dist = std::numeric_limits< double >::max();
+  double max_dist = std::numeric_limits< double >::min();
+
+  // Computing the sampling distance and front and back vertices
+  for ( int z = 0; z < 2; ++z )
+  {
+    for ( int y = 0; y < 2; ++y )
+    {
+      for ( int x = 0; x < 2; ++x )
+      {
+        Vector vertex( corners[ x ].x(), corners[ y ].y(), corners[ z ].z() );
+        double dist = Dot( vertex, this->private_->view_dir_ );
+        if ( dist < min_dist )
+        {
+          min_dist = dist;
+          this->private_->front_vertex_ = ( z << 2 ) + ( y << 1 ) + x;
+        }
+        if ( dist > max_dist )
+        {
+          max_dist = dist;
+        } 
+      }
+    }
+  }
+  // Make sure that the back vertex and the front vertex are on the opposite corners of the box
+  this->private_->back_vertex_ = ( ~this->private_->front_vertex_ ) & 0x7;
+  assert( this->private_->front_vertex_ >= 0 && this->private_->front_vertex_ <= 7 && 
+    this->private_->back_vertex_ >= 0 && this->private_->back_vertex_ <= 7 );
+  this->private_->sample_distance_ = ( max_dist - min_dist ) / sample_rate;
+
+  // Compute the start sampling position for the volume
+  Point vol_bbox_min( -0.5, -0.5, -0.5 );
+  corners[ 0 ] = grid_trans * vol_bbox_min;
+  double nx = static_cast< double >( grid_trans.get_nx() );
+  double ny = static_cast< double >( grid_trans.get_ny() );
+  double nz = static_cast< double >( grid_trans.get_nz() );
+  Point vol_bbox_max( nx - 0.5, ny - 0.5, nz - 0.5 );
+  corners[ 1 ] = grid_trans * vol_bbox_max;
+  double unit_length = ( corners[ 1 ] - corners[ 0 ] ).length() / Sqrt( nx * nx + ny * ny + nz * nz );
+  this->private_->normalized_sample_distance_ = this->private_->sample_distance_ / unit_length;
+  int start_vertex_index = front_to_back ? this->private_->front_vertex_ : this->private_->back_vertex_;
+  Vector start_vertex( corners[ ( start_vertex_index & 0x1 ) > 0 ? 1 : 0 ].x(),
+    corners[ ( start_vertex_index & 0x2 ) > 0 ? 1 : 0 ].y(),
+    corners[ ( start_vertex_index & 0x4 ) > 0 ? 1 : 0 ].z() );
+  this->private_->sample_start_ = Dot( start_vertex, this->private_->view_dir_ ) 
+    + ( front_to_back ? this->private_->sample_distance_ : -this->private_->sample_distance_ );
+  
+  // Sort the bricks in the specified order based on their distances to the eye
   for ( size_t i = 0; i < num_bricks; ++i )
   {
     BrickEntry brick_entry;
@@ -537,26 +551,37 @@ void VolumeRendererPrivate::process_bricks( const std::vector< DataVolumeBrickHa
     // orthographic: sort bricks based on distance to the view plane
     if ( orthographic )
     {
-      Vector vertex( corners[ ( this->front_vertex_ & 0x1 ) > 0 ? 1 : 0 ].x(),
-        corners[ ( this->front_vertex_ & 0x2 ) > 0 ? 1 : 0 ].y(),
-        corners[ ( this->front_vertex_ & 0x4 ) > 0 ? 1 : 0 ].z() );
-      brick_entry.distance_ = Dot( vertex, this->view_dir_ );
+      Vector vertex( corners[ ( this->private_->front_vertex_ & 0x1 ) > 0 ? 1 : 0 ].x(),
+        corners[ ( this->private_->front_vertex_ & 0x2 ) > 0 ? 1 : 0 ].y(),
+        corners[ ( this->private_->front_vertex_ & 0x4 ) > 0 ? 1 : 0 ].z() );
+      brick_entry.distance_ = Dot( vertex, this->private_->view_dir_ );
     }
     // perspective: sort bricks based on distance to the eye point
     else
     {
-      brick_entry.distance_ = EyeToBoxDistance( eyep, this->view_dir_, brick_bbox );
+      brick_entry.distance_ = EyeToBoxDistance( view.eyep(), this->private_->view_dir_, brick_bbox );
     }
-    
-    sorted_bricks.push( brick_entry );
+
+    sorted_bricks.push_back( brick_entry );
+  }
+
+  if ( front_to_back )
+  {
+    std::sort( sorted_bricks.begin(), sorted_bricks.end(), CompareBrickEntryAscend );
+  }
+  else
+  {
+    std::sort( sorted_bricks.begin(), sorted_bricks.end(), CompareBrickEntryDescend );
   }
 }
 
-void VolumeRendererPrivate::render_brick( DataVolumeBrickHandle brick )
+void VolumeRendererBase::slice_brick( DataVolumeBrickHandle brick, 
+                   std::vector< PointF >& polygon_vertices, 
+                   std::vector< int >& first_vec, std::vector< int >& count_vec )
 {
   BBox brick_bbox = brick->get_brick_bbox();
   Point corners[] = { brick_bbox.min(), brick_bbox.max() };
-  
+
   // Coordinates of 8 brick vertices
   Vector vertex_pos[ 8 ] =
   {
@@ -576,20 +601,31 @@ void VolumeRendererPrivate::render_brick( DataVolumeBrickHandle brick )
 
   for ( int i = 0; i < 8; ++i )
   {
-    vals[ i ] = Dot( vertex_pos[ i ], this->view_dir_ );
+    vals[ i ] = Dot( vertex_pos[ i ], this->private_->view_dir_ );
     near_distance = Min( near_distance, vals[ i ] );
     far_distance = Max( far_distance, vals[ i ] );
   }
 
-  double sample_pos = this->sample_start_ - this->sample_distance_ * ( 
-    far_distance >= this->sample_start_ ? 0 : Ceil( 
-    ( this->sample_start_ - far_distance ) / this->sample_distance_ ) );
-  
+  double sample_pos;
+  if ( this->private_->front_to_back_ )
+  {
+    sample_pos = this->private_->sample_start_ + this->private_->sample_distance_ * ( 
+      near_distance <= this->private_->sample_start_ ? 0 : Ceil( 
+      ( near_distance - this->private_->sample_start_ ) / this->private_->sample_distance_ ) );
+  }
+  else
+  {
+    sample_pos = this->private_->sample_start_ - this->private_->sample_distance_ * ( 
+      far_distance >= this->private_->sample_start_ ? 0 : Ceil( 
+      ( this->private_->sample_start_ - far_distance ) / this->private_->sample_distance_ ) );
+  }
+  double sample_offset = this->private_->front_to_back_ ? 
+    this->private_->sample_distance_ : -this->private_->sample_distance_;
+
   // Use marching cubes algorithm to find the intersections of the slices and the brick
-  std::vector< PointF > polygon_vertices;
-  std::vector< int > first_vec, count_vec;
   Vector intersect_pos[ 12 ];
-  while ( sample_pos > near_distance )
+  while ( ( !this->private_->front_to_back_ && sample_pos > near_distance ) ||
+    ( this->private_->front_to_back_ && sample_pos < far_distance ) )
   {
     // generate the code to look up edge table and triangle table
     int c_code = 0;
@@ -620,125 +656,26 @@ void VolumeRendererPrivate::render_brick( DataVolumeBrickHandle brick )
     {
       polygon_vertices.push_back( PointF( intersect_pos[ static_cast< int >( poly_code[ n ] ) ] ) );
     }
-    assert(n < 7);
+    assert( n < 7 );
     count_vec.push_back( n );
 
-    sample_pos -= this->sample_distance_;
+    sample_pos += sample_offset;
   }
-
-  BBox texture_bbox = brick->get_texture_bbox();
-  Texture3DHandle brick_texture = brick->get_texture();
-  VectorF texel_size( brick->get_texel_size() );
-  VectorF texture_size( texture_bbox.diagonal() );
-  this->volume_shader_->set_texture_bbox_min( static_cast< float >( texture_bbox.min().x() ),
-    static_cast< float >( texture_bbox.min().y() ), static_cast< float >( texture_bbox.min().z() ) );
-  this->volume_shader_->set_texture_bbox_size( texture_size[ 0 ], texture_size[ 1 ], texture_size[ 2 ] );
-  this->volume_shader_->set_texel_size( texel_size[ 0 ], texel_size[ 1 ], texel_size[ 2 ] );
-
-  Texture::lock_type tex_lock( brick_texture->get_mutex() );
-  brick_texture->bind();
-
-  glEnableClientState( GL_VERTEX_ARRAY );
-  glVertexPointer( 3, GL_FLOAT, 0, &polygon_vertices[ 0 ][ 0 ] );
-  glMultiDrawArrays( GL_POLYGON, &first_vec[ 0 ], &count_vec[ 0 ], 
-    static_cast< GLsizei >( count_vec.size() ) );
-  glDisableClientState( GL_VERTEX_ARRAY );
-
-  brick_texture->unbind();
 }
 
-//////////////////////////////////////////////////////////////////////////
-// Class VolumeRenderer
-//////////////////////////////////////////////////////////////////////////
-
-VolumeRenderer::VolumeRenderer() :
-  private_( new VolumeRendererPrivate )
+Core::Vector VolumeRendererBase::get_voxel_size()
 {
+  return this->private_->voxel_size_;
 }
 
-VolumeRenderer::~VolumeRenderer()
+double VolumeRendererBase::get_normalized_sample_distance()
 {
+  return this->private_->normalized_sample_distance_;
 }
 
-void VolumeRenderer::initialize()
+double VolumeRendererBase::get_sample_distance()
 {
-  this->private_->volume_shader_.reset( new VolumeShader );
-  this->private_->volume_shader_->initialize();
-  this->private_->volume_shader_->enable();
-  this->private_->volume_shader_->set_volume_texture( 0 );
-  this->private_->volume_shader_->set_diffuse_texture( 1 );
-  this->private_->volume_shader_->set_specular_texture( 2 );
-  this->private_->volume_shader_->disable();
-}
-
-void VolumeRenderer::render( DataVolumeHandle volume, const View3D& view, 
-              double znear, double zfar, double sample_rate, bool enable_lighting, 
-              bool enable_fog, TransferFunctionHandle tf, bool orthographic )
-{
-  boost::posix_time::ptime start_time = boost::posix_time::microsec_clock::local_time();
-
-  std::vector< DataVolumeBrickHandle > bricks;
-  volume->get_bricks( bricks );
-  if ( bricks.size() == 0 )
-  {
-    return;
-  }
-  
-  this->private_->view_dir_ = view.lookat() - view.eyep();
-  this->private_->view_dir_.normalize();
-
-  this->private_->analyze_volume( volume, sample_rate );
-
-  std::priority_queue< BrickEntry > brick_queue;
-  this->private_->process_bricks( bricks, brick_queue, view.eyep(), orthographic );
-
-  glPushAttrib( GL_DEPTH_BUFFER_BIT | GL_POLYGON_BIT );
-  glEnable( GL_DEPTH_TEST );
-  glDepthMask( GL_FALSE );
-  glDisable( GL_CULL_FACE );
-
-  unsigned int old_tex_unit = Texture::GetActiveTextureUnit();
-  TextureHandle diffuse_lut = tf->get_diffuse_lut();
-  TextureHandle specular_lut = tf->get_specular_lut();
-  Texture::lock_type diffuse_lock( diffuse_lut->get_mutex() );
-  Texture::lock_type specular_lock( specular_lut->get_mutex() );
-  Texture::SetActiveTextureUnit( 1 );
-  diffuse_lut->bind();
-  Texture::SetActiveTextureUnit( 2 );
-  specular_lut->bind();
-  Texture::SetActiveTextureUnit( 0 );
-  
-  this->private_->volume_shader_->enable();
-  this->private_->volume_shader_->set_voxel_size( 
-    static_cast< float >( this->private_->voxel_size_[ 0 ] ),
-    static_cast< float >( this->private_->voxel_size_[ 1 ] ),
-    static_cast< float >( this->private_->voxel_size_[ 2 ] ) );
-  this->private_->volume_shader_->set_lighting( enable_lighting );
-  this->private_->volume_shader_->set_fog( enable_fog );
-  this->private_->volume_shader_->set_scale_bias( 1.0f, 0.0f );
-  this->private_->volume_shader_->set_sample_rate( static_cast< float >( sample_rate ) );
-  this->private_->volume_shader_->set_fog_range( static_cast< float >( znear ), 
-    static_cast< float >( zfar ) );
-
-  while ( !brick_queue.empty() )
-  {
-    this->private_->render_brick( brick_queue.top().brick_ );
-    brick_queue.pop();
-  }
-
-  this->private_->volume_shader_->disable();
-
-  Texture::SetActiveTextureUnit( 1 );
-  diffuse_lut->unbind();
-  Texture::SetActiveTextureUnit( 2 );
-  diffuse_lut->unbind();
-  Texture::SetActiveTextureUnit( old_tex_unit );
-  glPopAttrib();
-
-  boost::posix_time::ptime end_time = boost::posix_time::microsec_clock::local_time();
-  boost::posix_time::time_duration vr_time = end_time - start_time;
-  CORE_LOG_DEBUG( "Volume rendering finished in " + 
-    ExportToString( vr_time.total_milliseconds() ) + " milliseconds." );
+  return this->private_->sample_distance_;
 }
 
 } // end namespace Core

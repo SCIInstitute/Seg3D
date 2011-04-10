@@ -49,11 +49,10 @@ CORE_ACTION(
 public:
   ActionSetAt()
   {
-    this->add_argument( this->stateid_ );
-    this->add_argument( this->index_ );
-    this->add_argument( this->value_ );
+    this->add_parameter( this->stateid_ );
+    this->add_parameter( this->index_ );
+    this->add_parameter( this->value_ );
   } 
-  virtual ~ActionSetAt() {}
 
   // -- Functions that describe action --
   virtual bool validate( ActionContextHandle& context );
@@ -64,41 +63,28 @@ public:
 
 
 private:
-  ActionParameter< std::string > stateid_;
-  ActionParameter< size_t > index_;
-  ActionParameterVariant value_;
+  std::string stateid_;
+  size_t index_;
+  Variant value_;
 
   StateVectorBaseWeakHandle state_weak_handle_;
 
 public:
-  template< class T >
-  static ActionHandle Create( const typename StateVector< T >::handle_type& state,
-    size_t index, const T& value );
-
+  // DISPATCH:
+  // Dispatch the action from the interface
   template< class T >
   static void Dispatch( ActionContextHandle context,
-    const typename StateVector< T >::handle_type& state, size_t index, const T& value );
-};
-
-template< class T >
-ActionHandle ActionSetAt::Create( const typename StateVector< T >::handle_type& state, 
-                 size_t index, const T& value )
-{
-  ActionSetAt* action = new ActionSetAt;
-  action->stateid_.set_value( state->get_stateid() );
-  action->index_.set_value( index );
-  action->value_.set_value( value );
-  action->state_weak_handle_ = state;
-
-  return ActionHandle( action );
-}
-
-template< class T >
-void ActionSetAt::Dispatch( ActionContextHandle context, 
     const typename StateVector< T >::handle_type& state, size_t index, const T& value )
-{
-  ActionDispatcher::PostAction( Create( state, index, value ), context );
-}
+  {
+    ActionSetAt* action = new ActionSetAt;
+    action->stateid_ = state->get_stateid();
+    action->index_ = index;
+    action->value_.set( value );
+    action->state_weak_handle_ = state;
+
+    ActionDispatcher::PostAction( ActionHandle( action ), context );
+  }
+};
 
 } // end namespace Core
 

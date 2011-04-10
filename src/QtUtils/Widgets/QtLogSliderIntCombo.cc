@@ -48,6 +48,7 @@ public:
 
 QtLogSliderIntCombo::QtLogSliderIntCombo( QWidget* parent ) :
   QWidget( parent ),
+  value_( 0 ),
   private_( new QtLogSliderIntComboPrivate )
 {
     this->private_->ui_.setupUi( this );
@@ -57,23 +58,16 @@ QtLogSliderIntCombo::QtLogSliderIntCombo( QWidget* parent ) :
     this->connect( this->private_->ui_.spinBox, SIGNAL( valueChanged( int ) ), 
     this, SLOT( spinner_signal( int ) ) );
   
-#if defined ( __APPLE__ )  
-  QFont font;
-  font.setPointSize( 10 );
-  this->private_->ui_.min_->setFont( font );
-  this->private_->ui_.max_->setFont( font );
-  this->private_->ui_.spinBox->setFont( font );
-#endif
-
-    this->private_->ui_.decrease_range_button_->hide();
-    this->private_->ui_.increase_range_button_->hide();
-  this->private_->ui_.edit_button_->hide();
-  
   this->private_->ui_.horizontalSlider->setTickPosition( QSlider::NoTicks );
 }
 
 QtLogSliderIntCombo::~QtLogSliderIntCombo()
 {
+}
+  
+void QtLogSliderIntCombo::set_description( std::string description )
+{
+  this->private_->ui_.description_->setText( QString::fromStdString( description ) );
 }
 
 void QtLogSliderIntCombo::spinner_signal( int value )

@@ -35,11 +35,12 @@
 #include <Core/VolumeRenderer/TransferFunction.h>
 
 #include <QtUtils/Widgets/QtTransferFunctionScene.h>
+#include <QtUtils/Bridge/detail/QtConnectorBase.h>
 
 namespace QtUtils
 {
 
-  class QtTransferFunctionSceneConnector : public QObject, private Core::ConnectionHandler
+class QtTransferFunctionSceneConnector : public QtConnectorBase
 {
   Q_OBJECT
 

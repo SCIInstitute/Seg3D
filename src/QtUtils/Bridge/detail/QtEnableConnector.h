@@ -33,14 +33,18 @@
 #include <QPointer>
 #include <QAction>
 
+// Core includes
 #include <Core/Utils/ConnectionHandler.h>
-#include <QtUtils/Widgets/QtHistogramWidget.h>
 #include <Core/State/State.h>
+
+// Qt Utils includes
+#include <QtUtils/Widgets/QtHistogramWidget.h>
+#include <QtUtils/Bridge/detail/QtConnectorBase.h>
 
 namespace QtUtils
 {
 
-class QtEnableConnector : public QObject, protected Core::ConnectionHandler
+class QtEnableConnector : public QtConnectorBase
 {
   Q_OBJECT
 public:

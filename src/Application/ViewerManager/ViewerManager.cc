@@ -35,7 +35,7 @@
 #include <Application/Viewer/Viewer.h> 
 #include <Application/ViewerManager/ViewerManager.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
-#include <Application/Session/Session.h>
+#include <Application/Project/Project.h>
 
 // Core includes
 #include <Core/Utils/StringUtil.h>
@@ -279,7 +279,7 @@ void ViewerManagerPrivate::change_layout( std::string layout )
     return;
   }
   
-  if( layout == ViewerManager::SINGLE_C )
+  if( layout == ViewerManager::VIEW_SINGLE_C )
   {
     this->viewers_[ 0 ]->viewer_visible_state_->set( true );
     this->viewers_[ 1 ]->viewer_visible_state_->set( false );
@@ -288,7 +288,7 @@ void ViewerManagerPrivate::change_layout( std::string layout )
     this->viewers_[ 4 ]->viewer_visible_state_->set( false );
     this->viewers_[ 5 ]->viewer_visible_state_->set( false );
   }
-  else if( layout == ViewerManager::_1AND1_C )
+  else if( layout == ViewerManager::VIEW_1AND1_C )
   {
     this->viewers_[ 0 ]->viewer_visible_state_->set( true );
     this->viewers_[ 1 ]->viewer_visible_state_->set( false );
@@ -297,7 +297,7 @@ void ViewerManagerPrivate::change_layout( std::string layout )
     this->viewers_[ 4 ]->viewer_visible_state_->set( false );
     this->viewers_[ 5 ]->viewer_visible_state_->set( false );
   }
-  else if( layout == ViewerManager::_1AND2_C )
+  else if( layout == ViewerManager::VIEW_1AND2_C )
   {
     this->viewers_[ 0 ]->viewer_visible_state_->set( true );
     this->viewers_[ 1 ]->viewer_visible_state_->set( false );
@@ -306,7 +306,7 @@ void ViewerManagerPrivate::change_layout( std::string layout )
     this->viewers_[ 4 ]->viewer_visible_state_->set( true );
     this->viewers_[ 5 ]->viewer_visible_state_->set( false );
   }
-  else if( layout == ViewerManager::_1AND3_C )
+  else if( layout == ViewerManager::VIEW_1AND3_C )
   {
     this->viewers_[ 0 ]->viewer_visible_state_->set( true );
     this->viewers_[ 1 ]->viewer_visible_state_->set( false );
@@ -315,7 +315,7 @@ void ViewerManagerPrivate::change_layout( std::string layout )
     this->viewers_[ 4 ]->viewer_visible_state_->set( true );
     this->viewers_[ 5 ]->viewer_visible_state_->set( true );
   }
-  else if( layout == ViewerManager::_2AND2_C )
+  else if( layout == ViewerManager::VIEW_2AND2_C )
   {
     this->viewers_[ 0 ]->viewer_visible_state_->set( true );
     this->viewers_[ 1 ]->viewer_visible_state_->set( true );
@@ -324,7 +324,7 @@ void ViewerManagerPrivate::change_layout( std::string layout )
     this->viewers_[ 4 ]->viewer_visible_state_->set( true );
     this->viewers_[ 5 ]->viewer_visible_state_->set( false );
   }
-  else if( layout == ViewerManager::_2AND3_C )
+  else if( layout == ViewerManager::VIEW_2AND3_C )
   {
     this->viewers_[ 0 ]->viewer_visible_state_->set( true );
     this->viewers_[ 1 ]->viewer_visible_state_->set( true );
@@ -333,7 +333,7 @@ void ViewerManagerPrivate::change_layout( std::string layout )
     this->viewers_[ 4 ]->viewer_visible_state_->set( true );
     this->viewers_[ 5 ]->viewer_visible_state_->set( true );
   }
-  else if( layout == ViewerManager::_3AND3_C )
+  else if( layout == ViewerManager::VIEW_3AND3_C )
   {
     this->viewers_[ 0 ]->viewer_visible_state_->set( true );
     this->viewers_[ 1 ]->viewer_visible_state_->set( true );
@@ -474,13 +474,13 @@ void ViewerManagerPrivate::reset()
 
 CORE_SINGLETON_IMPLEMENTATION( ViewerManager );
 
-const std::string ViewerManager::SINGLE_C( "single" );
-const std::string ViewerManager::_1AND1_C( "1and1" );
-const std::string ViewerManager::_1AND2_C( "1and2" );
-const std::string ViewerManager::_1AND3_C( "1and3" );
-const std::string ViewerManager::_2AND2_C( "2and2" );
-const std::string ViewerManager::_2AND3_C( "2and3" );
-const std::string ViewerManager::_3AND3_C( "3and3" );
+const std::string ViewerManager::VIEW_SINGLE_C( "single" );
+const std::string ViewerManager::VIEW_1AND1_C( "1and1" );
+const std::string ViewerManager::VIEW_1AND2_C( "1and2" );
+const std::string ViewerManager::VIEW_1AND3_C( "1and3" );
+const std::string ViewerManager::VIEW_2AND2_C( "2and2" );
+const std::string ViewerManager::VIEW_2AND3_C( "2and3" );
+const std::string ViewerManager::VIEW_3AND3_C( "3and3" );
 
 ViewerManager::ViewerManager() :
   StateHandler( "view", false ),
@@ -516,6 +516,19 @@ ViewerManager::ViewerManager() :
   this->add_connection( LayerManager::Instance()->layers_changed_signal_.connect(
     boost::bind( &ViewerManagerPrivate::update_volume_rendering_targets, this->private_ ) ) );
   this->add_connection( this->volume_rendering_target_state_->state_changed_signal_.connect(
+    boost::bind( &ViewerManagerPrivate::update_volume_rendering, this->private_ ) ) );
+
+  this->add_state( "volume_renderer", this->volume_renderer_state_, 
+    "simple", "simple=Simple|ao=Ambient Occlusion" );
+  this->add_connection( this->volume_renderer_state_->state_changed_signal_.connect(
+    boost::bind( &ViewerManagerPrivate::update_volume_rendering, this->private_ ) ) );
+
+  this->add_state( "occlusion_angle", this->vr_occlusion_angle_state_, 50.0, 0.0, 80.0, 1.0 );
+  this->add_connection( this->vr_occlusion_angle_state_->state_changed_signal_.connect(
+    boost::bind( &ViewerManagerPrivate::update_volume_rendering, this->private_ ) ) );
+
+  this->add_state( "sample_grid_resolution", this->vr_occlusion_grid_resolution_state_, 2, 1, 10, 1 );
+  this->add_connection( this->vr_occlusion_grid_resolution_state_->state_changed_signal_.connect(
     boost::bind( &ViewerManagerPrivate::update_volume_rendering, this->private_ ) ) );
 
   for ( size_t i = 0; i < 6; ++i )
@@ -782,7 +795,7 @@ bool ViewerManager::post_save_states( Core::StateIO& state_io )
   {
     this->private_->viewers_[ i ]->save_states( state_io );
   }
-
+  
   this->private_->transfer_function_->save_states( state_io );
   
   return true;

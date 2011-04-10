@@ -29,15 +29,20 @@
 #ifndef APPLICATION_FILTERS_ACTIONS_ACTIONCONFIDENCECONNECTEDFILTER_H
 #define APPLICATION_FILTERS_ACTIONS_ACTIONCONFIDENCECONNECTEDFILTER_H
 
+// Core includes
 #include <Core/Action/Actions.h>
 #include <Core/Geometry/Point.h>
 #include <Core/Interface/Interface.h>
+
+// Application includes
 #include <Application/Layer/Layer.h>
+#include <Application/LayerManager/LayerAction.h>
+
 
 namespace Seg3D
 {
 
-class ActionConfidenceConnectedFilter : public Core::Action
+class ActionConfidenceConnectedFilter : public LayerAction
 {
 
 CORE_ACTION( 
@@ -54,17 +59,10 @@ CORE_ACTION(
 public:
   ActionConfidenceConnectedFilter()
   {
-    // Action arguments
-    this->add_argument( this->target_layer_ );
-    this->add_argument( this->seeds_ );
-    
-    // Action options
-    this->add_key( this->iterations_ );
-    this->add_key( this->multiplier_ );
-  }
-  
-  virtual ~ActionConfidenceConnectedFilter()
-  {
+    this->add_layer_id( this->target_layer_ );
+    this->add_parameter( this->seeds_ );
+    this->add_parameter( this->iterations_ );
+    this->add_parameter( this->multiplier_ );
   }
   
   // -- Functions that describe action --
@@ -75,11 +73,11 @@ public:
   // -- Action parameters --
 private:
 
-  Core::ActionParameter< std::string > target_layer_;
-  Core::ActionParameter< std::vector< Core::Point > > seeds_;
+  std::string target_layer_;
+  std::vector< Core::Point > seeds_;
   
-  Core::ActionParameter< unsigned int > iterations_;
-  Core::ActionParameter< double > multiplier_;
+  unsigned int iterations_;
+  double multiplier_;
   
   // -- Dispatch this action from the interface --
 public:

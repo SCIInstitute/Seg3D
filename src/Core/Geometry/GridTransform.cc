@@ -168,7 +168,7 @@ void GridTransform::AlignToCanonicalCoordinates( const GridTransform& src_transf
       }     
     }
   }
-
+  
   for ( int i = 0; i < 3; i++ )
   {
     if ( permutation[ i ] < 0 )

@@ -29,14 +29,18 @@
 #ifndef APPLICATION_FILTERS_ACTIONS_ACTIONXORFILTER_H
 #define APPLICATION_FILTERS_ACTIONS_ACTIONXORFILTER_H
 
+// Core includes
 #include <Core/Action/Actions.h>
 #include <Core/Interface/Interface.h>
+
+// Application includes
 #include <Application/Layer/Layer.h>
+#include <Application/LayerManager/LayerAction.h>
 
 namespace Seg3D
 {
 
-class ActionXorFilter : public Core::Action
+class ActionXorFilter : public LayerAction
 {
 
 CORE_ACTION( 
@@ -52,18 +56,11 @@ CORE_ACTION(
 public:
   ActionXorFilter()
   {
-    // Action arguments
-    this->add_argument( this->target_layer_ );
-    this->add_argument( this->mask_layer_ );
+    this->add_layer_id( this->target_layer_ );
+    this->add_layer_id( this->mask_layer_ );
+    this->add_parameter( this->replace_ );    
+  }
 
-    // Action options
-    this->add_key( this->replace_ );    
-  }
-  
-  virtual ~ActionXorFilter()
-  {
-  }
-  
   // -- Functions that describe action --
 public:
   virtual bool validate( Core::ActionContextHandle& context );
@@ -72,13 +69,12 @@ public:
   // -- Action parameters --
 private:
 
-  Core::ActionParameter< std::string > target_layer_;
-  Core::ActionParameter< std::string > mask_layer_;
-  Core::ActionParameter< bool > replace_;
+  std::string target_layer_;
+  std::string mask_layer_;
+  bool replace_;
   
   // -- Dispatch this action from the interface --
 public:
-
   // DISPATCH:
   // Create and dispatch action that inserts the new layer 
   static void Dispatch( Core::ActionContextHandle context, 

@@ -52,12 +52,8 @@ CORE_ACTION_ARGUMENT( "value", "The new value of the state variable." )
 public:
   ActionSet()
   {
-    add_argument( stateid_ );
-    add_argument( state_value_ );
-  }
-
-  virtual ~ActionSet()
-  {
+    this->add_parameter( this->stateid_ );
+    this->add_parameter( this->state_value_ );
   }
 
   // -- Functions that describe action --
@@ -70,10 +66,10 @@ public:
   // -- Action parameters --
 private:
   // This one describes where the state is located
-  ActionParameter< std::string > stateid_;
+  std::string stateid_;
 
   // This one describes the value of the state variable
-  ActionParameterVariant state_value_;
+  Variant state_value_;
 
   // -- Action optimization --
 private:
@@ -84,33 +80,24 @@ private:
   // -- Dispatch this action from the interface --
 public:
 
-  // CREATE:
-  // Create the action but do not dispatch it yet
-  template< class HANDLE, class T >
-  static ActionHandle Create( HANDLE& state, const T& statevalue )
-  {
-    // Create new action
-    ActionSet* action = new ActionSet;
-
-    // Set action parameters
-    action->stateid_.value() = state->get_stateid();
-    action->state_value_.set_value( statevalue );
-
-    // Add optimization
-    action->state_weak_handle_ = state;
-
-    // return the new action
-    return ActionHandle( action );
-  }
-
   // DISPATCH:
   // Dispatch the action from the interface
   template< class STATE >
   static void DispatchState( ActionContextHandle context, typename STATE::handle_type& state, 
     const typename STATE::value_type& statevalue )
   {
+    // Create new action
+    ActionSet* action = new ActionSet;
+
+    // Set action parameters
+    action->stateid_ = state->get_stateid();
+    action->state_value_.set( statevalue );
+
+    // Add optimization
+    action->state_weak_handle_ = state;
+
     // Post the new action
-    ActionDispatcher::PostAction( Create( state, statevalue ), context );
+    ActionDispatcher::PostAction( ActionHandle( action ), context );
   }
   
   // DISPATCH:
@@ -118,8 +105,17 @@ public:
   template< class HANDLE, class T >
   static void Dispatch( ActionContextHandle context, HANDLE& state, const T& statevalue )
   {
+    // Create new action
+    ActionSet* action = new ActionSet;
+
+    // Set action parameters
+    action->stateid_ = state->get_stateid();
+    action->state_value_.set( statevalue );
+
+    // Add optimization
+    action->state_weak_handle_ = state;
     // Post the new action
-    ActionDispatcher::PostAction( Create( state, statevalue ), context );
+    ActionDispatcher::PostAction( ActionHandle( action ), context );
   }
 
 };

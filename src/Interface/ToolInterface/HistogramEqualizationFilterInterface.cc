@@ -104,6 +104,11 @@ bool HistogramEqualizationFilterInterface::build_widget( QFrame* frame )
     tool->use_active_layer_state_, true );
   QtUtils::QtBridge::Connect( this->private_->ui_.runFilterButton, boost::bind(
     &Tool::execute, tool, Core::Interface::GetWidgetActionContext() ) );
+  
+  this->private_->ui_.amount_->set_description( "Equalization" );
+  this->private_->ui_.bins_->set_description( "Histogram Bins" );
+  this->private_->ui_.ignore_bins_->set_description( "Bins to Ignore" );
+  
       
   return true;
 } // end build_widget

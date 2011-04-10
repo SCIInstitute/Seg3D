@@ -88,7 +88,7 @@ ExportInfoPage::ExportInfoPage( QWidget *parent )
 
   this->project_name_lineedit_ = new QLineEdit();
   this->project_name_lineedit_->setText(  QString::fromStdString( ProjectManager::Instance()->
-    current_project_->project_name_state_->get() ) );
+    get_current_project()->project_name_state_->get() ) );
 
     this->project_path_label_ = new QLabel( "Project Path:" );
     this->project_path_lineedit_ = new QLineEdit;
@@ -117,11 +117,9 @@ ExportInfoPage::ExportInfoPage( QWidget *parent )
   
 void ExportInfoPage::initializePage()
 {
-  QString export_path = QString::fromStdString( 
-    PreferencesManager::Instance()->export_path_state_->get() );
-
-  this->project_path_lineedit_->setText( export_path );
-  registerField( "projectPath", this->project_path_lineedit_ );
+  this->project_path_lineedit_->setText( 
+    QString::fromStdString( ProjectManager::Instance()->get_current_project_folder().string() ) );
+  this->registerField( "projectPath", this->project_path_lineedit_ );
 }
   
 void ExportInfoPage::set_path()
@@ -145,11 +143,12 @@ void ExportInfoPage::set_path()
 
 bool ExportInfoPage::validatePage()
 {
-  boost::filesystem::path new_path = 
+  boost::filesystem::path project_path = 
     boost::filesystem::path( this->project_path_lineedit_->text().toStdString() ) / 
-    boost::filesystem::path( this->project_name_lineedit_->text().toStdString() );
+    boost::filesystem::path( this->project_name_lineedit_->text().toStdString() + 
+      Project::GetDefaultProjectPathExtension() );
 
-  if( boost::filesystem::exists( new_path ) )
+  if( boost::filesystem::exists( project_path ) )
   {
     QMessageBox::critical( this, 
       "A project with this name already exists!",
@@ -161,7 +160,7 @@ bool ExportInfoPage::validatePage()
     return false;
   }
 
-  if( !boost::filesystem::exists( new_path.parent_path() ) )
+  if( !boost::filesystem::exists( project_path.parent_path() ) )
   {
     this->warning_message_->setText( QString::fromUtf8( 
       "This location does not exist, please chose a valid location." ) );
@@ -171,7 +170,7 @@ bool ExportInfoPage::validatePage()
   
   try // to create a project sessions folder
   {
-    boost::filesystem::create_directory( new_path );
+    boost::filesystem::create_directory( project_path );
   }
   catch ( ... ) // any errors that we might get thrown would indicate that we cant write here
   {
@@ -182,14 +181,10 @@ bool ExportInfoPage::validatePage()
   }
 
   // if we have made it to here we have created a new directory lets remove it.
-  boost::filesystem::remove( new_path );
+  boost::filesystem::remove( project_path );
   
   this->warning_message_->hide();
-  
-  Core::ActionSet::Dispatch(  Core::Interface::GetWidgetActionContext(), 
-    PreferencesManager::Instance()->export_path_state_, new_path.parent_path().string() );
-  
-  return true;
+    return true;
 }
 
 ExportSummaryPage::ExportSummaryPage( QWidget *parent )

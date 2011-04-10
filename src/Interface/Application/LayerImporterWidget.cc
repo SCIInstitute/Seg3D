@@ -58,8 +58,7 @@ namespace Seg3D
 class LayerImporterWidgetPrivate
 {
 public:
-  LayerImporterWidgetPrivate() : 
-    mode_( LayerImporterMode::INVALID_E )
+  LayerImporterWidgetPrivate()
   {
   }
   
@@ -69,306 +68,61 @@ public:
   QtUtils::QtDoubleClickPushButton *mask_single_button_;
   QtUtils::QtDoubleClickPushButton *mask_1234_button_;
   QtUtils::QtDoubleClickPushButton *mask_1248_button_;
-  QButtonGroup *type_button_group_;
 
+  QButtonGroup *type_button_group_;
   QButtonGroup *itk_import_type_button_group_;
 
-  // The importer(s) that were chosen in the filedialog
+  // The importers that were provided for this data
   std::vector< LayerImporterHandle > importers_;
-  std::vector< std::string > files_;
-  std::string importer_name_;
-  bool series_;
-
+  
+  // File information for the first file
+  LayerImporterFileInfoHandle info_;
+  
   // The current active mode
-  LayerImporterMode mode_;
+  std::string mode_;
 };
 
+
 LayerImporterWidget::LayerImporterWidget( std::vector< LayerImporterHandle > importers, 
-  std::vector< std::string > files, QWidget *parent, bool from_series /* = false */ ) :
+  QWidget *parent ) :
   QDialog( parent ),
   private_( new LayerImporterWidgetPrivate )
 {
+  // Copy importers to private class
+  this->private_->importers_ = importers;
+  // Set data as default importer
+  this->private_->mode_ = "data";
+
   this->setup_ui();
 
-  this->private_->importers_ = importers;
-  this->private_->files_ = files;
-  this->private_->importer_name_ = this->private_->importers_[ 0 ]->name();
-
-  boost::filesystem::path full_filename( this->private_->importers_[ 0 ]->get_filename() );
-  this->private_->ui_.file_name_label_->setText( QString::fromUtf8( "Scanning: " ) +
-    QString::fromStdString( full_filename.leaf() ) );
-
-  boost::thread( boost::bind( &LayerImporterWidget::ScanFile, 
-    qpointer_type( this ), this->private_->importers_[ 0 ] ) );
+  // Tell the user which file we are scanning and start the actual scanning process.
+  // The first file is scanned to use as a template for importing the others.
+  // The scan is run on a separate thread, as loading can take a while and some
+  // importers need to scan the full file to read header information.
+  if ( this->private_->importers_.size() )
+  {
+    this->private_->ui_.file_name_label_->setText( QString::fromUtf8( "Scanning: " ) +
+      QString::fromStdString( this->private_->importers_[ 0 ]->get_file_tag() ) );
+    boost::thread( boost::bind( &LayerImporterWidget::ScanFirstFile, qpointer_type( this ) ) );
+  }
   
-  this->private_->ui_.horizontalLayout_20->setAlignment( Qt::AlignCenter );
+  this->private_->ui_.swap_x_y_spacing_widget_layout_->setAlignment( Qt::AlignCenter );
   this->private_->ui_.swap_x_y_spacing_widget_->hide();
+  this->private_->ui_.series_warning_widget_->hide();
 
-  this->private_->ui_.series_warning_widget_->setVisible( ( from_series && ( files.size() == 1 ) ) );
-  
+  // We warn the user if only one file was selected and it is a series importer. Most likely
+  // the scanning of similar files failed.
+  if( importers.size() > 0 && importers[ 0 ]->get_type() == LayerImporterType::FILE_SERIES_E )
+  {
+    if ( importers[ 0 ]->get_filenames().size() < 2 )
+    {
+      this->private_->ui_.series_warning_widget_->setVisible( true );
+    }
+  } 
 }
-
 
 LayerImporterWidget::~LayerImporterWidget()
 {
-}
-
-void LayerImporterWidget::list_import_options()
-{
-  this->setUpdatesEnabled( false );
-
-  // We are done scanning, so we hide the scanning widget
-  this->private_->ui_.scanning_file_->hide();
-
-  // Step (1): Switch off options that this importer does not support
-  int importer_modes = this->private_->importers_[ 0 ]->get_importer_modes();
-
-  if( importer_modes & LayerImporterMode::LABEL_MASK_E )
-  {
-    this->private_->ui_.label_mask_->show();
-    this->private_->mask_1234_button_->setMinimumSize( this->private_->ui_.bitplane_mask_->size() );
-    this->private_->mask_1234_button_->setChecked( true );
-    this->private_->mode_ = LayerImporterMode::LABEL_MASK_E;
-  }
-  else
-  {
-    this->private_->ui_.label_mask_->hide();
-  }
-
-  if( importer_modes & LayerImporterMode::BITPLANE_MASK_E )
-  {
-    this->private_->ui_.bitplane_mask_->show();
-    this->private_->mask_1248_button_->setMinimumSize( this->private_->ui_.label_mask_->size());
-    this->private_->mask_1248_button_->setChecked( true );
-    this->private_->mode_ = LayerImporterMode::BITPLANE_MASK_E;
-  }
-  else
-  {
-    this->private_->ui_.bitplane_mask_->hide();
-  }
-
-  if( importer_modes & LayerImporterMode::SINGLE_MASK_E )
-  {
-    this->private_->ui_.single_mask_->show();
-    this->private_->mask_single_button_->setMinimumSize( this->private_->ui_.single_mask_->size() );
-    this->private_->mask_single_button_->setChecked( true );
-    this->private_->mode_ = LayerImporterMode::SINGLE_MASK_E;
-  }
-  else
-  {
-    this->private_->ui_.single_mask_->hide();
-    
-  }
-
-  if( importer_modes &  LayerImporterMode::DATA_E )
-  {
-    this->private_->ui_.data_->show();
-    this->private_->data_volume_button_->setMinimumSize( this->private_->ui_.data_->size() );
-    this->private_->data_volume_button_->setChecked( true );
-    this->private_->mode_ = LayerImporterMode::DATA_E;
-    std::string extension = boost::filesystem::path( this->private_->files_[ 0 ] ).extension();
-    if( ( extension == ".dcm" ) || ( extension == "" ) )
-    {
-      this->private_->ui_.swap_x_y_spacing_widget_->show();
-    }
-  }
-  else
-  {
-    this->private_->ui_.data_->hide();
-  }
-
-  this->private_->ui_.file_name_table_->show();
-
-  //Step (3): Add information from importer to the table
-  for( int i = 0; i < static_cast< int >( this->private_->files_.size() ); ++i )
-  {
-    QTableWidgetItem *new_item;
-    new_item = new QTableWidgetItem( QString::fromStdString( 
-      boost::filesystem::path( this->private_->files_[ i ] ).filename() ) );
-    this->private_->ui_.file_name_table_->insertRow( i );
-    this->private_->ui_.file_name_table_->setItem( i, 0, new_item );
-
-  }
-
-  this->private_->ui_.file_name_table_->verticalHeader()->resizeSection( 0, 24 );
-
-  // Step (4): connect the buttons
-  connect( this->private_->type_button_group_, SIGNAL( buttonClicked( int ) ), 
-    this, SLOT( set_type( int ) ) );
-
-  connect( this->private_->ui_.import_button_, SIGNAL( clicked() ),
-    this, SLOT( import() ) );
-    
-  this->private_->data_volume_button_->set_double_click_function( 
-    boost::bind( &LayerImporterWidget::import, this ) );
-  this->private_->mask_single_button_->set_double_click_function( 
-    boost::bind( &LayerImporterWidget::import, this ) );
-  this->private_->mask_1234_button_->set_double_click_function( 
-    boost::bind( &LayerImporterWidget::import, this ) );
-  this->private_->mask_1248_button_->set_double_click_function( 
-    boost::bind( &LayerImporterWidget::import, this ) );
-
-
-  // Step (5): Swap out visuals to allow the user to select the right option
-  this->resize( 10, 10 );
-  this->private_->ui_.importer_options_->show();
-  
-  // Step (6): Make the import button the default option
-  this->private_->ui_.import_button_->setEnabled( true );
-  this->private_->ui_.cancel_button_->setDefault( false );
-  this->private_->ui_.cancel_button_->setAutoDefault( false );
-  this->private_->ui_.import_button_->setDefault( true );
-  this->private_->ui_.import_button_->setAutoDefault( true );
-  
-  this->adjustSize();
-  this->center_widget_on_screen( this );
-  this->setUpdatesEnabled( true );
-  this->update();
-}
-
-  
-void LayerImporterWidget::center_widget_on_screen( QWidget *widget ) 
-{
-  QRect rect = QApplication::desktop()->availableGeometry();
-  
-  widget->move( rect.center() - widget->rect().center() );
-}
-  
-
-void LayerImporterWidget::set_type( int file_type )
-{
-  switch( file_type )
-  {
-  case 0:
-    set_mode( LayerImporterMode::DATA_E );
-    break;
-
-  case 1:
-    set_mode( LayerImporterMode::SINGLE_MASK_E );
-    break;
-
-  case 2:
-    set_mode( LayerImporterMode::BITPLANE_MASK_E ); 
-    break;
-
-  case 3:
-    set_mode( LayerImporterMode::LABEL_MASK_E );
-    break;
-  default:
-    break;
-  }
-}
-
-void LayerImporterWidget::set_mode( LayerImporterMode mode )
-{
-  this->private_->mode_ = mode;
-}
-
-void LayerImporterWidget::import()
-{
-  this->setUpdatesEnabled( false );
-  this->private_->ui_.scanning_file_->show();
-  this->private_->ui_.importer_options_->hide();
-  this->private_->ui_.file_name_table_->hide();
-  this->private_->ui_.swap_x_y_spacing_widget_->hide();
-  this->setMaximumHeight( 80 );
-  this->setUpdatesEnabled( true );
-  
-  this->repaint();
-
-  this->private_->ui_.import_button_->setEnabled( false );
-
-  this->center_widget_on_screen( this );
-
-  this->repaint();
-
-  // if it is a series, we use the series importer and then exit  
-  for( size_t i = 0; i < this->private_->importers_.size(); ++i )
-  {
-    if( i > 0 )
-    {
-      boost::filesystem::path full_filename( this->private_->importers_[ i ]->get_filename() );
-      this->private_->ui_.file_name_label_->setText( QString::fromUtf8( "Scanning: " ) +
-        QString::fromStdString( full_filename.leaf() ) );
-      this->repaint();
-      this->private_->importers_[ i ]->import_header();
-    }
-    
-    this->private_->importers_[ i ]->set_swap_xy_spacing( 
-      this->private_->ui_.swap_spacing_checkbox_->isChecked() );
-    
-    if( this->private_->series_ )
-    {
-      ActionImportSeries::Dispatch( Core::Interface::GetWidgetActionContext(), 
-        this->private_->importers_[ i ], this->private_->mode_ );
-    }
-    else
-    {
-      ActionImportLayer::Dispatch( Core::Interface::GetWidgetActionContext(), 
-        this->private_->importers_[ i ], this->private_->mode_ );
-    } 
-  }
-  accept();
-}
-
-void LayerImporterWidget::ScanFile( qpointer_type qpointer, LayerImporterHandle importer )
-{
-  // Step (1) : Import the file header or in some cases the full file
-  bool success = importer->import_header();
-    
-  // Step (2) : Update the widget if it still exists
-  if( success && ( importer->get_importer_modes() != 0 ) )
-  {
-    if( ( qpointer->private_->files_.size() > 1 ) &&
-      ( importer->set_file_list( qpointer->private_->files_ ) ) )
-    {
-      qpointer->private_->series_ = true;
-    }
-    else
-    {
-      qpointer->private_->series_ = false;
-    }
-      
-    importer->set_file_list( qpointer->private_->files_ );
-
-    Core::Interface::Instance()->post_event( boost::bind( 
-      &LayerImporterWidget::ListImportOptions, qpointer, importer ) ); 
-  }
-  else
-  {
-    Core::Interface::Instance()->post_event( boost::bind( 
-      &LayerImporterWidget::ReportImportError, qpointer, importer ) );
-  }
-}
-
-void LayerImporterWidget::ListImportOptions( qpointer_type qpointer, LayerImporterHandle importer )
-{
-  if( qpointer.data() ) 
-  {
-    qpointer->list_import_options();
-  }
-}
-
-void LayerImporterWidget::ReportImportError( qpointer_type qpointer, LayerImporterHandle importer )
-{
-  if( qpointer.data() )
-  {
-    QWidget* parent = dynamic_cast<QWidget*>( qpointer->parent() );
-    qpointer->reject();
-  
-    std::string error_message = std::string("ERROR: Could not read file '") + 
-      importer->get_filename() + std::string("'.");
-    std::string detailed_message = importer->get_error(); 
-      
-    QMessageBox message_box( parent );
-    message_box.setWindowTitle( "Import Layer..." );
-    message_box.addButton( QMessageBox::Ok );
-    message_box.setIcon( QMessageBox::Critical );
-    message_box.setText( QString::fromStdString( error_message ) );
-    message_box.setDetailedText( QString::fromStdString ( detailed_message ) );
-    message_box.exec();
-    return; 
-  }
 }
 
 void LayerImporterWidget::setup_ui()
@@ -413,7 +167,6 @@ void LayerImporterWidget::setup_ui()
   this->private_->ui_.scanning_file_->hide();
 
   this->resize( 10, 10 );
-
   this->private_->ui_.import_button_->setEnabled( false );
 
   // Step (5): Activate the cancel button
@@ -422,7 +175,233 @@ void LayerImporterWidget::setup_ui()
 
   // Step (6): Show Scanning Widget then Asynchronously scan file, so UI stays interactive
   this->private_->ui_.scanning_file_->show();
+}
+  
+void LayerImporterWidget::set_type( int file_type )
+{
+  switch( file_type )
+  {
+  case 0:
+    this->private_->mode_ = "data";
+    break;
 
+  case 1:
+    this->private_->mode_ = "single_mask";
+    break;
+
+  case 2:
+    this->private_->mode_ = "bitplane_mask";
+    break;
+
+  case 3:
+    this->private_->mode_ = "label_mask";
+    break;
+  default:
+    break;
+  }
+}
+
+void LayerImporterWidget::import()
+{
+  // Run through the importers and send an action to the application thread
+  for( size_t i = 0; i < this->private_->importers_.size(); ++i )
+  {   
+    this->private_->importers_[ i ]->set_dicom_swap_xyspacing_hint( 
+      this->private_->ui_.swap_spacing_checkbox_->isChecked() );
+    
+    // File series have a different action hence dispatch that one here
+    if( this->private_->importers_[ i ]->get_type() == LayerImporterType::FILE_SERIES_E )
+    {
+      ActionImportSeries::Dispatch( Core::Interface::GetWidgetActionContext(), 
+        this->private_->importers_[ i ], this->private_->mode_ );
+    }
+    else
+    {
+      // Single file importer path.
+      ActionImportLayer::Dispatch( Core::Interface::GetWidgetActionContext(), 
+        this->private_->importers_[ i ], this->private_->mode_ );
+    } 
+  }
+  accept();
+}
+
+void LayerImporterWidget::list_import_options()
+{
+  // Security check: this one should have been set, if not just fail.
+  if ( ! this->private_->info_ ) return;
+
+  // Do not update immediately, but consolidate changes.
+  this->setUpdatesEnabled( false );
+
+  // We are done scanning, so we hide the scanning widget.
+  this->private_->ui_.scanning_file_->hide();
+
+  // Show the data importer option
+  this->private_->ui_.data_->show();
+  this->private_->data_volume_button_->setMinimumSize( this->private_->ui_.data_->size() );
+  this->private_->data_volume_button_->setChecked( this->private_->mode_ == "data" );
+    
+  if ( this->private_->info_->get_mask_compatible() )
+  {
+    // Show the mask options.
+    this->private_->ui_.label_mask_->show();
+    this->private_->ui_.bitplane_mask_->show();
+    this->private_->ui_.single_mask_->show();
+
+    // Ensure that the widgets have the right size
+    this->private_->mask_1234_button_->setMinimumSize( this->private_->ui_.bitplane_mask_->size() );
+    this->private_->mask_1234_button_->setChecked( this->private_->mode_ == "label_mask" );
+    
+    this->private_->mask_1248_button_->setMinimumSize( this->private_->ui_.label_mask_->size());
+    this->private_->mask_1248_button_->setChecked( this->private_->mode_ == "bitplane_mask" );
+
+    this->private_->mask_single_button_->setMinimumSize( this->private_->ui_.single_mask_->size() );
+    this->private_->mask_single_button_->setChecked( this->private_->mode_ == "single_mask" );
+  }
+  else
+  {
+    // Otherwise hide the mask buttons
+    this->private_->ui_.label_mask_->hide();
+    this->private_->ui_.bitplane_mask_->hide();
+    this->private_->ui_.single_mask_->hide();
+  }
+
+  if ( this->private_->info_->get_file_type() == "dicom" )
+  {
+    this->private_->ui_.swap_x_y_spacing_widget_->show();
+  }
+
+  this->private_->ui_.file_name_table_->show();
+
+  //Step (3): Add information from importer to the table
+  int row = 0;
+  for ( size_t j = 0; j < this->private_->importers_.size(); j++ )
+  {
+    std::vector<std::string> filenames = this->private_->importers_[ j ]->get_filenames();
+  
+    for( size_t i = 0; i < filenames.size(); i++, row++ )
+    {
+      boost::filesystem::path path( filenames[ i ] );
+      QTableWidgetItem *new_item = new QTableWidgetItem( QString::fromStdString( 
+          path.filename().string() ) );
+      this->private_->ui_.file_name_table_->insertRow( row );
+      this->private_->ui_.file_name_table_->setItem( row, 0, new_item );
+    }
+  }
+
+  this->private_->ui_.file_name_table_->verticalHeader()->resizeSection( 0, 24 );
+
+  // Step (4): connect the buttons
+  connect( this->private_->type_button_group_, SIGNAL( buttonClicked( int ) ), 
+    this, SLOT( set_type( int ) ) );
+
+  connect( this->private_->ui_.import_button_, SIGNAL( clicked() ),
+    this, SLOT( import() ) );
+    
+  this->private_->data_volume_button_->set_double_click_function( 
+    boost::bind( &LayerImporterWidget::import, this ) );
+  this->private_->mask_single_button_->set_double_click_function( 
+    boost::bind( &LayerImporterWidget::import, this ) );
+  this->private_->mask_1234_button_->set_double_click_function( 
+    boost::bind( &LayerImporterWidget::import, this ) );
+  this->private_->mask_1248_button_->set_double_click_function( 
+    boost::bind( &LayerImporterWidget::import, this ) );
+
+
+  // Step (5): Swap out visuals to allow the user to select the right option
+  this->resize( 10, 10 );
+  this->private_->ui_.importer_options_->show();
+  
+  // Step (6): Make the import button the default option
+  this->private_->ui_.import_button_->setEnabled( true );
+  this->private_->ui_.import_button_->setDefault( true );
+  this->private_->ui_.import_button_->setAutoDefault( true );
+  this->private_->ui_.cancel_button_->setDefault( false );
+  this->private_->ui_.cancel_button_->setAutoDefault( false );
+  
+  this->adjustSize();
+  // Center on screen
+  this->move( QApplication::desktop()->availableGeometry().center() - this->rect().center() );
+  this->setUpdatesEnabled( true );
+  this->update();
+}
+
+
+void LayerImporterWidget::scan_first_file()
+{
+  // We should not get into this loop, but just in case we did not get any importers
+  // just bail out and report an error.
+  if ( this->private_->importers_.size() == 0 )
+  {
+    // Post an importer error.
+    LayerImporterHandle empty_handle;
+    Core::Interface::Instance()->post_event( boost::bind( 
+      &LayerImporterWidget::ReportImportError, qpointer_type( this ), empty_handle ) );
+    return; 
+  }
+  
+  // Get the first importer
+  LayerImporterHandle importer = this->private_->importers_[ 0 ];
+  if ( ! importer->get_file_info( this->private_->info_ ) )
+  {
+    // Post an importer error, since we cannot read the first file
+    Core::Interface::Instance()->post_event( boost::bind( 
+      &LayerImporterWidget::ReportImportError, qpointer_type( this ), importer ) );
+    return;
+  }
+  else
+  {
+    // We scanned the first file, hence the widget can now query the information needed
+    // to show the next menu.
+    Core::Interface::Instance()->post_event( boost::bind( 
+      &LayerImporterWidget::ListImportOptions, qpointer_type( this ), importer ) );
+    return;
+  } 
+}
+
+
+void LayerImporterWidget::ScanFirstFile( qpointer_type qpointer )
+{
+  if( qpointer.data() ) 
+  {
+    qpointer->scan_first_file();
+  }
+}
+
+void LayerImporterWidget::ListImportOptions( qpointer_type qpointer, LayerImporterHandle importer )
+{
+  if( qpointer.data() ) 
+  {
+    qpointer->list_import_options();
+  }
+}
+
+void LayerImporterWidget::ReportImportError( qpointer_type qpointer, LayerImporterHandle importer )
+{
+  if( qpointer.data() )
+  {
+    QWidget* parent = dynamic_cast<QWidget*>( qpointer->parent() );
+    qpointer->reject();
+  
+    std::string error_message = "Could not create file";
+    std::string detailed_message = "Could not create suitable importer fo file.";
+    
+    if ( importer )
+    {
+      error_message = std::string( "ERROR: Could not read file '" ) + 
+        importer->get_filename() + std::string( "'." );
+      detailed_message = importer->get_error(); 
+    }
+    
+    QMessageBox message_box( parent );
+    message_box.setWindowTitle( "Import Layer..." );
+    message_box.addButton( QMessageBox::Ok );
+    message_box.setIcon( QMessageBox::Critical );
+    message_box.setText( QString::fromStdString( error_message ) );
+    message_box.setDetailedText( QString::fromStdString ( detailed_message ) );
+    message_box.exec();
+    return; 
+  }
 }
 
 }  // end namespace Seg3D

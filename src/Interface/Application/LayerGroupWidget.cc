@@ -162,6 +162,8 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   
   this->private_->ui_.group_dummy_->hide();
   
+  this->private_->ui_.group_background_->setStyleSheet( StyleSheet::GROUP_WIDGET_BACKGROUND_ACTIVE_C );
+
   this->private_->group_height = this->private_->ui_.tools_and_layers_widget_->height();
 }
 
@@ -235,7 +237,8 @@ void LayerGroupWidget::dropEvent( QDropEvent* event )
   event->setAccepted( true );
   
   std::string drop_item_id = event->mimeData()->text().toStdString();
-  if( ( this->get_group_id() != drop_item_id ) && ( LayerManager::Instance()->get_layer_group( drop_item_id ) ) ) 
+  if( ( this->get_group_id() != drop_item_id ) && (
+    LayerManager::Instance()->get_group_by_id( drop_item_id ) ) ) 
   {
     dynamic_cast< LayerGroupWidget* >( event->source() )->set_drop_target( this ); 
     event->setDropAction( Qt::MoveAction );
@@ -249,7 +252,8 @@ void LayerGroupWidget::dragEnterEvent( QDragEnterEvent* event)
 {
   std::string drop_item_id = event->mimeData()->text().toStdString();
 
-  if( ( this->get_group_id() != drop_item_id ) && ( LayerManager::Instance()->get_layer_group( drop_item_id ) ) ) 
+  if( ( this->get_group_id() != drop_item_id ) && ( 
+    LayerManager::Instance()->get_group_by_id( drop_item_id ) ) ) 
   {
     this->enable_drop_space( true );
   }
@@ -346,7 +350,9 @@ void LayerGroupWidget::get_selected_layer_ids( std::vector< std::string >& layer
   {
     if( ( *it ).second->get_selected() )
     {
-      layers.push_back( ( *it ).first );
+      std::string layer_id;
+      Core::ImportFromString( ( *it ).first, layer_id );
+      layers.push_back( layer_id );
     }
   }
 }

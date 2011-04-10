@@ -48,299 +48,76 @@
 namespace Core
 {
 
-// PARAMETER CLASSES
-// ACTIONPARAMETER<TYPE> and ACTIONPARAMETERVARIANT
-// These two classes are both used to store parameters the first one explicitly 
-// states the type and the second one does type conversion. The difference is
-// that for the first class type the compiler checks the type integrity and 
-// hence is the preferred model. However types are not always know up front
-// or the action is so general that the parameter is not of a specied class
-// for the latter case do we use the variant version.
-
-
 // ACTIONPARAMETERBASE:
 // Base class needed for uniform access to import and export the value
 // in a uniform way.
 
-class ActionParameterBase;
-typedef boost::shared_ptr< ActionParameterBase > ActionParameterBaseHandle;
-
 class ActionParameterBase
 {
-  // -- define handle --
-public:
-  typedef boost::shared_ptr< ActionParameterBase > Handle;
-
   // -- destructor --
 public:
   virtual ~ActionParameterBase();
 
   // -- functions for accessing data --
-  // EXPORT_TO_STRING
-  // export the contents of the parameter to string
-  virtual std::string export_to_string() const = 0;
-
+public:
   // IMPORT_FROM_STRING
-  // import a parameter from a string. The function returns true
+  // Import a parameter from a string. The function returns true
   // if the import succeeded
   virtual bool import_from_string( const std::string& str ) = 0;
 
+  // EXPORT_TO_STRING
+  // Export the contents of the parameter to string
+  virtual std::string export_to_string() const = 0;
+
+  // HAS_EXTENSION
+  // Has exented information in the derived class
+  virtual bool has_extension() const = 0;
 };
 
 // ACTIONPARAMETER:
 // Parameter for an action.
 
-// Forward declaration:
-template< class T > class ActionParameter;
-
 // Class definition:
 template< class T >
 class ActionParameter : public ActionParameterBase
 {
-
-  // -- define handle --
-public:
-  typedef boost::shared_ptr< ActionParameter< T > > Handle;
-
   // -- constructor/destructor --
 public:
-  ActionParameter()
+  ActionParameter( T& parameter ) :
+    parameter_( parameter )
   {
-  }
-
-  ActionParameter( const T& default_value ) :
-    value_( default_value )
-  {
-  }
-
-  virtual ~ActionParameter()
-  {
-  }
-
-  ActionParameter& operator=( const T& value )
-  {
-    value_ = value;
-    return *this;
-  }
-
-  const T& operator()()
-  {
-    return value_;
   }
 
   // -- access to value --
 public:
-  // General access to the parameter value
-  T& value()
-  {
-    return value_;
-  }
-
-  // For run when running with constness
-  const T& value() const
-  {
-    return value_;
-  }
-
-  // Get access similar to the variant version
-  bool get_value( T& value )
-  {
-    value = value_;
-    return ( true );
-  }
-
-  // Set access similar to the variant version
-  void set_value( const T& value )
-  {
-    value_ = value;
-  }
-
-  // EXPORT_TO_STRING
-  // export the contents of the parameter to string
-  virtual std::string export_to_string() const
-  {
-    return ExportToString( value_ );
-  }
 
   // IMPORT_FROM_STRING
   // import a parameter from a string. The function returns true
   // if the import succeeded
   virtual bool import_from_string( const std::string& str )
   {
-    return ImportFromString( str, value_ );
+    return ImportFromString( str, this->parameter_ );
   }
-
-private:
-  // The actual value
-  T value_;
-};
-
-// ACTIONPARAMETERVARIANT:
-// Parameter for an action.
-
-// Forward declaration:
-class ActionParameterVariant;
-
-// Class definition:
-class ActionParameterVariant : public ActionParameterBase
-{
-
-  // -- define handle --
-public:
-  typedef boost::shared_ptr< ActionParameterVariant > Handle;
-
-  // -- constructor/destructor --
-public:
-  // CONSTRUCTOR of untyped parameter
-  ActionParameterVariant();
-
-  // CONSTRUCTOR of typed version
-  template< class T >
-  ActionParameterVariant( const T& default_value )
-  {
-    typed_value_ = ActionParameterBaseHandle( new ActionParameter< T > ( default_value ) );
-  }
-
-  // DESTRUCTOR
-  virtual ~ActionParameterVariant();
-
-  // Direct assignment
-  template< class T >
-  ActionParameterVariant& operator=( const T& value )
-  {
-    this->set_value( value );
-    return *this;
-  }
-
-  // -- functions for accessing data --
-public:
-
+  
   // EXPORT_TO_STRING
   // export the contents of the parameter to string
-  virtual std::string export_to_string() const;
-
-  // IMPORT_FROM_STRING
-  // import a parameter from a string. The function returns true
-  // if the import succeeded
-  virtual bool import_from_string( const std::string& str );
-
-  // SET_VALUE
-  // Set the value using a typed version of the parameter
-  template< class T >
-  void set_value( const T& value )
+  virtual std::string export_to_string() const
   {
-    // Set the value typed
-    typed_value_ = ActionParameterBaseHandle( new ActionParameter< T > ( value ) );
-    // Clear string version
-    string_value_.clear();
+    return ExportToString( this->parameter_ );
   }
 
-  // GET_VALUE
-  // Get the value from string or typed value. If a typed one is available
-  // use that one.
-  template< class T >
-  bool get_value( T& value )
+  // HAS_EXTENSION
+  // Has exented information in the derived class
+  virtual bool has_extension() const
   {
-    // If a typed version exists
-    if ( typed_value_.get() )
-    {
-      // if the typed version exists, use that one
-      // use a dynamic cast to ensure that the type is correct
-      ActionParameter< T >* param_ptr =
-          dynamic_cast< ActionParameter< T >* > ( typed_value_.get() );
-      if ( param_ptr == 0 )
-      {
-        if ( !( ImportFromString( typed_value_->export_to_string(), value ) ) )
-        {
-          return ( false );
-        }
-
-        return ( true );
-      }
-
-      value = param_ptr->value();
-      return ( true );
-    }
-    else
-    {
-      // Generate a new typed version. So it is only converted once
-      ActionParameter< T >* param_ptr = new ActionParameter< T > ;
-      typed_value_ = ActionParameterBaseHandle( param_ptr );
-      if ( !( typed_value_->import_from_string( string_value_ ) ) )
-      {
-        return ( false );
-      }
-
-      value = param_ptr->value();
-      return ( true );
-    }
+    return false;
   }
 
-  // VALIDATE_TYPE
-  // Check and convert to a certain type, but do not return the value
-  // This function is intended for validating the action by forcing the
-  // contained value to be converted to a certain type
-  template< class T >
-  bool validate_type()
-  {
-    // If a typed version exists
-    if ( typed_value_.get() )
-    {
-      // if the typed version exists, use that one
-      // use a dynamic cast to ensure that the type is correct
-      ActionParameter< T >* param_ptr =
-          dynamic_cast< ActionParameter< T >* > ( typed_value_.get() );
-      if ( param_ptr == 0 )
-      {
-        T value;
-        if ( !( ImportFromString( typed_value_->export_to_string(), value ) ) )
-        {
-          return ( false );
-        }
-      }
-      return ( true );
-    }
-    else
-    {
-      // Generate a new typed version. So it is only converted once
-      ActionParameter< T >* param_ptr = new ActionParameter< T > ;
-      typed_value_ = ActionParameterBaseHandle( param_ptr );
-      if ( !( typed_value_->import_from_string( string_value_ ) ) )
-      {
-        return ( false );
-      }
-      return ( true );
-    }
-  }
-
-  // -- accessors --
-
-  // TYPED_VALUE:
-  // Access to the parameter variable that stores the typed variable.
-  ActionParameterBaseHandle& typed_value()
-  {
-    return typed_value_;
-  }
-
-  // STRING_VALUE:
-  // The value stored as a string. This one is only valid if there is
-  // no typed value.
-  std::string& string_value()
-  {
-    return string_value_;
-  }
-
-private:
-
-  // Typed version
-  ActionParameterBaseHandle typed_value_;
-
-  // String version
-  std::string string_value_;
-
+protected:
+  // The actual parameter (as a reference)
+  T& parameter_;
 };
 
 } // namespace Core
-
 
 #endif

@@ -29,8 +29,12 @@
 #ifndef APPLICATION_TOOLS_ACTIONS_ACTIOINFLOODFILL_H
 #define APPLICATION_TOOLS_ACTIONS_ACTIOINFLOODFILL_H
 
+// Core includes
 #include <Core/Action/Action.h>
+
+// Application includes
 #include <Application/LayerManager/LayerManager.h>
+#include <Application/LayerManager/LayerAction.h>
 
 namespace Seg3D
 {
@@ -56,7 +60,7 @@ public:
   bool erase_;
 };
 
-class ActionFloodFill : public Core::Action
+class ActionFloodFill : public LayerAction
 {
 
 CORE_ACTION
@@ -82,7 +86,6 @@ CORE_ACTION
 
 public:
   ActionFloodFill();
-  virtual ~ActionFloodFill();
 
   // VALIDATE:
   // Each action needs to be validated just before it is posted. This way we

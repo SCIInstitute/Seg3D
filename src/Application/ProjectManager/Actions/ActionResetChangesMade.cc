@@ -48,16 +48,11 @@ bool ActionResetChangesMade::run( Core::ActionContextHandle& context,
   ProjectManager::Instance()->get_current_project()->reset_project_changed();
   return true;
 }
-  
-Core::ActionHandle ActionResetChangesMade::Create()
-{
-  ActionResetChangesMade* action = new ActionResetChangesMade;
-  return Core::ActionHandle( action );
-}
 
 void ActionResetChangesMade::Dispatch( Core::ActionContextHandle context )
 {
-  Core::ActionDispatcher::PostAction( Create(), context );
+  ActionResetChangesMade* action = new ActionResetChangesMade;
+  Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }
 
 } // end namespace Seg3D

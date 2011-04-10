@@ -31,12 +31,14 @@
 
 #include <Core/Action/Actions.h>
 #include <Core/Interface/Interface.h>
+
 #include <Application/Layer/Layer.h>
+#include <Application/LayerManager/LayerAction.h>
 
 namespace Seg3D
 {
 
-class ActionCannyEdgeDetectionFilter : public Core::Action
+class ActionCannyEdgeDetectionFilter : public LayerAction
 {
 
 CORE_ACTION( 
@@ -54,15 +56,9 @@ public:
   ActionCannyEdgeDetectionFilter()
   {
     // Action arguments
-    this->add_argument( this->target_layer_ );
-    
-    // Action options
-    this->add_key( this->blurring_distance_ );
-    this->add_key( this->threshold_ );
-  }
-  
-  virtual ~ActionCannyEdgeDetectionFilter()
-  {
+    this->add_layer_id( this->target_layer_ );
+    this->add_parameter( this->blurring_distance_ );
+    this->add_parameter( this->threshold_ );
   }
   
   // -- Functions that describe action --
@@ -73,10 +69,9 @@ public:
   // -- Action parameters --
 private:
 
-  Core::ActionParameter< std::string > target_layer_;
-  
-  Core::ActionParameter< double > blurring_distance_;
-  Core::ActionParameter< double > threshold_;
+  std::string target_layer_;
+  double blurring_distance_;
+  double threshold_;
   
   // -- Dispatch this action from the interface --
 public:

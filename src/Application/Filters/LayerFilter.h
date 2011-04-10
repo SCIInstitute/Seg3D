@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
  
-#ifndef APPLICATION_FILTERS_BASEFILTER_H 
-#define APPLICATION_FILTERS_BASEFILTER_H 
+#ifndef APPLICATION_FILTERS_LAYERFILTER_H 
+#define APPLICATION_FILTERS_LAYERFILTER_H 
  
 // Boost includes
 #include <boost/smart_ptr.hpp> 
@@ -129,8 +129,16 @@ public:
   // NOTE: This function can only be run from the application thread.
   // NOTE: The BaseFilter class records which layers are locked and will schedule an unlock
   // for each layer that was not unlocked by the time this class is destroyed.
-  bool lock_for_processing( LayerHandle layer, bool check_point_volume = true );
-  
+  bool lock_for_processing( LayerHandle layer );
+
+  // LOCK_FOR_DELETION:
+  // Lock a layer for processing and then for deletion, i.e. when we change the data contained in
+  // the data/mask of the layer.
+  // NOTE: This function can only be run from the application thread.
+  // NOTE: The BaseFilter class records which layers are locked and will schedule an unlock
+  // for each layer that was not unlocked by the time this class is destroyed.
+  bool lock_for_deletion( LayerHandle layer );
+    
   // CREATE_AND_LOCK_DATA_LAYER_FROM_LAYER:
   // Create a new data layer with the same dimensions as another layer, the layer is immediately
   // locked as it does not contain any data and will be in the creating state.
@@ -178,6 +186,16 @@ public:
   // CREATE_UNDO_REDO_RECORD:
   // Create an undo record and add it to the undo stack
   bool create_undo_redo_record( Core::ActionContextHandle context, Core::ActionHandle redo_action );
+
+  // CREATE_PROVENANCE_RECORD:
+  // Create a provenance record and add it to the provenance database
+  bool create_provenance_record( Core::ActionContextHandle context, Core::ActionHandle action );
+
+  // UPDATE_PROVENANCE_ACTION_STRING:
+  // For filters that can be stopped at certain iterations the provenance string needs
+  // to be updated with the number of iterations.
+  // This function allows to update it
+  bool update_provenance_action_string( Core::ActionHandle action );
 
   // -- filter specific information --
 public:

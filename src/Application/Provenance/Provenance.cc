@@ -26,65 +26,68 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Boost includes
+#include <boost/thread.hpp>
+
 // Core includes
-#include <Core/State/StateEngine.h>
-#include <Core/State/StateIO.h>
+#include <Core/Application/Application.h>
 
 // Application includes
-#include <Application/Session/Session.h>
-#include <Application/ViewerManager/ViewerManager.h>
+#include <Application/Provenance/Provenance.h>
+
+
 
 namespace Seg3D
 {
 
-Session::Session( const std::string& session_name ) :
-  StateHandler( "session", false )
-{ 
-  this->add_state( "session_name", this->session_name_state_, session_name );
-}
-  
-Session::~Session()
+class ProvenanceCounter 
 {
-
-}
-
-bool Session::load( boost::filesystem::path path, const std::string& session_name )
-{
-  Core::StateIO state_io;
-  if ( !state_io.import_from_file( path / "sessions" / ( session_name + ".xml" ) ) )
+public:
+  ProvenanceCounter() :
+    count_ ( 0 )
   {
-    return false;
   }
 
-  bool result = Core::StateEngine::Instance()->load_states( state_io );
-  return result;
-}
-  
-bool Session::save( boost::filesystem::path path, const std::string& session_name )
-{
-  Core::StateIO state_io;
-  state_io.initialize();
-  path = path / "sessions";
-  if ( Core::StateEngine::Instance()->save_states( state_io ) )
+  ProvenanceID generate()
   {
-    if ( !boost::filesystem::exists( path ) )
-    {
-      try
-      {
-        boost::filesystem::create_directory( path );
-      }
-      catch(  std::exception& e ) 
-      {
-        CORE_LOG_ERROR( e.what() );
-        return false;
-      }
-      
-    }
-    return state_io.export_to_file( path / ( session_name + ".xml" ) );
+    lock_type lock( this->mutex_ );
+    count_++;
+    return count_;
   }
 
-  return false;
-}
-    
-} // end namespace Seg3d
+  ProvenanceID get()
+  {
+    lock_type lock( this->mutex_ );
+    return count_;
+  }
 
+  void set( ProvenanceID count )
+  {
+    lock_type lock( this->mutex_ );
+    count_ = count;
+  }
+
+private:
+  typedef boost::mutex::scoped_lock lock_type;
+  boost::mutex mutex_;
+  ProvenanceID count_;
+};
+
+static ProvenanceCounter ProvenanceCounter;
+
+ProvenanceID GenerateProvenanceID()
+{
+  return ProvenanceCounter.generate();
+}
+
+ProvenanceID GetProvenanceCount()
+{
+  return ProvenanceCounter.get(); 
+}
+
+void SetProvenanceCount( ProvenanceID count )
+{
+  ProvenanceCounter.set( count );
+}
+
+} // end namespace Seg3D

@@ -30,11 +30,11 @@
 #define APPLICATION_LAYERIO_GDCMLAYERIMPORTER_H
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
-# pragma once
+#pragma once
 #endif 
 
 // Application includes
-#include <Application/LayerIO/LayerImporter.h>
+#include <Application/LayerIO/LayerFileSeriesImporter.h>
 
 namespace Seg3D
 {
@@ -42,66 +42,37 @@ namespace Seg3D
 class GDCMLayerImporterPrivate;
 typedef boost::shared_ptr< GDCMLayerImporterPrivate > GDCMLayerImporterPrivateHandle;
 
-class GDCMLayerImporter : public LayerImporter
+class GDCMLayerImporter : public LayerFileSeriesImporter
 {
-  SCI_IMPORTER_TYPE( "GDCM Importer", 
-             "*;.dcm;.dicom;.ima", 
-             15,
-             LayerImporterType::FILE_SERIES_E )
-
-  friend class GDCMLayerImporterPrivate;
-
+  SEG3D_IMPORTER_TYPE( "GDCM Dicom Importer", "*;.dcm;.dicom;.ima;.DCM;.DICOM;.IMA", 25 )
   // -- Constructor/Destructor --
 public:
   // Construct a new layer file importer
-  GDCMLayerImporter( const std::string& filename );
+  GDCMLayerImporter();
+  virtual ~GDCMLayerImporter();
 
-  // Virtual destructor for memory management of derived classes
-  virtual ~GDCMLayerImporter() {}
-
-  // -- Import a file information --
+  // -- Import information from file --
 public:
+  // GET_FILE_INFO
+  // Get the information about the file we are currently importing.
+  // NOTE: This function often causes the file to be loaded in its entirety
+  // Hence it is best to run this on a separate thread if needed ( from the GUI ).
+  virtual bool get_file_info( LayerImporterFileInfoHandle& info );
 
-  // IMPORT_HEADER:
-  // Import all the information needed to translate the header and metadata information, but not
-  // necessarily read the whole file. NOTE: Some external packages do not support reading a header
-  // and hence these importers should read the full file here.
-  virtual bool import_header();
-
-  // GET_GRID_TRANSFORM:
-  // Get the grid transform of the grid that we are importing
-  virtual Core::GridTransform get_grid_transform();
-
-  // GET_DATA_TYPE:
-  // Get the type of data that is being imported
-  virtual Core::DataType get_data_type();
-
-  // GET_IMPORTER_MODES:
-  // Get then supported importer modes
-  virtual int get_importer_modes();
-  
-  // --Import the data as a specific type --  
+  // -- Import data from file --  
 public: 
-
-  // SET_FILE_LIST:
-  // we need a list of files to import, this function provides the list, the list must be set 
-  // before import_layer is called.
-  virtual bool set_file_list( const std::vector< std::string >& file_list );
-
-  // GET_FILE_LIST:
-  // Get the list stored in the importer.
-  virtual std::vector< std::string > get_file_list();
-
-protected:
-  // LOAD_DATA:
-  // Load the data from the file(s).
-  // NOTE: This function is called by import_layer internally.
-  virtual bool load_data( Core::DataBlockHandle& data_block, 
-    Core::GridTransform& grid_trans, LayerMetaData& meta_data  );
-
-  // GET_LAYER_NAME:
-  // Return the string that will be used to name the layers.
-  virtual std::string get_layer_name();
+  // GET_FILE_DATA
+  // Get the file data from the file/ file series
+  // NOTE: The information is generated again, so that hints can be processed
+  virtual bool get_file_data( LayerImporterFileDataHandle& data );
+  
+  // -- Addional hints to compensate for file formats where user input is needed --
+public:
+  // SET_DICOM_SWAP_XYSPACING_HINT
+  // Some dicom writers interpret X/Y spacing incorrectly. 
+  // The DICOM standard says that pixel spacing is in Y/X order, 
+  // but some scanners put it in X/Y order. Hence a hint can be given how to interpret the data
+  virtual void set_dicom_swap_xyspacing_hint( bool value ); 
 
 private:
   GDCMLayerImporterPrivateHandle private_;

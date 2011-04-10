@@ -126,7 +126,8 @@ GroupButtonMenu::GroupButtonMenu( QWidget* parent, LayerGroupHandle group ) :
     
 
   QtUtils::QtBridge::Show( this->private_->ui_.iso_quality_, group->show_iso_menu_state_ ); 
-  QtUtils::QtBridge::Show( this->private_->ui_.iso_capping_, group->show_iso_menu_state_ ); 
+  //QtUtils::QtBridge::Show( this->private_->ui_.iso_capping_, group->show_iso_menu_state_ ); 
+  this->private_->ui_.iso_capping_->hide();
   QtUtils::QtBridge::Show( this->private_->ui_.delete_, group->show_delete_menu_state_ );
   QtUtils::QtBridge::Show( this->private_->ui_.duplicate_layers_,
     group->show_duplicate_menu_state_ );
@@ -167,11 +168,11 @@ void GroupButtonMenu::dropEvent( QDropEvent* event )
   {
     LayerWidget* layer_widget = dynamic_cast< LayerWidget* >( event->source() );
     if ( layer_widget )
-    {
+  {
       layer_widget->set_drop_group( this ); 
       event->setDropAction( Qt::MoveAction );
       return;
-    } 
+  }
   }
 
   event->setDropAction( Qt::IgnoreAction );

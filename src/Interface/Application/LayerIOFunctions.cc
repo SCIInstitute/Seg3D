@@ -60,19 +60,25 @@ namespace Seg3D
 
 void LayerIOFunctions::ImportFiles( QMainWindow* main_window, std::string file_to_open )
 {
+  // List of files that need to be imported.
   QStringList file_list;
-  std::string filtername;
+  // The name of the importer to use.
+  std::string importer_name;
+  
   if( file_to_open != "" )
   {
+    // If there is a file, do not open a dialog and just add it into the file_list.
     file_list << QString::fromStdString( file_to_open );
-    filtername = "All Importers (*)";
+    // Let the program find the right importer.
+    importer_name = "All Importers (*)";
   }
   else
   {
-    // Step (1): Get the importer list from the LayerIO system
-    LayerIO::importer_types_type importer_types = 
-      LayerIO::Instance()->get_importer_types();
+    // Get the importer list from the LayerIO system.
+    std::vector< std::string > importer_types = 
+      LayerIO::Instance()->get_single_file_importer_types();
     
+    // Make a list to select the right importer from.
     QString filters = "";
     for ( size_t j = 0; j < importer_types.size(); j++ )
     {
@@ -83,328 +89,148 @@ void LayerIOFunctions::ImportFiles( QMainWindow* main_window, std::string file_t
       }
       filters = filters + ";;" + QString::fromStdString( importer_types[j] );
     }
-    
-    // Step (2): Bring up the file dialog
+
+    // Bring up the file dialog.
     QString qs_filtername;
     file_list = QFileDialog::getOpenFileNames( main_window, 
       "Import Layer(s)... ", "/home", filters, &qs_filtername );
     
-    if( file_list.size() == 0) return;
-    filtername = qs_filtername.toStdString();
-  }
-  
-  std::vector< LayerImporterHandle > importers;
-  std::vector< std::string > files;
+    // If no file was selected just return
+    if( file_list.size() == 0 )
+    {
+      QMessageBox message_box( main_window );
+      message_box.setWindowTitle( "Import Layer Error" );
+      message_box.addButton( QMessageBox::Ok );
+      message_box.setIcon( QMessageBox::Critical );
+      message_box.setText( "No files were selected." );
+      message_box.exec(); 
+      return;
+    }
 
+    // Get the name of the importer that was selected
+    importer_name = qs_filtername.toStdString();
+  }
+
+  // List of importers to use
+  std::vector< LayerImporterHandle > importers;
+
+  // Loop over all the selected files and generate an importer for them
   for( int i = 0; i < file_list.size(); ++i )
   {
     LayerImporterHandle importer;
-    if( ! ( LayerIO::Instance()->create_importer( file_list.at( i ).toStdString(), 
-      importer, filtername ) ) )
+    
+    // Create a new importer
+    if( ! ( LayerIO::Instance()->create_single_file_importer( file_list.at( i ).toStdString(), 
+      importer, importer_name ) ) )
     {
-      std::string error_message = std::string("ERROR: No importer is available for file '") + 
-        file_list.at( i ).toStdString() + std::string("'.");
+      // Failed to create the importer, and warn the user explicitly
+      std::string error_message = std::string( "ERROR: No importer is available for file '" ) 
+        + file_list.at( i ).toStdString() + std::string( "'." );
 
       QMessageBox message_box( main_window );
-      message_box.setWindowTitle( "Import Layer..." );
+      message_box.setWindowTitle( "Import Layer Error" );
       message_box.addButton( QMessageBox::Ok );
       message_box.setIcon( QMessageBox::Critical );
       message_box.setText( QString::fromStdString( error_message ) );
+      
+      // Send message box to Qt
       message_box.exec();
       return;
     }
     else
     {
+      // Add the importer to the list of all the importers that need to be handled
       importers.push_back( importer );
-
-      boost::filesystem::path full_filename( importer->get_filename() );
-      files.push_back( full_filename.string() );
     }
   }
 
-  importers[ 0 ]->set_file_list( files );
-
-  // Step (5): Open the importer dialog that issues the action to import the data file(s)
-  LayerImporterWidget layer_import_dialog( importers, files, main_window );
+  // Open the importer dialog that issues the action to import the data file(s)
+  LayerImporterWidget layer_import_dialog( importers, main_window );
   layer_import_dialog.exec();
 }
 
 void LayerIOFunctions::ImportSeries( QMainWindow* main_window )
 {
-  // Step (1): Get the importer list from the LayerIO system
-  LayerIO::importer_types_type importer_types = LayerIO::Instance()->get_series_importer_types();
+  // Get the importer list from the LayerIO system
+  std::vector< std::string > importer_types = LayerIO::Instance()->get_file_series_importer_types();
 
   QString filters = "";
   for ( size_t j = 0; j < importer_types.size(); j++ )
   {
     if( j == 0 )
     {
-      filters = QString::fromStdString( importer_types[j] );
+      filters = QString::fromStdString( importer_types[ j ] );
       continue;
     }
-    filters = filters + ";;" + QString::fromStdString( importer_types[j] );
+    filters = filters + ";;" + QString::fromStdString( importer_types[ j ] );
   }
 
-  // Step (2): Bring up the file dialog
+  // Bring up the file dialog
   QString filtername;
   QStringList file_list = QFileDialog::getOpenFileNames( main_window, 
     "Select a file from the series... ", "/home", filters, &filtername );
-  
-  if( file_list.size() == 0) return;
-  
-  std::vector< LayerImporterHandle > importers;
-  std::vector< std::string > files;
+
+  // If no files were selected just exit
+  if( file_list.size() == 0 )
+  {
+    QMessageBox message_box( main_window );
+    message_box.setWindowTitle( "Import Layer Error" );
+    message_box.addButton( QMessageBox::Ok );
+    message_box.setIcon( QMessageBox::Critical );
+    message_box.setText( "No files were selected."  );
+    message_box.exec(); 
+    return;
+  }
+
+  // Convert the filenames into STL strings
+  std::vector< std::string > filenames( file_list.size() );
+  for ( int j = 0; j < file_list.size(); j++ )
+  {
+    filenames[ j ] = file_list.at( j ).toStdString();
+  }
+    
+  // Find all the filenames that are associated with this series
+  if ( !( LayerIO::FindFileSeries( filenames ) ) )
+  {
+    QMessageBox message_box( main_window );
+    message_box.setWindowTitle( "Import Layer Error" );
+    message_box.addButton( QMessageBox::Ok );
+    message_box.setIcon( QMessageBox::Critical );
+    message_box.setText( "Could not resolve filenames." );
+    message_box.exec(); 
+    return;
+  }
+    
+  std::string importer_name = filtername.toStdString();
 
   LayerImporterHandle importer;
-  if( ! ( LayerIO::Instance()->create_importer( file_list.at( 0 ).toStdString(), 
-    importer, filtername.toStdString() ) ) )
+  if( ! ( LayerIO::Instance()->create_file_series_importer( filenames, importer, 
+    importer_name ) ) )
   {
-    // IF we are unable to create an importer we pop up an error message box
-    std::string error_message = std::string("ERROR: No importer is available for file '") + 
-      file_list.at( 0 ).toStdString() + std::string("'.");
+    // If we are unable to create an importer we pop up an error message box
+    std::string error_message = std::string( "ERROR: No importer is available for file '" ) + 
+      file_list.at( 0 ).toStdString() + std::string( "'." );
 
     QMessageBox message_box( main_window );
-    message_box.setWindowTitle( "Import Layer Error." );
+    message_box.setWindowTitle( "Import Layer Error" );
     message_box.addButton( QMessageBox::Ok );
     message_box.setIcon( QMessageBox::Critical );
     message_box.setText( QString::fromStdString( error_message ) );
     message_box.exec();
     return;
   }
-  else if ( file_list.size() == 1 )
+  else
   {
     // If we are able to create an importer, we then need to figure out which files are part
     // of the series.
     
-    // Step 1: we add the importer to the importers vector, in this case we only have a single
+    // We add the importer to the importers vector, in this case we only have a single
     // importer in the vector.
-    importers.push_back( importer );
+    std::vector< LayerImporterHandle > importers( 1, importer );
 
-    // Step 2: we get the get a boost::filesystem::path version of the file name so we can 
-    // take advantage of the filesystem functionality
-    boost::filesystem::path full_filename( importer->get_filename() );
-    
-    if( !boost::filesystem::exists( full_filename ) ) return;
-    
-    // Step 3: now we want to see if we can figure out the file name pattern.  We will start by
-    // checking to see if the sequence numbers are at the end of the file name.  
-    std::string filename = boost::filesystem::basename( full_filename );
-    
-    std::vector<std::pair<size_t,size_t> > numbers;
-    
-    size_t j = 0;
-    while ( j < filename.size() )
-    {
-      size_t start, end;
-      while ( j < filename.size() && ( filename[ j ] < '0' || filename[ j ] > '9' ) ) j++;
-      if ( j == filename.size() ) break;
-      start = j;
-      while ( j < filename.size() && ( filename[ j ] >= '0' && filename[ j ] <= '9' ) ) j++;
-      end = j;      
-      if ( start != end ) numbers.push_back( std::make_pair<size_t,size_t>( start, end ) );
-    }
-    
-    std::vector<std::string> dir_files;
-    std::vector< boost::filesystem::path > dir_full_filenames;
-    if( boost::filesystem::exists( full_filename.parent_path() ) )
-    {
-      boost::filesystem::directory_iterator dir_end;
-      for( boost::filesystem::directory_iterator dir_itr( full_filename.parent_path() ); 
-        dir_itr != dir_end; ++dir_itr )
-      {
-        dir_full_filenames.push_back( *dir_itr );
-        dir_files.push_back( boost::filesystem::basename( dir_itr->filename() ) );
-      }
-    }
-
-    size_t index = 0;
-    size_t num_files = 0;
-
-    for ( size_t j = 0; j < numbers.size(); j++ )
-    {
-      size_t start = numbers[ j ].first;
-      size_t end = filename.size() - numbers[ j ].second;
-      
-      std::string filename_prefix = filename.substr( 0, start );
-      std::string filename_postfix = filename.substr( filename.size() - end );
-      
-      std::set<size_t> indices;
-      
-      for ( size_t k = 0; k < dir_files.size(); k++ )
-      {       
-        if ( dir_files[ k ].substr( 0, start ) == filename_prefix && ( dir_files[ k ].size() >= end ) &&
-          dir_files[ k ].substr( dir_files[ k ].size() - end ) == filename_postfix )
-        {
-          size_t val;
-          if ( dir_files[ k ].size() >= end + start  && 
-            Core::ImportFromString( dir_files[ k ].substr( start, 
-              dir_files[ k ].size() - end - start ), val ) )
-          {
-            indices.insert( val );
-          }
-        }
-      }
-      
-      if ( num_files < indices.size() )
-      {
-        index = j;
-        num_files = indices.size();
-      }
-    }
-
-    if ( numbers.size() && num_files ) 
-    {
-      std::vector<std::pair<size_t,size_t> > order( num_files );
-      
-      size_t start = numbers[ index ].first;
-      size_t end = filename.size() - numbers[ index ].second;
-      
-      std::string filename_prefix = filename.substr( 0, start );
-      std::string filename_postfix = filename.substr( filename.size() - end );
-      
-      size_t  j = 0;
-      
-      for ( size_t k = 0; k < dir_files.size(); k++ )
-      {
-        if ( dir_files[ k ].substr( 0, start ) == filename_prefix && 
-          dir_files[ k ].size() >= end &&
-          dir_files[ k ].substr( dir_files[ k ].size() - end ) == filename_postfix )
-        {
-          size_t val;
-          if ( dir_files[ k ].size() >= end + start &&  
-            Core::ImportFromString( dir_files[ k ].substr( start, 
-            dir_files[ k ].size() - end - start ), val ) )
-          {
-            order[ j ].first = val;
-            order[ j ].second = j;
-            j++;
-            files.push_back( dir_full_filenames[ k ].string() );
-          }
-        }
-      }
-    
-      std::sort( order.begin(), order.end() );
-      
-      std::vector<std::string> old_files = files;
-      for ( size_t j = 0; j < order.size(); j++ )
-      {
-        files[ j ] = old_files[ order[ j ].second ];
-      }   
-    }
-    else
-    {
-      files.push_back( full_filename.string() );
-    }
-    
+    LayerImporterWidget layer_import_dialog( importers, main_window );
+    layer_import_dialog.exec();
   }
-  else
-  {
-    QStringList::iterator it = file_list.begin();
-    QStringList::iterator it_end = file_list.end();
-    
-    std::vector<std::vector<size_t> > file_numbers;
-    while ( it != it_end )
-    {
-      std::string filename = (*it).toStdString();
-      files.push_back( filename );
-      
-      for ( size_t j = 0; j < filename.size(); j++ )
-      {
-        if ( filename[ j ] < '0' || filename[ j ] > '9' ) filename[ j ] = ' ';
-      }
-
-      std::vector<size_t> filename_numbers;
-      Core::ImportFromString( filename, filename_numbers );
-      file_numbers.push_back( filename_numbers );
-      ++it;
-    }
-    
-    size_t max_size = 0;
-    for ( size_t j = 0; j < file_numbers.size(); j++ )
-    {
-      if ( file_numbers[ j ].size() > max_size ) max_size = file_numbers[ j ].size();
-    }
-
-    if ( max_size )
-    {
-      std::vector<std::set<size_t> > numbers( 2*max_size );
-      
-      for ( size_t j = 0; j < file_numbers.size(); j++ )
-      {
-        for ( size_t k = 0; k < file_numbers[ j ].size(); k++ )
-        {
-          numbers[ k ].insert( file_numbers[ j ][ k ] );
-          numbers[ max_size + file_numbers[ j ].size() - 1 - k ].insert( file_numbers[ j ][ k ] );
-        }
-      }
-
-      size_t index = 0;
-      std::pair< std::set<size_t>::iterator, std::set<size_t>::iterator > min_max = 
-        boost::minmax_element( numbers[ 0 ].begin(), numbers[ 0 ].end() );
-      size_t index_range = (*min_max.second) - (*min_max.first);
-      size_t index_size = numbers[ 0 ].size();
-      
-      for ( size_t j = 0; j < numbers.size(); j++ )
-      {
-        min_max = boost::minmax_element( numbers[ j ].begin(), numbers[ j ].end() );
-        size_t range = (*min_max.second) - (*min_max.first);
-        size_t size = numbers[ j ].size();
-        
-        if ( ( size > index_size ) || ( size == index_size && range < index_range ) )
-        {
-          index = j;
-          index_size = size;
-          index_range = range;
-        }
-      }
-      
-      if ( index_size != files.size() )
-      {
-        // Not enough for sorting, use alphabetical order
-        std::sort( files.begin(), files.end() );
-      }
-      else
-      {
-        std::vector<std::pair<size_t,size_t> > order( files.size() );
-        if ( index < max_size )
-        {
-          for ( size_t j = 0; j < order.size(); j++ )
-          {
-            order[ j ].second = j;
-            order[ j ].first = file_numbers[ j ][ index ];
-          }
-        }
-        else
-        {
-          for ( size_t j = 0; j < order.size(); j++ )
-          {
-            order[ j ].second = j;
-            order[ j ].first = file_numbers[ j ][ file_numbers[ j ].size() - 1 - ( index - max_size ) ];
-          }
-        }
-        
-        std::sort( order.begin(), order.end() );
-        
-        std::vector<std::string> old_files = files;
-        for ( size_t j = 0; j < order.size(); j++ )
-        {
-          files[ j ] = old_files[ order[ j ].second ];
-        }
-      }
-    }
-    else
-    {
-      // no numbers for sorting use alphabetical order
-      std::sort( files.begin(), files.end() );
-    }
-    
-    importers.push_back( importer );
-  }
-
-  importers[ 0 ]->set_file_list( files );
-
-  LayerImporterWidget layer_import_dialog( importers, files, main_window, true );
-  layer_import_dialog.exec();
 }
   
 void LayerIOFunctions::ExportLayer( QMainWindow* main_window )
@@ -443,7 +269,7 @@ void LayerIOFunctions::ExportLayer( QMainWindow* main_window )
       boost::filesystem::path( filename.toStdString() ).parent_path().string() );
   }
     
-  std::string extension = boost::filesystem::path( filename.toStdString() ).extension(); 
+  std::string extension = boost::filesystem::extension( boost::filesystem::path( filename.toStdString() ) ); 
   std::string exportername;
   
   if( extension == ".nrrd" ) exportername = "NRRD Exporter";
@@ -464,8 +290,8 @@ void LayerIOFunctions::ExportLayer( QMainWindow* main_window )
     return;
   }
     
-  ActionExportLayer::Dispatch( Core::Interface::GetWidgetActionContext(), exporter,
-    filename.toStdString() );
+  ActionExportLayer::Dispatch( Core::Interface::GetWidgetActionContext(), 
+    layer_handles[ 0 ]->get_layer_id(), exporter, filename.toStdString() );
 }
 
 void LayerIOFunctions::ExportSegmentation( QMainWindow* main_window )

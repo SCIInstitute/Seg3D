@@ -41,10 +41,10 @@ class ActionSetMeasurementPointPrivate
 {
 public:
   // Required action parameters
-  Core::ActionParameter< std::string > measurements_stateid_;
-  Core::ActionParameter< std::string > measurement_id_;
-  Core::ActionParameter< int > point_index_;
-  Core::ActionParameter< Core::Point > world_point_;
+  std::string measurements_stateid_;
+  std::string measurement_id_;
+  int point_index_;
+  Core::Point world_point_;
   
   // This is an internal optimization to avoid the lookup in the state database
   Core::StateVectorBaseWeakHandle measurements_state_weak_handle_;
@@ -53,10 +53,10 @@ public:
 ActionSetMeasurementPoint::ActionSetMeasurementPoint() :
   private_( new ActionSetMeasurementPointPrivate )
 {
-  this->add_argument( this->private_->measurements_stateid_ );
-  this->add_argument( this->private_->measurement_id_ );
-  this->add_argument( this->private_->point_index_ );
-  this->add_argument( this->private_->world_point_ );
+  this->add_parameter( this->private_->measurements_stateid_ );
+  this->add_parameter( this->private_->measurement_id_ );
+  this->add_parameter( this->private_->point_index_ );
+  this->add_parameter( this->private_->world_point_ );
 }
 
 ActionSetMeasurementPoint::~ActionSetMeasurementPoint()
@@ -72,10 +72,10 @@ bool ActionSetMeasurementPoint::validate( Core::ActionContextHandle& context )
   {
     // Query the state engine
     if ( !Core::StateEngine::Instance()->get_state( 
-      this->private_->measurements_stateid_.value(), vector_state ) )
+      this->private_->measurements_stateid_, vector_state ) )
     {
       context->report_error( std::string( "Unknown state variable '" ) + 
-        this->private_->measurements_stateid_.value() + "'" );
+        this->private_->measurements_stateid_ + "'" );
       return false;
     }
     // Check the type of the state
@@ -84,13 +84,13 @@ bool ActionSetMeasurementPoint::validate( Core::ActionContextHandle& context )
     if ( !measurment_state )
     {
       context->report_error( std::string( "State variable '") + 
-        this->private_->measurements_stateid_.value() + "' doesn't support ActionSetMeasurementPoint" );
+        this->private_->measurements_stateid_ + "' doesn't support ActionSetMeasurementPoint" );
       return false;
     }
     this->private_->measurements_state_weak_handle_ = measurment_state;
   }
 
-  if( !( this->private_->point_index_.value() == 0 || this->private_->point_index_.value() == 1 ) ) 
+  if( !( this->private_->point_index_ == 0 || this->private_->point_index_ == 1 ) ) 
   {
     return false;
   }
@@ -113,12 +113,12 @@ bool ActionSetMeasurementPoint::run( Core::ActionContextHandle& context,
     // Find one with matching id
     for( size_t i = 0; i < measurements.size(); i++ )
     {
-      if( measurements[ i ].get_id() == this->private_->measurement_id_.value() )
+      if( measurements[ i ].get_id() == this->private_->measurement_id_ )
       {
         // Set point
         Core::Measurement m = measurements[ i ];
-        m.set_point( this->private_->point_index_.value(), 
-          this->private_->world_point_.value() );
+        m.set_point( this->private_->point_index_, 
+          this->private_->world_point_ );
         measurements_state->set_at( i, m, context->source() );
         return true;
       }
@@ -133,11 +133,11 @@ Core::ActionHandle ActionSetMeasurementPoint::Create(
   const std::string& measurement_id, int point_index, const Core::Point& world_point )
 {
   ActionSetMeasurementPoint* action = new ActionSetMeasurementPoint;
-  action->private_->measurements_stateid_.set_value( measurements_state->get_stateid() );
+  action->private_->measurements_stateid_ = measurements_state->get_stateid();
   action->private_->measurements_state_weak_handle_ = measurements_state;
-  action->private_->measurement_id_.value() = measurement_id;
-  action->private_->point_index_.value() = point_index;
-  action->private_->world_point_.value() = world_point;
+  action->private_->measurement_id_ = measurement_id;
+  action->private_->point_index_ = point_index;
+  action->private_->world_point_ = world_point;
   
   return Core::ActionHandle( action );
 }

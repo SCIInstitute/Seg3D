@@ -38,62 +38,59 @@
 #include <Core/DataBlock/NrrdDataBlock.h>
 
 // Application includes
-#include <Application/LayerIO/LayerImporter.h>
+#include <Application/LayerIO/LayerSingleFileImporter.h>
 #include <Application/LayerIO/LayerIO.h>
 
 namespace Seg3D
 {
 
-class NrrdLayerImporter : public LayerImporter
+// Forward declaration for internals of this class
+class NrrdLayerImporterPrivate;
+typedef boost::shared_ptr<NrrdLayerImporterPrivate> NrrdLayerImporterPrivateHandle;
+
+// CLASS NrrdLayerImporter
+// This class imports nrrds, the default file type supported by Seg3D. Hence it has the
+// highest priority as this importer should be used by default for nrrd files.
+class NrrdLayerImporter : public LayerSingleFileImporter
 {
-  SCI_IMPORTER_TYPE( "Teem Importer", 
-             ".nrrd;.nhdr", 30, 
-             LayerImporterType::SINGLE_FILE_E )
+  SEG3D_IMPORTER_TYPE( "Teem Importer", ".nrrd;.nhdr", 50 )
 
   // -- Constructor/Destructor --
 public:
-  // Construct a new layer file importer
-  NrrdLayerImporter( const std::string& filename ) :
-    LayerImporter( filename )
-  {
-  }
+  NrrdLayerImporter();
+  virtual ~NrrdLayerImporter();
 
-  // Virtual destructor for memory management of derived classes
-  virtual ~NrrdLayerImporter()
-  {
-  }
-
-  // -- Import a file information --
+  // -- Import information from file --
 public:
+  // GET_FILE_INFO
+  // Get the information about the file we are currently importing.
+  // NOTE: This function often causes the file to be loaded in its entirety
+  // Hence it is best to run this on a separate thread if needed ( from the GUI ).
+  virtual bool get_file_info( LayerImporterFileInfoHandle& info );
 
-  // IMPORT_HEADER:
-  // Import all the information needed to translate the header and metadata information, but not
-  // necessarily read the whole file. NOTE: Some external packages do not support reading a header
-  // and hence these importers should read the full file here.
-  virtual bool import_header();
+  // -- Import data from file --  
+public: 
+  // GET_FILE_DATA
+  // Get the file data from the file/ file series
+  // NOTE: The information is generated again, so that hints can be processed
+  virtual bool get_file_data( LayerImporterFileDataHandle& data );
 
-  // GET_GRID_TRANSFORM:
-  // Get the grid transform of the grid that we are importing
-  virtual Core::GridTransform get_grid_transform();
-
-  // GET_DATA_TYPE:
-  // Get the type of data that is being imported
-  virtual Core::DataType get_data_type();
-
-  // GET_IMPORTER_MODES
-  // Get then supported importer modes
-  virtual int get_importer_modes();
+  // -- Copy files --
+public:
+  // COPY_FILES
+  // For provenance files need to be copied into the project cache. As some files need special
+  // attention: for example mhd and nhdr files actually list where there data is stored, this
+  // function can be overloaded with a specific function that copies the files. Otherwise a
+  // default implementation is given in the two derived classes.
   
-protected:  
-  // LOAD_DATA:
-  // Load the data from the file(s).
-  // NOTE: This function is called by import_layer internally.
-  virtual bool load_data( Core::DataBlockHandle& data_block, 
-    Core::GridTransform& grid_trans, LayerMetaData& meta_data  );
+  // NOTE: This function has to be implemented as nhdr files can refer to other files on the
+  // file system. Hence copying NRRD files needs special logic, as it needs to copy the depending
+  // files as well and may need to change file references in the header files.
+  virtual bool copy_files( boost::filesystem::path& project_cache_path );
 
-private:
-  Core::NrrdDataHandle nrrd_data_;
-
+  // --internals --
+public:
+  NrrdLayerImporterPrivateHandle private_;
 };
 
 } // end namespace seg3D

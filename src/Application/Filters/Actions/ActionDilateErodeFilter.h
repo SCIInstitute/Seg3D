@@ -29,14 +29,18 @@
 #ifndef APPLICATION_FILTERS_ACTIONS_ACTIONDILATEERODEFILTER_H
 #define APPLICATION_FILTERS_ACTIONS_ACTIONDILATEERODEFILTER_H
 
+// Core includes
 #include <Core/Action/Actions.h>
 #include <Core/Interface/Interface.h>
+
+// Application includes
 #include <Application/Layer/Layer.h>
+#include <Application/LayerManager/LayerAction.h>
 
 namespace Seg3D
 {
 
-class ActionDilateErodeFilter : public Core::Action
+class ActionDilateErodeFilter : public LayerAction
 {
 
 CORE_ACTION( 
@@ -58,24 +62,20 @@ public:
   ActionDilateErodeFilter()
   {
     // Action arguments
-    this->add_argument( this->target_layer_ );
+    this->add_layer_id( this->target_layer_ );
     
     // Action options
-    this->add_key( this->replace_ );    
-    this->add_key( this->dilate_radius_ );
-    this->add_key( this->erode_radius_ );
+    this->add_parameter( this->replace_ );    
+    this->add_parameter( this->dilate_radius_ );
+    this->add_parameter( this->erode_radius_ );
 
     // Constraint
-    this->add_key( this->mask_layer_ );
-    this->add_key( this->mask_invert_ );  
+    this->add_layer_id( this->mask_layer_ );
+    this->add_parameter( this->mask_invert_ );  
     
     // 2D constraint
-    this->add_key( this->only2d_ );
-    this->add_key( this->slice_type_ );
-  }
-  
-  virtual ~ActionDilateErodeFilter()
-  {
+    this->add_parameter( this->only2d_ );
+    this->add_parameter( this->slice_type_ );
   }
   
   // -- Functions that describe action --
@@ -86,16 +86,16 @@ public:
   // -- Action parameters --
 private:
 
-  Core::ActionParameter< std::string > target_layer_;
-  Core::ActionParameter< bool > replace_;
-  Core::ActionParameter< int > dilate_radius_;
-  Core::ActionParameter< int > erode_radius_;
+  std::string target_layer_;
+  bool replace_;
+  int dilate_radius_;
+  int erode_radius_;
 
-  Core::ActionParameter< std::string > mask_layer_;
-  Core::ActionParameter< bool > mask_invert_;
+  std::string mask_layer_;
+  bool mask_invert_;
 
-  Core::ActionParameter< bool > only2d_;
-  Core::ActionParameter< int > slice_type_;
+  bool only2d_;
+  int slice_type_;
       
   // -- Dispatch this action from the interface --
 public:
@@ -105,8 +105,7 @@ public:
   static void Dispatch( Core::ActionContextHandle context, 
     std::string target_layer, bool replace, int dilate_radius, int erode_radius,
     std::string mask_layer, bool mask_invert, bool only2d,
-    int slice_type );
-          
+    int slice_type );     
 };
   
 } // end namespace Seg3D

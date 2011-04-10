@@ -50,7 +50,7 @@ public:
   ~TransferFunctionFeature();
 
   const std::string& get_feature_id() const;
-  
+
   // Functions used by TransferFunction class to build the lookup table
 private:
   friend class TransferFunction;
@@ -66,13 +66,18 @@ private:
   // 0 is returned.
   float interpolate( float value );
 
+  // GET_AMBIENT_COEFFICIENT:
+  // Returns the coefficient by which the material color will be multiplied to compute
+  // the ambient light component. The value is in range [0, 1].
+  float get_ambient_coefficient();
+
   // GET_DIFFUSE_COLOR:
   // Returns the diffuse color of the feature. The values are normalized to [0, 1].
   const Color& get_diffuse_color();
 
-  // GET_SPECULAR_COLOR:
-  // Returns the specular color of the feature. The values are normalized to [0, 1].
-  const Color& get_specular_color();
+  // GET_SPECULAR_INTENSITY:
+  // Returns the intensity of the specular light. The value is in range [0, 1].
+  float get_specular_intensity();
 
   // GET_SHININESS:
   // Returns the shininess of the feature.
@@ -87,12 +92,14 @@ private:
 
 public:
   StateTransferFunctionControlPointVectorHandle control_points_state_;
+  StateRangedDoubleHandle ambient_coefficient_state_;
   StateRangedIntHandle diffuse_color_red_state_;
   StateRangedIntHandle diffuse_color_green_state_;
   StateRangedIntHandle diffuse_color_blue_state_;
   StateRangedDoubleHandle specular_intensity_state_;
   StateRangedIntHandle shininess_state_;
   StateBoolHandle enabled_state_;
+  StateBoolHandle solid_state_;
 
 private:
   TransferFunctionFeaturePrivateHandle private_;

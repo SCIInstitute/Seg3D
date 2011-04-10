@@ -83,7 +83,7 @@ ControllerInterface::ControllerInterface( QWidget* parent ) :
   // Step 1: Setup the private structure and allocate all the needed structures
   private_->ui_.setupUi( this );
   private_->context_ = Core::ActionContextHandle( new ControllerContext( this ) );
-
+  
   // Update the title of the dialog
   std::string title = std::string( "Controller - "  )
     + Core::Application::GetApplicationNameAndVersion();

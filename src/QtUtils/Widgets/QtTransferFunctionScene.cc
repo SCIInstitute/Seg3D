@@ -135,7 +135,7 @@ void QtTransferFunctionScene::mousePressEvent( QGraphicsSceneMouseEvent* mouseEv
       {
         control_point->get_curve()->remove_control_point( control_point );
       }
-    }
+      }
     else
     {
       QtTransferFunctionEdge* edge = dynamic_cast< QtTransferFunctionEdge* >( item );
@@ -151,7 +151,7 @@ void QtTransferFunctionScene::mousePressEvent( QGraphicsSceneMouseEvent* mouseEv
       this->private_->prev_pos_ = mouseEvent->scenePos();
       mouseEvent->accept();
       return;
-    }
+  }
   }
 
   QGraphicsScene::mousePressEvent( mouseEvent );

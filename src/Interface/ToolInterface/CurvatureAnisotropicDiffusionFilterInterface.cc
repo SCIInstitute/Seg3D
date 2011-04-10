@@ -95,6 +95,10 @@ bool CurvatureAnisotropicDiffusionFilterInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Connect( this->private_->ui_.runFilterButton, boost::bind(
     &Tool::execute, tool, Core::Interface::GetWidgetActionContext() ) );
   
+  this->private_->ui_.iterations_->set_description( "Iterations" );
+  this->private_->ui_.sensitivity_->set_description( "Sensitivity Range" );
+  
+  
   return true;
 }
 

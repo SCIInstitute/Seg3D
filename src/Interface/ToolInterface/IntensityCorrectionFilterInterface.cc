@@ -95,6 +95,9 @@ bool IntensityCorrectionFilterInterface::build_widget( QFrame* frame )
     tool->use_active_layer_state_, true );
   QtUtils::QtBridge::Connect( this->private_->ui_.runFilterButton, boost::bind(
     &Tool::execute, tool, Core::Interface::GetWidgetActionContext() ) );
+  
+  this->private_->ui_.order_->set_description( "Polynomial Order" );
+  this->private_->ui_.edge_->set_description( "Edge Sensitivity" );
 
   return true;
 }

@@ -532,12 +532,12 @@ bool SegmentationSummaryPage::validatePage()
   { 
     exporter->set_label_layer_values( values );
     ActionExportSegmentation::Dispatch( Core::Interface::GetWidgetActionContext(), exporter,
-      LayerExporterMode::LABEL_MASK_E, this->private_->file_name_, extension );
+      "label_mask", this->private_->file_name_, extension );
   }
   else
   {
     ActionExportSegmentation::Dispatch( Core::Interface::GetWidgetActionContext(), exporter,
-      LayerExporterMode::SINGLE_MASK_E, this->private_->file_name_, extension );
+      "single_mask", this->private_->file_name_, extension );
   }
     
   return true;

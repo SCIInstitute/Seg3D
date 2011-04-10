@@ -26,83 +26,248 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-// Core includes
-#include <Core/DataBlock/NrrdData.h>
-#include <Core/DataBlock/MaskDataBlock.h>
-#include <Core/DataBlock/NrrdDataBlock.h>
-#include <Core/DataBlock/MaskDataBlockManager.h>
-#include <Core/Volume/DataVolume.h>
-#include <Core/Volume/MaskVolume.h>
+// STL includes
+#include <fstream>
+
+// Boost includes
+#include <boost/filesystem.hpp>
 
 // Application includes
 #include <Application/LayerIO/NrrdLayerImporter.h>
-#include <Application/Layer/DataLayer.h>
-#include <Application/Layer/MaskLayer.h>
 
-SCI_REGISTER_IMPORTER( Seg3D, NrrdLayerImporter );
+#ifdef _WIN32
+#define snprintf _snprintf
+#endif
+
+SEG3D_REGISTER_IMPORTER( Seg3D, NrrdLayerImporter );
 
 namespace Seg3D
 {
 
-bool NrrdLayerImporter::import_header()
+// Private implementation
+class NrrdLayerImporterPrivate
 {
-  // Only import the data once
-  if ( nrrd_data_ ) return true;
-  
-  // NOTE: We load the full data set, as Teem does not support reading headers only :(
-  // Hence we need to read the full file
-  std::string error;
-  if ( ! ( Core::NrrdData::LoadNrrd( get_filename() , nrrd_data_, error ) ) )
+public:
+  Core::NrrdDataHandle nrrd_data_;
+};
+
+
+NrrdLayerImporter::NrrdLayerImporter() :
+  private_( new NrrdLayerImporterPrivate )
+{
+}
+
+NrrdLayerImporter::~NrrdLayerImporter()
+{
+}
+
+bool NrrdLayerImporter::get_file_info( LayerImporterFileInfoHandle& info )
+{
+  if ( !this->private_->nrrd_data_ )
   {
-    set_error( error );
+    // NOTE: We load the full data set, as Teem does not support reading headers only.
+    // Hence we need to read the full file
+    std::string error;
+    if ( ! ( Core::NrrdData::LoadNrrd( get_filename() , this->private_->nrrd_data_, error ) ) )
+    {
+      this->set_error( error );
+      return false;
+    } 
+  }
+  
+  info = LayerImporterFileInfoHandle( new LayerImporterFileInfo );
+  info->set_data_type( this->private_->nrrd_data_->get_data_type() );
+  info->set_grid_transform( this->private_->nrrd_data_->get_grid_transform() );
+  info->set_file_type( "nrrd" );
+  info->set_mask_compatible( true );
+  
+  // Done
+  return true;
+}
+
+bool NrrdLayerImporter::get_file_data( LayerImporterFileDataHandle& data )
+{
+  if ( !this->private_->nrrd_data_ )
+  {
+    // NOTE: We load the full data set, as Teem does not support reading headers only.
+    // Hence we need to read the full file
+    std::string error;
+    if ( ! ( Core::NrrdData::LoadNrrd( get_filename() , this->private_->nrrd_data_, error ) ) )
+    {
+      this->set_error( error );
+      return false;
+    } 
+  }
+  
+  data = LayerImporterFileDataHandle( new LayerImporterFileData );
+  data->set_grid_transform( this->private_->nrrd_data_->get_grid_transform() );
+  
+  data->set_data_block( Core::NrrdDataBlock::New( this->private_->nrrd_data_ ) );
+  data->set_name( this->get_file_tag() );
+    
+  // Done
+  return true;
+}
+
+bool NrrdLayerImporter::copy_files( boost::filesystem::path& project_cache_path )
+{
+  bool has_detached_header = false;
+  
+  try
+  {
+    std::ifstream file_header( this->get_filename().c_str(), std::ios::binary );
+
+    // Scan whether file has a detached header
+    std::string line;
+    while( !file_header.eof() )
+    {
+      // Grab the next line
+      std::getline( file_header, line );
+      if ( line.empty() ) break;
+
+      if ( line.size() > 10 && line.substr( 0, 10 ) == "data file:" )
+      {
+        has_detached_header = true;
+        break;
+      }
+    }
+  }
+  catch ( ... )
+  {
+    this->set_error( "Could not read nrrd file." );
     return false;
   }
-  return true;
-}
 
-
-Core::GridTransform NrrdLayerImporter::get_grid_transform()
-{
-  if ( nrrd_data_ )  return nrrd_data_->get_grid_transform();
-  else return Core::GridTransform(1,1,1);
-}
-
-
-Core::DataType NrrdLayerImporter::get_data_type()
-{
-  if ( this->nrrd_data_ ) return this->nrrd_data_->get_data_type();
-  else return Core::DataType::UNKNOWN_E;
-}
-
-
-int NrrdLayerImporter::get_importer_modes()
-{
-  Core::DataType data_type = nrrd_data_->get_data_type();
-  
-  int importer_modes = 0;
-  if ( Core::IsReal( data_type ) )
+  if ( !has_detached_header )
   {
-    importer_modes |= LayerImporterMode::DATA_E;
+    return LayerSingleFileImporter::copy_files( project_cache_path );
   }
-  
-  if ( Core::IsInteger( data_type ) ) 
+
+  std::vector< boost::filesystem::path > data_files;
+
+  // Copy and update header file    
+  try
   {
-    importer_modes |= LayerImporterMode::SINGLE_MASK_E | LayerImporterMode::BITPLANE_MASK_E |
-      LayerImporterMode::LABEL_MASK_E | LayerImporterMode::DATA_E;
-  }
+    boost::filesystem::path input_header_name( this->get_filename() );
+    boost::filesystem::path output_header_name = project_cache_path / input_header_name.filename();
   
-  return importer_modes;
-}
+    std::ifstream old_file_header( input_header_name.filename().c_str(), std::ios::binary );
+    std::ofstream new_file_header( output_header_name.filename().c_str(), std::ios::binary );
+  
+    bool need_to_write_file_list = false;
+    
+    while( !old_file_header.eof() )
+    {
+      // Grab the next line
+      std::string line;
+      std::getline( old_file_header, line );
+      if ( line.empty() ) break;
 
-bool NrrdLayerImporter::load_data( Core::DataBlockHandle& data_block, 
-  Core::GridTransform& grid_trans, LayerMetaData& meta_data  )
-{
-  if ( !this->nrrd_data_ ) import_header();
+      if ( line.size() > 10 && line.substr( 0, 10 ) == "data file:" )
+      {
+        std::string contents = line.substr( 10 );
+        std::vector<std::string> components;
+        if ( Core::ImportFromString( contents, components ) )
+        {
+          this->set_error( "Cannot interpret the data file in header of nrrd file." );
+          return false;
+        }
 
-  data_block = Core::NrrdDataBlock::New( this->nrrd_data_ );
-  grid_trans = this->nrrd_data_->get_grid_transform();
+        // Check the three options
+        if ( components.size() == 1 ||  components.size() == 2 )
+        {
+          if ( components[ 0 ] == "LIST" )
+          {
+            // MetaIO format
+            new_file_header << "data file: LIST" << std::endl;
+            
+            // Copy over every entry and fix the name of the file to be local
+            while( !old_file_header.eof() )
+            {
+              std::getline( old_file_header, line );
+              if ( line.empty() ) break;
+              boost::filesystem::path filename( line );
+              data_files.push_back( filename );
+              need_to_write_file_list = true;
+            }
+            
+            // Translation is complete there are no entries after LIST
+            break;
+          }
+          else
+          {
+            // The most common case, it just refers directly to a file
+            boost::filesystem::path filename( components[ 0 ] );
+            new_file_header << "data file: " << filename.filename() << std::endl;
+            data_files.push_back( filename );
+          }
+        }
+        else if ( components.size() == 4 || components.size() == 5 )
+        {
+          std::vector<char> buffer( components[ 0 ].size() + 20, '\0' );
+          int start, stop, step;
+          if ( !Core::ImportFromString( components[ 1 ], start ) ||
+            !Core::ImportFromString( components[ 2 ], stop ) ||
+            !Core::ImportFromString( components[ 3 ], step ) )
+          {
+            this->set_error( "Could not interpret 'data file' field in header." );
+            return false;
+          }
+          
+          for (int index = start; index <= stop; index += step )
+          {         
+            snprintf( &buffer[ 0 ], buffer.size() - 1, components[ 0 ].c_str(), index );
+            boost::filesystem::path filename( &buffer[ 0 ] );
+            data_files.push_back( filename );           
+          }
+          need_to_write_file_list = true;
+        }
+        else
+        {
+          this->set_error( "Invalid entry in 'data file' field in the header." );
+          return false;
+        }
+      }
+      else
+      {
+        // Copy the entry to cached file
+        new_file_header << line << std::endl;
+      }
+    }   
+  
+    // Data file list needs to be at the end of the file
+    if ( need_to_write_file_list )
+    {
+      new_file_header << "data file: LIST" << std::endl;
+      for ( size_t j = 0; j < data_files.size(); j++ )
+      {
+        new_file_header << data_files[ j ].filename() << std::endl;
+      }
+    }
+  }
+  catch ( ... )
+  {
+    this->set_error( "Could not copy and update header file." );
+    return false; 
+  }
 
-  return true;
+  // Copy the raw data files to the local cache directory
+  for ( size_t j = 0; j < data_files.size(); j++ )
+  {
+    try
+    {
+      boost::filesystem::copy_file( data_files[ j ], 
+        project_cache_path / data_files[ j ].filename() );
+    }
+    catch( ... )
+    {
+      this->set_error( std::string( "Could not copy file '" ) + data_files[ j ].string() + "'." );
+      return false;
+    }
+  }
+
+  // Successfully copied data file and generated new header.
+  return true;  
 }
 
 } // end namespace seg3D

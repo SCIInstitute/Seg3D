@@ -55,6 +55,10 @@ typedef boost::shared_ptr< ActionInfoPrivate > ActionInfoPrivateHandle;
 
 class ActionInfo : public boost::noncopyable
 {
+  // -- typedefs --
+public:
+  typedef boost::shared_ptr<ActionInfo> handle_type;
+  
   // -- constructor --
 public:
   ActionInfo( const std::string& definition );
@@ -76,6 +80,10 @@ public:
   // Get the description of the action
   std::string get_description() const;
   
+  // GET_PROPERTIES:
+  // Get the properties of the action
+  std::vector<std::string> get_properties() const;
+  
   // GET_NUM_ARGUMENTS:
   // The number of arguments for this action
   size_t get_num_arguments() const;
@@ -92,6 +100,10 @@ public:
   // The description of argument <index>
   std::string get_argument_description( size_t index ) const;
   
+  // GET_ARGUMENT_PROPERTIES:
+  // Get the properties of argument <index>
+  std::vector<std::string> get_argument_properties( size_t index ) const; 
+    
   // GET_KEY:
   // The name of key <index>
   std::string get_key( size_t index ) const;
@@ -107,7 +119,13 @@ public:
   // GET_KEY_DESCRIPTION:
   // The description of key <index>
   std::string get_key_description( size_t index ) const;
-  
+
+  // GET_KEY_PROPERTIES:
+  // Get the properties of key <index>
+  std::vector<std::string> get_key_properties( size_t index ) const;  
+
+  // -- action properties --
+public:
   // IS_VALID:
   // Check the validity of the action description
   bool is_valid() const;
@@ -116,10 +134,14 @@ public:
   // Check whether an action is undoable 
   bool is_undoable() const;
   
-  // GET_CHANGES_PROJECT_DATA:
+  // CHANGES_PROJECT_DATA:
   // Check whether the action changes the data of the program
-  bool get_changes_project_data() const;
-  
+  bool changes_project_data() const;
+
+  // CHANGES_PROVENANCE_DATA:
+  // Check whether the action changes the provenance of the program
+  bool changes_provenance_data() const;
+      
 private:
   // Private implementation of this class
   ActionInfoPrivateHandle private_;

@@ -49,42 +49,35 @@ CORE_ACTION(
 public:
   ActionSetRange()
   {
-    this->add_argument( this->stateid_ );
-    this->add_argument( this->min_value_ );
-    this->add_argument( this->max_value_ );
+    this->add_parameter( this->stateid_ );
+    this->add_parameter( this->min_value_ );
+    this->add_parameter( this->max_value_ );
   }
-  virtual ~ActionSetRange() {}
 
   virtual bool validate( ActionContextHandle& context );
   virtual bool run( ActionContextHandle& context, ActionResultHandle& result );
 
 private:
-  ActionParameter< std::string > stateid_;
-  ActionParameterVariant min_value_;
-  ActionParameterVariant max_value_;
+  std::string stateid_;
+  Variant min_value_;
+  Variant max_value_;
 
   StateRangedValueBaseWeakHandle state_weak_handle_;
 
 public:
 
   template< class T >
-  static ActionHandle Create( typename StateRangedValue< T >::handle_type& state_handle,
-    T min_value, T max_value )
-  {
-    ActionSetRange* action = new ActionSetRange;
-    action->stateid_.value() = state_handle->get_stateid();
-    action->min_value_.set_value( min_value );
-    action->max_value_.set_value( max_value );
-    action->state_weak_handle_ = state_handle;
-    return ActionHandle( action );
-  }
-
-  template< class T >
   static void Dispatch( ActionContextHandle context, 
     typename StateRangedValue< T >::handle_type& state_handle, 
     T min_value, T max_value )
   {
-    ActionDispatcher::PostAction( Create( state_handle, min_value, max_value ), context );
+    ActionSetRange* action = new ActionSetRange;
+    action->stateid_ = state_handle->get_stateid();
+    action->min_value_.set( min_value );
+    action->max_value_.set( max_value );
+    action->state_weak_handle_ = state_handle;
+
+    ActionDispatcher::PostAction( ActionHandle( action ), context );
   }
 };
 

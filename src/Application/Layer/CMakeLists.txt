@@ -45,7 +45,6 @@ SET(APPLICATION_LAYER_SRCS
   MaskLayer.cc
   LabelLayer.h
   LabelLayer.cc
-  LayerMetaData.h
 )
 
 SET(APPLICATION_LAYER_ACTIONS_SRCS
@@ -62,6 +61,6 @@ TARGET_LINK_LIBRARIES(Application_Layer
             Core_State
                       Core_Utils
                       Application_InterfaceManager
-            Application_LayerManager
+            Application_Provenance
                       ${SCI_BOOST_LIBRARY})
             

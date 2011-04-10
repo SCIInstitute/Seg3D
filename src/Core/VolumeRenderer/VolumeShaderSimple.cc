@@ -28,44 +28,42 @@
 
 #include <GL/glew.h>
 
-#include <Core/VolumeRenderer/VolumeShader.h>
+#include <Core/VolumeRenderer/VolumeShaderSimple.h>
 #include <Core/Utils/Log.h>
 
 namespace Core
 {
 
-VolumeShader::VolumeShader() :
+VolumeShaderSimple::VolumeShaderSimple() :
   ShaderBase()
 {
 }
 
-VolumeShader::~VolumeShader()
+VolumeShaderSimple::~VolumeShaderSimple()
 {
 }
 
-bool VolumeShader::get_vertex_shader_source( std::string& source )
+bool VolumeShaderSimple::get_vertex_shader_source( std::string& source )
 {
   const char VERT_SHADER_SOURCE_C[] =
   {
-#include "VolumeShader_vert"
-#include "Fog_vert"
+#include "VolumeShaderSimple_vert"
   };
   source = std::string( VERT_SHADER_SOURCE_C );
   return true;
-}
+  }
 
-bool VolumeShader::get_fragment_shader_source( std::string& source )
-{
+bool VolumeShaderSimple::get_fragment_shader_source( std::string& source )
+  {
   const char FRAG_SHADER_SOURCE_C[] =
   {
-#include "VolumeShader_frag"
-#include "Fog_frag"
+#include "VolumeShaderSimple_frag"
   };
   source = std::string( FRAG_SHADER_SOURCE_C );
   return true;
 }
 
-bool VolumeShader::post_initialize()
+bool VolumeShaderSimple::post_initialize()
 {
   this->enable();
   this->vol_tex_loc_ = this->get_uniform_location( "vol_tex" );
@@ -77,71 +75,83 @@ bool VolumeShader::post_initialize()
   this->tex_bbox_size_loc_ = this->get_uniform_location( "tex_bbox_size" );
   this->texel_size_loc_ = this->get_uniform_location( "texel_size" );
   this->voxel_size_loc_ = this->get_uniform_location( "voxel_size" );
-  this->scale_bias_loc_ = this->get_uniform_location( "scale_bias" );
-  this->sample_rate_loc_ = this->get_uniform_location( "sample_rate" );
+  this->slice_distance_loc_ = this->get_uniform_location( "slice_distance" );
   this->fog_range_loc_ = this->get_uniform_location( "fog_range" );
+  this->clip_plane_loc_ = this->get_uniform_location( "clip_plane" );
+  this->enable_clip_plane_loc_ = this->get_uniform_location( "enable_clip_plane" );
+  this->enable_clipping_loc_ = this->get_uniform_location( "enable_clipping" );
   this->disable();
   return true;
 }
 
-void VolumeShader::set_volume_texture( int tex_unit )
+void VolumeShaderSimple::set_volume_texture( int tex_unit )
 {
   glUniform1i( this->vol_tex_loc_, tex_unit );
 }
 
-void VolumeShader::set_diffuse_texture( int tex_unit )
+void VolumeShaderSimple::set_diffuse_texture( int tex_unit )
 {
   glUniform1i( this->diffuse_lut_loc_, tex_unit );
 }
 
-void VolumeShader::set_specular_texture( int tex_unit )
+void VolumeShaderSimple::set_specular_texture( int tex_unit )
 {
   glUniform1i( this->specular_lut_loc_, tex_unit );
 }
 
-void VolumeShader::set_lighting( bool enabled )
+void VolumeShaderSimple::set_lighting( bool enabled )
 {
   glUniform1i( this->enable_lighting_loc_, enabled );
 }
 
-void VolumeShader::set_fog( bool enabled )
+void VolumeShaderSimple::set_fog( bool enabled )
 {
   glUniform1i( this->enable_fog_loc_, enabled );
 }
 
-void VolumeShader::set_texture_bbox_min( float x, float y, float z )
+void VolumeShaderSimple::set_texture_bbox_min( float x, float y, float z )
 {
   glUniform3f( this->tex_bbox_min_loc_, x, y, z );
 }
 
-void VolumeShader::set_texture_bbox_size( float x, float y, float z )
+void VolumeShaderSimple::set_texture_bbox_size( float x, float y, float z )
 {
   glUniform3f( this->tex_bbox_size_loc_, x, y, z );
 }
 
-void VolumeShader::set_texel_size( float x, float y, float z )
+void VolumeShaderSimple::set_texel_size( float x, float y, float z )
 {
   glUniform3f( this->texel_size_loc_, x, y, z );
 }
 
-void VolumeShader::set_voxel_size( float x, float y, float z )
+void VolumeShaderSimple::set_voxel_size( float x, float y, float z )
 {
   glUniform3f( this->voxel_size_loc_, x, y, z );
 }
 
-void VolumeShader::set_scale_bias( float scale, float bias )
-{
-  glUniform2f( this->scale_bias_loc_, scale, bias );
-}
-
-void VolumeShader::set_sample_rate( float sample_rate )
-{
-  glUniform1f( this->sample_rate_loc_, sample_rate );
-}
-
-void VolumeShader::set_fog_range( float znear, float zfar )
+void VolumeShaderSimple::set_fog_range( float znear, float zfar )
 {
   glUniform2f( this->fog_range_loc_, znear, zfar );
+}
+
+void VolumeShaderSimple::set_clip_plane( const float clip_planes[ 6 ][ 4 ] )
+{
+  glUniform4fv( this->clip_plane_loc_, 6, &clip_planes[ 0 ][ 0 ] );
+}
+
+void VolumeShaderSimple::set_enable_clip_plane( const int enabled[ 6 ] )
+{
+  glUniform1iv( this->enable_clip_plane_loc_, 6, enabled );
+}
+
+void VolumeShaderSimple::set_enable_clipping( bool enabled )
+{
+  glUniform1i( this->enable_clipping_loc_, enabled );
+}
+
+void VolumeShaderSimple::set_slice_distance( float slice_distance )
+{
+  glUniform1f( this->slice_distance_loc_, slice_distance );
 }
 
 } // end namespace Seg3D

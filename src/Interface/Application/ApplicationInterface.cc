@@ -47,7 +47,7 @@
 #include <Application/PreferencesManager/Actions/ActionSavePreferences.h>
 #include <Application/ProjectManager/ProjectManager.h>
 #include <Application/ProjectManager/Actions/ActionSaveSession.h>
-#include <Application/ProjectManager/Actions/ActionQuickOpen.h>
+#include <Application/ProjectManager/Actions/ActionNewProject.h>
 #include <Application/ProjectManager/Actions/ActionLoadProject.h>
 
 // QtUtils includes
@@ -72,6 +72,7 @@
 #include <Interface/Application/SplashScreen.h>
 #include <Interface/Application/StatusBarWidget.h>
 #include <Interface/Application/ToolsDockWidget.h>
+#include <Interface/Application/ProvenanceDockWidget.h>
 #include <Interface/Application/ViewerInterface.h>
 
 
@@ -99,6 +100,7 @@ namespace Seg3D
     QPointer< ToolsDockWidget > tools_dock_window_;
     QPointer< LayerManagerDockWidget > layer_manager_dock_window_;
     QPointer< RenderingDockWidget > rendering_dock_window_;
+    QPointer< ProvenanceDockWidget > provenance_dock_window_;
     QPointer< ProgressWidget > progress_;
     
     // Pointer to the new project wizard
@@ -177,8 +179,11 @@ ApplicationInterface::ApplicationInterface( std::string file_to_view_on_open ) :
   
   this->private_->tools_dock_window_ = new ToolsDockWidget( this );
   this->addDockWidget( Qt::LeftDockWidgetArea, this->private_->tools_dock_window_ );
-  
 
+  this->private_->provenance_dock_window_ = new ProvenanceDockWidget( this );
+  this->addDockWidget( Qt::RightDockWidgetArea, this->private_->provenance_dock_window_ );
+  
+  
   // Connect the windows and widgets to their visibility states
   QtUtils::QtBridge::Show( this->private_->rendering_dock_window_,
     InterfaceManager::Instance()->rendering_dockwidget_visibility_state_ );
@@ -192,9 +197,12 @@ ApplicationInterface::ApplicationInterface( std::string file_to_view_on_open ) :
   QtUtils::QtBridge::Show( this->private_->project_dock_window_, 
     InterfaceManager::Instance()->project_dockwidget_visibility_state_ );
 
+  QtUtils::QtBridge::Show( this->private_->provenance_dock_window_, 
+    InterfaceManager::Instance()->provenance_dockwidget_visibility_state_ );
+
 //  QtUtils::QtBridge::Show( this->private_->history_dock_window_, 
 //    InterfaceManager::Instance()->history_dockwidget_visibility_state_ );
-  
+
   QtUtils::QtBridge::Show( this->private_->splash_screen_, 
     InterfaceManager::Instance()->splash_screen_visibility_state_ );
   this->center_seg3d_gui_on_screen( this->private_->splash_screen_ );
@@ -239,7 +247,7 @@ ApplicationInterface::ApplicationInterface( std::string file_to_view_on_open ) :
       value_changed_signal_.connect( boost::bind( &ApplicationInterface::SetFullScreen, 
       qpointer_type( this ), _1, _2 ) ) );
       
-    this->add_connection( ProjectManager::Instance()->current_project_->project_name_state_->
+    this->add_connection( ProjectManager::Instance()->get_current_project()->project_name_state_->
       value_changed_signal_.connect( boost::bind( &ApplicationInterface::SetProjectName, 
       qpointer_type( this ), _1, _2 ) ) ); 
   }
@@ -255,15 +263,30 @@ ApplicationInterface::ApplicationInterface( std::string file_to_view_on_open ) :
   
   this->private_->progress_ = new ProgressWidget( this->private_->viewer_interface_->parentWidget() );
   
-  if( ( file_to_view_on_open != "" ) && ( ( extension == ".nrrd" ) || ( extension == ".nhdr" ) ) )
+  if( file_to_view_on_open == "" ) return;
+  
+  if( ( extension == ".nrrd" ) || ( extension == ".nhdr" ) )
   {
-    ActionQuickOpen::Dispatch( Core::Interface::GetWidgetActionContext() );
+    // No location is set, so no project will be generated on disk for now
+    ActionNewProject::Dispatch( Core::Interface::GetWidgetActionContext(), 
+      "", "Untitled Project" );
     LayerIOFunctions::ImportFiles( this, file_to_view_on_open );
+    return;
   }
-  else if( ( file_to_view_on_open != "" ) && ( extension == ".s3d" ) )
+  
+  std::vector<std::string> project_file_extensions = Project::GetProjectFileExtensions();
+  if ( std::find( project_file_extensions.begin(), project_file_extensions.end(), extension ) !=
+    project_file_extensions.end() )
   {
     ActionLoadProject::Dispatch( Core::Interface::GetWidgetActionContext(), file_to_view_on_open ); 
   }
+  
+  std::vector<std::string> project_folder_extensions = Project::GetProjectPathExtensions();
+  if ( std::find( project_folder_extensions.begin(), project_folder_extensions.end(), extension ) !=
+    project_folder_extensions.end() )
+  {
+    ActionLoadProject::Dispatch( Core::Interface::GetWidgetActionContext(), file_to_view_on_open ); 
+  } 
 }
 
 ApplicationInterface::~ApplicationInterface()
@@ -276,7 +299,7 @@ void ApplicationInterface::closeEvent( QCloseEvent* event )
   // We are going to save the PreferencesManager when we exit
   ActionSavePreferences::Dispatch( Core::Interface::GetWidgetActionContext() );
   
-  if ( ProjectManager::Instance()->current_project_->check_project_changed() )
+  if ( ProjectManager::Instance()->get_current_project()->check_project_changed() )
   {
 
     // Check whether the users wants to save and whether the user wants to quit
@@ -296,8 +319,7 @@ void ApplicationInterface::closeEvent( QCloseEvent* event )
       this->disconnect_all();
 
       Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-      ActionSaveSession::Dispatch( Core::Interface::GetWidgetActionContext(), false, 
-        ProjectManager::Instance()->current_project_->current_session_name_state_->get() );   
+      ActionSaveSession::Dispatch( Core::Interface::GetWidgetActionContext(), "" );   
     }
   }
   this->disconnect_all();
@@ -368,7 +390,7 @@ void ApplicationInterface::closeEvent( QCloseEvent* event )
     this->private_->rendering_dock_window_->close();
     this->private_->rendering_dock_window_->deleteLater();
   }
-
+  
   event->accept();
 }
 
@@ -447,7 +469,7 @@ void ApplicationInterface::end_progress( Core::ActionProgressHandle /*handle*/ )
   this->private_->rendering_dock_window_->set_enabled( true );
   this->private_->tools_dock_window_->set_enabled( true );
   this->private_->project_dock_window_->set_enabled( true );
-
+  
   //this->private_->history_dock_window_->set_enabled( true );
   
   CORE_LOG_DEBUG( "-- Unpicturizing the Viewer Interface --" );
@@ -558,7 +580,5 @@ void ApplicationInterface::HandleCriticalErrorMessage( qpointer_type qpointer, i
   Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, 
     boost::bind( &ApplicationInterface::raise_error_messagebox, qpointer.data(), msg_type, message ) ) );
 }
-
-
 
 } // end namespace Seg3D

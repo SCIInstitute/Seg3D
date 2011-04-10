@@ -45,7 +45,8 @@ class ActionComputeIsosurface : public Core::Action
 CORE_ACTION( 
   CORE_ACTION_TYPE( "ComputeIsosurface", "Compute isosurface for the selected layer.")
   CORE_ACTION_ARGUMENT( "layerid", "The layerid of the layer for which the isosurface needs to be computed." )
-  CORE_ACTION_ARGUMENT( "quality_factor", "The quality factor for mask downsampling prior to isosurface computation." )
+  CORE_ACTION_KEY( "quality_factor", "1.0", "The quality factor for mask downsampling prior to isosurface computation." )
+  CORE_ACTION_KEY( "capping", "false", "Whether isosurfaces will be capped." )
   CORE_ACTION_CHANGES_PROJECT_DATA()
 )
   
@@ -53,13 +54,9 @@ CORE_ACTION(
 public:
   ActionComputeIsosurface()
   {
-    this->add_argument( this->layer_id_ );
-    this->add_argument( this->quality_factor_ );
-    this->add_argument( this->capping_enabled_ );
-  }
-  
-  virtual ~ActionComputeIsosurface()
-  {
+    this->add_parameter( this->layer_id_ );
+    this->add_parameter( this->quality_factor_ );
+    this->add_parameter( this->capping_enabled_ );
   }
   
 // -- Functions that describe action --
@@ -69,21 +66,16 @@ public:
 
 private:
   // This parameter contains the id of the layer group
-  Core::ActionParameter< std::string > layer_id_;
+  std::string layer_id_;
   
   // This parameter describes the quality factor of the isosurface
-  Core::ActionParameter< double > quality_factor_;
+  double quality_factor_;
 
   // This parameter describes whether capping is enabled for the isosurface
-  Core::ActionParameter< double > capping_enabled_;
+  double capping_enabled_;
 
   // -- Dispatch this action from the interface --
 public:
-
-  // CREATE:
-  // Create an action that computes the isosurface for the selected layer
-  static Core::ActionHandle Create( MaskLayerHandle mask_layer, double quality_factor,
-    bool capping_enabled );
 
   // DISPATCH
   // Create and dispatch action that computes the isosurface for the selected layer

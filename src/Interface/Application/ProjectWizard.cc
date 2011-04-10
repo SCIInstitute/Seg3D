@@ -56,7 +56,7 @@ ProjectWizard::ProjectWizard( QWidget *parent ) :
   connect( this->page( 0 ), SIGNAL( need_to_set_delete_path( QString ) ), this, 
     SLOT( set_delete_path( QString ) ) );
   
-  this->setWindowTitle(tr("New Project Wizard"));
+  this->setWindowTitle( tr( "New Project Wizard" ) );
 }
 
 ProjectWizard::~ProjectWizard()
@@ -76,9 +76,10 @@ void ProjectWizard::accept()
   }
 
   ActionNewProject::Dispatch( Core::Interface::GetWidgetActionContext(),
-    field("projectPath").toString().toStdString(),
-    field("projectName").toString().toStdString() );
+    field( "projectPath" ).toString().toStdString(),
+    field( "projectName" ).toString().toStdString() );
     QDialog::accept();
+
     Q_EMIT this->finished();
 }
 
@@ -92,7 +93,7 @@ ProjectInfoPage::ProjectInfoPage( QWidget *parent )
     : QWizardPage( parent )
 {
     this->setTitle( "Project Information" );
-    this->setSubTitle( "Specify basic information about the project for which you "
+    this->setSubTitle( "Specify basic information about the project which you "
                    "want to create." );
 
     this->project_name_label_ = new QLabel( "Project name:" );
@@ -105,7 +106,7 @@ ProjectInfoPage::ProjectInfoPage( QWidget *parent )
   else
   {
     this->project_name_lineedit_ = new QLineEdit();
-    this->project_name_lineedit_->setText(  "New Project " + default_name_count );
+    this->project_name_lineedit_->setText( "New Project " + default_name_count );
   }
   
     this->project_path_label_ = new QLabel( "Project Path:" );
@@ -115,12 +116,14 @@ ProjectInfoPage::ProjectInfoPage( QWidget *parent )
     connect( this->project_path_change_button_, SIGNAL( clicked() ), this, SLOT( set_path() ) );
   this->project_path_change_button_->setFocusPolicy( Qt::NoFocus );
 
-    registerField( "projectName", this->project_name_lineedit_ );
+    this->registerField( "projectName", this->project_name_lineedit_ );
     
-  this->warning_message_ = new QLabel( QString::fromUtf8( "This location does not exist, please chose a valid location." ) );
+  this->warning_message_ = new QLabel( QString::fromUtf8( 
+    "This location does not exist, please chose a valid location." ) );
   this->warning_message_->setObjectName( QString::fromUtf8( "warning_message_" ) );
   this->warning_message_->setWordWrap( true );
-  this->warning_message_->setStyleSheet(QString::fromUtf8( "QLabel#warning_message_{ color: red; } " ) );
+  this->warning_message_->setStyleSheet(QString::fromUtf8( 
+    "QLabel#warning_message_{ color: red; } " ) );
   this->warning_message_->hide();
 
     QGridLayout *layout = new QGridLayout;
@@ -130,14 +133,15 @@ ProjectInfoPage::ProjectInfoPage( QWidget *parent )
     layout->addWidget( this->project_path_lineedit_, 1, 1 );
     layout->addWidget( this->project_path_change_button_, 2, 1, 1, 2 );
     layout->addWidget( this->warning_message_, 3, 1, 1, 2 );
-    setLayout( layout );
+    this->setLayout( layout );
 
 }
   
 void ProjectInfoPage::initializePage()
 {
-  this->project_path_lineedit_->setText( QString::fromStdString( PreferencesManager::Instance()->project_path_state_->get() ) );
-  registerField( "projectPath", this->project_path_lineedit_ );
+  this->project_path_lineedit_->setText( QString::fromStdString( 
+    ProjectManager::Instance()->get_current_project_folder().string() ) );
+  this->registerField( "projectPath", this->project_path_lineedit_ );
 }
   
 
@@ -145,8 +149,8 @@ void ProjectInfoPage::set_path()
 {
   this->warning_message_->hide();
   
-    QDir project_directory_ = QDir( QFileDialog::getExistingDirectory ( this, "Choose Directory...",
-    this->project_path_lineedit_->text(), 
+    QDir project_directory_ = QDir( QFileDialog::getExistingDirectory ( 
+    this, "Choose Directory...", this->project_path_lineedit_->text(), 
     QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks ) );
   
     if ( project_directory_.exists() )
@@ -157,16 +161,19 @@ void ProjectInfoPage::set_path()
     {
     this->project_path_lineedit_->setText( "" );
   }
-    registerField( "projectPath", this->project_path_lineedit_ );
+  
+    this->registerField( "projectPath", this->project_path_lineedit_ );
 }
+
 
 bool ProjectInfoPage::validatePage()
 {
-  boost::filesystem::path new_path = 
+  boost::filesystem::path project_path = 
     boost::filesystem::path( this->project_path_lineedit_->text().toStdString() ) / 
-    boost::filesystem::path( this->project_name_lineedit_->text().toStdString() );
+    boost::filesystem::path( this->project_name_lineedit_->text().toStdString() +
+      Project::GetDefaultProjectPathExtension()  );
     
-  if( boost::filesystem::exists( new_path ) )
+  if( boost::filesystem::exists( project_path ) )
   {
     int ret = QMessageBox::warning( this, 
       "A project with this name already exists!",
@@ -180,16 +187,13 @@ bool ProjectInfoPage::validatePage()
       return false;
     }
 
-    Q_EMIT need_to_set_delete_path( QString::fromStdString( new_path.string() ) );
-
-    Core::ActionSet::Dispatch(  Core::Interface::GetWidgetActionContext(), 
-      PreferencesManager::Instance()->export_path_state_, new_path.parent_path().string() );
+    Q_EMIT need_to_set_delete_path( QString::fromStdString( project_path.string() ) );
 
     return true;
   } 
   
-
-  if( !boost::filesystem::exists( new_path.parent_path() ) )
+  // Check whether the location has a valid parent path
+  if( !boost::filesystem::exists( project_path.parent_path() ) )
   {
     this->warning_message_->setText( QString::fromUtf8( 
       "This location does not exist, please chose a valid location." ) );
@@ -197,9 +201,10 @@ bool ProjectInfoPage::validatePage()
     return false;
   }
 
+  // NOTE: Try to make the directory, so we know that we can write to this location.
   try // to create a project sessions folder
   {
-    boost::filesystem::create_directory( new_path );
+    boost::filesystem::create_directory( project_path );
   }
   catch ( ... ) // any errors that we might get thrown would indicate that we cant write here
   {
@@ -209,12 +214,18 @@ bool ProjectInfoPage::validatePage()
     return false;
   }
   
-  boost::filesystem::remove( new_path );
-
+  try 
+  {
+    // Remove the directory we just made
+    boost::filesystem::remove( project_path );
+  }
+  catch( ... )
+  {
+    std::string error = "Could not remove file '" + project_path.string() + "'.";
+    CORE_LOG_ERROR( error );
+  }
+  
   this->warning_message_->hide();
-
-  Core::ActionSet::Dispatch(  Core::Interface::GetWidgetActionContext(), 
-    PreferencesManager::Instance()->export_path_state_, new_path.parent_path().string() );
 
   return true;
 }
@@ -232,13 +243,13 @@ SummaryPage::SummaryPage( QWidget *parent )
     this->project_name_ = new QLabel;
     this->project_name_->setWordWrap( true );
 
-    this->project_path_ = new QLabel;
-    this->project_path_->setWordWrap( true );
+    this->project_location_ = new QLabel;
+    this->project_location_->setWordWrap( true );
   
     QVBoxLayout *layout = new QVBoxLayout;
   layout->addWidget( this->description_ );
     layout->addWidget( this->project_name_ );
-    layout->addWidget( this->project_path_ );
+    layout->addWidget( this->project_location_ );
     this->setLayout( layout );
 
 }
@@ -248,8 +259,10 @@ void SummaryPage::initializePage()
     QString finishText = wizard()->buttonText(QWizard::FinishButton);
     finishText.remove('&');
 
-    this->project_name_->setText( QString::fromUtf8( "Project Name: " ) + field("projectName").toString() );
-    this->project_path_->setText( QString::fromUtf8( "Project Path: " ) + field("projectPath").toString() );
+    this->project_name_->setText( QString::fromUtf8( "Project Name: " ) +
+    field( "projectName" ).toString() );
+    this->project_location_->setText( QString::fromUtf8( "Project Path: " ) + 
+    field( "projectPath" ).toString() );
 }
 
 } // end namespace Seg3D

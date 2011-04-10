@@ -30,6 +30,7 @@
 #include <algorithm>
 
 // Boost includes
+#include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 
 // Application includes
@@ -38,40 +39,87 @@
 namespace Seg3D
 {
 
-LayerImporterInfo::LayerImporterInfo( LayerImporterBuilderBaseHandle builder,
-  std::string name, std::string file_type_string,
-  int priority, LayerImporterType importer_type ) :
-    builder_( builder ),
-    name_( name ),
-    file_types_( Core::SplitString( file_type_string, ";" ) ),
-    any_type_(false),
-    priority_( priority ),
-    importer_type_( importer_type )
+class LayerImporterInfoPrivate
 {
-  if (file_types_.size() > 0)
+  // -- constructor --
+public:
+  LayerImporterInfoPrivate() :
+    type_( LayerImporterType::SINGLE_FILE_E ),
+    any_type_( false ),
+    priority_( 0 )
   {
-    if (file_types_[0] == "*") any_type_ = true;
+  }
+  
+  // -- information --
+public: 
+  // Type of this importer
+  LayerImporterType type_;
+
+  // Name of the importer
+  std::string name_;
+  
+  // The file types the importer will handle
+  std::vector<std::string> file_types_; 
+  
+  // String with name and file types, to be used as a filter in a file selector
+  std::string file_type_string_;
+  
+  // Any file type, e.g. dicom readers tend to use no extension
+  bool any_type_;
+  
+  // The priority of the importer
+  int priority_;  
+
+  // Object that knows how to build the importer
+  LayerImporterBuilderBaseHandle builder_;
+};
+
+
+LayerImporterInfo::LayerImporterInfo( LayerImporterBuilderBaseHandle builder, std::string name, 
+  std::string file_type_string, int priority, LayerImporterType type ) :
+    private_( new LayerImporterInfoPrivate() )
+{
+  this->private_->builder_ = builder;
+  this->private_->name_ = name;
+  this->private_->file_types_ = Core::SplitString( file_type_string, ";" );
+  this->private_->priority_ = priority;
+  this->private_->type_ = type;
+
+  if ( this->private_->file_types_.size() > 0 )
+  {
+    if ( this->private_->file_types_[0] == "*" ) 
+    {
+      this->private_->any_type_ = true;
+    }
   }
 
-  if ( any_type_ ) 
+  if ( this->private_->any_type_ ) 
   {
-    file_type_string_ = name_ + std::string( " (* " );
-    for ( size_t j = 1; j < file_types_.size(); j++ )
+    this->private_->file_type_string_ = this->private_->name_ + std::string( " (* " );
+    for ( size_t j = 1; j < this->private_->file_types_.size(); j++ )
     {
-      file_type_string_ += std::string("*")+file_types_[j];
-      if ( j != ( file_types_.size() - 1 ) ) file_type_string_ += std::string( " " );
+      this->private_->file_type_string_ += std::string( "*" ) + 
+        this->private_->file_types_[ j ];
+      if ( j != ( this->private_->file_types_.size() - 1 ) )
+      {
+        this->private_->file_type_string_ += std::string( " " );
+      }
     }
-    file_type_string_ += std::string( ")" );
+    this->private_->file_type_string_ += std::string( ")" );
   }
   else
   {
-    file_type_string_ = name_ + std::string( " (" );
-    for ( size_t j = 0; j < file_types_.size(); j++ )
+    this->private_->file_type_string_ = this->private_->name_ + std::string( " (" );
+    for ( size_t j = 0; j < this->private_->file_types_.size(); j++ )
     {
-      file_type_string_ += std::string("*")+file_types_[j];
-      if ( j != ( file_types_.size() - 1 ) ) file_type_string_ += std::string( " " );
+      this->private_->file_type_string_ += std::string( "*" ) + 
+        this->private_->file_types_[ j ];
+      if ( j != ( this->private_->file_types_.size() - 1 ) )
+      {
+        this->private_->file_type_string_ += std::string( " " );
+      }
     }
-    file_type_string_ += std::string( ")" );
+    this->private_->file_type_string_ += std::string( ")" );
   }
 }
 
@@ -79,38 +127,37 @@ LayerImporterInfo::~LayerImporterInfo()
 {
 }
 
-std::string LayerImporterInfo::name() const 
-{ 
-  return name_;
-}
-
-LayerImporterHandle LayerImporterInfo::build( const std::string& filename ) const
+LayerImporterType LayerImporterInfo::get_type() const
 {
-  return builder_->build( filename );
+  return this->private_->type_;
 }
 
+std::string LayerImporterInfo::get_name() const 
+{ 
+  return this->private_->name_;
+}
+
+LayerImporterHandle LayerImporterInfo::build() const
+{
+  return this->private_->builder_->build();
+}
 
 bool LayerImporterInfo::converts_file_type( const std::string& file_type, bool strict ) const
 {
-  if ( any_type_ && !strict) return true;
-  std::string lower_file_type = file_type;
-  boost::to_lower( lower_file_type );
-  return ( std::find( file_types_.begin(), file_types_.end(), lower_file_type ) != file_types_.end() );
+  if ( this->private_->any_type_ && !strict ) return true;
+  std::string lower_file_type = boost::to_lower_copy( file_type );
+  return ( std::find( this->private_->file_types_.begin(), this->private_->file_types_.end(), 
+    lower_file_type ) != this->private_->file_types_.end() );
 }
 
-std::string LayerImporterInfo::file_type_string() const
+std::string LayerImporterInfo::get_file_type_string() const
 {
-  return file_type_string_;
+  return this->private_->file_type_string_;
 }
 
-int LayerImporterInfo::priority() const
+int LayerImporterInfo::get_priority() const
 {
-  return priority_;
-}
-
-LayerImporterType LayerImporterInfo::type() const
-{
-  return importer_type_;
+  return this->private_->priority_;
 }
 
 } // end namespace seg3D

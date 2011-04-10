@@ -40,16 +40,16 @@ bool ActionClear::validate( ActionContextHandle& context )
   StateBaseHandle state( this->state_weak_handle_.lock() );
   if ( !state )
   {
-    if ( !StateEngine::Instance()->get_state( this->stateid_.value(), state ) )
+    if ( !StateEngine::Instance()->get_state( this->stateid_, state ) )
     {
-      context->report_error( std::string( "Unknown state variable '" ) + stateid_.value() + "'" );
+      context->report_error( std::string( "Unknown state variable '" ) + stateid_ + "'" );
       return false;
     }
     StateVectorBaseHandle vector_state = 
       boost::dynamic_pointer_cast< StateVectorBase >( state );
     if ( !vector_state )
     {
-      context->report_error( std::string( "State variable '") + this->stateid_.value() +
+      context->report_error( std::string( "State variable '") + this->stateid_ +
         "' doesn't support ActionClear" );
       return false;
     }
@@ -71,20 +71,6 @@ bool ActionClear::run( ActionContextHandle& context, ActionResultHandle& result 
   return false;
 }
 
-ActionHandle ActionClear::Create( const StateVectorBaseHandle& state )
-{
-  ActionClear* action = new ActionClear;
-  action->stateid_.set_value( state->get_stateid() );
-  action->state_weak_handle_ = state;
-
-  return ActionHandle( action );
-}
-
-void ActionClear::Dispatch( ActionContextHandle context, const StateVectorBaseHandle& state )
-{
-  ActionDispatcher::PostAction( Create( state ), context );
-}
-
 bool ActionClear::changes_project_data()
 {
   StateBaseHandle state( state_weak_handle_.lock() );
@@ -92,7 +78,7 @@ bool ActionClear::changes_project_data()
   // If not the state cannot be retrieved report an error
   if ( !state )
   {
-    if ( !( StateEngine::Instance()->get_state( stateid_.value(), state ) ) )
+    if ( !( StateEngine::Instance()->get_state( stateid_, state ) ) )
     {
       return false;
     }
@@ -100,6 +86,14 @@ bool ActionClear::changes_project_data()
 
   // Keep track of whether the state changes the data of the program
   return state->is_project_data();
+}
+
+void ActionClear::Dispatch( ActionContextHandle context, const StateVectorBaseHandle& state )
+{
+  ActionClear* action = new ActionClear;
+  action->stateid_ = state->get_stateid();
+  action->state_weak_handle_ = state;
+  ActionDispatcher::PostAction( ActionHandle( action ), context );
 }
 
 } // end namespace Core

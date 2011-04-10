@@ -26,55 +26,21 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-// Boost includes
-#include <boost/filesystem.hpp>
-
-// Application includes
-#include <Application/ProjectManager/ProjectManager.h>
-#include <Application/LayerManager/LayerManager.h>
-#include <Application/UndoBuffer/UndoBuffer.h>
-#include <Application/ToolManager/ToolManager.h>
-#include <Application/ProjectManager/Actions/ActionQuickOpen.h>
-
-// REGISTER ACTION:
-// Define a function that registers the action. The action also needs to be
-// registered in the CMake file.
-CORE_REGISTER_ACTION( Seg3D, QuickOpen )
+#include <Application/Project/SessionInfo.h>
 
 namespace Seg3D
 {
 
-bool ActionQuickOpen::validate( Core::ActionContextHandle& context )
+SessionInfo::SessionInfo( std::string session_name , std::string username , 
+  std::string timestamp ) :
+    session_name_( session_name ),
+    username_( username ),
+    timestamp_( timestamp )
 {
-  return true;
-
 }
 
-bool ActionQuickOpen::run( Core::ActionContextHandle& context, 
-  Core::ActionResultHandle& result )
+SessionInfo::~SessionInfo()
 {
-
-  ProjectManager::Instance()->new_project( "", "", false );
-  if ( ProjectManager::Instance()->get_current_project() )
-  {
-    ProjectManager::Instance()->get_current_project()->reset_project_changed();
-  }
-  
-  // Clear undo buffer
-  UndoBuffer::Instance()->reset_undo_buffer();
-  
-  return true;
-}
-
-Core::ActionHandle ActionQuickOpen::Create()
-{
-  ActionQuickOpen* action = new ActionQuickOpen;
-  return Core::ActionHandle( action );
-}
-
-void ActionQuickOpen::Dispatch( Core::ActionContextHandle context )
-{
-  Core::ActionDispatcher::PostAction( Create(), context );
 }
 
 } // end namespace Seg3D

@@ -330,7 +330,7 @@ bool PolylineTool::handle_mouse_press( ViewerHandle viewer,
         
         Core::Vector edge_dir = points[ j ] - points[ k ];
         double edge_length = edge_dir.normalize();
-        double alpha = Dot( points[ j ] - pt, points[ j ] - points[ k ] ) / 
+        double alpha = Dot( points[ j ] - pt, points[ j ] - points[ k ] )/
           ( edge_length * edge_length );
           
         double dist = 0.0;

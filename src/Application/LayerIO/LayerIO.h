@@ -31,10 +31,12 @@
 
 // Core includes
 #include <Core/Utils/Singleton.h>
+#include <Core/Utils/Lockable.h>
 
 // Application includes
 #include <Application/Layer/Layer.h>
-#include <Application/LayerIO/LayerImporter.h>
+#include <Application/LayerIO/LayerSingleFileImporter.h>
+#include <Application/LayerIO/LayerFileSeriesImporter.h>
 #include <Application/LayerIO/LayerExporter.h>
 #include <Application/LayerIO/LayerImporterInfo.h>
 #include <Application/LayerIO/LayerExporterInfo.h>
@@ -45,28 +47,22 @@ namespace Seg3D
 // This class is the factory object for importer and exporter objects. As several packages tend
 // to read a file including header as one operation, we need an importer that abstracts this 
 // operation and hides some of the data management, like loading the data before deciding how to
-// import the data, e.g. as masks or data layers.
+  // import the data, e.g. as masks or data layers.
 
 // Forward declaration
 class LayerIO;
+class LayerIOPrivate;
+typedef boost::shared_ptr<LayerIOPrivate> LayerIOPrivateHandle;
 
 // Class definition
-class LayerIO
+class LayerIO : public Core::Lockable
 {
   CORE_SINGLETON( LayerIO );
-  // -- typedefs --
-public:
-  typedef boost::mutex mutex_type;
-  typedef boost::unique_lock< mutex_type > lock_type;
-  typedef std::vector< std::string > importer_types_type;
-  typedef std::vector< std::string > exporter_types_type;
-
 
   // -- constructor / destructor --
 private:
   LayerIO();
   virtual ~LayerIO();
-
 
   // -- Importer/Exporter registration --
 public:
@@ -76,16 +72,14 @@ public:
   template < class IMPORTER >
   void register_importer()
   {
-    // Lock the factory
-    lock_type lock( mutex_ );
-
     // Generate a new information class
     LayerImporterInfoHandle info( new LayerImporterInfo( 
       LayerImporterBuilderBaseHandle( new LayerImporterBuilder< IMPORTER > ),
-      IMPORTER::Name(), IMPORTER::FileTypes(), IMPORTER::Priority(), IMPORTER::ImporterType() ) );
-
-    // Insert the information block into the correct importer list
-    this->importer_list_.push_back( info );
+      IMPORTER::GetName(), IMPORTER::GetFileTypes(), IMPORTER::GetPriority(),
+      IMPORTER::GetType() ) );
+  
+    // Insert information into internal database
+    this->register_importer_internal( info );
   }
   
   // REGISTER_EXPORTER:
@@ -93,62 +87,56 @@ public:
   template < class EXPORTER >
   void register_exporter()
   {
-    // Lock the factory
-    lock_type lock( mutex_ );
-
     // Generate a new information class
     LayerExporterInfoHandle info( new LayerExporterInfo( 
       LayerExporterBuilderBaseHandle( new LayerExporterBuilder< EXPORTER > ),
-      EXPORTER::Name(), EXPORTER::FileTypes() ) );
+      EXPORTER::GetName(), EXPORTER::GetFileTypes() ) );
 
-    // Insert the information block into the exporter list
-    exporter_list_.push_back( info );
+    // Insert information into internal database
+    this->register_exporter_internal( info );
   }
 
+  // -- internals of registration process --
+private:
+  // REGISTER_IMPORTER_INTERNAL
+  // Registration of the importers into the internals of this class
+  void register_importer_internal( LayerImporterInfoHandle info );
+
+  // REGISTER_EXPORTER_INTERNAL
+  // Registration of the exporters into the internals of this class
+  void register_exporter_internal( LayerExporterInfoHandle info );
 
   // -- Get the types of importers available --
 public:
-  // GET_IMPORTER_TYPES:
-  // Get the names of all the importers that are available
-  importer_types_type get_importer_types();
-  importer_types_type get_series_importer_types();
-  exporter_types_type get_exporter_types();
+  // GET_SINGLE_FILE_IMPORTER_TYPES
+  // Get the names of all the importers that are available for a single file
+  std::vector< std::string > get_single_file_importer_types();
 
-private:
-  // The internal list of importers
-  typedef std::vector< LayerImporterInfoHandle > importer_list_type;
-  importer_list_type importer_list_;
+  // GET_FILE_SERIES_IMPORTER_TYPES
+  // Get the names of all the importers that are available for file series
+  std::vector< std::string > get_file_series_importer_types();
   
-  // The internal list of exporters
-  typedef std::vector< LayerExporterInfoHandle > exporter_list_type;
-  exporter_list_type exporter_list_;
-
-
-  // -- Locking interface --
-public:
-  // GET_MUTEX:
-  // Get the mutex so we can lock it from outside the class
-  mutex_type& get_mutex() { return mutex_; } 
-  
-private:
-  // Mutex protecting this resource
-  mutex_type mutex_;
-  
+  // GET_EXPORTER_TYPES
+  // Get the names of all the exporters that are available
+  std::vector< std::string > get_exporter_types();
 
   // -- functions for creating an importer
 public: 
-  // CREATE_IMPORTER:
+  // CREATE_SINGLE_FILE_IMPORTER:
   // This function creates a new importer by checking the file extension and it will return
   // the appropriate importer. If an importer name is given as well, it will restrain the 
   // search to that specific name of importer
-  bool create_importer( const std::string& filename, LayerImporterHandle& importer,
-    const std::string importername = "");
-
+  bool create_single_file_importer( const std::string& filename, 
+    LayerImporterHandle& importer, 
+    std::string& error, const std::string& importername = "");
+    
+  // CREATE_FILE_SERIES_IMPORTER: 
   // This function creates a new importer by checking the file extension and it will return
   // the appropriate importer. If an importer name is given as well, it will restrain the 
   // search to that specific name of importer
-  bool create_importer( const std::vector<std::string>& filenames, LayerImporterHandle& importer,
-    const std::string importername = "");
+  bool create_file_series_importer( const std::vector<std::string>& filenames, 
+    LayerImporterHandle& importer, 
+    std::string& error, const std::string& importername = "");
     
   // CREATE_EXPORTER:
   // This function creates a new exporter by checking the file extension and it will return
@@ -156,36 +144,23 @@ public:
   // search to that specific name of exporter           
   bool create_exporter( LayerExporterHandle& exporter, std::vector< LayerHandle >& layers, 
     const std::string importername = "", const std::string extension = "" );
-
-
-  // -- Signals for indicating when a file is imported or exported --
+    
+  // -- internals --
 public:
-  typedef boost::signals2::signal< void( LayerImporterHandle ) > layerimporter_signal_type;
-  typedef boost::signals2::signal< void( LayerExporterHandle ) > layerexporter_signal_type;
+  LayerIOPrivateHandle private_;
 
-  // LAYER_IMPORT_START_SIGNAL:
-  // Indicates that a layer import will start
-  layerimporter_signal_type layer_import_start_signal_;
-
-  // LAYER_IMPORT_END_SIGNAL:
-  // Indicates that a layer import has ended
-  layerimporter_signal_type layer_import_end_signal_;
-  
-  // LAYER_EXPORT_START_SIGNAL:
-  // Indicates that a layer export will start
-  layerexporter_signal_type layer_export_start_signal_;
-
-  // LAYER_EXPORT_END_SIGNAL:
-  // Indicates that a layer export has ended
-  layerexporter_signal_type layer_export_end_signal_;
-  
+  // -- static functions --
+public:
+  // FINDFILESERIES
+  // Process the names/name of a file in a file series and find all the files that should
+  // belong to that file series bsed on the filenames of the files in the same directory.
+  static bool FindFileSeries( std::vector<std::string >& filenames );
+    
 };
-
 
 // Macro for adding function that registers a new importer
 // Note these functions will be called in the init call of the program.
-
-#define SCI_REGISTER_IMPORTER(namesp, name)\
+#define SEG3D_REGISTER_IMPORTER(namesp, name)\
 namespace Core\
 {\
   using namespace namesp;\
@@ -197,8 +172,7 @@ namespace Core\
 
 // Macro for adding function that registers a new exporter
 // Note these functions will be called in the init call of the program.
-
-#define SCI_REGISTER_EXPORTER(namesp, name)\
+#define SEG3D_REGISTER_EXPORTER(namesp, name)\
   namespace Core\
 {\
   using namespace namesp;\

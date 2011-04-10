@@ -50,26 +50,20 @@ bool ActionActivateTool::validate( Core::ActionContextHandle& context )
 
 bool ActionActivateTool::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
-  ToolManager::Instance()->activate_tool( toolid_.value() );
+  ToolManager::Instance()->activate_tool( toolid_);
   return true; // success
 }
 
-Core::ActionHandle ActionActivateTool::Create( const std::string& toolid )
+void ActionActivateTool::Dispatch( Core::ActionContextHandle context, const std::string& toolid )
 {
   // Create new action
   ActionActivateTool* action = new ActionActivateTool;
 
   // Set action parameters
-  action->toolid_.value() = toolid;
+  action->toolid_ = toolid;
 
   // Post the new action
-  return Core::ActionHandle( action );
-}
-
-void ActionActivateTool::Dispatch( Core::ActionContextHandle context, const std::string& toolid )
-{
-  // Post the new action
-  Core::ActionDispatcher::PostAction( Create( toolid ), context );
+  Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }
 
 } // end namespace Seg3D

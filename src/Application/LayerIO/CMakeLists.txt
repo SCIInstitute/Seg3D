@@ -36,10 +36,18 @@ SET(APPLICATION_LAYERIO_SRCS
   LayerExporter.cc
   LayerImporter.h
   LayerImporter.cc
-  LayerExporterInfo.h
-  LayerExporterInfo.cc
+  LayerSingleFileImporter.h
+  LayerSingleFileImporter.cc
+  LayerFileSeriesImporter.h
+  LayerFileSeriesImporter.cc
   LayerImporterInfo.h
   LayerImporterInfo.cc
+  LayerImporterFileInfo.h
+  LayerImporterFileInfo.cc
+  LayerImporterFileData.h
+  LayerImporterFileData.cc
+  LayerExporterInfo.h
+  LayerExporterInfo.cc
   LayerIO.h
   LayerIO.cc
 )
@@ -61,6 +69,7 @@ SET(APPLICATION_LAYERIO_IMPORTERS_SRCS
   GDCMLayerImporter.h
   GDCMLayerImporter.cc
 )
+
 SET(APPLICATION_LAYERIO_EXPORTERS_SRCS
   ITKDataLayerExporter.h
   ITKDataLayerExporter.cc

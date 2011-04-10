@@ -89,18 +89,18 @@ protected:
 
   // EXPORT_TO_VARIANT
   // Export the state data to a variant parameter
-  virtual void export_to_variant( Core::ActionParameterVariant& variant ) const = 0;
+  virtual void export_to_variant( Variant& variant ) const = 0;
 
   // IMPORT_FROM_VARIANT:
   // Import the state data from a variant parameter.
-  virtual bool import_from_variant( Core::ActionParameterVariant& variant, 
+  virtual bool import_from_variant( Variant& variant, 
     Core::ActionSource source = Core::ActionSource::NONE_E ) = 0;
 
   // VALIDATE_VARIANT:
   // Validate a variant parameter
   // This function returns false if the parameter is invalid or cannot be
   // converted and in that case error will describe the error.
-  virtual bool validate_variant( Core::ActionParameterVariant& variant, std::string& error ) = 0;
+  virtual bool validate_variant( Variant& variant, std::string& error ) = 0;
 
   // ENABLE_SIGNALS:
   // Allow signals to be triggered from this state variable

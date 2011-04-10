@@ -29,14 +29,18 @@
 #ifndef APPLICATION_FILTERS_ACTIONS_ACTIONMEANFILTER_H
 #define APPLICATION_FILTERS_ACTIONS_ACTIONMEANFILTER_H
 
+// Core includes
 #include <Core/Action/Actions.h>
 #include <Core/Interface/Interface.h>
+
+// Application includes
 #include <Application/Layer/Layer.h>
+#include <Application/LayerManager/LayerAction.h>
 
 namespace Seg3D
 {
 
-class ActionMeanFilter : public Core::Action
+class ActionMeanFilter : public LayerAction
 {
 
 CORE_ACTION( 
@@ -56,19 +60,12 @@ public:
   ActionMeanFilter()
   {
     // Action arguments
-    this->add_argument( this->target_layer_ );
-    
-    // Action options
-    this->add_key( this->replace_ );
-    this->add_key( this->preserve_data_format_ );
-    
-    this->add_key( this->radius_ );
+    this->add_layer_id( this->target_layer_ );
+    this->add_parameter( this->replace_ );
+    this->add_parameter( this->preserve_data_format_ );
+    this->add_parameter( this->radius_ );
   }
-  
-  virtual ~ActionMeanFilter()
-  {
-  }
-  
+
   // -- Functions that describe action --
 public:
   virtual bool validate( Core::ActionContextHandle& context );
@@ -77,20 +74,17 @@ public:
   // -- Action parameters --
 private:
 
-  Core::ActionParameter< std::string > target_layer_;
-  Core::ActionParameter< bool > replace_;
-  Core::ActionParameter< bool > preserve_data_format_;
-  
-  Core::ActionParameter< int > radius_;
+  std::string target_layer_;
+  bool replace_;
+  bool preserve_data_format_;
+  int radius_;
   
   // -- Dispatch this action from the interface --
 public:
-
   // DISPATCH:
   // Create and dispatch action that inserts the new layer 
   static void Dispatch( Core::ActionContextHandle context, 
-    std::string target_layer, bool replace, bool preserve_data_format, int radius );
-          
+    std::string target_layer, bool replace, bool preserve_data_format, int radius );        
 };
   
 } // end namespace Seg3D

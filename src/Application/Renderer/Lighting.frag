@@ -27,7 +27,7 @@ vec4 compute_lighting()
   {
     color += ( diffuse * n_dot_l + ambient );
     
-    half_v = normalize( half_vector );
+    half_v = normalize(half_vector);
     n_dot_hv = max( dot ( n, half_v ), 0.0 );
     color += gl_FrontMaterial.specular * gl_LightSource[0].specular * 
             pow( n_dot_hv, gl_FrontMaterial.shininess );

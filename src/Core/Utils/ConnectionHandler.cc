@@ -32,39 +32,81 @@
 namespace Core
 {
 
-ConnectionHandler::ConnectionHandler()
+ConnectionHandlerConnection::~ConnectionHandlerConnection()
+{
+}
+
+class ConnectionHandlerPrivate : public boost::noncopyable
+{
+public:
+  // List of boost connections that need to be disconnected
+  typedef std::list< boost::signals2::connection > boost_connections_type;
+  boost_connections_type boost_connections_;
+  
+  // List of other connection that need to be disconnected
+  typedef std::list<ConnectionHandlerConnectionHandle> other_connections_type;
+  other_connections_type other_connections_;
+};
+
+ConnectionHandler::ConnectionHandler() :
+  private_( new ConnectionHandlerPrivate )
 {
 }
 
 ConnectionHandler::~ConnectionHandler()
 {
-  if ( !connections_.empty() )
+  if ( ! this->private_->boost_connections_.empty() ||
+     ! this->private_->other_connections_.empty() )
   {
-    CORE_LOG_ERROR("disconnect_all() needs to be called in the destructor of the derived class");
+    CORE_LOG_ERROR( "disconnect_all() needs to be called in the destructor of the derived class" );
     // Correct the problem, although this is not fully thread safe
-    disconnect_all();
+    this->disconnect_all();
   }
 }
 
 void ConnectionHandler::add_connection( const boost::signals2::connection& connection )
 {
-  connections_.push_back( connection );
+  this->private_->boost_connections_.push_back( connection );
+}
+
+void ConnectionHandler::add_connection( const ConnectionHandlerConnectionHandle& connection )
+{
+  this->private_->other_connections_.push_back( connection );
 }
 
 void ConnectionHandler::disconnect_all()
 {
-  connections_type::iterator it = connections_.begin();
-  connections_type::iterator it_end = connections_.end();
-
-  // disconnect all the connections
-  while ( it != it_end )
   {
-    ( *it ).disconnect();
-    ++it;
-  }
+    ConnectionHandlerPrivate::boost_connections_type::iterator it = 
+      this->private_->boost_connections_.begin();
+    ConnectionHandlerPrivate::boost_connections_type::iterator it_end = 
+      this->private_->boost_connections_.end();
 
+    // disconnect all the connections
+    while ( it != it_end )
+    {
+      ( *it ).disconnect();
+      ++it;
+    }
+  }
+  
+  {
+    ConnectionHandlerPrivate::other_connections_type::iterator it = 
+      this->private_->other_connections_.begin();
+    ConnectionHandlerPrivate::other_connections_type::iterator it_end = 
+      this->private_->other_connections_.end();
+
+    // disconnect all the connections
+    while ( it != it_end )
+    {
+      ( *it )->disconnect();
+      ++it;
+    }
+  }
+  
   // clear the connections
-  connections_.clear();
+  this->private_->boost_connections_.clear();
+  this->private_->other_connections_.clear();
 }
 
 } // end namespace Core

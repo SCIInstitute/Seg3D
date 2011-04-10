@@ -37,7 +37,7 @@ namespace QtUtils
 {
 
 QtLineEditConnector::QtLineEditConnector( QLineEdit* parent, 
-    Core::StateStringHandle& state, bool blocking ) :
+    Core::StateStringHandle& state, bool immediate_update, bool blocking ) :
   QtConnectorBase( parent, blocking ),
   parent_( parent ),
   state_( state )
@@ -52,11 +52,19 @@ QtLineEditConnector::QtLineEditConnector( QLineEdit* parent,
       boost::bind( &QtLineEditConnector::SetLineEditText, qpointer, _1, _2 ) ) );
   }
 
-  this->connect( parent, SIGNAL( editingFinished() ), SLOT( set_state() ) );
+  if ( immediate_update )
+  {
+    this->connect( parent, SIGNAL( textChanged ( const QString& ) ), 
+      SLOT( set_state( const QString& ) ) );
+  }
+  else
+  {
+    this->connect( parent, SIGNAL( editingFinished() ), SLOT( set_state() ) );
+  }
 }
 
 QtLineEditConnector::QtLineEditConnector( QLineEdit* parent, 
-    Core::StateNameHandle& state, bool blocking ) :
+    Core::StateNameHandle& state, bool immediate_update, bool blocking ) :
   QtConnectorBase( parent, blocking ),
   parent_( parent ),
   state_( state )
@@ -75,7 +83,15 @@ QtLineEditConnector::QtLineEditConnector( QLineEdit* parent,
       &QtLineEditConnector::SetLineEditText, qpointer, _2, Core::ActionSource::NONE_E ) ) );
   }
 
-  this->connect( parent, SIGNAL( editingFinished() ), SLOT( set_state() ) );
+  if ( immediate_update )
+  {
+    this->connect( parent, SIGNAL( textChanged ( const QString&) ), 
+      SLOT( set_state( const QString& ) ) );
+  }
+  else
+  {
+    this->connect( parent, SIGNAL( editingFinished() ), SLOT( set_state() ) );
+  }
 }
 
 
@@ -117,6 +133,15 @@ void QtLineEditConnector::set_state()
     this->parent_->setCursorPosition( 0 );
     std::string text = this->parent_->text().trimmed().toStdString();
     Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), this->state_, text );
+  }
+}
+
+void QtLineEditConnector::set_state( const QString& text )
+{
+  if ( !this->is_blocked() )
+  {
+    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), this->state_, 
+      text.trimmed().toStdString() );
   }
 }
 

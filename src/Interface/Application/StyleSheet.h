@@ -120,7 +120,17 @@ public:
   // === ViewerWidget === //
     const static QString VIEWERSELECTED_C;
     const static QString VIEWERNOTSELECTED_C;
+    
+  // == Rendering DockWidget == //
+    const static QString RENDERING_CLIPPING_ACTIVE_C;
+    const static QString RENDERING_CLIPPING_INACTIVE_C;   
 
+    const static QString RENDERING_FOG_ACTIVE_C;
+    const static QString RENDERING_FOG_INACTIVE_C;    
+
+    const static QString RENDERING_VR_ACTIVE_C;
+    const static QString RENDERING_VR_INACTIVE_C;   
+    
 };    
 
 }  // end namespace Seg3D

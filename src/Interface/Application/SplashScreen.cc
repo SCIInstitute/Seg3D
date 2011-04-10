@@ -43,7 +43,7 @@
 // Application includes
 #include <Application/ProjectManager/ProjectManager.h>
 #include <Application/ProjectManager/Actions/ActionLoadProject.h>
-#include <Application/ProjectManager/Actions/ActionQuickOpen.h>
+#include <Application/ProjectManager/Actions/ActionNewProject.h>
 
 // Resources includes
 #include <Resources/QtResources.h>
@@ -60,17 +60,23 @@ public:
 
 };
 
+
 SplashScreen::SplashScreen( QWidget *parent ) :
   QtUtils::QtCustomDialog( parent ),
   private_( new SplashScreenPrivate )
 {
   this->setAttribute( Qt::WA_DeleteOnClose, true );
   
-  this->setWindowFlags( Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint );
+  /*this->setWindowFlags( Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint );*/
+  this->setWindowFlags( Qt::Dialog | Qt::FramelessWindowHint );
+
   this->setModal( true );
 
   // Set up the private internals of the AppSplash class
   this->private_->ui_.setupUi( this );
+  this->setObjectName( QString::fromUtf8( "splashscreen" ) );
+
+  //this->setStyleSheet( QString::fromUtf8( "SplashScreen#splashscreen{ background-color: none; }" ) );
 
   // Disable these since they arent being used yet.
   this->private_->ui_.load_recent_button_->setEnabled( false );
@@ -104,9 +110,11 @@ SplashScreen::SplashScreen( QWidget *parent ) :
   this->private_->ui_.new_project_button_->setFocus();
 }
 
+
 SplashScreen::~SplashScreen()
 {
 }
+
   
 void SplashScreen::new_project()
 {
@@ -116,33 +124,104 @@ void SplashScreen::new_project()
   this->hide();
 }
 
+
 void SplashScreen::quit()
 {
   reinterpret_cast<QWidget*>( this->parent() )->close();
 }
 
+
 void SplashScreen::unhide()
 {
   this->show();
 }
+
   
 void SplashScreen::open_existing()
 {
-  boost::filesystem::path current_projects_path = complete( 
-    boost::filesystem::path( ProjectManager::Instance()->
-    current_project_path_state_->get().c_str(), boost::filesystem::native ) );
+  boost::filesystem::path current_projects_path = boost::filesystem::absolute( 
+    boost::filesystem::path( ProjectManager::Instance()-> get_current_project_folder() ) );
 
-  boost::filesystem::path full_path = ( QFileDialog::getOpenFileName ( this, 
-    tr( "Open Seg3D Project" ), QString::fromStdString( current_projects_path.string() ), 
-    tr( "Seg3D Project File ( *.s3d )" ) ) ).toStdString(); 
+
+  std::string project_type = std::string( "Open " ) + 
+    Core::Application::GetApplicationName() + " Project";
+    
+  std::vector<std::string> project_file_extensions = Project::GetProjectFileExtensions(); 
+  std::vector<std::string> project_path_extensions = Project::GetProjectPathExtensions(); 
+  std::string project_file_type =  Core::Application::GetApplicationName() + " Project File (";
+  
+  for ( size_t j = 0; j < project_file_extensions.size(); j++ )
+  {
+    project_file_type += std::string( " *" ) + project_file_extensions[ j ];
+  }
+
+  for ( size_t j = 0; j < project_path_extensions.size(); j++ )
+  {
+    project_file_type += std::string( " *" ) + project_path_extensions[ j ];
+  }
+
+  project_file_type += " )";
+
+  boost::filesystem::path full_path =  boost::filesystem::path( ( 
+    QFileDialog::getOpenFileName ( this, 
+    QString::fromStdString( project_type ), 
+    QString::fromStdString( current_projects_path.string() ), 
+    QString::fromStdString( project_file_type ) ) ).toStdString() ); 
+
+
+  bool is_path_extension = false;
+  for ( size_t j = 0; j < project_path_extensions.size(); j++ )
+  {
+    if ( boost::filesystem::extension( full_path ) == project_path_extensions[ j ] )
+    {
+      is_path_extension = true;
+      break;
+    }
+  }
+
+
+  if ( is_path_extension )
+  {
+    bool found_s3d_file = false;
+    
+    if ( boost::filesystem::is_directory( full_path ) )
+    {
+      boost::filesystem::directory_iterator dir_end;
+      for( boost::filesystem::directory_iterator dir_itr( full_path ); 
+        dir_itr != dir_end; ++dir_itr )
+      {
+        std::string filename = dir_itr->path().filename().string();
+        boost::filesystem::path dir_file = full_path / filename;
+        for ( size_t j = 0; j < project_file_extensions.size(); j++ )
+        {
+          if ( boost::filesystem::extension( dir_file ) ==project_file_extensions[ j ] )
+          {
+            full_path = dir_file;
+            found_s3d_file = true;
+            break;
+          }
+        }
+        
+        if ( found_s3d_file ) break;
+      }
+    }
+    
+    if ( !found_s3d_file )
+    {
+      QMessageBox::critical( this, 
+        "Error reading project file",
+        "Error reading project file:\n"
+        "The project file is incomplete." );
+      return;   
+    }
+  }
   
   std::string path = full_path.parent_path().string();
-  std::string file_name = full_path.filename();
+  std::string file_name = full_path.filename().string();
 
   if( boost::filesystem::exists( full_path ) )
   {
-    if ( ! ProjectManager::Instance()->check_if_file_is_valid_project( 
-      full_path ) )
+    if ( ! ProjectManager::CheckProjectFile( full_path ) )
     {
       QMessageBox::critical( 0, 
         "Error reading project file",
@@ -155,7 +234,8 @@ void SplashScreen::open_existing()
     this->close();
   }
 }
-  
+
+
 void SplashScreen::open_recent()
 {
   std::vector< RecentProject > recent_projects;
@@ -166,14 +246,25 @@ void SplashScreen::open_recent()
   if( recent_projects[ index ].name_ == 
     ( this->private_->ui_.recent_project_listwidget_->currentItem()->text() ).toStdString() )
   {
-    boost::filesystem::path path = 
-      recent_projects[ index ].path_;
+    std::vector<std::string> file_project_extensions = Project::GetProjectFileExtensions(); 
+  
+    bool found_project_file = false;
+    boost::filesystem::path path;
     
-    path = path / recent_projects[ index ].name_ / ( recent_projects[ index ].name_ + ".s3d" );
+    for ( size_t j = 0; j < file_project_extensions.size(); j++ )
+    {
+      path = boost::filesystem::path( recent_projects[ index ].path_ ) / 
+      ( recent_projects[ index ].name_ + file_project_extensions[ j ] );
+      if ( boost::filesystem::exists( path ) ) 
+      {
+        found_project_file = true;
+        break;
+      }
+    }
+  
+    if ( ! found_project_file ) return;
     
-    if( !boost::filesystem::exists( path ) ) return;
-    
-    if ( ! ProjectManager::Instance()->check_if_file_is_valid_project( path ) )
+    if ( ! ProjectManager::CheckProjectFile( path ) )
     {
       QMessageBox::critical( 0, 
         "Error reading project file",
@@ -190,14 +281,17 @@ void SplashScreen::open_recent()
   }
 }
 
+
 void SplashScreen::quick_open_file()
 {
-  ActionQuickOpen::Dispatch( Core::Interface::GetWidgetActionContext() );
+  ActionNewProject::Dispatch( Core::Interface::GetWidgetActionContext(), "",
+    "Untitled Project" );
   this->hide();
   LayerIOFunctions::ImportFiles( dynamic_cast< QMainWindow* >( this->parentWidget() ), "" );
   
 }
-  
+
+
 void SplashScreen::populate_recent_projects()
 {
   std::vector< RecentProject > recent_projects;
@@ -219,6 +313,7 @@ void SplashScreen::populate_recent_projects()
   }
     
 }
+
   
 void SplashScreen::enable_load_recent_button( QListWidgetItem* not_used )
 {

@@ -52,6 +52,7 @@
 
 // Application includes
 #include <Application/Layer/Layer.h>
+#include <Application/Provenance/Provenance.h>
 
 namespace Seg3D
 {
@@ -73,7 +74,8 @@ class LayerGroup : public Core::StateHandler, public boost::enable_shared_from_t
   // -- constructor/destructor --
 public:
 
-  LayerGroup( Core::GridTransform grid_transform, const LayerMetaData& meta_data );
+  LayerGroup( Core::GridTransform grid_transform, ProvenanceID provenance_id, 
+    const LayerMetaData& meta_data );
   LayerGroup( const std::string& state_id );
   virtual ~LayerGroup();
   
@@ -100,12 +102,15 @@ public:
   
   Core::StateOptionHandle layers_iso_visible_state_;
 
+  // The provenance id of the layer that created this group
+  Core::StateLongLongHandle provenance_id_state_;
+
   // State of the MetaData associated with this group
   Core::StateStringHandle meta_data_state_;
 
   // State variable that keeps track of what type of meta data was provided by the importer
   Core::StateStringHandle meta_data_info_state_;
-  
+
   // -- GUI related states --
 public:
   // Whether to show the isosurface menu
@@ -152,7 +157,7 @@ protected:
   // CLEAR:
   // Delete all  the layers.
   void clear();
-
+  
 public: 
   // GET_METADATA:
   // NOTE: Group meta data is derived from the first layer that generates the group.
@@ -161,8 +166,8 @@ public:
 
   // SET_METADATA:
   // Set all the metadata state variables
-  void set_meta_data( const LayerMetaData& meta_data );
-    
+  void set_meta_data( const LayerMetaData& meta_data ); 
+  
 protected:
   // POST_SAVE_STATES:
   // This function is called after the LayerGroup's states have been saved and then

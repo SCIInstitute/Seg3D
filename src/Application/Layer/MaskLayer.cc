@@ -269,6 +269,10 @@ bool MaskLayer::set_mask_volume( Core::MaskVolumeHandle volume )
 bool MaskLayer::pre_save_states( Core::StateIO& state_io )
 {
   this->generation_state_->set( static_cast< int >( this->get_mask_volume()->get_generation() ) );
+  std::string data_file_name = this->generation_state_->export_to_string() + ".nrrd";
+
+  ProjectManager::Instance()->get_current_project()->add_data_file( data_file_name );
+
   return true;
 }
 
@@ -283,8 +287,8 @@ bool MaskLayer::post_load_states( const Core::StateIO& state_io )
   if ( !success )
   {
     Core::DataVolumeHandle data_volume;
-    boost::filesystem::path volume_path = ProjectManager::Instance()->get_project_data_path() /
-      ( this->generation_state_->export_to_string() + ".nrrd" );
+    boost::filesystem::path volume_path = ProjectManager::Instance()->get_current_project()->
+      get_project_data_path() / ( this->generation_state_->export_to_string() + ".nrrd" );
     std::string error;
 
     if( Core::DataVolume::LoadDataVolume( volume_path, data_volume, error ) )

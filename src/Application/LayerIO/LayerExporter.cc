@@ -32,48 +32,14 @@
 namespace Seg3D
 {
 
-std::string ExportToString( LayerExporterMode mode )
-{
-  switch ( mode )
-  {
-    case LayerExporterMode::DATA_E: return "data";
-    case LayerExporterMode::SINGLE_MASK_E: return "single_mask";
-    case LayerExporterMode::BITPLANE_MASK_E: return "bitplane_mask";
-    case LayerExporterMode::LABEL_MASK_E: return "label_mask";
-    default: return "unknown";
-  }
+std::string LayerExporter::get_error() const 
+{ 
+  return error_; 
 }
 
-bool ImportFromString( const std::string& export_type_string, LayerExporterMode& mode )
+void LayerExporter::set_error( const std::string& error )
 {
-  std::string export_type = export_type_string;
-  boost::to_lower( export_type );
-  boost::erase_all( export_type , " " );
-
-  if ( export_type == "data" )
-  {
-    mode = LayerExporterMode::DATA_E;
-    return true;
-  }
-  else if ( export_type == "singlemask" || export_type == "single_mask" || export_type == "mask" )
-  {
-    mode = LayerExporterMode::SINGLE_MASK_E;
-    return true;
-  }
-  else if ( export_type == "bitplane_mask" || export_type == "bitplanemask" )
-  {
-    mode = LayerExporterMode::BITPLANE_MASK_E;
-    return true;
-  }
-  else if ( export_type == "label_mask" || export_type == "labelmask" )
-  {
-    mode = LayerExporterMode::LABEL_MASK_E;
-    return true;
-  }
-  else
-  {
-    return false;
-  }
+  error_ = error;
 }
 
 
@@ -85,7 +51,5 @@ LayerExporter::LayerExporter( std::vector< LayerHandle >& layers ) :
 LayerExporter::~LayerExporter()
 {
 }
-
-
 
 } // end namespace seg3D

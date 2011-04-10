@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>230</width>
-    <height>46</height>
+    <width>215</width>
+    <height>44</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -59,30 +59,6 @@ QToolButton#spacer_:pressed{
   color:  rgb(100, 100, 100);
 }
 
-
-QPushButton#activate_button_{
-  background-color:rgba(0, 0, 0, 0);
-  border-color: rgba(0, 0, 0, 0);
-  border: none;
-  height: 24px;
-  text-align: left;
-  color: white;
-  padding-left:4px;
-  font: bold;
-}
-
-QPushButton#activate_button_:hover{
-  color: silver;
-}
-
-QPushButton#activate_button_:pressed{
-  background-color:rgba(0, 0, 0, 0);
-  border-color: rgba(0, 0, 0, 0);
-  padding-left: 4px;
-  border: none;
-  color:  rgb(68, 68, 68);
-}
-
 QToolButton#close_button_{
   background-color: rgba(0, 0, 0, 0);
   border-radius: 4px;
@@ -93,7 +69,7 @@ QToolButton#close_button_:hover{
 }
 
 QToolButton#close_button_:pressed{
-  background-color: rgb(68, 68, 68);
+  background-color: rgb(100, 100, 100);
   border-radius: 4px;
 }
 
@@ -107,7 +83,7 @@ QToolButton#help_button_:hover{
 }
 
 QToolButton#help_button_:pressed{
-  background-color: rgb(68, 68, 68);
+  background-color: rgb(100, 100, 100);
   border-radius: 4px;
 }
 
@@ -120,7 +96,7 @@ QWidget#page_header_{
 
 QWidget#page_background_{
   /*background-color: rgb(255, 128, 0);*/
-  background-color: rgb( 237, 149, 31 );
+  background-color: rgb( 237, 165, 76 );
     border-radius: 3px;
 }
 
@@ -129,7 +105,7 @@ QWidget#ToolBoxPageWidget{
   
   background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(100, 100, 100, 255), stop:0.36 rgba(80, 80, 80, 255), stop:0.65 rgba(80, 80, 80, 255), stop:1 rgba(100, 100, 100, 255));
   border-radius:3px;
-  border: 1px solid rgb( 60, 60, 60 );
+  border: 1px solid rgb( 100, 100, 100 );
 }
 
 QWidget#tool_frame_{
@@ -144,7 +120,7 @@ QWidget#tool_frame_{
     <number>0</number>
    </property>
    <property name="margin">
-    <number>2</number>
+    <number>1</number>
    </property>
    <item>
     <widget class="QWidget" name="page_background_" native="true">
@@ -157,13 +133,13 @@ QWidget#tool_frame_{
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>21</height>
+       <height>24</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>21</height>
+       <height>24</height>
       </size>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_13">
@@ -184,14 +160,17 @@ QWidget#tool_frame_{
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>21</height>
+          <height>24</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
           <width>16777215</width>
-          <height>21</height>
+          <height>24</height>
          </size>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout">
          <property name="spacing">
@@ -211,8 +190,23 @@ QWidget#tool_frame_{
          </property>
          <item>
           <widget class="QToolButton" name="activate_button_">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>21</height>
+            </size>
+           </property>
            <property name="text">
             <string>Dimensions</string>
+           </property>
+           <property name="checkable">
+            <bool>false</bool>
            </property>
           </widget>
          </item>
@@ -233,14 +227,14 @@ QWidget#tool_frame_{
           <widget class="QToolButton" name="help_button_">
            <property name="minimumSize">
             <size>
-             <width>19</width>
-             <height>19</height>
+             <width>16</width>
+             <height>16</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>19</width>
-             <height>19</height>
+             <width>16</width>
+             <height>16</height>
             </size>
            </property>
            <property name="text">
@@ -256,14 +250,14 @@ QWidget#tool_frame_{
           <widget class="QToolButton" name="close_button_">
            <property name="minimumSize">
             <size>
-             <width>19</width>
-             <height>19</height>
+             <width>16</width>
+             <height>16</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>19</width>
-             <height>19</height>
+             <width>16</width>
+             <height>16</height>
             </size>
            </property>
            <property name="text">

@@ -55,8 +55,63 @@ Q_OBJECT
 public:
   Menu( QMainWindow* parent = 0 );
   virtual ~Menu();
+
+  // -- functions for building menus --
+private:
+  void create_file_menu( QMenuBar* menubar );
+  void create_edit_menu( QMenuBar* menubar );
+  void create_view_menu( QMenuBar* menubar );
+  void create_window_menu( QMenuBar* menubar );
+  void create_tool_menus( QMenuBar* menubar );
+  void create_help_menu( QMenuBar* menubar );
   
-public:
+  QMenu* file_menu_recents_;
+  QAction* export_segmentation_qaction_;
+  QAction* export_active_data_layer_qaction_;
+  
+  QAction* copy_qaction_;
+  QAction* paste_qaction_;
+  QAction* punch_qaction_;
+  
+  QAction* undo_action_;
+  QAction* redo_action_;
+  
+  // Keep a pointer to the main window
+  QMainWindow*  main_window_;
+  
+private Q_SLOTS:
+  // NEW_PROJECT:
+  // Create a new project and launch the wizard that walks the user through the process.
+  void new_project();
+  
+  // OPEN_PROJECT:
+  // Open an existing project
+  void open_project();
+  
+  // OPEN_PROJECT_FOLDER:
+  // This function launches the native explorer, so one can inspect the project folder
+  // This will call the explorer on Windows and Finder on the Mac
+  void open_project_folder();
+
+  // SAVE_PROJECT:
+  // Triggered by Save Project
+  void save_project();
+
+  // SAVE_PROJECT AS:
+  // Triggered by Save Project As
+  void save_project_as();
+  
+  // ABOUT:
+  // This launches the about dialog
+  void about();
+  
+  // MAC_OPEN_ANOTHER_VERSION:
+  // This opens another version of Seg3D on the mac.
+  // NOTE: Double clicking on the application will just highlight the current application
+  // Hence we added the option to launch a second version in the menu
+  void mac_open_another_version();
+
+private:
   typedef QPointer< Menu > qpointer_type;
   
   // SET_RECENT_FILE_LIST:
@@ -78,37 +133,6 @@ public:
   // UPDATE_REDO_TAG:
   // set the redo tag of what the next undo will actually do
   void update_redo_tag( std::string tag );
-
-  // -- functions for building menus --
-private:
-  void create_file_menu( QMenu* menu );
-  void create_edit_menu( QMenu* menu );
-  void create_view_menu( QMenu* menu );
-  void create_window_menu( QMenu* menu );
-  void create_tool_menus( QMenuBar* menubar );
-  void create_help_menu( QMenu* menu );
-  
-  QMenu* file_menu_recents_;
-  QAction* export_segmentation_qaction_;
-  QAction* export_active_data_layer_qaction_;
-  
-  QAction* copy_qaction_;
-  QAction* paste_qaction_;
-  QAction* punch_qaction_;
-  
-  QAction* undo_action_;
-  QAction* redo_action_;
-  
-  // Keep a pointer to the main window
-  QMainWindow*  main_window_;
-  
-private Q_SLOTS:
-  void new_project_wizard();
-  void open_project_from_file();
-  void open_project_folder();
-  void save_as_wizard();
-  void about();
-  void mac_open_another_version();
   
 public:
 

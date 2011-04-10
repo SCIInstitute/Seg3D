@@ -29,7 +29,11 @@
 #ifndef APPLICATION_FILTERS_ACTIONS_ACTIONARITHMETICFILTER_H
 #define APPLICATION_FILTERS_ACTIONS_ACTIONARITHMETICFILTER_H
 
+// Core includes
 #include <Core/Action/Actions.h>
+
+// Application includes
+#include <Application/LayerManager/LayerAction.h>
 
 namespace Seg3D
 {
@@ -37,7 +41,7 @@ namespace Seg3D
 class ActionArithmeticFilterPrivate;
 typedef boost::shared_ptr< ActionArithmeticFilterPrivate > ActionArithmeticFilterPrivateHandle;
 
-class ActionArithmeticFilter : public Core::Action
+class ActionArithmeticFilter : public LayerAction
 {
 
 CORE_ACTION( 
@@ -55,8 +59,6 @@ CORE_ACTION(
   // -- Constructor/Destructor --
 public:
   ActionArithmeticFilter();
-  
-  virtual ~ActionArithmeticFilter() {}
   
   // -- Functions that describe action --
 public:

@@ -50,49 +50,22 @@ namespace Seg3D
 {
   
 class ProjectDockWidgetPrivate;
+typedef boost::shared_ptr< ProjectDockWidgetPrivate > ProjectDockWidgetPrivateHandle;
 
 class ProjectDockWidget : public QtUtils::QtCustomDockWidget, public Core::ConnectionHandler
 {
   Q_OBJECT
   
+  // -- constructor/destructor --
 public:
   ProjectDockWidget( QWidget *parent = 0 );
   virtual ~ProjectDockWidget();
   
-private:
-  typedef QPointer< ProjectDockWidget > qpointer_type;
-
-  // HANDLESESSIONSCHANGED:
-  // A function that verifies that we're operating on the proper thread and if not, it moves the 
-  // process to the correct one in order to reload the sessions displayed after they have been
-  // updated elsewhere.
-  static void HandleSessionsChanged( qpointer_type qpointer );
-  
-  // HANDLENOTESSAVED:
-  // A function that verifies that we're operating on the proper thread and if not, it moves the 
-  // process to the correct one in order to save reload the notes displayed after they have been
-  // updated elsewhere.
-  static void HandleNoteSaved( qpointer_type qpointer );
-
-  // HANDLEAUTOSAVETIMECHANGED:
-  // this function handles signals that the autosave time has changed and routes them, on the 
-  // correct thread to the set_auto_save_label function so that it can update the label's text
-  static void HandleAutoSaveTimeChanged( qpointer_type qpointer, int duration );
-
-  // HANDLEFILESIZECHANGED:
-  // this function handles the signal that the file size has changed and sets the ui to reflect it
-  static void HandleFileSizeChanged( qpointer_type qpointer, long long file_size );
-  
-  static void HandleAutosaveStateChanged( qpointer_type qpointer, bool state );
 
 private:
   // SET_AUTO_SAVE_LABEL:
   // function that sets the autosave label's text
   void set_auto_save_label( int duration );
-
-  // SET_SMART_SAVE_LABEL:
-  // function that updates the gui to reflect the status of the smart autosave state variable
-  //void set_smart_save_label();
 
   // GET_DATE:
   // function for getting the current date to check the session names against
@@ -102,9 +75,13 @@ private:
   // function that actually sets the label to reflect the file size change
   void set_file_size_label( long long file_size );
   
-  void set_autosave_checkbox( bool state );
+
+  // UPDATE_WIDGET:
+  // Update the widget
+  void update_widget();
   
 private Q_SLOTS:
+
   // ENABLE_LOAD_DELETE_AND_EXPORT_BUTTONS:
   // this function enables the load, export and delete buttons when the user clicks on a session
   void enable_load_delete_and_export_buttons( int row, int column );
@@ -151,13 +128,43 @@ private Q_SLOTS:
   // this function disables the load, export and delete buttons for when a session is not selected
   void disable_load_delete_and_export_buttons();
   
-  // SET_AUTOSAVE_CHECKED_STATE:
-  // this function dispatches a function that sets the autosave checked state
-  void set_autosave_checked_state( bool state );
-  
-
+  // -- internals --
 private:
-  boost::shared_ptr< ProjectDockWidgetPrivate > private_;
+  ProjectDockWidgetPrivateHandle private_;
+  
+  // -- functions that handle callbacks from Application thread --
+public:
+  typedef QPointer< ProjectDockWidget > qpointer_type;
+
+  // HANDLESESSIONSCHANGED:
+  // A function that verifies that we're operating on the proper thread and if not, it moves the 
+  // process to the correct one in order to reload the sessions displayed after they have been
+  // updated elsewhere.
+  static void HandleSessionsChanged( qpointer_type qpointer );
+  
+  // HANDLENOTESSAVED:
+  // A function that verifies that we're operating on the proper thread and if not, it moves the 
+  // process to the correct one in order to save reload the notes displayed after they have been
+  // updated elsewhere.
+  static void HandleNoteSaved( qpointer_type qpointer );
+
+  // HANDLEAUTOSAVETIMECHANGED:
+  // This function handles signals that the autosave time has changed and routes them, on the 
+  // correct thread to the set_auto_save_label function so that it can update the label's text
+  static void HandleAutoSaveTimeChanged( qpointer_type qpointer, int duration );
+
+  // HANDLEFILESIZECHANGED:
+  // This function handles the signal that the file size has changed and sets the ui to reflect it
+  static void HandleFileSizeChanged( qpointer_type qpointer, long long file_size ); 
+
+  // HANDLEPROJECTCHANGED:
+  // This function is called when the signal that a new project has been loaded is triggered
+  static void HandleProjectChanged( qpointer_type qpointer );
+  
+  // HANDLEUPDATEWIDGET:
+  // This function updates the widget
+  static void HandleUpdateWidget( qpointer_type qpointer );
+  
 };
   
 } // end namespace Seg3D

@@ -78,7 +78,7 @@ public:
   bool erase_;
 };
 
-class PaintTool : public SeedPointsTool, public boost::enable_shared_from_this< PaintTool >
+class PaintTool : public SeedPointsTool, public boost::enable_shared_from_this< PaintTool >//, public SingleTargetTool
 {
 
 SEG3D_TOOL

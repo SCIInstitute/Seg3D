@@ -40,34 +40,19 @@ namespace Seg3D
   
 bool ActionMoveLayerAbove::validate( Core::ActionContextHandle& context )
 {
-  // first to we check to see if we have been given the layer_id.  If not, then we check
-  // to see if it is the layer_name, if so, we get that value instead, if not we return false;
-  if( !LayerManager::Instance()->get_layer_by_id( this->layer_to_move_id_.value() ) )
+  if( !LayerManager::Instance()->get_layer_by_id( this->layer_to_move_id_ ) )
   {
-    if( LayerManager::Instance()->get_layer_by_name( this->layer_to_move_id_.value() ) )
-    {
-      this->layer_to_move_id_.value() = LayerManager::Instance()->get_layer_by_name( 
-        this->layer_to_move_id_.value() )->get_layer_id();
-    }
-    else
-    {
+      context->report_error( std::string( "Layer ID '") + this->layer_to_move_id_ + "' is invalid" );
       return false;
-    }
   }
   
   // first to we check to see if we have been given the layer_id.  If not, then we check
   // to see if it is the layer_name, if so, we get that value instead, if not we return false;
-  if( !LayerManager::Instance()->get_layer_by_id( this->target_layer_id_.value() ) )
+  if( !LayerManager::Instance()->get_layer_by_id( this->target_layer_id_ ) )
   {
-    if( LayerManager::Instance()->get_layer_by_name( this->target_layer_id_.value() ) )
-    {
-      this->target_layer_id_.value() = LayerManager::Instance()->get_layer_by_name( 
-        this->target_layer_id_.value() )->get_layer_id();
-    }
-    else
-    {
-      return false;
-    }
+
+      context->report_error( std::string( "Layer ID '") + this->target_layer_id_ + "' is invalid" );
+    return false;
   }
 
   return true;
@@ -77,32 +62,23 @@ bool ActionMoveLayerAbove::run( Core::ActionContextHandle& context,
                  Core::ActionResultHandle& result )
 {
   return LayerManager::Instance()->move_layer_above( 
-    LayerManager::Instance()->get_layer_by_id( this->layer_to_move_id_.value() ),
-    LayerManager::Instance()->get_layer_by_id( this->target_layer_id_.value() ) );
+    LayerManager::Instance()->get_layer_by_id( this->layer_to_move_id_ ),
+    LayerManager::Instance()->get_layer_by_id( this->target_layer_id_ ) );
 }
 
-Core::ActionHandle ActionMoveLayerAbove::Create( const std::string& layer_to_move_id, 
+void ActionMoveLayerAbove::Dispatch( Core::ActionContextHandle context, 
+  const std::string& layer_to_move_id, 
   const std::string& target_layer_id, bool move_above )
 {
   // Create new action
   ActionMoveLayerAbove* action = new ActionMoveLayerAbove;
   
   // We need to fill in these to ensure the action can be replayed
-  action->layer_to_move_id_.value() = layer_to_move_id;
-  action->target_layer_id_.value() = target_layer_id;
-  action->move_above_.value() = move_above;
+  action->layer_to_move_id_ = layer_to_move_id;
+  action->target_layer_id_ = target_layer_id;
+  action->move_above_ = move_above;
   
-  // Post the new action
-  return Core::ActionHandle( action );
-}
-
-
-void ActionMoveLayerAbove::Dispatch( Core::ActionContextHandle context, 
-  const std::string& layer_to_move_id, 
-  const std::string& layer_below_id, bool move_above )
-{
-  Core::ActionDispatcher::PostAction( Create( layer_to_move_id, layer_below_id, 
-    move_above ), context );
+  Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }
   
 } // end namespace Seg3D

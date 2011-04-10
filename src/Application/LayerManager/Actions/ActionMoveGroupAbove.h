@@ -51,12 +51,8 @@ public:
     group_to_move_id_(""),
     group_below_id_("") 
   {
-    this->add_argument( group_to_move_id_ );
-    this->add_argument( group_below_id_ );
-  }
-  
-  virtual ~ActionMoveGroupAbove()
-  {
+    this->add_parameter( this->group_to_move_id_ );
+    this->add_parameter( this->group_below_id_ );
   }
   
   // -- Functions that describe action --
@@ -67,8 +63,8 @@ public:
   // -- Action parameters --
 private:
   // Layer_handle that is requested
-  Core::ActionParameter< std::string >  group_to_move_id_;
-  Core::ActionParameter< std::string >  group_below_id_;
+  std::string group_to_move_id_;
+  std::string group_below_id_;
   
   // -- Dispatch this action from the interface --
 public:

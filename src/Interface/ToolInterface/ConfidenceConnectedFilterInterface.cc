@@ -86,6 +86,9 @@ bool ConfidenceConnectedFilterInterface::build_widget( QFrame* frame )
   //Send a message to the log that we have finished with building the Confidence Connected Filter Interface
   CORE_LOG_DEBUG("Finished building a Confidence Connected Filter Interface");
   
+  this->private_->ui_.iterations_->set_description( "Iterations" );
+  this->private_->ui_.multiplier_->set_description( "Multiplier" );
+  
   return true;
 
 } // end build_widget

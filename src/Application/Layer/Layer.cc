@@ -56,6 +56,14 @@ public:
   void handle_data_state_changed( std::string data_state );
   void handle_visible_state_changed( size_t viewer_id, bool visible );
 
+  // Function for setting abort flag
+  void handle_abort();
+  
+  // Function for setting stop flag
+  void handle_stop();
+
+public:
+  // Pointer back to the main class
   Layer* layer_;
 
   // Handle to the layer group (this one needs to be weak to ensure objects are not persistent
@@ -73,12 +81,6 @@ public:
 
   // Stop processing flag
   bool stop_;
-  
-  // Function for setting abort flag
-  void handle_abort();
-  
-  // Function for setting stop flag
-  void handle_stop();
 };
 
 void LayerPrivate::handle_locked_state_changed( bool locked )
@@ -219,18 +221,19 @@ void Layer::initialize_states( const std::string& name, bool creating )
 
   // == Selected by the LayerGroup ==
   this->add_state( "selected", selected_state_, false );
+  this->selected_state_->set_is_project_data( false );
 
-  // == The generation number of the data, or -1 if there is no data =
+  // == The generation number of the data, or -1 if there is no data ==
   this->add_state( "generation", this->generation_state_, -1 );
 
+  // == The generation number of the data, or -1 if there is no data ==
+  this->add_state( "provenance_id", this->provenance_id_state_, -1 );
+  
   // == The meta data for this dataset ==
   this->add_state( "metadata", this->meta_data_state_, "" );
 
   // == Information string for the metadata of this dataset ==
   this->add_state( "metadata_info", this->meta_data_info_state_, "" );
-  
-  // == The last action that was run on this layer ==
-  this->add_state( "last_action", this->last_action_state_, "" );
   
   // == The layer state indicating whether data is bein processed ==
   this->add_state( "data", this->data_state_,  creating ? CREATING_C : AVAILABLE_C  , 

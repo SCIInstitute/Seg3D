@@ -45,10 +45,10 @@ CORE_ACTION_ARGUMENT( "scale", "The scale to multiply the view by." )
 )
 
 public:
-  ActionScaleView();
-
-  virtual ~ActionScaleView()
+  ActionScaleView()
   {
+    this->add_parameter( this->stateid_ );
+    this->add_parameter( this->scale_ratio_ );
   }
 
   // -- Functions that describe action --
@@ -59,18 +59,13 @@ public:
   virtual bool changes_project_data();
 
 private:
-  ActionParameter< std::string > stateid_;
-  ActionParameter< double > scale_ratio_;
+  std::string stateid_;
+  double scale_ratio_;
 
   StateViewBaseWeakHandle state_weak_handle_;
 
   // -- Create and dispatch this action --
 public:
-
-  // CREATE:
-  // Create the action but do not dispatch it yet
-  static ActionHandle Create( StateViewBaseHandle& view_state, double ratio );
-
   // DISPATCH:
   // Dispatch the action from the specified context
   static void Dispatch( ActionContextHandle context, StateViewBaseHandle& view_state, 

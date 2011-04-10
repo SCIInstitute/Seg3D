@@ -29,7 +29,11 @@
 #ifndef APPLICATION_FILTERS_ACTIONS_ACTIONCROP_H
 #define APPLICATION_FILTERS_ACTIONS_ACTIONCROP_H
 
+// Core includes
 #include <Core/Action/Actions.h>
+
+// Application includes
+#include <Application/LayerManager/LayerAction.h>
 
 namespace Seg3D
 {
@@ -37,7 +41,7 @@ namespace Seg3D
 class ActionCropPrivate;
 typedef boost::shared_ptr< ActionCropPrivate > ActionCropPrivateHandle;
 
-class ActionCrop : public Core::Action
+class ActionCrop : public LayerAction
 {
 
 CORE_ACTION( 
@@ -53,8 +57,6 @@ CORE_ACTION(
   // -- Constructor/Destructor --
 public:
   ActionCrop();
-  
-  virtual ~ActionCrop() {}
   
   // -- Functions that describe action --
 public:

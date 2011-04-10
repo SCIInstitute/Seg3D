@@ -58,7 +58,7 @@ namespace Seg3D
 
 class ITKDataLayerExporter : public LayerExporter
 {
-  SCI_EXPORTER_TYPE( "ITK Data Exporter", ".dcm;.tiff;.png;.bmp" )
+  SEG3D_EXPORTER_TYPE( "ITK Data Exporter", ".dcm;.tiff;.png;.bmp" )
 
   // -- Constructor/Destructor --
 public:
@@ -72,18 +72,6 @@ public:
 
   // -- Import a file information --
 public:
-  // GET_GRID_TRANSFORM:
-  // Get the grid transform of the grid that we are exporting
-  virtual Core::GridTransform get_grid_transform();
-
-  // GET_DATA_TYPE:
-  // Get the type of data that is being exported
-  virtual Core::DataType get_data_type();
-
-  // GET_IMPORTER_MODES
-  // Get then supported exporter modes
-  virtual int get_exporter_modes();
-  
   // SET_EXTENSION:
   // function that sets the extension to be used by the exporter
   virtual void set_extension( std::string extension ){ this->extension_ = extension; }
@@ -93,7 +81,7 @@ public:
 
   // EXPORT_LAYER
   // Export the layer to file
-  virtual bool export_layer( LayerExporterMode mode, const std::string& file_path, 
+  virtual bool export_layer( const std::string& mode, const std::string& file_path, 
     const std::string& name );
     
 private:
@@ -103,7 +91,6 @@ private:
 private:
   Core::DataType pixel_type_;
   std::string extension_;
-
 };
 
 } // end namespace seg3D

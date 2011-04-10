@@ -37,8 +37,6 @@
 #include <Core/Action/Action.h> 
 #include <Core/Interface/Interface.h>
 
-
-
 namespace Seg3D
 {
 
@@ -55,10 +53,6 @@ public:
   {
   }
 
-  virtual ~ActionResetChangesMade()
-  {
-  }
-
   // -- Functions that describe action --
 public:
   virtual bool validate( Core::ActionContextHandle& context );
@@ -66,11 +60,6 @@ public:
   
   // -- Dispatch this action from the interface --
 public:
-  
-  // CREATE:
-  // Create an action that resets whether changes have been made to a project
-  static Core::ActionHandle Create();
-  
   // DISPATCH:
   // Dispatch an action that resets whether changes have been made to a project
   static void Dispatch( Core::ActionContextHandle context);

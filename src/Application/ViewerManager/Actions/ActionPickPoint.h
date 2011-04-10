@@ -30,7 +30,6 @@
 #define APPLICATION_VIEWERMANAGER_ACTIONS_ACTIONPICKPOINT_H
 
 #include <Core/Action/Action.h>
-
 #include <Core/Geometry/Point.h>
 
 namespace Seg3D
@@ -49,18 +48,16 @@ CORE_ACTION(
 
 public:
   ActionPickPoint();
-  virtual ~ActionPickPoint();
 
   virtual bool validate( Core::ActionContextHandle& context );
   virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
 
 private:
   // TODO: Need to replace this with viewerid instead of number
-  Core::ActionParameter< int > viewer_;
-  Core::ActionParameter< Core::Point > point_;
+  int viewer_;
+  Core::Point point_;
 
 public:
-  static Core::ActionHandle Create( size_t src_viewer, const Core::Point& pt );
   static void Dispatch( Core::ActionContextHandle context, 
     size_t src_viewer, const Core::Point& pt );
 };

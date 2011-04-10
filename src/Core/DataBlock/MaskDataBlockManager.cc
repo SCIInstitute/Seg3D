@@ -42,9 +42,6 @@
 #include <Core/DataBlock/StdDataBlock.h>
 #include <Core/DataBlock/DataBlockManager.h>
 
-// Application includes
-#include <Application/Layer/MaskLayer.h>
-
 namespace Core
 {
 

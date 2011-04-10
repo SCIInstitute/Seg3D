@@ -182,16 +182,16 @@ bool StateLabeledMultiOption::import_from_string( const std::string& str,
   return this->set( value, source );
 }
 
-void StateLabeledMultiOption::export_to_variant( Core::ActionParameterVariant& variant ) const
+void StateLabeledMultiOption::export_to_variant( Variant& variant ) const
 {
-  variant.set_value( this->private_->value_ );
+  variant.set( this->private_->value_ );
 }
 
-bool StateLabeledMultiOption::import_from_variant( Core::ActionParameterVariant& variant, 
+bool StateLabeledMultiOption::import_from_variant( Variant& variant, 
   Core::ActionSource source)
 {
   std::vector< std::string > value;
-  if ( !variant.get_value( value ) )
+  if ( !variant.get( value ) )
   {
     return false;
   }
@@ -199,10 +199,10 @@ bool StateLabeledMultiOption::import_from_variant( Core::ActionParameterVariant&
   return this->set( value, source );
 }
 
-bool StateLabeledMultiOption::validate_variant( ActionParameterVariant& variant, std::string& error )
+bool StateLabeledMultiOption::validate_variant( Variant& variant, std::string& error )
 {
   std::vector< std::string > value;
-  if ( !( variant.get_value( value ) ) )
+  if ( !( variant.get( value ) ) )
   {
     error = "Cannot convert the value '" + variant.export_to_string() + "'";
     return false;

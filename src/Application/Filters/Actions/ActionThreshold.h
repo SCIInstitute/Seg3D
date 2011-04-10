@@ -29,12 +29,16 @@
 #ifndef APPLICATION_FILTERS_ACTIONS_ACTIONTHRESHOLD_H
 #define APPLICATION_FILTERS_ACTIONS_ACTIONTHRESHOLD_H
 
+// Core includes
 #include <Core/Action/Actions.h>
+
+// Application includes
+#include <Application/LayerManager/LayerAction.h>
 
 namespace Seg3D
 {
 
-class ActionThreshold : public Core::Action
+class ActionThreshold : public LayerAction
 {
 
 CORE_ACTION( 
@@ -50,8 +54,6 @@ CORE_ACTION(
 public:
   ActionThreshold();
   
-  virtual ~ActionThreshold() {}
-  
   // -- Functions that describe action --
 public:
   virtual bool validate( Core::ActionContextHandle& context );
@@ -60,14 +62,12 @@ public:
   // -- Action parameters --
 private:
 
-  Core::ActionParameter< std::string > target_layer_;
-  
-  Core::ActionParameter< double > upper_threshold_;
-  Core::ActionParameter< double > lower_threshold_;
+  std::string target_layer_;
+  double upper_threshold_;
+  double lower_threshold_;
   
   // -- Dispatch this action from the interface --
 public:
-
   // DISPATCH:
   // Create and dispatch action that inserts the new layer 
   static void Dispatch( Core::ActionContextHandle context, 

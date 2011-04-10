@@ -65,6 +65,8 @@
 #include <Application/Filters/LayerResampler.h>
 #include <Application/LayerManager/Actions/ActionMoveLayerBelow.h>
 
+#include <Application/ProjectManager/ProjectManager.h>
+
 
 //Interface Includes
 #include <Interface/Application/LayerWidget.h>
@@ -110,7 +112,7 @@ public:
   
   LayerWidget* drop_layer_;
   bool drop_layer_set_;
-  
+
   GroupButtonMenu* drop_group_;
   bool drop_group_set_;
 
@@ -306,7 +308,9 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
       layer_group->spacing_state_ );
     QtUtils::QtBridge::Connect( this->private_->ui_.centering_label_,
       layer->centering_state_ );
-
+    QtUtils::QtBridge::Connect( this->private_->ui_.provenance_id_,
+      layer->provenance_id_state_ );
+      
     QtUtils::QtBridge::Connect( this->private_->ui_.info_button_, 
       layer->show_information_state_ );
     QtUtils::QtBridge::Show( this->private_->ui_.info_bar_, 
@@ -425,6 +429,13 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
       ( boost::lambda::bind( &Core::StateBool::get, viewer_visible_states[ 5 ].get() ) &&
       boost::lambda::bind( &Core::StateBool::get, layer->visible_state_[ 5 ].get() ) );
     QtUtils::QtBridge::Enable( this->private_->ui_.visibility_button_, enable_states, condition );
+    
+    this->private_->ui_.brightness_adjuster_->set_description( "Brightness" );
+    this->private_->ui_.contrast_adjuster_->set_description( "Contrast" );
+    this->private_->ui_.display_max_adjuster_->set_description( "Max" );
+    this->private_->ui_.display_min_adjuster_->set_description( "Min" );
+    this->private_->ui_.opacity_adjuster_->set_description( "Opacity" );
+    
     
     switch( this->get_volume_type() )
     {
@@ -853,31 +864,31 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
   { 
     if ( this->private_->drop_layer_set_ )
     {
-      LayerGroupHandle dst_group = this->private_->drop_layer_->
-        private_->layer_->get_layer_group();
-        
-      if ( this->private_->layer_->get_layer_group() != dst_group )
+    LayerGroupHandle dst_group = this->private_->drop_layer_->
+      private_->layer_->get_layer_group();
+      
+    if ( this->private_->layer_->get_layer_group() != dst_group )
+    {
+      this->set_picked_up( false );
+      LayerResamplerHandle layer_resampler( new LayerResampler(
+        this->private_->layer_, this->private_->drop_layer_->private_->layer_ ) );
+      LayerResamplerDialog* dialog = new LayerResamplerDialog( layer_resampler, this );
+      if ( dialog->exec() == QDialog::Accepted )
       {
-        this->set_picked_up( false );
-        LayerResamplerHandle layer_resampler( new LayerResampler(
-          this->private_->layer_, this->private_->drop_layer_->private_->layer_ ) );
-        LayerResamplerDialog* dialog = new LayerResamplerDialog( layer_resampler, this );
-        if ( dialog->exec() == QDialog::Accepted )
-        {
-          layer_resampler->execute( Core::Interface::GetWidgetActionContext() );
-        }
-        else
-        {
-          this->private_->drop_layer_->enable_drop_space( false );
-        }
-        dialog->deleteLater();
+        layer_resampler->execute( Core::Interface::GetWidgetActionContext() );
       }
       else
       {
-        ActionMoveLayerAbove::Dispatch( Core::Interface::GetWidgetActionContext(),
-          this->get_layer_id(), this->private_->drop_layer_->get_layer_id() );
+        this->private_->drop_layer_->enable_drop_space( false );
       }
+      dialog->deleteLater();
     }
+    else
+    {
+      ActionMoveLayerAbove::Dispatch( Core::Interface::GetWidgetActionContext(),
+        this->get_layer_id(), this->private_->drop_layer_->get_layer_id() );
+    }
+  }
     else if ( this->private_->drop_group_set_ )
     {
       LayerGroupHandle dst_group = this->private_->drop_group_->get_group();
@@ -898,8 +909,8 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
             {
               layer_resampler->execute( Core::Interface::GetWidgetActionContext() );
             }
-            else
-            {
+  else
+  {
               this->private_->drop_group_->enable_drop_space( false );
             }
             dialog->deleteLater();
@@ -955,9 +966,9 @@ void LayerWidget::dropEvent( QDropEvent* event )
     if ( layer_widget )
     {
       layer_widget->set_drop_target( this ); 
-      event->setDropAction( Qt::MoveAction );
-      return;
-    }
+    event->setDropAction( Qt::MoveAction );
+    return;
+  }
   }
   
   event->setDropAction( Qt::IgnoreAction );
@@ -1194,6 +1205,9 @@ void LayerWidget::contextMenuEvent( QContextMenuEvent * event )
   qaction = menu.addAction( tr( "Delete Layer" ) );
   connect( qaction, SIGNAL( triggered() ), this, SLOT( delete_layer_from_context_menu() ) );
   
+  qaction = menu.addAction( tr( "Show Provenance" ) );
+  connect( qaction, SIGNAL( triggered() ), this, SLOT( request_provenance() ) );
+
   QMenu* export_menu;
   export_menu = new QMenu( this );
   if( this->private_->layer_->get_type() == Core::VolumeType::DATA_E )
@@ -1234,7 +1248,9 @@ void LayerWidget::delete_layer_from_context_menu()
   if( ret == QMessageBox::Yes )
   {
     std::vector< std::string > layer;
-    layer.push_back( this->get_layer_id() );
+    std::string layer_id;
+    Core::ImportFromString( this->get_layer_id(), layer_id );
+    layer.push_back( layer_id );
     ActionDeleteLayers::Dispatch( Core::Interface::GetWidgetActionContext(), 
       layer );
   }
@@ -1271,7 +1287,7 @@ void LayerWidget::export_layer( const std::string& type_extension )
     Core::VolumeType::MASK_E )
   {
     ActionExportSegmentation::Dispatch( Core::Interface::GetWidgetActionContext(), 
-      this->private_->layer_->get_layer_name(), LayerExporterMode::SINGLE_MASK_E, 
+      this->private_->layer_->get_layer_id(), "single_mask", 
       export_path.toStdString(), type_extension );
   }
   else if( LayerManager::Instance()->get_layer_by_id( this->get_layer_id() )->get_type() == 
@@ -1281,7 +1297,7 @@ void LayerWidget::export_layer( const std::string& type_extension )
       this->private_->layer_->get_layer_name() ).string();
 
     ActionExportLayer::Dispatch( Core::Interface::GetWidgetActionContext(), 
-      this->private_->layer_->get_layer_name(), file_name, type_extension );
+      this->private_->layer_->get_layer_id(), file_name, type_extension );
   }
   
   Core::ActionSet::Dispatch(  Core::Interface::GetWidgetActionContext(), 
@@ -1326,5 +1342,12 @@ void LayerWidget::set_iso_surface_visibility( bool visibility )
     }
   }
 }
+
+void LayerWidget::request_provenance()
+{
+  ProjectManager::Instance()->get_current_project()->request_signal_provenance_record( 
+    this->private_->layer_->provenance_id_state_->get() );
+}
+
 
 } //end namespace Seg3D

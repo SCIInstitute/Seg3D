@@ -29,14 +29,18 @@
 #ifndef APPLICATION_FILTERS_ACTIONS_ACTIONINTENSITYCORRECTIONFILTER_H
 #define APPLICATION_FILTERS_ACTIONS_ACTIONINTENSITYCORRECTIONFILTER_H
 
+// Core includes
 #include <Core/Action/Actions.h>
 #include <Core/Interface/Interface.h>
+
+// Application includes
 #include <Application/Layer/Layer.h>
+#include <Application/LayerManager/LayerAction.h>
 
 namespace Seg3D
 {
 
-class ActionIntensityCorrectionFilter : public Core::Action
+class ActionIntensityCorrectionFilter : public LayerAction
 {
 
 CORE_ACTION( 
@@ -57,18 +61,11 @@ public:
   ActionIntensityCorrectionFilter()
   {
     // Action arguments
-    this->add_argument( this->target_layer_ );
-    
-    // Action options
-    this->add_key( this->preserve_data_format_ );
-    this->add_key( this->replace_ );  
-      
-    this->add_key( this->order_ );
-    this->add_key( this->edge_ );
-  }
-  
-  virtual ~ActionIntensityCorrectionFilter()
-  {
+    this->add_layer_id( this->target_layer_ );
+    this->add_parameter( this->preserve_data_format_ );
+    this->add_parameter( this->replace_ );
+    this->add_parameter( this->order_ );
+    this->add_parameter( this->edge_ );
   }
   
   // -- Functions that describe action --
@@ -79,11 +76,11 @@ public:
   // -- Action parameters --
 private:
 
-  Core::ActionParameter< std::string > target_layer_;
-  Core::ActionParameter< bool > preserve_data_format_;
-  Core::ActionParameter< bool > replace_; 
-  Core::ActionParameter< int > order_;
-  Core::ActionParameter< double > edge_;
+  std::string target_layer_;
+  bool preserve_data_format_;
+  bool replace_;  
+  int order_;
+  double edge_;
   
   // -- Dispatch this action from the interface --
 public:

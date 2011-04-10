@@ -40,9 +40,9 @@ bool ActionAdd::validate( ActionContextHandle& context )
   StateBaseHandle state( this->state_weak_handle_.lock() );
   if ( !state )
   {
-    if ( !StateEngine::Instance()->get_state( this->stateid_.value(), state ) )
+    if ( !StateEngine::Instance()->get_state( this->stateid_, state ) )
     {
-      context->report_error( std::string( "Unknown state variable '" ) + stateid_.value() + "'" );
+      context->report_error( std::string( "Unknown state variable '" ) + stateid_ + "'" );
       return false;
     }
     this->state_weak_handle_ = state;
@@ -72,7 +72,7 @@ bool ActionAdd::validate( ActionContextHandle& context )
     return true;
   }
   
-  context->report_error( std::string( "State variable '") + this->stateid_.value() +
+  context->report_error( std::string( "State variable '") + this->stateid_ +
     "' doesn't support ActionAdd" );
   return false;
 }
@@ -103,7 +103,7 @@ bool ActionAdd::changes_project_data()
   // If not the state cannot be retrieved report an error
   if ( !state )
   {
-    if ( !( StateEngine::Instance()->get_state( stateid_.value(), state ) ) )
+    if ( !( StateEngine::Instance()->get_state( stateid_, state ) ) )
     {
       return false;
     }

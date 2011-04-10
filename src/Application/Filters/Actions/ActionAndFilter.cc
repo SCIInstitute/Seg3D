@@ -48,46 +48,24 @@ namespace Seg3D
 bool ActionAndFilter::validate( Core::ActionContextHandle& context )
 {
   // Check for layer existance and type information
-  std::string error;
-  if ( ! LayerManager::CheckLayerExistanceAndType( this->target_layer_.value(), 
-    Core::VolumeType::MASK_E, error ) )
-  {
-    context->report_error( error );
-    return false;
-  }
+  if ( ! LayerManager::CheckLayerExistanceAndType( this->target_layer_, Core::VolumeType::MASK_E, 
+    context ) ) return false;
   
   // Check for layer availability 
-  Core::NotifierHandle notifier;
-  if ( ! LayerManager::CheckLayerAvailability( this->target_layer_.value(), 
-    this->replace_.value(), notifier ) )
-  {
-    context->report_need_resource( notifier );
-    return false;
-  }
+  if ( ! LayerManager::CheckLayerAvailability( this->target_layer_, this->replace_, 
+    context ) ) return false;
   
   // Check for layer existance and type information mask layer
-  if ( ! LayerManager::CheckLayerExistanceAndType( this->mask_layer_.value(), 
-    Core::VolumeType::MASK_E, error ) )
-  {
-    context->report_error( error );
-    return false;
-  }
+  if ( ! LayerManager::CheckLayerExistanceAndType( this->mask_layer_, Core::VolumeType::MASK_E,
+    context ) ) return false;
 
   // Check whether mask and data have the same size
-  if ( ! LayerManager::CheckLayerSize( this->mask_layer_.value(), this->target_layer_.value(),
-    error ) )
-  {
-    context->report_error( error );
-    return false; 
-  }
+  if ( ! LayerManager::CheckLayerSize( this->mask_layer_, this->target_layer_,
+    context ) ) return false;
     
   // Check for layer availability mask layer
-  if ( ! LayerManager::CheckLayerAvailability( this->mask_layer_.value(), 
-    this->replace_.value(), notifier ) )
-  {
-    context->report_need_resource( notifier );
-    return false;
-  }
+  if ( ! LayerManager::CheckLayerAvailability( this->mask_layer_, 
+    this->replace_, context ) ) return false;
   
   // Validation successful
   return true;
@@ -241,15 +219,16 @@ bool ActionAndFilter::run( Core::ActionContextHandle& context,
   boost::shared_ptr<AndFilterAlgo> algo( new AndFilterAlgo );
 
   // Find the handle to the layer
-  if ( !( algo->find_layer( this->target_layer_.value(), algo->src_layer_ ) ) )
-  {
-    return false;
-  }
+  algo->src_layer_ = LayerManager::FindLayer( this->target_layer_ );
+  algo->mask_layer_ = LayerManager::FindLayer( this->mask_layer_ );
   
-  algo->find_layer( this->mask_layer_.value(), algo->mask_layer_ );
+  // Check whether the source layer was found
+  if ( !algo->src_layer_ || !algo->mask_layer_ ) return false;
+  
+  // Lock the mask layer, so no other layer can access it
   algo->lock_for_use( algo->mask_layer_ );
 
-  if ( this->replace_.value() )
+  if ( this->replace_ )
   {
     // Copy the handles as destination and source will be the same
     algo->dst_layer_ = algo->src_layer_;
@@ -268,8 +247,11 @@ bool ActionAndFilter::run( Core::ActionContextHandle& context,
   // Return the id of the destination layer.
   result = Core::ActionResultHandle( new Core::ActionResult( algo->dst_layer_->get_layer_id() ) );
 
-  // Build the undo-redo record
+  // Build the undo-redo record for this action
   algo->create_undo_redo_record( context, this->shared_from_this() );
+
+  // Build the provenance record for this action
+  algo->create_provenance_record( context, this->shared_from_this() );
 
   // Start the filter.
   Core::Runnable::Start( algo );
@@ -284,9 +266,9 @@ void ActionAndFilter::Dispatch( Core::ActionContextHandle context, std::string t
   ActionAndFilter* action = new ActionAndFilter;
 
   // Setup the parameters
-  action->target_layer_.value() = target_layer;
-  action->mask_layer_.value() = mask_layer; 
-  action->replace_.value() = replace;
+  action->target_layer_ = target_layer;
+  action->mask_layer_ = mask_layer; 
+  action->replace_ = replace;
 
   // Dispatch action to underlying engine
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );

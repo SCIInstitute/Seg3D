@@ -68,222 +68,256 @@
 namespace QtUtils
 {
 
-void QtBridge::Connect( QAbstractButton* qbutton, Core::StateBoolHandle& state )
+Core::ConnectionHandle QtBridge::Connect( QAbstractButton* qbutton, Core::StateBoolHandle& state )
 {
-  new QtAbstractButtonConnector( qbutton, state );
+  return Core::ConnectionHandle( new QtConnection(
+    new QtAbstractButtonConnector( qbutton, state ) ) );
 }
 
-void QtBridge::Connect( QAbstractButton* qbutton, boost::function< void() > function )
+Core::ConnectionHandle QtBridge::Connect( QAbstractButton* qbutton, boost::function< void() > function )
 {
-  new QtAbstractButtonConnector( qbutton, function );
+  return Core::ConnectionHandle( new QtConnection(
+    new QtAbstractButtonConnector( qbutton, function ) ) );
 }
 
-void QtBridge::ConnectBoolean( QAbstractButton* qbutton, boost::function< void( bool ) > function )
+Core::ConnectionHandle QtBridge::ConnectBoolean( QAbstractButton* qbutton, boost::function< void( bool ) > function )
 {
-  new QtAbstractButtonConnector( qbutton, function );
+  return Core::ConnectionHandle( new QtConnection(
+    new QtAbstractButtonConnector( qbutton, function ) ) );
 }
 
-void QtBridge::Connect( QAbstractButton* qbutton, 
+Core::ConnectionHandle QtBridge::Connect( QAbstractButton* qbutton, 
              std::vector<Core::StateBoolHandle>& state,
              Core::StateIntSetHandle& index)
 {
-  new QtAbstractButtonVectorConnector( qbutton, state, index );
+  return Core::ConnectionHandle( new QtConnection(
+    new QtAbstractButtonVectorConnector( qbutton, state, index ) ) );
 }
 
-void QtBridge::Connect( QLineEdit* qlineedit, Core::StateStringHandle& state )
+Core::ConnectionHandle QtBridge::Connect( QLineEdit* qlineedit, Core::StateStringHandle& state,
+  bool immediate_update )
 {
-  new QtLineEditConnector( qlineedit, state );
+  return Core::ConnectionHandle( new QtConnection(
+    new QtLineEditConnector( qlineedit, state, immediate_update ) ) );
 }
 
-void QtBridge::Connect( QLineEdit* qlineedit, Core::StateNameHandle& state )
+Core::ConnectionHandle QtBridge::Connect( QLineEdit* qlineedit, Core::StateNameHandle& state,
+  bool immediate_update )
 {
-  new QtLineEditConnector( qlineedit, state );
+  return Core::ConnectionHandle( new QtConnection(
+    new QtLineEditConnector( qlineedit, state, immediate_update ) ) );
 }
 
-void QtBridge::Connect( QDoubleSpinBox* qdoublespinbox, Core::StateDoubleHandle& state )
+Core::ConnectionHandle QtBridge::Connect( QDoubleSpinBox* qdoublespinbox, Core::StateDoubleHandle& state )
 {
-  new QtSpinBoxConnector( qdoublespinbox, state );  
+  return Core::ConnectionHandle( new QtConnection(
+    new QtSpinBoxConnector( qdoublespinbox, state ) ) );  
 }
 
-void QtBridge::Connect( QDoubleSpinBox* qdoublespinbox, Core::StateRangedDoubleHandle& state )
+Core::ConnectionHandle QtBridge::Connect( QDoubleSpinBox* qdoublespinbox, Core::StateRangedDoubleHandle& state )
 {
-  new QtSpinBoxConnector( qdoublespinbox, state );
+  return Core::ConnectionHandle( new QtConnection(
+    new QtSpinBoxConnector( qdoublespinbox, state ) ) );
 }
 
-void QtBridge::Connect( QSpinBox* qspinbox, Core::StateIntHandle& state )
+Core::ConnectionHandle QtBridge::Connect( QSpinBox* qspinbox, Core::StateIntHandle& state )
 {
-  new QtSpinBoxConnector( qspinbox, state );  
+  return Core::ConnectionHandle( new QtConnection(
+    new QtSpinBoxConnector( qspinbox, state ) ) );  
 }
 
-void QtBridge::Connect( QSpinBox* qspinbox, Core::StateRangedIntHandle& state )
+Core::ConnectionHandle QtBridge::Connect( QSpinBox* qspinbox, Core::StateRangedIntHandle& state )
 {
-  new QtSpinBoxConnector( qspinbox, state );  
+  return Core::ConnectionHandle( new QtConnection(
+    new QtSpinBoxConnector( qspinbox, state ) ) );  
 }
 
-void QtBridge::Connect( QComboBox* qcombobox, Core::StateOptionHandle& state )
+Core::ConnectionHandle QtBridge::Connect( QComboBox* qcombobox, Core::StateOptionHandle& state )
 {
-  new QtComboBoxConnector( qcombobox, state );
+  return Core::ConnectionHandle( new QtConnection(
+    new QtComboBoxConnector( qcombobox, state ) ) );
 }
 
-void QtBridge::Connect( QComboBox* qcombobox, 
+Core::ConnectionHandle QtBridge::Connect( QComboBox* qcombobox, 
   Core::StateLabeledOptionHandle& state )
 {
-  new QtComboBoxConnector( qcombobox, state );
+  return Core::ConnectionHandle( new QtConnection(
+    new QtComboBoxConnector( qcombobox, state ) ) );
 }
 
-void QtBridge::Connect( QtSliderIntCombo* sscombo, Core::StateRangedIntHandle& state )
+Core::ConnectionHandle QtBridge::Connect( QtSliderIntCombo* sscombo, Core::StateRangedIntHandle& state )
 {
-  new QtSliderIntComboConnector( sscombo, state );
+  return Core::ConnectionHandle( new QtConnection(
+    new QtSliderIntComboConnector( sscombo, state ) ) );
 }
 
-void QtBridge::Connect( QtLogSliderIntCombo* sscombo, Core::StateRangedIntHandle& state )
+Core::ConnectionHandle QtBridge::Connect( QtLogSliderIntCombo* sscombo, Core::StateRangedIntHandle& state )
 {
-  new QtLogSliderIntComboConnector( sscombo, state );
+  return Core::ConnectionHandle( new QtConnection(
+  new QtLogSliderIntComboConnector( sscombo, state ) ) );
 }
 
-void QtBridge::Connect( QtColorBarWidget* colorbar_widget, 
+Core::ConnectionHandle QtBridge::Connect( QtColorBarWidget* colorbar_widget, 
   Core::StateIntHandle& state, std::vector< Core::StateColorHandle >& colors )
 {
-  new QtColorBarWidgetConnector( colorbar_widget, state, colors );
+  return Core::ConnectionHandle( new QtConnection(
+    new QtColorBarWidgetConnector( colorbar_widget, state, colors ) ) );
 }
 
-void QtBridge::Connect( QtSliderDoubleCombo* sscombo, Core::StateRangedDoubleHandle& state )
+Core::ConnectionHandle QtBridge::Connect( QtSliderDoubleCombo* sscombo, Core::StateRangedDoubleHandle& state )
 {
-  new QtSliderDoubleComboConnector( sscombo, state );
+  return Core::ConnectionHandle( new QtConnection(
+    new QtSliderDoubleComboConnector( sscombo, state ) ) );
 }
 
-void QtBridge::Connect( QtColorButton* colorbutton, Core::StateColorHandle& state )
+Core::ConnectionHandle QtBridge::Connect( QtColorButton* colorbutton, Core::StateColorHandle& state )
 {
-  new QtColorButtonConnector( colorbutton, state ); 
+  return Core::ConnectionHandle( new QtConnection(
+    new QtColorButtonConnector( colorbutton, state ) ) ); 
 }
 
-void QtBridge::Connect( QAction* qaction, boost::function< void() > function )
+Core::ConnectionHandle QtBridge::Connect( QAction* qaction, boost::function< void() > function )
 {
-  new QtActionConnector( qaction, function );
+  return Core::ConnectionHandle( new QtConnection(
+    new QtActionConnector( qaction, function ) ) );
 }
 
-void QtBridge::Connect( QAction* qaction, Core::StateBoolHandle& state )
+Core::ConnectionHandle QtBridge::Connect( QAction* qaction, Core::StateBoolHandle& state )
 {
-  new QtActionConnector( qaction, state );
+  return Core::ConnectionHandle( new QtConnection(
+    new QtActionConnector( qaction, state ) ) );
 }
 
-void QtBridge::Connect( QAction* qaction, std::vector<Core::StateBoolHandle>& state,
+Core::ConnectionHandle QtBridge::Connect( QAction* qaction, std::vector<Core::StateBoolHandle>& state,
   Core::StateIntHandle& index)
 {
-  new QtActionVectorConnector( qaction, state, index );
+  return Core::ConnectionHandle( new QtConnection(
+    new QtActionVectorConnector( qaction, state, index ) ) );
 }
 
-void QtBridge::Connect( QActionGroup* qactiongroup, Core::StateOptionHandle& state )
+Core::ConnectionHandle QtBridge::Connect( QActionGroup* qactiongroup, Core::StateOptionHandle& state )
 {
-  new QtActionGroupConnector( qactiongroup, state );
+  return Core::ConnectionHandle( new QtConnection(
+    new QtActionGroupConnector( qactiongroup, state ) ) );
 }
 
-void QtBridge::Connect( QButtonGroup* qbuttongroup, Core::StateOptionHandle& state_handle )
+Core::ConnectionHandle QtBridge::Connect( QButtonGroup* qbuttongroup, Core::StateOptionHandle& state_handle )
 {
-  new QtButtonGroupConnector( qbuttongroup, state_handle );
+  return Core::ConnectionHandle( new QtConnection(
+    new QtButtonGroupConnector( qbuttongroup, state_handle ) ) );
 }
 
-void QtBridge::Connect( QButtonGroup* qbuttongroup, Core::StateLabeledOptionHandle& state )
+Core::ConnectionHandle QtBridge::Connect( QButtonGroup* qbuttongroup, Core::StateLabeledOptionHandle& state )
 {
-  new QtButtonGroupConnector( qbuttongroup, state );
+  return Core::ConnectionHandle( new QtConnection(
+    new QtButtonGroupConnector( qbuttongroup, state ) ) );
 }
 
-void QtBridge::Connect( QListWidget* qlistwidget, Core::StateLabeledMultiOptionHandle& state )
+Core::ConnectionHandle QtBridge::Connect( QListWidget* qlistwidget, Core::StateLabeledMultiOptionHandle& state )
 {
-  new QtListWidgetConnector( qlistwidget, state );
+  return Core::ConnectionHandle( new QtConnection(
+    new QtListWidgetConnector( qlistwidget, state ) ) );
 }
 
-void QtBridge::Connect( QListWidget* qwidget, Core::StateStringVectorHandle& state )
+Core::ConnectionHandle QtBridge::Connect( QListWidget* qwidget, Core::StateStringVectorHandle& state )
 {
-  new QtListWidgetConnector( qwidget, state );
+  return Core::ConnectionHandle( new QtConnection(
+    new QtListWidgetConnector( qwidget, state ) ) );
 }
 
-void QtBridge::Connect( QLabel* qlabel, Core::StateBaseHandle state )
+Core::ConnectionHandle QtBridge::Connect( QLabel* qlabel, Core::StateBaseHandle state )
 {
-  new QtLabelConnector( qlabel, state );
+  return Core::ConnectionHandle( new QtConnection(
+    new QtLabelConnector( qlabel, state ) ) );
 }
 
-void QtBridge::Connect( QPlainTextEdit* qwidget, Core::StateStringHandle& state )
+Core::ConnectionHandle QtBridge::Connect( QPlainTextEdit* qwidget, Core::StateStringHandle& state )
 {
-  new QtPlainTextEditConnector( qwidget, state );
+  return Core::ConnectionHandle( new QtConnection(
+    new QtPlainTextEditConnector( qwidget, state ) ) );
 }
 
-void QtBridge::Connect( QtTristateToolButton* tristate_button, Core::StateOptionHandle& state )
+Core::ConnectionHandle QtBridge::Connect( QtTristateToolButton* tristate_button, Core::StateOptionHandle& state )
 {
-  new QtTristateToolButtonConnector( tristate_button, state );
+  return Core::ConnectionHandle( new QtConnection(
+    new QtTristateToolButtonConnector( tristate_button, state ) ) );
+}
+  
+Core::ConnectionHandle QtBridge::Connect( QtTransferFunctionScene* tf_scene, Core::TransferFunctionHandle& tf )
+{
+  return Core::ConnectionHandle( new QtConnection(
+    new QtTransferFunctionSceneConnector( tf_scene, tf ) ) );
 }
 
-void QtBridge::Connect( QtTransferFunctionScene* tf_scene, Core::TransferFunctionHandle& tf )
+Core::ConnectionHandle QtBridge::Connect( QtTransferFunctionCurve* tf_curve, Core::TransferFunctionFeatureHandle& feature )
 {
-  new QtTransferFunctionSceneConnector( tf_scene, tf );
+  return Core::ConnectionHandle( new QtConnection(
+    new QtTransferFunctionCurveConnector( tf_curve, feature ) ) );
 }
 
-void QtBridge::Connect( QtTransferFunctionCurve* tf_curve, Core::TransferFunctionFeatureHandle& feature )
+Core::ConnectionHandle QtBridge::Enable( QAction* qaction, Core::StateBoolHandle& state, bool opposite_logic )
 {
-  new QtTransferFunctionCurveConnector( tf_curve, feature );
-}
-
-void QtBridge::Enable( QAction* qaction, Core::StateBoolHandle& state, bool opposite_logic )
-{
-  new QtEnableConnector( qaction, state, opposite_logic );
+  return Core::ConnectionHandle( new QtConnection(
+    new QtEnableConnector( qaction, state, opposite_logic ) ) );
 } 
 
-void QtBridge::Enable( QWidget* qwidget, Core::StateBoolHandle& state, bool opposite_logic )
+Core::ConnectionHandle QtBridge::Enable( QWidget* qwidget, Core::StateBoolHandle& state, bool opposite_logic )
 {
-  new QtEnableConnector( qwidget, state, opposite_logic );
+  return Core::ConnectionHandle( new QtConnection(
+    new QtEnableConnector( qwidget, state, opposite_logic ) ) );
 }
 
-void QtBridge::Enable( QtHistogramWidget* histogram, Core::StateBoolHandle& state, bool opposite_logic /*= false */ )
+Core::ConnectionHandle QtBridge::Enable( QtHistogramWidget* histogram, Core::StateBoolHandle& state, bool opposite_logic /*= false */ )
 {
-  new QtEnableConnector( histogram, state, opposite_logic );
+  return Core::ConnectionHandle( new QtConnection(
+    new QtEnableConnector( histogram, state, opposite_logic ) ) );
 }
 
-void QtBridge::Enable( QWidget* qwidget, std::vector< Core::StateBaseHandle >& states,
+Core::ConnectionHandle QtBridge::Enable( QWidget* qwidget, std::vector< Core::StateBaseHandle >& states,
             boost::function< bool () > condition )
 {
-  new QtEnableConnector( qwidget, states, condition );
+  return Core::ConnectionHandle( new QtConnection(
+    new QtEnableConnector( qwidget, states, condition ) ) );
 }
 
-void QtBridge::Enable( QWidget* qwidget, Core::StateBaseHandle state, 
+Core::ConnectionHandle QtBridge::Enable( QWidget* qwidget, Core::StateBaseHandle state, 
             boost::function< bool () > condition )
 {
-  new QtEnableConnector( qwidget, state, condition );
+  return Core::ConnectionHandle( new QtConnection(
+    new QtEnableConnector( qwidget, state, condition ) ) );
 }
 
-void QtBridge::Show( QWidget* qwidget, Core::StateBoolHandle& state, bool opposite_logic )
+Core::ConnectionHandle QtBridge::Show( QWidget* qwidget, Core::StateBoolHandle& state, bool opposite_logic )
 {
-  new QtShowConnector( qwidget, state, opposite_logic );
+  return Core::ConnectionHandle( new QtConnection(
+    new QtShowConnector( qwidget, state, opposite_logic ) ) );
 }
 
-void QtBridge::Show( QtCustomDockWidget* dockwidget, Core::StateBoolHandle& state, bool opposite_logic /*= false */ )
+Core::ConnectionHandle QtBridge::Show( QtCustomDockWidget* dockwidget, Core::StateBoolHandle& state, bool opposite_logic /*= false */ )
 {
-  new QtShowConnector( dockwidget, state, opposite_logic );
+  return Core::ConnectionHandle( new QtConnection(
+    new QtShowConnector( dockwidget, state, opposite_logic ) ) );
 }
 
-void QtBridge::Show( QtCustomDialog* dialog, Core::StateBoolHandle& state, bool opposite_logic /*= false */ )
+Core::ConnectionHandle QtBridge::Show( QtCustomDialog* dialog, Core::StateBoolHandle& state, bool opposite_logic /*= false */ )
 {
-  new QtShowConnector( dialog, state, opposite_logic );
+  return Core::ConnectionHandle( new QtConnection(
+    new QtShowConnector( dialog, state, opposite_logic ) ) );
 }
 
 
-void QtBridge::Show( QWidget* qwidget, std::vector< Core::StateBaseHandle >& states, 
+Core::ConnectionHandle QtBridge::Show( QWidget* qwidget, std::vector< Core::StateBaseHandle >& states, 
           boost::function< bool () > condition )
 {
-  new QtShowConnector( qwidget, states, condition );
+  return Core::ConnectionHandle( new QtConnection(
+    new QtShowConnector( qwidget, states, condition ) ) );
 }
 
-void QtBridge::Show( QWidget* qwidget, Core::StateBaseHandle state, 
+Core::ConnectionHandle QtBridge::Show( QWidget* qwidget, Core::StateBaseHandle state, 
           boost::function< bool () > condition )
 {
-  new QtShowConnector( qwidget, state, condition );
+  return Core::ConnectionHandle( new QtConnection(
+    new QtShowConnector( qwidget, state, condition ) ) );
 }
-
-
-
-
-
-
-
-
 
 } // end namespace QtUtils

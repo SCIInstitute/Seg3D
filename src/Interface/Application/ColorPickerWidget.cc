@@ -76,6 +76,10 @@ ColorPickerWidget::ColorPickerWidget( QWidget *parent ) :
   this->private_->b_adjuster_->setRange( 0, 255 );
   this->private_->b_adjuster_->setCurrentValue( 0 );
   
+  this->private_->r_adjuster_->set_description( "R" );
+  this->private_->g_adjuster_->set_description( "G" );
+  this->private_->b_adjuster_->set_description( "B" );
+  
 
   connect( this, SIGNAL( color_changed() ), this, SLOT( set_color() ) );
 

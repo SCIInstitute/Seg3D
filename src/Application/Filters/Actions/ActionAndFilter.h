@@ -31,12 +31,14 @@
 
 #include <Core/Action/Actions.h>
 #include <Core/Interface/Interface.h>
+
 #include <Application/Layer/Layer.h>
+#include <Application/LayerManager/LayerAction.h>
 
 namespace Seg3D
 {
 
-class ActionAndFilter : public Core::Action
+class ActionAndFilter : public LayerAction
 {
 
 CORE_ACTION( 
@@ -52,33 +54,26 @@ CORE_ACTION(
 public:
   ActionAndFilter()
   {
-    // Action arguments
-    this->add_argument( this->target_layer_ );
-    this->add_argument( this->mask_layer_ );
+    this->add_layer_id( this->target_layer_ );
+    this->add_layer_id( this->mask_layer_ );
+    this->add_parameter( this->replace_ );    
+  }
 
-    // Action options
-    this->add_key( this->replace_ );    
-  }
-  
-  virtual ~ActionAndFilter()
-  {
-  }
-  
   // -- Functions that describe action --
 public:
   virtual bool validate( Core::ActionContextHandle& context );
-  virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
+  virtual bool run( Core::ActionContextHandle& context, 
+    Core::ActionResultHandle& result );
   
   // -- Action parameters --
 private:
 
-  Core::ActionParameter< std::string > target_layer_;
-  Core::ActionParameter< std::string > mask_layer_;
-  Core::ActionParameter< bool > replace_;
+  std::string target_layer_;
+  std::string mask_layer_;
+  bool replace_;
   
   // -- Dispatch this action from the interface --
 public:
-
   // DISPATCH:
   // Create and dispatch action that inserts the new layer 
   static void Dispatch( Core::ActionContextHandle context, 

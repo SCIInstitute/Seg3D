@@ -81,7 +81,7 @@ public:
   void post_and_wait_event( boost::function< void() > function );
 
   // -- Processing events from within the event handler thread --
-protected:
+public:
 
   // PROCESS_EVENTS:
   // Process the events that are in the event handler queue.

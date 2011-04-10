@@ -130,23 +130,23 @@ void StateView3D::translate( const Core::Vector& offset )
   }
 }
 
-void StateView3D::export_to_variant( ActionParameterVariant& variant ) const
+void StateView3D::export_to_variant( Variant& variant ) const
 {
-  variant.set_value( this->value_ );
+  variant.set( this->value_ );
 }
 
-bool StateView3D::import_from_variant( ActionParameterVariant& variant, ActionSource source )
+bool StateView3D::import_from_variant( Variant& variant, ActionSource source )
 {
   Core::View3D value;
-  if ( !( variant.get_value( value ) ) ) return false;
+  if ( !( variant.get( value ) ) ) return false;
 
   return this->set( value, source );
 }
 
-bool StateView3D::validate_variant( ActionParameterVariant& variant, std::string& error )
+bool StateView3D::validate_variant( Variant& variant, std::string& error )
 {
   Core::View3D value;
-  if ( !( variant.get_value( value ) ) )
+  if ( !( variant.get( value ) ) )
   {
     error = "Cannot convert the value '" + variant.export_to_string()
         + "' to a 3D Camera position";

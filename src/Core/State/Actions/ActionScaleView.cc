@@ -36,27 +36,20 @@ CORE_REGISTER_ACTION( Core, ScaleView )
 namespace Core
 {
 
-ActionScaleView::ActionScaleView()
-{
-  add_argument( this->stateid_ );
-  add_argument( this->scale_ratio_ );
-}
-
 bool ActionScaleView::validate( ActionContextHandle& context )
 {
   StateBaseHandle state = this->state_weak_handle_.lock();
   if ( !state )
   {
-    if ( !( StateEngine::Instance()->get_state( stateid_.value(), state ) ) )
+    if ( !( StateEngine::Instance()->get_state( stateid_, state ) ) )
     {
-      context->report_error( std::string( "Unknown state variable '" ) + stateid_.value()
-          + "'" );
+      context->report_error( std::string( "Unknown state variable '" ) + stateid_ + "'" );
       return false;
     }
 
     if ( typeid(*state) != typeid(StateView2D) && typeid(*state) != typeid(StateView3D) )
     {
-      context->report_error( std::string( "State variable '" ) + stateid_.value()
+      context->report_error( std::string( "State variable '" ) + stateid_
           + "' doesn't support ActionScaleView" );
       return false;
     }
@@ -73,26 +66,11 @@ bool ActionScaleView::run( ActionContextHandle& context, ActionResultHandle& res
 
   if ( state )
   {
-    state->scale( this->scale_ratio_.value() );
+    state->scale( this->scale_ratio_ );
     return true;
   }
 
   return false;
-}
-
-ActionHandle ActionScaleView::Create( StateViewBaseHandle& view_state, double ratio )
-{
-  ActionScaleView* action = new ActionScaleView;
-  action->stateid_ = view_state->get_stateid();
-  action->scale_ratio_ = ratio;
-  action->state_weak_handle_ = view_state;
-  return ActionHandle( action );
-}
-
-void ActionScaleView::Dispatch( ActionContextHandle context, StateViewBaseHandle& view_state, 
-  double ratio )
-{
-  ActionDispatcher::PostAction( Create( view_state, ratio ), context );
 }
 
 bool ActionScaleView::changes_project_data()
@@ -102,7 +80,7 @@ bool ActionScaleView::changes_project_data()
   // If not the state cannot be retrieved report an error
   if ( !state )
   {
-    if ( !( StateEngine::Instance()->get_state( stateid_.value(), state ) ) )
+    if ( !( StateEngine::Instance()->get_state( stateid_, state ) ) )
     {
       return false;
     }
@@ -111,5 +89,18 @@ bool ActionScaleView::changes_project_data()
   // Keep track of whether the state changes the data of the program
   return state->is_project_data();
 }
+
+void ActionScaleView::Dispatch( ActionContextHandle context, StateViewBaseHandle& view_state, 
+  double ratio )
+{
+  ActionScaleView* action = new ActionScaleView;
+  action->stateid_ = view_state->get_stateid();
+  action->scale_ratio_ = ratio;
+  action->state_weak_handle_ = view_state;
+
+  ActionDispatcher::PostAction( ActionHandle( action ), context );
+}
+
+
 
 } // end namespace Core

@@ -34,61 +34,46 @@
 #endif 
 
 // Application includes
-#include <Application/LayerIO/LayerImporter.h>
+#include <Application/LayerIO/LayerSingleFileImporter.h>
 #include <Application/LayerIO/LayerIO.h>
 
 namespace Seg3D
 {
 
-class MatlabLayerImporter;
+// Forward declaration for internals of this class
 class MatlabLayerImporterPrivate;
 typedef boost::shared_ptr<MatlabLayerImporterPrivate> MatlabLayerImporterPrivateHandle;
 
-class MatlabLayerImporter : public LayerImporter
+// CLASS MatlabLayerImporter. It relies on the MatlabIO library and provides support
+// for basic 3D matrices as well as structured information that delivers spacing and 
+// origin information.
+
+class MatlabLayerImporter : public LayerSingleFileImporter
 {
-  SCI_IMPORTER_TYPE( "Matlab Importer", 
-            ".mat", 20, 
-            LayerImporterType::SINGLE_FILE_E )
+  SEG3D_IMPORTER_TYPE( "Matlab Importer", ".mat;.MAT", 30 )
 
   // -- Constructor/Destructor --
 public:
-  // Construct a new layer file importer
-  MatlabLayerImporter( const std::string& filename );
-  
-  // Virtual destructor for memory management of derived classes
+  MatlabLayerImporter();
   virtual ~MatlabLayerImporter();
 
-  // -- Import a file information --
+  // -- Import information from file --
 public:
+  // GET_FILE_INFO
+  // Get the information about the file we are currently importing.
+  // NOTE: This function often causes the file to be loaded in its entirety
+  // Hence it is best to run this on a separate thread if needed ( from the GUI ).
+  virtual bool get_file_info( LayerImporterFileInfoHandle& info );
 
-  // IMPORT_HEADER:
-  // Import all the information needed to translate the header and metadata information, but not
-  // necessarily read the whole file. NOTE: Some external packages do not support reading a header
-  // and hence these importers should read the full file here.
-  virtual bool import_header();
-
-  // GET_GRID_TRANSFORM:
-  // Get the grid transform of the grid that we are importing
-  virtual Core::GridTransform get_grid_transform();
-
-  // GET_DATA_TYPE:
-  // Get the type of data that is being imported
-  virtual Core::DataType get_data_type();
-  
-  // GET_IMPORTER_MODES:
-  // Get then supported importer modes
-  virtual int get_importer_modes();
+  // -- Import data from file --  
+public: 
+  // GET_FILE_DATA
+  // Get the file data from the file/ file series
+  // NOTE: The information is generated again, so that hints can be processed
+  virtual bool get_file_data( LayerImporterFileDataHandle& data );
     
-protected:
-  // LOAD_DATA:
-  // Load the data from the file(s).
-  // NOTE: This function is called by import_layer internally.
-  virtual bool load_data( Core::DataBlockHandle& data_block, 
-    Core::GridTransform& grid_trans, LayerMetaData& meta_data  );
-
 private:
   MatlabLayerImporterPrivateHandle private_;
-
 };
 
 } // end namespace seg3D

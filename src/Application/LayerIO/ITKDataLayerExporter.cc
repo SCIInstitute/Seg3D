@@ -35,6 +35,7 @@
 
 // gdcm includes
 #include <gdcmUIDGenerator.h>
+
 // Core includes
 #include <Core/Volume/DataVolume.h>
 
@@ -43,7 +44,7 @@
 #include <Application/Layer/DataLayer.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
 
-SCI_REGISTER_EXPORTER( Seg3D, ITKDataLayerExporter );
+SEG3D_REGISTER_EXPORTER( Seg3D, ITKDataLayerExporter );
 
 namespace Seg3D
 {
@@ -133,6 +134,7 @@ bool export_dicom_series( const std::string& file_path, const std::string& file_
   names_generator->SetEndIndex( last_slice );
   names_generator->SetIncrementIndex( 1 );
 
+
   ///////////////////////////////////////////////////////////////////////////
 
   // Check whether header file was included
@@ -143,29 +145,28 @@ bool export_dicom_series( const std::string& file_path, const std::string& file_
   std::vector< std::string > header_files;
   if ( PreferencesManager::Instance()->export_dicom_headers_state_->get() )
   {
-    if ( meta_data.meta_data_info_ == "dicom_filename" )
+  if ( meta_data.meta_data_info_ == "dicom_filename" )
+  {
+    Core::ImportFromString( meta_data.meta_data_, header_files );
+    boost::filesystem::path file( header_files[ 0 ] ); 
+    has_header_file = true;
+    if ( header_files.size() == 0 )
     {
-      Core::ImportFromString( meta_data.meta_data_, header_files );
-      boost::filesystem::path file( header_files[ 0 ] ); 
-      has_header_file = true;
-      if ( header_files.size() == 0 )
-      {
-        has_header_file = false;    
-      }
+      has_header_file = false;    
+    }
 
-      for ( size_t j = 0; j < header_files.size(); j++ )
+    for ( size_t j = 0; j < header_files.size(); j++ )
+    {
+      if ( ! boost::filesystem::exists( header_files[ j ] ) )
       {
-        if ( ! boost::filesystem::exists( header_files[ j ] ) )
-        {
-          has_header_file = false;
-          break;
-        }
+        has_header_file = false;
+        break;
       }
     }
   }
-  
-  std::string l_extension = extension;
-  boost::to_lower( l_extension );
+  }
+
+  std::string l_extension = boost::to_lower_copy( extension );
   if ( l_extension == ".dcm" || l_extension == ".dicom" || l_extension == ".ima" )
   {
     is_dicom = true;
@@ -332,26 +333,7 @@ ITKDataLayerExporter::ITKDataLayerExporter( std::vector< LayerHandle >& layers )
   this->pixel_type_ = layers[ 0 ]->get_data_type();
 }
 
-
-Core::GridTransform ITKDataLayerExporter::get_grid_transform()
-{
-  if( !this->layers_[ 0 ] ) return Core::GridTransform( 1, 1, 1 );
-  return this->layers_[ 0 ]->get_grid_transform();
-}
-
-
-Core::DataType ITKDataLayerExporter::get_data_type()
-{
-  if( !this->layers_[ 0 ] ) return Core::DataType::UNKNOWN_E;
-  return this->layers_[ 0 ]->get_data_type();
-}
-
-int ITKDataLayerExporter::get_exporter_modes()
-{
-  return LayerExporterMode::DATA_E;
-}
-
-bool ITKDataLayerExporter::export_layer( LayerExporterMode mode, const std::string& file_path, 
+bool ITKDataLayerExporter::export_layer( const std::string& mode, const std::string& file_path, 
   const std::string& name )
 {
   if( this->extension_ == ".dcm" )
@@ -373,28 +355,36 @@ bool ITKDataLayerExporter::export_dcm_series( const std::string& file_path, cons
   switch( this->layers_[ 0 ]->get_data_type() )
   {
     case Core::DataType::UCHAR_E:
-      return export_dicom_series< unsigned char, unsigned char >( file_path, name, temp_handle, this->extension_ );
+      return export_dicom_series< unsigned char, unsigned char >( file_path, name, 
+        temp_handle, this->extension_ );
       break;
     case Core::DataType::CHAR_E:
-      return export_dicom_series< signed char, signed char >( file_path, name, temp_handle, this->extension_ );
+      return export_dicom_series< signed char, signed char >( file_path, name, 
+        temp_handle, this->extension_ );
       break;
     case Core::DataType::USHORT_E:
-      return export_dicom_series< unsigned short, unsigned short >( file_path, name, temp_handle, this->extension_ );
+      return export_dicom_series< unsigned short, unsigned short >( file_path, name, 
+        temp_handle, this->extension_ );
       break;
     case Core::DataType::SHORT_E:
-      return export_dicom_series< signed short, signed short >( file_path, name, temp_handle, this->extension_ );
+      return export_dicom_series< signed short, signed short >( file_path, name, 
+        temp_handle, this->extension_ );
       break;
     case Core::DataType::UINT_E:
-      return export_dicom_series< signed int, signed int >( file_path, name, temp_handle, this->extension_ );
+      return export_dicom_series< signed int, signed int >( file_path, name, 
+        temp_handle, this->extension_ );
       break;
     case Core::DataType::INT_E:
-      return export_dicom_series< unsigned int, unsigned int >( file_path, name, temp_handle, this->extension_ );
+      return export_dicom_series< unsigned int, unsigned int >( file_path, name, 
+        temp_handle, this->extension_ );
       break;
     case Core::DataType::FLOAT_E:
-      return export_dicom_series< float, signed short >( file_path, name, temp_handle, this->extension_ );
+      return export_dicom_series< float, signed short >( file_path, name, 
+        temp_handle, this->extension_ );
       break;
     case Core::DataType::DOUBLE_E:
-      return export_dicom_series< double, signed short >( file_path, name, temp_handle, this->extension_ );
+      return export_dicom_series< double, signed short >( file_path, name, 
+        temp_handle, this->extension_ );
       break;
     default:
       return false;
@@ -443,14 +433,6 @@ bool ITKDataLayerExporter::export_itk_series( const std::string& file_path )
     return false;
   }
   return false;
-
 }
-
-
-
-  
-
-
-
 
 } // end namespace seg3D

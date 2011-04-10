@@ -8,7 +8,11 @@
         <file>Images/YviewOff.png</file>
         <file>Images/ZviewOff.png</file>
         <file>Images/Add.png</file>
+        <file>Images/AddOn.png</file>
         <file>Images/AddWhite.png</file>
+        <file>Images/Minus.png</file>
+        <file>Images/MinusOn.png</file>
+        <file>Images/MinusWhite.png</file>
         <file>Images/AutoView.png</file>
         <file>Images/AutoViewOff.png</file>
         <file>Images/BitPlaneMask.png</file>
@@ -106,6 +110,7 @@
         <file>Images/SlicesVisible.png</file>
         <file>Images/SlicesVisibleOff.png</file>
 		<file>Images/Seg3DSplash.png</file>
+		<file>Images/Seg3DSplash-2-1.png</file>
         <file>Images/Transform.png</file>
         <file>Images/TransformOff.png</file>
         <file>Images/Text.png</file>
@@ -144,7 +149,9 @@
         <file>Images/TextOffError.png</file>
         <file>Images/InvisibleSlicesVisible.png</file>
         <file>Images/InvisibleSlicesVisibleOff.png</file>
-        <file>Images/Clip.png</file>
+		<file>Images/Clip.png</file>
         <file>Images/ClipOff.png</file>
+		<file>Images/VolumeRendering.png</file>
+        <file>Images/VolumeRenderingOff.png</file>		
     </qresource>
 </RCC>

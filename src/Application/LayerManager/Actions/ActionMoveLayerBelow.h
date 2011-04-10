@@ -51,12 +51,8 @@ public:
     layer_(""),
     group_id_("") 
   {
-    this->add_argument( layer_ );
-    this->add_argument( group_id_ );
-  }
-  
-  virtual ~ActionMoveLayerBelow()
-  {
+    this->add_parameter( this->layer_ );
+    this->add_parameter( this->group_id_ );
   }
   
   // -- Functions that describe action --
@@ -67,16 +63,11 @@ public:
   // -- Action parameters --
 private:
   // Layer_handle that is requested
-  Core::ActionParameter< std::string >  layer_;
-  Core::ActionParameter< std::string >  group_id_;
+  std::string layer_;
+  std::string group_id_;
   
   // -- Dispatch this action from the interface --
-public:
-  // CREATE:
-  // Create action that moves the layer above
-  static Core::ActionHandle Create( const std::string& layer, 
-    const std::string& group_id );
-  
+public: 
   // DISPATCH
   // Create and dispatch action that moves the layer above 
   static void Dispatch( Core::ActionContextHandle context, const std::string& layer, 

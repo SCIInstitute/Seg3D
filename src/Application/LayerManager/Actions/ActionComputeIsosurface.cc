@@ -44,27 +44,17 @@ bool ActionComputeIsosurface::validate( Core::ActionContextHandle& context )
 {
   // Check whether the layer exists and is of the right type and return an
   // error if not
-  std::string error;
-  if ( !( LayerManager::CheckLayerExistanceAndType( this->layer_id_.value(), 
-    Core::VolumeType::MASK_E, error ) ) )
-  {
-    context->report_error( error );
-    return false;
-  }
+  if ( !( LayerManager::CheckLayerExistanceAndType( this->layer_id_, 
+    Core::VolumeType::MASK_E, context ) ) ) return false;
   
   // Check whether the layer is not locked for processing or creating, in which case the
   // data is not data yet, hence we cannot compute an isosurface on it. The function returns
   // a notifier when the action can be completed.
-  Core::NotifierHandle notifier;
-  if ( !( LayerManager::CheckLayerAvailabilityForUse( this->layer_id_.value(), 
-     notifier ) ) )
-  {
-    context->report_need_resource( notifier );
-    return false;
-  }
+  if ( !( LayerManager::CheckLayerAvailabilityForUse( this->layer_id_, 
+     context ) ) ) return false;
   
   // Check for valid quality factor
-  double quality_factor = this->quality_factor_.value();
+  double quality_factor = this->quality_factor_;
   if( !( quality_factor == 1.0 || quality_factor == 0.5 || 
     quality_factor == 0.25 || quality_factor == 0.125 ) )
   {
@@ -77,8 +67,8 @@ bool ActionComputeIsosurface::validate( Core::ActionContextHandle& context )
 bool ActionComputeIsosurface::run( Core::ActionContextHandle& context, 
   Core::ActionResultHandle& result )
 {
-  MaskLayerHandle mask_layer = LayerManager::FindMaskLayer( this->layer_id_.value() );
-  mask_layer->compute_isosurface( this->quality_factor_.value(), this->capping_enabled_.value() );
+  MaskLayerHandle mask_layer = LayerManager::FindMaskLayer( this->layer_id_ );
+  mask_layer->compute_isosurface( this->quality_factor_, this->capping_enabled_ );
 
   /*
   Hide the abort message (if aborted).  This is a workaround for the fact that this action is
@@ -104,23 +94,16 @@ bool ActionComputeIsosurface::run( Core::ActionContextHandle& context,
   return true;
 }
 
-Core::ActionHandle ActionComputeIsosurface::Create( MaskLayerHandle mask_layer, 
-  double quality_factor, bool capping_enabled )
-{
-  ActionComputeIsosurface* action = new ActionComputeIsosurface;
-
-  action->layer_id_.value() = mask_layer->get_layer_id();
-  action->quality_factor_.value() = quality_factor;
-  action->capping_enabled_.value() = capping_enabled;
-
-  return Core::ActionHandle( action );
-}
-
 void ActionComputeIsosurface::Dispatch( Core::ActionContextHandle context, 
   MaskLayerHandle mask_layer, double quality_factor, bool capping_enabled )
 {
-  Core::ActionDispatcher::PostAction( Create( mask_layer, quality_factor, capping_enabled ), 
-    context );
+  ActionComputeIsosurface* action = new ActionComputeIsosurface;
+
+  action->layer_id_= mask_layer->get_layer_id();
+  action->quality_factor_ = quality_factor;
+  action->capping_enabled_ = capping_enabled;
+
+  Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }
 
 void ActionComputeIsosurface::Dispatch( Core::ActionContextHandle context )

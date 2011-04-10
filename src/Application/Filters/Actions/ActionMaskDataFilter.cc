@@ -44,51 +44,29 @@ namespace Seg3D
 bool ActionMaskDataFilter::validate( Core::ActionContextHandle& context )
 {
   // Check for layer existance and type information
-  std::string error;
-  if ( ! LayerManager::CheckLayerExistanceAndType( this->target_layer_.value(), 
-    Core::VolumeType::DATA_E, error ) )
-  {
-    context->report_error( error );
-    return false;
-  }
+  if ( ! LayerManager::CheckLayerExistanceAndType( this->target_layer_, 
+    Core::VolumeType::DATA_E, context ) ) return false;
   
   // Check for layer availability 
-  Core::NotifierHandle notifier;
-  if ( ! LayerManager::CheckLayerAvailability( this->target_layer_.value(), 
-    this->replace_.value(), notifier ) )
-  {
-    context->report_need_resource( notifier );
-    return false;
-  }
+  if ( ! LayerManager::CheckLayerAvailability( this->target_layer_, 
+    this->replace_, context ) ) return false;
   
   // Check for layer existance and type information mask layer
-  if ( ! LayerManager::CheckLayerExistanceAndType( this->mask_layer_.value(), 
-    Core::VolumeType::MASK_E, error ) )
-  {
-    context->report_error( error );
-    return false;
-  }
+  if ( ! LayerManager::CheckLayerExistanceAndType( this->mask_layer_, 
+    Core::VolumeType::MASK_E, context ) ) return false;
 
   // Check whether mask and data have the same size
-  if ( ! LayerManager::CheckLayerSize( this->mask_layer_.value(), this->target_layer_.value(),
-    error ) )
-  {
-    context->report_error( error );
-    return false; 
-  }
+  if ( ! LayerManager::CheckLayerSize( this->mask_layer_, this->target_layer_,
+    context ) ) return false;
     
   // Check for layer availability mask layer
-  if ( ! LayerManager::CheckLayerAvailability( this->mask_layer_.value(), 
-    this->replace_.value(), notifier ) )
-  {
-    context->report_need_resource( notifier );
-    return false;
-  }
+  if ( ! LayerManager::CheckLayerAvailability( this->mask_layer_, 
+    this->replace_, context ) ) return false;
   
   // If the number of iterations is lower than one, we cannot run the filter
-  if( ! ( this->replace_with_.value() == "zero" || this->replace_with_.value() == "max_value" ||
-    this->replace_with_.value() == "min_value" || this->replace_with_.value() == "new_max_value" ||
-    this->replace_with_.value() == "new_min_value" ) )
+  if( ! ( this->replace_with_ == "zero" || this->replace_with_ == "max_value" ||
+    this->replace_with_ == "min_value" || this->replace_with_ == "new_max_value" ||
+    this->replace_with_ == "new_min_value" ) )
   {
     context->report_error( "Replace_with needs be zero, max_value, min_value, new_max_value,"
       " or new_min_value." );
@@ -281,19 +259,19 @@ bool ActionMaskDataFilter::run( Core::ActionContextHandle& context,
   boost::shared_ptr<MaskDataFilterAlgo> algo( new MaskDataFilterAlgo );
 
   // Copy the parameters over to the algorithm that runs the filter
-  algo->invert_mask_ = this->invert_mask_.value();
-  algo->replace_with_ = this->replace_with_.value();
+  algo->invert_mask_ = this->invert_mask_;
+  algo->replace_with_ = this->replace_with_;
 
   // Find the handle to the layer
-  if ( !( algo->find_layer( this->target_layer_.value(), algo->src_layer_ ) ) )
+  if ( !( algo->find_layer( this->target_layer_, algo->src_layer_ ) ) )
   {
     return false;
   }
   
-  algo->find_layer( this->mask_layer_.value(), algo->mask_layer_ );
+  algo->find_layer( this->mask_layer_, algo->mask_layer_ );
   algo->lock_for_use( algo->mask_layer_ );
 
-  if ( this->replace_.value() )
+  if ( this->replace_ )
   {
     // Copy the handles as destination and source will be the same
     algo->dst_layer_ = algo->src_layer_;
@@ -315,6 +293,9 @@ bool ActionMaskDataFilter::run( Core::ActionContextHandle& context,
   // Build the undo-redo record
   algo->create_undo_redo_record( context, this->shared_from_this() );
 
+  // Build the provenance record
+  algo->create_provenance_record( context, this->shared_from_this() );
+  
   // Start the filter.
   Core::Runnable::Start( algo );
 
@@ -328,11 +309,11 @@ void ActionMaskDataFilter::Dispatch( Core::ActionContextHandle context, std::str
   ActionMaskDataFilter* action = new ActionMaskDataFilter;
 
   // Setup the parameters
-  action->target_layer_.value() = target_layer;
-  action->mask_layer_.value() = mask_layer; 
-  action->replace_.value() = replace;
-  action->invert_mask_.value() = invert_mask;
-  action->replace_with_.value() = replace_with;
+  action->target_layer_ = target_layer;
+  action->mask_layer_ = mask_layer; 
+  action->replace_ = replace;
+  action->invert_mask_ = invert_mask;
+  action->replace_with_ = replace_with;
 
   // Dispatch action to underlying engine
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );

@@ -51,7 +51,7 @@ public:
   virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
 
 private:
-  Core::ActionParameter< std::string > feature_id_;
+  std::string feature_id_;
 
 public:
   static void Dispatch( Core::ActionContextHandle context, const std::string& feature_id );

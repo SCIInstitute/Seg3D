@@ -54,10 +54,10 @@ bool IsosurfaceShader::get_vertex_shader_source( std::string& source )
   };
   source = std::string( VERT_SHADER_SOURCE_C );
   return true;
-}
+  }
 
 bool IsosurfaceShader::get_fragment_shader_source( std::string& source )
-{
+  {
   const char FRAG_SHADER_SOURCE_C[] =
   {
 #include "IsosurfaceShader_frag"

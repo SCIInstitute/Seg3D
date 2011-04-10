@@ -46,9 +46,8 @@ CORE_ACTION(
 public:
   ActionClear()
   {
-    this->add_argument( this->stateid_ );
-  } 
-  virtual ~ActionClear() {}
+    this->add_parameter( this->stateid_ );
+  }
 
   // -- Functions that describe action --
   virtual bool validate( ActionContextHandle& context );
@@ -58,13 +57,11 @@ public:
   virtual bool changes_project_data();
 
 private:
-  ActionParameter< std::string > stateid_;
+  std::string stateid_;
 
   StateVectorBaseWeakHandle state_weak_handle_;
 
 public:
-  static ActionHandle Create( const StateVectorBaseHandle& state );
-
   static void Dispatch( ActionContextHandle context, const StateVectorBaseHandle& state );
 };
 

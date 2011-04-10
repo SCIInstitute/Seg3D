@@ -52,7 +52,7 @@
 #include <Application/Layer/Layer.h>
 #include <Application/Layer/DataLayer.h>
 #include <Application/Layer/MaskLayer.h>
-#include <Application/Session/Session.h>
+#include <Application/Project/Project.h>
 
 namespace Seg3D
 {
@@ -78,9 +78,6 @@ public:
   // --JS
   virtual int get_session_priority() { return SessionPriority::LAYER_MANAGER_PRIORITY_E; }
 
-public:
-  typedef std::list < LayerGroupHandle > group_list_type;
-
   // -- Accessor Functions --
 public:
     // Functions for getting a copy of the Layers and Groups with the proper locking
@@ -104,9 +101,13 @@ public:
   bool check_for_same_group( const std::string layer_to_insert_id, 
     const std::string layer_below_id );
   
-  // GET_LAYER_GROUP:
+  // GET_GROUP_BY_ID:
   // this function returns the group with the id that is passed
-  LayerGroupHandle get_layer_group( std::string group_id );
+  LayerGroupHandle get_group_by_id( std::string group_id );
+
+  // GET_GROUP_BY_PROVENANCE_ID:
+  // this function returns the group with the id that is passed
+  LayerGroupHandle get_group_by_provenance_id( ProvenanceID provenance_id );
   
   // GET_LAYER_BY_ID:
   // this function returns a handle to the layer with the id that is passed
@@ -115,6 +116,10 @@ public:
   // GET_LAYER_BY_NAME:
   // this function returns a handle to a layer with the name that is passed
   LayerHandle get_layer_by_name( const std::string& layer_name );
+
+  // GET_LAYER_BY_PROVENANCE_ID:
+  // this function returns a handle to a layer with the provenance id that was given
+  LayerHandle get_layer_by_provenance_id( ProvenanceID provenance_id );
 
   // GET_DATA_LAYER_BY_ID:
   // this function returns a handle to the layer with the id that is passed
@@ -160,7 +165,7 @@ public:
 
   // DELETE_LAYERS:
   // this function deletes the selected layers in the group that is passed
-  void delete_layers( std::vector< std::string > layers );
+  void delete_layers( std::vector< LayerHandle > layers );
 
   // SET_ACTIVE_LAYER:
   // this function sets the active layer
@@ -214,7 +219,7 @@ private:
   
   int find_free_color();
 
-  // Typedef's for the Mutex
+  // -- locking --
 public: 
   typedef Core::StateEngine::mutex_type mutex_type;
   typedef Core::StateEngine::lock_type lock_type;
@@ -296,7 +301,6 @@ protected:
   // this function clears out all existing layers before we load a project from file
   virtual bool pre_load_states( const Core::StateIO& state_io );
   
-  
 private:
   friend class LayerManagerPrivate;
   LayerManagerPrivateHandle private_;
@@ -310,6 +314,18 @@ public:
   // Find a layer inside the layer manager
   static LayerHandle FindLayer( const std::string& layer_id );
 
+  // FINDLAYER:
+  // Find a layer inside the layer manager
+  static LayerHandle FindLayer( ProvenanceID prov_id );
+
+  // FINDGROUP:
+  // Find a layer inside the layer manager
+  static LayerGroupHandle FindGroup( const std::string& group_id );
+
+  // FINDGROUP:
+  // Find a layer inside the layer manager
+  static LayerGroupHandle FindGroup( ProvenanceID prov_id );
+  
   // FINDMASKLAYER:
   // Find a mask layer inside the layer manager
   static MaskLayerHandle FindMaskLayer( const std::string& layer_id );
@@ -318,33 +334,46 @@ public:
   // Find a data layer inside the layer manager
   static DataLayerHandle FindDataLayer( const std::string& layer_id );
 
+//// Functions that need to be removed ///////////
   // FINDLAYERGROUP:
   // Find a group inside the layer manager
+  // TODO: Need to make this one obsolete for provenance reasons everyhting will have to be
+  // done with layerid lists
+  // --JGS
   static LayerGroupHandle FindLayerGroup( const std::string& group_id );
-
-  // CHECKLAYEREXISTANCE:
-  // Check whether a layer exists.
-  // If it does not exist, the function returns false and an error is string is returned.
-  static bool CheckLayerExistance( const std::string& layer_id, std::string& error );
 
   // CHECKGROUPEXISTANCE:
   // Check whether a group exists.
   // If it does not exist, the function returns false and an error is string is returned.
+  // TODO: Need to make this one obsolete for provenance reasons everyhting will have to be
+  // done with layerid lists
+  // --JGS
   static bool CheckGroupExistance( const std::string& layer_id, std::string& error );
+//////////////////////////////////////////////////
+
+  // CHECKLAYEREXISTANCE:
+  // Check whether a layer exists.
+  // If it does not exist, the function returns and reports the error in the context 
+  static bool CheckLayerExistance( const std::string& layer_id, 
+    Core::ActionContextHandle context );
+  
+  // Check whether a layer exists.
+  // If it does not exist, the function returns false.
+  static bool CheckLayerExistance( const std::string& layer_id ); 
   
   // CHECKLAYEREXISTANCEANDTYPE:
   // Check whether a layer exists and whether it is of the right type.
-  // If it does not exist or is not of the right type, the function returns false and
-  // an error is string is returned.
+  // If it does not exist or is not of the right type, the function returns the error in the
+  // context.
   static bool CheckLayerExistanceAndType( const std::string& layer_id, Core::VolumeType type, 
-    std::string& error );
+    Core::ActionContextHandle context  );
 
   // CHECKLAYERSIZE:
   // Check whether a layer has the right size.
-  // If it does not have the right size, the function returns false and an error is string is 
-  // returned.  
+  // If it does not have the right size, the function returns false and returns the error in 
+  // the context. 
   static bool CheckLayerSize( const std::string& layer_id1, const std::string& layer_id2,
-    std::string& error );
+    Core::ActionContextHandle context  );
       
   // CHECKLAYERAVAILABILITYFORPROCESSING:
   // Check whether a layer is available for processing, at the end of the filter the data will
@@ -352,11 +381,11 @@ public:
   // If a layer is not available a notifier is returned that tells can be used to assess when to
   // check for availability again. Even though the notifier may return another process may have
   // grabbed it in the mean time. In that case a new notifier will need to be issued by rechecking
-  // availability. Only when the this function OKs the  
+  // availability. 
   // NOTE: Availability needs to be tested to ensure that another process is not working on this
   // this layer. 
   static bool CheckLayerAvailabilityForProcessing( const std::string& layer_id, 
-    Core::NotifierHandle& notifier );
+    Core::ActionContextHandle context  );
 
   // CHECKLAYERAVAILABILITYFORUSE:
   // Check whether a layer is available for use, i.e. data is not changed but needs to remain
@@ -364,11 +393,11 @@ public:
   // If a layer is not available a notifier is returned that tells can be used to assess when to
   // check for availability again. Even though the notifier may return another process may have
   // grabbed it in the mean time. In that case a new notifier will need to be issued by rechecking
-  // availability. Only when the this function OKs the  
+  // availability. 
   // NOTE: Availability needs to be tested to ensure that another process is not working on this
   // this layer. 
   static bool CheckLayerAvailabilityForUse( const std::string& layer_id, 
-    Core::NotifierHandle& notifier );
+    Core::ActionContextHandle context  );
     
   // CHECKLAYERAVAILABILITY:
   // Check whether a layer is available for use. This case processes both of the above cases:
@@ -377,11 +406,11 @@ public:
   // If a layer is not available a notifier is returned that tells can be used to assess when to
   // check for availability again. Even though the notifier may return another process may have
   // grabbed it in the mean time. In that case a new notifier will need to be issued by rechecking
-  // availability. Only when the this function OKs the  
+  // availability.
   // NOTE: Availability needs to be tested to ensure that another process is not working on this
   // this layer. 
   static bool CheckLayerAvailability( const std::string& layer_id, bool replace,
-    Core::NotifierHandle& notifier ); 
+    Core::ActionContextHandle context  ); 
     
   // == functions for creating and locking layers ==
 public: 
@@ -433,50 +462,55 @@ public:
   // DISPATCHUNLOCKORDELETELAYER:
   // Unlock layer if valid, delete otherwise. This function will relay a call to the 
   // Application thread if needed.
-  static void DispatchUnlockOrDeleteLayer( LayerHandle layer, filter_key_type key = filter_key_type( 0 ) );
+  static void DispatchUnlockOrDeleteLayer( LayerHandle layer, 
+    filter_key_type key = filter_key_type( 0 ) );
 
   // DISPATCHINSERTDATAVOLUMEINTOLAYER:
   // Insert a data volume into a data layer. This function will relay a call to the 
   // Application thread if needed.
   static void DispatchInsertDataVolumeIntoLayer( DataLayerHandle layer, 
-    Core::DataVolumeHandle data, filter_key_type key = filter_key_type( 0 ) );
+    Core::DataVolumeHandle data, ProvenanceID provid, 
+    filter_key_type key = filter_key_type( 0 ) );
 
   // DISPATCHINSERTMASKVOLUMEINTOLAYER:
   // Insert a mask volume into a mask layer. This function will relay a call to the 
   // Application thread if needed.
   static void DispatchInsertMaskVolumeIntoLayer( MaskLayerHandle layer, 
-    Core::MaskVolumeHandle mask, filter_key_type key = filter_key_type( 0 ) );
+    Core::MaskVolumeHandle mask, ProvenanceID provid, 
+    filter_key_type key = filter_key_type( 0 ) );
 
   // DISPATCHINSERTVOLUMEINTOLAYER:
   // Insert a mask or data volume into a layer. This function will relay a call to the 
   // Application thread if needed.
   static void DispatchInsertVolumeIntoLayer( LayerHandle layer, 
-    Core::VolumeHandle mask, filter_key_type key = filter_key_type( 0 ) );
+    Core::VolumeHandle mask, ProvenanceID provid, 
+    filter_key_type key = filter_key_type( 0 ) );
 
   // DISPATCHINSERTDATASLICEINTOLAYER:
   // Insert a data slice into a data layer. 
   static void DispatchInsertDataSliceIntoLayer( DataLayerHandle layer,
-    Core::DataSliceHandle data, filter_key_type key = filter_key_type( 0 ) );
+    Core::DataSliceHandle data, ProvenanceID provid, 
+    filter_key_type key = filter_key_type( 0 ) );
 
   // DISPATCHINSERTDATASLICEINTOLAYER:
   // Insert a data slice into a data layer. 
   static void DispatchInsertDataSlicesIntoLayer( DataLayerHandle layer,
-    std::vector<Core::DataSliceHandle> data, 
+    std::vector<Core::DataSliceHandle> data, ProvenanceID provid, 
     filter_key_type key = filter_key_type( 0 ) );
 
   // DISPATCHINSERTMASKSLICEINTOLAYER:
   // Insert a data slice into a data layer. 
   static void DispatchInsertMaskSliceIntoLayer( MaskLayerHandle layer,
-    Core::MaskDataSliceHandle mask, filter_key_type key = filter_key_type( 0 ) );
+    Core::MaskDataSliceHandle mask, ProvenanceID provid,
+    filter_key_type key = filter_key_type( 0 ) );
 
   // DISPATCHINSERTMASKSLICESINTOLAYER:
   // Insert a data slice into a data layer. 
   static void DispatchInsertMaskSlicesIntoLayer( MaskLayerHandle layer,
-    std::vector<Core::MaskDataSliceHandle> mask, 
+    std::vector<Core::MaskDataSliceHandle> mask, ProvenanceID provid, 
     filter_key_type key = filter_key_type( 0 ) );
 
-  // == function for obtaining the current layer and group id counters
-  
+  // -- functions for obtaining the current layer and group id counters --
   typedef std::vector<int> id_count_type;
   
   // GETLAYERIDCOUNT:

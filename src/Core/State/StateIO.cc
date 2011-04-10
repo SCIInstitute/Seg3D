@@ -79,26 +79,30 @@ bool StateIO::import_from_file( const boost::filesystem::path& path )
   }
 
   const std::string& name = this->private_->current_element_->ValueStr();
-  if ( name != "Seg3D" && name != "Seg3D2" )
-  {
-    return false;
+  if ( name == Core::Application::GetApplicationName() )
+  { 
+    this->private_->current_element_->QueryIntAttribute( "major_version", 
+      &this->private_->major_version_ );
+    this->private_->current_element_->QueryIntAttribute( "minor_version", 
+      &this->private_->minor_version_ );
+    this->private_->current_element_->QueryIntAttribute( "patch_version", 
+      &this->private_->patch_version_ );
   }
-
-  this->private_->current_element_->QueryIntAttribute( "major_version", 
-    &this->private_->major_version_ );
-  this->private_->current_element_->QueryIntAttribute( "minor_version", 
-    &this->private_->minor_version_ );
-  this->private_->current_element_->QueryIntAttribute( "patch_version", 
-    &this->private_->patch_version_ );
+  else
+  {
+    this->private_->major_version_ = -1;
+    this->private_->minor_version_ = -1;
+    this->private_->patch_version_ = -1;
+  }
   
   return true;
 }
 
-void StateIO::initialize( const std::string& root_name )
+void StateIO::initialize()
 {
   this->private_->xml_doc_.LinkEndChild( new TiXmlDeclaration( "1.0", "", "" ) );  
 
-  this->private_->current_element_ = new TiXmlElement( root_name );
+  this->private_->current_element_ = new TiXmlElement( Core::Application::GetApplicationName() );
   this->private_->current_element_->SetAttribute( "major_version", 
     Core::Application::GetMajorVersion() );
   this->private_->current_element_->SetAttribute( "minor_version", 

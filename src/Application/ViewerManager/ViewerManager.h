@@ -174,8 +174,17 @@ public:
   // The target data layer for volume rendering
   Core::StateLabeledOptionHandle volume_rendering_target_state_;
 
+  // Which volume renderer to use.
+  Core::StateLabeledOptionHandle volume_renderer_state_;
+
   // The sampling rate of volume rendering
   Core::StateRangedDoubleHandle volume_sample_rate_state_;
+
+  // The aperture angle of the cone for occlusion volume rendering
+  Core::StateRangedDoubleHandle vr_occlusion_angle_state_;
+
+  // The grid resolution for sampling the cone base
+  Core::StateRangedIntHandle vr_occlusion_grid_resolution_state_;
 
   // Clipping planes enabled state
   Core::StateBoolHandle enable_clip_plane_state_[ 6 ];
@@ -243,13 +252,13 @@ private:
 
   // -- Layout options --
 public:
-  static const std::string SINGLE_C;
-  static const std::string _1AND1_C;
-  static const std::string _1AND2_C;
-  static const std::string _1AND3_C;
-  static const std::string _2AND2_C;
-  static const std::string _2AND3_C;
-  static const std::string _3AND3_C;
+  static const std::string VIEW_SINGLE_C;
+  static const std::string VIEW_1AND1_C;
+  static const std::string VIEW_1AND2_C;
+  static const std::string VIEW_1AND3_C;
+  static const std::string VIEW_2AND2_C;
+  static const std::string VIEW_2AND3_C;
+  static const std::string VIEW_3AND3_C;
 
 }; // class ViewerManager
 

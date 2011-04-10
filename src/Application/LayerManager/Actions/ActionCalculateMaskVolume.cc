@@ -41,14 +41,14 @@ namespace Seg3D
 
 bool ActionCalculateMaskVolume::validate( Core::ActionContextHandle& context )
 {
-  if ( LayerManager::Instance()->get_mask_layer_by_id( this->mask_name_.value() ) ) return true;
+  if ( LayerManager::Instance()->get_mask_layer_by_id( this->mask_name_ ) ) return true;
   
   if( LayerManager::Instance()->get_layer_by_name( 
-    this->mask_name_.value() )->get_type() == Core::VolumeType::MASK_E )
+    this->mask_name_ )->get_type() == Core::VolumeType::MASK_E )
   {
     // If they passed the name instead, then we'll take the opportunity to get the id instead.
-    this->mask_name_.value() = LayerManager::Instance()->get_layer_by_name( 
-      this->mask_name_.value() )->get_layer_id();
+    this->mask_name_ = LayerManager::Instance()->get_layer_by_name( 
+      this->mask_name_ )->get_layer_id();
     return true;
   }
   return false; // validated
@@ -64,27 +64,20 @@ bool ActionCalculateMaskVolume::run( Core::ActionContextHandle& context,
 
   progress->begin_progress_reporting();
 
-  LayerManager::Instance()->get_mask_layer_by_id( this->mask_name_.value() )->calculate_volume();
+  LayerManager::Instance()->get_mask_layer_by_id( this->mask_name_ )->calculate_volume();
   
   progress->end_progress_reporting();
   
   return true;
 }
 
-Core::ActionHandle ActionCalculateMaskVolume::Create( const std::string& mask_name )
-{
-  ActionCalculateMaskVolume* action = new ActionCalculateMaskVolume;
-  
-  action->mask_name_.value() = mask_name;
-
-  return Core::ActionHandle( action );
-}
-
-
 void ActionCalculateMaskVolume::Dispatch( Core::ActionContextHandle context, 
   const std::string& mask_name )
 {
-  Core::ActionDispatcher::PostAction( Create( mask_name ), context );
+  ActionCalculateMaskVolume* action = new ActionCalculateMaskVolume;
+  action->mask_name_ = mask_name;
+  
+  Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }
 
 } // end namespace Seg3D

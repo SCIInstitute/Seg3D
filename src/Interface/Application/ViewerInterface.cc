@@ -200,7 +200,7 @@ void ViewerInterface::set_active_viewer( int viewer_id )
 
 void ViewerInterface::set_layout( const std::string& layout )
 {
-  if( layout == ViewerManager::SINGLE_C )
+  if( layout == ViewerManager::VIEW_SINGLE_C )
   {
     private_->vert_splitter1_->show();
     private_->vert_splitter2_->hide();
@@ -211,7 +211,7 @@ void ViewerInterface::set_layout( const std::string& layout )
     private_->horiz_splitter_->setSizes( sizes );
     private_->horiz_splitter_->repaint();
   }
-  else if( layout == ViewerManager::_1AND1_C )
+  else if( layout == ViewerManager::VIEW_1AND1_C )
   {
     private_->vert_splitter1_->show();
     private_->vert_splitter2_->show();
@@ -222,7 +222,7 @@ void ViewerInterface::set_layout( const std::string& layout )
     private_->horiz_splitter_->setSizes( sizes );
     private_->horiz_splitter_->repaint();
   }
-  else if( layout == ViewerManager::_1AND2_C )
+  else if( layout == ViewerManager::VIEW_1AND2_C )
   {
     private_->vert_splitter1_->show();
     private_->vert_splitter2_->show();
@@ -239,7 +239,7 @@ void ViewerInterface::set_layout( const std::string& layout )
     private_->vert_splitter2_->setSizes( vsizes );
     private_->horiz_splitter_->repaint();
   }
-  else if( layout == ViewerManager::_1AND3_C )
+  else if( layout == ViewerManager::VIEW_1AND3_C )
   {
     private_->vert_splitter1_->show();
     private_->vert_splitter2_->show();
@@ -256,7 +256,7 @@ void ViewerInterface::set_layout( const std::string& layout )
     private_->vert_splitter2_->setSizes( vsizes );
     private_->horiz_splitter_->repaint();
   }
-  else if( layout == ViewerManager::_2AND2_C )
+  else if( layout == ViewerManager::VIEW_2AND2_C )
   {
     private_->vert_splitter1_->show();
     private_->vert_splitter2_->show();
@@ -274,7 +274,7 @@ void ViewerInterface::set_layout( const std::string& layout )
     private_->vert_splitter2_->setSizes( vsizes );
     private_->horiz_splitter_->repaint();
   }
-  else if( layout == ViewerManager::_2AND3_C )
+  else if( layout == ViewerManager::VIEW_2AND3_C )
   {
     private_->vert_splitter1_->show();
     private_->vert_splitter2_->show();
@@ -293,7 +293,7 @@ void ViewerInterface::set_layout( const std::string& layout )
     private_->vert_splitter2_->setSizes( vsizes );
     private_->horiz_splitter_->repaint();
   }
-  else if( layout == ViewerManager::_3AND3_C )
+  else if( layout == ViewerManager::VIEW_3AND3_C )
   {
     private_->vert_splitter1_->show();
     private_->vert_splitter2_->show();

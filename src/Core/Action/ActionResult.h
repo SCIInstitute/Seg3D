@@ -37,7 +37,7 @@
 #include <boost/shared_ptr.hpp>
 
 // Application
-#include <Core/Action/ActionParameter.h>
+#include <Core/Utils/Variant.h>
 
 namespace Core
 {
@@ -47,8 +47,8 @@ namespace Core
 // each action may have a different result we currently typedef this to the
 // ActionParameterVariant class
 
-typedef ActionParameterVariant ActionResult;
-typedef boost::shared_ptr< ActionParameterVariant > ActionResultHandle;
+typedef Variant ActionResult;
+typedef boost::shared_ptr< ActionResult > ActionResultHandle;
 
 } // namespace Core
 

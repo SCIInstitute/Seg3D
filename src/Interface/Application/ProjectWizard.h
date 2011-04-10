@@ -54,7 +54,6 @@ public:
 private Q_SLOTS:
   void set_delete_path( QString );
 
-private:
     void accept();
     void reject();
     
@@ -106,7 +105,7 @@ protected:
 private:
   QLabel *description_;
     QLabel *project_name_;
-    QLabel *project_path_;
+    QLabel *project_location_;
 
 };
 

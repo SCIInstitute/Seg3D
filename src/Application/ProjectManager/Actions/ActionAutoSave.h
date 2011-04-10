@@ -26,62 +26,54 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_SESSION_SESSION_H
-#define APPLICATION_SESSION_SESSION_H
+#ifndef APPLICATION_PROJECTMANAGER_ACTIONS_ACTIONAUTOSAVE_H
+#define APPLICATION_PROJECTMANAGER_ACTIONS_ACTIONAUTOSAVE_H
 
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
-#pragma once
-#endif
 
 // Boost includes
-#include <boost/filesystem.hpp>
-#include <boost/shared_ptr.hpp>
+#include <boost/date_time.hpp>
 
 // Core includes
-#include <Core/State/State.h>
-#include <Core/Utils/EnumClass.h>
+#include <Core/Action/Action.h> 
+#include <Core/Interface/Interface.h>
+
 
 namespace Seg3D
 {
 
-CORE_ENUM_CLASS
-(
-  SessionPriority,
-  DEFAULT_PRIORITY_E = -1,
-  LAYER_MANAGER_PRIORITY_E = 300,
-  VIEWER_MANAGER_PRIORITY_E = 200,
-  TOOL_MANAGER_PRIORITY_E = 100
+class ActionAutoSave : public Core::Action
+{
+  
+CORE_ACTION(
+  CORE_ACTION_TYPE( "AutoAutoSave", "Create a new auto save session if needed." )
 )
 
-// CLASS Session
-// This is the main class for collecting state information on a Session
-class Session;
-  
-typedef boost::shared_ptr< Session > SessionHandle;
-
-// Class definition
-class Session : public Core::StateHandler
-{
-  // -- constructor/destructor --
+  // -- Constructor/Destructor --
 public:
-  Session( const std::string& session_name );
-  virtual ~Session();
-  
-public:
-  // general session data
-  Core::StateStringHandle session_name_state_;
+  ActionAutoSave()
+  {
+    // Get the local time, so we can cancel the auto save if a save occurs between issuing
+    // the action and the actual save.
+    this->time_stamp_ = boost::posix_time::second_clock::local_time();
+  }
 
+  // -- Functions that describe action --
 public:
-  // INITIALIZE_FROM_FILE:
-  // this file initializes the state values for Session from the file at the path specified
-  bool load( boost::filesystem::path path, const std::string& session_name );
+  virtual bool validate( Core::ActionContextHandle& context );
+  virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
+    
+  // -- Dispatch this action from the interface --
+public:
+  // DISPATCH:
+  // Dispatch an action that activates a layer
+  static void Dispatch( Core::ActionContextHandle context );
   
-  // SAVE_CURRENT_STATE:
-  // this function will take a snapshot of the current state of the project and save it
-  bool save( boost::filesystem::path path, const std::string& session_name );
-
+  // -- time stamp --
+private:
+  boost::posix_time::ptime time_stamp_;
+  
 };
 
 } // end namespace Seg3D
 
-#endif // SESSION_H
+#endif

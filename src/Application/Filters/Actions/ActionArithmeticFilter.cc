@@ -141,11 +141,11 @@ public:
   // Validate the filter inputs, outputs and expression prior to running filter.
   bool validate_parser( Core::ActionContextHandle& context );
 
-  Core::ActionParameter< std::vector< std::string > > layer_ids_;
-  Core::ActionParameter< std::string > expressions_;
-  Core::ActionParameter< std::string > output_type_;
-  Core::ActionParameter< bool > replace_;
-  Core::ActionParameter< bool > preserve_data_format_;
+  std::vector< std::string > layer_ids_;
+  std::string expressions_;
+  std::string output_type_;
+  bool replace_;
+  bool preserve_data_format_;
   boost::shared_ptr< ArithmeticFilterAlgo > algo_;
 };
 
@@ -155,9 +155,9 @@ bool ActionArithmeticFilterPrivate::validate_parser( Core::ActionContextHandle& 
   // Create algorithm
   this->algo_ = boost::shared_ptr< ArithmeticFilterAlgo >( new ArithmeticFilterAlgo );
 
-  bool replace = this->replace_.value();
+  bool replace = this->replace_;
 
-  const std::vector< std::string >& layer_ids = this->layer_ids_.value();
+  const std::vector< std::string >& layer_ids = this->layer_ids_;
   std::vector< LayerHandle > layers( layer_ids.size() );
 
   std::string name( "A" );
@@ -246,16 +246,16 @@ bool ActionArithmeticFilterPrivate::validate_parser( Core::ActionContextHandle& 
     this->algo_->dst_layer_ = layers[ 0 ];
     // Make sure the dst layer type matches the output type
     if( !( ( this->algo_->dst_layer_->get_type() == Core::VolumeType::MASK_E && 
-      this->output_type_.value() ==  ActionArithmeticFilter::MASK_C ) ||
+      this->output_type_ ==  ActionArithmeticFilter::MASK_C ) ||
       ( this->algo_->dst_layer_->get_type() == Core::VolumeType::DATA_E && 
-      this->output_type_.value() ==  ActionArithmeticFilter::DATA_C ) ) )
+      this->output_type_ ==  ActionArithmeticFilter::DATA_C ) ) )
     {
       context->report_error( 
         std::string("Arithmetic Filter: Cannot replace first input -- input/output types don't match.") );
       return false;
     }
   }
-  else if ( this->output_type_.value() == ActionArithmeticFilter::DATA_C )
+  else if ( this->output_type_ == ActionArithmeticFilter::DATA_C )
   {
     if ( ! (this->algo_->create_and_lock_data_layer_from_layer( layers[ 0 ], 
       this->algo_->dst_layer_ ) ) )
@@ -276,7 +276,7 @@ bool ActionArithmeticFilterPrivate::validate_parser( Core::ActionContextHandle& 
     }
   }
 
-  if( this->preserve_data_format_.value() )
+  if( this->preserve_data_format_ )
   {
     this->algo_->src_layer_ = layers[ 0 ];
   }
@@ -307,7 +307,7 @@ bool ActionArithmeticFilterPrivate::validate_parser( Core::ActionContextHandle& 
     }
   }
 
-  this->algo_->engine_.add_expressions( this->expressions_.value() );
+  this->algo_->engine_.add_expressions( this->expressions_ );
 
   if( !this->algo_->engine_.parse_and_validate( error ) )
   {
@@ -331,18 +331,18 @@ ActionArithmeticFilter::ActionArithmeticFilter() :
   private_( new ActionArithmeticFilterPrivate )
 {
   // Action arguments
-  this->add_argument( this->private_->layer_ids_ );
-  this->add_argument( this->private_->expressions_ );
-  this->add_argument( this->private_->output_type_ );
-
-  // Action options
-  this->add_key( this->private_->replace_ );
-  this->add_key( this->private_->preserve_data_format_ );
+  this->add_layer_id_list( this->private_->layer_ids_ );
+  this->add_parameter( this->private_->expressions_ );
+  this->add_parameter( this->private_->output_type_ );
+  this->add_parameter( this->private_->replace_ );
+  this->add_parameter( this->private_->preserve_data_format_ );
 }
 
 bool ActionArithmeticFilter::validate( Core::ActionContextHandle& context )
 {
-  const std::vector< std::string >& layer_ids = this->private_->layer_ids_.value();
+  // TODO:
+  // This code needs cleanup
+  const std::vector< std::string >& layer_ids = this->private_->layer_ids_;
   if ( layer_ids.size() == 0 )
   {
     context->report_error( "No input layers specified" );
@@ -374,13 +374,8 @@ bool ActionArithmeticFilter::validate( Core::ActionContextHandle& context )
     }
     
     // Check for layer availability 
-    Core::NotifierHandle notifier;
-    if ( !LayerManager::CheckLayerAvailability( layer_ids[ i ], 
-      i == 0 && this->private_->replace_.value(), notifier ) )
-    {
-      context->report_need_resource( notifier );
-      return false;
-    }
+    if ( ! LayerManager::CheckLayerAvailability( layer_ids[ i ], 
+      i == 0 && this->private_->replace_, context ) ) return false;
   }
 
   // Validate parser inputs, outputs, and expression
@@ -397,7 +392,7 @@ bool ActionArithmeticFilter::run( Core::ActionContextHandle& context,
   Core::ActionResultHandle& result )
 {
   // Copy the parameters over to the algorithm that runs the filter
-  this->private_->algo_->preserve_data_format_ = this->private_->preserve_data_format_.value();
+  this->private_->algo_->preserve_data_format_ = this->private_->preserve_data_format_;
 
   // Connect ArrayMathEngine progress signal to output layer progress signal
   this->private_->algo_->engine_.update_progress_signal_.connect(
@@ -409,6 +404,9 @@ bool ActionArithmeticFilter::run( Core::ActionContextHandle& context,
 
   // Create undo/redo record for this layer action
   this->private_->algo_->create_undo_redo_record( context, this->shared_from_this() );
+
+  // Create provenance record for this layer action
+  this->private_->algo_->create_provenance_record( context, this->shared_from_this() );
 
   // Start the filter.
   Core::Runnable::Start( this->private_->algo_ );
@@ -426,11 +424,11 @@ void ActionArithmeticFilter::Dispatch( Core::ActionContextHandle context,
                     bool replace, bool preserve_data_format )
 {
   ActionArithmeticFilter* action = new ActionArithmeticFilter;
-  action->private_->layer_ids_.set_value( layer_ids );
-  action->private_->expressions_.set_value( expressions );
-  action->private_->output_type_.set_value( output_type );
-  action->private_->replace_.set_value( replace );
-  action->private_->preserve_data_format_.set_value( preserve_data_format );
+  action->private_->layer_ids_= layer_ids;
+  action->private_->expressions_ = expressions;
+  action->private_->output_type_ = output_type;
+  action->private_->replace_ = replace;
+  action->private_->preserve_data_format_ = preserve_data_format;
 
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }

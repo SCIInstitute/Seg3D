@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef CORE_VOLUMERENDERER_VOLUMESHADER_H
-#define CORE_VOLUMERENDERER_VOLUMESHADER_H
+#ifndef CORE_VOLUMERENDERER_VOLUMESHADEROCCLUSION_H
+#define CORE_VOLUMERENDERER_VOLUMESHADEROCCLUSION_H
 
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
@@ -37,27 +37,30 @@
 namespace Core
 {
 
-class VolumeShader;
-typedef boost::shared_ptr< VolumeShader > VolumeShaderHandle;
+class VolumeShaderOcclusion;
+typedef boost::shared_ptr< VolumeShaderOcclusion > VolumeShaderOcclusionHandle;
 
-class VolumeShader : public ShaderBase
+class VolumeShaderOcclusion : public ShaderBase
 {
 public:
-  VolumeShader();
-  virtual ~VolumeShader();
+  VolumeShaderOcclusion();
+  virtual ~VolumeShaderOcclusion();
 
   void set_texture_bbox_min( float x, float y, float z );
   void set_texture_bbox_size( float x, float y, float z );
   void set_texel_size( float x, float y, float z );
   void set_voxel_size( float x, float y, float z );
-  void set_scale_bias( float scale, float bias );
-  void set_sample_rate( float sample_rate );
   void set_volume_texture( int tex_unit );
   void set_diffuse_texture( int tex_unit );
   void set_specular_texture( int tex_unit );
-  void set_lighting( bool enabled );
-  void set_fog( bool enabled );
-  void set_fog_range( float znear, float zfar );
+  void set_occlusion_sample_texture( int tex_unit );
+  void set_occlusion_buffer_texture( int tex_unit );
+  void set_num_of_occlusion_samples( int num_of_samples );
+  void set_occlusion_extent( float extent );
+  void set_slice_distance( float slice_distance );
+  void set_clip_plane( const float clip_planes[ 6 ][ 4 ] );
+  void set_enable_clip_plane( const int enabled[ 6 ] );
+  void set_enable_clipping( bool enabled );
 
 protected:
   virtual bool get_vertex_shader_source( std::string& source );
@@ -65,18 +68,21 @@ protected:
   virtual bool post_initialize();
 
 private:
-  int vol_tex_loc_;
-  int diffuse_lut_loc_;
-  int specular_lut_loc_;
-  int enable_lighting_loc_;
-  int enable_fog_loc_;
   int tex_bbox_min_loc_;
   int tex_bbox_size_loc_;
   int texel_size_loc_;
   int voxel_size_loc_;
-  int scale_bias_loc_;
-  int sample_rate_loc_;
-  int fog_range_loc_;
+  int vol_tex_loc_;
+  int diffuse_lut_loc_;
+  int specular_lut_loc_;
+  int occlusion_sample_lut_loc_;
+  int occlusion_buffer_loc_;
+  int num_of_occlusion_samples_loc_;
+  int occlusion_extent_loc_;
+  int slice_distance_loc_;
+  int clip_plane_loc_;
+  int enable_clip_plane_loc_;
+  int enable_clipping_loc_;
 };
 
 } // end namespace Seg3D

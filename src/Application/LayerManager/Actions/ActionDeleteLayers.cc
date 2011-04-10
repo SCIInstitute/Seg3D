@@ -44,50 +44,63 @@ namespace Seg3D
 
 bool ActionDeleteLayers::validate( Core::ActionContextHandle& context )
 {
-  if( this->layers_.value() != "" )
+  if ( this->layers_.size() == 0 )
   {
-    this->layers_vector_ = Core::SplitString( this->layers_.value(), "|" );
+    context->report_error( "No layers to delete." );
+    return false;
   }
-  
-  if( this->layers_vector_.size() == 0 ) return false;
 
-  return true; // validated
-}
-
-bool ActionDeleteLayers::run( Core::ActionContextHandle& context, 
-  Core::ActionResultHandle& result )
-{
-  // Create an undo item for this action
-  LayerUndoBufferItemHandle item( new LayerUndoBufferItem( "Delete layer(s)" ) );
-  // Tell which action has to be re-executed to obtain the result
-  item->set_redo_action( this->shared_from_this() );
-  // Tell which layers are to be deleted so they can be added back 
-  for ( size_t i = 0; i < this->layers_vector_.size(); ++i )
+  for ( size_t j = 0; j < this->layers_.size(); j++ )
   {
-    LayerHandle layer = LayerManager::Instance()->get_layer_by_id( this->layers_vector_[ i ] );
-    layer->abort_signal_();
-    item->add_layer_to_add( layer );
+    if ( !( LayerManager::CheckLayerExistance( this->layers_[ j ], context ) ) ) return false;  
   }
-  // Add the complete record to the undo buffer
-  UndoBuffer::Instance()->insert_undo_item( context, item );
-
-  LayerManager::Instance()->delete_layers( this->layers_vector_ );
   
   return true;
 }
 
-Core::ActionHandle ActionDeleteLayers::Create( std::vector< std::string > layers )
-{
-  ActionDeleteLayers* action = new ActionDeleteLayers;
-  action->layers_vector_ = layers;
+bool ActionDeleteLayers::run( Core::ActionContextHandle& context, 
+  Core::ActionResultHandle& result )
+{   
+  // Create an undo item for this action
+  LayerUndoBufferItemHandle item( new LayerUndoBufferItem( "Delete layer(s)" ) );
+  
+  // Tell which action has to be re-executed to obtain the result
+  item->set_redo_action( this->shared_from_this() );
+  
+  
+  std::vector< LayerHandle > layers;
+  
+  for ( size_t j = 0; j < this->layers_.size(); j++ )
+  {
+    // Find the layer handle
+    LayerHandle layer = LayerManager::Instance()->get_layer_by_id( this->layers_[ j ] );
 
-  return Core::ActionHandle( action );
+    // If a filter is still running on the layer, try to abort it. 
+    // NOTE: The program will continue while the layer and its filter are being deleted
+    layer->abort_signal_();
+    
+    // Tell which layers are to be deleted so they can be added back 
+    item->add_layer_to_add( layer );
+
+    // Add layer to list of the layers that need to be deleted from the layer manager
+    layers.push_back( layer );
+  }
+
+  // Add the complete record to the undo buffer
+  UndoBuffer::Instance()->insert_undo_item( context, item );
+
+  // Remove the layers from the layer manager
+  LayerManager::Instance()->delete_layers( layers);
+  
+  return true;
 }
-
 
 void ActionDeleteLayers::Dispatch( Core::ActionContextHandle context, std::vector< std::string > layers )
 {
-  Core::ActionDispatcher::PostAction( Create( layers ), context );
+  ActionDeleteLayers* action = new ActionDeleteLayers;
+  action->layers_ = layers;
+  
+  Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }
 
 } // end namespace Seg3D

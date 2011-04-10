@@ -47,20 +47,18 @@ CORE_ACTION(
 public:
   ActionSnap()
   {
-    add_argument( this->viewer_id_ );
-  } 
-  virtual ~ActionSnap() {}
+    this->add_parameter( this->viewer_id_ );
+  }
 
   virtual bool validate( Core::ActionContextHandle& context );
   virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
 
 private:
-  Core::ActionParameter< size_t > viewer_id_;
+  size_t viewer_id_;
 
   ViewerWeakHandle viewer_weak_handle_;
 
 public:
-  static Core::ActionHandle Create( size_t viewer_id );
   static void Dispatch( Core::ActionContextHandle context, size_t viewer_id );
 };
 

@@ -47,22 +47,12 @@ namespace Seg3D
 bool ActionGradientMagnitudeFilter::validate( Core::ActionContextHandle& context )
 {
   // Check for layer existance and type information
-  std::string error;
-  if ( ! LayerManager::CheckLayerExistanceAndType( this->target_layer_.value(), 
-    Core::VolumeType::DATA_E, error ) )
-  {
-    context->report_error( error );
-    return false;
-  }
+  if ( ! LayerManager::CheckLayerExistanceAndType( this->target_layer_, 
+    Core::VolumeType::DATA_E, context ) ) return false;
   
   // Check for layer availability 
-  Core::NotifierHandle notifier;
-  if ( ! LayerManager::CheckLayerAvailability( this->target_layer_.value(), 
-    this->replace_.value(), notifier ) )
-  {
-    context->report_need_resource( notifier );
-    return false;
-  }
+  if ( ! LayerManager::CheckLayerAvailability( this->target_layer_, 
+    this->replace_, context ) ) return false;
     
   // Validation successful
   return true;
@@ -165,7 +155,6 @@ public:
   {
     return "GradientMagnitude"; 
   }
-
 };
 
 
@@ -176,15 +165,15 @@ bool ActionGradientMagnitudeFilter::run( Core::ActionContextHandle& context,
   boost::shared_ptr<GradientMagnitudeFilterAlgo> algo( new GradientMagnitudeFilterAlgo );
 
   // Copy the parameters over to the algorithm that runs the filter
-  algo->preserve_data_format_ = this->preserve_data_format_.value();
+  algo->preserve_data_format_ = this->preserve_data_format_;
 
   // Find the handle to the layer
-  if ( !( algo->find_layer( this->target_layer_.value(), algo->src_layer_ ) ) )
+  if ( !( algo->find_layer( this->target_layer_, algo->src_layer_ ) ) )
   {
     return false;
   }
 
-  if ( this->replace_.value() )
+  if ( this->replace_ )
   {
     // Copy the handles as destination and source will be the same
     algo->dst_layer_ = algo->src_layer_;
@@ -206,12 +195,14 @@ bool ActionGradientMagnitudeFilter::run( Core::ActionContextHandle& context,
   // Build the undo-redo record
   algo->create_undo_redo_record( context, this->shared_from_this() );
 
+  // Build the provenance record
+  algo->create_provenance_record( context, this->shared_from_this() );
+  
   // Start the filter on a separate thread.
   Core::Runnable::Start( algo );
 
   return true;
 }
-
 
 void ActionGradientMagnitudeFilter::Dispatch( Core::ActionContextHandle context, 
   std::string target_layer, bool replace, bool preserve_data_format )
@@ -220,9 +211,9 @@ void ActionGradientMagnitudeFilter::Dispatch( Core::ActionContextHandle context,
   ActionGradientMagnitudeFilter* action = new ActionGradientMagnitudeFilter;
 
   // Setup the parameters
-  action->target_layer_.value() = target_layer;
-  action->replace_.value() = replace;
-  action->preserve_data_format_.value() = preserve_data_format;
+  action->target_layer_ = target_layer;
+  action->replace_ = replace;
+  action->preserve_data_format_ = preserve_data_format;
 
   // Dispatch action to underlying engine
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );

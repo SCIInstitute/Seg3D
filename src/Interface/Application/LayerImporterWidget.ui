@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>445</width>
-    <height>458</height>
+    <height>474</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -735,7 +735,7 @@ p, li { white-space: pre-wrap; }
           <pointsize>10</pointsize>
          </font>
         </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_20">
+        <layout class="QHBoxLayout" name="swap_x_y_spacing_widget_layout_">
          <property name="spacing">
           <number>0</number>
          </property>

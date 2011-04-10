@@ -29,8 +29,12 @@
 #ifndef APPLICATION_FILTERS_ACTIONS_ACTIONRESAMPLE_H
 #define APPLICATION_FILTERS_ACTIONS_ACTIONRESAMPLE_H
 
+// Core includes
 #include <Core/Action/Actions.h>
 #include <Core/Geometry/GridTransform.h>
+
+// Application includes
+#include <Application/LayerManager/LayerAction.h>
 
 namespace Seg3D
 {
@@ -38,7 +42,7 @@ namespace Seg3D
 class ActionResamplePrivate;
 typedef boost::shared_ptr< ActionResamplePrivate > ActionResamplePrivateHandle;
 
-class ActionResample : public Core::Action
+class ActionResample : public LayerAction
 {
 
 CORE_ACTION( 
@@ -58,9 +62,7 @@ CORE_ACTION(
   // -- Constructor/Destructor --
 public:
   ActionResample();
-  
-  virtual ~ActionResample() {}
-  
+
   // -- Functions that describe action --
 public:
   virtual bool validate( Core::ActionContextHandle& context );

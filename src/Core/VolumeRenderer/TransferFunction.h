@@ -79,6 +79,10 @@ protected:
   virtual bool post_save_states( StateIO& state_io );
 
 public:
+  // Whether to use faux shading
+  StateBoolHandle faux_shading_state_;
+
+public:
   typedef boost::signals2::signal< void ( TransferFunctionFeatureHandle ) > feature_signal_type;
   feature_signal_type feature_added_signal_;
   feature_signal_type feature_deleted_signal_;

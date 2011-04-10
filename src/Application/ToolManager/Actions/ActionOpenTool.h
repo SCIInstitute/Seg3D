@@ -48,11 +48,7 @@ CORE_ACTION(
 public:
   ActionOpenTool()
   {
-    this->add_argument( this->toolid_ );
-  }
-
-  virtual ~ActionOpenTool()
-  {
+    this->add_parameter( this->toolid_ );
   }
 
   // -- Functions that describe action --
@@ -63,18 +59,13 @@ public:
   // -- Action parameters --
 private:
   // ToolID that is requested
-  Core::ActionParameter< std::string > toolid_;
+  std::string toolid_;
 
   // -- Dispatch this action from the interface --
 public:
-  // CREATE
-  // Create action that opens a tool
-  static Core::ActionHandle Create( const std::string& tooltype );
-
   // DISPATCH
   // Create and dispatch action that closes a tool
   static void Dispatch( Core::ActionContextHandle context, const std::string& tooltype );
-
 };
 
 }

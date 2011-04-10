@@ -51,10 +51,6 @@ public:
   {
   }
 
-  virtual ~ActionSavePreferences()
-  {
-  }
-
   // -- Functions that describe action --
 public:
   virtual bool validate( Core::ActionContextHandle& context );
@@ -62,11 +58,6 @@ public:
   
   // -- Dispatch this action from the interface --
 public:
-  
-  // CREATE:
-  // Create an action that saves the preferences
-  static Core::ActionHandle Create();
-  
   // DISPATCH:
   // Dispatch an action that saves the preferences
   static void Dispatch( Core::ActionContextHandle context );

@@ -40,6 +40,23 @@
 namespace Core
 {
 
+class ConnectionHandler;
+class ConnectionHandlerPrivate;
+class ConnectionHandlerConnection;
+typedef boost::shared_ptr<ConnectionHandlerPrivate> ConnectionHandlerPrivateHandle;
+typedef boost::shared_ptr<ConnectionHandlerConnection> ConnectionHandlerConnectionHandle;
+typedef ConnectionHandlerConnectionHandle ConnectionHandle;
+
+class ConnectionHandlerConnection : public boost::noncopyable 
+{
+public:
+  virtual ~ConnectionHandlerConnection();
+
+  // DISCONNECT:
+  // This function is overloaded to disconnect the connection
+  virtual void disconnect() = 0;
+};
+
 // CLASS CONNECTIONHANDLER:
 // A simple class for managing connections
 
@@ -58,20 +75,24 @@ public:
 public:
 
   // ADD_CONNECTION:
-  // Add a connection into the list so it can be deleted on the destruction
-  // of the clas
+  // Add a connection into the list so it can be deleted when disconnect is
+  // called
   void add_connection( const boost::signals2::connection& connection );
+
+  // ADD_CONNECTION:
+  // Add a connection into the list so it can be deleted when disconnect is
+  // called
+  void add_connection( const ConnectionHandlerConnectionHandle& connection );
+
 
   // DISCONNECT_ALL:
   // Disconnect alal the connections that are stored in this class.
   // NOTE: this function needs to be called in the most derived class
   void disconnect_all();
 
-  // -- internal database --
+  // -- internals --
 private:
-  typedef std::list< boost::signals2::connection > connections_type;
-
-  connections_type connections_;
+  ConnectionHandlerPrivateHandle private_;
 };
 
 } // end namespace Core

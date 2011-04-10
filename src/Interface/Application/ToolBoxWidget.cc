@@ -41,6 +41,9 @@
 // QtUtils includes
 #include <QtUtils/Bridge/QtBridge.h>
 
+// Application includes
+#include <Application/InterfaceManager/InterfaceManager.h>
+
 // Interface includes
 #include <Interface/Application/ToolBoxWidget.h>
 #include <Interface/Application/StyleSheet.h>
@@ -91,6 +94,10 @@ ToolBoxWidget::ToolBoxWidget( QWidget* parent ) :
   this->setContentsMargins( 1, 1, 1, 1 );
   this->setWidgetResizable( true );
 
+  this->setFrameShape( QFrame::NoFrame );
+  this->setFrameShadow( QFrame::Plain );
+  this->setLineWidth( 0 );
+
   this->main_ = new QWidget( this );
   setWidget( this->main_ );
   
@@ -106,7 +113,6 @@ ToolBoxWidget::ToolBoxWidget( QWidget* parent ) :
 
 ToolBoxWidget::~ToolBoxWidget()
 {
-
 }
 
 void ToolBoxWidget::add_tool( QWidget * tool, const QString &label,
@@ -124,17 +130,23 @@ void ToolBoxWidget::add_tool( QWidget * tool, const QString &label,
   new_page.ui_.url_->setText( QString::fromStdString( help_url ) );
   new_page.ui_.url_->hide();
   
-#if defined ( __APPLE__ )
-  QFont font;
-  font.setPointSize( 10 );
-  new_page.ui_.activate_button_->setFont( font );
-#endif
+  
+  new_page.ui_.page_background_->setStyleSheet( StyleSheet::TOOLBOXPAGEWIDGET_PAGE_BACKGROUND_ACTIVE_C );
+  new_page.ui_.activate_button_->setStyleSheet( StyleSheet::TOOLBOXPAGEWIDGET_ACTIVATE_BUTTON_ACTIVE_C ); 
 
   new_page.ui_.activate_button_->setText( label );
 
   new_page.ui_.help_button_->setIcon( active_help_icon_ );
   new_page.ui_.help_button_->setIconSize( QSize( 18, 18 ) );
 
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    if ( InterfaceManager::Instance()->enable_tool_help_state_->get() == false )
+    {
+      new_page.ui_.help_button_->hide();
+    }
+  }
+  
   new_page.ui_.close_button_->setIcon( active_close_icon_ );
   new_page.ui_.close_button_->setIconSize( QSize( 18, 18 ) );
 
@@ -198,6 +210,7 @@ void ToolBoxWidget::set_active_tool( QWidget *tool )
         this->private_->page_list_[ i ].ui_.help_button_->setIcon(
             this->active_help_icon_ );
         this->private_->page_list_[ i ].ui_.tool_frame_->show();
+        
       }
       break;
     }

@@ -26,177 +26,251 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Specific includes for reading large datafiles
+// NOTE: We needed to special case Windows as VS 2008 has an improper 64bit seek function in its
+// STL implementation.
 #ifdef _WIN32
-// Windows includes
 #include <windows.h>
 #else
-// STL includes
 #include <fstream>
 #endif
-
-
-
-// Boost Includes
-#include <boost/lexical_cast.hpp>
 
 // Core includes
 #include <Core/Volume/DataVolume.h>
 
 // Application includes
-#include <Application/LayerIO/VFFLayerImporter.h>
-
-// Application includes
 #include <Application/Layer/DataLayer.h> 
+#include <Application/LayerIO/VFFLayerImporter.h>
 #include <Application/LayerManager/LayerManager.h>
 
-SCI_REGISTER_IMPORTER( Seg3D, VFFLayerImporter );
-
+SEG3D_REGISTER_IMPORTER( Seg3D, VFFLayerImporter );
 
 namespace Seg3D
 {
 
-VFFLayerImporter::VFFLayerImporter( const std::string& filename ) :
-  LayerImporter( filename ),
-  pixel_type_( Core::DataType::SHORT_E )
-{
-  // set a default value for the grid transform
-  this->grid_transform_ = Core::GridTransform( 1, 1, 1 );
-}
+//////////////////////////////////////////////////////////////////////////
+// Class VFFLayerImporterPrivate
+//////////////////////////////////////////////////////////////////////////
 
-bool VFFLayerImporter::import_header()
+class VFFLayerImporterPrivate : public boost::noncopyable
 {
-  // First thing we do is set the extension
-  this->set_extension();
-
-  if( this->extension_ == ".vff" )
+public:
+  VFFLayerImporterPrivate() :
+    importer_( 0 ),
+    data_type_( Core::DataType::UNKNOWN_E ),
+    vff_end_of_header_( 0 ),
+    read_header_( false ),
+    read_data_( false )
   {
-    return this->scan_vff();
   }
-  return false; 
-}
+  
+  // Pointer back to the main class
+  VFFLayerImporter* importer_;
+  
+public:
+  // Datablock that was extracted
+  Core::DataBlockHandle data_block_;
 
-Core::GridTransform VFFLayerImporter::get_grid_transform()
-{
-  return this->grid_transform_;
-}
+  // Grid transform that was extracted
+  Core::GridTransform grid_transform_;
+  
+  // Type of the pixels in the file
+  Core::DataType data_type_;
 
-Core::DataType VFFLayerImporter::get_data_type()
-{
-  return this->pixel_type_;
-}
+  // Where the actual data is located
+  size_t vff_end_of_header_;
+  
+  // Whether the header has been read
+  bool read_header_;
 
-int VFFLayerImporter::get_importer_modes()
-{
-  return LayerImporterMode::DATA_E;
-}
+  // Whether the data has been read
+  bool read_data_;
 
-bool VFFLayerImporter::scan_vff()
+public:
+  // READ_HEADER
+  // Read the header of the file
+  bool read_header();
+  
+  // READ_DATA
+  // Read the data from the file
+  bool read_data();
+};
+
+bool VFFLayerImporterPrivate::read_header()
 {
-  // First we will peek at the file to see if it has the proper header.
-  std::ifstream vff_test_peek( this->get_filename().c_str() );
+  // If read it before, we do need read it a second time.
+  if ( this->read_header_ ) return true;
+
+  // Check the the magic at the top of the file
+  // The first line needs to be "ncaa"
+  std::ifstream vff_test_peek( this->importer_->get_filename().c_str() );
   std::string ncaa;
   std::getline(  vff_test_peek, ncaa );
-  if( ncaa.substr( 0, 4 ) != "ncaa" ) return false;
+  if ( ncaa.substr( 0, 4 ) != "ncaa" ) 
+  {
+    this->importer_->set_error( "File is not a VFF file." );
+    return false;
+  }
   vff_test_peek.close();
 
   // Now that we know that we are good to go, we read in and store the header information in a map
-  std::ifstream file_data( this->get_filename().c_str(), std::ios::binary );
-  std::string line;
-  std::string end_of_header;
-  end_of_header.push_back(12);
+  std::ifstream file_data( this->importer_->get_filename().c_str(), std::ios::binary );
 
+  // Store the key/value pairs in a map
+  std::map< std::string, std::string > vff_values;
+
+  // Read the header line by line
+  std::string line;
   while( !file_data.eof() )
   {
-    if ( end_of_header == line ) 
+    // Grab the next line
+    std::getline( file_data, line );
+
+    // If it is the last one, break out of the loop
+    if ( "\f" == line ) 
     {
       this->vff_end_of_header_ = static_cast<size_t>( file_data.tellg() );
       break;
     }
-    std::getline( file_data, line );
+    
     if ( line[ 0 ] == '#' ) continue; // here we skip comments
     if ( line.find_first_of( "=" ) == std::string::npos ) continue; // we skip invalid lines
     line.erase( line.find( ";" ) ); // we clean out the semicolon's from the lines
     
     // now we split each line using '=' as the delimiter and store the pair in our map
     std::vector< std::string > key_value_pairs = Core::SplitString( line, "=" );
-    this->vff_values_[ key_value_pairs[ 0 ] ] = key_value_pairs[ 1 ];
+    vff_values[ key_value_pairs[ 0 ] ] = key_value_pairs[ 1 ];
   }
 
-  if( this->vff_values_.empty() ) return false;
-  if( this->vff_values_.find( "bits" ) == this->vff_values_.end() ) return false;
-  if( this->vff_values_[ "bits" ] == "16" ) this->pixel_type_ = Core::DataType::SHORT_E;
-  if( this->vff_values_[ "bits" ] == "8" ) this->pixel_type_ = Core::DataType::UCHAR_E;
+  // Check if any entries were given
+  if ( vff_values.empty() ) 
+  {
+    this->importer_->set_error( "This vff file has incomplete header." );
+    return false;
+  }
+  
+  // We need the bits field
+  if ( vff_values.find( "bits" ) == vff_values.end() ) 
+  {
+    this->importer_->set_error( "This vff file misses information on the number of bits of the data." );
+    return false;
+  }
+  
+  // Check which data type is contained in the file
+  if ( vff_values[ "bits" ] == "16" )
+  {
+    this->data_type_ = Core::DataType::SHORT_E;
+  }
+  else if ( vff_values[ "bits" ] == "8" )
+  {
+    this->data_type_ = Core::DataType::UCHAR_E;
+  }
+  else
+  {
+    this->importer_->set_error( "This vff file contains an unknown data type." );
+    return false;
+  }
+  
+  // We check to see if the header contained the size, if so we use them, otherwise 
+  // we return false
+  if ( vff_values.find( "size" ) == vff_values.end() )
+  {
+    this->importer_->set_error( "No size is given in the vff header." );
+    return false;
+  }
+
+  // Get the dimensions of the data
+  std::vector<size_t> dim;
+  Core::ImportFromString( vff_values[ "size" ], dim );
+
+  if ( dim.size() != 3 )
+  {
+    this->importer_->set_error( "Vff file is not a 3D volume." );
+    return false;
+  }
+  
+  // We check to see if the header contained the origin, if so we use it, otherwise
+  // we use default value. 
+  Core::Point origin; 
+  if( vff_values.find( "origin" ) != vff_values.end() ) 
+  {
+    if (!( Core::ImportFromString( vff_values[ "origin" ], origin ) ) )
+    {
+      origin = Core::Point( 0.0, 0.0, 0.0 );
+    }
+  }
+
+  // Similar check for spacing.
+  Core::Vector spacing;
+  if( vff_values.find( "spacing" ) != vff_values.end() ) 
+  {
+    if (!( Core::ImportFromString( vff_values[ "spacing" ], spacing ) ) )
+    {
+      spacing = Core::Vector( 1.0, 1.0, 1.0 );
+    }
+  }
+
+  // Generate the grid transform that describes the data
+  Core::Transform transform( origin, Core::Vector( spacing.x(), 0.0 , 0.0 ), 
+    Core::Vector( 0.0, spacing.y(), 0.0 ), Core::Vector( 0.0, 0.0, spacing.z() ) );
+
+  this->grid_transform_ = Core::GridTransform( dim[ 0 ], dim[ 1 ], dim[ 2 ], transform );
+  this->grid_transform_.set_originally_node_centered( false );
+
+  // Indicate that we read the header.
+  this->read_header_ = true;
 
   return true;
 }
 
-bool VFFLayerImporter::import_vff()
+bool VFFLayerImporterPrivate::read_data()
 {
-  // First we check to see if the file was scanned and the map of values was filled
-  if( this->vff_values_.empty() ) return false;
+  // Check if we already read the data.
+  if ( this->read_data_ ) return true;
 
-  // Step 1: we check to see if the header contained the size, if so we use them, otherwise 
-  // we return false
-  if( this->vff_values_.find( "size" ) == this->vff_values_.end() ) return false;
-  std::vector< std::string > size = Core::SplitString( this->vff_values_[ "size" ], " " );
-  size_t nx = boost::lexical_cast< size_t >( size[ 0 ] );
-  size_t ny = boost::lexical_cast< size_t >( size[ 1 ] );
-  size_t nz = boost::lexical_cast< size_t >( size[ 2 ] );
-
-  // Step 2: we check to see if the header contained the origin, if so we use it, otherwise
-  // we return false
-  if( this->vff_values_.find( "origin" ) == this->vff_values_.end() ) return false;
-  std::vector< std::string > origin_vector = 
-    Core::SplitString( this->vff_values_[ "origin" ], " " );
-  Core::Point point = Core::Point( 
-    boost::lexical_cast< double >( origin_vector[ 0 ] ), 
-    boost::lexical_cast< double >( origin_vector[ 1 ] ), 
-    boost::lexical_cast< double >( origin_vector[ 2 ] ) );
-
-  // Step 3: we check to see if the header contained the spacing, if so we use them, otherwise
-  // we return false
-  if( this->vff_values_.find( "spacing" ) == this->vff_values_.end() ) return false;
-  std::vector< std::string > spacing_vector = 
-    Core::SplitString( this->vff_values_[ "spacing" ], " " );
-  Core::Transform transform = Core::Transform( point, 
-    Core::Vector( boost::lexical_cast< double >( spacing_vector[ 0 ] ), 0.0 , 0.0 ), 
-    Core::Vector( 0.0, boost::lexical_cast< double >( spacing_vector[ 1 ] ), 0.0 ), 
-    Core::Vector( 0.0, 0.0, boost::lexical_cast< double >( spacing_vector[ 2 ] ) ) );
-
-  size_t data_type_size = 1;
-
-  // Step 4: now we instantiate a DataBlock based on the type of pixel that we expect
-  if( this->pixel_type_ == Core::DataType::SHORT_E )
+  // Ensure that we read the header of this file.
+  if ( ! this->read_header() ) 
   {
-    this->data_block_ = Core::StdDataBlock::New( nx, ny, nz, Core::DataType::SHORT_E );
-    data_type_size = 2;
-  }
-  else if( this->pixel_type_ == Core::DataType::UCHAR_E )
-  {
-    this->data_block_ = Core::StdDataBlock::New( nx, ny, nz, Core::DataType::UCHAR_E );
-
-  }
-  else
-  {
+    this->importer_->set_error( "Failed to read header of vff file." );
     return false;
   }
 
-  // Step 4: now we read in the file
-#ifdef _WIN32
-  HANDLE file_desc = CreateFileA( this->get_filename().c_str(), GENERIC_READ,
-                             FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
-  if ( file_desc == INVALID_HANDLE_VALUE ) return false;
+  // Generate a new data block
+  this->data_block_ = Core::StdDataBlock::New( this->grid_transform_.get_nx(), 
+    this->grid_transform_.get_ny(), this->grid_transform_.get_nz(), this->data_type_ );
 
+  // We need to check if we could allocate the destination datablock
+  if ( !this->data_block_ )
+  {
+    this->importer_->set_error( "Could not allocate enough memory to read vff file." );
+    return false;
+  }
+
+  // Now we read in the file
+  // NOTE: We had to split this out due to a bug in Visual Studio's implementation for filestreams
+  // These are unfortunately not 64bit compatible and hence use 32bit integers to denote offsets
+  // into a file. Hence this breaks large data support. Hence in the next piece of code we deal
+  // with windows separately.
+  
+#ifdef _WIN32
+  HANDLE file_desc = CreateFileA( this->importer_->get_filename().c_str(), GENERIC_READ,
+    FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+  if ( file_desc == INVALID_HANDLE_VALUE ) 
+  {
+    this->importer_->set_error( "Could not open file." );
+    return false;
+  }
 #else
-  std::ifstream data_file( this->get_filename().c_str(), std::ios::in | std::ios::binary );
-  if( !data_file ) return false;
+  std::ifstream data_file( this->importer_->get_filename().c_str(), 
+    std::ios::in | std::ios::binary );
+  if( !data_file )
+  {
+    this->importer_->set_error( "Could not open file." );
+    return false;
+  }
 #endif
 
-
-  size_t length = this->data_block_->get_size() * data_type_size;
-  
-  // Step 4a: we start by getting the length of the entire file
-
+  // We start by getting the length of the entire file
 #ifdef _WIN32
   LARGE_INTEGER offset; offset.QuadPart = 0;
     SetFilePointerEx( file_desc, offset, NULL, FILE_END);
@@ -204,9 +278,7 @@ bool VFFLayerImporter::import_vff()
   data_file.seekg( 0, std::ios::end );
 #endif
 
-  // Step 4b: next we compute the length of the data by subtracting the size of the header
-
-  // TODO: Need to make sure this does the right thing under 32bits
+  // Next we compute the length of the data by subtracting the size of the header
   size_t file_size = 0;
 
 #ifdef _WIN32
@@ -218,15 +290,15 @@ bool VFFLayerImporter::import_vff()
   file_size = static_cast<size_t>( data_file.tellg() ) + 1;
 #endif
   
+  // Ensure that the vff file is of the right length
+  size_t length = this->data_block_->get_size() * Core::GetSizeDataType( this->data_type_ );  
   if ( file_size - ( this->vff_end_of_header_ ) < length )
   {
-    // CORRUPT FILE
+    this->importer_->set_error( "Incorrect length of file." );
     return false;
   }
 
-    
-  // Step 4c: then, after we make place for the data, we move the reader's position back to the
-  // front of the file and then to the start of the data;
+  // We move the reader's position back to the front of the file and then to the start of the data
   char* data = reinterpret_cast<char *>( this->data_block_->get_data() );
 
 #ifdef _WIN32
@@ -236,13 +308,15 @@ bool VFFLayerImporter::import_vff()
   data_file.seekg( this->vff_end_of_header_, std::ios::beg );
 #endif
 
-  // Step 4d: finally, we do the actual reading and then save the data to the data block.
+  // Finally, we do the actual reading and then save the data to the data block.
 #ifdef _WIN32
-
+  // NOTE: For windows we need to divide the read in chuncks due to limitations in the
+  // sizes we can store in the ReadFile function.
   char* data_ptr = data;
     DWORD dwReadBytes;
   size_t read_length = length;
   size_t chunk = 1UL<<30;
+  
   while ( read_length > chunk )
   {
     ReadFile( file_desc, data_ptr, DWORD(chunk), &dwReadBytes, NULL );
@@ -252,18 +326,10 @@ bool VFFLayerImporter::import_vff()
   ReadFile( file_desc, data_ptr, DWORD( read_length ), &dwReadBytes, NULL );
 
 #else
-  char* data_ptr = data;
-  size_t read_length = length;
-  size_t chunk = 1UL<<30;
-  while ( read_length > chunk )
-  {
-    data_file.read( data_ptr, chunk );
-    read_length -= chunk;
-    data_ptr += chunk;
-  }
-  data_file.read( data_ptr, read_length );
+  data_file.read( data, length );
 #endif
   
+  // Close the file
 #ifdef _WIN32
   CloseHandle( file_desc );
 #else
@@ -271,30 +337,80 @@ bool VFFLayerImporter::import_vff()
 #endif
 
   // VFF data is always stored as big endian data
-  // Hence we need to swap
+  // Hence we need to swap if we are on a little endian system.
   if ( Core::DataBlock::IsLittleEndian() )
   {
     this->data_block_->swap_endian();
   }
 
-  // Step 5: now we set our grid transform.
-  this->grid_transform_ = Core::GridTransform( nx, ny, nz, transform );
-  this->grid_transform_.set_originally_node_centered( false );
+  // Mark that we have read the data.
+  this->read_data_ = true;
+
+  // Done
   return true;
 }
 
-bool VFFLayerImporter::load_data( Core::DataBlockHandle& data_block, 
-  Core::GridTransform& grid_trans, LayerMetaData& meta_data )
+//////////////////////////////////////////////////////////////////////////
+// Class VFFLayerImporter
+//////////////////////////////////////////////////////////////////////////
+
+VFFLayerImporter::VFFLayerImporter() :
+  private_( new VFFLayerImporterPrivate )
 {
-  if( this->extension_ == ".vff" )
-  {
-    if( !this->import_vff() ) return false;
+  // Ensure that the private class has a pointer back into this class.
+  this->private_->importer_ = this;
+}
+
+VFFLayerImporter::~VFFLayerImporter()
+{
+}
+
+bool VFFLayerImporter::get_file_info( LayerImporterFileInfoHandle& info )
+{
+  try
+  { 
+    // Try to read the header
+    if ( ! this->private_->read_header() ) return false;
+  
+    // Generate an information structure with the information.
+    info = LayerImporterFileInfoHandle( new LayerImporterFileInfo );
+    info->set_data_type( this->private_->data_type_ );
+    info->set_grid_transform( this->private_->grid_transform_ );
+    info->set_file_type( "vff" ); 
+    info->set_mask_compatible( true );
   }
+  catch ( ... )
+  {
+    // In case something failed, recover from here and let the user
+    // deal with the error. 
+    this->set_error( "VFF Importer crashed while reading file." );
+    return false;
+  }
+    
+  return true;
+}
 
-  if( !this->data_block_ ) return false;
 
-  data_block = this->data_block_;
-  grid_trans = this->grid_transform_;
+bool VFFLayerImporter::get_file_data( LayerImporterFileDataHandle& data )
+{
+  try
+  { 
+    // Read the data from the file
+    if ( !this->private_->read_data() ) return false;
+  
+    // Create a data structure with handles to the actual data in this file 
+    data = LayerImporterFileDataHandle( new LayerImporterFileData );
+    data->set_data_block( this->private_->data_block_ );
+    data->set_grid_transform( this->private_->grid_transform_ );
+    data->set_name( this->get_file_tag() );
+  }
+  catch ( ... )
+  {
+    // In case something failed, recover from here and let the user
+    // deal with the error. 
+    this->set_error( "VFF Importer crashed when reading file." );
+    return false;
+  }
 
   return true;
 }

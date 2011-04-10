@@ -64,13 +64,25 @@ TransferFunctionFeatureWidget::TransferFunctionFeatureWidget(
       feature->diffuse_color_green_state_ );
     QtUtils::QtBridge::Connect( this->private_->ui_.diffuse_blue_slider_, 
       feature->diffuse_color_blue_state_ );
+    QtUtils::QtBridge::Connect( this->private_->ui_.ambient_coeff_slider_,
+      feature->ambient_coefficient_state_ );
     QtUtils::QtBridge::Connect( this->private_->ui_.specular_intensity_slider_,
       feature->specular_intensity_state_ );
     QtUtils::QtBridge::Connect( this->private_->ui_.shininess_slider_, 
       feature->shininess_state_ );
     QtUtils::QtBridge::Connect( this->private_->ui_.enable_checkbox_,
       feature->enabled_state_ );
-  }
+    QtUtils::QtBridge::Connect( this->private_->ui_.solid_checkbox_,
+      feature->solid_state_ );
+    
+    this->private_->ui_.ambient_coeff_slider_->set_description( "Coefficient" );
+    this->private_->ui_.specular_intensity_slider_->set_description( "Intensity" );
+    this->private_->ui_.shininess_slider_->set_description( "Shineyness" );
+    
+    this->private_->ui_.diffuse_red_slider_->set_description( "Red" );
+    this->private_->ui_.diffuse_green_slider_->set_description( "Green" );
+    this->private_->ui_.diffuse_blue_slider_->set_description( "Blue" );
+}
 }
 
 TransferFunctionFeatureWidget::~TransferFunctionFeatureWidget()

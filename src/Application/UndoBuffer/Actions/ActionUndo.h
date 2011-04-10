@@ -48,21 +48,12 @@ public:
   {
   }
 
-  virtual ~ActionUndo()
-  {
-  }
-
   // -- Functions that describe action --
 public:
   virtual bool validate( Core::ActionContextHandle& context );
   virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
   
 public:
-  
-  // CREATE:
-  // Create an action that activates a layer
-  static Core::ActionHandle Create();
-
   // DISPATCH:
   // Dispatch an action that activates a layer
   static void Dispatch( Core::ActionContextHandle context );

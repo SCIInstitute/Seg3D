@@ -48,9 +48,8 @@ QToolButton#group_delete_button_:hover{
   background-color: rgba( 0, 0, 0, 30 ); border-radius: 3px;
 }
 QToolButton#group_delete_button_:checked{
-  background-color: rgb(233, 111, 53);
-  border-radius: 3px;
-  border: 1px solid rgb(142, 67, 32);
+  background-color: rgba(0, 0, 0, 0);
+  border: 1px solid rgba(0, 0, 0, 0);
   margin: 0 0 0 0;
   padding: 0 0 0 0;
 }
@@ -66,9 +65,8 @@ QToolButton#group_iso_button_:hover{
   background-color: rgba( 0, 0, 0, 30 ); border-radius: 3px;
 }
 QToolButton#group_iso_button_:checked{
-  background-color: rgb(233, 111, 53);
-  border-radius: 3px;
-  border: 1px solid rgb(142, 67, 32);
+  background-color: rgba(0, 0, 0, 0);
+  border: 1px solid rgba(0, 0, 0, 0);
   margin: 0 0 0 0;
   padding: 0 0 0 0;
 }
@@ -84,13 +82,11 @@ QToolButton#duplicate_layer_button_:hover{
   background-color: rgba( 0, 0, 0, 30 ); border-radius: 3px;
 }
 QToolButton#duplicate_layer_button_:checked{
-  background-color: rgb(233, 111, 53);
-  border-radius: 3px;
-  border: 1px solid rgb(142, 67, 32);
+  background-color: rgba(0, 0, 0, 0);
+  border: 1px solid rgba(0, 0, 0, 0);
   margin: 0 0 0 0;
   padding: 0 0 0 0;
 }
-
 
 QWidget#group_tools_{
   border-radius: 4px;
@@ -258,8 +254,14 @@ QWidget#buttons_{
               </property>
               <property name="icon">
                <iconset resource="../../Resources/QtResources.qrc">
-                <normaloff>:/Images/Delete.png</normaloff>
-                <normalon>:/Images/DeleteWhite.png</normalon>:/Images/Delete.png</iconset>
+                <normaloff>:/Images/Minus.png</normaloff>
+                <normalon>:/Images/MinusOn.png</normalon>:/Images/Minus.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>20</width>
+                <height>20</height>
+               </size>
               </property>
               <property name="checkable">
                <bool>true</bool>
@@ -289,7 +291,7 @@ QWidget#buttons_{
               <property name="icon">
                <iconset resource="../../Resources/QtResources.qrc">
                 <normaloff>:/Images/Add.png</normaloff>
-                <normalon>:/Images/AddWhite.png</normalon>:/Images/Add.png</iconset>
+                <normalon>:/Images/AddOn.png</normalon>:/Images/Add.png</iconset>
               </property>
               <property name="iconSize">
                <size>

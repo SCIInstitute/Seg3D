@@ -26,39 +26,56 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef CORE_VOLUMERENDERER_VOLUMERENDERER_H
-#define CORE_VOLUMERENDERER_VOLUMERENDERER_H
-
-#include <boost/utility.hpp>
-
-#include <Core/Geometry/View3D.h>
-#include <Core/Volume/DataVolume.h>
-#include <Core/VolumeRenderer/TransferFunction.h>
+#include <Core/Utils/Variant.h>
 
 namespace Core
 {
 
-class VolumeRenderer;
-typedef boost::shared_ptr< VolumeRenderer > VolumeRendererHandle;
-
-class VolumeRendererPrivate;
-typedef boost::shared_ptr< VolumeRendererPrivate > VolumeRendererPrivateHandle;
-
-class VolumeRenderer : public boost::noncopyable
+VariantBase::~VariantBase()
 {
-public:
-  VolumeRenderer();
-  ~VolumeRenderer();
+}
 
-  void initialize();
-  void render( DataVolumeHandle volume, const View3D& view, double znear, double zfar,
-    double sample_rate, bool enable_lighting, bool enable_fog, TransferFunctionHandle tf, 
-    bool orthographic = false ); 
+Variant::Variant()
+{
+}
 
-private:
-  VolumeRendererPrivateHandle private_;
-};
+Variant::~Variant()
+{
+}
 
-} // end namespace Core
+std::string Variant::export_to_string() const
+{
+  // Export a value that is still typed or has been convereted to a string
+  // if typed_value exist, we need to convert it
+  if ( this->typed_value_.get() )
+  {
+    return this->typed_value_->export_to_string();
+  }
+  else
+  {
+    // in case typed_value does not exist it must be recorded as a string
+    return this->string_value_;
+  }
+}
 
-#endif
+bool Variant::import_from_string( const std::string& str )
+{
+  // As we do not know the implied type. It can only be recorded as a string
+  this->typed_value_.reset();
+  this->string_value_ = str;
+
+  return true;
+}
+
+std::string ExportToString( const Variant& variant )
+{
+  return variant.export_to_string();
+}
+
+
+bool ImportFromString( const std::string& str, Variant& variant )
+{
+  return variant.import_from_string( str );
+}
+
+} // namespace Core

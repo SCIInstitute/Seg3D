@@ -32,20 +32,26 @@
 ##################################################
 
 SET(CORE_VOLUMERENDERER_SHADER_SRCS
-  Fog.frag
-  Fog.vert
-  VolumeShader.frag
-  VolumeShader.vert
+  VolumeShaderSimple.frag
+  VolumeShaderSimple.vert
+  VolumeShaderOcclusion.frag
+  VolumeShaderOcclusion.vert
   )
   
 CORE_IMPORT_SHADER(CORE_VOLUMERENDERER_SHADER_STRING_SRCS
           ${CORE_VOLUMERENDERER_SHADER_SRCS})
 
 SET(CORE_VOLUMERENDERER_SRCS
-  VolumeRenderer.h
-  VolumeRenderer.cc
-  VolumeShader.h
-  VolumeShader.cc
+  VolumeRendererBase.h
+  VolumeRendererBase.cc
+  VolumeRendererSimple.h
+  VolumeRendererSimple.cc
+  VolumeRendererOcclusion.h
+  VolumeRendererOcclusion.cc
+  VolumeShaderSimple.h
+  VolumeShaderSimple.cc
+  VolumeShaderOcclusion.h
+  VolumeShaderOcclusion.cc
   TransferFunctionFeature.h
   TransferFunctionFeature.cc
   TransferFunctionControlPoint.h

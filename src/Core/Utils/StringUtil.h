@@ -49,28 +49,36 @@ namespace Core
 {
 
 // Export functions to strings
-std::string ExportToString( const bool& value );
+std::string ExportToString( bool value );
 
-std::string ExportToString( const char& value );
-std::string ExportToString( const unsigned char& value);
+std::string ExportToString( char value );
+std::string ExportToString( unsigned char value);
 
-std::string ExportToString( const short& value );
-std::string ExportToString( const unsigned short& value);
+std::string ExportToString( short value );
+std::string ExportToString( unsigned short value);
 
-std::string ExportToString( const int& value );
-std::string ExportToString( const unsigned int& value);
+std::string ExportToString( int value );
+std::string ExportToString( unsigned int value);
 
-std::string ExportToString( const long& value );
-std::string ExportToString( const unsigned long& value );
+std::string ExportToString( long value );
+std::string ExportToString( unsigned long value );
 
-std::string ExportToString( const long long& value );
-std::string ExportToString( const unsigned long long& value );
+std::string ExportToString( long long value );
+std::string ExportToString( unsigned long long value );
 
-std::string ExportToString( const float& value );
-std::string ExportToString( const double& value );
+std::string ExportToString( float value );
+std::string ExportToString( double value );
 
-std::string ExportToString( const float& value, int precision );
-std::string ExportToString( const double& value, int precision );
+std::string ExportToString( unsigned char value, int precision );
+std::string ExportToString( unsigned short value, int precision );
+std::string ExportToString( unsigned int value, int precision );
+std::string ExportToString( unsigned long long value, int precision );
+
+std::string ExportToString( float value, int precision );
+std::string ExportToString( double value, int precision );
+
+// TODO: Should check the logic of this one, as it just differs by signedness from the previous
+// function.
 std::string ExportToString( const double& value, size_t digits );
 
 std::string ExportToString( const std::string& value );
@@ -100,24 +108,23 @@ std::string ExportToString( const std::vector< double >& value, int precision );
   
 std::string ExportToString( const std::set< int >& value );
 
-
 // Import functions from strings
 bool ImportFromString( const std::string& str, bool& value );
 
 bool ImportFromString( const std::string& str, char& value );
-bool ImportFromString(const std::string& str, unsigned char& value);
+bool ImportFromString( const std::string& str, unsigned char& value);
 
 bool ImportFromString( const std::string& str, short& value );
-bool ImportFromString(const std::string& str, unsigned short& value);
+bool ImportFromString( const std::string& str, unsigned short& value);
 
 bool ImportFromString( const std::string& str, int& value );
-bool ImportFromString(const std::string& str, unsigned int& value);
+bool ImportFromString( const std::string& str, unsigned int& value);
 
-bool ImportFromString(const std::string& str, long& value);
-bool ImportFromString(const std::string& str, unsigned long& value);
+bool ImportFromString( const std::string& str, long& value);
+bool ImportFromString( const std::string& str, unsigned long& value);
 
-bool ImportFromString(const std::string& str, long long& value);
-bool ImportFromString(const std::string& str, unsigned long long& value);
+bool ImportFromString( const std::string& str, long long& value);
+bool ImportFromString( const std::string& str, unsigned long long& value);
 
 bool ImportFromString( const std::string& str, float& value );
 bool ImportFromString( const std::string& str, double& value );

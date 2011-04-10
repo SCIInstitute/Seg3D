@@ -92,8 +92,13 @@ bool PolylineToolInterface::build_widget( QFrame* frame )
 
   //Send a message to the log that we have finished with building the Polyline Tool Interface
   CORE_LOG_MESSAGE("Finished building a Polyline Tool Interface");
+  
+#if defined ( __APPLE__ )  
+  this->private_->ui_.verticalLayout->setSpacing( 8 );
+#endif
+  
 
-  return ( true );
+  return true;
 } // end build_widget
 
 } // end namespace Seg3D

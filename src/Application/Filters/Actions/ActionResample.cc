@@ -67,14 +67,14 @@ namespace Seg3D
 class ActionResamplePrivate
 {
 public:
-  Core::ActionParameter< std::vector< std::string > > layer_ids_;
-  Core::ActionParameter< int > x_;
-  Core::ActionParameter< int > y_;
-  Core::ActionParameter< int > z_;
-  Core::ActionParameter< std::string > kernel_;
-  Core::ActionParameter< double > param1_;
-  Core::ActionParameter< double > param2_;
-  Core::ActionParameter< bool > replace_;
+  std::vector< std::string > layer_ids_;
+  int x_;
+  int y_;
+  int z_;
+  std::string kernel_;
+  double param1_;
+  double param2_;
+  bool replace_;
 
   Core::GridTransform grid_transform_;
   bool resample_to_grid_;
@@ -932,16 +932,16 @@ ActionResample::ActionResample() :
   private_( new ActionResamplePrivate )
 {
   // Action arguments
-  this->add_argument( this->private_->layer_ids_ );
-  this->add_argument( this->private_->x_ );
-  this->add_argument( this->private_->y_ );
-  this->add_argument( this->private_->z_ );
+  this->add_layer_id_list( this->private_->layer_ids_ );
+  this->add_parameter( this->private_->x_ );
+  this->add_parameter( this->private_->y_ );
+  this->add_parameter( this->private_->z_ );
 
   // Action options
-  this->add_key( this->private_->kernel_ );
-  this->add_key( this->private_->param1_ );
-  this->add_key( this->private_->param2_ );
-  this->add_key( this->private_->replace_ );
+  this->add_parameter( this->private_->kernel_ );
+  this->add_parameter( this->private_->param1_ );
+  this->add_parameter( this->private_->param2_ );
+  this->add_parameter( this->private_->replace_ );
 
   this->private_->resample_to_grid_ = false;
   this->private_->resample_to_layer_ = false;
@@ -949,7 +949,7 @@ ActionResample::ActionResample() :
 
 bool ActionResample::validate( Core::ActionContextHandle& context )
 {
-  const std::vector< std::string >& layer_ids = this->private_->layer_ids_.value();
+  const std::vector< std::string >& layer_ids = this->private_->layer_ids_;
   if ( layer_ids.size() == 0 )
   {
     context->report_error( "No input layers specified" );
@@ -959,21 +959,11 @@ bool ActionResample::validate( Core::ActionContextHandle& context )
   for ( size_t i = 0; i < layer_ids.size(); ++i )
   {
     // Check for layer existence and type information
-    std::string error;
-    if ( !LayerManager::CheckLayerExistance( layer_ids[ i ], error ) )
-    {
-      context->report_error( error );
-      return false;
-    }
+    if ( !LayerManager::CheckLayerExistance( layer_ids[ i ], context ) ) return false;
     
     // Check for layer availability 
-    Core::NotifierHandle notifier;
     if ( !LayerManager::CheckLayerAvailability( layer_ids[ i ], 
-      this->private_->replace_.value(), notifier ) )
-    {
-      context->report_need_resource( notifier );
-      return false;
-    }
+      this->private_->replace_, context ) ) return false;
   }
 
   if ( this->private_->resample_to_layer_ )
@@ -986,9 +976,9 @@ bool ActionResample::validate( Core::ActionContextHandle& context )
       return false;
     }
     Core::GridTransform grid_trans = layer->get_grid_transform();
-    this->private_->x_.set_value( static_cast< int >( grid_trans.get_nx() ) );
-    this->private_->y_.set_value( static_cast< int >( grid_trans.get_ny() ) );
-    this->private_->z_.set_value( static_cast< int >( grid_trans.get_nz() ) );
+    this->private_->x_ = static_cast< int >( grid_trans.get_nx() );
+    this->private_->y_ = static_cast< int >( grid_trans.get_ny() );
+    this->private_->z_ = static_cast< int >( grid_trans.get_nz() );
     this->private_->grid_transform_ = grid_trans;
   }
   
@@ -1005,21 +995,21 @@ bool ActionResample::validate( Core::ActionContextHandle& context )
   }
   else
   {
-    if ( this->private_->x_.value() < 1 ||
-      this->private_->y_.value() < 1 ||
-      this->private_->z_.value() < 1 )
+    if ( this->private_->x_ < 1 ||
+      this->private_->y_ < 1 ||
+      this->private_->z_ < 1 )
     {
       context->report_error( "Invalid resample size" );
       return false;
     }
   }
   
-  if ( this->private_->kernel_.value() != BOX_C &&
-    this->private_->kernel_.value() != TENT_C &&
-    this->private_->kernel_.value() != CUBIC_BS_C &&
-    this->private_->kernel_.value() != CUBIC_CR_C &&
-    this->private_->kernel_.value() != QUARTIC_C &&
-    this->private_->kernel_.value() != GAUSSIAN_C )
+  if ( this->private_->kernel_ != BOX_C &&
+    this->private_->kernel_ != TENT_C &&
+    this->private_->kernel_ != CUBIC_BS_C &&
+    this->private_->kernel_ != CUBIC_CR_C &&
+    this->private_->kernel_ != QUARTIC_C &&
+    this->private_->kernel_ != GAUSSIAN_C )
   {
     context->report_error( "Unknown kernel type" );
     return false;
@@ -1033,19 +1023,19 @@ bool ActionResample::run( Core::ActionContextHandle& context,
   Core::ActionResultHandle& result )
 {
   // Create algorithm
-  boost::shared_ptr< ResampleAlgo > algo( new ResampleAlgo( this->private_->kernel_.value(), 
-    this->private_->param1_.value(), this->private_->param2_.value() ) );
+  boost::shared_ptr< ResampleAlgo > algo( new ResampleAlgo( this->private_->kernel_, 
+    this->private_->param1_, this->private_->param2_ ) );
 
   // Set up parameters
-  algo->replace_ = this->private_->replace_.value();
-  algo->dimesions_[ 0 ] = static_cast< unsigned int >( this->private_->x_.value() );
-  algo->dimesions_[ 1 ] = static_cast< unsigned int >( this->private_->y_.value() );
-  algo->dimesions_[ 2 ] = static_cast< unsigned int >( this->private_->z_.value() );
+  algo->replace_ = this->private_->replace_;
+  algo->dimesions_[ 0 ] = static_cast< unsigned int >( this->private_->x_ );
+  algo->dimesions_[ 1 ] = static_cast< unsigned int >( this->private_->y_ );
+  algo->dimesions_[ 2 ] = static_cast< unsigned int >( this->private_->z_ );
   algo->resample_to_grid_ = this->private_->resample_to_grid_ || 
     this->private_->resample_to_layer_;
   algo->padding_ = this->private_->padding_;
 
-  const std::vector< std::string >& layer_ids = this->private_->layer_ids_.value();
+  const std::vector< std::string >& layer_ids = this->private_->layer_ids_;
   
   // Set up input and output layers
   size_t num_of_layers = layer_ids.size();
@@ -1060,7 +1050,7 @@ bool ActionResample::run( Core::ActionContextHandle& context,
     algo->find_layer( layer_ids[ i ], algo->src_layers_[ i ] );
     if ( algo->replace_ )
     {
-      algo->lock_for_processing( algo->src_layers_[ i ], false );
+      algo->lock_for_deletion( algo->src_layers_[ i ] );
     }
     else
     {
@@ -1145,6 +1135,10 @@ bool ActionResample::run( Core::ActionContextHandle& context,
   // Build the undo-redo record
   algo->create_undo_redo_record( context, this->shared_from_this() );
 
+  // Build the provenance record
+  algo->create_provenance_record( context, this->shared_from_this() );
+
+
   // Start the filter.
   Core::Runnable::Start( algo );
 
@@ -1157,14 +1151,14 @@ void ActionResample::Dispatch( Core::ActionContextHandle context,
                 double param1, double param2, bool replace )
 {
   ActionResample* action = new ActionResample;
-  action->private_->layer_ids_.set_value( layer_ids );
-  action->private_->x_.set_value( x );
-  action->private_->y_.set_value( y );
-  action->private_->z_.set_value( z );
-  action->private_->kernel_.set_value( kernel );
-  action->private_->param1_.set_value( param1 );
-  action->private_->param2_.set_value( param2 );
-  action->private_->replace_.set_value( replace );
+  action->private_->layer_ids_ = layer_ids;
+  action->private_->x_ = x;
+  action->private_->y_ = y;
+  action->private_->z_ = z;
+  action->private_->kernel_ = kernel;
+  action->private_->param1_ = param1;
+  action->private_->param2_ = param2;
+  action->private_->replace_ = replace;
 
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }
@@ -1176,7 +1170,7 @@ void ActionResample::Dispatch( Core::ActionContextHandle context,
                 double param1, double param2, bool replace )
 {
   ActionResample* action = new ActionResample;
-  action->private_->layer_ids_.set_value( layer_ids );
+  action->private_->layer_ids_ = layer_ids;
   action->private_->grid_transform_ = grid_trans;
   action->private_->resample_to_grid_ = true;
   action->private_->padding_ = padding;
@@ -1184,14 +1178,14 @@ void ActionResample::Dispatch( Core::ActionContextHandle context,
   int nx = static_cast< int >( grid_trans.get_nx() );
   int ny = static_cast< int >( grid_trans.get_ny() );
   int nz = static_cast< int >( grid_trans.get_nz() );
-  action->private_->x_.set_value( nx );
-  action->private_->y_.set_value( ny );
-  action->private_->z_.set_value( nz );
+  action->private_->x_ = nx;
+  action->private_->y_ = ny;
+  action->private_->z_ = nz;
 
-  action->private_->kernel_.set_value( kernel );
-  action->private_->param1_.set_value( param1 );
-  action->private_->param2_.set_value( param2 );
-  action->private_->replace_.set_value( replace );
+  action->private_->kernel_ = kernel;
+  action->private_->param1_ = param1;
+  action->private_->param2_ = param2;
+  action->private_->replace_ = replace;
 
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }
@@ -1204,16 +1198,16 @@ void ActionResample::Dispatch( Core::ActionContextHandle context,
   ActionResample* action = new ActionResample;
 
   std::vector< std::string > layer_ids( 1, src_layer );
-  action->private_->layer_ids_.set_value( layer_ids );
+  action->private_->layer_ids_ = layer_ids;
   action->private_->dst_layer_id_ = dst_layer;
   action->private_->resample_to_layer_ = true;
 
   action->private_->padding_ = padding;
 
-  action->private_->kernel_.set_value( kernel );
-  action->private_->param1_.set_value( param1 );
-  action->private_->param2_.set_value( param2 );
-  action->private_->replace_.set_value( replace );
+  action->private_->kernel_ = kernel;
+  action->private_->param1_ = param1;
+  action->private_->param2_ = param2;
+  action->private_->replace_ = replace;
 
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }

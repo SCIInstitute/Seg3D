@@ -58,16 +58,10 @@ bool ActionActivatePreviousLayer::run( Core::ActionContextHandle& context,
   return true;
 }
 
-Core::ActionHandle ActionActivatePreviousLayer::Create()
-{
-  ActionActivatePreviousLayer* action = new ActionActivatePreviousLayer;
-
-  return Core::ActionHandle( action );
-}
-
 void ActionActivatePreviousLayer::Dispatch( Core::ActionContextHandle context )
 {
-  Core::ActionDispatcher::PostAction( Create(), context );
+  ActionActivatePreviousLayer* action = new ActionActivatePreviousLayer;
+  Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }
 
 } // end namespace Seg3D

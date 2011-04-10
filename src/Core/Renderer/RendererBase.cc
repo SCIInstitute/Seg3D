@@ -325,7 +325,7 @@ void RendererBase::initialize()
   // Save old GL context so it can be restored at the end
   RenderContextHandle old_context = RenderResources::Instance()->get_current_context();
 #endif
-  
+
   // Make the GL context current. In multi-threaded rendering mode,
   // this call is only needed once.
   this->private_->context_->make_current();

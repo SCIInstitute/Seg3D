@@ -37,7 +37,7 @@
 #include <Core/State/StateIO.h>
 #include <Core/Utils/ScopedCounter.h>
 
-#include <Application/Session/Session.h>
+#include <Application/Project/Project.h>
 #include <Application/Tool/ToolFactory.h>
 #include <Application/ToolManager/ToolManager.h>
 
@@ -317,7 +317,7 @@ ToolManager::ToolManager() :
   // Mask the data contained in this manager as session data.
   this->mark_as_project_data();
 
-  this->add_state( "active_tool", this->active_tool_state_, "", "" );
+  this->add_state( "active_tool", this->active_tool_state_ );
   
   // this state variable is currently not being used.
   this->add_state( "disable_tools", this->disable_tools_state_, false );
@@ -575,6 +575,7 @@ bool ToolManager::pre_load_states( const Core::StateIO& state_io )
     FirstChildElement( "tools" );
   if ( tools_element == 0 )
   {
+    CORE_LOG_ERROR( "Could not find tools element." );
     return false;
   }
 
@@ -589,7 +590,12 @@ bool ToolManager::pre_load_states( const Core::StateIO& state_io )
     if ( this->open_tool( toolid, toolid ) )
     {
       ToolHandle tool = this->get_tool( toolid );
-      success &= tool->load_states( state_io );
+      if ( ! tool->load_states( state_io ) )
+      {
+        std::string error = std::string( "Could not states for tool '" ) + toolid + "'.";
+        CORE_LOG_ERROR( error );
+        success = false;
+      } 
     }
     tool_element = tool_element->NextSiblingElement();
   }

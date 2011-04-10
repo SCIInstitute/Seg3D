@@ -23,6 +23,11 @@
   padding: 0px;
 }
 
+QFrame#line_,
+QFrame#sep_line_{
+  background-color: gray;
+}
+
 QWidget#viewer_mode_holder_{
   margin: 0px;
   padding: 0px;
@@ -86,9 +91,11 @@ QToolButton:pressed{
      border-bottom-right-radius: 3px;
  }
 
+/*
  QComboBox::down-arrow {
      image: url(&quot;:/Images/Arrow.png&quot;);
  }
+*/
 
  QComboBox::down-arrow:on { /* shift the arrow when popup is open */
      top: 0px;
@@ -208,7 +215,7 @@ QComboBox::icon{
                 <widget class="QComboBox" name="viewer_mode_">
                  <property name="minimumSize">
                   <size>
-                   <width>100</width>
+                   <width>82</width>
                    <height>0</height>
                   </size>
                  </property>
@@ -633,13 +640,13 @@ QComboBox::icon{
              <widget class="Line" name="line_">
               <property name="minimumSize">
                <size>
-                <width>3</width>
+                <width>1</width>
                 <height>0</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>3</width>
+                <width>1</width>
                 <height>16777215</height>
                </size>
               </property>
@@ -823,25 +830,6 @@ QComboBox::icon{
                 </widget>
                </item>
               </layout>
-             </widget>
-            </item>
-            <item>
-             <widget class="Line" name="sep_line_">
-              <property name="minimumSize">
-               <size>
-                <width>3</width>
-                <height>0</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>3</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
              </widget>
             </item>
             <item>
@@ -1139,8 +1127,8 @@ QComboBox::icon{
                  </property>
                  <property name="icon">
                   <iconset resource="../../Resources/QtResources.qrc">
-                   <normaloff>:/Images/DataVolumeOff.png</normaloff>
-                   <normalon>:/Images/DataVolume.png</normalon>:/Images/DataVolumeOff.png</iconset>
+                   <normaloff>:/Images/VolumeRenderingOff.png</normaloff>
+                   <normalon>:/Images/VolumeRendering.png</normalon>:/Images/VolumeRenderingOff.png</iconset>
                  </property>
                 </widget>
                </item>

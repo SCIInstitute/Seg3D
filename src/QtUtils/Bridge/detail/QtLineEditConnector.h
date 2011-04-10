@@ -45,10 +45,10 @@ class QtLineEditConnector : public QtConnectorBase
   Q_OBJECT
 
 public:
-  QtLineEditConnector( QLineEdit* parent, Core::StateStringHandle& state,
+  QtLineEditConnector( QLineEdit* parent, Core::StateStringHandle& state, bool immediate_update,
     bool blocking = true );
 
-  QtLineEditConnector( QLineEdit* parent, Core::StateNameHandle& state,
+  QtLineEditConnector( QLineEdit* parent, Core::StateNameHandle& state, bool immediate_update,
     bool blocking = true );
 
   virtual ~QtLineEditConnector();
@@ -61,6 +61,7 @@ private:
   // -- slot functions for Qt signals --
 private Q_SLOTS:
   void set_state();
+  void set_state( const QString& text );
 
 private:
   QLineEdit* parent_;

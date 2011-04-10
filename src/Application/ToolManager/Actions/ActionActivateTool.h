@@ -47,11 +47,7 @@ CORE_ACTION(
 public:
   ActionActivateTool()
   {
-    this->add_argument( this->toolid_ );
-  }
-
-  virtual ~ActionActivateTool()
-  {
+    this->add_parameter( this->toolid_ );
   }
 
   // -- Functions that describe action --
@@ -71,7 +67,7 @@ public:
 
   // -- Action parameters --
 private:
-  Core::ActionParameter< std::string > toolid_;
+  std::string toolid_;
 };
 
 } // end namespace Seg3D

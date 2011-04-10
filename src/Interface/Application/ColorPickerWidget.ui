@@ -70,19 +70,6 @@ QWidget#gradient_{
             <property name="margin">
              <number>0</number>
             </property>
-            <item>
-             <widget class="QLabel" name="label">
-              <property name="minimumSize">
-               <size>
-                <width>16</width>
-                <height>0</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>R:</string>
-              </property>
-             </widget>
-            </item>
            </layout>
           </widget>
          </item>
@@ -95,19 +82,6 @@ QWidget#gradient_{
             <property name="margin">
              <number>0</number>
             </property>
-            <item>
-             <widget class="QLabel" name="label_2">
-              <property name="minimumSize">
-               <size>
-                <width>16</width>
-                <height>0</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>G:</string>
-              </property>
-             </widget>
-            </item>
            </layout>
           </widget>
          </item>
@@ -120,19 +94,6 @@ QWidget#gradient_{
             <property name="margin">
              <number>0</number>
             </property>
-            <item>
-             <widget class="QLabel" name="label_3">
-              <property name="minimumSize">
-               <size>
-                <width>16</width>
-                <height>0</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>B:</string>
-              </property>
-             </widget>
-            </item>
            </layout>
           </widget>
          </item>

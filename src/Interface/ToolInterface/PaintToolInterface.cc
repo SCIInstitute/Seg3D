@@ -102,6 +102,10 @@ bool PaintToolInterface::build_widget( QFrame* frame )
     tool->upper_threshold_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.lower_threshold_, 
     tool->lower_threshold_state_ );
+
+  this->private_->ui_.lower_threshold_->connect_min( this->private_->ui_.upper_threshold_ );
+  this->private_->ui_.upper_threshold_->connect_max( this->private_->ui_.lower_threshold_ );
+
   QtUtils::QtBridge::Connect( this->private_->ui_.eraseCheckBox, 
     tool->erase_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.show_boundary_,
@@ -114,6 +118,10 @@ bool PaintToolInterface::build_widget( QFrame* frame )
     &PaintTool::flood_fill, tool, Core::Interface::GetWidgetActionContext(), true ) );
   QtUtils::QtBridge::Connect( this->private_->ui_.clear_seeds_button_, boost::bind(
     &SeedPointsTool::clear, tool, Core::Interface::GetWidgetActionContext() ) );
+  
+  this->private_->ui_.brush_radius_->set_description( "Radius" );
+  this->private_->ui_.upper_threshold_->set_description( "Upper" );
+  this->private_->ui_.lower_threshold_->set_description( "Lower" );
   
 
   //this->private_->ui_.message_alert_->set_warning_message( "Select a mask layer to activate this tool." );
@@ -140,6 +148,10 @@ bool PaintToolInterface::build_widget( QFrame* frame )
     tool->mask_constraint2_layer_state_.get() ) != Tool::NONE_OPTION_C;
   QtUtils::QtBridge::Show( this->private_->ui_.mask_constraint_2_widget_, 
     tool->mask_constraint2_layer_state_, condition );
+  
+#if defined ( __APPLE__ )
+  this->private_->ui_.verticalLayout_8->setSpacing( 8 );
+#endif
   
   
   return true;

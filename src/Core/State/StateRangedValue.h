@@ -76,18 +76,17 @@ protected:
 
   // IMPORT_OFFSET_FROM_VARIANT:
   // Import the offset value from the variant and apply it to the current value.
-  virtual bool import_offset_from_variant( ActionParameterVariant& variant, 
+  virtual bool import_offset_from_variant( Variant& variant, 
     ActionSource source = ActionSource::NONE_E ) = 0;
 
   // IMPORT_RANGE_FROM_VARIANT:
   // Import range values from variants.
-  virtual bool import_range_from_variant( ActionParameterVariant& variant_min,
-    ActionParameterVariant& variant_max, 
+  virtual bool import_range_from_variant( Variant& variant_min, Variant& variant_max, 
     ActionSource source = ActionSource::NONE_E ) = 0;
 
   // VALIDATE_OFFSET_VARIANT:
   // Returns true if the value stored in the variant is a valid offset value, otherwise false.
-  virtual bool validate_value_type_variant( ActionParameterVariant& variant, 
+  virtual bool validate_value_type_variant( Variant& variant, 
     std::string& error ) = 0;
 };
 
@@ -143,19 +142,19 @@ public:
 protected:
   // EXPORT_TO_VARIANT
   // Export the state data to a variant parameter
-  virtual void export_to_variant( Core::ActionParameterVariant& variant ) const
+  virtual void export_to_variant( Variant& variant ) const
   {
-    variant.set_value( this->value_ );
+    variant.set( this->value_ );
   }
 
   // IMPORT_FROM_VARIANT:
   // Import the state data from a variant parameter.
-  virtual bool import_from_variant( Core::ActionParameterVariant& variant, 
+  virtual bool import_from_variant( Variant& variant, 
     Core::ActionSource source = Core::ActionSource::NONE_E )
   {
     // Get the value from the action parameter
     T value;
-    if ( !( variant.get_value( value ) ) ) return false;
+    if ( !( variant.get( value ) ) ) return false;
 
     // Set the parameter in this state variable
     return this->set( value, source );
@@ -163,11 +162,11 @@ protected:
 
   // IMPORT_OFFSET_FROM_VARIANT:
   // Import the offset value from the variant and apply it to the current value.
-  virtual bool import_offset_from_variant( ActionParameterVariant& variant, 
+  virtual bool import_offset_from_variant( Variant& variant, 
     ActionSource source = ActionSource::NONE_E )
   {
     T offset_value;
-    if ( !variant.get_value( offset_value ) )
+    if ( !variant.get( offset_value ) )
     {
       return false;
     }
@@ -176,13 +175,12 @@ protected:
 
   // IMPORT_RANGE_FROM_VARIANT:
   // Import range values from variants.
-  virtual bool import_range_from_variant( ActionParameterVariant& variant_min,
-    ActionParameterVariant& variant_max, 
+  virtual bool import_range_from_variant( Variant& variant_min, Variant& variant_max, 
     ActionSource source = ActionSource::NONE_E )
   {
     T min_val, max_val;
-    if ( !variant_min.get_value( min_val ) ||
-      !variant_max.get_value( max_val ) )
+    if ( !variant_min.get( min_val ) ||
+      !variant_max.get( max_val ) )
     {
       return false;
     }
@@ -194,7 +192,7 @@ protected:
   // Validate a variant parameter
   // This function returns false if the parameter is invalid or cannot be
   // converted and in that case error will describe the error.
-  virtual bool validate_variant( ActionParameterVariant& variant, std::string& error )
+  virtual bool validate_variant( Variant& variant, std::string& error )
   {
     if ( !( variant.validate_type< T > () ) )
     {
@@ -203,7 +201,7 @@ protected:
     }
 
     T value;
-    variant.get_value( value );
+    variant.get( value );
     if ( value < this->min_value_ || value > this->max_value_ )
     {
       error = "Value " + ExportToString( value ) + " is out of range [" + ExportToString(
@@ -216,8 +214,7 @@ protected:
 
   // VALIDATE_OFFSET_VARIANT:
   // Returns true if the value stored in the variant is a valid offset value, otherwise false.
-  virtual bool validate_value_type_variant( ActionParameterVariant& variant, 
-    std::string& error )
+  virtual bool validate_value_type_variant( Variant& variant, std::string& error )
   {
     if ( !( variant.validate_type< T > () ) )
     {

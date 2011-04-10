@@ -52,11 +52,7 @@ CORE_ACTION(
 public:
   ActionCalculateMaskVolume()
   {
-    this->add_argument( this->mask_name_ );
-  }
-  
-  virtual ~ActionCalculateMaskVolume()
-  {
+    this->add_parameter( this->mask_name_ );
   }
   
 // -- Functions that describe action --
@@ -66,15 +62,10 @@ public:
 
 private:
   // This parameter contains the id of the layer group
-  Core::ActionParameter< std::string > mask_name_;
+  std::string mask_name_;
 
   // -- Dispatch this action from the interface --
 public:
-
-  // CREATE:
-  // Create an action that deletes the selected layers
-  static Core::ActionHandle Create( const std::string& mask_name );
-
   // DISPATCH
   // Create and dispatch action that deletes the selected layers
   static void Dispatch( Core::ActionContextHandle context, const std::string& mask_name );  

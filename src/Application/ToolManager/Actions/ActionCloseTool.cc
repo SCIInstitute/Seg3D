@@ -50,25 +50,19 @@ bool ActionCloseTool::validate( Core::ActionContextHandle& context )
 
 bool ActionCloseTool::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
-  ToolManager::Instance()->close_tool( toolid_.value() );
+  ToolManager::Instance()->close_tool( toolid_ );
   return true; // success
 }
 
-Core::ActionHandle ActionCloseTool::Create( const std::string& toolid )
+void ActionCloseTool::Dispatch( Core::ActionContextHandle context, const std::string& toolid )
 {
   // Create new action
   ActionCloseTool* action = new ActionCloseTool;
 
   // Set action parameters
-  action->toolid_.value() = toolid;
+  action->toolid_ = toolid;
 
-  // Post the new action
-  return Core::ActionHandle( action );
-}
-
-void ActionCloseTool::Dispatch( Core::ActionContextHandle context, const std::string& toolid )
-{
-  Core::ActionDispatcher::PostAction( Create( toolid ), context );
+  Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }
 
 } // end namespace Seg3D

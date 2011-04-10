@@ -52,10 +52,10 @@ bool MaskShader::get_fragment_shader_source( std::string& source )
   };
   source = std::string( FRAG_SHADER_SOURCE_C );
   return true;
-}
+  }
 
 bool MaskShader::post_initialize()
-{
+  {
   this->enable();
   this->tex_loc_ = this->get_uniform_location( "tex" );
   this->opacity_loc_ = this->get_uniform_location( "opacity" );

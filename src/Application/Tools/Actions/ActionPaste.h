@@ -55,7 +55,6 @@ CORE_ACTION
 
 public:
   ActionPaste();
-  virtual ~ActionPaste();
 
   // VALIDATE:
   // Each action needs to be validated just before it is posted. This way we

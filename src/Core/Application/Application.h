@@ -181,10 +181,19 @@ public:
 
   // -- Signals --
 public:
-  // RESET_SIGNAL_:
+  // RESET_SIGNAL
   // This signal is triggered by calling the reset function.
   // WARNING: Do NOT trigger this signal directly. Call the reset function instead.
   boost::signals2::signal< void () > reset_signal_;
+
+  // APPLICATION_START_SIGNAL
+  // This signal is triggered at the start of the application, before the splash
+  // screen is shown. This signal can be used to initialize code from plugins
+  boost::signals2::signal< void () > application_start_signal_;
+
+  // APPLICATION_STOP_SIGNAL
+  // This signal is triggered at the end of the program
+  boost::signals2::signal< void () > application_stop_signal_;
 
   // -- internals --
 private:
@@ -251,6 +260,10 @@ public:
   // GETAPPLICATIONNAMEANDVERSION
   // Get the name of the application and its version
   static std::string GetApplicationNameAndVersion();
+
+  // GETABOUT
+  // Get the information that should be shown in the about screen
+  static std::string GetAbout();
   
 };
 

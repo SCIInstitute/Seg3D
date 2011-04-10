@@ -48,22 +48,22 @@ SET(MAIN_SRCS
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SEG3D_OUTPUT_DIRECTORY})
 
 IF(APPLE)
-  SET(MAIN_SRCS ${MAIN_SRCS} "${CMAKE_SOURCE_DIR}/Resources/Icons/Seg3D.icns")
-  SET_SOURCE_FILES_PROPERTIES(${CMAKE_SOURCE_DIR}/Resources/Icons/Seg3D.icns
+  SET(MAIN_SRCS ${MAIN_SRCS} "${APPLICATION_OSX_ICON_FULL_PATH}")
+  SET_SOURCE_FILES_PROPERTIES(${APPLICATION_OSX_ICON_FULL_PATH}
                               PROPERTIES
                               MACOSX_PACKAGE_LOCATION Resources)
-  SET(MACOSX_BUNDLE_ICON_FILE "Seg3D.icns")
-  ADD_EXECUTABLE(Seg3D2 MACOSX_BUNDLE ${MAIN_SRCS})
+  SET(MACOSX_BUNDLE_ICON_FILE "${APPLICATION_OSX_ICON}" )
+  ADD_EXECUTABLE(${APPLICATION_NAME} MACOSX_BUNDLE ${MAIN_SRCS})
 ELSE(APPLE)
   IF(WIN32)
     SET(MAIN_SRCS ${MAIN_SRCS} "${CMAKE_SOURCE_DIR}/Resources/Icons/Seg3D.rc")
-    ADD_EXECUTABLE(Seg3D2 WIN32 ${MAIN_SRCS})
+    ADD_EXECUTABLE(${APPLICATION_NAME} WIN32 ${MAIN_SRCS})
   ELSE(WIN32)
-    ADD_EXECUTABLE(Seg3D2 ${MAIN_SRCS})
+    ADD_EXECUTABLE(${APPLICATION_NAME} ${MAIN_SRCS})
   ENDIF(WIN32)
 ENDIF(APPLE)
 
-TARGET_LINK_LIBRARIES(Seg3D2 
+TARGET_LINK_LIBRARIES(${APPLICATION_NAME} 
   ${QT_LIBRARIES}
   ${SCI_BOOST_LIBRARY}
   Core_Utils
@@ -82,18 +82,19 @@ TARGET_LINK_LIBRARIES(Seg3D2
   QtUtils_Bridge
   Interface_Application
   Interface_ToolInterface
+  ${RESOURCES_LIBRARY}
 )
 
 IF(WIN32)
-  TARGET_LINK_LIBRARIES(Seg3D2 ${QT_QTMAIN_LIBRARY} )
+  TARGET_LINK_LIBRARIES(${APPLICATION_NAME} ${QT_QTMAIN_LIBRARY} )
 ENDIF(WIN32)
 
 IF(BUILD_WITH_PYTHON)
-  TARGET_LINK_LIBRARIES(Seg3D2 Application_PythonModule)
+  TARGET_LINK_LIBRARIES(${APPLICATION_NAME} Application_PythonModule)
 ENDIF(BUILD_WITH_PYTHON)
 
 # add libraries with plug-ins and extensions
-REGISTERED_TARGET_LINK_LIBRARIES(Seg3D2)
+REGISTERED_TARGET_LINK_LIBRARIES(${APPLICATION_NAME})
 
 ###########################################
 # SETUP MACOSX APPLICATION BUNDLE
@@ -108,60 +109,60 @@ REGISTERED_TARGET_LINK_LIBRARIES(Seg3D2)
 IF(APPLE)
   IF(${CMAKE_GENERATOR} MATCHES "Xcode")
 
-    ADD_CUSTOM_COMMAND(TARGET Seg3D2 
+    ADD_CUSTOM_COMMAND(TARGET ${APPLICATION_NAME} 
        POST_BUILD
-       COMMAND [ ! -d Debug ] || cp -rf "${QT_QTCORE_LIBRARY_RELEASE}/Versions/4/QtCore" "Debug/Seg3D2.app/Contents/MacOS/" 
-       COMMAND [ ! -d Debug ] || cp -rf "${QT_QTGUI_LIBRARY_RELEASE}/Versions/4/QtGui" "Debug/Seg3D2.app/Contents/MacOS/"
-       COMMAND [ ! -d Debug ] || cp -rf "${QT_QTOPENGL_LIBRARY_RELEASE}/Versions/4/QtOpenGL" "Debug/Seg3D2.app/Contents/MacOS/"
-       COMMAND [ ! -d Debug ] || install_name_tool -id QtCore Debug/Seg3D2.app/Contents/MacOS/QtCore
-       COMMAND [ ! -d Debug ] || install_name_tool -id QtGui Debug/Seg3D2.app/Contents/MacOS/QtGui
-       COMMAND [ ! -d Debug ] || install_name_tool -id QtOpenGL Debug/Seg3D2.app/Contents/MacOS/QtOpenGL
-       COMMAND [ ! -d Debug ] || install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore Debug/Seg3D2.app/Contents/MacOS/QtGui
-       COMMAND [ ! -d Debug ] || install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore Debug/Seg3D2.app/Contents/MacOS/QtOpenGL
-       COMMAND [ ! -d Debug ] || install_name_tool -change QtGui.framework/Versions/4/QtGui @executable_path/QtGui Debug/Seg3D2.app/Contents/MacOS/QtOpenGL
-       COMMAND [ ! -d Debug ] || install_name_tool -change QtGui.framework/Versions/4/QtGui @executable_path/QtGui Debug/Seg3D2.app/Contents/MacOS/Seg3D2
-       COMMAND [ ! -d Debug ] || install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore Debug/Seg3D2.app/Contents/MacOS/Seg3D2
-       COMMAND [ ! -d Debug ] || install_name_tool -change QtOpenGL.framework/Versions/4/QtOpenGL @executable_path/QtOpenGL Debug/Seg3D2.app/Contents/MacOS/Seg3D2
-       COMMAND [ ! -d Debug ] || cp "-rf" "${QT_QTGUI_LIBRARY_RELEASE}/Versions/Current/Resources" "Debug/Seg3D2.app/Contents"
-       COMMAND [ ! -d Debug ] || [ -d Debug/Seg3D2.app/Contents/MacOS/plugins ] || mkdir Debug/Seg3D2.app/Contents/MacOS/plugins
-       COMMAND [ ! -d Debug ] || cp -rf "${CMAKE_SOURCE_DIR}/CMake/qt.conf" Debug/Seg3D2.app/Contents/Resources
+       COMMAND [ ! -d Debug ] || cp -rf "${QT_QTCORE_LIBRARY_RELEASE}/Versions/4/QtCore" "Debug/${APPLICATION_NAME}.app/Contents/MacOS/" 
+       COMMAND [ ! -d Debug ] || cp -rf "${QT_QTGUI_LIBRARY_RELEASE}/Versions/4/QtGui" "Debug/${APPLICATION_NAME}.app/Contents/MacOS/"
+       COMMAND [ ! -d Debug ] || cp -rf "${QT_QTOPENGL_LIBRARY_RELEASE}/Versions/4/QtOpenGL" "Debug/${APPLICATION_NAME}.app/Contents/MacOS/"
+       COMMAND [ ! -d Debug ] || install_name_tool -id QtCore Debug/${APPLICATION_NAME}.app/Contents/MacOS/QtCore
+       COMMAND [ ! -d Debug ] || install_name_tool -id QtGui Debug/${APPLICATION_NAME}.app/Contents/MacOS/QtGui
+       COMMAND [ ! -d Debug ] || install_name_tool -id QtOpenGL Debug/${APPLICATION_NAME}.app/Contents/MacOS/QtOpenGL
+       COMMAND [ ! -d Debug ] || install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore Debug/${APPLICATION_NAME}.app/Contents/MacOS/QtGui
+       COMMAND [ ! -d Debug ] || install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore Debug/${APPLICATION_NAME}.app/Contents/MacOS/QtOpenGL
+       COMMAND [ ! -d Debug ] || install_name_tool -change QtGui.framework/Versions/4/QtGui @executable_path/QtGui Debug/${APPLICATION_NAME}.app/Contents/MacOS/QtOpenGL
+       COMMAND [ ! -d Debug ] || install_name_tool -change QtGui.framework/Versions/4/QtGui @executable_path/QtGui Debug/${APPLICATION_NAME}.app/Contents/MacOS/${APPLICATION_NAME}
+       COMMAND [ ! -d Debug ] || install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore Debug/${APPLICATION_NAME}.app/Contents/MacOS/${APPLICATION_NAME}
+       COMMAND [ ! -d Debug ] || install_name_tool -change QtOpenGL.framework/Versions/4/QtOpenGL @executable_path/QtOpenGL Debug/${APPLICATION_NAME}.app/Contents/MacOS/${APPLICATION_NAME}
+       COMMAND [ ! -d Debug ] || cp "-rf" "${QT_QTGUI_LIBRARY_RELEASE}/Versions/Current/Resources" "Debug/${APPLICATION_NAME}.app/Contents"
+       COMMAND [ ! -d Debug ] || [ -d Debug/${APPLICATION_NAME}.app/Contents/MacOS/plugins ] || mkdir Debug/${APPLICATION_NAME}.app/Contents/MacOS/plugins
+       COMMAND [ ! -d Debug ] || cp -rf "${CMAKE_SOURCE_DIR}/CMake/qt.conf" Debug/${APPLICATION_NAME}.app/Contents/Resources
 
-       COMMAND [ ! -d Release ] || cp -rf "${QT_QTCORE_LIBRARY_RELEASE}/Versions/4/QtCore" "Release/Seg3D2.app/Contents/MacOS/" 
-       COMMAND [ ! -d Release ] || cp -rf "${QT_QTGUI_LIBRARY_RELEASE}/Versions/4/QtGui" "Release/Seg3D2.app/Contents/MacOS/"
-       COMMAND [ ! -d Release ] || cp -rf "${QT_QTOPENGL_LIBRARY_RELEASE}/Versions/4/QtOpenGL" "Release/Seg3D2.app/Contents/MacOS/"
-       COMMAND [ ! -d Release ] || install_name_tool -id QtCore Release/Seg3D2.app/Contents/MacOS/QtCore
-       COMMAND [ ! -d Release ] || install_name_tool -id QtGui Release/Seg3D2.app/Contents/MacOS/QtGui
-       COMMAND [ ! -d Release ] || install_name_tool -id QtOpenGL Release/Seg3D2.app/Contents/MacOS/QtOpenGL
-       COMMAND [ ! -d Release ] || install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore Release/Seg3D2.app/Contents/MacOS/QtGui
-       COMMAND [ ! -d Release ] || install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore Release/Seg3D2.app/Contents/MacOS/QtOpenGL
-       COMMAND [ ! -d Release ] || install_name_tool -change QtGui.framework/Versions/4/QtGui @executable_path/QtGui Release/Seg3D2.app/Contents/MacOS/QtOpenGL
-       COMMAND [ ! -d Release ] || install_name_tool -change QtGui.framework/Versions/4/QtGui @executable_path/QtGui Release/Seg3D2.app/Contents/MacOS/Seg3D2
-       COMMAND [ ! -d Release ] || install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore Release/Seg3D2.app/Contents/MacOS/Seg3D2
-       COMMAND [ ! -d Release ] || install_name_tool -change QtOpenGL.framework/Versions/4/QtOpenGL @executable_path/QtOpenGL Release/Seg3D2.app/Contents/MacOS/Seg3D2
-       COMMAND [ ! -d Release ] || cp "-rf" "${QT_QTGUI_LIBRARY_RELEASE}/Versions/Current/Resources" "Release/Seg3D2.app/Contents"
-       COMMAND [ ! -d Release ] || [ -d Release/Seg3D2.app/Contents/MacOS/plugins ] || mkdir Release/Seg3D2.app/Contents/MacOS/plugins
-       COMMAND [ ! -d Release ] || cp -rf "${CMAKE_SOURCE_DIR}/CMake/qt.conf" Release/Seg3D2.app/Contents/Resources
+       COMMAND [ ! -d Release ] || cp -rf "${QT_QTCORE_LIBRARY_RELEASE}/Versions/4/QtCore" "Release/${APPLICATION_NAME}.app/Contents/MacOS/" 
+       COMMAND [ ! -d Release ] || cp -rf "${QT_QTGUI_LIBRARY_RELEASE}/Versions/4/QtGui" "Release/${APPLICATION_NAME}.app/Contents/MacOS/"
+       COMMAND [ ! -d Release ] || cp -rf "${QT_QTOPENGL_LIBRARY_RELEASE}/Versions/4/QtOpenGL" "Release/${APPLICATION_NAME}.app/Contents/MacOS/"
+       COMMAND [ ! -d Release ] || install_name_tool -id QtCore Release/${APPLICATION_NAME}.app/Contents/MacOS/QtCore
+       COMMAND [ ! -d Release ] || install_name_tool -id QtGui Release/${APPLICATION_NAME}.app/Contents/MacOS/QtGui
+       COMMAND [ ! -d Release ] || install_name_tool -id QtOpenGL Release/${APPLICATION_NAME}.app/Contents/MacOS/QtOpenGL
+       COMMAND [ ! -d Release ] || install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore Release/${APPLICATION_NAME}.app/Contents/MacOS/QtGui
+       COMMAND [ ! -d Release ] || install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore Release/${APPLICATION_NAME}.app/Contents/MacOS/QtOpenGL
+       COMMAND [ ! -d Release ] || install_name_tool -change QtGui.framework/Versions/4/QtGui @executable_path/QtGui Release/${APPLICATION_NAME}.app/Contents/MacOS/QtOpenGL
+       COMMAND [ ! -d Release ] || install_name_tool -change QtGui.framework/Versions/4/QtGui @executable_path/QtGui Release/${APPLICATION_NAME}.app/Contents/MacOS/${APPLICATION_NAME}
+       COMMAND [ ! -d Release ] || install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore Release/${APPLICATION_NAME}.app/Contents/MacOS/${APPLICATION_NAME}
+       COMMAND [ ! -d Release ] || install_name_tool -change QtOpenGL.framework/Versions/4/QtOpenGL @executable_path/QtOpenGL Release/${APPLICATION_NAME}.app/Contents/MacOS/${APPLICATION_NAME}
+       COMMAND [ ! -d Release ] || cp "-rf" "${QT_QTGUI_LIBRARY_RELEASE}/Versions/Current/Resources" "Release/${APPLICATION_NAME}.app/Contents"
+       COMMAND [ ! -d Release ] || [ -d Release/${APPLICATION_NAME}.app/Contents/MacOS/plugins ] || mkdir Release/${APPLICATION_NAME}.app/Contents/MacOS/plugins
+       COMMAND [ ! -d Release ] || cp -rf "${CMAKE_SOURCE_DIR}/CMake/qt.conf" Release/${APPLICATION_NAME}.app/Contents/Resources
 
        WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
   ELSE(${CMAKE_GENERATOR} MATCHES "Xcode")
-    ADD_CUSTOM_COMMAND(TARGET Seg3D2 
+    ADD_CUSTOM_COMMAND(TARGET ${APPLICATION_NAME} 
        POST_BUILD
-       COMMAND cp -rf "${QT_QTCORE_LIBRARY_RELEASE}/Versions/4/QtCore" "Seg3D2.app/Contents/MacOS/"
-       COMMAND cp -rf "${QT_QTGUI_LIBRARY_RELEASE}/Versions/4/QtGui" "Seg3D2.app/Contents/MacOS/"
-       COMMAND cp -rf "${QT_QTOPENGL_LIBRARY_RELEASE}/Versions/4/QtOpenGL" "Seg3D2.app/Contents/MacOS/"
-       COMMAND install_name_tool -id QtCore Seg3D2.app/Contents/MacOS/QtCore
-       COMMAND install_name_tool -id QtGui Seg3D2.app/Contents/MacOS/QtGui
-       COMMAND install_name_tool -id QtOpenGL Seg3D2.app/Contents/MacOS/QtOpenGL
-       COMMAND install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore Seg3D2.app/Contents/MacOS/QtGui
-       COMMAND install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore Seg3D2.app/Contents/MacOS/QtOpenGL
-       COMMAND install_name_tool -change QtGui.framework/Versions/4/QtGui @executable_path/QtGui Seg3D2.app/Contents/MacOS/QtOpenGL
-       COMMAND install_name_tool -change QtGui.framework/Versions/4/QtGui @executable_path/QtGui Seg3D2.app/Contents/MacOS/Seg3D2
-       COMMAND install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore Seg3D2.app/Contents/MacOS/Seg3D2
-       COMMAND install_name_tool -change QtOpenGL.framework/Versions/4/QtOpenGL @executable_path/QtOpenGL Seg3D2.app/Contents/MacOS/Seg3D2
-       COMMAND cp "-rf" "${QT_QTGUI_LIBRARY_RELEASE}/Versions/Current/Resources" "Seg3D2.app/Contents"
-       COMMAND [ -d Seg3D2.app/Contents/MacOS/plugins ] || mkdir Seg3D2.app/Contents/MacOS/plugins
-       COMMAND cp -rf "${CMAKE_SOURCE_DIR}/CMake/qt.conf" Seg3D2.app/Contents/Resources
+       COMMAND cp -rf "${QT_QTCORE_LIBRARY_RELEASE}/Versions/4/QtCore" "${APPLICATION_NAME}.app/Contents/MacOS/"
+       COMMAND cp -rf "${QT_QTGUI_LIBRARY_RELEASE}/Versions/4/QtGui" "${APPLICATION_NAME}.app/Contents/MacOS/"
+       COMMAND cp -rf "${QT_QTOPENGL_LIBRARY_RELEASE}/Versions/4/QtOpenGL" "${APPLICATION_NAME}.app/Contents/MacOS/"
+       COMMAND install_name_tool -id QtCore ${APPLICATION_NAME}.app/Contents/MacOS/QtCore
+       COMMAND install_name_tool -id QtGui ${APPLICATION_NAME}.app/Contents/MacOS/QtGui
+       COMMAND install_name_tool -id QtOpenGL ${APPLICATION_NAME}.app/Contents/MacOS/QtOpenGL
+       COMMAND install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore ${APPLICATION_NAME}.app/Contents/MacOS/QtGui
+       COMMAND install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore ${APPLICATION_NAME}.app/Contents/MacOS/QtOpenGL
+       COMMAND install_name_tool -change QtGui.framework/Versions/4/QtGui @executable_path/QtGui ${APPLICATION_NAME}.app/Contents/MacOS/QtOpenGL
+       COMMAND install_name_tool -change QtGui.framework/Versions/4/QtGui @executable_path/QtGui ${APPLICATION_NAME}.app/Contents/MacOS/${APPLICATION_NAME}
+       COMMAND install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore ${APPLICATION_NAME}.app/Contents/MacOS/${APPLICATION_NAME}
+       COMMAND install_name_tool -change QtOpenGL.framework/Versions/4/QtOpenGL @executable_path/QtOpenGL ${APPLICATION_NAME}.app/Contents/MacOS/${APPLICATION_NAME}
+       COMMAND cp "-rf" "${QT_QTGUI_LIBRARY_RELEASE}/Versions/Current/Resources" "${APPLICATION_NAME}.app/Contents"
+       COMMAND [ -d ${APPLICATION_NAME}.app/Contents/MacOS/plugins ] || mkdir ${APPLICATION_NAME}.app/Contents/MacOS/plugins
+       COMMAND cp -rf "${CMAKE_SOURCE_DIR}/CMake/qt.conf" ${APPLICATION_NAME}.app/Contents/Resources
 
        WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
@@ -169,7 +170,7 @@ IF(APPLE)
 ENDIF(APPLE)
 
 IF(APPLE)
-  INSTALL(TARGETS Seg3D2 
+  INSTALL(TARGETS ${APPLICATION_NAME} 
         RUNTIME DESTINATION .
         BUNDLE DESTINATION . )
 ELSE(APPLE)
@@ -178,7 +179,7 @@ ELSE(APPLE)
   GET_FILENAME_COMPONENT(QTOPENGLNAME ${QT_QTOPENGL_LIBRARY_RELEASE} NAME_WE)
   
   IF(WIN32)
-    INSTALL(TARGETS Seg3D2 
+    INSTALL(TARGETS ${APPLICATION_NAME} 
         RUNTIME DESTINATION bin )
 
     INSTALL(PROGRAMS 
@@ -192,7 +193,7 @@ ELSE(APPLE)
     DESTINATION bin )
     
   ELSE(WIN32)
-    INSTALL(TARGETS Seg3D2 
+    INSTALL(TARGETS ${APPLICATION_NAME} 
         RUNTIME DESTINATION bin )
     
     INSTALL(FILES 

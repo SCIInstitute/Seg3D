@@ -64,16 +64,16 @@ QWidget#group_header_{
 }
 
 QWidget#group_background_{
-  background-color: rgb(232, 145, 32);
+  background-color: rgb(237, 165, 76);
     border-radius: 3px;
-  border: 1px solid rgb(90, 90, 90);
+  border: 1px solid rgb(100, 100, 100);
 }
 
 QWidget#base_{
-  background-color: rgb( 90, 90, 90 );
+  background-color: rgb( 100, 100, 100 );
   border-radius:4px;
   border: 1px solid rgb(60, 60, 60);
-  color: rgb(90, 90, 90);
+  color: rgb(100, 100, 100);
 }
 
 QWidget#tools_and_layers_widget_{
@@ -95,7 +95,7 @@ QWidget#tools_and_layers_widget_{
        <number>0</number>
       </property>
       <property name="margin">
-       <number>2</number>
+       <number>1</number>
       </property>
       <item>
        <widget class="QWidget" name="group_background_" native="true">
@@ -315,19 +315,10 @@ QWidget#tools_and_layers_widget_{
            </property>
            <layout class="QVBoxLayout" name="group_frame_layout_">
             <property name="spacing">
-             <number>3</number>
+             <number>4</number>
             </property>
-            <property name="leftMargin">
+            <property name="margin">
              <number>1</number>
-            </property>
-            <property name="topMargin">
-             <number>2</number>
-            </property>
-            <property name="rightMargin">
-             <number>1</number>
-            </property>
-            <property name="bottomMargin">
-             <number>2</number>
             </property>
            </layout>
           </widget>

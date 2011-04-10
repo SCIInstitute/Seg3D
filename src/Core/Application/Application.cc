@@ -67,7 +67,7 @@ class ApplicationPrivate
 {
 public:
   boost::filesystem::path app_filepath_;
-  boost::filesystem::path app_filename_;
+  boost::filesystem::path app_filename_;  
   
   // NOTE:
   // OSX 10.5 or less has poor OpenGL support, hence we need to disable some features there
@@ -95,7 +95,7 @@ Application::Application() :
       if ( version < 10 )
       {
         this->private_->is_osx_10_5_or_less_ = true;
-      }
+}
     }
   }
 
@@ -422,6 +422,11 @@ std::string Application::GetReleaseName()
 std::string Application::GetApplicationNameAndVersion()
 {
   return GetApplicationName() + " " + GetReleaseName() + " " + GetVersion();
+}
+
+std::string Application::GetAbout()
+{
+  return CORE_APPLICATION_ABOUT;
 }
 
 

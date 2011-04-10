@@ -58,6 +58,7 @@ public:
   
 private:
   void update_tab_appearance( bool enabled, int index  );
+  void update_tool_appearance();
   void handle_feature_added( Core::TransferFunctionFeatureHandle feature );
   void handle_feature_deleted( Core::TransferFunctionFeatureHandle feature );
   void handle_volume_rendering_target_changed( std::string target_id );
@@ -74,6 +75,7 @@ private:
   typedef QPointer< RenderingDockWidget > qpointer_type;
 
   static void HandleClippingPlanesStateChanged( qpointer_type qpointer, bool state, int index );
+  static void HandleUpdateToolAppearance( qpointer_type qpointer );
   static void HandleFeatureAdded( qpointer_type qpointer, Core::TransferFunctionFeatureHandle feature );
   static void HandleFeatureDeleted( qpointer_type qpointer, Core::TransferFunctionFeatureHandle feature );
   static void HandleVolumeRenderingTargetChanged( qpointer_type qpointer, std::string target_id );

@@ -62,8 +62,7 @@ Q_OBJECT
 public:
   typedef QPointer< LayerImporterWidget > qpointer_type;
 
-  LayerImporterWidget( std::vector< LayerImporterHandle > importers, 
-    std::vector< std::string > files, QWidget *parent = 0, bool from_series = false );
+  LayerImporterWidget( std::vector< LayerImporterHandle > importers, QWidget *parent = 0 );
   virtual ~LayerImporterWidget();
     
 private Q_SLOTS:
@@ -79,23 +78,23 @@ private:
   // UPDATE_ICONS:
   // Update the icons to reflect active mode
   void setup_ui();
-
-  // SET_MODE:
-  // Set the mode of the importer
-  void set_mode( LayerImporterMode mode );
   
   // LIST_IMPORT_OPTIONS:
   // Prompt for the import options that are available
   void list_import_options();
-  
+
+  // SCAN_FIRST_FILE:
+  // Scan the first file
+  void scan_first_file();
+
 private:
   // The private information for rendering the widget
   LayerImporterWidgetPrivateHandle private_;
   
 private:  
-  // SCANFILE:
+  // SCANFIRSTFILE:
   // Function that needs to be run asynchronously to scan the file contents
-  static void ScanFile( qpointer_type qpointer, LayerImporterHandle importer ); 
+  static void ScanFirstFile( qpointer_type qpointer ); 
 
   // LIST_IMPORT_OPTIONS:
   // List the import options in the dialog
@@ -105,8 +104,6 @@ private:
   // Close the dialog and show an error dialog
   static void ReportImportError( qpointer_type qpointer, LayerImporterHandle importer );
   
-  // CENTER
-  void center_widget_on_screen( QWidget *widget );
 };
 
 } //endnamespace Seg3D

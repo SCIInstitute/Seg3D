@@ -116,7 +116,13 @@ bool  StateEngine::load_states( const StateIO& state_io )
     if ( it != this->private_->state_handler_map_.end() )
     {
       lock.unlock();
-      success &= ( *it ).second->load_states( state_io );
+      if ( ! ( *it ).second->load_states( state_io  ) )
+      {
+        success = false;
+        std::string error = std::string( "Could not load states for '" ) + statehandler_id +
+          "'.";
+        CORE_LOG_ERROR( error );
+      }
     }
   }
 

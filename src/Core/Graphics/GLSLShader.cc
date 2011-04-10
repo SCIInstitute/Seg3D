@@ -88,8 +88,8 @@ void GLSLShader::set_source( const std::string& source )
   if ( Core::Application::Instance()->is_osx_10_5_or_less() )
   {
     source_str += std::string( "#define DISABLE_CLIPPING\n" );
-  }
-  
+}
+
   source_str += source;
 
   const char* shader_str = source_str.c_str();

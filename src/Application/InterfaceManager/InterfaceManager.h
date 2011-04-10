@@ -79,6 +79,7 @@ public:
   Core::StateBoolHandle toolmanager_dockwidget_visibility_state_;
   Core::StateBoolHandle layermanager_dockwidget_visibility_state_;
   Core::StateBoolHandle rendering_dockwidget_visibility_state_;
+  Core::StateBoolHandle provenance_dockwidget_visibility_state_;
   Core::StateBoolHandle history_dockwidget_visibility_state_;
   
   // Other widget visibility state
@@ -87,6 +88,10 @@ public:
   Core::StateBoolHandle message_window_visibility_state_;
   Core::StateBoolHandle splash_screen_visibility_state_;
   Core::StateBoolHandle keyboard_shortcut_visibility_state_;
+  
+  //Options of what to show
+  Core::StateBoolHandle enable_controller_state_;
+  Core::StateBoolHandle enable_tool_help_state_;
   
 private:
   // INITIALIZE_STATES:

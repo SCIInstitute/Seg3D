@@ -53,6 +53,8 @@ public:
 
   void enable();
   void disable();
+  void safe_bind();
+  void safe_unbind();
 
   void attach_texture( TextureHandle texture, unsigned int attachment = 
     GL_COLOR_ATTACHMENT0_EXT, int level = 0, int layer = 0 );
@@ -61,10 +63,6 @@ public:
   bool check_status( GLenum* status = NULL );
 
 private:
-
-  void safe_bind();
-  void safe_unbind();
-
   unsigned int id_;
   int saved_id_;
 

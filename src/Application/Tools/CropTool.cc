@@ -88,7 +88,7 @@ void CropToolPrivate::handle_target_group_changed()
 
   Core::ScopedCounter signal_block( this->signal_block_count_ );
 
-  LayerGroupHandle layer_group = LayerManager::Instance()->get_layer_group( group_id );
+  LayerGroupHandle layer_group = LayerManager::Instance()->get_group_by_id( group_id );
   const Core::GridTransform& grid_trans = layer_group->get_grid_transform();
   int nx = static_cast< int >( grid_trans.get_nx() );
   int ny = static_cast< int >( grid_trans.get_ny() );
@@ -144,7 +144,7 @@ void CropToolPrivate::handle_cropbox_origin_changed( int index, double value,
   {
     return;
   }
-
+  
   // NOTE: Lock the state engine because the following changes need to be atomic
   Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
 
@@ -154,7 +154,7 @@ void CropToolPrivate::handle_cropbox_origin_changed( int index, double value,
     return;
   }
 
-  LayerGroupHandle layer_group = LayerManager::Instance()->get_layer_group( group_id );
+  LayerGroupHandle layer_group = LayerManager::Instance()->get_group_by_id( group_id );
   const Core::GridTransform& grid_trans = layer_group->get_grid_transform();
   Core::Transform inv_trans = grid_trans.get_inverse();
   Core::Point origin( 0, 0, 0 );
@@ -198,7 +198,7 @@ void CropToolPrivate::handle_cropbox_size_changed( int index, double value )
     return;
   }
 
-  LayerGroupHandle layer_group = LayerManager::Instance()->get_layer_group( group_id );
+  LayerGroupHandle layer_group = LayerManager::Instance()->get_group_by_id( group_id );
   const Core::GridTransform& grid_trans = layer_group->get_grid_transform();
   Core::Transform inv_trans = grid_trans.get_inverse();
   Core::Point end( 0, 0, 0 );
@@ -223,7 +223,7 @@ void CropToolPrivate::handle_cropbox_origin_index_changed( int index, int value 
     return;
   }
 
-  LayerGroupHandle layer_group = LayerManager::Instance()->get_layer_group( group_id );
+  LayerGroupHandle layer_group = LayerManager::Instance()->get_group_by_id( group_id );
   const Core::GridTransform& grid_trans = layer_group->get_grid_transform();
   Core::Point origin( 0, 0, 0 );
   origin[ index ] = value;
@@ -254,7 +254,7 @@ void CropToolPrivate::handle_cropbox_size_index_changed( int index, int value )
     return;
   }
 
-  LayerGroupHandle layer_group = LayerManager::Instance()->get_layer_group( group_id );
+  LayerGroupHandle layer_group = LayerManager::Instance()->get_group_by_id( group_id );
   const Core::GridTransform& grid_trans = layer_group->get_grid_transform();
   Core::Point end( 0, 0, 0 );
   end[ index ] = this->tool_->cropbox_origin_index_state_[ index ]->get() + value - 1;

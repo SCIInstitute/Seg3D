@@ -52,7 +52,7 @@ Q_SIGNALS:
   
 // -- constructor/destructor --
 public:
-    QtSliderDoubleCombo( QWidget* parent = 0, bool edit_range = false );
+  QtSliderDoubleCombo( QWidget* parent = 0 );
     virtual ~QtSliderDoubleCombo();
     
 public Q_SLOTS:
@@ -62,23 +62,25 @@ public Q_SLOTS:
 
 public:
   double get_value(){ return value_; }
+  void set_description( std::string description );
+  void connect_min( QtSliderDoubleCombo* min );
+  void connect_max( QtSliderDoubleCombo* max );
     
 // -- widget internals -- 
 private:
+    double value_;
     QtSliderDoubleComboPrivateHandle private_;
     
 private Q_SLOTS:
-    void edit_ranges( bool edit );
     void change_min( double new_min );
     void change_max( double new_max );
-    void double_range();
-    void half_range();
-    void slider_signal( int value );
+    void slider_signal( int percentage );
     void spinner_signal( double value );
+  void handle_min_signal( double value );
+  void handle_max_signal( double value );
 
 private:
     void block_signals( bool block );    
-    double value_;
   
 };
 

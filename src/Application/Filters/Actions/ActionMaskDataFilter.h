@@ -29,14 +29,18 @@
 #ifndef APPLICATION_FILTERS_ACTIONS_ACTIONMASKDATAFILTER_H
 #define APPLICATION_FILTERS_ACTIONS_ACTIONMASKDATAFILTER_H
 
+// Core includes
 #include <Core/Action/Actions.h>
 #include <Core/Interface/Interface.h>
+
+// Application includes
 #include <Application/Layer/Layer.h>
+#include <Application/LayerManager/LayerAction.h>
 
 namespace Seg3D
 {
 
-class ActionMaskDataFilter : public Core::Action
+class ActionMaskDataFilter : public LayerAction
 {
 
 CORE_ACTION( 
@@ -54,18 +58,11 @@ CORE_ACTION(
 public:
   ActionMaskDataFilter()
   {
-    // Action arguments
-    this->add_argument( this->target_layer_ );
-    this->add_argument( this->mask_layer_ );
-
-    // Action options
-    this->add_key( this->replace_ );    
-    this->add_key( this->invert_mask_ );
-    this->add_key( this->replace_with_ );
-  }
-  
-  virtual ~ActionMaskDataFilter()
-  {
+    this->add_layer_id( this->target_layer_ );
+    this->add_layer_id( this->mask_layer_ );
+    this->add_parameter( this->replace_ );
+    this->add_parameter( this->invert_mask_ );
+    this->add_parameter( this->replace_with_ );
   }
   
   // -- Functions that describe action --
@@ -76,11 +73,11 @@ public:
   // -- Action parameters --
 private:
 
-  Core::ActionParameter< std::string > target_layer_;
-  Core::ActionParameter< std::string > mask_layer_;
-  Core::ActionParameter< bool > replace_;
-  Core::ActionParameter< bool > invert_mask_;
-  Core::ActionParameter< std::string > replace_with_;
+  std::string target_layer_;
+  std::string mask_layer_;
+  bool replace_;
+  bool invert_mask_;
+  std::string replace_with_;
   
   // -- Dispatch this action from the interface --
 public:

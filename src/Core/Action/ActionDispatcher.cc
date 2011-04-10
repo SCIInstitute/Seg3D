@@ -181,13 +181,30 @@ bool ActionDispatcher::is_busy()
 
 void ActionDispatcher::run_action( ActionHandle action, ActionContextHandle action_context )
 {
-  // Step (1): An action needs to be validated before it can be executed.
+  // Step (1): Some actions require a translation before they can be validated
+  // The first step is calling the translation function.
+  // NOTE: if translation fails the action is not executed.
+  if ( !( action->translate( action_context ) ) )
+  {
+    // The action context should return unavailable or invalid
+    if ( action_context->status() != ActionStatus::UNAVAILABLE_E )
+    {
+      action_context->report_status( ActionStatus::INVALID_E );
+    }
+    action_context->report_done();
+
+    // Clear any cached handles
+    action->clear_cache();
+    return; 
+  }
+  
+  // Step (2): An action needs to be validated before it can be executed.
   // The validation is a separate step as invalid actions should not be
   // posted to the observers that record what the program does.
 
   if ( !( action->validate( action_context ) ) )
   {
-    // The action  context should return unavailable or invalid
+    // The action context should return unavailable or invalid
     if ( action_context->status() != ActionStatus::UNAVAILABLE_E )
     {
       action_context->report_status( ActionStatus::INVALID_E );
@@ -202,10 +219,10 @@ void ActionDispatcher::run_action( ActionHandle action, ActionContextHandle acti
   // NOTE: Observers that connect to this signal should not change the state of
   // the program as that may invalidate actions that were just run.
 
-  // Step (2): Tell observers what action has been executed
+  // Step (3): Tell observers what action has been executed
   pre_action_signal_( action );
 
-  // Step (3): Run action from the context that was provided. And if the action
+  // Step (4): Run action from the context that was provided. And if the action
   // was synchronous a done signal is triggered in the context, to inform the
   // program whether the action succeeded.
 
@@ -221,7 +238,7 @@ void ActionDispatcher::run_action( ActionHandle action, ActionContextHandle acti
     return;
   }
 
-  // Step (4): Set the action result if any was returned.
+  // Step (5): Set the action result if any was returned.
 
   if ( result.get() )
   {
@@ -237,7 +254,7 @@ void ActionDispatcher::run_action( ActionHandle action, ActionContextHandle acti
   // NOTE: Observers that connect to this signal should not change the state of
   // the program as that may invalidate actions that were just run.
 
-  // Step (5): Tell observers what action has been executed
+  // Step (6): Tell observers what action has been executed
   post_action_signal_( action, result );
 
   return;

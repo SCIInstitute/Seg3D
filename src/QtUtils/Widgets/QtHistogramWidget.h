@@ -38,11 +38,11 @@
 //Qt includes
 #include <QWidget>
 
-// QtUtils includes
-#include <QtUtils/Widgets/QtSliderDoubleCombo.h>
-
 // Core includes
 #include <Core/DataBlock/Histogram.h>
+
+// QtUtils includes
+#include <QtUtils/Widgets/QtSliderDoubleCombo.h>
 
 namespace QtUtils
 {
@@ -76,6 +76,8 @@ public Q_SLOTS:
   double get_histogram_min();
   double get_histogram_max();
 
+  void set_bars_enabled( bool enabled );
+
   // RESET_HISTOGRAM:
   // Invalidate the current histogram
   void reset_histogram();
@@ -84,6 +86,8 @@ public:
   virtual void mousePressEvent( QMouseEvent* e );
 
   virtual void mouseMoveEvent( QMouseEvent* e );
+
+  virtual void resizeEvent( QResizeEvent* e );
 
   void set_thresholds( QtSliderDoubleCombo* upper_threshold, 
     QtSliderDoubleCombo* lower_threshold );
@@ -96,10 +100,7 @@ private Q_SLOTS:
 
 private:
   QtHistogramWidgetPrivateHandle private_;
-  QtUtils::QtSliderDoubleCombo *upper_threshold_;
-  QtUtils::QtSliderDoubleCombo *lower_threshold_;
-  QWidget* min_bar_;
-  QWidget* max_bar_;
+  
 };
 
 } // end namespace Seg3D

@@ -97,6 +97,12 @@ bool ResampleToolInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Connect( this->private_->ui_.output_x_, tool->output_dimensions_state_[ 0 ] );
   QtUtils::QtBridge::Connect( this->private_->ui_.output_y_, tool->output_dimensions_state_[ 1 ] );
   QtUtils::QtBridge::Connect( this->private_->ui_.output_z_, tool->output_dimensions_state_[ 2 ] );
+  
+  this->private_->ui_.output_x_->set_description( "X" );
+  this->private_->ui_.output_y_->set_description( "Y" );
+  this->private_->ui_.output_z_->set_description( "Z" );
+  this->private_->ui_.scale_->set_description( "Scale" );
+  
 
   QtUtils::QtBridge::Connect( this->private_->ui_.aspect_checkbox_, tool->constraint_aspect_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.scale_, tool->scale_state_ );

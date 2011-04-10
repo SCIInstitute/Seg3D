@@ -55,10 +55,10 @@ bool SliceShader::get_vertex_shader_source( std::string& source )
   };
   source = std::string( VERT_SHADER_SOURCE_C );
   return true;
-}
+  }
 
 bool SliceShader::get_fragment_shader_source( std::string& source )
-{
+  {
   const char FRAG_SHADER_SOURCE_C[] =
   {
 #include "SliceShader_frag"

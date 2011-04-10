@@ -29,14 +29,18 @@
 #ifndef APPLICATION_FILTERS_ACTIONS_ACTIONHISTOGRAMEQUALIZATIONFILTER_H
 #define APPLICATION_FILTERS_ACTIONS_ACTIONHISTOGRAMEQUALIZATIONFILTER_H
 
+// Core includes
 #include <Core/Action/Actions.h>
 #include <Core/Interface/Interface.h>
+
+// Application includes
 #include <Application/Layer/Layer.h>
+#include <Application/LayerManager/LayerAction.h>
 
 namespace Seg3D
 {
 
-class ActionHistogramEqualizationFilter : public Core::Action
+class ActionHistogramEqualizationFilter : public LayerAction
 {
 
 CORE_ACTION( 
@@ -55,17 +59,11 @@ public:
   ActionHistogramEqualizationFilter()
   {
     // Action arguments
-    this->add_argument( this->target_layer_ );
-    
-    // Action options
-    this->add_key( this->replace_ );    
-    this->add_key( this->amount_ );
-    this->add_key( this->bins_ );
-    this->add_key( this->ignore_bins_ );
-  }
-  
-  virtual ~ActionHistogramEqualizationFilter()
-  {
+    this->add_layer_id( this->target_layer_ );
+    this->add_parameter( this->replace_ );
+    this->add_parameter( this->amount_ );
+    this->add_parameter( this->bins_ );
+    this->add_parameter( this->ignore_bins_ );
   }
   
   // -- Functions that describe action --
@@ -76,12 +74,12 @@ public:
   // -- Action parameters --
 private:
 
-  Core::ActionParameter< std::string > target_layer_;
+  std::string target_layer_;
 
-  Core::ActionParameter< bool > replace_; 
-  Core::ActionParameter< double > amount_;
-  Core::ActionParameter< int > bins_;
-  Core::ActionParameter< int > ignore_bins_;
+  bool replace_;  
+  double amount_;
+  int bins_;
+  int ignore_bins_;
   
   // -- Dispatch this action from the interface --
 public:

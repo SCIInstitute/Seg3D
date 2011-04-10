@@ -46,8 +46,11 @@ CORE_ACTION_ARGUMENT("value","The offset that needs to be added.")
 )
 
 public:
-  ActionOffset();
-  virtual ~ActionOffset();
+  ActionOffset()
+  {
+    this->add_parameter( this->stateid_ );
+    this->add_parameter( this->offset_value_ );
+  }
 
   // -- Functions that describe action --
   virtual bool validate( ActionContextHandle& context );
@@ -57,39 +60,25 @@ public:
   virtual bool changes_project_data();
 
 private:
-  ActionParameter< std::string > stateid_;
-  ActionParameterVariant offset_value_;
+  std::string stateid_;
+  Variant offset_value_;
 
   StateRangedValueBaseWeakHandle state_weak_handle_;
 
 public:
   template< class T >
-  static ActionHandle Create( const typename StateRangedValue< T >::handle_type& state, 
-    const T& offset );
-
-  template< class T >
   static void Dispatch( ActionContextHandle context,  
-    const typename StateRangedValue< T >::handle_type& state, const T& offset );
+    const typename StateRangedValue< T >::handle_type& state, const T& offset )
+  {
+    ActionOffset* action = new ActionOffset;
+    action->stateid_ = state->get_stateid();
+    action->offset_value_.set( offset );
+    action->state_weak_handle_ = state;
+
+    ActionDispatcher::PostAction( ActionHandle( action ), context );
+  }
+
 };
-
-template< class T >
-ActionHandle ActionOffset::Create( const typename StateRangedValue< T >::handle_type& state, 
-                  const T& offset )
-{
-  ActionOffset* action = new ActionOffset;
-  action->stateid_.value() = state->get_stateid();
-  action->offset_value_.set_value( offset );
-  action->state_weak_handle_ = state;
-
-  return ActionHandle( action );
-}
-
-template< class T >
-void ActionOffset::Dispatch( ActionContextHandle context, 
-  const typename StateRangedValue< T >::handle_type& state, const T& offset )
-{
-  ActionDispatcher::PostAction( Create( state, offset ), context );
-}
 
 } // end namespace Core
 

@@ -29,14 +29,18 @@
 #ifndef APPLICATION_FILTERS_ACTIONS_ACTIONDISTANCEFILTER_H
 #define APPLICATION_FILTERS_ACTIONS_ACTIONDISTANCEFILTER_H
 
+// Core includes
 #include <Core/Action/Actions.h>
 #include <Core/Interface/Interface.h>
+
+// Application includes
 #include <Application/Layer/Layer.h>
+#include <Application/LayerManager/LayerAction.h>
 
 namespace Seg3D
 {
   
-class ActionDistanceFilter : public Core::Action
+class ActionDistanceFilter : public LayerAction
 {
 
 CORE_ACTION( 
@@ -54,16 +58,9 @@ CORE_ACTION(
 public:
   ActionDistanceFilter()
   {
-    // Action arguments
-    this->add_argument( this->target_layer_ );
-    
-    // Action options
-    this->add_key( this->use_index_space_ );
-    this->add_key( this->inside_positive_ );
-  }
-  
-  virtual ~ActionDistanceFilter()
-  {
+    this->add_layer_id( this->target_layer_ );
+    this->add_parameter( this->use_index_space_ );
+    this->add_parameter( this->inside_positive_ );
   }
   
   // -- Functions that describe action --
@@ -74,17 +71,12 @@ public:
   // -- Action parameters --
 private:
 
-  Core::ActionParameter< std::string > target_layer_;
-  Core::ActionParameter< bool > use_index_space_;
-  Core::ActionParameter< bool > inside_positive_;
+  std::string target_layer_;
+  bool use_index_space_;
+  bool inside_positive_;
     
   // -- Dispatch this action from the interface --
 public:
-
-  // CREATE:  
-  // Create the action, but do not dispatch it
-  static Core::ActionHandle Create( std::string layer_id, bool replace );
-    
   // DISPATCH
   // Create and dispatch action that inserts the new layer 
   static void Dispatch( Core::ActionContextHandle context, std::string target_layer,

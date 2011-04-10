@@ -96,9 +96,12 @@ void ThresholdToolPrivate::handle_target_layer_changed()
       LayerManager::Instance()->get_layer_by_id( target_layer_id ) );
     double min_val = data_layer->get_data_volume()->get_data_block()->get_min();
     double max_val = data_layer->get_data_volume()->get_data_block()->get_max();
-    double epsilon = ( max_val - min_val ) * 0.005;
-    min_val -= epsilon;
-    max_val += epsilon;
+
+    //TODO: We need to fix this.  This causes an inconsistency in the threshold tool between 
+    // the histogram and the sliders 
+//    double epsilon = ( max_val - min_val ) * 0.005;
+//    min_val -= epsilon;
+//    max_val += epsilon;
     this->tool_->lower_threshold_state_->set_range( min_val, max_val );
     this->tool_->upper_threshold_state_->set_range( min_val, max_val );
 

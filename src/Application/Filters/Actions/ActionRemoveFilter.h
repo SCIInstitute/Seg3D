@@ -29,14 +29,18 @@
 #ifndef APPLICATION_FILTERS_ACTIONS_ACTIONREMOVEFILTER_H
 #define APPLICATION_FILTERS_ACTIONS_ACTIONREMOVEFILTER_H
 
+// Core includes
 #include <Core/Action/Actions.h>
 #include <Core/Interface/Interface.h>
+
+// Application includes
 #include <Application/Layer/Layer.h>
+#include <Application/LayerManager/LayerAction.h>
 
 namespace Seg3D
 {
 
-class ActionRemoveFilter : public Core::Action
+class ActionRemoveFilter : public LayerAction
 {
 
 CORE_ACTION( 
@@ -53,15 +57,9 @@ public:
   ActionRemoveFilter()
   {
     // Action arguments
-    this->add_argument( this->target_layer_ );
-    this->add_argument( this->mask_layer_ );
-
-    // Action options
-    this->add_key( this->replace_ );    
-  }
-  
-  virtual ~ActionRemoveFilter()
-  {
+    this->add_layer_id( this->target_layer_ );
+    this->add_layer_id( this->mask_layer_ );
+    this->add_parameter( this->replace_ );    
   }
   
   // -- Functions that describe action --
@@ -72,9 +70,9 @@ public:
   // -- Action parameters --
 private:
 
-  Core::ActionParameter< std::string > target_layer_;
-  Core::ActionParameter< std::string > mask_layer_;
-  Core::ActionParameter< bool > replace_;
+  std::string target_layer_;
+  std::string mask_layer_;
+  bool replace_;
   
   // -- Dispatch this action from the interface --
 public:

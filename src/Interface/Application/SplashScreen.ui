@@ -2,9 +2,6 @@
 <ui version="4.0">
  <class>SplashScreen</class>
  <widget class="QDialog" name="SplashScreen">
-  <property name="windowModality">
-   <enum>Qt::ApplicationModal</enum>
-  </property>
   <property name="enabled">
    <bool>true</bool>
   </property>
@@ -12,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1030</width>
+    <width>1036</width>
     <height>479</height>
    </rect>
   </property>
@@ -21,18 +18,6 @@
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
-  </property>
-  <property name="minimumSize">
-   <size>
-    <width>1030</width>
-    <height>479</height>
-   </size>
-  </property>
-  <property name="maximumSize">
-   <size>
-    <width>1030</width>
-    <height>479</height>
-   </size>
   </property>
   <property name="font">
    <font>
@@ -50,6 +35,8 @@
    <string notr="true">QDialog#SplashScreen {
   background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(221, 221, 221, 255), stop:0.155779 rgba(228, 228, 228, 255), stop:1 rgba(202, 204, 204, 255));
 }
+
+SplashScreen#splashscreen{ background-color: none; }
 
 QPushButton{
   background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(221, 221, 221, 255), stop:0.155779 rgba(238, 238, 238, 255), stop:1 rgba(192, 194, 194, 255));
@@ -73,7 +60,11 @@ QPushButton:pressed{
 }
 
 QPushButton#quit_seg3d_button_{
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(195, 195, 195, 255), stop:0.497512 rgba(165, 165, 165, 255), stop:1 rgba(150, 150, 150, 255));
+  /*background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(195, 195, 195, 255), stop:0.497512 rgba(165, 165, 165, 255), stop:1 rgba(150, 150, 150, 255));*/
+
+  
+  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(98, 0, 0, 255), stop:0.299435 rgba(128, 0, 0, 255), stop:0.491525 rgba(128, 0, 0, 255), stop:1 rgba(98, 0, 0, 255));
+
   border-radius: 4px;
   border: 1px solid rgb(90, 90, 90);
   margin:4px;
@@ -81,7 +72,8 @@ QPushButton#quit_seg3d_button_{
 }
 
 QPushButton#quit_seg3d_button_:hover{
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(155, 155, 155, 255), stop:0.497512 rgba(115, 115, 115, 255), stop:1 rgba(90, 90, 90, 255));
+  /*background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(155, 155, 155, 255), stop:0.497512 rgba(115, 115, 115, 255), stop:1 rgba(90, 90, 90, 255));*/
+  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(80, 0, 0, 255), stop:0.299435 rgba(110, 0, 0, 255), stop:0.491525 rgba(110, 0, 0, 255), stop:1 rgba(80, 0, 0, 255));
   border-radius: 4px;
   border: 1px solid rgb(90, 90, 90);
   margin:4px;
@@ -89,12 +81,33 @@ QPushButton#quit_seg3d_button_:hover{
 }
 
 QPushButton#quit_seg3d_button_:pressed{
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(80, 80, 80, 255), stop:0.497512 rgba(50, 50, 50, 255), stop:1 rgba(55, 55, 55, 255));
+  /*background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(80, 80, 80, 255), stop:0.497512 rgba(50, 50, 50, 255), stop:1 rgba(55, 55, 55, 255));*/
+  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(50, 0, 0, 255), stop:0.299435 rgba(80, 0, 0, 255), stop:0.491525 rgba(80, 0, 0, 255), stop:1 rgba(50, 0, 0, 255));
+
   border-radius: 4px;
   border: 1px solid rgb(90, 90, 90);
   margin:4px;
 }
-</string>
+QWidget#image_widget_{
+  background-color:  rgb(90, 90, 90);
+}
+
+QGroupBox#groupBox{
+  /*background-color: rgb( 221, 221, 221 );*/
+  color: rgb(50, 50, 50);
+}
+
+QWidget#base_{
+  background-color: rgb(90,90,90);
+}
+
+QWidget#widget{
+  border-top: 1px solid rgb(90, 90, 90);
+  border-right:  1px solid rgb(90, 90, 90);
+  border-bottom:  1px solid rgb(90, 90, 90);
+  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgb(190, 190, 190), stop:0.25 rgb(200, 200, 200), stop:0.520599 rgb(205, 205, 205), stop:1 rgb(185, 185, 185));
+  
+}</string>
   </property>
   <property name="sizeGripEnabled">
    <bool>false</bool>
@@ -102,102 +115,44 @@ QPushButton#quit_seg3d_button_:pressed{
   <property name="modal">
    <bool>true</bool>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout">
+  <layout class="QHBoxLayout" name="horizontalLayout_6">
    <property name="spacing">
     <number>0</number>
    </property>
-   <property name="leftMargin">
-    <number>2</number>
-   </property>
-   <property name="topMargin">
-    <number>3</number>
-   </property>
-   <property name="rightMargin">
-    <number>2</number>
-   </property>
-   <property name="bottomMargin">
-    <number>2</number>
+   <property name="margin">
+    <number>0</number>
    </property>
    <item>
-    <widget class="QLabel" name="splash_image_">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>758</width>
-       <height>474</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>758</width>
-       <height>474</height>
-      </size>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="pixmap">
-      <pixmap resource="../../Resources/QtResources.qrc">:/Images/Seg3DSplash.png</pixmap>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QWidget" name="widget" native="true">
-     <layout class="QVBoxLayout" name="verticalLayout_2">
+    <widget class="QWidget" name="base_" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout_7">
       <property name="spacing">
        <number>0</number>
       </property>
-      <property name="leftMargin">
-       <number>4</number>
-      </property>
-      <property name="topMargin">
-       <number>0</number>
-      </property>
-      <property name="rightMargin">
-       <number>4</number>
-      </property>
-      <property name="bottomMargin">
-       <number>0</number>
+      <property name="margin">
+       <number>2</number>
       </property>
       <item>
-       <widget class="QWidget" name="widget_3" native="true">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>38</height>
-         </size>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout_3">
+       <widget class="QWidget" name="image_widget_" native="true">
+        <layout class="QHBoxLayout" name="horizontalLayout">
          <property name="spacing">
           <number>0</number>
          </property>
          <property name="margin">
-          <number>2</number>
+          <number>1</number>
          </property>
          <item>
-          <widget class="QPushButton" name="quit_seg3d_button_">
+          <widget class="QLabel" name="splash_image_">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
            <property name="text">
-            <string>Quit Seg3D</string>
+            <string/>
            </property>
-           <property name="autoDefault">
-            <bool>false</bool>
+           <property name="pixmap">
+            <pixmap resource="../../Resources/QtResources.qrc">:/Images/Seg3DSplash.png</pixmap>
            </property>
           </widget>
          </item>
@@ -205,80 +160,193 @@ QPushButton#quit_seg3d_button_:pressed{
        </widget>
       </item>
       <item>
-       <widget class="QGroupBox" name="groupBox">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="title">
-         <string>Recent Projects:</string>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout">
+       <widget class="QWidget" name="widget" native="true">
+        <layout class="QVBoxLayout" name="verticalLayout_2">
          <property name="spacing">
-          <number>2</number>
+          <number>0</number>
          </property>
          <property name="leftMargin">
-          <number>1</number>
+          <number>4</number>
          </property>
          <property name="topMargin">
-          <number>2</number>
+          <number>0</number>
          </property>
          <property name="rightMargin">
-          <number>1</number>
+          <number>4</number>
          </property>
          <property name="bottomMargin">
           <number>0</number>
          </property>
          <item>
-          <widget class="QListWidget" name="recent_project_listwidget_">
+          <widget class="QWidget" name="widget_3" native="true">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
-           <property name="focusPolicy">
-            <enum>Qt::ClickFocus</enum>
-           </property>
-           <property name="horizontalScrollBarPolicy">
-            <enum>Qt::ScrollBarAlwaysOff</enum>
-           </property>
-           <property name="editTriggers">
-            <set>QAbstractItemView::NoEditTriggers</set>
-           </property>
-           <property name="showDropIndicator" stdset="0">
-            <bool>false</bool>
-           </property>
-           <property name="alternatingRowColors">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QWidget" name="widget_5" native="true">
            <property name="minimumSize">
             <size>
              <width>0</width>
              <height>38</height>
             </size>
            </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>38</height>
-            </size>
-           </property>
-           <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <layout class="QVBoxLayout" name="verticalLayout_3">
             <property name="spacing">
              <number>0</number>
             </property>
             <property name="margin">
+             <number>2</number>
+            </property>
+            <item>
+             <widget class="QPushButton" name="quit_seg3d_button_">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Quit</string>
+              </property>
+              <property name="autoDefault">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="groupBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="title">
+            <string>Recent Projects:</string>
+           </property>
+           <property name="flat">
+            <bool>true</bool>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout">
+            <property name="spacing">
+             <number>2</number>
+            </property>
+            <property name="leftMargin">
+             <number>1</number>
+            </property>
+            <property name="topMargin">
+             <number>2</number>
+            </property>
+            <property name="rightMargin">
+             <number>1</number>
+            </property>
+            <property name="bottomMargin">
              <number>0</number>
             </property>
             <item>
-             <widget class="QPushButton" name="load_recent_button_">
+             <widget class="QListWidget" name="recent_project_listwidget_">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="focusPolicy">
+               <enum>Qt::ClickFocus</enum>
+              </property>
+              <property name="horizontalScrollBarPolicy">
+               <enum>Qt::ScrollBarAlwaysOff</enum>
+              </property>
+              <property name="editTriggers">
+               <set>QAbstractItemView::NoEditTriggers</set>
+              </property>
+              <property name="showDropIndicator" stdset="0">
+               <bool>false</bool>
+              </property>
+              <property name="alternatingRowColors">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QWidget" name="widget_5" native="true">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>38</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>38</height>
+               </size>
+              </property>
+              <layout class="QHBoxLayout" name="horizontalLayout_3">
+               <property name="spacing">
+                <number>0</number>
+               </property>
+               <property name="margin">
+                <number>2</number>
+               </property>
+               <item>
+                <widget class="QPushButton" name="load_recent_button_">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>50</height>
+                  </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::NoFocus</enum>
+                 </property>
+                 <property name="text">
+                  <string>Load Recent Project</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QWidget" name="widget_4" native="true">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>38</height>
+            </size>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="leftMargin">
+             <number>2</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>2</number>
+            </property>
+            <property name="bottomMargin">
+             <number>2</number>
+            </property>
+            <item>
+             <widget class="QPushButton" name="existing_project_button_">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                 <horstretch>0</horstretch>
@@ -291,117 +359,95 @@ QPushButton#quit_seg3d_button_:pressed{
                 <height>50</height>
                </size>
               </property>
-              <property name="focusPolicy">
-               <enum>Qt::NoFocus</enum>
-              </property>
               <property name="text">
-               <string>Load Recent Project</string>
+               <string>Open Existing Project</string>
               </property>
              </widget>
             </item>
            </layout>
           </widget>
          </item>
-        </layout>
-       </widget>
-      </item>
-      <item>
-       <widget class="QWidget" name="widget_4" native="true">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>38</height>
-         </size>
-        </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
-         <property name="spacing">
-          <number>0</number>
-         </property>
-         <property name="margin">
-          <number>0</number>
-         </property>
          <item>
-          <widget class="QPushButton" name="existing_project_button_">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="maximumSize">
+          <widget class="QWidget" name="widget_6" native="true">
+           <property name="minimumSize">
             <size>
-             <width>16777215</width>
-             <height>50</height>
+             <width>0</width>
+             <height>38</height>
             </size>
            </property>
-           <property name="text">
-            <string>Open Existing Project</string>
-           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="leftMargin">
+             <number>2</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>2</number>
+            </property>
+            <property name="bottomMargin">
+             <number>2</number>
+            </property>
+            <item>
+             <widget class="QPushButton" name="new_project_button_">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Start New Project</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </widget>
          </item>
-        </layout>
-       </widget>
-      </item>
-      <item>
-       <widget class="QWidget" name="widget_6" native="true">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>38</height>
-         </size>
-        </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_4">
-         <property name="spacing">
-          <number>0</number>
-         </property>
-         <property name="margin">
-          <number>0</number>
-         </property>
          <item>
-          <widget class="QPushButton" name="new_project_button_">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
+          <widget class="QWidget" name="widget_7" native="true">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>38</height>
+            </size>
            </property>
-           <property name="text">
-            <string>Start New Project</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item>
-       <widget class="QWidget" name="widget_7" native="true">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>38</height>
-         </size>
-        </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_5">
-         <property name="spacing">
-          <number>0</number>
-         </property>
-         <property name="margin">
-          <number>0</number>
-         </property>
-         <item>
-          <widget class="QPushButton" name="quick_open_button_">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="toolTip">
-            <string>Click to open a data file without starting a project</string>
-           </property>
-           <property name="text">
-            <string>Quick Open File</string>
-           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_5">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="leftMargin">
+             <number>2</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>2</number>
+            </property>
+            <property name="bottomMargin">
+             <number>2</number>
+            </property>
+            <item>
+             <widget class="QPushButton" name="quick_open_button_">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip">
+               <string>Click to open a data file without starting a project</string>
+              </property>
+              <property name="text">
+               <string>Quick Open File</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </widget>
          </item>
         </layout>
@@ -413,6 +459,10 @@ QPushButton#quit_seg3d_button_:pressed{
   </layout>
  </widget>
  <resources>
+  <include location="../../Resources/QtResources.qrc"/>
+  <include location="../../Resources/QtResources.qrc"/>
+  <include location="../../Resources/QtResources.qrc"/>
+  <include location="../../Resources/QtResources.qrc"/>
   <include location="../../Resources/QtResources.qrc"/>
   <include location="../../Resources/QtResources.qrc"/>
   <include location="../../Resources/QtResources.qrc"/>

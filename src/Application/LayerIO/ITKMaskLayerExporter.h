@@ -54,7 +54,7 @@ namespace Seg3D
 
 class ITKMaskLayerExporter : public LayerExporter
 {
-  SCI_EXPORTER_TYPE( "ITK Mask Exporter", ".tiff;.bmp;.png" )
+  SEG3D_EXPORTER_TYPE( "ITK Mask Exporter", ".tiff;.bmp;.png" )
 
   // -- Constructor/Destructor --
 public:
@@ -68,18 +68,6 @@ public:
 
   // -- Import a file information --
 public:
-  // GET_GRID_TRANSFORM:
-  // Get the grid transform of the grid that we are exporting
-  virtual Core::GridTransform get_grid_transform();
-
-  // GET_DATA_TYPE:
-  // Get the type of data that is being exported
-  virtual Core::DataType get_data_type();
-
-  // GET_IMPORTER_MODES
-  // Get then supported exporter modes
-  virtual int get_exporter_modes();
-  
   virtual void set_extension( std::string extension ){ this->extension_ = extension; }
   
   // --Import the data as a specific type --  
@@ -87,7 +75,7 @@ public:
 
   // EXPORT_LAYER
   // Export the layer to file
-  virtual bool export_layer( LayerExporterMode mode, const std::string& file_path, 
+  virtual bool export_layer( const std::string& mode, const std::string& file_path, 
     const std::string& name );
 
 private:

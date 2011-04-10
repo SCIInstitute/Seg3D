@@ -50,32 +50,22 @@ namespace Seg3D
 bool ActionIntensityCorrectionFilter::validate( Core::ActionContextHandle& context )
 {
   // Check for layer existance and type information
-  std::string error;
-  if ( ! LayerManager::CheckLayerExistanceAndType( this->target_layer_.value(), 
-    Core::VolumeType::DATA_E, error ) )
-  {
-    context->report_error( error );
-    return false;
-  }
+  if ( ! LayerManager::CheckLayerExistanceAndType( this->target_layer_, 
+    Core::VolumeType::DATA_E, context ) ) return false;
   
   // Check for layer availability 
-  Core::NotifierHandle notifier;
-  if ( ! LayerManager::CheckLayerAvailability( this->target_layer_.value(), 
-    this->replace_.value(), notifier ) )
-  {
-    context->report_need_resource( notifier );
-    return false;
-  }
+  if ( ! LayerManager::CheckLayerAvailability( this->target_layer_, 
+    this->replace_, context ) ) return false;
     
   // If the number of iterations is lower than one, we cannot run the filter
-  if( this->order_.value() < 1  || this->order_.value() > 4)
+  if( this->order_ < 1  || this->order_ > 4)
   {
     context->report_error( "The polynomial order needs to be between 1 and 4." );
     return false;
   }
   
   // Conductance needs to be a positive number
-  if( this->edge_.value() < 0.0 )
+  if( this->edge_ < 0.0 )
   {
     context->report_error( "The sensitivity needs to be larger than zero." );
     return false;
@@ -620,17 +610,17 @@ bool ActionIntensityCorrectionFilter::run( Core::ActionContextHandle& context,
     new IntensityCorrectionFilterAlgo );
 
   // Copy the parameters over to the algorithm that runs the filter
-  algo->order_ = this->order_.value();
-  algo->edge_  = this->edge_.value();
-  algo->preserve_data_format_ = this->preserve_data_format_.value();
+  algo->order_ = this->order_;
+  algo->edge_  = this->edge_;
+  algo->preserve_data_format_ = this->preserve_data_format_;
 
   // Find the handle to the layer
-  if ( !( algo->find_layer( this->target_layer_.value(), algo->src_layer_ ) ) )
+  if ( !( algo->find_layer( this->target_layer_, algo->src_layer_ ) ) )
   {
     return false;
   }
 
-  if ( this->replace_.value() )
+  if ( this->replace_ )
   {
     // Copy the handles as destination and source will be the same
     algo->dst_layer_ = algo->src_layer_;
@@ -652,6 +642,9 @@ bool ActionIntensityCorrectionFilter::run( Core::ActionContextHandle& context,
   // Build the undo-redo record
   algo->create_undo_redo_record( context, this->shared_from_this() );
 
+  // Build the provenance record
+  algo->create_provenance_record( context, this->shared_from_this() );
+  
   // Start the filter.
   Core::Runnable::Start( algo );
 
@@ -666,11 +659,11 @@ void ActionIntensityCorrectionFilter::Dispatch( Core::ActionContextHandle contex
     new ActionIntensityCorrectionFilter;
 
   // Setup the parameters
-  action->target_layer_.value() = layer_id;
-  action->order_.value() = order;
-  action->edge_.value() = edge;
-  action->preserve_data_format_.value() = preserve_data_format;
-  action->replace_.value() = replace;
+  action->target_layer_ = layer_id;
+  action->order_ = order;
+  action->edge_ = edge;
+  action->preserve_data_format_ = preserve_data_format;
+  action->replace_ = replace;
 
   // Dispatch action to underlying engine
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );

@@ -33,8 +33,7 @@
 // Boost includes
 #include <boost/algorithm/string.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/path.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/thread/mutex.hpp>
 
 // Core includes
@@ -121,8 +120,8 @@ void RolloverLogFilePrivate::rollover_log_files()
       if ( boost::filesystem::is_regular_file( itr->status() ) )
       {
         // Log files are identified as starting with app name and ending with .log
-        if( boost::algorithm::starts_with( itr->path().filename(), 
-          Application::GetApplicationName() ) && itr->path().extension() == ".log" ) 
+        if( boost::algorithm::starts_with( itr->path().filename().string(), 
+          Application::GetApplicationName() ) && boost::filesystem::extension( itr->path() ) == ".log" ) 
         {
           std::time_t file_write_time = boost::filesystem::last_write_time( itr->path() );
           std::time_t current_time = std::time( 0 );

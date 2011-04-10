@@ -44,8 +44,11 @@ CORE_ACTION(
 
   // -- Constructor/Destructor --
 public:
-  ActionSaveToolPreferences() { }
-  virtual ~ActionSaveToolPreferences() {}
+  ActionSaveToolPreferences() 
+  {}
+  
+  virtual ~ActionSaveToolPreferences() 
+  {}
 
   // -- Functions that describe action --
 public:

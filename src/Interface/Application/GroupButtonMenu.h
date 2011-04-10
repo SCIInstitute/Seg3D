@@ -84,7 +84,7 @@ protected:
   // DRAGLEAVEEVENT:
   // Overloaded function that is triggered when a drag even leaves the group
   virtual void dragLeaveEvent( QDragLeaveEvent* event );
-
+  
 public:
   void enable_drop_space( bool drop );
   

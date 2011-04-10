@@ -200,13 +200,13 @@ public:
   // Fire off the action that executes the filter
   virtual void execute( Core::ActionContextHandle context );
 
+  // -- internals --
 private:
   ToolPrivateHandle private_;
 
 public:
 
   const static std::string NONE_OPTION_C;
-
 };
 
 
@@ -230,7 +230,6 @@ public:
 
 #define SEG3D_TOOL_VERSION( version ) \
 "<version>" version "</version>"
-
 
 #define SEG3D_TOOL( definition_string ) \
 public: \

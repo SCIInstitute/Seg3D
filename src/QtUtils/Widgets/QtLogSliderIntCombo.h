@@ -64,10 +64,12 @@ public Q_SLOTS:
   
 public:
   int get_value() { return value_; }
+  void set_description( std::string description );
 
 // -- widget internals -- 
 private:
     QtLogSliderIntComboPrivateHandle private_;
+  int value_;  
     
 private Q_SLOTS:
     void change_min( int new_min );
@@ -77,8 +79,6 @@ private Q_SLOTS:
     
 private:
   void block_signals( bool block );
-  int value_;
-  
 };
 
 }  // end namespace QtUtils

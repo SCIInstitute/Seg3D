@@ -37,7 +37,6 @@
 #include <Core/Utils/Singleton.h>
 #include <Core/Utils/Lockable.h>
 
-
 namespace Seg3D
 {
 

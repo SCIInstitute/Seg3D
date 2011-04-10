@@ -180,7 +180,7 @@ private:
   // SET_DROP_TARGET:
   // this function is for keeping track of which layer the drop is going to happen on
   void set_drop_target( LayerWidget* target_layer );
-  
+
   // MOUSEPRESSEVENT:
   // this function is overloaded to enable drag and drop
   virtual void mousePressEvent( QMouseEvent* event );
@@ -263,6 +263,10 @@ private Q_SLOTS:
   // EXPORT_PNG:
   // dispatches an action that exports the layer as a png
   void export_png();
+
+  // REQUEST_PROVENANCE:
+  // gets the provenance
+  void request_provenance();
 
 protected:
   void resizeEvent( QResizeEvent *event );

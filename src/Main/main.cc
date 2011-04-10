@@ -37,6 +37,7 @@
 
 // Core includes
 #include <Core/Utils/Log.h>
+#include <Core/Utils/LogStreamer.h>
 #include <Core/Utils/LogHistory.h>
 #include <Core/Application/Application.h>
 #include <Core/Interface/Interface.h>
@@ -95,8 +96,19 @@ int main( int argc, char **argv )
   // -- Send message to revolving log file -- 
   Core::RolloverLogFile event_log( Core::LogMessageType::ALL_E );
 
+#ifndef NDEBUG
+  // -- Stream errors to console window
+  new Core::LogStreamer( Core::LogMessageType::ALL_E, &std::cerr );
+#endif
+
   // -- Log application information --
   Core::Application::Instance()->log_start();
+
+  // -- Add plugins into the architecture  
+  Core::RegisterClasses();
+
+  // -- Start the application event handler --
+  Core::Application::Instance()->start_eventhandler();
 
   // -- Checking for the socket parameter --
   std::string port_number_string;
@@ -110,15 +122,12 @@ int main( int argc, char **argv )
       Core::ActionSocket::Instance()->start( port_number );
     }
   }
-    
-  // -- Add plugins into the architecture  
-  Core::RegisterClasses();
-
-  // -- Start the application event handler --
-  Core::Application::Instance()->start_eventhandler();
 
   // Initialize the startup tools list
   ToolFactory::Instance()->initialize_states();
+  
+  // Trigger the application start signal
+  Core::Application::Instance()->application_start_signal_();
   
   // -- Setup the QT Interface Layer --
   if ( !( QtUtils::QtApplication::Instance()->setup( argc, argv ) ) ) return ( -1 );
@@ -131,7 +140,8 @@ int main( int argc, char **argv )
   {
     std::string warning = std::string( "<h3>" ) +
       Core::Application::GetApplicationName() + " " + Core::Application::GetVersion() + " 32BIT" 
-      "</h3><h6><p align=\"justify\">Please note: Seg3D is meant to run in 64-bit mode. "
+      "</h3><h6><p align=\"justify\">Please note: " + Core::Application::GetApplicationName()
+      + " is meant to run in 64-bit mode. "
       "In 32-bit mode the size of volumes that can be processed are limited, as "
       "Seg3D may run out of addressable memory. If you have a 64-bit machine,"
       " we would recommend to download the 64-bit version</p></h6>";
@@ -166,6 +176,9 @@ int main( int argc, char **argv )
 
   // -- Run QT event loop --
   if ( !( QtUtils::QtApplication::Instance()->exec() ) ) return ( -1 );
+
+  // Trigger the application stop signal
+  Core::Application::Instance()->application_stop_signal_();
 
   // Finish the remainder of the actions that are still on the application thread.
   Core::Application::Instance()->finish();

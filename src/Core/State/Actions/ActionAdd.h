@@ -49,10 +49,9 @@ CORE_ACTION(
 public:
   ActionAdd()
   {
-    this->add_argument( this->stateid_ );
-    this->add_argument( this->value_ );
+    this->add_parameter( this->stateid_ );
+    this->add_parameter( this->value_ );
   } 
-  virtual ~ActionAdd() {}
 
   // -- Functions that describe action --
   virtual bool validate( ActionContextHandle& context );
@@ -62,8 +61,8 @@ public:
   virtual bool changes_project_data();
 
 private:
-  ActionParameter< std::string > stateid_;
-  ActionParameterVariant value_;
+  std::string stateid_;
+  Variant   value_;
 
   StateBaseWeakHandle state_weak_handle_;
 
@@ -84,8 +83,8 @@ template< class HANDLE, class T >
 ActionHandle ActionAdd::Create( const HANDLE& state, const T& value )
 {
   ActionAdd* action = new ActionAdd;
-  action->stateid_.set_value( state->get_stateid() );
-  action->value_.set_value( value );
+  action->stateid_ = state->get_stateid();
+  action->value_.set( value );
   action->state_weak_handle_ = state;
 
   return ActionHandle( action );

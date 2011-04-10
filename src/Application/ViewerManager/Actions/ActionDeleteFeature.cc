@@ -37,7 +37,7 @@ namespace Seg3D
 
 ActionDeleteFeature::ActionDeleteFeature()
 {
-  this->add_argument( this->feature_id_ );
+  this->add_parameter( this->feature_id_ );
 }
 
 ActionDeleteFeature::~ActionDeleteFeature()
@@ -52,7 +52,7 @@ bool ActionDeleteFeature::validate( Core::ActionContextHandle& context )
 bool ActionDeleteFeature::run( Core::ActionContextHandle& context,
               Core::ActionResultHandle& result )
 {
-  ViewerManager::Instance()->delete_feature( this->feature_id_.value() );
+  ViewerManager::Instance()->delete_feature( this->feature_id_ );
   return true;
 }
 
@@ -60,7 +60,7 @@ void ActionDeleteFeature::Dispatch( Core::ActionContextHandle context,
                    const std::string& feature_id )
 {
   ActionDeleteFeature* action = new ActionDeleteFeature;
-  action->feature_id_.set_value( feature_id );
+  action->feature_id_ = feature_id;
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }
 

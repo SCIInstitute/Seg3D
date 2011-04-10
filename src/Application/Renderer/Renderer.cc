@@ -40,7 +40,8 @@
 #include <Core/Graphics/UnitCube.h>
 #include <Core/TextRenderer/TextRenderer.h>
 #include <Core/Graphics/ColorMap.h>
-#include <Core/VolumeRenderer/VolumeRenderer.h>
+#include <Core/VolumeRenderer/VolumeRendererSimple.h>
+#include <Core/VolumeRenderer/VolumeRendererOcclusion.h>
 
 // Application includes
 #include <Application/Layer/DataLayer.h>
@@ -133,7 +134,7 @@ public:
   Core::Texture2DHandle pattern_texture_;
   Core::TextRendererHandle text_renderer_;
   Core::Texture2DHandle text_texture_;
-  Core::VolumeRendererHandle volume_renderer_;
+  Core::VolumeRendererBaseHandle volume_renderers_[ 2 ];
 
   size_t viewer_id_;
   bool rendering_enabled_;
@@ -582,7 +583,8 @@ Renderer::Renderer( size_t viewer_id ) :
   this->private_->slice_shader_.reset( new SliceShader );
   this->private_->isosurface_shader_.reset( new IsosurfaceShader );
   this->private_->text_renderer_.reset( new Core::TextRenderer );
-  this->private_->volume_renderer_.reset( new Core::VolumeRenderer );
+  this->private_->volume_renderers_[ 0 ].reset( new Core::VolumeRendererSimple );
+  this->private_->volume_renderers_[ 1 ].reset( new Core::VolumeRendererOcclusion );
   this->private_->viewer_id_ = viewer_id;
 }
 
@@ -615,7 +617,8 @@ void Renderer::post_initialize()
 
     this->private_->slice_shader_->initialize();
     this->private_->isosurface_shader_->initialize();
-    this->private_->volume_renderer_->initialize();
+    this->private_->volume_renderers_[ 0 ]->initialize();
+    this->private_->volume_renderers_[ 1 ]->initialize();
     this->private_->pattern_texture_.reset( new Core::Texture2D );
     this->private_->pattern_texture_->set_image( PATTERN_SIZE_C, PATTERN_SIZE_C, 
       GL_ALPHA, MASK_PATTERNS_C, GL_ALPHA, GL_UNSIGNED_BYTE );
@@ -685,7 +688,7 @@ bool Renderer::render()
 
   Core::Color bkg_color = PreferencesManager::Instance()->get_background_color();
 
-  glClearColor( bkg_color.r(), bkg_color.g(), bkg_color.b(), 1.0f );
+  glClearColor( bkg_color.r(), bkg_color.g(), bkg_color.b(), 0.0f );
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
   CORE_LOG_DEBUG( std::string("Renderer ") + Core::ExportToString( 
@@ -708,7 +711,10 @@ bool Renderer::render()
     bool draw_slices = viewer->volume_slices_visible_state_->get();
     bool draw_isosurfaces = viewer->volume_isosurfaces_visible_state_->get();
     bool render_volume = viewer->volume_volume_rendering_visible_state_->get();
+    int volume_renderer_index = ViewerManager::Instance()->volume_renderer_state_->index();
     double sample_rate = ViewerManager::Instance()->volume_sample_rate_state_->get();
+    double occlusion_angle = ViewerManager::Instance()->vr_occlusion_angle_state_->get();
+    int occlusion_grid_resolution = ViewerManager::Instance()->vr_occlusion_grid_resolution_state_->get();
     bool draw_bbox = viewer->volume_show_bounding_box_state_->get();
     bool show_invisible_slices = viewer->volume_show_invisible_slices_state_->get();
     size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
@@ -795,10 +801,13 @@ bool Renderer::render()
 
     if ( enable_clipping )
     {
-      glPushMatrix();
-      glTranslated( bbox.center().x(), bbox.center().y(), bbox.center().z() );
       glPushAttrib( GL_ENABLE_BIT );
 
+      // NOTE: clipping planes are defined relative to the center of the bounding box,
+      // so we need to add an offset to the distance in order to get their positions
+      // in world space.
+
+      Core::Vector clip_plane_offset( bbox.center() );
       for ( int i = 0; i < 6; ++i )
       {
         if ( !clip_plane_enable[ i ] || clip_plane_normal[ i ].normalize() == 0.0 )
@@ -806,13 +815,14 @@ bool Renderer::render()
           continue;
         }
         int sign = clip_plane_reverse_normal[ i ] ? -1 : 1;
-        GLdouble eqn[ 4 ] = { sign * clip_plane_normal[ i ].x(), sign * clip_plane_normal[ i ].y(),
-          sign * clip_plane_normal[ i ].z(), -sign * clip_plane_distance[ i ] };
+        clip_plane_normal[ i ] = clip_plane_normal[ i ] * sign;
+        clip_plane_distance[ i ] = -sign * clip_plane_distance[ i ] - 
+          Core::Dot( clip_plane_offset, clip_plane_normal[ i ] );
+        GLdouble eqn[ 4 ] = { clip_plane_normal[ i ].x(), clip_plane_normal[ i ].y(),
+          clip_plane_normal[ i ].z(), clip_plane_distance[ i ] };
         glClipPlane( GL_CLIP_PLANE0 + i, eqn );
         glEnable( GL_CLIP_PLANE0 + i );
       }
-
-      glPopMatrix();
     }
     
     CORE_CHECK_OPENGL_ERROR();
@@ -829,7 +839,7 @@ bool Renderer::render()
       CORE_CHECK_OPENGL_ERROR();
     }
 
-    if ( draw_isosurfaces)
+    if ( draw_isosurfaces )
     {
       this->private_->isosurface_shader_->enable();
       this->private_->isosurface_shader_->set_lighting( with_lighting );
@@ -878,17 +888,31 @@ bool Renderer::render()
       DataLayerHandle data_layer = LayerManager::Instance()->get_data_layer_by_id( vr_layer );
       if ( data_layer && data_layer->has_valid_data() )
       {
-        //double data_min = data_layer->min_value_state_->get();
-        //double data_range = data_layer->max_value_state_->get() - data_min;
-        //double display_max = data_layer->display_max_value_state_->get();
-        //double window_size = display_max - data_layer->display_min_value_state_->get();
-        //window_size = Core::Max( 0.01 * data_range, window_size );
-        //double scale = data_range > 0 ? data_range / window_size : 1.0;
-        //double bias = data_range > 0 ? 1.0 - ( scale * display_max
-        //  - data_min ) / data_range : 0.0;
-        this->private_->volume_renderer_->render( data_layer->get_data_volume(), 
-          view3d, znear, zfar, sample_rate, with_lighting, with_fog, 
-          ViewerManager::Instance()->get_transfer_function() );
+        Core::VolumeRenderingParam vr_param;
+        vr_param.view_ = view3d;
+        vr_param.znear_ = znear;
+        vr_param.zfar_ = zfar;
+        vr_param.sampling_rate_ = sample_rate;
+        vr_param.enable_lighting_ = with_lighting;
+        vr_param.enable_fog_ = with_fog;
+        vr_param.orthographic_ = false;
+        vr_param.transfer_function_ = ViewerManager::Instance()->get_transfer_function();
+        vr_param.enable_clipping_ = enable_clipping;
+        if ( enable_clipping )
+        {
+          for ( int i = 0; i < 6; ++i )
+          {
+            vr_param.enable_clip_plane_[ i ] = clip_plane_enable[ i ];
+            vr_param.clip_plane_[ i ][ 0 ] = static_cast< float >( clip_plane_normal[ i ].x() );
+            vr_param.clip_plane_[ i ][ 1 ] = static_cast< float >( clip_plane_normal[ i ].y() );
+            vr_param.clip_plane_[ i ][ 2 ] = static_cast< float >( clip_plane_normal[ i ].z() );
+            vr_param.clip_plane_[ i ][ 3 ] = static_cast< float >( clip_plane_distance[ i ] );
+          }
+        }
+        vr_param.occlusion_angle_ = occlusion_angle;
+        vr_param.grid_resolution_ = occlusion_grid_resolution;
+        this->private_->volume_renderers_[ volume_renderer_index ]->render( 
+          data_layer->get_data_volume(), vr_param );
         CORE_CHECK_OPENGL_ERROR();
       }
     }

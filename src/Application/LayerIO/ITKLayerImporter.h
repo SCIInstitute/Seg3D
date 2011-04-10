@@ -40,83 +40,65 @@
 #include <Core/DataBlock/StdDataBlock.h>
 
 // Application includes
-#include <Application/LayerIO/LayerImporter.h>
+#include <Application/LayerIO/LayerSingleFileImporter.h>
 #include <Application/LayerIO/LayerIO.h>
 
 namespace Seg3D
 {
 
-class ITKLayerImporter;
+// Forward declaration for internals of this class
 class ITKLayerImporterPrivate;
 typedef boost::shared_ptr<ITKLayerImporterPrivate> ITKLayerImporterPrivateHandle;
 
+// CLASS ITKLayerImporter
+// This class imports files, using ITK's importers. This one has a low priority as it is the
+// the importer of last resort. As ITK's importers are buggy, dedicated importers are preferred
+// over ITK's importers
 
-class ITKLayerImporter : public LayerImporter
+class ITKLayerImporter : public LayerSingleFileImporter
 {
-  // The ITKLayerImporter is capable of importing DICOMS, tiffs, and pngs.  It assumes that
-  // when a file name does not include an extension that it is a DICOM
-  
-  SCI_IMPORTER_TYPE( "ITK Importer",  "*;"
-                    ".lsm;.LSM;"
+  SEG3D_IMPORTER_TYPE( "ITK Importer",".lsm;.LSM;"
                     ".tiff;.tif;.TIFF;.TIF;.stk;.STK;"
                     ".nii;.img;.hdr;"
                     ".vtk;.VTK;"
-                    ".mha;.mhd", 5, 
-                    LayerImporterType::SINGLE_FILE_E )
+                    ".mha;.mhd", 5 )
 
   // -- Constructor/Destructor --
 public:
-  // Construct a new layer file importer
-  ITKLayerImporter( const std::string& filename );
+  ITKLayerImporter();
+  virtual ~ITKLayerImporter();
 
-  // Virtual destructor for memory management of derived classes
-  virtual ~ITKLayerImporter()
-  {
-  }
-
-  // -- Import a file information --
+  // -- Import information from file --
 public:
+  // GET_FILE_INFO
+  // Get the information about the file we are currently importing.
+  // NOTE: This function often causes the file to be loaded in its entirety
+  // Hence it is best to run this on a separate thread if needed ( from the GUI ).
+  virtual bool get_file_info( LayerImporterFileInfoHandle& info );
 
-  // IMPORT_HEADER:
-  // Import all the information needed to translate the header and metadata information, but not
-  // necessarily read the whole file. NOTE: Some external packages do not support reading a header
-  // and hence these importers should read the full file here.
-  virtual bool import_header();
-
-  // GET_GRID_TRANSFORM:
-  // Get the grid transform of the grid that we are importing
-  virtual Core::GridTransform get_grid_transform();
-
-  // GET_DATA_TYPE:
-  // Get the type of data that is being imported
-  virtual Core::DataType get_data_type();
-
-  // GET_IMPORTER_MODES:
-  // Get then supported importer modes
-  virtual int get_importer_modes();
-  
-  // --Import the data as a specific type --  
+  // -- Import data from file --  
 public: 
+  // GET_FILE_DATA
+  // Get the file data from the file/ file series
+  // NOTE: The information is generated again, so that hints can be processed
+  virtual bool get_file_data( LayerImporterFileDataHandle& data );
 
-  // SET_FILE_LIST:
-  // we need a list of files to import, this function provides the list, the list must be set 
-  // before import_layer is called.
-  virtual bool set_file_list( const std::vector< std::string >& file_list );
+  // -- Copy files --
+public:
+  // COPY_FILES
+  // For provenance files need to be copied into the project cache. As some files need special
+  // attention: for example mhd and nhdr files actually list where there data is stored, this
+  // function can be overloaded with a specific function that copies the files. Otherwise a
+  // default implementation is given in the two derived classes.
+  
+  // NOTE: This function has to be implemented as metaIO files can refer to other files on the
+  // file system. Hence copying the header files needs special logic, as it needs to copy the depending
+  // files as well and may need to change file references in the header files.
+  virtual bool copy_files( boost::filesystem::path& project_cache_path );
   
   // -- internals of the class --
 private:
   ITKLayerImporterPrivateHandle private_;
-
-protected:
-  // LOAD_DATA:
-  // Load the data from the file(s).
-  // NOTE: This function is called by import_layer internally.
-  virtual bool load_data( Core::DataBlockHandle& data_block, 
-    Core::GridTransform& grid_trans, LayerMetaData& meta_data  );
-
-  // GET_LAYER_NAME:
-  // Return the string that will be used to name the layers.
-  virtual std::string get_layer_name();
 };
 
 } // end namespace seg3D

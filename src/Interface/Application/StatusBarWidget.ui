@@ -7,19 +7,19 @@
     <x>0</x>
     <y>0</y>
     <width>1172</width>
-    <height>20</height>
+    <height>24</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>0</width>
-    <height>20</height>
+    <height>24</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>16777215</width>
-    <height>20</height>
+    <height>24</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -38,8 +38,8 @@ QToolButton:hover{
 
 
  QComboBox {
-     padding: 1px 1px 1px 1px;
-     /*min-width: 6em;*/
+    /* padding: 1px 1px 1px 1px;
+    min-width: 6em;*/
   background-color: rgba( 0,0,0,0 );
   color: black;
  }
@@ -82,6 +82,23 @@ QToolButton:hover{
 QComboBox::icon{
   border: 1px solid rgba( 0, 0, 0, 0 );
 }
+
+QWidget#label_values_ {
+  background-color: rgba(50, 50, 50, 30 );
+  border-radius: 3px;
+    border: 1px solid  rgb( 150, 150, 150 );
+}
+
+QWidget#actives_{
+  background-color: rgba(50, 50, 50, 30 );
+  border-radius: 3px;
+    border: 1px solid  rgb( 150, 150, 150 );
+}
+
+QFrame#line{
+  background-color: rgb(150,150,150);
+}
+
 </string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout_11">
@@ -251,25 +268,6 @@ QComboBox::icon{
         </layout>
        </widget>
       </item>
-      <item>
-       <widget class="Line" name="line_2">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>20</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>20</height>
-         </size>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-       </widget>
-      </item>
      </layout>
     </widget>
    </item>
@@ -297,7 +295,16 @@ QComboBox::icon{
       <property name="spacing">
        <number>3</number>
       </property>
-      <property name="margin">
+      <property name="leftMargin">
+       <number>4</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>4</number>
+      </property>
+      <property name="bottomMargin">
        <number>0</number>
       </property>
       <item>
@@ -327,13 +334,13 @@ QComboBox::icon{
         </property>
         <property name="minimumSize">
          <size>
-          <width>0</width>
+          <width>1</width>
           <height>20</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>16777215</width>
+          <width>1</width>
           <height>20</height>
          </size>
         </property>
@@ -372,13 +379,13 @@ QComboBox::icon{
      </property>
      <property name="minimumSize">
       <size>
-       <width>420</width>
+       <width>364</width>
        <height>20</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
-       <width>439</width>
+       <width>470</width>
        <height>20</height>
       </size>
      </property>
@@ -532,7 +539,7 @@ QComboBox::icon{
            </property>
            <property name="maximumSize">
             <size>
-             <width>80</width>
+             <width>58</width>
              <height>16777215</height>
             </size>
            </property>
@@ -615,7 +622,7 @@ QComboBox::icon{
            </property>
            <property name="maximumSize">
             <size>
-             <width>80</width>
+             <width>58</width>
              <height>16777215</height>
             </size>
            </property>
@@ -698,7 +705,7 @@ QComboBox::icon{
            </property>
            <property name="maximumSize">
             <size>
-             <width>80</width>
+             <width>58</width>
              <height>16777215</height>
             </size>
            </property>
@@ -835,31 +842,6 @@ QComboBox::icon{
       <property name="margin">
        <number>0</number>
       </property>
-      <item>
-       <widget class="Line" name="line_3">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>20</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>20</height>
-         </size>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-       </widget>
-      </item>
       <item>
        <widget class="QToolButton" name="swap_visibility_button_">
         <property name="minimumSize">

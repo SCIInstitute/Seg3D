@@ -100,9 +100,9 @@ vec4 shade_mask_slice()
     }
     else
     {
-      float pattern = texture2D( pattern_tex, gl_TexCoord[1].st ).a;
+    float pattern = texture2D( pattern_tex, gl_TexCoord[1].st ).a;
       color = vec4( mask_color, pattern * opacity );
-    }
+  }
   }
   else if ( mask_mode == 0 ) // border only
   {
@@ -117,8 +117,8 @@ vec4 shade_mask_slice()
     }
     else
     {
-      discard;
-    }
+    discard;
+  }
   }
   else // fill
   {

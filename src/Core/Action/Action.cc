@@ -43,12 +43,17 @@
 namespace Core
 {
 
-Action::Action()
+Action::Action() 
 {
 }
 
 Action::~Action()
 {
+  // Clean out the parameter accessors
+  for ( size_t j = 0; j < this->parameters_.size(); j++ )
+  {
+    delete this->parameters_[ j ];
+  }
 }
 
 std::string Action::get_definition() const
@@ -78,7 +83,12 @@ int Action::get_key_index( const std::string& key ) const
 
 bool Action::changes_project_data()
 {
-  return this->get_action_info()->get_changes_project_data();
+  return this->get_action_info()->changes_project_data();
+}
+
+bool Action::changes_provenance_data() const
+{
+  return this->get_action_info()->changes_provenance_data();
 }
 
 bool Action::is_undoable() const
@@ -91,15 +101,9 @@ std::string Action::get_default_key_value( size_t index ) const
   return this->get_action_info()->get_default_key_value( index );
 }
 
-void Action::add_argument_ptr( ActionParameterBase* param )
+bool Action::translate( ActionContextHandle& context )
 {
-  this->arguments_.push_back( param );
-}
-
-void Action::add_key_ptr( ActionParameterBase* param )
-{
-  param->import_from_string( this->get_default_key_value( this->keys_.size() ) );
-  this->keys_.push_back( param );
+  return true;
 }
 
 void Action::clear_cache()
@@ -111,19 +115,17 @@ std::string Action::export_to_string() const
   // Add action name to string
   std::string command = std::string( this->get_type() ) + " ";
 
+  size_t num_arguments = this->get_action_info()->get_num_arguments();
+
   // Loop through all the arguments and add them
-  for ( size_t j = 0; j < this->arguments_.size(); j++ )
+  for ( size_t j = 0; j < num_arguments && j < this->parameters_.size(); j++ )
   {
-    command += this->arguments_[ j ]->export_to_string() + " ";
+    command += this->parameters_[ j ]->export_to_string() + " ";
   }
   
-  for ( size_t j = 0; j < keys_.size(); j++ )
+  for ( size_t j = num_arguments; j < this->parameters_.size(); j++ )
   {
-    if ( keys_[ j ] == 0 )
-    {
-      CORE_THROW_LOGICERROR( "Encountered incorrectly constructed action" );
-    }
-    command += this->get_key( j ) + "=" + this->keys_[ j ]->export_to_string() + " ";
+    command += this->get_key( j - num_arguments ) + "=" + this->parameters_[ j ]->export_to_string() + " ";
   }
 
   // Return the command
@@ -155,7 +157,9 @@ bool Action::import_from_string( const std::string& action, std::string& error )
     return false;
   }
 
-  for ( size_t j = 0; j < arguments_.size(); j++ )
+  size_t num_arguments = this->get_action_info()->get_num_arguments();
+
+  for ( size_t j = 0; j < num_arguments; j++ )
   {
     if ( !( Core::ScanValue( action, pos, value, error ) ) )
     {
@@ -169,7 +173,7 @@ bool Action::import_from_string( const std::string& action, std::string& error )
       return false;
     }
 
-    if ( !( this->arguments_[ j ]->import_from_string( value ) ) )
+    if ( !( this->parameters_[ j ]->import_from_string( value ) ) )
     {
       error = std::string( "SYNTAX ERROR: Could not interpret '" + value + "'" );
       return false;
@@ -196,12 +200,12 @@ bool Action::import_from_string( const std::string& action, std::string& error )
       return false;   
     }
 
-    if ( this->keys_[ index ] == 0 )
+    if ( this->parameters_[ index + num_arguments ] == 0 )
     {
       CORE_THROW_LOGICERROR( "Encountered incorrectly constructed action" );
     }
     
-    this->keys_[ index ]->import_from_string( value );
+    this->parameters_[ index + num_arguments ]->import_from_string( value );
   }
 
   return true;

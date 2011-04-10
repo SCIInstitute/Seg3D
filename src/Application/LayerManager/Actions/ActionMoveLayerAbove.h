@@ -50,15 +50,11 @@ CORE_ACTION(
 public:
   ActionMoveLayerAbove()    
   {
-    add_argument( layer_to_move_id_ );
-    add_argument( target_layer_id_ );
-    add_key( move_above_ );
+    this->add_parameter( this->layer_to_move_id_ );
+    this->add_parameter( this->target_layer_id_ );
+    this->add_parameter( this->move_above_ );
   }
-  
-  virtual ~ActionMoveLayerAbove()
-  {
-  }
-  
+
   // -- Functions that describe action --
 public:
   virtual bool validate( Core::ActionContextHandle& context );
@@ -67,17 +63,12 @@ public:
   // -- Action parameters --
 private:
   // Layer_handle that is requested
-  Core::ActionParameter< std::string > layer_to_move_id_;
-  Core::ActionParameter< std::string > target_layer_id_;
-  Core::ActionParameter< bool >    move_above_;
+  std::string layer_to_move_id_;
+  std::string target_layer_id_;
+  bool move_above_;
   
   // -- Dispatch this action from the interface --
 public:
-  // CREATE:
-  // Create action that moves the layer above
-  static Core::ActionHandle Create( const std::string& layer_to_move_id, 
-    const std::string& target_layer_id, bool move_above = true );
-  
   // DISPATCH
   // Create and dispatch action that moves the layer above 
   static void Dispatch( Core::ActionContextHandle context,

@@ -64,17 +64,15 @@ public Q_SLOTS:
   
 public:
   int get_value() { return value_; }
+  void set_description( std::string description );
 
 // -- widget internals -- 
 private:
     QtSliderIntComboPrivateHandle private_;
     
 private Q_SLOTS:
-    void edit_ranges( bool edit );
     void change_min( int new_min );
     void change_max( int new_max );
-    void double_range();
-    void half_range();
     void slider_signal( int value );
     void spinner_signal( int value );
     

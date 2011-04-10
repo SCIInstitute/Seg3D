@@ -37,8 +37,10 @@
 #include <Application/Tools/Actions/ActionFloodFill.h>
 #include <Application/Layer/MaskLayer.h>
 #include <Application/LayerManager/LayerManager.h>
-#include <Application/UndoBuffer/UndoBuffer.h>
 #include <Application/LayerManager/LayerUndoBufferItem.h>
+#include <Application/UndoBuffer/UndoBuffer.h>
+#include <Application/ProjectManager/ProjectManager.h>
+
 
 CORE_REGISTER_ACTION( Seg3D, FloodFill )
 
@@ -48,19 +50,19 @@ namespace Seg3D
 class ActionFloodFillPrivate
 {
 public:
-  Core::ActionParameter< std::string > target_layer_id_;
-  Core::ActionParameter< int > slice_type_;
-  Core::ActionParameter< size_t > slice_number_;
-  Core::ActionParameter< std::vector< Core::Point > > seeds_;
-  Core::ActionParameter< std::string > data_cstr_layer_id_;
-  Core::ActionParameter< double > min_val_;
-  Core::ActionParameter< double > max_val_;
-  Core::ActionParameter< bool > negative_data_cstr_;
-  Core::ActionParameter< std::string > mask_cstr1_layer_id_;
-  Core::ActionParameter< bool > negative_mask_cstr1_;
-  Core::ActionParameter< std::string > mask_cstr2_layer_id_;
-  Core::ActionParameter< bool > negative_mask_cstr2_;
-  Core::ActionParameter< bool > erase_;
+  std::string target_layer_id_;
+  int slice_type_;
+  size_t slice_number_;
+  std::vector< Core::Point > seeds_;
+  std::string data_cstr_layer_id_;
+  double min_val_;
+  double max_val_;
+  bool negative_data_cstr_;
+  std::string mask_cstr1_layer_id_;
+  bool negative_mask_cstr1_;
+  std::string mask_cstr2_layer_id_;
+  bool negative_mask_cstr2_;
+  bool erase_;
 
   Core::MaskVolumeSliceHandle vol_slice_;
   Core::DataVolumeSliceHandle data_cstr_slice_;
@@ -73,57 +75,47 @@ public:
 ActionFloodFill::ActionFloodFill() :
   private_( new ActionFloodFillPrivate )
 {
-  this->add_argument( this->private_->target_layer_id_ );
-  this->add_argument( this->private_->slice_type_ );
-  this->add_argument( this->private_->slice_number_ );
-  this->add_argument( this->private_->seeds_ );
-
-  this->add_key( this->private_->data_cstr_layer_id_ );
-  this->add_key( this->private_->min_val_ );
-  this->add_key( this->private_->max_val_ );
-  this->add_key( this->private_->negative_data_cstr_ );
-  this->add_key( this->private_->mask_cstr1_layer_id_ );
-  this->add_key( this->private_->negative_mask_cstr1_ );
-  this->add_key( this->private_->mask_cstr2_layer_id_ );
-  this->add_key( this->private_->negative_mask_cstr2_ );
-  this->add_key( this->private_->erase_ );
-}
-
-ActionFloodFill::~ActionFloodFill()
-{
+  this->add_layer_id( this->private_->target_layer_id_ );
+  this->add_parameter( this->private_->slice_type_ );
+  this->add_parameter( this->private_->slice_number_ );
+  this->add_parameter( this->private_->seeds_ );
+  this->add_layer_id( this->private_->data_cstr_layer_id_ );
+  this->add_parameter( this->private_->min_val_ );
+  this->add_parameter( this->private_->max_val_ );
+  this->add_parameter( this->private_->negative_data_cstr_ );
+  this->add_layer_id( this->private_->mask_cstr1_layer_id_ );
+  this->add_parameter( this->private_->negative_mask_cstr1_ );
+  this->add_layer_id( this->private_->mask_cstr2_layer_id_ );
+  this->add_parameter( this->private_->negative_mask_cstr2_ );
+  this->add_parameter( this->private_->erase_ );
 }
 
 bool ActionFloodFill::validate( Core::ActionContextHandle& context )
 { 
   // Check whether the target layer exists
   MaskLayerHandle target_layer = boost::dynamic_pointer_cast< MaskLayer >( 
-    LayerManager::Instance()->get_layer_by_id( this->private_->target_layer_id_.value() ) );
+    LayerManager::Instance()->get_layer_by_id( this->private_->target_layer_id_ ) );
   if ( !target_layer )
   {
-    context->report_error( "Layer '" + this->private_->target_layer_id_.value() +
+    context->report_error( "Layer '" + this->private_->target_layer_id_ +
       "' is not a valid mask layer." );
     return false;
   }
 
   if ( target_layer->locked_state_->get() )
   {
-    context->report_error( "Layer '" + this->private_->target_layer_id_.value() +
+    context->report_error( "Layer '" + this->private_->target_layer_id_ +
       "' is locked." );
     return false;
   }
   
   // Check whether the target layer can be used for processing
-  Core::NotifierHandle notifier;
   if ( !LayerManager::Instance()->CheckLayerAvailabilityForProcessing(
-    this->private_->target_layer_id_.value(), notifier ) )
-  {
-    context->report_need_resource( notifier );
-    return false;
-  }
+    this->private_->target_layer_id_, context ) ) return false;
   
   // Check whether slice type has a valid 
   Core::VolumeSliceType slice_type = static_cast< Core::VolumeSliceType::enum_type >(
-    this->private_->slice_type_.value() );
+    this->private_->slice_type_ );
 
   if ( slice_type != Core::VolumeSliceType::AXIAL_E &&
     slice_type != Core::VolumeSliceType::CORONAL_E &&
@@ -137,94 +129,91 @@ bool ActionFloodFill::validate( Core::ActionContextHandle& context )
   this->private_->vol_slice_.reset( new Core::MaskVolumeSlice( target_layer->get_mask_volume(), 
     slice_type ) );
   
-  if ( this->private_->slice_number_.value() >= this->private_->vol_slice_->number_of_slices() )
+  if ( this->private_->slice_number_ >= this->private_->vol_slice_->number_of_slices() )
   {
     context->report_error( "Slice number is out of range." );
     return false;
   }
 
-  this->private_->vol_slice_->set_slice_number( this->private_->slice_number_.value() );
+  this->private_->vol_slice_->set_slice_number( this->private_->slice_number_ );
 
-  if ( this->private_->data_cstr_layer_id_.value() != "" &&
-    this->private_->data_cstr_layer_id_.value() != "<none>" )
+  if ( this->private_->data_cstr_layer_id_ != "" &&
+    this->private_->data_cstr_layer_id_ != "<none>" )
   {
     DataLayerHandle data_cstr_layer = boost::dynamic_pointer_cast< DataLayer >(
       LayerManager::Instance()->get_layer_by_id( 
-      this->private_->data_cstr_layer_id_.value() ) );
+      this->private_->data_cstr_layer_id_ ) );
 
     if ( !data_cstr_layer || 
       data_cstr_layer->get_layer_group() != target_layer->get_layer_group() )
     {
-      context->report_error( "Layer '" + this->private_->data_cstr_layer_id_.value() +
+      context->report_error( "Layer '" + this->private_->data_cstr_layer_id_ +
         "' is not a valid data constraint layer, will proceed as if no data constraint." );
     }
     else if ( !LayerManager::Instance()->CheckLayerAvailabilityForUse( 
-      this->private_->data_cstr_layer_id_.value(), notifier ) )
+      this->private_->data_cstr_layer_id_, context ) )
     {
-      context->report_error( "Data layer '" + this->private_->data_cstr_layer_id_.value() +
-        "' not available for reading, will proceed as if no data constraint." );
+      return false;
     }
     else
     {
       this->private_->data_cstr_slice_.reset( new Core::DataVolumeSlice( 
         data_cstr_layer->get_data_volume(), slice_type, 
-        this->private_->slice_number_.value() ) );
+        this->private_->slice_number_ ) );
     }
   }
   
-  if ( this->private_->mask_cstr1_layer_id_.value() != "" &&
-    this->private_->mask_cstr1_layer_id_.value() != "<none>" )
+  if ( this->private_->mask_cstr1_layer_id_ != "" &&
+    this->private_->mask_cstr1_layer_id_ != "<none>" )
   {
     MaskLayerHandle mask_cstr1_layer = boost::dynamic_pointer_cast< MaskLayer >(
       LayerManager::Instance()->get_layer_by_id( 
-      this->private_->mask_cstr1_layer_id_.value() ) );
+      this->private_->mask_cstr1_layer_id_ ) );
     if ( !mask_cstr1_layer || 
       mask_cstr1_layer->get_layer_group() != target_layer->get_layer_group() )
     {
-      context->report_error( "Layer '" + this->private_->mask_cstr1_layer_id_.value() +
+      context->report_error( "Layer '" + this->private_->mask_cstr1_layer_id_ +
         "' is not a valid mask constraint layer, will proceed as if no mask constraint 1." );
     }
     else if ( !LayerManager::Instance()->CheckLayerAvailabilityForUse( 
-      this->private_->mask_cstr1_layer_id_.value(), notifier ) )
+      this->private_->mask_cstr1_layer_id_, context ) )
     {
-      context->report_error( "Mask layer '" + this->private_->mask_cstr1_layer_id_.value() +
-        "' not available for reading, will proceed as if no mask constraint 1." );
+      return false;
     }
     else
     {
       this->private_->mask_cstr1_slice_.reset( new Core::MaskVolumeSlice(
         mask_cstr1_layer->get_mask_volume(), slice_type, 
-        this->private_->slice_number_.value() ) );
+        this->private_->slice_number_ ) );
     }
   }
 
-  if ( this->private_->mask_cstr2_layer_id_.value() != "" &&
-    this->private_->mask_cstr2_layer_id_.value() != "<none>" )
+  if ( this->private_->mask_cstr2_layer_id_ != "" &&
+    this->private_->mask_cstr2_layer_id_ != "<none>" )
   {
     MaskLayerHandle mask_cstr2_layer = boost::dynamic_pointer_cast< MaskLayer >(
       LayerManager::Instance()->get_layer_by_id( 
-        this->private_->mask_cstr2_layer_id_.value() ) );
+        this->private_->mask_cstr2_layer_id_ ) );
     if ( !mask_cstr2_layer || 
       mask_cstr2_layer->get_layer_group() != target_layer->get_layer_group() )
     {
-      context->report_error( "Layer '" + this->private_->mask_cstr2_layer_id_.value() +
+      context->report_error( "Layer '" + this->private_->mask_cstr2_layer_id_ +
         "' is not a valid mask constraint layer, will proceed as if no mask constraint 2." );
     }
     else if ( !LayerManager::Instance()->CheckLayerAvailabilityForUse( 
-      this->private_->mask_cstr2_layer_id_.value(), notifier ) )
+      this->private_->mask_cstr2_layer_id_, context ) )
     {
-      context->report_error( "Mask layer '" + this->private_->mask_cstr2_layer_id_.value() +
-        "' not available for reading, will proceed as if no mask constraint 2." );
+      return false;
     }
     else
     {
       this->private_->mask_cstr2_slice_.reset( new Core::MaskVolumeSlice(
         mask_cstr2_layer->get_mask_volume(), slice_type, 
-        this->private_->slice_number_.value() ) );
+        this->private_->slice_number_ ) );
     }
   }
 
-  const std::vector< Core::Point >& seeds = this->private_->seeds_.value();
+  const std::vector< Core::Point >& seeds = this->private_->seeds_;
   int nx = static_cast< int >( this->private_->vol_slice_->nx() );
   int ny = static_cast< int >( this->private_->vol_slice_->ny() );
   this->private_->seeds_2d_.clear();
@@ -267,18 +256,18 @@ bool ActionFloodFill::run( Core::ActionContextHandle& context, Core::ActionResul
   if ( this->private_->data_cstr_slice_ )
   {
     this->private_->data_cstr_slice_->create_threshold_mask( data_cstr,
-      this->private_->min_val_.value(), this->private_->max_val_.value(), 
-      this->private_->negative_data_cstr_.value() );
+      this->private_->min_val_, this->private_->max_val_, 
+      this->private_->negative_data_cstr_ );
   }
   if ( this->private_->mask_cstr1_slice_ )
   {
     this->private_->mask_cstr1_slice_->copy_slice_data( mask_cstr1,
-      this->private_->negative_mask_cstr1_.value() );
+      this->private_->negative_mask_cstr1_ );
   }
   if ( this->private_->mask_cstr2_slice_ )
   {
     this->private_->mask_cstr2_slice_->copy_slice_data( mask_cstr2,
-      this->private_->negative_mask_cstr2_.value() );
+      this->private_->negative_mask_cstr2_ );
   }
 
   {
@@ -287,14 +276,14 @@ bool ActionFloodFill::run( Core::ActionContextHandle& context, Core::ActionResul
 
     // Get the axis along which the flood fill works
     Core::SliceType slice_type = static_cast< Core::SliceType::enum_type>(
-      this->private_->slice_type_.value() );
+      this->private_->slice_type_ );
     
     // Get the slice number
-    size_t slice_number = this->private_->slice_number_.value();
+    size_t slice_number = this->private_->slice_number_;
     
     // Get the layer on which this action operates
     LayerHandle layer = LayerManager::Instance()->get_layer_by_id( 
-      this->private_->target_layer_id_.value() );
+      this->private_->target_layer_id_ );
     // Create a check point of the slice on which the flood fill will operate
     LayerCheckPointHandle check_point( new LayerCheckPoint( layer, slice_type, slice_number ) );
 
@@ -305,13 +294,33 @@ bool ActionFloodFill::run( Core::ActionContextHandle& context, Core::ActionResul
 
     // Now add the undo/redo action to undo buffer
     UndoBuffer::Instance()->insert_undo_item( context, item );
+
+    // Set the output provenance id
+    layer->provenance_id_state_->set( this->get_output_provenance_id( 0 ) );
+
+    // Create a provenance record
+    ProvenanceStepHandle provenance_step( new ProvenanceStep );
+    
+    // Get the input provenance ids from the translate step
+    provenance_step->set_input_provenance_ids( this->get_input_provenance_ids() );
+    
+    // Get the output and replace provenance ids from the analysis above
+    provenance_step->set_output_provenance_ids(  this->get_output_provenance_ids()  );
+    
+    ProvenanceIDList deleted_provenance_ids( 1, layer->provenance_id_state_->get() );
+    provenance_step->set_deleted_provenance_ids( deleted_provenance_ids );
+  
+    provenance_step->set_action( this->export_to_provenance_string() );   
+    
+    ProjectManager::Instance()->get_current_project()->add_to_provenance_database(
+      provenance_step );    
   }
 
   {
     Core::MaskVolumeSlice::lock_type lock( volume_slice->get_mutex() );
     unsigned char* slice_cache = volume_slice->get_cached_data();
     unsigned char fill_value = mask_value;
-    if ( this->private_->erase_.value() )
+    if ( this->private_->erase_ )
     {
       fill_value = 0;
     }
@@ -382,6 +391,5 @@ void ActionFloodFill::Dispatch( Core::ActionContextHandle context,
 
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }
-
 
 } // end namespace Seg3D

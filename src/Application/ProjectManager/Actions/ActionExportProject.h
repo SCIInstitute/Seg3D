@@ -29,9 +29,9 @@
 #ifndef APPLICATION_PROJECTMANAGER_ACTIONS_ACTIONEXPORTPROJECT_H
 #define APPLICATION_PROJECTMANAGER_ACTIONS_ACTIONEXPORTPROJECT_H
 
+// Core includes
 #include <Core/Action/Action.h> 
 #include <Core/Interface/Interface.h>
-
 
 namespace Seg3D
 {
@@ -41,22 +41,18 @@ class ActionExportProject : public Core::Action
 
 CORE_ACTION( 
   CORE_ACTION_TYPE( "ExportProject", "Export a project." )
+  CORE_ACTION_ARGUMENT( "session", "Name of the exporting session." )
   CORE_ACTION_ARGUMENT( "path", "Path to export the project to." )
   CORE_ACTION_ARGUMENT( "name", "Name to export the project as." )
-  CORE_ACTION_ARGUMENT( "session", "Name of the exporting session." )
 )
 
   // -- Constructor/Destructor --
 public:
   ActionExportProject()
   {
-    this->add_argument( this->export_path_ );
-    this->add_argument( this->project_name_ );
-    this->add_argument( this->session_name_ );
-  }
-
-  virtual ~ActionExportProject()
-  {
+    this->add_parameter( this->session_name_ );
+    this->add_parameter( this->export_path_ );
+    this->add_parameter( this->project_name_ );
   }
 
   // -- Functions that describe action --
@@ -67,17 +63,12 @@ public:
 private:
 
   // This parameter contains the name of the session to be loaded
-  Core::ActionParameter< std::string > export_path_;
-  Core::ActionParameter< std::string > project_name_;
-  Core::ActionParameter< std::string > session_name_;
+  std::string session_name_;
+  std::string export_path_;
+  std::string project_name_;
+  
   // -- Dispatch this action from the interface --
 public:
-  
-  // CREATE:
-  // Create an action that loads a session
-  static Core::ActionHandle Create( const std::string& export_path, 
-    const std::string& project_name, const std::string& session_name );
-  
   // DISPATCH:
   // Dispatch an action loads a session
   static void Dispatch( Core::ActionContextHandle context, const std::string& export_path, 
@@ -86,4 +77,4 @@ public:
 
 } // end namespace Seg3D
 
-#endif  //ACTIONEXPORTPROJECT_H
+#endif 

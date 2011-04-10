@@ -47,9 +47,9 @@ bool ActionSet::validate( ActionContextHandle& context )
   // If not the state cannot be retrieved report an error
   if ( !state.get() )
   {
-    if ( !( StateEngine::Instance()->get_state( stateid_.value(), state ) ) )
+    if ( !( StateEngine::Instance()->get_state( stateid_, state ) ) )
     {
-      context->report_error( std::string( "Unknown state variable '" ) + stateid_.value()
+      context->report_error( std::string( "Unknown state variable '" ) + stateid_
           + "'" );
       return false;
     }
@@ -92,7 +92,7 @@ bool ActionSet::changes_project_data()
   // If not the state cannot be retrieved report an error
   if ( !state )
   {
-    if ( !( StateEngine::Instance()->get_state( stateid_.value(), state ) ) )
+    if ( !( StateEngine::Instance()->get_state( stateid_, state ) ) )
     {
       return false;
     }

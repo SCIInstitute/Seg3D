@@ -47,32 +47,22 @@ namespace Seg3D
 bool ActionGradientAnisotropicDiffusionFilter::validate( Core::ActionContextHandle& context )
 {
   // Check for layer existance and type information
-  std::string error;
-  if ( ! LayerManager::CheckLayerExistanceAndType( this->layer_id_.value(), 
-    Core::VolumeType::DATA_E, error ) )
-  {
-    context->report_error( error );
-    return false;
-  }
+  if ( ! LayerManager::CheckLayerExistanceAndType( this->layer_id_, 
+    Core::VolumeType::DATA_E, context ) ) return false;
   
   // Check for layer availability 
-  Core::NotifierHandle notifier;
-  if ( ! LayerManager::CheckLayerAvailability( this->layer_id_.value(), 
-    this->replace_.value(), notifier ) )
-  {
-    context->report_need_resource( notifier );
-    return false;
-  }
+  if ( ! LayerManager::CheckLayerAvailability( this->layer_id_, 
+    this->replace_, context ) ) return false;
     
   // If the number of iterations is lower than one, we cannot run the filter
-  if( this->iterations_.value() < 1 )
+  if( this->iterations_ < 1 )
   {
     context->report_error( "The number of iterations needs to be larger than zero." );
     return false;
   }
   
   // Conductance needs to be a positive number
-  if( this->sensitivity_.value() < 0.0 )
+  if( this->sensitivity_ < 0.0 )
   {
     context->report_error( "The sensitivity needs to be larger than zero." );
     return false;
@@ -200,17 +190,17 @@ bool ActionGradientAnisotropicDiffusionFilter::run( Core::ActionContextHandle& c
     new GradientAnisotropicDiffusionFilterAlgo );
 
   // Copy the parameters over to the algorithm that runs the filter
-  algo->iterations_ = this->iterations_.value();
-  algo->sensitivity_ = this->sensitivity_.value();
-  algo->preserve_data_format_ = this->preserve_data_format_.value();
+  algo->iterations_ = this->iterations_;
+  algo->sensitivity_ = this->sensitivity_;
+  algo->preserve_data_format_ = this->preserve_data_format_;
 
   // Find the handle to the layer
-  if ( !( algo->find_layer( this->layer_id_.value(), algo->src_layer_ ) ) )
+  if ( !( algo->find_layer( this->layer_id_, algo->src_layer_ ) ) )
   {
     return false;
   }
 
-  if ( this->replace_.value() )
+  if ( this->replace_ )
   {
     // Copy the handles as destination and source will be the same
     algo->dst_layer_ = algo->src_layer_;
@@ -232,6 +222,9 @@ bool ActionGradientAnisotropicDiffusionFilter::run( Core::ActionContextHandle& c
   // Build the undo-redo record
   algo->create_undo_redo_record( context, this->shared_from_this() );
 
+  // Build the provenance record
+  algo->create_provenance_record( context, this->shared_from_this() );
+  
   // Start the filter.
   Core::Runnable::Start( algo );
 
@@ -248,11 +241,11 @@ void ActionGradientAnisotropicDiffusionFilter::Dispatch( Core::ActionContextHand
     new ActionGradientAnisotropicDiffusionFilter;
 
   // Setup the parameters
-  action->layer_id_.value() = layer_id;
-  action->iterations_.value() = iterations;
-  action->sensitivity_.value() = sensitivity;
-  action->preserve_data_format_.value() = preserve_data_format;
-  action->replace_.value() = replace;
+  action->layer_id_ = layer_id;
+  action->iterations_ = iterations;
+  action->sensitivity_ = sensitivity;
+  action->preserve_data_format_ = preserve_data_format;
+  action->replace_ = replace;
 
   // Dispatch action to underlying engine
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );

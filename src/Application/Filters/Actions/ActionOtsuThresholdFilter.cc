@@ -47,25 +47,16 @@ namespace Seg3D
 bool ActionOtsuThresholdFilter::validate( Core::ActionContextHandle& context )
 {
   // Check for layer existance and type information
-  std::string error;
-  if ( ! LayerManager::CheckLayerExistanceAndType( this->target_layer_.value(), 
-    Core::VolumeType::DATA_E, error ) )
-  {
-    context->report_error( error );
-    return false;
-  }
+  if ( ! LayerManager::CheckLayerExistanceAndType( this->target_layer_, 
+    Core::VolumeType::DATA_E, context ) ) return false;
   
   // Check for layer availability 
   Core::NotifierHandle notifier;
-  if ( ! LayerManager::CheckLayerAvailabilityForProcessing( this->target_layer_.value(), 
-    notifier ) )
-  {
-    context->report_need_resource( notifier );
-    return false;
-  }
+  if ( ! LayerManager::CheckLayerAvailabilityForProcessing( this->target_layer_, 
+    context ) ) return false;
     
   // If the number of iterations is lower than one, we cannot run the filter
-  if( this->amount_.value() < 1 )
+  if( this->amount_ < 1 )
   {
     context->report_error( "The number of thresholds needs to be at least one." );
     return false;
@@ -181,10 +172,10 @@ bool ActionOtsuThresholdFilter::run( Core::ActionContextHandle& context,
   boost::shared_ptr<OtsuThresholdFilterAlgo> algo( new OtsuThresholdFilterAlgo );
 
   // Copy the parameters over to the algorithm that runs the filter
-  algo->amount_ = this->amount_.value();
+  algo->amount_ = this->amount_;
 
   // Find the handle to the layer
-  if ( !( algo->find_layer( this->target_layer_.value(), algo->src_layer_ ) ) )
+  if ( !( algo->find_layer( this->target_layer_, algo->src_layer_ ) ) )
   {
     return false;
   }
@@ -208,7 +199,10 @@ bool ActionOtsuThresholdFilter::run( Core::ActionContextHandle& context,
   
   // Build the undo-redo record
   algo->create_undo_redo_record( context, this->shared_from_this() );
-    
+
+  // Build the provenance record
+  algo->create_provenance_record( context, this->shared_from_this() );
+      
   // Start the filter on a separate thread.
   Core::Runnable::Start( algo );
 
@@ -222,8 +216,8 @@ void ActionOtsuThresholdFilter::Dispatch( Core::ActionContextHandle context,
   ActionOtsuThresholdFilter* action = new ActionOtsuThresholdFilter;
 
   // Setup the parameters
-  action->target_layer_.value() = target_layer;
-  action->amount_.value() = amount;
+  action->target_layer_ = target_layer;
+  action->amount_ = amount;
 
   // Dispatch action to underlying engine
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );

@@ -50,11 +50,7 @@ CORE_ACTION(
 public:
   ActionActivateLayer()
   {
-    this->add_argument( this->layer_id_ );
-  }
-
-  virtual ~ActionActivateLayer()
-  {
+    this->add_parameter( this->layer_id_ );
   }
 
   // -- Functions that describe action --
@@ -64,19 +60,10 @@ public:
   
 private:
   // This parameter contains the id of the layer
-  Core::ActionParameter< std::string > layer_id_;
+  std::string layer_id_;
 
   // -- Dispatch this action from the interface --
 public:
-  
-  // CREATE:
-  // Create an action that activates a layer
-  static Core::ActionHandle Create( LayerHandle layer );
-
-  // CREATE:
-  // Create an action that activates a layer
-  static Core::ActionHandle Create( std::string layer_id );
-  
   // DISPATCH:
   // Dispatch an action that activates a layer
   static void Dispatch( Core::ActionContextHandle context, LayerHandle layer );

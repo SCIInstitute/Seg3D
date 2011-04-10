@@ -133,6 +133,8 @@ TARGET_LINK_LIBRARIES(Application_Filters
                       Core_Parser
                       Application_Layer
                       Application_LayerManager
+                      Application_Project
+                      Application_ProjectManager
                       ${SCI_BOOST_LIBRARY})
 
 # Register action classes

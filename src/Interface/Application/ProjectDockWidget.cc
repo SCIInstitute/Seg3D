@@ -33,6 +33,7 @@
 #include <Core/Utils/Log.h>
 #include <Core/Interface/Interface.h>
 #include <Core/State/Actions/ActionSet.h>
+#include <Core/State/Actions/ActionAdd.h>
 
 // Qt includes
 #include <QtGui/QStandardItemModel>
@@ -53,6 +54,7 @@
 // Interface includes
 #include <Interface/Application/ProjectDockWidget.h>
 #include <Interface/Application/ProjectExportWizard.h>
+#include <Interface/Application/SaveProjectAsWizard.h>
 #include "ui_ProjectDockWidget.h"
 
 namespace Seg3D
@@ -61,118 +63,172 @@ namespace Seg3D
 class ProjectDockWidgetPrivate
 {
 public:
-
+  ProjectDockWidgetPrivate() :
+    resetting_( false )
+  {
+  }
+  
+public:
+  // The UI that was created with QtCreator
   Ui::ProjectDockWidget ui_;
-  bool resetting_;
-  QStandardItemModel* note_model_;
 
+  // Handle to the current project
+  ProjectHandle current_project_;
+
+  bool resetting_;
+  std::vector< std::string > sessions_;
 };
 
 ProjectDockWidget::ProjectDockWidget( QWidget *parent ) :
   QtUtils::QtCustomDockWidget( parent ), 
   private_( new ProjectDockWidgetPrivate )
 {
-  if( this->private_ )
-  {
-    qpointer_type project_dock_widget( this );
-    
-    this->private_->ui_.setupUi( this );
-    this->private_->resetting_ = false;
-    
-    // We dont want them to be able to save blank notes.
-    this->private_->ui_.save_note_button_->setEnabled( false );
 
-    int minutes = PreferencesManager::Instance()->auto_save_time_state_->get();
-    this->private_->ui_.minutes_label_->setText( QString::number( minutes ) );
+  // Setup the User Interface 
+  this->private_->ui_.setupUi( this );
   
-    this->private_->ui_.autosave_checkbox_->setChecked( 
-      PreferencesManager::Instance()->auto_save_state_->get() );
+  // Update some settings in the design from QtDesigner that we cannot set directly
+  QStringList headers; headers << "Time" << "Session Name";
+  this->private_->ui_.sessions_list_->setHorizontalHeaderLabels( headers );
+  this->private_->ui_.horizontalLayout_2->setAlignment( Qt::AlignHCenter );
+
+  connect( this->private_->ui_.save_session_button_, SIGNAL( clicked() ), 
+    this, SLOT( save_session() ) );
+
+//  connect( this->private_->ui_.session_name_linedit_, SIGNAL( returnPressed() ),
+//    this, SLOT( save_session() ) );
+
+  connect( this->private_->ui_.load_session_button_, SIGNAL( clicked() ), 
+    this, SLOT( load_session() ) );
+  
+  connect( this->private_->ui_.delete_session_button_, SIGNAL( clicked() ),
+    this, SLOT( delete_session() ) );
+
+  connect( this->private_->ui_.sessions_list_, SIGNAL( cellDoubleClicked ( int, int ) ),
+    this, SLOT( load_session() ) );
+
+  connect( this->private_->ui_.save_note_button_, SIGNAL( clicked() ), 
+    this, SLOT( save_note() ) );
+
+  connect( this->private_->ui_.note_edit_, SIGNAL( cursorPositionChanged() ),
+    this, SLOT( enable_save_notes_button() ) );
+
+  connect( this->private_->ui_.export_project_button_, SIGNAL( clicked() ),
+    this, SLOT( export_project() ) );
+
+  connect( this->private_->ui_.sessions_list_, SIGNAL( cellClicked ( int, int ) ), 
+    this, SLOT( enable_load_delete_and_export_buttons( int, int ) ) );
+
+
     
-    connect( this->private_->ui_.autosave_checkbox_, SIGNAL( clicked( bool ) ), this,
-      SLOT( set_autosave_checked_state( bool ) ) );
-    
-    add_connection( PreferencesManager::Instance()->auto_save_state_->
-       value_changed_signal_.connect( boost::bind( 
-      &ProjectDockWidget::HandleAutosaveStateChanged, project_dock_widget, _1 ) ) );
+  // This will make sure that the starting active tab is always the sessions tab
+  this->private_->ui_.tabWidget->setCurrentIndex( this->private_->ui_.tabWidget->indexOf( 
+    this->private_->ui_.sessions_tab_ ) );
 
-    QtUtils::QtBridge::Connect( this->private_->ui_.project_name_, 
-      ProjectManager::Instance()->current_project_->project_name_state_ );
-    
-    QtUtils::QtBridge::Connect( this->private_->ui_.custom_colors_checkbox_, 
-      ProjectManager::Instance()->current_project_->save_custom_colors_state_ );
-
-    QtUtils::QtBridge::Connect( this->private_->ui_.session_name_linedit_, 
-      ProjectManager::Instance()->current_project_->current_session_name_state_ );
-
-    add_connection( ProjectManager::Instance()->current_project_->sessions_state_->
-      state_changed_signal_.connect( boost::bind( &ProjectDockWidget::HandleSessionsChanged, 
-      project_dock_widget ) ) );
-
-    add_connection( ProjectManager::Instance()->current_project_->project_notes_state_->
-      state_changed_signal_.connect( boost::bind( &ProjectDockWidget::HandleNoteSaved, 
-      project_dock_widget ) ) );
-
-    add_connection( PreferencesManager::Instance()->auto_save_time_state_->
-      value_changed_signal_.connect( boost::bind( 
-      &ProjectDockWidget::HandleAutoSaveTimeChanged, project_dock_widget, _1 ) ) );
-
-    add_connection( ProjectManager::Instance()->current_project_->project_file_size_state_->
-      value_changed_signal_.connect( boost::bind(
-      &ProjectDockWidget::HandleFileSizeChanged, project_dock_widget, _1 ) ) );
-    
-    connect( this->private_->ui_.save_session_button_, SIGNAL( clicked() ), 
-      this, SLOT( save_session() ) );
-
-    connect( this->private_->ui_.session_name_linedit_, SIGNAL( returnPressed() ),
-      this, SLOT( save_session() ) );
-
-    connect( this->private_->ui_.load_session_button_, SIGNAL( clicked() ), 
-      this, SLOT( load_session() ) );
-    
-    connect( this->private_->ui_.delete_session_button_, SIGNAL( clicked() ),
-      this, SLOT( delete_session() ) );
-
-    connect( this->private_->ui_.sessions_list_, SIGNAL( cellDoubleClicked ( int, int ) ),
-      this, SLOT( load_session() ) );
-
-    connect( this->private_->ui_.save_note_button_, SIGNAL( clicked() ), 
-      this, SLOT( save_note() ) );
-
-    connect( this->private_->ui_.note_edit_, SIGNAL( cursorPositionChanged() ),
-      this, SLOT( enable_save_notes_button() ) );
-
-    connect( this->private_->ui_.export_project_button_, SIGNAL( clicked() ),
-      this, SLOT( export_project() ) );
-
-    connect( this->private_->ui_.sessions_list_, SIGNAL( cellClicked ( int, int ) ), 
-      this, SLOT( enable_load_delete_and_export_buttons( int, int ) ) );
-    
-    QtUtils::QtBridge::Enable( this, ProjectManager::Instance()->project_saved_state_ );
-    
-    QStringList headers;
-    headers << "Time:" << "Session Name:";
-    this->private_->ui_.sessions_list_->setHorizontalHeaderLabels( headers );
-    
-    this->private_->ui_.horizontalLayout_2->setAlignment( Qt::AlignHCenter );
-
-    this->disable_load_delete_and_export_buttons();
-    
-    // This will make sure that the starting active tab is always the sessions tab
-    this->private_->ui_.tabWidget->setCurrentIndex( this->private_->ui_.tabWidget->indexOf( this->private_->ui_.sessions_tab_ ) );
-
-  }
-
+  this->update_widget();
 }
 
 ProjectDockWidget::~ProjectDockWidget()
 {
   this->disconnect_all();
 }
+
+void ProjectDockWidget::update_widget()
+{
+  // Get the current project
+  // ProjectHandle current_project = ProjectManager::Instance()->get_current_project();
+
+  // If the project is the same, do not do anything
+  // if ( this->private_->current_project_ == current_project ) return;
+
+  // -- First disconnect all open connections --
+
+  // Disconnect all connections managed by the QtUtils and boost
+  this->disconnect_all();
+
+  // -------------------------------------------
+
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    // Grab this one, once again, but now within the lock
+    ProjectHandle current_project = ProjectManager::Instance()->get_current_project();
+    
+    // Swap out the project handle
+    this->private_->current_project_ = current_project;
+
+    // We dont want them to be able to save blank notes.
+    this->private_->ui_.save_note_button_->setEnabled( false );
+
+    int minutes = PreferencesManager::Instance()->auto_save_time_state_->get();
+    this->private_->ui_.minutes_label_->setText( QString::number( minutes ) );
+
+    // This connection will trigger this function to be run, and forces all connections to be
+    // updated and the new project to be used.
+    this->add_connection( ProjectManager::Instance()->current_project_changed_signal_.
+      connect( boost::bind( &ProjectDockWidget::HandleUpdateWidget, qpointer_type( this ) ) ) );
+
+    // TODO: Need to reroute thsi through the QtBridge
+    this->add_connection( PreferencesManager::Instance()->auto_save_time_state_->
+      value_changed_signal_.connect( boost::bind( 
+      &ProjectDockWidget::HandleAutoSaveTimeChanged, qpointer_type( this ), _1 ) ) );
+
+    // This connection will ensure that the session list is updated when a new session is available
+    this->add_connection( current_project->sessions_changed_signal_.
+      connect( boost::bind( &ProjectDockWidget::HandleSessionsChanged, qpointer_type( this ) ) ) );
+
+    // This connection will update the notes in the window
+    this->add_connection( current_project->project_notes_state_->state_changed_signal_.
+      connect( boost::bind( &ProjectDockWidget::HandleNoteSaved, qpointer_type( this ) ) ) );
+
+    // TODO: Need to generate QtLabel conenctor with a formatting function, so this can run
+    // through the Qt bridge.
+    this->add_connection( current_project->project_size_state_->value_changed_signal_.
+      connect( boost::bind( &ProjectDockWidget::HandleFileSizeChanged, qpointer_type( this ), _1 ) ) );
+      
+    this->add_connection( QtUtils::QtBridge::Connect( this->private_->ui_.autosave_checkbox_,
+      PreferencesManager::Instance()->auto_save_state_ ) );
+
+    this->add_connection( QtUtils::QtBridge::Connect( this->private_->ui_.project_name_, 
+      current_project->project_name_state_ ) );
+    
+    this->add_connection( QtUtils::QtBridge::Connect( this->private_->ui_.custom_colors_checkbox_, 
+      current_project->save_custom_colors_state_ ) );
+
+    this->add_connection( QtUtils::QtBridge::Connect( this->private_->ui_.session_name_linedit_, 
+      current_project->current_session_name_state_, true ) );
+
+    this->add_connection( QtUtils::QtBridge::Enable( this,
+      ProjectManager::Instance()->get_current_project()->project_files_generated_state_ ) );
+  
+    // Update the session list
+    this->populate_session_list();
+    
+    // Update notes list
+    this->populate_notes_list();
+    
+    // Update file size
+    this->set_file_size_label( current_project->project_size_state_->get() );
+    
+    // Update buttons
+    this->disable_load_delete_and_export_buttons();
+  }
+}
+
   
 void ProjectDockWidget::save_session()
 {
-  std::string session_name = this->private_->ui_.session_name_linedit_->text().toStdString();
-  ActionSaveSession::Dispatch( Core::Interface::GetWidgetActionContext(), false, session_name );
+  ProjectHandle current_project = ProjectManager::Instance()->get_current_project();
+
+  // Need to lock state engine as we need query state properties of the current project.
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+  if ( current_project->project_files_generated_state_->get() == false ||
+    current_project->project_files_accessible_state_->get() == false )
+  {
+    SaveProjectAsWizard* save_project_as_wizard_ = new SaveProjectAsWizard( qobject_cast< QWidget* >( this->parent() ) );
+    save_project_as_wizard_->exec();
+  }
+
+  ActionSaveSession::Dispatch( Core::Interface::GetWidgetActionContext(), "" );
 }
 
 void ProjectDockWidget::save_note()
@@ -182,13 +238,21 @@ void ProjectDockWidget::save_note()
 
   this->private_->resetting_ = true;
   this->private_->ui_.note_edit_->setStyleSheet( 
-    QString::fromUtf8( "QTextEdit#note_edit_{ color: light gray; }" ) );
+    QString::fromUtf8( "QPlainTextEdit#note_edit_{ color: rgb(150, 150, 150); }" ) );
   this->private_->ui_.note_edit_->setPlainText( 
     QString::fromUtf8( "Enter your note here." ) );
   this->private_->ui_.save_note_button_->setEnabled( false );
 
-  Core::Application::PostEvent( boost::bind( &ProjectManager::save_note,
-    ProjectManager::Instance(), current_text ) );
+  std::string current_user;
+  Core::Application::Instance()->get_user_name( current_user );
+
+  std::string time_stamp = boost::posix_time::to_simple_string( 
+    boost::posix_time::second_clock::local_time() );
+    
+  // TODO: This function is probably called from the wrong thread
+  Core::ActionAdd::Dispatch( Core::Interface::GetWidgetActionContext(),
+    ProjectManager::Instance()->get_current_project()->project_notes_state_, 
+    time_stamp + " - " + current_user + "|" + current_text );
 }
   
 void ProjectDockWidget::load_session()
@@ -206,66 +270,54 @@ void ProjectDockWidget::load_session()
   {
     return;
   }
-
-  std::string row_time = this->private_->ui_.sessions_list_->item( row, 0 )->text().toStdString();
-
-  if( row_time != "" )
+  
+  if ( this->private_->current_project_ )
   {
-    if ( ProjectManager::Instance()->current_project_ )
+    if ( this->private_->current_project_->check_project_changed() )
     {
-      if ( ProjectManager::Instance()->current_project_->check_project_changed() )
+      // Check whether the users wants to save and whether the user wants to quit
+      int ret = QMessageBox::warning( this, "Save Current Session ?",
+        "Your current session has not been saved.\n"
+        "Do you want to save your changes?",
+        QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel );
+      
+      if ( ret == QMessageBox::Save )
       {
-
-        // Check whether the users wants to save and whether the user wants to quit
-        int ret = QMessageBox::warning( this, "Save Current Session ?",
-          "Your current session has not been saved.\n"
-          "Do you want to save your changes?",
-          QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel );
-        
-        if ( ret == QMessageBox::Save )
-        {
-          Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-          ActionSaveSession::Dispatch( Core::Interface::GetWidgetActionContext(), false, 
-            ProjectManager::Instance()->current_project_->
-            current_session_name_state_->get() );   
-        }
-
-        if ( ret != QMessageBox::Cancel )
-        {
-          std::vector< std::string > sessions = 
-            ProjectManager::Instance()->current_project_->sessions_state_->get();
-
-          std::string session_name = sessions[ row ];
-          ActionLoadSession::Dispatch( Core::Interface::GetWidgetActionContext(), 
-            session_name );
-        }
+        Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+        ActionSaveSession::Dispatch( Core::Interface::GetWidgetActionContext(), "" );   
       }
-      else
-      {
-        std::vector< std::string > sessions = ProjectManager::Instance()->current_project_->
-          sessions_state_->get();
 
-        std::string session_name = sessions[ row ];
-        ActionLoadSession::Dispatch( Core::Interface::GetWidgetActionContext(), 
-          session_name );   
+      if ( ret == QMessageBox::Cancel )
+      {
+        return;
       }
     }
+
+    ActionLoadSession::Dispatch( Core::Interface::GetWidgetActionContext(), 
+      this->private_->sessions_[ row ] );
   }
 }
 
 void ProjectDockWidget::delete_session()
 { 
-  std::vector< int > session_indices_to_delete;
+  if( static_cast<size_t>( this->private_->ui_.sessions_list_->rowCount() ) 
+    != this->private_->sessions_.size() )
+  {
+    CORE_LOG_ERROR( "DANGER! The project dock's session list is out of sync with the actual sessions" );
+    return;
+  }
+
+  std::vector< std::string > sessions_to_delete;
     
   for( int i = 0; i < this->private_->ui_.sessions_list_->rowCount(); ++i ) 
   {
     if( this->private_->ui_.sessions_list_->item( i, 0 )->isSelected() )
     {
-      session_indices_to_delete.push_back( i );
+      sessions_to_delete.push_back( this->private_->sessions_[ i ] );
     }
   }
 
-  if( session_indices_to_delete.size() > 0 )
+  if( sessions_to_delete.size() > 0 )
   {
     QMessageBox message_box;
     message_box.setText( QString::fromUtf8( "WARNING: You cannot recover deleted sessions.") );
@@ -274,19 +326,14 @@ void ProjectDockWidget::delete_session()
     message_box.setDefaultButton( QMessageBox::No );
     if( QMessageBox::Yes == message_box.exec() )
     {
-      std::vector< std::string > sessions_to_delete;
-      std::vector< std::string > sessions = ProjectManager::Instance()->current_project_->
-        sessions_state_->get();
-      for( size_t i = 0; i < session_indices_to_delete.size(); ++i )
-      {
-        sessions_to_delete.push_back( sessions[ session_indices_to_delete[ i ] ] ); 
-      }
       for( size_t i = 0; i < sessions_to_delete.size(); ++i )
       {
+        // Issue a command to delete the session on the application thread
+        // This needs to be done synchronously with the main program and hence
+        // it needs to be dispatched to the main application thread.
         ActionDeleteSession::Dispatch( Core::Interface::GetWidgetActionContext(), 
           sessions_to_delete[ i ] );
       } 
-      
     }
   }
   this->disable_load_delete_and_export_buttons();
@@ -294,11 +341,8 @@ void ProjectDockWidget::delete_session()
 
 void ProjectDockWidget::populate_session_list()
 {
-  std::vector< std::string > sessions;
-  {
-    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-    sessions = ProjectManager::Instance()->current_project_->sessions_state_->get();
-  }
+  // We are going to update our local copy of the session list so we'll clear it first
+  this->private_->sessions_.clear();
 
   this->private_->ui_.sessions_list_->verticalHeader()->setUpdatesEnabled( false );
 
@@ -307,83 +351,67 @@ void ProjectDockWidget::populate_session_list()
   {
     this->private_->ui_.sessions_list_->removeRow( j );
   }
+  this->private_->ui_.sessions_list_->verticalHeader()->setUpdatesEnabled( true );
+  this->private_->ui_.sessions_list_->repaint();
+  this->private_->ui_.sessions_list_->verticalHeader()->setUpdatesEnabled( false );
 
-  // The session list has a list of session files that we need to list.  The session files are 
-  // saved in the format timestamp - sessionname - username.xml
-  for( int i = 0; i < static_cast< int >( sessions.size() ); ++i )
+  std::vector< SessionInfo > sessions_info;
+  if( !this->private_->current_project_->get_all_sessions( sessions_info ) )
   {
-    // in the saving and reloading using Splitstring we occasionally get empty spaces in our
-    // vectors as well as extra ] characters, so we need to filter them out
-    if( ( sessions[ i ] == "" ) || ( sessions[ i ] == "]" ) )
-    {
-      continue;
-    }
+    CORE_LOG_DEBUG( "no previous sessions exist" );
+    return;
+  }
 
-    if( static_cast< int >( Core::SplitString( sessions[ i ], " - " ).size() ) < 3 )
-    {
-      continue;
-    }
-
-    std::string session_name = sessions[ i ];
-    QTableWidgetItem *new_item_name;
+  for( size_t i = 0; i < sessions_info.size(); ++i )
+  {
     QTableWidgetItem *new_item_time;
-
-    new_item_time = new QTableWidgetItem( QString::fromStdString( 
-      ( Core::SplitString( session_name, " - " ) )[ 0 ] ) );
-    new_item_name = new QTableWidgetItem( QString::fromStdString( 
-      ( Core::SplitString( session_name, " - " ) )[ 1 ] ) );
-
-    QFont font;
-    //font.setPointSize( 11 );
+    QTableWidgetItem *new_item_name;
+  
+    // first we get today's date in the format that we want     
+    std::string todays_date = ( Core::SplitString( boost::posix_time::to_simple_string( 
+      boost::posix_time::second_clock::local_time() ), " " ) )[ 0 ];
+      
+    std::string date = ( Core::SplitString( sessions_info[ i ].timestamp_, " " ) )[ 0 ];
+    std::string time = ( Core::SplitString( sessions_info[ i ].timestamp_, " " ) )[ 1 ];
+    std::string name = ( Core::SplitString( sessions_info[ i ].session_name_, "-" ) )[ 1 ];
     
-    if( ( Core::SplitString( session_name, " - " ) )[ 1 ]== "AutoSave" )
+    // Here we are going to cache a local copy of the full session names
+    this->private_->sessions_.push_back( sessions_info[ i ].session_name_ );
+     
+    if( todays_date == date )
+    {
+      new_item_time = new QTableWidgetItem( QString::fromStdString( time ) );
+    }
+    else
+    {
+      new_item_time = new QTableWidgetItem( QString::fromStdString( date ) );
+    }
+    
+    new_item_name = new QTableWidgetItem( QString::fromStdString( name ) );
+      
+    QFont font;
+    if( name == "AutoSave" )
     {
       font.setBold( true );
     }
-    
     new_item_name->setFont( font );
     new_item_time->setFont( font );
-
-    this->private_->ui_.sessions_list_->insertRow( i );
-
-    std::vector< std::string > time_vector = Core::SplitString( 
-      new_item_time->text().toStdString(), "-" );
-
-    if( time_vector.size() == 6 )
-    {
-
-      QString date_stamp = QString::fromStdString( time_vector[ 0 ] + "|" + 
-        time_vector[ 1 ] + "|" + time_vector[ 2 ] );
-
-      QString time_stamp = QString::fromStdString( time_vector[ 3 ] + ":" + 
-        time_vector[ 4 ] + ":" + time_vector[ 5 ] );
-
-      if( date_stamp.toStdString() == this->get_date() )
-      {
-        new_item_time->setText( time_stamp );
-      }
-      else
-      {
-        new_item_time->setText( date_stamp );
-      }
-
-      // Add a tooltip to display the user who saved the session 
-      QString tool_tip = QString::fromUtf8( "This session was saved by: " )
-        + QString::fromStdString( ( Core::SplitString( session_name, " - " ) )[ 2 ] ) 
-        + " on " + date_stamp + " at " + time_stamp;
-
-      new_item_time->setToolTip( tool_tip );
-      new_item_name->setToolTip( tool_tip );
-    }
-
-    std::string test = new_item_time->text().toStdString();
-    this->private_->ui_.sessions_list_->setItem( i, 0, new_item_time );
-    this->private_->ui_.sessions_list_->setItem( i, 1, new_item_name );
-    this->private_->ui_.sessions_list_->verticalHeader()->resizeSection( i, 24 );
     
+    QString tool_tip = QString::fromUtf8( "This session was saved by: " )
+      + QString::fromStdString( sessions_info[ i ].username_ ) +  QString::fromUtf8( " at " ) +
+       QString::fromStdString( sessions_info[ i ].timestamp_ );
+       
+    new_item_time->setToolTip( tool_tip );
+    new_item_name->setToolTip( tool_tip );
+    
+    this->private_->ui_.sessions_list_->insertRow( static_cast< int >( i ) );
+    this->private_->ui_.sessions_list_->setItem( static_cast< int >( i ), 0, new_item_time );
+    this->private_->ui_.sessions_list_->setItem( static_cast< int >( i ), 1, new_item_name );
+    this->private_->ui_.sessions_list_->verticalHeader()->resizeSection( static_cast< int >( i ), 24 );
   }
 
   this->private_->ui_.sessions_list_->verticalHeader()->setUpdatesEnabled( true );
+  this->private_->ui_.sessions_list_->repaint();
 }
     
 
@@ -392,7 +420,7 @@ void ProjectDockWidget::populate_notes_list()
   std::vector< std::string > notes;
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-    notes = ProjectManager::Instance()->current_project_->project_notes_state_->get();
+    notes = this->private_->current_project_->project_notes_state_->get();
   }
   
   // Clear out the treewidget
@@ -432,33 +460,6 @@ void ProjectDockWidget::populate_notes_list()
     this->private_->ui_.notes_tree_->topLevelItem( 0 ) );
 }
   
-void ProjectDockWidget::HandleSessionsChanged( qpointer_type qpointer )
-{
-  if( !( Core::Interface::IsInterfaceThread() ) )
-  {
-    Core::Interface::Instance()->post_event( boost::bind( 
-      &ProjectDockWidget::HandleSessionsChanged,  qpointer ) );
-    return;
-  }
-  
-  CORE_LOG_DEBUG( "HandleSessionsChanged started" );
-  if( qpointer.data() ) qpointer->populate_session_list();
-  CORE_LOG_DEBUG( "HandleSessionsChanged done" );
-}
-
-void ProjectDockWidget::HandleNoteSaved( qpointer_type qpointer )
-{
-  if( !( Core::Interface::IsInterfaceThread() ) )
-  {
-    Core::Interface::Instance()->post_event( boost::bind( 
-      &ProjectDockWidget::HandleNoteSaved, qpointer ) );
-    return;
-  }
-
-  CORE_LOG_DEBUG( "HandleNoteSaved started" );
-  if( qpointer.data() ) qpointer->populate_notes_list();
-  CORE_LOG_DEBUG( "HandleNoteSaved done" );
-}
 
 void ProjectDockWidget::enable_save_notes_button()
 {
@@ -471,7 +472,7 @@ void ProjectDockWidget::enable_save_notes_button()
       this->private_->ui_.note_edit_->setPlainText( 
         QString::fromUtf8( "" ) );
       this->private_->ui_.note_edit_->setStyleSheet( 
-        QString::fromUtf8( "QTextEdit#note_edit_{ color: black; }" ) );
+        QString::fromUtf8( "QPlainTextEdit#note_edit_{ color: black; }" ) );
     }
     else
     {
@@ -492,30 +493,6 @@ void ProjectDockWidget::enable_save_notes_button()
 void ProjectDockWidget::call_load_session( int row, int column )
 {
   this->load_session();
-}
-
-void ProjectDockWidget::HandleAutoSaveTimeChanged( qpointer_type qpointer, int duration )
-{
-  if( !( Core::Interface::IsInterfaceThread() ) )
-  {
-    Core::Interface::Instance()->post_event( boost::bind( 
-      &ProjectDockWidget::HandleAutoSaveTimeChanged, qpointer, duration ) );
-    return;
-  }
-
-  if( qpointer.data() ) qpointer->set_auto_save_label( duration );
-
-}
-
-void ProjectDockWidget::HandleFileSizeChanged( qpointer_type qpointer, long long file_size )
-{
-  if( !( Core::Interface::IsInterfaceThread() ) )
-  {
-    Core::Interface::Instance()->post_event( boost::bind( 
-      &ProjectDockWidget::HandleFileSizeChanged, qpointer, file_size ) );
-    return;
-  }
-  if( qpointer.data() ) qpointer->set_file_size_label( file_size );
 }
 
 
@@ -661,14 +638,9 @@ void ProjectDockWidget::export_project()
     message_box.exec();
     return;
   }
-  
-  
-  std::vector< std::string > sessions = ProjectManager::Instance()->current_project_->
-    sessions_state_->get();
-  std::string session_name = sessions[ row ];
 
   QPointer< ProjectExportWizard > project_export_wizard_ = 
-    new ProjectExportWizard( session_name, this );
+    new ProjectExportWizard( this->private_->sessions_[ row ], this );
   project_export_wizard_->show();
 
   this->disable_load_delete_and_export_buttons();
@@ -706,26 +678,96 @@ void ProjectDockWidget::disable_load_delete_and_export_buttons()
   }
 }
 
-void ProjectDockWidget::set_autosave_checked_state( bool state )
+void ProjectDockWidget::HandleUpdateWidget( qpointer_type qpointer )
 {
-  Core::ActionSet::Dispatch( Core::Interface::GetMouseActionContext(),
-    PreferencesManager::Instance()->auto_save_state_, state );
+  // This function needs to be called on the Interface thread, hence if we are not on the
+  // Interface thread we need send a message to the Interface thread to actually execute
+  // this function, with the current parameters.
+  
+  if( !( Core::Interface::IsInterfaceThread() ) )
+  {
+    Core::Interface::Instance()->post_event( boost::bind( 
+      &ProjectDockWidget::HandleUpdateWidget, qpointer ) );
+    return;
+  }
 
-}
-             
-void ProjectDockWidget::set_autosave_checkbox( bool state )
-{
-   this->private_->ui_.autosave_checkbox_->blockSignals( true );
-   this->private_->ui_.autosave_checkbox_->setChecked( state );
-   this->private_->ui_.autosave_checkbox_->blockSignals( false );
-}
-
-void ProjectDockWidget::HandleAutosaveStateChanged( qpointer_type qpointer, bool state )
-{
-  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, 
-    boost::bind( &ProjectDockWidget::set_autosave_checkbox, qpointer.data(), state ) ) );
-   
+  // We need to check whether the object still exists, the use of the qpointer allows for
+  // checking if the object still exists.
+  if( qpointer.data() ) qpointer->update_widget();  
 }
 
+void ProjectDockWidget::HandleAutoSaveTimeChanged( qpointer_type qpointer, int duration )
+{
+  // This function needs to be called on the Interface thread, hence if we are not on the
+  // Interface thread we need send a message to the Interface thread to actually execute
+  // this function, with the current parameters.
+
+  if( !( Core::Interface::IsInterfaceThread() ) )
+  {
+    Core::Interface::Instance()->post_event( boost::bind( 
+      &ProjectDockWidget::HandleAutoSaveTimeChanged, qpointer, duration ) );
+    return;
+  }
+
+  // We need to check whether the object still exists, the use of the qpointer allows for
+  // checking if the object still exists.
+  if( qpointer.data() ) qpointer->set_auto_save_label( duration );
+}
+
+void ProjectDockWidget::HandleFileSizeChanged( qpointer_type qpointer, long long file_size )
+{
+  // This function needs to be called on the Interface thread, hence if we are not on the
+  // Interface thread we need send a message to the Interface thread to actually execute
+  // this function, with the current parameters.
+
+  if( !( Core::Interface::IsInterfaceThread() ) )
+  {
+    Core::Interface::Instance()->post_event( boost::bind( 
+      &ProjectDockWidget::HandleFileSizeChanged, qpointer, file_size ) );
+    return;
+  }
+
+  // We need to check whether the object still exists, the use of the qpointer allows for
+  // checking if the object still exists.
+  if( qpointer.data() ) qpointer->set_file_size_label( file_size );
+}
+
+
+void ProjectDockWidget::HandleSessionsChanged( qpointer_type qpointer )
+{
+  // This function needs to be called on the Interface thread, hence if we are not on the
+  // Interface thread we need send a message to the Interface thread to actually execute
+  // this function, with the current parameters.
+
+  if( !( Core::Interface::IsInterfaceThread() ) )
+  {
+    Core::Interface::Instance()->post_event( boost::bind( 
+      &ProjectDockWidget::HandleSessionsChanged,  qpointer ) );
+    return;
+  }
+  
+  // We need to check whether the object still exists, the use of the qpointer allows for
+  // checking if the object still exists.
+  if( qpointer.data() ) qpointer->populate_session_list();
+}
+
+
+void ProjectDockWidget::HandleNoteSaved( qpointer_type qpointer )
+{
+  // This function needs to be called on the Interface thread, hence if we are not on the
+  // Interface thread we need send a message to the Interface thread to actually execute
+  // this function, with the current parameters.
+
+  if( !( Core::Interface::IsInterfaceThread() ) )
+  {
+    Core::Interface::Instance()->post_event( boost::bind( 
+      &ProjectDockWidget::HandleNoteSaved, qpointer ) );
+    return;
+  }
+
+  // We need to check whether the object still exists, the use of the qpointer allows for
+  // checking if the object still exists.
+  if( qpointer.data() ) qpointer->populate_notes_list();
+}
 
 } // end namespace Seg3D

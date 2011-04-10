@@ -106,15 +106,15 @@ void DataVolumePrivate::copy_typed_data( DST_TYPE* buffer, size_t width, size_t 
       {
         buffer[ dst_index ] = buffer[ dst_index - 1 ];
         ++dst_index;
-      }
     }
+  }
 
     // Pad the texture in Y-direction with boundary values
     for ( size_t y = y_end - y_start + 2; y <= height; ++y )
     {
       memcpy( buffer + dst_index, buffer + dst_index - width, sizeof( DST_TYPE ) * width );
       dst_index += width;
-    }
+}
   }
 
   // Pad the texture in Z-direction with boundary values
@@ -194,7 +194,7 @@ bool DataVolumePrivate::generate_bricks()
 
   size_t brick_x_start, brick_x_end, brick_y_start, brick_y_end, brick_z_start, brick_z_end;
   for ( size_t z = 0; z < nz; z = brick_z_end + 1 )
-  {   
+  {
     // The boundary of the brick texture ( padded to power of 2 ) in index space
     size_t data_z_start = z > OVERLAP_SIZE_C ? ( z - OVERLAP_SIZE_C ) : z;
     size_t texture_depth = BRICK_SIZE_C;
@@ -274,9 +274,9 @@ bool DataVolumePrivate::generate_bricks()
         tex->bind();
         tex->set_mag_filter( GL_LINEAR );
         tex->set_min_filter( GL_LINEAR );
-        tex->set_wrap_s( GL_CLAMP );
-        tex->set_wrap_t( GL_CLAMP );
-        tex->set_wrap_r( GL_CLAMP );
+        tex->set_wrap_s( GL_CLAMP_TO_EDGE );
+        tex->set_wrap_t( GL_CLAMP_TO_EDGE );
+        tex->set_wrap_r( GL_CLAMP_TO_EDGE );
         tex->set_image( static_cast< int >( texture_width ), static_cast< int >( texture_height ), 
           static_cast< int >( texture_depth ), DataVolumeBrick::TEXTURE_FORMAT_C,
           0, GL_ALPHA, DataVolumeBrick::TEXTURE_DATA_TYPE_C );
@@ -457,19 +457,16 @@ bool DataVolume::SaveDataVolume( const boost::filesystem::path& filepath,
                 DataVolumeHandle& volume, std::string& error, 
                 bool compress, int level )
 {
-  if( !boost::filesystem::exists( filepath ) )
-  {
-    NrrdDataHandle nrrd = NrrdDataHandle( new NrrdData( 
-      volume->private_->data_block_, volume->get_grid_transform() ) );
+  NrrdDataHandle nrrd = NrrdDataHandle( new NrrdData( 
+    volume->private_->data_block_, volume->get_grid_transform() ) );
 
-    nrrd->set_histogram( volume->private_->data_block_->get_histogram() );
-    
-    DataBlock::shared_lock_type slock( volume->private_->data_block_->get_mutex() );
-    if ( ! ( NrrdData::SaveNrrd( filepath.string(), nrrd, error, compress, level ) ) ) 
-    {
-      CORE_LOG_ERROR( error );
-      return false;
-    }
+  nrrd->set_histogram( volume->private_->data_block_->get_histogram() );
+  
+  DataBlock::shared_lock_type slock( volume->private_->data_block_->get_mutex() );
+  if ( ! ( NrrdData::SaveNrrd( filepath.string(), nrrd, error, compress, level ) ) ) 
+  {
+    CORE_LOG_ERROR( error );
+    return false;
   }
   
   return true;

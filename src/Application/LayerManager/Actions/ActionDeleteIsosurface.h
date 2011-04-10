@@ -52,11 +52,7 @@ CORE_ACTION(
 public:
   ActionDeleteIsosurface()
   {
-    this->add_argument( this->layer_id_ );
-  }
-  
-  virtual ~ActionDeleteIsosurface()
-  {
+    this->add_parameter( this->layer_id_ );
   }
   
 // -- Functions that describe action --
@@ -66,15 +62,10 @@ public:
 
 private:
   // This parameter contains the id of the layer group
-  Core::ActionParameter< std::string > layer_id_;
+  std::string layer_id_;
   
   // -- Dispatch this action from the interface --
 public:
-
-  // CREATE:
-  // Create an action that deletes the isosurface for the selected layer
-  static Core::ActionHandle Create( MaskLayerHandle mask_layer );
-
   // DISPATCH
   // Create and dispatch action that deletes the isosurface for the selected layer
   static void Dispatch( Core::ActionContextHandle context, MaskLayerHandle mask_layer );  

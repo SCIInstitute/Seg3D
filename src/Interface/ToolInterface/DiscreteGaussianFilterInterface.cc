@@ -93,6 +93,8 @@ bool DiscreteGaussianFilterInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Connect( this->private_->ui_.runFilterButton, boost::bind(
     &Tool::execute, tool, Core::Interface::GetWidgetActionContext() ) );
   
+  this->private_->ui_.blurring_distance_->set_description( "Distance (pixels)" );
+  
   return true;
 } // end build_widget
 

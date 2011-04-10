@@ -41,18 +41,17 @@ class ActionRemove : public Action
 {
 CORE_ACTION( 
   CORE_ACTION_TYPE( "Remove", "Remove an item from a vector or set state." )
-  CORE_ACTION_ARGUMENT( "stateid", "The stateid of the state variable from which the item needs to be removed" )
+  CORE_ACTION_ARGUMENT( "stateid", "The stateid of the state variable from"
+    " which the item needs to be removed" )
   CORE_ACTION_ARGUMENT( "value", "The value that needs to be removed" ) 
 )
 
 public:
   ActionRemove()
   {
-    this->add_argument( this->stateid_ );
-    this->add_argument( this->value_ );
+    this->add_parameter( this->stateid_ );
+    this->add_parameter( this->value_ );
   }
-  
-  virtual ~ActionRemove() {}
 
   // -- Functions that describe action --
   virtual bool validate( ActionContextHandle& context );
@@ -62,48 +61,40 @@ public:
   virtual bool changes_project_data();
 
 private:
-  ActionParameter< std::string > stateid_;
-  ActionParameterVariant value_;
+  std::string stateid_;
+  Variant value_;
 
   StateBaseWeakHandle state_weak_handle_;
 
 public:
-  template< class HANDLE, class T >
-  static ActionHandle Create( const HANDLE& state, const T& value );
 
   template< class T >
   static void Dispatch( ActionContextHandle context,
-    StateVectorBaseHandle state, const T& value );
-
-  template< class T >
-  static void Dispatch( ActionContextHandle context,
-    StateSetBaseHandle state, const T& value );
-};
-
-template< class HANDLE, class T >
-ActionHandle ActionRemove::Create( const HANDLE& state, const T& value )
-{
-  ActionRemove* action = new ActionRemove;
-  action->stateid_.set_value( state->get_stateid() );
-  action->value_.set_value( value );
-  action->state_weak_handle_ = state;
-
-  return ActionHandle( action );
-}
-
-template< class T >
-void ActionRemove::Dispatch( ActionContextHandle context, 
     StateVectorBaseHandle state, const T& value )
-{
-  ActionDispatcher::PostAction( Create( state, value ), context );
-}
+  {
+    ActionRemove* action = new ActionRemove;
+    
+    action->stateid_ = state->get_stateid();
+    action->value_.set( value );
+    action->state_weak_handle_ = state;
 
-template< class T >
-void ActionRemove::Dispatch( ActionContextHandle context, 
+    ActionDispatcher::PostAction( ActionHandle( action ), context );
+  }
+
+  template< class T >
+  static void Dispatch( ActionContextHandle context,
     StateSetBaseHandle state, const T& value )
-{
-  ActionDispatcher::PostAction( Create( state, value ), context );
-}
+  {
+    ActionRemove* action = new ActionRemove;
+    
+    action->stateid_ = state->get_stateid();
+    action->value_.set( value );
+    action->state_weak_handle_ = state;
+
+    ActionDispatcher::PostAction( ActionHandle( action ), context );
+  }
+
+};
 
 } // end namespace Core
 

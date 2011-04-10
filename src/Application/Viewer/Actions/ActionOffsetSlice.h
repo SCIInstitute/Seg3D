@@ -51,7 +51,6 @@ CORE_ACTION(
 
 public:
   ActionOffsetSlice();
-  virtual ~ActionOffsetSlice();
 
   virtual bool validate( Core::ActionContextHandle& context );
   virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
@@ -60,7 +59,6 @@ private:
   ActionOffsetSlicePrivateHandle private_;
 
 public:
-  static Core::ActionHandle Create( const ViewerHandle& viewer, int offset );
   static void Dispatch( Core::ActionContextHandle context, 
     const ViewerHandle& viewer, int offset );
 };

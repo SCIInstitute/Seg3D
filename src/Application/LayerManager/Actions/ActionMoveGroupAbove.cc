@@ -40,9 +40,10 @@ namespace Seg3D
   
 bool ActionMoveGroupAbove::validate( Core::ActionContextHandle& context )
 {
-  if( !LayerManager::Instance()->get_layer_group( this->group_to_move_id_.value() ) ||
-    !LayerManager::Instance()->get_layer_group( this->group_below_id_.value() ) )
+  if( !LayerManager::Instance()->get_group_by_id( this->group_to_move_id_ ) ||
+    !LayerManager::Instance()->get_group_by_id( this->group_below_id_ ) )
   {
+    context->report_error( "Group ids are invalid." );
     return false;
   }
 
@@ -52,29 +53,21 @@ bool ActionMoveGroupAbove::validate( Core::ActionContextHandle& context )
 bool ActionMoveGroupAbove::run( Core::ActionContextHandle& context, 
                  Core::ActionResultHandle& result )
 {
-  return LayerManager::Instance()->move_group_above( this->group_to_move_id_.value(),
-    this->group_below_id_.value() );
-}
-
-Core::ActionHandle ActionMoveGroupAbove::Create( const std::string& group_to_move_id, 
-  const std::string& group_below_id )
-{
-  // Create new action
-  ActionMoveGroupAbove* action = new ActionMoveGroupAbove;
-  
-  // We need to fill in these to ensure the action can be replayed
-  action->group_below_id_.value() = group_below_id;
-  action->group_to_move_id_.value() = group_to_move_id;
-  
-  // Post the new action
-  return Core::ActionHandle( action );
+  return LayerManager::Instance()->move_group_above( this->group_to_move_id_, this->group_below_id_ );
 }
 
 
 void ActionMoveGroupAbove::Dispatch( Core::ActionContextHandle context, 
   const std::string& group_to_move_id, const std::string& group_below_id )
 {
-  Core::ActionDispatcher::PostAction( Create( group_to_move_id, group_below_id ), context );
+  // Create new action
+  ActionMoveGroupAbove* action = new ActionMoveGroupAbove;
+  
+  // We need to fill in these to ensure the action can be replayed
+  action->group_below_id_ = group_below_id;
+  action->group_to_move_id_ = group_to_move_id;
+  
+  Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }
   
 } // end namespace Seg3D

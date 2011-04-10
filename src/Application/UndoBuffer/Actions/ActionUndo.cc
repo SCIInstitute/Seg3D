@@ -56,14 +56,9 @@ bool ActionUndo::run( Core::ActionContextHandle& context,
   return UndoBuffer::Instance()->undo( context );
 }
 
-Core::ActionHandle ActionUndo::Create()
-{
-  return Core::ActionHandle( new ActionUndo );
-}
-
 void ActionUndo::Dispatch( Core::ActionContextHandle context )
 {
-  Core::ActionDispatcher::PostAction( Create(), context );
+  Core::ActionDispatcher::PostAction( Core::ActionHandle( new ActionUndo ), context );
 }
 
 } // end namespace Seg3D

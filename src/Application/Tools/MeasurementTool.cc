@@ -1054,7 +1054,7 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 				glLineStipple(1, 0x00FF );
 				glEnable( GL_LINE_STIPPLE ); 
 			}
-			else if( m_idx == active_index )
+			else if( static_cast<int>( m_idx ) == active_index )
 			{
 				// Draw solid line to indicate active measurement
 				glLineWidth( 2.0f );

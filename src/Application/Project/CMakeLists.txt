@@ -34,6 +34,8 @@
 SET(APPLICATION_PROJECT_SRCS
   Project.h
   Project.cc
+  SessionInfo.h
+  SessionInfo.cc
   DataManager.h
   DataManager.cc
 )
@@ -50,8 +52,9 @@ TARGET_LINK_LIBRARIES(Application_Project
                       Core_Utils
                       Core_Application
                       Core_Interface
-            Application_Session
                       Application_InterfaceManager
                   Application_LayerManager
-                      ${SCI_BOOST_LIBRARY})
+                  Application_Provenance
+                      ${SCI_BOOST_LIBRARY}
+                      ${SCI_SQLITE_LIBRARY})
                     

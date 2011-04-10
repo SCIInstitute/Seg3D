@@ -29,11 +29,11 @@
 #ifndef APPLICATION_LAYERIO_LAYERIMPORTERINFO_H
 #define APPLICATION_LAYERIO_LAYERIMPORTERINFO_H
 
+// Boost includes
+#include <boost/utility.hpp>
 
 // Application includes
-#include <Application/Layer/Layer.h>
 #include <Application/LayerIO/LayerImporter.h>
-
 
 namespace Seg3D
 {
@@ -52,7 +52,7 @@ public:
   }
   
   // the function call to build the object
-  virtual LayerImporterHandle build( const std::string& filename ) = 0;
+  virtual LayerImporterHandle build() = 0;
 };
 
 
@@ -69,9 +69,9 @@ public:
   }
 
   // The actual builder call
-  virtual LayerImporterHandle build( const std::string& filename )
+  virtual LayerImporterHandle build()
   { 
-    return LayerImporterHandle( new LAYERIMPORTER( filename ));
+    return LayerImporterHandle( new LAYERIMPORTER );
   }
 };
 
@@ -82,64 +82,48 @@ public:
 
 // Class declaration
 class LayerImporterInfo;
+class LayerImporterInfoPrivate;
 typedef boost::shared_ptr<LayerImporterInfo> LayerImporterInfoHandle;
+typedef boost::shared_ptr<LayerImporterInfoPrivate> LayerImporterInfoPrivateHandle;
 
 // Class definition
-class LayerImporterInfo 
+class LayerImporterInfo : public boost::noncopyable
 {
   // -- constructor/destructor --
 public:
-  LayerImporterInfo( LayerImporterBuilderBaseHandle builder,
-    std::string name, std::string file_type_string,
-    int priority, LayerImporterType type );
-  
+  LayerImporterInfo( LayerImporterBuilderBaseHandle builder, std::string name,
+    std::string file_type_string, int priority, LayerImporterType type );
   ~LayerImporterInfo();
 
-  // BUILD:
+  // -- description of the importer --
+public:
+  // TYPE
+  // The type of importer this one is
+  LayerImporterType get_type() const;
+
+  // BUILD
   // Build the importer
-  LayerImporterHandle build( const std::string& filename ) const;
+  LayerImporterHandle build() const;
 
-  // NAME:
+  // GET_NAME
   // Get the name of the importer
-  std::string name() const;
+  std::string get_name() const;
 
-  // CONVERTS_FILE_TYPE:
+  // CONVERTS_FILE_TYPE
   // Check whether this importer deals with a specific file type
   bool converts_file_type( const std::string& file_type, bool strict = true ) const;
   
-  // FILE_TYPES:
+  // GET_FILE_TYPES
   // Get the string that defines the allowed file types
-  std::string file_type_string() const;
+  std::string get_file_type_string() const;
   
-  // PRIORITY:
+  // GET_PRIORITY
   // Get the priority of the importer
-  int priority() const;
+  int get_priority() const;
   
-  // IMPORTER_TYPE:
-  // Whether the importer is for a series of files or for a single file
-  LayerImporterType type() const;
-
+  // -- internals --
 private:
-  // Object that knows how to build the importer
-  LayerImporterBuilderBaseHandle builder_;
-  
-  // Name of the importer
-  std::string name_;
-  
-  // The file types the importer will handle
-  std::vector<std::string> file_types_; 
-  
-  // String with name and file types, to be used as a filter in a file selector
-  std::string file_type_string_;
-  
-  // Any file type, e.g. dicom readers tend to use no extension
-  bool any_type_;
-  
-  // The priority of the importer
-  int priority_;
-  
-  // The type of the importer
-  LayerImporterType importer_type_;
+  LayerImporterInfoPrivateHandle private_;
 };
 
 } // end namespace seg3D

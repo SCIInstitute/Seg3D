@@ -105,6 +105,8 @@ bool OtsuThresholdFilterInterface::build_widget( QFrame* frame )
     tool->use_active_layer_state_, true );
   QtUtils::QtBridge::Connect( this->private_->ui_.runFilterButton, boost::bind(
     &Tool::execute, tool, Core::Interface::GetWidgetActionContext() ) );
+  
+  this->private_->ui_.amount_->set_description( "Thresholds" );
 
   return true;
   

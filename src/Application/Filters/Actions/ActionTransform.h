@@ -29,7 +29,11 @@
 #ifndef APPLICATION_FILTERS_ACTIONS_ACTIONTRANSFORM_H
 #define APPLICATION_FILTERS_ACTIONS_ACTIONTRANSFORM_H
 
+// Core includes
 #include <Core/Action/Actions.h>
+
+// Application includes
+#include <Application/LayerManager/LayerAction.h>
 
 namespace Seg3D
 {
@@ -37,7 +41,7 @@ namespace Seg3D
 class ActionTransformPrivate;
 typedef boost::shared_ptr< ActionTransformPrivate > ActionTransformPrivateHandle;
 
-class ActionTransform : public Core::Action
+class ActionTransform : public LayerAction
 {
 
 CORE_ACTION( 
@@ -53,8 +57,6 @@ CORE_ACTION(
   // -- Constructor/Destructor --
 public:
   ActionTransform();
-  
-  virtual ~ActionTransform() {}
   
   // -- Functions that describe action --
 public:

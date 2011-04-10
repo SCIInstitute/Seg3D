@@ -40,16 +40,16 @@ bool ActionSetAt::validate( ActionContextHandle& context )
   StateBaseHandle state( this->state_weak_handle_.lock() );
   if ( !state )
   {
-    if ( !StateEngine::Instance()->get_state( this->stateid_.value(), state ) )
+    if ( !StateEngine::Instance()->get_state( this->stateid_, state ) )
     {
-      context->report_error( std::string( "Unknown state variable '" ) + stateid_.value() + "'" );
+      context->report_error( std::string( "Unknown state variable '" ) + stateid_ + "'" );
       return false;
     }
     StateVectorBaseHandle vector_state = 
       boost::dynamic_pointer_cast< StateVectorBase >( state );
     if ( !vector_state )
     {
-      context->report_error( std::string( "State variable '") + this->stateid_.value() +
+      context->report_error( std::string( "State variable '") + this->stateid_ +
         "' doesn't support ActionSetAt" );
       return false;
     }
@@ -57,7 +57,7 @@ bool ActionSetAt::validate( ActionContextHandle& context )
   }
   
   StateVectorBaseHandle vector_state = this->state_weak_handle_.lock();
-  if ( this->index_.value() >= vector_state->size() )
+  if ( this->index_ >= vector_state->size() )
   {
     context->report_error( std::string( "Index out of range" ) );
     return false;
@@ -78,7 +78,7 @@ bool ActionSetAt::run( ActionContextHandle& context, ActionResultHandle& result 
   StateVectorBaseHandle vector_state( this->state_weak_handle_.lock() );
   if ( vector_state )
   {
-    return vector_state->set_at( this->index_.value(), this->value_, context->source() );
+    return vector_state->set_at( this->index_, this->value_, context->source() );
   }
 
   return false;
@@ -92,7 +92,7 @@ bool ActionSetAt::changes_project_data()
   // If not the state cannot be retrieved report an error
   if ( !state )
   {
-    if ( !( StateEngine::Instance()->get_state( stateid_.value(), state ) ) )
+    if ( !( StateEngine::Instance()->get_state( stateid_, state ) ) )
     {
       return false;
     }
@@ -101,6 +101,5 @@ bool ActionSetAt::changes_project_data()
   // Keep track of whether the state changes the data of the program
   return state->is_project_data();
 }
-
 
 } // end namespace Core

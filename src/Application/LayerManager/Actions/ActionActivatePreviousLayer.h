@@ -51,10 +51,6 @@ public:
   {
   }
 
-  virtual ~ActionActivatePreviousLayer()
-  {
-  }
-
   // -- Functions that describe action --
 public:
   virtual bool validate( Core::ActionContextHandle& context );
@@ -62,10 +58,6 @@ public:
   
   // -- Dispatch this action from the interface --
 public:
-
-  // CREATE:
-  // Create an action that activates a layer
-  static Core::ActionHandle Create();
   
   // DISPATCH:
   // Dispatch an action that activates a layer

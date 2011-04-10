@@ -53,7 +53,6 @@ CORE_ACTION
 
 public:
   ActionCopy();
-  virtual ~ActionCopy();
 
   // -- Functions that describe action --
 public:

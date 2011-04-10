@@ -40,21 +40,16 @@ namespace Seg3D
   
 bool ActionMoveLayerBelow::validate( Core::ActionContextHandle& context )
 {
-  if( !LayerManager::Instance()->get_layer_by_id( this->layer_.value() ) )
+  if( !LayerManager::Instance()->get_layer_by_id( this->layer_ ) )
   {
-    if( LayerManager::Instance()->get_layer_by_name( this->layer_.value() ) )
-    {
-      this->layer_.value() = LayerManager::Instance()->get_layer_by_name( 
-        this->layer_.value() )->get_layer_id();
-    }
-    else
-    {
-      return false;
-    }
+  
+    context->report_error( std::string( "Layer ID '") + this->layer_ + "' is invalid" );
+    return false;
   }
 
-  if( !LayerManager::Instance()->get_layer_group( this->group_id_.value() ) )
+  if( !LayerManager::Instance()->get_group_by_id( this->group_id_ ) )
   {
+    context->report_error( std::string( "Group ID '") + this->group_id_ + "' is invalid" );
     return false;
   }
 
@@ -64,29 +59,21 @@ bool ActionMoveLayerBelow::validate( Core::ActionContextHandle& context )
 bool ActionMoveLayerBelow::run( Core::ActionContextHandle& context, 
   Core::ActionResultHandle& result )
 {
-  return LayerManager::Instance()->move_layer_below( this->layer_.value(),
-    this->group_id_.value() );
+  return LayerManager::Instance()->move_layer_below( this->layer_,
+    this->group_id_ );
 }
 
-Core::ActionHandle ActionMoveLayerBelow::Create( const std::string& layer, 
-  const std::string& group_id )
+void ActionMoveLayerBelow::Dispatch( Core::ActionContextHandle context, 
+  const std::string& layer, const std::string& group_id )
 {
   // Create new action
   ActionMoveLayerBelow* action = new ActionMoveLayerBelow;
   
   // We need to fill in these to ensure the action can be replayed
-  action->layer_.value() = layer;
-  action->group_id_.value() = group_id;
+  action->layer_ = layer;
+  action->group_id_ = group_id;
   
-  // Post the new action
-  return Core::ActionHandle( action );
-}
-
-
-void ActionMoveLayerBelow::Dispatch( Core::ActionContextHandle context, 
-  const std::string& layer, const std::string& group_id )
-{
-  Core::ActionDispatcher::PostAction( Create( layer, group_id ), context );
+  Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }
   
 } // end namespace Seg3D

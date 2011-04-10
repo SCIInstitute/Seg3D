@@ -149,7 +149,7 @@ void GroupTargetToolPrivate::handle_target_group_changed( std::string group_id )
   std::vector< std::string > selected_layers;
   if ( group_id != "" && group_id != Tool::NONE_OPTION_C )
   {
-    LayerGroupHandle group = LayerManager::Instance()->get_layer_group( group_id );
+    LayerGroupHandle group = LayerManager::Instance()->get_group_by_id( group_id );
     group->get_layer_names( layer_names, this->target_type_ );
     if ( this->tool_->use_active_group_state_->get() )
     {

@@ -74,16 +74,13 @@ protected:
   friend class ActionAdd;
   friend class ActionRemove;
 
-  virtual bool add( ActionParameterVariant& variant, 
-    ActionSource source = ActionSource::NONE_E ) = 0;
+  virtual bool add( Variant& variant, ActionSource source = ActionSource::NONE_E ) = 0;
 
-  virtual bool remove( ActionParameterVariant& variant, 
-    ActionSource source = ActionSource::NONE_E ) = 0;
+  virtual bool remove( Variant& variant, ActionSource source = ActionSource::NONE_E ) = 0;
 
   virtual void clear( ActionSource source = ActionSource::NONE_E ) = 0;
 
-  virtual bool validate_element_variant( ActionParameterVariant& variant, 
-    std::string& error ) = 0;
+  virtual bool validate_element_variant( Variant& variant, std::string& error ) = 0;
 };
 
 
@@ -137,45 +134,41 @@ public:
 protected:
   // EXPORT_TO_VARIANT
   // Export the state data to a variant parameter
-  virtual void export_to_variant( ActionParameterVariant& variant ) const
+  virtual void export_to_variant( Variant& variant ) const
   {
-    variant.set_value( this->values_set_ );
+    variant.set( this->values_set_ );
   }
 
   // IMPORT_FROM_VARIANT:
   // Import the state data from a variant parameter.
-  virtual bool import_from_variant( ActionParameterVariant& variant, 
-    Core::ActionSource source = Core::ActionSource::NONE_E )
+  virtual bool import_from_variant( Variant& variant, ActionSource source = Core::ActionSource::NONE_E )
   {
     std::set<T> value;
-    if ( !( variant.get_value( value ) ) ) return false;
+    if ( !( variant.get( value ) ) ) return false;
     return this->set( value, source );  
   }
 
-  virtual bool add( ActionParameterVariant& variant, 
-    Core::ActionSource source = Core::ActionSource::NONE_E )
+  virtual bool add( Variant& variant, ActionSource source = Core::ActionSource::NONE_E )
   {
     T element_value;
-    if ( !variant.get_value( element_value ) )
+    if ( !variant.get( element_value ) )
     {
       return false;
     }
     return this->add( element_value, source );
   }
 
-  virtual bool remove( ActionParameterVariant& variant, 
-    Core::ActionSource source = Core::ActionSource::NONE_E )
+  virtual bool remove( Variant& variant, Core::ActionSource source = Core::ActionSource::NONE_E )
   {
     T element_value;
-    if ( !variant.get_value( element_value ) )
+    if ( !variant.get( element_value ) )
     {
       return false;
     }
     return this->remove( element_value, source );
   }
 
-  virtual bool validate_element_variant( ActionParameterVariant& variant, 
-    std::string& error )
+  virtual bool validate_element_variant( Variant& variant, std::string& error )
   {
     if ( !variant.validate_type< T >() )
     {
@@ -190,7 +183,7 @@ protected:
   // Validate a variant parameter
   // This function returns false if the parameter is invalid or cannot be
   // converted and in that case error will describe the error.
-  virtual bool validate_variant( ActionParameterVariant& variant, std::string& error )
+  virtual bool validate_variant( Variant& variant, std::string& error )
   {
     if ( !( variant.validate_type< std::set< T > > () ) )
     {

@@ -51,22 +51,12 @@ namespace Seg3D
 bool ActionConnectedComponentSizeFilter::validate( Core::ActionContextHandle& context )
 {
   // Check for layer existence and type information
-  std::string error;
-  if ( ! LayerManager::CheckLayerExistanceAndType( this->target_layer_.value(), 
-    Core::VolumeType::MASK_E, error ) )
-  {
-    context->report_error( error );
-    return false;
-  }
-  
+  if ( ! LayerManager::CheckLayerExistanceAndType( this->target_layer_, Core::VolumeType::MASK_E, 
+    context ) ) return false;
+
   // Check for layer availability 
-  Core::NotifierHandle notifier;
-  if ( ! LayerManager::CheckLayerAvailabilityForProcessing( this->target_layer_.value(), 
-    notifier ) )
-  {
-    context->report_need_resource( notifier );
-    return false;
-  }
+  if ( ! LayerManager::CheckLayerAvailabilityForProcessing( this->target_layer_, 
+    context ) ) return false;
 
   // Validation successful
   return true;
@@ -215,7 +205,10 @@ bool ActionConnectedComponentSizeFilter::run( Core::ActionContextHandle& context
   boost::shared_ptr<ConnectedComponentSizeFilterAlgo> algo( new ConnectedComponentSizeFilterAlgo );
 
   // Find the handle to the layer
-  algo->find_layer( this->target_layer_.value(), algo->src_layer_ );
+  algo->src_layer_ = LayerManager::FindLayer( this->target_layer_ );
+
+  // In case the layer did not exist, fail gracefully
+  if ( !algo->src_layer_ ) return false;
   
   // Lock the src layer, so it cannot be used else where
   algo->lock_for_use( algo->src_layer_ );
@@ -224,7 +217,7 @@ bool ActionConnectedComponentSizeFilter::run( Core::ActionContextHandle& context
   algo->create_and_lock_data_layer_from_layer( algo->src_layer_, algo->dst_layer_ );
 
   // Copy the parameters
-  algo->log_scale_ = this->log_scale_.value();
+  algo->log_scale_ = this->log_scale_;
 
   // Return the id of the destination layer.
   result = Core::ActionResultHandle( new Core::ActionResult( algo->dst_layer_->get_layer_id() ) );
@@ -232,6 +225,9 @@ bool ActionConnectedComponentSizeFilter::run( Core::ActionContextHandle& context
   // Build the undo-redo record
   algo->create_undo_redo_record( context, this->shared_from_this() );
 
+  // Build the provenance record
+  algo->create_provenance_record( context, this->shared_from_this() );
+  
   // Start the filter on a separate thread.
   Core::Runnable::Start( algo );
 
@@ -245,8 +241,8 @@ void ActionConnectedComponentSizeFilter::Dispatch( Core::ActionContextHandle con
   ActionConnectedComponentSizeFilter* action = new ActionConnectedComponentSizeFilter;
 
   // Setup the parameters
-  action->target_layer_.value() = target_layer;
-  action->log_scale_.value() = log_scale;
+  action->target_layer_ = target_layer;
+  action->log_scale_ = log_scale;
 
   // Dispatch action to underlying engine
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );

@@ -26,18 +26,20 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Core includes
 #include <Core/DataBlock/DataSlice.h>
 #include <Core/DataBlock/MaskDataSlice.h>
 #include <Core/DataBlock/DataBlock.h>
 #include <Core/DataBlock/MaskDataBlock.h>
 #include <Core/DataBlock/MaskDataBlockManager.h>
 
+// Application includes
+#include <Application/Provenance/Provenance.h>
 #include <Application/LayerManager/LayerCheckPoint.h>
 #include <Application/LayerManager/LayerManager.h>
 
 namespace Seg3D
 {
-
 
 class LayerCheckPointPrivate : public boost::noncopyable
 {
@@ -51,6 +53,8 @@ public:
 
   typedef std::vector<Core::MaskDataSliceHandle> mask_slice_vector_type;
   mask_slice_vector_type mask_slices_;
+  
+  ProvenanceID provenance_id_;
 };
 
 
@@ -83,7 +87,8 @@ bool LayerCheckPoint::apply( LayerHandle layer ) const
   // If there is a full volume in the check point insert it into the layer
   if ( this->private_->volume_ )
   {
-    LayerManager::DispatchInsertVolumeIntoLayer( layer, this->private_->volume_ );
+    LayerManager::DispatchInsertVolumeIntoLayer( layer, this->private_->volume_, 
+      this->private_->provenance_id_ );
     return true;
   }
   
@@ -93,7 +98,7 @@ bool LayerCheckPoint::apply( LayerHandle layer ) const
     if ( ! data_layer ) return false;
 
     LayerManager::DispatchInsertDataSlicesIntoLayer( data_layer, 
-      this->private_->data_slices_ );
+      this->private_->data_slices_, this->private_->provenance_id_ );
     return false;
   }
 
@@ -103,7 +108,7 @@ bool LayerCheckPoint::apply( LayerHandle layer ) const
     if ( ! mask_layer ) return false;
 
     LayerManager::DispatchInsertMaskSlicesIntoLayer( mask_layer, 
-      this->private_->mask_slices_ );
+      this->private_->mask_slices_, this->private_->provenance_id_ );
     return false;
   }
 
@@ -112,6 +117,8 @@ bool LayerCheckPoint::apply( LayerHandle layer ) const
   
 bool LayerCheckPoint::create_volume( LayerHandle layer )
 {
+  this->private_->provenance_id_ = layer->provenance_id_state_->get();
+
   this->private_->volume_ = layer->get_volume();
   return false;
 }
@@ -119,6 +126,8 @@ bool LayerCheckPoint::create_volume( LayerHandle layer )
 bool LayerCheckPoint::create_slice( LayerHandle layer, Core::SliceType type, 
   Core::DataBlock::index_type index )
 {
+  this->private_->provenance_id_ = layer->provenance_id_state_->get();
+
   if ( layer->get_type() == Core::VolumeType::MASK_E )
   {
     MaskLayerHandle mask = boost::shared_dynamic_cast<MaskLayer>( layer );
@@ -148,6 +157,8 @@ bool LayerCheckPoint::create_slice( LayerHandle layer, Core::SliceType type,
 bool LayerCheckPoint::create_slice( LayerHandle layer, Core::SliceType type, 
   Core::DataBlock::index_type start, Core::DataBlock::index_type end )
 {
+  this->private_->provenance_id_ = layer->provenance_id_state_->get();
+
   if ( layer->get_type() == Core::VolumeType::MASK_E )
   {
     for ( Core::DataBlock::index_type j = start; j <= end; j++ )

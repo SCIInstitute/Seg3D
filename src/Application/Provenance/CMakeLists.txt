@@ -31,14 +31,17 @@
 # Set sources
 ##################################################
 
-SET(APPLICATION_SESSION_SRCS
-  Session.h
-  Session.cc
-)
+SET(APPLICATION_PROVENANCE_SRCS
+  Provenance.h
+  Provenance.cc
+  ProvenanceStep.h
+  ProvenanceStep.cc
+  )
 
-CORE_ADD_LIBRARY(Application_Session
-         ${APPLICATION_SESSION_SRCS} )
+CORE_ADD_LIBRARY(Application_Provenance ${APPLICATION_PROVENANCE_SRCS} )
             
-TARGET_LINK_LIBRARIES(Application_Session
+TARGET_LINK_LIBRARIES(Application_Provenance
+                      Core_Application
+                      Core_Utils
                       ${SCI_BOOST_LIBRARY})
-                    
+

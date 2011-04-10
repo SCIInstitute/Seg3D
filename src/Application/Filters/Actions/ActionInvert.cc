@@ -228,21 +228,11 @@ public:
 bool ActionInvert::validate( Core::ActionContextHandle& context )
 {
   // Check for layer existence and type information
-  std::string error;
-  if ( ! LayerManager::CheckLayerExistance( this->layer_id_.value(), error ) )
-  {
-    context->report_error( error );
-    return false;
-  }
+  if ( ! LayerManager::CheckLayerExistance( this->layer_id_, context ) ) return false;
 
   // Check for layer availability 
-  Core::NotifierHandle notifier;
-  if ( ! LayerManager::CheckLayerAvailability( this->layer_id_.value(), 
-    this->replace_.value(), notifier ) )
-  {
-    context->report_need_resource( notifier );
-    return false;
-  }
+  if ( ! LayerManager::CheckLayerAvailability( this->layer_id_, 
+    this->replace_, context ) ) return false;
 
   // Validation successful
   return true;
@@ -255,12 +245,12 @@ bool ActionInvert::run( Core::ActionContextHandle& context,
   boost::shared_ptr< InvertFilterAlgo > algo( new InvertFilterAlgo );
 
   // Find the handle to the layer 
-  if ( !( algo->find_layer( this->layer_id_.value(), algo->src_layer_ ) ) )
+  if ( !( algo->find_layer( this->layer_id_, algo->src_layer_ ) ) )
   {
     return false;
   }
 
-  if ( this->replace_.value() )
+  if ( this->replace_ )
   {
     // Copy the handles as destination and source will be the same
     algo->dst_layer_ = algo->src_layer_;
@@ -294,7 +284,10 @@ bool ActionInvert::run( Core::ActionContextHandle& context,
 
   // Build the undo-redo record
   algo->create_undo_redo_record( context, this->shared_from_this() );
-
+  
+  // Build the provenance record
+  algo->create_provenance_record( context, this->shared_from_this() );
+  
   // Start the filter.
   Core::Runnable::Start( algo );
 
@@ -309,8 +302,8 @@ void ActionInvert::Dispatch( Core::ActionContextHandle context,
   ActionInvert* action = new ActionInvert;
 
   // Setup the parameters
-  action->layer_id_.value() = layer_id;
-  action->replace_.value() = replace;
+  action->layer_id_ = layer_id;
+  action->replace_ = replace;
 
   // Dispatch action to underlying engine
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );

@@ -85,6 +85,9 @@ bool CannyEdgeDetectionFilterInterface::build_widget( QFrame* frame )
     tool->use_active_layer_state_, true ); 
   QtUtils::QtBridge::Connect( this->private_->ui_.runFilterButton, boost::bind(
     &Tool::execute, tool, Core::Interface::GetWidgetActionContext() ) );
+  
+  this->private_->ui_.blurring_distance_->set_description( "Distance (pixels)" );
+  this->private_->ui_.threshold_->set_description( "Minimum Threshold" );
 
   return true;
 }

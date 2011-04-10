@@ -40,13 +40,8 @@ namespace Seg3D
 
 bool ActionActivateLayer::validate( Core::ActionContextHandle& context )
 {
-  std::string error;
-  
-  if ( !(LayerManager::Instance()->CheckLayerExistance( this->layer_id_.value(), error ) ) )
-  {
-    context->report_error( error );
-    return false;
-  }
+  if ( !(LayerManager::Instance()->CheckLayerExistance( this->layer_id_, 
+    context ) ) ) return false;
 
   return true; // validated
 }
@@ -54,37 +49,25 @@ bool ActionActivateLayer::validate( Core::ActionContextHandle& context )
 bool ActionActivateLayer::run( Core::ActionContextHandle& context, 
   Core::ActionResultHandle& result )
 {
-  LayerHandle layer = LayerManager::FindLayer( this->layer_id_.value() );
+  LayerHandle layer = LayerManager::FindLayer( this->layer_id_ );
   LayerManager::Instance()->set_active_layer( layer );
   return true;
 }
 
-Core::ActionHandle ActionActivateLayer::Create( LayerHandle layer )
-{
-  ActionActivateLayer* action = new ActionActivateLayer;
-  
-  action->layer_id_.value() = layer->get_layer_id();
-  
-  return Core::ActionHandle( action );
-}
-
-Core::ActionHandle ActionActivateLayer::Create( std::string layer_id )
-{
-  ActionActivateLayer* action = new ActionActivateLayer;
-
-  action->layer_id_.value() = layer_id;
-
-  return Core::ActionHandle( action );
-}
-
 void ActionActivateLayer::Dispatch( Core::ActionContextHandle context, LayerHandle layer )
 {
-  Core::ActionDispatcher::PostAction( Create( layer ), context );
+  ActionActivateLayer* action = new ActionActivateLayer;
+  action->layer_id_ = layer->get_layer_id();
+  
+  Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }
 
 void ActionActivateLayer::Dispatch( Core::ActionContextHandle context, std::string layer_id )
 {
-  Core::ActionDispatcher::PostAction( Create( layer_id ), context );
+  ActionActivateLayer* action = new ActionActivateLayer;
+  action->layer_id_ = layer_id;
+  
+  Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }
 
 } // end namespace Seg3D

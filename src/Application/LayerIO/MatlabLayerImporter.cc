@@ -35,39 +35,51 @@
 // Application includes
 #include <Application/LayerIO/MatlabLayerImporter.h>
 
-SCI_REGISTER_IMPORTER( Seg3D, MatlabLayerImporter );
+SEG3D_REGISTER_IMPORTER( Seg3D, MatlabLayerImporter );
 
 namespace Seg3D
 {
 
-
 class MatlabLayerImporterPrivate
 {
-public:
-  Core::GridTransform grid_transform_;
-  Core::DataBlockHandle data_block_;
-  
-  Core::DataType data_type_;
-
 public:
   MatlabLayerImporterPrivate() :
     grid_transform_( 1, 1, 1 ),
     data_type_( Core::DataType::UNKNOWN_E ),
-    read_header_( false )
-  {}
+    matlab_array_index_( -1 ),
+    read_header_( false ),
+    read_data_( false )
+  {
+  }
 
-  // IS_COMPATIBLE:
-  // Check whether an array can be imported
-  bool is_compatible( MatlabIO::matlabarray &mlarray );
+  // Pointer back to the main class
+  MatlabLayerImporter* importer_;
   
-  // IMPORT_MAT_ARRAY:
-  // Import the matlab array into the program.
-  bool import_mat_array( MatlabIO::matlabarray &mlarray );
+public:
+  // Information extracted from the header
+  Core::GridTransform grid_transform_;
+  Core::DataType data_type_;
+
+  // Data extracted from the file
+  Core::DataBlockHandle data_block_;
   
+  int matlab_array_index_;
+  
+public:
+
+  // SCAN_MAT_ARRAY:
+  // Check whether an array can be imported and if so extract data type and transform from
+  // file.
+  bool scan_mat_array( MatlabIO::matlabarray &mlarray, std::string& error );
+
   // SCAN_MAT_FILE:
   // Scan whether there is a compatible object in the mat file
   bool scan_mat_file( const std::string& filename );
   
+  // IMPORT_MAT_ARRAY:
+  // Import the matlab array into the program.
+  bool import_mat_array( MatlabIO::matlabarray &mlarray, std::string& error );
+    
   // IMPORT_MAT_FILE:
   // Scan through the file and now import the data
   bool import_mat_file( const std::string& filename );
@@ -76,11 +88,17 @@ public:
   // Convert the matlabio types to Seg3D types
   Core::DataType convert_type( MatlabIO::matlabarray::mitype type );
   
+  // Whether the header has been read
   bool read_header_;
+  
+  // Whether the data has been read
+  bool read_data_;
+  
 };
 
 Core::DataType MatlabLayerImporterPrivate::convert_type( MatlabIO::matlabarray::mitype type )
 {
+  // Convert type information from one enum into another enum
   switch (type)
     {
     case MatlabIO::matlabarray::miINT8:   return Core::DataType::CHAR_E;
@@ -95,19 +113,27 @@ Core::DataType MatlabLayerImporterPrivate::convert_type( MatlabIO::matlabarray::
     }
 }
 
-bool MatlabLayerImporterPrivate::is_compatible( MatlabIO::matlabarray &mlarray )
+bool MatlabLayerImporterPrivate::scan_mat_array( MatlabIO::matlabarray &mlarray, std::string& error )
 {
+  // Clear error string
+  error = "";
+  
+  // Check if the matlab array is empty
   if ( mlarray.isempty() )
   {
     // empty array cannot contain any data
+    error = "Matlab Object does not contain any data.";
     return false ;
   }
   
+  // Check if there are any elements in the matlab array
   if ( mlarray.getnumelements() == 0 ) 
   {
+    error = "Matlab Object is empty.";
     return false ;
   }
   
+  // What type of matlab array are we dealing with
   MatlabIO::matlabarray::mlclass mclass;
   mclass = mlarray.getclass();
         
@@ -115,64 +141,192 @@ bool MatlabLayerImporterPrivate::is_compatible( MatlabIO::matlabarray &mlarray )
   // pr as the the data needs to be divided over
   // three separate Nrrds
         
+  // If the class is struct or class, check whether the required data fields are present  
   if ( mclass == MatlabIO::matlabarray::mlSTRUCT || mclass == MatlabIO::matlabarray::mlOBJECT )
   {
     int fieldnameindex;
     MatlabIO::matlabarray subarray;
               
+    // Check for different versions of where the data may be stored   
     fieldnameindex = mlarray.getfieldnameindexCI( "data" );
     if (fieldnameindex == -1) fieldnameindex = mlarray.getfieldnameindexCI( "potvals" );
     if (fieldnameindex == -1) fieldnameindex = mlarray.getfieldnameindexCI( "field" );
     if (fieldnameindex == -1) fieldnameindex = mlarray.getfieldnameindexCI( "scalarfield" );
     if (fieldnameindex == -1) 
     {
+      // Could not find main data array in structure
+      error = "Matlab array does not have a data, potvals, or field in its main data structure.";
       return false;
     }
     
+    // Check whether the data array is not empty
     subarray = mlarray.getfield( 0, fieldnameindex );      
     if ( subarray.isempty() ) 
     {
+      error = "Matlab array does not contain any data.";
       return false;
     }
 
     MatlabIO::matlabarray::mlclass mclass;
     mclass = subarray.getclass();
               
-    if ( mclass != MatlabIO::matlabarray::mlDENSE && mclass != MatlabIO::matlabarray::mlSPARSE ) 
+    if ( mclass != MatlabIO::matlabarray::mlDENSE ) 
     {
+      error = "Matrix that should contain data is not a dense matrix.";
       return false;
     }
               
     if ( subarray.getnumdims() > 3 )    
     {
+      error = "Matrix dimension is larger than 3.";
       return false;    
     }
     
     if ( subarray.getnumelements() == 0 )
     {   
+      error = "Matlab array does not contain any data.";
       return false;
     }      
+
+    // Get dimensions of the data
+    std::vector<int> dims = subarray.getdims();
+    while ( dims.size() < 3 ) dims.push_back( 1 );
+
+    size_t nx = static_cast<size_t>( dims[ 0 ] );
+    size_t ny = static_cast<size_t>( dims[ 1 ] );
+    size_t nz = static_cast<size_t>( dims[ 2 ] );
+
+    float nxf = static_cast<float>( dims[ 0 ] );
+    float nyf = static_cast<float>( dims[ 1 ] );
+    float nzf = static_cast<float>( dims[ 2 ] );
+
+    // Add axes properties if they are specified
+    int axisindex;
+    axisindex = mlarray.getfieldnameindexCI( "axis" );
               
-    this->data_type_ = this->convert_type( subarray.gettype() );    
+    if ( axisindex != -1 )
+    {
+      if ( mlarray.isfieldCI(  "axis" ) )
+      {
+        MatlabIO::matlabarray axisarray = mlarray.getfieldCI( 0, "axis" );
+                    
+        if ( ! axisarray.isstruct() ) 
+        {
+          error = "Axis field needs to be structured objects.";
+          return false;
+        }
+        int numaxis = axisarray.getm();
+        if ( numaxis > 3 ) numaxis = 3;
+        
+        bool read_spacing = false;
+        bool read_min = false;
+        bool read_max = false;
+        
+        Core::Vector spacing;
+        Core::Point min;
+        Core::Point max;
+
+        for ( int p = 0 ; p < numaxis; p++ )
+        { 
+          if ( axisarray.isfield( "spacing" ) )
+          {
+            MatlabIO::matlabarray farray = axisarray.getfield( p, "spacing" );
+            if ( farray.isdense() && farray.getnumelements() > 0 )
+            {
+              farray.getnumericarray( &spacing[ p ], 1 );
+              read_spacing = true;
+            }
+          }
+
+          if ( axisarray.isfield( "min" ) )
+          {
+            MatlabIO::matlabarray farray = axisarray.getfield( p, "min" );
+            if ( farray.isdense() && farray.getnumelements() > 0 )
+            {
+              farray.getnumericarray( &min[ p ], 1 );
+              read_min = true;
+            }
+          }
+
+          if ( axisarray.isfield( "max" ) )
+          {
+            MatlabIO::matlabarray farray = axisarray.getfield( p, "max" );
+            if ( farray.isdense() && farray.getnumelements() > 0 )
+            {
+              farray.getnumericarray( &max[ p ], 1 );
+              read_max = true;
+            }
+          }           
+        }
+        
+        Core::Point Origin;
+        if ( ! read_spacing )
+        {
+          if ( read_min && read_max )
+          {
+            spacing = Core::Vector( 
+              ( max.x() - min.x() ) / Core::Max( 1.0f, nxf ),
+              ( max.y() - min.y() ) / Core::Max( 1.0f, nyf ),
+              ( max.z() - min.z() ) / Core::Max( 1.0f, nzf ) );
+          }
+          else
+          {
+            spacing = Core::Vector( 1.0, 1.0, 1.0 );
+          }
+        }
+        
+        if ( read_min )
+        {
+          Origin = min + 0.5 * spacing;
+        }
+        else if ( read_max )
+        {
+          Origin = max - Core::Vector( spacing.x() * ( nxf - 0.5 ), 
+            spacing.y() * ( nyf - 0.5 ), spacing.z() * ( nzf - 0.5 ) );
+        }
+        
+        this->grid_transform_ = Core::GridTransform( nx, ny, nz, Origin, 
+          spacing.x() * Core::Vector( 1.0, 0.0, 0.0 ), 
+          spacing.y() * Core::Vector( 0.0, 1.0, 0.0 ),
+          spacing.z() * Core::Vector( 0.0, 0.0, 1.0 ) );
+        this->grid_transform_.set_originally_node_centered( false );
+      }
+    }
+
+    this->data_type_ = this->convert_type( subarray.gettype() );
+    this->read_header_ = true;
+    
     return true;  
   }
         
   if ( mclass != MatlabIO::matlabarray::mlDENSE )
   {
+    error = "Matrix that should contain data is not a dense matrix.";
     return false;
   }
 
   if ( mlarray.isempty() ) 
   {
+    error = "Matlab array does not contain any data.";
     return false;
   }
     
   if ( mlarray.getnumelements() == 0 )
   {   
+    error = "Matlab array does not contain any data.";
     return false;
   }      
 
+  std::vector<int> dims = mlarray.getdims();
+  while ( dims.size() < 3 ) dims.push_back( 1 );
+
+  size_t nx = static_cast<size_t>( dims[ 0 ] );
+  size_t ny = static_cast<size_t>( dims[ 1 ] );
+  size_t nz = static_cast<size_t>( dims[ 2 ] );
+
+  this->grid_transform_ = Core::GridTransform( nx, ny, nz );
   this->data_type_ = this->convert_type( mlarray.gettype() );   
+  this->read_header_ = true;
 
   return true;
 }
@@ -180,61 +334,58 @@ bool MatlabLayerImporterPrivate::is_compatible( MatlabIO::matlabarray &mlarray )
 
 bool MatlabLayerImporterPrivate::scan_mat_file( const std::string& filename )
 {
+  // Check if we already read it
+  if ( this->read_header_ ) return true;
+
+  // A matlabfile is an abstraction of the matlab file itself, and represents the database
+  // of objects contained in the file
   MatlabIO::matlabfile matlab_file;
+  // A matlabarray is a hierarchical object that is stored in the matlabfile
   MatlabIO::matlabarray matlab_array;
+
+  // String from returning error
+  std::string error;
   
+  // Scan through all objects in the file and pick the first one that we can import.
   try
   {
+    // Open the matlab file in read mode
     matlab_file.open( filename, "r" );
     
+    // Get the number of objects stored in the file
     int numarrays = matlab_file.getnummatlabarrays();
-
-    for (int j = 0; j < numarrays; j++ )
+    
+    // Extract the objects one by one
+    for ( int j = 0; j < numarrays; j++ )
     {
+      // The info call scans through the entire file and reads all objects except the
+      // large datablocks, entries with more than 100 elements. 
       matlab_array = matlab_file.getmatlabarrayinfo( j );
-      if ( this->is_compatible( matlab_array ) )
+      if ( this->scan_mat_array( matlab_array, error ) )
       {
-        read_header_ = true;
+        this->matlab_array_index_  = j;
+        this->read_header_ = true;
         return true;
       }
     }
   }
   catch( ... )
   {
+    error = "Importer crashed while reading header of matlab file.";
   }
-
-  return false;
-}
-
-bool MatlabLayerImporterPrivate::import_mat_file( const std::string& filename )
-{
-  MatlabIO::matlabfile matlab_file;
-  MatlabIO::matlabarray matlab_array;
   
-  try
+  // If the cause is known report an error to the user
+  if ( ! error.empty() )
   {
-    matlab_file.open( filename, "r" );
-    
-    int numarrays = matlab_file.getnummatlabarrays();
-
-    for (int j = 0; j < numarrays; j++ )
-    {
-      matlab_array = matlab_file.getmatlabarray( j );
-      if ( this->is_compatible( matlab_array ) )
-      {
-        return this->import_mat_array( matlab_array );
-      }
-    }
-  }
-  catch( ... )
-  {
+    this->importer_->set_error( error );
   }
 
   return false;
 }
 
 
-bool MatlabLayerImporterPrivate::import_mat_array( MatlabIO::matlabarray &mlarray )
+bool MatlabLayerImporterPrivate::import_mat_array( MatlabIO::matlabarray &mlarray,
+  std::string& error )
 {
   try
   {
@@ -297,6 +448,7 @@ bool MatlabLayerImporterPrivate::import_mat_array( MatlabIO::matlabarray &mlarra
               static_cast<int>( this->data_block_->get_size() ) );
             break;
           default:
+            error = "Encountered unknown datatype in matlab file.";
             return false;
         }
         
@@ -310,12 +462,13 @@ bool MatlabLayerImporterPrivate::import_mat_array( MatlabIO::matlabarray &mlarra
       case MatlabIO::matlabarray::mlOBJECT:
       {
         int dataindex;
-        dataindex = mlarray.getfieldnameindexCI("data");
+        dataindex = mlarray.getfieldnameindexCI( "data" );
         if ( dataindex == -1 ) dataindex = mlarray.getfieldnameindexCI( "potvals" );
         if ( dataindex == -1 ) dataindex = mlarray.getfieldnameindexCI( "field" );
         if ( dataindex == -1 ) dataindex = mlarray.getfieldnameindexCI( "scalarfield" );             
-        if (dataindex == -1)
+        if ( dataindex == -1 )
         {
+          error = "Matlab array needs to have field called data, potvals, or field.";
            return false;
         }
                 
@@ -327,109 +480,18 @@ bool MatlabLayerImporterPrivate::import_mat_array( MatlabIO::matlabarray &mlarra
                   
         if ( subclass != MatlabIO::matlabarray::mlDENSE )
         {
+          error = "Only importing dense matrices is supported.";
           return false;
         }
             
-        if ( !( this->import_mat_array( subarray ) ) ) return false;
-                  
-        // Add axes properties if they are specified
-                  
-        int axisindex;
-        axisindex = mlarray.getfieldnameindexCI( "axis" );
-                  
-        if (axisindex != -1)
-        {             
-          float nx = static_cast<float>( this->data_block_->get_nx() );
-          float ny = static_cast<float>( this->data_block_->get_ny() );
-          float nz = static_cast<float>( this->data_block_->get_nz() );
-          
-          if ( mlarray.isfieldCI(  "axis" ) )
-          {
-            MatlabIO::matlabarray axisarray = mlarray.getfieldCI( 0, "axis" );
-                        
-            if ( ! axisarray.isstruct() ) return false;
-
-            int numaxis = axisarray.getm();
-            if ( numaxis > 3 ) numaxis = 3;
-            
-            bool read_spacing = false;
-            bool read_min = false;
-            bool read_max = false;
-            
-            Core::Vector spacing;
-            Core::Point min;
-            Core::Point max;
-
-            for ( int p = 0 ; p < numaxis; p++ )
-            { 
-              if ( axisarray.isfield( "spacing" ) )
-              {
-                MatlabIO::matlabarray farray = axisarray.getfield( p, "spacing" );
-                if ( farray.isdense() && farray.getnumelements() > 0 )
-                {
-                  farray.getnumericarray( &spacing[ p ], 1 );
-                  read_spacing = true;
-                }
-              }
-
-              if ( axisarray.isfield( "min" ) )
-              {
-                MatlabIO::matlabarray farray = axisarray.getfield( p, "min" );
-                if ( farray.isdense() && farray.getnumelements() > 0 )
-                {
-                  farray.getnumericarray( &min[ p ], 1 );
-                  read_min = true;
-                }
-              }
-
-              if ( axisarray.isfield( "max" ) )
-              {
-                MatlabIO::matlabarray farray = axisarray.getfield( p, "max" );
-                if ( farray.isdense() && farray.getnumelements() > 0 )
-                {
-                  farray.getnumericarray( &max[ p ], 1 );
-                  read_max = true;
-                }
-              }           
-            }
-            
-            Core::Point Origin;
-            if ( ! read_spacing )
-            {
-              if ( read_min && read_max )
-              {
-                spacing = Core::Vector( 
-                  ( max.x() - min.x() ) / Core::Max( 1.0f, nx ),
-                  ( max.y() - min.y() ) / Core::Max( 1.0f, ny ),
-                  ( max.z() - min.z() ) / Core::Max( 1.0f, nz ) );
-              }
-              else
-              {
-                spacing = Core::Vector( 1.0, 1.0, 1.0 );
-              }
-            }
-            
-            if ( read_min )
-            {
-              Origin = min + 0.5 * spacing;
-            }
-            else if ( read_max )
-            {
-              Origin = max - Core::Vector( spacing.x() * ( nx - 0.5 ), 
-                spacing.y() * ( ny - 0.5 ), spacing.z() * ( nz - 0.5 ) );
-            }
-            
-            this->grid_transform_ = Core::GridTransform( this->data_block_->get_nx(),
-              this->data_block_->get_ny(), this->data_block_->get_nz(),
-              Origin, spacing.x() * Core::Vector( 1.0, 0.0, 0.0 ), 
-              spacing.y() * Core::Vector( 0.0, 1.0, 0.0 ),
-              spacing.z() * Core::Vector( 0.0, 0.0, 1.0 ) );
-            this->grid_transform_.set_originally_node_centered( false );
-          }
+        if ( !( this->import_mat_array( subarray, error ) ) ) 
+        {
+          return false;
         }
         return true;        
       }
       default:
+      error = "Matlab array needs to be a dense matrix or a structure array.";
       return false;
     }
   }
@@ -437,12 +499,50 @@ bool MatlabLayerImporterPrivate::import_mat_array( MatlabIO::matlabarray &mlarra
   {
   }
   
+  error = "Could not open file.";
   return false;
 }
 
 
-MatlabLayerImporter::MatlabLayerImporter(const std::string& filename) :
-  LayerImporter(filename),
+bool MatlabLayerImporterPrivate::import_mat_file( const std::string& filename )
+{
+  // Check if we already read it
+  if ( this->read_data_ ) return true;
+
+  MatlabIO::matlabfile matlab_file;
+  MatlabIO::matlabarray matlab_array;
+  
+  // String from returning error
+  std::string error;
+    
+  try
+  {
+    matlab_file.open( filename, "r" );
+    
+    matlab_array = matlab_file.getmatlabarray( this->matlab_array_index_ );
+    if ( this->import_mat_array( matlab_array, error ) )
+    {
+      this->read_data_ = true;
+      return true;
+    }
+  }
+  catch( ... )
+  {
+    error = "Importer crashed while reading matlab file.";
+  }
+
+  // If the cause is known report an error to the user
+  if ( ! error.empty() )
+  {
+    this->importer_->set_error( error );
+  }
+
+  return false;
+}
+
+
+
+MatlabLayerImporter::MatlabLayerImporter() :
   private_( new MatlabLayerImporterPrivate )
 {
 }
@@ -451,50 +551,53 @@ MatlabLayerImporter::~MatlabLayerImporter()
 {
 }
 
-bool MatlabLayerImporter::import_header()
+bool MatlabLayerImporter::get_file_info( LayerImporterFileInfoHandle& info )
 {
-  if ( this->private_->read_header_ ) return true;
-  return this->private_->scan_mat_file( this->get_filename() );
-}
-
-Core::GridTransform MatlabLayerImporter::get_grid_transform()
-{
-  return this->private_->grid_transform_;
-}
-
-Core::DataType MatlabLayerImporter::get_data_type()
-{
-  return this->private_->data_type_;
-}
-
-int MatlabLayerImporter::get_importer_modes()
-{
-  Core::DataType data_type = this->private_->data_type_;
+  try
+  { 
+    // Try to read the header
+    if ( ! this->private_->scan_mat_file( this->get_filename() ) ) return false;
   
-  int importer_modes = 0;
-  if ( Core::IsReal( data_type ) )
-  {
-    importer_modes |= LayerImporterMode::DATA_E;
+    // Generate an information structure with the information.
+    info = LayerImporterFileInfoHandle( new LayerImporterFileInfo );
+    info->set_data_type( this->private_->data_type_ );
+    info->set_grid_transform( this->private_->grid_transform_ );
+    info->set_file_type( "matlab" ); 
+    info->set_mask_compatible( true );
   }
-  
-  if ( Core::IsInteger( data_type ) ) 
+  catch ( ... )
   {
-    importer_modes |= LayerImporterMode::SINGLE_MASK_E | LayerImporterMode::BITPLANE_MASK_E |
-      LayerImporterMode::LABEL_MASK_E | LayerImporterMode::DATA_E;
+    // In case something failed, recover from here and let the user
+    // deal with the error. 
+    this->set_error( "Matlab Importer crashed while reading file." );
+    return false;
   }
-  
-  return importer_modes;
+    
+  return true;
 }
 
-bool MatlabLayerImporter::load_data( Core::DataBlockHandle& data_block, 
-  Core::GridTransform& grid_transform, LayerMetaData& meta_data  )
+bool MatlabLayerImporter::get_file_data( LayerImporterFileDataHandle& data )
 {
-  this->private_->import_mat_file( this->get_filename() );
+  try
+  { 
+    // Read the data from the file
+    if ( !this->private_->import_mat_file( this->get_filename() ) ) return false;
   
-  data_block = this->private_->data_block_;
-  grid_transform = this->private_->grid_transform_;
-  
-  if ( data_block ) return true; else return false;
+    // Create a data structure with handles to the actual data in this file 
+    data = LayerImporterFileDataHandle( new LayerImporterFileData );
+    data->set_data_block( this->private_->data_block_ );
+    data->set_grid_transform( this->private_->grid_transform_ );
+    data->set_name( this->get_file_tag() );
+  }
+  catch ( ... )
+  {
+    // In case something failed, recover from here and let the user
+    // deal with the error. 
+    this->set_error( "Matlab Importer crashed while reading file." );
+    return false;
+  }
+
+  return true;
 }
 
 } // end namespace seg3D

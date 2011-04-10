@@ -40,7 +40,7 @@ SET(INTERFACE_TOOLINTERFACE_SRCS
   ThresholdToolInterface.cc
   ArithmeticFilterInterface.cc
   BinaryDilateErodeFilterInterface.cc
-#  BinaryIterativeDilateErodeFilterInterface.cc
+  #BinaryIterativeDilateErodeFilterInterface.cc
   BinarySmoothDilateErodeFilterInterface.cc
   CannyEdgeDetectionFilterInterface.cc
   ConfidenceConnectedFilterInterface.cc
@@ -79,7 +79,7 @@ SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
   ThresholdToolInterface.h
   ArithmeticFilterInterface.h
   BinaryDilateErodeFilterInterface.h
-#  BinaryIterativeDilateErodeFilterInterface.h
+  #BinaryIterativeDilateErodeFilterInterface.h
   BinarySmoothDilateErodeFilterInterface.h
   CannyEdgeDetectionFilterInterface.h
   ConfidenceConnectedFilterInterface.h
@@ -129,7 +129,7 @@ SET(INTERFACE_TOOLINTERFACE_UI_SRCS
   ResampleToolInterface.ui  
   ArithmeticFilterInterface.ui
   BinaryDilateErodeFilterInterface.ui
-#  BinaryIterativeDilateErodeFilterInterface.ui
+  #BinaryIterativeDilateErodeFilterInterface.ui
   BinarySmoothDilateErodeFilterInterface.ui
   CannyEdgeDetectionFilterInterface.ui  
   ConfidenceConnectedFilterInterface.ui
@@ -206,7 +206,6 @@ TARGET_LINK_LIBRARIES(Interface_ToolInterface
                       QtUtils_Widgets
             QtUtils_Bridge
             Interface_Application
-            Resources_QtResources
                       ${QT_LIBRARIES} 
                       ${SCI_BOOST_LIBRARY})
 

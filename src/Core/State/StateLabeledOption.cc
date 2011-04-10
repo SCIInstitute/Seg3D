@@ -196,16 +196,16 @@ bool StateLabeledOption::import_from_string( const std::string& str,
   return this->set( value, source );
 }
 
-void StateLabeledOption::export_to_variant( Core::ActionParameterVariant& variant ) const
+void StateLabeledOption::export_to_variant( Variant& variant ) const
 {
-  variant.set_value( this->private_->value_ );
+  variant.set( this->private_->value_ );
 }
 
-bool StateLabeledOption::import_from_variant( Core::ActionParameterVariant& variant, 
+bool StateLabeledOption::import_from_variant( Variant& variant, 
   Core::ActionSource source)
 {
   std::string value;
-  if ( !variant.get_value( value ) )
+  if ( !variant.get( value ) )
   {
     return false;
   }
@@ -213,10 +213,10 @@ bool StateLabeledOption::import_from_variant( Core::ActionParameterVariant& vari
   return this->set( value, source );
 }
 
-bool StateLabeledOption::validate_variant( ActionParameterVariant& variant, std::string& error )
+bool StateLabeledOption::validate_variant( Variant& variant, std::string& error )
 {
   std::string value;
-  if ( !( variant.get_value( value ) ) )
+  if ( !( variant.get( value ) ) )
   {
     error = "Cannot convert the value '" + variant.export_to_string() + "'";
     return false;
@@ -336,7 +336,8 @@ bool StateLabeledOption::set( const std::string& input_value, Core::ActionSource
       }
     }
 
-    return false;
+    if ( input_value.size() ) return false;
+    return true;
   }
 
   // NOTE: input_value can be either an option or its label, so it's necessary to set

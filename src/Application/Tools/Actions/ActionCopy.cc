@@ -45,10 +45,10 @@ namespace Seg3D
 class ActionCopyPrivate
 {
 public:
-  Core::ActionParameter< std::string > target_layer_id_;
-  Core::ActionParameter< int > slice_type_;
-  Core::ActionParameter< size_t > slice_number_;
-  Core::ActionParameter< size_t > slot_number_;
+  std::string target_layer_id_;
+  int slice_type_;
+  size_t slice_number_;
+  size_t slot_number_;
 
   Core::MaskLayerHandle target_layer_;
   Core::MaskVolumeSliceHandle vol_slice_;
@@ -59,17 +59,12 @@ public:
 ActionCopy::ActionCopy() :
   private_( new ActionCopyPrivate )
 {
-  this->add_argument( this->private_->target_layer_id_ );
-  this->add_argument( this->private_->slice_type_ );
-  this->add_argument( this->private_->slice_number_ );
-
-  this->add_key( this->private_->slot_number_ );
+  this->add_parameter( this->private_->target_layer_id_ );
+  this->add_parameter( this->private_->slice_type_ );
+  this->add_parameter( this->private_->slice_number_ );
+  this->add_parameter( this->private_->slot_number_ );
 
   this->private_->deduce_params_ = false;
-}
-
-ActionCopy::~ActionCopy()
-{
 }
 
 bool ActionCopy::validate( Core::ActionContextHandle& context )
@@ -95,56 +90,46 @@ bool ActionCopy::validate( Core::ActionContextHandle& context )
     
     Core::VolumeSliceHandle vol_slice = viewer->get_active_volume_slice();
     this->private_->target_layer_ = boost::dynamic_pointer_cast< MaskLayer >( active_layer );
-    this->private_->target_layer_id_.value() = active_layer->get_layer_id();
-    this->private_->slice_number_.value() = vol_slice->get_slice_number();
-    this->private_->slice_type_.value() = vol_slice->get_slice_type();
-    this->private_->slot_number_.value() = 0;
+    this->private_->target_layer_id_ = active_layer->get_layer_id();
+    this->private_->slice_number_ = vol_slice->get_slice_number();
+    this->private_->slice_type_ = vol_slice->get_slice_type();
+    this->private_->slot_number_ = 0;
   }
   
   // Check whether the layer exists and is of the right type and return an
   // error if not
-  std::string error;
   if ( !( LayerManager::CheckLayerExistanceAndType(
-    this->private_->target_layer_id_.value(), Core::VolumeType::MASK_E, error ) ) )
-  {
-    context->report_error( error );
-    return false;
-  }
+    this->private_->target_layer_id_, Core::VolumeType::MASK_E, context ) ) ) return false;
 
   // Check whether the layer is not locked for processing or creating, in which case the
   // data is not data yet, hence we cannot compute an isosurface on it. The function returns
   // a notifier when the action can be completed.
-  Core::NotifierHandle notifier;
   if ( !( LayerManager::CheckLayerAvailabilityForProcessing( 
-    this->private_->target_layer_id_.value(), notifier ) ) )
-  {
-    context->report_need_resource( notifier );
-    return false;
-  }
+    this->private_->target_layer_id_, context ) ) ) return false;
   
   this->private_->target_layer_ = 
-    LayerManager::FindMaskLayer( this->private_->target_layer_id_.value() );
+    LayerManager::FindMaskLayer( this->private_->target_layer_id_ );
   
-  if ( this->private_->slice_type_.value() != Core::VolumeSliceType::AXIAL_E &&
-    this->private_->slice_type_.value() != Core::VolumeSliceType::CORONAL_E &&
-    this->private_->slice_type_.value() != Core::VolumeSliceType::SAGITTAL_E )
+  if ( this->private_->slice_type_ != Core::VolumeSliceType::AXIAL_E &&
+    this->private_->slice_type_ != Core::VolumeSliceType::CORONAL_E &&
+    this->private_->slice_type_ != Core::VolumeSliceType::SAGITTAL_E )
   {
     context->report_error( "Invalid slice type" );
     return false;
   }
   
   Core::VolumeSliceType slice_type = static_cast< Core::VolumeSliceType::enum_type >(
-    this->private_->slice_type_.value() );
+    this->private_->slice_type_ );
     
   Core::MaskVolumeSliceHandle volume_slice( new Core::MaskVolumeSlice(
     this->private_->target_layer_->get_mask_volume(), slice_type ) );
-  if ( this->private_->slice_number_.value() >= volume_slice->number_of_slices() )
+  if ( this->private_->slice_number_ >= volume_slice->number_of_slices() )
   {
     context->report_error( "Slice number is out of range." );
     return false;
   }
 
-  volume_slice->set_slice_number( this->private_->slice_number_.value() );
+  volume_slice->set_slice_number( this->private_->slice_number_ );
   this->private_->vol_slice_ = volume_slice;
     
   return true;
@@ -152,15 +137,14 @@ bool ActionCopy::validate( Core::ActionContextHandle& context )
 
 bool ActionCopy::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
-  ClipboardItemConstHandle old_item = Clipboard::Instance()->get_item( 
-    this->private_->slot_number_.value() );
+  ClipboardItemConstHandle old_item = Clipboard::Instance()->get_item( this->private_->slot_number_ );
   ClipboardItemHandle checkpoint;
   if ( old_item )
   {
     checkpoint = old_item->clone();
   }
   ClipboardUndoBufferItemHandle undo_item( new ClipboardUndoBufferItem( "Copy",
-    checkpoint, this->private_->slot_number_.value() ) );
+    checkpoint, this->private_->slot_number_ ) );
   undo_item->set_redo_action( this->shared_from_this() );
   UndoBuffer::Instance()->insert_undo_item( context, undo_item );
   
@@ -168,7 +152,7 @@ bool ActionCopy::run( Core::ActionContextHandle& context, Core::ActionResultHand
   size_t ny = this->private_->vol_slice_->ny();
 
   ClipboardItemHandle clipboard_item = Clipboard::Instance()->get_item( nx, ny,
-    Core::DataType::UCHAR_E, this->private_->slot_number_.value() );
+    Core::DataType::UCHAR_E, this->private_->slot_number_ );
    this->private_->vol_slice_->copy_slice_data( reinterpret_cast< unsigned char* >( 
     clipboard_item->get_buffer() ) );
 
@@ -194,10 +178,10 @@ void ActionCopy::Dispatch( Core::ActionContextHandle context,
 {
   ActionCopy* action = new ActionCopy;
   action->private_->deduce_params_ = false;
-  action->private_->target_layer_id_.value() = layer_id;
-  action->private_->slice_type_.value() = slice_type;
-  action->private_->slice_number_.value() = slice_number;
-  action->private_->slot_number_.value() = 0;
+  action->private_->target_layer_id_ = layer_id;
+  action->private_->slice_type_ = slice_type;
+  action->private_->slice_number_ = slice_number;
+  action->private_->slot_number_ = 0;
 
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }

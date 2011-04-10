@@ -58,6 +58,7 @@ SET(INTERFACE_APPLICATION_SRCS
   ProjectDockWidget.cc
   ProjectExportWizard.cc
   ProjectWizard.cc
+  ProvenanceDockWidget.cc
   PushDragButton.cc
   QtLayerListWidget.cc
   SaveProjectAsWizard.cc
@@ -101,6 +102,7 @@ SET(INTERFACE_APPLICATION_MOC_SRCS
   ProjectDockWidget.h
   ProjectExportWizard.h
   ProjectWizard.h
+  ProvenanceDockWidget.h
   PushDragButton.h
   QtLayerListWidget.h
   SaveProjectAsWizard.h
@@ -141,6 +143,7 @@ SET(INTERFACE_APPLICATION_UI_SRCS
   PreferencesInterface.ui
   ProjectDockWidget.ui
   ProgressWidget.ui
+  ProvenanceDockWidget.ui
   QtLayerListWidget.ui
   StatusBarWidget.ui
   ShortcutsInterface.ui
@@ -210,6 +213,5 @@ TARGET_LINK_LIBRARIES(Interface_Application
                       QtUtils_Utils
                       QtUtils_Widgets
             QtUtils_Bridge
-            Resources_QtResources
                       ${QT_LIBRARIES} 
                       ${SCI_BOOST_LIBRARY})

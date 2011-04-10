@@ -61,8 +61,8 @@ SaveProjectAsWizard::SaveProjectAsWizard( QWidget *parent ) :
   connect( this->page( 0 ), SIGNAL( need_to_set_delete_path( QString ) ), this, 
     SLOT( set_delete_path( QString ) ) );
   
-  this->setPixmap( QWizard::BackgroundPixmap, QPixmap( QString::fromUtf8( 
-    ":/Images/Symbol.png" ) ) );
+  this->setPixmap( QWizard::BackgroundPixmap, 
+    QPixmap( QString::fromUtf8( ":/Images/Symbol.png" ) ) );
   
   this->setWindowTitle( tr( "Save Project As Wizard" ) );
 }
@@ -75,13 +75,23 @@ void SaveProjectAsWizard::accept()
 {
   if( this->path_to_delete_ != "" )
   {
-    boost::filesystem::remove_all( boost::filesystem::path( this->path_to_delete_ ) );
+    try
+    {
+      boost::filesystem::remove_all( boost::filesystem::path( this->path_to_delete_ ) );
+    }
+    catch ( ... )
+    {
+      std::string error = std::string( "Could not remove all files from directory '" ) +
+        this->path_to_delete_ + "'.";
+      CORE_LOG_ERROR( error );
+    }
   }
   
   ActionSaveProjectAs::Dispatch( Core::Interface::GetWidgetActionContext(), 
     field( "projectPath" ).toString().toStdString(),
     field( "projectName" ).toString().toStdString() );
   
+  // Switch on autosave if needed
   if( field( "autosave" ).toBool() )
   {
     Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
@@ -105,14 +115,14 @@ void SaveProjectAsWizard::set_delete_path( QString path )
 SaveAsInfoPage::SaveAsInfoPage( QWidget *parent )
     : QWizardPage( parent )
 {
-    this->setTitle( "Export Project Information" );
-    this->setSubTitle( "You are exporting the current project with the following settings: " );
+    this->setTitle( "Save Project As..." );
+    this->setSubTitle( "You are saving the current project with the following settings: " );
 
     this->project_name_label_ = new QLabel( "Project name:" );
 
   this->project_name_lineedit_ = new QLineEdit();
   std::string project_name = ProjectManager::Instance()->
-    current_project_->project_name_state_->get();
+    get_current_project()->project_name_state_->get();
   
   if( project_name == "untitled_project" )
   {
@@ -150,11 +160,11 @@ SaveAsInfoPage::SaveAsInfoPage( QWidget *parent )
 void SaveAsInfoPage::initializePage()
 {
   QString finishText = wizard()->buttonText( QWizard::FinishButton );
-  finishText.remove('&');
+  finishText.remove( '&' );
 
   this->project_path_lineedit_->setText( QString::fromStdString( 
-    ProjectManager::Instance()->current_project_path_state_->get() ) );
-  registerField( "projectPath", this->project_path_lineedit_ );
+    ProjectManager::Instance()->get_current_project_folder().string() ) );
+  this->registerField( "projectPath", this->project_path_lineedit_ );
 }
   
 void SaveAsInfoPage::set_path()
@@ -182,19 +192,22 @@ bool SaveAsInfoPage::validatePage()
   // before we do anything we clear the delete path variable
   Q_EMIT need_to_set_delete_path( "" );
   
-  boost::filesystem::path new_path = 
+  boost::filesystem::path project_path = 
     boost::filesystem::path( this->project_path_lineedit_->text().toStdString() ) / 
-    boost::filesystem::path( this->project_name_lineedit_->text().toStdString() );
+    boost::filesystem::path( this->project_name_lineedit_->text().toStdString() + 
+      Project::GetDefaultProjectPathExtension() );
     
   // We check to see if the path they are choosing already exists
-  if( boost::filesystem::exists( new_path ) )
+  if( boost::filesystem::exists( project_path ) )
   {
-    if( ( ProjectManager::Instance()->current_project_->project_name_state_->get() == 
+    // If we save on top of our current project
+    if( ( ProjectManager::Instance()->get_current_project()->project_name_state_->get() == 
       this->project_name_lineedit_->text().toStdString() ) && 
-      ( ProjectManager::Instance()->current_project_path_state_->get() == 
-      this->project_path_lineedit_->text().toStdString() ) )
+      ( ProjectManager::Instance()->get_current_project()->project_path_state_->get() == 
+      project_path.string() ) )
     {
-      ActionSaveSession::Dispatch( Core::Interface::GetWidgetActionContext(), false, "" );
+      // Just save a session
+      ActionSaveSession::Dispatch( Core::Interface::GetWidgetActionContext(), "" );
       Q_EMIT just_a_save();
       return true;    
     }
@@ -211,16 +224,13 @@ bool SaveAsInfoPage::validatePage()
       return false;
     }
     
-    Q_EMIT need_to_set_delete_path( QString::fromStdString( new_path.string() ) );
-    
-    Core::ActionSet::Dispatch(  Core::Interface::GetWidgetActionContext(), 
-      PreferencesManager::Instance()->export_path_state_, new_path.parent_path().string() );
+    Q_EMIT need_to_set_delete_path( QString::fromStdString( project_path.string() ) );
     
     return true;
   }
   
   // Check to see if the directory that we are trying to save in exists
-  if( !boost::filesystem::exists( new_path.parent_path() ) )
+  if( !boost::filesystem::exists( project_path.parent_path() ) )
   {
     this->warning_message_->setText( QString::fromUtf8( 
       "This location does not exist, please chose a valid location." ) );
@@ -231,7 +241,7 @@ bool SaveAsInfoPage::validatePage()
   // Finally we check to see if we can write to that directory
   try // to create a project sessions folder
   {
-    boost::filesystem::create_directory( new_path );
+    boost::filesystem::create_directory( project_path );
   }
   catch ( ... ) // any errors that we might get thrown would indicate that we cant write here
   {
@@ -242,13 +252,9 @@ bool SaveAsInfoPage::validatePage()
   }
 
   // if we have made it to here we have created a new directory lets remove it.
-  boost::filesystem::remove( new_path );
+  boost::filesystem::remove( project_path );
   
   this->warning_message_->hide();
-
-  Core::ActionSet::Dispatch(  Core::Interface::GetWidgetActionContext(), 
-    PreferencesManager::Instance()->export_path_state_, new_path.parent_path().string() );
-  
 
   return true;
 }

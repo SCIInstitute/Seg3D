@@ -89,6 +89,12 @@ bool ThresholdSegmentationLSFilterInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Show( this->private_->ui_.message_alert_, tool->valid_target_state_, true );
   QtUtils::QtBridge::Enable( this->private_->ui_.runFilterButton, tool->valid_target_state_ );
   QtUtils::QtBridge::Enable( this->private_->ui_.target_layer_, tool->use_active_layer_state_, true );
+  
+  this->private_->ui_.iterations_->set_description( "Iterations" );
+  this->private_->ui_.threshold_range_->set_description( "Threshold Range" );
+  this->private_->ui_.curvature_->set_description( "Curvature Weight" );
+  this->private_->ui_.propagation_->set_description( "Propagation Weight" );
+  this->private_->ui_.edge_->set_description( "Edge Weight" );
 
   return true;
 }

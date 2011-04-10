@@ -30,7 +30,7 @@
 #define CORE_VOLUMERENDERER_TRANSFERFUNCTIONCONTROLPOINT_H
 
 #include <vector>
-
+#include <string>
 
 namespace Core
 {

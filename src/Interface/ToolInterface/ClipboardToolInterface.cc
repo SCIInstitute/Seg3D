@@ -118,6 +118,8 @@ bool ClipboardToolInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Enable( this->private_->ui_.grab_max_slice_button_, states,
     boost::lambda::bind( &Core::StateBool::get, tool->valid_target_state_.get() ) &&
     boost::lambda::bind( &Core::StateBool::get, tool->use_active_viewer_state_.get() ) );
+  
+  QtUtils::QtBridge::Show( this->private_->ui_.choose_slice_widget_, tool->use_active_viewer_state_, true );
 
   QtUtils::QtBridge::Connect( this->private_->ui_.copy_button_, boost::bind( 
     &ClipboardTool::copy, tool, Core::Interface::GetWidgetActionContext() ) );
@@ -127,6 +129,10 @@ bool ClipboardToolInterface::build_widget( QFrame* frame )
     boost::bind( &ClipboardTool::grab_min_paste_slice, tool ) );
   QtUtils::QtBridge::Connect( this->private_->ui_.grab_max_slice_button_, 
     boost::bind( &ClipboardTool::grab_max_paste_slice, tool ) );
+  
+  this->private_->ui_.copy_slice_number_->set_description( "Slice Number" );
+  this->private_->ui_.paste_slice_number_min_->set_description( "Min Slice Number" );
+  this->private_->ui_.paste_slice_number_max_->set_description( "Max Slice Number" );
 
   return true;
 } 

@@ -268,7 +268,8 @@ void LayerGroupPrivate::update_grid_information()
 // Class LayerGroup
 //////////////////////////////////////////////////////////////////////////
 
-LayerGroup::LayerGroup( Core::GridTransform grid_transform, const LayerMetaData& meta_data ) :
+LayerGroup::LayerGroup( Core::GridTransform grid_transform, 
+  ProvenanceID provenance_id, const LayerMetaData& meta_data ) :
   StateHandler( "group", true ),
   private_( new LayerGroupPrivate )
 {
@@ -279,6 +280,7 @@ LayerGroup::LayerGroup( Core::GridTransform grid_transform, const LayerMetaData&
   
   // This is the layer that generated this group. Hence that is the dependent layer
   // for new mask or other layers that are created in the group.
+  this->provenance_id_state_->set( provenance_id );
   this->set_meta_data( meta_data );
 }
 
@@ -303,14 +305,16 @@ void LayerGroup::initialize_states()
 {
   this->add_state( "isosurface_quality", this->isosurface_quality_state_, 
     "1.0", "1.0|0.5|0.25|0.125" );
-  this->add_state( "isosurface_capping_enabled", this->isosurface_capping_enabled_state_, true );
+  this->add_state( "isosurface_capping_enabled", this->isosurface_capping_enabled_state_, false );
 
   this->add_state( "layers_visible", this->layers_visible_state_, "all", "none|some|all" );
   this->add_state( "layers_iso_visible", this->layers_iso_visible_state_, "all", "none|some|all" );
   
+  this->add_state( "provenance_id", this->provenance_id_state_, -1 );
+
   this->add_state( "meta_data", this->meta_data_state_, "" ); 
   this->add_state( "meta_data_info", this->meta_data_info_state_, "" ); 
-    
+
   Core::Point dimensions( static_cast< double>( this->grid_transform_.get_nx() ), 
     static_cast< double>( this->grid_transform_.get_ny() ), 
     static_cast< double>( this->grid_transform_.get_nz() ) );
@@ -327,7 +331,6 @@ void LayerGroup::initialize_states()
   
   this->add_state( "group_widget_expanded", this->group_widget_expanded_state_, true );
   
-
   this->add_state( "show_iso_menu", this->show_iso_menu_state_, false );
   this->add_state( "show_delete_menu", this->show_delete_menu_state_, false );
   this->add_state( "show_duplicate_menu", this->show_duplicate_menu_state_, false );
@@ -364,6 +367,7 @@ void LayerGroup::set_meta_data( const LayerMetaData& meta_data )
   this->meta_data_state_->set( meta_data.meta_data_ );
   this->meta_data_info_state_->set( meta_data.meta_data_info_ );
 }
+
 
 void LayerGroup::insert_layer( LayerHandle new_layer )
 { 

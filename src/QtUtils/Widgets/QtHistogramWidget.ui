@@ -162,10 +162,13 @@ QLabel#label_3{
                <item>
                 <widget class="QLabel" name="label_2">
                  <property name="layoutDirection">
-                  <enum>Qt::RightToLeft</enum>
+                  <enum>Qt::LeftToRight</enum>
                  </property>
                  <property name="text">
                   <string>Max</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                  </property>
                 </widget>
                </item>
@@ -217,6 +220,9 @@ QLabel#label_3{
                </property>
                <item>
                 <widget class="QComboBox" name="log_histogram_combo_">
+                 <property name="currentIndex">
+                  <number>0</number>
+                 </property>
                  <item>
                   <property name="text">
                    <string>Linear</string>
@@ -235,10 +241,13 @@ QLabel#label_3{
             <item>
              <widget class="QLabel" name="max">
               <property name="layoutDirection">
-               <enum>Qt::RightToLeft</enum>
+               <enum>Qt::LeftToRight</enum>
               </property>
               <property name="text">
                <string>-</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
               </property>
              </widget>
             </item>

@@ -45,8 +45,9 @@
 
 // Core includes
 #include <Core/Utils/EnumClass.h>
-#include <Core/Utils/Log.h>
 #include <Core/Utils/IntrusiveBase.h>
+#include <Core/Utils/Log.h>
+#include <Core/Utils/Variant.h>
 
 // Action includes
 #include <Core/Action/ActionInfo.h>
@@ -67,7 +68,7 @@ typedef std::vector< ActionHandle > ActionHandleList;
 // An action is not copyable as that would invalidate 
 // the ActionParameter pointers used internally.
 
-class Action : public boost::enable_shared_from_this< Action >
+class Action : public boost::enable_shared_from_this< Action >, boost::noncopyable
 {
   // -- Constructor/Destructor --
 public:
@@ -125,20 +126,28 @@ public:
   // Chekc whether the action is undoable
   bool is_undoable() const;
   
-  // -- query overloadable data ( from the action info if not overloaded ) --
-public:
   // CHANGES_PROJECT_DATA:
   // Query whether the action changes the data
-  virtual bool changes_project_data();
-  
   // NOTE: This function is overloadable from the default subclass definition. As certain 
   // functions like Set, Add, etc, have this property depend on the actual object they operate
   // on. For example setting a layer state variable should change this, whereas a interface
   // variable should not. For these functions the default implementation that picks up this
   // property from the macro can thence be overwritten.
+  virtual bool changes_project_data();
   
-  // -- Run/Validate interface --
+  // CHANGES_PROVENANCE_DATA:
+  // Query whether the action changes the provenance data base
+  bool changes_provenance_data() const;
+  
+  // -- Run/Validate/Translat interface --
 public:
+  // TRANSLATE:
+  // Some actions need to be translated before they can be validated. Translate takes
+  // care of most provenance related issue, by for example translating the provenance
+  // information into real action information. This function is called before validate
+  // NOTE: This function is *not* const and may alter the values of the parameters
+  //       and correct faulty input.
+  virtual bool translate( ActionContextHandle& context );
 
   // VALIDATE:
   // Each action needs to be validated just before it is posted. This way we
@@ -148,7 +157,6 @@ public:
   //       and correct faulty input. Run on the other hand is not allowed to
   //       change anything in the action, as it is posted to any observers
   //       after the action is validated.
-
   virtual bool validate( ActionContextHandle& context ) = 0;
 
   // RUN:
@@ -158,33 +166,16 @@ public:
   // program relies on report_done() from the context to be triggered when
   // the asynchronous part has finished. In any other case the ActionDispatcher
   // will issue the report_done() when run returns.
-
   virtual bool run( ActionContextHandle& context, ActionResultHandle& result ) = 0;
+
+  // CLEAR_CACHE:
+  // Clear any objects that were given as a short cut to improve performance.
+  // NOTE: An action should not contain any persistent handles, as actions may be kept
+  // for a provenance record.
+  virtual void clear_cache();
+
   // -- Action parameters --
-
 public:
-
-  // ADD_ARGUMENT:
-  // A argument to the action needs to be registered with the base
-  // class so we can import and export the arguments to a string.
-  // This function links the arguments of the action to an internal
-  // record of all the arguments
-  template< class ARGUMENT >
-  void add_argument( ARGUMENT& argument )
-  {
-    this->add_argument_ptr( &argument );
-  }
-
-  // ADD_KEY:
-  // A key needs to be registered with the base class
-  // so we can import and export the keys to a string.
-  // This function links the keys of the action to an internal
-  // key value pair system to records all the keys
-  template< class KEY >
-  void add_key( KEY& param )
-  {
-    this->add_key_ptr( &param );
-  }
 
   // EXPORT_TO_STRING:
   // Export the action command into a string, so it can stored
@@ -200,29 +191,47 @@ public:
   // Same as function above, but without the error report
   bool import_from_string( const std::string& action );
 
-  // CLEAR_CACHE:
-  // Clear any objects that were given as a short cut to improve performance.
-  // NOTE: An action should not contain any persistent handles, as actions may be kept
-  // for a provenance record.
-  virtual void clear_cache();
+  // -- functionality for setting parameter list --
+protected:
+  // ADD_PARAMETER
+  // Adding a parameter to the action's internal structure
+  // Each parameter should be added using this function in the action's constructor
+  template< class T >
+  inline void add_parameter( T& parameter )
+  {
+    this->add_param( new ActionParameter<T>( parameter ) );
+  }
+
+protected:
+  // ADD_PARAM
+  // Add a parameter to the internal structure of the action
+  inline void add_param( ActionParameterBase* parameter )
+  {
+    this->parameters_.push_back( parameter );
+  }
+
+  // GET_PARAM
+  // Retrieve the parameter from the internal structure of the action
+  inline ActionParameterBase* get_param( size_t index ) const 
+  {
+    return this->parameters_[ index ]; 
+  }
+  
+  // NUM_PARAMS
+  // Number of parameter in this action
+  inline size_t num_params() const
+  {
+    return parameters_.size();
+  }
 
 private:
-
-  // IMPLEMENTATION OF ADD_PARAMETER, ADD_ARGUMENT AND ADD_CACHEDHANDLE:
-  // These take pointers to the base class, the ones defined above work
-  // with references of the parameters for more convenience.
-  void add_argument_ptr( ActionParameterBase* param );
-  void add_key_ptr( ActionParameterBase* param );
-
-  // Typedefs
+  // Typedef for list of pointers to the actual parameters
   typedef std::vector< ActionParameterBase* > parameter_list_type;
 
   // Vector that stores the required arguments of the action.
-  parameter_list_type arguments_;
-
-  // Vector that stores the option key value pairs of the action.
-  parameter_list_type keys_;
+  parameter_list_type parameters_;
 };
+
 
 // CORE_ACTION:
 // Action type should be defined at the top of each action. It renders code that
@@ -235,6 +244,39 @@ private:
 
 } // end namespace Core
 
+#define CORE_ACTION_INTERNAL( definition_string, info_class ) \
+public: \
+  static std::string Definition() { return GetActionInfo()->get_definition(); }\
+  static std::string Type() { return GetActionInfo()->get_type(); } \
+  static Core::ActionInfo::handle_type GetActionInfo() \
+  {\
+    return GetTypedActionInfo(); \
+  }\
+  virtual Core::ActionInfoHandle get_action_info() const { return GetActionInfo(); } \
+  \
+  static info_class::handle_type GetTypedActionInfo() \
+  {\
+    static bool initialized_; \
+    static info_class::handle_type info_; \
+    if ( !initialized_ ) \
+    {\
+      {\
+        info_class::lock_type lock( info_class::GetMutex() );\
+        std::string definition = std::string( "<?xml version=\"1.0\"?>\n" definition_string "\n" ); \
+        if ( !info_ ) info_ = info_class::handle_type( new info_class( definition ) ); \
+      }\
+      {\
+        info_class::lock_type lock( info_class::GetMutex() );\
+        initialized_ = true;\
+      }\
+    }\
+    return info_;\
+  } \
+  virtual info_class::handle_type get_typed_action_infp() const { return GetTypedActionInfo();  }
+
+#define CORE_ACTION(definition_string) \
+CORE_ACTION_INTERNAL(definition_string, Core::ActionInfo )
+
 #define CORE_ACTION_TYPE( name, description ) \
 "<action name=\"" name "\">" description "</action>"
 
@@ -244,37 +286,23 @@ private:
 #define CORE_ACTION_KEY( name, default_value, description ) \
 "<key name=\"" name "\" default=\"" default_value "\"> " description "</key>"
 
+#define CORE_ACTION_PROPERTY( property ) \
+"<property>" property "</property>"
+
+#define CORE_ACTION_ARGUMENT_PROPERTY( name, property ) \
+"<property name=\"" name "\">" property "</property>"
+
+#define CORE_ACTION_KEY_PROPERTY( name, property ) \
+"<property name=\"" name "\">" property "</property>"
+
 #define CORE_ACTION_CHANGES_PROJECT_DATA() \
-"<changes_project_data/>"
+CORE_ACTION_PROPERTY( "changes_project_data" )
+
+#define CORE_ACTION_CHANGES_PROVENANCE_DATA() \
+CORE_ACTION_PROPERTY( "changes_provenance_data" )
 
 #define CORE_ACTION_IS_UNDOABLE() \
-"<undoable/>"
-
-#define CORE_ACTION(definition_string) \
-public: \
-  static std::string Definition() { return GetActionInfo()->get_definition(); }\
-  static std::string Type() { return GetActionInfo()->get_type(); } \
-  static std::string Usage() { return GetActionInfo()->get_usage(); } \
-  static Core::ActionInfoHandle GetActionInfo() \
-  {\
-    static bool initialized_; \
-    static Core::ActionInfoHandle info_; \
-    if ( !initialized_ ) \
-    {\
-      {\
-        Core::ActionInfo::lock_type lock( Core::ActionInfo::GetMutex() );\
-        std::string definition = std::string( "<?xml version=\"1.0\"?>\n" definition_string "\n" ); \
-        if ( !info_ ) info_ = Core::ActionInfoHandle( new Core::ActionInfo( definition ) ); \
-      }\
-      {\
-        Core::ActionInfo::lock_type lock( Core::ActionInfo::GetMutex() );\
-        initialized_ = true;\
-      }\
-    }\
-    return info_;\
-  } \
-  \
-  virtual Core::ActionInfoHandle get_action_info() const { return GetActionInfo(); }
+CORE_ACTION_PROPERTY( "is_undoable" )
 
 #endif
 

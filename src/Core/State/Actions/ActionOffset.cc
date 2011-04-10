@@ -35,32 +35,22 @@ CORE_REGISTER_ACTION( Core, Offset )
 namespace Core
 {
 
-ActionOffset::ActionOffset()
-{
-  this->add_argument( this->stateid_ );
-  this->add_argument( this->offset_value_ );
-}
-
-ActionOffset::~ActionOffset()
-{
-}
-
 bool ActionOffset::validate( ActionContextHandle& context )
 {
   StateBaseHandle state( this->state_weak_handle_.lock() );
 
   if ( !state )
   {
-    if ( !StateEngine::Instance()->get_state( this->stateid_.value(), state ) )
+    if ( !StateEngine::Instance()->get_state( this->stateid_, state ) )
     {
-      context->report_error( std::string( "Unknown state variable '" ) + stateid_.value() + "'" );
+      context->report_error( std::string( "Unknown state variable '" ) + stateid_ + "'" );
       return false;
     }
     StateRangedValueBaseHandle value_state = 
       boost::dynamic_pointer_cast< StateRangedValueBase >( state );
     if ( !value_state )
     {
-      context->report_error( std::string( "State variable '") + this->stateid_.value() +
+      context->report_error( std::string( "State variable '") + this->stateid_ +
         "' doesn't support ActionOffset" );
       return false;
     }
@@ -88,7 +78,6 @@ bool ActionOffset::run( ActionContextHandle& context, ActionResultHandle& result
   return false;
 }
 
-
 bool ActionOffset::changes_project_data()
 {
   StateBaseHandle state( state_weak_handle_.lock() );
@@ -96,7 +85,7 @@ bool ActionOffset::changes_project_data()
   // If not the state cannot be retrieved report an error
   if ( !state )
   {
-    if ( !( StateEngine::Instance()->get_state( stateid_.value(), state ) ) )
+    if ( !( StateEngine::Instance()->get_state( stateid_, state ) ) )
     {
       return false;
     }

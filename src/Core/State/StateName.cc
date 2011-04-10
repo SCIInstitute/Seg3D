@@ -179,15 +179,15 @@ bool StateName::import_from_string( const std::string& str, ActionSource source 
   return this->set( value, source );
 }
 
-void StateName::export_to_variant( ActionParameterVariant& variant ) const
+void StateName::export_to_variant( Variant& variant ) const
 {
-  variant.set_value( this->private_->value_ );
+  variant.set( this->private_->value_ );
 }
 
-bool StateName::import_from_variant( ActionParameterVariant& variant, ActionSource source )
+bool StateName::import_from_variant( Variant& variant, ActionSource source )
 {
   std::string value;
-  if ( !variant.get_value( value ) )
+  if ( !variant.get( value ) )
   {
     return false;
   }
@@ -195,10 +195,10 @@ bool StateName::import_from_variant( ActionParameterVariant& variant, ActionSour
   return this->set( value, source );
 }
 
-bool StateName::validate_variant( ActionParameterVariant& variant, std::string& error )
+bool StateName::validate_variant( Variant& variant, std::string& error )
 {
   std::string value;
-  if ( !variant.get_value( value ) )
+  if ( !variant.get( value ) )
   {
     error = "Cannot convert the value '" + variant.export_to_string() + "'";
     return false;

@@ -54,11 +54,7 @@ CORE_ACTION(
 public:
   ActionNewMaskLayer()
   {
-    this->add_argument( group_id_);
-  }
-  
-  virtual ~ActionNewMaskLayer()
-  {
+    this->add_group_id( this->group_id_ );
   }
   
 // -- Functions that describe action --
@@ -69,14 +65,10 @@ public:
   
 private:
   // The name of the group where the mask needs to be added
-  Core::ActionParameter< std::string > group_id_;
+  std::string group_id_;
   
   // -- Dispatch this action from the interface --
 public:
-  // CREATE:
-  // Create action that moves the layer above
-  static Core::ActionHandle Create( const std::string& group_id );
-  
   // DISPATCH:
   // Dispatch action that creates a new mask layer 
   static void Dispatch( Core::ActionContextHandle context, const std::string& group_id );

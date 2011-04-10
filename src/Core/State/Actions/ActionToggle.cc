@@ -40,10 +40,9 @@ bool ActionToggle::validate(  ActionContextHandle& context )
   StateBaseHandle state = this->state_weak_handle_.lock();
   if ( !state )
   {
-    if ( !( StateEngine::Instance()->get_state( stateid_.value(), state ) ) )
+    if ( !( StateEngine::Instance()->get_state( stateid_, state ) ) )
     {
-      context->report_error( std::string( "Unknown state variable '" ) + stateid_.value()
-          + "'" );
+      context->report_error( std::string( "Unknown state variable '" ) + stateid_ + "'" );
       return false;
     }
 
@@ -51,8 +50,7 @@ bool ActionToggle::validate(  ActionContextHandle& context )
       boost::dynamic_pointer_cast< StateBool >( state );
     if ( !typed_state )
     {
-      context->report_error( std::string( "State variable '" ) + stateid_.value()
-        + "' doesn't support ActionToggle" );
+      context->report_error( std::string( "State variable '" ) + stateid_ + "' doesn't support ActionToggle" );
       return false;
     }
     
@@ -81,7 +79,7 @@ bool ActionToggle::changes_project_data()
   // If not the state cannot be retrieved report an error
   if ( !state )
   {
-    if ( !( StateEngine::Instance()->get_state( stateid_.value(), state ) ) )
+    if ( !( StateEngine::Instance()->get_state( stateid_, state ) ) )
     {
       return false;
     }

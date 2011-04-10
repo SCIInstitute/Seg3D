@@ -29,14 +29,18 @@
 #ifndef APPLICATION_FILTERS_ACTIONS_ACTIONTHRESHOLDSEGMENTLSFILTER_H
 #define APPLICATION_FILTERS_ACTIONS_ACTIONTHRESHOLDSEGMENTLSFILTER_H
 
+// Core includes
 #include <Core/Action/Actions.h>
 #include <Core/Interface/Interface.h>
+
+// Application includes
 #include <Application/Layer/Layer.h>
+#include <Application/LayerManager/LayerAction.h>
 
 namespace Seg3D
 {
   
-class ActionThresholdSegmentationLSFilter : public Core::Action
+class ActionThresholdSegmentationLSFilter : public LayerAction
 {
 
 CORE_ACTION( 
@@ -58,19 +62,15 @@ public:
   ActionThresholdSegmentationLSFilter()
   {
     // Action arguments
-    this->add_argument( this->layer_id_ );
-    this->add_argument( this->mask_ );
+    this->add_layer_id( this->layer_id_ );
+    this->add_layer_id( this->mask_ );
     
     // Action options
-    this->add_key( this->iterations_ );
-    this->add_key( this->threshold_range_ );
-    this->add_key( this->curvature_ );
-    this->add_key( this->propagation_ );
-    this->add_key( this->edge_ );
-  }
-  
-  virtual ~ActionThresholdSegmentationLSFilter()
-  {
+    this->add_parameter( this->iterations_ );
+    this->add_parameter( this->threshold_range_ );
+    this->add_parameter( this->curvature_ );
+    this->add_parameter( this->propagation_ );
+    this->add_parameter( this->edge_ );
   }
   
   // -- Functions that describe action --
@@ -78,22 +78,21 @@ public:
   virtual bool validate( Core::ActionContextHandle& context );
   virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
   
-  void set_iterations( int iterations ) { this->iterations_.value() = iterations; }
+  void set_iterations( int iterations ) { this->iterations_ = iterations; }
   // -- Action parameters --
 private:
 
-  Core::ActionParameter< std::string > layer_id_;
-  Core::ActionParameter< std::string > mask_;
+  std::string layer_id_;
+  std::string mask_;
   
-  Core::ActionParameter< int > iterations_;
-  Core::ActionParameter< double > threshold_range_;
-  Core::ActionParameter< double > curvature_;
-  Core::ActionParameter< double > propagation_;
-  Core::ActionParameter< double > edge_;
+  int iterations_;
+  double threshold_range_;
+  double curvature_;
+  double propagation_;
+  double edge_;
   
   // -- Dispatch this action from the interface --
-public:
-        
+public:     
   // DISPATCH:
   // Create and dispatch action that inserts the new layer 
   static void Dispatch( Core::ActionContextHandle context, std::string layer_id, 

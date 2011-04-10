@@ -127,7 +127,7 @@ std::string ExportToString( const std::vector< Measurement >& value )
   BOOST_FOREACH( Measurement measurement, value )
   {
     export_string += ExportToString( measurement );
-  }
+}
   return export_string;
 }
 
@@ -160,8 +160,8 @@ bool ImportFromString( const std::string& str, Measurement& value )
     ImportFromString( m[ 8 ].str(), p1 );
     value.set_point( 1, p1 );
     value.set_note( m[ 11 ].str() );
-    return true;
-  } 
+  return true;
+}
   return false;
 }
 

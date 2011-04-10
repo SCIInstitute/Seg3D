@@ -38,7 +38,7 @@ SET(APPLICATION_VIEWMANAGER_SRCS
 
 SET(APPLICATION_VIEWMANAGER_ACTIONS_SRCS
   Actions/ActionPickPoint.h
-  Actions/ActionPickPoint.cc
+  Actions/ActionPickPoint.cc  
   Actions/ActionNewFeature.h
   Actions/ActionNewFeature.cc
   Actions/ActionDeleteFeature.h

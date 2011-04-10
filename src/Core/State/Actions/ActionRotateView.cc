@@ -33,32 +33,21 @@ CORE_REGISTER_ACTION( Core, RotateView )
 namespace Core
 {
 
-ActionRotateView::ActionRotateView()
-{
-  add_argument( this->stateid_ );
-  add_argument( this->axis_ );
-  add_argument( this->angle_ );
-}
-
-ActionRotateView::~ActionRotateView()
-{
-}
-
 bool ActionRotateView::validate( ActionContextHandle& context )
 {
   StateBaseHandle state = this->view3d_state_.lock();
   if ( !state )
   {
-    if ( !( StateEngine::Instance()->get_state( stateid_.value(), state ) ) )
+    if ( !( StateEngine::Instance()->get_state( this->stateid_, state ) ) )
     {
-      context->report_error( std::string( "Unknown state variable '" ) + stateid_.value()
+      context->report_error( std::string( "Unknown state variable '" ) + stateid_
           + "'" );
       return false;
     }
 
     if ( typeid(*state) != typeid(StateView3D) )
     {
-      context->report_error( std::string( "State variable '" ) + stateid_.value()
+      context->report_error( std::string( "State variable '" ) + stateid_
           + "' doesn't support ActionRotateView" );
       return false;
     }
@@ -76,28 +65,11 @@ bool ActionRotateView::run( ActionContextHandle& context, ActionResultHandle& re
 
   if ( state )
   {
-    state->rotate( this->axis_.value(), this->angle_.value() );
+    state->rotate( this->axis_, this->angle_ );
     return true;
   }
 
   return false;
-}
-
-ActionHandle ActionRotateView::Create( StateView3DHandle& view3d_state, const Core::Vector& axis,
-    double angle )
-{
-  ActionRotateView* action = new ActionRotateView;
-  action->stateid_.value() = view3d_state->get_stateid();
-  action->axis_.value() = axis;
-  action->angle_.value() = angle;
-  action->view3d_state_ = StateView3DWeakHandle( view3d_state );
-  return ActionHandle( action );
-}
-
-void ActionRotateView::Dispatch( ActionContextHandle context, StateView3DHandle& view3d_state, 
-  const Core::Vector& axis, double angle )
-{
-  ActionDispatcher::PostAction( Create( view3d_state, axis, angle), context );
 }
 
 bool ActionRotateView::changes_project_data()
@@ -107,7 +79,7 @@ bool ActionRotateView::changes_project_data()
   // If not the state cannot be retrieved report an error
   if ( !state )
   {
-    if ( !( StateEngine::Instance()->get_state( stateid_.value(), state ) ) )
+    if ( !( StateEngine::Instance()->get_state( stateid_, state ) ) )
     {
       return false;
     }
@@ -115,6 +87,17 @@ bool ActionRotateView::changes_project_data()
 
   // Keep track of whether the state changes the data of the program
   return state->is_project_data();
+}
+
+void ActionRotateView::Dispatch( ActionContextHandle context, StateView3DHandle& view3d_state, 
+  const Core::Vector& axis, double angle )
+{
+  ActionRotateView* action = new ActionRotateView;
+  action->stateid_ = view3d_state->get_stateid();
+  action->axis_ = axis;
+  action->angle_ = angle;
+  action->view3d_state_ = StateView3DWeakHandle( view3d_state );
+  ActionDispatcher::PostAction( ActionHandle( action ), context );
 }
 
 } // end namespace Core

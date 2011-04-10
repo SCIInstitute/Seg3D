@@ -35,27 +35,20 @@ CORE_REGISTER_ACTION( Core, TranslateView )
 namespace Core
 {
 
-ActionTranslateView::ActionTranslateView()
-{
-  add_argument( this->stateid_ );
-  add_argument( this->offset_ );
-}
-
 bool ActionTranslateView::validate( ActionContextHandle &context )
 {
   StateBaseHandle state = this->state_weak_handle_.lock();
   if ( !state )
   {
-    if ( !( StateEngine::Instance()->get_state( stateid_.value(), state ) ) )
+    if ( !( StateEngine::Instance()->get_state( stateid_, state ) ) )
     {
-      context->report_error( std::string( "Unknown state variable '" ) + stateid_.value()
-          + "'" );
+      context->report_error( std::string( "Unknown state variable '" ) + stateid_ + "'" );
       return false;
     }
 
     if ( typeid(*state) != typeid(StateView2D) && typeid(*state) != typeid(StateView3D) )
     {
-      context->report_error( std::string( "State variable '" ) + stateid_.value()
+      context->report_error( std::string( "State variable '" ) + stateid_
         + "' doesn't support ActionScaleView3D" );
       return false;
     }
@@ -72,7 +65,7 @@ bool ActionTranslateView::run( ActionContextHandle& context, ActionResultHandle&
 
   if ( state )
   {
-    state->translate( this->offset_.value() );
+    state->translate( this->offset_ );
     return true;
   }
 
@@ -86,7 +79,7 @@ bool ActionTranslateView::changes_project_data()
   // If not the state cannot be retrieved report an error
   if ( !state )
   {
-    if ( !( StateEngine::Instance()->get_state( stateid_.value(), state ) ) )
+    if ( !( StateEngine::Instance()->get_state( stateid_, state ) ) )
     {
       return false;
     }

@@ -123,6 +123,11 @@ bool FlipToolInterface::build_widget( QFrame* frame )
     this->add_connection( PreferencesManager::Instance()->z_axis_label_state_->value_changed_signal_.
       connect( boost::bind( &FlipToolInterface::ChangeZAxisLabel, qpointer_type( this ), _1 ) ) );
   }
+  
+#if defined ( __APPLE__ )  
+  this->private_->ui_.verticalLayout->setSpacing( 8 );
+  this->private_->ui_.verticalLayout_2->setSpacing( 8 );
+#endif
 
   //Send a message to the log that we have finished with building the Flip Tool Interface
   CORE_LOG_DEBUG( "Finished building a Flip Tool Interface" );

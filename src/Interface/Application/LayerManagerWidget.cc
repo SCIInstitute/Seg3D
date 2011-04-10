@@ -131,30 +131,25 @@ LayerManagerWidget::LayerManagerWidget( QWidget* parent ) :
   this->private_->loading_states_ = false;
 
   // Customize the settings for the scroll area
-  setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-  setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded );
-  setContentsMargins( 1, 1, 1, 1 );
-  setWidgetResizable( true );
+  this->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+  this->setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded );
+  this->setContentsMargins( 1,1,1,1 );
+  this->setWidgetResizable( true );
   
-  this->setStyleSheet(
-    QString::fromUtf8( "QWidget { background-color: none; }" ) );
-
+  this->setFrameShape( QFrame::NoFrame );
+  this->setFrameShadow( QFrame::Plain );
+  this->setLineWidth( 0 );
 
   // Define a new central widget inside the scroll area
   this->private_->main_ = new QWidget( parent );
-  this->private_->main_->setObjectName( QString::fromUtf8( "main_" ) );
-  this->private_->main_->setStyleSheet( 
-    QString::fromUtf8( "QWidget#main_{ background-color: none; }" ) );
   this->setWidget( this->private_->main_ );
   
   // Setup the spacing between the groups
   this->private_->group_layout_ = new QVBoxLayout( this->private_->main_ );
   this->private_->group_layout_->setSpacing( 2 );
-  this->private_->group_layout_->setContentsMargins( 1, 1, 1, 1 );
+  this->private_->group_layout_->setContentsMargins( 1,1,1,1 );
   this->private_->group_layout_->setAlignment( Qt::AlignTop );
   
-  // Link the layout to the main widget
-//  this->private_->main_->setLayout( this->private_->group_layout_ );
   this->private_->main_->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Preferred );
   this->private_->main_->setAcceptDrops( true );
 
@@ -319,7 +314,7 @@ void LayerManagerWidget::prep_layers_for_drag_and_drop( bool move_time )
     this->private_->group_map_.begin(); it != this->private_->group_map_.end(); ++it )
   {
     LayerGroupHandle group = 
-      LayerManager::Instance()->get_layer_group( ( *it ).second->get_group_id() );
+      LayerManager::Instance()->get_group_by_id( ( *it ).second->get_group_id() );
   
     if( group && group->group_widget_expanded_state_->get() )
     { 

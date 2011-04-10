@@ -53,6 +53,7 @@ QtCustomDockWidget::QtCustomDockWidget( QWidget *parent ) :
     " background-color: rgba(211, 211, 211, 212);"
     "}" ) );
   this->private_->overlay_->hide();
+
 }
   
 QtCustomDockWidget::~QtCustomDockWidget()

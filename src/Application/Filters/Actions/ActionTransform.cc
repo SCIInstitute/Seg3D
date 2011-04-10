@@ -51,10 +51,10 @@ namespace Seg3D
 class ActionTransformPrivate
 {
 public:
-  Core::ActionParameter< std::vector< std::string > > layer_ids_;
-  Core::ActionParameter< Core::Point > origin_;
-  Core::ActionParameter< Core::Vector > spacing_;
-  Core::ActionParameter< bool > replace_;
+  std::vector< std::string > layer_ids_;
+  Core::Point origin_;
+  Core::Vector spacing_;
+  bool replace_;
 
   Core::GridTransform output_grid_trans_;
 };
@@ -237,16 +237,15 @@ ActionTransform::ActionTransform() :
   private_( new ActionTransformPrivate )
 {
   // Action arguments
-  this->add_argument( this->private_->layer_ids_ );
-  this->add_argument( this->private_->origin_ );
-  this->add_argument( this->private_->spacing_ );
-
-  this->add_key( this->private_->replace_ );
+  this->add_layer_id_list( this->private_->layer_ids_ );
+  this->add_parameter( this->private_->origin_ );
+  this->add_parameter( this->private_->spacing_ );
+  this->add_parameter( this->private_->replace_ );
 }
 
 bool ActionTransform::validate( Core::ActionContextHandle& context )
 {
-  const std::vector< std::string >& layer_ids = this->private_->layer_ids_.value();
+  const std::vector< std::string >& layer_ids = this->private_->layer_ids_;
   if ( layer_ids.size() == 0 )
   {
     context->report_error( "No input layers specified" );
@@ -276,16 +275,11 @@ bool ActionTransform::validate( Core::ActionContextHandle& context )
     }
     
     // Check for layer availability 
-    Core::NotifierHandle notifier;
     if ( !LayerManager::CheckLayerAvailability( layer_ids[ i ], 
-      this->private_->replace_.value(), notifier ) )
-    {
-      context->report_need_resource( notifier );
-      return false;
-    }
+      this->private_->replace_, context ) ) return false;
   }
   
-  const Core::Vector& spacing = this->private_->spacing_.value();
+  const Core::Vector& spacing = this->private_->spacing_;
   if ( spacing[ 0 ] <= 0 || spacing[ 1 ] <= 0 || spacing[ 2 ] <= 0 )
   {
     context->report_error( "Spacing must be greater than 0" );
@@ -297,7 +291,7 @@ bool ActionTransform::validate( Core::ActionContextHandle& context )
   this->private_->output_grid_trans_.set_nx( src_grid_trans.get_nx() );
   this->private_->output_grid_trans_.set_ny( src_grid_trans.get_ny() );
   this->private_->output_grid_trans_.set_nz( src_grid_trans.get_nz() );
-  this->private_->output_grid_trans_.load_basis( this->private_->origin_.value(), 
+  this->private_->output_grid_trans_.load_basis( this->private_->origin_, 
     Core::Vector( spacing[ 0 ], 0, 0 ), Core::Vector( 0, spacing[ 1 ], 0 ), 
     Core::Vector( 0, 0, spacing[ 2 ] ) );
   
@@ -312,10 +306,10 @@ bool ActionTransform::run( Core::ActionContextHandle& context,
   boost::shared_ptr< TransformAlgo > algo( new TransformAlgo );
 
   // Set up parameters
-  algo->replace_ = this->private_->replace_.value();
+  algo->replace_ = this->private_->replace_;
 
   // Set up input and output layers
-  const std::vector< std::string >& layer_ids = this->private_->layer_ids_.value();
+  const std::vector< std::string >& layer_ids = this->private_->layer_ids_;
   size_t num_of_layers = layer_ids.size();
   algo->src_layers_.resize( num_of_layers );
   algo->dst_layers_.resize( num_of_layers );
@@ -326,7 +320,7 @@ bool ActionTransform::run( Core::ActionContextHandle& context,
     algo->find_layer( layer_ids[ i ], algo->src_layers_[ i ] );
     if ( algo->replace_ )
     {
-      algo->lock_for_processing( algo->src_layers_[ i ], false );
+      algo->lock_for_deletion( algo->src_layers_[ i ] );
     }
     else
     {
@@ -357,6 +351,9 @@ bool ActionTransform::run( Core::ActionContextHandle& context,
   // Build the undo-redo record
   algo->create_undo_redo_record( context, this->shared_from_this() );
 
+  // Build the provenance record
+  algo->create_provenance_record( context, this->shared_from_this() );
+
   // Start the filter.
   Core::Runnable::Start( algo );
 
@@ -369,10 +366,10 @@ void ActionTransform::Dispatch( Core::ActionContextHandle context,
                 bool replace )
 {
   ActionTransform* action = new ActionTransform;
-  action->private_->layer_ids_.set_value( layer_ids );
-  action->private_->origin_.set_value( origin );
-  action->private_->spacing_.set_value( spacing );
-  action->private_->replace_.set_value( replace );
+  action->private_->layer_ids_ = layer_ids;
+  action->private_->origin_ = origin;
+  action->private_->spacing_ = spacing;
+  action->private_->replace_ = replace;
 
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }

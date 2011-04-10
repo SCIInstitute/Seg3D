@@ -26,50 +26,46 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_PROJECTMANAGER_ACTIONS_ACTIONQUICKOPEN_H
-#define APPLICATION_PROJECTMANAGER_ACTIONS_ACTIONQUICKOPEN_H
+#ifndef QTUTILS_BRIDGE_QTCONNECTION_H
+#define QTUTILS_BRIDGE_QTCONNECTION_H
 
-#include <Core/Action/Action.h> 
-#include <Core/Interface/Interface.h>
+// Boost includes
+#include <boost/utility.hpp>
+#include <boost/smart_ptr.hpp>
 
+// QT includes
+#include <QObject>
+#include <QPointer>
 
-namespace Seg3D
+// Core includes
+#include <Core/Utils/ConnectionHandler.h>
+
+namespace QtUtils
 {
 
-class ActionQuickOpen : public Core::Action
+class QtConnection;
+class QtConnectorBase;
+typedef boost::shared_ptr<QtConnection> QtConnectionHandle;
+
+// CLASS QTBRIDGE:
+// This class provides bridges between widgets and state variables
+
+class QtConnection : public Core::ConnectionHandlerConnection
 {
-  
-CORE_ACTION( 
-  CORE_ACTION_TYPE( "QuickOpen", "View a supported file." )
-)
-
-  // -- Constructor/Destructor --
+  // -- constructor --
 public:
-  ActionQuickOpen()
-  {
-  }
+  QtConnection( QtConnectorBase* connection );
+  virtual ~QtConnection();
 
-  virtual ~ActionQuickOpen()
-  {
-  }
-
-  // -- Functions that describe action --
 public:
-  virtual bool validate( Core::ActionContextHandle& context );
-  virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
+  // DISCONNECT
+  // Disconnect the connection that was made using the QtBridge
+  virtual void disconnect();
   
-  // -- Dispatch this action from the interface --
-public:
-  
-  // CREATE:
-  // Create an action that loads a session
-  static Core::ActionHandle Create();
-  
-  // DISPATCH:
-  // Dispatch an action loads a session
-  static void Dispatch( Core::ActionContextHandle context );
+private:
+  QPointer< QtConnectorBase > connection_;
 };
 
-} // end namespace Seg3D
+} // end namespace QtUtils
 
-#endif  //ACTIONNEWPROJECT_H
+#endif

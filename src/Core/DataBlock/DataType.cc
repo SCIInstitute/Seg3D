@@ -41,8 +41,7 @@ namespace Core
 
 bool ImportFromString( const std::string& data_type_string, DataType& data_type )
 {
-  std::string lower_data_type = data_type_string;
-  boost::to_lower( lower_data_type );
+  std::string lower_data_type = boost::to_lower_copy( data_type_string ); 
   boost::erase_all( lower_data_type , " " );
 
   if ( lower_data_type == "char" || lower_data_type == "signedchar")

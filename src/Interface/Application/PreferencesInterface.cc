@@ -91,7 +91,7 @@ PreferencesInterface::PreferencesInterface( QWidget *parent ) :
   this->setup_interface_controls_prefs();
 
   //Hide the interface controls since they arent connected yet
-  this->private_->ui_.prefs_tabs_->removeTab( 2 );
+  this->private_->ui_.prefs_tabs_->removeTab( 3 );
   
   //This will ensure that the first tab, the general settings tab, will always be active by default
   this->private_->ui_.prefs_tabs_->setCurrentIndex( 0 );
@@ -160,7 +160,7 @@ void PreferencesInterface::setup_general_prefs()
     PreferencesManager::Instance()->active_layer_navigation_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.export_dicom_headers_,
     PreferencesManager::Instance()->export_dicom_headers_state_ );  
-
+  
   QtUtils::QtBridge::Connect( this->private_->ui_.enable_compression_checkbox_,
     PreferencesManager::Instance()->compression_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.compression_adjuster_,
@@ -197,6 +197,21 @@ void PreferencesInterface::setup_general_prefs()
   
   QtUtils::QtBridge::Enable( this->private_->ui_.compression_adjuster_, 
     PreferencesManager::Instance()->compression_state_ );
+
+  QtUtils::QtBridge::Connect( this->private_->ui_.embed_input_files_,
+    PreferencesManager::Instance()->embed_input_files_state_ );
+  
+  QtUtils::QtBridge::Connect( this->private_->ui_.generate_osx_project_bundle_,
+    PreferencesManager::Instance()->generate_osx_project_bundle_state_ );
+    
+#ifndef __APPLE__
+  this->private_->ui_.generate_osx_project_bundle_->hide();
+#endif  
+  
+  this->private_->ui_.compression_adjuster_->set_description( "Compression" );
+  this->private_->ui_.auto_save_timer_adjuster_->set_description( "Frequency (minutes)" );
+  this->private_->ui_.percent_of_memory_->set_description( "Undo/Redo buffer size" );
+  this->private_->ui_.opacity_adjuster_->set_description( "Default layer opacity" );
 
 }
 
@@ -273,6 +288,13 @@ void PreferencesInterface::setup_sidebar_prefs()
     PreferencesManager::Instance()->show_layermanager_bar_state_->get() );
   this->private_->ui_.project_manager_checkbox_->setChecked( 
     PreferencesManager::Instance()->show_projectmanager_bar_state_->get() );
+  this->private_->ui_.volume_view_checkbox_->setChecked( 
+    PreferencesManager::Instance()->show_rendering_bar_state_->get() );
+  this->private_->ui_.provenance_checkbox_->setChecked( 
+    PreferencesManager::Instance()->show_provenance_bar_state_->get() );
+  
+  
+  
 //  this->private_->ui_.history_checkbox_->setChecked( 
 //    PreferencesManager::Instance()->show_history_bar_state_->get() );
   
@@ -283,6 +305,11 @@ void PreferencesInterface::setup_sidebar_prefs()
     PreferencesManager::Instance()->show_layermanager_bar_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.project_manager_checkbox_, 
     PreferencesManager::Instance()->show_projectmanager_bar_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.volume_view_checkbox_, 
+    PreferencesManager::Instance()->show_rendering_bar_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.provenance_checkbox_, 
+    PreferencesManager::Instance()->show_provenance_bar_state_ );
+  
 //  QtUtils::QtBridge::Connect( this->private_->ui_.history_checkbox_, 
 //    PreferencesManager::Instance()->show_history_bar_state_ );
   

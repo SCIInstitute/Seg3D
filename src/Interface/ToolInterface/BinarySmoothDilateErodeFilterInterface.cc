@@ -119,6 +119,9 @@ bool BinarySmoothDilateErodeFilterInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Connect( this->private_->ui_.erodeButton, boost::bind( 
     &BinarySmoothDilateErodeFilter::execute_erode, tool, Core::Interface::GetWidgetActionContext() ) );
   
+  this->private_->ui_.erode_->set_description( "Erode" );
+  this->private_->ui_.dilate_->set_description( "Dilate" );
+  
   return true;
 
 } // end build_widget

@@ -39,32 +39,17 @@ namespace Seg3D
 
 bool ActionSaveSession::validate( Core::ActionContextHandle& context )
 {
-  boost::filesystem::path current_project_path = boost::filesystem::path( 
-    ProjectManager::Instance()->current_project_path_state_->get() ) /
-    ProjectManager::Instance()->current_project_->project_name_state_->get() /
-    ( ProjectManager::Instance()->current_project_->project_name_state_->get() + ".s3d" );
-
-  if( !boost::filesystem::exists( current_project_path ) && ProjectManager::Instance()->project_saved_state_->get() )
+  // Check whether files still exist, if not an error is being generated
+  // We are dealing with file I/O, hence there is no guarantee that files still exist.
+  // The user may have accidentally deleted the files, or a network connection may be lost, etc.
+  if ( ! ProjectManager::Instance()->get_current_project()->check_project_files() )
   {
-    CORE_LOG_ERROR( "Your project could not be found at the place it was last saved!" );
-    ProjectManager::Instance()->project_saved_state_->set( false );
+    context->report_error( "The project directory cannot be found." );
+    // Draw the users attention to this problem.
+    CORE_LOG_CRITICAL_ERROR( "Save FAILED as the project directory cannot found. "
+      "Please perform a 'Save As' as soon as possible to preserve your data." );        
+    return false;
   }
-
-
-  if( this->is_autosave_.value() )
-  {
-    boost::posix_time::ptime time_stamp = ProjectManager::Instance()->get_last_saved_session_time_stamp();
-    if( ProjectManager::Instance()->get_last_saved_session_time_stamp() > this->time_stamp_ )
-    {
-      return false;
-    }
-    
-    if( ProjectManager::Instance()->is_saving() )
-    {
-      return false;
-    }
-  }
-
   
   return true; // validated
 }
@@ -72,42 +57,40 @@ bool ActionSaveSession::validate( Core::ActionContextHandle& context )
 bool ActionSaveSession::run( Core::ActionContextHandle& context, 
   Core::ActionResultHandle& result )
 {
-  std::string message = std::string("Please wait, while your session is being saved...");
+  std::string message = std::string( "Please wait, while your session is being saved..." );
 
   Core::ActionProgressHandle progress = 
     Core::ActionProgressHandle( new Core::ActionProgress( message ) );
 
   progress->begin_progress_reporting();
 
-  bool save_success = 
-    ProjectManager::Instance()->save_project( this->is_autosave_.value(), 
-    this->session_name_.value() );
+  // A save can still fail, we have no control over whether disk actions will succeed, hence
+  // we need to keep checking the integrity of the file save.
+  bool success = ProjectManager::Instance()->save_project_session( this->session_name_ );
 
   progress->end_progress_reporting();
 
-  if( save_success )
+  if( !success )
   {
-    ProjectManager::Instance()->get_current_project()->reset_project_changed();
+    // Draw the users attention to this problem.
+    CORE_LOG_CRITICAL_ERROR( "Save FAILED for project: '" 
+      + ProjectManager::Instance()->get_current_project()->project_name_state_->get() 
+      + "'. Please perform a 'Save As' as soon as possible to preserve your data." );       
   }
 
-  return save_success;
+  std::string success_message = std::string( "Successfully saved session '" ) + 
+    ProjectManager::Instance()->get_current_project()->project_name_state_->get() + "'.";
+  CORE_LOG_SUCCESS( success_message );
+
+  return success;   
 }
 
-Core::ActionHandle ActionSaveSession::Create( bool is_autosave, const std::string& session_name )
+void ActionSaveSession::Dispatch( Core::ActionContextHandle context, const std::string& session_name )
 {
   ActionSaveSession* action = new ActionSaveSession;
-  
-  action->is_autosave_.value() = is_autosave;
-  action->session_name_.value() = session_name;
-  
-  action->time_stamp_ = boost::posix_time::second_clock::local_time();
-  return Core::ActionHandle( action );
-}
+  action->session_name_ = session_name;
 
-void ActionSaveSession::Dispatch( Core::ActionContextHandle context, bool is_autosave, 
-  std::string session_name )
-{
-  Core::ActionDispatcher::PostAction( Create( is_autosave, session_name ), context );
+  Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }
 
 } // end namespace Seg3D

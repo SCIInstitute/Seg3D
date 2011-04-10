@@ -1,6 +1,46 @@
 Release Notes
 =============
 
+Version 2.1.0
+-------------
+
+This version introduces a new cleaner look, first version of provenance tracking and a volume
+renderer.
+
+* Upgraded the look and feel of Seg3D. The colors are lighter and should focus more attention to the actual viewer.
+
+* Sliders and Histograms now have better default settings.
+
+* Options in tools are hidden if not used.
+
+* Highlighted the status bar coordinates.
+
+* Added volume rendering.
+
+* Refactored importers to have clearer logic.
+
+* Refactored the action mechanism to be easier to program.
+
+* Added provenance recording and a central database to each project.
+
+* Project Folders now have an extension.
+
+* Project Folders on the mac now generate a mac osx bundle.
+
+* Refactored project logic to manage files more efficient.
+
+
+Version 2.0.3
+------------
+
+This version adds several bug fixes and a few extra features.
+
+* Added a measurement tool.
+
+* Added capping for isosurfaces.
+
+* Fix world coordinates display.
+
 Version 2.0.2
 -------------
 

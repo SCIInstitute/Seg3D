@@ -65,6 +65,8 @@ SET(CORE_UTILS_SRCS
   StringUtil.cc
   Timer.h
   Timer.cc
+  Variant.h
+  Variant.cc
 )
 
 ##################################################

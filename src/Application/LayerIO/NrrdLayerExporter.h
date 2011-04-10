@@ -45,7 +45,7 @@ namespace Seg3D
 
 class NrrdLayerExporter : public LayerExporter
 {
-  SCI_EXPORTER_TYPE( "NRRD Exporter", ".nrrd" )
+  SEG3D_EXPORTER_TYPE( "NRRD Exporter", ".nrrd" )
 
   // -- Constructor/Destructor --
 public:
@@ -57,26 +57,12 @@ public:
   {
   }
 
-  // -- Import a file information --
-public:
-  // GET_GRID_TRANSFORM:
-  // Get the grid transform of the grid that we are importing
-  virtual Core::GridTransform get_grid_transform();
-
-  // GET_DATA_TYPE:
-  // Get the type of data that is being imported
-  virtual Core::DataType get_data_type();
-
-  // GET_IMPORTER_MODES
-  // Get then supported importer modes
-  virtual int get_exporter_modes();
-  
   // --Import the data as a specific type --  
 public: 
 
   // EXPORT_LAYER
   // Export the layer to file
-  virtual bool export_layer( LayerExporterMode mode, const std::string& file_path, 
+  virtual bool export_layer( const std::string& mode, const std::string& file_path, 
     const std::string& name );
     
   virtual void set_label_layer_values( std::vector< double > values )

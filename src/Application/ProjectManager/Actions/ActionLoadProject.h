@@ -29,9 +29,9 @@
 #ifndef APPLICATION_PROJECTMANAGER_ACTIONS_ACTIONLOADPROJECT_H
 #define APPLICATION_PROJECTMANAGER_ACTIONS_ACTIONLOADPROJECT_H
 
+// Core includes
 #include <Core/Action/Action.h> 
 #include <Core/Interface/Interface.h>
-
 
 namespace Seg3D
 {
@@ -41,18 +41,14 @@ class ActionLoadProject : public Core::Action
   
 CORE_ACTION( 
   CORE_ACTION_TYPE( "LoadProject", "Load a new project and discard the current one." )
-  CORE_ACTION_ARGUMENT( "projectfolder", "Folder name that contains the project." )
+  CORE_ACTION_ARGUMENT( "project", "The project file that needs to be opened." )
 )
 
   // -- Constructor/Destructor --
 public:
   ActionLoadProject()
   {
-    this->add_argument( this->project_path_ );
-  }
-
-  virtual ~ActionLoadProject()
-  {
+    this->add_parameter( this->project_file_ );
   }
 
   // -- Functions that describe action --
@@ -62,20 +58,14 @@ public:
   
 private:
 
-  // This parameter contains the index of the session to be loaded
-  Core::ActionParameter< std::string > project_path_;
+  // This parameter contains the name of the s3d file of the project that needs to be loaded.
+  std::string project_file_;
   
   // -- Dispatch this action from the interface --
 public:
-  
-  // CREATE:
-  // Create an action that loads a session
-  static Core::ActionHandle Create( const std::string& project_path );
-  
   // DISPATCH:
   // Dispatch an action loads a session
-  static void Dispatch( Core::ActionContextHandle context, const std::string& project_path );
-
+  static void Dispatch( Core::ActionContextHandle context, const std::string& project_file );
 };
 
 } // end namespace Seg3D

@@ -39,6 +39,8 @@ SET(APPLICATION_PROJECTMANAGER_SRCS
 )
 
 SET(APPLICATION_PROJECTMANAGER_ACTIONS_SRCS
+    Actions/ActionAutoSave.h
+    Actions/ActionAutoSave.cc
     Actions/ActionDeleteSession.h
     Actions/ActionDeleteSession.cc
     Actions/ActionExportProject.h
@@ -49,8 +51,6 @@ SET(APPLICATION_PROJECTMANAGER_ACTIONS_SRCS
     Actions/ActionLoadSession.cc
     Actions/ActionNewProject.h
     Actions/ActionNewProject.cc
-  Actions/ActionQuickOpen.h
-  Actions/ActionQuickOpen.cc
     Actions/ActionResetChangesMade.h
     Actions/ActionResetChangesMade.cc
     Actions/ActionSaveProjectAs.h
@@ -71,8 +71,9 @@ TARGET_LINK_LIBRARIES(Application_ProjectManager
                       Core_Action
                       Core_State
                       Application_Project
-            ${SCI_SQLITE_LIBRARY}
-                      ${SCI_BOOST_LIBRARY})
+                      Application_DatabaseManager
+                      ${SCI_BOOST_LIBRARY}
+                      ${SCI_SQLITE_LIBRARY})
 
 # Register action classes
 REGISTER_LIBRARY_AND_CLASSES(Application_ProjectManager

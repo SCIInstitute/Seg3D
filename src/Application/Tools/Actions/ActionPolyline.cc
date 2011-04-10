@@ -29,6 +29,9 @@
 #include <Core/Action/ActionFactory.h>
 #include <Core/Volume/MaskVolumeSlice.h>
 
+#include <Application/Provenance/Provenance.h>
+#include <Application/Provenance/ProvenanceStep.h>
+#include <Application/ProjectManager/ProjectManager.h>
 #include <Application/ToolManager/ToolManager.h>
 #include <Application/Tools/Actions/ActionPolyline.h>
 #include <Application/Layer/MaskLayer.h>
@@ -52,11 +55,11 @@ namespace Seg3D
 class ActionPolylinePrivate
 {
 public:
-  Core::ActionParameter< std::string > target_layer_id_;
-  Core::ActionParameter< int > slice_type_;
-  Core::ActionParameter< size_t > slice_number_;
-  Core::ActionParameter< bool > erase_;
-  Core::ActionParameter< std::vector< ActionPolyline::VertexCoord > > vertices_;
+  std::string target_layer_id_;
+  int slice_type_;
+  size_t slice_number_;
+  bool erase_;
+  std::vector< ActionPolyline::VertexCoord > vertices_;
 
   Core::MaskLayerHandle target_layer_;
   Core::MaskVolumeSliceHandle vol_slice_;
@@ -65,25 +68,21 @@ public:
 ActionPolyline::ActionPolyline() :
   private_( new ActionPolylinePrivate )
 {
-  this->add_argument( this->private_->target_layer_id_ );
-  this->add_argument( this->private_->slice_type_ );
-  this->add_argument( this->private_->slice_number_ );
-  this->add_argument( this->private_->erase_ );
-  this->add_argument( this->private_->vertices_ );
-}
-
-ActionPolyline::~ActionPolyline()
-{
+  this->add_layer_id( this->private_->target_layer_id_ );
+  this->add_parameter( this->private_->slice_type_ );
+  this->add_parameter( this->private_->slice_number_ );
+  this->add_parameter( this->private_->erase_ );
+  this->add_parameter( this->private_->vertices_ );
 }
 
 bool ActionPolyline::validate( Core::ActionContextHandle& context )
 {
   // Check whether the target layer exists
   MaskLayerHandle target_layer = boost::dynamic_pointer_cast< MaskLayer >( 
-    LayerManager::Instance()->get_layer_by_id( this->private_->target_layer_id_.value() ) );
+    LayerManager::Instance()->get_layer_by_id( this->private_->target_layer_id_ ) );
   if ( !target_layer )
   {
-    context->report_error( "Layer '" + this->private_->target_layer_id_.value() +
+    context->report_error( "Layer '" + this->private_->target_layer_id_ +
       "' is not a valid mask layer." );
     return false;
   }
@@ -91,37 +90,33 @@ bool ActionPolyline::validate( Core::ActionContextHandle& context )
   // Check whether the target layer can be used for processing
   Core::NotifierHandle notifier;
   if ( !LayerManager::Instance()->CheckLayerAvailabilityForProcessing(
-    this->private_->target_layer_id_.value(), notifier ) )
-  {
-    context->report_need_resource( notifier );
-    return false;
-  }
+    this->private_->target_layer_id_, context ) ) return false;
   
   this->private_->target_layer_ = LayerManager::FindMaskLayer( 
-    this->private_->target_layer_id_.value() );
+    this->private_->target_layer_id_ );
   
-  if ( this->private_->slice_type_.value() != Core::VolumeSliceType::AXIAL_E &&
-    this->private_->slice_type_.value() != Core::VolumeSliceType::CORONAL_E &&
-    this->private_->slice_type_.value() != Core::VolumeSliceType::SAGITTAL_E )
+  if ( this->private_->slice_type_ != Core::VolumeSliceType::AXIAL_E &&
+    this->private_->slice_type_ != Core::VolumeSliceType::CORONAL_E &&
+    this->private_->slice_type_ != Core::VolumeSliceType::SAGITTAL_E )
   {
     context->report_error( "Invalid slice type" );
     return false;
   }
   
   Core::VolumeSliceType slice_type = static_cast< Core::VolumeSliceType::enum_type >(
-    this->private_->slice_type_.value() );
+    this->private_->slice_type_ );
   Core::MaskVolumeSliceHandle volume_slice( new Core::MaskVolumeSlice(
     this->private_->target_layer_->get_mask_volume(), slice_type ) );
-  if ( this->private_->slice_number_.value() >= volume_slice->number_of_slices() )
+  if ( this->private_->slice_number_ >= volume_slice->number_of_slices() )
   {
     context->report_error( "Slice number is out of range." );
     return false;
   }
   
-  volume_slice->set_slice_number( this->private_->slice_number_.value() );
+  volume_slice->set_slice_number( this->private_->slice_number_ );
   this->private_->vol_slice_ = volume_slice;
   
-  const std::vector< VertexCoord >& vertices = this->private_->vertices_.value();
+  const std::vector< VertexCoord >& vertices = this->private_->vertices_;
   if ( vertices.size() <= 2 )
   {
     context->report_error( "The polyline has less than 3 vertices." );
@@ -204,7 +199,7 @@ bool ActionPolyline::run( Core::ActionContextHandle& context, Core::ActionResult
   int max_x = std::numeric_limits< int >::min();
   int min_y = min_x;
   int max_y = max_x;
-  const std::vector< VertexCoord >& vertices = this->private_->vertices_.value();
+  const std::vector< VertexCoord >& vertices = this->private_->vertices_;
   size_t num_of_vertices = vertices.size();
   for ( size_t i = 0; i < num_of_vertices; ++i )
   {
@@ -228,14 +223,14 @@ bool ActionPolyline::run( Core::ActionContextHandle& context, Core::ActionResult
 
     // Get the axis along which the flood fill works
     Core::SliceType slice_type = static_cast< Core::SliceType::enum_type>(
-      this->private_->slice_type_.value() );
+      this->private_->slice_type_ );
     
     // Get the slice number
-    size_t slice_number = this->private_->slice_number_.value();
+    size_t slice_number = this->private_->slice_number_;
     
     // Get the layer on which this action operates
     LayerHandle layer = LayerManager::Instance()->get_layer_by_id( 
-      this->private_->target_layer_id_.value() );
+      this->private_->target_layer_id_ );
     // Create a check point of the slice on which the flood fill will operate
     LayerCheckPointHandle check_point( new LayerCheckPoint( layer, slice_type, slice_number ) );
 
@@ -247,6 +242,26 @@ bool ActionPolyline::run( Core::ActionContextHandle& context, Core::ActionResult
 
     // Now add the undo/redo action to undo buffer
     UndoBuffer::Instance()->insert_undo_item( context, item );
+
+    // Add provenance id to output layer
+    layer->provenance_id_state_->set( this->get_output_provenance_id( 0 ) );
+
+    // Create a provenance record
+    ProvenanceStepHandle provenance_step( new ProvenanceStep );
+    
+    // Get the input provenance ids from the translate step
+    provenance_step->set_input_provenance_ids( this->get_input_provenance_ids() );
+    
+    // Get the output and replace provenance ids from the analysis above
+    provenance_step->set_output_provenance_ids(  this->get_output_provenance_ids()  );
+    
+    ProvenanceIDList deleted_provenance_ids( 1, layer->provenance_id_state_->get() );
+    provenance_step->set_deleted_provenance_ids( deleted_provenance_ids );
+  
+    provenance_step->set_action( this->export_to_provenance_string() );   
+    
+    ProjectManager::Instance()->get_current_project()->add_to_provenance_database(
+      provenance_step );    
   }
 
   // Otherwise, do a scanline fill in the overlapped region
@@ -261,7 +276,7 @@ bool ActionPolyline::run( Core::ActionContextHandle& context, Core::ActionResult
   unsigned char* mask_data = mask_data_block->get_mask_data();
   unsigned char mask_value = mask_data_block->get_mask_value();
   unsigned char not_mask_value = ~mask_value;
-  bool erase = this->private_->erase_.value();
+  bool erase = this->private_->erase_;
   const size_t x_stride = volume_slice->to_index( 1, 0 ) - volume_slice->to_index( 0, 0 );
   for ( int y = min_y; y <= max_y; ++y )
   {
@@ -330,11 +345,11 @@ void ActionPolyline::Dispatch( Core::ActionContextHandle context,
                 const std::vector< VertexCoord >& vertices )
 {
   ActionPolyline* action = new ActionPolyline;
-  action->private_->target_layer_id_.value() = layer_id;
-  action->private_->slice_type_.value() = slice_type;
-  action->private_->slice_number_.value() = slice_number;
-  action->private_->erase_.value() = erase;
-  action->private_->vertices_.value() = vertices;
+  action->private_->target_layer_id_ = layer_id;
+  action->private_->slice_type_ = slice_type;
+  action->private_->slice_number_ = slice_number;
+  action->private_->erase_ = erase;
+  action->private_->vertices_ = vertices;
 
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }

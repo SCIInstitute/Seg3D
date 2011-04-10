@@ -41,9 +41,9 @@ class ActionSetMeasurementVisiblePrivate
 {
 public:
   // Required action parameters
-  Core::ActionParameter< std::string > measurements_stateid_;
-  Core::ActionParameter< std::string > measurement_id_;
-  Core::ActionParameter< bool > visible_;
+  std::string measurements_stateid_;
+  std::string measurement_id_;
+  bool visible_;
   
   // This is an internal optimization to avoid the lookup in the state database
   Core::StateVectorBaseWeakHandle measurements_state_weak_handle_;
@@ -52,9 +52,9 @@ public:
 ActionSetMeasurementVisible::ActionSetMeasurementVisible() :
   private_( new ActionSetMeasurementVisiblePrivate )
 {
-  this->add_argument( this->private_->measurements_stateid_ );
-  this->add_argument( this->private_->measurement_id_ );
-  this->add_argument( this->private_->visible_ );
+  this->add_parameter( this->private_->measurements_stateid_ );
+  this->add_parameter( this->private_->measurement_id_ );
+  this->add_parameter( this->private_->visible_ );
 }
 
 ActionSetMeasurementVisible::~ActionSetMeasurementVisible()
@@ -70,10 +70,10 @@ bool ActionSetMeasurementVisible::validate( Core::ActionContextHandle& context )
   {
     // Query the state engine
     if ( !Core::StateEngine::Instance()->get_state( 
-      this->private_->measurements_stateid_.value(), vector_state ) )
+      this->private_->measurements_stateid_, vector_state ) )
     {
       context->report_error( std::string( "Unknown state variable '" ) + 
-        this->private_->measurements_stateid_.value() + "'" );
+        this->private_->measurements_stateid_ + "'" );
       return false;
     }
     // Check the type of the state
@@ -82,7 +82,7 @@ bool ActionSetMeasurementVisible::validate( Core::ActionContextHandle& context )
     if ( !measurment_state )
     {
       context->report_error( std::string( "State variable '") + 
-        this->private_->measurements_stateid_.value() + "' doesn't support ActionSetMeasurementVisible" );
+        this->private_->measurements_stateid_ + "' doesn't support ActionSetMeasurementVisible" );
       return false;
     }
     this->private_->measurements_state_weak_handle_ = measurment_state;
@@ -107,11 +107,11 @@ bool ActionSetMeasurementVisible::run( Core::ActionContextHandle& context,
     // Find one with matching id
     for( size_t i = 0; i < measurements.size(); i++ )
     {
-      if( measurements[ i ].get_id() == this->private_->measurement_id_.value() )
+      if( measurements[ i ].get_id() == this->private_->measurement_id_ )
       {
         // Set visibility
         Core::Measurement m = measurements[ i ];
-        m.set_visible( this->private_->visible_.value() );
+        m.set_visible( this->private_->visible_ );
         measurements_state->set_at( i, m, context->source() );
         return true;
       }
@@ -126,10 +126,10 @@ Core::ActionHandle ActionSetMeasurementVisible::Create(
   const std::string& measurement_id, bool visible )
 {
   ActionSetMeasurementVisible* action = new ActionSetMeasurementVisible;
-  action->private_->measurements_stateid_.set_value( measurements_state->get_stateid() );
+  action->private_->measurements_stateid_ = measurements_state->get_stateid();
   action->private_->measurements_state_weak_handle_ = measurements_state;
-  action->private_->measurement_id_.value() = measurement_id;
-  action->private_->visible_.value() = visible;
+  action->private_->measurement_id_ = measurement_id;
+  action->private_->visible_ = visible;
 
   return Core::ActionHandle( action );
 }

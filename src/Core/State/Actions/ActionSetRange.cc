@@ -40,10 +40,9 @@ bool ActionSetRange::validate(  ActionContextHandle& context )
   StateBaseHandle state = this->state_weak_handle_.lock();
   if ( !state )
   {
-    if ( !( StateEngine::Instance()->get_state( stateid_.value(), state ) ) )
+    if ( !( StateEngine::Instance()->get_state( stateid_, state ) ) )
     {
-      context->report_error( std::string( "Unknown state variable '" ) + stateid_.value()
-          + "'" );
+      context->report_error( std::string( "Unknown state variable '" ) + stateid_ + "'" );
       return false;
     }
 
@@ -51,8 +50,7 @@ bool ActionSetRange::validate(  ActionContextHandle& context )
       boost::dynamic_pointer_cast< StateRangedValueBase >( state );
     if ( !ranged_value )
     {
-      context->report_error( std::string( "State variable '" ) + stateid_.value()
-        + "' doesn't support ActionSetRange" );
+      context->report_error( std::string( "State variable '" ) + stateid_ + "' doesn't support ActionSetRange" );
       return false;
     }
 

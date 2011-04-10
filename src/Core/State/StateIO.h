@@ -53,7 +53,7 @@ public:
 
 public:
 
-  void initialize( const std::string& root_name = "Seg3D2" );
+  void initialize();
 
   const TiXmlElement* get_current_element() const;
   TiXmlElement* get_current_element();

@@ -50,9 +50,12 @@
 #include <Core/Volume/Volume.h>
 
 // Application includes
+#include <Application/Provenance/Provenance.h>
+
 #include <Application/Layer/LayerFWD.h>
 #include <Application/Layer/LayerMetaData.h>
 #include <Application/Layer/LayerAbstractFilter.h>
+
 
 namespace Seg3D
 {
@@ -200,6 +203,12 @@ public:
   // An exclusive group of boolean states that control the visibility of different parts
   Core::BooleanStateGroupHandle gui_state_group_;
 
+  // Information needed to keep track of where the data came from
+  // and how to handle provenance
+
+  // State that keeps track of the provenance number
+  Core::StateLongLongHandle provenance_id_state_;
+  
   // State of the MetaData associated with this layer
   Core::StateStringHandle meta_data_state_;
 
@@ -211,10 +220,7 @@ public:
 
 protected:
   // State that stores the generation of its datablock
-  Core::StateLongLongHandle generation_state_;
-  
-  // State that stores the last action that was played
-  Core::StateStringHandle last_action_state_;
+  Core::StateLongLongHandle generation_state_;  
 
   // -- Accessors --
 public:
@@ -246,7 +252,7 @@ public:
   // SET_METADATA:
   // Set all the metadata state variables
   void set_meta_data( const LayerMetaData& meta_data );
-  
+
   // -- abort/stop processing handling --
 public:
   // CHECK_ABORT:
@@ -279,7 +285,7 @@ public:
   // FILTER_KEY:
   // This is a unique key that is inserted when an asynchronous filter is running. 
   // The asynchronous calls back to the layer are compared with the key, if they don't
-  // match the layer is not modified, at it is assumed that the filtering was aborted.
+  // match the layer is not modified, and it is assumed that the filtering was aborted.
   typedef long long filter_key_type;
 
   // CHECK_FILTER_KEY:
@@ -322,11 +328,10 @@ public:
 
   // RESET_ALLOW_STOP:
   // Reset the flag that allows stopping the filter
-  void reset_allow_stop();
+  void reset_allow_stop();  
 
   // -- internals of class --
 private:  
-
   LayerPrivateHandle private_;
 
   // -- Locking system --
@@ -343,14 +348,13 @@ public:
 public:
   static filter_key_type GenerateFilterKey();
 
+  // -- states a layer can be in --
 public:
-
   // Options for the state of the data inside of the layer
   const static std::string CREATING_C;
   const static std::string PROCESSING_C;
   const static std::string AVAILABLE_C;
   const static std::string IN_USE_C;
-
 };
 
 } // end namespace Seg3D

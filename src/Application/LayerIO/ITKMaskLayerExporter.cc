@@ -44,7 +44,7 @@
 #include <Application/Layer/DataLayer.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
 
-SCI_REGISTER_EXPORTER( Seg3D, ITKMaskLayerExporter );
+SEG3D_REGISTER_EXPORTER( Seg3D, ITKMaskLayerExporter );
 
 namespace Seg3D
 {
@@ -57,6 +57,7 @@ bool export_mask_series( const std::string& file_path, const std::string& file_n
   typedef itk::Image< InputPixelType, 3 > ImageType;
   typedef itk::Image< OutputPixelType, 2 > OutputImageType;
   typedef itk::ImageSeriesWriter< ImageType, OutputImageType > WriterType;
+
   typename WriterType::Pointer writer = WriterType::New();
 
   Core::GridTransform grid_transform = temp_handle->get_grid_transform();
@@ -94,29 +95,29 @@ bool export_mask_series( const std::string& file_path, const std::string& file_n
   std::vector< std::string > header_files;
   if ( PreferencesManager::Instance()->export_dicom_headers_state_->get() )
   {
-    if ( meta_data.meta_data_info_ == "dicom_filename" )
+  if ( meta_data.meta_data_info_ == "dicom_filename" )
+  {
+    Core::ImportFromString( meta_data.meta_data_, header_files );
+    boost::filesystem::path file( header_files[ 0 ] ); 
+    has_header_file = true;
+    if ( header_files.size() == 0 )
     {
-      Core::ImportFromString( meta_data.meta_data_, header_files );
-      boost::filesystem::path file( header_files[ 0 ] ); 
-      has_header_file = true;
-      if ( header_files.size() == 0 )
-      {
-        has_header_file = false;    
-      }
+      has_header_file = false;    
+    }
 
-      for ( size_t j = 0; j < header_files.size(); j++ )
+    for ( size_t j = 0; j < header_files.size(); j++ )
+    {
+      if ( ! boost::filesystem::exists( header_files[ j ] ) )
       {
-        if ( ! boost::filesystem::exists( header_files[ j ] ) )
-        {
-          has_header_file = false;
-          break;
-        }
+        has_header_file = false;
+        break;
       }
     }
   }
-  
-  std::string extension = boost::filesystem::path( file_name ).extension();
-  boost::to_lower( extension );
+  }
+
+  std::string extension = 
+    boost::to_lower_copy( boost::filesystem::extension( boost::filesystem::path( file_name ) ) );
 
   if ( extension == ".dcm" || extension == ".dicom" || extension == ".ima" )
   {
@@ -234,7 +235,7 @@ void set_mask_series_names( itk::NumericSeriesFileNames::Pointer& name_series_ge
 { 
   boost::filesystem::path path = boost::filesystem::path( file_path );
 
-  std::string extension = boost::filesystem::path( file_name ).extension();
+  std::string extension = boost::filesystem::extension( boost::filesystem::path( file_name ) );
 
   std::string filename_without_extension = file_name;
   filename_without_extension = filename_without_extension.substr( 0, 
@@ -272,26 +273,7 @@ ITKMaskLayerExporter::ITKMaskLayerExporter( std::vector< LayerHandle >& layers )
   this->pixel_type_ = layers[ 0 ]->get_data_type();
 }
 
-
-Core::GridTransform ITKMaskLayerExporter::get_grid_transform()
-{
-  if( !this->layers_[ 0 ] ) return Core::GridTransform( 1, 1, 1 );
-  return this->layers_[ 0 ]->get_grid_transform();
-}
-
-
-Core::DataType ITKMaskLayerExporter::get_data_type()
-{
-  if( !this->layers_[ 0 ] ) return Core::DataType::UNKNOWN_E;
-  return this->layers_[ 0 ]->get_data_type();
-}
-
-int ITKMaskLayerExporter::get_exporter_modes()
-{
-  return LayerImporterMode::SINGLE_MASK_E;
-}
-
-bool ITKMaskLayerExporter::export_layer( LayerExporterMode mode, const std::string& file_path, 
+bool ITKMaskLayerExporter::export_layer( const std::string& mode, const std::string& file_path, 
   const std::string& name )
 {
   for( int i = 0; i < static_cast< int >( this->layers_.size() ); ++i )

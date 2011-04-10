@@ -99,17 +99,17 @@ public:
   // Build the exporter
   LayerExporterHandle build( std::vector< LayerHandle >& layers ) const;
 
-  // NAME:
+  // GET_NAME:
   // Get the name of the exporter
-  std::string name() const;
+  std::string get_name() const;
 
   // CONVERTS_FILE_TYPE:
   // Check whether this exporter deals with a specific file type
   bool converts_file_type( const std::string& file_type ) const;
   
-  // FILE_TYPES:
+  // GET_FILE_TYPE_STRING:
   // Get the string that defines the allowed file types
-  std::string file_type_string() const;
+  std::string get_file_type_string() const;
   
 private:
   // Object that knows how to build the exporter

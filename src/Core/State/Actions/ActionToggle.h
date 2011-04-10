@@ -51,11 +51,7 @@ CORE_ACTION_ARGUMENT( "stateid", "The name of the state variable." )
 public:
   ActionToggle()
   {
-    this->add_argument( this->stateid_ );
-  }
-
-  virtual ~ActionToggle()
-  {
+    this->add_parameter( this->stateid_ );
   }
 
   // -- Functions that describe action --
@@ -68,7 +64,7 @@ public:
   // -- Action parameters --
 private:
   // This one describes where the state is located
-  ActionParameter< std::string > stateid_;
+  std::string stateid_;
 
   // -- Action optimization --
 private:
@@ -79,29 +75,21 @@ private:
   // -- Dispatch this action from the interface --
 public:
 
-  // CREATE:
-  // Create the action but do not dispatch it yet
-  static ActionHandle Create( StateBoolHandle& state )
+  // DISPATCH:
+  // Dispatch the action from the interface
+  static void Dispatch( ActionContextHandle context, StateBoolHandle& state )
   {
     // Create new action
     ActionToggle* action = new ActionToggle;
 
     // Set action parameters
-    action->stateid_.value() = state->get_stateid();
+    action->stateid_ = state->get_stateid();
 
     // Add optimization
     action->state_weak_handle_ = state;
 
-    // return the new action
-    return ActionHandle( action );
-  }
-
-  // DISPATCH:
-  // Dispatch the action from the interface
-  static void Dispatch( ActionContextHandle context, StateBoolHandle& state )
-  {
     // Post the new action
-    ActionDispatcher::PostAction( Create( state ), context );
+    ActionDispatcher::PostAction( ActionHandle( action ), context );
   }
   
 };

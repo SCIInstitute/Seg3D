@@ -29,9 +29,12 @@
 #ifndef APPLICATION_TOOLS_ACTIONS_ACTIOINPOLYLINE_H
 #define APPLICATION_TOOLS_ACTIONS_ACTIOINPOLYLINE_H
 
+// Core includes
 #include <Core/Volume/VolumeSlice.h>
 
+// Application includes
 #include <Application/LayerManager/LayerManager.h>
+#include <Application/LayerManager/LayerAction.h>
 
 namespace Seg3D
 {
@@ -39,7 +42,7 @@ namespace Seg3D
 class ActionPolylinePrivate;
 typedef boost::shared_ptr< ActionPolylinePrivate > ActionPolylinePrivateHandle;
 
-class ActionPolyline : public Core::Action
+class ActionPolyline : public LayerAction
 {
 
 CORE_ACTION
@@ -59,7 +62,6 @@ typedef Core::PointF VertexCoord;
 
 public:
   ActionPolyline();
-  virtual ~ActionPolyline();
 
   // VALIDATE:
   // Each action needs to be validated just before it is posted. This way we

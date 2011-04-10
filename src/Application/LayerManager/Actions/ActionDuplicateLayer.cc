@@ -30,6 +30,9 @@
 #include <Application/Layer/MaskLayer.h>
 #include <Application/Layer/LayerGroup.h>
 
+#include <Application/Provenance/Provenance.h>
+#include <Application/Provenance/ProvenanceStep.h>
+#include <Application/ProjectManager/ProjectManager.h>
 #include <Application/UndoBuffer/UndoBuffer.h>
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/LayerManager/LayerUndoBufferItem.h>
@@ -46,20 +49,12 @@ namespace Seg3D
 bool ActionDuplicateLayer::validate( Core::ActionContextHandle& context )
 {
   // Step (1): Check whether the layer actually exists 
-  std::string error;
-  if ( !( LayerManager::CheckLayerExistance( this->layer_id_.value(), error ) ) )
-  {
-    context->report_error( error );
-    return false;
-  }
+  if ( !( LayerManager::CheckLayerExistance( this->layer_id_, 
+    context ) ) ) return false;
   
   // Step (2): Check whether the layer is available for making a copy from it
-  Core::NotifierHandle notifier;
-  if ( !LayerManager::CheckLayerAvailabilityForUse( this->layer_id_.value(), notifier ) )
-  {
-    context->report_need_resource( notifier );
+  if ( !LayerManager::CheckLayerAvailabilityForUse( this->layer_id_, context ) )
     return false;
-  }
   
   return true; // validated
 }
@@ -73,7 +68,7 @@ bool ActionDuplicateLayer::run( Core::ActionContextHandle& context, Core::Action
 
   // Step (2):
   // Find the layer that needs to be duplicated
-  LayerHandle layer = LayerManager::FindLayer( this->layer_id_.value() );
+  LayerHandle layer = LayerManager::FindLayer( this->layer_id_ );
 
   if ( !layer )
   {
@@ -92,6 +87,7 @@ bool ActionDuplicateLayer::run( Core::ActionContextHandle& context, Core::Action
   }
 
   new_layer->set_meta_data( layer->get_meta_data() );
+  new_layer->provenance_id_state_->set( this->get_output_provenance_id( 0 ) );
 
   // Step (4):
   // Register the new layer with the LayerManager. This will insert it into the right group.
@@ -110,38 +106,44 @@ bool ActionDuplicateLayer::run( Core::ActionContextHandle& context, Core::Action
   // Add the complete record to the undo buffer
   UndoBuffer::Instance()->insert_undo_item( context, item );
   
-  return true;
-}
-
-Core::ActionHandle ActionDuplicateLayer::Create( const std::string& layer_id )
-{
-  ActionDuplicateLayer* action = new ActionDuplicateLayer;
-  action->layer_id_.value() = layer_id;
   
-  return Core::ActionHandle( action );
-}
-
-
-Core::ActionHandle ActionDuplicateLayer::Create( )
-{
-  ActionDuplicateLayer* action = new ActionDuplicateLayer;
-  LayerHandle active_layer = LayerManager::Instance()->get_active_layer();
-  if ( active_layer )
-  {
-    action->layer_id_.value() = active_layer->get_layer_id();
-  }
-  return Core::ActionHandle( action );
+  // Step (6): Create a provenance record
+  ProvenanceStepHandle provenance_step( new ProvenanceStep );
+  
+  // Get the input provenance ids from the translate step
+  provenance_step->set_input_provenance_ids( this->get_input_provenance_ids() );
+  
+  // Get the output and replace provenance ids from the analysis above
+  provenance_step->set_output_provenance_ids( this->get_output_provenance_ids() );
+    
+  // Get the action and turn it into provenance 
+  provenance_step->set_action( this->export_to_provenance_string() );   
+  
+  // Add step to provenance record
+  ProjectManager::Instance()->get_current_project()->add_to_provenance_database(
+    provenance_step );    
+  return true;
 }
 
 void ActionDuplicateLayer::Dispatch( Core::ActionContextHandle context, 
   const std::string& layer_id )
 {
-  Core::ActionDispatcher::PostAction( Create( layer_id ), context );
+  ActionDuplicateLayer* action = new ActionDuplicateLayer;
+  action->layer_id_ = layer_id;
+  
+  Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }
 
 void ActionDuplicateLayer::Dispatch( Core::ActionContextHandle context )
 {
-  Core::ActionDispatcher::PostAction( Create(), context );
+  ActionDuplicateLayer* action = new ActionDuplicateLayer;
+  LayerHandle active_layer = LayerManager::Instance()->get_active_layer();
+  if ( active_layer )
+  {
+    action->layer_id_ = active_layer->get_layer_id();
+  }
+  
+  Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }
 
 } // end namespace Seg3D

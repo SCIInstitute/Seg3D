@@ -40,7 +40,7 @@ namespace QtUtils
 
 QtTransferFunctionSceneConnector::QtTransferFunctionSceneConnector( 
   QtTransferFunctionScene* parent, Core::TransferFunctionHandle& tf ) :
-  QObject( parent ),
+  QtConnectorBase( parent ),
   parent_( parent ),
   transfer_function_( tf )
 {

@@ -30,11 +30,15 @@
 #include <sstream>
 #include <iostream>
 
+// boost includes
 #include <boost/foreach.hpp>
+#include <boost/lambda/bind.hpp>
+#include <boost/lambda/lambda.hpp>
 
 // Core includes
 #include <Core/Utils/Log.h>
 #include <Core/Application/Application.h>
+#include <Core/State/Actions/ActionToggle.h>
 
 // QtUtils includes
 #include <QtUtils/Bridge/QtBridge.h>
@@ -51,6 +55,7 @@
 // Interface includes
 #include <Interface/Application/TransferFunctionFeatureWidget.h>
 #include <Interface/Application/RenderingDockWidget.h>
+#include <Interface/Application/StyleSheet.h>
 
 // Automatically generated UI file
 #include "ui_RenderingDockWidget.h"
@@ -85,8 +90,6 @@ RenderingDockWidget::RenderingDockWidget( QWidget *parent ) :
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
 
   // Fog widgets
-  QtUtils::QtBridge::Connect( this->private_->ui_.fog_open_button_,
-    ViewerManager::Instance()->show_fog_control_state_ );
   QtUtils::QtBridge::Show( this->private_->ui_.fog_content_,
     ViewerManager::Instance()->show_fog_control_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.fog_density_, 
@@ -95,12 +98,10 @@ RenderingDockWidget::RenderingDockWidget( QWidget *parent ) :
   // Clipping widgets
   if ( Core::Application::Instance()->is_osx_10_5_or_less() )
   {
-    // NOTE: No clipping on this platform as driver are inconsistent
+    // NOTE: No clipping on this platform as drivers are inconsistent
     this->private_->ui_.clipping_widget_->hide();
   }
   
-  QtUtils::QtBridge::Connect( this->private_->ui_.clipping_open_button_,
-    ViewerManager::Instance()->show_clipping_control_state_ );
   QtUtils::QtBridge::Show( this->private_->ui_.clipping_content_,
     ViewerManager::Instance()->show_clipping_control_state_ );
 
@@ -203,17 +204,26 @@ RenderingDockWidget::RenderingDockWidget( QWidget *parent ) :
   
   // Volume rendering widgets
   Core::TransferFunctionHandle tf = ViewerManager::Instance()->get_transfer_function();
-  QtUtils::QtBridge::Connect( this->private_->ui_.vr_open_button_,
-    ViewerManager::Instance()->show_volume_rendering_control_state_ );
   QtUtils::QtBridge::Show( this->private_->ui_.vr_content_,
     ViewerManager::Instance()->show_volume_rendering_control_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.vr_target_, 
     ViewerManager::Instance()->volume_rendering_target_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.vr_sample_rate_,
     ViewerManager::Instance()->volume_sample_rate_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.renderer_combobox_,
+    ViewerManager::Instance()->volume_renderer_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.occlusion_angle_,
+    ViewerManager::Instance()->vr_occlusion_angle_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.grid_resolution_,
+    ViewerManager::Instance()->vr_occlusion_grid_resolution_state_ );
+  QtUtils::QtBridge::Show( this->private_->ui_.occlusion_widget_,
+    ViewerManager::Instance()->volume_renderer_state_,
+    boost::lambda::bind( &Core::StateLabeledOption::index, 
+    ViewerManager::Instance()->volume_renderer_state_.get() ) == 1 );
   QtUtils::QtBridge::Connect( this->private_->ui_.tf_view_->get_scene(), tf );
   QtUtils::QtBridge::Connect( this->private_->ui_.add_feature_button_, boost::bind(
     ActionNewFeature::Dispatch, Core::Interface::GetWidgetActionContext() ) );
+  QtUtils::QtBridge::Connect( this->private_->ui_.faux_checkbox_, tf->faux_shading_state_ );
   this->connect( this->private_->ui_.delete_feature_button_, SIGNAL( clicked() ),
     SLOT( delete_active_curve() ) );
   this->connect( this->private_->ui_.histogram_scale_combobox_, 
@@ -228,6 +238,81 @@ RenderingDockWidget::RenderingDockWidget( QWidget *parent ) :
     &RenderingDockWidget::HandleVolumeRenderingTargetChanged, qpointer, _2 ) ) );
   this->add_connection( Core::Application::Instance()->reset_signal_.connect( boost::bind(
     &RenderingDockWidget::HandleReset, qpointer ) ) );
+    
+    
+  QtUtils::QtBridge::Connect( this->private_->ui_.clipping_open_button_, 
+    boost::bind( &Core::ActionToggle::Dispatch, Core::Interface::GetWidgetActionContext(), 
+    ViewerManager::Instance()->show_clipping_control_state_ ) );
+
+  QtUtils::QtBridge::Connect( this->private_->ui_.clipping_spacer_, 
+    boost::bind( &Core::ActionToggle::Dispatch, Core::Interface::GetWidgetActionContext(), 
+    ViewerManager::Instance()->show_clipping_control_state_ ) );
+    
+  QtUtils::QtBridge::Connect( this->private_->ui_.fog_open_button_, 
+    boost::bind( &Core::ActionToggle::Dispatch, Core::Interface::GetWidgetActionContext(), 
+    ViewerManager::Instance()->show_fog_control_state_ ) );
+
+  QtUtils::QtBridge::Connect( this->private_->ui_.fog_spacer_, 
+    boost::bind( &Core::ActionToggle::Dispatch, Core::Interface::GetWidgetActionContext(), 
+    ViewerManager::Instance()->show_fog_control_state_ ) );
+
+  QtUtils::QtBridge::Connect( this->private_->ui_.vr_open_button_, 
+    boost::bind( &Core::ActionToggle::Dispatch, Core::Interface::GetWidgetActionContext(), 
+    ViewerManager::Instance()->show_volume_rendering_control_state_ ) );
+
+  QtUtils::QtBridge::Connect( this->private_->ui_.vr_spacer_, 
+    boost::bind( &Core::ActionToggle::Dispatch, Core::Interface::GetWidgetActionContext(), 
+    ViewerManager::Instance()->show_volume_rendering_control_state_ ) );
+
+    
+  this->add_connection( ViewerManager::Instance()->show_clipping_control_state_->
+    state_changed_signal_.connect( boost::bind( 
+      &RenderingDockWidget::HandleUpdateToolAppearance,qpointer ) ) ); 
+
+  this->add_connection( ViewerManager::Instance()->show_volume_rendering_control_state_->
+    state_changed_signal_.connect( boost::bind( 
+      &RenderingDockWidget::HandleUpdateToolAppearance,qpointer ) ) ); 
+
+  this->add_connection( ViewerManager::Instance()->show_fog_control_state_->
+    state_changed_signal_.connect( boost::bind( 
+      &RenderingDockWidget::HandleUpdateToolAppearance,qpointer ) ) ); 
+  
+  this->private_->ui_.cp1_d_->set_description( "Distance" );
+  this->private_->ui_.cp2_d_->set_description( "Distance" );
+  this->private_->ui_.cp3_d_->set_description( "Distance" );
+  this->private_->ui_.cp4_d_->set_description( "Distance" );
+  this->private_->ui_.cp5_d_->set_description( "Distance" );
+  this->private_->ui_.cp6_d_->set_description( "Distance" );
+  
+  this->private_->ui_.cp1_x_->set_description( "X" );
+  this->private_->ui_.cp2_x_->set_description( "X" );
+  this->private_->ui_.cp3_x_->set_description( "X" );
+  this->private_->ui_.cp4_x_->set_description( "X" );
+  this->private_->ui_.cp5_x_->set_description( "X" );
+  this->private_->ui_.cp6_x_->set_description( "X" );
+  
+  this->private_->ui_.cp1_y_->set_description( "Y" );
+  this->private_->ui_.cp2_y_->set_description( "Y" );
+  this->private_->ui_.cp3_y_->set_description( "Y" );
+  this->private_->ui_.cp4_y_->set_description( "Y" );
+  this->private_->ui_.cp5_y_->set_description( "Y" );
+  this->private_->ui_.cp6_y_->set_description( "Y" );
+  
+  this->private_->ui_.cp1_z_->set_description( "Z" );
+  this->private_->ui_.cp2_z_->set_description( "Z" );
+  this->private_->ui_.cp3_z_->set_description( "Z" );
+  this->private_->ui_.cp4_z_->set_description( "Z" );
+  this->private_->ui_.cp5_z_->set_description( "Z" );
+  this->private_->ui_.cp6_z_->set_description( "Z" );
+  
+  this->private_->ui_.fog_density_->set_description( "Density" );
+  
+  this->private_->ui_.vr_sample_rate_->set_description( "Sampling Rate" );
+  this->private_->ui_.occlusion_angle_->set_description( "Occlusion Angle" );
+  this->private_->ui_.grid_resolution_->set_description( "Sampling Resolution" );
+  
+      
+  update_tool_appearance();
 }
 
 RenderingDockWidget::~RenderingDockWidget()
@@ -247,6 +332,45 @@ void RenderingDockWidget::update_tab_appearance( bool enabled, int index )
     this->private_->ui_.clipping_tabwidget_->
       setTabText( index, QString::number( index + 1 ) );
   }
+}
+
+void RenderingDockWidget::update_tool_appearance()
+{
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
+  if ( ViewerManager::Instance()->show_clipping_control_state_->get() )
+  {
+    this->private_->ui_.clipping_widget_->setStyleSheet( 
+      StyleSheet::RENDERING_CLIPPING_ACTIVE_C );
+  }
+  else 
+  {
+    this->private_->ui_.clipping_widget_->setStyleSheet( 
+      StyleSheet::RENDERING_CLIPPING_INACTIVE_C );    
+  }
+
+  if ( ViewerManager::Instance()->show_volume_rendering_control_state_->get() )
+  {
+    this->private_->ui_.vr_widget_->setStyleSheet( 
+      StyleSheet::RENDERING_VR_ACTIVE_C );
+  }
+  else 
+  {
+    this->private_->ui_.vr_widget_->setStyleSheet( 
+      StyleSheet::RENDERING_VR_INACTIVE_C );    
+  }
+
+  if ( ViewerManager::Instance()->show_fog_control_state_->get() )
+  {
+    this->private_->ui_.fog_widget_->setStyleSheet( 
+      StyleSheet::RENDERING_FOG_ACTIVE_C );
+  }
+  else 
+  {
+    this->private_->ui_.fog_widget_->setStyleSheet( 
+      StyleSheet::RENDERING_FOG_INACTIVE_C );   
+  }
+
 }
 
 void RenderingDockWidget::handle_feature_added( Core::TransferFunctionFeatureHandle feature )
@@ -275,7 +399,7 @@ void RenderingDockWidget::handle_feature_deleted( Core::TransferFunctionFeatureH
   {
     this->private_->ui_.dummy_widget_->show();
     this->private_->ui_.delete_feature_button_->setEnabled( false );
-  }
+}
 }
 
 void RenderingDockWidget::handle_volume_rendering_target_changed( std::string target_id )
@@ -355,6 +479,12 @@ void RenderingDockWidget::HandleReset( qpointer_type qpointer )
 {
   Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind( 
     &RenderingDockWidget::handle_reset, qpointer.data() ) ) );
+}
+
+void RenderingDockWidget::HandleUpdateToolAppearance( qpointer_type qpointer )
+{
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind( 
+    &RenderingDockWidget::update_tool_appearance, qpointer.data() ) ) );
 }
 
 } // end namespace Seg3D

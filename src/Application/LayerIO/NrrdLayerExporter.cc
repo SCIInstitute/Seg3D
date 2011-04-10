@@ -36,7 +36,7 @@
 #include <Application/Layer/MaskLayer.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
 
-SCI_REGISTER_EXPORTER( Seg3D, NrrdLayerExporter );
+SEG3D_REGISTER_EXPORTER( Seg3D, NrrdLayerExporter );
 
 namespace Seg3D
 {
@@ -47,51 +47,25 @@ NrrdLayerExporter::NrrdLayerExporter( std::vector< LayerHandle >& layers ) :
   if( !layers[ 0 ] ) return;
 }
 
-
-Core::GridTransform NrrdLayerExporter::get_grid_transform()
-{
-  if( !this->layers_[ 0 ] ) return Core::GridTransform( 1, 1, 1 );
-  return this->layers_[ 0 ]->get_grid_transform();
-}
-
-
-Core::DataType NrrdLayerExporter::get_data_type()
-{
-  if( !this->layers_[ 0 ] ) return Core::DataType::UNKNOWN_E;
-  return this->layers_[ 0 ]->get_data_type();
-}
-
-int NrrdLayerExporter::get_exporter_modes()
-{
-  int exporter_modes = 0;
-  exporter_modes |= LayerExporterMode::DATA_E;
-  return exporter_modes;
-}
-
-bool NrrdLayerExporter::export_layer( LayerExporterMode mode, const std::string& file_path, 
+bool NrrdLayerExporter::export_layer( const std::string& mode, const std::string& file_path, 
   const std::string& name )
 {
   boost::filesystem::path path = boost::filesystem::path( file_path ) / ( name + ".nrrd" );
   bool success;
   
-  switch ( mode )
+  if ( mode == "data" )
   {
-  case LayerExporterMode::DATA_E:
     success = this->export_nrrd( path.string() );
-    break;
-    
-  case LayerExporterMode::SINGLE_MASK_E:
-    success = this->export_single_masks( file_path );
-    break;
-    
-  case LayerExporterMode::LABEL_MASK_E:
-    success = this->export_mask_label( path.string() );
-    break;
-    
-  default:
-    return false;
-  
   }
+  else if ( mode == "single_mask" )
+  {
+    success = this->export_single_masks( file_path );
+  }
+  else if ( mode == "label_mask" )
+  {
+    success = this->export_mask_label( path.string() );
+  }
+    
   if( success ) CORE_LOG_SUCCESS( "NRRD export has been successfully completed." );
   return success;
 }

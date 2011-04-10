@@ -41,77 +41,87 @@ namespace Seg3D
 
 bool ActionLoadSession::validate( Core::ActionContextHandle& context )
 {
-  if( ProjectManager::Instance()->current_project_->
-    validate_session_name( this->session_name_.value() ) )
+  // Check whether files still exist, if not an error is being generated.
+  // We are dealing with file I/O, hence there is no guarantee that files still exist.
+  // The user may have accidentally deleted the files, or a network connection may be lost, etc.
+  if ( ! ProjectManager::Instance()->get_current_project()->check_project_files() )
   {
-    return true;
+    // In this case just report to the user using the normal mechanism.
+    // The user is trying to load a new session, it will be apparent that the operation
+    // failed, when no new session is loaded. However we will still issue a critical error.
+    context->report_error( "The current project directory cannot be found." );
+    
+    // Draw the users attention to this problem.
+    CORE_LOG_CRITICAL_ERROR( "Could not load session, as the current project directory cannot be found." );
+    return false;
   }
-  return false;
+
+  // Ensure the session exists
+  if( !ProjectManager::Instance()->get_current_project()->
+    is_session( this->session_name_ ) )
+  {
+    std::string error = std::string( "'" ) + this->session_name_ + "' is not a valid session.";
+    context->report_error( error );
+    return false;
+  }
+  
+  return true;
 }
 
 bool ActionLoadSession::run( Core::ActionContextHandle& context, 
   Core::ActionResultHandle& result )
 {
-  bool success = false;
-
-  std::string message = std::string("Please wait while session: '") + 
-    this->session_name_.value() + std::string("' is loaded...");
+  std::string message = std::string( "Loading session: '" ) + 
+    this->session_name_ + std::string( "' ..." );
 
   Core::ActionProgressHandle progress = 
     Core::ActionProgressHandle( new Core::ActionProgress( message ) );
-
+  
+  // NOTE: This will send a message to GUI to lock it and report what is going on.
   progress->begin_progress_reporting();
 
   // -- For now add logging of exceptions if session cannot be loaded correctly --
+
+  bool success = false;
   try
   {
-    if( ProjectManager::Instance()->load_project_session( this->session_name_.value() ) )
-    {
-      success = true;
-    }
-  }
-  catch ( std::exception& exp )
-  {
-    CORE_LOG_ERROR( exp.what() );
-    success = false;
-  }
-  catch( Core::Exception& exp )
-  {
-    CORE_LOG_ERROR( exp.what() ); 
-    success = false;
+    success = ProjectManager::Instance()->load_project_session( this->session_name_ );
   }
   catch( ... )
   {
-    CORE_LOG_ERROR( "Caught an unknown exception." ); 
+    std::string error = std::string( "Failed to load session '" ) + this->session_name_ + "'.";
+    context->report_error( error );
     success = false;  
   }
   
-  progress->end_progress_reporting();
+  // Clear undo buffer, we do not keep the undo buffer around
+  UndoBuffer::Instance()->reset_undo_buffer();
 
+  // TODO: This works around a problem in the current code, that makes a change when a session
+  // is loaded. This adds a reset on the current application callback stack so only changes 
+  // after this point will count. At some point in the near future we should check this logic.
   if ( ProjectManager::Instance()->get_current_project() )
   {
     ActionResetChangesMade::Dispatch( Core::Interface::GetWidgetActionContext() );
   }
 
-  // Clear undo buffer
-  UndoBuffer::Instance()->reset_undo_buffer();
-
+  // Allow the user to interact with the GUI once more.
+  progress->end_progress_reporting();
+  
+  std::string success_message = std::string( "Successfully loaded session '" ) + this->session_name_ + 
+    "'.";
+  CORE_LOG_SUCCESS( success_message );
+  
   return success;
-}
-
-Core::ActionHandle ActionLoadSession::Create( const std::string& session_name )
-{
-  ActionLoadSession* action = new ActionLoadSession;
-  
-  action->session_name_.value() = session_name;
-  
-  return Core::ActionHandle( action );
 }
 
 void ActionLoadSession::Dispatch( Core::ActionContextHandle context, 
   const std::string& session_name )
 {
-  Core::ActionDispatcher::PostAction( Create( session_name ), context );
+  ActionLoadSession* action = new ActionLoadSession;
+  action->session_name_ = session_name;
+
+  Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }
 
 } // end namespace Seg3D

@@ -41,10 +41,10 @@ namespace Seg3D
 bool ActionOpenTool::validate( Core::ActionContextHandle& context )
 {
   // Check whether the tool has a valid type
-  if ( !( ToolFactory::Instance()->is_tool_type( toolid_.value() ) ) )
+  if ( !( ToolFactory::Instance()->is_tool_type( toolid_ ) ) )
   {
     context->report_error( std::string( "No tool available of type '" ) + 
-      toolid_.value() + "'" );
+      toolid_ + "'" );
     return false;
   }
 
@@ -56,27 +56,22 @@ bool ActionOpenTool::run( Core::ActionContextHandle& context, Core::ActionResult
   std::string new_tool_id;
 
   // Open and Activate the tool
-  ToolManager::Instance()->open_tool( toolid_.value(), new_tool_id );
+  ToolManager::Instance()->open_tool( toolid_, new_tool_id );
   ToolManager::Instance()->activate_tool( new_tool_id );
 
   result = Core::ActionResultHandle( new Core::ActionResult( new_tool_id ) );
   return true; // success
 }
 
-Core::ActionHandle ActionOpenTool::Create( const std::string& toolid )
+void ActionOpenTool::Dispatch( Core::ActionContextHandle context, const std::string& toolid )
 {
   // Create new action
   ActionOpenTool* action = new ActionOpenTool;
 
   // Set action parameters
-  action->toolid_.value() = toolid;
+  action->toolid_ = toolid;
 
-  return Core::ActionHandle( action );
-}
-
-void ActionOpenTool::Dispatch( Core::ActionContextHandle context, const std::string& toolid )
-{
-  Core::ActionDispatcher::PostAction( Create( toolid ), context );
+  Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }
 
 } // end namespace Seg3D

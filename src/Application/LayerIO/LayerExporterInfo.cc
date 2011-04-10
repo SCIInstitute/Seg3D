@@ -71,7 +71,7 @@ LayerExporterInfo::~LayerExporterInfo()
 {
 }
 
-std::string LayerExporterInfo::name() const 
+std::string LayerExporterInfo::get_name() const 
 { 
   return name_;
 }
@@ -88,7 +88,7 @@ bool LayerExporterInfo::converts_file_type( const std::string& file_type ) const
   return ( std::find( file_types_.begin(), file_types_.end(), file_type ) != file_types_.end() );
 }
 
-std::string LayerExporterInfo::file_type_string() const
+std::string LayerExporterInfo::get_file_type_string() const
 {
   return file_type_string_;
 }

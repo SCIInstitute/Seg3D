@@ -112,6 +112,20 @@ bool CropToolInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Show( this->private_->ui_.message_alert_, tool->valid_target_state_, true );
   QtUtils::QtBridge::Enable( this->private_->ui_.target_group_, 
     tool->use_active_group_state_, true ); 
+  
+  this->private_->ui_.crop_origin_x_->set_description( "X" );
+  this->private_->ui_.crop_origin_y_->set_description( "Y" );
+  this->private_->ui_.crop_origin_z_->set_description( "Z" );
+  this->private_->ui_.crop_origin_index_x_->set_description( "X" );
+  this->private_->ui_.crop_origin_index_y_->set_description( "Y" );
+  this->private_->ui_.crop_origin_index_z_->set_description( "Z" );
+  
+  this->private_->ui_.crop_width_->set_description( "Width" );
+  this->private_->ui_.crop_height_->set_description( "Height" );
+  this->private_->ui_.crop_depth_->set_description( "Depth" );
+  this->private_->ui_.crop_index_width_->set_description( "Width" );
+  this->private_->ui_.crop_index_height_->set_description( "Height" );
+  this->private_->ui_.crop_index_depth_->set_description( "Depth" );
 
   CORE_LOG_DEBUG( "Finished building a Resample Tool Interface" );
 

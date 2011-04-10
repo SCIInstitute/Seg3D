@@ -43,13 +43,8 @@ bool ActionDeleteIsosurface::validate( Core::ActionContextHandle& context )
 {
   // Check whether the layer exists and is of the right type and return an
   // error if not
-  std::string error;
-  if ( !( LayerManager::CheckLayerExistanceAndType( this->layer_id_.value(), 
-    Core::VolumeType::MASK_E, error ) ) )
-  {
-    context->report_error( error );
-    return false;
-  }
+  if ( !( LayerManager::CheckLayerExistanceAndType( this->layer_id_, 
+    Core::VolumeType::MASK_E, context ) ) ) return false;
   
   // NOTE: We do not check whether the layer is locked. The isosurface that is presently there
   // can still be deleted no matter what.
@@ -60,25 +55,19 @@ bool ActionDeleteIsosurface::validate( Core::ActionContextHandle& context )
 bool ActionDeleteIsosurface::run( Core::ActionContextHandle& context, 
   Core::ActionResultHandle& result )
 {
-  MaskLayerHandle mask_layer = LayerManager::FindMaskLayer( this->layer_id_.value() );
+  MaskLayerHandle mask_layer = LayerManager::FindMaskLayer( this->layer_id_ );
   mask_layer->delete_isosurface();
 
   return true;
 }
 
-Core::ActionHandle ActionDeleteIsosurface::Create( MaskLayerHandle mask_layer )
-{
-  ActionDeleteIsosurface* action = new ActionDeleteIsosurface;
-
-  action->layer_id_.value() = mask_layer->get_layer_id();
-
-  return Core::ActionHandle( action );
-}
-
 void ActionDeleteIsosurface::Dispatch( Core::ActionContextHandle context, 
   MaskLayerHandle mask_layer )
 {
-  Core::ActionDispatcher::PostAction( Create( mask_layer ), context );
+  ActionDeleteIsosurface* action = new ActionDeleteIsosurface;
+  action->layer_id_ = mask_layer->get_layer_id();
+  
+  Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }
 
 } // end namespace Seg3D

@@ -48,10 +48,9 @@ bool ActionGet::validate( ActionContextHandle& context )
   // If not the state cannot be retrieved report an error
   if ( !state.get() )
   {
-    if ( !( StateEngine::Instance()->get_state( stateid_.value(), state ) ) )
+    if ( !( StateEngine::Instance()->get_state( stateid_, state ) ) )
     {
-      context->report_error( std::string( "Unknown state variable '" ) + stateid_.value()
-          + "'" );
+      context->report_error( std::string( "Unknown state variable '" ) + stateid_ + "'" );
       return false;
     }
     state_weak_handle_ = state;
@@ -78,25 +77,16 @@ bool ActionGet::run( ActionContextHandle& context, ActionResultHandle& result )
   return false;
 }
 
-ActionHandle ActionGet::Create( StateBaseHandle& state )
-{
-  // Create new action
-  ActionGet* action = new ActionGet;
-
-  // Set action parameters
-  action->stateid_.value() = state->get_stateid();
-
-  // Add optimization
-  action->state_weak_handle_ = state;
-
-  // return the new action
-  return ActionHandle( action );
-}
 
 void ActionGet::Dispatch( ActionContextHandle context, StateBaseHandle& state )
 {
+  // Create new action
+  ActionGet* action = new ActionGet;
+  action->stateid_ = state->get_stateid();
+  action->state_weak_handle_ = state;
+
   // Post the a action
-  ActionDispatcher::PostAction( Create( state ), context );
+  ActionDispatcher::PostAction( ActionHandle( action ), context );
 }
 
 } // end namespace Core

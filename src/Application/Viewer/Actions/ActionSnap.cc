@@ -40,18 +40,18 @@ bool ActionSnap::validate( Core::ActionContextHandle& context )
   ViewerHandle viewer = this->viewer_weak_handle_.lock();
   if ( !viewer )
   {
-    viewer = ViewerManager::Instance()->get_viewer( this->viewer_id_.value() );
+    viewer = ViewerManager::Instance()->get_viewer( this->viewer_id_ );
     if ( !viewer )
     {
       context->report_error( std::string( "Viewer '" ) 
-        + Core::ExportToString( this->viewer_id_.value() )
+        + Core::ExportToString( this->viewer_id_ )
         + "' does not exist" );
       return false;
     }
 
     if ( !viewer->is_volume_view() )
     {
-      context->report_error( "Viewer '" + Core::ExportToString( this->viewer_id_.value() ) +
+      context->report_error( "Viewer '" + Core::ExportToString( this->viewer_id_ ) +
         "' not in volume view" );
       return false;
     }
@@ -85,17 +85,12 @@ bool ActionSnap::run( Core::ActionContextHandle& context, Core::ActionResultHand
   return false;
 }
 
-Core::ActionHandle ActionSnap::Create( size_t viewer_id )
+void ActionSnap::Dispatch( Core::ActionContextHandle context, size_t viewer_id )
 {
   ActionSnap* action = new ActionSnap;
   action->viewer_id_ = viewer_id;
   
-  return Core::ActionHandle( action );
-}
-
-void ActionSnap::Dispatch( Core::ActionContextHandle context, size_t viewer_id )
-{
-  Core::ActionDispatcher::PostAction( Create( viewer_id ), context );
+  Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }
 
 } // end namespace Seg3D
