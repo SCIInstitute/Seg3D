@@ -377,6 +377,10 @@ ProjectManager::ProjectManager() :
   // used for saving/loading projects
   this->add_state( "current_project_folder", this->current_project_folder_state_, "" );
 
+  // This state variable keeps track of what the last directory was that we
+  // used for saving/loading layer files
+  this->add_state( "current_file_folder", this->current_file_folder_state_, "" );
+
   // Find the local configuration directory
   boost::filesystem::path configuration_dir;
   Core::Application::Instance()->get_config_directory( configuration_dir );
@@ -393,8 +397,11 @@ ProjectManager::ProjectManager() :
   // one that it can use.
   boost::filesystem::path current_project_folder = this->get_current_project_folder();
 
+  boost::filesystem::path current_file_folder = this->get_current_file_folder();
+
   // Update the current_project_folder to the most recent version 
   this->current_project_folder_state_->set( current_project_folder.string() );
+  this->current_file_folder_state_->set( current_file_folder.string() );
   
   // Here we check to see if the recent projects database exists, otherwise we create it
   this->private_->setup_database();
@@ -445,7 +452,8 @@ boost::filesystem::path ProjectManager::get_current_project_folder()
     {
       Core::Application::Instance()->get_user_directory( current_project_folder );
       
-      current_project_folder = current_project_folder / "Seg3d-Projects";
+      current_project_folder = current_project_folder / 
+        ( Core::Application::GetApplicationName() + "-Projects" );
       // Try current working path
       if ( !boost::filesystem::exists( current_project_folder ) )
       {
@@ -455,6 +463,36 @@ boost::filesystem::path ProjectManager::get_current_project_folder()
   }
   
   return current_project_folder;
+}
+
+
+boost::filesystem::path ProjectManager::get_current_file_folder()
+{
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() ); 
+
+  boost::filesystem::path current_file_folder( this->current_file_folder_state_->get() );
+  try
+  {
+    // Complete the path to have an absolute path
+    current_file_folder = boost::filesystem::absolute( current_file_folder );
+  }
+  catch ( ... )
+  {
+  }
+
+  // If it does not exist reset the path to another path
+  if ( !boost::filesystem::exists( current_file_folder ) )
+  {
+    Core::Application::Instance()->get_user_directory( current_file_folder );
+      
+    // Try current working path
+    if ( !boost::filesystem::exists( current_file_folder ) )
+    {
+      current_file_folder = current_file_folder.parent_path();
+    }
+  }
+  
+  return current_file_folder;
 }
 
 

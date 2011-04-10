@@ -136,6 +136,19 @@ int main( int argc, char **argv )
   std::string file_to_view = "";
   Core::Application::Instance()->check_command_line_parameter( "file_to_open_on_start", file_to_view );
 
+  {
+    std::string warning = std::string( "<h3>" ) +
+      Core::Application::GetApplicationName() + " " + Core::Application::GetVersion() + 
+      "</h3><h6><p align=\"justify\">Please note: This version of " + Core::Application::GetApplicationName()
+      + " is still under development. For daily use we recommend the released version, as" 
+      " stability of this version depends on on going development.</p></h6>";
+    
+    QMessageBox::information( 0, 
+      QString::fromStdString( Core::Application::GetApplicationNameAndVersion() ), 
+      QString::fromStdString( warning )  );
+  }
+  
+
   if ( sizeof( void * ) == 4 )
   {
     std::string warning = std::string( "<h3>" ) +
@@ -143,7 +156,8 @@ int main( int argc, char **argv )
       "</h3><h6><p align=\"justify\">Please note: " + Core::Application::GetApplicationName()
       + " is meant to run in 64-bit mode. "
       "In 32-bit mode the size of volumes that can be processed are limited, as "
-      "Seg3D may run out of addressable memory. If you have a 64-bit machine,"
+      + Core::Application::GetApplicationName() +
+      " may run out of addressable memory. If you have a 64-bit machine,"
       " we would recommend to download the 64-bit version</p></h6>";
     
     QMessageBox::information( 0, 

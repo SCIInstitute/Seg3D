@@ -150,6 +150,10 @@ public:
   // Get a current_project_folder that is actually available
   boost::filesystem::path get_current_project_folder();
   
+  // GET_CURRENT_FILE_FOLDER:
+  // Get a current_file_folder that is actually available
+  boost::filesystem::path get_current_file_folder();
+  
 public:
   // Here is the signal we need to let everyone know that the recent projects database has changed
   typedef boost::signals2::signal< void() > recent_project_signal_type;
@@ -164,6 +168,9 @@ public:
   
   // Path to the directory from which projects are loaded
   Core::StateStringHandle current_project_folder_state_; 
+
+  // Path to the directory from which files are loaded
+  Core::StateStringHandle current_file_folder_state_; 
 
   // -- internals --
 private:

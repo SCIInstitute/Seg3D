@@ -79,7 +79,6 @@ ShortcutsInterface::ShortcutsInterface( QWidget *parent ) :
   this->setWindowIcon( icon );
   
   this->private_->ui_.verticalLayout_5->setAlignment( Qt::AlignTop );
-  this->private_->ui_.verticalLayout_6->setAlignment( Qt::AlignTop );
   this->private_->ui_.verticalLayout_13->setAlignment( Qt::AlignTop );
   
   this->private_->ui_.active_tool_shortcuts_widget_->deleteLater();
@@ -102,6 +101,7 @@ ShortcutsInterface::~ShortcutsInterface()
 
 void ShortcutsInterface::add_tool_shortcuts()
 {
+/*
   ToolMenuList menu_list;
 
   ToolFactory::Instance()->list_menus( menu_list );
@@ -175,6 +175,8 @@ void ShortcutsInterface::add_tool_shortcuts()
 
   // Update fonts and text
   update_fonts_and_text();
+
+*/
 }
 
 void ShortcutsInterface::ShowActiveToolControls( QPointer< ShortcutsInterface > qpointer, ToolHandle tool )

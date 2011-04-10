@@ -47,6 +47,7 @@
 // Application includes
 #include <Application/LayerIO/LayerIO.h>
 #include <Application/LayerManager/LayerManager.h>
+#include <Application/ProjectManager/ProjectManager.h>
 #include <Application/LayerManager/Actions/ActionExportLayer.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
 
@@ -92,8 +93,12 @@ void LayerIOFunctions::ImportFiles( QMainWindow* main_window, std::string file_t
 
     // Bring up the file dialog.
     QString qs_filtername;
+    
+    boost::filesystem::path current_file_folder = 
+      ProjectManager::Instance()->get_current_file_folder();
+      
     file_list = QFileDialog::getOpenFileNames( main_window, 
-      "Import Layer(s)... ", "/home", filters, &qs_filtername );
+      "Import Layer(s)... ", current_file_folder.string().c_str(), filters, &qs_filtername );
     
     // If no file was selected just return
     if( file_list.size() == 0 )
@@ -165,10 +170,15 @@ void LayerIOFunctions::ImportSeries( QMainWindow* main_window )
     filters = filters + ";;" + QString::fromStdString( importer_types[ j ] );
   }
 
+
+  boost::filesystem::path current_file_folder = 
+    ProjectManager::Instance()->get_current_file_folder();
+
   // Bring up the file dialog
   QString filtername;
   QStringList file_list = QFileDialog::getOpenFileNames( main_window, 
-    "Select a file from the series... ", "/home", filters, &filtername );
+    "Select a file from the series... ", current_file_folder.string().c_str(), 
+    filters, &filtername );
 
   // If no files were selected just exit
   if( file_list.size() == 0 )
@@ -253,8 +263,8 @@ void LayerIOFunctions::ExportLayer( QMainWindow* main_window )
     return;
   }
 
-  boost::filesystem::path file_path = boost::filesystem::path( 
-    PreferencesManager::Instance()->export_path_state_->get() ) / layer_handles[ 0 ]->get_layer_name();
+  boost::filesystem::path file_path = 
+    ProjectManager::Instance()->get_current_file_folder();
 
   QString filename = QFileDialog::getSaveFileName( main_window, "Export Data Layer As... ",
     QString::fromStdString( file_path.string() ),

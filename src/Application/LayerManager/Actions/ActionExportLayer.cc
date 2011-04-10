@@ -33,6 +33,8 @@
 #include <Application/LayerManager/Actions/ActionExportLayer.h>
 #include <Application/LayerIO/LayerIO.h>
 #include <Application/LayerManager/LayerManager.h>
+#include <Application/ProjectManager/ProjectManager.h>
+
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
@@ -106,6 +108,10 @@ bool ActionExportLayer::run( Core::ActionContextHandle& context, Core::ActionRes
     
   this->layer_exporter_->export_layer( "data", filename_and_path.parent_path().string(), 
     filename_without_extension );
+
+  ProjectManager::Instance()->current_file_folder_state_->set( 
+    filename_and_path.parent_path().string() );
+  ProjectManager::Instance()->checkpoint_projectmanager();
 
   progress->end_progress_reporting();
 

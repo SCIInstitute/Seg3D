@@ -35,6 +35,7 @@
 #include <Application/LayerManager/Actions/ActionImportSeries.h>
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/LayerManager/LayerUndoBufferItem.h>
+#include <Application/ProjectManager/ProjectManager.h>
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
@@ -212,8 +213,14 @@ bool ActionImportSeries::run( Core::ActionContextHandle& context, Core::ActionRe
     ProjectManager::Instance()->get_current_project()->add_to_provenance_database(
       provenance_step );  
   }
+  ProjectManager::Instance()->current_file_folder_state_->set( 
+    file_path.string() );
+  ProjectManager::Instance()->checkpoint_projectmanager();
+
+
   // We are done processing
   progress->end_progress_reporting();
+
 
   return true;
 }

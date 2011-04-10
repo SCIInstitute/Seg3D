@@ -35,6 +35,7 @@
 #include <Application/LayerManager/Actions/ActionImportLayer.h>
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/LayerManager/LayerUndoBufferItem.h>
+#include <Application/ProjectManager/ProjectManager.h>
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
@@ -201,6 +202,11 @@ bool ActionImportLayer::run( Core::ActionContextHandle& context, Core::ActionRes
       provenance_step );    
   }
   
+  boost::filesystem::path full_filename( this->filename_ );
+  ProjectManager::Instance()->current_file_folder_state_->set( 
+    full_filename.parent_path().string() );
+  ProjectManager::Instance()->checkpoint_projectmanager();
+
   // We are done processing
   progress->end_progress_reporting();
 
