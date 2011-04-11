@@ -235,7 +235,7 @@ bool StateHandler::load_states( const StateIO& state_io )
     {
       std::string error = std::string( "Could not find element '" ) + 
         this->get_statehandler_id_base() + "' in xml file.";
-      CORE_LOG_ERROR( error );
+      CORE_LOG_DEBUG( error );
       return false;
     }
   }
@@ -247,7 +247,7 @@ bool StateHandler::load_states( const StateIO& state_io )
     {
       std::string error = std::string( "Could not find element '" ) + 
         this->get_statehandler_id() + "' in xml file.";
-      CORE_LOG_ERROR( error );
+      CORE_LOG_DEBUG( error );
       return false;
     }
 
