@@ -77,7 +77,7 @@ TransferFunctionFeatureWidget::TransferFunctionFeatureWidget(
     
     this->private_->ui_.ambient_coeff_slider_->set_description( "Coefficient" );
     this->private_->ui_.specular_intensity_slider_->set_description( "Intensity" );
-    this->private_->ui_.shininess_slider_->set_description( "Shineyness" );
+    this->private_->ui_.shininess_slider_->set_description( "Shininess" );
     
     this->private_->ui_.diffuse_red_slider_->set_description( "Red" );
     this->private_->ui_.diffuse_green_slider_->set_description( "Green" );
