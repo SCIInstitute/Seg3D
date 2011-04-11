@@ -216,21 +216,22 @@ void SplashScreen::open_existing()
     }
   }
   
-  std::string path = full_path.parent_path().string();
   std::string file_name = full_path.filename().string();
 
   if( boost::filesystem::exists( full_path ) )
   {
     if ( ! ProjectManager::CheckProjectFile( full_path ) )
     {
+      std::string error = std::string( "Error reading project file:\n"
+        "The project file was saved with newer version of " ) +
+        Core::Application::GetApplicationName();
       QMessageBox::critical( 0, 
         "Error reading project file",
-        "Error reading project file:\n"
-        "The project file was saved with newer version of Seg3D" );
+        QString::fromStdString( error ) );
       return;
     }   
   
-    ActionLoadProject::Dispatch( Core::Interface::GetWidgetActionContext(), path );
+    ActionLoadProject::Dispatch( Core::Interface::GetWidgetActionContext(), full_path.string() );
     this->close();
   }
 }

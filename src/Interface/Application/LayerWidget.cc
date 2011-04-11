@@ -384,6 +384,9 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
     QtUtils::QtBridge::Show( this->private_->ui_.opacity_bar_,
       layer->show_opacity_state_ );
 
+    QtUtils::QtBridge::Connect( this->private_->ui_.provenance_button_,
+      boost::bind( &LayerWidget::RequestProvenance, qpointer_type( this ) ) );
+
     // Compute isosurface button is enabled when the layer is not locked and is available
     QtUtils::QtBridge::Enable( this->private_->ui_.compute_iso_surface_button_, enable_states,
       !boost::lambda::bind( &Core::StateBool::get, layer->locked_state_.get() ) && 
@@ -1349,5 +1352,22 @@ void LayerWidget::request_provenance()
     this->private_->layer_->provenance_id_state_->get() );
 }
 
+
+void LayerWidget::RequestProvenance( qpointer_type qpointer )
+{
+  // Hand it off to the right thread
+  if( !( Core::Interface::IsInterfaceThread() ) )
+  {
+    Core::Interface::Instance()->post_event( boost::bind( &LayerWidget::RequestProvenance, 
+      qpointer ) );
+    return; 
+  }
+
+  // When we are finally on the interface thread run this code:
+  if ( qpointer.data() )
+  {
+    qpointer->request_provenance();
+  }
+}
 
 } //end namespace Seg3D

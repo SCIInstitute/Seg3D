@@ -99,27 +99,27 @@ QWidget#scanning_file_{
 }
 
 QWidget#data_volume_icon_widget_{
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(237, 149, 31, 255), stop:0.372881 rgba(237, 172, 84, 255), stop:1 rgba(237, 149, 31, 255));
+  background-color: rgb( 237, 165, 76 );
   border-radius: 3px;
-  border: 1px solid rgb(208, 130, 27);
+  border: 1px solid rgb(130, 130, 130);
 }
 
 QWidget#single_mask_icon_widget_{
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(237, 149, 31, 255), stop:0.372881 rgba(237, 172, 84, 255), stop:1 rgba(237, 149, 31, 255));
+  background-color: rgb( 237, 165, 76 );
   border-radius: 3px;
-  border: 1px solid rgb(208, 130, 27);
+  border: 1px solid rgb(130, 130, 130);
 }
 
 QWidget#series_of_masks_1234_icon_widget_{
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(237, 149, 31, 255), stop:0.372881 rgba(237, 172, 84, 255), stop:1 rgba(237, 149, 31, 255));
+  background-color: rgb( 237, 165, 76 );
   border-radius: 3px;
-  border: 1px solid rgb(208, 130, 27);
+  border: 1px solid rgb(130, 130, 130);
 }
 
 QWidget#series_of_masks_1248_icon_widget_{
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(237, 149, 31, 255), stop:0.372881 rgba(237, 172, 84, 255), stop:1 rgba(237, 149, 31, 255));
+  background-color: rgb( 237, 165, 76 );
   border-radius: 3px;
-  border: 1px solid rgb(208, 130, 27);
+  border: 1px solid rgb(130, 130, 130);
 }
 QToolButton#data_button_{
   border: 1px solid rgba( 0, 0, 0, 0 );
@@ -189,7 +189,7 @@ QToolButton#series_1234_button_:pressed{
          </font>
         </property>
         <property name="text">
-         <string>WARNING: You have selected the import series option but only one file has been found, if you meant to import a series, cancel this import, and try again, this time selecting all the files in the series.</string>
+         <string>WARNING: You have selected the import series option but only one file has been found, if you meant to import a series, cancel this import, and try again, this time select all the files in the series by holding down shift.</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -367,7 +367,7 @@ p, li { white-space: pre-wrap; }
               </property>
               <property name="icon">
                <iconset resource="../../Resources/QtResources.qrc">
-                <normaloff>:/Images/Data.png</normaloff>:/Images/Data.png</iconset>
+                <normaloff>:/Images/DataWhite.png</normaloff>:/Images/DataWhite.png</iconset>
               </property>
               <property name="iconSize">
                <size>
@@ -573,7 +573,7 @@ p, li { white-space: pre-wrap; }
               </property>
               <property name="icon">
                <iconset resource="../../Resources/QtResources.qrc">
-                <normaloff>:/Images/BitPlaneMaskOff.png</normaloff>:/Images/BitPlaneMaskOff.png</iconset>
+                <normaloff>:/Images/BitPlaneMaskWhite.png</normaloff>:/Images/BitPlaneMaskWhite.png</iconset>
               </property>
               <property name="iconSize">
                <size>
@@ -676,7 +676,7 @@ p, li { white-space: pre-wrap; }
               </property>
               <property name="icon">
                <iconset resource="../../Resources/QtResources.qrc">
-                <normaloff>:/Images/LabelMaskOff.png</normaloff>:/Images/LabelMaskOff.png</iconset>
+                <normaloff>:/Images/LabelMapMaskWhite.png</normaloff>:/Images/LabelMapMaskWhite.png</iconset>
               </property>
               <property name="iconSize">
                <size>

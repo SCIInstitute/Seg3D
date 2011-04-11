@@ -173,6 +173,9 @@ void LayerImporterWidget::setup_ui()
   connect( this->private_->ui_.cancel_button_, SIGNAL( released() ),
     this, SLOT( reject() ) );
 
+  this->setStyleSheet( StyleSheet::LAYERIO_C );
+
+
   // Step (6): Show Scanning Widget then Asynchronously scan file, so UI stays interactive
   this->private_->ui_.scanning_file_->show();
 }

@@ -16,6 +16,7 @@
         <file>Images/AutoView.png</file>
         <file>Images/AutoViewOff.png</file>
         <file>Images/BitPlaneMask.png</file>
+        <file>Images/BitPlaneMaskWhite.png</file>
         <file>Images/BitPlaneMaskOff.png</file>
         <file>Images/Border.png</file>
         <file>Images/BorderOff.png</file>
@@ -80,6 +81,7 @@
         <file>Images/LabelMapVolume.png</file>
         <file>Images/LabelMapWhite.png</file>
         <file>Images/LabelMapWhite.png</file>
+        <file>Images/LabelMapMaskWhite.png</file>
         <file>Images/Light.png</file>
         <file>Images/LightOff.png</file>
         <file>Images/Lock.png</file>
@@ -149,9 +151,11 @@
         <file>Images/TextOffError.png</file>
         <file>Images/InvisibleSlicesVisible.png</file>
         <file>Images/InvisibleSlicesVisibleOff.png</file>
-		<file>Images/Clip.png</file>
+	<file>Images/Clip.png</file>
         <file>Images/ClipOff.png</file>
-		<file>Images/VolumeRendering.png</file>
-        <file>Images/VolumeRenderingOff.png</file>		
+	<file>Images/VolumeRendering.png</file>
+        <file>Images/VolumeRenderingOff.png</file>
+	<file>Images/Provenance.png</file>
+	<file>Images/ProvenanceOff.png</file>
     </qresource>
 </RCC>

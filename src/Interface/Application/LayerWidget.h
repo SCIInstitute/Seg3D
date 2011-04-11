@@ -290,6 +290,10 @@ public:
   // Update the progress bar 
   static void UpdateProgress( qpointer_type qpointer, double progress );
   
+  // REQUESTPROVENANCE:
+  // Request provenance trail
+  static void RequestProvenance( qpointer_type qpointer );
+  
 };
 
 } //end namespace Seg3D
