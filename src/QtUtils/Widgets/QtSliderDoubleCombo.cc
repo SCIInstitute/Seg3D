@@ -82,16 +82,9 @@ void QtSliderDoubleCombo::spinner_signal( double value )
 
   double temp_max;
   double percentage;
-  if( this->private_->min_ < 0 )
-  {
-    value = value + Core::Abs( this->private_->min_ );
-    temp_max = this->private_->max_ + Core::Abs( this->private_->min_ );
-  }
-  else
-  {
-    value = value - this->private_->min_;
-    temp_max = this->private_->max_ - this->private_->min_;
-  }
+
+  value = this->value_ - this->private_->min_;
+  temp_max = this->private_->max_ - this->private_->min_;
 
   percentage = value / temp_max;
 
@@ -105,16 +98,10 @@ void QtSliderDoubleCombo::slider_signal( int percentage )
 {
     this->private_->ui_.spinBox->blockSignals( true );
 
-  double temp_max;
-  if( this->private_->min_ < 0 )
-  {
-    temp_max = this->private_->max_ + Core::Abs( this->private_->min_ );
-  }
-  else
-  {
-    temp_max = this->private_->max_ - this->private_->min_;
-  }
-  double new_value = temp_max * ( percentage * 0.01 );
+  double temp_max = this->private_->max_ - this->private_->min_;
+
+  double new_value = temp_max * ( static_cast<double>( percentage ) * 0.01 ) 
+    + this->private_->min_;
 
   if( percentage == 0 )
   {
@@ -124,6 +111,7 @@ void QtSliderDoubleCombo::slider_signal( int percentage )
   {
     new_value = this->private_->max_;
   }
+
   this->value_ = new_value;
 
     this->private_->ui_.spinBox->setValue( this->value_ );
@@ -144,8 +132,14 @@ void QtSliderDoubleCombo::setRange( double min, double max )
   this->private_->min_ = min;
   this->private_->max_ = max;
     this->private_->ui_.spinBox->setRange( min, max );
-    this->private_->ui_.min_->setNum( min );
-    this->private_->ui_.max_->setNum( max );
+  QString min_string;
+  min_string.setNum( min, 'g', 3 );
+    this->private_->ui_.min_->setText( min_string );
+
+  QString max_string;
+  max_string.setNum( max, 'g', 3 );
+    this->private_->ui_.max_->setText( max_string );
+
     this->block_signals( false );
 }
 void QtSliderDoubleCombo::setCurrentValue( double value )
@@ -155,16 +149,9 @@ void QtSliderDoubleCombo::setCurrentValue( double value )
     
   double temp_max;
   double percentage;
-  if( this->private_->min_ < 0 )
-  {
-    value = value + Core::Abs( this->private_->min_ );
-    temp_max = this->private_->max_ + Core::Abs( this->private_->min_ );
-  }
-  else
-  {
-    value = value - this->private_->min_;
-    temp_max = this->private_->max_ - this->private_->min_;
-  }
+
+  value = this->value_ - this->private_->min_;
+  temp_max = this->private_->max_ - this->private_->min_;
 
   percentage = value / temp_max;
 
@@ -178,8 +165,10 @@ void QtSliderDoubleCombo::change_min( double new_min )
 {
   this->private_->min_ = new_min;
     this->block_signals( true );
-        this->private_->ui_.spinBox->setMinimum( new_min );
-    this->private_->ui_.min_->setNum( new_min );
+  this->private_->ui_.spinBox->setMinimum( new_min );
+  QString min_string;
+  min_string.setNum( new_min, 'g', 3 );
+    this->private_->ui_.min_->setText( min_string );
     this->block_signals( false );
 }
 
@@ -188,7 +177,9 @@ void QtSliderDoubleCombo::change_max( double new_max )
   this->private_->max_ = new_max;
     this->block_signals( true );
     this->private_->ui_.spinBox->setMaximum( new_max );
-    this->private_->ui_.max_->setNum( new_max );
+  QString max_string;
+  max_string.setNum( new_max, 'g', 3 );
+    this->private_->ui_.max_->setText( max_string );
     this->block_signals( false );
 }
 
@@ -223,9 +214,5 @@ void QtSliderDoubleCombo::handle_max_signal( double value )
     this->setCurrentValue( value );
   }
 }
-
-
-
-
 
 }  // end namespace QtUtils
