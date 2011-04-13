@@ -92,7 +92,7 @@ StatusBarWidget::StatusBarWidget( QMainWindow* parent ) :
 
   this->private_->statusbar_->addWidget( this->private_->statusbar_widget_, 1 );
   
-  this->private_->statusbar_->setStyleSheet( StyleSheet::STATUSBAR_C );
+//  this->private_->statusbar_->setStyleSheet( StyleSheet::STATUSBAR_C );
   
   connect( this->private_->ui_.swap_visibility_button_, 
     SIGNAL( clicked() ), this, SLOT( swap_bars() ) );
