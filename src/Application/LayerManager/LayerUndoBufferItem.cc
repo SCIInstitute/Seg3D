@@ -120,9 +120,12 @@ void LayerUndoBufferItem::add_layer_to_add( LayerHandle layer )
   LayerGroupHandle layer_group = layer->get_layer_group();
   size_t group_pos = LayerManager::Instance()->get_group_position( layer_group );
   size_t layer_pos = layer_group->get_layer_position( layer );
+
   std::map< size_t, LayerDeletionUndoRecordHandle >::iterator group_it =
     this->private_->layers_to_add_.find( group_pos );
   LayerDeletionUndoRecordHandle undo_record;
+
+
   if ( group_it != this->private_->layers_to_add_.end() )
   {
     undo_record = ( *group_it ).second;
@@ -137,6 +140,10 @@ void LayerUndoBufferItem::add_layer_to_add( LayerHandle layer )
 
   assert( undo_record->layer_pos_map_.count( layer_pos ) == 0 );
   undo_record->layer_pos_map_[ layer_pos ] = layer;
+
+  // Modify the name, so another layer can take the same name
+  std::string new_name = std::string( "UNDOBUFFER_" ) + layer->name_state_->get();
+  layer->name_state_->set( new_name );
 }
 
 void LayerUndoBufferItem::add_layer_to_restore( LayerHandle layer, 
@@ -223,6 +230,11 @@ bool LayerUndoBufferItem::apply_and_clear_undo()
     {
       LayerHandle layer = ( *layer_it ).second;
       size_t layer_pos = ( *layer_it ).first;
+
+      // Restore the old name
+      std::string old_name = layer->name_state_->get().substr( 11 );
+      layer->name_state_->set( old_name );
+
 
       LayerAbstractFilterHandle filter = layer->get_filter_handle();
       if ( filter ) 
