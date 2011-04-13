@@ -46,6 +46,20 @@ SET(APPLICATION_PROJECT_ACTIONS_SRCS
 CORE_ADD_LIBRARY(Application_Project ${APPLICATION_PROJECT_SRCS}
             ${APPLICATION_PROJECT_ACTIONS_SRCS} )
             
+IF(APPLE)
+TARGET_LINK_LIBRARIES(Application_Project
+                      Core_Action
+                      Core_State
+                      Core_Utils
+                      Core_Application
+                      Core_Interface
+                      Application_InterfaceManager
+                  Application_LayerManager
+                  Application_Provenance
+                      ${SCI_BOOST_LIBRARY}
+                      ${SCI_SQLITE_LIBRARY}
+            /System/Library/Frameworks/CoreServices.framework)
+ELSE(APPLE)                    
 TARGET_LINK_LIBRARIES(Application_Project
                       Core_Action
                       Core_State
@@ -57,4 +71,6 @@ TARGET_LINK_LIBRARIES(Application_Project
                   Application_Provenance
                       ${SCI_BOOST_LIBRARY}
                       ${SCI_SQLITE_LIBRARY})
-                    
+
+ENDIF(APPLE)          
+          

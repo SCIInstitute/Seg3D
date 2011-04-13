@@ -26,6 +26,10 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#if defined( __APPLE__ )  
+#include <CoreServices/CoreServices.h>
+#endif
+
 // STL includes
 #include <vector>
 #include <set>
@@ -228,15 +232,32 @@ bool ProjectPrivate::update_project_directory( const boost::filesystem::path& pr
 
 #if defined( __APPLE__ )  
   if ( PreferencesManager::Instance()->generate_osx_project_bundle_state_->get() )
-  {
+  {   
     std::vector<std::string> project_path_extensions = Project::GetProjectPathExtensions();
     
     for ( size_t j = 0; j < project_path_extensions.size(); j++ )
     {
       if ( boost::filesystem::extension( project_directory ) == project_path_extensions[ j ] )
       {
-        std::string command = std::string( "SetFile -a B \"" ) + project_directory.string() +"\"";
-        system( command.c_str() );
+        // MAC CODE
+        try
+        {
+          FSRef file_ref;
+          Boolean is_directory;
+          FSPathMakeRef( reinterpret_cast<const unsigned char*>( 
+            project_directory.string().c_str() ), &file_ref, &is_directory );
+          FSCatalogInfo info;
+          FSGetCatalogInfo( &file_ref, kFSCatInfoFinderInfo, &info, 0, 0, 0 );
+          
+          FolderInfo&  finder_info = *reinterpret_cast<FolderInfo*>( &info.finderInfo );
+          finder_info.finderFlags |= kHasBundle;
+          FSSetCatalogInfo( &file_ref, kFSCatInfoFinderInfo, &info);
+        }
+        catch( ... )
+        {
+        }
+        //std::string command = std::string( "SetFile -a B \"" ) + project_directory.string() +"\"";
+        //system( command.c_str() );
         break;
       }
     }
@@ -1002,12 +1023,57 @@ bool Project::load_project( const boost::filesystem::path& project_file )
   // First update the state variables that were not saved, such as
   // project name and project path
   
+  bool is_bundle = false;
+
+#ifdef __APPLE__
+
+  // MAC CODE
+  try
+  {
+    FSRef file_ref;
+    Boolean is_directory;
+    FSPathMakeRef( reinterpret_cast<const unsigned char*>( 
+      full_filename.parent_path().string().c_str() ), &file_ref, &is_directory );
+    FSCatalogInfo info;
+    FSGetCatalogInfo( &file_ref, kFSCatInfoFinderInfo, &info, 0, 0, 0 );
+    
+    FolderInfo&  finder_info = *reinterpret_cast<FolderInfo*>( &info.finderInfo );
+    if ( finder_info.finderFlags & kHasBundle ) is_bundle = true;
+  }
+  catch( ... )
+  {
+  }
+
+#endif  
   
+  if ( is_bundle )
+  {
+    if ( full_filename.parent_path().stem().string() != full_filename.stem().string() )
+    {
+      boost::filesystem::path new_project_file = full_filename.parent_path() /
+        ( full_filename.parent_path().stem().string() + Project::GetDefaultProjectFileExtension() );
+    
+      try
+      {
+        boost::filesystem::rename( full_filename, new_project_file );
+        full_filename = new_project_file;
+      }
+      catch ( ... )
+      {
+      }
+    }
+    
+    
+    
+  }
+
   // The name of the project
   this->project_name_state_->set( full_filename.stem().string() );
 
+
   // The file in which the project was saved
   this->project_file_state_->set( full_filename.filename().string() );
+
 
   // Ensure all directories that we require are present, if not this function
   // will generate them.
@@ -1048,6 +1114,7 @@ bool Project::load_project( const boost::filesystem::path& project_file )
   }
   //////////////////////////////////////////////////////////////////
 
+
   // Once we have loaded the state of the sessions_list, 
   // we need to validate that the files exist. As the user
   // may have editted files and may have removed them, we
@@ -1062,6 +1129,8 @@ bool Project::load_project( const boost::filesystem::path& project_file )
     this->sessions_changed_signal_();
     return true;
   }
+  
+  
   
   // We could not load the file, hence send a message to the user
   std::string error = std::string( "Could not open session '" ) +

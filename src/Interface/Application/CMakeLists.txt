@@ -197,6 +197,27 @@ CORE_ADD_LIBRARY(Interface_Application
             ${INTERFACE_APPLICATION_MOC_SRCS}
             ${INTERFACE_APPLICATION_QT_RCC_SRCS})
 
+IF(APPLE)
+TARGET_LINK_LIBRARIES(Interface_Application
+                      Core_Utils
+                      Core_EventHandler
+                      Core_Action
+                      Core_Interface
+                      Core_State
+            Application_Project
+            Application_ProjectManager
+                  Application_Renderer
+                      Application_Tool
+                      Application_ToolManager
+                      Application_Tools
+                      Application_LayerIO
+                      QtUtils_Utils
+                      QtUtils_Widgets
+            QtUtils_Bridge
+                      ${QT_LIBRARIES} 
+                      ${SCI_BOOST_LIBRARY}
+            /System/Library/Frameworks/CoreServices.framework)
+ELSE(APPLE)
 TARGET_LINK_LIBRARIES(Interface_Application
                       Core_Utils
                       Core_EventHandler
@@ -215,3 +236,4 @@ TARGET_LINK_LIBRARIES(Interface_Application
             QtUtils_Bridge
                       ${QT_LIBRARIES} 
                       ${SCI_BOOST_LIBRARY})
+ENDIF(APPLE)

@@ -163,7 +163,7 @@ void SplashScreen::open_existing()
   project_file_type += " )";
 
   boost::filesystem::path full_path =  boost::filesystem::path( ( 
-    QFileDialog::getOpenFileName ( this, 
+    QFileDialog::getOpenFileName ( 0, 
     QString::fromStdString( project_type ), 
     QString::fromStdString( current_projects_path.string() ), 
     QString::fromStdString( project_file_type ) ) ).toStdString() ); 

@@ -26,6 +26,10 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#if defined( __APPLE__ )  
+#include <CoreServices/CoreServices.h>
+#endif
+
 // Boost includes
 #include <boost/filesystem.hpp>
 
@@ -706,21 +710,31 @@ void Menu::open_project_folder()
     QString qstring_path = QString::fromStdString( project_path.string() );
 
 #ifdef __APPLE__
+
+    bool is_bundle = false;
+
+    // MAC CODE
+    try
     {
-      QProcess process;
-      process.setReadChannelMode( QProcess::MergedChannels );
-      process.start( "GetFileInfo", QStringList() << "-ab" << qstring_path );
+      FSRef file_ref;
+      Boolean is_directory;
+      FSPathMakeRef( reinterpret_cast<const unsigned char*>( 
+        project_path.string().c_str() ), &file_ref, &is_directory );
+      FSCatalogInfo info;
+      FSGetCatalogInfo( &file_ref, kFSCatInfoFinderInfo, &info, 0, 0, 0 );
       
-      if ( process.waitForFinished() )
-      {
-        int result = 0;
-        Core::ImportFromString( QString( process.readAll() ).toStdString(), result );
-        if ( result )
-        {
-          qstring_path = QString::fromStdString( project_path.parent_path().string() );
-        }
-      }
+      FolderInfo&  finder_info = *reinterpret_cast<FolderInfo*>( &info.finderInfo );
+      if ( finder_info.finderFlags & kHasBundle ) is_bundle = true;
     }
+    catch( ... )
+    {
+    }
+
+    if ( is_bundle )
+    {
+      qstring_path = QString::fromStdString( project_path.parent_path().string() );
+    }
+    
 #endif
 
     QProcess process;

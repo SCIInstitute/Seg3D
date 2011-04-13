@@ -105,6 +105,7 @@ public:
   bool erase_;
   bool brush_visible_;
   bool paintable_;
+  bool data_layer_;
   size_t signal_block_count_;
 
   bool has_data_constraint_;
@@ -661,6 +662,7 @@ PaintTool::PaintTool( const std::string& toolid ) :
   this->private_->painting_ = false;
   this->private_->brush_visible_ = true;
   this->private_->paintable_ = false;
+  this->private_->data_layer_ = false;
   this->private_->signal_block_count_ = 0;
 
   std::vector< LayerIDNamePair > empty_names( 1, 
@@ -926,12 +928,11 @@ bool PaintTool::handle_mouse_enter( ViewerHandle viewer, int x, int y )
 {
   PaintToolPrivate::lock_type lock( this->private_->get_mutex() );
   this->private_->viewer_ = viewer;
-  if ( !this->private_->viewer_->is_volume_view() )
-  {
-    this->private_->brush_visible_ = true;
-    this->private_->center_x_ = x;
-    this->private_->center_y_ = y;
-  }
+  if ( this->private_->viewer_->is_volume_view() ) return false;
+
+  this->private_->brush_visible_ = true;
+  this->private_->center_x_ = x;
+  this->private_->center_y_ = y;
 
   return true;
 }
@@ -961,6 +962,8 @@ void PaintTool::deactivate()
 bool PaintTool::handle_mouse_move( ViewerHandle viewer, const Core::MouseHistory& mouse_history, 
   int button, int buttons, int modifiers )
 {
+  if ( this->private_->data_layer_ ) return false;
+
   // NOTE: This function call is running on the interface thread
   // Hence we need to lock as most of the paint tool runs on the Application thread.
   {
@@ -1066,6 +1069,8 @@ bool PaintTool::handle_mouse_press( ViewerHandle viewer, const Core::MouseHistor
   bool paintable = false;
   bool erase = false;
   {
+  
+    this->private_->data_layer_ = false;
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
     erase = this->erase_state_->get();
     if ( this->target_layer_state_->get() != Tool::NONE_OPTION_C &&
@@ -1079,6 +1084,16 @@ bool PaintTool::handle_mouse_press( ViewerHandle viewer, const Core::MouseHistor
         paintable = layer->is_visible( viewer_id ) && layer->has_valid_data() && 
           !layer->locked_state_->get();
       }
+      else
+      {
+        this->private_->data_layer_ = true;
+        return false;
+      }
+    }
+    else
+    {
+      this->private_->data_layer_ = true;
+      return false;
     }
   }
 
@@ -1138,6 +1153,8 @@ bool PaintTool::handle_mouse_press( ViewerHandle viewer, const Core::MouseHistor
 bool PaintTool::handle_mouse_release( ViewerHandle viewer, const Core::MouseHistory& mouse_history, 
   int button, int buttons, int modifiers )
 {
+  if ( this->private_->data_layer_ ) return false;
+
   {
     PaintToolPrivate::lock_type lock( this->private_->get_mutex() );
     this->private_->viewer_ = viewer;

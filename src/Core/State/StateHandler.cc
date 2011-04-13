@@ -233,9 +233,9 @@ bool StateHandler::load_states( const StateIO& state_io )
 
     if ( sh_element == 0 )
     {
-      std::string error = std::string( "Could not find element '" ) + 
-        this->get_statehandler_id_base() + "' in xml file.";
-      CORE_LOG_DEBUG( error );
+//      std::string error = std::string( "Could not find element '" ) + 
+//        this->get_statehandler_id_base() + "' in xml file.";
+//      CORE_LOG_DEBUG( error );
       return false;
     }
   }
@@ -245,9 +245,9 @@ bool StateHandler::load_states( const StateIO& state_io )
       FirstChildElement( this->get_statehandler_id().c_str() ); 
     if ( sh_element == 0 )
     {
-      std::string error = std::string( "Could not find element '" ) + 
-        this->get_statehandler_id() + "' in xml file.";
-      CORE_LOG_DEBUG( error );
+//      std::string error = std::string( "Could not find element '" ) + 
+//        this->get_statehandler_id() + "' in xml file.";
+//      CORE_LOG_DEBUG( error );
       return false;
     }
 
