@@ -40,7 +40,7 @@ class BinarySmoothDilateErodeFilter : public SliceTargetTool
 SEG3D_TOOL(
 SEG3D_TOOL_NAME( "BinarySmoothDilateErodeFilter", "Grow and Shrink segmentations" )
 SEG3D_TOOL_MENULABEL( "Smooth Binary Dilate -> Erode" )
-SEG3D_TOOL_MENU( "Basic Filters" )
+SEG3D_TOOL_MENU( "Mask Filters" )
 SEG3D_TOOL_SHORTCUT_KEY( "Ctrl+Alt+B" )
 SEG3D_TOOL_URL( "http://www.sci.utah.edu/SCIRunDocs/index.php/CIBC:Seg3D2:BinaryErodeDilateSmoothFilter:1" )
 

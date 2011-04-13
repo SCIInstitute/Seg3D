@@ -41,7 +41,7 @@ class MaskDataFilter : public SingleTargetTool
 SEG3D_TOOL(
 SEG3D_TOOL_NAME( "MaskDataFilter", "Cut a masked region out of a data layer." )
 SEG3D_TOOL_MENULABEL( "Mask Data" )
-SEG3D_TOOL_MENU( "Basic Filters" )
+SEG3D_TOOL_MENU( "Data Filters" )
 SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+J" )
 SEG3D_TOOL_URL( "http://www.sci.utah.edu/SCIRunDocs/index.php/CIBC:Seg3D2:MaskDataFilter:1" )
 SEG3D_TOOL_VERSION( "1" )

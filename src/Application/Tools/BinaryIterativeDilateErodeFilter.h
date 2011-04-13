@@ -40,7 +40,7 @@ class BinaryIterativeDilateErodeFilter : public SingleTargetTool
 SEG3D_TOOL(
 SEG3D_TOOL_NAME( "BinaryIterativeDilateErodeFilter", "Grow and Shrink segmentations" )
 SEG3D_TOOL_MENULABEL( "Iterative Binary Dilate -> Erode" )
-SEG3D_TOOL_MENU( "Advanced Filters" )
+SEG3D_TOOL_MENU( "Mask Filters" )
 SEG3D_TOOL_SHORTCUT_KEY( "" )
 SEG3D_TOOL_URL( "http://seg3d.org/" )
 )

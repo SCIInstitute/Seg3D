@@ -41,7 +41,7 @@ class XorFilter : public SingleTargetTool
 SEG3D_TOOL(
 SEG3D_TOOL_NAME( "XorFilter", "Boolean EXCLUSIVE OR operation between two mask layers." )
 SEG3D_TOOL_MENULABEL( "Boolean XOR" )
-SEG3D_TOOL_MENU( "Basic Filters" )
+SEG3D_TOOL_MENU( "Mask Filters" )
 SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+X" )
 SEG3D_TOOL_URL( "http://www.sci.utah.edu/SCIRunDocs/index.php/CIBC:Seg3D2:XorFilter:1" )
 SEG3D_TOOL_VERSION( "1" )

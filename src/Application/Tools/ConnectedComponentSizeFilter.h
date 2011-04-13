@@ -42,7 +42,7 @@ class ConnectedComponentSizeFilter : public SingleTargetTool
 SEG3D_TOOL(
 SEG3D_TOOL_NAME( "ConnectedComponentSizeFilter", "Compute the size of connected components." )
 SEG3D_TOOL_MENULABEL( "Connected Component Size" )
-SEG3D_TOOL_MENU( "Basic Filters" )
+SEG3D_TOOL_MENU( "Mask Filters" )
 SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+S" )
 SEG3D_TOOL_URL( "http://www.sci.utah.edu/SCIRunDocs/index.php/CIBC:Seg3D2:ConnectedComponentSizeFilter:1" )
 SEG3D_TOOL_VERSION( "1" )
