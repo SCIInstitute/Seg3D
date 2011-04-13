@@ -249,7 +249,7 @@ bool ProjectPrivate::update_project_directory( const boost::filesystem::path& pr
           FSCatalogInfo info;
           FSGetCatalogInfo( &file_ref, kFSCatInfoFinderInfo, &info, 0, 0, 0 );
           
-          FolderInfo&  finder_info = *reinterpret_cast<FolderInfo*>( &info.finderInfo );
+          FileInfo&  finder_info = *reinterpret_cast<FileInfo*>( &info.finderInfo );
           finder_info.finderFlags |= kHasBundle;
           FSSetCatalogInfo( &file_ref, kFSCatInfoFinderInfo, &info);
         }
@@ -1037,7 +1037,7 @@ bool Project::load_project( const boost::filesystem::path& project_file )
     FSCatalogInfo info;
     FSGetCatalogInfo( &file_ref, kFSCatInfoFinderInfo, &info, 0, 0, 0 );
     
-    FolderInfo&  finder_info = *reinterpret_cast<FolderInfo*>( &info.finderInfo );
+    FileInfo&  finder_info = *reinterpret_cast<FileInfo*>( &info.finderInfo );
     if ( finder_info.finderFlags & kHasBundle ) is_bundle = true;
   }
   catch( ... )

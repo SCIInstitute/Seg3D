@@ -723,7 +723,7 @@ void Menu::open_project_folder()
       FSCatalogInfo info;
       FSGetCatalogInfo( &file_ref, kFSCatInfoFinderInfo, &info, 0, 0, 0 );
       
-      FolderInfo&  finder_info = *reinterpret_cast<FolderInfo*>( &info.finderInfo );
+      FileInfo&  finder_info = *reinterpret_cast<FileInfo*>( &info.finderInfo );
       if ( finder_info.finderFlags & kHasBundle ) is_bundle = true;
     }
     catch( ... )
