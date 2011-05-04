@@ -37,9 +37,6 @@
 
 // Applications
 #include <Application/UndoBuffer/UndoBuffer.h>
-#ifdef BUILD_WITH_PYTHON
-#include <Application/PythonModule/PythonInterpreter.h>
-#endif
 
 // QtUtils includes
 #include <QtUtils/Bridge/QtBridge.h>
@@ -195,9 +192,6 @@ void ControllerInterface::post_action()
   std::string action_error;
   std::string action_usage;
 
-#ifdef BUILD_WITH_PYTHON
-  PythonInterpreter::Instance()->run_string( action_string );
-#else
   Core::ActionHandle action;
   if ( !( Core::ActionFactory::CreateAction( action_string, action, action_error, action_usage ) ) )
   {
@@ -209,7 +203,6 @@ void ControllerInterface::post_action()
   {
     Core::ActionDispatcher::PostAction( action, private_->context_ );
   }
-#endif
 }
 
 void ControllerInterface::post_action_message( std::string message )

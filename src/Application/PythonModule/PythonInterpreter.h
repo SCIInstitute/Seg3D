@@ -31,6 +31,7 @@
 
 // Boost includes
 #include <boost/shared_ptr.hpp>
+#include <boost/signals2/signal.hpp>
 
 // Core includes
 #include <Core/Utils/Singleton.h>
@@ -38,6 +39,8 @@
 
 // Application includes
 #include <Application/PythonModule/PythonActionContext.h>
+
+class PythonStdIO;
 
 namespace Seg3D
 {
@@ -72,11 +75,21 @@ public:
   void initialize( wchar_t* program_name );
   PythonActionContextHandle get_action_context();
 
+  void print_banner();
   void run_string( std::string command );
   void run_file( std::string file_name );
+  void interrupt();
   void start_terminal();
 
+  // -- signals --
+public:
+  typedef boost::signals2::signal< void ( std::string ) > console_output_signal_type;
+  console_output_signal_type prompt_signal_;
+  console_output_signal_type error_signal_;
+  console_output_signal_type output_signal_;
+
 private:
+  friend class ::PythonStdIO;
   PythonInterpreterPrivateHandle private_;
 
 public:

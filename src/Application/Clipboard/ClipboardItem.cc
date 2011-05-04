@@ -46,6 +46,11 @@ public:
   size_t height_;
   Core::DataType data_type_;
   std::vector< unsigned char > buffer_;
+
+  // Source information
+  ProvenanceID provenance_id_;
+  int slice_type_;
+  size_t slice_number_;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -133,6 +138,20 @@ void ClipboardItem::resize( size_t width, size_t height, Core::DataType data_typ
 
   buffer_size *= ( width * height );
   this->private_->buffer_.resize( buffer_size );
+}
+
+void ClipboardItem::set_source( const ProvenanceID& pid, const int slice_type, const size_t slice_number )
+{
+  this->private_->provenance_id_ = pid;
+  this->private_->slice_type_ = slice_type;
+  this->private_->slice_number_ = slice_number;
+}
+
+void ClipboardItem::get_source( ProvenanceID& pid, int& slice_type, size_t& slice_number ) const
+{
+  pid = this->private_->provenance_id_;
+  slice_type = this->private_->slice_type_;
+  slice_number = this->private_->slice_number_;
 }
 
 } // end namespace Seg3D

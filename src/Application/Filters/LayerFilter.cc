@@ -185,8 +185,8 @@ void LayerFilterPrivate::finalize()
   
   if ( !abort && this->provenance_step_ )
   {
-    ProjectManager::Instance()->get_current_project()->add_to_provenance_database(
-      this->provenance_step_ );
+//    ProjectManager::Instance()->get_current_project()->add_to_provenance_database(
+//      this->provenance_step_ );
   }
   
   // Disconnect all the connections with the layer signals, i.e. the abort signal from target
@@ -503,6 +503,32 @@ bool LayerFilter::create_and_lock_mask_layer_from_layer( LayerHandle src_layer, 
     return false;
   }
   
+  // Record that the layer is locked
+  this->private_->created_layers_.push_back( dst_layer );
+
+  dst_layer->set_filter_handle( this->shared_from_this() );
+
+  // Hook up the abort signal from the layer
+  this->connect_abort( dst_layer );
+
+  // Success
+  return true;
+}
+
+bool LayerFilter::create_and_lock_mask_layer_from_layer( LayerHandle src_layer, LayerHandle& dst_layer, std::string dst_layer_name )
+{
+  // Generate a new name for the filter
+  std::string name = this->get_layer_prefix() + "_" + dst_layer_name;
+
+  // Create the layer in creating mode
+  if ( !( LayerManager::CreateAndLockMaskLayer( src_layer->get_grid_transform(),
+    name, dst_layer, src_layer->get_meta_data(), this->private_->key_ ) ) )
+  {
+    dst_layer.reset();
+    this->report_error( "Could not allocate enough memory." );
+    return false;
+  }
+
   // Record that the layer is locked
   this->private_->created_layers_.push_back( dst_layer );
 

@@ -115,6 +115,8 @@ SET(APPLICATION_TOOLS_SRCS
   TransformTool.cc
   ClipboardTool.h
   ClipboardTool.cc
+  ICPFilter.h
+  ICPFilter.cc
   )
 
 SET(APPLICATION_TOOLS_NOREGISTER_SRCS
@@ -131,6 +133,8 @@ SET(APPLICATION_TOOLS_ACTIONS_SRCS
   Actions/ActionPolyline.cc
   Actions/ActionCopy.h
   Actions/ActionCopy.cc
+  Actions/ActionCopyPaste.h
+  Actions/ActionCopyPaste.cc
   Actions/ActionPaste.h
   Actions/ActionPaste.cc
   Actions/ActionFloodFill.h

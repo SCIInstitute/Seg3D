@@ -34,6 +34,8 @@
 
 #include <Core/DataBlock/DataType.h>
 
+#include <Application/Provenance/Provenance.h>
+
 namespace Seg3D
 {
 
@@ -84,6 +86,14 @@ public:
   // GET_BUFFER:
   // Returns the pointer to the buffer of the clipboard item.
   void* get_buffer();
+
+  // SET_SOURCE:
+  // Set the source information of the clipboard content.
+  void set_source( const ProvenanceID& pid, const int slice_type, const size_t slice_number );
+
+  // GET_SOURCE:
+  // Get the source information of the clipboard content.
+  void get_source( ProvenanceID& pid, int& slice_type, size_t& slice_number ) const;
 
 private:
   // RESIZE:

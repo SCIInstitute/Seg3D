@@ -94,6 +94,13 @@ bool ActionCopy::validate( Core::ActionContextHandle& context )
     this->private_->slice_number_ = vol_slice->get_slice_number();
     this->private_->slice_type_ = vol_slice->get_slice_type();
     this->private_->slot_number_ = 0;
+
+    // Need to translate the action again because the parameters weren't ready
+    if ( !this->translate( context ) ) return false;
+
+    // Set the deduce_params_ flag to false so if the action is re-run (by the undo buffer),
+    // it won't need to go through the process again. 
+    this->private_->deduce_params_ = false;
   }
   
   // Check whether the layer exists and is of the right type and return an
@@ -101,10 +108,8 @@ bool ActionCopy::validate( Core::ActionContextHandle& context )
   if ( !( LayerManager::CheckLayerExistanceAndType(
     this->private_->target_layer_id_, Core::VolumeType::MASK_E, context ) ) ) return false;
 
-  // Check whether the layer is not locked for processing or creating, in which case the
-  // data is not data yet, hence we cannot compute an isosurface on it. The function returns
-  // a notifier when the action can be completed.
-  if ( !( LayerManager::CheckLayerAvailabilityForProcessing( 
+  // Check whether the layer is available for read access.
+  if ( !( LayerManager::CheckLayerAvailabilityForUse( 
     this->private_->target_layer_id_, context ) ) ) return false;
   
   this->private_->target_layer_ = 
@@ -155,6 +160,8 @@ bool ActionCopy::run( Core::ActionContextHandle& context, Core::ActionResultHand
     Core::DataType::UCHAR_E, this->private_->slot_number_ );
    this->private_->vol_slice_->copy_slice_data( reinterpret_cast< unsigned char* >( 
     clipboard_item->get_buffer() ) );
+   clipboard_item->set_source( this->private_->target_layer_->provenance_id_state_->get(), 
+     this->private_->slice_type_, this->private_->slice_number_ );
 
   return true;
 }

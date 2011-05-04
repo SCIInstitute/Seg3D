@@ -88,6 +88,7 @@ public:
   Core::StateBoolHandle message_window_visibility_state_;
   Core::StateBoolHandle splash_screen_visibility_state_;
   Core::StateBoolHandle keyboard_shortcut_visibility_state_;
+  Core::StateBoolHandle python_console_visibility_state_;
   
   //Options of what to show
   Core::StateBoolHandle enable_controller_state_;

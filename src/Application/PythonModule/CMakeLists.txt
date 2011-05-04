@@ -38,8 +38,6 @@ SET(APPLICATION_PYTHONMODULE_SRCS
   PythonInterpreter.cc
   PythonActionContext.h
   PythonActionContext.cc
-  AbstractPythonTerminalInterface.h
-  AbstractPythonTerminalInterface.cc
 )
 
 CORE_ADD_LIBRARY(Application_PythonModule 

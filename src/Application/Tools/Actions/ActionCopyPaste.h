@@ -26,34 +26,41 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_TOOLS_ACTIONS_ACTIONPASTE_H
-#define APPLICATION_TOOLS_ACTIONS_ACTIONPASTE_H
+#ifndef APPLICATION_TOOLS_ACTIONS_ACTIONCOPYPASTE_H
+#define APPLICATION_TOOLS_ACTIONS_ACTIONCOPYPASTE_H
 
+// Core includes
+#include <Core/Action/Actions.h>
+
+// Application includes
 #include <Application/LayerManager/LayerAction.h>
 
 namespace Seg3D
 {
 
-class ActionPastePrivate;
-typedef boost::shared_ptr< ActionPastePrivate > ActionPastePrivateHandle;
+class ActionCopyPastePrivate;
+typedef boost::shared_ptr< ActionCopyPastePrivate > ActionCopyPastePrivateHandle;
 
-class ActionPaste : public LayerAction
+class ActionCopyPaste : public LayerAction
 {
 
 CORE_ACTION
 ( 
-  CORE_ACTION_TYPE( "Paste", "Paste the content of the clipboard onto a mask slice.")
+  CORE_ACTION_TYPE( "CopyPaste", "Copy one slice from the source mask layer and"
+                    " paste onto the specified slice(s) of the destination mask layer." )
+  CORE_ACTION_ARGUMENT( "source", "The ID of the source mask layer." )
+  CORE_ACTION_ARGUMENT( "src_slice_type", "The source slicing direction." )
+  CORE_ACTION_ARGUMENT( "src_slice_number", "The source slice number." )
   CORE_ACTION_ARGUMENT( "target", "The ID of the target mask layer." )
-  CORE_ACTION_ARGUMENT( "slice_type", "The slicing direction." )
-  CORE_ACTION_ARGUMENT( "min_slice", "The minimum slice number to paste onto." )
-  CORE_ACTION_ARGUMENT( "max_slice", "The maximum slice number to paste onto." )
-  CORE_ACTION_KEY( "slot", "0", "Which clipboard slot to use." )
+  CORE_ACTION_ARGUMENT( "dst_slice_type", "The slicing direction." )
+  CORE_ACTION_ARGUMENT( "dst_min_slice", "The minimum slice number to paste onto." )
+  CORE_ACTION_ARGUMENT( "dst_max_slice", "The maximum slice number to paste onto." )
   CORE_ACTION_CHANGES_PROJECT_DATA()
   CORE_ACTION_IS_UNDOABLE()
 )
 
 public:
-  ActionPaste();
+  ActionCopyPaste();
 
   // VALIDATE:
   // Each action needs to be validated just before it is posted. This way we
@@ -71,19 +78,7 @@ public:
   virtual void clear_cache();
 
 private:
-  ActionPastePrivateHandle private_;
-
-public:
-  // DISPATCH:
-  // Dispatch the action.
-  // This version should only be called from the menu. It will deduce the parameters
-  // from the current active viewer and active layer.
-  static void Dispatch( Core::ActionContextHandle context, bool punch_through = false );
-
-  // DISPATCH:
-  // Dispatch the action.
-  static void Dispatch( Core::ActionContextHandle context, const std::string& layer_id,
-    int slice_type, size_t min_slice, size_t max_slice );
+  ActionCopyPastePrivateHandle private_;
 };
 
 } // end namespace Seg3D

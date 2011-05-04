@@ -70,7 +70,6 @@ public:
 
 void DefaultEventHandlerContextPrivate::start_thread( EventHandler* eventhandler )
 {
-  eventhandler->process_events();
   {
     boost::unique_lock< boost::mutex > lock( thread_mutex_ );
     thread_condition_variable_.notify_all();

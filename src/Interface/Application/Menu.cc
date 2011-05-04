@@ -487,6 +487,15 @@ void Menu::create_window_menu( QMenuBar* menubar )
   qaction->setCheckable( true );
   QtUtils::QtBridge::Connect( qaction, 
     InterfaceManager::Instance()->preferences_manager_visibility_state_ );
+
+  // Python Console
+#ifdef BUILD_WITH_PYTHON
+  qaction = qmenu->addAction( "Python Console" );
+  qaction->setShortcut( tr( "Ctrl+Shift+Y" ) );
+  qaction->setCheckable( true );
+  QtUtils::QtBridge::Connect( qaction, 
+    InterfaceManager::Instance()->python_console_visibility_state_ );
+#endif
 }
   
 void Menu::create_help_menu( QMenuBar* menubar )

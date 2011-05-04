@@ -40,7 +40,9 @@ namespace Seg3D
 // Forward declaration
 class SingleTargetToolPrivate;
 typedef boost::shared_ptr< SingleTargetToolPrivate > SingleTargetToolPrivateHandle;
-typedef boost::tuple< Core::StateLabeledOptionHandle, int, bool > option_list_tuple_type_;
+//typedef boost::tuple< Core::StateLabeledOptionHandle, int, bool > option_list_tuple_type_;
+
+typedef boost::tuple< Core::StateLabeledOptionHandle, int, bool, bool > option_list_tuple_type_;
 
 // Class definition
 class SingleTargetTool : public Tool
@@ -65,8 +67,12 @@ public:
   Core::StateBoolHandle valid_target_state_;
 
   // Add a state whose input is linked to the target and needs to be of the same type
+  //void add_dependent_layer_input( Core::StateLabeledOptionHandle dependent_layer_state, 
+  //  int dependent_layer_type, bool required = false );
+
   void add_dependent_layer_input( Core::StateLabeledOptionHandle dependent_layer_state, 
-    int dependent_layer_type, bool required = false );
+    int dependent_layer_type, bool required = false, bool independent_layer = false );
+
 
 private:
   SingleTargetToolPrivateHandle private_;

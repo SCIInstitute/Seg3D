@@ -30,6 +30,7 @@
 #include <Core/Volume/MaskVolumeSlice.h>
 
 #include <Application/Clipboard/Clipboard.h>
+#include <Application/Tools/Actions/ActionCopyPaste.h>
 #include <Application/Tools/Actions/ActionPaste.h>
 #include <Application/Layer/MaskLayer.h>
 #include <Application/LayerManager/LayerManager.h>
@@ -59,9 +60,10 @@ public:
 };
 
 ActionPaste::ActionPaste() :
+  LayerAction(),
   private_( new ActionPastePrivate )
 {
-  this->add_parameter( this->private_->target_layer_id_ );
+  this->add_layer_id( this->private_->target_layer_id_ );
   this->add_parameter( this->private_->slice_type_ );
   this->add_parameter( this->private_->min_slice_ );
   this->add_parameter( this->private_->max_slice_ );
@@ -117,6 +119,13 @@ bool ActionPaste::validate( Core::ActionContextHandle& context )
       this->private_->min_slice_ = vol_slice->get_slice_number();
       this->private_->max_slice_ = vol_slice->get_slice_number();
     }
+
+    // Need to translate the action again because the parameters weren't ready
+    if ( !this->translate( context ) ) return false;
+
+    // Set the deduce_params_ flag to false so if the action is re-run (by the undo buffer),
+    // it won't need to go through the process again. 
+    this->private_->deduce_params_ = false;
   }
   
   if ( !( LayerManager::CheckLayerExistanceAndType( this->private_->target_layer_id_,
@@ -177,30 +186,19 @@ bool ActionPaste::validate( Core::ActionContextHandle& context )
 
 bool ActionPaste::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
-  // Get the layer on which this action operates
-  LayerHandle layer = LayerManager::Instance()->get_layer_by_id( 
-    this->private_->target_layer_id_ );
-    
   // Build the undo/redo for this action
   LayerUndoBufferItemHandle item( new LayerUndoBufferItem( "Paste" ) );
 
   // The redo action is the current one
   item->set_redo_action( this->shared_from_this() );
         
-  // Get slice type
-  Core::VolumeSliceType slice_type = static_cast< Core::VolumeSliceType::enum_type >(
-    this->private_->slice_type_ );
-    
-  // Get the slice number
-  size_t min_slice = this->private_->min_slice_;
-  size_t max_slice = this->private_->max_slice_;
-    
   // Create a check point of the slice on which the flood fill will operate
-  LayerCheckPointHandle check_point( new LayerCheckPoint( layer, slice_type, 
-    min_slice, max_slice) );
+  LayerCheckPointHandle check_point( new LayerCheckPoint( 
+    this->private_->target_layer_, this->private_->vol_slice_->get_slice_type(), 
+    this->private_->min_slice_, this->private_->max_slice_ ) );
 
   // Tell the item which layer to restore with which check point for the undo action
-  item->add_layer_to_restore( layer, check_point );
+  item->add_layer_to_restore( this->private_->target_layer_, check_point );
 
   // Now add the undo/redo action to undo buffer
   UndoBuffer::Instance()->insert_undo_item( context, item );
@@ -217,7 +215,34 @@ bool ActionPaste::run( Core::ActionContextHandle& context, Core::ActionResultHan
   volume_slice->set_slice_number( this->private_->max_slice_ );
   volume_slice->set_slice_data( reinterpret_cast< const unsigned char* >( 
     clipboard_item->get_buffer() ), true );
-  
+  this->private_->target_layer_->provenance_id_state_->set(
+    this->get_output_provenance_id() );
+
+  ProvenanceID src_pid;
+  int src_slice_type;
+  size_t src_slice_number;
+  clipboard_item->get_source( src_pid, src_slice_type, src_slice_number );
+  ProvenanceIDList input_pids( 2 );
+  input_pids[ 0 ] = src_pid;
+  input_pids[ 1 ]= this->get_input_provenance_ids()[ 0 ];
+  ProvenanceIDList deleted_pids;
+  deleted_pids.push_back( input_pids[ 1 ] );
+  ProvenanceStep* prov_step = new ProvenanceStep;
+  prov_step->set_input_provenance_ids( input_pids );
+  prov_step->set_output_provenance_ids( this->get_output_provenance_ids() );
+  prov_step->set_deleted_provenance_ids( deleted_pids );
+  std::string action_str = ActionCopyPaste::Type() + " ";
+  action_str += Core::ExportToString( src_pid ) + " ";
+  action_str += Core::ExportToString( src_slice_type ) + " ";
+  action_str += Core::ExportToString( src_slice_number ) + " ";
+  action_str += Core::ExportToString( input_pids[ 1 ] ) + " ";
+  action_str += Core::ExportToString( this->private_->slice_type_ ) + " ";
+  action_str += Core::ExportToString( this->private_->min_slice_ ) + " ";
+  action_str += Core::ExportToString( this->private_->max_slice_ );
+  prov_step->set_action( action_str );
+  ProvenanceStepHandle prov_step_handle( prov_step );
+  ProjectManager::Instance()->get_current_project()->add_to_provenance_database( prov_step_handle );
+
   return true;
 }
 

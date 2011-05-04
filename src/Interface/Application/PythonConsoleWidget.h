@@ -26,20 +26,49 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Application/PythonModule/AbstractPythonTerminalInterface.h>
+#ifndef INTERFACE_APPLICATION_PYTHONCONSOLEWIDGET_H
+#define INTERFACE_APPLICATION_PYTHONCONSOLEWIDGET_H
+
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+# pragma once
+#endif 
+
+// Boost includes
+#include <boost/shared_ptr.hpp>
+
+// QT includes
+#include <QWidget>
+
+// Core includes
+#include <Core/Utils/ConnectionHandler.h>
+#include <Core/Utils/Log.h>
+#include <Core/Action/Actions.h>
+
+#include <QtUtils/Widgets/QtCustomDialog.h>
 
 namespace Seg3D
 {
 
-std::string AbstractPythonTerminalInterface::read( int n )
+class PythonConsoleWidgetPrivate;
+typedef boost::shared_ptr< PythonConsoleWidgetPrivate > PythonConsoleWidgetPrivateHandle;
+
+// Forward declaration
+class PythonConsoleWidget;
+
+// Class definition
+class PythonConsoleWidget : public QtUtils::QtCustomDialog, private Core::ConnectionHandler
 {
-  return std::string( "" );
-}
+  Q_OBJECT
 
-int AbstractPythonTerminalInterface::write( std::string data )
-{
-  return 0;
-}
+  // -- constructor/destructor --
+public:
+  PythonConsoleWidget( QWidget* parent = 0 );
+  virtual ~PythonConsoleWidget();
 
-} // end namespace Core
+private:
+  PythonConsoleWidgetPrivateHandle private_;
+};
 
+} // end namespace Seg3D
+
+#endif

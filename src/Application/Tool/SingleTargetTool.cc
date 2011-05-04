@@ -98,11 +98,27 @@ void SingleTargetToolPrivate::update_dependent_layers()
         std::make_pair( Tool::NONE_OPTION_C, Tool::NONE_OPTION_C ) );
       LayerHandle layer = LayerManager::Instance()->get_layer_by_id( 
         this->tool_->target_layer_state_->get() );
+      //if ( layer )
+      //{
+      //  LayerManager::Instance()->get_layer_names_from_group( layer->get_layer_group(),
+      //    layer_names, this->dependent_option_lists_[ j ].get< 1 >() );
+      //}
+
       if ( layer )
       {
-        LayerManager::Instance()->get_layer_names_from_group( layer->get_layer_group(),
-          layer_names, this->dependent_option_lists_[ j ].get< 1 >() );
+        bool independent_layer = this->dependent_option_lists_[j].get<3>();
+        if ( independent_layer )
+        {
+          LayerManager::Instance()->get_layer_names( layer_names );
+        }
+        else
+        {
+          LayerManager::Instance()->get_layer_names_from_group( layer->get_layer_group(),
+            layer_names, this->dependent_option_lists_[ j ].get< 1 >() );
+        }
+        
       }
+
       // Insert this list
       this->dependent_option_lists_[ j ].get< 0 >()->set_option_list( layer_names );
       //this->dependent_layer_states_[ j ]->set_option_list( layer_names );
@@ -305,21 +321,40 @@ SingleTargetTool::~SingleTargetTool()
   this->disconnect_all();
 }
 
+//void SingleTargetTool::add_dependent_layer_input( 
+//  Core::StateLabeledOptionHandle dependent_layer_state, 
+//  int dependent_layer_type, bool required )
+//{
+////  this->private_->dependent_layer_states_.push_back( dependent_layer_state );
+////  this->private_->dependent_layer_types_.push_back( dependent_layer_type );
+//
+//  this->add_connection( dependent_layer_state->state_changed_signal_.connect(
+//    boost::bind( &SingleTargetToolPrivate::check_dependent_layers, 
+//    this->private_.get() ) ) );
+//  
+//  // The tuple contains the following types:
+//  // boost::tuple< Core::StateLabeledOptionHandle, int dependent_layer_type, bool required >
+//  this->private_->dependent_option_lists_.push_back( 
+//    option_list_tuple_type_( dependent_layer_state, dependent_layer_type, required ) );
+//  this->private_->update_dependent_layers();
+//}
+
+
 void SingleTargetTool::add_dependent_layer_input( 
   Core::StateLabeledOptionHandle dependent_layer_state, 
-  int dependent_layer_type, bool required )
+  int dependent_layer_type, bool required, bool independent_layer )
 {
-//  this->private_->dependent_layer_states_.push_back( dependent_layer_state );
-//  this->private_->dependent_layer_types_.push_back( dependent_layer_type );
+  //  this->private_->dependent_layer_states_.push_back( dependent_layer_state );
+  //  this->private_->dependent_layer_types_.push_back( dependent_layer_type );
 
   this->add_connection( dependent_layer_state->state_changed_signal_.connect(
     boost::bind( &SingleTargetToolPrivate::check_dependent_layers, 
     this->private_.get() ) ) );
-  
+
   // The tuple contains the following types:
   // boost::tuple< Core::StateLabeledOptionHandle, int dependent_layer_type, bool required >
   this->private_->dependent_option_lists_.push_back( 
-    option_list_tuple_type_( dependent_layer_state, dependent_layer_type, required ) );
+    option_list_tuple_type_( dependent_layer_state, dependent_layer_type, required, independent_layer ) );
   this->private_->update_dependent_layers();
 }
 

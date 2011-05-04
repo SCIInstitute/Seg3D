@@ -76,7 +76,7 @@ private:
 private:
   // GET_TOOL:
   // This is an internal private function for retrieving the handle to a tool by passing its id
-  ToolHandle get_tool( const std::string& toolid );
+  //ToolHandle get_tool( const std::string& toolid );
 
   // -- Handler functions --
 protected:
@@ -149,6 +149,7 @@ protected:
 
 public:
   virtual int get_session_priority();
+  ToolHandle get_tool( const std::string& toolid );
 
 public:
   Core::StateLabeledOptionHandle active_tool_state_;

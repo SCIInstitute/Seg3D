@@ -33,6 +33,8 @@
 # pragma once
 #endif 
 
+#include <boost/signals2.hpp>
+
 // Core includes
 #include <Core/Action/ActionContext.h>
 

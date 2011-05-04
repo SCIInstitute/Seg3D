@@ -26,6 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#include <Core/Utils/Log.h>
+
 #include <Application/PythonModule/PythonActionContext.h>
 
 namespace Seg3D

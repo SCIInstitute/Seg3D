@@ -75,46 +75,52 @@
 #include <Interface/Application/ProvenanceDockWidget.h>
 #include <Interface/Application/ViewerInterface.h>
 
+#ifdef BUILD_WITH_PYTHON
+#include <Interface/Application/PythonConsoleWidget.h>
+#endif
 
 #include <Interface/Application/ProgressWidget.h>
 
 namespace Seg3D
 {
   
-  class ApplicationInterfacePrivate {
+class ApplicationInterfacePrivate {
+
+public:
+  // Pointer to the main canvas of the main window
+  QPointer< ViewerInterface > viewer_interface_;
   
-  public:
-    // Pointer to the main canvas of the main window
-    QPointer< ViewerInterface > viewer_interface_;
-    
-    // Pointers to dialog widgets
-    QPointer< ControllerInterface > controller_interface_;
-    QPointer< PreferencesInterface > preferences_interface_;
-    QPointer< MessageWindow > message_widget_;
-    QPointer< ShortcutsInterface > keyboard_shortcuts_;
-    QPointer< SplashScreen > splash_screen_;
-    
-    // The dock widgets
-    //QPointer< HistoryDockWidget > history_dock_window_;
-    QPointer< ProjectDockWidget > project_dock_window_;
-    QPointer< ToolsDockWidget > tools_dock_window_;
-    QPointer< LayerManagerDockWidget > layer_manager_dock_window_;
-    QPointer< RenderingDockWidget > rendering_dock_window_;
-    QPointer< ProvenanceDockWidget > provenance_dock_window_;
-    QPointer< ProgressWidget > progress_;
-    
-    // Pointer to the new project wizard
-    static QPointer< ProjectWizard > new_project_wizard_;
-    
-    // Application menu, statusbar
-    QPointer< Menu > menu_;
-    QPointer< StatusBarWidget > status_bar_;
-    
-    QPointer< QWidget > focused_item_; 
-    
-    bool critical_message_active_;
+  // Pointers to dialog widgets
+  QPointer< ControllerInterface > controller_interface_;
+  QPointer< PreferencesInterface > preferences_interface_;
+  QPointer< MessageWindow > message_widget_;
+  QPointer< ShortcutsInterface > keyboard_shortcuts_;
+  QPointer< SplashScreen > splash_screen_;
+#ifdef BUILD_WITH_PYTHON
+  QPointer< PythonConsoleWidget > python_console_;
+#endif
   
-  };
+  // The dock widgets
+  //QPointer< HistoryDockWidget > history_dock_window_;
+  QPointer< ProjectDockWidget > project_dock_window_;
+  QPointer< ToolsDockWidget > tools_dock_window_;
+  QPointer< LayerManagerDockWidget > layer_manager_dock_window_;
+  QPointer< RenderingDockWidget > rendering_dock_window_;
+  QPointer< ProvenanceDockWidget > provenance_dock_window_;
+  QPointer< ProgressWidget > progress_;
+  
+  // Pointer to the new project wizard
+  static QPointer< ProjectWizard > new_project_wizard_;
+  
+  // Application menu, statusbar
+  QPointer< Menu > menu_;
+  QPointer< StatusBarWidget > status_bar_;
+  
+  QPointer< QWidget > focused_item_; 
+  
+  bool critical_message_active_;
+
+};
 
 ApplicationInterface::ApplicationInterface( std::string file_to_view_on_open ) :
   private_( new ApplicationInterfacePrivate )
@@ -153,6 +159,9 @@ ApplicationInterface::ApplicationInterface( std::string file_to_view_on_open ) :
   this->private_->keyboard_shortcuts_ = new ShortcutsInterface( this );
   this->private_->message_widget_ = new MessageWindow( this );
   this->private_->splash_screen_ = new SplashScreen( this );
+#ifdef BUILD_WITH_PYTHON
+  this->private_->python_console_ = new PythonConsoleWidget( this );
+#endif
   
   std::string extension = "";
   if( file_to_view_on_open != "" )
@@ -221,7 +230,12 @@ ApplicationInterface::ApplicationInterface( std::string file_to_view_on_open ) :
     InterfaceManager::Instance()->message_window_visibility_state_ );
     
   QtUtils::QtBridge::Show( this->private_->keyboard_shortcuts_, 
-    InterfaceManager::Instance()->keyboard_shortcut_visibility_state_ );  
+    InterfaceManager::Instance()->keyboard_shortcut_visibility_state_ );
+
+#ifdef BUILD_WITH_PYTHON
+  QtUtils::QtBridge::Show( this->private_->python_console_,
+    InterfaceManager::Instance()->python_console_visibility_state_ );
+#endif
     
   this->add_connection( Core::ActionDispatcher::Instance()->begin_progress_signal_.connect( 
     boost::bind( &ApplicationInterface::HandleBeginProgress, qpointer_type( this ), _1 ) ) );
@@ -361,6 +375,13 @@ void ApplicationInterface::closeEvent( QCloseEvent* event )
     this->private_->keyboard_shortcuts_->deleteLater();
   }
   
+#ifdef BUILD_WITH_PYTHON
+  if ( this->private_->python_console_ )
+  {
+    this->private_->python_console_->close();
+    this->private_->python_console_->deleteLater();
+  }
+#endif
 //  if( this->private_->history_dock_window_ )
 //  {
 //    this->private_->history_dock_window_->close();
