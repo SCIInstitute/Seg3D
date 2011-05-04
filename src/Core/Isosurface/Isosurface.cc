@@ -29,6 +29,9 @@
 // STL includes
 #include <fstream>
 
+// Boost includes
+#include <boost/array.hpp>
+ 
 // Core includes
 #include <Core/DataBlock/StdDataBlock.h>
 #include <Core/Isosurface/Isosurface.h>
@@ -324,22 +327,22 @@ typedef struct {
 // For example: {{tri1.p1, tri1.p2, tri1.p3, tri2.p1, tri2.p2, tri2.p3, tri3.p1, tri3.p2, tri3.p3, 
 // tri4.p1, tri4,p2, tri4.p3}, num_tri}
 const CappingTableType CAPPING_TABLE_C[] = {
-  {{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}, 0},
-  {{0, 4, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1}, 1},
-  {{4, 1, 5, -1, -1, -1, -1, -1, -1, -1, -1, -1}, 1},
-  {{0, 1, 7, 7, 1, 5, -1, -1, -1, -1, -1, -1}, 2},
-  {{6, 5, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1}, 1},
-  {{0, 4, 7, 7, 4, 5, 7, 5, 6, 6, 5, 2}, 4},
-  {{4, 1, 6, 6, 1, 2, -1, -1, -1, -1, -1, -1}, 2},
-  {{0, 6, 7, 0, 1, 6, 6, 1, 2, -1, -1, -1}, 3},
-  {{7, 6, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1}, 1},
-  {{0, 4, 3, 3, 4, 6, -1, -1, -1, -1, -1, -1}, 2},
-  {{7, 6, 3, 7, 4, 6, 4, 5, 6, 4, 1, 5}, 4},
-  {{0, 6, 3, 0, 5, 6, 0, 1, 5, -1, -1, -1}, 3},
-  {{7, 5, 3, 3, 5, 2, -1, -1, -1, -1, -1, -1}, 2},
-  {{0, 5, 3, 0, 4, 5, 3, 5, 2, -1, -1, -1}, 3},
-  {{7, 4, 3, 3, 4, 2, 4, 1, 2, -1, -1, -1}, 3},
-  {{0, 1, 3, 3, 1, 2, -1, -1, -1, -1, -1, -1}, 2}};
+  {{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}, 0},  // 0
+  {{0, 4, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1}, 1},   // 1
+  {{4, 1, 5, -1, -1, -1, -1, -1, -1, -1, -1, -1}, 1},   // 2
+  {{0, 1, 7, 7, 1, 5, -1, -1, -1, -1, -1, -1}, 2},    // 3
+  {{6, 5, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1}, 1},   // 4
+  {{0, 4, 7, 7, 4, 5, 7, 5, 6, 6, 5, 2}, 4},        // 5
+  {{4, 1, 6, 6, 1, 2, -1, -1, -1, -1, -1, -1}, 2},    // 6
+  {{0, 6, 7, 0, 1, 6, 6, 1, 2, -1, -1, -1}, 3},     // 7
+  {{7, 6, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1}, 1},   // 8 
+  {{0, 4, 3, 3, 4, 6, -1, -1, -1, -1, -1, -1}, 2},    // 9
+  {{7, 6, 3, 7, 4, 6, 4, 5, 6, 4, 1, 5}, 4},        // 10
+  {{0, 6, 3, 0, 5, 6, 0, 1, 5, -1, -1, -1}, 3},     // 11
+  {{7, 5, 3, 3, 5, 2, -1, -1, -1, -1, -1, -1}, 2},    // 12
+  {{0, 5, 3, 0, 4, 5, 3, 5, 2, -1, -1, -1}, 3},     // 13
+  {{7, 4, 3, 3, 4, 2, 4, 1, 2, -1, -1, -1}, 3},     // 14
+  {{0, 1, 3, 3, 1, 2, -1, -1, -1, -1, -1, -1}, 2}};   // 15
 
 class VertexBufferBatch
 {
@@ -363,15 +366,21 @@ public:
   void parallel_downsample_mask( int thread, int num_threads, boost::barrier& barrier, 
     double quality_factor );
 
+  // Copy values to members just to simplify and shorten code.  Must be called after downsample
+  // and before face computation.
+  void compute_setup();
+
   // SETUP:
-  // Setup the algorithm and the buffers
-  void compute_setup( int num_threads );
+  // Setup the algorithm and the buffers for face computation
+  void compute_faces_setup( int num_threads );
 
   // PARALLEL_COMPUTE_FACES:
   // Parallelized isosurface computation algorithm 
   void parallel_compute_faces( int thread, int num_threads, boost::barrier& barrier );
 
   void translate_cap_coords( int cap_num, float i, float j, float& x, float& y, float& z );
+
+  size_t get_data_index( float x, float y, float z );
 
   // COMPUTE_CAP_FACES:
   // Compute the "cap" faces at the boundary of the mask volume to handle the case where the 
@@ -388,6 +397,7 @@ public:
   void upload_to_vertex_buffer();
 
   void reset();
+  
 
   // Pointer to public Isosurface -- needed to give access to public signals
   Isosurface* isosurface_;
@@ -595,22 +605,25 @@ void IsosurfacePrivate::parallel_downsample_mask( int thread, int num_threads,
   }
 }
 
-void IsosurfacePrivate::compute_setup( int num_threads )
+void IsosurfacePrivate::compute_setup()
 {
   this->nx_ = this->compute_mask_volume_->get_mask_data_block()->get_nx();
   this->ny_ = this->compute_mask_volume_->get_mask_data_block()->get_ny();
   this->nz_ = this->compute_mask_volume_->get_mask_data_block()->get_nz();
-
-  // Number of elements (cubes) in each dimension
-  this->elem_nx_ = this->nx_ - 1;
-  this->elem_ny_ = this->ny_ - 1;
-  this->elem_nz_ = this->nz_ - 1;
 
   // Mask data is stored in bit-plane (8 masks per data block)
   this->data_ = this->compute_mask_volume_->get_mask_data_block()->get_mask_data();
 
   // Bit where mask bit is stored
   this->mask_value_ = this->compute_mask_volume_->get_mask_data_block()->get_mask_value();
+}
+
+void IsosurfacePrivate::compute_faces_setup( int num_threads )
+{
+  // Number of elements (cubes) in each dimension
+  this->elem_nx_ = this->nx_ - 1;
+  this->elem_ny_ = this->ny_ - 1;
+  this->elem_nz_ = this->nz_ - 1;
 
   // Stores index into polgyon configuration table for each element (cube)?
   // Why +1?  Maybe just padding for safety?
@@ -676,7 +689,7 @@ void IsosurfacePrivate::parallel_compute_faces( int thread, int num_threads,
   // Setup the algorithm and the buffers
   if ( thread == 0 ) // Only need to setup once 
   {
-    this->compute_setup( num_threads ); 
+    this->compute_faces_setup( num_threads ); 
   }
 
   // An object of class barrier is a synchronization primitive used to cause a set of threads 
@@ -1192,6 +1205,13 @@ void IsosurfacePrivate::translate_cap_coords( int cap_num, float i, float j,
   }
 }
 
+size_t IsosurfacePrivate::get_data_index( float x, float y, float z )
+{
+  size_t data_index = ( static_cast< size_t >( z ) * this->nx_ * this->ny_ ) + 
+    ( static_cast< size_t >( y ) * this->nx_ ) + static_cast< size_t >( x );
+  return data_index;
+}
+
 /*
 Basic ideas:
 - Marching cubes:
@@ -1264,8 +1284,9 @@ void IsosurfacePrivate::compute_cap_faces()
     // Create an array of type per index
     size_t num_cells = ( ni - 1 )* ( nj - 1 );
     std::vector< unsigned char > cell_types( num_cells );
-    // Loop through all 2D cells 
+    // Loop through all 2D cells to find each cell type
     size_t cell_index = 0;
+    bool some_nodes_on = false;
     for( float j = 0; j < nj - 1; j++ )
     {
       for( float i = 0; i < ni - 1; i++ )
@@ -1278,34 +1299,42 @@ void IsosurfacePrivate::compute_cap_faces()
         // Bit on if vertex is inside surface, off otherwise
         float x, y, z;
         this->translate_cap_coords( cap_num, i, j, x, y, z ); 
-        size_t data_index = static_cast< size_t >( ( z * nx * ny ) + ( y * nx ) + x );
+        size_t data_index = this->get_data_index( x, y, z );
         if ( this->data_[ data_index ] & this->mask_value_ )  cell_type |= 0x1;
         
         this->translate_cap_coords( cap_num, i + 1, j, x, y, z ); 
-        data_index = static_cast< size_t >( ( z * nx * ny ) + ( y * nx ) + x );
+        data_index = this->get_data_index( x, y, z );
         if ( this->data_[ data_index ] & this->mask_value_ )  cell_type |= 0x2;
 
         this->translate_cap_coords( cap_num, i + 1, j + 1, x, y, z ); 
-        data_index = static_cast< size_t >( ( z * nx * ny ) + ( y * nx ) + x );
+        data_index = this->get_data_index( x, y, z );
         if ( this->data_[ data_index ] & this->mask_value_ )  cell_type |= 0x4;
 
         this->translate_cap_coords( cap_num, i, j + 1, x, y, z ); 
-        data_index = static_cast< size_t >( ( z * nx * ny ) + ( y * nx ) + x );
+        data_index = this->get_data_index( x, y, z );
         if ( this->data_[ data_index ] & this->mask_value_ )  cell_type |= 0x8;
 
         cell_types[ cell_index ] = cell_type;
         cell_index++; 
+
+        if( cell_type != 0 )
+        {
+          some_nodes_on = true;
+        }
       }
+    }
+
+    // If no border nodes for this cap are on, skip this cap
+    if( !some_nodes_on )
+    {
+      continue;
     }
 
     // STEP 2: Add nodes to points list and translation table
 
     // Create translation table (2D matrix storing indices into actual points vector)
     // size_t point_trans_table[num cells = (nx - 1) * (ny - 1)][8 canonical indices (4 nodes, 4 edge points)]
-    // TODO: Store boost arrays of size 8 instead of using a vector.  Hangs on destruction
-    // for very large vectors.
-    std::vector< std::vector< unsigned int > > 
-      point_trans_table( num_cells, std::vector< unsigned int >( 8 ) );
+    std::vector< boost::array< unsigned int, 8 > > point_trans_table( num_cells );
 
     // Get mask transform from MaskVolume 
     GridTransform grid_transform = this->compute_mask_volume_->get_grid_transform();
@@ -1313,6 +1342,7 @@ void IsosurfacePrivate::compute_cap_faces()
     // All border nodes that are "on" are included as points because they are all adjacent to 
     // the imaginary padding that is "off." 
     // Loop through all nodes
+    
     for( float j = 0; j < nj; j++ )
     {
       for( float i = 0; i < ni; i++ )
@@ -1322,7 +1352,7 @@ void IsosurfacePrivate::compute_cap_faces()
         this->translate_cap_coords( cap_num, i, j, x, y, z ); 
 
         // Look up mask value at (x, y, z)
-        size_t data_index = static_cast< size_t >( ( z * nx * ny ) + ( y * nx ) + x );
+        size_t data_index = this->get_data_index( x, y, z );
           
         // If mask value on
         if ( this->data_[ data_index ] & this->mask_value_ )
@@ -1386,11 +1416,9 @@ void IsosurfacePrivate::compute_cap_faces()
         float end_x, end_y, end_z;
         this->translate_cap_coords( cap_num, i, j + 1, end_x, end_y, end_z ); 
 
-        size_t start_data_index = 
-          static_cast< size_t >( ( start_z * nx * ny ) + ( start_y * nx ) + start_x );
-        size_t end_data_index = 
-          static_cast< size_t >( ( end_z * nx * ny ) + ( end_y * nx ) + end_x );
-
+        size_t start_data_index = this->get_data_index( start_x, start_y, start_z );
+        size_t end_data_index = this->get_data_index( end_x, end_y, end_z );
+          
         // If edge is "split" (one endpoint node is on and the other is off)
         unsigned char start_bit = this->data_[ start_data_index ] & this->mask_value_;
         unsigned char end_bit = this->data_[ end_data_index ] & this->mask_value_;
@@ -1440,10 +1468,8 @@ void IsosurfacePrivate::compute_cap_faces()
         float end_x, end_y, end_z;
         this->translate_cap_coords( cap_num, i + 1, j, end_x, end_y, end_z ); 
 
-        size_t start_data_index = 
-          static_cast< size_t >( ( start_z * nx * ny ) + ( start_y * nx ) + start_x );
-        size_t end_data_index = 
-          static_cast< size_t >( ( end_z * nx * ny ) + ( end_y * nx ) + end_x );
+        size_t start_data_index = this->get_data_index( start_x, start_y, start_z );
+        size_t end_data_index = this->get_data_index( end_x, end_y, end_z );
 
         // If edge is "split" (one endpoint node is on and the other is off)
         unsigned char start_bit = this->data_[ start_data_index ] & this->mask_value_;
@@ -1499,31 +1525,34 @@ void IsosurfacePrivate::compute_cap_faces()
       // For each triangle in the tesselation for this type
       for( int triangle_index = 0; triangle_index < tesselation.num_triangles_; triangle_index++ )
       {
-        // Find each canonical index in the triangle
-        int canonical_index1 = tesselation.points_[ 3 * triangle_index ];
-        int canonical_index2 = tesselation.points_[ 3 * triangle_index + 1 ];
-        int canonical_index3 = tesselation.points_[ 3 * triangle_index + 2 ];
+        // For each vertex in the triangle
+        for( int triangle_point_index = 0; triangle_point_index < 3; triangle_point_index++ )
+        {
+          // Find canonical index for the point
+          int canonical_index = 
+            tesselation.points_[ 3 * triangle_index + triangle_point_index ];
+        
+          // Look up the point index in the translation table for this cell 
+          unsigned int point_index = point_trans_table[ cell_index ][ canonical_index ];
 
-        // Look up the point index in the translation table for this cell 
-        unsigned int point_index1 = point_trans_table[ cell_index ][ canonical_index1 ];
-        unsigned int point_index2 = point_trans_table[ cell_index ][ canonical_index2 ];
-        unsigned int point_index3 = point_trans_table[ cell_index ][ canonical_index3 ];
-
-        // Add point index to the faces list
-        this->faces_.push_back( point_index1 );
-        this->faces_.push_back( point_index2 );
-        this->faces_.push_back( point_index3 );
+          // Add point index to the faces list
+          this->faces_.push_back( point_index );
+        }
       }
     }
 
-    // Create a patch for each cap 
-    this->min_point_index_.push_back( min_point_index );
-    this->max_point_index_.push_back( static_cast< unsigned int >( this->points_.size() ) );
+    // Create a rendering "patch" for each cap 
+    unsigned int max_point_index = static_cast< unsigned int >( this->points_.size() );
+    unsigned int max_face_index = static_cast< unsigned int >( this->faces_.size() );
+    if( min_point_index != max_point_index && min_face_index != max_face_index )
+    {
+      this->min_point_index_.push_back( min_point_index );
+      this->max_point_index_.push_back( max_point_index );
 
-    this->min_face_index_.push_back( min_face_index );
-    this->max_face_index_.push_back( static_cast< unsigned int >( this->faces_.size() ) );
+      this->min_face_index_.push_back( min_face_index );
+      this->max_face_index_.push_back( max_face_index );
+    }
   }
-  
 }
 
 void IsosurfacePrivate::parallel_compute_normals( int thread, int num_threads, 
@@ -1738,6 +1767,9 @@ void Isosurface::compute( double quality_factor, bool capping_enabled,
       this->private_->reset();
       return;
     }
+
+    // Copy values to members just to simplify and shorten code.
+    this->private_->compute_setup();
 
     // Compute isosurface without caps
     Parallel parallel_faces( boost::bind( &IsosurfacePrivate::parallel_compute_faces, 
