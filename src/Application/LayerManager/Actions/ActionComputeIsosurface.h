@@ -72,7 +72,7 @@ private:
   double quality_factor_;
 
   // This parameter describes whether capping is enabled for the isosurface
-  double capping_enabled_;
+  bool capping_enabled_;
 
   // -- Dispatch this action from the interface --
 public:
