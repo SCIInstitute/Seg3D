@@ -41,6 +41,7 @@
 
 #include <Application/PythonModule/ActionModule.h>
 #include <Application/PythonModule/PythonInterpreter.h>
+#include <Application/PythonModule/ToPythonConverters.h>
 
 //////////////////////////////////////////////////////////////////////////
 // Python flags defined in pythonrun.c
@@ -214,6 +215,12 @@ BOOST_PYTHON_MODULE( interpreter )
     .def( "write", &PythonStdErr::write );
 }
 
+BOOST_PYTHON_MODULE( seg3d )
+{
+  register_python_action_module();
+  register_to_python_converters();
+}
+
 namespace Seg3D
 {
 
@@ -385,8 +392,14 @@ void PythonInterpreter::run_string( std::string command )
   // If compilation succeeded and the code object is not Py_None
   else if ( code_obj )
   {
-    PyObject* result = PyEval_EvalCode( code_obj.ptr(), this->private_->globals_.ptr(), NULL );
-    Py_XDECREF( result );
+    this->private_->action_context_->set_action_mode( PythonActionMode::INTERACTIVE_E );
+    try
+    {
+      PyObject* result = PyEval_EvalCode( code_obj.ptr(), this->private_->globals_.ptr(), NULL );
+      Py_XDECREF( result );
+    }
+    catch ( ... ) {}
+
     if ( PyErr_Occurred() != NULL )
     {
       if ( PyErr_ExceptionMatches( PyExc_EOFError ) )
@@ -405,6 +418,54 @@ void PythonInterpreter::run_string( std::string command )
   {
     this->prompt_signal_( this->private_->prompt2_ );
     return;
+  }
+
+  this->private_->command_buffer_.clear();
+  this->prompt_signal_( this->private_->prompt1_ );
+}
+
+void PythonInterpreter::run_script( std::string script )
+{
+  {
+    PythonInterpreterPrivate::lock_type lock( this->private_->get_mutex() );
+    if ( !this->private_->initialized_ )
+    {
+      CORE_THROW_LOGICERROR( "The python interpreter hasn't been initialized!" );
+    }
+  }
+
+  if ( !this->is_eventhandler_thread() )
+  {
+    this->post_event( boost::bind( &PythonInterpreter::run_script, this, script ) );
+    return;
+  }
+
+  // Clear any previous Python errors.
+  PyErr_Clear();
+
+  // Compile the script
+  boost::python::object code_obj;
+  try
+  {
+    code_obj = this->private_->compiler_( script, "<script>" );
+  }
+  catch ( ... ) {}
+
+  // If an error happened during compilation, print the error message
+  if ( PyErr_Occurred() != NULL )
+  {
+    PyErr_Print();
+  }
+  // If compilation succeeded and the code object is not Py_None
+  else if ( code_obj )
+  {
+    this->private_->action_context_->set_action_mode( PythonActionMode::BATCH_E );
+    PyObject* result = PyEval_EvalCode( code_obj.ptr(), this->private_->globals_.ptr(), NULL );
+    Py_XDECREF( result );
+    if ( PyErr_Occurred() != NULL )
+    {
+      PyErr_Print();
+    }
   }
 
   this->private_->command_buffer_.clear();

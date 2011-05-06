@@ -34,8 +34,9 @@
 #endif 
 
 // STL
-#include <string>
 #include <algorithm>
+#include <string>
+#include <typeinfo>
 
 // Boost includes
 #include <boost/shared_ptr.hpp>
@@ -67,6 +68,11 @@ public:
   // import a parameter from a string. The function returns true
   // if the import succeeded
   virtual bool import_from_string( const std::string& str ) = 0;
+
+  // INTERNAL_TYPE:
+  // Return a const reference to the type_info object representing
+  // the actual type of value currently stored by the Variant object.
+  virtual const type_info& internal_type() const = 0;
 };
 
 // VARIANT:
@@ -128,6 +134,14 @@ public:
   virtual bool import_from_string( const std::string& str )
   {
     return ImportFromString( str, this->value_ );
+  }
+
+  // INTERNAL_TYPE:
+  // Return a const reference to the type_info object representing
+  // the actual type of value currently stored by the Variant object.
+  virtual const type_info& internal_type() const
+  {
+    return typeid( T );
   }
 
 private:
@@ -245,6 +259,19 @@ public:
     T dummy;
     return this->get( dummy );
   }
+
+  // INTERNAL_TYPE:
+  // Return a const reference to the type_info object representing
+  // the actual type of value currently stored by the Variant object.
+  virtual const type_info& internal_type() const
+  {
+    if ( this->typed_value_ )
+    {
+      return this->typed_value_->internal_type();
+    }
+    return typeid( std::string );
+  }
+
   // -- functions for accessing data --
 public:
 

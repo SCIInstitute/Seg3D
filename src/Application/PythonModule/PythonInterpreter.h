@@ -77,6 +77,7 @@ public:
 
   void print_banner();
   void run_string( std::string command );
+  void run_script( std::string script );
   void run_file( std::string file_name );
   void interrupt();
   void start_terminal();

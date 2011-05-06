@@ -37,9 +37,27 @@
 
 // Core includes
 #include <Core/Action/ActionContext.h>
+#include <Core/Utils/EnumClass.h>
 
 namespace Seg3D
 {
+
+CORE_ENUM_CLASS
+(
+  PythonActionMode,
+
+  // Run actions in interactive mode: 
+  // actions that require resources not immediately available will fail.
+  INTERACTIVE_E,  
+
+  // Run actions in batch mode:
+  // actions will wait for resources to become available and retry.
+  BATCH_E,
+
+  // Run actions in replay mode:
+  // actions won't recorded into the provenance buffer.
+  REPLAY_E
+)
 
 class PythonActionContext;
 typedef boost::shared_ptr< PythonActionContext > PythonActionContextHandle;
@@ -56,29 +74,25 @@ public:
   virtual void report_error( const std::string& error );
   virtual void report_warning( const std::string& warning );
   virtual void report_message( const std::string& message );
+  virtual void report_result( const Core::ActionResultHandle& result );
   virtual void report_need_resource( const Core::NotifierHandle& resource );
-
-  // -- Report that action was done --
-public:
-  virtual void report_done();
-
-  // -- Source/Status information --
-public:
   virtual Core::ActionSource source() const;
 
-  // -- Signals --
 public:
-  // ACTION_MESSAGE_SIGNAL:
-  // This signal is given when a message is posted from the python action
-  // context class
-  typedef boost::signals2::signal< void( int, std::string ) > action_message_signal_type;
-  action_message_signal_type action_message_signal_;
+  Core::NotifierHandle get_resource_notifier();
+  void reset_context();
+  Core::ActionResultHandle get_result();
+  std::string get_error_message();
 
-  // ACTION_DONE_SIGNAL:
-  // This signal is raised when an action returns done
-  typedef boost::signals2::signal< void( Core::ActionStatus ) > action_done_signal_type;
-  action_done_signal_type action_done_signal_;
+private:
+  friend class PythonInterpreter;
+  void set_action_mode( PythonActionMode mode );
 
+private:
+  PythonActionMode action_mode_;
+  std::string error_msg_;
+  Core::NotifierHandle notifier_;
+  Core::ActionResultHandle result_;
 };
 
 } //end namespace Seg3D

@@ -38,6 +38,8 @@ SET(APPLICATION_PYTHONMODULE_SRCS
   PythonInterpreter.cc
   PythonActionContext.h
   PythonActionContext.cc
+  ToPythonConverters.h
+  ToPythonConverters.cc
 )
 
 CORE_ADD_LIBRARY(Application_PythonModule 

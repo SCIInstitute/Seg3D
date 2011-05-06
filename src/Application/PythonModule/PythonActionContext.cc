@@ -33,7 +33,9 @@
 namespace Seg3D
 {
 
-PythonActionContext::PythonActionContext()
+PythonActionContext::PythonActionContext() :
+  ActionContext(),
+  action_mode_( PythonActionMode::INTERACTIVE_E )
 {
 }
 
@@ -43,34 +45,69 @@ PythonActionContext::~PythonActionContext()
 
 void PythonActionContext::report_error( const std::string& error )
 {
-  this->action_message_signal_( Core::LogMessageType::ERROR_E, error );
+  this->error_msg_ = error;
 }
 
 void PythonActionContext::report_warning( const std::string& warning )
 {
-  this->action_message_signal_( Core::LogMessageType::WARNING_E, warning );
+  this->error_msg_ = warning;
 }
 
 void PythonActionContext::report_message( const std::string& message )
 {
-  this->action_message_signal_( Core::LogMessageType::MESSAGE_E, message );
 }
 
 void PythonActionContext::report_need_resource( const Core::NotifierHandle& notifier )
 {
-  std::string message = std::string( "'" ) + notifier->get_name() + std::string(
+  this->notifier_ = notifier_;
+  this->error_msg_ = std::string( "'" ) + notifier->get_name() + std::string(
       "' is currently unavailable" );
-  this->action_message_signal_( Core::LogMessageType::ERROR_E, message );
 }
 
-void PythonActionContext::report_done()
+void PythonActionContext::report_result( const Core::ActionResultHandle& result )
 {
-  this->action_done_signal_( this->status() );
+  this->result_ = result;
 }
 
 Core::ActionSource PythonActionContext::source() const
 {
-  return Core::ActionSource::COMMANDLINE_E;
+  switch ( this->action_mode_ )
+  {
+  case PythonActionMode::BATCH_E:
+    return Core::ActionSource::SCRIPT_E;
+  case PythonActionMode::REPLAY_E:
+    return Core::ActionSource::PROVENANCE_E;
+  default:
+    return Core::ActionSource::COMMANDLINE_E;
+  }
 }
+
+void PythonActionContext::set_action_mode( PythonActionMode mode )
+{
+  this->action_mode_ = mode;
+}
+
+Core::NotifierHandle PythonActionContext::get_resource_notifier()
+{
+  return this->notifier_;
+}
+
+Core::ActionResultHandle PythonActionContext::get_result()
+{
+  return this->result_;
+}
+
+void PythonActionContext::reset_context()
+{
+  this->notifier_.reset();
+  this->result_.reset();
+  this->error_msg_.clear();
+}
+
+std::string PythonActionContext::get_error_message()
+{
+  return this->error_msg_;
+}
+
 
 } //end namespace Seg3D

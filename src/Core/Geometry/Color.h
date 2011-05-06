@@ -43,19 +43,25 @@ class Color
 
   // -- constructor/destructor --
 public:
-  Color() :
-    r_( 0.0 ), g_( 0.0 ), b_( 0.0 )
+  Color()
   {
+    this->data_[ 0 ] = 0.0f;
+    this->data_[ 1 ] = 0.0f;
+    this->data_[ 2 ] = 0.0f;
   }
 
-  Color( float r, float g, float b ) :
-    r_( r ), g_( g ), b_( b )
+  Color( float r, float g, float b )
   {
+    this->data_[ 0 ] = r;
+    this->data_[ 1 ] = g;
+    this->data_[ 2 ] = b;
   }
 
-  Color( const Color& color ) :
-    r_( color.r_ ), g_( color.g_ ), b_( color.b_ )
+  Color( const Color& color )
   {
+    this->data_[ 0 ] = color.data_[ 0 ];
+    this->data_[ 1 ] = color.data_[ 1 ];
+    this->data_[ 2 ] = color.data_[ 2 ];
   }
 
   ~Color()
@@ -64,72 +70,84 @@ public:
 
   Color& operator=( const Color& color )
   {
-    r_ = color.r_;
-    g_ = color.g_;
-    b_ = color.b_;
+    this->data_[ 0 ] = color.data_[ 0 ];
+    this->data_[ 1 ] = color.data_[ 1 ];
+    this->data_[ 2 ] = color.data_[ 2 ];
 
     return ( *this );
   }
 
   inline Color operator*( float alpha ) const
   {
-    return ( Color( r_ * alpha, g_ * alpha, b_ * alpha ) );
+    return Color( this->data_[ 0 ] * alpha, this->data_[ 1 ] * alpha, this->data_[ 2 ] * alpha );
   }
 
   Color operator+( const Color& rhs ) const
   {
-    return Color( this->r_ + rhs.r_, this->g_ + rhs.g_, this->b_ + rhs.b_ );
+    return Color( this->data_[ 0 ] + rhs[ 0 ], this->data_[ 1 ] + rhs[ 1 ], this->data_[ 2 ] + rhs[ 2 ] );
   }
 
   const Color& operator+=( const Color& rhs )
   {
-    this->r_ += rhs.r_;
-    this->g_ += rhs.g_;
-    this->b_ += rhs.b_;
+    this->data_[ 0 ] += rhs.data_[ 0 ];
+    this->data_[ 1 ] += rhs.data_[ 1 ];
+    this->data_[ 2 ] += rhs.data_[ 2 ];
     return *this;
   }
 
   bool operator==( const Color& color ) const
   {
-    return ( ( r_ == color.r_ ) && ( g_ == color.g_ ) && ( b_ == color.b_ ) );
+    return ( ( this->data_[ 0 ] == color.data_[ 0 ] ) && 
+      ( this->data_[ 1 ] == color.data_[ 1 ] ) && 
+      ( this->data_[ 2 ] == color.data_[ 2 ] ) );
   }
 
   bool operator!=( const Color& color ) const
   {
-    return ( ( r_ != color.r_ ) || ( g_ != color.g_ ) || ( b_ != color.b_ ) );
+    return ( ( this->data_[ 0 ] != color.data_[ 0 ] ) || 
+      ( this->data_[ 1 ] != color.data_[ 1 ] ) || 
+      ( this->data_[ 2 ] != color.data_[ 2 ] ) );
   }
 
-  inline float r() const
+  inline const float r() const
   {
-    return r_;
+    return this->data_[ 0 ];
   }
-  inline float g() const
+  inline const float g() const
   {
-    return g_;
+    return this->data_[ 1 ];
   }
-  inline float b() const
+  inline const float b() const
   {
-    return b_;
+    return this->data_[ 2 ];
   }
 
   inline void r( const float r )
   {
-    r_ = r;
+    this->data_[ 0 ] = r;
   }
   inline void g( const float g )
   {
-    g_ = g;
+    this->data_[ 1 ] = g;
   }
   inline void b( const float b )
   {
-    b_ = b;
+    this->data_[ 2 ] = b;
+  }
+
+  const float operator[]( size_t idx ) const
+  {
+    return this->data_[ idx ];
+  }
+
+  float& operator[]( size_t idx )
+  {
+    return this->data_[ idx ];
   }
 
 private:
   // red, green, blue
-  float r_;
-  float g_;
-  float b_;
+  float data_[ 3 ];
 };
 
 Color operator*( float alpha, Color color );
