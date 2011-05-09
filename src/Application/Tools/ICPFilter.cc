@@ -60,7 +60,7 @@ ICPFilter::ICPFilter( const std::string& toolid ) :
   //this->add_dependent_layer_input( this->mask_state_, Core::VolumeType::MASK_E, true );
   this->add_dependent_layer_input( this->mask_state_, Core::VolumeType::MASK_E, true, true );
 
-  this->add_state( "iterations", this->iterations_state_, 5, 1, 100, 1 );
+  this->add_state( "iterations", this->iterations_state_, 5, 1, 1000, 1 );
 
   std::vector< std::string > empty_option;
   this->add_state( "target_layers", this->target_layers_state_, empty_option, "" );
@@ -73,7 +73,13 @@ ICPFilter::ICPFilter( const std::string& toolid ) :
   this->add_connection( this->target_layer_state_->value_changed_signal_.connect(
     boost::bind( &ICPFilter::handle_target_layer_changed, this, _2 ) ) );
 
+  this->add_connection( this->iterations_state_->value_changed_signal_.connect(
+    boost::bind( &ICPFilter::handle_iteration_changed, this ) ) );
+
   this->add_state( "transformation_matrix", this->transform_matrix_, std::vector<double>());
+
+  this->add_connection( LayerManager::Instance()->layers_changed_signal_.connect(
+    boost::bind( &ICPFilter::handle_layers_changed, this ) ) );
 
 }
   
@@ -88,15 +94,19 @@ void ICPFilter::handle_target_layer_changed( std::string layer_id )
 }
 
 
-
-void ICPFilter::handle_mask_layer_changed( std::string layer_id )
+void ICPFilter::handle_iteration_changed(  )
 {
-  LayerHandle layer = LayerManager::Instance()->get_layer_by_id( layer_id );
+  registration_ready_state_->set( false );
+}
+
+void ICPFilter::handle_layers_changed()
+{
+  std::string mask_layer_id = this->mask_state_->get();
+  
+  LayerHandle layer = LayerManager::Instance()->get_layer_by_id( mask_layer_id );
 
   if ( layer )
   {
-    registration_ready_state_->set( false );
-
     LayerGroupHandle group = layer->get_layer_group();
     std::string group_id = group->get_group_id();
 
@@ -138,6 +148,54 @@ void ICPFilter::handle_mask_layer_changed( std::string layer_id )
 
 }
 
+void ICPFilter::handle_mask_layer_changed( std::string layer_id )
+{
+  LayerHandle layer = LayerManager::Instance()->get_layer_by_id( layer_id );
+
+  if ( layer )
+  {
+    registration_ready_state_->set( false );
+
+    LayerGroupHandle group = layer->get_layer_group();
+    std::string group_id = group->get_group_id();
+
+    Core::VolumeType mask_type = layer->get_type();
+
+    std::vector< LayerIDNamePair > layer_names;
+    std::vector< std::string > selected_layers;
+    if ( group_id != "" && group_id != Tool::NONE_OPTION_C )
+    {
+      group->get_layer_names( layer_names, mask_type );
+
+      LayerHandle target_layer = LayerManager::Instance()->get_layer_by_id( 
+        this->target_layer_state_->get());
+
+      std::string target_layer_name = target_layer->get_layer_name();
+      std::vector<LayerIDNamePair>::iterator it = layer_names.begin();
+
+      for ( ; it!=layer_names.end(); ++it )
+      {
+        if ( target_layer_name.compare( (*it).second ) == 0 ) 
+        {
+          break;
+        }
+      }
+
+      if ( it!= layer_names.end() )
+      {
+        layer_names.erase( it );
+      }
+    }
+
+    this->target_layers_state_->set_option_list( layer_names );
+    if ( selected_layers.size() > 0 )
+    {
+      this->target_layers_state_->set( selected_layers );
+    }
+  }
+
+}
+
 void ICPFilter::execute( Core::ActionContextHandle context )
 {
   // NOTE: Need to lock state engine as this function is run from the interface thread
@@ -147,7 +205,6 @@ void ICPFilter::execute( Core::ActionContextHandle context )
     this->target_layer_state_->get(),
     this->mask_state_->get(),
     this->iterations_state_->get(),
-    //this->replace_state_->get(),
     this->toolid() ); 
 
 }
@@ -160,7 +217,6 @@ void ICPFilter::apply( Core::ActionContextHandle context )
   ActionICPTransformFilter::Dispatch( context,
     this->target_layer_state_->get(),
     this->target_layers_state_->get(),
-    //this->replace_state_->get(),
     this->toolid()
     );    
 }

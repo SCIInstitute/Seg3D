@@ -84,6 +84,11 @@ public:
   virtual void apply( Core::ActionContextHandle context );
   void handle_mask_layer_changed( std::string layer_id );
   void handle_target_layer_changed( std::string layer_id );
+  void handle_iteration_changed(  );
+  void handle_layers_changed();
+
+private:
+  //std::string mask_layer_id_;
 };
 
 } // end namespace

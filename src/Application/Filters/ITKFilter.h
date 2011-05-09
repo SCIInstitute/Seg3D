@@ -470,12 +470,21 @@ protected:
 
   // OBSERVE_ITK_ITERATIONS:
   // Forward progess on iterations to a user specified function
+  //template< class T >
+  //void observe_itk_iterations( T filter_pointer, boost::function< void( itk::Object* ) > iteration_fcn )
+  //{
+  //  this->observe_itk_iterations_internal( itk::ProcessObject::Pointer( filter_pointer ),
+  //    iteration_fcn );
+  //}
+
+
   template< class T >
   void observe_itk_iterations( T filter_pointer, boost::function< void( itk::Object* ) > iteration_fcn )
   {
-    this->observe_itk_iterations_internal( itk::ProcessObject::Pointer( filter_pointer ),
+    this->observe_itk_iterations_internal( itk::Object::Pointer( filter_pointer ),
       iteration_fcn );
   }
+
 
   // LIMIT_NUMBER_OF_ITK_THREADS:
   // Limit the number of itk threads so that at least one thread can be used to allow for
@@ -502,7 +511,10 @@ private:
     const LayerHandle& layer, float progress_start, float progress_amount );
 
   // Internal function for setting up itk iteration forwarding
-  void observe_itk_iterations_internal( itk::ProcessObject::Pointer filter, 
+  //void observe_itk_iterations_internal( itk::ProcessObject::Pointer filter, 
+  //  boost::function< void( itk::Object* ) > iteration_fcn );
+
+  void observe_itk_iterations_internal( itk::Object::Pointer filter, 
     boost::function< void( itk::Object* ) > iteration_fcn );
     
   // Internal function for setting up abort handling

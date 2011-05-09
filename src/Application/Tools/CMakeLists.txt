@@ -117,6 +117,8 @@ SET(APPLICATION_TOOLS_SRCS
   ClipboardTool.cc
   ICPFilter.h
   ICPFilter.cc
+  #SpeedlineTool.h
+  #SpeedlineTool.cc
   )
 
 SET(APPLICATION_TOOLS_NOREGISTER_SRCS
@@ -145,6 +147,8 @@ SET(APPLICATION_TOOLS_ACTIONS_SRCS
   Actions/ActionSetMeasurementPoint.cc
   Actions/ActionSetMeasurementVisible.h
   Actions/ActionSetMeasurementVisible.cc
+  #Actions/ActionSpeedline.h
+  #Actions/ActionSpeedline.cc
   )
 
 CORE_ADD_LIBRARY(Application_Tools 

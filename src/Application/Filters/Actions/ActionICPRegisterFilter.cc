@@ -30,10 +30,15 @@
   #include <itkTranslationTransform.h>
   #include <itkEuler3DTransform.h>
   #include <itkRigid3DTransform.h>
+  #include <itkVersorTransform.h>
   #include <itkEuclideanDistancePointMetric.h>
   #include <itkLevenbergMarquardtOptimizer.h>
   #include <itkPointSetToPointSetRegistrationMethod.h>
+  #include <itkDanielssonDistanceMapImageFilter.h>
+  #include <itkPointSetToImageFilter.h>
   #include <itkResampleImageFilter.h>
+  #include <itkCommand.h>
+
 
   // Core includes
   #include <Core/Math/MathFunctions.h>
@@ -153,49 +158,151 @@
       MaskLayerHandle input_moving_layer = 
         boost::dynamic_pointer_cast<MaskLayer>( this->mask_layer_ );
 
-      //Estimate the quality factor from the fraction from 1/0
+      //Estimate the quality factor from the fraction from bounding box
       /*double target_layer_size  =
          input_fixed_layer->get_mask_volume()->get_mask_data_block()->get_size();
 
-      double voxel_count = 0;
+      size_t target_bounding_box_size;
       {
         Core::MaskDataBlock::shared_lock_type lock( 
           input_fixed_layer->get_mask_volume()->get_mask_data_block()->get_mutex() );
 
-        
-        for( size_t j = 0; 
-          j < input_fixed_layer->get_mask_volume()->get_mask_data_block()->get_size(); ++j )
+        size_t min_x = 0; 
+        size_t max_x = 0;
+        size_t min_y = 0; 
+        size_t max_y = 0;
+        size_t min_z = 0; 
+        size_t max_z = 0;
+
+        size_t nx = 
+          input_fixed_layer->get_mask_volume()->get_mask_data_block()->get_nx();
+
+        size_t ny = 
+          input_fixed_layer->get_mask_volume()->get_mask_data_block()->get_ny();
+
+        size_t nz = 
+          input_fixed_layer->get_mask_volume()->get_mask_data_block()->get_nz();
+
+        for( size_t x = 0; x < nx; ++x )
         {
-          if( input_fixed_layer->get_mask_volume()->get_mask_data_block()->get_mask_at( j ) )
+          for ( size_t y = 0; y < ny; ++y )
           {
-            voxel_count++;
+            for ( size_t z = 0; z < nz; ++z )
+            {
+              if( input_fixed_layer->get_mask_volume()->get_mask_data_block()->get_mask_at( x, y, z ) )
+              {
+                if ( x < min_x )
+                {
+                  min_x = x;
+                }
+
+                if ( y < min_y )
+                {
+                  min_y = y;
+                }
+
+                if ( z < min_z )
+                {
+                  min_z = z;
+                }
+
+                if ( x > max_x )
+                {
+                  max_x = x;
+                }
+
+                if ( y > max_y )
+                {
+                  max_y = y;
+                }
+
+                if ( z > max_z )
+                {
+                  max_z = z;
+                }
+              }
+            }
           }
         }
+
+        target_bounding_box_size =
+          ( max_x - min_x ) * ( max_y - min_y ) * ( max_z - min_z );
       }
 
-      double fraction_target_layer = voxel_count / target_layer_size;
+      double fraction_target_layer = 
+        target_bounding_box_size / target_layer_size;
 
-
-      double moving_layer_size  =
-        input_moving_layer->get_mask_volume()->get_mask_data_block()->get_size();
-
-      voxel_count = 0;
+      size_t moving_bounding_box_size;
       {
         Core::MaskDataBlock::shared_lock_type lock( 
           input_moving_layer->get_mask_volume()->get_mask_data_block()->get_mutex() );
 
+        size_t min_x = 0; 
+        size_t max_x = 0;
+        size_t min_y = 0; 
+        size_t max_y = 0;
+        size_t min_z = 0; 
+        size_t max_z = 0;
 
-        for( size_t j = 0; 
-          j < input_moving_layer->get_mask_volume()->get_mask_data_block()->get_size(); ++j )
+        size_t nx = 
+          input_moving_layer->get_mask_volume()->get_mask_data_block()->get_nx();
+
+        size_t ny = 
+          input_moving_layer->get_mask_volume()->get_mask_data_block()->get_ny();
+
+        size_t nz = 
+          input_moving_layer->get_mask_volume()->get_mask_data_block()->get_nz();
+
+        for( size_t x = 0; x < nx; ++x )
         {
-          if( input_moving_layer->get_mask_volume()->get_mask_data_block()->get_mask_at( j ) )
+          for ( size_t y = 0; y < ny; ++y )
           {
-            voxel_count++;
+            for ( size_t z = 0; z < nz; ++z )
+            {
+              if( input_moving_layer->get_mask_volume()->get_mask_data_block()->get_mask_at( x, y, z ) )
+              {
+                if ( x < min_x )
+                {
+                  min_x = x;
+                }
+
+                if ( y < min_y )
+                {
+                  min_y = y;
+                }
+
+                if ( z < min_z )
+                {
+                  min_z = z;
+                }
+
+                if ( x > max_x )
+                {
+                  max_x = x;
+                }
+
+                if ( y > max_y )
+                {
+                  max_y = y;
+                }
+
+                if ( z > max_z )
+                {
+                  max_z = z;
+                }
+              }
+            }
           }
         }
+
+        moving_bounding_box_size =
+          ( max_x - min_x ) * ( max_y - min_y ) * ( max_z - min_z );
       }
-      
-      double fraction_moving_layer = voxel_count / moving_layer_size;
+
+      double moving_layer_size  =
+        input_moving_layer->get_mask_volume()->get_mask_data_block()->get_size();
+
+      double fraction_moving_layer = moving_bounding_box_size / moving_layer_size;
 
       double fraction = (fraction_target_layer > fraction_moving_layer) ? fraction_target_layer : fraction_moving_layer;
 
@@ -217,104 +324,142 @@
       {
         quality_factor = 0.125;
       }*/
-
-
-      //Core::IsosurfaceHandle fixed_iso = 
-      //  input_fixed_layer->get_isosurface();
-
-      double quality_factor = 0.125;
       
+      double quality_factor = 1.0;
       Core::IsosurfaceHandle fixed_iso;
-      fixed_iso.reset( new Core::Isosurface( input_fixed_layer->get_mask_volume() ) );
-      fixed_iso->compute( quality_factor, false, boost::bind( &ICPFilterAlgo::check_abort, this ) );
-
-
-      //Core::IsosurfaceHandle moving_iso = 
-      //  input_moving_layer->get_isosurface();
-
       Core::IsosurfaceHandle moving_iso;
-      moving_iso.reset( new Core::Isosurface( input_moving_layer->get_mask_volume() ) );
-      moving_iso->compute( quality_factor, false, boost::bind( &ICPFilterAlgo::check_abort, this ) );
+      std::vector< Core::PointF > fixed_iso_points_set;
+      std::vector< Core::PointF > moving_iso_points_set;
+
+      bool sample_ready = false;
+
+      while ( !sample_ready )
+      {
+        fixed_iso.reset( new Core::Isosurface( input_fixed_layer->get_mask_volume() ) );
+        fixed_iso->compute( quality_factor, false, boost::bind( &ICPFilterAlgo::check_abort, this ) );
+
+        moving_iso.reset( new Core::Isosurface( input_moving_layer->get_mask_volume() ) );
+        moving_iso->compute( quality_factor, false, boost::bind( &ICPFilterAlgo::check_abort, this ) );
 
 
-      std::vector< Core::PointF > fixed_iso_points_set = 
-        fixed_iso->get_points();
+        fixed_iso_points_set = fixed_iso->get_points();
+        moving_iso_points_set = moving_iso->get_points();
 
-      std::vector< Core::PointF > moving_iso_points_set = 
-        moving_iso->get_points();
+        unsigned long fixed_point_set_size = fixed_iso_points_set.size();
+        unsigned long moving_point_set_size = moving_iso_points_set.size();
+
+        if ( fixed_point_set_size >= 2000 && moving_point_set_size >= 2000 )
+        {
+          if ( quality_factor == 0.125 )
+          {
+            sample_ready = true;
+            break;
+          }
+          else
+          {
+            quality_factor *= 0.5;
+          }
+        }
+        else
+        {
+          sample_ready = true;
+        }
+
+        //sample_ready = true;
+      }
+
+
+      
       //-----------------------------------------------------------
       // Set up  the Metric
       //-----------------------------------------------------------
-      const unsigned int Dimension = 3;
-      typedef itk::PointSet< float, Dimension >   PointSetType;
+      const unsigned int DIMENSION_C = 3;
+      typedef itk::PointSet< float, DIMENSION_C >  point_set_type;
 
-      PointSetType::Pointer fixedPointSet  = PointSetType::New();
-      PointSetType::Pointer movingPointSet = PointSetType::New();
+      point_set_type::Pointer fixed_point_set  = point_set_type::New();
+      point_set_type::Pointer moving_point_set = point_set_type::New();
 
-      typedef PointSetType::PointType     PointType;
-      typedef PointSetType::PointsContainer  PointsContainer;
+      typedef point_set_type::PointType     point_type;
+      typedef point_set_type::PointsContainer  points_container_type;
 
-      PointsContainer::Pointer fixedPointContainer  = PointsContainer::New();
-      PointsContainer::Pointer movingPointContainer = PointsContainer::New();
+      points_container_type::Pointer fixed_point_container  = points_container_type::New();
+      points_container_type::Pointer moving_point_container = points_container_type::New();
 
 
-      unsigned int pointId = 0;
+      unsigned int point_id = 0;
 
-      std::vector<Core::PointF>::const_iterator cii;
-      for(cii=fixed_iso_points_set.begin(); 
-        cii!=fixed_iso_points_set.end(); cii++)
+      std::vector< Core::PointF >::const_iterator cii;
+      for( cii=fixed_iso_points_set.begin(); 
+        cii!=fixed_iso_points_set.end(); cii++ )
       {
-        std::cout << *cii << std::endl;
-        PointType fixedPoint;
-        fixedPoint[0] = (*cii).x();
-        fixedPoint[1] = (*cii).y();
-        fixedPoint[2] = (*cii).z();
+        point_type fixed_point;
+        fixed_point[0] = (*cii).x();
+        fixed_point[1] = (*cii).y();
+        fixed_point[2] = (*cii).z();
 
-        fixedPointContainer->InsertElement( pointId++, fixedPoint );
+        fixed_point_container->InsertElement( point_id++, fixed_point );
       }
 
-      fixedPointSet->SetPoints( fixedPointContainer );
-      unsigned long fixed_points_num = fixedPointSet->GetNumberOfPoints(); 
+      fixed_point_set->SetPoints( fixed_point_container );
+      unsigned long fixed_points_num = fixed_point_set->GetNumberOfPoints(); 
       CORE_LOG_MESSAGE( std::string("Number of fixed Points = ") + 
         boost::lexical_cast<std::string>(fixed_points_num) );
-      //std::cout << "Number of fixed Points = "
-      //  << fixedPointSet->GetNumberOfPoints() << std::endl;
 
-      pointId = 0;
+      point_id = 0;
 
-      for(cii=moving_iso_points_set.begin(); 
-        cii!=moving_iso_points_set.end(); cii++)
+      for( cii=moving_iso_points_set.begin(); cii!=moving_iso_points_set.end(); cii++ )
       {
-        std::cout << *cii << std::endl;
+        point_type moving_point;
+        moving_point[0] = (*cii).x();
+        moving_point[1] = (*cii).y();
+        moving_point[2] = (*cii).z();
 
-        PointType movingPoint;
-        movingPoint[0] = (*cii).x();
-        movingPoint[1] = (*cii).y();
-        movingPoint[2] = (*cii).z();
-
-        movingPointContainer->InsertElement( pointId++, movingPoint );
+        moving_point_container->InsertElement( point_id++, moving_point );
       }
 
-      movingPointSet->SetPoints( movingPointContainer );
-      unsigned long moving_points_num =
-        movingPointSet->GetNumberOfPoints(); 
+      moving_point_set->SetPoints( moving_point_container );
+      unsigned long moving_points_num = moving_point_set->GetNumberOfPoints(); 
       CORE_LOG_MESSAGE( std::string("Number of moving Points = ") + 
-        boost::lexical_cast<std::string>(moving_points_num));
-      //std::cout << "Number of moving Points = "
-      //  << movingPointSet->GetNumberOfPoints() << std::endl;
+        boost::lexical_cast< std::string >( moving_points_num ) );
 
+      typedef itk::EuclideanDistancePointMetric< point_set_type, point_set_type > metric_type;
+      typedef metric_type::TransformType                transform_base_type;
+      typedef transform_base_type::ParametersType       parameters_type;
+      typedef transform_base_type::JacobianType         jacobian_type;
 
-      typedef itk::EuclideanDistancePointMetric<
-        PointSetType,
-        PointSetType>
-        MetricType;
+      metric_type::Pointer  metric = metric_type::New();
 
-      typedef MetricType::TransformType                 TransformBaseType;
-      typedef TransformBaseType::ParametersType         ParametersType;
-      typedef TransformBaseType::JacobianType           JacobianType;
+      //
+      // First map the Fixed Points into a binary image.
+      // This is needed because the DanielssonDistance
+      // filter expects an image as input.
+      //
+      //-------------------------------------------------
+      //typedef itk::Image< unsigned char, DIMENSION_C > binary_image_type;
+      //typedef itk::PointSetToImageFilter<
+      //  point_set_type,
+      //  binary_image_type > points_to_image_filter_type;
+      //points_to_image_filter_type::Pointer points_to_image_filter = 
+      //  points_to_image_filter_type::New();
+      //points_to_image_filter->SetInput( fixed_point_set );
 
-      MetricType::Pointer  metric = MetricType::New();
+      //binary_image_type::SpacingType spacing;
+      //spacing.Fill( 1.0 );
+      //binary_image_type::PointType origin;
+      //origin.Fill( 0.0 );
+      //points_to_image_filter->SetSpacing( spacing );
+      //points_to_image_filter->SetOrigin( origin );
+      //points_to_image_filter->Update();
+      //binary_image_type::Pointer binary_image = points_to_image_filter->GetOutput();
+      //typedef itk::Image< unsigned short, DIMENSION_C > distance_image_type;
+      //typedef itk::DanielssonDistanceMapImageFilter<
+      //  binary_image_type,
+      //  distance_image_type > distance_filter_type;
+      //distance_filter_type::Pointer distance_filter = distance_filter_type::New();
 
+      //distance_filter->SetInput( binary_image );
+      //distance_filter->Update();
+      //metric->SetDistanceMap( distance_filter->GetOutput() );
 
       //-----------------------------------------------------------
       // Set up a Transform
@@ -322,53 +467,52 @@
 
       //typedef itk::TranslationTransform< double, Dimension >      TransformType;
       //typedef Seg3D::Rigid3DTransformSurrogate<double>  TransformType;
-      typedef itk::Euler3DTransform< double > TransformType;
+      typedef itk::Euler3DTransform< double > transform_type;
+      //typedef itk::VersorTransform< double > TransformType;
 
-      TransformType::Pointer transform = TransformType::New();
-
+      transform_type::Pointer transform = transform_type::New();
 
       // Optimizer Type
-      typedef itk::LevenbergMarquardtOptimizer OptimizerType;
+      typedef itk::LevenbergMarquardtOptimizer optimizer_type;
 
-      OptimizerType::Pointer      optimizer     = OptimizerType::New();
+      optimizer_type::Pointer      optimizer     = optimizer_type::New();
       optimizer->SetUseCostFunctionGradient(false);
 
 
       // Registration Method
       typedef itk::PointSetToPointSetRegistrationMethod<
-        PointSetType,
-        PointSetType >
-        RegistrationType;
+        point_set_type,
+        point_set_type >
+        registration_type;
 
 
-      RegistrationType::Pointer   registration  = RegistrationType::New();
+      registration_type::Pointer   registration  = registration_type::New();
 
       this->forward_abort_to_filter( registration, this->dst_layer_ );
-      this->observe_itk_progress( registration, this->dst_layer_ );
 
       // Scale the translation components of the Transform in the Optimizer
-      OptimizerType::ScalesType scales( transform->GetNumberOfParameters() );
-      //scales.Fill( 0.01 );
-      const double translationScale = 500.0; // dynamic range of translations
-      const double rotationScale = 1.0; // dynamic range of rotations
-      scales[0] = 1.0 / rotationScale;
-      scales[1] = 1.0 / rotationScale;
-      scales[2] = 1.0 / rotationScale;
-      scales[3] = 1.0 / translationScale;
-      scales[4] = 1.0 / translationScale;
-      scales[5] = 1.0 / translationScale;
+      optimizer_type::ScalesType scales( transform->GetNumberOfParameters() );
+      
+      const double TRANSLATION_SCALE_C = 1000.0; // dynamic range of translations
+      const double ROTATION_SCALE_C = 1.0; // dynamic range of rotations
+      scales[0] = 1.0 / ROTATION_SCALE_C;
+      scales[1] = 1.0 / ROTATION_SCALE_C;
+      scales[2] = 1.0 / ROTATION_SCALE_C;
+      scales[3] = 1.0 / TRANSLATION_SCALE_C;
+      scales[4] = 1.0 / TRANSLATION_SCALE_C;
+      scales[5] = 1.0 / TRANSLATION_SCALE_C;
 
-      unsigned long   numberOfIterations = this->iterations_;
-      double          gradientTolerance  =  1e-5;    // convergence criterion
-      double          valueTolerance     =  1e-5;    // convergence criterion
-      double          epsilonFunction    =  1e-6;   // convergence criterion
+      unsigned long   number_of_iterations = this->iterations_;
+      double          gradient_tolerance  =  1e-5;    // convergence criterion
+      double          value_tolerance     =  1e-5;    // convergence criterion
+      double          epsilon_function    =  1e-6;   // convergence criterion
 
 
       optimizer->SetScales( scales );
-      optimizer->SetNumberOfIterations( numberOfIterations );
-      optimizer->SetValueTolerance( valueTolerance );
-      optimizer->SetGradientTolerance( gradientTolerance );
-      optimizer->SetEpsilonFunction( epsilonFunction );
+      optimizer->SetNumberOfIterations( number_of_iterations );
+      optimizer->SetValueTolerance( value_tolerance );
+      optimizer->SetGradientTolerance( gradient_tolerance );
+      optimizer->SetEpsilonFunction( epsilon_function );
 
       // Start from an Identity transform (in a normal case, the user
       // can probably provide a better guess than the identity...
@@ -382,13 +526,26 @@
       registration->SetMetric(        metric        );
       registration->SetOptimizer(     optimizer     );
       registration->SetTransform(     transform     );
-      registration->SetFixedPointSet( fixedPointSet );
-      registration->SetMovingPointSet(   movingPointSet   );
+      registration->SetFixedPointSet( fixed_point_set );
+      registration->SetMovingPointSet( moving_point_set );
 
       // Retrieve the image as an itk image from the underlying data structure
       // NOTE: This only does wrapping and does not regenerate the data.
       
-          
+      this->forward_abort_to_filter( registration, this->dst_layer_ );
+
+      double progress_unit =  1.0 / number_of_iterations ;
+      this->observe_itk_iterations( optimizer, boost::bind( 
+        &ICPFilterAlgo::update_iteration, this, _1, progress_unit ) );
+
+      this->progress_ = 0.0;
+      //CommandIterationUpdate::Pointer observer = CommandIterationUpdate::New();
+
+      //observer->SetProgressStart( 0.0 );
+      //observer->SetProgressUnit( progress_unit );
+      //observer->SetLayer(dst_layer_);
+      //optimizer->AddObserver( itk::IterationEvent(), observer );
+    
 
       // Ensure we will have some threads left for doing something else
       //this->limit_number_of_itk_threads( registration );
@@ -416,24 +573,26 @@
       // This one is set when the abort button is pressed and an abort is sent to ITK.
       if ( this->check_abort() ) return;
 
-      //std::cout << "Solution = " << transform->GetParameters() << std::endl;
-
-      RegistrationType::ParametersType finalParameters = 
+      registration_type::ParametersType final_parameters = 
         registration->GetLastTransformParameters();
 
-      std::string solution = "[" + boost::lexical_cast<std::string>(finalParameters[0]) +
-        "," + boost::lexical_cast<std::string>(finalParameters[1]) +"," + boost::lexical_cast<std::string>(finalParameters[2]) + "]"; 
+      std::string solution = "[" + boost::lexical_cast<std::string>(final_parameters[0]) +
+        "," + boost::lexical_cast<std::string>(final_parameters[1]) +"," +
+        boost::lexical_cast<std::string>(final_parameters[2]) + "," + 
+        boost::lexical_cast<std::string>(final_parameters[3]) + "," +
+        boost::lexical_cast<std::string>(final_parameters[4]) + "," +
+        boost::lexical_cast<std::string>(final_parameters[5]) + "]"; 
       CORE_LOG_MESSAGE( std::string("Solution = ") + 
         solution );
 
       //convert Euler transformation parameters into 4x4 matrix
-      std::vector<double> matrix_entries;
+      std::vector< double > matrix_entries;
       //matrix_entries.resize( 16 );
       //std::fill( matrix_entries.begin(), matrix_entries.end(), 0 );
 
-      for ( unsigned int i = 0; i < finalParameters.size(); ++i )
+      for ( unsigned int i = 0; i < final_parameters.size(); ++i )
       {
-        matrix_entries.push_back( finalParameters[i] );
+        matrix_entries.push_back( final_parameters[i] );
       }
 
       //itk::Matrix matrix = transform->GetMatrix();
@@ -449,24 +608,24 @@
 
 
 
-      TransformType::Pointer finalTransform = TransformType::New();
-      finalTransform->SetParameters( finalParameters );
+      transform_type::Pointer final_transform = transform_type::New();
+      final_transform->SetParameters( final_parameters );
 
       typedef itk:: LinearInterpolateImageFunction<
         TYPED_IMAGE_TYPE,
-        double          >    InterpolatorType;
+        double          >    interpolator_type;
 
       typedef itk::ResampleImageFilter<
         TYPED_IMAGE_TYPE,
-        TYPED_IMAGE_TYPE > ResampleFilterType;
+        TYPED_IMAGE_TYPE > resample_filter_type;
 
-      typename ResampleFilterType::Pointer resampler = ResampleFilterType::New();
+      resample_filter_type::Pointer resampler = resample_filter_type::New();
       typename Core::ITKImageDataT<VALUE_TYPE>::Handle moving_image; 
       this->get_itk_image_from_layer<VALUE_TYPE>( this->mask_layer_, moving_image );
       resampler->SetInput( moving_image->get_image() );
       //resampler->SetTransform( registration->GetOutput()->Get() );
-      finalTransform->GetInverse(finalTransform);
-      resampler->SetTransform( finalTransform );
+      final_transform->GetInverse( final_transform );
+      resampler->SetTransform( final_transform );
 
       typename Core::ITKImageDataT<VALUE_TYPE>::Handle fixed_image;
       this->get_itk_image_from_layer<VALUE_TYPE>( this->src_layer_, fixed_image );
@@ -477,8 +636,8 @@
       resampler->SetDefaultPixelValue( 0 );
 
       resampler->Update();
-      //this->dispatch_insert_mask_volume_into_layer( this->dst_layer_, mask_volume );
-      if (resampler->GetOutput() != NULL )
+
+      if ( resampler->GetOutput() != NULL )
       {
         this->insert_itk_image_into_layer( this->dst_layer_, resampler->GetOutput() );  
         ICPFilterHandle icp_tool = 
@@ -489,18 +648,6 @@
 
         Core::Application::PostEvent( boost::bind( &Core::StateDoubleVector::set,
           icp_tool->transform_matrix_, matrix_entries, Core::ActionSource::NONE_E ) );
-
-        //const Core::ITKImageDataT<VALUE_TYPE>::image_type::SpacingType& target_image_spacing = 
-        //  fixed_image->get_image()->GetSpacing();
-
-        //std::vector<double> spacing;
-        //spacing[0] = target_image_spacing[0];
-        //spacing[1] = target_image_spacing[1];
-        //spacing[2] = target_image_spacing[2];
-
-        //Core::Application::PostEvent( boost::bind( &Core::StateDoubleVector::set,
-        //  icp_tool->spacing_, spacing, Core::ActionSource::NONE_E ) );
-
       }
 
     }
@@ -522,6 +669,92 @@
       //return "AND"; 
       return "ICPRegister"; 
     }
+
+  private:
+    double progress_;
+
+    // UPDATE_ITERATION:
+    // At regular intervals update the results to the user
+    void update_iteration( itk::Object* itk_object, double progress_unit )
+    {
+      progress_ += progress_unit;
+      this->dst_layer_->update_progress_signal_( progress_ );
+
+      //typedef itk::LevenbergMarquardtOptimizer OptimizerType;
+      //typedef   const OptimizerType *              OptimizerPointer;
+
+      //OptimizerPointer optimizer =
+      //  dynamic_cast< OptimizerPointer >( itk_object );
+
+      //CORE_LOG_MESSAGE( std::string("value = ") + 
+      //  boost::lexical_cast<std::string>( optimizer->GetValue() ));
+
+      //CORE_LOG_MESSAGE( std::string("params = ") + 
+      //  boost::lexical_cast<std::string>( optimizer->GetCurrentPosition() ));
+    }
+
+    class CommandIterationUpdate : public itk::Command
+    {
+    public:
+      typedef  CommandIterationUpdate   Self;
+      typedef  itk::Command             Superclass;
+      typedef itk::SmartPointer<Self>   Pointer;
+      itkNewMacro( Self );
+    protected:
+      CommandIterationUpdate() {};
+
+    private:
+       LayerHandle layer_;
+       double progress_start_;
+       double progress_unit_;
+
+    public:
+      typedef itk::LevenbergMarquardtOptimizer OptimizerType;
+      typedef   const OptimizerType *              OptimizerPointer;
+
+      void SetLayer( LayerHandle layer )
+      {
+        this->layer_ = layer;
+      }
+
+      void SetProgressUnit( double progress_unit )
+      {
+        this->progress_unit_ = progress_unit;
+      }
+
+      void SetProgressStart( double progress_start )
+      {
+        this->progress_start_ = progress_start;
+      }
+
+      void Execute(itk::Object *caller, const itk::EventObject & event)
+      {
+        Execute( (const itk::Object *)caller, event);
+      }
+
+      void Execute(const itk::Object * object, const itk::EventObject & event)
+      {
+        OptimizerPointer optimizer =
+          dynamic_cast< OptimizerPointer >( object );
+
+        if( ! itk::IterationEvent().CheckEvent( &event ) )
+        {
+          return;
+        }
+
+        progress_start_ += progress_unit_;
+        layer_->update_progress_signal_( progress_start_ );
+
+
+        CORE_LOG_MESSAGE( std::string("value = ") + 
+          boost::lexical_cast<std::string>( optimizer->GetValue() ));
+
+        CORE_LOG_MESSAGE( std::string("params = ") + 
+          boost::lexical_cast<std::string>( optimizer->GetCurrentPosition() ));
+
+      }
+    };
+
   };
 
 

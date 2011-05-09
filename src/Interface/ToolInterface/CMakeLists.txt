@@ -69,6 +69,7 @@ SET(INTERFACE_TOOLINTERFACE_SRCS
   ClipboardToolInterface.cc
   MeasurementToolInterface.cc
   ICPFilterInterface.cc
+  #SpeedlineToolInterface.cc
 )
 
 SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
@@ -113,6 +114,7 @@ SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
   detail/MeasurementTextDelegate.h
   detail/MeasurementTextEdit.h
   ICPFilterInterface.h
+  #SpeedlineToolInterface.h
 )
 
 SET(INTERFACE_TOOLINTERFACE_NO_MOC_SRCS
@@ -160,6 +162,7 @@ SET(INTERFACE_TOOLINTERFACE_UI_SRCS
   ClipboardToolInterface.ui
   MeasurementToolInterface.ui
   ICPFilterInterface.ui
+  #SpeedlineToolInterface.ui
 )
 
 ##################################################

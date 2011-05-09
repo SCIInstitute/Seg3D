@@ -190,8 +190,15 @@ void ITKFilter::observe_itk_progress_internal( itk::ProcessObject::Pointer filte
     &ITKProgressReporter::Report, reporter, _1 ) ) );
 }
 
-void ITKFilter::observe_itk_iterations_internal( itk::ProcessObject::Pointer filter, 
-  boost::function< void( itk::Object* ) > iteration_fcn )
+//void ITKFilter::observe_itk_iterations_internal( itk::ProcessObject::Pointer filter, 
+//  boost::function< void( itk::Object* ) > iteration_fcn )
+//{
+//  // Setup progress measuring, by forwarding progress to the filter
+//  filter->AddObserver( itk::IterationEvent(), new ITKObserver( iteration_fcn ) ); 
+//}
+
+void ITKFilter::observe_itk_iterations_internal( itk::Object::Pointer filter, 
+                        boost::function< void( itk::Object* ) > iteration_fcn )
 {
   // Setup progress measuring, by forwarding progress to the filter
   filter->AddObserver( itk::IterationEvent(), new ITKObserver( iteration_fcn ) ); 
