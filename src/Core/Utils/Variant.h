@@ -72,7 +72,7 @@ public:
   // INTERNAL_TYPE:
   // Return a const reference to the type_info object representing
   // the actual type of value currently stored by the Variant object.
-  virtual const type_info& internal_type() const = 0;
+  virtual const std::type_info& internal_type() const = 0;
 };
 
 // VARIANT:
@@ -139,7 +139,7 @@ public:
   // INTERNAL_TYPE:
   // Return a const reference to the type_info object representing
   // the actual type of value currently stored by the Variant object.
-  virtual const type_info& internal_type() const
+  virtual const std::type_info& internal_type() const
   {
     return typeid( T );
   }
@@ -263,7 +263,7 @@ public:
   // INTERNAL_TYPE:
   // Return a const reference to the type_info object representing
   // the actual type of value currently stored by the Variant object.
-  virtual const type_info& internal_type() const
+  virtual const std::type_info& internal_type() const
   {
     if ( this->typed_value_ )
     {
