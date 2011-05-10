@@ -611,15 +611,15 @@
       transform_type::Pointer final_transform = transform_type::New();
       final_transform->SetParameters( final_parameters );
 
-      typedef itk:: LinearInterpolateImageFunction<
+      typedef typename itk:: LinearInterpolateImageFunction<
         TYPED_IMAGE_TYPE,
         double          >    interpolator_type;
 
-      typedef itk::ResampleImageFilter<
+      typedef typename itk::ResampleImageFilter<
         TYPED_IMAGE_TYPE,
         TYPED_IMAGE_TYPE > resample_filter_type;
 
-      resample_filter_type::Pointer resampler = resample_filter_type::New();
+      typename resample_filter_type::Pointer resampler = resample_filter_type::New();
       typename Core::ITKImageDataT<VALUE_TYPE>::Handle moving_image; 
       this->get_itk_image_from_layer<VALUE_TYPE>( this->mask_layer_, moving_image );
       resampler->SetInput( moving_image->get_image() );
