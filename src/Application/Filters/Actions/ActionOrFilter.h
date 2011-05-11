@@ -47,7 +47,7 @@ CORE_ACTION(
   CORE_ACTION_TYPE( "OrFilter", "Filter that does a boolean OR on two mask." )
   CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
   CORE_ACTION_ARGUMENT( "mask", "The layerid of the mask that needs to be applied." )
-  CORE_ACTION_KEY( "replace", "true", "Replace the old layer (true), or add an new mask layer (false)." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "replace", "true", "Replace the old layer (true), or add an new mask layer (false)." )
   CORE_ACTION_CHANGES_PROJECT_DATA()
   CORE_ACTION_IS_UNDOABLE()
 )

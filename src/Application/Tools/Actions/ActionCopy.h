@@ -47,7 +47,7 @@ CORE_ACTION
   CORE_ACTION_ARGUMENT( "target", "The ID of the target mask layer." )
   CORE_ACTION_ARGUMENT( "slice_type", "The slicing direction." )
   CORE_ACTION_ARGUMENT( "slice_number", "The slice number to be copied." )
-  CORE_ACTION_KEY( "slot", "0", "Which clipboard slot to use." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "slot", "0", "Which clipboard slot to use." )
   CORE_ACTION_IS_UNDOABLE()
 )
 

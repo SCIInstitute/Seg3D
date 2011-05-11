@@ -49,7 +49,7 @@ CORE_ACTION(
   CORE_ACTION_ARGUMENT( "layerids", "The layerids on which this tool needs to be run." )
   CORE_ACTION_ARGUMENT( "origin", "The new origin." )
   CORE_ACTION_ARGUMENT( "spacing", "The new spacing." )
-  CORE_ACTION_KEY( "replace", "false", "Whether to delete the input layers afterwards." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "replace", "false", "Whether to delete the input layers afterwards." )
   CORE_ACTION_CHANGES_PROJECT_DATA()
   CORE_ACTION_IS_UNDOABLE()
 )

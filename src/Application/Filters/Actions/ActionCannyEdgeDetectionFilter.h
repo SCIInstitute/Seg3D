@@ -44,9 +44,9 @@ class ActionCannyEdgeDetectionFilter : public LayerAction
 CORE_ACTION( 
   CORE_ACTION_TYPE( "CannyEdgeDetectionFilter", "ITK filter that detects where edges are in a data layer." )
   CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
-  CORE_ACTION_KEY( "blurring_distance", "2.0", "The distance over which the filter blurs"
+  CORE_ACTION_OPTIONAL_ARGUMENT( "blurring_distance", "2.0", "The distance over which the filter blurs"
     " before computing the gradient." )
-  CORE_ACTION_KEY( "threshold", "1.0", "Below this threshold the values are replaced with zero." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "threshold", "1.0", "Below this threshold the values are replaced with zero." )
   CORE_ACTION_CHANGES_PROJECT_DATA()
   CORE_ACTION_IS_UNDOABLE()
 )

@@ -46,7 +46,7 @@ class ActionOtsuThresholdFilter : public LayerAction
 CORE_ACTION( 
   CORE_ACTION_TYPE( "OtsuThresholdFilter", "Divide the image in different sections based on the histogram." )
   CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
-  CORE_ACTION_KEY( "amount", "2", "The amount of divisions to divide the image into" )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "amount", "2", "The amount of divisions to divide the image into" )
   CORE_ACTION_CHANGES_PROJECT_DATA()
   CORE_ACTION_IS_UNDOABLE()
 )

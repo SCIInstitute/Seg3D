@@ -84,25 +84,9 @@ public:
   // Get the properties of the action
   std::vector<std::string> get_properties() const;
   
-  // GET_NUM_ARGUMENTS:
-  // The number of arguments for this action
-  size_t get_num_arguments() const;
-  
   // GET_NUM_KEY_VALUE_PAIRS:
   // THe number of key value pairs associated with this action
   size_t get_num_key_value_pairs() const;
-  
-  // GET_ARGUMENT:
-  // The name of argument <index>
-  std::string get_argument( size_t index ) const;
-
-  // GET_ARGUMENT_DESCRIPTION:
-  // The description of argument <index>
-  std::string get_argument_description( size_t index ) const;
-  
-  // GET_ARGUMENT_PROPERTIES:
-  // Get the properties of argument <index>
-  std::vector<std::string> get_argument_properties( size_t index ) const; 
     
   // GET_KEY:
   // The name of key <index>

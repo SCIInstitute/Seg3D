@@ -45,7 +45,7 @@ CORE_ACTION(
   CORE_ACTION_TYPE( "ConnectedComponentSizeFilter", "Segment a mask into connected regions and order"
     " them by the size of the volume of the component.")
   CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
-  CORE_ACTION_KEY( "log_scale", "false", "Whether the log of the data should be used." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "log_scale", "false", "Whether the log of the data should be used." )
   CORE_ACTION_CHANGES_PROJECT_DATA()
   CORE_ACTION_IS_UNDOABLE()
 )

@@ -44,7 +44,7 @@ class ActionInvert : public LayerAction
 CORE_ACTION( 
   CORE_ACTION_TYPE( "Invert", "Invert the values of the data layer" )
   CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this tool needs to be run." )
-  CORE_ACTION_KEY( "replace", "true", "Replace the old layer (true), or add an new layer (false)" )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "replace", "true", "Replace the old layer (true), or add an new layer (false)" )
   CORE_ACTION_CHANGES_PROJECT_DATA()
   CORE_ACTION_IS_UNDOABLE()
 )

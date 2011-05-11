@@ -45,9 +45,9 @@ CORE_ACTION(
   CORE_ACTION_TYPE( "ExportSegmentation", "This action exports a layer to file.")
   CORE_ACTION_ARGUMENT( "layers", "A '|' delimited list of layers that are to be exported." )
   CORE_ACTION_ARGUMENT( "file_path", "A path, including the name of the file where the layer should be exported to." )
-  CORE_ACTION_KEY( "mode", "data", "The mode to use: data, single_mask, bitplane_mask, or label_mask.")
-  CORE_ACTION_KEY( "extension", ".nrrd", "Optional extension for a specific exporter. (default is .nrrd)" )
-  CORE_ACTION_KEY( "exporter", "", "Optional name for a specific exporter." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "mode", "data", "The mode to use: data, single_mask, bitplane_mask, or label_mask.")
+  CORE_ACTION_OPTIONAL_ARGUMENT( "extension", ".nrrd", "Optional extension for a specific exporter. (default is .nrrd)" )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "exporter", "", "Optional name for a specific exporter." )
   CORE_ACTION_CHANGES_PROJECT_DATA()
 )
 

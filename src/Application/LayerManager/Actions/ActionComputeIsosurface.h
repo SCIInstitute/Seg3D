@@ -45,8 +45,8 @@ class ActionComputeIsosurface : public Core::Action
 CORE_ACTION( 
   CORE_ACTION_TYPE( "ComputeIsosurface", "Compute isosurface for the selected layer.")
   CORE_ACTION_ARGUMENT( "layerid", "The layerid of the layer for which the isosurface needs to be computed." )
-  CORE_ACTION_KEY( "quality_factor", "1.0", "The quality factor for mask downsampling prior to isosurface computation." )
-  CORE_ACTION_KEY( "capping", "false", "Whether isosurfaces will be capped." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "quality_factor", "1.0", "The quality factor for mask downsampling prior to isosurface computation." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "capping", "false", "Whether isosurfaces will be capped." )
   CORE_ACTION_CHANGES_PROJECT_DATA()
 )
   

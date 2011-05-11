@@ -45,9 +45,9 @@ class ActionImportLayer : public LayerAction
 CORE_ACTION( 
   CORE_ACTION_TYPE( "ImportLayer", "This action imports a layer into the layer manager.")
   CORE_ACTION_ARGUMENT( "filename", "The name of the file to load." )
-  CORE_ACTION_KEY( "importer", "", "Optional name for a specific importer." )
-  CORE_ACTION_KEY( "mode", "data", "The mode to use: data, single_mask, bitplane_mask, or label_mask.")
-  CORE_ACTION_KEY( "cache", "-1" , "Location of the file if it is in the data cache of the project." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "importer", "", "Optional name for a specific importer." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "mode", "data", "The mode to use: data, single_mask, bitplane_mask, or label_mask.")
+  CORE_ACTION_OPTIONAL_ARGUMENT( "cache", "-1" , "Location of the file if it is in the data cache of the project." )
   CORE_ACTION_CHANGES_PROJECT_DATA()
   CORE_ACTION_IS_UNDOABLE()
 )

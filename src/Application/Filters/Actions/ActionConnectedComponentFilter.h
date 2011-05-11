@@ -47,9 +47,9 @@ CORE_ACTION(
     " the regions that connect to seed points or a mask.")
   CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
   CORE_ACTION_ARGUMENT( "seeds", "The seed points in world space." )
-  CORE_ACTION_KEY( "replace", "true", "Replace the old layer (true), or add an new layer (false)." )
-  CORE_ACTION_KEY( "mask", "<none>", "Select segments connected to this mask." )
-  CORE_ACTION_KEY( "invert_mask", "false", "Whether the mask needs to be inverted." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "replace", "true", "Replace the old layer (true), or add an new layer (false)." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "mask", "<none>", "Select segments connected to this mask." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "invert_mask", "false", "Whether the mask needs to be inverted." )
   CORE_ACTION_IS_UNDOABLE()
 )
   

@@ -56,13 +56,6 @@ public:
   // Properties of the action
   std::vector<std::string> properties_;
   
-  // Vector of arguments that need to be passed in
-  std::vector<std::string> argument_;
-  // Vector of descriptions per argument
-  std::vector<std::string> argument_description_;
-  // Vector of properties per argument
-  std::vector<std::vector<std::string> > argument_properties_;
-  
   // Vector of keys that can be added
   std::vector<std::string> key_;    
   // Vector of default values for each key
@@ -131,32 +124,33 @@ ActionInfo::ActionInfo( const std::string& definition ) :
       type = parameter_element->Value();
     }
     
-    if ( type == "argument" )
-    {
-      std::string name;
-      if ( parameter_element->Attribute( "name" ) ) 
-      {
-        name = parameter_element->Attribute( "name" );
-      }
-      std::string description;
-      if ( parameter_element->GetText() )
-      {
-        description = parameter_element->GetText();
-      }
-      
-      if ( name.empty() )
-      {
-        CORE_LOG_ERROR( "Action Registration: Action argument needs to have name." );
-        CORE_LOG_ERROR( "Action Registration: Skipping registration of this action" );
-        return;
-      }
-      
-      this->private_->argument_.push_back( name );
-      this->private_->argument_description_.push_back( description );
-      std::vector< std::string > empty_properties;
-      this->private_->argument_properties_.push_back( empty_properties );
-    }
-    else if ( type == "action" )
+    //if ( type == "argument" )
+    //{
+    //  std::string name;
+    //  if ( parameter_element->Attribute( "name" ) ) 
+    //  {
+    //    name = parameter_element->Attribute( "name" );
+    //  }
+    //  std::string description;
+    //  if ( parameter_element->GetText() )
+    //  {
+    //    description = parameter_element->GetText();
+    //  }
+    //  
+    //  if ( name.empty() )
+    //  {
+    //    CORE_LOG_ERROR( "Action Registration: Action argument needs to have name." );
+    //    CORE_LOG_ERROR( "Action Registration: Skipping registration of this action" );
+    //    return;
+    //  }
+    //  
+    //  this->private_->argument_.push_back( name );
+    //  this->private_->argument_description_.push_back( description );
+    //  std::vector< std::string > empty_properties;
+    //  this->private_->argument_properties_.push_back( empty_properties );
+    //}
+    //else if ( type == "action" )
+    if ( type == "action" )
     {
       std::string name;
       if ( parameter_element->Attribute( "name" ) )
@@ -225,21 +219,13 @@ ActionInfo::ActionInfo( const std::string& definition ) :
       if ( parameter_element->Attribute( "name" ) )
       {
         name = parameter_element->Attribute( "name" );
-        for ( size_t k = 0; k < this->private_->argument_.size(); k++ )
-        {
-          if ( this->private_->argument_[ k ] == name )
-          {
-            this->private_->argument_properties_[ k ].push_back( property );
-          }
-        }
-
         for ( size_t k = 0; k < this->private_->key_.size(); k++ )
         {
           if ( this->private_->key_[ k ] == name )
           {
             this->private_->key_properties_[ k ].push_back( property );
           }
-        }       
+        }
       }
       else
       {   
@@ -256,15 +242,18 @@ ActionInfo::ActionInfo( const std::string& definition ) :
   }
   
   std::string usage = this->private_->type_;
-  for ( size_t j = 0; j < this->private_->argument_.size(); j++ )
-  {
-    usage += std::string( " " ) + Core::StringToUpper( this->private_->argument_[ j ] );
-  }
   
-  for ( size_t j = 0; j> this->private_->key_.size(); j++ )
+  for ( size_t j = 0; j < this->private_->key_.size(); j++ )
   {
-    usage += std::string( " [" ) + this->private_->key_[ j ] + "=" +
-      this->private_->key_default_value_[ j ] + "]";
+    if ( this->private_->key_default_value_[ j ].empty() )
+    {
+      usage += ( " " + this->private_->key_[ j ] + "=<" + this->private_->key_[ j ] + ">" );
+    }
+    else
+    {
+      usage += std::string( " [" ) + this->private_->key_[ j ] + "=" +
+        this->private_->key_default_value_[ j ] + "]";
+    }
   }
 
   this->private_->usage_ = usage;
@@ -289,7 +278,6 @@ ActionInfo::ActionInfo( const std::string& definition ) :
   {
     this->private_->is_undoable_ = true;
   }
-  
 }
 
 std::string ActionInfo::get_definition() const
@@ -318,35 +306,9 @@ std::string ActionInfo::get_usage() const
   return this->private_->usage_;
 }
   
-size_t ActionInfo::get_num_arguments() const
-{
-  return this->private_->argument_.size();
-}
-  
 size_t ActionInfo::get_num_key_value_pairs() const
 {
   return this->private_->key_.size();
-}
-  
-std::string ActionInfo::get_argument( size_t index ) const
-{
-  if ( index >= this->private_->argument_.size() ) return "";
-  return this->private_->argument_[ index ];
-}
-
-std::string ActionInfo::get_argument_description( size_t index ) const
-{
-  if ( index >= this->private_->argument_.size() ) return "";
-  return this->private_->argument_description_[ index ];
-}
-  
-std::vector<std::string> ActionInfo::get_argument_properties( size_t index ) const
-{
-  if ( index >= this->private_->argument_properties_.size() )
-  {
-    return std::vector<std::string>();
-  }
-  return this->private_->argument_properties_[ index ];
 }
   
 std::string ActionInfo::get_key( size_t index ) const

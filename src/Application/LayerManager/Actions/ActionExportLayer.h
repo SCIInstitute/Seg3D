@@ -45,8 +45,8 @@ CORE_ACTION(
   CORE_ACTION_TYPE( "ExportLayer", "This action exports a layer to file.")
   CORE_ACTION_ARGUMENT( "layer", "The name of the data layer to be exported." )
   CORE_ACTION_ARGUMENT( "file_path", "A path, including the name of the file where the layer should be exported to." )
-  CORE_ACTION_KEY( "exporter", "", "Optional name for a specific exporter." )
-  CORE_ACTION_KEY( "extension", "", "Extension used for saving file." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "exporter", "", "Optional name for a specific exporter." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "extension", "", "Extension used for saving file." )
   CORE_ACTION_CHANGES_PROJECT_DATA()
 )
 

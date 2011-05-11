@@ -208,6 +208,11 @@ protected:
   inline void add_param( ActionParameterBase* parameter )
   {
     this->parameters_.push_back( parameter );
+    std::string default_val = this->get_default_key_value( this->parameters_.size() - 1 );
+    if ( !default_val.empty() )
+    {
+      parameter->import_from_string( default_val );
+    }
   }
 
   // GET_PARAM
@@ -219,7 +224,7 @@ protected:
   
   // NUM_PARAMS
   // Number of parameter in this action
-  inline size_t num_params() const
+  inline const size_t num_params() const
   {
     return parameters_.size();
   }
@@ -281,18 +286,15 @@ CORE_ACTION_INTERNAL(definition_string, Core::ActionInfo )
 "<action name=\"" name "\">" description "</action>"
 
 #define CORE_ACTION_ARGUMENT( name, description ) \
-"<argument name=\"" name "\">" description "</argument>"
+"<key name=\"" name "\">" description "</key>"
 
-#define CORE_ACTION_KEY( name, default_value, description ) \
+#define CORE_ACTION_OPTIONAL_ARGUMENT( name, default_value, description ) \
 "<key name=\"" name "\" default=\"" default_value "\"> " description "</key>"
 
 #define CORE_ACTION_PROPERTY( property ) \
 "<property>" property "</property>"
 
 #define CORE_ACTION_ARGUMENT_PROPERTY( name, property ) \
-"<property name=\"" name "\">" property "</property>"
-
-#define CORE_ACTION_KEY_PROPERTY( name, property ) \
 "<property name=\"" name "\">" property "</property>"
 
 #define CORE_ACTION_CHANGES_PROJECT_DATA() \

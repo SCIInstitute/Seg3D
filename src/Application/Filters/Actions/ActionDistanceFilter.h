@@ -46,9 +46,9 @@ class ActionDistanceFilter : public LayerAction
 CORE_ACTION( 
   CORE_ACTION_TYPE( "DistanceFilter", "Compute the signed distance to a mask." )
   CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
-  CORE_ACTION_KEY( "use_index_space", "false", "Whether to use index or world coordinates for"
+  CORE_ACTION_OPTIONAL_ARGUMENT( "use_index_space", "false", "Whether to use index or world coordinates for"
     "computing the distance." )
-  CORE_ACTION_KEY( "inside_positive", "false", "Whether the sign of the inside is positive and the"
+  CORE_ACTION_OPTIONAL_ARGUMENT( "inside_positive", "false", "Whether the sign of the inside is positive and the"
     " outside negative or vice versa.")
   CORE_ACTION_CHANGES_PROJECT_DATA()
   CORE_ACTION_IS_UNDOABLE()

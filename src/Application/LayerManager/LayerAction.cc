@@ -153,38 +153,21 @@ std::string LayerAction::export_to_provenance_string() const
   // Add action name to string
   std::string command = std::string( this->get_type() ) + " ";
 
-  size_t num_arguments = this->get_action_info()->get_num_arguments();
-
   // Loop through all the arguments and add them  
   size_t num_params = this->num_params();
-  
-  for ( size_t j = 0; j < num_arguments && j < num_params; j++ )
+    
+  for ( size_t j = 0; j < num_params; j++ )
   {
     Core::ActionParameterBase* param = this->get_param( j );
     if ( param->has_extension() )
     {
       LayerActionParameter* layer_param = reinterpret_cast< LayerActionParameter* >( param );
-      command += layer_param->export_to_provenance_string() + " ";
-    }
-    else
-    {
-      command += param->export_to_string() + " ";
-    }
-  }
-  
-  for ( size_t j = num_arguments; j < num_params; j++ )
-  {
-    Core::ActionParameterBase* param = this->get_param( j );
-    if ( param->has_extension() )
-    {
-      LayerActionParameter* layer_param = reinterpret_cast< LayerActionParameter* >( param );
-      command += this->get_key( j - num_arguments ) + "=" + 
+      command += this->get_key( j ) + "=" + 
         layer_param->export_to_provenance_string() + " ";
     }
     else
     {
-      command += this->get_key( j - num_arguments ) + "=" + 
-        param->export_to_string() + " ";
+      command += this->get_key( j ) + "=" + param->export_to_string() + " ";
     }
   }
 

@@ -47,12 +47,12 @@ CORE_ACTION(
   CORE_ACTION_TYPE( "ThresholdSegmentationLSFilter", "Run the ITK ThresholdSegmentLevelSet Filter." )
   CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
   CORE_ACTION_ARGUMENT( "mask", "The layerid on which this filter needs to be run." )
-  CORE_ACTION_KEY( "iterations", "50", "Number of iterations to perform." )
-  CORE_ACTION_KEY( "threshold_range", "2.5", "Range in variance of initially segmented data of"
+  CORE_ACTION_OPTIONAL_ARGUMENT( "iterations", "50", "Number of iterations to perform." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "threshold_range", "2.5", "Range in variance of initially segmented data of"
     " what is considered part of the segmentation target." )
-  CORE_ACTION_KEY( "curvature", "1.0", "Curvature weight." )
-  CORE_ACTION_KEY( "propagation", "1.0", "Propagation weight." )
-  CORE_ACTION_KEY( "edge", "0.0", "Edge weight." )  
+  CORE_ACTION_OPTIONAL_ARGUMENT( "curvature", "1.0", "Curvature weight." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "propagation", "1.0", "Propagation weight." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "edge", "0.0", "Edge weight." )  
   CORE_ACTION_CHANGES_PROJECT_DATA()
   CORE_ACTION_IS_UNDOABLE()
 )
