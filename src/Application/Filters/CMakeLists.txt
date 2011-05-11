@@ -121,10 +121,10 @@ SET(APPLICATION_FILTERS_ACTIONS_SRCS
   Actions/ActionPermute.cc
   Actions/ActionTransform.h
   Actions/ActionTransform.cc
-  Actions/ActionICPRegisterFilter.h
-  Actions/ActionICPRegisterFilter.cc
-  Actions/ActionICPTransformFilter.h
-  Actions/ActionICPTransformFilter.cc
+  Actions/ActionPointSetRegisterFilter.h
+  Actions/ActionPointSetRegisterFilter.cc
+  Actions/ActionPointSetTransformFilter.h
+  Actions/ActionPointSetTransformFilter.cc
   )
 
 CORE_ADD_LIBRARY(Application_Filters ${APPLICATION_FILTERS_SRCS}

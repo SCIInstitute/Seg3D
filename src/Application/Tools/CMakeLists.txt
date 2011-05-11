@@ -115,8 +115,8 @@ SET(APPLICATION_TOOLS_SRCS
   TransformTool.cc
   ClipboardTool.h
   ClipboardTool.cc
-  ICPFilter.h
-  ICPFilter.cc
+  PointSetFilter.h
+  PointSetFilter.cc
   #SpeedlineTool.h
   #SpeedlineTool.cc
   )
