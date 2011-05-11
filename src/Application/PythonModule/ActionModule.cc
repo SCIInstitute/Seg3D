@@ -30,10 +30,10 @@
 #pragma warning( disable: 4244 4267 )
 #endif
 
-#include <string>
-
 #include <boost/python.hpp>
 #include <boost/python/raw_function.hpp>
+
+#include <string>
 
 #include <Core/Action/ActionFactory.h>
 #include <Core/Action/ActionDispatcher.h>

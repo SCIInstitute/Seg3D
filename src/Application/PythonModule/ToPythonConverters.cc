@@ -91,7 +91,7 @@ public:
   static PyObject* convert( const Core::Variant& v )
   {
     boost::python::object result;
-    const type_info& value_type = v.internal_type();
+    const std::type_info& value_type = v.internal_type();
     if ( value_type == typeid( bool ) )
     {
       result = boost::python::object( GetValueFromVarient< bool >( v ) );
