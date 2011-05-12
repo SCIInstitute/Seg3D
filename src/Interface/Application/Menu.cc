@@ -145,11 +145,18 @@ void Menu::create_file_menu( QMenuBar* menubar )
 
   // == New Project ==
   QAction* qaction;
-  qaction = qmenu->addAction( tr( "&New Project" ) );
-  qaction->setShortcut( tr( "Ctrl+N" ) );
-  qaction->setToolTip( tr( "Start a new project." ) );
-  connect( qaction, SIGNAL( triggered() ), this, SLOT( new_project() ) );
 
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    bool project_creation = InterfaceManager::Instance()->enable_project_creation_state_->get();
+
+    qaction = qmenu->addAction( tr( "&New Project" ) );
+    qaction->setShortcut( tr( "Ctrl+N" ) );
+    qaction->setToolTip( tr( "Start a new project." ) );
+    qaction->setEnabled( project_creation );
+    connect( qaction, SIGNAL( triggered() ), this, SLOT( new_project() ) );
+  }
+  
   // == Open Project ==
   qaction = qmenu->addAction( tr( "&Open Project" ) );
   qaction->setShortcut( QKeySequence::Open );
@@ -195,20 +202,27 @@ void Menu::create_file_menu( QMenuBar* menubar )
   
   qmenu->addSeparator();
 
-  // == Import Layer From Single File... ==
-  qaction = qmenu->addAction( tr( "Import Layer From Single File...") );
-  qaction->setShortcut( tr( "Ctrl+Shift+O" ) );
-  qaction->setToolTip( tr( "Import new layer(s) into the layer manager from a file(s)." ) );
-  QtUtils::QtBridge::Connect( qaction, 
-    boost::bind( &LayerIOFunctions::ImportFiles, this->main_window_, "" ) );
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    bool file_import = InterfaceManager::Instance()->enable_file_import_state_->get();
 
-  // == Import Layer From Image Series... ==
-  qaction = qmenu->addAction( tr( "Import Layer From Image Series...") );
-  qaction->setShortcut( tr( "Ctrl+Shift+I" ) );
-  qaction->setToolTip( tr( "Import new data layer into the layer manager from a series." ) );
-  QtUtils::QtBridge::Connect( qaction, 
-    boost::bind( &LayerIOFunctions::ImportSeries, this->main_window_ ) );
+    // == Import Layer From Single File... ==
+    qaction = qmenu->addAction( tr( "Import Layer From Single File...") );
+    qaction->setShortcut( tr( "Ctrl+Shift+O" ) );
+    qaction->setToolTip( tr( "Import new layer(s) into the layer manager from a file(s)." ) );
+    qaction->setEnabled( file_import );
+    QtUtils::QtBridge::Connect( qaction, 
+      boost::bind( &LayerIOFunctions::ImportFiles, this->main_window_, "" ) );
 
+    // == Import Layer From Image Series... ==
+    qaction = qmenu->addAction( tr( "Import Layer From Image Series...") );
+    qaction->setShortcut( tr( "Ctrl+Shift+I" ) );
+    qaction->setToolTip( tr( "Import new data layer into the layer manager from a series." ) );
+    qaction->setEnabled( file_import );
+    QtUtils::QtBridge::Connect( qaction, 
+      boost::bind( &LayerIOFunctions::ImportSeries, this->main_window_ ) );
+
+  }
   qmenu->addSeparator();
 
   // == Export Segmentation... ==

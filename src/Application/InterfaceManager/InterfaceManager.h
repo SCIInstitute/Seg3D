@@ -91,6 +91,8 @@ public:
   Core::StateBoolHandle python_console_visibility_state_;
   
   //Options of what to show
+  Core::StateBoolHandle enable_project_creation_state_;
+  Core::StateBoolHandle enable_file_import_state_;
   Core::StateBoolHandle enable_controller_state_;
   Core::StateBoolHandle enable_tool_help_state_;
   

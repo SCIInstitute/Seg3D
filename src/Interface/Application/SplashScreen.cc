@@ -41,6 +41,7 @@
 #include <Interface/Application/LayerIOFunctions.h>
 
 // Application includes
+#include <Application/InterfaceManager/InterfaceManager.h>
 #include <Application/ProjectManager/ProjectManager.h>
 #include <Application/ProjectManager/Actions/ActionLoadProject.h>
 #include <Application/ProjectManager/Actions/ActionNewProject.h>
@@ -82,6 +83,18 @@ SplashScreen::SplashScreen( QWidget *parent ) :
   this->private_->ui_.load_recent_button_->setEnabled( false );
     
   this->populate_recent_projects();
+    
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    bool project_creation = InterfaceManager::Instance()->enable_project_creation_state_->get();
+    bool file_import = InterfaceManager::Instance()->enable_file_import_state_->get();
+    
+    if ( !project_creation )
+    {
+      this->private_->ui_.new_project_button_->setEnabled( false );
+      this->private_->ui_.quick_open_button_->setEnabled( false );
+    }
+  }
     
   connect( this->private_->ui_.new_project_button_, SIGNAL( clicked() ), 
     this, SLOT( new_project() ) );

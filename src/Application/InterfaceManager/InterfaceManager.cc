@@ -68,12 +68,17 @@ void InterfaceManager::initialize_states()
   this->add_state( "provenance_dockwidget_visibility", this->provenance_dockwidget_visibility_state_, 
     PreferencesManager::Instance()->show_provenance_bar_state_->get() );
   
+  
+  
   this->add_state( "preferences_manager_visibility", this->preferences_manager_visibility_state_, false );
   this->add_state( "controller_visibility", this->controller_visibility_state_, false );
   this->add_state( "message_window_visibility", this->message_window_visibility_state_, false );
   this->add_state( "splash_screen_visibility", this->splash_screen_visibility_state_, true );
   this->add_state( "keyboard_shortcut_visibility", this->keyboard_shortcut_visibility_state_, false );
   this->add_state( "python_console_visibility", this->python_console_visibility_state_, false );
+
+  this->add_state( "enable_project_creation", enable_project_creation_state_, true );
+  this->add_state( "enable_file_import", enable_file_import_state_, true );
 
   this->add_state( "enable_controller", this->enable_controller_state_, true );
   this->add_state( "enable_tool_help", this->enable_tool_help_state_, true );
