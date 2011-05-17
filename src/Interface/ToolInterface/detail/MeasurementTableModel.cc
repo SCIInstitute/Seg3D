@@ -41,6 +41,7 @@
 
 // Core includes
 #include <Core/State/Actions/ActionRemove.h>
+#include <Core/State/Actions/ActionSetAt.h>
 
 namespace Seg3D
 {
@@ -248,6 +249,18 @@ bool MeasurementTableModel::setData( const QModelIndex &index, const QVariant &v
           this->private_->measurement_tool_->measurements_state_, 
           measurements[ index.row() ].get_id(), value.toBool() );
       }
+      else if( index.column() == MeasurementColumns::LENGTH_E ) 
+      { 
+        // Convert length to world coordinates before setting length in measurement
+        double length = value.toFloat();
+        length = this->private_->measurement_tool_->convert_current_to_world( length );
+
+        // Set length in measurement state vector
+        Core::Measurement m = measurements[ index.row() ];
+        m.set_length( length );
+        Core::ActionSetAt::Dispatch( Core::Interface::GetWidgetActionContext(),
+          this->private_->measurement_tool_->measurements_state_, index.row(), m );
+      }
       else if( index.column() == MeasurementColumns::NOTE_E ) 
       {
         // Don't save note to state variable yet because we don't want to trigger a full update
@@ -328,7 +341,8 @@ QVariant MeasurementTableModel::headerData( int section, Qt::Orientation orienta
 Qt::ItemFlags MeasurementTableModel::flags( const QModelIndex &index ) const
 {
   Qt::ItemFlags flags = QAbstractItemModel::flags( index );
-  if ( index.column() == MeasurementColumns::NOTE_E ) // Only Note column is editable
+  if ( index.column() == MeasurementColumns::LENGTH_E || 
+    index.column() == MeasurementColumns::NOTE_E ) 
   {
     flags |= Qt::ItemIsEditable;
   }

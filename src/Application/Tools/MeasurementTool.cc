@@ -603,8 +603,10 @@ void MeasurementToolPrivate::update_cursor()
 
 	if( this->editing_ )
 	{
-		// Use blank cursor so that features of interest are not obscured
-		this->viewer_->set_cursor( Core::CursorShape::BLANK_E );
+		// Use cross cursor so that features of interest are not obscured.  This is the same cursor
+		// used normally, but we need a cursor and couldn't find a better one, so the measurement
+		// itself will be rendered differently to indicate that editing is happening.
+		this->viewer_->set_cursor( Core::CursorShape::CROSS_E );
 	}
 	else 
 	{
@@ -1287,36 +1289,20 @@ bool MeasurementTool::has_2d_visual()
 
 std::string MeasurementTool::get_length_string( const Core::Measurement& measurement ) const
 {
+	// May be called from interface or render threads
+
 	// NOTE: Do not call this function if RendererResources is locked.
 	// We need access to the show_world_units_state_, and several functions we call also lock
 	// the state engine.  
 	Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
 
-	// Thread-safety: We get a handle to the active layer 
-	// (get_active_layer is thread-safe), so it can't be deleted out from under 
-	// us.  
-	LayerHandle active_layer = LayerManager::Instance()->get_active_layer();
+	double length = this->convert_world_to_current( measurement.get_length() );
 
-	double length = 0;
 	bool use_scientific = false;
 	
-	if( !this->show_world_units_state_->get() && active_layer ) 
+	if( !this->show_world_units_state_->get() ) 
 	{
 		// Index units
-
-		// Convert world units to index units
-		// Use grid transform from active layer
-		Core::GridTransform grid_transform = active_layer->get_grid_transform();
-
-		// Grid transfrom takes index coords to world coords, so we need inverse
-		Core::Transform inverse_transform = grid_transform.get_inverse();
-
-		Core::Point p0, p1;
-		measurement.get_point( 0 , p0 );
-		measurement.get_point( 1 , p1 );
-		Core::Vector measure_vec = p1 - p0;
-		measure_vec = inverse_transform.project( measure_vec );
-		length = measure_vec.length();
 
 		// Use same formatting policy as status bar for coordinates
 		if( 10000 < length ) 
@@ -1331,7 +1317,6 @@ std::string MeasurementTool::get_length_string( const Core::Measurement& measure
 	else
 	{
 		// World units
-		length= measurement.get_length();
 
 		// Use same formatting policy as status bar for coordinates
 		if( ( 0.0 < length && length < 0.0001 ) || 1000 < length ) 
@@ -1360,6 +1345,69 @@ std::string MeasurementTool::get_length_string( const Core::Measurement& measure
 		oss << std::fixed << length;
 		return ( oss.str() );
 	}
+}
+
+// Used to convert user-edited length to world units required by Measurement class.
+double MeasurementTool::convert_current_to_world( double length ) const
+{
+	// Called from interface thread
+
+	// We need access to the show_world_units_state_, and several functions we call also lock
+	// the state engine.  
+	Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
+	// Thread-safety: We get a handle to the active layer 
+	// (get_active_layer is thread-safe), so it can't be deleted out from under 
+	// us.  
+	LayerHandle active_layer = LayerManager::Instance()->get_active_layer();
+
+	if( !this->show_world_units_state_->get() && active_layer ) // Current = Index units
+	{
+		// Index units
+
+		// Convert index units to world units
+		// Use grid transform from active layer
+		// Grid transfrom takes index coords to world coords
+		Core::GridTransform grid_transform = active_layer->get_grid_transform();
+
+		Core::Vector vec( length, 0, 0 );
+		vec = grid_transform.project( vec );
+		return vec.length();
+	}
+	return length; // Current = World units
+}
+
+// Used to convert Measurement length to index units for display if selected in tool.
+double MeasurementTool::convert_world_to_current( double length ) const
+{
+	// May be called from interface or render threads
+
+	// NOTE: Do not call this function if RendererResources is locked.
+	// We need access to the show_world_units_state_, and several functions we call also lock
+	// the state engine.  
+	Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
+	// Thread-safety: We get a handle to the active layer 
+	// (get_active_layer is thread-safe), so it can't be deleted out from under 
+	// us.  
+	LayerHandle active_layer = LayerManager::Instance()->get_active_layer();
+
+	if( !this->show_world_units_state_->get() && active_layer ) // Current = Index units
+	{
+		// Index units
+
+		// Convert world units to index units
+		// Use grid transform from active layer
+		Core::GridTransform grid_transform = active_layer->get_grid_transform();
+
+		// Grid transfrom takes index coords to world coords, so we need inverse
+		Core::Transform inverse_transform = grid_transform.get_inverse();
+
+		Core::Vector vec( length, 0, 0 );
+		vec = inverse_transform.project( vec );
+		return vec.length();
+	}
+	return length; // Current = World units
 }
 
 } // end namespace Seg3D

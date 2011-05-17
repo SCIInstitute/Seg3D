@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_TOOLINTERFACE_DETIAL_TEXTDELEGATE_H
-#define INTERFACE_TOOLINTERFACE_DETIAL_TEXTDELEGATE_H
+#ifndef INTERFACE_TOOLINTERFACE_DETAIL_MEASUREMENTITEMDELEGATE_H
+#define INTERFACE_TOOLINTERFACE_DETAIL_MEASUREMENTITEMDELEGATE_H
 
 // Qt includes
 #include <QtGui/QItemDelegate>
@@ -35,13 +35,14 @@
 namespace Seg3D
 {
 
-// Text edit delegate for note column in measurement table.
-class MeasurementTextDelegate : public QItemDelegate
+// Delegate for editing length and note columns in measurement table.  Note that only one delegate
+// can be set per view, so this delegate handles all custom columns in the table.
+class MeasurementItemDelegate : public QItemDelegate
 {
   Q_OBJECT
 
 public:
-  MeasurementTextDelegate( int text_column, QObject * parent = 0 );
+  MeasurementItemDelegate( int length_column, int note_column, QObject * parent = 0 );
 
   //
   // Inherited functions
@@ -59,7 +60,8 @@ private Q_SLOTS:
   void commit_editor();
 
 private:
-  int text_column_;
+  int length_column_;
+  int note_column_;
 };
 
 } // end namespace Seg3D

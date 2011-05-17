@@ -109,18 +109,18 @@ SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
   TransformToolInterface.h
   ClipboardToolInterface.h
   MeasurementToolInterface.h 
-  detail/MeasurementTableModel.h
   detail/MeasurementTableView.h
-  detail/MeasurementTextDelegate.h
+  detail/MeasurementTableModel.h
+  detail/MeasurementItemDelegate.h
   detail/MeasurementTextEdit.h
   PointSetFilterInterface.h
   #SpeedlineToolInterface.h
 )
 
 SET(INTERFACE_TOOLINTERFACE_NO_MOC_SRCS
-  detail/MeasurementTableModel.cc
   detail/MeasurementTableView.cc
-  detail/MeasurementTextDelegate.cc
+  detail/MeasurementTableModel.cc
+  detail/MeasurementItemDelegate.cc
   detail/MeasurementTextEdit.cc
 )
 

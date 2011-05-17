@@ -81,6 +81,16 @@ double Measurement::get_length() const
   return ( this->points_[ 1 ] - this->points_[ 0 ] ).length();
 }
 
+void Measurement::set_length( double length )
+{
+  if( length > 0.0 ) // Don't want to lose the vector
+  {
+    Vector unit_vector = ( this->points_[ 1 ] - this->points_[ 0 ] );
+    unit_vector.normalize();
+    this->points_[ 1 ] = this->points_[ 0 ] + ( length * unit_vector );
+  }
+}
+
 std::string Measurement::get_note() const
 {
   return this->note_;

@@ -93,7 +93,15 @@ public:
   // NOTE: Since this function locks the StateEngine, do not call it if RenderResources is locked
   // or deadlock will occur.
   std::string get_length_string( const Core::Measurement& measurement ) const;
-  
+
+  // CONVERT_CURRENT_TO_WORLD:
+  // Convert length from current units (show_world_units_state_) to world units.
+  double convert_current_to_world( double length ) const;
+
+  // CONVERT_WORLD_TO_CURRENT:
+  // Convert world length to current units (show_world_units_state_).
+  double convert_world_to_current( double length ) const;
+
   // -- signals --
 public:
   // UNITS_CHANGED_SIGNAL:

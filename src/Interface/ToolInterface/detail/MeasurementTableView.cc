@@ -37,9 +37,9 @@
 #include <QtGui/QScrollBar>
 
 // Interface includes
-#include <Interface/ToolInterface/detail/MeasurementTableModel.h>
 #include <Interface/ToolInterface/detail/MeasurementTableView.h>
-#include <Interface/ToolInterface/detail/MeasurementTextDelegate.h>
+#include <Interface/ToolInterface/detail/MeasurementTableModel.h>
+#include <Interface/ToolInterface/detail/MeasurementItemDelegate.h>
 
 namespace Seg3D
 {
@@ -115,8 +115,9 @@ MeasurementTableView::MeasurementTableView( QWidget* parent ) :
   this->private_->view_ = this;
   this->private_->delete_action_ = new QAction( tr( "&Delete" ), this );
   
-  // Custom text editor for note column
-  this->setItemDelegate( new MeasurementTextDelegate( MeasurementColumns::NOTE_E ) );
+  // Custom editors for length and note columns
+  this->setItemDelegate( 
+    new MeasurementItemDelegate( MeasurementColumns::LENGTH_E, MeasurementColumns::NOTE_E ) );
   this->horizontalHeader()->setClickable( true );
   this->horizontalHeader()->setStretchLastSection( true ); // Stretch note section
   QObject::connect( this->horizontalHeader(), SIGNAL( sectionClicked( int ) ), 

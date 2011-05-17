@@ -67,8 +67,13 @@ public:
   void set_id( std::string id );
 
   // GET_LENGTH:
-  // Get length of measurement
+  // Get length of measurement in world units.
   double get_length() const;
+
+  // SET_LENGTH:
+  // Set length of measurement in world units.  Moves second point to specified distance along 
+  // vector between points.  
+  void set_length( double length );
 
   // GET_NOTE:
   // Get user-editable description of measurement.  

@@ -27,23 +27,26 @@
  */
 
 // Qt includes
+#include <QtGui/QDoubleValidator>
 #include <QtGui/QLineEdit>
 #include <QtGui/QPainter>
 
 // Interface includes
-#include <Interface/ToolInterface/detail/MeasurementTextDelegate.h>
+#include <Interface/ToolInterface/detail/MeasurementItemDelegate.h>
 
 namespace Seg3D
 {
 
-MeasurementTextDelegate::MeasurementTextDelegate( int text_column, QObject * parent /*= 0 */ ) : 
-  text_column_( text_column ),
+MeasurementItemDelegate::MeasurementItemDelegate( int length_column, int note_column, 
+  QObject * parent /*= 0 */ ) : 
+  length_column_( length_column ),
+  note_column_( note_column ),
   QItemDelegate( parent ) {}
 
-void MeasurementTextDelegate::paint( QPainter *painter, const QStyleOptionViewItem &option, 
+void MeasurementItemDelegate::paint( QPainter *painter, const QStyleOptionViewItem &option, 
   const QModelIndex &index ) const
 {
-  if ( index.column() == text_column_ )
+  if ( index.column() == this->length_column_ || index.column() == this->note_column_ )
   { 
     QString text = index.model()->data( index, Qt::DisplayRole ).toString();
     painter->save();
@@ -60,10 +63,17 @@ void MeasurementTextDelegate::paint( QPainter *painter, const QStyleOptionViewIt
   }
 }
 
-QWidget* MeasurementTextDelegate::createEditor( QWidget *parent, const QStyleOptionViewItem &option, 
+QWidget* MeasurementItemDelegate::createEditor( QWidget *parent, const QStyleOptionViewItem &option, 
 const QModelIndex &index ) const
 {
-  if ( index.column() == text_column_ )
+  if ( index.column() == this->length_column_ )
+  {
+    QLineEdit* line_edit = new QLineEdit( parent );
+    QDoubleValidator* double_validator = new QDoubleValidator( parent );
+    line_edit->setValidator( double_validator );
+    return line_edit;
+  }
+  else if( index.column() == this->note_column_ )
   {
     QLineEdit* line_edit = new QLineEdit( parent );
     connect( line_edit, SIGNAL( textEdited( QString ) ), this, SLOT( commit_editor() ) );
@@ -75,13 +85,13 @@ const QModelIndex &index ) const
   }
 }
 
-void MeasurementTextDelegate::setEditorData( QWidget *editor, const QModelIndex &index ) const
+void MeasurementItemDelegate::setEditorData( QWidget *editor, const QModelIndex &index ) const
 {
-  if ( index.column() == text_column_ )
+  if ( index.column() == this->length_column_ || index.column() == this->note_column_ )
   {
-    QString note = index.model()->data( index, Qt::DisplayRole ).toString();
+    QString model_text = index.model()->data( index, Qt::DisplayRole ).toString();
     QLineEdit* line_edit = qobject_cast< QLineEdit* >( editor );
-    line_edit->setText( note );
+    line_edit->setText( model_text );
   }
   else
   {
@@ -89,14 +99,14 @@ void MeasurementTextDelegate::setEditorData( QWidget *editor, const QModelIndex 
   }
 }
 
-void MeasurementTextDelegate::setModelData( QWidget *editor, QAbstractItemModel *model, 
+void MeasurementItemDelegate::setModelData( QWidget *editor, QAbstractItemModel *model, 
   const QModelIndex &index ) const
 {
-  if ( index.column() == text_column_ )
+  if ( index.column() == this->length_column_ || index.column() == this->note_column_ )
   {
     QLineEdit* line_edit = qobject_cast< QLineEdit* >( editor );
-    QString note = line_edit->text();
-    model->setData( index, note );
+    QString editor_text = line_edit->text();
+    model->setData( index, editor_text );
   }
   else
   {
@@ -104,7 +114,7 @@ void MeasurementTextDelegate::setModelData( QWidget *editor, QAbstractItemModel 
   }
 }
 
-QSize MeasurementTextDelegate::sizeHint( const QStyleOptionViewItem & option, 
+QSize MeasurementItemDelegate::sizeHint( const QStyleOptionViewItem & option, 
   const QModelIndex & index ) const
 {
   QSize size_hint = QItemDelegate::sizeHint( option, index );
@@ -114,7 +124,9 @@ QSize MeasurementTextDelegate::sizeHint( const QStyleOptionViewItem & option,
   return size_hint;
 }
 
-void MeasurementTextDelegate::commit_editor()
+// Ensures that setModelData is called on every textEdited() signal so that note text box can be
+// kept in sync with note in table.
+void MeasurementItemDelegate::commit_editor()
 {
   QLineEdit* editor = qobject_cast<QLineEdit *>( sender() );
   Q_EMIT commitData( editor );
