@@ -88,7 +88,7 @@ void MeasurementTableModelPrivate::set_active_index( int active_index )
   // Make sure index is in valid range
   const std::vector< Core::Measurement >& measurements = 
     this->measurement_tool_->measurements_state_->get();
-  if( active_index < 0 || active_index >= measurements.size() ) return;
+  if( active_index < 0 || active_index >= static_cast< int >( measurements.size() ) ) return;
 
   // Set the active index in the measurement list
   Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
@@ -517,7 +517,7 @@ void MeasurementTableModel::save_cached_active_note()
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
     const std::vector< Core::Measurement >& measurements = 
       this->private_->measurement_tool_->measurements_state_->get();
-    size_t active_index = this->private_->measurement_tool_->active_index_state_->get();
+    int active_index = this->private_->measurement_tool_->active_index_state_->get();
 
     if( 0 <= active_index && active_index < static_cast< int >( measurements.size() ) )
     {
