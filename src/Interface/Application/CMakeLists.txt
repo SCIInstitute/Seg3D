@@ -241,3 +241,7 @@ TARGET_LINK_LIBRARIES(Interface_Application
                       ${QT_LIBRARIES} 
                       ${SCI_BOOST_LIBRARY})
 ENDIF(APPLE)
+
+IF(BUILD_WITH_PYTHON)
+  TARGET_LINK_LIBRARIES(Interface_Application Core_Python)
+ENDIF(BUILD_WITH_PYTHON)

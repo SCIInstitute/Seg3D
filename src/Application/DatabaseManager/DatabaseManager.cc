@@ -58,6 +58,12 @@ DatabaseManager::DatabaseManager() :
   {
     this->private_->database_ = 0;
   }
+  else
+  {
+    // Enable foreign key
+    std::string error;
+    this->run_sql_statement( "PRAGMA foreign_keys = ON;", error );
+  }
 }
 
 
@@ -192,6 +198,8 @@ bool DatabaseManager::load_database( const boost::filesystem::path& database_fil
     sqlite3_backup_finish( backup_database_object );
   }
   
+  sqlite3_close( temp_open_database );
+
   result = sqlite3_errcode( this->private_->database_ );
   if ( result != SQLITE_OK ) 
   {
@@ -199,8 +207,6 @@ bool DatabaseManager::load_database( const boost::filesystem::path& database_fil
     return false;
   }
   
-  sqlite3_close( temp_open_database );
-
   error = "";
   return true;  
 }

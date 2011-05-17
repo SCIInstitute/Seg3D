@@ -43,7 +43,7 @@
 #include <QtUtils/Utils/QtPointer.h>
 
 // Application includes
-#include <Application/PythonModule/PythonInterpreter.h>
+#include <Core/Python/PythonInterpreter.h>
 
 // Interface includes
 #include <Interface/Application/PythonConsoleWidget.h>
@@ -142,7 +142,7 @@ void PythonConsoleEdit::keyPressEvent( QKeyEvent* e )
     }
     else
     {
-      PythonInterpreter::Instance()->interrupt();
+      Core::PythonInterpreter::Instance()->interrupt();
     }
     e->accept();
     return;
@@ -307,7 +307,7 @@ void PythonConsoleEdit::issue_command()
   c.insertText( "\n" );
 
   this->interactive_position_ = this->document_end();
-  PythonInterpreter::Instance()->run_string( command.toStdString() );
+  Core::PythonInterpreter::Instance()->run_string( command.toStdString() );
 }
 
 void PythonConsoleEdit::prompt( const std::string text )
@@ -421,13 +421,13 @@ PythonConsoleWidget::PythonConsoleWidget( QWidget* parent ) :
   this->setMinimumSize( 500, 500 );
 
   PythonConsoleEditQWeakPointer qpointer( this->private_->console_edit_ );
-  this->add_connection( PythonInterpreter::Instance()->prompt_signal_.connect(
+  this->add_connection( Core::PythonInterpreter::Instance()->prompt_signal_.connect(
     boost::bind( &PythonConsoleEdit::Prompt, qpointer, _1 ) ) );
-  this->add_connection( PythonInterpreter::Instance()->output_signal_.connect(
+  this->add_connection( Core::PythonInterpreter::Instance()->output_signal_.connect(
     boost::bind( &PythonConsoleEdit::PrintOutput, qpointer, _1 ) ) );
-  this->add_connection( PythonInterpreter::Instance()->error_signal_.connect(
+  this->add_connection( Core::PythonInterpreter::Instance()->error_signal_.connect(
     boost::bind( &PythonConsoleEdit::PrintError, qpointer, _1 ) ) );
-  PythonInterpreter::Instance()->print_banner();
+  Core::PythonInterpreter::Instance()->print_banner();
 }
 
 PythonConsoleWidget::~PythonConsoleWidget()

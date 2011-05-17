@@ -27,9 +27,13 @@
  */
 
 #ifdef BUILD_WITH_PYTHON
+
 #include <Python.h>
-#include <Application/PythonModule/PythonInterpreter.h>
+#include <Core/Python/PythonInterpreter.h>
+#include "ActionPythonWrapperRegistration.h"
+
 #endif
+
 
 // STL includes
 #include <iostream>
@@ -168,8 +172,11 @@ int main( int argc, char **argv )
   size_t name_len = strlen( argv[ 0 ] );
   std::vector< wchar_t > program_name( name_len + 1 );
   mbstowcs( &program_name[ 0 ], argv[ 0 ], name_len + 1 );
-  Seg3D::PythonInterpreter::Instance()->initialize( &program_name[ 0 ] );
-//  Seg3D::PythonInterpreter::Instance()->start_terminal();
+
+  Core::PythonInterpreter::module_list_type python_modules;
+  python_modules.push_back( std::make_pair( std::string( "seg3d" ), PyInit_Seg3D2 ) );
+  Core::PythonInterpreter::Instance()->initialize( &program_name[ 0 ], python_modules );
+  Core::PythonInterpreter::Instance()->run_script( "import seg3d\nfrom seg3d import *\n" );
 #endif
 
   // -- Setup Application Interface Window --

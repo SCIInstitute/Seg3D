@@ -39,9 +39,8 @@
 #include <Core/Utils/Lockable.h>
 #include <Core/Utils/Log.h>
 
-#include <Application/PythonModule/ActionModule.h>
-#include <Application/PythonModule/PythonInterpreter.h>
-#include <Application/PythonModule/ToPythonConverters.h>
+#include <Core/Python/PythonInterpreter.h>
+#include <Core/Python/ToPythonConverters.h>
 
 //////////////////////////////////////////////////////////////////////////
 // Python flags defined in pythonrun.c
@@ -66,7 +65,7 @@ extern int Py_NoSiteFlag;
 // Py_OptimizeFlag:
 extern int Py_OptimizeFlag;
 
-namespace Seg3D
+namespace Core
 {
 
 //////////////////////////////////////////////////////////////////////////
@@ -80,6 +79,8 @@ public:
 
   // The name of the executable
   const wchar_t* program_name_;
+  // A list of Python extension modules that need to be initialized
+  PythonInterpreter::module_list_type modules_;
   // An instance of python CommandCompiler object (defined in codeop.py)
   boost::python::object compiler_;
   // The context of the Python main module.
@@ -93,7 +94,7 @@ public:
   std::string input_buffer_;
   // Whether the interpreter is waiting for input
   bool waiting_for_input_;
-  // The command buffer (for Python statement split into multiple lines)
+  // The command buffer (for Python statements that span over multiple lines)
   std::string command_buffer_;
   // Python sys.ps1
   std::string prompt1_;
@@ -166,7 +167,7 @@ std::string PythonInterpreterPrivate::read_from_console( const int bytes /*= -1 
   return result;
 }
 
-} // end namespace Seg3D
+} // end namespace Core
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -177,19 +178,19 @@ class PythonStdIO
 public:
   boost::python::object read( int n )
   {
-    std::string data = Seg3D::PythonInterpreter::Instance()->private_->read_from_console( n );
+    std::string data = Core::PythonInterpreter::Instance()->private_->read_from_console( n );
     boost::python::str pystr( data.c_str() );
     return pystr.encode();
   }
 
   std::string readline()
   {
-    return Seg3D::PythonInterpreter::Instance()->private_->read_from_console();
+    return Core::PythonInterpreter::Instance()->private_->read_from_console();
   }
 
   int write( std::string data )
   {
-    Seg3D::PythonInterpreter::Instance()->output_signal_( data );
+    Core::PythonInterpreter::Instance()->output_signal_( data );
     return static_cast< int >( data.size() );
   }
 };
@@ -199,7 +200,7 @@ class PythonStdErr
 public:
   int write( std::string data )
   {
-    Seg3D::PythonInterpreter::Instance()->error_signal_( data );
+    Core::PythonInterpreter::Instance()->error_signal_( data );
     return static_cast< int >( data.size() );
   }
 };
@@ -215,13 +216,12 @@ BOOST_PYTHON_MODULE( interpreter )
     .def( "write", &PythonStdErr::write );
 }
 
-BOOST_PYTHON_MODULE( seg3d )
-{
-  register_python_action_module();
-  register_to_python_converters();
-}
+//BOOST_PYTHON_MODULE( seg3d )
+//{
+//  register_python_action_module();
+//}
 
-namespace Seg3D
+namespace Core
 {
 
 //////////////////////////////////////////////////////////////////////////
@@ -252,8 +252,18 @@ void PythonInterpreter::initialize_eventhandler()
   using namespace boost::python;
 
   PythonInterpreterPrivate::lock_type lock( this->private_->get_mutex() );
-  PyImport_AppendInittab( "seg3d", PyInit_seg3d );
+
+  // Register C++ to Python type converters
+  RegisterToPythonConverters();
+
+  // Add the extension modules
   PyImport_AppendInittab( "interpreter", PyInit_interpreter );
+  for ( module_list_type::iterator it = this->private_->modules_.begin(); 
+    it != this->private_->modules_.end(); ++it )
+  {
+    PyImport_AppendInittab( ( *it ).first.c_str(), ( *it ).second );
+  }
+
   Py_SetProgramName( const_cast< wchar_t* >( this->private_->program_name_ ) );
   boost::filesystem::path lib_path( this->private_->program_name_ );
   lib_path = lib_path.parent_path() / PYTHONPATH;
@@ -264,10 +274,6 @@ void PythonInterpreter::initialize_eventhandler()
   Py_NoSiteFlag = 1;
   //Py_InteractiveFlag = 1;
   Py_Initialize();
-
-  // Import seg3d module and everything inside
-  PyRun_SimpleString( "import seg3d\n"
-    "from seg3d import *\n" );
 
   // Create the compiler object
   PyRun_SimpleString( "from codeop import CommandCompiler\n"
@@ -307,10 +313,11 @@ void PythonInterpreter::initialize_eventhandler()
   this->private_->thread_condition_variable_.notify_one();
 }
 
-void PythonInterpreter::initialize( wchar_t* program_name )
+void PythonInterpreter::initialize( wchar_t* program_name, const module_list_type& init_list )
 {
   CORE_LOG_DEBUG( "Initializing Python ..." );
   this->private_->program_name_ = program_name;
+  this->private_->modules_ = init_list;
 
   PythonInterpreterPrivate::lock_type lock( this->private_->get_mutex() );
   this->start_eventhandler();
@@ -447,7 +454,7 @@ void PythonInterpreter::run_script( std::string script )
   boost::python::object code_obj;
   try
   {
-    code_obj = this->private_->compiler_( script, "<script>" );
+    code_obj = this->private_->compiler_( script, "<script>", "exec" );
   }
   catch ( ... ) {}
 

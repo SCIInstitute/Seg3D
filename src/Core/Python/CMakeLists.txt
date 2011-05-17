@@ -31,9 +31,9 @@
 # Set sources
 ##################################################
 
-SET(APPLICATION_PYTHONMODULE_SRCS
-  ActionModule.h
-  ActionModule.cc
+SET(CORE_PYTHON_SRCS
+  Util.h
+  Util.cc
   PythonInterpreter.h
   PythonInterpreter.cc
   PythonActionContext.h
@@ -42,14 +42,9 @@ SET(APPLICATION_PYTHONMODULE_SRCS
   ToPythonConverters.cc
 )
 
-CORE_ADD_LIBRARY(Application_PythonModule 
-      ${APPLICATION_PYTHONMODULE_SRCS})
-      
-SET_TARGET_PROPERTIES(Application_PythonModule
-                      PROPERTIES
-                      COMPILE_DEFINITIONS "BOOST_PYTHON_STATIC_MODULE")
+CORE_ADD_LIBRARY(Core_Python ${CORE_PYTHON_SRCS})
             
-TARGET_LINK_LIBRARIES(Application_PythonModule
+TARGET_LINK_LIBRARIES(Core_Python
                       Core_Utils
                       Core_Action
                       ${SCI_PYTHON_LIBRARY}

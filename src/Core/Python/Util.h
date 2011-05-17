@@ -26,9 +26,19 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_PYTHONMODULE_TOPYTHONCONVERTERS_H
-#define APPLICATION_PYTHONMODULE_TOPYTHONCONVERTERS_H
+#ifndef CORE_PYTHON_UTIL_H
+#define CORE_PYTHON_UTIL_H
 
-void register_to_python_converters();
+#include <boost/python.hpp>
+
+namespace Core
+{
+  // RUNACTIONFROMPYTHON:
+  // This is a helper function for forwarding action function calls in Python
+  // to the internal program logic. The first element of "args" should always
+  // be the name of the action.
+  // NOTE: This function must only be called on the Python thread.
+  boost::python::object RunActionFromPython( boost::python::tuple args, boost::python::dict kw_args );
+}
 
 #endif

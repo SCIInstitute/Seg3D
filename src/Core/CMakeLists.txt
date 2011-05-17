@@ -41,6 +41,10 @@ ADD_SUBDIRECTORY(Utils)
 ADD_SUBDIRECTORY(Viewer)
 ADD_SUBDIRECTORY(Volume)
 
+IF(BUILD_WITH_PYTHON)
+  ADD_SUBDIRECTORY(Python)
+ENDIF(BUILD_WITH_PYTHON)
+
 # These next three depend on OpenGL and should only be compiled when the renderer is compiled
 ADD_SUBDIRECTORY(Graphics)
 ADD_SUBDIRECTORY(RenderResources)

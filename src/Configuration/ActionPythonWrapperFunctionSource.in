@@ -1,0 +1,8 @@
+static boost::python::object action_@ACTION@_python_wrapper( 
+  boost::python::tuple args, boost::python::dict kw_args )
+{
+  boost::python::list arg_list( args );
+  arg_list.insert( 0, "@ACTION@" );
+  boost::python::tuple complete_args( arg_list );
+  return Core::RunActionFromPython( complete_args, kw_args );
+}

@@ -42,7 +42,7 @@
 #include <Core/Geometry/Vector.h>
 #include <Core/Utils/Variant.h>
 
-#include <Application/PythonModule/ToPythonConverters.h>
+#include <Core/Python/ToPythonConverters.h>
 
 template< class T >
 class StdVectorToListConverter : public boost::python::converter::wrap_pytype< &PyList_Type >
@@ -145,7 +145,10 @@ public:
   }
 };
 
-void register_to_python_converters()
+namespace Core
+{
+
+void RegisterToPythonConverters()
 {
   boost::python::to_python_converter< std::vector< std::string >, 
     StdVectorToListConverter< std::string >, true >();
@@ -167,3 +170,5 @@ void register_to_python_converters()
 
   boost::python::to_python_converter< Core::Variant, VariantToPythonConverter >();
 }
+
+} // end namespace Core

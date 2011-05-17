@@ -90,7 +90,7 @@ IF(WIN32)
 ENDIF(WIN32)
 
 IF(BUILD_WITH_PYTHON)
-  TARGET_LINK_LIBRARIES(${APPLICATION_NAME} Application_PythonModule)
+  TARGET_LINK_LIBRARIES(${APPLICATION_NAME} Core_Python)
 ENDIF(BUILD_WITH_PYTHON)
 
 # add libraries with plug-ins and extensions

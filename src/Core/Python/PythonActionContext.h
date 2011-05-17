@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_PYTHONMODULE_PYTHONACTIONCONTEXT_H
-#define APPLICATION_PYTHONMODULE_PYTHONACTIONCONTEXT_H
+#ifndef CORE_PYTHON_PYTHONACTIONCONTEXT_H
+#define CORE_PYTHON_PYTHONACTIONCONTEXT_H
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
@@ -39,7 +39,7 @@
 #include <Core/Action/ActionContext.h>
 #include <Core/Utils/EnumClass.h>
 
-namespace Seg3D
+namespace Core
 {
 
 CORE_ENUM_CLASS
@@ -95,6 +95,6 @@ private:
   Core::ActionResultHandle result_;
 };
 
-} //end namespace Seg3D
+} //end namespace Core
 
 #endif

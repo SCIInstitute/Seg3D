@@ -296,6 +296,7 @@ INCLUDE_DIRECTORIES(${SCI_MATLABIO_INCLUDE})
 IF(BUILD_WITH_PYTHON)
   INCLUDE_DIRECTORIES(${SCI_PYTHON_INCLUDE})
   ADD_DEFINITIONS(-DPy_NO_ENABLE_SHARED)
+  INCLUDE(CMake/GenerateActionPythonWrapper.cmake)
 ENDIF(BUILD_WITH_PYTHON)
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
@@ -398,6 +399,15 @@ ENDIF(SEG3D_BUILD_INTERFACE)
 
 MESSAGE(STATUS "Configuring Seg3D registered functions")
 GENERATE_REGISTRATION_FILES()
+
+###########################################
+# Generate the python functions registration file
+###########################################
+
+IF(BUILD_WITH_PYTHON)
+  MESSAGE(STATUS "Configuring action python wrapper functions")
+  GENERATE_ACTION_PYTHON_WRAPPER_REGISTRATION_FILE()
+ENDIF(BUILD_WITH_PYTHON)
 
 ###########################################
 # Bootstrap

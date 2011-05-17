@@ -942,7 +942,7 @@ Project::Project( const std::string& project_name ) :
   // Count that keeps track of datablock generation numbers
   this->add_state( "generation_count", this->generation_count_state_, -1 );
 
-  // Count that keeps track of datablock generation numbers
+  // Count that keeps track of maximum provenance ID
   this->add_state( "provenance_count", this->provenance_count_state_, -1 );
   
   this->private_->data_manager_ = DataManagerHandle( new DataManager() );

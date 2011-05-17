@@ -27,10 +27,9 @@
  */
 
 #include <Core/Utils/Log.h>
+#include <Core/Python/PythonActionContext.h>
 
-#include <Application/PythonModule/PythonActionContext.h>
-
-namespace Seg3D
+namespace Core
 {
 
 PythonActionContext::PythonActionContext() :

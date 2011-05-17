@@ -26,10 +26,12 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_PYTHONMODULE_ACTIONPYTHONWRAPPER_H
-#define APPLICATION_PYTHONMODULE_ACTIONPYTHONWRAPPER_H
+#ifndef CORE_PYTHON_TOPYTHONCONVERTERS_H
+#define CORE_PYTHON_TOPYTHONCONVERTERS_H
 
-//extern PyObject* PyInit_seg3d();
-void register_python_action_module();
+namespace Core
+{
+  void RegisterToPythonConverters();
+}
 
 #endif
