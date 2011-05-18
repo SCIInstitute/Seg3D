@@ -46,6 +46,7 @@ SET(MAIN_SRCS
 ###########################################
 
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SEG3D_OUTPUT_DIRECTORY})
+ADD_DEFINITIONS(-DAPPLICATION_NAME=${APPLICATION_NAME})
 
 IF(APPLE)
   SET(MAIN_SRCS ${MAIN_SRCS} "${APPLICATION_OSX_ICON_FULL_PATH}")
@@ -111,37 +112,21 @@ IF(APPLE)
 
     ADD_CUSTOM_COMMAND(TARGET ${APPLICATION_NAME} 
        POST_BUILD
-       COMMAND [ ! -d Debug ] || cp -rf "${QT_QTCORE_LIBRARY_RELEASE}/Versions/4/QtCore" "Debug/${APPLICATION_NAME}.app/Contents/MacOS/" 
-       COMMAND [ ! -d Debug ] || cp -rf "${QT_QTGUI_LIBRARY_RELEASE}/Versions/4/QtGui" "Debug/${APPLICATION_NAME}.app/Contents/MacOS/"
-       COMMAND [ ! -d Debug ] || cp -rf "${QT_QTOPENGL_LIBRARY_RELEASE}/Versions/4/QtOpenGL" "Debug/${APPLICATION_NAME}.app/Contents/MacOS/"
-       COMMAND [ ! -d Debug ] || install_name_tool -id QtCore Debug/${APPLICATION_NAME}.app/Contents/MacOS/QtCore
-       COMMAND [ ! -d Debug ] || install_name_tool -id QtGui Debug/${APPLICATION_NAME}.app/Contents/MacOS/QtGui
-       COMMAND [ ! -d Debug ] || install_name_tool -id QtOpenGL Debug/${APPLICATION_NAME}.app/Contents/MacOS/QtOpenGL
-       COMMAND [ ! -d Debug ] || install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore Debug/${APPLICATION_NAME}.app/Contents/MacOS/QtGui
-       COMMAND [ ! -d Debug ] || install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore Debug/${APPLICATION_NAME}.app/Contents/MacOS/QtOpenGL
-       COMMAND [ ! -d Debug ] || install_name_tool -change QtGui.framework/Versions/4/QtGui @executable_path/QtGui Debug/${APPLICATION_NAME}.app/Contents/MacOS/QtOpenGL
-       COMMAND [ ! -d Debug ] || install_name_tool -change QtGui.framework/Versions/4/QtGui @executable_path/QtGui Debug/${APPLICATION_NAME}.app/Contents/MacOS/${APPLICATION_NAME}
-       COMMAND [ ! -d Debug ] || install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore Debug/${APPLICATION_NAME}.app/Contents/MacOS/${APPLICATION_NAME}
-       COMMAND [ ! -d Debug ] || install_name_tool -change QtOpenGL.framework/Versions/4/QtOpenGL @executable_path/QtOpenGL Debug/${APPLICATION_NAME}.app/Contents/MacOS/${APPLICATION_NAME}
-       COMMAND [ ! -d Debug ] || cp "-rf" "${QT_QTGUI_LIBRARY_RELEASE}/Versions/Current/Resources" "Debug/${APPLICATION_NAME}.app/Contents"
-       COMMAND [ ! -d Debug ] || [ -d Debug/${APPLICATION_NAME}.app/Contents/MacOS/plugins ] || mkdir Debug/${APPLICATION_NAME}.app/Contents/MacOS/plugins
-       COMMAND [ ! -d Debug ] || cp -rf "${CMAKE_SOURCE_DIR}/CMake/qt.conf" Debug/${APPLICATION_NAME}.app/Contents/Resources
-
-       COMMAND [ ! -d Release ] || cp -rf "${QT_QTCORE_LIBRARY_RELEASE}/Versions/4/QtCore" "Release/${APPLICATION_NAME}.app/Contents/MacOS/" 
-       COMMAND [ ! -d Release ] || cp -rf "${QT_QTGUI_LIBRARY_RELEASE}/Versions/4/QtGui" "Release/${APPLICATION_NAME}.app/Contents/MacOS/"
-       COMMAND [ ! -d Release ] || cp -rf "${QT_QTOPENGL_LIBRARY_RELEASE}/Versions/4/QtOpenGL" "Release/${APPLICATION_NAME}.app/Contents/MacOS/"
-       COMMAND [ ! -d Release ] || install_name_tool -id QtCore Release/${APPLICATION_NAME}.app/Contents/MacOS/QtCore
-       COMMAND [ ! -d Release ] || install_name_tool -id QtGui Release/${APPLICATION_NAME}.app/Contents/MacOS/QtGui
-       COMMAND [ ! -d Release ] || install_name_tool -id QtOpenGL Release/${APPLICATION_NAME}.app/Contents/MacOS/QtOpenGL
-       COMMAND [ ! -d Release ] || install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore Release/${APPLICATION_NAME}.app/Contents/MacOS/QtGui
-       COMMAND [ ! -d Release ] || install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore Release/${APPLICATION_NAME}.app/Contents/MacOS/QtOpenGL
-       COMMAND [ ! -d Release ] || install_name_tool -change QtGui.framework/Versions/4/QtGui @executable_path/QtGui Release/${APPLICATION_NAME}.app/Contents/MacOS/QtOpenGL
-       COMMAND [ ! -d Release ] || install_name_tool -change QtGui.framework/Versions/4/QtGui @executable_path/QtGui Release/${APPLICATION_NAME}.app/Contents/MacOS/${APPLICATION_NAME}
-       COMMAND [ ! -d Release ] || install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore Release/${APPLICATION_NAME}.app/Contents/MacOS/${APPLICATION_NAME}
-       COMMAND [ ! -d Release ] || install_name_tool -change QtOpenGL.framework/Versions/4/QtOpenGL @executable_path/QtOpenGL Release/${APPLICATION_NAME}.app/Contents/MacOS/${APPLICATION_NAME}
-       COMMAND [ ! -d Release ] || cp "-rf" "${QT_QTGUI_LIBRARY_RELEASE}/Versions/Current/Resources" "Release/${APPLICATION_NAME}.app/Contents"
-       COMMAND [ ! -d Release ] || [ -d Release/${APPLICATION_NAME}.app/Contents/MacOS/plugins ] || mkdir Release/${APPLICATION_NAME}.app/Contents/MacOS/plugins
-       COMMAND [ ! -d Release ] || cp -rf "${CMAKE_SOURCE_DIR}/CMake/qt.conf" Release/${APPLICATION_NAME}.app/Contents/Resources
+       COMMAND [ ! -d ${CMAKE_CFG_INTDIR} ] || cp -rf "${QT_QTCORE_LIBRARY_RELEASE}/Versions/4/QtCore" "${CMAKE_CFG_INTDIR}/${APPLICATION_NAME}.app/Contents/MacOS/" 
+       COMMAND [ ! -d ${CMAKE_CFG_INTDIR} ] || cp -rf "${QT_QTGUI_LIBRARY_RELEASE}/Versions/4/QtGui" "${CMAKE_CFG_INTDIR}/${APPLICATION_NAME}.app/Contents/MacOS/"
+       COMMAND [ ! -d ${CMAKE_CFG_INTDIR} ] || cp -rf "${QT_QTOPENGL_LIBRARY_RELEASE}/Versions/4/QtOpenGL" "${CMAKE_CFG_INTDIR}/${APPLICATION_NAME}.app/Contents/MacOS/"
+       COMMAND [ ! -d ${CMAKE_CFG_INTDIR} ] || install_name_tool -id QtCore ${CMAKE_CFG_INTDIR}/${APPLICATION_NAME}.app/Contents/MacOS/QtCore
+       COMMAND [ ! -d ${CMAKE_CFG_INTDIR} ] || install_name_tool -id QtGui ${CMAKE_CFG_INTDIR}/${APPLICATION_NAME}.app/Contents/MacOS/QtGui
+       COMMAND [ ! -d ${CMAKE_CFG_INTDIR} ] || install_name_tool -id QtOpenGL ${CMAKE_CFG_INTDIR}/${APPLICATION_NAME}.app/Contents/MacOS/QtOpenGL
+       COMMAND [ ! -d ${CMAKE_CFG_INTDIR} ] || install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore ${CMAKE_CFG_INTDIR}/${APPLICATION_NAME}.app/Contents/MacOS/QtGui
+       COMMAND [ ! -d ${CMAKE_CFG_INTDIR} ] || install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore ${CMAKE_CFG_INTDIR}/${APPLICATION_NAME}.app/Contents/MacOS/QtOpenGL
+       COMMAND [ ! -d ${CMAKE_CFG_INTDIR} ] || install_name_tool -change QtGui.framework/Versions/4/QtGui @executable_path/QtGui ${CMAKE_CFG_INTDIR}/${APPLICATION_NAME}.app/Contents/MacOS/QtOpenGL
+       COMMAND [ ! -d ${CMAKE_CFG_INTDIR} ] || install_name_tool -change QtGui.framework/Versions/4/QtGui @executable_path/QtGui ${CMAKE_CFG_INTDIR}/${APPLICATION_NAME}.app/Contents/MacOS/${APPLICATION_NAME}
+       COMMAND [ ! -d ${CMAKE_CFG_INTDIR} ] || install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore ${CMAKE_CFG_INTDIR}/${APPLICATION_NAME}.app/Contents/MacOS/${APPLICATION_NAME}
+       COMMAND [ ! -d ${CMAKE_CFG_INTDIR} ] || install_name_tool -change QtOpenGL.framework/Versions/4/QtOpenGL @executable_path/QtOpenGL ${CMAKE_CFG_INTDIR}/${APPLICATION_NAME}.app/Contents/MacOS/${APPLICATION_NAME}
+       COMMAND [ ! -d ${CMAKE_CFG_INTDIR} ] || cp "-rf" "${QT_QTGUI_LIBRARY_RELEASE}/Versions/Current/Resources" "${CMAKE_CFG_INTDIR}/${APPLICATION_NAME}.app/Contents"
+       COMMAND [ ! -d ${CMAKE_CFG_INTDIR} ] || [ -d ${CMAKE_CFG_INTDIR}/${APPLICATION_NAME}.app/Contents/MacOS/plugins ] || mkdir ${CMAKE_CFG_INTDIR}/${APPLICATION_NAME}.app/Contents/MacOS/plugins
+       COMMAND [ ! -d ${CMAKE_CFG_INTDIR} ] || cp -rf "${CMAKE_SOURCE_DIR}/CMake/qt.conf" ${CMAKE_CFG_INTDIR}/${APPLICATION_NAME}.app/Contents/Resources
 
        WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 

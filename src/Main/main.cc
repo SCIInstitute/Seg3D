@@ -39,6 +39,9 @@
 #include <iostream>
 #include <string>
 
+// boost includes
+#include <boost/preprocessor.hpp>
+
 // Core includes
 #include <Core/Utils/Log.h>
 #include <Core/Utils/LogStreamer.h>
@@ -174,9 +177,10 @@ int main( int argc, char **argv )
   mbstowcs( &program_name[ 0 ], argv[ 0 ], name_len + 1 );
 
   Core::PythonInterpreter::module_list_type python_modules;
-  python_modules.push_back( std::make_pair( std::string( "seg3d" ), PyInit_Seg3D2 ) );
+  std::string module_name = Core::StringToLower( BOOST_PP_STRINGIZE( APPLICATION_NAME ) );
+  python_modules.push_back( std::make_pair( module_name, BOOST_PP_CAT( PyInit_, APPLICATION_NAME ) ) );
   Core::PythonInterpreter::Instance()->initialize( &program_name[ 0 ], python_modules );
-  Core::PythonInterpreter::Instance()->run_script( "import seg3d\nfrom seg3d import *\n" );
+  Core::PythonInterpreter::Instance()->run_script( "import " + module_name + "\nfrom " + module_name + " import *\n" );
 #endif
 
   // -- Setup Application Interface Window --
