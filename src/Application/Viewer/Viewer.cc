@@ -355,7 +355,8 @@ void ViewerPrivate::insert_layer( LayerHandle layer )
 void ViewerPrivate::delete_layers( std::vector< LayerHandle > layers )
 {
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-
+  
+  bool layer_deleted = false;
   for ( size_t i = 0; i < layers.size(); ++i )
   {
     LayerHandle layer = layers[ i ];
@@ -371,23 +372,27 @@ void ViewerPrivate::delete_layers( std::vector< LayerHandle > layers )
     this->layer_connection_map_.erase( layer->get_layer_id() );
 
     volume_slice_map_type::iterator it = this->volume_slices_.find( layer->get_layer_id() );
-    assert( it != this->volume_slices_.end() );
+    if ( it == this->volume_slices_.end() ) continue;
     if ( this->active_layer_slice_ == ( *it ).second )
     {
       this->active_layer_slice_.reset();
     }
-    this->volume_slices_.erase( it );   
+    this->volume_slices_.erase( it );
+    layer_deleted = true;
   }
 
   lock.unlock();
 
-  if ( !LayerManager::Instance()->get_active_layer() )
+  if ( layer_deleted )
   {
-    this->viewer_->redraw_all();
-  }
-  else
-  {
-    this->viewer_->redraw_scene();
+    if ( !LayerManager::Instance()->get_active_layer() )
+    {
+      this->viewer_->redraw_all();
+    }
+    else
+    {
+      this->viewer_->redraw_scene();
+    }
   }
 }
 
