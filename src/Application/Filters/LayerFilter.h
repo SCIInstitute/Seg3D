@@ -237,6 +237,7 @@ public:
 
   // -- internals --
 private:
+  friend class LayerFilterPrivate;
   LayerFilterPrivateHandle private_;
 
 };

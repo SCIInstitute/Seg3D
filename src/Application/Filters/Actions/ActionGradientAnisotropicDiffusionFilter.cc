@@ -133,15 +133,15 @@ public:
     // are aborted. In that case we will relay a message to the status bar for information.
     try 
     { 
+      filter->Update(); 
+    } 
+    catch ( ... ) 
+    {
       if ( this->check_abort() )
       {
         this->report_error( "Filter was aborted." );
         return;
       }
-      filter->Update(); 
-    } 
-    catch ( ... ) 
-    {
       this->report_error( "ITK filter failed to complete." );
       return;
     }

@@ -152,7 +152,7 @@ void LayerUndoBufferItem::add_layer_to_restore( LayerHandle layer,
   this->private_->layers_to_restore_.push_back( std::make_pair( layer, checkpoint ) );
 }
 
-bool LayerUndoBufferItem::apply_and_clear_undo()
+void LayerUndoBufferItem::rollback_layer_changes()
 {
   // Step 1: 
   // Any filter action that is still running needs to be aborted to do an undo
@@ -167,14 +167,14 @@ bool LayerUndoBufferItem::apply_and_clear_undo()
   {
     // Get a handle to the filter if it still exist
     LayerAbstractFilterHandle filter = this->private_->layer_filters_to_abort_[ j ].lock();
-    
+
     // If it is still there...
     if ( filter )
     {
       // Notify the user that undoing an asynchronous filter may take a bit of time
       std::string message = std::string("Undoing filter '") + this->get_tag() 
         + std::string("'");
-    
+
       // Create application wide progress bar, that blocks the full program
       Core::ActionProgressHandle progress = 
         Core::ActionProgressHandle( new Core::ActionProgress( message ) );      
@@ -192,13 +192,13 @@ bool LayerUndoBufferItem::apply_and_clear_undo()
     // The filter should no longer be running and all the locks on the support layers
     // should have been released.
   }
-  
+
   // Remove this list as we are done with it.
   this->private_->layer_filters_to_abort_.clear();
-  
+
   // Step 2:
   // Now the filter is no longer running, we need to restore the data in layer
-  
+
   for ( size_t j = 0; j < this->private_->layers_to_restore_.size(); j++ )
   { 
     // Get the layer handle of the layer that needs to be restored.
@@ -207,7 +207,7 @@ bool LayerUndoBufferItem::apply_and_clear_undo()
     // Apply the check point, this should restore the data
     this->private_->layers_to_restore_[ j ].second->apply( layer );
   }
-  
+
   // Remove the layers from the undo mechanism so the program can actually delete them afterwards
   this->private_->layers_to_restore_.clear();
 
@@ -282,10 +282,15 @@ bool LayerUndoBufferItem::apply_and_clear_undo()
     std::vector< LayerHandle > layers( 1, layer );
     LayerManager::Instance()->delete_layers( layers );
   } 
-  
+
   // Remove the layers from the undo mechanism so the program can actually delete them
   this->private_->layers_to_delete_.clear();
-  
+}
+
+bool LayerUndoBufferItem::apply_and_clear_undo()
+{
+  this->rollback_layer_changes();
+
   // The counters need to be rolled back so when redo is done, it actually redos the same action
   // resulting in the same counters. This only needs to be done if layers got created and deleted
   // in the undo.

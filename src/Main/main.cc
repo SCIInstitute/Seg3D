@@ -26,14 +26,15 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifdef BUILD_WITH_PYTHON
+#ifdef _MSC_VER
+#pragma warning( disable: 4244 4267 )
+#endif
 
+#ifdef BUILD_WITH_PYTHON
 #include <Python.h>
 #include <Core/Python/PythonInterpreter.h>
 #include "ActionPythonWrapperRegistration.h"
-
 #endif
-
 
 // STL includes
 #include <iostream>

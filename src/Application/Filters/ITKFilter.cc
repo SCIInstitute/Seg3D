@@ -213,10 +213,12 @@ void ITKFilter::forward_abort_to_filter_internal( itk::ProcessObject::Pointer fi
   ITKFilterPrivate::lock_type lock( this->private_->get_mutex() );
   this->private_->disconnect_all();
   this->private_->filter_ = filter;
-  this->private_->add_connection( layer->abort_signal_.connect( boost::bind(
-    &ITKFilter::raise_abort, this ) ) );
-  this->private_->add_connection( layer->stop_signal_.connect( boost::bind(
-    &ITKFilter::raise_stop, this ) ) );
+  
+  // NOTE: The following logic is already done by LayerFilter.
+  //this->private_->add_connection( layer->abort_signal_.connect( boost::bind(
+  //  &ITKFilter::raise_abort, this ) ) );
+  //this->private_->add_connection( layer->stop_signal_.connect( boost::bind(
+  //  &ITKFilter::raise_stop, this ) ) );
 }
 
 void ITKFilter::handle_abort()

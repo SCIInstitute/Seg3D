@@ -48,6 +48,7 @@
 #include <Application/LayerManager/LayerUndoBufferItem.h>
 #include <Application/Filters/LayerFilter.h>
 #include <Application/Filters/LayerFilterLock.h>
+#include <Application/UndoBuffer/Actions/ActionUndo.h>
  
 namespace Seg3D
 {
@@ -116,6 +117,13 @@ public:
   
   // ProvenanceStep, the provenance step record that is associated with this filter
   ProvenanceStepHandle provenance_step_;
+
+  // A weak handle to the LayerUndoBufferItem. It's used to rollback any changes
+  // that might have already happened when the filter is aborted.
+  LayerUndoBufferItemWeakHandle undo_item_weak_handle_;
+
+  // Pointer to the filter.
+  LayerFilter* filter_;
   
   // -- internal functions --
 public:
@@ -127,6 +135,10 @@ public:
   // DELETE_LAYER:
   // Delete layer
   bool delete_layer( LayerHandle layer );
+
+  // INTERNAL_ABORT:
+  // Abort the filter.
+  void internal_abort();
 };
 
 bool LayerFilterPrivate::delete_layer( LayerHandle layer )
@@ -247,7 +259,8 @@ void LayerFilterPrivate::finalize()
   
   if ( this->error_.size() )
   {
-    CORE_LOG_ERROR( this->error_ ); 
+    // This is unnecessary since the error was already logged in report_error.
+    //CORE_LOG_ERROR( this->error_ ); 
   }
   else if ( this->success_.size() )
   {
@@ -255,9 +268,22 @@ void LayerFilterPrivate::finalize()
   }
 }
 
+void LayerFilterPrivate::internal_abort()
+{
+  boost::mutex::scoped_lock lock( this->mutex_ );
+  if ( !this->abort_ )
+  {
+    this->abort_ = true;
+    this->filter_->report_error( "Processing was aborted." );
+    this->filter_->handle_abort();
+  }
+}
+
+
 LayerFilter::LayerFilter() :
   private_( new LayerFilterPrivate )
 {
+  this->private_->filter_ = this;
 }
 
 LayerFilter::~LayerFilter()
@@ -267,10 +293,32 @@ LayerFilter::~LayerFilter()
 
 void LayerFilter::raise_abort()
 {
-  boost::mutex::scoped_lock lock( this->private_->mutex_ );
-  this->private_->abort_ = true;
-  this->report_error( "Processing was aborted." );
-  this->handle_abort();
+  {
+    boost::mutex::scoped_lock lock( this->private_->mutex_ );
+    if ( this->private_->abort_ ) return;
+  }
+
+  if ( !Core::Application::IsApplicationThread() )
+  {
+    Core::Application::PostEvent( boost::bind( &LayerFilter::raise_abort, 
+      boost::dynamic_pointer_cast< LayerFilter >( this->shared_from_this() ) ) );
+    return;
+  }
+
+  LayerUndoBufferItemHandle undo_item = this->private_->undo_item_weak_handle_.lock();
+  // If there exists an undo item, use it to roll back any changes. The actual abort will happen
+  // during the rollback.
+  // NOTE: This won't delete the undo record from undo buffer, as there might be some
+  // extra cleanups required to fully undo the action (such as restoring layer ID count).
+  if ( undo_item )
+  {
+    undo_item->rollback_layer_changes();
+  }
+  // Otherwise, abort immediately.
+  else
+  {
+    this->private_->internal_abort();
+  }
 }
 
 void LayerFilter::raise_stop()
@@ -301,7 +349,7 @@ void LayerFilter::abort_and_wait()
   }
   
   // Raise the abort in case it wasn't raised.
-  this->raise_abort();
+  this->private_->internal_abort();
   
   {
     boost::mutex::scoped_lock lock( this->private_->mutex_ ); 
@@ -394,6 +442,7 @@ bool LayerFilter::lock_for_processing( LayerHandle layer )
   
   // Hook up the abort signal from the layer
   this->connect_abort( layer );
+  this->connect_stop( layer );
   
   return true;
 }
@@ -420,6 +469,7 @@ bool LayerFilter::lock_for_deletion( LayerHandle layer )
   
   // Hook up the abort signal from the layer
   this->connect_abort( layer );
+  this->connect_stop( layer );
   
   return true;
 }
@@ -457,6 +507,7 @@ bool LayerFilter::create_and_lock_data_layer_from_layer( LayerHandle src_layer,
 
   // Hook up the abort signal from the layer
   this->connect_abort( dst_layer );
+  this->connect_stop( dst_layer );
 
   // Success
   return true;
@@ -484,6 +535,7 @@ bool LayerFilter::create_and_lock_data_layer( const Core::GridTransform& grid_tr
 
   // Hook up the abort signal from the layer
   this->connect_abort( dst_layer );
+  this->connect_stop( dst_layer );
 
   // Success
   return true;
@@ -510,6 +562,7 @@ bool LayerFilter::create_and_lock_mask_layer_from_layer( LayerHandle src_layer, 
 
   // Hook up the abort signal from the layer
   this->connect_abort( dst_layer );
+  this->connect_stop( dst_layer );
 
   // Success
   return true;
@@ -536,6 +589,7 @@ bool LayerFilter::create_and_lock_mask_layer_from_layer( LayerHandle src_layer, 
 
   // Hook up the abort signal from the layer
   this->connect_abort( dst_layer );
+  this->connect_stop( dst_layer );
 
   // Success
   return true;
@@ -563,6 +617,7 @@ bool LayerFilter::create_and_lock_mask_layer( const Core::GridTransform& grid_tr
 
   // Hook up the abort signal from the layer
   this->connect_abort( dst_layer );
+  this->connect_stop( dst_layer );
 
   // Success
   return true;
@@ -692,6 +747,7 @@ bool LayerFilter::create_undo_redo_record( Core::ActionContextHandle context, Co
 {
   // Create a new undo/redo record
   LayerUndoBufferItemHandle item( new LayerUndoBufferItem( get_filter_name() ) );
+  this->private_->undo_item_weak_handle_ = item;
 
   // Keep track of the filter
   item->add_filter_to_abort( this->shared_from_this() );
