@@ -47,6 +47,7 @@
 #include <Core/State/Actions/ActionRemove.h>
 #include <Core/State/Actions/ActionSetAt.h>
 #include <Core/TextRenderer/TextRenderer.h>
+#include <Core/Utils/EnumClass.h>
 #include <Core/Utils/Lockable.h>
 #include <Core/Viewer/Mouse.h>
 
@@ -57,45 +58,85 @@ namespace Seg3D
 {
 
 //////////////////////////////////////////////////////////////////////////
-// Class MeasurementPoint
+// Class HoverMeasurement
 //////////////////////////////////////////////////////////////////////////
 
-class MeasurementPoint
+CORE_ENUM_CLASS
+(
+	MeasurementHoverObject,
+	POINT_0_E = 0,
+	POINT_1_E = 1,
+	LINE_E = 2,
+	LABEL_E = 3,
+	NONE_E
+)
+
+class HoverMeasurement
 {
 public:
-	MeasurementPoint();
+	HoverMeasurement();
 
-	bool is_valid();
+	bool is_valid() const;
 	void invalidate();
 
-	// Storing id instead of index just in case measurements change on another thread
+	bool is_point() const;
+	bool is_line() const;
+
 	std::string measurement_id_;
-	int point_index_;
+	// Specific part of measurement that is hovered over (point, line, etc.)
+	MeasurementHoverObject hover_object_; 
 };
 
-MeasurementPoint::MeasurementPoint() 
+HoverMeasurement::HoverMeasurement() 
+	: hover_object_( MeasurementHoverObject::NONE_E )
 {
 	this->invalidate();
 }
 
-bool MeasurementPoint::is_valid()
+bool HoverMeasurement::is_valid() const
 {
-	return ( this->measurement_id_ != "" && ( this->point_index_ == 0 || this->point_index_ == 1 ) );	
+	if( this->measurement_id_ == "" || this->hover_object_ == MeasurementHoverObject::NONE_E )
+	{
+		return false;
+	}
+	return true;
 }
 
-void MeasurementPoint::invalidate()
+void HoverMeasurement::invalidate()
 {
 	this->measurement_id_ = "";
-	this->point_index_ = -1;
+	this->hover_object_ = MeasurementHoverObject::NONE_E;
+}
+
+bool HoverMeasurement::is_point() const
+{
+	return ( this->hover_object_ == MeasurementHoverObject::POINT_0_E || 
+		this->hover_object_ == MeasurementHoverObject::POINT_1_E );
+}
+
+bool HoverMeasurement::is_line() const
+{
+	return ( this->hover_object_ == MeasurementHoverObject::LINE_E );
 }
 
 //////////////////////////////////////////////////////////////////////////
 // Class MeasurementToolPrivate
 //////////////////////////////////////////////////////////////////////////
 
+CORE_ENUM_CLASS
+(
+	 MeasurementEditMode,
+	 NONE_E,
+	 MOVE_POINT_E,
+	 MOVE_MEASUREMENT_E,
+	 SNAP_TO_AXIS_E
+ )
+
 class MeasurementToolPrivate : public Core::RecursiveLockable
 {
 public:
+	MeasurementToolPrivate();
+
 	//
 	// Tool Interface 
 	// 
@@ -118,13 +159,21 @@ public:
 	// Redraw in relevant viewers.
 	void update_viewers();
 
+	// FIND_HOVER_MEASUREMENT:
+	// Find measurement (if any) that mouse is currently hovering over.
+	bool find_hover_measurement();
+
 	// FIND_HOVER_POINT:
 	// Find measurement point (if any) that mouse is currently hovering over.
 	bool find_hover_point();
 
+	// FIND_HOVER_LINE:
+	// Find measurement line (if any) that mouse is currently hovering over.
+	bool find_hover_line();
+
 	// MOVE_HOVER_POINT_TO_MOUSE:
-	// Move hover point to current mouse position.
-	void move_hover_point_to_mouse();
+	// Move hover object (point or entire measurement) to current mouse position.
+	void move_hover_measurement_to_mouse();
 
 	// SNAP_HOVER_POINT_TO_SLICE:
 	// Snap the hover point to its projected position on the current slice.
@@ -132,12 +181,11 @@ public:
 
 	// UPDATE_HOVER_POINT:
 	// Find or move the hover point, depending on whether user is editing or not.
-	void update_hover_point();
+	void update_hover_measurement();
 
 	// Locks: StateEngine
-	bool get_hover_measurement( size_t& index, Core::Measurement& measurement, 
-		Core::Point& world_point ); 
-
+	bool get_hover_measurement( size_t& index, Core::Measurement& measurement ) const;
+	
 	// UPDATE_CURSOR:
 	// Set cursor based on current editing/hover state
 	void update_cursor();
@@ -145,13 +193,19 @@ public:
 	void start_editing();
 	void finish_editing();
 
+	void create_new_measurement();
+
 	bool get_mouse_world_point( Core::Point& world_point );
 
-	// IN_SLICE:
-	// Return true if the point is in the current slice.  This is slightly different from seed 
+	// POINT_IN_SLICE:
+	// Return true if the given point is in the current slice.  This is slightly different from seed 
 	// points -- in this case the point needs to be within epsilon of the slice, not just nearest
-	// to it.
-	bool in_slice( ViewerHandle viewer, const Core::Point& world_point );
+	// to it. 
+	bool point_in_slice( ViewerHandle viewer, const Core::Point& world_point ) const;
+
+	// HOVER_OBJECT_IN_SLICE:
+	// Return true if the hover object (point or line) is in slice.  
+	bool hover_object_in_slice() const;
 
 	MeasurementTool* tool_;
 
@@ -159,17 +213,17 @@ public:
 
 	std::string active_group_id_; // Only accessed from application thread
 
-	// Is a measurement being edited?
-	bool editing_; // Should be mutex-protected
+	// Is a measurement being edited?  What mode?
+	MeasurementEditMode edit_mode_; // Should be mutex-protected
 
-	// Measurement point that is currently hovered over by the mouse. 
-	// We need to know the hover point for left-click + mouse move (editing),
+	// Measurement that is currently hovered over by the mouse. 
+	// We need to know the hover point or line for left-click + mouse move (editing),
 	// middle-click (move point to current slice) and right-click (delete measurement).
 	// Want to store this so that we don't have to "find" the hover point every time the mouse moves
-	// since during editing we might find a different point and start moving that one instead.  
+	// during editing since we might find a different point and start moving that one instead.  
 	// Also need to check this in redraw when determining which measurement (if any) to draw as a 
 	// dotted line.
-	MeasurementPoint hover_point_; // Should be mutex-protected
+	HoverMeasurement hover_measurement_; // Should be mutex-protected
 
 	int measurement_id_counter_; // Should be mutex-protected
 
@@ -178,7 +232,17 @@ public:
 	int saved_num_measurements_; // Only accessed from application thread
 
 	bool handle_measurements_changed_blocked_; // Only accessed from application thread
+
+	// Start points when dragging measurement line
+	Core::Point drag_mouse_start_; // Only accessed from interface thread
+	Core::Point drag_p0_start_; // Only accessed from interface thread
+	Core::Point drag_p1_start_; // Only accessed from interface thread
 };
+
+MeasurementToolPrivate::MeasurementToolPrivate()
+	: edit_mode_( MeasurementEditMode::NONE_E )// CORE_ENUM_CLASS has no default constructor
+{
+}
 
 // Called in response to state changed signal
 void MeasurementToolPrivate::handle_measurements_changed()
@@ -343,7 +407,7 @@ void MeasurementToolPrivate::handle_viewer_slice_changed( size_t viewer_id, int 
 	}
 
 	// Update hover point based on new slice
-	this->update_hover_point();
+	this->update_hover_measurement();
 }
 
 void MeasurementToolPrivate::initialize_id_counter()
@@ -420,24 +484,32 @@ void MeasurementToolPrivate::update_viewers()
 	ViewerManager::Instance()->update_2d_viewers_overlay();
 }
 
-bool MeasurementToolPrivate::find_hover_point()
+bool MeasurementToolPrivate::find_hover_measurement()
 {
 	// May be called from application (slice changed) or interface (mouse move) thread
 	lock_type lock( this->get_mutex() );
 
-	// Need to find first point within radius.
-	// NOTE: Should we find closest point within radius instead?
+	this->hover_measurement_.invalidate();
 
-	if( !this->viewer_ ) 
+	if( !this->viewer_ || !this->viewer_->get_active_volume_slice() ) 
 	{
-		this->hover_point_.invalidate();
 		return false;
 	}
 
-	Core::VolumeSliceHandle volume_slice = this->viewer_->get_active_volume_slice();
-	if( !volume_slice )
+	return ( this->find_hover_point() || this->find_hover_line() );
+}
+
+bool MeasurementToolPrivate::find_hover_point()
+{
+	// Need to find first point within radius.
+	// NOTE: Should we find closest point within radius instead?
+
+	// May be called from application (slice changed) or interface (mouse move) thread
+	lock_type lock( this->get_mutex() );
+
+	Core::VolumeSliceHandle active_slice = this->viewer_->get_active_volume_slice();
+	if( !active_slice )
 	{
-		this->hover_point_.invalidate();
 		return false;
 	}
 
@@ -449,8 +521,8 @@ bool MeasurementToolPrivate::find_hover_point()
 	double pixel_height = Core::Abs( y1 - y0 );
 
 	// Compute the mouse position in world space
-	double world_x, world_y;
-	this->viewer_->window_to_world( this->mouse_pos_.x_, this->mouse_pos_.y_, world_x, world_y );
+	double mouse_x, mouse_y;
+	this->viewer_->window_to_world( this->mouse_pos_.x_, this->mouse_pos_.y_, mouse_x, mouse_y );
 
 	// Search for the first vertex that's within 2 pixels of current mouse position
 	double range_x = pixel_width * 4;
@@ -469,38 +541,144 @@ bool MeasurementToolPrivate::find_hover_point()
 				Core::Point measurement_point;
 				m.get_point( point_index, measurement_point );
 				double pt_x, pt_y;
-				volume_slice->project_onto_slice( measurement_point, pt_x, pt_y );
-				if ( Core::Abs( pt_x - world_x ) <= range_x &&
-					Core::Abs( pt_y - world_y ) <= range_y )
+				active_slice->project_onto_slice( measurement_point, pt_x, pt_y );
+				if ( Core::Abs( pt_x - mouse_x ) <= range_x &&
+					Core::Abs( pt_y - mouse_y ) <= range_y )
 				{
-					this->hover_point_.measurement_id_ = m.get_id();
-					this->hover_point_.point_index_ = point_index; 
+					this->hover_measurement_.measurement_id_ = m.get_id();
+					MeasurementHoverObject hover_object = ( point_index == 0 ) ? 
+						MeasurementHoverObject::POINT_0_E : MeasurementHoverObject::POINT_1_E;
+					this->hover_measurement_.hover_object_ = hover_object; 
 					return true;
 				}
 			}
 		}
 	}
 
-	// If no point hovered over, invalidate hover point
-	this->hover_point_.invalidate();
 	return false;
 }
 
-void MeasurementToolPrivate::move_hover_point_to_mouse()
+bool MeasurementToolPrivate::find_hover_line()
+{
+	// May be called from application (slice changed) or interface (mouse move) thread
+	lock_type lock( this->get_mutex() );
+
+	Core::VolumeSliceHandle active_slice = this->viewer_->get_active_volume_slice();
+	if( !active_slice )
+	{
+		return false;
+	}
+
+	// Compute the size of a pixel in world space
+	double x0, y0, x1, y1;
+	this->viewer_->window_to_world( 0, 0, x0, y0 );
+	this->viewer_->window_to_world( 1, 1, x1, y1 );
+	double pixel_width = Core::Abs( x1 - x0 );
+	double pixel_height = Core::Abs( y1 - y0 );
+	double epsilon = pixel_width * 4;
+
+	// Compute the mouse position in world space
+	double mouse_x, mouse_y;
+	this->viewer_->window_to_world( this->mouse_pos_.x_, this->mouse_pos_.y_, mouse_x, mouse_y );
+	Core::Point mouse_point( mouse_x, mouse_y, 0 );
+
+	Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
+	const std::vector< Core::Measurement >& measurements = this->tool_->measurements_state_->get();
+
+	bool hovering = false;
+	double min_dist = DBL_MAX;
+	BOOST_FOREACH( Core::Measurement m, measurements )
+	{
+		// Get both measurement points
+		Core::Point p0, p1;
+		m.get_point( 0, p0 );
+		m.get_point( 1, p1 );
+
+		// Project points onto slice so that we can detect if we're hovering over a measurement
+		// not in the current slice.
+		double p0_x, p0_y;
+		active_slice->project_onto_slice( p0, p0_x, p0_y );
+		p0 = Core::Point( p0_x, p0_y, 0 );
+		double p1_x, p1_y;
+		active_slice->project_onto_slice( p1, p1_x, p1_y );
+		p1 = Core::Point( p1_x, p1_y, 0 );
+
+		// Calculate the shortest distance between the point and the line segment
+		double distance = 0.0;
+		double l2 = ( p1 - p0 ).length2();  // i.e. |w-v|^2 -  avoid a sqrt
+		if( l2 == 0.0 ) // p0 == p1 case
+		{
+			distance = ( mouse_point - p0 ).length();
+		}
+		else
+		{
+			// Consider the line extending the segment, parameterized as v + t (w - v).
+			// We find projection of point p onto the line. 
+			// It falls where t = [(p-v) . (w-v)] / |w-v|^2
+			double t = Dot( mouse_point - p0, p1 - p0 ) / l2;
+			if( t < 0.0 || t > 1.0 )
+			{
+				// Beyond the segment
+				continue;
+			}
+			else
+			{
+				Core::Point projection = p0 + t * ( p1 - p0 );  // Projection falls on the segment
+				distance = ( mouse_point - projection ).length();
+			}	
+		}
+
+		if( distance > epsilon || distance > min_dist )
+		{
+			continue;
+		}
+		
+		// Found the new closest measurement
+		hovering = true;
+		min_dist = distance;
+		this->hover_measurement_.measurement_id_ = m.get_id();
+		this->hover_measurement_.hover_object_ = MeasurementHoverObject::LINE_E;
+	}
+
+	return hovering;
+}
+
+void MeasurementToolPrivate::move_hover_measurement_to_mouse()
 {
 	// May be called from application (slice changed) or interface (mouse move) thread
 	lock_type lock( this->get_mutex() );
 	
-	if( this->hover_point_.is_valid() )
+	if( this->hover_measurement_.is_valid() )
 	{
 		// Convert current mouse coords to 3D world point
-		Core::Point moved_pt;
-		if( this->get_mouse_world_point( moved_pt ) )
+		Core::Point curr_mouse_pt;
+		if( this->get_mouse_world_point( curr_mouse_pt ) )
 		{
-			// Update hover point
-			ActionSetMeasurementPoint::Dispatch( Core::Interface::GetMouseActionContext(), 
-				this->tool_->measurements_state_, this->hover_point_.measurement_id_, 
-				this->hover_point_.point_index_, moved_pt );
+			if( this->hover_measurement_.is_point() )
+			{
+				// Update single hover point
+				ActionSetMeasurementPoint::Dispatch( Core::Interface::GetMouseActionContext(), 
+					this->tool_->measurements_state_, this->hover_measurement_.measurement_id_, 
+					this->hover_measurement_.hover_object_, curr_mouse_pt );
+			}
+			else if( this->hover_measurement_.is_line() )
+			{
+				// Find vector between mouse start and end
+				Core::Vector mouse_vec = curr_mouse_pt - this->drag_mouse_start_;
+
+				// Add vector to p0 and p1
+				size_t index;
+				Core::Measurement measurement;
+				if( this->get_hover_measurement( index, measurement ) )
+				{
+					// Update measurement
+					measurement.set_point( 0, this->drag_p0_start_ + mouse_vec );
+					measurement.set_point( 1, this->drag_p1_start_ + mouse_vec );
+
+					Core::ActionSetAt::Dispatch( Core::Interface::GetMouseActionContext(), 
+						this->tool_->measurements_state_, index, measurement );
+				}
+			}
 		}
 	}
 }
@@ -513,9 +691,11 @@ bool MeasurementToolPrivate::snap_hover_point_to_slice()
 	// Find world hover point
 	size_t measurement_index;
 	Core::Measurement edited_measurement;
-	Core::Point measurement_point;
-	if( this->get_hover_measurement( measurement_index, edited_measurement, measurement_point ) )
+	if( this->get_hover_measurement( measurement_index, edited_measurement ) )
 	{
+		Core::Point measurement_point;
+		edited_measurement.get_point( this->hover_measurement_.hover_object_, measurement_point );
+
 		if( !this->viewer_ )
 		{
 			return false;
@@ -535,14 +715,14 @@ bool MeasurementToolPrivate::snap_hover_point_to_slice()
 
 		// Update hover point
 		ActionSetMeasurementPoint::Dispatch( Core::Interface::GetMouseActionContext(), 
-			this->tool_->measurements_state_, this->hover_point_.measurement_id_, 
-			this->hover_point_.point_index_, moved_pt );
+			this->tool_->measurements_state_, this->hover_measurement_.measurement_id_, 
+			this->hover_measurement_.hover_object_, moved_pt );
 		return true;
 	}
 	return false;
 }
 
-void MeasurementToolPrivate::update_hover_point()
+void MeasurementToolPrivate::update_hover_measurement()
 {
 	// May be called from application (slice changed) or interface (mouse move) thread
 	lock_type lock( this->get_mutex() );
@@ -552,27 +732,29 @@ void MeasurementToolPrivate::update_hover_point()
 		return;
 	}
 
-	if( this->editing_ )
+	if( this->edit_mode_ == MeasurementEditMode::MOVE_POINT_E || 
+		this->edit_mode_ == MeasurementEditMode::MOVE_MEASUREMENT_E )
 	{
-		// Move hovered point.  We don't want to "find" the hover point every time the mouse moves
+		// Move hovered object (point or line).  
+		// Note: We don't want to "find" the hover point every time the mouse moves
 		// during editing since we might find a different point and start moving that one instead.
-		this->move_hover_point_to_mouse();
+		this->move_hover_measurement_to_mouse();
 	}
 	else
 	{	
-		// Find the measurement point that the mouse is currently hovering over, if there is one
-		this->find_hover_point();
+		// Find the measurement that the mouse is currently hovering over, if there is one
+		this->find_hover_measurement();
 	}
 	this->update_cursor();
 }
 
-bool MeasurementToolPrivate::get_hover_measurement( size_t& index, Core::Measurement& measurement, 
-	Core::Point& world_point )
+// TODO: Get rid of index once IDs are replaced with indexes
+bool MeasurementToolPrivate::get_hover_measurement( size_t& index, Core::Measurement& measurement ) const
 {
 	// May be called from application or interface thread
 	lock_type lock( this->get_mutex() );
 
-	if( this->hover_point_.is_valid() )
+	if( this->hover_measurement_.is_valid() )
 	{
 		// Get measurements
 		Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
@@ -582,11 +764,10 @@ bool MeasurementToolPrivate::get_hover_measurement( size_t& index, Core::Measure
 		// Find one with matching id
 		for( size_t i = 0; i < measurements.size(); i++ )
 		{
-			if( measurements[ i ].get_id() == this->hover_point_.measurement_id_ )
+			if( measurements[ i ].get_id() == this->hover_measurement_.measurement_id_ )
 			{
 				index = i;
 				measurement = measurements[ i ];
-				measurement.get_point( this->hover_point_.point_index_, world_point );
 				return true;
 			}
 		}
@@ -601,38 +782,53 @@ void MeasurementToolPrivate::update_cursor()
 
 	if( !this->viewer_ ) return;
 
-	if( this->editing_ )
+	if( this->edit_mode_ == MeasurementEditMode::MOVE_POINT_E )
 	{
 		// Use cross cursor so that features of interest are not obscured.  This is the same cursor
 		// used normally, but we need a cursor and couldn't find a better one, so the measurement
 		// itself will be rendered differently to indicate that editing is happening.
 		this->viewer_->set_cursor( Core::CursorShape::CROSS_E );
+		return;
 	}
-	else 
+	else if( this->edit_mode_ == MeasurementEditMode::MOVE_MEASUREMENT_E )
 	{
-		// Find the measurement point that the mouse is currently hovering over, if there is one
-		size_t measurement_index;
-		Core::Measurement measurement;
-		Core::Point hover_point;
-		if( this->get_hover_measurement( measurement_index, measurement, hover_point ) )
+		// Based on PowerPoint
+		this->viewer_->set_cursor( Core::CursorShape::SIZE_ALL_E );
+		return;
+	}
+	else if( this->hover_measurement_.is_valid() ) 
+	{
+		// State: Hovering, not editing
+
+		bool in_slice = this->hover_object_in_slice();
+		if( this->hover_measurement_.is_point() )
 		{
-			if( this->in_slice( this->viewer_, hover_point ) )
+			if( in_slice )
 			{
 				// Set cursor to open hand to indicate that point could be selected (but isn’t)
 				this->viewer_->set_cursor( Core::CursorShape::OPEN_HAND_E );
+				return;
 			}
 			else
 			{
 				// Out of slice -- can be snapped to slice but not edited otherwise
 				this->viewer_->set_cursor( Core::CursorShape::UP_ARROW_E );
+				return;
 			}
 		}
-		else
+		else if( this->hover_measurement_.is_line() )
 		{
-			// Set cross icon color to grey (normal)
-			this->viewer_->set_cursor( Core::CursorShape::CROSS_E );
+			if( in_slice )
+			{
+				// Based on PowerPoint
+				this->viewer_->set_cursor( Core::CursorShape::SIZE_ALL_E );
+				return;
+			}
 		}
 	}
+	
+	// Default: Set cross icon color to grey (normal)
+	this->viewer_->set_cursor( Core::CursorShape::CROSS_E );
 }
 
 void MeasurementToolPrivate::start_editing()
@@ -645,8 +841,45 @@ void MeasurementToolPrivate::start_editing()
 		return;
 	}
 
-	this->editing_ = true;
+	// Make hover measurement active
+	size_t index;
+	Core::Measurement measurement;
+	if( this->get_hover_measurement( index, measurement ) )
+	{
+		Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
+			this->tool_->active_index_state_, static_cast< int >( index ) );
+	}
 	
+	if( this->hover_measurement_.is_point() )
+	{
+		// Move existing measurement point
+		this->edit_mode_ = MeasurementEditMode::MOVE_POINT_E;
+	}
+	else if( this->hover_measurement_.is_line() )
+	{
+		// Save current measurement and mouse points so that offsets can be added to these
+		// Add vector to p0 and p1
+		size_t index;
+		Core::Measurement measurement;
+		if( this->get_hover_measurement( index, measurement ) )
+		{
+			// Get both points
+			measurement.get_point( 0, this->drag_p0_start_ );	
+			measurement.get_point( 1, this->drag_p1_start_ );
+
+			// Store world point for mouse as move start point
+			this->get_mouse_world_point( this->drag_mouse_start_ );
+
+			// Move existing measurement line
+			this->edit_mode_ = MeasurementEditMode::MOVE_MEASUREMENT_E;
+		}
+		else
+		{
+			this->edit_mode_ = MeasurementEditMode::NONE_E;
+		}
+		
+	}
+
 	// Use blank cursor so that features of interest are not obscured
 	this->update_cursor();
 
@@ -664,7 +897,7 @@ void MeasurementToolPrivate::finish_editing()
 		return;
 	}
 
-	this->editing_ = false;
+	this->edit_mode_ = MeasurementEditMode::NONE_E;
 
 	// No need to update measurement (interactively updated) 
 
@@ -673,6 +906,38 @@ void MeasurementToolPrivate::finish_editing()
 	
 	// Redraw so that measurement is drawn with solid line instead of dotted line
 	this->update_viewers();
+}
+
+void MeasurementToolPrivate::create_new_measurement()
+{
+	// Called from interface thread
+	lock_type lock( this->get_mutex() );
+
+	// Get 3D point from 2D mouse coords, create new measurement with P1 = P2, 
+	// add to state vector using action.
+	Core::Point pt;
+	if( this->get_mouse_world_point( pt ) )
+	{
+		// Create new measurement 
+		Core::Measurement measurement;
+
+		// Need ID for measurement
+		measurement.set_id( this->get_next_measurement_id() );
+		measurement.set_point( 0, pt );
+		measurement.set_point( 1, pt );
+		measurement.set_visible( true );
+
+		// Add measurement to state vector
+		Core::ActionAdd::Dispatch( Core::Interface::GetMouseActionContext(), 
+			this->tool_->measurements_state_, measurement );
+
+		// Second point in measurement needs to be the hover point
+		this->hover_measurement_.measurement_id_ = measurement.get_id();
+		// Editing second point
+		this->hover_measurement_.hover_object_ = MeasurementHoverObject::POINT_1_E; 
+
+		this->start_editing();
+	}
 }
 
 bool MeasurementToolPrivate::get_mouse_world_point( Core::Point& world_point )
@@ -700,9 +965,9 @@ bool MeasurementToolPrivate::get_mouse_world_point( Core::Point& world_point )
 	return true;
 }
 
-bool MeasurementToolPrivate::in_slice( ViewerHandle viewer, const Core::Point& world_point )
+bool MeasurementToolPrivate::point_in_slice( ViewerHandle viewer, const Core::Point& world_point ) const
 {
-	// May be called from interface thread or rendering thread
+	// May be called from interface or rendering thread
 
 	// Basically in_slice has to be within epsilon of this slice so that editing won't move the
 	// measurement points
@@ -720,6 +985,41 @@ bool MeasurementToolPrivate::in_slice( ViewerHandle viewer, const Core::Point& w
 	if( point_depth == slice_depth ) 
 	{
 		return true;
+	}
+	return false;
+}
+
+bool MeasurementToolPrivate::hover_object_in_slice() const
+{
+	lock_type lock( this->get_mutex() );
+
+	size_t index; 
+	Core::Measurement measurement; 
+	if( !this->get_hover_measurement( index, measurement ) )
+	{
+		return false;
+	}
+
+	// Check single point for hovered point, or both points for hovered line
+	if( this->hover_measurement_.is_point() )
+	{
+		// Get the single hovered point
+		Core::Point world_point;
+		measurement.get_point( this->hover_measurement_.hover_object_, world_point );
+
+		return this->point_in_slice( this->viewer_, world_point );
+	}
+	else if( this->hover_measurement_.is_line() )
+	{
+		// Get both points
+		Core::Point p0, p1;
+		measurement.get_point( 0, p0 );	
+		measurement.get_point( 1, p1 );
+
+		bool p0_in_slice = this->point_in_slice( this->viewer_, p0 );
+		bool p1_in_slice = this->point_in_slice( this->viewer_, p1 );
+
+		return ( p0_in_slice && p1_in_slice ) ;
 	}
 	return false;
 }
@@ -768,7 +1068,7 @@ MeasurementTool::MeasurementTool( const std::string& toolid ) :
 {
 	this->private_->tool_ = this;
 	this->private_->active_group_id_ = "";
-	this->private_->editing_ = false;
+	this->private_->edit_mode_ = MeasurementEditMode::NONE_E;
 	this->private_->measurement_id_counter_ = -1;
 	this->private_->saved_num_measurements_ = 0;
 	this->private_->handle_measurements_changed_blocked_ = false;
@@ -835,7 +1135,7 @@ bool MeasurementTool::handle_mouse_move( ViewerHandle viewer,
 	this->private_->viewer_ = viewer;
 	this->private_->mouse_pos_.x_ = mouse_history.current_.x_;
 	this->private_->mouse_pos_.y_ = mouse_history.current_.y_;
-	this->private_->update_hover_point();
+	this->private_->update_hover_measurement();
 
 	// Pass handling on to normal handler 
 	return false;
@@ -859,7 +1159,7 @@ bool MeasurementTool::handle_mouse_press( ViewerHandle viewer,
 
 	if( button == Core::MouseButton::LEFT_BUTTON_E )
 	{
-		if( this->private_->editing_ ) 
+		if( this->private_->edit_mode_ != MeasurementEditMode::NONE_E ) 
 		{
 			// State: We were editing
 
@@ -869,56 +1169,27 @@ bool MeasurementTool::handle_mouse_press( ViewerHandle viewer,
 		}
 		else 
 		{
-			// Find 3D world hover point
-			size_t measurement_index;
-			Core::Measurement measurement;
-			Core::Point hover_point;
-			if( this->private_->get_hover_measurement( measurement_index, measurement, hover_point ) 
-				&& this->private_->in_slice( viewer, hover_point ) )
+			// State: We are not editing
+
+			// If hovered point or line is in slice
+			if( this->private_->hover_measurement_.is_valid() && 
+				this->private_->hover_object_in_slice() )
 			{
-				// State: Hovering over point that is in slice 
-				
-				// Make hover measurement active
-				Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
-					this->active_index_state_, static_cast< int >( measurement_index ) );
-
-				// Start editing
-				this->private_->start_editing();
-			}
-			else 
-			{
-				// State: Hovering over no point or point not in slice
-
-				// Get 3D point from 2D mouse coords, create new measurement with P1 = P2, add to state vector using action.
-				Core::Point pt;
-				if( this->private_->get_mouse_world_point( pt ) )
-				{
-					// Create new measurement 
-					Core::Measurement measurement;
-
-					// Need ID for measurement
-					measurement.set_id( this->private_->get_next_measurement_id() );
-					measurement.set_point( 0, pt );
-					measurement.set_point( 1, pt );
-					measurement.set_visible( true );
-
-					// Add measurement to state vector
-					Core::ActionAdd::Dispatch( Core::Interface::GetMouseActionContext(), 
-						this->measurements_state_, measurement );
-
-					// Second point in measurement needs to be the hover point
-					this->private_->hover_point_.measurement_id_ = measurement.get_id();
-					this->private_->hover_point_.point_index_ = 1; // Editing second point
-
+					// Start editing
 					this->private_->start_editing();
-				}
+			}
+			else
+			{
+				// State: Not hovering over a measurement
+				this->private_->create_new_measurement();
 			}
 		}
 		return true;
 	}
 	else if( button == Core::MouseButton::MID_BUTTON_E )
 	{
-		if( this->private_->hover_point_.is_valid() ) // Hovering
+		if( this->private_->hover_measurement_.is_valid() && 
+			this->private_->hover_measurement_.is_point() ) // Hovering over point
 		{
 			// This point does not have to be in current slice
 			// Snap point to current slice
@@ -928,24 +1199,37 @@ bool MeasurementTool::handle_mouse_press( ViewerHandle viewer,
 	else if( button == Core::MouseButton::RIGHT_BUTTON_E )
 	{
 		// Find 3D world hover point
-		size_t measurement_index;
-		Core::Measurement measurement;
-		Core::Point hover_point;
-		if( this->private_->get_hover_measurement( measurement_index, measurement, hover_point ) && 
-			this->private_->in_slice( viewer, hover_point ) )
+		if( this->private_->hover_measurement_.is_valid() && 
+			this->private_->hover_object_in_slice() )
 		{
-			// Delete hovered measurement
-			Core::ActionRemove::Dispatch( Core::Interface::GetMouseActionContext(), 
-				this->measurements_state_, measurement );
+			size_t index;
+			Core::Measurement measurement;
+			if( this->private_->get_hover_measurement( index, measurement ) )
+			{
+				// Delete hovered measurement
+				Core::ActionRemove::Dispatch( Core::Interface::GetMouseActionContext(), 
+					this->measurements_state_, measurement );
 
-			// Ordering matters here
-			this->private_->hover_point_.invalidate();
-			this->private_->finish_editing();
-			
-			return true;
+				// Ordering matters here
+				this->private_->hover_measurement_.invalidate();
+				this->private_->finish_editing();
+				
+				return true;
+			}
 		}
 	}
 
+	return false;
+}
+
+bool MeasurementTool::handle_mouse_release( ViewerHandle viewer, 
+	const Core::MouseHistory& mouse_history, int button, int buttons, int modifiers )
+{
+	MeasurementToolPrivate::lock_type lock( this->private_->get_mutex() );
+	if( this->private_->edit_mode_ == MeasurementEditMode::MOVE_MEASUREMENT_E )
+	{
+		this->private_->finish_editing();
+	}
 	return false;
 }
 
@@ -1030,7 +1314,7 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 				Core::Point measurement_point;
 				m.get_point( static_cast< int >( v_idx ), measurement_point );
 
-				vertex_in_slice[ v_idx ] = this->private_->in_slice( viewer, measurement_point );
+				vertex_in_slice[ v_idx ] = this->private_->point_in_slice( viewer, measurement_point );
 				
 				// Project 3D point onto slice
 				double x_pos, y_pos;
@@ -1048,8 +1332,8 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 			glColor4f( color.r(), color.g(), color.b(), static_cast< float >( opacity ) );
 
 			// If editing this measurement
-			if( this->private_->editing_ && 
-				m.get_id() == this->private_->hover_point_.measurement_id_ )
+			if( this->private_->edit_mode_ != MeasurementEditMode::NONE_E && 
+				m.get_id() == this->private_->hover_measurement_.measurement_id_ )
 			{
 				// Draw coarsely dotted line 
 				glLineWidth( 2.0f );
@@ -1085,9 +1369,9 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 				// Make the moving point red in the current viewer (not necessarily active viewer)
 				if( this->private_->viewer_ && 
 					viewer_id == this->private_->viewer_->get_viewer_id() && 
-					this->private_->editing_ && 
-					m.get_id() == this->private_->hover_point_.measurement_id_ &&
-					v_idx == this->private_->hover_point_.point_index_ )
+					this->private_->edit_mode_ != MeasurementEditMode::NONE_E && 
+					m.get_id() == this->private_->hover_measurement_.measurement_id_ &&
+					v_idx == this->private_->hover_measurement_.hover_object_ )
 				{
 					color = Core::Color( 1.0, 0.0, 0.0 );
 				}

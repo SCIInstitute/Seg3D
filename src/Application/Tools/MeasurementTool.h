@@ -76,6 +76,10 @@ public:
     const Core::MouseHistory& mouse_history, 
     int button, int buttons, int modifiers );
 
+  virtual bool handle_mouse_release( ViewerHandle viewer, 
+    const Core::MouseHistory& mouse_history, 
+    int button, int buttons, int modifiers );
+
   // REDRAW:
   // Draw seed points in the specified viewer.
   // The function should only be called by the renderer, which has a valid GL context.
