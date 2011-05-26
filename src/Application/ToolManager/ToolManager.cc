@@ -68,6 +68,7 @@ public:
     int button, int buttons, int modifiers );
   bool handle_wheel( ViewerHandle viewer, int delta, int x, int y, int buttons, int modifiers );
   bool handle_key_press( ViewerHandle viewer, int key, int modifiers );
+  bool handle_key_release( ViewerHandle viewer, int key, int modifiers );
   bool handle_update_cursor( ViewerHandle viewer );
 
   void update_viewers( bool redraw_2d, bool redraw_3d );
@@ -218,6 +219,22 @@ bool ToolManagerPrivate::handle_key_press( ViewerHandle viewer, int key, int mod
   return false;
 }
 
+bool ToolManagerPrivate::handle_key_release( ViewerHandle viewer, int key, int modifiers )
+{
+  this->focus_viewer_ = viewer;
+
+  ToolHandle active_tool;
+  {
+    ToolManager::lock_type lock( ToolManager::Instance()->get_mutex() );
+    active_tool = this->active_tool_;
+  }
+  if ( active_tool )
+  {
+    return active_tool->handle_key_release( viewer, key, modifiers );
+  }
+  return false;
+}
+
 bool ToolManagerPrivate::handle_update_cursor( ViewerHandle viewer )
 {
   ToolHandle active_tool;
@@ -343,6 +360,8 @@ ToolManager::ToolManager() :
     viewer->set_wheel_event_handler( boost::bind( &ToolManagerPrivate::handle_wheel,
       this->private_, _1, _2, _3, _4, _5, _6 ) );
     viewer->set_key_press_event_handler( boost::bind( &ToolManagerPrivate::handle_key_press,
+      this->private_, _1, _2, _3 ) );
+    viewer->set_key_release_event_handler( boost::bind( &ToolManagerPrivate::handle_key_release,
       this->private_, _1, _2, _3 ) );
     viewer->set_cursor_handler( boost::bind( &ToolManagerPrivate::handle_update_cursor,
       this->private_, _1 ) );

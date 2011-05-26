@@ -171,6 +171,12 @@ bool Tool::handle_key_press( ViewerHandle viewer, int key, int modifiers )
   return false;
 }
 
+bool Tool::handle_key_release( ViewerHandle viewer, int key, int modifiers )
+{
+  // Default implementation doesn't handle this event
+  return false;
+}
+
 bool Tool::handle_update_cursor( ViewerHandle viewer )
 {
   // Default implementation doesn't handle this event

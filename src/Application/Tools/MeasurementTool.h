@@ -76,9 +76,19 @@ public:
     const Core::MouseHistory& mouse_history, 
     int button, int buttons, int modifiers );
 
+  // HANDLE_MOUSE_RELEASE:
+  // Called when a mouse button has been released.
   virtual bool handle_mouse_release( ViewerHandle viewer, 
     const Core::MouseHistory& mouse_history, 
     int button, int buttons, int modifiers );
+
+  // HANDLE_KEY_PRESS:
+  // Called when a key is pressed.
+  virtual bool handle_key_press( ViewerHandle viewer, int key, int modifiers );
+
+  // HANDLE_KEY_RELEASE:
+  // Called when a key is released
+  virtual bool handle_key_release( ViewerHandle viewer, int key, int modifiers );
 
   // REDRAW:
   // Draw seed points in the specified viewer.

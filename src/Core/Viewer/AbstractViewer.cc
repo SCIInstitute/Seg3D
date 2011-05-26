@@ -188,6 +188,12 @@ bool AbstractViewer::key_press_event( int key, int modifiers, int x, int y )
   return false;
 }
 
+bool AbstractViewer::key_release_event( int key, int modifiers, int x, int y )
+{
+  // do nothing
+  return false;
+}
+
 void AbstractViewer::install_renderer( AbstractRendererHandle renderer )
 {
   {

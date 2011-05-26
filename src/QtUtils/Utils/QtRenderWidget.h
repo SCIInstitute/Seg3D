@@ -115,6 +115,10 @@ protected:
   // This function is called by Qt when a key is pressed
   virtual void keyPressEvent( QKeyEvent* event );
 
+  // KEYPRESSEVENT:
+  // This function is called by Qt when a key is pressed
+  virtual void keyReleaseEvent( QKeyEvent* event );
+
   // -- internals of the QtRenderWidget --
 private:
   QtRenderWidgetPrivateHandle private_;

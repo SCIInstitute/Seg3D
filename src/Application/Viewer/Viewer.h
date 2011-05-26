@@ -84,6 +84,7 @@ public:
   typedef boost::function< bool( ViewerHandle ) > leave_event_handler_type;
   typedef boost::function< bool( ViewerHandle, int, int, int, int, int ) > wheel_event_handler_type;
   typedef boost::function< bool( ViewerHandle, int, int ) > key_press_event_handler_type;
+  typedef boost::function< bool( ViewerHandle, int, int ) > key_release_event_handler_type;
   typedef boost::function< bool( ViewerHandle ) > cursor_handler_type;
 
   // MOUSE_MOVE_EVENT:
@@ -117,9 +118,13 @@ public:
   // This function needs to be overloaded to track mouse wheel events. 
   virtual bool wheel_event( int delta, int x, int y, int buttons, int modifiers );
 
-  // KEY_EVENT:
+  // KEY_PRESS_EVENT:
   // This function is called when a key is pressed while hovering over the render widget
   virtual bool key_press_event( int key, int modifiers, int x, int y );
+
+  // KEY_RELEASE_EVENT:
+  // This function is called when a key is released while hovering over the render widget
+  virtual bool key_release_event( int key, int modifiers, int x, int y );
 
   void set_mouse_move_handler( mouse_event_handler_type func );
   void set_mouse_press_handler( mouse_event_handler_type func );
@@ -128,6 +133,7 @@ public:
   void set_mouse_leave_handler( leave_event_handler_type func );
   void set_wheel_event_handler( wheel_event_handler_type func );
   void set_key_press_event_handler( key_press_event_handler_type func );
+  void set_key_release_event_handler( key_press_event_handler_type func );
   void set_cursor_handler( cursor_handler_type func );
   void reset_mouse_handlers();
 

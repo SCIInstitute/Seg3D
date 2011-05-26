@@ -309,6 +309,23 @@ void QtRenderWidget::keyPressEvent( QKeyEvent* event )
   }
 }
 
+void QtRenderWidget::keyReleaseEvent( QKeyEvent* event )
+{
+  this->activate_signal_();
+
+  QPoint cursor_pos = this->mapFromGlobal( QCursor::pos() );
+  int x = cursor_pos.x();
+  int y = cursor_pos.y();
+
+  if ( this->private_->viewer_->key_release_event( event->key(), event->modifiers(), x, y ) )
+  {
+  }
+  else
+  {
+    QWidget::keyReleaseEvent( event );
+  }
+}
+
 void QtRenderWidget::enterEvent( QEvent* event )
 {
   event->accept();

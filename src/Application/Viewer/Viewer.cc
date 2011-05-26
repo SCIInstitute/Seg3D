@@ -148,6 +148,7 @@ public:
   Viewer::leave_event_handler_type mouse_leave_handler_;
   Viewer::wheel_event_handler_type wheel_event_handler_;
   Viewer::key_press_event_handler_type key_press_event_handler_;
+  Viewer::key_release_event_handler_type key_release_event_handler_;
   Viewer::cursor_handler_type cursor_handler_;
 
   ViewManipulatorHandle view_manipulator_;
@@ -1477,6 +1478,20 @@ bool Viewer::key_press_event( int key, int modifiers, int x, int y )
   return false;
 }
 
+bool Viewer::key_release_event( int key, int modifiers, int x, int y )
+{
+  if ( !this->private_->key_release_event_handler_.empty() )
+  {
+    if ( this->private_->key_release_event_handler_( this->shared_from_this(), key, modifiers ) )
+    {
+      return true;
+    }
+  }
+
+  // Not handled
+  return false;
+}
+
 void Viewer::set_mouse_move_handler( mouse_event_handler_type func )
 {
   this->private_->mouse_move_handler_ = func;
@@ -1512,6 +1527,11 @@ void Viewer::set_key_press_event_handler( key_press_event_handler_type func )
   this->private_->key_press_event_handler_ = func;
 }
 
+void Viewer::set_key_release_event_handler( key_release_event_handler_type func )
+{
+  this->private_->key_release_event_handler_ = func;
+}
+
 void Viewer::set_cursor_handler( cursor_handler_type func )
 {
   this->private_->cursor_handler_ = func;
@@ -1526,6 +1546,7 @@ void Viewer::reset_mouse_handlers()
   this->private_->mouse_leave_handler_ = 0;
   this->private_->wheel_event_handler_ = 0;
   this->private_->key_press_event_handler_ = 0;
+  this->private_->key_release_event_handler_ = 0;
   this->private_->cursor_handler_ = 0;
 }
 

@@ -171,13 +171,18 @@ public:
 	// Find measurement line (if any) that mouse is currently hovering over.
 	bool find_hover_line();
 
-	// MOVE_HOVER_POINT_TO_MOUSE:
+	// MOVE_HOVER_OBJECT_TO_MOUSE:
 	// Move hover object (point or entire measurement) to current mouse position.
-	void move_hover_measurement_to_mouse();
+	void move_hover_object_to_mouse();
 
 	// SNAP_HOVER_POINT_TO_SLICE:
 	// Snap the hover point to its projected position on the current slice.
-	bool snap_hover_point_to_slice();
+	void snap_hover_point_to_slice();
+
+	// SNAP_HOVER_POINT_TO_AXIS:
+	// Snap the hover point to be aligned with the other point along the closest axis in the current
+	// view.
+	void snap_hover_point_to_axis(); 
 
 	// UPDATE_HOVER_POINT:
 	// Find or move the hover point, depending on whether user is editing or not.
@@ -237,11 +242,20 @@ public:
 	Core::Point drag_mouse_start_; // Only accessed from interface thread
 	Core::Point drag_p0_start_; // Only accessed from interface thread
 	Core::Point drag_p1_start_; // Only accessed from interface thread
+
+	// Modifier key for snap to axis
+	bool snap_key_pressed_;
 };
 
 MeasurementToolPrivate::MeasurementToolPrivate()
 	: edit_mode_( MeasurementEditMode::NONE_E )// CORE_ENUM_CLASS has no default constructor
 {
+	this->active_group_id_ = "";
+	this->edit_mode_ = MeasurementEditMode::NONE_E;
+	this->measurement_id_counter_ = -1;
+	this->saved_num_measurements_ = 0;
+	this->handle_measurements_changed_blocked_ = false;
+	this->snap_key_pressed_ = false;
 }
 
 // Called in response to state changed signal
@@ -643,7 +657,7 @@ bool MeasurementToolPrivate::find_hover_line()
 	return hovering;
 }
 
-void MeasurementToolPrivate::move_hover_measurement_to_mouse()
+void MeasurementToolPrivate::move_hover_object_to_mouse()
 {
 	// May be called from application (slice changed) or interface (mouse move) thread
 	lock_type lock( this->get_mutex() );
@@ -683,7 +697,7 @@ void MeasurementToolPrivate::move_hover_measurement_to_mouse()
 	}
 }
 
-bool MeasurementToolPrivate::snap_hover_point_to_slice()
+void MeasurementToolPrivate::snap_hover_point_to_slice()
 {
 	ASSERT_IS_INTERFACE_THREAD();
 	lock_type lock( this->get_mutex() );
@@ -698,14 +712,14 @@ bool MeasurementToolPrivate::snap_hover_point_to_slice()
 
 		if( !this->viewer_ )
 		{
-			return false;
+			return;
 		}
 
 		// Project hover point onto current slice, find world point
 		Core::VolumeSliceHandle active_slice = this->viewer_->get_active_volume_slice();
 		if( !active_slice )
 		{
-			return false;
+			return;
 		}
 		
 		double world_x, world_y;
@@ -717,9 +731,91 @@ bool MeasurementToolPrivate::snap_hover_point_to_slice()
 		ActionSetMeasurementPoint::Dispatch( Core::Interface::GetMouseActionContext(), 
 			this->tool_->measurements_state_, this->hover_measurement_.measurement_id_, 
 			this->hover_measurement_.hover_object_, moved_pt );
-		return true;
+		return;
 	}
-	return false;
+	return;
+}
+
+void MeasurementToolPrivate::snap_hover_point_to_axis()
+{
+	// Called from interface thread
+	lock_type lock( this->get_mutex() );
+
+	// Get hovered measurement
+	size_t index; 
+	Core::Measurement measurement; 
+	if( !this->get_hover_measurement( index, measurement ) )
+	{
+		return;
+	}
+
+	// Get both points
+	Core::Point points[ 2 ];
+	measurement.get_point( 0, points[ 0 ] );	
+	measurement.get_point( 1, points[ 1 ] );
+	int hover_pt_idx = this->hover_measurement_.hover_object_;
+	if( hover_pt_idx > 1 ) return;
+	size_t snap_pt_idx = 1 - hover_pt_idx;
+
+	// Move hover point to mouse 
+	Core::Point mouse_point;
+	this->get_mouse_world_point( mouse_point );
+	points[ hover_pt_idx ] = mouse_point;
+	
+	// Find vector between points
+	Core::Vector measure_vec = Abs( points[ 1 ] - points[ 0 ] );
+
+	// Check the type of viewer and based on that determine which 2 components to check.  
+	Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
+	std::string view_mode = this->viewer_->view_mode_state_->get();
+
+	// Set smaller of two components to same as the non-hover point.
+	if( view_mode == Viewer::AXIAL_C )
+	{
+		// Compare x and y components
+		if( measure_vec.x() > measure_vec.y() )
+		{
+			points[ hover_pt_idx ].y( points[ snap_pt_idx ].y() );
+		}
+		else
+		{
+			points[ hover_pt_idx ].x( points[ snap_pt_idx ].x() );
+		}
+	}
+	else if( view_mode == Viewer::CORONAL_C )
+	{
+		// Compare x and z components
+		if( measure_vec.x() > measure_vec.z() )
+		{
+			points[ hover_pt_idx ].z( points[ snap_pt_idx ].z() );
+		}
+		else
+		{
+			points[ hover_pt_idx ].x( points[ snap_pt_idx ].x() );
+		}
+	}
+	else if( view_mode == Viewer::SAGITTAL_C )
+	{
+		// Compare y and z components
+		if( measure_vec.y() > measure_vec.z() )
+		{
+			points[ hover_pt_idx ].z( points[ snap_pt_idx ].z() );
+		}
+		else
+		{
+			points[ hover_pt_idx ].y( points[ snap_pt_idx ].y() );
+		}
+	}
+	else
+	{
+		return;
+	}
+
+	// Update measurement
+	measurement.set_point( hover_pt_idx, points[ hover_pt_idx ] );
+	
+	Core::ActionSetAt::Dispatch( Core::Interface::GetMouseActionContext(), 
+		this->tool_->measurements_state_, index, measurement );
 }
 
 void MeasurementToolPrivate::update_hover_measurement()
@@ -732,13 +828,22 @@ void MeasurementToolPrivate::update_hover_measurement()
 		return;
 	}
 
-	if( this->edit_mode_ == MeasurementEditMode::MOVE_POINT_E || 
-		this->edit_mode_ == MeasurementEditMode::MOVE_MEASUREMENT_E )
+	// Note: We don't want to "find" the hover point every time the mouse moves
+	// during editing since we might find a different point and start moving that one instead.
+	if( this->edit_mode_ == MeasurementEditMode::MOVE_MEASUREMENT_E )
+	{	
+		this->move_hover_object_to_mouse();
+	}
+	else if( this->edit_mode_ == MeasurementEditMode::MOVE_POINT_E )
 	{
-		// Move hovered object (point or line).  
-		// Note: We don't want to "find" the hover point every time the mouse moves
-		// during editing since we might find a different point and start moving that one instead.
-		this->move_hover_measurement_to_mouse();
+		if( this->snap_key_pressed_ )
+		{
+			this->snap_hover_point_to_axis();
+		}
+		else
+		{
+			this->move_hover_object_to_mouse();
+		}		
 	}
 	else
 	{	
@@ -1067,12 +1172,7 @@ MeasurementTool::MeasurementTool( const std::string& toolid ) :
 	private_( new MeasurementToolPrivate )
 {
 	this->private_->tool_ = this;
-	this->private_->active_group_id_ = "";
-	this->private_->edit_mode_ = MeasurementEditMode::NONE_E;
-	this->private_->measurement_id_counter_ = -1;
-	this->private_->saved_num_measurements_ = 0;
-	this->private_->handle_measurements_changed_blocked_ = false;
-	
+
 	// State variable gets allocated here
 	this->add_state( "measurements", this->measurements_state_ );
 	this->add_state( "active_index", this->active_index_state_, -1 );
@@ -1152,11 +1252,6 @@ bool MeasurementTool::handle_mouse_press( ViewerHandle viewer,
 	MeasurementToolPrivate::lock_type lock( this->private_->get_mutex() );
 	this->private_->viewer_ = viewer;
 
-	if( modifiers != Core::KeyModifier::NO_MODIFIER_E ) 
-	{
-		return false;
-	}
-
 	if( button == Core::MouseButton::LEFT_BUTTON_E )
 	{
 		if( this->private_->edit_mode_ != MeasurementEditMode::NONE_E ) 
@@ -1230,6 +1325,36 @@ bool MeasurementTool::handle_mouse_release( ViewerHandle viewer,
 	{
 		this->private_->finish_editing();
 	}
+	return false;
+}
+
+bool MeasurementTool::handle_key_press( ViewerHandle viewer, int key, int modifiers )
+{
+	if( key == Core::Key::KEY_SHIFT_E ) 
+	{
+		this->private_->snap_key_pressed_ = true;
+
+		if( this->private_->edit_mode_ == MeasurementEditMode::MOVE_POINT_E )
+		{
+			this->private_->snap_hover_point_to_axis();
+		}
+	}
+
+	return false;
+}
+
+bool MeasurementTool::handle_key_release( ViewerHandle viewer, int key, int modifiers )
+{
+	if( key == Core::Key::KEY_SHIFT_E ) 
+	{
+		this->private_->snap_key_pressed_ = false;
+
+		if( this->private_->edit_mode_ == MeasurementEditMode::MOVE_POINT_E )
+		{
+			this->private_->move_hover_object_to_mouse();
+		}
+	}
+
 	return false;
 }
 
