@@ -206,7 +206,7 @@ public:
 	// Return true if the given point is in the current slice.  This is slightly different from seed 
 	// points -- in this case the point needs to be within epsilon of the slice, not just nearest
 	// to it. 
-	bool point_in_slice( ViewerHandle viewer, const Core::Point& world_point ) const;
+	bool point_in_slice( ViewerHandle viewer, const Core::Point& world_point, double& point_depth ) const;
 
 	// HOVER_OBJECT_IN_SLICE:
 	// Return true if the hover object (point or line) is in slice.  
@@ -1070,7 +1070,8 @@ bool MeasurementToolPrivate::get_mouse_world_point( Core::Point& world_point )
 	return true;
 }
 
-bool MeasurementToolPrivate::point_in_slice( ViewerHandle viewer, const Core::Point& world_point ) const
+bool MeasurementToolPrivate::point_in_slice( ViewerHandle viewer, const Core::Point& world_point, 
+	double& point_depth ) const
 {
 	// May be called from interface or rendering thread
 
@@ -1083,7 +1084,6 @@ bool MeasurementToolPrivate::point_in_slice( ViewerHandle viewer, const Core::Po
 	}
 
 	double slice_depth = volume_slice->depth();
-	double point_depth;
 	double i_pos, j_pos;
 	volume_slice->project_onto_slice( world_point, i_pos, j_pos, point_depth );
 
@@ -1106,13 +1106,14 @@ bool MeasurementToolPrivate::hover_object_in_slice() const
 	}
 
 	// Check single point for hovered point, or both points for hovered line
+	double point_depth;
 	if( this->hover_measurement_.is_point() )
 	{
 		// Get the single hovered point
 		Core::Point world_point;
 		measurement.get_point( this->hover_measurement_.hover_object_, world_point );
 
-		return this->point_in_slice( this->viewer_, world_point );
+		return this->point_in_slice( this->viewer_, world_point, point_depth );
 	}
 	else if( this->hover_measurement_.is_line() )
 	{
@@ -1121,8 +1122,8 @@ bool MeasurementToolPrivate::hover_object_in_slice() const
 		measurement.get_point( 0, p0 );	
 		measurement.get_point( 1, p1 );
 
-		bool p0_in_slice = this->point_in_slice( this->viewer_, p0 );
-		bool p1_in_slice = this->point_in_slice( this->viewer_, p1 );
+		bool p0_in_slice = this->point_in_slice( this->viewer_, p0, point_depth );
+		bool p1_in_slice = this->point_in_slice( this->viewer_, p1, point_depth );
 
 		return ( p0_in_slice && p1_in_slice ) ;
 	}
@@ -1406,6 +1407,7 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 	
 	//-------------- StateEngine unlocked  -------------------
 
+	Core::Color active_color = Core::Color( 0.55f, 0.82f, 0.96f );
 	Core::Color in_slice_color = Core::Color( 1.0f, 1.0f, 0.0f );
 	Core::Color out_of_slice_color = Core::Color( 0.6f, 0.6f, 0.0f );
 
@@ -1415,7 +1417,6 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 	glLoadIdentity();
 	glMultMatrixd( proj_mat.data() );
 
-	glPointSize( 5.0f );
 	glEnable( GL_LINE_SMOOTH );
 
 	// Projected vertices per measurement
@@ -1434,12 +1435,15 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 			// TODO: Visually represent point in front differently?
 			// Project points, determine if they are "in slice"
 			vertices[ m_idx ].resize( 2 );
+			double point_depths[ 2 ]; 
+			
 			for( size_t v_idx = 0; v_idx < 2; v_idx++ )
 			{
 				Core::Point measurement_point;
 				m.get_point( static_cast< int >( v_idx ), measurement_point );
 
-				vertex_in_slice[ v_idx ] = this->private_->point_in_slice( viewer, measurement_point );
+				vertex_in_slice[ v_idx ] = 
+					this->private_->point_in_slice( viewer, measurement_point, point_depths[ v_idx ] );
 				
 				// Project 3D point onto slice
 				double x_pos, y_pos;
@@ -1453,30 +1457,38 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 			// where one point is "in slice", the other is not)
 			MeasurementToolPrivate::lock_type lock( this->private_->get_mutex() );
 			both_in_slice[ m_idx ] = vertex_in_slice[ 0 ] && vertex_in_slice[ 1 ];
+			bool points_in_same_slice = point_depths[ 0 ] == point_depths[ 1 ];
+
 			Core::Color color = both_in_slice[ m_idx ] ? in_slice_color : out_of_slice_color;
 			glColor4f( color.r(), color.g(), color.b(), static_cast< float >( opacity ) );
+			glLineWidth( 2.0f );
 
-			// If editing this measurement
-			if( this->private_->edit_mode_ != MeasurementEditMode::NONE_E && 
-				m.get_id() == this->private_->hover_measurement_.measurement_id_ )
+			bool editing = this->private_->edit_mode_ != MeasurementEditMode::NONE_E && 
+				m.get_id() == this->private_->hover_measurement_.measurement_id_;
+			if( editing ) // Editing
 			{
 				// Draw coarsely dotted line 
-				glLineWidth( 2.0f );
+				
 				glLineStipple(1, 0x00FF );
 				glEnable( GL_LINE_STIPPLE ); 
 			}
-			else if( static_cast<int>( m_idx ) == active_index )
+			else if( !points_in_same_slice ) // Spans slices
 			{
-				// Draw solid line to indicate active measurement
-				glLineWidth( 2.0f );
-				glDisable( GL_LINE_STIPPLE );
+				// Draw finely dotted line
+				glLineStipple(1, 0x0F0F );
+				//glLineStipple(1, 0xAAAA );
+				glEnable( GL_LINE_STIPPLE ); 
 			}
 			else
 			{
-				// Draw finely dotted line
-				glLineWidth( 1.5f );
-				glLineStipple(1, 0xAAAA );
-				glEnable( GL_LINE_STIPPLE ); 
+				// Draw solid line
+				glDisable( GL_LINE_STIPPLE );
+			}
+
+			if( !both_in_slice[ m_idx ] ) // Points not both in slice
+			{
+				// Draw thin line
+				glLineWidth( 1.0f );
 			}
 
 			glBegin( GL_LINES );
@@ -1489,8 +1501,24 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 			// Draw points
 			for( size_t v_idx = 0; v_idx < 2; v_idx++ )
 			{
-				Core::Color color = vertex_in_slice[ v_idx ] ? in_slice_color : out_of_slice_color;
-			
+				// Set point size based on relative point depths
+				glPointSize( 5.0f );
+				// If this point is farther away than the other point, make it smaller
+				if( point_depths[ v_idx ] > point_depths [ 1 - v_idx ] )
+				{
+					glPointSize( 3.0f );
+				}
+
+				Core::Color color;
+				if( static_cast<int>( m_idx ) == active_index ) // Active measurement
+				{
+					color = active_color;
+				}
+				else
+				{
+					color = vertex_in_slice[ v_idx ] ? in_slice_color : out_of_slice_color;
+				}
+
 				// Make the moving point red in the current viewer (not necessarily active viewer)
 				if( this->private_->viewer_ && 
 					viewer_id == this->private_->viewer_->get_viewer_id() && 
