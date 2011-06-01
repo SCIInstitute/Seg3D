@@ -683,6 +683,9 @@ void ProjectPrivate::query_provenance_trail( ProvenanceID prov_id, ProvenanceTra
 {
   if ( prov_id < 0 ) return;
 
+  // Get all the provenance steps that lead to the provenance ID
+
+  std::set< ProvenanceStepID > prov_steps;
   std::queue< ProvenanceID > provenance_queue;
   provenance_queue.push( prov_id );
   while ( !provenance_queue.empty() )
@@ -705,24 +708,7 @@ void ProjectPrivate::query_provenance_trail( ProvenanceID prov_id, ProvenanceTra
     if ( result_set.size() == 0 ) continue;
 
     ProvenanceStepID prov_step_id = boost::any_cast< long long >( result_set[ 0 ][ "prov_step_id" ] );
-
-    // Query the action string of the provenance step
-    sql_str = "SELECT action_name, action_params FROM provenance_step WHERE "
-      "prov_step_id = " + Core::ExportToString( prov_step_id ) + ";";
-    result_set.clear();
-    if ( !this->provenance_database_.run_sql_statement( sql_str, result_set, error ) )
-    {
-      CORE_LOG_ERROR( error );
-      return;
-    }
-    if ( result_set.size() != 1 )
-    {
-      CORE_LOG_ERROR( "Provenance database is broken." );
-      return;
-    }
-    std::string action_name = boost::any_cast< std::string >( result_set[ 0 ][ "action_name" ] );
-    std::string action_params = boost::any_cast< std::string >( result_set[ 0 ][ "action_params" ] );
-    provenance_trail.push_back( std::make_pair( output_id, action_name + " " + action_params ) );
+    prov_steps.insert( prov_step_id );
 
     // Query the inputs of the provenance step
     sql_str = "SELECT prov_id FROM provenance_input WHERE prov_step_id = " +
@@ -738,6 +724,36 @@ void ProjectPrivate::query_provenance_trail( ProvenanceID prov_id, ProvenanceTra
       ProvenanceID input_id = boost::any_cast< long long >( result_set[ i ][ "prov_id" ] );
       provenance_queue.push( input_id );
     }
+  }
+
+  // Query action strings for each provenance step.
+  // NOTE: The provenance steps are already sorted in ascending order
+  // because of the use of std::set.
+  std::set< ProvenanceStepID >::const_iterator it = prov_steps.begin();
+  std::set< ProvenanceStepID >::const_iterator it_end = prov_steps.end();
+  while ( it != it_end )
+  {
+    ProvenanceStepID prov_step_id = *it;
+    ++it;
+
+    // Query the action string of the provenance step
+    std::string sql_str = "SELECT action_name, action_params FROM provenance_step WHERE "
+      "prov_step_id = " + Core::ExportToString( prov_step_id ) + ";";
+    ResultSet result_set;
+    std::string error;
+    if ( !this->provenance_database_.run_sql_statement( sql_str, result_set, error ) )
+    {
+      CORE_LOG_ERROR( error );
+      return;
+    }
+    if ( result_set.size() != 1 )
+    {
+      CORE_LOG_ERROR( "Provenance database is broken." );
+      return;
+    }
+    std::string action_name = boost::any_cast< std::string >( result_set[ 0 ][ "action_name" ] );
+    std::string action_params = boost::any_cast< std::string >( result_set[ 0 ][ "action_params" ] );
+    provenance_trail.push_back( std::make_pair( action_name, action_params ) );
   }
 }
 
@@ -2022,13 +2038,8 @@ void Project::request_provenance_record( ProvenanceID prov_id )
     return;
   }
 
-  ProvenanceTrail provenance_trail;
-  this->private_->query_provenance_trail( prov_id, provenance_trail );
-
-  // Shouldn't have to sort the provenance trail if the record is correct
-  //std::sort( provenance_trail.begin(), provenance_trail.end() );
-
-  // TODO: Need to change this to just send a handle
+  ProvenanceTrailHandle provenance_trail( new ProvenanceTrail );
+  this->private_->query_provenance_trail( prov_id, *provenance_trail );
 
   this->provenance_record_signal_( provenance_trail );
 }

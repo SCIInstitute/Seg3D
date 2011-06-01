@@ -32,9 +32,6 @@
 // QtUtils includes
 #include <QtUtils/Widgets/QtDropableComboBox.h>
 
-// Application includes
-#include <Application/LayerManager/LayerManager.h>
-
 namespace QtUtils
 {
   
@@ -89,12 +86,5 @@ void QtDropableComboBox::add_color_icon( Core::Color button_color, int index )
     QColor( button_color.r(), button_color.g(), button_color.b() ) );
   this->setItemIcon( index, QIcon( pixmap ) );
 }
-
-
-
-
-
-
-
   
 } // end namespace QtUtils

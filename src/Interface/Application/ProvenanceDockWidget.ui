@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>274</width>
+    <width>351</width>
     <height>801</height>
    </rect>
   </property>
@@ -91,14 +91,8 @@ QPushButton:pressed{
        <bool>false</bool>
       </property>
       <property name="columnCount">
-       <number>2</number>
+       <number>3</number>
       </property>
-      <attribute name="horizontalHeaderDefaultSectionSize">
-       <number>47</number>
-      </attribute>
-      <attribute name="horizontalHeaderMinimumSectionSize">
-       <number>18</number>
-      </attribute>
       <attribute name="horizontalHeaderStretchLastSection">
        <bool>true</bool>
       </attribute>
@@ -107,12 +101,17 @@ QPushButton:pressed{
       </attribute>
       <column>
        <property name="text">
-        <string>P ID:</string>
+        <string>Step</string>
        </property>
       </column>
       <column>
        <property name="text">
-        <string>Action:</string>
+        <string>Action Name</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Action Parameters</string>
        </property>
       </column>
      </widget>

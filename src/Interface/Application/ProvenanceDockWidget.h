@@ -44,6 +44,7 @@
 #include <Core/Utils/ConnectionHandler.h>
 
 // Application includes
+#include <Application/Project/Project.h>
 #include <Application/Provenance/Provenance.h>
 
 // QtUtils includes
@@ -67,7 +68,7 @@ private:
 
   // HANDLEPROVENANCERESULT:
   // A function that handles the signal that contains the provenance of a particular layer.
-  static void HandleProvenanceResult( qpointer_type qpointer, std::vector< std::pair< ProvenanceID, std::string > > provenance_trail );
+  static void HandleProvenanceResult( qpointer_type qpointer, ProvenanceTrailHandle provenance_trail );
   
   // HANDLEPROJECTCHANGED:
   // A function that handles reconnecting the provenance dock widget to the current project when it has changed
@@ -75,7 +76,7 @@ private:
   
   // POPULATE_PROVENANCE_LIST:
   // this handles the actual updating of the ui
-  void populate_provenance_list( std::vector< std::pair< ProvenanceID, std::string > > provenance_trail );
+  void populate_provenance_list( ProvenanceTrailHandle provenance_trail );
   
   // CONNECT_PROJECT:
   // this function does the actual reconnecting

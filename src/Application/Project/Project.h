@@ -68,7 +68,8 @@ CORE_ENUM_CLASS
   TOOL_MANAGER_PRIORITY_E = 100
 )
 
-typedef std::vector< std::pair< ProvenanceID, std::string > > ProvenanceTrail;
+typedef std::vector< std::pair< std::string, std::string > > ProvenanceTrail;
+typedef boost::shared_ptr< ProvenanceTrail > ProvenanceTrailHandle;
 
 // CLASS Project
 // This is the main class for collecting state information on a Project.
@@ -147,7 +148,7 @@ public:
   typedef boost::signals2::signal< void() > sessions_changed_signal_type;
   sessions_changed_signal_type sessions_changed_signal_;
   
-  typedef boost::signals2::signal< void( ProvenanceTrail ) > provenance_records_signal_type;
+  typedef boost::signals2::signal< void( ProvenanceTrailHandle ) > provenance_records_signal_type;
   provenance_records_signal_type provenance_record_signal_;
 public:
   // SAVE_PROJECT:

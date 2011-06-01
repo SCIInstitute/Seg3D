@@ -69,7 +69,9 @@ ProvenanceDockWidget::ProvenanceDockWidget( QWidget *parent ) :
   if( this->private_ )
   {
     this->private_->ui_.setupUi( this );
-    
+    this->private_->ui_.provenance_list_->horizontalHeader()->resizeSection( 0, 40 );
+    this->private_->ui_.provenance_list_->horizontalHeader()->resizeSection( 1, 100 );
+
     this->add_connection( ProjectManager::Instance()->current_project_changed_signal_.
       connect( boost::bind( &ProvenanceDockWidget::HandleProjectChanged, qpointer_type( this ) ) ) );
     
@@ -86,7 +88,7 @@ ProvenanceDockWidget::~ProvenanceDockWidget()
 
   
 void ProvenanceDockWidget::HandleProvenanceResult( qpointer_type qpointer, 
-  std::vector< std::pair< ProvenanceID, std::string > > provenance_trail )
+  ProvenanceTrailHandle provenance_trail )
 {
 
   Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind( 
@@ -102,8 +104,7 @@ void ProvenanceDockWidget::HandleProjectChanged( qpointer_type qpointer )
 }
   
 
-void ProvenanceDockWidget::populate_provenance_list( 
-  std::vector< std::pair< ProvenanceID, std::string > > provenance_trail )
+void ProvenanceDockWidget::populate_provenance_list( ProvenanceTrailHandle provenance_trail )
 {
   if( this->isHidden() ) this->show();
   this->raise();
@@ -116,16 +117,19 @@ void ProvenanceDockWidget::populate_provenance_list(
     this->private_->ui_.provenance_list_->removeRow( j );
   }
   
-  for( size_t i = 0; i < provenance_trail.size(); ++i )
+  size_t num_steps = provenance_trail->size();
+  for( size_t i = 0; i < num_steps; ++i )
   {
-    QTableWidgetItem *new_prov_number = new QTableWidgetItem( QString::number( provenance_trail[ i ].first ) );
-    QTableWidgetItem *new_prov_action = new QTableWidgetItem( QString::fromStdString( provenance_trail[ i ].second ) );
+    QTableWidgetItem* step_number = new QTableWidgetItem( QString::number( i ) );
+    QTableWidgetItem *action_name = new QTableWidgetItem( QString::fromStdString( provenance_trail->at( i ).first ) );
+    QTableWidgetItem *action_params = new QTableWidgetItem( QString::fromStdString( provenance_trail->at( i ).second ) );
 
-    
-    this->private_->ui_.provenance_list_->insertRow( static_cast< int >( i ) );
-    this->private_->ui_.provenance_list_->setItem( static_cast< int >( i ), 0, new_prov_number );
-    this->private_->ui_.provenance_list_->setItem( static_cast< int >( i ), 1, new_prov_action );
-    this->private_->ui_.provenance_list_->verticalHeader()->resizeSection( static_cast< int >( i ), 24 );
+    int row_num = static_cast< int >( i );
+    this->private_->ui_.provenance_list_->insertRow( row_num );
+    this->private_->ui_.provenance_list_->setItem( row_num, 0, step_number );
+    this->private_->ui_.provenance_list_->setItem( row_num, 1, action_name );
+    this->private_->ui_.provenance_list_->setItem( row_num, 2, action_params );
+    this->private_->ui_.provenance_list_->verticalHeader()->resizeSection( row_num, 24 );
   }
 
   this->private_->ui_.provenance_list_->verticalHeader()->setUpdatesEnabled( true );
