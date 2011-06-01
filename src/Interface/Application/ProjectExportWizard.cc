@@ -51,7 +51,7 @@
 namespace Seg3D
 {
 
-ProjectExportWizard::ProjectExportWizard( const std::string& session_name, QWidget *parent ) :
+ProjectExportWizard::ProjectExportWizard( long long session_id, QWidget *parent ) :
     QWizard( parent )
 {
     this->addPage( new ExportInfoPage );
@@ -60,7 +60,7 @@ ProjectExportWizard::ProjectExportWizard( const std::string& session_name, QWidg
   this->setPixmap( QWizard::BackgroundPixmap, QPixmap( QString::fromUtf8( 
     ":/Images/Symbol.png" ) ) );
 
-  this->session_name_ = QString::fromStdString( session_name );
+  this->session_id_ = session_id;
   
   this->setWindowTitle( tr( "Export Project Wizard" ) );
 }
@@ -74,7 +74,7 @@ void ProjectExportWizard::accept()
   ActionExportProject::Dispatch( Core::Interface::GetWidgetActionContext(), 
     field( "projectPath" ).toString().toStdString(),
     field( "projectName" ).toString().toStdString(),
-    this->session_name_.toStdString() );
+    this->session_id_ );
     QDialog::accept();
 }
 

@@ -36,26 +36,56 @@
 // STL includes
 #include <string>
 
+#include <boost/date_time/posix_time/ptime.hpp>
+
 namespace Seg3D
 {
+
+typedef long long SessionID;
 
 // CLASS SessionInfo
 // This helper class is for storing sessions in the database
 class SessionInfo
 {
 public:
-  SessionInfo( std::string session_name = "", std::string username = "", 
-    std::string timestamp = "" );
+  typedef boost::posix_time::ptime timestamp_type;
 
-  virtual ~SessionInfo();
+  SessionInfo( SessionID session_id, const std::string& session_name, 
+    const std::string& user_id, const timestamp_type& timestamp );
+  SessionInfo();
+  ~SessionInfo();
   
-public:
+  const SessionID session_id() const
+  {
+    return this->session_id_;
+  }
+
+  const std::string& session_name() const
+  {
+    return this->session_name_;
+  }
+
+  const std::string& user_id() const
+  {
+    return this->user_id_;
+  }
+
+  const timestamp_type& timestamp() const
+  {
+    return this->timestamp_;
+  }
+  
+private:
+  friend class Project;
+
+  // ID of the session
+  SessionID session_id_;
   // Name of the session
   std::string session_name_;
   // User that saved the session
-  std::string username_;
-  // Timestamp of when the session was saved
-  std::string timestamp_;
+  std::string user_id_;
+  // Timestamp of when the session was saved in UTC time
+  timestamp_type timestamp_;
 };  
 
 } // end namespace Seg3D

@@ -41,7 +41,7 @@ class ActionExportProject : public Core::Action
 
 CORE_ACTION( 
   CORE_ACTION_TYPE( "ExportProject", "Export a project." )
-  CORE_ACTION_ARGUMENT( "session", "Name of the exporting session." )
+  CORE_ACTION_ARGUMENT( "sessionid", "ID of the exporting session." )
   CORE_ACTION_ARGUMENT( "path", "Path to export the project to." )
   CORE_ACTION_ARGUMENT( "name", "Name to export the project as." )
 )
@@ -50,7 +50,7 @@ CORE_ACTION(
 public:
   ActionExportProject()
   {
-    this->add_parameter( this->session_name_ );
+    this->add_parameter( this->session_id_ );
     this->add_parameter( this->export_path_ );
     this->add_parameter( this->project_name_ );
   }
@@ -63,7 +63,7 @@ public:
 private:
 
   // This parameter contains the name of the session to be loaded
-  std::string session_name_;
+  long long session_id_;
   std::string export_path_;
   std::string project_name_;
   
@@ -72,7 +72,7 @@ public:
   // DISPATCH:
   // Dispatch an action loads a session
   static void Dispatch( Core::ActionContextHandle context, const std::string& export_path, 
-    const std::string& project_name, const std::string& session_name );
+    const std::string& project_name, long long session_id );
 };
 
 } // end namespace Seg3D

@@ -666,6 +666,12 @@ bool LayerGroup::post_load_states( const Core::StateIO& state_io )
   }
 
   state_io.pop_current_element();
+
+  // If the layer group didn't have a provenance ID, assign it that of its first layer
+  if ( success && this->provenance_id_state_->get() < 0 )
+  {
+    this->provenance_id_state_->set( this->layer_list_.front()->provenance_id_state_->get() );
+  }
   
   this->private_->update_grid_information();
   return success;

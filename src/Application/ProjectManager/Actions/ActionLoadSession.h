@@ -41,13 +41,13 @@ class ActionLoadSession : public Core::Action
 
 CORE_ACTION( 
   CORE_ACTION_TYPE( "LoadSession", "Load a saved session.")
-  CORE_ACTION_ARGUMENT( "session", "Name of the session that needs to be loaded." )
+  CORE_ACTION_ARGUMENT( "sessionid", "ID of the session that needs to be loaded." )
 )
   // -- Constructor/Destructor --
 public:
   ActionLoadSession()
   {
-    this->add_parameter( this->session_name_ );
+    this->add_parameter( this->session_id_ );
   }
 
   virtual ~ActionLoadSession()
@@ -61,13 +61,13 @@ public:
   
 private:
   // This parameter contains the name of the session to be loaded
-  std::string session_name_;
+  long long session_id_;
   
   // -- Dispatch this action from the interface --
 public:
   // DISPATCH:
   // Dispatch an action loads a session
-  static void Dispatch( Core::ActionContextHandle context, const std::string& session_name );
+  static void Dispatch( Core::ActionContextHandle context, long long session_id );
 };
 
 } // end namespace Seg3D

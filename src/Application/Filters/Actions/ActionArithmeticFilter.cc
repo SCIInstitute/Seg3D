@@ -403,10 +403,7 @@ bool ActionArithmeticFilter::run( Core::ActionContextHandle& context,
     new Core::ActionResult( this->private_->algo_->dst_layer_->get_layer_id() ) );
 
   // Create undo/redo record for this layer action
-  this->private_->algo_->create_undo_redo_record( context, this->shared_from_this() );
-
-  // Create provenance record for this layer action
-  this->private_->algo_->create_provenance_record( context, this->shared_from_this() );
+  this->private_->algo_->create_undo_redo_and_provenance_record( context, this->shared_from_this() );
 
   // Start the filter.
   Core::Runnable::Start( this->private_->algo_ );

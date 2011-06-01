@@ -195,7 +195,7 @@ bool ProjectManagerPrivate::setup_database()
   // If we could not load it generate it from scratch
   if ( ! read_database )
   {
-    std::vector< std::string > create_statements( 1, 
+    std::string create_statements( 
       "CREATE TABLE recentprojects "
       "(id INTEGER NOT NULL, "
       "name VARCHAR(255) NOT NULL, "
@@ -204,7 +204,7 @@ bool ProjectManagerPrivate::setup_database()
       "PRIMARY KEY (id));" );
   
     std::string error;
-    if ( ! this->create_database( create_statements, error ) )
+    if ( ! this->run_sql_statement( create_statements, error ) )
     {
       CORE_LOG_ERROR( error );
       return false;
@@ -406,11 +406,11 @@ ProjectManager::ProjectManager() :
   // Here we check to see if the recent projects database exists, otherwise we create it
   this->private_->setup_database();
   
-  // Here we clean out any projects that dont exist where we think they should
+  // Here we clean out any projects that don't exist where we think they should
   this->private_->cleanup_recent_projects_database();
   
   // Create a new project
-  this->private_->current_project_ = ProjectHandle( new Project( "Untitled Project" ) );  
+  this->private_->current_project_ = ProjectHandle( new Project( std::string( "Untitled Project" ) ) ); 
 
   // Start the auto save thread
   AutoSave::Instance()->start();
@@ -581,25 +581,38 @@ bool ProjectManager::open_project( const std::string& project_file )
   // Reset the application.
   Core::Application::Reset();
 
-  // Create a new project, the old one will go out of scope as soon as the GUI releases the old
-  // project
-  this->private_->set_current_project( ProjectHandle( new Project( "Untitled Project" ) ) );
-  if ( ! this->get_current_project()->load_project( full_filename ) )
+  // Create a new project, the old one will go out of scope as soon as 
+  // the GUI releases the old project
+  ProjectHandle new_proj;
+  bool succeeded = true;
+  try
   {
-    // TODO: Need to fix the widget, so it connects to the state variables correctly
-    this->current_project_changed_signal_();
-    return false;
+    new_proj.reset( new Project( full_filename ) );
+  }
+  catch ( ... )
+  {
+    new_proj.reset( new Project( std::string( "Untitled Project" ) ) );
+    succeeded = false;
   }
 
-  // Reset the auto save system
-  AutoSave::Instance()->recompute_auto_save();
+  this->private_->set_current_project( new_proj );
 
-  // Update recent file list, the current folder and save them to disk
-  this->checkpoint_projectmanager();
+  if ( succeeded )
+  {
+    // Load the last session of the project
+    new_proj->load_last_session();
+
+    // Reset the auto save system
+    AutoSave::Instance()->recompute_auto_save();
+
+    // Update recent file list, the current folder and save them to disk
+    this->checkpoint_projectmanager();
+  }
   
+  // TODO: Need to fix the widget, so it connects to the state variables correctly
   this->current_project_changed_signal_();
 
-  return true;
+  return succeeded;
 }
   
   
@@ -635,20 +648,20 @@ bool ProjectManager::save_project_as( const std::string& project_location,
 }
 
   
-bool ProjectManager::export_project( const std::string& project_location, 
-  const std::string& project_name, const std::string& session_name )
+bool ProjectManager::export_project( const std::string& export_path, 
+                  const std::string& project_name, long long session_id )
 {
   // This function sets state variables directly, hence we need to be on the application thread
   ASSERT_IS_APPLICATION_THREAD();
 
   // Create a new directory for the project
   boost::filesystem::path project_path;
-  if ( ! this->private_->create_project_directory( project_location, project_name, project_path ) )
+  if ( ! this->private_->create_project_directory( export_path, project_name, project_path ) )
   {
     return false;
   }
 
-  if ( !this->get_current_project()->export_project( project_path, project_name, session_name ) )
+  if ( !this->get_current_project()->export_project( project_path, project_name, session_id ) )
   {
     return false;
   }
@@ -676,7 +689,7 @@ bool ProjectManager::save_project_session( const std::string& session_name  )
 }
 
 
-bool ProjectManager::load_project_session( const std::string& session_name )
+bool ProjectManager::load_project_session( long long session_id )
 {
   // This function sets state variables directly, hence we need to be on the application thread
   ASSERT_IS_APPLICATION_THREAD();
@@ -685,7 +698,7 @@ bool ProjectManager::load_project_session( const std::string& session_name )
   Core::Application::Reset();
 
   // Load the session
-  if ( this->get_current_project()->load_session( session_name ) )
+  if ( this->get_current_project()->load_session( session_id ) )
   {
     // Recompute when auto save needs to happen
     AutoSave::Instance()->recompute_auto_save();
@@ -696,12 +709,12 @@ bool ProjectManager::load_project_session( const std::string& session_name )
 }
   
 
-bool ProjectManager::delete_project_session( const std::string& session_name )
+bool ProjectManager::delete_project_session( long long session_id )
 {
   // This function sets state variables directly, hence we need to be on the application thread
   ASSERT_IS_APPLICATION_THREAD();
   
-  return this->get_current_project()->delete_session( session_name );
+  return this->get_current_project()->delete_session( session_id );
 }
 
 

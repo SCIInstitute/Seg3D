@@ -29,6 +29,9 @@
 // STL includes
 #include <time.h>
 
+// Boost includes
+#include <boost/date_time/c_local_time_adjustor.hpp>
+
 // Core includes
 #include <Core/Utils/Log.h>
 #include <Core/Interface/Interface.h>
@@ -76,7 +79,7 @@ public:
   ProjectHandle current_project_;
 
   bool resetting_;
-  std::vector< std::string > sessions_;
+  std::vector< SessionInfo > sessions_;
 };
 
 ProjectDockWidget::ProjectDockWidget( QWidget *parent ) :
@@ -294,7 +297,7 @@ void ProjectDockWidget::load_session()
     }
 
     ActionLoadSession::Dispatch( Core::Interface::GetWidgetActionContext(), 
-      this->private_->sessions_[ row ] );
+      this->private_->sessions_[ row ].session_id() );
   }
 }
 
@@ -307,13 +310,13 @@ void ProjectDockWidget::delete_session()
     return;
   }
 
-  std::vector< std::string > sessions_to_delete;
+  std::vector< SessionID > sessions_to_delete;
     
   for( int i = 0; i < this->private_->ui_.sessions_list_->rowCount(); ++i ) 
   {
     if( this->private_->ui_.sessions_list_->item( i, 0 )->isSelected() )
     {
-      sessions_to_delete.push_back( this->private_->sessions_[ i ] );
+      sessions_to_delete.push_back( this->private_->sessions_[ i ].session_id() );
     }
   }
 
@@ -361,36 +364,36 @@ void ProjectDockWidget::populate_session_list()
     CORE_LOG_DEBUG( "no previous sessions exist" );
     return;
   }
+  this->private_->sessions_ = sessions_info;
+
+  typedef boost::date_time::c_local_adjustor< SessionInfo::timestamp_type > local_time_adjustor;
+  SessionInfo::timestamp_type::date_type today = boost::posix_time::second_clock::local_time().date();
 
   for( size_t i = 0; i < sessions_info.size(); ++i )
   {
     QTableWidgetItem *new_item_time;
     QTableWidgetItem *new_item_name;
-  
-    // first we get today's date in the format that we want     
-    std::string todays_date = ( Core::SplitString( boost::posix_time::to_simple_string( 
-      boost::posix_time::second_clock::local_time() ), " " ) )[ 0 ];
-      
-    std::string date = ( Core::SplitString( sessions_info[ i ].timestamp_, " " ) )[ 0 ];
-    std::string time = ( Core::SplitString( sessions_info[ i ].timestamp_, " " ) )[ 1 ];
-    std::string name = ( Core::SplitString( sessions_info[ i ].session_name_, "-" ) )[ 1 ];
-    
-    // Here we are going to cache a local copy of the full session names
-    this->private_->sessions_.push_back( sessions_info[ i ].session_name_ );
+
+    // Convert the session timestamp from UTC to local time
+    SessionInfo::timestamp_type session_local_time = 
+      local_time_adjustor::utc_to_local( sessions_info[ i ].timestamp() );
      
-    if( todays_date == date )
+    if( today == session_local_time.date() )
     {
-      new_item_time = new QTableWidgetItem( QString::fromStdString( time ) );
+      new_item_time = new QTableWidgetItem( QString::fromStdString( 
+        boost::posix_time::to_simple_string( session_local_time.time_of_day() ) ) );
     }
     else
     {
-      new_item_time = new QTableWidgetItem( QString::fromStdString( date ) );
+      new_item_time = new QTableWidgetItem( QString::fromStdString( 
+        boost::gregorian::to_simple_string( session_local_time.date() ) ) );
     }
     
-    new_item_name = new QTableWidgetItem( QString::fromStdString( name ) );
+    new_item_name = new QTableWidgetItem( QString::fromStdString( 
+      sessions_info[ i ].session_name() ) );
       
     QFont font;
-    if( name == "AutoSave" )
+    if( sessions_info[ i ].session_name() == "AutoSave" )
     {
       font.setBold( true );
     }
@@ -398,8 +401,8 @@ void ProjectDockWidget::populate_session_list()
     new_item_time->setFont( font );
     
     QString tool_tip = QString::fromUtf8( "This session was saved by: " )
-      + QString::fromStdString( sessions_info[ i ].username_ ) +  QString::fromUtf8( " at " ) +
-       QString::fromStdString( sessions_info[ i ].timestamp_ );
+      + QString::fromStdString( sessions_info[ i ].user_id() ) +  QString::fromUtf8( " at " ) +
+       QString::fromStdString( boost::posix_time::to_simple_string( session_local_time ) );
        
     new_item_time->setToolTip( tool_tip );
     new_item_name->setToolTip( tool_tip );
@@ -640,7 +643,7 @@ void ProjectDockWidget::export_project()
   }
 
   QPointer< ProjectExportWizard > project_export_wizard_ = 
-    new ProjectExportWizard( this->private_->sessions_[ row ], this );
+    new ProjectExportWizard( this->private_->sessions_[ row ].session_id(), this );
   project_export_wizard_->show();
 
   this->disable_load_delete_and_export_buttons();

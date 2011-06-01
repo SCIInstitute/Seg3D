@@ -46,9 +46,7 @@ ProvenanceStep::ProvenanceStep()
 {
   // Record user for GLP
   Core::Application::Instance()->get_user_name( this->user_ );
-  // Record timestamp for GLP
-  this->time_stamp_ = boost::posix_time::to_simple_string( 
-    boost::posix_time::second_clock::local_time() );
+  // Timestamp will be automatically generated the database when the provenance is recorded
 }
 
 ProvenanceStep::~ProvenanceStep()
@@ -105,11 +103,6 @@ const std::string& ProvenanceStep::get_username() const
   return this->user_;
 }
 
-const std::string& ProvenanceStep::get_timestamp() const
-{
-  return this->time_stamp_;
-}
-
 void ProvenanceStep::print()
 {
   std::cout << "input ids = " << Core::ExportToString( this->input_provenance_ids_ ) << std::endl;
@@ -117,11 +110,6 @@ void ProvenanceStep::print()
   std::cout << "deleted ids = " << Core::ExportToString( this->deleted_provenance_ids_ ) << std::endl;
   std::cout << "action = " << this->action_ << std::endl;
   std::cout << "user = " << this->user_ << std::endl;
-  std::cout << "timestamp = " << this->time_stamp_ << std::endl;
 }
-
-
-
-
 
 } // end namespace Seg3D

@@ -186,11 +186,42 @@ bool ActionPaste::validate( Core::ActionContextHandle& context )
 
 bool ActionPaste::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
+  ClipboardItemConstHandle clipboard_item = Clipboard::Instance()->get_item( 
+    this->private_->slot_number_ );
+
+  ProvenanceID src_pid;
+  int src_slice_type;
+  size_t src_slice_number;
+  clipboard_item->get_source( src_pid, src_slice_type, src_slice_number );
+  ProvenanceIDList input_pids( 2 );
+  input_pids[ 0 ] = src_pid;
+  input_pids[ 1 ]= this->get_input_provenance_ids()[ 0 ];
+  ProvenanceIDList deleted_pids;
+  deleted_pids.push_back( input_pids[ 1 ] );
+  ProvenanceStep* prov_step = new ProvenanceStep;
+  prov_step->set_input_provenance_ids( input_pids );
+  prov_step->set_output_provenance_ids( this->get_output_provenance_ids( 1 ) );
+  prov_step->set_deleted_provenance_ids( deleted_pids );
+  std::string action_str = ActionCopyPaste::Type() + " ";
+  action_str += Core::ExportToString( src_pid ) + " ";
+  action_str += Core::ExportToString( src_slice_type ) + " ";
+  action_str += Core::ExportToString( src_slice_number ) + " ";
+  action_str += Core::ExportToString( input_pids[ 1 ] ) + " ";
+  action_str += Core::ExportToString( this->private_->slice_type_ ) + " ";
+  action_str += Core::ExportToString( this->private_->min_slice_ ) + " ";
+  action_str += Core::ExportToString( this->private_->max_slice_ );
+  prov_step->set_action( action_str );
+  ProvenanceStepHandle prov_step_handle( prov_step );
+  ProvenanceStepID step_id = ProjectManager::Instance()->get_current_project()->
+    add_provenance_record( prov_step_handle );
+
   // Build the undo/redo for this action
   LayerUndoBufferItemHandle item( new LayerUndoBufferItem( "Paste" ) );
 
   // The redo action is the current one
   item->set_redo_action( this->shared_from_this() );
+  // Tell which provenance record to delete when undone
+  item->set_provenance_step_id( step_id );
         
   // Create a check point of the slice on which the flood fill will operate
   LayerCheckPointHandle check_point( new LayerCheckPoint( 
@@ -204,8 +235,6 @@ bool ActionPaste::run( Core::ActionContextHandle& context, Core::ActionResultHan
   UndoBuffer::Instance()->insert_undo_item( context, item );
 
   Core::MaskVolumeSliceHandle volume_slice = this->private_->vol_slice_;
-  ClipboardItemConstHandle clipboard_item = Clipboard::Instance()->get_item( 
-    this->private_->slot_number_ );
   for ( size_t i = this->private_->min_slice_; i < this->private_->max_slice_; ++i )
   {
     volume_slice->set_slice_number( i );
@@ -217,31 +246,6 @@ bool ActionPaste::run( Core::ActionContextHandle& context, Core::ActionResultHan
     clipboard_item->get_buffer() ), true );
   this->private_->target_layer_->provenance_id_state_->set(
     this->get_output_provenance_id() );
-
-  ProvenanceID src_pid;
-  int src_slice_type;
-  size_t src_slice_number;
-  clipboard_item->get_source( src_pid, src_slice_type, src_slice_number );
-  ProvenanceIDList input_pids( 2 );
-  input_pids[ 0 ] = src_pid;
-  input_pids[ 1 ]= this->get_input_provenance_ids()[ 0 ];
-  ProvenanceIDList deleted_pids;
-  deleted_pids.push_back( input_pids[ 1 ] );
-  ProvenanceStep* prov_step = new ProvenanceStep;
-  prov_step->set_input_provenance_ids( input_pids );
-  prov_step->set_output_provenance_ids( this->get_output_provenance_ids() );
-  prov_step->set_deleted_provenance_ids( deleted_pids );
-  std::string action_str = ActionCopyPaste::Type() + " ";
-  action_str += Core::ExportToString( src_pid ) + " ";
-  action_str += Core::ExportToString( src_slice_type ) + " ";
-  action_str += Core::ExportToString( src_slice_number ) + " ";
-  action_str += Core::ExportToString( input_pids[ 1 ] ) + " ";
-  action_str += Core::ExportToString( this->private_->slice_type_ ) + " ";
-  action_str += Core::ExportToString( this->private_->min_slice_ ) + " ";
-  action_str += Core::ExportToString( this->private_->max_slice_ );
-  prov_step->set_action( action_str );
-  ProvenanceStepHandle prov_step_handle( prov_step );
-  ProjectManager::Instance()->get_current_project()->add_to_provenance_database( prov_step_handle );
 
   return true;
 }

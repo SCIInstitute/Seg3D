@@ -94,20 +94,7 @@ bool ActionDuplicateLayer::run( Core::ActionContextHandle& context, Core::Action
   LayerManager::Instance()->insert_layer( new_layer );
   LayerManager::Instance()->set_active_layer( new_layer );
 
-  // Step (5):
-  // Create an undo item for this action
-  LayerUndoBufferItemHandle item( new LayerUndoBufferItem( "Duplicate layer" ) );
-  // Tell which action has to be re-executed to obtain the result
-  item->set_redo_action( this->shared_from_this() );
-  // Tell which layer was added so undo can delete it
-  item->add_layer_to_delete( new_layer );
-  // Tell what the layer/group id counters are so we can undo those as well
-  item->add_id_count_to_restore( id_count );
-  // Add the complete record to the undo buffer
-  UndoBuffer::Instance()->insert_undo_item( context, item );
-  
-  
-  // Step (6): Create a provenance record
+  // Step (5): Create a provenance record
   ProvenanceStepHandle provenance_step( new ProvenanceStep );
   
   // Get the input provenance ids from the translate step
@@ -120,8 +107,23 @@ bool ActionDuplicateLayer::run( Core::ActionContextHandle& context, Core::Action
   provenance_step->set_action( this->export_to_provenance_string() );   
   
   // Add step to provenance record
-  ProjectManager::Instance()->get_current_project()->add_to_provenance_database(
-    provenance_step );    
+  ProvenanceStepID step_id = ProjectManager::Instance()->get_current_project()->
+    add_provenance_record( provenance_step );
+
+  // Step (5):
+  // Create an undo item for this action
+  LayerUndoBufferItemHandle item( new LayerUndoBufferItem( "Duplicate layer" ) );
+  // Tell which action has to be re-executed to obtain the result
+  item->set_redo_action( this->shared_from_this() );
+  // Tell which layer was added so undo can delete it
+  item->add_layer_to_delete( new_layer );
+  // Tell what the layer/group id counters are so we can undo those as well
+  item->add_id_count_to_restore( id_count );
+  // Tell which provenance record to delete when the action is undone
+  item->set_provenance_step_id( step_id );
+  // Add the complete record to the undo buffer
+  UndoBuffer::Instance()->insert_undo_item( context, item );
+  
   return true;
 }
 

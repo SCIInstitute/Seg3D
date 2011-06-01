@@ -30,6 +30,7 @@
 #include <Application/Layer/LayerGroup.h>
 #include <Application/LayerManager/LayerUndoBufferItem.h>
 #include <Application/LayerManager/LayerManager.h>
+#include <Application/ProjectManager/ProjectManager.h>
 
 namespace Seg3D
 {
@@ -63,6 +64,9 @@ public:
   
   // The count of the id of a layer, this one has to be rolled back in case of undo
   LayerManager::id_count_type id_count_;
+
+  // Provenance step ID of the associated action.
+  ProvenanceStepID prov_step_id_;
   
   // Size of the item
   size_t size_;
@@ -74,6 +78,7 @@ LayerUndoBufferItem::LayerUndoBufferItem( const std::string& tag ) :
 {
   this->private_->size_ = 0;
   this->private_->id_count_ = LayerManager::GetLayerInvalidIdCount();
+  this->private_->prov_step_id_ = -1;
 }
 
 LayerUndoBufferItem::~LayerUndoBufferItem()
@@ -144,6 +149,11 @@ void LayerUndoBufferItem::add_layer_to_add( LayerHandle layer )
   // Modify the name, so another layer can take the same name
   std::string new_name = std::string( "UNDOBUFFER_" ) + layer->name_state_->get();
   layer->name_state_->set( new_name );
+}
+
+void LayerUndoBufferItem::set_provenance_step_id( ProvenanceStepID step_id )
+{
+  this->private_->prov_step_id_ = step_id;
 }
 
 void LayerUndoBufferItem::add_layer_to_restore( LayerHandle layer, 
@@ -285,6 +295,15 @@ void LayerUndoBufferItem::rollback_layer_changes()
 
   // Remove the layers from the undo mechanism so the program can actually delete them
   this->private_->layers_to_delete_.clear();
+
+  // Step 5:
+  // Delete the provenance record.
+  if ( this->private_->prov_step_id_ >= 0 )
+  {
+    ProjectManager::Instance()->get_current_project()->
+      delete_provenance_record( this->private_->prov_step_id_ );
+    this->private_->prov_step_id_ = -1;
+  }
 }
 
 bool LayerUndoBufferItem::apply_and_clear_undo()

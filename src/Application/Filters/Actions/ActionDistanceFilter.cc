@@ -178,10 +178,7 @@ bool ActionDistanceFilter::run( Core::ActionContextHandle& context,
   result = Core::ActionResultHandle( new Core::ActionResult( algo->dst_layer_->get_layer_id() ) );
 
   // Build the undo-redo record
-  algo->create_undo_redo_record( context, this->shared_from_this() );
-
-  // Build the provenance record
-  algo->create_provenance_record( context, this->shared_from_this() );
+  algo->create_undo_redo_and_provenance_record( context, this->shared_from_this() );
   
   // Start the filter on a separate thread.
   Core::Runnable::Start( algo );

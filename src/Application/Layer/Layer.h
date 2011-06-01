@@ -278,7 +278,14 @@ public:
   void reset_stop();
 
 protected:
+  // POST_SAVE_STATES:
+  // This virtual function can be implemented in the StateHandlers and will be called after its
+  // states are saved.  If it doesn't succeed it needs to return false.
   virtual bool post_save_states( Core::StateIO& state_io );
+
+  // GET_VERSION:
+  // Get the version number of the project file.
+  virtual int get_version();
 
   // -- Filter keys --
 public: 

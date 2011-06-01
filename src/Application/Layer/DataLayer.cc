@@ -355,8 +355,6 @@ bool DataLayer::pre_save_states( Core::StateIO& state_io )
     boost::filesystem::path full_data_file_name = ProjectManager::Instance()->
       get_current_project()->get_project_data_path() / data_file_name;
     
-    ProjectManager::Instance()->get_current_project()->add_data_file( data_file_name );
-    
     if ( boost::filesystem::exists( full_data_file_name ) )
     {
       // File has already been saved
@@ -395,6 +393,13 @@ bool DataLayer::post_load_states( const Core::StateIO& state_io )
       this->data_volume_->register_data( this->generation_state_->get() );
       this->private_->update_data_info();
       this->private_->update_display_value_range();
+
+      // If the layer didn't have a valid provenance ID, generate one
+      if ( this->provenance_id_state_->get() < 0 )
+      {
+        this->provenance_id_state_->set( GenerateProvenanceID() );
+      }
+
       return true;
     }
     CORE_LOG_ERROR( error );

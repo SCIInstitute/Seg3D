@@ -431,4 +431,9 @@ void Layer::reset_allow_stop()
   this->show_stop_button_state_->set( false );
 }
 
+int Layer::get_version()
+{
+  return 2;
+}
+
 } // end namespace Seg3D

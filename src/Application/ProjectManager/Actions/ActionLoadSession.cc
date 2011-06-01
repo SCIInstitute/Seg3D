@@ -58,9 +58,9 @@ bool ActionLoadSession::validate( Core::ActionContextHandle& context )
 
   // Ensure the session exists
   if( !ProjectManager::Instance()->get_current_project()->
-    is_session( this->session_name_ ) )
+    is_session( this->session_id_ ) )
   {
-    std::string error = std::string( "'" ) + this->session_name_ + "' is not a valid session.";
+    std::string error = Core::ExportToString( this->session_id_ ) + " is not a valid session ID.";
     context->report_error( error );
     return false;
   }
@@ -71,8 +71,8 @@ bool ActionLoadSession::validate( Core::ActionContextHandle& context )
 bool ActionLoadSession::run( Core::ActionContextHandle& context, 
   Core::ActionResultHandle& result )
 {
-  std::string message = std::string( "Loading session: '" ) + 
-    this->session_name_ + std::string( "' ..." );
+  std::string message = std::string( "Loading session: " ) + 
+    Core::ExportToString( this->session_id_ ) + std::string( " ..." );
 
   Core::ActionProgressHandle progress = 
     Core::ActionProgressHandle( new Core::ActionProgress( message ) );
@@ -85,11 +85,12 @@ bool ActionLoadSession::run( Core::ActionContextHandle& context,
   bool success = false;
   try
   {
-    success = ProjectManager::Instance()->load_project_session( this->session_name_ );
+    success = ProjectManager::Instance()->load_project_session( this->session_id_ );
   }
   catch( ... )
   {
-    std::string error = std::string( "Failed to load session '" ) + this->session_name_ + "'.";
+    std::string error = std::string( "Failed to load session " ) + 
+      Core::ExportToString( this->session_id_ ) + ".";
     context->report_error( error );
     success = false;  
   }
@@ -108,18 +109,18 @@ bool ActionLoadSession::run( Core::ActionContextHandle& context,
   // Allow the user to interact with the GUI once more.
   progress->end_progress_reporting();
   
-  std::string success_message = std::string( "Successfully loaded session '" ) + this->session_name_ + 
-    "'.";
+  std::string success_message = std::string( "Successfully loaded session " ) + 
+    Core::ExportToString( this->session_id_ ) + ".";
   CORE_LOG_SUCCESS( success_message );
   
   return success;
 }
 
 void ActionLoadSession::Dispatch( Core::ActionContextHandle context, 
-  const std::string& session_name )
+   long long session_id )
 {
   ActionLoadSession* action = new ActionLoadSession;
-  action->session_name_ = session_name;
+  action->session_id_ = session_id;
 
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }

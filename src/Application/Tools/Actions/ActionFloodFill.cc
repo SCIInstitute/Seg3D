@@ -271,6 +271,27 @@ bool ActionFloodFill::run( Core::ActionContextHandle& context, Core::ActionResul
   }
 
   {
+    // Get the layer on which this action operates
+    LayerHandle layer = LayerManager::Instance()->get_layer_by_id( 
+      this->private_->target_layer_id_ );
+
+    // Create a provenance record
+    ProvenanceStepHandle provenance_step( new ProvenanceStep );
+    
+    // Get the input provenance ids from the translate step
+    provenance_step->set_input_provenance_ids( this->get_input_provenance_ids() );
+    
+    // Get the output and replace provenance ids from the analysis above
+    provenance_step->set_output_provenance_ids(  this->get_output_provenance_ids( 1 )  );
+    
+    ProvenanceIDList deleted_provenance_ids( 1, layer->provenance_id_state_->get() );
+    provenance_step->set_deleted_provenance_ids( deleted_provenance_ids );
+  
+    provenance_step->set_action( this->export_to_provenance_string() );   
+    
+    ProvenanceStepID step_id = ProjectManager::Instance()->get_current_project()->
+      add_provenance_record( provenance_step );
+
     // Build the undo/redo for this action
     LayerUndoBufferItemHandle item( new LayerUndoBufferItem( "FloodFill" ) );
 
@@ -281,14 +302,13 @@ bool ActionFloodFill::run( Core::ActionContextHandle& context, Core::ActionResul
     // Get the slice number
     size_t slice_number = this->private_->slice_number_;
     
-    // Get the layer on which this action operates
-    LayerHandle layer = LayerManager::Instance()->get_layer_by_id( 
-      this->private_->target_layer_id_ );
     // Create a check point of the slice on which the flood fill will operate
     LayerCheckPointHandle check_point( new LayerCheckPoint( layer, slice_type, slice_number ) );
 
     // The redo action is the current one
     item->set_redo_action( this->shared_from_this() );
+    // Tell which provenance record to delete when undone
+    item->set_provenance_step_id( step_id );
     // Tell the item which layer to restore with which check point for the undo action
     item->add_layer_to_restore( layer, check_point );
 
@@ -297,23 +317,6 @@ bool ActionFloodFill::run( Core::ActionContextHandle& context, Core::ActionResul
 
     // Set the output provenance id
     layer->provenance_id_state_->set( this->get_output_provenance_id( 0 ) );
-
-    // Create a provenance record
-    ProvenanceStepHandle provenance_step( new ProvenanceStep );
-    
-    // Get the input provenance ids from the translate step
-    provenance_step->set_input_provenance_ids( this->get_input_provenance_ids() );
-    
-    // Get the output and replace provenance ids from the analysis above
-    provenance_step->set_output_provenance_ids(  this->get_output_provenance_ids()  );
-    
-    ProvenanceIDList deleted_provenance_ids( 1, layer->provenance_id_state_->get() );
-    provenance_step->set_deleted_provenance_ids( deleted_provenance_ids );
-  
-    provenance_step->set_action( this->export_to_provenance_string() );   
-    
-    ProjectManager::Instance()->get_current_project()->add_to_provenance_database(
-      provenance_step );    
   }
 
   {

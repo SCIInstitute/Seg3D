@@ -120,7 +120,7 @@ public:
   // this function saves the value in current_project_, and the selected session to the desired
   // save location 
   bool export_project( const std::string& export_path, const std::string& project_name, 
-    const std::string& session_name );
+    long long session_id );
       
   // SAVE_PROJECT_SESSION:
   // this function saves the current session to disk
@@ -128,11 +128,11 @@ public:
   
   // LOAD_PROJECT_SESSION:
   // this function saves the current session to disk
-  bool load_project_session( const std::string& session_name );
+  bool load_project_session( long long session_id );
   
   // DELETE_PROJECT_SESSION:
   // this function deletes the current session from disk
-  bool delete_project_session( const std::string& session_name );
+  bool delete_project_session( long long session_id );
 
   // CHECKPOINT_PROJECTMANAGER:
   // This function calls save_states that writes the state values of ProjectManager to file

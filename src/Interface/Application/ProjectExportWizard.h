@@ -44,12 +44,12 @@ class ProjectExportWizard : public QWizard
 Q_OBJECT
 
 public:
-  ProjectExportWizard( const std::string& session_name, QWidget *parent = 0 );
+  ProjectExportWizard( long long session_id, QWidget *parent = 0 );
     virtual ~ProjectExportWizard();
 
 private:
     void accept();
-  QString session_name_;
+  long long session_id_;
 };
 
 class ExportInfoPage : public QWizardPage
@@ -58,9 +58,6 @@ Q_OBJECT
 
 public:
     ExportInfoPage( QWidget *parent = 0 );
-
-public:
-  QString session_name_;
   
 protected:
   // INITIALIZEPAGE:

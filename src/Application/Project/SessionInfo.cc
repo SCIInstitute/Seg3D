@@ -31,11 +31,17 @@
 namespace Seg3D
 {
 
-SessionInfo::SessionInfo( std::string session_name , std::string username , 
-  std::string timestamp ) :
-    session_name_( session_name ),
-    username_( username ),
-    timestamp_( timestamp )
+SessionInfo::SessionInfo( SessionID session_id, const std::string& session_name, 
+             const std::string& user_id, const timestamp_type& timestamp ) :
+  session_id_( session_id ),
+  session_name_( session_name ),
+  user_id_( user_id ),
+  timestamp_( timestamp )
+{
+}
+
+SessionInfo::SessionInfo() :
+  session_id_( -1 )
 {
 }
 

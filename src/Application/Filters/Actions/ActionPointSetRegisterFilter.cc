@@ -853,10 +853,7 @@
     result = Core::ActionResultHandle( new Core::ActionResult( algo->dst_layer_->get_layer_id() ) );
 
     // Build the undo-redo record for this action
-    algo->create_undo_redo_record( context, this->shared_from_this() );
-
-    // Build the provenance record for this action
-    algo->create_provenance_record( context, this->shared_from_this() );
+    algo->create_undo_redo_and_provenance_record( context, this->shared_from_this() );
 
     // Start the filter.
     Core::Runnable::Start( algo );

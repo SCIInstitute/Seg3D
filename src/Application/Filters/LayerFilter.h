@@ -192,12 +192,9 @@ public:
     Core::MaskVolumeHandle mask );
 
   // CREATE_UNDO_REDO_RECORD:
-  // Create an undo record and add it to the undo stack
-  bool create_undo_redo_record( Core::ActionContextHandle context, Core::ActionHandle redo_action );
-
-  // CREATE_PROVENANCE_RECORD:
-  // Create a provenance record and add it to the provenance database
-  bool create_provenance_record( Core::ActionContextHandle context, Core::ActionHandle action );
+  // Create a provenance record and add it to the provenance database, 
+  // and an undo record and add it to the undo stack.
+  void create_undo_redo_and_provenance_record( Core::ActionContextHandle context, Core::ActionHandle action );
 
   // UPDATE_PROVENANCE_ACTION_STRING:
   // For filters that can be stopped at certain iterations the provenance string needs

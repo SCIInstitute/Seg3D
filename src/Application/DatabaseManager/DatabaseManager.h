@@ -72,11 +72,10 @@ public:
   // Returns true on success, otherwise false.
   bool run_sql_statement( const std::string& sql_str, std::string& error );
   
-  // CREATE_DATABASE:
-  // Create new tables for the database
-  bool create_database( const std::vector< std::string >& database_create_tables_statements,
-    std::string& error );
-  
+  // RUN_SQL_SCRIPT:
+  // Execute multiple SQL statements sequentially.
+  bool run_sql_script( const std::string& sql_str, std::string& error );
+
   // SAVE_DATABASE:
   // Save the database to disk
   bool save_database( const boost::filesystem::path& database_file, std::string& error );
@@ -84,6 +83,17 @@ public:
   // LOAD_DATABASE:
   // Load the database from disk
   bool load_database( const boost::filesystem::path& database_file, std::string& error );
+
+  // GET_LAST_INSERT_ROWID:
+  // Return the row ID of last successful insert statement.
+  long long get_last_insert_rowid();
+
+  // GET_COLUMN_METADATA:
+  // Get metadata about a specific column of a specific database table.
+  // Returns true if the table and column exist, otherwise false.
+  bool get_column_metadata( const std::string& table_name, const std::string& column_name,
+    char const** data_type = NULL, char const** coll_seq = NULL, 
+    int* not_null = NULL, int* primary_key = NULL, int* auto_inc = NULL ); 
 
 private:
   boost::shared_ptr< DatabaseManagerPrivate > private_;

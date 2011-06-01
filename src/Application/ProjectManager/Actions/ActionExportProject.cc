@@ -59,10 +59,9 @@ bool ActionExportProject::validate( Core::ActionContextHandle& context )
 
   // Ensure the session exists
   if( !ProjectManager::Instance()->get_current_project()->
-    is_session( this->session_name_ ) )
+    is_session( this->session_id_ ) )
   {
-    std::string error = std::string( "'" ) + this->session_name_ +
-      "' is not a valid session.";
+    std::string error = Core::ExportToString( this->session_id_ ) + " is not a valid session.";
     context->report_error( error );
     return false;
   }
@@ -125,7 +124,7 @@ bool ActionExportProject::run( Core::ActionContextHandle& context,
   progress->begin_progress_reporting();
 
   bool success = ProjectManager::Instance()->export_project( this->export_path_,
-    this->project_name_, this->session_name_ );
+    this->project_name_, this->session_id_ );
 
   progress->end_progress_reporting();
 
@@ -137,14 +136,15 @@ bool ActionExportProject::run( Core::ActionContextHandle& context,
 }
 
 void ActionExportProject::Dispatch( Core::ActionContextHandle context, 
-  const std::string& export_path, const std::string& project_name, 
-  const std::string& session_name )
+                   const std::string& export_path, 
+                   const std::string& project_name, 
+                   long long session_id )
 {
   ActionExportProject* action = new ActionExportProject;
   
   action->export_path_ = export_path;
   action->project_name_ = project_name;
-  action->session_name_ = session_name;
+  action->session_id_ = session_id;
   
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }

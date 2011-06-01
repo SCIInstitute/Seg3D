@@ -46,6 +46,7 @@ namespace Seg3D
 // Forward Declaration
 class ProvenanceStep;
 typedef boost::shared_ptr<ProvenanceStep> ProvenanceStepHandle;
+typedef long long ProvenanceStepID;
 
 
 class ProvenanceStep : boost::noncopyable
@@ -93,10 +94,6 @@ public:
   // GET_USER:
   // get the user's name
   const std::string& get_username() const;
-  
-  // GET_TIMESTAMP:
-  // get the timestamp of the provenance step
-  const std::string& get_timestamp() const;
 
   // -- properties --
 public:
@@ -124,9 +121,6 @@ protected:
 
   // User that generated action
   std::string user_;
-  
-  // Time stamp for action
-  std::string time_stamp_;
 };
 
 } // end namespace Seg3D

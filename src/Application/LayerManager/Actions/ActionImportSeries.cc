@@ -180,23 +180,6 @@ bool ActionImportSeries::run( Core::ActionContextHandle& context, Core::ActionRe
   }
   
   {
-    // Create an undo item for this action
-    LayerUndoBufferItemHandle item( new LayerUndoBufferItem( "Import Series" ) );
-
-    // Tell which action has to be re-executed to obtain the result
-    item->set_redo_action( this->shared_from_this() );
-    // Tell which layer was added so undo can delete it
-    for ( size_t j = 0; j < layers.size(); j++ )
-    {
-      item->add_layer_to_delete( layers[ j ] );
-    }
-    
-    // Tell what the layer/group id counters are so we can undo those as well
-    item->add_id_count_to_restore( id_count );
-    
-    // Add the complete record to the undo buffer
-    UndoBuffer::Instance()->insert_undo_item( context, item );
-
     // Create a provenance record
     ProvenanceStepHandle provenance_step( new ProvenanceStep );
     
@@ -210,9 +193,31 @@ bool ActionImportSeries::run( Core::ActionContextHandle& context, Core::ActionRe
     provenance_step->set_action( this->export_to_provenance_string() );   
     
     // Add step to provenance record
-    ProjectManager::Instance()->get_current_project()->add_to_provenance_database(
-      provenance_step );  
+    ProvenanceStepID step_id = ProjectManager::Instance()->get_current_project()->
+      add_provenance_record( provenance_step ); 
+
+    // Create an undo item for this action
+    LayerUndoBufferItemHandle item( new LayerUndoBufferItem( "Import Series" ) );
+
+    // Tell which action has to be re-executed to obtain the result
+    item->set_redo_action( this->shared_from_this() );
+
+    // Tell which provenance record to delete when undone
+    item->set_provenance_step_id( step_id );
+
+    // Tell which layer was added so undo can delete it
+    for ( size_t j = 0; j < layers.size(); j++ )
+    {
+      item->add_layer_to_delete( layers[ j ] );
+    }
+    
+    // Tell what the layer/group id counters are so we can undo those as well
+    item->add_id_count_to_restore( id_count );
+    
+    // Add the complete record to the undo buffer
+    UndoBuffer::Instance()->insert_undo_item( context, item );
   }
+
   ProjectManager::Instance()->current_file_folder_state_->set( 
     file_path.string() );
   ProjectManager::Instance()->checkpoint_projectmanager();

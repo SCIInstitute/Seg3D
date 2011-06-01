@@ -53,6 +53,10 @@
 namespace Seg3D
 {
 
+//////////////////////////////////////////////////////////////////////////
+// Class LayerFilterPrivate
+//////////////////////////////////////////////////////////////////////////
+
 class LayerFilterPrivate : public Core::ConnectionHandler
 {
   // -- constructor --
@@ -118,6 +122,9 @@ public:
   // ProvenanceStep, the provenance step record that is associated with this filter
   ProvenanceStepHandle provenance_step_;
 
+  // Record ID of the provenance step.
+  ProvenanceStepID provenance_step_id_;
+
   // A weak handle to the LayerUndoBufferItem. It's used to rollback any changes
   // that might have already happened when the filter is aborted.
   LayerUndoBufferItemWeakHandle undo_item_weak_handle_;
@@ -139,6 +146,14 @@ public:
   // INTERNAL_ABORT:
   // Abort the filter.
   void internal_abort();
+
+  // CREATE_UNDO_REDO_RECORD:
+  // Create an undo record and add it to the undo stack
+  void create_undo_redo_record( Core::ActionContextHandle context, Core::ActionHandle action );
+
+  // CREATE_PROVENANCE_RECORD:
+  // Create a provenance record and add it to the provenance database
+  void create_provenance_record( Core::ActionContextHandle context, Core::ActionHandle action );
 };
 
 bool LayerFilterPrivate::delete_layer( LayerHandle layer )
@@ -194,13 +209,7 @@ void LayerFilterPrivate::finalize()
     boost::mutex::scoped_lock lock( this->mutex_ );
     abort = this->abort_;
   }
-  
-  if ( !abort && this->provenance_step_ )
-  {
-//    ProjectManager::Instance()->get_current_project()->add_to_provenance_database(
-//      this->provenance_step_ );
-  }
-  
+    
   // Disconnect all the connections with the layer signals, i.e. the abort signal from target
   // layers.
   this->disconnect_all();
@@ -279,11 +288,145 @@ void LayerFilterPrivate::internal_abort()
   }
 }
 
+void LayerFilterPrivate::create_undo_redo_record( Core::ActionContextHandle context, 
+                         Core::ActionHandle action )
+{
+  // Create a new undo/redo record
+  LayerUndoBufferItemHandle item( new LayerUndoBufferItem( this->filter_->get_filter_name() ) );
+  this->undo_item_weak_handle_ = item;
+
+  // Keep track of the filter
+  item->add_filter_to_abort( this->filter_->shared_from_this() );
+
+  std::vector<LayerHandle>::iterator it, it_end;
+  // Figure out which layers need to be deleted 
+  it = this->created_layers_.begin();
+  it_end = this->created_layers_.end();
+
+  while ( it != it_end )
+  {
+    item->add_layer_to_delete( *it );
+    ++it;
+  }
+
+  // Figure out which layers need to be restore using a check point
+  it = this->volume_check_point_layers_.begin();
+  it_end = this->volume_check_point_layers_.end();
+
+  while ( it != it_end )
+  {
+    item->add_layer_to_restore( *it, LayerCheckPointHandle( new LayerCheckPoint( *it ) ) );
+    ++it;
+  }
+
+  // Figure out which layers need to be added
+  it = this->deleted_layers_.begin();
+  it_end = this->deleted_layers_.end();
+
+  while ( it != it_end )
+  {
+    item->add_layer_to_add( *it );
+    ++it;
+  }
+
+  // Add the redo action
+  item->set_redo_action( action );
+
+  // Add id count to restore 
+  item->add_id_count_to_restore( this->id_count_ );
+
+  // Set the provenance step ID 
+  item->set_provenance_step_id( this->provenance_step_id_ );
+
+  // Insert the record into the undo buffer
+  UndoBuffer::Instance()->insert_undo_item( context, item );
+
+  this->volume_check_point_layers_.clear();
+  this->deleted_layers_.clear();
+}
+
+void LayerFilterPrivate::create_provenance_record( Core::ActionContextHandle context, 
+                          Core::ActionHandle action )
+{
+  // Provenance is only recorded for LayerActions
+  LayerAction* layer_action = dynamic_cast< LayerAction* >( action.get() ); 
+  if ( ! layer_action ) 
+  {
+    CORE_THROW_LOGICERROR( "LayerFilter should only be used with LayerAction objects." );
+  }
+
+  // Figure out what provenance numbers need to be send down to the layers
+  // when finalizing this filter 
+  size_t output_layer_count = 0;
+  ProvenanceIDList output_provenance_ids;
+  ProvenanceIDList deleted_provenance_ids;
+
+  for ( size_t j = 0; j < this->created_layers_.size(); j++ )
+  {
+    if ( this->created_layers_[ j ] ) 
+    {
+      ProvenanceID prov_id = layer_action->get_output_provenance_id( output_layer_count++ );
+      this->provenance_ids_[ this->created_layers_[ j ].get() ] = prov_id;
+      // NOTE: Update the provenance ID before actually running the filter, 
+      // so the next action that depends on the outputs of the current one 
+      // can be translated properly.
+      this->created_layers_[ j ]->provenance_id_state_->set( prov_id );
+      output_provenance_ids.push_back( prov_id );
+    }
+  }
+
+  for ( size_t j = 0; j < this->locked_for_processing_layers_.size(); j++ )
+  {
+    if ( this->locked_for_processing_layers_[ j ] ) 
+    {
+      ProvenanceID prov_id = layer_action->get_output_provenance_id( output_layer_count++ ); 
+      this->provenance_ids_[ this->locked_for_processing_layers_[ j ].get() ] = prov_id;
+      // NOTE: Update the provenance ID before actually running the filter, 
+      // so the next action that depends on the outputs of the current one 
+      // can be translated properly.
+      this->locked_for_processing_layers_[ j ]->provenance_id_state_->set( prov_id );
+
+      output_provenance_ids.push_back( prov_id );
+      deleted_provenance_ids.push_back( this->locked_for_processing_layers_[ j ]->
+        provenance_id_state_->get() );
+    }
+  }
+
+  for ( size_t j = 0; j < this->locked_for_deletion_layers_.size(); ++j )
+  {
+    if ( this->locked_for_deletion_layers_[ j ] )
+    {
+      deleted_provenance_ids.push_back( this->locked_for_deletion_layers_[ j ]->
+        provenance_id_state_->get() );
+    }
+  }
+
+  // Create a provenance record
+  this->provenance_step_ = ProvenanceStepHandle( new ProvenanceStep );
+  // Get the input provenance ids from the translate step
+  this->provenance_step_->set_input_provenance_ids( 
+    layer_action->get_input_provenance_ids() );
+  // Get the output and replace provenance ids from the analysis above
+  this->provenance_step_->set_output_provenance_ids( output_provenance_ids );
+  this->provenance_step_->set_deleted_provenance_ids( deleted_provenance_ids );
+
+  // Get the input command of what needs t be rerun
+  this->provenance_step_->set_action( 
+    layer_action->export_to_provenance_string() );
+
+  this->provenance_step_id_ = ProjectManager::Instance()->get_current_project()->
+    add_provenance_record( this->provenance_step_ );
+}
+
+//////////////////////////////////////////////////////////////////////////
+// Class LayerFilter
+//////////////////////////////////////////////////////////////////////////
 
 LayerFilter::LayerFilter() :
   private_( new LayerFilterPrivate )
 {
   this->private_->filter_ = this;
+  this->private_->provenance_step_id_ = -1;
 }
 
 LayerFilter::~LayerFilter()
@@ -568,7 +711,8 @@ bool LayerFilter::create_and_lock_mask_layer_from_layer( LayerHandle src_layer, 
   return true;
 }
 
-bool LayerFilter::create_and_lock_mask_layer_from_layer( LayerHandle src_layer, LayerHandle& dst_layer, std::string dst_layer_name )
+bool LayerFilter::create_and_lock_mask_layer_from_layer( LayerHandle src_layer, 
+                            LayerHandle& dst_layer, std::string dst_layer_name )
 {
   // Generate a new name for the filter
   std::string name = this->get_layer_prefix() + "_" + dst_layer_name;
@@ -743,120 +887,14 @@ Layer::filter_key_type LayerFilter::get_key() const
 }
 
 
-bool LayerFilter::create_undo_redo_record( Core::ActionContextHandle context, Core::ActionHandle redo_action )
+void LayerFilter::create_undo_redo_and_provenance_record( 
+  Core::ActionContextHandle context, Core::ActionHandle action )
 {
-  // Create a new undo/redo record
-  LayerUndoBufferItemHandle item( new LayerUndoBufferItem( get_filter_name() ) );
-  this->private_->undo_item_weak_handle_ = item;
+  // NOTE: Create the provenance record first, as the provenance step ID
+  // is needed by the undo/redo record.
 
-  // Keep track of the filter
-  item->add_filter_to_abort( this->shared_from_this() );
-  
-  std::vector<LayerHandle>::iterator it, it_end;
-  // Figure out which layers need to be deleted 
-  it = this->private_->created_layers_.begin();
-  it_end = this->private_->created_layers_.end();
-
-  while ( it != it_end )
-  {
-    item->add_layer_to_delete( *it );
-    ++it;
-  }
-
-  // Figure out which layers need to be restore using a check point
-  it = this->private_->volume_check_point_layers_.begin();
-  it_end = this->private_->volume_check_point_layers_.end();
-  
-  while ( it != it_end )
-  {
-    item->add_layer_to_restore( *it, LayerCheckPointHandle( new LayerCheckPoint( *it ) ) );
-    ++it;
-  }
-
-  // Figure out which layers need to be added
-  it = this->private_->deleted_layers_.begin();
-  it_end = this->private_->deleted_layers_.end();
-
-  while ( it != it_end )
-  {
-    item->add_layer_to_add( *it );
-    ++it;
-  }
-
-  // Add the redo action
-  item->set_redo_action( redo_action );
-
-  // Add id count to restore 
-  item->add_id_count_to_restore( this->private_->id_count_ );
-  
-  // Insert the record into the undo buffer
-  UndoBuffer::Instance()->insert_undo_item( context, item );
-
-  this->private_->volume_check_point_layers_.clear();
-  this->private_->deleted_layers_.clear();
-
-  return true;
-}
-
-bool LayerFilter::create_provenance_record( Core::ActionContextHandle context, 
-  Core::ActionHandle action )
-{
-  // Provenance is only recorded for LayerActions
-  LayerAction* layer_action = dynamic_cast<LayerAction*>( action.get() ); 
-  if ( ! layer_action ) return false;
-    
-  // Figure out what provenance numbers need to be send down to the layers
-  // when finalizing this filter 
-  size_t output_layer_count = 0;
-  ProvenanceIDList output_provenance_ids;
-  ProvenanceIDList deleted_provenance_ids;
-
-  for ( size_t j = 0; j < this->private_->created_layers_.size(); j++ )
-  {
-    if ( this->private_->created_layers_[ j ] ) 
-    {
-      ProvenanceID prov_id = layer_action->get_output_provenance_id( output_layer_count++ );
-      this->private_->provenance_ids_[ this->private_->created_layers_[ j ].get() ] = prov_id;
-      output_provenance_ids.push_back( prov_id );
-    }
-  }
-
-  for ( size_t j = 0; j < this->private_->locked_for_processing_layers_.size(); j++ )
-  {
-    if ( this->private_->locked_for_processing_layers_[ j ] ) 
-    {
-      ProvenanceID prov_id = layer_action->get_output_provenance_id( output_layer_count++ ); 
-      this->private_->provenance_ids_[ this->private_->locked_for_processing_layers_[ j ].get() ] = prov_id;
-          
-      output_provenance_ids.push_back( prov_id );
-      deleted_provenance_ids.push_back( this->private_->locked_for_processing_layers_[ j ]->
-        provenance_id_state_->get() );
-    }
-  }
-
-  for ( size_t j = 0; j < this->private_->locked_for_deletion_layers_.size(); ++j )
-  {
-    if ( this->private_->locked_for_deletion_layers_[ j ] )
-    {
-      deleted_provenance_ids.push_back( this->private_->locked_for_deletion_layers_[ j ]->
-        provenance_id_state_->get() );
-    }
-  }
-
-  // Create a provenance record
-  this->private_->provenance_step_ = ProvenanceStepHandle( new ProvenanceStep );
-  // Get the input provenance ids from the translate step
-  this->private_->provenance_step_->set_input_provenance_ids( 
-    layer_action->get_input_provenance_ids() );
-  // Get the output and replace provenance ids from the analysis above
-  this->private_->provenance_step_->set_output_provenance_ids( output_provenance_ids );
-  this->private_->provenance_step_->set_deleted_provenance_ids( deleted_provenance_ids );
-  
-  // Get the input command of what needs t be rerun
-  this->private_->provenance_step_->set_action( 
-    layer_action->export_to_provenance_string() );
-
-  return true;
+  this->private_->create_provenance_record( context, action );
+  this->private_->create_undo_redo_record( context, action );
 }
 
 bool LayerFilter::update_provenance_action_string( Core::ActionHandle action )
@@ -866,7 +904,9 @@ bool LayerFilter::update_provenance_action_string( Core::ActionHandle action )
   if ( ! layer_action ) return false;
 
   this->private_->provenance_step_->set_action( layer_action->export_to_provenance_string() );
-    
+  ProjectManager::Instance()->get_current_project()->update_provenance_record( 
+    this->private_->provenance_step_id_, this->private_->provenance_step_ );
+
   return true;
 }
 

@@ -26,6 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#include <Core/Action/ActionDispatcher.h>
+
 // Application includes
 #include <Application/ProjectManager/ProjectManager.h>
 #include <Application/ProjectManager/Actions/ActionDeleteSession.h>
@@ -51,10 +53,9 @@ bool ActionDeleteSession::validate( Core::ActionContextHandle& context )
 
   // Ensure the session exists
   if( !ProjectManager::Instance()->get_current_project()->
-    is_session( this->session_name_ ) )
+    is_session( this->session_id_ ) )
   {
-    std::string error = std::string( "'" ) + this->session_name_ +
-      "' is not a valid session.";
+    std::string error = Core::ExportToString( this->session_id_ ) + " is not a valid session.";
     context->report_error( error );
     return false;
   }
@@ -65,8 +66,7 @@ bool ActionDeleteSession::validate( Core::ActionContextHandle& context )
 bool ActionDeleteSession::run( Core::ActionContextHandle& context, 
   Core::ActionResultHandle& result )
 {
-  std::string message = std::string( "Deleting session: '" ) + this->session_name_ + 
-    std::string( "'." );
+  std::string message = "Deleting session: " + Core::ExportToString( this->session_id_ ) + "...";
 
   Core::ActionProgressHandle progress = 
     Core::ActionProgressHandle( new Core::ActionProgress( message ) );
@@ -75,7 +75,7 @@ bool ActionDeleteSession::run( Core::ActionContextHandle& context,
   progress->begin_progress_reporting();
 
   // Actual work is done here
-  bool success = ProjectManager::Instance()->delete_project_session( this->session_name_ );
+  bool success = ProjectManager::Instance()->delete_project_session( this->session_id_ );
 
   // Allow the user to interact with the GUI once more.
   progress->end_progress_reporting();
@@ -83,12 +83,11 @@ bool ActionDeleteSession::run( Core::ActionContextHandle& context,
   return success;
 }
 
-void ActionDeleteSession::Dispatch( Core::ActionContextHandle context, 
-  const std::string& session_name )
+void ActionDeleteSession::Dispatch( Core::ActionContextHandle context, long long session_id )
 {
   // Create action
   ActionDeleteSession* action = new ActionDeleteSession;
-  action->session_name_ = session_name;
+  action->session_id_ = session_id;
 
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }

@@ -27,7 +27,6 @@
  */
 
 #include <QtUtils/Widgets/QtSignalFocusLineEdit.h>
-#include <Application/LayerManager/LayerManager.h>
 
 namespace QtUtils
 {

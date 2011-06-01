@@ -208,6 +208,20 @@ void ActionPaint::clear_cache()
 
 bool ActionPaint::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
+  LayerHandle layer = LayerManager::Instance()->get_layer_by_id( 
+    this->private_->target_layer_id_ );
+
+  // Create a provenance record
+  ProvenanceIDList deleted_prov_ids( 1, layer->provenance_id_state_->get() );
+  ProvenanceStepHandle provenance_step( new ProvenanceStep );
+  provenance_step->set_input_provenance_ids( this->get_input_provenance_ids() );
+  provenance_step->set_output_provenance_ids( this->get_output_provenance_ids( 1 ) );
+  provenance_step->set_deleted_provenance_ids( deleted_prov_ids );
+  provenance_step->set_action( this->export_to_provenance_string() );
+  ProvenanceStepID prov_step_id = ProjectManager::Instance()->get_current_project()->
+    add_provenance_record( provenance_step );
+  assert( prov_step_id > 0 );
+
   // Create a new undo item
   LayerUndoBufferItemHandle item( new LayerUndoBufferItem( "Paint Stroke" ) );
   
@@ -215,30 +229,18 @@ bool ActionPaint::run( Core::ActionContextHandle& context, Core::ActionResultHan
   item->set_redo_action( this->shared_from_this() );
 
   // Add check point for the slice we are painting on
-  LayerHandle layer = LayerManager::Instance()->get_layer_by_id( 
-    this->private_->target_layer_id_ );
   Core::SliceType slice_type = static_cast<Core::SliceType::enum_type>( 
     this->private_->slice_type_ );
   int index = static_cast< int >( this->private_->slice_number_ );
   
   LayerCheckPointHandle check_point( new LayerCheckPoint( layer, slice_type, index ) );
   item->add_layer_to_restore( layer, check_point );
+  item->set_provenance_step_id( prov_step_id );
 
   UndoBuffer::Instance()->insert_undo_item( context, item );
 
   // Update the provenance ID of the target mask
-  ProvenanceIDList deleted_prov_ids( 1, layer->provenance_id_state_->get() );
-  ProvenanceID new_prov_id = GenerateProvenanceID();
-  ProvenanceIDList output_prov_ids( 1, new_prov_id );
-  layer->provenance_id_state_->set( new_prov_id );
-
-  // Create a provenance record
-  ProvenanceStepHandle provenance_step( new ProvenanceStep );
-  provenance_step->set_input_provenance_ids( this->get_input_provenance_ids() );
-  provenance_step->set_output_provenance_ids( output_prov_ids );
-  provenance_step->set_deleted_provenance_ids( deleted_prov_ids );
-  provenance_step->set_action( this->export_to_provenance_string() );
-  ProjectManager::Instance()->get_current_project()->add_to_provenance_database( provenance_step );
+  layer->provenance_id_state_->set( this->get_output_provenance_id() );
 
   // Painting will already have been done by the interface
   if ( context->source() == Core::ActionSource::INTERFACE_MOUSE_E ) return true;

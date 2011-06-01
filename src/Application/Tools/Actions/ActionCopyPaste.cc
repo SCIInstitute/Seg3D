@@ -144,23 +144,6 @@ bool ActionCopyPaste::validate( Core::ActionContextHandle& context )
 
 bool ActionCopyPaste::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {   
-  // Build the undo/redo for this action
-  LayerUndoBufferItemHandle item( new LayerUndoBufferItem( "CopyPaste" ) );
-
-  // The redo action is the current one
-  item->set_redo_action( this->shared_from_this() );
-
-  // Create a check point of the slice on which the flood fill will operate
-  LayerCheckPointHandle check_point( new LayerCheckPoint( this->private_->target_layer_, 
-    this->private_->target_vol_slice_->get_slice_type(), this->private_->dst_min_slice_,
-    this->private_->dst_max_slice_ ) );
-
-  // Tell the item which layer to restore with which check point for the undo action
-  item->add_layer_to_restore( this->private_->target_layer_, check_point );
-
-  // Now add the undo/redo action to undo buffer
-  UndoBuffer::Instance()->insert_undo_item( context, item );
-
   // Create a provenance record for this action
   ProvenanceStep* prov_step = new ProvenanceStep;
   prov_step->set_input_provenance_ids( this->get_input_provenance_ids() );
@@ -168,6 +151,24 @@ bool ActionCopyPaste::run( Core::ActionContextHandle& context, Core::ActionResul
   prov_step->set_deleted_provenance_ids( ProvenanceIDList( 1, 
     this->private_->target_layer_->provenance_id_state_->get() ) );
   prov_step->set_action( this->export_to_provenance_string() );
+  ProvenanceStepHandle prov_step_handle( prov_step );
+  ProvenanceStepID step_id = ProjectManager::Instance()->get_current_project()->
+    add_provenance_record( prov_step_handle );
+
+  // Build the undo/redo for this action
+  LayerUndoBufferItemHandle item( new LayerUndoBufferItem( "CopyPaste" ) );
+  // The redo action is the current one
+  item->set_redo_action( this->shared_from_this() );
+  // Tell which provenance record to delete when undone
+  item->set_provenance_step_id( step_id );
+  // Create a check point of the slice on which the flood fill will operate
+  LayerCheckPointHandle check_point( new LayerCheckPoint( this->private_->target_layer_, 
+    this->private_->target_vol_slice_->get_slice_type(), this->private_->dst_min_slice_,
+    this->private_->dst_max_slice_ ) );
+  // Tell the item which layer to restore with which check point for the undo action
+  item->add_layer_to_restore( this->private_->target_layer_, check_point );
+  // Now add the undo/redo action to undo buffer
+  UndoBuffer::Instance()->insert_undo_item( context, item );
 
   std::vector< unsigned char > buffer( this->private_->source_vol_slice_->nx() *
     this->private_->source_vol_slice_->ny() );
@@ -182,9 +183,6 @@ bool ActionCopyPaste::run( Core::ActionContextHandle& context, Core::ActionResul
   this->private_->target_vol_slice_->set_slice_data( &buffer[ 0 ], true );
   this->private_->target_layer_->provenance_id_state_->set( this->get_output_provenance_id() );
   
-  ProvenanceStepHandle prov_step_handle( prov_step );
-  ProjectManager::Instance()->get_current_project()->add_to_provenance_database( prov_step_handle );
-
   return true;
 }
 

@@ -271,8 +271,6 @@ bool MaskLayer::pre_save_states( Core::StateIO& state_io )
   this->generation_state_->set( static_cast< int >( this->get_mask_volume()->get_generation() ) );
   std::string data_file_name = this->generation_state_->export_to_string() + ".nrrd";
 
-  ProjectManager::Instance()->get_current_project()->add_data_file( data_file_name );
-
   return true;
 }
 
@@ -307,6 +305,12 @@ bool MaskLayer::post_load_states( const Core::StateIO& state_io )
       grid_transform, mask_data_block ) );
     this->add_connection( this->private_->mask_volume_->get_mask_data_block()->mask_updated_signal_.
       connect( boost::bind( &MaskLayerPrivate::handle_mask_data_changed, this->private_ ) ) );
+  }
+
+  // If the layer didn't have a valid provenance ID, generate one
+  if ( this->provenance_id_state_->get() < 0 )
+  {
+    this->provenance_id_state_->set( GenerateProvenanceID() );
   }
   
   return success;

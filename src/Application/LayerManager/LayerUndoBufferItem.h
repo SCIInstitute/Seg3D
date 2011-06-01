@@ -37,6 +37,7 @@
 #include <Application/Layer/Layer.h>
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/LayerManager/LayerCheckPoint.h>
+#include <Application/Provenance/ProvenanceStep.h>
 
 namespace Seg3D
 {
@@ -84,6 +85,10 @@ public:
   // Cache the count of layer and group ids, so they can be rolled back to the original ones
   // NOTE: If they are set to -1, the function will query the current ones.
   void add_id_count_to_restore( LayerManager::id_count_type id_count );
+
+  // SET_PROVENANCE_STEP_ID:
+  // Set the provenance record ID associated with the action.
+  void set_provenance_step_id( ProvenanceStepID step_id );
 
   // ROLLBACK_LAYER_CHANGES:
   // Abort corresponding filters (if any) and rollback all the layer changes.
