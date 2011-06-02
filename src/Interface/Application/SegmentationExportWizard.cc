@@ -53,7 +53,7 @@
 #include <Application/Layer/LayerGroup.h>
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/LayerManager/Actions/ActionExportSegmentation.h>
-#include <Application/PreferencesManager/PreferencesManager.h>
+#include <Application/ProjectManager/ProjectManager.h>
 
 // Interface includes
 #include <Interface/Application/SegmentationExportWizard.h>
@@ -334,22 +334,17 @@ bool SegmentationSelectionPage::validatePage()
   }
   
   QString filename;
+  boost::filesystem::path current_folder = ProjectManager::Instance()->get_current_file_folder();
   
   if( this->private_->single_file_radio_button_->isChecked() )
   {
     filename = QFileDialog::getSaveFileName( this, "Export Segmentation As... ",
-      QString::fromStdString( PreferencesManager::Instance()->export_path_state_->get() ),
-      "NRRD File (*.nrrd)" );
-
-    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
-      PreferencesManager::Instance()->export_path_state_, 
-      boost::filesystem::path( filename.toStdString() ).parent_path().string() );
+      current_folder.string().c_str(), "NRRD File (*.nrrd)" );
   }
   else
   {
     filename = QFileDialog::getExistingDirectory( this, tr( "Choose Directory for Export..." ),
-      QString::fromStdString( PreferencesManager::Instance()->export_path_state_->get() ),
-      QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks );
+      current_folder.string().c_str(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks );
       
     if( !QFileInfo( filename ).exists() )
     {
@@ -373,10 +368,6 @@ bool SegmentationSelectionPage::validatePage()
     // if we've made it here then we need to remove the folder we created
     boost::filesystem::remove( boost::filesystem::path( filename.toStdString() ) 
       / "delete_me" );
-
-    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
-      PreferencesManager::Instance()->export_path_state_, 
-      boost::filesystem::path( filename.toStdString() ).string() );
   }
   
   QDir file_path = QDir( filename );

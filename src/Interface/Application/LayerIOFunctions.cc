@@ -272,13 +272,6 @@ void LayerIOFunctions::ExportLayer( QMainWindow* main_window )
   
   if( filename == "" ) return;
   
-  if( boost::filesystem::exists( boost::filesystem::path( filename.toStdString() ).parent_path() ) )
-  {
-    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
-      PreferencesManager::Instance()->export_path_state_, 
-      boost::filesystem::path( filename.toStdString() ).parent_path().string() );
-  }
-    
   std::string extension = boost::filesystem::extension( boost::filesystem::path( filename.toStdString() ) ); 
   std::string exportername;
   

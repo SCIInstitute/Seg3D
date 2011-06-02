@@ -1261,9 +1261,9 @@ void LayerWidget::delete_layer_from_context_menu()
 
 void LayerWidget::export_layer( const std::string& type_extension )
 {
+  boost::filesystem::path current_folder = ProjectManager::Instance()->get_current_file_folder();
   QString export_path = QFileDialog::getExistingDirectory( this, tr( "Choose Directory for Export..." ),
-    QString::fromStdString( PreferencesManager::Instance()->export_path_state_->get() ),
-    QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks );
+    current_folder.string().c_str(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks );
   
   if( export_path == "" ) return;
   
@@ -1302,10 +1302,6 @@ void LayerWidget::export_layer( const std::string& type_extension )
     ActionExportLayer::Dispatch( Core::Interface::GetWidgetActionContext(), 
       this->private_->layer_->get_layer_id(), file_name, type_extension );
   }
-  
-  Core::ActionSet::Dispatch(  Core::Interface::GetWidgetActionContext(), 
-    PreferencesManager::Instance()->export_path_state_, export_path.toStdString() );
-
 }
 
 void LayerWidget::export_nrrd()
