@@ -611,7 +611,7 @@ bool ToolManager::pre_load_states( const Core::StateIO& state_io )
       ToolHandle tool = this->get_tool( toolid );
       if ( ! tool->load_states( state_io ) )
       {
-        std::string error = std::string( "Could not states for tool '" ) + toolid + "'.";
+        std::string error = std::string( "Could not load states for tool '" ) + toolid + "'.";
         CORE_LOG_ERROR( error );
         success = false;
       } 

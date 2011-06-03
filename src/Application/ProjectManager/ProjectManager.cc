@@ -599,9 +599,16 @@ bool ProjectManager::open_project( const std::string& project_file )
 
   if ( succeeded )
   {
-    // Load the last session of the project
-    new_proj->load_last_session();
+    succeeded = new_proj->load_last_session();
+    if ( !succeeded )
+    {
+      this->private_->set_current_project( ProjectHandle( 
+        new Project( std::string( "Untitled Project" ) ) ) );
+    }
+  }
 
+  if ( succeeded )
+  {
     // Reset the auto save system
     AutoSave::Instance()->recompute_auto_save();
 
@@ -705,6 +712,8 @@ bool ProjectManager::load_project_session( long long session_id )
     return true;
   }
   
+  // Reset the application.
+  Core::Application::Reset();
   return false;
 }
   

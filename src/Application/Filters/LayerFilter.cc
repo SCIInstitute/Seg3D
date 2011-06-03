@@ -508,6 +508,7 @@ void LayerFilter::abort_and_wait()
 
 void LayerFilter::connect_abort( const  LayerHandle& layer )
 {
+  // TODO: connect to a free function instead of a member function
   boost::mutex::scoped_lock lock( this->private_->mutex_ );
   this->private_->add_connection( layer->abort_signal_.connect( boost::bind(
     &LayerFilter::raise_abort, this ) ) );
@@ -515,6 +516,7 @@ void LayerFilter::connect_abort( const  LayerHandle& layer )
 
 void LayerFilter::connect_stop( const  LayerHandle& layer )
 {
+  // TODO: connect to a free function instead of a member function
   boost::mutex::scoped_lock lock( this->private_->mutex_ );
   this->private_->add_connection( layer->stop_signal_.connect( boost::bind(
     &LayerFilter::raise_stop, this ) ) );

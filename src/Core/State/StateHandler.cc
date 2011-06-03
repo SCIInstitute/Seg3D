@@ -253,11 +253,15 @@ bool StateHandler::load_states( const StateIO& state_io )
 
   }
    
+  bool success;
 
   state_io.push_current_element();
   state_io.set_current_element( sh_element );
-  this->pre_load_states( state_io );
+  success = this->pre_load_states( state_io );
   state_io.pop_current_element();
+
+  // Only continue if pre_load_states succeeded.
+  if ( !success ) return false;
 
   // Query the version number in the loaded XML file.
   // NOTE: If the call fails, loaded_verison will not be changed, and thus is the same
@@ -286,7 +290,6 @@ bool StateHandler::load_states( const StateIO& state_io )
   const TiXmlElement* state_element = 
     sh_element->FirstChildElement( STATE_ELEMENT_NAME.c_str() );
 
-  bool success = true;
   while ( success && state_element != 0 )
   {
     const char* stateid = state_element->Attribute( "id" );

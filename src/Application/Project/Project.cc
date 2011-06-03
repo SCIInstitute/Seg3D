@@ -863,8 +863,11 @@ void ProjectPrivate::convert_version1_project()
     std::set< long long > generations;
     if ( !this->parse_session_data( old_path, generations ) ) continue;
 
-    generation_count = Core::Max( generation_count, 
-      *( std::max_element( generations.begin(), generations.end() ) ) );
+    if ( !generations.empty() )
+    {
+      generation_count = Core::Max( generation_count, 
+        *( std::max_element( generations.begin(), generations.end() ) ) );
+    }
 
     SessionID session_id = this->insert_session_into_database( session_info_strs[ 1 ], session_info_strs[ 2 ], ss.str() );
     if ( session_id < 0 )
@@ -1628,7 +1631,9 @@ bool Project::load_last_session()
       return true;
     }
     // Remove the session record since it can't be loaded
+    CORE_LOG_ERROR( "Session '" + sessions[ i ].session_name() + "' is invalid." );
     this->private_->delete_session_from_database( sessions[ i ].session_id() );
+    Core::Application::Reset();
   }
 
   // We could not load the file, hence send a message to the user
