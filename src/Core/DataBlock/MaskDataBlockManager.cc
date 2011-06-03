@@ -246,12 +246,16 @@ bool MaskDataBlockManager::save_data_blocks( boost::filesystem::path path, bool 
 
   for ( size_t j = 0 ; j < mask_list.size() ; j++ )
   {
-    boost::filesystem::path volume_path = path / 
-      ( Core::ExportToString( mask_list[ j ].data_block_->
-      get_generation() ) + ".nrrd" );
+    DataBlock::generation_type generation = mask_list[ j ].data_block_->get_generation();
+
+    // Ignore unregistered data blocks
+    if ( generation < 0 ) continue;
+    
+    boost::filesystem::path volume_path = path / ( Core::ExportToString( generation ) + ".nrrd" );
 
     if( !boost::filesystem::exists( volume_path ) )
     {
+
       NrrdDataHandle nrrd = NrrdDataHandle( new NrrdData( 
         mask_list[ j ].data_block_, mask_list[ j ].grid_transform_ ) );
 

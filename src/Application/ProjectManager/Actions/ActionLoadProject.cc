@@ -144,11 +144,8 @@ bool ActionLoadProject::run( Core::ActionContextHandle& context,
   
   if ( success )
   {
-    // Clear undo buffer, we do not keep the undo buffer around
-    UndoBuffer::Instance()->reset_undo_buffer();
-
     // TODO: This works around a problem in the current code, that makes a change because a session
-    // is loaded. THis adds a reset on the current stack so only changes after this point will count.
+    // is loaded. This adds a reset on the current stack so only changes after this point will count.
     // At some point in the near future we should check this logic.
     if ( ProjectManager::Instance()->get_current_project() )
     {

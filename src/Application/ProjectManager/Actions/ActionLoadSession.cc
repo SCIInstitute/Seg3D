@@ -94,9 +94,6 @@ bool ActionLoadSession::run( Core::ActionContextHandle& context,
     context->report_error( error );
     success = false;  
   }
-  
-  // Clear undo buffer, we do not keep the undo buffer around
-  UndoBuffer::Instance()->reset_undo_buffer();
 
   // TODO: This works around a problem in the current code, that makes a change when a session
   // is loaded. This adds a reset on the current application callback stack so only changes 

@@ -127,9 +127,6 @@ bool ActionNewProject::run( Core::ActionContextHandle& context,
 
   ProjectManager::Instance()->get_current_project()->reset_project_changed();
   
-  // Clear undo buffer
-  UndoBuffer::Instance()->reset_undo_buffer();
-  
   // Release the GUI, again using message passing
   progress->end_progress_reporting();
   
