@@ -161,6 +161,10 @@ public:
   // Save the current state into the xml file
   bool save_state();
 
+  // GET_ALL_SESSIONS:
+  // Get the names of all the sessions in this project
+  bool get_all_sessions( std::vector< SessionInfo >& sessions );
+
   // LOAD_SESSION:
   // This function will be called to load a specific session
   // NOTE: This function can only can called from the application thread.
@@ -184,6 +188,11 @@ public:
   // Function for validating that a session name exists
   // NOTE: This function can only can called from the application thread.
   bool is_session( SessionID session_id );
+
+  // GET_SESSION_INFO:
+  // Query the information of a given session.
+  // Returns true on success, otherwise false.
+  bool get_session_info( SessionID session_id, SessionInfo& session_info );
 
   // EXPORT_PROJECT:
   // This function will export the current project and the passed vector of session names to file
@@ -261,13 +270,7 @@ public:
   // GET_PROVENANCE_RECORD:
   // returns a vector that is the provenance record for a particular ProvenanceID
   void request_provenance_record( ProvenanceID prov_id );
-  
-  // -- session support --
-public:     
-  // GET_ALL_SESSIONS:
-  // Get the names of all the sessions in this project
-  bool get_all_sessions( std::vector< SessionInfo >& sessions );
-    
+      
 private:
   // INITIALIZE_STATES:
   // Called by constructors to initialize state variables

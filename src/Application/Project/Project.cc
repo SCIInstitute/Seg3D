@@ -133,6 +133,7 @@ public:
 
   void query_provenance_trail( ProvenanceID prov_id, ProvenanceTrail& provenance_trail );
   
+  void extract_session_info( ResultSet& result_set, std::vector< SessionInfo >& sessions );
   bool get_all_sessions( std::vector< SessionInfo >& sessions );
 
   void convert_version1_project();
@@ -140,7 +141,6 @@ public:
   bool parse_session_data( const boost::filesystem::path& file_path, std::set< long long >& generations );
 
   void set_session_file( SessionID id, const std::string& file_name );
-
   // -- internal variables --
 public:
   // Pointer back to the project
@@ -353,16 +353,12 @@ bool ProjectPrivate::clean_up_session_database()
     if ( boost::filesystem::exists( session_file ) ) continue;
 
     // Otherwise, if there is 'session_file' explicitly stored in the database, try it also
-    ResultSet::value_type::iterator it = result_set[ i ].find( "session_file" );
-    if ( it != result_set[ i ].end() )
+    try
     {
-      std::string session_file_str = boost::any_cast< std::string >( ( *it ).second );
-      if ( !session_file_str.empty() )
-      {
-        session_file = project_path / SESSION_DIR_C / session_file_str;
-        if ( boost::filesystem::exists( session_file ) ) continue;
-      }
+      std::string session_file_str = boost::any_cast< std::string >( result_set[ i ][ "session_file" ] );
+      if ( boost::filesystem::exists( project_path / SESSION_DIR_C / session_file_str ) ) continue;
     }
+    catch ( ... ) {}
 
     // No session file exists for the session, delete it from database
     this->delete_session_from_database( session_id );
@@ -757,18 +753,8 @@ void ProjectPrivate::query_provenance_trail( ProvenanceID prov_id, ProvenanceTra
   }
 }
 
-bool ProjectPrivate::get_all_sessions( std::vector< SessionInfo >& sessions )
+void ProjectPrivate::extract_session_info( ResultSet& result_set, std::vector< SessionInfo >& sessions )
 {
-  std::string error;
-
-  ResultSet result_set;
-  std::string select_statement = "SELECT * FROM sessions ORDER BY session_id DESC;";
-  if( !this->session_database_.run_sql_statement( select_statement, result_set, error ) )
-  {
-    CORE_LOG_ERROR( error );
-    return false;
-  }
-
   typedef boost::date_time::c_local_adjustor< boost::posix_time::ptime > local_adjustor;
   std::stringstream ss;
   ss.imbue( std::locale( ss.getloc(), new boost::posix_time::time_input_facet( 
@@ -793,7 +779,21 @@ bool ProjectPrivate::get_all_sessions( std::vector< SessionInfo >& sessions )
     }
     sessions.push_back( SessionInfo( session_id, session_name, user_id, timestamp ) );
   }
+}
 
+bool ProjectPrivate::get_all_sessions( std::vector< SessionInfo >& sessions )
+{
+  std::string error;
+
+  ResultSet result_set;
+  std::string select_statement = "SELECT * FROM sessions ORDER BY session_id DESC;";
+  if( !this->session_database_.run_sql_statement( select_statement, result_set, error ) )
+  {
+    CORE_LOG_ERROR( error );
+    return false;
+  }
+
+  this->extract_session_info( result_set, sessions );
   return true;
 }
 
@@ -1577,15 +1577,12 @@ bool Project::load_session( SessionID session_id )
     ( Core::ExportToString( session_id ) + ".xml" );
   if ( !boost::filesystem::exists( session_file ) )
   {
-    ResultSet::value_type::iterator it = result_set[ 0 ].find( "session_file" );
-    if ( it != result_set[ 0 ].end() )
+    try
     {
-      std::string session_file_str = boost::any_cast< std::string >( ( *it ).second );
-      if ( !session_file_str.empty() )
-      {
-        session_file = project_path / SESSION_DIR_C / session_file_str;
-      }
+      std::string session_file_str = boost::any_cast< std::string >( result_set[ 0 ][ "session_file" ] );
+      session_file = project_path / SESSION_DIR_C / session_file_str;
     }
+    catch ( ... ) {}
   }
 
   if ( !boost::filesystem::exists( session_file ) )
@@ -1756,23 +1753,25 @@ bool Project::delete_session( SessionID session_id )
   else
   {
     // Otherwise, if there is 'session_file' explicitly stored in the database, try it also
-    ResultSet::value_type::iterator it = result_set[ 0 ].find( "session_file" );
-    if ( it != result_set[ 0 ].end() )
+    std::string session_file_str;
+    try
     {
-      std::string session_file_str = boost::any_cast< std::string >( ( *it ).second );
-      if ( !session_file_str.empty() )
+      session_file_str = boost::any_cast< std::string >( result_set[ 0 ][ "session_file" ] );
+    }
+    catch ( ... ) {}
+
+    if ( !session_file_str.empty() )
+    {
+      session_file = project_path / SESSION_DIR_C / session_file_str;
+      if ( boost::filesystem::exists( session_file ) ) 
       {
-        session_file = project_path / SESSION_DIR_C / session_file_str;
-        if ( boost::filesystem::exists( session_file ) ) 
+        try
         {
-          try
-          {
-            boost::filesystem::remove( session_file );
-          }
-          catch ( ... ) 
-          {
-            CORE_LOG_ERROR( "Couldn't delete file '" + session_file.string() + "'." );
-          }
+          boost::filesystem::remove( session_file );
+        }
+        catch ( ... ) 
+        {
+          CORE_LOG_ERROR( "Couldn't delete file '" + session_file.string() + "'." );
         }
       }
     }
@@ -1795,6 +1794,30 @@ bool Project::delete_session( SessionID session_id )
 
   return true;
 } 
+
+bool Project::get_session_info( SessionID session_id, SessionInfo& session_info )
+{
+  std::string error;
+  ResultSet result_set;
+  std::string sql_str = "SELECT * FROM sessions WHERE session_id = " +
+    Core::ExportToString( session_id ) + ";";
+  if( !this->private_->session_database_.run_sql_statement( sql_str, result_set, error ) )
+  {
+    CORE_LOG_ERROR( error );
+    return false;
+  }
+
+  if ( result_set.size() == 0 )
+  {
+    return false;
+  }
+
+  std::vector< SessionInfo > sessions;
+  this->private_->extract_session_info( result_set, sessions );
+  session_info = sessions[ 0 ];
+
+  return true;
+}
 
 void Project::reset_project_changed()
 {

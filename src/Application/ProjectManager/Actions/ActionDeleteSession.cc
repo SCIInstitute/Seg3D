@@ -55,7 +55,7 @@ bool ActionDeleteSession::validate( Core::ActionContextHandle& context )
   if( !ProjectManager::Instance()->get_current_project()->
     is_session( this->session_id_ ) )
   {
-    std::string error = Core::ExportToString( this->session_id_ ) + " is not a valid session.";
+    std::string error = Core::ExportToString( this->session_id_ ) + " is not a valid session ID.";
     context->report_error( error );
     return false;
   }

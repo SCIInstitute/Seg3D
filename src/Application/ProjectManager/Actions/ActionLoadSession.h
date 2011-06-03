@@ -60,8 +60,12 @@ public:
   virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
   
 private:
-  // This parameter contains the name of the session to be loaded
+  // This parameter contains the ID of the session to be loaded
   long long session_id_;
+
+  // Internally cached session name. 
+  // NOTE: It's for displaying purpose only. NOT a action parameter.
+  std::string session_name_;
   
   // -- Dispatch this action from the interface --
 public:
