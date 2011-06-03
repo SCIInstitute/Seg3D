@@ -58,6 +58,9 @@ bool ActionGradientMagnitudeFilter::validate( Core::ActionContextHandle& context
   return true;
 }
 
+
+
+
 // ALGORITHM CLASS
 // This class does the actual work and is run on a separate thread.
 // NOTE: The separation of the algorithm into a private class is for the purpose of running the

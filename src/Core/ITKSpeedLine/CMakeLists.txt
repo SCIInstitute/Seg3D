@@ -31,41 +31,19 @@
 # Set sources
 ##################################################
 
-SET(CORE_GEOMETRY_SRCS
-  BBox.h
-  BBox.cc
-  Color.h
-  Color.cc
-  Plane.h
-  Plane.cc
-  Point.h
-  Point.cc
-  Transform.h
-  Transform.cc
-  GridTransform.h
-  GridTransform.cc
-  Vector.h
-  Vector.cc
-  View3D.h
-  View3D.cc
-  View2D.h
-  View2D.cc
-  Quaternion.h
-  Quaternion.cc
-  Matrix.h
-  Matrix.cc
-  Algorithm.h
-  Algorithm.cc
-  Measurement.h
-  Measurement.cc
-  Path.h
-  Path.cc
+SET(CORE_ITK_SPEEDLINE_SRCS
+  itkSingleImageCostFunction.h
+  itkSingleImageCostFunction.txx
+  itkArrivalFunctionToPathFilter.h
+  itkArrivalFunctionToPathFilter.txx
+  itkSpeedFunctionToPathFilter.h
+  itkSpeedFunctionToPathFilter.txx
 )
 
 ##################################################
 # Build static library
 ##################################################
 
-CORE_ADD_LIBRARY(Core_Geometry ${CORE_GEOMETRY_SRCS})
+#CORE_ADD_LIBRARY(Core_ITK_SpeedLine ${CORE_ITK_SPEEDLINE_SRCS})
 
-TARGET_LINK_LIBRARIES(Core_Geometry ${SCI_BOOST_LIBRARY})
+#TARGET_LINK_LIBRARIES(Core_ITK_SpeedLine ${SCI_ITK_LIBRARIES})

@@ -875,7 +875,6 @@
     // Setup the parameters
     action->target_layer_ = target_layer;
     action->mask_layer_ = mask_layer; 
-    //action->replace_ = replace;
     action->iterations_ = iterations;
     action->pointset_tool_id_ = toolid;
 

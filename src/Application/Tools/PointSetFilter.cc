@@ -138,7 +138,6 @@ void PointSetFilter::handle_layers_changed()
         {
           break;
         }
-        //std::find( layer_names.begin(), layer_names.end(), target_layer_name );
       }
 
       if ( it!= layer_names.end() )

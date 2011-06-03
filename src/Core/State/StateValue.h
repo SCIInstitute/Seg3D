@@ -39,6 +39,7 @@
 #include <Core/Geometry/Color.h>
 #include <Core/Geometry/Point.h>
 #include <Core/Geometry/Vector.h>
+#include <Core/Geometry/Path.h>
 
 namespace Core
 {
@@ -80,6 +81,9 @@ typedef boost::weak_ptr< StateLongLong > StateLongLongWeakHandle;
 typedef StateValue< std::string > StateString;
 typedef boost::shared_ptr< StateString > StateStringHandle;
 typedef boost::weak_ptr< StateString > StateStringWeakHandle;
+
+typedef StateValue< Path > StateSpeedlinePath;
+typedef boost::shared_ptr< StateSpeedlinePath > StateSpeedlinePathHandle;
 
 // Definition of the templated StateValue class
 

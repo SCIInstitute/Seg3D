@@ -117,8 +117,8 @@ SET(APPLICATION_TOOLS_SRCS
   ClipboardTool.cc
   PointSetFilter.h
   PointSetFilter.cc
-  #SpeedlineTool.h
-  #SpeedlineTool.cc
+  SpeedlineTool.h
+  SpeedlineTool.cc
   )
 
 SET(APPLICATION_TOOLS_NOREGISTER_SRCS
@@ -147,8 +147,8 @@ SET(APPLICATION_TOOLS_ACTIONS_SRCS
   Actions/ActionSetMeasurementPoint.cc
   Actions/ActionSetMeasurementVisible.h
   Actions/ActionSetMeasurementVisible.cc
-  #Actions/ActionSpeedline.h
-  #Actions/ActionSpeedline.cc
+  Actions/ActionSpeedline.h
+  Actions/ActionSpeedline.cc
   )
   
 IF(BUILD_WITH_PYTHON)
@@ -169,6 +169,7 @@ TARGET_LINK_LIBRARIES(Application_Tools
                       Core_Interface
                       Core_Action
                       Core_State
+            Core_Geometry
             Application_Clipboard
             Application_Filters
                       Application_Tool
