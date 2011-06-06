@@ -85,7 +85,7 @@ public:
 
   // -- Copy files --
 public:
-  // COPY_FILES
+  // GET_INPUTFILES_IMPORTER
   // For provenance files need to be copied into the project cache. As some files need special
   // attention: for example mhd and nhdr files actually list where there data is stored, this
   // function can be overloaded with a specific function that copies the files. Otherwise a
@@ -94,8 +94,8 @@ public:
   // NOTE: This function has to be implemented as metaIO files can refer to other files on the
   // file system. Hence copying the header files needs special logic, as it needs to copy the depending
   // files as well and may need to change file references in the header files.
-  virtual bool copy_files( boost::filesystem::path& project_cache_path );
-  
+  virtual InputFilesImporterHandle get_inputfiles_importer();
+    
   // -- internals of the class --
 private:
   ITKLayerImporterPrivateHandle private_;

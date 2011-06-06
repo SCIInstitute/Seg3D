@@ -43,6 +43,7 @@
 #include <boost/utility.hpp>
 
 // Application includes
+#include <Application/Project/InputFilesImporter.h>
 #include <Application/LayerIO/LayerImporterFileInfo.h>
 #include <Application/LayerIO/LayerImporterFileData.h>
 
@@ -70,10 +71,6 @@ CORE_ENUM_CLASS
   // Importer that imports a series of related files
   FILE_SERIES_E = 2
 )
-
-// ------------------------------------------------------
-// CLASS LayerImporterMode:
-// The modes that define how data can be imported
 
 // class definition
 class LayerImporter : public boost::noncopyable
@@ -112,7 +109,13 @@ public:
   // Set the error message
   void set_error( const std::string& error );
   
-  // -- file tags --
+  // -- file_importer_id handling --
+public:
+  // GET_INPUTFILES_ID:
+  // Get an id from the project that will be used to catalogue an import of files into the project
+  InputFilesID get_inputfiles_id();
+  
+  // -- File tags --
 public:
   // GET_FILENAME
   // Get the name of the file that needs to imported. If multiple files are specified,
@@ -154,25 +157,16 @@ public:
   // NOTE: The information is generated again, so that hints can be processed
   virtual bool get_file_data( LayerImporterFileDataHandle& data ) = 0;
   
-  
-  // -- Reset the data --
-public: 
-  // RESET
-  // Reset the data and clear out the buffer that were generated for get_file_info and
-  // get_file_data. 
-  // NOTE: this does not clear out the filenames, as copy_files can be called after reset
-  virtual void reset();
-  
   // -- Copy files --
 public:
-  // COPY_FILES
+  // GET_INPUTFILES_IMPORTER
   // For provenance files need to be copied into the project cache. As some files need special
   // attention: for example mhd and nhdr files actually list where there data is stored, this
   // function can be overloaded with a specific function that copies the files. Otherwise a
   // default implementation is given in the two derived classes.
   // NOTE: This function does not need to be implemented if a check of the file extension
   // is deemed enough. The file extension check is in the derived class that handles the filenames.
-  virtual bool copy_files( boost::filesystem::path& project_cache_path ) = 0;
+  virtual InputFilesImporterHandle get_inputfiles_importer() = 0;
 
   // -- Addional hints to compensate for file formats where user input is needed --
 public:

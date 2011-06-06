@@ -109,13 +109,16 @@ bool NrrdLayerImporter::get_file_data( LayerImporterFileDataHandle& data )
   return true;
 }
 
-bool NrrdLayerImporter::copy_files( boost::filesystem::path& project_cache_path )
+
+
+bool CopyNrrdFile( const boost::filesystem::path& src, 
+  const boost::filesystem::path& dst )
 {
   bool has_detached_header = false;
   
   try
   {
-    std::ifstream file_header( this->get_filename().c_str(), std::ios::binary );
+    std::ifstream file_header( src.string().c_str(), std::ios::binary );
 
     // Scan whether file has a detached header
     std::string line;
@@ -134,13 +137,24 @@ bool NrrdLayerImporter::copy_files( boost::filesystem::path& project_cache_path 
   }
   catch ( ... )
   {
-    this->set_error( "Could not read nrrd file." );
+    CORE_LOG_ERROR( std::string( "Could not read nrrd file '" ) + src.string() + "'." );
     return false;
   }
 
   if ( !has_detached_header )
   {
-    return LayerSingleFileImporter::copy_files( project_cache_path );
+    try
+    {
+      boost::filesystem::copy_file( src, dst );
+    }
+    catch ( ... )
+    {
+      CORE_LOG_ERROR( std::string( "Could not copy file '" ) + src.string() + "' to '" +
+        dst.string() + "'." );
+      return false;
+    }
+    
+    return true; 
   }
 
   std::vector< boost::filesystem::path > data_files;
@@ -148,8 +162,8 @@ bool NrrdLayerImporter::copy_files( boost::filesystem::path& project_cache_path 
   // Copy and update header file    
   try
   {
-    boost::filesystem::path input_header_name( this->get_filename() );
-    boost::filesystem::path output_header_name = project_cache_path / input_header_name.filename();
+    boost::filesystem::path input_header_name( src.string() );
+    boost::filesystem::path output_header_name( dst.string() );
   
     std::ifstream old_file_header( input_header_name.filename().c_str(), std::ios::binary );
     std::ofstream new_file_header( output_header_name.filename().c_str(), std::ios::binary );
@@ -169,7 +183,8 @@ bool NrrdLayerImporter::copy_files( boost::filesystem::path& project_cache_path 
         std::vector<std::string> components;
         if ( Core::ImportFromString( contents, components ) )
         {
-          this->set_error( "Cannot interpret the data file in header of nrrd file." );
+          CORE_LOG_ERROR( std::string( "Cannot interpret the data file in header of nrrd file '" ) 
+            + src.string() + "'." );
           return false;
         }
 
@@ -210,7 +225,8 @@ bool NrrdLayerImporter::copy_files( boost::filesystem::path& project_cache_path 
             !Core::ImportFromString( components[ 2 ], stop ) ||
             !Core::ImportFromString( components[ 3 ], step ) )
           {
-            this->set_error( "Could not interpret 'data file' field in header." );
+            CORE_LOG_ERROR( std::string( "Could not interpret 'data file' field in header." )
+              + src.string() + "'." );
             return false;
           }
           
@@ -224,7 +240,8 @@ bool NrrdLayerImporter::copy_files( boost::filesystem::path& project_cache_path 
         }
         else
         {
-          this->set_error( "Invalid entry in 'data file' field in the header." );
+          CORE_LOG_ERROR( std::string( "Invalid entry in 'data file' field in the header." )
+              + src.string() + "'." );            
           return false;
         }
       }
@@ -247,7 +264,7 @@ bool NrrdLayerImporter::copy_files( boost::filesystem::path& project_cache_path 
   }
   catch ( ... )
   {
-    this->set_error( "Could not copy and update header file." );
+    CORE_LOG_ERROR( "Could not copy and update header file for nhdr file." );
     return false; 
   }
 
@@ -257,11 +274,11 @@ bool NrrdLayerImporter::copy_files( boost::filesystem::path& project_cache_path 
     try
     {
       boost::filesystem::copy_file( data_files[ j ], 
-        project_cache_path / data_files[ j ].filename() );
+        dst.parent_path() / data_files[ j ].filename() );
     }
     catch( ... )
     {
-      this->set_error( std::string( "Could not copy file '" ) + data_files[ j ].string() + "'." );
+      CORE_LOG_ERROR( std::string( "Could not copy file '" ) + data_files[ j ].string() + "'." );
       return false;
     }
   }
@@ -269,5 +286,26 @@ bool NrrdLayerImporter::copy_files( boost::filesystem::path& project_cache_path 
   // Successfully copied data file and generated new header.
   return true;  
 }
+
+
+InputFilesImporterHandle NrrdLayerImporter::get_inputfiles_importer()
+{
+  InputFilesImporterHandle importer( new InputFilesImporter( this->get_inputfiles_id() ) );
+  try
+  {
+    boost::filesystem::path full_filename( this->get_filename() );
+    importer->add_filename( full_filename );
+    importer->set_copy_file_function( &CopyNrrdFile );
+  }
+  catch ( ... )
+  {
+    this->set_error( std::string( "Could not resolve filename '" ) + 
+      this->get_filename() + "'." );
+  }
+  
+  return importer;
+}
+
+
 
 } // end namespace seg3D

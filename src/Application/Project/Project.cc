@@ -26,6 +26,7 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// NOTE: This include is needed for APPLE to deal with directories that are bundled as a single file.
 #if defined( __APPLE__ )  
 #include <CoreServices/CoreServices.h>
 #endif
@@ -65,6 +66,9 @@ static const boost::filesystem::path SESSION_DIR_C( "sessions" );
 static const boost::filesystem::path SESSION_DATABASE_C( "sessions.sqlite" );
 static const boost::filesystem::path PROVENANCE_DIR_C( "provenance" );
 static const boost::filesystem::path PROVENANCE_DATABASE_C( "provenance.sqlite" );
+static const boost::filesystem::path DATA_DIR_C( "data" );
+static const boost::filesystem::path INPUTFILES_DIR_C( "inputfiles" );
+
 
 class ProjectPrivate
 {
@@ -83,14 +87,14 @@ public:
   void update_project_size();
 
   // COMPUTE_DIRECTORY_SIZE
-  // Compute the size in bytes used by a directory
+  // Compute the size in bytes used by a directory ( used by update_directory_size() )
   long long compute_directory_size( const boost::filesystem::path& directory );
 
   // UPDATE_PROJECT_DIRECTORY:
   // Generate all the required directories for this project
   bool update_project_directory( const boost::filesystem::path& project_directory );
 
-  // CLEANUP_SESSION_DATABASE:
+  // CLEAN_UP_SESSION_DATABASE:
   // this function cleans up sessions in the session list that have been deleted by the user
   bool clean_up_session_database(); 
   
@@ -119,7 +123,9 @@ public:
   // INITIALIZE_PROVENANCE_DATABASE:
   // Create tables for the provenance database.
   bool initialize_provenance_database();
-
+  
+  // INSERT_SESSION_INTO_DATABASE
+  // Inset a session into the database
   SessionID insert_session_into_database( const std::string& session_name, 
     const std::string& user_id, const std::string& timestamp = "" );
   
@@ -134,6 +140,7 @@ public:
   void query_provenance_trail( ProvenanceID prov_id, ProvenanceTrail& provenance_trail );
   
   void extract_session_info( ResultSet& result_set, std::vector< SessionInfo >& sessions );
+  
   bool get_all_sessions( std::vector< SessionInfo >& sessions );
 
   void convert_version1_project();
@@ -141,6 +148,11 @@ public:
   bool parse_session_data( const boost::filesystem::path& file_path, std::set< long long >& generations );
 
   void set_session_file( SessionID id, const std::string& file_name );
+  
+  // PROCESS_INPUTFILE_IMPROTERS
+  // try to copy all the files into the project
+  bool process_inputfile_importers(); 
+  
   // -- internal variables --
 public:
   // Pointer back to the project
@@ -152,9 +164,19 @@ public:
   // Time when last session was saved for auto save functionality.
   boost::posix_time::ptime last_saved_session_time_stamp_;
 
-  DatabaseManager session_database_;
-  DatabaseManager provenance_database_;
+  // List of importers that need to be run
+  std::vector<InputFilesImporterHandle> input_file_importers_;
 
+  // The database that contains the session list
+  DatabaseManager session_database_;
+  
+  // NOTE: This variable is preventing a circular dependency
+  // Layer session saving will add this number to this list so it can be included
+  // into the final session database.
+  std::set<long long> session_generation_numbers_;
+  
+  // The database that contains the provenance information
+  DatabaseManager provenance_database_;
 };
 
 
@@ -172,7 +194,8 @@ void ProjectPrivate::update_project_size()
 
 
 // NOTE: This function needs to return a value in long long, even in 32 bit mode, as 
-// file sizes can exceed 2GB
+// file sizes can exceed 2GB. The total of directory with session can be larger than
+// the total size
 long long ProjectPrivate::compute_directory_size( const boost::filesystem::path& directory )
 {
   // Check if the directory exists
@@ -186,6 +209,7 @@ long long ProjectPrivate::compute_directory_size( const boost::filesystem::path&
   boost::filesystem::directory_iterator dir_end;
   for( boost::filesystem::directory_iterator dir_itr( directory ); dir_itr != dir_end; ++dir_itr )
   {
+    // Filename of the next component in the directory
     std::string filename = dir_itr->path().filename().string();
     boost::filesystem::path dir_file = directory / filename;
       
@@ -193,10 +217,12 @@ long long ProjectPrivate::compute_directory_size( const boost::filesystem::path&
     // symbolic links.
     if ( boost::filesystem::is_regular_file( dir_file ) )
     {
+      // Add the size of the file to our counter
       size += static_cast< long long >( boost::filesystem::file_size( dir_file ) );
     }
     else if ( boost::filesystem::is_directory( dir_file ) )
     {
+      // if it is a directory just sum up the full size of the directory
       size += this->compute_directory_size( dir_file );
     }
   }
@@ -217,18 +243,27 @@ bool ProjectPrivate::update_project_directory( const boost::filesystem::path& pr
     }
     catch ( ... )
     {
+      // If something went wrong, log the problem and continue
+      // We should not completely fail. The user should have the opportunity to try again/
       std::string error = std::string( "Could not create '" ) + project_directory.filename().string()
         + "'.";
       CORE_LOG_ERROR( error );
+      
+      // Return false to force the program to try again.
       return false; 
     }
   }
 
 #if defined( __APPLE__ )  
+  // Specialty code for bundles
   if ( PreferencesManager::Instance()->generate_osx_project_bundle_state_->get() )
   {   
+    // Get a list with possible extensions.
     std::vector<std::string> project_path_extensions = Project::GetProjectPathExtensions();
     
+    // Check if it has the special extension, old version do not have the extension and we should
+    // leave them the way they were, in order to prevent it from hiding files the user saved
+    // in that directory.
     for ( size_t j = 0; j < project_path_extensions.size(); j++ )
     {
       if ( boost::filesystem::extension( project_directory ) == project_path_extensions[ j ] )
@@ -236,6 +271,7 @@ bool ProjectPrivate::update_project_directory( const boost::filesystem::path& pr
         // MAC CODE
         try
         {
+          // This code sets the special flags on the mac
           FSRef file_ref;
           Boolean is_directory;
           FSPathMakeRef( reinterpret_cast<const unsigned char*>( 
@@ -250,15 +286,14 @@ bool ProjectPrivate::update_project_directory( const boost::filesystem::path& pr
         catch( ... )
         {
         }
-        //std::string command = std::string( "SetFile -a B \"" ) + project_directory.string() +"\"";
-        //system( command.c_str() );
         break;
       }
     }
   }
 #endif
 
-  
+  // Session folder logic
+  // All session XMLs are stored here
   if ( ! boost::filesystem::exists( project_directory / SESSION_DIR_C ) )
   {
     try // to create a project sessions folder
@@ -275,11 +310,13 @@ bool ProjectPrivate::update_project_directory( const boost::filesystem::path& pr
     }   
   }
   
-  if ( ! boost::filesystem::exists( project_directory / "data" ) )
+  // Data directory logic
+  // All the session data files are stored here
+  if ( ! boost::filesystem::exists( project_directory / DATA_DIR_C ) )
   { 
     try // to create a project data folder
     {
-      boost::filesystem::create_directory( project_directory / "data");
+      boost::filesystem::create_directory( project_directory / DATA_DIR_C );
     }
     catch ( ... )
     {
@@ -291,6 +328,8 @@ bool ProjectPrivate::update_project_directory( const boost::filesystem::path& pr
     }
   }
   
+  // Provenance directory logic
+  // The provenance database is stored here.
   if ( ! boost::filesystem::exists( project_directory / PROVENANCE_DIR_C ) )
   {         
     try // to create a folder with the provenance data base
@@ -307,11 +346,13 @@ bool ProjectPrivate::update_project_directory( const boost::filesystem::path& pr
     }
   }
 
-  if ( ! boost::filesystem::exists( project_directory / "inputfiles" ) )
+  // Inputfiles directory logic
+  // All input files are stored here
+  if ( ! boost::filesystem::exists( project_directory / INPUTFILES_DIR_C ) )
   {           
     try // to create a folder to store the original input files
     {
-      boost::filesystem::create_directory( project_directory / "inputfiles" );
+      boost::filesystem::create_directory( project_directory / INPUTFILES_DIR_C );
     }
     catch ( ... )
     {
@@ -323,8 +364,12 @@ bool ProjectPrivate::update_project_directory( const boost::filesystem::path& pr
     }   
   }
   
+  this->process_inputfile_importers();  
+  
+  // Everything worked, we should have a valid project directory
   return true;
 } 
+
 
 bool ProjectPrivate::clean_up_session_database()
 {
@@ -358,7 +403,9 @@ bool ProjectPrivate::clean_up_session_database()
       std::string session_file_str = boost::any_cast< std::string >( result_set[ i ][ "session_file" ] );
       if ( boost::filesystem::exists( project_path / SESSION_DIR_C / session_file_str ) ) continue;
     }
-    catch ( ... ) {}
+    catch ( ... ) 
+    {
+    }
 
     // No session file exists for the session, delete it from database
     this->delete_session_from_database( session_id );
@@ -398,7 +445,6 @@ bool ProjectPrivate::save_state( const boost::filesystem::path& project_director
     return false;
   }
   
-
   this->project_->project_files_generated_state_->set( true );
   this->project_->project_files_accessible_state_->set( true );
 
@@ -407,13 +453,16 @@ bool ProjectPrivate::save_state( const boost::filesystem::path& project_director
     SESSION_DIR_C / SESSION_DATABASE_C;
   boost::filesystem::path provenance_database = project_directory /
     PROVENANCE_DIR_C / PROVENANCE_DATABASE_C;
+    
   std::string error;
+  // Save the sesssion database to disk
   if ( !this->session_database_.save_database( session_database, error ) )
   {
     CORE_LOG_ERROR( error );
     return false;
   }
 
+  // Save the provenance database to disk
   if ( !this->provenance_database_.save_database( provenance_database, error ) )
   {
     CORE_LOG_ERROR( error );
@@ -1010,6 +1059,73 @@ SessionID ProjectPrivate::get_last_session()
 }
 
 
+bool ProjectPrivate::process_inputfile_importers()
+{
+  if ( this->project_->project_files_generated_state_->get() == false )
+  {
+    // Project has not yet been created, so we cannot save it
+    return false;
+  }
+
+  // Get the directory in which we need to store the input files.
+  boost::filesystem::path inputfiles_dir = this->project_->get_project_inputfiles_path(); 
+  if ( ! boost::filesystem::exists( inputfiles_dir ) )
+  {
+    // Directory does not exist
+    return false;
+  } 
+  
+  
+  // TODO: Keep the records that could not be written
+  for ( size_t j = 0; j < this->input_file_importers_.size();  j++ )
+  {
+    InputFilesImporterHandle importer = this->input_file_importers_[ j ];
+    InputFilesID inputfiles_id = importer->get_inputfiles_id();
+    
+    boost::filesystem::path import_dir = inputfiles_dir / Core::ExportToString( inputfiles_id );
+    if ( boost::filesystem::exists( import_dir ) )
+    {
+      try
+      {
+        boost::filesystem::remove_all( import_dir );
+      }
+      catch ( ... )
+      {
+        CORE_LOG_ERROR( std::string( "Could not remove directory '" ) + import_dir.string() +
+          "'." );
+      }
+    }
+
+    if ( ! boost::filesystem::exists( import_dir ) )
+    {
+      try
+      {
+        boost::filesystem::create_directory( import_dir );
+      }
+      catch ( ... )
+      {
+        CORE_LOG_ERROR( std::string( "Could not create directory '" ) + import_dir.string() +
+          "'." );     
+      }
+    }
+    
+    if ( boost::filesystem::exists( import_dir ) )
+    {
+      if (! importer->copy_files( import_dir ) )
+      {
+        CORE_LOG_ERROR( std::string( "Could not import original files into directory '" ) + 
+          import_dir.string() + "'." );
+      }
+    }
+  }
+  
+  // Clear the list with importers
+  this->input_file_importers_.clear();
+  
+  return true;
+}
+
+
 //////////////////////////////////////////////////////////
 
 Project::Project( const std::string& project_name ) :
@@ -1085,10 +1201,6 @@ void Project::initialize_states()
 
   // State variable with the project notes
   this->add_state( "project_notes", this->project_notes_state_ );
-
-  // This keeps track of the count for the sessions. Currently the maximum number of sessions 
-  // that we handle is 9999. 
-  this->add_state( "session_count", this->session_count_state_, 0 );
 
   // Name of the next session in the session menu. For each session it will just be set to the
   // last session name. It is a state variable however so we can handle all the name handling
@@ -1650,6 +1762,11 @@ bool Project::save_session( const std::string& name )
     session_name = this->current_session_name_state_->get();
   }
 
+  // NOTE: Need to clear this variable, as the save_states system will fill it out again.
+  // The reason for this is to avoid circular dependencies.
+  this->private_->session_generation_numbers_.clear();
+
+  // NOTE: We need to save first before making an entry into the database to be sure it will succeed.
   Core::StateIO state_io;
   state_io.initialize();
   if ( !Core::StateEngine::Instance()->save_states( state_io ) )
@@ -1659,15 +1776,18 @@ bool Project::save_session( const std::string& name )
     return false;
   }
 
+  // Get the user name, as session information contains the name of the user that saved the session.
   std::string user_id;
   if ( !Core::Application::Instance()->get_user_name( user_id ) )
   {
     user_id = "unknown";
   }
+  
+  // Add the entry to the session database
   SessionID session_id = this->private_->insert_session_into_database( session_name, user_id );
   assert( session_id >= 0 );
 
-  // Figure out where to save the data
+  // Write the XML file in the session directory
   boost::filesystem::path project_path( this->project_path_state_->get() );
   boost::filesystem::path session_path = project_path / SESSION_DIR_C / 
     ( Core::ExportToString( session_id ) + ".xml" );
@@ -1676,23 +1796,14 @@ bool Project::save_session( const std::string& name )
     std::string error = std::string( "Could not save session file '" ) + 
       session_path.string() + "'.";
     CORE_LOG_ERROR( error );
+    
+    // NOTE: We need to delete it when saving fails
     this->private_->delete_session_from_database( session_id );
     return false;
   }
-    
-  std::vector< LayerHandle > layers;
-  LayerManager::Instance()->get_layers( layers );
-  std::set< long long > generation_numbers;
-  for ( size_t i = 0; i < layers.size(); ++i )
-  {
-    long long generation = layers[ i ]->get_generation();
-    if ( generation >= 0 )
-    {
-      generation_numbers.insert( generation );
-    }
-  }
-  
-  if ( !this->private_->set_session_data( session_id, generation_numbers ) )
+
+  // NOTE: This variable was filled out by the saving function of each layer
+  if ( !this->private_->set_session_data( session_id, this->private_->session_generation_numbers_ ) )
   {
     this->private_->delete_session_from_database( session_id );
     return false;
@@ -2134,10 +2245,23 @@ std::vector<std::string> Project::GetProjectFileExtensions()
   }
 }
 
+void Project::add_generation_number( const long long generation_number )
+{
+  this->private_->session_generation_numbers_.insert( generation_number );
+}
+
+bool Project::execute_or_add_inputfiles_importer( const InputFilesImporterHandle& importer )
+{
+  // Add the importer to the list
+  this->private_->input_file_importers_.push_back( importer );
+
+  // If the project exists on disk copy all the files over
+  this->private_->process_inputfile_importers();  
+}
+
 int Project::get_version()
 {
   return 2;
 }
 
 } // end namespace Seg3D
-

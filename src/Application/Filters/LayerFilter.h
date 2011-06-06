@@ -191,7 +191,7 @@ public:
   bool dispatch_insert_mask_volume_into_layer( LayerHandle layer, 
     Core::MaskVolumeHandle mask );
 
-  // CREATE_UNDO_REDO_RECORD:
+  // CREATE_UNDO_REDO_AND_RPOVENANCE_RECORD:
   // Create a provenance record and add it to the provenance database, 
   // and an undo record and add it to the undo stack.
   void create_undo_redo_and_provenance_record( Core::ActionContextHandle context, Core::ActionHandle action );

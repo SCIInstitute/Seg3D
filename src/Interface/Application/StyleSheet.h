@@ -39,6 +39,9 @@ class StyleSheet
 {
 public:
 
+  // == Group menubar == //
+    const static QString GROUP_MENUBAR_C;
+
   // === ViewerWidget Styles === //
     const static QString VIEWERWIDGET_TOOLBAR_C;
   

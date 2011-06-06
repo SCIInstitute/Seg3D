@@ -498,12 +498,49 @@ bool NrrdData::LoadNrrd( const std::string& filename, NrrdDataHandle& nrrddata, 
     return false;
   }
 
-  if ( nrrd->dim < 3 )
+  if ( nrrd->dim < 2 )
   {
-    error = "Currently only 3D nrrd files are supported.";
+    error = "Currently only 2D or 3D nrrd files are supported.";
     nrrdNuke( nrrd );
     nrrddata.reset();
     return false;
+  }
+
+  if ( nrrd->dim == 2 )
+  {
+    nrrd->dim = 3;
+    nrrd->axis[ 2 ].size = 1;
+    nrrd->axis[ 2 ].spacing = 1.0;
+    nrrd->axis[ 2 ].min = 0.0;
+    nrrd->axis[ 2 ].max = 1.0;
+    nrrd->axis[ 2 ].center = nrrd->axis[ 1].center;
+    nrrd->axis[ 2 ].kind = nrrd->axis[ 1].kind;
+    nrrd->axis[ 2 ].label = 0;
+    nrrd->axis[ 2 ].units = 0;
+    
+    if ( nrrd->spaceDim == 2 )
+    {
+      nrrd->spaceDim = 3;
+      nrrd->axis[ 0 ].spaceDirection[ 2 ] = 0.0;
+      nrrd->axis[ 1 ].spaceDirection[ 2 ] = 0.0;
+      nrrd->axis[ 2 ].spaceDirection[ 0 ] = 0.0;
+      nrrd->axis[ 2 ].spaceDirection[ 1 ] = 0.0;
+      nrrd->axis[ 2 ].spaceDirection[ 2 ] = 1.0;
+       
+      nrrd->spaceUnits[ 2 ] = 0;
+      nrrd->spaceOrigin[ 2 ] = 0.0;
+      nrrd->measurementFrame[ 0 ][ 2 ] = 0.0;
+      nrrd->measurementFrame[ 1 ][ 2 ] = 0.0;
+      nrrd->measurementFrame[ 2 ][ 2 ] = 0.0;
+      nrrd->measurementFrame[ 2 ][ 1 ] = 0.0;
+      nrrd->measurementFrame[ 2 ][ 0 ] = 0.0;
+    }
+    else if ( nrrd->spaceDim == 3 )
+    {
+      nrrd->axis[ 2 ].spaceDirection[ 0 ] = 0.0;
+      nrrd->axis[ 2 ].spaceDirection[ 1 ] = 0.0;
+      nrrd->axis[ 2 ].spaceDirection[ 2 ] = 1.0;    
+    }
   }
 
   // Fix a problem with nrrds with stub axes

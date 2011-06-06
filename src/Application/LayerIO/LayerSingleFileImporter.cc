@@ -97,23 +97,24 @@ bool LayerSingleFileImporter::check_files()
   return true;
 }
 
-bool LayerSingleFileImporter::copy_files( boost::filesystem::path& project_cache_path )
-{
-  boost::filesystem::path full_filename( this->private_->filename_ );
 
+InputFilesImporterHandle LayerSingleFileImporter::get_inputfiles_importer()
+{
+  InputFilesImporterHandle importer( new InputFilesImporter( this->get_inputfiles_id() ) );
   try
   {
-     boost::filesystem::copy_file( full_filename, 
-      project_cache_path / full_filename.filename() );
+    boost::filesystem::path full_filename( this->private_->filename_ );
+    importer->add_filename( full_filename );
   }
-  catch( ... )
+  catch ( ... )
   {
-    this->set_error( std::string( "Could not copy file '" ) + full_filename.string() + "'." );
-    return false;
+    this->set_error( std::string( "Could not resolve filename '" ) + 
+      this->private_->filename_ + "'." );
   }
   
-  return true;
+  return importer;
 }
+
 
 LayerImporterType LayerSingleFileImporter::GetType() 
 { 

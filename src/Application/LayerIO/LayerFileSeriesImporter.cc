@@ -105,25 +105,26 @@ bool LayerFileSeriesImporter::check_files()
   return true;
 }
 
-bool LayerFileSeriesImporter::copy_files( boost::filesystem::path& project_cache_path )
+InputFilesImporterHandle LayerFileSeriesImporter::get_inputfiles_importer()
 {
-  try
+  InputFilesImporterHandle importer( new InputFilesImporter( this->get_inputfiles_id() ) );
+  for ( size_t j = 0; j < this->private_->filenames_.size(); j++ )
   {
-    for ( size_t j = 0; j < this->private_->filenames_.size(); j++ )
+    try
     {
       boost::filesystem::path full_filename( this->private_->filenames_[ j ] );
-      boost::filesystem::copy_file( full_filename, 
-        project_cache_path / full_filename.filename() );
+      importer->add_filename( full_filename );
+    }
+    catch ( ... )
+    {
+      this->set_error( std::string( "Could not resolve filename '" ) + 
+        this->private_->filenames_[ j ] + "'." );
     }
   }
-  catch( ... )
-  {
-    this->set_error( "Could not copy files." );
-    return false;
-  }
   
-  return true;
+  return importer;
 }
+
 
 LayerImporterType LayerFileSeriesImporter::GetType()
 { 

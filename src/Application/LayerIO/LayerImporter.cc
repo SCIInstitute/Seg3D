@@ -28,6 +28,7 @@
 
 // Application includes
 #include <Application/LayerIO/LayerImporter.h>
+#include <Application/ProjectManager/ProjectManager.h>
 
 namespace Seg3D
 {
@@ -36,11 +37,15 @@ class LayerImporterPrivate
 {
 public:
   std::string error_; 
+  
+  InputFilesID inputfiles_id_;
 };
 
 LayerImporter::LayerImporter() :
   private_( new LayerImporterPrivate )
 {
+  // Set id to an invalid id.
+  this->private_->inputfiles_id_ = -1;
 }
 
 LayerImporter::~LayerImporter()
@@ -61,8 +66,18 @@ void LayerImporter::set_dicom_swap_xyspacing_hint( bool )
 {
 }
 
-void LayerImporter::reset()
+InputFilesID LayerImporter::get_inputfiles_id()
 {
+  if ( this->private_->inputfiles_id_ == -1 )
+  {
+    ProjectHandle current_project = ProjectManager::Instance()->get_current_project();
+
+    this->private_->inputfiles_id_ = current_project->inputfiles_count_state_->get();
+    current_project->inputfiles_count_state_->set( this->private_->inputfiles_id_ + 1 );  
+  }
+
+  return this->private_->inputfiles_id_;
 }
+
 
 } // end namespace Seg3D

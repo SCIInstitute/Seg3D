@@ -145,6 +145,8 @@ GroupButtonMenu::GroupButtonMenu( QWidget* parent, LayerGroupHandle group ) :
   
   this->private_->overlay_ = new OverlayWidget( this ); 
   this->private_->overlay_->hide();
+  
+  this->setStyleSheet( StyleSheet::GROUP_MENUBAR_C );
 }
 
 GroupButtonMenu::~GroupButtonMenu()

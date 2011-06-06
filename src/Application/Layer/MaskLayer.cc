@@ -268,8 +268,12 @@ bool MaskLayer::set_mask_volume( Core::MaskVolumeHandle volume )
 
 bool MaskLayer::pre_save_states( Core::StateIO& state_io )
 {
-  this->generation_state_->set( static_cast< int >( this->get_mask_volume()->get_generation() ) );
+  long long generation_number = this->get_mask_volume()->get_generation();
+  this->generation_state_->set( generation_number );
   std::string data_file_name = this->generation_state_->export_to_string() + ".nrrd";
+
+  // Add the number to the project so it can be recorded into the session database
+  ProjectManager::Instance()->get_current_project()->add_generation_number( generation_number );
 
   return true;
 }

@@ -36,6 +36,7 @@
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/LayerManager/LayerUndoBufferItem.h>
 #include <Application/ProjectManager/ProjectManager.h>
+#include <Application/PreferencesManager/PreferencesManager.h>
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
@@ -164,6 +165,16 @@ bool ActionImportLayer::run( Core::ActionContextHandle& context, Core::ActionRes
   {
     layers[ j ]->provenance_id_state_->set( this->get_output_provenance_id( j ) );
     LayerManager::Instance()->insert_layer( layers[ j ] );
+  }
+
+  if ( PreferencesManager::Instance()->embed_input_files_state_->get() )
+  {
+    InputFilesImporterHandle inputfilesimporter = this->layer_importer_->get_inputfiles_importer();
+    ProjectHandle project = ProjectManager::Instance()->get_current_project();
+    if ( project )
+    {
+      project->execute_or_add_inputfiles_importer( inputfilesimporter );
+    }
   }
 
   // Now the layers are properly inserted, generate the undo item that will undo this action.

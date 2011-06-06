@@ -352,7 +352,9 @@ bool GDCMLayerImporterPrivate::read_data()
 
   if ( filenames.size() )
   {
-    this->meta_data_.meta_data_ = Core::ExportToString( filenames );
+    InputFilesID inputfile_id = this->importer_->get_inputfiles_id();
+    this->meta_data_.meta_data_ = Core::ExportToString( filenames ) + "|" +
+      Core::ExportToString( inputfile_id );
     this->meta_data_.meta_data_info_ = "dicom_filename"; 
   }
   

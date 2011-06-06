@@ -349,7 +349,11 @@ bool DataLayer::pre_save_states( Core::StateIO& state_io )
 {
   if ( this->data_volume_ )
   {
-    this->generation_state_->set( this->data_volume_->get_generation() );
+    long long generation_number = this->data_volume_->get_generation();
+    this->generation_state_->set( generation_number );
+
+    // Add the number to the project so it can be recorded into the session database
+    ProjectManager::Instance()->get_current_project()->add_generation_number( generation_number );
     
     std::string data_file_name = this->generation_state_->export_to_string() + ".nrrd";
     boost::filesystem::path full_data_file_name = ProjectManager::Instance()->
@@ -370,7 +374,6 @@ bool DataLayer::pre_save_states( Core::StateIO& state_io )
     {
       CORE_LOG_ERROR( error );
       return false;   
-
     }
 
     return true;

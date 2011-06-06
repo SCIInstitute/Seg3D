@@ -17,7 +17,7 @@
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
 
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPpwd
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -455,14 +455,25 @@ bool ITKLayerImporter::get_file_data( LayerImporterFileDataHandle& data )
   return true;
 }
 
-bool ITKLayerImporter::copy_files( boost::filesystem::path& project_cache_path )
+bool CopyITKFile( const boost::filesystem::path& src, 
+  const boost::filesystem::path& dst )
 {
-  boost::filesystem::path full_filename( this->get_filename() );
+  boost::filesystem::path full_filename = src;
   std::string extension = boost::to_lower_copy( boost::filesystem::extension( full_filename ) );
 
   if ( extension != ".mhd" )
   {
-    return LayerSingleFileImporter::copy_files( project_cache_path ); 
+    try
+    {
+      boost::filesystem::copy_file( src, dst );
+    }
+    catch ( ... )
+    {
+      CORE_LOG_ERROR( std::string( "Could not copy file '" ) + src.string() + "' to '" +
+        dst.string() + "'." );
+      return false;
+    } 
+    return true;
   }
 
   std::vector< boost::filesystem::path > data_files;
@@ -470,9 +481,9 @@ bool ITKLayerImporter::copy_files( boost::filesystem::path& project_cache_path )
   // Copy and update header file for ITK's MetaIO format  
   try
   {
-    boost::filesystem::path input_header_name( this->get_filename() );
-    boost::filesystem::path output_header_name = project_cache_path / input_header_name.filename();
-  
+    boost::filesystem::path input_header_name( src.string() );
+    boost::filesystem::path output_header_name( dst.string() );
+    
     std::ifstream old_file_header( input_header_name.filename().c_str(), std::ios::binary );
     std::ofstream new_file_header( output_header_name.filename().c_str(), std::ios::binary );
   
@@ -494,7 +505,8 @@ bool ITKLayerImporter::copy_files( boost::filesystem::path& project_cache_path )
         std::vector<std::string> components;
         if ( Core::ImportFromString( contents, components ) )
         {
-          this->set_error( "Cannot interpret the data file in header of mhd file." );
+          CORE_LOG_ERROR( std::string( "Cannot interpret the data file in header of mhd file '" )
+            + src.string() + "'." );
           return false;
         }
 
@@ -535,7 +547,8 @@ bool ITKLayerImporter::copy_files( boost::filesystem::path& project_cache_path )
             !Core::ImportFromString( components[ 2 ], stop ) ||
             !Core::ImportFromString( components[ 3 ], step ) )
           {
-            this->set_error( "Could not interpret 'ElementDataFile' field in header." );
+            CORE_LOG_ERROR( std::string( "Could not interpret 'ElementDataFile' field in header of file '" ) +
+              src.string() + "'." );
             return false;
           }
           
@@ -549,7 +562,8 @@ bool ITKLayerImporter::copy_files( boost::filesystem::path& project_cache_path )
         }
         else
         {
-          this->set_error( "Invalid entry in 'ElementDataFile' field in the header." );
+          CORE_LOG_ERROR( std::string( "Invalid entry in 'ElementDataFile' field in the header of file'" ) +
+            src.string() + "'." );
           return false;
         }
       }
@@ -572,7 +586,8 @@ bool ITKLayerImporter::copy_files( boost::filesystem::path& project_cache_path )
   }
   catch ( ... )
   {
-    this->set_error( "Could not copy and update header file." );
+    CORE_LOG_ERROR( std::string( "Could not copy and update header file '" ) +
+      src.string() + "'." );
     return false; 
   }
 
@@ -582,17 +597,37 @@ bool ITKLayerImporter::copy_files( boost::filesystem::path& project_cache_path )
     try
     {
       boost::filesystem::copy_file( data_files[ j ], 
-        project_cache_path / data_files[ j ].filename() );
+        dst.parent_path() / data_files[ j ].filename() );
     }
     catch( ... )
     {
-      this->set_error( std::string( "Could not copy file '" ) + data_files[ j ].string() + "'." );
+      CORE_LOG_ERROR( std::string( "Could not copy file '" ) + data_files[ j ].string() + "'." );
       return false;
     }
   }
 
   // Successfully copied data file and generated new header.
   return true;  
+}
+
+
+
+InputFilesImporterHandle ITKLayerImporter::get_inputfiles_importer()
+{
+  InputFilesImporterHandle importer( new InputFilesImporter( this->get_inputfiles_id() ) );
+  try
+  {
+    boost::filesystem::path full_filename( this->get_filename() );
+    importer->add_filename( full_filename );
+    importer->set_copy_file_function( &CopyITKFile );
+  }
+  catch ( ... )
+  {
+    this->set_error( std::string( "Could not resolve filename '" ) + 
+      this->get_filename() + "'." );
+  }
+  
+  return importer;
 }
    
 } // end namespace seg3D

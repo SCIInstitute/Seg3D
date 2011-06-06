@@ -80,13 +80,13 @@ public:
   // Check the file headers to see if we could import it.
   virtual bool check_files();
 
-  // COPY_FILES
+  // GET_INPUTFILES_IMPORTER
   // For provenance files need to be copied into the project cache. As some files need special
   // attention: for example mhd and nhdr files actually list where there data is stored, this
   // function can be overloaded with a specific function that copies the files. Otherwise a
   // default implementation is given in the two derived classes.
-  virtual bool copy_files( boost::filesystem::path& project_cache_path );
-
+  virtual InputFilesImporterHandle get_inputfiles_importer();
+  
   // -- internals --
 private:
   LayerSingleFileImporterPrivateHandle private_;

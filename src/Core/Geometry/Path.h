@@ -66,7 +66,7 @@ public:
 
   // ADD_ONE_PATH:
   // Add one path to paths
-  void Path::add_one_path( const std::vector< Point >& pt );
+  void add_one_path( const std::vector< Point >& pt );
 
   inline bool operator==( const Path& ) const;
   inline bool operator!=( const Path& ) const;
