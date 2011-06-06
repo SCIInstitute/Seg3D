@@ -1221,6 +1221,9 @@ void Project::initialize_states()
       PreferencesManager::Instance()->get_default_colors()[ j ] );
   }
 
+  // Count that keeps track of the unique ids for each input file
+  this->add_state( "inputfiles_count", this->inputfiles_count_state_, -1 );
+
   // Count that keeps track of datablock generation numbers
   this->add_state( "generation_count", this->generation_count_state_, -1 );
 
@@ -1433,7 +1436,7 @@ bool Project::save_project( const boost::filesystem::path& project_path,
     std::string project_file_name = project_name + Project::GetDefaultProjectFileExtension();
 
     // Generate the project directory if it does not exist and generate all the sub directories.
-    if (! this->private_->update_project_directory( project_path ) )
+    if ( !this->private_->update_project_directory( project_path ) )
     {
       return false;
     } 

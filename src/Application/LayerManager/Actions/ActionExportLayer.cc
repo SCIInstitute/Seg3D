@@ -66,6 +66,10 @@ bool ActionExportLayer::validate( Core::ActionContextHandle& context )
   {
     this->extension_ = boost::filesystem::extension( boost::filesystem::path( this->file_path_ ) );
   }
+  else
+  {
+    this->file_path_ += this->extension_;
+  }
   
   if( this->exporter_ == "" )
   {
