@@ -132,7 +132,7 @@ public:
   // This state variable keeps track of the unique ids for each input file
   // NOTE: We need to save this one, to ensure that new additions to the project
   // will have unique inputfiles number.
-  Core::StateIntHandle inputfiles_count_state_;
+  Core::StateLongLongHandle inputfiles_count_state_;
 
   // Generation counter state, this one is filled out when the project is saved
   // NOTE: We need to save this one, to ensure that new additions to the project

@@ -2256,7 +2256,7 @@ bool Project::execute_or_add_inputfiles_importer( const InputFilesImporterHandle
   this->private_->input_file_importers_.push_back( importer );
 
   // If the project exists on disk copy all the files over
-  this->private_->process_inputfile_importers();  
+  return this->private_->process_inputfile_importers(); 
 }
 
 int Project::get_version()
