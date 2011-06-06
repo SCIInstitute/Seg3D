@@ -117,7 +117,8 @@ MeasurementTableView::MeasurementTableView( QWidget* parent ) :
   
   // Custom editors for length and note columns
   this->setItemDelegate( 
-    new MeasurementItemDelegate( MeasurementColumns::LENGTH_E, MeasurementColumns::NOTE_E ) );
+    new MeasurementItemDelegate( MeasurementColumns::COLOR_E, MeasurementColumns::LENGTH_E,  
+    MeasurementColumns::NAME_E, parent ) );
   this->horizontalHeader()->setClickable( true );
   this->horizontalHeader()->setStretchLastSection( true ); // Stretch note section
   QObject::connect( this->horizontalHeader(), SIGNAL( sectionClicked( int ) ), 
@@ -141,7 +142,7 @@ void MeasurementTableView::set_measurement_model( MeasurementTableModel* measure
   // way we avoid updating the model for every keystroke.
   QAbstractItemDelegate* text_delegate = this->itemDelegate();
   QObject::connect( text_delegate, SIGNAL( closeEditor( QWidget* ) ), measurement_model, 
-    SLOT( save_cached_active_note() ) );
+    SLOT( save_cached_active_name() ) );
 }
 
 void MeasurementTableView::handle_model_reset()
@@ -182,32 +183,26 @@ void MeasurementTableView::copy_selected_cells() const
     QModelIndex current; 
     Q_FOREACH( current, indexes ) 
     { 
-      // If this is the first column and this row is selected, append the row header to the string
-      if ( previous.column() == 0 )
+      // Ignore visible and color columns
+      if( previous.column() != MeasurementColumns::VISIBLE_E &&
+        previous.column() != MeasurementColumns::COLOR_E )
       {
-        if( selection->isRowSelected( previous.row(), QModelIndex() ) )
-        {
-          QString header_text = model->headerData( 
-            previous.row(), Qt::Vertical, Qt::DisplayRole ).toString();
-          selected_text.append( header_text );
-        }
+        QString text = model->data( previous, Qt::DisplayRole ).toString(); 
+        
+        // At this point `text` contains the text in one cell 
+        selected_text.append( this->private_->remove_line_breaks( text ) ); 
+        // If you are at the start of the row the row number of the previous index 
+        // isn't the same.  Text is followed by a row separator, which is a newline. 
+        if ( current.row() != previous.row() ) 
+        { 
+          selected_text.append( QLatin1Char('\n') ); 
+        } 
+        // Otherwise it's the same row, so append a column separator, which is a tab. 
+        else 
+        { 
+          selected_text.append( QLatin1Char('\t') ); 
+        } 
       }
-
-      QString text = model->data( previous, Qt::DisplayRole ).toString(); 
-      
-      // At this point `text` contains the text in one cell 
-      selected_text.append( this->private_->remove_line_breaks( text ) ); 
-      // If you are at the start of the row the row number of the previous index 
-      // isn't the same.  Text is followed by a row separator, which is a newline. 
-      if ( current.row() != previous.row() ) 
-      { 
-        selected_text.append( QLatin1Char('\n') ); 
-      } 
-      // Otherwise it's the same row, so append a column separator, which is a tab. 
-      else 
-      { 
-        selected_text.append( QLatin1Char('\t') ); 
-      } 
       previous = current; 
     } 
 
@@ -215,24 +210,6 @@ void MeasurementTableView::copy_selected_cells() const
     QString text = model->data( previous, Qt::DisplayRole ).toString();
     selected_text.append( this->private_->remove_line_breaks( text ) ); 
     selected_text.append( QLatin1Char('\n') ); 
-  }
-  else // No cells are selected -- copy active measurement
-  {
-    int active_index = model->get_active_index();
-    if( active_index != -1 )
-    {
-      QString header_text = 
-        model->headerData( active_index, Qt::Vertical, Qt::DisplayRole ).toString();
-      selected_text.append( header_text );
-      selected_text.append( QLatin1Char('\t') ); 
-      selected_text.append( model->data( model->index( active_index, 
-        MeasurementColumns::LENGTH_E ), Qt::DisplayRole ).toString() ); 
-      selected_text.append( QLatin1Char('\t') ); 
-      QString note = model->data( model->index( active_index, MeasurementColumns::NOTE_E ), 
-        Qt::DisplayRole ).toString();
-      selected_text.append( this->private_->remove_line_breaks( note ) ); 
-      selected_text.append( QLatin1Char('\n') );
-    } 
   }
 
   if( !selected_text.isEmpty() )

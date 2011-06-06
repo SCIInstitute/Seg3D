@@ -26,6 +26,10 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Qt includes
+#include <QtGui/QClipboard>
+#include <QtGui/QColorDialog>
+
 // Qt Gui Includes
 #include <QtUtils/Bridge/QtBridge.h>
 
@@ -38,6 +42,9 @@
 // Application Includes
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/ViewerManager/Actions/ActionPickPoint.h>
+
+// Core Includes
+#include <Core/State/Actions/ActionSetAt.h>
 
 SCI_REGISTER_TOOLINTERFACE( Seg3D, MeasurementToolInterface )
 
@@ -53,10 +60,11 @@ public:
   MeasurementTableModel*  table_model_;
   MeasurementTableView* table_view_;
 
-  void handle_go_to_active_measurement( int point_index );
+  void go_to_active_measurement( int point_index );
+  void export_measurements_to_clipboard() const;
 };
 
-void MeasurementToolInterfacePrivate::handle_go_to_active_measurement( int point_index )
+void MeasurementToolInterfacePrivate::go_to_active_measurement( int point_index )
 {
   if( !( point_index == 0 || point_index == 1 ) ) return;
 
@@ -78,8 +86,44 @@ void MeasurementToolInterfacePrivate::handle_go_to_active_measurement( int point
     Core::Point pick_point;
     measurements[ active_index ].get_point( point_index, pick_point );
 
-    ActionPickPoint::Dispatch( Core::Interface::GetWidgetActionContext(), -1, pick_point );
+    ActionPickPoint::Dispatch( Core::Interface::GetWidgetActionContext(), pick_point );
   }
+}
+
+void MeasurementToolInterfacePrivate::export_measurements_to_clipboard() const
+{
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
+  MeasurementToolHandle tool_handle = 
+    boost::dynamic_pointer_cast< MeasurementTool >( this->interface_->tool() );
+  const std::vector< Core::Measurement >& measurements = tool_handle->measurements_state_->get();
+
+  QString text;
+  for( size_t i = 0; i < measurements.size(); i++ )
+  {
+    Core::Measurement m = measurements[ i ];
+    // Name
+    text.append( QString::fromStdString( m.get_name() ) );
+    text.append( QLatin1Char('\t') ); 
+
+    // Length
+    std::string length_unit_string = tool_handle->convert_world_to_unit_string( m.get_length() );
+    text.append( QString::fromStdString( length_unit_string ) );
+    text.append( QLatin1Char('\t') ); 
+
+    // Comment
+    std::string comment = m.get_comment();
+    // Remove line breaks
+    boost::replace_all( comment, "\n", " " );
+    boost::replace_all( comment, "\r", " " );
+    text.append( QString::fromStdString( comment ) );
+    text.append( QLatin1Char('\n') );
+  }
+
+  if( !text.isEmpty() )
+  {
+    qApp->clipboard()->setText( text );
+  } 
 }
 
 // constructor
@@ -113,47 +157,61 @@ bool MeasurementToolInterface::build_widget( QFrame* frame )
   The model in turn gets its data from the measurements state. */ 
   qpointer_type measurement_interface( this );  
   this->add_connection( tool_handle->num_measurements_changed_signal_.connect( 
-    boost::bind( &MeasurementToolInterface::UpdateMeasurementTable, measurement_interface ) ) );
+    boost::bind( &MeasurementToolInterface::UpdateGeneralTab, measurement_interface ) ) );
   this->add_connection( tool_handle->measurements_state_->state_changed_signal_.connect( 
-    boost::bind( &MeasurementToolInterface::UpdateMeasurementCells, measurement_interface ) ) );
+    boost::bind( &MeasurementToolInterface::UpdateTableCells, measurement_interface ) ) );
+  this->add_connection( tool_handle->measurements_state_->state_changed_signal_.connect( 
+    boost::bind( &MeasurementToolInterface::UpdateActiveTab, measurement_interface ) ) );
   this->add_connection( tool_handle->units_changed_signal_.connect(
-    boost::bind( &MeasurementToolInterface::UpdateMeasurementCells, measurement_interface ) ) );
+    boost::bind( &MeasurementToolInterface::UpdateTableCells, measurement_interface ) ) );
+  this->add_connection( tool_handle->units_changed_signal_.connect(
+    boost::bind( &MeasurementToolInterface::UpdateActiveTab, measurement_interface ) ) );
   this->add_connection( tool_handle->active_index_state_->state_changed_signal_.connect( 
-    boost::bind( &MeasurementToolInterface::UpdateActiveIndex, measurement_interface ) ) );
+    boost::bind( &MeasurementToolInterface::UpdateTableActiveIndex, measurement_interface ) ) );
+  this->add_connection( tool_handle->active_index_state_->state_changed_signal_.connect( 
+    boost::bind( &MeasurementToolInterface::UpdateActiveTab, measurement_interface ) ) );
   
   // Copied from resample tool
   QButtonGroup* units_button_group = new QButtonGroup( this );
   units_button_group->addButton( this->private_->ui_.rb_index_ );
   units_button_group->addButton( this->private_->ui_.rb_world_ );
 
-  QButtonGroup* label_button_group = new QButtonGroup( this );
-  label_button_group->addButton( this->private_->ui_.rb_id_ );
-  label_button_group->addButton( this->private_->ui_.rb_note_ );
-
   // Connect the gui to the tool through the QtBridge
+
+  // General tab
   QtUtils::QtBridge::Connect( units_button_group, tool_handle->units_selection_state_ );
-  QtUtils::QtBridge::Connect( label_button_group, tool_handle->label_selection_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.goto_first_button_, boost::bind(
-    &MeasurementToolInterfacePrivate::handle_go_to_active_measurement, this->private_, 0 ) );
+    &MeasurementToolInterfacePrivate::go_to_active_measurement, this->private_, 0 ) );
   QtUtils::QtBridge::Connect( this->private_->ui_.goto_second_button_, boost::bind(
-    &MeasurementToolInterfacePrivate::handle_go_to_active_measurement, this->private_, 1 ) );
+    &MeasurementToolInterfacePrivate::go_to_active_measurement, this->private_, 1 ) );
   QtUtils::QtBridge::Connect( this->private_->ui_.copy_button_, boost::bind(
     &MeasurementTableView::copy_selected_cells, this->private_->table_view_ ) );
   QtUtils::QtBridge::Connect( this->private_->ui_.delete_button_, boost::bind(
     &MeasurementTableView::delete_selected_measurements, this->private_->table_view_ ) );
   QtUtils::QtBridge::Connect( this->private_->ui_.measurement_opacity_slider_, 
     tool_handle->opacity_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.export_button_, boost::bind(
+    &MeasurementToolInterfacePrivate::export_measurements_to_clipboard, this->private_ ) );
 
-  // Connect note column and text box using Qt signals/slots since currently can't hook up two
-  // widgets to same state object.
-  QObject::connect( this->private_->table_model_, SIGNAL( active_note_changed( QString ) ), 
-    this, SLOT( set_measurement_note_box( QString ) ) );
-  QObject::connect( this->private_->ui_.note_textbox_, SIGNAL( textChanged() ), 
-    this, SLOT( set_measurement_note_table() ) );
-  QObject::connect( this->private_->ui_.note_textbox_, SIGNAL( editing_finished() ), 
-    this->private_->table_model_, SLOT( save_cached_active_note() ) );
+  // Active measurement tab
+  QtUtils::QtBridge::Connect( this->private_->ui_.unit_combobox_, tool_handle->units_selection_state_ );
+  // Don't have a QtBridge that can connect a widget to a particular attribute of a measurement
+  // in a StateVector, so use Qt signals/slots directly.  Widgets are updated to reflect state
+  // in UpdateActiveTab().
+  QObject::connect( this->private_->ui_.name_lineedit_, SIGNAL( editingFinished() ), 
+      this, SLOT( handle_name_lineedit_changed() ) );
+  QObject::connect( this->private_->ui_.comment_textbox_, SIGNAL( editing_finished() ), 
+    this, SLOT( handle_comment_textbox_changed() ) );
+  QObject::connect( this->private_->ui_.length_lineedit_, SIGNAL( editingFinished() ), 
+    this, SLOT( handle_length_lineedit_changed() ) );
+  QObject::connect( this->private_->ui_.show_checkbox_, SIGNAL( stateChanged( int ) ), 
+    this, SLOT( handle_show_checkbox_changed() ) );
+  QObject::connect( this->private_->ui_.color_button_, SIGNAL( clicked() ), 
+    this, SLOT( handle_color_button_clicked() ) );
 
-  UpdateMeasurementTable( measurement_interface );
+  // Initialize GUI values
+  UpdateGeneralTab( measurement_interface );
+  UpdateActiveTab( measurement_interface );
 
   //Send a message to the log that we have finished with building the Measure Tool Interface
   CORE_LOG_MESSAGE( "Finished building an Measure Tool Interface" );
@@ -161,30 +219,125 @@ bool MeasurementToolInterface::build_widget( QFrame* frame )
   return ( true );
 } // end build_widget 
 
-void MeasurementToolInterface::set_measurement_note_box( const QString & note )
+void MeasurementToolInterface::handle_name_lineedit_changed()
 {
-  // If text edit has focus, this is a circular update from the model -- don't modify text
-  if( !this->private_->ui_.note_textbox_->hasFocus() )
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
+  MeasurementToolHandle tool_handle = 
+    boost::dynamic_pointer_cast< MeasurementTool >( this->tool() );
+  const std::vector< Core::Measurement >& measurements = tool_handle->measurements_state_->get();
+  int active_index = tool_handle->active_index_state_->get();
+
+  if( 0 <= active_index && active_index < static_cast< int >( measurements.size() ) )
   {
-    this->private_->ui_.note_textbox_->blockSignals( true );
-    this->private_->ui_.note_textbox_->setText( note );
-    this->private_->ui_.note_textbox_->blockSignals( false );
-  } 
+    std::string lineedit_name = this->private_->ui_.name_lineedit_->text().toStdString();
+    
+    Core::Measurement m = measurements[ active_index ];
+    m.set_name( lineedit_name );
+    Core::ActionSetAt::Dispatch( Core::Interface::GetWidgetActionContext(),
+      tool_handle->measurements_state_, active_index, m );
+  }
 }
 
-void MeasurementToolInterface::set_measurement_note_table()
+void MeasurementToolInterface::handle_comment_textbox_changed()
 {
-  this->private_->table_model_->set_active_note( 
-    this->private_->ui_.note_textbox_->document()->toPlainText() );
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
+  
+  MeasurementToolHandle tool_handle = 
+    boost::dynamic_pointer_cast< MeasurementTool >( this->tool() );
+  int active_index = tool_handle->active_index_state_->get();
+  const std::vector< Core::Measurement >& measurements = tool_handle->measurements_state_->get();
+
+  if( 0 <= active_index && active_index < static_cast< int >( measurements.size() ) )
+  {
+    std::string textbox_comment = this->private_->ui_.comment_textbox_->toPlainText().toStdString();
+    
+    Core::Measurement m = measurements[ active_index ];
+    m.set_comment( textbox_comment );
+    Core::ActionSetAt::Dispatch( Core::Interface::GetWidgetActionContext(),
+      tool_handle->measurements_state_, active_index, m );
+  }
 }
 
-void MeasurementToolInterface::UpdateMeasurementTable( qpointer_type measurement_interface )
+void MeasurementToolInterface::handle_length_lineedit_changed()
+{
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
+  
+  MeasurementToolHandle tool_handle = 
+    boost::dynamic_pointer_cast< MeasurementTool >( this->tool() );
+  int active_index = tool_handle->active_index_state_->get();
+  const std::vector< Core::Measurement >& measurements = tool_handle->measurements_state_->get();
+
+  if( 0 <= active_index && active_index < static_cast< int >( measurements.size() ) )
+  {
+    std::string lineedit_length = this->private_->ui_.length_lineedit_->text().toStdString();
+    double world_length = tool_handle->convert_unit_string_to_world( lineedit_length );
+  
+    Core::Measurement m = measurements[ active_index  ];
+    m.set_length( world_length );
+    Core::ActionSetAt::Dispatch( Core::Interface::GetWidgetActionContext(),
+      tool_handle->measurements_state_, active_index , m );
+  }
+}
+
+void MeasurementToolInterface::handle_show_checkbox_changed()
+{
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
+  MeasurementToolHandle tool_handle = 
+    boost::dynamic_pointer_cast< MeasurementTool >( this->tool() );
+  int active_index = tool_handle->active_index_state_->get();
+  const std::vector< Core::Measurement >& measurements = tool_handle->measurements_state_->get();
+
+  if( 0 <= active_index && active_index < static_cast< int >( measurements.size() ) )
+  {
+    bool visible = this->private_->ui_.show_checkbox_->isChecked();
+
+    Core::Measurement m = measurements[ active_index  ];
+    m.set_visible( visible );
+    Core::ActionSetAt::Dispatch( Core::Interface::GetWidgetActionContext(),
+      tool_handle->measurements_state_, active_index , m );
+  }
+}
+
+void MeasurementToolInterface::handle_color_button_clicked()
+{
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
+  MeasurementToolHandle tool_handle = 
+    boost::dynamic_pointer_cast< MeasurementTool >( this->tool() );
+  int active_index = tool_handle->active_index_state_->get();
+  const std::vector< Core::Measurement >& measurements = tool_handle->measurements_state_->get();
+
+  if( 0 <= active_index && active_index < static_cast< int >( measurements.size() ) )
+  {
+    // Get current color
+    Core::Measurement m = measurements[ active_index  ];
+    Core::Color m_color;
+    m.get_color( m_color );
+
+    // Launch dialog to allow user to select color
+    QColor color = QColorDialog::getColor( QColor( m_color.r(), m_color.g(), m_color.b() ), this );
+    if( color.isValid() )
+    { 
+      // Set measurement color
+      m.set_color( 
+        Core::Color( color.red() / 255.0f, color.green() / 255.0f, color.blue() / 255.0f ) );
+      Core::ActionSetAt::Dispatch( Core::Interface::GetWidgetActionContext(),
+        tool_handle->measurements_state_, active_index , m );
+    }
+  }
+}
+
+void MeasurementToolInterface::UpdateGeneralTab( qpointer_type measurement_interface )
 {   
   // Ensure that this call gets relayed to the right thread
   if ( !( Core::Interface::IsInterfaceThread() ) )
   {
     Core::Interface::PostEvent( boost::bind( 
-      &MeasurementToolInterface::UpdateMeasurementTable, measurement_interface ) );
+      &MeasurementToolInterface::UpdateGeneralTab, measurement_interface ) );
     return;
   }
 
@@ -203,7 +356,6 @@ void MeasurementToolInterface::UpdateMeasurementTable( qpointer_type measurement
       tool_handle->active_index_state_->get() != -1 );
 
     measurement_interface->private_->ui_.table_view_->setEnabled( enable_widgets );
-    measurement_interface->private_->ui_.note_textbox_->setEnabled( enable_widgets );
     measurement_interface->private_->ui_.goto_first_button_->setEnabled( enable_widgets );
     measurement_interface->private_->ui_.goto_second_button_->setEnabled( enable_widgets );
     measurement_interface->private_->ui_.copy_button_->setEnabled( enable_widgets );
@@ -211,14 +363,14 @@ void MeasurementToolInterface::UpdateMeasurementTable( qpointer_type measurement
   }
 }
 
-void MeasurementToolInterface::UpdateMeasurementCells( qpointer_type measurement_interface )
+void MeasurementToolInterface::UpdateTableCells( qpointer_type measurement_interface )
 {
 
   // Ensure that this call gets relayed to the right thread
   if ( !( Core::Interface::IsInterfaceThread() ) )
   {
     Core::Interface::PostEvent( boost::bind( 
-      &MeasurementToolInterface::UpdateMeasurementCells, measurement_interface ) );
+      &MeasurementToolInterface::UpdateTableCells, measurement_interface ) );
     return;
   }
 
@@ -231,13 +383,13 @@ void MeasurementToolInterface::UpdateMeasurementCells( qpointer_type measurement
   }
 }
 
-void MeasurementToolInterface::UpdateActiveIndex( qpointer_type measurement_interface )
+void MeasurementToolInterface::UpdateTableActiveIndex( qpointer_type measurement_interface )
 {
   // Ensure that this call gets relayed to the right thread
   if ( !( Core::Interface::IsInterfaceThread() ) )
   {
     Core::Interface::PostEvent( boost::bind( 
-      &MeasurementToolInterface::UpdateActiveIndex, measurement_interface ) );
+      &MeasurementToolInterface::UpdateTableActiveIndex, measurement_interface ) );
     return;
   }
 
@@ -246,10 +398,91 @@ void MeasurementToolInterface::UpdateActiveIndex( qpointer_type measurement_inte
   {
     // Select active index and scroll to it
     measurement_interface->private_->table_view_->update_active_index();
+  }
+}
 
-    // Update note in text box to correspond to active index
-    measurement_interface->private_->ui_.note_textbox_->setText( 
-      measurement_interface->private_->table_model_->get_active_note() );
+void MeasurementToolInterface::UpdateActiveTab( qpointer_type measurement_interface )
+{
+  // Ensure that this call gets relayed to the right thread
+  if ( !( Core::Interface::IsInterfaceThread() ) )
+  {
+    Core::Interface::PostEvent( boost::bind( 
+      &MeasurementToolInterface::UpdateActiveTab, measurement_interface ) );
+    return;
+  }
+
+  // Protect interface pointer, so we do not execute if interface does not exist anymore
+  if ( measurement_interface.data() )
+  {
+    MeasurementToolHandle tool_handle = 
+      boost::dynamic_pointer_cast< MeasurementTool >( measurement_interface->tool() );
+
+    // Enable table only if measurements exist and active index is valid
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    int active_index = tool_handle->active_index_state_->get();
+    const std::vector< Core::Measurement >& measurements = tool_handle->measurements_state_->get();
+
+    bool enable_tab = ( measurements.size() > 0 &&
+      0 <= active_index && active_index < static_cast< int >( measurements.size() ) );
+
+    measurement_interface->private_->ui_.active_tab_->setEnabled( enable_tab );
+
+    if( enable_tab )
+    {
+      // Set widget values based on state
+
+      // Name
+      measurement_interface->private_->ui_.name_lineedit_->setText( 
+        QString::fromStdString( measurements[ active_index ].get_name() ) );
+      
+      // Comment
+      measurement_interface->private_->ui_.comment_textbox_->setText( 
+        QString::fromStdString( measurements[ active_index ].get_comment() ) );
+      
+      // Length
+      double world_length = measurements[ active_index ].get_length();
+      std::string unit_length = tool_handle->convert_world_to_unit_string( world_length );
+      measurement_interface->private_->ui_.length_lineedit_->setText( 
+        QString::fromStdString( unit_length ) );
+      
+      // Points
+      Core::Point p0, p1;
+      measurements[ active_index ].get_point( 0, p0 );
+      measurements[ active_index ].get_point( 1, p1 );
+      std::string p0_str = "( " +  tool_handle->convert_world_to_unit_string( p0.x() ) + 
+        ", " + tool_handle->convert_world_to_unit_string( p0.y() ) + ", " + 
+        tool_handle->convert_world_to_unit_string( p0.z() ) + " )";
+      measurement_interface->private_->ui_.p0_value_->setText( 
+        QString::fromStdString( p0_str ) );
+      std::string p1_str = "( " +  tool_handle->convert_world_to_unit_string( p1.x() ) + 
+        ", " + tool_handle->convert_world_to_unit_string( p1.y() ) + ", " + 
+        tool_handle->convert_world_to_unit_string( p1.z() ) + " )";
+      measurement_interface->private_->ui_.p1_value_->setText( 
+        QString::fromStdString( p1_str ) );
+      
+      // Hide/Show
+      measurement_interface->private_->ui_.show_checkbox_->setChecked( 
+        measurements[ active_index ].get_visible() );
+      
+      // Color
+      // Create QPixMap with color of active measurement
+      int height = measurement_interface->private_->ui_.color_button_->height();
+      QPixmap pix_map( height, height ); // Width is wrong initially, so use height
+      Core::Color m_color;
+      measurements[ active_index ].get_color( m_color );
+      pix_map.fill( QColor( m_color.r() * 255, m_color.g() * 255, m_color.b() * 255 ) );
+      measurement_interface->private_->ui_.color_button_->setIcon( pix_map );
+    }
+    else
+    {
+      // Clear widget values
+      measurement_interface->private_->ui_.name_lineedit_->clear();
+      measurement_interface->private_->ui_.comment_textbox_->clear();
+      measurement_interface->private_->ui_.length_lineedit_->clear();
+      measurement_interface->private_->ui_.p0_value_->clear();
+      measurement_interface->private_->ui_.p1_value_->clear();
+      measurement_interface->private_->ui_.show_checkbox_->setChecked( false );
+    }
   }
 }
 

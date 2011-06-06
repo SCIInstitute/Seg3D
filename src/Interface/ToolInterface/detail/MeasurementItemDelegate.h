@@ -42,7 +42,8 @@ class MeasurementItemDelegate : public QItemDelegate
   Q_OBJECT
 
 public:
-  MeasurementItemDelegate( int length_column, int note_column, QObject * parent = 0 );
+  MeasurementItemDelegate( int length_column, int color_column, int note_column, 
+    QObject * parent = 0 );
 
   //
   // Inherited functions
@@ -56,12 +57,10 @@ public:
   void setModelData( QWidget *editor, QAbstractItemModel *model, const QModelIndex &index ) const;
   QSize sizeHint( const QStyleOptionViewItem & option, const QModelIndex & index ) const;
 
-private Q_SLOTS:
-  void commit_editor();
-
 private:
+  int color_column_;
   int length_column_;
-  int note_column_;
+  int name_column_;
 };
 
 } // end namespace Seg3D

@@ -34,6 +34,7 @@
 #include <vector>
 
 // Core includes
+#include <Core/Geometry/Color.h>
 #include <Core/Geometry/Point.h>
 
 namespace Core
@@ -47,7 +48,8 @@ class Measurement
 {
 public:
 
-  Measurement( std::string id, bool visible, std::string note, Core::Point p0, Core::Point p1 );
+  Measurement( const std::string& name, const std::string& comment, 
+    const Point& p0, const Point& p1, const Color& color, bool visible );
   Measurement();
 
   // GET_VISIBLE:
@@ -59,12 +61,12 @@ public:
   void set_visible( bool visible ); 
 
   // GET_LABEL:
-  // Get short label to be rendered above measurement line.
-  std::string get_id() const; 
+  // Get short name to be rendered above measurement line.
+  std::string get_name() const; 
 
   // SET_LABEL:
-  // Set short label to be rendered above measurement line.
-  void set_id( std::string id );
+  // Set short name to be rendered above measurement line.
+  void set_name( std::string name );
 
   // GET_LENGTH:
   // Get length of measurement in world units.
@@ -78,12 +80,12 @@ public:
   // GET_NOTE:
   // Get user-editable description of measurement.  
   // May contain any characters including line breaks.
-  std::string get_note() const;
+  std::string get_comment() const;
 
   // SET_NOTE:
   // Set user-editable description of measurement.
   // May contain any characters including line breaks.
-  void set_note( std::string note ); 
+  void set_comment( std::string comment ); 
 
   // GET_POINT:
   // Get 3D world coordinate of point at given index (0 or 1)
@@ -93,30 +95,38 @@ public:
   // Set 3D world coordinate of point at given index (0 or 1)
   bool set_point( int index, const Point& pt );
 
+  // GET_COLOR:
+  void get_color( Color& color ) const;
+
+  // SET_COLOR:
+  void set_color( const Color& color );
+
   inline bool operator==( const Measurement& ) const;
   inline bool operator!=( const Measurement& ) const;
 
 private:
-  std::string id_; // Unique ID
+  std::string name_; // User-defined name
+  std::string comment_; // User-defined comment
+  Point points_[ 2 ]; // 3D world coordinates of end points
+  Color color_;
   bool visible_;
-  std::string note_; // User-defined note
-  Core::Point points_[ 2 ]; // 3D world coordinates of end points
 
 public:
   // User-defined notes can contain any character including line breaks, so we have to use our
   // own delimiter to signify the end of a note for parsing.
-  static const std::string NOTE_DELIMITER_C;
+  static const std::string COMMENT_DELIMITER_C;
+  static const Color DEFAULT_COLOR_C;
 };
 
 inline bool Measurement::operator==( const Measurement& m ) const
 {
-  return ( this->id_ == m.id_ && this->visible_ == m.visible_ && this->note_ == m.note_ &&
+  return ( this->name_ == m.name_ && this->visible_ == m.visible_ && this->comment_ == m.comment_ &&
     this->points_[ 0 ] == m.points_[ 0 ] && this->points_[ 1 ] == m.points_[ 1 ] );
 }
 
 inline bool Measurement::operator!=( const Measurement& m ) const
 {
-  return ( this->id_ != m.id_ || this->visible_ != m.visible_ || this->note_ != m.note_ ||
+  return ( this->name_ != m.name_ || this->visible_ != m.visible_ || this->comment_ != m.comment_ ||
     this->points_[ 0 ] != m.points_[ 0 ] || this->points_[ 1 ] != m.points_[ 1 ] );
 }
 

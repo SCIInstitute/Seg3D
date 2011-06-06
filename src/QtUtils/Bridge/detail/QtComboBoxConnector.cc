@@ -97,10 +97,9 @@ void QtComboBoxConnector::SetComboBoxIndexByText(
   QPointer< QtComboBoxConnector > qpointer,
   Core::ActionSource source )
 {
-  if ( source == Core::ActionSource::INTERFACE_WIDGET_E )
-  {
-    return;
-  }
+  // NOTE: Not checking ActionSource so that multiple widgets can be connected to the same state 
+  // and updated simultaneously.  This is safe because there will be at most one extra call to set
+  // the state since the state will be unchanged in subsequent calls.
 
   if ( !Core::Interface::IsInterfaceThread() )
   {
@@ -141,10 +140,9 @@ void QtComboBoxConnector::SetComboBoxIndexByData(
   QPointer< QtComboBoxConnector > qpointer,
   Core::ActionSource source )
 {
-  if ( source == Core::ActionSource::INTERFACE_WIDGET_E )
-  {
-    return;
-  }
+  // NOTE: Not checking ActionSource so that multiple widgets can be connected to the same state 
+  // and updated simultaneously.  This is safe because there will be at most one extra call to set
+  // the state since the state will be unchanged in subsequent calls.
 
   if ( !Core::Interface::IsInterfaceThread() )
   {

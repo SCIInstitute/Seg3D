@@ -36,8 +36,6 @@
 
 // Application includes
 #include <Application/LayerManager/LayerManager.h>
-#include <Application/Tools/Actions/ActionSetMeasurementNote.h>
-#include <Application/Tools/Actions/ActionSetMeasurementVisible.h>
 
 // Core includes
 #include <Core/State/Actions/ActionRemove.h>
@@ -60,8 +58,8 @@ public:
   void set_active_index( int active_index );
   void update_visibility();
 
-  std::string cached_active_note_;
-  bool use_cached_active_note_;
+  std::string cached_active_name_;
+  bool use_cached_active_name_;
   MeasurementToolHandle measurement_tool_;
 
   MeasurementTableModel * model_;
@@ -82,8 +80,8 @@ void MeasurementTableModelPrivate::set_active_index( int active_index )
   // If this is already the active measurement, return
   if( active_index == this->measurement_tool_->active_index_state_->get() ) return;
 
-  // Active index has changed, so don't want to use cached note for old active index
-  this->use_cached_active_note_ = false;
+  // Active index has changed, so don't want to use cached name for old active index
+  this->use_cached_active_name_ = false;
 
   // Make sure index is in valid range
   const std::vector< Core::Measurement >& measurements = 
@@ -93,11 +91,6 @@ void MeasurementTableModelPrivate::set_active_index( int active_index )
   // Set the active index in the measurement list
   Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
     this->measurement_tool_->active_index_state_, active_index );
-
-  // Send signal to update note in text box
-  // Can't use get_active_note() because active note is set on application thread asynchronously
-  QString active_note = QString::fromStdString( measurements[ active_index ].get_note() );
-  Q_EMIT this->model_->active_note_changed( active_note ); 
 }
 
 void MeasurementTableModelPrivate::update_visibility()
@@ -136,8 +129,8 @@ MeasurementTableModel::MeasurementTableModel( MeasurementToolHandle measurement_
 {
   this->private_->model_ = this;
   this->private_->measurement_tool_ = measurement_tool;
-  this->private_->cached_active_note_ = "";
-  this->private_->use_cached_active_note_ = false;
+  this->private_->cached_active_name_ = "";
+  this->private_->use_cached_active_name_ = false;
   this->private_->visibility_ = MeasurementVisibility::ALL_VISIBLE_E;
 }
 
@@ -154,7 +147,7 @@ int MeasurementTableModel::rowCount( const QModelIndex& /*index*/) const
 
 int MeasurementTableModel::columnCount( const QModelIndex& /*index*/) const
 {
-  return MeasurementColumns::NOTE_E + 1; 
+  return MeasurementColumns::NAME_E + 1; 
 }
 
 QVariant MeasurementTableModel::data( const QModelIndex& index, int role ) const
@@ -164,6 +157,8 @@ QVariant MeasurementTableModel::data( const QModelIndex& index, int role ) const
   if ( !index.isValid() ) return QVariant();
 
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+  const std::vector< Core::Measurement >& measurements = 
+    this->private_->measurement_tool_->measurements_state_->get();
 
   if ( role == Qt::TextAlignmentRole )
   {
@@ -173,8 +168,6 @@ QVariant MeasurementTableModel::data( const QModelIndex& index, int role ) const
   {
     if ( index.column() == MeasurementColumns::VISIBLE_E ) 
     {
-      const std::vector< Core::Measurement >& measurements = 
-        this->private_->measurement_tool_->measurements_state_->get();
       if( index.row() < static_cast< int >( measurements.size() ) )
       {
         if( measurements[ index.row() ].get_visible() )
@@ -187,33 +180,36 @@ QVariant MeasurementTableModel::data( const QModelIndex& index, int role ) const
         }
       }
     }
+    else if ( index.column() == MeasurementColumns::COLOR_E ) 
+    {
+      Core::Color color;
+      measurements[ index.row() ].get_color( color );
+      return QColor( color.r() * 255, color.g() * 255, color.b() * 255 );
+    }
   }
   else if ( role == Qt::DisplayRole )
   {
     int sz = this->rowCount( index );
     if ( index.row() < sz )
     {
-      const std::vector< Core::Measurement >& measurements = 
-        this->private_->measurement_tool_->measurements_state_->get();
       if( index.row() < static_cast< int >( measurements.size() ) )
       {
-        Core::Measurement measurement = measurements[ index.row() ];
-
         if ( index.column() == MeasurementColumns::LENGTH_E ) 
         {
+          double world_length = measurements[ index.row() ].get_length();
           return QString::fromStdString( 
-            this->private_->measurement_tool_->get_length_string( measurement ) );
+            this->private_->measurement_tool_->convert_world_to_unit_string( world_length ) );
         }
-        else if ( index.column() == MeasurementColumns::NOTE_E ) 
+        else if ( index.column() == MeasurementColumns::NAME_E ) 
         {
           if( index.row() == this->private_->measurement_tool_->active_index_state_->get()
-            && this->private_->use_cached_active_note_ )
+            && this->private_->use_cached_active_name_ )
           {
-            return QString::fromStdString( this->private_->cached_active_note_ );
+            return QString::fromStdString( this->private_->cached_active_name_ );
           }
           else
           {
-            return QString::fromStdString( measurement.get_note() );
+            return QString::fromStdString( measurements[ index.row() ].get_name() );
           }
         }
       }
@@ -221,10 +217,10 @@ QVariant MeasurementTableModel::data( const QModelIndex& index, int role ) const
   }
   else if ( role == Qt::BackgroundRole )
   {
-    // The active index is always selected, but if one column is highlighted it may not be
-    // obvious which is the active index, so color it.
     if ( index.row() == this->private_->measurement_tool_->active_index_state_->get() )
     {
+      // The active index is always selected, but if one column is highlighted it may not be
+      // obvious which is the active index, so color it.
       return QBrush( QColor( 225, 243, 252 ) ); // Light blue
     }
   }
@@ -245,34 +241,43 @@ bool MeasurementTableModel::setData( const QModelIndex &index, const QVariant &v
     {
       if ( index.column() == MeasurementColumns::VISIBLE_E ) 
       {
-        ActionSetMeasurementVisible::Dispatch( Core::Interface::GetWidgetActionContext(),
-          this->private_->measurement_tool_->measurements_state_, 
-          measurements[ index.row() ].get_id(), value.toBool() );
+        Core::Measurement m = measurements[ index.row() ];
+        m.set_visible( value.toBool() );
+        Core::ActionSetAt::Dispatch( Core::Interface::GetWidgetActionContext(),
+          this->private_->measurement_tool_->measurements_state_, index.row(), m );
+      }
+      if ( index.column() == MeasurementColumns::COLOR_E ) 
+      {
+        Core::Measurement m = measurements[ index.row() ];
+        QColor color = value.value< QColor >();
+        Core::Color m_color( color.red() / 255.0f, color.green() / 255.0f, 
+          color.blue() / 255.0f );
+        m.set_color( m_color );
+        Core::ActionSetAt::Dispatch( Core::Interface::GetWidgetActionContext(),
+          this->private_->measurement_tool_->measurements_state_, index.row(), m );
       }
       else if( index.column() == MeasurementColumns::LENGTH_E ) 
       { 
         // Convert length to world coordinates before setting length in measurement
-        double length = value.toFloat();
-        length = this->private_->measurement_tool_->convert_current_to_world( length );
+        std::string unit_length_str = value.toString().toStdString();
+        double world_length = 
+          this->private_->measurement_tool_->convert_unit_string_to_world( unit_length_str );
 
         // Set length in measurement state vector
         Core::Measurement m = measurements[ index.row() ];
-        m.set_length( length );
+        m.set_length( world_length );
         Core::ActionSetAt::Dispatch( Core::Interface::GetWidgetActionContext(),
           this->private_->measurement_tool_->measurements_state_, index.row(), m );
       }
-      else if( index.column() == MeasurementColumns::NOTE_E ) 
+      else if( index.column() == MeasurementColumns::NAME_E ) 
       {
-        // Don't save note to state variable yet because we don't want to trigger a full update
+        // Don't save name to state variable yet because we don't want to trigger a full update
         // for every character typed.  A full update interrupts editing so we're never
         // able to type more than one character before losing edit focus.  Instead, wait until 
-        // the note editing is finished to save the state.  In the meantime save and use a 
-        // cached copy of the note.
-        this->private_->cached_active_note_ = value.toString().toStdString();
-        this->private_->use_cached_active_note_ = true;
-
-        // If we are editing this cell then it is by definition the active measurement
-        Q_EMIT active_note_changed( value.toString() ); 
+        // the name editing is finished to save the state.  In the meantime save and use a 
+        // cached copy of the name.
+        this->private_->cached_active_name_ = value.toString().toStdString();
+        this->private_->use_cached_active_name_ = true;
       }
       else
       { 
@@ -305,6 +310,10 @@ QVariant MeasurementTableModel::headerData( int section, Qt::Orientation orienta
           return QIcon( QString::fromUtf8( ":/Images/VisibleGray.png" ) );
         }
       }
+      else if( section == MeasurementColumns::COLOR_E )
+      {
+        return QIcon( QString::fromUtf8( ":/Images/AppearanceOff.png" ) );
+      }
     }
   }
   else if ( role == Qt::DisplayRole )
@@ -313,13 +322,7 @@ QVariant MeasurementTableModel::headerData( int section, Qt::Orientation orienta
     {
       if( section < this->rowCount( QModelIndex() ) )
       {
-        Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-        const std::vector< Core::Measurement >& measurements = 
-          this->private_->measurement_tool_->measurements_state_->get();
-        if( section < static_cast< int >( measurements.size() ) )
-        { 
-          return QString::fromStdString( measurements[ section ].get_id() );
-        }   
+        return section;
       }
     }
     else if( orientation == Qt::Horizontal )
@@ -328,9 +331,9 @@ QVariant MeasurementTableModel::headerData( int section, Qt::Orientation orienta
       {
         return QString( "Length" );
       }
-      else if ( section == MeasurementColumns::NOTE_E )
+      else if ( section == MeasurementColumns::NAME_E )
       {
-        return QString( "Note" );
+        return QString( "Name" );
       }
     }
   }
@@ -341,8 +344,9 @@ QVariant MeasurementTableModel::headerData( int section, Qt::Orientation orienta
 Qt::ItemFlags MeasurementTableModel::flags( const QModelIndex &index ) const
 {
   Qt::ItemFlags flags = QAbstractItemModel::flags( index );
-  if ( index.column() == MeasurementColumns::LENGTH_E || 
-    index.column() == MeasurementColumns::NOTE_E ) 
+  if ( index.column() == MeasurementColumns::COLOR_E || 
+    index.column() == MeasurementColumns::LENGTH_E || 
+    index.column() == MeasurementColumns::NAME_E ) 
   {
     flags |= Qt::ItemIsEditable;
   }
@@ -382,18 +386,15 @@ bool MeasurementTableModel::removeRows( int row, int count, const QModelIndex & 
 void MeasurementTableModel::update_table()
 {
   this->private_->update_visibility();
-  this->private_->use_cached_active_note_ = false;
+  this->private_->use_cached_active_name_ = false;
 
   QAbstractTableModel::reset();
-
-  // Needed for initial update after loading measurements from project file
-  Q_EMIT active_note_changed( this->get_active_note() ); 
 }
 
 void MeasurementTableModel::update_cells()
 {
   this->private_->update_visibility();
-  this->private_->use_cached_active_note_ = false;
+  this->private_->use_cached_active_name_ = false;
 
   int rows = this->rowCount( QModelIndex() );
   int columns = this->columnCount( QModelIndex() );
@@ -401,8 +402,6 @@ void MeasurementTableModel::update_cells()
   QModelIndex bottom_right = this->index( rows - 1, columns - 1 );
   Q_EMIT dataChanged( top_left, bottom_right );
   Q_EMIT headerDataChanged( Qt::Horizontal, 0, 0 );
-
-  Q_EMIT active_note_changed( this->get_active_note() ); 
 }
 
 void MeasurementTableModel::remove_rows( const std::vector< int >& rows )
@@ -419,36 +418,6 @@ void MeasurementTableModel::remove_rows( const std::vector< int >& rows )
   {
     this->removeRow( *reverse_iter );
   }
-}
-
-QString MeasurementTableModel::get_active_note() const
-{
-  // Lock state engine so that active index can't change between getting active index and list
-  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-  int active_index = this->private_->measurement_tool_->active_index_state_->get();
-  const std::vector< Core::Measurement >& measurements = 
-    this->private_->measurement_tool_->measurements_state_->get();
-  if( 0 <= active_index && active_index < static_cast< int >( measurements.size() ) ) 
-  {
-    return QString::fromStdString( measurements[ active_index ].get_note() );
-  }
-  return "";
-}
-
-void MeasurementTableModel::set_active_note( const QString & note )
-{
-  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-  int active_index = this->private_->measurement_tool_->active_index_state_->get();
-  if( active_index == -1 ) return;
-  QModelIndex index = this->index( active_index, MeasurementColumns::NOTE_E );
-  this->setData( index, note, Qt::EditRole );
-
-  // The note can only be modified on the Interface thread, so it is safe to update
-  // the table view here.  Need to emit dataChanged so that table updates if 
-  // user is editing note in text box.  Moved this out of setData() because we don't want to 
-  // emit the signal if the note is being edited through the table since the cursor gets reset
-  // to the end of the line.  
-  Q_EMIT dataChanged( index, index ); 
 }
 
 int MeasurementTableModel::get_active_index() const
@@ -483,9 +452,10 @@ void MeasurementTableModel::toggle_visible()
     this->private_->measurement_tool_->measurements_state_->get();
   for( size_t i = 0; i < measurements.size(); i++ )
   {
-    ActionSetMeasurementVisible::Dispatch( Core::Interface::GetWidgetActionContext(), 
-      this->private_->measurement_tool_->measurements_state_, measurements[ i ].get_id(), 
-      visible );
+    Core::Measurement m = measurements[ i ];
+    m.set_visible( visible );
+    Core::ActionSetAt::Dispatch( Core::Interface::GetWidgetActionContext(),
+      this->private_->measurement_tool_->measurements_state_, i, m );
   }
 }
 
@@ -508,9 +478,9 @@ void MeasurementTableModel::handle_click( const QModelIndex & index )
   } 
 }
 
-void MeasurementTableModel::save_cached_active_note() 
+void MeasurementTableModel::save_cached_active_name() 
 {
-  if( this->private_->use_cached_active_note_ )
+  if( this->private_->use_cached_active_name_ )
   {
     // Lock state engine so measurements list doesn't change between getting active index
     // and getting list.
@@ -521,10 +491,10 @@ void MeasurementTableModel::save_cached_active_note()
 
     if( 0 <= active_index && active_index < static_cast< int >( measurements.size() ) )
     {
-      std::string measurement_id = measurements[ active_index ].get_id();
-      ActionSetMeasurementNote::Dispatch( Core::Interface::GetWidgetActionContext(), 
-        this->private_->measurement_tool_->measurements_state_,
-        measurement_id, this->private_->cached_active_note_ );
+      Core::Measurement m = measurements[ active_index ];
+      m.set_name( this->private_->cached_active_name_ );
+      Core::ActionSetAt::Dispatch( Core::Interface::GetWidgetActionContext(),
+        this->private_->measurement_tool_->measurements_state_, active_index, m );
     }
   }
 }

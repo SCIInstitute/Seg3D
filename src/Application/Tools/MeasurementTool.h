@@ -87,7 +87,7 @@ public:
   virtual bool handle_key_press( ViewerHandle viewer, int key, int modifiers );
 
   // HANDLE_KEY_RELEASE:
-  // Called when a key is released
+  // Called when a key is released.
   virtual bool handle_key_release( ViewerHandle viewer, int key, int modifiers );
 
   // REDRAW:
@@ -100,21 +100,17 @@ public:
   // Returns true if the tool draws itself in the 2D view, otherwise false.
   virtual bool has_2d_visual();
 
-  // GET_LENGTH_STRING:
-  // Get length as formatted string, respecting index vs. world units.  Function is here so that
-  // both interface and rendering use consistent formatting of length.  
+  // CONVERT_UNIT_STRING_TO_WORLD:
+  // Convert string in current units (show_world_units_state_) to world value.
+  double convert_unit_string_to_world( std::string unit_string );
+
+  // CONVERT_WORLD_TO_UNIT_STRING:
+  // Convert world value to string in current units (show_world_units_state_).
+  // Function is here so that both interface and rendering use consistent formatting of length.  
   // Locks: StateEngine
   // NOTE: Since this function locks the StateEngine, do not call it if RenderResources is locked
   // or deadlock will occur.
-  std::string get_length_string( const Core::Measurement& measurement ) const;
-
-  // CONVERT_CURRENT_TO_WORLD:
-  // Convert length from current units (show_world_units_state_) to world units.
-  double convert_current_to_world( double length ) const;
-
-  // CONVERT_WORLD_TO_CURRENT:
-  // Convert world length to current units (show_world_units_state_).
-  double convert_world_to_current( double length ) const;
+  std::string convert_world_to_unit_string( double world_value );
 
   // -- signals --
 public:
@@ -137,9 +133,6 @@ public:
   // Selection between display of index and world units.  Needed for radio button group.
   Core::StateLabeledOptionHandle units_selection_state_; 
 
-  // Selection between using ID or note as label in viewer.  Needed for radio button group.
-  Core::StateLabeledOptionHandle label_selection_state_; 
-
   // Boolean indicating whether world units (true) or index units (false) should be displayed.
   Core::StateBoolHandle show_world_units_state_; 
   
@@ -149,8 +142,6 @@ public:
 public:
   static const std::string INDEX_UNITS_C;
   static const std::string WORLD_UNITS_C;
-  static const std::string ID_LABEL_C;
-  static const std::string NOTE_LABEL_C;
 
 private:
   MeasurementToolPrivateHandle private_;

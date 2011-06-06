@@ -35,8 +35,6 @@
 #include <Application/Layer/LayerGroup.h>
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/Tool/ToolFactory.h>
-#include <Application/Tools/Actions/ActionSetMeasurementPoint.h>
-#include <Application/Tools/Actions/ActionSetMeasurementVisible.h>
 #include <Application/Tools/MeasurementTool.h>
 #include <Application/ViewerManager/ViewerManager.h>
 
@@ -82,7 +80,8 @@ public:
 	bool is_point() const;
 	bool is_line() const;
 
-	std::string measurement_id_;
+	int index_; // Index in measurements state vector
+
 	// Specific part of measurement that is hovered over (point, line, etc.)
 	MeasurementHoverObject hover_object_; 
 };
@@ -95,7 +94,7 @@ HoverMeasurement::HoverMeasurement()
 
 bool HoverMeasurement::is_valid() const
 {
-	if( this->measurement_id_ == "" || this->hover_object_ == MeasurementHoverObject::NONE_E )
+	if( this->index_ == -1 || this->hover_object_ == MeasurementHoverObject::NONE_E )
 	{
 		return false;
 	}
@@ -104,7 +103,7 @@ bool HoverMeasurement::is_valid() const
 
 void HoverMeasurement::invalidate()
 {
-	this->measurement_id_ = "";
+	this->index_ = -1;
 	this->hover_object_ = MeasurementHoverObject::NONE_E;
 }
 
@@ -148,6 +147,8 @@ public:
 	void handle_active_viewer_changed( int active_viewer );
 	void handle_viewer_slice_changed( size_t viewer_id, int slice_num );
 
+	// INITIALIZE_ID_COUNTER:
+	// ID counter used to create unique default names for measurements.
 	void initialize_id_counter();
 	std::string get_next_measurement_id();
 
@@ -184,12 +185,13 @@ public:
 	// view.
 	void snap_hover_point_to_axis(); 
 
-	// UPDATE_HOVER_POINT:
-	// Find or move the hover point, depending on whether user is editing or not.
+	// UPDATE_HOVER_MEASUREMENT:
+	// Find or move the hover measurement, depending on whether user is editing or not.
 	void update_hover_measurement();
 
+	// GET_HOVER_MEASUREMENT:
 	// Locks: StateEngine
-	bool get_hover_measurement( size_t& index, Core::Measurement& measurement ) const;
+	bool get_hover_measurement( Core::Measurement& measurement ) const;
 	
 	// UPDATE_CURSOR:
 	// Set cursor based on current editing/hover state
@@ -211,6 +213,14 @@ public:
 	// HOVER_OBJECT_IN_SLICE:
 	// Return true if the hover object (point or line) is in slice.  
 	bool hover_object_in_slice() const;
+
+	// CONVERT_CURRENT_TO_WORLD:
+	// Convert length from current units (show_world_units_state_) to world units.
+	double convert_unit_to_world( double length ) const;
+
+	// CONVERT_WORLD_TO_CURRENT:
+	// Convert world length to current units (show_world_units_state_).
+	double convert_world_to_unit( double length ) const;
 
 	MeasurementTool* tool_;
 
@@ -280,27 +290,8 @@ void MeasurementToolPrivate::handle_measurements_changed()
 		this->tool_->num_measurements_changed_signal_();
 	}
 
-	// If measurements were deleted, renumber IDs
-	if( num_measurements < saved_num_measurements_ )
-	{
-		lock_type lock( this->get_mutex() );
-		this->measurement_id_counter_ = 0;
-
-		if( num_measurements > 0 )
-		{
-			std::vector< Core::Measurement > measurements = 
-				this->tool_->measurements_state_->get();
-
-			for( size_t m_idx = 0; m_idx < measurements.size(); m_idx++ )
-			{
-				std::string id = "M" + Core::ExportToString( this->measurement_id_counter_ );
-				measurements[ m_idx ].set_id( id );
-				this->measurement_id_counter_++;
-			}
-			// Do all measurement changes at once to minimize updates
-			this->tool_->measurements_state_->set( measurements );	
-		}
-	}
+	// Reinitialize ID counter
+	this->initialize_id_counter();
 
 	// Measurements may have been added or removed, so update the active index
 	if( num_measurements > 0 )
@@ -426,8 +417,7 @@ void MeasurementToolPrivate::handle_viewer_slice_changed( size_t viewer_id, int 
 
 void MeasurementToolPrivate::initialize_id_counter()
 {
-	ASSERT_IS_INTERFACE_THREAD();
-
+	// May be run from application or interface thread
 	lock_type lock( this->get_mutex() );
 
 	// Find highest ID in use
@@ -441,7 +431,7 @@ void MeasurementToolPrivate::initialize_id_counter()
 		boost::smatch sub_matches;
 		// Note that we can't just pass m.get_id() directly into regex_match because the string will
 		// go out of scope and sub_matches contains iterators that point into the string.  
-		std::string str = m.get_id();
+		std::string str = m.get_name();
 		if( boost::regex_match( str, sub_matches, reg ) ) 
 		{
 			Core::ImportFromString( sub_matches[ 2 ].str(), measurement_id );
@@ -479,7 +469,7 @@ std::string MeasurementToolPrivate::get_next_measurement_id()
 			this->tool_->measurements_state_->get();
 		BOOST_FOREACH( Core::Measurement m, measurements )
 		{
-			if( canditate_id == m.get_id() )
+			if( canditate_id == m.get_name() )
 			{
 				in_use = true;
 				break;
@@ -544,8 +534,9 @@ bool MeasurementToolPrivate::find_hover_point()
 
 	Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
 	const std::vector< Core::Measurement >& measurements = this->tool_->measurements_state_->get();
-	BOOST_FOREACH( Core::Measurement m, measurements )
+	for( size_t m_idx = 0; m_idx < measurements.size(); m_idx++ )
 	{
+		const Core::Measurement& m = measurements[ m_idx ];
 		// Ignore hidden measurements
 		if( m.get_visible() )
 		{
@@ -559,7 +550,7 @@ bool MeasurementToolPrivate::find_hover_point()
 				if ( Core::Abs( pt_x - mouse_x ) <= range_x &&
 					Core::Abs( pt_y - mouse_y ) <= range_y )
 				{
-					this->hover_measurement_.measurement_id_ = m.get_id();
+					this->hover_measurement_.index_ = static_cast< int >( m_idx );
 					MeasurementHoverObject hover_object = ( point_index == 0 ) ? 
 						MeasurementHoverObject::POINT_0_E : MeasurementHoverObject::POINT_1_E;
 					this->hover_measurement_.hover_object_ = hover_object; 
@@ -601,8 +592,10 @@ bool MeasurementToolPrivate::find_hover_line()
 
 	bool hovering = false;
 	double min_dist = DBL_MAX;
-	BOOST_FOREACH( Core::Measurement m, measurements )
+	for( size_t m_idx = 0; m_idx < measurements.size(); m_idx++ )
 	{
+		const Core::Measurement& m = measurements[ m_idx ];
+
 		// Get both measurement points
 		Core::Point p0, p1;
 		m.get_point( 0, p0 );
@@ -650,7 +643,7 @@ bool MeasurementToolPrivate::find_hover_line()
 		// Found the new closest measurement
 		hovering = true;
 		min_dist = distance;
-		this->hover_measurement_.measurement_id_ = m.get_id();
+		this->hover_measurement_.index_ = static_cast< int >( m_idx );
 		this->hover_measurement_.hover_object_ = MeasurementHoverObject::LINE_E;
 	}
 
@@ -662,7 +655,8 @@ void MeasurementToolPrivate::move_hover_object_to_mouse()
 	// May be called from application (slice changed) or interface (mouse move) thread
 	lock_type lock( this->get_mutex() );
 	
-	if( this->hover_measurement_.is_valid() )
+	Core::Measurement measurement;
+	if( this->get_hover_measurement( measurement ) )
 	{
 		// Convert current mouse coords to 3D world point
 		Core::Point curr_mouse_pt;
@@ -671,9 +665,11 @@ void MeasurementToolPrivate::move_hover_object_to_mouse()
 			if( this->hover_measurement_.is_point() )
 			{
 				// Update single hover point
-				ActionSetMeasurementPoint::Dispatch( Core::Interface::GetMouseActionContext(), 
-					this->tool_->measurements_state_, this->hover_measurement_.measurement_id_, 
-					this->hover_measurement_.hover_object_, curr_mouse_pt );
+				measurement.set_point( this->hover_measurement_.hover_object_, curr_mouse_pt );
+
+				Core::ActionSetAt::Dispatch( Core::Interface::GetMouseActionContext(), 
+					this->tool_->measurements_state_, this->hover_measurement_.index_, 
+					measurement );
 			}
 			else if( this->hover_measurement_.is_line() )
 			{
@@ -681,16 +677,16 @@ void MeasurementToolPrivate::move_hover_object_to_mouse()
 				Core::Vector mouse_vec = curr_mouse_pt - this->drag_mouse_start_;
 
 				// Add vector to p0 and p1
-				size_t index;
 				Core::Measurement measurement;
-				if( this->get_hover_measurement( index, measurement ) )
+				if( this->get_hover_measurement( measurement ) )
 				{
 					// Update measurement
 					measurement.set_point( 0, this->drag_p0_start_ + mouse_vec );
 					measurement.set_point( 1, this->drag_p1_start_ + mouse_vec );
 
 					Core::ActionSetAt::Dispatch( Core::Interface::GetMouseActionContext(), 
-						this->tool_->measurements_state_, index, measurement );
+						this->tool_->measurements_state_, this->hover_measurement_.index_, 
+						measurement );
 				}
 			}
 		}
@@ -703,9 +699,8 @@ void MeasurementToolPrivate::snap_hover_point_to_slice()
 	lock_type lock( this->get_mutex() );
 
 	// Find world hover point
-	size_t measurement_index;
 	Core::Measurement edited_measurement;
-	if( this->get_hover_measurement( measurement_index, edited_measurement ) )
+	if( this->get_hover_measurement( edited_measurement ) )
 	{
 		Core::Point measurement_point;
 		edited_measurement.get_point( this->hover_measurement_.hover_object_, measurement_point );
@@ -728,9 +723,10 @@ void MeasurementToolPrivate::snap_hover_point_to_slice()
 		active_slice->get_world_coord( world_x, world_y, moved_pt );
 
 		// Update hover point
-		ActionSetMeasurementPoint::Dispatch( Core::Interface::GetMouseActionContext(), 
-			this->tool_->measurements_state_, this->hover_measurement_.measurement_id_, 
-			this->hover_measurement_.hover_object_, moved_pt );
+		edited_measurement.set_point( this->hover_measurement_.hover_object_, moved_pt );
+		Core::ActionSetAt::Dispatch( Core::Interface::GetMouseActionContext(), 
+			this->tool_->measurements_state_, this->hover_measurement_.index_, edited_measurement );
+		
 		return;
 	}
 	return;
@@ -742,9 +738,8 @@ void MeasurementToolPrivate::snap_hover_point_to_axis()
 	lock_type lock( this->get_mutex() );
 
 	// Get hovered measurement
-	size_t index; 
 	Core::Measurement measurement; 
-	if( !this->get_hover_measurement( index, measurement ) )
+	if( !this->get_hover_measurement( measurement ) )
 	{
 		return;
 	}
@@ -815,7 +810,7 @@ void MeasurementToolPrivate::snap_hover_point_to_axis()
 	measurement.set_point( hover_pt_idx, points[ hover_pt_idx ] );
 	
 	Core::ActionSetAt::Dispatch( Core::Interface::GetMouseActionContext(), 
-		this->tool_->measurements_state_, index, measurement );
+		this->tool_->measurements_state_, this->hover_measurement_.index_, measurement );
 }
 
 void MeasurementToolPrivate::update_hover_measurement()
@@ -854,7 +849,7 @@ void MeasurementToolPrivate::update_hover_measurement()
 }
 
 // TODO: Get rid of index once IDs are replaced with indexes
-bool MeasurementToolPrivate::get_hover_measurement( size_t& index, Core::Measurement& measurement ) const
+bool MeasurementToolPrivate::get_hover_measurement( Core::Measurement& measurement ) const
 {
 	// May be called from application or interface thread
 	lock_type lock( this->get_mutex() );
@@ -866,15 +861,10 @@ bool MeasurementToolPrivate::get_hover_measurement( size_t& index, Core::Measure
 		const std::vector< Core::Measurement >& measurements = 
 			this->tool_->measurements_state_->get();
 
-		// Find one with matching id
-		for( size_t i = 0; i < measurements.size(); i++ )
+		if( this->hover_measurement_.index_ < measurements.size() )
 		{
-			if( measurements[ i ].get_id() == this->hover_measurement_.measurement_id_ )
-			{
-				index = i;
-				measurement = measurements[ i ];
-				return true;
-			}
+			measurement = measurements[ this->hover_measurement_.index_ ];
+			return true;
 		}
 	}
 	return false;
@@ -945,15 +935,6 @@ void MeasurementToolPrivate::start_editing()
 	{
 		return;
 	}
-
-	// Make hover measurement active
-	size_t index;
-	Core::Measurement measurement;
-	if( this->get_hover_measurement( index, measurement ) )
-	{
-		Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
-			this->tool_->active_index_state_, static_cast< int >( index ) );
-	}
 	
 	if( this->hover_measurement_.is_point() )
 	{
@@ -964,9 +945,8 @@ void MeasurementToolPrivate::start_editing()
 	{
 		// Save current measurement and mouse points so that offsets can be added to these
 		// Add vector to p0 and p1
-		size_t index;
 		Core::Measurement measurement;
-		if( this->get_hover_measurement( index, measurement ) )
+		if( this->get_hover_measurement( measurement ) )
 		{
 			// Get both points
 			measurement.get_point( 0, this->drag_p0_start_ );	
@@ -1023,23 +1003,27 @@ void MeasurementToolPrivate::create_new_measurement()
 	Core::Point pt;
 	if( this->get_mouse_world_point( pt ) )
 	{
+		// Find number of measurements in order to get index
+		Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+		const std::vector< Core::Measurement >& measurements = 
+			this->tool_->measurements_state_->get();
+
+		this->hover_measurement_.index_ = static_cast< int >( measurements.size() );
+		// Second point in measurement needs to be the hover point
+		this->hover_measurement_.hover_object_ = MeasurementHoverObject::POINT_1_E; 
+
 		// Create new measurement 
 		Core::Measurement measurement;
 
 		// Need ID for measurement
-		measurement.set_id( this->get_next_measurement_id() );
+		measurement.set_name( this->get_next_measurement_id() );
 		measurement.set_point( 0, pt );
 		measurement.set_point( 1, pt );
 		measurement.set_visible( true );
 
-		// Add measurement to state vector
+		// Find number of measurements in order to get index
 		Core::ActionAdd::Dispatch( Core::Interface::GetMouseActionContext(), 
 			this->tool_->measurements_state_, measurement );
-
-		// Second point in measurement needs to be the hover point
-		this->hover_measurement_.measurement_id_ = measurement.get_id();
-		// Editing second point
-		this->hover_measurement_.hover_object_ = MeasurementHoverObject::POINT_1_E; 
 
 		this->start_editing();
 	}
@@ -1098,9 +1082,8 @@ bool MeasurementToolPrivate::hover_object_in_slice() const
 {
 	lock_type lock( this->get_mutex() );
 
-	size_t index; 
 	Core::Measurement measurement; 
-	if( !this->get_hover_measurement( index, measurement ) )
+	if( !this->get_hover_measurement( measurement ) )
 	{
 		return false;
 	}
@@ -1128,6 +1111,69 @@ bool MeasurementToolPrivate::hover_object_in_slice() const
 		return ( p0_in_slice && p1_in_slice ) ;
 	}
 	return false;
+}
+
+// Used to convert user-edited length to world units required by Measurement class.
+double MeasurementToolPrivate::convert_unit_to_world( double length ) const
+{
+	// Called from interface thread
+
+	// We need access to the show_world_units_state_, and several functions we call also lock
+	// the state engine.  
+	Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
+	// Thread-safety: We get a handle to the active layer 
+	// (get_active_layer is thread-safe), so it can't be deleted out from under 
+	// us.  
+	LayerHandle active_layer = LayerManager::Instance()->get_active_layer();
+
+	if( !this->tool_->show_world_units_state_->get() && active_layer ) // Current = Index units
+	{
+		// Index units
+
+		// Convert index units to world units
+		// Use grid transform from active layer
+		// Grid transfrom takes index coords to world coords
+		Core::GridTransform grid_transform = active_layer->get_grid_transform();
+
+		Core::Vector vec( length, 0, 0 );
+		vec = grid_transform.project( vec );
+		return vec.length();
+	}
+	return length; // Current = World units
+}
+
+// Used to convert Measurement length to index units for display if selected in tool.
+double MeasurementToolPrivate::convert_world_to_unit( double length ) const
+{
+	// May be called from interface or render threads
+
+	// NOTE: Do not call this function if RendererResources is locked.
+	// We need access to the show_world_units_state_, and several functions we call also lock
+	// the state engine.  
+	Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
+	// Thread-safety: We get a handle to the active layer 
+	// (get_active_layer is thread-safe), so it can't be deleted out from under 
+	// us.  
+	LayerHandle active_layer = LayerManager::Instance()->get_active_layer();
+
+	if( !this->tool_->show_world_units_state_->get() && active_layer ) // Current = Index units
+	{
+		// Index units
+
+		// Convert world units to index units
+		// Use grid transform from active layer
+		Core::GridTransform grid_transform = active_layer->get_grid_transform();
+
+		// Grid transfrom takes index coords to world coords, so we need inverse
+		Core::Transform inverse_transform = grid_transform.get_inverse();
+
+		Core::Vector vec( length, 0, 0 );
+		vec = inverse_transform.project( vec );
+		return vec.length();
+	}
+	return length; // Current = World units
 }
 
 //void create_test_data( std::vector< Core::Measurement >& measurements )
@@ -1165,8 +1211,6 @@ bool MeasurementToolPrivate::hover_object_in_slice() const
 
 const std::string MeasurementTool::INDEX_UNITS_C( "index_units" );
 const std::string MeasurementTool::WORLD_UNITS_C( "world_units" );
-const std::string MeasurementTool::ID_LABEL_C( "id_label" );
-const std::string MeasurementTool::NOTE_LABEL_C( "note_label" );
 
 MeasurementTool::MeasurementTool( const std::string& toolid ) :
 	Tool( toolid ),
@@ -1178,11 +1222,8 @@ MeasurementTool::MeasurementTool( const std::string& toolid ) :
 	this->add_state( "measurements", this->measurements_state_ );
 	this->add_state( "active_index", this->active_index_state_, -1 );
 	this->add_state( "units_selection", this->units_selection_state_, WORLD_UNITS_C, 
-		INDEX_UNITS_C + "=Index|" +
-		WORLD_UNITS_C + "=World" );
-	this->add_state( "label_selection", this->label_selection_state_, ID_LABEL_C, 
-		ID_LABEL_C + "=ID|" +
-		NOTE_LABEL_C + "=Note" );
+		INDEX_UNITS_C + "=Pixel|" +
+		WORLD_UNITS_C + "=Actual" );
 	this->add_state( "show_world_units", this->show_world_units_state_, true );
 	this->add_state( "opacity", this->opacity_state_, 1.0, 0.0, 1.0, 0.1 );
 
@@ -1198,8 +1239,6 @@ MeasurementTool::MeasurementTool( const std::string& toolid ) :
 		boost::bind( &MeasurementToolPrivate::update_viewers, this->private_ ) ) );
 	this->add_connection( this->units_selection_state_->value_changed_signal_.connect(
 		boost::bind( &MeasurementToolPrivate::handle_units_selection_changed, this->private_, _2 ) ) );
-	this->add_connection( this->label_selection_state_->value_changed_signal_.connect(
-		boost::bind( &MeasurementToolPrivate::update_viewers, this->private_ ) ) );
 	this->add_connection( LayerManager::Instance()->active_layer_changed_signal_.connect(
 		boost::bind( &MeasurementToolPrivate::handle_active_layer_changed, this->private_, _1 ) ) );
 	this->add_connection( this->opacity_state_->state_changed_signal_.connect(
@@ -1245,13 +1284,26 @@ bool MeasurementTool::handle_mouse_move( ViewerHandle viewer,
 bool MeasurementTool::handle_mouse_press( ViewerHandle viewer, 
 	const Core::MouseHistory& mouse_history, int button, int buttons, int modifiers )
 {
-	if( viewer->is_volume_view() ) 
+	if( viewer->is_volume_view() )
+	{
+		return false;
+	}
+
+	if( !( modifiers == Core::KeyModifier::NO_MODIFIER_E || 
+		modifiers == ( Core::KeyModifier::CONTROL_MODIFIER_E | Core::KeyModifier::SHIFT_MODIFIER_E ) ) )
 	{
 		return false;
 	}
 
 	MeasurementToolPrivate::lock_type lock( this->private_->get_mutex() );
 	this->private_->viewer_ = viewer;
+
+	// Make hover measurement active
+	if( this->private_->hover_measurement_.is_valid() )
+	{
+		Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
+			this->active_index_state_, this->private_->hover_measurement_.index_ );
+	}
 
 	if( button == Core::MouseButton::LEFT_BUTTON_E )
 	{
@@ -1267,12 +1319,16 @@ bool MeasurementTool::handle_mouse_press( ViewerHandle viewer,
 		{
 			// State: We are not editing
 
-			// If hovered point or line is in slice
-			if( this->private_->hover_measurement_.is_valid() && 
-				this->private_->hover_object_in_slice() )
+			// If hovered point or line 
+			if( this->private_->hover_measurement_.is_valid() )
 			{
+				// If in slice
+				if( this->private_->hover_object_in_slice() )
+				{
 					// Start editing
 					this->private_->start_editing();
+				}
+				// Else: Selected measurement not in slice, do nothing
 			}
 			else
 			{
@@ -1298,9 +1354,8 @@ bool MeasurementTool::handle_mouse_press( ViewerHandle viewer,
 		if( this->private_->hover_measurement_.is_valid() && 
 			this->private_->hover_object_in_slice() )
 		{
-			size_t index;
 			Core::Measurement measurement;
-			if( this->private_->get_hover_measurement( index, measurement ) )
+			if( this->private_->get_hover_measurement( measurement ) )
 			{
 				// Delete hovered measurement
 				Core::ActionRemove::Dispatch( Core::Interface::GetMouseActionContext(), 
@@ -1331,7 +1386,7 @@ bool MeasurementTool::handle_mouse_release( ViewerHandle viewer,
 
 bool MeasurementTool::handle_key_press( ViewerHandle viewer, int key, int modifiers )
 {
-	if( key == Core::Key::KEY_SHIFT_E ) 
+	if( key == Core::Key::KEY_SHIFT_E && ( modifiers & Core::KeyModifier::CONTROL_MODIFIER_E ) ) 
 	{
 		this->private_->snap_key_pressed_ = true;
 
@@ -1383,7 +1438,7 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 	std::vector< Core::Measurement > measurements = this->measurements_state_->get();
 	int active_index = this->active_index_state_->get();
 	double opacity = this->opacity_state_->get();
-	std::string label_selection = this->label_selection_state_->get();
+	//std::string label_selection = this->label_selection_state_->get();
 	
 	// Getting the length string requires locking the state engine because we need access to the
 	// show_world_units state and the LayerManager, which locks the state engine.
@@ -1392,7 +1447,8 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 	{
 		if( measurements[ m_idx ].get_visible() ) 
 		{
-			length_strings[ m_idx ] = this->get_length_string( measurements[ m_idx ] ); 
+			double world_length = measurements[ m_idx ].get_length();
+			length_strings[ m_idx ] = this->convert_world_to_unit_string( world_length );
 		}
 		else
 		{
@@ -1408,9 +1464,8 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 	//-------------- StateEngine unlocked  -------------------
 
 	Core::Color active_color = Core::Color( 0.55f, 0.82f, 0.96f );
-	Core::Color in_slice_color = Core::Color( 1.0f, 1.0f, 0.0f );
-	Core::Color out_of_slice_color = Core::Color( 0.6f, 0.6f, 0.0f );
-
+	float out_of_slice_fraction = 0.5f;
+	
 	glPushAttrib( GL_LINE_BIT | GL_POINT_BIT | GL_TRANSFORM_BIT );
 	glMatrixMode( GL_PROJECTION );
 	glPushMatrix();
@@ -1459,16 +1514,19 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 			both_in_slice[ m_idx ] = vertex_in_slice[ 0 ] && vertex_in_slice[ 1 ];
 			bool points_in_same_slice = point_depths[ 0 ] == point_depths[ 1 ];
 
+			Core::Color in_slice_color;
+			measurements[ m_idx ].get_color( in_slice_color );
+			// If this line is not in slice, display it with reduced color intensity
+			Core::Color out_of_slice_color = in_slice_color * out_of_slice_fraction;
 			Core::Color color = both_in_slice[ m_idx ] ? in_slice_color : out_of_slice_color;
 			glColor4f( color.r(), color.g(), color.b(), static_cast< float >( opacity ) );
 			glLineWidth( 2.0f );
 
 			bool editing = this->private_->edit_mode_ != MeasurementEditMode::NONE_E && 
-				m.get_id() == this->private_->hover_measurement_.measurement_id_;
+				m_idx == this->private_->hover_measurement_.index_;
 			if( editing ) // Editing
 			{
 				// Draw coarsely dotted line 
-				
 				glLineStipple(1, 0x00FF );
 				glEnable( GL_LINE_STIPPLE ); 
 			}
@@ -1476,7 +1534,6 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 			{
 				// Draw finely dotted line
 				glLineStipple(1, 0x0F0F );
-				//glLineStipple(1, 0xAAAA );
 				glEnable( GL_LINE_STIPPLE ); 
 			}
 			else
@@ -1516,14 +1573,20 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 				}
 				else
 				{
-					color = vertex_in_slice[ v_idx ] ? in_slice_color : out_of_slice_color;
+					color = in_slice_color;
+				}
+
+				// If this point is not in slice, display it with reduced color intensity
+				if( !vertex_in_slice[ v_idx ] ) 
+				{
+					color = color * out_of_slice_fraction;
 				}
 
 				// Make the moving point red in the current viewer (not necessarily active viewer)
 				if( this->private_->viewer_ && 
 					viewer_id == this->private_->viewer_->get_viewer_id() && 
 					this->private_->edit_mode_ != MeasurementEditMode::NONE_E && 
-					m.get_id() == this->private_->hover_measurement_.measurement_id_ &&
+					m_idx == this->private_->hover_measurement_.index_ &&
 					v_idx == this->private_->hover_measurement_.hover_object_ )
 				{
 					color = Core::Color( 1.0, 0.0, 0.0 );
@@ -1631,15 +1694,7 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 			// Label
 			//
 
-			std::string label = "";
-			if( label_selection == ID_LABEL_C )
-			{
-				label = m.get_id();
-			}
-			else if( label_selection == NOTE_LABEL_C )
-			{
-				label = m.get_note();
-			}
+			std::string label = m.get_name();
 			int text_height = 20; // Heuristically determined -- computing actual size didn't work
 			int text_width = static_cast< int >( label.size() ) * text_height;
 
@@ -1697,9 +1752,24 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 
 	// Blend the text onto the framebuffer
 	glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_ADD );
+
+	// Render drop-shadow by shifting vertices by 1 pixel
 	glBegin( GL_QUADS );
-	glColor4f( in_slice_color.r(), in_slice_color.g(), in_slice_color.b(), 
-		static_cast< float >( opacity ) );
+	glColor4f( 0.0f, 0.0f, 0.0f, static_cast< float >( opacity ) ); // Black 
+	glTexCoord2f( 0.0f, 0.0f );
+	glVertex2i( 1, -1 );
+	glTexCoord2f( 1.0f, 0.0f );
+	glVertex2i( viewer->get_width(), -1 );
+	glTexCoord2f( 1.0f, 1.0f );
+	glVertex2i( viewer->get_width(), viewer->get_height() - 2 );
+	glTexCoord2f( 0.0f, 1.0f );
+	glVertex2i( 1, viewer->get_height() - 2 );
+	glEnd();
+
+	// Render foreground text
+	glBegin( GL_QUADS );
+	Core::Color label_color = Core::Measurement::DEFAULT_COLOR_C;
+	glColor4f( label_color.r(), label_color.g(), label_color.b(), static_cast< float >( opacity ) );
 	glTexCoord2f( 0.0f, 0.0f );
 	glVertex2i( 0, 0 );
 	glTexCoord2f( 1.0f, 0.0f );
@@ -1709,6 +1779,7 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 	glTexCoord2f( 0.0f, 1.0f );
 	glVertex2i( 0, viewer->get_height() - 1 );
 	glEnd();
+
 	text_texture->disable();
 	
 	CORE_CHECK_OPENGL_ERROR();
@@ -1724,7 +1795,14 @@ bool MeasurementTool::has_2d_visual()
 	return true;
 }
 
-std::string MeasurementTool::get_length_string( const Core::Measurement& measurement ) const
+double MeasurementTool::convert_unit_string_to_world( std::string unit_string )
+{
+	double unit_value;
+	Core::ImportFromString( unit_string, unit_value );
+	return this->private_->convert_unit_to_world( unit_value );
+}
+
+std::string MeasurementTool::convert_world_to_unit_string( double world_value )
 {
 	// May be called from interface or render threads
 
@@ -1733,16 +1811,16 @@ std::string MeasurementTool::get_length_string( const Core::Measurement& measure
 	// the state engine.  
 	Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
 
-	double length = this->convert_world_to_current( measurement.get_length() );
+	double unit_value = this->private_->convert_world_to_unit( world_value );
 
 	bool use_scientific = false;
-	
+
 	if( !this->show_world_units_state_->get() ) 
 	{
 		// Index units
 
 		// Use same formatting policy as status bar for coordinates
-		if( 10000 < length ) 
+		if( 10000 < unit_value ) 
 		{
 			use_scientific = true;
 		}
@@ -1756,7 +1834,7 @@ std::string MeasurementTool::get_length_string( const Core::Measurement& measure
 		// World units
 
 		// Use same formatting policy as status bar for coordinates
-		if( ( 0.0 < length && length < 0.0001 ) || 1000 < length ) 
+		if( ( 0.0 < unit_value && unit_value < 0.0001 ) || 1000 < unit_value ) 
 		{
 			use_scientific = true;
 		}
@@ -1765,86 +1843,23 @@ std::string MeasurementTool::get_length_string( const Core::Measurement& measure
 			use_scientific = false;
 		}
 	}
-	
+
 	// Use same formatting policy as status bar for coordinates
 	std::ostringstream oss;
 	if( use_scientific ) 
 	{
 		// Use scientific notation
 		oss.precision( 2 );
-		oss << std::scientific << length;
+		oss << std::scientific << unit_value;
 		return ( oss.str() );
 	}
 	else 
 	{
 		// Format normally
 		oss.precision( 3 );
-		oss << std::fixed << length;
+		oss << std::fixed << unit_value;
 		return ( oss.str() );
 	}
-}
-
-// Used to convert user-edited length to world units required by Measurement class.
-double MeasurementTool::convert_current_to_world( double length ) const
-{
-	// Called from interface thread
-
-	// We need access to the show_world_units_state_, and several functions we call also lock
-	// the state engine.  
-	Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-
-	// Thread-safety: We get a handle to the active layer 
-	// (get_active_layer is thread-safe), so it can't be deleted out from under 
-	// us.  
-	LayerHandle active_layer = LayerManager::Instance()->get_active_layer();
-
-	if( !this->show_world_units_state_->get() && active_layer ) // Current = Index units
-	{
-		// Index units
-
-		// Convert index units to world units
-		// Use grid transform from active layer
-		// Grid transfrom takes index coords to world coords
-		Core::GridTransform grid_transform = active_layer->get_grid_transform();
-
-		Core::Vector vec( length, 0, 0 );
-		vec = grid_transform.project( vec );
-		return vec.length();
-	}
-	return length; // Current = World units
-}
-
-// Used to convert Measurement length to index units for display if selected in tool.
-double MeasurementTool::convert_world_to_current( double length ) const
-{
-	// May be called from interface or render threads
-
-	// NOTE: Do not call this function if RendererResources is locked.
-	// We need access to the show_world_units_state_, and several functions we call also lock
-	// the state engine.  
-	Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-
-	// Thread-safety: We get a handle to the active layer 
-	// (get_active_layer is thread-safe), so it can't be deleted out from under 
-	// us.  
-	LayerHandle active_layer = LayerManager::Instance()->get_active_layer();
-
-	if( !this->show_world_units_state_->get() && active_layer ) // Current = Index units
-	{
-		// Index units
-
-		// Convert world units to index units
-		// Use grid transform from active layer
-		Core::GridTransform grid_transform = active_layer->get_grid_transform();
-
-		// Grid transfrom takes index coords to world coords, so we need inverse
-		Core::Transform inverse_transform = grid_transform.get_inverse();
-
-		Core::Vector vec( length, 0, 0 );
-		vec = inverse_transform.project( vec );
-		return vec.length();
-	}
-	return length; // Current = World units
 }
 
 } // end namespace Seg3D

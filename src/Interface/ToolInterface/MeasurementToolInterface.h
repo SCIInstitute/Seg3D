@@ -59,13 +59,21 @@ public:
   virtual bool build_widget( QFrame* frame );
 
 private Q_SLOTS:
-  // SET_MEASUREMENT_NOTE_BOX:
-  // Update measurement note text box in response to measurement model change
-  void set_measurement_note_box( const QString & note );
+  // HANDLE_LINEEDIT_NAME_CHANGED:
+  // Set the active measurement name state based on the line edit.
+  void handle_name_lineedit_changed();
 
-  // SET_MEASUREMENT_NOTE_TABLE:
-  // Update note in measurement model in response to measurement text box change
-  void set_measurement_note_table();
+  // HANDLE_TEXTBOX_COMMENT_CHANGED:
+  void handle_comment_textbox_changed();
+
+  // HANDLE_LINEEDIT_LENGTH_CHANGED:
+  void handle_length_lineedit_changed();
+
+  // HANDLE_CHECKBOX_SHOW_CHANGED:
+  void handle_show_checkbox_changed();
+
+  // HANDLE_COLOR_BUTTON_CHANGED:
+  void handle_color_button_clicked();
 
 private:
     MeasurementToolInterfacePrivateHandle private_;
@@ -77,16 +85,20 @@ public:
   // Update entire table including dimensions.  Scroll to active index.  
   // Slower than UpdateMeasurementCells, so use only when needed. De-selects selected rows.  
   // TODO: This may be slow due to resizeColumns[Rows]ToContents -- try hard-coding sizes.
-  static void UpdateMeasurementTable( qpointer_type measurement_interface );
+  static void UpdateGeneralTab( qpointer_type measurement_interface );
 
   // UPDATEMEASUREMENTMODEL:
   // Update only table cells, not table dimensions.  Does not scroll to active index.
-  static void UpdateMeasurementCells( qpointer_type measurement_interface );
+  static void UpdateTableCells( qpointer_type measurement_interface );
 
   // UPDATEACTIVEINDEX:
   // Update interface table and text box in response to changed active index.
   // Locks: StateEngine
-  static void UpdateActiveIndex( qpointer_type measurement_interface );
+  static void UpdateTableActiveIndex( qpointer_type measurement_interface );
+
+  // UPDATEACTIVEMEASUREMENTTAB:
+  // Set widget values based on current measurement state.
+  static void UpdateActiveTab( qpointer_type measurement_interface );
 };
 
 } // end namespace Seg3D

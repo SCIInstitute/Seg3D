@@ -64,6 +64,14 @@ bool ActionPickPoint::run( Core::ActionContextHandle& context,
   return false;
 }
 
+void ActionPickPoint::Dispatch( Core::ActionContextHandle context, const Core::Point& pt )
+{
+  ActionPickPoint* action = new ActionPickPoint;
+  action->point_ = pt;
+  
+  Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
+}
+
 void ActionPickPoint::Dispatch( Core::ActionContextHandle context, size_t viewer, 
   const Core::Point& pt )
 {

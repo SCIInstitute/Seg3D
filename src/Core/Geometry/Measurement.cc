@@ -37,22 +37,25 @@
 namespace Core
 {
 
-const std::string Measurement::NOTE_DELIMITER_C = " NOTE_END]]";
+const std::string Measurement::COMMENT_DELIMITER_C = " COMMENT_END]]";
+const Color Measurement::DEFAULT_COLOR_C = Color( 1.0f, 1.0f, 0.0f ); // Yellow
 
-Measurement::Measurement( std::string id, bool visible, std::string note, 
-  Core::Point p0, Core::Point p1 ) : 
-  id_( id ),
-  visible_( visible ),  
-  note_( note )
+Measurement::Measurement( const std::string& name, const std::string& comment, 
+  const Point& p0, const Point& p1, const Color& color, bool visible ) : 
+  name_( name ),
+  comment_( comment ),
+  color_( color ),
+  visible_( visible )
 {
   this->points_[ 0 ] = p0;
   this->points_[ 1 ] = p1;
 }
 
 Measurement::Measurement() :
-  id_( "" ), 
-  visible_( false ), 
-  note_( "" )
+  name_( "" ), 
+  comment_( "" ),
+  color_( Measurement::DEFAULT_COLOR_C ),
+  visible_( false ) 
 {
 }
 
@@ -66,14 +69,14 @@ void Measurement::set_visible( bool visible )
   this->visible_ = visible;
 }
 
-std::string Measurement::get_id() const
+std::string Measurement::get_name() const
 {
-  return this->id_;
+  return this->name_;
 }
 
-void Measurement::set_id( std::string id )
+void Measurement::set_name( std::string name )
 {
-  this->id_ = id;
+  this->name_ = name;
 }
 
 double Measurement::get_length() const
@@ -91,14 +94,14 @@ void Measurement::set_length( double length )
   }
 }
 
-std::string Measurement::get_note() const
+std::string Measurement::get_comment() const
 {
-  return this->note_;
+  return this->comment_;
 }
 
-void Measurement::set_note( std::string note )
+void Measurement::set_comment( std::string comment )
 {
-  this->note_ = note;
+  this->comment_ = comment;
 }
 
 bool Measurement::get_point( int index, Point& pt ) const
@@ -117,18 +120,30 @@ bool Measurement::set_point( int index, const Point& pt )
   return true;
 }
 
+void Measurement::get_color( Color& color ) const
+{
+  color = this->color_;
+}
+
+void Measurement::set_color( const Color& color )
+{
+  this->color_ = color;
+}
+
 std::string ExportToString( const Measurement& value )
 {
-  // Need to use special delimiter for note since any characters are allowed in a note,
-  // including ']'.  Put note at end so that it functions as both a note delimiter and 
+  // Need to use special delimiter for comment since any characters are allowed in a comment,
+  // including ']'.  Put comment at end so that it functions as both a comment delimiter and 
   // measurement delimiter.
   Point p0;
   value.get_point( 0, p0 );
   Point p1;
   value.get_point( 1, p1 );
-  return ( std::string( 1, '[' ) + ExportToString( value.get_visible() ) + ' ' + value.get_id() 
+  Color color;
+  value.get_color( color );
+  return ( std::string( 1, '[' ) + ExportToString( value.get_visible() ) + ' ' + value.get_name() 
     + ' ' + ExportToString( p0 ) + ' ' + ExportToString( p1 ) + 
-    ' ' + '[' + value.get_note() + Measurement::NOTE_DELIMITER_C );
+    ' ' + ExportToString( color ) + ' ' + '[' + value.get_comment() + Measurement::COMMENT_DELIMITER_C );
 }
 
 std::string ExportToString( const std::vector< Measurement >& value )
@@ -143,18 +158,19 @@ std::string ExportToString( const std::vector< Measurement >& value )
 
 bool ImportFromString( const std::string& str, Measurement& value )
 {
-  // Example string: [true M1 [0 0 0] [1 1 1] [Knee NOTE_END]]
+  // Example string: [true M1 [0 0 0] [1 1 1] [1 0 0] [Knee COMMENT_END]]
   std::string open_bracket_reg = "(\\[)";
   std::string word_reg = "(\\w*)";
   std::string visible_reg = word_reg;
   std::string space_reg = "(\\s)";
-  std::string label_reg = word_reg;
+  std::string name_reg = word_reg;
   std::string point_reg = "(\\[[^\\]]*])";
-  std::string note_reg = "(.*?)";
-  std::string note_end_reg = "(\\sNOTE_END\\]\\])";
-  std::string full_reg = open_bracket_reg + visible_reg + space_reg + label_reg + space_reg + 
-    point_reg + space_reg + point_reg + space_reg + open_bracket_reg + note_reg + 
-    note_end_reg;
+  std::string color_reg = point_reg;
+  std::string comment_reg = "(.*?)";
+  std::string comment_end_reg = "(\\sCOMMENT_END\\]\\])";
+  std::string full_reg = open_bracket_reg + visible_reg + space_reg + name_reg + space_reg + 
+    point_reg + space_reg + point_reg + space_reg + color_reg + space_reg + open_bracket_reg + 
+    comment_reg + comment_end_reg;
   boost::regex reg( full_reg );
   boost::smatch m;
   if( boost::regex_match( str, m, reg ) ) 
@@ -162,14 +178,17 @@ bool ImportFromString( const std::string& str, Measurement& value )
     bool visible = false;
     ImportFromString( m[ 2 ].str(), visible );
     value.set_visible( visible );
-    value.set_id( m[ 4 ].str() );
+    value.set_name( m[ 4 ].str() );
     Point p0;
     ImportFromString( m[ 6 ].str(), p0 );
     value.set_point( 0, p0 );
     Point p1;
     ImportFromString( m[ 8 ].str(), p1 );
     value.set_point( 1, p1 );
-    value.set_note( m[ 11 ].str() );
+    Color color;
+    ImportFromString( m[ 10 ].str(), color );
+    value.set_color( color );
+    value.set_comment( m[ 13 ].str() );
   return true;
 }
   return false;
@@ -178,12 +197,12 @@ bool ImportFromString( const std::string& str, Measurement& value )
 bool ImportFromString( const std::string& str, std::vector< Measurement >& value )
 {
   value.clear();
-  std::vector< std::string > parts = Core::SplitString( str, Measurement::NOTE_DELIMITER_C );
+  std::vector< std::string > parts = SplitString( str, Measurement::COMMENT_DELIMITER_C );
   // The last part is ""
   for( size_t i = 0; i < parts.size() - 1; i++ )
   {
     std::string measurement_string = parts[ i ];
-    measurement_string += Measurement::NOTE_DELIMITER_C;
+    measurement_string += Measurement::COMMENT_DELIMITER_C;
     Measurement measurement;
     if( ImportFromString( measurement_string, measurement ) )
     {

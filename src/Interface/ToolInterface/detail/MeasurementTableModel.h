@@ -47,8 +47,9 @@ CORE_ENUM_CLASS
 (
   MeasurementColumns,
   VISIBLE_E, 
+  COLOR_E,
   LENGTH_E,
-  NOTE_E
+  NAME_E
 )
 
 // Hide header includes, private interface and implementation
@@ -95,14 +96,6 @@ public:
   // REMOVE_ROWS:
   // Remove measurements with specified row indices.
   void remove_rows( const std::vector< int >& rows );
-  
-  // GET_ACTIVE_NOTE:
-  // Get note for active measurement.
-  QString get_active_note() const;
-
-  // SET_ACTIVE_NOTE:
-  // Set note for active measurement.
-  void set_active_note( const QString & note );
 
   // GET_ACTIVE_INDEX:
   // Return row index of active measurement. Returns -1 if there are no measurements.
@@ -118,11 +111,6 @@ public:
   // Toggle tri-state button for visibility in horizontal header
   void toggle_visible();
 
-Q_SIGNALS:
-  // ACTIVE_NOTE_CHANGED:
-  // Note for active measurement changed.
-  void active_note_changed( const QString & note ) const;
-
 private Q_SLOTS:
 
   // HANDLE_CLICK:
@@ -132,7 +120,7 @@ private Q_SLOTS:
   // SAVE_ACTIVE_NOTE:
   // Save cached active note to state vector.  Avoids saving to state vector and triggering
   // updates on every keystroke.
-  void save_cached_active_note();
+  void save_cached_active_name();
 
 private:
   MeasurementTableModelPrivateHandle private_;
