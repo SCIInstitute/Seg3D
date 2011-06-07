@@ -99,7 +99,7 @@ ExportInfoPage::ExportInfoPage( QWidget *parent )
 
     registerField( "projectName", this->project_name_lineedit_ );
     
-  this->warning_message_ = new QLabel( QString::fromUtf8( "This location does not exist, please chose a valid location." ) );
+  this->warning_message_ = new QLabel( QString::fromUtf8( "This location does not exist, please choose a valid location." ) );
   this->warning_message_->setObjectName( QString::fromUtf8( "warning_message_" ) );
   this->warning_message_->setWordWrap( true );
   this->warning_message_->setStyleSheet(QString::fromUtf8( "QLabel#warning_message_{ color: red; } " ) );
@@ -163,7 +163,7 @@ bool ExportInfoPage::validatePage()
   if( !boost::filesystem::exists( project_path.parent_path() ) )
   {
     this->warning_message_->setText( QString::fromUtf8( 
-      "This location does not exist, please chose a valid location." ) );
+      "This location does not exist, please choose a valid location." ) );
     this->warning_message_->show();
     return false;
   }
@@ -175,7 +175,7 @@ bool ExportInfoPage::validatePage()
   catch ( ... ) // any errors that we might get thrown would indicate that we cant write here
   {
     this->warning_message_->setText( QString::fromUtf8( 
-      "This location is not writable, please chose a valid location." ) );
+      "This location is not writable, please choose a valid location." ) );
     this->warning_message_->show();
     return false;
   }
