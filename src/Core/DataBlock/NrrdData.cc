@@ -537,9 +537,16 @@ bool NrrdData::LoadNrrd( const std::string& filename, NrrdDataHandle& nrrddata, 
     }
     else if ( nrrd->spaceDim == 3 )
     {
-      nrrd->axis[ 2 ].spaceDirection[ 0 ] = 0.0;
-      nrrd->axis[ 2 ].spaceDirection[ 1 ] = 0.0;
-      nrrd->axis[ 2 ].spaceDirection[ 2 ] = 1.0;    
+      // Build two vectors, take cross product to find third space direction
+      Vector space_dir_0( nrrd->axis[ 0 ].spaceDirection[ 0 ], 
+        nrrd->axis[ 0 ].spaceDirection[ 1 ], nrrd->axis[ 0 ].spaceDirection[ 2 ] );
+      Vector space_dir_1( nrrd->axis[ 1 ].spaceDirection[ 0 ], 
+        nrrd->axis[ 1 ].spaceDirection[ 1 ], nrrd->axis[ 1 ].spaceDirection[ 2 ] );
+      Vector space_dir_2 = Cross( space_dir_0, space_dir_1 );
+
+      nrrd->axis[ 2 ].spaceDirection[ 0 ] = space_dir_2.x();
+      nrrd->axis[ 2 ].spaceDirection[ 1 ] = space_dir_2.y();
+      nrrd->axis[ 2 ].spaceDirection[ 2 ] = space_dir_2.z();    
     }
   }
 
