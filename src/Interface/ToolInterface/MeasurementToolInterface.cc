@@ -188,10 +188,11 @@ bool MeasurementToolInterface::build_widget( QFrame* frame )
     &MeasurementTableView::copy_selected_cells, this->private_->table_view_ ) );
   QtUtils::QtBridge::Connect( this->private_->ui_.delete_button_, boost::bind(
     &MeasurementTableView::delete_selected_measurements, this->private_->table_view_ ) );
-  QtUtils::QtBridge::Connect( this->private_->ui_.measurement_opacity_slider_, 
-    tool_handle->opacity_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.opacity_slider_, tool_handle->opacity_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.export_button_, boost::bind(
     &MeasurementToolInterfacePrivate::export_measurements_to_clipboard, this->private_ ) );
+
+  this->private_->ui_.opacity_slider_->set_description( "Opacity" );
 
   // Active measurement tab
   QtUtils::QtBridge::Connect( this->private_->ui_.unit_combobox_, tool_handle->units_selection_state_ );
