@@ -164,16 +164,22 @@ Transform NrrdData::get_transform() const
 
   if( space_dim > 0 ) // We have the space direction info already
   {
-    // For each axis
+    
+    // For space direction for each axis
     for( size_t axis_lookup = 0; axis_lookup < axis_idx_num; axis_lookup++ )
     {
-      // Find the space direction
       for( size_t space_dir_idx = 0; space_dir_idx < space_dim; space_dir_idx++ )
       {
         size_t axis_idx = axis_idx_array[ axis_lookup ];
         space_directions[ axis_lookup ][ space_dir_idx ] = 
           this->private_->nrrd_->axis[ axis_idx ].spaceDirection[ space_dir_idx ];
       }
+    }
+    
+    if( axis_idx_num == 2 && space_dim == 3 ) // Special case: 2D nrrd with 3D space dimensions
+    {
+      // Calculate third space direction as the cross product of the first two
+      space_directions[ 2 ] = Cross( space_directions[ 0 ], space_directions[ 1 ] );
     }
   }
   else // If possible, calculate spacing from mins, maxs, spacing
