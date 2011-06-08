@@ -189,6 +189,13 @@ bool ActionPaste::run( Core::ActionContextHandle& context, Core::ActionResultHan
   ClipboardItemConstHandle clipboard_item = Clipboard::Instance()->get_item( 
     this->private_->slot_number_ );
 
+  // NOTE: Copy/Paste needs special provenance logic:
+  // As Copy and Paste are separate actions that actual describe one action in the provenance
+  // trail, we add special logic here for now.
+  
+  // TODO: We should revisit all this logic: I think we should give the clipboard contents
+  // provenance IDs.
+
   ProvenanceID src_pid;
   int src_slice_type;
   size_t src_slice_number;
@@ -198,10 +205,12 @@ bool ActionPaste::run( Core::ActionContextHandle& context, Core::ActionResultHan
   input_pids[ 1 ]= this->get_input_provenance_ids()[ 0 ];
   ProvenanceIDList deleted_pids;
   deleted_pids.push_back( input_pids[ 1 ] );
-  ProvenanceStep* prov_step = new ProvenanceStep;
+  
+  ProvenanceStepHandle prov_step( new ProvenanceStep );
   prov_step->set_input_provenance_ids( input_pids );
   prov_step->set_output_provenance_ids( this->get_output_provenance_ids( 1 ) );
   prov_step->set_deleted_provenance_ids( deleted_pids );
+  
   std::string action_str = ActionCopyPaste::Type() + " ";
   action_str += Core::ExportToString( src_pid ) + " ";
   action_str += Core::ExportToString( src_slice_type ) + " ";
@@ -211,15 +220,16 @@ bool ActionPaste::run( Core::ActionContextHandle& context, Core::ActionResultHan
   action_str += Core::ExportToString( this->private_->min_slice_ ) + " ";
   action_str += Core::ExportToString( this->private_->max_slice_ );
   prov_step->set_action( action_str );
-  ProvenanceStepHandle prov_step_handle( prov_step );
+  
   ProvenanceStepID step_id = ProjectManager::Instance()->get_current_project()->
-    add_provenance_record( prov_step_handle );
+    add_provenance_record( prov_step );
 
   // Build the undo/redo for this action
   LayerUndoBufferItemHandle item( new LayerUndoBufferItem( "Paste" ) );
 
   // The redo action is the current one
   item->set_redo_action( this->shared_from_this() );
+  
   // Tell which provenance record to delete when undone
   item->set_provenance_step_id( step_id );
         
@@ -244,6 +254,7 @@ bool ActionPaste::run( Core::ActionContextHandle& context, Core::ActionResultHan
   volume_slice->set_slice_number( this->private_->max_slice_ );
   volume_slice->set_slice_data( reinterpret_cast< const unsigned char* >( 
     clipboard_item->get_buffer() ), true );
+    
   this->private_->target_layer_->provenance_id_state_->set(
     this->get_output_provenance_id() );
 

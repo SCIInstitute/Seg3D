@@ -690,17 +690,18 @@ bool ProjectPrivate::initialize_provenance_database()
 
   // Create table for storing inputs of each provenance step
   sql_statements += "CREATE TABLE provenance_input "
-    "(prov_step_id INTEGER NOT NULL REFERENCES provenance_step(prov_step_id) ON DELETE CASCADE, "
-    "prov_id INTEGER NOT NULL, "
-    "PRIMARY KEY (prov_step_id, prov_id));";
+    "(input_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
+    "prov_step_id INTEGER NOT NULL REFERENCES provenance_step(prov_step_id) ON DELETE CASCADE, "
+    "prov_id INTEGER NOT NULL);";
 
   // Create index on prov_step_id column of provenance_input
   sql_statements += "CREATE INDEX prov_input_index ON provenance_input(prov_step_id);";
 
   // Create table for storing outputs of each provenance step
   sql_statements += "CREATE TABLE provenance_output "
-    "(prov_step_id INTEGER NOT NULL REFERENCES provenance_step(prov_step_id) ON DELETE CASCADE, "
-    "prov_id INTEGER NOT NULL PRIMARY KEY);";
+    "(output_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
+    "prov_step_id INTEGER NOT NULL REFERENCES provenance_step(prov_step_id) ON DELETE CASCADE, "
+    "prov_id INTEGER NOT NULL UNIQUE);";
 
   // Create index on prov_step_id column of provenance_output
   sql_statements += "CREATE INDEX prov_output_index ON provenance_output(prov_step_id);";
@@ -2293,7 +2294,7 @@ ProvenanceStepID Project::add_provenance_record( const ProvenanceStepHandle& ste
 
   for ( size_t i = 0; i < input_list.size(); ++i )
   {
-    sql_str = "INSERT INTO provenance_input VALUES(" + Core::ExportToString( step_id ) + ", " +
+    sql_str = "INSERT INTO provenance_input (prov_step_id,prov_id) VALUES(" + Core::ExportToString( step_id ) + ", " +
       Core::ExportToString( input_list[ i ] ) + ");";
     if ( !this->private_->provenance_database_.run_sql_statement( sql_str, error ) )
     {
@@ -2305,7 +2306,7 @@ ProvenanceStepID Project::add_provenance_record( const ProvenanceStepHandle& ste
 
   for ( size_t i = 0; i < output_list.size(); ++i )
   {
-    sql_str = "INSERT INTO provenance_output VALUES(" + Core::ExportToString( step_id ) + ", " +
+    sql_str = "INSERT INTO provenance_output (prov_step_id,prov_id) VALUES(" + Core::ExportToString( step_id ) + ", " +
       Core::ExportToString( output_list[ i ] ) + ");";
     if ( !this->private_->provenance_database_.run_sql_statement( sql_str, error ) )
     {
@@ -2317,7 +2318,7 @@ ProvenanceStepID Project::add_provenance_record( const ProvenanceStepHandle& ste
   
   for ( size_t i = 0; i < deleted_list.size(); ++i )
   {
-    sql_str = "INSERT INTO provenance_deleted VALUES(" + Core::ExportToString( step_id ) + ", " +
+    sql_str = "INSERT INTO provenance_deleted (prov_step_id,prov_id) VALUES(" + Core::ExportToString( step_id ) + ", " +
       Core::ExportToString( deleted_list[ i ] ) + ");";
     if ( !this->private_->provenance_database_.run_sql_statement( sql_str, error ) )
     {
