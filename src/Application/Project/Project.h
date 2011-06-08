@@ -50,6 +50,7 @@
 #include <Core/State/State.h>
 
 // Application includes
+#include <Application/Project/ProjectNote.h>
 #include <Application/Project/SessionInfo.h>
 #include <Application/Project/InputFilesImporter.h>
 #include <Application/Provenance/Provenance.h>
@@ -149,11 +150,16 @@ public:
   Core::StateStringVectorHandle sessions_state_;
   
 public:
-  // SESSION_CHANGED_SIGNAL
+  // SESSION_LIST_CHANGED_SIGNAL
   // When a session is saved or deleted this signal is triggered
   // NOTE: This one is used by the User Interface
-  typedef boost::signals2::signal< void() > sessions_changed_signal_type;
-  sessions_changed_signal_type sessions_changed_signal_;
+  typedef boost::signals2::signal< void( SessionInfoListHandle ) > session_list_signal_type;
+  session_list_signal_type session_list_changed_signal_;
+
+  // NOTE_LIST_CHANGED_SIGNAL:
+  // Signals the current list of notes.
+  typedef boost::signals2::signal< void ( ProjectNoteListHandle ) > note_list_signal_type;
+  note_list_signal_type note_list_changed_signal_;
   
   // PROVENANCE_RECORDS_SIGNAL
   // This signal is triggered when a new provenance record is added
@@ -170,10 +176,6 @@ public:
   // SAVE_STATE:
   // Save the current state into the xml file
   bool save_state();
-
-  // GET_ALL_SESSIONS:
-  // Get the names of all the sessions in this project
-  bool get_all_sessions( std::vector< SessionInfo >& sessions );
 
   // LOAD_SESSION:
   // This function will be called to load a specific session
@@ -204,6 +206,11 @@ public:
   // Returns true on success, otherwise false.
   bool get_session_info( SessionID session_id, SessionInfo& session_info );
 
+  // REQUEST_SESSION_LIST:
+  // Request a list of all the sessions.
+  // This would trigger the session_list_changed_signal_ in the application thread.
+  void request_session_list();
+
   // EXPORT_PROJECT:
   // This function will export the current project and the passed vector of session names to file
   // NOTE: This function can only can called from the application thread.
@@ -227,6 +234,17 @@ public:
   // GET_PROJECT_INPUTFILES_PATH:
   // Get the input files path of this project
   boost::filesystem::path get_project_inputfiles_path() const;
+
+  // -- Notes --
+public:
+  // ADD_NOTE:
+  // Add a new note to project.
+  bool add_note( const std::string& note );
+
+  // REQUEST_NOTE_LIST:
+  // Request a list of all the notes.
+  // This would trigger the note_list_changed_signal_ in the application thread.
+  void request_note_list();
   
   // FIND_CACHED_FILE
   // Find a cached file in the project

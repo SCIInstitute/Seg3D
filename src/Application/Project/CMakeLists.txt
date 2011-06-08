@@ -40,6 +40,7 @@ SET(APPLICATION_PROJECT_SRCS
   Project.cc
   SessionInfo.h
   SessionInfo.cc
+  ProjectNote.h
 )
 
 SET(APPLICATION_PROJECT_ACTIONS_SRCS

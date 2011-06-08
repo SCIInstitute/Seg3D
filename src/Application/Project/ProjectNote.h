@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_PROJECT_SESSIONINFO_H
-#define APPLICATION_PROJECT_SESSIONINFO_H
+#ifndef APPLICATION_PROJECT_PROJECTNOTE_H
+#define APPLICATION_PROJECT_PROJECTNOTE_H
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 #pragma once
@@ -45,32 +45,32 @@ namespace Seg3D
 {
 
 // Forward declaration
-typedef long long SessionID;
+class ProjectNote;
+typedef std::vector< ProjectNote > ProjectNoteList;
+typedef boost::shared_ptr< ProjectNoteList > ProjectNoteListHandle;
 
-class SessionInfo;
-typedef std::vector< SessionInfo > SessionInfoList;
-typedef boost::shared_ptr< SessionInfoList > SessionInfoListHandle;
-
-// CLASS SessionInfo
-// This helper class is for storing sessions in the database
-class SessionInfo
+// CLASS ProjectNote
+// This helper class is for querying project notes from the interface thread.
+class ProjectNote
 {
 public:
   typedef boost::posix_time::ptime timestamp_type;
 
-  SessionInfo( SessionID session_id, const std::string& session_name, 
-    const std::string& user_id, const timestamp_type& timestamp );
-  SessionInfo();
-  ~SessionInfo();
-  
-  const SessionID session_id() const
+  ProjectNote( const std::string& note, const std::string& user_id, 
+    const timestamp_type& timestamp ) :
+    note_( note ),
+    user_id_( user_id ),
+    timestamp_( timestamp )
   {
-    return this->session_id_;
   }
 
-  const std::string& session_name() const
+  ProjectNote() {}
+
+  ~ProjectNote() {}
+  
+  const std::string& note() const
   {
-    return this->session_name_;
+    return this->note_;
   }
 
   const std::string& user_id() const
@@ -84,13 +84,11 @@ public:
   }
   
 private:
-  // ID of the session
-  SessionID session_id_;
-  // Name of the session
-  std::string session_name_;
-  // User that saved the session
+  // The content of the note
+  std::string note_;
+  // User that wrote the note
   std::string user_id_;
-  // Timestamp of when the session was saved in UTC time
+  // Timestamp of when the note was saved in UTC time
   timestamp_type timestamp_;
 };  
 

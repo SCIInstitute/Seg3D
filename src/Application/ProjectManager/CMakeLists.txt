@@ -39,6 +39,8 @@ SET(APPLICATION_PROJECTMANAGER_SRCS
 )
 
 SET(APPLICATION_PROJECTMANAGER_ACTIONS_SRCS
+  Actions/ActionAddNote.h
+  Actions/ActionAddNote.cc
     Actions/ActionAutoSave.h
     Actions/ActionAutoSave.cc
     Actions/ActionDeleteSession.h
