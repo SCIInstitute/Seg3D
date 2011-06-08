@@ -474,7 +474,7 @@ void Menu::create_window_menu( QMenuBar* menubar )
 
   // Provenance Widget
   qaction = qmenu->addAction( "Provenance Window" );
-  qaction->setShortcut( tr( "Ctrl+Shift+P" ) );
+  qaction->setShortcut( tr( "Ctrl+Shift+H" ) );
   qaction->setCheckable( true );
   QtUtils::QtBridge::Connect( qaction, 
     InterfaceManager::Instance()->provenance_dockwidget_visibility_state_ );
