@@ -418,7 +418,7 @@ bool ITKLayerImporter::get_file_info( LayerImporterFileInfoHandle& info )
     info->set_data_type( this->private_->data_type_ );
     info->set_grid_transform( this->private_->grid_transform_ );
     info->set_file_type( this->private_->file_type_ ); 
-    info->set_mask_compatible( false );
+    info->set_mask_compatible( true );
   }
   catch ( ... )
   {

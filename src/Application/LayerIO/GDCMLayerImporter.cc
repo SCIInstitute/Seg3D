@@ -245,6 +245,8 @@ bool GDCMLayerImporterPrivate::read_header()
   this->col_direction_ = Core::Vector( dircos[ 3 ], dircos[ 4 ], dircos[ 5 ] );
   this->slice_direction_ = Core::Cross( this->row_direction_, this->col_direction_ );
   this->slice_direction_.normalize();
+  this->row_direction_.normalize();
+  this->col_direction_.normalize();
 
   this->origin_[ 0 ] = origin[ 0 ];
   this->origin_[ 1 ] = origin[ 1 ];
@@ -295,8 +297,8 @@ bool GDCMLayerImporterPrivate::read_header()
     if ( spacing < -epsilon || spacing > epsilon ) 
     {
       this->z_spacing_ = spacing; 
-      dir.normalize();
       this->slice_direction_ = dir; 
+      this->slice_direction_.normalize();
     }
     else 
     {
@@ -307,13 +309,10 @@ bool GDCMLayerImporterPrivate::read_header()
   {
     this->z_spacing_ = 1.0;
   }
-
-  this->row_direction_ *= this->x_spacing_;
-  this->col_direction_ *= this->y_spacing_;
-  this->slice_direction_ *= this->z_spacing_;
   
-  this->grid_transform_.load_basis( this->origin_, this->row_direction_, this->col_direction_, 
-    this->slice_direction_ );
+  this->grid_transform_.load_basis( this->origin_, this->row_direction_ * this->x_spacing_,
+    this->col_direction_ * this->y_spacing_, 
+    this->slice_direction_ * this->z_spacing_ );
   this->grid_transform_.set_originally_node_centered( false );
 
   this->read_header_ = true;
@@ -328,12 +327,10 @@ bool GDCMLayerImporterPrivate::read_data()
     std::swap( this->x_spacing_, this->y_spacing_ );
   }
   
-  this->row_direction_ *= this->x_spacing_;
-  this->col_direction_ *= this->y_spacing_;
-  this->slice_direction_ *= this->z_spacing_;
-  
-  this->grid_transform_.load_basis( this->origin_, this->row_direction_, this->col_direction_, 
-    this->slice_direction_ );
+  this->grid_transform_.load_basis( this->origin_, this->row_direction_ * this->x_spacing_,
+    this->col_direction_ * this->y_spacing_, 
+    this->slice_direction_ * this->z_spacing_ );
+
   this->grid_transform_.set_originally_node_centered( false );
 
   this->data_block_ = Core::StdDataBlock::New( this->grid_transform_, this->pixel_type_ );
