@@ -671,6 +671,14 @@ bool ProjectPrivate::initialize_provenance_database()
   // Create index on prov_step_id column of provenance_deleted
   sql_statements += "CREATE INDEX prov_deleted_index ON provenance_deleted(prov_step_id);";
 
+  // Create table for storing outputs of each provenance step
+  sql_statements += "CREATE TABLE provenance_inputfiles_cache "
+    "(prov_step_id INTEGER NOT NULL REFERENCES provenance_step(prov_step_id) ON DELETE CASCADE, "
+    "inputfiles_cache_id INTEGER NOT NULL PRIMARY KEY);";
+
+  // Create index on prov_step_id column of provenance_output
+  sql_statements += "CREATE INDEX prov_inputfiles_cache_index ON provenance_inputfiles_cache(prov_step_id);";
+
   // Set the database version to 1
   sql_statements += "INSERT INTO database_version VALUES (1);";
 
@@ -1222,13 +1230,13 @@ void Project::initialize_states()
   }
 
   // Count that keeps track of the unique ids for each input file
-  this->add_state( "inputfiles_count", this->inputfiles_count_state_, -1 );
+  this->add_state( "inputfiles_count", this->inputfiles_count_state_, 0 );
 
   // Count that keeps track of datablock generation numbers
-  this->add_state( "generation_count", this->generation_count_state_, -1 );
+  this->add_state( "generation_count", this->generation_count_state_, 0 );
 
   // Count that keeps track of maximum provenance ID
-  this->add_state( "provenance_count", this->provenance_count_state_, -1 );
+  this->add_state( "provenance_count", this->provenance_count_state_, 0 );
 
   // Each time an action is executed, check whether it changes the project data, if so
   // mark this in the project, so the UI can query the user for a save action if the application
@@ -1515,7 +1523,7 @@ boost::filesystem::path Project::get_project_data_path() const
 {
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
   boost::filesystem::path project_path( this->project_path_state_->get() );
-  return project_path / "data";
+  return project_path / DATA_DIR_C;
 }
 
 boost::filesystem::path Project::get_project_sessions_path() const
@@ -1529,7 +1537,16 @@ boost::filesystem::path Project::get_project_inputfiles_path() const
 {
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
   boost::filesystem::path project_path( this->project_path_state_->get() );
-  return project_path / "inputfiles";
+  return project_path / INPUTFILES_DIR_C;
+}
+
+bool Project::find_cached_file( const boost::filesystem::path& filename, InputFilesID inputfiles_id,
+    boost::filesystem::path& cached_filename ) const
+{
+  cached_filename = this->get_project_inputfiles_path() / Core::ExportToString( inputfiles_id ) /
+    filename.filename();
+  if ( boost::filesystem::exists( cached_filename ) ) return true;
+  else return false;
 }
 
 bool Project::save_state()
@@ -2038,7 +2055,7 @@ bool Project::is_session( SessionID session_id )
 /////////////////////////////// Provenance Database Functionality //////////////////////////////////
 
 // This function is mostly just a placeholder.  Currently it just registers the actions.  We will probably want to 
-// create a Providence Object and then add it to the db.
+// create a Provenance Object and then add it to the db.
 ProvenanceStepID Project::add_provenance_record( const ProvenanceStepHandle& step )
 {
   // Print diagnostics
@@ -2070,6 +2087,7 @@ ProvenanceStepID Project::add_provenance_record( const ProvenanceStepHandle& ste
   ProvenanceIDList output_list = step->get_output_provenance_ids();
   ProvenanceIDList input_list = step->get_input_provenance_ids();
   ProvenanceIDList deleted_list = step->get_deleted_provenance_ids();
+  InputFilesID inputfiles_id = step->get_inputfiles_id();
 
   std::string sql_str = "INSERT INTO provenance_step (action_name, action_params, user_id)"
     " VALUES('" + action_name + "', '" + action_params + "', '" + user_name + "');";
@@ -2116,7 +2134,20 @@ ProvenanceStepID Project::add_provenance_record( const ProvenanceStepHandle& ste
       return -1;
     }
   }
-
+  
+  if ( inputfiles_id > -1 )
+  { // If it is a valid ID add it to the table
+    sql_str = "INSERT INTO provenance_inputfiles_cache VALUES (" + 
+      Core::ExportToString( step_id ) + ", " + Core::ExportToString( inputfiles_id ) + ");";
+      
+    if ( !this->private_->provenance_database_.run_sql_statement( sql_str, error ) )
+    {
+      CORE_LOG_ERROR( error );
+      this->delete_provenance_record( step_id );
+      return -1;
+    }
+  }
+  
   return step_id;
 }
 

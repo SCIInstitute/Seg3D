@@ -72,8 +72,9 @@ InputFilesID LayerImporter::get_inputfiles_id()
   {
     ProjectHandle current_project = ProjectManager::Instance()->get_current_project();
 
-    this->private_->inputfiles_id_ = current_project->inputfiles_count_state_->get();
-    current_project->inputfiles_count_state_->set( this->private_->inputfiles_id_ + 1 );  
+    this->private_->inputfiles_id_ = current_project->inputfiles_count_state_->get() + 1;
+    current_project->inputfiles_count_state_->set( this->private_->inputfiles_id_ );  
+
   }
 
   return this->private_->inputfiles_id_;

@@ -500,7 +500,7 @@ bool DataVolume::ConvertToCanonicalVolume( const DataVolumeHandle& src_volume,
   DataBlockHandle src_data_block = src_volume->get_data_block();
   DataBlockHandle dst_data_block;
   assert( permutation.size() == 3 );
-  if ( permutation[ 0 ] != 1 || permutation[ 1 ] != 2 || permutation[ 2 ] != 3)
+  if ( permutation[ 0 ] != 1 || permutation[ 1 ] != 2 || permutation[ 2 ] != 3 )
   {
     DataBlock::PermuteData( src_data_block, dst_data_block, permutation );
   }

@@ -792,9 +792,9 @@ bool DataBlock::PermuteData( const DataBlockHandle& src_data_block,
   }
   
   size_t dn[3];
-  dn[ 0 ] = 0;
-  dn[ 1 ] = 0;
-  dn[ 2 ] = 0;
+  dn[ 0 ] = 1;
+  dn[ 1 ] = 1;
+  dn[ 2 ] = 1;
   
   for ( size_t j = 0; j < 3; j++)
   {

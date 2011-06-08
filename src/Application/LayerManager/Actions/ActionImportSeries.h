@@ -51,7 +51,7 @@ CORE_ACTION(
   CORE_ACTION_ARGUMENT( "filenames", "The name of the file to load." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "importer", "", "Optional name for a specific importer." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "mode", "data", "The mode to use: data, single_mask, bitplane_mask, or label_mask.")
-  CORE_ACTION_OPTIONAL_ARGUMENT( "cache", "-1" , "Location of the file if it is in the data cache of the project." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "inputfiles_id", "-1" , "Location of the file if it is in the data cache of the project." )
   
   CORE_ACTION_CHANGES_PROJECT_DATA()
 )
@@ -63,7 +63,7 @@ public:
     this->add_parameter( this->filenames_ );
     this->add_parameter( this->importer_ );
     this->add_parameter( this->mode_ );
-    this->add_parameter( this->cache_ );
+    this->add_parameter( this->inputfiles_id_ );
   }
   
   // -- Functions that describe action --
@@ -90,7 +90,7 @@ private:
   std::vector< std::string > filenames_;
 
   // If the data is located in the data cache it is located in this directory
-  ProvenanceID cache_;
+  ProvenanceID inputfiles_id_;
   
   // How should the file be loaded
   std::string mode_;

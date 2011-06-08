@@ -228,6 +228,12 @@ public:
   // Get the input files path of this project
   boost::filesystem::path get_project_inputfiles_path() const;
   
+  // FIND_CACHED_FILE
+  // Find a cached file in the project
+  bool find_cached_file( const boost::filesystem::path& filename, InputFilesID inputfiles_id,
+    boost::filesystem::path& cached_filename ) const;
+  
+  
 protected:
   // PRE_SAVE_STATES:
   // this function synchronizes the colors if they are set to be saved with the project

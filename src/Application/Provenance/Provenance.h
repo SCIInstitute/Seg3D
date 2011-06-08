@@ -42,6 +42,12 @@ namespace Seg3D
 typedef long long ProvenanceID;
 typedef std::vector<ProvenanceID> ProvenanceIDList;
 
+// INPUTFILESID:
+// The inputfiles cache is organized by Input Files IDs. These are unique numbers that are used in
+// the provenance database as well as on disk to keep track of which input files are still needed
+typedef long long InputFilesID;
+typedef std::vector<InputFilesID> InputFilesIDList;
+
 // GENERATEPROVENANCEID:
 // Generate a new provenance ID
 ProvenanceID GenerateProvenanceID();

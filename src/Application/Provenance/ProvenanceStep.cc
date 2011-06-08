@@ -42,11 +42,11 @@
 namespace Seg3D
 {
 
-ProvenanceStep::ProvenanceStep()
+ProvenanceStep::ProvenanceStep() :
+  inputfiles_id_( -1 )
 {
   // Record user for GLP
   Core::Application::Instance()->get_user_name( this->user_ );
-  // Timestamp will be automatically generated the database when the provenance is recorded
 }
 
 ProvenanceStep::~ProvenanceStep()
@@ -88,6 +88,16 @@ void ProvenanceStep::set_deleted_provenance_ids( const ProvenanceIDList& deleted
   this->deleted_provenance_ids_ = deleted_provenance_ids;
 }
 
+void ProvenanceStep::set_inputfiles_id( const InputFilesID inputfiles_id )
+{
+  this->inputfiles_id_ = inputfiles_id;
+}
+  
+InputFilesID ProvenanceStep::get_inputfiles_id() const
+{
+  return this->inputfiles_id_;
+}
+
 void ProvenanceStep::set_action( const std::string& action )
 {
   this->action_ = action;
@@ -108,6 +118,7 @@ void ProvenanceStep::print()
   std::cout << "input ids = " << Core::ExportToString( this->input_provenance_ids_ ) << std::endl;
   std::cout << "output ids = " << Core::ExportToString( this->output_provenance_ids_ ) << std::endl;
   std::cout << "deleted ids = " << Core::ExportToString( this->deleted_provenance_ids_ ) << std::endl;
+  std::cout << "inputfiles id =" << Core::ExportToString( this->inputfiles_id_ ) << std::endl;
   std::cout << "action = " << this->action_ << std::endl;
   std::cout << "user = " << this->user_ << std::endl;
 }

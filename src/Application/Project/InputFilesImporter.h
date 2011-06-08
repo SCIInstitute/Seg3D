@@ -40,10 +40,11 @@
 // Core includes
 #include <Core/Utils/Lockable.h>
 
+// Application includes
+#include <Application/Provenance/Provenance.h>
+
 namespace Seg3D
 {
-
-typedef long long InputFilesID;
 
 
 // Forward declaration

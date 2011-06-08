@@ -59,29 +59,37 @@ public:
 
   // -- accessors --
 public:
-  // GET_INPUT_PROVENANCE_IDS:
+  // GET_INPUT_PROVENANCE_IDS
   // Get the input provenance ids
   const ProvenanceIDList& get_input_provenance_ids() const;
   
-  // SET_INPUT_PROVENANCE_IDS:
+  // SET_INPUT_PROVENANCE_IDS
   // Set the input provenance ids
   void set_input_provenance_ids( const ProvenanceIDList& input_provenance_ids );
 
-  // GET_OUTPUT_PROVENANCE_IDS:
+  // GET_OUTPUT_PROVENANCE_IDS
   // Get the input provenance ids
   const ProvenanceIDList& get_output_provenance_ids() const;
   
-  // SET_OUTPUT_PROVENANCE_IDS:
+  // SET_OUTPUT_PROVENANCE_IDS
   // Set the input provenance ids
   void set_output_provenance_ids( const ProvenanceIDList& output_provenance_ids );
 
-  // GET_DELETED_PROVENANCE_IDS:
+  // GET_DELETED_PROVENANCE_IDS
   // Get the deleted provenance ids
   const ProvenanceIDList& get_deleted_provenance_ids() const;
   
-  // SET_DELETED_PROVENANCE_IDS:
+  // SET_DELETED_PROVENANCE_IDS
   // Set the input provenance ids
   void set_deleted_provenance_ids( const ProvenanceIDList& deleted_provenance_ids );
+
+  // SET_INPUTFILES_ID
+  // Set the input files cache id in the provenance step
+  void set_inputfiles_id( const InputFilesID inputfiles_id );
+  
+  // GET_INPUTFILES_ID
+  // Get the input files cache id from this provenance step
+  InputFilesID get_inputfiles_id() const;
 
   // SET_ACTION:
   // Set the provenance action
@@ -121,6 +129,9 @@ protected:
 
   // User that generated action
   std::string user_;
+  
+  // Input Files cache id
+  InputFilesID inputfiles_id_;
 };
 
 } // end namespace Seg3D

@@ -53,6 +53,21 @@ bool ActionImportLayer::validate( Core::ActionContextHandle& context )
   // Convert the file to a boost filename
   boost::filesystem::path full_filename( this->filename_ );
   
+  // NOTE: Check cache first. If the file is in cache use the cache directory
+  if ( this->inputfiles_id_ > -1 )
+  {
+    ProjectHandle project = ProjectManager::Instance()->get_current_project();
+    boost::filesystem::path cached_filename;
+    if ( project->find_cached_file( full_filename, this->inputfiles_id_, cached_filename ) )
+    {
+      full_filename = cached_filename;
+    }
+    else
+    {
+      this->inputfiles_id_ = -1;
+    }
+  }
+    
   // Check whether the file exists
   if ( !( boost::filesystem::exists( full_filename ) ) )
   {
@@ -167,13 +182,23 @@ bool ActionImportLayer::run( Core::ActionContextHandle& context, Core::ActionRes
     LayerManager::Instance()->insert_layer( layers[ j ] );
   }
 
+  // If embedding is enabled we will generate an object that knows how to copy data to the project
+  // directory.
   if ( PreferencesManager::Instance()->embed_input_files_state_->get() )
   {
+    // Generate the copy object
     InputFilesImporterHandle inputfilesimporter = this->layer_importer_->get_inputfiles_importer();
+
+    // Get the current project
     ProjectHandle project = ProjectManager::Instance()->get_current_project();
+
+    // NOTE: Project should exist
     if ( project )
     {
+      // If the project is already on disk copy the data or else queue the copying
       project->execute_or_add_inputfiles_importer( inputfilesimporter );
+      // Keep track of where we stored the input files
+      this->inputfiles_id_ = inputfilesimporter->get_inputfiles_id();
     }
   }
 
@@ -190,6 +215,13 @@ bool ActionImportLayer::run( Core::ActionContextHandle& context, Core::ActionRes
       
     // Get the action and turn it into provenance 
     provenance_step->set_action( this->export_to_provenance_string() );   
+    
+    // Set the inputfiles cache id
+    if ( this->inputfiles_id_ > -1 )
+    {
+      // If this option is enabled record it in the provenance database
+      provenance_step->set_inputfiles_id( this->inputfiles_id_ );
+    }
     
     // Add step to provenance record
     ProvenanceStepID step_id = ProjectManager::Instance()->get_current_project()->
@@ -245,7 +277,7 @@ void ActionImportLayer::Dispatch( Core::ActionContextHandle context, const std::
   action->filename_ = filename;
   action->importer_ = importer;
   action->mode_ = mode;
-  action->cache_ = -1;
+  action->inputfiles_id_ = -1;
   
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }
@@ -263,7 +295,7 @@ void ActionImportLayer::Dispatch( Core::ActionContextHandle context,
   action->filename_ = importer->get_filename();
   action->importer_ = importer->get_name();
   action->mode_ = mode;
-  action->cache_ = -1;
+  action->inputfiles_id_ = -1;
   
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }

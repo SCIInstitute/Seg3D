@@ -42,6 +42,7 @@
 // Application includes
 #include <Application/LayerIO/ITKDataLayerExporter.h>
 #include <Application/Layer/DataLayer.h>
+#include <Application/ProjectManager/ProjectManager.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
 
 SEG3D_REGISTER_EXPORTER( Seg3D, ITKDataLayerExporter );
@@ -143,27 +144,43 @@ bool export_dicom_series( const std::string& file_path, const std::string& file_
 
   LayerMetaData meta_data = temp_handle->get_meta_data();
   std::vector< std::string > header_files;
+  ProjectHandle project = ProjectManager::Instance()->get_current_project();
+  InputFilesID inputfiles_id = -1;
+
+
   if ( PreferencesManager::Instance()->export_dicom_headers_state_->get() )
   {
-  if ( meta_data.meta_data_info_ == "dicom_filename" )
-  {
-    Core::ImportFromString( meta_data.meta_data_, header_files );
-    boost::filesystem::path file( header_files[ 0 ] ); 
-    has_header_file = true;
-    if ( header_files.size() == 0 )
+    if ( meta_data.meta_data_info_ == "dicom_filename" )
     {
-      has_header_file = false;    
-    }
+      std::vector<std::string> parts = Core::SplitString( meta_data.meta_data_, "|" );
+      Core::ImportFromString( parts[ 0 ], header_files );
 
-    for ( size_t j = 0; j < header_files.size(); j++ )
-    {
-      if ( ! boost::filesystem::exists( header_files[ j ] ) )
+      boost::filesystem::path full_file;
+      boost::filesystem::path cached_file;
+      if ( parts.size() > 1 ) Core::ImportFromString( parts[ 1 ], inputfiles_id );
+
+      has_header_file = true;   
+      for ( size_t j = 0; j < header_files.size(); j++ )
       {
-        has_header_file = false;
-        break;
+        full_file = boost::filesystem::path( header_files[ j ] );
+        // Check whether the files are cached inside the project, if so use the files
+        // in the cache
+        if ( inputfiles_id > -1 )
+        {
+          if ( project->find_cached_file( full_file, inputfiles_id, cached_file ) )
+          {
+            full_file = cached_file;
+            header_files[ j ] = full_file.string();
+          }
+        }
+
+        if ( ! boost::filesystem::exists( full_file ) )
+        {
+          has_header_file = false;
+          break;
+        }
       }
     }
-  }
   }
 
   std::string l_extension = boost::to_lower_copy( extension );
