@@ -93,6 +93,12 @@ QWidget#general_tab_, QWidget#active_tab_{
       </property>
       <item>
        <widget class="QTabWidget" name="tab_widget_">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="styleSheet">
          <string notr="true">QTabWidget#general_tab_{
   border-radius: 3px;
@@ -145,7 +151,14 @@ QWidget#general_tab_, QWidget#active_tab_{
                     <number>0</number>
                    </property>
                    <item>
-                    <widget class="Seg3D::MeasurementTableView" name="table_view_"/>
+                    <widget class="Seg3D::MeasurementTableView" name="table_view_">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                    </widget>
                    </item>
                   </layout>
                  </widget>
@@ -170,6 +183,12 @@ QWidget#general_tab_, QWidget#active_tab_{
                    </property>
                    <item>
                     <widget class="QPushButton" name="copy_button_">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
                      <property name="minimumSize">
                       <size>
                        <width>0</width>
@@ -183,6 +202,12 @@ QWidget#general_tab_, QWidget#active_tab_{
                    </item>
                    <item>
                     <widget class="QPushButton" name="delete_button_">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
                      <property name="minimumSize">
                       <size>
                        <width>0</width>
@@ -262,6 +287,12 @@ QWidget#general_tab_, QWidget#active_tab_{
                       </property>
                       <item>
                        <widget class="QRadioButton" name="rb_index_">
+                        <property name="sizePolicy">
+                         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                          <horstretch>0</horstretch>
+                          <verstretch>0</verstretch>
+                         </sizepolicy>
+                        </property>
                         <property name="text">
                          <string>Pixel</string>
                         </property>
@@ -269,6 +300,12 @@ QWidget#general_tab_, QWidget#active_tab_{
                       </item>
                       <item>
                        <widget class="QRadioButton" name="rb_world_">
+                        <property name="sizePolicy">
+                         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                          <horstretch>0</horstretch>
+                          <verstretch>0</verstretch>
+                         </sizepolicy>
+                        </property>
                         <property name="text">
                          <string>Actual</string>
                         </property>
@@ -361,6 +398,12 @@ QWidget#general_tab_, QWidget#active_tab_{
                    </property>
                    <item>
                     <widget class="QPushButton" name="export_button_">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
                      <property name="minimumSize">
                       <size>
                        <width>0</width>
@@ -499,7 +542,7 @@ QWidget#general_tab_, QWidget#active_tab_{
                    <item>
                     <widget class="Seg3D::MeasurementTextEdit" name="comment_textbox_">
                      <property name="sizePolicy">
-                      <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
+                      <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
                        <horstretch>0</horstretch>
                        <verstretch>0</verstretch>
                       </sizepolicy>
@@ -562,7 +605,7 @@ QWidget#general_tab_, QWidget#active_tab_{
                       <item>
                        <widget class="QComboBox" name="unit_combobox_">
                         <property name="sizePolicy">
-                         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                         <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
                           <horstretch>0</horstretch>
                           <verstretch>0</verstretch>
                          </sizepolicy>
@@ -602,7 +645,7 @@ QWidget#general_tab_, QWidget#active_tab_{
                          <item>
                           <widget class="QLabel" name="p0_label_">
                            <property name="sizePolicy">
-                            <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                              <horstretch>0</horstretch>
                              <verstretch>0</verstretch>
                             </sizepolicy>
@@ -625,6 +668,19 @@ QWidget#general_tab_, QWidget#active_tab_{
                            </property>
                           </widget>
                          </item>
+                         <item>
+                          <spacer name="horizontalSpacer_2">
+                           <property name="orientation">
+                            <enum>Qt::Horizontal</enum>
+                           </property>
+                           <property name="sizeHint" stdset="0">
+                            <size>
+                             <width>40</width>
+                             <height>20</height>
+                            </size>
+                           </property>
+                          </spacer>
+                         </item>
                         </layout>
                        </widget>
                       </item>
@@ -640,7 +696,7 @@ QWidget#general_tab_, QWidget#active_tab_{
                          <item>
                           <widget class="QLabel" name="p1_label_">
                            <property name="sizePolicy">
-                            <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                              <horstretch>0</horstretch>
                              <verstretch>0</verstretch>
                             </sizepolicy>
@@ -656,6 +712,19 @@ QWidget#general_tab_, QWidget#active_tab_{
                             <string>(X, Y, Z)</string>
                            </property>
                           </widget>
+                         </item>
+                         <item>
+                          <spacer name="horizontalSpacer_3">
+                           <property name="orientation">
+                            <enum>Qt::Horizontal</enum>
+                           </property>
+                           <property name="sizeHint" stdset="0">
+                            <size>
+                             <width>40</width>
+                             <height>20</height>
+                            </size>
+                           </property>
+                          </spacer>
                          </item>
                         </layout>
                        </widget>
@@ -702,7 +771,7 @@ QWidget#general_tab_, QWidget#active_tab_{
                       <item>
                        <widget class="QLabel" name="color_label_">
                         <property name="sizePolicy">
-                         <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                           <horstretch>0</horstretch>
                           <verstretch>0</verstretch>
                          </sizepolicy>
@@ -715,14 +784,14 @@ QWidget#general_tab_, QWidget#active_tab_{
                       <item>
                        <widget class="QPushButton" name="color_button_">
                         <property name="sizePolicy">
-                         <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                           <horstretch>0</horstretch>
                           <verstretch>0</verstretch>
                          </sizepolicy>
                         </property>
                         <property name="minimumSize">
                          <size>
-                          <width>0</width>
+                          <width>34</width>
                           <height>30</height>
                          </size>
                         </property>
@@ -735,6 +804,9 @@ QWidget#general_tab_, QWidget#active_tab_{
                        <spacer name="horizontalSpacer">
                         <property name="orientation">
                          <enum>Qt::Horizontal</enum>
+                        </property>
+                        <property name="sizeType">
+                         <enum>QSizePolicy::Expanding</enum>
                         </property>
                         <property name="sizeHint" stdset="0">
                          <size>
@@ -750,7 +822,7 @@ QWidget#general_tab_, QWidget#active_tab_{
                    <item>
                     <widget class="QCheckBox" name="show_checkbox_">
                      <property name="sizePolicy">
-                      <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                        <horstretch>0</horstretch>
                        <verstretch>0</verstretch>
                       </sizepolicy>
@@ -787,7 +859,7 @@ QWidget#general_tab_, QWidget#active_tab_{
                 <item>
                  <widget class="QPushButton" name="goto_first_button_">
                   <property name="sizePolicy">
-                   <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
@@ -806,7 +878,7 @@ QWidget#general_tab_, QWidget#active_tab_{
                 <item>
                  <widget class="QPushButton" name="goto_second_button_">
                   <property name="sizePolicy">
-                   <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>

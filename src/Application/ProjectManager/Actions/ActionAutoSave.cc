@@ -47,7 +47,7 @@ bool ActionAutoSave::validate( Core::ActionContextHandle& context )
   {
     context->report_error( "The project directory cannot be found." );
     // Draw the users attention to this problem.
-    CORE_LOG_CRITICAL_ERROR( "AutoSave FAILED as the project directory cannot found. "
+    CORE_LOG_CRITICAL_ERROR( "AutoSave FAILED as the project directory cannot be found. "
       "Please perform a 'Save As' as soon as possible to preserve your data." );        
     return false;
   }
