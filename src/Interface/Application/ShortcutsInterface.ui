@@ -489,7 +489,7 @@ QWidget#scrollAreaWidgetContents_4{
                    <item>
                     <widget class="QLabel" name="label_94">
                      <property name="text">
-                      <string>Compute ISO Surface:</string>
+                      <string>Compute Isosurface:</string>
                      </property>
                     </widget>
                    </item>
@@ -894,7 +894,7 @@ QWidget#scrollAreaWidgetContents_4{
                    <item>
                     <widget class="QLabel" name="label_65">
                      <property name="text">
-                      <string>Toggle iso-surface visibility:</string>
+                      <string>Toggle isosurface visibility:</string>
                      </property>
                     </widget>
                    </item>

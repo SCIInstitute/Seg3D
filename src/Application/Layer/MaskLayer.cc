@@ -55,7 +55,7 @@ public:
   void handle_isosurface_update_progress( double progress );
   void update_mask_info();
 
-  // bool to enable a different behavior when the iso surface is being generated after a session
+  // bool to enable a different behavior when the isosurface is being generated after a session
   // load.
   bool loading_;
 
@@ -104,7 +104,7 @@ void MaskLayerPrivate::initialize_states()
   // == Internal information for keeping track of which bit we are using ==
   this->layer_->add_state( "bit", this->bit_state_, 0 );
 
-  // == Keep track of whether the iso surface has been generated
+  // == Keep track of whether the isosurface has been generated
   this->layer_->add_state( "iso_generated", this->layer_->iso_generated_state_, false );
 
   // == Keep track of the calculated volume and put it in the UI

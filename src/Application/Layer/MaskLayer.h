@@ -106,10 +106,10 @@ public:
   bool set_mask_volume( Core::MaskVolumeHandle volume );
   
 
-  // -- iso surface handling --
+  // -- isosurface handling --
 public:
   // GET_ISOSURFACE:
-  // Get the iso-surface associated with this layer
+  // Get the isosurface associated with this layer
   Core::IsosurfaceHandle get_isosurface();
 
   // COMPUTE_ISOSURFACE
@@ -145,7 +145,7 @@ public:
   // State that describes whether to show the  isosurface state
   Core::StateBoolHandle show_isosurface_state_;
   
-  // State that describes whether the iso surface has been generated
+  // State that describes whether the isosurface has been generated
   Core::StateBoolHandle iso_generated_state_;
   
   // State that describes the calculated volume of the mask, as string because its connected to a 

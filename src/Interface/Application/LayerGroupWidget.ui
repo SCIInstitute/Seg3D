@@ -233,7 +233,7 @@ QWidget#tools_and_layers_widget_{
                </size>
               </property>
               <property name="toolTip">
-               <string>Click to hide/show computed iso surfaces for this group</string>
+               <string>Click to hide/show computed isosurfaces for this group</string>
               </property>
               <property name="text">
                <string/>

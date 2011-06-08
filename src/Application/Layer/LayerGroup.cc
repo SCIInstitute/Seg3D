@@ -643,7 +643,7 @@ bool LayerGroup::post_load_states( const Core::StateIO& state_io )
       
       // Here we do any post loading processing that requires both the group and layer info
       
-      // Now, if the mask had its ISO surface generated we dispatch an action to do it again
+      // Now, if the mask had its isosurface generated we dispatch an action to do it again
       if( layer_type == "mask" ) 
       {
         MaskLayerHandle temp_mask_handle = boost::dynamic_pointer_cast< MaskLayer >( layer );
