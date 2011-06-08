@@ -104,7 +104,13 @@ private:
   
   void set_full_screen( bool full_screen );
   
+  // SET_PROJECT_NAME
+  // Update the name of the project in the title bar
   void set_project_name( std::string project_name );
+  
+  // UPDATE_PROJECT_CONNECTIONS
+  // Update the project connections when a new project is opened
+  void update_project_connections();
   
   // NOTE:
   // We need to override these events for the progress widget that draws an transparent layer
@@ -154,13 +160,17 @@ public:
 
   // SETFULLSCREEN:
   // Set full screen mode of the Main Window
-  static void SetFullScreen( qpointer_type app_interface, 
-    bool full_screen, Core::ActionSource source );
+  static void SetFullScreen( qpointer_type app_interface, bool full_screen, 
+    Core::ActionSource source );
     
   // SETPROJECTNAME:
   // handles signals that the project name needs to change  
-  static void SetProjectName( qpointer_type app_interface, 
-    std::string project_name, Core::ActionSource source );
+  static void SetProjectName( qpointer_type qpointer, std::string project_name, 
+    Core::ActionSource source );
+  
+  // UPDATEPROJECTCONNECTIONS
+  // Update the connections to the current project
+  static void UpdateProjectConnections( qpointer_type qpointer );
 };
 
 } //end namespace

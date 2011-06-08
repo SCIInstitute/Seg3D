@@ -264,6 +264,10 @@ ApplicationInterface::ApplicationInterface( std::string file_to_view_on_open ) :
     this->add_connection( ProjectManager::Instance()->get_current_project()->project_name_state_->
       value_changed_signal_.connect( boost::bind( &ApplicationInterface::SetProjectName, 
       qpointer_type( this ), _1, _2 ) ) ); 
+      
+    this->add_connection( ProjectManager::Instance()->current_project_changed_signal_.connect(
+      boost::bind( &ApplicationInterface::UpdateProjectConnections, 
+      qpointer_type( this ) ) ) );  
   }
 
   if( PreferencesManager::Instance()->full_screen_on_startup_state_->get() )
@@ -449,6 +453,13 @@ void ApplicationInterface::set_project_name( std::string project_name )
     " - " + QString::fromStdString( project_name ) );
 }
 
+void ApplicationInterface::update_project_connections()
+{
+  this->add_connection( ProjectManager::Instance()->get_current_project()->project_name_state_->
+    value_changed_signal_.connect( boost::bind( &ApplicationInterface::SetProjectName, 
+    qpointer_type( this ), _1, _2 ) ) ); 
+}
+
 void ApplicationInterface::begin_progress( Core::ActionProgressHandle handle )
 {
   this->private_->focused_item_ = QApplication::focusWidget();
@@ -577,6 +588,21 @@ void ApplicationInterface::SetProjectName( qpointer_type qpointer, std::string p
 {
   Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
     &ApplicationInterface::set_project_name, qpointer.data(), project_name ) ) );
+}
+
+void ApplicationInterface::UpdateProjectConnections( qpointer_type qpointer )
+{
+  // We should be on the application thread here
+  ProjectHandle project = ProjectManager::Instance()->get_current_project();
+  if ( project )
+  {
+    std::string project_name = project->project_name_state_->get();
+    Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
+      &ApplicationInterface::set_project_name, qpointer.data(), project_name ) ) );
+  }
+  
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
+    &ApplicationInterface::update_project_connections, qpointer.data() ) ) );
 }
 
 void ApplicationInterface::raise_error_messagebox( int msg_type, std::string message )
