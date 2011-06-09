@@ -503,8 +503,13 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
         this->private_->ui_.bright_contrast_->hide();
         this->private_->ui_.datainfo_widget_->hide();
         
-        this->connect( this->private_->color_widget_, SIGNAL( color_changed( int ) ), 
+        this->connect( this->private_->color_widget_, SIGNAL( color_index_changed( int ) ), 
           this, SLOT( set_mask_background_color( int ) ) );
+
+        // Color changes only come from preferences and we only want to change the mask
+        // background color if the color was changed for the current index 
+        this->connect( this->private_->color_widget_, SIGNAL( color_changed( int ) ), 
+          this, SLOT( set_mask_background_color_from_preference_change( int ) ) );
           
         MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( layer.get() );  
         if ( mask_layer )
@@ -759,25 +764,13 @@ void LayerWidget::set_mask_background_color( int color_index )
 
 void LayerWidget::set_mask_background_color_from_preference_change( int color_index )
 {
-  if( dynamic_cast< MaskLayer* >( this->private_->layer_.get()  )->color_state_->get() != 
+  // We only want to change the mask background color if the color was changed for the 
+  // selected index 
+  if( dynamic_cast< MaskLayer* >( this->private_->layer_.get()  )->color_state_->get() == 
     color_index )
   {
-    return;
+    this->set_mask_background_color( color_index );
   }
-  
-  Core::Color color = PreferencesManager::Instance()->color_states_[ color_index ]->get();
-
-  int r = static_cast< int >( color.r() );
-  int g = static_cast< int >( color.g() );
-  int b = static_cast< int >( color.b() );
-  
-  QString style_sheet = QString::fromUtf8( 
-  "background-color: rgb(" ) + QString::number( r ) +
-  QString::fromUtf8( ", " ) + QString::number( g ) +
-  QString::fromUtf8( ", " ) + QString::number( b ) +
-  QString::fromUtf8( ");" );
-
-  this->private_->ui_.type_->setStyleSheet( style_sheet );
 }
 
 void LayerWidget::trigger_abort()

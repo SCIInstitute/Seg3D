@@ -49,6 +49,7 @@ QtColorBarWidgetConnector::QtColorBarWidgetConnector(
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
 
+    // Create color buttons for color bar
     for ( size_t j = 0; j < colors.size(); j++ )
     {
       QtColorButton* color_button =  new QtColorButton( parent, 

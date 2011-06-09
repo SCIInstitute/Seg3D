@@ -62,10 +62,10 @@ QtColorButtonConnector::~QtColorButtonConnector()
 void QtColorButtonConnector::SetButtonColor( QPointer< QtColorButtonConnector > qpointer, 
     Core::Color val, Core::ActionSource source )
 {
-  if ( source == Core::ActionSource::INTERFACE_WIDGET_E )
-  {
-    return;
-  }
+  // NOTE: Not checking ActionSource so that multiple widgets can be connected to the same state 
+  // and updated simultaneously.  For example, a INTERFACE_WIDGET_E source may be another widget, 
+  // not this one.  This is safe because there will be at most one extra call to set
+  // the state since the state will be unchanged in subsequent calls.
 
   if ( !Core::Interface::IsInterfaceThread() )
   {
