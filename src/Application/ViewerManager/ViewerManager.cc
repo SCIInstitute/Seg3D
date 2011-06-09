@@ -67,8 +67,9 @@ public:
   void update_clipping_range( size_t index );
   void handle_clipping_plane_changed( size_t index );
   void handle_clipping_plane_enabled( size_t index, bool enable );
-
+  void handle_volume_renderer_changed( std::string renderer_option );
   void update_volume_rendering_targets();
+
   void reset();
 public:
   ViewerManager* vm_;
@@ -445,6 +446,8 @@ void ViewerManagerPrivate::handle_fog_density_changed()
 
 void ViewerManagerPrivate::update_volume_rendering()
 {
+  if ( this->signal_block_count_ > 0 ) return;
+  
   for ( size_t i = 0; i < 6; ++i )
   {
     if ( this->viewers_[ i ]->is_volume_view() &&
@@ -458,6 +461,7 @@ void ViewerManagerPrivate::update_volume_rendering()
 void ViewerManagerPrivate::update_volume_rendering_targets()
 {
   std::vector< LayerIDNamePair > data_layers;
+  data_layers.push_back( std::make_pair( "<none>", "<none>" ) );
   LayerManager::Instance()->get_layer_names( data_layers, Core::VolumeType::DATA_E );
   this->vm_->volume_rendering_target_state_->set_option_list( data_layers );
 }
@@ -465,7 +469,14 @@ void ViewerManagerPrivate::update_volume_rendering_targets()
 void ViewerManagerPrivate::reset()
 {
   std::vector< LayerIDNamePair > empty_list;
+  empty_list.push_back( std::make_pair( "<none>", "<none>" ) );
   this->vm_->volume_rendering_target_state_->set_option_list( empty_list );
+}
+
+void ViewerManagerPrivate::handle_volume_renderer_changed( std::string renderer_option )
+{
+  Core::ScopedCounter signal_block( this->signal_block_count_ );
+  this->transfer_function_->faux_shading_state_->set( renderer_option == "simple_faux" );
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -519,7 +530,9 @@ ViewerManager::ViewerManager() :
     boost::bind( &ViewerManagerPrivate::update_volume_rendering, this->private_ ) ) );
 
   this->add_state( "volume_renderer", this->volume_renderer_state_, 
-    "simple", "simple=Simple|ao=Ambient Occlusion" );
+    "simple", "simple=Simple|simple_faux=Simple with Faux Shading|ao=Ambient Occlusion" );
+  this->add_connection( this->volume_renderer_state_->value_changed_signal_.connect(
+    boost::bind( &ViewerManagerPrivate::handle_volume_renderer_changed, this->private_, _2 ) ) );
   this->add_connection( this->volume_renderer_state_->state_changed_signal_.connect(
     boost::bind( &ViewerManagerPrivate::update_volume_rendering, this->private_ ) ) );
 

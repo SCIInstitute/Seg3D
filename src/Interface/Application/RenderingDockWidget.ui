@@ -248,9 +248,9 @@ QWidget#vr_content_{
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>0</y>
-         <width>262</width>
-         <height>767</height>
+         <y>-52</y>
+         <width>260</width>
+         <height>726</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="scroll_area_layout_">
@@ -1562,25 +1562,6 @@ border: 0px</string>
                     </widget>
                    </item>
                   </layout>
-                 </item>
-                 <item>
-                  <widget class="QWidget" name="widget_4" native="true">
-                   <layout class="QHBoxLayout" name="horizontalLayout_8">
-                    <property name="spacing">
-                     <number>0</number>
-                    </property>
-                    <property name="margin">
-                     <number>0</number>
-                    </property>
-                    <item>
-                     <widget class="QCheckBox" name="faux_checkbox_">
-                      <property name="text">
-                       <string>Enable faux shading</string>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </widget>
                  </item>
                  <item>
                   <layout class="QVBoxLayout" name="feature_control_layout_">

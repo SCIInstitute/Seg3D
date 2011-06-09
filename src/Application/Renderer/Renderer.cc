@@ -134,7 +134,7 @@ public:
   Core::Texture2DHandle pattern_texture_;
   Core::TextRendererHandle text_renderer_;
   Core::Texture2DHandle text_texture_;
-  Core::VolumeRendererBaseHandle volume_renderers_[ 2 ];
+  Core::VolumeRendererBaseHandle volume_renderers_[ 3 ];
 
   size_t viewer_id_;
   bool rendering_enabled_;
@@ -584,7 +584,8 @@ Renderer::Renderer( size_t viewer_id ) :
   this->private_->isosurface_shader_.reset( new IsosurfaceShader );
   this->private_->text_renderer_.reset( new Core::TextRenderer );
   this->private_->volume_renderers_[ 0 ].reset( new Core::VolumeRendererSimple );
-  this->private_->volume_renderers_[ 1 ].reset( new Core::VolumeRendererOcclusion );
+  this->private_->volume_renderers_[ 1 ] = this->private_->volume_renderers_[ 0 ];
+  this->private_->volume_renderers_[ 2 ].reset( new Core::VolumeRendererOcclusion );
   this->private_->viewer_id_ = viewer_id;
 }
 
@@ -618,7 +619,7 @@ void Renderer::post_initialize()
     this->private_->slice_shader_->initialize();
     this->private_->isosurface_shader_->initialize();
     this->private_->volume_renderers_[ 0 ]->initialize();
-    this->private_->volume_renderers_[ 1 ]->initialize();
+    this->private_->volume_renderers_[ 2 ]->initialize();
     this->private_->pattern_texture_.reset( new Core::Texture2D );
     this->private_->pattern_texture_->set_image( PATTERN_SIZE_C, PATTERN_SIZE_C, 
       GL_ALPHA, MASK_PATTERNS_C, GL_ALPHA, GL_UNSIGNED_BYTE );
@@ -883,7 +884,8 @@ bool Renderer::render()
     }
 
     // NOTE: Volume rendering should happen the last
-    if ( render_volume && vr_layer != Core::StateLabeledOption::EMPTY_OPTION_C )
+    if ( render_volume && vr_layer != "<none>" && 
+      vr_layer != Core::StateLabeledOption::EMPTY_OPTION_C )
     {
       DataLayerHandle data_layer = LayerManager::Instance()->get_data_layer_by_id( vr_layer );
       if ( data_layer && data_layer->has_valid_data() )

@@ -179,7 +179,7 @@ bool DatabaseManager::run_sql_script( const std::string& sql_str, std::string& e
     if ( sqlite3_prepare_v2( this->private_->database_, head, 
       static_cast< int >( sql_str.size() ), &statement, &tail ) != SQLITE_OK )
     {
-      error =  "The SQL statement '" + sql_str + "' failed to compile with error: "
+      error =  "The SQL statement '" + std::string( head ) + "' failed to compile with error: "
         + sqlite3_errmsg( this->private_->database_ );
       return false;
     }
@@ -188,7 +188,7 @@ bool DatabaseManager::run_sql_script( const std::string& sql_str, std::string& e
 
     if( InternalExecuteSqlStatement( statement, dummy_results ) != SQLITE_DONE )
     {
-      error =  "The SQL statement '" + sql_str + "' returned error: "
+      error =  "The SQL statement '" + std::string( head ) + "' returned error: "
         + sqlite3_errmsg( this->private_->database_ );
       return false;
     } 

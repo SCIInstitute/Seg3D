@@ -111,7 +111,7 @@ void QtTransferFunctionCurvePrivate::update_edges()
 
 qreal QtTransferFunctionCurvePrivate::get_edge_width()
 {
-  return this->active_ ? 3.5 : 1.5;
+  return this->active_ ? 6 : 4;
 }
 
 qreal QtTransferFunctionCurvePrivate::get_point_radius()

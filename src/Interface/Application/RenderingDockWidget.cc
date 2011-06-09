@@ -219,11 +219,10 @@ RenderingDockWidget::RenderingDockWidget( QWidget *parent ) :
   QtUtils::QtBridge::Show( this->private_->ui_.occlusion_widget_,
     ViewerManager::Instance()->volume_renderer_state_,
     boost::lambda::bind( &Core::StateLabeledOption::index, 
-    ViewerManager::Instance()->volume_renderer_state_.get() ) == 1 );
+    ViewerManager::Instance()->volume_renderer_state_.get() ) == 2 );
   QtUtils::QtBridge::Connect( this->private_->ui_.tf_view_->get_scene(), tf );
   QtUtils::QtBridge::Connect( this->private_->ui_.add_feature_button_, boost::bind(
     ActionNewFeature::Dispatch, Core::Interface::GetWidgetActionContext() ) );
-  QtUtils::QtBridge::Connect( this->private_->ui_.faux_checkbox_, tf->faux_shading_state_ );
   this->connect( this->private_->ui_.delete_feature_button_, SIGNAL( clicked() ),
     SLOT( delete_active_curve() ) );
   this->connect( this->private_->ui_.histogram_scale_combobox_, 
@@ -404,7 +403,7 @@ void RenderingDockWidget::handle_feature_deleted( Core::TransferFunctionFeatureH
 
 void RenderingDockWidget::handle_volume_rendering_target_changed( std::string target_id )
 {
-  if ( target_id != Core::StateLabeledOption::EMPTY_OPTION_C )
+  if ( target_id != "<none>" && target_id != Core::StateLabeledOption::EMPTY_OPTION_C )
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
     DataLayerHandle target_layer = LayerManager::Instance()->get_data_layer_by_id( target_id );

@@ -75,8 +75,8 @@ TransferFunctionFeatureWidget::TransferFunctionFeatureWidget(
     QtUtils::QtBridge::Connect( this->private_->ui_.solid_checkbox_,
       feature->solid_state_ );
     
-    this->private_->ui_.ambient_coeff_slider_->set_description( "Coefficient" );
-    this->private_->ui_.specular_intensity_slider_->set_description( "Intensity" );
+    this->private_->ui_.ambient_coeff_slider_->set_description( "Ambient" );
+    this->private_->ui_.specular_intensity_slider_->set_description( "Specular" );
     this->private_->ui_.shininess_slider_->set_description( "Shininess" );
     
     this->private_->ui_.diffuse_red_slider_->set_description( "Red" );
