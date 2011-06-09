@@ -590,7 +590,7 @@ void LayerWidget::compute_isosurface()
   // Dispatch action to compute isosurface
   MaskLayerHandle mask_layer = boost::dynamic_pointer_cast< MaskLayer >( this->private_->layer_ );
   ActionComputeIsosurface::Dispatch( Core::Interface::GetWidgetActionContext(), mask_layer, 
-    quality, capping_enabled );
+    quality, capping_enabled, true );
 }
 
 void LayerWidget::delete_isosurface()
@@ -1327,19 +1327,6 @@ void LayerWidget::export_bitmap()
 void LayerWidget::export_png()
 {
   this->export_layer( ".png" );
-}
-
-void LayerWidget::set_iso_surface_visibility( bool visibility )
-{
-  if( this->private_->layer_->get_type() == Core::VolumeType::MASK_E )
-  { 
-    MaskLayerHandle mask_layer = boost::dynamic_pointer_cast< MaskLayer >( 
-      this->private_->layer_ );
-    if( mask_layer->iso_generated_state_->get() )
-    {
-      this->private_->ui_.show_iso_surface_button_->setChecked( visibility );
-    }
-  }
 }
 
 void LayerWidget::request_provenance()

@@ -59,6 +59,15 @@ QtLogSliderIntCombo::QtLogSliderIntCombo( QWidget* parent ) :
     this, SLOT( spinner_signal( int ) ) );
   
   this->private_->ui_.horizontalSlider->setTickPosition( QSlider::NoTicks );
+
+  QFont font = this->private_->ui_.min_->font();
+#ifdef __APPLE__
+  font.setPointSize( 10 );
+#else
+  font.setPointSize( 8 );
+#endif
+  this->private_->ui_.min_->setFont( font );
+  this->private_->ui_.max_->setFont( font );
 }
 
 QtLogSliderIntCombo::~QtLogSliderIntCombo()

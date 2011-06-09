@@ -177,12 +177,9 @@ ApplicationInterface::ApplicationInterface( std::string file_to_view_on_open ) :
   this->private_->rendering_dock_window_ = new RenderingDockWidget( this );
   this->addDockWidget( Qt::RightDockWidgetArea, this->private_->rendering_dock_window_ );
 
-  this->private_->layer_manager_dock_window_ = new LayerManagerDockWidget( this );
-  this->addDockWidget( Qt::RightDockWidgetArea, this->private_->layer_manager_dock_window_ );
-
   this->private_->project_dock_window_ = new ProjectDockWidget( this );
-  this->addDockWidget( Qt::LeftDockWidgetArea, this->private_->project_dock_window_ );
-  
+  this->addDockWidget( Qt::LeftDockWidgetArea, this->private_->project_dock_window_ );  
+
 //  this->private_->history_dock_window_ = new HistoryDockWidget( this );
 //  this->addDockWidget( Qt::LeftDockWidgetArea, this->private_->history_dock_window_ );
   
@@ -191,6 +188,9 @@ ApplicationInterface::ApplicationInterface( std::string file_to_view_on_open ) :
 
   this->private_->provenance_dock_window_ = new ProvenanceDockWidget( this );
   this->addDockWidget( Qt::RightDockWidgetArea, this->private_->provenance_dock_window_ );
+
+  this->private_->layer_manager_dock_window_ = new LayerManagerDockWidget( this );
+  this->addDockWidget( Qt::RightDockWidgetArea, this->private_->layer_manager_dock_window_ );
   
   
   // Connect the windows and widgets to their visibility states

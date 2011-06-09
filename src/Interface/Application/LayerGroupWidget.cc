@@ -620,15 +620,6 @@ void LayerGroupWidget::enable_disable_duplicate_button()
   }
   this->private_->button_menu_->set_duplicate_enabled( false );
 }
-  
-void LayerGroupWidget::set_iso_surface_visibility( bool visible )
-{
-  for( std::map< std::string, LayerWidgetQHandle >::iterator it = this->layer_map_.begin(); 
-    it != this->layer_map_.end(); ++it )
-  {
-    ( *it ).second->set_iso_surface_visibility( visible );
-  }
-}
 
 void LayerGroupWidget::set_picked_up( bool up )
 {

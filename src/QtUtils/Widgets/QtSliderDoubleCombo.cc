@@ -58,6 +58,16 @@ QtSliderDoubleCombo::QtSliderDoubleCombo( QWidget* parent ) :
   this->private_->ui_.horizontalSlider->setTickInterval( 10 );
   this->private_->ui_.horizontalSlider->setPageStep( 10 );
 
+  QFont font = this->private_->ui_.min_->font();
+#ifdef __APPLE__
+  font.setPointSize( 10 );
+#else
+  font.setPointSize( 8 );
+#endif
+  this->private_->ui_.min_->setFont( font );
+  this->private_->ui_.max_->setFont( font );
+
+
     this->connect( this->private_->ui_.horizontalSlider, SIGNAL( valueChanged( int ) ), 
     this, SLOT( slider_signal( int ) ) );
     this->connect( this->private_->ui_.spinBox, SIGNAL( valueChanged( double ) ), 

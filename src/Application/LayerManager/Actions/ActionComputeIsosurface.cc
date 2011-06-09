@@ -91,17 +91,23 @@ bool ActionComputeIsosurface::run( Core::ActionContextHandle& context,
   Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
     mask_layer->show_abort_message_state_, false );
 
+  if ( this->show_ )
+  {
+    mask_layer->show_isosurface_state_->set( true );
+  }
+  
   return true;
 }
 
 void ActionComputeIsosurface::Dispatch( Core::ActionContextHandle context, 
-  MaskLayerHandle mask_layer, double quality_factor, bool capping_enabled )
+  MaskLayerHandle mask_layer, double quality_factor, bool capping_enabled, bool show )
 {
   ActionComputeIsosurface* action = new ActionComputeIsosurface;
 
   action->layer_id_= mask_layer->get_layer_id();
   action->quality_factor_ = quality_factor;
   action->capping_enabled_ = capping_enabled;
+  action->show_ = show;
 
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }

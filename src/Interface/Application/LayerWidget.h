@@ -146,10 +146,6 @@ public:
   // select all button
   void set_selected( bool selected );
   
-  // SET_ISO_SURFACE_VISIBILITY:
-  // function that sets the state of the isosurface visibility button, triggered from the layergroupwidget
-  void set_iso_surface_visibility( bool visibility );
-
 public:
   // GET_VOLUME_TYPE:
   // this function returns the type volume that the layerwidget represents

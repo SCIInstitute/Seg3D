@@ -47,6 +47,7 @@ CORE_ACTION(
   CORE_ACTION_ARGUMENT( "layerid", "The layerid of the layer for which the isosurface needs to be computed." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "quality_factor", "1.0", "The quality factor for mask downsampling prior to isosurface computation." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "capping", "false", "Whether isosurfaces will be capped." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "show", "true", "Whether isosurfaces will automatically made visible." )
   CORE_ACTION_CHANGES_PROJECT_DATA()
 )
   
@@ -57,6 +58,7 @@ public:
     this->add_parameter( this->layer_id_ );
     this->add_parameter( this->quality_factor_ );
     this->add_parameter( this->capping_enabled_ );
+    this->add_parameter( this->show_ );
   }
   
 // -- Functions that describe action --
@@ -74,13 +76,16 @@ private:
   // This parameter describes whether capping is enabled for the isosurface
   bool capping_enabled_;
 
+  // THis parameter describes whether the isosurface will be shown at the end of the computation
+  bool show_;
+  
   // -- Dispatch this action from the interface --
 public:
 
   // DISPATCH
   // Create and dispatch action that computes the isosurface for the selected layer
   static void Dispatch( Core::ActionContextHandle context, MaskLayerHandle mask_layer, 
-    double quality_factor, bool capping_enabled );
+    double quality_factor, bool capping_enabled, bool show = false );
 
   // DISPATCH:
   // Create and dispatch action that computes the isosurface for the active layer.

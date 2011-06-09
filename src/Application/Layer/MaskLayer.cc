@@ -55,10 +55,6 @@ public:
   void handle_isosurface_update_progress( double progress );
   void update_mask_info();
 
-  // bool to enable a different behavior when the isosurface is being generated after a session
-  // load.
-  bool loading_;
-
   // Extra private state information
   // NOTE: This used for saving the bit that is used in a mask to a session file. As the state
   // variables are read first, this will allow for reconstructing which data block and which bit
@@ -141,7 +137,6 @@ MaskLayer::MaskLayer( const std::string& name, const Core::MaskVolumeHandle& vol
   this->private_->mask_volume_ = volume;
   this->private_->mask_volume_->register_data();
   this->private_->layer_ = this;
-  this->private_->loading_ = false;
   
   this->private_->initialize_states();
   
@@ -158,7 +153,6 @@ MaskLayer::MaskLayer( const std::string& state_id ) :
   private_( new MaskLayerPrivate )
 {
   this->private_->layer_ = this;
-  this->private_->loading_ = false;
   this->private_->initialize_states();
 }
 
@@ -386,10 +380,6 @@ void MaskLayer::compute_isosurface( double quality_factor, bool capping_enabled 
   
   // now that we are done, we are going to set the proper 
   this->iso_generated_state_->set( true );
-  if( !this->private_->loading_ )
-  {
-    this->show_isosurface_state_->set( true );
-  }
 }
 
 void MaskLayer::delete_isosurface()

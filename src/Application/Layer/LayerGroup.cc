@@ -229,7 +229,7 @@ void LayerGroupPrivate::handle_layers_iso_visible_state_changed( std::string sta
     return;
   }
 
-  bool visible = state ==  "all";
+  bool visible = ( state ==  "all" );
 
   Core::ScopedCounter signal_block( this->signal_block_count_ );
 

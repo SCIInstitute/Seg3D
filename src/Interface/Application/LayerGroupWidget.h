@@ -193,11 +193,7 @@ private Q_SLOTS:
   // DUPLICATE_CHECKED_LAYERS:
   // dispatches actions for duplicating checked layers.
   void duplicate_checked_layers();
-  
-  // SET_ISO_SURFACE_VISIBILITY:
-  // Set whether the isosurface is visible
-  void set_iso_surface_visibility( bool visible );
-  
+    
 private:
   // TODO: These can be moved into the private class
 
