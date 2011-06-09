@@ -212,13 +212,13 @@ bool ActionPaste::run( Core::ActionContextHandle& context, Core::ActionResultHan
   prov_step->set_deleted_provenance_ids( deleted_pids );
   
   std::string action_str = ActionCopyPaste::Type() + " ";
-  action_str += Core::ExportToString( src_pid ) + " ";
-  action_str += Core::ExportToString( src_slice_type ) + " ";
-  action_str += Core::ExportToString( src_slice_number ) + " ";
-  action_str += Core::ExportToString( input_pids[ 1 ] ) + " ";
-  action_str += Core::ExportToString( this->private_->slice_type_ ) + " ";
-  action_str += Core::ExportToString( this->private_->min_slice_ ) + " ";
-  action_str += Core::ExportToString( this->private_->max_slice_ );
+  action_str += "source=" + Core::ExportToString( src_pid ) + " ";
+  action_str += "src_slice_type=" + Core::ExportToString( src_slice_type ) + " ";
+  action_str += "src_slice_number=" + Core::ExportToString( src_slice_number ) + " ";
+  action_str += "target=" + Core::ExportToString( input_pids[ 1 ] ) + " ";
+  action_str += "dst_slice_type=" + Core::ExportToString( this->private_->slice_type_ ) + " ";
+  action_str += "dst_min_slice=" + Core::ExportToString( this->private_->min_slice_ ) + " ";
+  action_str += "dst_max_slice=" + Core::ExportToString( this->private_->max_slice_ );
   prov_step->set_action( action_str );
   
   ProvenanceStepID step_id = ProjectManager::Instance()->get_current_project()->
