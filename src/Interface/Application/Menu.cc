@@ -565,9 +565,17 @@ void Menu::new_project()
     // The user selected to save the current session
     if ( ret == QMessageBox::Save )
     {
-      // Dispatch a save, the new session will be named after what ever is set in the
-      // state variable for the next session name
-      ActionSaveSession::Dispatch( Core::Interface::GetWidgetActionContext(), "" );   
+      Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+      if ( current_project->project_files_generated_state_->get() == false ||
+        current_project->project_files_accessible_state_->get() == false )
+      {
+        // We actually need to do a save as. Hence call that function
+        this->save_project_as();
+      }
+      else
+      {
+        ActionSaveSession::Dispatch( Core::Interface::GetWidgetActionContext(), "" ); 
+      }
     }
 
     if ( ret == QMessageBox::Cancel ) return;
@@ -597,9 +605,17 @@ void Menu::open_project()
     // The user selected to save the current session
     if ( ret == QMessageBox::Save )
     {
-      // Dispatch a save, the new session will be named after what ever is set in the
-      // state variable for the next session name
-      ActionSaveSession::Dispatch( Core::Interface::GetWidgetActionContext(), "" );   
+      Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+      if ( current_project->project_files_generated_state_->get() == false ||
+        current_project->project_files_accessible_state_->get() == false )
+      {
+        // We actually need to do a save as. Hence call that function
+        this->save_project_as();
+      }
+      else
+      {
+        ActionSaveSession::Dispatch( Core::Interface::GetWidgetActionContext(), "" ); 
+      }
     }
 
     if ( ret == QMessageBox::Cancel ) return;
@@ -845,9 +861,17 @@ void Menu::ConfirmRecentFileLoad( qpointer_type qpointer, const std::string& pat
     // The user selected to save the current session
     if ( ret == QMessageBox::Save )
     {
-      // Dispatch a save, the new session will be named after what ever is set in the
-      // state variable for the next session name
-      ActionSaveSession::Dispatch( Core::Interface::GetWidgetActionContext(), "" );   
+      Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+      if ( current_project->project_files_generated_state_->get() == false ||
+        current_project->project_files_accessible_state_->get() == false )
+      {
+        // We actually need to do a save as. Hence call that function
+        qpointer->save_project_as();
+      }
+      else
+      {
+        ActionSaveSession::Dispatch( Core::Interface::GetWidgetActionContext(), "" ); 
+      }
     }
 
     if ( ret == QMessageBox::Cancel ) return;

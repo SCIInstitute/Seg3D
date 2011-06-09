@@ -74,6 +74,7 @@
 #include <Interface/Application/ToolsDockWidget.h>
 #include <Interface/Application/ProvenanceDockWidget.h>
 #include <Interface/Application/ViewerInterface.h>
+#include <Interface/Application/SaveProjectAsWizard.h>
 
 #ifdef BUILD_WITH_PYTHON
 #include <Interface/Application/PythonConsoleWidget.h>
@@ -336,8 +337,19 @@ void ApplicationInterface::closeEvent( QCloseEvent* event )
     {
       this->disconnect_all();
 
+      ProjectHandle current_project = ProjectManager::Instance()->get_current_project();
       Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-      ActionSaveSession::Dispatch( Core::Interface::GetWidgetActionContext(), "" );   
+      if ( current_project->project_files_generated_state_->get() == false ||
+        current_project->project_files_accessible_state_->get() == false )
+      {
+        // We actually need to do a save as. Hence call that function
+        SaveProjectAsWizard* save_project_as_wizard_ = new SaveProjectAsWizard( this );
+        save_project_as_wizard_->exec();
+      }
+      else
+      {
+        ActionSaveSession::Dispatch( Core::Interface::GetWidgetActionContext(), "" ); 
+      }
     }
   }
   this->disconnect_all();
