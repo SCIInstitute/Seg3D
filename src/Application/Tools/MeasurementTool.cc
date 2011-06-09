@@ -1647,98 +1647,31 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 	{
 		if( measurements[ m_idx ].get_visible() )
 		{
-			Core::Measurement m = measurements[ m_idx ];
-
 			// Find position of label and length
 
 			Core::Point window_p0 = window_vertices[ m_idx ][ 0 ];
 			Core::Point window_p1 = window_vertices[ m_idx ][ 1 ];
 
-			// Find mid point
-			Core::Point mid_point = window_p0 + ( ( window_p1 - window_p0 ) / 2.0 );
+			// Find the right-most point
+			Core::Point right_point = window_p0.x() > window_p1.x() ? window_p0 : window_p1;
 
-			// Find perpendicular to line, normalize
-			Core::Vector measure_normal;
-			double dx = window_p1.x() - window_p0.x();
-			double dy = window_p0.y() - window_p1.y();
-			measure_normal = Core::Vector( dy, dx, 0 );
-			measure_normal.normalize();
-			int pixel_offset = 10;
-
-			// Put length on one side, label on other
-			bool flip_normal = measure_normal.y() < 0;
-			Core::Point label_point = mid_point + 
-				( measure_normal * pixel_offset * ( flip_normal ? -1 : 1 ) );
-			Core::Point length_point = mid_point + 
-				( measure_normal * pixel_offset * ( flip_normal ? 1 : -1 ) );
-
-			// Find angle of line
-			double angle = 0;
-			if( dx == 0 )
-			{
-				if( dy > 0 )
-				{
-					angle = 90;
-				}
-				else
-				{
-					angle = -90;
-				}
-			}
-			else
-			{
-				angle = ( atan( dy / dx ) ) * 180 / Core::Pi();
-			}
-		
-			//
-			// Label
-			//
-
-			std::string label = m.get_name();
-			int text_height = 20; // Heuristically determined -- computing actual size didn't work
-			int text_width = static_cast< int >( label.size() ) * text_height;
-
-			// Higher for more horizontal lines
-			double norm_angle = abs( angle ) / 90.0;
-			double x_offset = 0;
-			// Label to the left of line
-			if( angle < 0 )
-			{
-				x_offset = norm_angle * -0.5 * text_width; 
-			}
-
-			// Shift to the left by some amount so that the label doesn't intersect the line or the 
-			// other text
-			label_point[ 0 ] = label_point.x() + x_offset;
-
-			double y_offset = 0.5 * text_height;
-			label_point[ 1 ] = label_point.y() + y_offset;
+			// Place the labels to the right and below the right-most point
+			const int pixel_offset = 4;
+			const unsigned int font_size = 14; // Matches slice number font size
+			Core::Point label_point( right_point.x() + pixel_offset, 
+				right_point.y() + font_size + pixel_offset, 0.0 );
+			Core::Point length_point( right_point.x() + pixel_offset, 
+				right_point.y() + 2 * font_size + 2 * pixel_offset, 0.0 );
 
 			// Render label
-			unsigned int font_size = 14; // Matches slice number font size
+			Core::Measurement m = measurements[ m_idx ];
+			std::string label = m.get_name();
 			text_renderer->render( label, &buffer[ 0 ], 
 				viewer->get_width(), viewer->get_height(), static_cast< int >( label_point.x() ), 
 				viewer->get_height() - static_cast< int >( label_point.y() ), font_size, 0 );
 
-			//
-			// Length
-			//
-
-			std::string length_string = length_strings[ m_idx ];
-			text_width = static_cast< int >( length_string.size() ) * text_height;
-			
-			x_offset = 0;
-			// Label to the left of line
-			if( angle > 0 )
-			{
-				x_offset = norm_angle * -0.5 * text_width; 
-			}
-
-			// Shift to the left by some amount so that the label doesn't intersect the line or the 
-			// other text
-			length_point[ 0 ] = length_point.x() + x_offset;
-
 			// Render length
+			std::string length_string = length_strings[ m_idx ];
 			text_renderer->render( length_string, &buffer[ 0 ], 
 				viewer->get_width(), viewer->get_height(), static_cast< int >( length_point.x() ), 
 				viewer->get_height() - static_cast< int >( length_point.y() ), font_size, 0 );
