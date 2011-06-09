@@ -165,8 +165,6 @@ void ProjectManagerPrivate::reset_current_project_folder()
     PreferencesManager::Instance()->project_path_state_->get() );
 }
 
-
-
 bool ProjectManagerPrivate::setup_database()
 {
   // Find the directory where user settings are stored
@@ -431,7 +429,14 @@ boost::filesystem::path ProjectManager::get_current_project_folder()
 {
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() ); 
 
-  boost::filesystem::path current_project_folder( this->current_project_folder_state_->get() );
+  std::string current_project_folder_string = this->current_project_folder_state_->get(); 
+
+  if ( current_project_folder_string.empty() )
+  {
+    current_project_folder_string = PreferencesManager::Instance()->project_path_state_->get();     
+  }
+
+  boost::filesystem::path current_project_folder( current_project_folder_string );
   try
   {
     // Complete the path to have an absolute path
@@ -456,7 +461,7 @@ boost::filesystem::path ProjectManager::get_current_project_folder()
         ( Core::Application::GetApplicationName() + "-Projects" );
       // Try current working path
       if ( !boost::filesystem::exists( current_project_folder ) )
-      {
+      {     
         current_project_folder = current_project_folder.parent_path();
       }
     }     
@@ -508,7 +513,8 @@ bool ProjectManager::new_project( const std::string& project_location,
   // directory.
   if ( !project_location.empty() )
   {
-    if ( ! this->private_->create_project_directory( project_location, project_name, project_path ) )
+    if ( ! this->private_->create_project_directory( project_location, project_name, 
+      project_path ) )
     {
       return false;
     }
@@ -518,7 +524,7 @@ bool ProjectManager::new_project( const std::string& project_location,
   Core::Application::Reset();
 
   // Ensure that the next project default name will be increase by 1.
-  if( project_name.compare( 0, 11, "New Project" ) == 0 )
+  if( project_name.compare( 0, 12, "New Project " ) == 0 )
   {
     this->default_project_name_counter_state_->set( 
       this->default_project_name_counter_state_->get() + 1 ); 
@@ -628,6 +634,20 @@ bool ProjectManager::save_project_as( const std::string& project_location,
 {
   // This function sets state variables directly, hence we need to be on the application thread
   ASSERT_IS_APPLICATION_THREAD();
+  
+  if ( project_name.substr( 0, 12 ) == "New Project " )
+  {
+    int number;
+    if ( Core::ImportFromString( project_name.substr( 12 ), number ) )
+    {
+      int default_name_count = 
+        ProjectManager::Instance()->default_project_name_counter_state_->get();
+      if ( number >= default_name_count )
+      {
+        ProjectManager::Instance()->default_project_name_counter_state_->set( number + 1 );
+      }
+    }
+  }
   
   // Create a new directory for the project
   boost::filesystem::path project_path;

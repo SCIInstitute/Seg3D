@@ -98,9 +98,14 @@ ProjectInfoPage::ProjectInfoPage( QWidget *parent )
 
     this->project_name_label_ = new QLabel( "Project name:" );
 
-  QString default_name_count = QString::number( ProjectManager::Instance()->
-    default_project_name_counter_state_->get() );
 
+  QString default_name_count;
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    default_name_count = QString::number( ProjectManager::Instance()->
+      default_project_name_counter_state_->get() );
+  }
+  
   if( default_name_count == "0" )
     this->project_name_lineedit_ = new QLineEdit( "New Project" );
   else

@@ -123,17 +123,18 @@ SaveAsInfoPage::SaveAsInfoPage( QWidget *parent )
   this->project_name_lineedit_ = new QLineEdit();
   std::string project_name = ProjectManager::Instance()->
     get_current_project()->project_name_state_->get();
-  
-  if( project_name == "untitled_project" )
-  {
-    project_name = "";
-  }
+    
+  std::string current_project_dir = ProjectManager::Instance()->
+    get_current_project_folder().string();
     
   this->project_name_lineedit_->setText(  QString::fromStdString( project_name ) );
 
     this->project_path_label_ = new QLabel( "Project Path:" );
     this->project_path_lineedit_ = new QLineEdit;
     
+
+  this->project_path_lineedit_->setText(  QString::fromStdString( current_project_dir ) );
+
     this->project_path_change_button_ = new QPushButton( "Choose Alternative Location" );
     connect( this->project_path_change_button_, SIGNAL( clicked() ), this, SLOT( set_path() ) );
   this->project_path_change_button_->setFocusPolicy( Qt::NoFocus );

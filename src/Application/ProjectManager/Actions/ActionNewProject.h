@@ -65,7 +65,7 @@ private:
   
   // The name of the directory in which the project directory will be created
   std::string project_location_;
-  
+    
   // -- Dispatch this action from the interface --
 public:
   // DISPATCH:

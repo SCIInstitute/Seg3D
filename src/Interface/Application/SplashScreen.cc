@@ -298,11 +298,20 @@ void SplashScreen::open_recent()
 
 void SplashScreen::quick_open_file()
 {
-  ActionNewProject::Dispatch( Core::Interface::GetWidgetActionContext(), "",
-    "Untitled Project" );
-  this->hide();
-  LayerIOFunctions::ImportFiles( dynamic_cast< QMainWindow* >( this->parentWidget() ), "" );
+  // NOTE: Need to give the project a name
+  std::string default_project_name;
+  {
+    // Need to lock state engine as we are on a different thread
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    int default_name_count = ProjectManager::Instance()->default_project_name_counter_state_->get();
+    default_project_name = std::string( "New Project " ) + Core::ExportToString( default_name_count );
+  } 
   
+  ActionNewProject::Dispatch( Core::Interface::GetWidgetActionContext(), "",
+    default_project_name );
+  this->hide();
+  
+  LayerIOFunctions::ImportFiles( dynamic_cast< QMainWindow* >( this->parentWidget() ), "" );
 }
 
 
