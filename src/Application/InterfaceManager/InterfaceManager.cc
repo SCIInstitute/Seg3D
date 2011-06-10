@@ -64,12 +64,8 @@ void InterfaceManager::initialize_states()
     PreferencesManager::Instance()->show_layermanager_bar_state_->get() );
   this->add_state( "rendering_dockwidget_visible", this->rendering_dockwidget_visibility_state_, 
     PreferencesManager::Instance()->show_rendering_bar_state_->get() );
-  //this->add_state( "history_dockwidget_visibility", this->history_dockwidget_visibility_state_, 
-//    PreferencesManager::Instance()->show_history_bar_state_->get() );
   this->add_state( "provenance_dockwidget_visibility", this->provenance_dockwidget_visibility_state_, 
     PreferencesManager::Instance()->show_provenance_bar_state_->get() );
-  
-  
   
   this->add_state( "preferences_manager_visibility", this->preferences_manager_visibility_state_, false );
   this->add_state( "controller_visibility", this->controller_visibility_state_, false );
@@ -87,7 +83,7 @@ void InterfaceManager::initialize_states()
 
 int InterfaceManager::get_session_priority()
 {
-  return SessionPriority::TOOL_MANAGER_PRIORITY_E - 1;
+  return SessionPriority::DEFAULT_PRIORITY_E;
 }
 
 } // end namespace Seg3D

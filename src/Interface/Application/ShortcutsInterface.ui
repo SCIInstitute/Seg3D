@@ -1035,7 +1035,7 @@ QWidget#scrollAreaWidgetContents_4{
               <x>0</x>
               <y>0</y>
               <width>396</width>
-              <height>630</height>
+              <height>646</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -1686,6 +1686,41 @@ QWidget#scrollAreaWidgetContents_4{
                   </layout>
                  </widget>
                 </item>
+                <item>
+                 <widget class="QWidget" name="widget_61" native="true">
+                  <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="2,1">
+                   <property name="spacing">
+                    <number>4</number>
+                   </property>
+                   <property name="leftMargin">
+                    <number>10</number>
+                   </property>
+                   <property name="topMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="rightMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="bottomMargin">
+                    <number>0</number>
+                   </property>
+                   <item>
+                    <widget class="QLabel" name="label_96">
+                     <property name="text">
+                      <string>Punch Through:</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="label_97">
+                     <property name="text">
+                      <string>CTRL+P</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
                </layout>
               </widget>
              </item>
@@ -2281,15 +2316,21 @@ QWidget#scrollAreaWidgetContents_4{
                    </property>
                    <item>
                     <widget class="QLabel" name="label_47">
+                     <property name="minimumSize">
+                      <size>
+                       <width>249</width>
+                       <height>0</height>
+                      </size>
+                     </property>
                      <property name="text">
-                      <string>Controller Window:</string>
+                      <string>Provenance Window:</string>
                      </property>
                     </widget>
                    </item>
                    <item>
                     <widget class="QLabel" name="label_48">
                      <property name="text">
-                      <string>CTRL+SHIFT+C</string>
+                      <string>CTRL+SHIFT+H</string>
                      </property>
                     </widget>
                    </item>
