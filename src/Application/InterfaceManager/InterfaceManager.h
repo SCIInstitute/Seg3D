@@ -69,6 +69,9 @@ private:
   InterfaceManager();
   virtual ~InterfaceManager();
 
+public:
+  virtual int get_session_priority();
+
   // -- state variables of interface --
 public:
   // Whether the view is in full screen mode

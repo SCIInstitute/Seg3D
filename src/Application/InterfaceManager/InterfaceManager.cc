@@ -31,6 +31,7 @@
 
 #include <Application/InterfaceManager/InterfaceManager.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
+#include <Application/Project/Project.h>
 
 namespace Seg3D
 {
@@ -82,6 +83,11 @@ void InterfaceManager::initialize_states()
 
   this->add_state( "enable_controller", this->enable_controller_state_, true );
   this->add_state( "enable_tool_help", this->enable_tool_help_state_, true );
+}
+
+int InterfaceManager::get_session_priority()
+{
+  return SessionPriority::TOOL_MANAGER_PRIORITY_E - 1;
 }
 
 } // end namespace Seg3D
