@@ -28,6 +28,7 @@
 
 #include <Application/Clipboard/Clipboard.h>
 #include <Application/Clipboard/ClipboardUndoBufferItem.h>
+#include <Application/ProjectManager/ProjectManager.h>
 
 namespace Seg3D
 {
@@ -43,10 +44,13 @@ public:
 
   // Size of the item
   size_t size_;
+
+  // ID of the provenance record to delete when this undo item is applied.
+  ProvenanceStepID prov_step_id_;
 };
 
 ClipboardUndoBufferItem::ClipboardUndoBufferItem( const std::string& tag,
-  ClipboardItemHandle clipboard_item, size_t slot) :
+  ClipboardItemHandle clipboard_item, size_t slot ) :
   UndoBufferItem( tag ),
   private_( new ClipboardUndoBufferItemPrivate )
 {
@@ -62,6 +66,8 @@ ClipboardUndoBufferItem::~ClipboardUndoBufferItem()
 bool ClipboardUndoBufferItem::apply_and_clear_undo()
 {
   Clipboard::Instance()->set_item( this->private_->clipboard_item_, this->private_->slot_ );
+  ProjectManager::Instance()->get_current_project()->
+    delete_provenance_record( this->private_->prov_step_id_ );
   // Clear the checkpoint
   this->private_->clipboard_item_.reset();
   return true;
@@ -82,6 +88,11 @@ void ClipboardUndoBufferItem::compute_size()
   {
     this->private_->size_ = 0;
   }
+}
+
+void ClipboardUndoBufferItem::set_provenance_step_id( ProvenanceStepID step_id )
+{
+  this->private_->prov_step_id_ = step_id;
 }
 
 } // end namespace Seg3D

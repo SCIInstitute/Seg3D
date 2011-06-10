@@ -29,7 +29,7 @@
 #ifndef APPLICATION_TOOLS_ACTIONS_ACTIONCOPY_H
 #define APPLICATION_TOOLS_ACTIONS_ACTIONCOPY_H
 
-#include <Core/Action/Actions.h>
+#include <Application/LayerManager/LayerAction.h>
 #include <Application/LayerManager/LayerManager.h>
 
 namespace Seg3D
@@ -38,7 +38,7 @@ namespace Seg3D
 class ActionCopyPrivate;
 typedef boost::shared_ptr< ActionCopyPrivate > ActionCopyPrivateHandle;
 
-class ActionCopy : public Core::Action
+class ActionCopy : public LayerAction
 {
 
 CORE_ACTION

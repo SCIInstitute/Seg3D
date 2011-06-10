@@ -31,6 +31,7 @@
 
 // Application includes
 #include <Application/Clipboard/ClipboardItem.h>
+#include <Application/Provenance/ProvenanceStep.h>
 #include <Application/UndoBuffer/UndoBufferItem.h>
 
 namespace Seg3D
@@ -59,6 +60,10 @@ public:
   // APPLY_AND_CLEAR_UNDO:
   // Apply the undo information
   virtual bool apply_and_clear_undo();
+
+  // SET_PROVENANCE_STEP_ID:
+  // Set the provenance record ID associated with the action.
+  void set_provenance_step_id( ProvenanceStepID step_id );
 
   // -- size information --
 public:

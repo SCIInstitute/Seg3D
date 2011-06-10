@@ -193,33 +193,17 @@ bool ActionPaste::run( Core::ActionContextHandle& context, Core::ActionResultHan
   // As Copy and Paste are separate actions that actual describe one action in the provenance
   // trail, we add special logic here for now.
   
-  // TODO: We should revisit all this logic: I think we should give the clipboard contents
-  // provenance IDs.
-
-  ProvenanceID src_pid;
-  int src_slice_type;
-  size_t src_slice_number;
-  clipboard_item->get_source( src_pid, src_slice_type, src_slice_number );
-  ProvenanceIDList input_pids( 2 );
-  input_pids[ 0 ] = src_pid;
-  input_pids[ 1 ]= this->get_input_provenance_ids()[ 0 ];
+  ProvenanceID clipboard_pid = clipboard_item->get_provenance_id();
+  ProvenanceIDList input_pids = this->get_input_provenance_ids();
+  input_pids.push_back( clipboard_pid );
   ProvenanceIDList deleted_pids;
-  deleted_pids.push_back( input_pids[ 1 ] );
+  deleted_pids.push_back( input_pids[ 0 ] );
   
   ProvenanceStepHandle prov_step( new ProvenanceStep );
   prov_step->set_input_provenance_ids( input_pids );
   prov_step->set_output_provenance_ids( this->get_output_provenance_ids( 1 ) );
   prov_step->set_deleted_provenance_ids( deleted_pids );
-  
-  std::string action_str = ActionCopyPaste::Type() + " ";
-  action_str += "source=" + Core::ExportToString( src_pid ) + " ";
-  action_str += "src_slice_type=" + Core::ExportToString( src_slice_type ) + " ";
-  action_str += "src_slice_number=" + Core::ExportToString( src_slice_number ) + " ";
-  action_str += "target=" + Core::ExportToString( input_pids[ 1 ] ) + " ";
-  action_str += "dst_slice_type=" + Core::ExportToString( this->private_->slice_type_ ) + " ";
-  action_str += "dst_min_slice=" + Core::ExportToString( this->private_->min_slice_ ) + " ";
-  action_str += "dst_max_slice=" + Core::ExportToString( this->private_->max_slice_ );
-  prov_step->set_action( action_str );
+  prov_step->set_action( this->export_to_provenance_string() );
   
   ProvenanceStepID step_id = ProjectManager::Instance()->get_current_project()->
     add_provenance_record( prov_step );

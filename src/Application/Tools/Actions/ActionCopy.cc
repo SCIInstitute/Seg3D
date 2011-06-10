@@ -34,6 +34,7 @@
 #include <Application/Tools/Actions/ActionCopy.h>
 #include <Application/Layer/MaskLayer.h>
 #include <Application/LayerManager/LayerManager.h>
+#include <Application/ProjectManager/ProjectManager.h>
 #include <Application/UndoBuffer/UndoBuffer.h>
 #include <Application/ViewerManager/ViewerManager.h>
 
@@ -59,7 +60,7 @@ public:
 ActionCopy::ActionCopy() :
   private_( new ActionCopyPrivate )
 {
-  this->add_parameter( this->private_->target_layer_id_ );
+  this->add_layer_id( this->private_->target_layer_id_ );
   this->add_parameter( this->private_->slice_type_ );
   this->add_parameter( this->private_->slice_number_ );
   this->add_parameter( this->private_->slot_number_ );
@@ -144,13 +145,28 @@ bool ActionCopy::run( Core::ActionContextHandle& context, Core::ActionResultHand
 {
   ClipboardItemConstHandle old_item = Clipboard::Instance()->get_item( this->private_->slot_number_ );
   ClipboardItemHandle checkpoint;
+  ProvenanceID old_prov_id = -1;
   if ( old_item )
   {
     checkpoint = old_item->clone();
+    old_prov_id = old_item->get_provenance_id();
   }
+
+  ProvenanceStep* prov_step = new ProvenanceStep;
+  prov_step->set_input_provenance_ids( this->get_input_provenance_ids() );
+  prov_step->set_output_provenance_ids( this->get_output_provenance_ids( 1 ) );
+  if ( old_prov_id != -1 )
+  {
+    prov_step->set_deleted_provenance_ids( ProvenanceIDList( 1, old_prov_id ) );
+  }
+  prov_step->set_action( this->export_to_provenance_string() );
+  ProvenanceStepID step_id = ProjectManager::Instance()->get_current_project()->
+    add_provenance_record( ProvenanceStepHandle( prov_step ) );
+  
   ClipboardUndoBufferItemHandle undo_item( new ClipboardUndoBufferItem( "Copy",
     checkpoint, this->private_->slot_number_ ) );
   undo_item->set_redo_action( this->shared_from_this() );
+  undo_item->set_provenance_step_id( step_id );
   UndoBuffer::Instance()->insert_undo_item( context, undo_item );
   
   size_t nx = this->private_->vol_slice_->nx();
@@ -160,8 +176,7 @@ bool ActionCopy::run( Core::ActionContextHandle& context, Core::ActionResultHand
     Core::DataType::UCHAR_E, this->private_->slot_number_ );
    this->private_->vol_slice_->copy_slice_data( reinterpret_cast< unsigned char* >( 
     clipboard_item->get_buffer() ) );
-   clipboard_item->set_source( this->private_->target_layer_->provenance_id_state_->get(), 
-     this->private_->slice_type_, this->private_->slice_number_ );
+   clipboard_item->set_provenance_id( this->get_output_provenance_id() );
 
   return true;
 }

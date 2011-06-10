@@ -40,8 +40,21 @@ namespace Seg3D
 class ClipboardPrivate
 {
 public:
+  // RESET:
+  // Rest the clipboard.
+  void reset();
+
   std::vector< ClipboardItemHandle > slots_;
 };
+
+void ClipboardPrivate::reset()
+{
+  for ( size_t i = 0; i < this->slots_.size(); ++i )
+  {
+    this->slots_[ i ].reset();
+  }
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 // Implementation of class Clipboard
@@ -53,6 +66,9 @@ Clipboard::Clipboard() :
   private_( new ClipboardPrivate )
 {
   this->private_->slots_.resize( 3 );
+  // Reset the clipboard on application reset signal.
+  Core::Application::Instance()->reset_signal_.connect( boost::bind( 
+    &ClipboardPrivate::reset, this->private_ ) );
 }
 
 Clipboard::~Clipboard()

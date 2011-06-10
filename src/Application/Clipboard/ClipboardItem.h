@@ -87,13 +87,13 @@ public:
   // Returns the pointer to the buffer of the clipboard item.
   void* get_buffer();
 
-  // SET_SOURCE:
-  // Set the source information of the clipboard content.
-  void set_source( const ProvenanceID& pid, const int slice_type, const size_t slice_number );
+  // SET_PROVENANCE_ID:
+  // Set the provenance ID of the clipboard item.
+  void set_provenance_id( const ProvenanceID& pid );
 
-  // GET_SOURCE:
-  // Get the source information of the clipboard content.
-  void get_source( ProvenanceID& pid, int& slice_type, size_t& slice_number ) const;
+  // GET_PROVENANCE_ID:
+  // Get the provenance ID of the clipboard item.
+  ProvenanceID get_provenance_id() const;
 
 private:
   // RESIZE:
