@@ -1386,7 +1386,7 @@ bool MeasurementTool::handle_mouse_release( ViewerHandle viewer,
 
 bool MeasurementTool::handle_key_press( ViewerHandle viewer, int key, int modifiers )
 {
-	if( key == Core::Key::KEY_SHIFT_E && ( modifiers & Core::KeyModifier::CONTROL_MODIFIER_E ) ) 
+	if( key == Core::Key::KEY_Q_E ) 
 	{
 		this->private_->snap_key_pressed_ = true;
 
@@ -1401,7 +1401,7 @@ bool MeasurementTool::handle_key_press( ViewerHandle viewer, int key, int modifi
 
 bool MeasurementTool::handle_key_release( ViewerHandle viewer, int key, int modifiers )
 {
-	if( key == Core::Key::KEY_SHIFT_E ) 
+	if( key == Core::Key::KEY_Q_E ) 
 	{
 		this->private_->snap_key_pressed_ = false;
 
