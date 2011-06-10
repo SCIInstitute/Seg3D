@@ -255,6 +255,8 @@ void SegmentationSelectionPage::change_type_text( int index )
   
 void SegmentationSelectionPage::initializePage()
 {
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+  
   std::vector< LayerGroupHandle > groups;
   LayerManager::Instance()->get_groups( groups );
 
@@ -308,9 +310,11 @@ void SegmentationSelectionPage::initializePage()
     }
   }
   
-  this->private_->group_with_masks_tree_->topLevelItem( group_with_active_layer )->
-    setCheckState( 0, Qt::Checked );
-  
+  if ( group_with_active_layer >= 0 )
+  { 
+    this->private_->group_with_masks_tree_->topLevelItem( group_with_active_layer )->
+      setCheckState( 0, Qt::Checked );
+  }
 }
 
 bool SegmentationSelectionPage::validatePage()
