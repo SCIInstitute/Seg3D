@@ -50,8 +50,7 @@ void MeasurementItemDelegate::paint( QPainter *painter, const QStyleOptionViewIt
 {
   if( index.column() == this->color_column_ )
   {
-    // NOTE: Color editing disabled in model until dialog position can be fixed.  Still want
-    // to use paint function to set color of cell so that color doesn't change when cell is
+    // Use paint function to set color of cell so that color doesn't change when cell is
     // highlighted (selected).
     QColor measurement_color = index.model()->data( index, Qt::DecorationRole ).value< QColor >();
     painter->fillRect( option.rect, measurement_color );
@@ -85,7 +84,7 @@ const QModelIndex &index ) const
   }
   else if( index.column() == this->color_column_ )
   {
-    // NOTE: Color editing disabled in model until dialog position can be fixed
+    // TODO: Fix color dialog position on Windows
     QColorDialog* color_dialog = new QColorDialog( parent );
     color_dialog->setModal( true );
     return color_dialog;
@@ -111,7 +110,6 @@ void MeasurementItemDelegate::setEditorData( QWidget *editor, const QModelIndex 
   }
   else if( index.column() == this->color_column_ )
   {
-    // NOTE: Color editing disabled in model until dialog position can be fixed
     QColor measurement_color = index.model()->data( index, Qt::DecorationRole ).value< QColor >();
     QColorDialog* color_dialog = qobject_cast< QColorDialog* >( editor );
     color_dialog->setCurrentColor( measurement_color );
@@ -133,7 +131,6 @@ void MeasurementItemDelegate::setModelData( QWidget *editor, QAbstractItemModel 
   }
   else if( index.column() == this->color_column_ )
   {
-    // NOTE: Color editing disabled in model until dialog position can be fixed
     QColorDialog* color_dialog = qobject_cast< QColorDialog* >( editor );
     QColor color = color_dialog->currentColor();
     model->setData( index, color );

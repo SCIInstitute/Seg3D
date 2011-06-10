@@ -41,7 +41,7 @@ typedef boost::shared_ptr< RolloverLogFilePrivate > RolloverLogFilePrivateHandle
 // CLASS ROLLOVERLOGFILE:
 // Class for writing log messages to a log file that gets rolled over based on file size, number of 
 // files, and age. Creates log file in config directory.  Log file name includes application name, 
-// version, and timestamp.
+// version, and timestamp.  Logs messages in response to Log::Instance()->post_log_signal_.
 class RolloverLogFile 
 {
 public:

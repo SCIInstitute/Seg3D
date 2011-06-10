@@ -1386,7 +1386,7 @@ bool MeasurementTool::handle_mouse_release( ViewerHandle viewer,
 
 bool MeasurementTool::handle_key_press( ViewerHandle viewer, int key, int modifiers )
 {
-	if( key == Core::Key::KEY_Q_E ) 
+	/*if( key == Core::Key::KEY_Q_E ) 
 	{
 		this->private_->snap_key_pressed_ = true;
 
@@ -1394,14 +1394,14 @@ bool MeasurementTool::handle_key_press( ViewerHandle viewer, int key, int modifi
 		{
 			this->private_->snap_hover_point_to_axis();
 		}
-	}
+	}*/
 
 	return false;
 }
 
 bool MeasurementTool::handle_key_release( ViewerHandle viewer, int key, int modifiers )
 {
-	if( key == Core::Key::KEY_Q_E ) 
+	/*if( key == Core::Key::KEY_Q_E ) 
 	{
 		this->private_->snap_key_pressed_ = false;
 
@@ -1409,7 +1409,7 @@ bool MeasurementTool::handle_key_release( ViewerHandle viewer, int key, int modi
 		{
 			this->private_->move_hover_object_to_mouse();
 		}
-	}
+	}*/
 
 	return false;
 }

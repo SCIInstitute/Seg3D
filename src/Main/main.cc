@@ -102,6 +102,7 @@ int main( int argc, char **argv )
   }
 
   // -- Send message to revolving log file -- 
+  // Logs messages in response to Log::Instance()->post_log_signal_
   Core::RolloverLogFile event_log( Core::LogMessageType::ALL_E );
 
 #ifndef NDEBUG

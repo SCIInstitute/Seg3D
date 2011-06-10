@@ -344,7 +344,7 @@ QVariant MeasurementTableModel::headerData( int section, Qt::Orientation orienta
 Qt::ItemFlags MeasurementTableModel::flags( const QModelIndex &index ) const
 {
   Qt::ItemFlags flags = QAbstractItemModel::flags( index );
-  if ( index.column() == MeasurementColumns::COLOR_E ||  // TODO: Fix color dialog position
+  if ( index.column() == MeasurementColumns::COLOR_E ||  // TODO: Fix color dialog position on Windows
     index.column() == MeasurementColumns::LENGTH_E || 
     index.column() == MeasurementColumns::NAME_E ) 
   {
