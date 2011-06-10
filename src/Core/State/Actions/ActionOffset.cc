@@ -63,6 +63,12 @@ bool ActionOffset::validate( ActionContextHandle& context )
     context->report_error( error );
     return false;
   }
+
+  if ( state->get_locked() )
+  {
+    context->report_error( std::string( "State variable '" ) + stateid_ + "' has been locked." );
+    return false; 
+  }
   
   return true;
 }

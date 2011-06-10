@@ -56,6 +56,12 @@ bool ActionClear::validate( ActionContextHandle& context )
     this->state_weak_handle_ = vector_state;
   }
   
+  if ( state->get_locked() )
+  {
+    context->report_error( std::string( "State variable '" ) + stateid_ + "' has been locked." );
+    return false; 
+  }
+
   return true;
 }
 

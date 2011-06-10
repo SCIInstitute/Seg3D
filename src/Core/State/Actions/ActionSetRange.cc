@@ -62,6 +62,12 @@ bool ActionSetRange::validate(  ActionContextHandle& context )
       return false;
     }
 
+    if ( state->get_locked() )
+    {
+      context->report_error( std::string( "State variable '" ) + stateid_ + "' has been locked." );
+      return false; 
+    }
+
     this->state_weak_handle_ = ranged_value;
   }
 

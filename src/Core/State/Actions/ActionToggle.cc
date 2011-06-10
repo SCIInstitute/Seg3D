@@ -57,6 +57,12 @@ bool ActionToggle::validate(  ActionContextHandle& context )
     this->state_weak_handle_ = typed_state;
   }
 
+  if ( state->get_locked() )
+  {
+    context->report_error( std::string( "State variable '" ) + stateid_ + "' has been locked." );
+    return false; 
+  }
+
   return true;
 }
 

@@ -48,6 +48,9 @@ public:
 
   // Whether the data is part of the session data
   bool is_project_data_;
+  
+  // Whether data is locked and cannot be changed by the action mechanism
+  bool locked_;
 };
 
 StateBase::StateBase(const std::string& stateid) :
@@ -58,6 +61,7 @@ StateBase::StateBase(const std::string& stateid) :
   this->private_->initializing_ = false;
   this->private_->session_priority_ = DEFAULT_LOAD_E;
   this->private_->is_project_data_ = false;
+  this->private_->locked_ = false;
 }
 
 StateBase::~StateBase()
@@ -86,9 +90,20 @@ void StateBase::set_initializing( bool initializing )
   this->private_->initializing_ = initializing;
 }
 
-bool StateBase::get_initializing()
+bool StateBase::get_initializing() const
 {
   return this->private_->initializing_;
+}
+
+void StateBase::set_locked( bool locked )
+{
+  StateEngine::lock_type lock( StateEngine::Instance()->GetMutex() );
+  this->private_->locked_ = locked;
+}
+
+bool StateBase::get_locked() const
+{
+  return this->private_->locked_;
 }
 
 int StateBase::get_session_priority() const

@@ -117,16 +117,26 @@ protected:
   // access to the state variable, and thread safety checking is not needed. 
   // NOTE: This is mainly intended to be set in the constructor of the state handler of this
   // variable, which may need to initialize the state variables to certain values. As that handlers
-  // are can be singletons they can be created from any thread. Hence strict thread checking
+  // can be singletons they can be created from any thread. Hence strict thread checking
   // maybe an issue, however the creation of an instance normally is thread safe as no other
   // thread has access to the state parameters and signals are still being blocked.
   void set_initializing( bool initializing );
   
   // GET_INITIALIZING:
   // Query whether the state variable and its parent are still being initialized.
-  bool get_initializing();
+  bool get_initializing() const;
   
-
+public: 
+  // SET_LOCKED:
+  // Tell the program that this state variable cannot be changed by the action mechanism
+  // Only a direct set will work. This prevents any scripting system to override crucial
+  // variables.
+  void set_locked( bool locked );
+  
+  // GET_LOCKED:
+  // Query whether the variable has been designated as locked
+  bool get_locked() const; 
+  
   // -- session handling -- 
 public:
   enum 

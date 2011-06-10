@@ -75,10 +75,15 @@ void InterfaceManager::initialize_states()
   this->add_state( "python_console_visibility", this->python_console_visibility_state_, false );
 
   this->add_state( "enable_project_creation", enable_project_creation_state_, true );
+  this->enable_project_creation_state_->set_locked( true );
   this->add_state( "enable_file_import", enable_file_import_state_, true );
+  this->enable_file_import_state_->set_locked( true );
 
   this->add_state( "enable_controller", this->enable_controller_state_, true );
+  this->enable_controller_state_->set_locked( true );
   this->add_state( "enable_tool_help", this->enable_tool_help_state_, true );
+  this->enable_tool_help_state_->set_locked( true );
+
 }
 
 int InterfaceManager::get_session_priority()

@@ -48,6 +48,12 @@ bool ActionAdd::validate( ActionContextHandle& context )
     this->state_weak_handle_ = state;
   }
 
+  if ( state->get_locked() )
+  {
+    context->report_error( std::string( "State variable '" ) + stateid_ + "' has been locked." );
+    return false; 
+  }
+
   StateVectorBase* vector_state = dynamic_cast< StateVectorBase* >( state.get() );
   if ( vector_state != 0 )
   {

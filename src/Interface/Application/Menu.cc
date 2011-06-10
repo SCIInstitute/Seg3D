@@ -106,9 +106,27 @@ Menu::Menu( QMainWindow* parent ) :
     // Update to the most recent list
     this->set_recent_file_list(); 
 
+
+    // Ensure we have the right state
+    bool mask_layer_found = false;
+    bool data_layer_found = false;
+    std::vector< LayerHandle > layer_list;
+    LayerManager::Instance()->get_layers( layer_list );
+    for( size_t i = 0; i < layer_list.size(); ++i )
+    {
+      if( layer_list[ i ]->get_type() == Core::VolumeType::MASK_E )
+      {
+        mask_layer_found = true;
+      }
+      if( layer_list[ i ]->get_type() == Core::VolumeType::DATA_E )
+      {
+        data_layer_found = true;
+      }
+    }
+
     // Check what type of layer is active
-    this->enable_disable_mask_actions();
-    this->enable_disable_data_layer_actions(); 
+    this->enable_disable_mask_actions( mask_layer_found );
+    this->enable_disable_data_layer_actions( data_layer_found ); 
 
     // Automatically update the recent file list in the menu
     this->add_connection( ProjectManager::Instance()->recent_projects_changed_signal_.connect( 
@@ -117,13 +135,8 @@ Menu::Menu( QMainWindow* parent ) :
     // Automatically switch on exporting segmentations, depending on the choice of 
     // active layer.  
     this->add_connection( LayerManager::Instance()->layers_changed_signal_.connect( 
-      boost::bind( &Menu::EnableDisableMaskActions, qpointer_type( this ) ) ) );
+      boost::bind( &Menu::EnableDisableLayerActions, qpointer_type( this ) ) ) );
     
-    // Automatically switch on exporting data volumes, depending on the choice of 
-    // active layer.  
-    this->add_connection( LayerManager::Instance()->active_layer_changed_signal_.connect( 
-      boost::bind( &Menu::EnableDisableDataLayerActions, qpointer_type( this ) ) ) );
-
     // Automatically update the tag in the undo menu    
     this->add_connection( UndoBuffer::Instance()->update_undo_tag_signal_.connect(
       boost::bind( &Menu::UpdateUndoTag, qpointer_type( this ), _1 ) ) ); 
@@ -880,39 +893,16 @@ void Menu::ConfirmRecentFileLoad( qpointer_type qpointer, const std::string& pat
   ActionLoadProject::Dispatch( Core::Interface::GetWidgetActionContext(), path );
 }
 
-void Menu::enable_disable_mask_actions()
+void Menu::enable_disable_mask_actions( bool mask_layer_found )
 {
-  bool mask_layer_found = false;
-  std::vector< LayerHandle > layer_list;
-  LayerManager::Instance()->get_layers( layer_list );
-  for( size_t i = 0; i < layer_list.size(); ++i )
-  {
-    if( layer_list[ i ]->get_type() == Core::VolumeType::MASK_E )
-    {
-      mask_layer_found = true;
-    }
-  }
-  
   this->export_segmentation_qaction_->setEnabled( mask_layer_found );
-  
   this->copy_qaction_->setEnabled( mask_layer_found );
   this->paste_qaction_->setEnabled( mask_layer_found );
   this->punch_qaction_->setEnabled( mask_layer_found );
 }
 
-void Menu::enable_disable_data_layer_actions()
+void Menu::enable_disable_data_layer_actions( bool data_layer_found )
 {
-  bool data_layer_found = false;
-  std::vector< LayerHandle > layer_list;
-  LayerManager::Instance()->get_layers( layer_list );
-  for( size_t i = 0; i < layer_list.size(); ++i )
-  {
-    if( ( layer_list[ i ]->get_type() == Core::VolumeType::DATA_E ) &&
-      (  layer_list[ i ] == LayerManager::Instance()->get_active_layer() ) )
-    {
-      data_layer_found = true;
-    }
-  }
   this->export_active_data_layer_qaction_->setEnabled( data_layer_found );
 }
 
@@ -967,16 +957,32 @@ void Menu::SetRecentFileList( qpointer_type qpointer )
     &Menu::set_recent_file_list, qpointer.data() ) ) );
 }
 
-void Menu::EnableDisableMaskActions( qpointer_type qpointer )
+void Menu::EnableDisableLayerActions( qpointer_type qpointer )
 {
-  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
-    &Menu::enable_disable_mask_actions, qpointer.data() ) ) );
-}
+  // This function should be called from the application thread
+  ASSERT_IS_APPLICATION_THREAD();
+  
+  bool mask_layer_found = false;
+  bool data_layer_found = false;
+  std::vector< LayerHandle > layer_list;
+  LayerManager::Instance()->get_layers( layer_list );
+  for( size_t i = 0; i < layer_list.size(); ++i )
+  {
+    if( layer_list[ i ]->get_type() == Core::VolumeType::MASK_E )
+    {
+      mask_layer_found = true;
+    }
+    if( layer_list[ i ]->get_type() == Core::VolumeType::DATA_E )
+    {
+      data_layer_found = true;
+    }
+  }
 
-void Menu::EnableDisableDataLayerActions( qpointer_type qpointer )
-{
   Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
-    &Menu::enable_disable_data_layer_actions, qpointer.data() ) ) );
+    &Menu::enable_disable_mask_actions, qpointer.data(), mask_layer_found ) ) );
+
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
+    &Menu::enable_disable_data_layer_actions, qpointer.data(), data_layer_found ) ) );
 }
 
 
