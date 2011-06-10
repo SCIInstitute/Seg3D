@@ -401,7 +401,7 @@ void ProjectDockWidget::save_session()
   if ( current_project->project_files_generated_state_->get() == false ||
     current_project->project_files_accessible_state_->get() == false )
   {
-    SaveProjectAsWizard* save_project_as_wizard_ = new SaveProjectAsWizard( qobject_cast< QWidget* >( this->parent() ) );
+    SaveProjectAsWizard* save_project_as_wizard_ = new SaveProjectAsWizard( this->parentWidget() );
     save_project_as_wizard_->exec();
   }
 
@@ -444,7 +444,7 @@ void ProjectDockWidget::load_session()
     if ( this->private_->current_project_->check_project_changed() )
     {
       // Check whether the users wants to save and whether the user wants to quit
-      int ret = QMessageBox::warning( this, "Save Current Session ?",
+      int ret = QMessageBox::warning( this->parentWidget(), "Save Current Session ?",
         "Your current session has not been saved.\n"
         "Do you want to save your changes?",
         QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel );
@@ -687,7 +687,7 @@ void ProjectDockWidget::export_project()
   }
 
   QPointer< ProjectExportWizard > project_export_wizard_ = 
-    new ProjectExportWizard( this->private_->sessions_[ row ].session_id(), this );
+    new ProjectExportWizard( this->private_->sessions_[ row ].session_id(), this->parentWidget() );
   project_export_wizard_->show();
 
   this->disable_load_delete_and_export_buttons();

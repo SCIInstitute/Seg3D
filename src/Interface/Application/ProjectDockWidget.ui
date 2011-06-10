@@ -286,7 +286,7 @@ QPushButton:pressed{
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="sessions_tab_">
        <attribute name="title">
@@ -599,9 +599,15 @@ QPushButton:pressed{
            </item>
            <item>
             <widget class="QPushButton" name="save_note_button_">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="minimumSize">
               <size>
-               <width>75</width>
+               <width>100</width>
                <height>0</height>
               </size>
              </property>
