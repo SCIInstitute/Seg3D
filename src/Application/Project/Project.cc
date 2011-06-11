@@ -38,6 +38,7 @@
 
 // Boost includes
 #include <boost/filesystem.hpp>
+#include <boost/foreach.hpp>
 #include <boost/date_time/c_local_time_adjustor.hpp>
 
 // Core includes
@@ -89,10 +90,6 @@ public:
   // COMPUTE_DIRECTORY_SIZE
   // Compute the size in bytes used by a directory ( used by update_directory_size() )
   long long compute_directory_size( const boost::filesystem::path& directory );
-
-  // UPDATE_PROJECT_DIRECTORY:
-  // Generate all the required directories for this project
-  bool update_project_directory( const boost::filesystem::path& project_directory );
 
   // CLEAN_UP_SESSION_DATABASE:
   // this function cleans up sessions in the session list that have been deleted by the user
@@ -148,6 +145,10 @@ public:
   // QUERY_PROVENANCE_TRAIL:
   // Get all the provenance steps required to reproduce the given provenance ID.
   void query_provenance_trail( ProvenanceID prov_id, ProvenanceTrail& provenance_trail );
+
+  // GET_PROVENANCE_STEPS:
+  // Get all the provenance steps that lead to the given provenance ID.
+  void get_provenance_steps( ProvenanceID prov_id, std::set< ProvenanceStepID >& prov_steps );
   
   // EXTRACT_SESSION_INFO:
   // Extract session information from the database query result.
@@ -165,11 +166,20 @@ public:
   // Parse the session XML file and get the data generation numbers used by it.
   bool parse_session_data( const boost::filesystem::path& file_path, std::set< long long >& generations );
 
+  // PARSE_SESSION_PROVENANCE_IDS:
+  // Parse the session XML file and get the provenance IDs referenced by the session.
+  bool parse_session_provenance_ids( const boost::filesystem::path& file_path, 
+    std::vector< long long >& prov_ids );
+
   // SET_SESSION_FILE:
   // Set the session XML file if it's not named after the session ID and stores it in the database.
   // NOTE: This is only for backwards compatibility purpose when the old session XML files
   // could not be renamed.
   void set_session_file( SessionID id, const std::string& file_name );
+
+  // GET_SESSION_FILE:
+  // Get the path of the session XML file.
+  bool get_session_file( SessionID id, boost::filesystem::path& file_path, std::string& error );
   
   // PROCESS_INPUTFILE_IMPROTERS
   // try to copy all the files into the project
@@ -184,7 +194,7 @@ public:
   // GET_ALL_NOTES:
   // Get a list of all project notes.
   bool get_all_notes( ProjectNoteList& notes );
-  
+
   // -- internal variables --
 public:
   // Pointer back to the project
@@ -212,6 +222,16 @@ public:
 
   // The database that contains  the project notes.
   DatabaseManager note_database_;
+
+  // -- static helper functions --
+public:
+  // UPDATE_PROJECT_DIRECTORY:
+  // Generate all the required directories for the project
+  static bool UpdateProjectDirectory( const boost::filesystem::path& project_directory );
+
+  // CREATE_OR_IGNORE_DIRECTORY:
+  // Create the directory if it doesn't exist, otherwise do nothing.
+  static bool CreateOrIgnoreDirectory( const boost::filesystem::path& dir_path );
 };
 
 
@@ -266,27 +286,19 @@ long long ProjectPrivate::compute_directory_size( const boost::filesystem::path&
 }
 
 
-bool ProjectPrivate::update_project_directory( const boost::filesystem::path& project_directory  )
-{ 
-
+bool ProjectPrivate::UpdateProjectDirectory( const boost::filesystem::path& project_directory  )
+{
   // If the directory does not exist, make a new one
-  if ( ! boost::filesystem::exists( project_directory ) )
+  if ( !CreateOrIgnoreDirectory( project_directory ) )
   {
-    try // try to create a project folder
-    {
-      boost::filesystem::create_directory( project_directory );
-    }
-    catch ( ... )
-    {
-      // If something went wrong, log the problem and continue
-      // We should not completely fail. The user should have the opportunity to try again/
-      std::string error = std::string( "Could not create '" ) + project_directory.filename().string()
-        + "'.";
-      CORE_LOG_ERROR( error );
-      
-      // Return false to force the program to try again.
-      return false; 
-    }
+    // If something went wrong, log the problem and continue
+    // We should not completely fail. The user should have the opportunity to try again/
+    std::string error = std::string( "Could not create directory '" ) + 
+      project_directory.filename().string() + "'.";
+    CORE_LOG_ERROR( error );
+    
+    // Return false to force the program to try again.
+    return false; 
   }
 
 #if defined( __APPLE__ )  
@@ -329,78 +341,44 @@ bool ProjectPrivate::update_project_directory( const boost::filesystem::path& pr
 
   // Session folder logic
   // All session XMLs are stored here
-  if ( ! boost::filesystem::exists( project_directory / SESSION_DIR_C ) )
+  if ( !CreateOrIgnoreDirectory( project_directory / SESSION_DIR_C ) )
   {
-    try // to create a project sessions folder
-    {
-      boost::filesystem::create_directory( project_directory / SESSION_DIR_C );
-    }
-    catch ( ... )
-    {
-      std::string error = 
-        std::string( "Could not create sessions directory in project folder '" ) + 
-        project_directory.filename().string() + "'.";
-      CORE_LOG_ERROR( error );
-      return false; 
-    }   
+    std::string error = "Could not create sessions directory in project folder '" + 
+      project_directory.filename().string() + "'.";
+    CORE_LOG_ERROR( error );
+    return false; 
   }
   
   // Data directory logic
   // All the session data files are stored here
-  if ( ! boost::filesystem::exists( project_directory / DATA_DIR_C ) )
+  if ( !CreateOrIgnoreDirectory( project_directory / DATA_DIR_C ) )
   { 
-    try // to create a project data folder
-    {
-      boost::filesystem::create_directory( project_directory / DATA_DIR_C );
-    }
-    catch ( ... )
-    {
-      std::string error = 
-        std::string( "Could not create data directory in project folder '" ) + 
-        project_directory.filename().string() + "'.";
-      CORE_LOG_ERROR( error );
-      return false; 
-    }
+    std::string error = "Could not create data directory in project folder '" + 
+      project_directory.filename().string() + "'.";
+    CORE_LOG_ERROR( error );
+    return false; 
   }
   
   // Database directory logic
   // All the database files (session, provenance, and notes) are stored here.
-  if ( ! boost::filesystem::exists( project_directory / DATABASE_DIR_C ) )
-  {         
-    try // to create a database folder
-    {
-      boost::filesystem::create_directory( project_directory / DATABASE_DIR_C );
-    }
-    catch ( ... )
-    {
-      std::string error = 
-        std::string( "Could not create database directory in project folder '" ) + 
-        project_directory.filename().string() + "'.";
-      CORE_LOG_ERROR( error );
-      return false; 
-    }
+  if ( !CreateOrIgnoreDirectory( project_directory / DATABASE_DIR_C ) )
+  {
+    std::string error = "Could not create database directory in project folder '" + 
+      project_directory.filename().string() + "'.";
+    CORE_LOG_ERROR( error );
+    return false; 
   }
 
   // Inputfiles directory logic
   // All input files are stored here
-  if ( ! boost::filesystem::exists( project_directory / INPUTFILES_DIR_C ) )
+  if ( !CreateOrIgnoreDirectory( project_directory / INPUTFILES_DIR_C ) )
   {           
-    try // to create a folder to store the original input files
-    {
-      boost::filesystem::create_directory( project_directory / INPUTFILES_DIR_C );
-    }
-    catch ( ... )
-    {
-      std::string error = 
-        std::string( "Could not create inputfiles directory in project folder '" ) + 
-        project_directory.filename().string() + "'.";
-      CORE_LOG_ERROR( error );
-      return false; 
-    }   
+    std::string error = "Could not create inputfiles directory in project folder '" + 
+      project_directory.filename().string() + "'.";
+    CORE_LOG_ERROR( error );
+    return false; 
   }
-  
-  this->process_inputfile_importers();  
-  
+
   // Everything worked, we should have a valid project directory
   return true;
 } 
@@ -809,47 +787,8 @@ void ProjectPrivate::query_provenance_trail( ProvenanceID prov_id, ProvenanceTra
   if ( prov_id < 0 ) return;
 
   // Get all the provenance steps that lead to the provenance ID
-
   std::set< ProvenanceStepID > prov_steps;
-  std::queue< ProvenanceID > provenance_queue;
-  provenance_queue.push( prov_id );
-  while ( !provenance_queue.empty() )
-  {
-    ProvenanceID output_id = provenance_queue.front();
-    provenance_queue.pop();
-
-    std::string error;
-    std::string sql_str;
-    ResultSet result_set;
-
-    // Query the provenance step that generated the output_id
-    sql_str = "SELECT prov_step_id FROM provenance_output WHERE prov_id = " +
-      Core::ExportToString( output_id ) + ";";
-    if ( !this->provenance_database_.run_sql_statement( sql_str, result_set, error ) )
-    {
-      CORE_LOG_ERROR( error );
-      return;
-    }
-    if ( result_set.size() == 0 ) continue;
-
-    ProvenanceStepID prov_step_id = boost::any_cast< long long >( result_set[ 0 ][ "prov_step_id" ] );
-    prov_steps.insert( prov_step_id );
-
-    // Query the inputs of the provenance step
-    sql_str = "SELECT prov_id FROM provenance_input WHERE prov_step_id = " +
-      Core::ExportToString( prov_step_id ) + ";";
-    result_set.clear();
-    if ( !this->provenance_database_.run_sql_statement( sql_str, result_set, error ) )
-    {
-      CORE_LOG_ERROR( error );
-      return;
-    }
-    for ( size_t i = 0; i < result_set.size(); ++i )
-    {
-      ProvenanceID input_id = boost::any_cast< long long >( result_set[ i ][ "prov_id" ] );
-      provenance_queue.push( input_id );
-    }
-  }
+  this->get_provenance_steps( prov_id, prov_steps );
 
   // Query action strings for each provenance step.
   // NOTE: The provenance steps are already sorted in ascending order
@@ -1141,6 +1080,57 @@ bool ProjectPrivate::parse_session_data( const boost::filesystem::path& file_pat
   return true;
 }
 
+bool ProjectPrivate::parse_session_provenance_ids( const boost::filesystem::path& file_path, 
+                          std::vector< long long >& prov_ids )
+{
+  Core::StateIO state_io;
+  if ( !state_io.import_from_file( file_path ) ) return false;
+
+  TiXmlElement* root_element = state_io.get_current_element();
+  TiXmlElement* lm_element = root_element->FirstChildElement( "layermanager" );
+  if ( lm_element == 0 ) return false;
+
+  TiXmlElement* groups_element = lm_element->FirstChildElement( "groups" );
+  if ( groups_element == 0 ) return true;
+
+  TiXmlElement* group_element = groups_element->FirstChildElement();
+  while ( group_element != 0 )
+  {
+    TiXmlElement* layers_element = group_element->FirstChildElement( "layers" );
+    if ( layers_element == 0 ) return false;
+
+    TiXmlElement* layer_element = layers_element->FirstChildElement();
+    while ( layer_element != 0 )
+    {
+      TiXmlElement* state_element = layer_element->FirstChildElement( "State" );
+      while ( state_element != 0 )
+      {
+        const char* state_id = state_element->Attribute( "id" );
+        if ( state_id == 0 ) return false;
+        if ( strcmp( state_id, "provenance_id" ) == 0 )
+        {
+          const char* prov_id_str = state_element->GetText();
+          if ( prov_id_str == 0 || strlen( prov_id_str ) == 0 ) return false;
+          long long prov_id = -1;
+          if ( !Core::ImportFromString( prov_id_str, prov_id ) || prov_id < 0 )
+          {
+            return false;
+          }
+          prov_ids.push_back( prov_id );
+          break;
+        }
+        state_element = state_element->NextSiblingElement( "State" );
+      } // end while ( state_element != 0 )
+
+      layer_element = layer_element->NextSiblingElement();
+    } // end while ( layer_element != 0 )
+
+    group_element = group_element->NextSiblingElement();
+  } // end while ( group_element != 0 )
+
+  return true;
+}
+
 void ProjectPrivate::set_session_file( SessionID id, const std::string& file_name )
 {
   std::string sql_str = "UPDATE session SET session_file = '" + file_name +
@@ -1307,6 +1297,106 @@ bool ProjectPrivate::get_all_notes( ProjectNoteList& notes )
   return true;
 }
 
+bool ProjectPrivate::get_session_file( SessionID session_id, boost::filesystem::path& file_path, std::string& error )
+{
+  // Query session information from database
+  std::string sql_str = "SELECT session_file FROM session WHERE session_id = " + 
+    Core::ExportToString( session_id ) + ";";
+  ResultSet result_set;
+  if ( !this->session_database_.run_sql_statement( sql_str, result_set, error ) ||
+    result_set.size() == 0 )
+  {
+    error = "Session " + Core::ExportToString( session_id ) + " doesn't exist.";
+    return false;
+  }
+  assert( result_set.size() == 1 );
+
+  // Get the project directory path
+  boost::filesystem::path project_path( this->project_->project_path_state_->get() );
+
+  // Get the session XML file
+  boost::filesystem::path session_file = project_path / SESSION_DIR_C / 
+    ( Core::ExportToString( session_id ) + ".xml" );
+  if ( !boost::filesystem::exists( session_file ) )
+  {
+    try
+    {
+      std::string session_file_str = boost::any_cast< std::string >( result_set[ 0 ][ "session_file" ] );
+      session_file = project_path / SESSION_DIR_C / session_file_str;
+    }
+    catch ( ... ) {}
+  }
+
+  if ( !boost::filesystem::exists( session_file ) )
+  {
+    error = "Missing session file for session " + Core::ExportToString( session_id ) + ".";
+    return false;
+  }
+
+  file_path = session_file;
+  return true;
+}
+
+bool ProjectPrivate::CreateOrIgnoreDirectory( const boost::filesystem::path& dir_path )
+{
+  if ( !boost::filesystem::exists( dir_path ) )
+  {
+    try
+    {
+      boost::filesystem::create_directory( dir_path );
+    }
+    catch ( ... )
+    {
+      return false;
+    }
+  }
+  
+  return true;
+}
+
+void ProjectPrivate::get_provenance_steps( ProvenanceID prov_id, 
+                      std::set< ProvenanceStepID >& prov_steps )
+{
+  std::queue< ProvenanceID > provenance_queue;
+  provenance_queue.push( prov_id );
+  while ( !provenance_queue.empty() )
+  {
+    ProvenanceID output_id = provenance_queue.front();
+    provenance_queue.pop();
+
+    std::string error;
+    std::string sql_str;
+    ResultSet result_set;
+
+    // Query the provenance step that generated the output_id
+    sql_str = "SELECT prov_step_id FROM provenance_output WHERE prov_id = " +
+      Core::ExportToString( output_id ) + ";";
+    if ( !this->provenance_database_.run_sql_statement( sql_str, result_set, error ) )
+    {
+      CORE_LOG_ERROR( error );
+      return;
+    }
+    if ( result_set.size() == 0 ) continue;
+
+    ProvenanceStepID prov_step_id = boost::any_cast< long long >( result_set[ 0 ][ "prov_step_id" ] );
+    prov_steps.insert( prov_step_id );
+
+    // Query the inputs of the provenance step
+    sql_str = "SELECT prov_id FROM provenance_input WHERE prov_step_id = " +
+      Core::ExportToString( prov_step_id ) + ";";
+    result_set.clear();
+    if ( !this->provenance_database_.run_sql_statement( sql_str, result_set, error ) )
+    {
+      CORE_LOG_ERROR( error );
+      return;
+    }
+    for ( size_t i = 0; i < result_set.size(); ++i )
+    {
+      ProvenanceID input_id = boost::any_cast< long long >( result_set[ i ][ "prov_id" ] );
+      provenance_queue.push( input_id );
+    }
+  }
+}
 
 //////////////////////////////////////////////////////////
 
@@ -1529,10 +1619,10 @@ bool Project::load_project( const boost::filesystem::path& project_file )
 
   // Ensure all directories that we require are present, if not this function
   // will generate them.
-  if ( ! this->private_->update_project_directory( full_filename.parent_path() ) )
-  {
-    return false;
-  }
+  //if ( ! this->private_->update_project_directory( full_filename.parent_path() ) )
+  //{
+  //  return false;
+  //}
   
   this->project_path_state_->set( full_filename.parent_path().string() );
 
@@ -1627,7 +1717,8 @@ bool Project::save_project( const boost::filesystem::path& project_path,
     std::string project_file_name = project_name + Project::GetDefaultProjectFileExtension();
 
     // Generate the project directory if it does not exist and generate all the sub directories.
-    if ( !this->private_->update_project_directory( project_path ) )
+    if ( !ProjectPrivate::UpdateProjectDirectory( project_path ) ||
+      !this->private_->process_inputfile_importers() )
     {
       return false;
     } 
@@ -1754,67 +1845,200 @@ bool Project::export_project( const boost::filesystem::path& export_path,
   // This function sets state variables directly, hence we need to be on the application thread.
   ASSERT_IS_APPLICATION_THREAD();
 
-  // Check whether the directory in which we are exporting the data exists
-  if ( ! boost::filesystem::exists( export_path ) )
+  if ( !this->is_session( session_id ) )
   {
-    try 
-    {
-      boost::filesystem::create_directory( export_path );
-    }
-    catch ( ... )
-    {
-      std::string error = std::string( "Could not create directory '" ) +
-        export_path.string() + "'.";
-      CORE_LOG_ERROR( error );
-      return false;
-    }
+    CORE_LOG_ERROR( Core::ExportToString( session_id ) + "is not a valid session ID." );
+    return false;
   }
 
-  if ( ! boost::filesystem::is_directory( export_path ) )
+  std::string error;
+  if ( boost::filesystem::exists( export_path ) && 
+    !boost::filesystem::is_directory( export_path ) )
   {
-    std::string error = std::string( "Could not export project, because '"  ) +
+    error = std::string( "Could not export project, because '"  ) +
       export_path.string() + "' is not a directory.";
     CORE_LOG_ERROR( error );
     return false;
   }
 
-
-  // TODO: This code needs to be redone, as it currently copies all the files
-  // TODO: This code does not export provenance currently
-  
-  boost::filesystem::path project_path( this->project_path_state_->get() );
-  
-  boost::filesystem::path data_path = project_path / "data";
-  boost::filesystem::path export_data_path = export_path / "data";
-  
-  boost::filesystem::directory_iterator data_dir_itr( data_path );
-  boost::filesystem::directory_iterator data_dir_end;
-  for( ; data_dir_itr != data_dir_end; ++data_dir_itr )
+  // Create necessary directories for exporting the project
+  if ( !ProjectPrivate::UpdateProjectDirectory( export_path ) )
   {
+    return false;
+  }
+
+  boost::filesystem::path project_path( this->project_path_state_->get() );
+
+  // Make copies of the session and provenance databases
+  DatabaseManager export_session_db( this->private_->session_database_ );
+  DatabaseManager export_prov_db( this->private_->provenance_database_ );
+
+  // Delete all the session entries except the one to be exported
+  std::string sql_str = "DELETE FROM session WHERE session_id != " +
+    Core::ExportToString( session_id ) + ";";
+  if ( !export_session_db.run_sql_statement( sql_str, error ) )
+  {
+    CORE_LOG_ERROR( error );
+    return false;
+  }
+
+  // Get the session XML file
+  boost::filesystem::path session_file;
+  if ( !this->private_->get_session_file( session_id, session_file, error ) )
+  {
+    CORE_LOG_ERROR( error );
+    return false;
+  }
+
+  // Copy the session XML file
+  try
+  {
+    boost::filesystem::copy_file( session_file, export_path / SESSION_DIR_C /
+      ( Core::ExportToString( session_id ) + ".xml" ) );
+  }
+  catch ( ... )
+  {
+    CORE_LOG_ERROR( "Couldn't copy file '" + session_file.string() + "'." );
+    return false;
+  }
+
+  // Save out the session database
+  boost::filesystem::path export_session_db_path = 
+    export_path / DATABASE_DIR_C / SESSION_DATABASE_C;
+  if ( !export_session_db.save_database( export_session_db_path, error ) )
+  {
+    CORE_LOG_ERROR( error );
+    return false;
+  }
+
+  // Get data generations used by the session
+  sql_str = "SELECT data_generation FROM session_data;";
+  ResultSet result_set;
+  if ( !export_session_db.run_sql_statement( sql_str, result_set, error ) )
+  {
+    CORE_LOG_ERROR( error );
+    return false;
+  }
+  std::set< Core::DataBlock::generation_type > generations;
+  for ( size_t i = 0; i < result_set.size(); ++i )
+  {
+    generations.insert( boost::any_cast< Core::DataBlock::generation_type >(
+      result_set[ i ][ "data_generation" ] ) );
+  }
+
+  // Copy those data files
+  BOOST_FOREACH( Core::DataBlock::generation_type generation, generations )
+  {
+    boost::filesystem::path src_file = project_path / DATA_DIR_C / 
+      ( Core::ExportToString( generation ) + ".nrrd" );
+    boost::filesystem::path dst_file = export_path / DATA_DIR_C /
+      ( Core::ExportToString( generation ) + ".nrrd" );
+    if ( !boost::filesystem::exists( src_file ) )
+    {
+      CORE_LOG_ERROR( "Missing data file '" + src_file.string() + "'." );
+      return false;
+    }
     try
     {
-      boost::filesystem::copy_file( ( data_path / data_dir_itr->path().filename().string() ),
-        ( export_data_path / data_dir_itr->path().filename().string() ) );
+      boost::filesystem::copy_file( src_file, dst_file );
     }
-    catch ( ... ) 
+    catch ( ... )
     {
-      std::string error = std::string( "Could not copy file '" ) +
-        ( data_path / data_dir_itr->path().filename() ).string() + "'.";
-      CORE_LOG_ERROR( error );
+      CORE_LOG_ERROR( "Failed to copy file '" + src_file.string() + "'." );
       return false;
     }
   }
-  
-  try
+
+  // Parse out the provenance IDs referenced by the session
+  std::vector< ProvenanceID > prov_ids;
+  this->private_->parse_session_provenance_ids( session_file, prov_ids );
+
+  // Get all the provenance steps relevant to prov_ids
+  std::set< ProvenanceStepID > prov_steps;
+  BOOST_FOREACH( ProvenanceID prov_id, prov_ids )
   {
-    boost::filesystem::copy_file( ( project_path / SESSION_DIR_C / 
-      ( Core::ExportToString( session_id ) + ".xml" ) ),
-      ( export_path / SESSION_DIR_C / ( Core::ExportToString( session_id ) + ".xml" ) ) );
+    this->private_->get_provenance_steps( prov_id, prov_steps );
   }
-  catch ( ... ) // any errors that we might get thrown
+
+  // Delete irrelevant provenance records from the provenance database
+  if ( !prov_steps.empty() )
   {
-    std::string error = std::string( "Could not copy file '" ) +
-      ( project_path / SESSION_DIR_C / ( Core::ExportToString( session_id ) + ".xml" ) ).string() + "'.";
+    sql_str = "DELETE FROM provenance_step WHERE prov_step_id NOT IN (";
+    BOOST_FOREACH( ProvenanceStepID step_id, prov_steps )
+    {
+      sql_str += ( Core::ExportToString( step_id ) + "," );
+    }
+    sql_str[ sql_str.size() - 1 ] = ')';
+    sql_str += ";";
+  }
+  else
+  {
+    sql_str = "DELETE FROM provenance_step;";
+  }
+  if ( !export_prov_db.run_sql_statement( sql_str, error ) )
+  {
+    CORE_LOG_ERROR( error );
+    return false;
+  }
+  
+  // Save out the provenance database
+  boost::filesystem::path export_provenance_db_path = 
+    export_path / DATABASE_DIR_C / PROVENANCE_DATABASE_C;
+  if ( !export_prov_db.save_database( export_provenance_db_path, error ) )
+  {
+    CORE_LOG_ERROR( error );
+    return false;
+  }
+
+  // Copy inputfiles
+  sql_str = "SELECT inputfiles_cache_id FROM provenance_inputfiles_cache;";
+  if ( !export_prov_db.run_sql_statement( sql_str, result_set, error ) )
+  {
+    CORE_LOG_ERROR( error );
+    return false;
+  }
+  BOOST_FOREACH( ResultSet::value_type result, result_set )
+  {
+    long long inputfiles_cache_id = boost::any_cast< long long >( result[ "inputfiles_cache_id" ] );
+    boost::filesystem::path src_dir = project_path / INPUTFILES_DIR_C / 
+      Core::ExportToString( inputfiles_cache_id );
+    boost::filesystem::path dst_dir = export_path / INPUTFILES_DIR_C /
+      Core::ExportToString( inputfiles_cache_id );
+    try
+    {
+      boost::filesystem3::copy_directory( src_dir, dst_dir );
+    }
+    catch ( ... )
+    {
+      CORE_LOG_ERROR( "Failed to copy directory '" + src_dir.string() + "'." );
+      return false;
+    }
+  }
+
+  // Save out the notes database
+  boost::filesystem::path export_note_db_path =
+    export_path / DATABASE_DIR_C / NOTE_DATABASE_C;
+  if ( !this->private_->note_database_.save_database( export_note_db_path, error ) )
+  {
+    CORE_LOG_ERROR( error );
+    return false;
+  }
+
+  // Write out the project file
+  boost::filesystem::path export_project_file = export_path / 
+    ( project_name + GetDefaultProjectFileExtension() );
+  Core::StateIO stateio;
+  stateio.initialize();
+  if ( !this->save_states( stateio ) )
+  {
+    error = std::string( "Failed to save out the state of the project to file" );
+    CORE_LOG_ERROR( error );
+    return false;
+  }
+  if ( !stateio.export_to_file( export_project_file ) )
+  {
+    std::string error = std::string( "Failed to write project file '" ) +
+      export_project_file.string() + "'.";
     CORE_LOG_ERROR( error );
     return false;
   }
@@ -1871,41 +2095,15 @@ bool Project::load_session( SessionID session_id )
   // This function sets state variables directly, hence we need to be on the application thread
   ASSERT_IS_APPLICATION_THREAD();
 
-  // Query session information from database
-  std::string sql_str = "SELECT * FROM session WHERE session_id = " + 
-    Core::ExportToString( session_id ) + ";";
-  ResultSet result_set;
-  std::string error;
-  if ( !this->private_->session_database_.run_sql_statement( sql_str, result_set, error ) ||
-    result_set.size() == 0 )
-  {
-    CORE_LOG_ERROR( "Session " + Core::ExportToString( session_id ) + " doesn't exist." );
-    return false;
-  }
-  assert( result_set.size() == 1 );
-
-  // Get the project directory path
-  boost::filesystem::path project_path( this->project_path_state_->get() );
-
   // Get the session XML file
-  boost::filesystem::path session_file = project_path / SESSION_DIR_C / 
-    ( Core::ExportToString( session_id ) + ".xml" );
-  if ( !boost::filesystem::exists( session_file ) )
+  std::string error;
+  boost::filesystem::path session_file;
+  if ( !this->private_->get_session_file( session_id, session_file, error ) )
   {
-    try
-    {
-      std::string session_file_str = boost::any_cast< std::string >( result_set[ 0 ][ "session_file" ] );
-      session_file = project_path / SESSION_DIR_C / session_file_str;
-    }
-    catch ( ... ) {}
-  }
-
-  if ( !boost::filesystem::exists( session_file ) )
-  {
-    CORE_LOG_ERROR( "Missing session file for session " + Core::ExportToString( session_id ) );
+    CORE_LOG_ERROR( error );
     return false;
   }
-
+  
   // Tell program that project does not yet need to be saved.
   this->reset_project_changed();
   
@@ -2039,60 +2237,19 @@ bool Project::delete_session( SessionID session_id )
   ASSERT_IS_APPLICATION_THREAD();
 
   std::string error;
-  ResultSet result_set;
-  std::string sql_str = "SELECT session_id, session_file FROM session WHERE session_id = "
-    + Core::ExportToString( session_id ) + ";";
-  if ( !this->private_->session_database_.run_sql_statement( sql_str, result_set, error ) ||
-    result_set.size() == 0 )
-  {
-    CORE_LOG_ERROR( "Session " + Core::ExportToString( session_id ) + " doesn't exist." );
-    return false;
-  }
-
-  // Get the project directory path
-  boost::filesystem::path project_path( this->project_path_state_->get() );
-
-  // First, try session ID as the session file name
-  boost::filesystem::path session_file = project_path / SESSION_DIR_C / 
-    ( Core::ExportToString( session_id ) + ".xml" );
-  if ( boost::filesystem::exists( session_file ) )
+  boost::filesystem::path session_file;
+  if ( this->private_->get_session_file( session_id, session_file, error ) )
   {
     try
     {
       boost::filesystem::remove( session_file );
     }
-    catch ( ... )
+    catch ( ... ) 
     {
       CORE_LOG_ERROR( "Couldn't delete file '" + session_file.string() + "'." );
     }
   }
-  else
-  {
-    // Otherwise, if there is 'session_file' explicitly stored in the database, try it also
-    std::string session_file_str;
-    try
-    {
-      session_file_str = boost::any_cast< std::string >( result_set[ 0 ][ "session_file" ] );
-    }
-    catch ( ... ) {}
-
-    if ( !session_file_str.empty() )
-    {
-      session_file = project_path / SESSION_DIR_C / session_file_str;
-      if ( boost::filesystem::exists( session_file ) ) 
-      {
-        try
-        {
-          boost::filesystem::remove( session_file );
-        }
-        catch ( ... ) 
-        {
-          CORE_LOG_ERROR( "Couldn't delete file '" + session_file.string() + "'." );
-        }
-      }
-    }
-  }
-
+  
   // Delete the file from the database
   this->private_->delete_session_from_database( session_id );
   

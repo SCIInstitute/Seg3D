@@ -26,6 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#include <sqlite3.h>
+
 // Core includes
 #include <Core/Utils/StringUtil.h>
 
@@ -33,6 +35,7 @@
 #include <Application/DatabaseManager/DatabaseManager.h>
 
 // Core includes
+#include <Core/Utils/Exception.h>
 #include <Core/Utils/Lockable.h>
 
 
@@ -43,9 +46,6 @@ class DatabaseManagerPrivate : public Core::RecursiveLockable {
 public:
   // The actual database
   sqlite3* database_;
-  
-  // Where the database is located on disk
-  boost::filesystem::path database_path_;
 };
 
 
@@ -66,6 +66,32 @@ DatabaseManager::DatabaseManager() :
   }
 }
 
+DatabaseManager::DatabaseManager( const DatabaseManager& src ) :
+  private_( new DatabaseManagerPrivate )
+{
+  // Open a in-memory database
+  sqlite3_open( ":memory:", &this->private_->database_ );
+
+  {
+    // Lock the source database
+    DatabaseManagerPrivate::lock_type lock( src.private_->get_mutex() );
+    // Copy the database content from the source
+    sqlite3_backup* db_backup_obj = sqlite3_backup_init( this->private_->database_,
+      "main", src.private_->database_, "main" );
+    if ( db_backup_obj == NULL )
+    {
+      CORE_THROW_EXCEPTION( std::string( "Failed to copy database: " ) + 
+        sqlite3_errmsg( this->private_->database_ ) );
+    }
+
+    sqlite3_backup_step( db_backup_obj, -1 );
+    sqlite3_backup_finish( db_backup_obj );
+  }
+
+  // Enable foreign key
+  std::string error;
+  this->run_sql_statement( "PRAGMA foreign_keys = ON;", error );
+}
 
 DatabaseManager::~DatabaseManager()
 { 
@@ -133,6 +159,8 @@ bool DatabaseManager::run_sql_statement( const std::string& sql_str, std::string
 bool DatabaseManager::run_sql_statement( const std::string& sql_str, ResultSet& results, 
   std::string& error )
 {
+  results.clear();
+
   DatabaseManagerPrivate::lock_type lock( this->private_->get_mutex() );
 
   if ( this->private_->database_ == NULL )

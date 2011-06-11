@@ -39,10 +39,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/any.hpp>
-
-// Sqlite includes
-#include <Externals/sqlite/sqlite3.h>
-
+#include <boost/utility.hpp>
 
 namespace Seg3D
 {
@@ -53,11 +50,16 @@ typedef std::vector< std::map< std::string, boost::any > > ResultSet;
 class DatabaseManagerPrivate;
 
 // Class definition
-class DatabaseManager
+class DatabaseManager : public boost::noncopyable
 {
   // -- Constructor/Destructor --
 public:
+  // Default constructor
   DatabaseManager();
+
+  // Copy constructor
+  DatabaseManager( const DatabaseManager& src );
+
   virtual ~DatabaseManager();
   
 public:
