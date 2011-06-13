@@ -73,7 +73,7 @@ public:
   QWidget *statusbar_widget_;
   
   bool show_world_coord_;
-  DataPointInfo data_point_info_;
+  DataPointInfoHandle data_point_info_;
   
 };
 
@@ -198,7 +198,15 @@ void StatusBarWidget::update_data_point_info( DataPointInfoHandle data_point )
     return;
   }
 
-  this->private_->data_point_info_ = *data_point;
+  if ( data_point )
+  {
+    this->private_->data_point_info_.reset( new DataPointInfo( *data_point ) );
+  }
+  else
+  {
+    this->private_->data_point_info_.reset();
+  }
+  
   this->update_data_point_label();
 }
   
@@ -211,15 +219,24 @@ void StatusBarWidget::update_data_point_label()
       zero_based_slice_numbers_state_->get();
   }
   
+  // If there is no data to display
+  if ( !this->private_->data_point_info_ )
+  {
+    this->private_->ui_.x_->setText( "---" );
+    this->private_->ui_.y_->setText( "---" );
+    this->private_->ui_.z_->setText( "---" );
+    this->private_->ui_.value_->setText( "---" );
+    return;
+  }
   
   // get some local copies of the data
-  double world_x = this->private_->data_point_info_.world_coord().x();
-  double world_y = this->private_->data_point_info_.world_coord().y();
-  double world_z = this->private_->data_point_info_.world_coord().z();
+  double world_x = this->private_->data_point_info_->world_coord().x();
+  double world_y = this->private_->data_point_info_->world_coord().y();
+  double world_z = this->private_->data_point_info_->world_coord().z();
   
-  double index_x = this->private_->data_point_info_.index_coord().x();
-  double index_y = this->private_->data_point_info_.index_coord().y();
-  double index_z = this->private_->data_point_info_.index_coord().z();
+  double index_x = this->private_->data_point_info_->index_coord().x();
+  double index_y = this->private_->data_point_info_->index_coord().y();
+  double index_z = this->private_->data_point_info_->index_coord().z();
   
   if ( !zero_based_slice_numbers )
   {
@@ -231,7 +248,7 @@ void StatusBarWidget::update_data_point_label()
   
   // In the case that all the coordinates are 0 then show nice 0's.
   if( ( world_x == 0 ) && ( world_y == 0 ) && ( world_z == 0 ) && 
-    ( this->private_->data_point_info_.value() == 0 ) )
+    ( this->private_->data_point_info_->value() == 0 ) )
   { 
     this->private_->ui_.x_->setText( QString::fromUtf8("0.000") );
     this->private_->ui_.y_->setText( QString::fromUtf8("0.000") );
@@ -297,7 +314,7 @@ void StatusBarWidget::update_data_point_label()
   }
 
   // Value 
-  double val = this->private_->data_point_info_.value();
+  double val = this->private_->data_point_info_->value();
   if( ( 0.0 < val && val < 0.0001 ) || 1000 < val ) // Use scientific notation
   {
     this->private_->ui_.value_->setText( QString( "%1" ).arg( val, 0, 'e', 2 ) );

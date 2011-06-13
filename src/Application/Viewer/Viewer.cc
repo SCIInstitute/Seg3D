@@ -1604,13 +1604,11 @@ void Viewer::update_status_bar( int x, int y, const std::string& layer_id )
       }
       DataPointInfoHandle data_point( new DataPointInfo( index, world_pos, value ) );
       StatusBar::Instance()->set_data_point_info( data_point );
-    }
-    else
-    {
-      DataPointInfoHandle data_point( new DataPointInfo );
-      StatusBar::Instance()->set_data_point_info( data_point );
+      return;
     }
   }
+
+  StatusBar::Instance()->set_data_point_info( DataPointInfoHandle() );
 }
 
 bool Viewer::is_volume_view() const
