@@ -45,6 +45,7 @@
 #include <Core/Application/Application.h>
 #include <Core/State/StateIO.h>
 #include <Core/Utils/Exception.h>
+#include <Core/Utils/FilesystemUtil.h>
 #include <Core/Utils/StringUtil.h>
 #include <Core/Utils/Log.h>
 #include <Core/DataBlock/DataBlockManager.h>
@@ -103,12 +104,7 @@ public:
   // Save the state of the current project into the xml file and save the database
   // in the database file
   bool save_state( const boost::filesystem::path& project_directory );  
-  
-  // COPY_ALL_FILES:
-  // Copy all files from one directory into another directory
-  bool copy_all_files( const boost::filesystem::path& src_path, 
-    const boost::filesystem::path& dst_path, bool copy_s3d_file = false );
-    
+      
   // SET_LAST_SAVED_SESSION_TIME_STAMP
   // this function updates the time of when the last session was saved
   void set_last_saved_session_time_stamp();
@@ -228,10 +224,6 @@ public:
   // UPDATE_PROJECT_DIRECTORY:
   // Generate all the required directories for the project
   static bool UpdateProjectDirectory( const boost::filesystem::path& project_directory );
-
-  // CREATE_OR_IGNORE_DIRECTORY:
-  // Create the directory if it doesn't exist, otherwise do nothing.
-  static bool CreateOrIgnoreDirectory( const boost::filesystem::path& dir_path );
 };
 
 
@@ -289,7 +281,7 @@ long long ProjectPrivate::compute_directory_size( const boost::filesystem::path&
 bool ProjectPrivate::UpdateProjectDirectory( const boost::filesystem::path& project_directory  )
 {
   // If the directory does not exist, make a new one
-  if ( !CreateOrIgnoreDirectory( project_directory ) )
+  if ( !Core::CreateOrIgnoreDirectory( project_directory ) )
   {
     // If something went wrong, log the problem and continue
     // We should not completely fail. The user should have the opportunity to try again/
@@ -341,7 +333,7 @@ bool ProjectPrivate::UpdateProjectDirectory( const boost::filesystem::path& proj
 
   // Session folder logic
   // All session XMLs are stored here
-  if ( !CreateOrIgnoreDirectory( project_directory / SESSION_DIR_C ) )
+  if ( !Core::CreateOrIgnoreDirectory( project_directory / SESSION_DIR_C ) )
   {
     std::string error = "Could not create sessions directory in project folder '" + 
       project_directory.filename().string() + "'.";
@@ -351,7 +343,7 @@ bool ProjectPrivate::UpdateProjectDirectory( const boost::filesystem::path& proj
   
   // Data directory logic
   // All the session data files are stored here
-  if ( !CreateOrIgnoreDirectory( project_directory / DATA_DIR_C ) )
+  if ( !Core::CreateOrIgnoreDirectory( project_directory / DATA_DIR_C ) )
   { 
     std::string error = "Could not create data directory in project folder '" + 
       project_directory.filename().string() + "'.";
@@ -361,7 +353,7 @@ bool ProjectPrivate::UpdateProjectDirectory( const boost::filesystem::path& proj
   
   // Database directory logic
   // All the database files (session, provenance, and notes) are stored here.
-  if ( !CreateOrIgnoreDirectory( project_directory / DATABASE_DIR_C ) )
+  if ( !Core::CreateOrIgnoreDirectory( project_directory / DATABASE_DIR_C ) )
   {
     std::string error = "Could not create database directory in project folder '" + 
       project_directory.filename().string() + "'.";
@@ -371,7 +363,7 @@ bool ProjectPrivate::UpdateProjectDirectory( const boost::filesystem::path& proj
 
   // Inputfiles directory logic
   // All input files are stored here
-  if ( !CreateOrIgnoreDirectory( project_directory / INPUTFILES_DIR_C ) )
+  if ( !Core::CreateOrIgnoreDirectory( project_directory / INPUTFILES_DIR_C ) )
   {           
     std::string error = "Could not create inputfiles directory in project folder '" + 
       project_directory.filename().string() + "'.";
@@ -492,64 +484,6 @@ bool ProjectPrivate::save_state( const boost::filesystem::path& project_director
   
   return true;
 }
-
-
-bool ProjectPrivate::copy_all_files( const boost::filesystem::path& src_path, 
-  const boost::filesystem::path& dst_path, bool copy_s3d_file )
-{
-  if ( ! boost::filesystem::exists( dst_path ) )
-  {
-    try // to create a project sessions folder
-    {
-      boost::filesystem::create_directory( dst_path );
-    }
-    catch ( ... )
-    {
-      std::string error = std::string( "Could not create directory '" ) +
-        dst_path.string() + "'.";
-      CORE_LOG_ERROR( error );
-      return false;
-    }
-  }
-
-  std::string extension = Project::GetDefaultProjectFileExtension();
-  
-  boost::filesystem::directory_iterator dir_end;
-  for( boost::filesystem::directory_iterator dir_itr( src_path ); 
-    dir_itr != dir_end; ++dir_itr )
-  {
-    // Only copy regular files and directories
-    // Do not touch symbolic links, as they can generate circular paths
-    boost::filesystem::path dir_file( src_path / dir_itr->path().filename().string() );
-    
-    if ( boost::filesystem::is_regular_file( dir_file ) )
-    {
-      if ( !copy_s3d_file && dir_file.extension() == extension ) continue;
-      try
-      {
-        boost::filesystem::copy_file( dir_file, ( dst_path / dir_itr->path().filename().string() ) );
-      }
-      catch ( ... )
-      {
-        std::string error = std::string( "Could not copy file '" ) +
-          dir_itr->path().filename().string() + "'.";
-        CORE_LOG_ERROR( error );
-        return false;
-      }
-    }
-    else if ( boost::filesystem::is_directory( dir_file ) )
-    {
-      // Iterative copy of all files
-      if ( ! this->copy_all_files( dir_file, ( dst_path / dir_itr->path().filename().string() ), true ) )
-      {
-        return false;
-      }
-    }
-  }
-
-  return true;
-}
-
 
 void ProjectPrivate::clean_up_data_files()
 {
@@ -1337,23 +1271,6 @@ bool ProjectPrivate::get_session_file( SessionID session_id, boost::filesystem::
   return true;
 }
 
-bool ProjectPrivate::CreateOrIgnoreDirectory( const boost::filesystem::path& dir_path )
-{
-  if ( !boost::filesystem::exists( dir_path ) )
-  {
-    try
-    {
-      boost::filesystem::create_directory( dir_path );
-    }
-    catch ( ... )
-    {
-      return false;
-    }
-  }
-  
-  return true;
-}
-
 void ProjectPrivate::get_provenance_steps( ProvenanceID prov_id, 
                       std::set< ProvenanceStepID >& prov_steps )
 {
@@ -1717,8 +1634,7 @@ bool Project::save_project( const boost::filesystem::path& project_path,
     std::string project_file_name = project_name + Project::GetDefaultProjectFileExtension();
 
     // Generate the project directory if it does not exist and generate all the sub directories.
-    if ( !ProjectPrivate::UpdateProjectDirectory( project_path ) ||
-      !this->private_->process_inputfile_importers() )
+    if ( !ProjectPrivate::UpdateProjectDirectory( project_path ) )
     {
       return false;
     } 
@@ -1728,6 +1644,9 @@ bool Project::save_project( const boost::filesystem::path& project_path,
 
     // Make sure that the program knows that the current project now lives on disk. 
     this->project_files_generated_state_->set( true );
+
+    // Copy all the input files into the project directory
+    this->private_->process_inputfile_importers();
 
     // Save the current session so there is something to load when the project is opened.
     return this->save_session( this->current_session_name_state_->get() );
@@ -1777,9 +1696,20 @@ bool Project::save_project( const boost::filesystem::path& project_path,
     }
     else
     {
-      // OK copy the full project to the new directory, except the .s3d file
-      this->private_->copy_all_files( current_project_path, project_path, false );
-      
+      // OK copy the full project to the new directory
+      if ( !Core::RecursiveCopyDirectory( current_project_path, project_path ) )
+      {
+        CORE_LOG_ERROR( "Couldn't copy the project directory to the new location." );
+        return false;
+      }
+
+      // Delete the project file from the new directory because a new one will be generated
+      try
+      {
+        boost::filesystem::remove( project_path / current_project_file );
+      }
+      catch ( ... ) {}
+
       // Update the project
       this->project_name_state_->set( project_name );
       this->project_file_state_->set( project_name + 
@@ -2004,11 +1934,7 @@ bool Project::export_project( const boost::filesystem::path& export_path,
       Core::ExportToString( inputfiles_cache_id );
     boost::filesystem::path dst_dir = export_path / INPUTFILES_DIR_C /
       Core::ExportToString( inputfiles_cache_id );
-    try
-    {
-      boost::filesystem3::copy_directory( src_dir, dst_dir );
-    }
-    catch ( ... )
+    if ( !Core::RecursiveCopyDirectory( src_dir, dst_dir ) )
     {
       CORE_LOG_ERROR( "Failed to copy directory '" + src_dir.string() + "'." );
       return false;

@@ -500,6 +500,9 @@ ViewerManager::ViewerManager() :
   this->private_->signal_block_count_ = 0;
   this->private_->vm_ = this;
   this->private_->transfer_function_.reset( new Core::TransferFunction );
+  this->private_->transfer_function_->set_initializing( true );
+  this->private_->transfer_function_->faux_shading_state_->set( false );
+  this->private_->transfer_function_->set_initializing( false );
   this->add_connection( this->private_->transfer_function_->transfer_function_changed_signal_.
     connect( boost::bind( &ViewerManagerPrivate::update_volume_rendering, this->private_ ) ) );
 

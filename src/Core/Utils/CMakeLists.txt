@@ -38,6 +38,8 @@ SET(CORE_UTILS_SRCS
   EnumClass.h
   Exception.h
   Exception.cc
+  FilesystemUtil.h
+  FilesystemUtil.cc
   GenerationNumber.h
   GenerationNumber.cc
   IntrusiveBase.h

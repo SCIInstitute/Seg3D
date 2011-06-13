@@ -194,6 +194,7 @@ TransferFunction::TransferFunction() :
   this->private_->tf_ = this;
 
   this->add_state( "faux_shading", this->faux_shading_state_, true );
+  this->faux_shading_state_->set_session_priority( StateBase::DO_NOT_LOAD_E );
   this->add_connection( this->faux_shading_state_->state_changed_signal_.connect(
     boost::bind( &TransferFunctionPrivate::handle_tf_state_changed, this->private_ ) ) );
 
