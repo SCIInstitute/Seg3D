@@ -217,6 +217,12 @@ private:
   // it to the layer_name_changed_signal_ of LayerManager.
   void handle_layer_name_changed( std::string layer_id, std::string name );
   
+  // HANDLE_LAYER_DATA_CHANGED:
+  // This function keeps track off when layer data is changed.
+  void handle_layer_data_changed( LayerHandle layer );
+
+  // FIND_FREE_COLOR:
+  // Find a color that has not yet been used.
   int find_free_color();
 
   // -- locking --
@@ -239,14 +245,13 @@ public:
 
   // -- Signal/Slots --
   typedef boost::signals2::signal< void( LayerHandle ) > layer_signal_type;
-  typedef boost::signals2::signal< void( std::string ) > layer_name_signal_type;
   typedef boost::signals2::signal< void( LayerHandle, int ) > layer_at_signal_type;
   typedef boost::signals2::signal< void( LayerGroupHandle ) > group_signal_type;
   typedef boost::signals2::signal< void( std::string, int ) > group_at_signal_type;
   typedef boost::signals2::signal< void( std::vector< LayerHandle > ) > layers_signal_type;
   typedef boost::signals2::signal< void() > layers_changed_signal_type;
   typedef boost::signals2::signal< void() > groups_changed_signal_type;
-  
+  typedef boost::signals2::signal< void ( std::string, std::string ) > layer_name_changed_signal_type;
   
   // GROUP_INTERNALS_CHANGED_SIGNAL_:
   // signal is triggered when any of the contents of a group change
@@ -277,12 +282,17 @@ public:
   // LAYER_NAME_CHANGED_SIGNAL:
   // Triggered when the name of a layer has changed.
   // The first parameter is the layer ID, the second is the new name for that layer.
-  boost::signals2::signal< void ( std::string, std::string ) > layer_name_changed_signal_;
+  layer_name_changed_signal_type layer_name_changed_signal_;
 
-  // LAYER_VOLUME_CHANGED_SIGNAL_:
+  // LAYER_VOLUME_CHANGED_SIGNAL:
   // Triggered when the volume of a layer has changed.
   // The first parameter is the layer handle.
-  boost::signals2::signal< void ( LayerHandle ) > layer_volume_changed_signal_;
+  layer_signal_type layer_volume_changed_signal_;
+  
+  // LAYER_DATA_CHANGED_SIGNAL:
+  /// Trigger when the layer data state is changed. This tracks whether layers
+  // are being locked for processing and when new data will be available
+  layer_signal_type layer_data_changed_signal_;
 
 protected:
   virtual bool pre_save_states( Core::StateIO& state_io );

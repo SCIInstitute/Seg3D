@@ -114,7 +114,9 @@ Menu::Menu( QMainWindow* parent ) :
     LayerManager::Instance()->get_layers( layer_list );
     for( size_t i = 0; i < layer_list.size(); ++i )
     {
-      if( layer_list[ i ]->get_type() == Core::VolumeType::MASK_E )
+      if( layer_list[ i ]->get_type() == Core::VolumeType::MASK_E &&
+        layer_list[ i ]->data_state_->get() != Layer::CREATING_C &&
+        layer_list[ i ]->data_state_->get() != Layer::PROCESSING_C )
       {
         mask_layer_found = true;
       }
@@ -123,7 +125,9 @@ Menu::Menu( QMainWindow* parent ) :
     LayerHandle layer = LayerManager::Instance()->get_active_layer();
     if ( layer )
     {
-      if ( layer->get_type() == Core::VolumeType::DATA_E ) active_data_layer_found = true;
+      if ( layer->get_type() == Core::VolumeType::DATA_E  &&
+        layer->data_state_->get() != Layer::CREATING_C &&
+        layer->data_state_->get() != Layer::PROCESSING_C ) active_data_layer_found = true;
     }
 
     // Check what type of layer is active
@@ -140,6 +144,9 @@ Menu::Menu( QMainWindow* parent ) :
       boost::bind( &Menu::EnableDisableLayerActions, qpointer_type( this ) ) ) );
     
     this->add_connection( LayerManager::Instance()->active_layer_changed_signal_.connect( 
+      boost::bind( &Menu::EnableDisableLayerActions, qpointer_type( this ) ) ) );
+
+    this->add_connection( LayerManager::Instance()->layer_data_changed_signal_.connect( 
       boost::bind( &Menu::EnableDisableLayerActions, qpointer_type( this ) ) ) );
 
     // Automatically update the tag in the undo menu    
@@ -967,13 +974,16 @@ void Menu::EnableDisableLayerActions( qpointer_type qpointer )
   // This function should be called from the application thread
   ASSERT_IS_APPLICATION_THREAD();
   
+  
   bool mask_layer_found = false;
   bool active_data_layer_found = false;
   std::vector< LayerHandle > layer_list;
   LayerManager::Instance()->get_layers( layer_list );
   for( size_t i = 0; i < layer_list.size(); ++i )
   {
-    if( layer_list[ i ]->get_type() == Core::VolumeType::MASK_E )
+    if( layer_list[ i ]->get_type() == Core::VolumeType::MASK_E &&
+      layer_list[ i ]->data_state_->get() != Layer::CREATING_C &&
+      layer_list[ i ]->data_state_->get() != Layer::PROCESSING_C )
     {
       mask_layer_found = true;
     }
@@ -982,7 +992,9 @@ void Menu::EnableDisableLayerActions( qpointer_type qpointer )
   LayerHandle layer = LayerManager::Instance()->get_active_layer();
   if ( layer )
   {
-    if ( layer->get_type() == Core::VolumeType::DATA_E ) 
+    if ( layer->get_type() == Core::VolumeType::DATA_E &&
+      layer->data_state_->get() != Layer::CREATING_C &&
+      layer->data_state_->get() != Layer::PROCESSING_C ) 
     {
       active_data_layer_found = true;
     }

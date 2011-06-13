@@ -229,6 +229,12 @@ bool LayerManager::insert_layer( LayerHandle layer )
     // NOTE: LayerManager will always out-live layers, so it's safe to not disconnect.
     layer->name_state_->value_changed_signal_.connect( boost::bind(
       &LayerManager::handle_layer_name_changed, this, layer->get_layer_id(), _2 ) );
+      
+    // NOTE: Add a connection here to check when layer data state changes
+    // This is need to switch on/off menu options in the interface
+    layer->data_state_->state_changed_signal_.connect( boost::bind(
+      &LayerManager::handle_layer_data_changed, this, layer ) );
+        
   } // unlocked from here
 
   CORE_LOG_DEBUG( std::string( "Signalling that new layer was inserted" ) );
@@ -934,6 +940,12 @@ bool LayerManager::pre_load_states( const Core::StateIO& state_io )
         // NOTE: LayerManager will always out-live layers, so it's safe to not disconnect.
         ( *it )->name_state_->value_changed_signal_.connect( boost::bind(
           &LayerManager::handle_layer_name_changed, this, ( *it )->get_layer_id(), _2 ) );
+          
+        // NOTE: Add a connection here to check when layer data state changes
+        // This is need to switch on/off menu options in the interface
+        ( *it )->data_state_->state_changed_signal_.connect( boost::bind(
+          &LayerManager::handle_layer_data_changed, this, ( *it ) ) );
+
         this->layer_inserted_signal_( ( *it ) );
       }
     }
@@ -1703,6 +1715,11 @@ void LayerManager::SetLayerIdCount( id_count_type id_count )
 void LayerManager::handle_layer_name_changed( std::string layer_id, std::string name )
 {
   this->layer_name_changed_signal_( layer_id, name );
+}
+
+void LayerManager::handle_layer_data_changed( LayerHandle layer )
+{
+  this->layer_data_changed_signal_( layer );
 }
 
 int LayerManager::find_free_color()

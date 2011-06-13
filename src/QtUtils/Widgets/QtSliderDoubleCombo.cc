@@ -66,7 +66,7 @@ QtSliderDoubleCombo::QtSliderDoubleCombo( QWidget* parent ) :
 #endif
   this->private_->ui_.min_->setFont( font );
   this->private_->ui_.max_->setFont( font );
-
+  this->private_->ui_.spinBox->setFont( font );
 
     this->connect( this->private_->ui_.horizontalSlider, SIGNAL( valueChanged( int ) ), 
     this, SLOT( slider_signal( int ) ) );

@@ -68,6 +68,8 @@ QtLogSliderIntCombo::QtLogSliderIntCombo( QWidget* parent ) :
 #endif
   this->private_->ui_.min_->setFont( font );
   this->private_->ui_.max_->setFont( font );
+  this->private_->ui_.spinBox->setFont( font );
+
 }
 
 QtLogSliderIntCombo::~QtLogSliderIntCombo()
