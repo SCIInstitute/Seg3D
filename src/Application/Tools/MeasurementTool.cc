@@ -1290,7 +1290,8 @@ bool MeasurementTool::handle_mouse_press( ViewerHandle viewer,
 	}
 
 	if( !( modifiers == Core::KeyModifier::NO_MODIFIER_E || 
-		modifiers == ( Core::KeyModifier::CONTROL_MODIFIER_E | Core::KeyModifier::SHIFT_MODIFIER_E ) ) )
+		modifiers == Core::KeyModifier::CONTROL_MODIFIER_E ||
+		modifiers == Core::KeyModifier::GROUPSWITCH_MODIFIER_E ) )
 	{
 		return false;
 	}
@@ -1386,7 +1387,12 @@ bool MeasurementTool::handle_mouse_release( ViewerHandle viewer,
 
 bool MeasurementTool::handle_key_press( ViewerHandle viewer, int key, int modifiers )
 {
-	/*if( key == Core::Key::KEY_Q_E ) 
+#ifdef __APPLE__
+	if( key == Core::Key::KEY_CONTROL_E || modifiers == Core::KeyModifier::CONTROL_MODIFIER_E ||
+		key == Core::Key::KEY_META_E || modifiers == Core::KeyModifier::META_MODIFIER_E ) 
+#else
+	if( key == Core::Key::KEY_CONTROL_E || modifiers == Core::KeyModifier::CONTROL_MODIFIER_E ) 
+#endif
 	{
 		this->private_->snap_key_pressed_ = true;
 
@@ -1394,14 +1400,19 @@ bool MeasurementTool::handle_key_press( ViewerHandle viewer, int key, int modifi
 		{
 			this->private_->snap_hover_point_to_axis();
 		}
-	}*/
+	}
 
 	return false;
 }
 
 bool MeasurementTool::handle_key_release( ViewerHandle viewer, int key, int modifiers )
 {
-	/*if( key == Core::Key::KEY_Q_E ) 
+#ifdef __APPLE__
+	if( key == Core::Key::KEY_CONTROL_E || modifiers == Core::KeyModifier::CONTROL_MODIFIER_E ||
+		key == Core::Key::KEY_META_E || modifiers == Core::KeyModifier::META_MODIFIER_E ) 
+#else
+	if( key == Core::Key::KEY_CONTROL_E || modifiers == Core::KeyModifier::CONTROL_MODIFIER_E ) 
+#endif
 	{
 		this->private_->snap_key_pressed_ = false;
 
@@ -1409,7 +1420,7 @@ bool MeasurementTool::handle_key_release( ViewerHandle viewer, int key, int modi
 		{
 			this->private_->move_hover_object_to_mouse();
 		}
-	}*/
+	}
 
 	return false;
 }
@@ -1464,7 +1475,7 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 	//-------------- StateEngine unlocked  -------------------
 
 	Core::Color active_color = Core::Color( 0.55f, 0.82f, 0.96f );
-	float out_of_slice_fraction = 0.5f;
+	float out_of_slice_fraction = 0.75f;
 	
 	glPushAttrib( GL_LINE_BIT | GL_POINT_BIT | GL_TRANSFORM_BIT );
 	glMatrixMode( GL_PROJECTION );
