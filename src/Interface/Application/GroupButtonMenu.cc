@@ -124,7 +124,6 @@ GroupButtonMenu::GroupButtonMenu( QWidget* parent, LayerGroupHandle group ) :
   QtUtils::QtBridge::Connect( this->private_->ui_.duplicate_layer_button_, 
     group->show_duplicate_menu_state_ );
     
-
   QtUtils::QtBridge::Show( this->private_->ui_.iso_quality_, group->show_iso_menu_state_ ); 
   QtUtils::QtBridge::Show( this->private_->ui_.iso_capping_, group->show_iso_menu_state_ ); 
   QtUtils::QtBridge::Show( this->private_->ui_.delete_, group->show_delete_menu_state_ );

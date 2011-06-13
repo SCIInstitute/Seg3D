@@ -195,13 +195,16 @@ RenderingDockWidget::RenderingDockWidget( QWidget *parent ) :
   QtUtils::QtBridge::Enable( this->private_->ui_.cp6_params_widget_,
     ViewerManager::Instance()->enable_clip_plane_state_[ 5 ] );
 
-  for ( int i = 0; i < 6; ++i )
   {
-    this->add_connection( ViewerManager::Instance()->enable_clip_plane_state_[ i ]->
-      value_changed_signal_.connect( boost::bind( 
-      &RenderingDockWidget::HandleClippingPlanesStateChanged, qpointer, _1, i ) ) );
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    for ( int i = 0; i < 6; ++i )
+    {
+      this->add_connection( ViewerManager::Instance()->enable_clip_plane_state_[ i ]->
+        value_changed_signal_.connect( boost::bind( 
+        &RenderingDockWidget::HandleClippingPlanesStateChanged, qpointer, _1, i ) ) );
+      update_tab_appearance( ViewerManager::Instance()->enable_clip_plane_state_[ i ]->get(), i );  
+    }
   }
-  
   // Volume rendering widgets
   Core::TransferFunctionHandle tf = ViewerManager::Instance()->get_transfer_function();
   QtUtils::QtBridge::Show( this->private_->ui_.vr_content_,
@@ -325,12 +328,12 @@ void RenderingDockWidget::update_tab_appearance( bool enabled, int index )
   if( enabled )
   {
     this->private_->ui_.clipping_tabwidget_->
-      setTabText( index, ( "=" + QString::number( index + 1 ) + "=" ) );
+      setTabText( index, "+" );
   }
   else
   {
     this->private_->ui_.clipping_tabwidget_->
-      setTabText( index, QString::number( index + 1 ) );
+      setTabText( index, "-" );
   }
 }
 

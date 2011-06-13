@@ -229,7 +229,7 @@ QWidget#widget{
             <string>Recent Projects:</string>
            </property>
            <property name="flat">
-            <bool>true</bool>
+            <bool>false</bool>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout">
             <property name="spacing">

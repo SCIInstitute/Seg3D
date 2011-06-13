@@ -250,7 +250,7 @@ QWidget#vr_content_{
          <x>0</x>
          <y>0</y>
          <width>262</width>
-         <height>745</height>
+         <height>751</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="scroll_area_layout_">
@@ -499,7 +499,16 @@ QWidget#vr_content_{
               <property name="spacing">
                <number>2</number>
               </property>
-              <property name="margin">
+              <property name="leftMargin">
+               <number>4</number>
+              </property>
+              <property name="topMargin">
+               <number>12</number>
+              </property>
+              <property name="rightMargin">
+               <number>4</number>
+              </property>
+              <property name="bottomMargin">
                <number>4</number>
               </property>
               <item>
