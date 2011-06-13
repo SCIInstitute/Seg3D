@@ -227,6 +227,7 @@ RenderingDockWidget::RenderingDockWidget( QWidget *parent ) :
     SLOT( delete_active_curve() ) );
   this->connect( this->private_->ui_.histogram_scale_combobox_, 
     SIGNAL( currentIndexChanged( int ) ), SLOT( set_histogram_mode( int ) ) );
+  this->set_histogram_mode( 1 );
 
   this->add_connection( tf->feature_added_signal_.connect( boost::bind( 
     &RenderingDockWidget::HandleFeatureAdded, qpointer, _1 ) ) );

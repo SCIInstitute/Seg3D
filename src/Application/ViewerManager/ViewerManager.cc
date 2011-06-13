@@ -530,7 +530,7 @@ ViewerManager::ViewerManager() :
     boost::bind( &ViewerManagerPrivate::update_volume_rendering, this->private_ ) ) );
 
   this->add_state( "volume_renderer", this->volume_renderer_state_, 
-    "simple", "simple=Simple|simple_faux=Simple with Faux Shading|ao=Ambient Occlusion" );
+    "simple", "simple=Simple|simple_faux=Faux Shading|ao=Ambient Occlusion" );
   this->add_connection( this->volume_renderer_state_->value_changed_signal_.connect(
     boost::bind( &ViewerManagerPrivate::handle_volume_renderer_changed, this->private_, _2 ) ) );
   this->add_connection( this->volume_renderer_state_->state_changed_signal_.connect(

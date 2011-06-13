@@ -61,7 +61,16 @@ public:
   // widget is being hidden. 
   virtual void closeEvent( QCloseEvent* event );
   
+  // RESIZEEVENT:
+  // This function is called by Qt to deliver an event that tells that the
+  // widget is being resized. 
   virtual void resizeEvent( QResizeEvent *event );
+
+  // SHOWEVENT:
+  // This function is called by Qt to deliver an event that tells that the
+  // widget is being resized. 
+  virtual void showEvent( QShowEvent *event );
+
   
 public:
   void set_enabled( bool enabled );

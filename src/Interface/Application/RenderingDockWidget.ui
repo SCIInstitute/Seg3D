@@ -248,9 +248,9 @@ QWidget#vr_content_{
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>-52</y>
-         <width>260</width>
-         <height>726</height>
+         <y>0</y>
+         <width>262</width>
+         <height>745</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="scroll_area_layout_">
@@ -1347,7 +1347,14 @@ QWidget#vr_content_{
                   </widget>
                  </item>
                  <item>
-                  <widget class="QComboBox" name="vr_target_"/>
+                  <widget class="QComboBox" name="vr_target_">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </widget>
@@ -1375,7 +1382,14 @@ QWidget#vr_content_{
                   </widget>
                  </item>
                  <item>
-                  <widget class="QComboBox" name="renderer_combobox_"/>
+                  <widget class="QComboBox" name="renderer_combobox_">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </widget>
@@ -1433,6 +1447,9 @@ QWidget#vr_content_{
                    </item>
                    <item>
                     <widget class="QComboBox" name="histogram_scale_combobox_">
+                     <property name="currentIndex">
+                      <number>1</number>
+                     </property>
                      <item>
                       <property name="text">
                        <string>Linear</string>
