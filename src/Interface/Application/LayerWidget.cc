@@ -712,21 +712,25 @@ void LayerWidget::update_widget_state( bool initialize )
   {
     // Change the color of the widget
     this->update_appearance( visual_lock,  active_layer, false, initialize );
+    this->private_->ui_.selection_checkbox_->setVisible( true );
   }
   else if ( data_state == Layer::CREATING_C )
   {
     // Change the color of the widget
     update_appearance( true,  false, false, initialize ); 
+    this->private_->ui_.selection_checkbox_->setVisible( false );
   }
   else if ( data_state == Layer::PROCESSING_C )
   {
     // Change the color of the widget
     update_appearance( visual_lock,  active_layer, true, initialize );  
+    this->private_->ui_.selection_checkbox_->setVisible( false );
   }
   else if ( data_state == Layer::IN_USE_C )
   {
     // Change the color of the widget
     update_appearance( visual_lock,  active_layer, true, initialize );    
+    this->private_->ui_.selection_checkbox_->setVisible( true );
   }
 }
 
@@ -1180,7 +1184,8 @@ void LayerWidget::UpdateProgress( qpointer_type qpointer, double progress )
 
 bool LayerWidget::get_selected() const
 {
-  return this->private_->ui_.selection_checkbox_->isChecked();
+  return this->private_->ui_.selection_checkbox_->isChecked() &&
+    this->private_->ui_.selection_checkbox_->isVisible();
 }
 
 void LayerWidget::activate_from_lineedit_focus()
@@ -1191,6 +1196,18 @@ void LayerWidget::activate_from_lineedit_focus()
 
 void LayerWidget::contextMenuEvent( QContextMenuEvent * event )
 {
+  std::string data_state;
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    data_state = this->private_->layer_->data_state_->get();
+  }
+  
+  if ( data_state == Layer::PROCESSING_C || data_state == Layer::CREATING_C )
+  {
+    event->accept();
+    return;
+  }
+  
   QMenu menu( this );
   QAction* qaction;
   qaction = menu.addAction( tr( "Duplicate Layer" ) );
