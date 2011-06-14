@@ -109,6 +109,17 @@ QtHistogramWidget::QtHistogramWidget( QWidget *parent, QtSliderDoubleCombo* uppe
   this->private_->min_bar_ = new QWidget( this );
   this->private_->max_bar_ = new QWidget( this );
 
+  if ( this->private_->threshold_bars_enabled_ )
+  {
+    this->private_->min_bar_->show();
+    this->private_->max_bar_->show();
+  }
+  else 
+  {
+    this->private_->min_bar_->hide();
+    this->private_->max_bar_->hide();
+  }
+
   QFont font = this->private_->ui_.min->font();
 #ifdef __APPLE__
   font.setPointSize( 10 );
@@ -173,9 +184,16 @@ void QtHistogramWidget::set_histogram( const Core::Histogram& histogram )
     this->set_min( this->private_->lower_threshold_->get_value() );
   }
   
-  this->private_->min_bar_->show();
-  this->private_->max_bar_->show();
-  
+  if ( this->private_->threshold_bars_enabled_ )
+  {
+    this->private_->min_bar_->show();
+    this->private_->max_bar_->show();
+  }
+  else 
+  {
+    this->private_->min_bar_->hide();
+    this->private_->max_bar_->hide();
+  }
 }
 
 void QtHistogramWidget::reset_histogram( )
@@ -308,6 +326,8 @@ void QtHistogramWidget::resizeEvent( QResizeEvent* event )
 
 void QtHistogramWidget::set_bars_enabled( bool enabled )
 {
+  this->private_->threshold_bars_enabled_ = enabled;
+  
   if( enabled )
   {
     this->private_->min_bar_->show();

@@ -107,7 +107,7 @@ bool OtsuThresholdFilterInterface::build_widget( QFrame* frame )
     &Tool::execute, tool, Core::Interface::GetWidgetActionContext() ) );
   
   this->private_->ui_.amount_->set_description( "Thresholds" );
-
+  
   return true;
   
 } // end build_widget
