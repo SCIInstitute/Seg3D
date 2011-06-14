@@ -447,7 +447,7 @@ QFrame#line{
             <font/>
            </property>
            <property name="toolTip">
-            <string>Switch between world coordinates and index coordinates</string>
+            <string>Switch between actual coordinates and pixel coordinates</string>
            </property>
            <property name="text">
             <string/>
