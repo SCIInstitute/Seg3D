@@ -1285,7 +1285,7 @@ bool LayerManager::LockForUse( LayerHandle layer, filter_key_type key )
      layer->data_state_->get() != Layer::IN_USE_C ) return false;
 
   // If it is available set it to processing and list the key used by the filter
-  if ( layer->data_state_->get() != Layer::AVAILABLE_C )
+  if ( layer->data_state_->get() == Layer::AVAILABLE_C )
   {
     layer->data_state_->set( Layer::IN_USE_C );
   }

@@ -157,7 +157,7 @@ QPushButton:pressed{
       <item>
        <widget class="QCheckBox" name="index_space_">
         <property name="text">
-         <string>Measure in index space</string>
+         <string>Measure in pixel space</string>
         </property>
        </widget>
       </item>

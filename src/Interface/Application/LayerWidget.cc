@@ -1215,8 +1215,11 @@ void LayerWidget::contextMenuEvent( QContextMenuEvent * event )
     boost::bind( &ActionDuplicateLayer::Dispatch, Core::Interface::GetWidgetActionContext(), 
     this->private_->layer_->get_layer_id() ) );
   
-  qaction = menu.addAction( tr( "Delete Layer" ) );
-  connect( qaction, SIGNAL( triggered() ), this, SLOT( delete_layer_from_context_menu() ) );
+  if ( data_state != Layer::IN_USE_C  )
+  {
+    qaction = menu.addAction( tr( "Delete Layer" ) );
+    connect( qaction, SIGNAL( triggered() ), this, SLOT( delete_layer_from_context_menu() ) );
+  }
   
   qaction = menu.addAction( tr( "Show Provenance" ) );
   connect( qaction, SIGNAL( triggered() ), this, SLOT( request_provenance() ) );
