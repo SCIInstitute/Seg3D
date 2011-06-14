@@ -23,7 +23,28 @@
    </size>
   </property>
   <property name="styleSheet">
-   <string notr="true">QToolButton{
+   <string notr="true">QPushButton{
+  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(221, 221, 221, 255), stop:0.155779 rgba(238, 238, 238, 255), stop:1 rgba(192, 194, 194, 255));
+  border-radius: 4px;
+  border: 1px solid rgb(90, 90, 90);
+  margin:4px;
+}
+
+QPushButton:hover{
+  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(195, 195, 195, 255), stop:0.253769 rgba(206, 206, 206, 255), stop:1 rgba(185, 185, 185, 255));
+  border-radius: 4px;
+  border: 1px solid rgb(90, 90, 90);
+  margin:4px;
+}
+
+QPushButton:pressed{
+  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(150, 150, 150, 255), stop:0.753769 rgba(206, 206, 206, 255), stop:1 rgba(185, 185, 185, 255));
+  border-radius: 4px;
+  border: 1px solid rgb(90, 90, 90);
+  margin:4px;
+}
+
+QToolButton{
   background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(221, 221, 221, 255), stop:0.155779 rgba(238, 238, 238, 255), stop:1 rgba(192, 194, 194, 255));
   border-radius: 4px;
   border: 1px solid rgb(90, 90, 90);
@@ -248,9 +269,9 @@ QWidget#vr_content_{
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>0</y>
+         <y>-75</y>
          <width>262</width>
-         <height>751</height>
+         <height>749</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="scroll_area_layout_">
@@ -523,7 +544,7 @@ QWidget#vr_content_{
                  <enum>QTabWidget::Rounded</enum>
                 </property>
                 <property name="currentIndex">
-                 <number>2</number>
+                 <number>0</number>
                 </property>
                 <widget class="QWidget" name="clipping_plane1_">
                  <attribute name="title">
@@ -1572,6 +1593,12 @@ border: 0px</string>
                    </property>
                    <item>
                     <widget class="QPushButton" name="add_feature_button_">
+                     <property name="minimumSize">
+                      <size>
+                       <width>0</width>
+                       <height>30</height>
+                      </size>
+                     </property>
                      <property name="text">
                       <string>Add Feature</string>
                      </property>
@@ -1581,6 +1608,12 @@ border: 0px</string>
                     <widget class="QPushButton" name="delete_feature_button_">
                      <property name="enabled">
                       <bool>false</bool>
+                     </property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>0</width>
+                       <height>30</height>
+                      </size>
                      </property>
                      <property name="text">
                       <string>Delete Feature</string>
