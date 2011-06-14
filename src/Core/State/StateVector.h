@@ -306,15 +306,19 @@ public:
     {
       // Lock the state engine so no other thread will be accessing it
       StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
-      this->values_vector_[ index ] = value;
+      if ( value != this->values_vector_[ index ] )
+      {
+        this->values_vector_[ index ] = value;
+        lock.unlock();
+
+        if ( this->signals_enabled() )
+        {
+          this->value_changed_signal_( this->values_vector_, source );
+          this->state_changed_signal_();
+        }
+      }
     }
 
-    if ( this->signals_enabled() )
-    {
-      this->value_changed_signal_( this->values_vector_, source );
-      this->state_changed_signal_();
-    }
-    
     return true;
   }
 
