@@ -220,6 +220,8 @@ void SingleTargetToolPrivate::handle_layers_changed()
 void SingleTargetToolPrivate::handle_layer_name_changed( std::string layer_id )
 {
   LayerHandle layer = LayerManager::Instance()->get_layer_by_id( layer_id );
+  if ( !layer ) return;
+  
   if( layer->get_type() & this->target_type_ )
   {
     this->handle_layers_changed();
