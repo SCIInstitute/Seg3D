@@ -887,22 +887,28 @@ bool LayerManager::post_save_states( Core::StateIO& state_io )
   state_io.push_current_element();
   state_io.set_current_element( groups_element );
   
+  bool succeeded = true;
   for( LayerManagerPrivate::group_list_type::reverse_iterator i = 
     this->private_->group_list_.rbegin(); i != this->private_->group_list_.rend(); ++i )
   {
     if( ( *i )->has_a_valid_layer() )
     {
-      ( *i )->save_states( state_io );
+      succeeded = succeeded && ( *i )->save_states( state_io );
     }
   }
 
   state_io.pop_current_element();
 
-  // TODO: Need to check this logic, this most liky saves too much data
-  return Core::MaskDataBlockManager::Instance()->save_data_blocks( 
-    ProjectManager::Instance()->get_current_project()->get_project_data_path(),
-    PreferencesManager::Instance()->compression_state_->get(),
-    PreferencesManager::Instance()->compression_level_state_->get() );
+  // TODO: Need to check this logic, this most likely saves too much data
+  if ( succeeded )
+  {
+    succeeded = Core::MaskDataBlockManager::Instance()->save_data_blocks( 
+      ProjectManager::Instance()->get_current_project()->get_project_data_path(),
+      PreferencesManager::Instance()->compression_state_->get(),
+      PreferencesManager::Instance()->compression_level_state_->get() );
+  }
+  
+  return succeeded;
 } 
   
 bool LayerManager::pre_load_states( const Core::StateIO& state_io )
@@ -922,6 +928,7 @@ bool LayerManager::pre_load_states( const Core::StateIO& state_io )
   state_io.push_current_element();
   state_io.set_current_element( groups_element );
 
+  bool succeeded = true;
   const TiXmlElement* group_element = groups_element->FirstChildElement();
   while ( group_element != 0 )
   {
@@ -949,6 +956,10 @@ bool LayerManager::pre_load_states( const Core::StateIO& state_io )
         this->layer_inserted_signal_( ( *it ) );
       }
     }
+    else
+    {
+      succeeded = false;
+    }
 
     group_element = group_element->NextSiblingElement();
   }
@@ -958,7 +969,7 @@ bool LayerManager::pre_load_states( const Core::StateIO& state_io )
   this->groups_changed_signal_();
   this->layers_changed_signal_();
 
-  return true;
+  return succeeded;
 }
 
 bool LayerManager::post_load_states( const Core::StateIO& state_io )

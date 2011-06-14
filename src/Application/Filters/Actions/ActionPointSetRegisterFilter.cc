@@ -654,11 +654,8 @@
         PointSetFilterHandle pointset_tool = 
           boost::dynamic_pointer_cast<PointSetFilter> (ToolManager::Instance()->get_tool(this->pointset_tool_id_));
 
-        Core::Application::PostEvent( boost::bind( &Core::StateBool::set,
-          pointset_tool->registration_ready_state_, true, Core::ActionSource::NONE_E ) );
-
         Core::Application::PostEvent( boost::bind( &Core::StateDoubleVector::set,
-          pointset_tool->transform_matrix_, matrix_entries, Core::ActionSource::NONE_E ) );
+          pointset_tool->transform_matrix_state_, matrix_entries, Core::ActionSource::NONE_E ) );
 
         Core::Application::PostEvent( boost::bind( &Core::StateDouble::set,
           pointset_tool->translation_state_[0], translation[0] , Core::ActionSource::NONE_E ) );
@@ -677,6 +674,10 @@
 
         Core::Application::PostEvent( boost::bind( &Core::StateDouble::set,
           pointset_tool->rotation_state_[2], rotation[2] , Core::ActionSource::NONE_E ) );
+
+        // NOTE: Set registration_ready_state_ AFTER all the values have been set.
+        Core::Application::PostEvent( boost::bind( &Core::StateBool::set,
+          pointset_tool->registration_ready_state_, true, Core::ActionSource::NONE_E ) );
       }
 
     }

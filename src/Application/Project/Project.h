@@ -321,7 +321,7 @@ public:
 private:
   // INITIALIZE_STATES:
   // Called by constructors to initialize state variables
-  void initialize_states();
+  void initialize();
 
   // LOAD_PROJECT:
   // This function is called by the constructor to load the project into memory.

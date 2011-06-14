@@ -138,7 +138,8 @@ void ProjectDockWidgetPrivate::populate_session_list( SessionInfoListHandle sess
       session_info.session_name() ) );
 
     QFont font;
-    if( session_info.session_name() == "AutoSave" )
+    if( session_info.session_name() == "AutoSave" ||
+      session_info.session_name() == "Auto Save" )
     {
       font.setBold( true );
     }

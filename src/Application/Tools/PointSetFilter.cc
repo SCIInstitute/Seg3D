@@ -76,7 +76,12 @@ PointSetFilter::PointSetFilter( const std::string& toolid ) :
   this->add_connection( this->iterations_state_->value_changed_signal_.connect(
     boost::bind( &PointSetFilter::handle_iteration_changed, this ) ) );
 
-  this->add_state( "transformation_matrix", this->transform_matrix_, std::vector<double>());
+  std::vector< double > identity_matrix( 16, 0 );
+  identity_matrix[ 0 ] = 1;
+  identity_matrix[ 5 ] = 1;
+  identity_matrix[ 10 ] = 1;
+  identity_matrix[ 15 ] = 1;
+  this->add_state( "transformation_matrix", this->transform_matrix_state_, identity_matrix );
 
   this->add_connection( LayerManager::Instance()->layers_changed_signal_.connect(
     boost::bind( &PointSetFilter::handle_layers_changed, this ) ) );

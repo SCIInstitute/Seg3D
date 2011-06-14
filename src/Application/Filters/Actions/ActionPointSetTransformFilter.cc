@@ -124,7 +124,7 @@
         std::vector<double> matrix_params;
         {
           Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-          matrix_params = pointset_tool->transform_matrix_->get();
+          matrix_params = pointset_tool->transform_matrix_state_->get();
         }
 
         transform_type::ParametersType params = 

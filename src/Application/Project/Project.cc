@@ -72,6 +72,8 @@ static const boost::filesystem::path INPUTFILES_DIR_C( "inputfiles" );
 static const boost::filesystem::path DATABASE_DIR_C( "database" );
 static const boost::filesystem::path NOTE_DATABASE_C( "notes.sqlite" );
 
+static const std::string AUTO_SESSION_NAME_C( "Auto Save" );
+
 class ProjectPrivate
 {
   // -- constructor/destructor --
@@ -158,6 +160,10 @@ public:
   // Convert version 1 project data to the new format.
   void convert_version1_project();
 
+  // RENAME_VERSION1_SESSION_FILES:
+  // Rename the session files to the new format.
+  bool rename_version1_session_files();
+
   // PARSE_SESSION_DATA:
   // Parse the session XML file and get the data generation numbers used by it.
   bool parse_session_data( const boost::filesystem::path& file_path, std::set< long long >& generations );
@@ -218,6 +224,9 @@ public:
 
   // The database that contains  the project notes.
   DatabaseManager note_database_;
+
+  // Whether we need to convert the project when saving
+  bool conversion_needed_;
 
   // -- static helper functions --
 public:
@@ -397,23 +406,13 @@ bool ProjectPrivate::clean_up_session_database()
   {
     SessionID session_id = boost::any_cast< long long >( ( result_set[ i ] )[ "session_id" ] );
     
-    // First, try session ID as the session file name
-    boost::filesystem::path session_file = project_path / SESSION_DIR_C / 
-      ( Core::ExportToString( session_id ) + ".xml" );
-    if ( boost::filesystem::exists( session_file ) ) continue;
-
-    // Otherwise, if there is 'session_file' explicitly stored in the database, try it also
-    try
+    // Check the existence of the session file
+    boost::filesystem::path session_file;
+    if ( !this->get_session_file( session_id, session_file, error ) )
     {
-      std::string session_file_str = boost::any_cast< std::string >( result_set[ i ][ "session_file" ] );
-      if ( boost::filesystem::exists( project_path / SESSION_DIR_C / session_file_str ) ) continue;
+      // No session file exists for the session, delete it from database
+      this->delete_session_from_database( session_id );
     }
-    catch ( ... ) 
-    {
-    }
-
-    // No session file exists for the session, delete it from database
-    this->delete_session_from_database( session_id );
   }
 
   return true;
@@ -905,19 +904,7 @@ void ProjectPrivate::convert_version1_project()
       continue;
     }
 
-    // Generate the new path of where the session is located
-    boost::filesystem::path new_path = project_path / SESSION_DIR_C / ( Core::ExportToString( session_id ) + ".xml" );
-
-    try 
-    {
-      // Try to rename the session
-      boost::filesystem::rename( old_path, new_path );
-    }
-    catch ( ... )
-    {
-      // If the file can't be renamed, store the original file name in the database
-      this->set_session_file( session_id, old_session_name + ".xml" );
-    }
+    this->set_session_file( session_id, old_session_name + ".xml" );
 
     this->set_session_data( session_id, generations );
   }
@@ -963,8 +950,57 @@ void ProjectPrivate::convert_version1_project()
 
   // Clear the old state variable for notes
   this->project_->project_notes_state_->clear();
+}
 
-  this->project_->save_state();
+bool ProjectPrivate::rename_version1_session_files()
+{
+  std::string sql_str = "SELECT session_id, session_file FROM session;";
+  std::string error;
+  ResultSet results;
+  if ( !this->session_database_.run_sql_statement( sql_str, results, error ) )
+  {
+    CORE_LOG_ERROR( error );
+    return false;
+  }
+
+  boost::filesystem::path sessions_path = this->project_->get_project_sessions_path();
+  
+  for ( size_t i = 0; i < results.size(); ++i )
+  {
+    std::string session_file_name;
+    try
+    {
+      session_file_name = boost::any_cast< std::string >( results[ i ][ "session_file" ] );
+    }
+    catch ( ... ) 
+    {
+      continue; 
+    }
+
+    SessionID session_id = boost::any_cast< SessionID >( results[ i ][ "session_id" ] );
+    boost::filesystem::path old_session_file = sessions_path / session_file_name;
+    boost::filesystem::path new_session_file = sessions_path / 
+      ( Core::ExportToString( session_id ) + ".xml" );
+
+    try
+    {
+      boost::filesystem::rename( old_session_file, new_session_file );
+    }
+    catch ( ... ) 
+    {
+      continue;
+    }
+
+    sql_str = "UPDATE session SET session_file = NULL WHERE session_id = " +
+      Core::ExportToString( session_id ) + ";";
+    if ( !this->session_database_.run_sql_statement( sql_str, error ) )
+    {
+      CORE_LOG_ERROR( error );
+      return false;
+    }
+  }
+
+  return true;
 }
 
 bool ProjectPrivate::parse_session_data( const boost::filesystem::path& file_path, std::set< long long >& generations )
@@ -1140,7 +1176,6 @@ bool ProjectPrivate::process_inputfile_importers()
     // Directory does not exist
     return false;
   } 
-  
   
   // TODO: Keep the records that could not be written
   for ( size_t j = 0; j < this->input_file_importers_.size();  j++ )
@@ -1321,7 +1356,7 @@ Project::Project( const std::string& project_name ) :
   StateHandler( "project", true ),
   private_( new ProjectPrivate )
 {
-  this->initialize_states();
+  this->initialize();
   this->set_initializing( true );
   this->project_name_state_->set( project_name );
   this->project_file_state_->set( project_name + Project::GetDefaultProjectFileExtension() );
@@ -1335,7 +1370,7 @@ Project::Project( const boost::filesystem::path& project_file ) :
   StateHandler( "project", true ),
   private_( new ProjectPrivate )
 {
-  this->initialize_states();
+  this->initialize();
   this->set_initializing( true );
   if ( !this->load_project( project_file ) )
   {
@@ -1350,13 +1385,15 @@ Project::~Project()
   this->disconnect_all();
 }
 
-void Project::initialize_states()
+void Project::initialize()
 {
   // Mark this class so it does not add the state id number into the project file itself
   this->do_not_save_id_number();
 
   // Keep a pointer to this class in the private class
   this->private_->project_ = this;
+
+  this->private_->conversion_needed_ = false;
 
   // Name of the project
   this->add_state( "project_name", this->project_name_state_, "" );
@@ -1550,6 +1587,7 @@ bool Project::load_project( const boost::filesystem::path& project_file )
   // If the project was created by an old version, convert it
   if ( this->get_loaded_version() == 1 )
   {
+    this->private_->conversion_needed_ = true;
     this->private_->convert_version1_project();
   }
   // Otherwise load the database
@@ -1584,7 +1622,7 @@ bool Project::load_project( const boost::filesystem::path& project_file )
 
   // Delete session records from the database that don't have corresponding session files
   this->private_->clean_up_session_database();
-//  this->private_->clean_up_data_files();
+
   return true;
 }
 
@@ -1633,23 +1671,14 @@ bool Project::save_project( const boost::filesystem::path& project_path,
     this->project_name_state_->set( project_name );
     std::string project_file_name = project_name + Project::GetDefaultProjectFileExtension();
 
-    // Generate the project directory if it does not exist and generate all the sub directories.
-    if ( !ProjectPrivate::UpdateProjectDirectory( project_path ) )
-    {
-      return false;
-    } 
-
     // Set the new directory in which this project is saved.
     this->project_path_state_->set( project_path.string() );
 
     // Make sure that the program knows that the current project now lives on disk. 
     this->project_files_generated_state_->set( true );
 
-    // Copy all the input files into the project directory
-    this->private_->process_inputfile_importers();
-
     // Save the current session so there is something to load when the project is opened.
-    return this->save_session( this->current_session_name_state_->get() );
+    return this->save_session( AUTO_SESSION_NAME_C );
   }
   else 
   {
@@ -1661,38 +1690,35 @@ bool Project::save_project( const boost::filesystem::path& project_path,
     if ( current_project_path == project_path && current_project_name == project_name )
     {
       // All the user wanted is to save a session, as it is the same name and directory
-      return this->save_session( this->current_session_name_state_->get() );
+      return this->save_session( AUTO_SESSION_NAME_C );
     }
 
     if ( current_project_path == project_path )
     {
       // OK, the user gave us a new name, but directory is the same
-          
-      // Generate the new .s3d file and delete the old one  
-      boost::filesystem::path current_xml_file = current_project_path / current_project_file;
-
-      boost::filesystem::path new_xml_file = current_project_path / 
-        ( project_name + Project::GetDefaultProjectFileExtension() );     
-
-      // First save the new file, with all the new state information      
-      this->private_->save_state( new_xml_file );
-      
-      try 
-      {
-        boost::filesystem::remove( current_xml_file );
-      }
-      catch( ... )
-      {
-        std::string error = std::string( "Could not delete file '" ) + 
-          current_xml_file.string() + "'.";
-        CORE_LOG_ERROR( error );
-      }
-      
       // Update the project information
       this->project_name_state_->set( project_name ); 
       
       // Save out a session with the current information
-      return this->save_session( this->current_session_name_state_->get() );
+      bool succeeded = this->save_session( this->current_session_name_state_->get() );
+
+      if ( succeeded )
+      {
+        boost::filesystem::path current_xml_file = current_project_path / current_project_file;
+        // Remove the old project file
+        try 
+        {
+          boost::filesystem::remove( current_xml_file );
+        }
+        catch( ... )
+        {
+          std::string error = std::string( "Could not delete file '" ) + 
+            current_xml_file.string() + "'.";
+          CORE_LOG_ERROR( error );
+        }
+      }
+      
+      return succeeded;
     }
     else
     {
@@ -1704,11 +1730,15 @@ bool Project::save_project( const boost::filesystem::path& project_path,
       }
 
       // Delete the project file from the new directory because a new one will be generated
+      boost::filesystem::path old_project_file = project_path / current_project_file;
       try
       {
-        boost::filesystem::remove( project_path / current_project_file );
+        boost::filesystem::remove( old_project_file );
       }
-      catch ( ... ) {}
+      catch ( ... ) 
+      {
+        CORE_LOG_ERROR( "Couldn't remove file '" + old_project_file.string() + "'." );
+      }
 
       // Update the project
       this->project_name_state_->set( project_name );
@@ -1718,7 +1748,7 @@ bool Project::save_project( const boost::filesystem::path& project_path,
       
       // This will save a session and update the project file and 
       // provenance database
-      return this->save_session( this->current_session_name_state_->get() );
+      return this->save_session( AUTO_SESSION_NAME_C );
     }
   }
 }
@@ -1982,34 +2012,47 @@ bool Project::check_project_files()
   boost::filesystem::path project_path( this->project_path_state_->get() );
   if ( !boost::filesystem::exists( project_path ) )
   {
-    //this->project_files_generated_state_->set( false );
     this->project_files_accessible_state_->set( false );
     return false;
   }
 
-  // Check if s3d file still exists
-  if ( !boost::filesystem::exists( project_path / ( this->project_file_state_->get() ) ) )
+  if ( !boost::filesystem::exists( project_path / DATA_DIR_C ) )
   {
-    //this->project_files_generated_state_->set( false );
     this->project_files_accessible_state_->set( false );
-    return false;   
+    return false;
   }
 
-  // Check if session database file still exists
-  if ( !boost::filesystem::exists( project_path / DATABASE_DIR_C / SESSION_DATABASE_C ) )
+  if ( !boost::filesystem::exists( project_path / SESSION_DIR_C ) )
   {
-    //this->project_files_generated_state_->set( false );
     this->project_files_accessible_state_->set( false );
-    return false;   
+    return false;
   }
+  
+  
 
-  // Check if provenance database file still exists
-  if ( !boost::filesystem::exists( project_path / DATABASE_DIR_C / PROVENANCE_DATABASE_C ) )
-  {
-    //this->project_files_generated_state_->set( false );
-    this->project_files_accessible_state_->set( false );
-    return false;   
-  }
+  //// Check if s3d file still exists
+  //if ( !boost::filesystem::exists( project_path / ( this->project_file_state_->get() ) ) )
+  //{
+  //  //this->project_files_generated_state_->set( false );
+  //  this->project_files_accessible_state_->set( false );
+  //  return false;   
+  //}
+
+  //// Check if session database file still exists
+  //if ( !boost::filesystem::exists( project_path / DATABASE_DIR_C / SESSION_DATABASE_C ) )
+  //{
+  //  //this->project_files_generated_state_->set( false );
+  //  this->project_files_accessible_state_->set( false );
+  //  return false;   
+  //}
+
+  //// Check if provenance database file still exists
+  //if ( !boost::filesystem::exists( project_path / DATABASE_DIR_C / PROVENANCE_DATABASE_C ) )
+  //{
+  //  //this->project_files_generated_state_->set( false );
+  //  this->project_files_accessible_state_->set( false );
+  //  return false;   
+  //}
 
   this->project_files_accessible_state_->set( true );
   return true;
@@ -2093,6 +2136,17 @@ bool Project::save_session( const std::string& name )
   // The reason for this is to avoid circular dependencies.
   this->private_->session_generation_numbers_.clear();
 
+  boost::filesystem::path project_path( this->project_path_state_->get() );
+
+  // Generate the project directory if it does not exist and generate all the sub directories.
+  if ( !ProjectPrivate::UpdateProjectDirectory( project_path ) )
+  {
+    return false;
+  } 
+
+  // Copy all the input files into the project directory
+  this->private_->process_inputfile_importers();
+
   // NOTE: We need to save first before making an entry into the database to be sure it will succeed.
   Core::StateIO state_io;
   state_io.initialize();
@@ -2110,12 +2164,18 @@ bool Project::save_session( const std::string& name )
     user_id = "unknown";
   }
   
+  // Convert the old session files if necessary
+  if ( this->private_->conversion_needed_ )
+  {
+    this->private_->rename_version1_session_files();
+    this->private_->conversion_needed_ = false;
+  }
+
   // Add the entry to the session database
   SessionID session_id = this->private_->insert_session_into_database( session_name, user_id );
   assert( session_id >= 0 );
 
   // Write the XML file in the session directory
-  boost::filesystem::path project_path( this->project_path_state_->get() );
   boost::filesystem::path session_path = project_path / SESSION_DIR_C / 
     ( Core::ExportToString( session_id ) + ".xml" );
   if ( !state_io.export_to_file( session_path ) )

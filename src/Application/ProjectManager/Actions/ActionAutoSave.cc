@@ -75,7 +75,7 @@ bool ActionAutoSave::run( Core::ActionContextHandle& context,
 
   // A save can still fail, we have no control over whether disk actions will succeed, hence
   // we need to keep checking the integrity of the file save.
-  bool success = ProjectManager::Instance()->save_project_session( "AutoSave" );
+  bool success = ProjectManager::Instance()->save_project_session( "Auto Save" );
 
   progress->end_progress_reporting();
 
