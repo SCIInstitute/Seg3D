@@ -77,10 +77,6 @@ bool CropToolInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Connect( this->private_->ui_.layer_list_, tool->target_layers_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.use_active_group_, tool->use_active_group_state_ );
 
-  QtUtils::QtBridge::Connect( this->private_->ui_.label_nx_, tool->input_dimensions_state_[ 0 ] );
-  QtUtils::QtBridge::Connect( this->private_->ui_.label_ny_, tool->input_dimensions_state_[ 1 ] );
-  QtUtils::QtBridge::Connect( this->private_->ui_.label_nz_, tool->input_dimensions_state_[ 2 ] );
-
   QtUtils::QtBridge::Connect( this->private_->ui_.crop_origin_x_, tool->cropbox_origin_state_[ 0 ] );
   QtUtils::QtBridge::Connect( this->private_->ui_.crop_origin_y_, tool->cropbox_origin_state_[ 1 ] );
   QtUtils::QtBridge::Connect( this->private_->ui_.crop_origin_z_, tool->cropbox_origin_state_[ 2 ] );

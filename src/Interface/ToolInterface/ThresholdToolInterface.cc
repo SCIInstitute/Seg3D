@@ -72,11 +72,9 @@ bool ThresholdToolInterface::build_widget( QFrame* frame )
   //Step 1 - build the Qt GUI Widget
   this->private_->ui_.setupUi( frame );
   this->private_->ui_.horizontalLayout_2->setAlignment( Qt::AlignHCenter );
-  this->private_->ui_.horizontalLayout_3->setAlignment( Qt::AlignHCenter );
   this->private_->ui_.verticalLayout_5->setAlignment( Qt::AlignTop );
   this->private_->ui_.histogram_->set_thresholds( this->private_->ui_.upper_threshold_, 
     this->private_->ui_.lower_threshold_ );
-  
 
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
