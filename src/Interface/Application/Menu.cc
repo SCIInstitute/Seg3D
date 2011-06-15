@@ -139,10 +139,13 @@ Menu::Menu( QMainWindow* parent ) :
       boost::bind( &Menu::SetRecentFileList, qpointer_type( this ) ) ) );
       
     // Automatically switch on exporting segmentations, depending on the choice of 
-    // active layer.  
+    // project or active layer. 
+    this->add_connection( ProjectManager::Instance()->current_project_changed_signal_.connect( 
+      boost::bind( &Menu::EnableDisableLayerActions, qpointer_type( this ) ) ) ); 
+    
     this->add_connection( LayerManager::Instance()->layers_changed_signal_.connect( 
       boost::bind( &Menu::EnableDisableLayerActions, qpointer_type( this ) ) ) );
-    
+  
     this->add_connection( LayerManager::Instance()->active_layer_changed_signal_.connect( 
       boost::bind( &Menu::EnableDisableLayerActions, qpointer_type( this ) ) ) );
 
