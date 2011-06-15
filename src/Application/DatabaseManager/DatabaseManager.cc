@@ -334,4 +334,21 @@ bool DatabaseManager::get_column_metadata( const std::string& table_name,
     column_name.c_str(), data_type, coll_seq, not_null, primary_key, auto_inc ) == SQLITE_OK;
 }
 
+std::string DatabaseManager::EscapeQuotes( const std::string& str )
+{
+  std::string result;
+  std::string tmp_str = str;
+  std::string::size_type pos = str.find( '\'' );
+  while ( pos != std::string::npos )
+  {
+    result += tmp_str.substr( 0, pos );
+    result += "''";
+    tmp_str = tmp_str.substr( pos + 1 );
+    pos = tmp_str.find( '\'' );
+  }
+  result += tmp_str;
+
+  return result;
+}
+
 } // end namespace seg3D

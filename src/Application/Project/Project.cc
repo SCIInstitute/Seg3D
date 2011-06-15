@@ -682,12 +682,14 @@ SessionID ProjectPrivate::insert_session_into_database( const std::string& sessi
   if ( timestamp.empty() )
   {
     sql_statement = "INSERT INTO session (session_name, user_id) VALUES ('" +
-      session_name + "', '" + user_id + "');";
+      DatabaseManager::EscapeQuotes( session_name ) + "', '" + 
+      DatabaseManager::EscapeQuotes( user_id ) + "');";
   }
   else
   {
     sql_statement = "INSERT INTO session (session_name, user_id, timestamp) VALUES ('" +
-      session_name + "', '" + user_id + "', '" + timestamp + "');";
+      DatabaseManager::EscapeQuotes( session_name ) + "', '" + 
+      DatabaseManager::EscapeQuotes( user_id ) + "', '" + timestamp + "');";
   }
 
   std::string error;
@@ -806,12 +808,14 @@ long long ProjectPrivate::insert_note_into_database( const std::string& note,
   if ( timestamp.empty() )
   {
     sql_statement = "INSERT INTO note (note, user_id) VALUES ('" +
-      note + "', '" + user_id + "');";
+      DatabaseManager::EscapeQuotes( note ) + "', '" + 
+      DatabaseManager::EscapeQuotes( user_id ) + "');";
   }
   else
   {
     sql_statement = "INSERT INTO note (note, user_id, timestamp) VALUES ('" +
-      note + "', '" + user_id + "', '" + timestamp + "');";
+      DatabaseManager::EscapeQuotes( note ) + "', '" + 
+      DatabaseManager::EscapeQuotes( user_id ) + "', '" + timestamp + "');";
   }
 
   std::string error;
@@ -1103,7 +1107,8 @@ bool ProjectPrivate::parse_session_provenance_ids( const boost::filesystem::path
 
 void ProjectPrivate::set_session_file( SessionID id, const std::string& file_name )
 {
-  std::string sql_str = "UPDATE session SET session_file = '" + file_name +
+  std::string sql_str = "UPDATE session SET session_file = '" + 
+    DatabaseManager::EscapeQuotes( file_name ) +
     "' WHERE session_id = " + Core::ExportToString( id ) + ";";
   std::string err;
   if ( !this->session_database_.run_sql_statement( sql_str, err ) )
@@ -2426,7 +2431,8 @@ ProvenanceStepID Project::add_provenance_record( const ProvenanceStepHandle& ste
   InputFilesID inputfiles_id = step->get_inputfiles_id();
 
   std::string sql_str = "INSERT INTO provenance_step (action_name, action_params, user_id)"
-    " VALUES('" + action_name + "', '" + action_params + "', '" + user_name + "');";
+    " VALUES('" + action_name + "', '" + DatabaseManager::EscapeQuotes( action_params ) + 
+    "', '" + DatabaseManager::EscapeQuotes( user_name ) + "');";
   std::string error;
   if ( !this->private_->provenance_database_.run_sql_statement( sql_str, error ) )
   {
@@ -2518,7 +2524,8 @@ void Project::update_provenance_record( ProvenanceStepID record_id, const Proven
     action_params = " ";
   }
 
-  std::string sql_str = "UPDATE provenance_step SET action_params = '" + action_params +
+  std::string sql_str = "UPDATE provenance_step SET action_params = '" + 
+    DatabaseManager::EscapeQuotes( action_params ) +
     "' WHERE prov_step_id = " + Core::ExportToString( record_id ) + ";";
   std::string error;
   if ( !this->private_->provenance_database_.run_sql_statement( sql_str, error ) )

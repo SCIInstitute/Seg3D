@@ -100,6 +100,10 @@ public:
 private:
   boost::shared_ptr< DatabaseManagerPrivate > private_;
 
+public:
+  // ESCAPEQUOTES:
+  // Escape the quotes(') in the string so it can be used as text in a SQL statement.
+  static std::string EscapeQuotes( const std::string& str );
 };
 
 } // end namespace seg3d
