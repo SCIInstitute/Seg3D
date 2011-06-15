@@ -2178,7 +2178,11 @@ bool Project::save_session( const std::string& name )
 
   // Add the entry to the session database
   SessionID session_id = this->private_->insert_session_into_database( session_name, user_id );
-  assert( session_id >= 0 );
+  if ( session_id < 0 )
+  {
+    CORE_LOG_ERROR( "Failed to added a new session record to the database." );
+    return false;
+  }
 
   // Write the XML file in the session directory
   boost::filesystem::path session_path = project_path / SESSION_DIR_C / 
