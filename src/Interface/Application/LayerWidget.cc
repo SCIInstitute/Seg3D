@@ -1257,7 +1257,7 @@ void LayerWidget::contextMenuEvent( QContextMenuEvent * event )
 void LayerWidget::delete_layer_from_context_menu()
 { 
   // Check whether the users wants to save and whether the user wants to quit
-  int ret = QMessageBox::warning( this, "Delete Warning",
+  int ret = QMessageBox::warning( this->parentWidget(), "Delete Warning",
     "Are you sure you want to delete this layer?",
     QMessageBox::Yes | QMessageBox::No, QMessageBox::No  );
 
