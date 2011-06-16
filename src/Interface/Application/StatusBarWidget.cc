@@ -171,12 +171,12 @@ void StatusBarWidget::set_coordinates_mode( bool is_world )
   if( !is_world )
   {
     this->private_->ui_.world_button_->setToolTip( QString::fromUtf8(
-        "Coordinate mode is set to Local, click to toggle to Global" ) );
+        "Coordinate mode is set to pixel, click to toggle to actual" ) );
   }
   else
   {
     this->private_->ui_.world_button_->setToolTip( QString::fromUtf8(
-        "Coordinate mode is set to Global, click to toggle to Local" ) );
+        "Coordinate mode is set to actual, click to toggle to pixel" ) );
   }
 
   this->private_->show_world_coord_ = is_world;
