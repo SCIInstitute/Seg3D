@@ -39,9 +39,6 @@
 namespace Seg3D
 {
 
-class ActionSpeedlineAlgo;
-typedef boost::shared_ptr< ActionSpeedlineAlgo > ActionSpeedlineAlgoHandle;
-
 class ActionSpeedline : public LayerAction
 {
 
@@ -49,16 +46,17 @@ CORE_ACTION
 ( 
   CORE_ACTION_TYPE( "Speedline", "Fill or erase a slice of a mask layer within "
                     "the region enclosed by the Speedline.")
-  CORE_ACTION_ARGUMENT( "target", "The ID of the target mask layer." )
+  CORE_ACTION_ARGUMENT( "target", "The ID of the target data layer." )
   CORE_ACTION_ARGUMENT( "slice_type", "The slicing direction to be painted on." )
   CORE_ACTION_ARGUMENT( "slice_number", "The slice number to be painted on." )
-  CORE_ACTION_ARGUMENT( "erase", "Whether to erase." )
   CORE_ACTION_ARGUMENT( "vertices", "The 2D coordinates of Speedline vertices." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "iterations", "1000", "Number of iterations to perform." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "termination", "1.0", "Unit of Termination." )
   CORE_ACTION_CHANGES_PROJECT_DATA()
   CORE_ACTION_IS_UNDOABLE()
 )
 
-typedef Core::Point VertexCoord;
+//typedef Core::Point VertexCoord;
 
 public:
   ActionSpeedline();
@@ -74,18 +72,15 @@ public:
   // action is run. It returns whether the action was successful or not.
   virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
 
-  // CLEAR_CACHE:
-  // Clear any objects that were given as a short cut to improve performance.
-  //virtual void clear_cache();
-
 private:
-  //ActionSpeedlineAlgoHandle algo_;
 
   std::string target_layer_id_;
   int slice_type_;
   size_t slice_number_;
-  bool erase_;
-  std::vector< ActionSpeedline::VertexCoord > vertices_;
+  //std::vector< ActionSpeedline::VertexCoord > vertices_;
+  std::vector< Core::Point > vertices_;
+  int current_vertex_index_;
+  Core::Path itk_paths_;
 
   DataLayerHandle target_layer_;
   Core::DataVolumeSliceHandle vol_slice_;
@@ -93,15 +88,17 @@ private:
   int iterations_;
   double termination_;
   std::string speedline_tool_id_;
+  bool update_all_paths_;
 
 public:
-  //static void Dispatch( Core::ActionContextHandle context, const std::string& layer_id,
-  //  Core::VolumeSliceType slice_type, size_t slice_number, bool erase,
-  //  const std::vector< VertexCoord >& vertices );
 
   static void Dispatch( Core::ActionContextHandle context, const std::string& layer_id,
-    Core::VolumeSliceType slice_type, size_t slice_number, bool erase,
-    const std::vector< VertexCoord >& vertices, int iterations, double termination,
+    Core::VolumeSliceType slice_type, size_t slice_number,
+    const std::vector< Core::Point >& vertices, 
+    int current_vertex_index,
+    const Core::Path& itk_paths,
+    int iterations, double termination,
+    bool update_all_paths,
     std::string tool_id );
 };
 

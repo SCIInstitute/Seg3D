@@ -95,6 +95,7 @@ public:
   virtual bool has_2d_visual();
 
   // When slice changes, recompute the path
+  // in private class, not virtual
   virtual void handle_slice_changed( );
 
   // -- dispatch functions --
@@ -103,7 +104,10 @@ public:
   void erase( Core::ActionContextHandle context );
   void reset( Core::ActionContextHandle context );
 
+  //gradient magnitude : calculate magnitude
   void execute_gradient( Core::ActionContextHandle context );
+
+  // should be in private class
   void handle_gradient_layer_changed( std::string layer_id );
   void handle_target_mask_layer_changed( std::string layer_id );
 
@@ -115,7 +119,7 @@ public:
   Core::StateRangedIntHandle iterations_state_;
 
   Core::StateLabeledOptionHandle gradient_state_;
-  //Core::StatePointVectorHandle path_state_;
+  Core::StateSpeedlinePathHandle itk_path_state_;
   Core::StateSpeedlinePathHandle path_state_;
 
   Core::StateBoolHandle valid_gradient_state_;

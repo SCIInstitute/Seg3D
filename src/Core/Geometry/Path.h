@@ -35,6 +35,7 @@
 
 // Core includes
 #include <Core/Geometry/Point.h>
+#include <Core/Geometry/SinglePath.h>
 
 namespace Core
 {
@@ -42,6 +43,7 @@ namespace Core
 //=============================================================================
 // Class: Path
 //=============================================================================
+class SinglePath;
 
 class Path 
 {
@@ -56,23 +58,42 @@ public:
 
   // GET_ONE_PATH:
   // Get the corresponding path
-  std::vector< Point >& get_one_path( int index ) ;
+  //std::vector< Point >& get_one_path( int index ) ;
+  SinglePath& get_one_path( int index ) ;
 
-  std::vector< std::vector< Core::Point > >& get_all_paths( ) ;
+  //std::vector< std::vector< Core::Point > >& get_all_paths( ) ;
+  std::vector< SinglePath >& get_all_paths( ) ;
 
   // SET_ONE_PATH:
   // Set the corresponding path
-  void set_one_path( int index, const std::vector< Point >& pt ) ;
+  // void set_one_path( int index, const std::vector< Point >& pt ) ;
+  void set_one_path( int index, const SinglePath& pt ) ;
 
   // ADD_ONE_PATH:
   // Add one path to paths
-  void add_one_path( const std::vector< Point >& pt );
+  // void add_one_path( const std::vector< Point >& pt );
+  void add_one_path( const SinglePath& pt );
+
+  bool delete_one_path( Point& p1, Point& p2 ) ;
+
+  void delete_all_paths( ) ;
+
+  void set_start_point( const Point& pt );
+  Point& get_start_point () ;
+
+  void set_end_point( const Point& pt );
+  Point& get_end_point () ;
+
 
   inline bool operator==( const Path& ) const;
   inline bool operator!=( const Path& ) const;
 
 private:
-  std::vector< std::vector< Core::Point > > paths_; 
+  //std::vector< std::vector< Core::Point > > paths_; 
+  const static size_t PATHS_SIZE_C = 1000;
+  std::vector< SinglePath > paths_;
+  Point start_point_;
+  Point end_point_;
 
 public:
 

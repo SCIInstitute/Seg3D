@@ -38,6 +38,8 @@ SET(CORE_ITK_SPEEDLINE_SRCS
   itkArrivalFunctionToPathFilter.txx
   itkSpeedFunctionToPathFilter.h
   itkSpeedFunctionToPathFilter.txx
+  itkIterateNeighborhoodOptimizer.h
+  itkIterateNeighborhoodOptimizer.txx
 )
 
 ##################################################

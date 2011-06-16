@@ -50,6 +50,7 @@
 
 // Action associated with tool
 #include <Application/Filters/Actions/ActionGradientMagnitudeFilter.h>
+#include "Core/RenderResources/RenderResources.h"
 
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL( Seg3D, SpeedlineTool )
@@ -70,10 +71,10 @@ public:
   bool find_closest_vertex( ViewerHandle viewer, int x, int y, int& index );
   void execute( Core::ActionContextHandle context, bool erase, 
     ViewerHandle viewer = ViewerHandle() );
-  void execute_path(  );
+  void execute_path( bool update_all_paths );
 
   SpeedlineTool* tool_;
-  bool moving_vertex_;
+  bool moving_vertex_; //interface thread
   int vertex_index_;
 
 };
@@ -104,6 +105,7 @@ bool SpeedlineToolPrivate::find_vertex( ViewerHandle viewer, int x, int y, int& 
   // Step 3. Search for the first vertex that's within 2 pixels of current mouse position
   double range_x = pixel_width * 4;
   double range_y = pixel_height * 4;
+
   std::vector< Core::Point > vertices = this->tool_->vertices_state_->get();
   Core::VolumeSliceType slice_type( Core::VolumeSliceType::AXIAL_E );
   if ( viewer->view_mode_state_->get() == Viewer::CORONAL_C )
@@ -177,6 +179,7 @@ bool SpeedlineToolPrivate::find_closest_vertex( ViewerHandle viewer, int x, int 
 void SpeedlineToolPrivate::execute( Core::ActionContextHandle context, 
                   bool erase, ViewerHandle viewer )
 {
+  ASSERT_IS_INTERFACE_THREAD();
   Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
 
   if ( !this->tool_->valid_target_mask_state_->get() )
@@ -209,7 +212,7 @@ void SpeedlineToolPrivate::execute( Core::ActionContextHandle context,
   }
 
 
-  // Target mask being filled must not be locked.
+  // Target mask being filled must be visible.
   LayerHandle target_mask_layer = LayerManager::Instance()->get_layer_by_id( 
     this->tool_->mask_state_->get() );
 
@@ -235,18 +238,14 @@ void SpeedlineToolPrivate::execute( Core::ActionContextHandle context,
   Core::Path paths;
   std::vector< Core::Point > full_path;
 
-  {
-    Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
-    paths = this->tool_->path_state_->get();
-  }
-
+  paths = this->tool_->path_state_->get();
 
   for ( unsigned int i = 0; i < paths.get_path_num(); ++i )
   {
-    std::vector< Core::Point > single_path = paths.get_one_path( i );
-    for ( unsigned int j = 0; j < single_path.size(); ++j )
+    Core::SinglePath single_path = paths.get_one_path( i );
+    for ( unsigned int j = 0; j < single_path.get_points_num_on_path(); ++j )
     {
-      full_path.push_back( single_path[j] );
+      full_path.push_back( single_path.get_a_point( j ) );
     }
   }
 
@@ -267,19 +266,11 @@ void SpeedlineToolPrivate::execute( Core::ActionContextHandle context,
     volume_slice->get_slice_type(), volume_slice->get_slice_number(), erase, vertices_2d );
 }
 
-
-
-
-void SpeedlineToolPrivate::execute_path(  )
+void SpeedlineToolPrivate::execute_path( bool update_all_paths )
 {
   Core::ActionContextHandle context = Core::Interface::GetMouseActionContext();
   ViewerHandle viewer = ViewerManager::Instance()->get_active_viewer();
-  Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
-
-  //if ( !this->tool_->valid_target_state_->get() )
-  //{
-  //  return;
-  //}
+  //Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
 
   if ( !this->tool_->valid_target_state_->get() || !this->tool_->valid_gradient_state_->get() )
   {
@@ -310,14 +301,6 @@ void SpeedlineToolPrivate::execute_path(  )
     return;
   }
 
-
-  //LayerHandle layer = LayerManager::Instance()->get_layer_by_id( 
-  //  this->tool_->target_layer_state_->get() );
-  //if ( !layer->is_visible( viewer->get_viewer_id() ) || layer->locked_state_->get() )
-  //{
-  //  return;
-  //}
-
   // Either gradient or target mask must be visible. 
   // Both gradient and target mask must not be locked.
   LayerHandle target_layer = LayerManager::Instance()->get_layer_by_id( 
@@ -340,38 +323,24 @@ void SpeedlineToolPrivate::execute_path(  )
   const std::vector< Core::Point >& vertices = this->tool_->vertices_state_->get();
   size_t num_of_vertices = vertices.size();
 
-
-  if ( num_of_vertices < 2 )
+  if ( num_of_vertices < 1 )
   {
     return;
   }
 
-  //double world_x, world_y;
-  //int x, y;
-  //std::vector< ActionSpeedline::VertexCoord > vertices_2d;
-  //for ( size_t i = 0; i < num_of_vertices; ++i )
-  //{
-  //  volume_slice->project_onto_slice( vertices[ i ], world_x, world_y );
-  //  volume_slice->world_to_index( world_x, world_y, x, y );
-  //  vertices_2d.push_back( ActionSpeedline::VertexCoord( 
-  //    static_cast< float >( x ), static_cast< float >( y ), 0 ) );
-  //}
-
-  std::vector< ActionSpeedline::VertexCoord > vertices_3d;
-  for ( size_t i = 0; i < num_of_vertices; ++i )
-  {
-
-    vertices_3d.push_back( ActionSpeedline::VertexCoord( 
-      static_cast< float >( vertices[i].x() ), static_cast< float >( vertices[i].y() ),
-      static_cast< float >( vertices[i].z() ) ) );
-  }
-
   ActionSpeedline::Dispatch( context, this->tool_->gradient_state_->get(),
-    volume_slice->get_slice_type(), volume_slice->get_slice_number(), false, vertices_3d, 
-    this->tool_->iterations_state_->get(), this->tool_->termination_state_->get(), this->tool_->toolid() );
+    volume_slice->get_slice_type(), volume_slice->get_slice_number(), vertices, 
+    this->tool_->current_vertex_index_state_->get(),
+    this->tool_->itk_path_state_->get(),
+    this->tool_->iterations_state_->get(),
+    this->tool_->termination_state_->get(),
+    update_all_paths,
+    this->tool_->toolid() );
 }
 
-
+//////////////////////////////////////////////////////////////////////////
+// Class SpeedlineTool
+//////////////////////////////////////////////////////////////////////////
 
 void SpeedlineTool::execute_gradient( Core::ActionContextHandle context )
 {
@@ -384,13 +353,7 @@ void SpeedlineTool::execute_gradient( Core::ActionContextHandle context )
     false
     );    
 }
-//////////////////////////////////////////////////////////////////////////
-// Class SpeedlineTool
-//////////////////////////////////////////////////////////////////////////
 
-//SpeedlineTool::SpeedlineTool( const std::string& toolid ) :
-//  SingleTargetTool( Core::VolumeType::MASK_E, toolid ),
-//  private_( new SpeedlineToolPrivate )
 SpeedlineTool::SpeedlineTool( const std::string& toolid ) 
 :
 SingleTargetTool( Core::VolumeType::DATA_E, toolid ),
@@ -401,14 +364,14 @@ private_( new SpeedlineToolPrivate )
 
   this->add_state( "vertices", this->vertices_state_ );
 
-  this->add_connection( this->vertices_state_->state_changed_signal_.connect(
-    boost::bind( &SpeedlineToolPrivate::handle_vertices_changed, this->private_ ) ) );
+  //this->add_connection( this->vertices_state_->state_changed_signal_.connect(
+  //  boost::bind( &SpeedlineToolPrivate::handle_vertices_changed, this->private_ ) ) );
 
   this->add_connection( this->vertices_state_->state_changed_signal_.connect(
-    boost::bind( &SpeedlineToolPrivate::execute_path, this->private_ ) ) );
+    boost::bind( &SpeedlineToolPrivate::execute_path, this->private_, false ) ) );
 
-  this->add_state( "termination_state", this->termination_state_, 1.0, 0.0, 3.0, 0.0001 );
-  this->add_state( "iterations", this->iterations_state_, 20000, 1, 30000, 1 );
+  this->add_state( "termination_state", this->termination_state_, 1.0, 0.0, 2.0, 0.01 );
+  this->add_state( "iterations", this->iterations_state_, 1000, 1, 2000, 1 );
 
   std::vector< LayerIDNamePair > empty_list( 1, 
     std::make_pair( Tool::NONE_OPTION_C, Tool::NONE_OPTION_C ) );
@@ -426,17 +389,14 @@ private_( new SpeedlineToolPrivate )
   this->add_connection( this->mask_state_->value_changed_signal_.connect(
     boost::bind( &SpeedlineTool::handle_target_mask_layer_changed, this, _2 ) ) );
 
-  //this->add_state( "path", this->path_state_, std::vector<Core::Point>() );
+  this->add_state( "itk_path", this->itk_path_state_, Core::Path() );
   this->add_state( "path", this->path_state_,  Core::Path() );
   this->add_connection( this->path_state_->state_changed_signal_.connect(
     boost::bind( &SpeedlineToolPrivate::handle_path_changed, this->private_ ) ) );
 
   this->add_state( "current_vertex_index", this->current_vertex_index_state_, -1 );
 
-  //this->add_connection( this->gradient_state_->value_changed_signal_.connect(
-  //  boost::bind( &SpeedlineTool::handle_gradient_layer_changed, this, _2 ) ) );
-  //ViewerHandle viewer = ViewerManager::Instance()->get_active_viewer();
-
+  // activate and deactivate method overload, application thread
   for ( size_t i = 0; i < 6; ++i )
   {
     this->add_connection( 
@@ -444,9 +404,6 @@ private_( new SpeedlineToolPrivate )
       boost::bind( &SpeedlineTool::handle_slice_changed, this ) )
     );
   }
-  
-  //ViewerManager::Instance()->get_viewer( 0 )->slice_number_state_->value_changed_signal_.connect(
-  //  boost::bind( &SpeedlineTool::handle_slice_changed, this, _2 ) ) );
 }
 
 SpeedlineTool::~SpeedlineTool()
@@ -497,6 +454,8 @@ void SpeedlineTool::reset( Core::ActionContextHandle context )
   Core::ActionClear::Dispatch( context, this->vertices_state_ );
   Core::Application::PostEvent( boost::bind( &Core::StateSpeedlinePath::set,
     this->path_state_, Core::Path(), Core::ActionSource::NONE_E ) );
+  Core::Application::PostEvent( boost::bind( &Core::StateSpeedlinePath::set,
+    this->itk_path_state_, Core::Path(), Core::ActionSource::NONE_E ) );
 }
 
 bool SpeedlineTool::handle_mouse_press( ViewerHandle viewer, 
@@ -541,93 +500,120 @@ bool SpeedlineTool::handle_mouse_press( ViewerHandle viewer,
         mouse_history.current_.y_, world_x, world_y );
       Core::Point pt;
       active_slice->get_world_coord( world_x, world_y,  pt );
-      
-      double dmin = DBL_MAX;
-      double proj_min = DBL_MAX;
+      //
+      //double dmin = DBL_MAX;
+      //double proj_min = DBL_MAX;
       std::vector<Core::Point> points = this->vertices_state_->get();
-      
+      //
       size_t idx = 0;
-      for ( size_t j = 0; j < points.size(); j++ )
-      {
-        size_t k = j + 1;
-        if ( k ==  points.size() ) k = 0;
-        
-        Core::Vector edge_dir = points[ j ] - points[ k ];
-        double edge_length = edge_dir.normalize();
-        double alpha = Dot( points[ j ] - pt, points[ j ] - points[ k ] )/
-          ( edge_length * edge_length );
-          
-        double dist = 0.0;
-        double proj_len = 0.0;
-        if ( alpha < 0.0 ) 
-        {
-          Core::Vector dir = points[ j ] - pt;
-          dist = dir.length2();
-          proj_len = Core::Abs( Dot( edge_dir, dir ) );
-        }
-        else if ( alpha > 1.0 )
-        {
-          Core::Vector dir = points[ k ] - pt;
-          dist = dir.length2();
-          proj_len = Core::Abs( Dot( edge_dir, dir ) );
-        }
-        else 
-        {
-          dist = ( ( points[ j ] - pt ) - alpha * ( points[ j ] - points[ k ] ) ).length2();
-        }
-        
-        if ( dist < dmin ||
-          ( dist == dmin && proj_len < proj_min ) )
-        {
-          dmin = dist;
-          proj_min = proj_len;
-          idx = k;
-        }
-      }
-      points.insert( points.begin() + idx, pt );
+      //for ( size_t j = 0; j < points.size(); j++ )
+      //{
+      //  size_t k = j + 1;
+      //  if ( k ==  points.size() ) k = 0;
+      //  
+      //  Core::Vector edge_dir = points[ j ] - points[ k ];
+      //  double edge_length = edge_dir.normalize();
+      //  double alpha = Dot( points[ j ] - pt, points[ j ] - points[ k ] )/
+      //    ( edge_length * edge_length );
+      //    
+      //  double dist = 0.0;
+      //  double proj_len = 0.0;
+      //  if ( alpha < 0.0 ) 
+      //  {
+      //    Core::Vector dir = points[ j ] - pt;
+      //    dist = dir.length2();
+      //    proj_len = Core::Abs( Dot( edge_dir, dir ) );
+      //  }
+      //  else if ( alpha > 1.0 )
+      //  {
+      //    Core::Vector dir = points[ k ] - pt;
+      //    dist = dir.length2();
+      //    proj_len = Core::Abs( Dot( edge_dir, dir ) );
+      //  }
+      //  else 
+      //  {
+      //    dist = ( ( points[ j ] - pt ) - alpha * ( points[ j ] - points[ k ] ) ).length2();
+      //  }
+      //  
+      //  if ( dist < dmin ||
+      //    ( dist == dmin && proj_len < proj_min ) )
+      //  {
+      //    dmin = dist;
+      //    proj_min = proj_len;
+      //    idx = k;
+      //  }
+      //}
+      //points.insert( points.begin() + idx, pt );
 
-      //points.push_back( pt );
+      points.push_back( pt );
+      idx = points.size() - 1;
       
       //only update the current path, not every one
+      this->private_->vertex_index_ = static_cast< int >( idx );
+
       Core::Application::PostEvent( boost::bind( &Core::StateInt::set,
         this->current_vertex_index_state_, static_cast< int >(idx), Core::ActionSource::NONE_E ) );
       Core::ActionSet::Dispatch( Core::Interface::GetMouseActionContext(),
         this->vertices_state_, points );
 
       viewer->set_cursor( Core::CursorShape::OPEN_HAND_E );
-      this->private_->vertex_index_ = static_cast< int >( idx );
 
       return true;
     }
   }
-  else if ( modifiers == Core::KeyModifier::NO_MODIFIER_E &&
-    button == Core::MouseButton::LEFT_BUTTON_E )
-  {
-    Core::VolumeSliceHandle active_slice = viewer->get_active_volume_slice();
-    if ( active_slice && !active_slice->out_of_boundary() )
-    {
-      double world_x, world_y;
-      viewer->window_to_world( mouse_history.current_.x_, 
-        mouse_history.current_.y_, world_x, world_y );
-      Core::Point pt;
-      active_slice->get_world_coord( world_x, world_y,  pt );
-      Core::ActionAdd::Dispatch( Core::Interface::GetMouseActionContext(),
-        this->vertices_state_, pt );
-      return true;
-    }
-  }
+
   else if ( modifiers == Core::KeyModifier::NO_MODIFIER_E &&
     button == Core::MouseButton::RIGHT_BUTTON_E )
   {
     if ( this->private_->vertex_index_ != -1 )
     {
       Core::Point pt = this->vertices_state_->get()[ this->private_->vertex_index_ ];
+
+
+
+      //if ( this->private_->vertex_index_ == 0 || 
+      //    ( this->private_->vertex_index_ == this->vertices_state_->get().size() - 1 ) )
+      //{
+      //  this->private_->vertex_index_ = 0;
+      //} 
+      //else 
+      //{
+
+      //  this->private_->vertex_index_ = this->private_->vertex_index_ - 1;
+      //}
+
+      // only one point left
+      if ( this->private_->vertex_index_ == 0 &&  ( this->vertices_state_->get().size() == 1 ) )
+      {
+        this->private_->vertex_index_ = -1;
+      }
+      else if ( this->private_->vertex_index_ == 0 &&  ( this->vertices_state_->get().size() > 1 ) )
+  
+      {
+        this->private_->vertex_index_ = 0;
+      } 
+      else if ( ( this->private_->vertex_index_ == this->vertices_state_->get().size() - 1 ) 
+        && ( this->vertices_state_->get().size() > 1 ) )
+      {
+        this->private_->vertex_index_ = 0;
+      }
+      else 
+      {
+
+        this->private_->vertex_index_ = this->private_->vertex_index_ - 1;
+      }
+
+      
+      Core::Application::PostEvent( boost::bind( &Core::StateInt::set,
+        this->current_vertex_index_state_, static_cast< int >( this->private_->vertex_index_ ), Core::ActionSource::NONE_E ) );
+
       Core::ActionRemove::Dispatch( Core::Interface::GetMouseActionContext(),
         this->vertices_state_, pt );
 
       // Set to "not hovered over" state since the point no longer exists
       viewer->set_cursor( Core::CursorShape::CROSS_E );
-      this->private_->vertex_index_ = -1;
+    
+      //this->private_->vertex_index_ = -1;
 
       return true;
     }   
@@ -652,8 +638,10 @@ bool SpeedlineTool::handle_mouse_release( ViewerHandle viewer,
     this->private_->moving_vertex_ = false;
     this->private_->find_vertex( viewer, mouse_history.current_.x_, 
       mouse_history.current_.y_, this->private_->vertex_index_ );
+    
     viewer->set_cursor( this->private_->vertex_index_ != -1 ? 
       Core::CursorShape::OPEN_HAND_E : Core::CursorShape::CROSS_E );
+
     return true;
   }
   
@@ -673,6 +661,16 @@ bool SpeedlineTool::handle_mouse_move( ViewerHandle viewer,
   {
     this->private_->find_vertex( viewer, mouse_history.current_.x_, 
       mouse_history.current_.y_, this->private_->vertex_index_ );
+
+    //if ( this->private_->find_closest_vertex( viewer, mouse_history.current_.x_, 
+    //  mouse_history.current_.y_, this->private_->vertex_index_ ) )
+
+    if ( this->private_->vertex_index_ >= 0 )
+    {
+      Core::Application::PostEvent( boost::bind( &Core::StateInt::set,
+        this->current_vertex_index_state_, this->private_->vertex_index_, Core::ActionSource::NONE_E ) );
+    }
+    
     viewer->set_cursor( this->private_->vertex_index_ != -1 ? 
       Core::CursorShape::OPEN_HAND_E : Core::CursorShape::CROSS_E );
   }
@@ -726,9 +724,10 @@ bool SpeedlineTool::handle_mouse_move( ViewerHandle viewer,
     {
       Core::Point pt = vertices[ this->private_->vertex_index_ ];
       pt += pt_offset;
-      //this->current_vertex_index_state_->set( this->private_->vertex_index_ );
-      //Core::Application::PostEvent( boost::bind( &Core::StateInt::set,
-      //  this->current_vertex_index_state_, this->private_->vertex_index_, Core::ActionSource::NONE_E ) );
+
+      Core::Application::PostEvent( boost::bind( &Core::StateInt::set,
+        this->current_vertex_index_state_, this->private_->vertex_index_, Core::ActionSource::NONE_E ) );
+
       Core::ActionSetAt::Dispatch( Core::Interface::GetMouseActionContext(),
         this->vertices_state_, this->private_->vertex_index_, pt );
     }
@@ -747,7 +746,7 @@ bool SpeedlineTool::handle_mouse_move( ViewerHandle viewer,
 
 void SpeedlineTool::handle_slice_changed(  )
 {
-  this->private_->execute_path();
+  this->private_->execute_path( true );
 }
 
 void SpeedlineTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
@@ -760,7 +759,6 @@ void SpeedlineTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 
   std::vector< Core::Point > vertices;
   Core::Path paths;
-  std::vector< Core::Point > full_path;
 
   Core::VolumeSliceType slice_type( Core::VolumeSliceType::AXIAL_E );
   {
@@ -777,73 +775,104 @@ void SpeedlineTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
     }
   }
 
-  if ( vertices.size() == 0 )
+  size_t vertices_num = vertices.size();
+  if ( vertices_num == 0 )
   {
     return;
   }
 
-  //for ( unsigned int i = 0; i < paths.size(); ++i )
-  //{
-  //  for ( unsigned int j = 0; j < paths[i].size(); ++j )
-  //  {
-  //    full_path.push_back( paths[i][j] );
-  //  }
-
-  //}
-  //
-
-  for ( unsigned int i = 0; i < paths.get_path_num(); ++i )
-  {
-    std::vector< Core::Point > single_path = paths.get_one_path( i );
-    for ( unsigned int j = 0; j < single_path.size(); ++j )
-    {
-      full_path.push_back( single_path[j] );
-    }
-  }
+  size_t paths_num = paths.get_path_num();
 
 
+  CORE_CHECK_OPENGL_ERROR();
   glPushAttrib( GL_LINE_BIT | GL_POINT_BIT | GL_TRANSFORM_BIT );
+  CORE_CHECK_OPENGL_ERROR();
   glMatrixMode( GL_PROJECTION );
   glPushMatrix();
+  CORE_CHECK_OPENGL_ERROR();
   glLoadIdentity();
   glMultMatrixd( proj_mat.data() );
 
-  glPointSize( 5.0f );
-  glLineWidth( 2.0f );
+  glPointSize( 4.0f );
+  glLineWidth( 1.0f );
   glColor3f( 0.0f, 1.0f, 1.0f );
   glEnable( GL_LINE_SMOOTH );
 
-  glBegin( GL_POINTS );
-  for ( size_t i = 0; i < vertices.size(); ++i )
-  {
-    double x_pos, y_pos;
-    Core::VolumeSlice::ProjectOntoSlice( slice_type, vertices[ i ], x_pos, y_pos );
-    vertices[ i ][ 0 ] = x_pos;
-    vertices[ i ][ 1 ] = y_pos;
-    glVertex2d( x_pos, y_pos );
-  }
-  glEnd();
-
-  //glBegin( GL_LINE_LOOP );
-  glPointSize( 1.0f );
-  glColor3f( 0.0f, 1.0f, 0.0f );
-  glBegin( GL_POINTS );
-  //for ( size_t i = 0; i < vertices.size(); ++i )
+  //glColor3f( 1.0f, 0.0f, 1.0f );  
+  //glBegin( GL_POINTS );
+  //for ( size_t i = 0; i < vertices_num; ++i )
   //{
-  //  glVertex2d( vertices[ i ].x(), vertices[ i ].y() );
+  //  double x_pos, y_pos;
+  //  Core::VolumeSlice::ProjectOntoSlice( slice_type, vertices[ i ], x_pos, y_pos );
+  //  glVertex2d( x_pos, y_pos );
   //}
+  //glEnd();
 
-  for ( size_t i = 0; i < full_path.size(); ++i )
+  
+  
+  //Core::Point start_p = vertices[ 0 ];
+  //Core::Point end_p = vertices[ vertices_num - 1 ];
+  //bool is_more_than_two_edges =  vertices_num > 2 ? true : false;
+
+  Core::Point start_p = paths.get_start_point();
+  Core::Point end_p = paths.get_end_point();
+
+  if ( start_p == end_p  )
   {
-    double x_pos, y_pos;
-    Core::VolumeSlice::ProjectOntoSlice( slice_type, full_path[ i ], x_pos, y_pos );
-    //full_path[ i ][ 0 ] = x_pos;
-    //full_path[ i ][ 1 ] = y_pos;
-    glVertex2d( x_pos, y_pos );
-
+    glColor3f( 0.0f, 1.0f, 1.0f );
+    glBegin( GL_POINTS );
+    {
+      double x_pos, y_pos;
+      Core::VolumeSlice::ProjectOntoSlice( slice_type, start_p, x_pos, y_pos );
+      glVertex2d( x_pos, y_pos );
+    }
+    glEnd();
   }
-  glEnd();
+  
+  if ( paths_num > 0 )
+  {
+    bool is_more_than_two_edges =  paths_num > 2 ? true : false;
 
+    for ( unsigned int i = 0; i < paths_num; ++i )
+    {
+      Core::SinglePath single_path = paths.get_one_path( i );
+      Core::Point p0, p1;
+      single_path.get_point_on_ends( 0, p0 );
+      single_path.get_point_on_ends( 1, p1 );
+
+      if ( p0 == end_p && p1 == start_p && is_more_than_two_edges )
+      {
+        glColor3f( 1.0f, 0.0f, 0.0f );    // red
+      } 
+      else
+      {
+        glColor3f( 0.0f, 1.0f, 0.0f );    // green
+      }
+
+      glBegin( GL_LINE_STRIP );
+      for ( unsigned int j = 0; j < single_path.get_points_num_on_path(); ++j )
+      {
+        double x_pos, y_pos;
+        Core::VolumeSlice::ProjectOntoSlice( slice_type, single_path.get_a_point( j ), x_pos, y_pos );
+        glVertex2d( x_pos, y_pos );
+      }
+      glEnd();
+
+      glColor3f( 1.0f, 1.0f, 0.0f );
+      //glPointSize( 4.0f );
+      glBegin( GL_POINTS );
+      {
+        double x_pos, y_pos;
+        Core::VolumeSlice::ProjectOntoSlice( slice_type, p0, x_pos, y_pos );
+        glVertex2d( x_pos, y_pos );
+
+        Core::VolumeSlice::ProjectOntoSlice( slice_type, p1, x_pos, y_pos );
+        glVertex2d( x_pos, y_pos );
+
+      }
+      glEnd();
+    }
+  }
   glPopMatrix();
   glPopAttrib();
 

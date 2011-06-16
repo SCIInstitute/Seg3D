@@ -33,6 +33,7 @@
 
 #include <Core/ITKSpeedLine/itkSpeedFunctionToPathFilter.h>
 #include <Core/ITKSpeedLine/itkArrivalFunctionToPathFilter.h>
+#include <Core/ITKSpeedLine/itkIterateNeighborhoodOptimizer.h>
 
 #include <Application/Provenance/Provenance.h>
 #include <Application/Provenance/ProvenanceStep.h>
@@ -47,11 +48,12 @@
 #include <Application/Tools/SpeedlineTool.h>
 
 //ITK Includes
+#include <itkRescaleIntensityImageFilter.h>
+#include <itkDiscreteGaussianImageFilter.h>
 #include <itkExtractImageFilter.h>
 #include <itkLinearInterpolateImageFunction.h>
 #include <itkPathIterator.h>
 #include <itkGradientDescentOptimizer.h>
-#include <itkRegularStepGradientDescentOptimizer.h>
 #include <itkIndex.h>
 #include <itkImageBase.h>
 
@@ -72,51 +74,72 @@ class ActionSpeedlineAlgo : public  ITKFilter
 {
 public:
   static const unsigned int DIMENSION_C = 2;
-  typedef float pixel_type;
+  typedef double pixel_type;
   typedef itk::Image< pixel_type, DIMENSION_C > image_type;
   typedef itk::PolyLineParametricPath< DIMENSION_C > path_type;
   typedef itk::SpeedFunctionToPathFilter< image_type, path_type > path_filter_type;
-  typedef path_filter_type::CostFunctionType::CoordRepType coord_rep_type;
+  typedef path_filter_type::CostFunctionType::CoordRepType coord_rep_type; // double
 
   image_type::Pointer speed_image_2D_;
-  std::vector< std::vector< Core::Point > > paths_;
+  Core::Path itk_paths_;
+  Core::Path world_paths_;
 
 public:
   std::string target_layer_id_;
   int slice_type_;
   size_t slice_number_;
   bool erase_;
-  std::vector< ActionSpeedline::VertexCoord > vertices_;
-
+  std::vector< Core::Point > vertices_;
+  int current_vertex_index_;
+  
   DataLayerHandle target_layer_;
   Core::DataVolumeSliceHandle vol_slice_;
 
   int iterations_;
   double termination_;
+  bool update_all_paths_;
   std::string speedline_tool_id_;
 
-
-
 public:
-  void compute_path ( int start_index, int end_index, int num_of_vertices, bool is_edge = false )
+  void compute_path ( int start_index, int end_index )
   {
     // Create interpolator
-    typedef itk::LinearInterpolateImageFunction<image_type, coord_rep_type>
+
+    typedef itk::LinearInterpolateImageFunction< image_type, coord_rep_type >
       interpolator_type;
     interpolator_type::Pointer interp = interpolator_type::New();
 
     // Create cost function
+
     path_filter_type::CostFunctionType::Pointer cost = path_filter_type::CostFunctionType::New();
     cost->SetInterpolator( interp );
 
     // Create optimizer
-    typedef itk::GradientDescentOptimizer optimizer_type;
-    //typedef itk::RegularStepGradientDescentOptimizer optimizer_type;
+
+    typedef itk::RegularStepGradientDescentOptimizer optimizer_type;
     optimizer_type::Pointer optimizer = optimizer_type::New();
     optimizer->SetNumberOfIterations( this->iterations_ );
-    //optimizer->SetMaximumStepLength( 0.5 );
-    //optimizer->SetMinimumStepLength( 0.1 );
-    //optimizer->SetRelaxationFactor( 0.5 );
+    optimizer->SetMaximumStepLength( 0.5 );
+    optimizer->SetMinimumStepLength( 0.001 );
+    optimizer->SetRelaxationFactor( 0.5 );
+
+    //typedef itk::IterateNeighborhoodOptimizer optimizer_type;
+    //optimizer_type::Pointer optimizer = optimizer_type::New();
+    //optimizer->MinimizeOn();
+    //optimizer->FullyConnectedOn();
+    //optimizer_type::NeighborhoodSizeType size( DIMENSION_C );
+    //double StepLengthFactorValue = 1.0;
+
+    //for(size_t i = 0; i < DIMENSION_C; i++)
+    //{
+    //  size[i] = this->speed_image_2D_->GetSpacing()[ (unsigned int) i] * StepLengthFactorValue;
+    //}
+
+    //optimizer->SetNeighborhoodSize( size );
+
+    //typedef itk::GradientDescentOptimizer optimizer_type;
+    //optimizer_type::Pointer optimizer = optimizer_type::New();
+    //optimizer->SetNumberOfIterations( this->iterations_ );
 
     // Create path filter
     path_filter_type::Pointer path_filter = path_filter_type::New();
@@ -126,100 +149,75 @@ public:
     path_filter->SetTerminationValue( this->termination_ );
     path_filter->SetInput( this->speed_image_2D_ );
 
-    for ( size_t i = start_index; i < end_index; ++i )
+    if ( !this->update_all_paths_ )
     {
       // Add the seed points.
-      path_filter_type::PathInfo info;
+      path_filter_type::PathInfo  info;
       path_filter_type::PointType pnt;
 
       if ( this->slice_type_ == Core::VolumeSliceType::SAGITTAL_E )
       {
-        pnt[0] = this->vertices_[ i ].y();
-        pnt[1] = this->vertices_[ i ].z();
-      }
-      else if ( this->slice_type_ == Core::VolumeSliceType::CORONAL_E )
-      {
-        pnt[0] = this->vertices_[ i ].x();
-        pnt[1] = this->vertices_[ i ].z();
-      }
-      else
-      {
-        pnt[0] = this->vertices_[ i ].x();
-        pnt[1] = this->vertices_[ i ].y();
-      }
-
-      info.SetEndPoint( pnt );
-
-      if ( this->slice_type_ == Core::VolumeSliceType::SAGITTAL_E )
-      {
-        if ( i == num_of_vertices - 1 )
-        {
-          pnt[0] = this->vertices_[ 0 ].y();
-          pnt[1] = this->vertices_[ 0 ].z();
-        }
-        else
-        {
-          pnt[0] = this->vertices_[ i + 1 ].y();
-          pnt[1] = this->vertices_[ i + 1 ].z();
-        }
+        pnt[0] = this->vertices_[ start_index ].y();
+        pnt[1] = this->vertices_[ start_index ].z();
 
       }
       else if ( this->slice_type_ == Core::VolumeSliceType::CORONAL_E )
       {
-        if ( i == num_of_vertices - 1 )
-        {
-          pnt[0] = this->vertices_[ 0 ].x();
-          pnt[1] = this->vertices_[ 0 ].z();
-
-        }
-        else
-        {
-          pnt[0] = this->vertices_[ i + 1 ].x();
-          pnt[1] = this->vertices_[ i + 1 ].z();
-        }
+        pnt[0] = this->vertices_[ start_index ].x();
+        pnt[1] = this->vertices_[ start_index ].z();
 
       }
       else
       {
-        if ( i == num_of_vertices - 1 )
-        {
-          pnt[0] = this->vertices_[ 0 ].x();
-          pnt[1] = this->vertices_[ 0 ].y();
-        }
-        else
-        {
-          pnt[0] = this->vertices_[ i + 1 ].x();
-          pnt[1] = this->vertices_[ i + 1 ].y();
-        }
-
+        pnt[0] = this->vertices_[ start_index ].x();
+        pnt[1] = this->vertices_[ start_index ].y();
       }
 
       info.SetStartPoint( pnt );
 
+      if ( this->slice_type_ == Core::VolumeSliceType::SAGITTAL_E )
+      {
+        pnt[0] = this->vertices_[ end_index ].y();
+        pnt[1] = this->vertices_[ end_index ].z();
+
+      }
+      else if ( this->slice_type_ == Core::VolumeSliceType::CORONAL_E )
+      {
+        pnt[0] = this->vertices_[ end_index ].x();
+        pnt[1] = this->vertices_[ end_index ].z();
+
+      }
+      else
+      {
+        pnt[0] = this->vertices_[ end_index ].x();
+        pnt[1] = this->vertices_[ end_index ].y();
+      }
+
+      info.SetEndPoint( pnt );
+
       path_filter->AddPathInfo( info );
-    }
+      path_filter->Update();
 
-    path_filter->Update();
+      size_t num_of_outputs = path_filter->GetNumberOfOutputs(); 
+      assert( num_of_outputs == 1);
 
-    size_t num_of_outputs = path_filter->GetNumberOfOutputs();
-    for ( size_t j = 0; j < num_of_outputs; j++ )
-    {
-      this->paths_[ j + start_index ].clear();
-      path_type::Pointer path = path_filter->GetOutput( j );
+      Core::SinglePath new_path( this->vertices_[ start_index ], this->vertices_[ end_index ] );
 
-      size_t vertext_list_size = path->GetVertexList()->Size();
+      path_type::Pointer itk_path = path_filter->GetOutput( 0 );
+      size_t vertext_list_size = itk_path->GetVertexList()->Size();
+
       for ( unsigned int k = 0; k < vertext_list_size; k++ )
       {
-        const float x = path->GetVertexList()->ElementAt( k )[0];
-        const float y = path->GetVertexList()->ElementAt( k )[1];
+        const double x = itk_path->GetVertexList()->ElementAt( k )[0];
+        const double y = itk_path->GetVertexList()->ElementAt( k )[1];
 
         Core::Point ipnt;
 
         if ( this->slice_type_ == Core::VolumeSliceType::SAGITTAL_E ) // SAGITTAL_E = 2
         {
           ipnt[0] = this->slice_number_;
-          ipnt[2] = x;
-          ipnt[3] = y;
+          ipnt[1] = x;
+          ipnt[2] = y;
         }
         else if ( this->slice_type_ == Core::VolumeSliceType::CORONAL_E ) // CORONAL_E = 1
         {
@@ -233,32 +231,251 @@ public:
           ipnt[1] = y;
           ipnt[2] = this->slice_number_;
         }
-        this->paths_[ j + start_index ].push_back( ipnt );
+        new_path.add_a_point( ipnt );
+      }
+
+      this->itk_paths_.add_one_path( new_path );
+    }
+    else
+    {
+      // update each path in new slice
+      Core::Path updated_paths;
+
+      for ( unsigned int i = 0; i < this->itk_paths_.get_path_num(); ++i )
+      {
+        Core::SinglePath old_path = this->itk_paths_.get_one_path( i );
+        Core::Point p0, p1;
+        old_path.get_point_on_ends( 0, p0 );
+        old_path.get_point_on_ends( 1, p1 );
+
+        path_filter_type::PathInfo  info;
+        path_filter_type::PointType pnt;
+
+        if ( this->slice_type_ == Core::VolumeSliceType::SAGITTAL_E )
+        {
+          pnt[0] = p0.y();
+          pnt[1] = p0.z();
+
+        }
+        else if ( this->slice_type_ == Core::VolumeSliceType::CORONAL_E )
+        {
+          pnt[0] = p0.x();
+          pnt[1] = p0.z();
+
+        }
+        else
+        {
+          pnt[0] = p0.x();
+          pnt[1] = p0.y();
+        }
+
+        info.SetStartPoint( pnt );
+
+        if ( this->slice_type_ == Core::VolumeSliceType::SAGITTAL_E )
+        {
+          pnt[0] = p1.y();
+          pnt[1] = p1.z();
+
+        }
+        else if ( this->slice_type_ == Core::VolumeSliceType::CORONAL_E )
+        {
+          pnt[0] = p1.x();
+          pnt[1] = p1.z();
+
+        }
+        else
+        {
+          pnt[0] = p1.x();
+          pnt[1] = p1.y();
+        }
+
+        info.SetEndPoint( pnt );
+
+        path_filter->AddPathInfo( info );
+      }
+
+      path_filter->Update();
+
+      size_t num_of_outputs = path_filter->GetNumberOfOutputs(); 
+      for ( unsigned int j = 0; j < num_of_outputs; ++j )
+      {
+
+        Core::SinglePath old_path = this->itk_paths_.get_one_path( j );
+        Core::Point p0, p1;
+        old_path.get_point_on_ends( 0, p0 );
+        old_path.get_point_on_ends( 1, p1 );
+        Core::SinglePath new_path( p0, p1 );
+
+        path_type::Pointer itk_path = path_filter->GetOutput( j );
+        size_t vertext_list_size = itk_path->GetVertexList()->Size();
+
+        for ( unsigned int k = 0; k < vertext_list_size; ++k )
+        {
+          const double x = itk_path->GetVertexList()->ElementAt( k )[0];
+          const double y = itk_path->GetVertexList()->ElementAt( k )[1];
+
+          Core::Point ipnt;
+
+          if ( this->slice_type_ == Core::VolumeSliceType::SAGITTAL_E ) // SAGITTAL_E = 2
+          {
+            ipnt[0] = this->slice_number_;
+            ipnt[1] = x;
+            ipnt[2] = y;
+
+          }
+          else if ( this->slice_type_ == Core::VolumeSliceType::CORONAL_E ) // CORONAL_E = 1
+          {
+            ipnt[0] = x;
+            ipnt[1] = this->slice_number_;
+            ipnt[2] = y;
+          }
+          else
+          {
+            ipnt[0] = x;
+            ipnt[1] = y;
+            ipnt[2] = this->slice_number_;
+          }
+          new_path.add_a_point( ipnt );
+        }
+
+        updated_paths.add_one_path( new_path );
+      }
+
+      this->itk_paths_.delete_all_paths();
+
+      for ( unsigned int i = 0; i < updated_paths.get_path_num(); ++i )
+      {
+        this->itk_paths_.add_one_path( updated_paths.get_one_path( i ) );
       }
     }
+    
+  }
+
+  // When mouse is moved, clean the temporary paths
+  void clean_paths( )
+  {
+    //for ( unsigned int i = 0; i < paths_num; ++i )
+    //{
+    //  Core::SinglePath single_path = this->paths_.get_one_path( i );
+
+    //  Core::Point p0, p1;
+    //  single_path.get_point_on_ends( 0, p0 );
+    //  single_path.get_point_on_ends( 1, p1 );
+
+    //  std::vector< Core::Point >::iterator it0  = 
+    //    std::find( this->vertices_.begin(), this->vertices_.end(), p0 );
+
+    //  std::vector< Core::Point >::iterator it1  = 
+    //    std::find( this->vertices_.begin(), this->vertices_.end(), p1 );
+
+    //  if ( it0 == this->vertices_.end() || it1 == this->vertices_.end() )
+    //  {
+    //    //bool is_deleted = this->paths_.delete_one_path( p0, p1 );
+    //  }
+    //  else
+    //  {
+    //    tmp_paths.push_back( single_path );
+    //  }
+    //}
+
+    std::vector< Core::SinglePath > tmp_paths;
+
+    size_t paths_num = this->itk_paths_.get_path_num();
+    for ( unsigned int i = 0; i < paths_num; ++i )
+    {
+      Core::SinglePath single_path = this->itk_paths_.get_one_path( i );
+
+      Core::Point p0, p1;
+      single_path.get_point_on_ends( 0, p0 );
+      single_path.get_point_on_ends( 1, p1 );
+
+      std::vector< Core::Point >::iterator it0  = 
+        std::find( this->vertices_.begin(), this->vertices_.end(), p0 );
+
+      std::vector< Core::Point >::iterator it1  = 
+        std::find( this->vertices_.begin(), this->vertices_.end(), p1 );
+
+      if ( it0 == this->vertices_.end() || it1 == this->vertices_.end() )
+      {
+        //bool is_deleted = this->paths_.delete_one_path( p0, p1 );
+      }
+      else
+      {
+        tmp_paths.push_back( single_path );
+      }
+    }
+
+    this->itk_paths_.delete_all_paths();
+    for ( std::vector< Core::SinglePath >::iterator it = tmp_paths.begin(); it != tmp_paths.end(); ++it )
+    {
+      this->itk_paths_.add_one_path( *it );
+    }
+
+    //std::vector< Core::SinglePath > paths = this->paths_.get_all_paths();
+    //for ( std::vector< Core::SinglePath >::iterator it = paths.begin(); it != paths.end(); ++it )
+    //{
+    //  Core::SinglePath single_path = *it;
+    //  Core::Point p0, p1;
+    //  single_path.get_point_on_ends( 0, p0 );
+    //  single_path.get_point_on_ends( 1, p1 );
+
+    //  std::vector< Core::Point >::iterator it0  = 
+    //    std::find( this->vertices_.begin(), this->vertices_.end(), p0 );
+
+    //  std::vector< Core::Point >::iterator it1  = 
+    //    std::find( this->vertices_.begin(), this->vertices_.end(), p1 );
+
+    //  if ( it0 == this->vertices_.end() || it1 == this->vertices_.end() )
+    //  {
+    //    //paths.erase( it );
+    //  }
+    //}
+    
   }
 
   SCI_BEGIN_TYPED_ITK_RUN( this->target_layer_->get_data_type() )
   {
-    //-----------------------------------------------------------
-    // Set up ITK SpeedLine filter
-    //-----------------------------------------------------------
-    //const unsigned int DIMENSION_C = 2;
-    //typedef float pixel_type;
-    //typedef itk::Image< pixel_type, DIMENSION_C > image_type;
-    //typedef itk::PolyLineParametricPath< DIMENSION_C > path_type;
-    //typedef itk::SpeedFunctionToPathFilter< image_type, path_type > path_filter_type;
-    //typedef path_filter_type::CostFunctionType::CoordRepType coord_rep_type;
 
-    typename Core::ITKImageDataT<VALUE_TYPE>::Handle speed_image_3D;
-    this->get_itk_image_from_layer<VALUE_TYPE>( this->target_layer_, speed_image_3D );
+    SpeedlineToolHandle speedline_tool = 
+      boost::dynamic_pointer_cast< SpeedlineTool > ( ToolManager::Instance()->get_tool( this->speedline_tool_id_ ) );
+    {
+      Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+      this->world_paths_ = speedline_tool->path_state_->get();
+    }
+
+    this->world_paths_.delete_all_paths();
+    if ( this->current_vertex_index_ == -1 )
+    {
+      clean_paths();
+
+      Core::Application::PostEvent( boost::bind( &Core::StateSpeedlinePath::set,
+        speedline_tool->itk_path_state_, this->itk_paths_, Core::ActionSource::NONE_E ) );
+
+      Core::Application::PostEvent( boost::bind( &Core::StateSpeedlinePath::set,
+        speedline_tool->path_state_, this->world_paths_, Core::ActionSource::NONE_E ) );
+      return;
+    }
+
+    typename Core::ITKImageDataT< VALUE_TYPE >::Handle speed_image_3D;
+    this->get_itk_image_from_layer< VALUE_TYPE >( this->target_layer_, speed_image_3D );
+
+    //double epsilon = 1.0e-7;
+    //double max_value = 1.0;
+    //typedef itk::RescaleIntensityImageFilter < TYPED_IMAGE_TYPE, TYPED_IMAGE_TYPE > rescale_filter_type;
+
+    //rescale_filter_type::Pointer rescale_filter = rescale_filter_type::New();
+    //rescale_filter->SetInput( speed_image_3D->get_image() );
+    //rescale_filter->SetOutputMinimum( epsilon );
+    //rescale_filter->SetOutputMaximum( max_value );
+    //rescale_filter->Update();
 
     // Create 2D itk image
-    typedef itk::ExtractImageFilter<TYPED_IMAGE_TYPE, image_type >  extract_filter_type;
+    typedef itk::ExtractImageFilter< TYPED_IMAGE_TYPE, image_type >  extract_filter_type;
     typename extract_filter_type::Pointer extract_filter = extract_filter_type::New();
     
-    typename TYPED_IMAGE_TYPE::RegionType input_region = speed_image_3D->get_image()->GetLargestPossibleRegion();
-    typename TYPED_IMAGE_TYPE::SizeType size = input_region.GetSize();
+    TYPED_IMAGE_TYPE::RegionType input_region = speed_image_3D->get_image()->GetLargestPossibleRegion();
+    //TYPED_IMAGE_TYPE::RegionType input_region = ( rescale_filter->GetOutput() )->GetLargestPossibleRegion();
+    TYPED_IMAGE_TYPE::SizeType size = input_region.GetSize();
     size[2] = 0;
     typename TYPED_IMAGE_TYPE::IndexType start = input_region.GetIndex();
     start[2] = this->slice_number_;
@@ -268,105 +485,137 @@ public:
 
     extract_filter->SetExtractionRegion( desired_region );
     extract_filter->SetInput( speed_image_3D->get_image() );
+    //extract_filter->SetInput( rescale_filter->GetOutput() );
+    extract_filter->Update();
 
-    // typename image_type::Pointer speed_image_2D = extract_filter->GetOutput();
     this->speed_image_2D_ = extract_filter->GetOutput();
 
     size_t num_of_vertices = this->vertices_.size();
+    this->itk_paths_.set_start_point( this->vertices_[0] );
+    this->itk_paths_.set_end_point( this->vertices_[ this->vertices_.size() - 1 ] );
 
     // NOTE: ITK filter uses continueIndex instead of real physical point
     // So we need to convert the point position to continue index
     typedef itk::ContinuousIndex< double, 3 >   continuous_index_type;
     typedef itk::Point< double, 3 > itk_point_type;
 
-    // std::vector< Core::Point > cindices;
-
-    //for ( size_t i = 0; i < num_of_vertices; ++i )
-    //{
-    //  continuous_index_type cindex;
-    //  itk_point_type itk_point;
-    //  itk_point[ 0 ] = this->vertices_[ i ].x();
-    //  itk_point[ 1 ] = this->vertices_[ i ].y();
-    //  itk_point[ 2 ] = this->vertices_[ i ].z();
-
-    //  speed_image_3D->get_image()->TransformPhysicalPointToContinuousIndex( itk_point, cindex );
-    //    Core::Point cpoint( cindex[ 0 ], cindex[ 1 ], cindex[ 2 ] );
-    //  cindices.push_back( cpoint );
-    //}
-
-    //std::vector< std::vector< path_filter_type::PointType > > paths;
-    //std::vector< std::vector< Core::Point > > paths;
-
-    //if ( paths.size() != num_of_vertices )
-    //{
-    //  paths.resize( num_of_vertices );
-    //} 
-    
-    SpeedlineToolHandle speedline_tool = 
-      boost::dynamic_pointer_cast<SpeedlineTool> (ToolManager::Instance()->get_tool(this->speedline_tool_id_));
-    int current_vertex_index;
-    {
-      Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-      current_vertex_index = speedline_tool->current_vertex_index_state_->get();
-    }
-
-    // for ( size_t i = 0; i < num_of_vertices - 1; ++i )
     int start_index;
     int end_index;
 
-    if ( num_of_vertices < 2 )
-    {
-      return;
-    }
-    else if ( num_of_vertices == 2 )
+    if ( this->update_all_paths_ )
     {
       start_index = 0;
-      end_index = 1;
-      this->paths_.resize( num_of_vertices );
-      compute_path( start_index, end_index, num_of_vertices );
+      end_index = num_of_vertices - 1;
+
+      compute_path( start_index, end_index );
     }
+    
     else
-    { 
-      if ( this->paths_.size() != num_of_vertices  )
-      {       
-        this->paths_.resize( num_of_vertices );
-        start_index = 0;
-        end_index = num_of_vertices - 1;
-        compute_path( start_index, end_index, num_of_vertices );
-      }
-      else
+    {
+      // clean out-dated paths
+      clean_paths();
+
+      if ( num_of_vertices == 1)
       {
         start_index = 0;
-        end_index = num_of_vertices - 1;
-        compute_path( start_index, end_index, num_of_vertices );
+        end_index = 0;
+      }
+      
+      else if ( num_of_vertices == 2 )
+      {
+        start_index = 0;
+        end_index = 1;
+
+        this->itk_paths_.delete_all_paths();  //2 points just redraw
+
+        compute_path( start_index, end_index );
+      }
+      else
+      { 
+        if ( this->current_vertex_index_ == 0 )
+        {
+          start_index = num_of_vertices - 1;
+          end_index = this->current_vertex_index_ + 1;
+
+        }
+        else if ( this->current_vertex_index_ == num_of_vertices - 1)
+        { 
+          start_index = num_of_vertices - 2;
+          end_index = 0;  
+
+          if ( num_of_vertices > this->itk_paths_.get_path_num() )  //new vertex
+          {
+            int deleted_start_index = num_of_vertices - 2;
+            int deleted_end_index = 0;
+            Core::Point p0, p1;
+
+            p0 = this->vertices_[ deleted_start_index ];
+            p1 = this->vertices_[ deleted_end_index ];
+            bool is_deleted = this->itk_paths_.delete_one_path( p0, p1 );
+          }
+
+        }
+        else
+        {
+          start_index = this->current_vertex_index_ - 1;
+          end_index = this->current_vertex_index_ + 1;
+        
+        }
+        compute_path( start_index, this->current_vertex_index_ );
+        compute_path( this->current_vertex_index_, end_index );
       }
     }
+  
+    //Core::Path full_path;
+    //full_path.set_start_point( this->itk_paths_.get_start_point() );
+    //full_path.set_end_point( this->itk_paths_.get_end_point() );
 
-    Core::Path full_path;
-    for ( unsigned int i = 0; i < this->paths_.size(); ++i )
+    this->world_paths_.set_start_point( this->itk_paths_.get_start_point() );
+    this->world_paths_.set_end_point( this->itk_paths_.get_end_point() );
+
+    size_t path_num = this->itk_paths_.get_path_num();
+    for ( unsigned int i = 0; i < path_num; ++i )
     {
-      std::vector< Core::Point > pt;
-      for ( unsigned int j = 0; j < this->paths_[i].size(); ++j )
+      Core::SinglePath new_path;
+      Core::Point p0, p1;
+      this->itk_paths_.get_one_path( i ).get_point_on_ends( 0, p0 );
+      this->itk_paths_.get_one_path( i ).get_point_on_ends( 1, p1 );
+
+      new_path.set_point_on_ends( 0, p0 );
+      new_path.set_point_on_ends( 1, p1 );
+
+      size_t num_points_on_path = this->itk_paths_.get_one_path( i ).get_points_num_on_path();
+      Core::SinglePath cpath = this->itk_paths_.get_one_path( i );
+
+      new_path.add_a_point( p1 );
+
+      for ( unsigned int j = 0; j < num_points_on_path; ++j )
       {
         continuous_index_type cindex;
         itk_point_type itk_point;
 
-        cindex[ 0 ] =  this->paths_[i][j].x();
-        cindex[ 1 ] =  this->paths_[i][j].y();
-        cindex[ 2 ] =  this->paths_[i][j].z();
+        cindex[ 0 ] =  cpath.get_a_point( j ).x();
+        cindex[ 1 ] =  cpath.get_a_point( j ).y();
+        cindex[ 2 ] =  cpath.get_a_point( j ).z();
 
         speed_image_3D->get_image()->TransformContinuousIndexToPhysicalPoint( cindex, itk_point );  
         Core::Point cpoint( itk_point[ 0 ], itk_point[ 1 ], itk_point[ 2 ] );
-        pt.push_back( cpoint );
+        new_path.add_a_point( cpoint );
       }
-      full_path.add_one_path( pt );
+      new_path.add_a_point( p0 );
+      
+      //full_path.add_one_path( new_path );
+      this->world_paths_.add_one_path( new_path );
     }
-  
-    //Core::Application::PostEvent( boost::bind( &Core::StatePointVector::set,
-    //  speedline_tool->path_state_, single_path, Core::ActionSource::NONE_E ) );
 
     Core::Application::PostEvent( boost::bind( &Core::StateSpeedlinePath::set,
-      speedline_tool->path_state_, full_path, Core::ActionSource::NONE_E ) );
+      speedline_tool->itk_path_state_, this->itk_paths_, Core::ActionSource::NONE_E ) );
+
+    //Core::Application::PostEvent( boost::bind( &Core::StateSpeedlinePath::set,
+    //  speedline_tool->path_state_, full_path, Core::ActionSource::NONE_E ) );
+
+    Core::Application::PostEvent( boost::bind( &Core::StateSpeedlinePath::set,
+      speedline_tool->path_state_, this->world_paths_, Core::ActionSource::NONE_E ) );
   }
   SCI_END_TYPED_ITK_RUN()
 
@@ -389,9 +638,7 @@ ActionSpeedline::ActionSpeedline()
   this->add_layer_id(  this->target_layer_id_ );
   this->add_parameter( this->slice_type_ );
   this->add_parameter( this->slice_number_ );
-  this->add_parameter( this->erase_ );
   this->add_parameter( this->vertices_ );
-
   this->add_parameter( this->iterations_ );
   this->add_parameter( this->termination_ );
 }
@@ -437,13 +684,13 @@ bool ActionSpeedline::validate( Core::ActionContextHandle& context )
   volume_slice->set_slice_number( this->slice_number_ );
   this->vol_slice_ = volume_slice;
   
-  const std::vector< VertexCoord >& vertices = this->vertices_;
+  const std::vector< Core::Point >& vertices = this->vertices_;
 
-  if ( vertices.size() < 2 )
-  {
-    context->report_error( "The Speedline has less than 2 vertices." );
-    return false;
-  }
+  //if ( vertices.size() < 2 )
+  //{
+  //  context->report_error( "The Speedline has less than 2 vertices." );
+  //  return false;
+  //}
   
   return true;
 }
@@ -451,31 +698,6 @@ bool ActionSpeedline::validate( Core::ActionContextHandle& context )
 bool ActionSpeedline::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
   Core::DataVolumeSliceHandle volume_slice = this->vol_slice_;
-  //size_t nx = volume_slice->nx();
-  //size_t ny = volume_slice->ny();
-
-  //// Compute the bounding box of the Speedline
-  //int min_x = std::numeric_limits< int >::max();
-  //int max_x = std::numeric_limits< int >::min();
-  //int min_y = min_x;
-  //int max_y = max_x;
-  //const std::vector< VertexCoord >& vertices = this->vertices_;
-  //size_t num_of_vertices = vertices.size();
-  //for ( size_t i = 0; i < num_of_vertices; ++i )
-  //{
-  //  min_x = Core::Min( min_x, static_cast< int >( vertices[ i ][ 0 ] ) );
-  //  max_x = Core::Max( max_x, static_cast< int >( vertices[ i ][ 0 ] ) );
-  //  min_y = Core::Min( min_y, static_cast< int >( vertices[ i ][ 1 ] ) );
-  //  max_y = Core::Max( max_y, static_cast< int >( vertices[ i ][ 1 ] ) );
-  //}
-
-  //// If the Speedline doesn't overlap the slice, no need to proceed
-  //if ( min_x >= static_cast< int >( nx ) ||
-  //  max_x < 0 || max_y < 0 ||
-  //  min_y >= static_cast< int >( ny ) )
-  //{
-  //  return false;
-  //}
 
   {
     // Get the layer on which this action operates
@@ -529,17 +751,20 @@ bool ActionSpeedline::run( Core::ActionContextHandle& context, Core::ActionResul
   }
 
   // Create algorithm
-  boost::shared_ptr< ActionSpeedlineAlgo > algo( new ActionSpeedlineAlgo );
+  typedef boost::shared_ptr< ActionSpeedlineAlgo > ActionSpeedlineAlgoHandle;
+  ActionSpeedlineAlgoHandle algo( new ActionSpeedlineAlgo );
 
   algo->target_layer_id_ = this->target_layer_id_ ;
   algo->slice_type_ = this->slice_type_ ;
   algo->slice_number_ = this->slice_number_;
-  algo->erase_  = this->erase_;
   algo->vertices_ = this->vertices_;
+  algo->current_vertex_index_ = this->current_vertex_index_;
+  algo->itk_paths_ = this->itk_paths_;
   algo->iterations_ = this->iterations_;
   algo->termination_ = this->termination_;
   algo->target_layer_ = LayerManager::FindDataLayer( 
     this->target_layer_id_ );
+  algo->update_all_paths_ = this->update_all_paths_;
   algo->speedline_tool_id_ = this->speedline_tool_id_;
 
   Core::Runnable::Start( algo );
@@ -547,30 +772,27 @@ bool ActionSpeedline::run( Core::ActionContextHandle& context, Core::ActionResul
   return true;
 }
 
-//void ActionSpeedline::clear_cache()
-//{
-//  this->algo_->target_layer_.reset();
-//  this->algo_->vol_slice_.reset();
-//}
-
-
 void ActionSpeedline::Dispatch( Core::ActionContextHandle context, 
                 const std::string& layer_id, Core::VolumeSliceType slice_type, 
-                size_t slice_number, bool erase, 
-                const std::vector< VertexCoord >& vertices,
+                size_t slice_number,
+                const std::vector< Core::Point >& vertices,
+                int current_vertex_index,
+                const Core::Path& itk_paths,
                 int iterations, double termination, 
+                bool update_all_paths,
                 std::string toolid )
 {
   ActionSpeedline* action = new ActionSpeedline;
 
-
   action->target_layer_id_ = layer_id;
   action->slice_type_ = slice_type;
   action->slice_number_ = slice_number;
-  action->erase_ = erase;
   action->vertices_ = vertices;
+  action->current_vertex_index_ = current_vertex_index;
+  action->itk_paths_ = itk_paths;
   action->iterations_ = iterations;
   action->termination_ = termination;
+  action->update_all_paths_ = update_all_paths;
   action->speedline_tool_id_ = toolid;
 
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );

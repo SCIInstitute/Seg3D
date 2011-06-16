@@ -37,8 +37,10 @@
 namespace Core
 {
 
+
 Path::Path() 
 {
+  this->paths_.reserve( PATHS_SIZE_C );
 }
 
 Path::~Path()
@@ -51,29 +53,93 @@ size_t Path::get_path_num() const
   return paths_.size();
 }
 
-void Path::add_one_path( const std::vector< Point >& pt )
+//void Path::add_one_path( const std::vector< Point >& pt )
+//{
+//  this->paths_.push_back( pt );
+//}
+
+void Path::add_one_path( const SinglePath& pt )
 {
   this->paths_.push_back( pt );
 }
 
-std::vector< Core::Point >& Path::get_one_path( int index ) 
+//std::vector< Core::Point >& Path::get_one_path( int index ) 
+//{
+//  return this->paths_[index];
+//}
+
+SinglePath& Path::get_one_path( int index ) 
 {
   return this->paths_[index];
 }
 
-std::vector< std::vector< Core::Point > >& Path::get_all_paths( ) 
+//std::vector< std::vector< Core::Point > >& Path::get_all_paths( ) 
+//{
+//  return this->paths_;
+//}
+
+std::vector< SinglePath >& Path::get_all_paths( ) 
 {
   return this->paths_;
 }
 
-void Path::set_one_path( int index, const std::vector< Point >& pt ) 
+//void Path::set_one_path( int index, const std::vector< Point >& pt ) 
+//{
+//
+//  this->paths_[index].clear();
+//  for ( std::vector< Point >::const_iterator it = pt.begin(); it != pt.end(); ++it )
+//  {
+//    this->paths_[index].push_back( *it );
+//  }
+//}
+
+void Path::set_one_path( int index, const SinglePath& pt ) 
 {
 
-  this->paths_[index].clear();
-  for ( std::vector< Point >::const_iterator it = pt.begin(); it != pt.end(); ++it )
+  this->paths_[index] = pt;
+}
+
+bool Path::delete_one_path( Point& p1, Point& p2 ) 
+{
+  SinglePath path1( p1, p2 );
+
+  for ( std::vector< SinglePath >::iterator it = this->paths_.begin(); it != this->paths_.end(); ++it )
   {
-    this->paths_[index].push_back( *it );
+    SinglePath element = *it;
+    if ( element == path1 )
+    {
+      this->paths_.erase( it );
+      return true;
+    }
   }
+  
+  return false;
+}
+
+void Path::set_start_point( const Point& pt )
+{
+  this->start_point_ = pt;
+}
+
+void Path::set_end_point( const Point& pt )
+{
+  this->end_point_ = pt;
+}
+
+Point& Path::get_start_point()  
+{
+  return this->start_point_;
+}
+
+Point& Path::get_end_point () 
+{
+  return this->end_point_;
+}
+
+void Path::delete_all_paths( )
+{
+  this->paths_.clear();
+  this->paths_.reserve( PATHS_SIZE_C );
 }
 
 std::string ExportToString( const Path& value )

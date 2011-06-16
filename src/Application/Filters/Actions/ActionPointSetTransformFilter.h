@@ -46,8 +46,8 @@ class ActionPointSetTransformFilter : public LayerAction
 
 CORE_ACTION( 
   CORE_ACTION_TYPE( "PointSetTransformFilter", "Transform Filter that does a Iterative Closest Points Registration on two masks." )
+  CORE_ACTION_ARGUMENT( "targetlayerid", "Target layer id." )
   CORE_ACTION_ARGUMENT( "layerids", "The layerids on which this tool needs to be run." )
-  //CORE_ACTION_KEY( "replace", "true", "Replace the old layer (true), or add an new mask layer (false)." )
   CORE_ACTION_CHANGES_PROJECT_DATA()
   CORE_ACTION_IS_UNDOABLE()
 )
