@@ -252,47 +252,31 @@ void SplashScreen::open_existing()
 
 void SplashScreen::open_recent()
 {
-  std::vector< RecentProject > recent_projects;
-  ProjectManager::Instance()->get_recent_projects_from_database( recent_projects );
-
-  int index = this->private_->ui_.recent_project_listwidget_->currentRow();
-
-  if( recent_projects[ index ].name_ == 
-    ( this->private_->ui_.recent_project_listwidget_->currentItem()->text() ).toStdString() )
+  QListWidgetItem* current_item = this->private_->ui_.recent_project_listwidget_->currentItem();
+  if ( current_item == 0 )
   {
-    std::vector<std::string> file_project_extensions = Project::GetProjectFileExtensions(); 
-  
-    bool found_project_file = false;
-    boost::filesystem::path path;
-    
-    for ( size_t j = 0; j < file_project_extensions.size(); j++ )
-    {
-      path = boost::filesystem::path( recent_projects[ index ].path_ ) / 
-      ( recent_projects[ index ].name_ + file_project_extensions[ j ] );
-      if ( boost::filesystem::exists( path ) ) 
-      {
-        found_project_file = true;
-        break;
-      }
-    }
-  
-    if ( ! found_project_file ) return;
-    
-    if ( ! ProjectManager::CheckProjectFile( path ) )
-    {
-      QMessageBox::critical( 0, 
-        "Error reading project file",
-        "Error reading project file:\n"
-        "The project file was saved with newer version of Seg3D" );
-      return;
-    }
-
-    ActionLoadProject::Dispatch( Core::Interface::GetWidgetActionContext(),
-      path.string() );
-  
-  this->close();
-  
+    return;
   }
+  
+  boost::filesystem::path project_file( current_item->data( Qt::UserRole ).toString().toStdString() );
+  if ( !boost::filesystem::exists( project_file ) )
+  {
+    QMessageBox::critical( 0, "Project not found", "The project no longer exists." );
+    return;
+  }
+  
+  if ( ! ProjectManager::CheckProjectFile( project_file ) )
+  {
+    QMessageBox::critical( 0, 
+      "Error reading project file",
+      "Error reading project file:\n"
+      "The project file was saved with newer version of Seg3D." );
+    return;
+  }
+
+  ActionLoadProject::Dispatch( Core::Interface::GetWidgetActionContext(), project_file.string() );
+
+  this->close();
 }
 
 
@@ -317,24 +301,18 @@ void SplashScreen::quick_open_file()
 
 void SplashScreen::populate_recent_projects()
 {
-  std::vector< RecentProject > recent_projects;
-  ProjectManager::Instance()->get_recent_projects_from_database( recent_projects );
+  ProjectInfoList recent_projects;
+  ProjectManager::Instance()->get_recent_projects( recent_projects );
 
   for( size_t i = 0; i < recent_projects.size(); ++i )
   {
-    if( recent_projects[ i ].name_ != "" )
-    {
-      QListWidgetItem *new_item;
-      new_item = new QListWidgetItem( QString::fromStdString( recent_projects[ i ].name_ ) );
-      new_item->setToolTip( QString::fromUtf8( "This project was created on: " ) +
-        QString::fromStdString( recent_projects[ i ].date_ )
-        + QString::fromUtf8( " and is located at: " ) 
-        + QString::fromStdString( recent_projects[ i ].path_ ) );
-      this->private_->ui_.recent_project_listwidget_->addItem( new_item );
-
-    }
+    QListWidgetItem *new_item;
+    new_item = new QListWidgetItem( QString::fromStdString( recent_projects[ i ].name() ) );
+    QString project_file = QString::fromStdString( recent_projects[ i ].path().string() );
+    new_item->setData( Qt::UserRole, QVariant( project_file ) );
+    new_item->setToolTip( project_file );
+    this->private_->ui_.recent_project_listwidget_->addItem( new_item );
   }
-    
 }
 
   

@@ -53,32 +53,10 @@
 
 // Application includes
 #include <Application/Project/Project.h>
+#include <Application/ProjectManager/ProjectInfo.h>
 
 namespace Seg3D
 {
-
-class RecentProject
-{
-public:
-  RecentProject( std::string name, std::string path, std::string date, int project_id ) :
-    name_( name ),
-    path_( path ),
-    date_( date ),
-    id_( project_id )
-  {
-  }
-  
-  virtual ~RecentProject()
-  {
-  }
-
-public:
-  std::string name_;
-  std::string path_;
-  std::string date_;
-  int id_;
-};  
-
 
 // Forward declarations
 class ProjectManager;
@@ -86,7 +64,6 @@ class ProjectManagerPrivate;
 typedef boost::shared_ptr<ProjectManagerPrivate> ProjectManagerPrivateHandle;
 
 // Class definition
-//TODO: Inherit private class from DatabaseManager
 
 class ProjectManager : public Core::StateHandler, public Core::RecursiveLockable
 {
@@ -142,9 +119,9 @@ public:
   // Get the current project
   ProjectHandle get_current_project() const;
 
-  // GET_RECENT_PROJECTS_FROM_DATABASE:
-  // Get a vector of recent projects of recent
-  bool get_recent_projects_from_database( std::vector< RecentProject >& recent_projects );
+  // GET_RECENT_PROJECTS:
+  // Get a vector of recent projects
+  bool get_recent_projects( ProjectInfoList& recent_projects );
   
   // GET_CURRENT_PROJECT_FOLDER:
   // Get a current_project_folder that is actually available

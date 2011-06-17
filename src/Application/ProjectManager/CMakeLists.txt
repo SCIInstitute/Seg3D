@@ -36,6 +36,7 @@ SET(APPLICATION_PROJECTMANAGER_SRCS
     AutoSave.cc
     ProjectManager.h
     ProjectManager.cc
+  ProjectInfo.h
 )
 
 SET(APPLICATION_PROJECTMANAGER_ACTIONS_SRCS

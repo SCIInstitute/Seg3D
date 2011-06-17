@@ -831,43 +831,16 @@ void Menu::set_recent_file_list()
   QAction* qaction = 0;
   this->file_menu_recents_->clear();
   
-  std::vector< RecentProject > recent_projects;
-  ProjectManager::Instance()->get_recent_projects_from_database( recent_projects );
+  ProjectInfoList recent_projects;
+  ProjectManager::Instance()->get_recent_projects( recent_projects );
 
   for( size_t i = 0; i < recent_projects.size(); ++i )
   {
-    if( recent_projects[ i ].name_ != "" )
-    {
-      qaction = file_menu_recents_->addAction(
-        QString::fromStdString( recent_projects[ i ].name_ ) );
-        
-      qaction->setToolTip( tr( "Load this recent project" ) );
-      
-//      boost::filesystem::path path = boost::filesystem::path( recent_projects[ i ].path_ ) /
-//        boost::filesystem::path( recent_projects[ i ].name_ );
-      std::vector<std::string> file_extensions = Project::GetProjectFileExtensions(); 
-
-      boost::filesystem::path project_file;
-      bool found_file = false;
-      for ( size_t j = 0;  j < file_extensions.size(); j++ )
-      {
-        project_file = boost::filesystem::path( recent_projects[ i ].path_ ) /
-          ( recent_projects[ i ].name_ + file_extensions[ j ]);
-        if ( boost::filesystem::exists( project_file ) )
-        {
-          found_file = true;
-          break;
-        }
-      }
-
-      if ( found_file )
-      {
-        QtUtils::QtBridge::Connect( qaction, boost::bind( &Menu::ConfirmRecentFileLoad,
-          qpointer_type( this ), project_file.string() ) );
-      }
-
-
-    }
+    qaction = file_menu_recents_->addAction(
+      QString::fromStdString( recent_projects[ i ].name() ) );
+    qaction->setToolTip( tr( "Load this project" ) );
+    QtUtils::QtBridge::Connect( qaction, boost::bind( &Menu::ConfirmRecentFileLoad,
+      qpointer_type( this ), recent_projects[ i ].path().string() ) );
   }
 }
 

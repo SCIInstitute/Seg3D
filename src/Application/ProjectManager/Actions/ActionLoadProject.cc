@@ -55,7 +55,7 @@ bool ActionLoadProject::validate( Core::ActionContextHandle& context )
   }
   catch( ... )
   {
-    std::string error = std::string( "Directory'" ) + full_filename.string() +
+    std::string error = std::string( "File '" ) + full_filename.string() +
       "' does not exist.";
     context->report_error( error );
     return false;

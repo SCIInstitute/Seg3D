@@ -47,6 +47,8 @@ namespace Seg3D
 typedef std::vector< std::map< std::string, boost::any > > ResultSet;
 
 // Forward declaration
+class DatabaseManager;
+typedef boost::shared_ptr< DatabaseManager > DatabaseManagerHandle;
 class DatabaseManagerPrivate;
 
 // Class definition

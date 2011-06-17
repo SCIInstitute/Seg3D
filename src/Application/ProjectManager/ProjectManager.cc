@@ -27,7 +27,7 @@
  */
 
 // STL includes
-#include <time.h>
+#include <ctime>
 
 // Boost includes
 #include <boost/lexical_cast.hpp>
@@ -44,16 +44,36 @@
 #include <Application/ToolManager/ToolManager.h>
 #include <Application/DatabaseManager/DatabaseManager.h>
 
+#include "ApplicationConfiguration.h"
 
 namespace Seg3D
 {
 
 CORE_SINGLETON_IMPLEMENTATION( ProjectManager );
 
+// File name of the project database
+static const std::string PROJECT_DATABASE_C( 
+  std::string( CORE_APPLICATION_VERSION ) + "_recentprojects.sqlite" );
+
+// File name of the ProjectManager state config file
+static const std::string CONFIGURATION_FILE_C( 
+  std::string( CORE_APPLICATION_VERSION ) + "_projectmanager.xml" );
+
+// Version number of the project database
+static const int PROJECT_DATABASE_VERSION_C = 2;
 
 class ProjectManagerPrivate : public DatabaseManager 
 {
 public:
+  // INITIALIZE_PROJECT_DATABASE:
+  // Create the project database.
+  bool initialize_project_database();
+
+  // LOAD_OR_CREATE_PROJECT_DATABASE:
+  // Load the project database from file if it exists, or create a new one.
+  // It also handles converting old version database into the new format.
+  bool load_or_create_project_database();
+
   // SET_CURRENT_PROJECT:
   // Set the current project
   void set_current_project( const ProjectHandle& project );
@@ -65,29 +85,16 @@ public:
 
   // CLEANUP_PROJECTS_LIST:
   // this function cleans up projects from the recent projects list that don't exist.
-  void cleanup_recent_projects_database();
-     
-  // SETUP_DATABASE:
-  // Create a new database 
-  bool setup_database();
+  void cleanup_project_database();
   
-  // INSERT_RECENT_PROJECTS_ENTRY:
-  // Add a recent project to the database
-  bool insert_recent_projects_entry( const std::string& project_name, 
-    const std::string& project_path, const std::string& project_date );
-    
-  // DELETE_RECENT_PROJECTS_ENTRY:
-  // Remove a recent project from the database
-  bool delete_recent_projects_entry( const std::string& project_name, 
-    const std::string& project_path, const std::string& project_date );
+  // INSERT_OR_UPDATE_PROJECT_ENTRY:
+  // Add a project to the database if it doesn't exist yet, otherwise update
+  // its last_access_time to the current time.
+  bool insert_or_update_project_entry( const boost::filesystem::path& project_file );
 
   // RESET_CURRENT_PROJECT_FOLDER:
   // Reset the current project folder variable to the one the preference
   void reset_current_project_folder();
-
-  // GET_RECENT_PROJECTS_FROM_DATABASE:
-  // gets projects from database
-  bool get_recent_projects_from_database( std::vector< RecentProject >& recent_projects );
 
 public:
   // public handle to the current project
@@ -95,7 +102,84 @@ public:
 
   // Pointer back to project manager class
   ProjectManager* project_manager_;
+
+  // A database of recently loaded projects
+  DatabaseManagerHandle project_database_;
+
+  // Path of the project database file
+  boost::filesystem::path project_db_file_;
 };
+
+bool ProjectManagerPrivate::initialize_project_database()
+{
+  this->project_database_.reset( new DatabaseManager );
+  std::string sql_statements;
+
+  // Create table for storing the database version
+  sql_statements += "CREATE TABLE database_version "
+    "(version INTEGER NOT NULL PRIMARY KEY);";
+
+  // Create table for storing projects
+  sql_statements += "CREATE TABLE project "
+    "(project_id INTEGER NOT NULL PRIMARY KEY, "
+    "name TEXT NOT NULL, "
+    "path TEXT NOT NULL UNIQUE, "
+    "last_access_time INTEGER NOT NULL);";
+
+  // Set the database version to 2
+  sql_statements += "INSERT INTO database_version VALUES ("
+    + Core::ExportToString( PROJECT_DATABASE_VERSION_C ) + ");";
+
+  std::string error;
+  if ( !this->project_database_->run_sql_script( sql_statements, error ) )
+  {
+    CORE_LOG_ERROR( "Failed to initialize the project database: " + error );
+    return false;
+  }
+
+  return true;
+}
+
+bool ProjectManagerPrivate::load_or_create_project_database()
+{
+  // Find the directory where user settings are stored
+  Core::Application::Instance()->get_config_directory( this->project_db_file_ );
+  this->project_db_file_ = this->project_db_file_ / PROJECT_DATABASE_C;
+
+  this->project_database_.reset( new DatabaseManager );
+  std::string error;
+  if ( boost::filesystem::exists( this->project_db_file_ ) &&
+    this->project_database_->load_database( this->project_db_file_, error ) )
+  {
+    // Check the database version
+    long long version = 0;
+    std::string sql_str = "SELECT version FROM database_version ORDER BY version DESC LIMIT 1;";
+    ResultSet results;
+    if ( this->project_database_->run_sql_statement( sql_str, results, error ) && results.size() == 1 )
+    {
+      try
+      {
+        version = boost::any_cast< long long >( results[ 0 ][ "version" ] );
+      }
+      catch ( ... ) {}
+    }
+
+    // If the version is the same as current version
+    if ( version == PROJECT_DATABASE_VERSION_C )
+    {
+      // Clean out any projects that don't exist
+      this->cleanup_project_database();
+      return true;
+    }
+
+    // Otherwise log a warning
+    CORE_LOG_WARNING( "The project database is not compatible with this version of " +
+      Core::Application::GetApplicationName() + ". A new one will be created." );
+  }
+
+  // The project database doesn't exist or isn't compatible
+  return this->initialize_project_database();
+}
 
 void ProjectManagerPrivate::set_current_project( const ProjectHandle& current_project )
 {
@@ -165,194 +249,100 @@ void ProjectManagerPrivate::reset_current_project_folder()
     PreferencesManager::Instance()->project_path_state_->get() );
 }
 
-bool ProjectManagerPrivate::setup_database()
+bool ProjectManagerPrivate::insert_or_update_project_entry( const boost::filesystem::path& project_file )
 {
-  // Find the directory where user settings are stored
-  boost::filesystem::path recent_project_database_file;
-  Core::Application::Instance()->get_config_directory( recent_project_database_file );
-  recent_project_database_file = recent_project_database_file / "recentprojects.sqlite";
-  
-  bool read_database = false;
-
-  // Try to load the database first
-  if ( boost::filesystem::exists( recent_project_database_file ) )
+  std::string sql_str = "SELECT project_id FROM project WHERE path = '" + 
+    DatabaseManager::EscapeQuotes( project_file.generic_string() ) + "';";
+  ResultSet results;
+  std::string error;
+  if ( !this->project_database_->run_sql_statement( sql_str, results, error ) )
   {
-    std::string error;
-    if ( !this->load_database( recent_project_database_file, error ) )
-    {
-      CORE_LOG_ERROR( error );
-      // We will generate a new database
-    }
-    else
-    {
-      // Successfully read the database
-      read_database = true;
-    }
+    CORE_LOG_ERROR( error );
+    return false;
   }
   
-  // If we could not load it generate it from scratch
-  if ( ! read_database )
+  if ( results.size() > 0 )
   {
-    std::string create_statements( 
-      "CREATE TABLE recentprojects "
-      "(id INTEGER NOT NULL, "
-      "name VARCHAR(255) NOT NULL, "
-      "path VARCHAR(255) NOT NULL, "
-      "date VARCHAR(255) NOT NULL, "
-      "PRIMARY KEY (id));" );
-  
-    std::string error;
-    if ( ! this->run_sql_statement( create_statements, error ) )
+    assert( results.size() == 1 );
+    long long project_id = boost::any_cast< long long >( results[ 0 ][ "project_id" ] );
+    sql_str = "UPDATE project SET last_access_time = strftime('%s', 'now') WHERE project_id = " +
+      Core::ExportToString( project_id ) + ";";
+    if ( !this->project_database_->run_sql_statement( sql_str, error ) )
+    {
+      CORE_LOG_ERROR( error );
+      return false;
+    }
+  }
+  else
+  {
+    sql_str = "INSERT INTO project (name, path, last_access_time) VALUES ('" +
+      DatabaseManager::EscapeQuotes( project_file.stem().string() ) + "', '" + 
+      DatabaseManager::EscapeQuotes( project_file.generic_string() ) + "', strftime('%s', 'now'));";
+    if ( !this->project_database_->run_sql_statement( sql_str, error ) )
     {
       CORE_LOG_ERROR( error );
       return false;
     }
   }
   
-  // Done
-  return true;
-}
-
-
-bool ProjectManagerPrivate::insert_recent_projects_entry( const std::string& project_name, 
-  const std::string& project_path, const std::string& project_date )
-{
-  std::string error;
-
-  // First delete the old entry
-  std::string delete_statement = "DELETE FROM recentprojects WHERE (name = '" + project_name
-    + "') AND (path = '" + project_path + "')";
-  
-  // Run the statement to actually delete the entry
-  this->run_sql_statement( delete_statement, error );
-      
-  // Now insert the new one 
-  std::string insert_statement = "INSERT INTO recentprojects (name, path, date) "
-    "VALUES('" + project_name + "', '" + project_path + "', '" + project_date + "')";
-    
-  if( this->run_sql_statement( insert_statement, error ) )
-  {
-    // if we've successfully added recent projects to our database
-    // then we let everyone know things have changed.
-    this->project_manager_->recent_projects_changed_signal_();
-    return true;    
-  } 
-  else
-  {
-    CORE_LOG_ERROR( error );
-    return false;
-  }   
-}
-
-
-bool ProjectManagerPrivate::delete_recent_projects_entry( const std::string& project_name, 
-  const std::string& project_path, const std::string& project_date )
-{
-  // Delete an entry from the database
-  std::string delete_statement = "DELETE FROM recentprojects WHERE (name = '" + project_name
-    + "') AND (path = '" + project_path + "')";
-
-  std::string error;
-  this->run_sql_statement( delete_statement, error );
+  // if we've successfully added recent projects to our database
+  // then we let everyone know things have changed.
   this->project_manager_->recent_projects_changed_signal_();
-  
   return true;
 }
 
-
-void ProjectManagerPrivate::cleanup_recent_projects_database()
+void ProjectManagerPrivate::cleanup_project_database()
 {
-  // Get all the entries in the current database
-  std::vector< RecentProject > recent_projects;
-  this->get_recent_projects_from_database( recent_projects ); 
-
-  // Check the entries
-
-  std::vector<std::string> file_extensions = Project::GetProjectFileExtensions();
-
-  for( size_t i = 0; i < recent_projects.size(); ++i )
+  // Get all the entries from the database
+  std::string sql_str = "SELECT project_id, path FROM project;";
+  std::string error;
+  ResultSet results;
+  if ( !this->project_database_->run_sql_statement( sql_str, results, error ) )
   {
-    bool found_project = false;
-    
-    for ( size_t j = 0; j < file_extensions.size(); j++ )
-    {
+    CORE_LOG_ERROR( error );
+    return;
+  }
   
-      // Check whether the current one exists, if not we need to delete it from the database
-      boost::filesystem::path path = boost::filesystem::path( recent_projects[ i ].path_ ) / 
-        ( recent_projects[ i ].name_ + file_extensions[ j ] );
+  // Whether the database has been changed
+  bool changed = false;
 
-      if( boost::filesystem::exists( path ) ) 
-      {
-        found_project = true;
-        break;
-      }
-    }
-    
-
-    if( !found_project )
+  // For every entry, check if the project file still exists
+  for ( size_t i = 0; i < results.size(); ++i )
+  {
+    bool exists = false;
+    try
     {
-      this->delete_recent_projects_entry( recent_projects[ i ].name_, 
-        recent_projects[ i ].path_, recent_projects[ i ].date_ );
+      std::string file_str = boost::any_cast< std::string >( results[ i ][ "path" ] );
+      exists = boost::filesystem::exists( file_str ) && boost::filesystem::is_regular_file( file_str );
+    }
+    catch( ... ) {}
 
-      // Check if it by any chance is an older version where we assumed that data directory is the
-      // same name as the top project name
-
-      ///////// BACKWARDS COMPATIBILITY /////////////////////////
-      boost::filesystem::path path = boost::filesystem::path( recent_projects[ i ].path_ ) / 
-        recent_projects[ i ].name_ / ( recent_projects[ i ].name_ + ".s3d" );
-
-
-      if ( boost::filesystem::exists( path ) )
+    if ( !exists )
+    {
+      try
       {
-        path = boost::filesystem::path( recent_projects[ i ].path_ ) / 
-          recent_projects[ i ].name_;
-        this->insert_recent_projects_entry( recent_projects[ i ].name_, 
-          path.string(), recent_projects[ i ].date_ );
+        long long project_id = boost::any_cast< long long >( results[ i ][ "project_id" ] );
+        sql_str = "DELETE FROM project WHERE project_id = " +
+          Core::ExportToString( project_id ) + ";";
+        if ( !this->project_database_->run_sql_statement( sql_str, error ) )
+        {
+          CORE_LOG_ERROR( error );
+        }
+        else
+        {
+          changed = true;
+        }
       }
-      ///////////////////////////////////////////////////////////
+      catch( ... ) {}
     }
   }
-
-  // Find the directory where user settings are stored
-  boost::filesystem::path recent_project_database_file;
-  Core::Application::Instance()->get_config_directory( recent_project_database_file );
-  recent_project_database_file = recent_project_database_file / "recentprojects.sqlite";
-
-  std::string error;
-  if ( ! this->save_database( recent_project_database_file, error ) )
+  
+  // If the database was changed, save it out
+  if ( changed && !this->project_database_->save_database( this->project_db_file_, error ) )
   {
-    // Just log the error if things do not work
     CORE_LOG_ERROR( error );
   }
 }
-
-bool ProjectManagerPrivate::get_recent_projects_from_database( 
-  std::vector< RecentProject >& recent_projects )
-{
-  ResultSet result_set;
-  std::string select_statement = "SELECT * FROM recentprojects ORDER BY id DESC LIMIT 20";
-
-  // Get the 20 latest entries into this database
-  std::string error;
-  if( !this->run_sql_statement( select_statement, result_set, error ) )
-  {
-    CORE_LOG_ERROR( error );
-    return false;
-  }
-
-  // Get the information from the database
-  for( size_t i = 0; i < result_set.size(); ++i )
-  {
-    recent_projects.push_back( RecentProject( 
-      boost::any_cast< std::string >( ( result_set[ i ] )[ "name" ] ),
-      boost::any_cast< std::string >( ( result_set[ i ] )[ "path" ] ),
-      boost::any_cast< std::string >( ( result_set[ i ] )[ "date" ] ), 
-      static_cast< int >( boost::any_cast< long long >( ( result_set[ i ] )[ "id" ] ) ) ) );
-  }
-
-  return true;
-}
-
 
 //////////////////////////////////////////////////////////
 
@@ -385,9 +375,10 @@ ProjectManager::ProjectManager() :
 
   // Update the states from the configuration file
   Core::StateIO stateio;
-  if( stateio.import_from_file( configuration_dir / "projectmanager.xml" ) )
+  if ( stateio.import_from_file( configuration_dir / CONFIGURATION_FILE_C ) ||
+    stateio.import_from_file( configuration_dir / "projectmanager.xml" ) )
   {
-    this->load_states( stateio );
+    this->load_states( stateio ); 
   }
   
   // Check whether directory exists and whether it can be used, if not update it to something
@@ -402,10 +393,7 @@ ProjectManager::ProjectManager() :
   this->current_file_folder_state_->set( current_file_folder.string() );
   
   // Here we check to see if the recent projects database exists, otherwise we create it
-  this->private_->setup_database();
-  
-  // Here we clean out any projects that don't exist where we think they should
-  this->private_->cleanup_recent_projects_database();
+  this->private_->load_or_create_project_database();
   
   // Create a new project
   this->private_->current_project_ = ProjectHandle( new Project( std::string( "Untitled Project" ) ) ); 
@@ -757,12 +745,10 @@ void ProjectManager::checkpoint_projectmanager()
 {
   ProjectHandle current_project = this->get_current_project();
   
-  std::string time_stamp = boost::posix_time::to_simple_string( 
-    boost::posix_time::second_clock::local_time() );
-  this->private_->insert_recent_projects_entry( current_project->project_name_state_->get(), 
-    current_project->project_path_state_->get(), time_stamp );
-
   boost::filesystem::path project_path( current_project->project_path_state_->get() );
+  boost::filesystem::path project_file = project_path / current_project->project_file_state_->get();
+  this->private_->insert_or_update_project_entry( project_file );
+
   this->current_project_folder_state_->set( project_path.parent_path().string() );
 
   // Get local configuration directory
@@ -773,29 +759,42 @@ void ProjectManager::checkpoint_projectmanager()
   Core::StateIO stateio;
   stateio.initialize();
   this->save_states( stateio );
-  stateio.export_to_file( configuration_dir / "projectmanager.xml"  );
+  stateio.export_to_file( configuration_dir / CONFIGURATION_FILE_C );
   
   // Write out the database
-
-  // Find the directory where user settings are stored
-  boost::filesystem::path recent_project_database_file;
-  Core::Application::Instance()->get_config_directory( recent_project_database_file );
-  recent_project_database_file = recent_project_database_file / "recentprojects.sqlite";
-
   std::string error;
-  if ( ! this->private_->save_database( recent_project_database_file, error ) )
+  if ( !this->private_->project_database_->save_database( this->private_->project_db_file_, error ) )
   {
     // Just log the error if things do not work
     CORE_LOG_ERROR( error );
   }
 }
 
-
-bool ProjectManager::get_recent_projects_from_database( 
-  std::vector< RecentProject >& recent_projects )
+bool ProjectManager::get_recent_projects( ProjectInfoList& recent_projects )
 {
-  this->private_->cleanup_recent_projects_database();
-  return this->private_->get_recent_projects_from_database( recent_projects );
+  // Clean up the project database first
+  this->private_->cleanup_project_database();
+
+  std::string sql_str = "SELECT * FROM project ORDER BY last_access_time DESC LIMIT 20";
+  std::string error;
+  ResultSet results;
+  if ( !this->private_->project_database_->run_sql_statement( sql_str, results, error ) )
+  {
+    CORE_LOG_ERROR( error );
+    return false;
+  }
+  
+  for ( size_t i = 0; i < results.size(); ++i )
+  {
+    std::string name = boost::any_cast< std::string >( results[ i ][ "name" ] );
+    boost::filesystem::path path( boost::any_cast< std::string >( results[ i ][ "path" ] ) );
+    time_t last_access_time = static_cast< time_t >( boost::any_cast< long long >( 
+      results[ i ][ "last_access_time" ] ) );
+    recent_projects.push_back( ProjectInfo( name, path,
+      boost::posix_time::from_time_t( last_access_time ) ) );
+  }
+  
+  return true;
 }
 
 //////////////////////////////////////////////
