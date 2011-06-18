@@ -264,11 +264,33 @@ bool MaskLayer::pre_save_states( Core::StateIO& state_io )
 {
   long long generation_number = this->get_mask_volume()->get_generation();
   this->generation_state_->set( generation_number );
-  std::string data_file_name = this->generation_state_->export_to_string() + ".nrrd";
 
   // Add the number to the project so it can be recorded into the session database
   ProjectManager::Instance()->get_current_project()->add_generation_number( generation_number );
+  
+  boost::filesystem::path data_file = ProjectManager::Instance()->get_current_project()->
+    get_project_data_path() / ( this->generation_state_->export_to_string() + ".nrrd" );
+  if ( boost::filesystem::exists( data_file ) )
+  {
+    // File has already been saved
+    return true;
+  }
+  
+  bool compress = PreferencesManager::Instance()->compression_state_->get();
+  int level = PreferencesManager::Instance()->compression_level_state_->get();
 
+  Core::DataBlockHandle data_block = this->get_mask_volume()->
+    get_mask_data_block()->get_data_block();
+  Core::NrrdDataHandle nrrd( new Core::NrrdData( data_block, this->get_grid_transform() ) );
+
+  std::string error;
+  Core::DataBlock::shared_lock_type slock( data_block->get_mutex() );
+  if ( !Core::NrrdData::SaveNrrd( data_file.string(), nrrd, error, compress, level ) )
+  {
+    CORE_LOG_ERROR( error );
+    return false;
+  }
+  
   return true;
 }
 
