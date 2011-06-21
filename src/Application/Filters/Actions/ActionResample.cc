@@ -481,7 +481,7 @@ void ResampleAlgo::resample_mask_layer( MaskLayerHandle input, MaskLayerHandle o
     Core::NrrdDataHandle nrrd_data( new Core::NrrdData( nrrd_out ) );
     Core::DataBlockHandle data_block = Core::NrrdDataBlock::New( nrrd_data );
     Core::MaskDataBlockHandle mask_data_block;
-    if ( !( Core::MaskDataBlockManager::Convert( data_block, nrrd_data->get_grid_transform(),
+    if ( !( Core::MaskDataBlockManager::Convert( data_block, this->current_output_transform_,
       mask_data_block ) ) )
     {
       return;
