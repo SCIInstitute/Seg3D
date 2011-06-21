@@ -473,9 +473,9 @@ public:
     typedef itk::ExtractImageFilter< TYPED_IMAGE_TYPE, image_type >  extract_filter_type;
     typename extract_filter_type::Pointer extract_filter = extract_filter_type::New();
     
-    TYPED_IMAGE_TYPE::RegionType input_region = speed_image_3D->get_image()->GetLargestPossibleRegion();
+    typename TYPED_IMAGE_TYPE::RegionType input_region = speed_image_3D->get_image()->GetLargestPossibleRegion();
     //TYPED_IMAGE_TYPE::RegionType input_region = ( rescale_filter->GetOutput() )->GetLargestPossibleRegion();
-    TYPED_IMAGE_TYPE::SizeType size = input_region.GetSize();
+    typename TYPED_IMAGE_TYPE::SizeType size = input_region.GetSize();
     size[2] = 0;
     typename TYPED_IMAGE_TYPE::IndexType start = input_region.GetIndex();
     start[2] = this->slice_number_;

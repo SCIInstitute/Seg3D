@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>317</width>
-    <height>555</height>
+    <width>264</width>
+    <height>545</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -199,7 +199,7 @@ QPushButton:pressed{
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>40</height>
+       <height>32</height>
       </size>
      </property>
      <property name="maximumSize">
@@ -217,11 +217,8 @@ QPushButton:pressed{
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>137</width>
-          <height>13</height>
-         </size>
+        <property name="sizeType">
+         <enum>QSizePolicy::Preferred</enum>
         </property>
        </spacer>
       </item>
@@ -235,7 +232,13 @@ QPushButton:pressed{
         </property>
         <property name="minimumSize">
          <size>
-          <width>145</width>
+          <width>0</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
           <height>30</height>
          </size>
         </property>
@@ -577,6 +580,9 @@ QWidget#message_alert_{
         </property>
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="alternatingRowColors">
+         <bool>true</bool>
         </property>
         <property name="selectionMode">
          <enum>QAbstractItemView::MultiSelection</enum>
