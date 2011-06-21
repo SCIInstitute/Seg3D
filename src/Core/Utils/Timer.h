@@ -29,7 +29,11 @@
 #ifndef CORE_UTILS_TIMER_H
 #define CORE_UTILS_TIMER_H
 
-#include <boost/utility.hpp>
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+# pragma once
+#endif 
+
+#include <boost/noncopyable.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/signals2.hpp>
 
@@ -45,13 +49,13 @@ typedef boost::shared_ptr< TimerPrivate > TimerPrivateHandle;
 class Timer : public boost::noncopyable
 {
 public:
-  Timer( boost::int64_t interval );
+  Timer( long long interval );
   ~Timer();
 
   void start();
   void stop();
 
-  void set_interval( boost::int64_t interval ); 
+  void set_interval( long long interval ); 
   void set_single_shot( bool single_shot );
   
 public:

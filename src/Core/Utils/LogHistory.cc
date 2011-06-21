@@ -27,6 +27,7 @@
  */
 
 #include <Core/Utils/LogHistory.h>
+#include <Core/Utils/Log.h>
 
 namespace Core
 {

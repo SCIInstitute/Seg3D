@@ -33,10 +33,9 @@
 #include <boost/algorithm/string.hpp>
 
 // Core includes
+#include <Core/Utils/Exception.h>
 #include <Core/Utils/StringUtil.h>
 #include <Core/Utils/StringParser.h>
-
-// Application includes
 #include <Core/Action/ActionParameter.h>
 #include <Core/Action/Action.h>
 

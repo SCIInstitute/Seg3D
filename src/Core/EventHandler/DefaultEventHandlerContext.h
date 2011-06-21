@@ -33,12 +33,7 @@
 # pragma once
 #endif 
 
-// STL includes
-#include <queue>
-
 // Boost includes
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/thread.hpp>
 #include <boost/shared_ptr.hpp>
 
 // Include Base class

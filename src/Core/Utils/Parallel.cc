@@ -26,8 +26,13 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// STL includes
 #include <vector>
 
+// Boost includes
+#include <boost/thread.hpp>
+
+// Core includes
 #include <Core/Utils/Parallel.h>
 
 namespace Core

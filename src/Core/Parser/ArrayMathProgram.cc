@@ -26,6 +26,9 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Boost includes
+#include <boost/thread.hpp>
+
 // Core includes
 #include <Core/Parser/ArrayMathProgram.h> 
 #include <Core/Utils/Parallel.h>

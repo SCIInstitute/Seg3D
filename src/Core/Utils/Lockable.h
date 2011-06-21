@@ -29,8 +29,15 @@
 #ifndef CORE_UTILS_LOCKABLE_H
 #define CORE_UTILS_LOCKABLE_H
 
-#include <boost/thread.hpp>
-#include <boost/utility.hpp>
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+# pragma once
+#endif 
+
+// Boost includes
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/recursive_mutex.hpp>
+#include <boost/thread/shared_mutex.hpp>
+#include <boost/noncopyable.hpp>
 
 namespace Core
 {

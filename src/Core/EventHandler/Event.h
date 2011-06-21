@@ -38,6 +38,9 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition_variable.hpp>
 
+// include forward declaration
+#include <Core/EventHandler/EventFWD.h>
+
 namespace Core
 {
 
@@ -90,8 +93,6 @@ public:
 private:
   EventSyncHandle sync_handle_;
 };
-
-typedef boost::shared_ptr< Event > EventHandle;
 
 // CLASS EVENTT <TEMPLATE>
 // This class is redefined for each functor and contains only the

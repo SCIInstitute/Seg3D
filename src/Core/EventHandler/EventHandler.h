@@ -34,14 +34,12 @@
 #endif 
 
 // Boost includes
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/thread.hpp>
 #include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/utility.hpp>
+#include <boost/noncopyable.hpp>
 
 // For event handling
-#include <Core/EventHandler/Event.h>
+#include <Core/EventHandler/EventFWD.h>
 #include <Core/EventHandler/EventHandlerContext.h>
 
 namespace Core

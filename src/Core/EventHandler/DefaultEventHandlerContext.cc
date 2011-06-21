@@ -26,11 +26,20 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// STL includes
+#include <queue>
+
+// Boost includes
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/thread.hpp>
+
+
 #include <Core/Utils/Exception.h>
 #include <Core/Utils/Log.h>
 
-#include <Core/EventHandler/DefaultEventHandlerContext.h>
+#include <Core/EventHandler/Event.h>
 #include <Core/EventHandler/EventHandler.h>
+#include <Core/EventHandler/DefaultEventHandlerContext.h>
 
 namespace Core
 {

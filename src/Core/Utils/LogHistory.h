@@ -44,7 +44,6 @@
 #include <boost/signals2.hpp>
 
 // Core includes
-#include <Core/Utils/Log.h>
 #include <Core/Utils/Singleton.h>
 
 namespace Core

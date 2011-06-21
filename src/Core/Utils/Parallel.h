@@ -29,10 +29,14 @@
 #ifndef CORE_UTILS_PARALLEL_H
 #define CORE_UTILS_PARALLEL_H
 
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+# pragma once
+#endif 
+
 // Boost includes
-#include <boost/utility.hpp>
+#include <boost/noncopyable.hpp>
 #include <boost/smart_ptr.hpp>
-#include <boost/thread.hpp>
+#include <boost/function.hpp>
 #include <boost/thread/barrier.hpp>
 
 namespace Core

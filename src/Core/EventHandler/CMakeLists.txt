@@ -33,12 +33,14 @@
 
 SET(CORE_EVENTHANDLER_SRCS
   Event.h
+  EventFWD.h
   Event.cc
   EventHandler.h
   EventHandler.cc
   DefaultEventHandlerContext.h
   DefaultEventHandlerContext.cc
   EventHandlerContext.h
+  EventHandlerContextFWD.h
   )
 
 CORE_ADD_LIBRARY(Core_EventHandler ${CORE_EVENTHANDLER_SRCS} )

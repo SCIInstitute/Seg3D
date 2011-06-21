@@ -29,11 +29,13 @@
 #ifndef CORE_UTILS_SINGLETON_H
 #define CORE_UTILS_SINGLETON_H
 
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+# pragma once
+#endif 
+
 // Boost includes
 #include <boost/thread/mutex.hpp>
-#include <boost/thread/thread.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/utility.hpp>
+#include <boost/noncopyable.hpp>
 
 namespace Core
 {

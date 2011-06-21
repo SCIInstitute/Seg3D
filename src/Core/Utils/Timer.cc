@@ -41,7 +41,7 @@ public:
 
 public:
   Timer* timer_;
-  boost::int64_t interval_;
+  long long interval_;
   bool running_;
   bool single_shot_;
   boost::thread* timer_thread_;
@@ -77,7 +77,7 @@ void TimerPrivate::run()
   this->timer_condition_.notify_all();
 }
 
-Timer::Timer( boost::int64_t interval ) :
+Timer::Timer( long long interval ) :
   private_( new TimerPrivate )
 {
   this->private_->interval_ = interval;
@@ -110,7 +110,7 @@ void Timer::start()
   }
 }
 
-void Timer::set_interval( boost::int64_t interval )
+void Timer::set_interval( long long interval )
 {
   boost::mutex::scoped_lock lock( this->private_->mutex_ );
   this->private_->interval_ = interval;

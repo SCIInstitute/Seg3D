@@ -35,9 +35,10 @@
 
 // Boost includes
 #include <boost/shared_ptr.hpp>
-#include <boost/utility.hpp>
+#include <boost/noncopyable.hpp>
 
-#include <Core/EventHandler/Event.h>
+#include <Core/EventHandler/EventFWD.h>
+#include <Core/EventHandler/EventHandlerContextFWD.h>
 
 namespace Core
 {
@@ -51,8 +52,6 @@ namespace Core
 // share a single thread.
 
 class EventHandler;
-class EventHandlerContext;
-typedef boost::shared_ptr< EventHandlerContext > EventHandlerContextHandle;
 
 class EventHandlerContext : public boost::noncopyable
 {
@@ -106,8 +105,6 @@ public:
   // Check whether the eventhandler is running
   virtual bool eventhandler_started() = 0;  
 };
-
-typedef boost::shared_ptr< EventHandlerContext > EventHandlerContextHandle;
 
 } // end namespace Core
 

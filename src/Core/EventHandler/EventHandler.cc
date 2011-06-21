@@ -26,9 +26,15 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Boost includes
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/thread.hpp>
+
+
 #include <Core/Utils/Log.h>
 #include <Core/Utils/Exception.h>
 
+#include <Core/EventHandler/Event.h>
 #include <Core/EventHandler/EventHandler.h>
 #include <Core/EventHandler/DefaultEventHandlerContext.h>
 

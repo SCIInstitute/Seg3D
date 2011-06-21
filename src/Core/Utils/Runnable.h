@@ -30,8 +30,12 @@
 #ifndef CORE_UTILS_RUNTHREAD_H
 #define CORE_UTILS_RUNTHREAD_H
 
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+# pragma once
+#endif 
+
 #include <boost/smart_ptr.hpp>
-#include <boost/utility.hpp>
+#include <boost/noncopyable.hpp>
   
 namespace Core
 {

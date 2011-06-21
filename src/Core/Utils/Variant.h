@@ -40,7 +40,7 @@
 
 // Boost includes
 #include <boost/shared_ptr.hpp>
-#include <boost/utility.hpp>
+#include <boost/noncopyable.hpp>
 
 // Core
 #include <Core/Utils/StringUtil.h>

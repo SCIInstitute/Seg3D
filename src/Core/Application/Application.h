@@ -31,23 +31,13 @@
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
-#endif 
-
-// System includes -- for getting process id
-#ifdef _WIN32
-#include <Windows.h>
-#else
-#include <unistd.h>
 #endif
-
-// STL includes
-#include <map>
 
 // Boost includes
 #include <boost/filesystem/path.hpp>
+#include <boost/signals2.hpp>
 
 // Core includes
-#include <Core/Utils/Log.h>
 #include <Core/Utils/Singleton.h>
 #include <Core/Utils/Lockable.h>
 #include <Core/EventHandler/EventHandler.h>

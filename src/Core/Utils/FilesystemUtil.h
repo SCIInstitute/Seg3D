@@ -34,7 +34,7 @@
 #endif 
 
 // Boost includes
-#include <boost/filesystem.hpp>
+#include <boost/filesystem/path.hpp>
 
 namespace Core
 {

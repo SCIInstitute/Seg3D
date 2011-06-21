@@ -42,8 +42,6 @@
 // Boost includes
 #include <boost/smart_ptr.hpp>
 #include <boost/signals2.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/thread.hpp>
 
 namespace Core
 {

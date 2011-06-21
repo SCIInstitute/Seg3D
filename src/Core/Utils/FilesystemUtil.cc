@@ -26,6 +26,10 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Boost includes
+#include <boost/filesystem.hpp>
+
+// Core includes
 #include <Core/Utils/FilesystemUtil.h>
 
 namespace Core

@@ -36,8 +36,6 @@
 // STL includes
 #include <string>
 
-#include <Core/Utils/Exception.h>
-
 namespace Core
 {
 

@@ -26,6 +26,7 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#include <Core/EventHandler/Event.h>
 #include <Core/EventHandler/EventHandler.h>
 
 namespace Core

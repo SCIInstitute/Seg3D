@@ -29,6 +29,10 @@
 #ifndef CORE_UTILS_LOGSTREAMER_H
 #define CORE_UTILS_LOGSTREAMER_H
 
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+# pragma once
+#endif 
+
 // STL includes
 #include <ostream>
 

@@ -26,11 +26,13 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// STL includes
 #include <iostream>
 
+// Core includes
 #include <Core/Utils/StringParser.h>
 #include <Core/Utils/StringUtil.h>
-
+#include <Core/Utils/Exception.h>
 #include <Core/Action/ActionFactory.h>
 
 namespace Core

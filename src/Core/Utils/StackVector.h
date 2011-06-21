@@ -29,9 +29,12 @@
 #ifndef CORE_UTILS_STACKVECTOR_H
 #define CORE_UTILS_STACKVECTOR_H
 
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+# pragma once
+#endif 
+
 // STL includes
 #include <assert.h>
-#include <vector>
 
 namespace Core 
 {
@@ -43,6 +46,7 @@ class StackVector
 {
 
 public:
+// -- required typedefs for vector type class --
   typedef T        value_type;
   typedef T*       pointer_type;
   typedef T&       reference_type;
@@ -51,8 +55,18 @@ public:
   typedef const T* const_iterator_type;
   typedef size_t   size_type;
 
-  StackVector() { this->size_ = 0; }
-  StackVector( size_t s ) { assert( s <= CAPACITY ); this->size_ = s; }
+// -- constructor/destructor --
+  StackVector() 
+  { 
+    this->size_ = 0; 
+  }
+  
+  StackVector( size_t s ) 
+  { 
+    assert( s <= CAPACITY ); 
+    this->size_ = s; 
+  }
+  
   StackVector( size_t s, T val )
   { 
     assert( s <= CAPACITY ); 
@@ -62,27 +76,84 @@ public:
       this->data_[ i ] = val; 
     }
   }
+  
   ~StackVector() {}
 
-  iterator_type begin() { return this->data_; }
-  iterator_type end() { return this->data_ + this->size_; }
-  const_iterator_type begin() const { return this->data_; }
-  const_iterator_type end() const { return this->data_ + this->size_; }
-  size_t size() const { assert( this->size_ <= CAPACITY ); return this->size_; }
-  size_t max_size() const { return CAPACITY; }
-  size_t capacity() const { return CAPACITY; }
-  bool empty() const { return this->size_; }
-  reference_type operator[]( size_t n ) { return this->data_[ n ]; }
-  const_reference_type operator[]( size_t n ) const { return this->data_[ n ]; }
-  void resize( size_t s ) { assert( s <= CAPACITY ); this->size_ = s; }
+// -- iterators --
+  iterator_type begin()
+  { 
+    return this->data_; 
+  }
+  
+  iterator_type end() 
+  { 
+    return this->data_ + this->size_; 
+  }
+  
+  const_iterator_type begin() const 
+  { 
+    return this->data_; 
+  }
+  
+  const_iterator_type end() const 
+  { 
+    return this->data_ + this->size_; 
+  }
+  
+// -- capacity -- 
+  size_t size() const 
+  { 
+    assert( this->size_ <= CAPACITY ); 
+    return this->size_; 
+  }
+  
+  size_t max_size() const 
+  { 
+    return CAPACITY; 
+  }
+  
+  size_t capacity() const 
+  { 
+    return CAPACITY; 
+  }
+  
+  bool empty() const 
+  { 
+    return this->size_; 
+  }
+
+// -- accessors --
+  reference_type operator[]( size_t n ) 
+  { 
+    return this->data_[ n ]; 
+  }
+  
+  const_reference_type operator[]( size_t n ) const 
+  { 
+    return this->data_[ n ]; 
+  }
+  
+  void resize( size_t s ) 
+  { 
+    assert( s <= CAPACITY ); 
+    this->size_ = s; 
+  }
+  
   void reserve( size_t ) {}  // Do nothing: We already have a certain capacity
-  void push_back( T t ) { 
+  
+  void push_back( T t ) 
+  { 
     assert( this->size_ < CAPACITY ); 
     this->data_[ this->size_ ] = t; 
     this->size_++; 
   }
-  void clear() { this->size_ = 0; }
   
+  void clear() 
+  { 
+    this->size_ = 0; 
+  }
+  
+// -- internals --  
 private:
   size_t size_;
   T data_[ CAPACITY ];

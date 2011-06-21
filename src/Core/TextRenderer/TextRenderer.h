@@ -32,6 +32,7 @@
 // STL includes
 #include <map>
 #include <string>
+#include <vector>
 
 // boost includes
 #include <boost/smart_ptr.hpp>

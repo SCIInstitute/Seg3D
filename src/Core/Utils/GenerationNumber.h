@@ -29,10 +29,14 @@
 #ifndef CORE_UTILS_GENERATIONNUMBER_H
 #define CORE_UTILS_GENERATIONNUMBER_H
 
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+# pragma once
+#endif
+
 // Boost includes
 #include <boost/smart_ptr/detail/atomic_count.hpp>
 #include <boost/intrusive_ptr.hpp>
-#include <boost/utility.hpp>
+#include <boost/noncopyable.hpp>
 
 namespace Core
 {

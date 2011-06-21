@@ -48,8 +48,10 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #ifndef __APPLE__
+#include <unistd.h>
 #include <sys/sysinfo.h>
 #else
+#include <unistd.h>
 #include <sys/utsname.h>
 #include <sys/sysctl.h>
 #include <sys/param.h>
