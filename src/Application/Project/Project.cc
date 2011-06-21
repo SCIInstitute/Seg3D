@@ -2431,7 +2431,7 @@ ProvenanceStepID Project::add_provenance_record( const ProvenanceStepHandle& ste
     
   ProvenanceIDList output_list = step->get_output_provenance_ids();
   ProvenanceIDList input_list = step->get_input_provenance_ids();
-  ProvenanceIDList deleted_list = step->get_deleted_provenance_ids();
+  ProvenanceIDList deleted_list = step->get_replaced_provenance_ids();
   InputFilesID inputfiles_id = step->get_inputfiles_id();
 
   std::string sql_str = "INSERT INTO provenance_step (action_name, action_params, user_id)"

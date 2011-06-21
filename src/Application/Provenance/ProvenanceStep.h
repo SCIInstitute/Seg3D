@@ -34,8 +34,8 @@
 #endif
 
 // Boost includes
-#include <boost/utility.hpp>
-#include <boost/smart_ptr.hpp>
+#include <boost/noncopyable.hpp>
+#include <boost/shared_ptr.hpp>
 
 // Application includes
 #include <Application/Provenance/Provenance.h>
@@ -75,13 +75,13 @@ public:
   // Set the input provenance ids
   void set_output_provenance_ids( const ProvenanceIDList& output_provenance_ids );
 
-  // GET_DELETED_PROVENANCE_IDS
-  // Get the deleted provenance ids
-  const ProvenanceIDList& get_deleted_provenance_ids() const;
+  // GET_REPLACED_PROVENANCE_IDS:
+  // Get the replaced provenance ids
+  const ProvenanceIDList& get_replaced_provenance_ids() const;
   
-  // SET_DELETED_PROVENANCE_IDS
-  // Set the input provenance ids
-  void set_deleted_provenance_ids( const ProvenanceIDList& deleted_provenance_ids );
+  // SET_REPLACED_PROVENANCE_IDS:
+  // Set the replaced provenance ids
+  void set_replaced_provenance_ids( const ProvenanceIDList& replaced_provenance_ids );
 
   // SET_INPUTFILES_ID
   // Set the input files cache id in the provenance step
@@ -121,8 +121,8 @@ protected:
   // List of provenance ids that this action will generate
   ProvenanceIDList output_provenance_ids_;
   
-  // List of provenance ids that this action will delete
-  ProvenanceIDList deleted_provenance_ids_;
+  // List of provenance ids that this action will replace
+  ProvenanceIDList replaced_provenance_ids_;
 
   // Description of the action
   std::string action_;

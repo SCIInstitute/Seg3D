@@ -148,7 +148,7 @@ bool ActionCopyPaste::run( Core::ActionContextHandle& context, Core::ActionResul
   ProvenanceStep* prov_step = new ProvenanceStep;
   prov_step->set_input_provenance_ids( this->get_input_provenance_ids() );
   prov_step->set_output_provenance_ids( this->get_output_provenance_ids( 1 ) );
-  prov_step->set_deleted_provenance_ids( ProvenanceIDList( 1, 
+  prov_step->set_replaced_provenance_ids( ProvenanceIDList( 1, 
     this->private_->target_layer_->provenance_id_state_->get() ) );
   prov_step->set_action( this->export_to_provenance_string() );
   ProvenanceStepHandle prov_step_handle( prov_step );

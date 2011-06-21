@@ -78,14 +78,14 @@ void ProvenanceStep::set_output_provenance_ids( const ProvenanceIDList& output_p
   this->output_provenance_ids_ = output_provenance_ids;
 }
 
-const ProvenanceIDList& ProvenanceStep::get_deleted_provenance_ids() const
+const ProvenanceIDList& ProvenanceStep::get_replaced_provenance_ids() const
 {
-  return this->deleted_provenance_ids_;
+  return this->replaced_provenance_ids_;
 }
 
-void ProvenanceStep::set_deleted_provenance_ids( const ProvenanceIDList& deleted_provenance_ids )
+void ProvenanceStep::set_replaced_provenance_ids( const ProvenanceIDList& deleted_provenance_ids )
 {
-  this->deleted_provenance_ids_ = deleted_provenance_ids;
+  this->replaced_provenance_ids_ = deleted_provenance_ids;
 }
 
 void ProvenanceStep::set_inputfiles_id( const InputFilesID inputfiles_id )
@@ -117,7 +117,7 @@ void ProvenanceStep::print()
 {
   std::cout << "input ids = " << Core::ExportToString( this->input_provenance_ids_ ) << std::endl;
   std::cout << "output ids = " << Core::ExportToString( this->output_provenance_ids_ ) << std::endl;
-  std::cout << "deleted ids = " << Core::ExportToString( this->deleted_provenance_ids_ ) << std::endl;
+  std::cout << "replaced ids = " << Core::ExportToString( this->replaced_provenance_ids_ ) << std::endl;
   std::cout << "inputfiles id =" << Core::ExportToString( this->inputfiles_id_ ) << std::endl;
   std::cout << "action = " << this->action_ << std::endl;
   std::cout << "user = " << this->user_ << std::endl;

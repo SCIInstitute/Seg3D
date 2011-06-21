@@ -117,15 +117,15 @@ bool PointF::InInterval( PointF a, float epsilon )
 
 std::string ExportToString( const Point& value )
 {
-  return ( std::string( 1, '[' ) + ExportToString( value.x() ) + ' ' 
-    + ExportToString( value.y() ) + ' '
+  return ( std::string( 1, '[' ) + ExportToString( value.x() ) + ',' 
+    + ExportToString( value.y() ) + ','
       + ExportToString( value.z() ) + ']' );
 }
 
 std::string ExportToString( const PointF& value )
 {
-  return ( std::string( 1, '[' ) + ExportToString( value.x() ) + ' ' 
-    + ExportToString( value.y() ) + ' '
+  return ( std::string( 1, '[' ) + ExportToString( value.x() ) + ',' 
+    + ExportToString( value.y() ) + ','
       + ExportToString( value.z() ) + ']' );
 }
 
@@ -133,7 +133,7 @@ std::string ExportToString( const std::vector< Point >& value )
 {
   std::string result( 1, '[' );
   for ( size_t j = 0; j < value.size(); j++ )
-    result += ExportToString( value[ j ] ) + ' ';
+    result += ExportToString( value[ j ] ) + ',';
   result[ result.size() - 1 ] = ']';
   return result;
 }
@@ -142,7 +142,7 @@ std::string ExportToString( const std::vector< PointF >& value )
 {
   std::string result( 1, '[' );
   for ( size_t j = 0; j < value.size(); j++ )
-    result += ExportToString( value[ j ] ) + ' ';
+    result += ExportToString( value[ j ] ) + ',';
   result[ result.size() - 1 ] = ']';
   return result;
 }

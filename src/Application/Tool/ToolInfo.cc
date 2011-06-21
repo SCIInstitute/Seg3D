@@ -66,6 +66,9 @@ ToolInfo::ToolInfo( const std::string& definition ) :
 
   this->private_->definition_ = definition + "\n";
 
+  // Default version number for all tools
+  this->private_->version_ = 1;
+
   // Define a document
   TiXmlDocument doc;
   

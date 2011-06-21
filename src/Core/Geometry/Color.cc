@@ -39,8 +39,8 @@ Color operator*( float alpha, Color color )
 
 std::string ExportToString( const Color& value )
 {
-  return ( std::string( 1, '[' ) + ExportToString( value.r() ) + ' ' 
-    + ExportToString( value.g() ) + ' '
+  return ( std::string( 1, '[' ) + ExportToString( value.r() ) + ',' 
+    + ExportToString( value.g() ) + ','
       + ExportToString( value.b() ) + ']' );
 }
 

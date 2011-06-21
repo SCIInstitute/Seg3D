@@ -77,15 +77,15 @@ std::ostream& operator<<( std::ostream& os, const VectorF& v )
 
 std::string ExportToString( const Vector& value )
 {
-  return ( std::string( 1, '[' ) + ExportToString( value.x() ) + ' ' 
-    + ExportToString( value.y() ) + ' '
+  return ( std::string( 1, '[' ) + ExportToString( value.x() ) + ',' 
+    + ExportToString( value.y() ) + ','
       + ExportToString( value.z() ) + ']' );
 }
 
 std::string ExportToString( const VectorF& value )
 {
-  return ( std::string( 1, '[' ) + ExportToString( value.x() ) + ' ' 
-    + ExportToString( value.y() ) + ' '
+  return ( std::string( 1, '[' ) + ExportToString( value.x() ) + ',' 
+    + ExportToString( value.y() ) + ','
       + ExportToString( value.z() ) + ']' );
 }
 
@@ -93,7 +93,7 @@ std::string ExportToString( const std::vector< Vector >& value )
 {
   std::string result( 1, '[' );
   for ( size_t j = 0; j < value.size(); j++ )
-    result += ExportToString( value[ j ] ) + ' ';
+    result += ExportToString( value[ j ] ) + ',';
   result[ result.size() - 1 ] = ']';
   return result;
 }
@@ -102,7 +102,7 @@ std::string ExportToString( const std::vector< VectorF >& value )
 {
   std::string result( 1, '[' );
   for ( size_t j = 0; j < value.size(); j++ )
-    result += ExportToString( value[ j ] ) + ' ';
+    result += ExportToString( value[ j ] ) + ',';
   result[ result.size() - 1 ] = ']';
   return result;
 }

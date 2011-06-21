@@ -285,7 +285,7 @@ bool ActionFloodFill::run( Core::ActionContextHandle& context, Core::ActionResul
     provenance_step->set_output_provenance_ids(  this->get_output_provenance_ids( 1 )  );
     
     ProvenanceIDList deleted_provenance_ids( 1, layer->provenance_id_state_->get() );
-    provenance_step->set_deleted_provenance_ids( deleted_provenance_ids );
+    provenance_step->set_replaced_provenance_ids( deleted_provenance_ids );
   
     provenance_step->set_action( this->export_to_provenance_string() );   
     

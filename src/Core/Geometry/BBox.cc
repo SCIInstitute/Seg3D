@@ -51,7 +51,7 @@ bool BBox::overlaps_inside( const BBox & bb ) const
 
 std::string ExportToString( const BBox& value )
 {
-  return ( std::string( 1, '[' ) + ExportToString( value.min() ) + ' ' + ExportToString(
+  return ( std::string( 1, '[' ) + ExportToString( value.min() ) + ',' + ExportToString(
       value.max() ) + ']' );
 }
 

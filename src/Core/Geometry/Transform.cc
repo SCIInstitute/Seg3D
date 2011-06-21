@@ -525,13 +525,9 @@ VectorF operator*( const Transform& t, const VectorF& d )
 
 std::string ExportToString( const Transform& value )
 {
-  std::string result( 1, '[' );
   std::vector< double > trans( 16 );
   value.get( &trans[ 0 ] );
-  for ( size_t j = 0; j < 16; j++ )
-    result += ExportToString( trans[ j ] ) + ' ';
-  result[ result.size() - 1 ] = ']';
-  return result;
+  return ExportToString( trans );
 }
 
 bool ImportFromString( const std::string& str, Transform& value )
@@ -1024,13 +1020,9 @@ VectorF operator*( const TransformF& t, const VectorF& d )
 
 std::string ExportToString( const TransformF& value )
 {
-  std::string result( 1, '[' );
   std::vector< float > trans( 16 );
   value.get( &trans[ 0 ] );
-  for ( size_t j = 0; j < 16; j++ )
-    result += ExportToString( trans[ j ] ) + ' ';
-  result[ result.size() - 1 ] = ']';
-  return result;
+  return ExportToString( trans );
 }
 
 bool ImportFromString( const std::string& str, TransformF& value )

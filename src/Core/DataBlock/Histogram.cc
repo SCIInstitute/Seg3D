@@ -777,18 +777,14 @@ bool Histogram::is_valid() const
 
 std::string ExportToString( const Histogram& value )
 {
-  std::string result( 1, '[' );
+  std::string result = '[' + ExportToString( value.min_ ) + ',' +
+    ExportToString( value.max_ ) + ',' +
+    ExportToString( value.min_bin_ ) + ',' +
+    ExportToString( value.max_bin_ ) + ',' +
+    ExportToString( value.bin_start_ ) + ',' +
+    ExportToString( value.bin_size_ ) + ',' +
+    ExportToString( value.histogram_ ) + ']';
 
-  result += ExportToString( value.min_ ) + ' ' +
-    ExportToString( value.max_ ) + ' ' +
-    ExportToString( value.min_bin_ ) + ' ' +
-    ExportToString( value.max_bin_ ) + ' ' +
-    ExportToString( value.bin_start_ ) + ' ' +
-    ExportToString( value.bin_size_ ) + " [";
-    
-  for ( size_t j = 0; j < value.histogram_.size(); j++ )
-    result += ExportToString( value.histogram_[ j ] ) + ' ';
-  result += "] ]";
   return result;
 }
 

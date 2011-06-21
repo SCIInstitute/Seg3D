@@ -157,7 +157,7 @@ bool ActionCopy::run( Core::ActionContextHandle& context, Core::ActionResultHand
   prov_step->set_output_provenance_ids( this->get_output_provenance_ids( 1 ) );
   if ( old_prov_id != -1 )
   {
-    prov_step->set_deleted_provenance_ids( ProvenanceIDList( 1, old_prov_id ) );
+    prov_step->set_replaced_provenance_ids( ProvenanceIDList( 1, old_prov_id ) );
   }
   prov_step->set_action( this->export_to_provenance_string() );
   ProvenanceStepID step_id = ProjectManager::Instance()->get_current_project()->

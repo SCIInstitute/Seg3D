@@ -217,8 +217,8 @@ VectorF operator*( const GridTransform& gt, const VectorF& d )
 
 std::string ExportToString( const GridTransform& value )
 {
-  return ( std::string( 1, '[' ) + ExportToString( value.get_nx() ) + ' ' + ExportToString(
-      value.get_ny() ) + ' ' + ExportToString( value.get_nz() ) + ' ' + ExportToString(
+  return ( std::string( 1, '[' ) + ExportToString( value.get_nx() ) + ',' + ExportToString(
+      value.get_ny() ) + ',' + ExportToString( value.get_nz() ) + ',' + ExportToString(
       value.transform() ) + ']' );
 }
 

@@ -216,7 +216,7 @@ bool ActionPaint::run( Core::ActionContextHandle& context, Core::ActionResultHan
   ProvenanceStepHandle provenance_step( new ProvenanceStep );
   provenance_step->set_input_provenance_ids( this->get_input_provenance_ids() );
   provenance_step->set_output_provenance_ids( this->get_output_provenance_ids( 1 ) );
-  provenance_step->set_deleted_provenance_ids( deleted_prov_ids );
+  provenance_step->set_replaced_provenance_ids( deleted_prov_ids );
   provenance_step->set_action( this->export_to_provenance_string() );
   ProvenanceStepID prov_step_id = ProjectManager::Instance()->get_current_project()->
     add_provenance_record( provenance_step );

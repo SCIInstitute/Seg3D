@@ -200,9 +200,9 @@ Quaternion Slerp( const Quaternion& from, const Quaternion& to, double t, bool s
 
 std::string ExportToString( const Quaternion& value )
 {
-  return ( std::string( 1, '[' ) + ExportToString( value.w() ) + ' ' + ExportToString(
-      value.x() ) + ' ' + ExportToString( value.y() ) + ' ' + ExportToString( value.z() )
-      + " ]" );
+  return ( std::string( 1, '[' ) + ExportToString( value.w() ) + ',' + ExportToString(
+      value.x() ) + ',' + ExportToString( value.y() ) + ',' + ExportToString( value.z() )
+      + ']' );
 }
 
 bool ImportFromString( const std::string& str, Quaternion& value )

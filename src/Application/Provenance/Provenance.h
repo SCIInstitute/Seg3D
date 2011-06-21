@@ -33,6 +33,9 @@
 #pragma once
 #endif
 
+// STL includes
+#include <vector>
+
 namespace Seg3D
 {
 

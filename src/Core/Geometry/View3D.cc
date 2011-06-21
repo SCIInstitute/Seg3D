@@ -150,8 +150,8 @@ void View3D::compute_clipping_planes( const BBox& bbox, double& znear, double& z
 
 std::string ExportToString( const View3D& value )
 {
-  return ( std::string( 1, '[' ) + ExportToString( value.eyep() ) + ' ' + ExportToString(
-      value.lookat() ) + ' ' + ExportToString( value.up() ) + ' ' + ExportToString(
+  return ( std::string( 1, '[' ) + ExportToString( value.eyep() ) + ',' + ExportToString(
+      value.lookat() ) + ',' + ExportToString( value.up() ) + ',' + ExportToString(
       value.fov() ) + ']' );
 }
 

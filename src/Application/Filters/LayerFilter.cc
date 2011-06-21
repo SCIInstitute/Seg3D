@@ -408,7 +408,7 @@ void LayerFilterPrivate::create_provenance_record( Core::ActionContextHandle con
     layer_action->get_input_provenance_ids() );
   // Get the output and replace provenance ids from the analysis above
   this->provenance_step_->set_output_provenance_ids( output_provenance_ids );
-  this->provenance_step_->set_deleted_provenance_ids( deleted_provenance_ids );
+  this->provenance_step_->set_replaced_provenance_ids( deleted_provenance_ids );
 
   // Get the input command of what needs t be rerun
   this->provenance_step_->set_action( 
