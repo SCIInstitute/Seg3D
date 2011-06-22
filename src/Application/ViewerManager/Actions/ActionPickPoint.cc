@@ -26,7 +26,9 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Core/Interface/Interface.h>
+#include <Core/Action/ActionDispatcher.h>
+#include <Core/Action/ActionFactory.h>
+
 #include <Application/ViewerManager/Actions/ActionPickPoint.h>
 #include <Application/ViewerManager/ViewerManager.h>
 

@@ -38,6 +38,7 @@
  
 // Core includes
 #include <Core/Utils/Log.h>
+#include <Core/Utils/Exception.h>
 
 // Application includes
 #include <Application/StatusBar/StatusBar.h>

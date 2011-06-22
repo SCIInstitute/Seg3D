@@ -26,18 +26,13 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-// Need instance of main application for inserting events into main application
-// thread.
-// Boost includes
-#include <boost/date_time/posix_time/posix_time.hpp>
-
 // Core includes
 #include <Core/Utils/AtomicCounter.h>
 #include <Core/Utils/Exception.h>
+#include <Core/Utils/Log.h>
 #include <Core/Application/Application.h>
 #include <Core/Action/ActionDispatcher.h>
 #include <Core/Action/ActionHistory.h>
-
 
 namespace Core
 {

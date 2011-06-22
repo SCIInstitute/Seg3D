@@ -32,6 +32,7 @@
 
 // Core includes
 #include <Core/Utils/Log.h>
+#include <Core/Utils/Exception.h>
 #include <Core/Interface/Interface.h>
 #include <Core/State/Actions/ActionAdd.h>
 #include <Core/State/Actions/ActionSet.h>

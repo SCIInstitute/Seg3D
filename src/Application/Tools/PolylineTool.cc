@@ -33,6 +33,7 @@
 #include <Core/State/Actions/ActionClear.h>
 #include <Core/State/Actions/ActionSetAt.h>
 #include <Core/State/Actions/ActionRemove.h>
+#include <Core/Interface/Interface.h>
 
 // Application includes
 #include <Application/Tool/ToolFactory.h>

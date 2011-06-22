@@ -26,12 +26,15 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// teem includes
 #include <teem/nrrd.h>
 #include <teem/privateNrrd.h>
 
+// Core includes
 #include <Core/DataBlock/NrrdDataBlock.h>
 #include <Core/DataBlock/StdDataBlock.h>
 #include <Core/DataBlock/MaskDataBlockManager.h>
+#include <Core/Utils/Log.h>
 
 // Application includes
 #include <Application/LayerManager/LayerManager.h>

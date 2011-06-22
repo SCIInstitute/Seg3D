@@ -26,6 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Core includes
+#include <Core/Utils/Log.h>
 #include <Core/Volume/VolumeSlice.h>
 #include <Core/Volume/MaskVolumeSlice.h>
 

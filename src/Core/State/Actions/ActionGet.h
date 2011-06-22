@@ -29,8 +29,7 @@
 #ifndef CORE_STATE_ACTIONS_ACTIONGET_H
 #define CORE_STATE_ACTIONS_ACTIONGET_H
 
-#include <Core/Action/Actions.h>
-#include <Core/Interface/Interface.h>
+#include <Core/Action/Action.h>
 
 namespace Core
 {

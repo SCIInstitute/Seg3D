@@ -36,6 +36,7 @@
 #include <Core/State/StateIO.h>
 #include <Core/Utils/AtomicCounter.h>
 #include <Core/Utils/StringUtil.h>
+#include <Core/Utils/Log.h>
 
 // Application includes
 #include <Application/Layer/Layer.h>

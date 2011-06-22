@@ -28,6 +28,7 @@
 
 // Core includes
 #include <Core/DataBlock/StdDataBlock.h>
+#include <Core/DataBlock/MaskDataBlockManager.h>
 
 // Application includes
 #include <Application/LayerManager/LayerManager.h>

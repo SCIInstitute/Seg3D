@@ -26,6 +26,13 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// boost includes
+#include <boost/algorithm/string/replace.hpp>
+
+// Core includes
+#include <Core/Interface/Interface.h>
+#include <Core/Utils/Log.h>
+
 // Qt includes
 #include <QtGui/QClipboard>
 #include <QtGui/QColorDialog>

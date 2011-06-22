@@ -28,10 +28,6 @@
 
 // STL includes
 #include <vector>
-#include <fstream>
-
-// Boost Includes
-#include <boost/lexical_cast.hpp>
 
 // Core includes
 #include <Core/Application/Application.h>
@@ -39,7 +35,6 @@
 
 // Application includes
 #include <Application/PreferencesManager/PreferencesManager.h>
-
 
 namespace Seg3D
 {

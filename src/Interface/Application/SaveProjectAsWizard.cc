@@ -36,6 +36,7 @@
 #include <QtGui/QMessageBox>
 
 // Core includes
+#include <Core/State/Actions/ActionSet.h>
 #include <Core/Application/Application.h>
 
 // Application includes

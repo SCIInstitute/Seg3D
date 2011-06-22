@@ -34,16 +34,11 @@
 #endif 
 
 // Boost includes
-#include <boost/utility.hpp>
-#include <boost/signals2/signal.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/smart_ptr/enable_shared_from_this.hpp>
 
-#include <Core/Utils/Log.h>
-#include <Core/Utils/IntrusiveBase.h>
-#include <Core/Utils/Singleton.h>
+// Core includes
 #include <Core/Utils/Lockable.h>
-
-#include <Core/Action/Action.h>
 
 namespace Core
 {
@@ -56,7 +51,7 @@ class ActionProgress;
 // NOTE: The intrusive pointer will allow a handle to be generate inside the class
 typedef boost::shared_ptr< ActionProgress > ActionProgressHandle;
 
-// Class defintion
+// Class definition
 class ActionProgress :  public Core::Lockable, public boost::enable_shared_from_this<ActionProgress>
 {
   // -- Constructor / Destructor --

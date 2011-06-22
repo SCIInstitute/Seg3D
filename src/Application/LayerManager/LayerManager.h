@@ -33,18 +33,12 @@
 # pragma once
 #endif 
 
-
-
 // Boost includes
 #include <boost/shared_ptr.hpp>
-#include <boost/utility.hpp>
 
 // Core includes
 #include <Core/State/StateHandler.h>
-#include <Core/Utils/StringUtil.h>
 #include <Core/Utils/Singleton.h>
-#include <Core/Utils/Log.h>
-#include <Core/Utils/Exception.h>
 #include <Core/Volume/Volume.h>
 #include <Core/Geometry/BBox.h>
 

@@ -34,20 +34,11 @@
 #endif 
 
 // Boost includes
-#include <boost/filesystem.hpp>
+#include <boost/filesystem/path.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/utility.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
-#include <boost/thread/recursive_mutex.hpp>
-
-// SQLite
-#include <Externals/sqlite/sqlite3.h>
 
 // Core includes
-#include <Core/Utils/StringUtil.h>
 #include <Core/Utils/Singleton.h>
-#include <Core/Utils/Log.h>
-#include <Core/Utils/Exception.h>
 #include <Core/Utils/Lockable.h>
 #include <Core/State/StateHandler.h>
 

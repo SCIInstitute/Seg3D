@@ -31,19 +31,15 @@
  
 // Boost includes
 #include <boost/smart_ptr.hpp> 
-#include <boost/utility.hpp> 
  
 // Core includes
-#include <Core/Utils/Runnable.h>
 #include <Core/Volume/DataVolume.h>
 #include <Core/Volume/MaskVolume.h>
-#include <Core/DataBlock/MaskDataBlockManager.h> 
 
 // Application includes
 #include <Application/Layer/DataLayer.h> 
 #include <Application/Layer/MaskLayer.h> 
 #include <Application/Layer/LabelLayer.h> 
- 
 #include <Application/Layer/LayerAbstractFilter.h>
 
 namespace Seg3D

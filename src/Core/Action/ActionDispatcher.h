@@ -34,19 +34,16 @@
 #endif 
 
 // Boost includes
-#include <boost/utility.hpp>
+#include <boost/noncopyable.hpp>
 #include <boost/signals2/signal.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/date_time/posix_time/ptime.hpp>
 
-
-#include <Core/Utils/Log.h>
+// Core includes
 #include <Core/Utils/Singleton.h>
-
 #include <Core/Action/Action.h>
 #include <Core/Action/ActionContext.h>
 #include <Core/Action/ActionProgress.h>
-#include <Core/Action/ActionFactory.h>
 
 namespace Core
 {
@@ -59,7 +56,7 @@ class ActionDispatcher;
 class ActionDispatcherPrivate;
 typedef boost::shared_ptr< ActionDispatcherPrivate > ActionDispatcherPrivateHandle;
 
-// Class defintion
+// Class definition
 class ActionDispatcher : public boost::noncopyable
 {
   CORE_SINGLETON( ActionDispatcher );

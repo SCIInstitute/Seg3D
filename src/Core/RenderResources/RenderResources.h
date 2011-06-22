@@ -29,14 +29,14 @@
 #ifndef CORE_RENDERRESOURCES_RENDERRESOURCES_H
 #define CORE_RENDERRESOURCES_RENDERRESOURCES_H
 
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+# pragma once
+#endif 
+
 // Boost includes
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/recursive_mutex.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/utility.hpp>
 
 // Core includes
-#include <Core/Utils/Exception.h>
 #include <Core/Utils/Log.h>
 #include <Core/Utils/Singleton.h>
 #include <Core/Utils/StringUtil.h>

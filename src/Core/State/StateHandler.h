@@ -35,7 +35,6 @@
 
 // Boost includes
 #include <boost/utility.hpp>
-#include <boost/filesystem.hpp>
 
 // Core includes
 #include <Core/Utils/ConnectionHandler.h>

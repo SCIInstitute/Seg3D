@@ -26,6 +26,9 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// boost includes
+#include <boost/algorithm/string/replace.hpp>
+
 // Qt includes
 #include <QtGui/QAction>
 #include <QtGui/QApplication>
@@ -35,6 +38,9 @@
 #include <QtGui/QMenu>
 #include <QtGui/QMessageBox>
 #include <QtGui/QScrollBar>
+
+// Core includes
+#include <Core/Interface/Interface.h>
 
 // Interface includes
 #include <Interface/ToolInterface/detail/MeasurementTableView.h>

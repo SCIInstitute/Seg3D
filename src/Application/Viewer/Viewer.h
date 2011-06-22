@@ -33,14 +33,9 @@
 # pragma once
 #endif
 
-// STL includes
-#include <map>
-#include <vector>
-
 // Boost includes 
 #include <boost/smart_ptr.hpp>
 #include <boost/function.hpp>
-#include <boost/thread.hpp>
 
 // Core includes
 #include <Core/Viewer/AbstractViewer.h>

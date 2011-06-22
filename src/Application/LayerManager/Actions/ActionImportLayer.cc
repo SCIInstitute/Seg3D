@@ -29,6 +29,10 @@
 // Boost includes
 #include <boost/filesystem.hpp>
 
+// Core includes
+#include <Core/Action/ActionDispatcher.h>
+#include <Core/Action/ActionFactory.h>
+
 // Application includes
 #include <Application/UndoBuffer/UndoBuffer.h>
 #include <Application/LayerIO/LayerIO.h>

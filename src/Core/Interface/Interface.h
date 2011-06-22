@@ -33,19 +33,12 @@
 # pragma once
 #endif 
 
-// STL 
-#include <functional>
+// boost includes 
+#include <boost/function.hpp>
 
 // Core includes
-#include <Core/Utils/Log.h>
 #include <Core/Utils/Singleton.h>
 #include <Core/EventHandler/EventHandler.h>
-
-// Action includes
-#include <Core/Action/ActionContext.h>
-#include <Core/Action/ActionDispatcher.h>
-
-// Interface includes
 #include <Core/Interface/InterfaceActionContext.h>
 
 namespace Core

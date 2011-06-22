@@ -40,7 +40,7 @@
 #include <Core/State/StateEngine.h>
 #include <Core/State/StateName.h>
 #include <Core/Utils/StringUtil.h>
-
+#include <Core/Utils/Log.h>
 
 namespace Core
 {

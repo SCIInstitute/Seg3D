@@ -26,18 +26,18 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// STL includes
 #include <queue>
-
-// Boost includes
-#include <boost/lexical_cast.hpp>
 
 // TinyXML includes
 #include <Externals/tinyxml/tinyxml.h>
 
+// Core includes
 #include <Core/State/StateHandler.h>
 #include <Core/State/StateEngine.h>
 #include <Core/State/StateIO.h>
 #include <Core/Application/Application.h>
+#include <Core/Utils/Log.h>
 
 namespace Core
 {

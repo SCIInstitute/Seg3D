@@ -26,6 +26,10 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#include <Core/Action/ActionFactory.h>
+#include <Core/Action/ActionDispatcher.h>
+#include <Core/Action/ActionProgress.h>
+
 #include <Application/ProjectManager/ProjectManager.h>
 #include <Application/ProjectManager/Actions/ActionLoadSession.h>
 #include <Application/ProjectManager/Actions/ActionResetChangesMade.h>

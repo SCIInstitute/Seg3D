@@ -26,6 +26,9 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// boost includes
+#include <boost/tuple/tuple.hpp>
+
 // Core includes
 #include <Core/Utils/Log.h>
 #include <Core/Utils/Exception.h>

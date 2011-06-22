@@ -36,20 +36,12 @@
 // STL includes
 #include <vector>
 #include <string>
-#include <map>
 
 // Boost includes
-#include <boost/intrusive_ptr.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/utility.hpp>
+#include <boost/noncopyable.hpp>
 
 // Core includes
-#include <Core/Utils/EnumClass.h>
-#include <Core/Utils/IntrusiveBase.h>
-#include <Core/Utils/Log.h>
-#include <Core/Utils/Variant.h>
-
-// Action includes
 #include <Core/Action/ActionInfo.h>
 #include <Core/Action/ActionContext.h>
 #include <Core/Action/ActionParameter.h>

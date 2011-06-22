@@ -35,6 +35,7 @@
 #include <Application/Layer/MaskLayer.h>
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/LayerManager/LayerUndoBufferItem.h>
+#include <Application/ProjectManager/ProjectManager.h>
 #include <Application/UndoBuffer/UndoBuffer.h>
 #include <Application/ViewerManager/ViewerManager.h>
 

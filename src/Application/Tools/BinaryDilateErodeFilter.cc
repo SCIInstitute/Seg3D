@@ -26,6 +26,9 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Core includes
+#include <Core/Utils/Exception.h>
+
 // Application includes
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/BinaryDilateErodeFilter.h>

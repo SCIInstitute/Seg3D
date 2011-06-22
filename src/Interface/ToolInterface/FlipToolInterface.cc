@@ -26,6 +26,10 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Core includes
+#include <Core/Interface/Interface.h>
+#include <Core/Utils/Log.h>
+
 //QtUtils Includes
 #include <QtUtils/Bridge/QtBridge.h>
 

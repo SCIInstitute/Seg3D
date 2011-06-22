@@ -26,6 +26,7 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#include <Core/Action/ActionFactory.h>
 #include <Core/State/Actions/ActionTranslateView.h>
 #include <Core/State/StateView2D.h>
 #include <Core/State/StateView3D.h>

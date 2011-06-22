@@ -26,6 +26,9 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Core includes
+#include <Core/Interface/Interface.h>
+
 // QtGui includes
 #include "ui_AndFilterInterface.h"
 
@@ -35,7 +38,7 @@
 // QtUtils includes
 #include <QtUtils/Bridge/QtBridge.h>
 
-// Interaface includes
+// Interface includes
 #include <Interface/ToolInterface/AndFilterInterface.h>
 
 

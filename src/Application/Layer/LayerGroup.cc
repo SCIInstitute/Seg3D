@@ -35,6 +35,7 @@
 #include <Core/State/StateEngine.h>
 #include <Core/State/StateIO.h>
 #include <Core/Utils/ScopedCounter.h>
+#include <Core/Utils/Exception.h>
 
 // Application includes
 #include <Application/Layer/DataLayer.h>

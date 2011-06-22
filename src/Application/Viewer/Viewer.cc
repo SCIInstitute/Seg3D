@@ -31,6 +31,7 @@
 #include <Core/Interface/Interface.h>
 #include <Core/Utils/ScopedCounter.h>
 #include <Core/Utils/EnumClass.h>
+#include <Core/Utils/Exception.h>
 #include <Core/State/Actions/ActionOffset.h>
 #include <Core/State/Actions/ActionToggle.h>
 #include <Core/State/Actions/ActionSet.h>

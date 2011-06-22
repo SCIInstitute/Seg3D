@@ -31,6 +31,7 @@
 
 // Boost includes
 #include <boost/algorithm/minmax_element.hpp>
+#include <boost/algorithm/string/case_conv.hpp>
 #include <boost/filesystem.hpp>
 
 // Application includes

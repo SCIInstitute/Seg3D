@@ -36,6 +36,7 @@
 #include <Core/Application/Application.h>
 #include <Core/State/StateIO.h>
 #include <Core/Utils/ScopedCounter.h>
+#include <Core/Utils/Log.h>
 
 // Application includes
 #include <Application/ProjectManager/ProjectManager.h>

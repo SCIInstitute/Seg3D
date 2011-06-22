@@ -29,8 +29,12 @@
 #ifndef APPLICATION_UNDOBUFFER_UNDOBUFFER_H
 #define APPLICATION_UNDOBUFFER_UNDOBUFFER_H
 
+// boost includes
+#include <boost/signals2/signal.hpp>
+
 // Core includes
 #include <Core/Utils/ConnectionHandler.h>
+#include <Core/Utils/Singleton.h>
 
 // Application includes
 #include <Application/UndoBuffer/UndoBufferItem.h>

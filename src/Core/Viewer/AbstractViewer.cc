@@ -27,8 +27,8 @@
  */
 
 // Core includes
+#include <Core/Utils/Exception.h>
 #include <Core/Viewer/AbstractViewer.h>
-
 
 namespace Core
 {

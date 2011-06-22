@@ -36,6 +36,7 @@
 #include <Core/Graphics/Algorithm.h>
 #include <Core/RenderResources/RenderResources.h>
 #include <Core/Utils/ScopedCounter.h>
+#include <Core/Utils/Exception.h>
 #include <Core/Volume/DataVolumeSlice.h>
 #include <Core/Volume/MaskVolumeSlice.h>
 

@@ -31,7 +31,6 @@
  
 // Boost includes
 #include <boost/smart_ptr.hpp> 
-#include <boost/utility.hpp> 
  
 // Core includes
 #include <Core/Utils/Runnable.h>

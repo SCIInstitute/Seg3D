@@ -33,6 +33,7 @@
 #include <Core/State/Actions/ActionRemove.h>
 #include <Core/Viewer/Mouse.h>
 #include <Core/Volume/VolumeSlice.h>
+#include <Core/Interface/Interface.h>
 
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/Tool/SeedPointsTool.h>

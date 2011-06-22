@@ -26,6 +26,9 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// boost includes
+#include <boost/algorithm/string/case_conv.hpp>
+
 // ITK Includes
 #include <itkRGBPixel.h>
 #include <itkPNGImageIO.h>

@@ -30,9 +30,9 @@
 #define CORE_STATE_STATEIO_H
 
 // Boost includes
-#include <boost/smart_ptr/shared_ptr.hpp>
-#include <boost/filesystem.hpp>
-#include <boost/utility.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/filesystem/path.hpp>
+#include <boost/noncopyable.hpp>
 
 // TinyXML includes
 #include <tinyxml.h>

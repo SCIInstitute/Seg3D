@@ -35,7 +35,11 @@
 #include <AGL/AGL.h>
 #endif
 
+// boost includes
+#include <boost/thread/condition_variable.hpp>
+
 #include <Core/RenderResources/RenderResources.h>
+#include <Core/Utils/Exception.h>
 
 namespace Core
 {

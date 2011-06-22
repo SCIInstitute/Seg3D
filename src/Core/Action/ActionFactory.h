@@ -34,24 +34,17 @@
 #endif 
 
 // Boost includes
-#include <boost/algorithm/string.hpp>
-#include <boost/unordered_map.hpp>
-#include <boost/thread/mutex.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/utility.hpp>
 
 // Core includes
-#include <Core/Utils/StringUtil.h>
 #include <Core/Utils/Singleton.h>
 #include <Core/Utils/Lockable.h>
-
-// Application includes
 #include <Core/Action/Action.h>
 
 namespace Core
 {
 
-// ---- Auxilary Classes -----
+// ---- Auxiliary Classes -----
 // ACTIONBUILDER:
 // This class is the base functor for the class that builds the classes in
 // the factory

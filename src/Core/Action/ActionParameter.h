@@ -35,14 +35,8 @@
 
 // STL
 #include <string>
-#include <algorithm>
-
-// Boost includes
-#include <boost/shared_ptr.hpp>
-#include <boost/utility.hpp>
 
 // Core
-#include <Core/Utils/Log.h>
 #include <Core/Utils/StringUtil.h>
 
 namespace Core

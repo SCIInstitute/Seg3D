@@ -30,6 +30,9 @@
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
 
+// Core includes
+#include <Core/Interface/Interface.h>
+
 //Qt Gui Includes
 #include <Interface/ToolInterface/ClipboardToolInterface.h>
 #include "ui_ClipboardToolInterface.h"

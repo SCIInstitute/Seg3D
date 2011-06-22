@@ -33,7 +33,7 @@
 #include <Python.h>
 #include <boost/filesystem.hpp>
 #include <boost/python.hpp>
-#include <boost/thread/mutex.hpp>
+#include <boost/thread/condition_variable.hpp>
 
 #include <Core/Utils/Exception.h>
 #include <Core/Utils/Lockable.h>

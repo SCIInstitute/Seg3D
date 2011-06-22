@@ -26,6 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// STL includes
+#include <stack>
 
 // Core includes
 #include <Core/State/StateIO.h>

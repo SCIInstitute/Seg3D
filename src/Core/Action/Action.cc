@@ -26,12 +26,6 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-// STD includes
-#include <iostream>
-
-// Boost includes
-#include <boost/algorithm/string.hpp>
-
 // Core includes
 #include <Core/Utils/Exception.h>
 #include <Core/Utils/StringUtil.h>

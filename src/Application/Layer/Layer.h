@@ -39,23 +39,17 @@
 
 // Boost includes 
 #include <boost/shared_ptr.hpp>
-#include <boost/thread/mutex.hpp>
 
 // Core includes
-#include <Core/Action/Action.h>
-#include <Core/Application/Application.h>
-#include <Core/Interface/Interface.h>
 #include <Core/State/State.h>
+#include <Core/State/StateHandler.h>
 #include <Core/State/BooleanStateGroup.h>
 #include <Core/Volume/Volume.h>
 
 // Application includes
-#include <Application/Provenance/Provenance.h>
-
 #include <Application/Layer/LayerFWD.h>
 #include <Application/Layer/LayerMetaData.h>
 #include <Application/Layer/LayerAbstractFilter.h>
-
 
 namespace Seg3D
 {

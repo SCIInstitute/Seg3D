@@ -29,16 +29,13 @@
 // STL includes
 #include <vector>
 
-// Boost includes 
-#include <boost/lexical_cast.hpp>
-
 // Core includes
 #include <Core/Application/Application.h>
-#include <Core/Interface/Interface.h>
 #include <Core/DataBlock/MaskDataBlockManager.h>
 #include <Core/DataBlock/DataBlockManager.h>
 #include <Core/State/StateIO.h>
 #include <Core/Utils/ScopedCounter.h>
+#include <Core/Utils/Exception.h>
 
 // Application includes
 #include <Application/Layer/LayerGroup.h>

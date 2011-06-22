@@ -30,6 +30,9 @@
 #include <boost/lambda/bind.hpp>
 #include <boost/lambda/lambda.hpp>
 
+// Core includes
+#include <Core/Interface/Interface.h>
+
 //QtUtils Includes
 #include <QtUtils/Bridge/QtBridge.h>
 

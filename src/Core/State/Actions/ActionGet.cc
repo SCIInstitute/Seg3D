@@ -28,7 +28,7 @@
 
 #include <Core/State/StateEngine.h>
 #include <Core/State/Actions/ActionGet.h>
-#include <Core/Interface/Interface.h>
+#include <Core/Action/Actions.h>
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be

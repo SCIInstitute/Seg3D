@@ -26,6 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#include <Core/Action/ActionDispatcher.h>
+#include <Core/Action/ActionFactory.h>
 #include <Core/State/Actions/ActionRotateView.h>
 
 CORE_REGISTER_ACTION( Core, RotateView )

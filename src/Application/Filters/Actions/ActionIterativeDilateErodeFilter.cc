@@ -26,6 +26,9 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Core includes
+#include <Core/DataBlock/MaskDataBlockManager.h>
+
 // Application includes
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/StatusBar/StatusBar.h>

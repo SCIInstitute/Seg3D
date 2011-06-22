@@ -26,11 +26,13 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Core includes
+#include <Core/Utils/Exception.h>
 #include <Core/Utils/ScopedCounter.h>
 #include <Core/Volume/DataVolumeSlice.h>
 #include <Core/RenderResources/RenderResources.h>
-
 #include <Core/State/Actions/ActionToggle.h>
+#include <Core/Interface/Interface.h>
 
 // Application includes
 #include <Application/Tool/ToolFactory.h>

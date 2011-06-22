@@ -26,6 +26,9 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Core includes
+#include <Core/Interface/Interface.h>
+
 // QtGui includes
 #include "ui_DistanceFilterInterface.h"
 

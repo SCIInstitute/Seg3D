@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-// STL includes
-#include <iostream>
+// boost includes
+#include <boost/unordered/unordered_map.hpp>
 
 // Core includes
 #include <Core/Utils/StringParser.h>

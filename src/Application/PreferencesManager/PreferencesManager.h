@@ -33,20 +33,12 @@
 # pragma once
 #endif 
 
-
-
 // Boost includes
-#include <boost/filesystem.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/utility.hpp>
 
 // Core includes
-#include <Core/Utils/StringUtil.h>
 #include <Core/Utils/Singleton.h>
-#include <Core/Utils/Log.h>
-#include <Core/Utils/Exception.h>
 #include <Core/State/StateHandler.h>
-
 
 namespace Seg3D
 {

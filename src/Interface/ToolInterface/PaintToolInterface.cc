@@ -30,7 +30,12 @@
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
 
+// Qt includes
 #include <QComboBox>
+
+// Core includes
+#include <Core/Interface/Interface.h>
+#include <Core/Utils/Log.h>
 
 //Qt Gui Includes
 #include <Interface/ToolInterface/PaintToolInterface.h>

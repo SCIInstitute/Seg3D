@@ -38,16 +38,12 @@
 #include <vector>
 
 // Boost includes 
-#include <boost/unordered_map.hpp>
 #include <boost/signals2.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/utility.hpp>
-#include <boost/thread/mutex.hpp>
 
 // Core includes
 #include <Core/Utils/Singleton.h>
-#include <Core/State/State.h>
-#include <Core/State/StateSet.h>
+#include <Core/State/StateHandler.h>
 #include <Core/VolumeRenderer/TransferFunction.h>
 
 // Application includes

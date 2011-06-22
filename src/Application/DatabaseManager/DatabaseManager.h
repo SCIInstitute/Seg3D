@@ -33,13 +33,14 @@
 # pragma once
 #endif 
 
+// STL includes
 #include <map>
 
 // Boost includes
 #include <boost/filesystem.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/any.hpp>
-#include <boost/utility.hpp>
+#include <boost/noncopyable.hpp>
 
 namespace Seg3D
 {

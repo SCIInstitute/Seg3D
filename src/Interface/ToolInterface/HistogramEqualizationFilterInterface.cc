@@ -29,6 +29,9 @@
 // Qt includes
 #include <QPointer>
 
+// Core includes
+#include <Core/Interface/Interface.h>
+
 // QtGui includes
 #include "ui_HistogramEqualizationFilterInterface.h"
 

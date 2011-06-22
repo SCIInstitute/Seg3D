@@ -35,6 +35,7 @@
 #include <Core/DataBlock/MaskDataBlockManager.h>
 #include <Core/Utils/AtomicCounter.h>
 #include <Core/Utils/StringUtil.h>
+#include <Core/Utils/Log.h>
 #include <Core/Volume/MaskVolume.h>
 
 // Application includes

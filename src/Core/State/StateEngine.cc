@@ -29,15 +29,14 @@
 // STL includes
 #include <string>
 #include <queue>
-
-// Boost includes
-#include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
+#include <map>
 
 // Application includes
 #include <Core/State/StateEngine.h>
 #include <Core/State/StateHandler.h>
 #include <Core/Utils/AtomicCounter.h>
+#include <Core/Utils/Exception.h>
+#include <Core/Utils/Log.h>
 
 namespace Core
 {

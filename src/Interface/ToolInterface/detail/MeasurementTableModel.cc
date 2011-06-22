@@ -31,15 +31,16 @@
 #include <QtGui/QColor>
 #include <QtGui/QIcon>
 
+// Core includes
+#include <Core/State/Actions/ActionRemove.h>
+#include <Core/State/Actions/ActionSetAt.h>
+#include <Core/Interface/Interface.h>
+
 // Interface includes
 #include <Interface/ToolInterface/detail/MeasurementTableModel.h>
 
 // Application includes
 #include <Application/LayerManager/LayerManager.h>
-
-// Core includes
-#include <Core/State/Actions/ActionRemove.h>
-#include <Core/State/Actions/ActionSetAt.h>
 
 namespace Seg3D
 {

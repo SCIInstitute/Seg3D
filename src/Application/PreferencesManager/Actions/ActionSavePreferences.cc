@@ -26,6 +26,9 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#include <Core/Action/ActionDispatcher.h>
+#include <Core/Action/ActionFactory.h>
+
 // Application Includes
 #include <Application/PreferencesManager/PreferencesManager.h>
 #include <Application/PreferencesManager/Actions/ActionSavePreferences.h>

@@ -26,11 +26,7 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-// Core includs
-#include <Core/Utils/Log.h>
-
 // Application includes
-#include <Core/Application/Application.h>
 #include <Core/Action/ActionProgress.h>
 #include <Core/Action/ActionDispatcher.h>
 

@@ -34,14 +34,10 @@
 
 // Boost includes
 #include <boost/shared_ptr.hpp>
-#include <boost/utility.hpp>
 
 // Core includes
 #include <Core/State/StateHandler.h>
-#include <Core/Utils/EnumClass.h>
 #include <Core/Viewer/Mouse.h>
-#include <Core/Volume/Volume.h>
-#include <Core/Interface/Interface.h>
 
 // Application includes
 #include <Application/Layer/LayerFWD.h>

@@ -29,9 +29,6 @@
 // STL includes
 #include <ctime>
 
-// Boost includes
-#include <boost/lexical_cast.hpp>
-
 // Core includes
 #include <Core/State/StateIO.h>
 #include <Core/State/Actions/ActionAdd.h>
@@ -40,7 +37,6 @@
 #include <Application/ProjectManager/ProjectManager.h>
 #include <Application/ProjectManager/AutoSave.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
-#include <Application/StatusBar/StatusBar.h>
 #include <Application/ToolManager/ToolManager.h>
 #include <Application/DatabaseManager/DatabaseManager.h>
 

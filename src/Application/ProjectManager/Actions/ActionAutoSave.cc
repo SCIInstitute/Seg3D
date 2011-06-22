@@ -26,6 +26,11 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Core includes
+#include <Core/Action/ActionFactory.h>
+#include <Core/Action/ActionDispatcher.h>
+#include <Core/Action/ActionProgress.h>
+
 // Application includes
 #include <Application/ProjectManager/ProjectManager.h>
 #include <Application/ProjectManager/Actions/ActionAutoSave.h>

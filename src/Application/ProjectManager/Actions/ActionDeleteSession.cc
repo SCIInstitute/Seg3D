@@ -26,6 +26,7 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#include <Core/Action/ActionFactory.h>
 #include <Core/Action/ActionDispatcher.h>
 
 // Application includes

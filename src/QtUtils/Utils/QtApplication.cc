@@ -28,6 +28,7 @@
 
 // Core includes
 #include <Core/Utils/Log.h>
+#include <Core/Utils/Exception.h>
 #include <Core/RenderResources/RenderResources.h>
 #include <Core/Application/Application.h>
 #include <Core/Interface/Interface.h>

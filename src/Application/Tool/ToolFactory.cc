@@ -40,6 +40,8 @@
 
 // Core includes
 #include <Core/State/StateIO.h>
+#include <Core/Utils/Exception.h>
+#include <Core/Utils/Log.h>
 
 // Application includes
 #include <Application/Tool/ToolFactory.h>

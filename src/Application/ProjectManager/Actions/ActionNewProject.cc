@@ -29,6 +29,10 @@
 // Boost includes
 #include <boost/filesystem.hpp>
 
+// Core includes
+#include <Core/Action/ActionFactory.h>
+#include <Core/Action/ActionDispatcher.h>
+
 // Application includes
 #include <Application/ProjectManager/ProjectManager.h>
 #include <Application/LayerManager/LayerManager.h>

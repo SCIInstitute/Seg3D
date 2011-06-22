@@ -30,7 +30,7 @@
 #define CORE_STATE_ACTIONS_ACTIONSET_H
 
 #include <Core/Action/Action.h>
-#include <Core/Interface/Interface.h>
+#include <Core/Action/ActionDispatcher.h>
 #include <Core/State/StateBase.h>
 
 namespace Core

@@ -30,16 +30,15 @@
 #define CORE_ACTION_ACTIONHISTORY_H
 
 // STL includes
-#include <iostream>
+#include <deque>
 
 // Boost includes
-#include <boost/shared_ptr.hpp>
 #include <boost/signals2/signal.hpp>
 
 // Core includes
 #include <Core/Action/Action.h>
-#include <Core/Action/ActionDispatcher.h>
 #include <Core/Utils/Lockable.h>
+#include <Core/Utils/Singleton.h>
 
 namespace Core
 {
@@ -51,7 +50,7 @@ namespace Core
 class ActionHistory;
 
 // Class defintion
-class ActionHistory : public Core::Singleton< ActionHistory >, public Lockable
+class ActionHistory : public Lockable
 {
   CORE_SINGLETON( ActionHistory );
 

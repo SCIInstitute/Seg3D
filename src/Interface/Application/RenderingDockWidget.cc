@@ -38,6 +38,7 @@
 // Core includes
 #include <Core/Utils/Log.h>
 #include <Core/Application/Application.h>
+#include <Core/Interface/Interface.h>
 #include <Core/State/Actions/ActionToggle.h>
 
 // QtUtils includes

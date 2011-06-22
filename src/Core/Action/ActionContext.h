@@ -38,7 +38,6 @@
 
 // Boost includes
 #include <boost/shared_ptr.hpp>
-#include <boost/utility.hpp>
 
 // Core includes
 #include <Core/Utils/EnumClass.h>
