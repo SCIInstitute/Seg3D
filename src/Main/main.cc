@@ -180,7 +180,8 @@ int main( int argc, char **argv )
 
   Core::PythonInterpreter::module_list_type python_modules;
   std::string module_name = Core::StringToLower( BOOST_PP_STRINGIZE( APPLICATION_NAME ) );
-  python_modules.push_back( std::make_pair( module_name, BOOST_PP_CAT( PyInit_, APPLICATION_NAME ) ) );
+  python_modules.push_back( Core::PythonInterpreter::module_entry_type( module_name, 
+    BOOST_PP_CAT( PyInit_, APPLICATION_NAME ) ) );
   Core::PythonInterpreter::Instance()->initialize( &program_name[ 0 ], python_modules );
   Core::PythonInterpreter::Instance()->run_script( "import " + module_name + "\nfrom " + module_name + " import *\n" );
 #endif
