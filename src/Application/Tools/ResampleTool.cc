@@ -45,6 +45,13 @@ namespace Seg3D
 class ResampleToolPrivate
 {
 public:
+
+  // UPDATE_DST_GROUP_LIST:
+  // Update list of destination groups that can be chosen by the user. 
+  void update_dst_group_list();
+
+  // HANDLE_TARGET_GROUP_CHANGED:
+  // Resets dimensions based on new target group and updates destination group list.
   void handle_target_group_changed();
   void handle_size_scheme_changed( std::string size_scheme );
   void handle_dst_group_changed( std::string group_id );
@@ -57,13 +64,44 @@ public:
   ResampleTool* tool_;
 };
 
-void ResampleToolPrivate::handle_target_group_changed()
+void ResampleToolPrivate::update_dst_group_list()
 {
   const std::string& group_id = this->tool_->target_group_state_->get();
   std::vector< Core::OptionLabelPair > dst_groups;
   if ( group_id == "" || group_id == Tool::NONE_OPTION_C )
   {
     this->tool_->dst_group_state_->set_option_list( dst_groups );
+    return;
+  }
+
+  Core::ScopedCounter signal_block( this->signal_block_count_ );
+
+  LayerGroupHandle layer_group = LayerManager::Instance()->get_group_by_id( group_id );
+
+  std::vector< LayerGroupHandle > layer_groups;
+  LayerManager::Instance()->get_groups( layer_groups );
+  for ( size_t i = 0; i < layer_groups.size(); ++i )
+  {
+    if ( layer_groups[ i ] == layer_group )
+    {
+      continue;
+    }
+    const Core::GridTransform& grid_trans = layer_groups[ i ]->get_grid_transform();
+    std::string group_name = Core::ExportToString( grid_trans.get_nx() ) + " x " +
+      Core::ExportToString( grid_trans.get_ny() ) + " x " + 
+      Core::ExportToString( grid_trans.get_nz() );
+    dst_groups.push_back( std::make_pair( layer_groups[ i ]->get_group_id(), group_name ) );
+  }
+  this->tool_->dst_group_state_->set_option_list( dst_groups );
+}
+
+void ResampleToolPrivate::handle_target_group_changed()
+{
+  this->update_dst_group_list();
+
+  const std::string& group_id = this->tool_->target_group_state_->get();
+  if ( group_id == "" || group_id == Tool::NONE_OPTION_C )
+  {
     return;
   }
 
@@ -89,22 +127,6 @@ void ResampleToolPrivate::handle_target_group_changed()
   this->tool_->output_dimensions_state_[ 1 ]->set( Core::Round( ny * scale ) );
   this->tool_->output_dimensions_state_[ 2 ]->set_range( 1, nz * 2 );
   this->tool_->output_dimensions_state_[ 2 ]->set( Core::Round( nz * scale ) );
-
-  std::vector< LayerGroupHandle > layer_groups;
-  LayerManager::Instance()->get_groups( layer_groups );
-  for ( size_t i = 0; i < layer_groups.size(); ++i )
-  {
-    if ( layer_groups[ i ] == layer_group )
-    {
-      continue;
-    }
-    const Core::GridTransform& grid_trans = layer_groups[ i ]->get_grid_transform();
-    std::string group_name = Core::ExportToString( grid_trans.get_nx() ) + " x " +
-      Core::ExportToString( grid_trans.get_ny() ) + " x " + 
-      Core::ExportToString( grid_trans.get_nz() );
-    dst_groups.push_back( std::make_pair( layer_groups[ i ]->get_group_id(), group_name ) );
-  }
-  this->tool_->dst_group_state_->set_option_list( dst_groups );
 }
 
 void ResampleToolPrivate::handle_output_dimension_changed( int index, int size )
@@ -224,6 +246,12 @@ ResampleTool::ResampleTool( const std::string& toolid ) :
   this->add_state( "constraint_aspect", this->constraint_aspect_state_, true );
   this->add_state( "scale", this->scale_state_, 1.0, 0.01, 2.0, 0.01 );
 
+  // Need to load dimensions after constraint_aspect_state_ is loaded so that scale isn't 
+  // incorrectly used to overwrite output dimensions 
+  this->output_dimensions_state_[ 0 ]->set_session_priority( Core::StateBase::LOAD_LAST_E );
+  this->output_dimensions_state_[ 1 ]->set_session_priority( Core::StateBase::LOAD_LAST_E );
+  this->output_dimensions_state_[ 2 ]->set_session_priority( Core::StateBase::LOAD_LAST_E );
+
   std::vector< Core::OptionLabelPair > kernels;
   kernels.push_back( std::make_pair( ActionResample::BOX_C, "Box" ) );
   kernels.push_back( std::make_pair( ActionResample::TENT_C, "Tent" ) );
@@ -258,8 +286,9 @@ ResampleTool::ResampleTool( const std::string& toolid ) :
       boost::bind( &ResampleToolPrivate::handle_output_dimension_changed, 
       this->private_, i, _1 ) ) );
   }
+  // If groups were added or removed, update the destination group list in the tool interface
   this->add_connection( LayerManager::Instance()->groups_changed_signal_.connect( 
-    boost::bind( &ResampleToolPrivate::handle_target_group_changed, this->private_ ) ) );
+    boost::bind( &ResampleToolPrivate::update_dst_group_list, this->private_ ) ) );
   
   this->private_->handle_target_group_changed();
 }
