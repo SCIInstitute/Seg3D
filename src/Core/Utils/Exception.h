@@ -35,7 +35,6 @@
 
 // STL includes
 #include <string>
-#include <stdexcept>
 
 namespace Core
 {

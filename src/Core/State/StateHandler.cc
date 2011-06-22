@@ -333,7 +333,6 @@ bool StateHandler::load_states( const StateIO& state_io )
         CORE_LOG_ERROR( error );
         success = false;
       }
-      success &= state_entry.second->import_from_string( ( *state_it ).second );
     }
   }
   
