@@ -120,14 +120,16 @@ public:
 
 inline bool Measurement::operator==( const Measurement& m ) const
 {
-  return ( this->name_ == m.name_ && this->visible_ == m.visible_ && this->comment_ == m.comment_ &&
-    this->points_[ 0 ] == m.points_[ 0 ] && this->points_[ 1 ] == m.points_[ 1 ] );
+  return ( this->name_ == m.name_ && this->comment_ == m.comment_ &&
+    this->points_[ 0 ] == m.points_[ 0 ] && this->points_[ 1 ] == m.points_[ 1 ] &&
+    this->color_ == m.color_  && this->visible_ == m.visible_ );
 }
 
 inline bool Measurement::operator!=( const Measurement& m ) const
 {
-  return ( this->name_ != m.name_ || this->visible_ != m.visible_ || this->comment_ != m.comment_ ||
-    this->points_[ 0 ] != m.points_[ 0 ] || this->points_[ 1 ] != m.points_[ 1 ] );
+  return ( this->name_ != m.name_ || this->comment_ != m.comment_ ||
+    this->points_[ 0 ] != m.points_[ 0 ] || this->points_[ 1 ] != m.points_[ 1 ] || 
+    this->color_ != m.color_ || this->visible_ != m.visible_ );
 }
 
 std::string ExportToString( const Measurement& value );
