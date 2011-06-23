@@ -54,6 +54,7 @@ SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR} CACHE PATH "" FORCE) # Needed by 
 ###########################################
 
 SET(SEG3D_BUILD_INTERFACE 1 CACHE BOOL "Build the interface to Seg3D")
+SET(SEG3D_SPLIT_PROJECTS 0 CACHE BOOL "Split large projects into smaller projects to speed up compilation with Visual Studio")
 
 ###########################################
 # SEG3D VERSION NUMBERS

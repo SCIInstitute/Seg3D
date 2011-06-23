@@ -31,7 +31,16 @@
 # Set sources
 ##################################################
 
-SET(INTERFACE_TOOLINTERFACE_SRCS
+# Split into multiple projects to improve parallelization of compilation in Visual Studio.
+# Visual Studio doesn't parallelize compilation within projects, but it does parallelize
+# across projects.
+  
+# NOTE: Tried splitting into 8 projects, but compilation actually got slower.  Maybe it has 
+# something to do with the moc compiler?
+SET(NUM_PROJECTS 4)
+
+# PROJECT 1
+SET(INTERFACE_TOOLINTERFACE_SRCS_1
   CropToolInterface.cc
   PaintToolInterface.cc
   PolylineToolInterface.cc
@@ -40,8 +49,39 @@ SET(INTERFACE_TOOLINTERFACE_SRCS
   ThresholdToolInterface.cc
   ArithmeticFilterInterface.cc
   BinaryDilateErodeFilterInterface.cc
-  #BinaryIterativeDilateErodeFilterInterface.cc
   BinarySmoothDilateErodeFilterInterface.cc
+)
+SET(INTERFACE_TOOLINTERFACE_MOC_SRCS_1
+  CropToolInterface.h
+  InvertToolInterface.h
+  PaintToolInterface.h
+  PolylineToolInterface.h
+  ResampleToolInterface.h
+  ThresholdToolInterface.h
+  ArithmeticFilterInterface.h
+  BinaryDilateErodeFilterInterface.h
+  BinarySmoothDilateErodeFilterInterface.h
+  ResampleToolInterface.h
+  ThresholdToolInterface.h  
+  ArithmeticFilterInterface.h
+  BinaryDilateErodeFilterInterface.h
+  BinarySmoothDilateErodeFilterInterface.h
+)
+SET(INTERFACE_TOOLINTERFACE_NO_MOC_SRCS_1 "")
+SET(INTERFACE_TOOLINTERFACE_UI_SRCS_1
+  CropToolInterface.ui
+  InvertToolInterface.ui
+  PaintToolInterface.ui
+  PolylineToolInterface.ui
+  ResampleToolInterface.ui
+  ThresholdToolInterface.ui  
+  ArithmeticFilterInterface.ui
+  BinaryDilateErodeFilterInterface.ui
+  BinarySmoothDilateErodeFilterInterface.ui
+)
+
+# PROJECT 2
+SET(INTERFACE_TOOLINTERFACE_SRCS_2
   CannyEdgeDetectionFilterInterface.cc
   ConfidenceConnectedFilterInterface.cc
   ConnectedComponentFilterInterface.cc
@@ -51,6 +91,33 @@ SET(INTERFACE_TOOLINTERFACE_SRCS
   DistanceFilterInterface.cc
   FillHolesFilterInterface.cc
   GradientAnisotropicDiffusionFilterInterface.cc
+)
+SET(INTERFACE_TOOLINTERFACE_MOC_SRCS_2
+  CannyEdgeDetectionFilterInterface.h
+  ConfidenceConnectedFilterInterface.h
+  ConnectedComponentFilterInterface.h
+  ConnectedComponentSizeFilterInterface.h
+  CurvatureAnisotropicDiffusionFilterInterface.h
+  DiscreteGaussianFilterInterface.h
+  DistanceFilterInterface.h
+  FillHolesFilterInterface.h
+  GradientAnisotropicDiffusionFilterInterface.h 
+)
+SET(INTERFACE_TOOLINTERFACE_NO_MOC_SRCS_2 "")
+SET(INTERFACE_TOOLINTERFACE_UI_SRCS_2
+  CannyEdgeDetectionFilterInterface.ui  
+  ConfidenceConnectedFilterInterface.ui
+  ConnectedComponentFilterInterface.ui
+  ConnectedComponentSizeFilterInterface.ui
+  CurvatureAnisotropicDiffusionFilterInterface.ui
+  DiscreteGaussianFilterInterface.ui
+  DistanceFilterInterface.ui
+  FillHolesFilterInterface.ui
+  GradientAnisotropicDiffusionFilterInterface.ui
+)
+
+# PROJECT 3
+SET(INTERFACE_TOOLINTERFACE_SRCS_3
   GradientMagnitudeFilterInterface.cc
   HistogramEqualizationFilterInterface.cc
   IntensityCorrectionFilterInterface.cc
@@ -60,6 +127,33 @@ SET(INTERFACE_TOOLINTERFACE_SRCS
   NeighborhoodConnectedFilterInterface.cc
   OtsuThresholdFilterInterface.cc
   AndFilterInterface.cc
+)
+SET(INTERFACE_TOOLINTERFACE_MOC_SRCS_3
+  GradientMagnitudeFilterInterface.h
+  HistogramEqualizationFilterInterface.h
+  IntensityCorrectionFilterInterface.h
+  MaskDataFilterInterface.h
+  MedianFilterInterface.h
+  MeanFilterInterface.h
+  NeighborhoodConnectedFilterInterface.h
+  OtsuThresholdFilterInterface.h
+  AndFilterInterface.h
+)
+#SET(INTERFACE_TOOLINTERFACE_NO_MOC_SRCS_3 "")
+SET(INTERFACE_TOOLINTERFACE_UI_SRCS_3
+  GradientMagnitudeFilterInterface.ui
+  HistogramEqualizationFilterInterface.ui
+  IntensityCorrectionFilterInterface.ui
+  MaskDataFilterInterface.ui
+  MedianFilterInterface.ui
+  MeanFilterInterface.ui
+  NeighborhoodConnectedFilterInterface.ui
+  OtsuThresholdFilterInterface.ui
+  AndFilterInterface.ui
+)
+
+# PROJECT 4
+SET(INTERFACE_TOOLINTERFACE_SRCS_4
   RemoveFilterInterface.cc
   OrFilterInterface.cc
   XorFilterInterface.cc
@@ -71,36 +165,7 @@ SET(INTERFACE_TOOLINTERFACE_SRCS
   PointSetFilterInterface.cc
   SpeedlineToolInterface.cc
 )
-
-SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
-  CropToolInterface.h
-  InvertToolInterface.h
-  PaintToolInterface.h
-  PolylineToolInterface.h
-  ResampleToolInterface.h
-  ThresholdToolInterface.h
-  ArithmeticFilterInterface.h
-  BinaryDilateErodeFilterInterface.h
-  #BinaryIterativeDilateErodeFilterInterface.h
-  BinarySmoothDilateErodeFilterInterface.h
-  CannyEdgeDetectionFilterInterface.h
-  ConfidenceConnectedFilterInterface.h
-  ConnectedComponentFilterInterface.h
-  ConnectedComponentSizeFilterInterface.h
-  CurvatureAnisotropicDiffusionFilterInterface.h
-  DiscreteGaussianFilterInterface.h
-  DistanceFilterInterface.h
-  FillHolesFilterInterface.h
-  GradientAnisotropicDiffusionFilterInterface.h
-  GradientMagnitudeFilterInterface.h
-  HistogramEqualizationFilterInterface.h
-  IntensityCorrectionFilterInterface.h
-  MaskDataFilterInterface.h
-  MedianFilterInterface.h
-  MeanFilterInterface.h
-  NeighborhoodConnectedFilterInterface.h
-  OtsuThresholdFilterInterface.h
-  AndFilterInterface.h
+SET(INTERFACE_TOOLINTERFACE_MOC_SRCS_4
   RemoveFilterInterface.h
   OrFilterInterface.h
   XorFilterInterface.h
@@ -116,43 +181,14 @@ SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
   PointSetFilterInterface.h
   SpeedlineToolInterface.h
 )
-
-SET(INTERFACE_TOOLINTERFACE_NO_MOC_SRCS
+SET(INTERFACE_TOOLINTERFACE_NO_MOC_SRCS_4 
   detail/MeasurementTableView.cc
   detail/MeasurementTableModel.cc
   detail/MeasurementItemDelegate.cc
   detail/MeasurementTextEdit.cc
-)
 
-SET(INTERFACE_TOOLINTERFACE_UI_SRCS
-  CropToolInterface.ui
-  InvertToolInterface.ui
-  PaintToolInterface.ui
-  PolylineToolInterface.ui
-  ThresholdToolInterface.ui
-  ResampleToolInterface.ui  
-  ArithmeticFilterInterface.ui
-  BinaryDilateErodeFilterInterface.ui
-  #BinaryIterativeDilateErodeFilterInterface.ui
-  BinarySmoothDilateErodeFilterInterface.ui
-  CannyEdgeDetectionFilterInterface.ui  
-  ConfidenceConnectedFilterInterface.ui
-  ConnectedComponentFilterInterface.ui
-  ConnectedComponentSizeFilterInterface.ui
-  CurvatureAnisotropicDiffusionFilterInterface.ui
-  DiscreteGaussianFilterInterface.ui
-  DistanceFilterInterface.ui
-  FillHolesFilterInterface.ui
-  GradientAnisotropicDiffusionFilterInterface.ui
-  GradientMagnitudeFilterInterface.ui
-  HistogramEqualizationFilterInterface.ui
-  IntensityCorrectionFilterInterface.ui
-  MaskDataFilterInterface.ui
-  MedianFilterInterface.ui
-  MeanFilterInterface.ui
-  NeighborhoodConnectedFilterInterface.ui
-  OtsuThresholdFilterInterface.ui
-  AndFilterInterface.ui
+)
+SET(INTERFACE_TOOLINTERFACE_UI_SRCS_4
   RemoveFilterInterface.ui
   OrFilterInterface.ui
   XorFilterInterface.ui
@@ -162,26 +198,8 @@ SET(INTERFACE_TOOLINTERFACE_UI_SRCS
   ClipboardToolInterface.ui
   MeasurementToolInterface.ui
   PointSetFilterInterface.ui
-  SpeedlineToolInterface.ui
+  SpeedlineToolInterface.ui  
 )
-
-##################################################
-# Get Icon files
-##################################################
-
-#QT4_ADD_RESOURCES(INTERFACE_TOOLINTERFACE_QT_RCC_SRCS Resources.qrc)
-
-##################################################
-# Generate header out of UI code
-##################################################
-
-QT4_WRAP_UI(INTERFACE_TOOLINTERFACE_QT_UI_SRCS ${INTERFACE_TOOLINTERFACE_UI_SRCS})
-
-##################################################
-# Wrap QT code to expand all the moc code
-##################################################
-
-QT4_WRAP_CPP(INTERFACE_TOOLINTERFACE_QT_MOC_SRCS ${INTERFACE_TOOLINTERFACE_MOC_SRCS})
 
 ##################################################
 # Ensure that we can find the files generated
@@ -191,32 +209,124 @@ QT4_WRAP_CPP(INTERFACE_TOOLINTERFACE_QT_MOC_SRCS ${INTERFACE_TOOLINTERFACE_MOC_S
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 
 ##################################################
-# Build the Components library
+# Set link libraries
 ##################################################
 
-CORE_ADD_LIBRARY(Interface_ToolInterface 
-            ${INTERFACE_TOOLINTERFACE_SRCS} 
-            ${INTERFACE_TOOLINTERFACE_QT_UI_SRCS}
-            ${INTERFACE_TOOLINTERFACE_QT_MOC_SRCS}
-            ${INTERFACE_TOOLINTERFACE_NO_MOC_SRCS} 
-            ${INTERFACE_TOOLINTERFACE_MOC_SRCS})      
+SET(INTERFACE_TOOLINTERFACE_LINK_LIBS 
+  Core_Utils
+  Core_EventHandler
+  Core_Application
+  Core_Interface
+  Core_Action
+  Application_Tool
+  QtUtils_Utils
+  QtUtils_Widgets
+  QtUtils_Bridge
+  Interface_Application
+  ${QT_LIBRARIES} 
+  ${SCI_BOOST_LIBRARY}
+)
+
+# NOTE: Project splitting disabled since compiling these files in parallel often resulted in moc 
+# generation errors. Compiling split projects individually did not result on moc generation errors.               
+IF (FALSE) #(SEG3D_SPLIT_PROJECTS)
+
+  # Split large projects into smaller projects to speed up compilation with Visual Studio.
+  # Visual Studio doesn't parallelize compilation within projects, but it does parallelize
+  # across projects.  
+
+  
+  FOREACH (PROJ_IDX RANGE 1 ${NUM_PROJECTS})
+  
+    ##################################################
+    # Generate header out of UI code
+    ##################################################
+  
+    SET(INTERFACE_TOOLINTERFACE_UI_SRCS "INTERFACE_TOOLINTERFACE_UI_SRCS_${PROJ_IDX}")
+    QT4_WRAP_UI(INTERFACE_TOOLINTERFACE_QT_UI_SRCS ${${INTERFACE_TOOLINTERFACE_UI_SRCS}})
+    
+    ##################################################
+    # Wrap QT code to expand all the moc code
+    ##################################################
+
+    SET(INTERFACE_TOOLINTERFACE_MOC_SRCS "INTERFACE_TOOLINTERFACE_MOC_SRCS_${PROJ_IDX}")
+    QT4_WRAP_CPP(INTERFACE_TOOLINTERFACE_QT_MOC_SRCS ${${INTERFACE_TOOLINTERFACE_MOC_SRCS}})
+    
+    ##################################################
+    # Build the Components library
+    ##################################################
+    
+    SET(INTERFACE_TOOLINTERFACE_SRCS "INTERFACE_TOOLINTERFACE_SRCS_${PROJ_IDX}")
+    SET(INTERFACE_TOOLINTERFACE_NO_MOC_SRCS "INTERFACE_TOOLINTERFACE_NO_MOC_SRCS_${PROJ_IDX}") 
+    SET(INTERFACE_TOOLINTERFACE_MOC_SRCS "INTERFACE_TOOLINTERFACE_MOC_SRCS_${PROJ_IDX}")                
+    SET(INTERFACE_TOOLINTERFACE_LIB "Interface_ToolInterface_${PROJ_IDX}")  
+    CORE_ADD_LIBRARY(${INTERFACE_TOOLINTERFACE_LIB} 
+      ${${INTERFACE_TOOLINTERFACE_SRCS}} 
+      ${INTERFACE_TOOLINTERFACE_QT_UI_SRCS}
+      ${INTERFACE_TOOLINTERFACE_QT_MOC_SRCS}
+      ${${INTERFACE_TOOLINTERFACE_NO_MOC_SRCS}} 
+      ${${INTERFACE_TOOLINTERFACE_MOC_SRCS}})     
+                        
+    TARGET_LINK_LIBRARIES(${INTERFACE_TOOLINTERFACE_LIB}
+      ${INTERFACE_TOOLINTERFACE_LINK_LIBS})
+                                                        
+    # Register action classes
+    REGISTER_LIBRARY_AND_CLASSES(${INTERFACE_TOOLINTERFACE_LIB}
+          ${${INTERFACE_TOOLINTERFACE_SRCS}})
+    
+    # Create single CMake variable that other libraries can depend on
+    # Tack library onto end of list     
+    SET(Interface_ToolInterface "${Interface_ToolInterface};${INTERFACE_TOOLINTERFACE_LIB}")
+    
+  ENDFOREACH (PROJ_IDX)
+
+ELSE (SEG3D_SPLIT_PROJECTS)
+
+  # Consolidate sources back into single project
+  FOREACH (PROJ_IDX RANGE 1 ${NUM_PROJECTS})
+  
+    SET(INTERFACE_TOOLINTERFACE_PROJ_SRCS "INTERFACE_TOOLINTERFACE_SRCS_${PROJ_IDX}") 
+    SET(INTERFACE_TOOLINTERFACE_SRCS "${INTERFACE_TOOLINTERFACE_SRCS};${${INTERFACE_TOOLINTERFACE_PROJ_SRCS}}")
+      
+    SET(INTERFACE_TOOLINTERFACE_MOC_PROJ_SRCS "INTERFACE_TOOLINTERFACE_MOC_SRCS_${PROJ_IDX}")   
+    SET(INTERFACE_TOOLINTERFACE_MOC_SRCS "${INTERFACE_TOOLINTERFACE_MOC_SRCS};${${INTERFACE_TOOLINTERFACE_MOC_PROJ_SRCS}}")   
+    
+    SET(INTERFACE_TOOLINTERFACE_NO_MOC_PROJ_SRCS "INTERFACE_TOOLINTERFACE_NO_MOC_SRCS_${PROJ_IDX}")
+    SET(INTERFACE_TOOLINTERFACE_NO_MOC_SRCS "${INTERFACE_TOOLINTERFACE_NO_MOC_SRCS};${${INTERFACE_TOOLINTERFACE_NO_MOC_PROJ_SRCS}}")  
+    
+    SET(INTERFACE_TOOLINTERFACE_UI_PROJ_SRCS "INTERFACE_TOOLINTERFACE_UI_SRCS_${PROJ_IDX}") 
+    SET(INTERFACE_TOOLINTERFACE_UI_SRCS "${INTERFACE_TOOLINTERFACE_UI_SRCS};${${INTERFACE_TOOLINTERFACE_UI_PROJ_SRCS}}") 
+    
+  ENDFOREACH (PROJ_IDX)
+    
+  ##################################################
+  # Generate header out of UI code
+  ##################################################
+
+  QT4_WRAP_UI(INTERFACE_TOOLINTERFACE_QT_UI_SRCS ${INTERFACE_TOOLINTERFACE_UI_SRCS})
+
+  ##################################################
+  # Wrap QT code to expand all the moc code
+  ##################################################
+
+  QT4_WRAP_CPP(INTERFACE_TOOLINTERFACE_QT_MOC_SRCS ${INTERFACE_TOOLINTERFACE_MOC_SRCS})
+
+  ##################################################
+  # Build the Components library
+  ##################################################
                       
-TARGET_LINK_LIBRARIES(Interface_ToolInterface
-                      Core_Utils
-                      Core_EventHandler
-                      Core_Application
-                      Core_Interface
-                      Core_Action
-                      Application_Tool
-            QtUtils_Utils
-                      QtUtils_Widgets
-            QtUtils_Bridge
-            Interface_Application
-                      ${QT_LIBRARIES} 
-                      ${SCI_BOOST_LIBRARY})
-
-# Register action classes
-REGISTER_LIBRARY_AND_CLASSES(Interface_ToolInterface
-            ${INTERFACE_TOOLINTERFACE_SRCS})
-
-
+  CORE_ADD_LIBRARY(Interface_ToolInterface 
+    ${INTERFACE_TOOLINTERFACE_SRCS} 
+    ${INTERFACE_TOOLINTERFACE_QT_UI_SRCS}
+    ${INTERFACE_TOOLINTERFACE_QT_MOC_SRCS}
+    ${INTERFACE_TOOLINTERFACE_NO_MOC_SRCS} 
+    ${INTERFACE_TOOLINTERFACE_MOC_SRCS})      
+                        
+  TARGET_LINK_LIBRARIES(Interface_ToolInterface
+    ${INTERFACE_TOOLINTERFACE_LINK_LIBS})
+                                                
+  # Register action classes
+  REGISTER_LIBRARY_AND_CLASSES(Interface_ToolInterface
+    ${INTERFACE_TOOLINTERFACE_SRCS})
+        
+ENDIF (SEG3D_SPLIT_PROJECTS)  

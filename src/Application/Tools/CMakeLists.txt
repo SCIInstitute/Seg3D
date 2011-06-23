@@ -163,7 +163,7 @@ TARGET_LINK_LIBRARIES(Application_Tools
                       Core_State
             Core_Geometry
             Application_Clipboard
-            Application_Filters
+            ${Application_Filters}
                       Application_Tool
                       Application_ToolManager
                       ${SCI_BOOST_LIBRARY}
