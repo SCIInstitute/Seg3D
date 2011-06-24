@@ -32,6 +32,7 @@
 // System includes
 #include <string>
 #include <vector>
+#include <set>
 
 // Core includes
 #include <Core/Geometry/Point.h>
@@ -58,10 +59,9 @@ public:
 
   // GET_ONE_PATH:
   // Get the corresponding path
-  //std::vector< Point >& get_one_path( int index ) ;
   SinglePath& get_one_path( int index ) ;
+  bool find_one_path( Point& p1, Point& p2, SinglePath& spath ) ;
 
-  //std::vector< std::vector< Core::Point > >& get_all_paths( ) ;
   std::vector< SinglePath >& get_all_paths( ) ;
 
   // SET_ONE_PATH:
@@ -89,9 +89,9 @@ public:
   inline bool operator!=( const Path& ) const;
 
 private:
-  //std::vector< std::vector< Core::Point > > paths_; 
-  const static size_t PATHS_SIZE_C = 1000;
+  const static size_t PATHS_SIZE_C = 100;
   std::vector< SinglePath > paths_;
+
   Point start_point_;
   Point end_point_;
 

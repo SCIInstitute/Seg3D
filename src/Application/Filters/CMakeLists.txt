@@ -153,7 +153,9 @@ SET(APPLICATION_FILTERS_ACTIONS_SRCS_8
   Actions/ActionPointSetRegisterFilter.cc
   Actions/ActionPointSetTransformFilter.h
   Actions/ActionPointSetTransformFilter.cc
-)
+  Actions/ActionSpeedlineImageFilter.h
+  Actions/ActionSpeedlineImageFilter.cc
+  )
 
 SET(APPLICATION_FILTERS_LINK_LIBS
   Core_Utils

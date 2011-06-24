@@ -94,9 +94,15 @@ public:
   // The default implementation returns false.
   virtual bool has_2d_visual();
 
-  // When slice changes, recompute the path
-  // in private class, not virtual
-  virtual void handle_slice_changed( );
+  // ACTIVATE:
+  // Activate a tool: this tool is set as the active tool and hence it should
+  // setup the right mouse tools in the viewers.
+  virtual void activate();
+
+  // DEACTIVATE:
+  // Deactivate a tool. A tool is always deactivate before the next one is
+  // activated.
+  virtual void deactivate();
 
   // -- dispatch functions --
 public:
@@ -105,11 +111,11 @@ public:
   void reset( Core::ActionContextHandle context );
 
   //gradient magnitude : calculate magnitude
-  void execute_gradient( Core::ActionContextHandle context );
+  void calculate_speedimage( Core::ActionContextHandle context );
 
-  // should be in private class
-  void handle_gradient_layer_changed( std::string layer_id );
-  void handle_target_mask_layer_changed( std::string layer_id );
+  //// should be in private class
+  //void handle_gradient_layer_changed( std::string layer_id );
+  //void handle_target_data_layer_changed( std::string layer_id );
 
   // -- State Variables --
 public:
@@ -119,6 +125,8 @@ public:
   Core::StateRangedIntHandle iterations_state_;
 
   Core::StateLabeledOptionHandle gradient_state_;
+  Core::StateBoolHandle gradient_created_state_; // user created, true; loaded false;
+
   Core::StateSpeedlinePathHandle itk_path_state_;
   Core::StateSpeedlinePathHandle path_state_;
 
@@ -126,8 +134,14 @@ public:
 
   Core::StateIntHandle current_vertex_index_state_;
 
-  Core::StateLabeledOptionHandle mask_state_;
-  Core::StateBoolHandle valid_target_mask_state_;
+  //Core::StateLabeledOptionHandle mask_state_;
+  Core::StateLabeledOptionHandle target_data_layer_state_;
+
+  //Core::StateBoolHandle valid_target_mask_state_;
+  Core::StateBoolHandle valid_target_data_layer_state_;
+
+  Core::StateBoolHandle use_smoothing_state_;
+  Core::StateBoolHandle use_rescale_state_;
 
 private:
   SpeedlineToolPrivateHandle private_;

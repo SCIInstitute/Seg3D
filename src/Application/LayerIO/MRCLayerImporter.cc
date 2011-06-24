@@ -35,6 +35,7 @@
 #include <fstream>
 #endif
 
+#include <iostream>
 // Core includes
 #include <Core/DataBlock/StdDataBlock.h>
 

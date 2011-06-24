@@ -58,23 +58,6 @@ public:
     return true;
   }
 
-  // compare the start/end points of a single path
-  //inline bool operator==( const SinglePath& m ) const 
-  //{
-  //  return ( 
-  //    ( this->points_[ 0 ] == m.points_[ 0 ] && this->points_[ 1 ] == m.points_[ 1 ] ) || 
-  //    ( this->points_[ 0 ] == m.points_[ 1 ] && this->points_[ 1 ] == m.points_[ 0 ] )
-  //    );
-  //}
-
-  //inline bool operator!=( const SinglePath& m ) const
-  //{
-  //  return ( 
-  //    ( this->points_[ 0 ] != m.points_[ 0 ] || this->points_[ 1 ] != m.points_[ 1 ] ) &&
-  //    ( this->points_[ 0 ] != m.points_[ 1 ] || this->points_[ 1 ] != m.points_[ 0 ] )
-  //    );
-  //}
-
   inline bool operator==( const SinglePath& m ) const 
   {
     return ( this->points_[ 0 ] == m.points_[ 0 ] && this->points_[ 1 ] == m.points_[ 1 ] );

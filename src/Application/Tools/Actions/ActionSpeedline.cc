@@ -119,8 +119,14 @@ public:
     typedef itk::RegularStepGradientDescentOptimizer optimizer_type;
     optimizer_type::Pointer optimizer = optimizer_type::New();
     optimizer->SetNumberOfIterations( this->iterations_ );
-    optimizer->SetMaximumStepLength( 0.5 );
-    optimizer->SetMinimumStepLength( 0.001 );
+
+    image_type::SpacingType spacing = this->speed_image_2D_->GetSpacing();
+    double min_spacing = ( spacing[ 0 ] < spacing[ 1 ] ) ? spacing[ 0 ] : spacing[ 1 ];
+    double max_step = 0.5 * min_spacing;
+    double min_step = 0.001 * min_spacing;
+    
+    optimizer->SetMaximumStepLength( max_step );
+    optimizer->SetMinimumStepLength( min_step );
     optimizer->SetRelaxationFactor( 0.5 );
 
     //typedef itk::IterateNeighborhoodOptimizer optimizer_type;
@@ -146,7 +152,7 @@ public:
     
     path_filter->SetCostFunction( cost );
     path_filter->SetOptimizer( optimizer );
-    path_filter->SetTerminationValue( this->termination_ );
+    path_filter->SetTerminationValue( this->termination_ * min_spacing );
     path_filter->SetInput( this->speed_image_2D_ );
 
     if ( !this->update_all_paths_ )
@@ -352,7 +358,7 @@ public:
   }
 
   // When mouse is moved, clean the temporary paths
-  void clean_paths( )
+  bool clean_paths( )
   {
     //for ( unsigned int i = 0; i < paths_num; ++i )
     //{
@@ -378,6 +384,7 @@ public:
     //  }
     //}
 
+    bool delete_outdated_path = false;
     std::vector< Core::SinglePath > tmp_paths;
 
     size_t paths_num = this->itk_paths_.get_path_num();
@@ -398,6 +405,7 @@ public:
       if ( it0 == this->vertices_.end() || it1 == this->vertices_.end() )
       {
         //bool is_deleted = this->paths_.delete_one_path( p0, p1 );
+        delete_outdated_path = true;
       }
       else
       {
@@ -411,6 +419,7 @@ public:
       this->itk_paths_.add_one_path( *it );
     }
 
+    return delete_outdated_path;
     //std::vector< Core::SinglePath > paths = this->paths_.get_all_paths();
     //for ( std::vector< Core::SinglePath >::iterator it = paths.begin(); it != paths.end(); ++it )
     //{
@@ -447,6 +456,10 @@ public:
     if ( this->current_vertex_index_ == -1 )
     {
       clean_paths();
+      Core::Point pstart ( DBL_MAX, DBL_MAX, DBL_MAX );
+      Core::Point pend ( DBL_MIN, DBL_MIN, DBL_MIN );
+      this->itk_paths_.set_start_point( pstart );
+      this->itk_paths_.set_end_point( pend );
 
       Core::Application::PostEvent( boost::bind( &Core::StateSpeedlinePath::set,
         speedline_tool->itk_path_state_, this->itk_paths_, Core::ActionSource::NONE_E ) );
@@ -455,6 +468,11 @@ public:
         speedline_tool->path_state_, this->world_paths_, Core::ActionSource::NONE_E ) );
       return;
     }
+
+    size_t num_of_vertices = this->vertices_.size();
+
+    if ( num_of_vertices == 0 )
+      return;
 
     typename Core::ITKImageDataT< VALUE_TYPE >::Handle speed_image_3D;
     this->get_itk_image_from_layer< VALUE_TYPE >( this->target_layer_, speed_image_3D );
@@ -490,7 +508,6 @@ public:
 
     this->speed_image_2D_ = extract_filter->GetOutput();
 
-    size_t num_of_vertices = this->vertices_.size();
     this->itk_paths_.set_start_point( this->vertices_[0] );
     this->itk_paths_.set_end_point( this->vertices_[ this->vertices_.size() - 1 ] );
 
@@ -513,7 +530,7 @@ public:
     else
     {
       // clean out-dated paths
-      clean_paths();
+      bool deleted_paths = clean_paths();
 
       if ( num_of_vertices == 1)
       {
@@ -532,6 +549,8 @@ public:
       }
       else
       { 
+        bool deleted = true;
+
         if ( this->current_vertex_index_ == 0 )
         {
           start_index = num_of_vertices - 1;
@@ -543,16 +562,18 @@ public:
           start_index = num_of_vertices - 2;
           end_index = 0;  
 
-          if ( num_of_vertices > this->itk_paths_.get_path_num() )  //new vertex
-          {
-            int deleted_start_index = num_of_vertices - 2;
-            int deleted_end_index = 0;
-            Core::Point p0, p1;
+          //deleted = false;
 
-            p0 = this->vertices_[ deleted_start_index ];
-            p1 = this->vertices_[ deleted_end_index ];
-            bool is_deleted = this->itk_paths_.delete_one_path( p0, p1 );
-          }
+          //if ( num_of_vertices > this->itk_paths_.get_path_num() )  //new vertex
+          //{
+          //  int deleted_start_index = num_of_vertices - 2;
+          //  int deleted_end_index = 0;
+          //  Core::Point p0, p1;
+
+          //  p0 = this->vertices_[ deleted_start_index ];
+          //  p1 = this->vertices_[ deleted_end_index ];
+          //  bool is_deleted = this->itk_paths_.delete_one_path( p0, p1 );
+          //}
 
         }
         else
@@ -561,6 +582,32 @@ public:
           end_index = this->current_vertex_index_ + 1;
         
         }
+
+        //if ( num_of_vertices > this->itk_paths_.get_path_num() && deleted )  //new vertex
+        if ( num_of_vertices > this->itk_paths_.get_path_num() && !deleted_paths )
+        {
+          Core::Point p0, p1;
+
+          p0 = this->vertices_[start_index ];
+          p1 = this->vertices_[ end_index ];
+          bool is_deleted = this->itk_paths_.delete_one_path( p0, p1 );
+
+          if ( is_deleted )
+          {
+          }
+          
+        }
+
+        Core::Point p0, p1;
+
+        p0 = this->vertices_[ start_index ];
+        p1 = this->vertices_[ this->current_vertex_index_ ];
+        bool is_deleted = this->itk_paths_.delete_one_path( p0, p1 );
+
+        p0 = this->vertices_[ this->current_vertex_index_ ];
+        p1 = this->vertices_[ end_index ];
+        is_deleted = this->itk_paths_.delete_one_path( p0, p1 );
+
         compute_path( start_index, this->current_vertex_index_ );
         compute_path( this->current_vertex_index_, end_index );
       }

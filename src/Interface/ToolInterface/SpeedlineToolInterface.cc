@@ -74,22 +74,23 @@ bool SpeedlineToolInterface::build_widget( QFrame* frame )
   SpeedlineTool* tool = dynamic_cast< SpeedlineTool* > ( base_tool_.get() );
 
   //Step 3 - connect the gui to the tool through the QtBridge
-  //QtUtils::QtBridge::Connect( this->private_->ui_.target_mask_, tool->target_layer_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.target_layer_, tool->target_layer_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.target_mask_, tool->target_layer_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.use_active_layer_, tool->use_active_layer_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.use_smooth_, tool->use_smoothing_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.use_rescale_, tool->use_rescale_state_ );
+
   QtUtils::QtBridge::Connect( this->private_->ui_.fill_button_, boost::bind(
     &SpeedlineTool::fill, tool, Core::Interface::GetWidgetActionContext() ) );
   QtUtils::QtBridge::Connect( this->private_->ui_.erase_button_, boost::bind(
     &SpeedlineTool::erase, tool, Core::Interface::GetWidgetActionContext() ) );
   QtUtils::QtBridge::Connect( this->private_->ui_.clear_button_, boost::bind(
     &SpeedlineTool::reset, tool, Core::Interface::GetWidgetActionContext() ) );
-  QtUtils::QtBridge::Enable( this->private_->ui_.target_layer_, 
+
+  QtUtils::QtBridge::Enable( this->private_->ui_.target_mask_, 
     tool->use_active_layer_state_, true );
 
-
-  //QtUtils::QtBridge::Connect( this->private_->ui_.gradient_mask_layer_, tool->gradient_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.gradient_layer_, tool->gradient_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.target_mask_, tool->mask_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.target_data_layer_, tool->target_data_layer_state_ );
 
   this->private_->ui_.iterations_->set_description( "Iterations" );
   this->private_->ui_.termination_->set_description( "Termination" );
@@ -98,12 +99,14 @@ bool SpeedlineToolInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Connect( this->private_->ui_.termination_, 
     tool->termination_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.run_gradient_button_, boost::bind(
-    &SpeedlineTool::execute_gradient, tool, Core::Interface::GetWidgetActionContext() ) );
+    &SpeedlineTool::calculate_speedimage, tool, Core::Interface::GetWidgetActionContext() ) );
 
-  QtUtils::QtBridge::Enable( this->private_->ui_.fill_button_, tool->valid_target_mask_state_ );
-  QtUtils::QtBridge::Enable( this->private_->ui_.erase_button_, tool->valid_target_mask_state_ );
-  QtUtils::QtBridge::Show( this->private_->ui_.message_alert_, tool->valid_target_state_, true );
-  QtUtils::QtBridge::Show( this->private_->ui_.message_alert_, tool->valid_gradient_state_, true );
+  QtUtils::QtBridge::Enable( this->private_->ui_.fill_button_, tool->valid_target_state_);
+  QtUtils::QtBridge::Enable( this->private_->ui_.erase_button_, tool->valid_target_state_ );
+  QtUtils::QtBridge::Enable( this->private_->ui_.run_gradient_button_, tool->valid_target_data_layer_state_ );
+
+  QtUtils::QtBridge::Show( this->private_->ui_.message_mask_alert_, tool->valid_target_state_, true );
+  QtUtils::QtBridge::Show( this->private_->ui_.message_gradient_magnitude_layer_alert_, tool->valid_gradient_state_, true );
 
   //Send a message to the log that we have finished with building the Speedline Tool Interface
   CORE_LOG_MESSAGE("Finished building a Speedline Tool Interface");

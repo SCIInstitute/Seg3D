@@ -53,30 +53,18 @@ size_t Path::get_path_num() const
   return paths_.size();
 }
 
-//void Path::add_one_path( const std::vector< Point >& pt )
-//{
-//  this->paths_.push_back( pt );
-//}
 
 void Path::add_one_path( const SinglePath& pt )
 {
   this->paths_.push_back( pt );
 }
 
-//std::vector< Core::Point >& Path::get_one_path( int index ) 
-//{
-//  return this->paths_[index];
-//}
 
 SinglePath& Path::get_one_path( int index ) 
 {
   return this->paths_[index];
 }
 
-//std::vector< std::vector< Core::Point > >& Path::get_all_paths( ) 
-//{
-//  return this->paths_;
-//}
 
 std::vector< SinglePath >& Path::get_all_paths( ) 
 {
@@ -95,14 +83,12 @@ std::vector< SinglePath >& Path::get_all_paths( )
 
 void Path::set_one_path( int index, const SinglePath& pt ) 
 {
-
   this->paths_[index] = pt;
 }
 
 bool Path::delete_one_path( Point& p1, Point& p2 ) 
 {
   SinglePath path1( p1, p2 );
-
   for ( std::vector< SinglePath >::iterator it = this->paths_.begin(); it != this->paths_.end(); ++it )
   {
     SinglePath element = *it;
@@ -113,6 +99,22 @@ bool Path::delete_one_path( Point& p1, Point& p2 )
     }
   }
   
+  return false;
+}
+
+bool Path::find_one_path( Point& p1, Point& p2, SinglePath& spath ) 
+{
+  SinglePath path1( p1, p2 );
+  for ( std::vector< SinglePath >::iterator it = this->paths_.begin(); it != this->paths_.end(); ++it )
+  {
+    SinglePath element = *it;
+    if ( element == path1 )
+    {
+      spath = *it;
+      return true;
+    }
+  }
+
   return false;
 }
 
