@@ -37,168 +37,192 @@
   
 # NOTE: Tried splitting into 8 projects, but compilation actually got slower.  Maybe it has 
 # something to do with the moc compiler?
-SET(NUM_PROJECTS 4)
+SET(NUM_PROJECTS 8)
 
 # PROJECT 1
 SET(INTERFACE_TOOLINTERFACE_SRCS_1
   CropToolInterface.cc
   PaintToolInterface.cc
-  PolylineToolInterface.cc
   InvertToolInterface.cc
+  PolylineToolInterface.cc
   ResampleToolInterface.cc
-  ThresholdToolInterface.cc
-  ArithmeticFilterInterface.cc
-  BinaryDilateErodeFilterInterface.cc
-  BinarySmoothDilateErodeFilterInterface.cc
 )
 SET(INTERFACE_TOOLINTERFACE_MOC_SRCS_1
   CropToolInterface.h
-  InvertToolInterface.h
   PaintToolInterface.h
+  InvertToolInterface.h
   PolylineToolInterface.h
   ResampleToolInterface.h
-  ThresholdToolInterface.h
-  ArithmeticFilterInterface.h
-  BinaryDilateErodeFilterInterface.h
-  BinarySmoothDilateErodeFilterInterface.h
-  ResampleToolInterface.h
-  ThresholdToolInterface.h  
-  ArithmeticFilterInterface.h
-  BinaryDilateErodeFilterInterface.h
-  BinarySmoothDilateErodeFilterInterface.h
 )
-SET(INTERFACE_TOOLINTERFACE_NO_MOC_SRCS_1 "")
 SET(INTERFACE_TOOLINTERFACE_UI_SRCS_1
   CropToolInterface.ui
-  InvertToolInterface.ui
   PaintToolInterface.ui
+  InvertToolInterface.ui
   PolylineToolInterface.ui
   ResampleToolInterface.ui
-  ThresholdToolInterface.ui  
-  ArithmeticFilterInterface.ui
-  BinaryDilateErodeFilterInterface.ui
-  BinarySmoothDilateErodeFilterInterface.ui
 )
 
 # PROJECT 2
 SET(INTERFACE_TOOLINTERFACE_SRCS_2
+  ThresholdToolInterface.cc
+  ArithmeticFilterInterface.cc
+  BinaryDilateErodeFilterInterface.cc
+  BinarySmoothDilateErodeFilterInterface.cc
   CannyEdgeDetectionFilterInterface.cc
+)
+SET(INTERFACE_TOOLINTERFACE_MOC_SRCS_2
+  ThresholdToolInterface.h
+  ArithmeticFilterInterface.h
+  BinaryDilateErodeFilterInterface.h
+  BinarySmoothDilateErodeFilterInterface.h
+  CannyEdgeDetectionFilterInterface.h  
+)
+SET(INTERFACE_TOOLINTERFACE_UI_SRCS_2
+  ThresholdToolInterface.ui  
+  ArithmeticFilterInterface.ui
+  BinaryDilateErodeFilterInterface.ui
+  BinarySmoothDilateErodeFilterInterface.ui
+  CannyEdgeDetectionFilterInterface.ui  
+)
+
+# PROJECT 3
+SET(INTERFACE_TOOLINTERFACE_SRCS_3
   ConfidenceConnectedFilterInterface.cc
   ConnectedComponentFilterInterface.cc
   ConnectedComponentSizeFilterInterface.cc
   CurvatureAnisotropicDiffusionFilterInterface.cc
   DiscreteGaussianFilterInterface.cc
-  DistanceFilterInterface.cc
-  FillHolesFilterInterface.cc
-  GradientAnisotropicDiffusionFilterInterface.cc
 )
-SET(INTERFACE_TOOLINTERFACE_MOC_SRCS_2
-  CannyEdgeDetectionFilterInterface.h
+SET(INTERFACE_TOOLINTERFACE_MOC_SRCS_3
   ConfidenceConnectedFilterInterface.h
   ConnectedComponentFilterInterface.h
   ConnectedComponentSizeFilterInterface.h
   CurvatureAnisotropicDiffusionFilterInterface.h
   DiscreteGaussianFilterInterface.h
-  DistanceFilterInterface.h
-  FillHolesFilterInterface.h
-  GradientAnisotropicDiffusionFilterInterface.h 
+  
 )
-SET(INTERFACE_TOOLINTERFACE_NO_MOC_SRCS_2 "")
-SET(INTERFACE_TOOLINTERFACE_UI_SRCS_2
-  CannyEdgeDetectionFilterInterface.ui  
+SET(INTERFACE_TOOLINTERFACE_UI_SRCS_3
   ConfidenceConnectedFilterInterface.ui
   ConnectedComponentFilterInterface.ui
   ConnectedComponentSizeFilterInterface.ui
   CurvatureAnisotropicDiffusionFilterInterface.ui
   DiscreteGaussianFilterInterface.ui
+)
+
+# PROJECT 4
+SET(INTERFACE_TOOLINTERFACE_SRCS_4
+  DistanceFilterInterface.cc
+  FillHolesFilterInterface.cc
+  GradientAnisotropicDiffusionFilterInterface.cc
+  GradientMagnitudeFilterInterface.cc
+  HistogramEqualizationFilterInterface.cc
+)
+SET(INTERFACE_TOOLINTERFACE_MOC_SRCS_4
+  DistanceFilterInterface.h
+  FillHolesFilterInterface.h
+  GradientAnisotropicDiffusionFilterInterface.h 
+  GradientMagnitudeFilterInterface.h
+  HistogramEqualizationFilterInterface.h
+)
+SET(INTERFACE_TOOLINTERFACE_UI_SRCS_4
   DistanceFilterInterface.ui
   FillHolesFilterInterface.ui
   GradientAnisotropicDiffusionFilterInterface.ui
-)
+  GradientMagnitudeFilterInterface.ui
+  HistogramEqualizationFilterInterface.ui
+)  
 
-# PROJECT 3
-SET(INTERFACE_TOOLINTERFACE_SRCS_3
-  GradientMagnitudeFilterInterface.cc
-  HistogramEqualizationFilterInterface.cc
+# PROJECT 5
+SET(INTERFACE_TOOLINTERFACE_SRCS_5
   IntensityCorrectionFilterInterface.cc
   MaskDataFilterInterface.cc
   MedianFilterInterface.cc
   MeanFilterInterface.cc
   NeighborhoodConnectedFilterInterface.cc
-  OtsuThresholdFilterInterface.cc
-  AndFilterInterface.cc
 )
-SET(INTERFACE_TOOLINTERFACE_MOC_SRCS_3
-  GradientMagnitudeFilterInterface.h
-  HistogramEqualizationFilterInterface.h
+SET(INTERFACE_TOOLINTERFACE_MOC_SRCS_5
   IntensityCorrectionFilterInterface.h
   MaskDataFilterInterface.h
   MedianFilterInterface.h
   MeanFilterInterface.h
   NeighborhoodConnectedFilterInterface.h
-  OtsuThresholdFilterInterface.h
-  AndFilterInterface.h
 )
-#SET(INTERFACE_TOOLINTERFACE_NO_MOC_SRCS_3 "")
-SET(INTERFACE_TOOLINTERFACE_UI_SRCS_3
-  GradientMagnitudeFilterInterface.ui
-  HistogramEqualizationFilterInterface.ui
+SET(INTERFACE_TOOLINTERFACE_UI_SRCS_5
   IntensityCorrectionFilterInterface.ui
   MaskDataFilterInterface.ui
   MedianFilterInterface.ui
   MeanFilterInterface.ui
   NeighborhoodConnectedFilterInterface.ui
-  OtsuThresholdFilterInterface.ui
-  AndFilterInterface.ui
 )
 
-# PROJECT 4
-SET(INTERFACE_TOOLINTERFACE_SRCS_4
+# PROJECT 6
+SET(INTERFACE_TOOLINTERFACE_SRCS_6
+  OtsuThresholdFilterInterface.cc
+  AndFilterInterface.cc
   RemoveFilterInterface.cc
   OrFilterInterface.cc
   XorFilterInterface.cc
+)
+SET(INTERFACE_TOOLINTERFACE_MOC_SRCS_6
+  OtsuThresholdFilterInterface.h
+  AndFilterInterface.h
+  RemoveFilterInterface.h
+  OrFilterInterface.h
+  XorFilterInterface.h
+)
+SET(INTERFACE_TOOLINTERFACE_UI_SRCS_6
+  OtsuThresholdFilterInterface.ui
+  AndFilterInterface.ui
+  RemoveFilterInterface.ui
+  OrFilterInterface.ui
+  XorFilterInterface.ui
+)
+
+# PROJECT 7
+SET(INTERFACE_TOOLINTERFACE_SRCS_7
   ThresholdSegmentationLSFilterInterface.cc
   FlipToolInterface.cc
   TransformToolInterface.cc
   ClipboardToolInterface.cc
-  MeasurementToolInterface.cc
   PointSetFilterInterface.cc
   SpeedlineToolInterface.cc
 )
-SET(INTERFACE_TOOLINTERFACE_MOC_SRCS_4
-  RemoveFilterInterface.h
-  OrFilterInterface.h
-  XorFilterInterface.h
+SET(INTERFACE_TOOLINTERFACE_MOC_SRCS_7
   ThresholdSegmentationLSFilterInterface.h
   FlipToolInterface.h
   TransformToolInterface.h
   ClipboardToolInterface.h
-  MeasurementToolInterface.h 
-  detail/MeasurementTableView.h
-  detail/MeasurementTableModel.h
-  detail/MeasurementItemDelegate.h
-  detail/MeasurementTextEdit.h
   PointSetFilterInterface.h
   SpeedlineToolInterface.h
 )
-SET(INTERFACE_TOOLINTERFACE_NO_MOC_SRCS_4 
-  detail/MeasurementTableView.cc
-  detail/MeasurementTableModel.cc
-  detail/MeasurementItemDelegate.cc
-  detail/MeasurementTextEdit.cc
-
-)
-SET(INTERFACE_TOOLINTERFACE_UI_SRCS_4
-  RemoveFilterInterface.ui
-  OrFilterInterface.ui
-  XorFilterInterface.ui
+SET(INTERFACE_TOOLINTERFACE_UI_SRCS_7
   ThresholdSegmentationLSFilterInterface.ui
   FlipToolInterface.ui
   TransformToolInterface.ui
   ClipboardToolInterface.ui
-  MeasurementToolInterface.ui
   PointSetFilterInterface.ui
   SpeedlineToolInterface.ui  
+)
+
+# PROJECT 8
+SET(INTERFACE_TOOLINTERFACE_SRCS_8
+  MeasurementToolInterface.cc
+)
+SET(INTERFACE_TOOLINTERFACE_MOC_SRCS_8
+  MeasurementToolInterface.h
+  detail/MeasurementTableView.h
+  detail/MeasurementTableModel.h
+  detail/MeasurementItemDelegate.h
+  detail/MeasurementTextEdit.h
+)
+SET(INTERFACE_TOOLINTERFACE_NO_MOC_SRCS_8 
+  detail/MeasurementTableView.cc
+  detail/MeasurementTableModel.cc
+  detail/MeasurementItemDelegate.cc
+  detail/MeasurementTextEdit.cc
+)
+SET(INTERFACE_TOOLINTERFACE_UI_SRCS_8
+  MeasurementToolInterface.ui
 )
 
 ##################################################
@@ -227,15 +251,16 @@ SET(INTERFACE_TOOLINTERFACE_LINK_LIBS
   ${SCI_BOOST_LIBRARY}
 )
 
-# NOTE: Project splitting disabled since compiling these files in parallel often resulted in moc 
-# generation errors. Compiling split projects individually did not result on moc generation errors.               
-IF (FALSE) #(SEG3D_SPLIT_PROJECTS)
+##################################################
+# Create projects
+##################################################
+            
+IF (SEG3D_SPLIT_PROJECTS)
 
   # Split large projects into smaller projects to speed up compilation with Visual Studio.
   # Visual Studio doesn't parallelize compilation within projects, but it does parallelize
   # across projects.  
 
-  
   FOREACH (PROJ_IDX RANGE 1 ${NUM_PROJECTS})
   
     ##################################################
@@ -243,6 +268,8 @@ IF (FALSE) #(SEG3D_SPLIT_PROJECTS)
     ##################################################
   
     SET(INTERFACE_TOOLINTERFACE_UI_SRCS "INTERFACE_TOOLINTERFACE_UI_SRCS_${PROJ_IDX}")
+    # Clear variable of values from last iteration
+    SET(INTERFACE_TOOLINTERFACE_QT_UI_SRCS "")
     QT4_WRAP_UI(INTERFACE_TOOLINTERFACE_QT_UI_SRCS ${${INTERFACE_TOOLINTERFACE_UI_SRCS}})
     
     ##################################################
@@ -250,6 +277,8 @@ IF (FALSE) #(SEG3D_SPLIT_PROJECTS)
     ##################################################
 
     SET(INTERFACE_TOOLINTERFACE_MOC_SRCS "INTERFACE_TOOLINTERFACE_MOC_SRCS_${PROJ_IDX}")
+    # Clear variable of values from last iteration
+    SET(INTERFACE_TOOLINTERFACE_QT_MOC_SRCS "")
     QT4_WRAP_CPP(INTERFACE_TOOLINTERFACE_QT_MOC_SRCS ${${INTERFACE_TOOLINTERFACE_MOC_SRCS}})
     
     ##################################################

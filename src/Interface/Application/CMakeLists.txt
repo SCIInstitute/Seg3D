@@ -213,7 +213,7 @@ TARGET_LINK_LIBRARIES(Interface_Application
                   Application_Renderer
                       Application_Tool
                       Application_ToolManager
-                      Application_Tools
+                      ${Application_Tools}
                       Application_LayerIO
                       QtUtils_Utils
                       QtUtils_Widgets
@@ -233,7 +233,7 @@ TARGET_LINK_LIBRARIES(Interface_Application
                   Application_Renderer
                       Application_Tool
                       Application_ToolManager
-                      Application_Tools
+                      ${Application_Tools}
                       Application_LayerIO
                       QtUtils_Utils
                       QtUtils_Widgets

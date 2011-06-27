@@ -157,6 +157,10 @@ SET(APPLICATION_FILTERS_ACTIONS_SRCS_8
   Actions/ActionSpeedlineImageFilter.cc
   )
 
+##################################################
+# Set link libraries
+##################################################
+
 SET(APPLICATION_FILTERS_LINK_LIBS
   Core_Utils
   Core_Action
@@ -168,6 +172,10 @@ SET(APPLICATION_FILTERS_LINK_LIBS
   Application_ProjectManager
   ${SCI_BOOST_LIBRARY}
 )
+
+##################################################
+# Create projects
+##################################################
   
 IF (SEG3D_SPLIT_PROJECTS)
   
