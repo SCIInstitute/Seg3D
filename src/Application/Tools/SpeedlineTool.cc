@@ -34,6 +34,7 @@
 #include <Core/State/Actions/ActionClear.h>
 #include <Core/State/Actions/ActionSetAt.h>
 #include <Core/State/Actions/ActionRemove.h>
+#include <Core/Interface/Interface.h>
 
 // Geometry includes
 #include <Core/Geometry/Path.h>
@@ -287,8 +288,7 @@ void SpeedlineToolPrivate::execute_fill_erase( Core::ActionContextHandle context
     bool found_path = paths.find_one_path( p0, p1, single_path );
     if ( found_path )
     {
-      //for ( unsigned int j = 0; j < single_path.get_points_num_on_path(); ++j )
-      size_t num_of_points_on_single_path = single_path.get_points_num_on_path();
+      int num_of_points_on_single_path = static_cast< int > ( single_path.get_points_num_on_path() );
 
       for ( int j = num_of_points_on_single_path - 1; j >= 0; --j )
       {
@@ -296,16 +296,6 @@ void SpeedlineToolPrivate::execute_fill_erase( Core::ActionContextHandle context
       }
     } 
   }
-  
-
-  //for ( unsigned int i = 0; i < paths.get_path_num(); ++i )
-  //{
-  //  Core::SinglePath single_path = paths.get_one_path( i );
-  //  for ( unsigned int j = 0; j < single_path.get_points_num_on_path(); ++j )
-  //  {
-  //    full_path.push_back( single_path.get_a_point( j ) );
-  //  }
-  //}
 
   size_t num_of_points_on_paths = full_path.size();
 
@@ -378,12 +368,6 @@ void SpeedlineToolPrivate::execute_path( bool update_all_paths )
   }
 
   const std::vector< Core::Point >& vertices = this->tool_->vertices_state_->get();
-  //size_t num_of_vertices = vertices.size();
-
-  //if ( num_of_vertices < 1 )
-  //{
-  //  return;
-  //}
 
   ActionSpeedline::Dispatch( context, this->tool_->gradient_state_->get(),
     volume_slice->get_slice_type(), volume_slice->get_slice_number(), vertices, 
@@ -454,15 +438,6 @@ private_( new SpeedlineToolPrivate )
 
   this->add_state( "current_vertex_index", this->current_vertex_index_state_, -1 );
 
-  //// activate and deactivate method overload, application thread
-  //for ( size_t i = 0; i < 6; ++i )
-  //{
-  //  this->add_connection( 
-  //    ViewerManager::Instance()->get_viewer( i )->slice_number_state_->value_changed_signal_.connect(
-  //    boost::bind( &SpeedlineToolPrivate::handle_slice_changed, this->private_ ) )
-  //  );
-  //}
-
   this->add_state( "use_smoothing", this->use_smoothing_state_, true ); 
   this->add_state( "use_rescale", this->use_rescale_state_, true ); 
 
@@ -479,22 +454,22 @@ SpeedlineTool::~SpeedlineTool()
 // setup the right mouse tools in the viewers.
 void SpeedlineTool::activate()
 {
-  // activate and deactivate method overload, application thread
   for ( size_t i = 0; i < 6; ++i )
   {
-    this->add_connection( 
+    this->viewer_connection_[ i ] = 
       ViewerManager::Instance()->get_viewer( i )->slice_number_state_->value_changed_signal_.connect(
-      boost::bind( &SpeedlineToolPrivate::handle_slice_changed, this->private_ ) )
-      );
+        boost::bind( &SpeedlineToolPrivate::handle_slice_changed, this->private_ ) );
   }
 }
 
 // DEACTIVATE:
-// Deactivate a tool. A tool is always deactivate before the next one is
-// activated.
+// Deactivate a tool. A tool is always deactivate before the next one is activated.
 void SpeedlineTool::deactivate()
 {
-
+  for ( size_t i = 0; i < 6; ++i )
+  {
+    this->viewer_connection_[ i ].disconnect();
+  }
 }
 
 void SpeedlineTool::fill( Core::ActionContextHandle context )
@@ -519,6 +494,11 @@ bool SpeedlineTool::handle_key_press( ViewerHandle viewer, int key, int modifier
     case Core::Key::KEY_E_E:
     {
       this->private_->execute_fill_erase( Core::Interface::GetKeyboardActionContext(), true, viewer );
+      return true;
+    }
+    case Core::Key::KEY_C_E:
+    {
+      this->reset( Core::Interface::GetKeyboardActionContext() );
       return true;
     }
   }
@@ -566,44 +546,8 @@ bool SpeedlineTool::handle_mouse_press( ViewerHandle viewer,
     }
   }
 
-  //else if ( !( modifiers & Core::KeyModifier::SHIFT_MODIFIER_E ) &&
-  //  button == Core::MouseButton::LEFT_BUTTON_E )
-  //{
-  //  Core::VolumeSliceHandle active_slice = viewer->get_active_volume_slice();
-  //  if ( active_slice && !active_slice->out_of_boundary() )
-  //  {
-  //    double world_x, world_y;
-  //    viewer->window_to_world( mouse_history.current_.x_, 
-  //      mouse_history.current_.y_, world_x, world_y );
-  //    Core::Point pt;
-  //    active_slice->get_world_coord( world_x, world_y,  pt );
-
-  //    std::vector<Core::Point> points = this->vertices_state_->get();
-
-  //    points.push_back( pt );
-  //    size_t idx = points.size() - 1;
-
-  //    //only update the current path, not every one
-  //    this->private_->vertex_index_ = static_cast< int >( idx );
-  //
-  //    Core::Application::PostEvent( boost::bind( &Core::StateInt::set,
-  //      this->current_vertex_index_state_, static_cast< int >(idx), Core::ActionSource::NONE_E ) );
-
-  //    Core::ActionSet::Dispatch( Core::Interface::GetMouseActionContext(),
-  //      this->vertices_state_, points );
-
-  //    viewer->set_cursor( Core::CursorShape::OPEN_HAND_E );
-
-  //    return true;
-  //  }
-  //}
-
-
   else if ( !( modifiers & Core::KeyModifier::SHIFT_MODIFIER_E ) &&
     button == Core::MouseButton::LEFT_BUTTON_E )
-  //else if ( button == Core::MouseButton::MID_BUTTON_E &&
-  //( modifiers == Core::KeyModifier::NO_MODIFIER_E ||
-  //  modifiers == Core::KeyModifier::SHIFT_MODIFIER_E ) )
   {
     Core::VolumeSliceHandle active_slice = viewer->get_active_volume_slice();
     if ( active_slice && !active_slice->out_of_boundary() )
@@ -681,186 +625,99 @@ bool SpeedlineTool::handle_mouse_press( ViewerHandle viewer,
       if ( path_idx_changed ) //find one path
       {
         Core::Point p00, p01;
-        //Core::SinglePath single_path = paths.get_one_path( static_cast<int> ( path_idx ) );
-        //Core::Point p0, p1;
-        //single_path.get_point_on_ends( 0, p0 );
-        //single_path.get_point_on_ends( 1, p1 );
 
-        ////distance between the point on path and new point is less than control point and new point
-        //if ( dp_min < dmin ) 
-        //{
-        //  if ( p0 == points[ idx ] )
-        //  {
-        //    new_pt_idx = idx + 1;
-        //  }
-        //  else if ( p1 == points[ idx ] )
-        //  {
-        //    new_pt_idx = idx;
-        //  }
-        //} 
-        //else if ( dp_min == dmin )
-        //{
-          if ( path_idx_pos > 1 ) 
+        if ( path_idx_pos > 1 ) 
+        {
+          //we have to decide update which one using inner product
+          int path_indicator = 0;
+          int path_indicator_min_perdicular = 0;
+          double dp_perdicular_dist_min = DBL_MAX;
+          for ( unsigned int i = 0; i < path_idx_pos; ++i )
           {
-            //we have to decide update which one using inner product
-            int path_indicator = 0;
-            int path_indicator_min_perdicular = 0;
-            double dp_perdicular_dist_min = DBL_MAX;
-            for ( unsigned int i = 0; i < path_idx_pos; ++i )
-            {
-              Core::SinglePath single_path = paths.get_one_path( path_idx_arr[ i ] );
-              Core::Point p00, p01;
-              single_path.get_point_on_ends( 0, p00 );
-              single_path.get_point_on_ends( 1, p01 );
-
-              Core::Vector edge_dir = p01 - p00;
-              double edge_length = edge_dir.normalize();
-              double alpha = Dot( pt - p00,  p01 - p00 )/ ( edge_length * edge_length );
-
-              if ( alpha >= 0.0 && alpha <= 1.0 )
-              {
-                path_indicator = path_idx_arr[ i ];
-              //  if ( dp_min == dmin ) //we need to compute the the point to straight line distance
-              //  {
-                  double proj_dist = Dot( pt - p00,  p01 - p00 ) /edge_length;
-                  double dp_perdicular_dist = 
-                    ( pt - p00 ).length2() - proj_dist * proj_dist;
-                  
-                  if ( dp_perdicular_dist < dp_perdicular_dist_min )
-                  {
-                    dp_perdicular_dist_min = dp_perdicular_dist;
-                    path_indicator_min_perdicular = path_idx_arr[ i ];
-                  }
-                  
-              //  }
-                //else
-                //{   
-                //  if ( path_indicator == min_dist_path_idx )
-                //  {
-                //    path_indicator_min_perdicular = path_indicator;
-                //    break;
-                //  }
-                //}
-                
-              }
-            }
-
+            Core::SinglePath single_path = paths.get_one_path( path_idx_arr[ i ] );
             Core::Point p00, p01;
-            //Core::SinglePath single_path = paths.get_one_path( path_indicator );
-            Core::SinglePath single_path = paths.get_one_path( path_indicator_min_perdicular );
             single_path.get_point_on_ends( 0, p00 );
             single_path.get_point_on_ends( 1, p01 );
 
-            if ( p00 == points[ idx ] )
+            Core::Vector edge_dir = p01 - p00;
+            double edge_length = edge_dir.normalize();
+            double alpha = Dot( pt - p00,  p01 - p00 )/ ( edge_length * edge_length );
+
+            if ( alpha >= 0.0 && alpha <= 1.0 )
+            {
+              path_indicator = path_idx_arr[ i ];
+
+              //we need to compute the the point to straight line distance
+              double proj_dist = Dot( pt - p00,  p01 - p00 ) /edge_length;
+              double dp_perdicular_dist = 
+                ( pt - p00 ).length2() - proj_dist * proj_dist;
+              
+              if ( dp_perdicular_dist < dp_perdicular_dist_min )
+              {
+                dp_perdicular_dist_min = dp_perdicular_dist;
+                path_indicator_min_perdicular = path_idx_arr[ i ];
+              }
+            }
+          }
+
+          Core::Point p00, p01;
+          Core::SinglePath single_path = paths.get_one_path( path_indicator_min_perdicular );
+          single_path.get_point_on_ends( 0, p00 );
+          single_path.get_point_on_ends( 1, p01 );
+
+          if ( p00 == points[ idx ] )
+          {
+            new_pt_idx = idx + 1;
+          }
+          else
+          {
+            new_pt_idx = idx;
+          }
+        }
+        else
+        {
+          if ( p00 == points[ idx ] )
+          {
+            Core::Vector edge_dir = p01 - p00;
+            double edge_length = edge_dir.normalize();
+            double alpha = Dot( pt - p00,  p01 - p00 )/ ( edge_length * edge_length );
+
+            if ( alpha >= 0.0 && alpha <= 1.0 )
             {
               new_pt_idx = idx + 1;
             }
-            else
+            if ( alpha < 0.0 )
             {
               new_pt_idx = idx;
             }
           }
-          else
+
+          else if ( p01 == points[ idx ] )
           {
-            //if ( p0 == points[ idx ] )
-            //{
-            //  Core::Vector edge_dir = p1 - p0;
-            //  double edge_length = edge_dir.normalize();
-            //  double alpha = Dot( pt - p0,  p1 - p0 )/ ( edge_length * edge_length );
+            Core::Vector edge_dir = p01 - p00;
+            double edge_length = edge_dir.normalize();
+            double alpha = Dot( pt - p00,  p01 - p00 )/ ( edge_length * edge_length );
 
-            //  if ( alpha >= 0.0 && alpha <= 1.0 )
-            //  {
-            //    new_pt_idx = idx + 1;
-            //  }
-            //  if ( alpha < 0.0 )
-            //  {
-            //    new_pt_idx = idx;
-            //  }
-            //}
-
-            //else if ( p1 == points[ idx ] )
-            //{
-            //  Core::Vector edge_dir = p1 - p0;
-            //  double edge_length = edge_dir.normalize();
-            //  double alpha = Dot( pt - p0,  p1 - p0 )/ ( edge_length * edge_length );
-
-            //  if ( alpha >= 0.0 && alpha <= 1.0 )
-            //  {
-            //    new_pt_idx = idx  ;
-            //  }
-            //  else if ( alpha > 1.0 )
-            //  {
-            //    new_pt_idx = idx + 1;
-            //  }
-
-            //  else
-            //  {
-            //    new_pt_idx = idx + 1;
-            //  }
-            //  //new_pt_idx = idx + 1;
-            //}
-
-            if ( p00 == points[ idx ] )
+            if ( alpha >= 0.0 && alpha <= 1.0 )
             {
-              Core::Vector edge_dir = p01 - p00;
-              double edge_length = edge_dir.normalize();
-              double alpha = Dot( pt - p00,  p01 - p00 )/ ( edge_length * edge_length );
-
-              if ( alpha >= 0.0 && alpha <= 1.0 )
-              {
-                new_pt_idx = idx + 1;
-              }
-              if ( alpha < 0.0 )
-              {
-                new_pt_idx = idx;
-              }
+              new_pt_idx = idx  ;
             }
-
-            else if ( p01 == points[ idx ] )
+            else
             {
-              Core::Vector edge_dir = p01 - p00;
-              double edge_length = edge_dir.normalize();
-              double alpha = Dot( pt - p00,  p01 - p00 )/ ( edge_length * edge_length );
-
-              if ( alpha >= 0.0 && alpha <= 1.0 )
-              {
-                new_pt_idx = idx  ;
-              }
-              else
-              {
-                new_pt_idx = idx + 1;
-              }
+              new_pt_idx = idx + 1;
             }
           }
         }
-        
-        //else
-        //{
-        //  if ( p0 == points[ idx ] )
-        //  {
-        //    new_pt_idx = idx - 1;
-        //  }
-        //  else if ( p1 == points[ idx ] )
-        //  {
-        //    new_pt_idx = idx + 1;
-        //  }
-        //}
+      }
 
-      
       delete[] path_idx_arr;
-
-      //points.insert( points.begin() + idx, pt );
       points.insert( points.begin() + new_pt_idx, pt );
 
       //points.push_back( pt );
       //idx = points.size() - 1;
-      
-      //only update the current path, not every one
-      //this->private_->vertex_index_ = static_cast< int >( idx );
+  
       this->private_->vertex_index_ = static_cast< int >( new_pt_idx );
 
-      //Core::Application::PostEvent( boost::bind( &Core::StateInt::set,
-      //  this->current_vertex_index_state_, static_cast< int >(idx), Core::ActionSource::NONE_E ) );
       Core::Application::PostEvent( boost::bind( &Core::StateInt::set,
         this->current_vertex_index_state_, static_cast< int >(new_pt_idx), Core::ActionSource::NONE_E ) );
       Core::ActionSet::Dispatch( Core::Interface::GetMouseActionContext(),
@@ -879,7 +736,6 @@ bool SpeedlineTool::handle_mouse_press( ViewerHandle viewer,
     {
       Core::Point pt = this->vertices_state_->get()[ this->private_->vertex_index_ ];
 
-
       // only one point left
       if ( this->private_->vertex_index_ == 0 &&  ( this->vertices_state_->get().size() == 1 ) )
       {
@@ -890,11 +746,6 @@ bool SpeedlineTool::handle_mouse_press( ViewerHandle viewer,
       {
         this->private_->vertex_index_ = 0;
       } 
-      //else if ( ( this->private_->vertex_index_ == this->vertices_state_->get().size() - 1 ) 
-      //  && ( this->private_->vertex_index_ != 0 ) )
-      //{
-      //  this->private_->vertex_index_ = 0;
-      //}
       else 
       {
         this->private_->vertex_index_ = this->private_->vertex_index_ - 1;
@@ -1089,24 +940,6 @@ void SpeedlineTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
   glColor3f( 0.0f, 1.0f, 1.0f );
   glEnable( GL_LINE_SMOOTH );
 
-  //glColor3f( 1.0f, 0.0f, 1.0f );  
-  //glBegin( GL_POINTS );
-  //for ( size_t i = 0; i < vertices_num; ++i )
-  //{
-  //  double x_pos, y_pos;
-  //  Core::VolumeSlice::ProjectOntoSlice( slice_type, vertices[ i ], x_pos, y_pos );
-  //  glVertex2d( x_pos, y_pos );
-  //}
-  //glEnd();
-
-  
-  
-  //Core::Point start_p = vertices[ 0 ];
-  //Core::Point end_p = vertices[ vertices_num - 1 ];
-  //bool is_more_than_two_edges =  vertices_num > 2 ? true : false;
-
-
-
   if ( start_p == end_p  && paths_num == 0 ) // only one point 
   {
     glColor3f( 0.0f, 1.0f, 1.0f );  
@@ -1129,15 +962,6 @@ void SpeedlineTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
       Core::Point p0, p1;
       single_path.get_point_on_ends( 0, p0 );
       single_path.get_point_on_ends( 1, p1 );
-
-      //if ( p0 == end_p && p1 == start_p && is_more_than_two_edges )
-      //{
-      //  glColor3f( 1.0f, 0.0f, 0.0f );    // red
-      //} 
-      //else
-      //{
-      //  glColor3f( 0.0f, 1.0f, 0.0f );    // green
-      //}
 
       glColor3f( 0.0f, 1.0f, 0.0f );    // green
       glBegin( GL_LINE_STRIP );
@@ -1165,7 +989,6 @@ void SpeedlineTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
   }
   glPopMatrix();
   glPopAttrib();
-
 }
 
 bool SpeedlineTool::has_2d_visual()

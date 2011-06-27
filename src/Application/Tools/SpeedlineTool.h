@@ -110,12 +110,7 @@ public:
   void erase( Core::ActionContextHandle context );
   void reset( Core::ActionContextHandle context );
 
-  //gradient magnitude : calculate magnitude
   void calculate_speedimage( Core::ActionContextHandle context );
-
-  //// should be in private class
-  //void handle_gradient_layer_changed( std::string layer_id );
-  //void handle_target_data_layer_changed( std::string layer_id );
 
   // -- State Variables --
 public:
@@ -134,17 +129,16 @@ public:
 
   Core::StateIntHandle current_vertex_index_state_;
 
-  //Core::StateLabeledOptionHandle mask_state_;
   Core::StateLabeledOptionHandle target_data_layer_state_;
 
-  //Core::StateBoolHandle valid_target_mask_state_;
   Core::StateBoolHandle valid_target_data_layer_state_;
-
   Core::StateBoolHandle use_smoothing_state_;
   Core::StateBoolHandle use_rescale_state_;
 
 private:
   SpeedlineToolPrivateHandle private_;
+
+  boost::signals2::connection viewer_connection_[6];
 };
 
 } // end namespace

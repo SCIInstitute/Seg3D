@@ -94,8 +94,25 @@ public:
       FLOAT_IMAGE_TYPE > CastFilterType;
 
     CastFilterType::Pointer caster = CastFilterType::New();
-    caster->SetInput( input_image->get_image()  );
+    caster->SetInput( input_image->get_image() );
 
+    float progress_amount;
+
+    if ( this->is_smoothing_ && this->is_rescale_ )
+    {
+      progress_amount = 1.0 / 3.0;
+    } 
+    else if ( !this->is_smoothing_ && !this->is_rescale_ )
+    {
+      progress_amount = 1.0;
+    }
+    else
+    {
+      progress_amount = 1.0 / 2.0;
+    }
+    
+    float start_progress = 0.0;
+    
     FLOAT_IMAGE_TYPE::Pointer output_image = caster->GetOutput(); 
 
     if ( this->is_smoothing_ )
@@ -113,6 +130,9 @@ public:
 
       // Ensure we will have some threads left for doing something else
       this->limit_number_of_itk_threads( smoothing_filter );
+      this->forward_abort_to_filter( smoothing_filter, this->dst_layer_ );
+      this->observe_itk_progress( smoothing_filter, this->dst_layer_, start_progress, progress_amount * 8.0 );
+
 
       // Run the actual ITK filter.
       // This needs to be in a try/catch statement as certain filters throw exceptions when they
@@ -137,7 +157,7 @@ public:
       if ( this->check_abort() ) return;
 
       output_image = smoothing_filter->GetOutput();
-
+      start_progress = start_progress + progress_amount;
     } 
         
 
@@ -149,8 +169,8 @@ public:
     typename gradient_magnititude_filter_type::Pointer gm_filter = gradient_magnititude_filter_type::New();
 
     // Relay abort and progress information to the layer that is executing the filter.
-    //this->forward_abort_to_filter( filter, this->dst_layer_ );
-    //this->observe_itk_progress( filter, this->dst_layer_ );
+    this->forward_abort_to_filter( gm_filter, this->dst_layer_ );
+    this->observe_itk_progress( gm_filter, this->dst_layer_, start_progress, progress_amount );
     
     // Setup the filter parameters that we do not want to change.
     gm_filter->SetInput( output_image );
@@ -182,6 +202,7 @@ public:
     if ( this->check_abort() ) return;
 
     output_image = gm_filter->GetOutput();
+    start_progress = start_progress + progress_amount;
     
     if ( this->is_rescale_ )
     {
@@ -190,6 +211,9 @@ public:
       typedef itk::RescaleIntensityImageFilter < FLOAT_IMAGE_TYPE, FLOAT_IMAGE_TYPE > rescale_filter_type;
 
       rescale_filter_type::Pointer rescale_filter = rescale_filter_type::New();
+      this->forward_abort_to_filter( rescale_filter, this->dst_layer_ );
+      this->observe_itk_progress( rescale_filter, this->dst_layer_, start_progress, progress_amount );
+
       rescale_filter->SetInput( output_image );
       rescale_filter->SetOutputMinimum( epsilon );
       rescale_filter->SetOutputMaximum( max_value );

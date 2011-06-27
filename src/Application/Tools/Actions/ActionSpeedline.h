@@ -56,8 +56,6 @@ CORE_ACTION
   CORE_ACTION_IS_UNDOABLE()
 )
 
-//typedef Core::Point VertexCoord;
-
 public:
   ActionSpeedline();
 
@@ -77,7 +75,6 @@ private:
   std::string target_layer_id_;
   int slice_type_;
   size_t slice_number_;
-  //std::vector< ActionSpeedline::VertexCoord > vertices_;
   std::vector< Core::Point > vertices_;
   int current_vertex_index_;
   Core::Path itk_paths_;

@@ -33,7 +33,7 @@
 
 #include <Core/ITKSpeedLine/itkSpeedFunctionToPathFilter.h>
 #include <Core/ITKSpeedLine/itkArrivalFunctionToPathFilter.h>
-#include <Core/ITKSpeedLine/itkIterateNeighborhoodOptimizer.h>
+//#include <Core/ITKSpeedLine/itkIterateNeighborhoodOptimizer.h>
 
 #include <Application/Provenance/Provenance.h>
 #include <Application/Provenance/ProvenanceStep.h>
@@ -128,20 +128,6 @@ public:
     optimizer->SetMaximumStepLength( max_step );
     optimizer->SetMinimumStepLength( min_step );
     optimizer->SetRelaxationFactor( 0.5 );
-
-    //typedef itk::IterateNeighborhoodOptimizer optimizer_type;
-    //optimizer_type::Pointer optimizer = optimizer_type::New();
-    //optimizer->MinimizeOn();
-    //optimizer->FullyConnectedOn();
-    //optimizer_type::NeighborhoodSizeType size( DIMENSION_C );
-    //double StepLengthFactorValue = 1.0;
-
-    //for(size_t i = 0; i < DIMENSION_C; i++)
-    //{
-    //  size[i] = this->speed_image_2D_->GetSpacing()[ (unsigned int) i] * StepLengthFactorValue;
-    //}
-
-    //optimizer->SetNeighborhoodSize( size );
 
     //typedef itk::GradientDescentOptimizer optimizer_type;
     //optimizer_type::Pointer optimizer = optimizer_type::New();
@@ -360,30 +346,6 @@ public:
   // When mouse is moved, clean the temporary paths
   bool clean_paths( )
   {
-    //for ( unsigned int i = 0; i < paths_num; ++i )
-    //{
-    //  Core::SinglePath single_path = this->paths_.get_one_path( i );
-
-    //  Core::Point p0, p1;
-    //  single_path.get_point_on_ends( 0, p0 );
-    //  single_path.get_point_on_ends( 1, p1 );
-
-    //  std::vector< Core::Point >::iterator it0  = 
-    //    std::find( this->vertices_.begin(), this->vertices_.end(), p0 );
-
-    //  std::vector< Core::Point >::iterator it1  = 
-    //    std::find( this->vertices_.begin(), this->vertices_.end(), p1 );
-
-    //  if ( it0 == this->vertices_.end() || it1 == this->vertices_.end() )
-    //  {
-    //    //bool is_deleted = this->paths_.delete_one_path( p0, p1 );
-    //  }
-    //  else
-    //  {
-    //    tmp_paths.push_back( single_path );
-    //  }
-    //}
-
     bool delete_outdated_path = false;
     std::vector< Core::SinglePath > tmp_paths;
 
@@ -419,27 +381,7 @@ public:
       this->itk_paths_.add_one_path( *it );
     }
 
-    return delete_outdated_path;
-    //std::vector< Core::SinglePath > paths = this->paths_.get_all_paths();
-    //for ( std::vector< Core::SinglePath >::iterator it = paths.begin(); it != paths.end(); ++it )
-    //{
-    //  Core::SinglePath single_path = *it;
-    //  Core::Point p0, p1;
-    //  single_path.get_point_on_ends( 0, p0 );
-    //  single_path.get_point_on_ends( 1, p1 );
-
-    //  std::vector< Core::Point >::iterator it0  = 
-    //    std::find( this->vertices_.begin(), this->vertices_.end(), p0 );
-
-    //  std::vector< Core::Point >::iterator it1  = 
-    //    std::find( this->vertices_.begin(), this->vertices_.end(), p1 );
-
-    //  if ( it0 == this->vertices_.end() || it1 == this->vertices_.end() )
-    //  {
-    //    //paths.erase( it );
-    //  }
-    //}
-    
+    return delete_outdated_path;  
   }
 
   SCI_BEGIN_TYPED_ITK_RUN( this->target_layer_->get_data_type() )
@@ -477,22 +419,12 @@ public:
     typename Core::ITKImageDataT< VALUE_TYPE >::Handle speed_image_3D;
     this->get_itk_image_from_layer< VALUE_TYPE >( this->target_layer_, speed_image_3D );
 
-    //double epsilon = 1.0e-7;
-    //double max_value = 1.0;
-    //typedef itk::RescaleIntensityImageFilter < TYPED_IMAGE_TYPE, TYPED_IMAGE_TYPE > rescale_filter_type;
-
-    //rescale_filter_type::Pointer rescale_filter = rescale_filter_type::New();
-    //rescale_filter->SetInput( speed_image_3D->get_image() );
-    //rescale_filter->SetOutputMinimum( epsilon );
-    //rescale_filter->SetOutputMaximum( max_value );
-    //rescale_filter->Update();
-
     // Create 2D itk image
     typedef itk::ExtractImageFilter< TYPED_IMAGE_TYPE, image_type >  extract_filter_type;
     typename extract_filter_type::Pointer extract_filter = extract_filter_type::New();
     
-    typename TYPED_IMAGE_TYPE::RegionType input_region = speed_image_3D->get_image()->GetLargestPossibleRegion();
-    //TYPED_IMAGE_TYPE::RegionType input_region = ( rescale_filter->GetOutput() )->GetLargestPossibleRegion();
+    typename TYPED_IMAGE_TYPE::RegionType input_region = 
+      speed_image_3D->get_image()->GetLargestPossibleRegion();
     typename TYPED_IMAGE_TYPE::SizeType size = input_region.GetSize();
     size[2] = 0;
     typename TYPED_IMAGE_TYPE::IndexType start = input_region.GetIndex();
@@ -503,7 +435,6 @@ public:
 
     extract_filter->SetExtractionRegion( desired_region );
     extract_filter->SetInput( speed_image_3D->get_image() );
-    //extract_filter->SetInput( rescale_filter->GetOutput() );
     extract_filter->Update();
 
     this->speed_image_2D_ = extract_filter->GetOutput();
@@ -549,53 +480,30 @@ public:
       }
       else
       { 
-        bool deleted = true;
-
         if ( this->current_vertex_index_ == 0 )
         {
           start_index = num_of_vertices - 1;
           end_index = this->current_vertex_index_ + 1;
-
         }
         else if ( this->current_vertex_index_ == num_of_vertices - 1)
         { 
           start_index = num_of_vertices - 2;
           end_index = 0;  
-
-          //deleted = false;
-
-          //if ( num_of_vertices > this->itk_paths_.get_path_num() )  //new vertex
-          //{
-          //  int deleted_start_index = num_of_vertices - 2;
-          //  int deleted_end_index = 0;
-          //  Core::Point p0, p1;
-
-          //  p0 = this->vertices_[ deleted_start_index ];
-          //  p1 = this->vertices_[ deleted_end_index ];
-          //  bool is_deleted = this->itk_paths_.delete_one_path( p0, p1 );
-          //}
-
         }
         else
         {
           start_index = this->current_vertex_index_ - 1;
           end_index = this->current_vertex_index_ + 1;
-        
         }
-
-        //if ( num_of_vertices > this->itk_paths_.get_path_num() && deleted )  //new vertex
-        if ( num_of_vertices > this->itk_paths_.get_path_num() && !deleted_paths )
+ 
+        // Add a new vertex
+        if ( num_of_vertices > this->itk_paths_.get_path_num() && !deleted_paths ) 
         {
           Core::Point p0, p1;
 
           p0 = this->vertices_[start_index ];
           p1 = this->vertices_[ end_index ];
           bool is_deleted = this->itk_paths_.delete_one_path( p0, p1 );
-
-          if ( is_deleted )
-          {
-          }
-          
         }
 
         Core::Point p0, p1;
@@ -612,10 +520,6 @@ public:
         compute_path( this->current_vertex_index_, end_index );
       }
     }
-  
-    //Core::Path full_path;
-    //full_path.set_start_point( this->itk_paths_.get_start_point() );
-    //full_path.set_end_point( this->itk_paths_.get_end_point() );
 
     this->world_paths_.set_start_point( this->itk_paths_.get_start_point() );
     this->world_paths_.set_end_point( this->itk_paths_.get_end_point() );
@@ -650,16 +554,11 @@ public:
         new_path.add_a_point( cpoint );
       }
       new_path.add_a_point( p0 );
-      
-      //full_path.add_one_path( new_path );
       this->world_paths_.add_one_path( new_path );
     }
 
     Core::Application::PostEvent( boost::bind( &Core::StateSpeedlinePath::set,
       speedline_tool->itk_path_state_, this->itk_paths_, Core::ActionSource::NONE_E ) );
-
-    //Core::Application::PostEvent( boost::bind( &Core::StateSpeedlinePath::set,
-    //  speedline_tool->path_state_, full_path, Core::ActionSource::NONE_E ) );
 
     Core::Application::PostEvent( boost::bind( &Core::StateSpeedlinePath::set,
       speedline_tool->path_state_, this->world_paths_, Core::ActionSource::NONE_E ) );
@@ -732,12 +631,6 @@ bool ActionSpeedline::validate( Core::ActionContextHandle& context )
   this->vol_slice_ = volume_slice;
   
   const std::vector< Core::Point >& vertices = this->vertices_;
-
-  //if ( vertices.size() < 2 )
-  //{
-  //  context->report_error( "The Speedline has less than 2 vertices." );
-  //  return false;
-  //}
   
   return true;
 }
