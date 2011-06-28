@@ -34,8 +34,8 @@
 #else
 #include <fstream>
 #endif
-
 #include <iostream>
+
 // Core includes
 #include <Core/DataBlock/StdDataBlock.h>
 
@@ -62,7 +62,8 @@ namespace Seg3D
     MRCLayerImporterPrivate() : importer_( 0 ),
       data_type_( Core::DataType::UNKNOWN_E ),
       read_header_( false ),
-      read_data_( false )
+      read_data_( false ),
+      SPACING_MAX_(10000.0)
     {
     }
 
@@ -100,6 +101,8 @@ namespace Seg3D
     // READ_DATA
     // Read the data from the file
     bool read_data();
+  private:
+    const float SPACING_MAX_;
   };
   
   bool MRCLayerImporterPrivate::read_header()
@@ -131,8 +134,8 @@ namespace Seg3D
 
     std::vector<size_t> dims(3);
     Core::Point origin;
-    Core::Vector spacing;
     bool use_new_origin = this->mrcreader_.use_new_origin();
+    double spacing_x = 0, spacing_y = 0, spacing_z = 0;
 
     // X=1, Y=2 and Z=3
     // axis corresponding to columns
@@ -140,7 +143,7 @@ namespace Seg3D
     switch (this->header_.mapc) {
       case 1:
         dims[0] = header_.nx;
-        spacing.x(header_.mx);
+        spacing_x = header_.xlen/header_.mx;
         if (use_new_origin)
         {
           origin.x(header_.xorigin);
@@ -152,7 +155,7 @@ namespace Seg3D
         break;
       case 2:
         dims[0] = header_.ny;
-        spacing.x(header_.my);
+        spacing_x = header_.ylen/header_.my;
         if (use_new_origin)
         {
           origin.x(header_.yorigin);
@@ -164,7 +167,7 @@ namespace Seg3D
         break;
       case 3:
         dims[0] = header_.nz;
-        spacing.x(header_.mz);
+        spacing_x = header_.zlen/header_.mz;
         if (use_new_origin)
         {
           origin.x(header_.zorigin);
@@ -178,13 +181,15 @@ namespace Seg3D
         this->importer_->set_error("Bad mapc axis value");
         return false;
     }
+    if (spacing_x > this->SPACING_MAX_)
+      spacing_x = this->SPACING_MAX_;
 
     // axis corresponding to rows
     // medium axis
     switch (header_.mapr) {
       case 1:
         dims[1] = header_.nx;
-        spacing.y(header_.mx);
+        spacing_y = header_.xlen/header_.mx;
         if (use_new_origin)
         {
           origin.y(header_.xorigin);
@@ -196,7 +201,7 @@ namespace Seg3D
         break;
       case 2:
         dims[1] = header_.ny;
-        spacing.y(header_.my);
+        spacing_y = header_.ylen/header_.my;
         if (use_new_origin)
         {
           origin.y(header_.yorigin);
@@ -208,7 +213,7 @@ namespace Seg3D
         break;
       case 3:
         dims[1] = header_.nz;
-        spacing.y(header_.mz);
+        spacing_y = header_.zlen/header_.mz;
         if (use_new_origin)
         {
           origin.y(header_.zorigin);
@@ -222,13 +227,15 @@ namespace Seg3D
         this->importer_->set_error("Bad mapr axis value");
         return false;
     }
+    if (spacing_y > this->SPACING_MAX_)
+      spacing_y = this->SPACING_MAX_;
 
     // axis corresponding to sections
     // slowest moving axis
     switch (header_.maps) {
       case 1:
         dims[2] = header_.nx;
-        spacing.z(header_.mx);
+        spacing_z = header_.xlen/header_.mx;
         if (use_new_origin)
         {
           origin.z(header_.xorigin);
@@ -240,7 +247,7 @@ namespace Seg3D
         break;
       case 2:
         dims[2] = header_.ny;
-        spacing.z(header_.my);
+        spacing_z = header_.ylen/header_.my;
         if (use_new_origin)
         {
           origin.z(header_.yorigin);
@@ -252,7 +259,7 @@ namespace Seg3D
         break;
       case 3:
         dims[2] = header_.nz;
-        spacing.z(header_.mz);
+        spacing_z = header_.zlen/header_.mz;
         if (use_new_origin)
         {
           origin.z(header_.zorigin);
@@ -266,15 +273,18 @@ namespace Seg3D
         this->importer_->set_error("Bad maps axis value");
         return false;
     }
-    std::cout << "origin=[" << origin[0] << " " << origin[1] << " " << origin[2] << "]" << std::endl;
-    std::cout << "spacing=[" << spacing[0] << " " << spacing[1] << " " << spacing[2] << "]" << std::endl;
-    std::cout << "dims=[" << dims[0] << " " << dims[1] << " " << dims[2] << "]" << std::endl;
+    if (spacing_z > this->SPACING_MAX_)
+      spacing_z = this->SPACING_MAX_;
+
+    Core::Vector spacing(spacing_x, spacing_y, spacing_z);
     Core::Transform transform(origin,
                               Core::Vector( spacing.x(), 0.0 , 0.0 ),
                               Core::Vector( 0.0, spacing.y(), 0.0 ),
                               Core::Vector( 0.0, 0.0, spacing.z() ));
     this->grid_transform_ = Core::GridTransform( dims[ 0 ], dims[ 1 ], dims[ 2 ], transform );
     this->grid_transform_.set_originally_node_centered( false );
+    this->meta_data_.meta_data_ = this->mrcreader_.export_header(header_);
+    this->meta_data_.meta_data_info_ = "MRC2000 header";
 
     // Indicate that we read the header.
     this->read_header_ = true;
@@ -366,12 +376,6 @@ namespace Seg3D
     offset.QuadPart = MRC_HEADER_LENGTH;
     SetFilePointerEx( file_desc, offset, NULL, FILE_BEGIN );
 #else
-    // test
-    //data_file.seekg(0, std::ios::beg);
-    //char* buffer = new char[MRC_HEADER_LENGTH];
-    //data_file.read(buffer, MRC_HEADER_LENGTH);
-    // test
-
     data_file.seekg( MRC_HEADER_LENGTH, std::ios::beg );
 #endif
     
@@ -471,6 +475,7 @@ namespace Seg3D
       data->set_data_block( this->private_->data_block_ );
       data->set_grid_transform( this->private_->grid_transform_ );
       data->set_name( this->get_file_tag() );
+      data->set_meta_data( this->private_->meta_data_ );
     }
     catch ( ... )
     {
