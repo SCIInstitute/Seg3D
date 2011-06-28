@@ -1233,28 +1233,7 @@ MeasurementTool::MeasurementTool( const std::string& toolid ) :
 		this->private_->active_group_id_ = active_layer->get_layer_group()->get_group_id();
 	}
 
-	this->add_connection( this->measurements_state_->state_changed_signal_.connect(
-		boost::bind( &MeasurementToolPrivate::handle_measurements_changed, this->private_ ) ) );
-	this->add_connection( this->active_index_state_->state_changed_signal_.connect(
-		boost::bind( &MeasurementToolPrivate::update_viewers, this->private_ ) ) );
-	this->add_connection( this->units_selection_state_->value_changed_signal_.connect(
-		boost::bind( &MeasurementToolPrivate::handle_units_selection_changed, this->private_, _2 ) ) );
-	this->add_connection( LayerManager::Instance()->active_layer_changed_signal_.connect(
-		boost::bind( &MeasurementToolPrivate::handle_active_layer_changed, this->private_, _1 ) ) );
-	this->add_connection( this->opacity_state_->state_changed_signal_.connect(
-		boost::bind( &MeasurementToolPrivate::handle_opacity_changed, this->private_ ) ) );
-	this->add_connection( ViewerManager::Instance()->active_viewer_state_->value_changed_signal_.
-		connect( boost::bind( &MeasurementToolPrivate::handle_active_viewer_changed, 
-		this->private_, _1 ) ) );
-
-	size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
-	for ( size_t i = 0; i < num_of_viewers; ++i )
-	{
-		ViewerHandle viewer = ViewerManager::Instance()->get_viewer( i );
-		this->add_connection( viewer->slice_number_state_->value_changed_signal_.connect(
-			boost::bind( &MeasurementToolPrivate::handle_viewer_slice_changed,
-			this->private_, i, _1 ) ) );
-	}
+	// NOTE: Connections are added in activate()
 }
 
 MeasurementTool::~MeasurementTool()
@@ -1737,6 +1716,40 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 bool MeasurementTool::has_2d_visual()
 {
 	return true;
+}
+
+void MeasurementTool::activate()
+{
+	// Add all connections
+	this->add_connection( this->measurements_state_->state_changed_signal_.connect(
+		boost::bind( &MeasurementToolPrivate::handle_measurements_changed, this->private_ ) ) );
+	this->add_connection( this->active_index_state_->state_changed_signal_.connect(
+		boost::bind( &MeasurementToolPrivate::update_viewers, this->private_ ) ) );
+	this->add_connection( this->units_selection_state_->value_changed_signal_.connect(
+		boost::bind( &MeasurementToolPrivate::handle_units_selection_changed, this->private_, _2 ) ) );
+	this->add_connection( LayerManager::Instance()->active_layer_changed_signal_.connect(
+		boost::bind( &MeasurementToolPrivate::handle_active_layer_changed, this->private_, _1 ) ) );
+	this->add_connection( this->opacity_state_->state_changed_signal_.connect(
+		boost::bind( &MeasurementToolPrivate::handle_opacity_changed, this->private_ ) ) );
+	this->add_connection( ViewerManager::Instance()->active_viewer_state_->value_changed_signal_.
+		connect( boost::bind( &MeasurementToolPrivate::handle_active_viewer_changed, 
+		this->private_, _1 ) ) );
+
+	size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
+	for ( size_t i = 0; i < num_of_viewers; ++i )
+	{
+		ViewerHandle viewer = ViewerManager::Instance()->get_viewer( i );
+		this->add_connection( viewer->slice_number_state_->value_changed_signal_.connect(
+			boost::bind( &MeasurementToolPrivate::handle_viewer_slice_changed,
+			this->private_, i, _1 ) ) );
+	}
+}
+
+void MeasurementTool::deactivate()
+{
+	// Disconnect all connections because we don't want handlers to run when tool isn't active due
+	// to performance concerns.
+	this->disconnect_all();
 }
 
 double MeasurementTool::convert_unit_string_to_world( std::string unit_string )

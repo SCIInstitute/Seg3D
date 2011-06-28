@@ -102,6 +102,16 @@ public:
   // Returns true if the tool draws itself in the 2D view, otherwise false.
   virtual bool has_2d_visual();
 
+  // ACTIVATE:
+  // Activate a tool: this tool is set as the active tool and hence it should
+  // setup the right mouse tools in the viewers.
+  virtual void activate();
+
+  // DEACTIVATE:
+  // Deactivate a tool. A tool is always deactivate before the next one is
+  // activated.
+  virtual void deactivate();
+
   // CONVERT_UNIT_STRING_TO_WORLD:
   // Convert string in current units (show_world_units_state_) to world value.
   double convert_unit_string_to_world( std::string unit_string );
