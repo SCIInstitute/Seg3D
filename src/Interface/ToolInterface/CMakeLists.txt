@@ -35,8 +35,6 @@
 # Visual Studio doesn't parallelize compilation within projects, but it does parallelize
 # across projects.
   
-# NOTE: Tried splitting into 8 projects, but compilation actually got slower.  Maybe it has 
-# something to do with the moc compiler?
 SET(NUM_PROJECTS 8)
 
 # PROJECT 1
@@ -246,13 +244,13 @@ SET(INTERFACE_TOOLINTERFACE_LINK_LIBS
   QtUtils_Utils
   QtUtils_Widgets
   QtUtils_Bridge
-  Interface_Application
+  ${Interface_Application}
   ${QT_LIBRARIES} 
   ${SCI_BOOST_LIBRARY}
 )
 
 ##################################################
-# Create projects
+# Create project(s)
 ##################################################
             
 IF (SEG3D_SPLIT_PROJECTS)
@@ -261,6 +259,9 @@ IF (SEG3D_SPLIT_PROJECTS)
   # Visual Studio doesn't parallelize compilation within projects, but it does parallelize
   # across projects.  
 
+  # Clear cached value
+  SET(Interface_ToolInterface "" CACHE INTERNAL "Interface_ToolInterface libraries")
+  
   FOREACH (PROJ_IDX RANGE 1 ${NUM_PROJECTS})
   
     ##################################################
@@ -305,7 +306,9 @@ IF (SEG3D_SPLIT_PROJECTS)
     
     # Create single CMake variable that other libraries can depend on
     # Tack library onto end of list     
-    SET(Interface_ToolInterface "${Interface_ToolInterface};${INTERFACE_TOOLINTERFACE_LIB}")
+    # Note: Use INTERNAL so that the variable is put in the cache (global scope), but not
+    # exposed to the user in the CMake interface.   
+    SET(Interface_ToolInterface ${Interface_ToolInterface} ${INTERFACE_TOOLINTERFACE_LIB} CACHE INTERNAL "Interface_ToolInterface libraries")
     
   ENDFOREACH (PROJ_IDX)
 
@@ -343,19 +346,22 @@ ELSE (SEG3D_SPLIT_PROJECTS)
   ##################################################
   # Build the Components library
   ##################################################
-                      
-  CORE_ADD_LIBRARY(Interface_ToolInterface 
+  
+  # Note: Use INTERNAL so that the variable is put in the cache (global scope), but not
+  # exposed to the user in the CMake interface. 
+  SET(Interface_ToolInterface "Interface_ToolInterface" CACHE INTERNAL "Interface_ToolInterface library")                    
+  CORE_ADD_LIBRARY(${Interface_ToolInterface} 
     ${INTERFACE_TOOLINTERFACE_SRCS} 
     ${INTERFACE_TOOLINTERFACE_QT_UI_SRCS}
     ${INTERFACE_TOOLINTERFACE_QT_MOC_SRCS}
     ${INTERFACE_TOOLINTERFACE_NO_MOC_SRCS} 
     ${INTERFACE_TOOLINTERFACE_MOC_SRCS})      
                         
-  TARGET_LINK_LIBRARIES(Interface_ToolInterface
+  TARGET_LINK_LIBRARIES(${Interface_ToolInterface}
     ${INTERFACE_TOOLINTERFACE_LINK_LIBS})
                                                 
   # Register action classes
-  REGISTER_LIBRARY_AND_CLASSES(Interface_ToolInterface
+  REGISTER_LIBRARY_AND_CLASSES(${Interface_ToolInterface}
     ${INTERFACE_TOOLINTERFACE_SRCS})
         
 ENDIF (SEG3D_SPLIT_PROJECTS)  

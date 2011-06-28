@@ -173,10 +173,17 @@ SET(APPLICATION_FILTERS_LINK_LIBS
 )
 
 ##################################################
-# Create projects
+# Create project(s)
 ##################################################
   
 IF (SEG3D_SPLIT_PROJECTS)
+  
+  # Split large projects into smaller projects to speed up compilation with Visual Studio.
+  # Visual Studio doesn't parallelize compilation within projects, but it does parallelize
+  # across projects.  
+
+  # Clear cached value
+  SET(Application_Filters "" CACHE INTERNAL "Application_Filters libraries")
   
   FOREACH (PROJ_IDX RANGE 1 ${NUM_PROJECTS})
   
@@ -202,7 +209,9 @@ IF (SEG3D_SPLIT_PROJECTS)
       
     # Create single CMake variable that other libraries can depend on
     # Tack library onto end of list     
-    SET(Application_Filters "${Application_Filters};${APPLICATION_FILTERS_LIB}")
+    # Note: Use INTERNAL so that the variable is put in the cache (global scope), but not
+    # exposed to the user in the CMake interface.   
+    SET(Application_Filters ${Application_Filters} ${APPLICATION_FILTERS_LIB} CACHE INTERNAL "Application_Filters libraries")
                  
   ENDFOREACH (PROJ_IDX)
 
@@ -223,15 +232,18 @@ ELSE (SEG3D_SPLIT_PROJECTS)
     GENERATE_ACTION_PYTHON_WRAPPER(PYTHON_WRAPPER Application_Filters ${APPLICATION_FILTERS_ACTIONS_SRCS})
     SET(APPLICATION_FILTERS_SRCS ${APPLICATION_FILTERS_SRCS} ${PYTHON_WRAPPER})
   ENDIF(BUILD_WITH_PYTHON)
-    
-  CORE_ADD_LIBRARY(Application_Filters ${APPLICATION_FILTERS_SRCS}
+  
+  # Note: Use INTERNAL so that the variable is put in the cache (global scope), but not
+  # exposed to the user in the CMake interface. 
+  SET(Application_Filters "Application_Filters" CACHE INTERNAL "Application_Filters library")      
+  CORE_ADD_LIBRARY(${Application_Filters} ${APPLICATION_FILTERS_SRCS}
     ${APPLICATION_FILTERS_ACTIONS_SRCS} )
               
-  TARGET_LINK_LIBRARIES(Application_Filters
+  TARGET_LINK_LIBRARIES(${Application_Filters}
     ${APPLICATION_FILTERS_LINK_LIBS})
 
   # Register action classes
-  REGISTER_LIBRARY_AND_CLASSES(Application_Filters
+  REGISTER_LIBRARY_AND_CLASSES(${Application_Filters}
     ${APPLICATION_FILTERS_ACTIONS_SRCS})
                  
 ENDIF (SEG3D_SPLIT_PROJECTS)

@@ -81,7 +81,7 @@ TARGET_LINK_LIBRARIES(${APPLICATION_NAME}
   QtUtils_Utils
   QtUtils_Widgets
   QtUtils_Bridge
-  Interface_Application
+  ${Interface_Application}
   ${Interface_ToolInterface}
   ${RESOURCES_LIBRARY}
 )
