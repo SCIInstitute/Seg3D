@@ -36,7 +36,7 @@
 #include "ui_HistogramEqualizationFilterInterface.h"
 
 // Application includes
-#include <Application/LayerManager/LayerManager.h>
+#include <Application/Layer/LayerManager.h>
 #include <Application/Tools/HistogramEqualizationFilter.h>
 
 // QtUtils includes

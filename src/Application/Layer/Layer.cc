@@ -220,10 +220,6 @@ void Layer::initialize_states( const std::string& name, bool creating )
   this->add_state( "opacity", opacity_state_, 
     PreferencesManager::Instance()->default_layer_opacity_state_->get(), 0.0, 1.0, 0.01 );
 
-  // == Selected by the LayerGroup ==
-  this->add_state( "selected", selected_state_, false );
-  this->selected_state_->set_is_project_data( false );
-
   // == The generation number of the data, or -1 if there is no data ==
   this->add_state( "generation", this->generation_state_, -1 );
 

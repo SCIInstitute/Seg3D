@@ -30,7 +30,7 @@
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/BinaryIterativeDilateErodeFilter.h>
 #include <Application/Layer/Layer.h>
-#include <Application/LayerManager/LayerManager.h>
+#include <Application/Layer/LayerManager.h>
 #include <Application/Filters/Actions/ActionIterativeDilateFilter.h>
 #include <Application/Filters/Actions/ActionIterativeErodeFilter.h>
 #include <Application/Filters/Actions/ActionIterativeDilateErodeFilter.h>

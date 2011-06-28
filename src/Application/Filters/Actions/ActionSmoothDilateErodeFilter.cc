@@ -35,7 +35,7 @@
 #include <Core/DataBlock/StdDataBlock.h>
 
 // Application includes
-#include <Application/LayerManager/LayerManager.h>
+#include <Application/Layer/LayerManager.h>
 #include <Application/StatusBar/StatusBar.h>
 #include <Application/Filters/ITKFilter.h> // ITKFilter inherits LayerFilter
 #include <Application/Filters/Actions/ActionSmoothDilateErodeFilter.h>

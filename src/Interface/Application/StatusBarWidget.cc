@@ -43,7 +43,7 @@
 //  Application includes
 #include <Application/Tool/ToolFactory.h>
 #include <Application/ToolManager/ToolManager.h>
-#include <Application/LayerManager/LayerManager.h>
+#include <Application/Layer/LayerManager.h>
 #include <Application/InterfaceManager/InterfaceManager.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
 

@@ -32,9 +32,9 @@
 #include <Application/Tools/Actions/ActionPaint.h>
 #include <Application/Layer/MaskLayer.h>
 #include <Application/Layer/DataLayer.h>
-#include <Application/LayerManager/LayerManager.h>
+#include <Application/Layer/LayerManager.h>
 #include <Application/UndoBuffer/UndoBuffer.h>
-#include <Application/LayerManager/LayerUndoBufferItem.h>
+#include <Application/Layer/LayerUndoBufferItem.h>
 #include <Application/Provenance/ProvenanceStep.h>
 #include <Application/ProjectManager/ProjectManager.h>
 

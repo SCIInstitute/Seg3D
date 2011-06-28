@@ -31,7 +31,7 @@
 
 #include <Core/Action/Actions.h>
 
-#include <Application/LayerManager/LayerAction.h>
+#include <Application/Layer/LayerAction.h>
 #include <Application/Tools/PaintTool.h>
 
 namespace Seg3D

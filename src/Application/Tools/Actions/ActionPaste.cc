@@ -33,8 +33,8 @@
 #include <Application/Tools/Actions/ActionCopyPaste.h>
 #include <Application/Tools/Actions/ActionPaste.h>
 #include <Application/Layer/MaskLayer.h>
-#include <Application/LayerManager/LayerManager.h>
-#include <Application/LayerManager/LayerUndoBufferItem.h>
+#include <Application/Layer/LayerManager.h>
+#include <Application/Layer/LayerUndoBufferItem.h>
 #include <Application/ProjectManager/ProjectManager.h>
 #include <Application/UndoBuffer/UndoBuffer.h>
 #include <Application/ViewerManager/ViewerManager.h>

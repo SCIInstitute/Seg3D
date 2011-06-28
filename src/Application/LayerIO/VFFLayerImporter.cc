@@ -41,7 +41,7 @@
 // Application includes
 #include <Application/Layer/DataLayer.h> 
 #include <Application/LayerIO/VFFLayerImporter.h>
-#include <Application/LayerManager/LayerManager.h>
+#include <Application/Layer/LayerManager.h>
 
 SEG3D_REGISTER_IMPORTER( Seg3D, VFFLayerImporter );
 

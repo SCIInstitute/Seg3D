@@ -29,8 +29,8 @@
 #ifndef APPLICATION_TOOLS_ACTIONS_ACTIONCOPY_H
 #define APPLICATION_TOOLS_ACTIONS_ACTIONCOPY_H
 
-#include <Application/LayerManager/LayerAction.h>
-#include <Application/LayerManager/LayerManager.h>
+#include <Application/Layer/LayerAction.h>
+#include <Application/Layer/LayerManager.h>
 
 namespace Seg3D
 {

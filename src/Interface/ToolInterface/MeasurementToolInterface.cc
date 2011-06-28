@@ -47,7 +47,7 @@
 #include "ui_MeasurementToolInterface.h"
 
 // Application Includes
-#include <Application/LayerManager/LayerManager.h>
+#include <Application/Layer/LayerManager.h>
 #include <Application/ViewerManager/Actions/ActionPickPoint.h>
 
 // Core Includes

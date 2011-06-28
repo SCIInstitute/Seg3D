@@ -34,7 +34,7 @@
 
 // Application includes
 #include <Application/Layer/Layer.h>
-#include <Application/LayerManager/LayerManager.h>
+#include <Application/Layer/LayerManager.h>
 #include <Application/Tool/Tool.h>
 #include <Application/Tool/ToolFactory.h>
 

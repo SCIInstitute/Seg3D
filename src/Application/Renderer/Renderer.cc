@@ -47,8 +47,8 @@
 #include <Application/Layer/DataLayer.h>
 #include <Application/Layer/MaskLayer.h>
 #include <Application/Layer/LayerGroup.h>
-#include <Application/LayerManager/LayerManager.h>
-#include <Application/LayerManager/LayerScene.h>
+#include <Application/Layer/LayerManager.h>
+#include <Application/Layer/LayerScene.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
 #include <Application/Renderer/Renderer.h>
 #include <Application/Tool/Tool.h>

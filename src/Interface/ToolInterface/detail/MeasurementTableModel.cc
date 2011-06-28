@@ -40,7 +40,7 @@
 #include <Interface/ToolInterface/detail/MeasurementTableModel.h>
 
 // Application includes
-#include <Application/LayerManager/LayerManager.h>
+#include <Application/Layer/LayerManager.h>
 
 namespace Seg3D
 {

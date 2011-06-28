@@ -30,7 +30,7 @@
 #include <Core/DataBlock/MaskDataBlockManager.h>
 
 // Application includes
-#include <Application/LayerManager/LayerManager.h>
+#include <Application/Layer/LayerManager.h>
 #include <Application/Filters/Actions/ActionInvert.h>
 #include <Application/Filters/LayerFilter.h>
 

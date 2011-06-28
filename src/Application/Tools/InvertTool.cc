@@ -31,7 +31,7 @@
 #include <Application/Tools/InvertTool.h>
 #include <Application/Filters/Actions/ActionInvert.h>
 #include <Application/Layer/Layer.h>
-#include <Application/LayerManager/LayerManager.h>
+#include <Application/Layer/LayerManager.h>
 
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL( Seg3D, InvertTool )

@@ -29,7 +29,7 @@
 #ifndef APPLICATION_TOOLS_ACTIONS_ACTIONPASTE_H
 #define APPLICATION_TOOLS_ACTIONS_ACTIONPASTE_H
 
-#include <Application/LayerManager/LayerAction.h>
+#include <Application/Layer/LayerAction.h>
 
 namespace Seg3D
 {

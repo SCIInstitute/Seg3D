@@ -33,7 +33,7 @@
 // Application includes
 #include <Application/Layer/Layer.h>
 #include <Application/Layer/LayerGroup.h>
-#include <Application/LayerManager/LayerManager.h>
+#include <Application/Layer/LayerManager.h>
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/MeasurementTool.h>
 #include <Application/ViewerManager/ViewerManager.h>
@@ -364,7 +364,7 @@ void MeasurementToolPrivate::handle_active_layer_changed( LayerHandle active_lay
 		// Check to see if the group size is 1 to handle case where layer is deleted, then 
 		// delete is undone but group id didn't get changed in process.
 		if( this->active_group_id_ != curr_active_group_id || 
-			active_layer->get_layer_group()->get_list_size() == 1 )  
+			active_layer->get_layer_group()->number_of_layers() == 1 )  
 		{
 			this->active_group_id_ = curr_active_group_id;
 

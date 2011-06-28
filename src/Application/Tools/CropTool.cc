@@ -37,7 +37,7 @@
 #include <Application/Filters/Actions/ActionCrop.h>
 #include <Application/Layer/Layer.h>
 #include <Application/Layer/LayerGroup.h>
-#include <Application/LayerManager/LayerManager.h>
+#include <Application/Layer/LayerManager.h>
 #include <Application/ViewerManager/ViewerManager.h>
 
 // Register the tool into the tool factory

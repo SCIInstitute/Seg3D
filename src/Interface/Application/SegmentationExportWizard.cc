@@ -51,8 +51,8 @@
 // Application includes
 #include <Application/LayerIO/LayerIO.h>
 #include <Application/Layer/LayerGroup.h>
-#include <Application/LayerManager/LayerManager.h>
-#include <Application/LayerManager/Actions/ActionExportSegmentation.h>
+#include <Application/Layer/LayerManager.h>
+#include <Application/LayerIO/Actions/ActionExportSegmentation.h>
 #include <Application/ProjectManager/ProjectManager.h>
 
 // Interface includes
@@ -263,6 +263,7 @@ void SegmentationSelectionPage::initializePage()
   QStringList masks;
   
   int group_with_active_layer = -1;
+  LayerHandle active_layer = LayerManager::Instance()->get_active_layer();
   
   for( int i = 0; i < static_cast< int >( groups.size() ); ++i )
   {
@@ -281,11 +282,12 @@ void SegmentationSelectionPage::initializePage()
       QString::fromStdString( group_name ) );
     group->setExpanded( true );
 
-    layer_list_type layers = groups[ i ]->get_layer_list();
-    layer_list_type::iterator it = layers.begin();
+    LayerVector layers;
+    groups[ i ]->get_layers( layers );
+    LayerVector::iterator it = layers.begin();
     while( it != layers.end() )
     {
-      if( ( *it ) == LayerManager::Instance()->get_active_layer() )
+      if( ( *it ) == active_layer )
       {
         group_with_active_layer = i;
       }

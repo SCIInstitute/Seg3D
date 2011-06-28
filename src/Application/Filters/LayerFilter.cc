@@ -44,9 +44,9 @@
 #include <Application/StatusBar/StatusBar.h>
 #include <Application/ProjectManager/ProjectManager.h>
 #include <Application/UndoBuffer/UndoBuffer.h>
-#include <Application/LayerManager/LayerAction.h>
-#include <Application/LayerManager/LayerManager.h>
-#include <Application/LayerManager/LayerUndoBufferItem.h>
+#include <Application/Layer/LayerAction.h>
+#include <Application/Layer/LayerManager.h>
+#include <Application/Layer/LayerUndoBufferItem.h>
 #include <Application/Filters/LayerFilter.h>
 #include <Application/Filters/LayerFilterLock.h>
 #include <Application/UndoBuffer/Actions/ActionUndo.h>

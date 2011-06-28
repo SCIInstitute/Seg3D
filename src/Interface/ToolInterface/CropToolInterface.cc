@@ -41,7 +41,7 @@
 //Application Includes
 #include <Application/Layer/DataLayer.h>
 #include <Application/Tools/CropTool.h>
-#include <Application/LayerManager/LayerManager.h>
+#include <Application/Layer/LayerManager.h>
 
 SCI_REGISTER_TOOLINTERFACE( Seg3D, CropToolInterface )
 

@@ -34,64 +34,27 @@
 #endif
 
 // Qt includes
-#include <QtGui/QWidget>
-#include <QtGui/QScrollArea>
+#include <QScrollArea>
 
 // Core includes
-#include <Core/Utils/EnumClass.h>
 #include <Core/Utils/ConnectionHandler.h>
-
-// Application includes
-#include <Application/Layer/LayerGroup.h>
-
-// Interface includes
-#include <Interface/Application/LayerGroupWidget.h>
 
 namespace Seg3D
 {
 
 // Forward declarations 
 class LayerManagerWidgetPrivate;
-typedef boost::shared_ptr<LayerManagerWidgetPrivate> LayerManagerWidgetPrivateHandle;
   
 class LayerManagerWidget : public QScrollArea, public Core::ConnectionHandler
 {
-// Need to make it a Qt object
-Q_OBJECT
+  // Need to make it a Qt object
+  Q_OBJECT
   
   // -- constructor/destructor
 public:
   LayerManagerWidget( QWidget *parent = 0 );
   virtual ~LayerManagerWidget();
 
-  // -- function that handle signals --
-private:
-  // HANDLE_GROUP_INTERNALS_CHANGE:
-  // This function is called when the internals of a group are modified.
-  void handle_group_internals_change( LayerGroupHandle group );
-  
-  // HANDLE_GROUP_CHANGED:
-  // This function is called when new groups are added or deleted and when their
-  // order changes.
-  void handle_groups_changed();
-
-  // PRE_LOAD_STATES:
-  // Called on pre_load_states_signal_ from the StateEngine.
-  void pre_load_states();
-
-  // POST_LOAD_STATES:
-  // Called on post_load_states_signal_ from the StateEngine.
-  void post_load_states();
-
-  // RESET:
-  // Remove all the layer widgets.
-  void reset();
-
-  // MAKE_NEW_GROUP:
-  // function that creates a new group to put layers into. 
-  LayerGroupWidget* make_new_group( LayerGroupHandle group );
-  
-  
 private Q_SLOTS:
   // PREP_LAYERS_FOR_DRAG_AND_DROP:
   // this function tells the groups to prepare their layers for drag and drop
@@ -111,9 +74,7 @@ private Q_SLOTS:
   
   // -- internals of this class --
 private:
-  friend class LayerManagerWidgetPrivate;
-
-  LayerManagerWidgetPrivateHandle private_;
+  LayerManagerWidgetPrivate* private_;
 };
 
 } // end namespace Seg3D

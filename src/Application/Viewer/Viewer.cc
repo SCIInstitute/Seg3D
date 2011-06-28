@@ -44,9 +44,8 @@
 #include <Application/Layer/DataLayer.h>
 #include <Application/Layer/MaskLayer.h>
 #include <Application/Layer/LayerGroup.h>
-#include <Application/LayerManager/LayerManager.h>
-#include <Application/LayerManager/Actions/ActionActivateNextLayer.h>
-#include <Application/LayerManager/Actions/ActionActivatePreviousLayer.h>
+#include <Application/Layer/LayerManager.h>
+#include <Application/Layer/Actions/ActionShiftActiveLayer.h>
 #include <Application/StatusBar/StatusBar.h>
 #include <Application/Viewer/Viewer.h>
 #include <Application/Viewer/ViewManipulator.h>
@@ -54,7 +53,7 @@
 #include <Application/Viewer/Actions/ActionAutoView.h>
 #include <Application/ViewerManager/Actions/ActionPickPoint.h>
 #include <Application/ViewerManager/ViewerManager.h>
-#include <Application/LayerManager/Actions/ActionComputeIsosurface.h>
+#include <Application/Layer/Actions/ActionComputeIsosurface.h>
 
 namespace Seg3D
 {
@@ -84,7 +83,7 @@ public:
   void viewer_lock_state_changed( bool locked );
   void layer_state_changed( int affected_view_modes );
   void insert_layer( LayerHandle layer );
-  void delete_layers( std::vector< LayerHandle > layers );
+  void delete_layers( std::vector< std::string > layers );
   void set_active_layer( LayerHandle layer );
   void set_viewer_labels();
   void handle_flip_horizontal_changed( bool flip );
@@ -354,26 +353,26 @@ void ViewerPrivate::insert_layer( LayerHandle layer )
   }
 }
 
-void ViewerPrivate::delete_layers( std::vector< LayerHandle > layers )
+void ViewerPrivate::delete_layers( std::vector< std::string > layers )
 {
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
   
   bool layer_deleted = false;
   for ( size_t i = 0; i < layers.size(); ++i )
   {
-    LayerHandle layer = layers[ i ];
+    std::string layer_id = layers[ i ];
 
     // Disconnect from the signals of the layer states
     std::pair< connection_map_type::iterator, connection_map_type::iterator > range = 
-      this->layer_connection_map_.equal_range( layer->get_layer_id() );
+      this->layer_connection_map_.equal_range( layer_id );
 
     for ( connection_map_type::iterator it = range.first; it != range.second; ++it )
     {
       ( *it ).second.disconnect();
     }
-    this->layer_connection_map_.erase( layer->get_layer_id() );
+    this->layer_connection_map_.erase( layer_id );
 
-    volume_slice_map_type::iterator it = this->volume_slices_.find( layer->get_layer_id() );
+    volume_slice_map_type::iterator it = this->volume_slices_.find( layer_id );
     if ( it == this->volume_slices_.end() ) continue;
     if ( this->active_layer_slice_ == ( *it ).second )
     {
@@ -1035,6 +1034,8 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
     boost::bind( &ViewerPrivate::set_active_layer, this->private_, _1 ) ) );
   this->add_connection( LayerManager::Instance()->layers_reordered_signal_.connect(
     boost::bind( &Viewer::redraw_scene, this ) ) );
+  this->add_connection( LayerManager::Instance()->groups_reordered_signal_.connect(
+    boost::bind( &Viewer::redraw_scene, this ) ) );
 
   this->add_connection( this->view_mode_state_->value_changed_signal_.connect(
     boost::bind( &ViewerPrivate::change_view_mode, this->private_, _2, _3 ) ) );
@@ -1320,7 +1321,7 @@ bool Viewer::key_press_event( int key, int modifiers, int x, int y )
       {
         if ( PreferencesManager::Instance()->active_layer_navigation_state_->get() )
         {
-        ActionActivatePreviousLayer::Dispatch( Core::Interface::GetKeyboardActionContext() );
+        ActionShiftActiveLayer::Dispatch( Core::Interface::GetKeyboardActionContext(), false );
         }
         handled_successfully = true;
         break;
@@ -1330,7 +1331,7 @@ bool Viewer::key_press_event( int key, int modifiers, int x, int y )
       {
         if ( PreferencesManager::Instance()->active_layer_navigation_state_->get() )
         {
-        ActionActivateNextLayer::Dispatch( Core::Interface::GetKeyboardActionContext() );
+        ActionShiftActiveLayer::Dispatch( Core::Interface::GetKeyboardActionContext(), true );
         }
         handled_successfully = true;
         break;

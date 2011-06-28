@@ -38,7 +38,8 @@
 
 // Application includes
 #include <Application/Layer/Layer.h>
-#include <Application/LayerManager/LayerManager.h>
+#include <Application/Layer/LayerGroup.h>
+#include <Application/Layer/LayerManager.h>
 #include <Application/Tool/SingleTargetTool.h>
 
 namespace Seg3D
@@ -116,8 +117,8 @@ void SingleTargetToolPrivate::update_dependent_layers()
         }
         else
         {
-          LayerManager::Instance()->get_layer_names_from_group( layer->get_layer_group(),
-            layer_names, this->dependent_option_lists_[ j ].get< 1 >() );
+          layer->get_layer_group()->get_layer_names( layer_names, 
+            static_cast< Core::VolumeType::enum_type >( this->dependent_option_lists_[ j ].get< 1 >() ) );
         }
         
       }

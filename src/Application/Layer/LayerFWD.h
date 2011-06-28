@@ -32,6 +32,7 @@
 #include <utility>
 #include <string>
 #include <vector>
+#include <list>
 
 // Boost includes 
 #include <boost/shared_ptr.hpp>
@@ -47,6 +48,8 @@ typedef boost::weak_ptr< LayerGroup > LayerGroupWeakHandle;
 class Layer;
 typedef boost::shared_ptr< Layer > LayerHandle;
 typedef boost::weak_ptr< Layer > LayerWeakHandle;
+typedef std::list< LayerHandle > LayerList;
+typedef std::vector< LayerHandle > LayerVector;
 
 class DataLayer;
 typedef boost::shared_ptr< DataLayer > DataLayerHandle;

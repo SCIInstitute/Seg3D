@@ -35,7 +35,7 @@
 
 // Application includes
 #include <Application/ProjectManager/ProjectManager.h>
-#include <Application/LayerManager/LayerManager.h>
+#include <Application/Layer/LayerManager.h>
 #include <Application/UndoBuffer/UndoBuffer.h>
 #include <Application/ToolManager/ToolManager.h>
 #include <Application/ProjectManager/Actions/ActionNewProject.h>

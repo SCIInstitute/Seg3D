@@ -43,7 +43,7 @@
 #include <Application/Tools/detail/MaskShader.h>
 #include <Application/Layer/Layer.h>
 #include <Application/Layer/LayerGroup.h>
-#include <Application/LayerManager/LayerManager.h>
+#include <Application/Layer/LayerManager.h>
 #include <Application/ViewerManager/ViewerManager.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
 #include <Application/Filters/Actions/ActionTransform.h>

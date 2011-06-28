@@ -40,7 +40,7 @@
 #include <Application/Filters/Actions/ActionThreshold.h>
 #include <Application/Tools/detail/MaskShader.h>
 #include <Application/Layer/Layer.h>
-#include <Application/LayerManager/LayerManager.h>
+#include <Application/Layer/LayerManager.h>
 #include <Application/ViewerManager/ViewerManager.h>
 
 #ifdef min

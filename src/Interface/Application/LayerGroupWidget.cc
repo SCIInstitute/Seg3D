@@ -26,12 +26,13 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-//Boost Includes
-#include <boost/lexical_cast.hpp>
-
 // Qt includes
-#include <QtGui/QMessageBox>
-#include <QtCore/QPropertyAnimation>
+#include <QMessageBox>
+#include <QPropertyAnimation>
+#include <QMouseEvent>
+#include <QDragEnterEvent>
+#include <QDragLeaveEvent>
+#include <QDropEvent>
 
 //Core Includes - for logging
 #include <Core/Utils/Log.h>
@@ -39,21 +40,17 @@
 //QtUtils Includes
 #include <QtUtils/Bridge/QtBridge.h>
 
-//UI Includes
-#include "ui_LayerGroupWidget.h"
-
 //Application Includes
 #include <Application/Layer/DataLayer.h>
 #include <Application/Layer/MaskLayer.h>
-#include <Application/LayerManager/LayerManager.h>
-#include <Application/LayerManager/Actions/ActionDeleteLayers.h>
-#include <Application/LayerManager/Actions/ActionNewMaskLayer.h>
-#include <Application/LayerManager/Actions/ActionDuplicateLayer.h>
-#include <Application/LayerManager/Actions/ActionMoveGroupAbove.h>
-#include <Application/LayerManager/Actions/ActionMoveLayerBelow.h>
-#include <Application/ViewerManager/ViewerManager.h>
+#include <Application/Layer/LayerManager.h>
+#include <Application/Layer/Actions/ActionDeleteLayers.h>
+#include <Application/Layer/Actions/ActionNewMaskLayer.h>
+#include <Application/Layer/Actions/ActionDuplicateLayer.h>
+#include <Application/Layer/Actions/ActionMoveGroup.h>
 
 //Interface Includes
+#include <Interface/Application/LayerWidget.h>
 #include <Interface/Application/LayerGroupWidget.h>
 #include <Interface/Application/StyleSheet.h>
 #include <Interface/Application/DropSpaceWidget.h>
@@ -61,17 +58,56 @@
 #include <Interface/Application/PushDragButton.h>
 #include <Interface/Application/GroupButtonMenu.h>
 
+//UI Includes
+#include "ui_LayerGroupWidget.h"
+
 namespace Seg3D
 {
-  
-class LayerGroupWidgetPrivate
+
+typedef std::map< std::string, LayerWidget* > LayerWidgetMap;
+
+//////////////////////////////////////////////////////////////////////////
+// Class LayerGroupWidgetPrivate
+//////////////////////////////////////////////////////////////////////////
+
+class LayerGroupWidgetPrivate : public QObject
 {
+  // -- Constructor --
 public:
-//  LayerGroupHandle group_;
+  LayerGroupWidgetPrivate( LayerGroupWidget* parent ) :
+    QObject( parent ),
+    parent_( parent )
+  {}
+
+  // -- Helper functions --
+public:
+  // GET_SELECTED_LAYER_IDS:
+  // Get the IDs of all the selected layers.
+  void get_selected_layer_ids( std::vector< std::string >& layers );
+
+  // CREATE_LAYER_WIDGET:
+  // Create a LayerWidget for the given layer.
+  LayerWidget* create_layer_widget( LayerHandle layer );
+
+  // SEETHROUGH:
+  // function that puts the group widget into a state that makes it look "picked up"
+  void seethrough( bool see );
+
+  // SET_DROP_TARGET:
+  // this function stores a local copy of the widget that is going to be dropped onto
+  // in the LayerGroupWidget that is being dropped
+  void set_drop_target( LayerGroupWidget* target_group );
+
+  // ENABLE_DROP_SPACE:
+  // this function give the user the impression that a group is available for dropping onto by
+  // opening up a space for dropping
+  void enable_drop_space( bool drop );
+
+public:
+  LayerGroupWidget* parent_;
   Ui::LayerGroupWidget ui_;
   DropSpaceWidget* drop_space_;
   OverlayWidget* overlay_;
-  std::string layer_to_drop_;
   int group_height;
   LayerGroupWidget* drop_group_;
   GroupButtonMenu* button_menu_;
@@ -80,12 +116,85 @@ public:
   int picked_up_group_height_;
   bool group_menus_open_;
   bool picked_up_;
+
+  LayerWidgetMap layer_map_;    
 };
-  
+
+void LayerGroupWidgetPrivate::get_selected_layer_ids( std::vector< std::string >& layers )
+{
+  for( LayerWidgetMap::iterator it = this->layer_map_.begin(); 
+    it != this->layer_map_.end(); ++it )
+  {
+    if( it->second->is_selected() )
+    {
+      std::string layer_id;
+      Core::ImportFromString( it->first, layer_id );
+      layers.push_back( layer_id );
+    }
+  }
+}
+
+LayerWidget* LayerGroupWidgetPrivate::create_layer_widget( LayerHandle layer )
+{
+  LayerWidget* layer_widget = new LayerWidget( this->ui_.group_frame_, layer );
+
+  QObject::connect( layer_widget, SIGNAL( prep_for_drag_and_drop( bool ) ), 
+    this->parent_, SIGNAL( prep_layers_for_drag_and_drop_signal_( bool ) ) );
+  QObject::connect( layer_widget, SIGNAL( layer_size_signal_( int ) ), 
+    this->parent_, SIGNAL( picked_up_layer_size_signal_( int ) ) );
+  QObject::connect( layer_widget, SIGNAL( selection_box_changed() ),
+    this->parent_, SLOT( enable_disable_delete_button() ) );
+  QObject::connect( layer_widget, SIGNAL( selection_box_changed() ),
+    this->parent_, SLOT( enable_disable_duplicate_button() ) );
+
+  return layer_widget;
+}
+
+void LayerGroupWidgetPrivate::seethrough( bool see )
+{
+  this->picked_up_ = see;
+
+  if( see )
+  {
+    this->ui_.base_->hide();
+  }
+  else
+  { 
+    this->ui_.base_->show();
+  }
+}
+
+void LayerGroupWidgetPrivate::set_drop_target( LayerGroupWidget* target_group)
+{
+  this->drop_group_ = target_group;
+}
+
+void LayerGroupWidgetPrivate::enable_drop_space( bool drop )
+{
+  this->drop_space_->set_height( this->picked_up_group_height_ + 4 );
+
+  if( this->picked_up_ ) return;
+
+  if( drop )
+  {
+    this->drop_space_->show();
+    this->overlay_->show();
+  }
+  else
+  {
+    this->drop_space_->hide();
+    this->overlay_->hide();
+  }
+} 
+
+//////////////////////////////////////////////////////////////////////////
+// Class LayerGroupWidget
+//////////////////////////////////////////////////////////////////////////
+
 LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
-  QWidget( parent ),
-  private_( new LayerGroupWidgetPrivate )
-{ 
+  QWidget( parent )
+{
+  this->private_ = new LayerGroupWidgetPrivate( this );
   this->private_->ui_.setupUi( this );
   this->private_->group_id_ = group->get_group_id();
   this->private_->group_menus_open_ = false;
@@ -97,10 +206,10 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   this->setAcceptDrops( true );
 
   // set some values of the GUI
-  std::string group_name = Core::ExportToString( 
-    group->get_grid_transform().get_nx() ) + " x " +
-    Core::ExportToString( group->get_grid_transform().get_ny() ) + " x " +
-    Core::ExportToString( group->get_grid_transform().get_nz() );
+  Core::GridTransform trans = group->get_grid_transform();
+  std::string group_name = Core::ExportToString( trans.get_nx() ) + " x " +
+    Core::ExportToString( trans.get_ny() ) + " x " +
+    Core::ExportToString( trans.get_nz() );
   this->private_->ui_.group_dimensions_label_->setText( QString::fromStdString( group_name ) );
 
   this->private_->drop_space_ = new DropSpaceWidget( this, 105 );
@@ -203,7 +312,7 @@ void LayerGroupWidget::mousePressEvent( QMouseEvent *event )
   drag->setHotSpot( hotSpot );
 
   // Next we hide the LayerWidget that we are going to be dragging.
-  this->seethrough( true );
+  this->private_->seethrough( true );
 
   Q_EMIT prep_groups_for_drag_and_drop_signal_( true );
   Q_EMIT picked_up_group_size_signal_( this->height() - 2 );
@@ -211,108 +320,45 @@ void LayerGroupWidget::mousePressEvent( QMouseEvent *event )
   // If our drag was successful then we do stuff
   if( ( drag->exec( Qt::MoveAction, Qt::MoveAction ) ) == Qt::MoveAction ) 
   {
-    ActionMoveGroupAbove::Dispatch( Core::Interface::GetWidgetActionContext(), 
+    ActionMoveGroup::Dispatch( Core::Interface::GetWidgetActionContext(), 
       this->get_group_id(), this->private_->drop_group_->get_group_id() );
   }
-  else
-  {
-    this->seethrough( false );
-  }
 
-  this->enable_drop_space( false );
-  this->private_->layer_to_drop_ = "";
+  this->private_->seethrough( false );
   
   Q_EMIT prep_groups_for_drag_and_drop_signal_( false );
   event->setAccepted( true );
 }
 
-void LayerGroupWidget::set_drop_target( LayerGroupWidget* target_group)
-{
-  this->private_->drop_group_ = target_group;
-}
-
 void LayerGroupWidget::dropEvent( QDropEvent* event )
 {
-  this->enable_drop_space( false );
+  this->private_->enable_drop_space( false );
   event->setAccepted( true );
   
-  std::string drop_item_id = event->mimeData()->text().toStdString();
-  if( ( this->get_group_id() != drop_item_id ) && (
-    LayerManager::Instance()->get_group_by_id( drop_item_id ) ) ) 
+  LayerGroupWidget* source_widget = dynamic_cast< LayerGroupWidget* >( event->source() );
+  if( source_widget != NULL && source_widget != this )
   {
-    dynamic_cast< LayerGroupWidget* >( event->source() )->set_drop_target( this ); 
+    source_widget->private_->set_drop_target( this ); 
     event->setDropAction( Qt::MoveAction );
     return;
-
   }
   event->setDropAction( Qt::IgnoreAction );
 }
 
 void LayerGroupWidget::dragEnterEvent( QDragEnterEvent* event)
 {
-  std::string drop_item_id = event->mimeData()->text().toStdString();
-
-  if( ( this->get_group_id() != drop_item_id ) && ( 
-    LayerManager::Instance()->get_group_by_id( drop_item_id ) ) ) 
+  LayerGroupWidget* source_widget = dynamic_cast< LayerGroupWidget* >( event->source() );
+  if( source_widget != NULL && source_widget != this )
   {
-    this->enable_drop_space( true );
+    this->private_->enable_drop_space( true );
   }
   event->setAccepted( true );
 }
 
 void LayerGroupWidget::dragLeaveEvent( QDragLeaveEvent* event )
 {
-  this->enable_drop_space( false );
+  this->private_->enable_drop_space( false );
   event->setAccepted( true );
-}
-
-void LayerGroupWidget::seethrough( bool see )
-{
-  this->set_picked_up( see );
-
-  if( see )
-  {
-    this->private_->ui_.base_->hide();
-  }
-  else
-  { 
-    this->private_->ui_.base_->show();
-  }
-}
-
-void LayerGroupWidget::enable_drop_space( bool drop )
-{
-  this->private_->drop_space_->set_height( this->private_->picked_up_group_height_ + 4 );
-  
-  if( this->private_->picked_up_ )
-  {
-    return;
-  }
-  
-  if( drop )
-  {
-    this->private_->drop_space_->show();
-    this->private_->overlay_->show();
-  }
-  else
-  {
-    this->private_->drop_space_->hide();
-    this->private_->overlay_->hide();
-  }
-} 
-  
-LayerWidgetQWeakHandle LayerGroupWidget::set_active_layer( LayerHandle layer )
-{
-  std::map< std::string, LayerWidgetQHandle >::iterator found_layer_widget = 
-    this->layer_map_.find( layer->get_layer_id() );
-  
-  if( found_layer_widget != this->layer_map_.end() )
-  {
-    ( *found_layer_widget ).second->set_active( true );
-    return ( *found_layer_widget ).second;
-  }
-  
-  return LayerWidgetQWeakHandle();
 }
 
 const std::string& LayerGroupWidget::get_group_id()
@@ -331,7 +377,7 @@ void LayerGroupWidget::verify_delete()
   if( ret == QMessageBox::Yes )
   {
     std::vector< std::string > layers;
-    this->get_selected_layer_ids( layers );
+    this->private_->get_selected_layer_ids( layers );
     
     this->private_->button_menu_->blockSignals( true );
     this->private_->button_menu_->uncheck_delete_menu_button();
@@ -340,20 +386,6 @@ void LayerGroupWidget::verify_delete()
     
     ActionDeleteLayers::Dispatch( Core::Interface::GetWidgetActionContext(), 
       layers );
-  }
-}
-
-void LayerGroupWidget::get_selected_layer_ids( std::vector< std::string >& layers )
-{
-  for( std::map< std::string, LayerWidgetQHandle>::iterator it = this->layer_map_.begin(); 
-    it != this->layer_map_.end(); ++it )
-  {
-    if( ( *it ).second->get_selected() )
-    {
-      std::string layer_id;
-      Core::ImportFromString( ( *it ).first, layer_id );
-      layers.push_back( layer_id );
-    }
   }
 }
 
@@ -393,12 +425,6 @@ void LayerGroupWidget::show_group()
   this->private_->ui_.tools_and_layers_widget_->show();
   this->private_->ui_.group_background_->setStyleSheet( StyleSheet::GROUP_WIDGET_BACKGROUND_ACTIVE_C );
 }
-
-void LayerGroupWidget::hide_group()
-{
-  this->private_->ui_.fake_widget_->hide();
-  this->private_->ui_.group_background_->setStyleSheet( StyleSheet::GROUP_WIDGET_BACKGROUND_INACTIVE_C );
-}
   
 void LayerGroupWidget::resizeEvent( QResizeEvent *event )
 {
@@ -408,8 +434,8 @@ void LayerGroupWidget::resizeEvent( QResizeEvent *event )
   
 void LayerGroupWidget::prep_layers_for_drag_and_drop( bool move_time )
 {
-  for( std::map< std::string, LayerWidgetQHandle>::iterator it = this->layer_map_.begin(); 
-    it != this->layer_map_.end(); ++it )
+  for( LayerWidgetMap::iterator it = this->private_->layer_map_.begin(); 
+    it != this->private_->layer_map_.end(); ++it )
   {
     ( *it ).second->prep_for_animation( move_time );
   } 
@@ -445,102 +471,78 @@ void LayerGroupWidget::set_picked_up_group_size( int group_height )
   
 void LayerGroupWidget::handle_change()
 {
-  LayerGroupHandle this_group = LayerManager::Instance()->FindLayerGroup( this->private_->group_id_ );
+  LayerGroupHandle this_group = LayerManager::FindLayerGroup( this->private_->group_id_ );
   if ( !this_group )
   {
     // Group has been deleted, ignore
     return;
   }
   
-  layer_list_type layer_list = this_group->get_layer_list();
-  
-  int index = 0;
-  bool layer_widget_deleted = false;
-  this->setUpdatesEnabled( false );
-  
-  // First we remove the LayerWidgets that aren't needed any more.
-  for( std::map< std::string, LayerWidgetQHandle>::iterator it = this->layer_map_.begin(); 
-    it != this->layer_map_.end(); ++it )
-  {
-    // we are also going to take the opportunity to turn off all the drag and drop settings
-    ( *it ).second->set_picked_up( false );
-    ( *it ).second->instant_hide_drop_space();
-    ( *it ).second->hide_overlay();
-    ( *it ).second->set_selected( false );
-    if( this_group->show_delete_menu_state_->get() || 
-       this_group->show_duplicate_menu_state_->get() )
-    {
-      ( *it ).second->show_selection_checkbox( true );
-    }
-    
-    bool found = false;
-    for( layer_list_type::iterator i = layer_list.begin(); i != layer_list.end(); ++i )
-    {
-      if( ( *it ).first == ( *i )->get_layer_id() )
-      {
-        found = true;
-        break;
-      }
-    }
-    if( !found )
-    {
-      this->private_->ui_.group_frame_layout_->removeWidget( ( *it ).second.data() );
-      layer_widget_deleted = true;
-    }
-  }
+  // Whether the group menu is currently shown
+  bool show_menu = this_group->show_delete_menu_state_->get() || 
+    this_group->show_duplicate_menu_state_->get();
 
-  // then we need to, we delete the unused LayerWidgets from the layer_map_
-  if( layer_widget_deleted )
+  // Get a list of all the layers
+  LayerVector layers;
+  this_group->get_layers( layers );
+
+  // Make a copy of the current widgets map
+  LayerWidgetMap tmp_map = this->private_->layer_map_;
+  // Clear the original map
+  this->private_->layer_map_.clear();
+
+  // Disable UI updates
+  this->setUpdatesEnabled( false );
+
+  // Loop through all the layers and put their corresponding widgets in
+  // the right order. Create new widgets when necessary.
+  for ( size_t i = 0; i < layers.size(); ++i )
   {
-    this->cleanup_removed_widgets();
-  }
-  
-  this->private_->ui_.group_frame_->setMinimumHeight( 0 );
-  
-  for( layer_list_type::iterator i = layer_list.begin(); i != layer_list.end(); ++i )
-  {
-    std::map< std::string, LayerWidgetQHandle >::iterator found_layer_widget = this->layer_map_.find( ( *i )->get_layer_id() );
-    if( found_layer_widget != this->layer_map_.end() )
+    // Look for an existing widget for the layer. If found, remove it from the 
+    // temporary map. Otherwise, create a new widget.
+    LayerWidget* widget;
+    std::string layer_id = layers[ i ]->get_layer_id();
+    LayerWidgetMap::iterator it = tmp_map.find( layer_id );
+    if ( it != tmp_map.end() )
     {
-      this->private_->ui_.group_frame_layout_->insertWidget( index, ( *found_layer_widget ).second.data() );
+      widget = it->second;
+      tmp_map.erase( it );
+
+      // Instantly hide any still visible drop space
+      widget->instant_hide_drop_space();
+
+      // Clear selection checkbox
+      widget->set_selected( false );
+      if( show_menu )
+      {
+        widget->show_selection_checkbox( true );
+      }
     }
     else
     {
-      LayerWidgetQHandle new_layer_handle( new LayerWidget(this->private_->ui_.group_frame_, ( *i ) ) );
-      this->private_->ui_.group_frame_layout_->insertWidget( index, new_layer_handle.data() );
-      this->layer_map_[ ( *i )->get_layer_id() ] = new_layer_handle;
-      
-      connect( new_layer_handle.data(), SIGNAL( prep_for_drag_and_drop( bool ) ), 
-        this, SIGNAL( prep_layers_for_drag_and_drop_signal_( bool ) ) );
-        
-      connect( new_layer_handle.data(), SIGNAL( layer_size_signal_( int ) ), 
-        this, SIGNAL( picked_up_layer_size_signal_( int ) ) );
-        
-      connect( new_layer_handle.data(), SIGNAL( selection_box_changed() ),
-        this, SLOT( enable_disable_delete_button() ) );
-      
-      connect( new_layer_handle.data(), SIGNAL( selection_box_changed() ),
-          this, SLOT( enable_disable_duplicate_button() ) );
-      
+      widget = this->private_->create_layer_widget( layers[ i ] );
     }
-    index++;
+    
+    // Put the widget in the layout
+    this->private_->ui_.group_frame_layout_->insertWidget( static_cast< int >( i ), widget );
+    // Add the widget to the map
+    this->private_->layer_map_[ layer_id ] = widget;
   }
   
-  this->setUpdatesEnabled( true );
-}
-
-void LayerGroupWidget::cleanup_removed_widgets()
-{
-  std::map< std::string, LayerWidgetQHandle>::iterator it = this->layer_map_.begin();
-  while ( it != this->layer_map_.end() )
+  // For anything left in the temporary map, they are no longer needed.
+  // Remove them from the layout and delete them.
+  for ( LayerWidgetMap::iterator it = tmp_map.begin(); it != tmp_map.end(); ++it )
   {
-    std::map< std::string, LayerWidgetQHandle>::iterator prev = it++;
-    if( this->private_->ui_.group_frame_layout_->indexOf( ( *prev ).second.data() ) == -1 )
-    {
-      ( *prev ).second->deleteLater();
-      this->layer_map_.erase( prev );
-    }
+    LayerWidget* layer_widget = it->second;
+    this->private_->ui_.group_frame_layout_->removeWidget( layer_widget );
+    layer_widget->deleteLater();
   }
+  tmp_map.clear();
+
+  // Squeeze the layout
+  this->private_->ui_.group_frame_->setMinimumHeight( 0 );
+  // Enable UI updates
+  this->setUpdatesEnabled( true );
 }
 
 void LayerGroupWidget::instant_hide_drop_space()
@@ -550,8 +552,8 @@ void LayerGroupWidget::instant_hide_drop_space()
 
 void LayerGroupWidget::notify_picked_up_layer_size( int layer_size )
 {
-  for( std::map< std::string, LayerWidgetQHandle >::iterator it = this->layer_map_.begin(); 
-    it != this->layer_map_.end(); ++it )
+  for( LayerWidgetMap::iterator it = this->private_->layer_map_.begin(); 
+    it != this->private_->layer_map_.end(); ++it )
   {
     ( *it ).second->set_picked_up_layer_size( layer_size );
   }
@@ -564,10 +566,10 @@ void LayerGroupWidget::duplicate_checked_layers()
   this->private_->button_menu_->uncheck_duplicate_button();
   this->private_->button_menu_->blockSignals( false );
   
-  for( std::map< std::string, LayerWidgetQHandle >::iterator it = this->layer_map_.begin(); 
-    it != this->layer_map_.end(); ++it )
+  for( LayerWidgetMap::iterator it = this->private_->layer_map_.begin(); 
+    it != this->private_->layer_map_.end(); ++it )
   {
-    if( ( *it ).second->get_selected() )
+    if( ( *it ).second->is_selected() )
     {
       ActionDuplicateLayer::Dispatch( Core::Interface::GetWidgetActionContext(), 
         ( *it ).second->get_layer_id() );
@@ -577,8 +579,8 @@ void LayerGroupWidget::duplicate_checked_layers()
 
 void LayerGroupWidget::check_uncheck_for_delete( bool checked )
 {
-  for( std::map< std::string, LayerWidgetQHandle >::iterator it = this->layer_map_.begin(); 
-    it != this->layer_map_.end(); ++it )
+  for( LayerWidgetMap::iterator it = this->private_->layer_map_.begin(); 
+    it != this->private_->layer_map_.end(); ++it )
   {
     ( *it ).second->set_selected( checked );
   }
@@ -586,8 +588,8 @@ void LayerGroupWidget::check_uncheck_for_delete( bool checked )
   
 void LayerGroupWidget::check_uncheck_for_duplicate( bool checked )
 {
-  for( std::map< std::string, LayerWidgetQHandle >::iterator it = this->layer_map_.begin(); 
-    it != this->layer_map_.end(); ++it )
+  for( LayerWidgetMap::iterator it = this->private_->layer_map_.begin(); 
+    it != this->private_->layer_map_.end(); ++it )
   {
     ( *it ).second->set_selected( checked );
   }
@@ -595,10 +597,10 @@ void LayerGroupWidget::check_uncheck_for_duplicate( bool checked )
 
 void LayerGroupWidget::enable_disable_delete_button()
 {
-  for( std::map< std::string, LayerWidgetQHandle >::iterator it = this->layer_map_.begin(); 
-    it != this->layer_map_.end(); ++it )
+  for( LayerWidgetMap::iterator it = this->private_->layer_map_.begin(); 
+    it != this->private_->layer_map_.end(); ++it )
   {
-    if( ( *it ).second->get_selected() )
+    if( ( *it ).second->is_selected() )
     {
       this->private_->button_menu_->set_delete_enabled( true );
       return;
@@ -609,10 +611,10 @@ void LayerGroupWidget::enable_disable_delete_button()
   
 void LayerGroupWidget::enable_disable_duplicate_button()
 {
-  for( std::map< std::string, LayerWidgetQHandle >::iterator it = this->layer_map_.begin(); 
-    it != this->layer_map_.end(); ++it )
+  for( LayerWidgetMap::iterator it = this->private_->layer_map_.begin(); 
+    it != this->private_->layer_map_.end(); ++it )
   {
-    if( ( *it ).second->get_selected() )
+    if( ( *it ).second->is_selected() )
     {
       this->private_->button_menu_->set_duplicate_enabled( true );
       return;
@@ -620,12 +622,5 @@ void LayerGroupWidget::enable_disable_duplicate_button()
   }
   this->private_->button_menu_->set_duplicate_enabled( false );
 }
-
-void LayerGroupWidget::set_picked_up( bool up )
-{
-  this->private_->picked_up_ = up; 
-}
-
-
 
 }  //end namespace Seg3D

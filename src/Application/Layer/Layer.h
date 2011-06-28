@@ -166,9 +166,6 @@ public:
   // State that describes the opacity with which the layer is displayed
   Core::StateRangedDoubleHandle opacity_state_;
 
-  // State indicating whether the layer is selected for further processing
-  Core::StateBoolHandle selected_state_;
-
   // State that stores the current layer state
   Core::StateOptionHandle data_state_;
 

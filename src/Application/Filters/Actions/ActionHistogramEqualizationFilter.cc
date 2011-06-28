@@ -30,7 +30,7 @@
 #include <teem/nrrd.h>
 
 // Application includes
-#include <Application/LayerManager/LayerManager.h>
+#include <Application/Layer/LayerManager.h>
 #include <Application/StatusBar/StatusBar.h>
 #include <Application/Filters/NrrdFilter.h>
 #include <Application/Filters/Actions/ActionHistogramEqualizationFilter.h>

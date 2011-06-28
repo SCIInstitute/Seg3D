@@ -57,7 +57,7 @@ TARGET_LINK_LIBRARIES(Application_Project
                       Core_Application
                       Core_Interface
                       Application_InterfaceManager
-                  Application_LayerManager
+                  Application_Layer
                   Application_Provenance
                       ${SCI_BOOST_LIBRARY}
                       ${SCI_SQLITE_LIBRARY}
@@ -70,7 +70,7 @@ TARGET_LINK_LIBRARIES(Application_Project
                       Core_Application
                       Core_Interface
                       Application_InterfaceManager
-                  Application_LayerManager
+                  Application_Layer
                   Application_Provenance
                       ${SCI_BOOST_LIBRARY}
                       ${SCI_SQLITE_LIBRARY})

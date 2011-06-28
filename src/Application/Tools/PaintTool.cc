@@ -43,7 +43,7 @@
 // Application includes
 #include <Application/Layer/LayerGroup.h>
 #include <Application/Layer/MaskLayer.h>
-#include <Application/LayerManager/LayerManager.h>
+#include <Application/Layer/LayerManager.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
 #include <Application/Tools/detail/MaskShader.h>
 #include <Application/Tool/ToolFactory.h>

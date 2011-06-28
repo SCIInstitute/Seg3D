@@ -33,7 +33,7 @@
 #include <Application/Tools/ArithmeticFilter.h>
 #include <Application/Layer/Layer.h>
 #include <Application/Layer/LayerGroup.h>
-#include <Application/LayerManager/LayerManager.h>
+#include <Application/Layer/LayerManager.h>
 #include <Application/Filters/Actions/ActionArithmeticFilter.h>
 
 // Register the tool into the tool factory

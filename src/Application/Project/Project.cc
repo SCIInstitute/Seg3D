@@ -58,7 +58,7 @@
 #include <Application/PreferencesManager/PreferencesManager.h>
 #include <Application/DatabaseManager/DatabaseManager.h>
 #include <Application/Layer/Layer.h>
-#include <Application/LayerManager/LayerManager.h>
+#include <Application/Layer/LayerManager.h>
 
 // Include CMake generated files
 #include "ApplicationConfiguration.h"

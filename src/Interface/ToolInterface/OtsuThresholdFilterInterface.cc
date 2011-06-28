@@ -37,7 +37,7 @@
 
 // Application includes
 #include <Application/Tools/OtsuThresholdFilter.h>
-#include <Application/LayerManager/LayerManager.h>
+#include <Application/Layer/LayerManager.h>
 
 // QtUtils includes
 #include <QtUtils/Bridge/QtBridge.h>

@@ -38,8 +38,8 @@
 #include <Core/Utils/Log.h>
 
 // Application includes
-#include <Application/LayerManager/Actions/ActionImportLayer.h>
-#include <Application/LayerManager/Actions/ActionImportSeries.h>
+#include <Application/LayerIO/Actions/ActionImportLayer.h>
+#include <Application/LayerIO/Actions/ActionImportSeries.h>
 
 // QtUtils Includes
 #include <QtUtils/Bridge/QtBridge.h>

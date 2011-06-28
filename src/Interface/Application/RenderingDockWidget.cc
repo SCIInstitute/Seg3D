@@ -51,7 +51,7 @@
 #include <Application/ViewerManager/ViewerManager.h>
 #include <Application/ViewerManager/Actions/ActionNewFeature.h>
 #include <Application/ViewerManager/Actions/ActionDeleteFeature.h>
-#include <Application/LayerManager/LayerManager.h>
+#include <Application/Layer/LayerManager.h>
 
 // Interface includes
 #include <Interface/Application/TransferFunctionFeatureWidget.h>

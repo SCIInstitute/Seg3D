@@ -29,13 +29,17 @@
 //Boost Includes
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
-#include <boost/lexical_cast.hpp>
 
 // Qt includes
-#include <QtGui/QMessageBox>
-#include <QtGui/QMenu>
-#include <QtGui/QFileDialog>
-#include <QtGui/QBitmap>
+#include <QPointer>
+#include <QMessageBox>
+#include <QMenu>
+#include <QFileDialog>
+#include <QBitmap>
+#include <QMouseEvent>
+#include <QDragEnterEvent>
+#include <QDragLeaveEvent>
+#include <QDropEvent>
 
 //Core Includes - for logging
 #include <Core/Utils/Log.h>
@@ -46,27 +50,23 @@
 #include <QtUtils/Widgets/QtColorBarWidget.h>
 
 //Application Includes
-#include <Application/InterfaceManager/InterfaceManager.h>
 #include <Application/ViewerManager/ViewerManager.h>
 #include <Application/Layer/DataLayer.h>
 #include <Application/Layer/LayerGroup.h>
 #include <Application/Layer/MaskLayer.h>
-#include <Application/LayerManager/LayerManager.h>
-#include <Application/LayerManager/Actions/ActionActivateLayer.h>
-#include <Application/LayerManager/Actions/ActionComputeIsosurface.h>
-#include <Application/LayerManager/Actions/ActionDeleteIsosurface.h>
-#include <Application/LayerManager/Actions/ActionDeleteLayers.h>
-#include <Application/LayerManager/Actions/ActionMoveLayerAbove.h>
-#include <Application/LayerManager/Actions/ActionCalculateMaskVolume.h>
-#include <Application/LayerManager/Actions/ActionDuplicateLayer.h>
-#include <Application/LayerManager/Actions/ActionExportLayer.h>
-#include <Application/LayerManager/Actions/ActionExportSegmentation.h>
+#include <Application/Layer/LayerManager.h>
+#include <Application/Layer/Actions/ActionActivateLayer.h>
+#include <Application/Layer/Actions/ActionComputeIsosurface.h>
+#include <Application/Layer/Actions/ActionDeleteIsosurface.h>
+#include <Application/Layer/Actions/ActionDeleteLayers.h>
+#include <Application/Layer/Actions/ActionMoveLayer.h>
+#include <Application/Layer/Actions/ActionCalculateMaskVolume.h>
+#include <Application/Layer/Actions/ActionDuplicateLayer.h>
+#include <Application/LayerIO/Actions/ActionExportLayer.h>
+#include <Application/LayerIO/Actions/ActionExportSegmentation.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
 #include <Application/Filters/LayerResampler.h>
-#include <Application/LayerManager/Actions/ActionMoveLayerBelow.h>
-
 #include <Application/ProjectManager/ProjectManager.h>
-
 
 //Interface Includes
 #include <Interface/Application/LayerWidget.h>
@@ -75,7 +75,6 @@
 #include <Interface/Application/DropSpaceWidget.h>
 #include <Interface/Application/OverlayWidget.h>
 #include <Interface/Application/LayerResamplerDialog.h>
-#include <Interface/Application/GroupButtonMenu.h>
 
 //UI Includes
 #include "ui_LayerWidget.h"
@@ -83,14 +82,59 @@
 namespace Seg3D
 {
 
-class LayerWidgetPrivate : public Core::ConnectionHandler
+//////////////////////////////////////////////////////////////////////////
+// Class LayerWidgetPrivate
+//////////////////////////////////////////////////////////////////////////
+  
+class LayerWidgetPrivate : public QObject, public Core::ConnectionHandler
 {
-  // -- destructor --
+  // -- Constructor / Destructor --
 public:
+  LayerWidgetPrivate( LayerWidget* parent ) :
+    QObject( parent ),
+    parent_( parent )
+  {}
+
   virtual ~LayerWidgetPrivate();
 
-  // -- GUI pieces --
+  // -- Internal helper functions --
 public:
+  // UPDATE_APPEARANCE:
+  // Update the appearance of the widget to reflect its state
+  void update_appearance( bool locked, bool active, bool in_use, bool initialize = false);
+
+  // UPDATE_WIDGET_STATE:
+  // Update the button state, the open menus and color of the widget
+  void update_widget_state( bool initialize = false );
+
+  // UPDATE_PROGRESS_BAR:
+  // Update the progress in the widget
+  void update_progress_bar( double progress );
+
+  // ENABLE_DROP_SPACE:
+  // this function is called when a drag enter or leave event is triggered and it calls hide
+  // or show on the dropspace to make it look like there is a space for the user to drop the
+  // dragged layer
+  void enable_drop_space( bool drop );
+
+  // GET_VOLUME_TYPE:
+  // this function returns the type volume that the layerwidget represents
+  int get_volume_type();
+
+  // EXPORT_LAYER:
+  // function that checks the type of the layer and calls the appropriate function to export the layer  
+  void export_layer( const std::string& type_extension );
+
+  // SET_DROP_TARGET:
+  // this function is for keeping track of which layer the drop is going to happen on
+  void set_drop_target( LayerWidget* target_layer );
+
+  // SET_PICKED_UP:
+  // this function is called to set or unset the state of picked_up_
+  void set_picked_up( bool up );
+
+public:
+  LayerWidget* parent_;
   // Layer
   LayerHandle layer_;
   
@@ -122,11 +166,30 @@ public:
   bool in_use_;
   bool picked_up_;
   int picked_up_layer_size_;
-  
-  // these member variables are for keeping track of the states of the layers so that they can
-  // be represented properly in the gui
-  bool layer_menus_open_;
-  bool group_menus_open_;
+
+  // -- Static functions --
+public:
+  typedef QPointer< LayerWidgetPrivate > qpointer_type;
+
+  // UPDATESTATE:
+  // Entry point for the state engine to notify state has changed
+  static void UpdateState( qpointer_type qpointer );
+
+  // UPDATEACTIVESTATE:
+  // Entry point for the state engine to notify active layer has changed
+  static void UpdateActiveState( qpointer_type qpointer, LayerHandle layer );
+
+  // UPDATEVIEWERBUTTONS:
+  // update the layout of the viewer buttons
+  static void UpdateViewerButtons( qpointer_type qpointer, std::string layout );
+
+  // UPDATEPROGRESS:
+  // Update the progress bar 
+  static void UpdateProgress( qpointer_type qpointer, double progress );
+
+  // REQUESTPROVENANCE:
+  // Request provenance trail
+  static void RequestProvenance( qpointer_type qpointer );
 };
 
 LayerWidgetPrivate::~LayerWidgetPrivate()
@@ -134,19 +197,345 @@ LayerWidgetPrivate::~LayerWidgetPrivate()
   this->disconnect_all();
 }
 
-LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
-  QWidget( parent ),
-  private_( new LayerWidgetPrivate )
+void LayerWidgetPrivate::update_appearance( bool locked, bool active, bool in_use, bool initialize )
 {
+  if ( locked == this->locked_ && 
+    active == this->active_ &&
+    in_use == this->in_use_ && initialize == false ) return;
+
+  this->locked_ = locked;
+  this->active_ = active;
+  this->in_use_ = in_use;
+
+  // Update the background color inside the icon
+  switch( this->get_volume_type() )
+  {
+  case Core::VolumeType::DATA_E:
+    {
+      if ( locked )
+      {
+        this->ui_.type_->setStyleSheet( 
+          StyleSheet::LAYER_WIDGET_BACKGROUND_LOCKED_C );
+      }
+      else
+      {
+        this->ui_.type_->setStyleSheet( StyleSheet::DATA_VOLUME_COLOR_C );
+      }
+    }
+    break;
+  case Core::VolumeType::MASK_E:
+    {
+      int color_index =  dynamic_cast< MaskLayer* >( 
+        this->layer_.get() )->color_state_->get();
+      this->parent_->set_mask_background_color( color_index );
+    }
+    break;
+  case Core::VolumeType::LABEL_E:
+    {
+      if ( locked )
+      {
+        this->ui_.type_->setStyleSheet( 
+          StyleSheet::LAYER_WIDGET_BACKGROUND_LOCKED_C );
+      }
+      else
+      {
+        this->ui_.type_->setStyleSheet( StyleSheet::LABEL_VOLUME_COLOR_C );
+      }
+    }
+    break;
+  }
+
+  if ( locked )
+  {
+    this->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_LOCKED_C );
+    this->ui_.label_->setStyleSheet( StyleSheet::LAYER_WIDGET_LABEL_LOCKED_C ); 
+  }
+  else if( active && !in_use )
+  {
+    this->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_ACTIVE_C );  
+    this->ui_.label_->setStyleSheet( StyleSheet::LAYER_WIDGET_LABEL_ACTIVE_C );
+    if( this->layer_->gui_state_group_->get_enabled() )
+      this->ui_.header_->setStyleSheet( StyleSheet::LAYER_WIDGET_HEADER_ACTIVE_C );
+  }
+  else if( active && in_use )
+  {
+    this->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_ACTIVE_IN_USE_C );  
+    this->ui_.label_->setStyleSheet( StyleSheet::LAYER_WIDGET_LABEL_ACTIVE_IN_USE_C );
+    if( this->layer_->gui_state_group_->get_enabled() )
+      this->ui_.header_->setStyleSheet( StyleSheet::LAYER_WIDGET_HEADER_ACTIVE_IN_USE_C );
+  }
+  else if ( in_use )
+  {
+    this->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_IN_USE_C );  
+    this->ui_.label_->setStyleSheet( StyleSheet::LAYER_WIDGET_LABEL_IN_USE_C );
+    if( this->layer_->gui_state_group_->get_enabled() )
+      this->ui_.header_->setStyleSheet( StyleSheet::LAYER_WIDGET_HEADER_IN_USE_C );
+  }
+  else
+  {
+    this->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_INACTIVE_C );
+    this->ui_.label_->setStyleSheet( StyleSheet::LAYER_WIDGET_LABEL_INACTIVE_C );
+    if( this->layer_->gui_state_group_->get_enabled() )
+      this->ui_.header_->setStyleSheet( StyleSheet::LAYER_WIDGET_HEADER_INACTIVE_C );
+  }
+}
+
+void LayerWidgetPrivate::update_widget_state( bool initialize )
+{
+  // Step 1 : retrieve the state of the layer
+  std::string data_state;
+  bool visual_lock = false;
+  bool active_layer = false;
+
+  {
+    // NOTE:
+    // Since state is changed on the application thread
+    // We need to lock the state engine to prevent any change
+    // to be made into the state manager.
+    Layer::lock_type lock( Layer::GetMutex() );
+    data_state = this->layer_->data_state_->get();
+    visual_lock = this->layer_->locked_state_->get();
+    active_layer = ( LayerManager::Instance()->get_active_layer() == this->layer_ );
+  }
+
+  if ( data_state == Layer::AVAILABLE_C )
+  {
+    // Change the color of the widget
+    this->update_appearance( visual_lock,  active_layer, false, initialize );
+    this->ui_.selection_checkbox_->setVisible( true );
+  }
+  else if ( data_state == Layer::CREATING_C )
+  {
+    // Change the color of the widget
+    this->update_appearance( true,  false, false, initialize ); 
+    this->ui_.selection_checkbox_->setVisible( false );
+  }
+  else if ( data_state == Layer::PROCESSING_C )
+  {
+    // Change the color of the widget
+    this->update_appearance( visual_lock,  active_layer, true, initialize );  
+    this->ui_.selection_checkbox_->setVisible( false );
+  }
+  else if ( data_state == Layer::IN_USE_C )
+  {
+    // Change the color of the widget
+    this->update_appearance( visual_lock,  active_layer, true, initialize );    
+    this->ui_.selection_checkbox_->setVisible( true );
+  }
+}
+
+int LayerWidgetPrivate::get_volume_type()
+{ 
+  return this->layer_->get_type(); 
+}
+
+void LayerWidgetPrivate::set_picked_up( bool picked_up )
+{ 
+  this->picked_up_ = picked_up; 
+  if ( picked_up )
+  {
+    this->overlay_->set_transparent( false );
+    this->overlay_->show();
+  }
+  else
+  {
+    this->overlay_->hide();
+  }
+}
+
+void LayerWidgetPrivate::set_drop_target( LayerWidget* target_layer )
+{
+  this->drop_layer_ = target_layer;
+  this->drop_layer_set_ = true;
+}
+
+void LayerWidgetPrivate::enable_drop_space( bool drop )
+{
+  // First we check to see if it is picked up if so, we set change the way it looks
+  this->drop_space_->set_height( this->picked_up_layer_size_ + 4 );
+
+  // Ignore if the widget is currently being dragged
+  if ( this->picked_up_ ) return;
   
-  this->setAttribute( Qt::WA_TranslucentBackground, true );
+  if( drop )
+  {
+    this->overlay_->set_transparent( true );
+    this->overlay_->show();
+    this->drop_space_->show();
+  }
+  else
+  {
+    this->drop_space_->hide();
+    this->overlay_->hide();
+  }
+} 
+
+void LayerWidgetPrivate::update_progress_bar( double progress )
+{
+  this->ui_.progress_bar_->setValue( static_cast<int>( progress * 100.0 ) );
+}
+
+void LayerWidgetPrivate::export_layer( const std::string& type_extension )
+{
+  boost::filesystem::path current_folder = ProjectManager::Instance()->get_current_file_folder();
+  QString export_path = QFileDialog::getExistingDirectory( this->parent_, tr( "Choose Directory for Export..." ),
+    current_folder.string().c_str(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks );
+
+  if( export_path == "" ) return;
+
+  if( !QFileInfo( export_path ).exists() )
+  {
+    CORE_LOG_ERROR( "The layer could not be exported to that location. Please try another location." );
+    return;
+  }
+  try
+  {
+    boost::filesystem::create_directory( boost::filesystem::path( export_path.toStdString() ) / "delete_me" );
+  }
+  catch( ... ) // if the create fails then we are not in a writable directory
+  {
+    CORE_LOG_ERROR( "The layer could not be exported to that location. Please try another location." );
+    return;
+  }
+
+  // if we've made it here then we've created a folder and we need to delete it.
+  boost::filesystem::remove(  boost::filesystem::path( export_path.toStdString() ) / "delete_me" );
+
+  if( this->get_volume_type() == Core::VolumeType::MASK_E )
+  {
+    ActionExportSegmentation::Dispatch( Core::Interface::GetWidgetActionContext(), 
+      this->layer_->get_layer_id(), "single_mask", 
+      export_path.toStdString(), type_extension );
+  }
+  else if( this->get_volume_type() == Core::VolumeType::DATA_E )
+  { 
+    std::string file_name = ( boost::filesystem::path( export_path.toStdString() ) / 
+      this->layer_->get_layer_name() ).string();
+
+    ActionExportLayer::Dispatch( Core::Interface::GetWidgetActionContext(), 
+      this->layer_->get_layer_id(), file_name, type_extension );
+  }
+}
+
+void LayerWidgetPrivate::UpdateViewerButtons( qpointer_type qpointer, std::string layout )
+{
+  if( !( Core::Interface::IsInterfaceThread() ) )
+  {
+    Core::Interface::Instance()->post_event( boost::bind( &LayerWidgetPrivate::UpdateViewerButtons,
+      qpointer, layout ) );
+    return; 
+  }
+
+  LayerWidgetPrivate* widget_private = qpointer.data();
+
+  if ( !widget_private || QCoreApplication::closingDown() ) return;
+
+  if( layout == "single" )
+  {
+    widget_private->ui_.left_viewers_widget_->setMinimumWidth( 150 );
+    widget_private->ui_.left_viewers_widget_->setMaximumWidth( 150 );
+  }
+  else if( layout == "1and2" )
+  {
+    widget_private->ui_.left_viewers_widget_->setMinimumWidth( 90 );
+    widget_private->ui_.left_viewers_widget_->setMaximumWidth( 90 );
+  }
+  else if( layout == "1and3" )
+  {
+    widget_private->ui_.left_viewers_widget_->setMinimumWidth( 105 );
+    widget_private->ui_.left_viewers_widget_->setMaximumWidth( 105 );
+  }
+  else
+  {
+    widget_private->ui_.left_viewers_widget_->setMinimumWidth( 75 );
+    widget_private->ui_.left_viewers_widget_->setMaximumWidth( 75 );
+  }
+}
+
+void LayerWidgetPrivate::UpdateState( qpointer_type qpointer )
+{
+  // Hand it off to the right thread
+  if( !( Core::Interface::IsInterfaceThread() ) )
+  {
+    Core::Interface::Instance()->post_event( 
+      boost::bind( &LayerWidgetPrivate::UpdateState, qpointer) );
+    return; 
+  }
+
+  // When we are finally on the interface thread run this code:
+  if ( qpointer.data() && !QCoreApplication::closingDown() )
+  {
+    qpointer->parent_->setUpdatesEnabled( false );
+    qpointer->update_widget_state();
+    qpointer->parent_->setUpdatesEnabled( true );
+  }
+}
+
+void LayerWidgetPrivate::UpdateActiveState( qpointer_type qpointer, LayerHandle layer )
+{
+  // Hand it off to the right thread
+  if( !( Core::Interface::IsInterfaceThread() ) )
+  {
+    Core::Interface::Instance()->post_event( 
+      boost::bind( &LayerWidgetPrivate::UpdateActiveState, qpointer, layer ) );
+    return; 
+  }
+
+  // When we are finally on the interface thread run this code:
+  if ( qpointer.data() && !QCoreApplication::closingDown() )
+  {
+    qpointer->parent_->setUpdatesEnabled( false );
+    qpointer->update_widget_state();
+    qpointer->parent_->setUpdatesEnabled( true );
+  }
+}
+
+void LayerWidgetPrivate::UpdateProgress( qpointer_type qpointer, double progress )
+{
+  // Hand it off to the right thread
+  if( !( Core::Interface::IsInterfaceThread() ) )
+  {
+    Core::Interface::Instance()->post_event( boost::bind( &LayerWidgetPrivate::UpdateProgress, 
+      qpointer, progress) );
+    return; 
+  }
+
+  // When we are finally on the interface thread run this code:
+  if ( qpointer.data() && !QCoreApplication::closingDown() )
+  {
+    qpointer->update_progress_bar( progress );
+    qpointer->parent_->update();
+  }
+}
+
+void LayerWidgetPrivate::RequestProvenance( qpointer_type qpointer )
+{
+  // Hand it off to the right thread
+  if( !( Core::Interface::IsInterfaceThread() ) )
+  {
+    Core::Interface::Instance()->post_event( boost::bind( 
+      &LayerWidgetPrivate::RequestProvenance,   qpointer ) );
+    return; 
+  }
+
+  // When we are finally on the interface thread run this code:
+  if ( qpointer.data() && !QCoreApplication::closingDown() )
+  {
+    qpointer->parent_->request_provenance();
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////
+// Class LayerWidget
+//////////////////////////////////////////////////////////////////////////
+
+LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
+  QWidget( parent )
+{
+  this->setAttribute( Qt::WA_TranslucentBackground, true ); 
   
-  
-  
-  // Store the layer in the private class
+  this->private_ = new LayerWidgetPrivate( this );
   this->private_->layer_ = layer;
-  this->private_->layer_menus_open_ = false;
-  this->private_->group_menus_open_ = false;
   
   this->private_->active_ = false;
   this->private_->locked_ = false;
@@ -176,8 +565,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   
   // Set the defaults
   // this is a default setting until we can get the name of the layer from the file or by some other means
-  this->private_->ui_.label_->setText( QString::fromStdString( 
-    this->private_->layer_->name_state_->get() ) );
+  this->private_->ui_.label_->setText( QString::fromStdString( layer->name_state_->get() ) );
   this->private_->ui_.label_->setAcceptDrops( false );
   this->private_->ui_.label_->setValidator( new QRegExpValidator( 
     QRegExp( QString::fromStdString( Core::StateName::REGEX_VALIDATOR_C ) ), this ) );
@@ -220,53 +608,45 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
 
   this->connect( this->private_->ui_.stop_button_,
     SIGNAL ( pressed() ), this, SLOT( trigger_stop() ) );
+
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
   
-    qpointer_type qpointer( this );
+    LayerWidgetPrivate::qpointer_type qpointer( this->private_ );
     
     // Connect a slot to the signal that the visual lock state has changed
-    this->private_->add_connection( 
-      this->private_->layer_->locked_state_->state_changed_signal_.connect(
-        boost::bind( &LayerWidget::UpdateState, qpointer ) ) );
+    this->private_->add_connection( layer->locked_state_->state_changed_signal_.connect(
+        boost::bind( &LayerWidgetPrivate::UpdateState, qpointer ) ) );
 
     // Connect a slot to the signal that the data integrity state has changed
-    this->private_->add_connection( 
-      this->private_->layer_->data_state_->state_changed_signal_.connect(
-        boost::bind( &LayerWidget::UpdateState, qpointer ) ) );
+    this->private_->add_connection( layer->data_state_->state_changed_signal_.connect(
+        boost::bind( &LayerWidgetPrivate::UpdateState, qpointer ) ) );
 
     // Connect a slot to the signal that posts updates to the current progress of a filter
-    this->private_->add_connection( 
-      this->private_->layer_->update_progress_signal_.connect(
-        boost::bind( &LayerWidget::UpdateProgress, qpointer, _1 ) ) );
+    this->private_->add_connection( layer->update_progress_signal_.connect(
+        boost::bind( &LayerWidgetPrivate::UpdateProgress, qpointer, _1 ) ) );
       
     // Connect a slot to the signal that the active layer has changed
-    this->private_->add_connection( 
-      LayerManager::Instance()->active_layer_changed_signal_.connect(
-          boost::bind( &LayerWidget::UpdateActiveState, qpointer, _1 ) ) ); 
+    this->private_->add_connection( LayerManager::Instance()->active_layer_changed_signal_.connect(
+        boost::bind( &LayerWidgetPrivate::UpdateActiveState, qpointer, _1 ) ) );  
     
     // Connect a slot to the signal that indicates that the layout of the viewer has
     // changed  
-    this->private_->add_connection( 
-      ViewerManager::Instance()->layout_state_->value_changed_signal_.connect(
-        boost::bind( &LayerWidget::UpdateViewerButtons, qpointer, _1 ) ) );
+    this->private_->add_connection( ViewerManager::Instance()->layout_state_->value_changed_signal_.connect(
+        boost::bind( &LayerWidgetPrivate::UpdateViewerButtons, qpointer, _1 ) ) );
       
     // Reflect the current state in the widget      
-    UpdateViewerButtons( qpointer, ViewerManager::Instance()->layout_state_->get() );
+    LayerWidgetPrivate::UpdateViewerButtons( qpointer, ViewerManager::Instance()->layout_state_->get() );
   
     // Make the default connections, for any layer type, to the state engine
   
     // Connect activate button to dispatching an action activating the current layer
-    QtUtils::QtBridge::Connect( this->private_->activate_button_, 
-      boost::bind( static_cast<void (*) ( Core::ActionContextHandle, LayerHandle )>( 
-      &ActionActivateLayer::Dispatch ), Core::Interface::GetWidgetActionContext(), layer ) );
+    QtUtils::QtBridge::Connect( this->private_->activate_button_, boost::bind( 
+      &ActionActivateLayer::Dispatch, Core::Interface::GetWidgetActionContext(), 
+      layer->get_layer_id() ) );
       
     connect( this->private_->ui_.label_, SIGNAL( activate_layer_signal() ), this, 
       SLOT( activate_from_lineedit_focus() ) );
-    
-    // Connect the selection box in front of the widget to its underlying state
-    QtUtils::QtBridge::Connect( this->private_->ui_.selection_checkbox_, 
-      layer->selected_state_ );
       
     // now connect it to a signal that 
     connect( this->private_->ui_.selection_checkbox_, SIGNAL( stateChanged( int ) ), this, 
@@ -385,7 +765,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
       layer->show_opacity_state_ );
 
     QtUtils::QtBridge::Connect( this->private_->ui_.provenance_button_,
-      boost::bind( &LayerWidget::RequestProvenance, qpointer_type( this ) ) );
+      boost::bind( &LayerWidgetPrivate::RequestProvenance, qpointer ) );
 
     // Compute isosurface button is enabled when the layer is not locked and is available
     QtUtils::QtBridge::Enable( this->private_->ui_.compute_iso_surface_button_, enable_states,
@@ -440,7 +820,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
     this->private_->ui_.opacity_adjuster_->set_description( "Opacity" );
     
     
-    switch( this->get_volume_type() )
+    switch( this->private_->get_volume_type() )
     {
       // This if for the Data Layers
       case Core::VolumeType::DATA_E:
@@ -570,7 +950,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   this->private_->ui_.facade_widget_->hide();
   this->private_->ui_.verticalLayout_3->setAlignment( Qt::AlignBottom );
   
-  this->update_widget_state( true );
+  this->private_->update_widget_state( true );
   this->setUpdatesEnabled( true );
 }
 
@@ -606,134 +986,6 @@ void LayerWidget::delete_isosurface()
   this->private_->ui_.show_iso_surface_button_->setChecked( false );
 }
   
-void LayerWidget::update_appearance( bool locked, bool active, bool in_use, bool initialize )
-{
-  if ( locked == this->private_->locked_ && 
-     active == this->private_->active_ &&
-     in_use == this->private_->in_use_ && initialize == false ) return;
-  
-  this->private_->locked_ = locked;
-  this->private_->active_ = active;
-  this->private_->in_use_ = in_use;
-
-  // Update the background color inside the icon
-  switch( this->get_volume_type() )
-  {
-    case Core::VolumeType::DATA_E:
-    {
-      if ( locked )
-      {
-        this->private_->ui_.type_->setStyleSheet( 
-          StyleSheet::LAYER_WIDGET_BACKGROUND_LOCKED_C );
-      }
-      else
-      {
-        this->private_->ui_.type_->setStyleSheet( StyleSheet::DATA_VOLUME_COLOR_C );
-      }
-    }
-    break;
-    case Core::VolumeType::MASK_E:
-    {
-      int color_index =  dynamic_cast< MaskLayer* >( 
-        this->private_->layer_.get() )->color_state_->get();
-      
-      this->set_mask_background_color( color_index );
-    }
-    break;
-    case Core::VolumeType::LABEL_E:
-    {
-      if ( locked )
-      {
-        this->private_->ui_.type_->setStyleSheet( 
-          StyleSheet::LAYER_WIDGET_BACKGROUND_LOCKED_C );
-      }
-      else
-      {
-        this->private_->ui_.type_->setStyleSheet( StyleSheet::LABEL_VOLUME_COLOR_C );
-      }
-    }
-    break;
-  }
-
-  if ( locked )
-  {
-    this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_LOCKED_C );
-    this->private_->ui_.label_->setStyleSheet( StyleSheet::LAYER_WIDGET_LABEL_LOCKED_C ); 
-  }
-  else if( active && !in_use )
-  {
-    this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_ACTIVE_C );  
-    this->private_->ui_.label_->setStyleSheet( StyleSheet::LAYER_WIDGET_LABEL_ACTIVE_C );
-    if( this->private_->layer_->gui_state_group_->get_enabled() )
-      this->private_->ui_.header_->setStyleSheet( StyleSheet::LAYER_WIDGET_HEADER_ACTIVE_C );
-  }
-  else if( active && in_use )
-  {
-    this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_ACTIVE_IN_USE_C );  
-    this->private_->ui_.label_->setStyleSheet( StyleSheet::LAYER_WIDGET_LABEL_ACTIVE_IN_USE_C );
-    if( this->private_->layer_->gui_state_group_->get_enabled() )
-      this->private_->ui_.header_->setStyleSheet( StyleSheet::LAYER_WIDGET_HEADER_ACTIVE_IN_USE_C );
-  }
-  else if ( in_use )
-  {
-    this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_IN_USE_C );  
-    this->private_->ui_.label_->setStyleSheet( StyleSheet::LAYER_WIDGET_LABEL_IN_USE_C );
-    if( this->private_->layer_->gui_state_group_->get_enabled() )
-      this->private_->ui_.header_->setStyleSheet( StyleSheet::LAYER_WIDGET_HEADER_IN_USE_C );
-  }
-  else
-  {
-    this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_INACTIVE_C );
-    this->private_->ui_.label_->setStyleSheet( StyleSheet::LAYER_WIDGET_LABEL_INACTIVE_C );
-    if( this->private_->layer_->gui_state_group_->get_enabled() )
-      this->private_->ui_.header_->setStyleSheet( StyleSheet::LAYER_WIDGET_HEADER_INACTIVE_C );
-  }
-}
-
-void LayerWidget::update_widget_state( bool initialize )
-{
-  // Step 1 : retrieve the state of the layer
-  std::string data_state;
-  bool visual_lock = false;
-  bool active_layer = false;
-  
-  {
-    // NOTE:
-    // Since state is changed on the application thread
-    // We need to lock the state engine to prevent any change
-    // to be made into the state manager.
-    Layer::lock_type lock( Layer::GetMutex() );
-    data_state = this->private_->layer_->data_state_->get();
-    visual_lock = this->private_->layer_->locked_state_->get();
-    active_layer = ( LayerManager::Instance()->get_active_layer() == this->private_->layer_ );
-  }
-  
-  if ( data_state == Layer::AVAILABLE_C )
-  {
-    // Change the color of the widget
-    this->update_appearance( visual_lock,  active_layer, false, initialize );
-    this->private_->ui_.selection_checkbox_->setVisible( true );
-  }
-  else if ( data_state == Layer::CREATING_C )
-  {
-    // Change the color of the widget
-    update_appearance( true,  false, false, initialize ); 
-    this->private_->ui_.selection_checkbox_->setVisible( false );
-  }
-  else if ( data_state == Layer::PROCESSING_C )
-  {
-    // Change the color of the widget
-    update_appearance( visual_lock,  active_layer, true, initialize );  
-    this->private_->ui_.selection_checkbox_->setVisible( false );
-  }
-  else if ( data_state == Layer::IN_USE_C )
-  {
-    // Change the color of the widget
-    update_appearance( visual_lock,  active_layer, true, initialize );    
-    this->private_->ui_.selection_checkbox_->setVisible( true );
-  }
-}
-
 std::string LayerWidget::get_layer_id() const
 { 
   return this->private_->layer_->get_layer_id(); 
@@ -742,11 +994,6 @@ std::string LayerWidget::get_layer_id() const
 std::string LayerWidget::get_layer_name() const
 {
   return this->private_->layer_->get_layer_name();
-}
-
-int LayerWidget::get_volume_type() const
-{ 
-  return this->private_->layer_->get_type(); 
 }
 
 void LayerWidget::set_mask_background_color( int color_index )
@@ -801,14 +1048,9 @@ void LayerWidget::trigger_stop()
   this->private_->layer_->stop_signal_();
 }
 
-void LayerWidget::set_group_menu_status( bool status )
-{
-  this->private_->group_menus_open_ = status;
-}
-
 void LayerWidget::set_brightness_contrast_to_default()
 {
-  // These are hard coded because we have no way of retreiving the default values
+  // These are hard coded because we have no way of retrieving the default values
   // We can set the sliderspinners directly because they will emit the proper signals
   this->private_->ui_.brightness_adjuster_->setCurrentValue( 50.0 );
   this->private_->ui_.contrast_adjuster_->setCurrentValue( 0 );
@@ -825,8 +1067,7 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
   
   if( ( event->modifiers() != Qt::ControlModifier ) && ( event->modifiers() != Qt::ShiftModifier ) )
   {
-    ActionActivateLayer::Dispatch( Core::Interface::GetWidgetActionContext(),
-      LayerManager::Instance()->get_layer_by_id( this->get_layer_id() ) );
+    ActionActivateLayer::Dispatch( Core::Interface::GetWidgetActionContext(), this->get_layer_id() );
     event->setAccepted( true );
     return;
   }
@@ -852,8 +1093,7 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
 
   // Next we hide the LayerWidget that we are going to be dragging.
   this->parentWidget()->setMinimumHeight( this->parentWidget()->height() );
-  this->set_picked_up( true );
-  this->enable_drop_space( true );
+  this->private_->set_picked_up( true );
   
   Q_EMIT prep_for_drag_and_drop( true );
   Q_EMIT layer_size_signal_( this->height() - 2 );
@@ -864,31 +1104,25 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
   { 
     if ( this->private_->drop_layer_set_ )
     {
-    LayerGroupHandle dst_group = this->private_->drop_layer_->
-      private_->layer_->get_layer_group();
-      
-    if ( this->private_->layer_->get_layer_group() != dst_group )
-    {
-      this->set_picked_up( false );
-      LayerResamplerHandle layer_resampler( new LayerResampler(
-        this->private_->layer_, this->private_->drop_layer_->private_->layer_ ) );
-      LayerResamplerDialog* dialog = new LayerResamplerDialog( layer_resampler, this );
-      if ( dialog->exec() == QDialog::Accepted )
+      LayerGroupHandle dst_group = this->private_->drop_layer_->
+        private_->layer_->get_layer_group();
+      if ( this->private_->layer_->get_layer_group() != dst_group )
       {
-        layer_resampler->execute( Core::Interface::GetWidgetActionContext() );
+        LayerResamplerHandle layer_resampler( new LayerResampler(
+          this->private_->layer_, this->private_->drop_layer_->private_->layer_ ) );
+        LayerResamplerDialog* dialog = new LayerResamplerDialog( layer_resampler, this );
+        if ( dialog->exec() == QDialog::Accepted )
+        {
+          layer_resampler->execute( Core::Interface::GetWidgetActionContext() );
+        }
+        dialog->deleteLater();
       }
       else
       {
-        this->private_->drop_layer_->enable_drop_space( false );
+        ActionMoveLayer::Dispatch( Core::Interface::GetWidgetActionContext(),
+          this->get_layer_id(), this->private_->drop_layer_->get_layer_id() );
       }
-      dialog->deleteLater();
     }
-    else
-    {
-      ActionMoveLayerAbove::Dispatch( Core::Interface::GetWidgetActionContext(),
-        this->get_layer_id(), this->private_->drop_layer_->get_layer_id() );
-    }
-  }
     else if ( this->private_->drop_group_set_ )
     {
       LayerGroupHandle dst_group = this->private_->drop_group_->get_group();
@@ -896,55 +1130,38 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
       {
         if ( this->private_->layer_->get_layer_group() != dst_group )
         {
-          this->set_picked_up( false );
-          LayerHandle last_layer = dst_group->last_layer();
-          
+          LayerHandle last_layer = dst_group->bottom_layer();
+
           if ( last_layer )
           {
             LayerResamplerHandle layer_resampler( new LayerResampler(
               this->private_->layer_, last_layer ) );
-              
             LayerResamplerDialog* dialog = new LayerResamplerDialog( layer_resampler, this );
             if ( dialog->exec() == QDialog::Accepted )
             {
               layer_resampler->execute( Core::Interface::GetWidgetActionContext() );
             }
-  else
-  {
-              this->private_->drop_group_->enable_drop_space( false );
-            }
+
             dialog->deleteLater();
           }
         }
         else
         {
-          
-          ActionMoveLayerBelow::Dispatch( Core::Interface::GetWidgetActionContext(), 
-            this->get_layer_id(), dst_group->get_group_id() );
+          ActionMoveLayer::Dispatch( Core::Interface::GetWidgetActionContext(), 
+            this->get_layer_id() );
         }
       }
     }
   }
-  else
-  {
-    this->set_picked_up( false );
-  }
-  
+
+  this->private_->set_picked_up( false );
   this->private_->drop_layer_set_ = false;
   this->private_->drop_group_set_ = false;
 
   Q_EMIT prep_for_drag_and_drop( false );
-  this->enable_drop_space( false );
   this->parentWidget()->setMinimumHeight( 0 );
   this->repaint();
   event->setAccepted( true );
-}
-
-
-void LayerWidget::set_drop_target( LayerWidget* target_layer )
-{
-  this->private_->drop_layer_ = target_layer;
-  this->private_->drop_layer_set_ = true;
 }
 
 void LayerWidget::set_drop_group( GroupButtonMenu* target_group )
@@ -955,75 +1172,36 @@ void LayerWidget::set_drop_group( GroupButtonMenu* target_group )
 
 void LayerWidget::dropEvent( QDropEvent* event )
 {
-  this->enable_drop_space( false );
+  this->private_->enable_drop_space( false );
   event->setAccepted( true );
   
-  std::string layer_name = event->mimeData()->text().toStdString();
-  if( LayerManager::Instance()->get_layer_by_name( layer_name )
-    && ( this->get_layer_name() != layer_name ) )
+  LayerWidget* layer_widget = dynamic_cast< LayerWidget* >( event->source() );
+  if ( layer_widget != 0 && layer_widget != this )
   {
-    LayerWidget* layer_widget = dynamic_cast< LayerWidget* >( event->source() );
-    if ( layer_widget )
-    {
-      layer_widget->set_drop_target( this ); 
+    layer_widget->private_->set_drop_target( this ); 
     event->setDropAction( Qt::MoveAction );
     return;
-  }
   }
   
   event->setDropAction( Qt::IgnoreAction );
 }
 
-void LayerWidget::dragEnterEvent( QDragEnterEvent* event)
+void LayerWidget::dragEnterEvent( QDragEnterEvent* event )
 {
-  std::string layer_name = event->mimeData()->text().toStdString();
-  if( ( LayerManager::Instance()->get_layer_by_name( layer_name ) ) 
-    && ( this->get_layer_name() != layer_name ) )
+  LayerWidget* layer_widget = dynamic_cast< LayerWidget* >( event->source() );
+  if ( layer_widget != 0 && layer_widget != this )
   {
-    this->enable_drop_space( true );
+    this->private_->enable_drop_space( true );
   }
   event->setAccepted( true );
 }
 
 void LayerWidget::dragLeaveEvent( QDragLeaveEvent* event )
 {
-  this->enable_drop_space( false );
+  this->private_->enable_drop_space( false );
   event->setAccepted( true );
 }
-
-void LayerWidget::set_picked_up( bool picked_up )
-{ 
-  this->private_->picked_up_ = picked_up; 
-}
   
-void LayerWidget::enable_drop_space( bool drop )
-{
-  // First we check to see if it is picked up if so, we set change the way it looks
-  this->private_->drop_space_->set_height( this->private_->picked_up_layer_size_ + 4 );
-  
-  if( this->private_->picked_up_ )
-  {
-    this->private_->overlay_->set_transparent( false );
-    this->private_->overlay_->show();
-  }
-  else if( drop )
-  {
-    this->private_->overlay_->set_transparent( true );
-    this->private_->overlay_->show();
-    this->private_->drop_space_->show();
-  }
-  else
-  {
-    this->private_->drop_space_->hide();
-    this->private_->overlay_->hide();
-  }
-} 
-
-void LayerWidget::set_active( bool active )
-{
-  this->update_widget_state();
-}
-
 void LayerWidget::show_selection_checkbox( bool show )
 {
   if( show && (!this->private_->ui_.lock_button_->isChecked()) )
@@ -1034,11 +1212,6 @@ void LayerWidget::show_selection_checkbox( bool show )
   {
     this->private_->ui_.checkbox_widget_->hide();
   }
-}
-
-void LayerWidget::update_progress_bar( double progress )
-{
-  this->private_->ui_.progress_bar_->setValue( static_cast<int>( progress * 100.0 ) );
 }
 
 void LayerWidget::resizeEvent( QResizeEvent *event )
@@ -1075,11 +1248,6 @@ void LayerWidget::instant_hide_drop_space()
   this->private_->drop_space_->instant_hide();
 }
 
-void LayerWidget::hide_overlay()
-{
-  this->private_->overlay_->hide();
-}
-
 void LayerWidget::set_picked_up_layer_size( int size )
 {
   this->private_->picked_up_layer_size_ = size;
@@ -1090,99 +1258,7 @@ void LayerWidget::set_selected( bool selected )
   this->private_->ui_.selection_checkbox_->setChecked( selected );
 }
 
-void LayerWidget::UpdateViewerButtons( qpointer_type qpointer, std::string layout )
-{
-  if( !( Core::Interface::IsInterfaceThread() ) )
-  {
-    Core::Interface::Instance()->post_event( boost::bind( &LayerWidget::UpdateViewerButtons, 
-      qpointer, layout ) );
-    return; 
-  }
-
-  if ( !qpointer.data() ) return;
-  
-  if( layout == "single" )
-  {
-    qpointer->private_->ui_.left_viewers_widget_->setMinimumWidth( 150 );
-    qpointer->private_->ui_.left_viewers_widget_->setMaximumWidth( 150 );
-  }
-  else if( layout == "1and2" )
-  {
-    qpointer->private_->ui_.left_viewers_widget_->setMinimumWidth( 90 );
-    qpointer->private_->ui_.left_viewers_widget_->setMaximumWidth( 90 );
-  }
-  else if( layout == "1and3" )
-  {
-    qpointer->private_->ui_.left_viewers_widget_->setMinimumWidth( 105 );
-    qpointer->private_->ui_.left_viewers_widget_->setMaximumWidth( 105 );
-  }
-  else
-  {
-    qpointer->private_->ui_.left_viewers_widget_->setMinimumWidth( 75 );
-    qpointer->private_->ui_.left_viewers_widget_->setMaximumWidth( 75 );
-  }
-}
-
-
-
-void LayerWidget::UpdateState( qpointer_type qpointer )
-{
-  // Hand it off to the right thread
-  if( !( Core::Interface::IsInterfaceThread() ) )
-  {
-    Core::Interface::Instance()->post_event( 
-      boost::bind( &LayerWidget::UpdateState, qpointer) );
-    return; 
-  }
-
-  // When we are finally on the interface thread run this code:
-  if ( qpointer.data() )
-  {
-    qpointer->setUpdatesEnabled( false );
-    qpointer->update_widget_state();
-    qpointer->setUpdatesEnabled( true );
-  }
-}
-
-void LayerWidget::UpdateActiveState( qpointer_type qpointer, LayerHandle layer )
-{
-  // Hand it off to the right thread
-  if( !( Core::Interface::IsInterfaceThread() ) )
-  {
-    Core::Interface::Instance()->post_event( 
-      boost::bind( &LayerWidget::UpdateActiveState, qpointer, layer ) );
-    return; 
-  }
-
-  // When we are finally on the interface thread run this code:
-  if ( qpointer.data() )
-  {
-    qpointer->setUpdatesEnabled( false );
-    qpointer->update_widget_state();
-    qpointer->setUpdatesEnabled( true );
-  }
-}
-
-
-void LayerWidget::UpdateProgress( qpointer_type qpointer, double progress )
-{
-  // Hand it off to the right thread
-  if( !( Core::Interface::IsInterfaceThread() ) )
-  {
-    Core::Interface::Instance()->post_event( boost::bind( &LayerWidget::UpdateProgress, 
-      qpointer, progress) );
-    return; 
-  }
-
-  // When we are finally on the interface thread run this code:
-  if ( qpointer.data() )
-  {
-    qpointer->update_progress_bar( progress );
-    qpointer->update();
-  }
-}
-
-bool LayerWidget::get_selected() const
+bool LayerWidget::is_selected() const
 {
   return this->private_->ui_.selection_checkbox_->isChecked() &&
     this->private_->ui_.selection_checkbox_->isVisible();
@@ -1191,7 +1267,7 @@ bool LayerWidget::get_selected() const
 void LayerWidget::activate_from_lineedit_focus()
 {
   ActionActivateLayer::Dispatch( Core::Interface::GetWidgetActionContext(), 
-    this->private_->layer_ ) ;
+    this->private_->layer_->get_layer_id() ) ;
 }
 
 void LayerWidget::contextMenuEvent( QContextMenuEvent * event )
@@ -1272,98 +1348,35 @@ void LayerWidget::delete_layer_from_context_menu()
   }
 }
 
-void LayerWidget::export_layer( const std::string& type_extension )
-{
-  boost::filesystem::path current_folder = ProjectManager::Instance()->get_current_file_folder();
-  QString export_path = QFileDialog::getExistingDirectory( this, tr( "Choose Directory for Export..." ),
-    current_folder.string().c_str(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks );
-  
-  if( export_path == "" ) return;
-  
-  if( !QFileInfo( export_path ).exists() )
-  {
-    CORE_LOG_ERROR( "The layer could not be exported to that location. Please try another location." );
-    return;
-  }
-  try
-  {
-    boost::filesystem::create_directory( boost::filesystem::path( export_path.toStdString() ) / "delete_me" );
-  }
-  catch( ... ) // if the create fails then we are not in a writable directory
-  {
-    CORE_LOG_ERROR( "The layer could not be exported to that location. Please try another location." );
-    return;
-  }
-  
-  // if we've made it here then we've created a folder and we need to delete it.
-  boost::filesystem::remove(  boost::filesystem::path( export_path.toStdString() ) / "delete_me" );
-  
-  
-  if( LayerManager::Instance()->get_layer_by_id( this->get_layer_id() )->get_type() == 
-    Core::VolumeType::MASK_E )
-  {
-    ActionExportSegmentation::Dispatch( Core::Interface::GetWidgetActionContext(), 
-      this->private_->layer_->get_layer_id(), "single_mask", 
-      export_path.toStdString(), type_extension );
-  }
-  else if( LayerManager::Instance()->get_layer_by_id( this->get_layer_id() )->get_type() == 
-    Core::VolumeType::DATA_E )
-  { 
-    std::string file_name = ( boost::filesystem::path( export_path.toStdString() ) / 
-      this->private_->layer_->get_layer_name() ).string();
-
-    ActionExportLayer::Dispatch( Core::Interface::GetWidgetActionContext(), 
-      this->private_->layer_->get_layer_id(), file_name, type_extension );
-  }
-}
-
 void LayerWidget::export_nrrd()
 {
-  this->export_layer( ".nrrd" );
+  this->private_->export_layer( ".nrrd" );
 }
 
 void LayerWidget::export_dicom()
 {
-  this->export_layer( ".dcm" );
+  this->private_->export_layer( ".dcm" );
 }
 
 void LayerWidget::export_tiff()
 {
-  this->export_layer( ".tiff" );
+  this->private_->export_layer( ".tiff" );
 }
 
 void LayerWidget::export_bitmap()
 {
-  this->export_layer( ".bmp" );
+  this->private_->export_layer( ".bmp" );
 }
 
 void LayerWidget::export_png()
 {
-  this->export_layer( ".png" );
+  this->private_->export_layer( ".png" );
 }
 
 void LayerWidget::request_provenance()
 {
   ProjectManager::Instance()->get_current_project()->request_provenance_record( 
     this->private_->layer_->provenance_id_state_->get() );
-}
-
-
-void LayerWidget::RequestProvenance( qpointer_type qpointer )
-{
-  // Hand it off to the right thread
-  if( !( Core::Interface::IsInterfaceThread() ) )
-  {
-    Core::Interface::Instance()->post_event( boost::bind( &LayerWidget::RequestProvenance, 
-      qpointer ) );
-    return; 
-  }
-
-  // When we are finally on the interface thread run this code:
-  if ( qpointer.data() )
-  {
-    qpointer->request_provenance();
-  }
 }
 
 } //end namespace Seg3D

@@ -35,7 +35,7 @@
 #include <Core/Volume/VolumeSlice.h>
 #include <Core/Interface/Interface.h>
 
-#include <Application/LayerManager/LayerManager.h>
+#include <Application/Layer/LayerManager.h>
 #include <Application/Tool/SeedPointsTool.h>
 #include <Application/Viewer/Viewer.h>
 #include <Application/ViewerManager/ViewerManager.h>

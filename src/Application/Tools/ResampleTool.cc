@@ -34,7 +34,7 @@
 #include <Application/Filters/Actions/ActionResample.h>
 #include <Application/Layer/Layer.h>
 #include <Application/Layer/LayerGroup.h>
-#include <Application/LayerManager/LayerManager.h>
+#include <Application/Layer/LayerManager.h>
 
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL( Seg3D, ResampleTool )
@@ -59,6 +59,7 @@ public:
   void handle_scale_changed( double scale );
   void handle_constraint_aspect_changed( bool constraint );
   void handle_kernel_changed( std::string kernel_name );
+  void handle_layer_groups_changed( bool changed );
 
   size_t signal_block_count_;
   ResampleTool* tool_;
@@ -208,6 +209,14 @@ void ResampleToolPrivate::handle_dst_group_changed( std::string group_id )
   }
 }
 
+void ResampleToolPrivate::handle_layer_groups_changed( bool changed )
+{
+  if ( changed )
+  {
+    this->update_dst_group_list();
+  }
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Class ResampleTool
 //////////////////////////////////////////////////////////////////////////
@@ -287,8 +296,10 @@ ResampleTool::ResampleTool( const std::string& toolid ) :
       this->private_, i, _1 ) ) );
   }
   // If groups were added or removed, update the destination group list in the tool interface
-  this->add_connection( LayerManager::Instance()->groups_changed_signal_.connect( 
-    boost::bind( &ResampleToolPrivate::update_dst_group_list, this->private_ ) ) );
+  this->add_connection( LayerManager::Instance()->layer_inserted_signal_.connect( 
+    boost::bind( &ResampleToolPrivate::handle_layer_groups_changed, this->private_, _2 ) ) );
+  this->add_connection( LayerManager::Instance()->layers_deleted_signal_.connect(
+    boost::bind( &ResampleToolPrivate::handle_layer_groups_changed, this->private_, _3 ) ) );
   
   this->private_->handle_target_group_changed();
 }

@@ -33,7 +33,7 @@
 #include <Core/Geometry/Point.h>
 
 // Application includes
-#include <Application/LayerManager/LayerAction.h>
+#include <Application/Layer/LayerAction.h>
 
 namespace Seg3D
 {

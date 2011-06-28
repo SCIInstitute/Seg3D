@@ -31,7 +31,7 @@
 
 // Application includes
 #include <Application/Layer/LayerGroup.h>
-#include <Application/LayerManager/LayerManager.h>
+#include <Application/Layer/LayerManager.h>
 #include <Application/Filters/Actions/ActionPermute.h>
 #include <Application/Filters/LayerFilter.h>
 

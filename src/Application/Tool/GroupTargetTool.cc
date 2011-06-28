@@ -36,7 +36,7 @@
 // Application includes
 #include <Application/Layer/Layer.h>
 #include <Application/Layer/LayerGroup.h>
-#include <Application/LayerManager/LayerManager.h>
+#include <Application/Layer/LayerManager.h>
 #include <Application/Tool/GroupTargetTool.h>
 
 namespace Seg3D
@@ -50,6 +50,33 @@ class GroupTargetToolPrivate
 {
 
 public:
+  GroupTargetToolPrivate() :
+    target_type_( Core::VolumeType::DATA_E ),
+      tool_( 0 )
+    {}
+
+  // -- handle updates from layermanager --
+  void handle_layer_inserted( LayerHandle layer, bool new_group );
+  void handle_layers_deleted( std::vector< std::string > group_ids, bool groups_deleted );
+  void handle_active_layer_changed( LayerHandle layer );
+  void handle_layer_name_changed( std::string layer_id );
+
+  // -- handle updates from state variables --
+  void handle_use_active_group_changed( bool use_active_group );
+  void handle_target_group_changed( std::string group_id );
+  void handle_target_layers_changed();
+
+  // -- Helper functions --
+public:
+  // UPDATE_GROUP_LIST:
+  // Update the target group option list.
+  void update_group_list();
+
+  // UPDATE_LAYER_LIST:
+  // Update the target layers option list.
+  void update_layer_list();
+  
+public:
   // The type of layer that can be used with this filter
   Core::VolumeType target_type_;
   
@@ -57,50 +84,55 @@ public:
   // NOTE: This can be a pointer, as the callbacks are deleted when the tool is deleted and all
   // the tool components run on the same thread.
   GroupTargetTool* tool_;
-  
-  // -- handle updates from layermanager --
-  void handle_groups_changed();
-  void handle_layers_changed( LayerGroupHandle group );
-  void handle_active_layer_changed( LayerHandle layer );
-  void handle_layer_name_changed( std::string layer_id );
-  
-  // -- handle updates from state variables --
-  void handle_use_active_group_changed( bool use_active_group );
-  void handle_target_group_changed( std::string group_id );
-  void handle_target_layers_changed();
-  
-  GroupTargetToolPrivate() :
-    target_type_( Core::VolumeType::DATA_E ),
-    tool_( 0 )
-  {}
 };
 
-void GroupTargetToolPrivate::handle_groups_changed()
+void GroupTargetToolPrivate::handle_layer_inserted( LayerHandle layer, bool new_group )
 {
-  std::vector< LayerGroupHandle > groups;
-  LayerManager::Instance()->get_groups( groups );
-  std::vector< Core::OptionLabelPair > group_names;
-  for ( size_t i = 0; i < groups.size(); ++i )
+  // Store the current target group, so later we can check if the target group
+  // has changed.
+  std::string old_target_group = this->tool_->target_group_state_->get();
+  bool target_changed = false;
+
+  // If a new group has been added, update the group list first
+  if ( new_group )
   {
-    const Core::GridTransform& grid_trans = groups[ i ]->get_grid_transform();
-    std::string group_name = Core::ExportToString( grid_trans.get_nx() ) + " x " +
-      Core::ExportToString( grid_trans.get_ny() ) + " x " + 
-      Core::ExportToString( grid_trans.get_nz() );
-    group_names.push_back( std::make_pair( groups[ i ]->get_group_id(), group_name ) );
+    this->update_group_list();
+    target_changed = ( old_target_group != this->tool_->target_group_state_->get() );
   }
-  this->tool_->target_group_state_->set_option_list( group_names );
+  
+  // If the layer belongs to the current target group, update the layer list as well
+  if ( !target_changed && layer->get_layer_group()->get_group_id() == 
+    this->tool_->target_group_state_->get() )
+  {
+    this->update_layer_list();
+  }
 }
 
-void GroupTargetToolPrivate::handle_layers_changed( LayerGroupHandle group )
+void GroupTargetToolPrivate::handle_layers_deleted( std::vector< std::string > group_ids,
+                           bool groups_deleted )
 {
-  if ( group->get_group_id() != this->tool_->target_group_state_->get() )
-  {
-    return;
-  }
+  // Store the current target group, so later we can check if the target group
+  // has changed.
+  std::string old_target_group = this->tool_->target_group_state_->get();
+  bool target_changed = false;
 
-  std::vector< LayerIDNamePair > layer_names;
-  group->get_layer_names( layer_names, this->target_type_ );
-  this->tool_->target_layers_state_->set_option_list( layer_names );
+  // If groups have been deleted, update the group list
+  if ( groups_deleted )
+  {
+    this->update_group_list();
+    target_changed = ( old_target_group != this->tool_->target_group_state_->get() );
+  }
+  
+  // Update the layer list only if the target hasn't been changed. Otherwise, the layer
+  // list should have already been updated by handle_target_group_changed.
+  if ( !target_changed )
+  {
+    // If the target group is affected
+    if ( std::find( group_ids.begin(), group_ids.end(), old_target_group ) != group_ids.end() )
+    {
+      this->update_layer_list();
+    }
+  }
 }
 
 void GroupTargetToolPrivate::handle_active_layer_changed( LayerHandle layer )
@@ -145,25 +177,18 @@ void GroupTargetToolPrivate::handle_target_group_changed( std::string group_id )
     }
   }
 
-  std::vector< LayerIDNamePair > layer_names;
-  std::vector< std::string > selected_layers;
-  if ( group_id != "" && group_id != Tool::NONE_OPTION_C )
+  this->update_layer_list();
+
+  // Select the active layer
+  if ( this->tool_->use_active_group_state_->get() )
   {
-    LayerGroupHandle group = LayerManager::Instance()->get_group_by_id( group_id );
-    group->get_layer_names( layer_names, this->target_type_ );
-    if ( this->tool_->use_active_group_state_->get() )
+    std::vector< std::string > selected_layers;
+    LayerHandle active_layer = LayerManager::Instance()->get_active_layer();
+    if ( active_layer )
     {
-      LayerHandle active_layer = LayerManager::Instance()->get_active_layer();
-      if ( active_layer )
-      {
-        selected_layers.push_back( active_layer->get_layer_id() );
-      }   
-    } 
-  }
-  this->tool_->target_layers_state_->set_option_list( layer_names );
-  if ( selected_layers.size() > 0 )
-  {
-    this->tool_->target_layers_state_->set( selected_layers );
+      selected_layers.push_back( active_layer->get_layer_id() );
+      this->tool_->target_layers_state_->set( selected_layers );
+    }   
   }
 }
 
@@ -181,10 +206,37 @@ void GroupTargetToolPrivate::handle_layer_name_changed( std::string layer_id )
   if ( layer_group->get_group_id() == this->tool_->target_group_state_->get() &&
     ( layer->get_type() & this->target_type_ ) )
   {
-    this->handle_layers_changed( layer_group );
+    this->update_layer_list();
   } 
 }
 
+void GroupTargetToolPrivate::update_group_list()
+{
+  std::vector< LayerGroupHandle > groups;
+  LayerManager::Instance()->get_groups( groups );
+  std::vector< Core::OptionLabelPair > group_names;
+  for ( size_t i = 0; i < groups.size(); ++i )
+  {
+    const Core::GridTransform& grid_trans = groups[ i ]->get_grid_transform();
+    std::string group_name = Core::ExportToString( grid_trans.get_nx() ) + " x " +
+      Core::ExportToString( grid_trans.get_ny() ) + " x " + 
+      Core::ExportToString( grid_trans.get_nz() );
+    group_names.push_back( std::make_pair( groups[ i ]->get_group_id(), group_name ) );
+  }
+  this->tool_->target_group_state_->set_option_list( group_names );
+}
+
+void GroupTargetToolPrivate::update_layer_list()
+{
+  std::string group_id = this->tool_->target_group_state_->get();
+  std::vector< LayerIDNamePair > layer_names;
+  if ( group_id != "" && group_id != Tool::NONE_OPTION_C )
+  {
+    LayerGroupHandle group = LayerManager::Instance()->get_group_by_id( group_id );
+    group->get_layer_names( layer_names, this->target_type_ );
+  }
+  this->tool_->target_layers_state_->set_option_list( layer_names );
+}
 
 //////////////////////////////////////////////////////////////////////////
 // Class GroupTargetTool
@@ -209,10 +261,10 @@ GroupTargetTool::GroupTargetTool(  Core::VolumeType target_type, const std::stri
   this->target_group_state_->set_session_priority( Core::StateBase::DEFAULT_LOAD_E + 10 );
 
   // Adding connections to handle updates
-  this->add_connection( LayerManager::Instance()->groups_changed_signal_.connect(
-    boost::bind( &GroupTargetToolPrivate::handle_groups_changed, this->private_ ) ) );
-  this->add_connection( LayerManager::Instance()->group_internals_changed_signal_.connect(
-    boost::bind( &GroupTargetToolPrivate::handle_layers_changed, this->private_, _1 ) ) );
+  this->add_connection( LayerManager::Instance()->layer_inserted_signal_.connect(
+    boost::bind( &GroupTargetToolPrivate::handle_layer_inserted, this->private_, _1, _2 ) ) );
+  this->add_connection( LayerManager::Instance()->layers_deleted_signal_.connect(
+    boost::bind( &GroupTargetToolPrivate::handle_layers_deleted, this->private_, _2, _3 ) ) );
   this->add_connection( LayerManager::Instance()->active_layer_changed_signal_.connect(
     boost::bind( &GroupTargetToolPrivate::handle_active_layer_changed, this->private_, _1 ) ) );
   this->add_connection( LayerManager::Instance()->layer_name_changed_signal_.connect(
@@ -229,7 +281,7 @@ GroupTargetTool::GroupTargetTool(  Core::VolumeType target_type, const std::stri
   // Handle the updates to the StateEngine
   // As tools are created on the application thread, the state engine should not change underneath
   // it, as every change to the state engine has to go through the same thread.
-  this->private_->handle_groups_changed();
+  this->private_->update_group_list();
 }
 
 GroupTargetTool::~GroupTargetTool()

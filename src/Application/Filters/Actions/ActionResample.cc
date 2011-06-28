@@ -37,7 +37,7 @@
 #include <Core/Utils/Log.h>
 
 // Application includes
-#include <Application/LayerManager/LayerManager.h>
+#include <Application/Layer/LayerManager.h>
 #include <Application/Filters/Actions/ActionResample.h>
 #include <Application/Filters/LayerFilter.h>
 
@@ -1099,12 +1099,6 @@ bool ActionResample::run( Core::ActionContextHandle& context,
     }
     
     dst_layer_ids[ i ] = algo->dst_layers_[ i ]->get_layer_id();
-  }
-
-  if ( this->private_->resample_to_layer_ )
-  {
-    LayerManager::Instance()->move_layer_above( algo->dst_layers_[ 0 ], 
-      LayerManager::Instance()->get_layer_by_id( this->private_->dst_layer_id_ ) );
   }
 
   // Compute resample ranges if resampling to a given grid

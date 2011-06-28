@@ -30,7 +30,7 @@
 #include <itkOtsuMultipleThresholdsImageFilter.h>
 
 // Application includes
-#include <Application/LayerManager/LayerManager.h>
+#include <Application/Layer/LayerManager.h>
 #include <Application/StatusBar/StatusBar.h>
 #include <Application/Filters/ITKFilter.h>
 #include <Application/Filters/Actions/ActionOtsuThresholdFilter.h>

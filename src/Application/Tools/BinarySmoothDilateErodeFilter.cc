@@ -33,7 +33,7 @@
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/BinarySmoothDilateErodeFilter.h>
 #include <Application/Layer/Layer.h>
-#include <Application/LayerManager/LayerManager.h>
+#include <Application/Layer/LayerManager.h>
 #include <Application/Filters/Actions/ActionSmoothDilateFilter.h>
 #include <Application/Filters/Actions/ActionSmoothErodeFilter.h>
 #include <Application/Filters/Actions/ActionSmoothDilateErodeFilter.h>

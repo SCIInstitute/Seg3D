@@ -33,7 +33,7 @@
 #include <Application/Clipboard/ClipboardUndoBufferItem.h>
 #include <Application/Tools/Actions/ActionCopy.h>
 #include <Application/Layer/MaskLayer.h>
-#include <Application/LayerManager/LayerManager.h>
+#include <Application/Layer/LayerManager.h>
 #include <Application/ProjectManager/ProjectManager.h>
 #include <Application/UndoBuffer/UndoBuffer.h>
 #include <Application/ViewerManager/ViewerManager.h>

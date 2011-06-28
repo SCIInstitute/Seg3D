@@ -33,8 +33,8 @@
 #include <Core/Action/Action.h>
 
 // Application includes
-#include <Application/LayerManager/LayerManager.h>
-#include <Application/LayerManager/LayerAction.h>
+#include <Application/Layer/LayerManager.h>
+#include <Application/Layer/LayerAction.h>
 
 namespace Seg3D
 {

@@ -46,9 +46,9 @@
 
 // Application includes
 #include <Application/LayerIO/LayerIO.h>
-#include <Application/LayerManager/LayerManager.h>
+#include <Application/Layer/LayerManager.h>
 #include <Application/ProjectManager/ProjectManager.h>
-#include <Application/LayerManager/Actions/ActionExportLayer.h>
+#include <Application/LayerIO/Actions/ActionExportLayer.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
 
 // Interface includes

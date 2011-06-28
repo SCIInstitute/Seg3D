@@ -47,9 +47,8 @@
 #include <Interface/Application/LayerWidget.h>
 
 //Application Includes
-#include <Application/LayerManager/LayerManager.h>
-#include <Application/LayerManager/Actions/ActionMoveLayerBelow.h>
-#include <Application/LayerManager/Actions/ActionNewMaskLayer.h>
+#include <Application/Layer/LayerManager.h>
+#include <Application/Layer/Actions/ActionNewMaskLayer.h>
 
 //UI Includes
 #include "ui_GroupButtonMenu.h"

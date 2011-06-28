@@ -32,7 +32,7 @@
 #include <Core/Action/Actions.h>
 #include <Core/Interface/Interface.h>
 #include <Application/Layer/Layer.h>
-#include <Application/LayerManager/LayerAction.h>
+#include <Application/Layer/LayerAction.h>
 
 namespace Seg3D
 {
