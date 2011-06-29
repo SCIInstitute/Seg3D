@@ -138,7 +138,10 @@ public:
 private:
   SpeedlineToolPrivateHandle private_;
 
-  boost::signals2::connection viewer_connection_[6];
+  boost::signals2::connection viewer_connection_[ 6 ];
+  //Core::VolumeSliceType slice_type_[ 6 ];
+  size_t slice_no_[ 6 ];
+  bool initialized_;
 };
 
 } // end namespace

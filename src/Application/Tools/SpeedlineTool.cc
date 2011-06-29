@@ -441,6 +441,10 @@ private_( new SpeedlineToolPrivate )
   this->add_state( "use_smoothing", this->use_smoothing_state_, true ); 
   this->add_state( "use_rescale", this->use_rescale_state_, true ); 
 
+  for ( size_t i = 0; i < 6; ++i )
+    slice_no_[ i ] = 0;
+
+  this->initialized_ = false;
 }
 
 SpeedlineTool::~SpeedlineTool()
@@ -454,12 +458,40 @@ SpeedlineTool::~SpeedlineTool()
 // setup the right mouse tools in the viewers.
 void SpeedlineTool::activate()
 {
+  bool is_recompute = false;
+
   for ( size_t i = 0; i < 6; ++i )
   {
     this->viewer_connection_[ i ] = 
       ViewerManager::Instance()->get_viewer( i )->slice_number_state_->value_changed_signal_.connect(
         boost::bind( &SpeedlineToolPrivate::handle_slice_changed, this->private_ ) );
   }
+
+
+  if ( this->valid_gradient_state_->get() )
+  {
+    for ( size_t i = 0; i < 6; ++i )
+    {
+      Core::DataVolumeSliceHandle volume_slice = boost::dynamic_pointer_cast
+        < Core::DataVolumeSlice >( ViewerManager::Instance()->get_viewer( i )->get_volume_slice( 
+        this->gradient_state_->get() ) );
+
+      if ( volume_slice->get_slice_number() != this->slice_no_[ i ]  )
+      {
+        is_recompute = true;
+        break;
+      }
+    }
+  }
+  
+
+  if ( is_recompute && this->initialized_ )
+  {
+    this->private_->execute_path( true );
+  }
+
+  this->initialized_ = true;
+  
 }
 
 // DEACTIVATE:
@@ -469,6 +501,19 @@ void SpeedlineTool::deactivate()
   for ( size_t i = 0; i < 6; ++i )
   {
     this->viewer_connection_[ i ].disconnect();
+  }
+
+  if ( this->valid_gradient_state_->get() )
+  {
+    for ( size_t i = 0; i < 6; ++i )
+    {
+      Core::DataVolumeSliceHandle volume_slice = boost::dynamic_pointer_cast
+        < Core::DataVolumeSlice >( ViewerManager::Instance()->get_viewer( i )->get_volume_slice( 
+        this->gradient_state_->get() ) );
+      
+      this->slice_no_[ i ]  = volume_slice->get_slice_number();
+      //this->slice_type_[ i ] = volume_slice->get_slice_type();
+    }
   }
 }
 
