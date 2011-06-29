@@ -803,7 +803,7 @@ void LayerManager::undelete_layers( const std::vector< LayerHandle >& layers,
   layer_set.insert( layers.begin(), layers.end() );
 
   // For each group that was added
-  BOOST_FOREACH( LayerGroupHandle& layer_group, new_groups )
+  BOOST_FOREACH( const LayerGroupHandle& layer_group, new_groups )
   {
     // For the first layer in the group, the layer_inserted_signal_
     // needs to be triggered with the second parameter set to true
@@ -814,7 +814,7 @@ void LayerManager::undelete_layers( const std::vector< LayerHandle >& layers,
 
   // For the rest of the layers, trigger layer_inserted_signal_ with the second
   // parameter set to false
-  BOOST_FOREACH( LayerHandle& layer, layer_set )
+  BOOST_FOREACH( const LayerHandle& layer, layer_set )
   {
     this->layer_inserted_signal_( layer, false );
   }
