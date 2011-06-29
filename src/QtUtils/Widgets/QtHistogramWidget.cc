@@ -63,7 +63,7 @@ public:
 
 
 QtHistogramWidget::QtHistogramWidget( QWidget *parent, QtSliderDoubleCombo* upper_threshold, 
-  QtSliderDoubleCombo* lower_threshold ) :
+  QtSliderDoubleCombo* lower_threshold, bool show_threshold_brackets ) :
   QWidget( parent ),
     private_( new QtHistogramWidgetPrivate )
 {
@@ -71,7 +71,7 @@ QtHistogramWidget::QtHistogramWidget( QWidget *parent, QtSliderDoubleCombo* uppe
   
   this->private_->lower_threshold_ = lower_threshold;
   this->private_->upper_threshold_ = upper_threshold;
-  this->private_->threshold_bars_enabled_ = false;
+  this->private_->threshold_bars_enabled_ = show_threshold_brackets;
 
   this->private_->min_threshold_value_ = 0;
   this->private_->max_threshold_value_ = 0;
@@ -101,24 +101,10 @@ QtHistogramWidget::QtHistogramWidget( QWidget *parent, QtSliderDoubleCombo* uppe
       this, SLOT( set_min( double ) ) );
   }
 
-  if( ( this->private_->upper_threshold_ != 0 ) && ( this->private_->lower_threshold_ != 0 ) ) 
-  {
-    this->private_->threshold_bars_enabled_ = true;
-  }
     
   this->private_->min_bar_ = new QWidget( this );
   this->private_->max_bar_ = new QWidget( this );
-
-  if ( this->private_->threshold_bars_enabled_ )
-  {
-    this->private_->min_bar_->show();
-    this->private_->max_bar_->show();
-  }
-  else 
-  {
-    this->private_->min_bar_->hide();
-    this->private_->max_bar_->hide();
-  }
+  this->set_bar_visibility();
 
   QFont font = this->private_->ui_.min->font();
 #ifdef __APPLE__
@@ -157,6 +143,7 @@ void QtHistogramWidget::set_histogram( const Core::Histogram& histogram )
 
   this->private_->min_bar_ = new QWidget( this );
   this->private_->max_bar_ = new QWidget( this );
+  this->set_bar_visibility();
 
   if( ( !this->private_->upper_threshold_ ) || ( this->private_->upper_threshold_->get_value() > histogram.get_max() ) )
   {
@@ -182,17 +169,6 @@ void QtHistogramWidget::set_histogram( const Core::Histogram& histogram )
   else
   {
     this->set_min( this->private_->lower_threshold_->get_value() );
-  }
-  
-  if ( this->private_->threshold_bars_enabled_ )
-  {
-    this->private_->min_bar_->show();
-    this->private_->max_bar_->show();
-  }
-  else 
-  {
-    this->private_->min_bar_->hide();
-    this->private_->max_bar_->hide();
   }
 }
 
@@ -307,7 +283,9 @@ void QtHistogramWidget::mouseMoveEvent( QMouseEvent* e )
 void QtHistogramWidget::set_thresholds( QtSliderDoubleCombo* upper_threshold, QtSliderDoubleCombo* lower_threshold )
 { 
   this->private_->upper_threshold_ = upper_threshold;
-  this->private_->lower_threshold_ = lower_threshold; 
+  this->private_->lower_threshold_ = lower_threshold;
+  this->private_->threshold_bars_enabled_ = true;
+  this->set_bar_visibility();
   
   connect( this->private_->upper_threshold_, SIGNAL( valueAdjusted( double ) ), 
     this, SLOT( set_max( double ) ) );
@@ -324,11 +302,9 @@ void QtHistogramWidget::resizeEvent( QResizeEvent* event )
   this->set_max( this->private_->max_threshold_value_ );
 }
 
-void QtHistogramWidget::set_bars_enabled( bool enabled )
+void QtHistogramWidget::set_bar_visibility()
 {
-  this->private_->threshold_bars_enabled_ = enabled;
-  
-  if( enabled )
+  if( this->private_->threshold_bars_enabled_ )
   {
     this->private_->min_bar_->show();
     this->private_->max_bar_->show();
@@ -339,7 +315,24 @@ void QtHistogramWidget::set_bars_enabled( bool enabled )
     this->private_->max_bar_->hide();
   }
 }
+  
+void QtHistogramWidget::hide_threshold_bars()
+{
+  if( this->private_->min_bar_ != 0 && this->private_->min_bar_ != 0 )
+  {
+    this->private_->min_bar_->hide();
+    this->private_->max_bar_->hide();
+  }
+}
 
+void QtHistogramWidget::show_threshold_bars()
+{
+  if( this->private_->min_bar_ != 0 && this->private_->min_bar_ != 0 )
+  {
+    this->private_->min_bar_->show();
+    this->private_->max_bar_->show();
+  }
+}
 
 
 

@@ -62,7 +62,7 @@ Q_SIGNALS:
 
 public:
     QtHistogramWidget( QWidget *parent, QtSliderDoubleCombo* upper_threshold = 0, 
-    QtSliderDoubleCombo* lower_threshold = 0 );
+    QtSliderDoubleCombo* lower_threshold = 0, bool show_threshold_brackets = false );
     virtual ~QtHistogramWidget();
     
 public Q_SLOTS:
@@ -75,8 +75,9 @@ public Q_SLOTS:
   
   double get_histogram_min();
   double get_histogram_max();
-
-  void set_bars_enabled( bool enabled );
+  
+  void hide_threshold_bars();
+  void show_threshold_bars();
 
   // RESET_HISTOGRAM:
   // Invalidate the current histogram
@@ -97,6 +98,7 @@ private Q_SLOTS:
   void handle_right_button_click( int );
   void handle_left_button_click( int );
   void set_histogram_view( int );
+  void set_bar_visibility();
 
 private:
   QtHistogramWidgetPrivateHandle private_;

@@ -29,11 +29,11 @@
 #ifndef CORE_STATE_ACTIONS_ACTIONTRANSLATEVIEW_H
 #define CORE_STATE_ACTIONS_ACTIONTRANSLATEVIEW_H
 
+// Core Includes
 #include <Core/Action/Action.h>
 #include <Core/Action/ActionDispatcher.h>
 #include <Core/Interface/Interface.h>
 #include <Core/State/StateViewBase.h>
-
 #include <Core/Geometry/Vector.h>
 
 namespace Core

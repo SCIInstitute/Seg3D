@@ -77,9 +77,6 @@ bool ThresholdToolInterface::build_widget( QFrame* frame )
   this->private_->ui_.setupUi( frame );
   this->private_->ui_.horizontalLayout_2->setAlignment( Qt::AlignHCenter );
   this->private_->ui_.verticalLayout_5->setAlignment( Qt::AlignTop );
-  this->private_->ui_.histogram_->set_thresholds( this->private_->ui_.upper_threshold_, 
-    this->private_->ui_.lower_threshold_ );
-  this->private_->ui_.histogram_->set_bars_enabled( true );
 
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
@@ -125,6 +122,10 @@ bool ThresholdToolInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Enable( this->private_->ui_.lower_threshold_,
     tool->target_layer_state_, condition );
   
+  // Finally we set the thresholds to the histogram
+  this->private_->ui_.histogram_->set_thresholds( this->private_->ui_.upper_threshold_, 
+    this->private_->ui_.lower_threshold_ );
+  
   //Send a message to the log that we have finished with building the Threshold Tool Interface
   CORE_LOG_DEBUG( "Finished building a Threshold Tool Interface" );
 
@@ -136,12 +137,9 @@ void ThresholdToolInterface::refresh_histogram( QString layer_name )
   if( layer_name == "" || 
     layer_name == Tool::NONE_OPTION_C.c_str() )
   {
-    this->private_->ui_.histogram_->set_bars_enabled( false );
+    this->private_->ui_.histogram_->hide_threshold_bars();
     return;
   }
-
-  this->private_->ui_.histogram_->set_bars_enabled( true );
-
 
   DataLayerHandle data_layer = boost::dynamic_pointer_cast< DataLayer >(
     LayerManager::Instance()->get_layer_by_name( layer_name.toStdString() ) );
@@ -151,7 +149,9 @@ void ThresholdToolInterface::refresh_histogram( QString layer_name )
   }
   
   this->private_->ui_.histogram_->set_histogram( data_layer->get_data_volume()->
-    get_data_block()->get_histogram() );  
+    get_data_block()->get_histogram() );
+  
+  this->private_->ui_.histogram_->show_threshold_bars();
 }
 
 } // end namespace Seg3D
