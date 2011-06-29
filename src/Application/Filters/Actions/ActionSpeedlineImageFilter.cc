@@ -93,7 +93,7 @@ public:
       TYPED_IMAGE_TYPE,
       FLOAT_IMAGE_TYPE > CastFilterType;
 
-    CastFilterType::Pointer caster = CastFilterType::New();
+    typename CastFilterType::Pointer caster = CastFilterType::New();
     caster->SetInput( input_image->get_image() );
 
     float progress_amount;
