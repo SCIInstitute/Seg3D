@@ -501,7 +501,7 @@ QPushButton:pressed{
             <item>
              <widget class="QCheckBox" name="aspect_checkbox_">
               <property name="text">
-               <string>Constraint aspect</string>
+               <string>Constrain aspect</string>
               </property>
              </widget>
             </item>
