@@ -31,190 +31,156 @@
 # Set sources
 ##################################################
 
-# Split into multiple projects to improve parallelization of compilation in Visual Studio.
-# Visual Studio doesn't parallelize compilation within projects, but it does parallelize
-# across projects.
-  
-SET(NUM_PROJECTS 8)
-
-# PROJECT 1
-SET(INTERFACE_APPLICATION_SRCS_1
+SET(INTERFACE_APPLICATION_SRCS
   ApplicationInterface.cc
   ColorPickerWidget.cc
   ControllerInterface.cc
   ControllerContext.cc
   ControllerActionHistory.cc
-  ToolWidget.cc
-)
-SET(INTERFACE_APPLICATION_MOC_SRCS_1
-  ApplicationInterface.h
-  ColorPickerWidget.h
-  ControllerInterface.h
-  ControllerActionHistory.h
-  ToolWidget.h
-) 
-SET(INTERFACE_APPLICATION_NO_MOC_SRCS_1
-  ControllerContext.h
-  LayerIOFunctions.h
-  LayerIOFunctions.cc
-  StyleSheet.h
-  StyleSheet.cc
-)
-SET(INTERFACE_APPLICATION_UI_SRCS_1
-  ColorPickerWidget.ui
-  ControllerInterface.ui
-)
-
-# PROJECT 2
-SET(INTERFACE_APPLICATION_SRCS_2
   ControllerStateEngine.cc
   ControllerLogHistory.cc
   ControllerUndoBuffer.cc
   ControllerRedoBuffer.cc
   DropSpaceWidget.cc
-)
-SET(INTERFACE_APPLICATION_MOC_SRCS_2
-  ControllerStateEngine.h
-  ControllerLogHistory.h
-  ControllerUndoBuffer.h
-  ControllerRedoBuffer.h
-  DropSpaceWidget.h
-)  
-
-# PROJECT 3
-SET(INTERFACE_APPLICATION_SRCS_3
   GroupButtonMenu.cc
   HistoryDockWidget.cc
   LayerImporterWidget.cc
   LayerGroupWidget.cc
   LayerManagerDockWidget.cc
-)
-SET(INTERFACE_APPLICATION_MOC_SRCS_3
-  GroupButtonMenu.h
-  HistoryDockWidget.h
-  LayerImporterWidget.h
-  LayerGroupWidget.h
-  LayerManagerDockWidget.h
-)
-SET(INTERFACE_APPLICATION_UI_SRCS_3
-  GroupButtonMenu.ui
-  HistoryDockWidget.ui
-  LayerImporterWidget.ui
-  LayerGroupWidget.ui
-  LayerManagerDockWidget.ui
-)
-
-# PROJECT 4
-SET(INTERFACE_APPLICATION_SRCS_4
   LayerManagerWidget.cc
   LayerResamplerDialog.cc
   LayerWidget.cc
   Menu.cc
   MessageWindow.cc
-)
-SET(INTERFACE_APPLICATION_MOC_SRCS_4
-  LayerManagerWidget.h
-  LayerResamplerDialog.h
-  LayerWidget.h
-  Menu.h
-  MessageWindow.h
-)
-SET(INTERFACE_APPLICATION_UI_SRCS_4
-  LayerResamplerDialog.ui
-  LayerWidget.ui
-  MessageWindow.ui
-)
-
-# PROJECT 5
-SET(INTERFACE_APPLICATION_SRCS_5
   OverlayWidget.cc
   ProgressWidget.cc
   PreferencesInterface.cc
   ProjectDockWidget.cc
   ProjectExportWizard.cc
-)
-SET(INTERFACE_APPLICATION_MOC_SRCS_5
-  OverlayWidget.h
-  PreferencesInterface.h
-  ProgressWidget.h
-  ProjectDockWidget.h
-  ProjectExportWizard.h
-)
-SET(INTERFACE_APPLICATION_UI_SRCS_5
-  PreferencesInterface.ui
-  ProjectDockWidget.ui
-  ProgressWidget.ui
-)
-
-# PROJECT 6
-SET(INTERFACE_APPLICATION_SRCS_6
   ProjectWizard.cc
   ProvenanceDockWidget.cc
   PushDragButton.cc
   QtLayerListWidget.cc
   SaveProjectAsWizard.cc
-)
-SET(INTERFACE_APPLICATION_MOC_SRCS_6
-  ProjectWizard.h
-  ProvenanceDockWidget.h
-  PushDragButton.h
-  QtLayerListWidget.h
-  SaveProjectAsWizard.h
-)
-SET(INTERFACE_APPLICATION_UI_SRCS_6
-  ProvenanceDockWidget.ui
-  QtLayerListWidget.ui
-)
-
-# PROJECT 7
-SET(INTERFACE_APPLICATION_SRCS_7
   SegmentationExportWizard.cc
   ShortcutsInterface.cc
   SplashScreen.cc
   StatusBarWidget.cc
   ToolBoxWidget.cc
   ToolsDockWidget.cc
-)
-SET(INTERFACE_APPLICATION_MOC_SRCS_7
-  SegmentationExportWizard.h 
-  ShortcutsInterface.h
-  SplashScreen.h
-  StatusBarWidget.h
-  ToolBoxWidget.h
-  ToolsDockWidget.h
-)
-SET(INTERFACE_APPLICATION_UI_SRCS_7
-  ShortcutsInterface.ui
-  SplashScreen.ui
-  StatusBarWidget.ui
-  ToolBoxPageWidget.ui
-)
-  
-# PROJECT 8
-SET(INTERFACE_APPLICATION_SRCS_8
+  ToolWidget.cc
   ViewAction.cc
   ViewerInterface.cc
   ViewerWidget.cc
   RenderingDockWidget.cc
   TransferFunctionFeatureWidget.cc
 )
-SET(INTERFACE_APPLICATION_MOC_SRCS_8
+
+SET(INTERFACE_APPLICATION_MOC_SRCS
+  ApplicationInterface.h
+  ColorPickerWidget.h
+  ControllerInterface.h
+  ControllerActionHistory.h
+  ControllerStateEngine.h
+  ControllerLogHistory.h
+  ControllerUndoBuffer.h
+  ControllerRedoBuffer.h
+  DropSpaceWidget.h
+  GroupButtonMenu.h
+  HistoryDockWidget.h
+  LayerImporterWidget.h
+  LayerGroupWidget.h
+  LayerManagerDockWidget.h
+  LayerManagerWidget.h
+  LayerResamplerDialog.h
+  LayerWidget.h
+  Menu.h
+  MessageWindow.h
+  OverlayWidget.h
+  PreferencesInterface.h
+  ProgressWidget.h
+  ProjectDockWidget.h
+  ProjectExportWizard.h
+  ProjectWizard.h
+  ProvenanceDockWidget.h
+  PushDragButton.h
+  QtLayerListWidget.h
+  SaveProjectAsWizard.h
+  SegmentationExportWizard.h 
+  ShortcutsInterface.h
+  SplashScreen.h
+  StatusBarWidget.h
+  ToolBoxWidget.h
+  ToolsDockWidget.h
+  ToolWidget.h
   ViewAction.h
   ViewerInterface.h
   ViewerWidget.h
   RenderingDockWidget.h
   TransferFunctionFeatureWidget.h
 )
-SET(INTERFACE_APPLICATION_UI_SRCS_8
+
+IF(BUILD_WITH_PYTHON)
+  SET(INTERFACE_APPLICATION_SRCS ${INTERFACE_APPLICATION_SRCS} PythonConsoleWidget.cc)
+  SET(INTERFACE_APPLICATION_MOC_SRCS ${INTERFACE_APPLICATION_MOC_SRCS} PythonConsoleWidget.h)
+ENDIF(BUILD_WITH_PYTHON)
+
+SET(INTERFACE_APPLICATION_NO_MOC_SRCS
+  ControllerContext.h
+  LayerIOFunctions.h
+  LayerIOFunctions.cc
+  StyleSheet.h
+  StyleSheet.cc
+)
+
+SET(INTERFACE_APPLICATION_UI_SRCS
+  ColorPickerWidget.ui
+  ControllerInterface.ui
+  GroupButtonMenu.ui
+  HistoryDockWidget.ui
+  LayerGroupWidget.ui
+  LayerImporterWidget.ui
+  LayerManagerDockWidget.ui
+  LayerResamplerDialog.ui
+  LayerWidget.ui
+  MessageWindow.ui
+  PreferencesInterface.ui
+  ProjectDockWidget.ui
+  ProgressWidget.ui
+  ProvenanceDockWidget.ui
+  QtLayerListWidget.ui
+  StatusBarWidget.ui
+  ShortcutsInterface.ui
+  SplashScreen.ui
+  ToolBoxPageWidget.ui
   ViewerInterface.ui
   ViewerWidget.ui
   RenderingDockWidget.ui
   TransferFunctionFeatureWidget.ui
 )
-IF(BUILD_WITH_PYTHON)
-  SET(INTERFACE_APPLICATION_SRCS_8 ${INTERFACE_APPLICATION_SRCS_8} PythonConsoleWidget.cc)
-  SET(INTERFACE_APPLICATION_MOC_SRCS_8 ${INTERFACE_APPLICATION_MOC_SRCS_8} PythonConsoleWidget.h)
-ENDIF(BUILD_WITH_PYTHON)
+
+SET(INTERFACE_APPLICATION_RCC_SRCS
+)
+
+
+##################################################
+# Resource files
+##################################################
+
+QT4_ADD_RESOURCES(INTERFACE_APPLICATION_QT_RCC_SRCS ${INTERFACE_APPLICATION_RCC_SRCS})
+
+##################################################
+# Generate header out of UI code
+##################################################
+
+QT4_WRAP_UI(INTERFACE_APPLICATION_QT_UI_SRCS ${INTERFACE_APPLICATION_UI_SRCS})
+
+
+##################################################
+# Wrap QT code to expand all the moc code
+##################################################
+
+QT4_WRAP_CPP(INTERFACE_APPLICATION_QT_MOC_SRCS ${INTERFACE_APPLICATION_MOC_SRCS})
 
 ##################################################
 # Ensure that we can find the files generated
@@ -222,164 +188,60 @@ ENDIF(BUILD_WITH_PYTHON)
 ##################################################
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
-  
+
 ##################################################
-# Set link libraries
+# Build the Components library
 ##################################################
 
+CORE_ADD_LIBRARY(Interface_Application 
+            ${INTERFACE_APPLICATION_SRCS} 
+            ${INTERFACE_APPLICATION_QT_UI_SRCS}
+            ${INTERFACE_APPLICATION_QT_MOC_SRCS}
+            ${INTERFACE_APPLICATION_NO_MOC_SRCS} 
+            ${INTERFACE_APPLICATION_MOC_SRCS}
+            ${INTERFACE_APPLICATION_QT_RCC_SRCS})
+
 IF(APPLE)
-SET(INTERFACE_APPLICATION_LINK_LIBS 
-  Core_Utils
-  Core_EventHandler
-  Core_Action
-  Core_Interface
-  Core_State
-  Application_Project
-  Application_ProjectManager
-  Application_Renderer
-  Application_Tool
-  Application_ToolManager
-  ${Application_Tools}
-  Application_LayerIO
-  QtUtils_Utils
-  QtUtils_Widgets
-  QtUtils_Bridge
-  ${QT_LIBRARIES} 
-  ${SCI_BOOST_LIBRARY}
-  /System/Library/Frameworks/CoreServices.framework
-)
+TARGET_LINK_LIBRARIES(Interface_Application
+                      Core_Utils
+                      Core_EventHandler
+                      Core_Action
+                      Core_Interface
+                      Core_State
+            Application_Project
+            Application_ProjectManager
+                  Application_Renderer
+                      Application_Tool
+                      Application_ToolManager
+                      Application_Tools
+                      Application_LayerIO
+                      QtUtils_Utils
+                      QtUtils_Widgets
+            QtUtils_Bridge
+                      ${QT_LIBRARIES} 
+                      ${SCI_BOOST_LIBRARY}
+            /System/Library/Frameworks/CoreServices.framework)
 ELSE(APPLE)
-SET(INTERFACE_APPLICATION_LINK_LIBS 
-  Core_Utils
-  Core_EventHandler
-  Core_Action
-  Core_Interface
-  Core_State
-  Application_Project
-  Application_ProjectManager
-  Application_Renderer
-  Application_Tool
-  Application_ToolManager
-  ${Application_Tools}
-  Application_LayerIO
-  QtUtils_Utils
-  QtUtils_Widgets
-  QtUtils_Bridge
-  ${QT_LIBRARIES} 
-  ${SCI_BOOST_LIBRARY}
-)
+TARGET_LINK_LIBRARIES(Interface_Application
+                      Core_Utils
+                      Core_EventHandler
+                      Core_Action
+                      Core_Interface
+                      Core_State
+            Application_Project
+            Application_ProjectManager
+                  Application_Renderer
+                      Application_Tool
+                      Application_ToolManager
+                      Application_Tools
+                      Application_LayerIO
+                      QtUtils_Utils
+                      QtUtils_Widgets
+            QtUtils_Bridge
+                      ${QT_LIBRARIES} 
+                      ${SCI_BOOST_LIBRARY})
 ENDIF(APPLE)
 
 IF(BUILD_WITH_PYTHON)
-  SET(INTERFACE_APPLICATION_LINK_LIBS $INTERFACE_APPLICATION_LINK_LIBS Core_Python)
+  TARGET_LINK_LIBRARIES(Interface_Application Core_Python)
 ENDIF(BUILD_WITH_PYTHON)
-
-##################################################
-# Create project(s)
-##################################################
-            
-IF (SEG3D_SPLIT_PROJECTS)
-
-  # Split large projects into smaller projects to speed up compilation with Visual Studio.
-  # Visual Studio doesn't parallelize compilation within projects, but it does parallelize
-  # across projects.  
-  
-  # Clear cached value
-  SET(Interface_Application "" CACHE INTERNAL "Interface_Application libraries")
-    
-  FOREACH (PROJ_IDX RANGE 1 ${NUM_PROJECTS})
-  
-    ##################################################
-    # Generate header out of UI code
-    ##################################################
-  
-    SET(INTERFACE_APPLICATION_UI_SRCS "INTERFACE_APPLICATION_UI_SRCS_${PROJ_IDX}")
-    # Clear variable of values from last iteration
-    SET(INTERFACE_APPLICATION_QT_UI_SRCS "")
-    QT4_WRAP_UI(INTERFACE_APPLICATION_QT_UI_SRCS ${${INTERFACE_APPLICATION_UI_SRCS}})
-    
-    ##################################################
-    # Wrap QT code to expand all the moc code
-    ##################################################
-
-    SET(INTERFACE_APPLICATION_MOC_SRCS "INTERFACE_APPLICATION_MOC_SRCS_${PROJ_IDX}")
-    # Clear variable of values from last iteration
-    SET(INTERFACE_APPLICATION_QT_MOC_SRCS "")
-    QT4_WRAP_CPP(INTERFACE_APPLICATION_QT_MOC_SRCS ${${INTERFACE_APPLICATION_MOC_SRCS}})
-    
-    ##################################################
-    # Build the Components library
-    ##################################################
-    
-    SET(INTERFACE_APPLICATION_SRCS "INTERFACE_APPLICATION_SRCS_${PROJ_IDX}")
-    SET(INTERFACE_APPLICATION_NO_MOC_SRCS "INTERFACE_APPLICATION_NO_MOC_SRCS_${PROJ_IDX}") 
-    SET(INTERFACE_APPLICATION_MOC_SRCS "INTERFACE_APPLICATION_MOC_SRCS_${PROJ_IDX}")                
-    SET(INTERFACE_APPLICATION_LIB "Interface_Application_${PROJ_IDX}")  
-    CORE_ADD_LIBRARY(${INTERFACE_APPLICATION_LIB} 
-      ${${INTERFACE_APPLICATION_SRCS}} 
-      ${INTERFACE_APPLICATION_QT_UI_SRCS}
-      ${INTERFACE_APPLICATION_QT_MOC_SRCS}
-      ${${INTERFACE_APPLICATION_NO_MOC_SRCS}} 
-      ${${INTERFACE_APPLICATION_MOC_SRCS}})     
-                        
-    TARGET_LINK_LIBRARIES(${INTERFACE_APPLICATION_LIB}
-      ${INTERFACE_APPLICATION_LINK_LIBS})
-      
-    # Create single CMake variable that other libraries can depend on
-    # Tack library onto end of list 
-    # Note: Use INTERNAL so that the variable is put in the cache (global scope), but not
-    # exposed to the user in the CMake interface.   
-    SET(Interface_Application ${Interface_Application} ${INTERFACE_APPLICATION_LIB} CACHE INTERNAL "Interface_Application libraries")
-    
-  ENDFOREACH (PROJ_IDX)
-  
-ELSE (SEG3D_SPLIT_PROJECTS)
-
-  # Consolidate sources back into single project
-  FOREACH (PROJ_IDX RANGE 1 ${NUM_PROJECTS})
-  
-    SET(INTERFACE_APPLICATION_PROJ_SRCS "INTERFACE_APPLICATION_SRCS_${PROJ_IDX}") 
-    SET(INTERFACE_APPLICATION_SRCS "${INTERFACE_APPLICATION_SRCS};${${INTERFACE_APPLICATION_PROJ_SRCS}}")
-      
-    SET(INTERFACE_APPLICATION_MOC_PROJ_SRCS "INTERFACE_APPLICATION_MOC_SRCS_${PROJ_IDX}")   
-    SET(INTERFACE_APPLICATION_MOC_SRCS "${INTERFACE_APPLICATION_MOC_SRCS};${${INTERFACE_APPLICATION_MOC_PROJ_SRCS}}")   
-    
-    SET(INTERFACE_APPLICATION_NO_MOC_PROJ_SRCS "INTERFACE_APPLICATION_NO_MOC_SRCS_${PROJ_IDX}")
-    SET(INTERFACE_APPLICATION_NO_MOC_SRCS "${INTERFACE_APPLICATION_NO_MOC_SRCS};${${INTERFACE_APPLICATION_NO_MOC_PROJ_SRCS}}")  
-    
-    SET(INTERFACE_APPLICATION_UI_PROJ_SRCS "INTERFACE_APPLICATION_UI_SRCS_${PROJ_IDX}") 
-    SET(INTERFACE_APPLICATION_UI_SRCS "${INTERFACE_APPLICATION_UI_SRCS};${${INTERFACE_APPLICATION_UI_PROJ_SRCS}}") 
-    
-  ENDFOREACH (PROJ_IDX)
-  
-  ##################################################
-  # Generate header out of UI code
-  ##################################################
-
-  QT4_WRAP_UI(INTERFACE_APPLICATION_QT_UI_SRCS ${INTERFACE_APPLICATION_UI_SRCS})
-
-  ##################################################
-  # Wrap QT code to expand all the moc code
-  ##################################################
-
-  QT4_WRAP_CPP(INTERFACE_APPLICATION_QT_MOC_SRCS ${INTERFACE_APPLICATION_MOC_SRCS})
-
-  ##################################################
-  # Build the Components library
-  ##################################################
-
-  # Note: Use INTERNAL so that the variable is put in the cache (global scope), but not
-  # exposed to the user in the CMake interface. 
-  SET(Interface_Application "Interface_Application" CACHE INTERNAL "Interface_Application library")
-  CORE_ADD_LIBRARY(${Interface_Application} 
-        ${INTERFACE_APPLICATION_SRCS} 
-        ${INTERFACE_APPLICATION_QT_UI_SRCS}
-        ${INTERFACE_APPLICATION_QT_MOC_SRCS}
-        ${INTERFACE_APPLICATION_NO_MOC_SRCS} 
-        ${INTERFACE_APPLICATION_MOC_SRCS})
-
-  TARGET_LINK_LIBRARIES(${Interface_Application}
-    ${INTERFACE_APPLICATION_LINK_LIBS})
-
-ENDIF (SEG3D_SPLIT_PROJECTS)  
-

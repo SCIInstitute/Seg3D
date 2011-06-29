@@ -76,13 +76,13 @@ TARGET_LINK_LIBRARIES(${APPLICATION_NAME}
   Core_Interface
   Core_Action
   Core_Log
-  ${Application_Tools}
-  ${Application_Filters}
+  Application_Tools
+  Application_Filters
   QtUtils_Utils
   QtUtils_Widgets
   QtUtils_Bridge
-  ${Interface_Application}
-  ${Interface_ToolInterface}
+  Interface_Application
+  Interface_ToolInterface
   ${RESOURCES_LIBRARY}
 )
 

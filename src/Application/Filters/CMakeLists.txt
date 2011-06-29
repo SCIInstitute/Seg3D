@@ -31,34 +31,20 @@
 # Set sources
 ##################################################
 
-# Split into multiple projects to improve parallelization of compilation in Visual Studio.
-# Visual Studio doesn't parallelize compilation within projects, but it does parallelize
-# across projects.
-
-SET(NUM_PROJECTS 8)
-
-SET(APPLICATION_FILTERS_SRCS_1
+SET(APPLICATION_FILTERS_SRCS
   LayerFilter.h
   LayerFilter.cc
-)
-SET(APPLICATION_FILTERS_SRCS_2
   LayerFilterLock.h
   LayerFilterLock.cc
-)
-SET(APPLICATION_FILTERS_SRCS_3
   ITKFilter.h
   ITKFilter.cc
-)
-SET(APPLICATION_FILTERS_SRCS_4
   NrrdFilter.h
   NrrdFilter.cc
-)
-SET(APPLICATION_FILTERS_SRCS_5
   LayerResampler.h
   LayerResampler.cc
 )
 
-SET(APPLICATION_FILTERS_ACTIONS_SRCS_1
+SET(APPLICATION_FILTERS_ACTIONS_SRCS
   Actions/ActionResample.h
   Actions/ActionResample.cc
   Actions/ActionCannyEdgeDetectionFilter.h
@@ -69,8 +55,6 @@ SET(APPLICATION_FILTERS_ACTIONS_SRCS_1
   Actions/ActionConnectedComponentFilter.cc
   Actions/ActionConnectedComponentSizeFilter.h
   Actions/ActionConnectedComponentSizeFilter.cc
-)
-SET(APPLICATION_FILTERS_ACTIONS_SRCS_2
   Actions/ActionCurvatureAnisotropicDiffusionFilter.h
   Actions/ActionCurvatureAnisotropicDiffusionFilter.cc
   Actions/ActionDilateFilter.h
@@ -81,8 +65,6 @@ SET(APPLICATION_FILTERS_ACTIONS_SRCS_2
   Actions/ActionSmoothDilateFilter.cc
   Actions/ActionDilateErodeFilter.h
   Actions/ActionDilateErodeFilter.cc
-)
-SET(APPLICATION_FILTERS_ACTIONS_SRCS_3
   Actions/ActionIterativeDilateErodeFilter.h
   Actions/ActionIterativeDilateErodeFilter.cc
   Actions/ActionSmoothDilateErodeFilter.h
@@ -93,8 +75,6 @@ SET(APPLICATION_FILTERS_ACTIONS_SRCS_3
   Actions/ActionDistanceFilter.cc
   Actions/ActionErodeFilter.h
   Actions/ActionErodeFilter.cc
-)
-SET(APPLICATION_FILTERS_ACTIONS_SRCS_4
   Actions/ActionIterativeErodeFilter.h
   Actions/ActionIterativeErodeFilter.cc
   Actions/ActionSmoothErodeFilter.h
@@ -105,8 +85,6 @@ SET(APPLICATION_FILTERS_ACTIONS_SRCS_4
   Actions/ActionGradientMagnitudeFilter.cc
   Actions/ActionFillHolesFilter.h
   Actions/ActionFillHolesFilter.cc
-)
-SET(APPLICATION_FILTERS_ACTIONS_SRCS_5
   Actions/ActionHistogramEqualizationFilter.h
   Actions/ActionHistogramEqualizationFilter.cc
   Actions/ActionIntensityCorrectionFilter.h
@@ -117,8 +95,6 @@ SET(APPLICATION_FILTERS_ACTIONS_SRCS_5
   Actions/ActionMedianFilter.cc
   Actions/ActionMeanFilter.h
   Actions/ActionMeanFilter.cc
-)
-SET(APPLICATION_FILTERS_ACTIONS_SRCS_6
   Actions/ActionNeighborhoodConnectedFilter.h
   Actions/ActionNeighborhoodConnectedFilter.cc
   Actions/ActionOtsuThresholdFilter.h
@@ -129,8 +105,6 @@ SET(APPLICATION_FILTERS_ACTIONS_SRCS_6
   Actions/ActionRemoveFilter.cc
   Actions/ActionOrFilter.h
   Actions/ActionOrFilter.cc
-)
-SET(APPLICATION_FILTERS_ACTIONS_SRCS_7
   Actions/ActionXorFilter.h
   Actions/ActionXorFilter.cc
   Actions/ActionThresholdSegmentationLSFilter.h
@@ -141,8 +115,6 @@ SET(APPLICATION_FILTERS_ACTIONS_SRCS_7
   Actions/ActionInvert.cc
   Actions/ActionCrop.h
   Actions/ActionCrop.cc
-)
-SET(APPLICATION_FILTERS_ACTIONS_SRCS_8
   Actions/ActionArithmeticFilter.h
   Actions/ActionArithmeticFilter.cc
   Actions/ActionPermute.h
@@ -153,97 +125,27 @@ SET(APPLICATION_FILTERS_ACTIONS_SRCS_8
   Actions/ActionPointSetRegisterFilter.cc
   Actions/ActionPointSetTransformFilter.h
   Actions/ActionPointSetTransformFilter.cc
-  Actions/ActionSpeedlineImageFilter.h
-  Actions/ActionSpeedlineImageFilter.cc
   )
 
-##################################################
-# Set link libraries
-##################################################
-
-SET(APPLICATION_FILTERS_LINK_LIBS
-  Core_Utils
-  Core_Action
-  Core_State
-  Core_Parser
-  Application_Layer
-  Application_Project
-  Application_ProjectManager
-  ${SCI_BOOST_LIBRARY}
-)
-
-##################################################
-# Create project(s)
-##################################################
+IF(BUILD_WITH_PYTHON)
+  GENERATE_ACTION_PYTHON_WRAPPER(${APPLICATION_FILTERS_ACTIONS_SRCS})
+  SET(APPLICATION_FILTERS_SRCS ${APPLICATION_FILTERS_SRCS} ${CMAKE_CURRENT_BINARY_DIR}/ActionPythonWrapper.cc)
+ENDIF(BUILD_WITH_PYTHON)
   
-IF (SEG3D_SPLIT_PROJECTS)
-  
-  # Split large projects into smaller projects to speed up compilation with Visual Studio.
-  # Visual Studio doesn't parallelize compilation within projects, but it does parallelize
-  # across projects.  
+CORE_ADD_LIBRARY(Application_Filters ${APPLICATION_FILTERS_SRCS}
+            ${APPLICATION_FILTERS_ACTIONS_SRCS} )
+            
+TARGET_LINK_LIBRARIES(Application_Filters
+                      Core_Utils
+                      Core_Action
+                      Core_State
+                      Core_Parser
+                      Application_Layer
+                      Application_Project
+                      Application_ProjectManager
+                      ${SCI_BOOST_LIBRARY})
 
-  # Clear cached value
-  SET(Application_Filters "" CACHE INTERNAL "Application_Filters libraries")
-  
-  FOREACH (PROJ_IDX RANGE 1 ${NUM_PROJECTS})
-  
-    SET(APPLICATION_FILTERS_ACTIONS_SRCS "APPLICATION_FILTERS_ACTIONS_SRCS_${PROJ_IDX}")
-    SET(APPLICATION_FILTERS_SRCS "APPLICATION_FILTERS_SRCS_${PROJ_IDX}")
-    
-    SET(APPLICATION_FILTERS_LIB "Application_Filters_${PROJ_IDX}")  
-    
-    IF(BUILD_WITH_PYTHON)
-      GENERATE_ACTION_PYTHON_WRAPPER(PYTHON_WRAPPER ${APPLICATION_FILTERS_LIB} ${${APPLICATION_FILTERS_ACTIONS_SRCS}})
-      SET(${APPLICATION_FILTERS_SRCS} ${${APPLICATION_FILTERS_SRCS}} ${PYTHON_WRAPPER})
-    ENDIF(BUILD_WITH_PYTHON)
-    
-    CORE_ADD_LIBRARY(${APPLICATION_FILTERS_LIB} ${${APPLICATION_FILTERS_SRCS}}
-          ${${APPLICATION_FILTERS_ACTIONS_SRCS}})
-                
-    TARGET_LINK_LIBRARIES(${APPLICATION_FILTERS_LIB}
-      ${APPLICATION_FILTERS_LINK_LIBS})
-
-    # Register action classes
-    REGISTER_LIBRARY_AND_CLASSES(${APPLICATION_FILTERS_LIB}
-      ${${APPLICATION_FILTERS_ACTIONS_SRCS}})
-      
-    # Create single CMake variable that other libraries can depend on
-    # Tack library onto end of list     
-    # Note: Use INTERNAL so that the variable is put in the cache (global scope), but not
-    # exposed to the user in the CMake interface.   
-    SET(Application_Filters ${Application_Filters} ${APPLICATION_FILTERS_LIB} CACHE INTERNAL "Application_Filters libraries")
-                 
-  ENDFOREACH (PROJ_IDX)
-
-ELSE (SEG3D_SPLIT_PROJECTS)
-
-  # Consolidate sources back into single project
-  FOREACH (PROJ_IDX RANGE 1 ${NUM_PROJECTS})
-  
-    SET(APPLICATION_FILTERS_ACTIONS_PROJ_SRCS "APPLICATION_FILTERS_ACTIONS_SRCS_${PROJ_IDX}") 
-    SET(APPLICATION_FILTERS_ACTIONS_SRCS "${APPLICATION_FILTERS_ACTIONS_SRCS};${${APPLICATION_FILTERS_ACTIONS_PROJ_SRCS}}")
-      
-    SET(APPLICATION_FILTERS_PROJ_SRCS "APPLICATION_FILTERS_SRCS_${PROJ_IDX}")   
-    SET(APPLICATION_FILTERS_SRCS "${APPLICATION_FILTERS_SRCS};${${APPLICATION_FILTERS_PROJ_SRCS}}")   
-    
-  ENDFOREACH (PROJ_IDX)
-  
-  IF(BUILD_WITH_PYTHON)
-    GENERATE_ACTION_PYTHON_WRAPPER(PYTHON_WRAPPER Application_Filters ${APPLICATION_FILTERS_ACTIONS_SRCS})
-    SET(APPLICATION_FILTERS_SRCS ${APPLICATION_FILTERS_SRCS} ${PYTHON_WRAPPER})
-  ENDIF(BUILD_WITH_PYTHON)
-  
-  # Note: Use INTERNAL so that the variable is put in the cache (global scope), but not
-  # exposed to the user in the CMake interface. 
-  SET(Application_Filters "Application_Filters" CACHE INTERNAL "Application_Filters library")      
-  CORE_ADD_LIBRARY(${Application_Filters} ${APPLICATION_FILTERS_SRCS}
-    ${APPLICATION_FILTERS_ACTIONS_SRCS} )
-              
-  TARGET_LINK_LIBRARIES(${Application_Filters}
-    ${APPLICATION_FILTERS_LINK_LIBS})
-
-  # Register action classes
-  REGISTER_LIBRARY_AND_CLASSES(${Application_Filters}
-    ${APPLICATION_FILTERS_ACTIONS_SRCS})
-                 
-ENDIF (SEG3D_SPLIT_PROJECTS)
+# Register action classes
+REGISTER_LIBRARY_AND_CLASSES(Application_Filters
+               ${APPLICATION_FILTERS_ACTIONS_SRCS})
+                    
