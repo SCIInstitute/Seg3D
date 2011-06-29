@@ -338,10 +338,13 @@ LayerGroupWidget* LayerManagerWidgetPrivate::make_new_group( LayerGroupHandle gr
 
 void LayerManagerWidgetPrivate::reset()
 {
-  QLayoutItem* group_item;
-  while ( ( group_item = this->group_layout_->takeAt( 0 ) ) != 0 )
+  GroupWidgetMap::iterator it = this->group_map_.begin();
+  while ( it != this->group_map_.end() )
   {
-    delete group_item;
+    LayerGroupWidget* widget = it->second;
+    this->group_layout_->removeWidget( widget );
+    widget->deleteLater();
+    ++it;
   }
   this->group_map_.clear();
 }
