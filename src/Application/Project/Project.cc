@@ -1446,6 +1446,10 @@ void Project::initialize()
 
   // Should the project be anonymized (patient data removed) when saved? 
   this->add_state( "save_as_anonymized", this->save_as_anonymized_state_, false );
+  // This state is not session data and changes to this state don't change the project
+  this->save_as_anonymized_state_->set_is_project_data( false );
+  // Do not save or load this state
+  this->save_as_anonymized_state_->set_session_priority( Core::StateBase::DO_NOT_LOAD_E );
 
   // State of all the 12 colors in the system.
   // Initialize them with the colors from the preference manager

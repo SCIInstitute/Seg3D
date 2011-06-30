@@ -88,14 +88,12 @@ void SaveProjectAsWizard::accept()
     }
   }
   
-  // Switch on anonymize if needed
+  // Set anonymize variable
   ProjectHandle current_project = ProjectManager::Instance()->get_current_project();
-  if( field( "anonymize" ).toBool() )
-  {
-    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
-      current_project->save_as_anonymized_state_, true );
-  }
-
+  bool anonymize = field( "anonymize" ).toBool();
+  Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
+    current_project->save_as_anonymized_state_, anonymize );
+  
   ActionSaveProjectAs::Dispatch( Core::Interface::GetWidgetActionContext(), 
     field( "projectPath" ).toString().toStdString(),
     field( "projectName" ).toString().toStdString() );
