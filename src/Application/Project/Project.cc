@@ -1444,6 +1444,9 @@ void Project::initialize()
   // State variable for backwards compatibility, not used anymore
   this->add_state( "sessions", this->sessions_state_ );
 
+  // Should the project be anonymized (patient data removed) when saved? 
+  this->add_state( "save_as_anonymized", this->save_as_anonymized_state_, false );
+
   // State of all the 12 colors in the system.
   // Initialize them with the colors from the preference manager
   this->color_states_.resize( 12 );
@@ -1730,10 +1733,41 @@ bool Project::save_project( const boost::filesystem::path& project_path,
     else
     {
       // OK copy the full project to the new directory
+      // Some users have requested that all files/folders be copied, even ones they put in the 
+      // project folder.  This is why we need to do a recursive copy instead of explicity
+      // copying certain files and folders.
       if ( !Core::RecursiveCopyDirectory( current_project_path, project_path ) )
       {
         CORE_LOG_ERROR( "Couldn't copy the project directory to the new location." );
         return false;
+      }
+
+      // Remove patient-specific data if project should be anonymized
+      if( this->save_as_anonymized_state_->get() )
+      {
+        // Remove inputfiles directory from new project
+        boost::filesystem::path inputfiles_dir = project_path / INPUTFILES_DIR_C;
+        try
+        {
+          boost::filesystem::remove_all( inputfiles_dir );
+        }
+        catch ( ... ) 
+        {
+          CORE_LOG_ERROR( "Couldn't remove directory '" + inputfiles_dir.string() + "' for anonymization." );
+          return false;
+        }
+        
+        // Remove provenance database
+        boost::filesystem::path provenance_database = project_path / DATABASE_DIR_C / PROVENANCE_DATABASE_C;
+        try
+        {
+          boost::filesystem::remove( provenance_database );
+        }
+        catch ( ... ) 
+        {
+          CORE_LOG_ERROR( "Couldn't remove file '" + provenance_database.string() + "' for anonymization." );
+          return false;
+        }
       }
 
       // Delete the project file from the new directory because a new one will be generated

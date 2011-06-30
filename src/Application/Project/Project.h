@@ -144,6 +144,9 @@ public:
   // == old state variable *not* used any more ==
   // NOTE: This one is maintained for backwards compatibility only
   Core::StateStringVectorHandle sessions_state_;
+
+  // Should the project be anonymized (patient data removed) when saved? 
+  Core::StateBoolHandle save_as_anonymized_state_;
   
 public:
   // SESSION_LIST_CHANGED_SIGNAL

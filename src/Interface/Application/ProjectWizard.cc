@@ -78,7 +78,7 @@ void ProjectWizard::accept()
     }
     catch( boost::filesystem::filesystem_error& )
     { 
-      CORE_LOG_ERROR( "Project Wizard failed to delete path: " + this->path_to_delete_ );
+      CORE_LOG_ERROR( "Couldn't remove directory '" + this->path_to_delete_ + "'." );
       this->reject();
       return;
     } 

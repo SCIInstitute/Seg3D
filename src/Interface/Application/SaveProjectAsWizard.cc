@@ -88,6 +88,14 @@ void SaveProjectAsWizard::accept()
     }
   }
   
+  // Switch on anonymize if needed
+  ProjectHandle current_project = ProjectManager::Instance()->get_current_project();
+  if( field( "anonymize" ).toBool() )
+  {
+    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
+      current_project->save_as_anonymized_state_, true );
+  }
+
   ActionSaveProjectAs::Dispatch( Core::Interface::GetWidgetActionContext(), 
     field( "projectPath" ).toString().toStdString(),
     field( "projectName" ).toString().toStdString() );
@@ -99,6 +107,10 @@ void SaveProjectAsWizard::accept()
       PreferencesManager::Instance()->auto_save_state_, true );
   }
   
+  // Anonymize option always resets to false after save
+  Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
+    current_project->save_as_anonymized_state_, false );
+
     QDialog::accept();
 }
 
@@ -280,15 +292,22 @@ SaveAsSummaryPage::SaveAsSummaryPage( QWidget *parent )
   this->autosave_checkbox_->setObjectName(QString::fromUtf8("autosave_checkbox_"));
   this->autosave_checkbox_->setChecked(true);
   this->autosave_checkbox_->setText( QString::fromUtf8( "Enable Autosave" ) );
+
+  this->anonymize_checkbox_ = new QCheckBox();
+  this->anonymize_checkbox_->setObjectName(QString::fromUtf8("anonymize_checkbox_"));
+  this->anonymize_checkbox_->setChecked( false );
+  this->anonymize_checkbox_->setText( QString::fromUtf8( "Anonymize" ) );
   
     QVBoxLayout *layout = new QVBoxLayout;
   layout->addWidget( this->description_ );
     layout->addWidget( this->project_name_ );
     layout->addWidget( this->project_path_ );
   layout->addWidget( this->autosave_checkbox_ );
+  layout->addWidget( this->anonymize_checkbox_ );
     this->setLayout( layout );
   
   registerField( "autosave", this->autosave_checkbox_ );
+  registerField( "anonymize", this->anonymize_checkbox_ );
 }
 
 void SaveAsSummaryPage::initializePage()
