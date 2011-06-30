@@ -45,7 +45,7 @@
 #include <Application/LayerIO/LayerIO.h>
 
 #include <mrcheader.h>
-#include <MRCReader.h>
+#include <MRCUtil.h>
 
 SEG3D_REGISTER_IMPORTER( Seg3D, MRCLayerImporter );
 
@@ -85,7 +85,7 @@ namespace Seg3D
 
     // MRC header and reader classes
     MRC2000IO::MRCHeader header_;
-    MRC2000IO::MRCReader mrcreader_;
+    MRC2000IO::MRCUtil mrcutil_;
     
     // Whether the header has been read
     bool read_header_;
@@ -110,9 +110,9 @@ namespace Seg3D
     // If read it before, we do need read it a second time.
     if ( this->read_header_ ) return true;
 
-    if (! this->mrcreader_.read_header(this->importer_->get_filename(), this->header_) )
+    if (! this->mrcutil_.read_header(this->importer_->get_filename(), this->header_) )
     {
-      this->importer_->set_error(this->mrcreader_.get_error());
+      this->importer_->set_error(this->mrcutil_.get_error());
       return false;
     }
 
@@ -134,7 +134,7 @@ namespace Seg3D
 
     std::vector<size_t> dims(3);
     Core::Point origin;
-    bool use_new_origin = this->mrcreader_.use_new_origin();
+    bool use_new_origin = this->mrcutil_.use_new_origin();
     double spacing_x = 0, spacing_y = 0, spacing_z = 0;
 
     // X=1, Y=2 and Z=3
@@ -283,7 +283,7 @@ namespace Seg3D
                               Core::Vector( 0.0, 0.0, spacing.z() ));
     this->grid_transform_ = Core::GridTransform( dims[ 0 ], dims[ 1 ], dims[ 2 ], transform );
     this->grid_transform_.set_originally_node_centered( false );
-    this->meta_data_.meta_data_ = this->mrcreader_.export_header(header_);
+    this->meta_data_.meta_data_ = this->mrcutil_.export_header(header_);
     this->meta_data_.meta_data_info_ = "MRC2000 header";
 
     // Indicate that we read the header.
@@ -399,7 +399,7 @@ namespace Seg3D
 #else
     data_file.read( data, length );
 #endif
-    
+
     // Close the file
 #ifdef _WIN32
     CloseHandle( file_desc );
@@ -410,7 +410,7 @@ namespace Seg3D
 
     // MRC data is always stored as big endian data
     // Hence we need to swap if we are on a little endian system.
-    if ( this->mrcreader_.swap_endian() )
+    if ( this->mrcutil_.swap_endian() )
     {
       this->data_block_->swap_endian();
     }

@@ -85,9 +85,12 @@ SET(APPLICATION_LAYERIO_EXPORTERS_SRCS
   ITKDataLayerExporter.cc
   ITKMaskLayerExporter.h
   ITKMaskLayerExporter.cc
+  MRCLayerExporter.h
+  MRCLayerExporter.cc
   NrrdLayerExporter.h
   NrrdLayerExporter.cc
 )
+
 IF(BUILD_WITH_PYTHON)
   GENERATE_ACTION_PYTHON_WRAPPER(PYTHON_WRAPPER Application_LayerIO ${APPLICATION_LAYERIO_ACTIONS_SRCS})
   SET(APPLICATION_LAYERIO_SRCS ${APPLICATION_LAYERIO_SRCS} ${PYTHON_WRAPPER})
@@ -112,7 +115,7 @@ TARGET_LINK_LIBRARIES(Application_LayerIO
           ${SCI_BOOST_LIBRARY}
           ${SCI_GDCM_LIBRARY}
           ${SCI_MATLABIO_LIBRARY}
-                    ${SCI_MRC2000IO_LIBRARY})
+                                        ${SCI_MRC2000IO_LIBRARY})
 
 # Register actions and importers
 REGISTER_LIBRARY_AND_CLASSES(Application_LayerIO 

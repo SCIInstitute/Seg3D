@@ -268,7 +268,7 @@ void LayerIOFunctions::ExportLayer( QMainWindow* main_window )
 
   QString filename = QFileDialog::getSaveFileName( main_window, "Export Data Layer As... ",
     QString::fromStdString( file_path.string() ),
-    "NRRD files (*.nrrd);;DICOM files (*.dcm);;TIFF files (*.tiff);;PNG files (*.png)" );
+    "NRRD files (*.nrrd);;DICOM files (*.dcm);;TIFF files (*.tiff);;PNG files (*.png);;MRC files (*.mrc)" );
   
   if( filename == "" ) return;
   
@@ -276,6 +276,7 @@ void LayerIOFunctions::ExportLayer( QMainWindow* main_window )
   std::string exportername;
   
   if( extension == ".nrrd" ) exportername = "NRRD Exporter";
+  else if( extension == ".mrc" ) exportername = "MRC Exporter";
   else if( extension != "" ) exportername = "ITK Data Exporter";
     
   LayerExporterHandle exporter;
