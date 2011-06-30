@@ -388,11 +388,11 @@ void SpeedlineTool::calculate_speedimage( Core::ActionContextHandle context )
   // NOTE: Need to lock state engine as this function is run from the interface thread
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
 
-//  ActionSpeedlineImageFilter::Dispatch( context,
-//    this->target_data_layer_state_->get(),
-//    this->use_smoothing_state_->get(),
-//    this->use_rescale_state_->get()
-//    );  
+  ActionSpeedlineImageFilter::Dispatch( context,
+    this->target_data_layer_state_->get(),
+    this->use_smoothing_state_->get(),
+    this->use_rescale_state_->get()
+    );  
 }
 
 SpeedlineTool::SpeedlineTool( const std::string& toolid ) 
