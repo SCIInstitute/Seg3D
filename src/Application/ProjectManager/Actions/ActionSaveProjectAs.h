@@ -42,6 +42,7 @@ CORE_ACTION(
   CORE_ACTION_TYPE( "SaveProjectAs", "Save a project as..." )
   CORE_ACTION_ARGUMENT( "location", "Path to save the project to." )
   CORE_ACTION_ARGUMENT( "name", "Name to save the project as." )
+  CORE_ACTION_ARGUMENT( "anonymize", "Should the project be anonymized (patient data removed) when saved?" )
 )
 
   // -- Constructor/Destructor --
@@ -50,6 +51,7 @@ public:
   {
     this->add_parameter( this->project_location_ );
     this->add_parameter( this->project_name_ );
+    this->add_parameter( this->anonymize_ );
   }
 
   // -- Functions that describe action --
@@ -62,13 +64,15 @@ private:
   // This parameter contains the name of the session to be loaded
   std::string project_location_;
   std::string project_name_;
+  bool anonymize_;
 
   // -- Dispatch this action from the interface --
 public:
   // DISPATCH:
   // Dispatch an action loads a session
+  // If anonymize is true then patient-specific data will be removed when saving the project.
   static void Dispatch( Core::ActionContextHandle context, const std::string& export_path, 
-    const std::string& project_name );
+    const std::string& project_name, bool anonymize );
 };
 
 } // end namespace Seg3D

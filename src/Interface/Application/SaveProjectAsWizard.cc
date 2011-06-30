@@ -88,15 +88,11 @@ void SaveProjectAsWizard::accept()
     }
   }
   
-  // Set anonymize variable
-  ProjectHandle current_project = ProjectManager::Instance()->get_current_project();
   bool anonymize = field( "anonymize" ).toBool();
-  Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
-    current_project->save_as_anonymized_state_, anonymize );
-  
+
   ActionSaveProjectAs::Dispatch( Core::Interface::GetWidgetActionContext(), 
     field( "projectPath" ).toString().toStdString(),
-    field( "projectName" ).toString().toStdString() );
+    field( "projectName" ).toString().toStdString(), anonymize );
   
   // Switch on autosave if needed
   if( field( "autosave" ).toBool() )
@@ -104,10 +100,6 @@ void SaveProjectAsWizard::accept()
     Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
       PreferencesManager::Instance()->auto_save_state_, true );
   }
-  
-  // Anonymize option always resets to false after save
-  Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
-    current_project->save_as_anonymized_state_, false );
 
     QDialog::accept();
 }

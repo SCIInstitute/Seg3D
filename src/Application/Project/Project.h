@@ -145,9 +145,6 @@ public:
   // NOTE: This one is maintained for backwards compatibility only
   Core::StateStringVectorHandle sessions_state_;
 
-  // Should the project be anonymized (patient data removed) when saved? 
-  Core::StateBoolHandle save_as_anonymized_state_;
-  
 public:
   // SESSION_LIST_CHANGED_SIGNAL
   // When a session is saved or deleted this signal is triggered
@@ -168,9 +165,11 @@ public:
 public:
   // SAVE_PROJECT:
   // This function will save the current project in the designated path
+  // If anonymize is true then patient-specific data will be removed when saving the project.
   // NOTE: path already points to the project directory
   // NOTE: This function can only be called from the application thread.
-  bool save_project( const boost::filesystem::path& project_path, const std::string& project_name );
+  bool save_project( const boost::filesystem::path& project_path, const std::string& project_name,
+    bool anonymize );
 
   // SAVE_STATE:
   // Save the current state into the xml file

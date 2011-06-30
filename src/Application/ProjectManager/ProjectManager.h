@@ -81,8 +81,10 @@ public:
   bool open_project( const std::string& project_path );
   
   // SAVE_PROJECT_AS:
-  // this function saves the values in current_project_ to the current save location
-  bool save_project_as( const std::string& project_location, const std::string& project_name );
+  // this function saves the values in current_project_ to the current save location.
+  // If anonymize is true then patient-specific data will be removed when saving the project.
+  bool save_project_as( const std::string& project_location, const std::string& project_name,
+    bool anonymize );
   
   // EXPORT_PROJECT:
   // this function saves the value in current_project_, and the selected session to the desired

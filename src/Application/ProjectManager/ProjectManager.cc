@@ -522,7 +522,7 @@ bool ProjectManager::new_project( const std::string& project_location,
   
   if ( !project_location.empty() )
   {
-    if ( !this->get_current_project()->save_project( project_path, project_name ) )
+    if ( !this->get_current_project()->save_project( project_path, project_name, false ) )
     {
       // Need to update this so the old project
       this->current_project_changed_signal_();
@@ -614,7 +614,7 @@ bool ProjectManager::open_project( const std::string& project_file )
   
   
 bool ProjectManager::save_project_as( const std::string& project_location, 
-  const std::string& project_name )
+  const std::string& project_name, bool anonymize )
 {
   // This function sets state variables directly, hence we need to be on the application thread
   ASSERT_IS_APPLICATION_THREAD();
@@ -640,7 +640,7 @@ bool ProjectManager::save_project_as( const std::string& project_location,
     return false;
   }
 
-  if ( !this->get_current_project()->save_project( project_path, project_name ) )
+  if ( !this->get_current_project()->save_project( project_path, project_name, anonymize ) )
   {
     // An error should have been logged by the save_project function. 
     return false;

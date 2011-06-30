@@ -1444,13 +1444,6 @@ void Project::initialize()
   // State variable for backwards compatibility, not used anymore
   this->add_state( "sessions", this->sessions_state_ );
 
-  // Should the project be anonymized (patient data removed) when saved? 
-  this->add_state( "save_as_anonymized", this->save_as_anonymized_state_, false );
-  // This state is not session data and changes to this state don't change the project
-  this->save_as_anonymized_state_->set_is_project_data( false );
-  // Do not save or load this state
-  this->save_as_anonymized_state_->set_session_priority( Core::StateBase::DO_NOT_LOAD_E );
-
   // State of all the 12 colors in the system.
   // Initialize them with the colors from the preference manager
   this->color_states_.resize( 12 );
@@ -1641,7 +1634,7 @@ bool Project::load_project( const boost::filesystem::path& project_file )
 }
 
 bool Project::save_project( const boost::filesystem::path& project_path, 
-  const std::string& project_name )
+  const std::string& project_name, bool anonymize )
 {
   // This function sets state variables directly, hence we need to be on the application thread.
   ASSERT_IS_APPLICATION_THREAD();
@@ -1747,7 +1740,7 @@ bool Project::save_project( const boost::filesystem::path& project_path,
       }
 
       // Remove patient-specific data if project should be anonymized
-      if( this->save_as_anonymized_state_->get() )
+      if( anonymize )
       {
         // Remove inputfiles directory from new project
         boost::filesystem::path inputfiles_dir = project_path / INPUTFILES_DIR_C;

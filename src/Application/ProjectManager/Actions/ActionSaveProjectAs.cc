@@ -124,7 +124,7 @@ bool ActionSaveProjectAs::run( Core::ActionContextHandle& context,
   
   bool success = 
     ProjectManager::Instance()->save_project_as( 
-      this->project_location_, this->project_name_ );
+      this->project_location_, this->project_name_, this->anonymize_ );
 
   progress->end_progress_reporting();
   
@@ -144,12 +144,13 @@ bool ActionSaveProjectAs::run( Core::ActionContextHandle& context,
 }
 
 void ActionSaveProjectAs::Dispatch( Core::ActionContextHandle context, 
-  const std::string& project_location, const std::string& project_name )
+  const std::string& project_location, const std::string& project_name, bool anonymize )
 {
   ActionSaveProjectAs* action = new ActionSaveProjectAs;
   
   action->project_location_ = project_location;
   action->project_name_ = project_name;
+  action->anonymize_ = anonymize;
   
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }
