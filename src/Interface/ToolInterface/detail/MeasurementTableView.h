@@ -30,7 +30,7 @@
 #define INTERFACE_TOOLINTERFACE_DETAIL_MEASUREMENTTABLEVIEW_H
 
 // Qt includes
-#include <QtGUI/QTableView>
+#include <QtGui/QTableView>
 
 // Boost includes
 #include <boost/shared_ptr.hpp>
