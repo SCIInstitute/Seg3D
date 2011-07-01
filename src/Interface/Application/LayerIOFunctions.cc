@@ -59,7 +59,7 @@
 namespace Seg3D
 {
 
-void LayerIOFunctions::ImportFiles( QMainWindow* main_window, std::string file_to_open )
+bool LayerIOFunctions::ImportFiles( QMainWindow* main_window, std::string file_to_open )
 {
   // List of files that need to be imported.
   QStringList file_list;
@@ -109,7 +109,7 @@ void LayerIOFunctions::ImportFiles( QMainWindow* main_window, std::string file_t
       message_box.setIcon( QMessageBox::Critical );
       message_box.setText( "No files were selected." );
       message_box.exec(); 
-      return;
+      return false;
     }
 
     // Get the name of the importer that was selected
@@ -140,7 +140,7 @@ void LayerIOFunctions::ImportFiles( QMainWindow* main_window, std::string file_t
       
       // Send message box to Qt
       message_box.exec();
-      return;
+      return false;
     }
     else
     {
@@ -151,7 +151,7 @@ void LayerIOFunctions::ImportFiles( QMainWindow* main_window, std::string file_t
 
   // Open the importer dialog that issues the action to import the data file(s)
   LayerImporterWidget layer_import_dialog( importers, main_window );
-  layer_import_dialog.exec();
+  return layer_import_dialog.exec() == QDialog::Accepted;
 }
 
 void LayerIOFunctions::ImportSeries( QMainWindow* main_window )

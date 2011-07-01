@@ -295,7 +295,15 @@ void SplashScreen::quick_open_file()
     default_project_name );
   this->hide();
   
-  LayerIOFunctions::ImportFiles( dynamic_cast< QMainWindow* >( this->parentWidget() ), "" );
+  if( LayerIOFunctions::ImportFiles( dynamic_cast< QMainWindow* >( this->parentWidget() ), "" ) )
+  {
+    this->close();
+  }
+  else
+  {
+    this->show();
+  }
+
 }
 
 

@@ -225,7 +225,7 @@ void LayerImporterWidget::import()
         this->private_->importers_[ i ], this->private_->mode_ );
     } 
   }
-  accept();
+  this->accept();
 }
 
 void LayerImporterWidget::list_import_options()
