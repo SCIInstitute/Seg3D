@@ -1219,7 +1219,7 @@ bool ProjectPrivate::process_inputfile_importers()
     
     if ( boost::filesystem::exists( import_dir ) )
     {
-      if (! importer->copy_files( import_dir ) )
+      if ( !importer->copy_files( import_dir ) )
       {
         CORE_LOG_ERROR( std::string( "Could not import original files into directory '" ) + 
           import_dir.string() + "'." );

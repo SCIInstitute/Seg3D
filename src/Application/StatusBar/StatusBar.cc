@@ -93,13 +93,6 @@ StatusBar::StatusBar() :
   this->private_->status_bar_ = this;
   this->private_->signal_block_count_ = 0;
 
-  this->add_connection( Core::Interface::GetWidgetActionContext()->
-    action_message_signal_.connect( boost::bind( &StatusBar::set_message, this, _1, _2 ) ) );
-  this->add_connection( Core::Interface::GetMouseActionContext()->
-    action_message_signal_.connect( boost::bind( &StatusBar::set_message, this, _1, _2 ) ) );
-  this->add_connection( Core::Interface::GetKeyboardActionContext()->
-    action_message_signal_.connect( boost::bind( &StatusBar::set_message, this, _1, _2 ) ) );
-
   this->add_connection( Core::Log::Instance()->post_status_signal_.connect( 
     boost::bind( &StatusBar::set_message, this, _1, _2 ) ) );
 }
