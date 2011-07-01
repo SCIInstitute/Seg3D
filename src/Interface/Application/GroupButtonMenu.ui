@@ -558,12 +558,6 @@ QWidget#buttons_{
             </property>
             <item>
              <widget class="QPushButton" name="select_all_button_">
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>30</height>
-               </size>
-              </property>
               <property name="maximumSize">
                <size>
                 <width>100</width>
@@ -583,12 +577,6 @@ QWidget#buttons_{
             </item>
             <item>
              <widget class="QPushButton" name="delete_button_">
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>30</height>
-               </size>
-              </property>
               <property name="text">
                <string>Delete</string>
               </property>

@@ -38,12 +38,19 @@
 namespace Seg3D
 {
 
+  class MeasurementItemDelegatePrivate{
+  public:
+    QColor new_color_;
+
+  };
+
 MeasurementItemDelegate::MeasurementItemDelegate( int color_column, int length_column,  
   int name_column, QObject * parent /*= 0 */ ) : 
   color_column_( color_column ),
   length_column_( length_column ),
   name_column_( name_column ),
-  QItemDelegate( parent ) {}
+  QItemDelegate( parent ),
+  private_( new MeasurementItemDelegatePrivate ){}
 
 void MeasurementItemDelegate::paint( QPainter *painter, const QStyleOptionViewItem &option, 
   const QModelIndex &index ) const
@@ -84,10 +91,18 @@ const QModelIndex &index ) const
   }
   else if( index.column() == this->color_column_ )
   {
-    // TODO: Fix color dialog position on Windows
-    QColorDialog* color_dialog = new QColorDialog( parent );
-    color_dialog->setModal( true );
-    return color_dialog;
+    QColor measurement_color = index.model()->data( index, Qt::DecorationRole ).value< QColor >();
+    this->private_->new_color_ = QColorDialog::getColor( measurement_color, parent->parentWidget()->parentWidget() );
+    
+    // In the case that the user presses cancel instead, we'll abort the edit
+    if( !this->private_->new_color_.isValid() )
+    {
+      return 0;
+    }
+    // Here we are going to pass a dummy widget so that we can take advantage of some of this 
+    // editing process.
+    QWidget *dummy = new QWidget( parent );
+    return dummy;
   }
   else if( index.column() == this->name_column_ )
   {
@@ -110,9 +125,7 @@ void MeasurementItemDelegate::setEditorData( QWidget *editor, const QModelIndex 
   }
   else if( index.column() == this->color_column_ )
   {
-    QColor measurement_color = index.model()->data( index, Qt::DecorationRole ).value< QColor >();
-    QColorDialog* color_dialog = qobject_cast< QColorDialog* >( editor );
-    color_dialog->setCurrentColor( measurement_color );
+    //Here we do nothing since our editor has already finished.
   }
   else
   {
@@ -131,9 +144,11 @@ void MeasurementItemDelegate::setModelData( QWidget *editor, QAbstractItemModel 
   }
   else if( index.column() == this->color_column_ )
   {
-    QColorDialog* color_dialog = qobject_cast< QColorDialog* >( editor );
-    QColor color = color_dialog->currentColor();
-    model->setData( index, color );
+    // finally, if the user has selected a valid color we set it in the model.
+    if( this->private_->new_color_.isValid() )
+    {
+      model->setData( index, this->private_->new_color_ );
+    }
   }
   else
   {

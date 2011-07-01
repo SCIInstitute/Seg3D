@@ -29,11 +29,16 @@
 #ifndef INTERFACE_TOOLINTERFACE_DETAIL_MEASUREMENTITEMDELEGATE_H
 #define INTERFACE_TOOLINTERFACE_DETAIL_MEASUREMENTITEMDELEGATE_H
 
+// Boost includes
+#include <boost/shared_ptr.hpp>
+
 // Qt includes
 #include <QtGui/QItemDelegate>
 
 namespace Seg3D
 {
+
+class MeasurementItemDelegatePrivate;
 
 // Delegate for editing length and note columns in measurement table.  Note that only one delegate
 // can be set per view, so this delegate handles all custom columns in the table.
@@ -61,6 +66,9 @@ private:
   int color_column_;
   int length_column_;
   int name_column_;
+
+private:
+  boost::shared_ptr< MeasurementItemDelegatePrivate > private_;
 };
 
 } // end namespace Seg3D

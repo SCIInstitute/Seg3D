@@ -124,7 +124,7 @@ MeasurementTableView::MeasurementTableView( QWidget* parent ) :
   // Custom editors for length and note columns
   this->setItemDelegate( 
     new MeasurementItemDelegate( MeasurementColumns::COLOR_E, MeasurementColumns::LENGTH_E,  
-    MeasurementColumns::NAME_E, parent ) );
+    MeasurementColumns::NAME_E, this ) );
   this->horizontalHeader()->setClickable( true );
   this->horizontalHeader()->setStretchLastSection( true ); // Stretch note section
   QObject::connect( this->horizontalHeader(), SIGNAL( sectionClicked( int ) ), 
