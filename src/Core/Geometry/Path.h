@@ -62,7 +62,7 @@ public:
   SinglePath& get_one_path( int index ) ;
   bool find_one_path( Point& p1, Point& p2, SinglePath& spath ) ;
 
-  std::vector< SinglePath >& get_all_paths( ) ;
+  const std::vector< SinglePath >& get_all_paths( )  const;
 
   // SET_ONE_PATH:
   // Set the corresponding path
@@ -79,10 +79,10 @@ public:
   void delete_all_paths( ) ;
 
   void set_start_point( const Point& pt );
-  Point& get_start_point () ;
+  const Point& get_start_point () const; 
 
   void set_end_point( const Point& pt );
-  Point& get_end_point () ;
+  const Point& get_end_point () const;
 
 
   inline bool operator==( const Path& ) const;
@@ -111,7 +111,9 @@ inline bool Path::operator!=( const Path& m ) const
 
 
 std::string ExportToString( const Path& value );
+std::string ExportToString( const SinglePath& value );
 bool ImportFromString( const std::string& str, Path& value );
+bool ImportFromString( const std::string& str, SinglePath& value );
 
 } // end namespace Core
 

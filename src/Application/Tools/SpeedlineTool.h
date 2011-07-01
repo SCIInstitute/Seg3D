@@ -104,6 +104,11 @@ public:
   // activated.
   virtual void deactivate();
 
+  // POST_LOAD_STATES:
+  // This virtual function can be implemented in the StateHandlers and will be called after its
+  // states are loaded.  If it doesn't succeed it needs to return false.
+  virtual bool post_load_states( const Core::StateIO& state_io );
+
   // -- dispatch functions --
 public:
   void fill( Core::ActionContextHandle context );
@@ -111,6 +116,11 @@ public:
   void reset( Core::ActionContextHandle context );
 
   void calculate_speedimage( Core::ActionContextHandle context );
+  bool get_update_paths() { return this->update_all_paths_; }
+  void set_update_paths( bool update_all_paths ) { this->update_all_paths_ = update_all_paths; }
+
+  //const size_t* get_slice_no() const { return this->slice_no_; } 
+  //void set_slice_no( size_t slice_no[ 6 ] );
 
   // -- State Variables --
 public:
@@ -135,6 +145,8 @@ public:
   Core::StateBoolHandle use_smoothing_state_;
   Core::StateBoolHandle use_rescale_state_;
 
+  //Core::StateIntVectorHandle slice_no_state_;
+
 private:
   SpeedlineToolPrivateHandle private_;
 
@@ -142,6 +154,7 @@ private:
   //Core::VolumeSliceType slice_type_[ 6 ];
   size_t slice_no_[ 6 ];
   bool initialized_;
+    bool update_all_paths_;
 };
 
 } // end namespace

@@ -287,6 +287,9 @@ SingleTargetTool::SingleTargetTool(  int target_type, const std::string& tool_ty
   this->add_state( "valid_layer", this->valid_target_state_, false );
   this->add_state( "valid_primary_target", this->valid_primary_target_state_, false );  
 
+  this->target_layer_state_->set_session_priority( Core::StateBase::DEFAULT_LOAD_E + 10 );
+  this->use_active_layer_state_->set_session_priority( Core::StateBase::DEFAULT_LOAD_E + 20 );
+
   // Handle the updates to the StateEngine
   // As tools are created on the application thread, the state engine should not change underneath
   // it, as every change to the state engine has to go through the same thread.

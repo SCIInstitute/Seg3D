@@ -233,12 +233,19 @@ public:
       // update each path in new slice
       Core::Path updated_paths;
 
-      for ( unsigned int i = 0; i < this->itk_paths_.get_path_num(); ++i )
+      //for ( unsigned int i = 0; i < this->itk_paths_.get_path_num(); ++i )
+      //{
+      //  Core::SinglePath old_path = this->itk_paths_.get_one_path( i );
+
+      this->itk_paths_.delete_all_paths();
+      size_t vertices_num = this->vertices_.size();
+      for ( unsigned int i = 0; i < vertices_num; ++i )
       {
-        Core::SinglePath old_path = this->itk_paths_.get_one_path( i );
         Core::Point p0, p1;
-        old_path.get_point_on_ends( 0, p0 );
-        old_path.get_point_on_ends( 1, p1 );
+        //old_path.get_point_on_ends( 0, p0 );
+        //old_path.get_point_on_ends( 1, p1 );
+        p0 = this->vertices_[ i ];
+        p1 = this->vertices_[ ( i + 1 ) % vertices_num ];
 
         path_filter_type::PathInfo  info;
         path_filter_type::PointType pnt;
@@ -292,10 +299,13 @@ public:
       for ( unsigned int j = 0; j < num_of_outputs; ++j )
       {
 
-        Core::SinglePath old_path = this->itk_paths_.get_one_path( j );
+        //Core::SinglePath old_path = this->itk_paths_.get_one_path( j );
         Core::Point p0, p1;
-        old_path.get_point_on_ends( 0, p0 );
-        old_path.get_point_on_ends( 1, p1 );
+        //old_path.get_point_on_ends( 0, p0 );
+        //old_path.get_point_on_ends( 1, p1 );
+
+        p0 = this->vertices_[ j ];
+        p1 = this->vertices_[ ( j + 1 ) % vertices_num ];
         Core::SinglePath new_path( p0, p1 );
 
         path_type::Pointer itk_path = path_filter->GetOutput( j );

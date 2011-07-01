@@ -259,6 +259,7 @@ GroupTargetTool::GroupTargetTool(  Core::VolumeType target_type, const std::stri
   this->add_state( "valid_layer", this->valid_target_state_, false );
 
   this->target_group_state_->set_session_priority( Core::StateBase::DEFAULT_LOAD_E + 10 );
+  this->use_active_group_state_->set_session_priority( Core::StateBase::DEFAULT_LOAD_E + 20 );
 
   // Adding connections to handle updates
   this->add_connection( LayerManager::Instance()->layer_inserted_signal_.connect(

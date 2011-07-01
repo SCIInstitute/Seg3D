@@ -80,6 +80,9 @@ typedef boost::shared_ptr< StateMeasurementVector > StateMeasurementVectorHandle
 typedef StateVector< bool > StateBoolVector;
 typedef boost::shared_ptr< StateBoolVector > StateBoolVectorHandle;
 
+typedef StateVector< int > StateIntVector;
+typedef boost::shared_ptr< StateIntVector > StateIntVectorHandle;
+
 typedef StateVector< double > StateDoubleVector;
 typedef boost::shared_ptr< StateDoubleVector > StateDoubleVectorHandle;
   

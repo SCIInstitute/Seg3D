@@ -66,20 +66,11 @@ SinglePath& Path::get_one_path( int index )
 }
 
 
-std::vector< SinglePath >& Path::get_all_paths( ) 
+const std::vector< SinglePath >& Path::get_all_paths( ) const
 {
   return this->paths_;
 }
 
-//void Path::set_one_path( int index, const std::vector< Point >& pt ) 
-//{
-//
-//  this->paths_[index].clear();
-//  for ( std::vector< Point >::const_iterator it = pt.begin(); it != pt.end(); ++it )
-//  {
-//    this->paths_[index].push_back( *it );
-//  }
-//}
 
 void Path::set_one_path( int index, const SinglePath& pt ) 
 {
@@ -118,7 +109,7 @@ bool Path::find_one_path( Point& p1, Point& p2, SinglePath& spath )
   return false;
 }
 
-void Path::set_start_point( const Point& pt )
+void Path::set_start_point( const Point& pt ) 
 {
   this->start_point_ = pt;
 }
@@ -128,12 +119,12 @@ void Path::set_end_point( const Point& pt )
   this->end_point_ = pt;
 }
 
-Point& Path::get_start_point()  
+const Point& Path::get_start_point()  const
 {
   return this->start_point_;
 }
 
-Point& Path::get_end_point () 
+const Point& Path::get_end_point () const
 {
   return this->end_point_;
 }
@@ -144,60 +135,134 @@ void Path::delete_all_paths( )
   this->paths_.reserve( PATHS_SIZE_C );
 }
 
-std::string ExportToString( const Path& value )
+std::string ExportToString( const SinglePath& value )
 {
+  Point p0, p1;
+  value.get_point_on_ends( 0, p0 );
+  value.get_point_on_ends( 1, p1 );
 
-  //return ( std::string( 1, '[' ) + ExportToString( value.get_visible() ) + ' ' + value.get_id() 
-  //  + ' ' + ExportToString( p0 ) + ' ' + ExportToString( p1 ) + 
-  //  ' ' + '[' + value.get_note() + Path::NOTE_DELIMITER_C );
-
-  std::string str;
-  str = "[" ;
-  //for ( std::vector< Point >::iterator it = value->get_path().begin(); it != value->get_path().end(); ++it )
-  //{
-  //  Point p0 = *it;
-  //  str += ExportToString( p0 );
-  //  str += ' ';
-  //}
-
-  str = "]";
-
-  return str;
+  return ( std::string( 1, '[' ) + ExportToString( p0 ) + ' ' + 
+            ExportToString( p1 ) + std::string( 1, ']') );
 }
 
+std::string ExportToString( const Path& value )
+{
+  //std::vector< SinglePath > paths = value.get_all_paths();
+
+  //Point p0 = value.get_start_point();
+  //Point p1 = value.get_end_point();
+
+  //std::string export_string = std::string( 1, '[' ) ;
+
+  //BOOST_FOREACH( SinglePath spath, paths )
+  //{
+  //  export_string += ExportToString( spath );
+  //  export_string += ";";
+  //}
+
+  //export_string += ExportToString( SinglePath( p0, p1 ) );
+  //export_string += std::string( 1, ']') ;
+
+  std::string export_string =  "";
+  return export_string;
+}
+
+bool ImportFromString( const std::string& str, SinglePath& value )
+{
+  
+  //std::string open_bracket_reg = "(\\[)";
+  //std::string closed_bracket_reg = "(\\])";
+  ////std::string word_reg = "(\\w*)";
+  ////std::string visible_reg = word_reg;
+  //std::string space_reg = "(\\s)";
+  ////std::string name_reg = word_reg;
+  ////std::string point_reg = "(\\[[^\\]]*])";
+  //std::string point_reg = "(\\[*])";
+  ////std::string color_reg = point_reg;
+  ////std::string comment_reg = "(.*?)";
+  ////std::string comment_end_reg = "(\\sCOMMENT_END\\]\\])";
+  ////std::string full_reg = open_bracket_reg + visible_reg + space_reg + name_reg + space_reg + 
+  ////  point_reg + space_reg + point_reg + space_reg + color_reg + space_reg + open_bracket_reg + 
+  ////  comment_reg + comment_end_reg;
+
+  //std::string full_reg = open_bracket_reg + point_reg + space_reg + point_reg + closed_bracket_reg;
+  //boost::regex reg( full_reg );
+  //boost::smatch m;
+  //if( boost::regex_match( str, m, reg ) ) 
+  //{
+  //  Point p0, p1;
+  //  ImportFromString( m[ 0 ].str(), p0 );
+  //  value.set_point_on_ends( 0, p0 );
+  //  
+  //  ImportFromString( m[ 1 ].str(), p1 );
+  //  value.set_point_on_ends( 1, p1 );
+  //  return true;
+  //}
+  //return false;
+
+  return true;
+}
 
 bool ImportFromString( const std::string& str, Path& value )
 {
-//  // Example string: [true M1 [0 0 0] [1 1 1] [Knee NOTE_END]]
-//  std::string open_bracket_reg = "(\\[)";
-//  std::string word_reg = "(\\w*)";
-//  std::string visible_reg = word_reg;
-//  std::string space_reg = "(\\s)";
-//  std::string label_reg = word_reg;
-//  std::string point_reg = "(\\[[^\\]]*])";
-//  std::string note_reg = "(.*?)";
-//  std::string note_end_reg = "(\\sNOTE_END\\]\\])";
-//  std::string full_reg = open_bracket_reg + visible_reg + space_reg + label_reg + space_reg + 
-//    point_reg + space_reg + point_reg + space_reg + open_bracket_reg + note_reg + 
-//    note_end_reg;
-//  boost::regex reg( full_reg );
-//  boost::smatch m;
-//  if( boost::regex_match( str, m, reg ) ) 
-//  {
-//    bool visible = false;
-//    ImportFromString( m[ 2 ].str(), visible );
-//    value.set_visible( visible );
-//    value.set_id( m[ 4 ].str() );
-//    Point p0;
-//    ImportFromString( m[ 6 ].str(), p0 );
-//    value.set_point( 0, p0 );
-//    Point p1;
-//    ImportFromString( m[ 8 ].str(), p1 );
-//    value.set_point( 1, p1 );
-//    value.set_note( m[ 11 ].str() );
-//  return true;
-//}
-  return false;
+  //// Example string: [true M1 [0 0 0] [1 1 1] [Knee NOTE_END]]
+  //// Example string: [[0 0 0] [[0 0 0] [1 1 1]] [1 1 1]]
+
+  ////std::vector< std::vector< Point > > paths; //only contains start and end point
+  ////str[ 0 ] = ' ';
+  ////str[ str.length() - 1 ] = ' ';
+  //std::vector< std::string > parts = SplitString( str, ";" );
+
+  ////size_t paths_num = paths.size();
+
+  //// The last part is ""
+  //for( size_t i = 0; i < parts.size() - 1; i++ )
+  //{
+  //  std::string single_path_string = parts[ i ];
+  //  if ( i == 0 )
+  //  {
+  //    single_path_string[ 0 ] = ' ';
+  //  }
+  //  SinglePath spath;
+  //  if( ImportFromString( single_path_string, spath ) )
+  //  {
+  //    value.add_one_path( spath );
+  //  }
+  //  else
+  //  {
+  //    return false;
+  //  }
+  //}
+  //
+  ////for ( unsigned int i = 0; i < paths_num - 1; ++i )
+  ////{
+  ////  std::vector< Point > path = paths[ i ];
+  ////  SinglePath spath( path[ 0 ], path[ 1 ] );
+  ////  value.add_one_path( spath );
+  ////}
+
+  ////std::vector< Point > path = paths[ paths_num - 1 ];
+  ////value.set_start_point( path[ 0 ] );
+  ////value.set_end_point( path[ 1 ] );
+
+  //SinglePath spath;
+
+  //if( ImportFromString( parts[ parts.size() - 1 ], spath ) )
+  //{
+  //  Point p0, p1;
+  //  spath.get_point_on_ends( 0, p0 );
+  //  spath.get_point_on_ends( 1, p1 );
+
+  //  value.set_start_point( p0 );
+  //  value.set_end_point( p1 );
+  //}
+  //else
+  //{
+  //  return false;
+  //}
+
+
+  return true;
 }
 
 
