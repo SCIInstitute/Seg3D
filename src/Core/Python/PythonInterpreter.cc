@@ -334,7 +334,7 @@ void PythonInterpreter::print_banner()
     return;
   }
 
-  PyRun_SimpleString( "print('Pyton %s on %s' % (sys.version, sys.platform))\n" );
+  PyRun_SimpleString( "print('Python %s on %s' % (sys.version, sys.platform))\n" );
   this->prompt_signal_( this->private_->prompt1_ );
 }
 
