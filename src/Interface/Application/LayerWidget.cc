@@ -591,6 +591,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   this->private_->activate_button_->setMinimumHeight( 37 );
   this->private_->activate_button_->setMinimumWidth( 29 );
   this->private_->activate_button_->setIconSize( QSize( 25, 25 ) );
+  this->private_->ui_.horizontalLayout_9->setContentsMargins( 1, 0, 1, 0 );
   this->private_->ui_.horizontalLayout_9->addWidget( this->private_->activate_button_ );
   this->private_->activate_button_->setAcceptDrops( false );
   
