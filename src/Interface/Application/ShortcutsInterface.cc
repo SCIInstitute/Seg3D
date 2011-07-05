@@ -37,6 +37,7 @@
 //  Application includes
 #include <Application/Tool/ToolFactory.h>
 #include <Application/ToolManager/ToolManager.h>
+#include <Application/InterfaceManager/InterfaceManager.h>
 
 // QtUtils includes
 #include <QtUtils/Utils/QtPointer.h>
@@ -65,6 +66,8 @@ ShortcutsInterface::ShortcutsInterface( QWidget *parent ) :
 {
   // Set up the private internals of the MessageWindow class
   this->private_->ui_.setupUi( this );
+  this->private_->ui_.python_shortcut_label_->hide();
+  this->private_->ui_.controller_shortcut_label_->hide();
   
   // Update the title of the dialog
   std::string title = std::string( "Keyboard/Mouse Shortcuts - "  )
@@ -92,6 +95,22 @@ ShortcutsInterface::ShortcutsInterface( QWidget *parent ) :
 
   // Update fonts and text
   update_fonts_and_text();
+  
+  
+//=========== HANDLE SPECIAL MENU ITEM VISIBILITY ===========// 
+  // Python Shortcut visible
+#ifdef BUILD_WITH_PYTHON
+  this->private_->ui_.python_shortcut_label_->show();
+#endif
+  
+  // Controller Shortcut visible
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    if ( InterfaceManager::Instance()->enable_controller_state_->get() )
+    {
+      this->private_->ui_.controller_shortcut_label_->show();
+    }
+  }
 }
 
 ShortcutsInterface::~ShortcutsInterface()
