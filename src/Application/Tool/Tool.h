@@ -158,7 +158,13 @@ public:
   // REDRAW:
   // Draw the tool in the specified viewer. Default implementation does nothing.
   // The function should only be called by the renderer, which has a valid GL context.
-  virtual void redraw( size_t viewer_id, const Core::Matrix& proj_mat );
+  // NOTE: If the viewer layout changes, viewer attributes could be changed by the interface thread 
+  // underneath us.  Since there is no way to force Qt to lock the viewer before making these 
+  // changes, we grab the width and height up front and check for validity so that we at least
+  // don't crash later due to a width or height of 0.  The width and height are passed to the
+  // tools and should be used instead of querying the viewer directly.
+  virtual void redraw( size_t viewer_id, const Core::Matrix& proj_mat, 
+    int viewer_width, int viewer_height );
 
   // HAS_2D_VISUAL:
   // Returns true if the tool draws itself in the 2D view, otherwise false.

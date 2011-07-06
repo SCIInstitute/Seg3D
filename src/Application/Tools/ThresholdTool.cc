@@ -204,7 +204,8 @@ ThresholdTool::~ThresholdTool()
   this->disconnect_all();
 }
 
-void ThresholdTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
+void ThresholdTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
+  int viewer_width, int viewer_height )
 {
   ViewerHandle viewer = ViewerManager::Instance()->get_viewer( viewer_id );
   std::string target_layer_id;
@@ -278,7 +279,7 @@ void ThresholdTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
     double slice_height = top - bottom;
     Core::Vector slice_x( slice_width, 0.0, 0.0 );
     slice_x = proj_mat * slice_x;
-    double slice_screen_width = slice_x.x() / 2.0 * viewer->get_width();
+    double slice_screen_width = slice_x.x() / 2.0 * viewer_width;
     double slice_screen_height = slice_height / slice_width * slice_screen_width;
 
     MaskShader::lock_type shader_lock( this->private_->shader_->get_mutex() );
@@ -308,7 +309,7 @@ void ThresholdTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
     glPopAttrib();
   }
 
-  SeedPointsTool::redraw( viewer_id, proj_mat );
+  SeedPointsTool::redraw( viewer_id, proj_mat, viewer_width, viewer_height );
 }
 
 void ThresholdTool::execute( Core::ActionContextHandle context )

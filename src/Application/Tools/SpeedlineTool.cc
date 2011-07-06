@@ -1060,7 +1060,8 @@ bool SpeedlineTool::handle_mouse_move( ViewerHandle viewer,
   return false;
 }
 
-void SpeedlineTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
+void SpeedlineTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
+  int viewer_width, int viewer_height )
 {
   ViewerHandle viewer = ViewerManager::Instance()->get_viewer( viewer_id );
   if ( viewer->is_volume_view() )

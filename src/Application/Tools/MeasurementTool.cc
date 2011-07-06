@@ -1404,7 +1404,8 @@ bool MeasurementTool::handle_key_release( ViewerHandle viewer, int key, int modi
 	return false;
 }
 
-void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
+void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
+	int viewer_width, int viewer_height )
 {
 	// This function can be called from multiple rendering threads -- one per viewer
 	ViewerHandle viewer = ViewerManager::Instance()->get_viewer( viewer_id );
@@ -1417,7 +1418,7 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 	{
 		return;
 	} 
-	
+
 	//-------------- StateEngine locked  -------------------
 
 	// NOTE: The StateEngine and RenderResources should NEVER be locked
@@ -1631,7 +1632,7 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 	text_renderer.reset( new Core::TextRenderer );
 	Core::Texture2DHandle text_texture;
 	text_texture.reset( new Core::Texture2D );
-	std::vector< unsigned char > buffer( viewer->get_width() * viewer->get_height(), 0 );
+	std::vector< unsigned char > buffer( viewer_width * viewer_height, 0 );
 
 	for( size_t m_idx = 0; m_idx < measurements.size(); m_idx++ )
 	{
@@ -1657,20 +1658,20 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 			Core::Measurement m = measurements[ m_idx ];
 			std::string label = m.get_name();
 			text_renderer->render( label, &buffer[ 0 ], 
-				viewer->get_width(), viewer->get_height(), static_cast< int >( label_point.x() ), 
-				viewer->get_height() - static_cast< int >( label_point.y() ), font_size, 0 );
+				viewer_width, viewer_height, static_cast< int >( label_point.x() ), 
+				viewer_height - static_cast< int >( label_point.y() ), font_size, 0 );
 
 			// Render length
 			std::string length_string = length_strings[ m_idx ];
 			text_renderer->render( length_string, &buffer[ 0 ], 
-				viewer->get_width(), viewer->get_height(), static_cast< int >( length_point.x() ), 
-				viewer->get_height() - static_cast< int >( length_point.y() ), font_size, 0 );
+				viewer_width, viewer_height, static_cast< int >( length_point.x() ), 
+				viewer_height - static_cast< int >( length_point.y() ), font_size, 0 );
 		}
 	}
 
 	text_texture->enable();
 	glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
-	text_texture->set_image( viewer->get_width(), viewer->get_height(),
+	text_texture->set_image( viewer_width, viewer_height,
 		GL_ALPHA, &buffer[ 0 ], GL_ALPHA, GL_UNSIGNED_BYTE );
 
 	// Blend the text onto the framebuffer
@@ -1682,11 +1683,11 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 	glTexCoord2f( 0.0f, 0.0f );
 	glVertex2i( 1, -1 );
 	glTexCoord2f( 1.0f, 0.0f );
-	glVertex2i( viewer->get_width(), -1 );
+	glVertex2i( viewer_width, -1 );
 	glTexCoord2f( 1.0f, 1.0f );
-	glVertex2i( viewer->get_width(), viewer->get_height() - 2 );
+	glVertex2i( viewer_width, viewer_height - 2 );
 	glTexCoord2f( 0.0f, 1.0f );
-	glVertex2i( 1, viewer->get_height() - 2 );
+	glVertex2i( 1, viewer_height - 2 );
 	glEnd();
 
 	// Render foreground text
@@ -1696,11 +1697,11 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 	glTexCoord2f( 0.0f, 0.0f );
 	glVertex2i( 0, 0 );
 	glTexCoord2f( 1.0f, 0.0f );
-	glVertex2i( viewer->get_width() - 1, 0 );
+	glVertex2i( viewer_width - 1, 0 );
 	glTexCoord2f( 1.0f, 1.0f );
-	glVertex2i( viewer->get_width() - 1, viewer->get_height() - 1 );
+	glVertex2i( viewer_width - 1, viewer_height - 1 );
 	glTexCoord2f( 0.0f, 1.0f );
-	glVertex2i( 0, viewer->get_height() - 1 );
+	glVertex2i( 0, viewer_height - 1 );
 	glEnd();
 
 	text_texture->disable();

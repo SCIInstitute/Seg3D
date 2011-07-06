@@ -712,7 +712,8 @@ PaintTool::~PaintTool()
   this->disconnect_all();
 }
 
-void PaintTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
+void PaintTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
+  int viewer_width, int viewer_height )
 {
   ViewerHandle viewer = ViewerManager::Instance()->get_viewer( viewer_id );
   ViewerHandle current_viewer;
@@ -846,7 +847,7 @@ void PaintTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
     double slice_height = top - bottom;
     Core::Vector slice_x( slice_width, 0.0, 0.0 );
     slice_x = proj_mat * slice_x;
-    double slice_screen_width = Core::Abs( slice_x.x() ) / 2.0 * viewer->get_width();
+    double slice_screen_width = Core::Abs( slice_x.x() ) / 2.0 * viewer_width;
     double slice_screen_height = slice_height / slice_width * slice_screen_width;
     this->private_->shader_->set_pixel_size( static_cast< float >( 1.0 / slice_screen_width ), 
       static_cast< float >( 1.0 /slice_screen_height ) );
@@ -881,7 +882,7 @@ void PaintTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
     // Compute the size of the brush in window space
     Core::Vector brush_x( right - left, 0.0, 0.0 );
     brush_x = proj_mat * brush_x;
-    double brush_screen_width = Core::Abs( brush_x.x() ) / 2.0 * viewer->get_width();
+    double brush_screen_width = Core::Abs( brush_x.x() ) / 2.0 * viewer_width;
     double brush_screen_height = ( top - bottom ) / ( right - left ) * brush_screen_width;
 
     if ( current_viewer->get_viewer_id() != viewer_id )
@@ -918,7 +919,7 @@ void PaintTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 
   if ( layer_visible )
   {
-    SeedPointsTool::redraw( viewer_id, proj_mat );
+    SeedPointsTool::redraw( viewer_id, proj_mat, viewer_width, viewer_height );
     CORE_CHECK_OPENGL_ERROR();
   }
   

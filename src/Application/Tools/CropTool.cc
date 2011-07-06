@@ -542,7 +542,8 @@ void CropTool::execute( Core::ActionContextHandle context )
     origin, size, this->replace_state_->get() );
 }
 
-void CropTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
+void CropTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
+  int viewer_width, int viewer_height )
 {
   ViewerHandle viewer = ViewerManager::Instance()->get_viewer( viewer_id );
 

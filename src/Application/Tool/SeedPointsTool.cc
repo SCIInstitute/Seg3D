@@ -211,7 +211,8 @@ bool SeedPointsTool::handle_mouse_move( ViewerHandle viewer,
   return false;
 }
 
-void SeedPointsTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
+void SeedPointsTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
+  int viewer_width, int viewer_height )
 {
   ViewerHandle viewer = ViewerManager::Instance()->get_viewer( viewer_id );
   if ( viewer->is_volume_view() )
@@ -244,8 +245,8 @@ void SeedPointsTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
     vol_slice->project_onto_slice( seed_points[ i ], x_pos, y_pos );
     Core::Point pt( x_pos, y_pos, 0 );
     pt = proj_mat * pt;
-    int x = static_cast< int >( ( pt[ 0 ] + 1.0 ) * 0.5 * ( viewer->get_width() - 1 ) );
-    int y = static_cast< int >( ( pt[ 1 ] + 1.0 ) * 0.5 * ( viewer->get_height() - 1 ) );
+    int x = static_cast< int >( ( pt[ 0 ] + 1.0 ) * 0.5 * ( viewer_width - 1 ) );
+    int y = static_cast< int >( ( pt[ 1 ] + 1.0 ) * 0.5 * ( viewer_height - 1 ) );
     int slice_num = vol_slice->get_closest_slice( seed_points[ i ] );
     bool in_slice = ( !vol_slice->out_of_boundary() && 
       slice_num == static_cast< int >( vol_slice->get_slice_number() ) );

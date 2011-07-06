@@ -183,7 +183,8 @@ bool Tool::handle_update_cursor( ViewerHandle viewer )
   return false;
 }
 
-void Tool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
+void Tool::redraw( size_t viewer_id, const Core::Matrix& proj_mat, 
+  int viewer_width, int viewer_height )
 {
 }
 

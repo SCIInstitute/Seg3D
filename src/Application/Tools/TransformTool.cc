@@ -464,7 +464,8 @@ void TransformTool::execute( Core::ActionContextHandle context )
     this->show_border_state_, false, Core::ActionSource::NONE_E ) );
 }
 
-void TransformTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
+void TransformTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
+  int viewer_width, int viewer_height )
 {
   ViewerHandle viewer = ViewerManager::Instance()->get_viewer( viewer_id );
 

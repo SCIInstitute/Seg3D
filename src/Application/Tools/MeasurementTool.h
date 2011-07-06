@@ -96,7 +96,8 @@ public:
   // Draw seed points in the specified viewer.
   // The function should only be called by the renderer, which has a valid GL context.
   // Locks: StateEngine and RenderResources (not at same time)
-  virtual void redraw( size_t viewer_id, const Core::Matrix& proj_mat );
+  virtual void redraw( size_t viewer_id, const Core::Matrix& proj_mat,
+    int viewer_width, int viewer_height );
 
   // HAS_2D_VISUAL:
   // Returns true if the tool draws itself in the 2D view, otherwise false.

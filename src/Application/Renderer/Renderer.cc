@@ -1002,6 +1002,18 @@ bool Renderer::render_overlay()
   Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
 
   ViewerHandle viewer = ViewerManager::Instance()->get_viewer( this->private_->viewer_id_ );
+  // NOTE: If the viewer layout changes, viewer attributes could be changed by the interface thread   
+  // underneath us.  Since there is no way to force Qt to lock the viewer before making these   
+  // changes, we grab the width and height up front and check for validity so that we at least  
+  // don't crash later due to a width or height of 0.  The width and height are passed to the 
+  // tools and should be used instead of querying the viewer directly.  
+  int viewer_width = viewer->get_width(); 
+  int viewer_height = viewer->get_height(); 
+  if( viewer_width <= 0 || viewer_height <= 0 )   
+  {   
+    return false; 
+  } 
+  
   bool show_overlay = viewer->overlay_visible_state_->get();
 
   if ( viewer->is_volume_view() )
@@ -1075,7 +1087,7 @@ bool Renderer::render_overlay()
     ToolHandle tool = ToolManager::Instance()->get_active_tool();
     if ( tool )
     {
-      tool->redraw( this->private_->viewer_id_, proj_mat );
+      tool->redraw( this->private_->viewer_id_, proj_mat, viewer_width, viewer_height );
       CORE_CHECK_OPENGL_ERROR();
     }
 
