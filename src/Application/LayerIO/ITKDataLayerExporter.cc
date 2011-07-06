@@ -286,6 +286,7 @@ bool export_dicom_series( const std::string& file_path, const std::string& file_
       spacingArray[ 1 ] = spacing_y;
       spacingArray[ 2 ] = spacing_z;
 
+      itk::EncapsulateMetaData< unsigned int >( **dict_iter, itk::ITK_NumberOfDimensions, 3 );
       itk::EncapsulateMetaData< DoubleArrayType >( **dict_iter, itk::ITK_Origin, originArray );
       itk::EncapsulateMetaData< DoubleArrayType >( **dict_iter, itk::ITK_Spacing, spacingArray );
     }
