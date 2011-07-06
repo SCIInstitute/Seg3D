@@ -48,6 +48,7 @@
 //QtUtils Includes
 #include <QtUtils/Bridge/QtBridge.h>
 #include <QtUtils/Widgets/QtColorBarWidget.h>
+#include <QtUtils/Widgets/QtSliderDoubleCombo.h>
 
 //Application Includes
 #include <Application/ViewerManager/ViewerManager.h>
@@ -148,7 +149,7 @@ public:
   
   // Custom widgets that cannot be added by the Qt Designer
   QtUtils::QtColorBarWidget* color_widget_;
-  
+
   // Drag and drop stuff
   PushDragButton* activate_button_;
   DropSpaceWidget* drop_space_;
@@ -580,6 +581,11 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   this->private_->ui_.abort_bar_->hide();
   this->private_->ui_.opacity_bar_->hide();
   this->private_->ui_.volume_rendered_button_->hide();
+
+  // Connect the thresholds so that they keep in sync
+  this->private_->ui_.display_max_adjuster_->connect_max( this->private_->ui_.display_min_adjuster_ );
+  this->private_->ui_.display_min_adjuster_->connect_min( this->private_->ui_.display_max_adjuster_ );
+
   
   QtUtils::QtBridge::Show( this->private_->ui_.advanced_visibility_button_, 
     PreferencesManager::Instance()->advanced_visibility_settings_state_ );

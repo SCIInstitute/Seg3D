@@ -151,6 +151,7 @@ void ToolBoxWidget::add_tool( QWidget * tool, const QString &label,
   new_page.ui_.close_button_->setIconSize( QSize( 18, 18 ) );
 
   new_page.ui_.tool_frame_layout_->addWidget( new_page.tool_ );
+  new_page.ui_.tool_frame_layout_->setAlignment( Qt::AlignTop );
 
   // add the new_page_ to the tool_layout
   this->tool_layout_->addWidget( new_page.page_ );
