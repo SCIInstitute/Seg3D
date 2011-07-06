@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>275</width>
-    <height>188</height>
+    <height>187</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -15,12 +15,6 @@
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
-  </property>
-  <property name="minimumSize">
-   <size>
-    <width>0</width>
-    <height>188</height>
-   </size>
   </property>
   <property name="maximumSize">
    <size>
@@ -139,13 +133,13 @@ QPushButton:pressed{
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>66</height>
+       <height>64</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>66</height>
+       <height>64</height>
       </size>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
