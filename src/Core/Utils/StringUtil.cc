@@ -591,7 +591,26 @@ std::string ExportToString( const std::vector< char >& value )
   
 std::string ExportToString( const std::vector< std::string >& value )
 {
-  return MultipleToString( value );
+
+  std::vector< std::string >::const_iterator it = value.begin();
+  std::vector< std::string >::const_iterator it_end = value.end();
+  
+  std::string result( "[" );
+  while ( it != it_end )
+  {
+    result += '[' + ToString( *it ) + ']' + ',';
+    ++it;
+  }
+  if ( result.size() > 1 )
+  {
+    result[ result.size() - 1 ] = ']';
+  }
+  else
+  {
+    result += "]";
+  }
+  return result;
+  
 }
 
 std::string ExportToString(const std::vector< unsigned char >& value)
@@ -828,7 +847,7 @@ bool ImportFromString( const std::string& str, std::vector< std::string >& value
   while ( j < data.size() )
   {
     while ( j < data.size() && ( ( data[ j ] == ' ') || ( data[ j ] == '\t' ) || 
-      ( data[ j ] == '\r' ) || ( data[ j ] == '\n' ) ) ) j++;
+      ( data[ j ] == '\r' ) || ( data[ j ] == '\n' ) || ( data[ j ] == ',' ) ) ) j++;
 
     if ( j == data.size() ) return true;
     if ( data[ j ] == '[' )
@@ -853,7 +872,7 @@ bool ImportFromString( const std::string& str, std::vector< std::string >& value
     {
       size_t start = j;
       while ( j < data.size() && ( ( data[ j ] != ' ' )  && ( data[ j ] != '\t' ) &&
-        ( data[ j ] != '\r' ) && ( data[ j ] != '\n' ) ) ) j++;
+        ( data[ j ] != '\r' ) && ( data[ j ] != '\n' ) && ( data[ j ] != ',' ) ) ) j++;
     
       value.push_back( data.substr( start, j-start ) );
     }
