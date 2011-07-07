@@ -54,6 +54,9 @@ SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR} CACHE PATH "" FORCE) # Needed by 
 ###########################################
 
 SET(SEG3D_BUILD_INTERFACE 1 CACHE BOOL "Build the interface to Seg3D")
+IF (WIN32)
+  SET(SEG3D_SHOW_CONSOLE FALSE CACHE BOOL "Show console for debugging")
+ENDIF (WIN32)
 
 ###########################################
 # SEG3D VERSION NUMBERS
