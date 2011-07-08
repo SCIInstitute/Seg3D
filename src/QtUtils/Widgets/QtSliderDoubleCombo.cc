@@ -154,8 +154,14 @@ void QtSliderDoubleCombo::setRange( double min, double max )
 }
 void QtSliderDoubleCombo::setCurrentValue( double value )
 {
-    this->block_signals( true );
-  this->value_ = Core::Clamp( value, this->private_->min_, this->private_->max_ );
+  // Clamp the value to range
+  value = Core::Clamp( value, this->private_->min_, this->private_->max_ );
+  // The value is the same, do nothing
+  if ( this->value_ == value ) return;
+  
+  this->block_signals( true );
+
+  this->value_ = value;
     
   double temp_max;
   double percentage;

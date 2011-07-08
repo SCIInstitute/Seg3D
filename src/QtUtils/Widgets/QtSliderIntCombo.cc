@@ -126,6 +126,8 @@ void QtSliderIntCombo::setRange( int min, int max)
 
 void QtSliderIntCombo::setCurrentValue( int value )
 {
+  if ( this->value_ == value ) return;
+
   block_signals( true );
   this->value_ = value;
     this->private_->ui_.horizontalSlider->setValue( this->value_ );
