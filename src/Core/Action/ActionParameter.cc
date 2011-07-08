@@ -31,6 +31,11 @@
 namespace Core
 {
 
+ActionParameterBase::ActionParameterBase() :
+  persistent_( true )
+{
+}
+
 ActionParameterBase::~ActionParameterBase()
 {
 }

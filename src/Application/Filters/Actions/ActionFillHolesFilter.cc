@@ -50,13 +50,16 @@ namespace Seg3D
 
 bool ActionFillHolesFilter::validate( Core::ActionContextHandle& context )
 {
+  // Make sure that the sandbox exists
+  if ( !LayerManager::CheckSandboxExistence( this->sandbox_, context ) ) return false;
+
   // Check for layer existence and type information
-  if ( ! LayerManager::CheckLayerExistanceAndType( this->target_layer_, 
-    Core::VolumeType::MASK_E, context ) ) return false;
+  if ( ! LayerManager::CheckLayerExistenceAndType( this->target_layer_, 
+    Core::VolumeType::MASK_E, context, this->sandbox_ ) ) return false;
   
   // Check for layer availability 
   if ( ! LayerManager::CheckLayerAvailabilityForProcessing( this->target_layer_, 
-    context ) ) return false;
+    context, this->sandbox_ ) ) return false;
 
   // Validation successful
   return true;
@@ -89,7 +92,7 @@ public:
     // Retrieve the image as an itk image from the underlying data structure
     // NOTE: This only does wrapping and does not regenerate the data.
     Core::ITKImageDataT<unsigned char>::Handle input_image; 
-    // NOTE: Get the invertedd version f the mask
+    // NOTE: Get the inverted version f the mask
     this->get_itk_image_from_layer<unsigned char>( this->src_layer_, input_image, true );
         
     // Create a new ITK filter instantiation. 
@@ -384,6 +387,7 @@ bool ActionFillHolesFilter::run( Core::ActionContextHandle& context,
 {
   // Create algorithm
   boost::shared_ptr<FillHolesFilterAlgo> algo( new FillHolesFilterAlgo );
+  algo->set_sandbox( this->sandbox_ );
 
   // Find the handle to the layer
   if ( !( algo->find_layer( this->target_layer_, algo->src_layer_ ) ) )

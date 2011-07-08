@@ -31,11 +31,10 @@
 
 // Core includes
 #include <Core/Action/Actions.h>
-#include <Core/Interface/Interface.h>
 
 // Application includes
-#include <Application/Layer/LayerFWD.h>
 #include <Application/Layer/LayerAction.h>
+#include <Application/Layer/LayerManager.h>
 
 namespace Seg3D
 {
@@ -45,7 +44,9 @@ class ActionDuplicateLayer : public LayerAction
 
 CORE_ACTION( 
   CORE_ACTION_TYPE( "DuplicateLayer", "Duplicate a layer" )
-  CORE_ACTION_ARGUMENT( "layerid", "The layerid of the layer that needs to be duplicated.")
+  CORE_ACTION_ARGUMENT( "layerid", "The layerid of the layer that needs to be duplicated." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "sandbox", "-1", "The sandbox in which to run the action." )
+  CORE_ACTION_ARGUMENT_IS_NONPERSISTENT( "sandbox" )
   CORE_ACTION_CHANGES_PROJECT_DATA()
   CORE_ACTION_IS_UNDOABLE()
 )
@@ -55,6 +56,7 @@ public:
   ActionDuplicateLayer()
   {
     this->add_layer_id( this->layer_id_ );
+    this->add_parameter( this->sandbox_ );
   }
 
 // -- Functions that describe action --
@@ -66,6 +68,8 @@ public:
 private:
   // The name of the group where the mask needs to be added
   std::string layer_id_;
+  // The sandbox in which to run the action
+  SandboxID sandbox_;
   
   // -- Dispatch this action from the interface --
 public:
@@ -75,7 +79,7 @@ public:
 
   // DISPATCH:
   // Dispatch action that duplicates the active layer
-  static void Dispatch( Core::ActionContextHandle context);
+  static void Dispatch( Core::ActionContextHandle context );
 };
   
 } // end namespace Seg3D

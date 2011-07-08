@@ -48,12 +48,16 @@ namespace Seg3D
 
 bool ActionDuplicateLayer::validate( Core::ActionContextHandle& context )
 {
-  // Step (1): Check whether the layer actually exists 
-  if ( !( LayerManager::CheckLayerExistance( this->layer_id_, 
-    context ) ) ) return false;
+  // Step (1): Check whether the sandbox exists 
+  if ( !LayerManager::CheckSandboxExistence( this->sandbox_, context ) )
+    return false;
   
-  // Step (2): Check whether the layer is available for making a copy from it
-  if ( !LayerManager::CheckLayerAvailabilityForUse( this->layer_id_, context ) )
+  // Step (2): Check whether the layer actually exists 
+  if ( !( LayerManager::CheckLayerExistence( this->layer_id_, context, this->sandbox_ ) ) ) 
+    return false;
+  
+  // Step (3): Check whether the layer is available for making a copy from it
+  if ( !LayerManager::CheckLayerAvailabilityForUse( this->layer_id_, context, this->sandbox_ ) )
     return false;
   
   return true; // validated
@@ -68,11 +72,11 @@ bool ActionDuplicateLayer::run( Core::ActionContextHandle& context, Core::Action
 
   // Step (2):
   // Find the layer that needs to be duplicated
-  LayerHandle layer = LayerManager::FindLayer( this->layer_id_ );
+  LayerHandle layer = LayerManager::FindLayer( this->layer_id_, this->sandbox_ );
 
   if ( !layer )
   {
-    context->report_error( "Could find layer" );
+    context->report_error( "Could find layer '" + this->layer_id_ + "'." );
     return false;
   }
   
@@ -91,38 +95,46 @@ bool ActionDuplicateLayer::run( Core::ActionContextHandle& context, Core::Action
 
   // Step (4):
   // Register the new layer with the LayerManager. This will insert it into the right group.
-  LayerManager::Instance()->insert_layer( new_layer );
-  LayerManager::Instance()->set_active_layer( new_layer );
+  LayerManager::Instance()->insert_layer( new_layer, this->sandbox_ );
 
-  // Step (5): Create a provenance record
-  ProvenanceStepHandle provenance_step( new ProvenanceStep );
-  
-  // Get the input provenance ids from the translate step
-  provenance_step->set_input_provenance_ids( this->get_input_provenance_ids() );
-  
-  // Get the output and replace provenance ids from the analysis above
-  provenance_step->set_output_provenance_ids( this->get_output_provenance_ids() );
+  // report the layer ID to action result
+  result.reset( new Core::ActionResult( new_layer->get_layer_id() ) );
+
+  if ( this->sandbox_ == -1 )
+  {
+    LayerManager::Instance()->set_active_layer( new_layer );
+
+    // Step (5): Create a provenance record
+    ProvenanceStepHandle provenance_step( new ProvenanceStep );
     
-  // Get the action and turn it into provenance 
-  provenance_step->set_action( this->export_to_provenance_string() );   
-  
-  // Add step to provenance record
-  ProvenanceStepID step_id = ProjectManager::Instance()->get_current_project()->
-    add_provenance_record( provenance_step );
+    // Get the input provenance ids from the translate step
+    provenance_step->set_input_provenance_ids( this->get_input_provenance_ids() );
+    
+    // Get the output and replace provenance ids from the analysis above
+    provenance_step->set_output_provenance_ids( this->get_output_provenance_ids() );
+      
+    // Get the action and turn it into provenance 
+    provenance_step->set_action_name( this->get_type() );
+    provenance_step->set_action_params( this->export_params_to_provenance_string() );   
+    
+    // Add step to provenance record
+    ProvenanceStepID step_id = ProjectManager::Instance()->get_current_project()->
+      add_provenance_record( provenance_step );
 
-  // Step (5):
-  // Create an undo item for this action
-  LayerUndoBufferItemHandle item( new LayerUndoBufferItem( "Duplicate layer" ) );
-  // Tell which action has to be re-executed to obtain the result
-  item->set_redo_action( this->shared_from_this() );
-  // Tell which layer was added so undo can delete it
-  item->add_layer_to_delete( new_layer );
-  // Tell what the layer/group id counters are so we can undo those as well
-  item->add_id_count_to_restore( id_count );
-  // Tell which provenance record to delete when the action is undone
-  item->set_provenance_step_id( step_id );
-  // Add the complete record to the undo buffer
-  UndoBuffer::Instance()->insert_undo_item( context, item );
+    // Step (6):
+    // Create an undo item for this action
+    LayerUndoBufferItemHandle item( new LayerUndoBufferItem( "Duplicate layer" ) );
+    // Tell which action has to be re-executed to obtain the result
+    item->set_redo_action( this->shared_from_this() );
+    // Tell which layer was added so undo can delete it
+    item->add_layer_to_delete( new_layer );
+    // Tell what the layer/group id counters are so we can undo those as well
+    item->add_id_count_to_restore( id_count );
+    // Tell which provenance record to delete when the action is undone
+    item->set_provenance_step_id( step_id );
+    // Add the complete record to the undo buffer
+    UndoBuffer::Instance()->insert_undo_item( context, item );
+  }
   
   return true;
 }

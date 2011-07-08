@@ -50,13 +50,16 @@ namespace Seg3D
 
 bool ActionNeighborhoodConnectedFilter::validate( Core::ActionContextHandle& context )
 {
+  // Make sure that the sandbox exists
+  if ( !LayerManager::CheckSandboxExistence( this->sandbox_, context ) ) return false;
+
   // Check for layer existence and type information
-  if ( ! LayerManager::CheckLayerExistanceAndType( this->target_layer_, 
-    Core::VolumeType::DATA_E, context ) ) return false;
+  if ( ! LayerManager::CheckLayerExistenceAndType( this->target_layer_, 
+    Core::VolumeType::DATA_E, context, this->sandbox_ ) ) return false;
   
   // Check for layer availability 
   if ( ! LayerManager::CheckLayerAvailabilityForProcessing( this->target_layer_, 
-    context ) ) return false;
+    context, this->sandbox_ ) ) return false;
 
   if ( this->seeds_.size() == 0 )
   {
@@ -266,6 +269,7 @@ bool ActionNeighborhoodConnectedFilter::run( Core::ActionContextHandle& context,
 {
   // Create algorithm
   boost::shared_ptr<NeighborhoodConnectedFilterAlgo> algo( new NeighborhoodConnectedFilterAlgo );
+  algo->set_sandbox( sandbox_ );
 
   // Find the handle to the layer
   if ( !( algo->find_layer( this->target_layer_, algo->src_layer_ ) ) )

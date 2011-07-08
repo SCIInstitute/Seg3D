@@ -35,15 +35,11 @@
 #include <Core/ITKSpeedLine/itkArrivalFunctionToPathFilter.h>
 //#include <Core/ITKSpeedLine/itkIterateNeighborhoodOptimizer.h>
 
-#include <Application/Provenance/Provenance.h>
-#include <Application/Provenance/ProvenanceStep.h>
 #include <Application/ProjectManager/ProjectManager.h>
 #include <Application/ToolManager/ToolManager.h>
 #include <Application/Tools/Actions/ActionSpeedline.h>
 #include <Application/Layer/MaskLayer.h>
 #include <Application/Layer/LayerManager.h>
-#include <Application/Layer/LayerUndoBufferItem.h>
-#include <Application/UndoBuffer/UndoBuffer.h>
 #include <Application/Filters/ITKFilter.h>
 #include <Application/Tools/SpeedlineTool.h>
 
@@ -88,12 +84,10 @@ public:
   std::string target_layer_id_;
   int slice_type_;
   size_t slice_number_;
-  bool erase_;
   std::vector< Core::Point > vertices_;
   int current_vertex_index_;
   
   DataLayerHandle target_layer_;
-  Core::DataVolumeSliceHandle vol_slice_;
 
   int iterations_;
   double termination_;
@@ -589,133 +583,87 @@ public:
   }
 };
 
-ActionSpeedline::ActionSpeedline() 
+class ActionSpeedlinePrivate
 {
-  this->add_layer_id(  this->target_layer_id_ );
-  this->add_parameter( this->slice_type_ );
-  this->add_parameter( this->slice_number_ );
-  this->add_parameter( this->vertices_ );
-  this->add_parameter( this->iterations_ );
-  this->add_parameter( this->termination_ );
+public:
+  // == action parameters ==
+  std::string target_layer_id_;
+  int slice_type_;
+  size_t slice_number_;
+  std::vector< Core::Point > vertices_;
+  int iterations_;
+  double termination_;
+
+  int current_vertex_index_;
+  Core::Path itk_paths_;
+
+  std::string speedline_tool_id_;
+  bool update_all_paths_;
+};
+
+ActionSpeedline::ActionSpeedline() :
+  private_( new ActionSpeedlinePrivate )
+{
+  this->add_layer_id(  this->private_->target_layer_id_ );
+  this->add_parameter( this->private_->slice_type_ );
+  this->add_parameter( this->private_->slice_number_ );
+  this->add_parameter( this->private_->vertices_ );
+  this->add_parameter( this->private_->iterations_ );
+  this->add_parameter( this->private_->termination_ );
 }
 
 bool ActionSpeedline::validate( Core::ActionContextHandle& context )
 {
   // Check whether the target layer exists
-  DataLayerHandle target_layer = boost::dynamic_pointer_cast< DataLayer >( 
-    LayerManager::Instance()->get_layer_by_id( this->target_layer_id_ ) );
-  if ( !target_layer )
+  if ( !LayerManager::CheckLayerExistenceAndType( this->private_->target_layer_id_,
+    Core::VolumeType::DATA_E, context ) )
   {
-    context->report_error( "Layer '" + this->target_layer_id_ +
-      "' is not a valid mask layer." );
     return false;
   }
 
-  // Check whether the target layer can be used for processing
-  Core::NotifierHandle notifier;
-  if ( !LayerManager::Instance()->CheckLayerAvailabilityForProcessing(
-    this->target_layer_id_, context ) ) return false;
+  // Check whether the target layer can be used for read
+  if ( !LayerManager::CheckLayerAvailabilityForUse( this->private_->target_layer_id_, context ) )
+    return false;
   
-  this->target_layer_ = LayerManager::FindDataLayer( 
-    this->target_layer_id_ );
-  
-  if ( this->slice_type_ != Core::VolumeSliceType::AXIAL_E &&
-    this->slice_type_ != Core::VolumeSliceType::CORONAL_E &&
-    this->slice_type_ != Core::VolumeSliceType::SAGITTAL_E )
+  if ( this->private_->slice_type_ != Core::VolumeSliceType::AXIAL_E &&
+    this->private_->slice_type_ != Core::VolumeSliceType::CORONAL_E &&
+    this->private_->slice_type_ != Core::VolumeSliceType::SAGITTAL_E )
   {
     context->report_error( "Invalid slice type" );
     return false;
   }
   
+  DataLayerHandle target_layer = LayerManager::FindDataLayer( this->private_->target_layer_id_ );
   Core::VolumeSliceType slice_type = static_cast< Core::VolumeSliceType::enum_type >(
-    this->slice_type_ );
+    this->private_->slice_type_ );
   Core::DataVolumeSliceHandle volume_slice( new Core::DataVolumeSlice(
-    this->target_layer_->get_data_volume(), slice_type ) );
-  if ( this->slice_number_ >= volume_slice->number_of_slices() )
+    target_layer->get_data_volume(), slice_type ) );
+  if ( this->private_->slice_number_ >= volume_slice->number_of_slices() )
   {
     context->report_error( "Slice number is out of range." );
     return false;
   }
-  
-  volume_slice->set_slice_number( this->slice_number_ );
-  this->vol_slice_ = volume_slice;
-  
-  const std::vector< Core::Point >& vertices = this->vertices_;
   
   return true;
 }
 
 bool ActionSpeedline::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
-  Core::DataVolumeSliceHandle volume_slice = this->vol_slice_;
-
-  {
-    // Get the layer on which this action operates
-    LayerHandle layer = LayerManager::Instance()->get_layer_by_id( 
-      this->target_layer_id_ );
-
-    // Create a provenance record
-    ProvenanceStepHandle provenance_step( new ProvenanceStep );
-
-    // Get the input provenance ids from the translate step
-    provenance_step->set_input_provenance_ids( this->get_input_provenance_ids() );
-
-    // Get the output and replace provenance ids from the analysis above
-    provenance_step->set_output_provenance_ids(  this->get_output_provenance_ids( 1 )  );
-
-    ProvenanceIDList deleted_provenance_ids( 1, layer->provenance_id_state_->get() );
-    provenance_step->set_replaced_provenance_ids( deleted_provenance_ids );
-
-    provenance_step->set_action( this->export_to_provenance_string() );   
-
-    ProvenanceStepID step_id = ProjectManager::Instance()->get_current_project()->
-      add_provenance_record( provenance_step );   
-
-    // Build the undo/redo for this action
-    LayerUndoBufferItemHandle item( new LayerUndoBufferItem( "Speedline" ) );
-
-    // Get the axis along which the flood fill works
-    Core::SliceType slice_type = static_cast< Core::SliceType::enum_type>(
-      this->slice_type_ );
-
-    // Get the slice number
-    size_t slice_number = this->slice_number_;
-
-    // Create a check point of the slice on which the flood fill will operate
-    LayerCheckPointHandle check_point( new LayerCheckPoint( layer, slice_type, slice_number ) );
-
-    // The redo action is the current one
-    item->set_redo_action( this->shared_from_this() );
-
-    // Tell the item which provenance record to delete when undone
-    item->set_provenance_step_id( step_id );
-
-    // Tell the item which layer to restore with which check point for the undo action
-    item->add_layer_to_restore( layer, check_point );
-
-    // Now add the undo/redo action to undo buffer
-    UndoBuffer::Instance()->insert_undo_item( context, item );
-
-    // Add provenance id to output layer
-    layer->provenance_id_state_->set( this->get_output_provenance_id( 0 ) );
-  }
-
   // Create algorithm
   typedef boost::shared_ptr< ActionSpeedlineAlgo > ActionSpeedlineAlgoHandle;
   ActionSpeedlineAlgoHandle algo( new ActionSpeedlineAlgo );
 
-  algo->target_layer_id_ = this->target_layer_id_ ;
-  algo->slice_type_ = this->slice_type_ ;
-  algo->slice_number_ = this->slice_number_;
-  algo->vertices_ = this->vertices_;
-  algo->current_vertex_index_ = this->current_vertex_index_;
-  algo->itk_paths_ = this->itk_paths_;
-  algo->iterations_ = this->iterations_;
-  algo->termination_ = this->termination_;
-  algo->target_layer_ = LayerManager::FindDataLayer( 
-    this->target_layer_id_ );
-  algo->update_all_paths_ = this->update_all_paths_;
-  algo->speedline_tool_id_ = this->speedline_tool_id_;
+  algo->target_layer_id_ = this->private_->target_layer_id_ ;
+  algo->slice_type_ = this->private_->slice_type_ ;
+  algo->slice_number_ = this->private_->slice_number_;
+  algo->vertices_ = this->private_->vertices_;
+  algo->current_vertex_index_ = this->private_->current_vertex_index_;
+  algo->itk_paths_ = this->private_->itk_paths_;
+  algo->iterations_ = this->private_->iterations_;
+  algo->termination_ = this->private_->termination_;
+  algo->target_layer_ = LayerManager::FindDataLayer( this->private_->target_layer_id_ );
+  algo->update_all_paths_ = this->private_->update_all_paths_;
+  algo->speedline_tool_id_ = this->private_->speedline_tool_id_;
 
   Core::Runnable::Start( algo );
 
@@ -734,16 +682,16 @@ void ActionSpeedline::Dispatch( Core::ActionContextHandle context,
 {
   ActionSpeedline* action = new ActionSpeedline;
 
-  action->target_layer_id_ = layer_id;
-  action->slice_type_ = slice_type;
-  action->slice_number_ = slice_number;
-  action->vertices_ = vertices;
-  action->current_vertex_index_ = current_vertex_index;
-  action->itk_paths_ = itk_paths;
-  action->iterations_ = iterations;
-  action->termination_ = termination;
-  action->update_all_paths_ = update_all_paths;
-  action->speedline_tool_id_ = toolid;
+  action->private_->target_layer_id_ = layer_id;
+  action->private_->slice_type_ = slice_type;
+  action->private_->slice_number_ = slice_number;
+  action->private_->vertices_ = vertices;
+  action->private_->current_vertex_index_ = current_vertex_index;
+  action->private_->itk_paths_ = itk_paths;
+  action->private_->iterations_ = iterations;
+  action->private_->termination_ = termination;
+  action->private_->update_all_paths_ = update_all_paths;
+  action->private_->speedline_tool_id_ = toolid;
 
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }

@@ -49,25 +49,28 @@ ActionThreshold::ActionThreshold()
   this->add_layer_id( this->target_layer_ );
   this->add_parameter( this->upper_threshold_ );
   this->add_parameter( this->lower_threshold_ );
+  this->add_parameter( this->sandbox_ );
 }
 
 bool ActionThreshold::validate( Core::ActionContextHandle& context )
 {
+  // Make sure that the sandbox exists
+  if ( !LayerManager::CheckSandboxExistence( this->sandbox_, context ) ) return false;
+
   // Check for layer existence and type information
-  if ( ! LayerManager::CheckLayerExistanceAndType( this->target_layer_, 
-    Core::VolumeType::DATA_E, context ) ) return false;
+  if ( ! LayerManager::CheckLayerExistenceAndType( this->target_layer_, 
+    Core::VolumeType::DATA_E, context, this->sandbox_ ) ) return false;
   
   // Check for layer availability 
-  if ( ! LayerManager::CheckLayerAvailabilityForProcessing( this->target_layer_, 
-    context ) ) return false;
+  if ( ! LayerManager::CheckLayerAvailabilityForUse( this->target_layer_, 
+    context, this->sandbox_ ) ) return false;
   
   if ( this->lower_threshold_ > this->upper_threshold_ )
   {
     std::swap( this->lower_threshold_, this->upper_threshold_ );
   }
   
-  DataLayerHandle data_layer = LayerManager::Instance()->
-    get_data_layer_by_id( this->target_layer_ );
+  DataLayerHandle data_layer = LayerManager::FindDataLayer( this->target_layer_, this->sandbox_ );
   double min_val = data_layer->get_data_volume()->get_data_block()->get_min();
   double max_val = data_layer->get_data_volume()->get_data_block()->get_max();
 
@@ -221,6 +224,7 @@ bool ActionThreshold::run( Core::ActionContextHandle& context,
   boost::shared_ptr< ThresholdFilterAlgo > algo( new ThresholdFilterAlgo );
 
   // Copy the parameters over to the algorithm that runs the filter
+  algo->set_sandbox( this->sandbox_ );
   algo->lower_threshold_ = this->lower_threshold_;
   algo->upper_threshold_ = this->upper_threshold_;
 

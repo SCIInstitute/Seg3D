@@ -183,7 +183,8 @@ int main( int argc, char **argv )
   python_modules.push_back( Core::PythonInterpreter::module_entry_type( module_name, 
     BOOST_PP_CAT( PyInit_, APPLICATION_NAME ) ) );
   Core::PythonInterpreter::Instance()->initialize( &program_name[ 0 ], python_modules );
-  Core::PythonInterpreter::Instance()->run_script( "import " + module_name + "\nfrom " + module_name + " import *\n" );
+  Core::PythonInterpreter::Instance()->run_string( "import " + module_name + "\n" );
+  Core::PythonInterpreter::Instance()->run_string( "from " + module_name + " import *\n" );
 #endif
 
   // -- Setup Application Interface Window --

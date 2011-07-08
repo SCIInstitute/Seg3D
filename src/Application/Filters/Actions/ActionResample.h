@@ -55,6 +55,8 @@ CORE_ACTION(
   CORE_ACTION_OPTIONAL_ARGUMENT( "param1", "1.0", "The first parameter for the kernel" )
   CORE_ACTION_OPTIONAL_ARGUMENT( "param2", "1.0", "The second parameter for the kernel" )
   CORE_ACTION_OPTIONAL_ARGUMENT( "replace", "false", "Whether to delete the input layers when done" )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "sandbox", "-1", "The sandbox in which to run the action." )
+  CORE_ACTION_ARGUMENT_IS_NONPERSISTENT( "sandbox" )  
   CORE_ACTION_CHANGES_PROJECT_DATA()
   CORE_ACTION_IS_UNDOABLE()
 )

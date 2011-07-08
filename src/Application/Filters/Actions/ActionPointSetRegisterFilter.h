@@ -34,6 +34,7 @@
 
 #include <Application/Layer/Layer.h>
 #include <Application/Layer/LayerAction.h>
+#include <Application/Layer/LayerManager.h>
 
 namespace Seg3D
 {
@@ -46,6 +47,8 @@ CORE_ACTION(
   CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
   CORE_ACTION_ARGUMENT( "mask", "The layerid of the mask that needs to be applied." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "iterations", "5", "Number of iterations to perform." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "sandbox", "-1", "The sandbox in which to run the action." )
+  CORE_ACTION_ARGUMENT_IS_NONPERSISTENT( "sandbox" )  
   CORE_ACTION_CHANGES_PROJECT_DATA()
   CORE_ACTION_IS_UNDOABLE()
 )
@@ -57,6 +60,7 @@ public:
     this->add_layer_id( this->target_layer_ );
     this->add_layer_id( this->mask_layer_ );
     this->add_parameter( this->iterations_ ); 
+    this->add_parameter( this->sandbox_ );
   }
 
 
@@ -73,6 +77,7 @@ private:
   std::string mask_layer_;
   //bool replace_;
   int iterations_;
+  SandboxID sandbox_;
   std::string pointset_tool_id_;
   
   // -- Dispatch this action from the interface --

@@ -82,6 +82,15 @@ private:
   // this function does the actual reconnecting
   void connect_project();
 
+private Q_SLOTS:
+  // ENABLE_DISABLE_REPLAY_BUTTON:
+  // Enable or disable the 'Recreate' button based on the current selected row.
+  void enable_disable_replay_button();
+
+  // DISPATCH_RECREATE_PROVENANCE:
+  // Dispatch an ActionRecreateLayer if the current selected row has a valid provenance ID of interest.
+  void dispatch_recreate_provenance();
+
 private:
   boost::shared_ptr< ProvenanceDockWidgetPrivate > private_;
 };

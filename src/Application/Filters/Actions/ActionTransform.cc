@@ -55,6 +55,7 @@ public:
   Core::Point origin_;
   Core::Vector spacing_;
   bool replace_;
+  SandboxID sandbox_;
 
   Core::GridTransform output_grid_trans_;
 };
@@ -241,10 +242,14 @@ ActionTransform::ActionTransform() :
   this->add_parameter( this->private_->origin_ );
   this->add_parameter( this->private_->spacing_ );
   this->add_parameter( this->private_->replace_ );
+  this->add_parameter( this->private_->sandbox_ );
 }
 
 bool ActionTransform::validate( Core::ActionContextHandle& context )
 {
+  // Make sure that the sandbox exists
+  if ( !LayerManager::CheckSandboxExistence( this->private_->sandbox_, context ) ) return false;
+
   const std::vector< std::string >& layer_ids = this->private_->layer_ids_;
   if ( layer_ids.size() == 0 )
   {
@@ -252,11 +257,11 @@ bool ActionTransform::validate( Core::ActionContextHandle& context )
     return false;
   }
   
-  LayerGroupHandle layer_group;
+  Core::GridTransform src_grid_trans;
   for ( size_t i = 0; i < layer_ids.size(); ++i )
   {
     // Check for layer existence
-    LayerHandle layer = LayerManager::Instance()->get_layer_by_id( layer_ids[ i ] );
+    LayerHandle layer = LayerManager::FindLayer( layer_ids[ i ], this->private_->sandbox_ );
     if ( !layer )
     {
       context->report_error( "Layer '" + layer_ids[ i ] + "' doesn't exist" );
@@ -264,11 +269,11 @@ bool ActionTransform::validate( Core::ActionContextHandle& context )
     }
 
     // Make sure that all the layers are in the same group
-    if ( !layer_group )
+    if ( i == 0 )
     {
-      layer_group = layer->get_layer_group();
+      src_grid_trans = layer->get_grid_transform();
     }
-    else if ( layer_group != layer->get_layer_group() )
+    else if ( src_grid_trans != layer->get_grid_transform() )
     {
       context->report_error( "Input layers do not belong to the same group" );
       return false;
@@ -276,7 +281,7 @@ bool ActionTransform::validate( Core::ActionContextHandle& context )
     
     // Check for layer availability 
     if ( !LayerManager::CheckLayerAvailability( layer_ids[ i ], 
-      this->private_->replace_, context ) ) return false;
+      this->private_->replace_, context, this->private_->sandbox_ ) ) return false;
   }
   
   const Core::Vector& spacing = this->private_->spacing_;
@@ -287,7 +292,6 @@ bool ActionTransform::validate( Core::ActionContextHandle& context )
   }
 
   // Compute the output grid transform
-  const Core::GridTransform& src_grid_trans = layer_group->get_grid_transform();
   this->private_->output_grid_trans_.set_nx( src_grid_trans.get_nx() );
   this->private_->output_grid_trans_.set_ny( src_grid_trans.get_ny() );
   this->private_->output_grid_trans_.set_nz( src_grid_trans.get_nz() );
@@ -306,6 +310,7 @@ bool ActionTransform::run( Core::ActionContextHandle& context,
   boost::shared_ptr< TransformAlgo > algo( new TransformAlgo );
 
   // Set up parameters
+  algo->set_sandbox( this->private_->sandbox_ );
   algo->replace_ = this->private_->replace_;
 
   // Set up input and output layers

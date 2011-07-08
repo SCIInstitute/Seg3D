@@ -26,8 +26,11 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Core includes
+#include <Core/Utils/Exception.h>
 #include <Core/Application/Application.h>
 
+// Application includes
 #include <Application/Clipboard/Clipboard.h>
 
 namespace Seg3D
@@ -37,6 +40,8 @@ namespace Seg3D
 // Implementation of class ClipboardPrivate
 //////////////////////////////////////////////////////////////////////////
 
+typedef std::map< long long , ClipboardItemHandle > SandboxMap;
+
 class ClipboardPrivate
 {
 public:
@@ -44,15 +49,14 @@ public:
   // Rest the clipboard.
   void reset();
 
-  std::vector< ClipboardItemHandle > slots_;
+  ClipboardItemHandle item_;
+  SandboxMap sandboxes_;
 };
 
 void ClipboardPrivate::reset()
 {
-  for ( size_t i = 0; i < this->slots_.size(); ++i )
-  {
-    this->slots_[ i ].reset();
-  }
+  this->item_.reset();
+  this->sandboxes_.clear();
 }
 
 
@@ -65,7 +69,6 @@ CORE_SINGLETON_IMPLEMENTATION( Clipboard );
 Clipboard::Clipboard() :
   private_( new ClipboardPrivate )
 {
-  this->private_->slots_.resize( 3 );
   // Reset the clipboard on application reset signal.
   Core::Application::Instance()->reset_signal_.connect( boost::bind( 
     &ClipboardPrivate::reset, this->private_ ) );
@@ -75,25 +78,55 @@ Clipboard::~Clipboard()
 {
 }
 
-ClipboardItemConstHandle Clipboard::get_item( size_t index )
+ClipboardItemConstHandle Clipboard::get_item( long long sandbox )
 {
   ASSERT_IS_APPLICATION_THREAD();
-  assert( index < this->private_->slots_.size() );
+
+  if ( sandbox == -1 )
+  {
+    return this->private_->item_;
+  }
   
-  return this->private_->slots_[ index ];
+  SandboxMap::iterator it = this->private_->sandboxes_.find( sandbox );
+  if ( it != this->private_->sandboxes_.end() )
+  {
+    return it->second;
+  }
+  
+  CORE_THROW_LOGICERROR( "Sandbox not found!" );
 }
 
 ClipboardItemHandle Clipboard::get_item( size_t width, size_t height, 
-                    Core::DataType data_type, size_t index )
+                    Core::DataType data_type, long long sandbox )
 {
   ASSERT_IS_APPLICATION_THREAD();
-  assert( index < this->private_->slots_.size() );
 
-  ClipboardItemHandle item = this->private_->slots_[ index ];
+  ClipboardItemHandle item;
+  if ( sandbox == -1 )
+  {
+    item = this->private_->item_;
+  }
+  else
+  {
+    SandboxMap::iterator it = this->private_->sandboxes_.find( sandbox );
+    if ( it == this->private_->sandboxes_.end() )
+    {
+      CORE_THROW_LOGICERROR( "Sandbox not found!" );
+    }
+    item = it->second;    
+  }
+
   if ( !item )
   {
     item.reset( new ClipboardItem( width, height, data_type ) );
-    this->private_->slots_[ index ] = item;
+    if ( sandbox == -1 )
+    {
+      this->private_->item_ = item;
+    }
+    else
+    {
+      this->private_->sandboxes_[ sandbox ] = item;
+    }
   }
   else
   {
@@ -103,17 +136,20 @@ ClipboardItemHandle Clipboard::get_item( size_t width, size_t height,
   return item;
 }
 
-void Clipboard::set_item( ClipboardItemHandle item, size_t index )
+void Clipboard::set_item( ClipboardItemHandle item )
 {
   ASSERT_IS_APPLICATION_THREAD();
-  assert( index < this->private_->slots_.size() );
-
-  this->private_->slots_[ index ] = item;
+  this->private_->item_ = item;
 }
 
-size_t Clipboard::number_of_slots()
+void Clipboard::create_sandbox( long long sandbox_id )
 {
-  return this->private_->slots_.size();
+  this->private_->sandboxes_[ sandbox_id ] = ClipboardItemHandle();
+}
+
+bool Clipboard::delete_sandbox( long long sandbox_id )
+{
+  return this->private_->sandboxes_.erase( sandbox_id ) == 1;
 }
 
 } // end namespace Seg3D

@@ -87,7 +87,7 @@ ArithmeticFilter::~ArithmeticFilter()
 
 void ArithmeticFilter::update_output_type()
 {
-  LayerHandle layer = LayerManager::Instance()->get_layer_by_id( this->target_layer_state_->get() );
+  LayerHandle layer = LayerManager::Instance()->find_layer_by_id( this->target_layer_state_->get() );
   if ( layer )
   {
     if ( layer->get_type() == Core::VolumeType::DATA_E ) 
@@ -107,7 +107,7 @@ void ArithmeticFilter::update_output_type()
 
 void ArithmeticFilter::update_replace_options()
 {
-  LayerHandle layer = LayerManager::Instance()->get_layer_by_id( this->target_layer_state_->get() );
+  LayerHandle layer = LayerManager::Instance()->find_layer_by_id( this->target_layer_state_->get() );
   if( layer )
   {
     if( ( layer->get_type() == Core::VolumeType::DATA_E && 

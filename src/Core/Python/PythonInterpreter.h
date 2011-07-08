@@ -75,14 +75,39 @@ private:
   virtual void initialize_eventhandler();
 
 public:
+  // INITIALIZE:
+  // Initialize the python interpreter with extra modules.
   void initialize( wchar_t* program_name, const module_list_type& init_list );
+
+  // GET_ACTION_CONTEXT:
+  // Get the action context for running actions from python.
   PythonActionContextHandle get_action_context();
 
+  // PRINT_BANNER:
+  // Print the basic information about the python interpreter to output_signal_.
   void print_banner();
+
+  // RUN_STRING:
+  // Execute a single python command.
+  // NOTE: The command is run in the main namespace.
   void run_string( std::string command );
+
+  // RUN_SCRIPT:
+  // Execute a python script.
+  // NOTE: The script is run in its own local namespace.
   void run_script( std::string script );
+
+  // RUN_FILE:
+  // Execute a python script from file.
+  // NOTE: The script is run in its own local namespace.
   void run_file( std::string file_name );
+
+  // INTERRUPT:
+  // Interrupt the current execution.
   void interrupt();
+
+  // START_TERMINAL:
+  // To be implemented.
   void start_terminal();
 
   // -- signals --
@@ -97,7 +122,14 @@ private:
   PythonInterpreterPrivateHandle private_;
 
 public:
+  // GETACTIONCONTEXT:
+  // Returns the action context for the python interpreter.
   static PythonActionContextHandle GetActionContext();
+
+  // ESCAPEQUOTES:
+  // Escape the quotes(') and backslashes(\) in a string so it can be used as a python string enclosed
+  // by a pair of single quotes.
+  static std::string EscapeSingleQuotedString( const std::string& input_str );
 };
 
 } // end namespace Core

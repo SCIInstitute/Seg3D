@@ -85,11 +85,11 @@ bool RecursiveCopyDirectory( const boost::filesystem::path& from, const boost::f
       }
       path dst_path = to / file_path;
 
-      if ( is_regular_file( source_path ) )
+      if ( is_regular_file( dir_it->symlink_status() ) )
       {
         copy_file( source_path, dst_path );
       }
-      else if ( is_directory( source_path ) )
+      else if ( is_directory( dir_it->symlink_status() ) )
       {
         copy_directory( source_path, dst_path );
       }

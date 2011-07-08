@@ -66,7 +66,8 @@ public:
     done_( false ),
     abort_( false ),
     key_( Layer::GenerateFilterKey() ),
-    id_count_( LayerManager::GetLayerIdCount() )
+    id_count_( LayerManager::GetLayerIdCount() ),
+    sandbox_( -1 )
   {
   }
 
@@ -132,6 +133,9 @@ public:
 
   // Pointer to the filter.
   LayerFilter* filter_;
+
+  // Sandbox ID
+  SandboxID sandbox_;
   
   // -- internal functions --
 public:
@@ -220,7 +224,8 @@ void LayerFilterPrivate::finalize()
     // Only unlock it if the handle still exists
     if ( this->locked_for_use_layers_[ j ] )
     {
-      LayerManager::DispatchUnlockLayer( this->locked_for_use_layers_[ j ], this->key_ );
+      LayerManager::DispatchUnlockLayer( this->locked_for_use_layers_[ j ], 
+        this->key_, this->sandbox_ );
       this->locked_for_use_layers_[ j ].reset();
     }
   }
@@ -230,7 +235,8 @@ void LayerFilterPrivate::finalize()
     // Only unlock it if the handle still exists
     if ( this->locked_for_processing_layers_[ j ] )
     {
-      LayerManager::DispatchUnlockLayer( this->locked_for_processing_layers_[ j ], this->key_ );
+      LayerManager::DispatchUnlockLayer( this->locked_for_processing_layers_[ j ], 
+        this->key_, this->sandbox_ );
       this->locked_for_processing_layers_[ j ].reset();
     }
   }
@@ -239,7 +245,8 @@ void LayerFilterPrivate::finalize()
   {
     if ( this->locked_for_deletion_layers_[ j ] )
     {
-      LayerManager::DispatchUnlockLayer( this->locked_for_deletion_layers_[ j ], this->key_ );
+      LayerManager::DispatchUnlockLayer( this->locked_for_deletion_layers_[ j ], 
+        this->key_, this->sandbox_ );
       this->locked_for_deletion_layers_[ j ].reset();
     } 
   }
@@ -250,7 +257,7 @@ void LayerFilterPrivate::finalize()
     {
       if ( this->created_layers_[ j ] )
       {
-        LayerManager::DispatchDeleteLayer( this->created_layers_[ j ], this->key_ );
+        LayerManager::DispatchDeleteLayer( this->created_layers_[ j ], this->key_, this->sandbox_ );
         this->created_layers_[ j ].reset();
       }
     }
@@ -261,7 +268,8 @@ void LayerFilterPrivate::finalize()
     {
       if ( this->created_layers_[ j ] )
       {
-        LayerManager::DispatchUnlockOrDeleteLayer( this->created_layers_[ j ], this->key_ );
+        LayerManager::DispatchUnlockOrDeleteLayer( this->created_layers_[ j ], 
+          this->key_, this->sandbox_ );
         this->created_layers_[ j ].reset();
       }
     }
@@ -412,8 +420,9 @@ void LayerFilterPrivate::create_provenance_record( Core::ActionContextHandle con
   this->provenance_step_->set_replaced_provenance_ids( deleted_provenance_ids );
 
   // Get the input command of what needs t be rerun
-  this->provenance_step_->set_action( 
-    layer_action->export_to_provenance_string() );
+  this->provenance_step_->set_action_name( layer_action->get_type() );
+  this->provenance_step_->set_action_params( 
+    layer_action->export_params_to_provenance_string() );
 
   this->provenance_step_id_ = ProjectManager::Instance()->get_current_project()->
     add_provenance_record( this->provenance_step_ );
@@ -540,7 +549,7 @@ void LayerFilter::report_error( const std::string& error )
 
 bool LayerFilter::find_layer( const std::string& layer_id, LayerHandle& layer )
 {
-  layer = LayerManager::Instance()->get_layer_by_id( layer_id );
+  layer = LayerManager::FindLayer( layer_id, this->private_->sandbox_ );
   if ( layer )
   {
     return true;
@@ -629,7 +638,7 @@ bool LayerFilter::create_and_lock_data_layer_from_layer( LayerHandle src_layer,
 
   // Create the layer in creating mode
   if ( !( LayerManager::CreateAndLockDataLayer( src_layer->get_grid_transform(),
-    name, dst_layer, src_layer->get_meta_data(), this->private_->key_ ) ) )
+    name, dst_layer, src_layer->get_meta_data(), this->private_->key_, this->private_->sandbox_ ) ) )
   {
     dst_layer.reset();
     this->report_error( "Could not allocate enough memory." );
@@ -667,7 +676,7 @@ bool LayerFilter::create_and_lock_data_layer( const Core::GridTransform& grid_tr
 
   // Create the layer in creating mode
   if ( !( LayerManager::CreateAndLockDataLayer( grid_trans, name, dst_layer,
-     src_layer->get_meta_data(), this->private_->key_ ) ) )
+     src_layer->get_meta_data(), this->private_->key_, this->private_->sandbox_ ) ) )
   {
     dst_layer.reset();
     this->report_error( "Could not allocate enough memory." ); 
@@ -694,7 +703,7 @@ bool LayerFilter::create_and_lock_mask_layer_from_layer( LayerHandle src_layer, 
 
   // Create the layer in creating mode
   if ( !( LayerManager::CreateAndLockMaskLayer( src_layer->get_grid_transform(),
-    name, dst_layer, src_layer->get_meta_data(), this->private_->key_ ) ) )
+    name, dst_layer, src_layer->get_meta_data(), this->private_->key_, this->private_->sandbox_ ) ) )
   {
     dst_layer.reset();
     this->report_error( "Could not allocate enough memory." );
@@ -722,7 +731,7 @@ bool LayerFilter::create_and_lock_mask_layer_from_layer( LayerHandle src_layer,
 
   // Create the layer in creating mode
   if ( !( LayerManager::CreateAndLockMaskLayer( src_layer->get_grid_transform(),
-    name, dst_layer, src_layer->get_meta_data(), this->private_->key_ ) ) )
+    name, dst_layer, src_layer->get_meta_data(), this->private_->key_, this->private_->sandbox_ ) ) )
   {
     dst_layer.reset();
     this->report_error( "Could not allocate enough memory." );
@@ -750,7 +759,7 @@ bool LayerFilter::create_and_lock_mask_layer( const Core::GridTransform& grid_tr
 
   // Create the layer in creating mode
   if ( !( LayerManager::CreateAndLockMaskLayer( grid_trans, name, dst_layer,
-     src_layer->get_meta_data(), this->private_->key_ ) ) )
+     src_layer->get_meta_data(), this->private_->key_, this->private_->sandbox_ ) ) )
   {
     dst_layer.reset();
     this->report_error( "Could not allocate enough memory." );
@@ -779,7 +788,7 @@ bool LayerFilter::dispatch_unlock_layer( LayerHandle layer )
   }
 
   // Send a request to the layer manager to unlock the layer.
-  LayerManager::DispatchUnlockLayer( layer, this->private_->key_ );
+  LayerManager::DispatchUnlockLayer( layer, this->private_->key_, this->private_->sandbox_ );
 
   // Done
   return true;
@@ -794,7 +803,7 @@ bool LayerFilter::dispatch_delete_layer( LayerHandle layer )
   }
 
   // Send a request to the layer manager to unlock the layer.
-  LayerManager::DispatchDeleteLayer( layer, this->private_->key_ );
+  LayerManager::DispatchDeleteLayer( layer, this->private_->key_, this->private_->sandbox_ );
 
   // Done
   return true;
@@ -825,7 +834,7 @@ bool LayerFilter::dispatch_insert_data_volume_into_layer( LayerHandle layer,
   
   // Ensure that the application thread will process this update.
   LayerManager::DispatchInsertDataVolumeIntoLayer( data_layer, data, prov_id,
-     this->private_->key_ );
+     this->private_->key_, this->private_->sandbox_ );
   return true;
 }
 
@@ -849,7 +858,7 @@ bool LayerFilter::dispatch_insert_mask_volume_into_layer( LayerHandle layer,
   }
 
   LayerManager::DispatchInsertMaskVolumeIntoLayer( mask_layer, mask, prov_id,
-    this->private_->key_ );
+    this->private_->key_, this->private_->sandbox_ );
 
   return true;
 }
@@ -895,9 +904,12 @@ void LayerFilter::create_undo_redo_and_provenance_record(
 {
   // NOTE: Create the provenance record first, as the provenance step ID
   // is needed by the undo/redo record.
-
-  this->private_->create_provenance_record( context, action );
-  this->private_->create_undo_redo_record( context, action );
+  // Only create the records when not in a sandbox
+  if ( this->private_->sandbox_ == -1 )
+  {
+    this->private_->create_provenance_record( context, action );
+    this->private_->create_undo_redo_record( context, action );
+  }
 }
 
 bool LayerFilter::update_provenance_action_string( Core::ActionHandle action )
@@ -906,11 +918,25 @@ bool LayerFilter::update_provenance_action_string( Core::ActionHandle action )
   LayerAction* layer_action = dynamic_cast<LayerAction*>( action.get() ); 
   if ( ! layer_action ) return false;
 
-  this->private_->provenance_step_->set_action( layer_action->export_to_provenance_string() );
-  ProjectManager::Instance()->get_current_project()->update_provenance_record( 
-    this->private_->provenance_step_id_, this->private_->provenance_step_ );
-
+  if ( this->private_->sandbox_ == -1 )
+  {
+    this->private_->provenance_step_->set_action_params( 
+      layer_action->export_params_to_provenance_string() );
+    ProjectManager::Instance()->get_current_project()->update_provenance_record( 
+      this->private_->provenance_step_id_, this->private_->provenance_step_ );
+  }
+  
   return true;
+}
+
+void LayerFilter::set_sandbox( SandboxID sandbox )
+{
+  this->private_->sandbox_ = sandbox;
+}
+
+SandboxID LayerFilter::get_sandbox()
+{
+  return this->private_->sandbox_;
 }
 
 } // end namespace Seg3D

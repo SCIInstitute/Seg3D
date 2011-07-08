@@ -46,14 +46,17 @@ namespace Seg3D
 
 bool ActionOtsuThresholdFilter::validate( Core::ActionContextHandle& context )
 {
-  // Check for layer existance and type information
-  if ( ! LayerManager::CheckLayerExistanceAndType( this->target_layer_, 
-    Core::VolumeType::DATA_E, context ) ) return false;
+  // Make sure that the sandbox exists
+  if ( !LayerManager::CheckSandboxExistence( this->sandbox_, context ) ) return false;
+
+  // Check for layer existence and type information
+  if ( ! LayerManager::CheckLayerExistenceAndType( this->target_layer_, 
+    Core::VolumeType::DATA_E, context, this->sandbox_ ) ) return false;
   
   // Check for layer availability 
   Core::NotifierHandle notifier;
   if ( ! LayerManager::CheckLayerAvailabilityForProcessing( this->target_layer_, 
-    context ) ) return false;
+    context, this->sandbox_ ) ) return false;
     
   // If the number of iterations is lower than one, we cannot run the filter
   if( this->amount_ < 1 )
@@ -172,6 +175,7 @@ bool ActionOtsuThresholdFilter::run( Core::ActionContextHandle& context,
   boost::shared_ptr<OtsuThresholdFilterAlgo> algo( new OtsuThresholdFilterAlgo );
 
   // Copy the parameters over to the algorithm that runs the filter
+  algo->set_sandbox( this->sandbox_ );
   algo->amount_ = this->amount_;
 
   // Find the handle to the layer
@@ -186,15 +190,17 @@ bool ActionOtsuThresholdFilter::run( Core::ActionContextHandle& context,
   algo->lock_for_use( algo->src_layer_ );
   
   // Create the destination layer, which will show progress
+  std::vector< std::string > dst_layer_ids;
   for ( size_t j = 0; j < static_cast<size_t>( algo->amount_ + 1 );  j++ )
   {
     algo->create_and_lock_mask_layer_from_layer( algo->src_layer_, algo->dst_layer_[ j ] );
+    dst_layer_ids.push_back( algo->dst_layer_[ j ]->get_layer_id() );
   }
   
   // Return the id of the destination layer.
-  if ( algo->dst_layer_.size() )
+  if ( algo->dst_layer_.size() > 0 )
   {
-    result = Core::ActionResultHandle( new Core::ActionResult( algo->dst_layer_[ 0 ]->get_layer_id() ) );
+    result = Core::ActionResultHandle( new Core::ActionResult( dst_layer_ids ) );
   }
   
   // Build the undo-redo record

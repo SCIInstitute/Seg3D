@@ -58,6 +58,8 @@ SET(APPLICATION_LAYER_SRCS
   LayerActionParameter.cc
   LayerAction.h
   LayerAction.cc
+  LayerRecreationUndoBufferItem.h
+  LayerRecreationUndoBufferItem.cc
 )
 
 SET(APPLICATION_LAYER_ACTIONS_SRCS
@@ -81,6 +83,14 @@ SET(APPLICATION_LAYER_ACTIONS_SRCS
   Actions/ActionNewMaskLayer.cc
   Actions/ActionDuplicateLayer.h
   Actions/ActionDuplicateLayer.cc
+  Actions/ActionMigrateSandboxLayer.h
+  Actions/ActionMigrateSandboxLayer.cc
+  Actions/ActionCreateSandbox.h
+  Actions/ActionCreateSandbox.cc
+  Actions/ActionDeleteSandbox.h
+  Actions/ActionDeleteSandbox.cc
+  Actions/ActionRecreateLayer.h
+  Actions/ActionRecreateLayer.cc
 )
 
 IF(BUILD_WITH_PYTHON)

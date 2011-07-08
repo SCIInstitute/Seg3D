@@ -163,7 +163,7 @@ void GroupButtonMenu::dropEvent( QDropEvent* event )
     
   std::string layer_name_ = event->mimeData()->text().toStdString();
   
-  if ( LayerManager::Instance()->get_layer_by_name( layer_name_ ) )
+  if ( LayerManager::Instance()->find_layer_by_name( layer_name_ ) )
   {
     LayerWidget* layer_widget = dynamic_cast< LayerWidget* >( event->source() );
     if ( layer_widget )
@@ -179,7 +179,7 @@ void GroupButtonMenu::dropEvent( QDropEvent* event )
 
 void GroupButtonMenu::dragEnterEvent( QDragEnterEvent* event)
 {
-  if( LayerManager::Instance()->get_layer_by_name( event->mimeData()->text().toStdString() ) )
+  if( LayerManager::Instance()->find_layer_by_name( event->mimeData()->text().toStdString() ) )
   {
     this->enable_drop_space( true );
     event->setAccepted( true );

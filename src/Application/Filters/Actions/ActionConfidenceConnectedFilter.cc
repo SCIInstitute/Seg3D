@@ -46,13 +46,19 @@ namespace Seg3D
 
 bool ActionConfidenceConnectedFilter::validate( Core::ActionContextHandle& context )
 {
-  // Check for layer existance and type information
-  if ( ! LayerManager::CheckLayerExistanceAndType( this->target_layer_, 
-    Core::VolumeType::DATA_E, context ) ) return false;
+  // Make sure that the sandbox exists
+  if ( !LayerManager::CheckSandboxExistence( this->sandbox_, context ) )
+  {
+    return false;
+  }
+
+  // Check for layer existence and type information
+  if ( ! LayerManager::CheckLayerExistenceAndType( this->target_layer_, 
+    Core::VolumeType::DATA_E, context, this->sandbox_ ) ) return false;
   
   // Check for layer availability 
   if ( ! LayerManager::CheckLayerAvailabilityForProcessing( this->target_layer_, 
-    context ) ) return false;
+    context, this->sandbox_ ) ) return false;
 
   // Check whether any seed points were given
   if ( this->seeds_.size() == 0 )
@@ -191,9 +197,10 @@ bool ActionConfidenceConnectedFilter::run( Core::ActionContextHandle& context,
   // Copy the parameters over to the algorithm that runs the filter
   algo->iterations_ = this->iterations_;
   algo->multiplier_ = this->multiplier_;
+  algo->set_sandbox( this->sandbox_ );
 
   // Find the handle to the layer
-  algo->src_layer_ = LayerManager::FindLayer( this->target_layer_ );
+  algo->src_layer_ = LayerManager::FindLayer( this->target_layer_, this->sandbox_ );
   if ( !algo->src_layer_ ) return false;
 
   // Check the seed points against the source layer dimensions

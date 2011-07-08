@@ -30,7 +30,6 @@
 #include <Core/Volume/MaskVolumeSlice.h>
 
 #include <Application/Clipboard/Clipboard.h>
-#include <Application/Tools/Actions/ActionCopyPaste.h>
 #include <Application/Tools/Actions/ActionPaste.h>
 #include <Application/Layer/MaskLayer.h>
 #include <Application/Layer/LayerManager.h>
@@ -51,7 +50,7 @@ public:
   int slice_type_;
   size_t min_slice_;
   size_t max_slice_;
-  size_t slot_number_;
+  long long sandbox_;
 
   Core::MaskLayerHandle target_layer_;
   Core::MaskVolumeSliceHandle vol_slice_;
@@ -68,7 +67,7 @@ ActionPaste::ActionPaste() :
   this->add_parameter( this->private_->slice_type_ );
   this->add_parameter( this->private_->min_slice_ );
   this->add_parameter( this->private_->max_slice_ );
-  this->add_parameter( this->private_->slot_number_ );
+  this->add_parameter( this->private_->sandbox_ );
 
   this->private_->deduce_params_ = false;
   this->private_->punch_through_ = false;
@@ -76,6 +75,12 @@ ActionPaste::ActionPaste() :
 
 bool ActionPaste::validate( Core::ActionContextHandle& context )
 {
+  // Make sure that the sandbox exists
+  if ( !LayerManager::CheckSandboxExistence( this->private_->sandbox_, context ) )
+  {
+    return false;
+  }
+
   if ( this->private_->deduce_params_ )
   {
     size_t active_viewer_id = static_cast< size_t >( ViewerManager::Instance()->
@@ -109,7 +114,6 @@ bool ActionPaste::validate( Core::ActionContextHandle& context )
     this->private_->target_layer_ = boost::dynamic_pointer_cast< MaskLayer >( active_layer );
     this->private_->target_layer_id_ = active_layer->get_layer_id();
     this->private_->slice_type_ = vol_slice->get_slice_type();
-    this->private_->slot_number_ = 0;
     if ( this->private_->punch_through_ )
     {
       this->private_->min_slice_ = 0;
@@ -129,15 +133,14 @@ bool ActionPaste::validate( Core::ActionContextHandle& context )
     this->private_->deduce_params_ = false;
   }
   
-  if ( !( LayerManager::CheckLayerExistanceAndType( this->private_->target_layer_id_,
-    Core::VolumeType::MASK_E, context ) ) ) return false;
+  if ( !( LayerManager::CheckLayerExistenceAndType( this->private_->target_layer_id_,
+    Core::VolumeType::MASK_E, context, this->private_->sandbox_ ) ) ) return false;
   
   if ( !LayerManager::CheckLayerAvailabilityForProcessing(
-    this->private_->target_layer_id_, context ) ) return false;
+    this->private_->target_layer_id_, context, this->private_->sandbox_ ) ) return false;
   
   this->private_->target_layer_ = LayerManager::FindMaskLayer(
-    this->private_->target_layer_id_ );
-  
+    this->private_->target_layer_id_, this->private_->sandbox_ );
   
   if ( this->private_->slice_type_ != Core::VolumeSliceType::AXIAL_E &&
     this->private_->slice_type_ != Core::VolumeSliceType::CORONAL_E &&
@@ -167,7 +170,7 @@ bool ActionPaste::validate( Core::ActionContextHandle& context )
   this->private_->vol_slice_ = volume_slice;
 
   ClipboardItemConstHandle clipboard_item = Clipboard::Instance()->get_item(
-    this->private_->slot_number_ );
+    this->private_->sandbox_ );
 
   if ( !clipboard_item )
   {
@@ -187,47 +190,47 @@ bool ActionPaste::validate( Core::ActionContextHandle& context )
 
 bool ActionPaste::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
-  ClipboardItemConstHandle clipboard_item = Clipboard::Instance()->get_item( 
-    this->private_->slot_number_ );
+  ClipboardItemConstHandle clipboard_item = Clipboard::Instance()->get_item( this->private_->sandbox_ );
 
-  // NOTE: Copy/Paste needs special provenance logic:
-  // As Copy and Paste are separate actions that actual describe one action in the provenance
-  // trail, we add special logic here for now.
-  
-  ProvenanceID clipboard_pid = clipboard_item->get_provenance_id();
-  ProvenanceIDList input_pids = this->get_input_provenance_ids();
-  input_pids.push_back( clipboard_pid );
-  ProvenanceIDList deleted_pids;
-  deleted_pids.push_back( input_pids[ 0 ] );
-  
-  ProvenanceStepHandle prov_step( new ProvenanceStep );
-  prov_step->set_input_provenance_ids( input_pids );
-  prov_step->set_output_provenance_ids( this->get_output_provenance_ids( 1 ) );
-  prov_step->set_replaced_provenance_ids( deleted_pids );
-  prov_step->set_action( this->export_to_provenance_string() );
-  
-  ProvenanceStepID step_id = ProjectManager::Instance()->get_current_project()->
-    add_provenance_record( prov_step );
+  // Only create provenance and undo record if the action is not running in a sandbox
+  if ( this->private_->sandbox_ == -1 )
+  {
+    ProvenanceID clipboard_pid = clipboard_item->get_provenance_id();
+    ProvenanceIDList input_pids = this->get_input_provenance_ids();
+    input_pids.push_back( clipboard_pid );
+    ProvenanceIDList deleted_pids;
+    deleted_pids.push_back( input_pids[ 0 ] );
+    
+    ProvenanceStepHandle prov_step( new ProvenanceStep );
+    prov_step->set_input_provenance_ids( input_pids );
+    prov_step->set_output_provenance_ids( this->get_output_provenance_ids( 1 ) );
+    prov_step->set_replaced_provenance_ids( deleted_pids );
+    prov_step->set_action_name( this->get_type() );
+    prov_step->set_action_params( this->export_params_to_provenance_string() );
+    
+    ProvenanceStepID step_id = ProjectManager::Instance()->get_current_project()->
+      add_provenance_record( prov_step );
 
-  // Build the undo/redo for this action
-  LayerUndoBufferItemHandle item( new LayerUndoBufferItem( "Paste" ) );
+    // Build the undo/redo for this action
+    LayerUndoBufferItemHandle item( new LayerUndoBufferItem( "Paste" ) );
 
-  // The redo action is the current one
-  item->set_redo_action( this->shared_from_this() );
-  
-  // Tell which provenance record to delete when undone
-  item->set_provenance_step_id( step_id );
-        
-  // Create a check point of the slice on which the flood fill will operate
-  LayerCheckPointHandle check_point( new LayerCheckPoint( 
-    this->private_->target_layer_, this->private_->vol_slice_->get_slice_type(), 
-    this->private_->min_slice_, this->private_->max_slice_ ) );
+    // The redo action is the current one
+    item->set_redo_action( this->shared_from_this() );
+    
+    // Tell which provenance record to delete when undone
+    item->set_provenance_step_id( step_id );
+          
+    // Create a check point of the slice on which the flood fill will operate
+    LayerCheckPointHandle check_point( new LayerCheckPoint( 
+      this->private_->target_layer_, this->private_->vol_slice_->get_slice_type(), 
+      this->private_->min_slice_, this->private_->max_slice_ ) );
 
-  // Tell the item which layer to restore with which check point for the undo action
-  item->add_layer_to_restore( this->private_->target_layer_, check_point );
+    // Tell the item which layer to restore with which check point for the undo action
+    item->add_layer_to_restore( this->private_->target_layer_, check_point );
 
-  // Now add the undo/redo action to undo buffer
-  UndoBuffer::Instance()->insert_undo_item( context, item );
+    // Now add the undo/redo action to undo buffer
+    UndoBuffer::Instance()->insert_undo_item( context, item );
+  }
 
   Core::MaskVolumeSliceHandle volume_slice = this->private_->vol_slice_;
   for ( size_t i = this->private_->min_slice_; i < this->private_->max_slice_; ++i )
@@ -242,7 +245,7 @@ bool ActionPaste::run( Core::ActionContextHandle& context, Core::ActionResultHan
     
   this->private_->target_layer_->provenance_id_state_->set(
     this->get_output_provenance_id() );
-
+  result.reset( new Core::ActionResult( this->private_->target_layer_id_ ) );
   return true;
 }
 
@@ -270,7 +273,6 @@ void ActionPaste::Dispatch( Core::ActionContextHandle context,
   action->private_->slice_type_ = slice_type;
   action->private_->min_slice_ = min_slice;
   action->private_->max_slice_ = max_slice;
-  action->private_->slot_number_ = 0;
   action->private_->deduce_params_ = false;
 
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );

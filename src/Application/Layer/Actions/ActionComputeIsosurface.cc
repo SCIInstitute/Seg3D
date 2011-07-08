@@ -44,7 +44,7 @@ bool ActionComputeIsosurface::validate( Core::ActionContextHandle& context )
 {
   // Check whether the layer exists and is of the right type and return an
   // error if not
-  if ( !( LayerManager::CheckLayerExistanceAndType( this->layer_id_, 
+  if ( !( LayerManager::CheckLayerExistenceAndType( this->layer_id_, 
     Core::VolumeType::MASK_E, context ) ) ) return false;
   
   // Check whether the layer is not locked for processing or creating, in which case the

@@ -489,7 +489,7 @@ bool SegmentationSummaryPage::validatePage()
   std::vector< double > values;
   for( int i = 0; i < this->private_->masks_.size(); ++i )
   {
-    layers.push_back( LayerManager::Instance()->get_layer_by_name( 
+    layers.push_back( LayerManager::Instance()->find_layer_by_name( 
       this->private_->masks_[ i ]->get_label().toStdString() ) );
     values.push_back( this->private_->masks_[ i ]->get_value() );
   }

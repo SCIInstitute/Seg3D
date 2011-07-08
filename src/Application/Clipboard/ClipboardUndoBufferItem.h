@@ -51,7 +51,7 @@ class ClipboardUndoBufferItem : public UndoBufferItem
   // -- constructor/destructor --
 public:
   ClipboardUndoBufferItem( const std::string& tag, 
-    ClipboardItemHandle clipboard_item, size_t slot );
+    ClipboardItemHandle clipboard_item );
   virtual ~ClipboardUndoBufferItem();
 
   // -- apply undo/redo action --

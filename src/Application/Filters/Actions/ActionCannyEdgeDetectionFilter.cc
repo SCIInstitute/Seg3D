@@ -46,13 +46,19 @@ namespace Seg3D
 
 bool ActionCannyEdgeDetectionFilter::validate( Core::ActionContextHandle& context )
 {
-  // Check for layer existance and type information
-  if ( ! LayerManager::CheckLayerExistanceAndType( this->target_layer_, 
-    Core::VolumeType::DATA_E, context ) ) return false;
+  // Make sure that the sandbox exists
+  if ( !LayerManager::CheckSandboxExistence( this->sandbox_, context ) )
+  {
+    return false;
+  }
+
+  // Check for layer existence and type information
+  if ( ! LayerManager::CheckLayerExistenceAndType( this->target_layer_, 
+    Core::VolumeType::DATA_E, context, this->sandbox_ ) ) return false;
   
   // Check for layer availability 
   if ( ! LayerManager::CheckLayerAvailabilityForProcessing( this->target_layer_, 
-    context ) ) return false;
+    context, this->sandbox_ ) ) return false;
     
   // If the number of iterations is lower than one, we cannot run the filter
   if ( this->blurring_distance_ < 0.0 )
@@ -165,9 +171,10 @@ bool ActionCannyEdgeDetectionFilter::run( Core::ActionContextHandle& context,
   // Copy the parameters over to the algorithm that runs the filter
   algo->blurring_distance_ = this->blurring_distance_;
   algo->threshold_ = this->threshold_;
+  algo->set_sandbox( this->sandbox_ );
 
   // Find the handle to the layer
-  algo->src_layer_ = LayerManager::FindLayer( this->target_layer_ );
+  algo->src_layer_ = LayerManager::FindLayer( this->target_layer_, this->sandbox_ );
 
   // Check if layer really exists
   if ( !algo->src_layer_ ) return false;

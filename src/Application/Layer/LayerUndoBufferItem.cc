@@ -289,8 +289,7 @@ void LayerUndoBufferItem::rollback_layer_changes()
     layer->invalidate();
 
     // Delete the layer from the layer manager
-    std::vector< LayerHandle > layers( 1, layer );
-    LayerManager::Instance()->delete_layers( layers );
+    LayerManager::Instance()->delete_layer( layer );
   } 
 
   // Remove the layers from the undo mechanism so the program can actually delete them

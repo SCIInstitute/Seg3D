@@ -46,13 +46,16 @@ namespace Seg3D
 
 bool ActionDistanceFilter::validate( Core::ActionContextHandle& context )
 {
-  // Check for layer existance and type information
-  if ( ! LayerManager::CheckLayerExistanceAndType( this->target_layer_, 
-    Core::VolumeType::MASK_E, context ) ) return false;
+  // Make sure that the sandbox exists
+  if ( !LayerManager::CheckSandboxExistence( this->sandbox_, context ) ) return false;
+
+  // Check for layer existence and type information
+  if ( ! LayerManager::CheckLayerExistenceAndType( this->target_layer_, 
+    Core::VolumeType::MASK_E, context, this->sandbox_ ) ) return false;
   
   // Check for layer availability 
   if ( ! LayerManager::CheckLayerAvailability( this->target_layer_, false, 
-    context ) ) return false;
+    context, this->sandbox_ ) ) return false;
 
   // Validation successful
   return true;
@@ -159,6 +162,7 @@ bool ActionDistanceFilter::run( Core::ActionContextHandle& context,
   boost::shared_ptr<DistanceFilterAlgo> algo( new DistanceFilterAlgo );
 
   // Copy the parameters over to the algorithm that runs the filter
+  algo->set_sandbox( this->sandbox_ );
   algo->use_index_space_ = this->use_index_space_;
   algo->inside_positive_ = this->inside_positive_;
 

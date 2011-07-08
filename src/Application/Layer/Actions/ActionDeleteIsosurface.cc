@@ -43,7 +43,7 @@ bool ActionDeleteIsosurface::validate( Core::ActionContextHandle& context )
 {
   // Check whether the layer exists and is of the right type and return an
   // error if not
-  if ( !( LayerManager::CheckLayerExistanceAndType( this->layer_id_, 
+  if ( !( LayerManager::CheckLayerExistenceAndType( this->layer_id_, 
     Core::VolumeType::MASK_E, context ) ) ) return false;
   
   // NOTE: We do not check whether the layer is locked. The isosurface that is presently there

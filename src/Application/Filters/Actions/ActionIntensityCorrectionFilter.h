@@ -36,6 +36,7 @@
 // Application includes
 #include <Application/Layer/Layer.h>
 #include <Application/Layer/LayerAction.h>
+#include <Application/Layer/LayerManager.h>
 
 namespace Seg3D
 {
@@ -52,6 +53,8 @@ CORE_ACTION(
   CORE_ACTION_OPTIONAL_ARGUMENT( "replace", "true", "Replace the old layer (true), or add an new layer (false)." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "order", "2", "Polynomial order that approximates the sensitivity field." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "edge", "0.1", "The sensitivity to edges." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "sandbox", "-1", "The sandbox in which to run the action." )
+  CORE_ACTION_ARGUMENT_IS_NONPERSISTENT( "sandbox" )  
   CORE_ACTION_CHANGES_PROJECT_DATA()
   CORE_ACTION_IS_UNDOABLE()
 )
@@ -66,6 +69,7 @@ public:
     this->add_parameter( this->replace_ );
     this->add_parameter( this->order_ );
     this->add_parameter( this->edge_ );
+    this->add_parameter( this->sandbox_ );
   }
   
   // -- Functions that describe action --
@@ -81,6 +85,7 @@ private:
   bool replace_;  
   int order_;
   double edge_;
+  SandboxID sandbox_;
   
   // -- Dispatch this action from the interface --
 public:

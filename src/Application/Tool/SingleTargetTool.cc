@@ -100,7 +100,7 @@ void SingleTargetToolPrivate::update_dependent_layers()
       // Create a list with the new options
       std::vector< LayerIDNamePair > layer_names( 1, 
         std::make_pair( Tool::NONE_OPTION_C, Tool::NONE_OPTION_C ) );
-      LayerHandle layer = LayerManager::Instance()->get_layer_by_id( 
+      LayerHandle layer = LayerManager::Instance()->find_layer_by_id( 
         this->tool_->target_layer_state_->get() );
       //if ( layer )
       //{
@@ -223,7 +223,7 @@ void SingleTargetToolPrivate::handle_layers_changed()
 
 void SingleTargetToolPrivate::handle_layer_name_changed( std::string layer_id )
 {
-  LayerHandle layer = LayerManager::Instance()->get_layer_by_id( layer_id );
+  LayerHandle layer = LayerManager::Instance()->find_layer_by_id( layer_id );
   if ( !layer ) return;
   
   if( layer->get_type() & this->target_type_ )

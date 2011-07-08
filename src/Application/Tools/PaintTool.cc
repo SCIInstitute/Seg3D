@@ -426,7 +426,7 @@ void PaintToolPrivate::handle_data_constraint_changed()
   }
 
   const std::string& layer_id = this->paint_tool_->data_constraint_layer_state_->get();
-  LayerHandle layer = LayerManager::Instance()->get_layer_by_id( layer_id );
+  LayerHandle layer = LayerManager::Instance()->find_layer_by_id( layer_id );
   if ( !layer )
   {
     CORE_THROW_LOGICERROR( "Data layer '" + layer_id + "' does not exist" );
@@ -597,7 +597,7 @@ void PaintToolPrivate::flood_fill( Core::ActionContextHandle context,
       return;
     }
 
-    LayerHandle layer = LayerManager::Instance()->get_layer_by_id( ff_params.target_layer_id_ );
+    LayerHandle layer = LayerManager::Instance()->find_layer_by_id( ff_params.target_layer_id_ );
     if ( !layer->is_visible( viewer->get_viewer_id() ) )
     {
       context->report_error( "Layer not visible in the active viewer" );
@@ -635,7 +635,7 @@ bool PaintToolPrivate::check_paintable( ViewerHandle viewer )
     {
       size_t viewer_id = viewer->get_viewer_id();
       MaskLayerHandle layer = boost::dynamic_pointer_cast< Core::MaskLayer >(
-        LayerManager::Instance()->get_layer_by_id( layer_id ) );
+        LayerManager::Instance()->find_layer_by_id( layer_id ) );
       if ( layer )
       {
         paintable = layer->is_visible( viewer_id ) && layer->has_valid_data() &&
@@ -758,7 +758,7 @@ void PaintTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
     {
       return;
     }
-    target_layer = LayerManager::Instance()->get_layer_by_id( target_layer_id );
+    target_layer = LayerManager::Instance()->find_layer_by_id( target_layer_id );
     if ( !target_layer )
     {
       // NOTE: Since the rendering is happening on a different thread, occasionally
@@ -1080,7 +1080,7 @@ bool PaintTool::handle_mouse_press( ViewerHandle viewer, const Core::MouseHistor
     {
       size_t viewer_id = this->private_->viewer_->get_viewer_id();
       MaskLayerHandle layer = boost::dynamic_pointer_cast< Core::MaskLayer >(
-        LayerManager::Instance()->get_layer_by_id( this->target_layer_state_->get() ) );
+        LayerManager::Instance()->find_layer_by_id( this->target_layer_state_->get() ) );
       if ( layer )
       {
         paintable = layer->is_visible( viewer_id ) && layer->has_valid_data() && 

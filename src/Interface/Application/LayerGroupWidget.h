@@ -57,10 +57,6 @@ public:
     // INSTANT_HIDE_DROP_SPACE:
     // this function instantly hides the drop space for when a move has been made
     void instant_hide_drop_space();
-
-  // GET_GROUP_ID:
-  // function that returns a string containing the groups id
-  const std::string &get_group_id();
   
   // PREP_LAYERS_FOR_DRAG_AND_DROP:
   // this function tells each layer to prepare for drag and drop by replacing the actual widgets

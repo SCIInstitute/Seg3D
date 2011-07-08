@@ -48,6 +48,12 @@ namespace Seg3D
 
 bool ActionImportSeries::validate( Core::ActionContextHandle& context )
 {
+  // Make sure that the sandbox exists
+  if ( !LayerManager::CheckSandboxExistence( this->sandbox_, context ) )
+  {
+    return false;
+  }
+
   // Check whether filename were actually supplied
   if ( this->filenames_.size() == 0 )
   {
@@ -55,10 +61,8 @@ bool ActionImportSeries::validate( Core::ActionContextHandle& context )
     context->report_error( "No filenames provided." );
     return false;
   }
-  
     
-  
-  // For each filename in the list check whether it exists and gegt absolute paths, so that when
+  // For each filename in the list check whether it exists and get absolute paths, so that when
   // we replay the action, it will actually do the same thing
   for ( size_t j = 0; j < this->filenames_.size(); j++ )
   {
@@ -84,7 +88,6 @@ bool ActionImportSeries::validate( Core::ActionContextHandle& context )
         j = 0;
       }
     }
-    
     
     // Check whether the file exists
     if ( !( boost::filesystem::exists( full_filename ) ) )
@@ -166,11 +169,15 @@ bool ActionImportSeries::run( Core::ActionContextHandle& context, Core::ActionRe
   boost::filesystem::path file_path = full_filename.parent_path();
   std::string message = std::string("Importing file series from '") + file_path.filename().string() 
     + std::string("'");
-  Core::ActionProgressHandle progress = Core::ActionProgressHandle( 
-    new Core::ActionProgress( message ) );
+  Core::ActionProgressHandle progress;
 
-  // Indicate that we have started the process
-  progress->begin_progress_reporting();
+  // Progress reporting is only needed if not running in a sandbox
+  if ( this->sandbox_ == -1 )
+  {
+    progress.reset( new Core::ActionProgress( message ) );
+    // Indicate that we have started the process
+    progress->begin_progress_reporting();
+  }
   
   // The ImporterFileData is an abstraction of all the data can be extracted from the file
   LayerImporterFileDataHandle data;
@@ -178,29 +185,38 @@ bool ActionImportSeries::run( Core::ActionContextHandle& context, Core::ActionRe
   // Get the data from the file
   if ( !( this->layer_importer_->get_file_data( data ) ) )
   {
-    progress->end_progress_reporting();
+    if ( this->sandbox_ == -1 ) progress->end_progress_reporting();
     context->report_error( "Layer importer failed to extract volume data from file." );
     return false;
   } 
   
-  // Now convert this abtract intermediate into layers that can be inserted in the program
-  // NOTE: This step is only reformating the header of the data and adds the state variables
+  // Now convert this abstract intermediate into layers that can be inserted in the program
+  // NOTE: This step is only reformatting the header of the data and adds the state variables
   // for the layers.
   std::vector< LayerHandle > layers;
   if ( !( data->convert_to_layers( this->mode_, layers ) ) )
   {
-    progress->end_progress_reporting();
+    if ( this->sandbox_ == -1 ) progress->end_progress_reporting();
     context->report_error( "Importer could not convert data into the requested format." );
     return false; 
   }
   
   // Now insert the layers one by one into the layer manager.
+  std::vector< std::string > layer_ids;
   for ( size_t j = 0; j < layers.size(); j++ )
   {
     layers[ j ]->provenance_id_state_->set( this->get_output_provenance_id( j ) );
-    LayerManager::Instance()->insert_layer( layers[ j ] );
+    LayerManager::Instance()->insert_layer( layers[ j ], this->sandbox_ );
+    layer_ids.push_back( layers[ j ]->get_layer_id() );
   }
-  
+
+  // Report the layer IDs to action result
+  result.reset( new Core::ActionResult( layer_ids ) );
+
+  if ( this->sandbox_ != -1 ) return true;
+
+  // The following logic is only needed if not in a sandbox
+
   if ( PreferencesManager::Instance()->embed_input_files_state_->get() )
   {
     InputFilesImporterHandle inputfilesimporter = this->layer_importer_->get_inputfiles_importer();
@@ -222,7 +238,8 @@ bool ActionImportSeries::run( Core::ActionContextHandle& context, Core::ActionRe
     provenance_step->set_output_provenance_ids( this->get_output_provenance_ids() );
       
     // Get the action and turn it into provenance 
-    provenance_step->set_action( this->export_to_provenance_string() );   
+    provenance_step->set_action_name( this->get_type() );
+    provenance_step->set_action_params( this->export_params_to_provenance_string() );   
     
     // Set the inputfiles cache id
     if ( this->inputfiles_id_ > -1 )
@@ -261,10 +278,8 @@ bool ActionImportSeries::run( Core::ActionContextHandle& context, Core::ActionRe
     file_path.string() );
   ProjectManager::Instance()->checkpoint_projectmanager();
 
-
   // We are done processing
   progress->end_progress_reporting();
-
 
   return true;
 }

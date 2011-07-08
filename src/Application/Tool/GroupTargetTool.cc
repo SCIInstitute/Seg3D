@@ -199,7 +199,7 @@ void GroupTargetToolPrivate::handle_target_layers_changed()
 
 void GroupTargetToolPrivate::handle_layer_name_changed( std::string layer_id )
 {
-  LayerHandle layer = LayerManager::Instance()->get_layer_by_id( layer_id );
+  LayerHandle layer = LayerManager::Instance()->find_layer_by_id( layer_id );
   if ( !layer ) return;
 
   LayerGroupHandle layer_group = layer->get_layer_group();
@@ -232,7 +232,7 @@ void GroupTargetToolPrivate::update_layer_list()
   std::vector< LayerIDNamePair > layer_names;
   if ( group_id != "" && group_id != Tool::NONE_OPTION_C )
   {
-    LayerGroupHandle group = LayerManager::Instance()->get_group_by_id( group_id );
+    LayerGroupHandle group = LayerManager::Instance()->find_group( group_id );
     group->get_layer_names( layer_names, this->target_type_ );
   }
   this->tool_->target_layers_state_->set_option_list( layer_names );

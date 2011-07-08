@@ -26,14 +26,7 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-// STL includes
-#include <iostream>
-
-// Boost includes
-#include <boost/date_time.hpp>
-
 // Core includes
-#include <Core/Utils/StringUtil.h> 
 #include <Core/Application/Application.h>
 
 // Application includes
@@ -43,7 +36,8 @@ namespace Seg3D
 {
 
 ProvenanceStep::ProvenanceStep() :
-  inputfiles_id_( -1 )
+  inputfiles_id_( -1 ),
+  provenance_id_of_interest_( -1 )
 {
   // Record user for GLP
   Core::Application::Instance()->get_user_name( this->user_ );
@@ -98,29 +92,39 @@ InputFilesID ProvenanceStep::get_inputfiles_id() const
   return this->inputfiles_id_;
 }
 
-void ProvenanceStep::set_action( const std::string& action )
-{
-  this->action_ = action;
-}
-
-const std::string& ProvenanceStep::get_action() const
-{
-  return this->action_;
-}
-
 const std::string& ProvenanceStep::get_username() const
 {
   return this->user_;
 }
 
-void ProvenanceStep::print()
+void ProvenanceStep::set_provenance_id_of_interest( ProvenanceID poi )
 {
-  std::cout << "input ids = " << Core::ExportToString( this->input_provenance_ids_ ) << std::endl;
-  std::cout << "output ids = " << Core::ExportToString( this->output_provenance_ids_ ) << std::endl;
-  std::cout << "replaced ids = " << Core::ExportToString( this->replaced_provenance_ids_ ) << std::endl;
-  std::cout << "inputfiles id =" << Core::ExportToString( this->inputfiles_id_ ) << std::endl;
-  std::cout << "action = " << this->action_ << std::endl;
-  std::cout << "user = " << this->user_ << std::endl;
+  this->provenance_id_of_interest_ = poi;
+}
+
+ProvenanceID ProvenanceStep::get_provenance_id_of_interest() const
+{
+  return this->provenance_id_of_interest_;
+}
+
+void ProvenanceStep::set_action_name( const std::string& action_name )
+{
+  this->action_name_ = action_name;
+}
+
+const std::string& ProvenanceStep::get_action_name() const
+{
+  return this->action_name_;
+}
+
+void ProvenanceStep::set_action_params( const std::string& action_params )
+{
+  this->action_params_ = action_params;
+}
+
+const std::string& ProvenanceStep::get_action_params() const
+{
+  return this->action_params_;
 }
 
 } // end namespace Seg3D

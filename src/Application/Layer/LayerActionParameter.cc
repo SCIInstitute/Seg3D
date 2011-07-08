@@ -93,9 +93,14 @@ bool LayerActionLayerID::translate_provenance( ProvenanceIDList& input_provenanc
   } 
 }
 
-std::string LayerActionLayerID::export_to_provenance_string() const
+std::string LayerActionLayerID::export_to_provenance_string( size_t& input_counter ) const
 {
-  return Core::ExportToString( this->provenance_id_ );
+  if ( this->layer_id_ == "" || this->layer_id_ == "<none>" )
+  {
+    return this->layer_id_;
+  }
+  
+  return "${" + Core::ExportToString( input_counter++ ) + "}";
 }
 
 
@@ -149,13 +154,15 @@ bool LayerActionGroupID::translate_provenance( ProvenanceIDList& input_provenanc
   } 
 }
 
-std::string LayerActionGroupID::export_to_provenance_string() const
+std::string LayerActionGroupID::export_to_provenance_string( size_t& input_counter ) const
 {
-  return Core::ExportToString( this->provenance_id_ );
+  if ( this->group_id_ == "" || this->group_id_ == "<none>" )
+  {
+    return this->group_id_;
+  }
+
+  return "${" + Core::ExportToString( input_counter++ ) + "}";
 }
-
-
-
 
 LayerActionLayerIDList::LayerActionLayerIDList( std::vector<std::string>& layer_id_list ) :
   layer_id_list_( layer_id_list )
@@ -180,6 +187,8 @@ bool LayerActionLayerIDList::translate_provenance( ProvenanceIDList& input_prove
 {
   for ( size_t j = 0; j < this->layer_id_list_.size(); j++ )
   {
+    if ( this->layer_id_list_[ j ] == "" || this->layer_id_list_[ j ] == "<none>" ) continue;
+    
     LayerHandle layer = LayerManager::FindLayer( this->layer_id_list_[ j ] );
     if ( !layer )
     {
@@ -195,20 +204,35 @@ bool LayerActionLayerIDList::translate_provenance( ProvenanceIDList& input_prove
       ProvenanceID prov_id = layer->provenance_id_state_->get();
       this->provenance_id_list_.push_back( prov_id ); 
       input_provenance.push_back( prov_id );
-      return true;
     }
     else
     {
       return false;
-    } 
+    }
   }
 
   return true;
 }
 
-std::string LayerActionLayerIDList::export_to_provenance_string() const
+std::string LayerActionLayerIDList::export_to_provenance_string( size_t& input_counter ) const
 {
-  return Core::ExportToString( this->provenance_id_list_ );
+  size_t num_ids = this->layer_id_list_.size();
+  assert( num_ids > 0 );
+  std::string str = "[";
+  for ( size_t i = 0; i < num_ids; ++i )
+  {
+    if ( this->layer_id_list_[ i ] == "" || this->layer_id_list_[ i ] == "<none>" )
+    {
+      str += "'<none>',";
+    }
+    else
+    {
+      str += "${" + Core::ExportToString( input_counter++ ) + "},";
+    }
+  }
+  str[ str.size() - 1 ] = ']' ;
+
+  return str;
 }
 
 } // namespace Seg3D

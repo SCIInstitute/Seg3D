@@ -36,6 +36,7 @@
 // Application includes
 #include <Application/Layer/Layer.h>
 #include <Application/Layer/LayerAction.h>
+#include <Application/Layer/LayerManager.h>
 
 namespace Seg3D
 {
@@ -50,6 +51,8 @@ CORE_ACTION(
   CORE_ACTION_OPTIONAL_ARGUMENT( "replace", "true", "Replace the old layer (true), or add an new mask layer (false)." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "invert_mask", "false", "Whether the mask needs to be inverted." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "replace_with", "zero", "What the not masked region should be replaced with." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "sandbox", "-1", "The sandbox in which to run the action." )
+  CORE_ACTION_ARGUMENT_IS_NONPERSISTENT( "sandbox" )  
   CORE_ACTION_CHANGES_PROJECT_DATA()
   CORE_ACTION_IS_UNDOABLE()
 )
@@ -63,6 +66,7 @@ public:
     this->add_parameter( this->replace_ );
     this->add_parameter( this->invert_mask_ );
     this->add_parameter( this->replace_with_ );
+    this->add_parameter( this->sandbox_ );
   }
   
   // -- Functions that describe action --
@@ -78,6 +82,7 @@ private:
   bool replace_;
   bool invert_mask_;
   std::string replace_with_;
+  SandboxID sandbox_;
   
   // -- Dispatch this action from the interface --
 public:

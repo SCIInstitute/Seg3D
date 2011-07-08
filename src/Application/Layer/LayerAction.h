@@ -110,9 +110,10 @@ public:
 
   // -- Export provenance string --
 public:
-  // EXPORTTOPROVENANCESTRING
-  // Format the operation in a string that has the provenance ids inside
-  std::string export_to_provenance_string() const;
+  // EXPORT_PARAMS_TO_PROVENANCE_STRING:
+  // Export the action parameters to a string and mark the provenance inputs
+  // with special placeholders.
+  std::string export_params_to_provenance_string() const;
   
   // -- internals --
 private:  

@@ -56,9 +56,9 @@ void PythonActionContext::report_message( const std::string& message )
 {
 }
 
-void PythonActionContext::report_need_resource( const Core::NotifierHandle& notifier )
+void PythonActionContext::report_need_resource( Core::NotifierHandle& notifier )
 {
-  this->notifier_ = notifier_;
+  this->notifier_ = notifier;
   this->error_msg_ = std::string( "'" ) + notifier->get_name() + std::string(
       "' is currently unavailable" );
 }

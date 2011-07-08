@@ -64,7 +64,7 @@ ActionMoveLayer::ActionMoveLayer() :
 bool ActionMoveLayer::validate( Core::ActionContextHandle& context )
 {
   // Get the source layer
-  this->private_->src_layer_ = LayerManager::Instance()->get_layer_by_id( this->private_->src_layerid_ );
+  this->private_->src_layer_ = LayerManager::Instance()->find_layer_by_id( this->private_->src_layerid_ );
   if ( !this->private_->src_layer_ )
   {
     context->report_error( std::string( "Layer '") + this->private_->src_layerid_ + "' doesn't exist." );
@@ -74,7 +74,7 @@ bool ActionMoveLayer::validate( Core::ActionContextHandle& context )
   // Get the destination layer if it's given
   if ( !this->private_->dst_layerid_.empty() )
   {
-    this->private_->dst_layer_ = LayerManager::Instance()->get_layer_by_id( this->private_->dst_layerid_ );
+    this->private_->dst_layer_ = LayerManager::Instance()->find_layer_by_id( this->private_->dst_layerid_ );
     if ( !this->private_->dst_layer_ )
     {
       context->report_error( std::string( "Layer '") + this->private_->dst_layerid_ + "' doesn't exist." );

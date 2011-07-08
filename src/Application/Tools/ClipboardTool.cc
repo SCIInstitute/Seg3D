@@ -87,7 +87,7 @@ void ClipboardToolPrivate::update_slice_numbers()
   }
 
   MaskLayerHandle layer = boost::dynamic_pointer_cast< MaskLayer >( 
-    LayerManager::Instance()->get_layer_by_id( this->tool_->target_layer_state_->get() ) );
+    LayerManager::Instance()->find_layer_by_id( this->tool_->target_layer_state_->get() ) );
   Core::MaskVolumeSliceHandle vol_slice( new Core::MaskVolumeSlice( 
     layer->get_mask_volume(), slice_type ) );
   int min_slice = zero_based ? 0 : 1;

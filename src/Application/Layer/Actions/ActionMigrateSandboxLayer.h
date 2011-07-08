@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
-
+ 
  The MIT License
-
+ 
  Copyright (c) 2009 Scientific Computing and Imaging Institute,
  University of Utah.
-
-
+ 
+ 
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
-
+ 
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
-
+ 
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -26,42 +26,37 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_TOOLS_ACTIONS_ACTIONCOPYPASTE_H
-#define APPLICATION_TOOLS_ACTIONS_ACTIONCOPYPASTE_H
+#ifndef APPLICATION_LAYER_ACTIONS_ACTIONMIGRATESANDBOXLAYER_H
+#define APPLICATION_LAYER_ACTIONS_ACTIONMIGRATESANDBOXLAYER_H
 
 // Core includes
-#include <Core/Action/Actions.h>
-
-// Application includes
-#include <Application/Layer/LayerAction.h>
+#include <Core/Action/Action.h>
 
 namespace Seg3D
 {
 
-class ActionCopyPastePrivate;
-typedef boost::shared_ptr< ActionCopyPastePrivate > ActionCopyPastePrivateHandle;
+class ActionMigrateSandboxLayerPrivate;
+typedef boost::shared_ptr< ActionMigrateSandboxLayerPrivate > ActionMigrateSandboxLayerPrivateHandle;
 
-class ActionCopyPaste : public LayerAction
+class ActionMigrateSandboxLayer : public Core::Action
 {
 
 CORE_ACTION
 ( 
-  CORE_ACTION_TYPE( "CopyPaste", "Copy one slice from the source mask layer and"
-                    " paste onto the specified slice(s) of the destination mask layer." )
-  CORE_ACTION_ARGUMENT( "source", "The ID of the source mask layer." )
-  CORE_ACTION_ARGUMENT( "src_slice_type", "The source slicing direction." )
-  CORE_ACTION_ARGUMENT( "src_slice_number", "The source slice number." )
-  CORE_ACTION_ARGUMENT( "target", "The ID of the target mask layer." )
-  CORE_ACTION_ARGUMENT( "dst_slice_type", "The slicing direction." )
-  CORE_ACTION_ARGUMENT( "dst_min_slice", "The minimum slice number to paste onto." )
-  CORE_ACTION_ARGUMENT( "dst_max_slice", "The maximum slice number to paste onto." )
+  CORE_ACTION_TYPE( "MigrateSandboxLayer", "Move a layer out of a sandbox." )
+  CORE_ACTION_ARGUMENT( "layerid", "The ID of the sandbox layer." )
+  CORE_ACTION_ARGUMENT( "sandbox", "The sandbox ID from which to migrate the layer." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "prov_id", "-1", "The provenance ID to be used for the layer." )
   CORE_ACTION_CHANGES_PROJECT_DATA()
-  CORE_ACTION_IS_UNDOABLE()
 )
-
+  
+  // -- Constructor/Destructor --
 public:
-  ActionCopyPaste();
+  ActionMigrateSandboxLayer();
+  virtual ~ActionMigrateSandboxLayer();
 
+  // -- Functions that describe action --
+public:
   // VALIDATE:
   // Each action needs to be validated just before it is posted. This way we
   // enforce that every action that hits the main post_action signal will be
@@ -76,11 +71,11 @@ public:
   // CLEAR_CACHE:
   // Clear any objects that were given as a short cut to improve performance.
   virtual void clear_cache();
-
+  
 private:
-  ActionCopyPastePrivateHandle private_;
+  ActionMigrateSandboxLayerPrivateHandle private_;
 };
-
+  
 } // end namespace Seg3D
 
 #endif

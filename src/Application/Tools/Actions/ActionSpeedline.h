@@ -33,11 +33,13 @@
 #include <Core/Volume/VolumeSlice.h>
 
 // Application includes
-#include <Application/Layer/LayerManager.h>
 #include <Application/Layer/LayerAction.h>
 
 namespace Seg3D
 {
+
+class ActionSpeedlinePrivate;
+typedef boost::shared_ptr< ActionSpeedlinePrivate > ActionSpeedlinePrivateHandle;
 
 class ActionSpeedline : public LayerAction
 {
@@ -53,7 +55,6 @@ CORE_ACTION
   CORE_ACTION_OPTIONAL_ARGUMENT( "iterations", "1000", "Number of iterations to perform." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "termination", "1.0", "Unit of Termination." )
   CORE_ACTION_CHANGES_PROJECT_DATA()
-  CORE_ACTION_IS_UNDOABLE()
 )
 
 public:
@@ -71,21 +72,7 @@ public:
   virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
 
 private:
-
-  std::string target_layer_id_;
-  int slice_type_;
-  size_t slice_number_;
-  std::vector< Core::Point > vertices_;
-  int current_vertex_index_;
-  Core::Path itk_paths_;
-
-  DataLayerHandle target_layer_;
-  Core::DataVolumeSliceHandle vol_slice_;
-
-  int iterations_;
-  double termination_;
-  std::string speedline_tool_id_;
-  bool update_all_paths_;
+  ActionSpeedlinePrivateHandle private_;
 
 public:
 

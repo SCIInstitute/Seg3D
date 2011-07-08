@@ -46,6 +46,8 @@ CORE_ACTION(
     " them by the size of the volume of the component.")
   CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "log_scale", "false", "Whether the log of the data should be used." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "sandbox", "-1", "The sandbox in which to run the action." )
+  CORE_ACTION_ARGUMENT_IS_NONPERSISTENT( "sandbox" )  
   CORE_ACTION_CHANGES_PROJECT_DATA()
   CORE_ACTION_IS_UNDOABLE()
 )
@@ -57,6 +59,7 @@ public:
     // Action arguments
     this->add_layer_id( this->target_layer_ );
     this->add_parameter( this->log_scale_ );
+    this->add_parameter( this->sandbox_ );
   }
   
   // -- Functions that describe action --
@@ -69,6 +72,7 @@ private:
 
   std::string target_layer_;
   bool log_scale_;
+  SandboxID sandbox_;
 
   // -- Dispatch this action from the interface --
 public:

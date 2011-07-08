@@ -41,6 +41,7 @@
 #include <Application/Layer/MaskLayer.h> 
 #include <Application/Layer/LabelLayer.h> 
 #include <Application/Layer/LayerAbstractFilter.h>
+#include <Application/Layer/LayerManager.h>
 
 namespace Seg3D
 {
@@ -197,6 +198,14 @@ public:
   // to be updated with the number of iterations.
   // This function allows to update it
   bool update_provenance_action_string( Core::ActionHandle action );
+
+  // SET_SANDBOX:
+  // Set the sandbox in which the filter should be running.
+  void set_sandbox( SandboxID sandbox );
+
+  // GET_SANDBOX:
+  // Get the sandbox in which the filter is running.
+  SandboxID get_sandbox();
 
   // -- filter specific information --
 public:

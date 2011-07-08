@@ -68,10 +68,6 @@ CORE_ENUM_CLASS
   TOOL_MANAGER_PRIORITY_E = 100
 )
 
-// TODO: Will change this in the near future, current it is for displaying provenance
-typedef std::vector< std::pair< std::string, std::string > > ProvenanceTrail;
-typedef boost::shared_ptr< ProvenanceTrail > ProvenanceTrailHandle;
-
 // CLASS Project
 // This is the main class for collecting state information on a Project.
 // Project is separated from ProjectManager, so it can have its own state manager,
@@ -299,9 +295,15 @@ public:
   // Update the provenance record with new information.
   void update_provenance_record( ProvenanceStepID record_id, const ProvenanceStepHandle& prov_step );
   
-  // GET_PROVENANCE_RECORD:
-  // returns a vector that is the provenance record for a particular ProvenanceID
+  // REQUEST_PROVENANCE_RECORD:
+  // Request the provenance_record_signal_ to be triggered with the 
+  // provenance trail of the given provenance ID.
   void request_provenance_record( ProvenanceID prov_id );
+
+  // GET_PROVENANCE_TRAIL:
+  // Get the provenance trail of the given provenance ID.
+  // NOTE: This function can only be called on the application thread.
+  ProvenanceTrailHandle get_provenance_trail( ProvenanceID prov_id );
   
   // -- function called by layers --
 public:

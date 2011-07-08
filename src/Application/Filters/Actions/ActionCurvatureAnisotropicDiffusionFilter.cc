@@ -46,13 +46,16 @@ namespace Seg3D
 
 bool ActionCurvatureAnisotropicDiffusionFilter::validate( Core::ActionContextHandle& context )
 {
-  // Check for layer existance and type information
-  if ( ! LayerManager::CheckLayerExistanceAndType( this->layer_id_, 
-    Core::VolumeType::DATA_E, context ) ) return false;
+  // Make sure that the sandbox exists
+  if ( !LayerManager::CheckSandboxExistence( this->sandbox_, context ) ) return false;
+
+  // Check for layer existence and type information
+  if ( ! LayerManager::CheckLayerExistenceAndType( this->layer_id_, 
+    Core::VolumeType::DATA_E, context, this->sandbox_ ) ) return false;
   
   // Check for layer availability 
   if ( ! LayerManager::CheckLayerAvailability( this->layer_id_, 
-    this->replace_, context ) ) return false;
+    this->replace_, context, this->sandbox_ ) ) return false;
     
   // If the number of iterations is lower than one, we cannot run the filter
   if( this->iterations_ < 1 )
@@ -190,12 +193,13 @@ bool ActionCurvatureAnisotropicDiffusionFilter::run( Core::ActionContextHandle& 
     new CurvatureAnisotropicDiffusionFilterAlgo );
 
   // Copy the parameters over to the algorithm that runs the filter
+  algo->set_sandbox( this->sandbox_ );
   algo->iterations_ = this->iterations_;
   algo->sensitivity_ = this->sensitivity_;
   algo->preserve_data_format_ = this->preserve_data_format_;
 
   // Find the handle to the layer
-  algo->src_layer_ = LayerManager::FindLayer( this->layer_id_ );
+  algo->src_layer_ = LayerManager::FindLayer( this->layer_id_, this->sandbox_ );
   if ( !algo->src_layer_ ) return false;
 
   if ( this->replace_ )

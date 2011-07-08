@@ -133,8 +133,6 @@ SET(APPLICATION_TOOLS_ACTIONS_SRCS
   Actions/ActionPolyline.cc
   Actions/ActionCopy.h
   Actions/ActionCopy.cc
-  Actions/ActionCopyPaste.h
-  Actions/ActionCopyPaste.cc
   Actions/ActionPaste.h
   Actions/ActionPaste.cc
   Actions/ActionFloodFill.h

@@ -79,11 +79,6 @@ bool Action::changes_project_data()
   return this->get_action_info()->changes_project_data();
 }
 
-bool Action::changes_provenance_data() const
-{
-  return this->get_action_info()->changes_provenance_data();
-}
-
 bool Action::is_undoable() const
 {
   return this->get_action_info()->is_undoable();
@@ -117,7 +112,10 @@ std::string Action::export_to_string() const
   
   for ( size_t j = 0; j < this->parameters_.size(); j++ )
   {
-    command += this->get_key( j ) + "=" + this->parameters_[ j ]->export_to_string() + " ";
+    if ( this->parameters_[ j ]->is_persistent() )
+    {
+      command += this->get_key( j ) + "=" + this->parameters_[ j ]->export_to_string() + " ";
+    } 
   }
 
   // Return the command

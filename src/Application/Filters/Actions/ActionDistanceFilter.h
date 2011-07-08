@@ -35,6 +35,7 @@
 
 // Application includes
 #include <Application/Layer/Layer.h>
+#include <Application/Layer/LayerManager.h>
 #include <Application/Layer/LayerAction.h>
 
 namespace Seg3D
@@ -50,6 +51,8 @@ CORE_ACTION(
     "computing the distance." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "inside_positive", "false", "Whether the sign of the inside is positive and the"
     " outside negative or vice versa.")
+  CORE_ACTION_OPTIONAL_ARGUMENT( "sandbox", "-1", "The sandbox in which to run the action." )
+  CORE_ACTION_ARGUMENT_IS_NONPERSISTENT( "sandbox" )  
   CORE_ACTION_CHANGES_PROJECT_DATA()
   CORE_ACTION_IS_UNDOABLE()
 )
@@ -61,6 +64,7 @@ public:
     this->add_layer_id( this->target_layer_ );
     this->add_parameter( this->use_index_space_ );
     this->add_parameter( this->inside_positive_ );
+    this->add_parameter( this->sandbox_ );
   }
   
   // -- Functions that describe action --
@@ -74,6 +78,7 @@ private:
   std::string target_layer_;
   bool use_index_space_;
   bool inside_positive_;
+  SandboxID sandbox_;
     
   // -- Dispatch this action from the interface --
 public:

@@ -467,7 +467,7 @@ void LayerManagerWidget::prep_layers_for_drag_and_drop( bool move_time )
   for( GroupWidgetMap::iterator it = this->private_->group_map_.begin(); 
     it != this->private_->group_map_.end(); ++it )
   {
-    LayerGroupHandle group = LayerManager::Instance()->get_group_by_id( ( *it ).first );
+    LayerGroupHandle group = LayerManager::Instance()->find_group( ( *it ).first );
     if( group && group->group_widget_expanded_state_->get() )
     { 
       ( *it ).second->prep_layers_for_drag_and_drop( move_time );

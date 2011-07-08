@@ -54,6 +54,7 @@ public:
   std::vector< std::string > layer_ids_;
   std::vector< int > permutation_;
   bool replace_;
+  SandboxID sandbox_;
 
   Core::GridTransform output_grid_trans_;
 };
@@ -205,10 +206,14 @@ ActionPermute::ActionPermute() :
   this->add_layer_id_list( this->private_->layer_ids_ );
   this->add_parameter( this->private_->permutation_ );
   this->add_parameter( this->private_->replace_ );
+  this->add_parameter( this->private_->sandbox_ );
 }
 
 bool ActionPermute::validate( Core::ActionContextHandle& context )
 {
+  // Make sure that the sandbox exists
+  if ( !LayerManager::CheckSandboxExistence( this->private_->sandbox_, context ) ) return false;
+
   const std::vector< std::string >& layer_ids = this->private_->layer_ids_;
   if ( layer_ids.size() == 0 )
   {
@@ -216,11 +221,11 @@ bool ActionPermute::validate( Core::ActionContextHandle& context )
     return false;
   }
   
-  LayerGroupHandle layer_group;
+  Core::GridTransform src_grid_trans;
   for ( size_t i = 0; i < layer_ids.size(); ++i )
   {
     // Check for layer existence
-    LayerHandle layer = LayerManager::Instance()->get_layer_by_id( layer_ids[ i ] );
+    LayerHandle layer = LayerManager::FindLayer( layer_ids[ i ], this->private_->sandbox_ );
     if ( !layer )
     {
       context->report_error( "Layer '" + layer_ids[ i ] + "' doesn't exist" );
@@ -228,11 +233,11 @@ bool ActionPermute::validate( Core::ActionContextHandle& context )
     }
 
     // Make sure that all the layers are in the same group
-    if ( !layer_group )
+    if ( i == 0 )
     {
-      layer_group = layer->get_layer_group();
+      src_grid_trans = layer->get_grid_transform();
     }
-    else if ( layer_group != layer->get_layer_group() )
+    else if ( src_grid_trans != layer->get_grid_transform() )
     {
       context->report_error( "Input layers do not belong to the same group" );
       return false;
@@ -240,7 +245,7 @@ bool ActionPermute::validate( Core::ActionContextHandle& context )
     
     // Check for layer availability 
     if ( !LayerManager::CheckLayerAvailability( layer_ids[ i ], 
-      this->private_->replace_, context ) ) return false;
+      this->private_->replace_, context, this->private_->sandbox_ ) ) return false;
   }
   
   const std::vector< int >& permutation = this->private_->permutation_;
@@ -271,7 +276,6 @@ bool ActionPermute::validate( Core::ActionContextHandle& context )
   }
 
   // Compute the output grid transform
-  const Core::GridTransform& src_grid_trans = layer_group->get_grid_transform();
   std::vector< size_t > src_size( 3 );
   src_size[ 0 ] = src_grid_trans.get_nx();
   src_size[ 1 ] = src_grid_trans.get_ny();
@@ -310,6 +314,7 @@ bool ActionPermute::run( Core::ActionContextHandle& context,
   boost::shared_ptr< PermuteAlgo > algo( new PermuteAlgo );
 
   // Set up parameters
+  algo->set_sandbox( this->private_->sandbox_ );
   algo->permutation_ = this->private_->permutation_;
   algo->replace_ = this->private_->replace_;
 

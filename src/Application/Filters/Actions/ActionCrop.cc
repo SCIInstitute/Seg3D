@@ -55,6 +55,7 @@ public:
   Core::Point origin_;
   Core::Vector size_;
   bool replace_;
+  SandboxID sandbox_;
 
   int start_x_;
   int start_y_;
@@ -314,44 +315,46 @@ ActionCrop::ActionCrop() :
   this->add_parameter( this->private_->origin_ );
   this->add_parameter( this->private_->size_ );
   this->add_parameter( this->private_->replace_ );
+  this->add_parameter( this->private_->sandbox_ );
 }
 
 bool ActionCrop::validate( Core::ActionContextHandle& context )
 {
-  // TODO: This needs cleanup
-  // --JGS
-  const std::vector< std::string >& layer_ids = this->private_->layer_ids_;
-  if ( layer_ids.size() == 0 )
+  // Make sure that the sandbox exists
+  if ( !LayerManager::CheckSandboxExistence( this->private_->sandbox_, context ) ) return false;
+
+  if ( this->private_->layer_ids_.size() == 0 )
   {
     context->report_error( "No input layers specified" );
     return false;
   }
   
-  LayerGroupHandle layer_group;
-  for ( size_t i = 0; i < layer_ids.size(); ++i )
+  Core::GridTransform grid_trans;
+  for ( size_t i = 0; i < this->private_->layer_ids_.size(); ++i )
   {
     // Check for layer existence
-    LayerHandle layer = LayerManager::Instance()->get_layer_by_id( layer_ids[ i ] );
+    LayerHandle layer = LayerManager::FindLayer( this->private_->layer_ids_[ i ],
+      this->private_->sandbox_ );
     if ( !layer )
     {
-      context->report_error( "Layer '" + layer_ids[ i ] + "' doesn't exist" );
+      context->report_error( "Layer '" + this->private_->layer_ids_[ i ] + "' doesn't exist" );
       return false;
     }
 
     // Make sure that all the layers are in the same group
-    if ( !layer_group )
+    if ( i == 0 )
     {
-      layer_group = layer->get_layer_group();
+      grid_trans = layer->get_grid_transform();
     }
-    else if ( layer_group != layer->get_layer_group() )
+    else if ( grid_trans != layer->get_grid_transform() )
     {
       context->report_error( "Input layers do not belong to the same group" );
       return false;
     }
     
     // Check for layer availability 
-    if ( !LayerManager::CheckLayerAvailability( layer_ids[ i ], 
-      this->private_->replace_, context ) ) return false;
+    if ( !LayerManager::CheckLayerAvailability( this->private_->layer_ids_[ i ], 
+      this->private_->replace_, context, this->private_->sandbox_ ) ) return false;
   }
   
   const Core::Point& origin = this->private_->origin_;
@@ -365,7 +368,6 @@ bool ActionCrop::validate( Core::ActionContextHandle& context )
 
   // Convert the crop box to index space and clamp to layer boundary
   Core::Point end = origin + size;
-  const Core::GridTransform& grid_trans = layer_group->get_grid_transform();
   int nx = static_cast< int >( grid_trans.get_nx() );
   int ny = static_cast< int >( grid_trans.get_ny() );
   int nz = static_cast< int >( grid_trans.get_nz() );
@@ -420,6 +422,7 @@ bool ActionCrop::run( Core::ActionContextHandle& context,
   boost::shared_ptr< CropAlgo > algo( new CropAlgo );
 
   // Set up parameters
+  algo->set_sandbox( this->private_->sandbox_ );
   algo->replace_ = this->private_->replace_;
   algo->start_x_ = this->private_->start_x_;
   algo->start_y_ = this->private_->start_y_;

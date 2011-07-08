@@ -50,34 +50,37 @@ namespace Seg3D
 
 bool ActionConnectedComponentFilter::validate( Core::ActionContextHandle& context )
 {
+  // Make sure that the sandbox exists
+  if ( !LayerManager::CheckSandboxExistence( this->sandbox_, context ) ) return false;
+
   // Check for layer existence and type information
-  if ( ! LayerManager::CheckLayerExistanceAndType( this->target_layer_, 
-    Core::VolumeType::MASK_E, context ) ) return false;
+  if ( ! LayerManager::CheckLayerExistenceAndType( this->target_layer_, 
+    Core::VolumeType::MASK_E, context, this->sandbox_ ) ) return false;
   
   // Check for layer availability 
   if ( ! LayerManager::CheckLayerAvailabilityForProcessing( this->target_layer_, 
-    context ) ) return false;
+    context, this->sandbox_ ) ) return false;
 
   // Check for layer existence and type information
   bool use_mask = false;
   if ( this->mask_.size() > 0 && this->mask_ != "<none>" )
   {
     // Check whether the layer actually exists
-    if ( ! LayerManager::CheckLayerExistanceAndType( this->mask_, 
-      Core::VolumeType::MASK_E, context ) ) return false;
+    if ( ! LayerManager::CheckLayerExistenceAndType( this->mask_, 
+      Core::VolumeType::MASK_E, context, this->sandbox_ ) ) return false;
     
     // Check whether the size matches the main target layer
     if ( ! LayerManager::CheckLayerSize( this->mask_, this->target_layer_,
-      context ) ) return false;
+      context, this->sandbox_ ) ) return false;
 
     // Check for layer availability 
     if ( ! LayerManager::CheckLayerAvailabilityForProcessing( this->mask_, 
-      context ) ) return false;
+      context, this->sandbox_ ) ) return false;
     
     use_mask = true;
   }
 
-  // Check whether there are enogh seed points
+  // Check whether there are enough seed points
   if ( this->seeds_.size() == 0 && use_mask == false )
   {
     context->report_error( "There needs to be at least one seed point." );
@@ -415,8 +418,9 @@ bool ActionConnectedComponentFilter::run( Core::ActionContextHandle& context,
   boost::shared_ptr<ConnectedComponentFilterAlgo> algo( new ConnectedComponentFilterAlgo );
 
   // Find the handle to the layer
-  algo->src_layer_ = LayerManager::FindLayer( this->target_layer_ );
-  algo->mask_layer_ = LayerManager::FindLayer( this->mask_ );
+  algo->set_sandbox( this->sandbox_ );
+  algo->src_layer_ = LayerManager::FindLayer( this->target_layer_, this->sandbox_ );
+  algo->mask_layer_ = LayerManager::FindLayer( this->mask_, this->sandbox_ );
   
   // We definitely need a source layer, so make sure it exists
   if ( !algo->src_layer_ ) return false;

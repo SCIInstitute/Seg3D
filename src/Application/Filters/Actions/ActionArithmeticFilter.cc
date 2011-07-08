@@ -146,6 +146,7 @@ public:
   std::string output_type_;
   bool replace_;
   bool preserve_data_format_;
+  SandboxID sandbox_;
   boost::shared_ptr< ArithmeticFilterAlgo > algo_;
 };
 
@@ -154,6 +155,7 @@ bool ActionArithmeticFilterPrivate::validate_parser( Core::ActionContextHandle& 
   // Validate algorithm
   // Create algorithm
   this->algo_ = boost::shared_ptr< ArithmeticFilterAlgo >( new ArithmeticFilterAlgo );
+  this->algo_->set_sandbox( this->sandbox_ );
 
   bool replace = this->replace_;
 
@@ -336,46 +338,48 @@ ActionArithmeticFilter::ActionArithmeticFilter() :
   this->add_parameter( this->private_->output_type_ );
   this->add_parameter( this->private_->replace_ );
   this->add_parameter( this->private_->preserve_data_format_ );
+  this->add_parameter( this->private_->sandbox_ );
 }
 
 bool ActionArithmeticFilter::validate( Core::ActionContextHandle& context )
 {
-  // TODO:
-  // This code needs cleanup
-  const std::vector< std::string >& layer_ids = this->private_->layer_ids_;
-  if ( layer_ids.size() == 0 )
+  // Make sure that the sandbox exists
+  if ( !LayerManager::CheckSandboxExistence( this->private_->sandbox_, context ) ) return false;
+
+  if ( this->private_->layer_ids_.size() == 0 )
   {
     context->report_error( "No input layers specified" );
     return false;
   }
   
   // Validate layers
-  LayerGroupHandle layer_group;
-  for ( size_t i = 0; i < layer_ids.size(); ++i )
+  Core::GridTransform grid_trans;
+  for ( size_t i = 0; i < this->private_->layer_ids_.size(); ++i )
   {
-    if ( layer_ids[ i ] == "<none>" || layer_ids[ i ] == "" ) continue;
+    if ( this->private_->layer_ids_[ i ] == "<none>" || this->private_->layer_ids_[ i ] == "" ) continue;
     // Check for layer existence
-    LayerHandle layer = LayerManager::Instance()->get_layer_by_id( layer_ids[ i ] );
+    LayerHandle layer = LayerManager::FindLayer( this->private_->layer_ids_[ i ], 
+      this->private_->sandbox_ );
     if ( !layer )
     {
-      context->report_error( "Layer '" + layer_ids[ i ] + "' doesn't exist" );
+      context->report_error( "Layer '" + this->private_->layer_ids_[ i ] + "' doesn't exist" );
       return false;
     }
 
     // Make sure that all the layers are in the same group
-    if ( !layer_group )
+    if ( i == 0 )
     {
-      layer_group = layer->get_layer_group();
+      grid_trans = layer->get_grid_transform();
     }
-    else if ( layer_group != layer->get_layer_group() )
+    else if ( grid_trans != layer->get_grid_transform() )
     {
       context->report_error( "Input layers do not belong to the same group" );
       return false;
     }
     
     // Check for layer availability 
-    if ( ! LayerManager::CheckLayerAvailability( layer_ids[ i ], 
-      i == 0 && this->private_->replace_, context ) ) return false;
+    if ( ! LayerManager::CheckLayerAvailability( this->private_->layer_ids_[ i ], 
+      i == 0 && this->private_->replace_, context, this->private_->sandbox_ ) ) return false;
   }
 
   // Validate parser inputs, outputs, and expression
@@ -399,8 +403,7 @@ bool ActionArithmeticFilter::run( Core::ActionContextHandle& context,
     boost::bind( &Layer::update_progress, this->private_->algo_->dst_layer_, _1, 0.0, 1.0 ) );
 
   // Return the ids of the destination layer.
-  result = Core::ActionResultHandle( 
-    new Core::ActionResult( this->private_->algo_->dst_layer_->get_layer_id() ) );
+  result.reset( new Core::ActionResult( this->private_->algo_->dst_layer_->get_layer_id() ) );
 
   // Create undo/redo record for this layer action
   this->private_->algo_->create_undo_redo_and_provenance_record( context, this->shared_from_this() );

@@ -47,26 +47,29 @@ namespace Seg3D
 
 bool ActionErodeFilter::validate( Core::ActionContextHandle& context )
 {
-  // Check for layer existance and type information
-  if ( ! LayerManager::CheckLayerExistanceAndType( this->target_layer_, 
-    Core::VolumeType::MASK_E, context ) ) return false;
+  // Make sure that the sandbox exists
+  if ( !LayerManager::CheckSandboxExistence( this->sandbox_, context ) ) return false;
+
+  // Check for layer existence and type information
+  if ( ! LayerManager::CheckLayerExistenceAndType( this->target_layer_, 
+    Core::VolumeType::MASK_E, context, this->sandbox_ ) ) return false;
   
   // Check for layer availability 
   if ( ! LayerManager::CheckLayerAvailability( this->target_layer_, 
-    this->replace_, context ) ) return false;
+    this->replace_, context, this->sandbox_ ) ) return false;
     
-  // Check for layer existance and type information
+  // Check for layer existence and type information
   if ( ( this->mask_layer_ != "" ) && ( this->mask_layer_ != "<none>" ) )
   {
-    if ( ! LayerManager::CheckLayerExistanceAndType( this->mask_layer_, 
-      Core::VolumeType::MASK_E, context ) ) return false;
+    if ( ! LayerManager::CheckLayerExistenceAndType( this->mask_layer_, 
+      Core::VolumeType::MASK_E, context, this->sandbox_ ) ) return false;
     
     if ( ! LayerManager::CheckLayerSize( this->mask_layer_, this->target_layer_,
-      context ) ) return false;
+      context, this->sandbox_ ) ) return false;
     
     // Check for layer availability 
     if ( ! LayerManager::CheckLayerAvailability( this->mask_layer_, false, 
-      context ) ) return false;
+      context, this->sandbox_ ) ) return false;
   }
 
   // If the number of iterations is lower than one, we cannot run the filter
@@ -115,7 +118,7 @@ public:
   
 public:
   // RUN_FILTER:
-  // Implemtation of run of the Runnable base class, this function is called when the thread
+  // Implementation of run of the Runnable base class, this function is called when the thread
   // is launched.
 
   virtual void run_filter()
@@ -397,6 +400,7 @@ bool ActionErodeFilter::run( Core::ActionContextHandle& context,
   boost::shared_ptr<ErodeFilterAlgo> algo( new ErodeFilterAlgo );
 
   // Copy the parameters over to the algorithm that runs the filter
+  algo->set_sandbox( this->sandbox_ );
   algo->radius_ = this->radius_;
   algo->only2d_ = this->only2d_;
   algo->slice_type_ = this->slice_type_;

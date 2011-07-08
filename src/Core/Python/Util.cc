@@ -95,6 +95,10 @@ boost::python::object RunActionFromPython( boost::python::tuple args,
         {
           return boost::python::object( *action_result );
         }
+        else
+        {
+          return boost::python::object( true );
+        }
         repeat = false;
       }
       else

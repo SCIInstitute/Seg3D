@@ -103,6 +103,10 @@ public:
   // opening up a space for dropping
   void enable_drop_space( bool drop );
 
+  // GET_GROUP_ID:
+  // function that returns a string containing the groups id
+  const std::string &get_group_id();
+
 public:
   LayerGroupWidget* parent_;
   Ui::LayerGroupWidget ui_;
@@ -112,7 +116,7 @@ public:
   LayerGroupWidget* drop_group_;
   GroupButtonMenu* button_menu_;
 
-  std::string group_id_;
+  LayerGroupHandle layer_group_;
   int picked_up_group_height_;
   bool group_menus_open_;
   bool picked_up_;
@@ -187,6 +191,11 @@ void LayerGroupWidgetPrivate::enable_drop_space( bool drop )
   }
 } 
 
+const std::string& LayerGroupWidgetPrivate::get_group_id()
+{
+  return this->layer_group_->get_group_id();
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Class LayerGroupWidget
 //////////////////////////////////////////////////////////////////////////
@@ -196,7 +205,7 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
 {
   this->private_ = new LayerGroupWidgetPrivate( this );
   this->private_->ui_.setupUi( this );
-  this->private_->group_id_ = group->get_group_id();
+  this->private_->layer_group_ = group;
   this->private_->group_menus_open_ = false;
   this->private_->picked_up_ = false;
   this->private_->button_menu_ = new GroupButtonMenu( this, group );
@@ -296,9 +305,9 @@ void LayerGroupWidget::mousePressEvent( QMouseEvent *event )
   }
   QPoint hotSpot = event->pos();
 
-  // Make up some mimedata containing the layer_id of the layer
+  // Make up some mime data containing the layer_id of the layer
   QMimeData *mimeData = new QMimeData;
-  mimeData->setText( QString::fromStdString( this->get_group_id() ) );
+  mimeData->setText( QString::fromStdString( this->private_->get_group_id() ) );
 
   // Create a drag object and insert the hotspot
   QDrag *drag = new QDrag( this );
@@ -321,7 +330,7 @@ void LayerGroupWidget::mousePressEvent( QMouseEvent *event )
   if( ( drag->exec( Qt::MoveAction, Qt::MoveAction ) ) == Qt::MoveAction ) 
   {
     ActionMoveGroup::Dispatch( Core::Interface::GetWidgetActionContext(), 
-      this->get_group_id(), this->private_->drop_group_->get_group_id() );
+      this->private_->get_group_id(), this->private_->drop_group_->private_->get_group_id() );
   }
 
   this->private_->seethrough( false );
@@ -359,11 +368,6 @@ void LayerGroupWidget::dragLeaveEvent( QDragLeaveEvent* event )
 {
   this->private_->enable_drop_space( false );
   event->setAccepted( true );
-}
-
-const std::string& LayerGroupWidget::get_group_id()
-{
-  return this->private_->group_id_;
 }
 
 void LayerGroupWidget::verify_delete()
@@ -470,21 +474,14 @@ void LayerGroupWidget::set_picked_up_group_size( int group_height )
 }
   
 void LayerGroupWidget::handle_change()
-{
-  LayerGroupHandle this_group = LayerManager::FindLayerGroup( this->private_->group_id_ );
-  if ( !this_group )
-  {
-    // Group has been deleted, ignore
-    return;
-  }
-  
+{ 
   // Whether the group menu is currently shown
-  bool show_menu = this_group->show_delete_menu_state_->get() || 
-    this_group->show_duplicate_menu_state_->get();
+  bool show_menu = this->private_->layer_group_->show_delete_menu_state_->get() || 
+    this->private_->layer_group_->show_duplicate_menu_state_->get();
 
   // Get a list of all the layers
   LayerVector layers;
-  this_group->get_layers( layers );
+  this->private_->layer_group_->get_layers( layers );
 
   // Make a copy of the current widgets map
   LayerWidgetMap tmp_map = this->private_->layer_map_;

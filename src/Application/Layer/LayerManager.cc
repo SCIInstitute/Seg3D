@@ -57,11 +57,23 @@ namespace Seg3D
   
 typedef std::list < LayerGroupHandle > GroupList;
 
+typedef std::map< std::string, LayerHandle > LayerSandbox;
+typedef boost::shared_ptr< LayerSandbox > LayerSandboxHandle;
+typedef std::map< SandboxID, LayerSandboxHandle > LayerSandboxMap;
+
 class LayerManagerPrivate
 {
 public:
+  // UPDATE_LAYER_LIST:
+  // Update the option list of active_layer_state_.
   void update_layer_list();
+
+  // HANDLE_ACTIVE_LAYER_STATE_CHANGED:
+  // This function is connected to active_layer_state_::value_changed_signal_.
   void handle_active_layer_state_changed( std::string layer_id );
+
+  // HANDLE_ACTIVE_LAYER_CHANGED:
+  // Called by LayerManager::set_active_layer function.
   void handle_active_layer_changed();
 
   // RESET:
@@ -81,11 +93,22 @@ public:
   // Find a color that has not yet been used.
   int find_free_color();
 
+  // FIND_SANDBOX:
+  // Find the specified sandbox.
+  LayerSandboxHandle find_sandbox( SandboxID sandbox );
+
+  // An internal counter for temporarily blocking certain signals from being processed.
   size_t signal_block_count_;
-  
+  // A list of layer groups
   GroupList group_list_;
+  // The active layer
   LayerHandle active_layer_;
+  // Pointer to the layer manager instance
   LayerManager* layer_manager_;
+  // A map of sandboxes for processing in the background
+  LayerSandboxMap sandboxes_;
+  // Sandbox counter
+  SandboxID sandbox_count_;
 };
 
 void LayerManagerPrivate::update_layer_list()
@@ -112,7 +135,7 @@ void LayerManagerPrivate::handle_active_layer_state_changed( std::string layer_i
   
   Core::ScopedCounter signal_block( this->signal_block_count_ );
 
-  this->layer_manager_->set_active_layer( this->layer_manager_->get_layer_by_id( layer_id ) );
+  this->layer_manager_->set_active_layer( this->layer_manager_->find_layer_by_id( layer_id ) );
   // Set the state again because the requested active layer might not be valid
   if ( this->active_layer_ )
   {
@@ -190,6 +213,16 @@ int LayerManagerPrivate::find_free_color()
   return -1;
 }
 
+LayerSandboxHandle LayerManagerPrivate::find_sandbox( SandboxID sandbox )
+{
+  LayerSandboxMap::iterator it = this->sandboxes_.find( sandbox );
+  if ( it != this->sandboxes_.end() )
+  {
+    return it->second;
+  }
+  return LayerSandboxHandle();
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Class LayerManager
 //////////////////////////////////////////////////////////////////////////
@@ -205,6 +238,7 @@ LayerManager::LayerManager() :
   this->add_state( "active_layer", this->active_layer_state_, "", "" );
   this->private_->signal_block_count_ = 0;
   this->private_->layer_manager_ = this;
+  this->private_->sandbox_count_ = 0;
 
   this->add_connection( this->layers_changed_signal_.connect( boost::bind( 
     &LayerManagerPrivate::update_layer_list, this->private_ ) ) );
@@ -221,14 +255,28 @@ LayerManager::~LayerManager()
   this->disconnect_all();
 }
   
-bool LayerManager::insert_layer( LayerHandle layer )
+bool LayerManager::insert_layer( LayerHandle layer, SandboxID sandbox )
 {
+  ASSERT_IS_APPLICATION_THREAD();
+
   bool active_layer_changed = false;
   bool new_group = false;
   LayerGroupHandle group_handle;
   
   {
     lock_type lock( this->get_mutex() );
+
+    // If a sandbox is given, add the layer to the sandbox
+    if ( sandbox >= 0 )
+    {
+      LayerSandboxHandle layer_sandbox = this->private_->find_sandbox( sandbox );
+      if ( layer_sandbox )
+      {
+        layer_sandbox->operator []( layer->get_layer_id() ) = layer;
+        return true;
+      }
+      return false;
+    }
     
     CORE_LOG_MESSAGE( std::string("Insert New Layer: ") + layer->get_layer_id());
     
@@ -301,6 +349,8 @@ bool LayerManager::insert_layer( LayerHandle layer )
 
 bool LayerManager::move_group( LayerGroupHandle src_group, LayerGroupHandle dst_group )
 {
+  ASSERT_IS_APPLICATION_THREAD();
+
   // Find the src_group in the list
   GroupList::iterator src_it = std::find( this->private_->group_list_.begin(),
     this->private_->group_list_.end(), src_group );
@@ -339,6 +389,8 @@ bool LayerManager::move_group( LayerGroupHandle src_group, LayerGroupHandle dst_
 
 bool LayerManager::move_layer( LayerHandle src_layer, LayerHandle dst_layer /*= LayerHandle() */ )
 {
+  ASSERT_IS_APPLICATION_THREAD();
+
   LayerGroupHandle layer_group = src_layer->get_layer_group();
 
   assert( !dst_layer || layer_group == dst_layer->get_layer_group() );
@@ -355,6 +407,8 @@ bool LayerManager::move_layer( LayerHandle src_layer, LayerHandle dst_layer /*= 
 
 void LayerManager::set_active_layer( LayerHandle layer )
 {
+  ASSERT_IS_APPLICATION_THREAD();
+
   {
     lock_type lock( this->get_mutex() );    
     
@@ -417,7 +471,7 @@ void LayerManager::shift_active_layer( bool downward /*= false */ )
   }
 }
 
-LayerGroupHandle LayerManager::get_group_by_id( std::string group_id )
+LayerGroupHandle LayerManager::find_group( const std::string& group_id )
 {
     lock_type lock( this->get_mutex() );
     
@@ -432,7 +486,7 @@ LayerGroupHandle LayerManager::get_group_by_id( std::string group_id )
   return LayerGroupHandle();
 }
 
-LayerGroupHandle LayerManager::get_group_by_provenance_id( ProvenanceID prov_id )
+LayerGroupHandle LayerManager::find_group( ProvenanceID prov_id )
 {
     lock_type lock( this->get_mutex() );
     
@@ -448,10 +502,28 @@ LayerGroupHandle LayerManager::get_group_by_provenance_id( ProvenanceID prov_id 
 }
 
 
-LayerHandle LayerManager::get_layer_by_id( const std::string& layer_id )
+LayerHandle LayerManager::find_layer_by_id( const std::string& layer_id, SandboxID sandbox )
 {
   lock_type lock( this->get_mutex() );
 
+  // If a sandbox number is specified, look it up in the sandbox
+  if ( sandbox >= 0 )
+  {
+    // Look for the sandbox
+    LayerSandboxHandle layer_sandbox = this->private_->find_sandbox( sandbox );
+    if ( layer_sandbox )
+    {
+      // Look for the layer with the ID in the sandbox
+      LayerSandbox::iterator layer_it = layer_sandbox->find( layer_id );
+      if ( layer_it != layer_sandbox->end() )
+      {
+        return layer_it->second;
+      }
+    }
+    // Not found, return an empty handle
+    return LayerHandle();
+  }
+  
   for( GroupList::iterator i = this->private_->group_list_.begin(); 
     i != this->private_->group_list_.end(); ++i )
   {
@@ -467,9 +539,70 @@ LayerHandle LayerManager::get_layer_by_id( const std::string& layer_id )
   return LayerHandle();
 }
 
-LayerHandle LayerManager::get_layer_by_provenance_id( ProvenanceID provenance_id )
+LayerHandle LayerManager::find_layer_by_name( const std::string& layer_name, SandboxID sandbox )
 {
   lock_type lock( this->get_mutex() );
+
+  // If a sandbox number is specified, look it up in the sandbox
+  if ( sandbox >= 0 )
+  {
+    // Look for the sandbox
+    LayerSandboxHandle layer_sandbox = this->private_->find_sandbox( sandbox );
+    if ( layer_sandbox )
+    {
+      // Look for the layer with the name in the sandbox
+      LayerSandbox::iterator layer_it = layer_sandbox->begin();
+      for ( ; layer_it != layer_sandbox->end(); ++layer_it )
+      {
+        if ( layer_it->second->get_layer_name() == layer_name )
+        {
+          return layer_it->second;
+        }
+      }
+    }
+    // Not found, return an empty handle
+    return LayerHandle();
+  }
+
+  for( GroupList::iterator i = this->private_->group_list_.begin(); 
+    i != this->private_->group_list_.end(); ++i )
+  {
+    LayerList& layer_list = ( *i )->get_layer_list();
+    for( LayerList::iterator j = layer_list.begin(); j != layer_list.end(); ++j )
+    {
+      if( ( *j )->get_layer_name() == layer_name )
+      {
+        return ( *j );
+      }
+    }
+  }
+  return LayerHandle();
+}
+
+LayerHandle LayerManager::find_layer_by_provenance_id( ProvenanceID provenance_id, SandboxID sandbox )
+{
+  lock_type lock( this->get_mutex() );
+
+  // If a sandbox number is specified, look it up in the sandbox
+  if ( sandbox >= 0 )
+  {
+    // Look for the sandbox
+    LayerSandboxHandle layer_sandbox = this->private_->find_sandbox( sandbox );
+    if ( layer_sandbox )
+    {
+      // Look for the layer with the name in the sandbox
+      LayerSandbox::iterator layer_it = layer_sandbox->begin();
+      for ( ; layer_it != layer_sandbox->end(); ++layer_it )
+      {
+        if ( layer_it->second->provenance_id_state_->get() == provenance_id )
+        {
+          return layer_it->second;
+        }
+      }
+    }
+    // Not found, return an empty handle
+    return LayerHandle();
+  }
 
   for( GroupList::iterator i = this->private_->group_list_.begin(); 
     i != this->private_->group_list_.end(); ++i )
@@ -487,33 +620,14 @@ LayerHandle LayerManager::get_layer_by_provenance_id( ProvenanceID provenance_id
 }
 
 
-DataLayerHandle LayerManager::get_data_layer_by_id( const std::string& layer_id )
+DataLayerHandle LayerManager::find_data_layer_by_id( const std::string& layer_id, SandboxID sandbox )
 {
-  return boost::dynamic_pointer_cast<DataLayer>( get_layer_by_id( layer_id ) );
+  return boost::dynamic_pointer_cast<DataLayer>( find_layer_by_id( layer_id, sandbox ) );
 }
 
-MaskLayerHandle LayerManager::get_mask_layer_by_id( const std::string& layer_id )
+MaskLayerHandle LayerManager::find_mask_layer_by_id( const std::string& layer_id, SandboxID sandbox )
 {
-  return boost::dynamic_pointer_cast<MaskLayer>( get_layer_by_id( layer_id ) );
-}
-
-LayerHandle LayerManager::get_layer_by_name( const std::string& layer_name )
-{
-  lock_type lock( this->get_mutex() );
-
-  for( GroupList::iterator i = this->private_->group_list_.begin(); 
-    i != this->private_->group_list_.end(); ++i )
-  {
-    LayerList& layer_list = ( *i )->get_layer_list();
-    for( LayerList::iterator j = layer_list.begin(); j != layer_list.end(); ++j )
-    {
-      if( ( *j )->get_layer_name() == layer_name )
-      {
-        return ( *j );
-      }
-    }
-  }
-  return LayerHandle();
+  return boost::dynamic_pointer_cast<MaskLayer>( find_layer_by_id( layer_id, sandbox ) );
 }
 
 void LayerManager::get_groups( std::vector< LayerGroupHandle >& groups )
@@ -535,8 +649,10 @@ void LayerManager::get_layers( std::vector< LayerHandle >& layers )
   }
 }
 
-void LayerManager::delete_layers(  std::vector< LayerHandle > layers  )
+void LayerManager::delete_layers( const std::vector< LayerHandle >& layers, SandboxID sandbox )
 {
+  ASSERT_IS_APPLICATION_THREAD();
+
   if ( layers.empty() ) return;
   
   bool active_layer_changed = false;
@@ -547,6 +663,19 @@ void LayerManager::delete_layers(  std::vector< LayerHandle > layers  )
   
   { // start the lock scope
     lock_type lock( this->get_mutex() );  
+
+    if ( sandbox >= 0 )
+    {
+      LayerSandboxHandle layer_sandbox = this->private_->find_sandbox( sandbox );
+      if ( layer_sandbox )
+      {
+        BOOST_FOREACH( LayerHandle layer, layers )
+        {
+          layer_sandbox->erase( layer->get_layer_id() );
+        }
+      }
+      return;
+    }
     
     for( size_t i = 0; i < layers.size(); ++i )
     {
@@ -592,6 +721,12 @@ void LayerManager::delete_layers(  std::vector< LayerHandle > layers  )
   {
     this->active_layer_changed_signal_( this->private_->active_layer_ );
   }
+}
+
+void LayerManager::delete_layer( LayerHandle layer, SandboxID sandbox /*= -1 */ )
+{
+  std::vector< LayerHandle > layers( 1, layer );
+  this->delete_layers( layers, sandbox );
 }
 
 LayerHandle LayerManager::get_active_layer()
@@ -828,6 +963,44 @@ void LayerManager::undelete_layers( const std::vector< LayerHandle >& layers,
   }
 }
 
+SandboxID LayerManager::create_sandbox()
+{
+  ASSERT_IS_APPLICATION_THREAD();
+  lock_type lock( this->get_mutex() );
+  SandboxID sandbox_id = this->private_->sandbox_count_++;
+  this->private_->sandboxes_[ sandbox_id ] = LayerSandboxHandle( new LayerSandbox );
+  return sandbox_id;
+}
+
+bool LayerManager::delete_sandbox( SandboxID sandbox )
+{
+  ASSERT_IS_APPLICATION_THREAD();
+  lock_type lock( this->get_mutex() );
+  // Invalidate all the sandbox layers
+  // TODO: Ideally, at this point, the sandbox should be the only one that still has
+  // handles to those layers, and thus the invalidation shouldn't be necessary.
+  // However, some of the layers are still being referenced from somewhere else,
+  // causing the layers to persist after the sandbox is destroyed.
+  // We need to fix this.
+  LayerSandboxHandle layer_sandbox = this->private_->find_sandbox( sandbox );
+  if ( layer_sandbox )
+  {
+    for ( LayerSandbox::iterator it = layer_sandbox->begin();
+      it != layer_sandbox->end(); ++it )
+    {
+      it->second->invalidate();
+    }
+  }
+  
+  return this->private_->sandboxes_.erase( sandbox ) == 1;
+}
+
+bool LayerManager::is_sandbox( SandboxID sandbox_id )
+{
+  ASSERT_IS_APPLICATION_THREAD();
+  return ( sandbox_id == -1 ||
+    this->private_->sandboxes_.find( sandbox_id ) != this->private_->sandboxes_.end() );
+}
 
 bool LayerManager::pre_save_states( Core::StateIO& state_io )
 {
@@ -927,7 +1100,7 @@ bool LayerManager::post_load_states( const Core::StateIO& state_io )
   // If there are layers loaded, restore the active layer state
   if ( this->private_->group_list_.size() > 0 )
   {
-    LayerHandle active_layer = this->get_layer_by_id( this->active_layer_state_->get() );
+    LayerHandle active_layer = this->find_layer_by_id( this->active_layer_state_->get() );
     if ( !active_layer )
     {
       CORE_LOG_WARNING( "Incorrect active layer state loaded from session" );
@@ -943,18 +1116,38 @@ bool LayerManager::post_load_states( const Core::StateIO& state_io )
 
 // == static functions ==
 
-bool LayerManager::CheckLayerExistance( const std::string& layer_id )
+bool LayerManager::CheckSandboxExistence( SandboxID sandbox, Core::ActionContextHandle context )
 {
   // NOTE: Security check to keep the program logic sane
   // Only the Application Thread guarantees that nothing is changed in the program
   if ( !( Core::Application::IsApplicationThread() ) )
   {
-    CORE_THROW_LOGICERROR( "CheckLayerExistance can only be called from the"
+    CORE_THROW_LOGICERROR( "CheckLayerExistence can only be called from the"
+      " application thread." );
+  }
+
+  // Check whether the sandbox exists
+  if ( !LayerManager::Instance()->is_sandbox( sandbox ) )
+  {
+    context->report_error( Core::ExportToString( sandbox ) + " is not a valid sandbox ID." );
+    return false;
+  }
+  
+  return true;
+}
+
+bool LayerManager::CheckLayerExistence( const std::string& layer_id, SandboxID sandbox )
+{
+  // NOTE: Security check to keep the program logic sane
+  // Only the Application Thread guarantees that nothing is changed in the program
+  if ( !( Core::Application::IsApplicationThread() ) )
+  {
+    CORE_THROW_LOGICERROR( "CheckLayerExistence can only be called from the"
       " application thread." );
   }
 
   // Check whether layer exists
-  if ( !( LayerManager::Instance()->get_layer_by_id( layer_id ) ) )
+  if ( !( LayerManager::Instance()->find_layer_by_id( layer_id, sandbox ) ) )
   {
     return false;
   }
@@ -962,20 +1155,19 @@ bool LayerManager::CheckLayerExistance( const std::string& layer_id )
   return true;
 }
 
-
-bool LayerManager::CheckLayerExistance( const std::string& layer_id, 
-  Core::ActionContextHandle context )
+bool LayerManager::CheckLayerExistence( const std::string& layer_id, 
+  Core::ActionContextHandle context, SandboxID sandbox )
 {
   // NOTE: Security check to keep the program logic sane
   // Only the Application Thread guarantees that nothing is changed in the program
   if ( !( Core::Application::IsApplicationThread() ) )
   {
-    CORE_THROW_LOGICERROR( "CheckLayerExistance can only be called from the"
+    CORE_THROW_LOGICERROR( "CheckLayerExistence can only be called from the"
       " application thread." );
   }
 
   // Check whether layer exists
-  if ( !( LayerManager::Instance()->get_layer_by_id( layer_id ) ) )
+  if ( !( LayerManager::Instance()->find_layer_by_id( layer_id, sandbox ) ) )
   {
     context->report_error( std::string( "Incorrect layerid: layer '") + layer_id + 
       "' does not exist." );
@@ -986,14 +1178,14 @@ bool LayerManager::CheckLayerExistance( const std::string& layer_id,
 }
 
 
-bool LayerManager::CheckGroupExistance( const std::string& group_id, 
+bool LayerManager::CheckGroupExistence( const std::string& group_id, 
   std::string& error )
 {
   // NOTE: Security check to keep the program logic sane
   // Only the Application Thread guarantees that nothing is changed in the program
   if ( !( Core::Application::IsApplicationThread() ) )
   {
-    CORE_THROW_LOGICERROR( "CheckGroupExistance can only be called from the"
+    CORE_THROW_LOGICERROR( "CheckGroupExistence can only be called from the"
       " application thread." );
   }
   
@@ -1001,7 +1193,7 @@ bool LayerManager::CheckGroupExistance( const std::string& group_id,
   error = "";
 
   // Check whether layer exists
-  if ( !( LayerManager::Instance()->get_group_by_id( group_id ) ) )
+  if ( !( LayerManager::Instance()->find_group( group_id ) ) )
   {
     error = std::string( "Incorrect groupid: group '") + group_id + "' does not exist.";
     return false;
@@ -1011,19 +1203,19 @@ bool LayerManager::CheckGroupExistance( const std::string& group_id,
 }
 
 
-bool LayerManager::CheckLayerExistanceAndType( const std::string& layer_id, Core::VolumeType type, 
-    Core::ActionContextHandle context )
+bool LayerManager::CheckLayerExistenceAndType( const std::string& layer_id, Core::VolumeType type, 
+    Core::ActionContextHandle context, SandboxID sandbox )
 {
   // NOTE: Security check to keep the program logic sane
   // Only the Application Thread guarantees that nothing is changed in the program
   if ( !( Core::Application::IsApplicationThread() ) )
   {
-    CORE_THROW_LOGICERROR( "CheckLayerExistanceAndType can only be called from the"
+    CORE_THROW_LOGICERROR( "CheckLayerExistenceAndType can only be called from the"
       " application thread." );
   }
 
   // Check whether layer exists
-  LayerHandle layer = LayerManager::Instance()->get_layer_by_id( layer_id );
+  LayerHandle layer = LayerManager::Instance()->find_layer_by_id( layer_id, sandbox );
   if ( !layer )
   {
     context->report_error( std::string( "Incorrect layerid: layer '") + layer_id + 
@@ -1061,7 +1253,7 @@ bool LayerManager::CheckLayerExistanceAndType( const std::string& layer_id, Core
 }
 
 bool LayerManager::CheckLayerSize( const std::string& layer_id1, const std::string& layer_id2,
-    Core::ActionContextHandle context )
+    Core::ActionContextHandle context, SandboxID sandbox )
 {
   // NOTE: Security check to keep the program logic sane
   // Only the Application Thread guarantees that nothing is changed in the program
@@ -1072,7 +1264,7 @@ bool LayerManager::CheckLayerSize( const std::string& layer_id1, const std::stri
   }
 
   // Check whether layer exists
-  LayerHandle layer1 = LayerManager::Instance()->get_layer_by_id( layer_id1 );
+  LayerHandle layer1 = LayerManager::Instance()->find_layer_by_id( layer_id1, sandbox );
   if ( !layer1 )
   {
     context->report_error( std::string( "Incorrect layerid: layer '") + layer_id1 + 
@@ -1080,7 +1272,7 @@ bool LayerManager::CheckLayerSize( const std::string& layer_id1, const std::stri
     return false;
   }
 
-  LayerHandle layer2 = LayerManager::Instance()->get_layer_by_id( layer_id2 );
+  LayerHandle layer2 = LayerManager::Instance()->find_layer_by_id( layer_id2, sandbox );
   if ( !layer2 )
   {
     context->report_error( std::string( "Incorrect layerid: layer '") + layer_id2 + 
@@ -1099,7 +1291,7 @@ bool LayerManager::CheckLayerSize( const std::string& layer_id1, const std::stri
 }
 
 bool LayerManager::CheckLayerAvailabilityForProcessing( const std::string& layer_id, 
-    Core::ActionContextHandle context )
+    Core::ActionContextHandle context, SandboxID sandbox )
 {
   // NOTE: Security check to keep the program logic sane
   // Only the Application Thread guarantees that nothing is changed in the program
@@ -1109,17 +1301,17 @@ bool LayerManager::CheckLayerAvailabilityForProcessing( const std::string& layer
       " application thread." );
   }
   
-  LayerHandle layer = LayerManager::Instance()->get_layer_by_id( layer_id );
+  LayerHandle layer = LayerManager::Instance()->find_layer_by_id( layer_id, sandbox );
   // Check whether layer exists
   if ( !layer )
   {
-    CORE_THROW_LOGICERROR( "Layer does not exist, please check existance "
+    CORE_THROW_LOGICERROR( "Layer does not exist, please check existence "
       "before availability" );
   }
 
   std::string layer_state = layer->data_state_->get();
   bool lock_state = layer->locked_state_->get();
-  if ( layer_state == Layer::AVAILABLE_C && lock_state == false)
+  if ( layer_state == Layer::AVAILABLE_C && lock_state == false )
   {
     return true;
   }
@@ -1135,7 +1327,7 @@ bool LayerManager::CheckLayerAvailabilityForProcessing( const std::string& layer
 }
 
 bool LayerManager::CheckLayerAvailabilityForUse( const std::string& layer_id, 
-    Core::ActionContextHandle context )
+    Core::ActionContextHandle context, SandboxID sandbox )
 {
   // NOTE: Security check to keep the program logic sane
   // Only the Application Thread guarantees that nothing is changed in the program
@@ -1145,11 +1337,11 @@ bool LayerManager::CheckLayerAvailabilityForUse( const std::string& layer_id,
       " application thread." );
   }
   
-  LayerHandle layer = LayerManager::Instance()->get_layer_by_id( layer_id );
+  LayerHandle layer = LayerManager::Instance()->find_layer_by_id( layer_id, sandbox );
   // Check whether layer exists
   if ( !layer )
   {
-    CORE_THROW_LOGICERROR( "Layer does not exist, please check existance "
+    CORE_THROW_LOGICERROR( "Layer does not exist, please check existence "
       "before availability" );
   }
 
@@ -1173,7 +1365,7 @@ bool LayerManager::CheckLayerAvailabilityForUse( const std::string& layer_id,
 }
 
 bool LayerManager::CheckLayerAvailability( const std::string& layer_id, bool replace,
-    Core::ActionContextHandle context  )
+    Core::ActionContextHandle context, SandboxID sandbox )
 {
   // NOTE: Security check to keep the program logic sane
   // Only the Application Thread guarantees that nothing is changed in the program
@@ -1185,50 +1377,45 @@ bool LayerManager::CheckLayerAvailability( const std::string& layer_id, bool rep
 
   if ( replace )
   {
-    return LayerManager::CheckLayerAvailabilityForProcessing( layer_id, context );
+    return LayerManager::CheckLayerAvailabilityForProcessing( layer_id, context, sandbox );
   }
   else
   {
-    return LayerManager::CheckLayerAvailabilityForUse( layer_id, context ); 
+    return LayerManager::CheckLayerAvailabilityForUse( layer_id, context, sandbox );
   }
 }
 
-LayerHandle LayerManager::FindLayer( const std::string& layer_id )
+LayerHandle LayerManager::FindLayer( const std::string& layer_id, SandboxID sandbox )
 {
-  return LayerManager::Instance()->get_layer_by_id( layer_id );
+  return LayerManager::Instance()->find_layer_by_id( layer_id, sandbox );
 }
 
-LayerHandle LayerManager::FindLayer( ProvenanceID prov_id )
+LayerHandle LayerManager::FindLayer( ProvenanceID prov_id, SandboxID sandbox )
 {
-  return LayerManager::Instance()->get_layer_by_provenance_id( prov_id );
+  return LayerManager::Instance()->find_layer_by_provenance_id( prov_id, sandbox );
 }
 
 LayerGroupHandle LayerManager::FindGroup( const std::string& group_id )
 {
-  return LayerManager::Instance()->get_group_by_id( group_id );
+  return LayerManager::Instance()->find_group( group_id );
 }
 
 LayerGroupHandle LayerManager::FindGroup( ProvenanceID prov_id )
 {
-  return LayerManager::Instance()->get_group_by_provenance_id( prov_id );
+  return LayerManager::Instance()->find_group( prov_id );
 }
 
 
-MaskLayerHandle LayerManager::FindMaskLayer( const std::string& layer_id )
+MaskLayerHandle LayerManager::FindMaskLayer( const std::string& layer_id, SandboxID sandbox )
 {
   return boost::shared_dynamic_cast<MaskLayer>(  
-    LayerManager::Instance()->get_layer_by_id( layer_id ) );
+    LayerManager::Instance()->find_layer_by_id( layer_id, sandbox ) );
 }
 
-DataLayerHandle LayerManager::FindDataLayer( const std::string& layer_id )
+DataLayerHandle LayerManager::FindDataLayer( const std::string& layer_id, SandboxID sandbox )
 {
   return boost::shared_dynamic_cast<DataLayer>(  
-    LayerManager::Instance()->get_layer_by_id( layer_id ) );
-}
-
-LayerGroupHandle LayerManager::FindLayerGroup( const std::string& group_id )
-{
-  return LayerManager::Instance()->get_group_by_id( group_id );
+    LayerManager::Instance()->find_layer_by_id( layer_id, sandbox ) );
 }
 
 bool LayerManager::LockForUse( LayerHandle layer, filter_key_type key )
@@ -1278,7 +1465,7 @@ bool LayerManager::LockForProcessing( LayerHandle layer, filter_key_type key )
 }
 
 bool LayerManager::CreateAndLockMaskLayer( Core::GridTransform transform, const std::string& name, 
-    LayerHandle& layer, const LayerMetaData& meta_data, filter_key_type key )
+    LayerHandle& layer, const LayerMetaData& meta_data, filter_key_type key, SandboxID sandbox )
 {
   // NOTE: Security check to keep the program logic sane.
   // Only the Application Thread guarantees that nothing is changed in the program.
@@ -1306,13 +1493,13 @@ bool LayerManager::CreateAndLockMaskLayer( Core::GridTransform transform, const 
   layer->set_meta_data( meta_data );
   
   // Insert the layer into the layer manager.
-  LayerManager::Instance()->insert_layer( layer );
+  LayerManager::Instance()->insert_layer( layer, sandbox );
   
   return true;
 }
 
 bool LayerManager::CreateAndLockDataLayer( Core::GridTransform transform, const std::string& name, 
-  LayerHandle& layer, const LayerMetaData& meta_data, filter_key_type key )
+  LayerHandle& layer, const LayerMetaData& meta_data, filter_key_type key, SandboxID sandbox )
 {
   // NOTE: Security check to keep the program logic sane
   // Only the Application Thread guarantees that nothing is changed in the program
@@ -1340,18 +1527,18 @@ bool LayerManager::CreateAndLockDataLayer( Core::GridTransform transform, const 
   layer->set_meta_data( meta_data );
 
   // Insert the layer into the layer manager.
-  LayerManager::Instance()->insert_layer( layer );
+  LayerManager::Instance()->insert_layer( layer, sandbox );
   
   return true;
 }
 
-void LayerManager::DispatchDeleteLayer( LayerHandle layer, filter_key_type key )
+void LayerManager::DispatchDeleteLayer( LayerHandle layer, filter_key_type key, SandboxID sandbox )
 {
   // Move this request to the Application thread
   if ( !( Core::Application::IsApplicationThread() ) )
   {
     Core::Application::PostEvent( boost::bind( &LayerManager::DispatchDeleteLayer, 
-      layer, key ) );
+      layer, key, sandbox ) );
     return;
   }
 
@@ -1368,8 +1555,7 @@ void LayerManager::DispatchDeleteLayer( LayerHandle layer, filter_key_type key )
       // Unlock the layer before deleting it, so when it's undeleted the data state is correct
       layer->data_state_->set( Layer::AVAILABLE_C );
       // Delete the layer from the layer manager.
-      std::vector< LayerHandle > layers( 1, layer );
-      LayerManager::Instance()->delete_layers( layers );
+      LayerManager::Instance()->delete_layer( layer, sandbox );
     }
     else
     {
@@ -1378,13 +1564,13 @@ void LayerManager::DispatchDeleteLayer( LayerHandle layer, filter_key_type key )
   }
 }
 
-void LayerManager::DispatchUnlockLayer( LayerHandle layer, filter_key_type key )
+void LayerManager::DispatchUnlockLayer( LayerHandle layer, filter_key_type key, SandboxID sandbox )
 {
   // Move this request to the Application thread
   if ( !( Core::Application::IsApplicationThread() ) )
   {
     Core::Application::PostEvent( boost::bind( &LayerManager::DispatchUnlockLayer, 
-      layer, key ) );
+      layer, key, sandbox ) );
     return;
   }
 
@@ -1403,13 +1589,13 @@ void LayerManager::DispatchUnlockLayer( LayerHandle layer, filter_key_type key )
   }
 }
 
-void LayerManager::DispatchUnlockOrDeleteLayer( LayerHandle layer, filter_key_type key  )
+void LayerManager::DispatchUnlockOrDeleteLayer( LayerHandle layer, filter_key_type key, SandboxID sandbox )
 {
   // Move this request to the Application thread
   if ( !( Core::Application::IsApplicationThread() ) )
   {
     Core::Application::PostEvent( boost::bind( &LayerManager::DispatchUnlockOrDeleteLayer, 
-      layer, key ) );
+      layer, key, sandbox ) );
     return;
   }
 
@@ -1440,20 +1626,19 @@ void LayerManager::DispatchUnlockOrDeleteLayer( LayerHandle layer, filter_key_ty
       layer->reset_filter_handle();
       layer->reset_allow_stop();
 
-      std::vector< LayerHandle > layers( 1, layer );
-      LayerManager::Instance()->delete_layers( layers );
+      LayerManager::Instance()->delete_layer( layer, sandbox );
     }
   }
 }
 
 void LayerManager::DispatchInsertDataVolumeIntoLayer( DataLayerHandle layer, 
-  Core::DataVolumeHandle data, ProvenanceID prov_id, filter_key_type key )
+  Core::DataVolumeHandle data, ProvenanceID prov_id, filter_key_type key, SandboxID sandbox )
 {
   // Move this request to the Application thread
   if ( !( Core::Application::IsApplicationThread() ) )
   {
-    Core::Application::PostEvent( boost::bind( 
-      &LayerManager::DispatchInsertDataVolumeIntoLayer, layer, data, prov_id, key ) );
+    Core::Application::PostEvent( boost::bind( &LayerManager::DispatchInsertDataVolumeIntoLayer,
+      layer, data, prov_id, key, sandbox ) );
     return;
   }
   
@@ -1463,20 +1648,24 @@ void LayerManager::DispatchInsertDataVolumeIntoLayer( DataLayerHandle layer,
     if ( layer->set_data_volume( data ) )
     {
       layer->provenance_id_state_->set( prov_id );
-      LayerManager::Instance()->layer_volume_changed_signal_( layer );
-      LayerManager::Instance()->layers_changed_signal_();
+      // Only trigger signals if not in a sandbox
+      if ( sandbox == -1 )
+      {
+        LayerManager::Instance()->layer_volume_changed_signal_( layer );
+        LayerManager::Instance()->layers_changed_signal_();
+      }
     }
   }
 }
 
 void LayerManager::DispatchInsertMaskVolumeIntoLayer( MaskLayerHandle layer, 
-  Core::MaskVolumeHandle mask, ProvenanceID prov_id, filter_key_type key )
+  Core::MaskVolumeHandle mask, ProvenanceID prov_id, filter_key_type key, SandboxID sandbox )
 {
   // Move this request to the Application thread
   if ( !( Core::Application::IsApplicationThread() ) )
   {
     Core::Application::PostEvent( boost::bind( 
-      &LayerManager::DispatchInsertMaskVolumeIntoLayer, layer, mask, prov_id, key ) );
+      &LayerManager::DispatchInsertMaskVolumeIntoLayer, layer, mask, prov_id, key, sandbox ) );
     return;
   }
   
@@ -1486,14 +1675,18 @@ void LayerManager::DispatchInsertMaskVolumeIntoLayer( MaskLayerHandle layer,
     if ( layer->set_mask_volume( mask ) )
     {
       layer->provenance_id_state_->set( prov_id );
-      LayerManager::Instance()->layer_volume_changed_signal_( layer );
-      LayerManager::Instance()->layers_changed_signal_();
+      // Only trigger signals if not in a sandbox
+      if ( sandbox == -1 )
+      {
+        LayerManager::Instance()->layer_volume_changed_signal_( layer );
+        LayerManager::Instance()->layers_changed_signal_();
+      }   
     }
   }
 }
 
 void LayerManager::DispatchInsertVolumeIntoLayer( LayerHandle layer, 
-  Core::VolumeHandle volume, ProvenanceID prov_id, filter_key_type key )
+  Core::VolumeHandle volume, ProvenanceID prov_id, filter_key_type key, SandboxID sandbox )
 {
   if ( layer->get_type() == Core::VolumeType::MASK_E )
   {
@@ -1501,7 +1694,7 @@ void LayerManager::DispatchInsertVolumeIntoLayer( LayerHandle layer,
     Core::MaskVolumeHandle mask_volume = boost::shared_dynamic_cast<Core::MaskVolume>( volume );
     if ( mask && mask_volume )
     {
-      DispatchInsertMaskVolumeIntoLayer( mask, mask_volume, prov_id, key );
+      DispatchInsertMaskVolumeIntoLayer( mask, mask_volume, prov_id, key, sandbox );
     }
   }
   else if ( layer->get_type() == Core::VolumeType::DATA_E )
@@ -1510,19 +1703,19 @@ void LayerManager::DispatchInsertVolumeIntoLayer( LayerHandle layer,
     Core::DataVolumeHandle data_volume = boost::shared_dynamic_cast<Core::DataVolume>( volume );
     if ( data && data_volume )
     {
-      DispatchInsertDataVolumeIntoLayer( data, data_volume, prov_id, key );
+      DispatchInsertDataVolumeIntoLayer( data, data_volume, prov_id, key, sandbox );
     }
   }
 }
 
 void LayerManager::DispatchInsertDataSliceIntoLayer( DataLayerHandle layer,
-    Core::DataSliceHandle data,  ProvenanceID prov_id, filter_key_type key )
+    Core::DataSliceHandle data,  ProvenanceID prov_id, filter_key_type key, SandboxID sandbox )
 {
   // Move this request to the Application thread
   if ( !( Core::Application::IsApplicationThread() ) )
   {
     Core::Application::PostEvent( boost::bind( 
-      &LayerManager::DispatchInsertDataSliceIntoLayer, layer, data, prov_id, key ) );
+      &LayerManager::DispatchInsertDataSliceIntoLayer, layer, data, prov_id, key, sandbox ) );
     return;
   }
   
@@ -1535,20 +1728,24 @@ void LayerManager::DispatchInsertDataSliceIntoLayer( DataLayerHandle layer,
     if ( data_volume->insert_slice( data ) )
     {
       layer->provenance_id_state_->set( prov_id );
-      LayerManager::Instance()->layer_volume_changed_signal_( layer );
-      LayerManager::Instance()->layers_changed_signal_();
+      // Only trigger signals if not in a sandbox
+      if ( sandbox == -1 )
+      {
+        LayerManager::Instance()->layer_volume_changed_signal_( layer );
+        LayerManager::Instance()->layers_changed_signal_();
+      }
     }
   }
 }
 
 void LayerManager::DispatchInsertDataSlicesIntoLayer( DataLayerHandle layer,
-    std::vector<Core::DataSliceHandle> data, ProvenanceID prov_id, filter_key_type key )
+    std::vector<Core::DataSliceHandle> data, ProvenanceID prov_id, filter_key_type key, SandboxID sandbox )
 {
   // Move this request to the Application thread
   if ( !( Core::Application::IsApplicationThread() ) )
   {
     Core::Application::PostEvent( boost::bind( 
-      &LayerManager::DispatchInsertDataSlicesIntoLayer, layer, data, prov_id, key ) );
+      &LayerManager::DispatchInsertDataSlicesIntoLayer, layer, data, prov_id, key, sandbox ) );
     return;
   }
   
@@ -1568,20 +1765,23 @@ void LayerManager::DispatchInsertDataSlicesIntoLayer( DataLayerHandle layer,
     }
   
     layer->provenance_id_state_->set( prov_id );
-    LayerManager::Instance()->layer_volume_changed_signal_( layer );
-    LayerManager::Instance()->layers_changed_signal_();
+    if ( sandbox == -1 )
+    {
+      LayerManager::Instance()->layer_volume_changed_signal_( layer );
+      LayerManager::Instance()->layers_changed_signal_();
+    }
   }
 }
 
 
 void LayerManager::DispatchInsertMaskSliceIntoLayer(MaskLayerHandle layer,
-    Core::MaskDataSliceHandle mask, ProvenanceID prov_id, filter_key_type key )
+    Core::MaskDataSliceHandle mask, ProvenanceID prov_id, filter_key_type key, SandboxID sandbox )
 {
   // Move this request to the Application thread
   if ( !( Core::Application::IsApplicationThread() ) )
   {
     Core::Application::PostEvent( boost::bind( 
-      &LayerManager::DispatchInsertMaskSliceIntoLayer, layer, mask, prov_id, key ) );
+      &LayerManager::DispatchInsertMaskSliceIntoLayer, layer, mask, prov_id, key, sandbox ) );
     return;
   }
   
@@ -1594,20 +1794,24 @@ void LayerManager::DispatchInsertMaskSliceIntoLayer(MaskLayerHandle layer,
     if ( mask_volume->insert_slice( mask ) )
     {
       layer->provenance_id_state_->set( prov_id );
-      LayerManager::Instance()->layer_volume_changed_signal_( layer );
-      LayerManager::Instance()->layers_changed_signal_();
+      if ( sandbox == -1 )
+      {
+        LayerManager::Instance()->layer_volume_changed_signal_( layer );
+        LayerManager::Instance()->layers_changed_signal_();
+      }   
     }
   }
 }
 
 void LayerManager::DispatchInsertMaskSlicesIntoLayer( MaskLayerHandle layer,
-    std::vector<Core::MaskDataSliceHandle> mask, ProvenanceID prov_id, filter_key_type key )
+    std::vector<Core::MaskDataSliceHandle> mask, ProvenanceID prov_id, 
+    filter_key_type key, SandboxID sandbox )
 {
   // Move this request to the Application thread
   if ( !( Core::Application::IsApplicationThread() ) )
   {
     Core::Application::PostEvent( boost::bind( 
-      &LayerManager::DispatchInsertMaskSlicesIntoLayer, layer, mask, prov_id, key ) );
+      &LayerManager::DispatchInsertMaskSlicesIntoLayer, layer, mask, prov_id, key, sandbox ) );
     return;
   }
   
@@ -1627,8 +1831,11 @@ void LayerManager::DispatchInsertMaskSlicesIntoLayer( MaskLayerHandle layer,
     }
   
     layer->provenance_id_state_->set( prov_id );
-    LayerManager::Instance()->layer_volume_changed_signal_( layer );
-    LayerManager::Instance()->layers_changed_signal_();
+    if ( sandbox == -1 )
+    {
+      LayerManager::Instance()->layer_volume_changed_signal_( layer );
+      LayerManager::Instance()->layers_changed_signal_();
+    }
   }
 }
 

@@ -142,7 +142,7 @@ void ThresholdToolInterface::refresh_histogram( QString layer_name )
   }
 
   DataLayerHandle data_layer = boost::dynamic_pointer_cast< DataLayer >(
-    LayerManager::Instance()->get_layer_by_name( layer_name.toStdString() ) );
+    LayerManager::Instance()->find_layer_by_name( layer_name.toStdString() ) );
   if ( !data_layer )
   {
     return;

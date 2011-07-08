@@ -60,6 +60,8 @@ class ActionPaint : public LayerAction
     CORE_ACTION_OPTIONAL_ARGUMENT( "mask_constraint2", "<none>", "The ID of second mask constraint layer." )
     CORE_ACTION_OPTIONAL_ARGUMENT( "negative_mask_constraint2", "false", "Whether to negate the second mask constraint." )
     CORE_ACTION_OPTIONAL_ARGUMENT( "erase", "false", "Whether to erase instead of painting." )
+    CORE_ACTION_OPTIONAL_ARGUMENT( "sandbox", "-1", "The sandbox in which to run the action." )
+    CORE_ACTION_ARGUMENT_IS_NONPERSISTENT( "sandbox" )  
     CORE_ACTION_CHANGES_PROJECT_DATA()
     CORE_ACTION_IS_UNDOABLE() 
   )

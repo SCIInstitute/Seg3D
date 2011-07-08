@@ -127,11 +127,7 @@ public:
   // property from the macro can thence be overwritten.
   virtual bool changes_project_data();
   
-  // CHANGES_PROVENANCE_DATA:
-  // Query whether the action changes the provenance data base
-  bool changes_provenance_data() const;
-  
-  // -- Run/Validate/Translat interface --
+  // -- Run/Validate/Translate interface --
 public:
   // TRANSLATE:
   // Some actions need to be translated before they can be validated. Translate takes
@@ -175,7 +171,7 @@ public:
   std::string export_to_string() const;
 
   // IMPORT_ACTION_FROM_STRING:
-  // Import an action command from astring. This function is used by the
+  // Import an action command from a string. This function is used by the
   // ActionFactory.
   bool import_from_string( const std::string& action, std::string& error );
 
@@ -204,6 +200,14 @@ protected:
     if ( !default_val.empty() )
     {
       parameter->import_from_string( default_val );
+    }
+    // Check for the 'nonpersistent' property of the parameter
+    std::vector< std::string > param_properties = this->get_action_info()->
+      get_key_properties( this->parameters_.size() - 1 );
+    if ( std::find( param_properties.begin(), param_properties.end(), "nonpersistent" ) !=
+      param_properties.end() )
+    {
+      parameter->set_persistent( false );
     }
   }
 
@@ -289,11 +293,11 @@ CORE_ACTION_INTERNAL(definition_string, Core::ActionInfo )
 #define CORE_ACTION_ARGUMENT_PROPERTY( name, property ) \
 "<property name=\"" name "\">" property "</property>"
 
+#define CORE_ACTION_ARGUMENT_IS_NONPERSISTENT( name ) \
+CORE_ACTION_ARGUMENT_PROPERTY( name, "nonpersistent" )
+
 #define CORE_ACTION_CHANGES_PROJECT_DATA() \
 CORE_ACTION_PROPERTY( "changes_project_data" )
-
-#define CORE_ACTION_CHANGES_PROVENANCE_DATA() \
-CORE_ACTION_PROPERTY( "changes_provenance_data" )
 
 #define CORE_ACTION_IS_UNDOABLE() \
 CORE_ACTION_PROPERTY( "is_undoable" )

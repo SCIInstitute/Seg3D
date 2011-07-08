@@ -95,7 +95,7 @@ void ThresholdToolPrivate::handle_target_layer_changed()
     Core::ScopedCounter signal_block( this->signal_block_count_ );
 
     DataLayerHandle data_layer = boost::dynamic_pointer_cast< DataLayer >(
-      LayerManager::Instance()->get_layer_by_id( target_layer_id ) );
+      LayerManager::Instance()->find_layer_by_id( target_layer_id ) );
     double min_val = data_layer->get_data_volume()->get_data_block()->get_min();
     double max_val = data_layer->get_data_volume()->get_data_block()->get_max();
 
@@ -227,7 +227,7 @@ void ThresholdTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
   }
   
   DataLayerHandle target_layer = boost::dynamic_pointer_cast< DataLayer >(
-    LayerManager::Instance()->get_layer_by_id( target_layer_id ) );
+    LayerManager::Instance()->find_layer_by_id( target_layer_id ) );
   if ( !target_layer )
   {
     CORE_THROW_LOGICERROR( "Target layer '" + target_layer_id + "' doesn't exist" );
@@ -346,7 +346,7 @@ void ThresholdTool::handle_seed_points_changed()
   }
 
   DataLayerHandle data_layer = boost::dynamic_pointer_cast< DataLayer >(
-    LayerManager::Instance()->get_layer_by_id( target_layer_id ) );
+    LayerManager::Instance()->find_layer_by_id( target_layer_id ) );
   Core::DataVolumeHandle data_volume = data_layer->get_data_volume();
   Core::DataBlockHandle data_block = data_volume->get_data_block();
   double min_val = std::numeric_limits< double >::max(); 

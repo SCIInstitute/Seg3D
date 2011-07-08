@@ -62,14 +62,14 @@ ActionMoveGroup::ActionMoveGroup() :
 
 bool ActionMoveGroup::validate( Core::ActionContextHandle& context )
 {
-  this->private_->src_group_ = LayerManager::Instance()->get_group_by_id( this->private_->src_groupid_ );
+  this->private_->src_group_ = LayerManager::Instance()->find_group( this->private_->src_groupid_ );
   if ( !this->private_->src_group_ )
   {
     context->report_error( "'" + this->private_->src_groupid_ + "' is not a valid layer group." );
     return false;
   }
   
-  this->private_->dst_group_ = LayerManager::Instance()->get_group_by_id( this->private_->dst_groupid_ );
+  this->private_->dst_group_ = LayerManager::Instance()->find_group( this->private_->dst_groupid_ );
   if ( !this->private_->dst_group_ )
   {
     context->report_error( "'" + this->private_->dst_groupid_ + "' is not a valid layer group." );

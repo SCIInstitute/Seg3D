@@ -49,9 +49,12 @@ namespace Seg3D
 
 bool ActionSpeedlineImageFilter::validate( Core::ActionContextHandle& context )
 {
-  // Check for layer existance and type information
-  if ( ! LayerManager::CheckLayerExistanceAndType( this->target_layer_, 
-    Core::VolumeType::DATA_E, context ) ) return false;
+  // Make sure that the sandbox exists
+  if ( !LayerManager::CheckSandboxExistence( this->sandbox_, context ) ) return false;
+
+  // Check for layer existence and type information
+  if ( ! LayerManager::CheckLayerExistenceAndType( this->target_layer_, 
+    Core::VolumeType::DATA_E, context, this->sandbox_ ) ) return false;
     
   // Validation successful
   return true;
@@ -255,6 +258,7 @@ bool ActionSpeedlineImageFilter::run( Core::ActionContextHandle& context,
   boost::shared_ptr<SpeedlineImageFilterAlgo> algo( new SpeedlineImageFilterAlgo );
 
   // Copy the parameters over to the algorithm that runs the filter
+  algo->set_sandbox( this->sandbox_ );
   algo->is_smoothing_ = this->is_smoothing_;
   algo->is_rescale_ = this->is_rescale_;
 

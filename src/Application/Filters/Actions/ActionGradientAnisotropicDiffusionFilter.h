@@ -36,6 +36,7 @@
 // Application includes
 #include <Application/Layer/Layer.h>
 #include <Application/Layer/LayerAction.h>
+#include <Application/Layer/LayerManager.h>
 
 namespace Seg3D
 {
@@ -52,6 +53,8 @@ CORE_ACTION(
   CORE_ACTION_OPTIONAL_ARGUMENT( "replace", "true", "Replace the old layer (true), or add an new layer (false)" )
   CORE_ACTION_OPTIONAL_ARGUMENT( "iterations", "5", "Number of iterations to perform." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "sensitivity", "0.1", "Weight for specifying how closely connected values are." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "sandbox", "-1", "The sandbox in which to run the action." )
+  CORE_ACTION_ARGUMENT_IS_NONPERSISTENT( "sandbox" )  
   CORE_ACTION_CHANGES_PROJECT_DATA()
   CORE_ACTION_IS_UNDOABLE()
 )
@@ -66,6 +69,7 @@ public:
     this->add_parameter( this->replace_ );
     this->add_parameter( this->iterations_ );
     this->add_parameter( this->sensitivity_ );
+    this->add_parameter( this->sandbox_ );
   }
 
   // -- Functions that describe action --
@@ -81,6 +85,7 @@ private:
   bool replace_;
   int iterations_;
   double sensitivity_;
+  SandboxID sandbox_;
   
   // -- Dispatch this action from the interface --
 public:   

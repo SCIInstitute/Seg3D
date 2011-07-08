@@ -228,12 +228,15 @@ public:
 
 bool ActionInvert::validate( Core::ActionContextHandle& context )
 {
+  // Make sure that the sandbox exists
+  if ( !LayerManager::CheckSandboxExistence( this->sandbox_, context ) ) return false;
+
   // Check for layer existence and type information
-  if ( ! LayerManager::CheckLayerExistance( this->layer_id_, context ) ) return false;
+  if ( ! LayerManager::CheckLayerExistence( this->layer_id_, context, this->sandbox_ ) ) return false;
 
   // Check for layer availability 
   if ( ! LayerManager::CheckLayerAvailability( this->layer_id_, 
-    this->replace_, context ) ) return false;
+    this->replace_, context, this->sandbox_ ) ) return false;
 
   // Validation successful
   return true;
@@ -244,6 +247,7 @@ bool ActionInvert::run( Core::ActionContextHandle& context,
 {
   // Create algorithm
   boost::shared_ptr< InvertFilterAlgo > algo( new InvertFilterAlgo );
+  algo->set_sandbox( this->sandbox_ );
 
   // Find the handle to the layer 
   if ( !( algo->find_layer( this->layer_id_, algo->src_layer_ ) ) )

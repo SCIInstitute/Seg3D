@@ -36,6 +36,7 @@
 // Application includes
 #include <Application/Layer/Layer.h>
 #include <Application/Layer/LayerAction.h>
+#include <Application/Layer/LayerManager.h>
 
 namespace Seg3D
 {
@@ -50,6 +51,8 @@ CORE_ACTION(
   CORE_ACTION_OPTIONAL_ARGUMENT( "amount", "1.0", "Amount of equalization (between 0.0 and 1.0)." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "bins", "3000", "Number of bins to use for histogram equalization." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "ignore", "1", "Number of bins to ignore for histogram equalization." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "sandbox", "-1", "The sandbox in which to run the action." )
+  CORE_ACTION_ARGUMENT_IS_NONPERSISTENT( "sandbox" )  
   CORE_ACTION_CHANGES_PROJECT_DATA()
   CORE_ACTION_IS_UNDOABLE()
 )
@@ -64,6 +67,7 @@ public:
     this->add_parameter( this->amount_ );
     this->add_parameter( this->bins_ );
     this->add_parameter( this->ignore_bins_ );
+    this->add_parameter( this->sandbox_ );
   }
   
   // -- Functions that describe action --
@@ -80,6 +84,7 @@ private:
   double amount_;
   int bins_;
   int ignore_bins_;
+  SandboxID sandbox_;
   
   // -- Dispatch this action from the interface --
 public:

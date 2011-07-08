@@ -77,7 +77,7 @@ void ResampleToolPrivate::update_dst_group_list()
 
   Core::ScopedCounter signal_block( this->signal_block_count_ );
 
-  LayerGroupHandle layer_group = LayerManager::Instance()->get_group_by_id( group_id );
+  LayerGroupHandle layer_group = LayerManager::Instance()->find_group( group_id );
 
   std::vector< LayerGroupHandle > layer_groups;
   LayerManager::Instance()->get_groups( layer_groups );
@@ -108,7 +108,7 @@ void ResampleToolPrivate::handle_target_group_changed()
 
   Core::ScopedCounter signal_block( this->signal_block_count_ );
 
-  LayerGroupHandle layer_group = LayerManager::Instance()->get_group_by_id( group_id );
+  LayerGroupHandle layer_group = LayerManager::Instance()->find_group( group_id );
   const Core::GridTransform& grid_trans = layer_group->get_grid_transform();
   int nx = static_cast< int >( grid_trans.get_nx() );
   int ny = static_cast< int >( grid_trans.get_ny() );
@@ -323,7 +323,7 @@ void ResampleTool::execute( Core::ActionContextHandle context )
   }
   else
   {
-    LayerGroupHandle dst_group = LayerManager::Instance()->get_group_by_id(
+    LayerGroupHandle dst_group = LayerManager::Instance()->find_group(
       this->dst_group_state_->get() );
     if ( dst_group )
     {

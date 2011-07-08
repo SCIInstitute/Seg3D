@@ -48,25 +48,28 @@ namespace Seg3D
 
 bool ActionAndFilter::validate( Core::ActionContextHandle& context )
 {
-  // Check for layer existance and type information
-  if ( ! LayerManager::CheckLayerExistanceAndType( this->target_layer_, Core::VolumeType::MASK_E, 
-    context ) ) return false;
+  // Make sure that the sandbox exists
+  if ( !LayerManager::CheckSandboxExistence( this->sandbox_, context ) ) return false;
+
+  // Check for layer existence and type information
+  if ( ! LayerManager::CheckLayerExistenceAndType( this->target_layer_, Core::VolumeType::MASK_E, 
+    context, this->sandbox_ ) ) return false;
   
   // Check for layer availability 
   if ( ! LayerManager::CheckLayerAvailability( this->target_layer_, this->replace_, 
-    context ) ) return false;
+    context, this->sandbox_ ) ) return false;
   
-  // Check for layer existance and type information mask layer
-  if ( ! LayerManager::CheckLayerExistanceAndType( this->mask_layer_, Core::VolumeType::MASK_E,
-    context ) ) return false;
+  // Check for layer existence and type information mask layer
+  if ( ! LayerManager::CheckLayerExistenceAndType( this->mask_layer_, Core::VolumeType::MASK_E,
+    context, this->sandbox_ ) ) return false;
 
   // Check whether mask and data have the same size
   if ( ! LayerManager::CheckLayerSize( this->mask_layer_, this->target_layer_,
-    context ) ) return false;
+    context, this->sandbox_ ) ) return false;
     
   // Check for layer availability mask layer
   if ( ! LayerManager::CheckLayerAvailability( this->mask_layer_, 
-    this->replace_, context ) ) return false;
+    this->replace_, context, this->sandbox_ ) ) return false;
   
   // Validation successful
   return true;
@@ -87,7 +90,7 @@ public:
 
 public:
   // RUN:
-  // Implemtation of run of the Runnable base class, this function is called when the thread
+  // Implementation of run of the Runnable base class, this function is called when the thread
   // is launched.
 
   SCI_BEGIN_RUN( ) 
@@ -220,8 +223,9 @@ bool ActionAndFilter::run( Core::ActionContextHandle& context,
   boost::shared_ptr<AndFilterAlgo> algo( new AndFilterAlgo );
 
   // Find the handle to the layer
-  algo->src_layer_ = LayerManager::FindLayer( this->target_layer_ );
-  algo->mask_layer_ = LayerManager::FindLayer( this->mask_layer_ );
+  algo->set_sandbox( this->sandbox_ );
+  algo->src_layer_ = LayerManager::FindLayer( this->target_layer_, this->sandbox_ );
+  algo->mask_layer_ = LayerManager::FindLayer( this->mask_layer_, this->sandbox_ );
   
   // Check whether the source layer was found
   if ( !algo->src_layer_ || !algo->mask_layer_ ) return false;

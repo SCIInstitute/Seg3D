@@ -50,6 +50,7 @@ class ActionParameterBase
 {
   // -- destructor --
 public:
+  ActionParameterBase();
   virtual ~ActionParameterBase();
 
   // -- functions for accessing data --
@@ -64,8 +65,25 @@ public:
   virtual std::string export_to_string() const = 0;
 
   // HAS_EXTENSION
-  // Has exented information in the derived class
+  // Has extended information in the derived class
   virtual bool has_extension() const = 0;
+
+  // IS_PERSISTENT:
+  // Whether the parameter should be included when export an action to string.
+  bool is_persistent() const
+  {
+    return this->persistent_;
+  }
+
+  // SET_PERSISTENT:
+  // Set the persistent property of the action parameter.
+  void set_persistent( bool persistent )
+  {
+    this->persistent_ = persistent;
+  }
+
+private:
+  bool persistent_;
 };
 
 // ACTIONPARAMETER:

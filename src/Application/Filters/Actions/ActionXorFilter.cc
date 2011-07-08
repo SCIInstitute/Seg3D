@@ -48,25 +48,28 @@ namespace Seg3D
 
 bool ActionXorFilter::validate( Core::ActionContextHandle& context )
 {
-  // Check for layer existance and type information
-  if ( ! LayerManager::CheckLayerExistanceAndType( this->target_layer_, 
-    Core::VolumeType::MASK_E, context ) ) return false;
+  // Make sure that the sandbox exists
+  if ( !LayerManager::CheckSandboxExistence( this->sandbox_, context ) ) return false;
+
+  // Check for layer existence and type information
+  if ( ! LayerManager::CheckLayerExistenceAndType( this->target_layer_, 
+    Core::VolumeType::MASK_E, context, this->sandbox_ ) ) return false;
   
   // Check for layer availability 
   if ( ! LayerManager::CheckLayerAvailability( this->target_layer_, 
-    this->replace_, context ) ) return false;
+    this->replace_, context, this->sandbox_ ) ) return false;
   
-  // Check for layer existance and type information mask layer
-  if ( ! LayerManager::CheckLayerExistanceAndType( this->mask_layer_, 
-    Core::VolumeType::MASK_E, context ) ) return false;
+  // Check for layer existence and type information mask layer
+  if ( ! LayerManager::CheckLayerExistenceAndType( this->mask_layer_, 
+    Core::VolumeType::MASK_E, context, this->sandbox_ ) ) return false;
 
   // Check whether mask and data have the same size
   if ( ! LayerManager::CheckLayerSize( this->mask_layer_, this->target_layer_,
-    context ) ) return false;
+    context, this->sandbox_ ) ) return false;
     
   // Check for layer availability mask layer
   if ( ! LayerManager::CheckLayerAvailability( this->mask_layer_, 
-    this->replace_, context ) ) return false;
+    this->replace_, context, this->sandbox_ ) ) return false;
   
   // Validation successful
   return true;
@@ -227,6 +230,7 @@ bool ActionXorFilter::run( Core::ActionContextHandle& context,
 {
   // Create algorithm
   boost::shared_ptr<XorFilterAlgo> algo( new XorFilterAlgo );
+  algo->set_sandbox( this->sandbox_ );
 
   // Find the handle to the layer
   if ( !( algo->find_layer( this->target_layer_, algo->src_layer_ ) ) )

@@ -193,7 +193,7 @@ void PolylineToolPrivate::execute( Core::ActionContextHandle context,
     return;
   }
 
-  LayerHandle layer = LayerManager::Instance()->get_layer_by_id( 
+  LayerHandle layer = LayerManager::Instance()->find_layer_by_id( 
     this->tool_->target_layer_state_->get() );
   if ( !layer->is_visible( viewer->get_viewer_id() ) || layer->locked_state_->get() )
   {

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>351</width>
+    <width>374</width>
     <height>801</height>
    </rect>
   </property>
@@ -91,8 +91,11 @@ QPushButton:pressed{
        <bool>false</bool>
       </property>
       <property name="columnCount">
-       <number>3</number>
+       <number>4</number>
       </property>
+      <attribute name="horizontalHeaderDefaultSectionSize">
+       <number>80</number>
+      </attribute>
       <attribute name="horizontalHeaderStretchLastSection">
        <bool>true</bool>
       </attribute>
@@ -102,6 +105,11 @@ QPushButton:pressed{
       <column>
        <property name="text">
         <string>Step</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>PID</string>
        </property>
       </column>
       <column>
@@ -152,7 +160,7 @@ QPushButton:pressed{
           <string>Select a session you want to export to enable this button.</string>
          </property>
          <property name="text">
-          <string>Replay Provenance</string>
+          <string>Recreate</string>
          </property>
         </widget>
        </item>

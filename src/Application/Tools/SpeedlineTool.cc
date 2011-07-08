@@ -254,7 +254,7 @@ void SpeedlineToolPrivate::execute_fill_erase( Core::ActionContextHandle context
 
 
   // Target mask being filled must be visible.
-  LayerHandle target_mask_layer = LayerManager::Instance()->get_layer_by_id( 
+  LayerHandle target_mask_layer = LayerManager::Instance()->find_layer_by_id( 
     this->tool_->target_layer_state_->get() );
 
 
@@ -362,10 +362,10 @@ void SpeedlineToolPrivate::execute_path( bool update_all_paths )
 
   // Either gradient or target mask must be visible. 
   // Both gradient and target mask must not be locked.
-  LayerHandle target_layer = LayerManager::Instance()->get_layer_by_id( 
+  LayerHandle target_layer = LayerManager::Instance()->find_layer_by_id( 
     this->tool_->target_layer_state_->get() );
 
-  LayerHandle gradient_layer = LayerManager::Instance()->get_layer_by_id( 
+  LayerHandle gradient_layer = LayerManager::Instance()->find_layer_by_id( 
     this->tool_->gradient_state_->get() );
 
   if ( !target_layer->is_visible( viewer->get_viewer_id() ) ||

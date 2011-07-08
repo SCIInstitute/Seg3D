@@ -75,14 +75,12 @@ public:
   // Default properties
   bool is_undoable_;
   bool changes_project_data_;
-  bool changes_provenance_data_;
 };
 
 ActionInfoPrivate::ActionInfoPrivate() :
   valid_( false ),
   is_undoable_( false ),
-  changes_project_data_( false ),
-  changes_provenance_data_( false )
+  changes_project_data_( false )
 {
 }
 
@@ -268,12 +266,6 @@ ActionInfo::ActionInfo( const std::string& definition ) :
   }
 
   if ( std::find( this->private_->properties_.begin(), this->private_->properties_.end(), 
-    "changes_provenance_data" ) !=  this->private_->properties_.end() )
-  {
-    this->private_->changes_provenance_data_ = true;
-  }
-
-  if ( std::find( this->private_->properties_.begin(), this->private_->properties_.end(), 
     "is_undoable" ) !=  this->private_->properties_.end() )
   {
     this->private_->is_undoable_ = true;
@@ -355,11 +347,6 @@ bool ActionInfo::is_valid() const
 bool ActionInfo::changes_project_data() const
 {
   return this->private_->changes_project_data_;
-}
-
-bool ActionInfo::changes_provenance_data() const
-{
-  return this->private_->changes_provenance_data_;
 }
 
 bool ActionInfo::is_undoable() const

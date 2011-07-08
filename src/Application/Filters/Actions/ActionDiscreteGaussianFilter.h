@@ -33,6 +33,7 @@
 #include <Core/Interface/Interface.h>
 #include <Application/Layer/Layer.h>
 #include <Application/Layer/LayerAction.h>
+#include <Application/Layer/LayerManager.h>
 
 namespace Seg3D
 {
@@ -47,6 +48,8 @@ CORE_ACTION(
   CORE_ACTION_OPTIONAL_ARGUMENT( "preserve_data_format", "true", "ITK filters run in floating point percision,"
     " this option will convert the result back into the original format." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "blurring_distance", "2.0", "The amount of blurring." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "sandbox", "-1", "The sandbox in which to run the action." )
+  CORE_ACTION_ARGUMENT_IS_NONPERSISTENT( "sandbox" )  
   CORE_ACTION_CHANGES_PROJECT_DATA()
   CORE_ACTION_IS_UNDOABLE()
 )
@@ -59,6 +62,7 @@ public:
     this->add_parameter( this->replace_ );
     this->add_parameter( this->preserve_data_format_ );
     this->add_parameter( this->blurring_distance_ );
+    this->add_parameter( this->sandbox_ );
   }
 
   // -- Functions that describe action --
@@ -73,6 +77,7 @@ private:
   bool replace_;
   bool preserve_data_format_;
   double blurring_distance_;
+  SandboxID sandbox_;
   
   // -- Dispatch this action from the interface --
 public:

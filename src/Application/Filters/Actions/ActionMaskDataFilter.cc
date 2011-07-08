@@ -43,25 +43,28 @@ namespace Seg3D
 
 bool ActionMaskDataFilter::validate( Core::ActionContextHandle& context )
 {
-  // Check for layer existance and type information
-  if ( ! LayerManager::CheckLayerExistanceAndType( this->target_layer_, 
-    Core::VolumeType::DATA_E, context ) ) return false;
+  // Make sure that the sandbox exists
+  if ( !LayerManager::CheckSandboxExistence( this->sandbox_, context ) ) return false;
+
+  // Check for layer existence and type information
+  if ( ! LayerManager::CheckLayerExistenceAndType( this->target_layer_, 
+    Core::VolumeType::DATA_E, context, this->sandbox_ ) ) return false;
   
   // Check for layer availability 
   if ( ! LayerManager::CheckLayerAvailability( this->target_layer_, 
-    this->replace_, context ) ) return false;
+    this->replace_, context, this->sandbox_ ) ) return false;
   
-  // Check for layer existance and type information mask layer
-  if ( ! LayerManager::CheckLayerExistanceAndType( this->mask_layer_, 
-    Core::VolumeType::MASK_E, context ) ) return false;
+  // Check for layer existence and type information mask layer
+  if ( ! LayerManager::CheckLayerExistenceAndType( this->mask_layer_, 
+    Core::VolumeType::MASK_E, context, this->sandbox_ ) ) return false;
 
   // Check whether mask and data have the same size
   if ( ! LayerManager::CheckLayerSize( this->mask_layer_, this->target_layer_,
-    context ) ) return false;
+    context, this->sandbox_ ) ) return false;
     
   // Check for layer availability mask layer
   if ( ! LayerManager::CheckLayerAvailability( this->mask_layer_, 
-    this->replace_, context ) ) return false;
+    this->replace_, context, this->sandbox_ ) ) return false;
   
   // If the number of iterations is lower than one, we cannot run the filter
   if( ! ( this->replace_with_ == "zero" || this->replace_with_ == "max_value" ||
@@ -259,6 +262,7 @@ bool ActionMaskDataFilter::run( Core::ActionContextHandle& context,
   boost::shared_ptr<MaskDataFilterAlgo> algo( new MaskDataFilterAlgo );
 
   // Copy the parameters over to the algorithm that runs the filter
+  algo->set_sandbox( this->sandbox_ );
   algo->invert_mask_ = this->invert_mask_;
   algo->replace_with_ = this->replace_with_;
 

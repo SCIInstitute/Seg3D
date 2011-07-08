@@ -78,6 +78,7 @@ public:
   double param1_;
   double param2_;
   bool replace_;
+  SandboxID sandbox_;
 
   Core::GridTransform grid_transform_;
   bool resample_to_grid_;
@@ -939,12 +940,11 @@ ActionResample::ActionResample() :
   this->add_parameter( this->private_->x_ );
   this->add_parameter( this->private_->y_ );
   this->add_parameter( this->private_->z_ );
-
-  // Action options
   this->add_parameter( this->private_->kernel_ );
   this->add_parameter( this->private_->param1_ );
   this->add_parameter( this->private_->param2_ );
   this->add_parameter( this->private_->replace_ );
+  this->add_parameter( this->private_->sandbox_ );
 
   this->private_->resample_to_grid_ = false;
   this->private_->resample_to_layer_ = false;
@@ -952,6 +952,12 @@ ActionResample::ActionResample() :
 
 bool ActionResample::validate( Core::ActionContextHandle& context )
 {
+  // Make sure that the sandbox exists
+  if ( !LayerManager::CheckSandboxExistence( this->private_->sandbox_, context ) )
+  {
+    return false;
+  }
+
   const std::vector< std::string >& layer_ids = this->private_->layer_ids_;
   if ( layer_ids.size() == 0 )
   {
@@ -962,17 +968,18 @@ bool ActionResample::validate( Core::ActionContextHandle& context )
   for ( size_t i = 0; i < layer_ids.size(); ++i )
   {
     // Check for layer existence and type information
-    if ( !LayerManager::CheckLayerExistance( layer_ids[ i ], context ) ) return false;
+    if ( !LayerManager::CheckLayerExistence( layer_ids[ i ], context, this->private_->sandbox_ ) )
+      return false;
     
     // Check for layer availability 
     if ( !LayerManager::CheckLayerAvailability( layer_ids[ i ], 
-      this->private_->replace_, context ) ) return false;
+      this->private_->replace_, context, this->private_->sandbox_ ) ) return false;
   }
 
   if ( this->private_->resample_to_layer_ )
   {
-    LayerHandle layer = LayerManager::Instance()->get_layer_by_id( 
-      this->private_->dst_layer_id_ );
+    LayerHandle layer = LayerManager::FindLayer( 
+      this->private_->dst_layer_id_, this->private_->sandbox_ );
     if ( !layer )
     {
       context->report_error( "Invalid drop target" );
@@ -1037,6 +1044,7 @@ bool ActionResample::run( Core::ActionContextHandle& context,
   algo->resample_to_grid_ = this->private_->resample_to_grid_ || 
     this->private_->resample_to_layer_;
   algo->padding_ = this->private_->padding_;
+  algo->set_sandbox( this->private_->sandbox_ );
 
   const std::vector< std::string >& layer_ids = this->private_->layer_ids_;
   

@@ -46,8 +46,9 @@ namespace Seg3D
 // Forward Declaration
 class ProvenanceStep;
 typedef boost::shared_ptr<ProvenanceStep> ProvenanceStepHandle;
+typedef std::vector< ProvenanceStepHandle > ProvenanceTrail;
+typedef boost::shared_ptr< ProvenanceTrail > ProvenanceTrailHandle;
 typedef long long ProvenanceStepID;
-
 
 class ProvenanceStep : boost::noncopyable
 {
@@ -91,27 +92,37 @@ public:
   // Get the input files cache id from this provenance step
   InputFilesID get_inputfiles_id() const;
 
-  // SET_ACTION:
-  // Set the provenance action
-  void set_action( const std::string& action );
-  
-  // GET_ACTION:
-  // Get the provenance action
-  const std::string& get_action() const;
+  // SET_ACTION_NAME:
+  // Set the action name.
+  void set_action_name( const std::string& action_name );
+
+  // GET_ACTION_NAME:
+  // Get the action name.
+  const std::string& get_action_name() const;
+
+  // SET_ACTION_PARAMS:
+  // Set the action parameters string.
+  void set_action_params( const std::string& action_params );
+
+  // GET_ACTION_PARAMS:
+  // Get the action parameters string.
+  const std::string& get_action_params() const;
   
   // GET_USER:
   // get the user's name
   const std::string& get_username() const;
 
+  // SET_PROVENANCE_ID_OF_INTEREST:
+  // Set the provenance ID in which we are interested.
+  void set_provenance_id_of_interest( ProvenanceID poi );
+
+  // GET_PROVENANCE_ID_OF_INTEREST:
+  // Get the provenance ID in which we are interested.
+  ProvenanceID get_provenance_id_of_interest() const;
+
   // -- properties --
 public:
   virtual bool is_collapsable();
-
-  // -- debug tools --
-public:
-  // PRINT
-  // Print the provenance record to cout
-  void print();
 
   // -- internals --
 protected:
@@ -124,14 +135,22 @@ protected:
   // List of provenance ids that this action will replace
   ProvenanceIDList replaced_provenance_ids_;
 
-  // Description of the action
-  std::string action_;
+  // Name of the action
+  std::string action_name_;
+
+  // Parameters of the action
+  std::string action_params_;
 
   // User that generated action
   std::string user_;
   
   // Input Files cache id
   InputFilesID inputfiles_id_;
+
+  // Provenance ID of interest
+  // NOTE: This is for getting back a provenance trail, when we are only
+  // interested in provenance IDs of a certain layer.
+  ProvenanceID provenance_id_of_interest_;
 };
 
 } // end namespace Seg3D

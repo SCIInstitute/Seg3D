@@ -36,6 +36,7 @@
 // Application includes
 #include <Application/Layer/Layer.h>
 #include <Application/Layer/LayerAction.h>
+#include <Application/Layer/LayerManager.h>
 
 namespace Seg3D
 {
@@ -53,6 +54,8 @@ CORE_ACTION(
   CORE_ACTION_OPTIONAL_ARGUMENT( "invert_mask", "false", "Whether the mask needs to be inverted." ) 
   CORE_ACTION_OPTIONAL_ARGUMENT( "only2d", "false", "Whether the filter only works 2d." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "slice_type", "0", "The slice type for the 2d filter." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "sandbox", "-1", "The sandbox in which to run the action." )
+  CORE_ACTION_ARGUMENT_IS_NONPERSISTENT( "sandbox" )  
   CORE_ACTION_CHANGES_PROJECT_DATA()
   CORE_ACTION_IS_UNDOABLE()
 )
@@ -76,6 +79,8 @@ public:
     // 2D constraint
     this->add_parameter( this->only2d_ );
     this->add_parameter( this->slice_type_ );
+
+    this->add_parameter( this->sandbox_ );
   }
   
   // -- Functions that describe action --
@@ -96,6 +101,7 @@ private:
 
   bool only2d_;
   int slice_type_;
+  SandboxID sandbox_;
       
   // -- Dispatch this action from the interface --
 public:

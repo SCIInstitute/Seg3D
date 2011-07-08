@@ -46,13 +46,16 @@ namespace Seg3D
 
 bool ActionHistogramEqualizationFilter::validate( Core::ActionContextHandle& context )
 {
-  // Check for layer existance and type information
-  if ( ! LayerManager::CheckLayerExistanceAndType( this->target_layer_, 
-    Core::VolumeType::DATA_E, context ) ) return false;
+  // Make sure that the sandbox exists
+  if ( !LayerManager::CheckSandboxExistence( this->sandbox_, context ) ) return false;
+
+  // Check for layer existence and type information
+  if ( ! LayerManager::CheckLayerExistenceAndType( this->target_layer_, 
+    Core::VolumeType::DATA_E, context, this->sandbox_ ) ) return false;
   
   // Check for layer availability 
   if ( ! LayerManager::CheckLayerAvailability( this->target_layer_, 
-    this->replace_, context ) ) return false;
+    this->replace_, context, this->sandbox_ ) ) return false;
     
   // Check amount
   if( this->amount_ < 0.0 || this->amount_ > 1.0 )
@@ -154,6 +157,7 @@ bool ActionHistogramEqualizationFilter::run( Core::ActionContextHandle& context,
   boost::shared_ptr<HistogramEqualizationFilterAlgo> algo( new HistogramEqualizationFilterAlgo );
 
   // Copy the parameters over to the algorithm that runs the filter
+  algo->set_sandbox( this->sandbox_ );
   algo->amount_ = this->amount_;
   algo->bins_ = this->bins_;
   algo->ignore_bins_ = this->ignore_bins_;

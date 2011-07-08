@@ -73,6 +73,12 @@ void LayerAction::add_layer_id_list( std::vector<std::string>& layer_id_list )
 
 bool LayerAction::translate( Core::ActionContextHandle& context )
 {
+  // If the action comes from provenance replay, no need to translate
+  if ( context->source() == Core::ActionSource::PROVENANCE_E )
+  {
+    return true;
+  }
+  
   // Check whether we should remove the supplied provenance ids for the output
   // If we redoing an action it should generate the same outputs, like wise from
   // the provenance buffer it should generate output with the same provenance ids.
@@ -80,8 +86,7 @@ bool LayerAction::translate( Core::ActionContextHandle& context )
   // provided. If the action is however replayed but not from any of those buffers
   // the list should be cleared.
   if( this->private_->use_provenance_ids_list_ == true ||
-    context->source() == Core::ActionSource::UNDOBUFFER_E ||
-    context->source() == Core::ActionSource::PROVENANCE_E )
+    context->source() == Core::ActionSource::UNDOBUFFER_E )
   {
     this->private_->use_provenance_ids_list_ = false;
   }
@@ -148,31 +153,32 @@ void LayerAction::generate_output_provenance_ids( size_t num_provenance_ids )
   }
 }
 
-std::string LayerAction::export_to_provenance_string() const
+std::string LayerAction::export_params_to_provenance_string() const
 {
-  // Add action name to string
-  std::string command = std::string( this->get_type() ) + " ";
+  std::string action_params;
 
   // Loop through all the arguments and add them  
   size_t num_params = this->num_params();
-    
+  size_t input_count = 0;
   for ( size_t j = 0; j < num_params; j++ )
   {
     Core::ActionParameterBase* param = this->get_param( j );
-    if ( param->has_extension() )
+    if ( param->is_persistent() )
     {
-      LayerActionParameter* layer_param = reinterpret_cast< LayerActionParameter* >( param );
-      command += this->get_key( j ) + "=" + 
-        layer_param->export_to_provenance_string() + " ";
-    }
-    else
-    {
-      command += this->get_key( j ) + "=" + param->export_to_string() + " ";
+      if ( param->has_extension() )
+      {
+        LayerActionParameter* layer_param = static_cast< LayerActionParameter* >( param );
+        action_params += this->get_key( j ) + "=" + layer_param->export_to_provenance_string( input_count ) + " ";
+      }
+      else
+      {
+        action_params += this->get_key( j ) + "=" + param->export_to_string() + " ";
+      }
     }
   }
 
   // Return the command
-  return command;
+  return action_params;
 }
 
 } // end namespace Seg3D

@@ -63,6 +63,7 @@ public:
   std::string mask_cstr2_layer_id_;
   bool negative_mask_cstr2_;
   bool erase_;
+  SandboxID sandbox_;
 
   Core::MaskVolumeSliceHandle vol_slice_;
   Core::DataVolumeSliceHandle data_cstr_slice_;
@@ -88,13 +89,20 @@ ActionFloodFill::ActionFloodFill() :
   this->add_layer_id( this->private_->mask_cstr2_layer_id_ );
   this->add_parameter( this->private_->negative_mask_cstr2_ );
   this->add_parameter( this->private_->erase_ );
+  this->add_parameter( this->private_->sandbox_ );
 }
 
 bool ActionFloodFill::validate( Core::ActionContextHandle& context )
 { 
+  // Make sure that the sandbox exists
+  if ( !LayerManager::CheckSandboxExistence( this->private_->sandbox_, context ) )
+  {
+    return false;
+  }
+
   // Check whether the target layer exists
-  MaskLayerHandle target_layer = boost::dynamic_pointer_cast< MaskLayer >( 
-    LayerManager::Instance()->get_layer_by_id( this->private_->target_layer_id_ ) );
+  MaskLayerHandle target_layer = LayerManager::FindMaskLayer( 
+    this->private_->target_layer_id_, this->private_->sandbox_ );
   if ( !target_layer )
   {
     context->report_error( "Layer '" + this->private_->target_layer_id_ +
@@ -102,16 +110,9 @@ bool ActionFloodFill::validate( Core::ActionContextHandle& context )
     return false;
   }
 
-  if ( target_layer->locked_state_->get() )
-  {
-    context->report_error( "Layer '" + this->private_->target_layer_id_ +
-      "' is locked." );
-    return false;
-  }
-  
   // Check whether the target layer can be used for processing
   if ( !LayerManager::Instance()->CheckLayerAvailabilityForProcessing(
-    this->private_->target_layer_id_, context ) ) return false;
+    this->private_->target_layer_id_, context, this->private_->sandbox_ ) ) return false;
   
   // Check whether slice type has a valid 
   Core::VolumeSliceType slice_type = static_cast< Core::VolumeSliceType::enum_type >(
@@ -125,7 +126,6 @@ bool ActionFloodFill::validate( Core::ActionContextHandle& context )
     return false;
   }
   
-
   this->private_->vol_slice_.reset( new Core::MaskVolumeSlice( target_layer->get_mask_volume(), 
     slice_type ) );
   
@@ -140,18 +140,19 @@ bool ActionFloodFill::validate( Core::ActionContextHandle& context )
   if ( this->private_->data_cstr_layer_id_ != "" &&
     this->private_->data_cstr_layer_id_ != "<none>" )
   {
-    DataLayerHandle data_cstr_layer = boost::dynamic_pointer_cast< DataLayer >(
-      LayerManager::Instance()->get_layer_by_id( 
-      this->private_->data_cstr_layer_id_ ) );
+    DataLayerHandle data_cstr_layer = LayerManager::FindDataLayer( 
+      this->private_->data_cstr_layer_id_, this->private_->sandbox_ );
 
+    // NOTE: Compare layer grid transforms instead of their groups as in a sandbox
+    // layers aren't grouped.
     if ( !data_cstr_layer || 
-      data_cstr_layer->get_layer_group() != target_layer->get_layer_group() )
+      data_cstr_layer->get_grid_transform() != target_layer->get_grid_transform() )
     {
       context->report_error( "Layer '" + this->private_->data_cstr_layer_id_ +
         "' is not a valid data constraint layer, will proceed as if no data constraint." );
     }
     else if ( !LayerManager::Instance()->CheckLayerAvailabilityForUse( 
-      this->private_->data_cstr_layer_id_, context ) )
+      this->private_->data_cstr_layer_id_, context, this->private_->sandbox_ ) )
     {
       return false;
     }
@@ -166,17 +167,19 @@ bool ActionFloodFill::validate( Core::ActionContextHandle& context )
   if ( this->private_->mask_cstr1_layer_id_ != "" &&
     this->private_->mask_cstr1_layer_id_ != "<none>" )
   {
-    MaskLayerHandle mask_cstr1_layer = boost::dynamic_pointer_cast< MaskLayer >(
-      LayerManager::Instance()->get_layer_by_id( 
-      this->private_->mask_cstr1_layer_id_ ) );
+    MaskLayerHandle mask_cstr1_layer = LayerManager::FindMaskLayer( 
+      this->private_->mask_cstr1_layer_id_, this->private_->sandbox_ );
+
+    // NOTE: Compare layer grid transforms instead of their groups as in a sandbox
+    // layers aren't grouped.
     if ( !mask_cstr1_layer || 
-      mask_cstr1_layer->get_layer_group() != target_layer->get_layer_group() )
+      mask_cstr1_layer->get_grid_transform() != target_layer->get_grid_transform() )
     {
       context->report_error( "Layer '" + this->private_->mask_cstr1_layer_id_ +
         "' is not a valid mask constraint layer, will proceed as if no mask constraint 1." );
     }
     else if ( !LayerManager::Instance()->CheckLayerAvailabilityForUse( 
-      this->private_->mask_cstr1_layer_id_, context ) )
+      this->private_->mask_cstr1_layer_id_, context, this->private_->sandbox_ ) )
     {
       return false;
     }
@@ -191,17 +194,19 @@ bool ActionFloodFill::validate( Core::ActionContextHandle& context )
   if ( this->private_->mask_cstr2_layer_id_ != "" &&
     this->private_->mask_cstr2_layer_id_ != "<none>" )
   {
-    MaskLayerHandle mask_cstr2_layer = boost::dynamic_pointer_cast< MaskLayer >(
-      LayerManager::Instance()->get_layer_by_id( 
-        this->private_->mask_cstr2_layer_id_ ) );
+    MaskLayerHandle mask_cstr2_layer = LayerManager::FindMaskLayer( 
+        this->private_->mask_cstr2_layer_id_, this->private_->sandbox_ );
+
+    // NOTE: Compare layer grid transforms instead of their groups as in a sandbox
+    // layers aren't grouped.
     if ( !mask_cstr2_layer || 
-      mask_cstr2_layer->get_layer_group() != target_layer->get_layer_group() )
+      mask_cstr2_layer->get_grid_transform() != target_layer->get_grid_transform() )
     {
       context->report_error( "Layer '" + this->private_->mask_cstr2_layer_id_ +
         "' is not a valid mask constraint layer, will proceed as if no mask constraint 2." );
     }
     else if ( !LayerManager::Instance()->CheckLayerAvailabilityForUse( 
-      this->private_->mask_cstr2_layer_id_, context ) )
+      this->private_->mask_cstr2_layer_id_, context, this->private_->sandbox_ ) )
     {
       return false;
     }
@@ -270,10 +275,10 @@ bool ActionFloodFill::run( Core::ActionContextHandle& context, Core::ActionResul
       this->private_->negative_mask_cstr2_ );
   }
 
+  if ( this->private_->sandbox_ == -1 )
   {
     // Get the layer on which this action operates
-    LayerHandle layer = LayerManager::Instance()->get_layer_by_id( 
-      this->private_->target_layer_id_ );
+    LayerHandle layer = LayerManager::FindLayer( this->private_->target_layer_id_ );
 
     // Create a provenance record
     ProvenanceStepHandle provenance_step( new ProvenanceStep );
@@ -287,7 +292,8 @@ bool ActionFloodFill::run( Core::ActionContextHandle& context, Core::ActionResul
     ProvenanceIDList deleted_provenance_ids( 1, layer->provenance_id_state_->get() );
     provenance_step->set_replaced_provenance_ids( deleted_provenance_ids );
   
-    provenance_step->set_action( this->export_to_provenance_string() );   
+    provenance_step->set_action_name( this->get_type() );
+    provenance_step->set_action_params( this->export_params_to_provenance_string() );   
     
     ProvenanceStepID step_id = ProjectManager::Instance()->get_current_project()->
       add_provenance_record( provenance_step );
@@ -361,7 +367,7 @@ bool ActionFloodFill::run( Core::ActionContextHandle& context, Core::ActionResul
   }
 
   volume_slice->release_cached_data();
-
+  result.reset( new Core::ActionResult( this->private_->target_layer_id_ ) );
   return true;
 }
 

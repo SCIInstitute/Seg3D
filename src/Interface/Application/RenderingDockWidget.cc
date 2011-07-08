@@ -411,7 +411,7 @@ void RenderingDockWidget::handle_volume_rendering_target_changed( std::string ta
   if ( target_id != "<none>" && target_id != Core::StateLabeledOption::EMPTY_OPTION_C )
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-    DataLayerHandle target_layer = LayerManager::Instance()->get_data_layer_by_id( target_id );
+    DataLayerHandle target_layer = LayerManager::Instance()->find_data_layer_by_id( target_id );
     if ( target_layer && target_layer->has_valid_data() )
     {
       this->private_->ui_.histogram_->set_histogram( target_layer->get_data_volume()->

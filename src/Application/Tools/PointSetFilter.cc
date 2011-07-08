@@ -116,7 +116,7 @@ void PointSetFilter::handle_layers_changed()
 {
   std::string mask_layer_id = this->mask_state_->get();
   
-  LayerHandle layer = LayerManager::Instance()->get_layer_by_id( mask_layer_id );
+  LayerHandle layer = LayerManager::Instance()->find_layer_by_id( mask_layer_id );
 
   if ( layer )
   {
@@ -131,7 +131,7 @@ void PointSetFilter::handle_layers_changed()
     {
       group->get_layer_names( layer_names, mask_type );
 
-      LayerHandle target_layer = LayerManager::Instance()->get_layer_by_id( 
+      LayerHandle target_layer = LayerManager::Instance()->find_layer_by_id( 
         this->target_layer_state_->get());
 
       std::string target_layer_name = target_layer->get_layer_name();
@@ -162,7 +162,7 @@ void PointSetFilter::handle_layers_changed()
 
 void PointSetFilter::handle_mask_layer_changed( std::string layer_id )
 {
-  LayerHandle layer = LayerManager::Instance()->get_layer_by_id( layer_id );
+  LayerHandle layer = LayerManager::Instance()->find_layer_by_id( layer_id );
 
   if ( layer )
   {
@@ -179,7 +179,7 @@ void PointSetFilter::handle_mask_layer_changed( std::string layer_id )
     {
       group->get_layer_names( layer_names, mask_type );
 
-      LayerHandle target_layer = LayerManager::Instance()->get_layer_by_id( 
+      LayerHandle target_layer = LayerManager::Instance()->find_layer_by_id( 
         this->target_layer_state_->get());
 
       std::string target_layer_name = target_layer->get_layer_name();

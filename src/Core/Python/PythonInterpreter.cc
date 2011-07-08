@@ -33,6 +33,7 @@
 #include <Python.h>
 #include <boost/filesystem.hpp>
 #include <boost/python.hpp>
+#include <boost/regex.hpp>
 #include <boost/thread/condition_variable.hpp>
 
 #include <Core/Utils/Exception.h>
@@ -447,6 +448,9 @@ void PythonInterpreter::run_script( std::string script )
     return;
   }
 
+  // Output the script to the console
+  this->output_signal_( "Running script ...\n" + script + "\n" );
+
   // Clear any previous Python errors.
   PyErr_Clear();
 
@@ -466,8 +470,9 @@ void PythonInterpreter::run_script( std::string script )
   // If compilation succeeded and the code object is not Py_None
   else if ( code_obj )
   {
-    this->private_->action_context_->set_action_mode( PythonActionMode::BATCH_E );
-    PyObject* result = PyEval_EvalCode( code_obj.ptr(), this->private_->globals_.ptr(), NULL );
+    this->private_->action_context_->set_action_mode( PythonActionMode::REPLAY_E );
+    boost::python::dict local_var;
+    PyObject* result = PyEval_EvalCode( code_obj.ptr(), this->private_->globals_.ptr(), local_var.ptr() );
     Py_XDECREF( result );
     if ( PyErr_Occurred() != NULL )
     {
@@ -576,6 +581,12 @@ PythonActionContextHandle PythonInterpreter::get_action_context()
 PythonActionContextHandle PythonInterpreter::GetActionContext()
 {
   return Instance()->get_action_context();
+}
+
+std::string PythonInterpreter::EscapeSingleQuotedString( const std::string& str )
+{
+  boost::regex reg( "[\\\\']" );
+  return boost::regex_replace( str, reg, "\\\\$&", boost::regex_constants::format_default );
 }
 
 } // end namespace Core

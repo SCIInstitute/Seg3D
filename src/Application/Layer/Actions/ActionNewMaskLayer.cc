@@ -46,10 +46,54 @@ CORE_REGISTER_ACTION( Seg3D, NewMaskLayer )
 namespace Seg3D
 {
 
+class ActionNewMaskLayerPrivate
+{
+public:
+  // The name of the group where the mask needs to be added
+  std::string group_id_;
+  // The sandbox in which to run the action
+  SandboxID sandbox_;
+
+  // Cached layer handle
+  // NOTE: Although the action takes a group ID as input, internally
+  // it uses a layer from that group. This is for compatibility with
+  // sandbox mode.
+  LayerHandle layer_;
+};
+
+ActionNewMaskLayer::ActionNewMaskLayer() :
+  private_( new ActionNewMaskLayerPrivate )
+{
+  this->add_group_id( this->private_->group_id_ );
+  this->add_parameter( this->private_->sandbox_ );
+}
+
 bool ActionNewMaskLayer::validate( Core::ActionContextHandle& context )
 {
-  if( !LayerManager::Instance()->get_group_by_id( this->group_id_ ) ) return false; 
+  if ( !LayerManager::CheckSandboxExistence( this->private_->sandbox_, context ) )
+  {
+    return false;
+  }
   
+  if ( this->private_->sandbox_ == -1 )
+  {
+    LayerGroupHandle layer_group = LayerManager::FindGroup( this->private_->group_id_ );
+    if ( layer_group )
+    {
+      this->private_->layer_ = layer_group->bottom_layer();
+    }
+  }
+  else
+  {
+    this->private_->layer_ = LayerManager::FindLayer( this->private_->group_id_, this->private_->sandbox_ );
+  }
+
+  if ( !this->private_->layer_ )
+  {
+    context->report_error( "Layer group '" + this->private_->group_id_ + "' doesn't exist." );
+    return false;
+  }
+
   return true; // validated
 }
 
@@ -60,26 +104,30 @@ bool ActionNewMaskLayer::run( Core::ActionContextHandle& context, Core::ActionRe
   LayerManager::id_count_type id_count = LayerManager::GetLayerIdCount();
 
   // Create a new mask volume.
-  Core::MaskVolumeHandle new_mask_volume;
-  LayerGroupHandle group = LayerManager::Instance()->get_group_by_id( this->group_id_ );
-  
-  Core::MaskVolume::CreateEmptyMask( group->get_grid_transform(), new_mask_volume );
+  Core::MaskVolumeHandle new_mask_volume; 
+  Core::MaskVolume::CreateEmptyMask( this->private_->layer_->get_grid_transform(), new_mask_volume );
   
   // Create a new container to put it in.
   LayerHandle new_mask_layer( new MaskLayer( "MaskLayer", new_mask_volume ) );
-
-  // new_mask_layer->provenance_id_state_
-  new_mask_layer->set_meta_data( group->get_meta_data() );
+  new_mask_layer->set_meta_data( this->private_->layer_->get_meta_data() );
 
   // Register the new layer with the LayerManager. This will insert it into the right group.
-  LayerManager::Instance()->insert_layer( new_mask_layer );
+  LayerManager::Instance()->insert_layer( new_mask_layer, this->private_->sandbox_ );
   
-  // Now we make it active
-  LayerManager::Instance()->set_active_layer( new_mask_layer );
+  // report the layer ID to action result
+  result.reset( new Core::ActionResult( new_mask_layer->get_layer_id() ) );
+  
+  if ( this->private_->sandbox_ == -1 )
+  {
+    // Now we make it active
+    LayerManager::Instance()->set_active_layer( new_mask_layer );
+  }
 
   // Set a new provenance ID for the output
   new_mask_layer->provenance_id_state_->set( this->get_output_provenance_id( 0 ) );
 
+  // Only create provenance record and undo/redo if not running in a sandbox
+  if ( this->private_->sandbox_ == -1 )
   {
     // Create a provenance record
     ProvenanceStepHandle provenance_step( new ProvenanceStep );
@@ -91,7 +139,8 @@ bool ActionNewMaskLayer::run( Core::ActionContextHandle& context, Core::ActionRe
     provenance_step->set_output_provenance_ids( this->get_output_provenance_ids() );
       
     // Get the action and turn it into provenance 
-    provenance_step->set_action( this->export_to_provenance_string() );   
+    provenance_step->set_action_name( this->get_type() );
+    provenance_step->set_action_params( this->export_params_to_provenance_string() );   
     
     // Add step to provenance record
     ProvenanceStepID step_id = ProjectManager::Instance()->get_current_project()->
@@ -114,10 +163,15 @@ bool ActionNewMaskLayer::run( Core::ActionContextHandle& context, Core::ActionRe
   return true;
 }
 
+void ActionNewMaskLayer::clear_cache()
+{
+  this->private_->layer_.reset();
+}
+
 void ActionNewMaskLayer::Dispatch( Core::ActionContextHandle context, const std::string& group_id )
 {
   ActionNewMaskLayer* action = new ActionNewMaskLayer;
-  action->group_id_ = group_id;
+  action->private_->group_id_ = group_id;
   
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }

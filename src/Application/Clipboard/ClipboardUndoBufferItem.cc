@@ -39,9 +39,6 @@ public:
   // Clipboard item checkpoint
   ClipboardItemHandle clipboard_item_;
 
-  // The corresponding clipboard slot number of this undo item
-  size_t slot_;
-
   // Size of the item
   size_t size_;
 
@@ -50,13 +47,12 @@ public:
 };
 
 ClipboardUndoBufferItem::ClipboardUndoBufferItem( const std::string& tag,
-  ClipboardItemHandle clipboard_item, size_t slot ) :
+  ClipboardItemHandle clipboard_item ) :
   UndoBufferItem( tag ),
   private_( new ClipboardUndoBufferItemPrivate )
 {
   this->private_->size_ = 0;
   this->private_->clipboard_item_ = clipboard_item;
-  this->private_->slot_ = slot;
 }
 
 ClipboardUndoBufferItem::~ClipboardUndoBufferItem()
@@ -65,7 +61,7 @@ ClipboardUndoBufferItem::~ClipboardUndoBufferItem()
 
 bool ClipboardUndoBufferItem::apply_and_clear_undo()
 {
-  Clipboard::Instance()->set_item( this->private_->clipboard_item_, this->private_->slot_ );
+  Clipboard::Instance()->set_item( this->private_->clipboard_item_ );
   ProjectManager::Instance()->get_current_project()->
     delete_provenance_record( this->private_->prov_step_id_ );
   // Clear the checkpoint

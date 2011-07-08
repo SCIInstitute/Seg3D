@@ -60,7 +60,7 @@ bool ActionExportSegmentation::validate( Core::ActionContextHandle& context )
 
     for( size_t i = 0; i < layer_vector.size(); ++i )
     {
-      LayerHandle temp_handle = LayerManager::Instance()->get_layer_by_id( layer_vector[ i ] );
+      LayerHandle temp_handle = LayerManager::Instance()->find_layer_by_id( layer_vector[ i ] );
       if( !temp_handle )
       {
         context->report_error( std::string( "No valid layer ids were given" ) );

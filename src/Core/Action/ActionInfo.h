@@ -121,10 +121,6 @@ public:
   // CHANGES_PROJECT_DATA:
   // Check whether the action changes the data of the program
   bool changes_project_data() const;
-
-  // CHANGES_PROVENANCE_DATA:
-  // Check whether the action changes the provenance of the program
-  bool changes_provenance_data() const;
       
 private:
   // Private implementation of this class

@@ -52,7 +52,7 @@ bool ActionDeleteLayers::validate( Core::ActionContextHandle& context )
 
   for ( size_t j = 0; j < this->layers_.size(); j++ )
   {
-    if ( !( LayerManager::CheckLayerExistance( this->layers_[ j ], context ) ) ) return false;  
+    if ( !( LayerManager::CheckLayerExistence( this->layers_[ j ], context ) ) ) return false;  
   }
   
   return true;
@@ -73,7 +73,7 @@ bool ActionDeleteLayers::run( Core::ActionContextHandle& context,
   for ( size_t j = 0; j < this->layers_.size(); j++ )
   {
     // Find the layer handle
-    LayerHandle layer = LayerManager::Instance()->get_layer_by_id( this->layers_[ j ] );
+    LayerHandle layer = LayerManager::Instance()->find_layer_by_id( this->layers_[ j ] );
 
     // If a filter is still running on the layer, try to abort it. 
     // NOTE: The program will continue while the layer and its filter are being deleted
@@ -90,7 +90,7 @@ bool ActionDeleteLayers::run( Core::ActionContextHandle& context,
   UndoBuffer::Instance()->insert_undo_item( context, item );
 
   // Remove the layers from the layer manager
-  LayerManager::Instance()->delete_layers( layers);
+  LayerManager::Instance()->delete_layers( layers );
   
   return true;
 }

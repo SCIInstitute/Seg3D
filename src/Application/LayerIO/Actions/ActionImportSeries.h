@@ -34,8 +34,9 @@
 #include <Core/Interface/Interface.h>
 
 // Application includes
-#include <Application/LayerIO/LayerFileSeriesImporter.h>
+#include <Application/LayerIO/LayerImporter.h>
 #include <Application/Layer/LayerAction.h>
+#include <Application/Layer/LayerManager.h>
 
 namespace Seg3D
 {
@@ -49,7 +50,8 @@ CORE_ACTION(
   CORE_ACTION_OPTIONAL_ARGUMENT( "importer", "", "Optional name for a specific importer." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "mode", "data", "The mode to use: data, single_mask, bitplane_mask, or label_mask.")
   CORE_ACTION_OPTIONAL_ARGUMENT( "inputfiles_id", "-1" , "Location of the file if it is in the data cache of the project." )
-  
+  CORE_ACTION_OPTIONAL_ARGUMENT( "sandbox", "-1", "The sandbox in which to run the action." )
+  CORE_ACTION_ARGUMENT_IS_NONPERSISTENT( "sandbox" )  
   CORE_ACTION_CHANGES_PROJECT_DATA()
 )
 
@@ -61,6 +63,7 @@ public:
     this->add_parameter( this->importer_ );
     this->add_parameter( this->mode_ );
     this->add_parameter( this->inputfiles_id_ );
+    this->add_parameter( this->sandbox_ );
   }
   
   // -- Functions that describe action --
@@ -94,6 +97,9 @@ private:
 
   // Which type of importer should we use
   std::string importer_;
+
+  // The sandbox in which to run the action
+  SandboxID sandbox_;
 
   // Short cut to the layer importer that has already loaded the data if the file
   // was read through the GUI

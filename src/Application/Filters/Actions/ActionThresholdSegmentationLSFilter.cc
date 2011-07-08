@@ -49,22 +49,25 @@ namespace Seg3D
 
 bool ActionThresholdSegmentationLSFilter::validate( Core::ActionContextHandle& context )
 {
-  // Check for layer existance and type information
-  if ( ! LayerManager::CheckLayerExistanceAndType( this->layer_id_, 
-    Core::VolumeType::DATA_E, context ) ) return false;
+  // Make sure that the sandbox exists
+  if ( !LayerManager::CheckSandboxExistence( this->sandbox_, context ) ) return false;
+
+  // Check for layer existence and type information
+  if ( ! LayerManager::CheckLayerExistenceAndType( this->layer_id_, 
+    Core::VolumeType::DATA_E, context, this->sandbox_ ) ) return false;
   
-  if ( ! LayerManager::CheckLayerExistanceAndType( this->mask_, 
-    Core::VolumeType::MASK_E, context ) ) return false;
+  if ( ! LayerManager::CheckLayerExistenceAndType( this->mask_, 
+    Core::VolumeType::MASK_E, context, this->sandbox_ ) ) return false;
 
   if ( ! LayerManager::CheckLayerSize( this->layer_id_, this->mask_, 
-    context ) ) return false;
+    context, this->sandbox_ ) ) return false;
   
   // Check for layer availability 
   if ( ! LayerManager::CheckLayerAvailability( this->layer_id_, 
-    false, context ) ) return false;
+    false, context, this->sandbox_ ) ) return false;
   
   if ( ! LayerManager::CheckLayerAvailability( this->mask_, 
-    false, context ) ) return false;
+    false, context, this->sandbox_ ) ) return false;
         
   // If the number of iterations is lower than one, we cannot run the filter
   if( this->iterations_ < 1 )
@@ -276,6 +279,7 @@ bool ActionThresholdSegmentationLSFilter::run( Core::ActionContextHandle& contex
     new ThresholdSegmentationLSFilterAlgo );
 
   // Copy the parameters over to the algorithm that runs the filter
+  algo->set_sandbox( this->sandbox_ );
   algo->iterations_ = this->iterations_;
   algo->threshold_range_ = this->threshold_range_;
   algo->curvature_ = this->curvature_;

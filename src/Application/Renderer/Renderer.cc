@@ -887,7 +887,7 @@ bool Renderer::render()
     if ( render_volume && vr_layer != "<none>" && 
       vr_layer != Core::StateLabeledOption::EMPTY_OPTION_C )
     {
-      DataLayerHandle data_layer = LayerManager::Instance()->get_data_layer_by_id( vr_layer );
+      DataLayerHandle data_layer = LayerManager::Instance()->find_data_layer_by_id( vr_layer );
       if ( data_layer && data_layer->has_valid_data() )
       {
         Core::VolumeRenderingParam vr_param;

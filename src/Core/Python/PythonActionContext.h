@@ -75,7 +75,7 @@ public:
   virtual void report_warning( const std::string& warning );
   virtual void report_message( const std::string& message );
   virtual void report_result( const Core::ActionResultHandle& result );
-  virtual void report_need_resource( const Core::NotifierHandle& resource );
+  virtual void report_need_resource( Core::NotifierHandle& notifier );
   virtual Core::ActionSource source() const;
 
 public:
