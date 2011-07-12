@@ -200,7 +200,15 @@ private:
 
   // CREATE_SANDBOX:
   // Create a sandbox and return the sandbox ID.
+  // The returned ID starts from 1 and increases. 
+  // NOTE: Sandbox 0 is reserved for provenance playback.
   SandboxID create_sandbox();
+
+  // CREATE_SANDBOX:
+  // Try to create a sandbox with the specified ID. 
+  // Fails if the sandbox ID is negative, or if the sandbox already exists.
+  // Returns true on success, otherwise false.
+  bool create_sandbox( SandboxID sandbox );
 
   // DELETE_SANDBOX:
   // Delete a sandbox.
@@ -273,12 +281,34 @@ public:
   // LAYER_VOLUME_CHANGED_SIGNAL:
   // Triggered when the volume of a layer has changed.
   // The first parameter is the layer handle.
-  boost::signals2::signal< void( LayerHandle ) > layer_volume_changed_signal_;
+  boost::signals2::signal< void ( LayerHandle ) > layer_volume_changed_signal_;
   
   // LAYER_DATA_CHANGED_SIGNAL:
-  // Trigger when the layer data state is changed. This tracks whether layers
+  // Triggered when the layer data state is changed. This tracks whether layers
   // are being locked for processing and when new data will be available
-  boost::signals2::signal< void( LayerHandle ) > layer_data_changed_signal_;
+  boost::signals2::signal< void ( LayerHandle ) > layer_data_changed_signal_;
+
+  // -- Scripting related signals --
+public:
+  // SCRIPT_BEGIN_SIGNAL:
+  // Indicate the beginning of a script.
+  // The first parameter is sandbox in which the script is running, 
+  // the second parameter is the the script name.
+  // NOTE: The sandbox can be used to uniquely identify a running script.
+  boost::signals2::signal< void ( SandboxID, std::string ) > script_begin_signal_;
+
+  // SCRIPT_END_SIGNAL:
+  // Indicate the end of a script.
+  // The parameter is the sandbox in which the script is running.
+  boost::signals2::signal< void ( SandboxID ) > script_end_signal_;
+
+  // SCRIPT_PROGRESS_SIGNAL:
+  // Report the progress of a script.
+  // The first parameter is the sandbox in which the script is running.
+  // The second parameter is the name of the current running step.
+  // The third parameter is the number of steps that have finished.
+  // The fourth parameter is the total number of steps.
+  boost::signals2::signal< void ( SandboxID, std::string, size_t, size_t ) > script_progress_signal_;
 
 protected:
   virtual bool pre_save_states( Core::StateIO& state_io );

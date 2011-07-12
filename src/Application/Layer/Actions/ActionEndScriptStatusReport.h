@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_LAYER_ACTIONS_ACTIONDUPLICATELAYER_H
-#define APPLICATION_LAYER_ACTIONS_ACTIONDUPLICATELAYER_H
+#ifndef APPLICATION_LAYER_ACTIONS_ACTIONENDSCRIPTSTATUSREPORT_H
+#define APPLICATION_LAYER_ACTIONS_ACTIONENDSCRIPTSTATUSREPORT_H
 
 // Core includes
 #include <Core/Action/Action.h>
@@ -38,36 +38,28 @@
 namespace Seg3D
 {
 
-class ActionDeleteSandbox : public Core::Action
+class ActionEndScriptStatusReport : public Core::Action
 {
 
 CORE_ACTION
 ( 
-  CORE_ACTION_TYPE( "DeleteSandbox", "Delete a sandbox." )
-  CORE_ACTION_ARGUMENT( "sandbox", "The ID of the sandbox to be deleted." )
+   CORE_ACTION_TYPE( "EndScriptStatusReport", "Signal the end of a script." )
+   CORE_ACTION_ARGUMENT( "sandbox", "The sandbox in which the script is running." )
 )
   
   // -- Constructor/Destructor --
 public:
-  ActionDeleteSandbox()
-  {
-    this->add_parameter( this->sandbox_ );
-  }
+  ActionEndScriptStatusReport();
+  virtual ~ActionEndScriptStatusReport() {}
 
-  // -- Functions that describe action --
+// -- Functions that describe action --
 public:
   virtual bool validate( Core::ActionContextHandle& context );
   virtual bool run( Core::ActionContextHandle& context, 
     Core::ActionResultHandle& result );
-  
-private:
-  // The ID of the sandbox.
-  SandboxID sandbox_;
 
-public:
-  // DISPATCH:
-  // Create and dispatch an ActionDeleteSandbox.
-  static void Dispatch( Core::ActionContextHandle context, SandboxID sandbox ); 
+private:
+  SandboxID sandbox_;
 };
   
 } // end namespace Seg3D

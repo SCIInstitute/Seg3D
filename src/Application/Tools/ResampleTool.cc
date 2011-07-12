@@ -312,10 +312,14 @@ ResampleTool::~ResampleTool()
 void ResampleTool::execute( Core::ActionContextHandle context )
 {
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+  
+  // Reverse the order of target layers
+  std::vector< std::string > target_layers = this->target_layers_state_->get();
+  std::reverse( target_layers.begin(), target_layers.end() );
 
   if ( this->manual_size_state_->get() )
   {
-    ActionResample::Dispatch( context, this->target_layers_state_->get(), 
+    ActionResample::Dispatch( context, target_layers, 
       this->output_dimensions_state_[ 0 ]->get(), this->output_dimensions_state_[ 1 ]->get(),
       this->output_dimensions_state_[ 2 ]->get(), this->kernel_state_->get(),
       this->gauss_sigma_state_->get(), this->gauss_cutoff_state_->get(), 
@@ -327,7 +331,7 @@ void ResampleTool::execute( Core::ActionContextHandle context )
       this->dst_group_state_->get() );
     if ( dst_group )
     {
-      ActionResample::Dispatch( context, this->target_layers_state_->get(),
+      ActionResample::Dispatch( context, target_layers,
         dst_group->get_grid_transform(), this->padding_value_state_->get(),
         this->kernel_state_->get(), this->gauss_sigma_state_->get(),
         this->gauss_cutoff_state_->get(), this->replace_state_->get() );

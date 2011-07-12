@@ -84,9 +84,12 @@ void FlipTool::dispatch( Core::ActionContextHandle context, const std::vector< i
 {
   // NOTE: Need to lock state engine as this function is run from the interface thread
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-  
-  ActionPermute::Dispatch( context, this->target_layers_state_->get(), permutation,
-    this->replace_state_->get() );
+
+  // Reverse the order of target layers
+  std::vector< std::string > target_layers = this->target_layers_state_->get();
+  std::reverse( target_layers.begin(), target_layers.end() );
+
+  ActionPermute::Dispatch( context, target_layers, permutation, this->replace_state_->get() );
 }
 
 

@@ -538,8 +538,11 @@ void CropTool::execute( Core::ActionContextHandle context )
     this->cropbox_origin_state_[ 1 ]->get(), this->cropbox_origin_state_[ 2 ]->get() );
   Core::Vector size( this->cropbox_size_state_[ 0 ]->get(),
     this->cropbox_size_state_[ 1 ]->get(), this->cropbox_size_state_[ 2 ]->get() );
-  ActionCrop::Dispatch( context, this->target_layers_state_->get(), 
-    origin, size, this->replace_state_->get() );
+  // Reverse the order of target layers
+  std::vector< std::string > target_layers = this->target_layers_state_->get();
+  std::reverse( target_layers.begin(), target_layers.end() );
+
+  ActionCrop::Dispatch( context, target_layers, origin, size, this->replace_state_->get() );
 }
 
 void CropTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,

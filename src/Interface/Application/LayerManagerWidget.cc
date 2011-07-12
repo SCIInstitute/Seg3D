@@ -44,10 +44,12 @@
 
 //Application Includes
 #include <Application/Layer/LayerManager.h>
+#include <Application/Layer/Actions/ActionDeleteSandbox.h>
 
 //Interface Includes
 #include <Interface/Application/LayerManagerWidget.h>
 #include <Interface/Application/LayerGroupWidget.h>
+#include "ui_LayerManagerWidget.h"
 
 namespace Seg3D
 {
@@ -65,7 +67,8 @@ public:
   LayerManagerWidgetPrivate( LayerManagerWidget* parent ) :
     QObject( parent ),
     parent_( parent ),
-    loading_states_( false )
+    loading_states_( false ),
+    script_sandbox_( -1 )
   {
   }
 
@@ -103,24 +106,41 @@ public:
   // Remove all the layer widgets. Called on Core::Application::reset_signal_.
   void reset();
 
+  // HANDLE_SCRIPT_BEGIN:
+  // Show the script status widget.
+  void handle_script_begin( SandboxID sandbox, std::string script_name );
+
+  // HANDLE_SCRIPT_END:
+  // Hide the script status widget.
+  void handle_script_end( SandboxID sandbox );
+
+  // REPORT_SCRIPT_PROGRESS:
+  // Update the script progress bar and the current step name.
+  void report_script_progress( SandboxID sandbox, std::string current_step, 
+    size_t steps_done, size_t total_steps );
+
   // MAKE_NEW_GROUP:
   // function that creates a new group to put layers into. 
   LayerGroupWidget* make_new_group( LayerGroupHandle group );
 
 public:
+  // The UI implementation
+  Ui::LayerManagerWidget ui_;
+
   // Pointer to the LayerManagerWidget
   LayerManagerWidget* parent_;
-  // Main widget inside the scroll area
-  QWidget* main_;
   
-  // Layouts that define where the groups are located within the widget
-  QVBoxLayout* main_layout_;
+  // Layout that defines where the groups are located within the widget
   QVBoxLayout* group_layout_;
 
   // Mapping of group name to its underlying widget
   GroupWidgetMap group_map_;
+
   // A flag indicating a session loading in process
   bool loading_states_;
+
+  // The sandbox in which the current script (if any) is running.
+  SandboxID script_sandbox_;
 
   // -- static functions for callbacks into this widget --
 public:
@@ -154,6 +174,19 @@ public:
   // RESET:
   // Called on Core::Application::reset_signal_.
   static void HandleReset( qpointer_type qpointer );
+
+  // HANDLESCRIPTBEGIN:
+  // Called on LayerManager::script_begin_signal_.
+  static void HandleScriptBegin( qpointer_type qpointer, SandboxID sandbox, std::string script_name );
+
+  // HANDLESCRIPTEND:
+  // Called on LayerManager::script_end_signal_.
+  static void HandleScriptEnd( qpointer_type qpointer, SandboxID sandbox );
+
+  // REPORTSCRIPTPROGRESS:
+  // Called on LayerManager::script_progress_signal_.
+  static void ReportScriptProgress( qpointer_type qpointer, SandboxID sandbox, 
+    std::string current_step, size_t steps_done, size_t total_steps );
 };
 
 void LayerManagerWidgetPrivate::handle_layer_inserted( LayerHandle layer, bool new_group )
@@ -349,6 +382,31 @@ void LayerManagerWidgetPrivate::reset()
   this->group_map_.clear();
 }
 
+void LayerManagerWidgetPrivate::handle_script_begin( SandboxID sandbox, std::string script_name )
+{
+  this->script_sandbox_ = sandbox;
+  this->ui_.script_name_label_->setText( QString::fromStdString( script_name ) );
+  this->ui_.progress_widget_->show();
+  this->ui_.info_label_->hide();
+  this->ui_.progress_bar_->setValue( -1 );
+  this->ui_.step_name_label_->setText( QString( "" ) );
+  this->ui_.script_widget_->show();
+}
+
+void LayerManagerWidgetPrivate::handle_script_end( SandboxID sandbox )
+{
+  this->script_sandbox_ = -1;
+  this->ui_.script_widget_->hide();
+}
+
+void LayerManagerWidgetPrivate::report_script_progress( SandboxID sandbox, 
+                             std::string current_step, size_t steps_done, size_t total_steps )
+{
+  this->ui_.step_name_label_->setText( QString::fromStdString( current_step ) );
+  this->ui_.progress_bar_->setRange( 0, static_cast< int >( total_steps ) );
+  this->ui_.progress_bar_->setValue( static_cast< int >( steps_done ) );
+}
+
 void LayerManagerWidgetPrivate::HandleLayerInserted( qpointer_type qpointer, 
                           LayerHandle layer, bool new_group )
 {
@@ -395,6 +453,27 @@ void LayerManagerWidgetPrivate::HandleReset( qpointer_type qpointer )
     &LayerManagerWidgetPrivate::reset, qpointer.data() ) ) );
 }
 
+void LayerManagerWidgetPrivate::HandleScriptBegin( qpointer_type qpointer, 
+                          SandboxID sandbox, std::string script_name )
+{
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
+    &LayerManagerWidgetPrivate::handle_script_begin, qpointer.data(), sandbox, script_name ) ) );
+}
+
+void LayerManagerWidgetPrivate::HandleScriptEnd( qpointer_type qpointer, SandboxID sandbox )
+{
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
+    &LayerManagerWidgetPrivate::handle_script_end, qpointer.data(), sandbox ) ) );
+}
+
+void LayerManagerWidgetPrivate::ReportScriptProgress( qpointer_type qpointer, SandboxID sandbox,
+                           std::string current_step, size_t steps_done, size_t total_steps )
+{
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
+    &LayerManagerWidgetPrivate::report_script_progress, qpointer.data(), sandbox,
+    current_step, steps_done, total_steps ) ) );
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Class LayerManagerWidget
 //////////////////////////////////////////////////////////////////////////
@@ -403,29 +482,16 @@ LayerManagerWidget::LayerManagerWidget( QWidget* parent ) :
   QScrollArea( parent )
 {
   this->private_ = new LayerManagerWidgetPrivate( this );
+  this->private_->ui_.setupUi( this );
 
-  // Customize the settings for the scroll area
-  this->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-  this->setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded );
-  this->setContentsMargins( 1,1,1,1 );
-  this->setWidgetResizable( true );
-  
-  this->setFrameShape( QFrame::NoFrame );
-  this->setFrameShadow( QFrame::Plain );
-  this->setLineWidth( 0 );
-
-  // Define a new central widget inside the scroll area
-  this->private_->main_ = new QWidget( parent );
-  this->setWidget( this->private_->main_ );
-  
   // Setup the spacing between the groups
-  this->private_->group_layout_ = new QVBoxLayout( this->private_->main_ );
+  this->private_->group_layout_ = new QVBoxLayout( this->private_->ui_.main_ );
   this->private_->group_layout_->setSpacing( 2 );
   this->private_->group_layout_->setContentsMargins( 1,1,1,1 );
   this->private_->group_layout_->setAlignment( Qt::AlignTop );
-  
-  this->private_->main_->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Preferred );
-  this->private_->main_->setAcceptDrops( true );
+
+  // Hide the script widget
+  this->private_->ui_.script_widget_->hide();
 
   LayerManagerWidgetPrivate::qpointer_type qpointer( this->private_ );
 
@@ -448,6 +514,13 @@ LayerManagerWidget::LayerManagerWidget( QWidget* parent ) :
       boost::bind( &LayerManagerWidgetPrivate::PostLoadStates, qpointer ) ) );
     this->add_connection( Core::Application::Instance()->reset_signal_.connect(
       boost::bind( &LayerManagerWidgetPrivate::HandleReset, qpointer ) ) );
+
+    this->add_connection( LayerManager::Instance()->script_begin_signal_.connect(
+      boost::bind( &LayerManagerWidgetPrivate::HandleScriptBegin, qpointer, _1, _2 ) ) );
+    this->add_connection( LayerManager::Instance()->script_end_signal_.connect(
+      boost::bind( &LayerManagerWidgetPrivate::HandleScriptEnd, qpointer, _1 ) ) );
+    this->add_connection( LayerManager::Instance()->script_progress_signal_.connect(
+      boost::bind( &LayerManagerWidgetPrivate::ReportScriptProgress, qpointer, _1, _2, _3, _4 ) ) );
   }
   
   // Add any layers that may have been added before the GUI was initialized
@@ -500,6 +573,24 @@ void LayerManagerWidget::notify_groups_of_picked_up_layer_size( int layer_size )
   {
     ( *it ).second->notify_picked_up_layer_size( layer_size );
   }
+}
+
+void LayerManagerWidget::abort_script()
+{
+  // TODO: For scripts not running in a sandbox, display a message
+  if ( this->private_->script_sandbox_ < 0 )
+  {
+    return;
+  }
+
+  // Delete the sandbox that the script is running in, which will cause any pending
+  // actions in the script to fail, and any running filters to be aborted.
+  ActionDeleteSandbox::Dispatch( Core::Interface::GetWidgetActionContext(), 
+    this->private_->script_sandbox_ );
+
+  // Hide the progress bar and show the text
+  this->private_->ui_.progress_widget_->hide();
+  this->private_->ui_.info_label_->show();
 }
 
 }  // end namespace Seg3D

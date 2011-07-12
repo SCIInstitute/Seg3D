@@ -76,6 +76,13 @@ ActionRecreateLayer::~ActionRecreateLayer()
 
 bool ActionRecreateLayer::validate( Core::ActionContextHandle& context )
 {
+  // Make sure there is no running recreation
+  if ( LayerManager::Instance()->is_sandbox( 0 ) )
+  {
+    context->report_error( "A layer recreation process is already running." );
+    return false;
+  }
+
   // Get the provenance trail that leads to the desired provenance ID
   ProvenanceTrailHandle prov_trail = ProjectManager::Instance()->get_current_project()->
     get_provenance_trail( this->private_->prov_id_ );
@@ -188,7 +195,10 @@ bool ActionRecreateLayer::run( Core::ActionContextHandle& context, Core::ActionR
 
   // Create a sandbox for running the script
   // NOTE: sandbox must be created in both the layer manager and the clipboard
-  SandboxID sandbox = LayerManager::Instance()->create_sandbox();
+  // NOTE: provenance playback always uses sandbox 0 to guarantee that only one
+  // playback will be running at a time.
+  SandboxID sandbox = 0;
+  LayerManager::Instance()->create_sandbox( sandbox );
   Clipboard::Instance()->create_sandbox( sandbox );
   std::string sandbox_str = Core::ExportToString( sandbox );
 
@@ -200,16 +210,30 @@ bool ActionRecreateLayer::run( Core::ActionContextHandle& context, Core::ActionR
   
   // == Generate the script ==
 
+  // Regular expression that matches input provenances in the action params string
+  boost::regex input_regex( "\\$\\{[0-9]+\\}" );
+  // Regular expression that matches a word in the action name
+  boost::regex action_name_regex( "[[:upper:]]?[[:lower:]]*" );
+
+  // Generate python commands to run the necessary actions
   bool succeeded = true;
   std::string script( "try:\n" );
-  // Generate python commands to run the necessary actions
-  boost::regex input_regex( "\\$\\{[0-9]+\\}" );
+  script += "\tbeginscriptstatusreport(sandbox=" + sandbox_str + 
+    ", script_name='[Provenance Playback]')\n";
   for ( size_t i = 0 ; i < num_steps && succeeded; ++i )
   {
     ProvenanceStepHandle prov_step = this->private_->prov_trail_->at( i );
     const ProvenanceIDList& input_ids = prov_step->get_input_provenance_ids();
     const std::string& action_params = prov_step->get_action_params();
+    // Convert the action name to human readable format
+    std::string action_display_name = boost::regex_replace( prov_step->get_action_name(),
+      action_name_regex, "$& " );
     std::string output_name = "output" + Core::ExportToString( i );
+    // Report script progress
+    script += "\treportscriptstatus(sandbox=" + sandbox_str + ", current_step='[" + 
+      action_display_name + "]', steps_done=" + Core::ExportToString( i ) +
+      ", total_steps=" + Core::ExportToString( num_steps ) + ")\n";
+
     script += "\t" + output_name + "=" + Core::StringToLower( prov_step->get_action_name() ) + "(";
     std::string key, value, error;
     std::string::size_type start = 0;
@@ -254,6 +278,9 @@ bool ActionRecreateLayer::run( Core::ActionContextHandle& context, Core::ActionR
     }
     script += "sandbox=" + sandbox_str + ")\n";
 
+    // sync on the output
+    script += "\tsynchronize(layerids=" + output_name + ", sandbox=" + sandbox_str + ")\n";
+
     // Make sure that the output is a python list
     script += "\tif type(" + output_name + ")!=list:\n" 
       "\t\ttmp=list()\n" + "\t\ttmp.append(" + output_name + ")\n"
@@ -269,7 +296,11 @@ bool ActionRecreateLayer::run( Core::ActionContextHandle& context, Core::ActionR
     Clipboard::Instance()->delete_sandbox( sandbox );
     return false;
   }
-  
+
+  // Report script progress
+  script += "\treportscriptstatus(sandbox=" + sandbox_str + ", current_step='', steps_done=" +
+    Core::ExportToString( num_steps ) + ", total_steps=" + Core::ExportToString( num_steps ) + ")\n";
+
   // Get the layer ID of the desired output
   std::string layer_id = prov_id_map[ this->private_->prov_id_ ];
   // Set the layer name
@@ -286,8 +317,10 @@ bool ActionRecreateLayer::run( Core::ActionContextHandle& context, Core::ActionR
   script += "\tactivatelayer(layerid=" + layer_id + ")\n";
 
   // Exception handling
-  script += "except:\n\tprint('Layer recreation failed:', sys.exc_info()[:2])\n";
+  script += "except:\n\tprint('Layer recreation failed:', sys.exc_info()[:2], file=sys.stderr)\n";
   // Clean up, ignore any exceptions that might happen
+  script += "try:\n\tendscriptstatusreport(sandbox=" + sandbox_str +
+    ")\nexcept:\n\tpass\n";
   script += "try:\n\tdeletesandbox(sandbox=" + sandbox_str + 
     ")\nexcept:\n\tpass\n";
 

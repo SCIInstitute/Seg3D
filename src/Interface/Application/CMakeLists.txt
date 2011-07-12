@@ -140,7 +140,7 @@ SET(INTERFACE_APPLICATION_UI_SRCS
   HistoryDockWidget.ui
   LayerGroupWidget.ui
   LayerImporterWidget.ui
-  LayerManagerDockWidget.ui
+  LayerManagerWidget.ui
   LayerResamplerDialog.ui
   LayerWidget.ui
   MessageWindow.ui

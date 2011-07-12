@@ -35,12 +35,12 @@
 namespace Seg3D
 {
 
-  class ActionCreateSandbox : public Core::Action
+class ActionCreateSandbox : public Core::Action
 {
 
 CORE_ACTION
 ( 
-  CORE_ACTION_TYPE( "CreateSandbox", "Create a sandbox in layer manager." )
+  CORE_ACTION_TYPE( "CreateSandbox", "Create a sandbox." )
 )
   
   // -- Constructor/Destructor --

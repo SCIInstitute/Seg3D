@@ -325,9 +325,8 @@ bool ActionPermute::run( Core::ActionContextHandle& context,
   algo->dst_layers_.resize( num_of_layers );
   std::vector< std::string > dst_layer_ids( num_of_layers );
   
-  for ( size_t j = 0; j < num_of_layers; ++j )
+  for ( size_t i = 0; i < num_of_layers; ++i )
   {
-    size_t i = num_of_layers - 1 - j;
     if ( !( algo->find_layer( layer_ids[ i ], algo->src_layers_[ i ] ) ) )
     {
       return false;

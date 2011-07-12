@@ -456,8 +456,11 @@ void TransformTool::execute( Core::ActionContextHandle context )
     this->origin_state_[ 1 ]->get(), this->origin_state_[ 2 ]->get() );
   Core::Vector spacing( this->spacing_state_[ 0 ]->get(),
     this->spacing_state_[ 1 ]->get(), this->spacing_state_[ 2 ]->get() );
-  ActionTransform::Dispatch( context, this->target_layers_state_->get(), 
-    origin, spacing, this->replace_state_->get() );
+  // Reverse the order of target layers
+  std::vector< std::string > target_layers = this->target_layers_state_->get();
+  std::reverse( target_layers.begin(), target_layers.end() );
+
+  ActionTransform::Dispatch( context, target_layers, origin, spacing, this->replace_state_->get() );
   Core::Application::PostEvent( boost::bind( &Core::StateBool::set, 
     this->show_preview_state_, false, Core::ActionSource::NONE_E ) );
   Core::Application::PostEvent( boost::bind( &Core::StateBool::set, 

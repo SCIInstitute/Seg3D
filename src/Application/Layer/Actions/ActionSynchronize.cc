@@ -30,41 +30,47 @@
 #include <Core/Action/ActionFactory.h>
 
 // Application includes
-#include <Application/Clipboard/Clipboard.h>
-#include <Application/Layer/Actions/ActionDeleteSandbox.h>
+#include <Application/Layer/Actions/ActionSynchronize.h>
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
-CORE_REGISTER_ACTION( Seg3D, DeleteSandbox )
+CORE_REGISTER_ACTION( Seg3D, Synchronize )
 
 namespace Seg3D
 {
 
-bool ActionDeleteSandbox::validate( Core::ActionContextHandle& context )
+ActionSynchronize::ActionSynchronize()
 {
-  return true; // validated
+  this->add_parameter( this->layerids_ );
+  this->add_parameter( this->sandbox_ );
 }
 
-bool ActionDeleteSandbox::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
-{ 
-  if ( !LayerManager::Instance()->delete_sandbox( this->sandbox_ ) )
-  {
-    context->report_error( "Sandbox " + Core::ExportToString( this->sandbox_ ) + " doesn't exist." );
-    return false;
-  }
+bool ActionSynchronize::validate( Core::ActionContextHandle& context )
+{
+  // Make sure the sandbox exists
+  if ( !LayerManager::CheckSandboxExistence( this->sandbox_, context ) ) return false;
 
-  // NOTE: sandbox must be deleted from both the layer manager and the clipboard
-  Clipboard::Instance()->delete_sandbox( this->sandbox_ );
-    
+  for ( size_t i = 0; i < this->layerids_.size(); ++i )
+  {
+    LayerHandle layer = LayerManager::FindLayer( this->layerids_[ i ], this->sandbox_ );
+    // Ignore any non-exist layers, so this action can be used in scripts to generically sync
+    // any actions, not just actions that output layers
+    if ( !layer ) continue;
+
+    // CheckLayerAvailabilityForProcessing requires exclusive access to the layer,
+    // and thus guarantees that all operations are done when it returns true.
+    if ( !LayerManager::CheckLayerAvailabilityForProcessing( this->layerids_[ i ], context, this->sandbox_ ) )
+      return false; 
+  }
+  
   return true;
 }
 
-void ActionDeleteSandbox::Dispatch( Core::ActionContextHandle context, SandboxID sandbox )
-{
-  ActionDeleteSandbox* action = new ActionDeleteSandbox;
-  action->sandbox_ = sandbox;
-  Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
+bool ActionSynchronize::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
+{ 
+  // The layers are all in sync now
+  return true;
 }
 
 } // end namespace Seg3D

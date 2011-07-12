@@ -868,6 +868,28 @@ bool ImportFromString( const std::string& str, std::vector< std::string >& value
       value.push_back( data.substr( start, j-start ) );
       j++;
     }
+    else if ( data[ j ] == '\'' )
+    {
+      ++j;
+      size_t start = j;
+      while ( j < data.size() && data[ j ] != '\'' ) ++j;
+
+      if ( j == data.size() ) return false; // No matching quote
+
+      value.push_back( data.substr( start, j - start ) );
+      ++j;
+    }
+    else if ( data[ j ] == '"' )
+    {
+      ++j;
+      size_t start = j;
+      while ( j < data.size() && data[ j ] != '"' ) ++j;
+
+      if ( j == data.size() ) return false; // No matching double quote
+
+      value.push_back( data.substr( start, j - start ) );
+      ++j;
+    }
     else
     {
       size_t start = j;

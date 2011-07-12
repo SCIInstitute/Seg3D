@@ -91,6 +91,14 @@ SET(APPLICATION_LAYER_ACTIONS_SRCS
   Actions/ActionDeleteSandbox.cc
   Actions/ActionRecreateLayer.h
   Actions/ActionRecreateLayer.cc
+  Actions/ActionBeginScriptStatusReport.h
+  Actions/ActionBeginScriptStatusReport.cc
+  Actions/ActionEndScriptStatusReport.h
+  Actions/ActionEndScriptStatusReport.cc
+  Actions/ActionReportScriptStatus.h
+  Actions/ActionReportScriptStatus.cc
+  Actions/ActionSynchronize.h
+  Actions/ActionSynchronize.cc
 )
 
 IF(BUILD_WITH_PYTHON)

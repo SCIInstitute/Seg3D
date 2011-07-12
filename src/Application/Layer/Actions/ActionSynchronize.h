@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_LAYER_ACTIONS_ACTIONDUPLICATELAYER_H
-#define APPLICATION_LAYER_ACTIONS_ACTIONDUPLICATELAYER_H
+#ifndef APPLICATION_LAYER_ACTIONS_ACTIONREPORTSCRIPTSTATUS_H
+#define APPLICATION_LAYER_ACTIONS_ACTIONREPORTSCRIPTSTATUS_H
 
 // Core includes
 #include <Core/Action/Action.h>
@@ -38,36 +38,34 @@
 namespace Seg3D
 {
 
-class ActionDeleteSandbox : public Core::Action
+// ACTIONSYNCHRONIZE:
+// This action is used in scripts to synchronize operations on layers. The 'validate' function
+// of the action will fail if any of the layers is not available, and set a notifier in the action
+// context.
+class ActionSynchronize : public Core::Action
 {
 
 CORE_ACTION
 ( 
-  CORE_ACTION_TYPE( "DeleteSandbox", "Delete a sandbox." )
-  CORE_ACTION_ARGUMENT( "sandbox", "The ID of the sandbox to be deleted." )
+   CORE_ACTION_TYPE( "Synchronize", "Wait for the operations on the input layers to be done." )
+   CORE_ACTION_ARGUMENT( "layerids", "The IDs of the layers to wait for." )
+   CORE_ACTION_OPTIONAL_ARGUMENT( "sandbox", "-1", "The sandbox in which to run the action." )
 )
   
   // -- Constructor/Destructor --
 public:
-  ActionDeleteSandbox()
-  {
-    this->add_parameter( this->sandbox_ );
-  }
+  ActionSynchronize();
+  virtual ~ActionSynchronize() {}
 
-  // -- Functions that describe action --
+// -- Functions that describe action --
 public:
   virtual bool validate( Core::ActionContextHandle& context );
   virtual bool run( Core::ActionContextHandle& context, 
     Core::ActionResultHandle& result );
-  
-private:
-  // The ID of the sandbox.
-  SandboxID sandbox_;
 
-public:
-  // DISPATCH:
-  // Create and dispatch an ActionDeleteSandbox.
-  static void Dispatch( Core::ActionContextHandle context, SandboxID sandbox ); 
+private:
+  std::vector< std::string > layerids_;
+  SandboxID sandbox_;
 };
   
 } // end namespace Seg3D

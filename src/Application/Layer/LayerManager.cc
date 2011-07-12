@@ -238,7 +238,7 @@ LayerManager::LayerManager() :
   this->add_state( "active_layer", this->active_layer_state_, "", "" );
   this->private_->signal_block_count_ = 0;
   this->private_->layer_manager_ = this;
-  this->private_->sandbox_count_ = 0;
+  this->private_->sandbox_count_ = 1;
 
   this->add_connection( this->layers_changed_signal_.connect( boost::bind( 
     &LayerManagerPrivate::update_layer_list, this->private_ ) ) );
@@ -972,6 +972,21 @@ SandboxID LayerManager::create_sandbox()
   return sandbox_id;
 }
 
+bool LayerManager::create_sandbox( SandboxID sandbox )
+{
+  ASSERT_IS_APPLICATION_THREAD();
+  lock_type lock( this->get_mutex() );
+
+  // Sandbox ID must be non-negative, and should not exist yet
+  if ( sandbox < 0 || this->private_->sandboxes_.count( sandbox ) != 0 )
+  {
+    return false;
+  }
+  
+  this->private_->sandboxes_[ sandbox ] = LayerSandboxHandle( new LayerSandbox );
+  return true;
+}
+
 bool LayerManager::delete_sandbox( SandboxID sandbox )
 {
   ASSERT_IS_APPLICATION_THREAD();
@@ -988,6 +1003,9 @@ bool LayerManager::delete_sandbox( SandboxID sandbox )
     for ( LayerSandbox::iterator it = layer_sandbox->begin();
       it != layer_sandbox->end(); ++it )
     {
+      // Abort any filters that are still running on the layer
+      it->second->abort_signal_();
+      // Invalidate the layer
       it->second->invalidate();
     }
   }
@@ -999,7 +1017,7 @@ bool LayerManager::is_sandbox( SandboxID sandbox_id )
 {
   ASSERT_IS_APPLICATION_THREAD();
   return ( sandbox_id == -1 ||
-    this->private_->sandboxes_.find( sandbox_id ) != this->private_->sandboxes_.end() );
+    this->private_->sandboxes_.count( sandbox_id ) == 1 );
 }
 
 bool LayerManager::pre_save_states( Core::StateIO& state_io )
@@ -1122,7 +1140,7 @@ bool LayerManager::CheckSandboxExistence( SandboxID sandbox, Core::ActionContext
   // Only the Application Thread guarantees that nothing is changed in the program
   if ( !( Core::Application::IsApplicationThread() ) )
   {
-    CORE_THROW_LOGICERROR( "CheckLayerExistence can only be called from the"
+    CORE_THROW_LOGICERROR( "CheckSandboxExistence can only be called from the"
       " application thread." );
   }
 
@@ -1559,7 +1577,7 @@ void LayerManager::DispatchDeleteLayer( LayerHandle layer, filter_key_type key, 
     }
     else
     {
-      CORE_THROW_LOGICERROR( "Could not delete that is connected to another filter" );
+      CORE_THROW_LOGICERROR( "Could not delete layer that is connected to another filter" );
     }
   }
 }
@@ -1621,8 +1639,12 @@ void LayerManager::DispatchUnlockOrDeleteLayer( LayerHandle layer, filter_key_ty
     {
       if ( layer->num_filter_keys() != 0 )
       {
-        CORE_THROW_LOGICERROR( "Could not delete as filter is connected to another filter" );
+        CORE_THROW_LOGICERROR( "Could not delete layer as it is connected to another filter" );
       }
+      // NOTE: Unlock the layer before deleting it so any thing waiting for it can be waken up.
+      // This is crucial for scripts running in a sandbox because deleting layers from a sandbox
+      // won't trigger the layers_deleted_signal_.
+      layer->data_state_->set( Layer::AVAILABLE_C );
       layer->reset_filter_handle();
       layer->reset_allow_stop();
 

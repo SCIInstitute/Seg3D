@@ -45,7 +45,7 @@ namespace Seg3D
 // Forward declarations 
 class LayerManagerWidgetPrivate;
   
-class LayerManagerWidget : public QScrollArea, public Core::ConnectionHandler
+class LayerManagerWidget : public QScrollArea, private Core::ConnectionHandler
 {
   // Need to make it a Qt object
   Q_OBJECT
@@ -71,6 +71,10 @@ private Q_SLOTS:
   // NOTIFY_GROUPS_OF_PICKED_UP_LAYER_SIZE:
   // this function will notify the groups of the picked up layer size
   void notify_groups_of_picked_up_layer_size( int layer_size );
+
+  // ABORT_SCRIPT:
+  // Abort the current running script.
+  void abort_script();
   
   // -- internals of this class --
 private:
