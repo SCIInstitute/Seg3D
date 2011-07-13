@@ -38,9 +38,11 @@
 #include <boost/function.hpp>
 
 // Core includes
+#include <Core/Geometry/Point.h>
 #include <Core/Viewer/AbstractViewer.h>
 #include <Core/Volume/VolumeSlice.h>
 #include <Core/State/State.h>
+#include <Core/Renderer/PickPoint.h>
 
 // Application includes
 #include <Application/Layer/LayerFWD.h>
@@ -168,6 +170,10 @@ public:
   // Set the new size of the viewer.
   virtual void resize( int width, int height );
 
+  // INSTALL_RENDERER:
+  // Install a renderer to the viewer.
+  virtual void install_renderer( Core::AbstractRendererHandle renderer );
+
   // AUTO_VIEW:
   // Auto adjust the view for the active layer
   void auto_view();
@@ -221,10 +227,19 @@ public:
   // Emits both redraw_scene_signal_ and redraw_overlay_signal_
   void redraw_all();
 
+  // -- Signals and Slots --
+public:
+  // Types of signals
+  typedef boost::signals2::signal< void( Core::PickPointHandle ) > redraw_scene_pick_signal_type;
+  typedef boost::signals2::signal< void ( size_t ) > slice_changed_signal_type;
+
+  // REDRAW_SCENE_PICK_SIGNAL:
+  // Signals that 3D pick point needs to be obtained from renderer.
+  redraw_scene_pick_signal_type redraw_scene_pick_signal_;
+
   // SLICE_CHANGED_SIGNAL_:
   // Triggered when slice number or viewer visibility is changed.
   // Renderer of other viewers connect to this signal to update the overlay.
-  typedef boost::signals2::signal< void ( size_t ) > slice_changed_signal_type;
   slice_changed_signal_type slice_changed_signal_;
 
   // -- State handling --

@@ -648,8 +648,12 @@ void Renderer::post_initialize()
 
   ViewerHandle viewer = ViewerManager::Instance()->get_viewer( this->private_->viewer_id_ );
 
+  // Redraw without picking
   this->add_connection( viewer->redraw_scene_signal_.connect( 
     boost::bind( &Renderer::redraw_scene, this ) ) );
+  // Redraw with picking
+  this->add_connection( viewer->redraw_scene_pick_signal_.connect( 
+    boost::bind( &Renderer::redraw_scene, this, _1 ) ) );
   this->add_connection( viewer->redraw_overlay_signal_.connect( 
     boost::bind( &Renderer::redraw_overlay, this ) ) );
   this->add_connection( viewer->redraw_all_signal_.connect( 
@@ -677,7 +681,7 @@ void Renderer::post_initialize()
     boost::bind( &RendererPrivate::enable_rendering, this->private_, true ) ) );
 }
 
-bool Renderer::render()
+bool Renderer::render_scene()
 {
   if ( !this->private_->rendering_enabled_ )
   {
@@ -995,9 +999,6 @@ bool Renderer::render_overlay()
   glBlendFuncSeparate( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA , 
     GL_ZERO, GL_ONE_MINUS_SRC_ALPHA  );
 
-  glMatrixMode( GL_PROJECTION );
-  glLoadIdentity();
-
   // Lock the state engine
   Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
 
@@ -1018,6 +1019,11 @@ bool Renderer::render_overlay()
 
   if ( viewer->is_volume_view() )
   {
+    // NOTE: Make sure that the following objects are not modified so that 3D picking will work:
+    // - Scene depth buffer
+    // - Modelview matrix
+    // - Projection matrix
+    // - Viewport matrix
     Core::View3D view3d( viewer->volume_view_state_->get() );
     state_lock.unlock();
 
@@ -1029,6 +1035,9 @@ bool Renderer::render_overlay()
   }
   else
   {
+    glMatrixMode( GL_PROJECTION );
+    glLoadIdentity();
+
     bool show_grid = viewer->slice_grid_state_->get();
     bool show_picking_lines = viewer->slice_picking_visible_state_->get();
     bool show_slice_num = PreferencesManager::Instance()->show_slice_number_state_->get();

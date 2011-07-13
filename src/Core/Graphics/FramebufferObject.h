@@ -59,7 +59,8 @@ public:
   void attach_texture( TextureHandle texture, unsigned int attachment = 
     GL_COLOR_ATTACHMENT0_EXT, int level = 0, int layer = 0 );
   void detach_texture( TextureHandle texture, unsigned int attachment = GL_COLOR_ATTACHMENT0_EXT );
-  void attach_renderbuffer(RenderbufferHandle renderbuffer, unsigned int attachment);
+  void attach_renderbuffer( RenderbufferHandle renderbuffer, unsigned int attachment );
+  void detach_renderbuffer( RenderbufferHandle renderbuffer, unsigned int attachment );
   bool check_status( GLenum* status = NULL );
 
 private:

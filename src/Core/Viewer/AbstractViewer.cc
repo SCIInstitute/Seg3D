@@ -148,6 +148,39 @@ void AbstractViewer::resize( int width, int height )
   }
 }
 
+void AbstractViewer::install_renderer( AbstractRendererHandle renderer )
+{
+  {
+    lock_type lock( this->get_mutex() );
+
+    if ( !renderer )
+    {
+      CORE_THROW_LOGICERROR( "Invalid renderer given" );
+    }
+
+    if ( this->private_->renderer_ )
+    {
+      CORE_THROW_LOGICERROR( "Cannot install renderer twice into viewer" );
+    }
+
+    this->private_->renderer_ = renderer;
+  }
+
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
+    this->private_->handle_visibility_changed( this->viewer_visible_state_->get() );
+    this->add_connection( this->viewer_visible_state_->value_changed_signal_.connect(
+      boost::bind( &AbstractViewerPrivate::handle_visibility_changed, this->private_, _1 ) ) );
+  }
+
+  this->add_connection( this->private_->renderer_->redraw_completed_signal_.connect(
+    boost::bind( &AbstractViewerPrivate::set_texture, this->private_, _1, _2 ) ) );
+
+  this->add_connection( this->private_->renderer_->redraw_overlay_completed_signal_.connect(
+    boost::bind( &AbstractViewerPrivate::set_overlay_texture, this->private_, _1, _2 ) ) );
+}
+
 void AbstractViewer::mouse_move_event( const MouseHistory& mouse_history, 
                     int button, int buttons, int modifiers )
 {
@@ -192,39 +225,6 @@ bool AbstractViewer::key_release_event( int key, int modifiers, int x, int y )
 {
   // do nothing
   return false;
-}
-
-void AbstractViewer::install_renderer( AbstractRendererHandle renderer )
-{
-  {
-    lock_type lock( this->get_mutex() );
-
-    if ( !renderer )
-    {
-      CORE_THROW_LOGICERROR( "Invalid renderer given" );
-    }
-    
-    if ( this->private_->renderer_ )
-    {
-      CORE_THROW_LOGICERROR( "Cannot install renderer twice into viewer" );
-    }
-    
-    this->private_->renderer_ = renderer;
-  }
-  
-  {
-    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-
-    this->private_->handle_visibility_changed( this->viewer_visible_state_->get() );
-    this->add_connection( this->viewer_visible_state_->value_changed_signal_.connect(
-      boost::bind( &AbstractViewerPrivate::handle_visibility_changed, this->private_, _1 ) ) );
-  }
-
-  this->add_connection( this->private_->renderer_->redraw_completed_signal_.connect(
-    boost::bind( &AbstractViewerPrivate::set_texture, this->private_, _1, _2 ) ) );
-  
-  this->add_connection( this->private_->renderer_->redraw_overlay_completed_signal_.connect(
-    boost::bind( &AbstractViewerPrivate::set_overlay_texture, this->private_, _1, _2 ) ) );
 }
 
 Texture2DHandle AbstractViewer::get_texture()

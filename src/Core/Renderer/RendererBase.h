@@ -35,12 +35,14 @@
 
 #include <Core/EventHandler/EventHandler.h>
 #include <Core/Renderer/AbstractRenderer.h>
+#include <Core/Renderer/PickPoint.h>
 
 namespace Core
 {
 
 // Forward declarations
 class RendererBase;
+typedef boost::shared_ptr< RendererBase > RendererBaseHandle;
 class RendererBasePrivate;
 typedef boost::shared_ptr< RendererBasePrivate > RendererBasePrivateHandle;
 
@@ -77,6 +79,12 @@ public:
   // It triggers the "redraw_overlay_completed_signal_" at the end.
   virtual void redraw_all();
 
+  // VOLUME_PICK_POINT_SIGNAL_:
+  // Triggered when user "picks" in volume view.   
+  typedef boost::signals2::signal< void( Point world_pick_point ) >
+    volume_pick_point_signal_type;
+  volume_pick_point_signal_type volume_pick_point_signal_;
+
 protected:
   friend class RendererBasePrivate;
 
@@ -102,7 +110,7 @@ protected:
   // The default implementation renders a black scene.
   // This function should return true if the rendering was successful, or false if there
   // were errors or the rendering was interrupted.
-  virtual bool render();
+  virtual bool render_scene();
 
   // RENDER_OVERLAY:
   // Re-implement this function to render the overlay.
@@ -110,6 +118,15 @@ protected:
   // This function should return true if the rendering was successful, or false if there
   // were errors or the rendering was interrupted.
   virtual bool render_overlay();
+
+  // REDRAW_SCENE:
+  // If not picking (empty pick_point handle):
+  // - Calls the "render" function to render into the FBO.
+  // - It triggers the "redraw_completed_signal_" at the end.
+  // Else if picking:
+  // - Find 3D pick point
+  // - It triggers the volume_pick_point_signal_" at the end.
+  void redraw_scene( PickPointHandle pick_point );
 
   // REDRAW_NEEDED:
   // Returns true if there is redraw pending, otherwise false.

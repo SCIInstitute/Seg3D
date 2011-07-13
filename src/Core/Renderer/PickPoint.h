@@ -26,45 +26,28 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_RENDERER_RENDERER_H
-#define APPLICATION_RENDERER_RENDERER_H
+#ifndef CORE_RENDERER_PICKPOINT_H
+#define CORE_RENDERER_PICKPOINT_H
 
 #if defined (_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
 #endif
 
-#include <Core/Utils/ConnectionHandler.h>
-#include <Core/Renderer/RendererBase.h>
-
-namespace Seg3D
+namespace Core
 {
 
-// Forward declarations
-class Renderer;
-class RendererPrivate;
-typedef boost::shared_ptr< Renderer > RendererHandle;
-typedef boost::shared_ptr< RendererPrivate > RendererPrivateHandle;
+// Forward declaration
+class PickPoint;
+typedef boost::shared_ptr< PickPoint > PickPointHandle;
 
-// Class definitions
-class Renderer : public Core::RendererBase, private Core::ConnectionHandler
+class PickPoint
 {
-  friend class RendererPrivate;
-
-  // -- constructor/destructor --
 public:
-  Renderer( size_t viewer_id );
-  virtual ~Renderer();
-
-protected:
-  virtual void post_initialize();
-  virtual void post_resize();
-  virtual bool render_scene();
-  virtual bool render_overlay();
-
-private:
-  RendererPrivateHandle private_;
+  PickPoint( int window_x, int window_y ) { this->window_x_ = window_x; this->window_y_ = window_y; }
+  int window_x_;
+  int window_y_;
 };
 
-} // end namespace Seg3D
+} // end namespace Core
 
 #endif

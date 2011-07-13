@@ -27,6 +27,7 @@
  */
 
 // Core includes
+#include <Core/Geometry/Point.h>
 #include <Core/Graphics/FramebufferObject.h>
 #include <Core/Graphics/Renderbuffer.h>
 #include <Core/Graphics/Texture.h>
@@ -54,10 +55,10 @@ namespace Core
 class RendererBasePrivate : public Lockable
 {
 public:
-  bool render_scene();
+  bool render_scene( PickPointHandle pick_point );
   bool render_overlay();
 
-  void redraw_scene();
+  void redraw_scene( PickPointHandle pick_point );
   void redraw_overlay();
   void redraw_all();
 
@@ -65,10 +66,11 @@ public:
 
   Core::RenderContextHandle context_;
   Core::Texture2DHandle textures_[ 4 ];
-  Core::RenderbufferHandle depth_buffer_;
+  Core::RenderbufferHandle scene_depth_buffer_;
+  Core::RenderbufferHandle overlay_depth_buffer_;
   Core::FramebufferObjectHandle frame_buffer_;
 
-  int active_render_texture_;
+  int active_scene_texture_;
   int active_overlay_texture_;
 
   bool redraw_needed_;
@@ -77,24 +79,27 @@ public:
 };
 
 
-void RendererBasePrivate::redraw_scene()
+void RendererBasePrivate::redraw_scene( PickPointHandle pick_point )
 {
   // Migrate to the right thread
   if ( !this->renderer_->is_renderer_thread() )
   {
     this->renderer_->post_renderer_event( boost::bind( &RendererBasePrivate::redraw_scene, 
-      this) );
+      this, pick_point ) );
     return;
   }
 
-  if ( this->render_scene() )
+  if ( this->render_scene( pick_point ) )
   {
-    // signal rendering completed
-    this->renderer_->redraw_completed_signal_( 
-      this->textures_[ this->active_render_texture_ ], false );
+    if( !pick_point )
+    {
+      // signal rendering completed
+      this->renderer_->redraw_completed_signal_( 
+        this->textures_[ this->active_scene_texture_ ], false );
 
-    // swap render textures 
-    this->active_render_texture_ = ( ~this->active_render_texture_ ) & 1;
+      // swap render textures 
+      this->active_scene_texture_ = ( ~this->active_scene_texture_ ) & 1;
+    }
   }
 }
 
@@ -129,17 +134,17 @@ void RendererBasePrivate::redraw_all()
     return;
   }
 
-  bool render_scene_success = this->render_scene();
+  bool render_scene_success = this->render_scene( PickPointHandle() );
   bool render_overlay_success = this->render_overlay();
 
   if ( render_scene_success )
   {
     // signal scene rendering completed
     this->renderer_->redraw_completed_signal_( 
-      this->textures_[ this->active_render_texture_ ], render_overlay_success );
+      this->textures_[ this->active_scene_texture_ ], render_overlay_success );
       
     // swap render textures 
-    this->active_render_texture_ = ( ~this->active_render_texture_ ) & 1; 
+    this->active_scene_texture_ = ( ~this->active_scene_texture_ ) & 1; 
   }
 
   if ( render_overlay_success )
@@ -153,7 +158,7 @@ void RendererBasePrivate::redraw_all()
   }
 }
 
-bool RendererBasePrivate::render_scene()
+bool RendererBasePrivate::render_scene( PickPointHandle pick_point )
 {
 
 #if !MULTITHREADED_RENDERING
@@ -177,13 +182,14 @@ bool RendererBasePrivate::render_scene()
   }
 
   // lock the active render texture
-  Core::Texture::lock_type texture_lock( this->textures_[ this->active_render_texture_ ]->get_mutex() );
+  Core::Texture::lock_type texture_lock( this->textures_[ this->active_scene_texture_ ]->get_mutex() );
 
   // bind the framebuffer object
   this->frame_buffer_->enable();
+
   // attach texture
-  this->frame_buffer_->attach_texture( this->textures_[ this->active_render_texture_ ] );
-  this->frame_buffer_->attach_renderbuffer( this->depth_buffer_, GL_DEPTH_ATTACHMENT_EXT );
+  this->frame_buffer_->attach_texture( this->textures_[ this->active_scene_texture_ ] );
+  this->frame_buffer_->attach_renderbuffer( this->scene_depth_buffer_, GL_DEPTH_ATTACHMENT_EXT );
 
   if ( !this->frame_buffer_->check_status() )
   {
@@ -191,18 +197,55 @@ bool RendererBasePrivate::render_scene()
     return false;
   }
 
-  if ( !this->renderer_->render() )
+  // 3D picking
+  if( pick_point )
   {
-    CORE_LOG_DEBUG( "Rendering of the Scene failed" );
-    return false;
-  }
+    GLint viewport[ 4 ];
+    GLdouble modelview[ 16 ];
+    GLdouble projection[ 16 ];
+    GLfloat win_x, win_y, win_z;
+    GLdouble pos_x, pos_y, pos_z;
 
-  // Synchronization call for multi threaded rendering
-  glFinish();
+    glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
+    glGetDoublev( GL_PROJECTION_MATRIX, projection );
+    glGetIntegerv( GL_VIEWPORT, viewport );
+
+    win_x = static_cast< float >( pick_point->window_x_ );
+    win_y = static_cast< float >( 
+      static_cast< float >( viewport[ 3 ] ) - static_cast< float >( pick_point->window_y_ ) );
+    // Get the depth value from the last render pass at the pick point
+    // FBO is already bound
+    glReadPixels( pick_point->window_x_, static_cast< int >( win_y ), 1, 1, GL_DEPTH_COMPONENT, 
+      GL_FLOAT, &win_z );
+
+    // If z isn't on near or far plane
+    if( 0.0 < win_z && win_z < 1.0 )
+    {
+      // Convert window coordinates + depth into a 3D world coordinate
+      gluUnProject( win_x, win_y, win_z, modelview, projection, viewport, &pos_x, &pos_y, &pos_z );
+
+      Point world_pick_point( pos_x, pos_y, pos_z );
+      
+      // Emit signal with picked point
+      this->renderer_->volume_pick_point_signal_( world_pick_point );
+    }
+  }
+  else
+  {
+    if ( !this->renderer_->render_scene() )
+    {
+      CORE_LOG_DEBUG( "Rendering of the Scene failed" );
+      return false;
+    }
+  
+    // Synchronization call for multi threaded rendering
+    glFinish();
+  }
 
   CORE_CHECK_OPENGL_ERROR();
 
-  this->frame_buffer_->detach_texture( this->textures_[ this->active_render_texture_ ] );
+  this->frame_buffer_->detach_texture( this->textures_[ this->active_scene_texture_ ] );
+  this->frame_buffer_->detach_renderbuffer( this->scene_depth_buffer_, GL_DEPTH_ATTACHMENT_EXT );
   this->frame_buffer_->disable();
 
   // release the lock on the active render texture
@@ -246,7 +289,7 @@ bool RendererBasePrivate::render_overlay()
   this->frame_buffer_->enable();
   // attach texture
   this->frame_buffer_->attach_texture( this->textures_[ this->active_overlay_texture_ ] );
-  this->frame_buffer_->attach_renderbuffer( this->depth_buffer_, GL_DEPTH_ATTACHMENT_EXT );
+  this->frame_buffer_->attach_renderbuffer( this->overlay_depth_buffer_, GL_DEPTH_ATTACHMENT_EXT );
 
   if ( !this->frame_buffer_->check_status() )
   {
@@ -264,6 +307,7 @@ bool RendererBasePrivate::render_overlay()
   CORE_CHECK_OPENGL_ERROR();
 
   this->frame_buffer_->detach_texture( this->textures_[ this->active_overlay_texture_ ] );
+  this->frame_buffer_->detach_renderbuffer( this->overlay_depth_buffer_, GL_DEPTH_ATTACHMENT_EXT );
   this->frame_buffer_->disable();
 
   // release the lock on the active render texture
@@ -291,7 +335,7 @@ RendererBase::RendererBase() :
     CORE_THROW_EXCEPTION( "Failed to create a valid rendering context" );
   }
   this->private_->renderer_ = this;
-  this->private_->active_render_texture_ = 0;
+  this->private_->active_scene_texture_ = 0;
   this->private_->active_overlay_texture_ = 2;
   this->private_->redraw_needed_ = false;
   this->private_->redraw_overlay_needed_ =  false;
@@ -335,10 +379,9 @@ void RendererBase::initialize()
     // lock the shared render context
     Core::RenderResources::lock_type lock( Core::RenderResources::GetMutex() );
 
-    this->private_->depth_buffer_.reset( new Core::Renderbuffer );
+    this->private_->scene_depth_buffer_.reset( new Core::Renderbuffer );
+    this->private_->overlay_depth_buffer_.reset( new Core::Renderbuffer );
     this->private_->frame_buffer_.reset( new Core::FramebufferObject );
-    this->private_->frame_buffer_->attach_renderbuffer( 
-      this->private_->depth_buffer_, GL_DEPTH_ATTACHMENT_EXT );
   }
 
   this->post_initialize();
@@ -355,9 +398,7 @@ void RendererBase::initialize()
 
 void RendererBase::redraw_scene()
 {
-  this->set_redraw_needed();
-
-  this->private_->redraw_scene();
+  this->redraw_scene( PickPointHandle() );
 }
 
 void RendererBase::redraw_overlay()
@@ -402,7 +443,8 @@ void RendererBase::resize( int width, int height )
     this->private_->textures_[ 1 ]->set_image( width, height, GL_RGBA );
     this->private_->textures_[ 2 ]->set_image( width, height, GL_RGBA );
     this->private_->textures_[ 3 ]->set_image( width, height, GL_RGBA );
-    this->private_->depth_buffer_->set_storage( width, height, GL_DEPTH_COMPONENT24 );    
+    this->private_->scene_depth_buffer_->set_storage( width, height, GL_DEPTH_COMPONENT24 );
+    this->private_->overlay_depth_buffer_->set_storage( width, height, GL_DEPTH_COMPONENT24 );
   }
 
   this->width_ = width;
@@ -427,7 +469,7 @@ void RendererBase::post_resize()
 {
 }
 
-bool RendererBase::render()
+bool RendererBase::render_scene()
 {
   glClearColor( 0.0f, 0.0f, 0.0f, 0.0f );
   glClear( GL_COLOR_BUFFER_BIT );
@@ -440,6 +482,13 @@ bool RendererBase::render_overlay()
   glClear( GL_COLOR_BUFFER_BIT );
   return true;
 }
+
+void RendererBase::redraw_scene( PickPointHandle pick_point )
+{
+  this->set_redraw_needed();
+
+  this->private_->redraw_scene( pick_point );
+} 
 
 bool RendererBase::redraw_needed()
 {

@@ -34,6 +34,7 @@
 SET(CORE_RENDERER_SRCS
   AbstractRenderer.h
   DummyRenderer.h
+  PickPoint.h
   RendererBase.h
   RendererBase.cc
   )

@@ -38,6 +38,7 @@
 #include <Core/Utils/AtomicCounter.h>
 #include <Core/Volume/DataVolumeSlice.h>
 #include <Core/Volume/MaskVolumeSlice.h>
+#include <Core/Renderer/RendererBase.h>
 
 // Application includes
 #include <Application/PreferencesManager/PreferencesManager.h>
@@ -88,12 +89,15 @@ public:
   void set_viewer_labels();
   void handle_flip_horizontal_changed( bool flip );
   void handle_flip_vertical_changed( bool flip );
+  // Called by pick_point() for volume view, or called with empty handle for normal redraw.
+  void redraw_scene( Core::PickPointHandle pick_point );
   void reset();
 
   // -- Helper functions --
 public:
 
   void pick_point( int x, int y );
+  void pick_point( const Core::Point& world_pick_point );
 
   void adjust_contrast_brightness( int dx, int dy );
 
@@ -182,23 +186,32 @@ void ViewerPrivate::adjust_contrast_brightness( int dx, int dy )
     data_layer->brightness_state_, dx * brightness_step );
 }
 
-void ViewerPrivate::pick_point( int x, int y )
+void ViewerPrivate::pick_point( int window_x, int window_y )
 {
   if ( !Core::Application::IsApplicationThread() )
   {
-    Core::Application::PostEvent( boost::bind( &ViewerPrivate::pick_point, this, x, y ) );
+    Core::Application::PostEvent( boost::bind( &ViewerPrivate::pick_point, this, window_x, window_y ) );
     return;
   }
 
-  if ( !this->viewer_->is_volume_view() && this->active_layer_slice_ )
+  if( this->viewer_->is_volume_view() )
+  {
+    // Trigger redraw to get 3D world pick point based on last render pass
+    // Only need to redraw scene (not overlay) since we don't want to pick on the overlay
+    Core::PickPointHandle pick_point( new Core::PickPoint( window_x, window_y ) );
+    this->redraw_scene( pick_point );
+
+    // ActionPickPoint will be dispatched when renderer signals with 3D pick point
+  }
+  else if ( this->active_layer_slice_ )
   {
     double width =  static_cast<double>( this->viewer_->get_width() );
     double height = static_cast<double>( this->viewer_->get_height() );
 
     Core::VolumeSlice* volume_slice = this->active_layer_slice_.get();
     // Scale the mouse position to [-1, 1]
-    double xpos = x * 2.0 / ( width - 1.0 ) - 1.0;
-    double ypos = ( height - 1 - y ) * 2.0 / ( height - 1.0 ) - 1.0;
+    double xpos = window_x * 2.0 / ( width - 1.0 ) - 1.0;
+    double ypos = ( height - 1 - window_y ) * 2.0 / ( height - 1.0 ) - 1.0;
     double left, right, bottom, top;
     Core::StateView2D* view_2d = dynamic_cast<Core::StateView2D*>( 
       this->viewer_->get_active_view_state().get() );
@@ -210,9 +223,14 @@ void ViewerPrivate::pick_point( int x, int y )
     pos = inv_proj * pos;
     volume_slice->get_world_coord( pos.x(), pos.y(), pos );
 
-    ActionPickPoint::Dispatch( Core::Interface::GetWidgetActionContext(), 
-      this->viewer_->get_viewer_id(), pos );
+    this->pick_point( pos );
   }
+}
+
+void ViewerPrivate::pick_point( const Core::Point& world_pick_point )
+{
+  ActionPickPoint::Dispatch( Core::Interface::GetWidgetActionContext(), 
+    this->viewer_->get_viewer_id(), world_pick_point );
 }
 
 void ViewerPrivate::insert_layer( LayerHandle layer )
@@ -883,6 +901,27 @@ void ViewerPrivate::set_viewer_labels()
   this->viewer_->view_mode_state_->set_option_list( label_options );
 }
 
+void ViewerPrivate::redraw_scene( Core::PickPointHandle pick_point )
+{
+  if ( !Core::Application::IsApplicationThread() )
+  {
+    Core::Application::PostEvent( boost::bind( &ViewerPrivate::redraw_scene, this, pick_point ) );
+    return;
+  }
+
+  if ( this->signals_block_count_ == 0 && this->viewer_->viewer_visible_state_->get() )
+  {
+    if( pick_point )
+    {
+      this->viewer_->redraw_scene_pick_signal_( pick_point );
+    }
+    else
+    {
+      this->viewer_->redraw_scene_signal_();
+    }
+  }
+}
+
 void ViewerPrivate::reset()
 {
   ASSERT_IS_APPLICATION_THREAD();
@@ -1104,6 +1143,19 @@ void Viewer::resize( int width, int height )
   this->private_->view_manipulator_->resize( width, height );
 }
 
+void Viewer::install_renderer( Core::AbstractRendererHandle renderer )
+{
+  AbstractViewer::install_renderer( renderer ); 
+
+  Core::RendererBaseHandle renderer_base = 
+    boost::dynamic_pointer_cast< Core::RendererBase >( renderer );
+  if( renderer_base )
+  {
+    this->add_connection( renderer_base->volume_pick_point_signal_.connect(
+      boost::bind( &ViewerPrivate::pick_point, this->private_, _1 ) ) );
+  }
+}
+
 void Viewer::mouse_move_event( const Core::MouseHistory& mouse_history, int button, int buttons,
     int modifiers )
 {
@@ -1150,8 +1202,7 @@ void Viewer::mouse_press_event( const Core::MouseHistory& mouse_history, int but
 
   if ( button == Core::MouseButton::RIGHT_BUTTON_E && 
     ( modifiers == Core::KeyModifier::NO_MODIFIER_E || 
-      modifiers & Core::KeyModifier::CONTROL_MODIFIER_E ) &&
-    !( this->is_volume_view() ) )
+      modifiers & Core::KeyModifier::CONTROL_MODIFIER_E ) )
   {
     this->private_->pick_point( mouse_history.current_.x_, mouse_history.current_.y_ );
     return;
@@ -1639,17 +1690,7 @@ Core::VolumeSliceHandle Viewer::get_volume_slice( const std::string& layer_id )
 
 void Viewer::redraw_scene()
 {
-  if ( !Core::Application::IsApplicationThread() )
-  {
-    Core::Application::PostEvent( boost::bind( &Viewer::redraw_scene, this ) );
-    return;
-  }
-  
-  if ( this->private_->signals_block_count_ == 0 &&
-    this->viewer_visible_state_->get() )
-  {
-    this->redraw_scene_signal_();
-  }
+  this->private_->redraw_scene( Core::PickPointHandle() );
 }
 
 void Viewer::redraw_overlay()

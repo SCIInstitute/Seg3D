@@ -60,11 +60,18 @@ void FramebufferObject::disable()
   glBindFramebufferEXT( TARGET_C, 0 );
 }
 
-void FramebufferObject::attach_renderbuffer(RenderbufferHandle renderbuffer, unsigned int attachment)
+void FramebufferObject::attach_renderbuffer( RenderbufferHandle renderbuffer, unsigned int attachment )
 {
-  safe_bind();
-  glFramebufferRenderbufferEXT(TARGET_C, attachment, renderbuffer->get_target(), renderbuffer->get_id());
-  safe_unbind();
+  this->safe_bind();
+  glFramebufferRenderbufferEXT( TARGET_C, attachment, renderbuffer->get_target(), renderbuffer->get_id() );
+  this->safe_unbind();
+}
+
+void FramebufferObject::detach_renderbuffer( RenderbufferHandle renderbuffer, unsigned int attachment )
+{
+  this->safe_bind();
+  glFramebufferRenderbufferEXT( TARGET_C, attachment, renderbuffer->get_target(), 0 );
+  this->safe_unbind();
 }
 
 void FramebufferObject::attach_texture(TextureHandle texture, unsigned int attachment, int level, int layer)
