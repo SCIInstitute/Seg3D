@@ -160,6 +160,9 @@ bool ActionRecreateLayer::run( Core::ActionContextHandle& context, Core::ActionR
   // or are outputs from previous steps.
   std::map< ProvenanceID, std::string > prov_id_map;
   std::vector< LayerHandle > input_layers;
+  // A map of what provenance IDs are used by what provenance step. A later step will
+  // overwrite previous one.
+  std::map< ProvenanceID, size_t > prov_id_use_map;
   for ( size_t i = 0; i < num_steps; ++i )
   {
     ProvenanceStepHandle prov_step = this->private_->prov_trail_->at( i );
@@ -184,6 +187,7 @@ bool ActionRecreateLayer::run( Core::ActionContextHandle& context, Core::ActionR
           return false;
         }
       }
+      prov_id_use_map[ input_ids[ j ] ] = i;
     }
 
     for ( size_t j = 0; j < output_ids.size(); ++j )
@@ -233,8 +237,8 @@ bool ActionRecreateLayer::run( Core::ActionContextHandle& context, Core::ActionR
     script += "\treportscriptstatus(sandbox=" + sandbox_str + ", current_step='[" + 
       action_display_name + "]', steps_done=" + Core::ExportToString( i ) +
       ", total_steps=" + Core::ExportToString( num_steps ) + ")\n";
-
-    script += "\t" + output_name + "=" + Core::StringToLower( prov_step->get_action_name() ) + "(";
+    // Build the command for running the action
+    std::string action_cmd = "\t" + output_name + "=" + Core::StringToLower( prov_step->get_action_name() ) + "(";
     std::string key, value, error;
     std::string::size_type start = 0;
     
@@ -269,15 +273,34 @@ bool ActionRecreateLayer::run( Core::ActionContextHandle& context, Core::ActionR
 
       if ( formatted_val != value )
       {
-        script += key + "=" + formatted_val + ",";
+        action_cmd += key + "=" + formatted_val + ",";
       }
       else
       {
-        script += key + "='" + Core::PythonInterpreter::EscapeSingleQuotedString( value ) + "',";
+        action_cmd += key + "='" + Core::PythonInterpreter::EscapeSingleQuotedString( value ) + "',";
       }
     }
-    script += "sandbox=" + sandbox_str + ")\n";
+    action_cmd += "sandbox=" + sandbox_str + ")\n";
 
+    // Before running the action, duplicate any inputs that will be replaced by new data but
+    // the old data is needed but following steps.
+    const ProvenanceIDList& replaced_ids = prov_step->get_replaced_provenance_ids();
+    for ( size_t j = 0; j < replaced_ids.size(); ++j )
+    {
+      // If the provenance ID is still needed by a later step, duplicate the layer
+      if ( prov_id_use_map[ replaced_ids[ j ] ] > i )
+      {
+        std::string dup_name = "input" + Core::ExportToString( i ) + "_" + 
+          Core::ExportToString( j ) + "_dup";
+        script += "\t" + dup_name + "=duplicatelayer(layerid=" + prov_id_map[ replaced_ids[ j ] ] +
+          ", sandbox=" + sandbox_str + ")\n";
+        // Store the duplicate as the new input for the replaced provenance ID
+        prov_id_map[ replaced_ids[ j ] ] = dup_name;
+      }
+    }
+
+    // Issue the action
+    script += action_cmd;
     // sync on the output
     script += "\tsynchronize(layerids=" + output_name + ", sandbox=" + sandbox_str + ")\n";
 
