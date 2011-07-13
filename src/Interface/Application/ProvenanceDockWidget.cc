@@ -70,9 +70,6 @@ ProvenanceDockWidget::ProvenanceDockWidget( QWidget *parent ) :
   if( this->private_ )
   {
     this->private_->ui_.setupUi( this );
-    this->private_->ui_.provenance_list_->horizontalHeader()->resizeSection( 0, 40 );
-    this->private_->ui_.provenance_list_->horizontalHeader()->resizeSection( 1, 40 );
-    this->private_->ui_.provenance_list_->horizontalHeader()->resizeSection( 2, 100 );
 
     this->add_connection( ProjectManager::Instance()->current_project_changed_signal_.
       connect( boost::bind( &ProvenanceDockWidget::HandleProjectChanged, qpointer_type( this ) ) ) );
@@ -109,13 +106,8 @@ void ProvenanceDockWidget::populate_provenance_list( ProvenanceTrailHandle prove
   if( this->isHidden() ) this->show();
   this->raise();
 
-  this->private_->ui_.provenance_list_->verticalHeader()->setUpdatesEnabled( false );
-
-  // Clean out the old table
-  for( int j = this->private_->ui_.provenance_list_->rowCount() -1; j >= 0; j-- )
-  {
-    this->private_->ui_.provenance_list_->removeRow( j );
-  }
+  // Clean out the old view
+  this->private_->ui_.provenance_list_->clear();
   
   size_t num_steps = provenance_trail->size();
   for( size_t i = 0; i < num_steps; ++i )
@@ -125,22 +117,52 @@ void ProvenanceDockWidget::populate_provenance_list( ProvenanceTrailHandle prove
     std::string action_params = prov_step->get_action_params();
     ProvenanceID poi = prov_step->get_provenance_id_of_interest();
 
-    QTableWidgetItem* step_number_item = new QTableWidgetItem( QString::number( i ) );
-    QTableWidgetItem* poi_item = new QTableWidgetItem( poi == -1 ? QString( "" ) : QString::number( poi ) );
-    poi_item->setData( Qt::UserRole, QVariant( poi ) );
-    QTableWidgetItem *action_name_item = new QTableWidgetItem( QString::fromStdString( action_name ) );
-    QTableWidgetItem *action_params_item = new QTableWidgetItem( QString::fromStdString( action_params ) );
+    QStringList columns;
+    columns << QString::number( i )
+      << ( poi == -1 ? QString( "" ) : QString::number( poi ) )
+      << QString::fromStdString( action_name );
+    QTreeWidgetItem* top_item = new QTreeWidgetItem( columns );
 
-    int row_num = static_cast< int >( i );
-    this->private_->ui_.provenance_list_->insertRow( row_num );
-    this->private_->ui_.provenance_list_->setItem( row_num, 0, step_number_item );
-    this->private_->ui_.provenance_list_->setItem( row_num, 1, poi_item );
-    this->private_->ui_.provenance_list_->setItem( row_num, 2, action_name_item );
-    this->private_->ui_.provenance_list_->setItem( row_num, 3, action_params_item );
-    this->private_->ui_.provenance_list_->verticalHeader()->resizeSection( row_num, 24 );
+    if ( action_name == "Paint" )
+    {
+      size_t start_step = i;
+      ProvenanceID last_poi = -1;
+      while ( i < num_steps )
+      {
+        prov_step = provenance_trail->at( i );
+        action_name = prov_step->get_action_name();
+        poi = prov_step->get_provenance_id_of_interest();
+        if ( action_name != "Paint" ) break;
+        
+        QTreeWidgetItem* item = new QTreeWidgetItem( top_item );
+        item->setText( 0, QString::number( i ) );
+        item->setText( 1, poi == -1 ? QString( "" ) : QString::number( poi ) );
+        item->setText( 2, "Paint" );
+        if ( poi != -1 ) last_poi = poi;
+        
+        ++i;
+      }
+      
+      --i;
+      if ( start_step == i )
+      {
+        this->private_->ui_.provenance_list_->addTopLevelItem( top_item->takeChild( 0 ) );
+        delete top_item;
+      }
+      else
+      {
+        this->private_->ui_.provenance_list_->addTopLevelItem( top_item );
+        top_item->setText( 0, QString::number( start_step ) + "-" + QString::number( i ) );
+        top_item->setText( 1, last_poi == -1 ? QString( "" ) : QString::number( last_poi ) );
+        top_item->setText( 2, "Paint" );
+      }
+    }
+    else
+    {
+      this->private_->ui_.provenance_list_->addTopLevelItem( top_item );
+    }
   }
 
-  this->private_->ui_.provenance_list_->verticalHeader()->setUpdatesEnabled( true );
   this->private_->ui_.provenance_list_->repaint();
 }
   
@@ -158,12 +180,15 @@ void ProvenanceDockWidget::connect_project()
 
 void ProvenanceDockWidget::enable_disable_replay_button()
 {
-  int row = this->private_->ui_.provenance_list_->currentRow();
-  if ( row >= 0 )
+  QTreeWidgetItem* current_item = this->private_->ui_.provenance_list_->currentItem();
+  if ( current_item != 0 )
   {
-    QTableWidgetItem* poi_item = this->private_->ui_.provenance_list_->item( row, 1 );
-    assert( poi_item != 0 );
-    ProvenanceID poi = poi_item->data( Qt::UserRole ).toLongLong();
+    std::string poi_text = current_item->text( 1 ).toStdString();
+    ProvenanceID poi = -1;
+    if ( !poi_text.empty() )
+    {
+      Core::ImportFromString( poi_text, poi );
+    }
     this->private_->ui_.replay_button_->setEnabled( poi >= 0 );
   }
   else
@@ -174,16 +199,15 @@ void ProvenanceDockWidget::enable_disable_replay_button()
 
 void ProvenanceDockWidget::dispatch_recreate_provenance()
 {
-  int row = this->private_->ui_.provenance_list_->currentRow();
-  if ( row >= 0 )
+  QTreeWidgetItem* current_item = this->private_->ui_.provenance_list_->currentItem();
+  if ( current_item != 0 )
   {
-    QTableWidgetItem* poi_item = this->private_->ui_.provenance_list_->item( row, 1 );
-    assert( poi_item != 0 );
-    ProvenanceID poi = poi_item->data( Qt::UserRole ).toLongLong();
-    if ( poi >= 0 )
+    std::string poi_text = current_item->text( 1 ).toStdString();
+    ProvenanceID poi = -1;
+    if ( !poi_text.empty() &&
+      Core::ImportFromString( poi_text, poi ) &&
+      poi >= 0 )
     {
-      Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
-        InterfaceManager::Instance()->layermanager_dockwidget_visibility_state_, true );
       ActionRecreateLayer::Dispatch( Core::Interface::GetWidgetActionContext(), poi );
     }
   }

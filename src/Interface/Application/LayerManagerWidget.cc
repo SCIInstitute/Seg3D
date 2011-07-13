@@ -130,9 +130,6 @@ public:
   // Pointer to the LayerManagerWidget
   LayerManagerWidget* parent_;
   
-  // Layout that defines where the groups are located within the widget
-  QVBoxLayout* group_layout_;
-
   // Mapping of group name to its underlying widget
   GroupWidgetMap group_map_;
 
@@ -314,7 +311,7 @@ void LayerManagerWidgetPrivate::update_group_widgets()
     }
 
     // Put the widget in the layout
-    this->group_layout_->insertWidget( static_cast< int >( i ), group_widget );
+    this->ui_.group_layout_->insertWidget( static_cast< int >( i ), group_widget );
     // Add the widget to the map
     this->group_map_[ group_id ] = group_widget;
   }
@@ -325,7 +322,7 @@ void LayerManagerWidgetPrivate::update_group_widgets()
   {
     LayerGroupWidget* group_widget = it->second;
     // Remove the widget from the layout and mark it for deletion
-    this->group_layout_->removeWidget( group_widget );
+    this->ui_.group_layout_->removeWidget( group_widget );
     group_widget->deleteLater();
   }
   tmp_map.clear();
@@ -375,7 +372,7 @@ void LayerManagerWidgetPrivate::reset()
   while ( it != this->group_map_.end() )
   {
     LayerGroupWidget* widget = it->second;
-    this->group_layout_->removeWidget( widget );
+    this->ui_.group_layout_->removeWidget( widget );
     widget->deleteLater();
     ++it;
   }
@@ -391,6 +388,7 @@ void LayerManagerWidgetPrivate::handle_script_begin( SandboxID sandbox, std::str
   this->ui_.progress_bar_->setValue( -1 );
   this->ui_.step_name_label_->setText( QString( "" ) );
   this->ui_.script_widget_->show();
+  this->parent_->parentWidget()->raise();
 }
 
 void LayerManagerWidgetPrivate::handle_script_end( SandboxID sandbox )
@@ -484,11 +482,8 @@ LayerManagerWidget::LayerManagerWidget( QWidget* parent ) :
   this->private_ = new LayerManagerWidgetPrivate( this );
   this->private_->ui_.setupUi( this );
 
-  // Setup the spacing between the groups
-  this->private_->group_layout_ = new QVBoxLayout( this->private_->ui_.main_ );
-  this->private_->group_layout_->setSpacing( 2 );
-  this->private_->group_layout_->setContentsMargins( 1,1,1,1 );
-  this->private_->group_layout_->setAlignment( Qt::AlignTop );
+  // Setup the alignment of groups
+  this->private_->ui_.group_layout_->setAlignment( Qt::AlignTop );
 
   // Hide the script widget
   this->private_->ui_.script_widget_->hide();

@@ -101,13 +101,13 @@ PythonConsoleEdit::PythonConsoleEdit( PythonConsoleWidget* parent ) :
   this->setAcceptDrops( false );
   this->setAcceptRichText( false );
   this->setUndoRedoEnabled( false );
+  //this->setLineWrapMode( QTextEdit::NoWrap );
   this->document()->setMaximumBlockCount( 2048 );
 
   QFont f;
   f.setFamily( "Courier" );
   f.setStyleHint( QFont::TypeWriter );
   f.setFixedPitch( true );
-  //f.setPointSize( 10 );
 
   // Set the tab width to 4 spaces
   QFontMetrics fm( f, this );
