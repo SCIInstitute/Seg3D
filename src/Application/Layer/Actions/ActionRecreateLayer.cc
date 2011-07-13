@@ -36,7 +36,9 @@
 // Core includes
 #include <Core/Utils/Exception.h>
 #include <Core/Utils/StringParser.h>
+#ifdef BUILD_WITH_PYTHON
 #include <Core/Python/PythonInterpreter.h>
+#endif
 
 // Application includes
 #include <Application/Clipboard/Clipboard.h>
@@ -76,6 +78,11 @@ ActionRecreateLayer::~ActionRecreateLayer()
 
 bool ActionRecreateLayer::validate( Core::ActionContextHandle& context )
 {
+#if !defined( BUILD_WITH_PYTHON )
+  context->report_error( "Python is required to run ActionRecreateLayer." );
+  return false;
+#endif
+
   // Make sure there is no running recreation
   if ( LayerManager::Instance()->is_sandbox( 0 ) )
   {
@@ -353,10 +360,12 @@ bool ActionRecreateLayer::run( Core::ActionContextHandle& context, Core::ActionR
   item->set_redo_action( this->shared_from_this() );
   item->add_id_count_to_restore( id_count );
   UndoBuffer::Instance()->insert_undo_item( context, item );
-  
+
+#ifdef BUILD_WITH_PYTHON
   // Run the script to recreate the layer
   Core::PythonInterpreter::Instance()->run_script( script );
-  
+#endif
+
   return true;
 }
 
