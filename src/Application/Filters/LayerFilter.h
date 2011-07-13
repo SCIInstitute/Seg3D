@@ -33,6 +33,7 @@
 #include <boost/smart_ptr.hpp> 
  
 // Core includes
+#include <Core/Utils/Notifier.h>
 #include <Core/Volume/DataVolume.h>
 #include <Core/Volume/MaskVolume.h>
 
@@ -95,7 +96,13 @@ public:
 
   // CONNECT_STOP:
   // Monitor the stop flag of a layer
-  void connect_stop( const LayerHandle& layer );  
+  void connect_stop( const LayerHandle& layer );
+
+  // -- Filter Notifier --
+public:
+  // GET_NOTIFIER:
+  // Return a notifier that can be used to wait for the filter to finish.
+  Core::NotifierHandle get_notifier();
   
 protected:      
   // HANDLE_ABORT:

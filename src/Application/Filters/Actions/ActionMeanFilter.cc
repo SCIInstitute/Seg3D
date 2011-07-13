@@ -205,6 +205,13 @@ bool ActionMeanFilter::run( Core::ActionContextHandle& context,
 
   // Return the id of the destination layer.
   result = Core::ActionResultHandle( new Core::ActionResult( algo->dst_layer_->get_layer_id() ) );
+  // If the action is run from a script (provenance is a special case of script),
+  // return a notifier that the script engine can wait on.
+  if ( context->source() == Core::ActionSource::SCRIPT_E ||
+    context->source() == Core::ActionSource::PROVENANCE_E )
+  {
+    context->report_need_resource( algo->get_notifier() );
+  }
 
   // Build the undo-redo record
   algo->create_undo_redo_and_provenance_record( context, this->shared_from_this() );

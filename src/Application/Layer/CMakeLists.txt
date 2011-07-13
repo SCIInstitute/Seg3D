@@ -97,8 +97,6 @@ SET(APPLICATION_LAYER_ACTIONS_SRCS
   Actions/ActionEndScriptStatusReport.cc
   Actions/ActionReportScriptStatus.h
   Actions/ActionReportScriptStatus.cc
-  Actions/ActionSynchronize.h
-  Actions/ActionSynchronize.cc
 )
 
 IF(BUILD_WITH_PYTHON)

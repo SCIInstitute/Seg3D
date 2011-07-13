@@ -61,7 +61,7 @@ public:
 public:
   virtual void report_status( ActionStatus status );
   virtual void report_result( const ActionResultHandle& result );
-  virtual void report_need_resource( NotifierHandle& notifier );
+  virtual void report_need_resource( NotifierHandle notifier );
 
   // -- Report that action was done --
 public:

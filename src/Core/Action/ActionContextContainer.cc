@@ -69,7 +69,7 @@ void ActionContextContainer::report_status( ActionStatus status )
   }
 }
 
-void ActionContextContainer::report_need_resource( NotifierHandle& notifier )
+void ActionContextContainer::report_need_resource( NotifierHandle notifier )
 {
   if ( this->context_ ) this->context_->report_need_resource( notifier );
 }

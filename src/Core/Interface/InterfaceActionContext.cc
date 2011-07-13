@@ -55,7 +55,7 @@ void InterfaceActionContext::report_message( const std::string& message )
   CORE_LOG_MESSAGE( message );
 }
 
-void InterfaceActionContext::report_need_resource( NotifierHandle& notifier )
+void InterfaceActionContext::report_need_resource( NotifierHandle notifier )
 {
   std::string error = std::string( "'" ) + notifier->get_name() + "' is currently not available.";
   CORE_LOG_ERROR( error );

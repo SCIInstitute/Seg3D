@@ -308,9 +308,6 @@ bool ActionRecreateLayer::run( Core::ActionContextHandle& context, Core::ActionR
 
     // Issue the action
     script += action_cmd;
-    // sync on the output
-    script += "\tsynchronize(layerids=" + output_name + ", sandbox=" + sandbox_str + ")\n";
-
     // Make sure that the output is a python list
     script += "\tif type(" + output_name + ")!=list:\n" 
       "\t\ttmp=list()\n" + "\t\ttmp.append(" + output_name + ")\n"

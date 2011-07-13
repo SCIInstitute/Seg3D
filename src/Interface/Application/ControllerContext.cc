@@ -57,7 +57,7 @@ void ControllerContext::report_message( const std::string& message )
   ControllerInterface::PostActionMessage( controller_, message );
 }
 
-void ControllerContext::report_need_resource( const Core::NotifierHandle& notifier )
+void ControllerContext::report_need_resource( const Core::NotifierHandle notifier )
 {
   std::string message = std::string( "'" ) + notifier->get_name() + std::string(
       "' is currently unavailable" );

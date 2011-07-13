@@ -49,6 +49,7 @@
 #include <Application/Layer/LayerUndoBufferItem.h>
 #include <Application/Filters/LayerFilter.h>
 #include <Application/Filters/LayerFilterLock.h>
+#include <Application/Filters/LayerFilterNotifier.h> 
 #include <Application/UndoBuffer/Actions/ActionUndo.h>
  
 namespace Seg3D
@@ -136,6 +137,9 @@ public:
 
   // Sandbox ID
   SandboxID sandbox_;
+
+  // Filter done notifier
+  LayerFilterNotifierHandle notifier_;
   
   // -- internal functions --
 public:
@@ -284,6 +288,9 @@ void LayerFilterPrivate::finalize()
   {
     CORE_LOG_SUCCESS( this->success_ ); 
   }
+
+  // Notify that the filter is done
+  this->notifier_->trigger();
 }
 
 void LayerFilterPrivate::internal_abort()
@@ -437,6 +444,7 @@ LayerFilter::LayerFilter() :
 {
   this->private_->filter_ = this;
   this->private_->provenance_step_id_ = -1;
+  this->private_->notifier_.reset( new LayerFilterNotifier( "Layer Filter" ) );
 }
 
 LayerFilter::~LayerFilter()
@@ -937,6 +945,11 @@ void LayerFilter::set_sandbox( SandboxID sandbox )
 SandboxID LayerFilter::get_sandbox()
 {
   return this->private_->sandbox_;
+}
+
+Core::NotifierHandle LayerFilter::get_notifier()
+{
+  return this->private_->notifier_;
 }
 
 } // end namespace Seg3D

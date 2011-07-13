@@ -91,6 +91,13 @@ boost::python::object RunActionFromPython( boost::python::tuple args,
 
       if ( action_status == Core::ActionStatus::SUCCESS_E )
       {
+        // Wait for the resource if currently running in script mode
+        if ( resource_notifier && ( action_source == Core::ActionSource::SCRIPT_E ||
+          action_source == Core::ActionSource::PROVENANCE_E ) )
+        {
+          resource_notifier->wait();
+        }
+
         if ( action_result )
         {
           return boost::python::object( *action_result );

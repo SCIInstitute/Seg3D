@@ -43,6 +43,7 @@
 #include <QtUtils/Utils/QtPointer.h>
 
 //Application includes
+#include <Application/InterfaceManager/InterfaceManager.h>
 #include <Application/Layer/Actions/ActionRecreateLayer.h>
 #include <Application/ProjectManager/ProjectManager.h>
 
@@ -181,6 +182,8 @@ void ProvenanceDockWidget::dispatch_recreate_provenance()
     ProvenanceID poi = poi_item->data( Qt::UserRole ).toLongLong();
     if ( poi >= 0 )
     {
+      Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
+        InterfaceManager::Instance()->layermanager_dockwidget_visibility_state_, true );
       ActionRecreateLayer::Dispatch( Core::Interface::GetWidgetActionContext(), poi );
     }
   }

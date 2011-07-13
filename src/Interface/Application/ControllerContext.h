@@ -58,7 +58,7 @@ public:
   virtual void report_error( const std::string& error );
   virtual void report_warning( const std::string& warning );
   virtual void report_message( const std::string& message );
-  virtual void report_need_resource( const Core::NotifierHandle& resource );
+  virtual void report_need_resource( const Core::NotifierHandle resource );
 
   // -- Report that action was done --
 public:

@@ -42,6 +42,8 @@ SET(APPLICATION_FILTERS_SRCS
   NrrdFilter.cc
   LayerResampler.h
   LayerResampler.cc
+  LayerFilterNotifier.h
+  LayerFilterNotifier.cc
 )
 
 SET(APPLICATION_FILTERS_ACTIONS_SRCS

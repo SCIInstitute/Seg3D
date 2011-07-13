@@ -50,7 +50,7 @@ namespace Core
 class InterfaceActionContext;
 typedef boost::shared_ptr< InterfaceActionContext > InterfaceActionContextHandle;
 
-// Class defintion
+// Class definition
 class InterfaceActionContext : public ActionContext
 {
 
@@ -70,7 +70,7 @@ public:
 
   // -- Report back status and results --
 public:
-  virtual void report_need_resource( NotifierHandle& resource );
+  virtual void report_need_resource( NotifierHandle resource );
 
   // -- Report that action was done --
 public:

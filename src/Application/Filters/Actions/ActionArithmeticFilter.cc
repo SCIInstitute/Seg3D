@@ -404,6 +404,13 @@ bool ActionArithmeticFilter::run( Core::ActionContextHandle& context,
 
   // Return the ids of the destination layer.
   result.reset( new Core::ActionResult( this->private_->algo_->dst_layer_->get_layer_id() ) );
+  // If the action is run from a script (provenance is a special case of script),
+  // return a notifier that the script engine can wait on.
+  if ( context->source() == Core::ActionSource::SCRIPT_E ||
+    context->source() == Core::ActionSource::PROVENANCE_E )
+  {
+    context->report_need_resource( this->private_->algo_->get_notifier() );
+  }
 
   // Create undo/redo record for this layer action
   this->private_->algo_->create_undo_redo_and_provenance_record( context, this->shared_from_this() );
