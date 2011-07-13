@@ -312,12 +312,9 @@ void PythonConsoleEdit::issue_command()
 
 void PythonConsoleEdit::prompt( const std::string text )
 {
-  this->setTextColor( Qt::green );
-
-  QTextCursor text_cursor = this->textCursor();
+  QTextCursor text_cursor( this->document() );
   // Move the cursor to the end of the document
   text_cursor.setPosition( this->document_end() );
-  this->setTextCursor( text_cursor );
 
   // if the cursor is currently on a clean line, do nothing, otherwise we move
   // the cursor to a new line before showing the prompt.
@@ -325,38 +322,53 @@ void PythonConsoleEdit::prompt( const std::string text )
   int startpos = text_cursor.position();
   text_cursor.movePosition( QTextCursor::EndOfLine );
   int endpos = text_cursor.position();
+
+  // Make sure the new text will be in the right color
+  QTextCharFormat char_format = this->currentCharFormat();
+  char_format.setForeground( Qt::green );
+  text_cursor.setCharFormat( char_format );
+
   if ( endpos != startpos )
   {
-    this->textCursor().insertText( "\n" );
+    text_cursor.insertText( "\n" );
   }
 
-  this->textCursor().insertText( QString::fromStdString( text ) );
+  text_cursor.insertText( QString::fromStdString( text ) );
+  this->setTextCursor( text_cursor );
   this->interactive_position_ = this->document_end();
   this->ensureCursorVisible();
 }
 
 void PythonConsoleEdit::print_output( const std::string text )
 {
-  this->setTextColor( Qt::black );
-
-  QTextCursor text_cursor = this->textCursor();
+  QTextCursor text_cursor( this->document() );
+  // Move the cursor to the end of the document
   text_cursor.setPosition( this->document_end() );
-  this->setTextCursor( text_cursor );
-  text_cursor.insertText( QString::fromStdString( text ) );
+  
+  // Set the proper text color
+  QTextCharFormat char_format = this->currentCharFormat();
+  char_format.setForeground( Qt::black );
+  text_cursor.setCharFormat( char_format );
 
+  text_cursor.insertText( QString::fromStdString( text ) );
+  this->setTextCursor( text_cursor );
   this->interactive_position_ = this->document_end();
   this->ensureCursorVisible();
 }
 
 void PythonConsoleEdit::print_error( const std::string text )
 {
-  this->setTextColor( Qt::red );
-
-  QTextCursor text_cursor = this->textCursor();
+  QTextCursor text_cursor( this->document() );
+  // Move the cursor to the end of the document
   text_cursor.setPosition( this->document_end() );
-  this->setTextCursor( text_cursor );
-  text_cursor.insertText( QString::fromStdString( text ) );
 
+  // Set the proper text color
+  QTextCharFormat char_format = this->currentCharFormat();
+  char_format.setForeground( Qt::red );
+  text_cursor.setCharFormat( char_format );
+
+  text_cursor.insertText( QString::fromStdString( text ) );
+  this->setTextCursor( text_cursor );
   this->interactive_position_ = this->document_end();
   this->ensureCursorVisible();
 }
