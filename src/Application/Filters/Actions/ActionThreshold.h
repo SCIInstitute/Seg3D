@@ -43,7 +43,7 @@ class ActionThreshold : public LayerAction
 {
 
 CORE_ACTION( 
-  CORE_ACTION_TYPE( "ThresholdTool", "Build a mask layer by thresholding a data layer." )
+  CORE_ACTION_TYPE( "Threshold", "Build a mask layer by thresholding a data layer." )
   CORE_ACTION_ARGUMENT( "layerid", "The ID of the data layer on which to run the tool." )
   CORE_ACTION_ARGUMENT( "lower_threshold", "The minimum value of the threshold range." )
   CORE_ACTION_ARGUMENT( "upper_threshold", "The maximum value of the threshold range." )
