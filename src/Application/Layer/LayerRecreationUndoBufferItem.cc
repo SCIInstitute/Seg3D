@@ -36,7 +36,7 @@ class LayerRecreationUndoBufferItemPrivate
 {
 public: 
   // The provenance ID to recreate
-  ProvenanceID prov_id_;
+  ProvenanceIDList prov_ids_;
 
   // The sandbox used for the recreation
   SandboxID sandbox_;
@@ -49,13 +49,13 @@ public:
 };
 
 LayerRecreationUndoBufferItem::LayerRecreationUndoBufferItem( 
-  ProvenanceID prov_id, SandboxID sandbox ) :
+  const ProvenanceIDList& prov_ids, SandboxID sandbox ) :
   UndoBufferItem( "Recreate Layer" ),
   private_( new LayerRecreationUndoBufferItemPrivate )
 {
   this->private_->size_ = 0;
   this->private_->id_count_ = LayerManager::GetLayerInvalidIdCount();
-  this->private_->prov_id_ = prov_id;
+  this->private_->prov_ids_ = prov_ids;
   this->private_->sandbox_ = sandbox;
 }
 
@@ -69,15 +69,18 @@ bool LayerRecreationUndoBufferItem::apply_and_clear_undo()
   // Destroy the sandbox
   LayerManager::Instance()->delete_sandbox( this->private_->sandbox_ );
   
-  // Look for the layer with the provenance ID, delete it if exists
-  LayerHandle layer = LayerManager::FindLayer( this->private_->prov_id_ );
-  if ( layer )
+  for ( size_t i = 0; i < this->private_->prov_ids_.size(); ++i )
   {
-    // Invalidate the layer so the layer ID can be reused
-    layer->invalidate();
-    LayerManager::Instance()->delete_layer( layer );
+    // Look for the layer with the provenance ID, delete it if exists
+    LayerHandle layer = LayerManager::FindLayer( this->private_->prov_ids_[ i ] );
+    if ( layer )
+    {
+      // Invalidate the layer so the layer ID can be reused
+      layer->invalidate();
+      LayerManager::Instance()->delete_layer( layer );
+    }
   }
-
+  
   // The counters need to be rolled back so when redo is done, it actually redos the same action
   // resulting in the same counters. This only needs to be done if layers got created and deleted
   // in the undo.

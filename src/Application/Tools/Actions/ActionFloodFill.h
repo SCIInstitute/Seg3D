@@ -65,7 +65,7 @@ class ActionFloodFill : public LayerAction
 
 CORE_ACTION
 ( 
-  CORE_ACTION_TYPE( "Floodfill", "Flood fill the content of a mask slice "
+  CORE_ACTION_TYPE( "FloodFill", "Flood fill the content of a mask slice "
     "starting from seed points." )
   CORE_ACTION_ARGUMENT( "target", "The ID of the target mask layer." )
   CORE_ACTION_ARGUMENT( "slice_type", "The slicing direction." )

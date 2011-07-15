@@ -42,6 +42,8 @@
 #include <boost/date_time/c_local_time_adjustor.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/lambda/bind.hpp>
+#include <boost/lambda/lambda.hpp>
 
 // Core includes
 #include <Core/Application/Application.h>
@@ -144,11 +146,13 @@ public:
 
   // QUERY_PROVENANCE_TRAIL:
   // Get all the provenance steps required to reproduce the given provenance ID.
-  bool query_provenance_trail( ProvenanceID prov_id, ProvenanceTrail& provenance_trail );
+  bool query_provenance_trail( const std::vector< ProvenanceID >& prov_ids,
+    ProvenanceTrail& provenance_trail );
 
   // GET_PROVENANCE_STEPS:
   // Get all the provenance steps that lead to the given provenance ID.
-  void get_provenance_steps( ProvenanceID prov_id, std::set< ProvenanceStepID >& prov_steps );
+  void get_provenance_steps( const std::vector< ProvenanceID >& prov_ids, 
+    std::set< ProvenanceStepID >& prov_steps );
   
   // EXTRACT_SESSION_INFO:
   // Extract session information from the database query result.
@@ -719,24 +723,33 @@ bool ProjectPrivate::delete_session_from_database( SessionID session_id )
   return true;
 }
 
-bool ProjectPrivate::query_provenance_trail( ProvenanceID prov_id, ProvenanceTrail& provenance_trail )
+bool ProjectPrivate::query_provenance_trail( const std::vector< ProvenanceID >& prov_ids, 
+                      ProvenanceTrail& provenance_trail )
 {
-  if ( prov_id < 0 ) return false;
+  if ( prov_ids.size() == 0 ) return false;
 
   // Get all the provenance steps that lead to the provenance ID
   std::set< ProvenanceStepID > prov_steps;
-  this->get_provenance_steps( prov_id, prov_steps );
+  this->get_provenance_steps( prov_ids, prov_steps );
 
   // The length of provenance trail is the same as the number of steps
   provenance_trail.resize( prov_steps.size() );
 
-  // Query action strings for each provenance step.
+  // String stream for extracting timestamp value
+  std::stringstream ss;
+  ss.imbue( std::locale( ss.getloc(), new boost::posix_time::time_input_facet( 
+    "%Y-%m-%d %H:%M:%S" ) ) );
+  ss.exceptions( std::ios_base::failbit );
+
+  // Query detailed information for each provenance step.
   // NOTE: The provenance steps are already sorted in ascending order
   // because of the use of std::set.
-  // We start from the last step and traverse back
+  // NOTE: We start from the end of the trail, look for the steps that output
+  // the provenance IDs of interest as we proceed.
   std::set< ProvenanceStepID >::const_reverse_iterator it = prov_steps.rbegin();
   std::set< ProvenanceStepID >::const_reverse_iterator it_end = prov_steps.rend();
-  ProvenanceID prov_id_of_interest = prov_id;
+  std::set< ProvenanceID > poi_set;
+  poi_set.insert( prov_ids.begin(), prov_ids.end() );
   size_t index = prov_steps.size();
   while ( it != it_end )
   {
@@ -744,7 +757,7 @@ bool ProjectPrivate::query_provenance_trail( ProvenanceID prov_id, ProvenanceTra
     ProvenanceStepID prov_step_id = *it++;
 
     // Query the action string of the provenance step
-    std::string sql_str = "SELECT action_name, action_params FROM provenance_step WHERE "
+    std::string sql_str = "SELECT * FROM provenance_step WHERE "
       "prov_step_id = " + Core::ExportToString( prov_step_id ) + ";";
     ResultSet result_set;
     std::string error;
@@ -760,10 +773,50 @@ bool ProjectPrivate::query_provenance_trail( ProvenanceID prov_id, ProvenanceTra
     }
     std::string action_name = boost::any_cast< std::string >( result_set[ 0 ][ "action_name" ] );
     std::string action_params = boost::any_cast< std::string >( result_set[ 0 ][ "action_params" ] );
+    std::string user_id = boost::any_cast< std::string >( ( result_set[ 0 ] )[ "user_id" ] );
+    std::string timestamp_str = boost::any_cast< std::string >( ( result_set[ 0 ] )[ "timestamp" ] );
+    ProvenanceStep::timestamp_type timestamp;
+    ss.str( timestamp_str );
+    try
+    {
+      ss >> timestamp;
+    }
+    catch ( ... )
+    {
+      timestamp = boost::posix_time::second_clock::universal_time();
+    }
+
     prov_step->set_action_name( action_name );
     prov_step->set_action_params( action_params );
+    prov_step->set_username( user_id );
+    prov_step->set_timestamp( timestamp );
 
-    // Query inputs for the provenance step
+    // Query outputs for the provenance step
+    // We also figure out what output IDs we are interested in for this step
+    sql_str = "SELECT prov_id FROM provenance_output WHERE prov_step_id = " +
+      Core::ExportToString( prov_step_id ) + " ORDER BY output_id ASC;";
+    if ( !this->provenance_database_.run_sql_statement( sql_str, result_set, error ) )
+    {
+      CORE_LOG_ERROR( error );
+      return false;
+    }
+    ProvenanceIDList output_prov_ids;
+    ProvenanceIDList prov_ids_of_interest;
+    for ( size_t i = 0; i < result_set.size(); ++i )
+    {
+      output_prov_ids.push_back( boost::any_cast< ProvenanceID >( result_set[ i ][ "prov_id" ] ) );
+      if ( poi_set.find( output_prov_ids[ i ] ) != poi_set.end() )
+      {
+        prov_ids_of_interest.push_back( output_prov_ids[ i ] );
+        poi_set.erase( output_prov_ids[ i ] );
+      }
+    }
+    prov_step->set_output_provenance_ids( output_prov_ids );
+    prov_step->set_provenance_ids_of_interest( prov_ids_of_interest );
+
+
+    // Query inputs for the provenance step.
+    // Update the poi_set in the mean time.
     sql_str = "SELECT prov_id FROM provenance_input WHERE prov_step_id = " +
       Core::ExportToString( prov_step_id ) + " ORDER BY input_id ASC;";
     if ( !this->provenance_database_.run_sql_statement( sql_str, result_set, error ) )
@@ -775,23 +828,10 @@ bool ProjectPrivate::query_provenance_trail( ProvenanceID prov_id, ProvenanceTra
     for ( size_t i = 0; i < result_set.size(); ++i )
     {
       input_prov_ids.push_back( boost::any_cast< ProvenanceID >( result_set[ i ][ "prov_id" ] ) );
+      poi_set.insert( input_prov_ids[ i ] );
     }
     prov_step->set_input_provenance_ids( input_prov_ids );
 
-    // Query outputs for the provenance step
-    sql_str = "SELECT prov_id FROM provenance_output WHERE prov_step_id = " +
-      Core::ExportToString( prov_step_id ) + " ORDER BY output_id ASC;";
-    if ( !this->provenance_database_.run_sql_statement( sql_str, result_set, error ) )
-    {
-      CORE_LOG_ERROR( error );
-      return false;
-    }
-    ProvenanceIDList output_prov_ids;
-    for ( size_t i = 0; i < result_set.size(); ++i )
-    {
-      output_prov_ids.push_back( boost::any_cast< ProvenanceID >( result_set[ i ][ "prov_id" ] ) );
-    }
-    prov_step->set_output_provenance_ids( output_prov_ids );
 
     // Query replaced provenance IDs for the provenance step
     sql_str = "SELECT prov_id FROM provenance_replaced WHERE prov_step_id = " +
@@ -807,36 +847,6 @@ bool ProjectPrivate::query_provenance_trail( ProvenanceID prov_id, ProvenanceTra
       replaced_prov_ids.push_back( boost::any_cast< ProvenanceID >( result_set[ i ][ "prov_id" ] ) );
     }
     prov_step->set_replaced_provenance_ids( replaced_prov_ids );
-
-    // Look for the provenance ID of interest in the output
-    ProvenanceIDList::iterator pid_it = std::find( output_prov_ids.begin(), output_prov_ids.end(), 
-      prov_id_of_interest );
-    if ( pid_it != output_prov_ids.end() )
-    {
-      prov_step->set_provenance_id_of_interest( prov_id_of_interest );
-      size_t poi_index = static_cast< size_t >( pid_it - output_prov_ids.begin() ); 
-      if ( replaced_prov_ids.size() != 0 )
-      {
-        if ( poi_index >= replaced_prov_ids.size() )
-        {
-          CORE_LOG_ERROR( "Incorrect provenance record encountered." );
-          return false;
-        }
-        prov_id_of_interest = replaced_prov_ids[ poi_index ];
-      }
-      else if ( input_prov_ids.size() > poi_index )
-      {
-        prov_id_of_interest = input_prov_ids[ poi_index ];
-      }
-      else if ( input_prov_ids.size() > 0 )
-      {
-        prov_id_of_interest = input_prov_ids[ 0 ];
-      }
-      else
-      {
-        prov_id_of_interest = -1;
-      }
-    }
 
     provenance_trail[ --index ] = prov_step;
   }
@@ -1399,15 +1409,17 @@ bool ProjectPrivate::get_session_file( SessionID session_id, boost::filesystem::
   return true;
 }
 
-void ProjectPrivate::get_provenance_steps( ProvenanceID prov_id, 
+void ProjectPrivate::get_provenance_steps( const std::vector< ProvenanceID >& prov_ids, 
                       std::set< ProvenanceStepID >& prov_steps )
 {
   std::queue< ProvenanceID > provenance_queue;
-  provenance_queue.push( prov_id );
+  std::for_each( prov_ids.begin(), prov_ids.end(), boost::lambda::bind( 
+    &std::queue< ProvenanceID >::push, &provenance_queue, boost::lambda::_1 ) );
   while ( !provenance_queue.empty() )
   {
     ProvenanceID output_id = provenance_queue.front();
     provenance_queue.pop();
+    if ( output_id == -1 ) continue;
 
     std::string error;
     std::string sql_str;
@@ -2039,10 +2051,7 @@ bool Project::export_project( const boost::filesystem::path& export_path,
 
   // Get all the provenance steps relevant to prov_ids
   std::set< ProvenanceStepID > prov_steps;
-  BOOST_FOREACH( ProvenanceID prov_id, prov_ids )
-  {
-    this->private_->get_provenance_steps( prov_id, prov_steps );
-  }
+  this->private_->get_provenance_steps( prov_ids, prov_steps );
 
   // Delete irrelevant provenance records from the provenance database
   if ( !prov_steps.empty() )
@@ -2641,27 +2650,28 @@ boost::posix_time::ptime Project::get_last_saved_session_time_stamp() const
   return this->private_->last_saved_session_time_stamp_;
 }
 
-void Project::request_provenance_record( ProvenanceID prov_id )
+void Project::request_provenance_trail( ProvenanceID prov_id )
 {
   // Run SQL queries in application thread
   if ( !Core::Application::IsApplicationThread() )
   {
-    Core::Application::PostEvent( boost::bind( &Project::request_provenance_record, this, prov_id ) );
+    Core::Application::PostEvent( boost::bind( &Project::request_provenance_trail, this, prov_id ) );
     return;
   }
 
   ProvenanceTrailHandle provenance_trail( new ProvenanceTrail );
-  this->private_->query_provenance_trail( prov_id, *provenance_trail );
+  std::vector< ProvenanceID > prov_ids( 1, prov_id );
+  this->private_->query_provenance_trail( prov_ids, *provenance_trail );
 
-  this->provenance_record_signal_( provenance_trail );
+  this->provenance_trail_signal_( provenance_trail );
 }
 
-ProvenanceTrailHandle Project::get_provenance_trail( ProvenanceID prov_id )
+ProvenanceTrailHandle Project::get_provenance_trail( const std::vector< ProvenanceID >& prov_ids )
 {
   ASSERT_IS_APPLICATION_THREAD();
 
   ProvenanceTrailHandle provenance_trail( new ProvenanceTrail );
-  if ( !this->private_->query_provenance_trail( prov_id, *provenance_trail ) )
+  if ( !this->private_->query_provenance_trail( prov_ids, *provenance_trail ) )
   {
     provenance_trail.reset();
   }

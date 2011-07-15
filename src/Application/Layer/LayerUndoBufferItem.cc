@@ -66,7 +66,7 @@ public:
   LayerManager::id_count_type id_count_;
 
   // Provenance step ID of the associated action.
-  ProvenanceStepID prov_step_id_;
+  std::vector< ProvenanceStepID > prov_step_ids_;
   
   // Size of the item
   size_t size_;
@@ -78,7 +78,6 @@ LayerUndoBufferItem::LayerUndoBufferItem( const std::string& tag ) :
 {
   this->private_->size_ = 0;
   this->private_->id_count_ = LayerManager::GetLayerInvalidIdCount();
-  this->private_->prov_step_id_ = -1;
 }
 
 LayerUndoBufferItem::~LayerUndoBufferItem()
@@ -153,7 +152,13 @@ void LayerUndoBufferItem::add_layer_to_add( LayerHandle layer )
 
 void LayerUndoBufferItem::set_provenance_step_id( ProvenanceStepID step_id )
 {
-  this->private_->prov_step_id_ = step_id;
+  this->private_->prov_step_ids_.resize( 1 );
+  this->private_->prov_step_ids_[ 0 ] = step_id;
+}
+
+void LayerUndoBufferItem::set_provenance_step_ids( const std::vector< ProvenanceStepID >& step_ids )
+{
+  this->private_->prov_step_ids_ = step_ids;
 }
 
 void LayerUndoBufferItem::add_layer_to_restore( LayerHandle layer, 
@@ -297,12 +302,12 @@ void LayerUndoBufferItem::rollback_layer_changes()
 
   // Step 5:
   // Delete the provenance record.
-  if ( this->private_->prov_step_id_ >= 0 )
+  for ( size_t i = 0 ; i < this->private_->prov_step_ids_.size(); ++i )
   {
     ProjectManager::Instance()->get_current_project()->
-      delete_provenance_record( this->private_->prov_step_id_ );
-    this->private_->prov_step_id_ = -1;
-  }
+      delete_provenance_record( this->private_->prov_step_ids_[ i ] );
+  } 
+  this->private_->prov_step_ids_.clear();
 }
 
 bool LayerUndoBufferItem::apply_and_clear_undo()

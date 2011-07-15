@@ -56,7 +56,7 @@ public:
   // EXPORT_TO_PROVENANCE_STRING
   // Export the contents of the parameter to a provenance string.
   // This means layer ids will be translated to provenance id.
-  virtual std::string export_to_provenance_string( size_t& input_counter ) const = 0;
+  virtual std::string export_to_provenance_string( size_t& input_counter, bool single_input ) const = 0;
   
   // HAS_EXTENSION
   // Has extended information in the derived class.
@@ -91,7 +91,7 @@ public:
   // EXPORT_TO_PROVENANCE_STRING
   // Export the contents of the parameter to a provenance string.
   // This means layer ids will be translated to provenance id.
-  virtual std::string export_to_provenance_string( size_t& input_counter ) const;
+  virtual std::string export_to_provenance_string( size_t& input_counter, bool single_input ) const;
 
 private:
   std::string& layer_id_;
@@ -126,7 +126,7 @@ public:
   // EXPORT_TO_PROVENANCE_STRING
   // Export the contents of the parameter to a provenance string.
   // This means layer ids will be translated to provenance id.
-  virtual std::string export_to_provenance_string( size_t& input_counter ) const;
+  virtual std::string export_to_provenance_string( size_t& input_counter, bool single_input ) const;
 
 private:
   std::vector<std::string>& layer_id_list_;
@@ -161,7 +161,7 @@ public:
   // EXPORT_TO_PROVENANCE_STRING
   // Export the contents of the parameter to a provenance string.
   // This means layer ids will be translated to provenance id.
-  virtual std::string export_to_provenance_string( size_t& input_counter ) const;
+  virtual std::string export_to_provenance_string( size_t& input_counter, bool single_input ) const;
 
 private:
   std::string& group_id_;

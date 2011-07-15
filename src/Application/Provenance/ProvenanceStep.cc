@@ -36,8 +36,7 @@ namespace Seg3D
 {
 
 ProvenanceStep::ProvenanceStep() :
-  inputfiles_id_( -1 ),
-  provenance_id_of_interest_( -1 )
+  inputfiles_id_( -1 )
 {
   // Record user for GLP
   Core::Application::Instance()->get_user_name( this->user_ );
@@ -45,11 +44,6 @@ ProvenanceStep::ProvenanceStep() :
 
 ProvenanceStep::~ProvenanceStep()
 {
-}
-
-bool ProvenanceStep::is_collapsable()
-{
-  return false;
 }
 
 const ProvenanceIDList& ProvenanceStep::get_input_provenance_ids() const
@@ -92,19 +86,24 @@ InputFilesID ProvenanceStep::get_inputfiles_id() const
   return this->inputfiles_id_;
 }
 
+void ProvenanceStep::set_username( const std::string& username )
+{
+  this->user_ = username;
+}
+
 const std::string& ProvenanceStep::get_username() const
 {
   return this->user_;
 }
 
-void ProvenanceStep::set_provenance_id_of_interest( ProvenanceID poi )
+void ProvenanceStep::set_provenance_ids_of_interest( const ProvenanceIDList& poi )
 {
-  this->provenance_id_of_interest_ = poi;
+  this->prov_ids_of_interest_ = poi;
 }
 
-ProvenanceID ProvenanceStep::get_provenance_id_of_interest() const
+const ProvenanceIDList& ProvenanceStep::get_provenance_ids_of_interest() const
 {
-  return this->provenance_id_of_interest_;
+  return this->prov_ids_of_interest_;
 }
 
 void ProvenanceStep::set_action_name( const std::string& action_name )
@@ -125,6 +124,16 @@ void ProvenanceStep::set_action_params( const std::string& action_params )
 const std::string& ProvenanceStep::get_action_params() const
 {
   return this->action_params_;
+}
+
+void ProvenanceStep::set_timestamp( timestamp_type timestamp )
+{
+  this->timestamp_ = timestamp;
+}
+
+ProvenanceStep::timestamp_type ProvenanceStep::get_timestamp() const
+{
+  return this->timestamp_;
 }
 
 } // end namespace Seg3D

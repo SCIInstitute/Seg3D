@@ -198,7 +198,8 @@ public:
   // CREATE_UNDO_REDO_AND_RPOVENANCE_RECORD:
   // Create a provenance record and add it to the provenance database, 
   // and an undo record and add it to the undo stack.
-  void create_undo_redo_and_provenance_record( Core::ActionContextHandle context, Core::ActionHandle action );
+  void create_undo_redo_and_provenance_record( Core::ActionContextHandle context, 
+    Core::ActionHandle action, bool split_prov = false );
 
   // UPDATE_PROVENANCE_ACTION_STRING:
   // For filters that can be stopped at certain iterations the provenance string needs

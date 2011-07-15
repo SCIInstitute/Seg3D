@@ -50,7 +50,7 @@ class LayerRecreationUndoBufferItem : public UndoBufferItem
 
   // -- constructor/destructor --
 public:
-  LayerRecreationUndoBufferItem( ProvenanceID prov_id, SandboxID sandbox );
+  LayerRecreationUndoBufferItem( const ProvenanceIDList& prov_ids, SandboxID sandbox );
   virtual ~LayerRecreationUndoBufferItem();
 
   // -- creation of undo/redo action --

@@ -60,7 +60,7 @@ class ActionRecreateLayerPrivate
 {
 public:
   // -- Action Parameters --
-  ProvenanceID prov_id_;
+  ProvenanceIDList prov_ids_;
 
   // -- Internal variables --
   ProvenanceTrailHandle prov_trail_;
@@ -69,7 +69,7 @@ public:
 ActionRecreateLayer::ActionRecreateLayer() :
   private_( new ActionRecreateLayerPrivate )
 {
-  this->add_parameter( this->private_->prov_id_ );
+  this->add_parameter( this->private_->prov_ids_ );
 }
 
 ActionRecreateLayer::~ActionRecreateLayer()
@@ -90,20 +90,35 @@ bool ActionRecreateLayer::validate( Core::ActionContextHandle& context )
     return false;
   }
 
+  ProvenanceIDList tmp_list;
+  for ( size_t i = 0; i < this->private_->prov_ids_.size(); ++i )
+  {
+    if ( LayerManager::FindLayer( this->private_->prov_ids_[ i ] ) )
+    {
+      context->report_warning( "Layer with provenance ID " + 
+        Core::ExportToString( this->private_->prov_ids_[ i ] ) + " already exists." );
+    }
+    else
+    {
+      tmp_list.push_back( this->private_->prov_ids_[ i ] );
+    }
+  }
+
+  // Only keep provenance IDs that don't exist yet
+  this->private_->prov_ids_ = tmp_list;
+  if ( this->private_->prov_ids_.size() == 0 ) return true;
+
   // Get the provenance trail that leads to the desired provenance ID
   ProvenanceTrailHandle prov_trail = ProjectManager::Instance()->get_current_project()->
-    get_provenance_trail( this->private_->prov_id_ );
+    get_provenance_trail( this->private_->prov_ids_ );
   if ( !prov_trail || prov_trail->size() == 0 )
   {
-    context->report_error( "Provenance trail for provenance ID " + 
-      Core::ExportToString( this->private_->prov_id_ ) + " doesn't exist." );
+    context->report_error( "Provenance trail for provenance IDs " + 
+      Core::ExportToString( this->private_->prov_ids_ ) + " doesn't exist." );
     return false;
   }
 
   this->private_->prov_trail_.reset( new ProvenanceTrail );
-
-  // The provenance ID already exists
-  if ( LayerManager::FindLayer( this->private_->prov_id_ ) ) return true;
 
   // For every entry in the provenance trail, if all of its outputs already exist, ignore,
   // otherwise, put it in the private prov_trail_ structure.
@@ -147,14 +162,13 @@ static std::string ProvenanceInputFormatter( boost::smatch what,
 
 bool ActionRecreateLayer::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 { 
-  size_t num_steps = this->private_->prov_trail_->size();
+  size_t num_steps;
+
   // If the provenance trail required to recreate the layer is empty,
   // the layer should already exists in the layer manager.
-  if ( num_steps == 0 )
+  if ( !this->private_->prov_trail_ ||
+    ( num_steps = this->private_->prov_trail_->size() ) == 0 )
   {
-    LayerHandle layer = LayerManager::FindLayer( this->private_->prov_id_ );
-    LayerManager::Instance()->set_active_layer( layer );
-    result.reset( new Core::ActionResult( layer->get_layer_id() ) );
     return true;
   }
 
@@ -189,8 +203,8 @@ bool ActionRecreateLayer::run( Core::ActionContextHandle& context, Core::ActionR
         }
         else
         {
-          context->report_error( "The provenance trail for provenance ID " + 
-            Core::ExportToString( this->private_->prov_id_ ) + " is incomplete." );
+          context->report_error( "The provenance trail for provenance IDs " + 
+            Core::ExportToString( this->private_->prov_ids_ ) + " is incomplete." );
           return false;
         }
       }
@@ -328,20 +342,23 @@ bool ActionRecreateLayer::run( Core::ActionContextHandle& context, Core::ActionR
   script += "\treportscriptstatus(sandbox=" + sandbox_str + ", current_step='', steps_done=" +
     Core::ExportToString( num_steps ) + ", total_steps=" + Core::ExportToString( num_steps ) + ")\n";
 
-  // Get the layer ID of the desired output
-  std::string layer_id = prov_id_map[ this->private_->prov_id_ ];
-  // Set the layer name
-  std::string layer_name = "Recreated_Provenance_ID_" + 
-    Core::ExportToString( this->private_->prov_id_ );
-  script += "\tset(stateid=" + layer_id + "+'::name', value='" +
-    layer_name + "')\n";
-  // Move the final output layer out of the sandbox and assign the 
-  // desired provenance ID to it.
-  script += "\tmigratesandboxlayer(layerid=" + layer_id +
-    ", sandbox=" + sandbox_str + ", prov_id=" +
-    Core::ExportToString( this->private_->prov_id_ ) + ")\n";
-  // Activate the layer
-  script += "\tactivatelayer(layerid=" + layer_id + ")\n";
+  for ( size_t i = 0; i < this->private_->prov_ids_.size(); ++i )
+  {
+    // Get the layer ID of the desired output
+    std::string layer_id = prov_id_map[ this->private_->prov_ids_[ i ] ];
+    // Set the layer name
+    std::string layer_name = "Recreated_Provenance_ID_" + 
+      Core::ExportToString( this->private_->prov_ids_[ i ] );
+    script += "\tset(stateid=" + layer_id + "+'::name', value='" +
+      layer_name + "')\n";
+    // Move the final output layer out of the sandbox and assign the 
+    // desired provenance ID to it.
+    script += "\tmigratesandboxlayer(layerid=" + layer_id +
+      ", sandbox=" + sandbox_str + ", prov_id=" +
+      Core::ExportToString( this->private_->prov_ids_[ i ] ) + ")\n";
+    // Activate the layer
+    script += "\tactivatelayer(layerid=" + layer_id + ")\n";
+  }
 
   // Exception handling
   script += "except:\n\tprint('Layer recreation failed:', sys.exc_info()[:2], file=sys.stderr)\n";
@@ -353,7 +370,7 @@ bool ActionRecreateLayer::run( Core::ActionContextHandle& context, Core::ActionR
 
   // Create undo/redo record
   LayerRecreationUndoBufferItemHandle item( new LayerRecreationUndoBufferItem( 
-    this->private_->prov_id_, sandbox ) );
+    this->private_->prov_ids_, sandbox ) );
   item->set_redo_action( this->shared_from_this() );
   item->add_id_count_to_restore( id_count );
   UndoBuffer::Instance()->insert_undo_item( context, item );
@@ -366,10 +383,10 @@ bool ActionRecreateLayer::run( Core::ActionContextHandle& context, Core::ActionR
   return true;
 }
 
-void ActionRecreateLayer::Dispatch( Core::ActionContextHandle context, ProvenanceID prov_id )
+void ActionRecreateLayer::Dispatch( Core::ActionContextHandle context, const std::vector< ProvenanceID >& prov_ids )
 {
   ActionRecreateLayer* action = new ActionRecreateLayer;
-  action->private_->prov_id_ = prov_id;
+  action->private_->prov_ids_ = prov_ids;
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }
 

@@ -153,10 +153,11 @@ public:
   typedef boost::signals2::signal< void ( ProjectNoteListHandle ) > note_list_signal_type;
   note_list_signal_type note_list_changed_signal_;
   
-  // PROVENANCE_RECORDS_SIGNAL
-  // This signal is triggered when a new provenance record is added
-  typedef boost::signals2::signal< void( ProvenanceTrailHandle ) > provenance_records_signal_type;
-  provenance_records_signal_type provenance_record_signal_;
+  // PROVENANCE_TRAIL_SIGNAL:
+  // This signal is triggered when a new provenance record is added, or when
+  // the 'request_provenance_trail' function is called.
+  typedef boost::signals2::signal< void( ProvenanceTrailHandle ) > provenance_trail_signal_type;
+  provenance_trail_signal_type provenance_trail_signal_;
 
 public:
   // SAVE_PROJECT:
@@ -228,6 +229,11 @@ public:
   // GET_PROJECT_INPUTFILES_PATH:
   // Get the input files path of this project
   boost::filesystem::path get_project_inputfiles_path() const;
+  
+  // FIND_CACHED_FILE
+  // Find a cached file in the project
+  bool find_cached_file( const boost::filesystem::path& filename, InputFilesID inputfiles_id,
+    boost::filesystem::path& cached_filename ) const;
 
   // -- Notes --
 public:
@@ -239,12 +245,6 @@ public:
   // Request a list of all the notes.
   // This would trigger the note_list_changed_signal_ in the application thread.
   void request_note_list();
-  
-  // FIND_CACHED_FILE
-  // Find a cached file in the project
-  bool find_cached_file( const boost::filesystem::path& filename, InputFilesID inputfiles_id,
-    boost::filesystem::path& cached_filename ) const;
-  
   
 protected:
   // PRE_SAVE_STATES:
@@ -296,14 +296,14 @@ public:
   void update_provenance_record( ProvenanceStepID record_id, const ProvenanceStepHandle& prov_step );
   
   // REQUEST_PROVENANCE_RECORD:
-  // Request the provenance_record_signal_ to be triggered with the 
+  // Request the provenance_trail_signal_ to be triggered with the 
   // provenance trail of the given provenance ID.
-  void request_provenance_record( ProvenanceID prov_id );
+  void request_provenance_trail( ProvenanceID prov_id );
 
   // GET_PROVENANCE_TRAIL:
   // Get the provenance trail of the given provenance ID.
   // NOTE: This function can only be called on the application thread.
-  ProvenanceTrailHandle get_provenance_trail( ProvenanceID prov_id );
+  ProvenanceTrailHandle get_provenance_trail( const std::vector< ProvenanceID >& prov_ids );
   
   // -- function called by layers --
 public:

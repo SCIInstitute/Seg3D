@@ -29,6 +29,10 @@
 // STL includes
 #include <time.h>
 
+// Boost includes
+#include <boost/date_time/c_local_time_adjustor.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+
 // Core includes
 #include <Core/Utils/Log.h>
 #include <Core/Interface/Interface.h>
@@ -70,6 +74,8 @@ ProvenanceDockWidget::ProvenanceDockWidget( QWidget *parent ) :
   if( this->private_ )
   {
     this->private_->ui_.setupUi( this );
+    this->private_->ui_.provenance_list_->header()->resizeSection( 0, 140 );
+    this->private_->ui_.provenance_list_->header()->resizeSection( 1, 45 );
 
     this->add_connection( ProjectManager::Instance()->current_project_changed_signal_.
       connect( boost::bind( &ProvenanceDockWidget::HandleProjectChanged, qpointer_type( this ) ) ) );
@@ -77,7 +83,7 @@ ProvenanceDockWidget::ProvenanceDockWidget( QWidget *parent ) :
     this->connect_project();
 
     this->connect( this->private_->ui_.provenance_list_, SIGNAL( itemSelectionChanged () ), 
-      SLOT( enable_disable_replay_button() ) );
+      SLOT( update_current_provenance_step() ) );
     this->connect( this->private_->ui_.replay_button_, SIGNAL( clicked ( bool ) ),
       SLOT( dispatch_recreate_provenance() ) );
   }
@@ -108,37 +114,51 @@ void ProvenanceDockWidget::populate_provenance_list( ProvenanceTrailHandle prove
 
   // Clean out the old view
   this->private_->ui_.provenance_list_->clear();
-  
+
+  typedef boost::date_time::c_local_adjustor< SessionInfo::timestamp_type > local_time_adjustor;
+
   size_t num_steps = provenance_trail->size();
   for( size_t i = 0; i < num_steps; ++i )
   {
     ProvenanceStepHandle prov_step = provenance_trail->at( i );
     std::string action_name = prov_step->get_action_name();
     std::string action_params = prov_step->get_action_params();
-    ProvenanceID poi = prov_step->get_provenance_id_of_interest();
+    ProvenanceIDList poi = prov_step->get_provenance_ids_of_interest();
+    std::string user_id = prov_step->get_username();
+    // Convert the timestamp from UTC to local time
+    ProvenanceStep::timestamp_type prov_local_time = 
+      local_time_adjustor::utc_to_local( prov_step->get_timestamp() );
 
     QStringList columns;
-    columns << QString::number( i )
-      << ( poi == -1 ? QString( "" ) : QString::number( poi ) )
+    columns << QString::fromStdString( boost::posix_time::to_simple_string( prov_local_time ) )
+      << QString::fromStdString( user_id )
       << QString::fromStdString( action_name );
     QTreeWidgetItem* top_item = new QTreeWidgetItem( columns );
+    top_item->setData( 0, Qt::UserRole, QVariant( QString::fromStdString( Core::ExportToString( poi ) ) ) );
+    top_item->setData( 0, Qt::UserRole + 1, QVariant( QString::fromStdString( action_params ) ) );
 
     if ( action_name == "Paint" )
     {
       size_t start_step = i;
-      ProvenanceID last_poi = -1;
       while ( i < num_steps )
       {
         prov_step = provenance_trail->at( i );
-        action_name = prov_step->get_action_name();
-        poi = prov_step->get_provenance_id_of_interest();
-        if ( action_name != "Paint" ) break;
+        if ( prov_step->get_action_name() != "Paint" || 
+          prov_step->get_username() != user_id )
+        {
+          break;
+        }
         
+        action_params = prov_step->get_action_params();
+        poi = prov_step->get_provenance_ids_of_interest();
+        prov_local_time = local_time_adjustor::utc_to_local( prov_step->get_timestamp() );
+
         QTreeWidgetItem* item = new QTreeWidgetItem( top_item );
-        item->setText( 0, QString::number( i ) );
-        item->setText( 1, poi == -1 ? QString( "" ) : QString::number( poi ) );
+        item->setText( 0, QString::fromStdString( boost::posix_time::to_simple_string( prov_local_time ) ) );
+        item->setText( 1, QString::fromStdString( user_id ) );
         item->setText( 2, "Paint" );
-        if ( poi != -1 ) last_poi = poi;
+        item->setData( 0, Qt::UserRole, QVariant( QString::fromStdString( Core::ExportToString( poi ) ) ) );
+        item->setData( 0, Qt::UserRole + 1, QVariant( QString::fromStdString( action_params ) ) );
         
         ++i;
       }
@@ -152,9 +172,14 @@ void ProvenanceDockWidget::populate_provenance_list( ProvenanceTrailHandle prove
       else
       {
         this->private_->ui_.provenance_list_->addTopLevelItem( top_item );
-        top_item->setText( 0, QString::number( start_step ) + "-" + QString::number( i ) );
-        top_item->setText( 1, last_poi == -1 ? QString( "" ) : QString::number( last_poi ) );
-        top_item->setText( 2, "Paint" );
+        QFont font = top_item->font( 0 );
+        font.setBold( true );
+        top_item->setFont( 0, font );
+        top_item->setFont( 1, font );
+        top_item->setFont( 2, font );
+        top_item->setText( 0, QString::fromStdString( boost::posix_time::to_simple_string( prov_local_time ) ) );
+        top_item->setData( 0, Qt::UserRole, QVariant( QString::fromStdString( Core::ExportToString( poi ) ) ) );
+        top_item->setData( 0, Qt::UserRole + 1, QVariant( QString( "Various..." ) ) );
       }
     }
     else
@@ -163,6 +188,7 @@ void ProvenanceDockWidget::populate_provenance_list( ProvenanceTrailHandle prove
     }
   }
 
+  this->update_current_provenance_step();
   this->private_->ui_.provenance_list_->repaint();
 }
   
@@ -173,23 +199,36 @@ void ProvenanceDockWidget::connect_project()
   ProjectHandle current_project = ProjectManager::Instance()->get_current_project();
   if( !current_project ) return;
   
-  add_connection( current_project->provenance_record_signal_.
+  add_connection( current_project->provenance_trail_signal_.
     connect( boost::bind( &ProvenanceDockWidget::HandleProvenanceResult, 
     qpointer_type( this ), _1 ) ) );
 } 
 
-void ProvenanceDockWidget::enable_disable_replay_button()
+void ProvenanceDockWidget::update_current_provenance_step()
 {
   QTreeWidgetItem* current_item = this->private_->ui_.provenance_list_->currentItem();
+  QString timestamp_str, user_id, action_name, action_params, poi_text;
   if ( current_item != 0 )
   {
-    std::string poi_text = current_item->text( 1 ).toStdString();
-    ProvenanceID poi = -1;
-    if ( !poi_text.empty() )
-    {
-      Core::ImportFromString( poi_text, poi );
-    }
-    this->private_->ui_.replay_button_->setEnabled( poi >= 0 );
+    timestamp_str = current_item->text( 0 );
+    user_id = current_item->text( 1 );
+    action_name = current_item->text( 2 );
+    poi_text = current_item->data( 0, Qt::UserRole ).toString();
+    action_params = current_item->data( 0, Qt::UserRole + 1 ).toString();
+  }
+
+  this->private_->ui_.timestamp_label_->setText( timestamp_str );
+  this->private_->ui_.user_label_->setText( user_id );
+  this->private_->ui_.action_label_->setText( action_name );
+  this->private_->ui_.prov_ids_label_->setText( poi_text );
+  this->private_->ui_.action_params_->setText( action_params );
+
+  ProvenanceIDList poi;
+  if ( poi_text.size() > 0 &&
+    Core::ImportFromString( poi_text.toStdString(), poi ) &&
+    poi.size() > 0 )
+  {
+    this->private_->ui_.replay_button_->setEnabled( true );
   }
   else
   {
@@ -202,11 +241,11 @@ void ProvenanceDockWidget::dispatch_recreate_provenance()
   QTreeWidgetItem* current_item = this->private_->ui_.provenance_list_->currentItem();
   if ( current_item != 0 )
   {
-    std::string poi_text = current_item->text( 1 ).toStdString();
-    ProvenanceID poi = -1;
+    std::string poi_text = current_item->data( 0, Qt::UserRole ).toString().toStdString();
+    ProvenanceIDList poi;
     if ( !poi_text.empty() &&
       Core::ImportFromString( poi_text, poi ) &&
-      poi >= 0 )
+      poi.size() > 0 )
     {
       ActionRecreateLayer::Dispatch( Core::Interface::GetWidgetActionContext(), poi );
     }

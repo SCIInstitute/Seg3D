@@ -1382,7 +1382,7 @@ void LayerWidget::export_png()
 
 void LayerWidget::request_provenance()
 {
-  ProjectManager::Instance()->get_current_project()->request_provenance_record( 
+  ProjectManager::Instance()->get_current_project()->request_provenance_trail( 
     this->private_->layer_->provenance_id_state_->get() );
 }
 

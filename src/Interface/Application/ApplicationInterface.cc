@@ -188,7 +188,7 @@ ApplicationInterface::ApplicationInterface( std::string file_to_view_on_open ) :
   this->addDockWidget( Qt::LeftDockWidgetArea, this->private_->tools_dock_window_ );
 
   this->private_->provenance_dock_window_ = new ProvenanceDockWidget( this );
-  this->addDockWidget( Qt::RightDockWidgetArea, this->private_->provenance_dock_window_ );
+  this->addDockWidget( Qt::LeftDockWidgetArea, this->private_->provenance_dock_window_ );
 
   this->private_->layer_manager_dock_window_ = new LayerManagerDockWidget( this );
   this->addDockWidget( Qt::RightDockWidgetArea, this->private_->layer_manager_dock_window_ );

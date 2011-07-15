@@ -83,9 +83,9 @@ private:
   void connect_project();
 
 private Q_SLOTS:
-  // ENABLE_DISABLE_REPLAY_BUTTON:
-  // Enable or disable the 'Recreate' button based on the current selected row.
-  void enable_disable_replay_button();
+  // UPDATE_CURRENT_PROVENANCE_STEP:
+  // Update the detailed information when the current selected step has changed.
+  void update_current_provenance_step();
 
   // DISPATCH_RECREATE_PROVENANCE:
   // Dispatch an ActionRecreateLayer if the current selected row has a valid provenance ID of interest.

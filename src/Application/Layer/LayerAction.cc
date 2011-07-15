@@ -26,6 +26,10 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Core includes
+#include <Core/Utils/Exception.h>
+
+// Application includes
 #include <Application/Layer/Layer.h>
 #include <Application/Layer/LayerManager.h>
 #include <Application/Layer/LayerAction.h>
@@ -153,7 +157,7 @@ void LayerAction::generate_output_provenance_ids( size_t num_provenance_ids )
   }
 }
 
-std::string LayerAction::export_params_to_provenance_string() const
+std::string LayerAction::export_params_to_provenance_string( bool single_input ) const
 {
   std::string action_params;
 
@@ -168,13 +172,19 @@ std::string LayerAction::export_params_to_provenance_string() const
       if ( param->has_extension() )
       {
         LayerActionParameter* layer_param = static_cast< LayerActionParameter* >( param );
-        action_params += this->get_key( j ) + "=" + layer_param->export_to_provenance_string( input_count ) + " ";
+        action_params += this->get_key( j ) + "=" + layer_param->
+          export_to_provenance_string( input_count, single_input ) + " ";
       }
       else
       {
         action_params += this->get_key( j ) + "=" + param->export_to_string() + " ";
       }
     }
+  }
+
+  if ( single_input && input_count > 1 )
+  {
+    CORE_THROW_LOGICERROR( "Action can not be split." );
   }
 
   // Return the command

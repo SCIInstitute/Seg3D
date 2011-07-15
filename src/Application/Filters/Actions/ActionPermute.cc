@@ -376,7 +376,7 @@ bool ActionPermute::run( Core::ActionContextHandle& context,
   }
 
   // Build the undo-redo record
-  algo->create_undo_redo_and_provenance_record( context, this->shared_from_this() );
+  algo->create_undo_redo_and_provenance_record( context, this->shared_from_this(), true );
     
   // Start the filter.
   Core::Runnable::Start( algo );

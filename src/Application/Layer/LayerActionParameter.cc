@@ -93,7 +93,8 @@ bool LayerActionLayerID::translate_provenance( ProvenanceIDList& input_provenanc
   } 
 }
 
-std::string LayerActionLayerID::export_to_provenance_string( size_t& input_counter ) const
+std::string LayerActionLayerID::export_to_provenance_string( 
+  size_t& input_counter, bool single_input ) const
 {
   if ( this->layer_id_ == "" || this->layer_id_ == "<none>" )
   {
@@ -154,7 +155,8 @@ bool LayerActionGroupID::translate_provenance( ProvenanceIDList& input_provenanc
   } 
 }
 
-std::string LayerActionGroupID::export_to_provenance_string( size_t& input_counter ) const
+std::string LayerActionGroupID::export_to_provenance_string(
+  size_t& input_counter, bool single_input ) const
 {
   if ( this->group_id_ == "" || this->group_id_ == "<none>" )
   {
@@ -214,23 +216,31 @@ bool LayerActionLayerIDList::translate_provenance( ProvenanceIDList& input_prove
   return true;
 }
 
-std::string LayerActionLayerIDList::export_to_provenance_string( size_t& input_counter ) const
+std::string LayerActionLayerIDList::export_to_provenance_string( 
+  size_t& input_counter, bool single_input ) const
 {
   size_t num_ids = this->layer_id_list_.size();
   assert( num_ids > 0 );
   std::string str = "[";
-  for ( size_t i = 0; i < num_ids; ++i )
+  if ( single_input )
   {
-    if ( this->layer_id_list_[ i ] == "" || this->layer_id_list_[ i ] == "<none>" )
-    {
-      str += "'<none>',";
-    }
-    else
-    {
-      str += "${" + Core::ExportToString( input_counter++ ) + "},";
-    }
+    str += "${" + Core::ExportToString( input_counter++ ) + "}]";
   }
-  str[ str.size() - 1 ] = ']' ;
+  else
+  {
+    for ( size_t i = 0; i < num_ids; ++i )
+    {
+      if ( this->layer_id_list_[ i ] == "" || this->layer_id_list_[ i ] == "<none>" )
+      {
+        str += "'<none>',";
+      }
+      else
+      {
+        str += "${" + Core::ExportToString( input_counter++ ) + "},";
+      }
+    }
+    str[ str.size() - 1 ] = ']' ;
+  }
 
   return str;
 }

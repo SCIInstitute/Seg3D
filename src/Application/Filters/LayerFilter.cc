@@ -126,7 +126,7 @@ public:
   ProvenanceStepHandle provenance_step_;
 
   // Record ID of the provenance step.
-  ProvenanceStepID provenance_step_id_;
+  std::vector< ProvenanceStepID > prov_step_ids_;
 
   // A weak handle to the LayerUndoBufferItem. It's used to rollback any changes
   // that might have already happened when the filter is aborted.
@@ -162,7 +162,8 @@ public:
 
   // CREATE_PROVENANCE_RECORD:
   // Create a provenance record and add it to the provenance database
-  void create_provenance_record( Core::ActionContextHandle context, Core::ActionHandle action );
+  void create_provenance_record( Core::ActionContextHandle context, 
+    Core::ActionHandle action, bool split_prov );
 };
 
 bool LayerFilterPrivate::delete_layer( LayerHandle layer )
@@ -352,7 +353,7 @@ void LayerFilterPrivate::create_undo_redo_record( Core::ActionContextHandle cont
   item->add_id_count_to_restore( this->id_count_ );
 
   // Set the provenance step ID 
-  item->set_provenance_step_id( this->provenance_step_id_ );
+  item->set_provenance_step_ids( this->prov_step_ids_ );
 
   // Insert the record into the undo buffer
   UndoBuffer::Instance()->insert_undo_item( context, item );
@@ -362,7 +363,7 @@ void LayerFilterPrivate::create_undo_redo_record( Core::ActionContextHandle cont
 }
 
 void LayerFilterPrivate::create_provenance_record( Core::ActionContextHandle context, 
-                          Core::ActionHandle action )
+                          Core::ActionHandle action, bool split_prov )
 {
   // Provenance is only recorded for LayerActions
   LayerAction* layer_action = dynamic_cast< LayerAction* >( action.get() ); 
@@ -417,22 +418,62 @@ void LayerFilterPrivate::create_provenance_record( Core::ActionContextHandle con
     }
   }
 
-  // Create a provenance record
-  this->provenance_step_ = ProvenanceStepHandle( new ProvenanceStep );
-  // Get the input provenance ids from the translate step
-  this->provenance_step_->set_input_provenance_ids( 
-    layer_action->get_input_provenance_ids() );
-  // Get the output and replace provenance ids from the analysis above
-  this->provenance_step_->set_output_provenance_ids( output_provenance_ids );
-  this->provenance_step_->set_replaced_provenance_ids( deleted_provenance_ids );
+  ProvenanceIDList input_provenance_ids = layer_action->get_input_provenance_ids();
 
-  // Get the input command of what needs t be rerun
-  this->provenance_step_->set_action_name( layer_action->get_type() );
-  this->provenance_step_->set_action_params( 
-    layer_action->export_params_to_provenance_string() );
+  if ( split_prov )
+  {
+    size_t num_inputs = input_provenance_ids.size();
+    if ( num_inputs != output_provenance_ids.size() )
+    {
+      CORE_THROW_LOGICERROR( "Can't split provenance because the number of inputs"
+        " doesn't match the number of outputs." );
+    }
 
-  this->provenance_step_id_ = ProjectManager::Instance()->get_current_project()->
-    add_provenance_record( this->provenance_step_ );
+    if ( deleted_provenance_ids.size() > 0 && deleted_provenance_ids.size() != num_inputs )
+    {
+      CORE_THROW_LOGICERROR( "Can't split provenance because the number of replaced IDs"
+        " doesn't match the number of inputs." );
+    }
+    
+    this->prov_step_ids_.resize( num_inputs );
+    for ( size_t i = 0; i < num_inputs; ++i )
+    {
+      this->provenance_step_.reset( new ProvenanceStep );
+
+      this->provenance_step_->set_input_provenance_ids( ProvenanceIDList( 1, input_provenance_ids[ i ] ) );
+      this->provenance_step_->set_output_provenance_ids( ProvenanceIDList( 1, output_provenance_ids[ i ] ) );
+      if ( deleted_provenance_ids.size() > 0 )
+      {
+        this->provenance_step_->set_replaced_provenance_ids( ProvenanceIDList( 1, deleted_provenance_ids[ i ] ) );
+      }
+      // Get the input command of what needs t be rerun
+      this->provenance_step_->set_action_name( layer_action->get_type() );
+      this->provenance_step_->set_action_params( 
+        layer_action->export_params_to_provenance_string( true ) );
+
+      this->prov_step_ids_[ i ] = ProjectManager::Instance()->get_current_project()->
+        add_provenance_record( this->provenance_step_ );
+    }
+  }
+  else
+  {
+    // Create a provenance record
+    this->provenance_step_ = ProvenanceStepHandle( new ProvenanceStep );
+    // Get the input provenance ids from the translate step
+    this->provenance_step_->set_input_provenance_ids( 
+      layer_action->get_input_provenance_ids() );
+    // Get the output and replace provenance ids from the analysis above
+    this->provenance_step_->set_output_provenance_ids( output_provenance_ids );
+    this->provenance_step_->set_replaced_provenance_ids( deleted_provenance_ids );
+
+    // Get the input command of what needs t be rerun
+    this->provenance_step_->set_action_name( layer_action->get_type() );
+    this->provenance_step_->set_action_params( 
+      layer_action->export_params_to_provenance_string() );
+
+    this->prov_step_ids_.push_back( ProjectManager::Instance()->get_current_project()->
+      add_provenance_record( this->provenance_step_ ) );
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -443,7 +484,6 @@ LayerFilter::LayerFilter() :
   private_( new LayerFilterPrivate )
 {
   this->private_->filter_ = this;
-  this->private_->provenance_step_id_ = -1;
   this->private_->notifier_.reset( new LayerFilterNotifier( "Layer Filter" ) );
 }
 
@@ -908,14 +948,14 @@ Layer::filter_key_type LayerFilter::get_key() const
 
 
 void LayerFilter::create_undo_redo_and_provenance_record( 
-  Core::ActionContextHandle context, Core::ActionHandle action )
+  Core::ActionContextHandle context, Core::ActionHandle action, bool split_prov )
 {
   // NOTE: Create the provenance record first, as the provenance step ID
   // is needed by the undo/redo record.
   // Only create the records when not in a sandbox
   if ( this->private_->sandbox_ == -1 )
   {
-    this->private_->create_provenance_record( context, action );
+    this->private_->create_provenance_record( context, action, split_prov );
     this->private_->create_undo_redo_record( context, action );
   }
 }
@@ -926,12 +966,18 @@ bool LayerFilter::update_provenance_action_string( Core::ActionHandle action )
   LayerAction* layer_action = dynamic_cast<LayerAction*>( action.get() ); 
   if ( ! layer_action ) return false;
 
+  if ( this->private_->prov_step_ids_.size() > 1 )
+  {
+    CORE_THROW_LOGICERROR( "Can not split the provenance of an action that needs"
+      " dynamic parameter update." );
+  }
+  
   if ( this->private_->sandbox_ == -1 )
   {
     this->private_->provenance_step_->set_action_params( 
       layer_action->export_params_to_provenance_string() );
     ProjectManager::Instance()->get_current_project()->update_provenance_record( 
-      this->private_->provenance_step_id_, this->private_->provenance_step_ );
+      this->private_->prov_step_ids_[ 0 ], this->private_->provenance_step_ );
   }
   
   return true;

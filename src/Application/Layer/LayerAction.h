@@ -113,7 +113,7 @@ public:
   // EXPORT_PARAMS_TO_PROVENANCE_STRING:
   // Export the action parameters to a string and mark the provenance inputs
   // with special placeholders.
-  std::string export_params_to_provenance_string() const;
+  std::string export_params_to_provenance_string( bool single_input = false ) const;
   
   // -- internals --
 private:  

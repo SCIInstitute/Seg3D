@@ -90,6 +90,10 @@ public:
   // Set the provenance record ID associated with the action.
   void set_provenance_step_id( ProvenanceStepID step_id );
 
+  // SET_PROVENANCE_STEP_IDS:
+  // Set the provenance record ID associated with the action.
+  void set_provenance_step_ids( const std::vector< ProvenanceStepID >& step_ids );
+
   // ROLLBACK_LAYER_CHANGES:
   // Abort corresponding filters (if any) and rollback all the layer changes.
   // NOTE: This function should only be called by LayerFilter when aborted by the user.
