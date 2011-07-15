@@ -69,22 +69,26 @@ namespace Seg3D
 
 class ActionResamplePrivate
 {
+  // -- action parameters --
 public:
   std::vector< std::string > layer_ids_;
   int x_;
   int y_;
   int z_;
+  bool crop_;
+  Core::Point range_min_;
+  Core::Point range_max_;
+  std::string padding_;
   std::string kernel_;
   double param1_;
   double param2_;
   bool replace_;
   SandboxID sandbox_;
 
+  // -- internal variables --
+public:
+  bool match_grid_transform_;
   Core::GridTransform grid_transform_;
-  bool resample_to_grid_;
-  bool resample_to_layer_;
-  std::string dst_layer_id_;
-  std::string padding_;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -102,9 +106,9 @@ public:
   std::vector< LayerHandle > dst_layers_;
   bool replace_;
   unsigned int dimesions_[ 3 ];
-  double range_min_[ 3 ];
-  double range_max_[ 3 ];
-  bool resample_to_grid_;
+  bool crop_; // Whether to use a different dataset boundary than the original
+  Core::Point range_min_; // resample range in index space of the input data
+  Core::Point range_max_; // resample range in index space of the input data
   std::string padding_;
 
   bool padding_only_;
@@ -130,23 +134,41 @@ public:
   ResampleAlgo( const std::string& kernel, double param1, double param2 );
   virtual ~ResampleAlgo();
 
-  bool compute_output_grid_transform( LayerHandle layer, NrrdResampleContext* resample_context, Core::GridTransform& grid_transform );
+  // COMPUTE_OUTPUT_GRID_TRANSFORM:
+  // Compute the output grid transform of the input layer.
+  bool compute_output_grid_transform( LayerHandle layer, NrrdResampleContext* resample_context,
+    Core::GridTransform& grid_transform );
 
+  // DETECT_PADDING_ONLY:
+  // Detect cases where sample positions are not changed so we only need to do padding/cropping.
   void detect_padding_only();
 
+  // NRRD_RESAMPLE:
+  // Resample the nrrd data.
   bool nrrd_resample( Nrrd* nin, Nrrd* nout, NrrdKernelSpec* unuk );
+
+  // RESAMPLE_DATA_LAYER:
+  // Resample a  data layer.
   void resample_data_layer( DataLayerHandle input, DataLayerHandle output );
+
+  // RESAMPLE_MASK_LAYER:
+  // Resample a mask layer.
   void resample_mask_layer( MaskLayerHandle input, MaskLayerHandle output );
 
+  // PAD_AND_CROP_DATA_LAYER:
+  // Pad/crop data layer for cases where sample positions are not changed.
   void pad_and_crop_data_layer( DataLayerHandle input, DataLayerHandle output );
   
+  // PAD_AND_CROP_TYPED_DATA:
+  // Templated implementation for pad_and_crop_data_layer.
   template< class T >
   void pad_and_crop_typed_data( Core::DataBlockHandle src, Core::DataBlockHandle dst,
                  DataLayerHandle output_layer );
   
+  // PAD_AND_CROP_MASK_LAYER:
+  // Pad/crop mask layer for cases where sample positions are not changed.
   void pad_and_crop_mask_layer( MaskLayerHandle input, MaskLayerHandle output );
   
-
   // RUN_FILTER:
   // Implementation of run of the Runnable base class, this function is called 
   // when the thread is launched.
@@ -339,7 +361,15 @@ bool ResampleAlgo::compute_output_grid_transform( LayerHandle layer,
     error |= nrrdResampleKernelSet( resample_context, axis, 
       this->mask_kernel_->kernel, this->mask_kernel_->parm );
     error |= nrrdResampleSamplesSet( resample_context, axis, this->dimesions_[ axis ] );
-    error |= nrrdResampleRangeFullSet( resample_context, axis );
+    if ( this->crop_ )
+    {
+      error |= nrrdResampleRangeSet( resample_context, axis, 
+        this->range_min_[ axis ], this->range_max_[ axis ] );
+    }
+    else
+    {
+      error |= nrrdResampleRangeFullSet( resample_context, axis );
+    }
   }
   
   if ( error 
@@ -377,7 +407,7 @@ bool ResampleAlgo::nrrd_resample( Nrrd* nin, Nrrd* nout, NrrdKernelSpec* unuk )
       unuk->parm );
     error |= nrrdResampleSamplesSet( this->current_resample_context_, axis, 
       this->dimesions_[ axis ] );
-    if ( this->resample_to_grid_ )
+    if ( this->crop_ )
     {
       error |= nrrdResampleRangeSet( this->current_resample_context_, axis, 
         this->range_min_[ axis ], this->range_max_[ axis ] );
@@ -412,7 +442,7 @@ void ResampleAlgo::resample_data_layer( DataLayerHandle input, DataLayerHandle o
     input->get_data_volume()->get_data_block(),
     input->get_grid_transform() ) );
   Nrrd* nrrd_out = nrrdNew();
-  if ( this->resample_to_grid_ )
+  if ( this->crop_ )
   {
     if ( this->padding_ == ActionResample::ZERO_C )
     {
@@ -469,7 +499,7 @@ void ResampleAlgo::resample_mask_layer( MaskLayerHandle input, MaskLayerHandle o
   Core::NrrdDataHandle nrrd_in( new Core::NrrdData( input_data_block,
     input->get_grid_transform() ) );
   Nrrd* nrrd_out = nrrdNew();
-  if ( this->resample_to_grid_ )
+  if ( this->crop_ )
   {
     // Pad the mask layer with 0
     nrrdResamplePadValueSet( this->current_resample_context_, 0.0 );
@@ -514,7 +544,7 @@ void ResampleAlgo::run_filter()
     this->current_output_transform_ = this->output_transforms_[ i ];
     this->current_resample_context_ = this->resample_contexts_[ i ];
     
-    if ( this->resample_to_grid_ )
+    if ( this->crop_ )
     {
       this->detect_padding_only();
       nrrdResampleBoundarySet( this->current_resample_context_, nrrdBoundaryPad );
@@ -940,14 +970,17 @@ ActionResample::ActionResample() :
   this->add_parameter( this->private_->x_ );
   this->add_parameter( this->private_->y_ );
   this->add_parameter( this->private_->z_ );
+  this->add_parameter( this->private_->crop_ );
+  this->add_parameter( this->private_->range_min_ );
+  this->add_parameter( this->private_->range_max_ );
+  this->add_parameter( this->private_->padding_ );
   this->add_parameter( this->private_->kernel_ );
   this->add_parameter( this->private_->param1_ );
   this->add_parameter( this->private_->param2_ );
   this->add_parameter( this->private_->replace_ );
   this->add_parameter( this->private_->sandbox_ );
 
-  this->private_->resample_to_grid_ = false;
-  this->private_->resample_to_layer_ = false;
+  this->private_->match_grid_transform_ = false;
 }
 
 bool ActionResample::validate( Core::ActionContextHandle& context )
@@ -976,40 +1009,49 @@ bool ActionResample::validate( Core::ActionContextHandle& context )
       this->private_->replace_, context, this->private_->sandbox_ ) ) return false;
   }
 
-  if ( this->private_->resample_to_layer_ )
+  if ( this->private_->x_ < 1 ||
+    this->private_->y_ < 1 ||
+    this->private_->z_ < 1 )
   {
-    LayerHandle layer = LayerManager::FindLayer( 
-      this->private_->dst_layer_id_, this->private_->sandbox_ );
-    if ( !layer )
-    {
-      context->report_error( "Invalid drop target" );
-      return false;
-    }
-    Core::GridTransform grid_trans = layer->get_grid_transform();
-    this->private_->x_ = static_cast< int >( grid_trans.get_nx() );
-    this->private_->y_ = static_cast< int >( grid_trans.get_ny() );
-    this->private_->z_ = static_cast< int >( grid_trans.get_nz() );
-    this->private_->grid_transform_ = grid_trans;
+    context->report_error( "Invalid resample size" );
+    return false;
+  }
+
+  if ( this->private_->match_grid_transform_ )
+  {
+    this->private_->crop_ = true;
+
+    // Compute the boundary of the new grid transform in world space
+    // NOTE: If the destination grid is cell centered, the actual range of the grid should be
+    // extended by half a voxel in each direction
+    double offset = this->private_->grid_transform_.get_originally_node_centered() ? 0.0 : 0.5;
+    Core::Point start( -offset, -offset, -offset );
+    Core::Point end( this->private_->x_ - 1 + offset, this->private_->y_ - 1 + offset, this->private_->z_ - 1 + offset );
+    this->private_->range_min_ = this->private_->grid_transform_ * start;
+    this->private_->range_max_ = this->private_->grid_transform_ * end;
+
+    // Compute the resample range relative to the input in index space
+    LayerHandle layer = LayerManager::FindLayer( layer_ids[ 0 ] );
+    Core::Transform inverse_src_trans = layer->get_grid_transform().get_inverse();
+    this->private_->range_min_ = inverse_src_trans * this->private_->range_min_;
+    this->private_->range_max_ = inverse_src_trans * this->private_->range_max_;
   }
   
-  if ( this->private_->resample_to_grid_ || 
-    this->private_->resample_to_layer_ )
+  if ( this->private_->crop_ )
   {
+    if ( this->private_->range_max_[ 0 ] <= this->private_->range_min_[ 0 ] ||
+      this->private_->range_max_[ 1 ] <= this->private_->range_min_[ 1 ] ||
+      this->private_->range_max_[ 2 ] <= this->private_->range_min_[ 2 ] )
+    {
+      context->report_error( "Invalid resample range." );
+      return false;
+    }
+    
     if ( this->private_->padding_ != ZERO_C &&
       this->private_->padding_ != MIN_C &&
       this->private_->padding_ != MAX_C )
     {
       context->report_error( "Unknown padding option" );
-      return false;
-    }
-  }
-  else
-  {
-    if ( this->private_->x_ < 1 ||
-      this->private_->y_ < 1 ||
-      this->private_->z_ < 1 )
-    {
-      context->report_error( "Invalid resample size" );
       return false;
     }
   }
@@ -1037,17 +1079,18 @@ bool ActionResample::run( Core::ActionContextHandle& context,
     this->private_->param1_, this->private_->param2_ ) );
 
   // Set up parameters
+  algo->set_sandbox( this->private_->sandbox_ );
   algo->replace_ = this->private_->replace_;
   algo->dimesions_[ 0 ] = static_cast< unsigned int >( this->private_->x_ );
   algo->dimesions_[ 1 ] = static_cast< unsigned int >( this->private_->y_ );
   algo->dimesions_[ 2 ] = static_cast< unsigned int >( this->private_->z_ );
-  algo->resample_to_grid_ = this->private_->resample_to_grid_ || 
-    this->private_->resample_to_layer_;
+  algo->crop_ = this->private_->crop_;
+  algo->range_min_ = this->private_->range_min_;
+  algo->range_max_ = this->private_->range_max_;
   algo->padding_ = this->private_->padding_;
-  algo->set_sandbox( this->private_->sandbox_ );
 
   const std::vector< std::string >& layer_ids = this->private_->layer_ids_;
-  
+
   // Set up input and output layers
   size_t num_of_layers = layer_ids.size();
   algo->src_layers_.resize( num_of_layers );
@@ -1071,11 +1114,11 @@ bool ActionResample::run( Core::ActionContextHandle& context,
     algo->resample_contexts_[ i ] = nrrdResampleContextNew();
     algo->resample_contexts_[ i ]->verbose = 0;
     nrrdResampleDefaultCenterSet( algo->resample_contexts_[ i ], nrrdCenterCell );
-    if ( this->private_->resample_to_grid_ || this->private_->resample_to_layer_ )
+    if ( this->private_->match_grid_transform_ )
     {
       algo->output_transforms_[ i ] = this->private_->grid_transform_;
-      algo->output_transforms_[ i ].set_originally_node_centered( 
-        algo->src_layers_[ i ]->get_grid_transform().get_originally_node_centered() );
+      algo->output_transforms_[ i ].set_originally_node_centered( algo->src_layers_[ i ]->
+        get_grid_transform().get_originally_node_centered() );
     }
     else
     {
@@ -1106,31 +1149,6 @@ bool ActionResample::run( Core::ActionContextHandle& context,
     }
     
     dst_layer_ids[ i ] = algo->dst_layers_[ i ]->get_layer_id();
-  }
-
-  // Compute resample ranges if resampling to a given grid
-  if ( this->private_->resample_to_grid_ || this->private_->resample_to_layer_ )
-  {
-    Core::Transform inverse_src_trans = algo->src_layers_[ 0 ]->
-      get_grid_transform().get_inverse();
-    // Compute the range of the destination grid in world space
-    // NOTE: If the destination grid is cell centered, the actual range of the grid should be
-    // extended by half a voxel in each direction
-    double offset = this->private_->grid_transform_.get_originally_node_centered() ? 0.0 : 0.5;
-    Core::Point start( -offset, -offset, -offset );
-    Core::Point end( algo->dimesions_[ 0 ] - 1 + offset, algo->dimesions_[ 1 ] - 1 + offset, 
-      algo->dimesions_[ 2 ] - 1 + offset );
-    start = this->private_->grid_transform_ * start;
-    end = this->private_->grid_transform_ * end;
-
-    // Compute the resample range relative to the input in index space
-    start = inverse_src_trans * start;
-    end = inverse_src_trans * end;
-    for ( int i = 0; i < 3; ++i )
-    {
-      algo->range_min_[ i ] = start[ i ];
-      algo->range_max_[ i ] = end[ i ];
-    }
   }
 
   // Return the ids of the destination layer.
@@ -1177,17 +1195,19 @@ void ActionResample::Dispatch( Core::ActionContextHandle context,
                 double param1, double param2, bool replace )
 {
   ActionResample* action = new ActionResample;
+
   action->private_->layer_ids_ = layer_ids;
-  action->private_->grid_transform_ = grid_trans;
-  action->private_->resample_to_grid_ = true;
-  action->private_->padding_ = padding;
-  
   int nx = static_cast< int >( grid_trans.get_nx() );
   int ny = static_cast< int >( grid_trans.get_ny() );
   int nz = static_cast< int >( grid_trans.get_nz() );
   action->private_->x_ = nx;
   action->private_->y_ = ny;
   action->private_->z_ = nz;
+  action->private_->crop_ = true;
+  action->private_->padding_ = padding;
+
+  action->private_->match_grid_transform_ = true;
+  action->private_->grid_transform_ = grid_trans;
 
   action->private_->kernel_ = kernel;
   action->private_->param1_ = param1;
@@ -1202,21 +1222,13 @@ void ActionResample::Dispatch( Core::ActionContextHandle context,
                 const std::string& padding, const std::string& kernel, 
                 double param1, double param2, bool replace )
 {
-  ActionResample* action = new ActionResample;
-
-  std::vector< std::string > layer_ids( 1, src_layer );
-  action->private_->layer_ids_ = layer_ids;
-  action->private_->dst_layer_id_ = dst_layer;
-  action->private_->resample_to_layer_ = true;
-
-  action->private_->padding_ = padding;
-
-  action->private_->kernel_ = kernel;
-  action->private_->param1_ = param1;
-  action->private_->param2_ = param2;
-  action->private_->replace_ = replace;
-
-  Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
+  LayerHandle layer = LayerManager::FindLayer( dst_layer );
+  if ( layer )
+  {
+    std::vector< std::string > layer_ids( 1, src_layer );
+    ActionResample::Dispatch( context, layer_ids, layer->get_grid_transform(),
+      padding, kernel, param1, param2, replace );
+  }
 }
 
 } // end namespace Seg3D
