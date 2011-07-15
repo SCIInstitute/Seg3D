@@ -45,7 +45,7 @@ class ActionHistogramEqualizationFilter : public LayerAction
 {
 
 CORE_ACTION( 
-  CORE_ACTION_TYPE( "HistogramEqualization", "Teem filter equalizes the histogram of the data." )
+  CORE_ACTION_TYPE( "HistogramEqualizationFilter", "Teem filter equalizes the histogram of the data." )
   CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "replace", "true", "Replace the old layer (true), or add an new layer (false)" )
   CORE_ACTION_OPTIONAL_ARGUMENT( "amount", "1.0", "Amount of equalization (between 0.0 and 1.0)." )

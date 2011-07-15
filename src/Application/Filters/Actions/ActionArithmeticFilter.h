@@ -45,7 +45,7 @@ class ActionArithmeticFilter : public LayerAction
 {
 
 CORE_ACTION( 
-  CORE_ACTION_TYPE( "Arithmetic", "Apply boolean/arithmetic expressions to input layers." )
+  CORE_ACTION_TYPE( "ArithmeticFilter", "Apply boolean/arithmetic expressions to input layers." )
   CORE_ACTION_ARGUMENT( "layerids", "The layerids on which this tool needs to be run." )
   CORE_ACTION_ARGUMENT( "expressions", "The expressions" )
   CORE_ACTION_ARGUMENT( "output_type",  "The type of the output layer" )

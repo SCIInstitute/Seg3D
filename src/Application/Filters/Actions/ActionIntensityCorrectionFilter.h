@@ -45,7 +45,7 @@ class ActionIntensityCorrectionFilter : public LayerAction
 {
 
 CORE_ACTION( 
-  CORE_ACTION_TYPE( "IntensityCorrection", "Correct for small gradients in intensity, "
+  CORE_ACTION_TYPE( "IntensityCorrectionFilter", "Correct for small gradients in intensity, "
     "due for instance, an inhomogenous sensitivity of image recording systems, such as MRI." )
   CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "preserve_data_format", "true", "ITK filters run in floating point percision,"
