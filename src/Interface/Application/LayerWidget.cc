@@ -187,10 +187,6 @@ public:
   // UPDATEPROGRESS:
   // Update the progress bar 
   static void UpdateProgress( qpointer_type qpointer, double progress );
-
-  // REQUESTPROVENANCE:
-  // Request provenance trail
-  static void RequestProvenance( qpointer_type qpointer );
 };
 
 LayerWidgetPrivate::~LayerWidgetPrivate()
@@ -509,23 +505,6 @@ void LayerWidgetPrivate::UpdateProgress( qpointer_type qpointer, double progress
   }
 }
 
-void LayerWidgetPrivate::RequestProvenance( qpointer_type qpointer )
-{
-  // Hand it off to the right thread
-  if( !( Core::Interface::IsInterfaceThread() ) )
-  {
-    Core::Interface::Instance()->post_event( boost::bind( 
-      &LayerWidgetPrivate::RequestProvenance,   qpointer ) );
-    return; 
-  }
-
-  // When we are finally on the interface thread run this code:
-  if ( qpointer.data() && !QCoreApplication::closingDown() )
-  {
-    qpointer->parent_->request_provenance();
-  }
-}
-
 //////////////////////////////////////////////////////////////////////////
 // Class LayerWidget
 //////////////////////////////////////////////////////////////////////////
@@ -770,9 +749,6 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
       layer->show_opacity_state_ );
     QtUtils::QtBridge::Show( this->private_->ui_.opacity_bar_,
       layer->show_opacity_state_ );
-
-    QtUtils::QtBridge::Connect( this->private_->ui_.provenance_button_,
-      boost::bind( &LayerWidgetPrivate::RequestProvenance, qpointer ) );
 
     // Compute isosurface button is enabled when the layer is not locked and is available
     QtUtils::QtBridge::Enable( this->private_->ui_.compute_iso_surface_button_, enable_states,
@@ -1304,9 +1280,6 @@ void LayerWidget::contextMenuEvent( QContextMenuEvent * event )
     connect( qaction, SIGNAL( triggered() ), this, SLOT( delete_layer_from_context_menu() ) );
   }
   
-  qaction = menu.addAction( tr( "Show Provenance" ) );
-  connect( qaction, SIGNAL( triggered() ), this, SLOT( request_provenance() ) );
-
   QMenu* export_menu;
   export_menu = new QMenu( this );
   if( this->private_->layer_->get_type() == Core::VolumeType::DATA_E )
@@ -1378,12 +1351,6 @@ void LayerWidget::export_bitmap()
 void LayerWidget::export_png()
 {
   this->private_->export_layer( ".png" );
-}
-
-void LayerWidget::request_provenance()
-{
-  ProjectManager::Instance()->get_current_project()->request_provenance_trail( 
-    this->private_->layer_->provenance_id_state_->get() );
 }
 
 } //end namespace Seg3D

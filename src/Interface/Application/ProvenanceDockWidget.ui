@@ -223,7 +223,7 @@ QWidget#provenance_list_{
               <number>2</number>
              </property>
              <item>
-              <widget class="QGroupBox" name="groupBox">
+              <widget class="QGroupBox" name="step_detail_groupbox_">
                <property name="title">
                 <string>Provenance Step Detail</string>
                </property>

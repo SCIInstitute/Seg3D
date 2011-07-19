@@ -449,7 +449,8 @@ void PythonInterpreter::run_script( std::string script )
   }
 
   // Output the script to the console
-  this->output_signal_( "Running script ...\n" + script + "\n" );
+  //this->output_signal_( "Running script ...\n" + script + "\n" );
+  this->output_signal_( "Running script ...\n" );
 
   // Clear any previous Python errors.
   PyErr_Clear();

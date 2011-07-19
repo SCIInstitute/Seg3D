@@ -159,6 +159,10 @@ public:
   typedef boost::signals2::signal< void( ProvenanceTrailHandle ) > provenance_trail_signal_type;
   provenance_trail_signal_type provenance_trail_signal_;
 
+  // PROJECT_DATA_CHANGED_SIGNAL:
+  // Triggered when the project data has changed.
+  boost::signals2::signal< void () > project_data_changed_signal_;
+
 public:
   // SAVE_PROJECT:
   // This function will save the current project in the designated path
@@ -261,12 +265,6 @@ protected:
   
   // -- functions for keeping track of whether project still needs to be saved --
 public:
-  // SET_PROJECT_CHANGED:
-  // Set that the session has been modified
-  // NOTE: It needs the same signature of the ActionDispatcher
-  // NOTE: This function can only can called from the application thread.
-  void set_project_changed( Core::ActionHandle action, Core::ActionResultHandle result );
-
   // RESET_PROJECT_CHANGED:
   // Reset the flag that remembers that a session has changed
   // NOTE: This is called by saving a session.

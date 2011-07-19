@@ -973,4 +973,12 @@ const QString StyleSheet::LAYERIO_C = QString::fromUtf8(
 "}"
 );
 
+const QString StyleSheet::PROVENANCE_LIST_HEADER_C = QString::fromUtf8(
+  "QWidget#header_bkg_{"
+  " background-color: " ACCENT_COLOR ";"
+  " border-radius: 3px;"
+  " border: 1px solid rgb(100, 100, 100);"
+  "}"
+);
+
 }  // end namespace Seg3D

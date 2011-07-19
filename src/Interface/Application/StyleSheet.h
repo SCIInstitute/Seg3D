@@ -133,6 +133,9 @@ public:
 
     const static QString RENDERING_VR_ACTIVE_C;
     const static QString RENDERING_VR_INACTIVE_C;   
+
+  // == ProvenanceDockWidget == //
+    const static QString PROVENANCE_LIST_HEADER_C;
     
     const static QString LAYERIO_C;
     

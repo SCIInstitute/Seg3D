@@ -29,24 +29,6 @@
 #ifndef INTERFACE_APPLICATION_PROVENANCEDOCKWIDGET_H
 #define INTERFACE_APPLICATION_PROVENANCEDOCKWIDGET_H
 
-// QT includes
-#include <QtCore/QPointer>
-
-// STL includes
-#include <string>
-
-// Boost includes
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/thread.hpp>
-#include <boost/shared_ptr.hpp>
-
-// Core includes
-#include <Core/Utils/ConnectionHandler.h>
-
-// Application includes
-#include <Application/Project/Project.h>
-#include <Application/Provenance/Provenance.h>
-
 // QtUtils includes
 #include <QtUtils/Widgets/QtCustomDockWidget.h>
 
@@ -55,32 +37,13 @@ namespace Seg3D
   
 class ProvenanceDockWidgetPrivate;
 
-class ProvenanceDockWidget : public QtUtils::QtCustomDockWidget, public Core::ConnectionHandler
+class ProvenanceDockWidget : public QtUtils::QtCustomDockWidget
 {
   Q_OBJECT
   
 public:
   ProvenanceDockWidget( QWidget *parent = 0 );
   virtual ~ProvenanceDockWidget();
-  
-private:
-  typedef QPointer< ProvenanceDockWidget > qpointer_type;
-
-  // HANDLEPROVENANCERESULT:
-  // A function that handles the signal that contains the provenance of a particular layer.
-  static void HandleProvenanceResult( qpointer_type qpointer, ProvenanceTrailHandle provenance_trail );
-  
-  // HANDLEPROJECTCHANGED:
-  // A function that handles reconnecting the provenance dock widget to the current project when it has changed
-  static void HandleProjectChanged( qpointer_type qpointer );
-  
-  // POPULATE_PROVENANCE_LIST:
-  // this handles the actual updating of the ui
-  void populate_provenance_list( ProvenanceTrailHandle provenance_trail );
-  
-  // CONNECT_PROJECT:
-  // this function does the actual reconnecting
-  void connect_project();
 
 private Q_SLOTS:
   // UPDATE_CURRENT_PROVENANCE_STEP:
@@ -91,8 +54,13 @@ private Q_SLOTS:
   // Dispatch an ActionRecreateLayer if the current selected row has a valid provenance ID of interest.
   void dispatch_recreate_provenance();
 
+  // REFRESH_PROVENANCE_TRAIL:
+  // Request the up-to-date provenance trail of the current active layer.
+  void refresh_provenance_trail();
+
 private:
-  boost::shared_ptr< ProvenanceDockWidgetPrivate > private_;
+  friend class ProvenanceDockWidgetPrivate;
+  ProvenanceDockWidgetPrivate* private_;
 };
   
 } // end namespace Seg3D

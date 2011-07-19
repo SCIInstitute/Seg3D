@@ -194,10 +194,6 @@ private Q_SLOTS:
   // dispatches an action that exports the layer as a png
   void export_png();
 
-  // REQUEST_PROVENANCE:
-  // gets the provenance
-  void request_provenance();
-
 private:
   friend class LayerWidgetPrivate;
   LayerWidgetPrivate* private_; 

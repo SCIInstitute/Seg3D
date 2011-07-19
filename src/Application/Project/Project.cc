@@ -203,6 +203,12 @@ public:
   // Get a list of all project notes.
   bool get_all_notes( ProjectNoteList& notes );
 
+  // SET_PROJECT_CHANGED:
+  // Set that the session has been modified
+  // NOTE: It needs the same signature of the ActionDispatcher
+  // NOTE: This function can only can called from the application thread.
+  void set_project_changed( Core::ActionHandle action, Core::ActionResultHandle result );
+
   // -- internal variables --
 public:
   // Pointer back to the project
@@ -1455,6 +1461,26 @@ void ProjectPrivate::get_provenance_steps( const std::vector< ProvenanceID >& pr
   }
 }
 
+void ProjectPrivate::set_project_changed( Core::ActionHandle action, Core::ActionResultHandle result )
+{
+  // NOTE: This is executed on the application thread, hence we do not need a lock to read
+  // the variable that is only changed on the same thread
+
+  if ( action->changes_project_data() )
+  {
+    // Trigger the project_data_changed_signal_ whenever there is a new change
+    this->project_->project_data_changed_signal_();
+
+    // Set the changed flag if it's not been set yet
+    if ( !this->changed_ )
+    {
+      // NOTE: Changing the variable
+      Core::Application::lock_type lock( Core::Application::GetMutex() );
+      this->changed_ = true;
+    } 
+  }
+}
+
 //////////////////////////////////////////////////////////
 
 Project::Project( const std::string& project_name ) :
@@ -1566,7 +1592,7 @@ void Project::initialize()
   // mark this in the project, so the UI can query the user for a save action if the application
   // is closed while there is unsaved data.
   this->add_connection( Core::ActionDispatcher::Instance()->post_action_signal_.connect( 
-    boost::bind( &Project::set_project_changed, this, _1, _2 ) ) );
+    boost::bind( &ProjectPrivate::set_project_changed, this->private_, _1, _2 ) ) );
 }
 
 bool Project::load_project( const boost::filesystem::path& project_file )
@@ -2432,20 +2458,6 @@ bool Project::check_project_changed()
   // This function can be called from every where, hence we need to lock
   Core::Application::lock_type lock( Core::Application::GetMutex() );
   return this->private_->changed_;
-}
-
-void Project::set_project_changed( Core::ActionHandle action, Core::ActionResultHandle result )
-{
-  // NOTE: This is executed on the application thread, hence we do not need a lock to read
-  // the variable that is only changed on the same thread
-  
-  if ( this->private_->changed_ == false  && action->changes_project_data() )
-  {
-    // NOTE: Changing the variable
-    Core::Application::lock_type lock( Core::Application::GetMutex() );
-    this->private_->changed_ = true;
-    return;
-  }
 }
 
 bool Project::pre_save_states( Core::StateIO& state_io )
