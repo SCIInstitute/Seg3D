@@ -115,18 +115,13 @@ public:
   void fill( Core::ActionContextHandle context );
   void erase( Core::ActionContextHandle context );
   void reset( Core::ActionContextHandle context );
-
   void calculate_speedimage( Core::ActionContextHandle context );
-  bool get_update_paths() { return this->update_all_paths_; }
-  void set_update_paths( bool update_all_paths ) { this->update_all_paths_ = update_all_paths; }
-
-  //const size_t* get_slice_no() const { return this->slice_no_; } 
-  //void set_slice_no( size_t slice_no[ 6 ] );
 
   // -- State Variables --
 public:
   Core::StatePointVectorHandle vertices_state_;
   Core::StateRangedDoubleHandle termination_state_;
+
   // Number of iterations the filter needs to run
   Core::StateRangedIntHandle iterations_state_;
 
@@ -146,16 +141,8 @@ public:
   Core::StateBoolHandle use_smoothing_state_;
   Core::StateBoolHandle use_rescale_state_;
 
-  //Core::StateIntVectorHandle slice_no_state_;
-
 private:
   SpeedlineToolPrivateHandle private_;
-
-  boost::signals2::connection viewer_connection_[ 6 ];
-  //Core::VolumeSliceType slice_type_[ 6 ];
-  size_t slice_no_[ 6 ];
-  bool initialized_;
-    bool update_all_paths_;
 };
 
 } // end namespace

@@ -70,10 +70,16 @@ private:
   // -- Dispatch this action from the interface --
 public:
 
+  //static void Dispatch( Core::ActionContextHandle context, 
+  //  std::string target_layer,
+  //  const std::vector< std::string >& layer_ids,
+  //  std::string toolid );
+
   static void Dispatch( Core::ActionContextHandle context, 
     std::string target_layer,
     const std::vector< std::string >& layer_ids,
-    std::string toolid );
+    const std::vector< double >& matrix_params );
+
 };
   
 } // end namespace Seg3D

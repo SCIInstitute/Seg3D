@@ -72,10 +72,6 @@ bool ActionPointSetRegisterFilter::validate( Core::ActionContextHandle& context 
   // Check for layer existence and type information
   if ( ! LayerManager::CheckLayerExistenceAndType( this->target_layer_, Core::VolumeType::MASK_E, 
     context, this->sandbox_ ) ) return false;
-  
-  // Check for layer availability 
-  //if ( ! LayerManager::CheckLayerAvailability( this->target_layer_, this->replace_, 
-  //  context ) ) return false;
 
   if ( ! LayerManager::CheckLayerAvailability( this->target_layer_, false, 
     context, this->sandbox_ ) ) return false;
@@ -83,15 +79,6 @@ bool ActionPointSetRegisterFilter::validate( Core::ActionContextHandle& context 
   // Check for layer existence and type information mask layer
   if ( ! LayerManager::CheckLayerExistenceAndType( this->mask_layer_, Core::VolumeType::MASK_E,
     context, this->sandbox_ ) ) return false;
-
-  // Check whether mask and data have the same size
-  //if ( ! LayerManager::CheckLayerSize( this->mask_layer_, this->target_layer_,
-  //  context ) ) return false;
-    
-  // Check for layer availability mask layer
-  //if ( ! LayerManager::CheckLayerAvailability( this->mask_layer_, 
-  //  this->replace_, context ) ) return false;
-
 
   if ( ! LayerManager::CheckLayerAvailability( this->mask_layer_, 
     false, context, this->sandbox_ ) ) return false;
@@ -141,13 +128,12 @@ public:
   LayerHandle dst_layer_;
 
   int iterations_;
-  std::string pointset_tool_id_;
+  std::string transform_state_id_;
 
 public:
   // RUN:
   // Implementation of run of the Runnable base class, this function is called when the thread
   // is launched.
-
 
   bool check_abort()
   {
@@ -160,173 +146,6 @@ public:
       boost::dynamic_pointer_cast<MaskLayer>( this->src_layer_ );
     MaskLayerHandle input_moving_layer = 
       boost::dynamic_pointer_cast<MaskLayer>( this->mask_layer_ );
-
-    //Estimate the quality factor from the fraction from bounding box
-    /*double target_layer_size  =
-       input_fixed_layer->get_mask_volume()->get_mask_data_block()->get_size();
-
-    size_t target_bounding_box_size;
-    {
-      Core::MaskDataBlock::shared_lock_type lock( 
-        input_fixed_layer->get_mask_volume()->get_mask_data_block()->get_mutex() );
-
-      size_t min_x = 0; 
-      size_t max_x = 0;
-      size_t min_y = 0; 
-      size_t max_y = 0;
-      size_t min_z = 0; 
-      size_t max_z = 0;
-
-      size_t nx = 
-        input_fixed_layer->get_mask_volume()->get_mask_data_block()->get_nx();
-
-      size_t ny = 
-        input_fixed_layer->get_mask_volume()->get_mask_data_block()->get_ny();
-
-      size_t nz = 
-        input_fixed_layer->get_mask_volume()->get_mask_data_block()->get_nz();
-
-      for( size_t x = 0; x < nx; ++x )
-      {
-        for ( size_t y = 0; y < ny; ++y )
-        {
-          for ( size_t z = 0; z < nz; ++z )
-          {
-            if( input_fixed_layer->get_mask_volume()->get_mask_data_block()->get_mask_at( x, y, z ) )
-            {
-              if ( x < min_x )
-              {
-                min_x = x;
-              }
-
-              if ( y < min_y )
-              {
-                min_y = y;
-              }
-
-              if ( z < min_z )
-              {
-                min_z = z;
-              }
-
-              if ( x > max_x )
-              {
-                max_x = x;
-              }
-
-              if ( y > max_y )
-              {
-                max_y = y;
-              }
-
-              if ( z > max_z )
-              {
-                max_z = z;
-              }
-            }
-          }
-        }
-      }
-
-      target_bounding_box_size =
-        ( max_x - min_x ) * ( max_y - min_y ) * ( max_z - min_z );
-    }
-
-    double fraction_target_layer = 
-      target_bounding_box_size / target_layer_size;
-
-    size_t moving_bounding_box_size;
-    {
-      Core::MaskDataBlock::shared_lock_type lock( 
-        input_moving_layer->get_mask_volume()->get_mask_data_block()->get_mutex() );
-
-      size_t min_x = 0; 
-      size_t max_x = 0;
-      size_t min_y = 0; 
-      size_t max_y = 0;
-      size_t min_z = 0; 
-      size_t max_z = 0;
-
-      size_t nx = 
-        input_moving_layer->get_mask_volume()->get_mask_data_block()->get_nx();
-
-      size_t ny = 
-        input_moving_layer->get_mask_volume()->get_mask_data_block()->get_ny();
-
-      size_t nz = 
-        input_moving_layer->get_mask_volume()->get_mask_data_block()->get_nz();
-
-      for( size_t x = 0; x < nx; ++x )
-      {
-        for ( size_t y = 0; y < ny; ++y )
-        {
-          for ( size_t z = 0; z < nz; ++z )
-          {
-            if( input_moving_layer->get_mask_volume()->get_mask_data_block()->get_mask_at( x, y, z ) )
-            {
-              if ( x < min_x )
-              {
-                min_x = x;
-              }
-
-              if ( y < min_y )
-              {
-                min_y = y;
-              }
-
-              if ( z < min_z )
-              {
-                min_z = z;
-              }
-
-              if ( x > max_x )
-              {
-                max_x = x;
-              }
-
-              if ( y > max_y )
-              {
-                max_y = y;
-              }
-
-              if ( z > max_z )
-              {
-                max_z = z;
-              }
-            }
-          }
-        }
-      }
-
-      moving_bounding_box_size =
-        ( max_x - min_x ) * ( max_y - min_y ) * ( max_z - min_z );
-    }
-
-    double moving_layer_size  =
-      input_moving_layer->get_mask_volume()->get_mask_data_block()->get_size();
-
-    double fraction_moving_layer = moving_bounding_box_size / moving_layer_size;
-
-    double fraction = (fraction_target_layer > fraction_moving_layer) ? fraction_target_layer : fraction_moving_layer;
-
-    double quality_factor = 0.125;
-
-    if ( fraction < 0.125 )
-    {
-      quality_factor = 1.0;
-    }
-    else if ( fraction > 0.125 && fraction < 0.5 )
-    {
-      quality_factor = 0.5;
-    }
-    else if ( fraction > 0.5 && fraction < 0.75 )
-    {
-      quality_factor = 0.25;
-    }
-    else
-    {
-      quality_factor = 0.125;
-    }*/
     
     double quality_factor = 1.0;
     Core::IsosurfaceHandle fixed_iso;
@@ -367,10 +186,7 @@ public:
       {
         sample_ready = true;
       }
-
-      //sample_ready = true;
     }
-
 
     
     //-----------------------------------------------------------
@@ -432,46 +248,11 @@ public:
 
     metric_type::Pointer  metric = metric_type::New();
 
-    //
-    // First map the Fixed Points into a binary image.
-    // This is needed because the DanielssonDistance
-    // filter expects an image as input.
-    //
-    //-------------------------------------------------
-    //typedef itk::Image< unsigned char, DIMENSION_C > binary_image_type;
-    //typedef itk::PointSetToImageFilter<
-    //  point_set_type,
-    //  binary_image_type > points_to_image_filter_type;
-    //points_to_image_filter_type::Pointer points_to_image_filter = 
-    //  points_to_image_filter_type::New();
-    //points_to_image_filter->SetInput( fixed_point_set );
-
-    //binary_image_type::SpacingType spacing;
-    //spacing.Fill( 1.0 );
-    //binary_image_type::PointType origin;
-    //origin.Fill( 0.0 );
-    //points_to_image_filter->SetSpacing( spacing );
-    //points_to_image_filter->SetOrigin( origin );
-    //points_to_image_filter->Update();
-    //binary_image_type::Pointer binary_image = points_to_image_filter->GetOutput();
-    //typedef itk::Image< unsigned short, DIMENSION_C > distance_image_type;
-    //typedef itk::DanielssonDistanceMapImageFilter<
-    //  binary_image_type,
-    //  distance_image_type > distance_filter_type;
-    //distance_filter_type::Pointer distance_filter = distance_filter_type::New();
-
-    //distance_filter->SetInput( binary_image );
-    //distance_filter->Update();
-    //metric->SetDistanceMap( distance_filter->GetOutput() );
-
     //-----------------------------------------------------------
     // Set up a Transform
     //-----------------------------------------------------------
 
-    //typedef itk::TranslationTransform< double, Dimension >      TransformType;
-    //typedef Seg3D::Rigid3DTransformSurrogate<double>  TransformType;
     typedef itk::Euler3DTransform< double > transform_type;
-    //typedef itk::VersorTransform< double > TransformType;
 
     transform_type::Pointer transform = transform_type::New();
 
@@ -490,7 +271,6 @@ public:
 
 
     registration_type::Pointer   registration  = registration_type::New();
-
     this->forward_abort_to_filter( registration, this->dst_layer_ );
 
     // Scale the translation components of the Transform in the Optimizer
@@ -542,16 +322,9 @@ public:
       &PointSetFilterAlgo::update_iteration, this, _1, progress_unit ) );
 
     this->progress_ = 0.0;
-    //CommandIterationUpdate::Pointer observer = CommandIterationUpdate::New();
-
-    //observer->SetProgressStart( 0.0 );
-    //observer->SetProgressUnit( progress_unit );
-    //observer->SetLayer(dst_layer_);
-    //optimizer->AddObserver( itk::IterationEvent(), observer );
   
-
     // Ensure we will have some threads left for doing something else
-    //this->limit_number_of_itk_threads( registration );
+    this->limit_number_of_itk_threads( registration );
 
     // Run the actual ITK filter.
     // This needs to be in a try/catch statement as certain filters throw exceptions when they
@@ -588,39 +361,11 @@ public:
     CORE_LOG_MESSAGE( std::string("Solution = ") + 
       solution );
 
-    //convert Euler transformation parameters into 4x4 matrix
     std::vector< double > matrix_entries;
-    //matrix_entries.resize( 16 );
-    //std::fill( matrix_entries.begin(), matrix_entries.end(), 0 );
-
     for ( unsigned int i = 0; i < final_parameters.size(); ++i )
     {
       matrix_entries.push_back( final_parameters[i] );
     }
-
-    double  rotation[3];
-    double  translation[3];
-
-    rotation[0] = final_parameters[0]; 
-    rotation[1] = final_parameters[1]; 
-    rotation[2] = final_parameters[2]; 
-
-    translation[0] = final_parameters[3]; 
-    translation[1] = final_parameters[4]; 
-    translation[2] = final_parameters[5]; 
-
-    //itk::Matrix matrix = transform->GetMatrix();
-    //itk::OutputVectorType  translation = transform->GetTranslation();
-    //for ( unsigned row = 0; row < Dimension; ++row )
-    //{
-    //  for ( unsigned col = 0; col < Dimension; ++col )
-    //  {
-    //    matrix_entries.push_back(matrix[row][col]);
-    //  }
-    //  matrix_entries.push_back( translation[row] );
-    //}
-
-
 
     transform_type::Pointer final_transform = transform_type::New();
     final_transform->SetParameters( final_parameters );
@@ -637,7 +382,7 @@ public:
     typename Core::ITKImageDataT<VALUE_TYPE>::Handle moving_image; 
     this->get_itk_image_from_layer<VALUE_TYPE>( this->mask_layer_, moving_image );
     resampler->SetInput( moving_image->get_image() );
-    //resampler->SetTransform( registration->GetOutput()->Get() );
+  
     final_transform->GetInverse( final_transform );
     resampler->SetTransform( final_transform );
 
@@ -653,34 +398,24 @@ public:
 
     if ( resampler->GetOutput() != NULL )
     {
-      this->insert_itk_image_into_layer( this->dst_layer_, resampler->GetOutput() );  
-      PointSetFilterHandle pointset_tool = 
-        boost::dynamic_pointer_cast<PointSetFilter> (ToolManager::Instance()->get_tool(this->pointset_tool_id_));
+      this->insert_itk_image_into_layer( this->dst_layer_, resampler->GetOutput() );
 
-      Core::Application::PostEvent( boost::bind( &Core::StateDoubleVector::set,
-        pointset_tool->transform_matrix_state_, matrix_entries, Core::ActionSource::NONE_E ) );
-
-      Core::Application::PostEvent( boost::bind( &Core::StateDouble::set,
-        pointset_tool->translation_state_[0], translation[0] , Core::ActionSource::NONE_E ) );
-
-      Core::Application::PostEvent( boost::bind( &Core::StateDouble::set,
-        pointset_tool->translation_state_[1], translation[1] , Core::ActionSource::NONE_E ) );
-
-      Core::Application::PostEvent( boost::bind( &Core::StateDouble::set,
-        pointset_tool->translation_state_[2], translation[2] , Core::ActionSource::NONE_E ) );
-
-      Core::Application::PostEvent( boost::bind( &Core::StateDouble::set,
-        pointset_tool->rotation_state_[0], rotation[0] , Core::ActionSource::NONE_E ) );
-
-      Core::Application::PostEvent( boost::bind( &Core::StateDouble::set,
-        pointset_tool->rotation_state_[1], rotation[1] , Core::ActionSource::NONE_E ) );
-
-      Core::Application::PostEvent( boost::bind( &Core::StateDouble::set,
-        pointset_tool->rotation_state_[2], rotation[2] , Core::ActionSource::NONE_E ) );
-
-      // NOTE: Set registration_ready_state_ AFTER all the values have been set.
-      Core::Application::PostEvent( boost::bind( &Core::StateBool::set,
-        pointset_tool->registration_ready_state_, true, Core::ActionSource::NONE_E ) );
+      // Only output the state variable value when not in a sandbox
+      if ( this->get_sandbox() == -1 )
+      {
+        Core::StateBaseHandle state_var;
+        if ( Core::StateEngine::Instance()->get_state( 
+          this->transform_state_id_, state_var ) )
+        {
+          Core::StateDoubleVectorHandle transform_state = boost::dynamic_pointer_cast<
+            Core::StateDoubleVector > ( state_var );
+          if ( transform_state )
+          {
+            Core::Application::PostEvent( boost::bind( &Core::StateDoubleVector::set,
+              transform_state, matrix_entries, Core::ActionSource::NONE_E ) );
+          }
+        }
+      }
     }
 
   }
@@ -690,7 +425,6 @@ public:
   // The name of the filter, this information is used for generating new layer labels.
   virtual std::string get_filter_name() const
   {
-    //return "And Filter";
     return "PointSet Register Filter";
   }
 
@@ -699,7 +433,6 @@ public:
   // when a new layer is generated. 
   virtual std::string get_layer_prefix() const
   {
-    //return "AND"; 
     return "PointSetRegister";  
   }
 
@@ -712,18 +445,6 @@ private:
   {
     progress_ += progress_unit;
     this->dst_layer_->update_progress_signal_( progress_ );
-
-    //typedef itk::LevenbergMarquardtOptimizer OptimizerType;
-    //typedef   const OptimizerType *              OptimizerPointer;
-
-    //OptimizerPointer optimizer =
-    //  dynamic_cast< OptimizerPointer >( itk_object );
-
-    //CORE_LOG_MESSAGE( std::string("value = ") + 
-    //  boost::lexical_cast<std::string>( optimizer->GetValue() ));
-
-    //CORE_LOG_MESSAGE( std::string("params = ") + 
-    //  boost::lexical_cast<std::string>( optimizer->GetCurrentPosition() ));
   }
 
   class CommandIterationUpdate : public itk::Command
@@ -802,44 +523,14 @@ bool ActionPointSetRegisterFilter::run( Core::ActionContextHandle& context,
   algo->src_layer_ = LayerManager::FindLayer( this->target_layer_, this->sandbox_ );
   algo->mask_layer_ = LayerManager::FindLayer( this->mask_layer_, this->sandbox_ );
   algo->iterations_ = this->iterations_;
-  algo->pointset_tool_id_ = this->pointset_tool_id_;
+  algo->transform_state_id_ = this->transform_state_id_;
   
   // Check whether the source layer was found
   if ( !algo->src_layer_ || !algo->mask_layer_ ) return false;
   
   // Lock the mask layer, so no other layer can access it
   algo->lock_for_use( algo->mask_layer_ );
-
-  //if ( this->replace_ )
-  //{
-  //  // Copy the handles as destination and source will be the same
-  //  algo->dst_layer_ = algo->src_layer_;
-
-  //  // Mark the layer for processing.
-  //  algo->lock_for_processing( algo->dst_layer_ );  
-  //}
-  //else
-  //{
-  //  //// Lock the src layer, so it cannot be used else where
-  //  //algo->lock_for_use( algo->src_layer_ );
-  //  //
-  //  //// Create the destination layer, which will show progress
-  //  //algo->create_and_lock_data_layer_from_layer( algo->src_layer_, algo->dst_layer_ );
-
-  //  switch ( algo->src_layer_->get_type() )
-  //  { 
-  //  case Core::VolumeType::DATA_E:
-  //    algo->create_and_lock_data_layer_from_layer( 
-  //      algo->src_layer_, algo->dst_layer_  );
-  //    break;
-  //  case Core::VolumeType::MASK_E:
-  //    algo->create_and_lock_mask_layer_from_layer( 
-  //      algo->src_layer_, algo->dst_layer_ , algo->mask_layer_->get_layer_name() );
-  //    break;
-  //  default:
-  //    assert( false );
-  //  }
-  //}
+  algo->lock_for_use( algo->src_layer_ );
 
   switch ( algo->src_layer_->get_type() )
   { 
@@ -873,22 +564,19 @@ bool ActionPointSetRegisterFilter::run( Core::ActionContextHandle& context,
   return true;
 }
 
-//void ActionPointSetRegisterFilter::Dispatch( Core::ActionContextHandle context, std::string target_layer,
-//  std::string mask_layer,  int iterations, bool replace )
-//void ActionPointSetRegisterFilter::Dispatch( Core::ActionContextHandle context, std::string target_layer,
-//  std::string mask_layer,  int iterations, bool replace, std::string toolid )
 
 void ActionPointSetRegisterFilter::Dispatch( Core::ActionContextHandle context,
-  std::string target_layer, std::string mask_layer,  int iterations,  std::string toolid )
+  const std::string& target_layer, const std::string& mask_layer,  
+  int iterations, const std::string& transform_state_id )
 { 
   // Create a new action
   ActionPointSetRegisterFilter* action = new ActionPointSetRegisterFilter;
 
   // Setup the parameters
   action->target_layer_ = target_layer;
-  action->mask_layer_ = mask_layer; 
+  action->mask_layer_ = mask_layer;
+  action->transform_state_id_ = transform_state_id;
   action->iterations_ = iterations;
-  action->pointset_tool_id_ = toolid;
 
   // Dispatch action to underlying engine
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );

@@ -209,7 +209,7 @@ public:
     
     if ( this->is_rescale_ )
     {
-      double epsilon = 1.0e-7;
+      double min_value = 1.0e-2;
       double max_value = 1.0;
       typedef itk::RescaleIntensityImageFilter < FLOAT_IMAGE_TYPE, FLOAT_IMAGE_TYPE > rescale_filter_type;
 
@@ -218,7 +218,7 @@ public:
       this->observe_itk_progress( rescale_filter, this->dst_layer_, start_progress, progress_amount );
 
       rescale_filter->SetInput( output_image );
-      rescale_filter->SetOutputMinimum( epsilon );
+      rescale_filter->SetOutputMinimum( min_value );
       rescale_filter->SetOutputMaximum( max_value );
       rescale_filter->Update();
       //output_image = rescale_filter->GetOutput();

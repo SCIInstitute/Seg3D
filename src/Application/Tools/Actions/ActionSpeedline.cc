@@ -33,7 +33,6 @@
 
 #include <Core/ITKSpeedLine/itkSpeedFunctionToPathFilter.h>
 #include <Core/ITKSpeedLine/itkArrivalFunctionToPathFilter.h>
-//#include <Core/ITKSpeedLine/itkIterateNeighborhoodOptimizer.h>
 
 #include <Application/ProjectManager/ProjectManager.h>
 #include <Application/ToolManager/ToolManager.h>
@@ -49,7 +48,6 @@
 #include <itkExtractImageFilter.h>
 #include <itkLinearInterpolateImageFunction.h>
 #include <itkPathIterator.h>
-#include <itkGradientDescentOptimizer.h>
 #include <itkIndex.h>
 #include <itkImageBase.h>
 
@@ -92,7 +90,8 @@ public:
   int iterations_;
   double termination_;
   bool update_all_paths_;
-  std::string speedline_tool_id_;
+  std::string itk_path_state_id_;
+  std::string world_path_state_id_;
 
 public:
   void compute_path ( int start_index, int end_index )
@@ -110,24 +109,20 @@ public:
 
     // Create optimizer
 
-    typedef itk::RegularStepGradientDescentOptimizer optimizer_type;
-    optimizer_type::Pointer optimizer = optimizer_type::New();
-    optimizer->SetNumberOfIterations( this->iterations_ );
-
     image_type::SpacingType spacing = this->speed_image_2D_->GetSpacing();
     double min_spacing = ( spacing[ 0 ] < spacing[ 1 ] ) ? spacing[ 0 ] : spacing[ 1 ];
     double max_step = 0.5 * min_spacing;
     double min_step = 0.001 * min_spacing;
     
+    typedef itk::RegularStepGradientDescentOptimizer optimizer_type;
+    optimizer_type::Pointer optimizer = optimizer_type::New();
+    optimizer->SetNumberOfIterations( this->iterations_ );
     optimizer->SetMaximumStepLength( max_step );
     optimizer->SetMinimumStepLength( min_step );
-    optimizer->SetRelaxationFactor( 0.5 );
-
-    //typedef itk::GradientDescentOptimizer optimizer_type;
-    //optimizer_type::Pointer optimizer = optimizer_type::New();
-    //optimizer->SetNumberOfIterations( this->iterations_ );
+    optimizer->SetRelaxationFactor( 0.6 );
 
     // Create path filter
+
     path_filter_type::Pointer path_filter = path_filter_type::New();
     
     path_filter->SetCostFunction( cost );
@@ -227,17 +222,11 @@ public:
       // update each path in new slice
       Core::Path updated_paths;
 
-      //for ( unsigned int i = 0; i < this->itk_paths_.get_path_num(); ++i )
-      //{
-      //  Core::SinglePath old_path = this->itk_paths_.get_one_path( i );
-
       this->itk_paths_.delete_all_paths();
       size_t vertices_num = this->vertices_.size();
       for ( unsigned int i = 0; i < vertices_num; ++i )
       {
         Core::Point p0, p1;
-        //old_path.get_point_on_ends( 0, p0 );
-        //old_path.get_point_on_ends( 1, p1 );
         p0 = this->vertices_[ i ];
         p1 = this->vertices_[ ( i + 1 ) % vertices_num ];
 
@@ -292,11 +281,7 @@ public:
       size_t num_of_outputs = path_filter->GetNumberOfOutputs(); 
       for ( unsigned int j = 0; j < num_of_outputs; ++j )
       {
-
-        //Core::SinglePath old_path = this->itk_paths_.get_one_path( j );
         Core::Point p0, p1;
-        //old_path.get_point_on_ends( 0, p0 );
-        //old_path.get_point_on_ends( 1, p1 );
 
         p0 = this->vertices_[ j ];
         p1 = this->vertices_[ ( j + 1 ) % vertices_num ];
@@ -370,7 +355,6 @@ public:
 
       if ( it0 == this->vertices_.end() || it1 == this->vertices_.end() )
       {
-        //bool is_deleted = this->paths_.delete_one_path( p0, p1 );
         delete_outdated_path = true;
       }
       else
@@ -379,23 +363,45 @@ public:
       }
     }
 
-    this->itk_paths_.delete_all_paths();
-    for ( std::vector< Core::SinglePath >::iterator it = tmp_paths.begin(); it != tmp_paths.end(); ++it )
-    {
-      this->itk_paths_.add_one_path( *it );
-    }
+    //this->itk_paths_.delete_all_paths();
+    //for ( std::vector< Core::SinglePath >::iterator it = tmp_paths.begin(); it != tmp_paths.end(); ++it )
+    //{
+    //  this->itk_paths_.add_one_path( *it );
+    //}
+
+    this->itk_paths_.set_all_paths( tmp_paths );
 
     return delete_outdated_path;  
   }
 
   SCI_BEGIN_TYPED_ITK_RUN( this->target_layer_->get_data_type() )
   {
+    Core::StateSpeedlinePathHandle world_path_state;
+    Core::StateSpeedlinePathHandle itk_path_state;
+    
+    Core::StateBaseHandle state_var_1;
+    Core::StateBaseHandle state_var_2;
 
-    SpeedlineToolHandle speedline_tool = 
-      boost::dynamic_pointer_cast< SpeedlineTool > ( ToolManager::Instance()->get_tool( this->speedline_tool_id_ ) );
+    if ( Core::StateEngine::Instance()->get_state( 
+      this->world_path_state_id_, state_var_1 ) )
     {
-      Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-      this->world_paths_ = speedline_tool->path_state_->get();
+      world_path_state = boost::dynamic_pointer_cast<
+        Core::StateSpeedlinePath > ( state_var_1 );
+      if ( world_path_state )
+      {
+        this->world_paths_ = world_path_state->get();
+      }
+    }
+
+    if ( Core::StateEngine::Instance()->get_state( 
+      this->itk_path_state_id_, state_var_2 ) )
+    {
+      itk_path_state = boost::dynamic_pointer_cast<
+        Core::StateSpeedlinePath > ( state_var_2 );
+      if ( itk_path_state )
+      {
+        this->itk_paths_ = itk_path_state->get();
+      }
     }
 
     this->world_paths_.delete_all_paths();
@@ -408,10 +414,11 @@ public:
       this->itk_paths_.set_end_point( pend );
 
       Core::Application::PostEvent( boost::bind( &Core::StateSpeedlinePath::set,
-        speedline_tool->itk_path_state_, this->itk_paths_, Core::ActionSource::NONE_E ) );
-
+          itk_path_state, this->itk_paths_, Core::ActionSource::NONE_E ) );
+  
       Core::Application::PostEvent( boost::bind( &Core::StateSpeedlinePath::set,
-        speedline_tool->path_state_, this->world_paths_, Core::ActionSource::NONE_E ) );
+          world_path_state, this->world_paths_, Core::ActionSource::NONE_E ) );
+
       return;
     }
 
@@ -562,10 +569,10 @@ public:
     }
 
     Core::Application::PostEvent( boost::bind( &Core::StateSpeedlinePath::set,
-      speedline_tool->itk_path_state_, this->itk_paths_, Core::ActionSource::NONE_E ) );
+      itk_path_state, this->itk_paths_, Core::ActionSource::NONE_E ) );
 
     Core::Application::PostEvent( boost::bind( &Core::StateSpeedlinePath::set,
-      speedline_tool->path_state_, this->world_paths_, Core::ActionSource::NONE_E ) );
+      world_path_state, this->world_paths_, Core::ActionSource::NONE_E ) );
   }
   SCI_END_TYPED_ITK_RUN()
 
@@ -593,11 +600,9 @@ public:
   std::vector< Core::Point > vertices_;
   int iterations_;
   double termination_;
-
   int current_vertex_index_;
-  Core::Path itk_paths_;
-
-  std::string speedline_tool_id_;
+  std::string itk_path_state_id_;
+  std::string world_path_state_id_;
   bool update_all_paths_;
 };
 
@@ -608,8 +613,12 @@ ActionSpeedline::ActionSpeedline() :
   this->add_parameter( this->private_->slice_type_ );
   this->add_parameter( this->private_->slice_number_ );
   this->add_parameter( this->private_->vertices_ );
+  this->add_parameter( this->private_->current_vertex_index_ );
   this->add_parameter( this->private_->iterations_ );
   this->add_parameter( this->private_->termination_ );
+  this->add_parameter( this->private_->update_all_paths_ );
+  this->add_parameter( this->private_->itk_path_state_id_ );
+  this->add_parameter( this->private_->world_path_state_id_ );
 }
 
 bool ActionSpeedline::validate( Core::ActionContextHandle& context )
@@ -658,12 +667,12 @@ bool ActionSpeedline::run( Core::ActionContextHandle& context, Core::ActionResul
   algo->slice_number_ = this->private_->slice_number_;
   algo->vertices_ = this->private_->vertices_;
   algo->current_vertex_index_ = this->private_->current_vertex_index_;
-  algo->itk_paths_ = this->private_->itk_paths_;
   algo->iterations_ = this->private_->iterations_;
   algo->termination_ = this->private_->termination_;
   algo->target_layer_ = LayerManager::FindDataLayer( this->private_->target_layer_id_ );
   algo->update_all_paths_ = this->private_->update_all_paths_;
-  algo->speedline_tool_id_ = this->private_->speedline_tool_id_;
+  algo->itk_path_state_id_ = this->private_->itk_path_state_id_;
+  algo->world_path_state_id_ = this->private_->world_path_state_id_;
 
   Core::Runnable::Start( algo );
 
@@ -673,12 +682,13 @@ bool ActionSpeedline::run( Core::ActionContextHandle& context, Core::ActionResul
 void ActionSpeedline::Dispatch( Core::ActionContextHandle context, 
                 const std::string& layer_id, Core::VolumeSliceType slice_type, 
                 size_t slice_number,
-                const std::vector< Core::Point >& vertices,
+                const std::vector< Core::Point > vertices,
                 int current_vertex_index,
-                const Core::Path& itk_paths,
                 int iterations, double termination, 
                 bool update_all_paths,
-                std::string toolid )
+                const std::string& itk_path_state_id,
+                const std::string& world_path_state_id
+                )
 {
   ActionSpeedline* action = new ActionSpeedline;
 
@@ -687,11 +697,11 @@ void ActionSpeedline::Dispatch( Core::ActionContextHandle context,
   action->private_->slice_number_ = slice_number;
   action->private_->vertices_ = vertices;
   action->private_->current_vertex_index_ = current_vertex_index;
-  action->private_->itk_paths_ = itk_paths;
   action->private_->iterations_ = iterations;
   action->private_->termination_ = termination;
   action->private_->update_all_paths_ = update_all_paths;
-  action->private_->speedline_tool_id_ = toolid;
+  action->private_->itk_path_state_id_ = itk_path_state_id;
+  action->private_->world_path_state_id_ = world_path_state_id;
 
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }

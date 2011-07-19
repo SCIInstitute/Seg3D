@@ -47,6 +47,7 @@ CORE_ACTION(
   CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
   CORE_ACTION_ARGUMENT( "mask", "The layerid of the mask that needs to be applied." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "iterations", "5", "Number of iterations to perform." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "transform_state", "", "The statid of the state variable into which the transformation values will be written." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "sandbox", "-1", "The sandbox in which to run the action." )
   CORE_ACTION_ARGUMENT_IS_NONPERSISTENT( "sandbox" )  
   CORE_ACTION_CHANGES_PROJECT_DATA()
@@ -59,6 +60,7 @@ public:
   {
     this->add_layer_id( this->target_layer_ );
     this->add_layer_id( this->mask_layer_ );
+    this->add_parameter( this->transform_state_id_ );
     this->add_parameter( this->iterations_ ); 
     this->add_parameter( this->sandbox_ );
   }
@@ -75,28 +77,17 @@ private:
 
   std::string target_layer_;
   std::string mask_layer_;
-  //bool replace_;
+  std::string transform_state_id_;
   int iterations_;
   SandboxID sandbox_;
-  std::string pointset_tool_id_;
   
   // -- Dispatch this action from the interface --
 public:
   // DISPATCH:
   // Create and dispatch action that inserts the new layer 
-
-  //static void Dispatch( Core::ActionContextHandle context, 
-  //  std::string target_layer, std::string mask_layer, int iterations, bool replace );
-
-
-  //static void Dispatch( Core::ActionContextHandle context, 
-  //  std::string target_layer, std::string mask_layer, int iterations, 
-  //  bool replace, std::string toolid );
-
-
   static void Dispatch( Core::ActionContextHandle context, 
-    std::string target_layer, std::string mask_layer, int iterations, 
-    std::string toolid );
+    const std::string& target_layer, const std::string& mask_layer, int iterations, 
+    const std::string& transform_state_id );
 };
   
 } // end namespace Seg3D

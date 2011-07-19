@@ -86,8 +86,6 @@ bool PointSetFilterInterface::build_widget( QFrame* frame )
   
   QtUtils::QtBridge::Enable( this->private_->ui_.target_layer_, 
     tool->use_active_layer_state_, true );
-  QtUtils::QtBridge::Connect( this->private_->ui_.runFilterButton, boost::bind(
-    &Tool::execute, tool, Core::Interface::GetWidgetActionContext() ) );
 
   QtUtils::QtBridge::Connect( this->private_->ui_.iterations_, 
     tool->iterations_state_ );
@@ -95,11 +93,13 @@ bool PointSetFilterInterface::build_widget( QFrame* frame )
   this->private_->ui_.iterations_->set_description( "Iterations" );
 
   QtUtils::QtBridge::Connect( this->private_->ui_.layer_list_, tool->target_layers_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.runFilterButton, boost::bind(
+    &PointSetFilter::registration, tool, Core::Interface::GetWidgetActionContext() ) );
   QtUtils::QtBridge::Connect( this->private_->ui_.runFilterButton_2, boost::bind(
     &PointSetFilter::apply, tool, Core::Interface::GetWidgetActionContext() ) );
   QtUtils::QtBridge::Enable( this->private_->ui_.runFilterButton_2, tool->registration_ready_state_ );
 
-  std::vector<double> matrix_params;
+  //std::vector<double> matrix_params;
 
   QtUtils::QtBridge::Connect( this->private_->ui_.label_rx_, tool->rotation_state_[ 0 ] );
   QtUtils::QtBridge::Connect( this->private_->ui_.label_ry_, tool->rotation_state_[ 1 ] );

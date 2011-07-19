@@ -65,12 +65,11 @@ public:
   std::vector< std::string > layer_ids_;
   Core::Point origin_;
   Core::Vector spacing_;
-  //bool replace_;
   SandboxID sandbox_;
 
-  //Core::GridTransform output_grid_trans_;
   std::string target_layer_;
-  std::string pointset_tool_id_;
+  std::vector< double > matrix_params_;
+  //std::string pointset_tool_id_;
 };
 
 
@@ -80,11 +79,9 @@ class PointSetTransformAlgo : public  ITKFilter
 public:
   std::vector< LayerHandle > src_layers_;
   std::vector< LayerHandle > dst_layers_;
-
   LayerHandle target_layer_;
-
-  //bool replace_;
-  std::string pointset_tool_id_;
+  std::vector< double > matrix_params_;
+  //std::string pointset_tool_id_;
 
 public:
 
@@ -96,7 +93,7 @@ public:
   // RUN_FILTER:
   // Implementation of run of the Runnable base class, this function is called 
   // when the thread is launched.
-  //SCI_BEGIN_ITK_RUN( ) 
+
   SCI_BEGIN_TYPED_ITK_RUN( this->target_layer_->get_data_type() )
   {
     MaskLayerHandle input_fixed_layer = 
@@ -104,10 +101,6 @@ public:
 
     for ( size_t i = 0; i < this->src_layers_.size(); ++i )
     {
-      //this->transform_mask_layer(
-      //  input_fixed_layer,
-      //  boost::dynamic_pointer_cast< MaskLayer >( this->src_layers_[ i ] ),
-      //  boost::dynamic_pointer_cast< MaskLayer >( this->dst_layers_[ i ] ) );
 
       MaskLayerHandle fixed_layer = input_fixed_layer;
       MaskLayerHandle moving_layer = 
@@ -119,21 +112,22 @@ public:
       typedef itk::Euler3DTransform< double > transform_type;
       transform_type::Pointer transform = transform_type::New();
 
-      PointSetFilterHandle pointset_tool = 
-        boost::dynamic_pointer_cast<PointSetFilter> (ToolManager::Instance()->get_tool(this->pointset_tool_id_));
+      //PointSetFilterHandle pointset_tool = 
+      //  boost::dynamic_pointer_cast<PointSetFilter> (ToolManager::Instance()->get_tool(this->pointset_tool_id_));
 
-      std::vector<double> matrix_params;
-      {
-        Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-        matrix_params = pointset_tool->transform_matrix_state_->get();
-      }
+      //std::vector<double> matrix_params;
+      //{
+      //  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+      //  matrix_params = pointset_tool->transform_matrix_state_->get();
+      //}
+
 
       transform_type::ParametersType params = 
-        transform_type::ParametersType(matrix_params.size());
+        transform_type::ParametersType( this->matrix_params_.size() );
 
-      for ( unsigned int i = 0; i < matrix_params.size(); ++i )
+      for ( unsigned int i = 0; i < this->matrix_params_.size(); ++i )
       {
-        params.SetElement( i, matrix_params[i] );
+        params.SetElement( i, this->matrix_params_[i] );
       }
 
       transform->SetParameters( params );
@@ -170,7 +164,7 @@ public:
 
     }
   }
-  //SCI_END_ITK_RUN()
+
   SCI_END_TYPED_ITK_RUN()
 
   // GET_FITLER_NAME:
@@ -189,76 +183,6 @@ public:
   }
 
 };
-
-//void ICPTransformAlgo::run_filter()
-//{
-//  for ( size_t i = 0; i < this->src_layers_.size(); ++i )
-//  {
-//    switch ( this->src_layers_[ i ]->get_type() )
-//    {
-//    case Core::VolumeType::DATA_E:
-//      this->transform_data_layer(
-//        boost::dynamic_pointer_cast< DataLayer >( this->src_layers_[ i ] ),
-//        boost::dynamic_pointer_cast< DataLayer >( this->dst_layers_[ i ] ) );
-//      break;
-//    case Core::VolumeType::MASK_E:
-//      this->transform_mask_layer(
-//        boost::dynamic_pointer_cast< MaskLayer >( this->src_layers_[ i ] ),
-//        boost::dynamic_pointer_cast< MaskLayer >( this->dst_layers_[ i ] ) );
-//      break;
-//    }
-
-//    if ( this->check_abort() )
-//    {
-//      return;
-//    }
-//  }
-//}
-
-//void ICPTransformAlgo::transform_mask_layer( MaskLayerHandle fixed_layer,
-//  MaskLayerHandle moving_layer,
-//  MaskLayerHandle dst_layer )
-//{
-//  typedef itk::Euler3DTransform< double > transform_type;
-//  transform_type::Pointer transform = transform_type::New();
-
-//  ICPFilterHandle icp_tool = 
-//    boost::dynamic_pointer_cast<ICPFilter> (ToolManager::Instance()->get_tool(this->icp_tool_id_));
-//  transform->SetParameters( finalParameters );
-
-//  typedef itk:: LinearInterpolateImageFunction<
-//    TYPED_IMAGE_TYPE,
-//    double          >    InterpolatorType;
-
-//  typedef itk::ResampleImageFilter<
-//    TYPED_IMAGE_TYPE,
-//    TYPED_IMAGE_TYPE > ResampleFilterType;
-
-//  ResampleFilterType::Pointer resampler = ResampleFilterType::New();
-//  typename Core::ITKImageDataT<VALUE_TYPE>::Handle moving_image; 
-//  this->get_itk_image_from_layer<VALUE_TYPE>( moving_layer, moving_image );
-//  resampler->SetInput( moving_image->get_image() );
-//  transform->GetInverse( transform );
-//  resampler->SetTransform( transform );
-
-//  typename Core::ITKImageDataT<VALUE_TYPE>::Handle fixed_image;
-//  this->get_itk_image_from_layer<VALUE_TYPE>( this->fixed_layer, fixed_image );
-//  resampler->SetSize( fixed_image->get_image()->GetLargestPossibleRegion().GetSize() );
-//  resampler->SetOutputOrigin(  fixed_image->get_image()->GetOrigin() );
-//  resampler->SetOutputSpacing( fixed_image->get_image()->GetSpacing() );
-//  resampler->SetOutputDirection( fixed_image->get_image()->GetDirection() );
-//  resampler->SetDefaultPixelValue( 0 );
-
-//  resampler->Update();
-
-//  if (resampler->GetOutput() != NULL )
-//  {
-//    this->insert_itk_image_into_layer( dst_layer, resampler->GetOutput() ); 
-//  }
-
-//}
-
-
 
 bool ActionPointSetTransformFilter::validate( Core::ActionContextHandle& context )
 {
@@ -300,13 +224,6 @@ bool ActionPointSetTransformFilter::validate( Core::ActionContextHandle& context
       false, context, this->private_->sandbox_ ) ) return false;
   }
 
-  //const Core::Vector& spacing = this->private_->spacing_;
-  //if ( spacing[ 0 ] <= 0 || spacing[ 1 ] <= 0 || spacing[ 2 ] <= 0 )
-  //{
-  //  context->report_error( "Spacing must be greater than 0" );
-  //  return false;
-  //}
-
   // Validation successful
   return true;
 }
@@ -322,10 +239,7 @@ private_( new ActionPointSetTransformPrivate )
 {
   // Action arguments
   this->add_layer_id_list( this->private_->layer_ids_ );
-  //this->add_parameter( this->private_->origin_ );
-  //this->add_parameter( this->private_->spacing_ );
   this->add_layer_id( this->private_->target_layer_ );
-  //this->add_parameter( this->private_->replace_ );
   this->add_parameter( this->private_->sandbox_ );
 }
 
@@ -337,13 +251,11 @@ bool ActionPointSetTransformFilter::run( Core::ActionContextHandle& context,
   boost::shared_ptr<PointSetTransformAlgo> algo( new PointSetTransformAlgo );
   algo->set_sandbox( this->private_->sandbox_ );
 
-  // Set up parameters
-  //algo->replace_ = this->private_->replace_;
-
   // Find the handle to the layer
   algo->target_layer_ = LayerManager::FindLayer( this->private_->target_layer_, this->private_->sandbox_ );
 
-  algo->pointset_tool_id_ = this->private_->pointset_tool_id_;
+  //algo->pointset_tool_id_ = this->private_->pointset_tool_id_;
+  algo->matrix_params_ = this->private_->matrix_params_;
 
   const std::vector< std::string >& layer_ids = this->private_->layer_ids_;
   size_t num_of_layers = layer_ids.size();
@@ -380,7 +292,7 @@ bool ActionPointSetTransformFilter::run( Core::ActionContextHandle& context,
   }
 
   // Return the id of the destination layer.
-  //result = Core::ActionResultHandle( new Core::ActionResult( algo->dst_layers_[i]->get_layer_id() ) );
+
   // If the action is run from a script (provenance is a special case of script),
   // return a notifier that the script engine can wait on.
   if ( context->source() == Core::ActionSource::SCRIPT_E ||
@@ -399,25 +311,18 @@ bool ActionPointSetTransformFilter::run( Core::ActionContextHandle& context,
 
 }
 
-//void ActionPointSetTransformFilter::Dispatch( Core::ActionContextHandle context,
-//  std::string target_layer,
-//  const std::vector< std::string >& layer_ids,
-//  bool replace, std::string toolid )
 void ActionPointSetTransformFilter::Dispatch( Core::ActionContextHandle context,
-std::string target_layer, const std::vector< std::string >& layer_ids,
- std::string toolid )
+  std::string target_layer, const std::vector< std::string >& layer_ids,
+  const std::vector< double >& matrix_params )
 { 
   // Create a new action
   ActionPointSetTransformFilter* action = new ActionPointSetTransformFilter;
 
   // Setup the parameters
   action->private_->layer_ids_ = layer_ids;
-  //action->private_->origin_ = origin;
-  //action->private_->spacing_ = spacing;
   action->private_->target_layer_ = target_layer;
-  //action->private_->replace_ = replace;
-  action->private_->pointset_tool_id_ = toolid;
-  
+  //action->private_->pointset_tool_id_ = toolid;
+  action->private_->matrix_params_ = matrix_params;
 
   // Dispatch action to underlying engine
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );

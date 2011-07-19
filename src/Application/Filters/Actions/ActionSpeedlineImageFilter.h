@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_FILTERS_ACTIONS_ActionSpeedlineImageFilter_H
-#define APPLICATION_FILTERS_ACTIONS_ActionSpeedlineImageFilter_H
+#ifndef APPLICATION_FILTERS_ACTIONS_ACTIONSPEEDLINEIMAGEFILTER_H
+#define APPLICATION_FILTERS_ACTIONS_ACTIONSPEEDLINEIMAGEFILTER_H
 
 // Core includes
 #include <Core/Action/Actions.h>
@@ -48,11 +48,10 @@ CORE_ACTION(
   CORE_ACTION_TYPE( "SpeedlineImageFilter", "Extract the magnitude of the local gradient"
     " from a data layer." )
   CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "replace", "true", "Replace the old layer (true), or add an new layer (false)" )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "preserve_data_format", "true", "ITK filters run in floating point percision,"
-    " this option will convert the result back into the original format." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "smooth", "true", "Whether to smooth the input layer." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "rescale", "true", "Whether to resceale the values of the input layer." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "sandbox", "-1", "The sandbox in which to run the action." )
-  CORE_ACTION_ARGUMENT_IS_NONPERSISTENT( "sandbox" )  
+  CORE_ACTION_ARGUMENT_IS_NONPERSISTENT( "sandbox" )
   CORE_ACTION_CHANGES_PROJECT_DATA()
   CORE_ACTION_IS_UNDOABLE()
 )

@@ -52,19 +52,16 @@ PointSetFilter::PointSetFilter( const std::string& toolid ) :
   std::vector< LayerIDNamePair > empty_list( 1, 
     std::make_pair( Tool::NONE_OPTION_C, Tool::NONE_OPTION_C ) );
 
-  // Need to set ranges and default values for all parameters
-  //this->add_state( "replace", this->replace_state_, false );
-
   // Whether we use a mask to find which components to use
   this->add_state( "mask", this->mask_state_, Tool::NONE_OPTION_C, empty_list );
-  //this->add_dependent_layer_input( this->mask_state_, Core::VolumeType::MASK_E, true );
+  this->mask_state_->set_session_priority( Core::StateBase::DEFAULT_LOAD_E + 2 );
   this->add_dependent_layer_input( this->mask_state_, Core::VolumeType::MASK_E, true, true );
 
   this->add_state( "iterations", this->iterations_state_, 5, 1, 1000, 1 );
 
   std::vector< std::string > empty_option;
   this->add_state( "target_layers", this->target_layers_state_, empty_option, "" );
-
+  this->target_layers_state_->set_session_priority( Core::StateBase::DEFAULT_LOAD_E + 1 );
   this->add_state( "registration_ready", this->registration_ready_state_, false );
 
   this->add_connection( this->mask_state_->value_changed_signal_.connect(
@@ -76,11 +73,7 @@ PointSetFilter::PointSetFilter( const std::string& toolid ) :
   this->add_connection( this->iterations_state_->value_changed_signal_.connect(
     boost::bind( &PointSetFilter::handle_iteration_changed, this ) ) );
 
-  std::vector< double > identity_matrix( 16, 0 );
-  identity_matrix[ 0 ] = 1;
-  identity_matrix[ 5 ] = 1;
-  identity_matrix[ 10 ] = 1;
-  identity_matrix[ 15 ] = 1;
+  std::vector< double > identity_matrix( 6, 0 );
   this->add_state( "transformation_matrix", this->transform_matrix_state_, identity_matrix );
 
   this->add_connection( LayerManager::Instance()->layers_changed_signal_.connect(
@@ -93,6 +86,9 @@ PointSetFilter::PointSetFilter( const std::string& toolid ) :
   this->add_state( "rotation_x", this->rotation_state_[ 0 ], 0 );
   this->add_state( "rotation_y", this->rotation_state_[ 1 ], 0 );
   this->add_state( "rotation_z", this->rotation_state_[ 2 ], 0 );
+
+  this->add_connection( this->transform_matrix_state_->state_changed_signal_.connect(
+    boost::bind( &PointSetFilter::handle_transform_changed, this ) ) );
 
 }
   
@@ -112,6 +108,24 @@ void PointSetFilter::handle_iteration_changed(  )
   registration_ready_state_->set( false );
 }
 
+
+void PointSetFilter::handle_transform_changed(  )
+{
+  this->registration_ready_state_->set( true );
+
+  std::vector< double > matrix_params;
+  matrix_params = this->transform_matrix_state_->get();
+
+  this->rotation_state_[ 0 ]->set( matrix_params[ 0 ] );
+  this->rotation_state_[ 1 ]->set( matrix_params[ 1 ] );
+  this->rotation_state_[ 2 ]->set( matrix_params[ 2 ] );
+
+  this->translation_state_[ 0 ]->set( matrix_params[ 3 ] );
+  this->translation_state_[ 1 ]->set( matrix_params[ 4 ] );
+  this->translation_state_[ 2 ]->set( matrix_params[ 5 ] );
+
+}
+
 void PointSetFilter::handle_layers_changed()
 {
   std::string mask_layer_id = this->mask_state_->get();
@@ -120,13 +134,14 @@ void PointSetFilter::handle_layers_changed()
 
   if ( layer )
   {
+    registration_ready_state_->set( false );
     LayerGroupHandle group = layer->get_layer_group();
     std::string group_id = group->get_group_id();
 
     Core::VolumeType mask_type = layer->get_type();
 
     std::vector< LayerIDNamePair > layer_names;
-    std::vector< std::string > selected_layers;
+    //std::vector< std::string > selected_layers;
     if ( group_id != "" && group_id != Tool::NONE_OPTION_C )
     {
       group->get_layer_names( layer_names, mask_type );
@@ -152,10 +167,10 @@ void PointSetFilter::handle_layers_changed()
     }
 
     this->target_layers_state_->set_option_list( layer_names );
-    if ( selected_layers.size() > 0 )
-    {
-      this->target_layers_state_->set( selected_layers );
-    }
+    //if ( selected_layers.size() > 0 )
+    //{
+    //  this->target_layers_state_->set( selected_layers );
+    //}
   }
 
 }
@@ -174,7 +189,7 @@ void PointSetFilter::handle_mask_layer_changed( std::string layer_id )
     Core::VolumeType mask_type = layer->get_type();
 
     std::vector< LayerIDNamePair > layer_names;
-    std::vector< std::string > selected_layers;
+    //std::vector< std::string > selected_layers;
     if ( group_id != "" && group_id != Tool::NONE_OPTION_C )
     {
       group->get_layer_names( layer_names, mask_type );
@@ -200,15 +215,15 @@ void PointSetFilter::handle_mask_layer_changed( std::string layer_id )
     }
 
     this->target_layers_state_->set_option_list( layer_names );
-    if ( selected_layers.size() > 0 )
-    {
-      this->target_layers_state_->set( selected_layers );
-    }
+    //if ( selected_layers.size() > 0 )
+    //{
+    //  this->target_layers_state_->set( selected_layers );
+    //}
   }
 
 }
 
-void PointSetFilter::execute( Core::ActionContextHandle context )
+void PointSetFilter::registration( Core::ActionContextHandle context )
 {
   // NOTE: Need to lock state engine as this function is run from the interface thread
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
@@ -217,7 +232,8 @@ void PointSetFilter::execute( Core::ActionContextHandle context )
     this->target_layer_state_->get(),
     this->mask_state_->get(),
     this->iterations_state_->get(),
-    this->toolid() ); 
+    this->transform_matrix_state_->get_stateid()
+    );  
 
 }
 
@@ -229,7 +245,7 @@ void PointSetFilter::apply( Core::ActionContextHandle context )
   ActionPointSetTransformFilter::Dispatch( context,
     this->target_layer_state_->get(),
     this->target_layers_state_->get(),
-    this->toolid()
+    this->transform_matrix_state_->get()
     );    
 }
 

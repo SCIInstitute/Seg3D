@@ -63,6 +63,7 @@ public:
   bool find_one_path( Point& p1, Point& p2, SinglePath& spath ) ;
 
   const std::vector< SinglePath >& get_all_paths( )  const;
+  void set_all_paths(  std::vector< SinglePath >& paths );
 
   // SET_ONE_PATH:
   // Set the corresponding path

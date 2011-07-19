@@ -71,6 +71,10 @@ const std::vector< SinglePath >& Path::get_all_paths( ) const
   return this->paths_;
 }
 
+void Path::set_all_paths(  std::vector< SinglePath >& paths ) 
+{
+  this->paths_.swap( paths );
+}
 
 void Path::set_one_path( int index, const SinglePath& pt ) 
 {
