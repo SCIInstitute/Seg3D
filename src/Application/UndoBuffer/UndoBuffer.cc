@@ -110,9 +110,9 @@ UndoBuffer::~UndoBuffer()
 void UndoBuffer::insert_undo_item( Core::ActionContextHandle context, 
   UndoBufferItemHandle undo_item )
 {
-  undo_item->compute_size();
-
   if ( PreferencesManager::Instance()->enable_undo_state_->get() == false ) return;
+
+  undo_item->compute_size();
 
   // Clear REDO buffer if a new item is added from anywhere else except the undo buffer itself
   if ( context->source() != Core::ActionSource::UNDOBUFFER_E )

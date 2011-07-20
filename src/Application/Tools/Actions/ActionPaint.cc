@@ -37,6 +37,7 @@
 #include <Application/Layer/LayerUndoBufferItem.h>
 #include <Application/Provenance/ProvenanceStep.h>
 #include <Application/ProjectManager/ProjectManager.h>
+#include <Application/PreferencesManager/PreferencesManager.h>
 
 CORE_REGISTER_ACTION( Seg3D, Paint )
 
@@ -281,22 +282,25 @@ bool ActionPaint::run( Core::ActionContextHandle& context, Core::ActionResultHan
       add_provenance_record( provenance_step );
     assert( prov_step_id > 0 );
 
-    // Create a new undo item
-    LayerUndoBufferItemHandle item( new LayerUndoBufferItem( "Paint Stroke" ) );
-    
-    // Add redo information to undo item
-    item->set_redo_action( this->shared_from_this() );
+    if ( PreferencesManager::Instance()->enable_undo_state_->get() )
+    {
+      // Create a new undo item
+      LayerUndoBufferItemHandle item( new LayerUndoBufferItem( "Paint Stroke" ) );
+      
+      // Add redo information to undo item
+      item->set_redo_action( this->shared_from_this() );
 
-    // Add check point for the slice we are painting on
-    Core::SliceType slice_type = static_cast<Core::SliceType::enum_type>( 
-      this->private_->slice_type_ );
-    int index = static_cast< int >( this->private_->slice_number_ );
-    
-    LayerCheckPointHandle check_point( new LayerCheckPoint( layer, slice_type, index ) );
-    item->add_layer_to_restore( layer, check_point );
-    item->set_provenance_step_id( prov_step_id );
+      // Add check point for the slice we are painting on
+      Core::SliceType slice_type = static_cast<Core::SliceType::enum_type>( 
+        this->private_->slice_type_ );
+      int index = static_cast< int >( this->private_->slice_number_ );
+      
+      LayerCheckPointHandle check_point( new LayerCheckPoint( layer, slice_type, index ) );
+      item->add_layer_to_restore( layer, check_point );
+      item->set_provenance_step_id( prov_step_id );
 
-    UndoBuffer::Instance()->insert_undo_item( context, item );
+      UndoBuffer::Instance()->insert_undo_item( context, item );
+    }
   }
 
   // Update the provenance ID of the target mask

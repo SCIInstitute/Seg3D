@@ -217,11 +217,6 @@ BOOST_PYTHON_MODULE( interpreter )
     .def( "write", &PythonStdErr::write );
 }
 
-//BOOST_PYTHON_MODULE( seg3d )
-//{
-//  register_python_action_module();
-//}
-
 namespace Core
 {
 
@@ -444,7 +439,8 @@ void PythonInterpreter::run_script( std::string script )
 
   if ( !this->is_eventhandler_thread() )
   {
-    this->post_event( boost::bind( &PythonInterpreter::run_script, this, script ) );
+    this->post_event( boost::bind( static_cast< void ( PythonInterpreter::* ) ( std::string ) >( 
+      &PythonInterpreter::run_script ), this, script ) );
     return;
   }
 
@@ -483,6 +479,32 @@ void PythonInterpreter::run_script( std::string script )
 
   this->private_->command_buffer_.clear();
   this->prompt_signal_( this->private_->prompt1_ );
+}
+
+void PythonInterpreter::run_script( StringVectorConstHandle script )
+{
+  {
+    PythonInterpreterPrivate::lock_type lock( this->private_->get_mutex() );
+    if ( !this->private_->initialized_ )
+    {
+      CORE_THROW_LOGICERROR( "The python interpreter hasn't been initialized!" );
+    }
+  }
+
+  if ( !this->is_eventhandler_thread() )
+  {
+    this->post_event( boost::bind( static_cast< void ( PythonInterpreter::* ) ( StringVectorConstHandle ) >(
+      &PythonInterpreter::run_script ), this, script ) );
+    return;
+  }
+
+  // Concatenate the strings into one single string
+  std::string str;
+  for ( size_t i = 0; i < script->size(); ++i )
+  {
+    str += script->at( i );
+  }
+  this->run_script( str );
 }
 
 void PythonInterpreter::run_file( std::string file_name )
@@ -586,7 +608,7 @@ PythonActionContextHandle PythonInterpreter::GetActionContext()
 
 std::string PythonInterpreter::EscapeSingleQuotedString( const std::string& str )
 {
-  boost::regex reg( "[\\\\']" );
+  static const boost::regex reg( "[\\\\']" );
   return boost::regex_replace( str, reg, "\\\\$&", boost::regex_constants::format_default );
 }
 

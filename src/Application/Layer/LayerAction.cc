@@ -173,13 +173,19 @@ std::string LayerAction::export_params_to_provenance_string( bool single_input )
       {
         LayerActionParameter* layer_param = static_cast< LayerActionParameter* >( param );
         action_params += this->get_key( j ) + "=" + layer_param->
-          export_to_provenance_string( input_count, single_input ) + " ";
+          export_to_provenance_string( input_count, single_input ) + ", ";
       }
       else
       {
-        action_params += this->get_key( j ) + "=" + param->export_to_string() + " ";
+        action_params += this->get_key( j ) + "=" + param->export_to_string() + ", ";
       }
     }
+  }
+
+  // Get rid of the last ", "
+  if ( num_params > 0 )
+  {
+    action_params.resize( action_params.size() - 2 );
   }
 
   if ( single_input && input_count > 1 )

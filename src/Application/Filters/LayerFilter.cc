@@ -49,7 +49,8 @@
 #include <Application/Layer/LayerUndoBufferItem.h>
 #include <Application/Filters/LayerFilter.h>
 #include <Application/Filters/LayerFilterLock.h>
-#include <Application/Filters/LayerFilterNotifier.h> 
+#include <Application/Filters/LayerFilterNotifier.h>
+#include <Application/PreferencesManager/PreferencesManager.h>
 #include <Application/UndoBuffer/Actions/ActionUndo.h>
  
 namespace Seg3D
@@ -956,7 +957,10 @@ void LayerFilter::create_undo_redo_and_provenance_record(
   if ( this->private_->sandbox_ == -1 )
   {
     this->private_->create_provenance_record( context, action, split_prov );
-    this->private_->create_undo_redo_record( context, action );
+    if ( PreferencesManager::Instance()->enable_undo_state_->get() )
+    {
+      this->private_->create_undo_redo_record( context, action );
+    }
   }
 }
 

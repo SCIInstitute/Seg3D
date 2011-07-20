@@ -389,6 +389,7 @@ void LayerManagerWidgetPrivate::handle_script_begin( SandboxID sandbox, std::str
   this->ui_.step_name_label_->setText( QString( "" ) );
   this->ui_.script_widget_->show();
   this->parent_->parentWidget()->raise();
+  this->parent_->repaint();
 }
 
 void LayerManagerWidgetPrivate::handle_script_end( SandboxID sandbox )

@@ -32,10 +32,13 @@
 
 // boost includes
 #include <boost/regex.hpp>
+#include <boost/timer.hpp>
+#include <boost/unordered_map.hpp>
 
 // Core includes
 #include <Core/Utils/Exception.h>
 #include <Core/Utils/StringParser.h>
+#include <Core/Utils/StringContainer.h>
 #ifdef BUILD_WITH_PYTHON
 #include <Core/Python/PythonInterpreter.h>
 #endif
@@ -47,6 +50,7 @@
 #include <Application/Layer/Actions/ActionRecreateLayer.h>
 #include <Application/ProjectManager/ProjectManager.h>
 #include <Application/UndoBuffer/UndoBuffer.h>
+#include "Core/Utils/Log.h"
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
@@ -59,12 +63,190 @@ namespace Seg3D
 class ActionRecreateLayerPrivate
 {
 public:
+  // GENERATE_SCRIPT:
+  // Template function for generating a python script from the provenance trail.
+  template< class LAYER_LUT_TYPE, class PROV_USE_LUT_TYPE >
+  bool generate_script( Core::ActionContextHandle context, 
+    LAYER_LUT_TYPE& prov_input_lut, PROV_USE_LUT_TYPE& prov_use_lut, 
+    std::vector< LayerHandle >& input_layers, std::vector< std::string >& script );
+
   // -- Action Parameters --
   ProvenanceIDList prov_ids_;
 
   // -- Internal variables --
   ProvenanceTrailHandle prov_trail_;
 };
+
+template< class LAYER_LUT_TYPE, class PROV_USE_LUT_TYPE >
+bool ActionRecreateLayerPrivate::generate_script( Core::ActionContextHandle context,
+          LAYER_LUT_TYPE& layer_lut, PROV_USE_LUT_TYPE& prov_use_lut,
+          std::vector< LayerHandle >& input_layers, std::vector< std::string >& script )
+{
+  const size_t num_steps = this->prov_trail_->size();
+  const std::string num_steps_str = Core::ExportToString( num_steps );
+
+  boost::timer performance_timer;
+
+  // == Build lookup tables for provenance IDs ==
+  // All the input IDs of a provenance step must either already exist in the layer manager, 
+  // or are outputs from previous steps.
+  for ( size_t i = 0; i < num_steps; ++i )
+  {
+    ProvenanceStepHandle prov_step = this->prov_trail_->at( i );
+    const ProvenanceIDList& input_ids = prov_step->get_input_provenance_ids();
+    const ProvenanceIDList& output_ids = prov_step->get_output_provenance_ids();
+    for ( size_t j = 0; j < input_ids.size(); ++j )
+    {
+      if ( layer_lut[ input_ids[ j ] ].empty() )
+      {
+        LayerHandle layer = LayerManager::FindLayer( input_ids[ j ] );
+        if ( layer )
+        {
+          LayerHandle duplicate_layer = layer->duplicate();
+          duplicate_layer->provenance_id_state_->set( layer->provenance_id_state_->get() );
+          input_layers.push_back( duplicate_layer );
+          layer_lut[ input_ids[ j ] ] = "'" + duplicate_layer->get_layer_id() + "'";
+        }
+        else
+        {
+          context->report_error( "The provenance trail for provenance IDs " + 
+            Core::ExportToString( this->prov_ids_ ) + " is incomplete." );
+          return false;
+        }
+      }
+      prov_use_lut[ input_ids[ j ] ] = i;
+    }
+
+    for ( size_t j = 0; j < output_ids.size(); ++j )
+    {
+      layer_lut[ output_ids[ j ] ] = "output" + Core::ExportToString( i ) + "[" +
+        Core::ExportToString( j ) + "]";
+    }
+  }
+
+  double elapsed_time = performance_timer.elapsed();
+  CORE_LOG_MESSAGE( "Time spent on building lookup tables: " + Core::ExportToString( elapsed_time ) );
+  performance_timer.restart();
+
+  // == Generate the script ==
+
+  // Regular expression that matches input provenances in the action params string
+  const static boost::regex input_regex( "\\$\\{[0-9]+\\}" );
+  // Regular expression that matches a word in the action name
+  const static boost::regex action_name_regex( "[[:upper:]]?[[:lower:]]*" );
+
+  // Reserve roughly enough memory for the script
+  script.reserve( 5 * num_steps + 10 + 3 * this->prov_ids_.size() );
+
+  // Generate python commands to run the necessary actions
+  script.push_back( "try:\n" );
+  script.push_back( "\tbeginscriptstatusreport(sandbox=0, "
+    "script_name='[Provenance Playback]')\n" );
+  for ( size_t i = 0 ; i < num_steps; ++i )
+  {
+    const std::string i_str = Core::ExportToString( i );
+    ProvenanceStepHandle prov_step = this->prov_trail_->at( i );
+    const ProvenanceIDList& input_ids = prov_step->get_input_provenance_ids();
+    const std::string& action_params = prov_step->get_action_params();
+    // Convert the action name to human readable format
+    std::string action_display_name = boost::regex_replace( prov_step->get_action_name(),
+      action_name_regex, "$& " );
+    std::string output_name = "output" + i_str;
+    // Report script progress
+    script.push_back( "\treportscriptstatus(sandbox=0, current_step='[" + 
+      action_display_name + "]', steps_done=" + i_str +
+      ", total_steps=" + num_steps_str + ")\n" );
+
+    // == Build the command for running the action ==
+    std::string action_cmd = "\t" + output_name + "=" + Core::StringToLower( prov_step->get_action_name() ) + "(";
+    // Look for provenance inputs and replace them with proper layer IDs
+    std::string::size_type start_pos = 0;
+    for ( size_t j = 0; j < input_ids.size(); ++j )
+    {
+      std::string layer_id = layer_lut[ input_ids[ j ] ];
+      if ( layer_id.empty() )
+      {
+        context->report_error( "The provenance trail is incomplete." );
+        return false;
+      }
+      std::string input_pattern = "${" + Core::ExportToString( j ) + "}";
+      std::string::size_type pos = action_params.find( input_pattern, start_pos );
+      if ( pos == std::string::npos )
+      {
+        context->report_error( "Invalid provenance record encountered." );
+        return false;
+      }
+      action_cmd += action_params.substr( start_pos, pos ) + layer_id;
+      start_pos = pos + input_pattern.size();
+    }
+    // Append the rest of the parameter string to the command
+    if ( start_pos < action_params.size() )
+    {
+      action_cmd += action_params.substr( start_pos );
+    }
+    // Append the sandbox parameter
+    action_cmd += ", sandbox=0)\n";
+
+    // Before running the action, duplicate any inputs that will be replaced by new data but
+    // the old data is needed but following steps.
+    const ProvenanceIDList& replaced_ids = prov_step->get_replaced_provenance_ids();
+    for ( size_t j = 0; j < replaced_ids.size(); ++j )
+    {
+      // If the provenance ID is still needed by a later step, duplicate the layer
+      if ( prov_use_lut[ replaced_ids[ j ] ] > i )
+      {
+        std::string dup_name = "input" + i_str + "_" + Core::ExportToString( j ) + "_dup";
+        script.push_back( "\t" + dup_name + "=duplicatelayer(layerid=" + layer_lut[ replaced_ids[ j ] ] +
+          ", sandbox=0)\n" );
+        // Store the duplicate as the new input for the replaced provenance ID
+        layer_lut[ replaced_ids[ j ] ] = dup_name;
+      }
+    }
+
+    // Issue the action
+    script.push_back( action_cmd );
+    // Make sure that the output is a python list
+    script.push_back( "\tif type(" + output_name + ")!=list:\n" 
+      "\t\ttmp=list()\n" + "\t\ttmp.append(" + output_name + ")\n"
+      "\t\t" + output_name + "=tmp\n" );
+    // Print the output
+    //script.push_back( "\tprint('" + output_name + " =', " + output_name + ")\n" );
+  }
+
+  // Report script progress
+  script.push_back( "\treportscriptstatus(sandbox=0, current_step='', steps_done=" +
+    num_steps_str + ", total_steps=" + num_steps_str + ")\n" );
+
+  for ( size_t i = 0; i < this->prov_ids_.size(); ++i )
+  {
+    // Get the layer ID of the desired output
+    std::string layer_id = layer_lut[ this->prov_ids_[ i ] ];
+    // Set the layer name
+    std::string layer_name = "Recreated_Provenance_ID_" + 
+      Core::ExportToString( this->prov_ids_[ i ] );
+    script.push_back( "\tset(stateid=" + layer_id + "+'::name', value='" +
+      layer_name + "')\n" );
+    // Move the final output layer out of the sandbox and assign the 
+    // desired provenance ID to it.
+    script.push_back( "\tmigratesandboxlayer(layerid=" + layer_id +
+      ", sandbox=0, prov_id=" + Core::ExportToString( this->prov_ids_[ i ] ) + ")\n" );
+    // Activate the layer
+    script.push_back( "\tactivatelayer(layerid=" + layer_id + ")\n" );
+  }
+
+  // Exception handling
+  script.push_back( "except:\n\tprint('Layer recreation failed:', sys.exc_info()[:2], file=sys.stderr)\n" );
+
+  elapsed_time = performance_timer.elapsed();
+  CORE_LOG_MESSAGE( "Time spent on generating the script: " + Core::ExportToString( elapsed_time ) );
+  CORE_LOG_MESSAGE( "Script length: " + Core::ExportToString( script.size() ) );
+
+  return true;
+}
+
+//////////////////////////////////////////////////////////////////////////
+// Class ActionRecreateLayer
+//////////////////////////////////////////////////////////////////////////
 
 ActionRecreateLayer::ActionRecreateLayer() :
   private_( new ActionRecreateLayerPrivate )
@@ -108,6 +290,8 @@ bool ActionRecreateLayer::validate( Core::ActionContextHandle& context )
   this->private_->prov_ids_ = tmp_list;
   if ( this->private_->prov_ids_.size() == 0 ) return true;
 
+  boost::timer performance_timer;
+
   // Get the provenance trail that leads to the desired provenance ID
   ProvenanceTrailHandle prov_trail = ProjectManager::Instance()->get_current_project()->
     get_provenance_trail( this->private_->prov_ids_ );
@@ -117,6 +301,10 @@ bool ActionRecreateLayer::validate( Core::ActionContextHandle& context )
       Core::ExportToString( this->private_->prov_ids_ ) + " doesn't exist." );
     return false;
   }
+
+  double elapsed_time = performance_timer.elapsed();
+  CORE_LOG_MESSAGE( "Time spent on provenance trail query: " + Core::ExportToString( elapsed_time ) );
+  performance_timer.restart();
 
   this->private_->prov_trail_.reset( new ProvenanceTrail );
 
@@ -140,25 +328,15 @@ bool ActionRecreateLayer::validate( Core::ActionContextHandle& context )
       this->private_->prov_trail_->push_back( prov_step );
     }
   }
-  
+
+  elapsed_time = performance_timer.elapsed();
+  CORE_LOG_MESSAGE( "Time spent on provenance trail cleanup: " + Core::ExportToString( elapsed_time ) );
+
   return true; // validated
 }
 
-static std::string ProvenanceInputFormatter( boost::smatch what, 
-      const std::map< ProvenanceID, std::string >& prov_id_map,
-      const ProvenanceIDList& prov_input_ids )
-{
-  std::string match = what.str();
-  size_t input_index;
-  std::map< ProvenanceID, std::string >::const_iterator it;
-  if ( !Core::ImportFromString( match.substr( 2, match.size() - 3 ), input_index ) ||
-    input_index >= prov_input_ids.size() || 
-    ( it = prov_id_map.find( prov_input_ids[ input_index ] ) ) == prov_id_map.end() )
-  {
-    CORE_THROW_EXCEPTION( "Invalid provenance record." );
-  }
-  return it->second;
-}
+typedef boost::unordered_map< ProvenanceID, std::string > ProvenanceIDLayerIDMap;
+typedef boost::unordered_map< ProvenanceID, size_t > ProvenanceIDStepIDMap;
 
 bool ActionRecreateLayer::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 { 
@@ -176,201 +354,50 @@ bool ActionRecreateLayer::run( Core::ActionContextHandle& context, Core::ActionR
   // NOTE: This needs to be done before a new layer is created
   LayerManager::id_count_type id_count = LayerManager::GetLayerIdCount();
 
-  // Build a lookup table for all the provenance IDs involved in the provenance trail.
-  // All the input IDs of a provenance step must either already exist in the layer manager, 
-  // or are outputs from previous steps.
-  std::map< ProvenanceID, std::string > prov_id_map;
-  std::vector< LayerHandle > input_layers;
-  // A map of what provenance IDs are used by what provenance step. A later step will
-  // overwrite previous one.
-  std::map< ProvenanceID, size_t > prov_id_use_map;
-  for ( size_t i = 0; i < num_steps; ++i )
-  {
-    ProvenanceStepHandle prov_step = this->private_->prov_trail_->at( i );
-    const ProvenanceIDList& input_ids = prov_step->get_input_provenance_ids();
-    const ProvenanceIDList& output_ids = prov_step->get_output_provenance_ids();
-    for ( size_t j = 0; j < input_ids.size(); ++j )
-    {
-      if ( prov_id_map.find( input_ids[ j ] ) == prov_id_map.end() )
-      {
-        LayerHandle layer = LayerManager::FindLayer( input_ids[ j ] );
-        if ( layer )
-        {
-          LayerHandle duplicate_layer = layer->duplicate();
-          duplicate_layer->provenance_id_state_->set( layer->provenance_id_state_->get() );
-          input_layers.push_back( duplicate_layer );
-          prov_id_map[ input_ids[ j ] ] = "'" + duplicate_layer->get_layer_id() + "'";
-        }
-        else
-        {
-          context->report_error( "The provenance trail for provenance IDs " + 
-            Core::ExportToString( this->private_->prov_ids_ ) + " is incomplete." );
-          return false;
-        }
-      }
-      prov_id_use_map[ input_ids[ j ] ] = i;
-    }
+  // Figure out the maximum provenance ID the provenance trail contains
+  ProvenanceStepHandle last_prov_step = this->private_->prov_trail_->back();
+  ProvenanceID max_prov_id = *std::max_element( last_prov_step->get_output_provenance_ids().begin(),
+    last_prov_step->get_output_provenance_ids().end() );
 
-    for ( size_t j = 0; j < output_ids.size(); ++j )
-    {
-      prov_id_map[ output_ids[ j ] ] = "output" + Core::ExportToString( i ) + "[" +
-        Core::ExportToString( j ) + "]";
-    }
+  // Generate the Python script
+  // Depending on the value of the maximum provenance ID involved,
+  // used a std::vector or boost::unordered_map for lookup tables.
+  Core::StringVectorHandle script( new Core::StringVector );
+  std::vector< LayerHandle > input_layers;
+  bool succeeded = false;
+  if ( max_prov_id < 2000000 )
+  {
+    CORE_LOG_MESSAGE( "Generating script using std::vector" );
+    std::vector< std::string > layer_lut( static_cast< size_t >( max_prov_id + 1 ) );
+    std::vector< size_t > prov_use_lut( static_cast< size_t >( max_prov_id + 1 ) );
+    succeeded = this->private_->generate_script( context, layer_lut, prov_use_lut, input_layers, *script );
   }
+  else
+  {
+    CORE_LOG_MESSAGE( "Generating script using boost::unordered_map" );
+    ProvenanceIDLayerIDMap layer_lut;
+    ProvenanceIDStepIDMap prov_use_lut;
+    succeeded = this->private_->generate_script( context, layer_lut, prov_use_lut, input_layers, *script );
+  }
+
+  if ( !succeeded ) return false;
 
   // Create a sandbox for running the script
   // NOTE: sandbox must be created in both the layer manager and the clipboard
   // NOTE: provenance playback always uses sandbox 0 to guarantee that only one
   // playback will be running at a time.
-  SandboxID sandbox = 0;
-  LayerManager::Instance()->create_sandbox( sandbox );
-  Clipboard::Instance()->create_sandbox( sandbox );
-  std::string sandbox_str = Core::ExportToString( sandbox );
+  LayerManager::Instance()->create_sandbox( 0 );
+  Clipboard::Instance()->create_sandbox( 0 );
 
   // Add the input layers to the sandbox
   for ( size_t i = 0; i < input_layers.size(); ++i )
   {
-    LayerManager::Instance()->insert_layer( input_layers[ i ], sandbox );
+    LayerManager::Instance()->insert_layer( input_layers[ i ], 0 );
   }
   
-  // == Generate the script ==
-
-  // Regular expression that matches input provenances in the action params string
-  boost::regex input_regex( "\\$\\{[0-9]+\\}" );
-  // Regular expression that matches a word in the action name
-  boost::regex action_name_regex( "[[:upper:]]?[[:lower:]]*" );
-
-  // Generate python commands to run the necessary actions
-  bool succeeded = true;
-  std::string script( "try:\n" );
-  script += "\tbeginscriptstatusreport(sandbox=" + sandbox_str + 
-    ", script_name='[Provenance Playback]')\n";
-  for ( size_t i = 0 ; i < num_steps && succeeded; ++i )
-  {
-    ProvenanceStepHandle prov_step = this->private_->prov_trail_->at( i );
-    const ProvenanceIDList& input_ids = prov_step->get_input_provenance_ids();
-    const std::string& action_params = prov_step->get_action_params();
-    // Convert the action name to human readable format
-    std::string action_display_name = boost::regex_replace( prov_step->get_action_name(),
-      action_name_regex, "$& " );
-    std::string output_name = "output" + Core::ExportToString( i );
-    // Report script progress
-    script += "\treportscriptstatus(sandbox=" + sandbox_str + ", current_step='[" + 
-      action_display_name + "]', steps_done=" + Core::ExportToString( i ) +
-      ", total_steps=" + Core::ExportToString( num_steps ) + ")\n";
-    // Build the command for running the action
-    std::string action_cmd = "\t" + output_name + "=" + Core::StringToLower( prov_step->get_action_name() ) + "(";
-    std::string key, value, error;
-    std::string::size_type start = 0;
-    
-    // The functor for replacing input strings with correct input values
-    // NOTE: boost.regex library couldn't deduce the correct functor type from the boost::bind
-    // result, so we need to explicitly tell it
-    boost::function< std::string ( boost::smatch ) > formatter = boost::bind( 
-      &ProvenanceInputFormatter, _1, prov_id_map, input_ids );
-
-    while ( true ) 
-    {
-      if ( !Core::ScanKeyValuePair( action_params, start, key, value, error ) )
-      {
-        context->report_error( "Syntax error in provenance string: " + error );
-        succeeded = false;
-        break;
-      }
-      if ( key.empty() ) break;
-
-      std::string formatted_val;
-      try
-      {
-        formatted_val = boost::regex_replace( value, input_regex, formatter, 
-          boost::regex_constants::format_literal );
-      }
-      catch ( ... )
-      {
-        context->report_error( "Incorrectly constructed provenance record encountered." );
-        succeeded = false;
-        break;
-      }
-
-      if ( formatted_val != value )
-      {
-        action_cmd += key + "=" + formatted_val + ",";
-      }
-      else
-      {
-        action_cmd += key + "='" + Core::PythonInterpreter::EscapeSingleQuotedString( value ) + "',";
-      }
-    }
-    action_cmd += "sandbox=" + sandbox_str + ")\n";
-
-    // Before running the action, duplicate any inputs that will be replaced by new data but
-    // the old data is needed but following steps.
-    const ProvenanceIDList& replaced_ids = prov_step->get_replaced_provenance_ids();
-    for ( size_t j = 0; j < replaced_ids.size(); ++j )
-    {
-      // If the provenance ID is still needed by a later step, duplicate the layer
-      if ( prov_id_use_map[ replaced_ids[ j ] ] > i )
-      {
-        std::string dup_name = "input" + Core::ExportToString( i ) + "_" + 
-          Core::ExportToString( j ) + "_dup";
-        script += "\t" + dup_name + "=duplicatelayer(layerid=" + prov_id_map[ replaced_ids[ j ] ] +
-          ", sandbox=" + sandbox_str + ")\n";
-        // Store the duplicate as the new input for the replaced provenance ID
-        prov_id_map[ replaced_ids[ j ] ] = dup_name;
-      }
-    }
-
-    // Issue the action
-    script += action_cmd;
-    // Make sure that the output is a python list
-    script += "\tif type(" + output_name + ")!=list:\n" 
-      "\t\ttmp=list()\n" + "\t\ttmp.append(" + output_name + ")\n"
-      "\t\t" + output_name + "=tmp\n";
-    // Print the output
-    script += "\tprint('" + output_name + " =', " + output_name + ")\n";
-  }
-
-  // Error happened, destroy the sandbox and return
-  if ( !succeeded )
-  {
-    LayerManager::Instance()->delete_sandbox( sandbox );
-    Clipboard::Instance()->delete_sandbox( sandbox );
-    return false;
-  }
-
-  // Report script progress
-  script += "\treportscriptstatus(sandbox=" + sandbox_str + ", current_step='', steps_done=" +
-    Core::ExportToString( num_steps ) + ", total_steps=" + Core::ExportToString( num_steps ) + ")\n";
-
-  for ( size_t i = 0; i < this->private_->prov_ids_.size(); ++i )
-  {
-    // Get the layer ID of the desired output
-    std::string layer_id = prov_id_map[ this->private_->prov_ids_[ i ] ];
-    // Set the layer name
-    std::string layer_name = "Recreated_Provenance_ID_" + 
-      Core::ExportToString( this->private_->prov_ids_[ i ] );
-    script += "\tset(stateid=" + layer_id + "+'::name', value='" +
-      layer_name + "')\n";
-    // Move the final output layer out of the sandbox and assign the 
-    // desired provenance ID to it.
-    script += "\tmigratesandboxlayer(layerid=" + layer_id +
-      ", sandbox=" + sandbox_str + ", prov_id=" +
-      Core::ExportToString( this->private_->prov_ids_[ i ] ) + ")\n";
-    // Activate the layer
-    script += "\tactivatelayer(layerid=" + layer_id + ")\n";
-  }
-
-  // Exception handling
-  script += "except:\n\tprint('Layer recreation failed:', sys.exc_info()[:2], file=sys.stderr)\n";
-  // Clean up, ignore any exceptions that might happen
-  script += "try:\n\tendscriptstatusreport(sandbox=" + sandbox_str +
-    ")\nexcept:\n\tpass\n";
-  script += "try:\n\tdeletesandbox(sandbox=" + sandbox_str + 
-    ")\nexcept:\n\tpass\n";
-
   // Create undo/redo record
   LayerRecreationUndoBufferItemHandle item( new LayerRecreationUndoBufferItem( 
-    this->private_->prov_ids_, sandbox ) );
+    this->private_->prov_ids_, 0 ) );
   item->set_redo_action( this->shared_from_this() );
   item->add_id_count_to_restore( id_count );
   UndoBuffer::Instance()->insert_undo_item( context, item );
@@ -378,6 +405,13 @@ bool ActionRecreateLayer::run( Core::ActionContextHandle& context, Core::ActionR
 #ifdef BUILD_WITH_PYTHON
   // Run the script to recreate the layer
   Core::PythonInterpreter::Instance()->run_script( script );
+
+  // Clean up, ignore any exceptions that might happen
+  // NOTE: This part is separated out so that if the previous script failed to compile or run,
+  // the sandbox can still be deleted properly.
+  std::string cleanup_cmd( "try:\n\tendscriptstatusreport(sandbox=0)\nexcept:\n\tpass\n"
+    "try:\n\tdeletesandbox(sandbox=0)\nexcept:\n\tpass\n" );
+  Core::PythonInterpreter::Instance()->run_script( cleanup_cmd );
 #endif
 
   return true;

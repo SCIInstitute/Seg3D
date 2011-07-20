@@ -36,6 +36,7 @@
 
 // Core includes
 #include <Core/Utils/Singleton.h>
+#include <Core/Utils/StringContainer.h>
 #include <Core/EventHandler/EventHandler.h>
 #include <Core/Python/PythonActionContext.h>
 
@@ -96,6 +97,11 @@ public:
   // Execute a python script.
   // NOTE: The script is run in its own local namespace.
   void run_script( std::string script );
+
+  // RUN_SCRIPT:
+  // Execute a python script.
+  // NOTE: The script is run in its own local namespace.
+  void run_script( StringVectorConstHandle script );
 
   // RUN_FILE:
   // Execute a python script from file.

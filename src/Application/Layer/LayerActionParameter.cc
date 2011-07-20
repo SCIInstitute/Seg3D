@@ -98,7 +98,7 @@ std::string LayerActionLayerID::export_to_provenance_string(
 {
   if ( this->layer_id_ == "" || this->layer_id_ == "<none>" )
   {
-    return this->layer_id_;
+    return "'" + this->layer_id_ + "'";
   }
   
   return "${" + Core::ExportToString( input_counter++ ) + "}";
@@ -160,7 +160,7 @@ std::string LayerActionGroupID::export_to_provenance_string(
 {
   if ( this->group_id_ == "" || this->group_id_ == "<none>" )
   {
-    return this->group_id_;
+    return "'" + this->group_id_ + "'";
   }
 
   return "${" + Core::ExportToString( input_counter++ ) + "}";

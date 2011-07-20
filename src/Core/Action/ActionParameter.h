@@ -36,6 +36,9 @@
 // STL
 #include <string>
 
+// boost includes
+#include <boost/regex.hpp>
+
 // Core
 #include <Core/Utils/StringUtil.h>
 
@@ -115,11 +118,11 @@ public:
   // export the contents of the parameter to string
   virtual std::string export_to_string() const
   {
-    return ExportToString( this->parameter_ );
+    return "'" + ExportToString( this->parameter_ ) + "'";
   }
 
   // HAS_EXTENSION
-  // Has exented information in the derived class
+  // Has extended information in the derived class
   virtual bool has_extension() const
   {
     return false;
@@ -128,6 +131,50 @@ public:
 protected:
   // The actual parameter (as a reference)
   T& parameter_;
+};
+
+// Template specialization for string parameter
+template<>
+class ActionParameter< std::string > : public ActionParameterBase
+{
+  // -- constructor/destructor --
+public:
+  ActionParameter( std::string& parameter ) :
+    parameter_( parameter )
+  {
+  }
+
+    // -- access to value --
+public:
+
+  // IMPORT_FROM_STRING
+  // import a parameter from a string. The function returns true
+  // if the import succeeded
+  virtual bool import_from_string( const std::string& str )
+  {
+    return ImportFromString( str, this->parameter_ );
+  }
+
+  // EXPORT_TO_STRING
+  // export the contents of the parameter to string
+  virtual std::string export_to_string() const
+  {
+    static const boost::regex reg( "[\\\\']" );
+    // Format the string so it can be directly used as a string in python
+    return "'" + boost::regex_replace( ExportToString( this->parameter_ ), reg, 
+      "\\\\$&", boost::regex_constants::format_default ) + "'";
+  }
+
+  // HAS_EXTENSION
+  // Has extended information in the derived class
+  virtual bool has_extension() const
+  {
+    return false;
+  }
+
+protected:
+  // The actual parameter (as a reference)
+  std::string& parameter_;
 };
 
 } // namespace Core

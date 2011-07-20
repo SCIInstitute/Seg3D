@@ -61,6 +61,7 @@ SET(CORE_UTILS_SRCS
   Singleton.h
   StackBasedVector.h
   StackVector.h
+  StringContainer.h
   StringParser.h
   StringParser.cc
   StringUtil.h
