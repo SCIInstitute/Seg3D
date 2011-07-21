@@ -108,6 +108,9 @@ public:
   ProvenanceTreeModel* prov_tree_model_;
   boost::signals2::connection active_layer_prov_connection_;
   boost::signals2::connection project_provenance_connection_;
+
+  // Cached provenance trail
+  ProvenanceTrailHandle prov_trail_;
   
   // -- Static signal handling functions --
 public:
@@ -132,6 +135,7 @@ public:
 
 void ProvenanceDockWidgetPrivate::populate_provenance_list( ProvenanceTrailHandle provenance_trail )
 {
+  this->prov_trail_ = provenance_trail;
   this->prov_tree_model_->set_provenance_trail( provenance_trail );
   this->set_provenance_dirty( false );
 
@@ -232,6 +236,8 @@ void ProvenanceDockWidgetPrivate::set_provenance_dirty( bool dirty )
   this->ui_.replay_button_->setEnabled( !dirty );
   this->ui_.step_detail_groupbox_->setEnabled( !dirty );
   this->ui_.refresh_button_->setEnabled( dirty );
+
+  if ( dirty ) this->prov_trail_.reset();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -312,16 +318,28 @@ void ProvenanceDockWidget::dispatch_recreate_provenance()
 {
   QModelIndex index = this->private_->ui_.provenance_list_->currentIndex();
   this->private_->ui_.replay_button_->setEnabled( false );
-  if ( index.isValid() )
+  if ( this->private_->prov_trail_ && index.isValid() )
   {
     std::string poi_text = this->private_->prov_tree_model_->data( 
       index, ProvenanceTreeModel::PID_OF_INTEREST_E ).toString().toStdString();
+    size_t prov_step_index = this->private_->prov_tree_model_->data(
+      index, ProvenanceTreeModel::PROV_STEP_INDEX_E ).value< size_t >();
     ProvenanceIDList poi;
     if ( !poi_text.empty() &&
       Core::ImportFromString( poi_text, poi ) &&
       poi.size() > 0 )
     {
-      ActionRecreateLayer::Dispatch( Core::Interface::GetWidgetActionContext(), poi );
+      if ( prov_step_index < this->private_->prov_trail_->size() )
+      {
+        ProvenanceTrailHandle sub_trail( new ProvenanceTrail );
+        sub_trail->insert( sub_trail->end(), this->private_->prov_trail_->begin(),
+          this->private_->prov_trail_->begin() + prov_step_index + 1 );
+        ActionRecreateLayer::Dispatch( Core::Interface::GetWidgetActionContext(), poi, sub_trail );
+      }
+      else
+      {
+        ActionRecreateLayer::Dispatch( Core::Interface::GetWidgetActionContext(), poi );
+      }
     }
   }
 }

@@ -33,7 +33,7 @@
 #include <Core/Action/Actions.h>
 
 // Application includes
-#include <Application/Provenance/Provenance.h>
+#include <Application/Provenance/ProvenanceStep.h>
 
 namespace Seg3D
 {
@@ -60,6 +60,7 @@ public:
   virtual bool validate( Core::ActionContextHandle& context );
   virtual bool run( Core::ActionContextHandle& context, 
     Core::ActionResultHandle& result );
+  virtual void clear_cache();
   
 private:
   ActionRecreateLayerPrivateHandle private_;
@@ -67,7 +68,9 @@ private:
 public:
   // DISPATCH:
   // Dispatch an action to recreate the given provenance ID.
-  static void Dispatch( Core::ActionContextHandle context, const std::vector< ProvenanceID >& prov_ids );
+  static void Dispatch( Core::ActionContextHandle context, 
+    const std::vector< ProvenanceID >& prov_ids, 
+    ProvenanceTrailHandle prov_trail = ProvenanceTrailHandle() );
 };
   
 } // end namespace Seg3D

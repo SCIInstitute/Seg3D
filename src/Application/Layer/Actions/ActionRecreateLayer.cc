@@ -288,18 +288,51 @@ bool ActionRecreateLayer::validate( Core::ActionContextHandle& context )
 
   // Only keep provenance IDs that don't exist yet
   this->private_->prov_ids_ = tmp_list;
-  if ( this->private_->prov_ids_.size() == 0 ) return true;
+  if ( this->private_->prov_ids_.size() == 0 ) 
+  {
+    this->private_->prov_trail_.reset();
+    return true;
+  }
+
+  ProvenanceTrailHandle prov_trail;
+
+  // If a provenance trail was given, try to use it
+  if ( this->private_->prov_trail_ && this->private_->prov_trail_->size() > 0 )
+  {
+    // Check the last step of the trail for the desired provenance outputs
+    ProvenanceStepHandle prov_step = this->private_->prov_trail_->back();
+    const ProvenanceIDList& prov_output_ids = prov_step->get_output_provenance_ids();
+    bool trail_usable = true;
+    for ( size_t i = 0; i < this->private_->prov_ids_.size(); ++i )
+    {
+      if ( std::find( prov_output_ids.begin(), prov_output_ids.end(), 
+        this->private_->prov_ids_[ i ] ) == prov_output_ids.end() )
+      {
+        trail_usable = false;
+        context->report_warning( "The provided provenance trail is incorrect." );
+        break;
+      }
+    }
+
+    if ( trail_usable )
+    {
+      prov_trail.reset( new ProvenanceTrail( *this->private_->prov_trail_ ) );
+    }
+  }
 
   boost::timer performance_timer;
 
-  // Get the provenance trail that leads to the desired provenance ID
-  ProvenanceTrailHandle prov_trail = ProjectManager::Instance()->get_current_project()->
-    get_provenance_trail( this->private_->prov_ids_ );
-  if ( !prov_trail || prov_trail->size() == 0 )
+  if ( !prov_trail )
   {
-    context->report_error( "Provenance trail for provenance IDs " + 
-      Core::ExportToString( this->private_->prov_ids_ ) + " doesn't exist." );
-    return false;
+    // Get the provenance trail that leads to the desired provenance ID
+    prov_trail = ProjectManager::Instance()->get_current_project()->
+      get_provenance_trail( this->private_->prov_ids_ );
+    if ( !prov_trail || prov_trail->size() == 0 )
+    {
+      context->report_error( "Provenance trail for provenance IDs " + 
+        Core::ExportToString( this->private_->prov_ids_ ) + " doesn't exist." );
+      return false;
+    }
   }
 
   double elapsed_time = performance_timer.elapsed();
@@ -417,10 +450,17 @@ bool ActionRecreateLayer::run( Core::ActionContextHandle& context, Core::ActionR
   return true;
 }
 
-void ActionRecreateLayer::Dispatch( Core::ActionContextHandle context, const std::vector< ProvenanceID >& prov_ids )
+void ActionRecreateLayer::clear_cache()
+{
+  this->private_->prov_trail_.reset();
+}
+
+void ActionRecreateLayer::Dispatch( Core::ActionContextHandle context, 
+    const std::vector< ProvenanceID >& prov_ids, ProvenanceTrailHandle prov_trail )
 {
   ActionRecreateLayer* action = new ActionRecreateLayer;
   action->private_->prov_ids_ = prov_ids;
+  action->private_->prov_trail_ = prov_trail;
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }
 
