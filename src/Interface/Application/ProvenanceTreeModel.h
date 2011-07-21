@@ -26,44 +26,55 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_APPLICATION_PROVENANCEDOCKWIDGET_H
-#define INTERFACE_APPLICATION_PROVENANCEDOCKWIDGET_H
+#ifndef INTERFACE_APPLICATION_PROVENANCETREEMODEL_H
+#define INTERFACE_APPLICATION_PROVENANCETREEMODEL_H
 
 // Qt includes
 #include <QAbstractItemModel>
 
-// QtUtils includes
-#include <QtUtils/Widgets/QtCustomDockWidget.h>
+// Application includes
+#include <Application/Provenance/ProvenanceStep.h>
 
 namespace Seg3D
 {
   
-class ProvenanceDockWidgetPrivate;
+class ProvenanceTreeModelPrivate;
 
-class ProvenanceDockWidget : public QtUtils::QtCustomDockWidget
+class ProvenanceTreeModel : public QAbstractItemModel
 {
   Q_OBJECT
   
 public:
-  ProvenanceDockWidget( QWidget *parent = 0 );
-  virtual ~ProvenanceDockWidget();
+  ProvenanceTreeModel( QObject *parent = 0 );
+  virtual ~ProvenanceTreeModel();
 
-private Q_SLOTS:
-  // UPDATE_CURRENT_PROVENANCE_STEP:
-  // Update the detailed information when the current selected step has changed.
-  void handle_current_step_changed( const QModelIndex& index );
+public:
+  enum data_role
+  {
+    PID_OF_INTEREST_E = Qt::UserRole,
+    ACTION_PARAMS_E,
+    PROV_STEP_INDEX_E,
+    TIMESTAMP_E,
+    USER_ID_E,
+    ACTION_NAME_E
+  };
 
-  // DISPATCH_RECREATE_PROVENANCE:
-  // Dispatch an ActionRecreateLayer if the current selected row has a valid provenance ID of interest.
-  void dispatch_recreate_provenance();
+public:
+  void set_provenance_trail( ProvenanceTrailHandle prov_trail );
 
-  // REFRESH_PROVENANCE_TRAIL:
-  // Request the up-to-date provenance trail of the current active layer.
-  void refresh_provenance_trail();
+  // -- Reimplemented virtual functions
+public:
+  virtual int columnCount( const QModelIndex& parent = QModelIndex() ) const;
+  virtual QVariant data( const QModelIndex& index, int role = Qt::DisplayRole ) const;
+  virtual QModelIndex index( int row, int column, const QModelIndex& parent = QModelIndex() ) const;
+  virtual QModelIndex parent( const QModelIndex& index ) const;
+  virtual int rowCount( const QModelIndex& parent = QModelIndex() ) const;
+  
+  virtual QVariant headerData( int section, Qt::Orientation orientation, 
+    int role = Qt::DisplayRole ) const;
 
 private:
-  friend class ProvenanceDockWidgetPrivate;
-  ProvenanceDockWidgetPrivate* private_;
+  ProvenanceTreeModelPrivate* private_;
 };
   
 } // end namespace Seg3D

@@ -156,7 +156,7 @@ QWidget#provenance_list_{
            <number>4</number>
           </property>
           <item>
-           <widget class="QTreeWidget" name="provenance_list_">
+           <widget class="Seg3D::ProvenanceTreeView" name="provenance_list_">
             <property name="horizontalScrollBarPolicy">
              <enum>Qt::ScrollBarAlwaysOff</enum>
             </property>
@@ -164,9 +164,6 @@ QWidget#provenance_list_{
              <set>QAbstractItemView::NoEditTriggers</set>
             </property>
             <property name="showDropIndicator" stdset="0">
-             <bool>false</bool>
-            </property>
-            <property name="dragDropOverwriteMode">
              <bool>false</bool>
             </property>
             <property name="alternatingRowColors">
@@ -178,33 +175,6 @@ QWidget#provenance_list_{
             <property name="indentation">
              <number>12</number>
             </property>
-            <attribute name="headerDefaultSectionSize">
-             <number>100</number>
-            </attribute>
-            <column>
-             <property name="text">
-              <string>Timestamp</string>
-             </property>
-             <property name="textAlignment">
-              <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>User</string>
-             </property>
-             <property name="textAlignment">
-              <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Action</string>
-             </property>
-             <property name="textAlignment">
-              <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-             </property>
-            </column>
            </widget>
           </item>
           <item>
@@ -463,6 +433,13 @@ QWidget#provenance_list_{
    </layout>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>Seg3D::ProvenanceTreeView</class>
+   <extends>QTreeView</extends>
+   <header location="global">Interface/Application/ProvenanceTreeView.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

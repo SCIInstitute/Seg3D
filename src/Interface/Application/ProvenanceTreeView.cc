@@ -26,46 +26,27 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_APPLICATION_PROVENANCEDOCKWIDGET_H
-#define INTERFACE_APPLICATION_PROVENANCEDOCKWIDGET_H
-
-// Qt includes
-#include <QAbstractItemModel>
-
-// QtUtils includes
-#include <QtUtils/Widgets/QtCustomDockWidget.h>
+// Interface includes
+#include <Interface/Application/ProvenanceTreeView.h>
 
 namespace Seg3D
 {
-  
-class ProvenanceDockWidgetPrivate;
 
-class ProvenanceDockWidget : public QtUtils::QtCustomDockWidget
+ProvenanceTreeView::ProvenanceTreeView( QWidget* parent ) :
+  QTreeView( parent )
 {
-  Q_OBJECT
-  
-public:
-  ProvenanceDockWidget( QWidget *parent = 0 );
-  virtual ~ProvenanceDockWidget();
+}
 
-private Q_SLOTS:
-  // UPDATE_CURRENT_PROVENANCE_STEP:
-  // Update the detailed information when the current selected step has changed.
-  void handle_current_step_changed( const QModelIndex& index );
+ProvenanceTreeView::~ProvenanceTreeView()
+{
+}
 
-  // DISPATCH_RECREATE_PROVENANCE:
-  // Dispatch an ActionRecreateLayer if the current selected row has a valid provenance ID of interest.
-  void dispatch_recreate_provenance();
+void ProvenanceTreeView::currentChanged( const QModelIndex& current, 
+                    const QModelIndex& previous )
+{
+  QTreeView::currentChanged( current, previous );
 
-  // REFRESH_PROVENANCE_TRAIL:
-  // Request the up-to-date provenance trail of the current active layer.
-  void refresh_provenance_trail();
+  Q_EMIT this->current_item_changed( current );
+}
 
-private:
-  friend class ProvenanceDockWidgetPrivate;
-  ProvenanceDockWidgetPrivate* private_;
-};
-  
 } // end namespace Seg3D
-
-#endif 

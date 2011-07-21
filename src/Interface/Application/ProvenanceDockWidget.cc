@@ -60,6 +60,7 @@
 
 // Interface includes
 #include <Interface/Application/ProvenanceDockWidget.h>
+#include <Interface/Application/ProvenanceTreeModel.h>
 #include <Interface/Application/StyleSheet.h>
 #include "ui_ProvenanceDockWidget.h"
 
@@ -94,12 +95,17 @@ public:
   // Clear the provenance tree widget.
   void clear_provenance_list();
 
+  // SET_PROVENANCE_DIRTY:
+  // Set the current provenance trail to be out-of-date.
+  void set_provenance_dirty( bool dirty );
+
   // -- Internal variables --
 public:
   Ui::ProvenanceDockWidget ui_;
   bool resetting_;
   std::vector< std::string > sessions_;
-  ProvenanceDockWidget* parent_;  
+  ProvenanceDockWidget* parent_;
+  ProvenanceTreeModel* prov_tree_model_;
   boost::signals2::connection active_layer_prov_connection_;
   boost::signals2::connection project_provenance_connection_;
   
@@ -126,87 +132,10 @@ public:
 
 void ProvenanceDockWidgetPrivate::populate_provenance_list( ProvenanceTrailHandle provenance_trail )
 {
-  // Clean out the old view
-  this->ui_.provenance_list_->clear();
+  this->prov_tree_model_->set_provenance_trail( provenance_trail );
+  this->set_provenance_dirty( false );
 
-  typedef boost::date_time::c_local_adjustor< SessionInfo::timestamp_type > local_time_adjustor;
-
-  size_t num_steps = provenance_trail->size();
-  for( size_t i = 0; i < num_steps; ++i )
-  {
-    ProvenanceStepHandle prov_step = provenance_trail->at( i );
-    std::string action_name = prov_step->get_action_name();
-    std::string action_params = prov_step->get_action_params();
-    ProvenanceIDList poi = prov_step->get_provenance_ids_of_interest();
-    std::string user_id = prov_step->get_username();
-    // Convert the timestamp from UTC to local time
-    ProvenanceStep::timestamp_type prov_local_time = 
-      local_time_adjustor::utc_to_local( prov_step->get_timestamp() );
-
-    QStringList columns;
-    columns << QString::fromStdString( boost::posix_time::to_simple_string( prov_local_time ) )
-      << QString::fromStdString( user_id )
-      << QString::fromStdString( action_name );
-    QTreeWidgetItem* top_item = new QTreeWidgetItem( columns );
-    top_item->setData( 0, Qt::UserRole, QVariant( QString::fromStdString( Core::ExportToString( poi ) ) ) );
-    top_item->setData( 0, Qt::UserRole + 1, QVariant( QString::fromStdString( action_params ) ) );
-
-    if ( action_name == "Paint" )
-    {
-      size_t start_step = i;
-      while ( i < num_steps )
-      {
-        prov_step = provenance_trail->at( i );
-        if ( prov_step->get_action_name() != "Paint" || 
-          prov_step->get_username() != user_id )
-        {
-          break;
-        }
-
-        action_params = prov_step->get_action_params();
-        poi = prov_step->get_provenance_ids_of_interest();
-        prov_local_time = local_time_adjustor::utc_to_local( prov_step->get_timestamp() );
-
-        QTreeWidgetItem* item = new QTreeWidgetItem( top_item );
-        item->setText( 0, QString::fromStdString( boost::posix_time::to_simple_string( prov_local_time ) ) );
-        item->setText( 1, QString::fromStdString( user_id ) );
-        item->setText( 2, "Paint" );
-        item->setData( 0, Qt::UserRole, QVariant( QString::fromStdString( Core::ExportToString( poi ) ) ) );
-        item->setData( 0, Qt::UserRole + 1, QVariant( QString::fromStdString( action_params ) ) );
-
-        ++i;
-      }
-
-      --i;
-      if ( start_step == i )
-      {
-        this->ui_.provenance_list_->addTopLevelItem( top_item->takeChild( 0 ) );
-        delete top_item;
-      }
-      else
-      {
-        this->ui_.provenance_list_->addTopLevelItem( top_item );
-        QFont font = top_item->font( 0 );
-        font.setBold( true );
-        top_item->setFont( 0, font );
-        top_item->setFont( 1, font );
-        top_item->setFont( 2, font );
-        top_item->setText( 0, QString::fromStdString( boost::posix_time::to_simple_string( prov_local_time ) ) );
-        top_item->setData( 0, Qt::UserRole, QVariant( QString::fromStdString( Core::ExportToString( poi ) ) ) );
-        top_item->setData( 0, Qt::UserRole + 1, QVariant( QString( "Various..." ) ) );
-      }
-    }
-    else
-    {
-      this->ui_.provenance_list_->addTopLevelItem( top_item );
-    }
-  }
-
-  this->ui_.provenance_list_->setEnabled( true );
-  this->ui_.step_detail_groupbox_->setEnabled( true );
-  this->ui_.refresh_button_->setEnabled( false );
-  this->parent_->update_current_provenance_step();
-  this->ui_.provenance_list_->repaint();
+  this->parent_->handle_current_step_changed( QModelIndex() );
 }
 
 void ProvenanceDockWidgetPrivate::connect_project()
@@ -232,14 +161,14 @@ void ProvenanceDockWidgetPrivate::connect_project()
     this->active_layer_prov_connection_ = active_layer->provenance_id_state_->state_changed_signal_.
       connect( boost::bind( &ProvenanceDockWidgetPrivate::HandleActiveLayerProvenanceChanged,
       qpointer_type( this ) ) );
-    current_project->request_provenance_trail( active_layer->provenance_id_state_->get() );
+    this->set_provenance_dirty( true );
   }
 } 
 
 void ProvenanceDockWidgetPrivate::clear_provenance_list()
 {
-  this->ui_.provenance_list_->clear();
-  this->parent_->update_current_provenance_step();
+  this->prov_tree_model_->set_provenance_trail( ProvenanceTrailHandle() );
+  this->parent_->handle_current_step_changed( QModelIndex() );
   this->ui_.refresh_button_->setEnabled( false );
 }
 
@@ -269,20 +198,15 @@ void ProvenanceDockWidgetPrivate::HandleActiveLayerChanged( qpointer_type qpoint
   // Disconnect the connection to previous active layer
   qpointer->active_layer_prov_connection_.disconnect();
 
-  // If the new active layer exists, request the provenance trail of it
+  // If the new active layer exists, connect to it
   if ( active_layer )
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
     qpointer->active_layer_prov_connection_ = active_layer->provenance_id_state_->state_changed_signal_.
       connect( boost::bind( &ProvenanceDockWidgetPrivate::HandleActiveLayerProvenanceChanged, qpointer ) );
-    // Request the provenance trail only if there is a project connected
-    if ( qpointer->project_provenance_connection_.connected() )
-    {
-      ProjectManager::Instance()->get_current_project()->request_provenance_trail(
-        active_layer->provenance_id_state_->get() );
-    }
+    // Mark the provenance as dirty
+    qpointer->set_provenance_dirty( true );
   }
-  // Otherwise clear the tree widget
   else
   {
     qpointer->clear_provenance_list();
@@ -299,10 +223,15 @@ void ProvenanceDockWidgetPrivate::HandleActiveLayerProvenanceChanged( qpointer_t
   }
   
   // Grey out the provenance list and enable the refresh button
-  qpointer->ui_.provenance_list_->setEnabled( false );
-  qpointer->ui_.replay_button_->setEnabled( false );
-  qpointer->ui_.step_detail_groupbox_->setEnabled( false );
-  qpointer->ui_.refresh_button_->setEnabled( true );
+  qpointer->set_provenance_dirty( true );
+}
+
+void ProvenanceDockWidgetPrivate::set_provenance_dirty( bool dirty )
+{
+  this->ui_.provenance_list_->setEnabled( !dirty );
+  this->ui_.replay_button_->setEnabled( !dirty );
+  this->ui_.step_detail_groupbox_->setEnabled( !dirty );
+  this->ui_.refresh_button_->setEnabled( dirty );
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -313,10 +242,13 @@ ProvenanceDockWidget::ProvenanceDockWidget( QWidget *parent ) :
   QtUtils::QtCustomDockWidget( parent )
 {
   this->private_ = new ProvenanceDockWidgetPrivate( this );
+  this->private_->prov_tree_model_ = new ProvenanceTreeModel( this );
 
   this->private_->ui_.setupUi( this );
-  this->private_->ui_.provenance_list_->header()->resizeSection( 0, 140 );
-  this->private_->ui_.provenance_list_->header()->resizeSection( 1, 45 );
+  this->private_->ui_.provenance_list_->setModel( this->private_->prov_tree_model_ );
+  this->private_->ui_.provenance_list_->header()->resizeSection( 0, 120 );
+  this->private_->ui_.provenance_list_->header()->resizeSection( 1, 50 );
+  this->private_->ui_.provenance_list_->header()->setDefaultAlignment( Qt::AlignHCenter );
   this->private_->ui_.header_bkg_->setStyleSheet( StyleSheet::PROVENANCE_LIST_HEADER_C );
 
   ProvenanceDockWidgetPrivate::qpointer_type qpointer( this->private_ );
@@ -327,8 +259,9 @@ ProvenanceDockWidget::ProvenanceDockWidget( QWidget *parent ) :
 
   this->private_->connect_project();
 
-  this->connect( this->private_->ui_.provenance_list_, SIGNAL( itemSelectionChanged () ), 
-    SLOT( update_current_provenance_step() ) );
+  this->connect( this->private_->ui_.provenance_list_, 
+    SIGNAL( current_item_changed( const QModelIndex& ) ), 
+    SLOT( handle_current_step_changed( const QModelIndex& ) ) );
   this->connect( this->private_->ui_.replay_button_, SIGNAL( clicked ( bool ) ),
     SLOT( dispatch_recreate_provenance() ) );
   this->connect( this->private_->ui_.refresh_button_, SIGNAL( clicked( bool ) ),
@@ -339,17 +272,21 @@ ProvenanceDockWidget::~ProvenanceDockWidget()
 {
 }
 
-void ProvenanceDockWidget::update_current_provenance_step()
+void ProvenanceDockWidget::handle_current_step_changed( const QModelIndex& index )
 {
-  QTreeWidgetItem* current_item = this->private_->ui_.provenance_list_->currentItem();
   QString timestamp_str, user_id, action_name, action_params, poi_text;
-  if ( current_item != 0 )
+  if ( index.isValid() )
   {
-    timestamp_str = current_item->text( 0 );
-    user_id = current_item->text( 1 );
-    action_name = current_item->text( 2 );
-    poi_text = current_item->data( 0, Qt::UserRole ).toString();
-    action_params = current_item->data( 0, Qt::UserRole + 1 ).toString();
+    timestamp_str = this->private_->prov_tree_model_->data( 
+      index, ProvenanceTreeModel::TIMESTAMP_E ).toString();
+    user_id = this->private_->prov_tree_model_->data( 
+      index, ProvenanceTreeModel::USER_ID_E ).toString();
+    action_name = this->private_->prov_tree_model_->data( 
+      index, ProvenanceTreeModel::ACTION_NAME_E ).toString();
+    poi_text = this->private_->prov_tree_model_->data( 
+      index, ProvenanceTreeModel::PID_OF_INTEREST_E ).toString();
+    action_params = this->private_->prov_tree_model_->data( 
+      index, ProvenanceTreeModel::ACTION_PARAMS_E ).toString();
   }
 
   this->private_->ui_.timestamp_label_->setText( timestamp_str );
@@ -373,10 +310,12 @@ void ProvenanceDockWidget::update_current_provenance_step()
 
 void ProvenanceDockWidget::dispatch_recreate_provenance()
 {
-  QTreeWidgetItem* current_item = this->private_->ui_.provenance_list_->currentItem();
-  if ( current_item != 0 )
+  QModelIndex index = this->private_->ui_.provenance_list_->currentIndex();
+  this->private_->ui_.replay_button_->setEnabled( false );
+  if ( index.isValid() )
   {
-    std::string poi_text = current_item->data( 0, Qt::UserRole ).toString().toStdString();
+    std::string poi_text = this->private_->prov_tree_model_->data( 
+      index, ProvenanceTreeModel::PID_OF_INTEREST_E ).toString().toStdString();
     ProvenanceIDList poi;
     if ( !poi_text.empty() &&
       Core::ImportFromString( poi_text, poi ) &&

@@ -74,6 +74,8 @@ SET(INTERFACE_APPLICATION_SRCS
   ViewerWidget.cc
   RenderingDockWidget.cc
   TransferFunctionFeatureWidget.cc
+  ProvenanceTreeModel.cc
+  ProvenanceTreeView.cc
 )
 
 SET(INTERFACE_APPLICATION_MOC_SRCS
@@ -118,6 +120,8 @@ SET(INTERFACE_APPLICATION_MOC_SRCS
   ViewerWidget.h
   RenderingDockWidget.h
   TransferFunctionFeatureWidget.h
+  ProvenanceTreeModel.h
+  ProvenanceTreeView.h
 )
 
 IF(BUILD_WITH_PYTHON)
