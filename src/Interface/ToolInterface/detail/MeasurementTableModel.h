@@ -48,8 +48,9 @@ CORE_ENUM_CLASS
   MeasurementColumns,
   VISIBLE_E, 
   COLOR_E,
+  NAME_E,
   LENGTH_E,
-  NAME_E
+  COMMENT_E
 )
 
 // Hide header includes, private interface and implementation

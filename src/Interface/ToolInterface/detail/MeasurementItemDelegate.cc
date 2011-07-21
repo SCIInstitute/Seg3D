@@ -44,11 +44,11 @@ namespace Seg3D
 
   };
 
-MeasurementItemDelegate::MeasurementItemDelegate( int color_column, int length_column,  
-  int name_column, QObject * parent /*= 0 */ ) : 
+MeasurementItemDelegate::MeasurementItemDelegate( int color_column, int name_column, int length_column, 
+  QObject * parent /*= 0 */ ) : 
   color_column_( color_column ),
-  length_column_( length_column ),
   name_column_( name_column ),
+  length_column_( length_column ),
   QItemDelegate( parent ),
   private_( new MeasurementItemDelegatePrivate ){}
 
@@ -62,7 +62,7 @@ void MeasurementItemDelegate::paint( QPainter *painter, const QStyleOptionViewIt
     QColor measurement_color = index.model()->data( index, Qt::DecorationRole ).value< QColor >();
     painter->fillRect( option.rect, measurement_color );
   }
-  else if ( index.column() == this->length_column_ || index.column() == this->name_column_ )
+  else if ( index.column() == this->name_column_ || index.column() == this->length_column_ )
   { 
     QString text = index.model()->data( index, Qt::DisplayRole ).toString();
     painter->save();
@@ -136,7 +136,7 @@ void MeasurementItemDelegate::setEditorData( QWidget *editor, const QModelIndex 
 void MeasurementItemDelegate::setModelData( QWidget *editor, QAbstractItemModel *model, 
   const QModelIndex &index ) const
 {
-  if ( index.column() == this->length_column_ || index.column() == this->name_column_ )
+  if ( index.column() == this->name_column_ || index.column() == this->length_column_ )
   {
     QLineEdit* line_edit = qobject_cast< QLineEdit* >( editor );
     QString editor_text = line_edit->text();

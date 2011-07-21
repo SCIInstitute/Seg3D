@@ -1337,13 +1337,17 @@ bool MeasurementTool::handle_mouse_press( ViewerHandle viewer,
 			Core::Measurement measurement;
 			if( this->private_->get_hover_measurement( measurement ) )
 			{
-				// Delete hovered measurement
-				Core::ActionRemove::Dispatch( Core::Interface::GetMouseActionContext(), 
-					this->measurements_state_, measurement );
+				// NOTE: Disabled right-click delete because I think it is dangerous and might cause 
+				// users to accidentally lose their data (no undo).
+				// TODO: Context menu providing info and delete 
 
-				// Ordering matters here
-				this->private_->hover_measurement_.invalidate();
-				this->private_->finish_editing();
+				//// Delete hovered measurement
+				//Core::ActionRemove::Dispatch( Core::Interface::GetMouseActionContext(), 
+				//	this->measurements_state_, measurement );
+
+				//// Ordering matters here
+				//this->private_->hover_measurement_.invalidate();
+				//this->private_->finish_editing();
 				
 				return true;
 			}

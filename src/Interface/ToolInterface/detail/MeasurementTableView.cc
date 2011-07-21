@@ -70,20 +70,12 @@ void MeasurementScrollBar::wheelEvent( QWheelEvent * e )
 class MeasurementTableViewPrivate 
 {
 public:
-  QString remove_line_breaks( QString str ) const;
   void get_deletion_candidates( std::vector< int >& deletion_candidates ) const;
+  QString export_measurement( int index );
 
   MeasurementTableView * view_;
   QAction* delete_action_;
 };
-
-QString MeasurementTableViewPrivate::remove_line_breaks( QString str ) const
-{
-  std::string std_str = str.toStdString();
-  boost::replace_all( std_str, "\n", " " );
-  boost::replace_all( std_str, "\r", " " );
-  return QString::fromStdString( std_str );
-}
 
 void MeasurementTableViewPrivate::get_deletion_candidates( std::vector< int >& deletion_candidates ) const
 {
@@ -114,6 +106,33 @@ void MeasurementTableViewPrivate::get_deletion_candidates( std::vector< int >& d
   }
 }
 
+QString MeasurementTableViewPrivate::export_measurement( int index )
+{
+  MeasurementTableModel* model = qobject_cast< MeasurementTableModel* >( this->view_->model() );
+  QString export_text;
+
+  // Name
+  export_text.append( model->data( model->index( index, MeasurementColumns::NAME_E ), 
+    Qt::DisplayRole ).toString() ); 
+  export_text.append( QLatin1Char('\t') ); 
+
+  // Comment
+  std::string comment = model->data( model->index( index, MeasurementColumns::COMMENT_E ), 
+    Qt::DisplayRole ).toString().toStdString();
+  // Remove line breaks
+  boost::replace_all( comment, "\n", " " );
+  boost::replace_all( comment, "\r", " " );
+  export_text.append( QString::fromStdString( comment ) ); 
+  export_text.append( QLatin1Char('\t') ); 
+
+  // Length
+  export_text.append( model->data( model->index( index, MeasurementColumns::LENGTH_E ), 
+    Qt::DisplayRole ).toString() ); 
+  export_text.append( QLatin1Char('\n') );
+
+  return export_text;
+}
+
 MeasurementTableView::MeasurementTableView( QWidget* parent ) : 
   QTableView( parent ),
   private_( new MeasurementTableViewPrivate )
@@ -123,10 +142,9 @@ MeasurementTableView::MeasurementTableView( QWidget* parent ) :
   
   // Custom editors for length and note columns
   this->setItemDelegate( 
-    new MeasurementItemDelegate( MeasurementColumns::COLOR_E, MeasurementColumns::LENGTH_E,  
-    MeasurementColumns::NAME_E, this ) );
+    new MeasurementItemDelegate( MeasurementColumns::COLOR_E, MeasurementColumns::NAME_E, 
+    MeasurementColumns::LENGTH_E, this ) );
   this->horizontalHeader()->setClickable( true );
-  this->horizontalHeader()->setStretchLastSection( true ); // Stretch note section
   QObject::connect( this->horizontalHeader(), SIGNAL( sectionClicked( int ) ), 
     this, SLOT( handle_header_clicked( int ) ) );
   this->setVerticalScrollBar( new MeasurementScrollBar( this ) );
@@ -161,61 +179,49 @@ void MeasurementTableView::handle_model_reset()
   this->horizontalHeader()->reset();
   this->verticalHeader()->reset();
 
+  // Hidden comment column is only used for export
+  this->setColumnHidden( MeasurementColumns::COMMENT_E, true );
+
   // Have to resize rows/columns *after* model has been populated
+  this->horizontalHeader()->setResizeMode( MeasurementColumns::NAME_E, QHeaderView::Stretch );
   this->resizeColumnsToContents();
   this->resizeRowsToContents();
-
-  this->horizontalHeader()->setStretchLastSection( true ); // Stretch note section
-
+  
   // Scroll to active measurement
   this->update_active_index();
 }
 
-void MeasurementTableView::copy_selected_cells() const
+void MeasurementTableView::export_selected_measurements() const
 {
   MeasurementTableModel* model = qobject_cast< MeasurementTableModel* >( this->model() );
   QItemSelectionModel* selection = this->selectionModel(); 
   QModelIndexList indexes = selection->selectedIndexes();
 
   QString selected_text;
+
   if( indexes.size() > 0 ) // Cells are selected
   {
     // QModelIndex::operator < sorts first by row, then by column. This is what we need. 
     qSort( indexes.begin(), indexes.end() ); 
 
-    // You need a pair of indexes to find the row changes 
-    QModelIndex previous = indexes.first(); 
-    indexes.removeFirst();  
-    QModelIndex current; 
-    Q_FOREACH( current, indexes ) 
+    int current_row = -1;
+    QModelIndex current_index; 
+    Q_FOREACH( current_index, indexes ) 
     { 
-      // Ignore visible and color columns
-      if( previous.column() != MeasurementColumns::VISIBLE_E &&
-        previous.column() != MeasurementColumns::COLOR_E )
+      if( current_index.row() > current_row )
       {
-        QString text = model->data( previous, Qt::DisplayRole ).toString(); 
-        
-        // At this point `text` contains the text in one cell 
-        selected_text.append( this->private_->remove_line_breaks( text ) ); 
-        // If you are at the start of the row the row number of the previous index 
-        // isn't the same.  Text is followed by a row separator, which is a newline. 
-        if ( current.row() != previous.row() ) 
-        { 
-          selected_text.append( QLatin1Char('\n') ); 
-        } 
-        // Otherwise it's the same row, so append a column separator, which is a tab. 
-        else 
-        { 
-          selected_text.append( QLatin1Char('\t') ); 
-        } 
+        current_row = current_index.row();
+        selected_text.append( this->private_->export_measurement( current_row ) );
       }
-      previous = current; 
-    } 
-
-    // add last element 
-    QString text = model->data( previous, Qt::DisplayRole ).toString();
-    selected_text.append( this->private_->remove_line_breaks( text ) ); 
-    selected_text.append( QLatin1Char('\n') ); 
+    }
+  }
+  else // No cells are selected -- export active measurement
+  {
+    int active_index = model->get_active_index();
+    if( 0 <= active_index )
+    {
+      selected_text.append( this->private_->export_measurement( active_index ) );
+    }
   }
 
   if( !selected_text.isEmpty() )

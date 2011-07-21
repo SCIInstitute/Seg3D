@@ -68,7 +68,7 @@ public:
   // COPY_SELECTED_CELLS:
   // Copy selected cells to clipboard, or active measurement if no cells are selected.  
   // Copied cells can be pasted directly into Excel spreadsheet.
-  void copy_selected_cells() const;
+  void export_selected_measurements() const;
 
   // UPDATE_ACTIVE_INDEX:
   // Select active index and ensure that active index is visible in table.

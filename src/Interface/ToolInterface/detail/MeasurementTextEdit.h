@@ -60,7 +60,7 @@ public:
   //
 
 Q_SIGNALS:
-  void editing_finished() const;
+  void editing_finished( std::string text ) const;
 
 private:
   

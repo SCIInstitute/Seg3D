@@ -40,7 +40,7 @@ MeasurementTextEdit::MeasurementTextEdit( QWidget * parent ) :
 void MeasurementTextEdit::focusOutEvent( QFocusEvent * e )
 {
   QTextEdit::focusOutEvent( e );
-  Q_EMIT this->editing_finished();
+  Q_EMIT this->editing_finished( this->toPlainText().toStdString() );
 }
 
 } // end namespace Seg3D

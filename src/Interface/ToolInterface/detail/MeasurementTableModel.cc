@@ -148,7 +148,7 @@ int MeasurementTableModel::rowCount( const QModelIndex& /*index*/) const
 
 int MeasurementTableModel::columnCount( const QModelIndex& /*index*/) const
 {
-  return MeasurementColumns::NAME_E + 1; 
+  return MeasurementColumns::COMMENT_E + 1; 
 }
 
 QVariant MeasurementTableModel::data( const QModelIndex& index, int role ) const
@@ -195,13 +195,8 @@ QVariant MeasurementTableModel::data( const QModelIndex& index, int role ) const
     {
       if( index.row() < static_cast< int >( measurements.size() ) )
       {
-        if ( index.column() == MeasurementColumns::LENGTH_E ) 
-        {
-          double world_length = measurements[ index.row() ].get_length();
-          return QString::fromStdString( 
-            this->private_->measurement_tool_->convert_world_to_unit_string( world_length ) );
-        }
-        else if ( index.column() == MeasurementColumns::NAME_E ) 
+        
+        if ( index.column() == MeasurementColumns::NAME_E ) 
         {
           if( index.row() == this->private_->measurement_tool_->active_index_state_->get()
             && this->private_->use_cached_active_name_ )
@@ -212,6 +207,16 @@ QVariant MeasurementTableModel::data( const QModelIndex& index, int role ) const
           {
             return QString::fromStdString( measurements[ index.row() ].get_name() );
           }
+        }
+        else if ( index.column() == MeasurementColumns::LENGTH_E ) 
+        {
+          double world_length = measurements[ index.row() ].get_length();
+          return QString::fromStdString( 
+            this->private_->measurement_tool_->convert_world_to_unit_string( world_length ) );
+        }
+        else if ( index.column() == MeasurementColumns::COMMENT_E ) // Used only for export
+        {
+          return QString::fromStdString( measurements[ index.row() ].get_comment() );
         }
       }
     }
@@ -257,6 +262,16 @@ bool MeasurementTableModel::setData( const QModelIndex &index, const QVariant &v
         Core::ActionSetAt::Dispatch( Core::Interface::GetWidgetActionContext(),
           this->private_->measurement_tool_->measurements_state_, index.row(), m );
       }
+      else if( index.column() == MeasurementColumns::NAME_E ) 
+      {
+        // Don't save name to state variable yet because we don't want to trigger a full update
+        // for every character typed.  A full update interrupts editing so we're never
+        // able to type more than one character before losing edit focus.  Instead, wait until 
+        // the name editing is finished to save the state.  In the meantime save and use a 
+        // cached copy of the name.
+        this->private_->cached_active_name_ = value.toString().toStdString();
+        this->private_->use_cached_active_name_ = true;
+      }
       else if( index.column() == MeasurementColumns::LENGTH_E ) 
       { 
         // Convert length to world coordinates before setting length in measurement
@@ -269,16 +284,6 @@ bool MeasurementTableModel::setData( const QModelIndex &index, const QVariant &v
         m.set_length( world_length );
         Core::ActionSetAt::Dispatch( Core::Interface::GetWidgetActionContext(),
           this->private_->measurement_tool_->measurements_state_, index.row(), m );
-      }
-      else if( index.column() == MeasurementColumns::NAME_E ) 
-      {
-        // Don't save name to state variable yet because we don't want to trigger a full update
-        // for every character typed.  A full update interrupts editing so we're never
-        // able to type more than one character before losing edit focus.  Instead, wait until 
-        // the name editing is finished to save the state.  In the meantime save and use a 
-        // cached copy of the name.
-        this->private_->cached_active_name_ = value.toString().toStdString();
-        this->private_->use_cached_active_name_ = true;
       }
       else
       { 
@@ -328,13 +333,13 @@ QVariant MeasurementTableModel::headerData( int section, Qt::Orientation orienta
     }
     else if( orientation == Qt::Horizontal )
     {
-      if ( section == MeasurementColumns::LENGTH_E ) 
-      {
-        return QString( "Length" );
-      }
-      else if ( section == MeasurementColumns::NAME_E )
+      if ( section == MeasurementColumns::NAME_E )
       {
         return QString( "Name" );
+      }
+      else if ( section == MeasurementColumns::LENGTH_E ) 
+      {
+        return QString( "Length" );
       }
     }
   }
@@ -346,8 +351,8 @@ Qt::ItemFlags MeasurementTableModel::flags( const QModelIndex &index ) const
 {
   Qt::ItemFlags flags = QAbstractItemModel::flags( index );
   if ( index.column() == MeasurementColumns::COLOR_E ||  // TODO: Fix color dialog position on Windows
-    index.column() == MeasurementColumns::LENGTH_E || 
-    index.column() == MeasurementColumns::NAME_E ) 
+    index.column() == MeasurementColumns::NAME_E || 
+    index.column() == MeasurementColumns::LENGTH_E ) 
   {
     flags |= Qt::ItemIsEditable;
   }
@@ -390,6 +395,9 @@ void MeasurementTableModel::update_table()
   this->private_->use_cached_active_name_ = false;
 
   QAbstractTableModel::reset();
+
+  // Column resize doesn't work properly without this call
+  this->update_cells();
 }
 
 void MeasurementTableModel::update_cells()

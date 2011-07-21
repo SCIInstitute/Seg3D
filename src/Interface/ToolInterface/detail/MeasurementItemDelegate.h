@@ -47,7 +47,7 @@ class MeasurementItemDelegate : public QItemDelegate
   Q_OBJECT
 
 public:
-  MeasurementItemDelegate( int length_column, int color_column, int note_column, 
+  MeasurementItemDelegate( int color_column, int name_column, int length_column,  
     QObject * parent = 0 );
 
   //

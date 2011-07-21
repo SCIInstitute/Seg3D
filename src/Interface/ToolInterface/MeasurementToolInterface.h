@@ -64,7 +64,7 @@ private Q_SLOTS:
   void handle_name_lineedit_changed();
 
   // HANDLE_TEXTBOX_COMMENT_CHANGED:
-  void handle_comment_textbox_changed();
+  void handle_comment_textbox_changed( std::string comment );
 
   // HANDLE_LINEEDIT_LENGTH_CHANGED:
   void handle_length_lineedit_changed();
@@ -81,23 +81,28 @@ private:
 public:
   typedef QPointer< MeasurementToolInterface > qpointer_type;
 
-  // UPDATEMEASUREMENTTABLE:
+  // UPDATEGENERALTAB:
   // Update entire table including dimensions.  Scroll to active index.  
   // Slower than UpdateMeasurementCells, so use only when needed. De-selects selected rows.  
   // TODO: This may be slow due to resizeColumns[Rows]ToContents -- try hard-coding sizes.
   static void UpdateGeneralTab( qpointer_type measurement_interface );
 
-  // UPDATEMEASUREMENTMODEL:
+  // UPDATETABLECELLS:
   // Update only table cells, not table dimensions.  Does not scroll to active index.
   static void UpdateTableCells( qpointer_type measurement_interface );
 
-  // UPDATEACTIVEINDEX:
-  // Update interface table and text box in response to changed active index.
+  // UPDATETABLEACTIVEINDEX:
+  // Update table in response to changed active index.
   // Locks: StateEngine
   static void UpdateTableActiveIndex( qpointer_type measurement_interface );
 
-  // UPDATEACTIVEMEASUREMENTTAB:
-  // Set widget values based on current measurement state.
+  // UPDATEGENERALCOMMENT:
+  // Update comment text box in general tab based on active index.
+  // Locks: StateEngine
+  static void UpdateGeneralComment( qpointer_type measurement_interface );
+
+  // UPDATEACTIVETAB:
+  // Set widget values based on current active measurement state.
   static void UpdateActiveTab( qpointer_type measurement_interface );
 };
 
