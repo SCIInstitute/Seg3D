@@ -385,10 +385,6 @@ void LayerFilterPrivate::create_provenance_record( Core::ActionContextHandle con
     {
       ProvenanceID prov_id = layer_action->get_output_provenance_id( output_layer_count++ );
       this->provenance_ids_[ this->created_layers_[ j ].get() ] = prov_id;
-      // NOTE: Update the provenance ID before actually running the filter, 
-      // so the next action that depends on the outputs of the current one 
-      // can be translated properly.
-      this->created_layers_[ j ]->provenance_id_state_->set( prov_id );
       output_provenance_ids.push_back( prov_id );
     }
   }
@@ -399,11 +395,6 @@ void LayerFilterPrivate::create_provenance_record( Core::ActionContextHandle con
     {
       ProvenanceID prov_id = layer_action->get_output_provenance_id( output_layer_count++ ); 
       this->provenance_ids_[ this->locked_for_processing_layers_[ j ].get() ] = prov_id;
-      // NOTE: Update the provenance ID before actually running the filter, 
-      // so the next action that depends on the outputs of the current one 
-      // can be translated properly.
-      this->locked_for_processing_layers_[ j ]->provenance_id_state_->set( prov_id );
-
       output_provenance_ids.push_back( prov_id );
       deleted_provenance_ids.push_back( this->locked_for_processing_layers_[ j ]->
         provenance_id_state_->get() );
