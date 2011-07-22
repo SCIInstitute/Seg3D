@@ -256,7 +256,11 @@ void ProvenanceDockWidgetPrivate::HandleLayersDeleted( qpointer_type qpointer )
     return;
   }
 
-  qpointer->clear_provenance_list();
+  LayerHandle active_layer = LayerManager::Instance()->get_active_layer();
+  if ( !active_layer )
+  {
+    qpointer->clear_provenance_list();
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////
