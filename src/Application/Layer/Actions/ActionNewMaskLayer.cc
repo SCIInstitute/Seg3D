@@ -117,18 +117,15 @@ bool ActionNewMaskLayer::run( Core::ActionContextHandle& context, Core::ActionRe
   // report the layer ID to action result
   result.reset( new Core::ActionResult( new_mask_layer->get_layer_id() ) );
   
+  // The following steps are only needed if not running in a sandbox
   if ( this->private_->sandbox_ == -1 )
   {
     // Now we make it active
     LayerManager::Instance()->set_active_layer( new_mask_layer );
-  }
 
-  // Set a new provenance ID for the output
-  new_mask_layer->provenance_id_state_->set( this->get_output_provenance_id( 0 ) );
+    // Set a new provenance ID for the output
+    new_mask_layer->provenance_id_state_->set( this->get_output_provenance_id( 0 ) );
 
-  // Only create provenance record and undo/redo if not running in a sandbox
-  if ( this->private_->sandbox_ == -1 )
-  {
     // Create a provenance record
     ProvenanceStepHandle provenance_step( new ProvenanceStep );
     

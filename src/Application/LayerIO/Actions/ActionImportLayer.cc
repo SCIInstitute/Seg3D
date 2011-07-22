@@ -192,7 +192,7 @@ bool ActionImportLayer::run( Core::ActionContextHandle& context, Core::ActionRes
   std::vector< std::string > layer_ids;
   for ( size_t j = 0; j < layers.size(); j++ )
   {
-    layers[ j ]->provenance_id_state_->set( this->get_output_provenance_id( j ) );
+    if ( this->sandbox_ == -1 ) layers[ j ]->provenance_id_state_->set( this->get_output_provenance_id( j ) );
     LayerManager::Instance()->insert_layer( layers[ j ], this->sandbox_ );
     layer_ids.push_back( layers[ j ]->get_layer_id() );
   }

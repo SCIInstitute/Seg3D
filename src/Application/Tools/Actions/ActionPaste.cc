@@ -230,6 +230,9 @@ bool ActionPaste::run( Core::ActionContextHandle& context, Core::ActionResultHan
 
     // Now add the undo/redo action to undo buffer
     UndoBuffer::Instance()->insert_undo_item( context, item );
+
+    this->private_->target_layer_->provenance_id_state_->set(
+      this->get_output_provenance_id() );
   }
 
   Core::MaskVolumeSliceHandle volume_slice = this->private_->vol_slice_;
@@ -243,8 +246,6 @@ bool ActionPaste::run( Core::ActionContextHandle& context, Core::ActionResultHan
   volume_slice->set_slice_data( reinterpret_cast< const unsigned char* >( 
     clipboard_item->get_buffer() ), true );
     
-  this->private_->target_layer_->provenance_id_state_->set(
-    this->get_output_provenance_id() );
   result.reset( new Core::ActionResult( this->private_->target_layer_id_ ) );
   return true;
 }

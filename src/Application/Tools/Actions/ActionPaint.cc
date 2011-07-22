@@ -300,10 +300,11 @@ bool ActionPaint::run( Core::ActionContextHandle& context, Core::ActionResultHan
 
       UndoBuffer::Instance()->insert_undo_item( context, item );
     }
+
+    // Update the provenance ID of the target mask
+    layer->provenance_id_state_->set( this->get_output_provenance_id() );
   }
 
-  // Update the provenance ID of the target mask
-  layer->provenance_id_state_->set( this->get_output_provenance_id() );
 
   // Painting will already have been done by the interface
   if ( context->source() == Core::ActionSource::INTERFACE_MOUSE_E ) return true;
