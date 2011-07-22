@@ -237,11 +237,14 @@ void ProvenanceDockWidgetPrivate::HandleActiveLayerProvenanceChanged( qpointer_t
 void ProvenanceDockWidgetPrivate::set_provenance_dirty( bool dirty )
 {
   this->ui_.provenance_list_->setEnabled( !dirty );
-  this->ui_.replay_button_->setEnabled( !dirty );
   this->ui_.step_detail_groupbox_->setEnabled( !dirty );
   this->ui_.refresh_button_->setEnabled( dirty );
 
-  if ( dirty ) this->prov_trail_.reset();
+  if ( dirty )
+  {
+    this->ui_.replay_button_->setEnabled( false );
+    this->prov_trail_.reset();
+  }
 }
 
 void ProvenanceDockWidgetPrivate::HandleLayersDeleted( qpointer_type qpointer )

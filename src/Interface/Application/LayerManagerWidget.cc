@@ -38,6 +38,9 @@
 
 // Core includes
 #include <Core/Utils/Log.h>
+#ifdef BUILD_WITH_PYTHON
+#include <Core/Python/PythonInterpreter.h>
+#endif
 
 // QtUtils includes
 #include <QtUtils/Utils/QtPointer.h>
@@ -488,6 +491,8 @@ LayerManagerWidget::LayerManagerWidget( QWidget* parent ) :
 
   // Hide the script widget
   this->private_->ui_.script_widget_->hide();
+  // Connect the abort script button
+  this->connect( this->private_->ui_.abort_button_, SIGNAL( clicked() ), SLOT( abort_script() ) );
 
   LayerManagerWidgetPrivate::qpointer_type qpointer( this->private_ );
 
@@ -573,16 +578,9 @@ void LayerManagerWidget::notify_groups_of_picked_up_layer_size( int layer_size )
 
 void LayerManagerWidget::abort_script()
 {
-  // TODO: For scripts not running in a sandbox, display a message
-  if ( this->private_->script_sandbox_ < 0 )
-  {
-    return;
-  }
-
-  // Delete the sandbox that the script is running in, which will cause any pending
-  // actions in the script to fail, and any running filters to be aborted.
-  ActionDeleteSandbox::Dispatch( Core::Interface::GetWidgetActionContext(), 
-    this->private_->script_sandbox_ );
+#ifdef BUILD_WITH_PYTHON
+  Core::PythonInterpreter::Instance()->interrupt();
+#endif
 
   // Hide the progress bar and show the text
   this->private_->ui_.progress_widget_->hide();
