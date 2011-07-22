@@ -224,8 +224,15 @@ public:
 
       this->itk_paths_.delete_all_paths();
       size_t vertices_num = this->vertices_.size();
+
+
       for ( unsigned int i = 0; i < vertices_num; ++i )
       {
+        if ( i == 1 && vertices_num == 2)
+        {
+          break; //just update one path, not a loop
+        }
+
         Core::Point p0, p1;
         p0 = this->vertices_[ i ];
         p1 = this->vertices_[ ( i + 1 ) % vertices_num ];
@@ -275,7 +282,7 @@ public:
 
         path_filter->AddPathInfo( info );
       }
-
+      
       path_filter->Update();
 
       size_t num_of_outputs = path_filter->GetNumberOfOutputs(); 
@@ -363,13 +370,13 @@ public:
       }
     }
 
-    //this->itk_paths_.delete_all_paths();
-    //for ( std::vector< Core::SinglePath >::iterator it = tmp_paths.begin(); it != tmp_paths.end(); ++it )
-    //{
-    //  this->itk_paths_.add_one_path( *it );
-    //}
+    this->itk_paths_.delete_all_paths();
+    for ( std::vector< Core::SinglePath >::iterator it = tmp_paths.begin(); it != tmp_paths.end(); ++it )
+    {
+      this->itk_paths_.add_one_path( *it );
+    }
 
-    this->itk_paths_.set_all_paths( tmp_paths );
+    //this->itk_paths_.set_all_paths( tmp_paths );
 
     return delete_outdated_path;  
   }

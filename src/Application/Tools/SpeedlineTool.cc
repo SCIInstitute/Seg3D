@@ -381,8 +381,14 @@ void SpeedlineToolPrivate::execute_path( bool update_all_paths )
   LayerHandle gradient_layer = LayerManager::Instance()->find_layer_by_id( 
     this->tool_->gradient_state_->get() );
 
-  if ( !target_layer->is_visible( viewer->get_viewer_id() ) ||
-    !gradient_layer->is_visible( viewer->get_viewer_id() ) ) 
+  //if ( !target_layer->is_visible( viewer->get_viewer_id() ) ||
+  //  !gradient_layer->is_visible( viewer->get_viewer_id() ) ) 
+  //{
+  //  return;
+  //}
+
+  // Only allow to work when mask is visible.
+  if ( !target_layer->is_visible( viewer->get_viewer_id() )  ) 
   {
     return;
   }
@@ -605,6 +611,20 @@ bool SpeedlineTool::handle_mouse_press( ViewerHandle viewer,
     return false;
   }
 
+  if ( !this->valid_target_state_->get() || !this->valid_gradient_state_->get() )
+  {
+    return false;
+  }
+
+  LayerHandle target_layer = LayerManager::Instance()->find_layer_by_id( 
+    this->target_layer_state_->get() );
+
+  // Only the target layer is visible, user can add points.
+  if ( !target_layer->is_visible( viewer->get_viewer_id() )  ) 
+  {
+    return false;
+  }
+
   if ( button == Core::MouseButton::LEFT_BUTTON_E &&
     ( modifiers == Core::KeyModifier::NO_MODIFIER_E ||
     modifiers == Core::KeyModifier::SHIFT_MODIFIER_E ) &&
@@ -769,6 +789,21 @@ bool SpeedlineTool::handle_mouse_release( ViewerHandle viewer,
     return false;
   }
 
+  if ( !this->valid_target_state_->get() || !this->valid_gradient_state_->get() )
+  {
+    return false;
+  }
+
+  LayerHandle target_layer = LayerManager::Instance()->find_layer_by_id( 
+    this->target_layer_state_->get() );
+
+  // Only the target layer is visible, user can add points.
+  if ( !target_layer->is_visible( viewer->get_viewer_id() )  ) 
+  {
+    return false;
+  }
+
+
   if ( this->private_->moving_vertex_ && 
     ( button == Core::MouseButton::LEFT_BUTTON_E ||
     button == Core::MouseButton::MID_BUTTON_E ) )
@@ -794,7 +829,23 @@ bool SpeedlineTool::handle_mouse_move( ViewerHandle viewer,
   {
     return false;
   }
+
   
+  if ( !this->valid_target_state_->get() || !this->valid_gradient_state_->get() )
+  {
+    return false;
+  }
+  
+  LayerHandle target_layer = LayerManager::Instance()->find_layer_by_id( 
+    this->target_layer_state_->get() );
+
+  // Only the target layer is visible, user can add points.
+  if ( !target_layer->is_visible( viewer->get_viewer_id() )  ) 
+  {
+    return false;
+  }
+
+
   if ( buttons == Core::MouseButton::NO_BUTTON_E )
   {
     this->private_->find_vertex( viewer, mouse_history.current_.x_, 
@@ -887,6 +938,22 @@ void SpeedlineTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
     return;
   }
 
+  //if ( !this->valid_target_state_->get() || !this->valid_gradient_state_->get() )
+  //{
+  //  return;
+  //}
+
+  //LayerHandle target_layer = LayerManager::Instance()->find_layer_by_id( 
+  //  this->target_layer_state_->get() );
+
+  //// Only the target layer is visible, user can add points.
+  //if ( !target_layer->is_visible( viewer->get_viewer_id() )  ) 
+  //{
+  //  return;
+  //}
+
+
+
   std::vector< Core::Point > vertices;
   Core::Path paths;
 
@@ -904,6 +971,7 @@ void SpeedlineTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
       slice_type = Core::VolumeSliceType::CORONAL_E;
     }
   }
+
 
   size_t vertices_num = vertices.size();
   size_t paths_num = paths.get_path_num();
