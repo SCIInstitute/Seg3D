@@ -32,14 +32,10 @@
 // Core includes
 #include <Core/Action/Actions.h>
 
-// Application includes
-#include <Application/Layer/LayerAction.h>
-#include <Application/Layer/LayerManager.h>
-
 namespace Seg3D
 {
 
-class ActionDuplicateLayer : public LayerAction
+  class ActionDuplicateLayer : public Core::Action
 {
 
 CORE_ACTION( 
@@ -55,7 +51,7 @@ CORE_ACTION(
 public:
   ActionDuplicateLayer()
   {
-    this->add_layer_id( this->layer_id_ );
+    this->add_parameter( this->layer_id_ );
     this->add_parameter( this->sandbox_ );
   }
 

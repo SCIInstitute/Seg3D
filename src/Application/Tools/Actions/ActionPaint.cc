@@ -280,7 +280,6 @@ bool ActionPaint::run( Core::ActionContextHandle& context, Core::ActionResultHan
     provenance_step->set_action_params( this->export_params_to_provenance_string() );
     ProvenanceStepID prov_step_id = ProjectManager::Instance()->get_current_project()->
       add_provenance_record( provenance_step );
-    assert( prov_step_id > 0 );
 
     if ( PreferencesManager::Instance()->enable_undo_state_->get() )
     {

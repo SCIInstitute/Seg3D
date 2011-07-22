@@ -176,7 +176,7 @@ bool ActionRecreateLayerPrivate::generate_script( Core::ActionContextHandle cont
         context->report_error( "Invalid provenance record encountered." );
         return false;
       }
-      action_cmd += action_params.substr( start_pos, pos ) + layer_id;
+      action_cmd += action_params.substr( start_pos, pos - start_pos ) + layer_id;
       start_pos = pos + input_pattern.size();
     }
     // Append the rest of the parameter string to the command

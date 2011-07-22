@@ -209,6 +209,24 @@ public:
   // NOTE: This function can only can called from the application thread.
   void set_project_changed( Core::ActionHandle action, Core::ActionResultHandle result );
 
+  // GET_USER_ID:
+  // Get the user_id of the given user_name in the provenance database.
+  // If the user_name doesn't exist yet, it will be inserted into the database.
+  long long get_user_id( const std::string& user_name );
+
+  // GET_ACTION_ID:
+  // Get the action_id of the given action_name in the provenance database.
+  // If the action_name doesn't exist yet, it will be inserted into the database.
+  long long get_action_id( const std::string& action_name );
+
+  // GET_USER_NAME:
+  // Get the user name identified by the given ID.
+  bool get_user_name( long long user_id, std::string& user_name );
+
+  // GET_ACTION_NAME:
+  // Get the action name identified by the given ID.
+  bool get_action_name( long long action_id, std::string& action_name );
+
   // -- internal variables --
 public:
   // Pointer back to the project
@@ -239,6 +257,12 @@ public:
 
   // Whether we need to convert the project when saving
   bool conversion_needed_;
+
+  // Cached user_id to user_name map
+  std::map< long long, std::string > user_name_map_;
+
+  // Cached action_id to action_name map
+  std::map< long long, std::string > action_name_map_;
 
   // -- static helper functions --
 public:
@@ -603,13 +627,29 @@ bool ProjectPrivate::initialize_provenance_database()
   sql_statements += "CREATE TABLE database_version "
     "(version INTEGER NOT NULL PRIMARY KEY);";
 
+  // Create table for user names
+  sql_statements += "CREATE TABLE user "
+    "(user_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
+    "user_name TEXT NOT NULL UNIQUE);";
+
+  // Create table for action names
+  sql_statements += "CREATE TABLE action "
+    "(action_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
+    "action_name TEXT NOT NULL UNIQUE);";
+
   // Create table for storing provenance steps
   sql_statements += "CREATE TABLE provenance_step "
     "(prov_step_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
-    "action_name TEXT NOT NULL, "
+    "action_id INTEGER NOT NULL REFERENCES action(action_id) ON DELETE CASCADE, "
     "action_params TEXT NOT NULL, "
     "timestamp TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, "
-    "user_id TEXT NOT NULL);";
+    "user_id INTEGER NOT NULL REFERENCES user(user_id) ON DELETE CASCADE);";
+
+  // Create index on provenance_step(action_id)
+  sql_statements += "CREATE INDEX action_id_index ON provenance_step(action_id);";
+
+  // Create index on provenance_step(user_id)
+  sql_statements += "CREATE INDEX user_id_index ON provenance_step(user_id);";
 
   // Create table for storing inputs of each provenance step
   sql_statements += "CREATE TABLE provenance_input "
@@ -777,10 +817,28 @@ bool ProjectPrivate::query_provenance_trail( const std::vector< ProvenanceID >& 
       CORE_LOG_ERROR( "Provenance database is broken." );
       return false;
     }
-    std::string action_name = boost::any_cast< std::string >( result_set[ 0 ][ "action_name" ] );
-    std::string action_params = boost::any_cast< std::string >( result_set[ 0 ][ "action_params" ] );
-    std::string user_id = boost::any_cast< std::string >( ( result_set[ 0 ] )[ "user_id" ] );
-    std::string timestamp_str = boost::any_cast< std::string >( ( result_set[ 0 ] )[ "timestamp" ] );
+
+    long long action_id, user_id;
+    std::string action_name, action_params, user_name, timestamp_str;
+    try
+    {
+      action_id = boost::any_cast< long long >( result_set[ 0 ][ "action_id" ] );
+      action_params = boost::any_cast< std::string >( result_set[ 0 ][ "action_params" ] );
+      user_id = boost::any_cast< long long >( ( result_set[ 0 ] )[ "user_id" ] );
+      timestamp_str = boost::any_cast< std::string >( ( result_set[ 0 ] )[ "timestamp" ] );
+    }
+    catch ( ... )
+    {
+      CORE_LOG_ERROR( "Invalid provenance database." );
+      return false;
+    }
+
+    if ( !this->get_action_name( action_id, action_name ) ||
+      !this->get_user_name( user_id, user_name ) )
+    {
+      return false;
+    }
+    
     ProvenanceStep::timestamp_type timestamp;
     ss.str( timestamp_str );
     try
@@ -794,7 +852,7 @@ bool ProjectPrivate::query_provenance_trail( const std::vector< ProvenanceID >& 
 
     prov_step->set_action_name( action_name );
     prov_step->set_action_params( action_params );
-    prov_step->set_username( user_id );
+    prov_step->set_username( user_name );
     prov_step->set_timestamp( timestamp );
 
     // Query outputs for the provenance step
@@ -1481,6 +1539,136 @@ void ProjectPrivate::set_project_changed( Core::ActionHandle action, Core::Actio
   }
 }
 
+long long ProjectPrivate::get_user_id( const std::string& user_name )
+{
+  std::string sql_str = "SELECT user_id FROM user WHERE user_name = '" + 
+    DatabaseManager::EscapeQuotes( user_name ) + "';";
+  std::string error;
+  ResultSet results;
+  if ( !this->provenance_database_.run_sql_statement( sql_str, results, error ) )
+  {
+    CORE_LOG_ERROR( error );
+    return -1;
+  }
+
+  if ( results.size() > 0 )
+  {
+    return boost::any_cast< long long >( results[ 0 ][ "user_id" ] );
+  }
+  
+  sql_str = "INSERT INTO user (user_name) VALUES('" + 
+    DatabaseManager::EscapeQuotes( user_name ) + "');";
+  if ( !this->provenance_database_.run_sql_statement( sql_str, error ) )
+  {
+    CORE_LOG_ERROR( error );
+    return -1;
+  }
+  
+  return this->provenance_database_.get_last_insert_rowid();
+}
+
+long long ProjectPrivate::get_action_id( const std::string& action_name )
+{
+  std::string sql_str = "SELECT action_id FROM action WHERE action_name = '" + action_name + "';";
+  std::string error;
+  ResultSet results;
+  if ( !this->provenance_database_.run_sql_statement( sql_str, results, error ) )
+  {
+    CORE_LOG_ERROR( error );
+    return -1;
+  }
+
+  if ( results.size() > 0 )
+  {
+    return boost::any_cast< long long >( results[ 0 ][ "action_id" ] );
+  }
+
+  sql_str = "INSERT INTO action (action_name) VALUES('" + action_name + "');";
+  if ( !this->provenance_database_.run_sql_statement( sql_str, error ) )
+  {
+    CORE_LOG_ERROR( error );
+    return -1;
+  }
+
+  return this->provenance_database_.get_last_insert_rowid();
+}
+
+bool ProjectPrivate::get_user_name( long long user_id, std::string& user_name )
+{
+  std::map< long long, std::string >::iterator it = this->user_name_map_.find( user_id );
+  if ( it != this->user_name_map_.end() )
+  {
+    user_name = it->second;
+    return true;
+  }
+  
+  std::string sql_str = "SELECT user_name FROM user WHERE user_id = " +
+    Core::ExportToString( user_id ) + ";";
+  ResultSet results;
+  std::string error;
+  if ( !this->provenance_database_.run_sql_statement( sql_str, results, error ) )
+  {
+    CORE_LOG_ERROR( error );
+    return false;
+  }
+  
+  if ( results.size() == 0 )
+  {
+    CORE_LOG_ERROR( "Invalid provenance database." );
+    return false;
+  }
+  
+  try
+  {
+    user_name = boost::any_cast< std::string >( results[ 0 ][ "user_name" ] );
+  }
+  catch ( ... )
+  {
+    CORE_LOG_ERROR( "Invalid provenance database." );
+    return false;
+  }
+
+  return true;
+}
+
+bool ProjectPrivate::get_action_name( long long action_id, std::string& action_name )
+{
+  std::map< long long, std::string >::iterator it = this->action_name_map_.find( action_id );
+  if ( it != this->action_name_map_.end() )
+  {
+    action_name = it->second;
+    return true;
+  }
+
+  std::string sql_str = "SELECT action_name FROM action WHERE action_id = " +
+    Core::ExportToString( action_id ) + ";";
+  ResultSet results;
+  std::string error;
+  if ( !this->provenance_database_.run_sql_statement( sql_str, results, error ) )
+  {
+    CORE_LOG_ERROR( error );
+    return false;
+  }
+
+  if ( results.size() == 0 )
+  {
+    CORE_LOG_ERROR( "Invalid provenance database." );
+    return false;
+  }
+
+  try
+  {
+    action_name = boost::any_cast< std::string >( results[ 0 ][ "action_name" ] );
+  }
+  catch ( ... )
+  {
+    CORE_LOG_ERROR( "Invalid provenance database." );
+    return false;
+  }
+
+  return true;
+}
+
 //////////////////////////////////////////////////////////
 
 Project::Project( const std::string& project_name ) :
@@ -1494,6 +1682,7 @@ Project::Project( const std::string& project_name ) :
   this->private_->initialize_session_database();
   this->private_->initialize_provenance_database();
   this->private_->initialize_note_database();
+  SetProvenanceCount( 0 );
   this->set_initializing( false );
 }
 
@@ -2536,19 +2725,15 @@ bool Project::is_session( SessionID session_id )
   return true;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////// Provenance Database Functionality //////////////////////////////////
-
-// This function is mostly just a placeholder.  Currently it just registers the actions.  We will probably want to 
-// create a Provenance Object and then add it to the db.
 ProvenanceStepID Project::add_provenance_record( const ProvenanceStepHandle& step )
 {
-  std::string user_name = step->get_username();
-  std::string action_name = step->get_action_name();
-  std::string action_params = step->get_action_params();
+  long long user_id = this->private_->get_user_id( step->get_username() );
+  long long action_id = this->private_->get_action_id( step->get_action_name() );
+  if ( user_id == -1 || action_id == -1 ) return -1;
 
   // Make sure action_params is not empty.
   // NOTE: A non-empty parameter string simplifies the query process 
+  std::string action_params = step->get_action_params();
   if ( action_params.empty() )
   {
     action_params = " ";
@@ -2559,9 +2744,10 @@ ProvenanceStepID Project::add_provenance_record( const ProvenanceStepHandle& ste
   ProvenanceIDList deleted_list = step->get_replaced_provenance_ids();
   InputFilesID inputfiles_id = step->get_inputfiles_id();
 
-  std::string sql_str = "INSERT INTO provenance_step (action_name, action_params, user_id)"
-    " VALUES('" + action_name + "', '" + DatabaseManager::EscapeQuotes( action_params ) + 
-    "', '" + DatabaseManager::EscapeQuotes( user_name ) + "');";
+  std::string sql_str = "INSERT INTO provenance_step (action_id, action_params, user_id)"
+    " VALUES(" + Core::ExportToString( action_id ) + ", '" + 
+    DatabaseManager::EscapeQuotes( action_params ) + 
+    "', " + Core::ExportToString( user_id ) + ");";
   std::string error;
   if ( !this->private_->provenance_database_.run_sql_statement( sql_str, error ) )
   {
@@ -2673,7 +2859,10 @@ void Project::request_provenance_trail( ProvenanceID prov_id )
 
   ProvenanceTrailHandle provenance_trail( new ProvenanceTrail );
   std::vector< ProvenanceID > prov_ids( 1, prov_id );
-  this->private_->query_provenance_trail( prov_ids, *provenance_trail );
+  if ( !this->private_->query_provenance_trail( prov_ids, *provenance_trail ) )
+  {
+    provenance_trail->clear();
+  }
 
   this->provenance_trail_signal_( provenance_trail );
 }

@@ -27,16 +27,10 @@
  */
 
 // Application includes
-#include <Application/Layer/MaskLayer.h>
-#include <Application/Layer/LayerGroup.h>
-
-#include <Application/Provenance/Provenance.h>
-#include <Application/Provenance/ProvenanceStep.h>
-#include <Application/ProjectManager/ProjectManager.h>
-#include <Application/UndoBuffer/UndoBuffer.h>
 #include <Application/Layer/LayerManager.h>
 #include <Application/Layer/LayerUndoBufferItem.h>
 #include <Application/Layer/Actions/ActionDuplicateLayer.h>
+#include <Application/UndoBuffer/UndoBuffer.h>
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
@@ -91,7 +85,7 @@ bool ActionDuplicateLayer::run( Core::ActionContextHandle& context, Core::Action
   }
 
   new_layer->set_meta_data( layer->get_meta_data() );
-  new_layer->provenance_id_state_->set( this->get_output_provenance_id( 0 ) );
+  new_layer->provenance_id_state_->set( layer->provenance_id_state_->get() );
 
   // Step (4):
   // Register the new layer with the LayerManager. This will insert it into the right group.
@@ -104,24 +98,7 @@ bool ActionDuplicateLayer::run( Core::ActionContextHandle& context, Core::Action
   {
     LayerManager::Instance()->set_active_layer( new_layer );
 
-    // Step (5): Create a provenance record
-    ProvenanceStepHandle provenance_step( new ProvenanceStep );
-    
-    // Get the input provenance ids from the translate step
-    provenance_step->set_input_provenance_ids( this->get_input_provenance_ids() );
-    
-    // Get the output and replace provenance ids from the analysis above
-    provenance_step->set_output_provenance_ids( this->get_output_provenance_ids() );
-      
-    // Get the action and turn it into provenance 
-    provenance_step->set_action_name( this->get_type() );
-    provenance_step->set_action_params( this->export_params_to_provenance_string() );   
-    
-    // Add step to provenance record
-    ProvenanceStepID step_id = ProjectManager::Instance()->get_current_project()->
-      add_provenance_record( provenance_step );
-
-    // Step (6):
+    // Step (5):
     // Create an undo item for this action
     LayerUndoBufferItemHandle item( new LayerUndoBufferItem( "Duplicate layer" ) );
     // Tell which action has to be re-executed to obtain the result
@@ -130,8 +107,6 @@ bool ActionDuplicateLayer::run( Core::ActionContextHandle& context, Core::Action
     item->add_layer_to_delete( new_layer );
     // Tell what the layer/group id counters are so we can undo those as well
     item->add_id_count_to_restore( id_count );
-    // Tell which provenance record to delete when the action is undone
-    item->set_provenance_step_id( step_id );
     // Add the complete record to the undo buffer
     UndoBuffer::Instance()->insert_undo_item( context, item );
   }
@@ -155,9 +130,8 @@ void ActionDuplicateLayer::Dispatch( Core::ActionContextHandle context )
   if ( active_layer )
   {
     action->layer_id_ = active_layer->get_layer_id();
+    Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
   }
-  
-  Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }
 
 } // end namespace Seg3D

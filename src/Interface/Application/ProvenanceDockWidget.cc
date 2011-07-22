@@ -131,6 +131,10 @@ public:
   // HANDLEPROJECTDATACHANGED:
   // Called when the data of the current project has changed.
   static void HandleActiveLayerProvenanceChanged( qpointer_type qpointer );
+
+  // HANDLELAYERSDELETED:
+  // Called when layers have been deleted.
+  static void HandleLayersDeleted( qpointer_type qpointer );
 };
 
 void ProvenanceDockWidgetPrivate::populate_provenance_list( ProvenanceTrailHandle provenance_trail )
@@ -173,7 +177,7 @@ void ProvenanceDockWidgetPrivate::clear_provenance_list()
 {
   this->prov_tree_model_->set_provenance_trail( ProvenanceTrailHandle() );
   this->parent_->handle_current_step_changed( QModelIndex() );
-  this->ui_.refresh_button_->setEnabled( false );
+  this->set_provenance_dirty( false );
 }
 
 void ProvenanceDockWidgetPrivate::HandleProvenanceResult( qpointer_type qpointer, 
@@ -240,6 +244,18 @@ void ProvenanceDockWidgetPrivate::set_provenance_dirty( bool dirty )
   if ( dirty ) this->prov_trail_.reset();
 }
 
+void ProvenanceDockWidgetPrivate::HandleLayersDeleted( qpointer_type qpointer )
+{
+  if ( !Core::Interface::IsInterfaceThread() )
+  {
+    Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind( 
+      &ProvenanceDockWidgetPrivate::HandleLayersDeleted, qpointer ) ) );
+    return;
+  }
+
+  qpointer->clear_provenance_list();
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Class ProvenanceDockWidget
 //////////////////////////////////////////////////////////////////////////
@@ -262,6 +278,8 @@ ProvenanceDockWidget::ProvenanceDockWidget( QWidget *parent ) :
     connect( boost::bind( &ProvenanceDockWidgetPrivate::HandleProjectChanged, qpointer ) ) );
   this->private_->add_connection( LayerManager::Instance()->active_layer_changed_signal_.
     connect( boost::bind( &ProvenanceDockWidgetPrivate::HandleActiveLayerChanged, qpointer, _1 ) ) );
+  this->private_->add_connection( LayerManager::Instance()->layers_deleted_signal_.connect(
+    boost::bind( &ProvenanceDockWidgetPrivate::HandleLayersDeleted, qpointer ) ) );
 
   this->private_->connect_project();
 
