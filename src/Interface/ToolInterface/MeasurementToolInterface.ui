@@ -7,20 +7,14 @@
     <x>0</x>
     <y>0</y>
     <width>264</width>
-    <height>549</height>
+    <height>479</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+   <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
-  </property>
-  <property name="minimumSize">
-   <size>
-    <width>0</width>
-    <height>300</height>
-   </size>
   </property>
   <property name="maximumSize">
    <size>
@@ -166,6 +160,12 @@ QWidget#general_tab_, QWidget#active_tab_{
    </property>
    <item>
     <widget class="QWidget" name="base_" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="minimumSize">
       <size>
        <width>0</width>
@@ -189,16 +189,10 @@ QWidget#general_tab_, QWidget#active_tab_{
       <item>
        <widget class="QTabWidget" name="tab_widget_">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>540</height>
-         </size>
         </property>
         <property name="styleSheet">
          <string notr="true">QTabWidget#general_tab_{
@@ -208,9 +202,15 @@ QWidget#general_tab_, QWidget#active_tab_{
 }</string>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="general_tab_">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <attribute name="title">
           <string>General</string>
          </attribute>
@@ -223,6 +223,12 @@ QWidget#general_tab_, QWidget#active_tab_{
           </property>
           <item>
            <widget class="QWidget" name="general_base_" native="true">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <layout class="QVBoxLayout" name="verticalLayout_8">
              <property name="spacing">
               <number>0</number>
@@ -241,6 +247,12 @@ QWidget#general_tab_, QWidget#active_tab_{
              </property>
              <item>
               <widget class="QGroupBox" name="measurements_groupbox_">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
                <property name="title">
                 <string>Measurements</string>
                </property>
@@ -253,6 +265,12 @@ QWidget#general_tab_, QWidget#active_tab_{
                 </property>
                 <item>
                  <widget class="QWidget" name="table_widget_" native="true">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
                   <layout class="QVBoxLayout" name="verticalLayout_5">
                    <property name="spacing">
                     <number>0</number>
@@ -263,10 +281,22 @@ QWidget#general_tab_, QWidget#active_tab_{
                    <item>
                     <widget class="Seg3D::MeasurementTableView" name="table_view_">
                      <property name="sizePolicy">
-                      <sizepolicy hsizetype="Ignored" vsizetype="Expanding">
+                      <sizepolicy hsizetype="Ignored" vsizetype="Maximum">
                        <horstretch>0</horstretch>
                        <verstretch>0</verstretch>
                       </sizepolicy>
+                     </property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>0</width>
+                       <height>160</height>
+                      </size>
+                     </property>
+                     <property name="maximumSize">
+                      <size>
+                       <width>16777215</width>
+                       <height>160</height>
+                      </size>
                      </property>
                     </widget>
                    </item>
@@ -275,6 +305,12 @@ QWidget#general_tab_, QWidget#active_tab_{
                 </item>
                 <item>
                  <widget class="QWidget" name="general_comment_widget_" native="true">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
                   <layout class="QVBoxLayout" name="verticalLayout_18">
                    <property name="spacing">
                     <number>4</number>
@@ -293,6 +329,12 @@ QWidget#general_tab_, QWidget#active_tab_{
                    </property>
                    <item>
                     <widget class="QLabel" name="general_comment_label_">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
                      <property name="text">
                       <string>Comment:</string>
                      </property>
@@ -305,6 +347,12 @@ QWidget#general_tab_, QWidget#active_tab_{
                        <horstretch>0</horstretch>
                        <verstretch>0</verstretch>
                       </sizepolicy>
+                     </property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>0</width>
+                       <height>80</height>
+                      </size>
                      </property>
                      <property name="maximumSize">
                       <size>
@@ -319,6 +367,12 @@ QWidget#general_tab_, QWidget#active_tab_{
                 </item>
                 <item>
                  <widget class="QWidget" name="table_button_widget_" native="true">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
                   <layout class="QVBoxLayout" name="verticalLayout_17">
                    <property name="spacing">
                     <number>0</number>
@@ -372,6 +426,12 @@ QWidget#general_tab_, QWidget#active_tab_{
              </item>
              <item>
               <widget class="QWidget" name="bottom_widget_" native="true">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
                <layout class="QVBoxLayout" name="verticalLayout_4">
                 <property name="spacing">
                  <number>4</number>
@@ -381,6 +441,12 @@ QWidget#general_tab_, QWidget#active_tab_{
                 </property>
                 <item>
                  <widget class="QGroupBox" name="units_groupbox_">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
                   <property name="title">
                    <string>Units</string>
                   </property>
@@ -402,6 +468,12 @@ QWidget#general_tab_, QWidget#active_tab_{
                    </property>
                    <item>
                     <widget class="QWidget" name="rb_widget_" native="true">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
                      <property name="minimumSize">
                       <size>
                        <width>0</width>
@@ -433,7 +505,7 @@ QWidget#general_tab_, QWidget#active_tab_{
                       <item>
                        <widget class="QRadioButton" name="rb_index_">
                         <property name="sizePolicy">
-                         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                         <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
                           <horstretch>0</horstretch>
                           <verstretch>0</verstretch>
                          </sizepolicy>
@@ -446,7 +518,7 @@ QWidget#general_tab_, QWidget#active_tab_{
                       <item>
                        <widget class="QRadioButton" name="rb_world_">
                         <property name="sizePolicy">
-                         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                         <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
                           <horstretch>0</horstretch>
                           <verstretch>0</verstretch>
                          </sizepolicy>
@@ -508,7 +580,7 @@ QWidget#general_tab_, QWidget#active_tab_{
                 <item>
                  <widget class="QWidget" name="button_widget_" native="true">
                   <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
@@ -563,6 +635,12 @@ QWidget#general_tab_, QWidget#active_tab_{
          </layout>
         </widget>
         <widget class="QWidget" name="active_tab_">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <attribute name="title">
           <string>Active Measurement Details</string>
          </attribute>
@@ -575,6 +653,12 @@ QWidget#general_tab_, QWidget#active_tab_{
           </property>
           <item>
            <widget class="QWidget" name="active_base_" native="true">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <layout class="QVBoxLayout" name="verticalLayout_9">
              <property name="spacing">
               <number>0</number>
@@ -603,7 +687,7 @@ QWidget#general_tab_, QWidget#active_tab_{
                 <item>
                  <widget class="QWidget" name="name_widget_" native="true">
                   <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
@@ -626,6 +710,12 @@ QWidget#general_tab_, QWidget#active_tab_{
                    </property>
                    <item>
                     <widget class="QLabel" name="name_label_">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
                      <property name="text">
                       <string>Name:</string>
                      </property>
@@ -634,7 +724,7 @@ QWidget#general_tab_, QWidget#active_tab_{
                    <item>
                     <widget class="QLineEdit" name="name_lineedit_">
                      <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
                        <horstretch>1</horstretch>
                        <verstretch>0</verstretch>
                       </sizepolicy>
@@ -683,6 +773,12 @@ QWidget#general_tab_, QWidget#active_tab_{
                        <verstretch>0</verstretch>
                       </sizepolicy>
                      </property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>0</width>
+                       <height>80</height>
+                      </size>
+                     </property>
                     </widget>
                    </item>
                   </layout>
@@ -690,6 +786,12 @@ QWidget#general_tab_, QWidget#active_tab_{
                 </item>
                 <item>
                  <widget class="QWidget" name="position_widget_" native="true">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
                   <layout class="QVBoxLayout" name="verticalLayout_12">
                    <property name="spacing">
                     <number>4</number>
@@ -700,7 +802,7 @@ QWidget#general_tab_, QWidget#active_tab_{
                    <item>
                     <widget class="QWidget" name="length_widget_" native="true">
                      <property name="sizePolicy">
-                      <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+                      <sizepolicy hsizetype="Ignored" vsizetype="Maximum">
                        <horstretch>0</horstretch>
                        <verstretch>0</verstretch>
                       </sizepolicy>
@@ -723,6 +825,12 @@ QWidget#general_tab_, QWidget#active_tab_{
                       </property>
                       <item>
                        <widget class="QLabel" name="length_label_">
+                        <property name="sizePolicy">
+                         <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                          <horstretch>0</horstretch>
+                          <verstretch>0</verstretch>
+                         </sizepolicy>
+                        </property>
                         <property name="text">
                          <string>Length:</string>
                         </property>
@@ -731,7 +839,7 @@ QWidget#general_tab_, QWidget#active_tab_{
                       <item>
                        <widget class="QLineEdit" name="length_lineedit_">
                         <property name="sizePolicy">
-                         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                         <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
                           <horstretch>1</horstretch>
                           <verstretch>0</verstretch>
                          </sizepolicy>
@@ -753,6 +861,12 @@ QWidget#general_tab_, QWidget#active_tab_{
                    </item>
                    <item>
                     <widget class="QWidget" name="point_widget_" native="true">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
                      <layout class="QVBoxLayout" name="verticalLayout">
                       <property name="spacing">
                        <number>4</number>
@@ -771,6 +885,12 @@ QWidget#general_tab_, QWidget#active_tab_{
                       </property>
                       <item>
                        <widget class="QWidget" name="p0_widget_" native="true">
+                        <property name="sizePolicy">
+                         <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                          <horstretch>0</horstretch>
+                          <verstretch>0</verstretch>
+                         </sizepolicy>
+                        </property>
                         <layout class="QHBoxLayout" name="horizontalLayout_6">
                          <property name="spacing">
                           <number>4</number>
@@ -781,7 +901,7 @@ QWidget#general_tab_, QWidget#active_tab_{
                          <item>
                           <widget class="QLabel" name="p0_label_">
                            <property name="sizePolicy">
-                            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                            <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
                              <horstretch>0</horstretch>
                              <verstretch>0</verstretch>
                             </sizepolicy>
@@ -799,6 +919,12 @@ QWidget#general_tab_, QWidget#active_tab_{
                          </item>
                          <item>
                           <widget class="QLabel" name="p0_value_">
+                           <property name="sizePolicy">
+                            <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                             <horstretch>0</horstretch>
+                             <verstretch>0</verstretch>
+                            </sizepolicy>
+                           </property>
                            <property name="text">
                             <string>(X, Y, Z)</string>
                            </property>
@@ -825,6 +951,12 @@ QWidget#general_tab_, QWidget#active_tab_{
                       </item>
                       <item>
                        <widget class="QWidget" name="p1_widget_" native="true">
+                        <property name="sizePolicy">
+                         <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                          <horstretch>0</horstretch>
+                          <verstretch>0</verstretch>
+                         </sizepolicy>
+                        </property>
                         <layout class="QHBoxLayout" name="horizontalLayout_7">
                          <property name="spacing">
                           <number>4</number>
@@ -835,7 +967,7 @@ QWidget#general_tab_, QWidget#active_tab_{
                          <item>
                           <widget class="QLabel" name="p1_label_">
                            <property name="sizePolicy">
-                            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                            <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
                              <horstretch>0</horstretch>
                              <verstretch>0</verstretch>
                             </sizepolicy>
@@ -847,6 +979,12 @@ QWidget#general_tab_, QWidget#active_tab_{
                          </item>
                          <item>
                           <widget class="QLabel" name="p1_value_">
+                           <property name="sizePolicy">
+                            <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                             <horstretch>0</horstretch>
+                             <verstretch>0</verstretch>
+                            </sizepolicy>
+                           </property>
                            <property name="text">
                             <string>(X, Y, Z)</string>
                            </property>
@@ -882,6 +1020,12 @@ QWidget#general_tab_, QWidget#active_tab_{
              </item>
              <item>
               <widget class="QGroupBox" name="display_groupbox_">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
                <property name="title">
                 <string>Display</string>
                </property>
@@ -894,6 +1038,12 @@ QWidget#general_tab_, QWidget#active_tab_{
                 </property>
                 <item>
                  <widget class="QWidget" name="display_widget_" native="true">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
                   <layout class="QVBoxLayout" name="verticalLayout_15">
                    <property name="spacing">
                     <number>4</number>
@@ -903,6 +1053,12 @@ QWidget#general_tab_, QWidget#active_tab_{
                    </property>
                    <item>
                     <widget class="QWidget" name="color_widget_" native="true">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
                      <layout class="QHBoxLayout" name="horizontalLayout_10">
                       <property name="spacing">
                        <number>4</number>
@@ -913,7 +1069,7 @@ QWidget#general_tab_, QWidget#active_tab_{
                       <item>
                        <widget class="QLabel" name="color_label_">
                         <property name="sizePolicy">
-                         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                         <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
                           <horstretch>0</horstretch>
                           <verstretch>0</verstretch>
                          </sizepolicy>
@@ -970,7 +1126,7 @@ QWidget#general_tab_, QWidget#active_tab_{
                    <item>
                     <widget class="QCheckBox" name="show_checkbox_">
                      <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
                        <horstretch>0</horstretch>
                        <verstretch>0</verstretch>
                       </sizepolicy>
@@ -988,11 +1144,26 @@ QWidget#general_tab_, QWidget#active_tab_{
              </item>
              <item>
               <widget class="QWidget" name="goto_widget_" native="true">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
                <layout class="QVBoxLayout" name="verticalLayout_13">
                 <property name="spacing">
                  <number>0</number>
                 </property>
-                <property name="margin">
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>2</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
                  <number>0</number>
                 </property>
                 <item>
