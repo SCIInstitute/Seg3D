@@ -196,7 +196,7 @@ ENDIF(SEG3D_BUILD_INTERFACE)
 
 ###########################################
 # Configure python
-OPTION(BUILD_WITH_PYTHON "Build with python support." OFF)
+OPTION(BUILD_WITH_PYTHON "Build with python support." ON)
 IF(BUILD_WITH_PYTHON)
   ADD_DEFINITIONS(-DBUILD_WITH_PYTHON 
           -DPy_NO_ENABLE_SHARED 

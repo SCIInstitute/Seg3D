@@ -259,7 +259,7 @@ QVariant ProvenanceTreeModel::data( const QModelIndex& index, int role ) const
   case ACTION_PARAMS_E:
     return item->action_params_;
   case PROV_STEP_INDEX_E:
-    return item->prov_step_index_;
+        return static_cast< qulonglong >( item->prov_step_index_ );
   case TIMESTAMP_E:
     return item->timestamp_;
   case USER_ID_E:
