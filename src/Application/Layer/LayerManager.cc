@@ -973,6 +973,8 @@ SandboxID LayerManager::create_sandbox()
   lock_type lock( this->get_mutex() );
   SandboxID sandbox_id = this->private_->sandbox_count_++;
   this->private_->sandboxes_[ sandbox_id ] = LayerSandboxHandle( new LayerSandbox );
+  lock.unlock();
+  this->sandbox_created_signal_( sandbox_id );
   return sandbox_id;
 }
 
@@ -988,6 +990,8 @@ bool LayerManager::create_sandbox( SandboxID sandbox )
   }
   
   this->private_->sandboxes_[ sandbox ] = LayerSandboxHandle( new LayerSandbox );
+  lock.unlock();
+  this->sandbox_created_signal_( sandbox );
   return true;
 }
 
@@ -1014,7 +1018,14 @@ bool LayerManager::delete_sandbox( SandboxID sandbox )
     }
   }
   
-  return this->private_->sandboxes_.erase( sandbox ) == 1;
+  if ( this->private_->sandboxes_.erase( sandbox ) == 1 )
+  {
+    lock.unlock();
+    this->sandbox_deleted_signal_( sandbox );
+    return true;
+  }
+  
+  return  false;
 }
 
 bool LayerManager::is_sandbox( SandboxID sandbox_id )

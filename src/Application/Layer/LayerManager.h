@@ -288,6 +288,14 @@ public:
   // are being locked for processing and when new data will be available
   boost::signals2::signal< void ( LayerHandle ) > layer_data_changed_signal_;
 
+  // SANDBOX_CREATED_SIGNAL_:
+  // Triggered when a sandbox has been created.
+  boost::signals2::signal< void ( SandboxID ) > sandbox_created_signal_;
+
+  // SANDBOX_DELETED_SIGNAL_:
+  // Triggered when a sandbox has been deleted.
+  boost::signals2::signal< void ( SandboxID ) > sandbox_deleted_signal_;
+
   // -- Scripting related signals --
 public:
   // SCRIPT_BEGIN_SIGNAL:

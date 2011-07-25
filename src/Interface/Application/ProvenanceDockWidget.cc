@@ -102,8 +102,6 @@ public:
   // -- Internal variables --
 public:
   Ui::ProvenanceDockWidget ui_;
-  bool resetting_;
-  std::vector< std::string > sessions_;
   ProvenanceDockWidget* parent_;
   ProvenanceTreeModel* prov_tree_model_;
   boost::signals2::connection active_layer_prov_connection_;
@@ -111,6 +109,10 @@ public:
 
   // Cached provenance trail
   ProvenanceTrailHandle prov_trail_;
+  // Whether the sandbox for provenance replay is available
+  bool sandbox_available_;
+  // Whether the provenance trail needs update
+  bool provenance_dirty_;
   
   // -- Static signal handling functions --
 public:
@@ -135,6 +137,14 @@ public:
   // HANDLELAYERSDELETED:
   // Called when layers have been deleted.
   static void HandleLayersDeleted( qpointer_type qpointer );
+
+  // HANDLESANDBOXCREATED:
+  // Called when a sandbox has been created.
+  static void HandleSandboxCreated( qpointer_type qpointer, SandboxID sandbox );
+
+  // HANDLESANDBOXDELETED:
+  // Called when a sandbox has been deleted.
+  static void HandleSandboxDeleted( qpointer_type qpointer, SandboxID sandbox );
 };
 
 void ProvenanceDockWidgetPrivate::populate_provenance_list( ProvenanceTrailHandle provenance_trail )
@@ -236,6 +246,7 @@ void ProvenanceDockWidgetPrivate::HandleActiveLayerProvenanceChanged( qpointer_t
 
 void ProvenanceDockWidgetPrivate::set_provenance_dirty( bool dirty )
 {
+  this->provenance_dirty_ = dirty;
   this->ui_.provenance_list_->setEnabled( !dirty );
   this->ui_.step_detail_groupbox_->setEnabled( !dirty );
   this->ui_.refresh_button_->setEnabled( dirty );
@@ -263,6 +274,38 @@ void ProvenanceDockWidgetPrivate::HandleLayersDeleted( qpointer_type qpointer )
   }
 }
 
+void ProvenanceDockWidgetPrivate::HandleSandboxCreated( qpointer_type qpointer, SandboxID sandbox )
+{
+  // Ignore any sandbox other than 0
+  if ( sandbox != 0 ) return;
+
+  if ( !Core::Interface::IsInterfaceThread() )
+  {
+    Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind( 
+      &ProvenanceDockWidgetPrivate::HandleSandboxCreated, qpointer, sandbox ) ) );
+    return;
+  }
+  
+  qpointer->sandbox_available_ = false;
+  qpointer->parent_->handle_current_step_changed( qpointer->ui_.provenance_list_->currentIndex() );
+}
+
+void ProvenanceDockWidgetPrivate::HandleSandboxDeleted( qpointer_type qpointer, SandboxID sandbox )
+{
+  // Ignore any sandbox other than 0
+  if ( sandbox != 0 ) return;
+
+  if ( !Core::Interface::IsInterfaceThread() )
+  {
+    Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind( 
+      &ProvenanceDockWidgetPrivate::HandleSandboxDeleted, qpointer, sandbox ) ) );
+    return;
+  }
+
+  qpointer->sandbox_available_ = true;
+  qpointer->parent_->handle_current_step_changed( qpointer->ui_.provenance_list_->currentIndex() );
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Class ProvenanceDockWidget
 //////////////////////////////////////////////////////////////////////////
@@ -272,6 +315,8 @@ ProvenanceDockWidget::ProvenanceDockWidget( QWidget *parent ) :
 {
   this->private_ = new ProvenanceDockWidgetPrivate( this );
   this->private_->prov_tree_model_ = new ProvenanceTreeModel( this );
+  this->private_->sandbox_available_ = true;
+  this->private_->provenance_dirty_ = false;
 
   this->private_->ui_.setupUi( this );
   this->private_->ui_.provenance_list_->setModel( this->private_->prov_tree_model_ );
@@ -287,6 +332,10 @@ ProvenanceDockWidget::ProvenanceDockWidget( QWidget *parent ) :
     connect( boost::bind( &ProvenanceDockWidgetPrivate::HandleActiveLayerChanged, qpointer, _1 ) ) );
   this->private_->add_connection( LayerManager::Instance()->layers_deleted_signal_.connect(
     boost::bind( &ProvenanceDockWidgetPrivate::HandleLayersDeleted, qpointer ) ) );
+  this->private_->add_connection( LayerManager::Instance()->sandbox_created_signal_.connect(
+    boost::bind( &ProvenanceDockWidgetPrivate::HandleSandboxCreated, qpointer, _1 ) ) );
+  this->private_->add_connection( LayerManager::Instance()->sandbox_deleted_signal_.connect(
+    boost::bind( &ProvenanceDockWidgetPrivate::HandleSandboxDeleted, qpointer, _1 ) ) );
 
   this->private_->connect_project();
 
@@ -331,7 +380,8 @@ void ProvenanceDockWidget::handle_current_step_changed( const QModelIndex& index
     Core::ImportFromString( poi_text.toStdString(), poi ) &&
     poi.size() > 0 )
   {
-    this->private_->ui_.replay_button_->setEnabled( true );
+    this->private_->ui_.replay_button_->setEnabled( 
+      this->private_->sandbox_available_ && !this->private_->provenance_dirty_ );
   }
   else
   {
@@ -342,7 +392,6 @@ void ProvenanceDockWidget::handle_current_step_changed( const QModelIndex& index
 void ProvenanceDockWidget::dispatch_recreate_provenance()
 {
   QModelIndex index = this->private_->ui_.provenance_list_->currentIndex();
-  this->private_->ui_.replay_button_->setEnabled( false );
   if ( this->private_->prov_trail_ && index.isValid() )
   {
     std::string poi_text = this->private_->prov_tree_model_->data( 

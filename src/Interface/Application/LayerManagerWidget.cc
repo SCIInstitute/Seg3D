@@ -581,6 +581,11 @@ void LayerManagerWidget::abort_script()
 #ifdef BUILD_WITH_PYTHON
   Core::PythonInterpreter::Instance()->interrupt();
 #endif
+  if ( this->private_->script_sandbox_ >= 0 )
+  {
+    ActionDeleteSandbox::Dispatch( Core::Interface::GetWidgetActionContext(), 
+      this->private_->script_sandbox_ );
+  }
 
   // Hide the progress bar and show the text
   this->private_->ui_.progress_widget_->hide();
