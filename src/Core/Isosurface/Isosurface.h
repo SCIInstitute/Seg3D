@@ -81,6 +81,10 @@ public:
   // allocated before using this array (use get_mutex())
   const std::vector< VectorF >& get_normals() const;
 
+  // SURFACE_AREA:
+  // Return the area of the isosurface.
+  float surface_area() const;
+
   // GET_VALUES:
   // Get values per vertex.  Returns empty vector if use has not set values.
   // NOTE: This function is not thread-safe, make sure you have the mutex
@@ -138,7 +142,7 @@ public:
 
   // UPDATE_PROGRESS:
   // When new information on progress is available this signal is triggered. If this signal is 
-  // triggered it should end with a value 1.0 indicating that progress reporting has finised.
+  // triggered it should end with a value 1.0 indicating that progress reporting has finished.
   // Progress is measured between 0.0 and 1.0.
   update_progress_signal_type update_progress_signal_;
 

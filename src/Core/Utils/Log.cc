@@ -85,6 +85,7 @@ void Log::post_warning( std::string message, const int line, const char* file )
 {
   std::string str = this->header( line, file ) + std::string( " WARNING: " ) + message;
   post_log_signal_( LogMessageType::WARNING_E, str );
+  this->post_status_signal_( LogMessageType::WARNING_E, message );
 }
 
 void Log::post_message( std::string message, const int line, const char* file )

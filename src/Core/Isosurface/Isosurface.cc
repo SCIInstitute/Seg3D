@@ -420,6 +420,7 @@ public:
   std::vector< VectorF > normals_; 
   std::vector< unsigned int > faces_; // unsigned int because GL expects this
   std::vector< float > values_; // Should be in range [0, 1]
+  float area_; // Surface area of the isosurface
 
   // Single colormap shared by all isosurfaces
   ColorMapHandle color_map_;
@@ -441,8 +442,9 @@ public:
   std::vector< std::pair<unsigned int, unsigned int> > part_faces_;
   std::vector< std::vector< unsigned int > > part_indices_;
 
-  std::vector<std::vector< PointF > > new_points_; 
-  std::vector<std::vector< StackVector< size_t, 3 > > > new_elems_;
+  std::vector< std::vector< PointF > > new_points_; 
+  std::vector< std::vector< StackVector< size_t, 3 > > > new_elems_;
+  std::vector< float > new_elem_areas_;
 
   std::vector< size_t > front_offset_;
   std::vector< size_t > back_offset_;
@@ -625,7 +627,7 @@ void IsosurfacePrivate::compute_faces_setup( int num_threads )
   this->elem_ny_ = this->ny_ - 1;
   this->elem_nz_ = this->nz_ - 1;
 
-  // Stores index into polgyon configuration table for each element (cube)?
+  // Stores index into polygon configuration table for each element (cube)?
   // Why +1?  Maybe just padding for safety?
   this->type_buffer_.resize( ( this->nx_ + 1 ) * ( this->ny_ + 1 ) );
   // For each element (cube), holds edge ID (12 edges) back_buffer_x, back_buffer_y, 
@@ -641,6 +643,8 @@ void IsosurfacePrivate::compute_faces_setup( int num_threads )
 
   // Vector of face indices per triangle, per thread
   this->new_elems_.resize( num_threads );
+  // Surface areas of generated triangles per thread
+  this->new_elem_areas_.resize( num_threads, 0 );
   // Offset allows zero-based indexing over multiple slices
   this->front_offset_.resize( num_threads, 0 );
   this->back_offset_.resize( num_threads, 0 ); 
@@ -1108,6 +1112,10 @@ void IsosurfacePrivate::parallel_compute_faces( int thread, int num_threads,
             elems[ 2 ] = ( p3 & 0x00FFFFFF ) + this->front_offset_[ p3>>24 ];            
           }
           elements.push_back( elems );
+          // Add the area of the triangle to the total
+          this->new_elem_areas_[ thread ] += 0.5f * 
+            Cross( this->points_[ elems[ 1 ] ] - this->points_[ elems[ 0 ] ], 
+            this->points_[ elems[ 2 ] ] - this->points_[ elems[ 0 ] ] ).length();
         }
       }
     }
@@ -1158,6 +1166,17 @@ void IsosurfacePrivate::parallel_compute_faces( int thread, int num_threads,
     this->isosurface_->update_progress_signal_( total_progress );
   }   
 
+  barrier.wait();
+
+  // Add up surface areas computed in all threads
+  if ( thread == 0 )
+  {
+    for ( int p = 0; p < num_threads; ++p )
+    {
+      this->area_ += this->new_elem_areas_[ p ];
+    }
+  }
+  
   barrier.wait();
 }
 
@@ -1265,6 +1284,7 @@ void IsosurfacePrivate::compute_cap_faces()
   cap_dimensions.push_back( std::make_pair( nx, ny ) ); // front and back caps
   cap_dimensions.push_back( std::make_pair( nx, nz ) ); // top and bottom caps
   cap_dimensions.push_back( std::make_pair( ny, nz ) ); // left and right side caps
+  PointF elem_vertices[ 3 ]; // Temporary storage for triangle vertices
 
   // For each of 6 caps
   for( int cap_num = 0; cap_num < 6; cap_num++ )
@@ -1534,10 +1554,14 @@ void IsosurfacePrivate::compute_cap_faces()
         
           // Look up the point index in the translation table for this cell 
           unsigned int point_index = point_trans_table[ cell_index ][ canonical_index ];
-
+          // Store the point coordinates in the temporary variable
+          elem_vertices[ triangle_point_index ] = this->points_[ point_index ];
           // Add point index to the faces list
           this->faces_.push_back( point_index );
         }
+        // Compute the area of  the triangle and add it to the total area
+        this->area_ += 0.5f * Cross( elem_vertices[ 1 ] - elem_vertices[ 0 ], 
+          elem_vertices[ 2 ] - elem_vertices[ 0 ] ).length();
       }
     }
 
@@ -1743,6 +1767,7 @@ void Isosurface::compute( double quality_factor, bool capping_enabled,
   this->private_->normals_.clear();
   this->private_->faces_.clear();
   this->private_->values_.clear();
+  this->private_->area_ = 0;
   this->private_->values_changed_ = false;
   this->private_->check_abort_ = check_abort;
 
@@ -1822,6 +1847,7 @@ void Isosurface::compute( double quality_factor, bool capping_enabled,
   this->private_->edge_buffer_.clear();
   this->private_->new_points_.clear();
   this->private_->new_elems_.clear();
+  this->private_->new_elem_areas_.clear();
   this->private_->front_offset_.clear();
   this->private_->back_offset_.clear();
   
@@ -2142,6 +2168,12 @@ bool Isosurface::export_isosurface( const boost::filesystem::path& path,
   }
 
   return true;
+}
+
+float Isosurface::surface_area() const
+{
+  lock_type lock( this->get_mutex() );
+  return this->private_->area_;
 }
 
 } // end namespace Core

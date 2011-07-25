@@ -147,6 +147,9 @@ public:
   
   // State that describes whether the isosurface has been generated
   Core::StateBoolHandle iso_generated_state_;
+
+  // The area of the generated isosurface
+  Core::StateDoubleHandle isosurface_area_state_;
   
   // State that describes the calculated volume of the mask, as string because its connected to a 
   // label that will show a non numeric value, when the volume has not been calculated.

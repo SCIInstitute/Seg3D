@@ -201,11 +201,13 @@ bool DatabaseManager::run_sql_script( const std::string& sql_str, std::string& e
   ResultSet dummy_results;
   const char* head = sql_str.c_str();
   const char* tail = NULL;
-  while ( head != NULL && strlen( head ) > 0 )
+  // The input string length including the null terminator
+  int num_bytes = static_cast< int >( sql_str.size() + 1 ); 
+  while ( num_bytes > 1 )
   {
     sqlite3_stmt* statement = NULL;
     if ( sqlite3_prepare_v2( this->private_->database_, head, 
-      static_cast< int >( sql_str.size() ), &statement, &tail ) != SQLITE_OK )
+      num_bytes, &statement, &tail ) != SQLITE_OK )
     {
       error =  "The SQL statement '" + std::string( head ) + "' failed to compile with error: "
         + sqlite3_errmsg( this->private_->database_ );
@@ -221,6 +223,7 @@ bool DatabaseManager::run_sql_script( const std::string& sql_str, std::string& e
       return false;
     } 
 
+    num_bytes -= static_cast< int >( tail - head );
     head = tail;
   }
 

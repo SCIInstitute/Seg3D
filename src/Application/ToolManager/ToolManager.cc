@@ -318,6 +318,8 @@ void ToolManagerPrivate::reset()
   }
   this->active_tool_.reset();
   this->tool_list_.clear();
+  this->update_tool_list();
+  this->tool_manager_->disable_tools_state_->set( false );
   ViewerManager::Instance()->reset_cursor();
 }
 

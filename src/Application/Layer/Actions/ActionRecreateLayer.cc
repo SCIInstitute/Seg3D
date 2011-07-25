@@ -275,10 +275,12 @@ bool ActionRecreateLayer::validate( Core::ActionContextHandle& context )
   ProvenanceIDList tmp_list;
   for ( size_t i = 0; i < this->private_->prov_ids_.size(); ++i )
   {
-    if ( LayerManager::FindLayer( this->private_->prov_ids_[ i ] ) )
+    LayerHandle layer = LayerManager::FindLayer( this->private_->prov_ids_[ i ] );
+    if ( layer )
     {
-      context->report_warning( "Layer with provenance ID " + 
-        Core::ExportToString( this->private_->prov_ids_[ i ] ) + " already exists." );
+      context->report_warning( "The requested provenance ID " + 
+        Core::ExportToString( this->private_->prov_ids_[ i ] ) + " already exists as layer '" +
+        layer->get_layer_name() + "'." );
     }
     else
     {

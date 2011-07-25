@@ -820,6 +820,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
         this->private_->ui_.fill_->hide();
         this->private_->ui_.mask_volume_widget_->hide();
         this->private_->ui_.colors_->hide();
+        this->private_->ui_.isosurface_area_widget_->hide();
         
         // Add the layer specific connections
         DataLayer* data_layer = dynamic_cast< DataLayer* >( layer.get() );
@@ -908,7 +909,11 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
             boost::bind( &ActionCalculateMaskVolume::Dispatch, 
             Core::Interface::GetWidgetActionContext(), this->get_layer_id() ) );
 
-        
+          QtUtils::QtBridge::Connect( this->private_->ui_.isosurface_area_,
+            mask_layer->isosurface_area_state_ );
+          QtUtils::QtBridge::Show( this->private_->ui_.isosurface_area_widget_,
+            mask_layer->iso_generated_state_ );
+
           this->set_mask_background_color( mask_layer->color_state_->get() );
         }
       }

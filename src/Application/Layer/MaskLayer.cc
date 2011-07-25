@@ -104,6 +104,9 @@ void MaskLayerPrivate::initialize_states()
   // == Keep track of whether the isosurface has been generated
   this->layer_->add_state( "iso_generated", this->layer_->iso_generated_state_, false );
 
+  this->layer_->add_state( "isosurface_area", this->layer_->isosurface_area_state_, 0.0 );
+  this->layer_->isosurface_area_state_->set_session_priority( Core::StateBase::DO_NOT_LOAD_E );
+
   // == Keep track of the calculated volume and put it in the UI
   this->layer_->add_state( "calculated_volume", this->layer_->calculated_volume_state_, "N/A" );
 
@@ -389,6 +392,7 @@ void MaskLayer::compute_isosurface( double quality_factor, bool capping_enabled 
   iso->compute( quality_factor, capping_enabled, boost::bind( &Layer::check_abort, this ) );
 
   this->data_state_->set( Layer::AVAILABLE_C );
+  this->isosurface_area_state_->set( iso->surface_area() );
 
   if ( !this->private_->isosurface_)
   {

@@ -96,15 +96,9 @@ bool MRCLayerExporter::export_mrc( const std::string& file_path )
     MRC2000IO::MRCUtil mrcutil;
     MRC2000IO::MRCHeader header;
     mrcutil.import_header(meta_data.meta_data_, header);
-    // update if needed
-    if (header.nx != data_block_handle->get_nx())
-      header.nx = data_block_handle->get_nx();
-
-    if (header.ny != data_block_handle->get_ny())
-      header.ny = data_block_handle->get_ny();
-    
-    if (header.nz != data_block_handle->get_nz())
-      header.nz = data_block_handle->get_nz();
+  header.nx = static_cast< int >( data_block_handle->get_nx() );
+  header.ny = static_cast< int >( data_block_handle->get_ny() );
+  header.nz = static_cast< int >( data_block_handle->get_nz() );
       
     if ( Core::DataBlock::IsLittleEndian() )
       header.machinestamp = MRC2000IO::LITTLE_ENDIAN_STAMP;
