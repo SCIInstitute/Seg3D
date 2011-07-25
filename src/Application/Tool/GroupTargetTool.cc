@@ -60,6 +60,7 @@ public:
   void handle_layers_deleted( std::vector< std::string > group_ids, bool groups_deleted );
   void handle_active_layer_changed( LayerHandle layer );
   void handle_layer_name_changed( std::string layer_id );
+  void handle_layer_data_changed( LayerHandle layer );
 
   // -- handle updates from state variables --
   void handle_use_active_group_changed( bool use_active_group );
@@ -210,6 +211,18 @@ void GroupTargetToolPrivate::handle_layer_name_changed( std::string layer_id )
   } 
 }
 
+void GroupTargetToolPrivate::handle_layer_data_changed( LayerHandle layer )
+{
+  LayerGroupHandle layer_group = layer->get_layer_group();
+  if ( layer_group && 
+    layer_group->get_group_id() == this->tool_->target_group_state_->get() &&
+    ( layer->get_type() & this->target_type_ ) &&
+    layer->data_state_->get() != Layer::CREATING_C )
+  {
+    this->update_layer_list();
+  }
+}
+
 void GroupTargetToolPrivate::update_group_list()
 {
   std::vector< LayerGroupHandle > groups;
@@ -270,6 +283,8 @@ GroupTargetTool::GroupTargetTool(  Core::VolumeType target_type, const std::stri
     boost::bind( &GroupTargetToolPrivate::handle_active_layer_changed, this->private_, _1 ) ) );
   this->add_connection( LayerManager::Instance()->layer_name_changed_signal_.connect(
     boost::bind( &GroupTargetToolPrivate::handle_layer_name_changed, this->private_, _1 ) ) );
+  this->add_connection( LayerManager::Instance()->layer_data_changed_signal_.connect(
+    boost::bind( &GroupTargetToolPrivate::handle_layer_data_changed, this->private_, _1 ) ) );
 
   this->add_connection( this->use_active_group_state_->value_changed_signal_.connect(
     boost::bind( &GroupTargetToolPrivate::handle_use_active_group_changed, 

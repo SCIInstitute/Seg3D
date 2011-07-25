@@ -87,7 +87,7 @@ public:
 
   // HANDLE_LAYER_DATA_CHANGED:
   // This function keeps track off when layer data is changed.
-  void handle_layer_data_changed( LayerHandle layer );
+  void handle_layer_data_changed( LayerWeakHandle layer );
 
   // FIND_FREE_COLOR:
   // Find a color that has not yet been used.
@@ -182,9 +182,13 @@ void LayerManagerPrivate::handle_layer_name_changed( std::string layer_id, std::
   this->layer_manager_->layer_name_changed_signal_( layer_id, name );
 }
 
-void LayerManagerPrivate::handle_layer_data_changed( LayerHandle layer )
+void LayerManagerPrivate::handle_layer_data_changed( LayerWeakHandle layer_weak_handle )
 {
-  this->layer_manager_->layer_data_changed_signal_( layer );
+  LayerHandle layer = layer_weak_handle.lock();
+  if ( layer )
+  {
+    this->layer_manager_->layer_data_changed_signal_( layer );
+  }
 }
 
 int LayerManagerPrivate::find_free_color()
@@ -329,7 +333,7 @@ bool LayerManager::insert_layer( LayerHandle layer, SandboxID sandbox )
     // NOTE: Add a connection here to check when layer data state changes
     // This is need to switch on/off menu options in the interface
     layer->data_state_->state_changed_signal_.connect( boost::bind(
-      &LayerManagerPrivate::handle_layer_data_changed, this->private_, layer ) );
+      &LayerManagerPrivate::handle_layer_data_changed, this->private_, LayerWeakHandle( layer ) ) );
         
   } // unlocked from here
 
@@ -1092,7 +1096,7 @@ bool LayerManager::pre_load_states( const Core::StateIO& state_io )
         // NOTE: Add a connection here to check when layer data state changes
         // This is need to switch on/off menu options in the interface
         ( *it )->data_state_->state_changed_signal_.connect( boost::bind(
-          &LayerManagerPrivate::handle_layer_data_changed, this->private_, ( *it ) ) );
+          &LayerManagerPrivate::handle_layer_data_changed, this->private_, LayerWeakHandle( *it ) ) );
 
         this->layer_inserted_signal_( ( *it ), first );
         first = false;
