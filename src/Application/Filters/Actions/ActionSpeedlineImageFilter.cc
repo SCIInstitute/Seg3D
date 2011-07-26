@@ -77,6 +77,7 @@ public:
 
   bool is_smoothing_;
   bool is_rescale_;
+  ActionSpeedlineImageFilter::callback_type callback_;
   
 public:
   // RUN:
@@ -223,14 +224,17 @@ public:
       rescale_filter->Update();
       //output_image = rescale_filter->GetOutput();
       this->insert_itk_image_into_layer( this->dst_layer_, rescale_filter->GetOutput() ); 
-    }   
-
+    } 
     else
     {
       this->insert_itk_image_into_layer( this->dst_layer_, gm_filter->GetOutput() );
     }
-      
-
+    
+    // Dispatch the callback to the application thread
+    if ( this->callback_ != 0 )
+    {
+      Core::Application::PostEvent( boost::bind( this->callback_, this->dst_layer_->get_layer_id() ) );
+    }
   }
   SCI_END_TYPED_ITK_RUN()
   
@@ -261,6 +265,7 @@ bool ActionSpeedlineImageFilter::run( Core::ActionContextHandle& context,
   algo->set_sandbox( this->sandbox_ );
   algo->is_smoothing_ = this->is_smoothing_;
   algo->is_rescale_ = this->is_rescale_;
+  algo->callback_ = this->callback_;
 
   // Find the handle to the layer
   if ( !( algo->find_layer( this->target_layer_, algo->src_layer_ ) ) )
@@ -296,7 +301,7 @@ bool ActionSpeedlineImageFilter::run( Core::ActionContextHandle& context,
 }
 
 void ActionSpeedlineImageFilter::Dispatch( Core::ActionContextHandle context, 
-  std::string target_layer, bool is_smoothing, bool is_rescale )
+  std::string target_layer, bool is_smoothing, bool is_rescale, callback_type callback )
 { 
   // Create a new action
   ActionSpeedlineImageFilter* action = new ActionSpeedlineImageFilter;
@@ -305,9 +310,17 @@ void ActionSpeedlineImageFilter::Dispatch( Core::ActionContextHandle context,
   action->target_layer_ = target_layer;
   action->is_smoothing_ = is_smoothing;
   action->is_rescale_ = is_rescale;
+  action->callback_ = callback;
 
   // Dispatch action to underlying engine
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }
-  
+
+void ActionSpeedlineImageFilter::clear_cache()
+{
+  // Reset the callback so it won't be holding any handles
+  this->callback_ = 0;
+}
+
+
 } // end namespace Seg3D

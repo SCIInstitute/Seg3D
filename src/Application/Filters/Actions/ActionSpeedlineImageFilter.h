@@ -71,22 +71,25 @@ public:
 public:
   virtual bool validate( Core::ActionContextHandle& context );
   virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
+  virtual void clear_cache();
+
+  typedef boost::function< void ( std::string ) > callback_type;
   
   // -- Action parameters --
 private:
-
   std::string target_layer_;
   bool is_smoothing_;
   bool is_rescale_;
   SandboxID sandbox_;
+  callback_type callback_;
     
   // -- Dispatch this action from the interface --
 public:
   // DISPATCH
   // Create and dispatch action that inserts the new layer 
+  // Set the callback to get notified when the filter is done.
   static void Dispatch( Core::ActionContextHandle context, std::string target_layer,
-    bool is_smoothing, bool is_rescale );
-  
+    bool is_smoothing, bool is_rescale, callback_type callback = 0 );
 };
   
 } // end namespace Seg3D

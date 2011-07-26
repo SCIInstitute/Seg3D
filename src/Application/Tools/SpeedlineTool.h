@@ -39,8 +39,9 @@ typedef boost::shared_ptr< SpeedlineToolPrivate > SpeedlineToolPrivateHandle;
 
 class SpeedlineTool;
 typedef boost::shared_ptr<SpeedlineTool> SpeedlineToolHandle;
+typedef boost::weak_ptr< SpeedlineTool > SpeedlineToolWeakHandle;
 
-class SpeedlineTool : public SingleTargetTool
+class SpeedlineTool : public SingleTargetTool, public boost::enable_shared_from_this< SpeedlineTool >
 {
 
 SEG3D_TOOL

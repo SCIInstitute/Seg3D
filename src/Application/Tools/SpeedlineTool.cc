@@ -81,7 +81,7 @@ public:
   void execute_path( bool update_all_paths );
 
   //To highlight the created speedline image
-  void handle_layers_inserted( LayerHandle layer );
+  void handle_speedline_image_created( std::string layer_id, SpeedlineToolWeakHandle tool );
 
   void handle_gradient_layer_changed( std::string layer_id );
   void handle_target_data_layer_changed( std::string layer_id );
@@ -110,17 +110,13 @@ void SpeedlineToolPrivate::set_update_paths( bool update_all_paths )
   this->update_all_paths_ = update_all_paths;
 }
 
-void SpeedlineToolPrivate::handle_layers_inserted( LayerHandle layer )
+void SpeedlineToolPrivate::handle_speedline_image_created( std::string layer_id, SpeedlineToolWeakHandle tool )
 {
-  std::string layer_name = layer->get_layer_name();
-  std::string prefix = "SpeedlineImage_";
-  size_t found = layer_name.find( prefix );
-  if ( found != std::string::npos )
+  // Make sure that the tool still exists
+  if ( tool.lock() )
   {
-    this->tool_->gradient_state_->set( layer->get_layer_id() );
-  //  this->tool_->gradient_created_state_->set( true );
+    this->tool_->gradient_state_->set( layer_id );  
   }
-  
 }
 
 void SpeedlineToolPrivate::handle_vertices_changed()
@@ -423,8 +419,9 @@ void SpeedlineTool::calculate_speedimage( Core::ActionContextHandle context )
   ActionSpeedlineImageFilter::Dispatch( context,
     this->target_data_layer_state_->get(),
     this->use_smoothing_state_->get(),
-    this->use_rescale_state_->get()
-    );  
+    this->use_rescale_state_->get(),
+    boost::bind( &SpeedlineToolPrivate::handle_speedline_image_created, this->private_, 
+    _1, SpeedlineToolWeakHandle( this->shared_from_this() ) ) );  
 }
 
 SpeedlineTool::SpeedlineTool( const std::string& toolid ) :
@@ -456,9 +453,6 @@ SpeedlineTool::SpeedlineTool( const std::string& toolid ) :
   this->add_state( "valid_gradient_layer", this->valid_gradient_state_, false );
   this->add_connection( this->gradient_state_->value_changed_signal_.connect(
     boost::bind( &SpeedlineToolPrivate::handle_gradient_layer_changed, this->private_, _2 ) ) );
-
-  this->add_connection( LayerManager::Instance()->layer_inserted_signal_.connect(
-    boost::bind( &SpeedlineToolPrivate::handle_layers_inserted, this->private_, _1 ) ) );
 
   this->add_state( "data_layer", this->target_data_layer_state_, Tool::NONE_OPTION_C, empty_list );
   this->add_dependent_layer_input( this->target_data_layer_state_, Core::VolumeType::DATA_E, false );
