@@ -1782,7 +1782,9 @@ void Viewer::window_to_world( int x, int y, double& world_x, double& world_y ) c
 
   if ( this->is_volume_view() )
   {
-    CORE_THROW_LOGICERROR( "Viewer is in volume mode");
+    // NOTE: Log a warning instead of throwing an exception to avoid crash
+    CORE_LOG_WARNING( "Viewer::window_to_world called when viewer is in volume view." );
+    return;
   }
 
   // Scale the mouse position to [-1, 1]
@@ -1808,7 +1810,9 @@ void Viewer::world_to_window( double world_x, double world_y, double& x, double&
 
   if ( this->is_volume_view() )
   {
-    CORE_THROW_LOGICERROR( "Viewer is in volume mode");
+    // NOTE: Log a warning instead of throwing an exception to avoid crash
+    CORE_LOG_WARNING( "Viewer::world_to_window called when viewer is in volume view." );
+    return;
   }
 
   Core::Matrix proj;
@@ -1832,7 +1836,9 @@ void Viewer::get_projection_matrix( Core::Matrix& proj_mat ) const
 
   if ( this->is_volume_view() )
   {
-    CORE_THROW_LOGICERROR( "Viewer is in volume mode");
+    // NOTE: Log a warning instead of throwing an exception to avoid crash
+    CORE_LOG_WARNING( "Viewer::get_projection_matrix called when viewer is in volume view." );
+    return;
   }
 
   double left, right, bottom, top;

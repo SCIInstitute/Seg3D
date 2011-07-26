@@ -1989,7 +1989,7 @@ bool Project::save_project( const boost::filesystem::path& project_path,
   {   
     // Set the new project name.
     this->project_name_state_->set( project_name );
-    std::string project_file_name = project_name + Project::GetDefaultProjectFileExtension();
+    this->project_file_state_->set( project_name + Project::GetDefaultProjectFileExtension() );
 
     // Set the new directory in which this project is saved.
     this->project_path_state_->set( project_path.string() );
