@@ -18,12 +18,15 @@ private:
   const static size_t POINTS_NUM_ON_PATH_C = 1000;
 
 public:
-  SinglePath() { this->path_.reserve( POINTS_NUM_ON_PATH_C ); }
+  SinglePath() 
+  {
+    //this->path_.reserve( POINTS_NUM_ON_PATH_C );
+  }
   SinglePath( Point& p1, Point& p2 )
   {
     points_[ 0 ] = p1 ;
     points_[ 1 ] = p2 ; 
-    this->path_.reserve( POINTS_NUM_ON_PATH_C );
+    //this->path_.reserve( POINTS_NUM_ON_PATH_C );
   }
 
 
@@ -31,6 +34,7 @@ public:
   {
     this->path_.clear();
   }
+
   void add_a_point( const Core::Point& p )
   {
     this->path_.push_back( p );

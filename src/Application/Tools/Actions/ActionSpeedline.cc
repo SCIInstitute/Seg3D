@@ -389,25 +389,29 @@ public:
     Core::StateBaseHandle state_var_1;
     Core::StateBaseHandle state_var_2;
 
-    if ( Core::StateEngine::Instance()->get_state( 
-      this->world_path_state_id_, state_var_1 ) )
     {
-      world_path_state = boost::dynamic_pointer_cast<
-        Core::StateSpeedlinePath > ( state_var_1 );
-      if ( world_path_state )
+      Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    
+      if ( Core::StateEngine::Instance()->get_state( 
+        this->world_path_state_id_, state_var_1 ) )
       {
-        this->world_paths_ = world_path_state->get();
+        world_path_state = boost::dynamic_pointer_cast<
+          Core::StateSpeedlinePath > ( state_var_1 );
+        if ( world_path_state )
+        {
+          this->world_paths_ = world_path_state->get();
+        }
       }
-    }
 
-    if ( Core::StateEngine::Instance()->get_state( 
-      this->itk_path_state_id_, state_var_2 ) )
-    {
-      itk_path_state = boost::dynamic_pointer_cast<
-        Core::StateSpeedlinePath > ( state_var_2 );
-      if ( itk_path_state )
+      if ( Core::StateEngine::Instance()->get_state( 
+        this->itk_path_state_id_, state_var_2 ) )
       {
-        this->itk_paths_ = itk_path_state->get();
+        itk_path_state = boost::dynamic_pointer_cast<
+          Core::StateSpeedlinePath > ( state_var_2 );
+        if ( itk_path_state )
+        {
+          this->itk_paths_ = itk_path_state->get();
+        }
       }
     }
 
@@ -444,9 +448,28 @@ public:
     typename TYPED_IMAGE_TYPE::RegionType input_region = 
       speed_image_3D->get_image()->GetLargestPossibleRegion();
     typename TYPED_IMAGE_TYPE::SizeType size = input_region.GetSize();
-    size[2] = 0;
     typename TYPED_IMAGE_TYPE::IndexType start = input_region.GetIndex();
-    start[2] = this->slice_number_;
+
+    if ( this->slice_type_ == Core::VolumeSliceType::SAGITTAL_E )
+    {
+      // Collapse Dim X
+      size[ 0 ] = 0;
+      start[ 0 ] = this->slice_number_;
+    }
+    else if ( this->slice_type_ == Core::VolumeSliceType::CORONAL_E )
+    {
+      // Collapse Dim Y
+      size[ 1 ] = 0;
+      start[ 1 ] = this->slice_number_;
+
+    }
+    else
+    {
+      // Collapse Dim Z
+      size[ 2 ] = 0;
+      start[ 2 ] = this->slice_number_;
+    }
+
     typename TYPED_IMAGE_TYPE::RegionType desired_region;
     desired_region.SetSize( size );
     desired_region.SetIndex( start );
@@ -456,6 +479,7 @@ public:
     extract_filter->Update();
 
     this->speed_image_2D_ = extract_filter->GetOutput();
+    this->speed_image_2D_->DisconnectPipeline();
 
     this->itk_paths_.set_start_point( this->vertices_[0] );
     this->itk_paths_.set_end_point( this->vertices_[ this->vertices_.size() - 1 ] );
