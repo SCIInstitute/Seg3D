@@ -230,6 +230,7 @@ public:
       this->insert_itk_image_into_layer( this->dst_layer_, gm_filter->GetOutput() );
     }
     
+    this->dispatch_unlock_layer( this->dst_layer_ );
     // Dispatch the callback to the application thread
     if ( this->callback_ != 0 )
     {

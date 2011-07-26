@@ -80,9 +80,12 @@ public:
     ViewerHandle viewer = ViewerHandle() );
   void execute_path( bool update_all_paths );
 
+  void handle_target_layer_changed( std::string layer_id );
+
   //To highlight the created speedline image
   void handle_speedline_image_created( std::string layer_id, SpeedlineToolWeakHandle tool );
 
+  void handle_layers_changed();
   void handle_gradient_layer_changed( std::string layer_id );
   void handle_target_data_layer_changed( std::string layer_id );
 
@@ -134,9 +137,16 @@ void SpeedlineToolPrivate::handle_slice_changed(  )
   this->execute_path( true );
 }
 
+void SpeedlineToolPrivate::handle_target_layer_changed( std::string layer_id )
+{
+  //Clear the speedline tool
+  this->tool_->reset(Core::Interface::GetMouseActionContext());
+}
 void SpeedlineToolPrivate::handle_gradient_layer_changed( std::string layer_id )
 {
   this->tool_->valid_gradient_state_->set( layer_id != Tool::NONE_OPTION_C );
+  //Clear the speedline tool
+  this->tool_->reset(Core::Interface::GetMouseActionContext());
 }
 
 void SpeedlineToolPrivate::handle_target_data_layer_changed( std::string layer_id )
@@ -451,8 +461,14 @@ SpeedlineTool::SpeedlineTool( const std::string& toolid ) :
   this->add_state( "gradient", this->gradient_state_, Tool::NONE_OPTION_C, empty_list );
   this->add_dependent_layer_input( this->gradient_state_, Core::VolumeType::DATA_E, false );
   this->add_state( "valid_gradient_layer", this->valid_gradient_state_, false );
+
+  // When mask changes, clear the speedline
   this->add_connection( this->gradient_state_->value_changed_signal_.connect(
     boost::bind( &SpeedlineToolPrivate::handle_gradient_layer_changed, this->private_, _2 ) ) );
+
+  // When mask changes, clear the speedline
+  this->add_connection( this->target_layer_state_->value_changed_signal_.connect(
+    boost::bind( &SpeedlineToolPrivate::handle_target_layer_changed, this->private_, _2  ) ) );
 
   this->add_state( "data_layer", this->target_data_layer_state_, Tool::NONE_OPTION_C, empty_list );
   this->add_dependent_layer_input( this->target_data_layer_state_, Core::VolumeType::DATA_E, false );
