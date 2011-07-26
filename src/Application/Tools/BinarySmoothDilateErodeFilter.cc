@@ -59,7 +59,7 @@ BinarySmoothDilateErodeFilter::BinarySmoothDilateErodeFilter( const std::string&
 
   // Whether we use a mask to find which components to use
   this->add_state( "mask", this->mask_state_, Tool::NONE_OPTION_C, empty_list );
-  this->add_dependent_layer_input( this->mask_state_, Core::VolumeType::MASK_E );
+  this->add_extra_layer_input( this->mask_state_, Core::VolumeType::MASK_E );
 
   // Whether that mask should be inverted
   this->add_state( "invert_mask", this->mask_invert_state_, false );

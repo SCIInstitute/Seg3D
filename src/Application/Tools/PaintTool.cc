@@ -670,13 +670,13 @@ PaintTool::PaintTool( const std::string& toolid ) :
     std::make_pair( Tool::NONE_OPTION_C, Tool::NONE_OPTION_C ) );
 
   this->add_state( "data_constraint", this->data_constraint_layer_state_, Tool::NONE_OPTION_C, empty_names );
-  this->add_dependent_layer_input( this->data_constraint_layer_state_, Core::VolumeType::DATA_E );
+  this->add_extra_layer_input( this->data_constraint_layer_state_, Core::VolumeType::DATA_E );
 
   this->add_state( "mask_constraint1", this->mask_constraint1_layer_state_, Tool::NONE_OPTION_C, empty_names );
-  this->add_dependent_layer_input( this->mask_constraint1_layer_state_, Core::VolumeType::MASK_E );
+  this->add_extra_layer_input( this->mask_constraint1_layer_state_, Core::VolumeType::MASK_E );
 
   this->add_state( "mask_constraint2", this->mask_constraint2_layer_state_, Tool::NONE_OPTION_C, empty_names );
-  this->add_dependent_layer_input( this->mask_constraint2_layer_state_, Core::VolumeType::MASK_E );
+  this->add_extra_layer_input( this->mask_constraint2_layer_state_, Core::VolumeType::MASK_E );
 
   this->add_state( "negative_data_constraint", this->negative_data_constraint_state_, false );
   this->add_state( "negative_mask_constraint1", this->negative_mask_constraint1_state_, false );

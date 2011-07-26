@@ -459,7 +459,7 @@ SpeedlineTool::SpeedlineTool( const std::string& toolid ) :
 
   // Whether we use a mask to find which components to use
   this->add_state( "gradient", this->gradient_state_, Tool::NONE_OPTION_C, empty_list );
-  this->add_dependent_layer_input( this->gradient_state_, Core::VolumeType::DATA_E, false );
+  this->add_extra_layer_input( this->gradient_state_, Core::VolumeType::DATA_E, false );
   this->add_state( "valid_gradient_layer", this->valid_gradient_state_, false );
 
   // When mask changes, clear the speedline
@@ -471,7 +471,7 @@ SpeedlineTool::SpeedlineTool( const std::string& toolid ) :
     boost::bind( &SpeedlineToolPrivate::handle_target_layer_changed, this->private_, _2  ) ) );
 
   this->add_state( "data_layer", this->target_data_layer_state_, Tool::NONE_OPTION_C, empty_list );
-  this->add_dependent_layer_input( this->target_data_layer_state_, Core::VolumeType::DATA_E, false );
+  this->add_extra_layer_input( this->target_data_layer_state_, Core::VolumeType::DATA_E, false );
 
   this->add_state( "valid_target_data_layer", this->valid_target_data_layer_state_, false );
   this->add_connection( this->target_data_layer_state_->value_changed_signal_.connect(

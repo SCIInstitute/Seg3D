@@ -48,7 +48,7 @@ ThresholdSegmentationLSFilter::ThresholdSegmentationLSFilter( const std::string&
 
   // add default values for the the states
   add_state( "seed_mask", this->seed_mask_state_, Tool::NONE_OPTION_C, empty_list );
-  this->add_dependent_layer_input( this->seed_mask_state_, Core::VolumeType::MASK_E, true );
+  this->add_extra_layer_input( this->seed_mask_state_, Core::VolumeType::MASK_E, true );
 
   // add number of iterations
   add_state( "iterations", this->iterations_state_, 20, 1, 60000, 1 );

@@ -55,7 +55,7 @@ PointSetFilter::PointSetFilter( const std::string& toolid ) :
   // Whether we use a mask to find which components to use
   this->add_state( "mask", this->mask_state_, Tool::NONE_OPTION_C, empty_list );
   this->mask_state_->set_session_priority( Core::StateBase::DEFAULT_LOAD_E + 2 );
-  this->add_dependent_layer_input( this->mask_state_, Core::VolumeType::MASK_E, true, true );
+  this->add_extra_layer_input( this->mask_state_, Core::VolumeType::MASK_E, true, false );
 
   this->add_state( "iterations", this->iterations_state_, 5, 1, 1000, 1 );
 
