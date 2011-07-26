@@ -176,16 +176,12 @@ void SingleTargetToolPrivate::handle_use_active_layer_changed( bool use_active_l
 {
   if ( use_active_layer )
   {
-    std::string old_target = this->tool_->target_layer_state_->get();
     LayerHandle layer = LayerManager::Instance()->get_active_layer();
     this->tool_->valid_primary_target_state_->set( layer && layer->has_valid_data() &&
       ( layer->get_type() & this->target_type_ ) );
     this->tool_->target_layer_state_->set( this->tool_->valid_primary_target_state_->get() ? 
       layer->get_layer_id() : Tool::NONE_OPTION_C );
-    if ( old_target != this->tool_->target_layer_state_->get() )
-    {
-      this->update_dependent_layers();
-    }
+    this->update_dependent_layers();
   }
 }
 
@@ -198,18 +194,21 @@ void SingleTargetToolPrivate::handle_target_layer_changed( std::string layer_id 
       layer_id != active_layer->get_layer_id() )
     {
       this->tool_->target_layer_state_->set( active_layer->get_layer_id() );
-      return;
+      this->tool_->valid_primary_target_state_->set( true );
     }
     
     if ( !active_layer || ( active_layer && !(active_layer->get_type() & this->target_type_ ) 
       && layer_id != Tool::NONE_OPTION_C ) )
     {
       this->tool_->target_layer_state_->set( Tool::NONE_OPTION_C );
-      return;
+      this->tool_->valid_primary_target_state_->set( false );
     }
   }
+  else
+  {
+    this->tool_->valid_primary_target_state_->set( layer_id != Tool::NONE_OPTION_C );
+  }
 
-  this->tool_->valid_primary_target_state_->set( layer_id != Tool::NONE_OPTION_C );
   this->update_dependent_layers();
 }
 
@@ -353,13 +352,20 @@ void SingleTargetTool::add_extra_layer_input( Core::StateLabeledOptionHandle inp
   layer_input.state_ = input_layer_state;
   layer_input.type_ = type;
   layer_input.required_ = required;
+  if ( required )
+  {
+    this->add_connection( input_layer_state->state_changed_signal_.connect( boost::bind(
+      &SingleTargetToolPrivate::check_dependent_layers, this->private_.get() ) ) );
+  }
   if ( dependent )
   {
     this->private_->dependent_layers_.push_back( layer_input );
+    this->private_->update_dependent_layers();
   }
   else
   {
     this->private_->independent_layers_.push_back( layer_input );
+    this->private_->update_independent_layers();
   }
 }
 
