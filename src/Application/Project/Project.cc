@@ -123,6 +123,10 @@ public:
   // Create tables for the provenance database.
   bool initialize_provenance_database();
 
+  // CLEAR_PROVENANCE_DATABASE:
+  // Delete records from all tables in the provenance database.
+  bool clear_provenance_database();
+
   // INITIALIZE_NOTE_DATABASE:
   // Create tables for the note database.
   bool initialize_note_database();
@@ -695,6 +699,47 @@ bool ProjectPrivate::initialize_provenance_database()
     CORE_LOG_ERROR( "Failed to initialize the provenance database: " + error );
     return false;
   }
+
+  return true;
+}
+
+bool ProjectPrivate::clear_provenance_database()
+{
+  std::string sql_statements;
+
+  // Delete records from table for storing the database version
+  sql_statements += "DELETE FROM database_version;";
+
+  // Delete records from table for user names
+  sql_statements += "DELETE FROM user;";
+    
+  // Delete records from table for action names
+  sql_statements += "DELETE FROM action;";
+
+  // Delete records from table for storing provenance steps
+  sql_statements += "DELETE FROM provenance_step;";
+
+  // Delete records from table for storing inputs of each provenance step
+  sql_statements += "DELETE FROM provenance_input;";
+  
+  // Delete records from table for storing outputs of each provenance step
+  sql_statements += "DELETE FROM provenance_output;";
+
+  // Delete records from table for storing deleted provenance IDs of each provenance step
+  sql_statements += "DELETE FROM provenance_replaced;";
+
+  // Delete records from table for storing outputs of each provenance step
+  sql_statements += "DELETE FROM provenance_inputfiles_cache;";
+  
+  std::string error;
+  if ( !this->provenance_database_.run_sql_script( sql_statements, error ) )
+  {
+    CORE_LOG_ERROR( "Failed to clear the provenance database: " + error );
+    return false;
+  }
+
+  // Let the GUI know that provenance has changed
+  this->project_->provenance_trail_signal_( ProvenanceTrailHandle() );
 
   return true;
 }
@@ -1975,6 +2020,29 @@ bool Project::save_project( const boost::filesystem::path& project_path,
     return false;
   }
   
+  // Remove patient-specific data if project should be anonymized
+  if( anonymize )
+  {
+    // Remove inputfiles directory from new project in case user overwrites existing project
+    boost::filesystem::path inputfiles_dir = project_path / INPUTFILES_DIR_C;
+    try
+    {
+      boost::filesystem::remove_all( inputfiles_dir );
+    }
+    catch ( ... ) 
+    {
+      CORE_LOG_ERROR( "Couldn't remove directory '" + inputfiles_dir.string() + "' for anonymization." );
+      return false;
+    }
+
+    // Clear provenance database in memory
+    if( !this->private_->clear_provenance_database() )
+    {
+      CORE_LOG_ERROR( "Failed to clear provenance database for anonymization." );
+      return false;
+    }
+  }
+
   // NOTE: This function has several modes:
   // (1) If the project has not been saved yet, the project will be saved to the location 
   // indicated and a session will be saved, as a session is needed to load a project
@@ -2064,18 +2132,6 @@ bool Project::save_project( const boost::filesystem::path& project_path,
         catch ( ... ) 
         {
           CORE_LOG_ERROR( "Couldn't remove directory '" + inputfiles_dir.string() + "' for anonymization." );
-          return false;
-        }
-        
-        // Remove provenance database
-        boost::filesystem::path provenance_database = project_path / DATABASE_DIR_C / PROVENANCE_DATABASE_C;
-        try
-        {
-          boost::filesystem::remove( provenance_database );
-        }
-        catch ( ... ) 
-        {
-          CORE_LOG_ERROR( "Couldn't remove file '" + provenance_database.string() + "' for anonymization." );
           return false;
         }
       }
