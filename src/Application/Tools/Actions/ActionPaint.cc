@@ -65,7 +65,6 @@ public:
   bool erase_;
   SandboxID sandbox_;
 
-  PaintToolWeakHandle paint_tool_weak_handle_;
   Core::MaskVolumeSliceHandle target_slice_;
   Core::DataVolumeSliceHandle data_constraint_slice_;
   Core::MaskVolumeSliceHandle mask_constraint1_slice_;
