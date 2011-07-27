@@ -286,7 +286,7 @@ SaveAsSummaryPage::SaveAsSummaryPage( QWidget *parent )
   this->anonymize_checkbox_ = new QCheckBox();
   this->anonymize_checkbox_->setObjectName(QString::fromUtf8("anonymize_checkbox_"));
   this->anonymize_checkbox_->setChecked( false );
-  this->anonymize_checkbox_->setText( QString::fromUtf8( "Anonymize" ) );
+  this->anonymize_checkbox_->setText( QString::fromUtf8( "Anonymize (Remove provenance, remove embedded files, and remove meta data)" ) );
   
     QVBoxLayout *layout = new QVBoxLayout;
   layout->addWidget( this->description_ );
