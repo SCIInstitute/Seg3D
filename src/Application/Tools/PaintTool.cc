@@ -644,8 +644,10 @@ bool PaintToolPrivate::check_paintable( ViewerHandle viewer )
     }
   }
 
-  lock_type lock(  this->get_mutex() );
-  this->paintable_ = paintable;
+  {
+    lock_type lock(  this->get_mutex() );
+    this->paintable_ = paintable;
+  }
   return paintable;
 }
 
@@ -720,19 +722,25 @@ void PaintTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
   double world_x, world_y;
   int radius;
   bool brush_visible = false;
+  
+  int center_x, center_y;
+  
   {
     PaintToolPrivate::lock_type private_lock( this->private_->get_mutex() );
     current_viewer = this->private_->viewer_;
-    if ( current_viewer && !current_viewer->is_volume_view() )
-    {
-      current_viewer->window_to_world( this->private_->center_x_, this->private_->center_y_,
-        world_x, world_y );
-    }
-    
-    this->private_->initialize();
-    this->private_->upload_mask_texture();
     radius = this->private_->radius_;
+    center_x = this->private_->center_x_;
+    center_y = this->private_->center_y_;
+    
   }
+  
+  if ( current_viewer && !current_viewer->is_volume_view() )
+  {
+    current_viewer->window_to_world( center_x, center_y, world_x, world_y );
+  }
+  
+  this->private_->initialize();
+  this->private_->upload_mask_texture();
   
   std::string target_layer_id;
   std::string data_constraint_layer_id;
