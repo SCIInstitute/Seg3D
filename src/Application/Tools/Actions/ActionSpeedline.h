@@ -58,6 +58,7 @@ CORE_ACTION
   CORE_ACTION_OPTIONAL_ARGUMENT( "termination", "1.0", "Unit of Termination." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "itk_path_state_id", "", "The statid of the state variable into which ITK continuous index values will be written." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "world_path_state_id", "", "The statid of the state variable into which world coordinate path values will be written." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "path_vertices_state_id", "", "The statid of the state variable into which vertices values will be written." )
   CORE_ACTION_CHANGES_PROJECT_DATA()
 )
 
@@ -89,7 +90,8 @@ public:
     double termination,
     bool update_all_paths,
     const std::string& itk_path_state_id,
-    const std::string& world_path_state_id
+    const std::string& world_path_state_id,
+    const std::string& path_vertices_state_id
     );
 };
 

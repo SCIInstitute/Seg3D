@@ -132,6 +132,10 @@ public:
   Core::StateSpeedlinePathHandle itk_path_state_;
   Core::StateSpeedlinePathHandle path_state_;
 
+  // This state variable is only used for path, as we redraw when path state changes. We cannot use
+  // the current vertices state.
+  Core::StatePointVectorHandle path_vertices_state_;   
+
   Core::StateBoolHandle valid_gradient_state_;
 
   Core::StateIntHandle current_vertex_index_state_;

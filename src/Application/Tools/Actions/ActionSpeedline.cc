@@ -83,6 +83,8 @@ public:
   int slice_type_;
   size_t slice_number_;
   std::vector< Core::Point > vertices_;
+
+  std::vector< Core::Point > path_vertices_;
   int current_vertex_index_;
   
   DataLayerHandle target_layer_;
@@ -92,6 +94,7 @@ public:
   bool update_all_paths_;
   std::string itk_path_state_id_;
   std::string world_path_state_id_;
+  std::string path_vertices_state_id_;
 
 public:
   void compute_path ( int start_index, int end_index )
@@ -385,9 +388,11 @@ public:
   {
     Core::StateSpeedlinePathHandle world_path_state;
     Core::StateSpeedlinePathHandle itk_path_state;
+    Core::StatePointVectorHandle path_vertices_state;  
     
     Core::StateBaseHandle state_var_1;
     Core::StateBaseHandle state_var_2;
+    Core::StateBaseHandle state_var_3;
 
     {
       Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
@@ -413,9 +418,22 @@ public:
           this->itk_paths_ = itk_path_state->get();
         }
       }
+
+      if ( Core::StateEngine::Instance()->get_state( 
+        this->path_vertices_state_id_, state_var_3 ) )
+      {
+        path_vertices_state = boost::dynamic_pointer_cast<
+          Core::StatePointVector > ( state_var_3 );
+        if ( path_vertices_state )
+        {
+          this->path_vertices_ = path_vertices_state->get();
+        }
+      }
     }
 
     this->world_paths_.delete_all_paths();
+    this->path_vertices_ = vertices_;
+
     if ( this->current_vertex_index_ == -1 )
     {
       clean_paths();
@@ -429,6 +447,9 @@ public:
   
       Core::Application::PostEvent( boost::bind( &Core::StateSpeedlinePath::set,
           world_path_state, this->world_paths_, Core::ActionSource::NONE_E ) );
+
+      Core::Application::PostEvent( boost::bind( &Core::StatePointVector::set,
+          path_vertices_state, this->path_vertices_, Core::ActionSource::NONE_E ) );
 
       return;
     }
@@ -604,6 +625,9 @@ public:
 
     Core::Application::PostEvent( boost::bind( &Core::StateSpeedlinePath::set,
       world_path_state, this->world_paths_, Core::ActionSource::NONE_E ) );
+
+    Core::Application::PostEvent( boost::bind( &Core::StatePointVector::set,
+      path_vertices_state, this->path_vertices_, Core::ActionSource::NONE_E ) );
   }
   SCI_END_TYPED_ITK_RUN()
 
@@ -634,6 +658,7 @@ public:
   int current_vertex_index_;
   std::string itk_path_state_id_;
   std::string world_path_state_id_;
+  std::string path_vertices_state_id_;
   bool update_all_paths_;
 };
 
@@ -650,6 +675,7 @@ ActionSpeedline::ActionSpeedline() :
   this->add_parameter( this->private_->update_all_paths_ );
   this->add_parameter( this->private_->itk_path_state_id_ );
   this->add_parameter( this->private_->world_path_state_id_ );
+  this->add_parameter( this->private_->path_vertices_state_id_ );
 }
 
 bool ActionSpeedline::validate( Core::ActionContextHandle& context )
@@ -704,6 +730,7 @@ bool ActionSpeedline::run( Core::ActionContextHandle& context, Core::ActionResul
   algo->update_all_paths_ = this->private_->update_all_paths_;
   algo->itk_path_state_id_ = this->private_->itk_path_state_id_;
   algo->world_path_state_id_ = this->private_->world_path_state_id_;
+  algo->path_vertices_state_id_ = this->private_->path_vertices_state_id_;
 
   Core::Runnable::Start( algo );
 
@@ -718,7 +745,8 @@ void ActionSpeedline::Dispatch( Core::ActionContextHandle context,
                 int iterations, double termination, 
                 bool update_all_paths,
                 const std::string& itk_path_state_id,
-                const std::string& world_path_state_id
+                const std::string& world_path_state_id,
+                const std::string& path_vertices_state_id
                 )
 {
   ActionSpeedline* action = new ActionSpeedline;
@@ -733,6 +761,7 @@ void ActionSpeedline::Dispatch( Core::ActionContextHandle context,
   action->private_->update_all_paths_ = update_all_paths;
   action->private_->itk_path_state_id_ = itk_path_state_id;
   action->private_->world_path_state_id_ = world_path_state_id;
+  action->private_->path_vertices_state_id_ = path_vertices_state_id;
 
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }

@@ -171,7 +171,10 @@ bool SpeedlineToolPrivate::find_vertex( ViewerHandle viewer, int x, int y, int& 
   double range_x = pixel_width * 4;
   double range_y = pixel_height * 4;
 
+  //Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
   std::vector< Core::Point > vertices = this->tool_->vertices_state_->get();
+  //lock.unlock();
+
   Core::VolumeSliceType slice_type( Core::VolumeSliceType::AXIAL_E );
   if ( viewer->view_mode_state_->get() == Viewer::CORONAL_C )
   {
@@ -292,7 +295,8 @@ void SpeedlineToolPrivate::execute_fill_erase( Core::ActionContextHandle context
     return;
   }
 
-  const std::vector< Core::Point >& vertices = this->tool_->vertices_state_->get();
+  //const std::vector< Core::Point >& vertices = this->tool_->vertices_state_->get();
+  const std::vector< Core::Point >& vertices = this->tool_->path_vertices_state_->get();
   size_t num_of_vertices = vertices.size();
 
   if ( num_of_vertices < 3 )
@@ -341,6 +345,8 @@ void SpeedlineToolPrivate::execute_fill_erase( Core::ActionContextHandle context
 
 void SpeedlineToolPrivate::execute_path( bool update_all_paths )
 {
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
   if ( this->get_update_paths() )
   {
     update_all_paths = true;
@@ -413,7 +419,8 @@ void SpeedlineToolPrivate::execute_path( bool update_all_paths )
     this->tool_->termination_state_->get(),
     update_all_paths,
     this->tool_->itk_path_state_->get_stateid(),
-    this->tool_->path_state_->get_stateid()
+    this->tool_->path_state_->get_stateid(),
+    this->tool_->path_vertices_state_->get_stateid()
     );
 }
 
@@ -481,6 +488,7 @@ SpeedlineTool::SpeedlineTool( const std::string& toolid ) :
   this->add_state( "path", this->path_state_,  Core::Path() );
   this->add_connection( this->path_state_->state_changed_signal_.connect(
     boost::bind( &SpeedlineToolPrivate::handle_path_changed, this->private_ ) ) );
+  this->add_state( "path_vertices", this->path_vertices_state_ );
 
   this->add_state( "current_vertex_index", this->current_vertex_index_state_, -1 );
 
@@ -970,7 +978,8 @@ void SpeedlineTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
   Core::VolumeSliceType slice_type( Core::VolumeSliceType::AXIAL_E );
   {
     Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
-    vertices = this->vertices_state_->get();
+    //vertices = this->vertices_state_->get();
+    vertices = this->path_vertices_state_->get();
     paths = this->path_state_->get();
     if ( viewer->view_mode_state_->get() == Viewer::SAGITTAL_C )
     {
