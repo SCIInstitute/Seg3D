@@ -1037,6 +1037,28 @@ bool LayerManager::is_sandbox( SandboxID sandbox_id )
 
 bool LayerManager::pre_save_states( Core::StateIO& state_io )
 {
+  ProjectHandle current_project = ProjectManager::Instance()->get_current_project();
+  if ( current_project && current_project->get_need_anonymize() )
+  {
+    LayerMetaData empty_metadata;
+
+    for( GroupList::const_iterator i = 
+      this->private_->group_list_.begin(); i != this->private_->group_list_.end(); ++i )
+    {
+      LayerList& layer_list = ( *i )->get_layer_list();
+      LayerList::iterator it = layer_list.begin();
+      LayerList::iterator it_end = layer_list.end();
+      
+      while ( it != it_end )
+      {
+        (*it)->set_meta_data( empty_metadata );
+        ++it;
+      }
+    }
+  }
+
+  current_project->set_need_anonymize( false );
+  
   return true;
 }
 

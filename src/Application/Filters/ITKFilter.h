@@ -32,7 +32,7 @@
 // Boost includes
 #include <boost/function.hpp>
 #include <boost/smart_ptr.hpp> 
-#include <boost/utility.hpp> 
+#include <boost/noncopyable.hpp> 
  
 // Core includes
 #include <Core/DataBlock/ITKImageData.h>
@@ -45,7 +45,6 @@
 // Application includes
 #include <Application/Layer/DataLayer.h> 
 #include <Application/Layer/MaskLayer.h> 
-
 #include <Application/Filters/LayerFilter.h>
  
 namespace Seg3D

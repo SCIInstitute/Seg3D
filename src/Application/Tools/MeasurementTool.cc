@@ -579,7 +579,6 @@ bool MeasurementToolPrivate::find_hover_line()
 	this->viewer_->window_to_world( 0, 0, x0, y0 );
 	this->viewer_->window_to_world( 1, 1, x1, y1 );
 	double pixel_width = Core::Abs( x1 - x0 );
-	double pixel_height = Core::Abs( y1 - y0 );
 	double epsilon = pixel_width * 4;
 
 	// Compute the mouse position in world space
@@ -1450,9 +1449,6 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
 			length_strings[ m_idx ] = "";
 		}
 	}
-
-	size_t active_viewer = static_cast< size_t >( 
-		ViewerManager::Instance()->active_viewer_state_->get() );
 	
 	lock.unlock();
 	

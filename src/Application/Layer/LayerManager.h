@@ -319,10 +319,12 @@ public:
   boost::signals2::signal< void ( SandboxID, std::string, size_t, size_t ) > script_progress_signal_;
 
 protected:
+  // PRE_SAVE_STATES:
+  // This function is called before the LayerManager's states are being saved
   virtual bool pre_save_states( Core::StateIO& state_io );
 
   // POST_SAVE_STATES:
-  // This function is called after the LayerManagers states have been saved and then
+  // This function is called after the LayerManager's states have been saved and then
   // tells the groups to save their states as well.
   virtual bool post_save_states( Core::StateIO& state_io );
 

@@ -87,7 +87,6 @@ SplashScreen::SplashScreen( QWidget *parent ) :
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
     bool project_creation = InterfaceManager::Instance()->enable_project_creation_state_->get();
-    bool file_import = InterfaceManager::Instance()->enable_file_import_state_->get();
     
     if ( !project_creation )
     {

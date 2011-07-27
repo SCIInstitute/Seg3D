@@ -29,7 +29,9 @@
 // Python includes
 // NOTE: This one has to be here: Because the Python source code is sub standard, we need to include
 // this first, to avoid trouble with the macros that Python defines.
-#include <python.h>
+#ifdef BUILD_WITH_PYTHON
+#include <Python.h>
+#endif
 
 // STD includes
 #include <sstream>

@@ -38,9 +38,7 @@
 #include <Core/Volume/MaskVolume.h>
 
 // Application includes
-#include <Application/Layer/DataLayer.h> 
-#include <Application/Layer/MaskLayer.h> 
-#include <Application/Layer/LabelLayer.h> 
+#include <Application/Layer/LayerFWD.h> 
 #include <Application/Layer/LayerAbstractFilter.h>
 #include <Application/Layer/LayerManager.h>
 

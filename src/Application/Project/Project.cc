@@ -267,6 +267,9 @@ public:
 
   // Cached action_id to action_name map
   std::map< long long, std::string > action_name_map_;
+  
+  // Whether data needs to be anonymized on the next save
+  bool need_anonymize_;
 
   // -- static helper functions --
 public:
@@ -2131,9 +2134,119 @@ bool Project::save_project( const boost::filesystem::path& project_path,
         }
         catch ( ... ) 
         {
-          CORE_LOG_ERROR( "Couldn't remove directory '" + inputfiles_dir.string() + "' for anonymization." );
+          CORE_LOG_ERROR( "Couldn't remove directory '" + 
+            inputfiles_dir.string() + "' for anonymization." );
           return false;
         }
+        
+        // Remove meta data from session files
+        boost::filesystem::path session_dir = project_path / SESSION_DIR_C;
+        
+        // Iterate through directory
+        boost::filesystem::directory_iterator it = 
+          boost::filesystem::directory_iterator( session_dir );
+        boost::filesystem::directory_iterator it_end;
+                
+        while ( it != it_end )
+        {
+          boost::filesystem::path filename = (*it).path();
+          if ( filename.extension().string() == ".xml" )
+          {         
+            Core::StateIO state_io;
+            if ( !state_io.import_from_file( filename ) ) 
+            {
+              // NOTE: Rather remove a file than let patient data continue to persist
+              
+              try
+              {
+                boost::filesystem::remove( filename );
+                continue;
+              }
+              catch( ... )
+              {
+                CORE_LOG_ERROR( "Couldn't remove file '" + filename.string() 
+                  + "' for anonymization." );
+                return false;             
+              }
+            }
+            
+            // Find the layer manager element
+            TiXmlElement* root_element = state_io.get_current_element();
+            TiXmlElement* lm_element = root_element->FirstChildElement( "layermanager" );
+            if ( lm_element == 0 ) 
+            {
+              // does not contain layer manager so continue
+              continue;
+            }
+            
+            // Finr the groups element
+            TiXmlElement* groups_element = lm_element->FirstChildElement( "groups" );
+            if ( groups_element == 0 ) 
+            {
+              // does not contain layer groups so continue
+              continue;
+            }
+            
+            TiXmlElement* group_element = groups_element->FirstChildElement();
+            while ( group_element != 0 )
+            {
+              TiXmlElement* layers_element = group_element->FirstChildElement( "layers" );
+              if ( layers_element == 0 )
+              {
+                // does not contain layer groups so continue
+                continue;
+              }
+
+              TiXmlElement* layer_element = layers_element->FirstChildElement();
+              while ( layer_element != 0 )
+              {
+                TiXmlElement* state_element = layer_element->FirstChildElement( "State" );
+                while ( state_element != 0 )
+                {
+                  const char* state_id = state_element->Attribute( "id" );
+                  if ( state_id != 0 );
+                  {
+                    if ( strcmp( state_id, "metadata" ) == 0 ||
+                       strcmp( state_id, "metadata_info" ) == 0 )
+                    {
+                      state_element->LinkEndChild( new TiXmlText( "" ) );                 
+                    }                   
+                  }
+                  
+                  state_element = state_element->NextSiblingElement( "State" );
+                }
+
+                layer_element = layer_element->NextSiblingElement();
+              }
+
+              group_element = group_element->NextSiblingElement();
+            }
+            
+            if ( !state_io.export_to_file( filename ) )
+            {
+              // NOTE: Rather remove a file than let patient data continue to persist
+              
+              try
+              {
+                boost::filesystem::remove( filename );
+                continue;
+              }
+              catch( ... )
+              {
+                CORE_LOG_ERROR( "Couldn't remove file '" + filename.string() 
+                  + "' for anonymization." );
+                return false;             
+              }
+            }
+          }
+          ++it;
+        }
+        
+        // This will instruct the save session to strip the meta data out, when it is
+        // saved at the end of this function.
+        
+        this->set_need_anonymize( true );
+        // Done anonymizing
       }
 
       // Delete the project file from the new directory because a new one will be generated
@@ -3062,5 +3175,17 @@ void Project::request_note_list()
   this->private_->get_all_notes( *note_list );
   this->note_list_changed_signal_( note_list );
 }
+
+
+bool Project::get_need_anonymize()
+{
+  return this->private_->need_anonymize_;
+}
+
+void Project::set_need_anonymize( bool anonymize )
+{
+  this->private_->need_anonymize_ = anonymize;
+}
+
 
 } // end namespace Seg3D

@@ -127,18 +127,20 @@ bool ActionSaveProjectAs::run( Core::ActionContextHandle& context,
       this->project_location_, this->project_name_, this->anonymize_ );
 
   progress->end_progress_reporting();
-  
+
   if( !success )
   {
     // Draw the users attention to this problem.
     CORE_LOG_CRITICAL_ERROR( "Save As FAILED for project: '" 
       + ProjectManager::Instance()->get_current_project()->project_name_state_->get() 
-      + "'. Please perform a 'Save As' as soon as possible to preserve your data." );       
+      + "'. Please perform a 'Save As' as soon as possible to preserve your data." );
   }
-  
-  std::string success_message = std::string( "Successfully saved project as '" ) + 
-    ProjectManager::Instance()->get_current_project()->project_name_state_->get() + "'.";
-  CORE_LOG_SUCCESS( success_message );
+  else
+  {   
+    std::string success_message = std::string( "Successfully saved project as '" ) + 
+      ProjectManager::Instance()->get_current_project()->project_name_state_->get() + "'.";
+    CORE_LOG_SUCCESS( success_message );
+  }
   
   return success;
 }

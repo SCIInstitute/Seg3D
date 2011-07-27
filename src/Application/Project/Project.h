@@ -263,6 +263,17 @@ protected:
   // Get the version number of the project file.
   virtual int get_version();
   
+  // -- anonymize --
+public:
+
+  // GET_NEED_ANONYMIZE:
+  // Whether data needs to be anonymized on the next save
+  bool get_need_anonymize();
+  
+  // SET_NEED_ANONYMIZE:
+  // Whether data needs to be anonymized on the next save
+  void set_need_anonymize( bool enable );
+  
   // -- functions for keeping track of whether project still needs to be saved --
 public:
   // RESET_PROJECT_CHANGED:
