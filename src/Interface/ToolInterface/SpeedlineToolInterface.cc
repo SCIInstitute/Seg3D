@@ -79,6 +79,9 @@ bool SpeedlineToolInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Connect( this->private_->ui_.use_smooth_, tool->use_smoothing_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.use_rescale_, tool->use_rescale_state_ );
 
+  // Hide the rescale option to user. The default setting is true.
+  this->private_->ui_.use_rescale_->hide();
+
   QtUtils::QtBridge::Connect( this->private_->ui_.fill_button_, boost::bind(
     &SpeedlineTool::fill, tool, Core::Interface::GetWidgetActionContext() ) );
   QtUtils::QtBridge::Connect( this->private_->ui_.erase_button_, boost::bind(
@@ -107,6 +110,8 @@ bool SpeedlineToolInterface::build_widget( QFrame* frame )
 
   QtUtils::QtBridge::Show( this->private_->ui_.message_mask_alert_, tool->valid_target_state_, true );
   QtUtils::QtBridge::Show( this->private_->ui_.message_gradient_magnitude_layer_alert_, tool->valid_gradient_state_, true );
+
+  
 
   //Send a message to the log that we have finished with building the Speedline Tool Interface
   CORE_LOG_MESSAGE("Finished building a Speedline Tool Interface");

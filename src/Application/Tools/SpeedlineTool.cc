@@ -140,13 +140,28 @@ void SpeedlineToolPrivate::handle_slice_changed(  )
 void SpeedlineToolPrivate::handle_target_layer_changed( std::string layer_id )
 {
   //Clear the speedline tool
-  this->tool_->reset(Core::Interface::GetMouseActionContext());
+  //this->tool_->reset(Core::Interface::GetMouseActionContext());
+
+  //Core::Application::PostEvent( boost::bind( &Core::StateSpeedlinePath::set,
+  //  this->tool_->path_state_, Core::Path(), Core::ActionSource::NONE_E ) );
+  //Core::Application::PostEvent( boost::bind( &Core::StateSpeedlinePath::set,
+  //  this->tool_->itk_path_state_, Core::Path(), Core::ActionSource::NONE_E ) );
+
+  //this->execute_path( true );
+
 }
 void SpeedlineToolPrivate::handle_gradient_layer_changed( std::string layer_id )
 {
   this->tool_->valid_gradient_state_->set( layer_id != Tool::NONE_OPTION_C );
   //Clear the speedline tool
-  this->tool_->reset(Core::Interface::GetMouseActionContext());
+  //this->tool_->reset(Core::Interface::GetMouseActionContext());
+
+  //Core::Application::PostEvent( boost::bind( &Core::StateSpeedlinePath::set,
+  //  this->tool_->path_state_, Core::Path(), Core::ActionSource::NONE_E ) );
+  //Core::Application::PostEvent( boost::bind( &Core::StateSpeedlinePath::set,
+  //  this->tool_->itk_path_state_, Core::Path(), Core::ActionSource::NONE_E ) );
+
+  this->execute_path( true );
 }
 
 void SpeedlineToolPrivate::handle_target_data_layer_changed( std::string layer_id )
@@ -393,12 +408,6 @@ void SpeedlineToolPrivate::execute_path( bool update_all_paths )
   LayerHandle gradient_layer = LayerManager::Instance()->find_layer_by_id( 
     this->tool_->gradient_state_->get() );
 
-  //if ( !target_layer->is_visible( viewer->get_viewer_id() ) ||
-  //  !gradient_layer->is_visible( viewer->get_viewer_id() ) ) 
-  //{
-  //  return;
-  //}
-
   // Only allow to work when mask is visible.
   if ( !target_layer->is_visible( viewer->get_viewer_id() )  ) 
   {
@@ -459,14 +468,14 @@ SpeedlineTool::SpeedlineTool( const std::string& toolid ) :
     boost::bind( &SpeedlineToolPrivate::execute_path, this->private_, false ) ) );
 
   this->add_state( "termination_state", this->termination_state_, 1.0, 0.0, 2.0, 0.1 );
-  this->add_state( "iterations", this->iterations_state_, 1000, 1, 4000, 1 );
+  this->add_state( "iterations", this->iterations_state_, 1000, 1, 2000, 1 );
 
   std::vector< LayerIDNamePair > empty_list( 1, 
     std::make_pair( Tool::NONE_OPTION_C, Tool::NONE_OPTION_C ) );
 
   // Whether we use a mask to find which components to use
   this->add_state( "gradient", this->gradient_state_, Tool::NONE_OPTION_C, empty_list );
-  this->add_extra_layer_input( this->gradient_state_, Core::VolumeType::DATA_E, false );
+  this->add_extra_layer_input( this->gradient_state_, Core::VolumeType::DATA_E, false, false );
   this->add_state( "valid_gradient_layer", this->valid_gradient_state_, false );
 
   // When mask changes, clear the speedline
@@ -478,7 +487,7 @@ SpeedlineTool::SpeedlineTool( const std::string& toolid ) :
     boost::bind( &SpeedlineToolPrivate::handle_target_layer_changed, this->private_, _2  ) ) );
 
   this->add_state( "data_layer", this->target_data_layer_state_, Tool::NONE_OPTION_C, empty_list );
-  this->add_extra_layer_input( this->target_data_layer_state_, Core::VolumeType::DATA_E, false );
+  this->add_extra_layer_input( this->target_data_layer_state_, Core::VolumeType::DATA_E, false, false );
 
   this->add_state( "valid_target_data_layer", this->valid_target_data_layer_state_, false );
   this->add_connection( this->target_data_layer_state_->value_changed_signal_.connect(
@@ -491,6 +500,7 @@ SpeedlineTool::SpeedlineTool( const std::string& toolid ) :
   this->add_state( "path_vertices", this->path_vertices_state_ );
 
   this->add_state( "current_vertex_index", this->current_vertex_index_state_, -1 );
+  this->current_vertex_index_state_->set_session_priority( Core::StateBase::DEFAULT_LOAD_E + 50 );
 
   this->add_state( "use_smoothing", this->use_smoothing_state_, true ); 
   this->add_state( "use_rescale", this->use_rescale_state_, true ); 
