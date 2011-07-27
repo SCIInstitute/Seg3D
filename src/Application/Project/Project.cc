@@ -2194,7 +2194,7 @@ bool Project::save_project( const boost::filesystem::path& project_path,
               while ( state_element != 0 )
               {
                 const char* state_id = state_element->Attribute( "id" );
-                if ( state_id != 0 );
+                if ( state_id != 0 )
                 {
                   if ( strcmp( state_id, "meta_data" ) == 0 ||
                      strcmp( state_id, "meta_data_info" ) == 0 )
@@ -2229,7 +2229,7 @@ bool Project::save_project( const boost::filesystem::path& project_path,
                 while ( state_element != 0 )
                 {
                   const char* state_id = state_element->Attribute( "id" );
-                  if ( state_id != 0 );
+                  if ( state_id != 0 )
                   {
                     if ( strcmp( state_id, "metadata" ) == 0 ||
                        strcmp( state_id, "metadata_info" ) == 0 )
