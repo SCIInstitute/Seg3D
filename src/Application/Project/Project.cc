@@ -2190,6 +2190,31 @@ bool Project::save_project( const boost::filesystem::path& project_path,
             TiXmlElement* group_element = groups_element->FirstChildElement();
             while ( group_element != 0 )
             {
+              TiXmlElement* state_element = group_element->FirstChildElement( "State" );
+              while ( state_element != 0 )
+              {
+                const char* state_id = state_element->Attribute( "id" );
+                if ( state_id != 0 );
+                {
+                  if ( strcmp( state_id, "meta_data" ) == 0 ||
+                     strcmp( state_id, "meta_data_info" ) == 0 )
+                  {
+                    if ( state_element->FirstChild() )
+                    {
+                      state_element->FirstChild()->SetValue( "" );
+                    }
+                  }                   
+                }
+                
+                state_element = state_element->NextSiblingElement( "State" );
+              }
+
+              group_element = group_element->NextSiblingElement();
+            }
+            
+            group_element = groups_element->FirstChildElement();
+            while ( group_element != 0 )
+            {
               TiXmlElement* layers_element = group_element->FirstChildElement( "layers" );
               if ( layers_element == 0 )
               {
@@ -2209,7 +2234,10 @@ bool Project::save_project( const boost::filesystem::path& project_path,
                     if ( strcmp( state_id, "metadata" ) == 0 ||
                        strcmp( state_id, "metadata_info" ) == 0 )
                     {
-                      state_element->LinkEndChild( new TiXmlText( "" ) );                 
+                      if ( state_element->FirstChild() )
+                      {
+                        state_element->FirstChild()->SetValue( "" );
+                      }
                     }                   
                   }
                   

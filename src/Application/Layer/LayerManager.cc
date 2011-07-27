@@ -1042,10 +1042,12 @@ bool LayerManager::pre_save_states( Core::StateIO& state_io )
   {
     LayerMetaData empty_metadata;
 
-    for( GroupList::const_iterator i = 
-      this->private_->group_list_.begin(); i != this->private_->group_list_.end(); ++i )
+    for( GroupList::const_iterator git = 
+      this->private_->group_list_.begin(); git != this->private_->group_list_.end(); ++git )
     {
-      LayerList& layer_list = ( *i )->get_layer_list();
+      (*git)->set_meta_data( empty_metadata );
+    
+      LayerList& layer_list = ( *git )->get_layer_list();
       LayerList::iterator it = layer_list.begin();
       LayerList::iterator it_end = layer_list.end();
       
