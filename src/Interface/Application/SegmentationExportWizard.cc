@@ -61,45 +61,46 @@
 namespace Seg3D
 {
   
-  class SegmentationPrivate{
-  public:
-    QVector< QtLayerListWidget* > masks_;
-    QWidget* bitmap_widget_;
-    QLabel* export_label_;
-    QComboBox* export_selector_;
-    QHBoxLayout* bitmap_layout_;
-    
-    
-    // SegmentationSelectionPage
-    QVBoxLayout *selection_main_layout_;
-    QWidget *segmentation_top_widget_;
-    QVBoxLayout *verticalLayout;
-    QWidget *segmentation_name_widget_;
-    QHBoxLayout *horizontalLayout;
-    QLabel *segmentation_name_label_;
-    QTreeWidget *group_with_masks_tree_;
-    QLabel *warning_message_;
+class SegmentationPrivate
+{
+public:
+  QVector< QtLayerListWidget* > masks_;
+  QWidget* bitmap_widget_;
+  QLabel* export_label_;
+  QComboBox* export_selector_;
+  QHBoxLayout* bitmap_layout_;
+  
+  
+  // SegmentationSelectionPage
+  QVBoxLayout *selection_main_layout_;
+  QWidget *segmentation_top_widget_;
+  QVBoxLayout *verticalLayout;
+  QWidget *segmentation_name_widget_;
+  QHBoxLayout *horizontalLayout;
+  QLabel *segmentation_name_label_;
+  QTreeWidget *group_with_masks_tree_;
+  QLabel *warning_message_;
 
-    std::string file_name_;
-    
-    QWidget *single_or_multiple_files_widget_;
-    QHBoxLayout *horizontalLayout_1;
-    QWidget *single_file_widget_;
-    QHBoxLayout *horizontalLayout_4;
-    QRadioButton *single_file_radio_button_;
-    QWidget *multiple_files_widget_;
-    QHBoxLayout *horizontalLayout_5;
-    QRadioButton *individual_files_radio_button_;
-    QButtonGroup *radio_button_group_;
-    
-    //SegmentationSummaryPage
-    QLabel *description_;
-    QVBoxLayout *summary_main_layout_;
-    QScrollArea *mask_scroll_area_;
-    QWidget *layers_;
-    QVBoxLayout *masks_layout_;
-    
-  };
+  std::string file_name_;
+  
+  QWidget *single_or_multiple_files_widget_;
+  QHBoxLayout *horizontalLayout_1;
+  QWidget *single_file_widget_;
+  QHBoxLayout *horizontalLayout_4;
+  QRadioButton *single_file_radio_button_;
+  QWidget *multiple_files_widget_;
+  QHBoxLayout *horizontalLayout_5;
+  QRadioButton *individual_files_radio_button_;
+  QButtonGroup *radio_button_group_;
+  
+  //SegmentationSummaryPage
+  QLabel *description_;
+  QVBoxLayout *summary_main_layout_;
+  QScrollArea *mask_scroll_area_;
+  QWidget *layers_;
+  QVBoxLayout *masks_layout_;
+  
+};
   
 
 SegmentationExportWizard::SegmentationExportWizard( QWidget *parent ) :
