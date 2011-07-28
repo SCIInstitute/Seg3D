@@ -80,8 +80,6 @@ public:
     ViewerHandle viewer = ViewerHandle() );
   void execute_path( bool update_all_paths );
 
-  void handle_target_layer_changed( std::string layer_id );
-
   //To highlight the created speedline image
   void handle_speedline_image_created( std::string layer_id, SpeedlineToolWeakHandle tool );
 
@@ -137,31 +135,17 @@ void SpeedlineToolPrivate::handle_slice_changed(  )
   this->execute_path( true );
 }
 
-void SpeedlineToolPrivate::handle_target_layer_changed( std::string layer_id )
-{
-  //Clear the speedline tool
-  //this->tool_->reset(Core::Interface::GetMouseActionContext());
 
-  //Core::Application::PostEvent( boost::bind( &Core::StateSpeedlinePath::set,
-  //  this->tool_->path_state_, Core::Path(), Core::ActionSource::NONE_E ) );
-  //Core::Application::PostEvent( boost::bind( &Core::StateSpeedlinePath::set,
-  //  this->tool_->itk_path_state_, Core::Path(), Core::ActionSource::NONE_E ) );
-
-  //this->execute_path( true );
-
-}
 void SpeedlineToolPrivate::handle_gradient_layer_changed( std::string layer_id )
 {
   this->tool_->valid_gradient_state_->set( layer_id != Tool::NONE_OPTION_C );
-  //Clear the speedline tool
-  //this->tool_->reset(Core::Interface::GetMouseActionContext());
 
-  //Core::Application::PostEvent( boost::bind( &Core::StateSpeedlinePath::set,
-  //  this->tool_->path_state_, Core::Path(), Core::ActionSource::NONE_E ) );
-  //Core::Application::PostEvent( boost::bind( &Core::StateSpeedlinePath::set,
-  //  this->tool_->itk_path_state_, Core::Path(), Core::ActionSource::NONE_E ) );
-
-  this->execute_path( true );
+  // In the loading, only vertices changed will update the path
+  if ( !this->get_update_paths() )
+  {
+    this->execute_path( true );
+  }
+  
 }
 
 void SpeedlineToolPrivate::handle_target_data_layer_changed( std::string layer_id )
@@ -419,6 +403,8 @@ void SpeedlineToolPrivate::execute_path( bool update_all_paths )
     return;
   }
 
+  
+
   const std::vector< Core::Point > vertices = this->tool_->vertices_state_->get();
 
   ActionSpeedline::Dispatch( context, this->tool_->gradient_state_->get(),
@@ -464,6 +450,7 @@ SpeedlineTool::SpeedlineTool( const std::string& toolid ) :
   this->private_->initialized_ = false;
 
   this->add_state( "vertices", this->vertices_state_ );
+  this->vertices_state_->set_session_priority( Core::StateBase::DEFAULT_LOAD_E + 40 );
   this->add_connection( this->vertices_state_->state_changed_signal_.connect(
     boost::bind( &SpeedlineToolPrivate::execute_path, this->private_, false ) ) );
 
@@ -481,10 +468,6 @@ SpeedlineTool::SpeedlineTool( const std::string& toolid ) :
   // When mask changes, clear the speedline
   this->add_connection( this->gradient_state_->value_changed_signal_.connect(
     boost::bind( &SpeedlineToolPrivate::handle_gradient_layer_changed, this->private_, _2 ) ) );
-
-  // When mask changes, clear the speedline
-  this->add_connection( this->target_layer_state_->value_changed_signal_.connect(
-    boost::bind( &SpeedlineToolPrivate::handle_target_layer_changed, this->private_, _2  ) ) );
 
   this->add_state( "data_layer", this->target_data_layer_state_, Tool::NONE_OPTION_C, empty_list );
   this->add_extra_layer_input( this->target_data_layer_state_, Core::VolumeType::DATA_E, false, false );
@@ -629,6 +612,14 @@ void SpeedlineTool::reset( Core::ActionContextHandle context )
     this->itk_path_state_, Core::Path(), Core::ActionSource::NONE_E ) );
 }
 
+void SpeedlineTool::reset_parameters( Core::ActionContextHandle context )
+{
+  Core::Application::PostEvent( boost::bind( &Core::StateRangedInt::set,
+    this->iterations_state_, 1000, Core::ActionSource::NONE_E ) );
+  Core::Application::PostEvent( boost::bind( &Core::StateRangedDouble::set,
+    this->termination_state_, 1.0, Core::ActionSource::NONE_E ) );
+}
+
 bool SpeedlineTool::handle_mouse_press( ViewerHandle viewer, 
                     const Core::MouseHistory& mouse_history, 
                     int button, int buttons, int modifiers )
@@ -695,63 +686,236 @@ bool SpeedlineTool::handle_mouse_press( ViewerHandle viewer,
       Core::Path paths = this->path_state_->get();
       size_t paths_num = paths.get_path_num();
 
-      bool path_idx_changed = false;
-      int path_indicator_min_perdicular = 0;
+      //bool path_idx_changed = false;
+      //int path_indicator_min_perdicular = 0;
 
-      if ( paths_num > 2 )
+      //if ( paths_num > 2 )
+      //{
+      //  double dp_perdicular_dist_min = DBL_MAX;
+
+      //  for ( unsigned int i = 0; i < paths_num; ++i )
+      //  {
+      //    Core::SinglePath single_path = paths.get_one_path( i );
+      //    Core::Point p00, p01;
+      //    single_path.get_point_on_ends( 0, p00 );
+      //    single_path.get_point_on_ends( 1, p01 );
+
+      //    Core::Vector edge_dir = p01 - p00;
+      //    double edge_length = edge_dir.length();
+      //    double alpha = Dot( pt - p00,  p01 - p00 )/ ( edge_length * edge_length );
+
+      //    if ( alpha >= 0.0 && alpha <= 1.0 )
+      //    {
+      //      //we need to compute the the point to straight line distance
+      //      double proj_dist = Dot( pt - p00,  p01 - p00 ) / edge_length;
+      //      double dp_perdicular_dist = 
+      //        ( pt - p00 ).length2() - proj_dist * proj_dist;
+      //      
+      //      if ( dp_perdicular_dist < dp_perdicular_dist_min )
+      //      {
+      //        dp_perdicular_dist_min = dp_perdicular_dist;
+      //        path_indicator_min_perdicular = i;
+      //        path_idx_changed = true;
+      //      }
+      //    }
+      //  }
+      //}
+
+      //if ( path_idx_changed )
+      //{
+      //  Core::SinglePath single_path = paths.get_one_path( path_indicator_min_perdicular );
+      //  Core::Point p00, p01;
+      //  single_path.get_point_on_ends( 0, p00 );
+      //  single_path.get_point_on_ends( 1, p01 );
+
+      //  std::vector<Core::Point>::iterator it_p0 = 
+      //    std::find( points.begin(), points.end(), p00 );
+
+      //  if ( it_p0 != points.end() )
+      //  {
+      //    new_pt_idx = it_p0 - points.begin() + 1;
+      //  }
+      //  else
+      //  {
+      //    std::vector<Core::Point>::iterator it_p1 = 
+      //      std::find( points.begin(), points.end(), p01 );
+
+      //    if ( it_p1 != points.end() )
+      //    {
+      //      new_pt_idx = it_p1 - points.begin();
+      //    }
+      //  }
+      //}
+
+      if ( paths_num > 1 )
       {
         double dp_perdicular_dist_min = DBL_MAX;
+        int path_indicator_min_perdicular = 0;
+        std::vector< double > dist_arr;
 
         for ( unsigned int i = 0; i < paths_num; ++i )
         {
           Core::SinglePath single_path = paths.get_one_path( i );
-          Core::Point p00, p01;
-          single_path.get_point_on_ends( 0, p00 );
-          single_path.get_point_on_ends( 1, p01 );
+          double dist = single_path.get_smallest_distance2( pt );
+          dist_arr.push_back( dist );
 
-          Core::Vector edge_dir = p01 - p00;
-          double edge_length = edge_dir.length();
-          double alpha = Dot( pt - p00,  p01 - p00 )/ ( edge_length * edge_length );
-
-          if ( alpha >= 0.0 && alpha <= 1.0 )
+          if ( dist < dp_perdicular_dist_min )
           {
-            //we need to compute the the point to straight line distance
-            double proj_dist = Dot( pt - p00,  p01 - p00 ) / edge_length;
-            double dp_perdicular_dist = 
-              ( pt - p00 ).length2() - proj_dist * proj_dist;
-            
-            if ( dp_perdicular_dist < dp_perdicular_dist_min )
-            {
-              dp_perdicular_dist_min = dp_perdicular_dist;
-              path_indicator_min_perdicular = i;
-              path_idx_changed = true;
-            }
+            dp_perdicular_dist_min = dist;
+            path_indicator_min_perdicular = i;
           }
+
         }
-      }
 
-      if ( path_idx_changed )
-      {
-        Core::SinglePath single_path = paths.get_one_path( path_indicator_min_perdicular );
+        Core::SinglePath min_dist_single_path = 
+          paths.get_one_path( path_indicator_min_perdicular );
+
         Core::Point p00, p01;
-        single_path.get_point_on_ends( 0, p00 );
-        single_path.get_point_on_ends( 1, p01 );
+        min_dist_single_path.get_point_on_ends( 0, p00 );
+        min_dist_single_path.get_point_on_ends( 1, p01 );
 
-        std::vector<Core::Point>::iterator it_p0 = 
+        std::vector<Core::Point>::iterator it_p00 = 
           std::find( points.begin(), points.end(), p00 );
 
-        if ( it_p0 != points.end() )
-        {
-          new_pt_idx = it_p0 - points.begin() + 1;
-        }
-        else
-        {
-          std::vector<Core::Point>::iterator it_p1 = 
-            std::find( points.begin(), points.end(), p01 );
+        std::vector<Core::Point>::iterator it_p01 = 
+          std::find( points.begin(), points.end(), p01 );
 
-          if ( it_p1 != points.end() )
+        size_t p00_index = it_p00 - points.begin();
+        size_t p01_index = it_p01 - points.begin();
+
+        double dist_pt_p00 = ( pt - p00 ).length2();
+        double dist_pt_p01 = ( pt - p01 ).length2();
+
+        if ( ( dist_pt_p00 != dp_perdicular_dist_min )
+          && ( dist_pt_p01 != dp_perdicular_dist_min ) )
+        {
+          if ( it_p00 != points.end() )
           {
-            new_pt_idx = it_p1 - points.begin();
+            new_pt_idx = p00_index + 1;
+          }
+        }
+
+        else  // p00 is the closest to pt OR p01 is the closest to pt
+        { 
+
+          // Find the other path has the same distance
+          int another_path_indicator = -1;
+          for ( unsigned int i = 0; i < paths_num; ++i )
+          {
+            if ( ( dist_arr[i] == dp_perdicular_dist_min ) 
+              && ( i != path_indicator_min_perdicular ) )
+            {
+              another_path_indicator = i;
+              break;
+            }
+          }
+
+          if ( another_path_indicator == -1 )
+          {
+            if ( it_p00 != points.end() )
+            {
+              new_pt_idx = p00_index + 1;
+            }
+          }
+          else  // Find the other path
+          {
+            Core::SinglePath another_min_dist_single_path = 
+              paths.get_one_path( another_path_indicator );
+
+            Core::Point p10, p11;
+
+            another_min_dist_single_path.get_point_on_ends( 0, p10 );
+            another_min_dist_single_path.get_point_on_ends( 1, p11 );
+
+            std::vector<Core::Point>::iterator it_p10 = 
+              std::find( points.begin(), points.end(), p10 );
+
+            std::vector<Core::Point>::iterator it_p11 = 
+              std::find( points.begin(), points.end(), p11 );
+
+            size_t p10_index = it_p10 - points.begin();
+            size_t p11_index = it_p11 - points.begin();
+
+            if ( ( p01_index == 0 && p00_index == points.size() - 1 )
+              || ( p11_index == 0 && p10_index == points.size() - 1 ) )
+            {
+              new_pt_idx = points.size();
+            }
+
+            else
+            {
+
+              double dist_pt_p10 = ( pt - p10 ).length2();
+              double dist_pt_p11 = ( pt - p11 ).length2();
+
+              if ( dist_pt_p00 == dp_perdicular_dist_min 
+                  && dist_pt_p10 == dp_perdicular_dist_min )
+              {
+                if ( it_p00 != points.end() &&  it_p10 != points.end() )
+                {
+                  if ( p00_index <= p10_index )
+                  {
+                    new_pt_idx = p10_index + 1;
+                  } 
+                  else
+                  {
+                    new_pt_idx = p00_index + 1;
+                  }
+
+                }
+              }
+
+              else if ( dist_pt_p00 == dp_perdicular_dist_min 
+                && dist_pt_p11 == dp_perdicular_dist_min )
+              {
+                if ( it_p00 != points.end() &&  it_p11 != points.end() )
+                {
+                  if ( p00_index <= p11_index )
+                  {
+                    new_pt_idx = p11_index + 1;
+                  } 
+                  else
+                  {
+                    new_pt_idx = p00_index + 1;
+                  }
+
+                }
+              }
+
+              else if ( dist_pt_p01 == dp_perdicular_dist_min 
+                && dist_pt_p10 == dp_perdicular_dist_min )
+              {
+                if ( it_p01 != points.end() &&  it_p10 != points.end() )
+                {
+                  if ( p01_index <= p10_index )
+                  {
+                    new_pt_idx = p10_index + 1;
+                  } 
+                  else
+                  {
+                    new_pt_idx = p01_index + 1;
+                  }
+
+                }
+              }
+
+              else if ( dist_pt_p01 == dp_perdicular_dist_min 
+                && dist_pt_p11 == dp_perdicular_dist_min )
+              {
+                if ( it_p01 != points.end() &&  it_p11 != points.end() )
+                {
+                  if ( p01_index <= p11_index )
+                  {
+                    new_pt_idx = p11_index + 1;
+                  } 
+                  else
+                  {
+                    new_pt_idx = p01_index + 1;
+                  }
+
+                }
+              }
+            }
           }
         }
       }
@@ -966,22 +1130,6 @@ void SpeedlineTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
     return;
   }
 
-  //if ( !this->valid_target_state_->get() || !this->valid_gradient_state_->get() )
-  //{
-  //  return;
-  //}
-
-  //LayerHandle target_layer = LayerManager::Instance()->find_layer_by_id( 
-  //  this->target_layer_state_->get() );
-
-  //// Only the target layer is visible, user can add points.
-  //if ( !target_layer->is_visible( viewer->get_viewer_id() )  ) 
-  //{
-  //  return;
-  //}
-
-
-
   std::vector< Core::Point > vertices;
   Core::Path paths;
 
@@ -1052,7 +1200,7 @@ void SpeedlineTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
       single_path.get_point_on_ends( 0, p0 );
       single_path.get_point_on_ends( 1, p1 );
 
-      glColor3f( 0.0f, 1.0f, 0.0f );    // green
+      glColor3f( 1.0f, 0.5f, 0.0f );    // orange
       glBegin( GL_LINE_STRIP );
       for ( unsigned int j = 0; j < single_path.get_points_num_on_path(); ++j )
       {

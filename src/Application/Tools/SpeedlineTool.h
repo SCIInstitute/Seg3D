@@ -117,6 +117,7 @@ public:
   void erase( Core::ActionContextHandle context );
   void reset( Core::ActionContextHandle context );
   void calculate_speedimage( Core::ActionContextHandle context );
+  void reset_parameters( Core::ActionContextHandle context );
 
   // -- State Variables --
 public:

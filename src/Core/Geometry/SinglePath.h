@@ -6,6 +6,7 @@
 
 // Core includes
 #include <Core/Geometry/Point.h>
+#include <Core/Geometry/Algorithm.h>
 
 namespace Core
 {
@@ -60,6 +61,28 @@ public:
 
     this->points_[ index ] = pt;
     return true;
+  }
+
+  // Compute the distance to every piece of path
+  // Return the smallest distance
+
+  double get_smallest_distance2( const Point& pt )
+  {
+    double min_dist = DBL_MAX;
+    size_t num_points_on_path = this->path_.size();
+    const double epsilon = 1e-12;
+
+    for ( unsigned int i = 0; i < num_points_on_path - 1; ++i )
+    {
+      double dist = DistanceToLine2( pt, this->path_[ i ], this->path_[ i + 1 ], epsilon );
+      if ( dist < min_dist )
+      {
+        min_dist = dist;
+      }
+    }
+
+    return min_dist;
+    
   }
 
   inline bool operator==( const SinglePath& m ) const 

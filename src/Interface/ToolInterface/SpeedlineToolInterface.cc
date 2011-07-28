@@ -88,6 +88,8 @@ bool SpeedlineToolInterface::build_widget( QFrame* frame )
     &SpeedlineTool::erase, tool, Core::Interface::GetWidgetActionContext() ) );
   QtUtils::QtBridge::Connect( this->private_->ui_.clear_button_, boost::bind(
     &SpeedlineTool::reset, tool, Core::Interface::GetWidgetActionContext() ) );
+  QtUtils::QtBridge::Connect( this->private_->ui_.reset_parameters_button_, boost::bind(
+    &SpeedlineTool::reset_parameters, tool, Core::Interface::GetWidgetActionContext() ) );
 
   QtUtils::QtBridge::Enable( this->private_->ui_.target_mask_, 
     tool->use_active_layer_state_, true );
