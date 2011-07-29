@@ -42,8 +42,6 @@
 #include <boost/date_time/c_local_time_adjustor.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/lambda/bind.hpp>
-#include <boost/lambda/lambda.hpp>
 
 // Core includes
 #include <Core/Application/Application.h>
@@ -1524,9 +1522,12 @@ bool ProjectPrivate::get_session_file( SessionID session_id, boost::filesystem::
 void ProjectPrivate::get_provenance_steps( const std::vector< ProvenanceID >& prov_ids, 
                       std::set< ProvenanceStepID >& prov_steps )
 {
-  std::queue< ProvenanceID > provenance_queue;
-  std::for_each( prov_ids.begin(), prov_ids.end(), boost::lambda::bind( 
-    &std::queue< ProvenanceID >::push, &provenance_queue, boost::lambda::_1 ) );
+  typedef std::queue< ProvenanceID > prov_id_queue_type;
+  void ( prov_id_queue_type::*push_queue_func )( const ProvenanceID& ) = &prov_id_queue_type::push;
+  prov_id_queue_type provenance_queue;
+  std::for_each( prov_ids.begin(), prov_ids.end(), boost::bind( 
+    push_queue_func, &provenance_queue, _1 ) );
+
   while ( !provenance_queue.empty() )
   {
     ProvenanceID output_id = provenance_queue.front();
