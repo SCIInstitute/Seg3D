@@ -3,6 +3,7 @@
 
 // System includes
 #include <vector>
+#include <float.h>
 
 // Core includes
 #include <Core/Geometry/Point.h>

@@ -33,6 +33,7 @@
 #include <string>
 #include <vector>
 #include <set>
+#include <float.h>
 
 // Core includes
 #include <Core/Geometry/Point.h>
