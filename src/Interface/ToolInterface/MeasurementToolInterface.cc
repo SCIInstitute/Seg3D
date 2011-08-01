@@ -525,8 +525,10 @@ void MeasurementToolInterface::UpdateActiveTab( qpointer_type measurement_interf
         QString::fromStdString( p1_str ) );
       
       // Hide/Show
+      measurement_interface->private_->ui_.show_checkbox_->blockSignals( true );
       measurement_interface->private_->ui_.show_checkbox_->setChecked( 
         measurements[ active_index ].get_visible() );
+      measurement_interface->private_->ui_.show_checkbox_->blockSignals( false );
       
       // Color
       // Create QPixMap with color of active measurement

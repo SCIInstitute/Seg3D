@@ -255,6 +255,9 @@ public:
 
 	// Modifier key for snap to axis
 	bool snap_key_pressed_;
+
+	// Have measurements been initialized from session file or by adding first measurement?
+	bool measurements_initialized_;
 };
 
 MeasurementToolPrivate::MeasurementToolPrivate()
@@ -266,6 +269,7 @@ MeasurementToolPrivate::MeasurementToolPrivate()
 	this->saved_num_measurements_ = 0;
 	this->handle_measurements_changed_blocked_ = false;
 	this->snap_key_pressed_ = false;
+	this->measurements_initialized_ = false;
 }
 
 // Called in response to state changed signal
@@ -299,7 +303,10 @@ void MeasurementToolPrivate::handle_measurements_changed()
 		int active_index = this->tool_->active_index_state_->get();
 		bool active_index_invalid = active_index == -1 || active_index >= num_measurements;
 
-		if( num_measurements_changed || active_index_invalid )
+		// Don't want to set the active index if we've just read it from a session file, so
+		// check to see if measurements have been initialized.
+		if( active_index_invalid || 
+			( num_measurements_changed && this->measurements_initialized_ ) )
 		{
 			// Set active index to end of list.	
 			Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
@@ -320,6 +327,9 @@ void MeasurementToolPrivate::handle_measurements_changed()
 
 	// Need to redraw the overlay
 	this->update_viewers();
+
+	// Measurements have changed, so they have been initialized
+	this->measurements_initialized_ = true;
 }
 
 void MeasurementToolPrivate::handle_units_selection_changed( std::string units )
