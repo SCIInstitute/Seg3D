@@ -434,7 +434,9 @@ public:
     this->world_paths_.delete_all_paths();
     this->path_vertices_ = vertices_;
 
-    if ( this->current_vertex_index_ == -1 )
+    size_t num_of_vertices = this->vertices_.size();
+
+    if ( ( this->current_vertex_index_ == -1  ) || ( num_of_vertices == 0 ) )
     {
       clean_paths();
       Core::Point pstart ( DBL_MAX, DBL_MAX, DBL_MAX );
@@ -454,10 +456,10 @@ public:
       return;
     }
 
-    size_t num_of_vertices = this->vertices_.size();
+    //size_t num_of_vertices = this->vertices_.size();
 
-    if ( num_of_vertices == 0 )
-      return;
+    //if ( num_of_vertices == 0 )
+    //  return;
 
     typename Core::ITKImageDataT< VALUE_TYPE >::Handle speed_image_3D;
     this->get_itk_image_from_layer< VALUE_TYPE >( this->target_layer_, speed_image_3D );
