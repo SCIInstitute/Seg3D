@@ -40,7 +40,7 @@ SET(INTERFACE_TOOLINTERFACE_SRCS
   ThresholdToolInterface.cc
   ArithmeticFilterInterface.cc
   BinaryDilateErodeFilterInterface.cc
-  BinaryIterativeDilateErodeFilterInterface.cc
+  #BinaryIterativeDilateErodeFilterInterface.cc
   BinarySmoothDilateErodeFilterInterface.cc
   CannyEdgeDetectionFilterInterface.cc
   ConfidenceConnectedFilterInterface.cc
