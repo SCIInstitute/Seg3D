@@ -1674,6 +1674,10 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
 	text_texture->set_image( viewer_width, viewer_height,
 		GL_ALPHA, &buffer[ 0 ], GL_ALPHA, GL_UNSIGNED_BYTE );
 
+	render_lock.unlock();
+
+	//-------------- RenderResources unlocked  -------------------
+
 	// Blend the text onto the framebuffer
 	glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_ADD );
 
@@ -1710,8 +1714,6 @@ void MeasurementTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
 
 	glPopAttrib();
 	glFinish();
-
-	//-------------- RenderResources unlocked  -------------------
 }
 
 bool MeasurementTool::has_2d_visual()
