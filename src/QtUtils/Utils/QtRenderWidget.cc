@@ -206,10 +206,13 @@ void QtRenderWidget::paintGL()
 
 void QtRenderWidget::resizeGL( int width, int height )
 {
+  if ( width <= 0 || height <= 0 ) return;
+  
   glViewport( 0, 0, width, height );
   glMatrixMode( GL_PROJECTION );
   glLoadIdentity();
   gluOrtho2D( 0, width, 0, height );
+  CORE_CHECK_OPENGL_ERROR();
 
   if ( !this->private_->in_size_move_ )
   {
