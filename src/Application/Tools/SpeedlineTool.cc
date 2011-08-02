@@ -991,17 +991,17 @@ bool SpeedlineTool::handle_mouse_release( ViewerHandle viewer,
                     const Core::MouseHistory& mouse_history, 
                     int button, int buttons, int modifiers )
 {
-  //Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
+  Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
 
   if ( viewer->is_volume_view() )
   {
     return false;
   }
 
-  //if ( !this->valid_gradient_state_->get() )
-  //{
-  //  return false;
-  //}
+  if ( !this->valid_gradient_state_->get() )
+  {
+    return false;
+  }
 
   if ( this->private_->moving_vertex_ && 
     ( button == Core::MouseButton::LEFT_BUTTON_E ||
