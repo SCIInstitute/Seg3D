@@ -952,7 +952,8 @@ bool SpeedlineTool::handle_mouse_press( ViewerHandle viewer,
   else if ( modifiers == Core::KeyModifier::NO_MODIFIER_E &&
     button == Core::MouseButton::RIGHT_BUTTON_E )
   {
-    if ( this->private_->vertex_index_ != -1 )
+    //if ( this->private_->vertex_index_ != -1 )
+    if ( this->private_->vertex_index_ >= 0 )
     {
       Core::Point pt = this->vertices_state_->get()[ this->private_->vertex_index_ ];
 

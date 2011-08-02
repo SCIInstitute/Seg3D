@@ -415,7 +415,7 @@ public:
         // The criterion is the last point is in the same pixel as start point.
         // IF not, we just put a straight line between start point and end point.
 
-        bool is_successed = false;
+        bool is_succeed = false;
 
         if ( vertex_list_size > 0 )
         {
@@ -423,10 +423,10 @@ public:
           const double x0 = itk_path->GetVertexList()->ElementAt( vertex_list_size - 1 )[0];
           const double y0 = itk_path->GetVertexList()->ElementAt( vertex_list_size - 1 )[1];
 
-          is_successed = is_path_completed( x0, y0, start_index );
+          is_succeed = is_path_completed( x0, y0, j );
         }
 
-        if ( is_successed )
+        if ( is_succeed )
         {
           for ( unsigned int k = 0; k < vertex_list_size; ++k )
           {
