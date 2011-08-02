@@ -991,17 +991,17 @@ bool SpeedlineTool::handle_mouse_release( ViewerHandle viewer,
                     const Core::MouseHistory& mouse_history, 
                     int button, int buttons, int modifiers )
 {
-  Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
+  //Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
 
   if ( viewer->is_volume_view() )
   {
     return false;
   }
 
-  if ( !this->valid_gradient_state_->get() )
-  {
-    return false;
-  }
+  //if ( !this->valid_gradient_state_->get() )
+  //{
+  //  return false;
+  //}
 
   if ( this->private_->moving_vertex_ && 
     ( button == Core::MouseButton::LEFT_BUTTON_E ||
@@ -1025,7 +1025,6 @@ bool SpeedlineTool::handle_mouse_move( ViewerHandle viewer,
                    int button, int buttons, int modifiers )
 {
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-
   if ( viewer->is_volume_view() )
   {
     return false;
@@ -1035,6 +1034,7 @@ bool SpeedlineTool::handle_mouse_move( ViewerHandle viewer,
   {
     return false;
   }
+
 
   if ( buttons == Core::MouseButton::NO_BUTTON_E )
   {
@@ -1047,33 +1047,29 @@ bool SpeedlineTool::handle_mouse_move( ViewerHandle viewer,
 
   if ( this->private_->moving_vertex_ )
   {
-    //Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
     std::vector< Core::Point > vertices = this->vertices_state_->get();
     std::string view_mode = viewer->view_mode_state_->get();
-    double offset_x, offset_y, world_x0, world_y0, world_x1, world_y1;
-    viewer->window_to_world( mouse_history.previous_.x_,
-      mouse_history.previous_.y_, world_x0, world_y0 );
+    double world_x1, world_y1;
+
+    // Only use current mouse position
     viewer->window_to_world( mouse_history.current_.x_,
       mouse_history.current_.y_, world_x1, world_y1 );
-    offset_x = world_x1 - world_x0;
-    offset_y = world_y1 - world_y0;
-    //lock.unlock();
 
-    Core::Point pt_offset( 0.0, 0.0, 0.0 );
+    Core::Point new_pt( 0.0, 0.0, 0.0 );
     if ( view_mode == Viewer::AXIAL_C )
     {
-      pt_offset[ 0 ] = offset_x;
-      pt_offset[ 1 ] = offset_y;
+      new_pt[ 0 ] = world_x1;
+      new_pt[ 1 ] = world_y1;
     }
     else if ( view_mode == Viewer::CORONAL_C )
     {
-      pt_offset[ 0 ] = offset_x;
-      pt_offset[ 2 ] = offset_y;
+      new_pt[ 0 ] = world_x1;
+      new_pt[ 2 ] = world_y1;
     }
     else if ( view_mode == Viewer::SAGITTAL_C )
     {
-      pt_offset[ 1 ] = offset_x;
-      pt_offset[ 2 ] = offset_y;
+      new_pt[ 1 ] = world_x1;
+      new_pt[ 2 ] = world_y1;
     }
     else
     {
@@ -1081,19 +1077,10 @@ bool SpeedlineTool::handle_mouse_move( ViewerHandle viewer,
       return false;
     }
 
-    if ( modifiers == Core::KeyModifier::SHIFT_MODIFIER_E )
-    {
-      for ( size_t i = 0; i < vertices.size(); ++i )
-      {
-        vertices[ i ] += pt_offset;
-      }
-      Core::ActionSet::Dispatch( Core::Interface::GetMouseActionContext(),
-        this->vertices_state_, vertices );
-    }
-    else if ( this->private_->vertex_index_ >= 0 )
+    if ( this->private_->vertex_index_ >= 0 )
     {
       Core::Point pt = vertices[ this->private_->vertex_index_ ];
-      pt += pt_offset;
+      pt = new_pt;
 
       Core::Application::PostEvent( boost::bind( &Core::StateInt::set,
         this->current_vertex_index_state_, this->private_->vertex_index_, Core::ActionSource::NONE_E ) );
@@ -1128,7 +1115,6 @@ void SpeedlineTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
   Core::VolumeSliceType slice_type( Core::VolumeSliceType::AXIAL_E );
   {
     Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
-    //vertices = this->vertices_state_->get();
     vertices = this->path_vertices_state_->get();
     paths = this->path_state_->get();
     if ( viewer->view_mode_state_->get() == Viewer::SAGITTAL_C )
