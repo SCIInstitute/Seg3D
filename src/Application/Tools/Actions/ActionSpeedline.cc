@@ -96,6 +96,9 @@ public:
   std::string world_path_state_id_;
   std::string path_vertices_state_id_;
 
+  long action_id_;
+  Core::AtomicCounterHandle action_handle_;
+
 public:
   void compute_path ( int start_index, int end_index )
   {
@@ -386,6 +389,21 @@ public:
 
   SCI_BEGIN_TYPED_ITK_RUN( this->target_layer_->get_data_type() )
   {
+
+    // Compare whether this is a newer action
+    // If not, drop it
+    // else perform the action
+    if (this->action_handle_ == NULL )
+    {
+      return;
+    }
+
+    long counter = *( this->action_handle_ );
+    if ( this->action_id_ < counter )
+    {
+      return;
+    }
+
     Core::StateSpeedlinePathHandle world_path_state;
     Core::StateSpeedlinePathHandle itk_path_state;
     Core::StatePointVectorHandle path_vertices_state;  
@@ -662,6 +680,9 @@ public:
   std::string world_path_state_id_;
   std::string path_vertices_state_id_;
   bool update_all_paths_;
+
+  long action_id_;
+  Core::AtomicCounterHandle action_handle_;
 };
 
 ActionSpeedline::ActionSpeedline() :
@@ -682,6 +703,17 @@ ActionSpeedline::ActionSpeedline() :
 
 bool ActionSpeedline::validate( Core::ActionContextHandle& context )
 {
+  if (this->private_->action_handle_ == NULL )
+  {
+    return false;
+  }
+
+  long counter = *( this->private_->action_handle_ );
+  if ( this->private_->action_id_ < counter )
+  {
+    return false;
+  }
+
   // Check whether the target layer exists
   if ( !LayerManager::CheckLayerExistenceAndType( this->private_->target_layer_id_,
     Core::VolumeType::DATA_E, context ) )
@@ -717,6 +749,21 @@ bool ActionSpeedline::validate( Core::ActionContextHandle& context )
 
 bool ActionSpeedline::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
+
+  // Compare whether this is a newer action
+  // If not, drop it
+  // else perform the action
+
+  if (this->private_->action_handle_ == NULL )
+  {
+    return false;
+  }
+
+  long counter = *( this->private_->action_handle_ );
+  if ( this->private_->action_id_ < counter )
+  {
+    return false;
+  }
   // Create algorithm
   typedef boost::shared_ptr< ActionSpeedlineAlgo > ActionSpeedlineAlgoHandle;
   ActionSpeedlineAlgoHandle algo( new ActionSpeedlineAlgo );
@@ -733,6 +780,9 @@ bool ActionSpeedline::run( Core::ActionContextHandle& context, Core::ActionResul
   algo->itk_path_state_id_ = this->private_->itk_path_state_id_;
   algo->world_path_state_id_ = this->private_->world_path_state_id_;
   algo->path_vertices_state_id_ = this->private_->path_vertices_state_id_;
+  algo->action_id_ = this->private_->action_id_;
+  algo->action_handle_ = this->private_->action_handle_;
+
 
   Core::Runnable::Start( algo );
 
@@ -748,7 +798,9 @@ void ActionSpeedline::Dispatch( Core::ActionContextHandle context,
                 bool update_all_paths,
                 const std::string& itk_path_state_id,
                 const std::string& world_path_state_id,
-                const std::string& path_vertices_state_id
+                const std::string& path_vertices_state_id,
+                long action_id,
+                Core::AtomicCounterHandle action_handle
                 )
 {
   ActionSpeedline* action = new ActionSpeedline;
@@ -764,6 +816,8 @@ void ActionSpeedline::Dispatch( Core::ActionContextHandle context,
   action->private_->itk_path_state_id_ = itk_path_state_id;
   action->private_->world_path_state_id_ = world_path_state_id;
   action->private_->path_vertices_state_id_ = path_vertices_state_id;
+  action->private_->action_id_ = action_id;
+  action->private_->action_handle_ = action_handle;
 
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }

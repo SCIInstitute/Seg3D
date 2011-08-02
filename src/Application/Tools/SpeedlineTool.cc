@@ -35,7 +35,7 @@
 #include <Core/State/Actions/ActionSetAt.h>
 #include <Core/State/Actions/ActionRemove.h>
 #include <Core/Interface/Interface.h>
-
+#include <Core/Utils/AtomicCounter.h>
 
 // Geometry includes
 #include <Core/Geometry/Path.h>
@@ -68,6 +68,9 @@ namespace Seg3D
 class SpeedlineToolPrivate
 {
 public:
+  SpeedlineToolPrivate();
+  ~SpeedlineToolPrivate();
+
   //void handle_vertices_changed();
   void handle_path_changed();
   // When slice changes, recompute the path
@@ -99,7 +102,20 @@ public:
   bool update_all_paths_;
   boost::signals2::connection viewer_connection_[ 6 ];
 
+  // To ensure that the Speedline action performed in order
+  Core::AtomicCounterHandle action_counter_;
 };
+
+SpeedlineToolPrivate::SpeedlineToolPrivate() 
+{ 
+  action_counter_ = Core::AtomicCounterHandle( 
+    new Core::AtomicCounter( 0 ) );
+}
+
+SpeedlineToolPrivate::~SpeedlineToolPrivate()
+{
+
+}
 
 bool SpeedlineToolPrivate::get_update_paths() 
 { 
@@ -392,6 +408,11 @@ void SpeedlineToolPrivate::execute_path( bool update_all_paths )
     return;
   }
 
+  (*this->action_counter_)++;
+  long action_id = (*this->action_counter_);
+
+  assert( action_id == (*this->action_counter_));
+
   const std::vector< Core::Point > vertices = this->tool_->vertices_state_->get();
 
   ActionSpeedline::Dispatch( context, this->tool_->gradient_state_->get(),
@@ -402,7 +423,9 @@ void SpeedlineToolPrivate::execute_path( bool update_all_paths )
     update_all_paths,
     this->tool_->itk_path_state_->get_stateid(),
     this->tool_->path_state_->get_stateid(),
-    this->tool_->path_vertices_state_->get_stateid()
+    this->tool_->path_vertices_state_->get_stateid(),
+    action_id,
+    this->action_counter_
     );
 }
 
@@ -475,6 +498,7 @@ SpeedlineTool::SpeedlineTool( const std::string& toolid ) :
 
   this->add_state( "use_smoothing", this->use_smoothing_state_, true ); 
   this->add_state( "use_rescale", this->use_rescale_state_, true ); 
+
 }
 
 SpeedlineTool::~SpeedlineTool()
@@ -1016,12 +1040,6 @@ bool SpeedlineTool::handle_mouse_move( ViewerHandle viewer,
   {
     this->private_->find_vertex( viewer, mouse_history.current_.x_, 
       mouse_history.current_.y_, this->private_->vertex_index_ );
-
-    //if ( this->private_->vertex_index_ >= 0 )
-    //{
-    //  Core::Application::PostEvent( boost::bind( &Core::StateInt::set,
-    //    this->current_vertex_index_state_, this->private_->vertex_index_, Core::ActionSource::NONE_E ) );
-    //}
     
     viewer->set_cursor( this->private_->vertex_index_ != -1 ? 
       Core::CursorShape::OPEN_HAND_E : Core::CursorShape::CROSS_E );
@@ -1148,8 +1166,8 @@ void SpeedlineTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
   glLoadIdentity();
   glMultMatrixd( proj_mat.data() );
 
-  glPointSize( 4.0f );
-  glLineWidth( 1.0f );
+  glPointSize( 5.0f );
+  glLineWidth( 1.5f );
   glColor3f( 0.0f, 1.0f, 1.0f );
   glEnable( GL_LINE_SMOOTH );
 
