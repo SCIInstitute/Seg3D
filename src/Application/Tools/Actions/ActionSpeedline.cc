@@ -26,6 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#include <boost/math/special_functions/round.hpp>
+
 #include <Core/Action/ActionFactory.h>
 #include <Core/Volume/MaskVolumeSlice.h>
 #include <Core/Volume/DataVolumeSlice.h>
@@ -74,9 +76,15 @@ public:
   typedef itk::SpeedFunctionToPathFilter< image_type, path_type > path_filter_type;
   typedef path_filter_type::CostFunctionType::CoordRepType coord_rep_type; // double
 
+  typedef itk::ContinuousIndex< double, 3 >   continuous_index_type;
+  typedef itk::Point< double, 3 > itk_point_type;
+
   image_type::Pointer speed_image_2D_;
   Core::Path itk_paths_;
   Core::Path world_paths_;
+
+  continuous_index_type start_point_cindex_; // Continuous index for start point
+  std::vector< continuous_index_type > vertices_cindex_;
 
 public:
   std::string target_layer_id_;
@@ -100,6 +108,59 @@ public:
   Core::AtomicCounterHandle action_handle_;
 
 public:
+  bool is_path_completed( const double x0, const double y0, size_t vertex_index )
+  {
+    bool is_successed = false;
+    const double check_index_range = 2.5;
+
+    const double floor_x0 = floor( x0 );
+    const double floor_y0 = floor( y0 );
+
+    continuous_index_type cindex = this->vertices_cindex_[ vertex_index ];
+
+    // Notice: cindex is continuous index in ITK, not real world coordinate.
+    //Core::Point cindex;
+
+    if ( this->slice_type_ == Core::VolumeSliceType::SAGITTAL_E ) // SAGITTAL_E = 2
+    {
+      //cindex[0] = this->slice_number_;
+      //cindex[1] = x0;
+      //cindex[2] = y0;
+
+      if ( ( fabs( floor_x0  - floor( cindex[ 1 ] ) ) <= check_index_range )
+        && ( fabs( floor_y0 - floor( cindex[ 2 ] ) ) <= check_index_range ) )
+      {
+        is_successed = true;
+      } 
+    }
+    else if ( this->slice_type_ == Core::VolumeSliceType::CORONAL_E ) // CORONAL_E = 1
+    {
+      //cindex[0] = x0;
+      //cindex[1] = this->slice_number_;
+      //cindex[2] = y0;
+
+      if ( ( fabs( floor_x0 - floor( cindex[ 0 ] ) ) <= check_index_range )
+        && ( fabs(floor_y0 - floor( cindex[ 2 ] ) ) <= check_index_range ) )
+      {
+        is_successed = true;
+      } 
+    }
+    else
+    {
+      //cindex[0] = x0;
+      //cindex[1] = y0;
+      //cindex[2] = this->slice_number_;
+
+      if (  ( fabs( floor_x0 - floor( cindex[ 0 ] ) ) <= check_index_range )
+        && ( fabs(floor_y0 - floor( cindex[ 1 ] ) ) <= check_index_range ) )
+      {
+        is_successed = true;
+      }
+    }
+
+    return is_successed;
+  }
+
   void compute_path ( int start_index, int end_index )
   {
     // Create interpolator
@@ -191,35 +252,82 @@ public:
       Core::SinglePath new_path( this->vertices_[ start_index ], this->vertices_[ end_index ] );
 
       path_type::Pointer itk_path = path_filter->GetOutput( 0 );
-      size_t vertext_list_size = itk_path->GetVertexList()->Size();
+      size_t vertex_list_size = itk_path->GetVertexList()->Size();
 
-      for ( unsigned int k = 0; k < vertext_list_size; k++ )
+      // Need to check if this path has been successfully computed. 
+      // The criterion is the last point is in the same pixel as start point.
+      // IF not, we just put a straight line between start point and end point.
+
+      bool is_successed = false;
+
+      if ( vertex_list_size > 0 )
       {
-        const double x = itk_path->GetVertexList()->ElementAt( k )[0];
-        const double y = itk_path->GetVertexList()->ElementAt( k )[1];
+      
+        const double x0 = itk_path->GetVertexList()->ElementAt( vertex_list_size - 1 )[0];
+        const double y0 = itk_path->GetVertexList()->ElementAt( vertex_list_size - 1 )[1];
 
-        Core::Point ipnt;
+        is_successed = is_path_completed( x0, y0, start_index );
 
-        if ( this->slice_type_ == Core::VolumeSliceType::SAGITTAL_E ) // SAGITTAL_E = 2
-        {
-          ipnt[0] = this->slice_number_;
-          ipnt[1] = x;
-          ipnt[2] = y;
-        }
-        else if ( this->slice_type_ == Core::VolumeSliceType::CORONAL_E ) // CORONAL_E = 1
-        {
-          ipnt[0] = x;
-          ipnt[1] = this->slice_number_;
-          ipnt[2] = y;
-        }
-        else
-        {
-          ipnt[0] = x;
-          ipnt[1] = y;
-          ipnt[2] = this->slice_number_;
-        }
-        new_path.add_a_point( ipnt );
       }
+
+      if ( is_successed )
+      {
+        for ( unsigned int k = 0; k < vertex_list_size; k++ )
+        {
+          const double x = itk_path->GetVertexList()->ElementAt( k )[0];
+          const double y = itk_path->GetVertexList()->ElementAt( k )[1];
+
+          Core::Point ipnt;
+
+          if ( this->slice_type_ == Core::VolumeSliceType::SAGITTAL_E ) // SAGITTAL_E = 2
+          {
+            ipnt[0] = this->slice_number_;
+            ipnt[1] = x;
+            ipnt[2] = y;
+          }
+          else if ( this->slice_type_ == Core::VolumeSliceType::CORONAL_E ) // CORONAL_E = 1
+          {
+            ipnt[0] = x;
+            ipnt[1] = this->slice_number_;
+            ipnt[2] = y;
+          }
+          else
+          {
+            ipnt[0] = x;
+            ipnt[1] = y;
+            ipnt[2] = this->slice_number_;
+          }
+          new_path.add_a_point( ipnt );
+        }
+      }
+
+      //for ( unsigned int k = 0; k < vertext_list_size; k++ )
+      //{
+      //  const double x = itk_path->GetVertexList()->ElementAt( k )[0];
+      //  const double y = itk_path->GetVertexList()->ElementAt( k )[1];
+
+      //  Core::Point ipnt;
+
+      //  if ( this->slice_type_ == Core::VolumeSliceType::SAGITTAL_E ) // SAGITTAL_E = 2
+      //  {
+      //    ipnt[0] = this->slice_number_;
+      //    ipnt[1] = x;
+      //    ipnt[2] = y;
+      //  }
+      //  else if ( this->slice_type_ == Core::VolumeSliceType::CORONAL_E ) // CORONAL_E = 1
+      //  {
+      //    ipnt[0] = x;
+      //    ipnt[1] = this->slice_number_;
+      //    ipnt[2] = y;
+      //  }
+      //  else
+      //  {
+      //    ipnt[0] = x;
+      //    ipnt[1] = y;
+      //    ipnt[2] = this->slice_number_;
+      //  }
+      //  new_path.add_a_point( ipnt );
+      //}
 
       this->itk_paths_.add_one_path( new_path );
     }
@@ -301,35 +409,53 @@ public:
         Core::SinglePath new_path( p0, p1 );
 
         path_type::Pointer itk_path = path_filter->GetOutput( j );
-        size_t vertext_list_size = itk_path->GetVertexList()->Size();
+        size_t vertex_list_size = itk_path->GetVertexList()->Size();
 
-        for ( unsigned int k = 0; k < vertext_list_size; ++k )
+        // Need to check if this path has been successfully computed. 
+        // The criterion is the last point is in the same pixel as start point.
+        // IF not, we just put a straight line between start point and end point.
+
+        bool is_successed = false;
+
+        if ( vertex_list_size > 0 )
         {
-          const double x = itk_path->GetVertexList()->ElementAt( k )[0];
-          const double y = itk_path->GetVertexList()->ElementAt( k )[1];
 
-          Core::Point ipnt;
+          const double x0 = itk_path->GetVertexList()->ElementAt( vertex_list_size - 1 )[0];
+          const double y0 = itk_path->GetVertexList()->ElementAt( vertex_list_size - 1 )[1];
 
-          if ( this->slice_type_ == Core::VolumeSliceType::SAGITTAL_E ) // SAGITTAL_E = 2
-          {
-            ipnt[0] = this->slice_number_;
-            ipnt[1] = x;
-            ipnt[2] = y;
+          is_successed = is_path_completed( x0, y0, start_index );
+        }
 
-          }
-          else if ( this->slice_type_ == Core::VolumeSliceType::CORONAL_E ) // CORONAL_E = 1
+        if ( is_successed )
+        {
+          for ( unsigned int k = 0; k < vertex_list_size; ++k )
           {
-            ipnt[0] = x;
-            ipnt[1] = this->slice_number_;
-            ipnt[2] = y;
+            const double x = itk_path->GetVertexList()->ElementAt( k )[0];
+            const double y = itk_path->GetVertexList()->ElementAt( k )[1];
+
+            Core::Point ipnt;
+
+            if ( this->slice_type_ == Core::VolumeSliceType::SAGITTAL_E ) // SAGITTAL_E = 2
+            {
+              ipnt[0] = this->slice_number_;
+              ipnt[1] = x;
+              ipnt[2] = y;
+
+            }
+            else if ( this->slice_type_ == Core::VolumeSliceType::CORONAL_E ) // CORONAL_E = 1
+            {
+              ipnt[0] = x;
+              ipnt[1] = this->slice_number_;
+              ipnt[2] = y;
+            }
+            else
+            {
+              ipnt[0] = x;
+              ipnt[1] = y;
+              ipnt[2] = this->slice_number_;
+            }
+            new_path.add_a_point( ipnt );
           }
-          else
-          {
-            ipnt[0] = x;
-            ipnt[1] = y;
-            ipnt[2] = this->slice_number_;
-          }
-          new_path.add_a_point( ipnt );
         }
 
         updated_paths.add_one_path( new_path );
@@ -474,13 +600,24 @@ public:
       return;
     }
 
-    //size_t num_of_vertices = this->vertices_.size();
-
-    //if ( num_of_vertices == 0 )
-    //  return;
-
     typename Core::ITKImageDataT< VALUE_TYPE >::Handle speed_image_3D;
     this->get_itk_image_from_layer< VALUE_TYPE >( this->target_layer_, speed_image_3D );
+
+    // Convert the vertices to itk continuous index format
+    
+    for ( unsigned int i = 0; i < num_of_vertices; ++i )
+    {
+      itk_point_type itk_point;
+      continuous_index_type cindex;
+
+      itk_point[ 0 ] = this->vertices_[ i ].x();
+      itk_point[ 1 ] = this->vertices_[ i ].y();
+      itk_point[ 2 ] = this->vertices_[ i ].z();
+      speed_image_3D->get_image()->TransformPhysicalPointToContinuousIndex( 
+        itk_point, cindex );
+
+      this->vertices_cindex_.push_back( cindex );
+    }
 
     // Create 2D itk image
     typedef itk::ExtractImageFilter< TYPED_IMAGE_TYPE, image_type >  extract_filter_type;
@@ -527,8 +664,6 @@ public:
 
     // NOTE: ITK filter uses continueIndex instead of real physical point
     // So we need to convert the point position to continue index
-    typedef itk::ContinuousIndex< double, 3 >   continuous_index_type;
-    typedef itk::Point< double, 3 > itk_point_type;
 
     int start_index;
     int end_index;

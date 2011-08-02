@@ -1047,40 +1047,38 @@ bool SpeedlineTool::handle_mouse_move( ViewerHandle viewer,
 
   if ( this->private_->moving_vertex_ )
   {
-    std::vector< Core::Point > vertices = this->vertices_state_->get();
-    std::string view_mode = viewer->view_mode_state_->get();
-    double world_x1, world_y1;
-
-    // Only use current mouse position
-    viewer->window_to_world( mouse_history.current_.x_,
-      mouse_history.current_.y_, world_x1, world_y1 );
-
-    Core::Point new_pt( 0.0, 0.0, 0.0 );
-    if ( view_mode == Viewer::AXIAL_C )
-    {
-      new_pt[ 0 ] = world_x1;
-      new_pt[ 1 ] = world_y1;
-    }
-    else if ( view_mode == Viewer::CORONAL_C )
-    {
-      new_pt[ 0 ] = world_x1;
-      new_pt[ 2 ] = world_y1;
-    }
-    else if ( view_mode == Viewer::SAGITTAL_C )
-    {
-      new_pt[ 1 ] = world_x1;
-      new_pt[ 2 ] = world_y1;
-    }
-    else
-    {
-      this->private_->moving_vertex_ = false;
-      return false;
-    }
-
     if ( this->private_->vertex_index_ >= 0 )
     {
+      std::vector< Core::Point > vertices = this->vertices_state_->get();
       Core::Point pt = vertices[ this->private_->vertex_index_ ];
-      pt = new_pt;
+
+      std::string view_mode = viewer->view_mode_state_->get();
+      double world_x, world_y;
+
+      // Only use current mouse position
+      viewer->window_to_world( mouse_history.current_.x_,
+        mouse_history.current_.y_, world_x, world_y );
+
+      if ( view_mode == Viewer::AXIAL_C )
+      {
+        pt[ 0 ] = world_x;
+        pt[ 1 ] = world_y;
+      }
+      else if ( view_mode == Viewer::CORONAL_C )
+      {
+        pt[ 0 ] = world_x;
+        pt[ 2 ] = world_y;
+      }
+      else if ( view_mode == Viewer::SAGITTAL_C )
+      {
+        pt[ 1 ] = world_x;
+        pt[ 2 ] = world_y;
+      }
+      else
+      {
+        this->private_->moving_vertex_ = false;
+        return false;
+      }
 
       Core::Application::PostEvent( boost::bind( &Core::StateInt::set,
         this->current_vertex_index_state_, this->private_->vertex_index_, Core::ActionSource::NONE_E ) );
@@ -1127,7 +1125,6 @@ void SpeedlineTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
     }
   }
 
-
   size_t vertices_num = vertices.size();
   size_t paths_num = paths.get_path_num();
   Core::Point start_p = paths.get_start_point();
@@ -1137,11 +1134,6 @@ void SpeedlineTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
   {
     return;
   }
-  
-  //if ( start_p != end_p  && paths_num == 0   ) // no point 
-  //{
-  //  return;
-  //}
 
   CORE_CHECK_OPENGL_ERROR();
   glPushAttrib( GL_LINE_BIT | GL_POINT_BIT | GL_TRANSFORM_BIT );
