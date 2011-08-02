@@ -267,8 +267,9 @@ void PythonInterpreter::initialize_eventhandler()
   Py_IgnoreEnvironmentFlag = 1;
   Py_InspectFlag = 1;
   Py_OptimizeFlag = 2;
+#if !defined( _WIN32 )
   Py_NoSiteFlag = 1;
-  //Py_InteractiveFlag = 1;
+#endif
   Py_Initialize();
 
   // Create the compiler object
