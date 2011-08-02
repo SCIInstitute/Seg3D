@@ -57,8 +57,7 @@ SEG3D_TOOL
   SEG3D_TOOL_MENU( "Tools" )
   SEG3D_TOOL_SHORTCUT_KEY( "Ctrl+ALT+0" )
   SEG3D_TOOL_URL( "http://www.sci.utah.edu/SCIRunDocs/index.php/CIBC:Seg3D2:MeasurementTool:1" )
-  SEG3D_TOOL_HOTKEYS( "Snap To Axis=CTRL|Snap Point To Slice=Middle Mouse Button|"
-    "Delete=Right Mouse Button" )
+  SEG3D_TOOL_HOTKEYS( "Snap To Axis=CTRL|Snap Point To Slice=Middle Mouse Button" )
 )
 
   // -- constructor/destructor --
