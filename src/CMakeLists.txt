@@ -201,9 +201,7 @@ IF(BUILD_WITH_PYTHON)
   ADD_DEFINITIONS(-DBUILD_WITH_PYTHON 
           -DPy_NO_ENABLE_SHARED 
           -DBOOST_PYTHON_STATIC_MODULE
-          -DBOOST_PYTHON_STATIC_LIB 
-          -DLANDMARK=L"lib/pythonlib.zip"
-          -DPYTHONPATH=L"./lib/pythonlib.zip")
+          -DBOOST_PYTHON_STATIC_LIB)
 ENDIF(BUILD_WITH_PYTHON)
 
 ###########################################
