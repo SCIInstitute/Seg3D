@@ -51,9 +51,9 @@ SEG3D_TOOL
   SEG3D_TOOL_MENU( "Tools" )
   SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+6" )
   SEG3D_TOOL_URL( "http://www.sci.utah.edu/SCIRunDocs/index.php/CIBC:Seg3D2:SpeedlineTool:1" )
-  SEG3D_TOOL_HOTKEYS( "Add Point=Left Mouse Button|Move Point=Right Mouse Button"
-    "|Add Point in Segment=ALT Left Mouse Button|Delete Point=ALT Right Mouse Button"
-    "|Paint Floodfill=F|Erase Floodfill=E" )  
+  SEG3D_TOOL_HOTKEYS( "Add Point=Left Mouse Button|Move Point=Left Mouse Button"
+    "|Delete Point=Right Mouse Button"
+    "|Paint Floodfill=F|Erase Floodfill=E|Clear Speedline=C" )  
 )
 
   // -- constructor/destructor --
