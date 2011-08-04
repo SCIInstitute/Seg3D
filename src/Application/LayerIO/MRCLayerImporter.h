@@ -54,7 +54,7 @@ namespace Seg3D
   
   class MRCLayerImporter : public LayerSingleFileImporter
   {
-    SEG3D_IMPORTER_TYPE( "MRC Importer", ".mrc;.MRC", 60 )
+    SEG3D_IMPORTER_TYPE( "MRC Importer", ".mrc;.MRC;.map;.MAP", 60 )
     
     // -- Constructor/Destructor --
   public:
