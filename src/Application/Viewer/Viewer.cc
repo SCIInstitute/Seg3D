@@ -1201,8 +1201,7 @@ void Viewer::mouse_press_event( const Core::MouseHistory& mouse_history, int but
   }
 
   if ( button == Core::MouseButton::RIGHT_BUTTON_E && 
-    ( modifiers == Core::KeyModifier::NO_MODIFIER_E || 
-      modifiers & Core::KeyModifier::CONTROL_MODIFIER_E ) )
+    ( modifiers == Core::KeyModifier::CONTROL_MODIFIER_E ) )
   {
     this->private_->pick_point( mouse_history.current_.x_, mouse_history.current_.y_ );
     return;

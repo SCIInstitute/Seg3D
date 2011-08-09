@@ -57,7 +57,7 @@ bool ActionExportProject::validate( Core::ActionContextHandle& context )
     // Draw the users attention to this problem.
     CORE_LOG_CRITICAL_ERROR( "Export Project FAILED for project: '" 
         + ProjectManager::Instance()->get_current_project()->project_name_state_->get() 
-        + "'. Please perform a 'Save As' as soon as possible to preserve your data." );       
+        + "'. Please perform a 'Save Project As' as soon as possible to preserve your data." );       
     return false;
   }
   

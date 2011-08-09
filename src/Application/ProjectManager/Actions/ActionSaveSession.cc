@@ -50,7 +50,7 @@ bool ActionSaveSession::validate( Core::ActionContextHandle& context )
     context->report_error( "The project directory cannot be found." );
     // Draw the users attention to this problem.
     CORE_LOG_CRITICAL_ERROR( "Save FAILED as the project directory cannot be found. "
-      "Please perform a 'Save As' as soon as possible to preserve your data." );        
+      "Please perform a 'Save Project As' as soon as possible to preserve your data." );        
     return false;
   }
   
@@ -78,7 +78,7 @@ bool ActionSaveSession::run( Core::ActionContextHandle& context,
     // Draw the users attention to this problem.
     CORE_LOG_CRITICAL_ERROR( "Save FAILED for project: '" 
       + ProjectManager::Instance()->get_current_project()->project_name_state_->get() 
-      + "'. Please perform a 'Save As' as soon as possible to preserve your data." );       
+      + "'. Please perform a 'Save Project As' as soon as possible to preserve your data." );       
   }
 
   std::string success_message = std::string( "Successfully saved session '" ) + 

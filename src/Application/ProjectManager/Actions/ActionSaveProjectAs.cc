@@ -131,9 +131,9 @@ bool ActionSaveProjectAs::run( Core::ActionContextHandle& context,
   if( !success )
   {
     // Draw the users attention to this problem.
-    CORE_LOG_CRITICAL_ERROR( "Save As FAILED for project: '" 
+    CORE_LOG_CRITICAL_ERROR( "Save Project As FAILED for project: '" 
       + ProjectManager::Instance()->get_current_project()->project_name_state_->get() 
-      + "'. Please perform a 'Save As' as soon as possible to preserve your data." );
+      + "'. Please perform a 'Save Project As' as soon as possible to preserve your data." );
   }
   else
   {   
