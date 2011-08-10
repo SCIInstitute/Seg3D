@@ -39,7 +39,7 @@
 #include <Core/Interface/Interface.h>
 #include <Core/Renderer/RendererBase.h>
 
-#if defined(_WIN32) || defined(__APPLE__) || defined(X11_THREADSAFE)
+#if defined(__APPLE__) || defined(X11_THREADSAFE) // Windows isn't considered threadsafe for OpenGL
 #define MULTITHREADED_RENDERING 1
 #else
 #define MULTITHREADED_RENDERING 0
