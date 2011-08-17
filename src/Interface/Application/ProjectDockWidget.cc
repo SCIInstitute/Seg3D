@@ -80,6 +80,10 @@ public:
   // POPULATE_NOTES_LIST:
   // This function clears the current notes list and reloads it from the state variables
   void populate_notes_list( ProjectNoteListHandle note_list );
+
+  // UPDATE_PROJECT_NAME_TOOLTIP:
+  // Set the tooltip for the project name label in case the name is too long and gets truncated.
+  void update_project_name_tooltip( std::string project_name );
   
 public:
   // The UI that was created with QtCreator
@@ -201,6 +205,13 @@ void ProjectDockWidgetPrivate::populate_notes_list( ProjectNoteListHandle note_l
   this->ui_.notes_tree_->expandItem( this->ui_.notes_tree_->topLevelItem( 0 ) );
 }
 
+void ProjectDockWidgetPrivate::update_project_name_tooltip( std::string project_name )
+{
+  ASSERT_IS_INTERFACE_THREAD();
+
+  this->ui_.project_name_->setToolTip( QString::fromStdString( project_name ) );
+}
+
 // HANDLESESSIONSCHANGED:
 // A function that verifies that we're operating on the proper thread and if not, it moves the 
 // process to the correct one in order to reload the sessions displayed after they have been
@@ -249,6 +260,31 @@ static void UpdateNoteList( ProjectDockWidgetPrivateQWeakHandle qpointer,
   if( qpointer.data() && !QCoreApplication::closingDown() ) 
   {
     qpointer->populate_notes_list( note_list );
+  }
+}
+
+// UPDATEPROJECTNAMETOOLTIP:
+// Update the tooltip for the project name label to contain the full project name in case the
+// project name was too long to fit in the widget and got truncated.
+static void UpdateProjectNameTooltip( ProjectDockWidgetPrivateQWeakHandle qpointer, 
+  std::string project_name )
+{
+  // This function needs to be called on the Interface thread, hence if we are not on the
+  // Interface thread we need send a message to the Interface thread to actually execute
+  // this function, with the current parameters.
+
+  if( !( Core::Interface::IsInterfaceThread() ) )
+  {
+    Core::Interface::Instance()->post_event( 
+      boost::bind( &UpdateProjectNameTooltip, qpointer, project_name ) );
+    return;
+  }
+
+  // We need to check whether the object still exists, the use of the qpointer allows for
+  // checking if the object still exists.
+  if( qpointer.data() && !QCoreApplication::closingDown() ) 
+  {
+    qpointer->update_project_name_tooltip( project_name );
   }
 }
 
@@ -370,6 +406,15 @@ void ProjectDockWidget::update_widget()
     this->add_connection( QtUtils::QtBridge::Connect( this->private_->ui_.project_name_, 
       current_project->project_name_state_ ) );
     
+    // Set the tooltip for the project name label in case the name is too long and gets truncated
+    std::string project_name = current_project->project_name_state_->get();
+    this->private_->update_project_name_tooltip( project_name );
+    
+    // Add connection to update project name tooltip in case it changes (e.g. Save As)
+    this->add_connection( current_project->project_name_state_->value_changed_signal_.
+      connect( boost::bind( &UpdateProjectNameTooltip, 
+      ProjectDockWidgetPrivateQWeakHandle( this->private_ ), _1 ) ) );
+
     this->add_connection( QtUtils::QtBridge::Connect( this->private_->ui_.custom_colors_checkbox_, 
       current_project->save_custom_colors_state_ ) );
 

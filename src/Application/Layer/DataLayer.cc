@@ -203,7 +203,7 @@ void DataLayer::initialize_states()
   this->set_initializing( true ); 
 
   // == The brightness of the layer ==
-  this->add_state( "brightness", brightness_state_, 75.0, 0.0, 100.0, 0.1 );
+  this->add_state( "brightness", brightness_state_, 50.0, 0.0, 100.0, 0.1 );
 
   // == The contrast of the layer ==
   this->add_state( "contrast", contrast_state_, 0.0, 0.0, 100.0, 0.1 );
