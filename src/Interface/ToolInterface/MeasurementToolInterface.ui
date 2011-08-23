@@ -395,7 +395,7 @@ QWidget#general_tab_, QWidget#active_tab_{
                       </size>
                      </property>
                      <property name="text">
-                      <string>Export Selection To Clipboard</string>
+                      <string>Copy Selection To Clipboard</string>
                      </property>
                     </widget>
                    </item>
@@ -619,7 +619,7 @@ QWidget#general_tab_, QWidget#active_tab_{
                       </size>
                      </property>
                      <property name="text">
-                      <string>Export All To Clipboard</string>
+                      <string>Copy All To Clipboard</string>
                      </property>
                     </widget>
                    </item>
