@@ -545,6 +545,7 @@ bool MatlabLayerImporterPrivate::import_mat_file( const std::string& filename )
 MatlabLayerImporter::MatlabLayerImporter() :
   private_( new MatlabLayerImporterPrivate )
 {
+  private_->importer_ = this;
 }
 
 MatlabLayerImporter::~MatlabLayerImporter()
