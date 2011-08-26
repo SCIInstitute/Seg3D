@@ -102,13 +102,14 @@ bool ActionImportLayer::validate( Core::ActionContextHandle& context )
   // If there is no layer importer we need to generate one
   if ( !this->layer_importer_ )
   {
+    std::string error;
     // Create a new importer
     if ( !( LayerIO::Instance()->create_single_file_importer( this->filename_,  
-      this->layer_importer_, this->importer_ ) ) )
+      this->layer_importer_, error, this->importer_ ) ) )
     {
       // In case the importer could not be generated
       context->report_error( std::string( "Could not create importer with name '" ) +
-        this->importer_ + "' for file '" + this->filename_ + "'." );
+        this->importer_ + "' for file '" + this->filename_ + "'. " + error);
       return false;
     }
     

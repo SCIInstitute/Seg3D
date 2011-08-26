@@ -123,14 +123,15 @@ bool LayerIOFunctions::ImportFiles( QMainWindow* main_window, std::string file_t
   for( int i = 0; i < file_list.size(); ++i )
   {
     LayerImporterHandle importer;
+    std::string error;
     
     // Create a new importer
     if( ! ( LayerIO::Instance()->create_single_file_importer( file_list.at( i ).toStdString(), 
-      importer, importer_name ) ) )
+      importer, error, importer_name ) ) )
     {
       // Failed to create the importer, and warn the user explicitly
       std::string error_message = std::string( "ERROR: No importer is available for file '" ) 
-        + file_list.at( i ).toStdString() + std::string( "'." );
+        + file_list.at( i ).toStdString() + std::string( "'. " ) + error;
 
       QMessageBox message_box( main_window );
       message_box.setWindowTitle( "Import Layer Error" );
