@@ -68,6 +68,8 @@ SET(APPLICATION_LAYERIO_IMPORTERS_SRCS
   ITKLayerImporter.cc
   ITKSeriesLayerImporter.h
   ITKSeriesLayerImporter.cc
+  Matlab73LayerImporter.h
+  Matlab73LayerImporter.cc
   MatlabLayerImporter.h
   MatlabLayerImporter.cc
   MRCLayerImporter.h
@@ -114,8 +116,9 @@ TARGET_LINK_LIBRARIES(Application_LayerIO
           Application_Layer
           ${SCI_BOOST_LIBRARY}
           ${SCI_GDCM_LIBRARY}
+          ${SCI_HDF5_LIBRARY}
           ${SCI_MATLABIO_LIBRARY}
-                                        ${SCI_MRC2000IO_LIBRARY})
+          ${SCI_MRC2000IO_LIBRARY})
 
 # Register actions and importers
 REGISTER_LIBRARY_AND_CLASSES(Application_LayerIO 
