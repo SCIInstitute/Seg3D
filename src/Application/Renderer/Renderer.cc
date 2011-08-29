@@ -335,8 +335,12 @@ void RendererPrivate::draw_slice( LayerSceneItemHandle layer_item,
       double window_size = data_layer_item->display_max_ - data_layer_item->display_min_;
       window_size = Core::Max( 0.01 * data_range, window_size );
       double scale = data_range > 0 ? data_range / window_size : 1.0;
-      double bias = data_range > 0 ? 1.0 - ( scale * data_layer_item->display_max_ 
-        - data_layer_item->data_min_ ) / data_range : 0.0;
+      double level = ( ( data_layer_item->display_min_ + data_layer_item->display_max_ ) / 2 );
+      // Seg3D adjusts [data_min, data_max] to range [0, 1] prior to shader
+      double adjusted_level =  ( level - data_layer_item->data_min_ ) / data_range;
+      // Goal is to shift level so that it ends up at 0.5 after scale and bias are applied:
+      // 0.5 = level * scale + bias
+      double bias = 0.5 - adjusted_level * scale;
       this->slice_shader_->set_scale_bias( static_cast< float >( scale ), 
         static_cast< float >( bias ) );
     }
