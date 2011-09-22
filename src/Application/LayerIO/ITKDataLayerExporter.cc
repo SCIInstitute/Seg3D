@@ -200,26 +200,38 @@ bool export_dicom_series( const std::string& file_path, const std::string& file_
   typename ReaderType::Pointer reader;
   typename ReaderType::DictionaryArrayType dict_array;
 
-  if ( has_header_file && is_dicom )
+  if ( is_dicom )
   { 
-    reader = ReaderType::New();
-    reader->SetImageIO( dicom_io );
-    reader->SetFileNames( header_files ); 
-    try 
+    if ( has_header_file )
     {
-      reader->Update();
-    }
-        catch (itk::ExceptionObject & err ) 
-    {
-      std::cerr << "error " << err << std::endl;
-      return false;   
-    }
-    catch ( ... ) 
-    {
-      return false;
-    }
+      reader = ReaderType::New();
+      reader->SetImageIO( dicom_io );
+      reader->SetFileNames( header_files ); 
+      try 
+      {
+        reader->Update();
+      }
+      catch (itk::ExceptionObject & err ) 
+      {
+        std::cerr << "error " << err << std::endl;
+        return false;   
+      }
+      catch ( ... ) 
+      {
+        return false;
+      }
 
-    dict_array = *( reader->GetMetaDataDictionaryArray() );
+      dict_array = *( reader->GetMetaDataDictionaryArray() );
+
+    }
+    else
+    {
+      size_t num_slices = names_generator->GetFileNames().size();
+      for ( size_t j = 0; j < num_slices; j++ )
+      {
+        dict_array.push_back( new itk::MetaDataDictionary );
+      }
+    }
 
     std::string uid_prefix = dicom_io->GetUIDPrefix();
     gdcm::UIDGenerator::SetRoot( uid_prefix.c_str() );

@@ -256,6 +256,7 @@ bool GDCMLayerImporterPrivate::read_header()
   this->y_spacing_ = spacing[ 1 ];
   
   gdcm::Tag slice_thickness_tag( 0x0018,0x0050 );
+  gdcm::Tag slice_distance_tag( 0x0018,0x0088 );
   gdcm::Tag patient_position_tag( 0x0020, 0x0032 );
 
   bool found_thickness = false;
@@ -275,6 +276,22 @@ bool GDCMLayerImporterPrivate::read_header()
       }
     }
   }
+  else if( ds.FindDataElement( slice_distance_tag ) )
+  {
+    const gdcm::DataElement& de = ds.GetDataElement( slice_distance_tag );
+    if ( ! de.IsEmpty() )
+    {
+      gdcm::Attribute< 0x0018, 0x0088 > slice_thickness;
+      slice_thickness.SetFromDataElement( de );
+      double thickness = slice_thickness.GetValue( 0 );
+      if ( thickness > epsilon )
+      {
+        this->z_spacing_ = thickness;
+        found_thickness = true;
+      }
+    }
+  }
+  
   
   if ( filenames.size() > 1 && ds.FindDataElement( patient_position_tag ) )
   {

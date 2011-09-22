@@ -26,53 +26,59 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef CORE_ACTION_ACTIONSOCKET_H
-#define CORE_ACTION_ACTIONSOCKET_H
+#ifndef APPLICATION_LAYERIO_MATLABLAYEREXPORTER_H
+#define APPLICATION_LAYERIO_MATLABLAYEREXPORTER_H
 
-// STL includes
-#include <iostream>
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+# pragma once
+#endif 
 
-// Boost includes
-#include <boost/utility.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/signals2/signal.hpp>
+#include <boost/filesystem.hpp>
 
-// Core includes
-#include <Core/Utils/Singleton.h>
 
 // Application includes
-#include <Core/Action/Action.h>
-#include <Core/Action/ActionDispatcher.h>
+#include <Application/LayerIO/LayerExporter.h>
+#include <Application/LayerIO/LayerIO.h>
 
-namespace Core
+namespace Seg3D
 {
 
-// CLASS ACTIONSOCKET
-// Class that defines a socket for issuing commands
-
-// Forward declaration
-class AtionSocket;
-
-// Class defintion
-class ActionSocket : public boost::noncopyable
+class MatlabLayerExporter : public LayerExporter
 {
-  CORE_SINGLETON( ActionSocket );
-  
+  SEG3D_EXPORTER_TYPE( "Matlab Exporter", ".mat" )
+
   // -- Constructor/Destructor --
-private:
-  ActionSocket();
-  virtual ~ActionSocket();
-
 public:
-  void start( int portnum );
+  // Construct a new layer file importer
+  MatlabLayerExporter( std::vector< LayerHandle >& layers );
 
+  // Virtual destructor for memory management of derived classes
+  virtual ~MatlabLayerExporter()
+  {
+  }
+
+  // --Import the data as a specific type --  
+public: 
+
+  // EXPORT_LAYER
+  // Export the layer to file
+  virtual bool export_layer( const std::string& mode, const std::string& file_path, 
+    const std::string& name );
+    
+  virtual void set_label_layer_values( std::vector< double > values )
+  { 
+    this->label_values_ = values;
+  }
+    
 private:
-  static void run_action_socket( int portnum );
-
-  boost::thread* action_socket_thread_;
-
+  bool export_nrrd( const std::string& file_path );
+  bool export_single_masks( const std::string& file_path );
+  bool export_mask_label( const std::string& file_path );
+  
+private:
+  std::vector< double > label_values_;
 };
 
-} // end namespace Core
+} // end namespace seg3D
 
 #endif

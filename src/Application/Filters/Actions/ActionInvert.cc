@@ -90,7 +90,7 @@ public:
       {
         return;
       }
-      if ( z > 0 && z % tenth_nz == 0 )
+      if ( tenth_nz > 0 && z > 0 && z % tenth_nz == 0 )
       {
         dst->update_progress_signal_( ( z * 1.0 ) / nz );
       }

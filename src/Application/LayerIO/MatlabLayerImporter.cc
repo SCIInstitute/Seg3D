@@ -175,11 +175,30 @@ bool MatlabLayerImporterPrivate::scan_mat_array( MatlabIO::matlabarray &mlarray,
       error = "Matrix that should contain data is not a dense matrix.";
       return false;
     }
+
+    std::vector<int> dims = subarray.getdims();
+    bool old_version_4d_matrix = false;
               
-    if ( subarray.getnumdims() > 3 )    
-    {
-      error = "Matrix dimension is larger than 3.";
-      return false;    
+    if ( dims.size() > 3 )    
+    { 
+      // The old version of Seg3D had one version that generated 4D matrices instead
+      // of 3D matrices. Only one dimension is 1 in this case
+      
+      if ( dims.size() == 4 && dims[ 0 ] ==  1 )
+      {
+        dims[ 0 ] = dims[ 1 ];
+        dims[ 1 ] = dims[ 2 ];
+        dims[ 2 ] = dims[ 3 ];
+
+        old_version_4d_matrix = true;
+      } 
+      
+      if ( !old_version_4d_matrix )
+      {
+        error = "Matrix dimension is larger than 3.";
+        return false;    
+
+      }
     }
     
     if ( subarray.getnumelements() == 0 )
@@ -189,7 +208,6 @@ bool MatlabLayerImporterPrivate::scan_mat_array( MatlabIO::matlabarray &mlarray,
     }      
 
     // Get dimensions of the data
-    std::vector<int> dims = subarray.getdims();
     while ( dims.size() < 3 ) dims.push_back( 1 );
 
     size_t nx = static_cast<size_t>( dims[ 0 ] );
@@ -215,8 +233,17 @@ bool MatlabLayerImporterPrivate::scan_mat_array( MatlabIO::matlabarray &mlarray,
           error = "Axis field needs to be structured objects.";
           return false;
         }
+      
+        int dim_start = 0;
         int numaxis = axisarray.getm();
+        if ( numaxis == 4 && dims.size() == 4 )
+        {
+          numaxis = 4;
+          dim_start = 1;
+        }
+        
         if ( numaxis > 3 ) numaxis = 3;
+         
         
         bool read_spacing = false;
         bool read_min = false;
@@ -226,7 +253,8 @@ bool MatlabLayerImporterPrivate::scan_mat_array( MatlabIO::matlabarray &mlarray,
         Core::Point min;
         Core::Point max;
 
-        for ( int p = 0 ; p < numaxis; p++ )
+
+        for ( int p = dim_start ; p < numaxis; p++ )
         { 
           if ( axisarray.isfield( "spacing" ) )
           {
@@ -254,7 +282,7 @@ bool MatlabLayerImporterPrivate::scan_mat_array( MatlabIO::matlabarray &mlarray,
             if ( farray.isdense() && farray.getnumelements() > 0 )
             {
               farray.getnumericarray( &max[ p ], 1 );
-              read_max = true;
+              read_max = true;              
             }
           }           
         }
@@ -363,7 +391,7 @@ bool MatlabLayerImporterPrivate::scan_mat_file( const std::string& filename )
       matlab_array = matlab_file.getmatlabarrayinfo( j );
       if ( this->scan_mat_array( matlab_array, error ) )
       {
-        this->matlab_array_index_  = j;
+        this->matlab_array_index_ = j;
         this->read_header_ = true;
         return true;
       }
@@ -400,6 +428,12 @@ bool MatlabLayerImporterPrivate::import_mat_array( MatlabIO::matlabarray &mlarra
             
         std::vector<int> dims = mlarray.getdims();
         while ( dims.size() < 3 ) dims.push_back( 1 );
+        if ( dims.size() == 4 )
+        {
+          dims[ 0 ] = dims[ 1 ];
+          dims[ 1 ] = dims[ 2 ];
+          dims[ 2 ] = dims[ 3 ];        
+        }
 
         this->data_block_ = Core::StdDataBlock::New( static_cast<size_t>( dims[ 0 ] ),
           static_cast<size_t>( dims[ 1 ] ), static_cast<size_t>( dims[ 2 ] ),
@@ -545,7 +579,7 @@ bool MatlabLayerImporterPrivate::import_mat_file( const std::string& filename )
 MatlabLayerImporter::MatlabLayerImporter() :
   private_( new MatlabLayerImporterPrivate )
 {
-  private_->importer_ = this;
+  this->private_->importer_ = this;
 }
 
 MatlabLayerImporter::~MatlabLayerImporter()

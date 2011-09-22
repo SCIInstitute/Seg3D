@@ -151,7 +151,7 @@ bool NrrdLayerExporter::export_mask_label( const std::string& file_path )
 {
   // Step 1: We get a pointer to one of the MaskLayers so we can get its MaskDataBlock
   std::vector < std::string > first_mask_name_and_number;
-  MaskLayer* temp_handle = dynamic_cast< MaskLayer* >( this->layers_[ 1 ].get() );
+  MaskLayer* temp_handle = dynamic_cast< MaskLayer* >( this->layers_[ 0 ].get() );
 
   // Step 2: Get a handle to its MaskDataBlock and use that to build a new DataBlockHandle of the 
   // same size and type.

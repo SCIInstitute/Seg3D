@@ -1507,38 +1507,6 @@ QPushButton#activate_button_{
              </widget>
             </item>
             <item>
-             <widget class="QWidget" name="widget_10" native="true">
-              <layout class="QHBoxLayout" name="horizontalLayout_24">
-               <property name="spacing">
-                <number>0</number>
-               </property>
-               <property name="margin">
-                <number>0</number>
-               </property>
-               <item>
-                <widget class="QLabel" name="label_13">
-                 <property name="maximumSize">
-                  <size>
-                   <width>100</width>
-                   <height>16777215</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>Provenance ID:</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLabel" name="provenance_id_">
-                 <property name="text">
-                  <string>0</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item>
              <widget class="QWidget" name="datainfo_widget_" native="true">
               <property name="minimumSize">
                <size>
@@ -1597,58 +1565,6 @@ QPushButton#activate_button_{
                  </layout>
                 </widget>
                </item>
-               <item>
-                <widget class="QWidget" name="min_max_widget_" native="true">
-                 <property name="minimumSize">
-                  <size>
-                   <width>0</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                 <property name="maximumSize">
-                  <size>
-                   <width>16777215</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                 <layout class="QHBoxLayout" name="horizontalLayout_20">
-                  <property name="spacing">
-                   <number>0</number>
-                  </property>
-                  <property name="margin">
-                   <number>0</number>
-                  </property>
-                  <item>
-                   <widget class="QLabel" name="label_11">
-                    <property name="text">
-                     <string>Min:</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLabel" name="min_label_">
-                    <property name="text">
-                     <string>0</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLabel" name="label_12">
-                    <property name="text">
-                     <string>Max:</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLabel" name="max_label_">
-                    <property name="text">
-                     <string>0</string>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </widget>
-               </item>
               </layout>
              </widget>
             </item>
@@ -1688,6 +1604,90 @@ QPushButton#activate_button_{
                </item>
                <item>
                 <widget class="QLabel" name="isosurface_area_">
+                 <property name="text">
+                  <string>0</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QWidget" name="widget_10" native="true">
+              <layout class="QHBoxLayout" name="horizontalLayout_24">
+               <property name="spacing">
+                <number>0</number>
+               </property>
+               <property name="margin">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="QLabel" name="label_13">
+                 <property name="maximumSize">
+                  <size>
+                   <width>100</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>Provenance ID:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="provenance_id_">
+                 <property name="text">
+                  <string>0</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QWidget" name="min_max_widget_" native="true">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>20</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>20</height>
+               </size>
+              </property>
+              <layout class="QHBoxLayout" name="horizontalLayout_20">
+               <property name="spacing">
+                <number>0</number>
+               </property>
+               <property name="margin">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="QLabel" name="label_11">
+                 <property name="text">
+                  <string>Min:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="min_label_">
+                 <property name="text">
+                  <string>0</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_12">
+                 <property name="text">
+                  <string>Max:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="max_label_">
                  <property name="text">
                   <string>0</string>
                  </property>

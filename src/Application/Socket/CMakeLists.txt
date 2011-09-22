@@ -31,33 +31,13 @@
 # Set sources
 ##################################################
 
-SET(CORE_ACTION_SRCS
-  Action.h
-  Action.cc
-  ActionContext.h
-  ActionContext.cc
-  ActionContextContainer.h
-  ActionContextContainer.cc
-  ActionParameter.h
-  ActionParameter.cc
-  ActionResult.h
-  ActionProgress.h
-  ActionProgress.cc
-  ActionDispatcher.h
-  ActionDispatcher.cc
-  ActionFactory.h
-  ActionFactory.cc
-  ActionHistory.h
-  ActionHistory.cc
-  ActionInfo.h
-  ActionInfo.cc
+SET(APPLICATION_SOCKET_SRCS
+  ActionSocket.h
+  ActionSocket.cc
   )
 
-CORE_ADD_LIBRARY(Core_Action ${CORE_ACTION_SRCS} )
+CORE_ADD_LIBRARY(Application_Socket ${APPLICATION_SOCKET_SRCS} )
             
-TARGET_LINK_LIBRARIES(Core_Action
-                      Core_Utils
-                      Core_EventHandler
-                      Core_Application
-                      ${SCI_BOOST_LIBRARY})
+TARGET_LINK_LIBRARIES(Application_Socket
+                      Core_Python)
 

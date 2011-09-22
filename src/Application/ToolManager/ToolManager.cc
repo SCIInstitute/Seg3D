@@ -615,7 +615,8 @@ bool ToolManager::pre_load_states( const Core::StateIO& state_io )
       {
         std::string error = std::string( "Could not load states for tool '" ) + toolid + "'.";
         CORE_LOG_ERROR( error );
-        success = false;
+        // NOTE: We should not fail the entire session if a tool fails to load
+        //success = false;
       } 
     }
     tool_element = tool_element->NextSiblingElement();

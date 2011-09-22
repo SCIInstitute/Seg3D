@@ -332,6 +332,16 @@ bool FromString( const std::string &str, double &value )
     return ( true );
   }
 
+  // NOTE: On MAC this value does not convert properly even though it can write it out.
+  // Hence fix this by special casing this
+
+  if ( data.size() > 11 && data.substr( 0, 12 ) == "2.22507e-308" )
+  {
+    value = 2.22507e-308;
+    return true;
+  }
+  
+
   std::istringstream iss( data );
   iss.exceptions( std::ifstream::eofbit | std::ifstream::failbit | std::ifstream::badbit );
   try

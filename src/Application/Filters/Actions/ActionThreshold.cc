@@ -126,7 +126,7 @@ public:
       {
         return;
       }
-      if ( z > 0 && z % tenth_nz == 0 )
+      if ( tenth_nz > 0 && z > 0 && z % tenth_nz == 0 )
       {
         this->dst_layer_->update_progress_signal_( ( z * 0.5 ) / nz );
       }

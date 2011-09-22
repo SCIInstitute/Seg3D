@@ -301,33 +301,6 @@ public:
         }
       }
 
-      //for ( unsigned int k = 0; k < vertext_list_size; k++ )
-      //{
-      //  const double x = itk_path->GetVertexList()->ElementAt( k )[0];
-      //  const double y = itk_path->GetVertexList()->ElementAt( k )[1];
-
-      //  Core::Point ipnt;
-
-      //  if ( this->slice_type_ == Core::VolumeSliceType::SAGITTAL_E ) // SAGITTAL_E = 2
-      //  {
-      //    ipnt[0] = this->slice_number_;
-      //    ipnt[1] = x;
-      //    ipnt[2] = y;
-      //  }
-      //  else if ( this->slice_type_ == Core::VolumeSliceType::CORONAL_E ) // CORONAL_E = 1
-      //  {
-      //    ipnt[0] = x;
-      //    ipnt[1] = this->slice_number_;
-      //    ipnt[2] = y;
-      //  }
-      //  else
-      //  {
-      //    ipnt[0] = x;
-      //    ipnt[1] = y;
-      //    ipnt[2] = this->slice_number_;
-      //  }
-      //  new_path.add_a_point( ipnt );
-      //}
 
       this->itk_paths_.add_one_path( new_path );
     }

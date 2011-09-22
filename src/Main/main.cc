@@ -50,14 +50,15 @@
 #include <Core/Application/Application.h>
 #include <Core/Interface/Interface.h>
 #include <Core/Action/ActionHistory.h>
-#include <Core/Action/ActionSocket.h>
 #include <Core/Log/RolloverLogFile.h>
 
 // QtUtils includes
 #include <QtUtils/Utils/QtApplication.h>
 
 // Application includes
+#include <Application/InterfaceManager/InterfaceManager.h>
 #include <Application/Tool/ToolFactory.h>
+#include <Application/Socket/ActionSocket.h>
 
 // Interface includes
 #include <Interface/Application/ApplicationInterface.h>
@@ -119,19 +120,6 @@ int main( int argc, char **argv )
   // -- Start the application event handler --
   Core::Application::Instance()->start_eventhandler();
 
-  // -- Checking for the socket parameter --
-  std::string port_number_string;
-  if( Core::Application::Instance()->check_command_line_parameter( "socket", port_number_string ) )
-  {
-    int port_number;
-    if ( Core::ImportFromString( port_number_string, port_number) )
-    {
-      // -- Add a socket for receiving actions --
-      CORE_LOG_DEBUG( std::string("Starting a socket on port: ") + Core::ExportToString( port_number ) );
-      Core::ActionSocket::Instance()->start( port_number );
-    }
-  }
-
   // Initialize the startup tools list
   ToolFactory::Instance()->initialize_states();
   
@@ -155,8 +143,7 @@ int main( int argc, char **argv )
     QMessageBox::information( 0, 
       QString::fromStdString( Core::Application::GetApplicationNameAndVersion() ), 
       QString::fromStdString( warning )  );
-  }
-  
+  } 
 
   if ( sizeof( void * ) == 4 )
   {
@@ -186,6 +173,22 @@ int main( int argc, char **argv )
   Core::PythonInterpreter::Instance()->run_string( "import " + module_name + "\n" );
   Core::PythonInterpreter::Instance()->run_string( "from " + module_name + " import *\n" );
 #endif
+
+  // -- Checking for the socket parameter --
+  std::string port_number_string;
+  if( Core::Application::Instance()->check_command_line_parameter( "socket", port_number_string ) )
+  {
+    int port_number;
+    if ( Core::ImportFromString( port_number_string, port_number) )
+    {
+      // -- Add a socket for receiving actions --
+      CORE_LOG_DEBUG( std::string("Starting a socket on port: ") + Core::ExportToString( port_number ) );
+      Seg3D::ActionSocket::Instance()->start( port_number );
+      InterfaceManager::Instance()->set_initializing( true );
+      InterfaceManager::Instance()->splash_screen_visibility_state_->set( false );
+      InterfaceManager::Instance()->set_initializing( false );
+    }
+  }
 
   // -- Setup Application Interface Window --
 //  std::string file_to_view = "";

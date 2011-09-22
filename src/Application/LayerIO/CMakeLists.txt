@@ -91,6 +91,8 @@ SET(APPLICATION_LAYERIO_EXPORTERS_SRCS
   MRCLayerExporter.cc
   NrrdLayerExporter.h
   NrrdLayerExporter.cc
+  MatlabLayerExporter.h
+  MatlabLayerExporter.cc
 )
 
 IF(BUILD_WITH_PYTHON)

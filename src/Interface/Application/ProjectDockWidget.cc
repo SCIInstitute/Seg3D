@@ -83,7 +83,7 @@ public:
 
   // UPDATE_PROJECT_NAME_TOOLTIP:
   // Set the tooltip for the project name label in case the name is too long and gets truncated.
-  void set_project_name_tooltip( std::string project_name );
+  void update_project_name_tooltip( std::string project_name );
   
 public:
   // The UI that was created with QtCreator
@@ -205,7 +205,7 @@ void ProjectDockWidgetPrivate::populate_notes_list( ProjectNoteListHandle note_l
   this->ui_.notes_tree_->expandItem( this->ui_.notes_tree_->topLevelItem( 0 ) );
 }
 
-void ProjectDockWidgetPrivate::set_project_name_tooltip( std::string project_name )
+void ProjectDockWidgetPrivate::update_project_name_tooltip( std::string project_name )
 {
   ASSERT_IS_INTERFACE_THREAD();
 
@@ -284,7 +284,7 @@ static void UpdateProjectNameTooltip( ProjectDockWidgetPrivateQWeakHandle qpoint
   // checking if the object still exists.
   if( qpointer.data() && !QCoreApplication::closingDown() ) 
   {
-    qpointer->set_project_name_tooltip( project_name );
+    qpointer->update_project_name_tooltip( project_name );
   }
 }
 
@@ -406,6 +406,10 @@ void ProjectDockWidget::update_widget()
     this->add_connection( QtUtils::QtBridge::Connect( this->private_->ui_.project_name_, 
       current_project->project_name_state_ ) );
     
+    // Set the tooltip for the project name label in case the name is too long and gets truncated
+    std::string project_name = current_project->project_name_state_->get();
+    this->private_->update_project_name_tooltip( project_name );
+    
     // Add connection to update project name tooltip in case it changes (e.g. Save As)
     this->add_connection( current_project->project_name_state_->value_changed_signal_.
       connect( boost::bind( &UpdateProjectNameTooltip, 
@@ -431,9 +435,6 @@ void ProjectDockWidget::update_widget()
     // Update buttons
     this->disable_load_delete_and_export_buttons();
 
-    // Update project name label tooltip 
-    std::string project_name = current_project->project_name_state_->get();
-    this->private_->set_project_name_tooltip( project_name );
   }
 }
 

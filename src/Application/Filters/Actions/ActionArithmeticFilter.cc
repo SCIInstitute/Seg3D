@@ -101,6 +101,7 @@ void ArithmeticFilterAlgo::run_filter()
   {
     Core::DataBlockHandle output_data_block;
     this->engine_.get_data_block( ActionArithmeticFilter::RESULT_C, output_data_block );
+    
     if ( this->dst_layer_->get_type() == Core::VolumeType::MASK_E )
     {
       Core::MaskDataBlockHandle mask_data_block;

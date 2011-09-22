@@ -207,6 +207,7 @@ SegmentationSelectionPage::SegmentationSelectionPage( SegmentationPrivateHandle 
   
   this->private_->export_selector_ = new QComboBox( this->private_->bitmap_widget_ );
   this->private_->export_selector_->addItem( QString::fromUtf8( ".nrrd" ) );
+  this->private_->export_selector_->addItem( QString::fromUtf8( ".mat" ) );
   this->private_->export_selector_->addItem( QString::fromUtf8( ".tiff" ) );
   this->private_->export_selector_->addItem( QString::fromUtf8( ".bmp" ) );
   this->private_->export_selector_->addItem( QString::fromUtf8( ".png" ) );
@@ -501,6 +502,10 @@ bool SegmentationSummaryPage::validatePage()
   if( this->private_->single_file_radio_button_->isChecked() )
   {
     result = LayerIO::Instance()->create_exporter( exporter, layers, "NRRD Exporter", ".nrrd" );
+  }
+  else if( extension == ".mat" )
+  {
+    result = LayerIO::Instance()->create_exporter( exporter, layers, "Matlab Exporter", extension );
   }
   else if( extension == ".nrrd" )
   {

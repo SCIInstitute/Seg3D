@@ -143,11 +143,11 @@ void QtSliderDoubleCombo::setRange( double min, double max )
   this->private_->max_ = max;
     this->private_->ui_.spinBox->setRange( min, max );
   QString min_string;
-  min_string.setNum( min, 'g', 2 );
+  min_string.setNum( min, 'g', 3 );
     this->private_->ui_.min_->setText( min_string );
 
   QString max_string;
-  max_string.setNum( max, 'g', 2 );
+  max_string.setNum( max, 'g', 3 );
     this->private_->ui_.max_->setText( max_string );
 
     this->block_signals( false );
@@ -183,7 +183,7 @@ void QtSliderDoubleCombo::change_min( double new_min )
     this->block_signals( true );
   this->private_->ui_.spinBox->setMinimum( new_min );
   QString min_string;
-  min_string.setNum( new_min, 'g', 2 );
+  min_string.setNum( new_min, 'g', 3 );
     this->private_->ui_.min_->setText( min_string );
     this->block_signals( false );
 }
@@ -194,7 +194,7 @@ void QtSliderDoubleCombo::change_max( double new_max )
     this->block_signals( true );
     this->private_->ui_.spinBox->setMaximum( new_max );
   QString max_string;
-  max_string.setNum( new_max, 'g', 2 );
+  max_string.setNum( new_max, 'g', 3 );
     this->private_->ui_.max_->setText( max_string );
     this->block_signals( false );
 }
