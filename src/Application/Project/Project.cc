@@ -83,7 +83,8 @@ public:
   ProjectPrivate() :
     project_( 0 ),
     changed_( false ),
-    last_saved_session_time_stamp_( boost::posix_time::second_clock::local_time() )
+    last_saved_session_time_stamp_( boost::posix_time::second_clock::local_time() ),
+    need_anonymize_( false ) 
   { 
   }
 
