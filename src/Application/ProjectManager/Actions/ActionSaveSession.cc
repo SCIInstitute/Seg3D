@@ -81,7 +81,7 @@ bool ActionSaveSession::run( Core::ActionContextHandle& context,
       + "'. Please perform a 'Save Project As' as soon as possible to preserve your data." );       
   }
 
-  std::string success_message = std::string( "Successfully saved session '" ) + 
+  std::string success_message = std::string( "Successfully saved session for project: '" ) + 
     ProjectManager::Instance()->get_current_project()->project_name_state_->get() + "'.";
   CORE_LOG_SUCCESS( success_message );
 

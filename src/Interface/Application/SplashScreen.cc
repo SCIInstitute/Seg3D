@@ -148,7 +148,6 @@ void SplashScreen::unhide()
   this->show();
 }
 
-  
 void SplashScreen::open_existing()
 {
   boost::filesystem::path current_projects_path = boost::filesystem::absolute( 
@@ -179,7 +178,6 @@ void SplashScreen::open_existing()
     QString::fromStdString( project_type ), 
     QString::fromStdString( current_projects_path.string() ), 
     QString::fromStdString( project_file_type ) ) ).toStdString() ); 
-
 
   bool is_path_extension = false;
   for ( size_t j = 0; j < project_path_extensions.size(); j++ )

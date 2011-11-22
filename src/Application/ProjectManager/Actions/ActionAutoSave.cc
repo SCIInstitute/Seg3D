@@ -88,7 +88,7 @@ bool ActionAutoSave::run( Core::ActionContextHandle& context,
   {
     // TODO: Check whether this call is still needed here
     ProjectManager::Instance()->get_current_project()->reset_project_changed();
-    std::string message = std::string( "Successfully saved session '" ) + 
+    std::string message = std::string( "Successfully autosaved session for project: '" ) + 
       ProjectManager::Instance()->get_current_project()->project_name_state_->get() + "'.";
     CORE_LOG_SUCCESS( message );
     return true;

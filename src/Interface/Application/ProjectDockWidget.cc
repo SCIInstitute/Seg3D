@@ -304,6 +304,9 @@ ProjectDockWidget::ProjectDockWidget( QWidget *parent ) :
   this->private_->ui_.sessions_list_->setHorizontalHeaderLabels( headers );
   this->private_->ui_.horizontalLayout_2->setAlignment( Qt::AlignHCenter );
 
+  this->private_->ui_.session_name_linedit_->setValidator( new QRegExpValidator( 
+    QRegExp( QString::fromStdString( Core::StateName::REGEX_VALIDATOR_C ) ), this ) );
+
   connect( this->private_->ui_.save_session_button_, SIGNAL( clicked() ), 
     this, SLOT( save_session() ) );
 

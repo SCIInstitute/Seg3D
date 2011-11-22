@@ -69,7 +69,7 @@ bool StateIO::export_to_file( const boost::filesystem::path& path )
 
 bool StateIO::import_from_file( const boost::filesystem::path& path )
 {
-  if ( !this->private_->xml_doc_.LoadFile( path.string() ) )
+  if ( !this->private_->xml_doc_.LoadFile( path.string(), TiXmlEncoding::TIXML_ENCODING_UTF8 ) )
   {
     return false;
   }
