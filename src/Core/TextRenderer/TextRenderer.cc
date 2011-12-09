@@ -35,6 +35,9 @@
 
 #include <Core/Math/MathFunctions.h>
 #include <Core/TextRenderer/TextRenderer.h>
+#include <Core/Utils/Log.h>
+
+#include <boost/filesystem.hpp>
 
 #ifdef min
 #undef min
@@ -48,22 +51,37 @@ namespace Core
 {
 
 TextRenderer::TextRenderer() :
+  ft_library_(FreeTypeLibraryFactory::CreateLibrary()),
+  face_index_(0),
   valid_( true )
 {
-  this->ft_library_ = FreeTypeLibraryFactory::CreateLibrary();
-
 #if defined( _WIN32 )
   std::vector<char> buffer( MAX_PATH );
   GetWindowsDirectory( &buffer[0], MAX_PATH );
   this->font_file_.assign( &buffer[0] );
   this->font_file_ += "\\fonts\\arial.ttf";
-  this->face_index_ = 0;
 #elif defined( __APPLE__ )
   this->font_file_.assign( "/System/Library/Fonts/Helvetica.dfont" );
   this->face_index_ = 2;
 #else
-  this->font_file_.assign( "/usr/share/fonts/truetype/freefont/FreeSerif.ttf" );
-  this->face_index_ = 0;
+  const char* font_path = "/usr/share/fonts/truetype/freefont/FreeSerif.ttf";
+  if (! boost::filesystem::exists(font_path) )
+  {
+    // alternative path to freefont paths on some linux distros (OpenSuSE for example)
+    font_path = "/usr/share/fonts/truetype/FreeSerif.ttf";
+
+    if (! boost::filesystem::exists(font_path) )
+    {
+      // TODO: would it make sense to throw an exception here?
+      // object will be incompletely constructed if font path cannot be found
+      //
+      // alternatively, configure location of font path on program startup, so this check
+      // does not have to be run every time the object is constructed? (AYK)
+      CORE_LOG_ERROR( "Unable to locate FreeSerif.ttf in /usr/share/fonts/truetype/freefont or /usr/share/fonts/truetype." );
+      return;
+    }
+  }
+  this->font_file_.assign( font_path );
 #endif
 }
 
