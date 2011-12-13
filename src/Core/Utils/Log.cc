@@ -44,8 +44,6 @@ namespace Core
 
 CORE_SINGLETON_IMPLEMENTATION( Log );
 
-boost::timer log_timer;
-
 Log::Log()
 {
 }
@@ -60,7 +58,6 @@ std::string Log::header( const int line, const char* file ) const
 
   std::string header_string = std::string( "[" ) + 
     boost::posix_time::to_simple_string( timestamp ) + 
-    std::string( "|" ) + ExportToString( log_timer.elapsed() ) +
     std::string( "|" ) + filename.filename().string() +  
     std::string( "|" ) + ExportToString( line ) + std::string( "]" );
   return header_string;
