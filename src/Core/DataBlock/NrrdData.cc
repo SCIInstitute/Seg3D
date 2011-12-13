@@ -497,6 +497,7 @@ bool NrrdData::LoadNrrd( const std::string& filename, NrrdDataHandle& nrrddata, 
 
   Nrrd* nrrd = nrrdNew();
     boost::filesystem::path nrrd_path = boost::filesystem::path( filename ).parent_path();
+    std::string filename_only = boost::filesystem::path( filename ).filename().string();
     
     boost::system::error_code ec;
     boost::filesystem::path current_path = boost::filesystem::current_path( ec );
@@ -512,7 +513,7 @@ bool NrrdData::LoadNrrd( const std::string& filename, NrrdDataHandle& nrrddata, 
         return false;
     }
 
-  if ( nrrdLoad( nrrd, filename.c_str(), 0 ) )
+  if ( nrrdLoad( nrrd, filename_only.c_str(), 0 ) )
   {
     char *err = biffGet( NRRD );
     error = std::string( "Could not open file: " ) + filename + " : " + std::string( err );
