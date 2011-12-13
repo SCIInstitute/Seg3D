@@ -95,7 +95,7 @@ bool ActionExportSegmentation::validate( Core::ActionContextHandle& context )
         context->report_error( "Could not create ITK exporter." );
         return false;
       }
-    }
+    } 
   } 
 
   boost::filesystem::path segmentation_path( this->file_path_ );

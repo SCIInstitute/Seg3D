@@ -34,6 +34,9 @@
 #include <Core/Geometry/GridTransform.h>
 #include <Core/DataBlock/NrrdData.h>
 
+// Boost includes
+#include <boost/filesystem.hpp>
+
 namespace Core
 {
 
@@ -493,6 +496,22 @@ bool NrrdData::LoadNrrd( const std::string& filename, NrrdDataHandle& nrrddata, 
   lock_type lock( GetMutex() );
 
   Nrrd* nrrd = nrrdNew();
+    boost::filesystem::path nrrd_path = boost::filesystem::path( filename ).parent_path();
+    
+    boost::system::error_code ec;
+    boost::filesystem::path current_path = boost::filesystem::current_path( ec );
+    if ( ec )
+    {
+    error = std::string( "Could not open file: " ) + filename + " : Could not get current directory.";
+        return false;
+    }
+    boost::filesystem::current_path( nrrd_path, ec );
+    if ( ec )
+    {
+    error = std::string( "Could not open file: " ) + filename + " : Could not access path.";
+        return false;
+    }
+
   if ( nrrdLoad( nrrd, filename.c_str(), 0 ) )
   {
     char *err = biffGet( NRRD );
@@ -501,8 +520,10 @@ bool NrrdData::LoadNrrd( const std::string& filename, NrrdDataHandle& nrrddata, 
     biffDone( NRRD );
     nrrdNuke( nrrd );
     nrrddata.reset();
+        boost::filesystem::current_path( current_path, ec );
     return false;
   }
+    boost::filesystem::current_path( current_path, ec );
 
   if ( nrrd->dim < 2 )
   {
