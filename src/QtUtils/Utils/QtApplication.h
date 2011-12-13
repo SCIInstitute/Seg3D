@@ -100,6 +100,10 @@ public:
   // Triggered when the user stops resizing the application window.
   boost::signals2::signal< void () > exit_size_move_signal_;
 
+  // OSX_FILE_OPEN_EVENT_SIGNAL:
+  // Triggered via Mac OS X file associations
+  boost::signals2::signal< void (std::string) > osx_file_open_event_signal_;
+
 private:
   friend class QtApplicationPrivate;
   QtApplicationPrivate* private_;

@@ -57,6 +57,10 @@ Q_SIGNALS:
 public:
   SplashScreen( QWidget* parent = 0 );
   virtual ~SplashScreen();
+
+  // GET_USER_INTERACTED:
+  // this function returns whether or not the user has interacted with the splash screen
+  bool get_user_interacted(); 
   
 private:
   

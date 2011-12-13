@@ -45,6 +45,34 @@
 namespace QtUtils
 {
 
+
+class OverrideQApplication : public QApplication 
+{
+public:
+  OverrideQApplication( int& argc, char** argv ) : QApplication( argc, argv )
+  {
+  }
+  
+  virtual ~OverrideQApplication() 
+  {
+  }
+  
+protected:
+  bool event( QEvent *event ) 
+  {
+    if (event->type() == QEvent::FileOpen) 
+    {
+      std::string filename = ( static_cast< QFileOpenEvent* > ( event )->file() ).toStdString();
+      QtApplication::Instance()->osx_file_open_event_signal_( filename );
+      return true;
+    }
+    
+    return QApplication::event( event );
+  }
+};
+
+
+
 class QtApplicationPrivate
 {
 public:
@@ -96,7 +124,7 @@ bool QtApplication::setup( int& argc, char **argv )
   {
     // Step 1: Main application class
     CORE_LOG_DEBUG( "Creating QApplication" );
-    this->private_->qt_application_ = new QApplication( argc, argv );
+    this->private_->qt_application_ = new OverrideQApplication( argc, argv );
 
     // Set the event filter for QApplication
     this->private_->qt_application_->setEventFilter( &QtApplicationPrivate::FilterEvent );

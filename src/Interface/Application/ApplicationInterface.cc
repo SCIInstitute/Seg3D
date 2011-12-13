@@ -51,6 +51,7 @@
 #include <Application/ProjectManager/Actions/ActionLoadProject.h>
 
 // QtUtils includes
+#include <QtUtils/Utils/QtApplication.h>
 #include <QtUtils/Utils/QtPointer.h>
 #include <QtUtils/Bridge/QtBridge.h>
 
@@ -163,15 +164,7 @@ ApplicationInterface::ApplicationInterface( std::string file_to_view_on_open ) :
 #ifdef BUILD_WITH_PYTHON
   this->private_->python_console_ = new PythonConsoleWidget( this );
 #endif
-  
-  std::string extension = "";
-  if( file_to_view_on_open != "" )
-  {
-    extension = boost::filesystem::extension( boost::filesystem::path( file_to_view_on_open ) );
-    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
-      InterfaceManager::Instance()->splash_screen_visibility_state_, false );
-  }
-  
+
   this->private_->critical_message_active_ = false;
   
   // Instantiate the dock widgets
@@ -210,10 +203,6 @@ ApplicationInterface::ApplicationInterface( std::string file_to_view_on_open ) :
 //  QtUtils::QtBridge::Show( this->private_->history_dock_window_, 
 //    InterfaceManager::Instance()->history_dockwidget_visibility_state_ );
 
-  QtUtils::QtBridge::Show( this->private_->splash_screen_, 
-    InterfaceManager::Instance()->splash_screen_visibility_state_ );
-  this->center_seg3d_gui_on_screen( this->private_->splash_screen_ );
-  
   QtUtils::QtBridge::Show( this->private_->preferences_interface_, 
     InterfaceManager::Instance()->preferences_manager_visibility_state_ );
   
@@ -279,30 +268,18 @@ ApplicationInterface::ApplicationInterface( std::string file_to_view_on_open ) :
   
   this->private_->progress_ = new ProgressWidget( this->private_->viewer_interface_->parentWidget() );
   
-  if( file_to_view_on_open == "" ) return;
+  // add signal connection for OS X file assocation open event
+  this->add_connection( QtUtils::QtApplication::Instance()->osx_file_open_event_signal_.connect( boost::bind( 
+    &ApplicationInterface::handle_osx_file_open_event, this, _1 ) ) );
+
+  file_to_view_on_open = this->find_project_file( file_to_view_on_open );
+
+  this->open_initial_project ( file_to_view_on_open );
+
+  QtUtils::QtBridge::Show( this->private_->splash_screen_, 
+    InterfaceManager::Instance()->splash_screen_visibility_state_ );
+  this->center_seg3d_gui_on_screen( this->private_->splash_screen_ );
   
-  if( ( extension == ".nrrd" ) || ( extension == ".nhdr" ) )
-  {
-    // No location is set, so no project will be generated on disk for now
-    ActionNewProject::Dispatch( Core::Interface::GetWidgetActionContext(), 
-      "", "Untitled Project" );
-    LayerIOFunctions::ImportFiles( this, file_to_view_on_open );
-    return;
-  }
-  
-  std::vector<std::string> project_file_extensions = Project::GetProjectFileExtensions();
-  if ( std::find( project_file_extensions.begin(), project_file_extensions.end(), extension ) !=
-    project_file_extensions.end() )
-  {
-    ActionLoadProject::Dispatch( Core::Interface::GetWidgetActionContext(), file_to_view_on_open ); 
-  }
-  
-  std::vector<std::string> project_folder_extensions = Project::GetProjectPathExtensions();
-  if ( std::find( project_folder_extensions.begin(), project_folder_extensions.end(), extension ) !=
-    project_folder_extensions.end() )
-  {
-    ActionLoadProject::Dispatch( Core::Interface::GetWidgetActionContext(), file_to_view_on_open ); 
-  } 
 }
 
 ApplicationInterface::~ApplicationInterface()
@@ -636,5 +613,106 @@ void ApplicationInterface::HandleCriticalErrorMessage( qpointer_type qpointer, i
   Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, 
     boost::bind( &ApplicationInterface::raise_error_messagebox, qpointer.data(), msg_type, message ) ) );
 }
+
+void ApplicationInterface::handle_osx_file_open_event (std::string filename) 
+{
+  Seg3D::ProjectHandle current_project = Seg3D::ProjectManager::Instance()->get_current_project();
+  
+  // must do this to make sure a double-click on a project file doesn't use this executable session
+  bool new_session = InterfaceManager::Instance()->splash_screen_visibility_state_->get();
+  if ( this->private_->splash_screen_->get_user_interacted() ) 
+  {
+    new_session = false;
+  }
+  
+  if ( !new_session ) 
+  {
+    boost::filesystem::path app_filepath;
+    Core::Application::Instance()->get_application_filepath( app_filepath );
+    
+    std::string command = std::string( "" ) + 
+    app_filepath.parent_path().parent_path().string() + "/Contents/MacOS/Seg3D2 \"" + filename + "\" &";
+    
+    system( command.c_str() );
+  } 
+  else 
+  {
+    std::vector<std::string> project_file_extensions = Project::GetProjectFileExtensions(); 
+    
+    filename = this->find_project_file ( filename );
+ 
+    this->open_initial_project (filename);
+  }
+}
+
+
+std::string ApplicationInterface::find_project_file ( std::string path )
+{
+  std::vector<std::string> project_file_extensions = Project::GetProjectFileExtensions(); 
+
+  boost::filesystem::path full_path =  boost::filesystem::path(path);
+
+  bool found_s3d_file = false;
+
+  if ( boost::filesystem::is_directory( full_path ) )
+  {
+    boost::filesystem::directory_iterator dir_end;
+    for( boost::filesystem::directory_iterator dir_itr( full_path ); 
+         dir_itr != dir_end; ++dir_itr )
+    {
+      std::string file = dir_itr->path().filename().string();
+      boost::filesystem::path dir_file = full_path / file;
+      for ( size_t j = 0; j < project_file_extensions.size(); j++ )
+      {
+        if ( boost::filesystem::extension( dir_file ) ==project_file_extensions[ j ] )
+        {
+          full_path = dir_file;
+          path = full_path.string();
+          found_s3d_file = true;
+          break;
+        }
+      }
+    
+      if ( found_s3d_file ) break;
+    }
+  }
+  return path;
+}
+
+void ApplicationInterface::open_initial_project ( std::string filename )
+{
+  if ( filename == "" ) return;
+  
+  std::string extension = boost::filesystem::extension( boost::filesystem::path( filename ) );
+
+  std::cerr << "Turning off splash screen!\n";
+  Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
+                             InterfaceManager::Instance()->splash_screen_visibility_state_, false );
+  
+  if ( ( extension == ".nrrd" ) || ( extension == ".nhdr" ) )
+  {
+    // No location is set, so no project will be generated on disk for now
+    ActionNewProject::Dispatch( Core::Interface::GetWidgetActionContext(), 
+                                "", "Untitled Project" );
+    LayerIOFunctions::ImportFiles( NULL, filename );
+    return;
+  }
+  
+  std::vector<std::string> project_file_extensions = Project::GetProjectFileExtensions(); 
+  if ( std::find( project_file_extensions.begin(), project_file_extensions.end(), extension ) !=
+       project_file_extensions.end() )
+  {
+    ActionLoadProject::Dispatch( Core::Interface::GetWidgetActionContext(), filename ); 
+  }
+  
+  std::vector<std::string> project_folder_extensions = Project::GetProjectPathExtensions();
+  if ( std::find( project_folder_extensions.begin(), project_folder_extensions.end(), extension ) !=
+       project_folder_extensions.end() )
+  {
+    ActionLoadProject::Dispatch( Core::Interface::GetWidgetActionContext(), filename ); 
+  } 
+}
+
+
 
 } // end namespace Seg3D

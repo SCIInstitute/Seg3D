@@ -104,14 +104,26 @@ private:
   
   void set_full_screen( bool full_screen );
   
-  // SET_PROJECT_NAME
+  // SET_PROJECT_NAME:
   // Update the name of the project in the title bar
   void set_project_name( std::string project_name );
   
-  // UPDATE_PROJECT_CONNECTIONS
+  // UPDATE_PROJECT_CONNECTIONS:
   // Update the project connections when a new project is opened
   void update_project_connections();
+
+  // HANDLE_OSX_FILE_OPEN_EVENT:
+  // Open a file via OS X file associations
+  void handle_osx_file_open_event ( std::string filename );
+
+  // FILE_PROJECT_FILE:
+  // Finds the project file within a bundle directory, or returns the project file if already given
+  std::string find_project_file ( std::string path );
   
+  // OPEN_INITIAL_PROJECT:
+  // Opens a project on startup
+  void open_initial_project ( std::string filename );
+
   // NOTE:
   // We need to override these events for the progress widget that draws an transparent layer
   // over the full GUI.
