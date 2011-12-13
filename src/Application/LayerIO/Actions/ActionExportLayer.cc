@@ -75,6 +75,7 @@ bool ActionExportLayer::validate( Core::ActionContextHandle& context )
   {
     if( this->extension_ == ".nrrd" ) this->exporter_ = "NRRD Exporter";
     else if( this->extension_ == ".mat" ) this->exporter_ = "Matlab Exporter";
+    else if( this->extension_ == ".dcm" ) this->exporter_ = "ITK Data Exporter";
     else if( this->extension_ == ".mrc" ) this->exporter_ = "MRC Exporter";
     else if( this->extension_ != "" ) this->exporter_ = "ITK Data Exporter";
   }

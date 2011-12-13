@@ -212,11 +212,11 @@ SegmentationSelectionPage::SegmentationSelectionPage( SegmentationPrivateHandle 
   this->private_->export_selector_->addItem( QString::fromUtf8( ".bmp" ) );
   this->private_->export_selector_->addItem( QString::fromUtf8( ".png" ) );
   this->private_->export_selector_->setCurrentIndex( 0 );
-  this->private_->export_selector_->setEnabled( false );
+  this->private_->export_selector_->setEnabled( true );
   this->private_->bitmap_layout_->addWidget( this->private_->export_selector_ );
   
-  connect( this->private_->export_selector_, SIGNAL( currentIndexChanged( int ) ), this,
-    SLOT( change_type_text( int ) ) );
+  // connect( this->private_->export_selector_, SIGNAL( currentIndexChanged( int ) ), this,
+  //  SLOT( change_type_text( int ) ) );
   
   this->private_->warning_message_ = new QLabel( QString::fromUtf8( "This location does not exist, please choose a valid location." ) );
   this->private_->warning_message_->setObjectName( QString::fromUtf8( "warning_message_" ) );
@@ -346,13 +346,18 @@ bool SegmentationSelectionPage::validatePage()
   
   if( this->private_->single_file_radio_button_->isChecked() )
   {
+        std::string file_type = this->private_->export_selector_->currentText().toStdString();
+        std::string file_selector = Core::StringToUpper( file_type.substr( 1 ) ) + 
+             " File (*"  + file_type + ")";
+    
     filename = QFileDialog::getSaveFileName( this, "Export Segmentation As... ",
-      current_folder.string().c_str(), "NRRD File (*.nrrd)" );
+      current_folder.string().c_str(), QString::fromStdString( file_selector ) );
   }
   else
   {
     filename = QFileDialog::getExistingDirectory( this, tr( "Choose Directory for Export..." ),
-      current_folder.string().c_str(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks );
+      current_folder.string().c_str(), QFileDialog::ShowDirsOnly | 
+                QFileDialog::DontResolveSymlinks );
       
     if( !QFileInfo( filename ).exists() )
     {
@@ -499,11 +504,8 @@ bool SegmentationSummaryPage::validatePage()
   LayerExporterHandle exporter;
   bool result = false;
   std::string extension = this->private_->export_selector_->currentText().toStdString();
-  if( this->private_->single_file_radio_button_->isChecked() )
-  {
-    result = LayerIO::Instance()->create_exporter( exporter, layers, "NRRD Exporter", ".nrrd" );
-  }
-  else if( extension == ".mat" )
+    
+    if( extension == ".mat" )
   {
     result = LayerIO::Instance()->create_exporter( exporter, layers, "Matlab Exporter", extension );
   }

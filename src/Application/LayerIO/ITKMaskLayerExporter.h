@@ -54,7 +54,7 @@ namespace Seg3D
 
 class ITKMaskLayerExporter : public LayerExporter
 {
-  SEG3D_EXPORTER_TYPE( "ITK Mask Exporter", ".tiff;.bmp;.png" )
+  SEG3D_EXPORTER_TYPE( "ITK Mask Exporter", ".tiff;.bmp;.png;.dcm" )
 
   // -- Constructor/Destructor --
 public:
@@ -70,6 +70,11 @@ public:
 public:
   virtual void set_extension( std::string extension ){ this->extension_ = extension; }
   
+    virtual void set_label_layer_values( std::vector< double > values )
+  { 
+    this->label_values_ = values;
+  }
+  
   // --Import the data as a specific type --  
 public: 
 
@@ -82,6 +87,7 @@ private:
   Core::DataType pixel_type_;
   std::string extension_;
 
+  std::vector< double > label_values_;
 };
 
 } // end namespace seg3D

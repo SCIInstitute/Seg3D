@@ -58,14 +58,17 @@ bool MatlabLayerExporter::export_layer( const std::string& mode, const std::stri
   boost::filesystem::path path = boost::filesystem::path( file_path ) / ( name + ".mat" );
   bool success;
   
+    // Export data as single volume file
   if ( mode == "data" )
   {
-    success = this->export_nrrd( path.string() );
+    success = this->export_matfile( path.string() );
   }
+    // Export data as separate files
   else if ( mode == "single_mask" )
   {
     success = this->export_single_masks( file_path );
   }
+    // Export data as a single file
   else if ( mode == "label_mask" )
   {
     success = this->export_mask_label( path.string() );
@@ -75,18 +78,16 @@ bool MatlabLayerExporter::export_layer( const std::string& mode, const std::stri
   return success;
 }
 
-bool MatlabLayerExporter::export_nrrd( const std::string& file_path )
+bool MatlabLayerExporter::export_matfile( const std::string& file_path )
 {
   DataLayer* layer = dynamic_cast< DataLayer* >( 
     this->layers_[ 0 ].get() );
-
 
   MatlabIO::matlabarray mldata;
   std::vector<int> dims( 3 );
   dims[ 0 ] = layer->get_data_volume()->get_nx(); 
   dims[ 1 ] = layer->get_data_volume()->get_ny(); 
   dims[ 2 ] = layer->get_data_volume()->get_nz(); 
-  
   
   MatlabIO::matlabarray::mitype dataformat;
   switch( layer->get_data_volume()->get_data_type() )
@@ -366,7 +367,7 @@ bool MatlabLayerExporter::export_mask_label( const std::string& file_path )
 {
   // Step 1: We get a pointer to one of the MaskLayers so we can get its MaskDataBlock
   std::vector < std::string > first_mask_name_and_number;
-  MaskLayer* layer = dynamic_cast< MaskLayer* >( this->layers_[ 0 ].get() );
+  MaskLayer* layer = dynamic_cast< MaskLayer* >( this->layers_[ 1 ].get() );
 
   // Step 2: Get a handle to its MaskDataBlock and use that to build a new DataBlockHandle of the 
   // same size and type.
@@ -378,7 +379,7 @@ bool MatlabLayerExporter::export_mask_label( const std::string& file_path )
   // datablock to that value
   for( size_t i = 0; i < mask_block->get_size(); ++i )
   {
-    new_data_block->set_data_at( i, this->label_values_[ 0 ]  );
+    new_data_block->set_data_at( i, this->label_values_[ 0 ] );
   }
   
   // Step 4: Loop through all the MaskLayers and insert their values into our new DataBlock

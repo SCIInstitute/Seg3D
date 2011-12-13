@@ -36,7 +36,8 @@
 #include <itkGDCMImageIO.h>
 #include <itkMetaDataObject.h>
 
-// gdcm includes
+// GDCM includes
+#include <gdcmImageHelper.h>
 #include <gdcmUIDGenerator.h>
 
 // Core includes
@@ -254,10 +255,6 @@ bool export_dicom_series( const std::string& file_path, const std::string& file_
 
       // [Series Instance UID]
       itk::EncapsulateMetaData<std::string>( **dict_iter, "0020|000e", series_uid );
-      // [SOP Instance UID]
-      // itk::EncapsulateMetaData<std::string>( **dict_iter, "0008|0018", sop_uid );
-      // [Media Stored SOP Instance UID] 
-      // itk::EncapsulateMetaData<std::string>( **dict_iter, "0002|0003", sop_uid );
       // [ Window Center ]
       itk::EncapsulateMetaData<std::string>( **dict_iter, "0028|1050", data_center );
       // [ Window Width ]

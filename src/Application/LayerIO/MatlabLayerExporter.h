@@ -71,7 +71,7 @@ public:
   }
     
 private:
-  bool export_nrrd( const std::string& file_path );
+  bool export_matfile( const std::string& file_path );
   bool export_single_masks( const std::string& file_path );
   bool export_mask_label( const std::string& file_path );
   

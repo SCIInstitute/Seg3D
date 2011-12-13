@@ -33,13 +33,10 @@
 # pragma once
 #endif 
 
-// GDCM includes
-#include "gdcmImageHelper.h"
-
 // ITK includes
-#include "itkImageSeriesWriter.h"
-#include "itkGDCMImageIO.h"
-#include "itkNumericSeriesFileNames.h"
+#include <itkImageSeriesWriter.h>
+#include <itkGDCMImageIO.h>
+#include <itkNumericSeriesFileNames.h>
 
 // Boost includes
 #include <boost/filesystem.hpp>

@@ -1302,13 +1302,12 @@ void LayerWidget::contextMenuEvent( QContextMenuEvent * event )
   
   QMenu* export_menu;
   export_menu = new QMenu( this );
-  if( this->private_->layer_->get_type() == Core::VolumeType::DATA_E )
-  {
+    
     export_menu->setTitle( tr( "Export Data As..." ) );
     qaction = export_menu->addAction( tr( "DICOM" ) );
     connect( qaction, SIGNAL( triggered() ), this, SLOT( export_dicom() ) );
-  }
-  else
+
+  if( this->private_->layer_->get_type() == Core::VolumeType::MASK_E )
   {
     export_menu->setTitle( tr( "Export Segmentation As..." ) );
     
