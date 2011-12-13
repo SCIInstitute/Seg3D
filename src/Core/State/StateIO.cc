@@ -29,6 +29,9 @@
 // STL includes
 #include <stack>
 
+// Boost includes
+#include <boost/filesystem.hpp>
+
 // Core includes
 #include <Core/State/StateIO.h>
 #include <Core/Utils/StringUtil.h>
@@ -69,14 +72,29 @@ bool StateIO::export_to_file( const boost::filesystem::path& path )
 
 bool StateIO::import_from_file( const boost::filesystem::path& path )
 {
+    std::string error;
+    return this->import_from_file( path, error );
+}
+
+bool StateIO::import_from_file( const boost::filesystem::path& path,
+    std::string& error )
+{
+    if ( ! boost::filesystem::exists( path ) )
+    {
+        error = std::string( "File '" ) + path.string() + "' does not exist.";
+        return false;
+    }
+
   if ( !this->private_->xml_doc_.LoadFile( path.string(), TIXML_ENCODING_UTF8 ) )
   {
+        error = "Could not parse the contents of the file.";
     return false;
   }
   
   this->private_->current_element_ = this->private_->xml_doc_.FirstChildElement();
   if ( this->private_->current_element_ == 0 )
   {
+        error = "File does not contain valid XML tags.";
     return false;
   }
 

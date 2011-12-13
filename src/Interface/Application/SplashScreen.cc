@@ -221,7 +221,7 @@ void SplashScreen::open_existing()
       QMessageBox::critical( this, 
         "Error reading project file",
         "Error reading project file:\n"
-        "The project file is incomplete." );
+        "The project is incomplete." );
       return;   
     }
   }
@@ -230,11 +230,10 @@ void SplashScreen::open_existing()
 
   if( boost::filesystem::exists( full_path ) )
   {
-    if ( ! ProjectManager::CheckProjectFile( full_path ) )
+        std::string error;
+    if ( ! ProjectManager::CheckProjectFile( full_path, error ) )
     {
-      std::string error = std::string( "Error reading project file:\n"
-        "The project file was saved with newer version of " ) +
-        Core::Application::GetApplicationName();
+            Core::Application::GetApplicationName();
       QMessageBox::critical( 0, 
         "Error reading project file",
         QString::fromStdString( error ) );
@@ -262,12 +261,12 @@ void SplashScreen::open_recent()
     return;
   }
   
-  if ( ! ProjectManager::CheckProjectFile( project_file ) )
+    std::string error;
+  if ( ! ProjectManager::CheckProjectFile( project_file, error ) )
   {
     QMessageBox::critical( 0, 
       "Error reading project file",
-      "Error reading project file:\n"
-      "The project file was saved with newer version of Seg3D." );
+      QString::fromStdString( error ) );
     return;
   }
 

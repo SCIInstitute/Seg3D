@@ -795,16 +795,20 @@ bool ProjectManager::get_recent_projects( ProjectInfoList& recent_projects )
 
 //////////////////////////////////////////////
 
-bool ProjectManager::CheckProjectFile( const boost::filesystem::path& path )
+bool ProjectManager::CheckProjectFile( const boost::filesystem::path& path, std::string& error )
 {
   Core::StateIO stateio;
 
   // Check whether the XML file can be imported
-  if ( ! stateio.import_from_file( path ) ) return false;
-  
+  if ( ! stateio.import_from_file( path, error ) )
+    {
+        return false;
+  }
+    
   // Check whether the version is equal or lower to the program version
   if ( stateio.get_major_version() > Core::Application::GetMajorVersion() )
   {
+        error = "This project was saved with a newer version of Seg3D.";
     return false;
   }
   
@@ -813,6 +817,7 @@ bool ProjectManager::CheckProjectFile( const boost::filesystem::path& path )
   {
     if ( stateio.get_minor_version() > Core::Application::GetMinorVersion() )
     {
+            error = "This project was saved with a newer version of Seg3D.";
       return false;
     }
   }

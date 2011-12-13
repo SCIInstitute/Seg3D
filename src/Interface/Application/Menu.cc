@@ -713,12 +713,12 @@ void Menu::open_project()
 
   if( boost::filesystem::exists( full_path ) )
   { 
-    if ( ! ProjectManager::CheckProjectFile( full_path ) )
+        std::string error;
+    if ( ! ProjectManager::CheckProjectFile( full_path, error ) )
     {
       QMessageBox::critical( this->main_window_, 
         "Error reading project file",
-        "Error reading project file:\n"
-        "The project file was saved with newer version of Seg3D" );
+        QString::fromStdString( error ) );
       return;
     }
 

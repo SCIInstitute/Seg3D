@@ -59,7 +59,9 @@ public:
   TiXmlElement* get_current_element();
 
   bool import_from_file( const boost::filesystem::path& path );
-  bool export_to_file( const boost::filesystem::path& path );
+    bool import_from_file( const boost::filesystem::path& path, std::string& error );
+  
+    bool export_to_file( const boost::filesystem::path& path );
 
   void push_current_element() const;
   void pop_current_element() const;

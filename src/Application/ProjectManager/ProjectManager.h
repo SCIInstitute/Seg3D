@@ -151,7 +151,8 @@ public:
   
   // CHECKPROJECTFILE:
   // Check if a file is a valid project
-  static bool CheckProjectFile( const boost::filesystem::path& path );  
+  static bool CheckProjectFile( const boost::filesystem::path& path, 
+        std::string& error ); 
 };
 
 } // end namespace seg3d
