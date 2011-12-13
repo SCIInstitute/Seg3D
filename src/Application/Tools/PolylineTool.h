@@ -48,6 +48,7 @@ SEG3D_TOOL
   SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+6" )
   SEG3D_TOOL_URL( "http://www.sci.utah.edu/SCIRunDocs/index.php/CIBC:Seg3D2:PolylineTool:1" )
   SEG3D_TOOL_HOTKEYS( "Add Point=Left Mouse Button|Move Point=Left Mouse Button"
+    "|Move Polyline=SHIFT + Left Mouse Button"
     "|Delete Point=Right Mouse Button"
     "|Paint Floodfill=F|Erase Floodfill=E" )  
 )
