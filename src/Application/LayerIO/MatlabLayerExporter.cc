@@ -223,7 +223,7 @@ bool MatlabLayerExporter::export_matfile( const std::string& file_path )
   mlarray.setfield( 0, "axis", axisma );
 
   MatlabIO::matlabfile output( file_path, "w" );
-  output.putmatlabarray( mlarray, "data_volume" );
+  output.putmatlabarray( mlarray, "scirunnrrd" );
   
   return true;
 }
@@ -357,7 +357,7 @@ bool MatlabLayerExporter::export_single_masks( const std::string& path )
       ( layer->get_layer_name() + ".mat" );
       
     MatlabIO::matlabfile output( mask_path.string(), "w" );
-    output.putmatlabarray( mlarray, "mask_volume" );    
+    output.putmatlabarray( mlarray, "scirunnrrd" );   
       
   }
   return true;
@@ -488,7 +488,7 @@ bool MatlabLayerExporter::export_mask_label( const std::string& file_path )
   mlarray.setfield( 0, "axis", axisma );
 
   MatlabIO::matlabfile output( file_path, "w" );
-  output.putmatlabarray( mlarray, "mask_volume" );  
+  output.putmatlabarray( mlarray, "scirunnrrd" ); 
 
   return true;
 }
