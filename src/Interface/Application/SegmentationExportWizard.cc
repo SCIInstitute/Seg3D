@@ -187,9 +187,6 @@ SegmentationSelectionPage::SegmentationSelectionPage( SegmentationPrivateHandle 
   this->private_->individual_files_radio_button_->setText( 
     QString::fromUtf8( "Save masks as individual files" ) );
   this->private_->radio_button_group_->addButton( this->private_->individual_files_radio_button_, 1 );
-  
-  connect( this->private_->radio_button_group_, SIGNAL( buttonClicked( int ) ), this, 
-    SLOT( enable_disable_bitmap_button( int ) ) );
 
   this->private_->horizontalLayout_5->addWidget( this->private_->individual_files_radio_button_ );
   this->private_->horizontalLayout_1->addWidget( this->private_->multiple_files_widget_ );
@@ -211,6 +208,7 @@ SegmentationSelectionPage::SegmentationSelectionPage( SegmentationPrivateHandle 
   this->private_->export_selector_->addItem( QString::fromUtf8( ".tiff" ) );
   this->private_->export_selector_->addItem( QString::fromUtf8( ".bmp" ) );
   this->private_->export_selector_->addItem( QString::fromUtf8( ".png" ) );
+  this->private_->export_selector_->addItem( QString::fromUtf8( ".dcm" ) );
   this->private_->export_selector_->setCurrentIndex( 0 );
   this->private_->export_selector_->setEnabled( true );
   this->private_->bitmap_layout_->addWidget( this->private_->export_selector_ );
@@ -229,18 +227,6 @@ SegmentationSelectionPage::SegmentationSelectionPage( SegmentationPrivateHandle 
   this->private_->selection_main_layout_->addWidget( this->private_->bitmap_widget_ );
 
   this->private_->single_file_radio_button_->setChecked( true );
-}
-  
-void SegmentationSelectionPage::enable_disable_bitmap_button( int button_id )
-{
-  if( button_id == 0 )
-  {
-    this->private_->export_selector_->setEnabled( false );
-  }
-  else
-  {
-    this->private_->export_selector_->setEnabled( true );
-  }
 }
   
 void SegmentationSelectionPage::change_type_text( int index )

@@ -395,6 +395,7 @@ bool ITKMaskLayerExporter::export_layer( const std::string& mode, const std::str
     }
     else
     {
+        bool success = true;
         for( size_t j = 0; j < this->layers_.size(); j++ )
         {
             MaskLayerHandle mask = boost::dynamic_pointer_cast< MaskLayer >( this->layers_[ j ] );
@@ -406,15 +407,17 @@ bool ITKMaskLayerExporter::export_layer( const std::string& mode, const std::str
 
             if ( is_dicom )
             {
-                return export_dicom_series( file_path, ( mask->get_layer_name() + this->extension_ ), 
+                success = export_dicom_series( file_path, ( mask->get_layer_name() + this->extension_ ), 
                     volume, mask->get_meta_data() );            
             }
             else
             {
-                return export_mask_series( file_path, ( mask->get_layer_name() + this->extension_ ), 
+                success = export_mask_series( file_path, ( mask->get_layer_name() + this->extension_ ), 
                     volume, mask->get_meta_data() );
             }
         }
+        
+        return success;
     }
     
   CORE_LOG_SUCCESS( "Segmentation export has been successfully completed." );

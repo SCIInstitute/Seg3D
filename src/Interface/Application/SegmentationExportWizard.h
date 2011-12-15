@@ -75,7 +75,6 @@ protected:
   virtual bool validatePage();
   
 private Q_SLOTS:
-  void enable_disable_bitmap_button( int button_id );
   void change_type_text( int index );
   
 private:
