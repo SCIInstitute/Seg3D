@@ -32,7 +32,7 @@
 #include <Windows.h>
 #endif
 #ifdef __APPLE__
-#include <AGL/AGL.h>
+#include <AGL/agl.h>
 #endif
 
 // boost includes
