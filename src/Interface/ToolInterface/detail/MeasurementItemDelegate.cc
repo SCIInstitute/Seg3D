@@ -35,6 +35,9 @@
 // Interface includes
 #include <Interface/ToolInterface/detail/MeasurementItemDelegate.h>
 
+// Core includes
+#include <Core/Geometry/Measurement.h>
+
 namespace Seg3D
 {
 
@@ -107,6 +110,8 @@ const QModelIndex &index ) const
   else if( index.column() == this->name_column_ )
   {
     QLineEdit* line_edit = new QLineEdit( parent );
+    line_edit->setValidator( new QRegExpValidator( 
+      QRegExp( QString::fromStdString( Core::Measurement::REGEX_VALIDATOR_C ) ), parent ) );
     return line_edit;
   }
   else

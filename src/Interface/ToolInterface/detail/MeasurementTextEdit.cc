@@ -26,6 +26,9 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Qt includes
+#include <QKeyEvent>
+
 // Interface includes
 #include <Interface/ToolInterface/detail/MeasurementTextEdit.h>
 
@@ -41,6 +44,15 @@ void MeasurementTextEdit::focusOutEvent( QFocusEvent * e )
 {
   QTextEdit::focusOutEvent( e );
   Q_EMIT this->editing_finished( this->toPlainText().toStdString() );
+}
+
+void MeasurementTextEdit::keyPressEvent( QKeyEvent * e )
+{
+  // Disallow brackets since these are used as special characters for parsing
+  if( !( e->key() == Qt::Key_BracketLeft || e->key() == Qt::Key_BracketRight ) )
+  {
+    QTextEdit::keyPressEvent( e );
+  }
 }
 
 } // end namespace Seg3D

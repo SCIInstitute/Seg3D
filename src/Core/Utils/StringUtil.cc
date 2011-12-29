@@ -475,6 +475,69 @@ std::vector<std::string> SplitString( const std::string& str, const std::string&
   return option_list;
 }
 
+void AppendSpaceSplitSubstring( std::string str, size_t string_start, size_t string_end, 
+                 std::vector< std::string >& value )
+{
+  std::string sub_str = 
+    str.substr( string_start, string_end - string_start + 1 );
+  std::vector< std::string > space_strings = SplitString( sub_str, " " );
+  for( size_t str_idx = 0; str_idx < space_strings.size(); str_idx++ ) 
+  {
+    if( space_strings[ str_idx ] != "" )
+    {
+      value.push_back( space_strings[ str_idx ] );
+    }
+  }
+}
+
+std::vector<std::string> SplitStringByBracketsThenSpaces( const std::string& str )
+{
+  std::string data = str;
+  std::vector<std::string> value;
+
+  size_t j = 0;
+  size_t space_string_start = 0; // Inclusive
+  // Loop over all characters in string
+  while ( j < data.size() )
+  {
+    // If a start bracket is found, go until matching end bracket is found
+    if ( data[ j ] == '[' )
+    {
+      // Split the preceding string by spaces and add it to the vector
+      if( j > space_string_start )
+      {
+        size_t space_string_end = j - 1; // Inclusive
+        AppendSpaceSplitSubstring( data, space_string_start, space_string_end, value );
+      }
+
+      j++;
+      size_t start = j;
+      size_t paren_count = 0;
+
+      while ( j < data.size() && ( data[ j ] != ']' || paren_count > 0 ) )
+      {
+        if ( data[ j ] == '[' ) paren_count++;
+        if ( data[ j ] == ']' ) paren_count--;
+        j++;
+      }
+
+      // if there is no end bracket
+      if ( j == data.size() ) return value;
+
+      value.push_back( data.substr( start, j-start ) );
+      space_string_start = j + 1;
+    }
+    else if( j == data.size() - 1 ) // Reached end of string
+    {
+      // Split the preceding string by spaces and add it to the vector
+      size_t space_string_end = j; // Inclusive
+      AppendSpaceSplitSubstring( data, space_string_start, space_string_end, value );
+    }
+    j++;
+  }
+
+  return value;
+}
 
 std::string ExportToString( bool value )
 {

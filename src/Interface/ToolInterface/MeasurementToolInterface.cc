@@ -230,6 +230,10 @@ bool MeasurementToolInterface::build_widget( QFrame* frame )
   QObject::connect( this->private_->ui_.color_button_, SIGNAL( clicked() ), 
     this, SLOT( handle_color_button_clicked() ) );
 
+  // Don't allow brackets in name
+  this->private_->ui_.name_lineedit_->setValidator( new QRegExpValidator( 
+    QRegExp( QString::fromStdString( Core::Measurement::REGEX_VALIDATOR_C ) ), this ) );
+  
   // Initialize GUI values
   UpdateGeneralTab( measurement_interface );
   UpdateActiveTab( measurement_interface );

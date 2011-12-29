@@ -165,6 +165,10 @@ void StripSurroundingSpaces( std::string& str );
 // strings
 std::vector<std::string> SplitString( const std::string& str, const std::string& delimiter );
 
+// Split string first by outer bracket pairs [] then by spaces.  Useful for parsing a string made up
+// of concatenated results of ExportToString (separated by spaces).
+std::vector<std::string> SplitStringByBracketsThenSpaces( const std::string& str );
+
 } // End namespace Core
 
 #endif

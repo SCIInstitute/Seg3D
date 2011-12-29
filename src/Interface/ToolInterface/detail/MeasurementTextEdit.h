@@ -53,6 +53,8 @@ protected:
 
   void focusOutEvent( QFocusEvent * e );
 
+  void keyPressEvent( QKeyEvent * e ); 
+
 public:
   
   //
