@@ -113,7 +113,7 @@ private:
 
 public:
   // Backwards compatibility -- old code used comment delimiter
-  static const std::string Measurement::COMMENT_DELIMITER_C;
+  static const std::string COMMENT_DELIMITER_C;
   static const Color DEFAULT_COLOR_C;
   // The regular expression for validating a name or comment string
   const static std::string REGEX_VALIDATOR_C;
