@@ -671,7 +671,7 @@ std::string ExportToString( const std::vector< std::string >& value )
   std::string result( "[" );
   while ( it != it_end )
   {
-    result += '[' + ToString( *it ) + ']' + ',';
+    result += '[' + *it + ']' + ',';
     ++it;
   }
   if ( result.size() > 1 )
