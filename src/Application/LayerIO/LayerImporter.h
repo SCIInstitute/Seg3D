@@ -108,7 +108,15 @@ public:
   // SET_ERROR
   // Set the error message
   void set_error( const std::string& error );
+
+  // GET_WARNING
+  // Get the last warning recorded in the importer
+  std::string get_warning() const;
   
+  // SET_WARNING
+  // Set the warning message
+  void set_warning( const std::string& warning );
+
   // -- file_importer_id handling --
 public:
   // GET_INPUTFILES_ID:

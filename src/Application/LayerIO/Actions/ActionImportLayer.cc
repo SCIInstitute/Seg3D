@@ -174,9 +174,14 @@ bool ActionImportLayer::run( Core::ActionContextHandle& context, Core::ActionRes
   if ( !( this->layer_importer_->get_file_data( data ) ) )
   {
     if ( this->sandbox_ == -1 ) progress->end_progress_reporting();
+        std::string importer_error = this->layer_importer_->get_error();
+        if ( importer_error.size() ) context->report_error( importer_error );
     context->report_error( "Layer importer failed to extract volume data from file." );
     return false;
   }
+
+    std::string importer_warning = this->layer_importer_->get_warning();
+    if ( importer_warning.size() ) context->report_warning( importer_warning );
   
   // Now convert this abstract intermediate into layers that can be inserted in the program
   // NOTE: This step is only reformatting the header of the data and adds the state variables

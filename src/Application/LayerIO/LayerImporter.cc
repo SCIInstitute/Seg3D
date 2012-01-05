@@ -37,6 +37,7 @@ class LayerImporterPrivate
 {
 public:
   std::string error_; 
+  std::string warning_; 
   
   InputFilesID inputfiles_id_;
 };
@@ -60,6 +61,16 @@ void LayerImporter::set_error( const std::string& error )
 std::string LayerImporter::get_error() const
 {
   return this->private_->error_;
+}
+
+void LayerImporter::set_warning( const std::string& warning )
+{
+  this->private_->warning_ = warning;
+}
+
+std::string LayerImporter::get_warning() const
+{
+  return this->private_->warning_;
 }
 
 void LayerImporter::set_dicom_swap_xyspacing_hint( bool )

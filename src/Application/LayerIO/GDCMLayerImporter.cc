@@ -274,6 +274,10 @@ bool GDCMLayerImporterPrivate::read_header()
         this->z_spacing_ = thickness;
         found_thickness = true;
       }
+            else
+            {
+                this->importer_->set_warning( "Encountered an incorrect value in the slice thickness tag." );
+            }
     }
   }
   else if( ds.FindDataElement( slice_distance_tag ) )
@@ -289,9 +293,12 @@ bool GDCMLayerImporterPrivate::read_header()
         this->z_spacing_ = thickness;
         found_thickness = true;
       }
+            else
+            {
+                this->importer_->set_warning( "Encountered an incorrect value in the slice distance tag." );
+            }
     }
   }
-  
   
   if ( filenames.size() > 1 && ds.FindDataElement( patient_position_tag ) )
   {
@@ -311,6 +318,12 @@ bool GDCMLayerImporterPrivate::read_header()
     Core::Vector dir = origin_vec2 - origin_vec;
     
     double spacing = dir.length();
+        
+        if ( found_thickness && Core::Abs( this->z_spacing_ - spacing ) > epsilon )
+        {
+            this->importer_->set_warning( "Slice spacing in DICOM header is inconsistent, using the patient slice location to derive the z spacing." );
+        }
+        
     if ( spacing < -epsilon || spacing > epsilon ) 
     {
       this->z_spacing_ = spacing; 
@@ -319,11 +332,13 @@ bool GDCMLayerImporterPrivate::read_header()
     }
     else 
     {
+            this->importer_->set_warning( "Slice spacing in DICOM header is too close to zero, reseting it to 1.0." );
       this->z_spacing_ = 1.0;
     }
   }
   else if ( found_thickness == false )
   {
+        this->importer_->set_warning( "No slice spacing is assigned in the DICOM header." );
     this->z_spacing_ = 1.0;
   }
   
