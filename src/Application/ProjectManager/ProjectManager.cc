@@ -139,9 +139,12 @@ bool ProjectManagerPrivate::initialize_project_database()
 bool ProjectManagerPrivate::load_or_create_project_database()
 {
   // Find the directory where user settings are stored
-  Core::Application::Instance()->get_config_directory( this->project_db_file_ );
-  this->project_db_file_ = this->project_db_file_ / PROJECT_DATABASE_C;
-
+    if ( Core::Application::Instance()->get_config_directory( this->project_db_file_ ) )
+    {
+        this->project_db_file_ = this->project_db_file_ / PROJECT_DATABASE_C;
+        CORE_LOG_ERROR( "Could not access user directory." );
+    }
+    
   this->project_database_.reset( new DatabaseManager );
   std::string error;
   if ( boost::filesystem::exists( this->project_db_file_ ) &&
@@ -334,7 +337,7 @@ void ProjectManagerPrivate::cleanup_project_database()
   }
   
   // If the database was changed, save it out
-  if ( changed && !this->project_database_->save_database( this->project_db_file_, error ) )
+  if ( changed  && !this->project_database_->save_database( this->project_db_file_, error ) )
   {
     CORE_LOG_ERROR( error );
   }
@@ -755,8 +758,12 @@ void ProjectManager::checkpoint_projectmanager()
   Core::StateIO stateio;
   stateio.initialize();
   this->save_states( stateio );
-  stateio.export_to_file( configuration_dir / CONFIGURATION_FILE_C );
-  
+    
+    if ( boost::filesystem::exists( configuration_dir ) )
+    {
+        stateio.export_to_file( configuration_dir / CONFIGURATION_FILE_C );
+  }
+    
   // Write out the database
   std::string error;
   if ( !this->private_->project_database_->save_database( this->private_->project_db_file_, error ) )

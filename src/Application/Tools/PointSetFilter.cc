@@ -99,18 +99,22 @@ PointSetFilter::~PointSetFilter()
 
 void PointSetFilter::handle_target_layer_changed( std::string layer_id )
 {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
   registration_ready_state_->set( false );
 }
 
 
 void PointSetFilter::handle_iteration_changed(  )
 {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
   registration_ready_state_->set( false );
 }
 
 
 void PointSetFilter::handle_transform_changed(  )
 {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
   this->registration_ready_state_->set( true );
 
   std::vector< double > matrix_params;
@@ -128,6 +132,8 @@ void PointSetFilter::handle_transform_changed(  )
 
 void PointSetFilter::handle_layers_changed()
 {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
   std::string mask_layer_id = this->mask_state_->get();
   
   LayerHandle layer = LayerManager::Instance()->find_layer_by_id( mask_layer_id );
@@ -167,16 +173,14 @@ void PointSetFilter::handle_layers_changed()
     }
 
     this->target_layers_state_->set_option_list( layer_names );
-    //if ( selected_layers.size() > 0 )
-    //{
-    //  this->target_layers_state_->set( selected_layers );
-    //}
   }
 
 }
 
 void PointSetFilter::handle_mask_layer_changed( std::string layer_id )
 {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
   LayerHandle layer = LayerManager::Instance()->find_layer_by_id( layer_id );
 
   if ( layer )
@@ -215,10 +219,6 @@ void PointSetFilter::handle_mask_layer_changed( std::string layer_id )
     }
 
     this->target_layers_state_->set_option_list( layer_names );
-    //if ( selected_layers.size() > 0 )
-    //{
-    //  this->target_layers_state_->set( selected_layers );
-    //}
   }
 
 }

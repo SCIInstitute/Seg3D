@@ -234,6 +234,13 @@ bool Application::get_user_directory( boost::filesystem::path& user_dir, bool co
   if ( getenv( "HOME" ) )
   {
     user_dir = boost::filesystem::path( getenv( "HOME" ) );
+        
+        if (! boost::filesystem::exists( user_dir ) )
+        {
+      CORE_LOG_ERROR( std::string( "Could not get user directory." ) );
+      return false;            
+        }
+        
     return true;
   }
   else
@@ -269,11 +276,19 @@ bool Application::get_user_desktop_directory( boost::filesystem::path& user_desk
   if ( getenv( "HOME" ) )
   {
     user_desktop_dir = boost::filesystem::path( getenv( "HOME" ) ) / "Desktop" / "";
+
+        if (! boost::filesystem::exists( user_desktop_dir ) )
+        {
+      CORE_LOG_ERROR( std::string( "Could not get user desktop directory." ) );
+      return false;            
+        }
+
+
     return true;
   }
   else
   {
-    CORE_LOG_ERROR( std::string( "Could not get user directory." ) );
+    CORE_LOG_ERROR( std::string( "Could not get user desktop directory." ) );
     return false;
   }
 #endif
@@ -299,13 +314,13 @@ bool Application::get_config_directory( boost::filesystem::path& config_dir )
     if ( !( boost::filesystem::create_directory( config_dir ) ) )
     {
       CORE_LOG_ERROR( std::string( "Could not create directory: " ) + config_dir.string() );
-      return ( false );
+      return false;
     }
     
     CORE_LOG_MESSAGE( std::string( "Created directory: " ) + config_dir.string() );
   }
   
-  return ( true );
+  return true;
 }
 
 bool Application::get_user_name( std::string& user_name )

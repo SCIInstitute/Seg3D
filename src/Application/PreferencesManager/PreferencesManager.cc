@@ -29,6 +29,8 @@
 // STL includes
 #include <vector>
 
+#include <boost/filesystem.hpp>
+
 // Core includes
 #include <Core/Application/Application.h>
 #include <Core/State/StateIO.h>
@@ -135,9 +137,14 @@ Core::Color PreferencesManager::get_color( int index ) const
 void PreferencesManager::initialize_states()
 {
   boost::filesystem::path user_path;
-  Core::Application::Instance()->get_user_directory( user_path );
-  user_path = user_path / ( Core::Application::GetApplicationName() + "-Projects" );
-  
+  if (! Core::Application::Instance()->get_user_directory( user_path ) )
+    {
+        user_path = user_path / ( Core::Application::GetApplicationName() + "-Projects" );
+  }
+    else
+    {
+        user_path = boost::filesystem::current_path();
+    }
   boost::filesystem::path desktop_path;
   Core::Application::Instance()->get_user_desktop_directory( desktop_path );
 

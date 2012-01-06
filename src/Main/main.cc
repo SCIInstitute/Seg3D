@@ -134,6 +134,7 @@ int main( int argc, char **argv )
   Core::Application::Instance()->check_command_line_parameter( "file_to_open_on_start", file_to_view );
 
   {
+/*
     std::string warning = std::string( "<h3>" ) +
       Core::Application::GetApplicationName() + " " + Core::Application::GetVersion() + 
       "</h3><h6><p align=\"justify\">Please note: This version of " + Core::Application::GetApplicationName()
@@ -143,6 +144,7 @@ int main( int argc, char **argv )
     QMessageBox::information( 0, 
       QString::fromStdString( Core::Application::GetApplicationNameAndVersion() ), 
       QString::fromStdString( warning )  );
+*/
   } 
 
   if ( sizeof( void * ) == 4 )
