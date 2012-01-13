@@ -35,12 +35,21 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 PROJECT(Seg3D)
 
 ###########################################
-#
+# Verify build directory
 ###########################################
 
-IF( ${CMAKE_BINARY_DIR} MATCHES ${CMAKE_SOURCE_DIR} )
+IF ( ${CMAKE_BINARY_DIR} MATCHES ${CMAKE_SOURCE_DIR} )
   MESSAGE( FATAL_ERROR "Please delete the CMakeCache.txt from the src directory and build Seg3D in the bin directory. Run 'rm CMakeCache.txt; cd ../bin; cmake ../src' from the binary directory." )
-ENDIF( ${CMAKE_BINARY_DIR} MATCHES ${CMAKE_SOURCE_DIR} )
+ENDIF ( ${CMAKE_BINARY_DIR} MATCHES ${CMAKE_SOURCE_DIR} )
+
+###########################################
+# Set default CMAKE_BUILD_TYPE
+# if empty for Unix Makefile builds
+###########################################
+
+IF (CMAKE_GENERATOR MATCHES "Unix Makefiles" AND NOT CMAKE_BUILD_TYPE)
+  SET(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
+ENDIF (CMAKE_GENERATOR MATCHES "Unix Makefiles" AND NOT CMAKE_BUILD_TYPE)
 
 ###########################################
 # WHERE TO COMPILE EXECUTABLES
