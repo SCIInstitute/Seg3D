@@ -142,9 +142,12 @@ bool ProjectManagerPrivate::load_or_create_project_database()
     if ( Core::Application::Instance()->get_config_directory( this->project_db_file_ ) )
     {
         this->project_db_file_ = this->project_db_file_ / PROJECT_DATABASE_C;
-        CORE_LOG_ERROR( "Could not access user directory." );
     }
-    
+  else
+  {
+    CORE_LOG_ERROR( "Could not access user directory." );
+  }
+
   this->project_database_.reset( new DatabaseManager );
   std::string error;
   if ( boost::filesystem::exists( this->project_db_file_ ) &&
@@ -337,7 +340,7 @@ void ProjectManagerPrivate::cleanup_project_database()
   }
   
   // If the database was changed, save it out
-  if ( changed  && !this->project_database_->save_database( this->project_db_file_, error ) )
+  if ( changed && !this->project_database_->save_database( this->project_db_file_, error ) )
   {
     CORE_LOG_ERROR( error );
   }
