@@ -27,6 +27,7 @@
 #  DEALINGS IN THE SOFTWARE.
 #  
 
+##########################################################################
 # Seg3D build script
 #
 # This script will configure Seg3D builds using CMake
@@ -34,10 +35,11 @@
 # in which case, the project will automatically be built using make.
 #
 # If an Xcode project is specified using the --xcode-build flag,
-# the project will just be configured.
+# the project will be built using the command line utility xcodebuild.
 #
 # Shortcuts for setting up the default OS X SDK build target and
 # architecture are also available.
+##########################################################################
 
 CMAKE_MAJOR_VERSION=2
 CMAKE_MINOR_VERSION=8
@@ -49,20 +51,23 @@ OSX_TARGET_VERSION="10.5"
 OSX_TARGET_VERSION_SDK="/Developer/SDKs/MacOSX10.5.sdk"
 OSX_TARGET_ARCH="x86_64"
 
+##########################################################################
+# Helper functions
+##########################################################################
+
 printhelp() {
-    echo -e "build.sh: configure Seg3D with CMake and optionally build with GNU make."
-    echo -e "If configured with --xcode-build, an Xcode project will be configured and the script will exit."
+    echo -e "build.sh: configure Seg3D with CMake and build with either GNU make or Xcode [OS X only]."
     echo -e "--debug\t\t\tBuilds Seg3D with debug symbols"
-    echo -e "--release\t\tBuilds Seg3D without debug symbols (default)"
+    echo -e "--release\t\tBuilds Seg3D without debug symbols [default]"
     echo -e "--set-osx-version-min\tTarget a minimum Mac OS X version (currently ${OSX_TARGET_VERSION}, ${OSX_TARGET_ARCH}) [OS X only]"
-    echo -e "--xcode-build\t\tConfigure Xcode project [OS X only]"
-    echo -e "-j#\t\t\tRuns # parallel make processes when building"
+    echo -e "--xcode-build\t\tConfigure and build Xcode project against ALL_BUILD target [OS X only]"
+    echo -e "-j#\t\t\tRuns # parallel make processes when building [GNU make only]"
     echo -e "-?\t\t\tThis help"
     exit 0
 }
 
 # will cause the script to bailout if the passed in command fails
-try () {
+try() {
   $*
   if [[ $? != "0" ]]; then
       echo -e "\n***ERROR in build script\nThe failed command was:\n$*\n"
@@ -70,7 +75,7 @@ try () {
   fi
 }
 
-trybuild () {
+trybuild() {
   $*
   if [[ $? != "0" ]]; then
       echo -e "Building Seg3D returned an error\n"
@@ -81,16 +86,21 @@ trybuild () {
   fi
 }
 
-# functionally equivalent to try(),
+# functionally equivalent to try,
 # but it prints a different error message
-ensure () {
+ensure() {
   $* >& /dev/null
   if [[ $? != "0" ]]; then
       echo -e "\n***ERROR, $* is required but not found on this system\n"
       exit 1
   fi
 }
-    
+
+get_cmake_version() {
+    local version=`$cmakebin --version | cut -d ' ' -f 3 | sed -e "s/[^[:digit:].]//g"`
+    echo "$version"
+}
+
 # Try to find a version of cmake
 find_cmake() {
     if [[ $getcmake != "1" ]]; then
@@ -103,7 +113,7 @@ find_cmake() {
         download=1
     else
         # see if cmake is up-to-date
-        version=`$cmakebin --version | cut -d ' ' -f 3 | sed -e "s/[^[:digit:].]//g"`
+        version=$(get_cmake_version)
         echo "$cmakebin version $version found"
         major_version=${version:0:1}
         minor_version=${version:2:1}
@@ -120,7 +130,7 @@ find_cmake() {
 
         if [[ -e $cmakebin ]]; then
             # see if local cmake install is compatible
-            version=`$cmakebin --version | cut -d ' ' -f 3 | sed -e "s/[^[:digit:].]//g"`
+            version=$(get_cmake_version)
             echo "$cmakebin version $version found"
             major_version=${version:0:1}
             minor_version=${version:2:1}
@@ -144,6 +154,34 @@ find_cmake() {
     ensure $cmakebin --version
 }
 
+##########################################################################
+# Build configure functions
+##########################################################################
+
+# handle both types of OS X generators
+configure_seg3d_osx() {
+    local build_opts=$1
+
+    if [[ $setosxmin -eq 1 ]]; then
+        build_opts="${build_opts} -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${OSX_TARGET_VERSION} -DCMAKE_OSX_SYSROOT:PATH=${OSX_TARGET_VERSION_SDK} -DCMAKE_OSX_ARCHITECTURES:STRING=${OSX_TARGET_ARCH}"
+    fi
+
+    if [[ $xcodebuild -eq 1 ]]; then
+        try $cmakebin $DIR/src -G Xcode $build_opts $cmakeargs
+    else
+        configure_seg3d_make
+    fi
+}
+
+# generic Unix makefile build
+configure_seg3d_make() {
+    local build_opts=$1
+
+    build_opts="${build_opts} -DCMAKE_BUILD_TYPE:STRING=${buildtype} -DCMAKE_VERBOSE_MAKEFILE:BOOL=${verbosebuild}"
+
+    try $cmakebin $DIR/src $build_opts $cmakeargs
+}
+
 configure_seg3d() {
     if [[ ! -d $builddir ]]; then
         echo "Creating build directory $builddir"
@@ -151,44 +189,58 @@ configure_seg3d() {
     fi
     try cd $builddir
 
+    # we may want to set more build options in the future
     local COMMON_BUILD_OPTS=""
 
-    if [[ $setosxmin -eq 1 ]]; then
-        COMMON_BUILD_OPTS="${COMMON_BUILD_OPTS} -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${OSX_TARGET_VERSION} -DCMAKE_OSX_SYSROOT:PATH=${OSX_TARGET_VERSION_SDK} -DCMAKE_OSX_ARCHITECTURES:STRING=${OSX_TARGET_ARCH}"
-    fi
-
-    if [[ $xcodebuild -eq 1 ]]; then
-        try $cmakebin $DIR/src -G Xcode $COMMON_BUILD_OPTS $cmakeargs
+    if [[ $osx -eq 1 ]]; then
+        configure_seg3d_osx $COMMON_BUILD_OPTS
     else
-        # all Unix Makefile builds
-        COMMON_BUILD_OPTS="${COMMON_BUILD_OPTS} -DCMAKE_BUILD_TYPE:STRING=${buildtype}  -DCMAKE_VERBOSE_MAKEFILE:BOOL=${verbosebuild}"
-        try $cmakebin $DIR/src $COMMON_BUILD_OPTS $cmakeargs
+        configure_seg3d_make $COMMON_BUILD_OPTS
     fi
 }
 
+##########################################################################
+# Build functions
+##########################################################################
 
-build_seg3d() {
-    if [[ $builddir != `pwd` ]]; then
-      try cd $builddir
-    fi
-
+build_seg3d_make() {
     echo "Building SCIRun using make..."
     trybuild make $makeflags
 }
 
+build_seg3d_xcode() {
+    echo "Building SCIRun using Xcode..."
+    trybuild xcodebuild -project Seg3D.xcodeproj -target ALL_BUILD -configuration $buildtype
+}
 
-######### build.sh script execution starts here
+build_seg3d() {
+    local cwd=`pwd`
+    if [[ $builddir != $cwd ]]; then
+      try cd $builddir
+    fi
+
+    if [[ $xcodebuild -eq 1 ]]; then
+        build_seg3d_xcode
+    else
+        build_seg3d_make
+    fi
+}
+
+##########################################################################
+# build.sh script execution starts here
+##########################################################################
 
 export DIR=`pwd`
 
 linux=0
 osx=0
+platform=`uname`
 
-if [[ `uname` == "Darwin" ]]; then
+if [[ $platform =~ [dD]arwin ]]; then
     getcommand="curl -OL"
     osx=1
     echo "Build platform is OS X."
-elif [[ `uname` == "Linux" ]]; then
+elif [[ $platform =~ [lL]inux ]]; then
     # TODO: could also try lsb_release (if available) to attempt to identify distro
     getcommand="wget"
     linux=1
@@ -265,18 +317,18 @@ echo "CMake args: $cmakeargs"
 echo "Get CMake: $getcmake"
 echo "Make Flags: $makeflags"
 if [[ $xcodebuild -eq 0 ]]; then
+    # ensure make is on the system
+    ensure make --version
+
     echo "Build Type: $buildtype"
 else
+    ensure xcodebuild -version
+
     echo "Generating Xcode project"
 fi
-
-ensure make --version # ensure make is on the system
 
 find_cmake
 
 configure_seg3d
 
-# build using make if generator is not Xcode
-if [[ $xcodebuild -eq 0 ]]; then
-    build_seg3d
-fi
+build_seg3d
