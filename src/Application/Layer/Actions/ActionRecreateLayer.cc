@@ -173,8 +173,8 @@ bool ActionRecreateLayerPrivate::generate_script( Core::ActionContextHandle cont
       std::string::size_type pos = action_params.find( input_pattern, start_pos );
       if ( pos == std::string::npos )
       {
-        context->report_error( "Invalid provenance record encountered." );
-        return false;
+        // The input is used implicitly by the filter (most likely an ActionPaste)
+        continue;
       }
       action_cmd += action_params.substr( start_pos, pos - start_pos ) + layer_id;
       start_pos = pos + input_pattern.size();

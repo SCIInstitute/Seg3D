@@ -48,6 +48,12 @@ namespace Seg3D
 
 bool ActionRemoveFilter::validate( Core::ActionContextHandle& context )
 {
+  if ( this->target_layer_ == this->mask_layer_ )
+  {
+    context->report_error( "Can't remove a layer from itself." );
+    return false;
+  }
+
   // Make sure that the sandbox exists
   if ( !LayerManager::CheckSandboxExistence( this->sandbox_, context ) ) return false;
 
