@@ -246,9 +246,6 @@ public:
       path_filter->AddPathInfo( info );
       path_filter->Update();
 
-      size_t num_of_outputs = path_filter->GetNumberOfOutputs(); 
-      assert( num_of_outputs == 1);
-
       Core::SinglePath new_path( this->vertices_[ start_index ], this->vertices_[ end_index ] );
 
       path_type::Pointer itk_path = path_filter->GetOutput( 0 );
@@ -686,26 +683,20 @@ public:
           start_index = this->current_vertex_index_ - 1;
           end_index = this->current_vertex_index_ + 1;
         }
- 
-        // Add a new vertex
-        if ( num_of_vertices > this->itk_paths_.get_path_num() && !deleted_paths ) 
-        {
-          Core::Point p0, p1;
-
-          p0 = this->vertices_[start_index ];
-          p1 = this->vertices_[ end_index ];
-          bool is_deleted = this->itk_paths_.delete_one_path( p0, p1 );
-        }
 
         Core::Point p0, p1;
 
         p0 = this->vertices_[ start_index ];
         p1 = this->vertices_[ this->current_vertex_index_ ];
-        bool is_deleted = this->itk_paths_.delete_one_path( p0, p1 );
+        this->itk_paths_.delete_one_path( p0, p1 );
 
         p0 = this->vertices_[ this->current_vertex_index_ ];
         p1 = this->vertices_[ end_index ];
-        is_deleted = this->itk_paths_.delete_one_path( p0, p1 );
+        this->itk_paths_.delete_one_path( p0, p1 );
+
+        p0 = this->vertices_[ start_index ];
+        p1 = this->vertices_[ end_index ];
+        this->itk_paths_.delete_one_path( p0, p1 );
 
         compute_path( start_index, this->current_vertex_index_ );
         compute_path( this->current_vertex_index_, end_index );

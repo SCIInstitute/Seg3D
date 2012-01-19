@@ -97,9 +97,27 @@ bool LayerIOFunctions::ImportFiles( QMainWindow* main_window, std::string file_t
     boost::filesystem::path current_file_folder = 
       ProjectManager::Instance()->get_current_file_folder();
       
+        qs_filtername = "All Importers (*)";
+            
+#if defined(__APPLE__) || defined(_WIN32)
+        // Use native dialog
     file_list = QFileDialog::getOpenFileNames( main_window, 
       "Import Layer(s)... ", current_file_folder.string().c_str(), filters, &qs_filtername );
-    
+#else
+        // It seems Ubuntus Qt4 version is broken and its dialog tends to crash
+        // Hence use the other way of defining a dialog
+        QFileDialog* diag = new QFileDialog( main_window, "Import Layer(s)...", 
+            current_file_folder.string().c_str(), filters );
+        diag->setFileMode(QFileDialog::ExistingFiles);
+        diag->setNameFilter( qs_filtername );
+        diag->exec();
+        
+        file_list = diag->selectedFiles();
+        qs_filtername = diag->selectedNameFilter();
+
+        delete diag;
+#endif    
+        
     // If no file was selected just return
     if( file_list.size() == 0 )
     {
@@ -108,7 +126,7 @@ bool LayerIOFunctions::ImportFiles( QMainWindow* main_window, std::string file_t
       message_box.addButton( QMessageBox::Ok );
       message_box.setIcon( QMessageBox::Critical );
       message_box.setText( "No files were selected." );
-      message_box.exec(); 
+      message_box.exec();
       return false;
     }
 
@@ -129,6 +147,38 @@ bool LayerIOFunctions::ImportFiles( QMainWindow* main_window, std::string file_t
     if( ! ( LayerIO::Instance()->create_single_file_importer( file_list.at( i ).toStdString(), 
       importer, error, importer_name ) ) )
     {
+            if ( i == 0 )
+            {
+                // Convert the filenames into STL strings
+                std::vector< std::string > filenames( file_list.size() );
+                for ( int j = 0; j < file_list.size(); j++ )
+                {
+                    filenames[ j ] = file_list.at( j ).toStdString();
+                }
+                    
+                // Find all the filenames that are associated with this series
+                if ( !( LayerIO::FindFileSeries( filenames ) ) )
+                {
+                    QMessageBox message_box( main_window );
+                    message_box.setWindowTitle( "Import Layer Error" );
+                    message_box.addButton( QMessageBox::Ok );
+                    message_box.setIcon( QMessageBox::Critical );
+                    message_box.setText( "Could not resolve filenames." );
+                    message_box.exec(); 
+                    return false;
+                }
+
+                LayerImporterHandle importer;
+
+                // Try to load files as a series
+                if(  LayerIO::Instance()->create_file_series_importer( filenames, 
+                    importer, importer_name ) )
+                {                
+                    importers.push_back( importer );
+                    break;
+                }
+            }        
+        
       // Failed to create the importer, and warn the user explicitly
       std::string error_message = std::string( "ERROR: No importer is available for file '" ) 
         + file_list.at( i ).toStdString() + std::string( "'. " ) + error;
@@ -177,10 +227,26 @@ void LayerIOFunctions::ImportSeries( QMainWindow* main_window )
 
   // Bring up the file dialog
   QString filtername;
-  QStringList file_list = QFileDialog::getOpenFileNames( main_window, 
-    "Select a file from the series... ", current_file_folder.string().c_str(), 
-    filters, &filtername );
+  QStringList file_list;
 
+#if defined(__APPLE__) || defined(_WIN32)
+        // Use native dialog
+    file_list = QFileDialog::getOpenFileNames( main_window, 
+      "Select a file from the series... ", current_file_folder.string().c_str(), filters, &filtername );
+#else
+        // It seems Ubuntus Qt4 version is broken and its dialog tends to crash
+        // Hence use the other way of defining a dialog
+        QFileDialog* diag = new QFileDialog( main_window, "Select a file from the series...", 
+            current_file_folder.string().c_str(), filters );
+        diag->setFileMode(QFileDialog::ExistingFiles);
+        diag->setNameFilter( filtername );
+        diag->exec();
+        
+        filtername = diag->selectedNameFilter();
+        file_list = diag->selectedFiles();
+        delete diag;
+#endif
+    
   // If no files were selected just exit
   if( file_list.size() == 0 )
   {

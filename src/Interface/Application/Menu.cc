@@ -656,11 +656,34 @@ void Menu::open_project()
 
   project_file_type += " )";
 
-  boost::filesystem::path full_path =  boost::filesystem::path( ( 
+    boost::filesystem::path full_path;
+    
+#if defined(__APPLE__) || defined(_WIN32)
+  full_path =  boost::filesystem::path( ( 
     QFileDialog::getOpenFileName ( this->main_window_, 
     QString::fromStdString( project_type ), 
     QString::fromStdString( current_projects_path.string() ), 
     QString::fromStdString( project_file_type ) ) ).toStdString() ); 
+
+#else
+        // It seems Ubuntus Qt4 version is broken and its dialog tends to crash
+        // Hence use the other way of defining a dialog
+        QFileDialog* diag = new QFileDialog( this->main_window_,
+            QString::fromStdString( project_type ), 
+            QString::fromStdString( current_projects_path.string() ), 
+            QString::fromStdString( project_file_type ) );
+        diag->setFileMode(QFileDialog::ExistingFile);
+        diag->exec();
+        
+        QList<QString> files = diag->selectedFiles();
+        if ( files.count() )
+        {
+            full_path =  boost::filesystem::path( files[ 0 ].toStdString() );
+        }
+        delete diag;
+#endif
+
+
 
 
   bool is_path_extension = false;
