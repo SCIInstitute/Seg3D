@@ -434,6 +434,21 @@ ENDIF(BUILD_WITH_PYTHON)
 ADD_SUBDIRECTORY(Bootstrap)
 
 ###########################################
+# LaTeX based documentation system
+###########################################
+
+FIND_PACKAGE(LATEX)
+
+OPTION(BUILD_DOCUMENTATION "Build documentation" OFF)
+MARK_AS_ADVANCED(BUILD_DOCUMENTATION)
+
+IF (PDFLATEX_COMPILER)
+  IF (BUILD_DOCUMENTATION)
+    ADD_SUBDIRECTORY(Documentation)
+  ENDIF (BUILD_DOCUMENTATION)
+ENDIF (PDFLATEX_COMPILER)
+
+###########################################
 # Packaging:
 # This part sets up the packager using
 # CPack.

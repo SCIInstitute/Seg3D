@@ -61,6 +61,7 @@ printhelp() {
     echo -e "--release\t\tBuilds Seg3D without debug symbols [default]"
     echo -e "--set-osx-version-min\tTarget a minimum Mac OS X version (currently ${OSX_TARGET_VERSION}, ${OSX_TARGET_ARCH}) [OS X only]"
     echo -e "--xcode-build\t\tConfigure and build Xcode project against ALL_BUILD target [OS X only]"
+    echo -e "--documentation\t\tEnable building documentation (requires LaTeX)"
     echo -e "-j#\t\t\tRuns # parallel make processes when building [GNU make only]"
     echo -e "-?\t\t\tThis help"
     exit 0
@@ -189,8 +190,7 @@ configure_seg3d() {
     fi
     try cd $builddir
 
-    # we may want to set more build options in the future
-    local COMMON_BUILD_OPTS=""
+    local COMMON_BUILD_OPTS="-DBUILD_DOCUMENTATION:BOOL=$documentation"
 
     if [[ $osx -eq 1 ]]; then
         configure_seg3d_osx $COMMON_BUILD_OPTS
@@ -259,6 +259,7 @@ setosxmin=0
 verbosebuild="OFF"
 builddir="$DIR/bin"
 xcodebuild=0
+documentation=0
 
 echo "Parsing arguments..."
 while [[ $1 != "" ]]; do
@@ -299,6 +300,8 @@ while [[ $1 != "" ]]; do
             else
               echo "WARNING: Only OS X supports the --xcode-build flag."
             fi;;
+        --documentation)
+            documentation="1";;
         -j*)
             makeflags="${makeflags} $1";;
         -D*)
