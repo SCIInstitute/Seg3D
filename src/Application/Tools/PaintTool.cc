@@ -972,6 +972,21 @@ void PaintTool::deactivate()
 bool PaintTool::handle_mouse_move( ViewerHandle viewer, const Core::MouseHistory& mouse_history, 
   int button, int buttons, int modifiers )
 {
+  // On Apple, there is a bug in Qt (QTBUG-11979) that prevents mouseReleaseEvent's from coming through.
+  // So this is a workaround, we can check at mouseMoveEvent whether the appropriate button is still pressed,
+  // and if not, issue the mouseReleaseEvent ourselves.
+  if ( this->private_->painting_ )
+  {
+    if ( this->private_->erase_ && !(buttons & Core::MouseButton::RIGHT_BUTTON_E ) )
+    {
+      this->handle_mouse_release( viewer, mouse_history, Core::MouseButton::RIGHT_BUTTON_E, buttons, modifiers);
+    }
+    if ( !this->private_->erase_ && !(buttons & Core::MouseButton::LEFT_BUTTON_E ) )
+    {
+      this->handle_mouse_release( viewer, mouse_history, Core::MouseButton::LEFT_BUTTON_E, buttons, modifiers);
+    }
+  }
+
   if ( this->private_->data_layer_ ) return false;
 
   // NOTE: This function call is running on the interface thread
@@ -1057,7 +1072,7 @@ bool PaintTool::handle_mouse_press( ViewerHandle viewer, const Core::MouseHistor
   int button, int buttons, int modifiers )
 {
   // if already painting (or erasing), ignore additional mouse presses
-  if ( this->private_->painting_ ) 
+  if ( this->private_->painting_ )
   {
     return true;
   }
