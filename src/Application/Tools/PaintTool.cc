@@ -972,21 +972,6 @@ void PaintTool::deactivate()
 bool PaintTool::handle_mouse_move( ViewerHandle viewer, const Core::MouseHistory& mouse_history, 
   int button, int buttons, int modifiers )
 {
-  // On Apple, there is a bug in Qt (QTBUG-11979) that prevents mouseReleaseEvent's from coming through.
-  // So this is a workaround, we can check at mouseMoveEvent whether the appropriate button is still pressed,
-  // and if not, issue the mouseReleaseEvent ourselves.
-  if ( this->private_->painting_ )
-  {
-    if ( this->private_->erase_ && !(buttons & Core::MouseButton::RIGHT_BUTTON_E ) )
-    {
-      this->handle_mouse_release( viewer, mouse_history, Core::MouseButton::RIGHT_BUTTON_E, buttons, modifiers);
-    }
-    if ( !this->private_->erase_ && !(buttons & Core::MouseButton::LEFT_BUTTON_E ) )
-    {
-      this->handle_mouse_release( viewer, mouse_history, Core::MouseButton::LEFT_BUTTON_E, buttons, modifiers);
-    }
-  }
-
   if ( this->private_->data_layer_ ) return false;
 
   // NOTE: This function call is running on the interface thread
@@ -1071,12 +1056,6 @@ bool PaintTool::handle_mouse_move( ViewerHandle viewer, const Core::MouseHistory
 bool PaintTool::handle_mouse_press( ViewerHandle viewer, const Core::MouseHistory& mouse_history, 
   int button, int buttons, int modifiers )
 {
-  // if already painting (or erasing), ignore additional mouse presses
-  if ( this->private_->painting_ )
-  {
-    return true;
-  }
-
   {
     PaintToolPrivate::lock_type lock( this->private_->get_mutex() );
     this->private_->viewer_ = viewer;   
@@ -1198,9 +1177,8 @@ bool PaintTool::handle_mouse_release( ViewerHandle viewer, const Core::MouseHist
   
   if ( this->private_->painting_ )
   {
-    // stop painting if the left mouse button was released, stop erasing if the right button is released
-    if ( ( this->private_->erase_ && button == Core::MouseButton::RIGHT_BUTTON_E ) ||
-      ( !this->private_->erase_ && button == Core::MouseButton::LEFT_BUTTON_E ) )
+    if ( button == Core::MouseButton::RIGHT_BUTTON_E ||
+      button == Core::MouseButton::LEFT_BUTTON_E )
     {
       {
         {
