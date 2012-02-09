@@ -236,14 +236,12 @@ bool MatlabLayerImporterPrivate::scan_mat_array( MatlabIO::matlabarray &mlarray,
       
         int dim_start = 0;
         int numaxis = axisarray.getm();
+
         if ( numaxis == 4 && dims.size() == 4 )
         {
           numaxis = 4;
           dim_start = 1;
         }
-        
-        if ( numaxis > 3 ) numaxis = 3;
-         
         
         bool read_spacing = false;
         bool read_min = false;
@@ -261,7 +259,7 @@ bool MatlabLayerImporterPrivate::scan_mat_array( MatlabIO::matlabarray &mlarray,
             MatlabIO::matlabarray farray = axisarray.getfield( p, "spacing" );
             if ( farray.isdense() && farray.getnumelements() > 0 )
             {
-              farray.getnumericarray( &spacing[ p ], 1 );
+              farray.getnumericarray( &spacing[ p - dim_start ], 1 );
               read_spacing = true;
             }
           }
@@ -271,7 +269,7 @@ bool MatlabLayerImporterPrivate::scan_mat_array( MatlabIO::matlabarray &mlarray,
             MatlabIO::matlabarray farray = axisarray.getfield( p, "min" );
             if ( farray.isdense() && farray.getnumelements() > 0 )
             {
-              farray.getnumericarray( &min[ p ], 1 );
+              farray.getnumericarray( &min[ p - dim_start], 1 );
               read_min = true;
             }
           }
@@ -281,7 +279,7 @@ bool MatlabLayerImporterPrivate::scan_mat_array( MatlabIO::matlabarray &mlarray,
             MatlabIO::matlabarray farray = axisarray.getfield( p, "max" );
             if ( farray.isdense() && farray.getnumelements() > 0 )
             {
-              farray.getnumericarray( &max[ p ], 1 );
+              farray.getnumericarray( &max[ p - dim_start ], 1 );
               read_max = true;              
             }
           }           
@@ -388,7 +386,7 @@ bool MatlabLayerImporterPrivate::scan_mat_file( const std::string& filename )
     {
       // The info call scans through the entire file and reads all objects except the
       // large datablocks, entries with more than 100 elements. 
-      matlab_array = matlab_file.getmatlabarrayinfo( j );
+      matlab_array = matlab_file.getmatlabarray( j );
       if ( this->scan_mat_array( matlab_array, error ) )
       {
         this->matlab_array_index_ = j;
@@ -485,10 +483,6 @@ bool MatlabLayerImporterPrivate::import_mat_array( MatlabIO::matlabarray &mlarra
             error = "Encountered unknown datatype in matlab file.";
             return false;
         }
-        
-        this->grid_transform_ = Core::GridTransform( this->data_block_->get_nx(),
-          this->data_block_->get_ny(), this->data_block_->get_nz() );
-        this->grid_transform_.set_originally_node_centered( false );
         
         return true;
       }

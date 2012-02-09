@@ -52,6 +52,9 @@ PointSetFilter::PointSetFilter( const std::string& toolid ) :
   std::vector< LayerIDNamePair > empty_list( 1, 
     std::make_pair( Tool::NONE_OPTION_C, Tool::NONE_OPTION_C ) );
 
+  std::vector< std::string > empty_option;
+  this->add_state( "target_layers", this->target_layers_state_, empty_option, "" );
+
   // Whether we use a mask to find which components to use
   this->add_state( "mask", this->mask_state_, Tool::NONE_OPTION_C, empty_list );
   this->mask_state_->set_session_priority( Core::StateBase::DEFAULT_LOAD_E + 2 );
@@ -59,8 +62,6 @@ PointSetFilter::PointSetFilter( const std::string& toolid ) :
 
   this->add_state( "iterations", this->iterations_state_, 5, 1, 1000, 1 );
 
-  std::vector< std::string > empty_option;
-  this->add_state( "target_layers", this->target_layers_state_, empty_option, "" );
   this->target_layers_state_->set_session_priority( Core::StateBase::DEFAULT_LOAD_E + 1 );
   this->add_state( "registration_ready", this->registration_ready_state_, false );
 
@@ -155,7 +156,8 @@ void PointSetFilter::handle_layers_changed()
       LayerHandle target_layer = LayerManager::Instance()->find_layer_by_id( 
         this->target_layer_state_->get());
 
-      std::string target_layer_name = target_layer->get_layer_name();
+      std::string target_layer_name = "";
+            if ( target_layer ) target_layer_name = target_layer->get_layer_name();
       std::vector<LayerIDNamePair>::iterator it = layer_names.begin();
 
       for ( ; it!=layer_names.end(); ++it )
@@ -201,7 +203,8 @@ void PointSetFilter::handle_mask_layer_changed( std::string layer_id )
       LayerHandle target_layer = LayerManager::Instance()->find_layer_by_id( 
         this->target_layer_state_->get());
 
-      std::string target_layer_name = target_layer->get_layer_name();
+      std::string target_layer_name = "";
+            if ( target_layer ) target_layer_name = target_layer->get_layer_name();
       std::vector<LayerIDNamePair>::iterator it = layer_names.begin();
 
       for ( ; it!=layer_names.end(); ++it )

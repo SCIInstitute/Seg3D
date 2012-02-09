@@ -219,5 +219,14 @@ int main( int argc, char **argv )
 
   // Indicate a successful finish of the program
   Core::Application::Instance()->log_finish();
+
+#ifdef _WIN32 || __APPLE__
   return ( 0 );
+#else
+    // NOTE: On Linux Qt tends to crash in one of its static destructors. Since we do not need these
+    // destructors to be executed, we just exit in stead. For Windows we return to WinMain, hence
+    // we need to return in that case.
+    exit ( 0 );
+#endif
+
 }

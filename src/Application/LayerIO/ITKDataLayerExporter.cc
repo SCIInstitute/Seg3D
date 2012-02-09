@@ -53,6 +53,39 @@ SEG3D_REGISTER_EXPORTER( Seg3D, ITKDataLayerExporter );
 
 namespace Seg3D
 {
+    
+void set_data_series_names( itk::NumericSeriesFileNames::Pointer& name_series_generator, 
+                           const std::string& file_path, const std::string& file_name, 
+                           const size_t size, const std::string& extension )
+{ 
+    boost::filesystem::path path = boost::filesystem::path( file_path );
+    
+    // here we make sure that we dont have an extension and then afterwards we add the correct one
+    std::string filename_without_extension = file_name;
+    filename_without_extension = filename_without_extension.substr( 0, 
+                                                                   filename_without_extension.find_last_of( "." ) );
+    
+    boost::filesystem::path filename_path = path / filename_without_extension;
+    
+    if( size < 100 )
+    {
+        name_series_generator->SetSeriesFormat( filename_path.string() + "-%02d" + extension );
+    }
+    else if ( size < 1000 )
+    {
+        name_series_generator->SetSeriesFormat( filename_path.string() + "-%03d" + extension );
+    }
+    else if ( size < 10000 )
+    {
+        name_series_generator->SetSeriesFormat( filename_path.string() + "-%04d" + extension );
+    }
+    else
+    {
+        name_series_generator->SetSeriesFormat( filename_path.string() + "-%10d" + extension );
+    }
+}
+    
+    
 ////////////// - Templated functions for exporting bitmaps and DICOM's - ///////////////
 ////////////////////////////////////////////////////////////////////////////////////////
 template< class InputPixelType, class OutputPixelType >
@@ -319,37 +352,6 @@ bool export_dicom_series( const std::string& file_path, const std::string& file_
   }
 
   return true;
-}
-
-void set_data_series_names( itk::NumericSeriesFileNames::Pointer& name_series_generator, 
-               const std::string& file_path, const std::string& file_name, 
-               const size_t size, const std::string& extension )
-{ 
-  boost::filesystem::path path = boost::filesystem::path( file_path );
-
-  // here we make sure that we dont have an extension and then afterwards we add the correct one
-  std::string filename_without_extension = file_name;
-  filename_without_extension = filename_without_extension.substr( 0, 
-    filename_without_extension.find_last_of( "." ) );
-
-  boost::filesystem::path filename_path = path / filename_without_extension;
-
-  if( size < 100 )
-  {
-    name_series_generator->SetSeriesFormat( filename_path.string() + "-%02d" + extension );
-  }
-  else if ( size < 1000 )
-  {
-    name_series_generator->SetSeriesFormat( filename_path.string() + "-%03d" + extension );
-  }
-  else if ( size < 10000 )
-  {
-    name_series_generator->SetSeriesFormat( filename_path.string() + "-%04d" + extension );
-  }
-  else
-  {
-    name_series_generator->SetSeriesFormat( filename_path.string() + "-%10d" + extension );
-  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////

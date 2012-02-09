@@ -43,6 +43,30 @@ namespace Core
 
 // Convert multiple values in a string into a vector with numbers
 
+// Convert a value into a string
+
+template< class T >
+bool FromString( const std::string &str, T &value )
+{
+    std::string data = str + " ";
+    for ( size_t j = 0; j < data.size(); j++ )
+        if ( ( data[ j ] == '\t' ) || ( data[ j ] == '\r' ) || ( data[ j ] == '\n' ) || ( data[ j ]
+                                                                                         == '"' ) || ( data[ j ] == ',' ) || ( data[ j ] == '[' ) || ( data[ j ] == ']' )
+            || ( data[ j ] == '(' ) || ( data[ j ] == ')' ) ) data[ j ] = ' ';
+    
+    std::istringstream iss( data );
+    iss.exceptions( std::ifstream::eofbit | std::ifstream::failbit | std::ifstream::badbit );
+    try
+    {
+        iss >> value;
+        return ( true );
+    }
+    catch ( ... )
+    {
+        return ( false );
+    }
+}    
+    
 template< class T >
 bool MultipleFromString( const std::string &str, std::vector< T > &values )
 {
@@ -71,7 +95,7 @@ bool MultipleFromString( const std::string &str, std::vector< T > &values )
 
     // Extract the number
     T value;
-    if ( FromString( data.substr( p, next_space - p ), value ) ) values.push_back( value );
+    if ( FromString<T>( data.substr( p, next_space - p ), value ) ) values.push_back( value );
     p = next_space;
 
     if ( p >= data.size() ) break;
@@ -82,29 +106,7 @@ bool MultipleFromString( const std::string &str, std::vector< T > &values )
   return ( false );
 }
 
-// Convert a value into a string
 
-template< class T >
-bool FromString( const std::string &str, T &value )
-{
-  std::string data = str + " ";
-  for ( size_t j = 0; j < data.size(); j++ )
-    if ( ( data[ j ] == '\t' ) || ( data[ j ] == '\r' ) || ( data[ j ] == '\n' ) || ( data[ j ]
-        == '"' ) || ( data[ j ] == ',' ) || ( data[ j ] == '[' ) || ( data[ j ] == ']' )
-        || ( data[ j ] == '(' ) || ( data[ j ] == ')' ) ) data[ j ] = ' ';
-
-  std::istringstream iss( data );
-  iss.exceptions( std::ifstream::eofbit | std::ifstream::failbit | std::ifstream::badbit );
-  try
-  {
-    iss >> value;
-    return ( true );
-  }
-  catch ( ... )
-  {
-    return ( false );
-  }
-}
 
 // Export a value to a string
 template< class T >
