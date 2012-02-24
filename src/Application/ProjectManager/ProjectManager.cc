@@ -513,8 +513,8 @@ bool ProjectManager::new_project( const std::string& project_location,
   // Reset the application.
   Core::Application::Reset();
 
-  // Ensure that the next project default name will be increase by 1.
-  if( project_name.compare( 0, 12, "New Project " ) == 0 )
+  // Ensure that the next project default name will be increased by 1.
+  if ( project_name.substr( 0, 11 ) == "New Project" )
   {
     this->default_project_name_counter_state_->set( 
       this->default_project_name_counter_state_->get() + 1 ); 
