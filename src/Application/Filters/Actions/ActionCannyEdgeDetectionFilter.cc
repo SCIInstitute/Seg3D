@@ -114,7 +114,8 @@ public:
     // Setup the filter parameters that we do not want to change.
     filter->SetInput( input_image->get_image() );
     filter->SetVariance( this->blurring_distance_ );
-    filter->SetThreshold( static_cast<float>( this->threshold_ ) );
+    filter->SetUpperThreshold( static_cast<float>( this->threshold_ ) );
+    filter->SetLowerThreshold( static_cast<float>( this->threshold_/2.0 ) );
 
     // Ensure we will have some threads left for doing something else
     this->limit_number_of_itk_threads( filter );
