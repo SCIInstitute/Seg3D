@@ -542,11 +542,10 @@ bool ProjectManager::new_project( const std::string& project_location,
     // Make sure auto save is recomputed
     AutoSave::Instance()->recompute_auto_save();  
   }
-  else
-  {
-    // Switch off auto save, as the project is not on disk one cannot save automatically.
-    PreferencesManager::Instance()->auto_save_state_->set( false );
-  }
+
+  // NOTE: Even if the project location is empty (Quick Open), it is not necessary (or safe) 
+  // to turn off autosave.  Autosave will not run if it sees an empty project location, even
+  // if autosave is enabled.
 
   this->current_project_changed_signal_();
 

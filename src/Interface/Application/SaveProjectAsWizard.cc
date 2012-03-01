@@ -278,11 +278,6 @@ SaveAsSummaryPage::SaveAsSummaryPage( QWidget *parent )
     this->project_path_ = new QLabel;
     this->project_path_->setWordWrap( true );
   
-  this->autosave_checkbox_ = new QCheckBox();
-  this->autosave_checkbox_->setObjectName(QString::fromUtf8("autosave_checkbox_"));
-  this->autosave_checkbox_->setChecked(true);
-  this->autosave_checkbox_->setText( QString::fromUtf8( "Enable Autosave" ) );
-
   this->anonymize_checkbox_ = new QCheckBox();
   this->anonymize_checkbox_->setObjectName(QString::fromUtf8("anonymize_checkbox_"));
   this->anonymize_checkbox_->setChecked( false );
@@ -292,11 +287,9 @@ SaveAsSummaryPage::SaveAsSummaryPage( QWidget *parent )
   layout->addWidget( this->description_ );
     layout->addWidget( this->project_name_ );
     layout->addWidget( this->project_path_ );
-  layout->addWidget( this->autosave_checkbox_ );
   layout->addWidget( this->anonymize_checkbox_ );
     this->setLayout( layout );
   
-  registerField( "autosave", this->autosave_checkbox_ );
   registerField( "anonymize", this->anonymize_checkbox_ );
 }
 

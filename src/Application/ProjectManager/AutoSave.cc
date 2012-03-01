@@ -126,7 +126,9 @@ void AutoSave::recompute_auto_save()
 double AutoSave::compute_timeout()
 {
   Core::StateEngine::lock_type state_engine_lock( Core::StateEngine::GetMutex() );
-  if( PreferencesManager::Instance()->auto_save_state_->get() == false ) 
+  // If autosave is disabled or we're doing a Quick Open (empty project path)
+  if( PreferencesManager::Instance()->auto_save_state_->get() == false ||
+    ProjectManager::Instance()->get_current_project()->project_path_state_->get() == "" ) 
   {
     return 60.0;
   }
@@ -148,6 +150,12 @@ bool AutoSave::needs_auto_save()
 {
   Core::StateEngine::lock_type state_engine_lock( Core::StateEngine::GetMutex() );  
   if( PreferencesManager::Instance()->auto_save_state_->get() == false )
+  {
+    return false;
+  }
+
+  // If the project path is an empty string, assume we used Quick Open and don't try to autosave
+  if( ProjectManager::Instance()->get_current_project()->project_path_state_->get() == "" )
   {
     return false;
   }
