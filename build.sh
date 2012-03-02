@@ -69,6 +69,7 @@ printhelp() {
 
 # will cause the script to bailout if the passed in command fails
 try() {
+  echo $*
   $*
   if [[ $? != "0" ]]; then
       echo -e "\n***ERROR in build script\nThe failed command was:\n$*\n"
@@ -77,6 +78,7 @@ try() {
 }
 
 trybuild() {
+  echo $*
   $*
   if [[ $? != "0" ]]; then
       echo -e "Building Seg3D returned an error\n"
@@ -170,7 +172,7 @@ configure_seg3d_osx() {
     if [[ $xcodebuild -eq 1 ]]; then
         try $cmakebin $DIR/src -G Xcode $build_opts $cmakeargs
     else
-        configure_seg3d_make
+        configure_seg3d_make $build_opts
     fi
 }
 
@@ -259,7 +261,7 @@ setosxmin=0
 verbosebuild="OFF"
 builddir="$DIR/bin"
 xcodebuild=0
-documentation=0
+documentation="OFF"
 
 echo "Parsing arguments..."
 while [[ $1 != "" ]]; do
@@ -301,7 +303,7 @@ while [[ $1 != "" ]]; do
               echo "WARNING: Only OS X supports the --xcode-build flag."
             fi;;
         --documentation)
-            documentation="1";;
+            documentation="ON";;
         -j*)
             makeflags="${makeflags} $1";;
         -D*)
