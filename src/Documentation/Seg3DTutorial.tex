@@ -37,7 +37,7 @@ Seg3D is distributed as a binary download for Linux, Windows, and OS X. Please v
 
 This tutorial uses two datasets. The first one is a set  of two 3D scans, one is an anatomical MRI of the atria and the second one is a delayed enhanced MR image of the same region. Both images have been registered. The second data is a brain data set that contains a preoperative MR image of the brain and a post surgery CT image of a pediatric patient.
 
-The datasets are available in the SCIRunData zip files. The datasets for this tutorial are inside the Seg3D directory.
+The datasets are available in the SCIRunData zip files. Please visit\href{http://www.sci.utah.edu/cibc/software/106-scirun.html}{SCIRun Datasets} to download the datasets. The datasets for this tutorial are inside the Seg3D directory.
 
 %---------------------------------------------
 
@@ -50,14 +50,14 @@ Scope: Navigating in Seg3D
 
 \section{Starting Seg3D}
 
-When you start Seg3D, you will be greeted by the welcome screen (Figure~\ref{fig:welcome}).  As you will see, you have some options:  you may load a recent project from the list (likely to be empty), open a project that you have saved on your machine, start a new project, take a quick look at a single segmentation or image file, or you may quite Seg3D if you have changed your mind. 
+When you start Seg3D, you will be greeted by the welcome screen (Figure~\ref{fig:welcome}).  As you will see, you have some options:  you may load a recent project from the list (likely to be empty), open a project that you have saved on your machine, start a new project, take a quick look at a single segmentation or image file, or you may quit Seg3D if you have changed your mind. 
 
 \begin{figure}
 \scalebox{0.3}{\includegraphics{Seg3DTutorial_figures/welcome_screen.png}}
 \caption{Seg3D welcome screen}\label{fig:welcome}
 \end{figure}
 
-Seg3D handles your data mainly in the form of projects which are similar to those used in other applications.  A project consists of a group of files and with this set up, Seg3D is able to track and save your data that you are working on, the settings that you are using, and the tools and filters that you are using.  This is very useful, especially as your segmentation become larger and more complicated.  For now, we will begin by starting a new project.  Once you choose that, you will be asked to choose a name and location for the project.  Test\_1 will do for a name and so will the default location of {\tt Seg3D-Projects} created by Seg3D during installation.
+Seg3D handles your data mainly in the form of projects which are similar to those used in other applications.  A project consists of a group of files and with this set up, Seg3D is able to track and save your data that you are working on, the settings that you are using, and the tools and filters that you are using.  This is very useful, especially as your segmentations become larger and more complicated.  For now, we will begin by starting a new project.  Once you choose to open a new project, you will be asked to choose a name and location for the project.  Test\_1 will do for a name and the default location will be a directory that was created during installation called {\tt Seg3D-Projects}. You can use this directory to store future projects.
 
 \section{Loading A Dataset}
 
@@ -69,14 +69,14 @@ In order to get a good feel for the Seg3D program, one needs to load a dataset. 
 \caption{Loading a volume}\label{fig:LoadVolume}
 \end{figure}
 
-Layer importer widget will then appear (figure~\ref{fig:LoadVolume_2}).  This widget is for distinguishing how the data from the file is read and is especially needed when loading a previously saved label masks.  For this dataset, choose the only available option, which is \textbf {Data Volume}.  This will load the file as a gray scale image volume.  
+The layer importer widget will then appear (figure~\ref{fig:LoadVolume_2}).  This widget is for distinguishing how the data from the file is read and the widget is especially needed when loading previously saved label masks.  For this dataset, choose the only available option, which is \textbf {Data Volume}.  This will load the file as a gray scale image volume.  
 
 \begin{figure}
 \scalebox{0.4}{\includegraphics{Seg3DTutorial_figures/LoadVolume_2.png}}
 \caption{Chose type of data to load}\label{fig:LoadVolume_2}
 \end{figure}
 
-Note: we converted the datasets for this demo into the {\em NRRD} dataset format as it does not contain any patient information. Seg3D reads as well dicom files and any image file format supported by the Insight ToolKit, as well as Matlab files. The browser decides which fileformat to use based on the extension of the file.
+Note: we converted the datasets for this demo into the {\em NRRD} dataset format as it does not contain any patient information. For more information on NRRD filetypes, refer to \href{http://teem.sourceforge.net/nrrd/format.html}{the NRRD Format}. Seg3D reads \href{http://en.wikipedia.org/wiki/DICOM}{DICOM} files as well and any image file format supported by the Insight ToolKit, as well as Matlab files. For additional supported filetypes, view the filetype drop-down menu that appears while browsing to open a file. The browser decides which fileformat to use based on the extension of the file.
 
 \begin{figure}
 \scalebox{0.3}{\includegraphics{Seg3DTutorial_figures/MainSeg3DWindow.png}}
@@ -87,7 +87,7 @@ Note: we converted the datasets for this demo into the {\em NRRD} dataset format
 Once the file has loaded one can see the data being displayed in the 3 slice views and the 3D viewer. The layout of the Seg3D program is highlighted in figure~\ref{fig:MainSeg3DWindow}. On the top left one has a tool menu that will show the options of the currently loaded tool and is currently empty. On the right one can see the layer menu. Each layer in Seg3D is a separate volume and the order in the Layer Editor depicts the order in which datasets are being shown. In the center one has the three orthogonal views and one 3D viewer and to the lower left one can browse the position of the active dataset and sample the value.
 
 \section{Navigation}
-
+Note: These operations are based on a setup that involves a three-button mouse. For other configurations, see {\bf Keyboard Shortcuts} in the Help menu.
 \begin{description}
 \item[Brightness] Move the mouse up and down while pressing left mouse button.
 
