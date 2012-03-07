@@ -122,7 +122,7 @@ private:
   
   // OPEN_INITIAL_PROJECT:
   // Opens a project on startup
-  void open_initial_project ( std::string filename );
+  bool open_initial_project ( std::string filename );
 
   // NOTE:
   // We need to override these events for the progress widget that draws an transparent layer

@@ -274,12 +274,12 @@ ApplicationInterface::ApplicationInterface( std::string file_to_view_on_open ) :
 
   file_to_view_on_open = this->find_project_file( file_to_view_on_open );
 
-  this->open_initial_project ( file_to_view_on_open );
-
-  QtUtils::QtBridge::Show( this->private_->splash_screen_, 
-    InterfaceManager::Instance()->splash_screen_visibility_state_ );
-  this->center_seg3d_gui_on_screen( this->private_->splash_screen_ );
-  
+  if ( ! this->open_initial_project ( file_to_view_on_open ) )
+  {
+    QtUtils::QtBridge::Show( this->private_->splash_screen_, 
+       InterfaceManager::Instance()->splash_screen_visibility_state_ );
+    this->center_seg3d_gui_on_screen( this->private_->splash_screen_ );
+  }
 }
 
 ApplicationInterface::~ApplicationInterface()
@@ -620,7 +620,7 @@ void ApplicationInterface::handle_osx_file_open_event (std::string filename)
   
   // must do this to make sure a double-click on a project file doesn't use this executable session
   bool new_session = InterfaceManager::Instance()->splash_screen_visibility_state_->get();
-  if ( this->private_->splash_screen_->get_user_interacted() ) 
+  if ( !this->private_->splash_screen_ || this->private_->splash_screen_->get_user_interacted() ) 
   {
     new_session = false;
   }
@@ -679,13 +679,12 @@ std::string ApplicationInterface::find_project_file ( std::string path )
   return path;
 }
 
-void ApplicationInterface::open_initial_project ( std::string filename )
+bool ApplicationInterface::open_initial_project ( std::string filename )
 {
-  if ( filename == "" ) return;
+  if ( filename == "" ) return false;
   
   std::string extension = boost::filesystem::extension( boost::filesystem::path( filename ) );
 
-  std::cerr << "Turning off splash screen!\n";
   Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
                              InterfaceManager::Instance()->splash_screen_visibility_state_, false );
   
@@ -695,7 +694,7 @@ void ApplicationInterface::open_initial_project ( std::string filename )
     ActionNewProject::Dispatch( Core::Interface::GetWidgetActionContext(), 
                                 "", "Untitled Project" );
     LayerIOFunctions::ImportFiles( NULL, filename );
-    return;
+    return true;
   }
   
   std::vector<std::string> project_file_extensions = Project::GetProjectFileExtensions(); 
@@ -711,6 +710,7 @@ void ApplicationInterface::open_initial_project ( std::string filename )
   {
     ActionLoadProject::Dispatch( Core::Interface::GetWidgetActionContext(), filename ); 
   } 
+  return true;
 }
 
 
