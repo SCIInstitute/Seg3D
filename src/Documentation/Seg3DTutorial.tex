@@ -37,7 +37,7 @@ Seg3D is distributed as a binary download for Linux, Windows, and OS X. Please v
 
 This tutorial uses two datasets. The first one is a set  of two 3D scans, one is an anatomical MRI of the atria and the second one is a delayed enhanced MR image of the same region. Both images have been registered. The second data is a brain data set that contains a preoperative MR image of the brain and a post surgery CT image of a pediatric patient.
 
-The datasets are available in the SCIRunData zip files. Please visit\href{http://www.sci.utah.edu/cibc/software/106-scirun.html}{SCIRun Datasets} to download the datasets. The datasets for this tutorial are inside the Seg3D directory.
+The datasets are available in the SCIRunData zip files. Please visit \href{http://www.sci.utah.edu/cibc/software/106-scirun.html}{SCIRun Datasets} to download the datasets. The datasets for this tutorial are inside the Seg3D directory.
 
 %---------------------------------------------
 
@@ -133,10 +133,10 @@ There is also an option for a full screen mode which will fill the entire comput
 \section{Loading a second dataset}
 
 Open the {\bf Import Layer From Single File...} menu once more and now load the Angio.nrrd dataset by choosing \textbf {Data Volume}.
-After loading this dataset, two datasets are present in the menu on the right.  You can see that because the data sets are in a different group, \emph{i.e.}, they each have an orange header, the volumes are slightly different.  Be clicking on the \emph{i} button for each volume you can see that the origins are slightly different.  You may correct this using the {\bf Transform} tool.  With this tool you can change the origin of one volume to match the other. The corrected volume will then join the other into a single group. This step is not needed for  the purposes of this tutorial, but tools and filters that use two layers as inputs cannot use layers of different groups.  
+After loading this dataset, two datasets are present in the menu on the right.  You can see that because the data sets are in a different group, \emph{i.e.}, they each have an orange header, the volumes are slightly different.  By clicking on the \emph{i} button for each volume you can see that the origins are slightly different.  You may correct this using the {\bf Transform} tool.  With this tool you can change the origin of one volume to match the other. The corrected volume will then join the other into a single group. This step is not needed for  the purposes of this tutorial, but tools and filters that use two layers as inputs cannot use layers of different groups.  
 
 Press on the eye to show which layer is visible. As volume layers are full data layers they completely clutter the underlying image.
-Switch on the visibility of both layers and toggle the visibility of the top most layer.  The top most is the one found on top of the menu. 
+Switch on the visibility (using the eye) of both layers and toggle the visibility of the top most layer.  The top most is the one found on top of the menu. 
 The blue highlight set the selected layer.  Select the top layer and press space and press space again (put the cursor in the Viewer Window).
 This option can be used to quickly view the difference between layers.
 
@@ -155,7 +155,7 @@ Scope: Paint Tool - Polyline Tool - Logical Operators - Creating Isosurfaces - M
 
 \section{DEMRI Dataset}
 
-In this section we will use the paint and polyline tools to segment a simple structure, the aorta, from the DEMRI dataset.  Delayed enhancement MRI (DEMRI) makes use of the contrast enhancement that gadolinium (Gd) provides in MR imaging.  In this scan Gd was injected via IV into the patient's venous system.  As the Gd washes through the system it enters and exits tissues at variable rates.  In this case, 15 min. after administration, the Gd has washed into and out of most tissue.  Contrast enhanced tissues that continue to sequester Gd are assumed to have disrupted, or altered vascular perfusion.  This method has be used to detect cardiac ischemia, infarct, and scarring.  This particular DEMRI dataset was used to evaluate post-operative scarring in the left atrium.  To get started, we will be looking at the ascending and descending aorta.%reference anatomy figure
+In this section we will use the paint and polyline tools to segment a simple structure, the aorta, from the DEMRI dataset.  Delayed enhancement MRI (DEMRI) makes use of the contrast enhancement that gadolinium (Gd) provides in MR imaging.  In this scan Gd was injected via IV into the patient's venous system.  As the Gd washes through the system it enters and exits tissues at variable rates.  In this case, 15 minutes after administration, the Gd has washed into and out of most tissue.  Enhanced tissues that continue to sequester Gd are assumed to have disrupted, or altered vascular perfusion.  This method has be used to detect cardiac ischemia, infarct, and scarring.  This particular DEMRI dataset was used to evaluate post-operative scarring in the left atrium.  To get started, we will be looking at the ascending and descending aorta.%reference anatomy figure
 
 % Insert Anatomy figure 
 \section{Label Masks}
@@ -176,6 +176,7 @@ Begin by selecting Paint Brush under Tools on the menu bar.  When the circular i
 Prepare to segment by clicking on the + widget under DEMRI on the Layer Menu to create a label mask.  Begin segmentation of the aorta by navigating the Paint icon over the {\bf Descending Aorta} on the axial plane.  Adjust the diameter of the tool with the scroll wheel, or by holding the right mouse button until it just fills the lumen of the aorta.  Once you have positioned and sized the icon click the left mouse button.  The circle icon should then fill with the same color of the selected label mask.  Proceed to the next few slices painting the lumen of each one (Figure \ref{fig:paintlumen}).  Next, create a new label mask, and expand the diameter of the Paint icon so it encircles the outer diameter, or superficial surface of the aorta.  Now paint the superficial surface of the same slices.  It is possible to erase painting on the label mask by holding the right mouse button and moving the icon over the region to be erased.
 
 %{\bf Note:  Seg3D allows for multiple tools, even of the same type, to remain in the tool menu making switching between tools easier.}
+
 
 \begin{figure}
 \scalebox{0.3}{\includegraphics{Seg3DTutorial_figures/polylinelumen.png}}
@@ -205,7 +206,7 @@ Open the Polyline Tool under the Tools menu on the menu bar.  Without changing t
 
 Once you have masked the lumen and superficial surface of both the ascending and descending aorta we can use logical operators to mask the real region of interest, the aorta wall.
 Under Mask Filters on the menu bar, select Boolean Xor.
-Highlight either of the label masks.  You will notice that the name of the highlighted filter will appear in the target layer field.  You can change this by unchecking the `Always use active layer' option. Choose the other label mask in the Mask Layer option by selecting it from the list of eligible layers, or be shift clicking on the face color image of desired layer and dragging it to the option list.  Click on the Run Filter button, this will create a new label mask that only covers the aorta wall (Figures \ref{fig:logicaloperators}).  The resulting layer is shown in Figure~\ref{fig:creatingisosurface}.  Notice there is an option called Replace on the bottom of the tool menu.  Most of the filters have this option.  It will replace the target layer with the result of the filter.  This is very useful when you do not need the unmodified layer after you run the filter.  
+Highlight either of the label masks.  You will notice that the name of the highlighted filter will appear in the target layer field.  You can change this by unchecking the `Always use active layer' option. Choose the other label mask in the Mask Layer option by selecting it from the list of eligible layers, or by holding down shift and clicking on the face color image of desired layer and dragging it to the option list.  Click on the Run Filter button, this will create a new label mask that only covers the aorta wall (Figures \ref{fig:logicaloperators}).  The resulting layer is shown in Figure~\ref{fig:creatingisosurface}.  Notice there is an option called Replace on the bottom of the tool menu.  Most of the filters have this option.  It will replace the target layer with the result of the filter.  This is very useful when you do not need the unmodified layer after you run the filter.  
 
 
 \begin{figure}
@@ -355,7 +356,8 @@ Browse the Brain\_DataSet directory and load the following two files: CTbrain50.
 
 Note that the data is not perfectly registered and that a part of the skull has been lifted to actually insert the electrode arrays.
 
-To segment out the Skull we will be using the CT image. Select the CT image in the Layer Menu. Now from the Filters menu select the Neighborhood Connected filter. This filter needs seed points and finds every connected tissue of the same gray scale range. Hence placing seed points needs to be carefully. An example of this placement is given in figure~\ref{fig:NeighborhoodConnected}. 
+To segment out the Skull we will be using the CT image. Select the CT image in the Layer Menu. Now from the Data
+ Filters menu select the Neighborhood Connected filter. This filter needs seed points and finds every connected tissue of the same gray scale range. Hence placing seed points needs to be carefully. An example of this placement is given in figure~\ref{fig:NeighborhoodConnected}. 
 
 \begin{figure}
 \scalebox{0.4}{\includegraphics{Seg3DTutorial_figures/SkullSegmentation.png}}
