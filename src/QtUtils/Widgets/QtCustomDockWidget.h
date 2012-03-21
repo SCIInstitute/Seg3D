@@ -49,6 +49,7 @@ class QtCustomDockWidget : public QDockWidget
 Q_OBJECT
   
 Q_SIGNALS:
+  void opened();
   void closed();
   
 public:
@@ -68,7 +69,7 @@ public:
 
   // SHOWEVENT:
   // This function is called by Qt to deliver an event that tells that the
-  // widget is being resized. 
+  // widget is being shown. 
   virtual void showEvent( QShowEvent *event );
 
   

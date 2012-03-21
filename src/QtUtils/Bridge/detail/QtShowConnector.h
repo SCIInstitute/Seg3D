@@ -65,6 +65,7 @@ private:
   
 private Q_SLOTS:
   void set_state();
+  void set_state_visible();
 
   // -- internal variables --
 private:

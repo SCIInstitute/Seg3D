@@ -63,6 +63,7 @@ QtCustomDockWidget::~QtCustomDockWidget()
 void QtCustomDockWidget::showEvent( QShowEvent* event )
 {
   QDockWidget::showEvent( event );
+  Q_EMIT opened();
   this->raise();
 }
 

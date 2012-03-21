@@ -41,6 +41,7 @@ class QtCustomDialog : public QDialog
 Q_OBJECT
   
 Q_SIGNALS:
+  void opened();
   void closed();
   
 public:
@@ -54,6 +55,11 @@ private:
   // This function is called by Qt to deliver an event that tells that the
   // widget is being hidden. 
   virtual void closeEvent( QCloseEvent* event );
+
+  // SHOWEVENT:
+  // This function is called by Qt to deliver an event that tells that the
+  // widget is being shown. 
+  virtual void showEvent( QShowEvent *event );
   
 };
   

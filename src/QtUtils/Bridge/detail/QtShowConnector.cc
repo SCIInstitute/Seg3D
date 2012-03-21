@@ -74,6 +74,7 @@ QtShowConnector::QtShowConnector( QtCustomDockWidget* parent,
   }
   
   this->connect( parent, SIGNAL( closed() ), SLOT( set_state() ) );
+  this->connect( parent, SIGNAL( opened() ), SLOT( set_state_visible() ) );
 }
 
 QtShowConnector::QtShowConnector( QtCustomDialog* parent, 
@@ -93,6 +94,7 @@ QtShowConnector::QtShowConnector( QtCustomDialog* parent,
   }
 
   this->connect( parent, SIGNAL( closed() ), SLOT( set_state() ) );
+  this->connect( parent, SIGNAL( opened() ), SLOT( set_state_visible() ) );
 }
 
 QtShowConnector::QtShowConnector( QWidget* parent, 
@@ -178,5 +180,14 @@ void QtShowConnector::set_state()
     Core::ActionSet::Dispatch( Core::Interface::GetMouseActionContext(), this->state_, false );
   }
 }
+
+void QtShowConnector::set_state_visible()
+{
+  if ( !this->is_blocked() )
+  {
+    Core::ActionSet::Dispatch( Core::Interface::GetMouseActionContext(), this->state_, true );
+  }
+}
+
 
 } // end namespace QtUtils

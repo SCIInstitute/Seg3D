@@ -49,5 +49,12 @@ void QtCustomDialog::closeEvent( QCloseEvent* event )
   event->accept();
 }
 
+void QtCustomDialog::showEvent( QShowEvent *event )
+{
+  QDialog::showEvent( event );
+  Q_EMIT opened();
+}
+
+
 
 } // end namespace QtUtils
