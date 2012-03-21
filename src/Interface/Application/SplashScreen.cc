@@ -132,6 +132,9 @@ SplashScreen::~SplashScreen()
   
 void SplashScreen::new_project()
 {
+  // must do this to make sure a double-click on project file doesn't use this executable session
+  this->private_->user_interacted_ = true;
+
   this->new_project_wizard_ = new ProjectWizard( this->parentWidget() );
   connect( this->new_project_wizard_, SIGNAL( canceled() ), this, SLOT( unhide() ) );
   this->new_project_wizard_->show();
