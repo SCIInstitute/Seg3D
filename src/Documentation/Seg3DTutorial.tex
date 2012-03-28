@@ -37,7 +37,7 @@ Seg3D is distributed as a binary download for Linux, Windows, and OS X. Please v
 
 This tutorial uses two datasets. The first one is a set  of two 3D scans, one is an anatomical MRI of the atria and the second one is a delayed enhanced MR image of the same region. Both images have been registered. The second data is a brain data set that contains a preoperative MR image of the brain and a post surgery CT image of a pediatric patient.
 
-The datasets are available in the SCIRunData zip files. Please visit \href{http://www.sci.utah.edu/cibc/software/106-scirun.html}{SCIRun Datasets} to download the datasets. The datasets for this tutorial are inside the Seg3D directory.
+The datasets are available in the SCIRunData zip files. Please visit \href{http://www.sci.utah.edu/cibc/software/106-scirun.html}{SCIRun Datasets} to download the datasets. The datasets for this tutorial are inside the Seg3D directory. The direct linked to the zipped SCIRun Datasets can be found \href{http://www.sci.utah.edu/download/scirun/4.4.html}{here}.
 
 %---------------------------------------------
 
@@ -61,7 +61,7 @@ Seg3D handles your data mainly in the form of projects which are similar to thos
 
 \section{Loading A Dataset}
 
-In order to get a good feel for the Seg3D program, one needs to load a dataset. Please open up the file menu and select the {\bf Import Layer From Single File...} menu item as indicated in figure~\ref{fig:LoadVolume}. This opens up a file browser. Browse to the Heart\_DataSet directory and select this one to load the DEMRI.nrrd file.
+In order to get a good feel for the Seg3D program, one needs to load a dataset. Please open up the file menu and select the {\bf Import Layer From Single File...} menu item as indicated in figure~\ref{fig:LoadVolume}. This opens up a file browser. Browse to the Heart\_DataSet directory and select this one to load the DEMRI.NRRD file.
 
 
 \begin{figure}
@@ -87,7 +87,13 @@ Note: we converted the datasets for this demo into the {\em NRRD} dataset format
 Once the file has loaded one can see the data being displayed in the 3 slice views and the 3D viewer. The layout of the Seg3D program is highlighted in figure~\ref{fig:MainSeg3DWindow}. On the top left one has a tool menu that will show the options of the currently loaded tool and is currently empty. On the right one can see the layer menu. Each layer in Seg3D is a separate volume and the order in the Layer Editor depicts the order in which datasets are being shown. In the center one has the three orthogonal views and one 3D viewer and to the lower left one can browse the position of the active dataset and sample the value.
 
 \section{Navigation}
-Note: These operations are based on a setup that involves a three-button mouse. For other configurations, see {\bf Keyboard Shortcuts} in the Help menu.
+Note: These operations are based on a setup that involves a three-button mouse. For other configurations, see {\bf Keyboard Shortcuts} in the Help menu (figure~\ref{fig:KeyboardShortcuts}).
+
+\begin{figure}
+\scalebox{0.4}{\includegraphics{Seg3DTutorial_figures/KeyboardShortcuts.png}}
+\caption{The keyboard shortcuts as found in the help menu}\label{fig:KeyboardShortcuts}
+\end{figure}
+
 \begin{description}
 \item[Brightness] Move the mouse up and down while pressing left mouse button.
 
@@ -132,7 +138,7 @@ There is also an option for a full screen mode which will fill the entire comput
 
 \section{Loading a second dataset}
 
-Open the {\bf Import Layer From Single File...} menu once more and now load the Angio.nrrd dataset by choosing \textbf {Data Volume}.
+Open the {\bf Import Layer From Single File...} menu once more and now load the Angio.NRRD dataset by choosing \textbf {Data Volume}.
 After loading this dataset, two datasets are present in the menu on the right.  You can see that because the data sets are in a different group, \emph{i.e.}, they each have an orange header, the volumes are slightly different.  By clicking on the \emph{i} button for each volume you can see that the origins are slightly different.  You may correct this using the {\bf Transform} tool.  With this tool you can change the origin of one volume to match the other. The corrected volume will then join the other into a single group. This step is not needed for  the purposes of this tutorial, but tools and filters that use two layers as inputs cannot use layers of different groups.  
 
 Press on the eye to show which layer is visible. As volume layers are full data layers they completely clutter the underlying image.
@@ -233,7 +239,7 @@ To extract the data covered by the label mask select the Mask Data option under 
 
 \section{Saving}
 
-At this point there are multiple options for saving the work that you have done.  Under the File menu are the options: Save Project, Save Project as ..., Export Segmentation, and Export Active Data Layer.  There are hotkeys for these functions and many others that can be see by clicking the help menu then Keyboard Shortcuts.  Save Project/Save Project as ... will save the work that you done to this point in for later restoration.  The Export Segmentation option save the label masks that you have created.   Export Active Data Layer will save the image data selected in the Layer Menu.  Individual mask and data layers may be exported by right clicking on the layers and choosing Export Segmentation/Data as... and then choosing the file type.  As apparent, the export data types available are image stacks (bitmap, png, tiff, dicom), matlab v7.3, and nrrd (see \url{http://teem.sourceforge.net/nrrd/}).  The preferred data format for CIBC software is nrrd, and is required for using BioMesh3D, a tetrahedral mesh generation software also developed by CIBC \url{http://biomesh3d.com}.
+At this point there are multiple options for saving the work that you have done.  Under the File menu are the options: Save Project, Save Project as ..., Export Segmentation, and Export Active Data Layer.  There are hotkeys for these functions and many others that can be see by clicking the help menu then Keyboard Shortcuts.  Save Project/Save Project as ... will save the work that you done to this point in for later restoration.  The Export Segmentation option save the label masks that you have created.   Export Active Data Layer will save the image data selected in the Layer Menu.  Individual mask and data layers may be exported by right clicking on the layers and choosing Export Segmentation/Data as... and then choosing the file type.  As apparent, the export data types available are image stacks (bitmap, png, tiff, dicom), matlab v7.3, and NRRD (see \url{http://teem.sourceforge.net/nrrd/}).  The preferred data format for CIBC software is NRRD, and is required for using BioMesh3D, a tetrahedral mesh generation software also developed by CIBC \url{http://biomesh3d.com}.
   
 \chapter{Filters and Threshold Tool}
 
@@ -249,9 +255,9 @@ Scope: Using Masks - Filtering Data
 
 \section{Loading  Angiogram}
 
-The second cardiac dataset that is part of this example is the angiogram. For this part of the tutorial load the Angio.nrrd file. Use the {\bf Import Layer From Single File...} menu in the File Menu to load this dataset. An example of this dataset is depicted in figure~\ref{fig:AngioData}.
+The second cardiac dataset that is part of this example is the angiogram. For this part of the tutorial load the Angio.NRRD file. Use the {\bf Import Layer From Single File...} menu in the File Menu to load this dataset. An example of this dataset is depicted in figure~\ref{fig:AngioData}.
 
-This dataset was previously registered to the DEMRI.nrrd dataset. As both datasets have the sampling distance and coordinate system. One can use label mask from the DEMRI dataset in the Angio dataset and vice versa. 
+This dataset was previously registered to the DEMRI.NRRD dataset. As both datasets have the sampling distance and coordinate system. One can use label mask from the DEMRI dataset in the Angio dataset and vice versa. 
 
 \begin{figure}
 \scalebox{0.4}{\includegraphics{Seg3DTutorial_figures/FilteredAngioData.png}}
@@ -352,7 +358,7 @@ The final goal of this research is generate a patient specific model which can b
 \end{figure}
 \section{Neighborhood Connected}
 
-Browse the Brain\_DataSet directory and load the following two files: CTbrain50.nrrd and MRI-brain50.nrrd. The first one is the post operative CT image and the second one is the pre-surgery MR image. After loading the datasets the Seg3D window should look like the one in figure~\ref{fig:LoadingBrainDataSet}. 
+Browse the Brain\_DataSet directory and load the following two files: CTbrain50.NRRD and MRI-brain50.NRRD. The first one is the post operative CT image and the second one is the pre-surgery MR image. After loading the datasets the Seg3D window should look like the one in figure~\ref{fig:LoadingBrainDataSet}. 
 
 Note that the data is not perfectly registered and that a part of the skull has been lifted to actually insert the electrode arrays.
 
@@ -398,7 +404,7 @@ Apply this filter and again look at the differences. The resulting image is also
 
 To mask out brain, the easiest is to manually generate a mask and paint with a brush a rough segmentation of the brain cavity. The goal of masking out the data is to be able to threshold the white and gray matter inside the skull without picking up data from the scalp.
 
-To jump start the process a segmentation is available in the dataset. This one was generated by manually painting the slices. Load the label layer through the {\bf Import Layer From Single File...} from the  File menu. Choose the Brain.nrrd dataset.  Then click on Import file as a {\bf Series of Masks:} There are two of these options and either one is valid because this data file has only one mask layer.  After loading the dataset Seg3D should look like the image depicted in figure~\ref{fig:LoadingSegmentation}.
+To jump start the process a segmentation is available in the dataset. This one was generated by manually painting the slices. Load the label layer through the {\bf Import Layer From Single File...} from the  File menu. Choose the Brain.NRRD dataset.  Then click on Import file as a {\bf Series of Masks:} There are two of these options and either one is valid because this data file has only one mask layer.  After loading the dataset Seg3D should look like the image depicted in figure~\ref{fig:LoadingSegmentation}.
 
 \begin{figure}
 \scalebox{0.4}{\includegraphics{Seg3DTutorial_figures/MaskDataBrain.png}}
@@ -425,6 +431,24 @@ Repeat the same procedure for the gray matter (see figure~\ref{fig:ThresholdGray
 \begin{figure}
 \scalebox{0.4}{\includegraphics{Seg3DTutorial_figures/ThresholdGreyMatter.png}}
 \caption{Thresholding grey matter using threshold range}\label{fig:ThresholdGrayMatter}
+\end{figure}
+
+\section{Otsu Threshold}
+
+Another thresholding tool available in the Data Filters menu is the Otsu Threshold. The Otsu Threshold uses an image intensity histogram to determine adeuqate threshold levels and segment the image based on the determined threshold levels. A demonstration of the Otsu Threshold will be done on the CT image from the brain dataset.
+
+To use the Otsu Threshold, first select the {\bf Otsu Threshold} tool from the {\bf Data Filters} menu. The tools window will then show the information on the Otsu Threshold tool. The target layer may be selected, and the number of thresholds can be selected, from zero to four different thresholding layers. Below the number of thresholds is the histogram representing the intensities of the pixels of the image (figure~\ref{fig:OtsuBefore}).
+
+\begin{figure}
+\scalebox{0.3}{\includegraphics{Seg3DTutorial_figures/OtsuBefore.png}}
+\caption{Brain data before Otsu thresholding}\label{fig:OtsuBefore}
+\end{figure}
+
+To use the Otsu Threshold tool on the brain CT image, select the tool and then choose three as the number of thresholds. Select linear as the method for calculation, and run the filter. The thresholded layers will appear in the layers view on the right. The number of layers corresponds to the number of thresholds selected in the tool view. In the brain data, the tool created different layers for dense matter like bone, other matter, and empty space (figure~\ref{fig:OtsuAfter}).
+
+\begin{figure}
+\scalebox{0.3}{\includegraphics{Seg3DTutorial_figures/OtsuAfter.png}}
+\caption{Brain data after Otsu thresholding}\label{fig:OtsuAfter}
 \end{figure}
 
 \end{document}
