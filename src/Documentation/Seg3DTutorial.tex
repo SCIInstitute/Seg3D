@@ -435,21 +435,44 @@ Repeat the same procedure for the gray matter (see figure~\ref{fig:ThresholdGray
 
 \section{Otsu Threshold}
 
-Another thresholding tool available in the Data Filters menu is the Otsu Threshold. The Otsu Threshold uses an image intensity histogram to determine adeuqate threshold levels and segment the image based on the determined threshold levels. A demonstration of the Otsu Threshold will be done on the CT image from the brain dataset.
+Another thresholding tool available in the Data Filters menu is the Otsu Threshold. The Otsu Threshold uses an image intensity histogram to determine adequate threshold levels and segment the image based on the determined threshold levels. A demonstration of the Otsu Threshold will be done on the CT image from the brain dataset.
 
-To use the Otsu Threshold, first select the {\bf Otsu Threshold} tool from the {\bf Data Filters} menu. The tools window will then show the information on the Otsu Threshold tool. The target layer may be selected, and the number of thresholds can be selected, from zero to four different thresholding layers. Below the number of thresholds is the histogram representing the intensities of the pixels of the image (figure~\ref{fig:OtsuBefore}).
+To use the Otsu Threshold, first select the {\bf Otsu Threshold} tool from the {\bf Data Filters} menu. The tools window will then show the information on the Otsu Threshold tool. The target layer may be selected, and the number of thresholds can be selected, from zero to four different thresholding layers. Below the number of thresholds is the histogram representing the intensities of the pixels of the image (figure~\ref{fig:OtsuBefore}). The menu box below the histogram allows the user to select whether they would like a logarithmic or a linear graph.
 
 \begin{figure}
 \scalebox{0.3}{\includegraphics{Seg3DTutorial_figures/OtsuBefore.png}}
 \caption{Brain data before Otsu thresholding}\label{fig:OtsuBefore}
 \end{figure}
 
-To use the Otsu Threshold tool on the brain CT image, select the tool and then choose three as the number of thresholds. Select linear as the method for calculation, and run the filter. The thresholded layers will appear in the layers view on the right. The number of layers corresponds to the number of thresholds selected in the tool view. In the brain data, the tool created different layers for dense matter like bone, other matter, and empty space (figure~\ref{fig:OtsuAfter}).
+To use the Otsu Threshold tool on the brain CT image, select the tool and then choose three as the number of thresholds. Select logarithmic for the display of the histogram, and run the filter. The thresholded layers will appear in the layers view on the right. The number of layers corresponds to the number of thresholds selected in the tool view. In the brain data, the tool created different layers for dense matter like bone, other less dense matter, and air (figure~\ref{fig:OtsuAfter}).
 
 \begin{figure}
 \scalebox{0.3}{\includegraphics{Seg3DTutorial_figures/OtsuAfter.png}}
 \caption{Brain data after Otsu thresholding}\label{fig:OtsuAfter}
 \end{figure}
 
+\section{Canny Edge Detection Filter}
+An advanced tool for edge detection is the Canny Edge Detection Filter. This filter computes the edges using a Canny Edge Detection Filter, which involves smoothing the image with a Gaussian filter, calculating the second directional derivatives of the smoothed image, and performing a non-maximum supression to find the correct extrema. The hysteresis thresholding is then applied to the gradient magnitude of the smoothed image to find and link edges. A demonstration of the Canny Edge Detection Filter will be done on the CT image from the brain dataset.
+
+To use the Canny edge detection filter on the volume, first select the Canny edge detection tool from the Advanced Filters menu. In the tools window, the Canny edge detection tool will appear, allowing you to select the layer to run the filter on, as well as an area to select the distance and minimum threshold (figure~\ref{fig:CannyBefore}). 
+
+\begin{figure}
+\scalebox{0.3}{\includegraphics{Seg3DTutorial_figures/CannyBefore.png}}
+\caption{Brain data before Canny edge detection}\label{fig:CannyBefore}
+\end{figure}
+
+The distance is the distance between edges, and the threshold is the pixel intensity threshold for distinguishing edges. Select the distance as 4 and the threshold as 40. When the layer, distance and threshold have been selected, run the filter to create a new layer with the Canny edges displayed (figure~\ref{fig:CannyAfter}). Note the detection of edges between dense bone matter and less dense matter.
+
+\begin{figure}
+\scalebox{0.3}{\includegraphics{Seg3DTutorial_figures/CannyAfter.png}}
+\caption{Brain data after Canny edge detection}\label{fig:CannyAfter}
+\end{figure}
+
+Notice that if the threshold is changed from 4 to 0, the filter detects edges in brain matter, as seen in figure~\ref{fig:CannyAfterMatter}
+
+\begin{figure}
+\scalebox{0.3}{\includegraphics{Seg3DTutorial_figures/CannyAfterMatter.png}}
+\caption{Canny edge detection with a lower threshold}\label{fig:CannyAfterMatter}
+\end{figure}
 \end{document}
 
