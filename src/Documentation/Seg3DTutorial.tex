@@ -86,6 +86,8 @@ Note: we converted the datasets for this demo into the {\em NRRD} dataset format
 
 Once the file has loaded one can see the data being displayed in the 3 slice views and the 3D viewer. The layout of the Seg3D program is highlighted in figure~\ref{fig:MainSeg3DWindow}. On the top left one has a tool menu that will show the options of the currently loaded tool and is currently empty. On the right one can see the layer menu. Each layer in Seg3D is a separate volume and the order in the Layer Editor depicts the order in which datasets are being shown. In the center one has the three orthogonal views and one 3D viewer and to the lower left one can browse the position of the active dataset and sample the value.
 
+
+Some tools require data to be represented in a histogram, which would be shown in the tool menu. The histogram shows pixel intensities in a cross section of the image, and the data from the histograms is used for image filtering. The data in the histogram can be represented in either a logarithmic or a linear format, with the linear format showing linear values, which often results in more dramatic intensity gradients, and the logarithmic format showing an alternative, with lower intensities receiving a greater emphasis.
 \section{Navigation}
 Note: These operations are based on a setup that involves a three-button mouse. For other configurations, see {\bf Keyboard Shortcuts} in the Help menu (figure~\ref{fig:KeyboardShortcuts}).
 
