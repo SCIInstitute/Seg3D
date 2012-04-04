@@ -5,7 +5,7 @@
 \author{Jeroen Stinstra, Josh Blauer, Jess Tate, Brett Burton, Ahrash Poursaid}
 
 % INCLUDE SCI STYLE DOCUMENT
-\usepackage{seg3d}
+\usepackage{scirun}
 \usepackage{marvosym}
 
 \begin{document}
@@ -163,9 +163,8 @@ Scope: Paint Tool - Polyline Tool - Logical Operators - Creating Isosurfaces - M
 
 \section{DEMRI Dataset}
 
-In this section we will use the paint and polyline tools to segment a simple structure, the aorta, from the DEMRI dataset.  Delayed enhancement MRI (DEMRI) makes use of the contrast enhancement that gadolinium (Gd) provides in MR imaging.  In this scan Gd was injected via IV into the patient's venous system.  As the Gd washes through the system it enters and exits tissues at variable rates.  In this case, 15 minutes after administration, the Gd has washed into and out of most tissue.  Enhanced tissues that continue to sequester Gd are assumed to have disrupted, or altered vascular perfusion.  This method has be used to detect cardiac ischemia, infarct, and scarring.  This particular DEMRI dataset was used to evaluate post-operative scarring in the left atrium.  To get started, we will be looking at the ascending and descending aorta.%reference anatomy figure
+In this section we will use the paint and polyline tools to segment a simple structure, the aorta, from the DEMRI dataset.  Delayed enhancement MRI (DEMRI) makes use of the contrast enhancement that gadolinium (Gd) provides in MR imaging.  In this scan Gd was injected via IV into the patient's venous system.  As the Gd washes through the system it enters and exits tissues at variable rates.  In this case, 15 minutes after administration, the Gd has washed into and out of most tissue.  Enhanced tissues that continue to sequester Gd are assumed to have disrupted, or altered vascular perfusion.  This method has be used to detect cardiac ischemia, infarct, and scarring.  This particular DEMRI dataset was used to evaluate post-operative scarring in the left atrium.  To get started, we will be looking at the ascending and descending aorta.
 
-% Insert Anatomy figure 
 \section{Label Masks}
 
 Seg3D has two types of layers that can operated on by different tools and filters.  These are volume and label masks.  Volumes are image data that has been loaded in, or produced by one of the filters.  The DEMRI and Angio datasets loaded in the first section are volumes, and appear left aligned on the Layer Menu.  If you select the $+$ button below either of these volumes a new layer with the name 'Mask Layer' appears indented above the volume.  This is a label mask, and you may rename it anytime by clicking on the name of the layer.  The label mask displays the segmented regions of interest as a colored opaque layer.  When using any tool or feature it is important to know whether it operates on a volume, label mask, or both. 
@@ -183,7 +182,7 @@ Begin by selecting Paint Brush under Tools on the menu bar.  When the circular i
 
 Prepare to segment by clicking on the + widget under DEMRI on the Layer Menu to create a label mask.  Begin segmentation of the aorta by navigating the Paint icon over the {\bf Descending Aorta} on the axial plane.  Adjust the diameter of the tool with the scroll wheel, or by holding the right mouse button until it just fills the lumen of the aorta.  Once you have positioned and sized the icon click the left mouse button.  The circle icon should then fill with the same color of the selected label mask.  Proceed to the next few slices painting the lumen of each one (Figure \ref{fig:paintlumen}).  Next, create a new label mask, and expand the diameter of the Paint icon so it encircles the outer diameter, or superficial surface of the aorta.  Now paint the superficial surface of the same slices.  It is possible to erase painting on the label mask by holding the right mouse button and moving the icon over the region to be erased.
 
-%{\bf Note:  Seg3D allows for multiple tools, even of the same type, to remain in the tool menu making switching between tools easier.}
+
 
 
 \begin{figure}
