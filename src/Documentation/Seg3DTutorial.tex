@@ -436,7 +436,7 @@ Repeat the same procedure for the gray matter (see figure~\ref{fig:ThresholdGray
 
 \section{Otsu Threshold}
 
-Another thresholding tool available in the Data Filters menu is the Otsu Threshold. The Otsu Threshold uses an image intensity histogram to determine adequate threshold levels and segment the image based on the determined threshold levels. A demonstration of the Otsu Threshold will be done on the CT image that was taken on the 15 year old pediatric patient.The file can be found in the SCIRun datasets (see section~\ref{sec:softwarerequirements}). Open the CTbrain50 file to get started.
+Another thresholding tool available in the Data Filters menu is the Otsu Threshold. The Otsu Threshold uses an image intensity histogram to determine adequate threshold levels and segment the image based on the determined threshold levels. A demonstration of the Otsu Threshold will be done on the CT image that was taken on the 15 year old pediatric patient.The file can be found in the SCIRun datasets (see section~\ref{sec:softwarerequirements}). We will be working with the CTbrain50.NRRD file.
 
 To use the Otsu Threshold, first select the {\bf Otsu Threshold} tool from the {\bf Data Filters} menu. The tools window will then show the information on the Otsu Threshold tool. The target layer may be selected, and the number of thresholds can be selected, from zero to four different thresholding layers. Below the number of thresholds is the histogram representing the intensities of the pixels of the image (figure~\ref{fig:OtsuBefore}). The menu box below the histogram allows the user to select whether they would like a logarithmic or a linear graph.
 
@@ -453,7 +453,7 @@ To use the Otsu Threshold tool on the brain CT image, select the tool and then c
 \end{figure}
 
 \section{Canny Edge Detection Filter}
-An advanced tool for edge detection is the Canny Edge Detection Filter. This filter computes the edges using a Canny Edge Detection Filter, which involves smoothing the image with a Gaussian filter, calculating the second directional derivatives of the smoothed image, and performing a non-maximum supression to find the correct extrema. The hysteresis thresholding is then applied to the gradient magnitude of the smoothed image to find and link edges. A demonstration of the Canny Edge Detection Filter will be done on the CT image that was taken on the 15 year old pediatric patient.The file can be found in the SCIRun datasets (see section~\ref{sec:softwarerequirements}). Open the CTbrain50 file to get started.  
+An advanced tool for edge detection is the Canny Edge Detection Filter. This filter computes the edges using a Canny Edge Detection Filter, which involves smoothing the image with a Gaussian filter, calculating the second directional derivatives of the smoothed image, and performing a non-maximum supression to find the correct extrema. The hysteresis thresholding is then applied to the gradient magnitude of the smoothed image to find and link edges. A demonstration of the Canny Edge Detection Filter will be done on the CT image that was taken on the 15 year old pediatric patient.The file can be found in the SCIRun datasets (see section~\ref{sec:softwarerequirements}). We will be working with the CTbrain50.NRRD data file.
 
 To use the Canny edge detection filter on the volume, first select the Canny edge detection tool from the Advanced Filters menu. In the tools window, the Canny edge detection tool will appear, allowing you to select the layer to run the filter on, as well as a distance slider. The distance slider sets the variance for the Gaussian smoothing algorithm. Below, there is a slider to set the threshold for hysteresis thresholding to find and link edges. (figure~\ref{fig:CannyBefore}). 
 
@@ -473,11 +473,11 @@ The distance is the distance between edges, and the threshold is the pixel inten
 The Canny edge detection filter may also be run by first applying a mean smoothing filter prior to applying the Canny edge detection filter. 
 
 \begin{figure}
-\scalebox{0.5}{\includegraphics{Seg3DTutorial_figures/Cannywithmean.png}}
-\caption{Canny edge detection with mean filter}\label{fig:Cannywithmean}
+\scalebox{0.3}{\includegraphics{Seg3DTutorial_figures/Cannywithmeanandlayers.png}}
+\caption{Canny edge detection with mean filter}\label{fig:Cannywithmeanandlayers}
 \end{figure}
 
-The image in figure~\ref{fig:Cannywithmean} had a mean filter applied to it with a radius of 6, followed by a Canny edge detection filter with a distance of 5 and a threshold of 30. Notice how smooth the image is prior to the application of the Canny filter.
+The image in figure~\ref{fig:Cannywithmeanandlayers} had a mean filter applied to it with a radius of 6, followed by a Canny edge detection filter with a distance of 5 and a threshold of 30. Notice how smooth the image is prior to the application of the Canny filter.
 
 \end{document}
 
