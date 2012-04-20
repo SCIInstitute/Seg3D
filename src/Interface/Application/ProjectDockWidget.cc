@@ -770,7 +770,7 @@ void ProjectDockWidget::disable_load_delete_and_export_buttons()
   {
     for( int j = 0; j < this->private_->ui_.sessions_list_->rowCount(); ++j )
     {
-      this->private_->ui_.sessions_list_->itemAt( j, i )->setSelected( false );
+      this->private_->ui_.sessions_list_->item( j, i )->setSelected( false );
     }
   }
 }
