@@ -51,7 +51,7 @@ typedef boost::shared_ptr< ActionInfo > ActionInfoHandle;
 typedef boost::shared_ptr< ActionInfoPrivate > ActionInfoPrivateHandle;
 
 // CLASS ACTIONINFO:
-// Information class about an action
+/// Information class about an action
 
 class ActionInfo : public boost::noncopyable
 {
@@ -65,65 +65,65 @@ public:
   
 public:
   // GET_DEFINITION:
-  // Get the definition of the action (in xml format)
+  /// Get the definition of the action (in xml format)
   std::string get_definition() const;
 
   // GET_TYPE:
-  // The type/name of the action
+  /// The type/name of the action
   std::string get_type() const;
 
   // GET_USAGE:
-  // The usage string of the action
+  /// The usage string of the action
   std::string get_usage() const;
   
   // GET_DESCRIPTION:
-  // Get the description of the action
+  /// Get the description of the action
   std::string get_description() const;
   
   // GET_PROPERTIES:
-  // Get the properties of the action
+  /// Get the properties of the action
   std::vector<std::string> get_properties() const;
   
   // GET_NUM_KEY_VALUE_PAIRS:
-  // THe number of key value pairs associated with this action
+  /// The number of key value pairs associated with this action
   size_t get_num_key_value_pairs() const;
     
   // GET_KEY:
-  // The name of key <index>
+  /// The name of key <index>
   std::string get_key( size_t index ) const;
   
   // GET_INDEX:
-  // The index of a key
+  /// The index of a key
   int get_key_index( const std::string& key ) const;
   
   // GET_DEFAULT_KEY_VALUE:
-  // The default value of the key <index>
+  /// The default value of the key <index>
   std::string get_default_key_value( size_t index ) const;
   
   // GET_KEY_DESCRIPTION:
-  // The description of key <index>
+  /// The description of key <index>
   std::string get_key_description( size_t index ) const;
 
   // GET_KEY_PROPERTIES:
-  // Get the properties of key <index>
+  /// Get the properties of key <index>
   std::vector<std::string> get_key_properties( size_t index ) const;  
 
   // -- action properties --
 public:
   // IS_VALID:
-  // Check the validity of the action description
+  /// Check the validity of the action description
   bool is_valid() const;
   
   // IS_UNDOABLE:
-  // Check whether an action is undoable 
+  /// Check whether an action is undoable 
   bool is_undoable() const;
   
   // CHANGES_PROJECT_DATA:
-  // Check whether the action changes the data of the program
+  /// Check whether the action changes the data of the program
   bool changes_project_data() const;
       
 private:
-  // Private implementation of this class
+  /// Private implementation of this class
   ActionInfoPrivateHandle private_;
 
 public:
@@ -131,11 +131,11 @@ public:
   typedef boost::unique_lock<mutex_type> lock_type;
   
   // GET_MUTEX:
-  // Get the mutex that protects the generation of ActionInfo instances
+  /// Get the mutex that protects the generation of ActionInfo instances
   static mutex_type& GetMutex();
 
 private:
-  // the actual mutex that is shared between all the ActionInfo classes
+  /// the actual mutex that is shared between all the ActionInfo classes
   static mutex_type mutex_;
 };
 

@@ -43,9 +43,9 @@ namespace Core
 {
 
 // ACTIONRESULT
-// Class for returning the result of an action. As this needs to be a variant,
-// each action may have a different result we currently typedef this to the
-// ActionParameterVariant class
+/// Class for returning the result of an action. As this needs to be a variant,
+/// each action may have a different result we currently typedef this to the
+/// ActionParameterVariant class
 
 typedef Variant ActionResult;
 typedef boost::shared_ptr< ActionResult > ActionResultHandle;

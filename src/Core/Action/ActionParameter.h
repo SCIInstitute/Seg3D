@@ -46,8 +46,8 @@ namespace Core
 {
 
 // ACTIONPARAMETERBASE:
-// Base class needed for uniform access to import and export the value
-// in a uniform way.
+/// Base class needed for uniform access to import and export the value
+/// in a uniform way.
 
 class ActionParameterBase
 {
@@ -59,27 +59,27 @@ public:
   // -- functions for accessing data --
 public:
   // IMPORT_FROM_STRING
-  // Import a parameter from a string. The function returns true
-  // if the import succeeded
+  /// Import a parameter from a string. The function returns true
+  /// if the import succeeded
   virtual bool import_from_string( const std::string& str ) = 0;
 
   // EXPORT_TO_STRING
-  // Export the contents of the parameter to string
+  /// Export the contents of the parameter to string
   virtual std::string export_to_string() const = 0;
 
   // HAS_EXTENSION
-  // Has extended information in the derived class
+  /// Has extended information in the derived class
   virtual bool has_extension() const = 0;
 
   // IS_PERSISTENT:
-  // Whether the parameter should be included when export an action to string.
+  /// Whether the parameter should be included when export an action to string.
   bool is_persistent() const
   {
     return this->persistent_;
   }
 
   // SET_PERSISTENT:
-  // Set the persistent property of the action parameter.
+  /// Set the persistent property of the action parameter.
   void set_persistent( bool persistent )
   {
     this->persistent_ = persistent;
@@ -90,7 +90,7 @@ private:
 };
 
 // ACTIONPARAMETER:
-// Parameter for an action.
+/// Parameter for an action.
 
 // Class definition:
 template< class T >
@@ -107,33 +107,33 @@ public:
 public:
 
   // IMPORT_FROM_STRING
-  // import a parameter from a string. The function returns true
-  // if the import succeeded
+  /// import a parameter from a string. The function returns true
+  /// if the import succeeded
   virtual bool import_from_string( const std::string& str )
   {
     return ImportFromString( str, this->parameter_ );
   }
   
   // EXPORT_TO_STRING
-  // export the contents of the parameter to string
+  /// export the contents of the parameter to string
   virtual std::string export_to_string() const
   {
     return "'" + ExportToString( this->parameter_ ) + "'";
   }
 
   // HAS_EXTENSION
-  // Has extended information in the derived class
+  /// Has extended information in the derived class
   virtual bool has_extension() const
   {
     return false;
   }
 
 protected:
-  // The actual parameter (as a reference)
+  /// The actual parameter (as a reference)
   T& parameter_;
 };
 
-// Template specialization for string parameter
+/// Template specialization for string parameter
 template<>
 class ActionParameter< std::string > : public ActionParameterBase
 {
@@ -148,15 +148,15 @@ public:
 public:
 
   // IMPORT_FROM_STRING
-  // import a parameter from a string. The function returns true
-  // if the import succeeded
+  /// import a parameter from a string. The function returns true
+  /// if the import succeeded
   virtual bool import_from_string( const std::string& str )
   {
     return ImportFromString( str, this->parameter_ );
   }
 
   // EXPORT_TO_STRING
-  // export the contents of the parameter to string
+  /// export the contents of the parameter to string
   virtual std::string export_to_string() const
   {
     static const boost::regex reg( "[\\\\']" );
@@ -166,14 +166,14 @@ public:
   }
 
   // HAS_EXTENSION
-  // Has extended information in the derived class
+  /// Has extended information in the derived class
   virtual bool has_extension() const
   {
     return false;
   }
 
 protected:
-  // The actual parameter (as a reference)
+  /// The actual parameter (as a reference)
   std::string& parameter_;
 };
 

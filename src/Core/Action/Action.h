@@ -47,6 +47,8 @@
 #include <Core/Action/ActionParameter.h>
 #include <Core/Action/ActionResult.h>
 
+/* This is a Doxygen test comment */
+
 namespace Core
 {
 
@@ -55,11 +57,10 @@ typedef boost::shared_ptr< Action > ActionHandle;
 typedef boost::weak_ptr< Action > ActionWeakHandle;
 typedef std::vector< ActionHandle > ActionHandleList;
 
-// CLASS ACTION:
-// Main class that defines an action in the program
-// An action is not copyable as that would invalidate 
-// the ActionParameter pointers used internally.
-
+/// CLASS ACTION:
+/// Main class that defines an action in the program
+/// An action is not copyable as that would invalidate 
+/// the ActionParameter pointers used internally.
 class Action : public boost::enable_shared_from_this< Action >, boost::noncopyable
 {
   // -- Constructor/Destructor --
@@ -72,11 +73,11 @@ public:
 
   // -- query information (from the action info) --
 public:
-  // GET_ACTION_INFO:
-  // Get the action information class that contains all the information about the
-  // action.
-  // NOTE: this function is generated using the macro for each function. Hence it does not need
-  // to be implemented
+  /// GET_ACTION_INFO:
+  /// Get the action information class that contains all the information about the
+  /// action.
+  /// NOTE: this function is generated using the macro for each function. Hence it does not need
+  /// to be implemented
   virtual ActionInfoHandle get_action_info() const = 0;
 
   // -- direct functions for querying information --
@@ -91,99 +92,99 @@ public:
   // function is virtual. It accesses the record from the derived class.
   
   // GET_DEFINTION:
-  // Get the definition of the action (in XML format)
+  /// Get the definition of the action (in XML format)
   std::string get_definition() const;
   
   // GET_TYPE:
-  // Get the type of the action
+  /// Get the type of the action
   std::string get_type() const;
   
   // GET_USAGE:
-  // Get a usage description
+  /// Get a usage description
   std::string get_usage() const;
   
   // GET_KEY:
-  // Get the name of the key with a certain index
+  /// Get the name of the key with a certain index
   std::string get_key( size_t index ) const;
 
   // GET_KEY_DEFAULT_VALUE:
-  // Get the name of the key with a certain index
+  /// Get the name of the key with a certain index
   std::string get_default_key_value( size_t index ) const;
   
   // GET_KEY_INDEX:
-  // Get the index of a certain key
+  /// Get the index of a certain key
   int get_key_index( const std::string& name ) const;
   
   // IS_UNDOABLE:
-  // Chekc whether the action is undoable
+  /// Chekc whether the action is undoable
   bool is_undoable() const;
   
   // CHANGES_PROJECT_DATA:
-  // Query whether the action changes the data
-  // NOTE: This function is overloadable from the default subclass definition. As certain 
-  // functions like Set, Add, etc, have this property depend on the actual object they operate
-  // on. For example setting a layer state variable should change this, whereas a interface
-  // variable should not. For these functions the default implementation that picks up this
-  // property from the macro can thence be overwritten.
+  /// Query whether the action changes the data
+  /// NOTE: This function is overloadable from the default subclass definition. As certain 
+  /// functions like Set, Add, etc, have this property depend on the actual object they operate
+  /// on. For example setting a layer state variable should change this, whereas a interface
+  /// variable should not. For these functions the default implementation that picks up this
+  /// property from the macro can thence be overwritten.
   virtual bool changes_project_data();
   
   // -- Run/Validate/Translate interface --
 public:
   // TRANSLATE:
-  // Some actions need to be translated before they can be validated. Translate takes
-  // care of most provenance related issue, by for example translating the provenance
-  // information into real action information. This function is called before validate
-  // NOTE: This function is *not* const and may alter the values of the parameters
-  //       and correct faulty input.
+  /// Some actions need to be translated before they can be validated. Translate takes
+  /// care of most provenance related issue, by for example translating the provenance
+  /// information into real action information. This function is called before validate
+  /// NOTE: This function is *not* const and may alter the values of the parameters
+  ///       and correct faulty input.
   virtual bool translate( ActionContextHandle& context );
 
   // VALIDATE:
-  // Each action needs to be validated just before it is posted. This way we
-  // enforce that every action that hits the main post_action signal will be
-  // a valid action to execute.
-  // NOTE: This function is *not* const and may alter the values of the parameters
-  //       and correct faulty input. Run on the other hand is not allowed to
-  //       change anything in the action, as it is posted to any observers
-  //       after the action is validated.
+  /// Each action needs to be validated just before it is posted. This way we
+  /// enforce that every action that hits the main post_action signal will be
+  /// a valid action to execute.
+  /// NOTE: This function is *not* const and may alter the values of the parameters
+  ///       and correct faulty input. Run on the other hand is not allowed to
+  ///       change anything in the action, as it is posted to any observers
+  ///       after the action is validated.
   virtual bool validate( ActionContextHandle& context ) = 0;
 
   // RUN:
-  // Each action needs to have this piece implemented. It spells out how the
-  // action is run. It returns whether the action was successful or not.
-  // NOTE: In case of an asynchronous action, the return value is ignored and the
-  // program relies on report_done() from the context to be triggered when
-  // the asynchronous part has finished. In any other case the ActionDispatcher
-  // will issue the report_done() when run returns.
+  /// Each action needs to have this piece implemented. It spells out how the
+  /// action is run. It returns whether the action was successful or not.
+  /// NOTE: In case of an asynchronous action, the return value is ignored and the
+  /// program relies on report_done() from the context to be triggered when
+  /// the asynchronous part has finished. In any other case the ActionDispatcher
+  /// will issue the report_done() when run returns.
   virtual bool run( ActionContextHandle& context, ActionResultHandle& result ) = 0;
 
   // CLEAR_CACHE:
-  // Clear any objects that were given as a short cut to improve performance.
-  // NOTE: An action should not contain any persistent handles, as actions may be kept
-  // for a provenance record.
+  /// Clear any objects that were given as a short cut to improve performance.
+  /// NOTE: An action should not contain any persistent handles, as actions may be kept
+  /// for a provenance record.
   virtual void clear_cache();
 
   // -- Action parameters --
 public:
 
   // EXPORT_TO_STRING:
-  // Export the action command into a string, so it can stored
-  // The action factory can recreate the action from this string
+  /// Export the action command into a string, so it can stored
+  /// The action factory can recreate the action from this string
   std::string export_to_string() const;
 
   // IMPORT_ACTION_FROM_STRING:
-  // Import an action command from a string. This function is used by the
-  // ActionFactory.
+  /// Import an action command from a string. This function is used by the
+  /// ActionFactory.
   bool import_from_string( const std::string& action, std::string& error );
 
   // IMPORT_ACTION_FROM_STRING:
-  // Same as function above, but without the error report
+  /// Same as function above, but without the error report
   bool import_from_string( const std::string& action );
 
   // -- functionality for setting parameter list --
 protected:
   // ADD_PARAMETER
-  // Adding a parameter to the action's internal structure
-  // Each parameter should be added using this function in the action's constructor
+  /// Adding a parameter to the action's internal structure
+  /// Each parameter should be added using this function in the action's constructor
   template< class T >
   inline void add_parameter( T& parameter )
   {
@@ -192,7 +193,7 @@ protected:
 
 protected:
   // ADD_PARAM
-  // Add a parameter to the internal structure of the action
+  /// Add a parameter to the internal structure of the action
   inline void add_param( ActionParameterBase* parameter )
   {
     this->parameters_.push_back( parameter );
@@ -212,24 +213,24 @@ protected:
   }
 
   // GET_PARAM
-  // Retrieve the parameter from the internal structure of the action
+  /// Retrieve the parameter from the internal structure of the action
   inline ActionParameterBase* get_param( size_t index ) const 
   {
     return this->parameters_[ index ]; 
   }
   
   // NUM_PARAMS
-  // Number of parameter in this action
+  /// Number of parameter in this action
   inline const size_t num_params() const
   {
     return parameters_.size();
   }
 
 private:
-  // Typedef for list of pointers to the actual parameters
+  /// Typedef for list of pointers to the actual parameters
   typedef std::vector< ActionParameterBase* > parameter_list_type;
 
-  // Vector that stores the required arguments of the action.
+  /// Vector that stores the required arguments of the action.
   parameter_list_type parameters_;
 };
 

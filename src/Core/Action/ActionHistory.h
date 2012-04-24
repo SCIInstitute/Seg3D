@@ -44,7 +44,7 @@ namespace Core
 {
 
 // CLASS ACTIONHISTORY
-// A record of the last actions issued in the program
+/// A record of the last actions issued in the program
 
 // Forward Declaration
 class ActionHistory;
@@ -63,23 +63,23 @@ private:
 
 public:
   // SET_MAX_HISTORY_SIZE:
-  // Set the size of the action history buffer
+  /// Set the size of the action history buffer
   void set_max_history_size( size_t size );
 
   // MAX_HISTORY_SIZE:
-  // Retrieve the size of this buffer
+  /// Retrieve the size of this buffer
   size_t max_history_size();
 
   // HISTORY_SIZE:
-  // Get the number of entries in the history buffer
+  /// Get the number of entries in the history buffer
   size_t history_size();
 
   // ACTION
-  // Get the nth action in the buffer
+  /// Get the nth action in the buffer
   ActionHandle action( size_t index );
 
   // ACTIONRESULT
-  // Get the nth action result in the buffer
+  /// Get the nth action result in the buffer
   ActionResultHandle result( size_t index );
 
 private:
@@ -96,7 +96,7 @@ public:
   typedef boost::signals2::signal< void() > history_changed_signal_type;
 
   // HISTORY_CHANGED_SIGNAL:
-  // Signal indicating that the history changed
+  /// Signal indicating that the history changed
   history_changed_signal_type history_changed_signal_;
 
 };

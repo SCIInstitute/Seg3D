@@ -49,7 +49,7 @@ namespace Core
 {
 
 // CLASS ACTIONDISPATCHER
-// The main dispatcher of actions in the Seg3D framework
+/// The main dispatcher of actions in the Seg3D framework
 
 // Forward declaration
 class ActionDispatcher;
@@ -70,38 +70,38 @@ private:
 public:
 
   // POST_ACTION:
-  // Post an action onto the application thread, the action is posted on the
-  // stack of actions that need to be processed. Each action needs to be
-  // posted with an ActionContextHandle which describes where feedback from
-  // the action needs to posted.
-  // The action context needs to be created before posting the action.
+  /// Post an action onto the application thread, the action is posted on the
+  /// stack of actions that need to be processed. Each action needs to be
+  /// posted with an ActionContextHandle which describes where feedback from
+  /// the action needs to posted.
+  /// The action context needs to be created before posting the action.
   void post_action( ActionHandle action, ActionContextHandle action_context ); // << THREAD-SAFE SLOT
 
   // POST_AND_WAIT_ACTION:
-  // Post an action onto the application thread, the action is posted on the
-  // stack of actions that need to be processed. Each action needs to be
-  // posted with an ActionContextHandle which describes where feedback from
-  // the action needs to posted.
-  // The action context needs to be created before posting the action.
-  // This function also waits on the action to be fully completed and hence
-  // needs to be called from a thread that is not needed for action processing
+  /// Post an action onto the application thread, the action is posted on the
+  /// stack of actions that need to be processed. Each action needs to be
+  /// posted with an ActionContextHandle which describes where feedback from
+  /// the action needs to posted.
+  /// The action context needs to be created before posting the action.
+  /// This function also waits on the action to be fully completed and hence
+  /// needs to be called from a thread that is not needed for action processing
   void post_and_wait_action( ActionHandle action, ActionContextHandle action_context ); // << THREAD-SAFE SLOT
 
   // POST_ACTIONS:
-  // Post multiple actions in specified order
+  /// Post multiple actions in specified order
   void post_actions( std::vector< ActionHandle > actions, ActionContextHandle action_context ); // << THREAD-SAFE SLOT
 
   // POST_AND_WAIT_ACTIONS:
-  // Post multiple actions in specified order and wait for them to finish
+  /// Post multiple actions in specified order and wait for them to finish
   void post_and_wait_actions( std::vector< ActionHandle > actions,
       ActionContextHandle action_context ); // << THREAD-SAFE SLOT
 
   // IS_BUSY:
-  // Returns true if there are actions being processed, otherwise false.
+  /// Returns true if there are actions being processed, otherwise false.
   bool is_busy();
 
   // LAST_ACTION_COMPLETED:
-  // Returns the timestamp of the last action that was completed
+  /// Returns the timestamp of the last action that was completed
   boost::posix_time::ptime last_action_completed() const;
 
 
@@ -109,26 +109,26 @@ private:
   friend class ActionDispatcherPrivate;
 
   // RUN_ACTION:
-  // Run the action
+  /// Run the action
   void run_action( ActionHandle action, ActionContextHandle action_context );
 
   // RUN_ACTIONS:
-  // Run multiple actions in specified order
+  /// Run multiple actions in specified order
   void run_actions( std::vector< ActionHandle > actions, ActionContextHandle action_context );
 
   // -- Action monitoring --
 
 public:
   // TYPEDEFS
-  // The type of the main action signal
+  /// The type of the main action signal
 
   typedef boost::signals2::signal< void( ActionHandle ) > pre_action_signal_type;
   typedef boost::signals2::signal< void( ActionHandle, ActionResultHandle ) > post_action_signal_type;
   typedef boost::signals2::signal< void( ActionProgressHandle ) > action_progress_signal_type;
 
   // PRE_ACTION_SIGNAL:
-  // Connect an observer that records all the actions in the program before
-  // they are executed
+  /// Connect an observer that records all the actions in the program before
+  /// they are executed
   pre_action_signal_type pre_action_signal_;
 
   // NOTE: One can observe action before or after they have been issued:
@@ -139,23 +139,23 @@ public:
   // options.
 
   // POST_ACTION_SIGNAL:
-  // Connect an observer that records all the actions in the program after
-  // they are executed.
+  /// Connect an observer that records all the actions in the program after
+  /// they are executed.
   post_action_signal_type post_action_signal_;
 
   // BEGIN_PROGRESS_SIGNAL:
-  // This signals a slow action that is being processed and progress needs to be reported
-  // This is only in a few instances needed, like loading files, where the load happens inside
-  // the action. The interface can connect to this signal so it can block further input until
-  // the action has been processed
+  /// This signals a slow action that is being processed and progress needs to be reported
+  /// This is only in a few instances needed, like loading files, where the load happens inside
+  /// the action. The interface can connect to this signal so it can block further input until
+  /// the action has been processed
   action_progress_signal_type begin_progress_signal_;
 
   // END_PROGRESS_SIGNAL:
-  // This signals the end of the slow action.
+  /// This signals the end of the slow action.
   action_progress_signal_type end_progress_signal_;
 
   // REPORT_PROGRESS_SIGNAL:
-  // Issued every time when progress can be reported
+  /// Issued every time when progress can be reported
   action_progress_signal_type report_progress_signal_;
 
 private:
@@ -163,18 +163,18 @@ private:
 
 public:
   // FUNCTION PostAction:
-  // This function is a short cut to posting an action using the dispatcher
+  /// This function is a short cut to posting an action using the dispatcher
   static void PostAction( const ActionHandle& action, 
     const ActionContextHandle& action_context );
 
   // FUNCTION PostAndWaitAction:
-  // This function is a short cut to posting an action using the dispatcher and
-  // waiting until the action has been completed
+  /// This function is a short cut to posting an action using the dispatcher and
+  /// waiting until the action has been completed
   static void PostAndWaitAction( const ActionHandle& action, 
     const ActionContextHandle& action_context );
 
   // Function IsBusy:
-  // This is a short cut function to the "is_busy" function of the singleton.
+  /// This is a short cut function to the "is_busy" function of the singleton.
   static bool IsBusy();
 
 };

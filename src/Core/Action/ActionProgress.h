@@ -44,11 +44,11 @@ namespace Core
 {
 
 // CLASS ACTIONPROGRESS
-// For slow actions the action progress class, keeps track of progress
+/// For slow actions the action progress class, keeps track of progress
 
 // Forward declaration
 class ActionProgress;
-// NOTE: The intrusive pointer will allow a handle to be generate inside the class
+/// NOTE: The intrusive pointer will allow a handle to be generate inside the class
 typedef boost::shared_ptr< ActionProgress > ActionProgressHandle;
 
 // Class definition
@@ -66,15 +66,15 @@ public:
 public:
 
   // BEGIN_PROGRESS_REPORTING:
-  // Begin the progress reporting
+  /// Begin the progress reporting
   void begin_progress_reporting();
 
   // END_PROGRESS_REPORTING:
-  // End the progress reporting
+  /// End the progress reporting
   void end_progress_reporting();
   
   // SET_INTERRUPT:
-  // Set the interrupt flag to notify that action needs to canceled
+  /// Set the interrupt flag to notify that action needs to canceled
   void set_interrupt( bool interrupt );
   
   // GET_INTERRUPT:
@@ -82,11 +82,11 @@ public:
   bool get_interrupt();
   
   // SET_PROGRESS:
-  // Set the progress of the action
+  /// Set the progress of the action
   void set_progress( double progress );
 
   // GET_PROGRESS:
-  // Get the progress of the action
+  /// Get the progress of the action
   double get_progress();
   
   // GET_MESSAGE:
@@ -98,7 +98,7 @@ public:
   bool is_interruptable() const;
   
   // HAS_PROGRESS_UPDATES:
-  // Whether progress will be updated
+  /// Whether progress will be updated
   bool has_progress_updates() const;
   
   // -- Internals of the progress reporter --
