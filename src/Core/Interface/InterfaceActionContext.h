@@ -89,13 +89,13 @@ private:
   // -- Signals --
 public:
   // ACTION_MESSAGE_SIGNAL:
-  // This signal is given when a message is posted from the interface action
-  // context class
+  /// This signal is given when a message is posted from the interface action
+  /// context class
   typedef boost::signals2::signal< void( int, std::string ) > action_message_signal_type;
   action_message_signal_type action_message_signal_;
 
   // ACTION_DONE_SIGNAL:
-  // This signal is raised when an action returns done
+  /// This signal is raised when an action returns done
   typedef boost::signals2::signal< void( ActionStatus ) > action_done_signal_type;
   action_done_signal_type action_done_signal_;
 

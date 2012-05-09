@@ -61,8 +61,8 @@ private:
 public:
   ~FreeTypeFace();
 
-  // NOTE: The following two functions only work for scalable fonts, and they don't
-  // check for errors.
+  /// NOTE: The following two functions only work for scalable fonts, and they don't
+  /// check for errors.
 
   void set_char_size( FT_F26Dot6 width, FT_F26Dot6 height, 
     unsigned int horz_resolution, unsigned int vert_resolution );
@@ -81,7 +81,7 @@ private:
   FT_Face face_;
 
   typedef std::map< unsigned int, FreeTypeGlyphHandle > glyph_map_type;
-  // Cache of glyphs indexed by their char index
+  /// Cache of glyphs indexed by their char index
   glyph_map_type glyph_map_;
 };
 

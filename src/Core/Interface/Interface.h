@@ -45,8 +45,8 @@ namespace Core
 {
 
 // CLASS INTERFACE: 
-// Interface is the abstraction of the interface layer
-// It manages the events and thread of the user interface.
+/// Interface is the abstraction of the interface layer
+/// It manages the events and thread of the user interface.
 
 // Forward declaration
 class Interface;
@@ -68,15 +68,15 @@ private:
   // -- Action context interface --
 public:
   // GET_WIDGET_ACTION_CONTEXT:
-  // Get the current interface action context for widgets
+  /// Get the current interface action context for widgets
   InterfaceActionContextHandle get_widget_action_context();
 
   // GET_MOUSE_ACTION_CONTEXT:
-  // Get the current interface action context for mouse commands
+  /// Get the current interface action context for mouse commands
   InterfaceActionContextHandle get_mouse_action_context();
 
   // GET_KEYBOARD_ACTION_CONTEXT:
-  // Get the current interface action context for keyboard commands
+  /// Get the current interface action context for keyboard commands
   InterfaceActionContextHandle get_keyboard_action_context();
 
 private:
@@ -86,30 +86,30 @@ private:
 public:
 
   // ISINTERFACETHREAD:
-  // Test whether the current thread is the interface thread
+  /// Test whether the current thread is the interface thread
   static bool IsInterfaceThread()
   {
     return ( Instance()->is_eventhandler_thread() );
   }
 
   // POSTEVENT:
-  // Short cut to the event handler
+  /// Short cut to the event handler
   static void PostEvent( boost::function< void() > function );
 
   // POSTANDWAITEVENT:
-  // Short cut to the event handler
+  /// Short cut to the event handler
   static void PostAndWaitEvent( boost::function< void() > function );
 
   // GETWIDGETACTIONCONTEXT:
-  // Get the action context that widgets use to post their actions
+  /// Get the action context that widgets use to post their actions
   static InterfaceActionContextHandle GetWidgetActionContext();
 
   // GETMOUSEACTIONCONTEXT:
-  // Get the action context that mouse actions use to post their actions
+  /// Get the action context that mouse actions use to post their actions
   static InterfaceActionContextHandle GetMouseActionContext();
 
   // GETKEYBOARDACTIONCONTEXT:
-  // Get the action context that keyboard actions use to post their actions
+  /// Get the action context that keyboard actions use to post their actions
   static InterfaceActionContextHandle GetKeyboardActionContext();
 
 };

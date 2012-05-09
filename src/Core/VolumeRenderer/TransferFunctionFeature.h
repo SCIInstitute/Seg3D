@@ -51,40 +51,40 @@ public:
 
   const std::string& get_feature_id() const;
 
-  // Functions used by TransferFunction class to build the lookup table
+  /// Functions used by TransferFunction class to build the lookup table
 private:
   friend class TransferFunction;
   friend class TransferFunctionPrivate;
 
   // TAKE_SNAPSHOT:
-  // Get a snapshot of all the states.
+  /// Get a snapshot of all the states.
   void take_snapshot();
 
   // INTERPOLATE:
-  // Get the opacity corresponding to the given value by interpolating between
-  // control points. If value is outside the range defined by controls points, 
-  // 0 is returned.
+  /// Get the opacity corresponding to the given value by interpolating between
+  /// control points. If value is outside the range defined by controls points, 
+  /// 0 is returned.
   float interpolate( float value );
 
   // GET_AMBIENT_COEFFICIENT:
-  // Returns the coefficient by which the material color will be multiplied to compute
-  // the ambient light component. The value is in range [0, 1].
+  /// Returns the coefficient by which the material color will be multiplied to compute
+  /// the ambient light component. The value is in range [0, 1].
   float get_ambient_coefficient();
 
   // GET_DIFFUSE_COLOR:
-  // Returns the diffuse color of the feature. The values are normalized to [0, 1].
+  /// Returns the diffuse color of the feature. The values are normalized to [0, 1].
   const Color& get_diffuse_color();
 
   // GET_SPECULAR_INTENSITY:
-  // Returns the intensity of the specular light. The value is in range [0, 1].
+  /// Returns the intensity of the specular light. The value is in range [0, 1].
   float get_specular_intensity();
 
   // GET_SHININESS:
-  // Returns the shininess of the feature.
+  /// Returns the shininess of the feature.
   int get_shininess();
 
   // IS_ENABLED:
-  // Returns true if the feature is enabled, otherwise false.
+  /// Returns true if the feature is enabled, otherwise false.
   bool is_enabled();
 
 private:

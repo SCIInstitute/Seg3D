@@ -41,11 +41,11 @@ namespace Core
 {
 
 // CLASS SINGLETON:
-// Class for defining a singleton implementation
-// A singleton class embeds this class to handle 
-// the creation of the singleton class.
+/// Class for defining a singleton implementation
+/// A singleton class embeds this class to handle 
+/// the creation of the singleton class.
 
-// NOTE: This singleton model requires that the project is linked statically
+/// NOTE: This singleton model requires that the project is linked statically
 
 template< class T >
 class Singleton : public boost::noncopyable
@@ -61,7 +61,7 @@ public:
   // -- obtain singleton pointer --
 public:
   // INSTANCE:
-  // Get the singleton pointer to the application
+  /// Get the singleton pointer to the application
 
   T* instance()
   {

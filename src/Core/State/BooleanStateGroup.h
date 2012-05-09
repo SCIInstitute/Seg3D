@@ -59,7 +59,7 @@ public:
   void clear_selection();
   
   // GET_ENABLED:
-  // returns true if one of the group is true returns false if not
+  /// returns true if one of the group is true returns false if not
   bool get_enabled() const;
 
 private:

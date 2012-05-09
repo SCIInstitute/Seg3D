@@ -38,10 +38,10 @@ namespace Core
 {
 
 // DISTANCETOLINE2:
-// Compute the distance squared from the point to the given line,
-// where the line is specified by two end points.  This function
-// actually computes the distance to the line segment
-// between the given points and not to the line itself.
+/// Compute the distance squared from the point to the given line,
+/// where the line is specified by two end points.  This function
+/// actually computes the distance to the line segment
+/// between the given points and not to the line itself.
 double DistanceToLine2( const Point& p, const Point& a, const Point& b, 
              const double epsilon = 1e-12 );
 
@@ -52,8 +52,8 @@ void DistanceToLine2Aux( Point& result, int& node, const Point& p,
             const Point& a, const Point& b, const double epsilon = 1e-12 );
 
 // CLOSESTPOINTONTRIANGLE:
-// Compute the point on the triangle closest to the given point.
-// The distance to the triangle will be (P - result).length())
+/// Compute the point on the triangle closest to the given point.
+/// The distance to the triangle will be (P - result).length())
 void ClosestPointOnTriangle( Point& result, const Point& P, const Point& A, 
               const Point& B, const Point& C, const double epsilon = 1e-12 );
 
@@ -62,15 +62,15 @@ void ClosestPointOnTriangle( Point& result, int& edge, int& node, const Point& P
 
 
 // ESTIMATECLOSESTPOINTONQUAD:
-// This is only an estimate for an element that is not flat, it is exact
-// for a flat element.
+/// This is only an estimate for an element that is not flat, it is exact
+/// for a flat element.
 void EstimateClosestPointOnQuad( Point& result, const Point& P, const Point &A, 
                  const Point& B, const Point& C, const Point& D, const double epsilon = 1e-12 );
 
 // CLOSESTLINETOLINE:
-// Compute s and t such that the distance between A0 + s * (A1 - AO)
-// and B0 + t * (B1 - B0) is minimal.  Return false if the lines are
-// parallel, true otherwise.
+/// Compute s and t such that the distance between A0 + s * (A1 - AO)
+/// and B0 + t * (B1 - B0) is minimal.  Return false if the lines are
+/// parallel, true otherwise.
 bool ClosestLineToLine( double& s, double& t, const Point& A0, const Point& A1,
              const Point& B0, const Point& B1, const double epsilon = 1e-12 );
 

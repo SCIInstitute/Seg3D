@@ -56,12 +56,12 @@ public:
   void clear();
 
   // GET_DIFFUSE_LUT:
-  // Get the lookup texture of the diffuse color.
+  /// Get the lookup texture of the diffuse color.
   TextureHandle get_diffuse_lut() const;
 
   // GET_SPECULAR_LUT:
-  // Get the lookup texture of the specular color.
-  // The alpha component contains the shininess value.
+  /// Get the lookup texture of the specular color.
+  /// The alpha component contains the shininess value.
   TextureHandle get_specular_lut() const;
 
   TransferFunctionFeatureHandle get_feature( const std::string& feature_id ) const;
@@ -69,17 +69,17 @@ public:
 protected:
 
   // POST_LOAD_STATES:
-  // This virtual function can be implemented in the StateHandlers and will be called after its
-  // states are loaded.  If it doesn't succeed it needs to return false.
+  /// This virtual function can be implemented in the StateHandlers and will be called after its
+  /// states are loaded.  If it doesn't succeed it needs to return false.
   virtual bool post_load_states( const StateIO& state_io );
 
   // POST_SAVE_STATES:
-  // This virtual function can be implemented in the StateHandlers and will be called after its
-  // states are saved.  If it doesn't succeed it needs to return false.
+  /// This virtual function can be implemented in the StateHandlers and will be called after its
+  /// states are saved.  If it doesn't succeed it needs to return false.
   virtual bool post_save_states( StateIO& state_io );
 
 public:
-  // Whether to use faux shading
+  /// Whether to use faux shading
   StateBoolHandle faux_shading_state_;
 
 public:

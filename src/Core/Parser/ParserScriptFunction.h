@@ -46,13 +46,13 @@ class ParserScriptFunction
 {
 
 public:
-  // Constructor
+  /// Constructor
   ParserScriptFunction( std::string name, ParserFunction* function );
 
-  // Get the name of the function
+  /// Get the name of the function
   std::string get_name();
 
-  // Get the number of input variables this function depends on
+  /// Get the number of input variables this function depends on
   size_t num_input_vars();
 
   ParserScriptVariableHandle get_input_var( size_t j );
@@ -68,7 +68,7 @@ public:
   void set_flags( int flags );
   void clear_flags();
 
-  // For debugging
+  /// For debugging
   void print();
 
 private:

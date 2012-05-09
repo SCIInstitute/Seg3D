@@ -76,7 +76,7 @@ public:
   // -- accessors --
 public:
   // GET_NX, GET_NY, GET_NZ, GET_SIZE
-  // Get the dimensions of the grid this class describes
+  /// Get the dimensions of the grid this class describes
   size_t get_nx() const
   {
     return nx_;
@@ -91,7 +91,7 @@ public:
   }
 
   // SPACING_X, SPACING_Y, SPACING_Z
-  // The spacing in each of directions
+  /// The spacing in each of directions
   double spacing_x() const
   {
     return project( Vector( 1.0, 0.0, 0.0 ) ).length();
@@ -108,7 +108,7 @@ public:
   }
 
   // SET_NX, SET_NY, SET_NY
-  // Set the size of the grid
+  /// Set the size of the grid
   void set_nx( size_t nx )
   {
     nx_ = nx;
@@ -123,20 +123,20 @@ public:
   }
   
   // TRANSFORM
-  // Get the underlying transform
+  /// Get the underlying transform
   Transform transform() const;
   
   // SET_ORIGINALLY_NODE_CENTERED
   // SET_ORIGINALLY_NODE_CENTERED:
-  // This is needed when this value needs to be copied from one grid transform to another
+  /// This is needed when this value needs to be copied from one grid transform to another
   void set_originally_node_centered( bool originally_node_centered )
   {
     this->originally_node_centered_ = originally_node_centered;
   }
 
   // GET_ORIGINALLY_NODE_CENTERED:
-  // Returns true if the volume was originally node-centered or unknown.  Returns true if the 
-  // volume was originally specified as cell-centered.
+  /// Returns true if the volume was originally node-centered or unknown.  Returns true if the 
+  /// volume was originally specified as cell-centered.
   bool get_originally_node_centered() const
   {
     return this->originally_node_centered_;

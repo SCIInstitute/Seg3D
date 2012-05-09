@@ -45,46 +45,46 @@ namespace Core
 {
 
 // CLASS EVENTSYNC:
-// Auxilary class needed for doing synchronization
+/// Auxilary class needed for doing synchronization
 
 class EventSync
 {
 
 public:
-  // Thread communication model
+  /// Thread communication model
   boost::mutex lock_;
   boost::condition_variable condition_;
 };
 
-// Define an Application Event Sync type handle
+/// Define an Application Event Sync type handle
 typedef boost::shared_ptr< EventSync > EventSyncHandle;
 
 // CLASS EVENT:
-// Base class for function callback into the event handler thread
-// This class is an empty base class we need it for launching the
-// functor object from a non-templated environment.
+/// Base class for function callback into the event handler thread
+/// This class is an empty base class we need it for launching the
+/// functor object from a non-templated environment.
 
 class Event
 {
 public:
 
-  // Constructor
+  /// Constructor
   Event();
 
-  // Destructor needs to be virtual so we can use the base class to delete
-  // the object without leaking memory
+  /// Destructor needs to be virtual so we can use the base class to delete
+  /// the object without leaking memory
   virtual ~Event();
 
   // HANDLE_EVENT:
-  // Handle the synchronization part and run the event code
+  /// Handle the synchronization part and run the event code
   void handle_event();
 
   // RUN:
-  // Function for running the functor object.
+  /// Function for running the functor object.
   virtual void run() = 0;
 
   // SYNC_HANDLE:
-  // Get/set the synchronization handle
+  /// Get/set the synchronization handle
   EventSyncHandle& sync_handle()
   {
     return sync_handle_;
@@ -95,29 +95,29 @@ private:
 };
 
 // CLASS EVENTT <TEMPLATE>
-// This class is redefined for each functor and contains only the
-// pointer to the function object. It is generated on the fly whereever
-// the compiler needs it. 
+/// This class is redefined for each functor and contains only the
+/// pointer to the function object. It is generated on the fly whereever
+/// the compiler needs it. 
 
 template< class FUNCTOR >
 class EventT : public Event
 {
 public:
 
-  // Constructor
+  /// Constructor
   EventT( FUNCTOR functor ) :
     functor_( functor )
   {
   }
 
-  // Destructor (we need one for the base class destruction)
+  /// Destructor (we need one for the base class destruction)
   virtual ~EventT()
   {
   }
 
   // RUN:
-  // Run the functor object. This function is accessed from the base class
-  // so we do not need to template the inner workings of the event handler.
+  /// Run the functor object. This function is accessed from the base class
+  /// so we do not need to template the inner workings of the event handler.
   virtual void run()
   {
     functor_();

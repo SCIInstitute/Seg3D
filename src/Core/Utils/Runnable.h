@@ -51,7 +51,7 @@ public:
 protected:
   friend void ExecuteRunnable( RunnableHandle runnable );
   // RUN:
-  // The function that needs to run on a different thread
+  /// The function that needs to run on a different thread
   virtual void run() = 0;
   
 public:

@@ -56,8 +56,8 @@ typedef boost::shared_ptr< StateVectorBase > StateVectorBaseHandle;
 typedef boost::weak_ptr< StateVectorBase > StateVectorBaseWeakHandle;
 
 // STATEVECTOR:
-// This class is a specification of State that is used to hold a single unbound
-// instance of a value.
+/// This class is a specification of State that is used to hold a single unbound
+/// instance of a value.
 
 // Forward declaration of the StateVector class
 template< class T >
@@ -108,23 +108,23 @@ protected:
   friend class ActionSetAt;
 
   // ADD
-  // Add variant data to the state vector
+  /// Add variant data to the state vector
   virtual bool add( Variant& variant, ActionSource source = ActionSource::NONE_E ) = 0;
 
   // REMOVE
-  // Remove variant data from the vector
+  /// Remove variant data from the vector
   virtual bool remove( Variant& variant, ActionSource source = ActionSource::NONE_E ) = 0;
 
   // SET_AT
-  // Set a value at a certain index
+  /// Set a value at a certain index
   virtual bool set_at( size_t index, Variant& variant, ActionSource source = ActionSource::NONE_E ) = 0;
 
   // CLEAR
-  // Clear the vector
+  /// Clear the vector
   virtual void clear( ActionSource source = ActionSource::NONE_E ) = 0;
 
   // VALIDATE_ELEMENT_VARIANT
-  // validate whether the variant data is of the right type
+  /// validate whether the variant data is of the right type
   virtual bool validate_element_variant( Variant& variant, std::string& error ) = 0;
 };
 
@@ -139,7 +139,7 @@ public:
   
   // -- constructor/destructor --
 public:
-  // CONSTRUCTOR
+  /// CONSTRUCTOR
   StateVector( const std::string& stateid, const std::vector< T >& default_value ) :
     StateVectorBase( stateid ),
     values_vector_( default_value )
@@ -151,7 +151,7 @@ public:
   {
   }
 
-  // DESTRUCTOR
+  /// DESTRUCTOR
   virtual ~StateVector()
   {
   }
@@ -159,14 +159,14 @@ public:
   // -- functions for accessing data --
 public:
   // EXPORT_TO_STRING:
-  // Convert the contents of the State into a string
+  /// Convert the contents of the State into a string
   virtual std::string export_to_string() const
   {
     return Core::ExportToString( values_vector_ );
   }
 
   // IMPORT_FROM_STRING:
-  // Set the State from a string
+  /// Set the State from a string
   virtual bool import_from_string( const std::string& str, ActionSource source =
     ActionSource::NONE_E )
   {
@@ -178,14 +178,14 @@ public:
 
 protected:
   // EXPORT_TO_VARIANT
-  // Export the state data to a variant parameter
+  /// Export the state data to a variant parameter
   virtual void export_to_variant( Variant& variant ) const
   {
     variant.set( this->values_vector_ );
   }
 
   // IMPORT_FROM_VARIANT:
-  // Import the state data from a variant parameter.
+  /// Import the state data from a variant parameter.
   virtual bool import_from_variant( Variant& variant, 
     Core::ActionSource source = Core::ActionSource::NONE_E )
   {
@@ -240,9 +240,9 @@ protected:
   }
 
   // VALIDATE_VARIANT:
-  // Validate a variant parameter
-  // This function returns false if the parameter is invalid or cannot be
-  // converted and in that case error will describe the error.
+  /// Validate a variant parameter
+  /// This function returns false if the parameter is invalid or cannot be
+  /// converted and in that case error will describe the error.
   virtual bool validate_variant( Variant& variant, std::string& error )
   {
     if ( !( variant.validate_type< std::vector< T > > () ) )
@@ -257,23 +257,23 @@ protected:
   // -- access value --
 public:
   // GET:
-  // Get the value of the state variable
+  /// Get the value of the state variable
   const std::vector< T >& get() const
   {
     return this->values_vector_;
   }
 
   // SIZE:
-  // Return the number of elements in the vector.
+  /// Return the number of elements in the vector.
   virtual size_t size() const
   {
     return this->values_vector_.size();
   }
 
   // SET:
-  // Set the value of the state variable
-  // NOTE: this function by passes the action mechanism and should only be used
-  // to enforce a constraint from another action.
+  /// Set the value of the state variable
+  /// NOTE: this function by passes the action mechanism and should only be used
+  /// to enforce a constraint from another action.
   bool set( const std::vector< T >& value, ActionSource source = ActionSource::NONE_E )
   {
     // NOTE: State variables can only be set from the application thread
@@ -393,7 +393,7 @@ public:
   // -- signals describing the state --
 public:
   // VALUE_CHANGED_SIGNAL:
-  // Signal when the data in the state is changed.
+  /// Signal when the data in the state is changed.
   typedef boost::signals2::signal< void( std::vector< T >, 
     Core::ActionSource ) > values_changed_signal_type;
   values_changed_signal_type value_changed_signal_;

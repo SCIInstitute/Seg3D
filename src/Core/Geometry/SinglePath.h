@@ -55,7 +55,7 @@ public:
   }
 
   // SET_POINT:
-  // Set 3D world coordinate of point at given index (0 or 1)
+  /// Set 3D world coordinate of point at given index (0 or 1)
   bool set_point_on_ends( int index, const Point& pt )
   {
     if( !( index == 0 || index == 1 ) ) return false;
@@ -64,8 +64,8 @@ public:
     return true;
   }
 
-  // Compute the distance to every piece of path
-  // Return the smallest distance
+  /// Compute the distance to every piece of path
+  /// Return the smallest distance
 
   double get_smallest_distance2( const Point& pt )
   {

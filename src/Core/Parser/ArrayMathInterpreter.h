@@ -43,11 +43,11 @@ public:
   // The first step is setting the data sources and sinks
 
   //------------------------------------------------------------------------
-  // Step 0 : create program variable
+  /// Step 0 : create program variable
   bool create_program( ArrayMathProgramHandle& mprogram, std::string& error );
 
   //------------------------------------------------------------------------
-  // Step 1: add sources and sinks
+  /// Step 1: add sources and sinks
   bool add_data_block_source( ArrayMathProgramHandle& pprogram, 
     std::string& name, DataBlockHandle data_block, std::string& error );
 
@@ -59,20 +59,20 @@ public:
     std::string& name, DataBlockHandle data_block, std::string& error );
 
   //------------------------------------------------------------------------
-  // Step 2: translate code and generate executable code
+  /// Step 2: translate code and generate executable code
 
-  // Main function for transcribing the parser output into a program that
-  // can actually be executed
+  /// Main function for transcribing the parser output into a program that
+  /// can actually be executed
   bool translate( ParserProgramHandle& pprogram, ArrayMathProgramHandle& mprogram,
     std::string& error );
 
   //------------------------------------------------------------------------
-  // Step 3: Set the array size
+  /// Step 3: Set the array size
 
   bool set_array_size( ArrayMathProgramHandle& mprogram, size_type array_size );
 
   //------------------------------------------------------------------------
-  // Step 4: Run the code
+  /// Step 4: Run the code
 
   bool run( ArrayMathProgramHandle& mprogram, std::string& error );
 

@@ -52,18 +52,18 @@ public:
 
 public: 
   // WAIT:
-  // Wait for the event to be triggered. If the event was already triggered this function
-  // returns immediately.
+  /// Wait for the event to be triggered. If the event was already triggered this function
+  /// returns immediately.
   virtual void wait() = 0;
   
   // WAIT:
-  // Wait for the event to be triggered. If the event was already triggered this function
-  // returns immediately with true. After the timeout the function returns. If a timeout
-  // was triggered it returns false.
+  /// Wait for the event to be triggered. If the event was already triggered this function
+  /// returns immediately with true. After the timeout the function returns. If a timeout
+  /// was triggered it returns false.
   virtual bool timed_wait( double timeout ) = 0;
 
   // GET_NAME:
-  // The name of the resource we are waiting for
+  /// The name of the resource we are waiting for
   virtual std::string get_name() const = 0;
 };
 

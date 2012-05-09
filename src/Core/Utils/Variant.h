@@ -61,17 +61,17 @@ public:
 public:
   // -- functions for accessing data --
   // EXPORT_TO_STRING
-  // export the contents of the parameter to string
+  /// export the contents of the parameter to string
   virtual std::string export_to_string() const = 0;
 
   // IMPORT_FROM_STRING
-  // import a parameter from a string. The function returns true
-  // if the import succeeded
+  /// import a parameter from a string. The function returns true
+  /// if the import succeeded
   virtual bool import_from_string( const std::string& str ) = 0;
 
   // INTERNAL_TYPE:
-  // Return a const reference to the type_info object representing
-  // the actual type of value currently stored by the Variant object.
+  /// Return a const reference to the type_info object representing
+  /// the actual type of value currently stored by the Variant object.
   virtual const std::type_info& internal_type() const = 0;
 };
 
@@ -122,30 +122,30 @@ public:
   }
 
   // EXPORT_TO_STRING
-  // export the contents of the parameter to string
+  /// export the contents of the parameter to string
   virtual std::string export_to_string() const
   {
     return ExportToString( this->value_ );
   }
 
   // IMPORT_FROM_STRING
-  // import a parameter from a string. The function returns true
-  // if the import succeeded
+  /// import a parameter from a string. The function returns true
+  /// if the import succeeded
   virtual bool import_from_string( const std::string& str )
   {
     return ImportFromString( str, this->value_ );
   }
 
   // INTERNAL_TYPE:
-  // Return a const reference to the type_info object representing
-  // the actual type of value currently stored by the Variant object.
+  /// Return a const reference to the type_info object representing
+  /// the actual type of value currently stored by the Variant object.
   virtual const std::type_info& internal_type() const
   {
     return typeid( T );
   }
 
 private:
-  // The actual value
+  /// The actual value
   T value_;
 };
 
@@ -199,7 +199,7 @@ public:
   // -- get/set data --
 public:
   // SET
-  // Set the value using a typed version of the parameter
+  /// Set the value using a typed version of the parameter
   template< class T >
   void set( const T& value )
   {
@@ -210,8 +210,8 @@ public:
   }
 
   // GET_VALUE
-  // Get the value from string or typed value. If a typed one is available
-  // use that one.
+  /// Get the value from string or typed value. If a typed one is available
+  /// use that one.
   template< class T >
   bool get( T& value )
   {
@@ -250,9 +250,9 @@ public:
   }
 
   // VALIDATE_TYPE
-  // Check and convert to a certain type, but do not return the value
-  // This function is intended for validating the action by forcing the
-  // contained value to be converted to a certain type
+  /// Check and convert to a certain type, but do not return the value
+  /// This function is intended for validating the action by forcing the
+  /// contained value to be converted to a certain type
   template< class T >
   bool validate_type()
   {
@@ -261,8 +261,8 @@ public:
   }
 
   // INTERNAL_TYPE:
-  // Return a const reference to the type_info object representing
-  // the actual type of value currently stored by the Variant object.
+  /// Return a const reference to the type_info object representing
+  /// the actual type of value currently stored by the Variant object.
   virtual const std::type_info& internal_type() const
   {
     if ( this->typed_value_ )
@@ -276,12 +276,12 @@ public:
 public:
 
   // EXPORT_TO_STRING
-  // export the contents of the parameter to string
+  /// export the contents of the parameter to string
   virtual std::string export_to_string() const;
 
   // IMPORT_FROM_STRING
-  // import a parameter from a string. The function returns true
-  // if the import succeeded
+  /// import a parameter from a string. The function returns true
+  /// if the import succeeded
   virtual bool import_from_string( const std::string& str );
 
 private:

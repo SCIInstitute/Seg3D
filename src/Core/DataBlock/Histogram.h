@@ -57,7 +57,7 @@ public:
   virtual ~Histogram();
   
   // COMPUTE:
-  // Compute a histogram on an arbitrary size of data
+  /// Compute a histogram on an arbitrary size of data
   bool compute( const signed char* data, size_t size );
   bool compute( const unsigned char* data, size_t size );
   bool compute( const short* data, size_t size );
@@ -68,35 +68,35 @@ public:
   bool compute( const double* data, size_t size );
   
   // GET_MIN:
-  // Get the minimum value of the data
+  /// Get the minimum value of the data
   double get_min() const;
 
   // GET_MAX:
-  // Get the maximum value of the data
+  /// Get the maximum value of the data
   double get_max() const;
   
   // GET_CUM_VALUE:
-  // Get the value that has a certain fraction of the data be smaller values
+  /// Get the value that has a certain fraction of the data be smaller values
   double get_cum_value( double fraction ) const;
   
   // GET_MIN_BIN:
-  // Get the minimum size of a histogram bar
+  /// Get the minimum size of a histogram bar
   size_t get_min_bin() const;
 
   // GET_MAX_BIN:
-  // Get the maximum size of a histogram bar
+  /// Get the maximum size of a histogram bar
   size_t get_max_bin() const;
   
   // GET_BIN_SIZE:
-  // Get the size of each bin in data values
+  /// Get the size of each bin in data values
   double get_bin_size() const;
   
   // GET_BIN_START:
-  // Get the value where a specific bin starts
+  /// Get the value where a specific bin starts
   double get_bin_start( size_t idx = 0) const;
 
   // GET_BIN_END:
-  // Get the value where a specific bin ends
+  /// Get the value where a specific bin ends
   double get_bin_end( size_t idx = 0) const;
   
   // GET_SIZE:
@@ -104,11 +104,11 @@ public:
   size_t get_size() const;
   
   // GET_BINS:
-  // Get the actual histogram data
+  /// Get the actual histogram data
   const std::vector<size_t>& get_bins() const;
   
   // IS_VALID:
-  // Check whther histogram is valid
+  /// Check whther histogram is valid
   bool is_valid() const;
         
 private:
@@ -129,11 +129,11 @@ private:
 };
 
 // EXPORTTOSTRING:
-// Put the contents of the histogram into a string
+/// Put the contents of the histogram into a string
 std::string ExportToString( const Histogram& value );
 
 // IMPORTFROMSTRING:
-// Import the histogram from a string and return true if the conversion succeeded 
+/// Import the histogram from a string and return true if the conversion succeeded 
 bool ImportFromString( const std::string& str, Histogram& value );
 
 

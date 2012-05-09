@@ -40,34 +40,34 @@ namespace Core
 {
 
 // CLASS EXCEPTION:
-// This exception model is modeled after the std::exception classes
-// The base class is Exception and it has a variety of subclasses derived
-// from it that mirror the std::exception classes.
+/// This exception model is modeled after the std::exception classes
+/// The base class is Exception and it has a variety of subclasses derived
+/// from it that mirror the std::exception classes.
 
-// The difference with the std::exception classes is that macros are provided
-// for these classes that allow for easy insertion of filename and line number
-// of where the exception was generated.
+/// The difference with the std::exception classes is that macros are provided
+/// for these classes that allow for easy insertion of filename and line number
+/// of where the exception was generated.
 
-// Hence it is recommended to use the macros for throwing the exceptions
+/// Hence it is recommended to use the macros for throwing the exceptions
 
 class Exception 
 {
 
 public:
-  // Constructor/destructor
+  /// Constructor/destructor
   Exception( std::string message, unsigned int line, const char* file );
 
   virtual ~Exception() ;
 
-  // Description of the type of exception
+  /// Description of the type of exception
   virtual std::string what() const;
 
-  // Description of what caused the exception
+  /// Description of what caused the exception
   std::string message() const;
 
 private:
 
-  // Error message for debug purposes
+  /// Error message for debug purposes
   std::string message_;
 };
 
@@ -75,12 +75,12 @@ class LogicError : public Exception
 {
 
 public:
-  // Constructor/destructor
+  /// Constructor/destructor
   LogicError( std::string message, unsigned int line, const char* file );
 
   virtual ~LogicError();
 
-  // Description of the type of exception
+  /// Description of the type of exception
   virtual std::string what() const;
 };
 
@@ -88,12 +88,12 @@ class RunTimeError : public Exception
 {
 
 public:
-  // Constructor/destructor
+  /// Constructor/destructor
   RunTimeError( std::string message, unsigned int line, const char* file );
 
   virtual ~RunTimeError();
 
-  // Description of the type of exception
+  /// Description of the type of exception
   virtual std::string what() const;
 };
 
@@ -101,12 +101,12 @@ class NotImplementedError : public Exception
 {
 
 public:
-  // Constructor/destructor
+  /// Constructor/destructor
   NotImplementedError( std::string message, unsigned int line, const char* file );
 
   virtual ~NotImplementedError();
 
-  // Description of the type of exception
+  /// Description of the type of exception
   virtual std::string what() const;
 };
 
@@ -114,12 +114,12 @@ class InvalidArgument : public LogicError
 {
 
 public:
-  // Constructor/destructor
+  /// Constructor/destructor
   InvalidArgument( std::string message, unsigned int line, const char* file );
 
   virtual ~InvalidArgument();
 
-  // Description of the type of exception
+  /// Description of the type of exception
   virtual std::string what() const;
 };
 
@@ -127,12 +127,12 @@ class LengthError : public LogicError
 {
 
 public:
-  // Constructor/destructor
+  /// Constructor/destructor
   LengthError( std::string message, unsigned int line, const char* file );
 
   virtual ~LengthError();
 
-  // Description of the type of exception
+  /// Description of the type of exception
   virtual std::string what() const;
 };
 
@@ -140,12 +140,12 @@ class OutOfRange : public LogicError
 {
 
 public:
-  // Constructor/destructor
+  /// Constructor/destructor
   OutOfRange( std::string message, unsigned int line, const char* file );
 
   virtual ~OutOfRange();
 
-  // Description of the type of exception
+  /// Description of the type of exception
   virtual std::string what() const;
 };
 
@@ -153,12 +153,12 @@ class RangeError : public RunTimeError
 {
 
 public:
-  // Constructor/destructor
+  /// Constructor/destructor
   RangeError( std::string message, unsigned int line, const char* file );
 
   virtual ~RangeError();
 
-  // Description of the type of exception
+  /// Description of the type of exception
   virtual std::string what() const;
 };
 
@@ -166,12 +166,12 @@ class OverflowError : public RunTimeError
 {
 
 public:
-  // Constructor/destructor
+  /// Constructor/destructor
   OverflowError( std::string message, unsigned int line, const char* file );
 
   virtual ~OverflowError();
 
-  // Description of the type of exception
+  /// Description of the type of exception
   virtual std::string what() const;
 };
 
@@ -179,12 +179,12 @@ class UnderflowError : public RunTimeError
 {
 
 public:
-  // Constructor/destructor
+  /// Constructor/destructor
   UnderflowError( std::string message, unsigned int line, const char* file );
 
   virtual ~UnderflowError();
 
-  // Description of the type of exception
+  /// Description of the type of exception
   virtual std::string what() const;
 };
 
@@ -193,10 +193,10 @@ class OpenGLException : public Core::Exception
 public:
   OpenGLException( std::string message, unsigned int line, const char* file );
   
-  // Constructor/destructor
+  /// Constructor/destructor
   virtual ~OpenGLException();
 
-  // Description of the type of exception
+  /// Description of the type of exception
   virtual std::string what() const;
 };
 

@@ -43,7 +43,7 @@ namespace Core
 {
 
 // CLASS DataType:
-// This class describes the data types that the program uses
+/// This class describes the data types that the program uses
 
 CORE_ENUM_CLASS
 (
@@ -62,32 +62,32 @@ CORE_ENUM_CLASS
 )
 
 // IMPORTFROMSTRING:
-// Import a DataType from a string
-// NOTE: If the import fails UNKNOWN_E is returned and the function returns false
+/// Import a DataType from a string
+/// NOTE: If the import fails UNKNOWN_E is returned and the function returns false
 bool ImportFromString( const std::string& data_type_string, DataType& data_type );
 
 // EXPORTTOSTRING:
-// Export the data type to a string
+/// Export the data type to a string
 std::string ExportToString( DataType data_type );
 
 // ISINTEGER:
-// Test whether data type is an integer 
+/// Test whether data type is an integer 
 bool IsInteger( const DataType& data_type );
 
 // ISREAL:
-// Test whether data is floating point
+/// Test whether data is floating point
 bool IsReal( const DataType& data_type );
 
 // GETNRRDDATATYPE:
-// Get the type of the data
+/// Get the type of the data
 int GetNrrdDataType( const DataType& data_type );
 
 // GETSIZEDATATYPE:
-// Get the number of bytes in this data type
+/// Get the number of bytes in this data type
 size_t GetSizeDataType( const DataType& data_type );
 
 // GETDATATYPE:
-// Get the data type from a pointer to the type
+/// Get the data type from a pointer to the type
 DataType GetDataType( signed char* );
 DataType GetDataType( unsigned char* );
 DataType GetDataType( short* );

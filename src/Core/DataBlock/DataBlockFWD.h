@@ -36,15 +36,13 @@ namespace Core
 {
 
 // CLASS DataBlock
-// This class is an abstract representation of a block of volume data in
-// memory. It stores the pointer to where the data is located as well as 
-// its dimensions, and the type of the data
+/// This class is an abstract representation of a block of volume data in
+/// memory. It stores the pointer to where the data is located as well as 
+/// its dimensions, and the type of the data
 
-// NOTE: This is a base class that does not do any memory allocation, use one
-// of the derived classes to generate a datablock. The implementation in this
-// class is just the common access to the data.
-
-// Forward Declaration
+/// NOTE: This is a base class that does not do any memory allocation, use one
+/// of the derived classes to generate a datablock. The implementation in this
+/// class is just the common access to the data.
 class DataBlock;
 typedef boost::shared_ptr< DataBlock > DataBlockHandle;
 typedef boost::weak_ptr< DataBlock > DataBlockWeakHandle;

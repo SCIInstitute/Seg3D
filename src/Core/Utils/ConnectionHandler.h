@@ -53,15 +53,15 @@ public:
   virtual ~ConnectionHandlerConnection();
 
   // DISCONNECT:
-  // This function is overloaded to disconnect the connection
+  /// This function is overloaded to disconnect the connection
   virtual void disconnect() = 0;
 };
 
 // CLASS CONNECTIONHANDLER:
-// A simple class for managing connections
+/// A simple class for managing connections
 
-// NOTE: To use this class the derived class needs to call disconnect_all()
-// in the distructor before any of the structures are deleted.
+/// NOTE: To use this class the derived class needs to call disconnect_all()
+/// in the distructor before any of the structures are deleted.
 
 class ConnectionHandler : public boost::noncopyable
 {
@@ -75,19 +75,19 @@ public:
 public:
 
   // ADD_CONNECTION:
-  // Add a connection into the list so it can be deleted when disconnect is
-  // called
+  /// Add a connection into the list so it can be deleted when disconnect is
+  /// called
   void add_connection( const boost::signals2::connection& connection );
 
   // ADD_CONNECTION:
-  // Add a connection into the list so it can be deleted when disconnect is
-  // called
+  /// Add a connection into the list so it can be deleted when disconnect is
+  /// called
   void add_connection( const ConnectionHandlerConnectionHandle& connection );
 
 
   // DISCONNECT_ALL:
-  // Disconnect alal the connections that are stored in this class.
-  // NOTE: this function needs to be called in the most derived class
+  /// Disconnect alal the connections that are stored in this class.
+  /// NOTE: this function needs to be called in the most derived class
   void disconnect_all();
 
   // -- internals --

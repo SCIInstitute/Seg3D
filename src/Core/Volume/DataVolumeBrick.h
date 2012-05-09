@@ -59,11 +59,11 @@ private:
   DataVolumeBrickPrivateHandle private_;
 
 public:
-  // An array of GLenum's for data types, indexed by data_type values
+  /// An array of GLenum's for data types, indexed by data_type values
   const static unsigned int TEXTURE_DATA_TYPE_C;
 
-  // An array of GLenum's for GL internal texture formats, indexed by data_type values.
-  // These formats are picked to best match the data type.
+  /// An array of GLenum's for GL internal texture formats, indexed by data_type values.
+  /// These formats are picked to best match the data type.
   const static unsigned int TEXTURE_FORMAT_C;
 };
 

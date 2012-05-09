@@ -38,30 +38,30 @@
 namespace Core
 {
 
-// Hide header includes, private interface and implementation
+/// Hide header includes, private interface and implementation
 class ParserFunctionCatalogPrivate;
 typedef boost::shared_ptr< ParserFunctionCatalogPrivate > ParserFunctionCatalogPrivateHandle;
 
-// ParserFunctionCatalog: This class contains a list of functions that are
-//              available, and hence is used for validating the program
-// The ParserFunctionCatalog serves two purposes:
-//  - Tell the parser which functions are valid
-//  - Tell the parser what the return type is of each function call
+/// ParserFunctionCatalog: This class contains a list of functions that are
+///              available, and hence is used for validating the program
+/// The ParserFunctionCatalog serves two purposes:
+///  - Tell the parser which functions are valid
+///  - Tell the parser what the return type is of each function call
 class ParserFunctionCatalog 
 {
 public:
 
-  // Constructor
+  /// Constructor
   ParserFunctionCatalog();
 
-  // Add definitions of functions to the list
-  // Various calls with different amounts of arguments
+  /// Add definitions of functions to the list
+  /// Various calls with different amounts of arguments
   void add_function( ParserFunction* function );
 
-  // Retrieve a function from the data base
+  /// Retrieve a function from the data base
   bool find_function( std::string function_id, ParserFunction*& function );
 
-  // For debugging
+  /// For debugging
   void print();
 
 private:

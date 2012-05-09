@@ -45,25 +45,25 @@ typedef boost::shared_ptr< ParserVariablePrivate > ParserVariablePrivateHandle;
 // Render human readable output
 std::string ParserVariableType( std::string type );
 
-// ParserVariable: A variable for the the parser program. This class contains
-//              the names of the variables that are defined at the start of the
-//              program and which need to be defined at the end of the program
+/// ParserVariable: A variable for the the parser program. This class contains
+///              the names of the variables that are defined at the start of the
+///              program and which need to be defined at the end of the program
 class ParserVariable
 {
 public:
   ParserVariable( std::string name, std::string type );
   ParserVariable( std::string name, std::string type, int flags );
 
-  // Retrieve the type of the variable
+  /// Retrieve the type of the variable
   std::string get_type();
 
-  // Set the type of the variable
+  /// Set the type of the variable
   void set_type( std::string type );
 
-  // Retrieve the flags of the variable
+  /// Retrieve the flags of the variable
   int get_flags();
 
-  // Get the name of the variable
+  /// Get the name of the variable
   std::string get_name();
 
 private:

@@ -47,30 +47,30 @@ class ParserScriptVariable
 
 public:
 
-  // Create input variable
+  /// Create input variable
   ParserScriptVariable( std::string name, std::string uname, std::string type, int flags );
 
-  // Create output variable
+  /// Create output variable
   ParserScriptVariable( std::string uname, std::string type, int flags );
 
-  // Create scalar const variable
+  /// Create scalar const variable
   ParserScriptVariable( std::string uname, float value );
 
-  // Create string const variable
+  /// Create string const variable
   ParserScriptVariable( std::string uname, std::string value );
 
-  // Set/get parent
+  /// Set/get parent
   void set_parent( ParserScriptFunctionHandle& handle );
   ParserScriptFunctionHandle get_parent();
 
-  // Get kind of the variable
+  /// Get kind of the variable
   int get_kind();
   void set_kind( int kind );
 
   std::string get_type();
   void set_type( std::string type );
 
-  // Get/set flags of the variable
+  /// Get/set flags of the variable
   int get_flags();
   void set_flags( int flags );
   void clear_flags();
@@ -83,18 +83,18 @@ public:
   bool is_single_var();
   bool is_sequential_var();
 
-  // Get the name and the unique name
+  /// Get the name and the unique name
   std::string get_name();
   void set_name( std::string name );
 
   std::string get_uname();
   void set_uname( std::string uname );
 
-  // Get the constant values
+  /// Get the constant values
   float get_scalar_value();
   std::string get_string_value();
 
-  // Dependence of this variable
+  /// Dependence of this variable
   void compute_dependence();
 
   std::string get_dependence();
@@ -103,7 +103,7 @@ public:
   int get_var_number();
   void set_var_number( int var_number );
 
-  // For debugging
+  /// For debugging
   void print();
 
 private:

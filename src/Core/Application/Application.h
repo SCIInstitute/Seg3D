@@ -46,7 +46,7 @@ namespace Core
 {
 
 // CLASS APPLICATION:
-// Application is the thread that processes all the actions in the program.
+/// Application is the thread that processes all the actions in the program.
 
 class Application;
 class ApplicationPrivate;
@@ -65,14 +65,14 @@ private:
   // -- finish application --
 public:
   // FINISH:
-  // Execute the remainder of the actions and terminate the application thread
-  // NOTE: This function should be called by main at the end of the program to ensure
-  // that actions like saving the last session are properly executed.
+  /// Execute the remainder of the actions and terminate the application thread
+  /// NOTE: This function should be called by main at the end of the program to ensure
+  /// that actions like saving the last session are properly executed.
   void finish();
 
   // RESET:
-  // Reset the application. It triggers the reset_signal_.
-  // NOTE: This function should only be called in the application thread.
+  /// Reset the application. It triggers the reset_signal_.
+  /// NOTE: This function should only be called in the application thread.
   void reset();
 
   // -- Command line parser --
@@ -81,16 +81,16 @@ public:
   bool is_command_line_parameter( const std::string& key );
 
   // CHECK_COMMAND_LINE_PARAMETERS:
-  // check to see if a particular parameter has been placed into the map
-  // if so it returns the value as a string
+  /// check to see if a particular parameter has been placed into the map
+  /// if so it returns the value as a string
   bool check_command_line_parameter( const std::string& key, std::string& value );
 
   // SET_PARAMETER:
-  // put parameters from the command line into a map
+  /// put parameters from the command line into a map
   void set_command_line_parameter( const std::string& key, const std::string& value );
 
   // PARSE_COMMAND_LINE_PARAMETERS:
-  // parse paremeters from the command line
+  /// parse parameters from the command line
   void parse_command_line_parameters( int argc, char** argv );
 
 private:
@@ -100,7 +100,7 @@ private:
   // -- Log information on the current executable --
 public:
   // LOG_START:
-  // Log information about the system to the log file
+  /// Log information about the system to the log file
   void log_start();
 
   // LOG_FINISH:
@@ -110,59 +110,59 @@ public:
   // -- Directory information --
 public:
   // GET_USER_DIRECTORY:
-  // Get the user directory on the current system 
+  /// Get the user directory on the current system  
   bool get_user_directory( boost::filesystem::path& user_dir, bool config_path = false );
 
   // GET_CONFIG_DIRECTORY:
-  // Get the configuration directory on the current system  
+  /// Get the configuration directory on the current system 
   bool get_config_directory( boost::filesystem::path& config_dir );
 
   // GET_USER_DESKTOP_DIRECTORY:
-  // get the path of the users desktop directory
+  /// get the path of the users desktop directory
   bool get_user_desktop_directory( boost::filesystem::path& user_desktop_dir );
 
   // GET_USER_NAME:
-  // Get the current username
+  /// Get the current username
   bool get_user_name( std::string& user_name );
 
   // GET_APPLICACTION_FILEPATH:
-  // The directory from which the application was launched
+  /// The directory from which the application was launched
   bool get_application_filepath( boost::filesystem::path& app_filepath );
   
   // GET_APPLICACTION_FILENAME:
-  // The directory from which the application was launched plus the name of the executable
+  /// The directory from which the application was launched plus the name of the executable
   bool get_application_filename( boost::filesystem::path& app_filename );
 
   // -- Memory information --
 public:
   // GET_TOTAL_VIRTUAL_MEMORY:
-  // Get the total amount of virtual memory available
+  /// Get the total amount of virtual memory available
   long long get_total_virtual_memory();
 
   // GET_TOTAL_PHYSICAL_MEMORY:
-  // Get the total amount of physical memory available
+  /// Get the total amount of physical memory available
   long long get_total_physical_memory();
   
   // GET_TOTAL_ADDRESSABLE_MEMORY:
-  // Get the amount of addressable memory available
+  /// Get the amount of addressable memory available
   long long get_total_addressable_memory();
 
   // GET_TOTAL_ADDRESSABLE_PHYSICAL_MEMORY:
-  // Get the amount of addressable memory available inside RAM
+  /// Get the amount of addressable memory available inside RAM
   long long get_total_addressable_physical_memory();
   
   // GET_MY_VIRTUAL_MEMORY_USED:
-  // Get the amount of virtual memory used by current process
+  /// Get the amount of virtual memory used by current process
   long long get_my_virtual_memory_used();
   
   // GET_MY_PHYSICAL_MEMORY_USED:
-  // Get the amount of physical memory used by current process
+  /// Get the amount of physical memory used by current process
   long long get_my_physical_memory_used();
   
   // -- Process information --
 public:
   // GET_PROCESS_ID:
-  // Get the process id for the current process
+  /// Get the process id for the current process
   int get_process_id();
 
   // -- OSX information --
@@ -172,17 +172,17 @@ public:
   // -- Signals --
 public:
   // RESET_SIGNAL
-  // This signal is triggered by calling the reset function.
-  // WARNING: Do NOT trigger this signal directly. Call the reset function instead.
+  /// This signal is triggered by calling the reset function.
+  /// WARNING: Do NOT trigger this signal directly. Call the reset function instead.
   boost::signals2::signal< void () > reset_signal_;
 
   // APPLICATION_START_SIGNAL
-  // This signal is triggered at the start of the application, before the splash
-  // screen is shown. This signal can be used to initialize code from plugins
+  /// This signal is triggered at the start of the application, before the splash
+  /// screen is shown. This signal can be used to initialize code from plugins
   boost::signals2::signal< void () > application_start_signal_;
 
   // APPLICATION_STOP_SIGNAL
-  // This signal is triggered at the end of the program
+  /// This signal is triggered at the end of the program
   boost::signals2::signal< void () > application_stop_signal_;
 
   // -- internals --
@@ -193,66 +193,66 @@ private:
   // -- Application thread --
 public:
   // ISAPPLICATIONTHREAD:
-  // Test whether the current thread is the application thread
+  /// Test whether the current thread is the application thread
   static bool IsApplicationThread();
 
   // POSTEVENT:
-  // Short cut to the event handler
+  /// Short cut to the event handler
   static void PostEvent( boost::function< void() > function );
 
   // POSTANDWAITEVENT:
-  // Short cut to the event handler
+  /// Short cut to the event handler
   static void PostAndWaitEvent( boost::function< void() > function );
 
   // GETMUTEX:
-  // Get the mutex of the application.
+  /// Get the mutex of the application.
   static mutex_type& GetMutex();
 
   // RESET:
-  // Reset the application.
+  /// Reset the application.
   static void Reset();
 
   // -- Program information --
 public: 
   
   // GETVERSION:
-  // Get the application version
+  /// Get the application version
   static std::string GetVersion();
   
   // GETMAJORVERSION:
-  // Major release version
+  /// Major release version
   static int GetMajorVersion();
 
   // GETMINORVERSION:
-  // Minor release version
+  /// Minor release version
   static int GetMinorVersion();
 
   // GETPATCHVERSION:
-  // Patch version
+  /// Patch version
   static int GetPatchVersion();
   
   // IS64BIT:
-  // Is the executable a 64bit version
+  /// Is the executable a 64bit version
   static bool Is64Bit();
   
   // IS32BIT:
-  // Is the executable a 64bit version
+  /// Is the executable a 64bit version
   static bool Is32Bit();
   
   // GETAPPLICATIONNAME:
-  // Get the name of the application
+  /// Get the name of the application
   static std::string GetApplicationName();
 
   // GETRELEASENAME:
-  // Get the release of the application
+  /// Get the release of the application
   static std::string GetReleaseName();
   
   // GETAPPLICATIONNAMEANDVERSION
-  // Get the name of the application and its version
+  /// Get the name of the application and its version
   static std::string GetApplicationNameAndVersion();
 
   // GETABOUT
-  // Get the information that should be shown in the about screen
+  /// Get the information that should be shown in the about screen
   static std::string GetAbout();
   
 };

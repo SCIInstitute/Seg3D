@@ -45,8 +45,8 @@ typedef boost::shared_ptr< StateRangedValueBase > StateRangedValueBaseHandle;
 typedef boost::weak_ptr< StateRangedValueBase > StateRangedValueBaseWeakHandle;
 
 // STATEVALUE:
-// This class is a specification of State that is used to hold a single bound
-// instance of a value.
+/// This class is a specification of State that is used to hold a single bound
+/// instance of a value.
 
 // Forward declaration of the StateValue class
 template< class T >
@@ -61,7 +61,7 @@ typedef StateRangedValue< int > StateRangedInt;
 typedef boost::shared_ptr< StateRangedInt > StateRangedIntHandle;
 
 // Class StateValueBase:
-// This pure virtual class defines an extra interface that StateValue provides.
+/// This pure virtual class defines an extra interface that StateValue provides.
 class StateRangedValueBase : public StateBase
 {
 public:
@@ -75,17 +75,17 @@ protected:
   friend class ActionSetRange;
 
   // IMPORT_OFFSET_FROM_VARIANT:
-  // Import the offset value from the variant and apply it to the current value.
+  /// Import the offset value from the variant and apply it to the current value.
   virtual bool import_offset_from_variant( Variant& variant, 
     ActionSource source = ActionSource::NONE_E ) = 0;
 
   // IMPORT_RANGE_FROM_VARIANT:
-  // Import range values from variants.
+  /// Import range values from variants.
   virtual bool import_range_from_variant( Variant& variant_min, Variant& variant_max, 
     ActionSource source = ActionSource::NONE_E ) = 0;
 
   // VALIDATE_OFFSET_VARIANT:
-  // Returns true if the value stored in the variant is a valid offset value, otherwise false.
+  /// Returns true if the value stored in the variant is a valid offset value, otherwise false.
   virtual bool validate_value_type_variant( Variant& variant, 
     std::string& error ) = 0;
 };
@@ -123,14 +123,14 @@ public:
   // -- functions for accessing data --
 public:
   // EXPORT_TO_STRING:
-  // Convert the contents of the State into a string
+  /// Convert the contents of the State into a string
   virtual std::string export_to_string() const
   {
     return Core::ExportToString( this->value_ );
   }
 
   // IMPORT_FROM_STRING:
-  // Set the State from a string
+  /// Set the State from a string
   virtual bool import_from_string( const std::string& str, Core::ActionSource source =
     Core::ActionSource::NONE_E )
   {
@@ -141,14 +141,14 @@ public:
 
 protected:
   // EXPORT_TO_VARIANT
-  // Export the state data to a variant parameter
+  /// Export the state data to a variant parameter
   virtual void export_to_variant( Variant& variant ) const
   {
     variant.set( this->value_ );
   }
 
   // IMPORT_FROM_VARIANT:
-  // Import the state data from a variant parameter.
+  /// Import the state data from a variant parameter.
   virtual bool import_from_variant( Variant& variant, 
     Core::ActionSource source = Core::ActionSource::NONE_E )
   {
@@ -161,7 +161,7 @@ protected:
   }
 
   // IMPORT_OFFSET_FROM_VARIANT:
-  // Import the offset value from the variant and apply it to the current value.
+  /// Import the offset value from the variant and apply it to the current value.
   virtual bool import_offset_from_variant( Variant& variant, 
     ActionSource source = ActionSource::NONE_E )
   {
@@ -174,7 +174,7 @@ protected:
   }
 
   // IMPORT_RANGE_FROM_VARIANT:
-  // Import range values from variants.
+  /// Import range values from variants.
   virtual bool import_range_from_variant( Variant& variant_min, Variant& variant_max, 
     ActionSource source = ActionSource::NONE_E )
   {
@@ -189,9 +189,9 @@ protected:
   }
 
   // VALIDATE_VARIANT:
-  // Validate a variant parameter
-  // This function returns false if the parameter is invalid or cannot be
-  // converted and in that case error will describe the error.
+  /// Validate a variant parameter
+  /// This function returns false if the parameter is invalid or cannot be
+  /// converted and in that case error will describe the error.
   virtual bool validate_variant( Variant& variant, std::string& error )
   {
     if ( !( variant.validate_type< T > () ) )
@@ -213,7 +213,7 @@ protected:
   }
 
   // VALIDATE_OFFSET_VARIANT:
-  // Returns true if the value stored in the variant is a valid offset value, otherwise false.
+  /// Returns true if the value stored in the variant is a valid offset value, otherwise false.
   virtual bool validate_value_type_variant( Variant& variant, std::string& error )
   {
     if ( !( variant.validate_type< T > () ) )
@@ -230,9 +230,9 @@ protected:
 public:
 
   // SET_RANGE:
-  // Set the range of permissible values for this state variable. This
-  // variable normally is represented by a slider and this one records the
-  // min and max values so values can be validated correctly
+  /// Set the range of permissible values for this state variable. This
+  /// variable normally is represented by a slider and this one records the
+  /// min and max values so values can be validated correctly
 
   void set_range( T min_value, T max_value,
     Core::ActionSource source = Core::ActionSource::NONE_E )
@@ -295,17 +295,17 @@ public:
   // -- access value --
 public:
   // GET:
-  // Get the value of the state variable
+  /// Get the value of the state variable
   T get() const
   {
     return this->value_;
   }
 
   // SET:
-  // Set the value of the state variable
-  // NOTE: this function by passes the action mechanism and should only be used
-  // to enforce a constraint from another action. Normally use the action
-  // mechanism to ensure that the action is recorded correctly.
+  /// Set the value of the state variable
+  /// NOTE: this function by passes the action mechanism and should only be used
+  /// to enforce a constraint from another action. Normally use the action
+  /// mechanism to ensure that the action is recorded correctly.
   bool set( T value, Core::ActionSource source = Core::ActionSource::NONE_E )
   {
     // NOTE: State variables can only be set from the application thread
@@ -347,7 +347,7 @@ public:
   }
 
   // OFFSET:
-  // Offset the value of the state variable by the specified amount.
+  /// Offset the value of the state variable by the specified amount.
   bool offset( const T& offset_value, ActionSource source = ActionSource::NONE_E )
   {
     // NOTE: State variables can only be set from the application thread
@@ -384,7 +384,7 @@ public:
   }
 
   // GET_RANGE:
-  // Get the range of the variable
+  /// Get the range of the variable
   void get_range( T& min_value, T& max_value )
   {
     min_value = this->min_value_;
@@ -401,29 +401,29 @@ public:
 public:
 
   // VALUE_CHANGED_SIGNAL:
-  // Signal when the data in the state is changed, the second parameter
-  // indicates the source of the change
+  /// Signal when the data in the state is changed, the second parameter
+  /// indicates the source of the change
 
   typedef boost::signals2::signal< void( T, Core::ActionSource ) > value_changed_signal_type;
   value_changed_signal_type value_changed_signal_;
 
   // RANGE_CHANGED_SIGNAL:
-  // This signal is triggered when the range of the state is changed
+  /// This signal is triggered when the range of the state is changed
   typedef boost::signals2::signal< void( T, T, Core::ActionSource ) > range_changed_signal_type;
   range_changed_signal_type range_changed_signal_;
 
   // STEP_CHANGED_SIGNAL:
-  // This signal is triggered when the step of the state is changed
+  /// This signal is triggered when the step of the state is changed
   typedef boost::signals2::signal< void( T, Core::ActionSource ) > step_changed_signal_type;
   step_changed_signal_type step_changed_signal_;
 
   // -- internals of StateValue --
 private:
 
-  // Storage for the actual value
+  /// Storage for the actual value
   T value_;
 
-  // Min and max values
+  /// Min and max values
   T min_value_;
   T max_value_;
   T step_value_;

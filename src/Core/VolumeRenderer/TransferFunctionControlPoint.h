@@ -91,21 +91,21 @@ private:
 };
 
 // EXPORTTOSTRING:
-// Export a vector of control points to string.
+/// Export a vector of control points to string.
 std::string ExportToString( const TransferFunctionControlPointVector& control_points );
 
 // IMPORTFROMSTRING:
-// Import a vector of control points from string.
-// Returns true on success, otherwise false.
+/// Import a vector of control points from string.
+/// Returns true on success, otherwise false.
 bool ImportFromString( const std::string& str, TransferFunctionControlPointVector& control_points );
 
 // EXPORTTOSTRING:
-// Export a control points to string.
+/// Export a control points to string.
 std::string ExportToString( const TransferFunctionControlPoint& control_point );
 
 // IMPORTFROMSTRING:
-// Import a control points from string.
-// Returns true on success, otherwise false.
+/// Import a control points from string.
+/// Returns true on success, otherwise false.
 bool ImportFromString( const std::string& str, TransferFunctionControlPoint& control_point );
 
 } // end namespace Core

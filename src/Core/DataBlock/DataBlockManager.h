@@ -54,46 +54,46 @@ class DataBlockManager : public RecursiveLockable
 
   // -- constructor --
 private:
-  // NOTE: This one is private, use the singleton Instance() function to access this class
+  /// NOTE: This one is private, use the singleton Instance() function to access this class
   DataBlockManager();
   
 public:
   // REGISTER_DATABLOCK:
-  // This function needs to be called by the various datablock factories. So we can look up in
-  // this DataBlock manager whether a datablock has already been loaded (needed for the mask data)
+  /// This function needs to be called by the various datablock factories. So we can look up in
+  /// this DataBlock manager whether a datablock has already been loaded (needed for the mask data)
   void register_datablock( DataBlockHandle data_block, 
     DataBlock::generation_type generation = -1 );
 
   // UNREGISTER_DATABLOCK:
-  // Needed by DataBlock to remove its entry from the database.
+  /// Needed by DataBlock to remove its entry from the database.
   void unregister_datablock( DataBlock::generation_type generation );
 
   // FIND_DATABLOCK:
-  // Find a datablock with a specific generation number.
+  /// Find a datablock with a specific generation number.
   bool find_datablock( DataBlock::generation_type generation, DataBlockHandle& datablock );
 
   // CLEAR:
-  // Remove all the data blocks.
+  /// Remove all the data blocks.
   void clear();
 
 public:
   
   // GET_GENERATION_COUNT:
-  // Get the most recent generation number
-  // NOTE: Needed by the project manager when storing the project updates to disk. As within a 
-  // aproject for provenance and session reasons we cannot use an older generation. The last
-  // used number needs to be stored.
+  /// Get the most recent generation number
+  /// NOTE: Needed by the project manager when storing the project updates to disk. As within a 
+  /// aproject for provenance and session reasons we cannot use an older generation. The last
+  /// used number needs to be stored.
   DataBlock::generation_type get_generation_count();
   
   // SET_GENERATION_COUNT:
-  // Set the current count in the generation counter
-  // NOTE: This is needed when loading an existing project, as each project has its own generation
-  // count. 
+  /// Set the current count in the generation counter
+  /// NOTE: This is needed when loading an existing project, as each project has its own generation
+  /// count. 
   void set_generation_count( DataBlock::generation_type generation );
 
-  /// INCREMENT_GENERATION:
-  // Generate a new generation number for a datablock. This function is called through the
-  // DataBlock class whenever the data in a datablock is changed.
+  // INCREMENT_GENERATION:
+  /// Generate a new generation number for a datablock. This function is called through the
+  /// DataBlock class whenever the data in a datablock is changed.
   DataBlock::generation_type increase_generation( DataBlock::generation_type old_generation );
 
 private:

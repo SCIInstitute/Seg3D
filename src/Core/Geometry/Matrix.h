@@ -110,19 +110,19 @@ private:
   // static funtions
 public:
   // INVERT:
-  // Compute the inverse of the input matrix using LU decomposition
+  /// Compute the inverse of the input matrix using LU decomposition
   static bool Invert( const Matrix& mat, Matrix& inverse );
 
   // TRANSPOSE:
-  // Transpose a matrix
+  /// Transpose a matrix
   static void Transpose( const Matrix& mat, Matrix& trans );
   
   // ZERO:
-  // Create a zero matrix
+  /// Create a zero matrix
   static Matrix Zero();
   
   // IDENTITY:
-  // Create an identity matrix
+  /// Create an identity matrix
   static Matrix Identity();
 };
 
@@ -197,19 +197,19 @@ private:
 public:
 
   // INVERT:
-  // Compute the inverse of the input matrix using LU decomposition
+  /// Compute the inverse of the input matrix using LU decomposition
   static bool Invert( const MatrixF& mat, MatrixF& inverse );
 
   // TRANSPOSE:
-  // Transpose a matrix
+  /// Transpose a matrix
   static void Transpose( const MatrixF& mat, MatrixF& trans );
   
   // ZERO:
-  // Create a zero matrix
+  /// Create a zero matrix
   static MatrixF Zero();
   
   // IDENTITY:
-  // Create an identity matrix
+  /// Create an identity matrix
   static MatrixF Identity();
 };
 

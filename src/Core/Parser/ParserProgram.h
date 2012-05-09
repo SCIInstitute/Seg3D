@@ -48,24 +48,24 @@ class ParserProgram
 public:
   ParserProgram();
 
-  // Add an expression to a program: this is a combination of the raw 
-  // unparsed program code and the expression tree
+  /// Add an expression to a program: this is a combination of the raw 
+  /// unparsed program code and the expression tree
   void add_expression( std::string& expression_string, ParserTreeHandle expression_tree );
 
-  // Retrieve an expression from a program
-  // This gets one expression in unparsed and parsed form from the program
+  /// Retrieve an expression from a program
+  /// This gets one expression in unparsed and parsed form from the program
   void get_expression( int expression_num, std::string& expression_string,
     ParserTreeHandle& expression_handle );
 
   void get_expression( int expression_num, ParserTreeHandle& expression_handle );
 
-  // Retrieve the number of expressions in the program
+  /// Retrieve the number of expressions in the program
   size_t num_expressions();
 
-  // Add an input variable to the program
+  /// Add an input variable to the program
   void add_input_variable( std::string name, std::string type = "U", int flags = 0 );
 
-  // Add an output variable to the program
+  /// Add an output variable to the program
   void add_output_variable( std::string name, std::string type = "U", int flags = 0 );
 
   void get_input_variables( ParserVariableList& var_list );
@@ -74,7 +74,7 @@ public:
   ParserFunctionCatalogHandle get_catalog();
   void set_catalog( ParserFunctionCatalogHandle catalog );
 
-  // Insert the variables
+  /// Insert the variables
   void add_const_var( ParserScriptVariableHandle& handle );
   void add_single_var( ParserScriptVariableHandle& handle );
   void add_sequential_var( ParserScriptVariableHandle& handle );
@@ -83,7 +83,7 @@ public:
   void add_single_function( ParserScriptFunctionHandle& handle );
   void add_sequential_function( ParserScriptFunctionHandle& handle );
 
-  // Get the variables that need to be assigned
+  /// Get the variables that need to be assigned
   size_t num_const_variables();
   size_t num_single_variables();
   size_t num_sequential_variables();
@@ -92,7 +92,7 @@ public:
   bool get_single_variable( size_t j, ParserScriptVariableHandle& handle );
   bool get_sequential_variable( size_t j, ParserScriptVariableHandle& handle );
 
-  // Get the functions that need to be assigned
+  /// Get the functions that need to be assigned
   size_t num_const_functions();
   size_t num_single_functions();
   size_t num_sequential_functions();
@@ -101,7 +101,7 @@ public:
   bool get_single_function( size_t j, ParserScriptFunctionHandle& handle );
   bool get_sequential_function( size_t j, ParserScriptFunctionHandle& handle );
 
-  // For debugging
+  /// For debugging
   void print();
 
 private:

@@ -50,8 +50,8 @@ namespace Core
 {
 
 // CLASS LOGHISTORY:
-// This class records the last entries of the log and keeps a record of the
-// last entries.
+/// This class records the last entries of the log and keeps a record of the
+/// last entries.
 
 // Forward declaration
 class LogHistory;
@@ -73,18 +73,18 @@ private:
 
 public:
   // SET_MAX_HISTORY_SIZE:
-  // Set the size of the action history buffer
+  /// Set the size of the action history buffer
   void set_max_history_size( size_t size );
 
   // MAX_HISTORY_SIZE:
-  // Retrieve the size of this buffer
+  /// Retrieve the size of this buffer
   size_t max_history_size();
 
   // HISTORY_SIZE:
   size_t history_size();
 
   // LOG_ENTRY
-  // Get the nth log entry in the buffer
+  /// Get the nth log entry in the buffer
   log_entry_type log_entry( size_t index );
 
 private:
@@ -101,7 +101,7 @@ public:
   typedef boost::signals2::signal< void() > history_changed_signal_type;
 
   // HISTORY_CHANGED_SIGNAL:
-  // Signal indicating that the history changed
+  /// Signal indicating that the history changed
   history_changed_signal_type history_changed_signal_;
 
 };

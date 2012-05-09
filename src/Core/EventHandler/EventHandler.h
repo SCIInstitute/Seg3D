@@ -61,73 +61,73 @@ public:
 public:
 
   // IS_EVENTHANDLER_THREAD:
-  // Is this the event handler thread
+  /// Is this the event handler thread
   bool is_eventhandler_thread() const;
 
   // POST_EVENT:
-  // Post an event on the application event stack. If the program uses a GUI
-  // these events are mixed in with the main event handler and are execute at
-  // the same time.
+  /// Post an event on the application event stack. If the program uses a GUI
+  /// these events are mixed in with the main event handler and are execute at
+  /// the same time.
   void post_event( boost::function< void() > function );
 
   // POST_AND_WAIT_EVENT:
-  // This function is similar to post_event, but waits until the function
-  // has finished execution. Note in case the function is called from the
-  // application thread itself it will immediately execute and not post
-  // any events on the event stack in order for the application not to
-  // dead lock
+  /// This function is similar to post_event, but waits until the function
+  /// has finished execution. Note in case the function is called from the
+  /// application thread itself it will immediately execute and not post
+  /// any events on the event stack in order for the application not to
+  /// dead lock
   void post_and_wait_event( boost::function< void() > function );
 
   // -- Processing events from within the event handler thread --
 public:
 
   // PROCESS_EVENTS:
-  // Process the events that are in the event handler queue.
+  /// Process the events that are in the event handler queue.
   bool process_events();
 
   // WAIT_AND_PROCESS_EVENTS:
-  // Wait for events to come in and process the events
+  /// Wait for events to come in and process the events
   bool wait_and_process_events();
 
   // -- Thread interface --
 public:
 
   // START_EVENTHANDLER:
-  // Start the eventhandler. This will launch the eventhandler
-  // thread and runs the run_eventhandler() function.
+  /// Start the eventhandler. This will launch the eventhandler
+  /// thread and runs the run_eventhandler() function.
   bool start_eventhandler();
 
   // EVENTHANDLER_STARTED:
-  // Check whether the eventhandler is running
+  /// Check whether the eventhandler is running
   bool eventhandler_started();  
 
   // RUN_EVENTHANDLER:
-  // The main functions that processes all the incoming events.
+  /// The main functions that processes all the incoming events.
   virtual void run_eventhandler();
 
 protected:
   // INITIALIZE_EVENTHANDLER:
-  // This function will be called on the event handler thread before it will start
-  // processing events
+  /// This function will be called on the event handler thread before it will start
+  /// processing events
   virtual void initialize_eventhandler();
 
   friend void TerminateEventHandlerThread( EventHandlerHandle handle );
 
   // TERMINATE_EVENTHANDLER:
-  // Terminate processing events and kill the thread that processes them.
-  // This function is private and can only be called from
-  // TerminateEventHandler(). This function launches a separate thread
-  // that joins with the eventhandler thread, to allow for the remainder
-  // events to be processed before the object is destructed.
+  /// Terminate processing events and kill the thread that processes them.
+  /// This function is private and can only be called from
+  /// TerminateEventHandler(). This function launches a separate thread
+  /// that joins with the eventhandler thread, to allow for the remainder
+  /// events to be processed before the object is destructed.
   void terminate_eventhandler();
 
   // -- Context interface --
 public:
 
   // INSTALL_EVENTHANDLER_CONTEXT()
-  // Setup the application context. The application context abstracts the
-  // interface piece of the GUI layer that is needed for communication with
-  // the application thread.
+  /// Setup the application context. The application context abstracts the
+  /// interface piece of the GUI layer that is needed for communication with
+  /// the application thread.
   void install_eventhandler_context( EventHandlerContextHandle& context );
 
 private:
@@ -140,9 +140,9 @@ private:
 
 };
 
-// This function terminates the object that uses the eventhandler
-// We need an additional thread to terminate the eventhandler thread
-// safely.
+/// This function terminates the object that uses the eventhandler
+/// We need an additional thread to terminate the eventhandler thread
+/// safely.
 void TerminateEventHandler( EventHandlerHandle& eventhandlerhandle );
 
 } // end namespace Core

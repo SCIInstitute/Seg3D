@@ -55,37 +55,37 @@ public:
 
   void set_data_at( size_t i, size_t j, double value );
 
-  // Upload the data slice to graphics texture.
-  // NOTE: This function allocates resources on the GPU, so the caller should
-  // acquire a lock on the RenderResources before calling this function.
+  /// Upload the data slice to graphics texture.
+  /// NOTE: This function allocates resources on the GPU, so the caller should
+  /// acquire a lock on the RenderResources before calling this function.
   virtual void upload_texture();
 
   // CLONE:
-  // Make a copy of the slice, which will share texture object with the original one.
+  /// Make a copy of the slice, which will share texture object with the original one.
   virtual VolumeSliceHandle clone();
 
   // SET_VOLUME:
-  // Set the volume out of which the slice will be taken.
+  /// Set the volume out of which the slice will be taken.
   virtual void set_volume( const VolumeHandle& volume );
 
   // CREATE_THRESHOLD_MASK:
-  // Create a threshold mask based on the data of current slice and the give min/max 
-  // values. The mask will be inverted if negative_constraint is true.
+  /// Create a threshold mask based on the data of current slice and the give min/max 
+  /// values. The mask will be inverted if negative_constraint is true.
   void create_threshold_mask( std::vector< unsigned char >& mask, 
     double min_val, double max_val, bool negative_constraint ) const;
 
 private:
   DataVolumeSlicePrivateHandle private_;
 
-  // Pointer to the data block. The base class keeps a handle of the volume,
-  // so it is safe to use a pointer here.
+  /// Pointer to the data block. The base class keeps a handle of the volume,
+  /// so it is safe to use a pointer here.
   DataBlock* data_block_;
 
-  // An array of GLenum's for data types, indexed by data_type values
+  /// An array of GLenum's for data types, indexed by data_type values
   const static unsigned int TEXTURE_DATA_TYPE_C;
 
-  // An array of GLenum's for GL internal texture formats, indexed by data_type values.
-  // These formats are picked to best match the data type.
+  /// An array of GLenum's for GL internal texture formats, indexed by data_type values.
+  /// These formats are picked to best match the data type.
   const static unsigned int TEXTURE_FORMAT_C;
 };
 

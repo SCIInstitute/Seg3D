@@ -47,8 +47,8 @@ namespace Core
 {
 
 // CLASS LOG:
-// This class records a log entry and pushes it onto a signal so more than
-// one recorder can record the log entries.
+/// This class records a log entry and pushes it onto a signal so more than
+/// one recorder can record the log entries.
 
 // Forward declaration
 class Log;
@@ -79,32 +79,32 @@ private:
 public:
 
   // POST_CRITICAL_ERROR:
-  // Post an error onto the log signal !!THIS WILL CAUSE AN ERROR DIALOG TO DISPLAY FOR THE USER!!
+  /// Post an error onto the log signal !!THIS WILL CAUSE AN ERROR DIALOG TO DISPLAY FOR THE USER!!
   void post_critical_error( std::string message, const int line, const char* file );
 
   // POST_ERROR:
-  // Post an error onto the log signal
+  /// Post an error onto the log signal
   void post_error( std::string message, const int line, const char* file );
 
   // POST_WARNING:
-  // Post a warning onto the log signal
+  /// Post a warning onto the log signal
   void post_warning( std::string message, const int line, const char* file );
 
   // POST_MESSAGE:
-  // Post a message onto the log signal
+  /// Post a message onto the log signal
   void post_message( std::string message, const int line, const char* file );
 
   // POST_SUCCESS:
-  // Post a message onto the log signal
+  /// Post a message onto the log signal
   void post_success( std::string message, const int line, const char* file );
 
   // POST_DEBUG:
-  // Post debug information onto the log signal
+  /// Post debug information onto the log signal
   void post_debug( std::string message, const int line, const char* file );
 
 private:
   // HEADER:
-  // Generate a uniform header for the message that is posted
+  /// Generate a uniform header for the message that is posted
   std::string header( const int line, const char* file ) const;
 
   // -- signal where to receive the logging information from --
@@ -112,15 +112,15 @@ public:
   typedef boost::signals2::signal< void( unsigned int, std::string ) > post_log_signal_type;
 
   // POST_LOG_SIGNAL
-  // Signal indicating that a message needs to be written to the log file
+  /// Signal indicating that a message needs to be written to the log file
   post_log_signal_type post_log_signal_;
 
   // POST_STATUS_SIGNAL
-  // Signal indicating that a message needs to be written to the status bar
+  /// Signal indicating that a message needs to be written to the status bar
   post_log_signal_type post_status_signal_;
   
   // POST_CRITICAL_SIGNAL
-  // Signal indicating that a message needs to be written to the status bar
+  /// Signal indicating that a message needs to be written to the status bar
   post_log_signal_type post_critical_signal_;
 
 };

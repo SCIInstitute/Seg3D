@@ -37,17 +37,17 @@ namespace Core
 {
 
 //-----------------------------------------------------------------------------
-// Functions for databasing the function calls that make up the program
+/// Functions for databasing the function calls that make up the program
 
-// This class is used to describe each function in the system
-// It describes the name + input arguments, the return type,
-// additional flags and a pointer the the actual function that
-// needs to be called
+/// This class is used to describe each function in the system
+/// It describes the name + input arguments, the return type,
+/// additional flags and a pointer the the actual function that
+/// needs to be called
 
 class ArrayMathFunction : public ParserFunction
 {
 public:
-  // Build a new function
+  /// Build a new function
   ArrayMathFunction(
     ArrayMathFunctionObject function,
     std::string function_id, std::string function_type, int function_flags );
@@ -67,7 +67,7 @@ public:
   }
 
 private:
-  // The function to call that needs to be called on the data
+  /// The function to call that needs to be called on the data
   ArrayMathFunctionObject function_;
 
 };

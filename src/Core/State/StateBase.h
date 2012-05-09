@@ -69,16 +69,16 @@ public:
   // -- functions for accessing data --
 public:
   // EXPORT_TO_STRING:
-  // Convert the contents of the State into a string
+  /// Convert the contents of the State into a string
   virtual std::string export_to_string() const = 0;
 
   // IMPORT_FROM_STRING:
-  // Set the State from a string
+  /// Set the State from a string
   virtual bool import_from_string( const std::string& str, Core::ActionSource source =
     Core::ActionSource::NONE_E ) = 0;
   
   // SET_IS_PROJECT_DATA:
-  // Set whether the data is part of the project data
+  /// Set whether the data is part of the project data
   void set_is_project_data( bool is_project_data );
 
 protected:
@@ -88,53 +88,53 @@ protected:
   friend class StateHandler;
 
   // EXPORT_TO_VARIANT
-  // Export the state data to a variant parameter
+  /// Export the state data to a variant parameter
   virtual void export_to_variant( Variant& variant ) const = 0;
 
   // IMPORT_FROM_VARIANT:
-  // Import the state data from a variant parameter.
+  /// Import the state data from a variant parameter.
   virtual bool import_from_variant( Variant& variant, 
     Core::ActionSource source = Core::ActionSource::NONE_E ) = 0;
 
   // VALIDATE_VARIANT:
-  // Validate a variant parameter
-  // This function returns false if the parameter is invalid or cannot be
-  // converted and in that case error will describe the error.
+  /// Validate a variant parameter
+  /// This function returns false if the parameter is invalid or cannot be
+  /// converted and in that case error will describe the error.
   virtual bool validate_variant( Variant& variant, std::string& error ) = 0;
 
   // ENABLE_SIGNALS:
-  // Allow signals to be triggered from this state variable
-  // NOTE: Signal enabling is used for loading sessions, switching off signalling can prevent
-  // a lot of signals being triggered when every state variable is reinitialized.
+  /// Allow signals to be triggered from this state variable
+  /// NOTE: Signal enabling is used for loading sessions, switching off signalling can prevent
+  /// a lot of signals being triggered when every state variable is reinitialized.
   void enable_signals( bool signals_enabled );
   
   // SIGNALS_ENABLED:
-  // Check whether signals are enabled
+  /// Check whether signals are enabled
   bool signals_enabled();
     
   // SET_INITIALIZING:
-  // Indicate that the statehandler is still being created. Hence only one thread will have
-  // access to the state variable, and thread safety checking is not needed. 
-  // NOTE: This is mainly intended to be set in the constructor of the state handler of this
-  // variable, which may need to initialize the state variables to certain values. As that handlers
-  // can be singletons they can be created from any thread. Hence strict thread checking
-  // maybe an issue, however the creation of an instance normally is thread safe as no other
-  // thread has access to the state parameters and signals are still being blocked.
+  /// Indicate that the statehandler is still being created. Hence only one thread will have
+  /// access to the state variable, and thread safety checking is not needed. 
+  /// NOTE: This is mainly intended to be set in the constructor of the state handler of this
+  /// variable, which may need to initialize the state variables to certain values. As that handlers
+  /// can be singletons they can be created from any thread. Hence strict thread checking
+  /// maybe an issue, however the creation of an instance normally is thread safe as no other
+  /// thread has access to the state parameters and signals are still being blocked.
   void set_initializing( bool initializing );
   
   // GET_INITIALIZING:
-  // Query whether the state variable and its parent are still being initialized.
+  /// Query whether the state variable and its parent are still being initialized.
   bool get_initializing() const;
   
 public: 
   // SET_LOCKED:
-  // Tell the program that this state variable cannot be changed by the action mechanism
-  // Only a direct set will work. This prevents any scripting system to override crucial
-  // variables.
+  /// Tell the program that this state variable cannot be changed by the action mechanism
+  /// Only a direct set will work. This prevents any scripting system to override crucial
+  /// variables.
   void set_locked( bool locked );
   
   // GET_LOCKED:
-  // Query whether the variable has been designated as locked
+  /// Query whether the variable has been designated as locked
   bool get_locked() const; 
   
   // -- session handling -- 
@@ -147,35 +147,35 @@ public:
   };
   
   // GET_SESSION_PRIORITY:
-  // Get the priority in which loading sets the states
+  /// Get the priority in which loading sets the states
   int get_session_priority() const;
   
   // SET_SESSION_PRIORITY:
-  // By default the priority is set to DEAFULT_LOAD_E.
+  /// By default the priority is set to DEAFULT_LOAD_E.
   void set_session_priority( int priority );
   
   // -- stateid handling --
 public:
   // GET_STATEID:
-  // Get the unique id assigned to the state variable
+  /// Get the unique id assigned to the state variable
   std::string get_stateid() const;
 
   // IS_PROJECT_DATA:
-  // Whether the data is tagged as project data that is saved in a session
+  /// Whether the data is tagged as project data that is saved in a session
   bool is_project_data() const;
 
   // -- signal handling --
 public:
   // STATE_CHANGED_SIGNAL:
-  // This signal is triggered when the state is changed
+  /// This signal is triggered when the state is changed
   typedef boost::signals2::signal< void() > state_changed_signal_type;
   state_changed_signal_type state_changed_signal_;
 
 protected:
   // INVALIDATE:
-  // Invalidate the state variable. This function is called by the "invalidate" function of 
-  // StateHandler to release any resource occupied by the state.
-  // Default implementation does nothing.
+  /// Invalidate the state variable. This function is called by the "invalidate" function of 
+  /// StateHandler to release any resource occupied by the state.
+  /// Default implementation does nothing.
   virtual void invalidate();
 
 private:

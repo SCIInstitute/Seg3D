@@ -43,8 +43,8 @@ namespace Core
 {
 
 // CLASS MouseButton:
-// Enums for mouse buttons 
-// they have the same values as corresponding Qt ones
+/// Enums for mouse buttons 
+/// they have the same values as corresponding Qt ones
 CORE_ENUM_CLASS
 (
   MouseButton,
@@ -55,8 +55,8 @@ CORE_ENUM_CLASS
 )
 
 // CLASS KeyModifier:
-// Enums for key modifiers
-// they have the same values as corresponding Qt ones
+/// Enums for key modifiers
+/// they have the same values as corresponding Qt ones
 CORE_ENUM_CLASS
 (
   KeyModifier,
@@ -142,7 +142,7 @@ CORE_ENUM_CLASS
 )
 
 // CLASS HitPosition:
-// Classifies which part of a rectangle region the mouse cursor is on.
+/// Classifies which part of a rectangle region the mouse cursor is on.
 CORE_ENUM_CLASS
 (
    HitPosition,
@@ -159,7 +159,7 @@ CORE_ENUM_CLASS
  )
 
 // CLASS MousePosition:
-// Class for recording the location of the mouse
+/// Class for recording the location of the mouse
 
 class MousePosition
 {
@@ -178,8 +178,8 @@ public:
 typedef boost::shared_ptr< MousePosition > MousePositionHandle;
 
 // CLASS MouseHistory:
-// Class for recording the history of a mouse event
-// This is needed to track mouse gestures
+/// Class for recording the history of a mouse event
+/// This is needed to track mouse gestures
 
 class MouseHistory
 {

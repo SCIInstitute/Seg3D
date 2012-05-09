@@ -46,14 +46,12 @@ namespace Core
 {
 
 // CLASS MaskDataBlock
-// This class represents a datablock for masks that are collapsed in several
-// bitplanes in a common datablock. It runs through the SharedDataBlockManager
-// to allocate a new datablock or share the datablock with another mask.
-// When a new datablock is created, it is checked whether a similar mask with
-// the same dimensions exists with an unassigned bit and used if possible,
-// otherwise a new one is generated.
-
-// Class definition
+/// This class represents a datablock for masks that are collapsed in several
+/// bitplanes in a common datablock. It runs through the SharedDataBlockManager
+/// to allocate a new datablock or share the datablock with another mask.
+/// When a new datablock is created, it is checked whether a similar mask with
+/// the same dimensions exists with an unassigned bit and used if possible,
+/// otherwise a new one is generated.
 class MaskDataBlock : public boost::noncopyable, 
   public boost::enable_shared_from_this< MaskDataBlock >
 {
@@ -108,72 +106,72 @@ public:
   }
 
   // DATA
-  // Pointer to the block of data
+  /// Pointer to the block of data
   inline unsigned char* get_mask_data()
   {
     return  this->data_;
   }
 
   // GET_MASK_BIT:
-  // Get the bit that describes the mask
+  /// Get the bit that describes the mask
   inline unsigned int get_mask_bit()
   {
     return this->mask_bit_;
   }
 
   // GET_MASK_VALUE
-  // Get the value at which the mask is stored
+  /// Get the value at which the mask is stored
   inline unsigned char get_mask_value()
   {
     return this->mask_value_;
   }
 
   // GET_DATA_BLOCK
-  // Retrieve the pointer to the data block
-  // NOTE: This one is needed for loading the textures onto the
-  // graphics card. As masks are shared the Texture will be shared
-  // hence access to the datablock is needed to see whether this one
-  // has already been uploaded
+  /// Retrieve the pointer to the data block
+  /// NOTE: This one is needed for loading the textures onto the
+  /// graphics card. As masks are shared the Texture will be shared
+  /// hence access to the datablock is needed to see whether this one
+  /// has already been uploaded
   DataBlockHandle get_data_block();
 
   // GET_GENERATION:
-  // Get the current generation number of the data volume.
+  /// Get the current generation number of the data volume.
   DataBlock::generation_type get_generation() const;
 
   // INCREASE_GENERATION:
-  // Increase the generation number to a new unique number.
+  /// Increase the generation number to a new unique number.
   void increase_generation();
 
   // GET_MASK_AT:
-  // Get the mask value at a certain coordinate
+  /// Get the mask value at a certain coordinate
   inline bool get_mask_at( size_t x, size_t y, size_t z ) const
   {
     return this->get_mask_at( this->to_index( x, y, z ) );
   }
 
   // GET_MASK_AT:
-  // Get the mask value at a certain index
+  /// Get the mask value at a certain index
   inline bool get_mask_at( size_t index ) const
   {
     return ( this->data_[ index ] & this->mask_value_ ) != 0;
   }
 
   // SET_MASK_AT:
-  // Set the mask value at a certain coordinate
+  /// Set the mask value at a certain coordinate
   inline void set_mask_at( size_t x, size_t y, size_t z )
   {
     this->set_mask_at( this->to_index( x, y, z ) );
   }
   
   // SET_MASK_AT:
-  // Set the mask value at a certain index
+  /// Set the mask value at a certain index
   inline void set_mask_at( size_t index )
   {
     this->data_[ index ] |= this->mask_value_;
   }
   
   // Clear_MASK_AT:
-  // Clear the mask value at a certain index
+  /// Clear the mask value at a certain index
   inline void clear_mask_at( size_t x, size_t y, size_t z )
   {
     this->clear_mask_at( this->to_index( x, y, z ) );
@@ -188,7 +186,7 @@ public:
 public:
 
   // GET_MUTEX:
-  // Get the mutex that locks the datablock
+  /// Get the mutex that locks the datablock
   mutex_type& get_mutex() const
   { 
     return data_block_->get_mutex();
@@ -198,41 +196,41 @@ public:
 public:
 
   // MASK_UPDATED_SIGNAL
-  // Triggered when mask has been update
+  /// Triggered when mask has been update
   //
-  // NOTE: This signal is never triggered inside the class. 
-  // Any object that makes change to the mask data is responsible for triggering
-  // this signal after modification is done.
+  /// NOTE: This signal is never triggered inside the class. 
+  /// Any object that makes change to the mask data is responsible for triggering
+  /// this signal after modification is done.
   boost::signals2::signal<void ()> mask_updated_signal_;
 
   // -- extracting slices and inserting slices
 public:
   // INSERT_SLICE:
-  // Insert slice into the datablock
+  /// Insert slice into the datablock
   bool insert_slice( const MaskDataSliceHandle slice );
 
   // EXTRACT_SLICE:
-  // Extract a slice from the datablock
+  /// Extract a slice from the datablock
   bool extract_slice( SliceType type, index_type index, MaskDataSliceHandle& slice  );
 
   // -- internals of the DataBlock --
 private:
-  // The dimensions of the datablock
+  /// The dimensions of the datablock
   size_t nx_;
   size_t ny_;
   size_t nz_;
 
-  // The datablock that is shared
+  /// The datablock that is shared
   DataBlockHandle data_block_;
 
-  // The bit that is used for this mask
+  /// The bit that is used for this mask
   const unsigned int mask_bit_;
 
-  // Values that have the maskbit set or all the other bits
+  /// Values that have the maskbit set or all the other bits
   const unsigned char mask_value_;
   const unsigned char not_mask_value_;
 
-  // Cached data pointer of the underlying DataBlock
+  /// Cached data pointer of the underlying DataBlock
   unsigned char* data_;
 
 };

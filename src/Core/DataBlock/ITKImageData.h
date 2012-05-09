@@ -73,37 +73,37 @@ public:
   // -- Accessors --
 public:
   // GET_DATA:
-  // Get the pointer to the data block within the itkImage
+  /// Get the pointer to the data block within the itkImage
   virtual void* get_data() const = 0;
 
   // GET_BASE_IMAGE:
-  // Get the pointer to the base image class
+  /// Get the pointer to the base image class
   virtual image_base_type::Pointer get_base_image() const = 0;
 
   // GRID_TRANSFORM:
-  // Extract the transform from the nrrd
+  /// Extract the transform from the nrrd
   virtual GridTransform get_grid_transform() const = 0;
 
   // TRANSFORM:
-  // Extract the transform from the nrrd
+  /// Extract the transform from the nrrd
   virtual Transform get_transform() const = 0;
 
   // SET_TRANSFORM:
-  // Set the transfrom in the nrrd data
+  /// Set the transfrom in the nrrd data
   virtual void set_transform( Transform& transform ) = 0;
 
   // GET_NX, GET_NY, GET_NZ:
-  // Get the dimensions of the itkImage
+  /// Get the dimensions of the itkImage
   virtual size_t get_nx() const = 0;
   virtual size_t get_ny() const = 0;
   virtual size_t get_nz() const = 0;
 
   // GET_SIZE
-  // Get the total size of the pixel buffer
+  /// Get the total size of the pixel buffer
   virtual size_t get_size() const = 0;
 
   // GET_DATA_TYPE:
-  // Get the data type of the nrrd
+  /// Get the data type of the nrrd
   virtual DataType get_data_type() const = 0;
   
 };
@@ -126,10 +126,10 @@ public:
 
   // -- Constructor/destructor --
 public:
-  // Create the wrapper class from an itkImage smart pointer
+  /// Create the wrapper class from an itkImage smart pointer
   ITKImageDataT( typename image_type::Pointer itk_image );
   
-  // Create the wrapper class from a data block
+  /// Create the wrapper class from a data block
   ITKImageDataT( DataBlockHandle data_block );
   ITKImageDataT( DataBlockHandle data_block, Transform transform );
 
@@ -141,53 +141,53 @@ private:
   // -- Accessors --
 public:
   // GET_TYPED_IMAGE:
-  // Return the itkImage class template to the derived class
+  /// Return the itkImage class template to the derived class
   typename image_type::Pointer get_image() const;
 
   // GET_BASE_IMAGE:
-  // Get the pointer to the base image class
+  /// Get the pointer to the base image class
   virtual image_base_type::Pointer get_base_image() const;
 
   // GET_DATA:
-  // Get the pointer to the data block within the itkImage
+  /// Get the pointer to the data block within the itkImage
   virtual void* get_data() const;
 
   // GET_TYPED_DATA:
-  // Get the pointer to the data block within the itkImage
+  /// Get the pointer to the data block within the itkImage
   T* get_typed_data() const;
 
   // GRID_TRANSFORM:
-  // Extract the transform from the nrrd
+  /// Extract the transform from the nrrd
   virtual GridTransform get_grid_transform() const;
 
   // TRANSFORM:
-  // Extract the transform from the nrrd
+  /// Extract the transform from the nrrd
   virtual Transform get_transform() const;
 
   // SET_TRANSFORM:
-  // Set the transfrom in the nrrd data
+  /// Set the transfrom in the nrrd data
   virtual void set_transform( Transform& transform );
 
   // GET_NX, GET_NY, GET_NZ:
-  // Get the dimensions of the itkImage
+  /// Get the dimensions of the itkImage
   virtual size_t get_nx() const;
   virtual size_t get_ny() const;
   virtual size_t get_nz() const;
 
   // GET_SIZE
-  // Get the total size of the pixel buffer
+  /// Get the total size of the pixel buffer
   virtual size_t get_size() const;
 
   // GET_DATA_TYPE:
-  // Get the data type of the nrrd
+  /// Get the data type of the nrrd
   virtual DataType get_data_type() const;
 
   // -- Internals of this class --
 private:
-  // Smart pointer to the itk object
+  /// Smart pointer to the itk object
   typename image_type::Pointer itk_image_;
 
-  // Handle to a data_block that was wrapped in an itk object
+  /// Handle to a data_block that was wrapped in an itk object
   DataBlockHandle data_block_;
 
 public:

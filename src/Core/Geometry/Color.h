@@ -36,7 +36,7 @@ namespace Core
 {
 
 // CLASS Color
-// This class defines an rgb color
+/// This class defines an rgb color
 
 class Color
 {

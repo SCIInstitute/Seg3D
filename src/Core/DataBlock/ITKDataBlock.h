@@ -63,13 +63,13 @@ private:
   
 public: 
   // NEW:
-  // Constructor of a new data block using the ITKImageData wrapper class.
-  // Version with 3D data
+  /// Constructor of a new data block using the ITKImageData wrapper class.
+  /// Version with 3D data
   static DataBlockHandle New( ITKImageDataHandle itk_data );
 
   // NEW:
-  // Constructor of a new data block using the ITKImageData wrapper class.
-  // Version with 2D data
+  /// Constructor of a new data block using the ITKImageData wrapper class.
+  /// Version with 2D data
   static DataBlockHandle New( ITKImage2DDataHandle itk_data, SliceType slice = SliceType::AXIAL_E );
 
   // -----------------------------
@@ -78,7 +78,7 @@ public:
   // the underlying class.
   
   // NEW:
-  // Constructor of a new data block using an itk image pointer.
+  /// Constructor of a new data block using an itk image pointer.
   template< class T >
   static DataBlockHandle New( typename itk::Image<T,3>::Pointer itk_image )
   {
@@ -90,7 +90,7 @@ public:
   }
 
   // NEW:
-  // Constructor of a new data block using an itk image pointer.
+  /// Constructor of a new data block using an itk image pointer.
   template< class T >
   static DataBlockHandle New( typename itk::Image<T,2>::Pointer itk_image, 
     SliceType slice = SliceType::AXIAL_E )
@@ -103,7 +103,7 @@ public:
   }
 
   // NEW:
-  // Constructor of a new data block using an itk image pointer.
+  /// Constructor of a new data block using an itk image pointer.
   template< class T >
   static DataBlockHandle New( typename itk::Image<T,3>* itk_image )
   {

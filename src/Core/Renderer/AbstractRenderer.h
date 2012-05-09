@@ -55,37 +55,37 @@ public:
 
 public:
   // INITIALIZE:
-  // Initialize the renderer.
+  /// Initialize the renderer.
   virtual void initialize() = 0;
 
   // RESIZE:
-  // resize the renderer.
+  /// resize the renderer.
   virtual void resize( int width, int height ) = 0;
 
   // REDRAW_SCENE:
-  // It triggers the "redraw_completed_signal_" at the end.
+  /// It triggers the "redraw_completed_signal_" at the end.
   virtual void redraw_scene() = 0;
 
   // REDRAW_OVERLAY:
-  // It triggers the "redraw_overlay_completed_signal_" at the end.
+  /// It triggers the "redraw_overlay_completed_signal_" at the end.
   virtual void redraw_overlay() = 0;
 
   // REDRAW_ALL:
-  // It triggers the "redraw_overlay_completed_signal_" and
-  // "redraw_completed_signal_" at the end.
+  /// It triggers the "redraw_overlay_completed_signal_" and
+  /// "redraw_completed_signal_" at the end.
   virtual void redraw_all() = 0;
 
   // REDRAW_COMPLETED_SIGNAL_
-  // Triggered when redraw is done. The first parameter is a handle to the texture
-  // containing the redraw result, the second indicates whether the update should be
-  // delayed, such as when there will be another texture coming after this signal.
+  /// Triggered when redraw is done. The first parameter is a handle to the texture
+  /// containing the redraw result, the second indicates whether the update should be
+  /// delayed, such as when there will be another texture coming after this signal.
   typedef boost::signals2::signal< void( Core::Texture2DHandle, bool ) > 
     redraw_completed_signal_type;
   redraw_completed_signal_type redraw_completed_signal_;
 
   // REDRAW_OVERLAY_COMPLETED_SIGNAL_
-  // Triggered when redraw_overlay is done.
-  // The parameter is a handle to the texture containing the overlay.
+  /// Triggered when redraw_overlay is done.
+  /// The parameter is a handle to the texture containing the overlay.
   redraw_completed_signal_type redraw_overlay_completed_signal_;
 
 protected:
@@ -93,15 +93,15 @@ protected:
   friend class AbstractViewerPrivate;
 
   // ACTIVATE:
-  // Activate the renderer
+  /// Activate the renderer
   virtual void activate() = 0;
 
   // DEACTIVATE:
-  // Deactivate the renderer
+  /// Deactivate the renderer
   virtual void deactivate() = 0;  
 
   // IS_ACTIVE:
-  // Return the status of the renderer
+  /// Return the status of the renderer
   virtual bool is_active() = 0;
 
 };

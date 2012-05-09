@@ -46,16 +46,16 @@ CORE_ENUM_CLASS
 (
   PythonActionMode,
 
-  // Run actions in interactive mode: 
-  // actions that require resources not immediately available will fail.
+  /// Run actions in interactive mode: 
+  /// actions that require resources not immediately available will fail.
   INTERACTIVE_E,  
 
-  // Run actions in batch mode:
-  // actions will wait for resources to become available and retry.
+  /// Run actions in batch mode:
+  /// actions will wait for resources to become available and retry.
   BATCH_E,
 
-  // Run actions in replay mode:
-  // actions won't recorded into the provenance buffer.
+  /// Run actions in replay mode:
+  /// actions won't recorded into the provenance buffer.
   REPLAY_E
 )
 

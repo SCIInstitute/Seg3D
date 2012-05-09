@@ -60,47 +60,47 @@ public:
   virtual ~DefaultEventHandlerContext();
 
   // POST_EVENT:
-  // Post an event onto the event handler stack. This one
-  // returns immediately after posting the event, and does
-  // not wait for the process to finish the event.
+  /// Post an event onto the event handler stack. This one
+  /// returns immediately after posting the event, and does
+  /// not wait for the process to finish the event.
 
   virtual void post_event( EventHandle& event );
 
   // POST_AND_WAIT_APPLICATION_EVENT:
-  // Post an event onto the event handler stack. This one
-  // returns after the thread signals that the event has been
-  // executed. The function does the full hand shaking for
-  // the synchronization.
+  /// Post an event onto the event handler stack. This one
+  /// returns after the thread signals that the event has been
+  /// executed. The function does the full hand shaking for
+  /// the synchronization.
 
   virtual void post_and_wait_event( EventHandle& event );
 
   // PROCESS_EVENTS:
-  // process the events that are queued in the event handler mailbox
+  /// process the events that are queued in the event handler mailbox
 
   virtual bool process_events();
 
   // WAIT_AND_PROCESS_EVENTS:
-  // process the events that are queued in the event handler mailbox
+  /// process the events that are queued in the event handler mailbox
 
   virtual bool wait_and_process_events();
 
   // IS_EVENTHANDLER_THREAD:
-  // Check whether we are running on the thread that handles the events
-  // This function is needed to avoid to post and execute things in an infinite
-  // loop.
+  /// Check whether we are running on the thread that handles the events
+  /// This function is needed to avoid to post and execute things in an infinite
+  /// loop.
 
   virtual bool is_eventhandler_thread() const;
 
   // START_EVENTHANDLER:
-  // Start the eventhandler thread and start processing events
+  /// Start the eventhandler thread and start processing events
   virtual bool start_eventhandler( EventHandler* eventhandler );
 
   // EVENTHANDLER_STARTED:
-  // Check whether the eventhandler is running
+  /// Check whether the eventhandler is running
   virtual bool eventhandler_started();
 
   // TERMINATE_EVENTHANDLER:
-  // Terminate the eventhandler
+  /// Terminate the eventhandler
   virtual void terminate_eventhandler();
 
   // -- internals of this class --

@@ -61,30 +61,30 @@ private:
   // -- Interface for accessing state variables --
 public:
   // GET_STATE:
-  // Get pointer to the state variable based on the unique state tag
+  /// Get pointer to the state variable based on the unique state tag
   bool get_state( const std::string& stateid, StateBaseHandle& state );
 
   // GET_STATE:
-  // Get the state variable by index
+  /// Get the state variable by index
   bool get_state( const size_t idx, StateBaseHandle& state);
 
   // NUMBER_OF_STATES:
-  // The number of state variables in the system
+  /// The number of state variables in the system
   size_t number_of_states();
   
   // GET_NEXT_STATEHANDLER_COUNT:
-  // Get the count for the next state handler
+  /// Get the count for the next state handler
   size_t get_next_statehandler_count( const std::string& stateid );
   
   // SET_NEXT_STATEHANDLER_COUNT:
-  // Reset the count to a certain number
-  // NOTE: This functionality is intended for redo
+  /// Reset the count to a certain number
+  /// NOTE: This functionality is intended for redo
   void set_next_statehandler_count( const std::string& stateid, size_t count);
 
 public:
   // LOAD_STATES:
-  // This function finds the StateHandlers that are saved to file by default and then
-  // sets their state variables from the values that have been loaded into session_states_
+  /// This function finds the StateHandlers that are saved to file by default and then
+  /// sets their state variables from the values that have been loaded into session_states_
   bool load_states( const StateIO& state_io );
 
   bool save_states( StateIO& state_io );
@@ -109,16 +109,16 @@ private:
   // -- Signals --
 public:
   // STATE_CHANGED_SIGNAL:
-  // This signal is triggered when a state in the state engine is changed
+  /// This signal is triggered when a state in the state engine is changed
   typedef boost::signals2::signal<void ()> state_changed_signal_type;
   state_changed_signal_type state_changed_signal_;
 
   // PRE_LOAD_STATES_SIGNAL_:
-  // Triggered at the beginning of load_states function.
+  /// Triggered at the beginning of load_states function.
   boost::signals2::signal< void () > pre_load_states_signal_;
 
   // POST_LOAD_STATES_SIGNAL_:
-  // Triggered at the end of load_states function.
+  /// Triggered at the end of load_states function.
   boost::signals2::signal< void () > post_load_states_signal_;
 
   // -- Implementation details --
@@ -129,8 +129,8 @@ private:
 public:
 
   // GETMUTEX
-  // Get the mutex of the state engine
-  // NOTE: Do not lock the StateEngine while RenderResources is locked as this will cause deadlock
+  /// Get the mutex of the state engine
+  /// NOTE: Do not lock the StateEngine while RenderResources is locked as this will cause deadlock
   static mutex_type& GetMutex()
   {
     return Instance()->get_mutex();

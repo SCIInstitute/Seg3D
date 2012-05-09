@@ -48,8 +48,8 @@ namespace Core
 {
 
 // STATEOPTION:
-// This class is a specification of State that is used to hold an option out of
-// a list of possible options.
+/// This class is a specification of State that is used to hold an option out of
+/// a list of possible options.
 
 class StateView3D;
 typedef boost::shared_ptr< StateView3D > StateView3DHandle;
@@ -75,15 +75,15 @@ public:
 
 public:
   // EXPORT_TO_STRING:
-  // Convert the contents of the State into a string
+  /// Convert the contents of the State into a string
   virtual std::string export_to_string() const;
 
   // IMPORT_FROM_STRING:
-  // Set the State from a string
+  /// Set the State from a string
   virtual bool import_from_string( const std::string& str, ActionSource source =
       ActionSource::NONE_E );
 
-  // Rotate the stored View3D
+  /// Rotate the stored View3D
   void rotate( const Core::Vector& axis, double angle );
 
   virtual void scale( double ratio );
@@ -92,25 +92,25 @@ public:
 
 protected:
   // EXPORT_TO_VARIANT
-  // Export the state data to a variant parameter
+  /// Export the state data to a variant parameter
   virtual void export_to_variant( Variant& variant ) const;
 
   // IMPORT_FROM_VARIANT:
-  // Import the state data from a variant parameter.
+  /// Import the state data from a variant parameter.
   virtual bool import_from_variant( Variant& variant, ActionSource source =
       ActionSource::NONE_E );
 
   // VALIDATE_VARIANT:
-  // Validate a variant parameter
-  // This function returns false if the parameter is invalid or cannot be
-  // converted and in that case error will describe the error.
+  /// Validate a variant parameter
+  /// This function returns false if the parameter is invalid or cannot be
+  /// converted and in that case error will describe the error.
   virtual bool validate_variant( Variant& variant, std::string& error );
 
   // -- signals describing the state --
 public:
   // VALUE_CHANGED_SIGNAL:
-  // Signal when the data in the state is changed, the second parameter
-  // indicates the source of the change
+  /// Signal when the data in the state is changed, the second parameter
+  /// indicates the source of the change
 
   typedef boost::signals2::signal< void( Core::View3D, ActionSource ) > value_changed_signal_type;
   value_changed_signal_type value_changed_signal_;
@@ -121,16 +121,16 @@ public:
   // -- access value --
 public:
   // GET:
-  // Get the value of the state variable
+  /// Get the value of the state variable
   const Core::View3D& get() const
   {
     return this->value_;
   }
 
   // SET:
-  // Set the value of the state variable
-  // NOTE: this function by passes the action mechanism and should only be used
-  // to enforce a constraint from another action.
+  /// Set the value of the state variable
+  /// NOTE: this function by passes the action mechanism and should only be used
+  /// to enforce a constraint from another action.
   bool set( const Core::View3D& value, ActionSource source = ActionSource::NONE_E );
 
   // -- storage of the view --

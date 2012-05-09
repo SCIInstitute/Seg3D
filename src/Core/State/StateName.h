@@ -60,37 +60,37 @@ public:
 
 public:
   // EXPORT_TO_STRING:
-  // Convert the contents of the State into a string
+  /// Convert the contents of the State into a string
   virtual std::string export_to_string() const;
 
   // IMPORT_FROM_STRING:
-  // Set the State from a string
+  /// Set the State from a string
   virtual bool import_from_string( const std::string& str, ActionSource source =
     ActionSource::NONE_E );
 
 protected:
   // EXPORT_TO_VARIANT
-  // Export the state data to a variant parameter
+  /// Export the state data to a variant parameter
   virtual void export_to_variant( Variant& variant ) const;
 
   // IMPORT_FROM_VARIANT:
-  // Import the state data from a variant parameter.
+  /// Import the state data from a variant parameter.
   virtual bool import_from_variant( Variant& variant, 
     ActionSource source = ActionSource::NONE_E );
 
   // VALIDATE_VARIANT:
-  // Validate a variant parameter
-  // This function returns false if the parameter is invalid or cannot be
-  // converted and in that case error will describe the error.
+  /// Validate a variant parameter
+  /// This function returns false if the parameter is invalid or cannot be
+  /// converted and in that case error will describe the error.
   virtual bool validate_variant( Variant& variant, std::string& error );
 
   // -- signals describing the state --
 public:
 
   // VALUE_CHANGED_SIGNAL:
-  // Signal when the data in the state is changed.
-  // The first two parameters contain the old and new values respectively.
-  // The third parameter indicates the source of the change
+  /// Signal when the data in the state is changed.
+  /// The first two parameters contain the old and new values respectively.
+  /// The third parameter indicates the source of the change
   typedef boost::signals2::signal< void( std::string, std::string, ActionSource ) > 
     value_changed_signal_type;
   value_changed_signal_type value_changed_signal_;
@@ -98,24 +98,24 @@ public:
   // -- access value --
 public:
   // GET:
-  // Get the value of the state variable
+  /// Get the value of the state variable
   const std::string& get() const;
 
   // SET:
-  // Set the value of the state variable
-  // NOTE: this function by passes the action mechanism and should only be used
-  // to enforce a constraint from another action.
+  /// Set the value of the state variable
+  /// NOTE: this function by passes the action mechanism and should only be used
+  /// to enforce a constraint from another action.
   bool set( const std::string& value, ActionSource source = ActionSource::NONE_E );
 
 protected:
   // INVALIDATE:
-  // Invalidate the state variable. This function is called by the "invalidate" function of 
-  // StateHandler to release any resource occupied by the state.
-  // It will put the name string back to the pool.
+  /// Invalidate the state variable. This function is called by the "invalidate" function of 
+  /// StateHandler to release any resource occupied by the state.
+  /// It will put the name string back to the pool.
   virtual void invalidate();
 
 public:
-  // The regular expression for validating a name string
+  /// The regular expression for validating a name string
   const static std::string REGEX_VALIDATOR_C;
 
 private:

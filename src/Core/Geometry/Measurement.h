@@ -53,28 +53,28 @@ public:
   Measurement();
 
   // GET_VISIBLE:
-  // Get whether this measurement is visible.
+  /// Get whether this measurement is visible.
   bool get_visible() const;
 
   // SET_VISIBLE:
-  // Set whether this measurement is visible.  User-editable.
+  /// Set whether this measurement is visible.  User-editable.
   void set_visible( bool visible ); 
 
   // GET_LABEL:
-  // Get short name to be rendered above measurement line.
+  /// Get short name to be rendered above measurement line.
   std::string get_name() const; 
 
   // SET_LABEL:
-  // Set short name to be rendered above measurement line.
+  /// Set short name to be rendered above measurement line.
   void set_name( std::string name );
 
   // GET_LENGTH:
-  // Get length of measurement in world units.
+  /// Get length of measurement in world units.
   double get_length() const;
 
   // SET_LENGTH:
-  // Set length of measurement in world units.  Moves second point to specified distance along 
-  // vector between points.  
+  /// Set length of measurement in world units.  Moves second point to specified distance along 
+  /// vector between points.  
   void set_length( double length );
 
   // GET_NOTE:
@@ -83,16 +83,16 @@ public:
   std::string get_comment() const;
 
   // SET_NOTE:
-  // Set user-editable description of measurement.
-  // May contain any characters including line breaks.
+  /// Set user-editable description of measurement.
+  /// May contain any characters including line breaks.
   void set_comment( std::string comment ); 
 
   // GET_POINT:
-  // Get 3D world coordinate of point at given index (0 or 1)
+  /// Get 3D world coordinate of point at given index (0 or 1)
   bool get_point( int index, Point& pt ) const;
 
   // SET_POINT:
-  // Set 3D world coordinate of point at given index (0 or 1)
+  /// Set 3D world coordinate of point at given index (0 or 1)
   bool set_point( int index, const Point& pt );
 
   // GET_COLOR:

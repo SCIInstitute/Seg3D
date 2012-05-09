@@ -39,25 +39,25 @@ class RolloverLogFilePrivate;
 typedef boost::shared_ptr< RolloverLogFilePrivate > RolloverLogFilePrivateHandle;
 
 // CLASS ROLLOVERLOGFILE:
-// Class for writing log messages to a log file that gets rolled over based on file size, number of 
-// files, and age. Creates log file in config directory.  Log file name includes application name, 
-// version, and timestamp.  Logs messages in response to Log::Instance()->post_log_signal_.
+/// Class for writing log messages to a log file that gets rolled over based on file size, number of 
+/// files, and age. Creates log file in config directory.  Log file name includes application name, 
+/// version, and timestamp.  Logs messages in response to Log::Instance()->post_log_signal_.
 class RolloverLogFile 
 {
 public:
-  // Create log file, hook up to post_log_signal
+  /// Create log file, hook up to post_log_signal
   RolloverLogFile( unsigned int log_flags );
 
   // SET_MAX_FILES:
-  // Set the maximum number of rollover log files
+  /// Set the maximum number of rollover log files
   void set_max_files( int num_files );
   
   // SET_MAX_LINES:
-  // Set the maximum number of lines per event log file
+  /// Set the maximum number of lines per event log file
   void set_max_lines( int num_lines );
 
   // SET_MAX_AGE:
-  // Set the maximum age of a log file.  Log files older than this will be deleted. 
+  /// Set the maximum age of a log file.  Log files older than this will be deleted. 
   void set_max_age( int num_days );
 
 private:

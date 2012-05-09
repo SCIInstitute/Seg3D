@@ -43,8 +43,8 @@ namespace Core
 {
 
 // CLASS CursorShape:
-// Enums for various cursors.
-// They have the same values as corresponding Qt ones
+/// Enums for various cursors.
+/// They have the same values as corresponding Qt ones
 CORE_ENUM_CLASS
 (
   CursorShape,

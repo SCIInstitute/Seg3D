@@ -63,20 +63,20 @@ public:
 
   ArrayMathProgramCode();
 
-  // Set the function pointer
+  /// Set the function pointer
   inline void set_function( ArrayMathFunctionObject function )
   {
     this->function_ = function;
   }
 
-  // Get the function pointer
+  /// Get the function pointer
   inline ArrayMathFunctionObject get_function()
   {
     return this->function_;
   }
 
-  // Tell the progam where to temporary space has been allocated
-  // for this part of the program
+  /// Tell the progam where to temporary space has been allocated
+  /// for this part of the program
   inline void set_variable( size_t j, float* variable )
   {
     if ( j >= this->variables_.size() ) this->variables_.resize( j + 1 );
@@ -95,14 +95,14 @@ public:
     this->variables_[ j ] = reinterpret_cast< void* >( mask_data_block ); 
   }
 
-  // Set the index, we keep this in the list so the program knows which
-  // element we need to process.
+  /// Set the index, we keep this in the list so the program knows which
+  /// element we need to process.
   inline void set_index( index_type index )
   { 
     this->index_ = index;
   }
 
-  // Set the size of the array that needs to be processed
+  /// Set the size of the array that needs to be processed
   inline void set_size( size_type size )
   { 
     this->size_ = size;
@@ -113,8 +113,8 @@ public:
     return this->size_;
   }
 
-  // These functions are called by the actual code segments
-  // For Scalar, Vector and Tensor buffers
+  /// These functions are called by the actual code segments
+  /// For Scalar, Vector and Tensor buffers
   inline float* get_variable( size_t j )
   { 
     return reinterpret_cast< float* >( this->variables_[ j ] );
@@ -152,16 +152,16 @@ private:
   // In order improve performance, all the buffers and instructions are
   // grouped together so they fit in a few pages of the memory manager
 
-  // Function call to evaluate this piece of the code
+  /// Function call to evaluate this piece of the code
   ArrayMathFunctionObject function_;
 
-  // Location of where the data is stored
+  /// Location of where the data is stored
   StackBasedVector < void*, 3 > variables_;
 
-  // Index in where we are in the selection
+  /// Index in where we are in the selection
   index_type index_;
 
-  // Sequence size
+  /// Sequence size
   size_type size_;
 };
 

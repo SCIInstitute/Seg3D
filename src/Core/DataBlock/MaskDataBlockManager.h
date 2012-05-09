@@ -75,16 +75,16 @@ private:
 public:
 
   // CREATE:
-  // Create a new mask layer
+  /// Create a new mask layer
   bool create( GridTransform grid_transform, MaskDataBlockHandle& mask );
 
   // CREATE:
-  // Create a new mask layer with a given generation number and bit
+  /// Create a new mask layer with a given generation number and bit
   bool create( DataBlock::generation_type generation, unsigned int bit, 
     GridTransform& grid_transform, MaskDataBlockHandle& mask );
 
   // CLEAR:
-  // Remove all the MaskDataBlock.
+  /// Remove all the MaskDataBlock.
   void clear();
 
   // TODO:
@@ -93,8 +93,8 @@ public:
   void register_data_block( DataBlockHandle data_block, const GridTransform& grid_transform );
     
   // COMPACT:
-  // Compact the masks into less memory if possible by moving them around
-  // to compact the space required.
+  /// Compact the masks into less memory if possible by moving them around
+  /// to compact the space required.
   bool compact();
 
   // -- MaskDataBlock callbacks --
@@ -102,9 +102,9 @@ protected:
   friend class MaskDataBlock;
 
   // RELEASE:
-  // Function that is called by the destructor of the MaskDataBlock to
-  // inform that a bitplane can be reused or that a DataBlock can be
-  // released
+  /// Function that is called by the destructor of the MaskDataBlock to
+  /// inform that a bitplane can be reused or that a DataBlock can be
+  /// released
   void release( DataBlockHandle& datablock, unsigned int mask_bit );
 
   // -- internals of this class --
@@ -115,49 +115,49 @@ private:
 public:
 
   // CREATE:
-  // Create a new MaskDataBlock with a given GridTransform
+  /// Create a new MaskDataBlock with a given GridTransform
   static bool Create( GridTransform grid_transform, MaskDataBlockHandle& mask );
 
   // INSCRIBE:
-  // Inscribe a mask into a datablock with a certain label value. Both mask and data need
-  // to have been created before.
+  /// Inscribe a mask into a datablock with a certain label value. Both mask and data need
+  /// to have been created before.
   static bool Inscribe( MaskDataBlockHandle mask, DataBlockHandle data, double label, 
     bool invert = false );
 
   // CONVERT:
-  // Convert a MaskDataBlock into a DataBlock
+  /// Convert a MaskDataBlock into a DataBlock
   static bool Convert( MaskDataBlockHandle mask, DataBlockHandle& data, 
     DataType data_type, bool invert = false );  
 
   // CONVERTLABEL:
-  // Convert a MaskDataBlock into a DataBlock
+  /// Convert a MaskDataBlock into a DataBlock
   static bool ConvertLabel( MaskDataBlockHandle mask, DataBlockHandle& data, 
     DataType data_type, double label = 1.0 ); 
 
   // CONVERT:
-  // Convert a DataBlock into a MaskDataBlock
+  /// Convert a DataBlock into a MaskDataBlock
   static bool Convert( DataBlockHandle data, GridTransform grid_transform, 
     MaskDataBlockHandle& mask, bool invert = false );
 
   // CONVERTLARGERTHAN:
-  // Convert a DataBlock into a MaskDataBlock
-  // Only values larger than zero are considered part of the mask.
+  /// Convert a DataBlock into a MaskDataBlock
+  /// Only values larger than zero are considered part of the mask.
   static bool ConvertLargerThan( DataBlockHandle data, GridTransform grid_transform, 
     MaskDataBlockHandle& mask, bool invert = false );
 
   // CONVERTLABEL:
-  // Convert a DataBlock into a MaskDataBlock by checking for a certain value
+  /// Convert a DataBlock into a MaskDataBlock by checking for a certain value
   static bool ConvertLabel( DataBlockHandle data, GridTransform grid_transform, 
     MaskDataBlockHandle& mask, double label );
   
 
   // CREATEMASKFROMNONZERODATA:
-  // Create a mask from the non zero data contained in a datablock
+  /// Create a mask from the non zero data contained in a datablock
   static bool CreateMaskFromNonZeroData( const DataBlockHandle& data, 
     const GridTransform& grid_transform, MaskDataBlockHandle& mask );
 
   // CREATEMASKFROMBITPLANEDATA:
-  // Create a mask from each bitplane in integer data
+  /// Create a mask from each bitplane in integer data
   static bool CreateMaskFromBitPlaneData( const DataBlockHandle& data, 
     const GridTransform& grid_transform, std::vector<MaskDataBlockHandle>& masks );
 
@@ -167,7 +167,7 @@ public:
     const GridTransform& grid_transform, std::vector<MaskDataBlockHandle>& masks );
 
   // DUPLICATE:
-  // Duplicate a MaskDataBlock into a DataBlock
+  /// Duplicate a MaskDataBlock into a DataBlock
   static bool Duplicate( MaskDataBlockHandle src_mask_data_block, 
     const GridTransform& grid_transform, MaskDataBlockHandle& dst_mask_data_block );
 };

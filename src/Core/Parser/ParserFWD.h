@@ -53,8 +53,8 @@ namespace Core
   class MaskDataBlock;
   typedef boost::shared_ptr< MaskDataBlock > MaskDataBlockHandle;
 
-  // Handles for a few of the classes. These are helper classes that are located elsewhere in 
-  // memory.
+  /// Handles for a few of the classes. These are helper classes that are located elsewhere in 
+  /// memory.
 
   class ArrayMathFunctionCatalog;
   typedef boost::shared_ptr< ArrayMathFunctionCatalog > ArrayMathFunctionCatalogHandle;

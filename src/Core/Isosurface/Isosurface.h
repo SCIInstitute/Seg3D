@@ -60,90 +60,90 @@ public:
   Isosurface( const MaskVolumeHandle& mask_volume );  
 
   // COMPUTE:
-  // Compute isosurface.  quality_factor must be one of: {0.125, 0.25, 0.5, 1.0} 
+  /// Compute isosurface.  quality_factor must be one of: {0.125, 0.25, 0.5, 1.0} 
   void compute( double quality_factor, bool capping_enabled, boost::function< bool () > check_abort );
 
   // GET_POINTS:
-  // Get 3D points for vertices, each stored only once
-  // NOTE: This function is not thread-safe, make sure you have the mutex
-  // allocated before using this array (use get_mutex())
+  /// Get 3D points for vertices, each stored only once
+  /// NOTE: This function is not thread-safe, make sure you have the mutex
+  /// allocated before using this array (use get_mutex())
   const std::vector< PointF >& get_points() const;
 
   // GET_FACES:
-  // Indices into vertices, 3 per face
-  // NOTE: This function is not thread-safe, make sure you have the mutex
-  // allocated before using this array (use get_mutex())
+  /// Indices into vertices, 3 per face
+  /// NOTE: This function is not thread-safe, make sure you have the mutex
+  /// allocated before using this array (use get_mutex())
   const std::vector< unsigned int >& get_faces() const;
 
   // GET_NORMALS:
-  // Get one normal per vertex, interpolated
-  // NOTE: This function is not thread-safe, make sure you have the mutex
-  // allocated before using this array (use get_mutex())
+  /// Get one normal per vertex, interpolated
+  /// NOTE: This function is not thread-safe, make sure you have the mutex
+  /// allocated before using this array (use get_mutex())
   const std::vector< VectorF >& get_normals() const;
 
   // SURFACE_AREA:
-  // Return the area of the isosurface.
+  /// Return the area of the isosurface.
   float surface_area() const;
 
   // GET_VALUES:
-  // Get values per vertex.  Returns empty vector if use has not set values.
-  // NOTE: This function is not thread-safe, make sure you have the mutex
-  // allocated before using this array (use get_mutex())
+  /// Get values per vertex.  Returns empty vector if use has not set values.
+  /// NOTE: This function is not thread-safe, make sure you have the mutex
+  /// allocated before using this array (use get_mutex())
   const std::vector< float >& get_values() const; 
 
   // SET_VALUES:
-  // Set values for all vertices.  Vector must be same size as points and normals vectors 
-  // or empty.  Returns true on success, false on failure.
-  // NOTE: This function is not thread-safe, make sure you have the mutex
-  // allocated before using this array (use get_mutex())
+  /// Set values for all vertices.  Vector must be same size as points and normals vectors 
+  /// or empty.  Returns true on success, false on failure.
+  /// NOTE: This function is not thread-safe, make sure you have the mutex
+  /// allocated before using this array (use get_mutex())
   bool set_values( const std::vector< float >& values );
 
   // SET_COLOR_MAP:
-  // Set mapping from vertex values to RGB colors.  
-  // NOTE: This function is not thread-safe. Passing handle since colormap is unlikely
-  // to be modified after creation. 
+  /// Set mapping from vertex values to RGB colors.  
+  /// NOTE: This function is not thread-safe. Passing handle since colormap is unlikely
+  /// to be modified after creation. 
   void set_color_map( ColorMapHandle color_map );
 
   // GET_COLOR_MAP:
-  // Get mapping from vertex values to RGB colors
+  /// Get mapping from vertex values to RGB colors
   ColorMapHandle get_color_map() const;
 
   // REDRAW:
-  // Render the isosurface.  This function doesn't work in isolation -- it must be called from the 
-  // Seg3D Renderer. 
+  /// Render the isosurface.  This function doesn't work in isolation -- it must be called from the 
+  /// Seg3D Renderer. 
   void redraw( bool use_colormap );
 
   // EXPORT_ISOSURFACE:
-  // Write points to .pts file, faces to .fac file, and values (if assigned) to .val file.  
-  // Returns true on success, false on failure.
-  //
-  // path: Path to existing directory where files should be written.
-  // file_prefix: File prefix to use for output files (no extension).
-  // 
-  // Format for .pts:
-  // x y z
-  // x y z
-  // ...
-  // 
-  // Format for .fac:
-  // p1 p2 p3
-  // p1 p2 p3
-  // ...
-  //
-  // Format for .val:
-  // v1
-  // v2
-  // ...
-  //
-  // Note: can't call this function "export" because it is reserved by the Visual C++ compiler.
+  /// Write points to .pts file, faces to .fac file, and values (if assigned) to .val file.  
+  /// Returns true on success, false on failure.
+  ///
+  /// path: Path to existing directory where files should be written.
+  /// file_prefix: File prefix to use for output files (no extension).
+  /// 
+  /// Format for .pts:
+  /// x y z
+  /// x y z
+  /// ...
+  /// 
+  /// Format for .fac:
+  /// p1 p2 p3
+  /// p1 p2 p3
+  /// ...
+  ///
+  /// Format for .val:
+  /// v1
+  /// v2
+  /// ...
+  ///
+  /// Note: can't call this function "export" because it is reserved by the Visual C++ compiler.
   bool export_isosurface( const boost::filesystem::path& path, const std::string& file_prefix ); 
 
   typedef boost::signals2::signal< void (double) > update_progress_signal_type;
 
   // UPDATE_PROGRESS:
-  // When new information on progress is available this signal is triggered. If this signal is 
-  // triggered it should end with a value 1.0 indicating that progress reporting has finished.
-  // Progress is measured between 0.0 and 1.0.
+  /// When new information on progress is available this signal is triggered. If this signal is 
+  /// triggered it should end with a value 1.0 indicating that progress reporting has finished.
+  /// Progress is measured between 0.0 and 1.0.
   update_progress_signal_type update_progress_signal_;
 
 private:

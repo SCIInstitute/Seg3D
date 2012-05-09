@@ -49,80 +49,80 @@ public:
 
 public:
   // GET_TYPE:
-  // Get the type of the data volume
+  /// Get the type of the data volume
   virtual VolumeType get_type() const;
   
   // GET_MIN:
-  // Get the minimum value
+  /// Get the minimum value
   virtual double get_min() const;
 
   // GET_MAX:
-  // Get the maximum value
+  /// Get the maximum value
   virtual double get_max() const;
 
   // GET_CUM_VALUE:
-  // Get the value at a specific point in the histogram
+  /// Get the value at a specific point in the histogram
   virtual double get_cum_value( double fraction ) const;
 
   // IS_VALID:
-  // Check whether the volume has a valid data block
+  /// Check whether the volume has a valid data block
   virtual bool is_valid() const;
 
   // MASK_DATA_BLOCK:
-  // Get the datablock that contains the mask
+  /// Get the datablock that contains the mask
   MaskDataBlockHandle get_mask_data_block() const;
 
   // GET_MUTEX:
-  // Get access to the mutex protecting this MaskVolume
+  /// Get access to the mutex protecting this MaskVolume
   virtual mutex_type& get_mutex();
   
   // GET_GENERATION:
-  // Get the  generation number of the data volume
+  /// Get the  generation number of the data volume
   virtual DataBlock::generation_type get_generation() const;
 
   // REGISTER_DATA:
-  // Register the underlying data with the DataBlockManager.
+  /// Register the underlying data with the DataBlockManager.
   virtual DataBlock::generation_type register_data( DataBlock::generation_type generation = -1 );
 
   // UNREGISTER_DATA:
-  // Unregister the underlying data with DataBlockManager.
+  /// Unregister the underlying data with DataBlockManager.
   virtual void unregister_data();
 
   // GET_BYTE_SIZE:
-  // Get the size of the data in bytes
+  /// Get the size of the data in bytes
   virtual size_t get_byte_size() const;
   
   // -- slice handling --
 public: 
   // INSERT_SLICE:
-  // Insert a slice into the volume
+  /// Insert a slice into the volume
   bool insert_slice( const MaskDataSliceHandle slice );
   
   // EXTRACT_SLICE:
-  // Extract a slice from the volume
+  /// Extract a slice from the volume
   bool extract_slice( SliceType type, MaskDataBlock::index_type index, MaskDataSliceHandle& slice );
     
   // -- functions for creating MaskVolumes --
 public: 
 
   // CREATEEMPTYMASK:
-  // Create an empty mask with given dimensions.
+  /// Create an empty mask with given dimensions.
   static bool CreateEmptyMask( GridTransform grid_transform, MaskVolumeHandle& mask );
 
   // CREATEINVALIDMASK:
-  // Create a mask with given dimensions, but no data container associated with it.
+  /// Create a mask with given dimensions, but no data container associated with it.
   static bool CreateInvalidMask( GridTransform grid_transform, MaskVolumeHandle& mask );
   
   // DUPLICATEMASK:
-  // Duplicate the mask volume
+  /// Duplicate the mask volume
   static bool DuplicateMask( const MaskVolumeHandle& src_mask, MaskVolumeHandle& dst_mask );
 
 private:
-  // Handle to where the mask volume is really stored
+  /// Handle to where the mask volume is really stored
   MaskDataBlockHandle mask_data_block_;
   
-  // Mutex for a volume without a data block associated with it
-  // NOTE: This is use to set up a new layer that is still constructing its data
+  /// Mutex for a volume without a data block associated with it
+  /// NOTE: This is use to set up a new layer that is still constructing its data
   mutex_type invalid_mutex_;
   
 };

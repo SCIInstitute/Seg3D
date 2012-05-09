@@ -70,34 +70,34 @@ private:
   // -- overloaded event handler --
 private:
   // INITIALIZE_EVENTHANDLER:
-  // This function initializes the event handler associated with the singleton
-  // class. It is used to ensure that the OpenGL context for deleting objects has
-  // been initialized.
+  /// This function initializes the event handler associated with the singleton
+  /// class. It is used to ensure that the OpenGL context for deleting objects has
+  /// been initialized.
   virtual void initialize_eventhandler();
 
   // -- context handling --
 public:
   // CREATE_RENDER_CONTEXT:
-  // Generate a render context for one of the viewers
+  /// Generate a render context for one of the viewers
   bool create_render_context( RenderContextHandle& context );
 
   // INSTALL_RESOURCES_CONTEXT:
-  // Install a context from the UI system in the resource, so this
-  // class can generate virtual OpenGL contexts.
+  /// Install a context from the UI system in the resource, so this
+  /// class can generate virtual OpenGL contexts.
   void install_resources_context( RenderResourcesContextHandle resources_context );
 
   // VALID_RENDER_RESOURCES:
-  // Check whether valid render resources have been installed
+  /// Check whether valid render resources have been installed
   bool valid_render_resources();
   
   // GET_CURRENT_CONTEXT:
-  // Get the current render context of the calling thread
-  // NOTE: The returned handle should only be used in the scope where this function is
-  // being called, because it may become invalid later.
+  /// Get the current render context of the calling thread
+  /// NOTE: The returned handle should only be used in the scope where this function is
+  /// being called, because it may become invalid later.
   RenderContextHandle get_current_context();
   
   // GET_VRAM_SIZE:
-  // Return the total video memory size on the GPU.
+  /// Return the total video memory size on the GPU.
   unsigned long get_vram_size();
 
   // -- thread safe deletion of GL objects --
@@ -110,27 +110,27 @@ private:
   friend class GLSLProgram;
   
   // DELETE_TEXTURE:
-  // Delete a texture within the right context
+  /// Delete a texture within the right context
   void delete_texture( unsigned int texture_id );
   
   // DELETE_BUFFER_OBJECT:
-  // Delete a buffer object within the right context
+  /// Delete a buffer object within the right context
   void delete_buffer_object( unsigned int buffer_id );
 
   // DELETE_FRAMEBUFFER_OBJECT:
-  // Delete a framebuffer object within the right context
+  /// Delete a framebuffer object within the right context
   void delete_framebuffer_object( unsigned int framebuffer_id );
 
   // DELETE_RENDERBUFFER:
-  // Delete a renderbuffer within the right context
+  /// Delete a renderbuffer within the right context
   void delete_renderbuffer( unsigned int renderbuffer_id );
 
   // DELETE_PROGRAM:
-  // Delete the given GLSL program.
+  /// Delete the given GLSL program.
   void delete_program( unsigned int program_id );
 
   // DELETE_SHADER:
-  // Delete the given GLSL shader.
+  /// Delete the given GLSL shader.
   void delete_shader( unsigned int shader_id );
 
 private:
@@ -138,8 +138,8 @@ private:
   
 public:
   // GETMUTEX:
-  // Get the shared mutex for the opengl resources
-  // NOTE: Do not lock the RenderResources while StateEngine is locked as this will cause deadlock
+  /// Get the shared mutex for the opengl resources
+  /// NOTE: Do not lock the RenderResources while StateEngine is locked as this will cause deadlock
   static mutex_type& GetMutex();
 };
 

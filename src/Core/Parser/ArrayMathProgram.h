@@ -50,19 +50,19 @@ public:
   // Default constructor
   ArrayMathProgram();
 
-  // Constructor that allows overloading the default optimization parameters
+  /// Constructor that allows overloading the default optimization parameters
   ArrayMathProgram( size_type array_size, size_type buffer_size, int num_threads = -1 );
 
-  // Get the optimization parameters, these can only be set when creating the
-  // object as it depends on allocated buffer sizes and those are hard to change
-  // when allocated
-  // Get the number of entries that are processed at once
+  /// Get the optimization parameters, these can only be set when creating the
+  /// object as it depends on allocated buffer sizes and those are hard to change
+  /// when allocated
+  /// Get the number of entries that are processed at once
   size_type get_buffer_size();
 
-  // Get the number of threads
+  /// Get the number of threads
   int get_num_threads();
 
-  // Set the size of the array to process
+  /// Set the size of the array to process
   size_type get_array_size();
   void set_array_size( size_type array_size );
 
@@ -79,10 +79,10 @@ public:
   void resize_single_functions( size_t sz );
   void resize_sequential_functions( size_t sz );
 
-  // Central buffer for all parameters
+  /// Central buffer for all parameters
   float* create_buffer( size_t size );
 
-  // Set variables which we use as temporal information structures
+  /// Set variables which we use as temporal information structures
   // TODO: need to remove them at some point
   void set_const_variable( size_t j, ArrayMathProgramVariableHandle& handle );
   void set_single_variable( size_t j, ArrayMathProgramVariableHandle& handle );
@@ -92,12 +92,12 @@ public:
   ArrayMathProgramVariableHandle get_single_variable( size_t j );
   ArrayMathProgramVariableHandle get_sequential_variable( size_t j, size_t np );
 
-  // Set program code
+  /// Set program code
   void set_const_program_code( size_t j, ArrayMathProgramCode& pc );
   void set_single_program_code( size_t j, ArrayMathProgramCode& pc );
   void set_sequential_program_code( size_t j, size_t np, ArrayMathProgramCode& pc );
 
-  // Code to find the pointers that are given for sources and sinks  
+  /// Code to find the pointers that are given for sources and sinks  
   bool find_source( std::string& name, ArrayMathProgramSource& ps );
   bool find_sink( std::string& name, ArrayMathProgramSource& ps );
 
@@ -111,9 +111,9 @@ public:
   typedef boost::signals2::signal< void (double) > update_progress_signal_type;
 
   // UPDATE_PROGRESS:
-  // When new information on progress is available this signal is triggered. If this signal is 
-  // triggered it should end with a value 1.0 indicating that progress reporting has finised.
-  // Progress is measured between 0.0 and 1.0.
+  /// When new information on progress is available this signal is triggered. If this signal is 
+  /// triggered it should end with a value 1.0 indicating that progress reporting has finised.
+  /// Progress is measured between 0.0 and 1.0.
   update_progress_signal_type update_progress_signal_;
 
 private:

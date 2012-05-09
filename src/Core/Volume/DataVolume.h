@@ -54,74 +54,74 @@ public:
   virtual ~DataVolume();
 
   // GET_TYPE:
-  // Get the type of the data volume
+  /// Get the type of the data volume
   virtual VolumeType get_type() const;
 
   // GET_MIN:
-  // Get the minimum value
+  /// Get the minimum value
   virtual double get_min() const;
 
   // GET_MAX:
-  // Get the maximum value
+  /// Get the maximum value
   virtual double get_max() const;
 
   // GET_CUM_VALUE:
-  // Get the value at a specific point in the histogram
+  /// Get the value at a specific point in the histogram
   virtual double get_cum_value( double fraction ) const;
 
   // IS_VALID:
-  // Check whether the volume has a valid data block
+  /// Check whether the volume has a valid data block
   virtual bool is_valid() const;
 
   // DATA_BLOCK:
-  // Get the data block that contains the volume data
+  /// Get the data block that contains the volume data
   DataBlockHandle get_data_block() const;
 
   // GET_DATA_TYPE:
-  // Get the data type of the data in this volume
+  /// Get the data type of the data in this volume
   DataType get_data_type() const;
 
   // GET_MUTEX:
-  // Get access to the mutex protecting this DataVolume
+  /// Get access to the mutex protecting this DataVolume
   virtual mutex_type& get_mutex();
 
   // CONVERT_TO_NRRD:
-  // Get the volume data as a nrrd wrapped in a NrrdData structure
+  /// Get the volume data as a nrrd wrapped in a NrrdData structure
   virtual NrrdDataHandle convert_to_nrrd();
 
   // GET_GENERATION:
-  // Get the  generation number of the data volume
+  /// Get the  generation number of the data volume
   virtual DataBlock::generation_type get_generation() const;
 
   // REGISTER_DATA:
-  // Register the underlying data with the DataBlockManager.
+  /// Register the underlying data with the DataBlockManager.
   virtual DataBlock::generation_type register_data( DataBlock::generation_type generation = -1 );
 
   // UNREGISTER_DATA:
-  // Unregister the underlying data with DataBlockManager.
+  /// Unregister the underlying data with DataBlockManager.
   virtual void unregister_data();
 
   // GET_BYTE_SIZE:
-  // Get the size of the data in bytes
+  /// Get the size of the data in bytes
   virtual size_t get_byte_size() const;
 
   // GET_BRICKS:
-  // Split the volume into small bricks if not yet generated, and return a vector of the bricks.
+  /// Split the volume into small bricks if not yet generated, and return a vector of the bricks.
   void get_bricks( std::vector< DataVolumeBrickHandle >& bricks );
   
   // -- slice handling --
 public: 
   // INSERT_SLICE:
-  // Insert a slice into the volume
+  /// Insert a slice into the volume
   bool insert_slice( const DataSliceHandle slice );
   
   // EXTRACT_SLICE:
-  // Extract a slice from the volume
+  /// Extract a slice from the volume
   bool extract_slice( SliceType type, DataBlock::index_type index, DataSliceHandle& slice );
   
 private:
   // Mutex for a volume without a data block associated with it
-  // NOTE: This is used to set up a new layer that is still constructing its data
+  /// NOTE: This is used to set up a new layer that is still constructing its data
   mutex_type invalid_mutex_;
 
   DataVolumePrivateHandle private_;
@@ -130,31 +130,31 @@ private:
 public:
 
   // LOADDATAVOLUME:
-  // Load a DataVolume from a nrrd file
+  /// Load a DataVolume from a nrrd file
   static bool LoadDataVolume( const boost::filesystem::path& filename, DataVolumeHandle& volume,
     std::string& error );
 
   // SAVEDATAVOLUME:
-  // Save a DataVolume to a nrrd file
+  /// Save a DataVolume to a nrrd file
   static bool SaveDataVolume( const boost::filesystem::path& filepath, DataVolumeHandle& volume, std::string& error, bool compress, int level );
 
   // CREATEEMPTYDATA:
-  // Create an empty data volume with given dimensions.
+  /// Create an empty data volume with given dimensions.
   static bool CreateEmptyData( GridTransform grid_transform, DataType data_type, 
     DataVolumeHandle& data );
 
   // CREATEINVALIDDATA:
-  // Create a data volume with given dimensions, but no data container associated with it.
+  /// Create a data volume with given dimensions, but no data container associated with it.
   static bool CreateInvalidData( GridTransform grid_transform, DataVolumeHandle& data );
 
   // CONVERTTOCANONICALVOLUME:
-  // Convert the source volume to a canonical-axis-aligned volume.
-  // Returns true if conversion is done, otherwise false.
+  /// Convert the source volume to a canonical-axis-aligned volume.
+  /// Returns true if conversion is done, otherwise false.
   static bool ConvertToCanonicalVolume( const DataVolumeHandle& src_volume, 
     DataVolumeHandle& dst_volume );
     
   // DUPLICATEVOLUME:
-  // Duplicate the data volume
+  /// Duplicate the data volume
   static bool DuplicateVolume( const DataVolumeHandle& src_mask, 
     DataVolumeHandle& dst_mask );   
 };

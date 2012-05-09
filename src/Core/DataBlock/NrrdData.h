@@ -56,14 +56,12 @@ namespace Core
 {
 
 // CLASS NRRDDATA
-// This class is a wrapper for the Teem nrrd structure. It can be generated on the fly from a nrrd
-// object that the Teem library produces or it can be generated based on a DataBlock from this
-// core library.
+/// This class is a wrapper for the Teem nrrd structure. It can be generated on the fly from a nrrd
+/// object that the Teem library produces or it can be generated based on a DataBlock from this
+/// core library.
 
-// The purpose of this class is to do garbage collection and sharing of memory between different
-// pieces of the third party libraries.
-
-// Forward Declaration
+/// The purpose of this class is to do garbage collection and sharing of memory between different
+/// pieces of the third party libraries.
 class NrrdData;
 typedef boost::shared_ptr< NrrdData > NrrdDataHandle;
 
@@ -75,13 +73,13 @@ class NrrdData : boost::noncopyable
 {
   // -- Constructor/destructor --
 public:
-  // Construct the NrrdData wrapper from a nrrd
-  // own_data tells whether the data should be destroyed when this object is deleted
+  /// Construct the NrrdData wrapper from a nrrd
+  /// own_data tells whether the data should be destroyed when this object is deleted
   NrrdData( Nrrd* nrrd, bool own_data = true );
   
-  // Construct a NrrdData object from an existing DataBlock of data
-  // The datablock handle will be stored internally until the object is deleted
-  // and the memory with the data is shared between the object and the nrrd object.
+  /// Construct a NrrdData object from an existing DataBlock of data
+  /// The datablock handle will be stored internally until the object is deleted
+  /// and the memory with the data is shared between the object and the nrrd object.
   NrrdData( DataBlockHandle data_block );
   NrrdData( DataBlockHandle data_block, GridTransform transform );
 
@@ -90,58 +88,58 @@ public:
   // -- Accessors --
 public:
   // NRRD:
-  // Return the nrrd structure
+  /// Return the nrrd structure
   Nrrd* nrrd() const;
 
   // GET_DATA:
-  // Get the pointer to the data block within the nrrd
+  /// Get the pointer to the data block within the nrrd
   void* get_data() const;
 
   // OWN_DATA:
-  // Return whether the nrrd owns the data
+  /// Return whether the nrrd owns the data
   bool own_data() const;
 
   // GRID_TRANSFORM:
-  // Extract the transform from the nrrd
+  /// Extract the transform from the nrrd
   GridTransform get_grid_transform() const;
 
   // TRANSFORM:
-  // Extract the cell-centered transform from the nrrd 
+  /// Extract the cell-centered transform from the nrrd 
   Transform get_transform() const;
 
   // SET_TRANSFORM:
-  // Set the transfrom in the nrrd data
+  /// Set the transfrom in the nrrd data
   void set_transform( GridTransform& transform );
 
   // GET_HISTOGRAM:
-  // Get the histogram from the nrrd
-  // NOTE: If the data source can be trusted, the histogram is taken from the meta data,
-  // otherwise it is recomputed
+  /// Get the histogram from the nrrd
+  /// NOTE: If the data source can be trusted, the histogram is taken from the meta data,
+  /// otherwise it is recomputed
   Histogram get_histogram( bool trust_meta_data = false );
 
   // SET_HISTOGRAM:
-  // Insert a histogram into a nrrd's meta data
+  /// Insert a histogram into a nrrd's meta data
   void set_histogram( const Histogram& histogram );
 
   // GET_NX, GET_NY, GET_NZ:
-  // Get the dimensions of the nrrd
+  /// Get the dimensions of the nrrd
   size_t get_nx() const;
   size_t get_ny() const;
   size_t get_nz() const;
 
   // GET_SIZE:
-  // Get the total size of the nrrd in pixels
+  /// Get the total size of the nrrd in pixels
   size_t get_size() const;
 
   // GET_DATA_TYPE:
-  // Get the data type of the nrrd
+  /// Get the data type of the nrrd
   DataType get_data_type() const;
 
   // GET_ORIGINALLY_NODE_CENTERED:
-  // Get whether the nrrd was originally node-centered  
-  // Internally Seg3D converts the transform to be cell-centered, but we keep track of what the 
-  // original centering was so that the transform can be converted back to be node-centered on 
-  // export.
+  /// Get whether the nrrd was originally node-centered  
+  /// Internally Seg3D converts the transform to be cell-centered, but we keep track of what the 
+  /// original centering was so that the transform can be converted back to be node-centered on 
+  /// export.
   bool get_originally_node_centered() const;
 
   // -- Internals of this class --
@@ -152,12 +150,12 @@ private:
 public:
 
   // LOADNRRD:
-  // Load a nrrd into the nrrd data structure
+  /// Load a nrrd into the nrrd data structure
   static bool LoadNrrd( const std::string& filename, NrrdDataHandle& nrrddata, 
     std::string& error );
 
   // SAVENRRD:
-  // Save a nrrd to file from nrrd data structure
+  /// Save a nrrd to file from nrrd data structure
   static bool SaveNrrd( const std::string& filename, NrrdDataHandle nrrddata, std::string& error, 
     bool compress, int level );
 
@@ -167,7 +165,7 @@ public:
   typedef boost::unique_lock< mutex_type > lock_type;
 
   // GETMUTEX:
-  // Get the mutex that protects the Teem library
+  /// Get the mutex that protects the Teem library
   static mutex_type& GetMutex();
 };
 

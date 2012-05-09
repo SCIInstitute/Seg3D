@@ -40,16 +40,16 @@ namespace Core
 
 enum
 {
-  // A sequence denotes a vectorized variable, hence when this flag is set
-  // the function will apply the function to an array, instead of a single variable
+  /// A sequence denotes a vectorized variable, hence when this flag is set
+  /// the function will apply the function to an array, instead of a single variable
   SCRIPT_SEQUENTIAL_VAR_E = 1,
-  // Simple variable this is the default
+  /// Simple variable this is the default
   SCRIPT_SINGLE_VAR_E = 2,
-  // Reserved for numerical constants
+  /// Reserved for numerical constants
   SCRIPT_CONST_VAR_E = 4,
-  // Internal marker to mark which variables are actually used to compute the output
+  /// Internal marker to mark which variables are actually used to compute the output
   SCRIPT_USED_VAR_E = 8,
-  // Internal marker telling an output is optional
+  /// Internal marker telling an output is optional
   SCRIPT_OPTIONAL_VAR_E = 16
 };
 
@@ -65,14 +65,14 @@ enum
 
 enum
 {
-  // Define a function as sequential it will be evaluted for each instance in
-  // the sequence. This one is used for functions without parameters like rand
-  // so they trigger for each case
+  /// Define a function as sequential it will be evaluted for each instance in
+  /// the sequence. This one is used for functions without parameters like rand
+  /// so they trigger for each case
   PARSER_SEQUENTIAL_FUNCTION_E = 1,
   PARSER_SINGLE_FUNCTION_E = 2,
   PARSER_CONST_FUNCTION_E = 4,
-  // Variables are symmetric, this will tell the optimizer that the order of
-  // variables is not of interest
+  /// Variables are symmetric, this will tell the optimizer that the order of
+  /// variables is not of interest
   PARSER_SYMMETRIC_FUNCTION_E = 16
 };
 

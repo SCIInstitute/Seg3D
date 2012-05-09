@@ -79,54 +79,54 @@ public:
 public:
 
   // GET_TYPE:
-  // Get the type of the data layer
+  /// Get the type of the data layer
   virtual VolumeType get_type() const = 0;
 
   // GET_GENERATION:
-  // Get the generation number of the data block the layer is using
+  /// Get the generation number of the data block the layer is using
   virtual DataBlock::generation_type get_generation() const = 0;
 
   // GET_MIN:
-  // Get the minimum value
+  /// Get the minimum value
   virtual double get_min() const = 0;
 
   // GET_MAX:
-  // Get the maximum value
+  /// Get the maximum value
   virtual double get_max() const = 0;
 
   // GET_CUM_VALUE:
-  // Get the value at a specific point in the histogram
+  /// Get the value at a specific point in the histogram
   virtual double get_cum_value( double fraction ) const = 0;
 
   // IS_VALID:
-  // Check whether the volume has a valid data block
+  /// Check whether the volume has a valid data block
   virtual bool is_valid() const = 0;
 
   // REGISTER_DATA:
-  // Register the underlying data with the DataBlockManager.
+  /// Register the underlying data with the DataBlockManager.
   virtual DataBlock::generation_type register_data( DataBlock::generation_type generation = -1 ) = 0;
 
   // UNREGISTER_DATA:
-  // Unregister the underlying data with DataBlockManager.
+  /// Unregister the underlying data with DataBlockManager.
   virtual void unregister_data() = 0;
 
   // GET_BYTE_SIZE:
-  // Get the size of the data in bytes
+  /// Get the size of the data in bytes
   virtual size_t get_byte_size() const = 0;
   
   // GET_GRID_TRANSFORM:
-  // Get the grid location
+  /// Get the grid location
   const GridTransform& get_grid_transform() const
   {
     return this->grid_transform_;
   }
 
   // SET_GRID_TRANSFORM:
-  // Set the grid location
+  /// Set the grid location
   void set_grid_transform( const GridTransform& grid_transform, bool preserve_centering );
 
   // GET_TRANSFORM:
-  // Get the transform of the data
+  /// Get the transform of the data
   Transform get_transform() const
   {
     return this->grid_transform_.transform();
@@ -138,7 +138,7 @@ public:
   }
   
   // GET_NX, GET_NY, GET_NZ, GET_SIZE:
-  // The volume dimensions
+  /// The volume dimensions
   inline size_t get_nx() const
   {
     return this->nx_;
@@ -160,7 +160,7 @@ public:
   }
 
   // TO_INDEX:
-  // Compute the index into the data blcok based on a coordinate in index space
+  /// Compute the index into the data blcok based on a coordinate in index space
   inline size_t to_index( size_t x, size_t y, size_t z ) const
   {
     assert( x < this->nx_ && y < this->ny_ && z < this->nz_ );
@@ -168,28 +168,28 @@ public:
   }
   
   // APPLY_GRID_TRANSFORM:
-  // Compute corresponding point in world coordinates
+  /// Compute corresponding point in world coordinates
   Point apply_grid_transform( const Point& pt ) const;
 
   // APPLY_INVERSE_GRID_TRANSFORM:
-  // Compute corresponding point in index coordinates
+  /// Compute corresponding point in index coordinates
   Point apply_inverse_grid_transform( const Point& pt ) const;
 
   // GET_MUTEX:
-  // Get the mutex that protects this resource
+  /// Get the mutex that protects this resource
   virtual mutex_type& get_mutex() = 0;
 
   // -- internals of volume --
 private:
 
-  // Location of the volume object in space
-  // NOTE: Currently only axis aligned transforms are allowed
+  /// Location of the volume object in space
+  /// NOTE: Currently only axis aligned transforms are allowed
   GridTransform grid_transform_;
 
   // A precomputed transform in
   Transform inverse_transform_;
 
-  // Cached size information of the GridTransform for fast indexing into the volume
+  /// Cached size information of the GridTransform for fast indexing into the volume
   size_t nx_;
   size_t ny_;
   size_t nz_;

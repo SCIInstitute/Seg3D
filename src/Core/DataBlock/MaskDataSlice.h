@@ -43,7 +43,7 @@ namespace Core
 {
 
 // CLASS MaskDataSlice
-// Class for storing a slice of data from a datablock
+/// Class for storing a slice of data from a datablock
 
 class MaskDataSlice;
 typedef boost::shared_ptr<MaskDataSlice> MaskDataSliceHandle;
@@ -53,7 +53,7 @@ typedef boost::weak_ptr<MaskDataSlice> MaskDataSliceWeakHandle;
 class MaskDataSlice : public boost::noncopyable
 {
 public:
-  // Generation number compatible with DataBlock class
+  /// Generation number compatible with DataBlock class
   typedef long long  generation_type;
 
   // Index used for addressing memory inside the datablock underlying the slice
@@ -67,58 +67,58 @@ public:
   MaskDataSlice( MaskDataBlockHandle datablock, SliceType slice_type, index_type index ); 
 
 public:
-  // Destructor that unregisters itself from the DataBlockManager
+  /// Destructor that unregisters itself from the DataBlockManager
   virtual ~MaskDataSlice();
 
   // -- Access properties of data block --
 public:
 
   // GET_NX:
-  // Get the number of samples in the x direction.
+  /// Get the number of samples in the x direction.
   size_t get_nx() const;
   
   // GET_NY:
-  // Get the number of samples in the y direction.
+  /// Get the number of samples in the y direction.
   size_t get_ny() const;
 
   // GET_NZ:
-  // Get the number of samples in the z direction.
+  /// Get the number of samples in the z direction.
   size_t get_nz() const;
   
   // GET_SIZE:
-  // Get the total number of samples.
+  /// Get the total number of samples.
   size_t get_size() const;
 
   // GET_BYTE_SIZE:
-  // Get the size in bytes
+  /// Get the size in bytes
   size_t get_byte_size() const;
 
   // GET_SLICE_TYPE:
-  // Whether the slice is axial, coronal, or sagittal
+  /// Whether the slice is axial, coronal, or sagittal
   SliceType get_slice_type() const;
   
   // GET_GENERATION:
-  // Get the current generation number of the data volume.
+  /// Get the current generation number of the data volume.
   generation_type get_generation() const;
   
   // GET_MASKDATABLOCK:
-  // Get the underlying data block that contains the data of the slice
+  /// Get the underlying data block that contains the data of the slice
   MaskDataBlockHandle get_mask_data_block() const;
   
   // GET_INDEX:
-  // Get the index of the slice
+  /// Get the index of the slice
   index_type get_index() const;
   
   // -- internals of the DataBlock --
 private:
 
-  // Data block where the data is stored
+  /// Data block where the data is stored
   MaskDataBlockHandle slice_;
   
-  // Whether the slice is axial, sagittal, or coronal
+  /// Whether the slice is axial, sagittal, or coronal
   SliceType type_;
   
-  // The index of the slice in the original data block
+  /// The index of the slice in the original data block
   index_type index_;
 };
 

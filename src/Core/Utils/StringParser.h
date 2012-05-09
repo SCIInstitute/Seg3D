@@ -40,25 +40,25 @@ namespace Core
 {
 
 // SCANCOMMAND:
-// Scan for the first command in the string str starting at start
-// the function will return true if it success and other wise returns
-// an error. It returns the next scan point in start
+/// Scan for the first command in the string str starting at start
+/// the function will return true if it success and other wise returns
+/// an error. It returns the next scan point in start
 
 bool ScanCommand( const std::string& str, std::string::size_type& start, std::string& command,
     std::string& error );
 
 // SCANVALUE:
-// Scan for the first value in the string str starting at start
-// the function will return true if it success and other wise returns
-// an error. It returns the next scan point in start
+/// Scan for the first value in the string str starting at start
+/// the function will return true if it success and other wise returns
+/// an error. It returns the next scan point in start
 
 bool ScanValue( const std::string& str, std::string::size_type& start, std::string& value,
     std::string& error );
 
 // SCANKEYVALUEPAIR:
-// Scan for the first key value pair in the string str starting at start
-// the function will return true if it success and other wise returns
-// an error. It returns the next scan point in start
+/// Scan for the first key value pair in the string str starting at start
+/// the function will return true if it success and other wise returns
+/// an error. It returns the next scan point in start
 
 bool ScanKeyValuePair( const std::string& str, std::string::size_type& start, std::string& key,
     std::string& value, std::string& error );

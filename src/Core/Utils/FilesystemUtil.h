@@ -40,15 +40,15 @@ namespace Core
 {
 
 // CREATEORIGNOREDIRECTORY:
-// Create the directory if it doesn't exist, otherwise do nothing.
-// Returns true if the directory already exists, or it was created successfully,
-// otherwise false.
+/// Create the directory if it doesn't exist, otherwise do nothing.
+/// Returns true if the directory already exists, or it was created successfully,
+/// otherwise false.
 bool CreateOrIgnoreDirectory( const boost::filesystem::path& dir_path );
 
 // RECURSIVECOPYDIRECTORY:
-// Copy a directory recursively.
+/// Copy a directory recursively.
 // Returns true on success, otherwise false.
-bool RecursiveCopyDirectory( const boost::filesystem::path& from, const boost::filesystem::path& to );
+b/ool RecursiveCopyDirectory( const boost::filesystem::path& from, const boost::filesystem::path& to );
 
 } // end namespace Core
 

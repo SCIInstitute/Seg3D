@@ -54,19 +54,19 @@ public:
 
   // -- context functions --
   // IS_VALID:
-  // Test whether the context is valid
+  /// Test whether the context is valid
   virtual bool is_valid() const = 0;
 
   // MAKE_CURRENT:
-  // Set the rendering context current to this thread
+  /// Set the rendering context current to this thread
   virtual void make_current() = 0;
 
   // DONE_CURRENT:
-  // Indicate that rendering using this context is done for now
+  /// Indicate that rendering using this context is done for now
   virtual void done_current() = 0;
 
   // SWAP_BUFFERS:
-  // Swap the front and back buffers
+  /// Swap the front and back buffers
   virtual void swap_buffers() const = 0;
 };
 

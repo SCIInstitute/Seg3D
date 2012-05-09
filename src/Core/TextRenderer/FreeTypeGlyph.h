@@ -64,10 +64,10 @@ public:
 
   void transform( FT_Matrix* matrix, FT_Vector* delta );
 
-  // Get the CBox of the glyph in pixel coordinates
+  /// Get the CBox of the glyph in pixel coordinates
   void get_cbox( FT_BBox* cbox ) const;
 
-  // Render the glyph to a 8-bit anti-aliased bitmap
+  /// Render the glyph to a 8-bit anti-aliased bitmap
   FreeTypeBitmapGlyphHandle render_to_bitmap( FT_Vector* origin = 0 ) const;
 
 private:

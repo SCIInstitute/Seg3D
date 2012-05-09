@@ -45,8 +45,8 @@
 namespace Core
 {
 
-// NOTE: Vector and Point are two distinct classes to help formulate correct
-// geometric expressions. 
+/// NOTE: Vector and Point are two distinct classes to help formulate correct
+/// geometric expressions. 
 
 // NOTE: The double version of Point and Vector are defined separately. As Vector
 // and Point are dependent on each other, a templated version is limitted by the

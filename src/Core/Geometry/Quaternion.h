@@ -40,9 +40,9 @@ class Matrix;
 
 // CLASS QUATERNION
 //
-// NOTE: Class Quaternion will always keep itself normalized, since we are 
-// using Quaternion for rotation only. Similarly, only functions and operators necessary 
-// for performing rotations are implemented.
+/// NOTE: Class Quaternion will always keep itself normalized, since we are 
+/// using Quaternion for rotation only. Similarly, only functions and operators necessary 
+/// for performing rotations are implemented.
 
 class Quaternion
 {
@@ -54,23 +54,23 @@ public:
 
   inline Quaternion( double w, double x, double y, double z );
 
-  // copy constructor
+  /// copy constructor
   inline Quaternion( const Quaternion& src );
 
   //inline explicit Quaternion(const Vector& vec);
 
-  // construct a quaternion from the given axis and angle of rotation
+  /// construct a quaternion from the given axis and angle of rotation
   Quaternion( const Vector& axis, double angle );
 
-  // construct a quaternion from the given rotation transformation
-  // NOTE: if the matrix is not pure rotation, the result is undefined
-  // NOTE: the matrix should be column major
+  /// construct a quaternion from the given rotation transformation
+  /// NOTE: if the matrix is not pure rotation, the result is undefined
+  /// NOTE: the matrix should be column major
   explicit Quaternion( const Matrix& matrix );
 
   inline Quaternion get_conjugate() const;
   inline void conjugate();
 
-  // convert the quaternion to a column major matrix
+  /// convert the quaternion to a column major matrix
   void to_matrix( Matrix& matrix ) const;
 
   void from_matrix( const Matrix& matrix );
@@ -117,7 +117,7 @@ private:
   double z_;
 
   // NUMERIC_ZERO:
-  // any value less than or equal to it will be considered zero
+  /// any value less than or equal to it will be considered zero
   static const double NUMERIC_EPSILON;
 };
 

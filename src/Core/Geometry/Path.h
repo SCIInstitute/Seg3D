@@ -55,11 +55,11 @@ public:
   ~Path();
 
   // GET_LENGTH:
-  // Get number of Path
+  /// Get number of Path
   size_t get_path_num() const;
 
   // GET_ONE_PATH:
-  // Get the corresponding path
+  /// Get the corresponding path
   SinglePath& get_one_path( int index ) ;
   bool find_one_path( Point& p1, Point& p2, SinglePath& spath ) ;
 
@@ -68,13 +68,13 @@ public:
   void set_all_paths(  std::vector< SinglePath >& paths );
 
   // SET_ONE_PATH:
-  // Set the corresponding path
-  // void set_one_path( int index, const std::vector< Point >& pt ) ;
+  /// Set the corresponding path
+  /// void set_one_path( int index, const std::vector< Point >& pt ) ;
   void set_one_path( int index, const SinglePath& pt ) ;
 
   // ADD_ONE_PATH:
-  // Add one path to paths
-  // void add_one_path( const std::vector< Point >& pt );
+  /// Add one path to paths
+  /// void add_one_path( const std::vector< Point >& pt );
   void add_one_path( const SinglePath& pt );
 
   bool delete_one_path( Point& p1, Point& p2 ) ;

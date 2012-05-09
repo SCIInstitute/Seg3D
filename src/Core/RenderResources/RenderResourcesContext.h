@@ -62,15 +62,15 @@ protected:
   friend class RenderResources;
 
   // CREATE_RENDER_CONTEXT:
-  // Generate a render context for one of the viewers
+  /// Generate a render context for one of the viewers
   virtual bool create_render_context( RenderContextHandle& context ) = 0;
 
   // VALID_RENDER_RESOURCES:
-  // Check whether valid render resources were installed
+  /// Check whether valid render resources were installed
   virtual bool valid_render_resources() = 0;
 
   // GET_CURRENT_CONTEXT:
-  // Get the current render context of the calling thread
+  /// Get the current render context of the calling thread
   virtual Core::RenderContextHandle get_current_context() = 0;
 };
 

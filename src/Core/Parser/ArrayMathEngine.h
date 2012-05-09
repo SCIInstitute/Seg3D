@@ -50,7 +50,7 @@ public:
   // Make sure it starts with a clean definition file
   ArrayMathEngine();
 
-  // Generate input arrays
+  /// Generate input arrays
   bool add_input_data_block( std::string name, DataBlockHandle data_block, std::string& error );
   bool add_input_mask_data_block( std::string name, MaskDataBlockHandle mask_data_block, 
     std::string& error );
@@ -61,27 +61,27 @@ public:
   bool add_output_data_block( std::string name, size_t nx, size_t ny, size_t nz, 
     Core::DataType type, std::string& error );
   
-  // Setup the expression                        
+  /// Setup the expression                        
   bool add_expressions( std::string& expressions );
 
-  // Parse and validate the inputs/outputs/expression.
+  /// Parse and validate the inputs/outputs/expression.
   bool parse_and_validate( std::string& error );
 
-  // Run the expressions in parallel
+  /// Run the expressions in parallel
   bool run( std::string& error );
 
-  // Extract handles to the results
+  /// Extract handles to the results
   bool get_data_block( std::string name, DataBlockHandle& data_block );
 
-  // Clean up the engine
+  /// Clean up the engine
   void clear();
 
   typedef boost::signals2::signal< void (double) > update_progress_signal_type;
 
   // UPDATE_PROGRESS:
-  // When new information on progress is available this signal is triggered. If this signal is 
-  // triggered it should end with a value 1.0 indicating that progress reporting has finised.
-  // Progress is measured between 0.0 and 1.0.
+  /// When new information on progress is available this signal is triggered. If this signal is 
+  /// triggered it should end with a value 1.0 indicating that progress reporting has finised.
+  /// Progress is measured between 0.0 and 1.0.
   update_progress_signal_type update_progress_signal_;
 
 private:

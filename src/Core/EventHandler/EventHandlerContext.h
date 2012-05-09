@@ -44,12 +44,12 @@ namespace Core
 {
 
 // CLASS EVENTHANDLERCONTEXT:
-// This class isolates the calls that need to be done into the GUI system in
-// terms of communication. Since the application is multi threaded, we need
-// to push events from asynchronous threads back onto the main thread. As GUI systems
-// tend to be event driven, these asynchronous events need to be tunneled 
-// through the main GUI interface system, if the UI and the main application
-// share a single thread.
+/// This class isolates the calls that need to be done into the GUI system in
+/// terms of communication. Since the application is multi threaded, we need
+/// to push events from asynchronous threads back onto the main thread. As GUI systems
+/// tend to be event driven, these asynchronous events need to be tunneled 
+/// through the main GUI interface system, if the UI and the main application
+/// share a single thread.
 
 class EventHandler;
 
@@ -67,42 +67,42 @@ public:
   }
 
   // POST_EVENT:
-  // Post an event onto the event handler stack. This one
-  // returns immediately after posting the event, and does
-  // not wait for the process to finish the event.
+  /// Post an event onto the event handler stack. This one
+  /// returns immediately after posting the event, and does
+  /// not wait for the process to finish the event.
   virtual void post_event( EventHandle& event ) = 0;
 
   // POST_AND_WAIT_EVENT:
-  // Post an event onto the event handler stack. This one
-  // returns after the thread signals that the event has been
-  // executed. The function does the full hand shaking for
-  // the synchronization.
+  /// Post an event onto the event handler stack. This one
+  /// returns after the thread signals that the event has been
+  /// executed. The function does the full hand shaking for
+  /// the synchronization.
   virtual void post_and_wait_event( EventHandle& event ) = 0;
 
   // PROCESS_EVENT:
-  // process the events that are queued in the event handler stack
+  /// process the events that are queued in the event handler stack
   virtual bool process_events() = 0;
 
   // WAIT_AND_PROCESS_EVENTS:
-  // process the events that are queued in the event handler mailbox.
+  /// process the events that are queued in the event handler mailbox.
   virtual bool wait_and_process_events() = 0;
 
   // IS_EVENTHANDLER_THREAD:
-  // Check whether we are running on the thread that handles the events
-  // This function is needed to avoid to post and execute things in an
-  // infinite loop.
+  /// Check whether we are running on the thread that handles the events
+  /// This function is needed to avoid to post and execute things in an
+  /// infinite loop.
   virtual bool is_eventhandler_thread() const = 0;
 
   // START_EVENTHANDLER:
-  // Start the eventhandler thread and start processing events
+  /// Start the eventhandler thread and start processing events
   virtual bool start_eventhandler( EventHandler* eventhandler ) = 0;
 
   // TERMINATE_EVENTHANDLER:
-  // Terminate the eventhandler
+  /// Terminate the eventhandler
   virtual void terminate_eventhandler() = 0;
   
   // EVENTHANDLER_STARTED:
-  // Check whether the eventhandler is running
+  /// Check whether the eventhandler is running
   virtual bool eventhandler_started() = 0;  
 };
 

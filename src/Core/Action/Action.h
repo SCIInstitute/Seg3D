@@ -116,7 +116,7 @@ public:
   int get_key_index( const std::string& name ) const;
   
   // IS_UNDOABLE:
-  /// Chekc whether the action is undoable
+  /// Check whether the action is undoable
   bool is_undoable() const;
   
   // CHANGES_PROJECT_DATA:

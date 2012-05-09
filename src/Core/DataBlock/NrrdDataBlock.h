@@ -59,7 +59,7 @@ private:
 
 public:
   // NEW: ( Factory constructor )
-  // Constructs object and registers object with manager
+  /// Constructs object and registers object with manager
   static DataBlockHandle New( NrrdDataHandle nrrd_data );
 };
 

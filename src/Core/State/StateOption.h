@@ -39,8 +39,8 @@ namespace Core
 {
 
 // STATEOPTION:
-// This class is a specification of State that is used to hold an option out of
-// a list of possible options.
+/// This class is a specification of State that is used to hold an option out of
+/// a list of possible options.
 
 class StateOption;
 
@@ -70,45 +70,45 @@ public:
 
 public:
   // EXPORT_TO_STRING:
-  // Convert the contents of the State into a string
+  /// Convert the contents of the State into a string
   virtual std::string export_to_string() const;
 
   // EXPORT_LIST_TO_STRING:
-  // Convert the contents of the State into a string
+  /// Convert the contents of the State into a string
   virtual std::string export_list_to_string() const;
 
   // IMPORT_FROM_STRING:
-  // Set the State from a string
+  /// Set the State from a string
   virtual bool import_from_string( const std::string& str, ActionSource source =
       ActionSource::NONE_E );
 
 protected:
   // EXPORT_TO_VARIANT
-  // Export the state data to a variant parameter
+  /// Export the state data to a variant parameter
   virtual void export_to_variant( Variant& variant ) const;
 
   // IMPORT_FROM_VARIANT:
-  // Import the state data from a variant parameter.
+  /// Import the state data from a variant parameter.
   virtual bool import_from_variant( Variant& variant, 
     ActionSource source = ActionSource::NONE_E );
 
   // VALIDATE_VARIANT:
-  // Validate a variant parameter
-  // This function returns false if the parameter is invalid or cannot be
-  // converted and in that case error will describe the error.
+  /// Validate a variant parameter
+  /// This function returns false if the parameter is invalid or cannot be
+  /// converted and in that case error will describe the error.
   virtual bool validate_variant( Variant& variant, std::string& error );
 
   // -- signals describing the state --
 public:
   // VALUE_CHANGED_SIGNAL:
-  // Signal when the data in the state is changed, the second parameter
-  // indicates the source of the change
+  /// Signal when the data in the state is changed, the second parameter
+  /// indicates the source of the change
 
   typedef boost::signals2::signal< void( std::string, Core::ActionSource ) > value_changed_signal_type;
   value_changed_signal_type value_changed_signal_;
 
   // OPTIONLIST_CHANGED_SIGNAL:
-  // Signal when the option list is changed
+  /// Signal when the option list is changed
   typedef boost::signals2::signal< void() > optionlist_changed_signal_type;
   optionlist_changed_signal_type optionlist_changed_signal_;
 
@@ -116,66 +116,66 @@ public:
 public:
 
   // SET_OPTION_LIST:
-  // Set the list of options from which one can choose
+  /// Set the list of options from which one can choose
   void set_option_list( const std::string& option_list );
 
   // SET_OPTION_LIST:
-  // Set the list of options from which one can choose
+  /// Set the list of options from which one can choose
   void set_option_list( const std::string& option_list, const std::string& option );
 
   // SET_OPTION_LIST:
-  // Set the list of options from which one can choose
+  /// Set the list of options from which one can choose
   void set_option_list( const std::vector< std::string >& option_list );
 
   // SET_OPTION_LIST:
-  // Set the list of options from which one can choose
+  /// Set the list of options from which one can choose
   void set_option_list( const std::vector< std::string >& option_list, const std::string& option );
 
   // OPTION_LIST:
-  // Get the option list
+  /// Get the option list
   std::vector< std::string > option_list() const
   {
       return this->option_list_;
   }
 
   // IS_OPTION:
-  // Check whether a string is a valid option
+  /// Check whether a string is a valid option
   bool is_option( const std::string& option );
 
   // -- access value --
 public:
   // GET:
-  // Get the value of the state variable
+  /// Get the value of the state variable
   const std::string& get() const
   {
     return this->value_;
   }
 
   // INDEX:
-  // Get the index of the value
+  /// Get the index of the value
   inline int index() const
   {
     return this->index_;
   }
 
   // SET:
-  // Set the value of the state variable
+  /// Set the value of the state variable
   
-  // NOTE: this function by passes the action mechanism and should only be used
-  // to enforce a constraint from another action.
+  /// NOTE: this function by passes the action mechanism and should only be used
+  /// to enforce a constraint from another action.
   bool set( const std::string& value, 
     ActionSource source = ActionSource::NONE_E );
 
   // -- option list --
 protected:
 
-  // Storage for the actual value
+  /// Storage for the actual value
   std::string value_;
 
-  // Index of the current value in the option list
+  /// Index of the current value in the option list
   int index_;
 
-  // List with all the allowed options in lower case
+  /// List with all the allowed options in lower case
   std::vector< std::string > option_list_;
 
   typedef std::vector< std::string >::iterator option_list_iterator_type;
