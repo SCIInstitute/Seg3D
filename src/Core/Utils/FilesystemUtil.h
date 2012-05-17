@@ -47,8 +47,8 @@ bool CreateOrIgnoreDirectory( const boost::filesystem::path& dir_path );
 
 // RECURSIVECOPYDIRECTORY:
 /// Copy a directory recursively.
-// Returns true on success, otherwise false.
-b/ool RecursiveCopyDirectory( const boost::filesystem::path& from, const boost::filesystem::path& to );
+/// Returns true on success, otherwise false.
+bool RecursiveCopyDirectory( const boost::filesystem::path& from, const boost::filesystem::path& to );
 
 } // end namespace Core
 
