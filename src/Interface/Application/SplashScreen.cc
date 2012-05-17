@@ -136,9 +136,8 @@ void SplashScreen::new_project()
   this->private_->user_interacted_ = true;
 
   this->new_project_wizard_ = new ProjectWizard( this->parentWidget() );
-  connect( this->new_project_wizard_, SIGNAL( canceled() ), this, SLOT( unhide() ) );
-  this->new_project_wizard_->show();
-  this->hide();
+  connect( this->new_project_wizard_, SIGNAL( finished() ), this, SLOT( close() ) );
+  this->new_project_wizard_->exec();
 }
 
 
@@ -147,11 +146,6 @@ void SplashScreen::quit()
   reinterpret_cast<QWidget*>( this->parent() )->close();
 }
 
-
-void SplashScreen::unhide()
-{
-  this->show();
-}
 
 void SplashScreen::open_existing()
 {
