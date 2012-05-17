@@ -2640,6 +2640,13 @@ bool Project::load_session( SessionID session_id )
   
   this->project_files_generated_state_->set( true );
   this->project_files_accessible_state_->set( true );
+
+  // We need to restore provenance and generation count from the project
+  Core::DataBlock::generation_type generation = this->generation_count_state_->get(); 
+  Core::DataBlockManager::Instance()->set_generation_count( generation );
+  ProvenanceID provenance_id = this->provenance_count_state_->get();
+  SetProvenanceCount( provenance_id );
+
   return true;    
 }
 
