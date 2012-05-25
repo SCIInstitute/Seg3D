@@ -5,7 +5,7 @@
 \author{Jeroen Stinstra, Josh Blauer, Jess Tate, Brett Burton, Ahrash Poursaid}
 
 % INCLUDE SCI STYLE DOCUMENT
-\usepackage{scirun}
+\usepackage{seg3d}
 \usepackage{marvosym}
 
 \begin{document}
@@ -15,7 +15,7 @@
 
 
 % CREATE TITLE PAGE --------------------------------------------------
-%\maketitle
+\maketitle
 
 % CHAPTERS ---------------------------------------------------------------
 
@@ -29,7 +29,7 @@ This tutorial describes step by step instructions to segment Ascending and Desce
 
 \section{Software requirements}
 \label{sec:softwarerequirements}
-\subsection{Seg3D 2.1}
+\subsection{Seg3D \SegthreeDVersion}
 
 Seg3D is distributed as a binary download for Linux, Windows, and OS X. Please visit the \href{http://software.sci.utah.edu}{SCI software portal} to download the latest Seg3D binary. Any version of 2.0 or higher will do. 
 
@@ -37,7 +37,7 @@ Seg3D is distributed as a binary download for Linux, Windows, and OS X. Please v
 
 This tutorial uses two datasets. The first one is a set  of two 3D scans, one is an anatomical MRI of the atria and the second one is a delayed enhanced MR image of the same region. Both images have been registered. The second data is a brain data set that contains a preoperative MR image of the brain and a post surgery CT image of a pediatric patient.
 
-The datasets are available in the SCIRunData zip files. Please visit \href{http://www.sci.utah.edu/cibc/software/106-scirun.html}{SCIRun Datasets} to download the datasets. The datasets for this tutorial are inside the Seg3D directory. The direct linked to the zipped SCIRun Datasets can be found \href{http://www.sci.utah.edu/download/scirun/4.4.html}{here}.
+The datasets are available in the SCIRunData zip files. Please visit \href{http://www.sci.utah.edu/cibc/software/106-scirun.html}{SCIRun Datasets} to download the datasets. The datasets for this tutorial are inside the Seg3D directory. The direct linked to the zipped SCIRun Datasets can be found \href{http://www.sci.utah.edu/releases/scirun_v4.4/SCIRunData_4.4_20110817_data.tgz}{here}.
 
 %---------------------------------------------
 
@@ -233,7 +233,7 @@ To create a three dimensional isosurface of the Xor label mask, simple click the
 To extract the data covered by the label mask select the Mask Data option under the Data Filters menu.  Choose the label mask you want to use to extract data with and click Set Label Mask in the Tools Menu.  Select the Data layer you want to extract data from (DEMRI in this case), which should appear in the Target Layer field.  Then choose the Mask Layer you wish to mask the data with (XOR\_Superficial) from the drop down menu or by dragging the layer to the field.  Set the background value to the desired setting (min\_value), then click the Run Filter button.  A new data layer will appear in the Layer Menu (called MaskData\_DEMRI).  This should show only the region of interest from the masked volume (Figure \ref{fig:maskdata}).  You may need to toggle off the viewing of the mask layers to see the data.
 
 \begin{figure}
-\scalebox{0.4}{\includegraphics{Seg3DTutorial_figures/maskdata.png}}
+\scalebox{0.3}{\includegraphics{Seg3DTutorial_figures/maskdata.png}}
 \caption{Using label mask to extract data from volume.}\label{fig:maskdata}
 \end{figure}
 
@@ -276,7 +276,7 @@ Open up the {\bf Median Filters} from the Filters menu and select the Angio data
 The second stage of filtering uses the {\bf Gaussian Blur} from the {\bf Data Filters} Menu. Again the default settings will do. Select the output from the median filter and run this filter. After filtering the data will look like the results depicted in figure~\ref{fig:FilteredAngioData}.
 
 \begin{figure}
-\scalebox{0.33}{\includegraphics{Seg3DTutorial_figures/ThresholdAngio.png}}
+\scalebox{0.4}{\includegraphics{Seg3DTutorial_figures/ThresholdAngio.png}}
 \caption{Thresholding Angiogram while looking at DEMRI}\label{fig:ThresholdAngio}
 \end{figure}
 
@@ -292,6 +292,51 @@ To select the blood from the segmentation, use the {\bf Threshold Tool} from the
 Now create a new layer by pressing on the $+$ symbol in this layer. This will generate a new empty layer with the same dimensions. Now open up the {\bf Paint Brush} in the Tools Menu. Select the Mask Layer for the{\b Target Layer} in the Paint Brush Menu. Then under {\bf Mask Constraint 1} select the Threshold Angio and start painting the Ascending Aorta. As a mask has been set the painting will be restricted to previously segmented blood. (see figure~\ref{fig:MaskedPainting})
 
 Paint a couple of slices and then generate the isosurface of the vessel. Once you have captured the vessel to your satisfaction, you may export the segmentation as described in the previous chapter.
+
+\section{Otsu Threshold}
+
+Another thresholding tool available in the Data Filters menu is the Otsu Threshold. The Otsu Threshold uses an image intensity histogram to determine adequate threshold levels and segment the image based on the determined threshold levels. A demonstration of the Otsu Threshold will be done on the CT image that was taken on the 15 year old pediatric patient.The file can be found in the SCIRun datasets (see section~\ref{sec:softwarerequirements}). We will be working with the CTbrain50.NRRD file found in the  SCIRunData/Seg3D/Brain\_DataSet directory.
+
+To use the Otsu Threshold, first select the {\bf Otsu Threshold} tool from the {\bf Data Filters} menu. The tools window will then show the information on the Otsu Threshold tool. The target layer may be selected, and the number of thresholds can be selected, from zero to four different thresholding layers. Below the number of thresholds is the histogram representing the intensities of the pixels of the image (figure~\ref{fig:OtsuBefore}). The menu box below the histogram allows the user to select whether they would like a logarithmic or a linear graph.
+
+\begin{figure}
+\scalebox{0.3}{\includegraphics{Seg3DTutorial_figures/OtsuBefore.png}}
+\caption{Brain data before Otsu thresholding}\label{fig:OtsuBefore}
+\end{figure}
+
+To use the Otsu Threshold tool on the brain CT image, select the tool and then choose three as the number of thresholds. Select logarithmic for the display of the histogram, and run the filter. The thresholded layers will appear in the layers view on the right. The number of layers corresponds to the number of thresholds selected in the tool view. In the brain data, the tool created different layers for dense matter like bone, other less dense matter, and air (figure~\ref{fig:OtsuAfter}).
+
+\begin{figure}
+\scalebox{0.3}{\includegraphics{Seg3DTutorial_figures/OtsuAfter.png}}
+\caption{Brain data after Otsu thresholding}\label{fig:OtsuAfter}
+\end{figure}
+
+\section{Canny Edge Detection Filter}
+An advanced tool for edge detection is the Canny Edge Detection Filter. This filter computes the edges using a Canny Edge Detection Filter, which involves smoothing the image with a Gaussian filter, calculating the second directional derivatives of the smoothed image, and performing a non-maximum supression to find the correct extrema. The hysteresis thresholding is then applied to the gradient magnitude of the smoothed image to find and link edges. A demonstration of the Canny Edge Detection Filter will be done on the CT image that was taken on the 15 year old pediatric patient.The file can be found in the SCIRun datasets (see section~\ref{sec:softwarerequirements}). We will be working with the CTbrain50.NRRD data file.
+
+To use the Canny edge detection filter on the volume, first select the Canny edge detection tool from the Advanced Filters menu. In the tools window, the Canny edge detection tool will appear, allowing you to select the layer to run the filter on, as well as a distance slider. The distance slider sets the variance for the Gaussian smoothing algorithm. Below, there is a slider to set the threshold for hysteresis thresholding to find and link edges. (figure~\ref{fig:CannyBefore}). 
+
+\begin{figure}
+\scalebox{0.3}{\includegraphics{Seg3DTutorial_figures/CannyBefore.png}}
+\caption{Brain data before Canny edge detection}\label{fig:CannyBefore}
+\end{figure}
+
+The distance is the distance between edges, and the threshold is the pixel intensity threshold for distinguishing edges. Select the distance as 4 and the threshold as 40. When the layer, distance and threshold have been selected, run the filter to create a new layer with the Canny edges displayed (figure~\ref{fig:CannyAfter}). Note the detection of edges between dense bone matter and less dense matter.
+
+\begin{figure}
+\scalebox{0.3}{\includegraphics{Seg3DTutorial_figures/CannyAfter.png}}
+\caption{Brain data after Canny edge detection}\label{fig:CannyAfter}
+\end{figure}
+
+\subsection{Canny Edge Detection With Mean Filter}
+The Canny edge detection filter may also be run by first applying a mean smoothing filter prior to applying the Canny edge detection filter. 
+
+\begin{figure}
+\scalebox{0.3}{\includegraphics{Seg3DTutorial_figures/Cannywithmeanandlayers.png}}
+\caption{Canny edge detection with mean filter}\label{fig:Cannywithmeanandlayers}
+\end{figure}
+
+The image in figure~\ref{fig:Cannywithmeanandlayers} had a mean filter applied to it with a radius of 6, followed by a Canny edge detection filter with a distance of 5 and a threshold of 30. Notice how smooth the image is prior to the application of the Canny filter.
 
 
 
@@ -330,7 +375,7 @@ Once the speedline has been completed, it can be filled in by hitting {\bf F} or
 
 Now a segmentation is generated in one slice, proceed to the next slice by press {\bf $<$} or {\bf $>$}. The speedtool will try to accommodate it's shape to the new cross section. However, manual corrections can be made by moving points around using the left or right mouse buttons and dragging point around, or by adding additional points by pressing the left mouse button in the center of a segment. Press {\bf F} again to fill in the segmentation. (see figure~\ref{fig:SpeedLine2}).
 
-By doing this sequentially for many slices, one can quickly segment a section of a structure. Once a portion of the structure has been segmented, press the {\bf Iso} button with a filled triangle beneath it below your selected label mask in the {\bf Layer Manager} window on the right to visualize the results in the 3D.
+By doing this sequentially for many slices, one can quickly segment a section of a structure. Once a portion of the structure has been segmented, press the {\bf ISO \Forward} button below your selected label mask in the {\bf Layer Manager} window on the right to visualize the results in the 3D.
 
 This concludes the cardiac part of this tutorial. The next chapter will highlight some of the tools using a head dataset.
 
@@ -359,7 +404,7 @@ The final goal of this research is generate a patient specific model which can b
 \end{figure}
 \section{Neighborhood Connected}
 
-Browse the Brain\_DataSet directory and load the following two files: CTbrain50.NRRD and MRI-brain50.NRRD. The first one is the post operative CT image and the second one is the pre-surgery MR image. After loading the datasets the Seg3D window should look like the one in figure~\ref{fig:LoadingBrainDataSet}. 
+Browse the SCIRunData/Seg3D/Brain\_DataSet directory and load the following two files: CTbrain50.NRRD and MRI-brain50.NRRD. The first one is the post operative CT image and the second one is the pre-surgery MR image. After loading the datasets the Seg3D window should look like the one in figure~\ref{fig:LoadingBrainDataSet}. 
 
 Note that the data is not perfectly registered and that a part of the skull has been lifted to actually insert the electrode arrays.
 
@@ -427,57 +472,19 @@ To segment the white matter, we select the {\bf Threshold Tool} from the Tools m
 Now select the Masked Data Volume. With the {\bf Threshold Tool} insert a few seed points in the white matter. The threshold tool will now segment all the points that are within the range of the seed points. Keep adding points until the white matter has been marked.
 (see figure~\ref{fig:ThresholdWhiteMatter}). Once the segmentation is good enough press {\bf Create Threshold Layer} in the menu on the left and a new masking layer will be created.
 
-Repeat the same procedure for the gray matter (see figure~\ref{fig:ThresholdGrayMatter}). Finally one can use the boolean operators to subtract the white matter from the gray matter. Select {\bf Boolean AND} in the Mask Filters menu. Select one of the masks as the {\bf Target Layer} and the other as the {\bf Mask Layer} and click on {\bf Run Filter}. This concludes the tutorial. Feel free to explore other structures in the head and make a full segmentation.
+Repeat the same procedure for the gray matter (see figure~\ref{fig:ThresholdGrayMatter}). Finally one can use the boolean operators to subtract the white matter from the gray matter. Select {\bf Boolean AND} in the Mask Filters menu. Select one of the masks as the {\bf Target Layer} and the other as the {\bf Mask Layer} and click on {\bf Run Filter}. 
 
 \begin{figure}
 \scalebox{0.4}{\includegraphics{Seg3DTutorial_figures/ThresholdGreyMatter.png}}
 \caption{Thresholding grey matter using threshold range}\label{fig:ThresholdGrayMatter}
 \end{figure}
 
-\section{Otsu Threshold}
+\chapter{Conclusion}
 
-Another thresholding tool available in the Data Filters menu is the Otsu Threshold. The Otsu Threshold uses an image intensity histogram to determine adequate threshold levels and segment the image based on the determined threshold levels. A demonstration of the Otsu Threshold will be done on the CT image that was taken on the 15 year old pediatric patient.The file can be found in the SCIRun datasets (see section~\ref{sec:softwarerequirements}). We will be working with the CTbrain50.NRRD file.
+This concludes the tutorial. Feel free to explore other structures in the head and make a full segmentation. Please explore the use of the other tools presented in this tutorial and incorporate them into your segmentation strategy if they are useful.  Most of the tools and filters not presented utilize a similar structure and are relatively self explanatory;  try them out and use them in your project.  Contact us at \href{mailto:seg3d@sci.utah.edu}{seg3d@sci.utah.edu}  with questions or bug reports and we will try to answer your questions.  
 
-To use the Otsu Threshold, first select the {\bf Otsu Threshold} tool from the {\bf Data Filters} menu. The tools window will then show the information on the Otsu Threshold tool. The target layer may be selected, and the number of thresholds can be selected, from zero to four different thresholding layers. Below the number of thresholds is the histogram representing the intensities of the pixels of the image (figure~\ref{fig:OtsuBefore}). The menu box below the histogram allows the user to select whether they would like a logarithmic or a linear graph.
 
-\begin{figure}
-\scalebox{0.3}{\includegraphics{Seg3DTutorial_figures/OtsuBefore.png}}
-\caption{Brain data before Otsu thresholding}\label{fig:OtsuBefore}
-\end{figure}
 
-To use the Otsu Threshold tool on the brain CT image, select the tool and then choose three as the number of thresholds. Select logarithmic for the display of the histogram, and run the filter. The thresholded layers will appear in the layers view on the right. The number of layers corresponds to the number of thresholds selected in the tool view. In the brain data, the tool created different layers for dense matter like bone, other less dense matter, and air (figure~\ref{fig:OtsuAfter}).
-
-\begin{figure}
-\scalebox{0.3}{\includegraphics{Seg3DTutorial_figures/OtsuAfter.png}}
-\caption{Brain data after Otsu thresholding}\label{fig:OtsuAfter}
-\end{figure}
-
-\section{Canny Edge Detection Filter}
-An advanced tool for edge detection is the Canny Edge Detection Filter. This filter computes the edges using a Canny Edge Detection Filter, which involves smoothing the image with a Gaussian filter, calculating the second directional derivatives of the smoothed image, and performing a non-maximum supression to find the correct extrema. The hysteresis thresholding is then applied to the gradient magnitude of the smoothed image to find and link edges. A demonstration of the Canny Edge Detection Filter will be done on the CT image that was taken on the 15 year old pediatric patient.The file can be found in the SCIRun datasets (see section~\ref{sec:softwarerequirements}). We will be working with the CTbrain50.NRRD data file.
-
-To use the Canny edge detection filter on the volume, first select the Canny edge detection tool from the Advanced Filters menu. In the tools window, the Canny edge detection tool will appear, allowing you to select the layer to run the filter on, as well as a distance slider. The distance slider sets the variance for the Gaussian smoothing algorithm. Below, there is a slider to set the threshold for hysteresis thresholding to find and link edges. (figure~\ref{fig:CannyBefore}). 
-
-\begin{figure}
-\scalebox{0.3}{\includegraphics{Seg3DTutorial_figures/CannyBefore.png}}
-\caption{Brain data before Canny edge detection}\label{fig:CannyBefore}
-\end{figure}
-
-The distance is the distance between edges, and the threshold is the pixel intensity threshold for distinguishing edges. Select the distance as 4 and the threshold as 40. When the layer, distance and threshold have been selected, run the filter to create a new layer with the Canny edges displayed (figure~\ref{fig:CannyAfter}). Note the detection of edges between dense bone matter and less dense matter.
-
-\begin{figure}
-\scalebox{0.3}{\includegraphics{Seg3DTutorial_figures/CannyAfter.png}}
-\caption{Brain data after Canny edge detection}\label{fig:CannyAfter}
-\end{figure}
-
-\subsection{Canny Edge Detection With Mean Filter}
-The Canny edge detection filter may also be run by first applying a mean smoothing filter prior to applying the Canny edge detection filter. 
-
-\begin{figure}
-\scalebox{0.3}{\includegraphics{Seg3DTutorial_figures/Cannywithmeanandlayers.png}}
-\caption{Canny edge detection with mean filter}\label{fig:Cannywithmeanandlayers}
-\end{figure}
-
-The image in figure~\ref{fig:Cannywithmeanandlayers} had a mean filter applied to it with a radius of 6, followed by a Canny edge detection filter with a distance of 5 and a threshold of 30. Notice how smooth the image is prior to the application of the Canny filter.
 
 \end{document}
 
