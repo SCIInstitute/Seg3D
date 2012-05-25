@@ -14,7 +14,7 @@
 \fi
 
 \ifpdf
- \usepackage[pdftex,colorlinks=true,pdfhighlight=/N,citecolor=black,urlcolor=blue,linkcolor=black]{hyperref}
+ \usepackage[pdftex,colorlinks=true,pdfhighlight=/N,citecolor=black,pagecolor=black,urlcolor=blue,linkcolor=black]{hyperref}
   \pdfinfo{
     /Author (\@author)
     /Creator (TeX) 
@@ -51,6 +51,7 @@
 \newcommand{\Unit}[1]{\Tilde{#1}}
 \newcommand{\Prop}[1]{\mathbf{P}(#1)}
 \newcommand{\Max}[1]{\text{max}(#1)}
+\newcommand{\SegthreeDVersion}{@SEG3D_MAJOR_VERSION@.@SEG3D_MINOR_VERSION@\space}
 
 
 % DEFITION OF THE PAGE LAYOUT
@@ -66,8 +67,7 @@
 
 %define margins
 
-\oddsidemargin 0pt
-\evensidemargin 18pt
+\oddsidemargin 0pt \evensidemargin 18pt
 \topmargin 0pt
 \headheight 15pt
 \headsep 0pt
@@ -153,6 +153,9 @@
   \endlist
 }
 \let\endcustomdesc=\endlist % for efficiency
+
+% Special font for environment variables
+\newcommand{\textenvvar}[1]{\texttt{#1}}
 
 % LINE SPACING -----------------------------------------------------------
 \newlength{\defbaselineskip}
