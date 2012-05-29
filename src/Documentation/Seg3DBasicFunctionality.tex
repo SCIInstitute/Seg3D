@@ -2,7 +2,7 @@
 
 % These two need to be set before including scirun style package
 \title{Seg3D Basic Functionality}
-\author{Jess Tate}
+\author{Jess Tate, Brett Burton}
 
 % INCLUDE SCI STYLE DOCUMENT
 \usepackage{seg3d}
@@ -39,7 +39,7 @@ Seg3D is distributed as a binary download for Linux, Windows, and OS X. Please v
 \chapter{Welcome Screen}
 
 %\begin{figure}
-%\scalebox{0.3}{\includegraphics{Seg3DTutorial_figures/welcome_screen.png}}
+%\scalebox{0.3}{\includegraphics{Seg3DBasicFunctionality_figures/welcome_screen.png}}
 %\caption{Seg3D welcome screen}\label{fig:welcome}
 %\end{figure}
 
@@ -70,7 +70,7 @@ In addition to the viewer windows discussed in the above chapter, there are seve
 \section{Project Window}
 
 \begin{figure}
-\scalebox{0.3}{\includegraphics{Seg3DTutorial_figures/ProjectWindow.png}}
+\scalebox{0.3}{\includegraphics{Seg3DBasicFunctionality_figures/ProjectWindow.png}}
 \caption{Project Window}\label{fig:ProjectWindow}
 \end{figure}
 The project window is one of three windows that is opened by default when Seg3D launches.  
@@ -100,7 +100,7 @@ At any time the user can export the session to a new location - with or without 
 
 \section{Tools Window}
 \begin{figure}[b]
-\scalebox{0.3}{\includegraphics{Seg3DTutorial_figures/ToolWindow.png}}
+\scalebox{0.3}{\includegraphics{Seg3DBasicFunctionality_figures/ToolWindow.png}}
 \caption{Tools Window}\label{fig:ToolWindow}
 \end{figure}
 The tools window is another of the three windows that is opened upon Seg3D launch.  
@@ -121,7 +121,7 @@ This window is positioned to the right side of the Seg3D window pane and contain
 If a file is not selected when Seg3D launches, this window will be blank, otherwise it will contain the volume and mask surface files associated with the opened file.
 
 \begin{figure}[b]
-\scalebox{0.3}{\includegraphics{Seg3DTutorial_figures/LayerWindow.png}}
+\scalebox{0.3}{\includegraphics{Seg3DBasicFunctionality_figures/LayerWindow.png}}
 \caption{Layer Manager Window}\label{fig:LayerWindow}
 \end{figure}
 
@@ -140,50 +140,50 @@ A brief description of each icon follows:
 
 %% insert figure  of the eye
 \begin{figure}[h!]
-  \includegraphics[width=0.05\textwidth]{Seg3DTutorial_figures/VisibleOff.png}% picture filename
+  \includegraphics[width=0.05\textwidth]{Seg3DBasicFunctionality_figures/VisibleOff.png}% picture filename
   \caption{Visible Icon: The eye icon displays the current mask.  When the eye is highlighted the mask is visible in the view plane, when it is not, the mask is 'turned off.'}
 \end{figure}
 
 
 %% insert figure of the 'i'
 \begin{figure}[h!]
-  \includegraphics[width=0.05\textwidth]{Seg3DTutorial_figures/InfoOff.png}% picture filename
+  \includegraphics[width=0.05\textwidth]{Seg3DBasicFunctionality_figures/InfoOff.png}% picture filename
   \caption{Info Icon: The 'i' icon displays information about the layer.}
 \end{figure}
 
 %% insert figure of the bar chart
 \begin{figure}[h!]
-  \includegraphics[width=0.05\textwidth]{Seg3DTutorial_figures/OpacityOff.png}% picture filename
+  \includegraphics[width=0.05\textwidth]{Seg3DBasicFunctionality_figures/OpacityOff.png}% picture filename
   \caption{Opacity Icon: The histogram-looking icon allows the user to change opacity levels of the layer.}
 \end{figure}
 
 %% insert figure of the paintbrush
 \begin{figure}[h!]
-  \includegraphics[width=0.05\textwidth]{Seg3DTutorial_figures/AppearanceOff.png}% picture filename
+  \includegraphics[width=0.05\textwidth]{Seg3DBasicFunctionality_figures/AppearanceOff.png}% picture filename
   \caption{Appearance Icon: The paintbrush-like icon allows the user to change the layer's appearance.}
 \end{figure}
 
 %% insert figure of the lock
 \begin{figure}[h!]
-  \includegraphics[width=0.05\textwidth]{Seg3DTutorial_figures/LockOff.png}% picture filename
+  \includegraphics[width=0.05\textwidth]{Seg3DBasicFunctionality_figures/LockOff.png}% picture filename
   \caption{Lock Icon: The lock icon allows users to lock the layer to further editting.}
 \end{figure}
 
 %% insert figure of 'ISO'
 \begin{figure}[h!]
-  \includegraphics[width=0.05\textwidth]{Seg3DTutorial_figures/IsosurfaceMenuOff.png}% picture filename
+  \includegraphics[width=0.05\textwidth]{Seg3DBasicFunctionality_figures/IsosurfaceMenuOff.png}% picture filename
   \caption{IsosurfaceMenu Icon: This icon displays active isosurfaces (if the mask has one).}
 \end{figure}
 
 %% insert figure of ISO playbutton
 \begin{figure}[h!]
-  \includegraphics[width=0.05\textwidth]{Seg3DTutorial_figures/IsosurfaceComputeOff.png}% picture filename
+  \includegraphics[width=0.05\textwidth]{Seg3DBasicFunctionality_figures/IsosurfaceComputeOff.png}% picture filename
   \caption{IsosurfaceCompute Icon: This icon generates the isosurface for the mask.  It must be clicked before the IsosurfaceMenu or IsosurfaceDelete icons become active.}
 \end{figure}
 
 %% insert figure of ISO x
 \begin{figure}[h!]
-  \includegraphics[width=0.05\textwidth]{Seg3DTutorial_figures/IsosurfaceDeleteOff.png}% picture filename
+  \includegraphics[width=0.05\textwidth]{Seg3DBasicFunctionality_figures/IsosurfaceDeleteOff.png}% picture filename
   \caption{IsosurfaceDelete Icon: This icon deletes active isosurfaces (if the mask has one).}
 \end{figure}
 
@@ -225,7 +225,7 @@ Fog density can be tuned by using the slider in the the Volume View Window.
 By default the density value is 1.00.
 If the fog density increases, the fogging effect increases.
 \begin{figure}[t]
-\scalebox{0.3}{\includegraphics{Seg3DTutorial_figures/FogPanel.png}}
+\scalebox{0.3}{\includegraphics{Seg3DBasicFunctionality_figures/FogPanel.png}}
 \caption{Volume View Window - Fog Panel Displayed. The user must activate the Show fog option at the bottom of the viewer window.}\label{fig:FogPanel}
 \end{figure}
 
@@ -236,7 +236,7 @@ The + sign is an enabled clipping plan, while the - sign is disabled.
 The clipping panel option in the viewer window is activated by default.
 
 \begin{figure}[b!]
-\scalebox{0.3}{\includegraphics{Seg3DTutorial_figures/ClippingPanel.png}}
+\scalebox{0.3}{\includegraphics{Seg3DBasicFunctionality_figures/ClippingPanel.png}}
 \caption{Volume View Window - Clipping Panel Displayed. Show clipping option at the bottom of the viewer window is activated by default.}\label{fig:ClippingPanel}
 \end{figure}
 
@@ -262,7 +262,7 @@ Figure \ref{fig:ClippingPanel} shows the result of a clipping plane applied in a
 \subsection{Volume Rendering Panel}
 
 \begin{figure}[b!]
-\scalebox{0.3}{\includegraphics{Seg3DTutorial_figures/VolRendPanel.png}}
+\scalebox{0.3}{\includegraphics{Seg3DBasicFunctionality_figures/VolRendPanel.png}}
 \caption{Volume View Window - Volume Rendering Panel Displayed. Show volume rendering icon at the bottom of the viewer window must be activated.}\label{fig:VolRendPanel}
 \end{figure}
 
@@ -278,7 +278,7 @@ With these two options selected, the user now has three rendering options.
 These options are Simple, Faux Shading, and Ambient Occlusion.
 
 \begin{figure}[h!]
-\scalebox{0.3}{\includegraphics{Seg3DTutorial_figures/VolRendOpt.png}}
+\scalebox{0.3}{\includegraphics{Seg3DBasicFunctionality_figures/VolRendOpt.png}}
 \caption{Volume Rednering Options - A) Simple B) Faux Shading C) Ambient Occlusion}\label{fig:VolRendOpt}
 \end{figure}
 
@@ -337,7 +337,7 @@ Initially, nothing will appear in the Provenance window.
 Click the Refresh button at the bottom of the panel and the complete history of that mask will appear.
 
 \begin{figure}[b!]
-\scalebox{0.3}{\includegraphics{Seg3DTutorial_figures/ProvenanceWindow.png}}
+\scalebox{0.3}{\includegraphics{Seg3DBasicFunctionality_figures/ProvenanceWindow.png}}
 \caption{Volume View Window - Clipping Panel Displayed. Show clipping option at the bottom of the viewer window is activated by default.}\label{fig:ProvenanceWindow}
 \end{figure}
 
