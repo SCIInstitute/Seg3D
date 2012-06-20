@@ -269,11 +269,12 @@
         \vskip 0.5in
         {\parindent \z@ \raggedleft \normalfont
        \helvnf
-           {\normalsize
-            Supported by:\\[6pt]
-            {  \bf NIH grant P41- RR12553-07} \\}
+           {\small
+             This project was supported by grants from the National Center for Research Resources
+             \textbf{(5P41RR012553-14)} and the National Institute of General Medical Sciences\\
+             \textbf{(8 P41 GM103545-14)} from the National Institutes of Health. \\}
              \par\nobreak
-          }
+       }
 
         \vskip 0.5in
         {\parindent \z@ \raggedleft \normalfont
