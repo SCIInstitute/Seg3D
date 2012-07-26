@@ -7,6 +7,8 @@
 % INCLUDE SCI STYLE DOCUMENT
 \usepackage{seg3d}
 \usepackage{marvosym}
+\usepackage[rightcaption]{sidecap}
+
 
 \begin{document}
 
@@ -23,25 +25,38 @@
 
 \begin{introduction}
 
-This document is meant as a basic reference and walkthrough of the Seg3D layout and functionality.  
+This document is meant as a basic reference and walkthrough of the Seg3D layout and functionality.  Specifically, every tool, filter and feature of the software will be addressed in a brief manner.  
 
 \end{introduction}
 
+\section{About Seg3D}
+
+\begin{figure}
+\scalebox{0.3}{\includegraphics{Seg3DBasicFunctionality_figures/layout.png}}
+\caption{Seg3D in use.}\label{fig:layout}
+\end{figure}
+
+Seg3D is a lightweight software tool developed for use in visualizing and segmenting image data.  The core intended use of Seg3D involves loading 3D scalar data, such as MRI or CT scans, and generating labels mask to identify various regions of interest in the original image data.  Seg3D facilitates the process using interactive tools such as image processing filters and manual masking techniques.  
+
+In addition to manual segmenting, the current version of Seg3D includes some features that facilitate automated segmenting.  Provenance is a recently added feature which tracks the steps used to create label masks.  This feature allows the user to then repeat the same sets with different parameters using the python and controller windows.  Future extensions of these capabilities will allow for scripting in the terminal and porting to other programs such as SCIRun and Vistrails.
+
+Seg3D is an crucial element of our software suite also involving BioMesh3D and SCIRun that make possible the development of image based computational models.  Label masks generated with Seg3D are used in other software  for such applications as 3D visualization or computational modeling.  BioMesh3D requires a segmentation like those from Seg3D to generate high quality, multi-material computational meshes.  SCIRun is a modular problem solving environment that generates and runs visualization and simulation tasks on segmentations from Seg3D and meshes from BioMesh3D.  This interaction makes Seg3D a key step in image based modeling.
+
 \section{Software requirements}
 
-\subsection{Seg3D 2.1}
+\subsection{Seg3D \SegthreeDVersion}
 
-Seg3D is distributed as a binary download for Linux, Windows, and OS X. Please visit the SCI software portal ({http://software.sci.utah.edu} ) to download the latest Seg3D binary. Any version of 2.0 or higher will do. 
+Seg3D is distributed as a binary download for Linux, Windows, and OS X. Please visit the SCI software portal ({http://4software.sci.utah.edu} ) to download the latest Seg3D binary. 
 
 %---------------------------------------------
 
 
 \chapter{Welcome Screen}
 
-%\begin{figure}
-%\scalebox{0.3}{\includegraphics{Seg3DBasicFunctionality_figures/welcome_screen.png}}
-%\caption{Seg3D welcome screen}\label{fig:welcome}
-%\end{figure}
+\begin{figure}
+\scalebox{0.3}{\includegraphics{Seg3DBasicFunctionality_figures/welcome_screen.png}}
+\caption{Seg3D welcome screen}\label{fig:welcome}
+\end{figure}
 
 \chapter{Seg3D Viewer}
 
@@ -107,10 +122,10 @@ The tools window is another of the three windows that is opened upon Seg3D launc
 This window is also on the left of the Seg3D panel and is, unlike the project window, is displayed when Seg3D is opened.  
 Users can toggle between project and tool windows by selecting the specific tabs at the bottom of the left most window pane.
 
-The tool window houses the current tools that the user has selected from the 'Tools' dropdown menu.  
+The tool window houses the current tools that the user has selected from the 'Tools' drop down menu.  
 The active tool will be highlighted in orange and will be displayed.  
 Inactive tools, that have been opened during the session, will be grayed out and minimized.  
-To access one of the other tools, click one of the grayed out items or select it from the 'Tools' dropdown menu.  
+To access one of the other tools, click one of the grayed out items or select it from the 'Tools' drop down menu.  
 In Figure \ref{fig:ToolWindow} the 'Paint Brush' tool is active, while the 'Threshold,' 'Crop,' and 'Measure' tools are inactive.
 
 
@@ -139,53 +154,58 @@ Each volume or mask label has  standard, associated icons below their names.
 A brief description of each icon follows:
 
 %% insert figure  of the eye
-\begin{figure}[h!]
+\begin{SCfigure}[20][h]
+  \vspace{12 pt}
   \includegraphics[width=0.05\textwidth]{Seg3DBasicFunctionality_figures/VisibleOff.png}% picture filename
   \caption{Visible Icon: The eye icon displays the current mask.  When the eye is highlighted the mask is visible in the view plane, when it is not, the mask is 'turned off.'}
-\end{figure}
+\end{SCfigure}
 
 
 %% insert figure of the 'i'
-\begin{figure}[h!]
+\begin{SCfigure}[20][h]
   \includegraphics[width=0.05\textwidth]{Seg3DBasicFunctionality_figures/InfoOff.png}% picture filename
   \caption{Info Icon: The 'i' icon displays information about the layer.}
-\end{figure}
+\end{SCfigure}
 
 %% insert figure of the bar chart
-\begin{figure}[h!]
+\begin{SCfigure}[20][h!]
   \includegraphics[width=0.05\textwidth]{Seg3DBasicFunctionality_figures/OpacityOff.png}% picture filename
   \caption{Opacity Icon: The histogram-looking icon allows the user to change opacity levels of the layer.}
-\end{figure}
+\end{SCfigure}
 
 %% insert figure of the paintbrush
-\begin{figure}[h!]
+\begin{SCfigure}[20][h!]
+\vspace{4 pt}
   \includegraphics[width=0.05\textwidth]{Seg3DBasicFunctionality_figures/AppearanceOff.png}% picture filename
   \caption{Appearance Icon: The paintbrush-like icon allows the user to change the layer's appearance.}
-\end{figure}
+\end{SCfigure}
 
 %% insert figure of the lock
-\begin{figure}[h!]
+\begin{SCfigure}[20][h!]
   \includegraphics[width=0.05\textwidth]{Seg3DBasicFunctionality_figures/LockOff.png}% picture filename
   \caption{Lock Icon: The lock icon allows users to lock the layer to further editting.}
-\end{figure}
+\end{SCfigure}
 
 %% insert figure of 'ISO'
-\begin{figure}[h!]
+\begin{SCfigure}[20][h!]
+\vspace{6 pt}
   \includegraphics[width=0.05\textwidth]{Seg3DBasicFunctionality_figures/IsosurfaceMenuOff.png}% picture filename
   \caption{IsosurfaceMenu Icon: This icon displays active isosurfaces (if the mask has one).}
-\end{figure}
+\end{SCfigure}
 
 %% insert figure of ISO playbutton
-\begin{figure}[h!]
+\begin{SCfigure}[20][h!]
+\vspace{12 pt}
   \includegraphics[width=0.05\textwidth]{Seg3DBasicFunctionality_figures/IsosurfaceComputeOff.png}% picture filename
   \caption{IsosurfaceCompute Icon: This icon generates the isosurface for the mask.  It must be clicked before the IsosurfaceMenu or IsosurfaceDelete icons become active.}
-\end{figure}
+\end{SCfigure}
 
 %% insert figure of ISO x
-\begin{figure}[h!]
+\begin{SCfigure}[20][h!]
+\vspace{3 pt}
   \includegraphics[width=0.05\textwidth]{Seg3DBasicFunctionality_figures/IsosurfaceDeleteOff.png}% picture filename
   \caption{IsosurfaceDelete Icon: This icon deletes active isosurfaces (if the mask has one).}
-\end{figure}
+\end{SCfigure}
 
 These icons represent tools that are available for each individual layer.  
 Additionally, features of these masks can be toggled universally by clicking similar icons on the top of the pane, in the orange bar.  
