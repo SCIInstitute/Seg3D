@@ -75,7 +75,7 @@ Seg3D is distributed as a binary download for Linux, Windows, and OS X. Please v
 \begin{introduction}
 In addition to the viewer windows discussed in the above chapter, there are several other
  windows involved in streamlining the user interface of the Seg3D software.  
- Each of these windows can be accessed through the 'Window' dropdown menu.
+ Each of these windows can be accessed through the 'Window' drop-down menu.
  By default these windows appear in certain positions defined below, but each can be undocked
  from the Seg3D interface and either left as stand alone windows or repositioned elsewhere on
  the Seg3D application.
@@ -104,7 +104,7 @@ Below this is an 'Autosave' option. Seg3D autosaves sessions every 10 minutes by
 The default time between autosaves can be changed in the general Seg3D preferences.
 
 The second pane holds the 'Project Sessions' and 'Project Notes' panels.  
-The project session contains information on the saving of various sessions throughout the worktime in Seg3D - including autosaves.  
+The project session contains information on the saving of various sessions throughout the work-time in Seg3D - including autosaves.  
 These session saves can be selected and loaded at any time.  
 Loading a session save does not delete saves that came later.  
 To delete, the user must explicitly select the session and push the delete button at the bottom of the pane.  
@@ -183,7 +183,7 @@ A brief description of each icon follows:
 %% insert figure of the lock
 \begin{SCfigure}[20][h!]
   \includegraphics[width=0.05\textwidth]{Seg3DBasicFunctionality_figures/LockOff.png}% picture filename
-  \caption{Lock Icon: The lock icon allows users to lock the layer to further editting.}
+  \caption{Lock Icon: The lock icon allows users to lock the layer to further editing.}
 \end{SCfigure}
 
 %% insert figure of 'ISO'
@@ -299,7 +299,7 @@ These options are Simple, Faux Shading, and Ambient Occlusion.
 
 \begin{figure}[h!]
 \scalebox{0.3}{\includegraphics{Seg3DBasicFunctionality_figures/VolRendOpt.png}}
-\caption{Volume Rednering Options - A) Simple B) Faux Shading C) Ambient Occlusion}\label{fig:VolRendOpt}
+\caption{Volume Rendering Options - A) Simple B) Faux Shading C) Ambient Occlusion}\label{fig:VolRendOpt}
 \end{figure}
 
 \subsubsection{Simple}
@@ -370,7 +370,7 @@ For example, by selecting the Threshold option, the thresholding range will be d
 
 \section{Controller Window}
 The Controller Window is not opened by default when Seg3D is opened.  To open the window, click the 'Window' option in the task bar and select the Controller option.  The window may also be toggled by using the key command: Shift+cntrl/cmd+C.
-Notice the Controller Window option in the window drop-down menu is located below a seperator.  
+Notice the Controller Window option in the window drop-down menu is located below a separator.  
 This indicates that the window will open a new pop-up window outside of the general Seg3D user interface.
 
 The Controller window supplies the user with all of the data, variables, history, and logs of the current Seg3D session.
@@ -379,8 +379,8 @@ There are four tabs that can be selected in this window:
 \subsection{Actions Tab}
 The action tab displays all of the actions that have been taken during the Seg3D session.
 Console entries can also be made with this feature.
-A series of actions area provided in a dropdown menu at the bottom of the window.
-Once selected, the action will be placed into a command line to the right of the dropdown menu.
+A series of actions area provided in a drop-down menu at the bottom of the window.
+Once selected, the action will be placed into a command line to the right of the drop-down menu.
 The user can then define the parameters for the action, or simply press enter to see what parameters are required to make the action valid.
 If additional parameters are needed to run the action, they will be displayed in the box below the command line.
 
@@ -403,7 +403,7 @@ In these buffers a user can find the actions, in order, than can be either undon
 
 \section{Python Console}
 The Python Window is not opened by default when Seg3D is opened.  To open the window, click the 'Window' option in the task bar and select the Python option.  The window may also be toggled by using the key command: Shift+cntrl/cmd+Y.
-Notice the Python Window option in the window drop-down menu is located below a seperator.  
+Notice the Python Window option in the window drop-down menu is located below a separator.  
 This indicates that the window will open a new pop-up window outside of the general Seg3D user interface.
 
 The Python Window opens a python scripting console that can be used by advanced users to editing the Seg3D data via python coding.  
@@ -413,22 +413,144 @@ For more information on python coding, consult other resources.
 \chapter{Basic Program Functions}
 
 \begin{introduction}
+This section gives a brief overview of the options found under the File, Edit, and Help menus. These menus contain options
+that allow you to save and open new projects, and set preferences. 
 
 \end{introduction}
 
 \section{File}
 
 \subsection{New Project}
+The new project option will prompt you to save your current project such that it can be closed. A dialog box will then open
+asking for a Project name and a Project Path.  The Project name will be used to create a folder for all the project data.  The Project path defines the location of this folder.  The default location for this path can be set in the preferences section discussed below. A new project can also be created using the shortcut cntrl/cmd+N.
 
 \subsection{Open Project}
+The open project selection will prompt you to save you current project and open a new project based by selecting it from a file menu.  This function can be called using the shortcut cntrl/cmd+O.
 
-\subsection{etc.}
+\subsection{Show Project Folder}
+This option will open a file menu showing the projects contained in your default project location.  This function can be called using the shortcut shift+cntrl/cmd+O.  The default project location can be changed in Seg3D preferences.
+
+\subsection{Save Project}
+If the project as already been given a name and location, this will save the project.  If the project has not yet been named, it will prompt the user for a project name and location.  This function can be called using the shortcut cntrl/cmd+S.
+
+\subsection{Save Project As}
+This will create a copy of the current project under a new name and project location.  This function can be called using the shortcut shift+cntrl/cmd+S.
+
+\subsection{Launch Another Copy of Seg3D}
+This opens a new session of Seg3D.  It does not close the current session, but simply opens another copy.
+
+\subsection{Import Layer From Single File}
+Data and label maps can be stored in a variety of file formats.  Use this option when the data or label map is stored in one single file.  This function can be called using the shortcut shift+cntrl/cmd+O.
+
+\subsubsection{Import Widget}
+After the user selects the file/files to be read, a menu will appear asking the user to define the type of data being read as seen below.
+
+\begin{figure}[h!]
+\scalebox{0.3}{\includegraphics{Seg3DBasicFunctionality_figures/ImortWidget.png}}
+\caption{When importing data or label masks, the user is prompted to define the type of data being read.}\label{fig:ImportWidget}
+\end{figure}
+
+There are two types of files that can be read by Seg3D: Image data and label maps.  The first selection indicates that the file you wish to read in contains image data.  The next three selections all apply to label maps.  The second selection assumes that all non-zero values are part of a single label map.  The third selection will define each unique value in the file as part of a separate label map. However, the numerical value assigned to represent that label will be incrementally generated by Seg3D rather than assigned from the input file. The fourth selection is similar to the third in that it creates labels based on unique values in the input file.  However, in this case the value used to represent the label is the same as the value being read from the file.
+
+\subsection{Import Layer From Image Series}
+Data and label maps can be stored in a variety of file formats.  Use this option when the data or label map is stored in multiple files. See Import Layer From Single File for more information about the Import Widget. This function can be called using the shortcut shift+cntrl/cmd+I.
+
+\subsection{Export Segmentation}
+Label maps can be exported in a variety of file formats.  If a layer containing a label map is selected, then the user may select the Export Segmentation option which opens the following input window.
+
+\begin{figure}[h!]
+\scalebox{0.3}{\includegraphics{Seg3DBasicFunctionality_figures/ExportSeg.png}}
+\caption{This window appears when the user selects export segmentation.  It allows the user to select the layers they wish to export as label masks and the format they wish to export.}\label{fig:ExportSeg}
+\end{figure}
+
+This window allows the user to select the layers to export as label masks and the format they wish to export.  The available formats include: .nrrd, .mat (matlab), .tiff, .bmp, .png, .dcm. This function can be called using the shortcut cntrl/cmd+E.
+
+\subsection{Export Active Data Layer}
+
+If image data layer is selected, then the user may choose to Export Active Data Layer. This selection opens a file menu window where the user can select the location they wish to save the data file as well as specify the file format.  The available formats include: .nrrd, .dcm, .tiff, .png, .mrc, and .mat (matlab). This function can be called using the shortcut shift+cntrl/cmd+E.
+
+\subsection{Recent Projects}
+This menu shows recently opened projects..
 
 \section{Edit}
 
+\subsection{Undo}
+This function allows the user to undo a changes made to the unsaved project.  Changes made to the project are stored
+in a buffer, the size of which can be changed under Seg3D preferences. This function can be called using the shortcut cntrl/cmd+Z.
+
+
+\subsection{Redo}
+Redo an operation on a project that was previously undone. This function can be called using the shortcut shift+cntrl/cmd+Z.
+
+
+\subsection{Copy Mask Slice}
+Copy a single slice from a mask layer which can then be pasted onto other layers. This function can be called using the shortcut cntrl/cmd+C.
+
+
+\subsection{Paste Mask Slice}
+Paste a previously copied label from one slice of a mask label to all the slices of another mask label. This function can be called using the shortcut cntrl/cmd+V.
+
+
+\subsection{Punch Through Volume}
+After creating new label data on a single slice of a mask layer, that label can be copied or "punched" to every other slice by
+selecting this option. This function can be called using the shortcut cntrl/cmd+P.
+
+
 \section{Help}
+\subsection{Search}
+This feature allows you to search all the menus by typing in a search box.
+
+\subsection{Keyboard Shortcuts}
+This function opens a list of all the keyboard and mouse shortcuts available in Seg3D.
 
 \section{Preferences}
+The preference dialogue box can be opened by selection Seg3D-> preferences.  This dialog box
+contains four tabs which we will discuss here.
+
+\subsection{General}
+The in Seg3D preferences, the general tab allows you to change many details of the "autosave" options.  The user
+may turn on the autosave feature and set a frequency for which the project is save.  The "Don't interrupt me" option 
+can be turned on so that the auto save does not happen while another operation is being performed. Along with the
+frequency the amount of compression used to save each project can be controlled in this tab.  
+
+The "import/export" options allows you to turn on an off a feature that will export a dicom header with all dicoms that are
+exported.
+
+The "project" options allow you to change the default project location, change the buffer size, and change how the project
+is saved e.g. change if the input files are embedded into the project.
+
+\begin{figure}[h!]
+\scalebox{0.3}{\includegraphics{Seg3DBasicFunctionality_figures/Pref_gen.png}}
+\caption{}\label{fig:Pref_gen}
+\end{figure}
+
+
+\subsection{View}
+Under this tab the user is able to change many of the default view options such as the window layout (1 big window with 3 smaller windows), background color, and Grid size. In addition there are many options to customize what is seen in the visualization window.  At the bottom of this window the user can change the axis labels such that the X,Y, and Z directions
+are not fixed to represent Sagittal, Coronal, and Axial, but the user can define which axis label is assigned to each direction.
+
+\begin{figure}[h!]
+\scalebox{0.3}{\includegraphics{Seg3DBasicFunctionality_figures/Pref_view.png}}
+\caption{}\label{fig:Pref_view}
+\end{figure}
+
+\subsection{Layers}
+Under this tab the user can change the appearance of the label masks. These options include: layer opacity, available colors, mask fill option (striped or solid), and border thickness.
+
+\begin{figure}[h!]
+\scalebox{0.3}{\includegraphics{Seg3DBasicFunctionality_figures/Pref_layers.png}}
+\caption{}\label{fig:Pref_layers}
+\end{figure}
+
+
+\subsection{Sidebars/Tools + Filters}
+Under this tab the user can select which menus appear on start up and which tools/filters will appear in the 
+sidebars.  This intended for the user to customize their user interface to improve the ease of use.
+
+\begin{figure}[h!]
+\scalebox{0.3}{\includegraphics{Seg3DBasicFunctionality_figures/Pref_side.png}}
+\caption{}\label{fig:Pref_side}
+\end{figure}
 
 \chapter{Tools \& Filters}
 
