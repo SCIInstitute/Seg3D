@@ -123,4 +123,5 @@ ENDMACRO(ADD_PDF_DOCUMENT)
 # ADD DOCUMENTS
 
 ADD_PDF_DOCUMENT(Seg3DTutorial)
+ADD_PDF_DOCUMENT(Seg3DBasicFunctionality)
 # Forcing documentation to be build
