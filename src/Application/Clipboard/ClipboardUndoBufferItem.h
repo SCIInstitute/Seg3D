@@ -57,22 +57,22 @@ public:
   // -- apply undo/redo action --
 public:
 
-  // APPLY_AND_CLEAR_UNDO:
-  // Apply the undo information
+  /// APPLY_AND_CLEAR_UNDO:
+  /// Apply the undo information
   virtual bool apply_and_clear_undo();
 
-  // SET_PROVENANCE_STEP_ID:
-  // Set the provenance record ID associated with the action.
+  /// SET_PROVENANCE_STEP_ID:
+  /// Set the provenance record ID associated with the action.
   void set_provenance_step_id( ProvenanceStepID step_id );
 
   // -- size information --
 public:
-  // GET_BYTE_SIZE:
-  // The size of the item in memory ( approximately )
+  /// GET_BYTE_SIZE:
+  /// The size of the item in memory ( approximately )
   virtual size_t get_byte_size() const;
 
-  // COMPUTE_SIZE:
-  // Compute the size of the item
+  /// COMPUTE_SIZE:
+  /// Compute the size of the item
   virtual void compute_size();
 
   // -- internals --

@@ -58,15 +58,15 @@ public:
   
 // -- Functions that describe action --
 public:
-  // VALIDATE:
-  // Each action needs to be validated just before it is posted. This way we
-  // enforce that every action that hits the main post_action signal will be
-  // a valid action to execute.
+  /// VALIDATE:
+  /// Each action needs to be validated just before it is posted. This way we
+  /// enforce that every action that hits the main post_action signal will be
+  /// a valid action to execute.
   virtual bool validate( Core::ActionContextHandle& context );
 
-  // RUN:
-  // Each action needs to have this piece implemented. It spells out how the
-  // action is run. It returns whether the action was successful or not.
+  /// RUN:
+  /// Each action needs to have this piece implemented. It spells out how the
+  /// action is run. It returns whether the action was successful or not.
   virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
 
 private:
@@ -76,8 +76,8 @@ private:
   // -- Dispatch this action from the interface --
 public:
 
-  // DISPATCH
-  // Create and dispatch action that deletes the selected layers
+  /// DISPATCH
+  /// Create and dispatch action that deletes the selected layers
   static void Dispatch( Core::ActionContextHandle context, std::vector< std::string > layers ); 
 };
   

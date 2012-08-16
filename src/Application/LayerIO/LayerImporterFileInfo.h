@@ -53,9 +53,9 @@
 namespace Seg3D
 {
 
-// CLASS LayerImporterFileInfo
-// This class is returned from the LayerImporter class to summarize the information in the header of
-// the file needed to import the data and make decisions on how to import it.
+/// CLASS LayerImporterFileInfo
+/// This class is returned from the LayerImporter class to summarize the information in the header of
+/// the file needed to import the data and make decisions on how to import it.
 
 class LayerImporterFileInfo;
 typedef boost::shared_ptr< LayerImporterFileInfo > LayerImporterFileInfoHandle;
@@ -73,36 +73,36 @@ public:
 
   // -- accessors --
 public:
-  // GET_GRID_TRANSFORM
-  // Get the transform of the data
+  /// GET_GRID_TRANSFORM
+  /// Get the transform of the data
   const Core::GridTransform& get_grid_transform() const;
 
-  // SET_GRID_TRANSFORM
-  // Set the grid transform of the data
+  /// SET_GRID_TRANSFORM
+  /// Set the grid transform of the data
   void set_grid_transform( const Core::GridTransform& grid_transform );
 
-  // GET_DATA_TYPE
-  // Get the type of the data
+  /// GET_DATA_TYPE
+  /// Get the type of the data
   const Core::DataType& get_data_type() const;
   
-  // SET_DATA_TYPE
-  // Set the data type of the data
+  /// SET_DATA_TYPE
+  /// Set the data type of the data
   void set_data_type( const Core::DataType& data_type );
   
-  // GET_FILE_TYPE
-  // Get the file type that is being imported
+  /// GET_FILE_TYPE
+  /// Get the file type that is being imported
   const std::string& get_file_type();
   
-  // SET_FILE_TYPE
-  // Set the file type of the file being imported
+  /// SET_FILE_TYPE
+  /// Set the file type of the file being imported
   void set_file_type( const std::string& file_type ); 
     
-  // GET_MASK_COMPATIBLE
-  // Whether the data can be converted into a mask
+  /// GET_MASK_COMPATIBLE
+  /// Whether the data can be converted into a mask
   bool get_mask_compatible() const;
   
-  // SET_MASK_COMPATIBLE
-  // Set whether the data can be converted into a mask
+  /// SET_MASK_COMPATIBLE
+  /// Set whether the data can be converted into a mask
   void set_mask_compatible( bool mask_compatible );
           
   // -- internals --

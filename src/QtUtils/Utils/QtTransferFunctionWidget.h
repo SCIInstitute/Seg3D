@@ -64,17 +64,17 @@ public:
 
 protected:
 
-  // INITIALIZEGL:
-  // This function is called by Qt when the widget is initialized
+  /// INITIALIZEGL:
+  /// This function is called by Qt when the widget is initialized
   virtual void initializeGL();
   
-  // PAINTGL:
-  // This function is called whenever Qt has to repaint the contents of 
-  // the widget displaying the Qt scene
+  /// PAINTGL:
+  /// This function is called whenever Qt has to repaint the contents of 
+  /// the widget displaying the Qt scene
   virtual void paintGL();
   
-  // RESIZEGL:
-  // This function gets called whenever the Qt widget is resized
+  /// RESIZEGL:
+  /// This function gets called whenever the Qt widget is resized
   virtual void resizeGL( int width, int height );
 
   // -- internals of the QtTransferFunctionWidget --

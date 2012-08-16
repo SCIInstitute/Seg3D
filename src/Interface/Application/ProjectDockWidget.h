@@ -62,61 +62,61 @@ public:
   
 
 private:
-  // SET_AUTO_SAVE_LABEL:
-  // function that sets the autosave label's text
+  /// SET_AUTO_SAVE_LABEL:
+  /// function that sets the autosave label's text
   void set_auto_save_label( int duration );
 
-  // GET_DATE:
-  // function for getting the current date to check the session names against
+  /// GET_DATE:
+  /// function for getting the current date to check the session names against
   std::string get_date();
 
-  // SET_FILE_SIZE_LABEL:
-  // function that actually sets the label to reflect the file size change
+  /// SET_FILE_SIZE_LABEL:
+  /// function that actually sets the label to reflect the file size change
   void set_file_size_label( long long file_size );
   
 
-  // UPDATE_WIDGET:
-  // Update the widget
+  /// UPDATE_WIDGET:
+  /// Update the widget
   void update_widget();
   
 private Q_SLOTS:
 
-  // ENABLE_LOAD_DELETE_AND_EXPORT_BUTTONS:
-  // this function enables the load, export and delete buttons when the user clicks on a session
+  /// ENABLE_LOAD_DELETE_AND_EXPORT_BUTTONS:
+  /// this function enables the load, export and delete buttons when the user clicks on a session
   void enable_load_delete_and_export_buttons( int row, int column );
 
-  // SAVE_PROJECT:
-  // this function calls the Save Project Session action
+  /// SAVE_PROJECT:
+  /// this function calls the Save Project Session action
   void save_session();
   
-  // SAVE_NOTE:
-  // this function calls ProjectManagers save note function and then clears the editor window
+  /// SAVE_NOTE:
+  /// this function calls ProjectManagers save note function and then clears the editor window
   void save_note();
     
-  // LOAD_SESSION:
-  // This function calls the LoadSession action that loads the session
+  /// LOAD_SESSION:
+  /// This function calls the LoadSession action that loads the session
   void load_session();
   
-  // DELETE_SESSION:
-  // This function calls the DeleteSession action that deletes a session
+  /// DELETE_SESSION:
+  /// This function calls the DeleteSession action that deletes a session
   void delete_session();
   
-  // CALL_LOAD_SESSION:
-  // This is an internal function that allows loading session by double clicking on the session
-  // name.
+  /// CALL_LOAD_SESSION:
+  /// This is an internal function that allows loading session by double clicking on the session
+  /// name.
   void call_load_session( int row, int column );
   
-  // ENABLE_SAVE_NOTES_BUTTON:
-  // This is an internal function that enables the button for saving notes when at least 3
-  // characters have been entered.
+  /// ENABLE_SAVE_NOTES_BUTTON:
+  /// This is an internal function that enables the button for saving notes when at least 3
+  /// characters have been entered.
   void enable_save_notes_button();
 
-  // EXPORT_PROJECT:
-  // this function is an internal function that opens the export project wizard
+  /// EXPORT_PROJECT:
+  /// this function is an internal function that opens the export project wizard
   void export_project();
 
-  // DISABLE_LOAD_DELETE_AND_EXPORT_BUTTONS:
-  // this function disables the load, export and delete buttons for when a session is not selected
+  /// DISABLE_LOAD_DELETE_AND_EXPORT_BUTTONS:
+  /// this function disables the load, export and delete buttons for when a session is not selected
   void disable_load_delete_and_export_buttons();
   
   // -- internals --
@@ -127,21 +127,21 @@ private:
 public:
   typedef QPointer< ProjectDockWidget > qpointer_type;
 
-  // HANDLEAUTOSAVETIMECHANGED:
-  // This function handles signals that the autosave time has changed and routes them, on the 
-  // correct thread to the set_auto_save_label function so that it can update the label's text
+  /// HANDLEAUTOSAVETIMECHANGED:
+  /// This function handles signals that the autosave time has changed and routes them, on the 
+  /// correct thread to the set_auto_save_label function so that it can update the label's text
   static void HandleAutoSaveTimeChanged( qpointer_type qpointer, int duration );
 
-  // HANDLEFILESIZECHANGED:
-  // This function handles the signal that the file size has changed and sets the ui to reflect it
+  /// HANDLEFILESIZECHANGED:
+  /// This function handles the signal that the file size has changed and sets the ui to reflect it
   static void HandleFileSizeChanged( qpointer_type qpointer, long long file_size ); 
 
-  // HANDLEPROJECTCHANGED:
-  // This function is called when the signal that a new project has been loaded is triggered
+  /// HANDLEPROJECTCHANGED:
+  /// This function is called when the signal that a new project has been loaded is triggered
   static void HandleProjectChanged( qpointer_type qpointer );
   
-  // HANDLEUPDATEWIDGET:
-  // This function updates the widget
+  /// HANDLEUPDATEWIDGET:
+  /// This function updates the widget
   static void HandleUpdateWidget( qpointer_type qpointer );
   
 };

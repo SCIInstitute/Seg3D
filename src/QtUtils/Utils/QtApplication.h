@@ -71,37 +71,37 @@ private:
   // -- entry point --
 
 public:
-  // SETUP:
-  // Setup the interface context
+  /// SETUP:
+  /// Setup the interface context
   bool setup( int& argc, char **argv );
 
-  // EXEC:
-  // Start the interface execution
-  // This effectively will start the program.
+  /// EXEC:
+  /// Start the interface execution
+  /// This effectively will start the program.
   bool exec();
 
   // -- accessors --
 public:
-  // QT_APPLICATION:
-  // Get the pointer to the main QT Application
+  /// QT_APPLICATION:
+  /// Get the pointer to the main QT Application
   QApplication* qt_application();
 
-  // QT_RENDERRESOURCES_CONTEXT:
-  // Get the handle to the renderresources
+  /// QT_RENDERRESOURCES_CONTEXT:
+  /// Get the handle to the renderresources
   QtRenderResourcesContextHandle qt_renderresources_context();
 
   // -- Signals --
 public:
-  // ENTER_SIZE_MOVE_SIGNAL:
-  // Triggered when the user starts resizing the application window.
+  /// ENTER_SIZE_MOVE_SIGNAL:
+  /// Triggered when the user starts resizing the application window.
   boost::signals2::signal< void () > enter_size_move_signal_;
 
-  // EXIT_SIZE_MOVE_SIGNAL:
-  // Triggered when the user stops resizing the application window.
+  /// EXIT_SIZE_MOVE_SIGNAL:
+  /// Triggered when the user stops resizing the application window.
   boost::signals2::signal< void () > exit_size_move_signal_;
 
-  // OSX_FILE_OPEN_EVENT_SIGNAL:
-  // Triggered via Mac OS X file associations
+  /// OSX_FILE_OPEN_EVENT_SIGNAL:
+  /// Triggered via Mac OS X file associations
   boost::signals2::signal< void (std::string) > osx_file_open_event_signal_;
 
 private:

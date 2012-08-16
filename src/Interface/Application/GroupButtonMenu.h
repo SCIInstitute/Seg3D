@@ -68,21 +68,21 @@ public:
   LayerGroupHandle get_group() const;
   
 protected:
-  // RESIZEEVENT:
-  // this is an overloaded function to keep the size of the overlay widget in sync with the 
-  // size of the LayerGroupWidget
+  /// RESIZEEVENT:
+  /// this is an overloaded function to keep the size of the overlay widget in sync with the 
+  /// size of the LayerGroupWidget
   virtual void resizeEvent( QResizeEvent *event );
   
-  // DROPEVENT:
-  // Overloaded function that is triggered when a drop occurs on the group
+  /// DROPEVENT:
+  /// Overloaded function that is triggered when a drop occurs on the group
   virtual void dropEvent( QDropEvent* event );
 
-  // DRAGENTEREVENT:
-  // Overloaded function that is triggered when a drag even enters the group
+  /// DRAGENTEREVENT:
+  /// Overloaded function that is triggered when a drag even enters the group
   virtual void dragEnterEvent( QDragEnterEvent* event );
   
-  // DRAGLEAVEEVENT:
-  // Overloaded function that is triggered when a drag even leaves the group
+  /// DRAGLEAVEEVENT:
+  /// Overloaded function that is triggered when a drag even leaves the group
   virtual void dragLeaveEvent( QDragLeaveEvent* event );
   
 public:

@@ -39,28 +39,28 @@
 namespace Seg3D
 {
 
-// PROVENANCEID:
-// The full provenance database is organized by provenance IDs. These are ids are unique numbers
-// used in the provenance database to store provenance records.
+/// PROVENANCEID:
+/// The full provenance database is organized by provenance IDs. These are ids are unique numbers
+/// used in the provenance database to store provenance records.
 typedef long long ProvenanceID;
 typedef std::vector<ProvenanceID> ProvenanceIDList;
 
-// INPUTFILESID:
-// The inputfiles cache is organized by Input Files IDs. These are unique numbers that are used in
-// the provenance database as well as on disk to keep track of which input files are still needed
+/// INPUTFILESID:
+/// The inputfiles cache is organized by Input Files IDs. These are unique numbers that are used in
+/// the provenance database as well as on disk to keep track of which input files are still needed
 typedef long long InputFilesID;
 typedef std::vector<InputFilesID> InputFilesIDList;
 
-// GENERATEPROVENANCEID:
-// Generate a new provenance ID
+/// GENERATEPROVENANCEID:
+/// Generate a new provenance ID
 ProvenanceID GenerateProvenanceID();
 
-// GETPROVENANCECOUNT:
-// Retrieve the current value from the provenance counter
+/// GETPROVENANCECOUNT:
+/// Retrieve the current value from the provenance counter
 ProvenanceID GetProvenanceCount();
 
-// SETPROVENANCECOUNT:
-// Set the current value of the provenance counter
+/// SETPROVENANCECOUNT:
+/// Set the current value of the provenance counter
 void SetProvenanceCount( ProvenanceID count );
 
 } // end namespace Seg3D

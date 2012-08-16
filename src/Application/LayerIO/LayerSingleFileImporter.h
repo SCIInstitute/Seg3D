@@ -39,8 +39,8 @@
 namespace Seg3D
 {
 
-// CLASS LayerSingleFileImporter
-// Base class for importer for a single file
+/// CLASS LayerSingleFileImporter
+/// Base class for importer for a single file
 class LayerSingleFileImporter;
 class LayerSingleFileImporterPrivate;
 
@@ -51,40 +51,40 @@ class LayerSingleFileImporter : public LayerImporter
 {
   // -- Constructor/Destructor --
 public:
-  // Create an importer for a given file
+  /// Create an importer for a given file
   LayerSingleFileImporter();
   virtual ~LayerSingleFileImporter();
 
   // -- Filename accessor --
 public:
-  // GET_FILENAME
-  // Get the name of the file that needs to imported
+  /// GET_FILENAME
+  /// Get the name of the file that needs to imported
   virtual std::string get_filename() const;
 
-  // GET_FILENAMES
-  // Get the names of the files that need to imported
+  /// GET_FILENAMES
+  /// Get the names of the files that need to imported
   virtual std::vector<std::string> get_filenames() const;
   
-  // GET_FILE_TAG:
-  // Get the tag of the filename or directory we are scanning
+  /// GET_FILE_TAG:
+  /// Get the tag of the filename or directory we are scanning
   virtual std::string get_file_tag() const;   
   
 protected:
   friend class LayerIO;
-  // SET_FILENAME
-  // Set the name of the file that needs to be importerd
+  /// SET_FILENAME
+  /// Set the name of the file that needs to be importerd
   void set_filename( const std::string& filename );
 
 public:
-  // CHECK_FILES
-  // Check the file headers to see if we could import it.
+  /// CHECK_FILES
+  /// Check the file headers to see if we could import it.
   virtual bool check_files();
 
-  // GET_INPUTFILES_IMPORTER
-  // For provenance files need to be copied into the project cache. As some files need special
-  // attention: for example mhd and nhdr files actually list where there data is stored, this
-  // function can be overloaded with a specific function that copies the files. Otherwise a
-  // default implementation is given in the two derived classes.
+  /// GET_INPUTFILES_IMPORTER
+  /// For provenance files need to be copied into the project cache. As some files need special
+  /// attention: for example mhd and nhdr files actually list where there data is stored, this
+  /// function can be overloaded with a specific function that copies the files. Otherwise a
+  /// default implementation is given in the two derived classes.
   virtual InputFilesImporterHandle get_inputfiles_importer();
   
   // -- internals --
@@ -93,8 +93,8 @@ private:
 
   // -- importer typ --
 public:
-  // GETTYPE
-  // Get the type of the importere
+  /// GETTYPE
+  /// Get the type of the importere
   static LayerImporterType GetType();
 };
 

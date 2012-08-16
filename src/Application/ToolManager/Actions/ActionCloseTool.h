@@ -61,8 +61,8 @@ private:
 
   // -- Dispatch this action from the interface --
 public:
-  // DISPATCH
-  // Create and dispatch action that closes a tool
+  /// DISPATCH
+  /// Create and dispatch action that closes a tool
   static void Dispatch( Core::ActionContextHandle context, const std::string& toolid );
 };
 

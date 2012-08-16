@@ -59,16 +59,16 @@ namespace QtUtils
 class QtEventHandlerContext;
 class QtEventHandlerObject;
 
-// QTEVENTHANDLER:
+/// QTEVENTHANDLER:
 
-// As QT takes ownership of events, these classes wraps around our
-// functor call back classes and hide all the QT handling behind
-// a cleaner interface.
+/// As QT takes ownership of events, these classes wraps around our
+/// functor call back classes and hide all the QT handling behind
+/// a cleaner interface.
 
-// CLASS QtEventHandlerObject:
-// This is a helper class for QtEventHandlerContext. It installs an event filter and a timer
-// to the main Qt thread, which will trigger QtEventHandlerContext::process_events in
-// the Qt thread.
+/// CLASS QtEventHandlerObject:
+/// This is a helper class for QtEventHandlerContext. It installs an event filter and a timer
+/// to the main Qt thread, which will trigger QtEventHandlerContext::process_events in
+/// the Qt thread.
 
 class QtEventHandlerObject : public QObject
 {
@@ -90,10 +90,10 @@ private:
   int timer_id_;
 };
 
-// CLASS QtInterfaceContext:
-// This class wraps the functionality that the Application class needs in an
-// object, so there is a clean interface between Interface and Application
-// layer.
+/// CLASS QtInterfaceContext:
+/// This class wraps the functionality that the Application class needs in an
+/// object, so there is a clean interface between Interface and Application
+/// layer.
 
 class QtEventHandlerContext : public Core::EventHandlerContext
 {
@@ -104,65 +104,65 @@ public:
   QtEventHandlerContext( QApplication* qt_application );
   virtual ~QtEventHandlerContext();
 
-  // POST_EVENT:
-  // Post an event onto the event handler stack. This one
-  // returns immediately after posting the event, and does
-  // not wait for the process to finish the event.
+  /// POST_EVENT:
+  /// Post an event onto the event handler stack. This one
+  /// returns immediately after posting the event, and does
+  /// not wait for the process to finish the event.
   virtual void post_event( Core::EventHandle& event );
 
-  // POST_AND_WAIT_EVENT:
-  // Post an event onto the event handler stack. This one
-  // returns after the thread signals that the event has been
-  // executed. The function does the full hand shaking for
-  // the synchronization.
+  /// POST_AND_WAIT_EVENT:
+  /// Post an event onto the event handler stack. This one
+  /// returns after the thread signals that the event has been
+  /// executed. The function does the full hand shaking for
+  /// the synchronization.
   virtual void post_and_wait_event( Core::EventHandle& event );
 
-  // PROCESS_EVENT:
-  // process the events that are queued in the event handler stack.
+  /// PROCESS_EVENT:
+  /// process the events that are queued in the event handler stack.
   virtual bool process_events();
 
-  // WAIT_AND_PROCESS_EVENTS:
-  // process the events that are queued in the event handler mailbox.
+  /// WAIT_AND_PROCESS_EVENTS:
+  /// process the events that are queued in the event handler mailbox.
   virtual bool wait_and_process_events();
 
-  // IS_EVENTHANDLER_THREAD:
-  // Check whether we are running on the thread that handles the events
-  // This function is needed to avoid to post and execute things in an
-  // infinite loop.
+  /// IS_EVENTHANDLER_THREAD:
+  /// Check whether we are running on the thread that handles the events
+  /// This function is needed to avoid to post and execute things in an
+  /// infinite loop.
   virtual bool is_eventhandler_thread() const;
 
-  // START_EVENTHANDLER:
-  // Start the eventhandler thread and start processing events
+  /// START_EVENTHANDLER:
+  /// Start the eventhandler thread and start processing events
   virtual bool start_eventhandler( Core::EventHandler* eventhandler );
   
-  // EVENTHANDLER_STARTED:
-  // Check whether the eventhandler is running
+  /// EVENTHANDLER_STARTED:
+  /// Check whether the eventhandler is running
   virtual bool eventhandler_started();
 
-  // TERMINATE_EVENTHANDLER:
-  // Terminate the eventhandler
+  /// TERMINATE_EVENTHANDLER:
+  /// Terminate the eventhandler
   virtual void terminate_eventhandler();
 
-  // EMPTY_EVENT_QUEUE:
-  // Purge all the events in the queue.
+  /// EMPTY_EVENT_QUEUE:
+  /// Purge all the events in the queue.
   void empty_event_queue();
 
 private:
-  // Keep track of when the event filter is installed
+  /// Keep track of when the event filter is installed
   bool eventhandler_started_;
 
   bool eventhandler_stopped_;
 
-  // A pointer to the main Qt application class
+  /// A pointer to the main Qt application class
   QApplication* qapplication_;
 
-  // Thread id from the thread that is running Qt
+  /// Thread id from the thread that is running Qt
   boost::thread::id interface_thread_id_;
 
-  // Event queue
+  /// Event queue
   std::queue< Core::EventHandle > events_;
 
-  // Mutex for protecting the event queue
+  /// Mutex for protecting the event queue
   typedef boost::recursive_mutex mutex_type;
   typedef boost::unique_lock< mutex_type > lock_type;
   mutex_type mutex_;

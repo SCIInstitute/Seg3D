@@ -67,41 +67,41 @@ public:
     
 private Q_SLOTS:
 
-  // SLOTS: These functions connect to the buttons for importing the data as a specific
-  // layer type.
+  /// SLOTS: These functions connect to the buttons for importing the data as a specific
+  /// layer type.
   void set_type( int file_type );
 
-  // SLOT IMPORT: execute this function when the import button is selected
+  /// SLOT IMPORT: execute this function when the import button is selected
   void import();
   
 private:
-  // UPDATE_ICONS:
-  // Update the icons to reflect active mode
+  /// UPDATE_ICONS:
+  /// Update the icons to reflect active mode
   void setup_ui();
   
-  // LIST_IMPORT_OPTIONS:
-  // Prompt for the import options that are available
+  /// LIST_IMPORT_OPTIONS:
+  /// Prompt for the import options that are available
   void list_import_options();
 
-  // SCAN_FIRST_FILE:
-  // Scan the first file
+  /// SCAN_FIRST_FILE:
+  /// Scan the first file
   void scan_first_file();
 
 private:
-  // The private information for rendering the widget
+  /// The private information for rendering the widget
   LayerImporterWidgetPrivateHandle private_;
   
 private:  
-  // SCANFIRSTFILE:
-  // Function that needs to be run asynchronously to scan the file contents
+  /// SCANFIRSTFILE:
+  /// Function that needs to be run asynchronously to scan the file contents
   static void ScanFirstFile( qpointer_type qpointer ); 
 
-  // LIST_IMPORT_OPTIONS:
-  // List the import options in the dialog
+  /// LIST_IMPORT_OPTIONS:
+  /// List the import options in the dialog
   static void ListImportOptions ( qpointer_type qpointer, LayerImporterHandle importer );
   
-  // REPORT_IMPORT_ERROR:
-  // Close the dialog and show an error dialog
+  /// REPORT_IMPORT_ERROR:
+  /// Close the dialog and show an error dialog
   static void ReportImportError( qpointer_type qpointer, LayerImporterHandle importer );
   
 };

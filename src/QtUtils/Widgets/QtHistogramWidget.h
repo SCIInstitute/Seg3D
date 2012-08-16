@@ -66,8 +66,8 @@ public:
     virtual ~QtHistogramWidget();
     
 public Q_SLOTS:
-  // SET_HISTOGRAM:
-  // Set the histogram of the graph
+  /// SET_HISTOGRAM:
+  /// Set the histogram of the graph
   void set_histogram( const Core::Histogram& histogram );
   
   void set_min( double );
@@ -79,8 +79,8 @@ public Q_SLOTS:
   void hide_threshold_bars();
   void show_threshold_bars();
 
-  // RESET_HISTOGRAM:
-  // Invalidate the current histogram
+  /// RESET_HISTOGRAM:
+  /// Invalidate the current histogram
   void reset_histogram();
   
 public:

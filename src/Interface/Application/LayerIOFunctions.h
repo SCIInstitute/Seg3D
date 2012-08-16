@@ -41,20 +41,20 @@ namespace Seg3D
 class LayerIOFunctions
 {
 public:
-  // IMPORTSINGLEFILE:
-  // Import a layer into the LayerManager from a single file, returns its success/failure
+  /// IMPORTSINGLEFILE:
+  /// Import a layer into the LayerManager from a single file, returns its success/failure
   static bool ImportFiles( QMainWindow* main_window, std::string file_to_open );
 
-  // IMPORTSERIES:
-  // Import a data volume from a series of files using the ITK importer.
+  /// IMPORTSERIES:
+  /// Import a data volume from a series of files using the ITK importer.
   static void ImportSeries( QMainWindow* main_window );
   
-  // EXPORTLAYER:
-  // Export the current layer to file
+  /// EXPORTLAYER:
+  /// Export the current layer to file
   static void ExportLayer( QMainWindow* main_window );
   
-  // EXPORTSEGMENTATION:
-  // Export selected mask layers to file
+  /// EXPORTSEGMENTATION:
+  /// Export selected mask layers to file
   static void ExportSegmentation( QMainWindow* main_window );
 };
 

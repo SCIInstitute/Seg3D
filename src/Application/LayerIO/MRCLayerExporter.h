@@ -49,10 +49,10 @@ namespace Seg3D
     
     // -- Constructor/Destructor --
   public:
-    // Construct a new layer file importer
+    /// Construct a new layer file importer
     MRCLayerExporter( std::vector< LayerHandle >& layers );
     
-    // Virtual destructor for memory management of derived classes
+    /// Virtual destructor for memory management of derived classes
     virtual ~MRCLayerExporter()
     {
     }
@@ -60,8 +60,8 @@ namespace Seg3D
     // --Import the data as a specific type --  
   public: 
     
-    // EXPORT_LAYER
-    // Export the layer to file
+    /// EXPORT_LAYER
+    /// Export the layer to file
     virtual bool export_layer( const std::string& mode, const std::string& file_path, 
                                const std::string& name );
     

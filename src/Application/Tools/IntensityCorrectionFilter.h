@@ -53,21 +53,21 @@ public:
 
   // -- state --
 public:
-  // Whether the layer needs to be replaced
+  /// Whether the layer needs to be replaced
   Core::StateBoolHandle replace_state_;
 
-  // Whether the data format needs to be preserved in the filter
+  /// Whether the data format needs to be preserved in the filter
   Core::StateBoolHandle preserve_data_format_state_;
   
-  // The polynomial order to fit
+  /// The polynomial order to fit
   Core::StateRangedIntHandle order_state_;
 
-  // The sensitivity to edges
+  /// The sensitivity to edges
   Core::StateRangedDoubleHandle edge_state_;
 
   // -- execute --
 public:
-  // Execute the tool and dispatch the action
+  /// Execute the tool and dispatch the action
   virtual void execute( Core::ActionContextHandle context );
 };
 

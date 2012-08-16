@@ -54,8 +54,8 @@
 namespace Seg3D
 {
 
-// CLASS TOOLMANAGER:
-// This class manages the tools in the toolbox of the application
+/// CLASS TOOLMANAGER:
+/// This class manages the tools in the toolbox of the application
 
 // Forward declaration
 class ToolManager;
@@ -74,9 +74,9 @@ private:
   virtual ~ToolManager();
 
 private:
-  // GET_TOOL:
-  // This is an internal private function for retrieving the handle to a tool by passing its id
-  //ToolHandle get_tool( const std::string& toolid );
+  /// GET_TOOL:
+  /// This is an internal private function for retrieving the handle to a tool by passing its id
+  ///ToolHandle get_tool( const std::string& toolid );
 
   // -- Handler functions --
 protected:
@@ -85,57 +85,57 @@ protected:
   friend class ActionActivateTool;
   friend class ToolManagerPrivate;
 
-  // OPEN_TOOL (accessed through Action):
-  // Open a new tool into the current collection of active tools
+  /// OPEN_TOOL (accessed through Action):
+  /// Open a new tool into the current collection of active tools
   bool open_tool( const std::string& toolid, std::string& new_toolid );
 
-  // CLOSE_TOOL (accessed through Action):
-  // Close tool in current collection of active tools
+  /// CLOSE_TOOL (accessed through Action):
+  /// Close tool in current collection of active tools
   void close_tool( const std::string& toolid );
 
-  // ACTIVATE_TOOL (accessed through Action):
-  // Set which tool is currently highlighted
-  // The active tool has access to the viewer
+  /// ACTIVATE_TOOL (accessed through Action):
+  /// Set which tool is currently highlighted
+  /// The active tool has access to the viewer
   void activate_tool( const std::string& toolid );
 
   // -- Signals for the User Interface --
 public:
   typedef boost::signals2::signal< void( ToolHandle ) > tool_signal_type;
 
-  // OPEN_TOOL_SIGNAL:
-  // This signal is triggered after a tool has been opened
+  /// OPEN_TOOL_SIGNAL:
+  /// This signal is triggered after a tool has been opened
   tool_signal_type open_tool_signal_;
 
-  // CLOSE_TOOL_SIGNAL:
-  // This signal is triggered after a tool is closed
+  /// CLOSE_TOOL_SIGNAL:
+  /// This signal is triggered after a tool is closed
   tool_signal_type close_tool_signal_;
 
-  // ACTIVATE_TOOL_SIGNAL:
-  // This signal is triggered after a tool is activated
+  /// ACTIVATE_TOOL_SIGNAL:
+  /// This signal is triggered after a tool is activated
   tool_signal_type activate_tool_signal_;
   
   // -- Access to toollist --
 public:
   typedef std::map< std::string, ToolHandle > tool_list_type;
 
-  // TOOL_LIST:
-  // Get the current open tool list
+  /// TOOL_LIST:
+  /// Get the current open tool list
   tool_list_type tool_list();
 
-  // ACTIVE_TOOLID:
-  // Get the active toolid
+  /// ACTIVE_TOOLID:
+  /// Get the active toolid
   std::string active_toolid();
 
-  // GET_ACTIVE_TOOL:
-  // function that returns a handle to the active tool
+  /// GET_ACTIVE_TOOL:
+  /// function that returns a handle to the active tool
   ToolHandle get_active_tool();
 
-  // GET_TOOL_NAMES:
-  // function that populates a passed vector of pairs with the tool names
+  /// GET_TOOL_NAMES:
+  /// function that populates a passed vector of pairs with the tool names
   void get_tool_names( std::vector< ToolIDNamePair >& tool_names );
 
-  // OPEN_DEFAULT_TOOLS:
-  // Open the startup tools chosen by the user.
+  /// OPEN_DEFAULT_TOOLS:
+  /// Open the startup tools chosen by the user.
   void open_default_tools();
 
 protected:

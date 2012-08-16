@@ -63,14 +63,14 @@ private:
   // This parameter contains the ID of the session to be loaded
   long long session_id_;
 
-  // Internally cached session name. 
-  // NOTE: It's for displaying purpose only. NOT a action parameter.
+  /// Internally cached session name. 
+  /// NOTE: It's for displaying purpose only. NOT a action parameter.
   std::string session_name_;
   
   // -- Dispatch this action from the interface --
 public:
-  // DISPATCH:
-  // Dispatch an action loads a session
+  /// DISPATCH:
+  /// Dispatch an action loads a session
   static void Dispatch( Core::ActionContextHandle context, long long session_id );
 };
 

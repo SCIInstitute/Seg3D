@@ -51,9 +51,9 @@ public:
   
 private:
   
-  // HIDEEVENT:
-  // This function is called by Qt to deliver an event that tells that the
-  // widget is being hidden. 
+  /// HIDEEVENT:
+  /// This function is called by Qt to deliver an event that tells that the
+  /// widget is being hidden. 
   virtual void closeEvent( QCloseEvent* event );
 
   // SHOWEVENT:

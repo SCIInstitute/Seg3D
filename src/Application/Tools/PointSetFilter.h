@@ -60,16 +60,16 @@ public:
 
   // -- state --
 public:
-  // Whether the layer needs to be replaced
-  //Core::StateBoolHandle replace_state_;
+  /// Whether the layer needs to be replaced
+  ///Core::StateBoolHandle replace_state_;
 
-  // Layerid of the mask layer
+  /// Layerid of the mask layer
   Core::StateLabeledOptionHandle mask_state_;
 
-  // Number of iterations the filter needs to run
+  /// Number of iterations the filter needs to run
   Core::StateRangedIntHandle iterations_state_;
 
-  // Selected layers within the target group
+  /// Selected layers within the target group
   Core::StateLabeledMultiOptionHandle target_layers_state_;
 
   Core::StateBoolHandle registration_ready_state_;
@@ -81,7 +81,7 @@ public:
 
   // -- execute --
 public:
-  // Execute the tool and dispatch the action
+  /// Execute the tool and dispatch the action
   void registration( Core::ActionContextHandle context );
   void apply( Core::ActionContextHandle context );
   void handle_mask_layer_changed( std::string layer_id );

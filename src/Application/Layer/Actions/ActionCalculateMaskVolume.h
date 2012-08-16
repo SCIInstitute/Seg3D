@@ -61,13 +61,13 @@ public:
   virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
 
 private:
-  // This parameter contains the id of the layer group
+  /// This parameter contains the id of the layer group
   std::string mask_name_;
 
   // -- Dispatch this action from the interface --
 public:
-  // DISPATCH
-  // Create and dispatch action that deletes the selected layers
+  /// DISPATCH
+  /// Create and dispatch action that deletes the selected layers
   static void Dispatch( Core::ActionContextHandle context, const std::string& mask_name );  
 };
   

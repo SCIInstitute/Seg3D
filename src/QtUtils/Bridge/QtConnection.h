@@ -47,8 +47,8 @@ class QtConnection;
 class QtConnectorBase;
 typedef boost::shared_ptr<QtConnection> QtConnectionHandle;
 
-// CLASS QTBRIDGE:
-// This class provides bridges between widgets and state variables
+/// CLASS QTBRIDGE:
+/// This class provides bridges between widgets and state variables
 
 class QtConnection : public Core::ConnectionHandlerConnection
 {
@@ -58,8 +58,8 @@ public:
   virtual ~QtConnection();
 
 public:
-  // DISCONNECT
-  // Disconnect the connection that was made using the QtBridge
+  /// DISCONNECT
+  /// Disconnect the connection that was made using the QtBridge
   virtual void disconnect();
   
 private:

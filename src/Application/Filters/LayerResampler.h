@@ -51,8 +51,8 @@ public:
 
 public:
 
-  // EXECUTE:
-  // Execute the tool and dispatch the action
+  /// EXECUTE:
+  /// Execute the tool and dispatch the action
   void execute( Core::ActionContextHandle context );
 
   // -- state --

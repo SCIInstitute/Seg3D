@@ -60,8 +60,8 @@ public:
   
   // -- Dispatch this action from the interface --
 public:
-  // DISPATCH:
-  // Dispatch an action that resets whether changes have been made to a project
+  /// DISPATCH:
+  /// Dispatch an action that resets whether changes have been made to a project
   static void Dispatch( Core::ActionContextHandle context);
 };
 

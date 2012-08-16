@@ -53,29 +53,29 @@ private:
   ~Clipboard();
 
 public:
-  // GET_ITEM:
-  // Get the current item stored at slot index.
+  /// GET_ITEM:
+  /// Get the current item stored at slot index.
   ClipboardItemConstHandle get_item( long long sandbox = -1 );
 
-  // GET_ITEM:
-  // Create a new item with the specified width, height, and data type at the slot
-  // index, and return a handle to it.
+  /// GET_ITEM:
+  /// Create a new item with the specified width, height, and data type at the slot
+  /// index, and return a handle to it.
   ClipboardItemHandle get_item( size_t width, size_t height, 
     Core::DataType data_type, long long sandbox = -1 );
 
-  // CREATE_SANDBOX:
-  // Create a sandbox with specified ID.
+  /// CREATE_SANDBOX:
+  /// Create a sandbox with specified ID.
   void create_sandbox( long long sandbox_id );
 
-  // DELETE_SANDBOX:
-  // Delete a sandbox.
+  /// DELETE_SANDBOX:
+  /// Delete a sandbox.
   bool delete_sandbox( long long sandbox_id );
 
 private:
   friend class ClipboardUndoBufferItem;
 
-  // SET_ITEM:
-  // Set the item stored at the specified slot.
+  /// SET_ITEM:
+  /// Set the item stored at the specified slot.
   void set_item( ClipboardItemHandle item );
 
 private:

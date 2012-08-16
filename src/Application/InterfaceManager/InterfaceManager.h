@@ -53,8 +53,8 @@
 namespace Seg3D
 {
 
-// CLASS INTERFACEMANAGER
-// This class manages the layout of the application
+/// CLASS INTERFACEMANAGER
+/// This class manages the layout of the application
 
 // Forward Declaration
 class InterfaceManager;
@@ -74,10 +74,10 @@ public:
 
   // -- state variables of interface --
 public:
-  // Whether the view is in full screen mode
+  /// Whether the view is in full screen mode
   Core::StateBoolHandle full_screen_state_;
   
-  // Dock widget visibility states
+  /// Dock widget visibility states
   Core::StateBoolHandle project_dockwidget_visibility_state_;
   Core::StateBoolHandle toolmanager_dockwidget_visibility_state_;
   Core::StateBoolHandle layermanager_dockwidget_visibility_state_;
@@ -85,7 +85,7 @@ public:
   Core::StateBoolHandle provenance_dockwidget_visibility_state_;
   Core::StateBoolHandle history_dockwidget_visibility_state_;
   
-  // Other widget visibility state
+  /// Other widget visibility state
   Core::StateBoolHandle preferences_manager_visibility_state_;
   Core::StateBoolHandle controller_visibility_state_;
   Core::StateBoolHandle message_window_visibility_state_;
@@ -93,15 +93,15 @@ public:
   Core::StateBoolHandle keyboard_shortcut_visibility_state_;
   Core::StateBoolHandle python_console_visibility_state_;
   
-  //Options of what to show
+  ///Options of what to show
   Core::StateBoolHandle enable_project_creation_state_;
   Core::StateBoolHandle enable_file_import_state_;
   Core::StateBoolHandle enable_controller_state_;
   Core::StateBoolHandle enable_tool_help_state_;
   
 private:
-  // INITIALIZE_STATES:
-  // This function is called by the constructor to initialize the state variables
+  /// INITIALIZE_STATES:
+  /// This function is called by the constructor to initialize the state variables
   void initialize_states();
 
 };

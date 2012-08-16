@@ -58,43 +58,43 @@ public:
   SplashScreen( QWidget* parent = 0 );
   virtual ~SplashScreen();
 
-  // GET_USER_INTERACTED:
-  // this function returns whether or not the user has interacted with the splash screen
+  /// GET_USER_INTERACTED:
+  /// this function returns whether or not the user has interacted with the splash screen
   bool get_user_interacted(); 
   
 private:
   
-  // POPULATE_RECENT_PROJECTS:
-  // this function is called in the constructor to populate the list of recent projects from the
-  // project manager
+  /// POPULATE_RECENT_PROJECTS:
+  /// this function is called in the constructor to populate the list of recent projects from the
+  /// project manager
   void populate_recent_projects();
 
 private Q_SLOTS:
   
-  // NEW_PROJECT:
-  // this function is called when a user clicks the button to create a new project.  It starts the
-  // new project wizard and closes the splash screen
+  /// NEW_PROJECT:
+  /// this function is called when a user clicks the button to create a new project.  It starts the
+  /// new project wizard and closes the splash screen
   void new_project();
   
-  // OPEN_EXISTING:
-  // this function is called when a user clicks the button to open an existing project.  It starts
-  // a file browse dialog.
+  /// OPEN_EXISTING:
+  /// this function is called when a user clicks the button to open an existing project.  It starts
+  /// a file browse dialog.
   void open_existing();
   
-  // OPEN_RECENT:
-  // this function is called when a user double-clicks on an item in the list. 
+  /// OPEN_RECENT:
+  /// this function is called when a user double-clicks on an item in the list. 
   void open_recent();
 
-  // quit:
-  // this function close the application
+  /// quit:
+  /// this function close the application
   void quit();
 
-  // QUICK_OPEN_FILE:
-  // this function is called when someone clicks the quick open file button 
+  /// QUICK_OPEN_FILE:
+  /// this function is called when someone clicks the quick open file button  
   void quick_open_file();
   
-  // ENABLE_LOAD_RECENT_BUTTON:
-  // this function enables the load recent button if you select a recent project from the list
+  /// ENABLE_LOAD_RECENT_BUTTON:
+  /// this function enables the load recent button if you select a recent project from the list
   void enable_load_recent_button( QListWidgetItem* item );
 
 private:

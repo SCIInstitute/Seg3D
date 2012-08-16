@@ -61,8 +61,8 @@ private:
   
   // -- Dispatch this action from the interface --
 public:
-  // DISPATCH:
-  // Dispatch an action loads a session
+  /// DISPATCH:
+  /// Dispatch an action loads a session
   static void Dispatch( Core::ActionContextHandle context, long long session_id );
 };
 

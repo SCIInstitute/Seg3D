@@ -70,12 +70,12 @@ public:
 
 public Q_SLOTS:
 
-  // SELECT:
-  // This slot is triggered when the widget is selected.
+  /// SELECT:
+  /// This slot is triggered when the widget is selected.
   void select();
   
-  // DESELECT:
-  // This slot is triggered if another viewer is activated and this one needs to be deselected.
+  /// DESELECT:
+  /// This slot is triggered if another viewer is activated and this one needs to be deselected.
   void deselect();
     
 public:
@@ -83,23 +83,23 @@ public:
 
 protected:
 
-  // RESIZEEVENT:
-  // Overloaded Qt function
+  /// RESIZEEVENT:
+  /// Overloaded Qt function
   virtual void resizeEvent( QResizeEvent * event );
   
 private:
-  // ADD_ICONS_TO_COMBOBOX:
-  // This function adds the proper Icons to the viewer states combobox
+  /// ADD_ICONS_TO_COMBOBOX:
+  /// This function adds the proper Icons to the viewer states combobox
   void add_icons_to_combobox();
   
-  // GET_MINIMUM_SIZE;
-  // function returns the minimum size of that viewer widget needs before it needs to split
+  /// GET_MINIMUM_SIZE;
+  /// function returns the minimum size of that viewer widget needs before it needs to split
   int get_minimum_size();
   
 private:
   friend class ViewerWidgetPrivate;
-  // Internals of the viewer widget, so most dependencies do not need to
-  // be included here.
+  /// Internals of the viewer widget, so most dependencies do not need to
+  /// be included here.
   ViewerWidgetPrivateHandle private_;
 };
 

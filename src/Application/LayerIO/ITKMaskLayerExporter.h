@@ -58,10 +58,10 @@ class ITKMaskLayerExporter : public LayerExporter
 
   // -- Constructor/Destructor --
 public:
-  // Construct a new layer file exporter
+  /// Construct a new layer file exporter
   ITKMaskLayerExporter( std::vector< LayerHandle >& layers );
 
-  // Virtual destructor for memory management of derived classes
+  /// Virtual destructor for memory management of derived classes
   virtual ~ITKMaskLayerExporter()
   {
   }
@@ -78,8 +78,8 @@ public:
   // --Import the data as a specific type --  
 public: 
 
-  // EXPORT_LAYER
-  // Export the layer to file
+  /// EXPORT_LAYER
+  /// Export the layer to file
   virtual bool export_layer( const std::string& mode, const std::string& file_path, 
     const std::string& name );
 

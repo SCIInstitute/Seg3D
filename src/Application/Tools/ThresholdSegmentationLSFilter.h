@@ -53,16 +53,16 @@ public:
 
   // -- state --
 public:
-  // Mask that is used as seed points for this filter
+  /// Mask that is used as seed points for this filter
   Core::StateLabeledOptionHandle seed_mask_state_;
 
-  // Number of iterations
+  /// Number of iterations
   Core::StateRangedIntHandle iterations_state_;
 
-  // Upper threshold for the data that needs segmentation
+  /// Upper threshold for the data that needs segmentation
   Core::StateRangedDoubleHandle threshold_range_state_;
   
-  // Curvature weight
+  /// Curvature weight
   Core::StateRangedDoubleHandle curvature_state_;
 
   Core::StateRangedDoubleHandle propagation_state_;
@@ -71,7 +71,7 @@ public:
 
   // -- execute --
 public:
-  // Execute the tool and dispatch the action
+  /// Execute the tool and dispatch the action
   virtual void execute( Core::ActionContextHandle context );
 
 };

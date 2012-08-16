@@ -65,8 +65,8 @@ private:
   SandboxID sandbox_;
 
 public:
-  // DISPATCH:
-  // Create and dispatch an ActionDeleteSandbox.
+  /// DISPATCH:
+  /// Create and dispatch an ActionDeleteSandbox.
   static void Dispatch( Core::ActionContextHandle context, SandboxID sandbox ); 
 };
   

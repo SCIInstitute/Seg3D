@@ -35,6 +35,7 @@
 #include <QtGui/QLineEdit>
 #include <QtGui/QPushButton>
 #include <QtGui/QCheckBox>
+#include <QtGui/QFileDialog>
 
 namespace Seg3D
 {
@@ -59,7 +60,6 @@ private Q_SLOTS:
     
 private:
   std::string path_to_delete_;
-  
 };
 
 class ProjectInfoPage : public QWizardPage
@@ -75,9 +75,9 @@ public:
 protected:
     void initializePage();
     
-  // VALIDATEPAGE:
-  // function that is called right after the next button is clicked and used to process
-  // the entered data so it can be passed to the next page
+  /// VALIDATEPAGE:
+  /// function that is called right after the next button is clicked and used to process
+  /// the entered data so it can be passed to the next page
   virtual bool validatePage();
 
 private:
@@ -87,6 +87,7 @@ private:
     QLineEdit *project_path_lineedit_;
     QPushButton *project_path_change_button_;
     QLabel *warning_message_;
+    QDir *most_recent_path_;
 
 private Q_SLOTS:
     void set_path();

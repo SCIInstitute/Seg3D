@@ -85,9 +85,9 @@ private:
     
   // -- Dispatch this action from the interface --
 public:
-  // DISPATCH
-  // Create and dispatch action that inserts the new layer 
-  // Set the callback to get notified when the filter is done.
+  /// DISPATCH
+  /// Create and dispatch action that inserts the new layer 
+  /// Set the callback to get notified when the filter is done.
   static void Dispatch( Core::ActionContextHandle context, std::string target_layer,
     bool is_smoothing, bool is_rescale, callback_type callback = 0 );
 };

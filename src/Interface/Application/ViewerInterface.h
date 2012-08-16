@@ -68,9 +68,9 @@ public:
   // -- Setting widget state --
   void set_layout( const std::string& layout );
   
-  // SET_PIC_MODE:
-  // this function replaces the children of each ViewerWidget with a pixmap version when true is 
-  // passed, otherwise, it changes them back
+  /// SET_PIC_MODE:
+  /// this function replaces the children of each ViewerWidget with a pixmap version when true is 
+  /// passed, otherwise, it changes them back
   void set_pic_mode( bool pic_mode );
 
 public Q_SLOTS:
@@ -79,10 +79,10 @@ public Q_SLOTS:
   // -- Slots --    
 public:
   
-  // SetViewerLayout: (Thread safe slot)
+  /// SetViewerLayout: (Thread safe slot)
   static void SetViewerLayout( qpointer_type qpointer, std::string layout );
 
-  // SetActiveViewer: (Thread safe slot)
+  /// SetActiveViewer: (Thread safe slot)
   static void SetActiveViewer( qpointer_type qpointer, int active_viewer );
 };
 

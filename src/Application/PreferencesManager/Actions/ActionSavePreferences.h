@@ -58,8 +58,8 @@ public:
   
   // -- Dispatch this action from the interface --
 public:
-  // DISPATCH:
-  // Dispatch an action that saves the preferences
+  /// DISPATCH:
+  /// Dispatch an action that saves the preferences
   static void Dispatch( Core::ActionContextHandle context );
 
 };

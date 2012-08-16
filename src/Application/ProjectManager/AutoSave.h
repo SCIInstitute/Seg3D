@@ -50,33 +50,33 @@ public:
   virtual ~AutoSave();
 
 public:
-  // START:
-  // function that makes the connections to the ProjectManager and then starts the thread
+  /// START:
+  /// function that makes the connections to the ProjectManager and then starts the thread
   void start();
 
-  // RECOMPUTE_AUTO_SAVE:
-  // function that 
+  /// RECOMPUTE_AUTO_SAVE:
+  /// function that 
   void recompute_auto_save();
 
-  // AUTO_SAVE_DONE:
-  // function that notifies us that the autosave is done
+  /// AUTO_SAVE_DONE:
+  /// function that notifies us that the autosave is done
   void auto_save_is_done();
 
 private:
-  // RUN:
-  // function that actually runs the timer
+  /// RUN:
+  /// function that actually runs the timer
   void run();
 
-  // NEEDS_AUTO_SAVE:
-  // checks to see if autosave is needed
+  /// NEEDS_AUTO_SAVE:
+  /// checks to see if autosave is needed
   bool needs_auto_save();
 
-  // DO_AUTO_SAVE:
-  // function that actually dispatches the session save action
+  /// DO_AUTO_SAVE:
+  /// function that actually dispatches the session save action
   void do_auto_save();
 
-  // COMPUTE_TIMEOUT:
-  // function that computes the timeout
+  /// COMPUTE_TIMEOUT:
+  /// function that computes the timeout
   double compute_timeout();
   
   int get_smart_auto_save_timeout() const;

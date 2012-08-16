@@ -48,12 +48,12 @@ public:
   OverlayWidget( QWidget *parent );
   virtual ~OverlayWidget();
   
-  // SET_TRANSPARENT:
-  //
+  /// SET_TRANSPARENT:
+  ///
   void set_transparent( bool transparent );
   
-  // PAINTEVENT
-  // 
+  /// PAINTEVENT
+  /// 
   virtual void paintEvent( QPaintEvent * event );
 
 private:

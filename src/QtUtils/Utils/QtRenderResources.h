@@ -52,8 +52,8 @@
 namespace QtUtils
 {
 
-// CLASS: QtRenderResourcesContext
-// Qt specific implementation of the render resources class
+/// CLASS: QtRenderResourcesContext
+/// Qt specific implementation of the render resources class
 
 // Forward declarations
 class QtRenderResourcesContext;
@@ -72,27 +72,27 @@ public:
   virtual ~QtRenderResourcesContext();
 
 public:
-  // CREATE_RENDER_CONTEXT:
-  // Generate a render context for one of the viewers
+  /// CREATE_RENDER_CONTEXT:
+  /// Generate a render context for one of the viewers
   virtual bool create_render_context( Core::RenderContextHandle& context );
 
-  // CREATE_QT_RENDER_WIDGET:
-  // Create a QtRenderWidget associated with the given viewer.
+  /// CREATE_QT_RENDER_WIDGET:
+  /// Create a QtRenderWidget associated with the given viewer.
   QtRenderWidget* create_qt_render_widget( QWidget* parent, Core::AbstractViewerHandle viewer );
 
-  // CREATE_QT_TRANSFER_FUNCTION_WIDGET:
-  // Create a QtTransferFunctionWidget associated with the given transfer function.
+  /// CREATE_QT_TRANSFER_FUNCTION_WIDGET:
+  /// Create a QtTransferFunctionWidget associated with the given transfer function.
   QtTransferFunctionWidget* create_qt_transfer_function_widget( QWidget* parent,
     Core::TransferFunctionHandle tf );
 
-  // VALID_RENDER_RESOURCES:
-  // Check whether valid render resources were installed
+  /// VALID_RENDER_RESOURCES:
+  /// Check whether valid render resources were installed
   virtual bool valid_render_resources();
 
-  // GET_CURRENT_CONTEXT:
-  // Get the current render context of the calling thread
-  // NOTE: The returned handle should only be used in the scope where this function is
-  // being called, because it may become invalid later.
+  /// GET_CURRENT_CONTEXT:
+  /// Get the current render context of the calling thread
+  /// NOTE: The returned handle should only be used in the scope where this function is
+  /// being called, because it may become invalid later.
   virtual Core::RenderContextHandle get_current_context();
 
 private:

@@ -42,10 +42,10 @@
 namespace Seg3D
 {
 
-// UndoBuffer
-// This singleton class keeps a list of the actions that can be undone or redone.
+/// UndoBuffer
+/// This singleton class keeps a list of the actions that can be undone or redone.
 
-// Internals for the UndoBuffer singleton
+/// Internals for the UndoBuffer singleton
 class UndoBufferPrivate;
 typedef boost::shared_ptr< UndoBufferPrivate > UndoBufferPrivateHandle;
 
@@ -61,59 +61,59 @@ private:
   // -- undo interface --
 public:
 
-  // INSERT_UNDO_ITEM:
-  // Insert a new undo item in the queue
-  // NOTE: The action context is needed to verify whether it is inserted from the undo buffer
-  // itself or whether the undo item was created in a normal action.
+  /// INSERT_UNDO_ITEM:
+  /// Insert a new undo item in the queue
+  /// NOTE: The action context is needed to verify whether it is inserted from the undo buffer
+  /// itself or whether the undo item was created in a normal action.
   void insert_undo_item( Core::ActionContextHandle context, 
     UndoBufferItemHandle undo_item );
 
-  // UNDO:
-  // Undo the top item of the stack
+  /// UNDO:
+  /// Undo the top item of the stack
   bool undo( Core::ActionContextHandle context  ); 
   
-  // REDO:
-  // redo the top item of the stack
+  /// REDO:
+  /// redo the top item of the stack
   bool redo( Core::ActionContextHandle context );
   
-  // RESET_UNDO_BUFFER:
-  // Reset the buffer to its initial setting
+  /// RESET_UNDO_BUFFER:
+  /// Reset the buffer to its initial setting
   void reset_undo_buffer();
   
-  // GET_UNDO_TAG:
-  // Get the tag from the action stored on top of the undo stack.
-  // NOTE: if an empty string is returned the undo stack is empty.
+  /// GET_UNDO_TAG:
+  /// Get the tag from the action stored on top of the undo stack.
+  /// NOTE: if an empty string is returned the undo stack is empty.
   std::string get_undo_tag( size_t index = 0 ) const;
 
-  // GET_UNDO_BYTE_SIZE:
-  // Get the tag from the action stored on top of the undo stack.
-  // NOTE: if an empty string is returned the undo stack is empty.
+  /// GET_UNDO_BYTE_SIZE:
+  /// Get the tag from the action stored on top of the undo stack.
+  /// NOTE: if an empty string is returned the undo stack is empty.
   size_t get_undo_byte_size( size_t index = 0 ) const;
 
-  // GET_REDO_TAG:
-  // Get the tag from the action stored on top of the redo stack.
-  // NOTE: if an empty string is returned the redo stack is empty.
+  /// GET_REDO_TAG:
+  /// Get the tag from the action stored on top of the redo stack.
+  /// NOTE: if an empty string is returned the redo stack is empty.
   std::string get_redo_tag( size_t index = 0 ) const;
 
-  // GET_REDO_BYTE_SIZE:
-  // Get the tag from the action stored on top of the undo stack.
-  // NOTE: if an empty string is returned the undo stack is empty.
+  /// GET_REDO_BYTE_SIZE:
+  /// Get the tag from the action stored on top of the undo stack.
+  /// NOTE: if an empty string is returned the undo stack is empty.
   size_t get_redo_byte_size( size_t index = 0 ) const;
 
-  // HAS_UNDO:
-  // Check whether there is something to undo
+  /// HAS_UNDO:
+  /// Check whether there is something to undo
   bool has_undo() const;
   
-  // HAS_REDO:
-  // Check whether there is something to redo
+  /// HAS_REDO:
+  /// Check whether there is something to redo
   bool has_redo() const;
 
-  // NUM_UNDO_ITEMS:
-  // Get the number of undo items on the stack
+  /// NUM_UNDO_ITEMS:
+  /// Get the number of undo items on the stack
   size_t num_undo_items();
 
-  // NUM_REDO_ITEMS:
-  // Get the number of redo items on the stack
+  /// NUM_REDO_ITEMS:
+  /// Get the number of redo items on the stack
   size_t num_redo_items();
 
 
@@ -123,21 +123,21 @@ public:
   typedef boost::signals2::signal< void ( std::string ) > update_redo_tag_signal_type;
   typedef boost::signals2::signal< void () > buffer_changed_signal_type;
 
-  // UPDATE_UNDO_TAG_SIGNAL:
-  // This signal is triggered when a new undo item is on top of the undo stack
+  /// UPDATE_UNDO_TAG_SIGNAL:
+  /// This signal is triggered when a new undo item is on top of the undo stack
   update_undo_tag_signal_type update_undo_tag_signal_;
   
-  // UPDATE_REDO_TAG_SIGNAL:
-  // This signal is triggered when a new redo item is on top of the redo stack
+  /// UPDATE_REDO_TAG_SIGNAL:
+  /// This signal is triggered when a new redo item is on top of the redo stack
   update_redo_tag_signal_type update_redo_tag_signal_;
   
-  // BUFFER_CHANGED_SIGNAL:
-  // This signal is triggered whenever the buffer changes its contents
+  /// BUFFER_CHANGED_SIGNAL:
+  /// This signal is triggered whenever the buffer changes its contents
   buffer_changed_signal_type buffer_changed_signal_;
   
   // -- internals --
 private:
-  // Handle to internals
+  /// Handle to internals
   UndoBufferPrivateHandle private_;
 };
 

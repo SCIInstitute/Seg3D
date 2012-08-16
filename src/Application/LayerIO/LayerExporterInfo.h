@@ -56,8 +56,8 @@ public:
 };
 
 
-// LAYEREXPORTERBUILDER:
-// Auxiliary class to build the layer exporter class
+/// LAYEREXPORTERBUILDER:
+/// Auxiliary class to build the layer exporter class
 
 template < class LAYEREXPORTER >
 class LayerExporterBuilder: public LayerExporterBuilderBase
@@ -75,10 +75,10 @@ public:
   }
 };
 
-// -------------------------------------------------
-// LAYEREXPORTERINFO
-// Class that records the information of the different exporters that are available and auxiliary
-// functions that allow in the decision which exporter to use.
+/// -------------------------------------------------
+/// LAYEREXPORTERINFO
+/// Class that records the information of the different exporters that are available and auxiliary
+/// functions that allow in the decision which exporter to use.
 
 // Class declaration
 class LayerExporterInfo;
@@ -95,36 +95,36 @@ public:
   
   ~LayerExporterInfo();
 
-  // BUILD:
-  // Build the exporter
+  /// BUILD:
+  /// Build the exporter
   LayerExporterHandle build( std::vector< LayerHandle >& layers ) const;
 
-  // GET_NAME:
-  // Get the name of the exporter
+  /// GET_NAME:
+  /// Get the name of the exporter
   std::string get_name() const;
 
-  // CONVERTS_FILE_TYPE:
-  // Check whether this exporter deals with a specific file type
+  /// CONVERTS_FILE_TYPE:
+  /// Check whether this exporter deals with a specific file type
   bool converts_file_type( const std::string& file_type ) const;
   
-  // GET_FILE_TYPE_STRING:
-  // Get the string that defines the allowed file types
+  /// GET_FILE_TYPE_STRING:
+  /// Get the string that defines the allowed file types
   std::string get_file_type_string() const;
   
 private:
-  // Object that knows how to build the exporter
+  /// Object that knows how to build the exporter
   LayerExporterBuilderBaseHandle builder_;
   
-  // Name of the exporter
+  /// Name of the exporter
   std::string name_;
   
-  // The file types the exporter will handle
+  /// The file types the exporter will handle
   std::vector<std::string> file_types_; 
   
-  // String with name and file types, to be used as a filter in a file selector
+  /// String with name and file types, to be used as a filter in a file selector
   std::string file_type_string_;
   
-  // Any file type, e.g. dicom readers tend to use no extension
+  /// Any file type, e.g. dicom readers tend to use no extension
   bool any_type_;
   
 };

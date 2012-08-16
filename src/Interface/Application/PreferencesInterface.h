@@ -58,24 +58,24 @@ public:
     virtual ~PreferencesInterface();
   
 private:
-  // SETUP_GENERAL_PREFS:
-  // This function will initialize all the preferences contained within the general tab
+  /// SETUP_GENERAL_PREFS:
+  /// This function will initialize all the preferences contained within the general tab
   void setup_general_prefs();
 
-  // SETUP_LAYER_PREFS:
-  // This function will initialize all the preferences contained within the layer tab
+  /// SETUP_LAYER_PREFS:
+  /// This function will initialize all the preferences contained within the layer tab
   void setup_layer_prefs();
 
-  // SETUP_VIEWER_PREFS:
-  // This function will initialize all the preferences contained within the viewer tab
+  /// SETUP_VIEWER_PREFS:
+  /// This function will initialize all the preferences contained within the viewer tab
   void setup_viewer_prefs();
 
-  // SETUP_SIDEBAR_PREFS:
-  // This function will initialize all the preferences contained within the sidebar tab
+  /// SETUP_SIDEBAR_PREFS:
+  /// This function will initialize all the preferences contained within the sidebar tab
   void setup_sidebar_prefs();
 
-  // SETUP_INTERFACE_CONTROLS_PREFS:
-  // This function will initialize all the preferences contained within the interface control tab
+  /// SETUP_INTERFACE_CONTROLS_PREFS:
+  /// This function will initialize all the preferences contained within the interface control tab
   void setup_interface_controls_prefs();
   
   
@@ -86,17 +86,17 @@ private:
   static void HandleAutosaveStateChanged( qpointer_type qpointer, bool state );
   
 private Q_SLOTS:
-  // HIDE_THE_OTHERS
-  // This function will hide the inactive colorpickers
+  /// HIDE_THE_OTHERS
+  /// This function will hide the inactive colorpickers
   void hide_the_others( int index );
 
-  // SET_BUTTONS_TO_DEFAULT_COLORS:
-  // this function will set all the buttons colors back to default
+  /// SET_BUTTONS_TO_DEFAULT_COLORS:
+  /// this function will set all the buttons colors back to default
   void set_buttons_to_default_colors();
 
-  // CHANGE_PROJECT_DIRECTORY:
-  // this function will be called when the user clicks the button to change the default location
-  // of the project
+  /// CHANGE_PROJECT_DIRECTORY:
+  /// this function will be called when the user clicks the button to change the default location
+  /// of the project
   void change_project_directory();
   
   void set_autosave_checked_state( bool state );

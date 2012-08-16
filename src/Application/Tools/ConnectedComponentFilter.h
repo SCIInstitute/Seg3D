@@ -60,21 +60,21 @@ public:
 
   // -- state --
 public:
-  // Whether the layer needs to be replaced
+  /// Whether the layer needs to be replaced
   Core::StateBoolHandle replace_state_;
   
-  // Whether to ue the seed points
+  /// Whether to ue the seed points
   Core::StateBoolHandle use_seeds_state_;
   
-  // Layerid of the mask layer
+  /// Layerid of the mask layer
   Core::StateLabeledOptionHandle mask_state_;
     
-  // Whether mask should be inverted in this filter
+  /// Whether mask should be inverted in this filter
   Core::StateBoolHandle mask_invert_state_;
 
   // -- execute --
 public:
-  // Execute the tool and dispatch the action
+  /// Execute the tool and dispatch the action
   virtual void execute( Core::ActionContextHandle context );
 
 private:

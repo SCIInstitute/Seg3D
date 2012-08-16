@@ -61,8 +61,8 @@ private:
 
   // -- Dispatch this action --
 public:
-  // DISPATCH:
-  // Dispatch an action that activates a layer
+  /// DISPATCH:
+  /// Dispatch an action that activates a layer
   static void Dispatch( Core::ActionContextHandle context, bool downward = false );
 };
 

@@ -76,13 +76,13 @@ public:
 public:
   
 protected:
-  // INITIALIZEPAGE:
-  // function for preloading the page information for the info page
+  /// INITIALIZEPAGE:
+  /// function for preloading the page information for the info page
     void initializePage();
     
-  // VALIDATEPAGE:
-  // function that is called right after the next button is clicked and used to process
-  // the entered data so it can be passed to the next page
+  /// VALIDATEPAGE:
+  /// function that is called right after the next button is clicked and used to process
+  /// the entered data so it can be passed to the next page
   virtual bool validatePage();
 
 private:
@@ -94,8 +94,8 @@ private:
     QLabel *warning_message_;
 
 private Q_SLOTS:
-  // SETPATH:
-  // helper function for setting the path for project export
+  /// SETPATH:
+  /// helper function for setting the path for project export
     void set_path();
 };
 
@@ -107,8 +107,8 @@ public:
     SaveAsSummaryPage(QWidget *parent = 0);
 
 protected:
-  // INITIALIZEPAGE:
-  // function for preloading the page information for the summary page
+  /// INITIALIZEPAGE:
+  /// function for preloading the page information for the summary page
     void initializePage();
 
 private:

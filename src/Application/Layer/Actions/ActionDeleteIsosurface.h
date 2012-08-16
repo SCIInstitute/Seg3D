@@ -66,8 +66,8 @@ private:
   
   // -- Dispatch this action from the interface --
 public:
-  // DISPATCH
-  // Create and dispatch action that deletes the isosurface for the selected layer
+  /// DISPATCH
+  /// Create and dispatch action that deletes the isosurface for the selected layer
   static void Dispatch( Core::ActionContextHandle context, MaskLayerHandle mask_layer );  
 };
   

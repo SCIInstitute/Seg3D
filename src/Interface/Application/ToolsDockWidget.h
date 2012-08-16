@@ -75,30 +75,30 @@ public:
   // -- functions that control the toolbox --
 private:
 
-  // OPEN_TOOL
-  // The internals of opening a tool
+  /// OPEN_TOOL
+  /// The internals of opening a tool
   void open_tool( ToolHandle& tool );
 
-  // CLOSE_TOOL
-  // The internals of closing a tool
+  /// CLOSE_TOOL
+  /// The internals of closing a tool
   void close_tool( ToolHandle& tool );
 
-  // ACTIVATE_TOOL
-  // The internals of activating a tool
+  /// ACTIVATE_TOOL
+  /// The internals of activating a tool
   void activate_tool( ToolHandle& tool );
 
-  // CLEAR:
-  // Delete all the tool widgets. 
-  // It is called when the Application reset_signal_ is triggered.
+  /// CLEAR:
+  /// Delete all the tool widgets. 
+  /// It is called when the Application reset_signal_ is triggered.
   void clear();
 
   // -- internals of this class --
 private:
-  // List of tool widgets
+  /// List of tool widgets
   typedef std::map< std::string, ToolWidget* > tool_widget_list_type;
   tool_widget_list_type tool_widget_list_;
 
-  // Pointer to the ToolBox Widget
+  /// Pointer to the ToolBox Widget
   ToolBoxWidget* toolbox_;
   QWidget* tool_dock_widget_contents_;
   QWidget* disable_tools_widget_;
@@ -110,28 +110,28 @@ private:
 private:
   typedef QPointer< ToolsDockWidget > qpointer_type;
 
-  // NOTE: This function do not take references as the parameters are
-  // forwarded to a different thread and thus need a copy of the handle
-  // to ensure that the tool will not be destructed until this function is
-  // handled.
+  /// NOTE: This function do not take references as the parameters are
+  /// forwarded to a different thread and thus need a copy of the handle
+  /// to ensure that the tool will not be destructed until this function is
+  /// handled.
 
-  // HANDLEOPENTOOL:
-  // This function should be called to open the tool, this one relays all the
-  // information properly to the Qt thread
+  /// HANDLEOPENTOOL:
+  /// This function should be called to open the tool, this one relays all the
+  /// information properly to the Qt thread
   static void HandleOpenTool( qpointer_type qpointer, ToolHandle tool );
 
-  // HANDLECLOSETOOL:
-  // This function should be called to close the tool, this one relays all the
-  // information properly to the Qt thread
+  /// HANDLECLOSETOOL:
+  /// This function should be called to close the tool, this one relays all the
+  /// information properly to the Qt thread
   static void HandleCloseTool( qpointer_type qpointer, ToolHandle tool );
 
-  // HANDLEACTIVATETOOL:
-  // This function should be called to close the tool, this one relays all the
-  // information properly to the Qt thread
+  /// HANDLEACTIVATETOOL:
+  /// This function should be called to close the tool, this one relays all the
+  /// information properly to the Qt thread
   static void HandleActivateTool( qpointer_type qpointer, ToolHandle tool );
 
-  // HANDLERESET:
-  // This function is called when reset_signal_ of Core::Application is triggered.
+  /// HANDLERESET:
+  /// This function is called when reset_signal_ of Core::Application is triggered.
   static void HandleReset( qpointer_type qpointer );
 };
 

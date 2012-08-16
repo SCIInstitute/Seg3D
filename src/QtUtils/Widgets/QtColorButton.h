@@ -56,17 +56,17 @@ public:
   virtual ~QtColorButton();
   
 public Q_SLOTS:
-  // SET_COLOR:
-  // This function sets the color and the stylesheet of the button to reflect the desired color
+  /// SET_COLOR:
+  /// This function sets the color and the stylesheet of the button to reflect the desired color
   void set_color( Core::Color );
 
-  // GET_COLOR:
-  // This function returns the current color of the button
+  /// GET_COLOR:
+  /// This function returns the current color of the button
   Core::Color get_color(){ return button_color_; }
   
 private Q_SLOTS:
-  // TRIGGER_SIGNAL:
-  // This function is called when the button needs to signal that it has been toggled.
+  /// TRIGGER_SIGNAL:
+  /// This function is called when the button needs to signal that it has been toggled.
   void trigger_signal( bool );
 
 private:

@@ -66,36 +66,36 @@ public:
   virtual ~DatabaseManager();
   
 public:
-  // RUN_SQL_STATEMENT:
-  // Execute the given SQL statement on the database. If the statement generates
-  // any results, they will be put in the result set.
-  // Returns true on success, otherwise false.
+  /// RUN_SQL_STATEMENT:
+  /// Execute the given SQL statement on the database. If the statement generates
+  /// any results, they will be put in the result set.
+  /// Returns true on success, otherwise false.
   bool run_sql_statement( const std::string& sql_str, ResultSet& results, std::string& error );
 
-  // RUN_SQL_STATEMENT:
-  // Execute the given SQL statement on the database.
-  // Returns true on success, otherwise false.
+  /// RUN_SQL_STATEMENT:
+  /// Execute the given SQL statement on the database.
+  /// Returns true on success, otherwise false.
   bool run_sql_statement( const std::string& sql_str, std::string& error );
   
-  // RUN_SQL_SCRIPT:
-  // Execute multiple SQL statements sequentially.
+  /// RUN_SQL_SCRIPT:
+  /// Execute multiple SQL statements sequentially.
   bool run_sql_script( const std::string& sql_str, std::string& error );
 
-  // SAVE_DATABASE:
-  // Save the database to disk
+  /// SAVE_DATABASE:
+  /// Save the database to disk
   bool save_database( const boost::filesystem::path& database_file, std::string& error );
   
-  // LOAD_DATABASE:
-  // Load the database from disk
+  /// LOAD_DATABASE:
+  /// Load the database from disk
   bool load_database( const boost::filesystem::path& database_file, std::string& error );
 
-  // GET_LAST_INSERT_ROWID:
-  // Return the row ID of last successful insert statement.
+  /// GET_LAST_INSERT_ROWID:
+  /// Return the row ID of last successful insert statement.
   long long get_last_insert_rowid();
 
-  // GET_COLUMN_METADATA:
-  // Get metadata about a specific column of a specific database table.
-  // Returns true if the table and column exist, otherwise false.
+  /// GET_COLUMN_METADATA:
+  /// Get metadata about a specific column of a specific database table.
+  /// Returns true if the table and column exist, otherwise false.
   bool get_column_metadata( const std::string& table_name, const std::string& column_name,
     char const** data_type = NULL, char const** coll_seq = NULL, 
     int* not_null = NULL, int* primary_key = NULL, int* auto_inc = NULL ); 
@@ -104,8 +104,8 @@ private:
   boost::shared_ptr< DatabaseManagerPrivate > private_;
 
 public:
-  // ESCAPEQUOTES:
-  // Escape the quotes(') in the string so it can be used as text in a SQL statement.
+  /// ESCAPEQUOTES:
+  /// Escape the quotes(') in the string so it can be used as text in a SQL statement.
   static std::string EscapeQuotes( const std::string& str );
 };
 

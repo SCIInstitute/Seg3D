@@ -39,17 +39,17 @@
 namespace Seg3D
 {
 
-// CLASS BASEFILTER:
-// This class provides the basic underlying framework for running filters in a separate thread
-// from the application thread. It provides a series of functions common to all the filters.
+/// CLASS BASEFILTER:
+/// This class provides the basic underlying framework for running filters in a separate thread
+/// from the application thread. It provides a series of functions common to all the filters.
 
 class LayerMetaData
 {
 public:
-  // String containing the actual meta data
+  /// String containing the actual meta data
   std::string meta_data_;
   
-  // String describing the type of meta type
+  /// String describing the type of meta type
   std::string meta_data_info_;
 };
 

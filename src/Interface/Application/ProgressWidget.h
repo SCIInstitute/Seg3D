@@ -64,27 +64,27 @@ public:
   // -- Update widget --
 public:
 
-  // UPDATE_PROGRESS:
-  // Update the progress in this dialog
+  /// UPDATE_PROGRESS:
+  /// Update the progress in this dialog
   void update_progress();
   
-  // SETUP_PROGRESS_WIDGET:
-  // this will setup the widget and make all the connections
+  /// SETUP_PROGRESS_WIDGET:
+  /// this will setup the widget and make all the connections
   void setup_progress_widget( Core::ActionProgressHandle action_progress );
   
-  // CLEANUP_PROGRESS_WIDGET:
-  // this will cleanup the progress widget, disconnect the connections etc.
+  /// CLEANUP_PROGRESS_WIDGET:
+  /// this will cleanup the progress widget, disconnect the connections etc.
   void cleanup_progress_widget();
 
   // -- Slots --
 public Q_SLOTS:
 
-  // INTERUPT:
-  // Interrupt the current process
+  /// INTERUPT:
+  /// Interrupt the current process
   void interrupt();
 
-  // UPDATE_RUNNING:
-  // Update the running circle
+  /// UPDATE_RUNNING:
+  /// Update the running circle
   void update_running();
   
   // -- Internals --

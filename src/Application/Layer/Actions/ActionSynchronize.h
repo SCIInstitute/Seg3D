@@ -38,10 +38,10 @@
 namespace Seg3D
 {
 
-// ACTIONSYNCHRONIZE:
-// This action is used in scripts to synchronize operations on layers. The 'validate' function
-// of the action will fail if any of the layers is not available, and set a notifier in the action
-// context.
+/// ACTIONSYNCHRONIZE:
+/// This action is used in scripts to synchronize operations on layers. The 'validate' function
+/// of the action will fail if any of the layers is not available, and set a notifier in the action
+/// context.
 class ActionSynchronize : public Core::Action
 {
 

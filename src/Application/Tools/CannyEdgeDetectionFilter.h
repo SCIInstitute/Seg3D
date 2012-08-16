@@ -52,15 +52,15 @@ public:
   
   // -- state --
 public:
-  // The amount of blurring that was applied
+  /// The amount of blurring that was applied
   Core::StateRangedDoubleHandle blurring_distance_state_;
 
-  // Threshold is the lowest allowed value in the output image
+  /// Threshold is the lowest allowed value in the output image
   Core::StateRangedDoubleHandle threshold_state_;
 
   // -- execute --
 public:
-  // Execute the tool and dispatch the action
+  /// Execute the tool and dispatch the action
   virtual void execute( Core::ActionContextHandle context );
 };
 

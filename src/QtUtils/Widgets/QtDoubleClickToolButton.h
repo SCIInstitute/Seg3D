@@ -47,8 +47,8 @@ public:
   QtDoubleClickToolButton( QWidget *parent = 0 ); 
   virtual ~QtDoubleClickToolButton();
 
-  // SET_DOUBLE_CLICK_FUNCTION:
-  // Set the function that needs to be called when double clicking on this button.
+  /// SET_DOUBLE_CLICK_FUNCTION:
+  /// Set the function that needs to be called when double clicking on this button.
   void set_double_click_function( boost::function< void() > function );
 
 protected:

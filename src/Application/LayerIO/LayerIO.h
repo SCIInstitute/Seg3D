@@ -43,11 +43,11 @@
 
 namespace Seg3D
 {
-// LAYERIO:
-// This class is the factory object for importer and exporter objects. As several packages tend
-// to read a file including header as one operation, we need an importer that abstracts this 
-// operation and hides some of the data management, like loading the data before deciding how to
-  // import the data, e.g. as masks or data layers.
+/// LAYERIO:
+/// This class is the factory object for importer and exporter objects. As several packages tend
+/// to read a file including header as one operation, we need an importer that abstracts this 
+/// operation and hides some of the data management, like loading the data before deciding how to
+  /// import the data, e.g. as masks or data layers.
 
 // Forward declaration
 class LayerIO;
@@ -67,8 +67,8 @@ private:
   // -- Importer/Exporter registration --
 public:
 
-  // REGISTER_IMPORTER:
-  // Register an importer that abstracts importing a file in a certain file format
+  /// REGISTER_IMPORTER:
+  /// Register an importer that abstracts importing a file in a certain file format
   template < class IMPORTER >
   void register_importer()
   {
@@ -82,8 +82,8 @@ public:
     this->register_importer_internal( info );
   }
   
-  // REGISTER_EXPORTER:
-  // Register an importer that abstracts importing a file in a certain file format
+  /// REGISTER_EXPORTER:
+  /// Register an importer that abstracts importing a file in a certain file format
   template < class EXPORTER >
   void register_exporter()
   {
@@ -98,50 +98,50 @@ public:
 
   // -- internals of registration process --
 private:
-  // REGISTER_IMPORTER_INTERNAL
-  // Registration of the importers into the internals of this class
+  /// REGISTER_IMPORTER_INTERNAL
+  /// Registration of the importers into the internals of this class
   void register_importer_internal( LayerImporterInfoHandle info );
 
-  // REGISTER_EXPORTER_INTERNAL
-  // Registration of the exporters into the internals of this class
+  /// REGISTER_EXPORTER_INTERNAL
+  /// Registration of the exporters into the internals of this class
   void register_exporter_internal( LayerExporterInfoHandle info );
 
   // -- Get the types of importers available --
 public:
-  // GET_SINGLE_FILE_IMPORTER_TYPES
-  // Get the names of all the importers that are available for a single file
+  /// GET_SINGLE_FILE_IMPORTER_TYPES
+  /// Get the names of all the importers that are available for a single file
   std::vector< std::string > get_single_file_importer_types();
 
-  // GET_FILE_SERIES_IMPORTER_TYPES
-  // Get the names of all the importers that are available for file series
+  /// GET_FILE_SERIES_IMPORTER_TYPES
+  /// Get the names of all the importers that are available for file series
   std::vector< std::string > get_file_series_importer_types();
   
-  // GET_EXPORTER_TYPES
-  // Get the names of all the exporters that are available
+  /// GET_EXPORTER_TYPES
+  /// Get the names of all the exporters that are available
   std::vector< std::string > get_exporter_types();
 
   // -- functions for creating an importer
 public: 
-  // CREATE_SINGLE_FILE_IMPORTER:
-  // This function creates a new importer by checking the file extension and it will return
-  // the appropriate importer. If an importer name is given as well, it will restrain the 
-  // search to that specific name of importer
+  /// CREATE_SINGLE_FILE_IMPORTER:
+  /// This function creates a new importer by checking the file extension and it will return
+  /// the appropriate importer. If an importer name is given as well, it will restrain the 
+  /// search to that specific name of importer
   bool create_single_file_importer( const std::string& filename, 
     LayerImporterHandle& importer, 
     std::string& error, const std::string& importername = "");
     
-  // CREATE_FILE_SERIES_IMPORTER: 
-  // This function creates a new importer by checking the file extension and it will return
-  // the appropriate importer. If an importer name is given as well, it will restrain the 
-  // search to that specific name of importer
+  /// CREATE_FILE_SERIES_IMPORTER:  
+  /// This function creates a new importer by checking the file extension and it will return
+  /// the appropriate importer. If an importer name is given as well, it will restrain the 
+  /// search to that specific name of importer
   bool create_file_series_importer( const std::vector<std::string>& filenames, 
     LayerImporterHandle& importer, 
     std::string& error, const std::string& importername = "");
     
-  // CREATE_EXPORTER:
-  // This function creates a new exporter by checking the file extension and it will return
-  // the appropriate exporter. If an exporter name is given as well, it will restrain the 
-  // search to that specific name of exporter           
+  /// CREATE_EXPORTER:
+  /// This function creates a new exporter by checking the file extension and it will return
+  /// the appropriate exporter. If an exporter name is given as well, it will restrain the 
+  /// search to that specific name of exporter            
   bool create_exporter( LayerExporterHandle& exporter, std::vector< LayerHandle >& layers, 
     const std::string importername = "", const std::string extension = "" );
     
@@ -151,15 +151,15 @@ public:
 
   // -- static functions --
 public:
-  // FINDFILESERIES
-  // Process the names/name of a file in a file series and find all the files that should
-  // belong to that file series bsed on the filenames of the files in the same directory.
+  /// FINDFILESERIES
+  /// Process the names/name of a file in a file series and find all the files that should
+  /// belong to that file series bsed on the filenames of the files in the same directory.
   static bool FindFileSeries( std::vector<std::string >& filenames );
     
 };
 
-// Macro for adding function that registers a new importer
-// Note these functions will be called in the init call of the program.
+/// Macro for adding function that registers a new importer
+/// Note these functions will be called in the init call of the program.
 #define SEG3D_REGISTER_IMPORTER(namesp, name)\
 namespace Core\
 {\
@@ -170,8 +170,8 @@ namespace Core\
   }\
 }
 
-// Macro for adding function that registers a new exporter
-// Note these functions will be called in the init call of the program.
+/// Macro for adding function that registers a new exporter
+/// Note these functions will be called in the init call of the program.
 #define SEG3D_REGISTER_EXPORTER(namesp, name)\
   namespace Core\
 {\

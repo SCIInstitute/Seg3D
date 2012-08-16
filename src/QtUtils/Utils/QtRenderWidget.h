@@ -65,58 +65,58 @@ public:
 
 protected:
 
-  // INITIALIZEGL:
-  // This function is called by Qt when the widget is initialized
+  /// INITIALIZEGL:
+  /// This function is called by Qt when the widget is initialized
   virtual void initializeGL();
   
-  // PAINTGL:
-  // This function is called whenever Qt has to repaint the contents of 
-  // the widget displaying the Qt scene
+  /// PAINTGL:
+  /// This function is called whenever Qt has to repaint the contents of 
+  /// the widget displaying the Qt scene
   virtual void paintGL();
   
-  // RESIZEGL:
-  // This function gets called whenever the Qt widget is resized
+  /// RESIZEGL:
+  /// This function gets called whenever the Qt widget is resized
   virtual void resizeGL( int width, int height );
 
-  // MOUSEDOUBLECLICKEVENT:
-  // This function is called by Qt to deliver a double mouse click event
-  // to the GUI.
+  /// MOUSEDOUBLECLICKEVENT:
+  /// This function is called by Qt to deliver a double mouse click event
+  /// to the GUI.
   virtual void mouseDoubleClickEvent( QMouseEvent * event ) {}
 
-  // MOUSEMOVEEVENT:
-  // This function is called by Qt to deliver mouse movement event
-  // to the GUI.  
+  /// MOUSEMOVEEVENT:
+  /// This function is called by Qt to deliver mouse movement event
+  /// to the GUI. 
   virtual void mouseMoveEvent( QMouseEvent * event );
   
-  // MOUSEDOUBLECLICKEVENT:
-  // This function is called by Qt to deliver a single mouse click event
-  // to the GUI.
+  /// MOUSEDOUBLECLICKEVENT:
+  /// This function is called by Qt to deliver a single mouse click event
+  /// to the GUI.
   virtual void mousePressEvent( QMouseEvent * event );
   
-  // MOUSERELEASEEVENT:
-  // This function is called by Qt to deliver a mouse button release event
-  // to the GUI.  
+  /// MOUSERELEASEEVENT:
+  /// This function is called by Qt to deliver a mouse button release event
+  /// to the GUI. 
   virtual void mouseReleaseEvent( QMouseEvent * event );
   
-  // WHEELEVENT:
-  // This function is called by Qt to deliver mouse wheel event
-  // to the GUI.  
+  /// WHEELEVENT:
+  /// This function is called by Qt to deliver mouse wheel event
+  /// to the GUI. 
   virtual void wheelEvent( QWheelEvent* event );
 
-  // ENTEREVENT:
-  // This function is called by Qt when the mouse starts to hover over the widget
+  /// ENTEREVENT:
+  /// This function is called by Qt when the mouse starts to hover over the widget
   virtual void enterEvent ( QEvent* event );
 
-  // LEAVEEVENT:
-  // This function is called by Qt when the mouse finishes to hover over the widget
+  /// LEAVEEVENT:
+  /// This function is called by Qt when the mouse finishes to hover over the widget
   virtual void leaveEvent( QEvent* event );
   
-  // KEYPRESSEVENT:
-  // This function is called by Qt when a key is pressed
+  /// KEYPRESSEVENT:
+  /// This function is called by Qt when a key is pressed
   virtual void keyPressEvent( QKeyEvent* event );
 
-  // KEYPRESSEVENT:
-  // This function is called by Qt when a key is pressed
+  /// KEYPRESSEVENT:
+  /// This function is called by Qt when a key is pressed
   virtual void keyReleaseEvent( QKeyEvent* event );
 
   // -- internals of the QtRenderWidget --
@@ -125,8 +125,8 @@ private:
   
   // -- signals / slots --
 public:
-  // ACTIVATE_SIGNAL:
-  // This signal is triggered when the mouse is clicked in the widget
+  /// ACTIVATE_SIGNAL:
+  /// This signal is triggered when the mouse is clicked in the widget
   typedef boost::signals2::signal< void () > activate_signal_type;
   activate_signal_type activate_signal_;
 };

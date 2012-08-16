@@ -49,28 +49,28 @@ typedef boost::shared_ptr< PaintToolPrivate > PaintToolPrivateHandle;
 class PaintInfo
 {
 public:
-  // Slice we paint on
+  /// Slice we paint on
   std::string target_layer_id_;
   Core::MaskVolumeSliceHandle target_slice_;
   
-  // Data constraint
+  /// Data constraint
   std::string data_constraint_layer_id_;
   Core::DataVolumeSliceHandle data_constraint_slice_;
   double min_val_;
   double max_val_;
   bool negative_data_constraint_;
   
-  // Mask constraint 1
+  /// Mask constraint 1
   std::string mask_constraint1_layer_id_;
   Core::MaskVolumeSliceHandle mask_constraint1_slice_;
   bool negative_mask_constraint1_;
 
-  // Mask constraint 2
+  /// Mask constraint 2
   std::string mask_constraint2_layer_id_;
   Core::MaskVolumeSliceHandle mask_constraint2_slice_;
   bool negative_mask_constraint2_;
 
-  // Brush stroke
+  /// Brush stroke
   std::vector<int> x_;
   std::vector<int> y_;
   
@@ -102,64 +102,64 @@ public:
   virtual ~PaintTool();
 
 public:
-  // HANDLE_MOUSE_ENTER:
-  // Called when the mouse has entered a viewer.
+  /// HANDLE_MOUSE_ENTER:
+  /// Called when the mouse has entered a viewer.
   virtual bool handle_mouse_enter( ViewerHandle viewer, int x, int y );
 
-  // HANDLE_MOUSE_LEAVE:
-  // Called when the mouse has left a viewer.
+  /// HANDLE_MOUSE_LEAVE:
+  /// Called when the mouse has left a viewer.
   virtual bool handle_mouse_leave( ViewerHandle viewer );
 
-  // HANDLE_MOUSE_MOVE:
-  // Called when the mouse moves in a viewer.
+  /// HANDLE_MOUSE_MOVE:
+  /// Called when the mouse moves in a viewer.
   virtual bool handle_mouse_move( ViewerHandle viewer, 
     const Core::MouseHistory& mouse_history, 
     int button, int buttons, int modifiers );
 
-  // HANDLE_MOUSE_PRESS:
-  // Called when a mouse button has been pressed.
+  /// HANDLE_MOUSE_PRESS:
+  /// Called when a mouse button has been pressed.
   virtual bool handle_mouse_press( ViewerHandle viewer, 
     const Core::MouseHistory& mouse_history, 
     int button, int buttons, int modifiers );
 
-  // HANDLE_MOUSE_RELEASE:
-  // Called when a mouse button has been released.
+  /// HANDLE_MOUSE_RELEASE:
+  /// Called when a mouse button has been released.
   virtual bool handle_mouse_release( ViewerHandle viewer, 
     const Core::MouseHistory& mouse_history, 
     int button, int buttons, int modifiers );
 
-  // HANDLE_WHEEL:
-  // Called when the mouse wheel has been rotated.
+  /// HANDLE_WHEEL:
+  /// Called when the mouse wheel has been rotated.
   virtual bool handle_wheel( ViewerHandle viewer, int delta, 
     int x, int y, int buttons, int modifiers );
 
-  // HANDLE_KEY_PRESS:
-  // Called when a key is pressed.
+  /// HANDLE_KEY_PRESS:
+  /// Called when a key is pressed.
   virtual bool handle_key_press( ViewerHandle viewer, int key, int modifiers );
 
-  // HANDLE_UPDATE_CURSOR:
-  // Called when a viewer requires an update to its cursor.
+  /// HANDLE_UPDATE_CURSOR:
+  /// Called when a viewer requires an update to its cursor.
   virtual bool handle_update_cursor( ViewerHandle viewer );
   
-  // REDRAW:
-  // Draw the paint tool in the specified viewer.
-  // The function should only be called by the renderer, which has a valid GL context.
+  /// REDRAW:
+  /// Draw the paint tool in the specified viewer.
+  /// The function should only be called by the renderer, which has a valid GL context.
   virtual void redraw( size_t viewer_id, const Core::Matrix& proj_mat,
     int viewer_width, int viewer_height );
 
-  // HAS_2D_VISUAL:
-  // Returns true if the tool draws itself in the 2D view, otherwise false.
-  // The default implementation returns false.
+  /// HAS_2D_VISUAL:
+  /// Returns true if the tool draws itself in the 2D view, otherwise false.
+  /// The default implementation returns false.
   virtual bool has_2d_visual();
 
-  // ACTIVATE:
-  // Activate a tool: this tool is set as the active tool and hence it should
-  // setup the right mouse tools in the viewers.
+  /// ACTIVATE:
+  /// Activate a tool: this tool is set as the active tool and hence it should
+  /// setup the right mouse tools in the viewers.
   virtual void activate();
 
-  // DEACTIVATE:
-  // Deactivate a tool. A tool is always deactivate before the next one is
-  // activated.
+  /// DEACTIVATE:
+  /// Deactivate a tool. A tool is always deactivate before the next one is
+  /// activated.
   virtual void deactivate();
 
 protected:
@@ -170,8 +170,8 @@ private:
 
   bool paint( const PaintInfo& info );
   
-  // HANDLEPAINT:
-  // THis function is called to relay the paint call to the application thread
+  /// HANDLEPAINT:
+  /// THis function is called to relay the paint call to the application thread
   static void HandlePaint( PaintToolWeakHandle tool, const PaintInfo info );
 
 public:
@@ -189,16 +189,16 @@ public:
   Core::StateBoolHandle negative_mask_constraint2_state_;
   Core::StateBoolHandle show_data_cstr_bound_state_;
   
-  // Radius of the brush
+  /// Radius of the brush
   Core::StateRangedIntHandle brush_radius_state_;
 
-  // Upper threshold for painting
+  /// Upper threshold for painting
   Core::StateRangedDoubleHandle upper_threshold_state_;
 
-  // Lower threshold for painting
+  /// Lower threshold for painting
   Core::StateRangedDoubleHandle lower_threshold_state_;
 
-  // Erase data instead of painting
+  /// Erase data instead of painting
   Core::StateBoolHandle erase_state_;
 
 private:

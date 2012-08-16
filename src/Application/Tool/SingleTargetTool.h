@@ -57,14 +57,14 @@ public:
   // Layer ID of the target layer
   Core::StateLabeledOptionHandle target_layer_state_;
 
-  // Whether to use the active of one from the list
+  /// Whether to use the active of one from the list
   Core::StateBoolHandle use_active_layer_state_;
   Core::StateBoolHandle valid_primary_target_state_;
 
-  // Whether a valid layer has been selected
+  /// Whether a valid layer has been selected
   Core::StateBoolHandle valid_target_state_;
 
-  // Add a state whose input is linked to the target.
+  /// Add a state whose input is linked to the target.
   void add_extra_layer_input( Core::StateLabeledOptionHandle input_layer_state,
     Core::VolumeType type, bool required = false, bool dependent = true );
 

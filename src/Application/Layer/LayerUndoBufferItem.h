@@ -50,7 +50,7 @@ typedef boost::weak_ptr< LayerUndoBufferItem > LayerUndoBufferItemWeakHandle;
 typedef boost::shared_ptr<LayerUndoBufferItemPrivate> LayerUndoBufferItemPrivateHandle;
 
 
-// Class that describes all the steps that need to be undertaken to undo a layer action.
+/// Class that describes all the steps that need to be undertaken to undo a layer action.
 class LayerUndoBufferItem : public UndoBufferItem
 {
 
@@ -62,58 +62,58 @@ public:
   // -- creation of undo/redo action --
 public:
   
-  // ADD_FILTER_TO_ABORT:
-  // This adds a base filter weak handle to the process that will compute the
-  // filter output.
+  /// ADD_FILTER_TO_ABORT:
+  /// This adds a base filter weak handle to the process that will compute the
+  /// filter output.
   void add_filter_to_abort( LayerAbstractFilterHandle filter );
   
-  // ADD_LAYER_TO_DELETE:
-  // Add layer to delete list
-  // If a new layer is created by the action it should be deleted in the undo
-  // This functions adds a handle to the layer that needs to be deleted in the undo
+  /// ADD_LAYER_TO_DELETE:
+  /// Add layer to delete list
+  /// If a new layer is created by the action it should be deleted in the undo
+  /// This functions adds a handle to the layer that needs to be deleted in the undo
   void add_layer_to_delete( LayerHandle layer );
 
-  // ADD_LAYER_TO_ADD:
-  // Add layer to delete list
+  /// ADD_LAYER_TO_ADD:
+  /// Add layer to delete list
   void add_layer_to_add( LayerHandle layer );
 
-  // ADD_LAYER_TO_RESTORE:
-  // Add layer to restore list, layers are restored using check points.
+  /// ADD_LAYER_TO_RESTORE:
+  /// Add layer to restore list, layers are restored using check points.
   void add_layer_to_restore( LayerHandle layer, LayerCheckPointHandle checkpoint);
 
-  // ADD_ID_COUNT_TO_RESTORE:
-  // Cache the count of layer and group ids, so they can be rolled back to the original ones
-  // NOTE: If they are set to -1, the function will query the current ones.
+  /// ADD_ID_COUNT_TO_RESTORE:
+  /// Cache the count of layer and group ids, so they can be rolled back to the original ones
+  /// NOTE: If they are set to -1, the function will query the current ones.
   void add_id_count_to_restore( LayerManager::id_count_type id_count );
 
-  // SET_PROVENANCE_STEP_ID:
-  // Set the provenance record ID associated with the action.
+  /// SET_PROVENANCE_STEP_ID:
+  /// Set the provenance record ID associated with the action.
   void set_provenance_step_id( ProvenanceStepID step_id );
 
-  // SET_PROVENANCE_STEP_IDS:
-  // Set the provenance record ID associated with the action.
+  /// SET_PROVENANCE_STEP_IDS:
+  /// Set the provenance record ID associated with the action.
   void set_provenance_step_ids( const std::vector< ProvenanceStepID >& step_ids );
 
-  // ROLLBACK_LAYER_CHANGES:
-  // Abort corresponding filters (if any) and rollback all the layer changes.
-  // NOTE: This function should only be called by LayerFilter when aborted by the user.
+  /// ROLLBACK_LAYER_CHANGES:
+  /// Abort corresponding filters (if any) and rollback all the layer changes.
+  /// NOTE: This function should only be called by LayerFilter when aborted by the user.
   void rollback_layer_changes();
 
   // -- apply undo/redo action --
 public:
 
-  // APPLY_AND_CLEAR_UNDO:
-  // Apply the undo information
+  /// APPLY_AND_CLEAR_UNDO:
+  /// Apply the undo information
   virtual bool apply_and_clear_undo();
 
   // -- size information --
 public:
-  // GET_BYTE_SIZE:
-  // The size of the item in memory ( approximately )
+  /// GET_BYTE_SIZE:
+  /// The size of the item in memory ( approximately )
   virtual size_t get_byte_size() const;
 
-  // COMPUTE_SIZE:
-  // Compute the size of the item
+  /// COMPUTE_SIZE:
+  /// Compute the size of the item
   virtual void compute_size();
 
   // -- internals --

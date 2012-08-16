@@ -53,26 +53,26 @@ Q_OBJECT
 
 
 public:
-  // Constructor/destructor
+  /// Constructor/destructor
   MeasurementToolInterface();
   virtual ~MeasurementToolInterface();
   virtual bool build_widget( QFrame* frame );
 
 private Q_SLOTS:
-  // HANDLE_LINEEDIT_NAME_CHANGED:
-  // Set the active measurement name state based on the line edit.
+  /// HANDLE_LINEEDIT_NAME_CHANGED:
+  /// Set the active measurement name state based on the line edit.
   void handle_name_lineedit_changed();
 
-  // HANDLE_TEXTBOX_COMMENT_CHANGED:
+  /// HANDLE_TEXTBOX_COMMENT_CHANGED:
   void handle_comment_textbox_changed( std::string comment );
 
-  // HANDLE_LINEEDIT_LENGTH_CHANGED:
+  /// HANDLE_LINEEDIT_LENGTH_CHANGED:
   void handle_length_lineedit_changed();
 
-  // HANDLE_CHECKBOX_SHOW_CHANGED:
+  /// HANDLE_CHECKBOX_SHOW_CHANGED:
   void handle_show_checkbox_changed();
 
-  // HANDLE_COLOR_BUTTON_CHANGED:
+  /// HANDLE_COLOR_BUTTON_CHANGED:
   void handle_color_button_clicked();
 
 private:
@@ -81,28 +81,28 @@ private:
 public:
   typedef QPointer< MeasurementToolInterface > qpointer_type;
 
-  // UPDATEGENERALTAB:
-  // Update entire table including dimensions.  Scroll to active index.  
-  // Slower than UpdateMeasurementCells, so use only when needed. De-selects selected rows.  
-  // TODO: This may be slow due to resizeColumns[Rows]ToContents -- try hard-coding sizes.
+  /// UPDATEGENERALTAB:
+  /// Update entire table including dimensions.  Scroll to active index.  
+  /// Slower than UpdateMeasurementCells, so use only when needed. De-selects selected rows.  
+  /// TODO: This may be slow due to resizeColumns[Rows]ToContents -- try hard-coding sizes.
   static void UpdateGeneralTab( qpointer_type measurement_interface );
 
-  // UPDATETABLECELLS:
-  // Update only table cells, not table dimensions.  Does not scroll to active index.
+  /// UPDATETABLECELLS:
+  /// Update only table cells, not table dimensions.  Does not scroll to active index.
   static void UpdateTableCells( qpointer_type measurement_interface );
 
-  // UPDATETABLEACTIVEINDEX:
-  // Update table in response to changed active index.
-  // Locks: StateEngine
+  /// UPDATETABLEACTIVEINDEX:
+  /// Update table in response to changed active index.
+  /// Locks: StateEngine
   static void UpdateTableActiveIndex( qpointer_type measurement_interface );
 
-  // UPDATEGENERALCOMMENT:
-  // Update comment text box in general tab based on active index.
-  // Locks: StateEngine
+  /// UPDATEGENERALCOMMENT:
+  /// Update comment text box in general tab based on active index.
+  /// Locks: StateEngine
   static void UpdateGeneralComment( qpointer_type measurement_interface );
 
-  // UPDATEACTIVETAB:
-  // Set widget values based on current active measurement state.
+  /// UPDATEACTIVETAB:
+  /// Set widget values based on current active measurement state.
   static void UpdateActiveTab( qpointer_type measurement_interface );
 };
 

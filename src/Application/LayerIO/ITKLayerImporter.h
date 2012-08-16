@@ -50,10 +50,10 @@ namespace Seg3D
 class ITKLayerImporterPrivate;
 typedef boost::shared_ptr<ITKLayerImporterPrivate> ITKLayerImporterPrivateHandle;
 
-// CLASS ITKLayerImporter
-// This class imports files, using ITK's importers. This one has a low priority as it is the
-// the importer of last resort. As ITK's importers are buggy, dedicated importers are preferred
-// over ITK's importers
+/// CLASS ITKLayerImporter
+/// This class imports files, using ITK's importers. This one has a low priority as it is the
+/// the importer of last resort. As ITK's importers are buggy, dedicated importers are preferred
+/// over ITK's importers
 
 class ITKLayerImporter : public LayerSingleFileImporter
 {
@@ -70,30 +70,30 @@ public:
 
   // -- Import information from file --
 public:
-  // GET_FILE_INFO
-  // Get the information about the file we are currently importing.
-  // NOTE: This function often causes the file to be loaded in its entirety
-  // Hence it is best to run this on a separate thread if needed ( from the GUI ).
+  /// GET_FILE_INFO
+  /// Get the information about the file we are currently importing.
+  /// NOTE: This function often causes the file to be loaded in its entirety
+  /// Hence it is best to run this on a separate thread if needed ( from the GUI ).
   virtual bool get_file_info( LayerImporterFileInfoHandle& info );
 
   // -- Import data from file --  
 public: 
-  // GET_FILE_DATA
-  // Get the file data from the file/ file series
-  // NOTE: The information is generated again, so that hints can be processed
+  /// GET_FILE_DATA
+  /// Get the file data from the file/ file series
+  /// NOTE: The information is generated again, so that hints can be processed
   virtual bool get_file_data( LayerImporterFileDataHandle& data );
 
   // -- Copy files --
 public:
-  // GET_INPUTFILES_IMPORTER
-  // For provenance files need to be copied into the project cache. As some files need special
-  // attention: for example mhd and nhdr files actually list where there data is stored, this
-  // function can be overloaded with a specific function that copies the files. Otherwise a
-  // default implementation is given in the two derived classes.
+  /// GET_INPUTFILES_IMPORTER
+  /// For provenance files need to be copied into the project cache. As some files need special
+  /// attention: for example mhd and nhdr files actually list where there data is stored, this
+  /// function can be overloaded with a specific function that copies the files. Otherwise a
+  /// default implementation is given in the two derived classes.
   
-  // NOTE: This function has to be implemented as metaIO files can refer to other files on the
-  // file system. Hence copying the header files needs special logic, as it needs to copy the depending
-  // files as well and may need to change file references in the header files.
+  /// NOTE: This function has to be implemented as metaIO files can refer to other files on the
+  /// file system. Hence copying the header files needs special logic, as it needs to copy the depending
+  /// files as well and may need to change file references in the header files.
   virtual InputFilesImporterHandle get_inputfiles_importer();
     
   // -- internals of the class --

@@ -51,15 +51,15 @@ public:
 
   //-- interface builder --
 public:
-  // CREATE_WIDGET:
-  // The constructor only builds the class. Because this is handled through
-  // a factory method we use this auxillary function to build the inner parts
-  // of the widget
+  /// CREATE_WIDGET:
+  /// The constructor only builds the class. Because this is handled through
+  /// a factory method we use this auxillary function to build the inner parts
+  /// of the widget
   bool create_widget( QWidget* parent, ToolHandle& tool );
 
-  // BUILD_WIDGET:
-  // Function to create the specific tool widget:
-  // This one needs to be overloaded
+  /// BUILD_WIDGET:
+  /// Function to create the specific tool widget:
+  /// This one needs to be overloaded
   virtual bool build_widget( QFrame* frame ) = 0; // << NEEDS TO BE REIMPLEMENTED
 };
 

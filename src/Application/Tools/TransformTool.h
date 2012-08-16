@@ -58,48 +58,48 @@ public:
 
 public:
 
-  // HANDLE_MOUSE_LEAVE:
-  // Called when the mouse has left a viewer.
+  /// HANDLE_MOUSE_LEAVE:
+  /// Called when the mouse has left a viewer.
   virtual bool handle_mouse_leave( ViewerHandle viewer );
 
-  // HANDLE_MOUSE_MOVE:
-  // Called when the mouse moves in a viewer.
+  /// HANDLE_MOUSE_MOVE:
+  /// Called when the mouse moves in a viewer.
   virtual bool handle_mouse_move( ViewerHandle viewer, 
     const Core::MouseHistory& mouse_history, 
     int button, int buttons, int modifiers );
 
-  // HANDLE_MOUSE_PRESS:
-  // Called when a mouse button has been pressed.
+  /// HANDLE_MOUSE_PRESS:
+  /// Called when a mouse button has been pressed.
   virtual bool handle_mouse_press( ViewerHandle viewer, 
     const Core::MouseHistory& mouse_history, 
     int button, int buttons, int modifiers );
 
-  // HANDLE_MOUSE_RELEASE:
-  // Called when a mouse button has been released.
+  /// HANDLE_MOUSE_RELEASE:
+  /// Called when a mouse button has been released.
   virtual bool handle_mouse_release( ViewerHandle viewer, 
     const Core::MouseHistory& mouse_history, 
     int button, int buttons, int modifiers );
 
-  // REDRAW:
-  // Draw seed points in the specified viewer.
-  // The function should only be called by the renderer, which has a valid GL context.
+  /// REDRAW:
+  /// Draw seed points in the specified viewer.
+  /// The function should only be called by the renderer, which has a valid GL context.
   virtual void redraw( size_t viewer_id, const Core::Matrix& proj_mat,
     int viewer_width, int viewer_height );
 
-  // HAS_2D_VISUAL:
-  // Returns true if the tool draws itself in the 2D view, otherwise false.
-  // The default implementation returns false.
+  /// HAS_2D_VISUAL:
+  /// Returns true if the tool draws itself in the 2D view, otherwise false.
+  /// The default implementation returns false.
   virtual bool has_2d_visual();
 
-  // EXECUTE:
-  // Execute the tool and dispatch the action
+  /// EXECUTE:
+  /// Execute the tool and dispatch the action
   virtual void execute( Core::ActionContextHandle context );
 
-  // RESET:
-  // Reset the transformation to its original state.
+  /// RESET:
+  /// Reset the transformation to its original state.
   void reset();
 
-  // -- state --
+        // -- state --
 public:
   Core::StateRangedDoubleHandle origin_state_[ 3 ];
   Core::StateRangedDoubleHandle spacing_state_[ 3 ];

@@ -54,8 +54,8 @@ public:
   virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
   
 public:
-  // DISPATCH:
-  // Dispatch an action that activates a layer
+  /// DISPATCH:
+  /// Dispatch an action that activates a layer
   static void Dispatch( Core::ActionContextHandle context );
 };
 

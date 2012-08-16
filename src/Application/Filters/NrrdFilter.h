@@ -61,21 +61,21 @@ public:
     
 protected:
 
-  // GET_NRRD_FROM_LAYER:
-  // Get a nrrd from a data or mask layer
+  /// GET_NRRD_FROM_LAYER:
+  /// Get a nrrd from a data or mask layer
   bool get_nrrd_from_layer( const LayerHandle& layer, Core::NrrdDataHandle& nrrd_data );
 
-  // CREATE_NRRD
-  // Short cut for generating nrrds
+  /// CREATE_NRRD
+  /// Short cut for generating nrrds
   bool create_nrrd( Core::NrrdDataHandle& nrrd_data );
 
-  // INSERT_NRRD_INTO_LAYER:
-  // Insert an nrrd back into a layer
+  /// INSERT_NRRD_INTO_LAYER:
+  /// Insert an nrrd back into a layer
   bool insert_nrrd_into_layer( const LayerHandle& layer, Core::NrrdDataHandle nrrd_data );
   
-  // UPDATE_PROGRESS:
-  // Teem does not support updating progress, hence we add a small amount before and a large
-  // amount after the filter was run
+  /// UPDATE_PROGRESS:
+  /// Teem does not support updating progress, hence we add a small amount before and a large
+  /// amount after the filter was run
   void update_progress( LayerHandle layer, double amount );
 
 };

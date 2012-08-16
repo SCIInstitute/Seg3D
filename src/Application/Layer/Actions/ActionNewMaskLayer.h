@@ -71,8 +71,8 @@ private:
   
   // -- Dispatch this action from the interface --
 public:
-  // DISPATCH:
-  // Dispatch action that creates a new mask layer 
+  /// DISPATCH:
+  /// Dispatch action that creates a new mask layer 
   static void Dispatch( Core::ActionContextHandle context, const std::string& group_id );
 };
   

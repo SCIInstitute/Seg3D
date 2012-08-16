@@ -52,37 +52,37 @@ public:
 
   // -- state --
 public:
-  // How many iterations for dilating 
+  /// How many iterations for dilating 
   Core::StateRangedIntHandle dilate_state_;
 
-  // How many iterations for eroding 
+  /// How many iterations for eroding 
   Core::StateRangedIntHandle erode_state_;
 
-  // Whether to replace the input layer with the output layer
+  /// Whether to replace the input layer with the output layer
   Core::StateBoolHandle replace_state_;
 
-  // Layerid of the mask layer
+  /// Layerid of the mask layer
   Core::StateLabeledOptionHandle mask_state_;
     
-  // Whether mask should be inverted in this filter
+  /// Whether mask should be inverted in this filter
   Core::StateBoolHandle mask_invert_state_;
   
-  // Whether the filters runs 2d or 3d
+  /// Whether the filters runs 2d or 3d
   Core::StateBoolHandle only2d_state_;
   
 public:
 
-  // Execute the dilate -> erode action
+  /// Execute the dilate -> erode action
   void execute_dilateerode( Core::ActionContextHandle context );
   
-  // Execute the dilate action 
+  /// Execute the dilate action 
   void execute_dilate( Core::ActionContextHandle context );
   
-  // Execute the erode action
+  /// Execute the erode action
   void execute_erode( Core::ActionContextHandle context );
 
 private:
-  // Internal function for getting the slice type
+  /// Internal function for getting the slice type
   int get_slice_type();
 };
 

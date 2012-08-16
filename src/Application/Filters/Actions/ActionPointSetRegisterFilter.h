@@ -83,8 +83,8 @@ private:
   
   // -- Dispatch this action from the interface --
 public:
-  // DISPATCH:
-  // Create and dispatch action that inserts the new layer 
+  /// DISPATCH:
+  /// Create and dispatch action that inserts the new layer 
   static void Dispatch( Core::ActionContextHandle context, 
     const std::string& target_layer, const std::string& mask_layer, int iterations, 
     const std::string& transform_state_id );

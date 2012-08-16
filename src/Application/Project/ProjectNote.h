@@ -49,8 +49,8 @@ class ProjectNote;
 typedef std::vector< ProjectNote > ProjectNoteList;
 typedef boost::shared_ptr< ProjectNoteList > ProjectNoteListHandle;
 
-// CLASS ProjectNote
-// This helper class is for querying project notes from the interface thread.
+/// CLASS ProjectNote
+/// This helper class is for querying project notes from the interface thread.
 class ProjectNote
 {
 public:
@@ -84,11 +84,11 @@ public:
   }
   
 private:
-  // The content of the note
+  /// The content of the note
   std::string note_;
-  // User that wrote the note
+  /// User that wrote the note
   std::string user_id_;
-  // Timestamp of when the note was saved in UTC time
+  /// Timestamp of when the note was saved in UTC time
   timestamp_type timestamp_;
 };  
 

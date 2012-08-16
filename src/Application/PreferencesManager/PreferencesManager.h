@@ -109,33 +109,33 @@ public:
   Core::StateBoolHandle show_rendering_bar_state_;
   
 public:
-  // GET_DEFAULT_COLORS:
-  // This function returns a vector of the default colors
+  /// GET_DEFAULT_COLORS:
+  /// This function returns a vector of the default colors
   const std::vector< Core::Color >& get_default_colors() const;
 
-  // GET_COLOR:
-  // Get the color at the index.
+  /// GET_COLOR:
+  /// Get the color at the index.
   Core::Color get_color( int index ) const;
 
-  // GET_BACKGROUND_COLOR:
-  // Get the currently selected background color for the viewers.
+  /// GET_BACKGROUND_COLOR:
+  /// Get the currently selected background color for the viewers.
   Core::Color get_background_color() const;
 
-  // SAVE_STATE:
-  // Save the preferences to file.
+  /// SAVE_STATE:
+  /// Save the preferences to file.
   void save_state();
   
 private:
-  // INITIALIZE:
-  // this function loads the values for PreferencesManager from file
+  /// INITIALIZE:
+  /// this function loads the values for PreferencesManager from file
   void initialize();
 
-  // INITIALIZE_STATES:
-  // This function is called by the constructor to initialize the state variables
+  /// INITIALIZE_STATES:
+  /// This function is called by the constructor to initialize the state variables
   void initialize_states();
   
-  // INITIALIZE_DEFAULT_COLORS:
-  // This function is called by the constructor to initialize a vector of default color values
+  /// INITIALIZE_DEFAULT_COLORS:
+  /// This function is called by the constructor to initialize a vector of default color values
   bool initialize_default_colors();
   
 private:

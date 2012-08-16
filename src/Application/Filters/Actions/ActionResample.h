@@ -104,6 +104,5 @@ public:
   static const std::string GAUSSIAN_C;
 };
   
-} // end namespace Seg3D
-
+} //
 #endif

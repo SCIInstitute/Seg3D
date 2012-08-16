@@ -54,8 +54,8 @@
 namespace Seg3D
 {
 
-// CLASS LayerImporterFileData
-// This class contains the data extracted out of a file
+/// CLASS LayerImporterFileData
+/// This class contains the data extracted out of a file
 
 class LayerImporterFileData;
 class LayerImporterFileDataPrivate;
@@ -72,44 +72,44 @@ public:
 
   // -- accessors --
 public:
-  // GET_GRID_TRANSFORM
-  // Get the transform of the data
+  /// GET_GRID_TRANSFORM
+  /// Get the transform of the data
   const Core::GridTransform& get_grid_transform() const;
 
-  // SET_GRID_TRANSFORM
-  // Set the grid transform of the data
+  /// SET_GRID_TRANSFORM
+  /// Set the grid transform of the data
   void set_grid_transform( const Core::GridTransform& grid_transform );
 
-  // GET_META_DATA
-  // Get the meta data associated with the data
+  /// GET_META_DATA
+  /// Get the meta data associated with the data
   const LayerMetaData& get_meta_data() const;
   
-  // SET_META_DATA
-  // Set the meta data associated with the data
+  /// SET_META_DATA
+  /// Set the meta data associated with the data
   void set_meta_data( const LayerMetaData& meta_data );
   
-  // GET_DATABLOCK
-  // Get the datablock with the data
+  /// GET_DATABLOCK
+  /// Get the datablock with the data
   Core::DataBlockHandle get_data_block() const;
     
-  // SET_DATABLOCK
-  // Set the data block that was loaded from file
+  /// SET_DATABLOCK
+  /// Set the data block that was loaded from file
   void set_data_block( const Core::DataBlockHandle& data_block );
   
-  // GET_DATA_TYPE
-  // Get the type of the data
+  /// GET_DATA_TYPE
+  /// Get the type of the data
   const std::string& get_name() const;
   
-  // SET_DATA_TYPE
-  // Set the data type of the data
+  /// SET_DATA_TYPE
+  /// Set the data type of the data
   void set_name( const std::string& data_type );
     
   // -- converter functions --
 public:                     
   
-  // CONVERT_TO_LAYERS
-  // Convert the data contained in this structure into layers that can be inserted into the
-  // LayerManager
+  /// CONVERT_TO_LAYERS
+  /// Convert the data contained in this structure into layers that can be inserted into the
+  /// LayerManager
   bool convert_to_layers( const std::string& mode, std::vector< LayerHandle >& layers );
   
   // -- internals --

@@ -45,9 +45,9 @@
 namespace Seg3D
 {
 
-// CLASS TOOLINTERFACE:
-// Base class of each tool interface. These are not included inside the tool
-// to ensure that the GUI is properly separated from the application.
+/// CLASS TOOLINTERFACE:
+/// Base class of each tool interface. These are not included inside the tool
+/// to ensure that the GUI is properly separated from the application.
 
 class ToolInterface : public Core::ConnectionHandler
 {
@@ -60,22 +60,22 @@ public:
   // Store the parent tool this interface is intended for.
 public:
 
-  // SET_TOOL:
-  // Insert the tool into the interface
+  /// SET_TOOL:
+  /// Insert the tool into the interface
   void set_tool( ToolHandle tool );
 
-  // TOOL:
-  // Get the current tool handle stored in this interface class
+  /// TOOL:
+  /// Get the current tool handle stored in this interface class
   ToolHandle tool() const;
   
-  // TOOLID:
-  // This is a shortcut function to the toolid this interface is associated
-  // with
+  /// TOOLID:
+  /// This is a shortcut function to the toolid this interface is associated
+  /// with
   std::string toolid() const;
 
   // -- internals of this class --
 protected:
-  // Handle to the underlying tool
+  /// Handle to the underlying tool
   ToolHandle tool_;
 };
 

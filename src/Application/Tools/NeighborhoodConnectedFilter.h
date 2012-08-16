@@ -49,8 +49,8 @@ public:
   NeighborhoodConnectedFilter( const std::string& toolid );
   virtual ~NeighborhoodConnectedFilter();
 
-  // EXECUTE:
-  // Fire off the action that executes the filter
+  /// EXECUTE:
+  /// Fire off the action that executes the filter
   virtual void execute( Core::ActionContextHandle context );
 
 };

@@ -74,8 +74,8 @@ public:
     
 protected:
 
-  // GET_ITK_IMAGE_FROM_LAYER:
-  // Retrieve an itk image from a data or mask layer
+  /// GET_ITK_IMAGE_FROM_LAYER:
+  /// Retrieve an itk image from a data or mask layer
   template <class T>
   bool get_itk_image_from_layer( const LayerHandle& layer, 
     typename Core::ITKImageDataT<T>::Handle& image, bool invert = false )
@@ -149,8 +149,8 @@ protected:
   }
 
 
-  // GET_ITK_IMAGE_FROM_MASK_LAYER:
-  // Retrieve an itk image from a data or mask layer
+  /// GET_ITK_IMAGE_FROM_MASK_LAYER:
+  /// Retrieve an itk image from a data or mask layer
   template <class T>
   bool get_itk_image_from_mask_layer( const LayerHandle& layer, 
     typename Core::ITKImageDataT<T>::Handle& image, double label = 1.0 )
@@ -197,8 +197,8 @@ protected:
   }
 
 
-  // INSERT_ITK_IMAGE_INTO_LAYER:
-  // Insert an itk image back into a layer
+  /// INSERT_ITK_IMAGE_INTO_LAYER:
+  /// Insert an itk image back into a layer
   template< class T >
   bool insert_itk_image_into_layer( const LayerHandle& layer, 
     typename itk::Image<T,3>* itk_image )
@@ -207,8 +207,8 @@ protected:
     return insert_itk_image_pointer_into_layer<T>( layer, pointer );
   }
 
-  // INSERT_ITK_IMAGE_POINTER_INTO_LAYER:
-  // Insert an itk image back into a layer
+  /// INSERT_ITK_IMAGE_POINTER_INTO_LAYER:
+  /// Insert an itk image back into a layer
   template< class T >
   bool insert_itk_image_pointer_into_layer( const LayerHandle& layer, 
     typename itk::Image<T,3>::Pointer itk_image )
@@ -263,8 +263,8 @@ protected:
     return false;
   }
 
-  // INSERT_ITK_POSITIVE_LABELS_INTO_MASK_LAYER:
-  // Insert an itk image back into a layer
+  /// INSERT_ITK_POSITIVE_LABELS_INTO_MASK_LAYER:
+  /// Insert an itk image back into a layer
   template< class T >
   bool insert_itk_positive_labels_into_mask_layer( const LayerHandle& layer, 
     typename itk::Image<T,3>* itk_image, bool invert = false )
@@ -273,8 +273,8 @@ protected:
     return insert_itk_positive_labels_pointer_into_mask_layer<T>( layer, pointer, invert );
   }
 
-  // INSERT_ITK_POSITIVE_LABELS_POINTER_INTO_MASK_LAYER:
-  // Insert an itk image back into a layer
+  /// INSERT_ITK_POSITIVE_LABELS_POINTER_INTO_MASK_LAYER:
+  /// Insert an itk image back into a layer
   template< class T >
   bool insert_itk_positive_labels_pointer_into_mask_layer( const LayerHandle& layer, 
     typename itk::Image<T,3>::Pointer itk_image, bool invert = false )
@@ -311,8 +311,8 @@ protected:
   }
 
 
-  // INSERT_ITK_LABEL_INTO_MASK_LAYER:
-  // Insert an itk image back into a layer
+  /// INSERT_ITK_LABEL_INTO_MASK_LAYER:
+  /// Insert an itk image back into a layer
   template< class T >
   bool insert_itk_label_into_mask_layer( const LayerHandle& layer, 
     typename itk::Image<T,3>* itk_image, T label )
@@ -321,8 +321,8 @@ protected:
     return insert_itk_label_pointer_into_mask_layer<T>( layer, pointer, label );
   }
 
-  // INSERT_ITK_LABEL_POINTER_INTO_MASK_LAYER:
-  // Insert an itk image back into a layer
+  /// INSERT_ITK_LABEL_POINTER_INTO_MASK_LAYER:
+  /// Insert an itk image back into a layer
   template< class T >
   bool insert_itk_label_pointer_into_mask_layer( const LayerHandle& layer, 
     typename itk::Image<T,3>::Pointer itk_image, T label )
@@ -358,8 +358,8 @@ protected:
     return false;
   }
 
-  // CONVERT_AND_INSERT_ITK_IMAGE_INTO_LAYER:
-  // Insert an itk image back into a layer
+  /// CONVERT_AND_INSERT_ITK_IMAGE_INTO_LAYER:
+  /// Insert an itk image back into a layer
   template< class T >
   bool convert_and_insert_itk_image_into_layer( const LayerHandle& layer, 
     typename itk::Image<T,3>* itk_image, Core::DataType data_type )
@@ -369,8 +369,8 @@ protected:
       pointer, data_type );
   }
 
-  // CONVERT_AND_INSERT_ITK_IMAGE_POINTER_INTO_LAYER:
-  // Insert an itk image back into a layer
+  /// CONVERT_AND_INSERT_ITK_IMAGE_POINTER_INTO_LAYER:
+  /// Insert an itk image back into a layer
   template< class T >
   bool convert_and_insert_itk_image_pointer_into_layer( const LayerHandle& layer, 
     typename itk::Image<T,3>::Pointer itk_image, Core::DataType data_type )
@@ -448,8 +448,8 @@ protected:
     return false;
   }
 
-  // FORWARD_ABORT_TO_FILTER:
-  // Forward a Seg3D abort to an itk filter
+  /// FORWARD_ABORT_TO_FILTER:
+  /// Forward a Seg3D abort to an itk filter
   template< class T >
   void forward_abort_to_filter( T filter_pointer, LayerHandle layer )
   {
@@ -457,8 +457,8 @@ protected:
       layer );
   }
 
-  // OBSERVE_ITK_PROGRESS:
-  // Forward the progress an itk filter is making and check for the abort status of the layer
+  /// OBSERVE_ITK_PROGRESS:
+  /// Forward the progress an itk filter is making and check for the abort status of the layer
   template< class T >
   void observe_itk_progress( T filter_pointer, const LayerHandle& layer, 
     float progress_start = 0.0, float progress_amount = 1.0 )
@@ -467,14 +467,14 @@ protected:
       progress_start, progress_amount );
   }
 
-  // OBSERVE_ITK_ITERATIONS:
-  // Forward progess on iterations to a user specified function
-  //template< class T >
-  //void observe_itk_iterations( T filter_pointer, boost::function< void( itk::Object* ) > iteration_fcn )
-  //{
-  //  this->observe_itk_iterations_internal( itk::ProcessObject::Pointer( filter_pointer ),
-  //    iteration_fcn );
-  //}
+  /// OBSERVE_ITK_ITERATIONS:
+  /// Forward progess on iterations to a user specified function
+  ///template< class T >
+  ///void observe_itk_iterations( T filter_pointer, boost::function< void( itk::Object* ) > iteration_fcn )
+  ///{
+  /// this->observe_itk_iterations_internal( itk::ProcessObject::Pointer( filter_pointer ),
+  ///   iteration_fcn );
+  ///}
 
 
   template< class T >
@@ -485,10 +485,10 @@ protected:
   }
 
 
-  // LIMIT_NUMBER_OF_ITK_THREADS:
-  // Limit the number of itk threads so that at least one thread can be used to allow for
-  // interaction in the program.
-  // NOTE: If the host machine does not have multiple cores this function will not do anything
+  /// LIMIT_NUMBER_OF_ITK_THREADS:
+  /// Limit the number of itk threads so that at least one thread can be used to allow for
+  /// interaction in the program.
+  /// NOTE: If the host machine does not have multiple cores this function will not do anything
   template< class T>
   void limit_number_of_itk_threads( T filter_pointer )
   {
@@ -496,12 +496,12 @@ protected:
   }
   
 protected:      
-  // HANDLE_ABORT:
-  // A virtual function that can be overloaded
+  /// HANDLE_ABORT:
+  /// A virtual function that can be overloaded
   virtual void handle_abort();    
 
-  // HANDLE_STOP:
-  // A virtual function that can be overloaded
+  /// HANDLE_STOP:
+  /// A virtual function that can be overloaded
   virtual void handle_stop();   
   
 private:
@@ -509,17 +509,17 @@ private:
   void observe_itk_progress_internal( itk::ProcessObject::Pointer filter, 
     const LayerHandle& layer, float progress_start, float progress_amount );
 
-  // Internal function for setting up itk iteration forwarding
-  //void observe_itk_iterations_internal( itk::ProcessObject::Pointer filter, 
-  //  boost::function< void( itk::Object* ) > iteration_fcn );
+  /// Internal function for setting up itk iteration forwarding
+  ///void observe_itk_iterations_internal( itk::ProcessObject::Pointer filter, 
+  /// boost::function< void( itk::Object* ) > iteration_fcn );
 
   void observe_itk_iterations_internal( itk::Object::Pointer filter, 
     boost::function< void( itk::Object* ) > iteration_fcn );
     
-  // Internal function for setting up abort handling
+  /// Internal  function for setting up abort handling
   void forward_abort_to_filter_internal( itk::ProcessObject::Pointer filter, LayerHandle layer );
     
-  // Internal function for limiting the number of threads 
+  /// Internal function for limiting the number of threads  
   void limit_number_of_itk_threads_internal( itk::ProcessObject::Pointer filter );  
     
   ITKFilterPrivateHandle private_;

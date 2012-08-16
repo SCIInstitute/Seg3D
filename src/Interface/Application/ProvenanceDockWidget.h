@@ -49,16 +49,16 @@ public:
   virtual ~ProvenanceDockWidget();
 
 private Q_SLOTS:
-  // UPDATE_CURRENT_PROVENANCE_STEP:
-  // Update the detailed information when the current selected step has changed.
+  /// UPDATE_CURRENT_PROVENANCE_STEP:
+  /// Update the detailed information when the current selected step has changed.
   void handle_current_step_changed( const QModelIndex& index );
 
-  // DISPATCH_RECREATE_PROVENANCE:
-  // Dispatch an ActionRecreateLayer if the current selected row has a valid provenance ID of interest.
+  /// DISPATCH_RECREATE_PROVENANCE:
+  /// Dispatch an ActionRecreateLayer if the current selected row has a valid provenance ID of interest.
   void dispatch_recreate_provenance();
 
-  // REFRESH_PROVENANCE_TRAIL:
-  // Request the up-to-date provenance trail of the current active layer.
+  /// REFRESH_PROVENANCE_TRAIL:
+  /// Request the up-to-date provenance trail of the current active layer.
   void refresh_provenance_trail();
 
 private:

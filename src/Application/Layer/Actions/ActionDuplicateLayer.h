@@ -69,12 +69,12 @@ private:
   
   // -- Dispatch this action from the interface --
 public:
-  // DISPATCH:
-  // Dispatch action that duplicates a certain layer
+  /// DISPATCH:
+  /// Dispatch action that duplicates a certain layer
   static void Dispatch( Core::ActionContextHandle context, const std::string& layer_id );
 
-  // DISPATCH:
-  // Dispatch action that duplicates the active layer
+  /// DISPATCH:
+  /// Dispatch action that duplicates the active layer
   static void Dispatch( Core::ActionContextHandle context );
 };
   

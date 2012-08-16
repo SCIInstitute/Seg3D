@@ -57,55 +57,55 @@ public:
   DataLayer( const std::string& state_id );
   virtual ~DataLayer();
 
-  // GET_TYPE:
-  // this function returns the a Core::VolumeType indicating that this is a DataLayer 
+  /// GET_TYPE:
+  /// this function returns the a Core::VolumeType indicating that this is a DataLayer 
   virtual Core::VolumeType get_type() const { return Core::VolumeType::DATA_E; }
 
-  // GET_BYTE_SIZE:
-  // Get the size of the data contained in the layer in bytes
+  /// GET_BYTE_SIZE:
+  /// Get the size of the data contained in the layer in bytes
   virtual size_t get_byte_size() const;
 
-  // GET_GRID_TRANSFORM:
-  // this function returns the grid transform of the data volume
-  // Locks: StateEngine
+  /// GET_GRID_TRANSFORM:
+  /// this function returns the grid transform of the data volume
+  /// Locks: StateEngine
   virtual Core::GridTransform get_grid_transform() const;
   
-  // SET_GRID_TRANSFORM:
-  // Set the grid transform of the data volume
+  /// SET_GRID_TRANSFORM:
+  /// Set the grid transform of the data volume
   virtual void set_grid_transform( const Core::GridTransform& grid_transform, 
     bool preserve_centering );
 
-  // HAS_VALID_DATA:
-  // Check whether the layer has valid data.
+  /// HAS_VALID_DATA:
+  /// Check whether the layer has valid data.
   virtual bool has_valid_data() const;  
     
-  // GET_DATA_TYPE:
-  // Get the data type of the data volume
+  /// GET_DATA_TYPE:
+  /// Get the data type of the data volume
   virtual Core::DataType get_data_type() const;
   
-  // GET_VOLUME:
-  // Get the underlying volume.
+  /// GET_VOLUME:
+  /// Get the underlying volume.
   virtual Core::VolumeHandle get_volume() const;
 
-  // DUPLICATE_LAYER:
-  // Duplicate layer
+  /// DUPLICATE_LAYER:
+  /// Duplicate layer
   virtual LayerHandle duplicate() const;
 
-  // GET_DATA_VOLUME:
-  // this function returns the data volume
+  /// GET_DATA_VOLUME:
+  /// this function returns the data volume
   Core::DataVolumeHandle get_data_volume() const;
 
-  // SET_DATA_VOLUME:
-  // this function sets the data_volume
+  /// SET_DATA_VOLUME:
+  /// this function sets the data_volume
   bool set_data_volume( Core::DataVolumeHandle data_volume );
   
   // -- state variables --
 public:
 
-  // State describing contrast
+  /// State describing contrast
   Core::StateRangedDoubleHandle contrast_state_;
 
-  // State describing brightness
+  /// State describing brightness
   Core::StateRangedDoubleHandle brightness_state_;
 
   Core::StateRangedDoubleHandle display_min_value_state_;
@@ -114,7 +114,7 @@ public:
 
   Core::StateBoolHandle adjust_display_min_max_state_;
 
-  // State describing whether volume is volume rendered
+  /// State describing whether volume is volume rendered
   Core::StateBoolHandle volume_rendered_state_;
 
   Core::StateStringHandle data_type_state_;
@@ -122,16 +122,16 @@ public:
   Core::StateDoubleHandle max_value_state_;
 
 protected:
-  // PRE_SAVE_STATES:
-  // this function synchronize the generation number for the session saving
+  /// PRE_SAVE_STATES:
+  /// this function synchronize the generation number for the session saving
   virtual bool pre_save_states( Core::StateIO& state_io );
 
-  // POST_LOAD_STATES:
-  // this function takes care of connecting the DataVolume to the data layer after it's settings
+  /// POST_LOAD_STATES:
+  /// this function takes care of connecting the DataVolume to the data layer after it's settings
   virtual bool post_load_states( const Core::StateIO& state_io );
   
-  // CLEAN_UP:
-  // this function cleans up the data volume for when you are deleting the data layer and reloading
+  /// CLEAN_UP:
+  /// this function cleans up the data volume for when you are deleting the data layer and reloading
   virtual void clean_up();
 
 private:

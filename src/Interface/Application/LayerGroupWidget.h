@@ -50,108 +50,108 @@ public:
   virtual ~LayerGroupWidget();
 
 public:    
-  // PREP_FOR_ANIMATION:
-  // this function replaces the widget with a screenshot of the widget for speed
+  /// PREP_FOR_ANIMATION:
+  /// this function replaces the widget with a screenshot of the widget for speed
   void prep_for_animation( bool move_time );
   
-    // INSTANT_HIDE_DROP_SPACE:
-    // this function instantly hides the drop space for when a move has been made
+    /// INSTANT_HIDE_DROP_SPACE:
+    /// this function instantly hides the drop space for when a move has been made
     void instant_hide_drop_space();
   
-  // PREP_LAYERS_FOR_DRAG_AND_DROP:
-  // this function tells each layer to prepare for drag and drop by replacing the actual widgets
-  // with images of themselves.
+  /// PREP_LAYERS_FOR_DRAG_AND_DROP:
+  /// this function tells each layer to prepare for drag and drop by replacing the actual widgets
+  /// with images of themselves.
   void prep_layers_for_drag_and_drop( bool move_time );
   
-  // SET_PICKED_UP_GROUP_SIZE:
-  // function that sets the size of the currently picked up group
+  /// SET_PICKED_UP_GROUP_SIZE:
+  /// function that sets the size of the currently picked up group
   void set_picked_up_group_size( int group_height );
     
-  // HANDLE_CHANGE:
-  // this function handles changes from the layer manager.
+  /// HANDLE_CHANGE:
+  /// this function handles changes from the layer manager.
   void handle_change();
   
-  // NOTIFY_PICKED_UP_LAYER_SIZE:
-  // this function sets the layer size of all
+  /// NOTIFY_PICKED_UP_LAYER_SIZE:
+  /// this function sets the layer size of all
   void notify_picked_up_layer_size( int layer_size );
 
 protected:
-  // RESIZEEVENT:
-  // this is an overloaded function to keep the size of the overlay widget in sync with the 
-  // size of the LayerGroupWidget
+  /// RESIZEEVENT:
+  /// this is an overloaded function to keep the size of the overlay widget in sync with the 
+  /// size of the LayerGroupWidget
   virtual void resizeEvent( QResizeEvent *event );
 
-  // MOUSEPRESSEVENT:
-  // Overloaded function that is triggered when a user clicks on the group
+  /// MOUSEPRESSEVENT:
+  /// Overloaded function that is triggered when a user clicks on the group
   virtual void mousePressEvent( QMouseEvent* event );
 
-  // DROPEVENT:
-  // Overloaded function that is triggered when a drop occurs on the group
+  /// DROPEVENT:
+  /// Overloaded function that is triggered when a drop occurs on the group
   virtual void dropEvent( QDropEvent* event );
 
-  // DRAGENTEREVENT:
-  // Overloaded function that is triggered when a drag even enters the group
+  /// DRAGENTEREVENT:
+  /// Overloaded function that is triggered when a drag even enters the group
   virtual void dragEnterEvent( QDragEnterEvent* event );
   
-  // DRAGLEAVEEVENT:
-  // Overloaded function that is triggered when a drag even leaves the group
+  /// DRAGLEAVEEVENT:
+  /// Overloaded function that is triggered when a drag even leaves the group
   virtual void dragLeaveEvent( QDragLeaveEvent* event );
 
 Q_SIGNALS:
-  // PREP_GROUPS_FOR_DRAG_AND_DROP_SIGNAL_:
-  // this signal tells the LayerManagerWidget that it needs to prep all the groups for drag and 
-  // drop.
+  /// PREP_GROUPS_FOR_DRAG_AND_DROP_SIGNAL_:
+  /// this signal tells the LayerManagerWidget that it needs to prep all the groups for drag and 
+  /// drop.
   void prep_layers_for_drag_and_drop_signal_( bool );
 
-  // PREP_LAYERS_FOR_DRAG_AND_DROP_SIGNAL_:
-  // this signal tells the LayerManagerWidget that it needs to tell all the groups to prepare their
-  // layers for for drag and drop.
+  /// PREP_LAYERS_FOR_DRAG_AND_DROP_SIGNAL_:
+  /// this signal tells the LayerManagerWidget that it needs to tell all the groups to prepare their
+  /// layers for for drag and drop.
   void prep_groups_for_drag_and_drop_signal_( bool );
 
-  // PICKED_UP_GROUP_SIZE_SIGNAL_:
-  // this signal is sent to the LayerManagerWidget to notify the other groups what size this
-  // group is so that the proper size slot is opened up
+  /// PICKED_UP_GROUP_SIZE_SIGNAL_:
+  /// this signal is sent to the LayerManagerWidget to notify the other groups what size this
+  /// group is so that the proper size slot is opened up
   void picked_up_group_size_signal_( int );
 
-  // PICKED_UP_LAYER_SIZE_SIGNAL_:
-  // this signal is sent to the LayerManagerWidget to notify the other layers what size this
-  // layer is so that the proper size slot is opened up
+  /// PICKED_UP_LAYER_SIZE_SIGNAL_:
+  /// this signal is sent to the LayerManagerWidget to notify the other layers what size this
+  /// layer is so that the proper size slot is opened up
   void picked_up_layer_size_signal_( int );
   
 private Q_SLOTS:
-  // SHOW_LAYERS:
-  // function that shows or hides the layers
+  /// SHOW_LAYERS:
+  /// function that shows or hides the layers
   void show_layers( bool show );
 
-  // UNCHECK_DELETE_CONFIRM:
-  // this is a simple helper function that unchecks the delete confirmation checkbox
+  /// UNCHECK_DELETE_CONFIRM:
+  /// this is a simple helper function that unchecks the delete confirmation checkbox
     void verify_delete();
 
-  // SHOW_GROUP:
-  // helper function for the show_layers function that shows the group
+  /// SHOW_GROUP:
+  /// helper function for the show_layers function that shows the group
   void show_group();
   
-  // HIDE_SHOW_CHECKBOXES:
-  // check or uncheck all the checkboxes on all the layers
+  /// HIDE_SHOW_CHECKBOXES:
+  /// check or uncheck all the checkboxes on all the layers
   void check_uncheck_for_delete( bool checked );
   
-  // CHECK_UNCHECK_FOR_DUPLICATE:
-  // checks or unchecks all the checkboxes on all the layers
+  /// CHECK_UNCHECK_FOR_DUPLICATE:
+  /// checks or unchecks all the checkboxes on all the layers
   void check_uncheck_for_duplicate( bool checked );
   
-  // ENABLE_DISABLE_DELETE_BUTTON:
-  // enables or disables the delete button based on whether or not there are any boxes selected
+  /// ENABLE_DISABLE_DELETE_BUTTON:
+  /// enables or disables the delete button based on whether or not there are any boxes selected
   void enable_disable_delete_button();
   
-  // ENABLE_DISABLE_DUPLICATE_BUTTON:
-  // enables or disables the duplicate button based on whether or not there are any boxes selected
+  /// ENABLE_DISABLE_DUPLICATE_BUTTON:
+  /// enables or disables the duplicate button based on whether or not there are any boxes selected
   void enable_disable_duplicate_button();
   
-  // DUPLICATE_CHECKED_LAYERS:
-  // dispatches actions for duplicating checked layers.
+  /// DUPLICATE_CHECKED_LAYERS:
+  /// dispatches actions for duplicating checked layers.
   void duplicate_checked_layers();
 
-  // -- widget internals --
+  /// -- widget internals --
 private:
     LayerGroupWidgetPrivate* private_;
 };

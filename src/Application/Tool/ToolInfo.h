@@ -50,8 +50,8 @@ class ToolInfoPrivate;
 typedef boost::shared_ptr< ToolInfo > ToolInfoHandle;
 typedef boost::shared_ptr< ToolInfoPrivate > ToolInfoPrivateHandle;
 
-// CLASS TOOLINFO:
-// Information class about an action
+/// CLASS TOOLINFO:
+/// Information class about an action
 
 class ToolInfo : public boost::noncopyable
 {
@@ -60,40 +60,40 @@ public:
   ToolInfo( const std::string& definition );
   
 public:
-  // GET_DEFINITION:
-  // Get the definition of the action (in xml format)
+  /// GET_DEFINITION:
+  /// Get the definition of the action (in xml format)
   std::string get_definition() const;
 
-  // GET_DESCRIPTION:
-  // Get the description of the action
+  /// GET_DESCRIPTION:
+  /// Get the description of the action
   std::string get_description() const;
 
-  // GET_NAME:
-  // The type/name of the action
+  /// GET_NAME:
+  /// The type/name of the action
   std::string get_name() const;
 
-  // GET_MENU:
-  // The name of menu where to put the tool
+  /// GET_MENU:
+  /// The name of menu where to put the tool
   std::string get_menu() const;
   
-  // GET_MENU_LABEL:
-  // The name of menu item to activate this tool
+  /// GET_MENU_LABEL:
+  /// The name of menu item to activate this tool
   std::string get_menu_label() const;
 
-  // GET_SHORTCUT_KEY:
-  // The shortcut key for this tool
+  /// GET_SHORTCUT_KEY:
+  /// The shortcut key for this tool
   std::string get_shortcut_key() const;
   
-  // GET_HOTKEYS_AND_DEFINITIONS:
-  // The hotkeys for this tool
+  /// GET_HOTKEYS_AND_DEFINITIONS:
+  /// The hotkeys for this tool
   std::string get_hotkeys() const;
 
-  // GET_URL:
-  // Get the help url
+  /// GET_URL:
+  /// Get the help url
   std::string get_url() const;
   
-  // GET_VERSION:
-  // Get the tool version
+  /// GET_VERSION:
+  /// Get the tool version
   int get_version() const;
 
 private:
@@ -104,12 +104,12 @@ public:
   typedef boost::mutex mutex_type;
   typedef boost::unique_lock<mutex_type> lock_type;
   
-  // GET_MUTEX:
-  // Get the mutex that protects the generation of ToolInfo instances
+  /// GET_MUTEX:
+  /// Get the mutex that protects the generation of ToolInfo instances
   static mutex_type& GetMutex();
 
 private:
-  // the actual mutex that is shared between all the ToolInfo classes
+  /// the actual mutex that is shared between all the ToolInfo classes
   static mutex_type mutex_;
 };
 

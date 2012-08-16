@@ -57,12 +57,12 @@ public:
 
   // -- Dispatch this action from the interface --
 public:
-  // CREATE
-  // Create action that activates a tool
+  /// CREATE
+  /// Create action that activates a tool
   static Core::ActionHandle Create( const std::string& toolid );
 
-  // DISPATCH
-  // Create and dispatch action that activates a tool
+  /// DISPATCH
+  /// Create and dispatch action that activates a tool
   static void Dispatch( Core::ActionContextHandle context, const std::string& toolid );
 
   // -- Action parameters --

@@ -39,8 +39,8 @@
 namespace Seg3D
 {
 
-// CLASS ACTIONSOCKET
-// Class that defines a socket for issuing commands
+/// CLASS ACTIONSOCKET
+/// Class that defines a socket for issuing commands
 
 // Forward declaration
 class AtionSocket;

@@ -29,7 +29,6 @@
 // Qt includes
 #include <QtCore/QVariant>
 #include <QtGui/QGridLayout>
-#include <QtGui/QFileDialog>
 #include <QtGui/QMessageBox>
 
 // Application includs
@@ -170,6 +169,7 @@ void ProjectInfoPage::set_path()
     if ( project_directory_.exists() )
     {
         this->project_path_lineedit_->setText( project_directory_.canonicalPath() );
+        this->most_recent_path_ = &project_directory_;
     }
     else
     {

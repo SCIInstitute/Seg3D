@@ -59,45 +59,45 @@ public:
 
 public:
 
-  // CLONE:
-  // Make a copy of the item.
+  /// CLONE:
+  /// Make a copy of the item.
   ClipboardItemHandle clone() const;
 
-  // GET_WIDTH:
-  // Returns the width of the buffer.
+  /// GET_WIDTH:
+  /// Returns the width of the buffer.
   size_t get_width() const;
 
-  // GET_HEIGHT:
-  // Returns the height of the buffer.
+  /// GET_HEIGHT:
+  /// Returns the height of the buffer.
   size_t get_height() const;
 
-  // GET_DATA_TYPE:
-  // Returns the actual data type of the buffer.
+  /// GET_DATA_TYPE:
+  /// Returns the actual data type of the buffer.
   Core::DataType get_data_type() const;
 
-  // BUFFER_SIZE:
-  // Returns the number of bytes in the buffer.
+  /// BUFFER_SIZE:
+  /// Returns the number of bytes in the buffer.
   size_t buffer_size() const;
 
-  // GET_BUFFER:
-  // Returns the pointer to the buffer of the clipboard item.
+  /// GET_BUFFER:
+  /// Returns the pointer to the buffer of the clipboard item.
   const void* get_buffer() const;
 
-  // GET_BUFFER:
-  // Returns the pointer to the buffer of the clipboard item.
+  /// GET_BUFFER:
+  /// Returns the pointer to the buffer of the clipboard item.
   void* get_buffer();
 
-  // SET_PROVENANCE_ID:
-  // Set the provenance ID of the clipboard item.
+  /// SET_PROVENANCE_ID:
+  /// Set the provenance ID of the clipboard item.
   void set_provenance_id( const ProvenanceID& pid );
 
-  // GET_PROVENANCE_ID:
-  // Get the provenance ID of the clipboard item.
+  /// GET_PROVENANCE_ID:
+  /// Get the provenance ID of the clipboard item.
   ProvenanceID get_provenance_id() const;
 
 private:
-  // RESIZE:
-  // Resize the buffer to match the new width, height, and data type.
+  /// RESIZE:
+  /// Resize the buffer to match the new width, height, and data type.
   void resize(  size_t width, size_t height, Core::DataType data_type );
 
 private:

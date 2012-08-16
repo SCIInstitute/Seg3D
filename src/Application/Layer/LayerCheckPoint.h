@@ -54,14 +54,14 @@ class LayerCheckPoint : public boost::noncopyable
 {
   // -- constructor / destructor -- 
 public:
-  // Create a volume check point
+  /// Create a volume check point
   LayerCheckPoint( LayerHandle layer );
 
-  // Create a slice check point
+  /// Create a slice check point
   LayerCheckPoint( LayerHandle layer, Core::SliceType type,
     Core::DataBlock::index_type index );
 
-  // Create a slice check point
+  /// Create a slice check point
   LayerCheckPoint( LayerHandle layer, Core::SliceType type,
     Core::DataBlock::index_type start, Core::DataBlock::index_type end );
 
@@ -70,31 +70,31 @@ public:
   
   // -- retrieving check points --
 public:
-  // APPLY:
-  // Applies a check point to a layer
+  /// APPLY:
+  /// Applies a check point to a layer
   bool apply( LayerHandle layer ) const;
   
   // -- making check points --
 public:
-  // CREATE_VOLUME:
-  // Check point the full volume
+  /// CREATE_VOLUME:
+  /// Check point the full volume
   bool create_volume( LayerHandle layer );
   
-  // CREATE_SLICE:
-  // Check point a slice check point
+  /// CREATE_SLICE:
+  /// Check point a slice check point
   bool create_slice( LayerHandle layer, Core::SliceType type,
     Core::DataBlock::index_type index );
 
-  // CREATE_SLICE:
-  // Check point a slice check point
+  /// CREATE_SLICE:
+  /// Check point a slice check point
   bool create_slice( LayerHandle layer, Core::SliceType type,
     Core::DataBlock::index_type start, Core::DataBlock::index_type end );
   
-  // GET_BYTE_SIZE:
-  // Get the size of the check point
+  /// GET_BYTE_SIZE:
+  /// Get the size of the check point
   size_t get_byte_size() const;
   
-  // -- internals --
+        // -- internals --
 private:
   LayerCheckPointPrivateHandle private_;  
 };

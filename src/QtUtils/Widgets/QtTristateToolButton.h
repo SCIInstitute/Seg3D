@@ -57,18 +57,18 @@ public:
     CHECKED_E
   };
 
-  // SET_ICONS:
-  // Set the icons to be used for each state.
+  /// SET_ICONS:
+  /// Set the icons to be used for each state.
   void set_icons( const QIcon& unchecked_icon, const QIcon& intermediate_icon,
     const QIcon& checked_icon );
 
-  // SET_STATE_STRINGS:
-  // Set the string representation of each state.
+  /// SET_STATE_STRINGS:
+  /// Set the string representation of each state.
   void set_state_strings( const std::string& unchecked_str, 
     const std::string& intermediate_str, const std::string& checked_str );
 
-  // GET_STATE:
-  // Return the current state.
+  /// GET_STATE:
+  /// Return the current state.
   QtTristateToolButton::State get_state();
   
 Q_SIGNALS:

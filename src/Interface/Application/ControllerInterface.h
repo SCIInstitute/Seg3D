@@ -94,39 +94,39 @@ private:
 public:
   typedef QPointer< ControllerInterface > qpointer_type;
 
-  // These functions are static as they are called from the callback stack
-  // and as they may be delay, it is not clear whether the AppController
-  // still exists, hence the static functions check for the existence first
-  // These functions also relay the function calls to the right thread.
+  /// These functions are static as they are called from the callback stack
+  /// and as they may be delay, it is not clear whether the AppController
+  /// still exists, hence the static functions check for the existence first
+  /// These functions also relay the function calls to the right thread.
 
-  // UPDATEACTIONHISTORY:
-  // Force the Controller to update its action history widget
+  /// UPDATEACTIONHISTORY:
+  /// Force the Controller to update its action history widget
   static void UpdateActionHistory( qpointer_type controller );
 
-  // UPDATELOGHISTORY:
-  // Force the Controller to update its log history widget
+  /// UPDATELOGHISTORY:
+  /// Force the Controller to update its log history widget
   static void UpdateLogHistory( qpointer_type controller, bool relay, int message_type,
       std::string message );
 
-  // UPDATEUNDOBUFFER:
-  // Update the undo buffer
+  /// UPDATEUNDOBUFFER:
+  /// Update the undo buffer
   static void UpdateUndoBuffer( qpointer_type controller );
 
 
-  // UPDATESTATEENGINE:
-  // Force the Controller to update the state engine widget
+  /// UPDATESTATEENGINE:
+  /// Force the Controller to update the state engine widget
   static void UpdateStateEngine( qpointer_type controller );
 
-  // POSTACTIONMESSAGE:
-  // Post a message in the Controller message label
+  /// POSTACTIONMESSAGE:
+  /// Post a message in the Controller message label
   static void PostActionMessage( qpointer_type controller, std::string message );
 
-  // POSTACTIONUSAGE:
-  // Post a message in the controller usage label
+  /// POSTACTIONUSAGE:
+  /// Post a message in the controller usage label
   static void PostActionUsage( qpointer_type controller, std::string usage );
 
-  // SETACTIONTYPE:
-  // Set the action types available
+  /// SETACTIONTYPE:
+  /// Set the action types available
   static void SetActionType( qpointer_type controller, std::string action_type );
 };
 

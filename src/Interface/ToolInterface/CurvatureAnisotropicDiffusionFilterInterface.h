@@ -49,8 +49,8 @@ public:
 
 // -- create interface --
 public:
-  // BUILD_WIDGET:
-  // This function builds the actual GUI
+  /// BUILD_WIDGET:
+  /// This function builds the actual GUI
   virtual bool build_widget( QFrame* frame );
 
 // -- filter internals --

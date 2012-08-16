@@ -60,16 +60,16 @@ public:
   
 private:
 
-  // The name of the new project
+  /// The name of the new project
   std::string project_name_;
   
-  // The name of the directory in which the project directory will be created
+  /// The name of the directory in which the project directory will be created
   std::string project_location_;
     
   // -- Dispatch this action from the interface --
 public:
-  // DISPATCH:
-  // Dispatch an action loads a session
+  /// DISPATCH:
+  /// Dispatch an action loads a session
   static void Dispatch( Core::ActionContextHandle context, const std::string& project_location, 
     const std::string& project_name );
 };

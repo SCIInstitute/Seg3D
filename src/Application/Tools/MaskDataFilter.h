@@ -54,21 +54,21 @@ public:
 
   // -- state --
 public:
-  // Whether the layer needs to be replaced
+  /// Whether the layer needs to be replaced
   Core::StateBoolHandle replace_state_;
 
-  // Layerid of the mask layer
+  /// Layerid of the mask layer
   Core::StateLabeledOptionHandle mask_state_;
     
-  // Whether mask should be inverted in this filter
+  /// Whether mask should be inverted in this filter
   Core::StateBoolHandle mask_invert_state_;
 
-  // What the outside of the mask should be replaced with
+  /// What the outside of the mask should be replaced with
   Core::StateOptionHandle replace_with_state_;
 
   // -- execute --
 public:
-  // Execute the tool and dispatch the action
+  /// Execute the tool and dispatch the action
   virtual void execute( Core::ActionContextHandle context );
 
 };

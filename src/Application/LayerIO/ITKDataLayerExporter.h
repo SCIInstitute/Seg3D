@@ -59,25 +59,25 @@ class ITKDataLayerExporter : public LayerExporter
 
   // -- Constructor/Destructor --
 public:
-  // Construct a new layer file exporter
+  /// Construct a new layer file exporter
   ITKDataLayerExporter( std::vector< LayerHandle >& layers );
 
-  // Virtual destructor for memory management of derived classes
+  /// Virtual destructor for memory management of derived classes
   virtual ~ITKDataLayerExporter()
   {
   }
 
   // -- Import a file information --
 public:
-  // SET_EXTENSION:
-  // function that sets the extension to be used by the exporter
+  /// SET_EXTENSION:
+  /// function that sets the extension to be used by the exporter
   virtual void set_extension( std::string extension ){ this->extension_ = extension; }
   
   // --Import the data as a specific type --  
 public: 
 
-  // EXPORT_LAYER
-  // Export the layer to file
+  /// EXPORT_LAYER
+  /// Export the layer to file
   virtual bool export_layer( const std::string& mode, const std::string& file_path, 
     const std::string& name );
     

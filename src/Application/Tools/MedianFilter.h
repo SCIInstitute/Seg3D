@@ -52,18 +52,18 @@ public:
 
   // -- state --
 public:
-  // Whether the layer needs to be replaced
+  /// Whether the layer needs to be replaced
   Core::StateBoolHandle replace_state_;
 
-  // Whether the data format needs to be preserved in the filter
+  /// Whether the data format needs to be preserved in the filter
   Core::StateBoolHandle preserve_data_format_state_;
 
-  // How many pixels round the current one do we calculate a median for
+  /// How many pixels round the current one do we calculate a median for
   Core::StateRangedIntHandle radius_state_;
 
   // -- execute --
 public:
-  // Execute the tool and dispatch the action
+  /// Execute the tool and dispatch the action
   virtual void execute( Core::ActionContextHandle context );
 };
 

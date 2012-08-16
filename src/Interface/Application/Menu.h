@@ -80,79 +80,79 @@ private:
   QMainWindow*  main_window_;
   
 private Q_SLOTS:
-  // NEW_PROJECT:
-  // Create a new project and launch the wizard that walks the user through the process.
+  /// NEW_PROJECT:
+  /// Create a new project and launch the wizard that walks the user through the process.
   void new_project();
   
-  // OPEN_PROJECT:
-  // Open an existing project
+  /// OPEN_PROJECT:
+  /// Open an existing project
   void open_project();
   
-  // OPEN_PROJECT_FOLDER:
-  // This function launches the native explorer, so one can inspect the project folder
-  // This will call the explorer on Windows and Finder on the Mac
+  /// OPEN_PROJECT_FOLDER:
+  /// This function launches the native explorer, so one can inspect the project folder
+  /// This will call the explorer on Windows and Finder on the Mac
   void open_project_folder();
 
-  // SAVE_PROJECT:
-  // Triggered by Save Project
+  /// SAVE_PROJECT:
+  /// Triggered by Save Project
   void save_project();
 
-  // SAVE_PROJECT AS:
-  // Triggered by Save Project As
+  /// SAVE_PROJECT AS:
+  /// Triggered by Save Project As
   void save_project_as();
   
-  // ABOUT:
-  // This launches the about dialog
+  /// ABOUT:
+  /// This launches the about dialog
   void about();
   
-  // MAC_OPEN_ANOTHER_VERSION:
-  // This opens another version of Seg3D on the mac.
-  // NOTE: Double clicking on the application will just highlight the current application
-  // Hence we added the option to launch a second version in the menu
+  /// MAC_OPEN_ANOTHER_VERSION:
+  /// This opens another version of Seg3D on the mac.
+  /// NOTE: Double clicking on the application will just highlight the current application
+  /// Hence we added the option to launch a second version in the menu
   void mac_open_another_version();
 
 private:
   typedef QPointer< Menu > qpointer_type;
   
-  // SET_RECENT_FILE_LIST:
-  // populate the recent file list with these items
+  /// SET_RECENT_FILE_LIST:
+  /// populate the recent file list with these items
   void set_recent_file_list();
 
-  // ENABLE_DISABLE_LAYER_ACTIONS:
-  // Switch on/off export options depending on what is available
+  /// ENABLE_DISABLE_LAYER_ACTIONS:
+  /// Switch on/off export options depending on what is available
   void enable_disable_mask_actions( bool mask_layer_found );  
   
-  // ENABLE_DISABLE_DATA_LAYER_ACTIONS:
-  // switches off the export options based on whether or not the active layer is a data layer
+  /// ENABLE_DISABLE_DATA_LAYER_ACTIONS:
+  /// switches off the export options based on whether or not the active layer is a data layer
   void enable_disable_data_layer_actions( bool data_layer_found );
 
-  // UPDATE_UNDO_TAG:
-  // set the undo tag of what the next undo will actually do
+  /// UPDATE_UNDO_TAG:
+  /// set the undo tag of what the next undo will actually do
   void update_undo_tag( std::string tag );
 
-  // UPDATE_REDO_TAG:
-  // set the redo tag of what the next undo will actually do
+  /// UPDATE_REDO_TAG:
+  /// set the redo tag of what the next undo will actually do
   void update_redo_tag( std::string tag );
   
 public:
 
-  // SETRECENTFILELIST:
-  // This function is called when the recent file list is modified
+  /// SETRECENTFILELIST:
+  /// This function is called when the recent file list is modified
   static void SetRecentFileList( qpointer_type app_menu );
 
-  // ENABLEDISABLELAYERACTIONS:
-  // this function is called when new layers are added or layers are deleted
+  /// ENABLEDISABLELAYERACTIONS:
+  /// this function is called when new layers are added or layers are deleted
   static void EnableDisableLayerActions( qpointer_type qpointer );
 
-  // UPDATEUNDOTAG
-  // This function is called when there is a new undo tag
+  /// UPDATEUNDOTAG
+  /// This function is called when there is a new undo tag
   static void UpdateUndoTag( qpointer_type qpointer, std::string tag );
 
-  // UPDATEREDOTAG
-  // This function is called when there is a new redo tag
+  /// UPDATEREDOTAG
+  /// This function is called when there is a new redo tag
   static void UpdateRedoTag( qpointer_type qpointer, std::string tag );
   
-  // CONFIRMRECENTFILELOAD:
+  /// CONFIRMRECENTFILELOAD:
   static void ConfirmRecentFileLoad( qpointer_type qpointer, const std::string& path );
 };
 

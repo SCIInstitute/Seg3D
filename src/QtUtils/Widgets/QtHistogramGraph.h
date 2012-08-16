@@ -56,12 +56,12 @@ public:
     virtual ~QtHistogramGraph();
     
 public:
-  // SET_HISTOGRAM:
-  // Set the histogram of the graph
+  /// SET_HISTOGRAM:
+  /// Set the histogram of the graph
   void set_histogram( const Core::Histogram& histogram );
     
-  // RESET_HISTOGRAM:
-  // Invalidate the current histogram
+  /// RESET_HISTOGRAM:
+  /// Invalidate the current histogram
   void reset_histogram();
   
   bool get_logarithmic() const{ return this->logarithmic_; }
@@ -70,8 +70,8 @@ public Q_SLOTS:
   void set_logarithmic( bool logarithmic );
 
 protected:
-  // PAINTEVENT:
-  // Overloaded call that redraws the histogram plot
+  /// PAINTEVENT:
+  /// Overloaded call that redraws the histogram plot
     virtual void paintEvent( QPaintEvent *event );
     
 public:

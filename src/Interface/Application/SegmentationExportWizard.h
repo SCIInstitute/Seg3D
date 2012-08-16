@@ -64,14 +64,14 @@ public:
   SegmentationSelectionPage( SegmentationPrivateHandle private_handle, QWidget *parent = 0 );
   
 protected:
-  // INITIALIZEPAGE:
-  // function that is called right before the page is loaded and used to populate
-  // the page with data that we dont have when the constructor is called
+  /// INITIALIZEPAGE:
+  /// function that is called right before the page is loaded and used to populate
+  /// the page with data that we dont have when the constructor is called
     virtual void initializePage();
   
-  // VALIDATEPAGE:
-  // function that is called right after the next button is clicked and used to process
-  // the entered data so it can be passed to the next page
+  /// VALIDATEPAGE:
+  /// function that is called right after the next button is clicked and used to process
+  /// the entered data so it can be passed to the next page
   virtual bool validatePage();
   
 private Q_SLOTS:
@@ -90,19 +90,19 @@ public:
     SegmentationSummaryPage( SegmentationPrivateHandle private_handle, QWidget *parent = 0 );
 
 protected:
-  // INITIALIZEPAGE:
-  // function that is called right before the page is loaded and used to populate
-  // the page with data that we dont have when the constructor is called
+  /// INITIALIZEPAGE:
+  /// function that is called right before the page is loaded and used to populate
+  /// the page with data that we dont have when the constructor is called
     virtual void initializePage();
   
-  // ISCOMPLETE:
-  // function that is connected to all of the spinboxes so that any change in them is instantly 
-  // checked for validity
+  /// ISCOMPLETE:
+  /// function that is connected to all of the spinboxes so that any change in them is instantly 
+  /// checked for validity
   virtual bool isComplete() const;
   
-  // VALIDATEPAGE:
-  // This function is actually called after "isComplete" is called and in this case we use it to
-  // validate the information on the summary page and dispatch the actions
+  /// VALIDATEPAGE:
+  /// This function is actually called after "isComplete" is called and in this case we use it to
+  /// validate the information on the summary page and dispatch the actions
   virtual bool validatePage();
 
 private:

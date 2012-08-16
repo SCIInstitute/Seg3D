@@ -64,8 +64,8 @@ public:
     
   // -- Dispatch this action from the interface --
 public:
-  // DISPATCH:
-  // Dispatch an action that activates a layer
+  /// DISPATCH:
+  /// Dispatch an action that activates a layer
   static void Dispatch( Core::ActionContextHandle context );
   
   // -- time stamp --

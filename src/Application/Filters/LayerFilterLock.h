@@ -41,9 +41,9 @@
 namespace Seg3D
 {
 
-// This class prevents too many filters running simultaneously by allowing only
-// a certain amount of the filters to run in parallel. If too many threads are started
-// some will have to wait until others are done.
+/// This class prevents too many filters running simultaneously by allowing only
+/// a certain amount of the filters to run in parallel. If too many threads are started
+/// some will have to wait until others are done.
 
 class LayerFilterLockPrivate;
 typedef boost::shared_ptr<LayerFilterLockPrivate> LayerFilterLockPrivateHandle;
@@ -60,10 +60,10 @@ private:
     
   // -- interface --
 public:
-  // Lock the resource. The function will continue if enough filter slots are available
+  /// Lock the resource. The function will continue if enough filter slots are available
   void lock();
   
-  // Unlock the resource.
+  /// Unlock the resource.
   void unlock();
   
   // -- internals --

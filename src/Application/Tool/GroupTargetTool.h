@@ -54,16 +54,16 @@ public:
 
   // -- state --
 public:
-  // Group ID of the target group
+  /// Group ID of the target group
   Core::StateLabeledOptionHandle target_group_state_;
 
-  // Selected layers within the target group
+  /// Selected layers within the target group
   Core::StateLabeledMultiOptionHandle target_layers_state_;
 
-  // Whether to use the active of one from the list
+  /// Whether to use the active of one from the list
   Core::StateBoolHandle use_active_group_state_;
 
-  // Whether a valid layer has been selected
+  /// Whether a valid layer has been selected
   Core::StateBoolHandle valid_target_state_;
 
 private:

@@ -42,9 +42,9 @@
 namespace Seg3D
 {
 
-// CLASS BASEFILTER:
-// This class provides the basic underlying framework for running filters in a separate thread
-// from the application thread. It provides a series of functions common to all the filters.
+/// CLASS BASEFILTER:
+/// This class provides the basic underlying framework for running filters in a separate thread
+/// from the application thread. It provides a series of functions common to all the filters.
 
 class LayerAbstractFilter;
 typedef boost::shared_ptr<LayerAbstractFilter> LayerAbstractFilterHandle;

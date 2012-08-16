@@ -52,21 +52,21 @@ public:
 
   // -- state --
 public:
-  // Whether the layer needs to be replaced
+  /// Whether the layer needs to be replaced
   Core::StateBoolHandle replace_state_;
 
-  // Alpha parameter
+  /// Alpha parameter
   Core::StateRangedDoubleHandle amount_state_;
 
-  // Number of bins used to calculate histogram
+  /// Number of bins used to calculate histogram
   Core::StateRangedIntHandle bins_state_;
 
-  // Number of bins ignored in equalization
+  /// Number of bins ignored in equalization
   Core::StateRangedIntHandle ignore_bins_state_;
 
   // -- execute --
 public:
-  // Execute the tool and dispatch the action
+  /// Execute the tool and dispatch the action
   virtual void execute( Core::ActionContextHandle context );
 };
 

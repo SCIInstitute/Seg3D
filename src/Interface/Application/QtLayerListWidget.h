@@ -54,32 +54,32 @@ public:
     virtual ~QtLayerListWidget();
     
 public:
-  // GETVALUE:
-  // function that returns the value from the spinbox
+  /// GETVALUE:
+  /// function that returns the value from the spinbox
   int get_value() const;
   
-  // GETLABEL:
-  // function that returns the value of the label that contains the name of the layer
+  /// GETLABEL:
+  /// function that returns the value of the label that contains the name of the layer
   QString get_label() const;
   
-  // COUNTER_HIDDEN:
-  // function that returns wether the counter is hidden or not
+  /// COUNTER_HIDDEN:
+  /// function that returns wether the counter is hidden or not
   bool counter_hidden() const;
   
-  // SETVALIDITY:
-  // function that sets wether the widget is valid or not
+  /// SETVALIDITY:
+  /// function that sets wether the widget is valid or not
   void set_validity( bool valid );
   
-  // SETMASKNAME:
-  // function that sets the mask name
+  /// SETMASKNAME:
+  /// function that sets the mask name
   void set_mask_name( const std::string& name );
   
-  // SETMASKINDEX:
-  // function that sets the index of the mask in the widget
+  /// SETMASKINDEX:
+  /// function that sets the index of the mask in the widget
   void set_mask_index( const int index );
   
-  // HIDECOUNTER:
-  // hides the counter in the widget
+  /// HIDECOUNTER:
+  /// hides the counter in the widget
   void hide_counter( bool hide );
 
 private Q_SLOTS:

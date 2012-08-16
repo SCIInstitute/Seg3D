@@ -67,28 +67,28 @@ public:
   virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
 
 private:
-  // This parameter contains the id of the layer group
+  /// This parameter contains the id of the layer group
   std::string layer_id_;
   
-  // This parameter describes the quality factor of the isosurface
+  /// This parameter describes the quality factor of the isosurface
   double quality_factor_;
 
-  // This parameter describes whether capping is enabled for the isosurface
+  /// This parameter describes whether capping is enabled for the isosurface
   bool capping_enabled_;
 
-  // THis parameter describes whether the isosurface will be shown at the end of the computation
+  /// THis parameter describes whether the isosurface will be shown at the end of the computation
   bool show_;
   
   // -- Dispatch this action from the interface --
 public:
 
-  // DISPATCH
-  // Create and dispatch action that computes the isosurface for the selected layer
+  /// DISPATCH
+  /// Create and dispatch action that computes the isosurface for the selected layer
   static void Dispatch( Core::ActionContextHandle context, MaskLayerHandle mask_layer, 
     double quality_factor, bool capping_enabled, bool show = false );
 
-  // DISPATCH:
-  // Create and dispatch action that computes the isosurface for the active layer.
+  /// DISPATCH:
+  /// Create and dispatch action that computes the isosurface for the active layer.
   static void Dispatch( Core::ActionContextHandle context );
 };
   

@@ -54,42 +54,42 @@ public:
 
   // -- overloaded functions --
 public:
-  // WAIT:
-  // Wait for the event to be triggered. If the event was already triggered this function
-  // returns immediately.
+  /// WAIT:
+  /// Wait for the event to be triggered. If the event was already triggered this function
+  /// returns immediately.
   virtual void wait();
   
-  // WAIT:
-  // Wait for the event to be triggered. If the event was already triggered this function
-  // returns immediately with true. After the timeout the function returns. If a timeout
-  // was triggered it returns false.
+  /// WAIT:
+  /// Wait for the event to be triggered. If the event was already triggered this function
+  /// returns immediately with true. After the timeout the function returns. If a timeout
+  /// was triggered it returns false.
   virtual bool timed_wait( double timeout );
 
-  // GET_NAME:
-  // The name of the resource we are waiting for
+  /// GET_NAME:
+  /// The name of the resource we are waiting for
   virtual std::string get_name() const;
   
   
 private:
-  // TRIGGER:
-  // this function is called when a change in the LayerManager occurs or a change in the
-  // layer state. At that point in time we need to recheck whether 
+  /// TRIGGER:
+  /// this function is called when a change in the LayerManager occurs or a change in the
+  /// layer state. At that point in time we need to recheck whether 
   void trigger();
 
-  // Weak handle to the layer that we are monitoring
+  /// Weak handle to the layer that we are monitoring
   LayerWeakHandle layer_;
   
-  // Name of the layer we are waiting for
+  /// Name of the layer we are waiting for
   std::string layer_id_;
   
-  // Whether the notifier has been triggered
+  /// Whether the notifier has been triggered
   bool triggered_;
   
-  // Mutex that protects the condition variable
+  /// Mutex that protects the condition variable
   boost::mutex notifier_mutex_;
   
-  // Condition variable that is used to keep threads asleep while it is waiting for the
-  // change of data status of the layer
+  /// Condition variable that is used to keep threads asleep while it is waiting for the
+  /// change of data status of the layer
   boost::condition_variable notifier_cv_;
 };
 

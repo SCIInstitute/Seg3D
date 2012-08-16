@@ -51,8 +51,8 @@ class SessionInfo;
 typedef std::vector< SessionInfo > SessionInfoList;
 typedef boost::shared_ptr< SessionInfoList > SessionInfoListHandle;
 
-// CLASS SessionInfo
-// This helper class is for storing sessions in the database
+/// CLASS SessionInfo
+/// This helper class is for storing sessions in the database
 class SessionInfo
 {
 public:
@@ -84,13 +84,13 @@ public:
   }
   
 private:
-  // ID of the session
+  /// ID of the session
   SessionID session_id_;
-  // Name of the session
+  /// Name of the session
   std::string session_name_;
-  // User that saved the session
+  /// User that saved the session
   std::string user_id_;
-  // Timestamp of when the session was saved in UTC time
+  /// Timestamp of when the session was saved in UTC time
   timestamp_type timestamp_;
 };  
 

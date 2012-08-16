@@ -56,37 +56,37 @@ public:
   virtual ~ThresholdTool();
 
 public:
-  // REDRAW:
-  // Draw a preview of the threshold result in the specified viewer.
-  // The function should only be called by the renderer, which has a valid GL context.
+  /// REDRAW:
+  /// Draw a preview of the threshold result in the specified viewer.
+  /// The function should only be called by the renderer, which has a valid GL context.
   virtual void redraw( size_t viewer_id, const Core::Matrix& proj_mat,
     int viewer_width, int viewer_height );
 
-  // EXECUTE:
-  // Execute the tool and dispatch the action
+  /// EXECUTE:
+  /// Execute the tool and dispatch the action
   virtual void execute( Core::ActionContextHandle context );
 
-  // HANDLE_SEED_POINTS_CHANGED:
-  // Called when the seed points have changed.
+  /// HANDLE_SEED_POINTS_CHANGED:
+  /// Called when the seed points have changed.
   virtual void handle_seed_points_changed();
 
-  // HANDLE_KEY_PRESS:
-  // Called when a key is pressed.
+  /// HANDLE_KEY_PRESS:
+  /// Called when a key is pressed.
   virtual bool handle_key_press( ViewerHandle viewer, int key, int modifiers );
 
   // -- state --
 public:
 
-  // Upper threshold for painting
+  /// Upper threshold for painting
   Core::StateRangedDoubleHandle upper_threshold_state_;
 
-  // Lower threshold for painting
+  /// Lower threshold for painting
   Core::StateRangedDoubleHandle lower_threshold_state_;
 
-  // Whether to show the preview
+  /// Whether to show the preview
   Core::StateBoolHandle show_preview_state_;
 
-  // The opacity of the preview
+  /// The opacity of the preview
   Core::StateRangedDoubleHandle preview_opacity_state_;
 
 private:

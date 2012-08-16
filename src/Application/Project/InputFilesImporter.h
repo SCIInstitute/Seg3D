@@ -65,21 +65,21 @@ public:
   // --Add files that need to be copied --
 public:
 
-  // ADD_FILENAME
-  // Add the name and path a file that needs to be copied
+  /// ADD_FILENAME
+  /// Add the name and path a file that needs to be copied
   void add_filename( const boost::filesystem::path& filename );
   
-  // SET_COPY_FILE_FUNCTION
-  // Set the function that will copy the file
+  /// SET_COPY_FILE_FUNCTION
+  /// Set the function that will copy the file
   void set_copy_file_function( boost::function
     < bool( const boost::filesystem::path&, const boost::filesystem::path& ) > copy_file_function );
   
-  // GET_INPUTFILE_ID
-  // Get the inputfile_id that was assigned to the series of files
+  /// GET_INPUTFILE_ID
+  /// Get the inputfile_id that was assigned to the series of files
   InputFilesID get_inputfiles_id();
   
-  // COPY_FILES
-  // Copy the files to the destination location inside the project
+  /// COPY_FILES
+  /// Copy the files to the destination location inside the project
   bool copy_files( boost::filesystem::path& project_cache_path ); 
         
   // -- internals --

@@ -55,15 +55,15 @@ public:
 
   // -- state --
 public:
-  // Whether to use index space for the computation
+  /// Whether to use index space for the computation
   Core::StateBoolHandle use_index_space_state_;
 
-  // Whether to assign positive values on the inside
+  /// Whether to assign positive values on the inside
   Core::StateBoolHandle inside_positive_state_;
 
   // -- execute --
 public:
-  // Execute the tool and dispatch the action
+  /// Execute the tool and dispatch the action
   virtual void execute( Core::ActionContextHandle context );
 };
 

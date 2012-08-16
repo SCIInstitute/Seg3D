@@ -55,10 +55,10 @@ CORE_ENUM_CLASS
   INVALID_E
 )
 
-// GENERATESCRIPTFROMPROVENANCETRAIL:
-// Generate python script from the given provenance trail.
-// Returns ScriptStatus::VALID_E if successful, ScriptStatus::INCOMPLETE_E if successful
-// but some inputs are missing, ScriptStatus::INVALID_E if failed.
+/// GENERATESCRIPTFROMPROVENANCETRAIL:
+/// Generate python script from the given provenance trail.
+/// Returns ScriptStatus::VALID_E if successful, ScriptStatus::INCOMPLETE_E if successful
+/// but some inputs are missing, ScriptStatus::INVALID_E if failed.
 ScriptStatus GenerateScriptFromProvenanceTrail( ProvenanceTrailHandle prov_trail, 
       std::string& script, ProvenanceIDLayerIDMap& inputs );
 

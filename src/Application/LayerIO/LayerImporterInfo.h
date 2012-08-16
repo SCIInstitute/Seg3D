@@ -46,29 +46,29 @@ typedef boost::shared_ptr<LayerImporterBuilderBase> LayerImporterBuilderBaseHand
 class LayerImporterBuilderBase
 {
 public:
-  // ensure we can delete the builder correctly
+  /// ensure we can delete the builder correctly
   virtual ~LayerImporterBuilderBase()
   {
   }
   
-  // the function call to build the object
+  /// the function call to build the object
   virtual LayerImporterHandle build() = 0;
 };
 
 
-// LAYERIMPORTERBUILDER:
-// Auxillary class to build the layer importer class
+/// LAYERIMPORTERBUILDER:
+/// Auxillary class to build the layer importer class
 
 template < class LAYERIMPORTER >
 class LayerImporterBuilder: public LayerImporterBuilderBase
 {
 public:
-  // ensure we can delete the builder correctly
+  /// ensure we can delete the builder correctly
   virtual ~LayerImporterBuilder< LAYERIMPORTER >()
   {
   }
 
-  // The actual builder call
+  /// The actual builder call
   virtual LayerImporterHandle build()
   { 
     return LayerImporterHandle( new LAYERIMPORTER );
@@ -76,9 +76,9 @@ public:
 };
 
 // -------------------------------------------------
-// LAYERIMPORTERINFO
-// Class that records the information of the different importers that are available and auxillary
-// functions that allow in the decision which importer to use.
+/// LAYERIMPORTERINFO
+/// Class that records the information of the different importers that are available and auxillary
+/// functions that allow in the decision which importer to use.
 
 // Class declaration
 class LayerImporterInfo;
@@ -97,28 +97,28 @@ public:
 
   // -- description of the importer --
 public:
-  // TYPE
-  // The type of importer this one is
+  /// TYPE
+  /// The type of importer this one is
   LayerImporterType get_type() const;
 
-  // BUILD
-  // Build the importer
+  /// BUILD
+  /// Build the importer
   LayerImporterHandle build() const;
 
-  // GET_NAME
-  // Get the name of the importer
+  /// GET_NAME
+  /// Get the name of the importer
   std::string get_name() const;
 
-  // CONVERTS_FILE_TYPE
-  // Check whether this importer deals with a specific file type
+  /// CONVERTS_FILE_TYPE
+  /// Check whether this importer deals with a specific file type
   bool converts_file_type( const std::string& file_type, bool strict = true ) const;
   
-  // GET_FILE_TYPES
-  // Get the string that defines the allowed file types
+  /// GET_FILE_TYPES
+  /// Get the string that defines the allowed file types
   std::string get_file_type_string() const;
   
-  // GET_PRIORITY
-  // Get the priority of the importer
+  /// GET_PRIORITY
+  /// Get the priority of the importer
   int get_priority() const;
   
   // -- internals --

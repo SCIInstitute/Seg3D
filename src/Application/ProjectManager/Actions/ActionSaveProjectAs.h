@@ -68,9 +68,9 @@ private:
 
   // -- Dispatch this action from the interface --
 public:
-  // DISPATCH:
-  // Dispatch an action loads a session
-  // If anonymize is true then patient-specific data will be removed when saving the project.
+  /// DISPATCH:
+  /// Dispatch an action loads a session
+  /// If anonymize is true then patient-specific data will be removed when saving the project.
   static void Dispatch( Core::ActionContextHandle context, const std::string& export_path, 
     const std::string& project_name, bool anonymize );
 };

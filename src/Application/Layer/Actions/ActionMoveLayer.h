@@ -56,21 +56,21 @@ public:
 
   // -- Functions that describe action --
 public:
-  // VALIDATE:
-  // Each action needs to be validated just before it is posted. This way we
-  // enforce that every action that hits the main post_action signal will be
-  // a valid action to execute.
+  /// VALIDATE:
+  /// Each action needs to be validated just before it is posted. This way we
+  /// enforce that every action that hits the main post_action signal will be
+  /// a valid action to execute.
   virtual bool validate( Core::ActionContextHandle& context );
 
-  // RUN:
-  // Each action needs to have this piece implemented. It spells out how the
-  // action is run. It returns whether the action was successful or not.
+  /// RUN:
+  /// Each action needs to have this piece implemented. It spells out how the
+  /// action is run. It returns whether the action was successful or not.
   virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
 
-  // CLEAR_CACHE:
-  // Clear any objects that were given as a short cut to improve performance.
-  // NOTE: An action should not contain any persistent handles, as actions may be kept
-  // for a provenance record.
+  /// CLEAR_CACHE:
+  /// Clear any objects that were given as a short cut to improve performance.
+  /// NOTE: An action should not contain any persistent handles, as actions may be kept
+  /// for a provenance record.
   virtual void clear_cache();
 
 private:
@@ -78,10 +78,10 @@ private:
     
   // -- Dispatch this action --
 public:
-  // DISPATCH
-  // Create and dispatch action that moves the layer
-  // NOTE: We don't pass in layer handles directly so validate function can correctly
-  // check if the layers still exist.
+  /// DISPATCH
+  /// Create and dispatch action that moves the layer
+  /// NOTE: We don't pass in layer handles directly so validate function can correctly
+  /// check if the layers still exist.
   static void Dispatch( Core::ActionContextHandle context, const std::string& src_layerid,
     const std::string& dst_layerid = "" );  
 };

@@ -47,31 +47,31 @@ class GDCMLayerImporter : public LayerFileSeriesImporter
   SEG3D_IMPORTER_TYPE( "GDCM Dicom Importer", "*;.dcm;.dicom;.ima;.DCM;.DICOM;.IMA", 25 )
   // -- Constructor/Destructor --
 public:
-  // Construct a new layer file importer
+  /// Construct a new layer file importer
   GDCMLayerImporter();
   virtual ~GDCMLayerImporter();
 
   // -- Import information from file --
 public:
-  // GET_FILE_INFO
-  // Get the information about the file we are currently importing.
-  // NOTE: This function often causes the file to be loaded in its entirety
-  // Hence it is best to run this on a separate thread if needed ( from the GUI ).
+  /// GET_FILE_INFO
+  /// Get the information about the file we are currently importing.
+  /// NOTE: This function often causes the file to be loaded in its entirety
+  /// Hence it is best to run this on a separate thread if needed ( from the GUI ).
   virtual bool get_file_info( LayerImporterFileInfoHandle& info );
 
   // -- Import data from file --  
 public: 
-  // GET_FILE_DATA
-  // Get the file data from the file/ file series
-  // NOTE: The information is generated again, so that hints can be processed
+  /// GET_FILE_DATA
+  /// Get the file data from the file/ file series
+  /// NOTE: The information is generated again, so that hints can be processed
   virtual bool get_file_data( LayerImporterFileDataHandle& data );
   
   // -- Addional hints to compensate for file formats where user input is needed --
 public:
-  // SET_DICOM_SWAP_XYSPACING_HINT
-  // Some dicom writers interpret X/Y spacing incorrectly. 
-  // The DICOM standard says that pixel spacing is in Y/X order, 
-  // but some scanners put it in X/Y order. Hence a hint can be given how to interpret the data
+  /// SET_DICOM_SWAP_XYSPACING_HINT
+  /// Some dicom writers interpret X/Y spacing incorrectly. 
+  /// The DICOM standard says that pixel spacing is in Y/X order, 
+  /// but some scanners put it in X/Y order. Hence a hint can be given how to interpret the data
   virtual void set_dicom_swap_xyspacing_hint( bool value ); 
 
 private:

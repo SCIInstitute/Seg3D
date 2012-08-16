@@ -58,16 +58,16 @@ private Q_SLOTS:
 
 private:
 
-  // DROPEVENT:
-  // this function is called when the user drops a layer onto this object
+  /// DROPEVENT:
+  /// this function is called when the user drops a layer onto this object
   void dropEvent( QDropEvent* event );
   
-  // DRAGENTEREVENT:
-  // this function is called when the user drags a layer over the top of this
+  /// DRAGENTEREVENT:
+  /// this function is called when the user drags a layer over the top of this
   void dragEnterEvent( QDragEnterEvent* event );
   
-  // DRAGLEAVEEVENT:
-  // this function is called when the user drags a layer off of the top of this 
+  /// DRAGLEAVEEVENT:
+  /// this function is called when the user drags a layer off of the top of this 
   void dragLeaveEvent( QDragLeaveEvent* event );
   
 };

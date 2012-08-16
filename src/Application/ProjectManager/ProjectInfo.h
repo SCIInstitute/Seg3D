@@ -50,8 +50,8 @@ class ProjectInfo;
 typedef std::vector< ProjectInfo > ProjectInfoList;
 typedef boost::shared_ptr< ProjectInfoList > ProjectInfoListHandle;
 
-// CLASS ProjectInfo
-// This helper class is for storing recent projects in the database
+/// CLASS ProjectInfo
+/// This helper class is for storing recent projects in the database
 class ProjectInfo
 {
 public:
@@ -88,11 +88,11 @@ public:
   }
   
 private:
-  // Name of the project
+  /// Name of the project
   std::string project_name_;
-  // Path of the project file
+  /// Path of the project file
   boost::filesystem::path path_;
-  // Timestamp of when the project was last opened in UTC time
+  /// Timestamp of when the project was last opened in UTC time
   timestamp_type last_access_time_;
 };  
 

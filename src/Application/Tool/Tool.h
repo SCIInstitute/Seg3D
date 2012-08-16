@@ -52,8 +52,8 @@ namespace Seg3D
 class ToolPrivate;
 typedef boost::shared_ptr< ToolPrivate > ToolPrivateHandle;
 
-// CLASS TOOL:
-// The Tool class forms the basis of the tool classes
+/// CLASS TOOL:
+/// The Tool class forms the basis of the tool classes
 
 // Class definition
 class Tool : public Core::StateHandler
@@ -67,143 +67,143 @@ public:
 
   // -- query properties of tool --
 public:
-  // GET_TOOL_INFO:
-  // Get the tool information class that contains all the information about the
-  // tool.
-  // NOTE: this function is generated using the macro for each function
+  /// GET_TOOL_INFO:
+  /// Get the tool information class that contains all the information about the
+  /// tool.
+  /// NOTE: this function is generated using the macro for each function
   virtual ToolInfoHandle get_tool_info() const = 0;
 
-  // GET_NAME:
-  // Name of the tool
+  /// GET_NAME:
+  /// Name of the tool
   std::string get_name() const;
   
-  // GET_MENU:
-  // Get the menu in which the tool is located
+  /// GET_MENU:
+  /// Get the menu in which the tool is located
   std::string get_menu() const;
   
-  // GET_MENU_LABEL:
-  // Get the label with which the tool is displayed in the menu
+  /// GET_MENU_LABEL:
+  /// Get the label with which the tool is displayed in the menu
   std::string get_menu_label() const;
   
-  // GET_SHORTCUT_KEY:
-  // Get the short cut key for this tool
+  /// GET_SHORTCUT_KEY:
+  /// Get the short cut key for this tool
   std::string get_shortcut_key() const;
   
-  // GET_HOTKEYS_AND_DESCRIPTIONS:
-  // Get the hotkeys for this tool
+  /// GET_HOTKEYS_AND_DESCRIPTIONS:
+  /// Get the hotkeys for this tool
   std::string get_hotkeys_and_descriptions() const;
   
-  // GET_URL:
-  // Get the URL where more information on the tool can be found
+  /// GET_URL:
+  /// Get the URL where more information on the tool can be found
   std::string get_url() const;
   
-  // GET_DEFINITION:
-  // Get the definition of the tool in XML format
+  /// GET_DEFINITION:
+  /// Get the definition of the tool in XML format
   std::string get_definition() const;
 
-  // TOOLID:
-  // Get the statehandler id of this tool
+  /// TOOLID:
+  /// Get the statehandler id of this tool
   const std::string& toolid() const;
   
-  // TOOL_NAME:
-  // THe name that appears in the tool header
+  /// TOOL_NAME:
+  /// THe name that appears in the tool header
   virtual std::string tool_name() const;
 
   // -- mouse and keyboard event handlers --
 public:
-  // HANDLE_MOUSE_ENTER:
-  // Called when the mouse has entered a viewer.
+  /// HANDLE_MOUSE_ENTER:
+  /// Called when the mouse has entered a viewer.
   virtual bool handle_mouse_enter( ViewerHandle viewer, int x, int y );
 
-  // HANDLE_MOUSE_LEAVE:
-  // Called when the mouse has left a viewer.
+  /// HANDLE_MOUSE_LEAVE:
+  /// Called when the mouse has left a viewer.
   virtual bool handle_mouse_leave( ViewerHandle viewer );
 
-  // HANDLE_MOUSE_MOVE:
-  // Called when the mouse moves in a viewer.
+  /// HANDLE_MOUSE_MOVE:
+  /// Called when the mouse moves in a viewer.
   virtual bool handle_mouse_move( ViewerHandle viewer, 
     const Core::MouseHistory& mouse_history, 
     int button, int buttons, int modifiers );
 
-  // HANDLE_MOUSE_PRESS:
-  // Called when a mouse button has been pressed.
+  /// HANDLE_MOUSE_PRESS:
+  /// Called when a mouse button has been pressed.
   virtual bool handle_mouse_press( ViewerHandle viewer, 
     const Core::MouseHistory& mouse_history, 
     int button, int buttons, int modifiers );
 
-  // HANDLE_MOUSE_RELEASE:
-  // Called when a mouse button has been released.
+  /// HANDLE_MOUSE_RELEASE:
+  /// Called when a mouse button has been released.
   virtual bool handle_mouse_release( ViewerHandle viewer, 
     const Core::MouseHistory& mouse_history, 
     int button, int buttons, int modifiers );
 
-  // HANDLE_WHEEL:
-  // Called when the mouse wheel has been rotated.
+  /// HANDLE_WHEEL:
+  /// Called when the mouse wheel has been rotated.
   virtual bool handle_wheel( ViewerHandle viewer, int delta, 
     int x, int y, int buttons, int modifiers );
 
-  // HANDLE_KEY_PRESS:
-  // Called when a key is pressed
+  /// HANDLE_KEY_PRESS:
+  /// Called when a key is pressed
   virtual bool handle_key_press( ViewerHandle viewer, int key, int modifiers );
 
-  // HANDLE_KEY_RELEASE:
-  // Called when a key is released
+  /// HANDLE_KEY_RELEASE:
+  /// Called when a key is released
   virtual bool handle_key_release( ViewerHandle viewer, int key, int modifiers );
 
-  // HANDLE_UPDATE_CURSOR:
-  // Called when a viewer requires an update to its cursor.
+  /// HANDLE_UPDATE_CURSOR:
+  /// Called when a viewer requires an update to its cursor.
   virtual bool handle_update_cursor( ViewerHandle viewer );
 
 public:
-  // REDRAW:
-  // Draw the tool in the specified viewer. Default implementation does nothing.
-  // The function should only be called by the renderer, which has a valid GL context.
-  // NOTE: If the viewer layout changes, viewer attributes could be changed by the interface thread 
-  // underneath us.  Since there is no way to force Qt to lock the viewer before making these 
-  // changes, we grab the width and height up front and check for validity so that we at least
-  // don't crash later due to a width or height of 0.  The width and height are passed to the
-  // tools and should be used instead of querying the viewer directly.
+  /// REDRAW:
+  /// Draw the tool in the specified viewer. Default implementation does nothing.
+  /// The function should only be called by the renderer, which has a valid GL context.
+  /// NOTE: If the viewer layout changes, viewer attributes could be changed by the interface thread 
+  /// underneath us.  Since there is no way to force Qt to lock the viewer before making these 
+  /// changes, we grab the width and height up front and check for validity so that we at least
+  /// don't crash later due to a width or height of 0.  The width and height are passed to the
+  /// tools and should be used instead of querying the viewer directly.
   virtual void redraw( size_t viewer_id, const Core::Matrix& proj_mat, 
     int viewer_width, int viewer_height );
 
-  // HAS_2D_VISUAL:
-  // Returns true if the tool draws itself in the 2D view, otherwise false.
-  // The default implementation returns false.
+  /// HAS_2D_VISUAL:
+  /// Returns true if the tool draws itself in the 2D view, otherwise false.
+  /// The default implementation returns false.
   virtual bool has_2d_visual();
 
-  // HAS_3D_VISUAL:
-  // Returns true if the tool draws itself in the volume view, otherwise false.
-  // The default implementation returns false.
+  /// HAS_3D_VISUAL:
+  /// Returns true if the tool draws itself in the volume view, otherwise false.
+  /// The default implementation returns false.
   virtual bool has_3d_visual();
 
   // -- close tool --
 public:
-  // CLOSE:
-  // This function is called when the application closes the tool. It is meant
-  // to disconnect all connections. Since close tool is called synchronously
-  // on the application thread, it can clean out most of the underlying
-  // connections safely.
-  // NOTE: since the tool handle is given to the user interface, the user
-  // interface thread may issue the final destruction of the class. Hence all
-  // thread critical pieces should be done by this function.
+  /// CLOSE:
+  /// This function is called when the application closes the tool. It is meant
+  /// to disconnect all connections. Since close tool is called synchronously
+  /// on the application thread, it can clean out most of the underlying
+  /// connections safely.
+  /// NOTE: since the tool handle is given to the user interface, the user
+  /// interface thread may issue the final destruction of the class. Hence all
+  /// thread critical pieces should be done by this function.
   virtual void close();
 
   // -- activate/deactivate --
 public:
-  // ACTIVATE:
-  // Activate a tool: this tool is set as the active tool and hence it should
-  // setup the right mouse tools in the viewers.
+  /// ACTIVATE:
+  /// Activate a tool: this tool is set as the active tool and hence it should
+  /// setup the right mouse tools in the viewers.
   virtual void activate();
 
-  // DEACTIVATE:
-  // Deactivate a tool. A tool is always deactivate before the next one is
-  // activated.
+  /// DEACTIVATE:
+  /// Deactivate a tool. A tool is always deactivate before the next one is
+  /// activated.
   virtual void deactivate();
 
   // -- execute --
 public:
-  // EXECUTE:
-  // Fire off the action that executes the filter
+  /// EXECUTE:
+  /// Fire off the action that executes the filter
   virtual void execute( Core::ActionContextHandle context );
 
   // -- internals --

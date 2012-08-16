@@ -53,12 +53,12 @@ public:
 
   // -- state --
 public:
-  // The amount of thresholds, each extra threshold generates another mask layer
+  /// The amount of thresholds, each extra threshold generates another mask layer
   Core::StateRangedIntHandle amount_state_;
 
   // -- execute --
 public:
-  // Execute the tool and dispatch the action
+  /// Execute the tool and dispatch the action
   virtual void execute( Core::ActionContextHandle context );
 };
 

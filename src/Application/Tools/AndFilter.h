@@ -54,15 +54,15 @@ public:
 
   // -- state --
 public:
-  // Whether the layer needs to be replaced
+  /// Whether the layer needs to be replaced
   Core::StateBoolHandle replace_state_;
 
-  // Layerid of the mask layer
+  /// Layerid of the mask layer
   Core::StateLabeledOptionHandle mask_state_;
 
-  // -- execute --
+  /// -- execute --
 public:
-  // Execute the tool and dispatch the action
+  /// Execute the tool and dispatch the action
   virtual void execute( Core::ActionContextHandle context );
 };
 

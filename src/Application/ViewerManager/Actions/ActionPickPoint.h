@@ -58,12 +58,12 @@ private:
   Core::Point point_;
 
 public:
-  // DISPATCH:
-  // Move slices for all viewers
+  /// DISPATCH:
+  /// Move slices for all viewers
   static void Dispatch( Core::ActionContextHandle context, const Core::Point& pt );
 
-  // DISPATCH:
-  // Move slices for all but src_viewer
+  /// DISPATCH:
+  /// Move slices for all but src_viewer
   static void Dispatch( Core::ActionContextHandle context, 
     size_t src_viewer, const Core::Point& pt );
 };

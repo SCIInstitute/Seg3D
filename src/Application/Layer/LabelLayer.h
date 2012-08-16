@@ -58,16 +58,16 @@ public:
   // -- Layer properties --
 public:
 
-  // TYPE
-  // Get the type of the layer
+  /// TYPE
+  /// Get the type of the layer
   virtual Core::VolumeType get_type() const { return Core::VolumeType::LABEL_E; }
   
-  // GET_GRID_TRANSFORM:
-  // Get the transform of the layer
+  /// GET_GRID_TRANSFORM:
+  /// Get the transform of the layer
   virtual Core::GridTransform get_grid_transform() const = 0;
 
-  // HAS_VALID_DATA:
-  // Check whether the layer has valid data
+  /// HAS_VALID_DATA:
+  /// Check whether the layer has valid data
   virtual bool has_valid_data() const = 0;
 
 public:

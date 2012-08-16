@@ -61,13 +61,13 @@ private:
   boost::shared_ptr< MessageWindowPrivate > private_;
 
 private:
-  // ADDMESSAGE:
-  // static class for adding a message to the MessageWindow class
+  /// ADDMESSAGE:
+  /// static class for adding a message to the MessageWindow class
   static void AddMessage( QPointer< MessageWindow > qpointer, 
     int msg_type, std::string message );
   
-  // ADD_MESSAGE:
-  // member function that actually does the adding
+  /// ADD_MESSAGE:
+  /// member function that actually does the adding
   void add_message( int msg_type, std::string message );
 };
 

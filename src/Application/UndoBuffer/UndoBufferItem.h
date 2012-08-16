@@ -53,33 +53,33 @@ public:
 
   // -- creation of undo/redo action --
 public:
-  // SET_REDO_ACTION:
-  // Set a redo action for undoing the undo
-  // NOTE: This is generally the action that inserts the undo step onto the queue
+  /// SET_REDO_ACTION:
+  /// Set a redo action for undoing the undo
+  /// NOTE: This is generally the action that inserts the undo step onto the queue
   void set_redo_action( Core::ActionHandle action );
 
   // -- apply undo/redo action --
 public:
-  // APPLY_REDO:
-  // Apply the redo information
+  /// APPLY_REDO:
+  /// Apply the redo information
   bool apply_redo( Core::ActionContextHandle& context );
 
-  // APPLY_AND_CLEAR_UNDO:
-  // Apply the undo information
+  /// APPLY_AND_CLEAR_UNDO:
+  /// Apply the undo information
   virtual bool apply_and_clear_undo() = 0;
 
   // -- size information --
 public:
-  // GET_BYTE_SIZE:
-  // The size of the item in memory ( approximately )
+  /// GET_BYTE_SIZE:
+  /// The size of the item in memory ( approximately )
   virtual size_t get_byte_size() const = 0;
 
-  // COMPUTE_SIZE:
-  // Compute the size of the item
+  /// COMPUTE_SIZE:
+  /// Compute the size of the item
   virtual void compute_size() = 0;
 
-  // GET_TAG:
-  // Tag that appears in the menu for this item
+  /// GET_TAG:
+  /// Tag that appears in the menu for this item
   std::string get_tag() const;
 
   // -- internals --

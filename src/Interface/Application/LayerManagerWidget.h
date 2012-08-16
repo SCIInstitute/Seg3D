@@ -56,24 +56,24 @@ public:
   virtual ~LayerManagerWidget();
 
 private Q_SLOTS:
-  // PREP_LAYERS_FOR_DRAG_AND_DROP:
-  // this function tells the groups to prepare their layers for drag and drop
+  /// PREP_LAYERS_FOR_DRAG_AND_DROP:
+  /// this function tells the groups to prepare their layers for drag and drop
   void prep_layers_for_drag_and_drop( bool move_time );
   
-  // PREP_GROUPS_FOR_DRAG_AND_DROP:
-  // this function tells the groups to prepare for drag and drop
+  /// PREP_GROUPS_FOR_DRAG_AND_DROP:
+  /// this function tells the groups to prepare for drag and drop
   void prep_groups_for_drag_and_drop( bool move_time );
   
-  // NOTIFY_PICKED_UP_GROUP_SIZE:
-  // this function will notify all the groups of what size the currently picked up group is
+  /// NOTIFY_PICKED_UP_GROUP_SIZE:
+  /// this function will notify all the groups of what size the currently picked up group is
   void notify_picked_up_group_size( int group_size );
   
-  // NOTIFY_GROUPS_OF_PICKED_UP_LAYER_SIZE:
-  // this function will notify the groups of the picked up layer size
+  /// NOTIFY_GROUPS_OF_PICKED_UP_LAYER_SIZE:
+  /// this function will notify the groups of the picked up layer size
   void notify_groups_of_picked_up_layer_size( int layer_size );
 
-  // ABORT_SCRIPT:
-  // Abort the current running script.
+  /// ABORT_SCRIPT:
+  /// Abort the current running script.
   void abort_script();
   
   // -- internals of this class --

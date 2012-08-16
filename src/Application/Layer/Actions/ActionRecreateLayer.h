@@ -66,8 +66,8 @@ private:
   ActionRecreateLayerPrivateHandle private_;
 
 public:
-  // DISPATCH:
-  // Dispatch an action to recreate the given provenance ID.
+  /// DISPATCH:
+  /// Dispatch an action to recreate the given provenance ID.
   static void Dispatch( Core::ActionContextHandle context, 
     const std::vector< ProvenanceID >& prov_ids, 
     ProvenanceTrailHandle prov_trail = ProvenanceTrailHandle() );

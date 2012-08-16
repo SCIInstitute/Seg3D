@@ -70,8 +70,8 @@
 namespace QtUtils
 {
 
-// CLASS QTBRIDGE:
-// This class provides bridges between widgets and state variables
+/// CLASS QTBRIDGE:
+/// This class provides bridges between widgets and state variables
 
 class QtBridge : public boost::noncopyable
 {
@@ -79,7 +79,7 @@ class QtBridge : public boost::noncopyable
   // -- widget/menu connectors --
 public:
 
-  // Connect a QAbstractButton or its subclasses to StateValue<bool>
+  /// Connect a QAbstractButton or its subclasses to StateValue<bool>
   static Core::ConnectionHandle Connect( QAbstractButton* qbutton, Core::StateBoolHandle& state );
   
   static Core::ConnectionHandle Connect( QAbstractButton* qbutton, 
@@ -88,12 +88,12 @@ public:
   static Core::ConnectionHandle ConnectBoolean( QAbstractButton* qbutton, 
     boost::function< void( bool ) > function );
     
-  // Connect vector of bools to one button controlled by an index
+  /// Connect vector of bools to one button controlled by an index
   static Core::ConnectionHandle Connect(  QAbstractButton* qbutton, 
     std::vector<Core::StateBoolHandle>& state_handles, 
     Core::StateIntSetHandle& index_handle );
   
-  // Connect a QtTristateToolButton to a tri-option state.
+  /// Connect a QtTristateToolButton to a tri-option state.
   static Core::ConnectionHandle Connect( QtTristateToolButton* tristate_button, 
     Core::StateOptionHandle& state );
 
@@ -103,37 +103,37 @@ public:
   static Core::ConnectionHandle Connect( QButtonGroup* qbuttongroup, 
     Core::StateLabeledOptionHandle& state );
 
-  // Connect a SliderIntCombo to a StateRangedIntValue
+  /// Connect a SliderIntCombo to a StateRangedIntValue
   static Core::ConnectionHandle Connect( QtColorBarWidget* cbwidget, 
     Core::StateIntHandle& state_handle, std::vector< Core::StateColorHandle >& colors );
   
-  // Connect a SliderIntCombo to a StateRangedIntValue
+  /// Connect a SliderIntCombo to a StateRangedIntValue
   static Core::ConnectionHandle Connect( QtSliderIntCombo* sscombo, 
     Core::StateRangedIntHandle& state_handle );
 
-  // Connect a LogSliderIntCombo to a StateRangedIntValue
+  /// Connect a LogSliderIntCombo to a StateRangedIntValue
   static Core::ConnectionHandle Connect( QtLogSliderIntCombo* sscombo,
     Core::StateRangedIntHandle& state_handle );
   
-  // Connect a SliderDoubleCombo to a StateRangedIntValue
+  /// Connect a SliderDoubleCombo to a StateRangedIntValue
   static Core::ConnectionHandle Connect( QtSliderDoubleCombo* sscombo, 
     Core::StateRangedDoubleHandle& state_handle );
   
-  // Connect a QDoubleSpinBox to a StateDoubleValue
+  /// Connect a QDoubleSpinBox to a StateDoubleValue
   static Core::ConnectionHandle Connect( QDoubleSpinBox* qdoublespinbox, 
     Core::StateDoubleHandle& state_handle );
   
-  // Connect a QDoubleSpinBox to a StateRangedDouble
+  /// Connect a QDoubleSpinBox to a StateRangedDouble
   static Core::ConnectionHandle Connect( QDoubleSpinBox* qdoublespinbox,
     Core::StateRangedDoubleHandle& state );
 
-  // Connect a QSpinBox to a StateInt
+  /// Connect a QSpinBox to a StateInt
   static Core::ConnectionHandle Connect( QSpinBox* qspinbox, Core::StateIntHandle& state );
 
-  // Connect a QSpinBox to a StateRangedInt
+  /// Connect a QSpinBox to a StateRangedInt
   static Core::ConnectionHandle Connect( QSpinBox* qspinbox, Core::StateRangedIntHandle& state );
   
-  // Connect a QComboBox to StateOptionHandle
+  /// Connect a QComboBox to StateOptionHandle
   static Core::ConnectionHandle Connect( QComboBox* qcombobox, 
     Core::StateOptionHandle& state_handle );
 
@@ -143,7 +143,7 @@ public:
   static Core::ConnectionHandle Connect( QtColorButton* colorbutton, 
     Core::StateColorHandle& state_handle );
   
-  // Connect QLineEdits
+  /// Connect QLineEdits
   static Core::ConnectionHandle Connect( QLineEdit* qlineedit, 
     Core::StateStringHandle& state_handle, bool immediate_update = false );
   
@@ -152,40 +152,40 @@ public:
 
   static Core::ConnectionHandle Connect( QPlainTextEdit* qwidget, Core::StateStringHandle& state );
 
-  // Connect QLabel to display the string representation of a state variable
+  /// Connect QLabel to display the string representation of a state variable
   static Core::ConnectionHandle Connect( QLabel* qlabel, Core::StateBaseHandle state );
   
-  // Connect QActionGroup and StateOption
-  // NOTE: This requires that each QAction in the QActionGroup has its objectName
-  // the same as its corresponding option string
+  /// Connect QActionGroup and StateOption
+  /// NOTE: This requires that each QAction in the QActionGroup has its objectName
+  /// the same as its corresponding option string
   static Core::ConnectionHandle Connect( QActionGroup* qactiongroup, 
     Core::StateOptionHandle& state_handle );
 
-  // Connect menu action to dispatcher
+  /// Connect menu action to dispatcher
   static Core::ConnectionHandle Connect( QAction* qaction, boost::function< void() > function );
 
-  // Connect menu toggle action to state variable
+  /// Connect menu toggle action to state variable
   static Core::ConnectionHandle Connect( QAction* qaction, Core::StateBoolHandle& state_handle );
   
-  // Connect vector of bools to one button controlled by an index
+  /// Connect vector of bools to one button controlled by an index
   static Core::ConnectionHandle Connect( QAction* qaction, 
     std::vector<Core::StateBoolHandle>& state_handles, Core::StateIntHandle& index_handle );
 
-  // Connect QListWidget and StateLabeledMultiOption
+  /// Connect QListWidget and StateLabeledMultiOption
   static Core::ConnectionHandle Connect( QListWidget* qlistwidget, 
     Core::StateLabeledMultiOptionHandle& state );
 
   static Core::ConnectionHandle Connect( QListWidget* qwidget, Core::StateStringVectorHandle& state );
 
-  // Connect QtTransferFunctionScene and TransferFunction
+  /// Connect QtTransferFunctionScene and TransferFunction
   static Core::ConnectionHandle Connect( QtTransferFunctionScene* tf_scene, 
     Core::TransferFunctionHandle& tf );
 
-  // Connect QtTransferFunctionCurve and TransferFunctionFeature
+  /// Connect QtTransferFunctionCurve and TransferFunctionFeature
   static Core::ConnectionHandle Connect( QtTransferFunctionCurve* tf_curve, 
     Core::TransferFunctionFeatureHandle& feature );
 
-  // Enable / Disable a button from state engine
+  /// Enable / Disable a button from state engine
   static Core::ConnectionHandle Enable( QAction* qaction, Core::StateBoolHandle& state, 
     bool opposite_logic = false );
   static Core::ConnectionHandle Enable( QWidget* qwidget, Core::StateBoolHandle& state, 
@@ -199,23 +199,23 @@ public:
   static Core::ConnectionHandle Enable( QWidget* qwidget, std::vector< Core::StateBaseHandle >& states,
     boost::function< bool () > condition );
 
-  // Connect the visibility of the QWidget to a StateBool
+  /// Connect the visibility of the QWidget to a StateBool
   static Core::ConnectionHandle Show( QWidget* qwidget, Core::StateBoolHandle& state, 
     bool opposite_logic = false );
   
-  // Connect the visibility of the QtCustomDockWidget to a StateBool
+  /// Connect the visibility of the QtCustomDockWidget to a StateBool
   static Core::ConnectionHandle Show( QtCustomDockWidget* dockwidget, Core::StateBoolHandle& state, 
     bool opposite_logic = false );
   
-  // Connect the visibility of the QtCustomDialog to a StateBool
+  /// Connect the visibility of the QtCustomDialog to a StateBool
   static Core::ConnectionHandle Show( QtCustomDialog* dialog, Core::StateBoolHandle& state, 
     bool opposite_logic = false );
 
-  // Connect the visibility of the QWidget to a Statebase
+  /// Connect the visibility of the QWidget to a Statebase
   static Core::ConnectionHandle Show( QWidget* qwidget, Core::StateBaseHandle state,
     boost::function< bool () > condition );
 
-  // Connect the visibility of the QWidget to a StateBool
+  /// Connect the visibility of the QWidget to a StateBool
   static Core::ConnectionHandle Show( QWidget* qwidget, std::vector< Core::StateBaseHandle >& states,
     boost::function< bool () > condition );
 };

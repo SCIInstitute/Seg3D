@@ -43,14 +43,14 @@ namespace Seg3D
 class Matlab73LayerImporterPrivate;
 typedef boost::shared_ptr<Matlab73LayerImporterPrivate> Matlab73LayerImporterPrivateHandle;
 
-// CLASS Matlab73LayerImporter. It relies on the MatlabIO library and provides support
-// for basic 3D matrices as well as structured information that delivers spacing and 
-// origin information.
+/// CLASS Matlab73LayerImporter. It relies on the MatlabIO library and provides support
+/// for basic 3D matrices as well as structured information that delivers spacing and 
+/// origin information.
 
 class Matlab73LayerImporter : public LayerSingleFileImporter
 {
-  // assign lower priority than for older Matlab format, since it will
-  // probably be more common at this point
+  /// assign lower priority than for older Matlab format, since it will
+  /// probably be more common at this point
   SEG3D_IMPORTER_TYPE( "Matlab v7.3 Importer", ".mat;.MAT", 10 )
 
   // -- Constructor/Destructor --
@@ -60,17 +60,17 @@ public:
 
   // -- Import information from file --
 public:
-  // GET_FILE_INFO
-  // Get the information about the file we are currently importing.
-  // NOTE: This function often causes the file to be loaded in its entirety
-  // Hence it is best to run this on a separate thread if needed ( from the GUI ).
+  /// GET_FILE_INFO
+  /// Get the information about the file we are currently importing.
+  /// NOTE: This function often causes the file to be loaded in its entirety
+  /// Hence it is best to run this on a separate thread if needed ( from the GUI ).
   virtual bool get_file_info( LayerImporterFileInfoHandle& info );
 
   // -- Import data from file --  
 public: 
-  // GET_FILE_DATA
-  // Get the file data from the file/ file series
-  // NOTE: The information is generated again, so that hints can be processed
+  /// GET_FILE_DATA
+  /// Get the file data from the file/ file series
+  /// NOTE: The information is generated again, so that hints can be processed
   virtual bool get_file_data( LayerImporterFileDataHandle& data );
   
 private:

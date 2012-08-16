@@ -63,52 +63,52 @@ public:
 
 public:
 
-  // HANDLE_MOUSE_PRESS:
-  // Called when a mouse button has been pressed.
+  /// HANDLE_MOUSE_PRESS:
+  /// Called when a mouse button has been pressed.
   virtual bool handle_mouse_press( ViewerHandle viewer, 
     const Core::MouseHistory& mouse_history, 
     int button, int buttons, int modifiers );
     
-  // HANDLE_MOUSE_RELEASE:
-  // Called when a mouse button has been released.
+  /// HANDLE_MOUSE_RELEASE:
+  /// Called when a mouse button has been released.
   virtual bool handle_mouse_release( ViewerHandle viewer, 
     const Core::MouseHistory& mouse_history, 
     int button, int buttons, int modifiers );
     
-  // HANDLE_MOUSE_MOVE:
-  // Called when the mouse moves in a viewer.
+  /// HANDLE_MOUSE_MOVE:
+  /// Called when the mouse moves in a viewer.
   virtual bool handle_mouse_move( ViewerHandle viewer, 
     const Core::MouseHistory& mouse_history, 
     int button, int buttons, int modifiers );
 
-  // HANDLE_KEY_PRESS:
-  // Called when a key is pressed
+  /// HANDLE_KEY_PRESS:
+  /// Called when a key is pressed
   virtual bool handle_key_press( ViewerHandle viewer, int key, int modifiers ); 
   
-  // REDRAW:
-  // Draw seed points in the specified viewer.
-  // The function should only be called by the renderer, which has a valid GL context.
+  /// REDRAW:
+  /// Draw seed points in the specified viewer.
+  /// The function should only be called by the renderer, which has a valid GL context.
   virtual void redraw( size_t viewer_id, const Core::Matrix& proj_mat,
     int viewer_width, int viewer_height );
 
-  // HAS_2D_VISUAL:
-  // Returns true if the tool draws itself in the 2D view, otherwise false.
-  // The default implementation returns false.
+  /// HAS_2D_VISUAL:
+  /// Returns true if the tool draws itself in the 2D view, otherwise false.
+  /// The default implementation returns false.
   virtual bool has_2d_visual();
 
-  // ACTIVATE:
-  // Activate a tool: this tool is set as the active tool and hence it should
-  // setup the right mouse tools in the viewers.
+  /// ACTIVATE:
+  /// Activate a tool: this tool is set as the active tool and hence it should
+  /// setup the right mouse tools in the viewers.
   virtual void activate();
 
-  // DEACTIVATE:
-  // Deactivate a tool. A tool is always deactivate before the next one is
-  // activated.
+  /// DEACTIVATE:
+  /// Deactivate a tool. A tool is always deactivate before the next one is
+  /// activated.
   virtual void deactivate();
 
-  // POST_LOAD_STATES:
-  // This virtual function can be implemented in the StateHandlers and will be called after its
-  // states are loaded.  If it doesn't succeed it needs to return false.
+  /// POST_LOAD_STATES:
+  /// This virtual function can be implemented in the StateHandlers and will be called after its
+  /// states are loaded.  If it doesn't succeed it needs to return false.
   virtual bool post_load_states( const Core::StateIO& state_io );
 
   // -- dispatch functions --
@@ -124,7 +124,7 @@ public:
   Core::StatePointVectorHandle vertices_state_;
   Core::StateRangedDoubleHandle termination_state_;
 
-  // Number of iterations the filter needs to run
+  /// Number of iterations the filter needs to run
   Core::StateRangedIntHandle iterations_state_;
 
   Core::StateLabeledOptionHandle gradient_state_;
@@ -133,8 +133,8 @@ public:
   Core::StateSpeedlinePathHandle itk_path_state_;
   Core::StateSpeedlinePathHandle path_state_;
 
-  // This state variable is only used for path, as we redraw when path state changes. We cannot use
-  // the current vertices state.
+  /// This state variable is only used for path, as we redraw when path state changes. We cannot use
+  /// the current vertices state.
   Core::StatePointVectorHandle path_vertices_state_;   
 
   Core::StateBoolHandle valid_gradient_state_;

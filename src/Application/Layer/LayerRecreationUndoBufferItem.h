@@ -44,7 +44,7 @@ class LayerRecreationUndoBufferItemPrivate;
 typedef boost::shared_ptr<LayerRecreationUndoBufferItemPrivate> LayerRecreationUndoBufferItemPrivateHandle;
 
 
-// Class that describes all the steps that need to be undertaken to undo a layer action.
+/// Class that describes all the steps that need to be undertaken to undo a layer action.
 class LayerRecreationUndoBufferItem : public UndoBufferItem
 {
 
@@ -56,26 +56,26 @@ public:
   // -- creation of undo/redo action --
 public:
 
-  // ADD_ID_COUNT_TO_RESTORE:
-  // Cache the count of layer and group ids, so they can be rolled back to the original ones
-  // NOTE: If they are set to -1, the function will query the current ones.
+  /// ADD_ID_COUNT_TO_RESTORE:
+  /// Cache the count of layer and group ids, so they can be rolled back to the original ones
+  /// NOTE: If they are set to -1, the function will query the current ones.
   void add_id_count_to_restore( LayerManager::id_count_type id_count );
 
   // -- apply undo/redo action --
 public:
 
-  // APPLY_AND_CLEAR_UNDO:
-  // Apply the undo information
+  /// APPLY_AND_CLEAR_UNDO:
+  /// Apply the undo information
   virtual bool apply_and_clear_undo();
 
   // -- size information --
 public:
-  // GET_BYTE_SIZE:
-  // The size of the item in memory ( approximately )
+  /// GET_BYTE_SIZE:
+  /// The size of the item in memory ( approximately )
   virtual size_t get_byte_size() const;
 
-  // COMPUTE_SIZE:
-  // Compute the size of the item
+  /// COMPUTE_SIZE:
+  /// Compute the size of the item
   virtual void compute_size();
 
   // -- internals --

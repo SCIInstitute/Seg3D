@@ -64,61 +64,61 @@ public:
   virtual ~StatusBarWidget();
 
 private:
-  // UPDATE_DATA_POINT_INFO:
-  //
+  /// UPDATE_DATA_POINT_INFO:
+  ///
   void update_data_point_info( DataPointInfoHandle data_point );
   
-  // UPDATE_DATA_POINT_LABEL:
-  //
+  /// UPDATE_DATA_POINT_LABEL:
+  ///
   void update_data_point_label();
   
-  // SET_MESSAGE:
-  // 
+  /// SET_MESSAGE:
+  /// 
   void set_message( int msg_type, std::string message );
   
-  // CHECK_TIME:
-  // 
+  /// CHECK_TIME:
+  /// 
   void check_time();
 
 private Q_SLOTS:
-  // SET_COORDINATES_MODE:
-  // function that sets which mode the status bar is showing the coordinates in
+  /// SET_COORDINATES_MODE:
+  /// function that sets which mode the status bar is showing the coordinates in
   void set_coordinates_mode( bool is_world );
 
-  // SET_STATUS_REPORT_LABEL:
-  // function that actually sets the message on the status bar
+  /// SET_STATUS_REPORT_LABEL:
+  /// function that actually sets the message on the status bar
   void set_status_report_label( std::string& report );
 
-  // RESET_ICON:
-  // function that resets the icon after an error has been viewed in the message window
+  /// RESET_ICON:
+  /// function that resets the icon after an error has been viewed in the message window
   void reset_icon( bool show_errors );
   
-  // FIX_ICON_STATUS:
-  // function that sets the status report label back to true
-  //void fix_icon_status();
+  /// FIX_ICON_STATUS:
+  /// function that sets the status report label back to true
+  ///void fix_icon_status();
   
-  // SWAP_BARS:
-  // function that swaps between the coordinates bar and the active tools/layer bar
+  /// SWAP_BARS:
+  /// function that swaps between the coordinates bar and the active tools/layer bar
   void swap_bars();
   
-  // CLEAR_LABEL:
-  // function that clears the message that is on the status bar
+  /// CLEAR_LABEL:
+  /// function that clears the message that is on the status bar
   void clear_label();
   
-  // SLIDE_IN:
-  // function that animates the status message in
+  /// SLIDE_IN:
+  /// function that animates the status message in
   void slide_in();
   
-  // SLIDE_OUT:
-  // function that animates the status message out
+  /// SLIDE_OUT:
+  /// function that animates the status message out
   void slide_out();
   
-  // SLIDE_OUT_THEN_IN:
-  // function that animates the status message out then in
+  /// SLIDE_OUT_THEN_IN:
+  /// function that animates the status message out then in
   void slide_out_then_in();
   
-  // SET_FINISHED_ANIMATING:
-  // function that sets the animating status to done;
+  /// SET_FINISHED_ANIMATING:
+  /// function that sets the animating status to done;
   void set_finished_animating();
   
 private:

@@ -52,25 +52,25 @@ public:
 
   // -- overloaded functions --
 public:
-  // WAIT:
-  // Wait for the event to be triggered. If the event was already triggered this function
-  // returns immediately.
+  /// WAIT:
+  /// Wait for the event to be triggered. If the event was already triggered this function
+  /// returns immediately.
   virtual void wait();
   
-  // WAIT:
-  // Wait for the event to be triggered. If the event was already triggered this function
-  // returns immediately with true. After the timeout the function returns. If a timeout
-  // was triggered it returns false.
+  /// WAIT:
+  /// Wait for the event to be triggered. If the event was already triggered this function
+  /// returns immediately with true. After the timeout the function returns. If a timeout
+  /// was triggered it returns false.
   virtual bool timed_wait( double timeout );
 
-  // GET_NAME:
-  // The name of the resource we are waiting for
+  /// GET_NAME:
+  /// The name of the resource we are waiting for
   virtual std::string get_name() const;
   
 private:
   friend class LayerFilterPrivate;
-  // TRIGGER:
-  // Called by LayerFilter when it has finished processing.
+  /// TRIGGER:
+  /// Called by LayerFilter when it has finished processing.
   void trigger();
 
 private:
