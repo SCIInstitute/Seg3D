@@ -134,7 +134,7 @@ left button drag & Modify brightness and contrast.  \\ &Vertical is contrast, ho
 \hline 
 scroll up/down & Move up/down a slice\\ &Note: using shift maybe needed while using some tools (like paint brush)\\
 \hline
-cmd/crtl+right button & Move slices in other planes to intersect at cursor.\\  &Viewers must have the picking icon enabled (Figure~\ref{fig:pick}).\\
+cmd/crtl+right button & Move slices in other planes to intersect at cursor.\\  &Viewers must have the picking icon enabled (Table~\ref{tab:2dicons}).\\
 \hline
 shift+left button drag & Zan view\\
 shift+right button drag & Zoom view in/out\\
@@ -352,14 +352,14 @@ The tool bar located at the bottom of the Seg3D window contains some useful func
 \end{tabular}
 \end{table}
 
-The information toolbar will show information about the volume at the location indicated by the mouse.  As shown in Figure~\ref{fig:geometricinfo}, the information given is the x, y, and z coordinates and the value of the layer at the mouse position in the selected volume.  By clicking on the world icon (Figure~\ref{fig:world}), you may toggle between indexed values (relative) and the world values (absolute, considers spacing).  The data shown is changed when the mouse is moved, the active slice is changed, or the active layer is changed.
+The information toolbar will show information about the volume at the location indicated by the mouse.  As shown in Figure~\ref{fig:geometricinfo}, the information given is the x, y, and z coordinates and the value of the layer at the mouse position in the selected volume.  By clicking on the world icon (Table~\ref{tab:toolbaricons}), you may toggle between indexed values (relative) and the world values (absolute, considers spacing).  The data shown is changed when the mouse is moved, the active slice is changed, or the active layer is changed.
 
 \begin{figure}[h!]
 \scalebox{.7}{\includegraphics{Seg3DBasicFunctionality_figures/geometric_info.png}}
 \caption{Geometric Information shown in the information tool bar.}\label{fig:geometricinfo}
 \end{figure}
 
-By clicking on the switch tool icon (Figure~\ref{fig:switchtool}), the tool bar will display a quick menu for the available tools and layers instead of geometric information.  As seen in Figure~\ref{fig:quickmenu}, this menu will display the active tool and layer.  if the either is clicked, a dropped down menu will appear allowing the user to switch to an open tool or layer.  This can be especially useful in full screen mode.  
+By clicking on the switch tool icon (Table~\ref{tab:toolbaricons}), the tool bar will display a quick menu for the available tools and layers instead of geometric information.  As seen in Table~\ref{tab:toolbaricons}, this menu will display the active tool and layer.  if the either is clicked, a dropped down menu will appear allowing the user to switch to an open tool or layer.  This can be especially useful in full screen mode.  
 
 \begin{figure}[h!]
 \scalebox{.7}{\includegraphics{Seg3DBasicFunctionality_figures/quick_menu.png}}
@@ -1276,7 +1276,7 @@ The filters listed in the `Data Filters' menu all use data layers as inputs.  Mo
 
 \subsection{Arithmetic}
 
-The arithmetic filter allows the user to run basic arithmetic and boolean operations on both image and mask data on a pixel by pixel basis.  This filter can handle up to four inputs and can be used to perform calculate any expression provided by the user(correct syntax is RESULT = <expression>;).  There are also many saved expressions that exists as separate filters or tools, the main difference is the functionality to handle more than two inputs.
+The arithmetic filter allows the user to run basic arithmetic and boolean operations on both image and mask data on a pixel by pixel basis.  This filter can handle up to four inputs and can be used to perform calculate any expression provided by the user(correct syntax is RESULT = \emph{$<$expression$>$};).  There are also many saved expressions that exists as separate filters or tools, the main difference is the functionality to handle more than two inputs.
 
 Any operation can be performed on either type of data, but it should be noted that if a boolean operator is performed it uses zero and non-zero values as the only two possible cases.  This applies to using data layers and also values that may be the summation of mask layers.  
 
