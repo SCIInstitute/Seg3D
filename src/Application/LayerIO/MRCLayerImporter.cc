@@ -115,6 +115,11 @@ namespace Seg3D
       this->importer_->set_error(this->mrcutil_.get_error());
       return false;
     }
+    
+    if (header_.machinestamp == 0)
+    {
+      this->importer_->set_warning("Machine stamp was not set in header. The endianness of this file may not be properly detected.");
+    }
 
     switch (header_.mode)
     {
@@ -128,7 +133,7 @@ namespace Seg3D
         this->data_type_ = Core::DataType::FLOAT_E;
         break;
       default:
-        this->importer_->set_error("Unsupported MRC format.");
+        this->importer_->set_error("Unsupported MRC data type.");
         return false;
     }
 
@@ -406,6 +411,7 @@ namespace Seg3D
 #else
     data_file.close();
 #endif
+
     this->data_block_->set_data(data);
 
     // MRC data is always stored as big endian data
