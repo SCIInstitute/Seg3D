@@ -3,7 +3,7 @@
  
  The MIT License
  
- Copyright (c) 2011 Scientific Computing and Imaging Institute,
+ Copyright (c) 2012 Scientific Computing and Imaging Institute,
  University of Utah.
  
  
@@ -38,6 +38,9 @@
 // Application includes
 #include <Application/LayerIO/Matlab73LayerImporter.h>
 
+#define MAX_DIMS 3
+#define BUFFER_SIZE 256
+
 SEG3D_REGISTER_IMPORTER( Seg3D, Matlab73LayerImporter );
 
 namespace Seg3D
@@ -52,9 +55,7 @@ Matlab73LayerImporterPrivate() :
   read_header_( false ),
   read_data_( false ),
   object_is_struct_(false),
-  ROOT_GROUP_C("/"),
-  MAX_DIMS(3),
-  BUFFER_SIZE(256)
+  ROOT_GROUP_C("/")
   {
   }
 
@@ -113,8 +114,6 @@ public:
   bool object_is_struct_;
 
   const std::string ROOT_GROUP_C;
-  const int MAX_DIMS;
-  const size_t BUFFER_SIZE;
 };  
 
 class H5ObjectWrapperPrivate
