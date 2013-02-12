@@ -198,6 +198,10 @@ private Q_SLOTS:
   /// dispatches an action that exports the layer as a png
   void export_png();
 
+  /// EXPORT_ISOSURFACE:
+  /// dispatches an action that exports the isosurface for this layer
+  void export_isosurface();
+
 private:
   friend class LayerWidgetPrivate;
   LayerWidgetPrivate* private_; 

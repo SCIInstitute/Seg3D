@@ -57,6 +57,8 @@ SET(APPLICATION_LAYERIO_ACTIONS_SRCS
   Actions/ActionExportLayer.cc
   Actions/ActionExportSegmentation.h
   Actions/ActionExportSegmentation.cc
+  Actions/ActionExportIsosurface.h
+  Actions/ActionExportIsosurface.cc
   Actions/ActionImportLayer.h
   Actions/ActionImportLayer.cc
   Actions/ActionImportSeries.h
