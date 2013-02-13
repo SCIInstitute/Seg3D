@@ -38,6 +38,8 @@
 // Application includes
 #include <Application/LayerIO/Matlab73LayerImporter.h>
 
+#include <iostream>
+
 #define MAX_DIMS 3
 #define BUFFER_SIZE 256
 
@@ -114,7 +116,7 @@ public:
   bool object_is_struct_;
 
   const std::string ROOT_GROUP_C;
-};  
+};    
 
 class H5ObjectWrapperPrivate
 {
@@ -168,7 +170,7 @@ bool Matlab73LayerImporterPrivate::scan_mat_object( hid_t obj_id, H5O_type_t typ
     error = "error opening dataset MATLAB_class attribute";
     return false;
   }
-
+  
   char attribute_data[BUFFER_SIZE];
 
   if (H5LTget_attribute_string(mat_class_id, ".", "MATLAB_class", attribute_data ) < 0)
@@ -234,9 +236,9 @@ bool Matlab73LayerImporterPrivate::scan_mat_array( hid_t obj_id, const char *att
       vdims.push_back(1);
   }
   
-  this->grid_transform_ = Core::GridTransform(static_cast<size_t>( vdims[ 0 ] ),
-                        static_cast<size_t>( vdims[ 1 ] ),
-                        static_cast<size_t>( vdims[ 2 ] ));
+  this->grid_transform_ = Core::GridTransform(static_cast<size_t>( vdims[ 2 ] ),
+                                              static_cast<size_t>( vdims[ 1 ] ),
+                                              static_cast<size_t>( vdims[ 0 ] ));
   this->grid_transform_.set_originally_node_centered( false );
   this->data_type_ = this->convert_type(attribute_data);
   this->read_header_ = true;
@@ -393,11 +395,6 @@ bool Matlab73LayerImporterPrivate::scan_mat_file( const std::string& filename )
 
       if ( (obj_info.type == H5O_TYPE_GROUP) || (obj_info.type == H5O_TYPE_DATASET) )
       {
-        // test
-        if (obj_info.type == H5O_TYPE_GROUP) CORE_LOG_DEBUG(obj_name + " H5O_TYPE_GROUP");
-        if (obj_info.type == H5O_TYPE_DATASET) CORE_LOG_DEBUG(obj_name + " H5O_TYPE_DATASET");
-        // test
-
         this->matlab_object_name_ = obj_name;
         this->matlab_dataset_name_ = obj_name;
 
@@ -434,15 +431,15 @@ bool Matlab73LayerImporterPrivate::import_mat_array( H5::DataSet& dataset, std::
 {
   // Generate a new data block
   this->data_block_ = Core::StdDataBlock::New( this->grid_transform_.get_nx(), 
-                        this->grid_transform_.get_ny(),
-                        this->grid_transform_.get_nz(),
-                        this->data_type_ );
+                    this->grid_transform_.get_ny(),
+                    this->grid_transform_.get_nz(),
+                    this->data_type_ );
 
   // We need to check if we could allocate the destination datablock
   if ( !this->data_block_ )
   {
-    error = "Could not allocate enough memory to read Matlab file.";
-    return false;
+  error = "Could not allocate enough memory to read Matlab file.";
+  return false;
   }
 
   try
@@ -455,82 +452,94 @@ bool Matlab73LayerImporterPrivate::import_mat_array( H5::DataSet& dataset, std::
     dims2[1] = this->data_block_->get_ny();
     dims2[2] = this->data_block_->get_nz();
 
-    // get full space for dataset
-    H5::DataSpace dataspace = dataset.getSpace();
-    int rank = dataspace.getSimpleExtentNdims();
-    int ndims = dataspace.getSimpleExtentDims( dims, NULL);
-    size_t length = this->data_block_->get_size() * Core::GetSizeDataType( this->data_type_ );
-
-    // get memory space to read dataset
-    H5::DataSpace memspace(MAX_DIMS, dims2);
-    
-    // PredType wraps H5T_* types
-    // HDF5 native types are probably best to use here
-    switch( this->data_type_ )
+    H5::DSetCreatPropList propList = dataset.getCreatePlist();
+    for (int i = 0; i < propList.getNfilters(); ++i)
     {
-      case Core::DataType::CHAR_E:
+      unsigned int flags, filter_config;
+      // We don't care about the filter name or the compression level (cd_values[0] in HDF5 docs)
+      size_t cd_values_size = 0, buff_size = 0;
+
+      H5Z_filter_t filter_id = propList.getFilter(i, flags, cd_values_size, 0, buff_size, 0, filter_config);
+      unsigned int decode_enabled =  filter_config & H5Z_FILTER_CONFIG_DECODE_ENABLED;
+      if ( filter_id == H5Z_FILTER_DEFLATE && decode_enabled == 0 )
       {
-        signed char* data = reinterpret_cast<signed char*>( this->data_block_->get_data() );
-        dataset.read(data, H5::PredType::NATIVE_CHAR, memspace, dataspace);
-        break;
+        std::ostringstream oss;
+        oss << "GZIP data compression was detected in " << this->importer_->get_filename() << ", but the importer was not configured to support GZIP decompression.";
+        error = oss.str();
+        return false;
       }
-      case Core::DataType::UCHAR_E:
-      {
-        unsigned char* data = reinterpret_cast<unsigned char*>( this->data_block_->get_data() );
-        dataset.read(data, H5::PredType::NATIVE_UCHAR, memspace, dataspace);
-        break;
-      }     
-      case Core::DataType::SHORT_E:
-      {
-        short* data = reinterpret_cast<short*>( this->data_block_->get_data() );
-        dataset.read(data, H5::PredType::NATIVE_SHORT, memspace, dataspace);
-        break;
-      }
-      case Core::DataType::USHORT_E:
-      {
-        unsigned short* data = reinterpret_cast<unsigned short*>( this->data_block_->get_data() );
-        dataset.read(data, H5::PredType::NATIVE_USHORT, memspace, dataspace);
-        break;
-      }
-      case Core::DataType::INT_E:
-      {
-        int* data = reinterpret_cast<int*>( this->data_block_->get_data() );
-        dataset.read(data, H5::PredType::NATIVE_INT, memspace, dataspace);
-        break;
-      }
-      case Core::DataType::UINT_E:
-      {
-        unsigned int* data = reinterpret_cast<unsigned int*>( this->data_block_->get_data() );
-        dataset.read(data, H5::PredType::NATIVE_UINT, memspace, dataspace);
-        break;
-      }
-      case Core::DataType::FLOAT_E:
-      {
-        float* data = reinterpret_cast<float*>( this->data_block_->get_data() );
-        dataset.read(data, H5::PredType::NATIVE_FLOAT, memspace, dataspace);
-        break;
-      }
-      case Core::DataType::DOUBLE_E:
-      {
-        double* data = reinterpret_cast<double*>( this->data_block_->get_data() );
-        dataset.read(data, H5::PredType::NATIVE_DOUBLE, memspace, dataspace);
-        break;
-      }
-      default:
-        error = "trying to read unknown data type";
-        return false;       
+    }
+
+
+  // get full space for dataset
+  H5::DataSpace dataspace = dataset.getSpace();
+  int rank = dataspace.getSimpleExtentNdims();
+  int ndims = dataspace.getSimpleExtentDims( dims, NULL);
+  size_t length = this->data_block_->get_size() * Core::GetSizeDataType( this->data_type_ );
+
+
+  // get memory space to read dataset
+  H5::DataSpace memspace(MAX_DIMS, dims2);
+
+  // PredType wraps H5T_* types
+  // HDF5 native types are probably best to use here
+  switch( this->data_type_ )
+  {
+    case Core::DataType::CHAR_E:
+    {
+      signed char* data = reinterpret_cast<signed char*>( this->data_block_->get_data() );
+      dataset.read(data, H5::PredType::NATIVE_CHAR, memspace, dataspace);
+      break;
+    }
+    case Core::DataType::UCHAR_E:
+    {
+      unsigned char* data = reinterpret_cast<unsigned char*>( this->data_block_->get_data() );
+      dataset.read(data, H5::PredType::NATIVE_UCHAR, memspace, dataspace);
+      break;
+    }     
+    case Core::DataType::SHORT_E:
+    {
+      short* data = reinterpret_cast<short*>( this->data_block_->get_data() );
+      dataset.read(data, H5::PredType::NATIVE_SHORT, memspace, dataspace);
+      break;
+    }
+    case Core::DataType::USHORT_E:
+    {
+      unsigned short* data = reinterpret_cast<unsigned short*>( this->data_block_->get_data() );
+      dataset.read(data, H5::PredType::NATIVE_USHORT, memspace, dataspace);
+      break;
+    }
+    case Core::DataType::INT_E:
+    {
+      int* data = reinterpret_cast<int*>( this->data_block_->get_data() );
+      dataset.read(data, H5::PredType::NATIVE_INT, memspace, dataspace);
+      break;
+    }
+    case Core::DataType::UINT_E:
+    {
+      unsigned int* data = reinterpret_cast<unsigned int*>( this->data_block_->get_data() );
+      dataset.read(data, H5::PredType::NATIVE_UINT, memspace, dataspace);
+      break;
+    }
+    case Core::DataType::FLOAT_E:
+    {
+      float* data = reinterpret_cast<float*>( this->data_block_->get_data() );
+      dataset.read(data, H5::PredType::NATIVE_FLOAT, memspace, dataspace);
+      break;
+    }
+    case Core::DataType::DOUBLE_E:
+    {
+      double* data = reinterpret_cast<double*>( this->data_block_->get_data() );
+      dataset.read(data, H5::PredType::NATIVE_DOUBLE, memspace, dataspace);
+      break;
+    }
+    default:
+      error = "trying to read unknown data type";
+      return false;       
     }
     return true;
   }
-  catch( H5::DataSpaceIException e )
-  {
-    error = e.getDetailMsg();
-  }
-  catch( H5::DataTypeIException e )
-  {
-    error = e.getDetailMsg();
-  }
-  catch( H5::DataSetIException e )
+  catch( H5::Exception e )
   {
     error = e.getDetailMsg();
   }
@@ -638,7 +647,7 @@ bool Matlab73LayerImporter::get_file_info( LayerImporterFileInfoHandle& info )
   {
     // In case something failed, recover from here and let the user
     // deal with the error.
-    this->set_error( "Matlab v7.3 Importer crashed while reading file." );
+    this->set_error( "Matlab v7.3 Importer crashed while reading header." );
     return false;
   }
   return true;
