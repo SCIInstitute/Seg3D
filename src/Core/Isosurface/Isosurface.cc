@@ -1929,7 +1929,7 @@ void Isosurface::compute( double quality_factor, bool capping_enabled,
   this->update_progress_signal_( 1.0 );
 
   // Test code
-  //this->export_legacy_isosurface( "", "test_isosurface" );
+  // this->export_legacy_isosurface( "", "test_isosurface" );
 }
 
 const std::vector< PointF >& Isosurface::get_points() const
@@ -2181,6 +2181,8 @@ bool Isosurface::export_vtk_isosurface( const boost::filesystem::path& filename 
     return false;
   }
 
+  // Legacy VTK file format (http://vtk.org/VTK/img/file-formats.pdf)
+  //
   // write header
   vtk_file << "# vtk DataFile Version 3.0\n";
   vtk_file << "vtk output\n";
@@ -2195,7 +2197,7 @@ bool Isosurface::export_vtk_isosurface( const boost::filesystem::path& filename 
     vtk_file << pt.x() << " " << pt.y() << " " << pt.z() << std::endl; 
   }
 
-  unsigned int num_triangles = this->private_->faces_.size();
+  unsigned int num_triangles = this->private_->faces_.size() / 3;
   unsigned int triangle_list_size = num_triangles * 4;
 
   vtk_file << "\nPOLYGONS " << num_triangles << " " << triangle_list_size << std::endl;
