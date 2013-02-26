@@ -179,9 +179,13 @@ private Q_SLOTS:
   void export_nrrd();
 
   /// EXPORT_MATLAB:
-  /// dispatches an action that exports the layer as a nrrd
+  /// dispatches an action that exports the layer as a matlab
   void export_matlab();
-    
+  
+  /// EXPORT_MRC:
+  /// dispatches an action that exports the layer as a mrc
+  void export_mrc();
+  
   /// EXPORT_DICOM:
   /// dispatches an action that exports the layer as a dicom
   void export_dicom();

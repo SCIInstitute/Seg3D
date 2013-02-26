@@ -1363,6 +1363,9 @@ void LayerWidget::contextMenuEvent( QContextMenuEvent * event )
   qaction = export_menu->addAction( tr( "TIFF" ) );
   connect( qaction, SIGNAL( triggered() ), this, SLOT( export_tiff() ) );
   
+  qaction = export_menu->addAction( tr( "MRC" ) );
+  connect( qaction, SIGNAL( triggered() ), this, SLOT( export_mrc() ) );
+  
   menu.addMenu( export_menu );
   
 
@@ -1403,6 +1406,11 @@ void LayerWidget::export_matlab()
   this->private_->export_layer( ".mat" );
 }
 
+void LayerWidget::export_mrc()
+{
+  this->private_->export_layer( ".mrc" );
+}
+  
 void LayerWidget::export_dicom()
 {
   this->private_->export_layer( ".dcm" );
