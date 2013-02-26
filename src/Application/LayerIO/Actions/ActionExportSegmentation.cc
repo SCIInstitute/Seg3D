@@ -87,6 +87,15 @@ bool ActionExportSegmentation::validate( Core::ActionContextHandle& context )
         return false;
       }
     }
+    else if( this->extension_ == ".mrc" )
+    {
+      if( ! LayerIO::Instance()->create_exporter( this->layer_exporter_, layer_handles, 
+                                                 "MRC Exporter", this->extension_ ) )
+      {
+        context->report_error( "Could not create MRC2000 exporter." );
+        return false;
+      }
+    }
     else
     {
       if( ! LayerIO::Instance()->create_exporter( this->layer_exporter_, layer_handles, 
