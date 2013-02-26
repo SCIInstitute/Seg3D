@@ -307,7 +307,7 @@ bool Layer::post_save_states( Core::StateIO& state_io )
     layer_type = "label";
     break;
   default:
-    CORE_LOG_ERROR( "Unknow layer type" );
+    CORE_LOG_ERROR( "Unknown layer type" );
     assert( false );
   }
   
