@@ -145,14 +145,14 @@ public:
       // lock does not cover it
       if ( mask1_data_block->get_data_block() != output_mask_data_block->get_data_block() )
       {
-        slock1.swap( Core::MaskDataBlock::shared_lock_type( 
-           mask1_data_block->get_mutex() ) );
+        Core::MaskDataBlock::shared_lock_type mutex( mask1_data_block->get_mutex() );
+        slock1.swap(mutex);
       }
     
       if ( mask2_data_block->get_data_block() != output_mask_data_block->get_data_block() )
       {
-        slock2.swap( Core::MaskDataBlock::shared_lock_type( 
-           mask2_data_block->get_mutex() ) );
+        Core::MaskDataBlock::shared_lock_type mutex( mask2_data_block->get_mutex() );
+        slock2.swap(mutex);
       }
     
       size_t size = mask1_data_block->get_size();
