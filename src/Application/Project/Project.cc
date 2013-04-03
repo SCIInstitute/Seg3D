@@ -26,11 +26,6 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-// NOTE: This include is needed for APPLE to deal with directories that are bundled as a single file.
-#if defined( __APPLE__ )  
-#include <CoreServices/CoreServices.h>
-#endif
-
 // STL includes
 #include <queue>
 #include <set>
@@ -59,6 +54,11 @@
 #include <Application/DatabaseManager/DatabaseManager.h>
 #include <Application/Layer/Layer.h>
 #include <Application/Layer/LayerManager.h>
+
+// NOTE: This include is needed for APPLE to deal with directories that are bundled as a single file.
+#if defined( __APPLE__ )  
+#  include <CoreServices/CoreServices.h>
+#endif
 
 // Include CMake generated files
 #include "ApplicationConfiguration.h"

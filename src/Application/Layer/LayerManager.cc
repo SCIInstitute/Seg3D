@@ -46,7 +46,10 @@
 #include <Application/Layer/LayerManager.h>
 #include <Application/ProjectManager/ProjectManager.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
-#include "boost/foreach.hpp"
+
+// Boost includes
+#include <boost/foreach.hpp>
+#include <boost/smart_ptr.hpp>
 
 namespace Seg3D
 {
@@ -1465,13 +1468,13 @@ LayerGroupHandle LayerManager::FindGroup( ProvenanceID prov_id )
 
 MaskLayerHandle LayerManager::FindMaskLayer( const std::string& layer_id, SandboxID sandbox )
 {
-  return boost::shared_dynamic_cast<MaskLayer>(  
+  return boost::dynamic_pointer_cast<MaskLayer>(  
     LayerManager::Instance()->find_layer_by_id( layer_id, sandbox ) );
 }
 
 DataLayerHandle LayerManager::FindDataLayer( const std::string& layer_id, SandboxID sandbox )
 {
-  return boost::shared_dynamic_cast<DataLayer>(  
+  return boost::dynamic_pointer_cast<DataLayer>(  
     LayerManager::Instance()->find_layer_by_id( layer_id, sandbox ) );
 }
 
@@ -1751,8 +1754,8 @@ void LayerManager::DispatchInsertVolumeIntoLayer( LayerHandle layer,
 {
   if ( layer->get_type() == Core::VolumeType::MASK_E )
   {
-    MaskLayerHandle mask = boost::shared_dynamic_cast<MaskLayer>( layer );
-    Core::MaskVolumeHandle mask_volume = boost::shared_dynamic_cast<Core::MaskVolume>( volume );
+    MaskLayerHandle mask = boost::dynamic_pointer_cast<MaskLayer>( layer );
+    Core::MaskVolumeHandle mask_volume = boost::dynamic_pointer_cast<Core::MaskVolume>( volume );
     if ( mask && mask_volume )
     {
       DispatchInsertMaskVolumeIntoLayer( mask, mask_volume, prov_id, key, sandbox );
@@ -1760,8 +1763,8 @@ void LayerManager::DispatchInsertVolumeIntoLayer( LayerHandle layer,
   }
   else if ( layer->get_type() == Core::VolumeType::DATA_E )
   {
-    DataLayerHandle data = boost::shared_dynamic_cast<DataLayer>( layer );
-    Core::DataVolumeHandle data_volume = boost::shared_dynamic_cast<Core::DataVolume>( volume );
+    DataLayerHandle data = boost::dynamic_pointer_cast<DataLayer>( layer );
+    Core::DataVolumeHandle data_volume = boost::dynamic_pointer_cast<Core::DataVolume>( volume );
     if ( data && data_volume )
     {
       DispatchInsertDataVolumeIntoLayer( data, data_volume, prov_id, key, sandbox );

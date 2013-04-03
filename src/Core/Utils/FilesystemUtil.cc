@@ -58,7 +58,7 @@ bool CreateOrIgnoreDirectory( const boost::filesystem::path& dir_path )
 
 bool RecursiveCopyDirectory( const boost::filesystem::path& from, const boost::filesystem::path& to )
 {
-  using namespace boost::filesystem3;
+  using namespace boost::filesystem;
   
   // If the source path doesn't exist or it's not a directory
   if ( !exists( from ) || !is_directory( from ) ) return false;
