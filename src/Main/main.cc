@@ -220,7 +220,7 @@ int main( int argc, char **argv )
   // Indicate a successful finish of the program
   Core::Application::Instance()->log_finish();
 
-#ifdef _WIN32 || __APPLE__
+#if defined (_WIN32) || defined(__APPLE__)
   return ( 0 );
 #else
     // NOTE: On Linux Qt tends to crash in one of its static destructors. Since we do not need these
