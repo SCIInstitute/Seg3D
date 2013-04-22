@@ -80,17 +80,26 @@ bool CannyEdgeDetectionFilterInterface::build_widget( QFrame* frame )
         
   QtUtils::QtBridge::Connect( this->private_->ui_.blurring_distance_, 
     tool->blurring_distance_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.threshold_, 
-    tool->threshold_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.lower_threshold_, 
+    tool->lower_threshold_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.upper_threshold_, 
+                             tool->upper_threshold_state_ );
+  
+  // Connect the thresholds so that they keep in sync
+  this->private_->ui_.lower_threshold_->connect_min( this->private_->ui_.upper_threshold_ );
+  this->private_->ui_.upper_threshold_->connect_max( this->private_->ui_.lower_threshold_ );
+
   QtUtils::QtBridge::Enable( this->private_->ui_.runFilterButton,tool->valid_target_state_ );
   QtUtils::QtBridge::Show( this->private_->ui_.message_alert_, tool->valid_target_state_, true );
-  QtUtils::QtBridge::Enable( this->private_->ui_.target_layer_, 
+  QtUtils::QtBridge::Enable( this->private_->ui_.target_layer_,
     tool->use_active_layer_state_, true ); 
+
   QtUtils::QtBridge::Connect( this->private_->ui_.runFilterButton, boost::bind(
     &Tool::execute, tool, Core::Interface::GetWidgetActionContext() ) );
-  
-  this->private_->ui_.blurring_distance_->set_description( "Distance (pixels)" );
-  this->private_->ui_.threshold_->set_description( "Minimum Threshold" );
+
+  this->private_->ui_.blurring_distance_->set_description( "Distance (pixels)" );  
+  this->private_->ui_.upper_threshold_->set_description( "Upper" );
+  this->private_->ui_.lower_threshold_->set_description( "Lower" );
 
   return true;
 }
