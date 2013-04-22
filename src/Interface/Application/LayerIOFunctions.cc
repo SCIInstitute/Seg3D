@@ -43,6 +43,7 @@
 
 // Core includes
 #include <Core/State/Actions/ActionSet.h>
+#include <Core/Utils/Log.h>
 
 // Application includes
 #include <Application/LayerIO/LayerIO.h>
@@ -121,12 +122,7 @@ bool LayerIOFunctions::ImportFiles( QMainWindow* main_window, std::string file_t
     // If no file was selected just return
     if( file_list.size() == 0 )
     {
-      QMessageBox message_box( main_window );
-      message_box.setWindowTitle( "Import Layer Error" );
-      message_box.addButton( QMessageBox::Ok );
-      message_box.setIcon( QMessageBox::Critical );
-      message_box.setText( "No files were selected." );
-      message_box.exec();
+      CORE_LOG_DEBUG("Zero files selected for import.")
       return false;
     }
 
@@ -246,16 +242,11 @@ void LayerIOFunctions::ImportSeries( QMainWindow* main_window )
         file_list = diag->selectedFiles();
         delete diag;
 #endif
-    
+
   // If no files were selected just exit
   if( file_list.size() == 0 )
   {
-    QMessageBox message_box( main_window );
-    message_box.setWindowTitle( "Import Layer Error" );
-    message_box.addButton( QMessageBox::Ok );
-    message_box.setIcon( QMessageBox::Critical );
-    message_box.setText( "No files were selected."  );
-    message_box.exec(); 
+    CORE_LOG_DEBUG("Zero files from series selected for import.")
     return;
   }
 
