@@ -93,6 +93,10 @@ private Q_SLOTS:
   /// this function is called when someone clicks the quick open file button  
   void quick_open_file();
   
+  /// QUICK_OPEN_NEW_PROJECT:
+  /// this function is called when someone clicks the cancel button 
+  void quick_open_new_project();
+  
   /// ENABLE_LOAD_RECENT_BUTTON:
   /// this function enables the load recent button if you select a recent project from the list
   void enable_load_recent_button( QListWidgetItem* item );
