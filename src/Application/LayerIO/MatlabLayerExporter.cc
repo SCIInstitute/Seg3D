@@ -26,9 +26,7 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-
-// MatlabIO includes
-#include <MatlabIO.h>
+#include <vector>
 
 // Core includes
 #include <Core/DataBlock/NrrdData.h>
@@ -40,12 +38,83 @@
 #include <Application/Layer/MaskLayer.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
 
+#include <boost/assign/std/vector.hpp>
+
+using namespace boost::assign;
 
 SEG3D_REGISTER_EXPORTER( Seg3D, MatlabLayerExporter );
 
 namespace Seg3D
 {
 
+void MatlabLayerExporter::createDoubleArray(const char* name, double value, int index, MatlabIO::matlabarray& array)
+{
+  MatlabIO::matlabarray testma;
+  testma.createdensearray(1, 1, MatlabIO::matlabarray::miDOUBLE);
+  testma.setnumericarray(&value, 1);
+  array.setfield( index, name, testma );
+}
+
+void MatlabLayerExporter::createStringArray(const char* name, const char* value, int index, MatlabIO::matlabarray& array)
+{
+  MatlabIO::matlabarray testma;
+  testma.createstringarray( value );
+  array.setfield( index, name, testma );
+}
+
+void MatlabLayerExporter::configureDataLayerAxis(MatlabIO::matlabarray& axisma, DataLayer* layer)
+{
+  Core::GridTransform tf = layer->get_data_volume()->get_grid_transform();  
+  configureAxis(axisma, tf);
+}
+
+void MatlabLayerExporter::configureMaskLayerAxis(MatlabIO::matlabarray& axisma, MaskLayer* layer)
+{
+  Core::GridTransform tf = layer->get_mask_volume()->get_grid_transform();
+  configureAxis(axisma, tf);
+}
+
+void MatlabLayerExporter::configureAxis(MatlabIO::matlabarray& axisma, Core::GridTransform& tf)
+{
+  // Set the properies of the axis
+  std::vector<std::string> axisfieldnames;
+  axisfieldnames += "size", "spacing", "min", "max", "center", "label", "unit";
+  
+  std::vector<int> dims( 2 );
+  dims[0] = 3;
+  dims[1] = 1;
+  
+  axisma.createstructarray( dims, axisfieldnames );
+  Core::Vector size( tf.get_nx(), tf.get_ny(), tf.get_nz() );
+  Core::Vector spacing( tf.project( Core::Vector( 1.0, 0.0, 0.0 ) ).length(), 
+                       tf.project( Core::Vector( 0.0, 1.0, 0.0 ) ).length(),
+                       tf.project( Core::Vector( 0.0, 0.0, 1.0 ) ).length() );      
+  
+  
+  Core::Point min( tf.project( Core::Point( 0.0 ,0.0, 0.0 ) ) );      
+  Core::Point max( tf.project( Core::Point( static_cast<double>( tf.get_nx() - 1 ),
+    static_cast<double>( tf.get_ny() - 1 ) , static_cast<double>( tf.get_nz() - 1 ) ) ) );      
+  Core::Vector center( 0.0, 0.0, 0.0 );
+  
+  if ( ! tf.get_originally_node_centered() )
+  {
+    min -= ( spacing * 0.5 );
+    max += ( spacing * 0.5 );
+    center = Core::Vector( 1.0, 1.0, 1.0 );
+  }
+  
+  for (int p = 0; p < 3; p++ )
+  {
+    createDoubleArray("size", static_cast<double>(size[ p ]), p, axisma);
+    createDoubleArray("spacing", static_cast<double>(spacing[ p ]), p, axisma);
+    createDoubleArray("min", static_cast<double>(min[ p ]), p, axisma);
+    createDoubleArray("max", static_cast<double>(max[ p ]), p, axisma);
+    createDoubleArray("center", static_cast<double>(center[ p ]), p, axisma);
+    createStringArray("label", "axis ", p, axisma);
+    createStringArray("unit", "no unit", p, axisma);
+  }
+}
+  
 MatlabLayerExporter::MatlabLayerExporter( std::vector< LayerHandle >& layers ) :
   LayerExporter( layers )
 {
@@ -150,84 +219,18 @@ bool MatlabLayerExporter::export_matfile( const std::string& file_path )
 
   mlarray.createstructarray();
   mlarray.setfield( 0, "data", mldata );
-                
-  // Set the properies of the axis
-  std::vector<std::string> axisfieldnames( 7 );
-  axisfieldnames[ 0 ] = "size";
-  axisfieldnames[ 1 ] = "spacing";
-  axisfieldnames[ 2 ] = "min";
-  axisfieldnames[ 3 ] = "max";
-  axisfieldnames[ 4 ] = "center";
-  axisfieldnames[ 5 ] = "label";
-  axisfieldnames[ 6 ] = "unit";
-                                
+
   MatlabIO::matlabarray axisma;
-  dims.resize( 2 );
-  dims[0] = 3;
-  dims[1] = 1;
-  
-  axisma.createstructarray( dims, axisfieldnames );
-    Core::GridTransform tf = layer->get_data_volume()->get_grid_transform();            
-        
-  Core::Vector size( tf.get_nx(), tf.get_ny(), tf.get_nz() );
-  Core::Vector spacing( tf.project( Core::Vector( 1.0, 0.0, 0.0 ) ).length(), 
-    tf.project( Core::Vector( 0.0, 1.0, 0.0 ) ).length(),
-    tf.project( Core::Vector( 0.0, 0.0, 1.0 ) ).length() );     
-
-
-  Core::Point min( tf.project( Core::Point( 0.0 ,0.0, 0.0 ) ) );      
-  Core::Point max( tf.project( Core::Point( static_cast<double>( tf.get_nx() - 1 ),
-    static_cast<double>( tf.get_ny() - 1 ) , static_cast<double>( tf.get_nz() - 1 ) ) ) );      
-  Core::Vector center( 0.0, 0.0, 0.0 );
-  
-  if ( ! tf.get_originally_node_centered() )
-  {
-    min -= ( spacing * 0.5 );
-    max += ( spacing * 0.5 );
-    center = Core::Vector( 1.0, 1.0, 1.0 );
-  }     
-
-
-  for (int p = 0; p < 3; p++ )
-  {
-    MatlabIO::matlabarray sizema;
-    MatlabIO::matlabarray spacingma;
-    MatlabIO::matlabarray minma;
-    MatlabIO::matlabarray maxma;
-    MatlabIO::matlabarray centerma;
-    MatlabIO::matlabarray labelma;
-    MatlabIO::matlabarray unitma;
-              
-    sizema.createdoublescalar( static_cast<double>( size[ p ] ) );
-    axisma.setfield( p, "size", sizema );
-
-    spacingma.createdoublescalar( static_cast<double>( spacing[ p ] ) );
-    axisma.setfield( p," spacing", spacingma );
-
-    minma.createdoublescalar( static_cast<double>( min[ p ] ) );
-    axisma.setfield( p, "min", minma );
-
-    maxma.createdoublescalar( static_cast<double>( max[ p ] ) );
-    axisma.setfield( p, "max", maxma );
-
-    centerma.createdoublescalar( static_cast<double>( center[ p ] ) );
-    axisma.setfield( p, "center", centerma );
-
-    labelma.createstringarray( std::string( "axis " ) + Core::ExportToString( p ) );
-    axisma.setfield( p, "label", labelma );
-
-    unitma.createstringarray( "no unit" );
-    axisma.setfield( p, "unit", unitma );
-  }
+  configureDataLayerAxis(axisma, layer);
     
   mlarray.setfield( 0, "axis", axisma );
 
   MatlabIO::matlabfile output( file_path, "w" );
   output.putmatlabarray( mlarray, "scirunnrrd" );
+  output.close();
   
   return true;
 }
-
 
 bool MatlabLayerExporter::export_single_masks( const std::string& path )
 {
@@ -281,75 +284,9 @@ bool MatlabLayerExporter::export_single_masks( const std::string& path )
 
     mlarray.createstructarray();
     mlarray.setfield( 0, "data", mldata );
-          
-    // Set the properies of the axis
-    std::vector<std::string> axisfieldnames( 7 );
-    axisfieldnames[ 0 ] = "size";
-    axisfieldnames[ 1 ] = "spacing";
-    axisfieldnames[ 2 ] = "min";
-    axisfieldnames[ 3 ] = "max";
-    axisfieldnames[ 4 ] = "center";
-    axisfieldnames[ 5 ] = "label";
-    axisfieldnames[ 6 ] = "unit";
-                  
+
     MatlabIO::matlabarray axisma;
-    dims.resize( 2 );
-    dims[0] = 3;
-    dims[1] = 1;
-    
-    axisma.createstructarray( dims, axisfieldnames );
-    Core::GridTransform tf = layer->get_mask_volume()->get_grid_transform();            
-          
-    Core::Vector size( tf.get_nx(), tf.get_ny(), tf.get_nz() );
-    Core::Vector spacing( tf.project( Core::Vector( 1.0, 0.0, 0.0 ) ).length(), 
-      tf.project( Core::Vector( 0.0, 1.0, 0.0 ) ).length(),
-      tf.project( Core::Vector( 0.0, 0.0, 1.0 ) ).length() );     
-
-
-    Core::Point min( tf.project( Core::Point( 0.0 ,0.0, 0.0 ) ) );      
-    Core::Point max( tf.project( Core::Point( static_cast<double>( tf.get_nx() - 1 ),
-      static_cast<double>( tf.get_ny() - 1 ) , static_cast<double>( tf.get_nz() - 1 ) ) ) );      
-    Core::Vector center( 0.0, 0.0, 0.0 );
-    
-    if ( ! tf.get_originally_node_centered() )
-    {
-      min -= ( spacing * 0.5 );
-      max += ( spacing * 0.5 );
-      center = Core::Vector( 1.0, 1.0, 1.0 );
-    }     
-
-
-    for (int p = 0; p < 3; p++ )
-    {
-      MatlabIO::matlabarray sizema;
-      MatlabIO::matlabarray spacingma;
-      MatlabIO::matlabarray minma;
-      MatlabIO::matlabarray maxma;
-      MatlabIO::matlabarray centerma;
-      MatlabIO::matlabarray labelma;
-      MatlabIO::matlabarray unitma;
-                
-      sizema.createdoublescalar( static_cast<double>( size[ p ] ) );
-      axisma.setfield( p, "size", sizema );
-
-      spacingma.createdoublescalar( static_cast<double>( spacing[ p ] ) );
-      axisma.setfield( p," spacing", spacingma );
-
-      minma.createdoublescalar( static_cast<double>( min[ p ] ) );
-      axisma.setfield( p, "min", minma );
-
-      maxma.createdoublescalar( static_cast<double>( max[ p ] ) );
-      axisma.setfield( p, "max", maxma );
-
-      centerma.createdoublescalar( static_cast<double>( center[ p ] ) );
-      axisma.setfield( p, "center", centerma );
-
-      labelma.createstringarray( std::string( "axis " ) + Core::ExportToString( p ) );
-      axisma.setfield( p, "label", labelma );
-
-      unitma.createstringarray( "no unit" );
-      axisma.setfield( p, "unit", unitma );
-    }
+    configureMaskLayerAxis(axisma, layer);
       
     mlarray.setfield( 0, "axis", axisma );
 
@@ -358,7 +295,7 @@ bool MatlabLayerExporter::export_single_masks( const std::string& path )
       
     MatlabIO::matlabfile output( mask_path.string(), "w" );
     output.putmatlabarray( mlarray, "scirunnrrd" );   
-      
+    output.close();
   }
   return true;
 }
@@ -417,78 +354,15 @@ bool MatlabLayerExporter::export_mask_label( const std::string& file_path )
 
   mlarray.createstructarray();
   mlarray.setfield( 0, "data", mldata );
-        
-  // Set the properies of the axis
-  std::vector<std::string> axisfieldnames( 7 );
-  axisfieldnames[ 0 ] = "size";
-  axisfieldnames[ 1 ] = "spacing";
-  axisfieldnames[ 2 ] = "min";
-  axisfieldnames[ 3 ] = "max";
-  axisfieldnames[ 4 ] = "center";
-  axisfieldnames[ 5 ] = "label";
-  axisfieldnames[ 6 ] = "unit";
-                
+
   MatlabIO::matlabarray axisma;
-  dims.resize( 2 );
-  dims[0] = 3;
-  dims[1] = 1;
-  
-  axisma.createstructarray( dims, axisfieldnames );
-  Core::GridTransform tf = layer->get_mask_volume()->get_grid_transform();            
-        
-  Core::Vector size( tf.get_nx(), tf.get_ny(), tf.get_nz() );
-  Core::Vector spacing( tf.project( Core::Vector( 1.0, 0.0, 0.0 ) ).length(), 
-    tf.project( Core::Vector( 0.0, 1.0, 0.0 ) ).length(),
-    tf.project( Core::Vector( 0.0, 0.0, 1.0 ) ).length() );     
+  configureMaskLayerAxis(axisma, layer);
 
-  Core::Point min( tf.project( Core::Point( 0.0 ,0.0, 0.0 ) ) );      
-  Core::Point max( tf.project( Core::Point( static_cast<double>( tf.get_nx() - 1 ),
-    static_cast<double>( tf.get_ny() - 1 ) , static_cast<double>( tf.get_nz() - 1 ) ) ) );      
-  Core::Vector center( 0.0, 0.0, 0.0 );
-  
-  if ( ! tf.get_originally_node_centered() )
-  {
-    min -= ( spacing * 0.5 );
-    max += ( spacing * 0.5 );
-    center = Core::Vector( 1.0, 1.0, 1.0 );
-  }     
-
-  for (int p = 0; p < 3; p++ )
-  {
-    MatlabIO::matlabarray sizema;
-    MatlabIO::matlabarray spacingma;
-    MatlabIO::matlabarray minma;
-    MatlabIO::matlabarray maxma;
-    MatlabIO::matlabarray centerma;
-    MatlabIO::matlabarray labelma;
-    MatlabIO::matlabarray unitma;
-              
-    sizema.createdoublescalar( static_cast<double>( size[ p ] ) );
-    axisma.setfield( p, "size", sizema );
-
-    spacingma.createdoublescalar( static_cast<double>( spacing[ p ] ) );
-    axisma.setfield( p," spacing", spacingma );
-
-    minma.createdoublescalar( static_cast<double>( min[ p ] ) );
-    axisma.setfield( p, "min", minma );
-
-    maxma.createdoublescalar( static_cast<double>( max[ p ] ) );
-    axisma.setfield( p, "max", maxma );
-
-    centerma.createdoublescalar( static_cast<double>( center[ p ] ) );
-    axisma.setfield( p, "center", centerma );
-
-    labelma.createstringarray( std::string( "axis " ) + Core::ExportToString( p ) );
-    axisma.setfield( p, "label", labelma );
-
-    unitma.createstringarray( "no unit" );
-    axisma.setfield( p, "unit", unitma );
-  }
-    
   mlarray.setfield( 0, "axis", axisma );
 
   MatlabIO::matlabfile output( file_path, "w" );
-  output.putmatlabarray( mlarray, "scirunnrrd" ); 
+  output.putmatlabarray( mlarray, "scirunnrrd" );
+  output.close();
 
   return true;
 }
