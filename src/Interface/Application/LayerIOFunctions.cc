@@ -122,7 +122,7 @@ bool LayerIOFunctions::ImportFiles( QMainWindow* main_window, std::string file_t
     // If no file was selected just return
     if( file_list.size() == 0 )
     {
-      CORE_LOG_DEBUG("Zero files selected for import.")
+      CORE_LOG_DEBUG("Zero files selected for import.");
       return false;
     }
 
@@ -246,7 +246,7 @@ void LayerIOFunctions::ImportSeries( QMainWindow* main_window )
   // If no files were selected just exit
   if( file_list.size() == 0 )
   {
-    CORE_LOG_DEBUG("Zero files from series selected for import.")
+    CORE_LOG_DEBUG("Zero files from series selected for import.");
     return;
   }
 
