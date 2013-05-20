@@ -1129,6 +1129,10 @@ void ProjectPrivate::convert_version1_project()
   // Set the generation count
   Core::DataBlockManager::Instance()->set_generation_count( generation_count + 1 );
 
+  // Need to overwrite the generation_count_state, otherwise at the end of session load
+  // it will be set back to zero if there was no generation_count_state in the old project
+  this->project_->generation_count_state_->set( generation_count + 1);
+     
   // ==== Convert notes ====
 
   const std::vector< std::string >& notes = this->project_->project_notes_state_->get();
