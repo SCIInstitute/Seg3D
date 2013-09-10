@@ -185,6 +185,8 @@ void DataBlock::set_nz( size_t nz )
 
 void DataBlock::set_data( void* data )
 {
+  // TODO: this leaks memory
+  // Make unit tests before attempting to correct
   this->data_ = data;
 }
 
