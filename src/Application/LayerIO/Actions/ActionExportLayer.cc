@@ -50,53 +50,59 @@ bool ActionExportLayer::validate( Core::ActionContextHandle& context )
   // error if not
   if ( !( LayerManager::CheckLayerExistence( this->layer_id_, context ) ) ) return false;
 
-  std::vector< LayerHandle > layer_handles;
+    std::vector< LayerHandle > layer_handles;
   
-  LayerHandle layer = LayerManager::Instance()->find_layer_by_id( this->layer_id_ );
-  if( !layer ) 
-  {
-    return false;
-  }
-  else
-  {
-    layer_handles.push_back( layer );
-  }
-  
-  if( this->extension_ == "" )
-  {
-    this->extension_ = boost::filesystem::extension( boost::filesystem::path( this->file_path_ ) );
-  }
-  else
-  {
-    this->file_path_ += this->extension_;
-  }
-  
-  if( this->exporter_ == "" )
-  {
-    if( this->extension_ == ".nrrd" ) this->exporter_ = "NRRD Exporter";
-    else if( this->extension_ == ".mat" ) this->exporter_ = "Matlab Exporter";
-    else if( this->extension_ == ".dcm" ) this->exporter_ = "ITK Data Exporter";
-    else if( this->extension_ == ".mrc" ) this->exporter_ = "MRC Exporter";
-    else if( this->extension_ != "" ) this->exporter_ = "ITK Data Exporter";
-  }
-  
-  if( ! ( LayerIO::Instance()->create_exporter( this->layer_exporter_, layer_handles, 
-    this->exporter_, this->extension_ ) ) )
-  {
-    context->report_error( "Could not create the specified exporter." );
-    return false;
-  }
-  
-  // first we validate the path for saving the segmentation
-  boost::filesystem::path segmentation_path( this->file_path_ );
-  if ( !( boost::filesystem::exists ( segmentation_path.parent_path() ) ) )
-  {
-    context->report_error( std::string( "The path '" ) + this->file_path_ +
-      "' does not exist." );
-    return false;
-  }
+    LayerHandle layer = LayerManager::Instance()->find_layer_by_id( this->layer_id_ );
+    if (! layer ) 
+    {
+      return false;
+    }
 
-  return true; // validated
+    if ( layer->get_type() == Core::VolumeType::DATA_E )
+    {
+      layer_handles.push_back( layer );
+    }
+    else
+    {
+      context->report_error("ExportLayer exports a data layer to file. Use ExportSegmentation for mask layers.");
+      return false;
+    }
+  
+    if ( this->extension_ == "" )
+    {
+      this->extension_ = boost::filesystem::extension( boost::filesystem::path( this->file_path_ ) );
+    }
+    else
+    {
+      this->file_path_ += this->extension_;
+    }
+  
+    if ( this->exporter_ == "" )
+    {
+      if ( this->extension_ == ".nrrd" ) this->exporter_ = "NRRD Exporter";
+      else if ( this->extension_ == ".mat" ) this->exporter_ = "Matlab Exporter";
+      else if ( this->extension_ == ".dcm" ) this->exporter_ = "ITK Data Exporter";
+      else if ( this->extension_ == ".mrc" ) this->exporter_ = "MRC Exporter";
+      else if ( this->extension_ != "" ) this->exporter_ = "ITK Data Exporter";
+    }
+  
+    if ( ! ( LayerIO::Instance()->create_exporter( this->layer_exporter_, layer_handles, 
+      this->exporter_, this->extension_ ) ) )
+    {
+      context->report_error( "Could not create the specified exporter." );
+      return false;
+    }
+  
+    // first we validate the path for saving the segmentation
+    boost::filesystem::path segmentation_path( this->file_path_ );
+    if ( !( boost::filesystem::exists ( segmentation_path.parent_path() ) ) )
+    {
+      context->report_error( std::string( "The path '" ) + this->file_path_ +
+        "' does not exist." );
+      return false;
+    }
+
+    return true; // validated
 }
 
 bool ActionExportLayer::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
