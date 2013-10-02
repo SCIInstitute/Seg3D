@@ -2,7 +2,7 @@
 
 % These two need to be set before including scirun style package
 \title{Seg3D Basic Functionality}
-\author{Jess Tate, Brett Burton}
+\author{Jess Tate, Brett Burton, Ayla Khan}
 
 % INCLUDE Seg3D STYLE DOCUMENT
 \usepackage{seg3d}
@@ -12,9 +12,6 @@
 
 
 \begin{document}
-
-%% starting from SCIRun Doc wiki
-%% http://software.sci.utah.edu/SCIRunDocs/index.php/CIBC:Documentation:SCIRun:Tutorial:BioPSE
 
 
 % CREATE TITLE PAGE --------------------------------------------------
@@ -40,7 +37,7 @@ Note:  If you are looking for a refresher on the available keyboard and mouse sh
 
 Seg3D is a lightweight software tool developed for use in visualizing and segmenting image data.  The core intended use of Seg3D involves loading 3D scalar data, such as MRI or CT scans, and generating labels mask to identify various regions of interest in the original image data.  Seg3D facilitates the process using interactive tools such as image processing filters and manual masking techniques.  
 
-In addition to manual segmenting, the current version of Seg3D includes some features that facilitate automated segmenting.  Provenance is a recently added feature which tracks the steps used to create label masks.  This feature allows the user to then repeat the same sets with different parameters using the python and controller windows.  Future extensions of these capabilities will allow for scripting in the terminal and porting to other programs such as SCIRun and Vistrails.
+In addition to manual segmenting, the current version of Seg3D includes some features that facilitate automated segmenting.  Provenance is a recently added feature which tracks the steps used to create label masks.  This feature allows the user to then repeat the same sets with different parameters using the Python and controller windows.  Future extensions of these capabilities will allow for scripting in the terminal and porting to other programs such as SCIRun and VisTrails.
 
 Seg3D is an crucial element of our software suite also involving BioMesh3D and SCIRun that make possible the development of image based computational models.  Label masks generated with Seg3D are used in other software  for such applications as 3D visualization or computational modeling.  BioMesh3D requires a segmentation like those from Seg3D to generate high quality, multi-material computational meshes.  SCIRun is a modular problem solving environment that generates and runs visualization and simulation tasks on segmentations from Seg3D and meshes from BioMesh3D.  This interaction makes Seg3D a key step in image based modeling.
 
@@ -48,7 +45,7 @@ Seg3D is an crucial element of our software suite also involving BioMesh3D and S
 
 \subsection{Seg3D \SegthreeDVersion}
 
-Seg3D is distributed as a binary download for Linux, Windows, and OS X. Please visit the SCI software portal ({http://4software.sci.utah.edu} ) to download the latest Seg3D binary. 
+Seg3D is distributed as a binary download for Linux, Windows, and OS X. Please visit the \href{http://www.seg3d.org}{SCI software portal} to download the latest Seg3D binary. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -84,7 +81,7 @@ This option is the same as `File:New Project' (sec~\ref{sec:newproject}).  It wi
 This option is the same as `File:Import Layer From Single File...' (sec~\ref{sec:importsinglefile}).  You may choose a file to load into Seg3D for viewing.  All of the filters and tools will be available, but the project can not be saved automatically until a project name is created by using the `File: Save Project As' (sec~\ref{sec:saveprojectas}). 
 \\
 \\
-This option currently does not allow the opening of image stacks.
+This option does not allow the opening of image stacks.
 
 \section{Quit}
 
@@ -815,11 +812,22 @@ In these buffers a user can find the actions, in order, than can be either undon
 
 
 \section{Python Console}
-The Python Window is not opened by default when Seg3D is opened.  To open the window, click the 'Window' option in the task bar and select the Python option.  The window may also be toggled by using the key command: Shift+cntrl/cmd+Y.
+The Python Console window is not opened by default when Seg3D is opened.
+To open the window, click the 'Window' option in the task bar and select the Python option.
+The window may also be toggled by using the key command: Shift+CTRL/CMD+Y.
 Notice the Python Window option in the window drop-down menu is located below a separator.  
 This indicates that the window will open a new pop-up window outside of the general Seg3D user interface.
 
-The Python Window opens a python scripting console that can be used by advanced users to editing the Seg3D data via python coding.  A treatment of python coding will not be attempted in this document.  For more information on python coding, consult other resources.
+The Python Window opens a Python scripting console that can be used by advanced users to control Seg3D.
+Python code wrappers are generated allowing tools, filters, the viewer and data to be controlled in Python scripts. 
+Basic Seg3D Python code samples are available under User Documentation and Tutorials.
+A treatment of python coding will not be attempted in this document.
+For more information on python coding, consult other resources.
+
+\begin{figure}[h]
+\scalebox{0.5}{\includegraphics{Seg3DBasicFunctionality_figures/PythonConsole_blank.png}}
+\caption{Python Console Window}\label{fig:PythonConsole}
+\end{figure}
 
 \section{Message History Window}
 \label{sec:messagehistory}
