@@ -25,7 +25,7 @@
 \begin{introduction}
 This document is meant as a basic reference and walkthrough of the Seg3D layout and functionality.  Specifically, every tool, filter and feature of the software will be addressed in a brief manner.
 
-Note:  If you are looking for a refresher on the available keyboard and mouse shortcuts, there is a list under the `Help' menu of the Seg3D.  
+Note:  If you are looking for a refresher on the available keyboard and mouse shortcuts, there is a list under the \textbf{Help} menu of the Seg3D.  
 \end{introduction}
 
 \section{About Seg3D}
@@ -35,11 +35,18 @@ Note:  If you are looking for a refresher on the available keyboard and mouse sh
 \caption{Seg3D in use.}\label{fig:layout}
 \end{figure}
 
-Seg3D is a lightweight software tool developed for use in visualizing and segmenting image data.  The core intended use of Seg3D involves loading 3D scalar data, such as MRI or CT scans, and generating labels mask to identify various regions of interest in the original image data.  Seg3D facilitates the process using interactive tools such as image processing filters and manual masking techniques.  
+Seg3D is a lightweight software tool developed for use in visualizing and segmenting image data.
+The core intended use of Seg3D involves loading 3D scalar data, such as MRI or CT scans, and generating labels mask to identify various regions of interest in the original image data.  Seg3D facilitates the process using interactive tools such as image processing filters and manual masking techniques.  
 
-In addition to manual segmenting, the current version of Seg3D includes some features that facilitate automated segmenting.  Provenance is a recently added feature which tracks the steps used to create label masks.  This feature allows the user to then repeat the same sets with different parameters using the Python and controller windows.  Future extensions of these capabilities will allow for scripting in the terminal and porting to other programs such as SCIRun and VisTrails.
+In addition to manual segmenting, the current version of Seg3D includes some features that facilitate automated segmenting.
+Provenance is a recently added feature which tracks the steps used to create label masks.
+This feature allows the user to then repeat the same sets with different parameters using the Python and Controller windows.
+Future extensions of these capabilities will allow for scripting in the terminal and porting to other programs such as SCIRun and VisTrails.
 
-Seg3D is an crucial element of our software suite also involving BioMesh3D and SCIRun that make possible the development of image based computational models.  Label masks generated with Seg3D are used in other software  for such applications as 3D visualization or computational modeling.  BioMesh3D requires a segmentation like those from Seg3D to generate high quality, multi-material computational meshes.  SCIRun is a modular problem solving environment that generates and runs visualization and simulation tasks on segmentations from Seg3D and meshes from BioMesh3D.  This interaction makes Seg3D a key step in image based modeling.
+Seg3D is an crucial element of our software suite also involving BioMesh3D and SCIRun that make possible the development of image based computational models.  Label masks generated with Seg3D are used in other software  for such applications as 3D visualization or computational modeling.
+BioMesh3D requires a segmentation like those from Seg3D to generate high quality, multi-material computational meshes.
+SCIRun is a modular problem solving environment that generates and runs visualization and simulation tasks on segmentations from Seg3D and meshes from BioMesh3D.
+This interaction makes Seg3D a key step in image based modeling.
 
 \section{Software requirements}
 
@@ -55,7 +62,10 @@ Seg3D is distributed as a binary download for Linux, Windows, and OS X. Please v
 \label{sec:welcome}
 
 \begin{introduction}
-Anytime you start Seg3D, users are first presented with the Seg3D welcome screen.  As seen in Figure~\ref{fig:welcome}, the welcome screen consists of the Seg3D splash screen and a menu displaying the available options for starting and continuing a segmentation in Seg3D.  The included options are to load a recent project, open existing project, start a new project, quickly open a file for viewing, and to quit Seg3D.  These options are the same as some of the options in the `File' menu which are explained in this chapter as well as Sec.~\ref{sec:file}.
+Anytime you start Seg3D, users are first presented with the Seg3D welcome screen.
+As seen in Figure~\ref{fig:welcome}, the welcome screen consists of the Seg3D splash screen and a menu displaying the available options for starting and continuing a segmentation in Seg3D.
+The included options are to load a recent project, open existing project, start a new project, quickly open a file for viewing, and to quit Seg3D.
+These options are the same as some of the options in the \textbf{File} menu which are explained in this chapter as well as Sec.~\ref{sec:file}.
 \end{introduction}
 
 \begin{figure}
@@ -66,19 +76,26 @@ Anytime you start Seg3D, users are first presented with the Seg3D welcome screen
 
 \section{Load Recent Project}
 
-This option allows the users to quickly open a project recently opened in Seg3D.  The list of recent projects is shown in the text box above the `Load Recent Project' button (see Figure~\ref{fig:welcome}).  This option will be unavailable unless one of the recent projects in the list is selected.  Updating or reinstalling Seg3D may erase the saved list of recent projects even though the projects still exist.  
+This option allows the users to quickly open a project recently opened in Seg3D.
+The list of recent projects is shown in the text box above the \textbf{Load Recent Project} button (see Figure~\ref{fig:welcome}).
+This option will be unavailable unless one of the recent projects in the list is selected.
+Updating or reinstalling Seg3D may erase the saved list of recent projects even though the projects still exist.  
 
 \section{Open Existing Project}
 
-This option is the same as `File:Open Project' (sec~\ref{sec:openproject}).  It will open a dialogue window to allow the user to choose an existing *.s3d or *.seg3dproj file to load into Seg3D.  
+This option is the same as the \textbf{File} $\Rightarrow$ \textbf{Open Project} (Section~\ref{sec:openproject}) menu item.
+It will open a dialogue window to allow the user to choose an existing \textit{*.s3d} or \textit{*.seg3dproj} file to load into Seg3D.  
 
 \section{Start New Project}
 
-This option is the same as `File:New Project' (sec~\ref{sec:newproject}).  It will display the New Project Wizard (Figure~\ref{fig:newproject}), allowing the user to choose a project name and location so that the project can be saved easily and automatically.  
+This option is the same as the \textbf{File} $\Rightarrow$ \textbf{New Project} (Section~\ref{sec:newproject}) menu item.
+It will display the New Project Wizard (Figure~\ref{fig:newproject}), allowing the user to choose a project name and location so that the project can be saved easily and automatically.  
 
 \section{Quick Open File}
 
-This option is the same as `File:Import Layer From Single File...' (sec~\ref{sec:importsinglefile}).  You may choose a file to load into Seg3D for viewing.  All of the filters and tools will be available, but the project can not be saved automatically until a project name is created by using the `File: Save Project As' (sec~\ref{sec:saveprojectas}). 
+This option is the same as the \textbf{File} $\Rightarrow$ \textbf{Import Layer From Single File...} (Section~\ref{sec:importsinglefile}) menu item.
+You may choose a file to load into Seg3D for viewing.
+All of the filters and tools will be available, but the project can not be saved automatically until a project name is created by using the \textbf{File} $\Rightarrow$ \textbf{Save Project As} menu item (Section~\ref{sec:saveprojectas}). 
 \\
 \\
 This option does not allow the opening of image stacks.
@@ -95,7 +112,9 @@ This option will quit Seg3D.  This exist for the rare occasion that you accident
 \label{sec:viewer}
 
 \begin{introduction}
-The Seg3D viewer is the main interface between the users and the software.  This viewer is meant to be highly interactive and intuitive.  Using a combination of mouse functions, keyboard shortcuts, and visual buttons the users can quickly visualize and segment data.  This chapter will describe the functionality of several aspects of the Seg3D viewer including the overall layout of the interface, 2D slice viewer, 3D volume viewer, and the various viewing options available.
+The Seg3D viewer is the main interface between the users and the software.  This viewer is meant to be highly interactive and intuitive.
+Using a combination of mouse functions, keyboard shortcuts, and visual buttons the users can quickly visualize and segment data.
+This chapter will describe the functionality of several aspects of the Seg3D viewer including the overall layout of the interface, 2D slice viewer, 3D volume viewer, and the various viewing options available.
 \end{introduction}
 
 
@@ -105,20 +124,38 @@ The Seg3D viewer is the main interface between the users and the software.  This
 \caption{Seg3D interface}\label{fig:blank}
 \end{figure}
 
-The default layout when Seg3D is opened and a new project is created is shown in Figure~\ref{fig:blank}.  As seen from the image the interface for Seg3D consists of a number of viewers (both 2D and 3D), windows to control the functionality of Seg3D, and a tool bar at the bottom of the screen.  
+The default layout when Seg3D is opened and a new project is created is shown in Figure~\ref{fig:blank}.
+As seen from the image the interface for Seg3D consists of a number of viewers (both 2D and 3D), windows to control the functionality of Seg3D, and a tool bar at the bottom of the screen.  
 
 \section{Controlling Windows}
 \label{sec:window_control}
 
-The windows on docked the side of the screen can be any of five windows explained in Chapter~\ref{sec:windows} (Project, Tools, Layer Manager, Volume Viewer, and Provenance windows).  Each of these widows can be closed by pressing on the close button \scalebox{0.5}{\includegraphics{Seg3DBasicFunctionality_figures/close_window.png}} and opened by choosing the window from the `Window' menu or using hot key.  When opened, the window will appear in the last location used, or the default if never opened.  The windows can also be detached from the side (by pressing the detach button \scalebox{0.5}{\includegraphics{Seg3DBasicFunctionality_figures/dock.png}} and reattached to the side by moving the window close to the side of the Seg3D window, or by double clicking on the window header.  Any detached window can be moved by clicking and dragging on the window header and resized by clicking and dragging on the corner of the window.  Attached windows can also be resized by clicking and dragging on border between it and the viewing panels, but are more limited in the changes allowed.  
+The windows on docked the side of the screen can be any of five windows explained in Chapter~\ref{sec:windows} (Project, Tools, Layer Manager, Volume Viewer, and Provenance windows).
+Each of these widows can be closed by pressing on the close button \scalebox{0.5}{\includegraphics{Seg3DBasicFunctionality_figures/close_window.png}} and opened by choosing the window from the \textbf{Window} menu or using hot key.
+When opened, the window will appear in the last location used, or the default if never opened.
+The windows can also be detached from the side (by pressing the detach button \scalebox{0.5}{\includegraphics{Seg3DBasicFunctionality_figures/dock.png}} and reattached to the side by moving the window close to the side of the Seg3D window, or by double clicking on the window header.
+Any detached window can be moved by clicking and dragging on the window header and resized by clicking and dragging on the corner of the window.
+Attached windows can also be resized by clicking and dragging on border between it and the viewing panels, but are more limited in the changes allowed.  
 
 \section{Viewer Panels}
 
-As seen in Figure~\ref{fig:blank}, there are a number of viewer panels in Seg3D, though the exact number can be set (see Sec.~\ref{sec:viewing}).  Each of these viewer windows can be changed in size and in type.  The type options are: volume, axial, sagittal, and coronal. The names of the 2D planes can be changed by the user in preferences (Sec.~\ref{sec:preferences}).  You can change the view of each pane by clicking on the view name and choosing the view to change it too.  This is a drop down menu, so you can scroll over the name and the view will also change.  There are also shortcuts to change views (V--Volume, X--Sagittal, Y--Coronal, and Z--Axial) There are several icons in each view panel, as well as mouse and keyboard shortcuts.  The controls for each of the 2D viewers will be described below, as will the controls for the 3D volume viewer.
+As seen in Figure~\ref{fig:blank}, there are a number of viewer panels in Seg3D, though the exact number can be set (see Section~\ref{sec:viewing}).
+Each of these viewer windows can be changed in size and in type.
+The type options are: volume, axial, sagittal, and coronal.
+The names of the 2D planes can be changed by the user in preferences (Sec.~\ref{sec:preferences}).
+You can change the view of each pane by clicking on the view name and choosing the view to change it too.
+This is a drop down menu, so you can scroll over the name and the view will also change.
+There are also shortcuts to change views (V--Volume, X--Sagittal, Y--Coronal, and Z--Axial).
+There are several icons in each view panel, as well as mouse and keyboard shortcuts.
+The controls for each of the 2D viewers will be described below, as will the controls for the 3D volume viewer.
 
 \subsection{2D Slice Viewer}
 
-Tables~\ref{tab:2dmouse}~\&~\ref{tab:2dkey}  show the mouse and keyboard actions which can be used to control the visualization and manipulation of image and segmentation data.  Though these functions are general, there are tools which used these functions for specify purposes or may otherwise block a couple of these functions, the most prominent example is the scroll wheel in the paint brush tool is used to change brush size.  In this case, you can still scroll through slices by holding shift.  In all cases, an alternative is given in the software.  Also presented in this section is a list and description of the icons presented in the 2D slice viewer (Table~\ref{tab:2dicons}).
+Tables~\ref{tab:2dmouse}~\&~\ref{tab:2dkey}  show the mouse and keyboard actions which can be used to control the visualization and manipulation of image and segmentation data.
+Though these functions are general, there are tools which used these functions for specify purposes or may otherwise block a couple of these functions, the most prominent example is the scroll wheel in the paint brush tool is used to change brush size.
+In this case, you can still scroll through slices by holding Shift.
+In all cases, an alternative is given in the software.
+Also presented in this section is a list and description of the icons presented in the 2D slice viewer (Table~\ref{tab:2dicons}).
 
 \begin{table}[h!]
 \label{tab:2dmouse}
@@ -129,12 +166,12 @@ Tables~\ref{tab:2dmouse}~\&~\ref{tab:2dkey}  show the mouse and keyboard actions
 \hline
 left button drag & Modify brightness and contrast.  \\ &Vertical is contrast, horizontal is brightness. \\
 \hline 
-scroll up/down & Move up/down a slice\\ &Note: using shift maybe needed while using some tools (like paint brush)\\
+scroll up/down & Move up/down a slice\\ &Note: using Shift maybe needed while using some tools (like paint brush)\\
 \hline
-cmd/crtl+right button & Move slices in other planes to intersect at cursor.\\  &Viewers must have the picking icon enabled (Table~\ref{tab:2dicons}).\\
+CMD/CTRL+right button & Move slices in other planes to intersect at cursor.\\  &Viewers must have the picking icon enabled (Table~\ref{tab:2dicons}).\\
 \hline
-shift+left button drag & Zan view\\
-shift+right button drag & Zoom view in/out\\
+Shift+left button drag & Zan view\\
+Shift+right button drag & Zoom view in/out\\
 \hline
 \end{tabular}
 \end{table}
@@ -149,8 +186,8 @@ shift+right button drag & Zoom view in/out\\
 up arrow,$>$ & move up one slice\\
 down arrow,$<$ & move down one slice\\
 \hline
-shift+up arrow,shift+$>$ & Jump up n slices (set n in preferences)\\
-shift+down arrow,shift+$<$ & Jump down n slices (set n in preferences)\\
+Shift+up arrow,Shift+$>$ & Jump up n slices (set n in preferences)\\
+Shift+down arrow,Shift+$<$ & Jump down n slices (set n in preferences)\\
 \hline
 left/right arrow & Change active layer to previous/next layer\\
 \hline
@@ -217,7 +254,10 @@ L & Toggle lock viewer (to other locked views of the same type)\\
 
 \subsection{3D Volume Viewer}
 
-Though there is no segmentation that can be performed in the 3D volume viewer, it is a very useful function in Seg3D.  It allows the user to see the 3D representation of the original and segmented data.  There are many objects that can be viewed in the 3D viewer such as the 2D slices in 3D, isosurfaces of the segmented data, volume rendering of the image data,  depth cues, and clipping planes.  The purpose of this viewer is to allow you to view your data in as many ways as possible to facilitate segmentation.
+Though there is no segmentation that can be performed in the 3D volume viewer, it is a very useful function in Seg3D.
+It allows the user to see the 3D representation of the original and segmented data.
+There are many objects that can be viewed in the 3D viewer such as the 2D slices in 3D, isosurfaces of the segmented data, volume rendering of the image data,  depth cues, and clipping planes.
+The purpose of this viewer is to allow you to view your data in as many ways as possible to facilitate segmentation.
 
 \begin{table}[h!]
 \label{tab:3dmouse}
@@ -322,7 +362,11 @@ L & Toggle lock viewer (to other locked views of the same type)\\
 \clearpage
 \section{Tool Bar}
 
-The tool bar located at the bottom of the Seg3D window contains some useful functions.  The first is the message history icon on the left side of the tool bar (Table~\ref{tab:toolbaricons}).   For more information on this window, see Sec.~\ref{sec:messagehistory}.  The other use function is on the right side of the tool bar, the information tool bar.  This tool bar can switch between displaying information about the active layer at the mouse location and a quick menu for the active layers by clicking on the switch tool button (Table~\ref{tab:toolbaricons}).  
+The tool bar located at the bottom of the Seg3D window contains some useful functions.
+The first is the message history icon on the left side of the tool bar (Table~\ref{tab:toolbaricons}).
+For more information on this window, see Sec.~\ref{sec:messagehistory}.
+The other use function is on the right side of the tool bar, the information tool bar.
+This tool bar can switch between displaying information about the active layer at the mouse location and a quick menu for the active layers by clicking on the switch tool button (Table~\ref{tab:toolbaricons}).  
 
 
 \begin{table}[h!]
@@ -349,14 +393,20 @@ The tool bar located at the bottom of the Seg3D window contains some useful func
 \end{tabular}
 \end{table}
 
-The information toolbar will show information about the volume at the location indicated by the mouse.  As shown in Figure~\ref{fig:geometricinfo}, the information given is the x, y, and z coordinates and the value of the layer at the mouse position in the selected volume.  By clicking on the world icon (Table~\ref{tab:toolbaricons}), you may toggle between indexed values (relative) and the world values (absolute, considers spacing).  The data shown is changed when the mouse is moved, the active slice is changed, or the active layer is changed.
+The information toolbar will show information about the volume at the location indicated by the mouse.
+As shown in Figure~\ref{fig:geometricinfo}, the information given is the x, y, and z coordinates and the value of the layer at the mouse position in the selected volume.
+By clicking on the world icon (Table~\ref{tab:toolbaricons}), you may toggle between indexed values (relative) and the world values (absolute, considers spacing).
+The data shown is changed when the mouse is moved, the active slice is changed, or the active layer is changed.
 
 \begin{figure}[h!]
 \scalebox{.7}{\includegraphics{Seg3DBasicFunctionality_figures/geometric_info.png}}
 \caption{Geometric Information shown in the information tool bar.}\label{fig:geometricinfo}
 \end{figure}
 
-By clicking on the switch tool icon (Table~\ref{tab:toolbaricons}), the tool bar will display a quick menu for the available tools and layers instead of geometric information.  As seen in Table~\ref{tab:toolbaricons}, this menu will display the active tool and layer.  if the either is clicked, a dropped down menu will appear allowing the user to switch to an open tool or layer.  This can be especially useful in full screen mode.  
+By clicking on the switch tool icon (Table~\ref{tab:toolbaricons}), the tool bar will display a quick menu for the available tools and layers instead of geometric information.
+As seen in Table~\ref{tab:toolbaricons}, this menu will display the active tool and layer.
+If the either is clicked, a dropped down menu will appear allowing the user to switch to an open tool or layer.
+This can be especially useful in full screen mode.  
 
 \begin{figure}[h!]
 \scalebox{.7}{\includegraphics{Seg3DBasicFunctionality_figures/quick_menu.png}}
@@ -367,15 +417,23 @@ By clicking on the switch tool icon (Table~\ref{tab:toolbaricons}), the tool bar
 \section{Viewing Options}
 \label{sec:viewing}
 
-There are several options to change the layout and data viewing in Seg3D.  As mentioned before, several windows can be moved and undocked to customize the layout.  The viewing panels can also be altered so that there are virtually any number (up to sixe) and any size.  Viewing panel sizes can be adjusted by clicking and dragging on the borders.  This may change the sizes of several panels at once, but there are several different configurations available in the `View' menu at the top of the screen.  The various options are explained in the sections following.  
+There are several options to change the layout and data viewing in Seg3D.
+As mentioned before, several windows can be moved and undocked to customize the layout.
+The viewing panels can also be altered so that there are virtually any number (up to sixe) and any size.
+Viewing panel sizes can be adjusted by clicking and dragging on the borders.
+This may change the sizes of several panels at once, but there are several different configurations available in the \textbf{View} menu at the top of the screen.
+The various options are explained below.
 
 \subsection{Full Screen}
 
-This is a unique and useful viewing option will cause Seg3D to use all of the real estate of whatever screen you are using.  Full screen mode will cover everything else that may be open on your desktop, including the common menus on the top and bottom of the screen.  The top tool bar will reappear if the mouse is held at the top of the screen momentarily, allowing the user to choose any tools or filters desired.  Full screen mode is enable and disabled by clicking on the option in the menu, or by using the shortcut: ctrl/cmd+F.  
+This is a unique and useful viewing option will cause Seg3D to use all of the real estate of whatever screen you are using.  Full screen mode will cover everything else that may be open on your desktop, including the common menus on the top and bottom of the screen.  The top tool bar will reappear if the mouse is held at the top of the screen momentarily, allowing the user to choose any tools or filters desired.  Full screen mode is enable and disabled by clicking on the option in the menu, or by using the shortcut CTRL/CMD+F.  
 
-\subsection{Only One Viewer}
+\subsection{One Viewer}
 
-This and the following viewing options should be self evident.  This option will show only one viewer.  This is useful if you only care about one view at a time because it maximizes screen real estate.  This one viewer can still be switch between the 3 slice orientations and the volume viewer.  
+This and the following viewing options should be self evident.
+This option will show only one viewer.
+This is useful if you only care about one view at a time because it maximizes screen real estate.
+This one viewer can still be switch between the three slice orientations and the volume viewer.  
 
 \subsection{One and One}
 
@@ -387,19 +445,24 @@ This will create three viewers,  one bigger one on the left and two smaller ones
 
 \subsection{One and Three}
 
-This is the default configuration,  though it can be changed int he preferences.  This generates four viewers, one large one on the left and three smaller ones stacked on the right.  This is a useful configuration because most people do more work in a single view, giving the user one large space to work, but use the other views as references only, so they do not take as much space.
+This is the default configuration,  though it can be changed in the preferences.
+This generates four viewers, one large one on the left and three smaller ones stacked on the right.
+One and Three is a useful configuration because most people do more work in a single view, giving the user one large space to work, but use the other views as references only, so they do not take as much space.
 
 \subsection{Two and Two}
 
-This will generate four viewers of equal size, two on the left and right.  This is useful when you segment in multiple planes simultaneously.
+This will generate four viewers of equal size, two on the left and right, which
+is useful when segmenting in multiple planes simultaneously.
 
 \subsection{Two and Three}
 
-This generates five viewers, two on the left and three on the right.  For when four just doesn't cut it.  
+This generates five viewers, two on the left and three on the right, for when four just doesn't cut it.  
 
 \subsection{Three and Three}
 
-This generates six viewers, the maximum number, three on the left and right.  This is generally used when multiple planes in the same direction are needed.  These planes can be locked together as the user scrolls through them.  
+This generates six viewers, the maximum number, three on the left and right.
+This is generally used when multiple planes in the same direction are needed.
+These planes can be locked together as the user scrolls through them.  
 
 \subsection{Table of Shortcuts}
 
@@ -410,21 +473,21 @@ This generates six viewers, the maximum number, three on the left and right.  Th
 \hline
 {\bf Keyboard Action} & {\bf Function}\\
 \hline
-ctrl/cmd+F & Toggle Full Screen Mode\\
+CTRL/CMD+F & Toggle Full Screen Mode\\
 \hline
-alt+0 & One viewer only\\
+Alt+0 & One viewer only\\
 \hline
-alt+1 & One and One\\
+Alt+1 & One and One\\
 \hline
-alt+2 & One and Two\\
+Alt+2 & One and Two\\
 \hline
-alt+3 & One and Three\\
+Alt+3 & One and Three\\
 \hline
-alt+4 & Two and Two\\
+Alt+4 & Two and Two\\
 \hline
-alt+5 & Two and Three\\
+Alt+5 & Two and Three\\
 \hline
-alt+6 & Three and Three\\
+Alt+6 & Three and Three\\
 \hline
 \end{tabular}
 \end{table}
@@ -632,7 +695,7 @@ Each volume or mask label has  standard, associated icons below their names.  Ta
 \section{Volume View Window}
 The Volume View Window is not opened by default when Seg3D is opened.  
 To open the window, click the 'Window' option in the task bar and select the Volume View option.  
-The window may also be toggled by using the key command: Shift+cntrl/cmd+V. 
+The window may also be toggled by using the key command: Shift+CTRL/CMD+V. 
 Once activated, the window will appear on the right and side of the Seg3D panel covering the layer mask window.
 To toggle back to the layer mask window, click the Layer Manager tab at the bottom of the page.
 The Volume View Window has three separate options for volume displaying.
@@ -758,7 +821,7 @@ Additionally, each features Ambient and Specular lighting can be adjusted as wel
 \section{Provenance Window}
 The Provenance Window is not opened by default when Seg3D is opened. 
 To open the window, click the 'Window' option in the task bar and select the Provenance option.  
-The window may also be toggled by using the key command: Shift+cntrl/cmd+H.
+The window may also be toggled by using the key command: Shift+CTRL/CMD+H.
 When the window opens, it will appear on the left side of the Seg3D user interface over top of the 'Current Project' panel and the 'Tools' panel.
 
 The Provenance Window shows the history of the active layer.  
@@ -779,7 +842,7 @@ By selecting one of the steps in the Provenance window, the parameters defining 
 For example, by selecting the Threshold option, the thresholding range will be displayed.
 
 \section{Controller Window}
-The Controller Window is not opened by default when Seg3D is opened.  To open the window, click the 'Window' option in the task bar and select the Controller option.  The window may also be toggled by using the key command: Shift+cntrl/cmd+C.
+The Controller Window is not opened by default when Seg3D is opened.  To open the window, click the 'Window' option in the task bar and select the Controller option.  The window may also be toggled by using the key command: Shift+CTRL/CMD+C.
 Notice the Controller Window option in the window drop-down menu is located below a separator.  
 This indicates that the window will open a new pop-up window outside of the general Seg3D user interface.
 
@@ -787,16 +850,40 @@ The Controller window supplies the user with all of the data, variables, history
 There are four tabs that can be selected in this window:
 
 \subsection{Actions Tab}
-The action tab displays all of the actions that have been taken during the Seg3D session.
+The Actions tab displays all of the actions that have been taken during the Seg3D session.
 Console entries can also be made with this feature.
-A series of actions area provided in a drop-down menu at the bottom of the window.
+
+\begin{figure}[h]
+\scalebox{0.5}{\includegraphics{Seg3DBasicFunctionality_figures/Controller_OnStartup.png}}
+\caption{Controller Window on inital open.}\label{fig:OnStartup}
+\end{figure}
+
+A series of actions area provided in a drop-down menu at the bottom of the window (Figure~\ref{fig:ControllerActionList}).
 Once selected, the action will be placed into a command line to the right of the drop-down menu.
+
+\begin{figure}[h]
+\scalebox{0.3}{\includegraphics{Seg3DBasicFunctionality_figures/Controller_ActionList.png}}
+\caption{Controller Window action list.}\label{fig:ControllerActionList}
+\end{figure}
+
 The user can then define the parameters for the action, or simply press enter to see what parameters are required to make the action valid.
-If additional parameters are needed to run the action, they will be displayed in the box below the command line.
+If additional parameters are needed to run the action, they will be displayed in a message in the box below the command line (Figure~\ref{fig:UsabilityMsg}).
+
+\begin{figure}[h]
+\scalebox{0.3}{\includegraphics{Seg3DBasicFunctionality_figures/Controller_UsabilityMsg.png}}
+\caption{Action usability message.}\label{fig:UsabilityMsg}
+\end{figure}
 
 \subsection{State Variables Tab}
 The state variables tab  shows a list of all the state settings for the session.
-Settings cannot be edited in this window.
+Settings cannot be edited in this window, instead use the built-in get and set functions .
+The state variables include Seg3D viewer settings, tool and filter arguments and settings.
+For example, Figure~\ref{fig:ToolStateVars} shows Threshold tool state variables.
+
+\begin{figure}[h]
+\scalebox{0.3}{\includegraphics{Seg3DBasicFunctionality_figures/Controller_ToolStateVars.png}}
+\caption{Threshold tool state variables.}\label{fig:ToolStateVars}
+\end{figure}
 
 \subsection{Event Log Tab}
 The event log shows actions that have been taken on the session since the latest load of the session.
@@ -818,11 +905,11 @@ The window may also be toggled by using the key command: Shift+CTRL/CMD+Y.
 Notice the Python Window option in the window drop-down menu is located below a separator.  
 This indicates that the window will open a new pop-up window outside of the general Seg3D user interface.
 
-The Python Window opens a Python scripting console that can be used by advanced users to control Seg3D.
+The Python Window opens a Python scripting console that can be used by advanced users to control Seg3D (Figure~\ref{fig:PythonConsole}).
 Python code wrappers are generated allowing tools, filters, the viewer and data to be controlled in Python scripts. 
-Basic Seg3D Python code samples are available under User Documentation and Tutorials.
-A treatment of python coding will not be attempted in this document.
-For more information on python coding, consult other resources.
+Basic Seg3D Python code samples are available under on the \href{http://www.seg3d.org}{Seg3D site} under User Documentation and Tutorials.
+An extensive treatment of python coding will not be attempted in this document;
+for more information on python coding, consult other resources.
 
 \begin{figure}[h]
 \scalebox{0.5}{\includegraphics{Seg3DBasicFunctionality_figures/PythonConsole_blank.png}}
@@ -831,7 +918,9 @@ For more information on python coding, consult other resources.
 
 \section{Message History Window}
 \label{sec:messagehistory}
-The Message History Window is not opened by default when Seg3D is opened.  This window is opened by clicking on the message history icon in the bottom left of the screen in the tool bar (Table~\ref{tab:toolbaricons}).    This window will show the messages that Seg3D displays when many functions are performed.  This can be used to track your steps at a high level.  
+The Message History Window is not opened by default when Seg3D is opened.
+This window is opened by clicking on the message history icon in the bottom left of the screen in the tool bar (Table~\ref{tab:toolbaricons}).
+This window will show the messages that Seg3D displays when many functions are performed.  This can be used to track your steps at a high level.  
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -854,7 +943,7 @@ that allow you to save and open new projects, and set preferences.
 \subsection{New Project}
 \label{sec:newproject}
 The new project option will prompt you to save your current project such that it can be closed. A dialog box will then open
-asking for a Project name and a Project Path (Figure~\ref{fig:newproject}).  The Project name will be used to create a folder for all the project data.  The Project path defines the location of this folder, which can be set by typing the path or through a seperate dialogue box by pressing 'Choose Alternate Location'.  The default location for this path can be set in the preferences section discussed below. A new project can also be created using the shortcut cntrl/cmd+N.
+asking for a Project name and a Project Path (Figure~\ref{fig:newproject}).  The Project name will be used to create a folder for all the project data.  The Project path defines the location of this folder, which can be set by typing the path or through a seperate dialogue box by pressing 'Choose Alternate Location'.  The default location for this path can be set in the preferences section discussed below. A new project can also be created using the shortcut CTRL/CMD+N.
 
 \begin{figure}[h!]
 \scalebox{0.6}{\includegraphics{Seg3DBasicFunctionality_figures/newProject.png}}
@@ -863,24 +952,24 @@ asking for a Project name and a Project Path (Figure~\ref{fig:newproject}).  The
 
 \subsection{Open Project}
 \label{sec:openproject}
-The open project selection will prompt you to save you current project and open a new project based by selecting it from a file menu.  This function can be called using the shortcut cntrl/cmd+O.
+The open project selection will prompt you to save you current project and open a new project based by selecting it from a file menu.  This function can be called using the shortcut CTRL/CMD+O.
 
 \subsection{Show Project Folder}
-This option will open a file menu showing the projects contained in your default project location.  This function can be called using the shortcut shift+cntrl/cmd+O.  The default project location can be changed in Seg3D preferences.
+This option will open a file menu showing the projects contained in your default project location.  This function can be called using the shortcut Shift+CTRL/CMD+O.  The default project location can be changed in Seg3D preferences.
 
 \subsection{Save Project}
-If the project as already been given a name and location, this will save the project.  If the project has not yet been named, it will prompt the user for a project name and location.  This function can be called using the shortcut cntrl/cmd+S.
+If the project as already been given a name and location, this will save the project.  If the project has not yet been named, it will prompt the user for a project name and location.  This function can be called using the shortcut CTRL/CMD+S.
 
 \subsection{Save Project As}
 \label{sec:saveprojectas}
-This will create a copy of the current project under a new name and project location.  This function can be called using the shortcut shift+cntrl/cmd+S.
+This will create a copy of the current project under a new name and project location.  This function can be called using the shortcut Shift+CTRL/CMD+S.
 
 \subsection{Launch Another Copy of Seg3D}
 This opens a new session of Seg3D.  It does not close the current session, but simply opens another copy.
 
 \subsection{Import Layer From Single File}
 \label{sec:importsinglefile}
-Data and label maps can be stored in a variety of file formats.  Use this option when the data or label map is stored in one single file.  This function can be called using the shortcut shift+cntrl/cmd+O.
+Data and label maps can be stored in a variety of file formats.  Use this option when the data or label map is stored in one single file.  This function can be called using the shortcut Shift+CTRL/CMD+O.
 
 \subsubsection{Import Widget}
 After the user selects the file/files to be read, a menu will appear asking the user to define the type of data being read as seen below (Figure~\ref{fig:ImportWidget}).
@@ -893,7 +982,7 @@ After the user selects the file/files to be read, a menu will appear asking the 
 There are two types of files that can be read by Seg3D: Image data and label maps.  The first selection indicates that the file you wish to read in contains image data.  The next three selections all apply to label maps.  The second selection assumes that all non-zero values are part of a single label map.  The third selection will define each unique value in the file as part of a separate label map. However, the numerical value assigned to represent that label will be incrementally generated by Seg3D rather than assigned from the input file. The fourth selection is similar to the third in that it creates labels based on unique values in the input file.  However, in this case the value used to represent the label is the same as the value being read from the file.
 
 \subsection{Import Layer From Image Series}
-Data and label maps can be stored in a variety of file formats.  Use this option when the data or label map is stored in multiple files. See Import Layer From Single File for more information about the Import Widget. This function can be called using the shortcut shift+cntrl/cmd+I.
+Data and label maps can be stored in a variety of file formats.  Use this option when the data or label map is stored in multiple files. See Import Layer From Single File for more information about the Import Widget. This function can be called using the shortcut Shift+CTRL/CMD+I.
 
 \subsection{Export Segmentation}
 Label maps can be exported in a variety of file formats.  If a layer containing a label map is selected, then the user may select the Export Segmentation option which opens the segmentation dialogue (Figure~\ref{fig:ExportSeg}).
@@ -903,7 +992,7 @@ Label maps can be exported in a variety of file formats.  If a layer containing 
 \caption{This window appears when the user selects export segmentation.  It allows the user to select the layers they wish to export as label masks and the format they wish to export.}\label{fig:ExportSeg}
 \end{figure}
 
-This window allows the user to select the layers to export as label masks and the format they wish to export.  The available formats include: .nrrd, .mat (matlab), .tiff, .bmp, .png, .dcm. This function can be called using the shortcut cntrl/cmd+E.  The segmentation may be saved as a single file or as multiple files.  
+This window allows the user to select the layers to export as label masks and the format they wish to export.  The available formats include: .nrrd, .mat (matlab), .tiff, .bmp, .png, .dcm. This function can be called using the shortcut CTRL/CMD+E.  The segmentation may be saved as a single file or as multiple files.  
 
 After choosing a file name (single file only) and location for the segmentation, you will be shown the Export to Segmentation Summary.  This window shows the layers chosen to save as a segmentation.  In the case of saving as a single file,  there is an additional layer (the background, which is the remainder of the volume)  and an option to choose the value to represent each of the layers (Figure~\ref{fig:ExportSeg_2}).  I should be noted that the segmentation will only represent one value per voxel, so if any of the selected layers overlap the higher value will overwrite the region of overlap.  If saving as multiple files, this window will show the names of the layers only.  
 
@@ -914,7 +1003,7 @@ After choosing a file name (single file only) and location for the segmentation,
 
 \subsection{Export Active Data Layer}
 
-If image data layer is selected, then the user may choose to Export Active Data Layer. This selection opens a file menu window where the user can select the location they wish to save the data file as well as specify the file format.  The available formats include: .nrrd, .dcm, .tiff, .png, .mrc, and .mat (matlab). This function can be called using the shortcut shift+cntrl/cmd+E.
+If image data layer is selected, then the user may choose to Export Active Data Layer. This selection opens a file menu window where the user can select the location they wish to save the data file as well as specify the file format.  The available formats include: .nrrd, .dcm, .tiff, .png, .mrc, and .mat (matlab). This function can be called using the shortcut Shift+CTRL/CMD+E.
 
 \subsection{Recent Projects}
 This menu shows recently opened projects.  These projects can be opened quickly by clicking on the name of the project.
@@ -923,27 +1012,27 @@ This menu shows recently opened projects.  These projects can be opened quickly 
 
 \subsection{Undo}
 This function allows the user to undo a changes made to the unsaved project.  Changes made to the project are stored
-in a buffer, the size of which can be changed under Seg3D preferences. This function can be called using the shortcut cntrl/cmd+Z.
+in a buffer, the size of which can be changed under Seg3D preferences. This function can be called using the shortcut CTRL/CMD+Z.
 
 
 \subsection{Redo}
-Redo an operation on a project that was previously undone. This function can be called using the shortcut shift+cntrl/cmd+Z.
+Redo an operation on a project that was previously undone. This function can be called using the shortcut Shift+CTRL/CMD+Z.
 
 
 \subsection{Copy Mask Slice}
 \label{sec:copy}
-Copy a single slice from a mask layer which can then be pasted onto other layers. This function can be called using the shortcut cntrl/cmd+C.
+Copy a single slice from a mask layer which can then be pasted onto other layers. This function can be called using the shortcut CTRL/CMD+C.
 
 
 \subsection{Paste Mask Slice}
 \label{sec:paste}
-Paste a previously copied label from one slice of a mask label to all the slices of another mask label. This function can be called using the shortcut cntrl/cmd+V.
+Paste a previously copied label from one slice of a mask label to all the slices of another mask label. This function can be called using the shortcut CTRL/CMD+V.
 
 
 \subsection{Punch Through Volume}
 \label{sec:punch}
 After creating new label data on a single slice of a mask layer, that label can be copied or "punched" to every other slice by
-selecting this option. This function can be called using the shortcut cntrl/cmd+P.
+selecting this option. This function can be called using the shortcut CTRL/CMD+P.
 
 
 \section{Help}
@@ -955,8 +1044,9 @@ This function opens a list of all the keyboard and mouse shortcuts available in 
 
 \section{Preferences}
 \label{sec:preferences}
-The preference dialogue box can be opened by selection Seg3D-> preferences.  This dialog box
-contains four tabs which we will discuss here.
+The preference dialogue box can be opened by selecting \textbf{Seg3D} $\Rightarrow$ \textbf{Preferences} on Mac OS X.
+%% TODO: Windows and Linux
+This dialog box contains four tabs which we will discuss here.
 
 
 \subsection{General}
@@ -965,10 +1055,10 @@ may turn on the autosave feature and set a frequency for which the project is sa
 can be turned on so that the auto save does not happen while another operation is being performed. Along with the
 frequency the amount of compression used to save each project can be controlled in this tab.  
 
-The "import/export" options allows you to turn on an off a feature that will export a dicom header with all dicoms that are
+The \textbf{Import/Export} options allows you to turn on an off a feature that will export a dicom header with all dicoms that are
 exported.
 
-The "project" options allow you to change the default project location, change the buffer size, and change how the project
+The \textbf{Project} options allow you to change the default project location, change the buffer size, and change how the project
 is saved e.g. change if the input files are embedded into the project.
 
 \begin{figure}[h!]
@@ -1071,7 +1161,7 @@ Back in the general tab, the active layer can be deleted and the opacity of the 
 \hline
 {\bf Action} & {\bf Function}\\
 \hline
-ctrl/cmd & snap to axis\\
+CTRL/CMD & snap to axis\\
 \hline
 middle mouse buttom & snap to slice\\
 \hline
@@ -1087,9 +1177,9 @@ The paint brush size can be changed with the scroll wheel or in the tools window
 
 You can constrain the paint brush with other mask layers (up to two) or with a data layer and threshold limits (this is the same as creating a threshold mask layer and using it as a constraint) to limit the pixels that can be painted. 
 
-There is a flood fill and erase function which will fill an area in the slice that is completely surrounded with the mask layer, or delete a connected region.  If no seed points are used with these functions, the entire slice will be filled or erased.  Seed points are chosen with with alt+left mouse button.  
+There is a flood fill and erase function which will fill an area in the slice that is completely surrounded with the mask layer, or delete a connected region.  If no seed points are used with these functions, the entire slice will be filled or erased.  Seed points are chosen with with Alt+left mouse button.  
 
-It should be noted that since this tool uses the scroll function to change the paint brush size, it will not also change the slice in the viewer.  To change the slice use the arrow up/down or shift+scroll.  
+It should be noted that since this tool uses the scroll function to change the paint brush size, it will not also change the slice in the viewer.  To change the slice use the arrow up/down or Shift+scroll.  
 
 
 \begin{table}[h!]
@@ -1105,9 +1195,9 @@ right mouse & erase\\
 \hline
 scroll up/down & increase/decrease brush size\\
 \hline
-alt+left mouse & add seed point\\
+Alt+left mouse & add seed point\\
 \hline
-alt+right mouse & remove seed point\\
+Alt+right mouse & remove seed point\\
 \hline 
 C & clear seed points\\
 \hline
@@ -1128,7 +1218,7 @@ To run this registration, choose for the first input the mask layer in the desti
 
 The polyline tool is a tool that allows manual creating and editing of mask layers.  The polyline tool allows the user to define a region of the layer to modify by adding or erasing the data in the region defined by the polyline.  This tool can only manipulate existing mask layers (can be empty).  
 
-The polyline is created by clicking with the left mouse on the 2D viewer.  The polyline can be modified in any plane, but will only fill/erase in the active plane.   The polyline will try to order the new point in between two existing points to make as smooth a shape as possible.  This means that the user should try to place a few points around the edge of the shape desired to create a coarse shape and then fill in the details as needed.  points can be moved with the left mouse button (pointer will turn into a hand) and deleted with the right mouse button.  The whole polyline can be moved with shift+left mouse on one of the points.  
+The polyline is created by clicking with the left mouse on the 2D viewer.  The polyline can be modified in any plane, but will only fill/erase in the active plane.   The polyline will try to order the new point in between two existing points to make as smooth a shape as possible.  This means that the user should try to place a few points around the edge of the shape desired to create a coarse shape and then fill in the details as needed.  points can be moved with the left mouse button (pointer will turn into a hand) and deleted with the right mouse button.  The whole polyline can be moved with Shift+left mouse on one of the points.  
 
 Once the desired region is designated by the polyline, the user can fill the area or delete the mask data in the area.  This tools then is like the paint brush tool, where the brush can be shape in any way.  The polyline will remain as the slice changes, so that the user can modify the existing polyline instead of creating a new one.  If desired, a new polyline can be created by clearing the polyline and starting fresh.  
 
@@ -1144,7 +1234,7 @@ left mouse & add or move point \\
 \hline
 right mouse & erase point\\
 \hline
-shift+left mouse & move polyline (on one of the points)\\
+Shift+left mouse & move polyline (on one of the points)\\
 \hline
 F & Paint flood fill\\
 \hline
@@ -1182,7 +1272,7 @@ left mouse & add or move point \\
 \hline
 right mouse & erase point\\
 \hline
-shift+left mouse & move polyline (on one of the points)\\
+Shift+left mouse & move polyline (on one of the points)\\
 \hline
 F & Paint flood fill\\
 \hline
