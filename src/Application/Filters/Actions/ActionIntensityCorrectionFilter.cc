@@ -114,9 +114,6 @@ public:
     // NOTE: This only does wrapping and does not regenerate the data.
     typename TYPED_CONTAINER_TYPE::Handle input_image; 
     this->get_itk_image_from_layer<VALUE_TYPE>( this->src_layer_, input_image );
-
-    size_t size1 = input_image->get_size();
-    std::cerr << "ActionIntensityCorrection Filter,  got size=" << size1 << std::endl;
   
     Core::DataBlockHandle input_data_block = Core::ITKDataBlock::New( input_image );
   
@@ -266,7 +263,6 @@ public:
     // Create the matrices.
 
     size_t size = input_image->get_size();
-std::cerr << "ActionIntensityCorrection Filter,  got size=" << size << std::endl;
     size_t size_x = input_image->get_nx();
     size_t size_y = input_image->get_ny();
     size_t size_z = input_image->get_nz();
@@ -282,7 +278,6 @@ std::cerr << "ActionIntensityCorrection Filter,  got size=" << size << std::endl
     // Build F (U?)
     try
     {
-std::cerr << "ActionIntensityCorrection Filter, attempt to allocate vnl_matrix. Size=" << size << std::endl;
       vnl_matrix< float > U( 3 * size, 1, 0.0f );
       
       typedef itk::ImageRegionIterator< GradientImageType > GradientImageIterator;
