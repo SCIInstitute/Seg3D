@@ -245,6 +245,7 @@ PythonInterpreter::~PythonInterpreter()
 
 void PythonInterpreter::initialize_eventhandler()
 {
+std::cerr << "PythonInterpreter::initialize_eventhandler() begin" << std::endl;
   using namespace boost::python;
 
   PythonInterpreterPrivate::lock_type lock( this->private_->get_mutex() );
@@ -308,6 +309,7 @@ void PythonInterpreter::initialize_eventhandler()
   PyRun_SimpleString( "del (interpreter, __internal_compiler, __term_io, __term_err)\n" );
 
   this->private_->thread_condition_variable_.notify_one();
+std::cerr << "PythonInterpreter::initialize_eventhandler() end" << std::endl;
 }
 
 void PythonInterpreter::initialize( wchar_t* program_name, const module_list_type& init_list )
