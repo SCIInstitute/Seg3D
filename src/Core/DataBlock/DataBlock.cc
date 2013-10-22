@@ -54,6 +54,13 @@ DataBlock::~DataBlock()
 
 double DataBlock::get_data_at( index_type index ) const
 {
+  // range check
+  // TODO: exception would be clearer, but would there be a performance impact?
+  if (index >= get_size())
+  {
+    return 0.0;
+  }
+
   switch( this->data_type_ )
   {
   case DataType::CHAR_E:
@@ -178,6 +185,8 @@ void DataBlock::set_nz( size_t nz )
 
 void DataBlock::set_data( void* data )
 {
+  // TODO: this leaks memory
+  // Make unit tests before attempting to correct
   this->data_ = data;
 }
 

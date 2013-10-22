@@ -965,6 +965,11 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
           QtUtils::QtBridge::Show( this->private_->ui_.isosurface_area_widget_,
             mask_layer->iso_generated_state_ );
 
+          QtUtils::QtBridge::Connect( this->private_->ui_.min_label_,
+                                     mask_layer->min_value_state_ );
+          QtUtils::QtBridge::Connect( this->private_->ui_.max_label_,
+                                     mask_layer->max_value_state_ );
+          
           this->set_mask_background_color( mask_layer->color_state_->get() );
         }
       }

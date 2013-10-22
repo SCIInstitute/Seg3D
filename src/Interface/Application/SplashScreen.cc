@@ -110,7 +110,10 @@ SplashScreen::SplashScreen( QWidget *parent ) :
     this, SLOT( quit() ) );
   
   connect( this->private_->ui_.quick_open_button_, SIGNAL( clicked() ), 
-      this, SLOT( quick_open_file() ) );
+    this, SLOT( quick_open_file() ) );
+  
+  connect( this->private_->ui_.skip_project_button_, SIGNAL( clicked() ),
+    this, SLOT( quick_open_new_project() ) );
   
   connect( this->private_->ui_.recent_project_listwidget_, SIGNAL( itemPressed( QListWidgetItem* ) ),
     this, SLOT( enable_load_recent_button( QListWidgetItem* ) ) );  
@@ -310,7 +313,26 @@ void SplashScreen::quick_open_file()
 
 }
 
-
+void SplashScreen::quick_open_new_project()
+{
+  // must do this to make sure a double-click on project file doesn't use this executable session
+  this->private_->user_interacted_ = true;
+  
+  // NOTE: Need to give the project a name
+  std::string default_project_name;
+  {
+    // Need to lock state engine as we are on a different thread
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    int default_name_count = ProjectManager::Instance()->default_project_name_counter_state_->get();
+    default_project_name = std::string( "New Project " ) + Core::ExportToString( default_name_count );
+  } 
+  
+  ActionNewProject::Dispatch( Core::Interface::GetWidgetActionContext(), "",
+                             default_project_name );
+  this->hide();
+  this->close();
+}
+  
 void SplashScreen::populate_recent_projects()
 {
   ProjectInfoList recent_projects;

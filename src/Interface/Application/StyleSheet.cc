@@ -227,7 +227,7 @@ const QString StyleSheet::TOOLBOXPAGEWIDGET_ACTIVATE_BUTTON_ACTIVE_C = QString(
   " border: none;"
   " color: white;"
   " font: bold;"
-#ifdef __APPLLE__
+#ifdef __APPLE__
   "   font-size: 13;"
 #endif  
   "}"
@@ -264,7 +264,7 @@ const QString StyleSheet::TOOLBOXPAGEWIDGET_ACTIVATE_BUTTON_INACTIVE_C = QString
   " border: none;"
   " color: rgb(25, 25, 25);"
   " font: normal;"
-#ifdef __APPLLE__
+#ifdef __APPLE__
   "   font-size: 13;"
 #endif  
   "}\n"
@@ -305,7 +305,7 @@ const QString StyleSheet::RENDERING_CLIPPING_ACTIVE_C = QString(
   " border: none;"
   " color: white;"
   " font: bold;"
-#ifdef __APPLLE__
+#ifdef __APPLE__
   "   font-size: 13;"
 #endif  
   "}"
@@ -351,7 +351,7 @@ const QString StyleSheet::RENDERING_CLIPPING_INACTIVE_C = QString(
   " border: none;"
   " color: rgb(25, 25, 25);"
   " font: normal;"
-#ifdef __APPLLE__
+#ifdef __APPLE__
   "   font-size: 13;"
 #endif  
   "}"
@@ -371,7 +371,7 @@ const QString StyleSheet::RENDERING_CLIPPING_INACTIVE_C = QString(
   " border: none;"
   " color: rgb(25, 25, 25);"
   " font: normal;"
-#ifdef __APPLLE__
+#ifdef __APPLE__
   "   font-size: 13;"
 #endif  
   "}"
@@ -400,7 +400,7 @@ const QString StyleSheet::RENDERING_VR_ACTIVE_C = QString(
   " border: none;"
   " color: white;"
   " font: bold;"
-#ifdef __APPLLE__
+#ifdef __APPLE__
   "   font-size: 13;"
 #endif  
   "}"
@@ -442,7 +442,7 @@ const QString StyleSheet::RENDERING_VR_INACTIVE_C = QString(
   " border: none;"
   " color: rgb(25, 25, 25);"
   " font: normal;"
-#ifdef __APPLLE__
+#ifdef __APPLE__
   "   font-size: 13;"
 #endif  
   "}"
@@ -484,7 +484,7 @@ const QString StyleSheet::RENDERING_FOG_ACTIVE_C = QString(
   " border: none;"
   " color: white;"
   " font: bold;"
-#ifdef __APPLLE__
+#ifdef __APPLE__
   "   font-size: 13;"
 #endif  
   "}"
@@ -525,7 +525,7 @@ const QString StyleSheet::RENDERING_FOG_INACTIVE_C = QString(
   " border: none;"
   " color: rgb(25, 25, 25);"
   " font: normal;"
-#ifdef __APPLLE__
+#ifdef __APPLE__
   "   font-size: 13;"
 #endif  
   "}"

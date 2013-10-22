@@ -38,6 +38,9 @@
 #include <Application/Layer/LayerCheckPoint.h>
 #include <Application/Layer/LayerManager.h>
 
+// Boost includes
+#include <boost/smart_ptr.hpp>
+
 namespace Seg3D
 {
 
@@ -94,7 +97,7 @@ bool LayerCheckPoint::apply( LayerHandle layer ) const
   
   if ( !( this->private_->data_slices_.empty() ) )
   {
-    DataLayerHandle data_layer = boost::shared_dynamic_cast<DataLayer>( layer );
+    DataLayerHandle data_layer = boost::dynamic_pointer_cast<DataLayer>( layer );
     if ( ! data_layer ) return false;
 
     LayerManager::DispatchInsertDataSlicesIntoLayer( data_layer, 
@@ -104,7 +107,7 @@ bool LayerCheckPoint::apply( LayerHandle layer ) const
 
   if ( !( this->private_->mask_slices_.empty() ) )
   {
-    MaskLayerHandle mask_layer = boost::shared_dynamic_cast<MaskLayer>( layer );
+    MaskLayerHandle mask_layer = boost::dynamic_pointer_cast<MaskLayer>( layer );
     if ( ! mask_layer ) return false;
 
     LayerManager::DispatchInsertMaskSlicesIntoLayer( mask_layer, 
@@ -130,7 +133,7 @@ bool LayerCheckPoint::create_slice( LayerHandle layer, Core::SliceType type,
 
   if ( layer->get_type() == Core::VolumeType::MASK_E )
   {
-    MaskLayerHandle mask = boost::shared_dynamic_cast<MaskLayer>( layer );
+    MaskLayerHandle mask = boost::dynamic_pointer_cast<MaskLayer>( layer );
     if ( ! mask->has_valid_data() ) return false;
     
     Core::MaskDataSliceHandle slice;
@@ -141,7 +144,7 @@ bool LayerCheckPoint::create_slice( LayerHandle layer, Core::SliceType type,
   }
   else if ( layer->get_type() == Core::VolumeType::DATA_E )
   {
-    DataLayerHandle data = boost::shared_dynamic_cast<DataLayer>( layer );
+    DataLayerHandle data = boost::dynamic_pointer_cast<DataLayer>( layer );
     if ( ! data->has_valid_data() ) return false;
     
     Core::DataSliceHandle slice;
@@ -164,7 +167,7 @@ bool LayerCheckPoint::create_slice( LayerHandle layer, Core::SliceType type,
     for ( Core::DataBlock::index_type j = start; j <= end; j++ )
     {
 
-      MaskLayerHandle mask = boost::shared_dynamic_cast<MaskLayer>( layer );
+      MaskLayerHandle mask = boost::dynamic_pointer_cast<MaskLayer>( layer );
       if ( ! mask->has_valid_data() ) return false;
       
       Core::MaskDataSliceHandle slice;
@@ -178,7 +181,7 @@ bool LayerCheckPoint::create_slice( LayerHandle layer, Core::SliceType type,
   {
     for ( Core::DataBlock::index_type j = start; j <= end; j++ )
     {
-      DataLayerHandle data = boost::shared_dynamic_cast<DataLayer>( layer );
+      DataLayerHandle data = boost::dynamic_pointer_cast<DataLayer>( layer );
       if ( ! data->has_valid_data() ) return false;
       
       Core::DataSliceHandle slice;

@@ -155,7 +155,9 @@ bool MRCLayerExporter::export_single_masks( const std::string& path )
       std::ofstream out(mask_path.c_str(), std::ios::out | std::ios::binary);
       if (! out )
       {
-        CORE_LOG_ERROR( std::string("Failed to open file ") + mask_path.c_str() + std::string( " for export.") );
+    std::ostringstream oss;
+    oss << "Failed to open file " << mask_path.c_str() << " for export.";
+        CORE_LOG_ERROR( oss.str() );
         return false;
       }
       

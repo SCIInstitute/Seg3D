@@ -153,6 +153,13 @@ public:
   /// Get the mask value at a certain index
   inline bool get_mask_at( size_t index ) const
   {
+    // range check
+    // TODO: exception would be clearer, but would there be a performance impact?
+    if (index >= get_size())
+    {
+        return false;
+    }
+
     return ( this->data_[ index ] & this->mask_value_ ) != 0;
   }
 

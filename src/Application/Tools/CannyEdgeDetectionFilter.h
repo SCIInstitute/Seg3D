@@ -56,7 +56,8 @@ public:
   Core::StateRangedDoubleHandle blurring_distance_state_;
 
   /// Threshold is the lowest allowed value in the output image
-  Core::StateRangedDoubleHandle threshold_state_;
+  Core::StateRangedDoubleHandle lower_threshold_state_;
+  Core::StateRangedDoubleHandle upper_threshold_state_;
 
   // -- execute --
 public:

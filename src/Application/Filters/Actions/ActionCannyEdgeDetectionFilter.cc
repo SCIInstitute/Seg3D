@@ -84,7 +84,8 @@ public:
   LayerHandle dst_layer_;
 
   double blurring_distance_;
-  double threshold_;
+  double lower_threshold_;
+  double upper_threshold_;
   
 public:
   // RUN:
@@ -114,8 +115,8 @@ public:
     // Setup the filter parameters that we do not want to change.
     filter->SetInput( input_image->get_image() );
     filter->SetVariance( this->blurring_distance_ );
-    filter->SetUpperThreshold( static_cast<float>( this->threshold_ ) );
-    filter->SetLowerThreshold( static_cast<float>( this->threshold_/2.0 ) );
+    filter->SetUpperThreshold( static_cast<float>( this->upper_threshold_ ) );
+    filter->SetLowerThreshold( static_cast<float>( this->lower_threshold_ ) );
 
     // Ensure we will have some threads left for doing something else
     this->limit_number_of_itk_threads( filter );
@@ -171,7 +172,8 @@ bool ActionCannyEdgeDetectionFilter::run( Core::ActionContextHandle& context,
 
   // Copy the parameters over to the algorithm that runs the filter
   algo->blurring_distance_ = this->blurring_distance_;
-  algo->threshold_ = this->threshold_;
+  algo->lower_threshold_ = this->lower_threshold_;
+  algo->upper_threshold_ = this->upper_threshold_;
   algo->set_sandbox( this->sandbox_ );
 
   // Find the handle to the layer
@@ -213,7 +215,7 @@ bool ActionCannyEdgeDetectionFilter::run( Core::ActionContextHandle& context,
 
 
 void ActionCannyEdgeDetectionFilter::Dispatch( Core::ActionContextHandle context, 
-  std::string target_layer, double blurring_distance, double threshold )
+  std::string target_layer, double blurring_distance, double lower_threshold, double upper_threshold )
 { 
   // Create a new action
   ActionCannyEdgeDetectionFilter* action = new ActionCannyEdgeDetectionFilter;
@@ -221,7 +223,8 @@ void ActionCannyEdgeDetectionFilter::Dispatch( Core::ActionContextHandle context
   // Setup the parameters
   action->target_layer_ = target_layer;
   action->blurring_distance_ = blurring_distance;
-  action->threshold_ = threshold;
+  action->lower_threshold_ = lower_threshold;
+  action->upper_threshold_ = upper_threshold;
 
   // Dispatch action to underlying engine
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );

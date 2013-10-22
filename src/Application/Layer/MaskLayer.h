@@ -157,6 +157,9 @@ public:
   
   Core::StateStringHandle counted_pixels_state_;
 
+  Core::StateDoubleHandle min_value_state_;
+  Core::StateDoubleHandle max_value_state_;
+  
 protected:
   /// PRE_SAVE_STATES:
   /// this function synchronize the generation number for the session saving

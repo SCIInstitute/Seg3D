@@ -35,6 +35,8 @@
 
 #include <boost/filesystem.hpp>
 
+// MatlabIO includes
+#include <MatlabIO.h>
 
 // Application includes
 #include <Application/LayerIO/LayerExporter.h>
@@ -74,7 +76,13 @@ private:
   bool export_matfile( const std::string& file_path );
   bool export_single_masks( const std::string& file_path );
   bool export_mask_label( const std::string& file_path );
-  
+
+  void createDoubleArray(const char* name, double value, int index, MatlabIO::matlabarray& array);
+  void createStringArray(const char* name, const char* value, int index, MatlabIO::matlabarray& array);
+  void configureDataLayerAxis(MatlabIO::matlabarray& axisma, DataLayer* layer);
+  void configureMaskLayerAxis(MatlabIO::matlabarray& axisma, MaskLayer* layer);
+  void configureAxis(MatlabIO::matlabarray& axisma, Core::GridTransform& tf);
+
 private:
   std::vector< double > label_values_;
 };
