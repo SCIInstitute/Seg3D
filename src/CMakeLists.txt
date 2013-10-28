@@ -34,22 +34,32 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 PROJECT(Seg3D)
 
+
+###########################################
+# Configure testing support.
+# This should be done before any
+# MESSAGE(FATAL_ERROR ...) commands are
+# invoked.
+###########################################
+
+INCLUDE( CTest )
+
 ###########################################
 # Verify build directory
 ###########################################
 
-IF ( ${CMAKE_BINARY_DIR} MATCHES ${CMAKE_SOURCE_DIR} )
+IF( ${CMAKE_BINARY_DIR} MATCHES ${CMAKE_SOURCE_DIR} )
   MESSAGE( FATAL_ERROR "Please delete the CMakeCache.txt from the src directory and build Seg3D in the bin directory. Run 'rm CMakeCache.txt; cd ../bin; cmake ../src' from the binary directory." )
-ENDIF ( ${CMAKE_BINARY_DIR} MATCHES ${CMAKE_SOURCE_DIR} )
+ENDIF( ${CMAKE_BINARY_DIR} MATCHES ${CMAKE_SOURCE_DIR} )
 
 ###########################################
 # Set default CMAKE_BUILD_TYPE
 # if empty for Unix Makefile builds
 ###########################################
 
-IF (CMAKE_GENERATOR MATCHES "Unix Makefiles" AND NOT CMAKE_BUILD_TYPE)
+IF(CMAKE_GENERATOR MATCHES "Unix Makefiles" AND NOT CMAKE_BUILD_TYPE)
   SET(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
-ENDIF (CMAKE_GENERATOR MATCHES "Unix Makefiles" AND NOT CMAKE_BUILD_TYPE)
+ENDIF(CMAKE_GENERATOR MATCHES "Unix Makefiles" AND NOT CMAKE_BUILD_TYPE)
 
 ###########################################
 # WHERE TO COMPILE EXECUTABLES
@@ -63,9 +73,9 @@ SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR} CACHE PATH "" FORCE) # Needed by 
 ###########################################
 
 SET(SEG3D_BUILD_INTERFACE 1 CACHE BOOL "Build the interface to Seg3D")
-IF (WIN32)
+IF(WIN32)
   SET(SEG3D_SHOW_CONSOLE FALSE CACHE BOOL "Show console for debugging")
-ENDIF (WIN32)
+ENDIF(WIN32)
 
 ###########################################
 # SEG3D VERSION NUMBERS
@@ -115,18 +125,18 @@ INCLUDE(CheckCSourceCompiles)
 # architecture settings
 ###########################################
 
-IF (CMAKE_SIZEOF_VOID_P MATCHES 8)
+IF(CMAKE_SIZEOF_VOID_P MATCHES 8)
   SET(SEG3D_BITS "64bit")
   SET(MSVC90_BUILD "amd64")
   ADD_DEFINITIONS(-DSCI_64BITS)
-ELSE (CMAKE_SIZEOF_VOID_P MATCHES 8)
+ELSE(CMAKE_SIZEOF_VOID_P MATCHES 8)
   SET(SEG3D_BITS "32bit")
   SET(MSVC90_BUILD "x86")
   ADD_DEFINITIONS(-DSCI_32BITS)
-  IF (WIN32)
-  ADD_DEFINITIONS(-DBOOST_BIND_ENABLE_STDCALL)
-  ENDIF (WIN32)
-ENDIF (CMAKE_SIZEOF_VOID_P MATCHES 8)
+  IF(WIN32)
+    ADD_DEFINITIONS(-DBOOST_BIND_ENABLE_STDCALL)
+  ENDIF(WIN32)
+ENDIF(CMAKE_SIZEOF_VOID_P MATCHES 8)
 
 ###########################################
 # SETUP DEFINTIONS FOR EXTERNAL PACKAGES
@@ -150,7 +160,7 @@ SET(ITK_USE_REVIEW_STATISTICS TRUE CACHE BOOLEAN "Seg3D requires the ITK Review 
 # Flags for Microsoft Compiler
 ###########################################
 
-IF (WIN32 AND MSVC)
+IF(WIN32 AND MSVC)
   ADD_DEFINITIONS(-D_WIN32_WINNT=0x0501 -DNTDDI_VERSION=0x05010000)
   ADD_DEFINITIONS(-DPSAPI_VERSION=1)
   # Disable Visual C++ Secure Warnings
@@ -162,7 +172,7 @@ IF (WIN32 AND MSVC)
   SET(CMAKE_CXX_FLAGS "/Oi ${CMAKE_CXX_FLAGS}")
   # Build with multiple processes -- speeds up compilation on multi-processor machines.
   SET(CMAKE_CXX_FLAGS "/MP ${CMAKE_CXX_FLAGS}") 
-ENDIF (WIN32 AND MSVC)
+ENDIF(WIN32 AND MSVC)
 
 
 ###########################################
@@ -194,12 +204,12 @@ SET(QT_MIN_VERSION "4.6.0")
 INCLUDE(FindQt4)
 #SET(QT_USE_FILE ${CMAKE_CURRENT_SOURCE_DIR}/CMake/UseQt4.cmake)
 
-IF (QT_FOUND)
+IF(QT_FOUND)
   SET(QT_USE_QTOPENGL 1)
   INCLUDE(${QT_USE_FILE})
-ELSE (QT_FOUND)
+ELSE(QT_FOUND)
   MESSAGE(FATAL_ERROR "QT ${QT_MIN_VERSION} or later is required for building Seg3D")
-ENDIF (QT_FOUND)
+ENDIF(QT_FOUND)
 
 ENDIF(SEG3D_BUILD_INTERFACE)
 
