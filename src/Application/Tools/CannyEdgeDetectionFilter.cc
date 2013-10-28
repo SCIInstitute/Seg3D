@@ -48,9 +48,9 @@ CannyEdgeDetectionFilter::CannyEdgeDetectionFilter( const std::string& toolid ) 
   SingleTargetTool( Core::VolumeType::DATA_E, toolid )
 {
   // Need to set ranges and default values for all parameters
-  this->add_state( "blurring_distance", this->blurring_distance_state_, 1.0, 0.0, 10.0, 0.10 );
-  this->add_state( "threshold", this->threshold_state_, 0.0, 0.0, 100.0, 1.0 );
-  
+  this->add_state( "blurring_distupper_thresholdance", this->blurring_distance_state_, 1.0, 0.0, 10.0, 0.10 );
+  this->add_state( "lower_threshold", this->lower_threshold_state_, 0.0, 0.0, 100.0, 1.0 );
+  this->add_state( "upper_threshold", this->upper_threshold_state_, 0.0, 0.0, 100.0, 1.0 );
 }
 
 CannyEdgeDetectionFilter::~CannyEdgeDetectionFilter()
@@ -66,7 +66,8 @@ void CannyEdgeDetectionFilter::execute( Core::ActionContextHandle context )
   ActionCannyEdgeDetectionFilter::Dispatch( context,
     this->target_layer_state_->get(),
     this->blurring_distance_state_->get(),
-    this->threshold_state_->get() );  
+    this->lower_threshold_state_->get(),
+    this->upper_threshold_state_->get() );  
 }
 
 } // end namespace Seg3D

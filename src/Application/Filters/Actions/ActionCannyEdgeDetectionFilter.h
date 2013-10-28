@@ -47,7 +47,8 @@ CORE_ACTION(
   CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "blurring_distance", "2.0", "The distance over which the filter blurs"
     " before computing the gradient." )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "threshold", "1.0", "Below this threshold the values are replaced with zero." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "lower_threshold", "1.0", "Below this threshold the values are replaced with zero." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "upper_threshold", "1.0", "Below this threshold the values are replaced with zero." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "sandbox", "-1", "The sandbox in which to run the action." )
   CORE_ACTION_ARGUMENT_IS_NONPERSISTENT( "sandbox" )  
   CORE_ACTION_CHANGES_PROJECT_DATA()
@@ -61,7 +62,8 @@ public:
     // Action arguments
     this->add_layer_id( this->target_layer_ );
     this->add_parameter( this->blurring_distance_ );
-    this->add_parameter( this->threshold_ );
+    this->add_parameter( this->lower_threshold_ );
+    this->add_parameter( this->upper_threshold_ );
     this->add_parameter( this->sandbox_ );
   }
   
@@ -75,7 +77,8 @@ private:
 
   std::string target_layer_;
   double blurring_distance_;
-  double threshold_;
+  double lower_threshold_;
+  double upper_threshold_;
   SandboxID sandbox_;
 
   // -- Dispatch this action from the interface --
@@ -85,7 +88,7 @@ public:
   // Create and dispatch action that inserts the new layer 
   static void Dispatch( Core::ActionContextHandle context, 
     std::string target_layer, double blurring_distance,
-    double threshold );
+    double lower_threshold, double upper_threshold );
           
 };
   

@@ -43,8 +43,6 @@ SET(APPLICATION_LAYER_SRCS
   DataLayer.cc
   MaskLayer.h
   MaskLayer.cc
-  LabelLayer.h
-  LabelLayer.cc
   LayerAvailabilityNotifier.h
   LayerAvailabilityNotifier.cc
   LayerManager.h

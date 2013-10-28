@@ -57,6 +57,8 @@ SET(APPLICATION_LAYERIO_ACTIONS_SRCS
   Actions/ActionExportLayer.cc
   Actions/ActionExportSegmentation.h
   Actions/ActionExportSegmentation.cc
+  Actions/ActionExportIsosurface.h
+  Actions/ActionExportIsosurface.cc
   Actions/ActionImportLayer.h
   Actions/ActionImportLayer.cc
   Actions/ActionImportSeries.h
@@ -68,8 +70,8 @@ SET(APPLICATION_LAYERIO_IMPORTERS_SRCS
   ITKLayerImporter.cc
   ITKSeriesLayerImporter.h
   ITKSeriesLayerImporter.cc
-  #Matlab73LayerImporter.h
-  #Matlab73LayerImporter.cc
+  Matlab73LayerImporter.h
+  Matlab73LayerImporter.cc
   MatlabLayerImporter.h
   MatlabLayerImporter.cc
   MRCLayerImporter.h
@@ -118,7 +120,7 @@ TARGET_LINK_LIBRARIES(Application_LayerIO
           Application_Layer
           ${SCI_BOOST_LIBRARY}
           ${SCI_GDCM_LIBRARY}
-          #${SCI_HDF5_LIBRARY}
+          ${SCI_HDF5_LIBRARY}
           ${SCI_MATLABIO_LIBRARY}
           ${SCI_MRC2000IO_LIBRARY})
 

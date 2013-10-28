@@ -135,7 +135,10 @@ QPushButton:pressed{
     <widget class="QtUtils::QtSliderDoubleCombo" name="blurring_distance_" native="true"/>
    </item>
    <item>
-    <widget class="QtUtils::QtSliderDoubleCombo" name="threshold_" native="true"/>
+    <widget class="QtUtils::QtSliderDoubleCombo" name="upper_threshold_" native="true"/>
+   </item>
+   <item>
+    <widget class="QtUtils::QtSliderDoubleCombo" name="lower_threshold_" native="true"/>
    </item>
    <item>
     <widget class="QWidget" name="replaceRunWidget" native="true">

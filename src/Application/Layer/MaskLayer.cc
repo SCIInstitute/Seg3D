@@ -113,6 +113,9 @@ void MaskLayerPrivate::initialize_states()
   // == Keep track of the calculated volume and put it in the UI
   this->layer_->add_state( "counted_pixels", this->layer_->counted_pixels_state_, "N/A" );
 
+  this->layer_->add_state( "min", this->layer_->min_value_state_, std::numeric_limits< double >::quiet_NaN() );
+  this->layer_->add_state( "max", this->layer_->max_value_state_, std::numeric_limits< double >::quiet_NaN() );
+
   this->update_mask_info();
 }
 
@@ -132,6 +135,17 @@ void MaskLayerPrivate::update_mask_info()
 {
   this->layer_->centering_state_->set( 
     this->layer_->get_grid_transform().get_originally_node_centered() ? "node" : "cell" );
+
+  if (! this->mask_volume_ ||
+      ! this->mask_volume_->is_valid() )
+  {
+    this->layer_->min_value_state_->set( std::numeric_limits< double >::quiet_NaN() );
+    this->layer_->max_value_state_->set( std::numeric_limits< double >::quiet_NaN() );
+    return;
+  }
+  
+  this->layer_->min_value_state_->set( this->mask_volume_->get_min() );
+  this->layer_->max_value_state_->set( this->mask_volume_->get_max() );
 }
 
 MaskLayer::MaskLayer( const std::string& name, const Core::MaskVolumeHandle& volume ) :
@@ -329,6 +343,7 @@ bool MaskLayer::post_load_states( const Core::StateIO& state_io )
       grid_transform, mask_data_block ) );
     this->add_connection( this->private_->mask_volume_->get_mask_data_block()->mask_updated_signal_.
       connect( boost::bind( &MaskLayerPrivate::handle_mask_data_changed, this->private_ ) ) );
+    this->private_->update_mask_info();
   }
 
   // If the layer didn't have a valid provenance ID, generate one

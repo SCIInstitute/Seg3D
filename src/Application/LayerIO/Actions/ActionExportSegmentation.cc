@@ -45,67 +45,86 @@ namespace Seg3D
 
 bool ActionExportSegmentation::validate( Core::ActionContextHandle& context )
 {
-  if( this->mode_ == "data" )
+  if ( this->mode_ == "data" )
   {
     context->report_error( std::string( "You cannot export data as a segmention." ) );
     return false;
-  } 
+  }
   
-  if( this->layers_ != "" )
+  if ( this->layers_ != "" )
   {
     std::vector< std::string > layer_vector;
     Core::ImportFromString( this->layers_, layer_vector );
     
     std::vector< LayerHandle > layer_handles;
-
-    for( size_t i = 0; i < layer_vector.size(); ++i )
+    
+    for ( size_t i = 0; i < layer_vector.size(); ++i )
     {
       LayerHandle temp_handle = LayerManager::Instance()->find_layer_by_id( layer_vector[ i ] );
-      if( !temp_handle )
+
+      if ( ! temp_handle )
       {
         context->report_error( std::string( "No valid layer ids were given" ) );
         return false;
       }
-      else layer_handles.push_back( temp_handle );
+      
+      if ( temp_handle->get_type() == Core::VolumeType::MASK_E )
+      {
+        layer_handles.push_back( temp_handle );
+      }
+      else
+      {
+        context->report_error("ExportSegmentation exports mask layers to file. Use ExportLayer for data layers.");
+        return false;
+      }
     }
-
-    if( this->extension_ == ".nrrd" )
+    
+    if ( this->extension_ == ".nrrd" )
     {
-      if( ! LayerIO::Instance()->create_exporter( this->layer_exporter_, layer_handles, 
-        "NRRD Exporter", this->extension_ ) )
+      if ( ! LayerIO::Instance()->create_exporter( this->layer_exporter_, layer_handles,
+                                                  "NRRD Exporter", this->extension_ ) )
       {
         context->report_error( "Could not create NRRD exporter." );
         return false;
       }
     }
-    else if( this->extension_ == ".mat" )
+    else if ( this->extension_ == ".mat" )
     {
-      if( ! LayerIO::Instance()->create_exporter( this->layer_exporter_, layer_handles, 
-        "Matlab Exporter", this->extension_ ) )
+      if( ! LayerIO::Instance()->create_exporter( this->layer_exporter_, layer_handles,
+                                                 "Matlab Exporter", this->extension_ ) )
       {
         context->report_error( "Could not create Matlab exporter." );
         return false;
       }
     }
+    else if ( this->extension_ == ".mrc" )
+    {
+      if( ! LayerIO::Instance()->create_exporter( this->layer_exporter_, layer_handles,
+                                                 "MRC Exporter", this->extension_ ) )
+      {
+        context->report_error( "Could not create MRC2000 exporter." );
+        return false;
+      }
+    }
     else
     {
-      if( ! LayerIO::Instance()->create_exporter( this->layer_exporter_, layer_handles, 
-        "ITK Mask Exporter", this->extension_ ) )
+      if( ! LayerIO::Instance()->create_exporter( this->layer_exporter_, layer_handles,
+                                                 "ITK Mask Exporter", this->extension_ ) )
       {
         context->report_error( "Could not create ITK exporter." );
         return false;
       }
-    } 
-  } 
-
+    }
+  }
+  
   boost::filesystem::path segmentation_path( this->file_path_ );
   if ( !( boost::filesystem::exists ( segmentation_path.parent_path() ) ) )
   {
     context->report_error( std::string( "The path '" ) + this->file_path_ +
-      "' does not exist." );
+                          "' does not exist." );
     return false;
   }
-
+  
   return true; // validated
 }
 
@@ -123,7 +142,7 @@ bool ActionExportSegmentation::run( Core::ActionContextHandle& context, Core::Ac
   filename_without_extension = filename_without_extension.substr( 0, 
     filename_without_extension.find_last_of( "." ) );
 
-  if( this->mode_ == "single_mask" )
+  if ( this->mode_ == "single_mask" )
   {
     this->layer_exporter_->export_layer(  this->mode_, filename_and_path.string(), "unused" );
 

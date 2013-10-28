@@ -113,7 +113,7 @@ public:
   /// Seg3D Renderer. 
   void redraw( bool use_colormap );
 
-  // EXPORT_ISOSURFACE:
+  // EXPORT_LEGACY_ISOSURFACE:
   /// Write points to .pts file, faces to .fac file, and values (if assigned) to .val file.  
   /// Returns true on success, false on failure.
   ///
@@ -136,7 +136,11 @@ public:
   /// ...
   ///
   /// Note: can't call this function "export" because it is reserved by the Visual C++ compiler.
-  bool export_isosurface( const boost::filesystem::path& path, const std::string& file_prefix ); 
+  bool export_legacy_isosurface( const boost::filesystem::path& path, const std::string& file_prefix ); 
+
+  // EXPORT_ISOSURFACE:
+  /// Writes out an isosurface in VTK mesh format
+  bool export_vtk_isosurface( const boost::filesystem::path& filename );
 
   typedef boost::signals2::signal< void (double) > update_progress_signal_type;
 

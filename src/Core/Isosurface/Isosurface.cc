@@ -1929,7 +1929,7 @@ void Isosurface::compute( double quality_factor, bool capping_enabled,
   this->update_progress_signal_( 1.0 );
 
   // Test code
-  //this->export_isosurface( "", "test_isosurface" );
+  // this->export_legacy_isosurface( "", "test_isosurface" );
 }
 
 const std::vector< PointF >& Isosurface::get_points() const
@@ -2115,7 +2115,7 @@ void Isosurface::redraw( bool use_colormap )
   } 
 }
 
-bool Isosurface::export_isosurface( const boost::filesystem::path& path, 
+bool Isosurface::export_legacy_isosurface( const boost::filesystem::path& path, 
   const std::string& file_prefix )
 {
   lock_type lock( this->get_mutex() );
@@ -2169,6 +2169,50 @@ bool Isosurface::export_isosurface( const boost::filesystem::path& path,
 
   return true;
 }
+
+
+bool Isosurface::export_vtk_isosurface( const boost::filesystem::path& filename )
+{
+  lock_type lock( this->get_mutex() );
+
+  std::ofstream vtk_file( filename.string().c_str() );
+  if( !vtk_file.is_open() ) 
+  {
+    return false;
+  }
+
+  // Legacy VTK file format (http://vtk.org/VTK/img/file-formats.pdf)
+  //
+  // write header
+  vtk_file << "# vtk DataFile Version 3.0\n";
+  vtk_file << "vtk output\n";
+
+  vtk_file << "ASCII\n";
+  vtk_file << "DATASET POLYDATA\n";
+  vtk_file << "POINTS " << this->private_->points_.size() << " float\n";
+
+  for( size_t i = 0; i < this->private_->points_.size(); i++ )
+  {
+    PointF pt = this->private_->points_[ i ];
+    vtk_file << pt.x() << " " << pt.y() << " " << pt.z() << std::endl; 
+  }
+
+  unsigned int num_triangles = this->private_->faces_.size() / 3;
+  unsigned int triangle_list_size = num_triangles * 4;
+
+  vtk_file << "\nPOLYGONS " << num_triangles << " " << triangle_list_size << std::endl;
+
+  for( size_t i = 0; i + 2 < this->private_->faces_.size(); i += 3 )
+  {
+    vtk_file << "3 " << this->private_->faces_[ i ] << " " << this->private_->faces_[ i + 1 ] << " " 
+      << this->private_->faces_[ i + 2 ] << std::endl; 
+  }
+
+  vtk_file.close();
+
+  return true;
+}
+
 
 float Isosurface::surface_area() const
 {

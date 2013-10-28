@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_LAYERIO_ACTIONS_ACTIONEXPORTSEGMENTATION_H
-#define APPLICATION_LAYERIO_ACTIONS_ACTIONEXPORTSEGMENTATION_H
+#ifndef APPLICATION_LAYERIO_ACTIONS_ACTIONEXPORTISOSURFACE_H
+#define APPLICATION_LAYERIO_ACTIONS_ACTIONEXPORTISOSURFACE_H
 
 // Core includes
 #include <Core/Action/Actions.h>
@@ -38,28 +38,22 @@
 namespace Seg3D
 {
   
-class ActionExportSegmentation : public Core::Action
+class ActionExportIsosurface : public Core::Action
 {
 
 CORE_ACTION( 
-  CORE_ACTION_TYPE( "ExportSegmentation", "This action exports one or more mask layers to file.")
-  CORE_ACTION_ARGUMENT( "layers", "A '|' delimited list of layers that are to be exported." )
+  CORE_ACTION_TYPE( "ExportIsosurface", "This action exports an isosurface to file.")
+  CORE_ACTION_ARGUMENT( "layer", "layer to be exported." )
   CORE_ACTION_ARGUMENT( "file_path", "A path, including the name of the file where the layer should be exported to." )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "mode", "single_mask", "The mode to use: single_mask, bitplane_mask, or label_mask.")
-  CORE_ACTION_OPTIONAL_ARGUMENT( "extension", ".nrrd", "Optional extension for a specific exporter. (default is .nrrd)" )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "exporter", "", "Optional name for a specific exporter." )
   CORE_ACTION_CHANGES_PROJECT_DATA()
 )
 
   // -- Constructor/Destructor --
 public:
-  ActionExportSegmentation()
+  ActionExportIsosurface()
   {
-    this->add_parameter( this->layers_ );
+    this->add_parameter( this->layer_ );
     this->add_parameter( this->file_path_ );
-    this->add_parameter( this->mode_ );
-    this->add_parameter( this->extension_ );
-    this->add_parameter( this->exporter_ );
   }
 
   // -- Functions that describe action --
@@ -81,33 +75,19 @@ public:
 
   // -- Action parameters --
 private:
+
   // Where the layer should be exported
   std::string file_path_;
   
-  // How should the file be exported
-  std::string mode_;
-  
-  // Which type of exporter should we use
-  std::string exporter_;
-  
-  // The layers to be exported
-  std::string layers_;
-
-  std::string extension_;
-  
-  // Short cut to the layer exporter that has already loaded the data if the file
-  // was read through the GUI
-  LayerExporterHandle layer_exporter_;
+  // The layer to be exported
+  std::string layer_;
   
   // -- Dispatch this action from the interface --
 public:
 
   // DISPATCH:
-  static void Dispatch( Core::ActionContextHandle context, const LayerExporterHandle& exporter, 
-    const std::string& mode, const std::string& file_path, std::string extension = ".nrrd" );
-  
-  static void Dispatch( Core::ActionContextHandle context, const std::string& layer_id, 
-    const std::string& mode, const std::string& file_path, std::string extension = ".nrrd" );
+    static void Dispatch( Core::ActionContextHandle context, const std::string& layer_id, 
+      const std::string& file_path );
       
 };
   

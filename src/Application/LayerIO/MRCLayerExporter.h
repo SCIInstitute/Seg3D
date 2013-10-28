@@ -3,7 +3,7 @@
  
  The MIT License
  
- Copyright (c) 2011 Scientific Computing and Imaging Institute,
+ Copyright (c) 2013 Scientific Computing and Imaging Institute,
  University of Utah.
  
  
@@ -53,9 +53,7 @@ namespace Seg3D
     MRCLayerExporter( std::vector< LayerHandle >& layers );
     
     /// Virtual destructor for memory management of derived classes
-    virtual ~MRCLayerExporter()
-    {
-    }
+    virtual ~MRCLayerExporter() {}
     
     // --Import the data as a specific type --  
   public: 
@@ -72,7 +70,9 @@ namespace Seg3D
     
   private:
     bool export_mrc(  const std::string& file_path );
-    
+    bool export_single_masks( const std::string& file_path );
+    bool export_mask_label( const std::string& file_path );
+
   private:
     std::vector< double > label_values_;
   };

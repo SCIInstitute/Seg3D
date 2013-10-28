@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>850</width>
-    <height>676</height>
+    <height>738</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -74,8 +74,8 @@ QWidget#scrollAreaWidgetContents_4{
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>415</width>
-              <height>651</height>
+              <width>446</width>
+              <height>703</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_13">
@@ -1001,14 +1001,14 @@ QWidget#scrollAreaWidgetContents_4{
               </widget>
              </item>
              <item>
-              <widget class="QWidget" name="widget_63" native="true">
+              <widget class="QWidget" name="widget_65" native="true">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
-               <layout class="QVBoxLayout" name="verticalLayout_6">
+               <layout class="QVBoxLayout" name="verticalLayout_15">
                 <property name="spacing">
                  <number>0</number>
                 </property>
@@ -1132,6 +1132,113 @@ QWidget#scrollAreaWidgetContents_4{
              </item>
              <item>
               <widget class="Line" name="line_7">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QWidget" name="widget_63" native="true">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_6">
+                <property name="spacing">
+                 <number>0</number>
+                </property>
+                <property name="leftMargin">
+                 <number>4</number>
+                </property>
+                <property name="topMargin">
+                 <number>2</number>
+                </property>
+                <property name="rightMargin">
+                 <number>4</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>4</number>
+                </property>
+                <item>
+                 <widget class="QLabel" name="label_118">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Slice View -</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_66" stretch="2,1">
+                  <property name="spacing">
+                   <number>4</number>
+                  </property>
+                  <property name="leftMargin">
+                   <number>10</number>
+                  </property>
+                  <item>
+                   <widget class="QLabel" name="label_119">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>Pan:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_121">
+                    <property name="text">
+                     <string>SHIFT + Left Mouse Button</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_67" stretch="2,1">
+                  <property name="spacing">
+                   <number>4</number>
+                  </property>
+                  <property name="leftMargin">
+                   <number>10</number>
+                  </property>
+                  <item>
+                   <widget class="QLabel" name="label_120">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>Zoom:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_122">
+                    <property name="text">
+                     <string>SHIFT + Right Mouse Button</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item>
+              <widget class="Line" name="line_8">
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
                </property>
@@ -1307,8 +1414,8 @@ QWidget#scrollAreaWidgetContents_4{
             <property name="geometry">
              <rect>
               <x>0</x>
-              <y>0</y>
-              <width>398</width>
+              <y>-98</y>
+              <width>430</width>
               <height>698</height>
              </rect>
             </property>
@@ -2819,8 +2926,8 @@ QWidget#scrollAreaWidgetContents_4{
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>415</width>
-              <height>158</height>
+              <width>445</width>
+              <height>148</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_8">

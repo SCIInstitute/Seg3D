@@ -1790,7 +1790,7 @@ std::string MeasurementTool::convert_world_to_unit_string( double world_value )
 		// Index units
 
 		// Use same formatting policy as status bar for coordinates
-		if( 10000 < unit_value ) 
+		if( ( 0.0 < unit_value && unit_value < 0.0001 ) || 10000 < unit_value ) 
 		{
 			use_scientific = true;
 		}

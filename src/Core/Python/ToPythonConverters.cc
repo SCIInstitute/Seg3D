@@ -81,6 +81,7 @@ T GetValueFromVarient( const Core::Variant& v )
 {
   T result;
   bool succeed = const_cast< Core::Variant& >( v ).get< T >( result );
+  // TODO: replace with exception
   assert( succeed );
   return result;
 }
@@ -156,6 +157,8 @@ void RegisterToPythonConverters()
     StdVectorToListConverter< bool >, true >();
   boost::python::to_python_converter< std::vector< double >,
     StdVectorToListConverter< double >, true >();
+  boost::python::to_python_converter< std::vector< Core::Point >,
+    StdVectorToListConverter< Core::Point >, true >();
 
   boost::python::to_python_converter< Core::Color,
     TripleToListConverter< Core::Color >, true >();

@@ -205,6 +205,7 @@ SegmentationSelectionPage::SegmentationSelectionPage( SegmentationPrivateHandle 
   this->private_->export_selector_ = new QComboBox( this->private_->bitmap_widget_ );
   this->private_->export_selector_->addItem( QString::fromUtf8( ".nrrd" ) );
   this->private_->export_selector_->addItem( QString::fromUtf8( ".mat" ) );
+  this->private_->export_selector_->addItem( QString::fromUtf8( ".mrc" ) );
   this->private_->export_selector_->addItem( QString::fromUtf8( ".tiff" ) );
   this->private_->export_selector_->addItem( QString::fromUtf8( ".bmp" ) );
   this->private_->export_selector_->addItem( QString::fromUtf8( ".png" ) );
@@ -437,6 +438,9 @@ void SegmentationSummaryPage::initializePage()
   
   bool save_as_single_file = this->private_->single_file_radio_button_->isChecked();
   
+  // TODO: creates new mask layer widget for background -> where should underlying mask layer be created?
+  // Alternatively, don't put new mask layer widget in vector passed to action (is this possible???)
+  
   // insert the background layer settings
   if( save_as_single_file )
   {
@@ -480,7 +484,7 @@ bool SegmentationSummaryPage::validatePage()
   
   std::vector< LayerHandle > layers;
   std::vector< double > values;
-  for( int i = 0; i < this->private_->masks_.size(); ++i )
+  for ( int i = 0; i < this->private_->masks_.size(); ++i )
   {
     layers.push_back( LayerManager::Instance()->find_layer_by_name( 
       this->private_->masks_[ i ]->get_label().toStdString() ) );
@@ -491,35 +495,38 @@ bool SegmentationSummaryPage::validatePage()
   bool result = false;
   std::string extension = this->private_->export_selector_->currentText().toStdString();
     
-    if( extension == ".mat" )
+  if ( extension == ".mat" )
   {
     result = LayerIO::Instance()->create_exporter( exporter, layers, "Matlab Exporter", extension );
   }
-  else if( extension == ".nrrd" )
+  else if ( extension == ".nrrd" )
   {
     result = LayerIO::Instance()->create_exporter( exporter, layers, "NRRD Exporter", extension );
+  }
+  else if ( extension == ".mrc" )
+  {
+    result = LayerIO::Instance()->create_exporter( exporter, layers, "MRC Exporter", extension );
   }
   else
   {
     result = LayerIO::Instance()->create_exporter( exporter, layers, "ITK Mask Exporter", extension );
   }
   
-  if( !result )
+  if ( !result )
   {
-    std::string error_message = std::string("ERROR: No importer is available for file '") + 
+    std::string error_message = std::string("ERROR: No exporter is available for file '") + 
       this->private_->file_name_ + std::string("'.");
 
     QMessageBox message_box( this );
-    message_box.setWindowTitle( "Import Layer..." );
+    message_box.setWindowTitle( "Export Layer..." );
     message_box.addButton( QMessageBox::Ok );
     message_box.setIcon( QMessageBox::Critical );
     message_box.setText( QString::fromStdString( error_message ) );
     message_box.exec();
     return false;
-  
   }
 
-  if( this->private_->single_file_radio_button_->isChecked() )
+  if ( this->private_->single_file_radio_button_->isChecked() )
   { 
     exporter->set_label_layer_values( values );
     ActionExportSegmentation::Dispatch( Core::Interface::GetWidgetActionContext(), exporter,
