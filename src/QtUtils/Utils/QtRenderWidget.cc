@@ -337,10 +337,6 @@ void QtRenderWidget::saveComposite(const std::string& name)
 
 void QtRenderWidget::mouseReleaseEvent( QMouseEvent * event )
 {
-  saveSceneOnly("/tmp/scene.png");
-  saveOverlayOnly("/tmp/overlay.png");
-  saveComposite("/tmp/composite.png");
-
   this->private_->mouse_history_.previous_ = this->private_->mouse_history_.current_;
   this->private_->mouse_history_.current_.x_ = event->x();
   this->private_->mouse_history_.current_.y_ = event->y();
