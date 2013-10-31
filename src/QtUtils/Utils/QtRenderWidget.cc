@@ -261,8 +261,86 @@ void QtRenderWidget::mousePressEvent( QMouseEvent * event )
       event->modifiers() );
 }
 
+void QtRenderWidget::saveTexture(const std::string& name, Core::Texture2DHandle texture)
+{
+  Core::Texture::lock_type texture_lock( texture->get_mutex() );
+
+  texture->enable();
+
+  int width = 0;
+  int height = 0;
+  glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &width);
+  glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &height);
+
+  // Build images.
+  QImage image(width, height, QImage::Format_RGB32);
+  GLubyte *buffer = new GLubyte[width * height * 4];
+
+  // Grab OpenGL Image.
+  glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+
+  // We extracted RGBA from OpenGL, but QImage expects ARGB.
+  QRgb value;
+  for (int y = 0; y < height; y++)
+  {
+    for (int x = 0; x < width; x++)
+    {
+      int offset = ((y * width) + x) * 4;
+      int r = buffer[offset + 0];
+      int g = buffer[offset + 1];
+      int b = buffer[offset + 2];
+      int a = buffer[offset + 3];
+
+      value = qRgb(r,g,b);
+      image.setPixel(x,y,value);
+    }
+  }
+
+  // Delete the OpenGL buffer.
+  delete []buffer;
+
+  // Flip the image vertically. OpenGL's coordinate system starts in the bottom
+  // left corner instead of the upper left corner.
+  QImage mirrored = image.mirrored(false, true);
+
+  // Save the image.
+  mirrored.save(name.c_str());
+
+  texture->disable();
+}
+
+void QtRenderWidget::saveSceneOnly(const std::string& name)
+{
+  Core::Texture2DHandle texture = this->private_->viewer_->get_texture();
+  if (texture)
+  {
+    saveTexture(name, texture);
+  }
+}
+
+void QtRenderWidget::saveOverlayOnly(const std::string& name)
+{
+  Core::Texture2DHandle overlay_texture = this->private_->viewer_->get_overlay_texture();
+  if (overlay_texture)
+  {
+    saveTexture(name, overlay_texture);
+  }
+}
+
+void QtRenderWidget::saveComposite(const std::string& name)
+{
+  // Force a normal rendering (compositing) of the two textures.
+  glDraw();
+  QImage img = grabFrameBuffer();
+  img.save(name.c_str());
+}
+
 void QtRenderWidget::mouseReleaseEvent( QMouseEvent * event )
 {
+  saveSceneOnly("/tmp/scene.png");
+  saveOverlayOnly("/tmp/overlay.png");
+  saveComposite("/tmp/composite.png");
+
   this->private_->mouse_history_.previous_ = this->private_->mouse_history_.current_;
   this->private_->mouse_history_.current_.x_ = event->x();
   this->private_->mouse_history_.current_.y_ = event->y();
