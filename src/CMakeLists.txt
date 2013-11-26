@@ -43,6 +43,11 @@ PROJECT(Seg3D)
 ###########################################
 
 INCLUDE( CTest )
+IF(BUILD_TESTING)
+  ENABLE_TESTING()
+  INCLUDE(CMake/RegisterUnitTest.cmake)
+  INCLUDE_DIRECTORIES( ${SCI_GTEST_INCLUDE} )
+ENDIF(BUILD_TESTING)
 
 ###########################################
 # Verify build directory
