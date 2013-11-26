@@ -3,7 +3,7 @@
 
  The MIT License
 
- Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ Copyright (c) 2013 Scientific Computing and Imaging Institute,
  University of Utah.
 
 
@@ -49,6 +49,10 @@ bool CreateOrIgnoreDirectory( const boost::filesystem::path& dir_path );
 /// Copy a directory recursively.
 /// Returns true on success, otherwise false.
 bool RecursiveCopyDirectory( const boost::filesystem::path& from, const boost::filesystem::path& to );
+
+// GETFULLEXTENSION
+/// Detect and return file extension with multiple components (compressed, usually).
+std::string GetFullExtension( const boost::filesystem::path& filename );
 
 } // end namespace Core
 
