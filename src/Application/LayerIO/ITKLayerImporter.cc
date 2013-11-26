@@ -49,6 +49,7 @@
 #include <Core/DataBlock/ITKImageData.h>
 #include <Core/DataBlock/ITKDataBlock.h>
 #include <Core/Volume/DataVolume.h>
+#include <Core/Utils/FilesystemUtil.h>
 
 // Application includes
 #include <Application/LayerIO/ITKLayerImporter.h>
@@ -102,7 +103,8 @@ public:
   // IMPORT_SIMPLE_VOLUME:
   // Import the volume in its final format by choosing the right format
   template< class ItkImporterType >
-  bool import_simple_volume();  
+  bool import_simple_volume();
+
   
 public:
   // File type that we are importing
@@ -122,6 +124,38 @@ public:
   
   // Whether the data was read
   bool read_data_;
+
+public:
+  // file type detection helpers
+  bool detect_tiff( const std::string& extension )
+  {
+    return ( extension == ".tif" || extension == ".tiff" || extension == ".stk" );
+  }
+
+  bool detect_vtk( const std::string& extension )
+  {
+    return extension == ".vtk";
+  }
+
+  bool detect_lsm( const std::string& extension )
+  {
+    return extension == ".lsm";
+  }
+
+  bool detect_analyze( const std::string& extension )
+  {
+    return ( extension == ".img" || extension == ".hdr" );
+  }
+  
+  bool detect_nifti( const std::string& extension )
+  {
+    return ( extension == ".nii" || extension == ".nii.gz" );
+  }
+
+  bool detect_metaimage( const std::string& extension )
+  {
+    return ( extension == ".mha" || extension == ".mhd" );
+  }
 };
 
 Core::DataType ITKLayerImporterPrivate::convert_data_type( std::string& type )
@@ -226,40 +260,39 @@ bool ITKLayerImporterPrivate::read_header()
   // Get the extension to see which reader to use
   // NOTE: We spell them out so we can read the header data returned by the IO class.
   boost::filesystem::path full_filename( this->importer_->get_filename() );
-  std::string extension = boost::to_lower_copy( boost::filesystem::extension( full_filename ) );
+  std::string extension = Core::GetFullExtension( full_filename );
 
   // Set file type and scan the file for data type and transform
-  if ( extension == ".tif" || extension == ".tiff" || extension == ".stk" )
+  if ( detect_tiff(extension) )
   {
     this->file_type_ = "tiff";
     return this->scan_simple_volume< itk::TIFFImageIO >();
   }
-  else if( extension == ".vtk"  )
+  else if ( detect_vtk( extension ) )
   {
     this->file_type_ = "VTK";
     return this->scan_simple_volume< itk::VTKImageIO >();
   }
-  else if( extension == ".lsm"  )
+  else if ( detect_lsm( extension ) ) 
   {
     this->file_type_ = "LSM";
     return this->scan_simple_volume< itk::LSMImageIO >();
   }
-  else if( extension == ".img" || extension == ".hdr" )
+  else if ( detect_analyze( extension ) ) 
   {
     this->file_type_ = "Analyze";
     return this->scan_simple_volume< itk::AnalyzeImageIO >();
   } 
-  else if( extension == ".nii" )
+  else if ( detect_nifti( extension ) ) 
   {
     this->file_type_ = "NIfTY";
     return this->scan_simple_volume< itk::NiftiImageIO >();
   } 
-  else if( extension == ".mha" || extension == ".mhd" )
+  else if ( detect_metaimage( extension ) )
   {
     this->file_type_ = "MetaIO";
     return this->scan_simple_volume< itk::MetaImageIO >();
   }   
-  
   this->importer_->set_error( "Unknown file format." );
   return false; 
 }
@@ -364,29 +397,29 @@ bool ITKLayerImporterPrivate::read_data()
   
   // Get the extension of the file
   boost::filesystem::path full_filename( this->importer_->get_filename() );
-  std::string extension = boost::to_lower_copy( boost::filesystem::extension( full_filename ) );
+  std::string extension = Core::GetFullExtension( full_filename );
 
-  if ( extension == ".tif" || extension == ".tiff" || extension == ".stk" )
+  if ( detect_tiff(extension) )
   {
     return this->import_simple_volume<itk::TIFFImageIO>();
   }
-  else if ( extension == ".vtk"  )
+  else if ( detect_vtk( extension ) )
   {
     return this->import_simple_volume<itk::VTKImageIO>();
   } 
-  else if( extension == ".lsm"  ) 
+  else if ( detect_lsm( extension ) ) 
   {
     return this->import_simple_volume<itk::LSMImageIO>();
   } 
-  else if( extension == ".img"  || extension == ".hdr" )  
+  else if ( detect_analyze( extension ) ) 
   {
     return this->import_simple_volume<itk::AnalyzeImageIO>();
   } 
-  else if( extension == ".nii" )  
+  else if ( detect_nifti( extension ) ) 
   {
     return this->import_simple_volume<itk::NiftiImageIO>();
   } 
-  else if( extension == ".mha" || extension == ".mhd" )
+  else if ( detect_metaimage( extension ) )
   {
     return this->import_simple_volume<itk::MetaImageIO>();    
   }
