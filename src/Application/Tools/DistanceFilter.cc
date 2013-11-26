@@ -31,7 +31,7 @@
 #include <Application/Layer/Layer.h>
 #include <Application/Layer/LayerManager.h>
 
-// StateEnigne of the tool
+// StateEngine of the tool
 #include <Application/Tools/DistanceFilter.h>
 
 // Action associated with tool

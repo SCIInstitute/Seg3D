@@ -3,7 +3,7 @@
 
  The MIT License
 
- Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ Copyright (c) 2013 Scientific Computing and Imaging Institute,
  University of Utah.
 
 
@@ -27,7 +27,10 @@
  */
 
 // Boost includes
+#include <boost/algorithm/string/case_conv.hpp>
 #include <boost/filesystem.hpp>
+
+#include <sstream>
 
 // Core includes
 #include <Core/Utils/FilesystemUtil.h>
@@ -105,5 +108,22 @@ bool RecursiveCopyDirectory( const boost::filesystem::path& from, const boost::f
 
   return true;
 }
+
+std::string GetFullExtension( const boost::filesystem::path& filename )
+{
+  // NOTE: extension includes the dot
+  std::string extension = boost::to_lower_copy( boost::filesystem::extension( filename ) );
+  
+  // Special case if gzipped (ITK, possibly others...)
+  // TODO: check to see if there's another extension
+  if (extension == ".gz")
+  {
+    std::ostringstream oss;
+    oss << boost::to_lower_copy( boost::filesystem::extension( filename.stem() ) ) << ".gz";
+    return oss.str();
+  }
+  return extension;
+}
+
 
 } // end namespace

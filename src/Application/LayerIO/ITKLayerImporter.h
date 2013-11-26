@@ -59,7 +59,7 @@ class ITKLayerImporter : public LayerSingleFileImporter
 {
   SEG3D_IMPORTER_TYPE( "ITK Importer",".lsm;.LSM;"
                     ".tiff;.tif;.TIFF;.TIF;.stk;.STK;"
-                    ".nii;.img;.hdr;"
+                    ".nii;.nii.gz;.img;.hdr;"
                     ".vtk;.VTK;"
                     ".mha;.mhd", 5 )
 

@@ -34,6 +34,9 @@
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/filesystem.hpp>
 
+// Core includes
+#include <Core/Utils/FilesystemUtil.h>
+
 // Application includes
 #include <Application/LayerIO/LayerIO.h>
 
@@ -147,7 +150,7 @@ bool LayerIO::create_single_file_importer( const std::string& filename,
 
   // Check whether file exists
   boost::filesystem::path full_filename( filename );
-  if ( ! ( boost::filesystem::exists( full_filename.parent_path() ) ) ) 
+  if ( ! boost::filesystem::exists( full_filename.parent_path() ) ) 
   {
     error = std::string( "File '" ) + full_filename.string() + "' does not exist.";
     return false;
@@ -155,7 +158,7 @@ bool LayerIO::create_single_file_importer( const std::string& filename,
 
   // Determine the file extension  
   // NOTE: extension includes the dot
-  std::string extension = boost::to_lower_copy( boost::filesystem::extension( full_filename ) );
+  std::string extension = Core::GetFullExtension( full_filename );
 
   // Lock the factory
   lock_type lock( this->get_mutex() );
@@ -366,7 +369,7 @@ bool LayerIO::create_file_series_importer( const std::vector< std::string >& fil
       }
     }   
     // If none with this extension is found, we look for one that accepts any extension.
-    if ( !importer )
+    if ( ! importer )
     {
       for (size_t j = 0; j < this->private_->file_series_importer_list_.size(); j++ )
       {
@@ -486,7 +489,7 @@ bool LayerIO::FindFileSeries( std::vector<std::string >& filenames )
       return false;
     }
     
-    if( !boost::filesystem::exists( full_filename ) ) return false;
+    if ( ! boost::filesystem::exists( full_filename ) ) return false;
     
     // Step 3: now we want to see if we can figure out the file name pattern.  We will start by
     // checking to see if the sequence numbers are at the end of the file name.  
@@ -512,7 +515,7 @@ bool LayerIO::FindFileSeries( std::vector<std::string >& filenames )
     
     std::vector<std::string> dir_files;
     std::vector< boost::filesystem::path > dir_full_filenames;
-    if( boost::filesystem::exists( full_filename.parent_path() ) )
+    if ( boost::filesystem::exists( full_filename.parent_path() ) )
     {
       boost::filesystem::directory_iterator dir_end;
       for( boost::filesystem::directory_iterator dir_itr( full_filename.parent_path() ); 

@@ -29,6 +29,9 @@
 // Application Includes
 #include <Application/LayerIO/LayerSingleFileImporter.h>
 
+// Core includes
+#include <Core/Utils/FilesystemUtil.h>
+
 namespace Seg3D {
 
 class LayerSingleFileImporterPrivate
@@ -60,7 +63,14 @@ std::vector<std::string> LayerSingleFileImporter::get_filenames() const
 std::string LayerSingleFileImporter::get_file_tag() const
 {
   if ( this->private_->filename_.size() == 0 ) return "";
+
   boost::filesystem::path full_filename( this->private_->filename_ );
+  std::string ext = Core::GetFullExtension( full_filename );
+  if ( boost::filesystem::extension(ext) != "" )
+  {
+    return full_filename.stem().stem().string();
+  }
+
   return full_filename.stem().string();
 }
 
