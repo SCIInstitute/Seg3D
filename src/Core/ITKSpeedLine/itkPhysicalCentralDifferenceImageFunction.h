@@ -42,7 +42,7 @@ template <
 class ITK_EXPORT PhysicalCentralDifferenceImageFunction :
   public ImageFunction< TInputImage, 
                         CovariantVector<double, \
-                        ::itk::GetImageDimension<TInputImage>::ImageDimension>, 
+                        TInputImage::ImageDimension>,
                         TCoordRep >
 {
 public:
