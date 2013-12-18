@@ -268,7 +268,7 @@ bool GDCMLayerImporterPrivate::read_header()
     {
       gdcm::Attribute< 0x0018, 0x0050 > slice_thickness;
       slice_thickness.SetFromDataElement( de );
-      double thickness = slice_thickness.GetValue( 0 );
+      double thickness = slice_thickness.GetValue();
       if ( thickness > epsilon )
       {
         this->z_spacing_ = thickness;
@@ -287,7 +287,7 @@ bool GDCMLayerImporterPrivate::read_header()
     {
       gdcm::Attribute< 0x0018, 0x0088 > slice_thickness;
       slice_thickness.SetFromDataElement( de );
-      double thickness = slice_thickness.GetValue( 0 );
+      double thickness = slice_thickness.GetValue();
       if ( thickness > epsilon )
       {
         this->z_spacing_ = thickness;
