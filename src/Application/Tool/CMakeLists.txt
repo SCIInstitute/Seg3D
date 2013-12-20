@@ -1,4 +1,3 @@
-
 #
 #  For more information, please see: http://software.sci.utah.edu
 # 
@@ -48,24 +47,26 @@ SET(APPLICATION_TOOL_SRCS
   ToolInfo.cc
   ToolInterface.h
   ToolInterface.cc
-  )
+)
 
 SET(APPLICATION_TOOL_ACTIONS_SRCS
   Actions/ActionSaveToolPreferences.h
   Actions/ActionSaveToolPreferences.cc
-  )
+)
 
 CORE_ADD_LIBRARY(Application_Tool ${APPLICATION_TOOL_SRCS} ${APPLICATION_TOOL_ACTIONS_SRCS} )
             
 TARGET_LINK_LIBRARIES(Application_Tool
-                      Core_Utils
-                      Core_Application
-                      Core_Interface
-                      Core_Action
-                      Core_State
-                      ${SCI_BOOST_LIBRARY}
-            ${SCI_TINYXML_LIBRARY}
-                      ${SCI_ITK_LIBRARIES})
+  Core_Utils
+  Core_Application
+  Core_Interface
+  Core_Action
+  Core_State
+  ${SCI_BOOST_LIBRARY}
+  ${SCI_TINYXML_LIBRARY}
+  #${SCI_ITK_LIBRARIES}
+)
                     
 REGISTER_LIBRARY_AND_CLASSES(Application_Tool
-               ${APPLICATION_TOOL_ACTIONS_SRCS})
+  ${APPLICATION_TOOL_ACTIONS_SRCS}
+)

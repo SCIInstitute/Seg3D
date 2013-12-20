@@ -1,4 +1,3 @@
-
 #
 #  For more information, please see: http://software.sci.utah.edu
 # 
@@ -33,10 +32,11 @@
 
 SET(APPLICATION_TOOLS_SHADER_SRCS
   detail/MaskShader.frag
-  )
+)
   
 CORE_IMPORT_SHADER(APPLICATION_TOOLS_SHADER_STRING_SRCS
-          ${APPLICATION_TOOLS_SHADER_SRCS})
+  ${APPLICATION_TOOLS_SHADER_SRCS}
+)
 
 ##################################################
 # Set sources
@@ -146,30 +146,38 @@ IF(BUILD_WITH_PYTHON)
   SET(APPLICATION_TOOLS_NOREGISTER_SRCS ${APPLICATION_TOOLS_NOREGISTER_SRCS} ${PYTHON_WRAPPER})
 ENDIF(BUILD_WITH_PYTHON)
 
+ITK_MODULE_LOAD(ITKCommon)
+
 CORE_ADD_LIBRARY(Application_Tools 
-                 ${APPLICATION_TOOLS_SRCS}
-                 ${APPLICATION_TOOLS_NOREGISTER_SRCS}
-         ${APPLICATION_TOOLS_ACTIONS_SRCS}
-         ${APPLICATION_TOOLS_SHADER_SRCS}
-         ${APPLICATION_TOOLS_SHADER_STRING_SRCS})
-            
+  ${APPLICATION_TOOLS_SRCS}
+  ${APPLICATION_TOOLS_NOREGISTER_SRCS}
+  ${APPLICATION_TOOLS_ACTIONS_SRCS}
+  ${APPLICATION_TOOLS_SHADER_SRCS}
+  ${APPLICATION_TOOLS_SHADER_STRING_SRCS}
+)
+
+INCLUDE_DIRECTORIES(${ITKCommon_INCLUDE_DIRS})
+
 TARGET_LINK_LIBRARIES(Application_Tools
-                      Core_Utils
-                      Core_Application
-                      Core_Interface
-                      Core_Action
-                      Core_State
-            Core_Geometry
-            Application_Clipboard
-            Application_Filters
-                      Application_Tool
-                      Application_ToolManager
-                      ${SCI_BOOST_LIBRARY}
-            ${SCI_ITK_LIBRARIES})
+  Core_Utils
+  Core_Application
+  Core_Interface
+  Core_Action
+  Core_State
+  Core_Geometry
+  Application_Clipboard
+  Application_Filters
+  Application_Tool
+  Application_ToolManager
+  ${SCI_BOOST_LIBRARY}
+  ${ITKCommon_LIBRARIES}
+  #${SCI_ITK_LIBRARIES}
+)
 
 # Register tool classes
 REGISTER_LIBRARY_AND_CLASSES(Application_Tools
-               ${APPLICATION_TOOLS_SRCS}
-               ${APPLICATION_TOOLS_ACTIONS_SRCS})
+  ${APPLICATION_TOOLS_SRCS}
+  ${APPLICATION_TOOLS_ACTIONS_SRCS}
+)
 
                     
