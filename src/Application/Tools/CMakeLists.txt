@@ -1,4 +1,3 @@
-
 #
 #  For more information, please see: http://software.sci.utah.edu
 # 
@@ -27,16 +26,20 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
+
+# Main Seg3D tools and filters
+
 ##################################################
 # Import shaders into source files
 ##################################################
 
 SET(APPLICATION_TOOLS_SHADER_SRCS
   detail/MaskShader.frag
-  )
+)
   
 CORE_IMPORT_SHADER(APPLICATION_TOOLS_SHADER_STRING_SRCS
-          ${APPLICATION_TOOLS_SHADER_SRCS})
+  ${APPLICATION_TOOLS_SHADER_SRCS}
+)
 
 ##################################################
 # Set sources
@@ -119,12 +122,12 @@ SET(APPLICATION_TOOLS_SRCS
   PointSetFilter.cc
   SpeedlineTool.h
   SpeedlineTool.cc
-  )
+)
 
 SET(APPLICATION_TOOLS_NOREGISTER_SRCS
   detail/MaskShader.h
   detail/MaskShader.cc
-  )
+)
   
 SET(APPLICATION_TOOLS_ACTIONS_SRCS
   Actions/ActionPaint.h
@@ -139,7 +142,7 @@ SET(APPLICATION_TOOLS_ACTIONS_SRCS
   Actions/ActionFloodFill.cc
   Actions/ActionSpeedline.h
   Actions/ActionSpeedline.cc
-  )
+)
   
 IF(BUILD_WITH_PYTHON)
   GENERATE_ACTION_PYTHON_WRAPPER(PYTHON_WRAPPER Application_Tools ${APPLICATION_TOOLS_ACTIONS_SRCS})
@@ -147,29 +150,30 @@ IF(BUILD_WITH_PYTHON)
 ENDIF(BUILD_WITH_PYTHON)
 
 CORE_ADD_LIBRARY(Application_Tools 
-                 ${APPLICATION_TOOLS_SRCS}
-                 ${APPLICATION_TOOLS_NOREGISTER_SRCS}
-         ${APPLICATION_TOOLS_ACTIONS_SRCS}
-         ${APPLICATION_TOOLS_SHADER_SRCS}
-         ${APPLICATION_TOOLS_SHADER_STRING_SRCS})
+  ${APPLICATION_TOOLS_SRCS}
+  ${APPLICATION_TOOLS_NOREGISTER_SRCS}
+  ${APPLICATION_TOOLS_ACTIONS_SRCS}
+  ${APPLICATION_TOOLS_SHADER_SRCS}
+  ${APPLICATION_TOOLS_SHADER_STRING_SRCS}
+)
             
 TARGET_LINK_LIBRARIES(Application_Tools
-                      Core_Utils
-                      Core_Application
-                      Core_Interface
-                      Core_Action
-                      Core_State
-            Core_Geometry
-            Application_Clipboard
-            Application_Filters
-                      Application_Tool
-                      Application_ToolManager
-                      ${SCI_BOOST_LIBRARY}
-            ${SCI_ITK_LIBRARIES})
+  Core_Utils
+  Core_Application
+  Core_Interface
+  Core_Action
+  Core_State
+  Core_Geometry
+  Application_Clipboard
+  Application_Filters
+  Application_Tool
+  Application_ToolManager
+  ${SCI_BOOST_LIBRARY}
+  ${SCI_ITK_LIBRARIES}
+)
 
 # Register tool classes
 REGISTER_LIBRARY_AND_CLASSES(Application_Tools
-               ${APPLICATION_TOOLS_SRCS}
-               ${APPLICATION_TOOLS_ACTIONS_SRCS})
-
-                    
+  ${APPLICATION_TOOLS_SRCS}
+  ${APPLICATION_TOOLS_ACTIONS_SRCS}
+)

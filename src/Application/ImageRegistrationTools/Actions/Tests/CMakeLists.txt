@@ -3,7 +3,7 @@
 # 
 #  The MIT License
 # 
-#  Copyright (c) 2009 Scientific Computing and Imaging Institute,
+#  Copyright (c) 2013 Scientific Computing and Imaging Institute,
 #  University of Utah.
 # 
 #  
@@ -26,24 +26,17 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
+SET(APPLICATION_IRTOOLS_ACTIONS_TESTS_SRCS
+  ActionAssembleFilterTests.cc
+  ActionFFTFilterTests.cc
+  ActionRefineTranslateFilterTests.cc
+)
 
-ADD_SUBDIRECTORY(DatabaseManager)
-ADD_SUBDIRECTORY(Filters)
-ADD_SUBDIRECTORY(ImageRegistrationTools)
-ADD_SUBDIRECTORY(InterfaceManager)
-ADD_SUBDIRECTORY(Layer)
-ADD_SUBDIRECTORY(LayerIO)
-ADD_SUBDIRECTORY(PreferencesManager)
-ADD_SUBDIRECTORY(Project)
-ADD_SUBDIRECTORY(ProjectManager)
-ADD_SUBDIRECTORY(Provenance)
-ADD_SUBDIRECTORY(Renderer)
-ADD_SUBDIRECTORY(StatusBar)
-ADD_SUBDIRECTORY(Tool)
-ADD_SUBDIRECTORY(ToolManager)
-ADD_SUBDIRECTORY(Tools)
-ADD_SUBDIRECTORY(Viewer)
-ADD_SUBDIRECTORY(ViewerManager)
-ADD_SUBDIRECTORY(Clipboard)
-ADD_SUBDIRECTORY(UndoBuffer)
-ADD_SUBDIRECTORY(Socket)
+REGISTER_UNIT_TEST(Application_ImageRegistrationTools_Actions_Tests
+  ${APPLICATION_IRTOOLS_ACTIONS_TESTS_SRCS}
+)
+
+TARGET_LINK_LIBRARIES(Application_ImageRegistrationTools_Actions_Tests
+  Application_ImageRegistrationTools
+  ${SCI_GTESTMAIN_LIBRARY}
+)
