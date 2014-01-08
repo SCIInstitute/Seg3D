@@ -470,7 +470,7 @@ bool LayerIO::create_exporter( LayerExporterHandle& exporter, std::vector< Layer
 }
 
 bool LayerIO::FindFileSeries( std::vector<std::string >& filenames )
-{
+{ 
   if ( filenames.size() == 1 )
   {
     // If we are able to create an importer, we then need to figure out which files are part
@@ -494,6 +494,7 @@ bool LayerIO::FindFileSeries( std::vector<std::string >& filenames )
     // Step 3: now we want to see if we can figure out the file name pattern.  We will start by
     // checking to see if the sequence numbers are at the end of the file name.  
     std::string filename = boost::filesystem::basename( full_filename );
+    std::string extension = Core::GetFullExtension( full_filename );
     
     // Create a vector for finding numbers in the filename, for each one we will scan if there
     // is a sequential list available. The next vector denotes from where to where numbers can
@@ -537,15 +538,18 @@ bool LayerIO::FindFileSeries( std::vector<std::string >& filenames )
     {
       size_t start = numbers[ j ].first;
       size_t end = filename.size() - numbers[ j ].second;
-      
+
       std::string filename_prefix = filename.substr( 0, start );
       std::string filename_postfix = filename.substr( filename.size() - end );
       
       std::set<size_t> indices;
       
       for ( size_t k = 0; k < dir_files.size(); k++ )
-      {       
-        if ( dir_files[ k ].substr( 0, start ) == filename_prefix && 
+      {
+        std::string filename_extension = Core::GetFullExtension( dir_full_filenames[ k ] );
+
+        if ( filename_extension == extension &&
+          dir_files[ k ].substr( 0, start ) == filename_prefix &&
           ( dir_files[ k ].size() >= end ) &&
           dir_files[ k ].substr( dir_files[ k ].size() - end ) == filename_postfix )
         {
@@ -584,7 +588,9 @@ bool LayerIO::FindFileSeries( std::vector<std::string >& filenames )
       
       for ( size_t k = 0; k < dir_files.size(); k++ )
       {
-        if ( dir_files[ k ].substr( 0, start ) == filename_prefix && 
+        std::string filename_extension = Core::GetFullExtension( dir_full_filenames[ k ] );
+        if ( filename_extension == extension &&
+          dir_files[ k ].substr( 0, start ) == filename_prefix &&
           dir_files[ k ].size() >= end &&
           dir_files[ k ].substr( dir_files[ k ].size() - end ) == filename_postfix )
         {
@@ -611,7 +617,7 @@ bool LayerIO::FindFileSeries( std::vector<std::string >& filenames )
         filenames[ j ] = old_files[ order[ j ].second ];
       }
       
-      return true;
+      return  true;
     }
     else
     {
