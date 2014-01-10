@@ -24,80 +24,52 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
-*/
+ */
 
-#ifndef CORE_ITKCOMMON_ITKTYPES_H
-#define CORE_ITKCOMMON_ITKTYPES_H
-
-#include <itkPoint.h>
-#include <itkVector.h>
-
-//TODO: namespace!!!
+#include <Core/ITKCommon/BoundingBox.h>
 
 
 //----------------------------------------------------------------
-// pnt2d_t
+// is_empty_bbox
 // 
-// Shorthand for 2D points.
+// Test whether a bounding box is empty (min > max)
 // 
-typedef itk::Point<double, 2> pnt2d_t;
-
-//----------------------------------------------------------------
-// vec2d_t
-// 
-// Shorthand for 2D vectors.
-// 
-typedef itk::Vector<double, 2> vec2d_t;
-
-//----------------------------------------------------------------
-// xyz_t
-//
-// Shorthand for 3D points. This is typically used to represent RGB
-// or HSV colors.
-// 
-typedef itk::Vector<double, 3> xyz_t;
-
-//----------------------------------------------------------------
-// pnt2d
-// 
-// Constructor function for pnt2d_t.
-// 
-inline static const pnt2d_t
-pnt2d(const double & x, const double & y)
+bool
+is_empty_bbox(const pnt2d_t & min,
+              const pnt2d_t & max)
 {
-  pnt2d_t pt;
-  pt[0] = x;
-  pt[1] = y;
-  return pt;
+  return min[0] > max[0] || min[1] > max[1];
 }
 
 //----------------------------------------------------------------
-// vec2d
+// is_singular_bbox
 // 
-// Constructor function for vec2d_t.
+// Test whether a bounding box is singular (min == max)
 // 
-inline static const vec2d_t
-vec2d(const double & x, const double & y)
+bool
+is_singular_bbox(const pnt2d_t & min,
+                 const pnt2d_t & max)
 {
-  vec2d_t vc;
-  vc[0] = x;
-  vc[1] = y;
-  return vc;
+  return min == max;
 }
 
 //----------------------------------------------------------------
-// xyz
-//
-// Constructor function for xyz_t.
+// clamp_bbox
 // 
-inline static xyz_t
-xyz(const double & r, const double & g, const double & b)
+// Restrict a bounding box to be within given limits.
+// 
+void
+clamp_bbox(const pnt2d_t & confines_min,
+           const pnt2d_t & confines_max,
+           pnt2d_t & min,
+           pnt2d_t & max)
 {
-  xyz_t rgb;
-  rgb[0] = r;
-  rgb[1] = g;
-  rgb[2] = b;
-  return rgb;
+  if (!is_empty_bbox(confines_min, confines_max))
+  {
+    min[0] = std::min(confines_max[0], std::max(confines_min[0], min[0]));
+    min[1] = std::min(confines_max[1], std::max(confines_min[1], min[1]));
+    
+    max[0] = std::min(confines_max[0], std::max(confines_min[0], max[0]));
+    max[1] = std::min(confines_max[1], std::max(confines_min[1], max[1]));
+  }
 }
-
-#endif

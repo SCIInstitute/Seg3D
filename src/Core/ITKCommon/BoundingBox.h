@@ -26,78 +26,89 @@
  DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef CORE_ITKCOMMON_ITKTYPES_H
-#define CORE_ITKCOMMON_ITKTYPES_H
+#ifndef CORE_ITKCOMMON_BOUNDINGBOX_H
+#define CORE_ITKCOMMON_BOUNDINGBOX_H
 
 #include <itkPoint.h>
 #include <itkVector.h>
 
-//TODO: namespace!!!
-
-
-//----------------------------------------------------------------
-// pnt2d_t
-// 
-// Shorthand for 2D points.
-// 
-typedef itk::Point<double, 2> pnt2d_t;
+#include <Core/ITKCommon/itkTypes.h>
 
 //----------------------------------------------------------------
-// vec2d_t
+// is_empty_bbox
 // 
-// Shorthand for 2D vectors.
+// Test whether a bounding box is empty (min > max)
 // 
-typedef itk::Vector<double, 2> vec2d_t;
+extern bool
+is_empty_bbox(const pnt2d_t & min,
+              const pnt2d_t & max);
 
 //----------------------------------------------------------------
-// xyz_t
-//
-// Shorthand for 3D points. This is typically used to represent RGB
-// or HSV colors.
+// is_singular_bbox
 // 
-typedef itk::Vector<double, 3> xyz_t;
+// Test whether a bounding box is singular (min == max)
+// 
+extern bool
+is_singular_bbox(const pnt2d_t & min,
+                 const pnt2d_t & max);
 
 //----------------------------------------------------------------
-// pnt2d
+// clamp_bbox
 // 
-// Constructor function for pnt2d_t.
+// Restrict a bounding box to be within given limits.
 // 
-inline static const pnt2d_t
-pnt2d(const double & x, const double & y)
+extern void
+clamp_bbox(const pnt2d_t & confines_min,
+           const pnt2d_t & confines_max,
+           pnt2d_t & min,
+           pnt2d_t & max);
+
+//----------------------------------------------------------------
+// update_bbox
+// 
+// Expand the bounding box to include a given point.
+// 
+inline static void
+update_bbox(pnt2d_t & min, pnt2d_t & max, const pnt2d_t & pt)
 {
-  pnt2d_t pt;
-  pt[0] = x;
-  pt[1] = y;
-  return pt;
+  if (min[0] > pt[0]) min[0] = pt[0];
+  if (min[1] > pt[1]) min[1] = pt[1];
+  if (max[0] < pt[0]) max[0] = pt[0];
+  if (max[1] < pt[1]) max[1] = pt[1];
+}
+
+
+//----------------------------------------------------------------
+// bbox_overlap
+// 
+// Test whether two bounding boxes overlap.
+// 
+inline bool
+bbox_overlap(const pnt2d_t & min_box1, 
+             const pnt2d_t & max_box1, 
+             const pnt2d_t & min_box2,
+             const pnt2d_t & max_box2)
+{
+  return
+  max_box1[0] > min_box2[0] && 
+  min_box1[0] < max_box2[0] &&
+  max_box1[1] > min_box2[1] && 
+  min_box1[1] < max_box2[1];
 }
 
 //----------------------------------------------------------------
-// vec2d
+// inside_bbox
 // 
-// Constructor function for vec2d_t.
+// Test whether a given point is inside the bounding box.
 // 
-inline static const vec2d_t
-vec2d(const double & x, const double & y)
+inline bool
+inside_bbox(const pnt2d_t & min, const pnt2d_t & max, const pnt2d_t & pt)
 {
-  vec2d_t vc;
-  vc[0] = x;
-  vc[1] = y;
-  return vc;
-}
-
-//----------------------------------------------------------------
-// xyz
-//
-// Constructor function for xyz_t.
-// 
-inline static xyz_t
-xyz(const double & r, const double & g, const double & b)
-{
-  xyz_t rgb;
-  rgb[0] = r;
-  rgb[1] = g;
-  rgb[2] = b;
-  return rgb;
+  return
+  min[0] <= pt[0] &&
+  pt[0] <= max[0] &&
+  min[1] <= pt[1] &&
+  pt[1] <= max[1];
 }
 
 #endif

@@ -31,33 +31,35 @@
 ##################################################
 
 SET(CORE_ITKCOMMON_SRCS
-  itkCascadedTransform.h
+  #itkCascadedTransform.h
   itkDiscontinuousTransform.h
   itkDiscontinuousTransform.cxx
-  itkGridTransform.h
-  itkInverseTransform.h
+  #itkGridTransform.h
+  #itkInverseTransform.h
   itkLegendrePolynomialTransform.h
   itkLegendrePolynomialTransform.txx
-  itkMeshTransform.h
-  itkNumericInverse.h
+  #itkMeshTransform.h
+  #itkNumericInverse.h
   itkRBFTransform.cxx
   itkRBFTransform.h
   itkRadialDistortionTransform.h
   itkRadialDistortionTransform.txx
-  itkTypes.h
+  #itkTypes.h
+  BoundingBox.h
+  BoundingBox.cxx
 )
 
-SET(CORE_ITKCOMMON_TEST_SRCS
-  itkTransformAdaptor.h
-  itkIdentityTransformAdaptor.h
-  test.cxx
-)
+#SET(CORE_ITKCOMMON_TEST_SRCS
+#  itkTransformAdaptor.h
+#  itkIdentityTransformAdaptor.h
+#  test.cxx
+#)
 
-CORE_ADD_LIBRARY(Core_ITKCommonTest ${CORE_ITKCOMMON_TEST_SRCS})
-TARGET_LINK_LIBRARIES(Core_ITKCommonTest ${SCI_ITK_LIBRARIES})
+#CORE_ADD_LIBRARY(Core_ITKCommonTest ${CORE_ITKCOMMON_TEST_SRCS})
+#TARGET_LINK_LIBRARIES(Core_ITKCommonTest ${SCI_ITK_LIBRARIES})
 
-#CORE_ADD_LIBRARY(Core_ITKCommon ${CORE_ITKCOMMON_SRCS})
-#TARGET_LINK_LIBRARIES(Core_ITKCommon ${SCI_ITK_LIBRARIES})
+CORE_ADD_LIBRARY(Core_ITKCommon ${CORE_ITKCOMMON_SRCS})
+TARGET_LINK_LIBRARIES(Core_ITKCommon ${SCI_ITK_LIBRARIES})
 
 IF(BUILD_TESTING)
   ADD_SUBDIRECTORY(
