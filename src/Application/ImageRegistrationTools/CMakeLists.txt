@@ -44,20 +44,20 @@ SET(APPLICATION_IRTOOLS_ACTIONS_SRCS
   Actions/ActionRefineTranslateFilter.cc
 )
 
-#SET(APPLICATION_IRTOOLS_UTILS_SRCS
-#  Utils/MosaicIO.h
-#  Utils/MosaicIO.cc
-#  Utils/MosaicLayout.h
-#  Utils/MosaicLayout.cc
-#  Utils/LocalMapping.h
-#  Utils/LocalMapping.cc
-#)
+SET(APPLICATION_IRTOOLS_UTILS_SRCS
+  Utils/MosaicIO.h
+  Utils/MosaicIO.cc
+  Utils/MosaicLayout.h
+  Utils/MosaicLayout.cc
+  Utils/LocalMapping.h
+  Utils/LocalMapping.cc
+)
 
 # code that needs to be reworked and/or replaced
-#SET(APPLICATION_IRTOOLS_UTILS_TMP_SRCS
-#  Utils/tmp/the_text.hxx
-#  Utils/tmp/the_text.cxx
-#)
+SET(APPLICATION_IRTOOLS_UTILS_TMP_SRCS
+  Utils/tmp/the_text.hxx
+  Utils/tmp/the_text.cxx
+)
 
   
 IF(BUILD_WITH_PYTHON)
@@ -69,8 +69,8 @@ CORE_ADD_LIBRARY(Application_ImageRegistrationTools
   ${APPLICATION_IRTOOLS_NOREGISTER_SRCS}
   ${APPLICATION_IRTOOLS_SRCS}
   ${APPLICATION_IRTOOLS_ACTIONS_SRCS}
-#  ${APPLICATION_IRTOOLS_UTILS_SRCS}
-#  ${APPLICATION_IRTOOLS_UTILS_TMP_SRCS}
+  ${APPLICATION_IRTOOLS_UTILS_SRCS}
+  ${APPLICATION_IRTOOLS_UTILS_TMP_SRCS}
 )
             
 TARGET_LINK_LIBRARIES(Application_ImageRegistrationTools
@@ -80,6 +80,7 @@ TARGET_LINK_LIBRARIES(Application_ImageRegistrationTools
   Core_Action
   Core_State
   Core_Geometry
+  Core_ITKCommon
   Application_Filters
   Application_Tool
   Application_ToolManager
