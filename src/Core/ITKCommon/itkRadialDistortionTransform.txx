@@ -139,6 +139,8 @@ namespace itk
     vx[0] -= ta * Rmax;
     vx[1] -= tb * Rmax;
     bool ok = inverse.transform(vy, vx, true);
+
+    // TODO: replace with exception!!!
     if (!ok) assert(false);
     
     OutputPointType x;

@@ -29,11 +29,66 @@
 #ifndef CORE_ITKCOMMON_ITKTYPES_H
 #define CORE_ITKCOMMON_ITKTYPES_H
 
+#include <itkImage.h>
 #include <itkPoint.h>
+#include <itkTransform.h>
+#include <itkIdentityTransform.h>
+#include <itkTranslationTransform.h>
 #include <itkVector.h>
 
 //TODO: namespace!!!
 
+//----------------------------------------------------------------
+// pixel_t
+//
+// All-encompasing pixel type -- float.
+// Works everywhere, takes up 4 times as much memory as 8-bit pixels.
+// 
+typedef float pixel_t;
+
+//----------------------------------------------------------------
+// native_pixel_t
+// 
+// Native refers to the usual 8 bit pixels here. These are native
+// (standard) in the real world, but may look odd in the medical
+// imaging world where float or short int are more common.
+// 
+typedef unsigned char native_pixel_t;
+
+//----------------------------------------------------------------
+// native_image_t
+//
+// 8-bit grayscale image.
+// 
+typedef itk::Image<native_pixel_t, 2> native_image_t;
+
+//----------------------------------------------------------------
+// image_t
+// 
+// float grayscale image.
+// 
+typedef itk::Image<pixel_t, 2> image_t;
+
+//----------------------------------------------------------------
+// base_transform_t
+// 
+// Shorthand for abstract 2D tranforms.
+// 
+typedef itk::Transform<double, 2, 2> base_transform_t;
+
+//----------------------------------------------------------------
+// identity_transform_t
+// 
+// Shorthand for 2D identity ITK transform.
+// 
+typedef itk::IdentityTransform<double, 2> identity_transform_t;
+
+//----------------------------------------------------------------
+// translate_transform_t
+// 
+// Shorthand for 2D rigid translation ITK transform.
+// 
+typedef itk::TranslationTransform<double, 2> translate_transform_t;
 
 //----------------------------------------------------------------
 // pnt2d_t

@@ -41,21 +41,17 @@
 // system includes:
 #include <iostream>
 
-// namespace access:
-using std::cerr;
-using std::endl;
-
 
 namespace itk {
-#if 0
-}
-#endif
+//#if 0
+//}
+//#endif
 
 //----------------------------------------------------------------
 // RBFTransform::RBFTransform
 // 
-RBFTransform::RBFTransform():
-  Superclass(2, 0)
+RBFTransform::RBFTransform() :
+  RBFTransform::Superclass(2, 0)
 {
   this->m_FixedParameters.SetSize(4);
   this->m_Parameters.SetSize(6);
@@ -80,6 +76,12 @@ RBFTransform::RBFTransform():
   ab_vec[4] = 0;
   ab_vec[5] = 1;
 }
+
+RBFTransform::~RBFTransform()
+{
+  return;
+}
+
 
 //----------------------------------------------------------------
 // RBFTransform::TransformPoint
@@ -129,9 +131,11 @@ RBFTransform::TransformPoint(const InputPointType & uv) const
 //----------------------------------------------------------------
 // RBFTransform::GetInverse
 // 
-RBFTransform::InverseTransformPointer
-RBFTransform::GetInverse() const
+bool
+RBFTransform::GetInverse(Self* inverse) const
 {
+  if (! inverse) return false;
+
   unsigned int num_pts = num_points();
   std::vector<OutputPointType> xy_vec(num_pts);
   std::vector<InputPointType> uv_vec(num_pts);
@@ -155,14 +159,25 @@ RBFTransform::GetInverse() const
   tile_max[0] = GetXmax() * 2;
   tile_max[1] = GetYmax() * 2;
   
-  RBFTransform::Pointer inverse = RBFTransform::New();
+//  RBFTransform::Pointer inverse = RBFTransform::New();
   inverse->setup(tile_min,
 		 tile_max,
 		 num_pts,
-		 num_pts ? &(xy_vec[0]) : NULL,
-		 num_pts ? &(uv_vec[0]) : NULL);
+		 num_pts ? &(xy_vec[0]) : 0,
+		 num_pts ? &(uv_vec[0]) : 0);
   
-  return inverse.GetPointer();
+//  //return inverse.GetPointer();
+//  RBFTransform::InverseTransformPointer inverseTransform =
+//    static_cast<RBFTransform::InverseTransformPointer>(inverse);
+//  return inverseTransform;
+  return true;
+}
+
+RBFTransform::InverseTransformBasePointer
+RBFTransform::GetInverseTransform() const
+{
+  Pointer inv = Self::New();
+  return GetInverse(inv) ? inv.GetPointer() : 0;
 }
 
 //----------------------------------------------------------------
@@ -250,9 +265,9 @@ RBFTransform::setup(// image bounding box expressed in the image space,
     
     // FIXME:
 #if 0
-    cerr << "M: " << M << endl
-	 << "bx: " << bx << endl
-	 << "by: " << by << endl;
+//    cerr << "M: " << M << endl
+//	 << "bx: " << bx << endl
+//	 << "by: " << by << endl;
 #endif
     
     // use SVD to solve the linear system:
@@ -333,78 +348,78 @@ RBFTransform::GetJacobian(const InputPointType & point) const
 //----------------------------------------------------------------
 // RBFTransform::eval
 // 
-void
-RBFTransform::eval(const std::vector<double> & point,
-		   std::vector<double> & function,
-		   std::vector<std::vector<double> > & jacobian) const
-{
-  // shortcuts:
-  const double & Xmax = GetXmax();
-  const double & Ymax = GetYmax();
-  const double & uc = GetUc();
-  const double & vc = GetVc();
-  
-  const double & u = point[0];
-  const double & v = point[1];
-  
-  const double A = (u - uc) / Xmax;
-  const double B = (v - vc) / Ymax;
-  
-  const unsigned int num_pts = num_points();
-  
-  double F = 0;
-  double G = 0;
-  double dF_du = 0;
-  double dF_dv = 0;
-  double dG_du = 0;
-  double dG_dv = 0;
-  
-  for (unsigned int i = 0; i < num_pts; i++)
-  {
-    const double * fg = &(this->m_Parameters[index_f(i)]);
-    const double & fi = fg[0];
-    const double & gi = fg[1];
-    
-    const double * uv = &(this->m_FixedParameters[index_uv(i)]);
-    const double & ui = uv[0];
-    const double & vi = uv[1];
-    
-    double U = (u - ui) / Xmax;
-    double V = (v - vi) / Ymax;
-    double R = U * U + V * V;
-    double r = sqrt(R);
-    double lR = R == 0 ? 0 : log(R);
-    double Q = R * lR;
-    
-    F += fi * Q;
-    G += gi * Q;
-    
-    dF_du += fi * (u - ui) * (lnR + 1);
-    dF_dv += fi * (v - vi) * (lnR + 1);
-    dG_du += gi * (u - ui) * (lnR + 1);
-    dG_dv += gi * (v - vi) * (lnR + 1);
-  }
-  
-  dF_du *= 2 / (Xmax * Xmax);
-  dF_dv *= 2 / (Ymax * Ymax);
-  dG_du *= 2 / (Xmax * Xmax);
-  dG_dv *= 2 / (Ymax * Ymax);
-  
-  function[0] = Xmax * (a(0) + a(1) * A + a(2) * B + F);
-  function[1] = Ymax * (b(0) + b(1) * A + b(2) * B + G);
-  
-  // dx/du:
-  jacobian[0][0] = Xmax * (a(1) + dF_du);
-  
-  // dx/dv:
-  jacobian[0][1] = Xmax * (a(2) + dF_dv);
-  
-  // dy/du:
-  jacobian[1][0] = Ymax * (b(1) + dG_du);
-  
-  // dy/dv:
-  jacobian[1][1] = Ymax * (b(2) + dG_dv);
-}
+//void
+//RBFTransform::eval(const std::vector<double> & point,
+//		   std::vector<double> & function,
+//		   std::vector<std::vector<double> > & jacobian) const
+//{
+//  // shortcuts:
+//  const double & Xmax = GetXmax();
+//  const double & Ymax = GetYmax();
+//  const double & uc = GetUc();
+//  const double & vc = GetVc();
+//  
+//  const double & u = point[0];
+//  const double & v = point[1];
+//  
+//  const double A = (u - uc) / Xmax;
+//  const double B = (v - vc) / Ymax;
+//  
+//  const unsigned int num_pts = num_points();
+//  
+//  double F = 0;
+//  double G = 0;
+//  double dF_du = 0;
+//  double dF_dv = 0;
+//  double dG_du = 0;
+//  double dG_dv = 0;
+//  
+//  for (unsigned int i = 0; i < num_pts; i++)
+//  {
+//    const double * fg = &(this->m_Parameters[index_f(i)]);
+//    const double & fi = fg[0];
+//    const double & gi = fg[1];
+//    
+//    const double * uv = &(this->m_FixedParameters[index_uv(i)]);
+//    const double & ui = uv[0];
+//    const double & vi = uv[1];
+//    
+//    double U = (u - ui) / Xmax;
+//    double V = (v - vi) / Ymax;
+//    double R = U * U + V * V;
+//    double r = sqrt(R);
+//    double lR = R == 0 ? 0 : log(R);
+//    double Q = R * lR;
+//    
+//    F += fi * Q;
+//    G += gi * Q;
+//    
+//    dF_du += fi * (u - ui) * (lnR + 1);
+//    dF_dv += fi * (v - vi) * (lnR + 1);
+//    dG_du += gi * (u - ui) * (lnR + 1);
+//    dG_dv += gi * (v - vi) * (lnR + 1);
+//  }
+//  
+//  dF_du *= 2 / (Xmax * Xmax);
+//  dF_dv *= 2 / (Ymax * Ymax);
+//  dG_du *= 2 / (Xmax * Xmax);
+//  dG_dv *= 2 / (Ymax * Ymax);
+//  
+//  function[0] = Xmax * (a(0) + a(1) * A + a(2) * B + F);
+//  function[1] = Ymax * (b(0) + b(1) * A + b(2) * B + G);
+//  
+//  // dx/du:
+//  jacobian[0][0] = Xmax * (a(1) + dF_du);
+//  
+//  // dx/dv:
+//  jacobian[0][1] = Xmax * (a(2) + dF_dv);
+//  
+//  // dy/du:
+//  jacobian[1][0] = Ymax * (b(1) + dG_du);
+//  
+//  // dy/dv:
+//  jacobian[1][1] = Ymax * (b(2) + dG_dv);
+//}
 #endif
 
 //----------------------------------------------------------------
@@ -417,32 +432,32 @@ RBFTransform::PrintSelf(std::ostream & os, Indent indent) const
   
   unsigned int num_pts = num_points();
   
-  os << indent << "Xmax = " << GetXmax() << endl
-     << indent << "Ymax = " << GetYmax() << endl
-     << indent << "uc = " << GetUc() << endl
-     << indent << "vc = " << GetVc() << endl;
+  os << indent << "Xmax = " << GetXmax() << std::endl
+     << indent << "Ymax = " << GetYmax() << std::endl
+     << indent << "uc = " << GetUc() << std::endl
+     << indent << "vc = " << GetVc() << std::endl;
   
-  os << indent << "a0 = " << a(0) << endl
-     << indent << "a1 = " << a(1) << endl
-     << indent << "a2 = " << a(2) << endl;
+  os << indent << "a0 = " << a(0) << std::endl
+     << indent << "a1 = " << a(1) << std::endl
+     << indent << "a2 = " << a(2) << std::endl;
   
   for (unsigned int i = 0; i < num_pts; i++)
   {
-    os << indent << 'f' << i << " = " << f(i) << endl;
+    os << indent << 'f' << i << " = " << f(i) << std::endl;
   }
   
-  os << indent << "b0 = " << b(0) << endl
-     << indent << "b1 = " << b(1) << endl
-     << indent << "b2 = " << b(2) << endl;
+  os << indent << "b0 = " << b(0) << std::endl
+     << indent << "b1 = " << b(1) << std::endl
+     << indent << "b2 = " << b(2) << std::endl;
   
   for (unsigned int i = 0; i < num_pts; i++)
   {
-    os << indent << 'g' << i << " = " << g(i) << endl;
+    os << indent << 'g' << i << " = " << g(i) << std::endl;
   }
 }
 
 
-#if 0
-{
-#endif
+//#if 0
+//{
+//#endif
 } // namespace itk

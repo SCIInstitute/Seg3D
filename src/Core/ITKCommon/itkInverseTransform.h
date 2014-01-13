@@ -49,93 +49,96 @@
 // 
 namespace itk
 {
-  //----------------------------------------------------------------
-  // InverseTransform
-  //
-  template <class ForwardTransform>
-  class InverseTransform :
-    public Transform< typename ForwardTransform::ScalarType,
-          ForwardTransform::OutputSpaceDimension,
-          ForwardTransform::InputSpaceDimension >
-  {
-  public:
-    /** Standard class typedefs. */
-    typedef InverseTransform Self;
-    
-    typedef Transform< typename ForwardTransform::ScalarType,
-           ForwardTransform::OutputSpaceDimension,
-           ForwardTransform::InputSpaceDimension > Superclass;
-    
-    typedef SmartPointer< Self >  Pointer;
-    typedef SmartPointer< const Self >  ConstPointer;
-    
-    /** Base inverse transform type. */
-    typedef typename Superclass::InverseTransformType InverseTransformType;
-    typedef SmartPointer< InverseTransformType > InverseTransformPointer;
-    
-    /** New method for creating an object using a factory. */
-    itkNewMacro(Self);
-    
-    /** Run-time type information (and related methods). */
-    itkTypeMacro( InverseTransform, Transform );
-    
-    /** Standard scalar type for this class. */
-    typedef typename Superclass::ScalarType ScalarType;
-    
-    /** Type of the input parameters. */
-    typedef typename Superclass::ParametersType ParametersType;
-    
-    /** Type of the Jacobian matrix. */
-    typedef typename Superclass::JacobianType JacobianType;
-    
-    /** Standard coordinate point type for this class. */
-    typedef typename Superclass::InputPointType InputPointType;
-    typedef typename Superclass::OutputPointType OutputPointType;
-    
-    /** Dimension of the domain space. */
-    itkStaticConstMacro(InputSpaceDimension,
-      unsigned int,
-      ForwardTransform::OutputSpaceDimension);
-    itkStaticConstMacro(OutputSpaceDimension,
-      unsigned int,
-      ForwardTransform::InputSpaceDimension);
-    
-    /** Set the forward transform pointer. */
-    void SetForwardTransform(const ForwardTransform * forward)
-    { forward_ = forward; }
-    
-    /**  Method to transform a point. */
-    virtual OutputPointType TransformPoint(const InputPointType & y) const
-    {
-      assert(forward_ != NULL);
-      return forward_->BackTransformPoint(y);
-    }
-    
-    virtual const JacobianType & GetJacobian(const InputPointType &) const
-    {
-      itkExceptionMacro(<< "GetJacobian is not implemented "
-      "for InverseTransform");
-      return this->m_Jacobian;
-    };
-    
-    virtual unsigned int GetNumberOfParameters() const 
-    { return 0; }
-    
-    virtual InverseTransformPointer GetInverse() const
-    { return const_cast<ForwardTransform *>(forward_); }
-    
-  protected:
-    InverseTransform(): Superclass(0, 0) {}
-    
-  private:
-    // disable default copy constructor and assignment operator:
-    InverseTransform(const Self & other);
-    const Self & operator = (const Self & t);
-    
-    // the transform whose inverse we are trying to evaluate:
-    const ForwardTransform * forward_;
-  };
+
+//----------------------------------------------------------------
+// InverseTransform
+//
+template <class ForwardTransform>
+class InverseTransform :
+public Transform< typename ForwardTransform::ScalarType,
+ForwardTransform::OutputSpaceDimension,
+ForwardTransform::InputSpaceDimension >
+{
+public:
+  /** Standard class typedefs. */
+  typedef InverseTransform Self;
   
+  typedef Transform< typename ForwardTransform::ScalarType,
+  ForwardTransform::OutputSpaceDimension,
+  ForwardTransform::InputSpaceDimension > Superclass;
+  
+  typedef SmartPointer< Self >  Pointer;
+  typedef SmartPointer< const Self >  ConstPointer;
+  
+  /** Base inverse transform type. This type should not be changed to the
+   * concrete inverse transform type or inheritance would be lost.*/
+  typedef typename Superclass::InverseTransformBaseType InverseTransformBaseType;
+  typedef typename InverseTransformBaseType::Pointer    InverseTransformBasePointer;
+  
+  /** New method for creating an object using a factory. */
+  itkNewMacro(Self);
+  
+  /** Run-time type information (and related methods). */
+  itkTypeMacro( InverseTransform, Transform );
+  
+  /** Standard scalar type for this class. */
+  typedef typename Superclass::ScalarType ScalarType;
+  
+  /** Type of the input parameters. */
+  typedef typename Superclass::ParametersType ParametersType;
+  
+  /** Type of the Jacobian matrix. */
+  typedef typename Superclass::JacobianType JacobianType;
+  
+  /** Standard coordinate point type for this class. */
+  typedef typename Superclass::InputPointType InputPointType;
+  typedef typename Superclass::OutputPointType OutputPointType;
+  
+  /** Dimension of the domain space. */
+  itkStaticConstMacro(InputSpaceDimension,
+                      unsigned int,
+                      ForwardTransform::OutputSpaceDimension);
+  itkStaticConstMacro(OutputSpaceDimension,
+                      unsigned int,
+                      ForwardTransform::InputSpaceDimension);
+
+  /** Set the forward transform pointer. */
+  void SetForwardTransform(const ForwardTransform * forward)
+  { forward_ = forward; }
+  
+  /**  Method to transform a point. */
+  virtual OutputPointType TransformPoint(const InputPointType & y) const
+  {
+    // TODO: replace with exception
+    assert(forward_ != NULL);
+    return forward_->BackTransformPoint(y);
+  }
+
+  virtual const JacobianType & GetJacobian(const InputPointType &) const
+  {
+    itkExceptionMacro(<< "GetJacobian is not implemented "
+                      "for InverseTransform");
+    return this->m_Jacobian;
+  };
+
+  virtual unsigned int GetNumberOfParameters() const 
+  { return 0; }
+
+  virtual InverseTransformBasePointer GetInverseTransform() const
+  { return const_cast<ForwardTransform *>(forward_); }
+
+protected:
+  InverseTransform(): Superclass(0, 0) {}
+  
+private:
+  // disable default copy constructor and assignment operator:
+  InverseTransform(const Self & other);
+  const Self & operator = (const Self & t);
+  
+  // the transform whose inverse we are trying to evaluate:
+  const ForwardTransform * forward_;
+};
+
 } // namespace itk
 
 #endif // __itkInverseTransform_h

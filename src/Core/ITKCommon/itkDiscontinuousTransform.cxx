@@ -39,7 +39,8 @@
 //                vertex coordinates.
 
 // local includes:
-#include <Core/ITKCommon/itkDiscontinousTransform.h>
+#include <Core/ITKCommon/itkDiscontinuousTransform.h>
+#include <Core/ITKCommon/BoundingBox.h>
 
 // system includes:
 #include <algorithm>

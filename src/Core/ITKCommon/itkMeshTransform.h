@@ -61,290 +61,292 @@
 //
 namespace itk
 {
-  class MeshTransform : public Transform<double, 2, 2>
+
+class MeshTransform : public Transform<double, 2, 2>
+{
+public:
+  // standard typedefs:
+  typedef MeshTransform Self;
+  typedef SmartPointer<Self> Pointer;
+  typedef SmartPointer<const Self> ConstPointer;
+
+  typedef Transform<double, 2, 2> Superclass;
+
+  /** Base inverse transform type. This type should not be changed to the
+   * concrete inverse transform type or inheritance would be lost.*/
+  typedef Superclass::InverseTransformBaseType InverseTransformBaseType;
+  typedef InverseTransformBaseType::Pointer    InverseTransformBasePointer;
+  
+  // RTTI:
+  itkTypeMacro(MeshTransform, Transform);
+
+  // macro for instantiation through the object factory:
+  itkNewMacro(Self);
+
+  /** Standard scalar type for this class. */
+  typedef double ScalarType;
+
+  /** Dimension of the domain space. */
+  itkStaticConstMacro(InputSpaceDimension, unsigned int, 2);
+  itkStaticConstMacro(OutputSpaceDimension, unsigned int, 2);
+
+  // shortcuts:
+  typedef Superclass::ParametersType ParametersType;
+  typedef Superclass::JacobianType JacobianType;
+  
+  typedef Superclass::InputPointType InputPointType;
+  typedef Superclass::OutputPointType OutputPointType;
+  
+  // virtual:
+  virtual OutputPointType TransformPoint(const InputPointType & x) const
   {
-  public:
-    // standard typedefs:
-    typedef MeshTransform Self;
-    typedef SmartPointer<Self> Pointer;
-    typedef SmartPointer<const Self> ConstPointer;
-
-    typedef Transform<double, 2, 2> Superclass;
-
-    // Base inverse transform type:
-//    typedef Superclass::InverseTransformType InverseTransformType;
-    typedef Superclass InverseTransformType;
-    typedef SmartPointer< InverseTransformType > InverseTransformPointer;
-
-    // RTTI:
-    itkTypeMacro(MeshTransform, Transform);
-
-    // macro for instantiation through the object factory:
-    itkNewMacro(Self);
-
-    /** Standard scalar type for this class. */
-    typedef double ScalarType;
-
-    /** Dimension of the domain space. */
-    itkStaticConstMacro(InputSpaceDimension, unsigned int, 2);
-    itkStaticConstMacro(OutputSpaceDimension, unsigned int, 2);
-
-    // shortcuts:
-    typedef Superclass::ParametersType ParametersType;
-    typedef Superclass::JacobianType JacobianType;
-    
-    typedef Superclass::InputPointType InputPointType;
-    typedef Superclass::OutputPointType OutputPointType;
-    
-    // virtual:
-    OutputPointType TransformPoint(const InputPointType & x) const
+    OutputPointType y;
+    if ( transform_.grid_.cols_ == 0 || transform_.grid_.cols_ == 0 )
     {
-      OutputPointType y;
-      if ( transform_.grid_.cols_ == 0 || transform_.grid_.cols_ == 0 )
-      {
-        // No grid has been setup.  Use the identity.
-        y[0] = x[0];
-        y[1] = x[1];
-      }
-      else if (is_inverse())
-      {
-        pnt2d_t uv;
-        uv[0] = (x[0] - transform_.tile_min_[0]) / transform_.tile_ext_[0];
-        uv[1] = (x[1] - transform_.tile_min_[1]) / transform_.tile_ext_[1];
-        transform_.transform_inv(uv, y);
-      }
-      else
-      {
-        transform_.transform(x, y);
-        y[0] *= transform_.tile_ext_[0];
-        y[1] *= transform_.tile_ext_[1];
-        y[0] += transform_.tile_min_[0];
-        y[1] += transform_.tile_min_[1];
-      }
-      
-      // ITK is not forgiving to NaNs:
-      if (y[0] != y[0])
-      {
-        y[0] = std::numeric_limits<double>::max();
-        y[1] = y[0];
-      }
-      
-      return y;
+      // No grid has been setup.  Use the identity.
+      y[0] = x[0];
+      y[1] = x[1];
+    }
+    else if (is_inverse())
+    {
+      pnt2d_t uv;
+      uv[0] = (x[0] - transform_.tile_min_[0]) / transform_.tile_ext_[0];
+      uv[1] = (x[1] - transform_.tile_min_[1]) / transform_.tile_ext_[1];
+      transform_.transform_inv(uv, y);
+    }
+    else
+    {
+      transform_.transform(x, y);
+      y[0] *= transform_.tile_ext_[0];
+      y[1] *= transform_.tile_ext_[1];
+      y[0] += transform_.tile_min_[0];
+      y[1] += transform_.tile_min_[1];
     }
     
-    // Inverse transformations:
-    // If y = Transform(x), then x = BackTransform(y);
-    // if no mapping from y to x exists, then an exception is thrown.
-    InputPointType BackTransformPoint(const OutputPointType & y) const
+    // ITK is not forgiving to NaNs:
+    if (y[0] != y[0])
     {
-      InputPointType x;
-      if (is_inverse())
-      {
-        transform_.transform(y, x);
-        x[0] *= transform_.tile_ext_[0];
-        x[1] *= transform_.tile_ext_[1];
-        x[0] += transform_.tile_min_[0];
-        x[1] += transform_.tile_min_[1];
-      }
-      else
-      {
-        pnt2d_t uv;
-        uv[0] = (y[0] - transform_.tile_min_[0]) / transform_.tile_ext_[0];
-        uv[1] = (y[1] - transform_.tile_min_[1]) / transform_.tile_ext_[1];
-        transform_.transform_inv(uv, x);
-      }
-      
-      // ITK does not handle NaNs well:
-      if (x[0] != x[0])
-      {
-        x[0] = std::numeric_limits<double>::max();
-        x[1] = x[0];
-      }
-      
-      return x;
+      y[0] = std::numeric_limits<double>::max();
+      y[1] = y[0];
     }
     
-    // virtual:
-    void SetFixedParameters(const ParametersType & params)
-    { this->m_FixedParameters = params; }
+    return y;
+  }
+  
+  // Inverse transformations:
+  // If y = Transform(x), then x = BackTransform(y);
+  // if no mapping from y to x exists, then an exception is thrown.
+  InputPointType BackTransformPoint(const OutputPointType & y) const
+  {
+    InputPointType x;
+    if (is_inverse())
+    {
+      transform_.transform(y, x);
+      x[0] *= transform_.tile_ext_[0];
+      x[1] *= transform_.tile_ext_[1];
+      x[0] += transform_.tile_min_[0];
+      x[1] += transform_.tile_min_[1];
+    }
+    else
+    {
+      pnt2d_t uv;
+      uv[0] = (y[0] - transform_.tile_min_[0]) / transform_.tile_ext_[0];
+      uv[1] = (y[1] - transform_.tile_min_[1]) / transform_.tile_ext_[1];
+      transform_.transform_inv(uv, x);
+    }
     
-    // virtual:
-    const ParametersType & GetFixedParameters() const
+    // ITK does not handle NaNs well:
+    if (x[0] != x[0])
     {
-      ParametersType params = this->m_FixedParameters;
+      x[0] = std::numeric_limits<double>::max();
+      x[1] = x[0];
+    }
+    
+    return x;
+  }
+  
+  // virtual:
+  virtual void SetFixedParameters(const ParametersType & params)
+  { this->m_FixedParameters = params; }
+  
+  // virtual:
+  const ParametersType & GetFixedParameters() const
+  {
+    ParametersType params = this->m_FixedParameters;
 
-      // acceleration grid size:
-      params[1] = transform_.grid_.rows_;
-      params[2] = transform_.grid_.cols_;
+    // acceleration grid size:
+    params[1] = transform_.grid_.rows_;
+    params[2] = transform_.grid_.cols_;
+    
+    // bounding box if the image associated with this transform:
+    params[3] = transform_.tile_min_[0];
+    params[4] = transform_.tile_min_[1];
+    params[5] = transform_.tile_ext_[0];
+    params[6] = transform_.tile_ext_[1];
+    
+    // number of vertices in the Delaunay triangle mesh:
+    params[7] = transform_.grid_.mesh_.size();
+    
+    // update the parameters vector:
+    MeshTransform * fake = const_cast<MeshTransform *>(this);
+    fake->m_FixedParameters = params;
+    return this->m_FixedParameters;
+  }
+
+  // virtual:
+  virtual void SetParameters(const ParametersType & params)
+  {
+    this->m_Parameters = params;
+    
+    std::size_t accel_grid_rows = std::size_t(this->m_FixedParameters[1]);
+    std::size_t accel_grid_cols = std::size_t(this->m_FixedParameters[2]);
+
+    pnt2d_t tile_min;
+    tile_min[0] = this->m_FixedParameters[3];
+    tile_min[1] = this->m_FixedParameters[4];
+
+    pnt2d_t tile_max;
+    tile_max[0] = tile_min[0] + this->m_FixedParameters[5];
+    tile_max[1] = tile_min[1] + this->m_FixedParameters[6];
+
+    const std::size_t num_points = std::size_t(this->m_FixedParameters[7]);
+    std::vector<pnt2d_t> uv(num_points);
+    std::vector<pnt2d_t> xy(num_points);
+
+    for (unsigned int i = 0; i < num_points; i++)
+    {
+      const std::size_t idx = i * 4;
       
-      // bounding box if the image associated with this transform:
-      params[3] = transform_.tile_min_[0];
-      params[4] = transform_.tile_min_[1];
-      params[5] = transform_.tile_ext_[0];
-      params[6] = transform_.tile_ext_[1];
-      
-      // number of vertices in the Delaunay triangle mesh:
-      params[7] = transform_.grid_.mesh_.size();
-      
-      // update the parameters vector:
-      MeshTransform * fake = const_cast<MeshTransform *>(this);
-      fake->m_FixedParameters = params;
-      return this->m_FixedParameters;
+      uv[i][0] = params[idx + 0];
+      uv[i][1] = params[idx + 1];
+      xy[i][0] = params[idx + 2];
+      xy[i][1] = params[idx + 3];
     }
 
-    // virtual:
-    void SetParameters(const ParametersType & params)
+    transform_.setup(tile_min,
+                     tile_max,
+                     uv,
+                     xy,
+                     accel_grid_rows,
+                     accel_grid_cols);
+  }
+
+  // virtual:
+  virtual const ParametersType & GetParameters() const
+  {
+    ParametersType params(GetNumberOfParameters());
+
+    const std::size_t num_points = transform_.grid_.mesh_.size();
+    for (std::size_t i = 0; i < num_points; i++)
     {
-      this->m_Parameters = params;
+      const vertex_t & vx = transform_.grid_.mesh_[i];
+      const std::size_t idx = i * 4;
       
-      std::size_t accel_grid_rows = std::size_t(this->m_FixedParameters[1]);
-      std::size_t accel_grid_cols = std::size_t(this->m_FixedParameters[2]);
+      params[idx + 0] = vx.uv_[0];
+      params[idx + 1] = vx.uv_[1];
+      params[idx + 2] = vx.xy_[0];
+      params[idx + 3] = vx.xy_[1];
+    }
 
-      pnt2d_t tile_min;
-      tile_min[0] = this->m_FixedParameters[3];
-      tile_min[1] = this->m_FixedParameters[4];
+    // update the parameters vector:
+    MeshTransform * fake = const_cast<MeshTransform *>(this);
+    fake->m_Parameters = params;
+    return this->m_Parameters;
+  }
 
-      pnt2d_t tile_max;
-      tile_max[0] = tile_min[0] + this->m_FixedParameters[5];
-      tile_max[1] = tile_min[1] + this->m_FixedParameters[6];
+  // virtual:
+  virtual unsigned int GetNumberOfParameters() const
+  { return 4 * transform_.grid_.mesh_.size(); }
 
-      const std::size_t num_points = std::size_t(this->m_FixedParameters[7]);
-      std::vector<pnt2d_t> uv(num_points);
-      std::vector<pnt2d_t> xy(num_points);
+  // virtual: return an inverse of this transform.
+  virtual InverseTransformBasePointer GetInverseTransform() const
+  {
+    MeshTransform::Pointer inv = MeshTransform::New();
+    inv->setup(transform_, !is_inverse());
+    return inv.GetPointer();
+  }
 
-      for (unsigned int i = 0; i < num_points; i++)
+  // setup the transform:
+  void setup(const the_mesh_transform_t & transform,
+             const bool & is_inverse = false)
+  {
+    transform_ = transform;
+    GetParameters();
+    GetFixedParameters();
+    this->m_Jacobian.SetSize(2, GetNumberOfParameters());
+    this->m_FixedParameters[0] = is_inverse ? 1.0 : 0.0;
+  }
+
+  // inverse transform flag check:
+  inline bool is_inverse() const
+  { return this->m_FixedParameters[0] != 0.0; }
+
+  // virtual:
+  virtual
+  const JacobianType &
+  GetJacobian(const InputPointType & point) const
+  {
+    // FIXME: 20061227 -- this function was written and not tested:
+
+    // these scales are necessary to account for the fact that
+    // the_mesh_transform_t expects uv in the [0,1]x[0,1] range,
+    // where as we remap it into the image tile physical coordinates
+    // according to tile_min_ and tile_ext_:
+    double Su = transform_.tile_ext_[0];
+    double Sv = transform_.tile_ext_[1];
+
+    unsigned int idx[3];
+    double jac[12];
+    this->m_Jacobian.SetSize(2, GetNumberOfParameters());
+    this->m_Jacobian.Fill(0.0);
+    if (transform_.jacobian(point, idx, jac))
+    {
+      for (unsigned int i = 0; i < 3; i++)
       {
-        const std::size_t idx = i * 4;
-        
-        uv[i][0] = params[idx + 0];
-        uv[i][1] = params[idx + 1];
-        xy[i][0] = params[idx + 2];
-        xy[i][1] = params[idx + 3];
+        unsigned int addr = idx[i] * 2;
+        this->m_Jacobian(0, addr) = Su * jac[i * 2];
+        this->m_Jacobian(0, addr + 1) = Su * jac[i * 2 + 1];
+        this->m_Jacobian(1, addr) = Sv * jac[i * 2 + 6];
+        this->m_Jacobian(1, addr + 1) = Sv * jac[i * 2 + 7];
       }
-
-      transform_.setup(tile_min,
-                       tile_max,
-                       uv,
-                       xy,
-                       accel_grid_rows,
-                       accel_grid_cols);
     }
 
-    // virtual:
-    const ParametersType & GetParameters() const
-    {
-      ParametersType params(GetNumberOfParameters());
+    return this->m_Jacobian;
+  }
 
-      const std::size_t num_points = transform_.grid_.mesh_.size();
-      for (std::size_t i = 0; i < num_points; i++)
-      {
-        const vertex_t & vx = transform_.grid_.mesh_[i];
-        const std::size_t idx = i * 4;
-        
-        params[idx + 0] = vx.uv_[0];
-        params[idx + 1] = vx.uv_[1];
-        params[idx + 2] = vx.xy_[0];
-        params[idx + 3] = vx.xy_[1];
-      }
+protected:
+  MeshTransform():
+    Superclass(2, 0)
+  {
+    this->m_FixedParameters.SetSize(8);
 
-      // update the parameters vector:
-      MeshTransform * fake = const_cast<MeshTransform *>(this);
-      fake->m_Parameters = params;
-      return this->m_Parameters;
-    }
+    // initialize the inverse flag:
+    this->m_FixedParameters[0] = 0.0;
 
-    // virtual:
-    unsigned int GetNumberOfParameters() const
-    { return 4 * transform_.grid_.mesh_.size(); }
+    // acceleration grid size:
+    this->m_FixedParameters[1] = 0.0;
+    this->m_FixedParameters[2] = 0.0;
 
-    // virtual: return an inverse of this transform.
-    InverseTransformPointer GetInverse() const
-    {
-      MeshTransform::Pointer inv = MeshTransform::New();
-      inv->setup(transform_, !is_inverse());
-      return inv.GetPointer();
-    }
+    // bounding box if the image associated with this transform:
+    this->m_FixedParameters[3] = std::numeric_limits<double>::max();
+    this->m_FixedParameters[4] = this->m_FixedParameters[3];
+    this->m_FixedParameters[5] = -(this->m_FixedParameters[3]);
+    this->m_FixedParameters[6] = -(this->m_FixedParameters[3]);
 
-    // setup the transform:
-    void setup(const the_mesh_transform_t & transform,
-               const bool & is_inverse = false)
-    {
-      transform_ = transform;
-      GetParameters();
-      GetFixedParameters();
-      this->m_Jacobian.SetSize(2, GetNumberOfParameters());
-      this->m_FixedParameters[0] = is_inverse ? 1.0 : 0.0;
-    }
+    // number of vertices in the Delaunay triangle mesh:
+    this->m_FixedParameters[7] = 0.0;
+  }
 
-    // inverse transform flag check:
-    inline bool is_inverse() const
-    { return this->m_FixedParameters[0] != 0.0; }
+private:
+  // disable default copy constructor and assignment operator:
+  MeshTransform(const Self & other);
+  const Self & operator = (const Self & t);
 
-    // virtual:
-    const JacobianType &
-    GetJacobian(const InputPointType & point) const
-    {
-      // FIXME: 20061227 -- this function was written and not tested:
+public:
+  // the actual transform:
+  the_mesh_transform_t transform_;
 
-      // these scales are necessary to account for the fact that
-      // the_mesh_transform_t expects uv in the [0,1]x[0,1] range,
-      // where as we remap it into the image tile physical coordinates
-      // according to tile_min_ and tile_ext_:
-      double Su = transform_.tile_ext_[0];
-      double Sv = transform_.tile_ext_[1];
-
-      unsigned int idx[3];
-      double jac[12];
-      this->m_Jacobian.SetSize(2, GetNumberOfParameters());
-      this->m_Jacobian.Fill(0.0);
-      if (transform_.jacobian(point, idx, jac))
-      {
-        for (unsigned int i = 0; i < 3; i++)
-        {
-          unsigned int addr = idx[i] * 2;
-          this->m_Jacobian(0, addr) = Su * jac[i * 2];
-          this->m_Jacobian(0, addr + 1) = Su * jac[i * 2 + 1];
-          this->m_Jacobian(1, addr) = Sv * jac[i * 2 + 6];
-          this->m_Jacobian(1, addr + 1) = Sv * jac[i * 2 + 7];
-        }
-      }
-
-      return this->m_Jacobian;
-    }
-
-  protected:
-    MeshTransform():
-      Superclass(2, 0)
-    {
-      this->m_FixedParameters.SetSize(8);
-
-      // initialize the inverse flag:
-      this->m_FixedParameters[0] = 0.0;
-
-      // acceleration grid size:
-      this->m_FixedParameters[1] = 0.0;
-      this->m_FixedParameters[2] = 0.0;
-
-      // bounding box if the image associated with this transform:
-      this->m_FixedParameters[3] = std::numeric_limits<double>::max();
-      this->m_FixedParameters[4] = this->m_FixedParameters[3];
-      this->m_FixedParameters[5] = -(this->m_FixedParameters[3]);
-      this->m_FixedParameters[6] = -(this->m_FixedParameters[3]);
-
-      // number of vertices in the Delaunay triangle mesh:
-      this->m_FixedParameters[7] = 0.0;
-    }
-
-  private:
-    // disable default copy constructor and assignment operator:
-    MeshTransform(const Self & other);
-    const Self & operator = (const Self & t);
-
-  public:
-    // the actual transform:
-    the_mesh_transform_t transform_;
-
-  }; // class MeshTransform
+}; // class MeshTransform
 
 } // namespace itk
 

@@ -41,6 +41,8 @@
 #ifndef THE_GRID_TRANSFORM_HXX_
 #define THE_GRID_TRANSFORM_HXX_
 
+// TODO: rename - this is not actually an ITK transform class
+
 // local includes:
 //#include "itk/common.hxx"
 

@@ -76,275 +76,276 @@
 // 
 namespace itk
 {
-  template < class TScalar = double, unsigned int N = 2 >
-  class LegendrePolynomialTransform :
-    public Transform<TScalar, 2, 2>
+
+template < class TScalar = double, unsigned int N = 2 >
+class LegendrePolynomialTransform :
+public Transform<TScalar, 2, 2>
+{
+public:
+  // standard typedefs:
+  typedef LegendrePolynomialTransform Self;
+  typedef SmartPointer<Self> Pointer;
+  typedef SmartPointer<const Self> ConstPointer;
+  
+  typedef Transform<TScalar, 2, 2> Superclass;
+  
+  /** Base inverse transform type. This type should not be changed to the
+   * concrete inverse transform type or inheritance would be lost.*/
+  typedef typename Superclass::InverseTransformBaseType InverseTransformBaseType;
+  typedef typename InverseTransformBaseType::Pointer    InverseTransformBasePointer;
+  
+  // static constant for the degree of the polynomial:
+  itkStaticConstMacro(Degree, unsigned int, N);
+  
+  // static constant for the number of a_jk (or b_jk) coefficients:
+  itkStaticConstMacro(CoefficientsPerDimension,
+                      unsigned int,
+                      ((N + 1) * (N + 2)) / 2);
+  
+  // static constant for the length of the parameter vector:
+  itkStaticConstMacro(ParameterVectorLength,
+                      unsigned int,
+                      (N + 1) * (N + 2));
+  
+  // RTTI:
+  itkTypeMacro(LegendrePolynomialTransform, Transform);
+  
+  // macro for instantiation through the object factory:
+  itkNewMacro(Self);
+  
+  /** Standard scalar type for this class. */
+  typedef typename Superclass::ScalarType ScalarType;
+  
+  /** Dimension of the domain space. */
+  itkStaticConstMacro(InputSpaceDimension, unsigned int, 2);
+  itkStaticConstMacro(OutputSpaceDimension, unsigned int, 2);
+  
+  // shortcuts:
+  typedef typename Superclass::ParametersType ParametersType;
+  typedef typename Superclass::JacobianType JacobianType;
+  
+  typedef typename Superclass::InputPointType  InputPointType;
+  typedef typename Superclass::OutputPointType OutputPointType;
+  
+  // virtual:
+  virtual OutputPointType TransformPoint(const InputPointType & x) const;
+  
+  // Inverse transformations:
+  // If y = Transform(x), then x = BackTransform(y);
+  // if no mapping from y to x exists, then an exception is thrown.
+  InputPointType BackTransformPoint(const OutputPointType & y) const;
+  
+  // virtual:
+  virtual void SetFixedParameters(const ParametersType & params)
+  { this->m_FixedParameters = params; }
+  
+  // virtual:
+  virtual const ParametersType & GetFixedParameters() const
+  { return this->m_FixedParameters; }
+  
+  // virtual:
+  virtual void SetParameters(const ParametersType & params)
+  { this->m_Parameters = params; }
+  
+  // virtual:
+  virtual const ParametersType & GetParameters() const
+  { return this->m_Parameters; }
+  
+  // virtual:
+  virtual unsigned int GetNumberOfParameters() const
+  { return ParameterVectorLength; }
+  
+  // virtual:
+  virtual const JacobianType & GetJacobian(const InputPointType & point) const;
+  
+  // virtual: return an inverse of this transform.
+  virtual InverseTransformBasePointer GetInverseTransform() const
   {
-  public:
-    // standard typedefs:
-    typedef LegendrePolynomialTransform Self;
-    typedef SmartPointer<Self> Pointer;
-    typedef SmartPointer<const Self> ConstPointer;
-    
-    typedef Transform<TScalar, 2, 2> Superclass;
-    
-    // Base inverse transform type:
-//    typedef typename Superclass::InverseTransformType InverseTransformType;
-    typedef Superclass InverseTransformType;
-    typedef SmartPointer< InverseTransformType > InverseTransformPointer;
-    
-    // static constant for the degree of the polynomial:
-    itkStaticConstMacro(Degree, unsigned int, N);
-    
-    // static constant for the number of a_jk (or b_jk) coefficients:
-    itkStaticConstMacro(CoefficientsPerDimension,
-      unsigned int,
-      ((N + 1) * (N + 2)) / 2);
-    
-    // static constant for the length of the parameter vector:
-    itkStaticConstMacro(ParameterVectorLength,
-      unsigned int,
-      (N + 1) * (N + 2));
-    
-    // RTTI:
-    itkTypeMacro(LegendrePolynomialTransform, Transform);
-    
-    // macro for instantiation through the object factory:
-    itkNewMacro(Self);
-    
-    /** Standard scalar type for this class. */
-    typedef typename Superclass::ScalarType ScalarType;
-    
-     /** Dimension of the domain space. */
-    itkStaticConstMacro(InputSpaceDimension, unsigned int, 2);
-    itkStaticConstMacro(OutputSpaceDimension, unsigned int, 2);
-    
-    // shortcuts:
-    typedef typename Superclass::ParametersType ParametersType;
-    typedef typename Superclass::JacobianType JacobianType;
-    
-    typedef typename Superclass::InputPointType  InputPointType;
-    typedef typename Superclass::OutputPointType OutputPointType;
-    
-    // virtual:
-    OutputPointType TransformPoint(const InputPointType & x) const;
-    
-    // Inverse transformations:
-    // If y = Transform(x), then x = BackTransform(y);
-    // if no mapping from y to x exists, then an exception is thrown.
-    InputPointType BackTransformPoint(const OutputPointType & y) const;
-    
-    // virtual:
-    void SetFixedParameters(const ParametersType & params)
-    { this->m_FixedParameters = params; }
-    
-    // virtual:
-    const ParametersType & GetFixedParameters() const
-    { return this->m_FixedParameters; }
-    
-    // virtual:
-    void SetParameters(const ParametersType & params)
-    { this->m_Parameters = params; }
-    
-    // virtual:
-    const ParametersType & GetParameters() const
-    { return this->m_Parameters; }
-    
-    // virtual:
-    unsigned int GetNumberOfParameters() const
-    { return ParameterVectorLength; }
-    
-    // virtual:
-    const JacobianType & GetJacobian(const InputPointType & point) const;
-    
-    // virtual: return an inverse of this transform.
-    InverseTransformPointer GetInverse() const
-    {
-      typedef InverseTransform<Self> InvTransformType;
-      typename InvTransformType::Pointer inv = InvTransformType::New();
-      inv->SetForwardTransform(this);
-      return inv.GetPointer();
-    }
-    
-    // setup the fixed transform parameters:
-    void setup(// image bounding box expressed in the physical space:
-         const double x_min,
-         const double x_max,
-         const double y_min,
-         const double y_max,
-         
-         // normalization parameters:
-         const double Xmax = 0.0,
-         const double Ymax = 0.0)
-    {
-      double & uc_ = this->m_FixedParameters[0];
-      double & vc_ = this->m_FixedParameters[1];
-      double & xmax_ = this->m_FixedParameters[2];
-      double & ymax_ = this->m_FixedParameters[3];
-      double & a00_ = this->m_Parameters[index_a(0, 0)];
-      double & b00_ = this->m_Parameters[index_b(0, 0)];
-      
-      // center of the image:
-      double xc = (x_min + x_max) / 2.0;
-      double yc = (y_min + y_max) / 2.0;
-      uc_ = xc;
-      vc_ = yc;
-      
-      // setup the normalization parameters:
-      if (Xmax != 0.0 && Ymax != 0.0)
-      {
-  xmax_ = Xmax;
-  ymax_ = Ymax;
-      }
-      else
-      {
-  const double w = x_max - x_min;
-  const double h = y_max - y_min;
+    typedef InverseTransform<Self> InvTransformType;
+    typename InvTransformType::Pointer inv = InvTransformType::New();
+    inv->SetForwardTransform(this);
+    return inv.GetPointer();
+  }
   
-  // -1 : 1
-  xmax_ = w / 2.0;
-  ymax_ = h / 2.0;
-      }
+  // setup the fixed transform parameters:
+  void setup(// image bounding box expressed in the physical space:
+             const double x_min,
+             const double x_max,
+             const double y_min,
+             const double y_max,
+             
+             // normalization parameters:
+             const double Xmax = 0.0,
+             const double Ymax = 0.0)
+  {
+    double & uc_ = this->m_FixedParameters[0];
+    double & vc_ = this->m_FixedParameters[1];
+    double & xmax_ = this->m_FixedParameters[2];
+    double & ymax_ = this->m_FixedParameters[3];
+    double & a00_ = this->m_Parameters[index_a(0, 0)];
+    double & b00_ = this->m_Parameters[index_b(0, 0)];
+    
+    // center of the image:
+    double xc = (x_min + x_max) / 2.0;
+    double yc = (y_min + y_max) / 2.0;
+    uc_ = xc;
+    vc_ = yc;
+    
+    // setup the normalization parameters:
+    if (Xmax != 0.0 && Ymax != 0.0)
+    {
+      xmax_ = Xmax;
+      ymax_ = Ymax;
+    }
+    else
+    {
+      const double w = x_max - x_min;
+      const double h = y_max - y_min;
       
-      // setup a00, b00 (local translation parameters):
-      a00_ = xc / xmax_;
-      b00_ = yc / ymax_;
+      // -1 : 1
+      xmax_ = w / 2.0;
+      ymax_ = h / 2.0;
     }
     
-    // setup the translation parameters:
-    void setup_translation(// translation is expressed in the physical space:
-         const double tx_Xmax = 0.0,
-         const double ty_Ymax = 0.0)
-    {
-      // incorporate translation into the (uc, vc) fixed parameters:
-      double & uc_ = this->m_FixedParameters[0];
-      double & vc_ = this->m_FixedParameters[1];
-      
-      // FIXME: the signs might be wrong here (20051101):
-      uc_ -= tx_Xmax;
-      vc_ -= ty_Ymax;
-      
-      // FIXME: untested:
-      /*
-      double & a00_ = this->m_Parameters[index_a(0, 0)];
-      double & b00_ = this->m_Parameters[index_b(0, 0)];
-      a00_ -= tx_Xmax / GetXmax();
-      b00_ -= ty_Ymax / GetYmax();
-      */
-    }
-    
-    // helper required for numeric inverse transform calculation;
-    // evaluate F = T(x), J = dT/dx (another Jacobian):
-    void eval(const std::vector<ScalarType> & x,
-        std::vector<ScalarType> & F,
-        std::vector<std::vector<ScalarType> > & J) const;
-    
-    // setup a linear system to solve for the parameters of this
-    // transform such that it maps points uv to xy:
-    void setup_linear_system(const unsigned int start_with_degree,
-           const unsigned int degrees_covered,
-           const std::vector<InputPointType> & uv,
-           const std::vector<OutputPointType> & xy,
-           vnl_matrix<double> & M,
-           vnl_vector<double> & bx,
-           vnl_vector<double> & by) const;
-    
-    // find the polynomial coefficients such that this transform
-    // would map uv to xy:
-    void solve_for_parameters(const unsigned int start_with_degree,
-            const unsigned int degrees_covered,
-            const std::vector<InputPointType> & uv, // mosaic
-            const std::vector<OutputPointType> & xy,// tile
-            ParametersType & params) const;
-    
-    inline void solve_for_parameters(const unsigned int start_with_degree,
-             const unsigned int degrees_covered,
-             const std::vector<InputPointType> & uv,
-             const std::vector<OutputPointType> & xy)
-    {
-      ParametersType params = GetParameters();
-      solve_for_parameters(start_with_degree,
-         degrees_covered,
-         uv,
-         xy,
-         params);
-      SetParameters(params);
-    }
-    
-    // calculate the number of coefficients of a given
-    // degree range (per dimension):
-    inline static unsigned int
-    count_coefficients(const unsigned int start_with_degree,
-           const unsigned int degrees_covered)
-    {
-      return
-  index_a(0, start_with_degree + degrees_covered) -
-  index_a(0, start_with_degree);
-    }
-    
-    // accessors to the warp origin expressed in the mosaic coordinate system:
-    inline const double & GetUc() const
-    { return this->m_FixedParameters[0]; }
-    
-    inline const double & GetVc() const
-    { return this->m_FixedParameters[1]; }
-    
-    // accessors to the normalization parameters Xmax, Ymax:
-    inline const double & GetXmax() const
-    { return this->m_FixedParameters[2]; }
-    
-    inline const double & GetYmax() const
-    { return this->m_FixedParameters[3]; }
-    
-    // generate a mask of shared parameters:
-    static void setup_shared_params_mask(bool shared, std::vector<bool> & mask)
-    {
-      mask.assign(ParameterVectorLength, shared);
-      mask[index_a(0, 0)] = false;
-      mask[index_b(0, 0)] = false;
-    }
-    
-    // Convert the j, k indeces associated with a(j, k) coefficient
-    // into an index that can be used with the parameters array:
-    inline static unsigned int index_a(const unsigned int & j,
-               const unsigned int & k)
-    { return j + ((j + k) * (j + k + 1)) / 2; }
-    
-    inline static unsigned int index_b(const unsigned int & j,
-               const unsigned int & k)
-    { return CoefficientsPerDimension + index_a(j, k); }
-    
-    // virtual: Generate a platform independent name:
-    std::string GetTransformTypeAsString() const
-    {
-      std::string base = Superclass::GetTransformTypeAsString();
-      OStringStream name;
-      name << base << '_' << N;
-      return name.str();
-    }
-    
-  protected:
-    LegendrePolynomialTransform();      
-    
-    // virtual:
-    void PrintSelf(std::ostream & s, Indent indent) const;
-    
-  private:
-    // disable default copy constructor and assignment operator:
-    LegendrePolynomialTransform(const Self & other);
-    const Self & operator = (const Self & t);
-    
-    // polynomial coefficient accessors:
-    inline const double & a(const unsigned int & j,
-          const unsigned int & k) const
-    { return this->m_Parameters[index_a(j, k)]; }
-    
-    inline const double & b(const unsigned int & j,
-          const unsigned int & k) const
-    { return this->m_Parameters[index_b(j, k)]; }
-    
-  }; // class LegendrePolynomialTransform
+    // setup a00, b00 (local translation parameters):
+    a00_ = xc / xmax_;
+    b00_ = yc / ymax_;
+  }
   
+  // setup the translation parameters:
+  void setup_translation(// translation is expressed in the physical space:
+                         const double tx_Xmax = 0.0,
+                         const double ty_Ymax = 0.0)
+  {
+    // incorporate translation into the (uc, vc) fixed parameters:
+    double & uc_ = this->m_FixedParameters[0];
+    double & vc_ = this->m_FixedParameters[1];
+    
+    // FIXME: the signs might be wrong here (20051101):
+    uc_ -= tx_Xmax;
+    vc_ -= ty_Ymax;
+    
+    // FIXME: untested:
+    /*
+     double & a00_ = this->m_Parameters[index_a(0, 0)];
+     double & b00_ = this->m_Parameters[index_b(0, 0)];
+     a00_ -= tx_Xmax / GetXmax();
+     b00_ -= ty_Ymax / GetYmax();
+     */
+  }
+  
+  // helper required for numeric inverse transform calculation;
+  // evaluate F = T(x), J = dT/dx (another Jacobian):
+  void eval(const std::vector<ScalarType> & x,
+            std::vector<ScalarType> & F,
+            std::vector<std::vector<ScalarType> > & J) const;
+  
+  // setup a linear system to solve for the parameters of this
+  // transform such that it maps points uv to xy:
+  void setup_linear_system(const unsigned int start_with_degree,
+                           const unsigned int degrees_covered,
+                           const std::vector<InputPointType> & uv,
+                           const std::vector<OutputPointType> & xy,
+                           vnl_matrix<double> & M,
+                           vnl_vector<double> & bx,
+                           vnl_vector<double> & by) const;
+  
+  // find the polynomial coefficients such that this transform
+  // would map uv to xy:
+  void solve_for_parameters(const unsigned int start_with_degree,
+                            const unsigned int degrees_covered,
+                            const std::vector<InputPointType> & uv, // mosaic
+                            const std::vector<OutputPointType> & xy,// tile
+                            ParametersType & params) const;
+  
+  inline void solve_for_parameters(const unsigned int start_with_degree,
+                                   const unsigned int degrees_covered,
+                                   const std::vector<InputPointType> & uv,
+                                   const std::vector<OutputPointType> & xy)
+  {
+    ParametersType params = GetParameters();
+    solve_for_parameters(start_with_degree,
+                         degrees_covered,
+                         uv,
+                         xy,
+                         params);
+    SetParameters(params);
+  }
+  
+  // calculate the number of coefficients of a given
+  // degree range (per dimension):
+  inline static unsigned int
+  count_coefficients(const unsigned int start_with_degree,
+                     const unsigned int degrees_covered)
+  {
+    return
+    index_a(0, start_with_degree + degrees_covered) -
+    index_a(0, start_with_degree);
+  }
+  
+  // accessors to the warp origin expressed in the mosaic coordinate system:
+  inline const double & GetUc() const
+  { return this->m_FixedParameters[0]; }
+  
+  inline const double & GetVc() const
+  { return this->m_FixedParameters[1]; }
+  
+  // accessors to the normalization parameters Xmax, Ymax:
+  inline const double & GetXmax() const
+  { return this->m_FixedParameters[2]; }
+  
+  inline const double & GetYmax() const
+  { return this->m_FixedParameters[3]; }
+  
+  // generate a mask of shared parameters:
+  static void setup_shared_params_mask(bool shared, std::vector<bool> & mask)
+  {
+    mask.assign(ParameterVectorLength, shared);
+    mask[index_a(0, 0)] = false;
+    mask[index_b(0, 0)] = false;
+  }
+  
+  // Convert the j, k indeces associated with a(j, k) coefficient
+  // into an index that can be used with the parameters array:
+  inline static unsigned int index_a(const unsigned int & j,
+                                     const unsigned int & k)
+  { return j + ((j + k) * (j + k + 1)) / 2; }
+  
+  inline static unsigned int index_b(const unsigned int & j,
+                                     const unsigned int & k)
+  { return CoefficientsPerDimension + index_a(j, k); }
+  
+  // virtual: Generate a platform independent name:
+  std::string GetTransformTypeAsString() const
+  {
+    std::string base = Superclass::GetTransformTypeAsString();
+    OStringStream name;
+    name << base << '_' << N;
+    return name.str();
+  }
+  
+protected:
+  LegendrePolynomialTransform();      
+  
+  // virtual:
+  void PrintSelf(std::ostream & s, Indent indent) const;
+  
+private:
+  // disable default copy constructor and assignment operator:
+  LegendrePolynomialTransform(const Self & other);
+  const Self & operator = (const Self & t);
+  
+  // polynomial coefficient accessors:
+  inline const double & a(const unsigned int & j,
+                          const unsigned int & k) const
+  { return this->m_Parameters[index_a(j, k)]; }
+  
+  inline const double & b(const unsigned int & j,
+                          const unsigned int & k) const
+  { return this->m_Parameters[index_b(j, k)]; }
+  
+}; // class LegendrePolynomialTransform
+
 } // namespace itk
 
 

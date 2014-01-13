@@ -27,7 +27,8 @@
 #
 
 SET(CORE_ITKCOMMON_TESTS_SRCS
-  ITKTransformAdapterTests.cc
+  #ITKTransformAdapterTests.cc
+  ITKTransformTests.cc
 )
 
 REGISTER_UNIT_TEST(Core_ITKCommon_Tests
@@ -35,6 +36,8 @@ REGISTER_UNIT_TEST(Core_ITKCommon_Tests
 )
 
 TARGET_LINK_LIBRARIES(Core_ITKCommon_Tests
+  Core_Utils
+  Core_ITKCommon
   ${SCI_ITK_LIBRARIES}
   ${SCI_GTESTMAIN_LIBRARY}
 )

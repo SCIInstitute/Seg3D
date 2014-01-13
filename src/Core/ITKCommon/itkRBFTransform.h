@@ -76,171 +76,181 @@
 // 
 namespace itk
 {
-  class RBFTransform : public Transform<double, 2, 2>
-  {
-  public:
-    // standard typedefs:
-    typedef RBFTransform Self;
-    typedef SmartPointer<Self> Pointer;
-    typedef SmartPointer<const Self> ConstPointer;
-    
-    typedef Transform<double, 2, 2> Superclass;
-    
-    // Base inverse transform type:
-//    typedef Superclass::InverseTransformType InverseTransformType;
-    typedef Superclass InverseTransformType;
-    typedef SmartPointer< InverseTransformType > InverseTransformPointer;
-    
-    // RTTI:
-    itkTypeMacro(RBFTransform, Transform);
-    
-    // macro for instantiation through the object factory:
-    itkNewMacro(Self);
-    
-    /** Standard scalar type for this class. */
-    typedef double ScalarType;
-    
-    /** Dimension of the domain space. */
-    itkStaticConstMacro(InputSpaceDimension, unsigned int, 2);
-    itkStaticConstMacro(OutputSpaceDimension, unsigned int, 2);
-    
-    // shortcuts:
-    typedef Superclass::ParametersType ParametersType;
-    typedef Superclass::JacobianType JacobianType;
-    
-    typedef Superclass::InputPointType  InputPointType;
-    typedef Superclass::OutputPointType OutputPointType;
-    
-    // virtual:
-    OutputPointType TransformPoint(const InputPointType & uv) const;
-    
-    // Inverse transformations:
-    // If y = Transform(x), then x = BackTransform(y);
-    // if no mapping from y to x exists, then an exception is thrown.
-    InputPointType BackTransformPoint(const OutputPointType & y) const;
-    
-    // virtual:
-    void SetFixedParameters(const ParametersType & params)
-    { this->m_FixedParameters = params; }
-    
-    // virtual:
-    const ParametersType & GetFixedParameters() const
-    { return this->m_FixedParameters; }
-    
-    // virtual:
-    void SetParameters(const ParametersType & params)
-    { this->m_Parameters = params; }
-    
-    // virtual:
-    const ParametersType & GetParameters() const
-    { return this->m_Parameters; }
-    
-    // virtual:
-    unsigned int GetNumberOfParameters() const
-    { return this->m_Parameters.size(); }
-    
-    // virtual: return an inverse of this transform.
-    InverseTransformPointer GetInverse() const;
-    
-    // setup the transform parameters:
-    void setup(// image bounding box expressed in the image space,
-         // defines transform normalization parameters:
-         const OutputPointType & tile_min,  // tile space
-         const OutputPointType & tile_max,  // tile space
-         
-         // landmark correspondences:
-         const unsigned int num_pts,    // number of pairs
-         const InputPointType * uv,   // mosaic space
-         const OutputPointType * xy);   // tile space
-    
-    // virtual:
-    const JacobianType & GetJacobian(const InputPointType & point) const;
-    
-#if 0
-    // helper required for numeric inverse transform calculation;
-    // evaluate F = T(x), J = dT/dx (another Jacobian):
-    void eval(const std::vector<double> & x,
-        std::vector<double> & F,
-        std::vector<std::vector<double> > & J) const;
-#endif
-    
-    // number of landmark correspondences:
-    inline unsigned int num_points() const
-    { return (this->m_FixedParameters.size() - 4) / 2; }
-    
-    // calculate parameter vector indeces for various transform parameters:
-    inline static unsigned int index_a(const unsigned int & i)
-    { return i * 2; }
-    
-    inline static unsigned int index_b(const unsigned int & i)
-    { return i * 2 + 1; }
-    
-    inline static unsigned int index_f(const unsigned int & i)
-    { return i * 2 + 6; }
-    
-    inline static unsigned int index_g(const unsigned int & i)
-    { return i * 2 + 7; }
-    
-    inline static unsigned int index_uv(const unsigned int & i)
-    { return i * 2 + 4; }
-    
-    // accessors to the normalization parameters Xmax, Ymax:
-    inline const double & GetXmax() const
-    { return this->m_FixedParameters[0]; }
-    
-    inline const double & GetYmax() const
-    { return this->m_FixedParameters[1]; }
-    
-    // accessors to the warp origin expressed in the mosaic coordinate system:
-    inline const double & GetUc() const
-    { return this->m_FixedParameters[2]; }
-    
-    inline const double & GetVc() const
-    { return this->m_FixedParameters[3]; }
-    
-    // mosaic space landmark accessor:
-    inline const double * uv(const unsigned int & i) const
-    { return &(this->m_FixedParameters[index_uv(i)]); }
-    
-    // polynomial coefficient accessors:
-    inline const double & a(const unsigned int & i) const
-    { return this->m_Parameters[index_a(i)]; }
-    
-    inline const double & b(const unsigned int & i) const
-    { return this->m_Parameters[index_b(i)]; }
-    
-    // radial basis function accessors:
-    inline const double & f(const unsigned int & i) const
-    { return this->m_Parameters[index_f(i)]; }
-    
-    inline const double & g(const unsigned int & i) const
-    { return this->m_Parameters[index_g(i)]; }
-    
-    // the Radial Basis Function kernel:
-    inline static double kernel(const double * uv,
-        const double * uv_i,
-        const double & Xmax,
-        const double & Ymax)
-    {
-      double U = (uv[0] - uv_i[0]) / Xmax;
-      double V = (uv[1] - uv_i[1]) / Ymax;
-      double R = U * U + V * V;
-      return R == 0 ? 0 : R * log(R);
-    }
-    
-  protected:
-    RBFTransform();      
-    
-    // virtual:
-    void PrintSelf(std::ostream & s, Indent indent) const;
-    
-  private:
-    // disable default copy constructor and assignment operator:
-    RBFTransform(const Self & other);
-    const Self & operator = (const Self & t);
-    
-  }; // class RBFTransform
+
+class RBFTransform : public Transform<double, 2, 2>
+{
+public:
+  // standard typedefs:
+  typedef RBFTransform Self;
+  typedef Transform<double, 2, 2> Superclass;
+  typedef SmartPointer<Self> Pointer;
+  typedef SmartPointer<const Self> ConstPointer;
+
+  /** Base inverse transform type. This type should not be changed to the
+   * concrete inverse transform type or inheritance would be lost.*/
+  typedef Superclass::InverseTransformBaseType InverseTransformBaseType;
+  typedef InverseTransformBaseType::Pointer    InverseTransformBasePointer;
   
+  // RTTI:
+  itkTypeMacro(RBFTransform, Transform);
+  
+  // macro for instantiation through the object factory:
+  itkNewMacro(Self);
+  
+  /** Standard scalar type for this class. */
+  typedef double ScalarType;
+  
+  /** Dimension of the domain space. */
+  itkStaticConstMacro(InputSpaceDimension, unsigned int, 2);
+  itkStaticConstMacro(OutputSpaceDimension, unsigned int, 2);
+  
+  // shortcuts:
+  typedef Superclass::ParametersType ParametersType;
+  typedef Superclass::JacobianType JacobianType;
+  
+  typedef Superclass::InputPointType  InputPointType;
+  typedef Superclass::OutputPointType OutputPointType;
+  
+  // virtual:
+  virtual OutputPointType TransformPoint(const InputPointType & uv) const;
+  
+  // Inverse transformations:
+  // If y = Transform(x), then x = BackTransform(y);
+  // if no mapping from y to x exists, then an exception is thrown.
+  InputPointType BackTransformPoint(const OutputPointType & y) const;
+  
+  // virtual:
+  virtual
+  void SetFixedParameters(const ParametersType & params)
+  { this->m_FixedParameters = params; }
+  
+  // virtual:
+  virtual
+  const ParametersType & GetFixedParameters() const
+  { return this->m_FixedParameters; }
+  
+  // virtual:
+  virtual
+  void SetParameters(const ParametersType & params)
+  { this->m_Parameters = params; }
+  
+  // virtual:
+  virtual
+  const ParametersType & GetParameters() const
+  { return this->m_Parameters; }
+  
+  // virtual:
+  virtual
+  unsigned int GetNumberOfParameters() const
+  { return this->m_Parameters.size(); }
+
+  bool GetInverse(Self* inverse) const;
+  
+  // virtual: return an inverse of this transform.
+  virtual InverseTransformBasePointer GetInverseTransform() const;
+  
+  // setup the transform parameters:
+  void setup(// image bounding box expressed in the image space,
+       // defines transform normalization parameters:
+       const OutputPointType & tile_min,  // tile space
+       const OutputPointType & tile_max,  // tile space
+       
+       // landmark correspondences:
+       const unsigned int num_pts,    // number of pairs
+       const InputPointType * uv,   // mosaic space
+       const OutputPointType * xy);   // tile space
+  
+  // virtual:
+  virtual
+  const JacobianType & GetJacobian(const InputPointType & point) const;
+  
+#if 0
+//    // helper required for numeric inverse transform calculation;
+//    // evaluate F = T(x), J = dT/dx (another Jacobian):
+//    void eval(const std::vector<double> & x,
+//        std::vector<double> & F,
+//        std::vector<std::vector<double> > & J) const;
+#endif
+  
+  // number of landmark correspondences:
+  inline unsigned int num_points() const
+  { return (this->m_FixedParameters.size() - 4) / 2; }
+  
+  // calculate parameter vector indeces for various transform parameters:
+  inline static unsigned int index_a(const unsigned int & i)
+  { return i * 2; }
+  
+  inline static unsigned int index_b(const unsigned int & i)
+  { return i * 2 + 1; }
+  
+  inline static unsigned int index_f(const unsigned int & i)
+  { return i * 2 + 6; }
+  
+  inline static unsigned int index_g(const unsigned int & i)
+  { return i * 2 + 7; }
+  
+  inline static unsigned int index_uv(const unsigned int & i)
+  { return i * 2 + 4; }
+  
+  // accessors to the normalization parameters Xmax, Ymax:
+  inline const double & GetXmax() const
+  { return this->m_FixedParameters[0]; }
+  
+  inline const double & GetYmax() const
+  { return this->m_FixedParameters[1]; }
+  
+  // accessors to the warp origin expressed in the mosaic coordinate system:
+  inline const double & GetUc() const
+  { return this->m_FixedParameters[2]; }
+  
+  inline const double & GetVc() const
+  { return this->m_FixedParameters[3]; }
+  
+  // mosaic space landmark accessor:
+  inline const double * uv(const unsigned int & i) const
+  { return &(this->m_FixedParameters[index_uv(i)]); }
+  
+  // polynomial coefficient accessors:
+  inline const double & a(const unsigned int & i) const
+  { return this->m_Parameters[index_a(i)]; }
+  
+  inline const double & b(const unsigned int & i) const
+  { return this->m_Parameters[index_b(i)]; }
+  
+  // radial basis function accessors:
+  inline const double & f(const unsigned int & i) const
+  { return this->m_Parameters[index_f(i)]; }
+  
+  inline const double & g(const unsigned int & i) const
+  { return this->m_Parameters[index_g(i)]; }
+  
+  // the Radial Basis Function kernel:
+  inline static double kernel(const double * uv,
+      const double * uv_i,
+      const double & Xmax,
+      const double & Ymax)
+  {
+    double U = (uv[0] - uv_i[0]) / Xmax;
+    double V = (uv[1] - uv_i[1]) / Ymax;
+    double R = U * U + V * V;
+    return R == 0 ? 0 : R * log(R);
+  }
+  
+protected:
+  RBFTransform();      
+  ~RBFTransform();      
+  
+  // virtual:
+  virtual
+  void PrintSelf(std::ostream & s, Indent indent) const;
+  
+private:
+  // disable default copy constructor and assignment operator:
+  RBFTransform(const Self & other);
+  const Self & operator = (const Self & t);
+  
+}; // class RBFTransform
+
 } // namespace itk
 
 
