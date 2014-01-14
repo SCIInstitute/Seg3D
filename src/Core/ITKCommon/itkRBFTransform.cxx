@@ -51,7 +51,7 @@ namespace itk {
 // RBFTransform::RBFTransform
 // 
 RBFTransform::RBFTransform() :
-  RBFTransform::Superclass(2, 0)
+  RBFTransform::Superclass(2)
 {
   this->m_FixedParameters.SetSize(4);
   this->m_Parameters.SetSize(6);

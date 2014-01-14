@@ -63,6 +63,10 @@ public:
     
   virtual ~QtRenderWidget();
 
+  void saveSceneOnly(const std::string& name);
+  void saveOverlayOnly(const std::string& name);
+  void saveComposite(const std::string& name);
+
 protected:
 
   /// INITIALIZEGL:
@@ -118,6 +122,10 @@ protected:
   /// KEYPRESSEVENT:
   /// This function is called by Qt when a key is pressed
   virtual void keyReleaseEvent( QKeyEvent* event );
+
+  /// SAVETEXTURE:
+  /// JH: Saves a texture to the specified filename.
+  void saveTexture(const std::string& name, Core::Texture2DHandle texture);
 
   // -- internals of the QtRenderWidget --
 private:

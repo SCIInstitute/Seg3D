@@ -1,10 +1,9 @@
-
 #
 #  For more information, please see: http://software.sci.utah.edu
 # 
 #  The MIT License
 # 
-#  Copyright (c) 2009 Scientific Computing and Imaging Institute,
+#  Copyright (c) 2013 Scientific Computing and Imaging Institute,
 #  University of Utah.
 # 
 #  
@@ -62,14 +61,26 @@ SET(CORE_DATABLOCK_SRCS
   SliceType.h
   StdDataBlock.h
   StdDataBlock.cc
-  )
+)
 
 CORE_ADD_LIBRARY(Core_DataBlock ${CORE_DATABLOCK_SRCS} )
-            
-TARGET_LINK_LIBRARIES(Core_DataBlock
-                      Core_Utils
-                      Core_Geometry
-            ${SCI_ITK_LIBRARY}
-                      ${SCI_TEEM_LIBRARY}
-                      ${SCI_BOOST_LIBRARY})
 
+ITK_MODULE_LOAD(ITKCommon)
+
+MESSAGE(STATUS "Core/DataBlock ITK dependencies: ${ITKCommon_INCLUDE_DIRS}, ${ITKCommon_LIBRARIES}")
+#MESSAGE(STATUS "Core/DataBlock ITK libraries: ${ITK_LIBRARIES}")
+
+INCLUDE_DIRECTORIES(${ITKCommon_INCLUDE_DIRS})
+
+TARGET_LINK_LIBRARIES(Core_DataBlock
+  Core_Utils
+  Core_Geometry
+  #${SCI_ITK_LIBRARIES}
+  ${ITKCommon_LIBRARIES}
+  ${SCI_TEEM_LIBRARY}
+  ${SCI_BOOST_LIBRARY})
+
+#SET_TARGET_PROPERTIES(Core_DataBlock
+#  PROPERTIES
+#  INCLUDE_DIRECTORIES "${ITKCommon_INCLUDE_DIRS}"
+#)

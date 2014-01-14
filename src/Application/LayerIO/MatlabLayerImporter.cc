@@ -285,6 +285,7 @@ bool MatlabLayerImporterPrivate::scan_mat_array( MatlabIO::matlabarray &mlarray,
           }           
         }
         
+        // Sets up cell centered data
         Core::Point Origin;
         if ( ! read_spacing )
         {
@@ -409,7 +410,6 @@ bool MatlabLayerImporterPrivate::scan_mat_file( const std::string& filename )
   return false;
 }
 
-
 bool MatlabLayerImporterPrivate::import_mat_array( MatlabIO::matlabarray &mlarray,
   std::string& error )
 {
@@ -432,6 +432,8 @@ bool MatlabLayerImporterPrivate::import_mat_array( MatlabIO::matlabarray &mlarra
           dims[ 1 ] = dims[ 2 ];
           dims[ 2 ] = dims[ 3 ];        
         }
+ 
+        // node-centered (default)
 
         this->data_block_ = Core::StdDataBlock::New( static_cast<size_t>( dims[ 0 ] ),
           static_cast<size_t>( dims[ 1 ] ), static_cast<size_t>( dims[ 2 ] ),

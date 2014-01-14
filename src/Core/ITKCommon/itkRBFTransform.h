@@ -141,7 +141,7 @@ public:
   
   // virtual:
   virtual
-  unsigned int GetNumberOfParameters() const
+  NumberOfParametersType GetNumberOfParameters() const
   { return this->m_Parameters.size(); }
 
   bool GetInverse(Self* inverse) const;
