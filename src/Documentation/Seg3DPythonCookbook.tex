@@ -1,0 +1,166 @@
+\documentclass[fleqn,11pt,openany]{book}
+
+% These two need to be set before including scirun style package
+\title{Seg3D Python Cookbook}
+\author{Ayla Khan}
+
+% INCLUDE Seg3D STYLE DOCUMENT
+\usepackage{seg3d}
+\usepackage{marvosym}
+\usepackage[rightcaption]{sidecap}
+\usepackage{multirow}
+% see http://en.wikibooks.org/wiki/LaTeX/Source_Code_Listings,
+% http://stackoverflow.com/questions/741985/latex-source-code-listing-like-in-professional-books
+\usepackage{listings}
+%\usepackage{courier}
+\lstset{ %
+  basicstyle=\footnotesize\ttfamily,
+  breaklines=true,
+  commentstyle=\itshape\color{Violet},
+  frame=b,
+  framexleftmargin=17pt,
+  framexrightmargin=5pt,
+  framexbottommargin=4pt,
+  identifierstyle=\color{OliveGreen},
+  keepspaces=true,
+  keywordstyle=\bfseries\color{Blue},
+  language=Python,
+  numbersep=5pt,
+  numberstyle=\tiny
+  showspaces=false,
+  showtabs=false,
+  showstringspaces=false,
+  stringstyle=\ttfamily\color{BrickRed},
+  tabsize=2,
+  xleftmargin=\parindent
+}
+\DeclareCaptionFont{White}{\color{White}}
+\DeclareCaptionFormat{listing}{\colorbox{Gray}{\parbox{\textwidth}{#1#2#3}}}
+\captionsetup[lstlisting]{format=listing,labelfont=White,textfont=White}
+
+\begin{document}
+
+
+% CREATE TITLE PAGE --------------------------------------------------
+\maketitle
+
+% CHAPTERS ---------------------------------------------------------------
+
+\chapter{Overview}
+\label{sec:overview}
+
+\begin{introduction}
+Examples of how to use Seg3D python capabilities...
+See the Seg3D \href{http://www.sci.utah.edu/devbuilds/seg3d_docs/Seg3DBasicFunctionality.pdf}{Basic Functionality manual} and \href{http://www.sci.utah.edu/devbuilds/seg3d_docs/Seg3DTutorial.pdf}{tutorial} for general information about using Seg3D.
+\end{introduction}
+
+\chapter{Basics}
+
+\section{Loading Scripts}
+Python scripts can be run in the console using the open and exec commands, for example, on Linux or Mac OS X:
+
+\begin{lstlisting}[label=samplecode,caption=A sample]
+exec(open('/home/user/mypythonscript.py').read())
+\end{lstlisting}
+
+%% TODO:
+%And on Windows:
+%
+%\begin{lstlisting}[frame=single]
+%exec(open('mypythonscript.py').read())
+%\end{lstlisting}
+
+\section{Manipulating the GUI}
+
+Seg3D can be manipulated through state variables using the get and set functions. Look for the variable names in the Controller Window under the State Variables tab.
+
+\begin{lstlisting}[frame=single]
+# Switch the first view window (6 view windows in total)
+# to the Sagittal slice plane.
+# Returns bool value.
+result = set(stateid='viewer0::view_mode', value='Sagittal')
+\end{lstlisting}
+
+\section{Using Tools}
+
+The following are sample Seg3D python code snippets that can be run in the python console:
+
+\begin{lstlisting}[frame=single]
+# Threshold tool doesn't need to be open in GUI to run
+# thresholding as a python function.
+# Assumes a data layer with ID layer_0 is already open.
+result = threshold(layerid='layer_0', lower_threshold=56360, upper_threshold=24248)
+
+# Open the Threshold tool.
+id = opentool(tooltype='thresholdtool')
+
+# Close the Threshold tool.
+closetool(toolid=id)
+
+# Run the Neighborhood Connected filter (does not have to be
+# open in the GUI).
+# Assumes a data layer with ID layer_0 is already open.
+# Need at least one seed.
+result = neighborhoodconnectedfilter(layerid='layer_0', seeds=[[-0.24,20.3,57.2],[35.3,18.1,57.3],[18.7,25.4,57.3]])
+print(result)
+\end{lstlisting}
+
+\chapter{Batch Processing}
+
+Tool IDs can be obtained either from using the opentool method as shown above, or by looking them up in the Controller Window under the State Variables tab. Tool variables can be used to batch fill polylines from the Polyline or Speedline tools in slices in a given layer.
+
+\begin{lstlisting}[frame=single]
+# Get the list of vertices making up a polyline in the
+# Polyline or Speedline tools.
+current_vertices=get(stateid='speedlinetool_0::vertices')
+
+# Use polyline list
+polyline(target='layer_2', slice_type=0, slice_number=93, vertices=current_vertices,erase=False)
+polyline(target='layer_2', slice_type=0, slice_number=94, vertices=current_vertices,erase=False)
+\end{lstlisting}
+
+A more complex example involves waiting for a filter to finish before exporting the results, in this case, mask layers. It is necessary to check if data is available in the layer using the ID returned by the filter (a layer has 4 states: creating, processing, in use and available).
+
+In this case, a condition variable blocks until the predicate (lambda function that checks the layer state) evaluates to True.
+
+\begin{lstlisting}[frame=single]
+import os
+import threading
+
+class MyThread(threading.Thread):
+  def __init__(self, layerID, timeout=2.0, max_iterations=1000):
+    self.layerID = layerID
+    self.outputDir = outputDir
+    self.TIMEOUT = timeout
+    self.MAX_ITERATIONS = max_iterations
+    self.condition = threading.Condition()
+    threading.Thread.__init__(self)
+
+
+  def run(self):
+    stateIDData = self.layerID + "::data"
+    layerStatus = get(stateid=stateIDData)
+    print(self.layerID, " ", layerStatus)
+
+    with self.condition:
+      self.condition.wait_for(lambda: "available" == get(stateid=stateIDData), timeout=self.TIMEOUT)
+
+    print("Layer {} done processing".format(self.layerID))
+
+
+def transformExportNRRD(filesnames, outputDir):
+  if not os.path.exists(outputDir):
+    raise ValueError("Path %s does not exist." % outputDir)
+
+  layers = []
+  for f in files:
+    if not os.path.exists(f):
+      raise ValueError("Path {} does not exist.".format(f))
+    importedFile = importlayer(filename=f, importer='[Matlab Importer]', mode='label_mask')
+    if len(importedFile) < 1:
+      raise Exception("importlayer failed")
+    layers.append(importedFile[0])
+\end{lstlisting}
+
+\end{document}
+

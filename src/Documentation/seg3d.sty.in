@@ -3,7 +3,7 @@
 \usepackage{ifpdf}
 \usepackage[centertags]{amsmath}
 %\usepackage{authordate1-4}
-\usepackage{color}
+\usepackage[usenames,dvipsnames]{color}
 \usepackage{fancyhdr}
 
 \ifpdf
@@ -26,7 +26,8 @@
 \fi
 
 
-\usepackage[normal,nooneline]{caption2}
+%\usepackage[normal,nooneline]{caption2}
+\usepackage[normal,nooneline]{caption}
 \usepackage[normal,footnotesize,nooneline]{subfigure}
 \usepackage{array}
 \usepackage{amsmath}
@@ -134,9 +135,9 @@
 % define captions
 %\renewcommand\captionfont{\small}%
 %\renewcommand\captionlabelfont{\bfseries}%
-\setcaptionmargin{0pt}%
-\setlength\captionindent{0pt}%
-\renewcommand*\captionlabeldelim{.}%
+%\setcaptionmargin{0pt}%
+%\setlength\captionindent{0pt}%
+%\renewcommand*\captionlabeldelim{.}%
 
 % distances in subfig environment
 \renewcommand\subfigtopskip{0pt}

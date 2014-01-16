@@ -124,4 +124,5 @@ ENDMACRO(ADD_PDF_DOCUMENT)
 
 ADD_PDF_DOCUMENT(Seg3DTutorial)
 ADD_PDF_DOCUMENT(Seg3DBasicFunctionality)
-# Forcing documentation to be build
+ADD_PDF_DOCUMENT(Seg3DPythonCookbook)
+# Forcing documentation build
