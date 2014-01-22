@@ -161,8 +161,10 @@ public:
        const OutputPointType * xy);   // tile space
   
   // virtual:
-  virtual
-  const JacobianType & GetJacobian(const InputPointType & point) const;
+//  virtual
+//  const JacobianType & GetJacobian(const InputPointType & point) const;
+
+  virtual void ComputeJacobianWithRespectToParameters( const InputPointType &, JacobianType & ) const;
   
 #if 0
 //    // helper required for numeric inverse transform calculation;

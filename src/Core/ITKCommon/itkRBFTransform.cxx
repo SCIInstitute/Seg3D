@@ -55,8 +55,8 @@ RBFTransform::RBFTransform() :
 {
   this->m_FixedParameters.SetSize(4);
   this->m_Parameters.SetSize(6);
-  this->m_Jacobian.SetSize(2, 6);
-  this->m_Jacobian.Fill(0);
+//  this->m_Jacobian.SetSize(2, 6);
+//  this->m_Jacobian.Fill(0);
   
   double & Xmax = this->m_FixedParameters[0];
   double & Ymax = this->m_FixedParameters[1];
@@ -196,8 +196,8 @@ RBFTransform::setup(// image bounding box expressed in the image space,
 {
   this->m_FixedParameters.SetSize(4 + num_pts * 2);
   this->m_Parameters.SetSize(6 + num_pts * 2);
-  this->m_Jacobian.SetSize(2, 6 + num_pts * 2);
-  this->m_Jacobian.Fill(0);
+//  this->m_Jacobian.SetSize(2, 6 + num_pts * 2);
+//  this->m_Jacobian.Fill(0);
   
   // setup the normalization parameters:
   double & Xmax = this->m_FixedParameters[0];
@@ -301,8 +301,51 @@ RBFTransform::setup(// image bounding box expressed in the image space,
 //----------------------------------------------------------------
 // RBFTransform::GetJacobian
 // 
-const RBFTransform::JacobianType &
-RBFTransform::GetJacobian(const InputPointType & point) const
+//const RBFTransform::JacobianType &
+//RBFTransform::GetJacobian(const InputPointType & point) const
+//{
+//  // shortcuts:
+//  const double & Xmax = GetXmax();
+//  const double & Ymax = GetYmax();
+//  const double & uc = GetUc();
+//  const double & vc = GetVc();
+//  
+//  const double & u = point[0];
+//  const double & v = point[1];
+//  
+//  const double A = (u - uc) / Xmax;
+//  const double B = (v - vc) / Ymax;
+//  
+//  this->m_Jacobian(0, index_a(0)) = Xmax;
+//  this->m_Jacobian(0, index_a(1)) = Xmax * A;
+//  this->m_Jacobian(0, index_a(2)) = Xmax * B;
+//  
+//  this->m_Jacobian(1, index_b(0)) = Ymax;
+//  this->m_Jacobian(1, index_b(1)) = Ymax * A;
+//  this->m_Jacobian(1, index_b(2)) = Ymax * B;
+//  
+//  const unsigned int num_pts = num_points();
+//  const double * uv_vec = &(this->m_FixedParameters[index_uv(0)]);
+//  
+//  for (unsigned int i = 0; i < num_pts; i++)
+//  {
+//    unsigned int offset = i * 2;
+//    double U = (u - uv_vec[offset]) / Xmax;
+//    double V = (v - uv_vec[offset + 1]) / Ymax;
+//    
+//    double R = U * U + V * V;
+//    double lR = R == 0 ? 0 : log(R);
+//    double Q = R * lR;
+//    
+//    this->m_Jacobian(0, index_f(i)) = Xmax * Q;
+//    this->m_Jacobian(1, index_g(i)) = Ymax * Q;
+//  }
+//  
+//  return this->m_Jacobian;
+//}
+
+void
+  RBFTransform::ComputeJacobianWithRespectToParameters( const InputPointType& point, JacobianType& jacobian ) const
 {
   // shortcuts:
   const double & Xmax = GetXmax();
@@ -316,13 +359,13 @@ RBFTransform::GetJacobian(const InputPointType & point) const
   const double A = (u - uc) / Xmax;
   const double B = (v - vc) / Ymax;
   
-  this->m_Jacobian(0, index_a(0)) = Xmax;
-  this->m_Jacobian(0, index_a(1)) = Xmax * A;
-  this->m_Jacobian(0, index_a(2)) = Xmax * B;
+  jacobian(0, index_a(0)) = Xmax;
+  jacobian(0, index_a(1)) = Xmax * A;
+  jacobian(0, index_a(2)) = Xmax * B;
   
-  this->m_Jacobian(1, index_b(0)) = Ymax;
-  this->m_Jacobian(1, index_b(1)) = Ymax * A;
-  this->m_Jacobian(1, index_b(2)) = Ymax * B;
+  jacobian(1, index_b(0)) = Ymax;
+  jacobian(1, index_b(1)) = Ymax * A;
+  jacobian(1, index_b(2)) = Ymax * B;
   
   const unsigned int num_pts = num_points();
   const double * uv_vec = &(this->m_FixedParameters[index_uv(0)]);
@@ -337,12 +380,11 @@ RBFTransform::GetJacobian(const InputPointType & point) const
     double lR = R == 0 ? 0 : log(R);
     double Q = R * lR;
     
-    this->m_Jacobian(0, index_f(i)) = Xmax * Q;
-    this->m_Jacobian(1, index_g(i)) = Ymax * Q;
+    jacobian(0, index_f(i)) = Xmax * Q;
+    jacobian(1, index_g(i)) = Ymax * Q;
   }
-  
-  return this->m_Jacobian;
 }
+
 
 #if 0
 //----------------------------------------------------------------
