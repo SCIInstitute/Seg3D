@@ -123,6 +123,16 @@ public:
     itkExceptionMacro(<< "ComputeJacobianWithRespectToParameters is not implemented for InverseTransform");
   }
 
+  virtual void SetFixedParameters(const ParametersType &)
+  {
+    itkExceptionMacro(<< "SetFixedParameters is not implemented for InverseTransform");
+  }
+  
+  virtual void SetParameters(const ParametersType &)
+  {
+    itkExceptionMacro(<< "SetParameters is not implemented for InverseTransform");
+  }
+
   virtual NumberOfParametersType GetNumberOfParameters() const 
   { return 0; }
 
