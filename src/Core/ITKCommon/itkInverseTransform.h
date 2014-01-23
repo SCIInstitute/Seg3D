@@ -94,6 +94,10 @@ public:
   typedef typename Superclass::InputPointType InputPointType;
   typedef typename Superclass::OutputPointType OutputPointType;
   
+  /** The number of parameters defininig this transform. */
+  typedef typename Superclass::NumberOfParametersType NumberOfParametersType;
+  
+  
   /** Dimension of the domain space. */
   itkStaticConstMacro(InputSpaceDimension,
                       unsigned int,
@@ -114,21 +118,19 @@ public:
     return forward_->BackTransformPoint(y);
   }
 
-  virtual const JacobianType & GetJacobian(const InputPointType &) const
+  virtual void ComputeJacobianWithRespectToParameters( const InputPointType &, JacobianType & ) const
   {
-    itkExceptionMacro(<< "GetJacobian is not implemented "
-                      "for InverseTransform");
-    return this->m_Jacobian;
-  };
+    itkExceptionMacro(<< "ComputeJacobianWithRespectToParameters is not implemented for InverseTransform");
+  }
 
-  virtual unsigned int GetNumberOfParameters() const 
+  virtual NumberOfParametersType GetNumberOfParameters() const 
   { return 0; }
 
   virtual InverseTransformBasePointer GetInverseTransform() const
   { return const_cast<ForwardTransform *>(forward_); }
 
 protected:
-  InverseTransform(): Superclass(0, 0) {}
+  InverseTransform(): Superclass(0) {}
   
 private:
   // disable default copy constructor and assignment operator:

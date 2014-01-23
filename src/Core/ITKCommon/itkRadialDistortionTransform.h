@@ -102,6 +102,9 @@ public:
   /** Standard scalar type for this class. */
   typedef typename Superclass::ScalarType ScalarType;
   
+  /** The number of parameters defininig this transform. */
+  typedef typename Superclass::NumberOfParametersType NumberOfParametersType;
+  
   // shortcuts:
   typedef typename Superclass::ParametersType ParametersType;
   typedef typename Superclass::JacobianType JacobianType;
@@ -140,12 +143,13 @@ public:
   
   // virtual: mumber of parameters that define this transform:
   virtual
-  unsigned int GetNumberOfParameters() const
+  NumberOfParametersType GetNumberOfParameters() const
   { return N + 2; }
   
   // virtual:
-  virtual
-  const JacobianType & GetJacobian(const InputPointType & point) const;
+//  virtual
+//  const JacobianType & GetJacobian(const InputPointType & point) const;
+  virtual void ComputeJacobianWithRespectToParameters( const InputPointType &, JacobianType & ) const;
   
   // virtual: return an inverse of this transform.
   virtual InverseTransformBasePointer GetInverseTransform() const

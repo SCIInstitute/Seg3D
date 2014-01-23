@@ -255,7 +255,7 @@ public:
   }
 
   // virtual:
-  virtual unsigned int GetNumberOfParameters() const
+  virtual NumberOfParametersType GetNumberOfParameters(void) const
   { return 4 * transform_.grid_.mesh_.size(); }
 
   // virtual: return an inverse of this transform.
@@ -273,7 +273,7 @@ public:
     transform_ = transform;
     GetParameters();
     GetFixedParameters();
-    this->m_Jacobian.SetSize(2, GetNumberOfParameters());
+//    this->m_Jacobian.SetSize(2, GetNumberOfParameters());
     this->m_FixedParameters[0] = is_inverse ? 1.0 : 0.0;
   }
 
@@ -281,42 +281,73 @@ public:
   inline bool is_inverse() const
   { return this->m_FixedParameters[0] != 0.0; }
 
-  // virtual:
+//  // virtual:
+//  virtual
+//  const JacobianType &
+//  GetJacobian(const InputPointType & point) const
+//  {
+//    // FIXME: 20061227 -- this function was written and not tested:
+//
+//    // these scales are necessary to account for the fact that
+//    // the_mesh_transform_t expects uv in the [0,1]x[0,1] range,
+//    // where as we remap it into the image tile physical coordinates
+//    // according to tile_min_ and tile_ext_:
+//    double Su = transform_.tile_ext_[0];
+//    double Sv = transform_.tile_ext_[1];
+//
+//    unsigned int idx[3];
+//    double jac[12];
+//    this->m_Jacobian.SetSize(2, GetNumberOfParameters());
+//    this->m_Jacobian.Fill(0.0);
+//    if (transform_.jacobian(point, idx, jac))
+//    {
+//      for (unsigned int i = 0; i < 3; i++)
+//      {
+//        unsigned int addr = idx[i] * 2;
+//        this->m_Jacobian(0, addr) = Su * jac[i * 2];
+//        this->m_Jacobian(0, addr + 1) = Su * jac[i * 2 + 1];
+//        this->m_Jacobian(1, addr) = Sv * jac[i * 2 + 6];
+//        this->m_Jacobian(1, addr + 1) = Sv * jac[i * 2 + 7];
+//      }
+//    }
+//
+//    return this->m_Jacobian;
+//  }
+
   virtual
-  const JacobianType &
-  GetJacobian(const InputPointType & point) const
+  void
+  ComputeJacobianWithRespectToParameters( const InputPointType &point, JacobianType &jacobian ) const
   {
     // FIXME: 20061227 -- this function was written and not tested:
-
+    
     // these scales are necessary to account for the fact that
     // the_mesh_transform_t expects uv in the [0,1]x[0,1] range,
     // where as we remap it into the image tile physical coordinates
     // according to tile_min_ and tile_ext_:
     double Su = transform_.tile_ext_[0];
     double Sv = transform_.tile_ext_[1];
-
+    
     unsigned int idx[3];
     double jac[12];
-    this->m_Jacobian.SetSize(2, GetNumberOfParameters());
-    this->m_Jacobian.Fill(0.0);
+    jacobian.SetSize(2, GetNumberOfParameters());
+    jacobian.Fill(0.0);
     if (transform_.jacobian(point, idx, jac))
     {
       for (unsigned int i = 0; i < 3; i++)
       {
         unsigned int addr = idx[i] * 2;
-        this->m_Jacobian(0, addr) = Su * jac[i * 2];
-        this->m_Jacobian(0, addr + 1) = Su * jac[i * 2 + 1];
-        this->m_Jacobian(1, addr) = Sv * jac[i * 2 + 6];
-        this->m_Jacobian(1, addr + 1) = Sv * jac[i * 2 + 7];
+        jacobian(0, addr) = Su * jac[i * 2];
+        jacobian(0, addr + 1) = Su * jac[i * 2 + 1];
+        jacobian(1, addr) = Sv * jac[i * 2 + 6];
+        jacobian(1, addr + 1) = Sv * jac[i * 2 + 7];
       }
     }
-
-    return this->m_Jacobian;
   }
-
+  
 protected:
   MeshTransform():
-    Superclass(2, 0)
+//    Superclass(2, 0)
+    Superclass(0)
   {
     this->m_FixedParameters.SetSize(8);
 

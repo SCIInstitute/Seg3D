@@ -120,6 +120,9 @@ public:
   itkStaticConstMacro(InputSpaceDimension, unsigned int, 2);
   itkStaticConstMacro(OutputSpaceDimension, unsigned int, 2);
   
+  /** The number of parameters defininig this transform. */
+  typedef typename Superclass::NumberOfParametersType NumberOfParametersType;
+  
   // shortcuts:
   typedef typename Superclass::ParametersType ParametersType;
   typedef typename Superclass::JacobianType JacobianType;
@@ -152,11 +155,12 @@ public:
   { return this->m_Parameters; }
   
   // virtual:
-  virtual unsigned int GetNumberOfParameters() const
+  virtual NumberOfParametersType GetNumberOfParameters() const
   { return ParameterVectorLength; }
   
   // virtual:
-  virtual const JacobianType & GetJacobian(const InputPointType & point) const;
+//  virtual const JacobianType & GetJacobian(const InputPointType & point) const;
+  virtual void ComputeJacobianWithRespectToParameters( const InputPointType &, JacobianType & ) const;
   
   // virtual: return an inverse of this transform.
   virtual InverseTransformBasePointer GetInverseTransform() const
@@ -319,7 +323,7 @@ public:
   std::string GetTransformTypeAsString() const
   {
     std::string base = Superclass::GetTransformTypeAsString();
-    OStringStream name;
+    std::ostringstream name;
     name << base << '_' << N;
     return name.str();
   }

@@ -145,7 +145,7 @@ namespace itk
   template <class TScalarType, unsigned int N>
   LegendrePolynomialTransform<TScalarType, N>::
   LegendrePolynomialTransform():
-    Superclass(2, ParameterVectorLength)
+    Superclass(ParameterVectorLength)
   {
     // by default, the parameters are initialized for an identity transform:
     // initialize the parameters for an identity transform:
@@ -164,12 +164,12 @@ namespace itk
     this->m_Parameters[index_a(0, 0)] = GetUc() / GetXmax();
     this->m_Parameters[index_b(0, 0)] = GetVc() / GetYmax();
     
-    // zero-out the Jacobian:
-    for (unsigned int i = 0; i < ParameterVectorLength; i++)
-    {
-      this->m_Jacobian(0, i) = 0.0;
-      this->m_Jacobian(1, i) = 0.0;
-    }
+//    // zero-out the Jacobian:
+//    for (unsigned int i = 0; i < ParameterVectorLength; i++)
+//    {
+//      this->m_Jacobian(0, i) = 0.0;
+//      this->m_Jacobian(1, i) = 0.0;
+//    }
   }
   
   //----------------------------------------------------------------
@@ -258,13 +258,54 @@ namespace itk
     return x;
   }
   
-  //----------------------------------------------------------------
-  // GetJacobian
-  // 
+//  //----------------------------------------------------------------
+//  // GetJacobian
+//  // 
+//  template <class TScalarType, unsigned int N>
+//  const typename LegendrePolynomialTransform<TScalarType, N>::JacobianType & 
+//  LegendrePolynomialTransform<TScalarType, N>::
+//  GetJacobian(const InputPointType & x) const
+//  {
+//    const double & uc = this->GetUc();
+//    const double & vc = this->GetVc();
+//    const double & Xmax = this->GetXmax();
+//    const double & Ymax = this->GetYmax();
+//    
+//    const ScalarType & u = x[0];
+//    const ScalarType & v = x[1];
+//    
+//    const double A = (u - uc) / Xmax;
+//    const double B = (v - vc) / Ymax;
+//    
+//    double P[N + 1];
+//    double Q[N + 1];
+//    for (unsigned int i = 0; i <= N; i++)
+//    {
+//      P[i] = Legendre::P[i](A);
+//      Q[i] = Legendre::P[i](B);
+//    }
+//    
+//    // derivatives with respect to a_jk, b_jk:
+//    for (unsigned int i = 0; i <= N; i++)
+//    {
+//      for (unsigned int j = 0; j <= i; j++)
+//      {
+//	unsigned int k = i - j;
+//	
+//	double PjQk = P[j] * Q[k];
+//	this->m_Jacobian(0, index_a(j, k)) = Xmax * PjQk;
+//	this->m_Jacobian(1, index_b(j, k)) = Ymax * PjQk;
+//      }
+//    }
+//    
+//    // done:
+//    return this->m_Jacobian;
+//  }
+
   template <class TScalarType, unsigned int N>
-  const typename LegendrePolynomialTransform<TScalarType, N>::JacobianType & 
+  void 
   LegendrePolynomialTransform<TScalarType, N>::
-  GetJacobian(const InputPointType & x) const
+  ComputeJacobianWithRespectToParameters( const InputPointType &x, JacobianType &jacobian ) const
   {
     const double & uc = this->GetUc();
     const double & vc = this->GetVc();
@@ -290,16 +331,13 @@ namespace itk
     {
       for (unsigned int j = 0; j <= i; j++)
       {
-	unsigned int k = i - j;
-	
-	double PjQk = P[j] * Q[k];
-	this->m_Jacobian(0, index_a(j, k)) = Xmax * PjQk;
-	this->m_Jacobian(1, index_b(j, k)) = Ymax * PjQk;
+        unsigned int k = i - j;
+        
+        double PjQk = P[j] * Q[k];
+        jacobian(0, index_a(j, k)) = Xmax * PjQk;
+        jacobian(1, index_b(j, k)) = Ymax * PjQk;
       }
-    }
-    
-    // done:
-    return this->m_Jacobian;
+    }    
   }
   
   //----------------------------------------------------------------
