@@ -35,23 +35,30 @@ SET(CORE_ITKCOMMON_SRCS
   itkDiscontinuousTransform.h
   itkDiscontinuousTransform.cxx
   itkGridTransform.h
+  itkImageMosaicVarianceMetric.h
+  itkImageMosaicVarianceMetric.txx
   itkInverseTransform.h
   itkLegendrePolynomialTransform.h
-  #itkLegendrePolynomialTransform.txx
+  itkLegendrePolynomialTransform.txx
   itkMeshTransform.h
   itkNumericInverse.h
   itkRBFTransform.h
   itkRBFTransform.cxx
   itkRadialDistortionTransform.h
-  #itkRadialDistortionTransform.txx
+  itkRadialDistortionTransform.txx
+  itkRegularStepGradientDescentOptimizer2.h
+  itkRegularStepGradientDescentOptimizer2.cxx
   itkTypes.h
   BoundingBox.h
   BoundingBox.cxx
+  FFTWrapper.h
+  FFTWrapper.cxx
 )
 
 CORE_ADD_LIBRARY(Core_ITKCommon ${CORE_ITKCOMMON_SRCS})
 TARGET_LINK_LIBRARIES(Core_ITKCommon
   Core_Utils
+  Core_IRTools_tmp
   ${SCI_ITK_LIBRARIES}
 )
 
