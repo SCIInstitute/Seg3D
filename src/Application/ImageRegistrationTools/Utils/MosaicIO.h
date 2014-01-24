@@ -44,7 +44,7 @@
 #include <Core/ITKCommon/itkTypes.h>
 
 // TODO: temporary
-#include <Application/ImageRegistrationTools/Utils/tmp/the_text.hxx>
+#include <Core/IRTools_tmp/the_text.hxx>
 
 //----------------------------------------------------------------
 // load_mosaic

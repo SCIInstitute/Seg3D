@@ -35,8 +35,6 @@
 // the includes:
 #include <Application/ImageRegistrationTools/Utils/MosaicLayout.h>
 
-#include <itk/itkRegularStepGradientDescentOptimizer2.h>
-#include <itk/itkImageMosaicVarianceMetric.h>
 
 // ITK includes:
 #include <itkCommand.h>

@@ -53,13 +53,6 @@ SET(APPLICATION_IRTOOLS_UTILS_SRCS
   Utils/LocalMapping.cc
 )
 
-# code that needs to be reworked and/or replaced
-SET(APPLICATION_IRTOOLS_UTILS_TMP_SRCS
-  Utils/tmp/the_text.hxx
-  Utils/tmp/the_text.cxx
-)
-
-  
 IF(BUILD_WITH_PYTHON)
  GENERATE_ACTION_PYTHON_WRAPPER(PYTHON_WRAPPER Application_ImageRegistrationTools ${APPLICATION_IRTOOLS_ACTIONS_SRCS})
  SET(APPLICATION_IRTOOLS_NOREGISTER_SRCS ${PYTHON_WRAPPER})
@@ -70,7 +63,6 @@ CORE_ADD_LIBRARY(Application_ImageRegistrationTools
   ${APPLICATION_IRTOOLS_SRCS}
   ${APPLICATION_IRTOOLS_ACTIONS_SRCS}
   ${APPLICATION_IRTOOLS_UTILS_SRCS}
-  ${APPLICATION_IRTOOLS_UTILS_TMP_SRCS}
 )
             
 TARGET_LINK_LIBRARIES(Application_ImageRegistrationTools
@@ -81,6 +73,7 @@ TARGET_LINK_LIBRARIES(Application_ImageRegistrationTools
   Core_State
   Core_Geometry
   Core_ITKCommon
+  Core_IRTools_tmp
   Application_Filters
   Application_Tool
   Application_ToolManager

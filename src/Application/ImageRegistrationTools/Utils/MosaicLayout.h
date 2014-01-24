@@ -35,21 +35,33 @@
 #ifndef APPLICATION_IMAGEREGISTRATIONTOOLS_UTILS_MOSAICLAYOUT_H
 #define APPLICATION_IMAGEREGISTRATIONTOOLS_UTILS_MOSAICLAYOUT_H
 
+#if 0
 // the includes:
 //#include <itk/common.hxx>
-#include <itk/fft_common.hxx>
-#include <itk/grid_common.hxx>
-#include <itk/itkLegendrePolynomialTransform.h>
-#include <itk/itkRegularStepGradientDescentOptimizer2.h>
-#include <itk/itkImageMosaicVarianceMetric.h>
-#include <utils/the_utils.hxx>
-//#include <utils/the_log.hxx>
+//#include <itk/fft_common.hxx>
+//#include <itk/grid_common.hxx>
+#endif
+
+#include <Core/ITKCommon/itkTypes.h>
+#include <Core/ITKCommon/itkLegendrePolynomialTransform.h>
+#include <Core/ITKCommon/itkRegularStepGradientDescentOptimizer2.h>
+#include <Core/ITKCommon/itkImageMosaicVarianceMetric.h>
+
+#include <Application/ImageRegistrationTools/Utils/FFTCommon.h>
+#include <Application/ImageRegistrationTools/Utils/GridCommon.h>
+
+
+// TODO: temporary
+#include <Core/IRTools_tmp/the_log.hxx>
+#include <Core/IRTools_tmp/the_utils.hxx>
 
 // ITK includes:
 #include <itkCommand.h>
 #include <itkImageMaskSpatialObject.h>
 #include <itkImageRegistrationMethod.h>
 #include <itkMeanSquaresImageToImageMetric.h>
+
+
 
 
 //----------------------------------------------------------------
