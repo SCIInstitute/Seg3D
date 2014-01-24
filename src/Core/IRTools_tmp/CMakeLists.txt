@@ -36,6 +36,7 @@ SET(CORE_IRTOOLS_TMP_SRCS
   the_boost_thread.hxx
   the_boost_thread_storage.hxx
   the_dynamic_array.hxx
+  the_exception.hxx
   the_log.cxx
   the_log.hxx
   the_mutex_interface.cxx
