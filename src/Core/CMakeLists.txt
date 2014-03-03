@@ -51,6 +51,3 @@ ADD_SUBDIRECTORY(Graphics)
 ADD_SUBDIRECTORY(RenderResources)
 ADD_SUBDIRECTORY(Renderer)
 ADD_SUBDIRECTORY(VolumeRenderer)
-
-# TODO: temporary
-ADD_SUBDIRECTORY(IRTools_tmp)
