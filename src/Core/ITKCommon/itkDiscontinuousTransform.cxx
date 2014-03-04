@@ -40,7 +40,6 @@
 
 // local includes:
 #include <Core/ITKCommon/itkDiscontinuousTransform.h>
-#include <Core/ITKCommon/BoundingBox.h>
 
 // system includes:
 #include <algorithm>

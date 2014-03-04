@@ -43,6 +43,8 @@
 // ITK includes:
 #include <itkSingleValuedNonLinearOptimizer.h>
 
+#include "the_log.hxx"
+
 
 namespace itk
 {
@@ -120,8 +122,8 @@ public:
   itkSetMacro(PickUpPaceSteps, unsigned int);
   itkGetConstReferenceMacro(PickUpPaceSteps, unsigned int);
   
-//  inline void SetLog(the_log_t * log)
-//  { log_ = log; }
+  inline void SetLog(the_log_t * log)
+  { log_ = log; }
   
   itkGetConstReferenceMacro(CurrentStepLength, double);
   itkGetConstMacro(CurrentIteration, unsigned int);
@@ -179,7 +181,7 @@ protected:
   // default is 1000000:
   unsigned int    m_PickUpPaceSteps;
   
-//  the_log_t * log_;
+  the_log_t * log_;
   
 private:
   // disable the copy constructor and assignment operator:

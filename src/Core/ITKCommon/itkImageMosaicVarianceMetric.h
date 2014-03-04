@@ -1,4 +1,3 @@
-// -*- Mode: c++; tab-width: 8; c-basic-offset: 2; indent-tabs-mode: t -*-
 /*
  For more information, please see: http://software.sci.utah.edu
  

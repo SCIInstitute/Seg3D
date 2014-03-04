@@ -108,6 +108,9 @@ public:
   typedef CovariantVectorType InputCovariantVectorType;
   typedef CovariantVectorType OutputCovariantVectorType;
   
+  /** The number of parameters defininig this transform. */
+  typedef typename Superclass::NumberOfParametersType NumberOfParametersType;
+  
   // virtual:
   virtual PointType TransformPoint(const PointType & x) const
   {
@@ -187,8 +190,7 @@ public:
     {
       unsigned int idx = (cascade_length - 1) - i;
 //      inverse->transform_[i] = transform_[idx]->GetInverseTransform();
-      TransformPointer inverseTransform = Superclass::New();
-      inverseTransform =
+      TransformPointer inverseTransform =
         dynamic_cast<Superclass*>( transform_[idx]->GetInverseTransform().GetPointer() );
       if (inverseTransform)
       {
@@ -216,19 +218,23 @@ public:
   {
     Pointer inv = Self::New();
     return this->GetInverse(inv) ? inv.GetPointer() : 0;
-//    InverseTransformBasePointer baseType = dynamic_cast<
   }
 
   // virtual:
   virtual void SetParameters(const ParametersType & params)
   { transform_[active_params_]->SetParameters(params); }
   
+  virtual void SetFixedParameters(const ParametersType &)
+  {
+    itkExceptionMacro(<< "SetFixedParameters is not implemented for CascadedTransform");
+  }
+
   // virtual:
   virtual const ParametersType & GetParameters() const
   { return transform_[active_params_]->GetParameters(); }
   
   // virtual:
-  virtual unsigned int GetNumberOfParameters() const
+  virtual NumberOfParametersType GetNumberOfParameters() const
   { return transform_[active_params_]->GetNumberOfParameters(); }
   
   // virtual:
@@ -301,7 +307,7 @@ public:
   
 protected:
   CascadedTransform():
-  Superclass(Dimension, 0),
+  Superclass(/*Dimension,*/0),
   transform_(0),
   active_params_(~0),
   active_start_(0),
