@@ -24,10 +24,10 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
- */
+*/
 
-#ifndef APPLICATION_IMAGEREGISTRATIONTOOLS_ACTIONS_ACTIONFFTFILTER_H
-#define APPLICATION_IMAGEREGISTRATIONTOOLS_ACTIONS_ACTIONFFTFILTER_H
+#ifndef APPLICATION_IMAGEREGISTRATIONTOOLS_ACTIONS_ACTIONREFINEGRIDFILTER_H
+#define APPLICATION_IMAGEREGISTRATIONTOOLS_ACTIONS_ACTIONREFINEGRIDFILTER_H
 
 #include <Core/Action/Actions.h>
 #include <Core/Interface/Interface.h>
@@ -36,31 +36,27 @@
 #include <Application/Layer/LayerAction.h>
 #include <Application/Layer/LayerManager.h>
 
-#include <string>
-#include <vector>
-
 namespace Seg3D
 {
 
-class ActionFFTFilter : public LayerAction
+class ActionRefineGridFilter : public LayerAction
 {
-
+  
 CORE_ACTION(
-  CORE_ACTION_TYPE( "FFTFilter", "ir-fft" )
+  CORE_ACTION_TYPE( "RefineGridFilter", "ir-refine-grid" )
   CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
-  CORE_ACTION_ARGUMENT( "directory", "Image file directory. If files is not used, then filter will search directory for image files." )
-  CORE_ACTION_ARGUMENT( "output_mosaic_file", "Output mosaic file." )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "files", "<none>", "Image file names." )
+  CORE_ACTION_ARGUMENT( "input_mosaic", "Input mosaic file." )
+  CORE_ACTION_ARGUMENT( "output_mosaic", "Output mosaic file." )
+  CORE_ACTION_ARGUMENT( "directory", "Image file directory." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "shrink_factor", "1", "Downsample factor." )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "pyramid_levels", "1", "Number of multiresolution pyramid levels." )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "iterations_per_level", "5", "Iterations per pyramid level." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "num_threads", "0", "Number of threads used (if 0, number of cores will be used)." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "iterations", "10", "Run algorithm for given number of iterations." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "cell_size", "1", "Cell size." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "mesh_rows", "0", "Transform mesh rows." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "mesh_cols", "0", "Transform mesh columns." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "pixel_spacing", "1.0", "Pixel spacing." )          
-  CORE_ACTION_OPTIONAL_ARGUMENT( "clahe_slope", "1.0", "Maximum CLAHE slope." )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "overlap_min", "0.05", "Minimum overlap ratio." )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "overlap_max", "1.0", "Maximum overlap ratio." )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "use_standard_mask", "false", "Use standard mask." )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "try_refining", "false", "Try refining image." )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "run_on_one", "false", "Run on one image only." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "displacement_threshold", "1.0", "Pixel spacing." )          
+  CORE_ACTION_OPTIONAL_ARGUMENT( "use_standard_mask", "false", "Use the default mask." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "sandbox", "-1", "The sandbox in which to run the action." )
   CORE_ACTION_ARGUMENT_IS_NONPERSISTENT( "sandbox" )
 //  CORE_ACTION_CHANGES_PROJECT_DATA()
@@ -68,23 +64,29 @@ CORE_ACTION(
 )
   
 public:
-  ActionFFTFilter()
-  : MAX_PEAKS(16)
+  ActionRefineGridFilter() :
+    MAX_ITERATIONS(100),
+    MIN_STEP_SCALE(1e-12),
+    MIN_ERROR_SQ(1e-16),
+    PICKUP_PACE_STEPS(5),
+    PREWARP_TILES(true),
+    MIN_OVERLAP(0.25),
+    DEFAULT_MEDIAN_FILTER_RADIUS(1),
+    MOVE_ALL_TILES(false)
   {
     this->add_layer_id( this->target_layer_ );
-    this->add_parameter( this->directory_ );
+    this->add_parameter( this->input_mosaic_file_ );
     this->add_parameter( this->output_mosaic_file_ );
-    this->add_parameter( this->files_ );
+    this->add_parameter( this->directory_ );
     this->add_parameter( this->shrink_factor_ );
-    this->add_parameter( this->pyramid_levels_ );
-    this->add_parameter( this->iterations_per_level_ );
+    this->add_parameter( this->num_threads_ );
+    this->add_parameter( this->iterations_ );
+    this->add_parameter( this->cell_size_ );
+    this->add_parameter( this->mesh_rows_ );
+    this->add_parameter( this->mesh_cols_ );
     this->add_parameter( this->pixel_spacing_ );
-    this->add_parameter( this->clahe_slope_ );
-    this->add_parameter( this->overlap_min_ );
-    this->add_parameter( this->overlap_max_ );
+    this->add_parameter( this->displacement_threshold_ );
     this->add_parameter( this->use_standard_mask_ );
-    this->add_parameter( this->try_refining_ );
-    this->add_parameter( this->run_on_one_ );
     this->add_parameter( this->sandbox_ );
   }
   
@@ -95,39 +97,44 @@ public:
   // Create and dispatch action that inserts the new layer
   static void Dispatch(Core::ActionContextHandle context,
                        std::string target_layer,
-                       std::string directory,
-                       std::string output_mosaic_file,
-                       std::vector<std::string> files,
                        unsigned int shrink_factor,
-                       unsigned int pyramid_levels,
-                       unsigned int iterations_per_level,
+                       unsigned int num_threads,
+                       unsigned int iterations,
+                       unsigned int cell_size,
+                       unsigned int mesh_rows,
+                       unsigned int mesh_cols,
                        double pixel_spacing,
-                       double clahe_slope,
-                       double overlap_min,
-                       double overlap_max,
+                       double displacement_threshold,
                        bool use_standard_mask,
-                       bool try_refining,
-                       bool run_on_one);
+                       std::string input_mosaic_file,
+                       std::string output_mosaic_file,
+                       std::string directory);
   
 private:
   std::string target_layer_;
   SandboxID sandbox_;  
-  
-  std::string directory_;
-  std::string output_mosaic_file_;
-  std::vector<std::string> files_;
+
   unsigned int shrink_factor_;
-  unsigned int pyramid_levels_;
-  unsigned int iterations_per_level_;
+  unsigned int num_threads_;
+  unsigned int iterations_;
+  unsigned int cell_size_;
+  unsigned int mesh_rows_;
+  unsigned int mesh_cols_;
   double pixel_spacing_;
-  double clahe_slope_;
-  double overlap_min_;
-  double overlap_max_;
-  bool use_standard_mask_;
-  bool try_refining_;
-  bool run_on_one_;
+  double displacement_threshold_;
+  bool use_standard_mask_;  
+  std::string input_mosaic_file_;
+  std::string output_mosaic_file_;
+  std::string directory_;
   
-  const int MAX_PEAKS;
+  const unsigned int MAX_ITERATIONS;
+  const double MIN_STEP_SCALE;
+  const double MIN_ERROR_SQ;
+  const unsigned int PICKUP_PACE_STEPS;
+  const bool PREWARP_TILES;
+  const double MIN_OVERLAP;
+  const unsigned int DEFAULT_MEDIAN_FILTER_RADIUS;
+  const bool MOVE_ALL_TILES;
 };
 
 }

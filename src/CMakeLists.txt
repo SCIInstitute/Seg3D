@@ -193,6 +193,15 @@ IF(UNIX)
 ENDIF(UNIX)
 
 ###########################################
+# SETUP DEFINTIONS FOR IMAGE REGISTRATION TOOLS
+###########################################
+OPTION(USE_IR_TERMINATORS "Use Image Registation Tools ITK process terminators" OFF)
+
+IF(USE_IR_TERMINATORS)
+  ADD_DEFINITIONS(-DUSE_THE_TERMINATORS -DUSE_ITK_TERMINATORS)
+ENDIF(USE_IR_TERMINATORS)
+
+###########################################
 # Find QT
 # We need QT - We use a modified version of
 # the FindQt4.cmake file that can be set
@@ -405,7 +414,7 @@ FOREACH(DIR ${PLUGIN_DIRS})
 ENDFOREACH(DIR ${PLUGIN_DIRS})
 
 ###########################################
-# Rsources:
+# Resources:
 # images + icons
 ###########################################
 

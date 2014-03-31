@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_IMAGEREGISTRATIONTOOLS_ACTIONS_ACTIONREFINETRANSLATEFILTER_H
-#define APPLICATION_IMAGEREGISTRATIONTOOLS_ACTIONS_ACTIONREFINETRANSLATEFILTER_H
+#ifndef APPLICATION_IMAGEREGISTRATIONTOOLS_ACTIONS_ACTIONBLOBFILTER_H
+#define APPLICATION_IMAGEREGISTRATIONTOOLS_ACTIONS_ACTIONBLOBFILTER_H
 
 #include <Core/Action/Actions.h>
 #include <Core/Interface/Interface.h>
@@ -39,50 +39,36 @@
 namespace Seg3D
 {
 
-class ActionRefineTranslateFilter : public LayerAction
+class ActionBlobFeatureEnhancementFilter : public LayerAction
 {
-
+  
 CORE_ACTION(
-  CORE_ACTION_TYPE( "RefineTranslateFilter", "ir-refine-translate" )
+  CORE_ACTION_TYPE( "BlobFeatureEnhancementFilter", "ir-blob" )
   CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
-  CORE_ACTION_ARGUMENT( "input_mosaic", "Input mosaic file." )
-  CORE_ACTION_ARGUMENT( "output_mosaic", "Output mosaic file." )
-  CORE_ACTION_ARGUMENT( "directory", "Image file directory." )
+  CORE_ACTION_ARGUMENT( "input_image", "Input image file." )
+  CORE_ACTION_ARGUMENT( "output_image", "Output image file." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "shrink_factor", "1", "Downsample factor." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "num_threads", "0", "Number of threads used (if 0, number of cores will be used)." )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "prune_tile_size", "32", "" )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "pixel_spacing", "1.0", "Pixel spacing." )          
-  CORE_ACTION_OPTIONAL_ARGUMENT( "intensity_tolerance", "0", "Intensity tolerance." )          
-  CORE_ACTION_OPTIONAL_ARGUMENT( "max_offset_x", "std::numeric_limits<double>::max()", "" )          
-  CORE_ACTION_OPTIONAL_ARGUMENT( "max_offset_y", "std::numeric_limits<double>::max()", "" )          
-  CORE_ACTION_OPTIONAL_ARGUMENT( "black_mask_x", "std::numeric_limits<double>::max()", "" )          
-  CORE_ACTION_OPTIONAL_ARGUMENT( "black_mask_y", "std::numeric_limits<double>::max()", "" )          
+  CORE_ACTION_OPTIONAL_ARGUMENT( "radius", "2", "Radius in pixels." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "threshold", "3", "Maxiumum threshold." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "median_radius", "0", "Median radius in pixels." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "use_standard_mask", "false", "Use the default mask." )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "use_clahe", "true", "Use the default mask." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "sandbox", "-1", "The sandbox in which to run the action." )
   CORE_ACTION_ARGUMENT_IS_NONPERSISTENT( "sandbox" )
-//  CORE_ACTION_CHANGES_PROJECT_DATA()
-//  CORE_ACTION_IS_UNDOABLE()
 )
   
 public:
-  ActionRefineTranslateFilter()
+  ActionBlobFeatureEnhancementFilter()
   {
-    this->add_layer_id( this->target_layer_ );
+    this->add_layer_id( this->target_layer_ ); // tmp
+    this->add_parameter( this->input_image_ );
+    this->add_parameter( this->output_image_ );
     this->add_parameter( this->shrink_factor_ );
     this->add_parameter( this->num_threads_ );
-    this->add_parameter( this->prune_tile_size_ );
-    this->add_parameter( this->pixel_spacing_ );
-    this->add_parameter( this->intensity_tolerance_ );
-    this->add_parameter( this->max_offset_x_ );
-    this->add_parameter( this->max_offset_y_ );
-    this->add_parameter( this->black_mask_x_ );
-    this->add_parameter( this->black_mask_y_ );
+    this->add_parameter( this->radius_ );
+    this->add_parameter( this->threshold_ );
+    this->add_parameter( this->median_radius_ );
     this->add_parameter( this->use_standard_mask_ );
-    this->add_parameter( this->use_clahe_ );
-    this->add_parameter( this->input_mosaic_file_ );
-    this->add_parameter( this->output_mosaic_file_ );
-    this->add_parameter( this->directory_ );
     this->add_parameter( this->sandbox_ );
   }
   
@@ -93,41 +79,29 @@ public:
   // Create and dispatch action that inserts the new layer
   static void Dispatch(Core::ActionContextHandle context,
                        std::string target_layer,
+                       std::string input_image,
+                       std::string output_image,
                        unsigned int shrink_factor,
                        unsigned int num_threads,
-                       unsigned int prune_tile_size,
-                       double pixel_spacing,
-                       double intensity_tolerance,
-                       double max_offset_x,
-                       double max_offset_y,
-                       double black_mask_x,
-                       double black_mask_y,
-                       bool use_standard_mask,
-                       bool use_clahe,
-                       std::string input_mosaic_file,
-                       std::string output_mosaic_file,
-                       std::string directory);
+                       int radius,
+                       double threshold,
+                       unsigned int median_radius,
+                       bool use_standard_mask);
   
 private:
   std::string target_layer_;
   SandboxID sandbox_;  
-
+  
+  std::string input_image_;
+  std::string output_image_;
   unsigned int shrink_factor_;
   unsigned int num_threads_;
-  unsigned int prune_tile_size_;
-  double pixel_spacing_;
-  double intensity_tolerance_;
-  double max_offset_x_;
-  double max_offset_y_;
-  double black_mask_x_;
-  double black_mask_y_;
+  int radius_;
+  double threshold_;
+  unsigned int median_radius_;
   bool use_standard_mask_;
-  bool use_clahe_;
-  std::string input_mosaic_file_;
-  std::string output_mosaic_file_;
-  std::string directory_;
 };
-
+  
 }
 
 #endif
