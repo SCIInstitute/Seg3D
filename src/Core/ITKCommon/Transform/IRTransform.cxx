@@ -46,8 +46,8 @@
 // IRTransform::IRTransform
 // 
 IRTransform::IRTransform(base_transform_t::Pointer transformBase,
-                         const std::string& imageID,
-                         const std::string& maskID)
+                         const bfs::path & imageID,
+                         const bfs::path & maskID)
 {
 	_transformBase = transformBase;
 	_imageID = imageID;
@@ -55,7 +55,7 @@ IRTransform::IRTransform(base_transform_t::Pointer transformBase,
 	_groupID = -1;
 	
 	IRImageLoader* imageLoader = IRImageLoader::sharedImageLoader();
-	vec2d_t tile_size = imageLoader->getImageSize(_imageID, _transformBase);
+	vec2d_t tile_size = imageLoader->getImageSize(_imageID.string(), _transformBase);
 	pnt2d_t bbox_min;
 	bbox_min[0] = bbox_min[1] = 0;
 	pnt2d_t bbox_max;
@@ -361,7 +361,7 @@ IRTransform::transformBase()
 //----------------------------------------------------------------
 // IRTransform::imageID
 // 
-const std::string &
+const bfs::path &
 IRTransform::imageID() const
 {
 	return _imageID;
@@ -370,7 +370,7 @@ IRTransform::imageID() const
 //----------------------------------------------------------------
 // IRTransform::imageID
 // 
-const std::string &
+const bfs::path &
 IRTransform::maskID() const
 {
 	return _maskID;

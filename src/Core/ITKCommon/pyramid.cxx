@@ -42,18 +42,15 @@
 #include <Core/ITKCommon/histogram.hxx>
 #include <Core/ITKCommon/Transform/itkLegendrePolynomialTransform.h>
 
+#include <Core/Utils/Exception.h>
 #include <Core/Utils/Log.h>
 
 // ITK includes:
 #include <itkGradientAnisotropicDiffusionImageFilter.h>
 #include <itkCurvatureAnisotropicDiffusionImageFilter.h>
 
-#include <boost/filesystem.hpp>
-
 // system includes:
 #include <fstream>
-
-namespace bfs=boost::filesystem;
 
 
 //----------------------------------------------------------------
@@ -185,7 +182,7 @@ vectors_from_orientation_histogram(std::list<gradient_t> & dm,
   {
     const centerofmass_t<1> & peak = *i;
     gradient_t vec;
-    vec[0] = TWO_PI * fmod((peak[0] + 0.5) / double(bins), 1.0);
+    vec[0] = TWO_PI * fmod((peak[0] + 0.5) / static_cast<double>(bins), 1.0);
     vec[1] = peak.mass_;
     dm.push_back(vec);
   }
@@ -220,10 +217,10 @@ identify_orientations(const gradient_image_t * gL,
   
   const gradient_image_t::RegionType::SizeType sz =
   gL->GetLargestPossibleRegion().GetSize();
-  unsigned int x0 = static_cast<unsigned int>(std::max(int(1), int(xc - r)));
-  unsigned int y0 = static_cast<unsigned int>(std::max(int(1), int(yc - r)));
-  unsigned int x1 = static_cast<unsigned int>(std::min(int(sz[0] - 2), int(xc + r)));
-  unsigned int y1 = static_cast<unsigned int>(std::min(int(sz[1] - 2), int(yc + r)));
+  unsigned int x0 = static_cast<unsigned int>(std::max(static_cast<int>(1), static_cast<int>(xc - r)));
+  unsigned int y0 = static_cast<unsigned int>(std::max(static_cast<int>(1), static_cast<int>(yc - r)));
+  unsigned int x1 = static_cast<unsigned int>(std::min(static_cast<int>(sz[0] - 2), static_cast<int>(xc + r)));
+  unsigned int y1 = static_cast<unsigned int>(std::min(static_cast<int>(sz[1] - 2), static_cast<int>(yc + r)));
   
   image_t::RegionType rn;
   image_t::RegionType::SizeType rn_sz;
@@ -300,7 +297,7 @@ generate_feature_vector_v0(// gradient image:
                            descriptor_t & key)
 {
   static const unsigned int bins = 8;
-  static const unsigned int rows = static_cast<unsigned int>(sqrt(double(KEY_SIZE / bins)));
+  static const unsigned int rows = static_cast<unsigned int>(sqrt(static_cast<double>(KEY_SIZE / bins)));
   static const unsigned int cols = rows;
   
   static const double sqrt_two = sqrt(2.0);
@@ -323,8 +320,8 @@ generate_feature_vector_v0(// gradient image:
   
   unsigned int x0 = std::max(static_cast<int>(key.extrema_->pixel_coords_[0] - R), 0);
   unsigned int y0 = std::max(static_cast<int>(key.extrema_->pixel_coords_[1] - R), 0);
-  unsigned int x1 = std::min(static_cast<int>(key.extrema_->pixel_coords_[0] + R), int(sz[0] - 1));
-  unsigned int y1 = std::min(static_cast<int>(key.extrema_->pixel_coords_[1] + R), int(sz[1] - 1));
+  unsigned int x1 = std::min(static_cast<int>(key.extrema_->pixel_coords_[0] + R), static_cast<int>(sz[0] - 1));
+  unsigned int y1 = std::min(static_cast<int>(key.extrema_->pixel_coords_[1] + R), static_cast<int>(sz[1] - 1));
   
   image_t::RegionType rn;
   
@@ -420,7 +417,7 @@ generate_feature_vector_v1(// gradient image:
   // weight sigma:
   const double weight_sigma = R / 3.0;
   const double two_sigma_sqrd = 2.0 * weight_sigma * weight_sigma;
-  const double max_r2 = double(R * R);
+  const double max_r2 = static_cast<double>(R * R);
   const double r_quadrant = R / sqrt_two;
   
   // find the region falling under the descriptor:
@@ -430,7 +427,7 @@ generate_feature_vector_v1(// gradient image:
   unsigned int x0 = std::max(static_cast<int>(key.extrema_->pixel_coords_[0] - R), 0);
   unsigned int y0 = std::max(static_cast<int>(key.extrema_->pixel_coords_[1] - R), 0);
   unsigned int x1 = std::min(static_cast<int>(key.extrema_->pixel_coords_[0] + R), static_cast<int>(sz[0] - 1));
-  unsigned int y1 = std::min(int(key.extrema_->pixel_coords_[1] + R), static_cast<int>(sz[1] - 1));
+  unsigned int y1 = std::min(static_cast<int>(key.extrema_->pixel_coords_[1] + R), static_cast<int>(sz[1] - 1));
   
   image_t::RegionType rn;
   
@@ -475,8 +472,8 @@ generate_feature_vector_v1(// gradient image:
     double gaussian_weight = exp(- r2 / two_sigma_sqrd);
     
     // determine the quadrant coordinates:
-    double tcol = tx * double(cols);
-    double trow = ty * double(rows);
+    double tcol = tx * static_cast<double>(cols);
+    double trow = ty * static_cast<double>(rows);
     
     unsigned int col = std::min(cols - 1, static_cast<unsigned int>(floor(tcol)));
     unsigned int row = std::min(rows - 1, static_cast<unsigned int>(floor(trow)));
@@ -569,7 +566,11 @@ generate_feature_vector_v2(// minima and maxima of a given octave scale:
   
   // total number of sections:
   static const unsigned int num_sections = sections[a1] + address[a1];
-  assert(2 * num_sections == KEY_SIZE);
+//  assert(2 * num_sections == KEY_SIZE);
+  if (2 * num_sections != KEY_SIZE)
+  {
+    CORE_THROW_EXCEPTION("Total number of sections does not match key size");
+  }
   
   // find the region falling under the sampling window:
   image_t::RegionType rn;
@@ -627,9 +628,21 @@ generate_feature_vector_v2(// minima and maxima of a given octave scale:
     double w0 = a > a0 ? std::max(0.0, 0.5 - (ta - a)) : 0.0;
     double w2 = a < a1 ? std::max(0.0, (ta - a) - 0.5) : 0.0;
     double w1 = 1.0 - (w0 + w2);
-    assert(w0 <= 0.5 && w0 >= 0.0);
-    assert(w1 <= 1.0 && w1 >= 0.0);
-    assert(w2 <= 0.5 && w2 >= 0.0);
+//    assert(w0 <= 0.5 && w0 >= 0.0);
+//    assert(w1 <= 1.0 && w1 >= 0.0);
+//    assert(w2 <= 0.5 && w2 >= 0.0);
+    if (w0 > 0.5 && w0 < 0.0)
+    {
+      CORE_THROW_EXCEPTION("Bad annulus coordinate w0");
+    }
+    if (w1 > 1.0 && w1 < 0.0)
+    {
+      CORE_THROW_EXCEPTION("Bad annulus coordinate w1");
+    }
+    if (w2 > 0.5 && w2 < 0.0)
+    {
+      CORE_THROW_EXCEPTION("Bad annulus coordinate w2");
+    }
     
     double mass_min = min->GetPixel(ix);
     double mass_max = max->GetPixel(ix);
@@ -712,7 +725,11 @@ generate_feature_vector_v3(// gradient image:
   
   // total number of sections:
   static const unsigned int num_sections = sections[a1] + address[a1];
-  assert(KEY_SIZE == 2 * num_sections);
+//  assert(KEY_SIZE == 2 * num_sections);
+  if (KEY_SIZE == 2 * num_sections)
+  {
+    CORE_THROW_EXCEPTION("Total number of sections does not match key size");
+  }
   
   // each section has a histogram that will be used to determine
   // the dominant gradient vector for that section:
@@ -911,12 +928,12 @@ generate_feature_vector_v4(// gradient image:
     const gradient_image_t::RegionType::SizeType sz =
     gL->GetLargestPossibleRegion().GetSize();
     
-    unsigned int x0 = std::max(int(key.extrema_->pixel_coords_[0] - R), 0);
-    unsigned int y0 = std::max(int(key.extrema_->pixel_coords_[1] - R), 0);
-    unsigned int x1 = std::min(int(key.extrema_->pixel_coords_[0] + R),
-                               int(sz[0] - 1));
-    unsigned int y1 = std::min(int(key.extrema_->pixel_coords_[1] + R),
-                               int(sz[1] - 1));
+    unsigned int x0 = std::max(static_cast<int>(key.extrema_->pixel_coords_[0] - R), 0);
+    unsigned int y0 = std::max(static_cast<int>(key.extrema_->pixel_coords_[1] - R), 0);
+    unsigned int x1 = std::min(static_cast<int>(key.extrema_->pixel_coords_[0] + R),
+                               static_cast<int>(sz[0] - 1));
+    unsigned int y1 = std::min(static_cast<int>(key.extrema_->pixel_coords_[1] + R),
+                               static_cast<int>(sz[1] - 1));
     
     image_t::RegionType::SizeType rn_sz;
     rn_sz[0] = x1 - x0 + 1;
@@ -1048,8 +1065,7 @@ generate_feature_vector_v5(// gradient image:
                            descriptor_t & key)
 {
   static const unsigned int bins = 8;
-  static const unsigned int rows = (unsigned int)(sqrt(double(KEY_SIZE /
-                                                              bins)));
+  static const unsigned int rows = static_cast<unsigned int>(sqrt(static_cast<double>(KEY_SIZE / bins)));
   static const unsigned int cols = rows;
   
   static const double sqrt_two = sqrt(2.0);
@@ -1430,7 +1446,9 @@ generate_descriptor(// which version of the descriptor should be used:
       break;
       
     default:
-      assert(0);
+//      assert(0);
+      CORE_THROW_EXCEPTION("descriptor_version = 0");
+      
   }
   
   if (descriptor_version != 3)
@@ -1692,7 +1710,7 @@ octave_t::detect_extrema(const unsigned int & pyramid,
                          const unsigned int & octave,
                          const double percent_below_threshold,
                          const bool threshold_by_area,
-                         const std::string & fn_prefix)
+                         const bfs::path & fn_prefix)
 {
   raw_min_.resize(scales());
   raw_max_.resize(scales());
@@ -2198,13 +2216,13 @@ void
 pyramid_t::detect_extrema(const unsigned int & pyramid,
                           const double percent_below_threshold,
                           const bool threshold_by_area,
-                          const std::string & fn_prefix)
+                          const bfs::path & fn_prefix)
 {
   for (unsigned int i = 0; i < octaves(); i++)
   {
     std::ostringstream prefix;
     prefix << fn_prefix;
-    if (fn_prefix.size() != 0)
+    if (! fn_prefix.empty())
     {
       prefix << "o" << the_text_t::number(i) << "-";
     }
@@ -2281,7 +2299,7 @@ pyramid_t::count_keys() const
 // save a bunch of images with the keys marked on them in color:
 // 
 void
-pyramid_t::debug(const std::string & fn_prefix) const
+pyramid_t::debug(const bfs::path & fn_prefix) const
 {
 //#if 1
   // RGB:
@@ -2337,7 +2355,7 @@ pyramid_t::debug(const std::string & fn_prefix) const
 template <class T>
 void
 save_image(std::ostream & fout,
-           const std::string & fn,
+           const bfs::path & fn,
            const T * data)
 {
   // save the filename:
@@ -2367,7 +2385,7 @@ load_image(const bfs::path & dir,
   f_in >> sp[0] >> sp[1];
 
   bfs::path data_fn = dir / fn;
-  data = ::load<T>(data_fn.string());
+  data = ::load<T>(data_fn);
   data->SetSpacing(sp);
 }
 
@@ -2377,8 +2395,8 @@ load_image(const bfs::path & dir,
 template <class T>
 void
 save_images(std::ostream & fout,
-            const std::string & pfx,
-            const std::string & sfx,
+            const bfs::path & pfx,
+            const bfs::path & sfx,
             const std::vector<T> & data)
 {
   typedef typename T::ObjectType Ti;
@@ -2397,7 +2415,7 @@ save_images(std::ostream & fout,
 // 
 template <class T>
 void
-load_images(const std::string & dir,
+load_images(const bfs::path & dir,
             std::istream & f_in,
             std::vector<T> & data)
 {
@@ -2447,7 +2465,7 @@ load_extrema(std::istream & f_in, extrema_t & ex)
 // pyramid_t::save
 // 
 bool
-pyramid_t::save(const std::string & fn_save) const
+pyramid_t::save(const bfs::path & fn_save) const
 {
   std::fstream fout;
   fout.open(fn_save.c_str(), std::ios::out);
@@ -2537,7 +2555,7 @@ pyramid_t::save(const std::string & fn_save) const
 // pyramid_t::load
 // 
 bool
-pyramid_t::load(const std::string & fn_load)
+pyramid_t::load(const bfs::path & fn_load)
 {
   std::fstream f_in;
   f_in.open(fn_load.c_str(), std::ios::in);
@@ -2549,7 +2567,7 @@ pyramid_t::load(const std::string & fn_load)
   bfs::path dir = fn_path.parent_path();
   if (dir.empty())
   {
-    CORE_LOG_WARNING("Missing directory for loading pyramid file " + fn_load);
+    CORE_LOG_WARNING("Missing directory for loading pyramid file " + fn_load.string());
   }
   
 //  if (!dir.is_empty() && !dir.match_tail("/"))
@@ -2570,28 +2588,28 @@ pyramid_t::load(const std::string & fn_load)
     // load the masks:
     {
       mask_t::Pointer mask;
-      load_image<mask_t>(dir.string(), f_in, mask);
+      load_image<mask_t>(dir, f_in, mask);
       o.mask_ = mask;
       
       mask_t::Pointer mask_eroded;
-      load_image<mask_t>(dir.string(), f_in, mask_eroded);
+      load_image<mask_t>(dir, f_in, mask_eroded);
       o.mask_eroded_ = mask_eroded;
     }
     
     // load the blurred images:
-    load_images<image_t::Pointer>(dir.string(), f_in, o.L_);
+    load_images<image_t::Pointer>(dir, f_in, o.L_);
     
     // load the Difference of Gaussian images:
-    load_images<image_t::Pointer>(dir.string(), f_in, o.D_);
+    load_images<image_t::Pointer>(dir, f_in, o.D_);
     
     // load the gradient images:
-    load_images<gradient_image_t::Pointer>(dir.string(), f_in, o.gL_);
+    load_images<gradient_image_t::Pointer>(dir, f_in, o.gL_);
     
     // load raw_min images:
-    load_images<image_t::Pointer>(dir.string(), f_in, o.raw_min_);
+    load_images<image_t::Pointer>(dir, f_in, o.raw_min_);
     
     // load raw_max images:
-    load_images<image_t::Pointer>(dir.string(), f_in, o.raw_max_);
+    load_images<image_t::Pointer>(dir, f_in, o.raw_max_);
     
     // load sigma:
     unsigned int num_sigma = 0;
@@ -2645,7 +2663,7 @@ pyramid_t::load(const std::string & fn_load)
 // load_pyramid
 // 
 void
-load_pyramid(const std::string & fn_load,
+load_pyramid(const bfs::path & fn_load,
              pyramid_t & pyramid,
              image_t::Pointer & mosaic,
              mask_t::Pointer & mosaic_mask)

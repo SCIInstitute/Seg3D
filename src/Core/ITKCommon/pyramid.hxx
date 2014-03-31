@@ -43,9 +43,13 @@
 // ITK includes:
 #include <itkGradientImageFilter.h>
 
+#include <boost/filesystem.hpp>
+
 // system includes:
 #include <list>
 #include <vector>
+
+namespace bfs=boost::filesystem;
 
 
 //----------------------------------------------------------------
@@ -116,7 +120,7 @@ public:
                       const unsigned int & octave,
                       const double percent_below_threshold,
                       const bool threshold_by_area,
-                      const std::string & fn_prefix = "");
+                      const bfs::path & fn_prefix = "");
   
   // NOTE: this operates on the results produced by detect_extrema:
   void generate_keys();
@@ -188,7 +192,7 @@ public:
   void detect_extrema(const unsigned int & pyramid,
                       const double percent_below_threshold,
                       const bool threshold_by_area = true,
-                      const std::string & fn_prefix = "");
+                      const bfs::path & fn_prefix = "");
   
   // NOTE: this operates on the results produced by detect_extrema:
   void generate_keys();
@@ -203,24 +207,24 @@ public:
   unsigned int count_keys() const;
   
   // save a bunch of images with the keys marked on them in color:
-  void debug(const std::string & fn_prefix) const;
+  void debug(const bfs::path & fn_prefix) const;
   
   // use this to speed up pyramid setup:
-  bool save(const std::string & fn_save) const;
-  bool load(const std::string & fn_save);
+  bool save(const bfs::path & fn_save) const;
+  bool load(const bfs::path & fn_save);
   
   // image pyramid octaves:
   std::vector<octave_t> octave_;
   
   // file name of the image that originated this pyramid:
-  std::string fn_data_;
+  bfs::path fn_data_;
 };
 
 //----------------------------------------------------------------
 // load_pyramid
 // 
 extern void
-load_pyramid(const std::string & fn_load,
+load_pyramid(const bfs::path & fn_load,
              pyramid_t & pyramid,
              image_t::Pointer & mosaic,
              mask_t::Pointer & mosaic_mask);

@@ -57,8 +57,8 @@ class IRTransform
   
 public:
 	IRTransform(base_transform_t::Pointer transformBase,
-              const std::string& imageID,
-              const std::string& maskID);
+              const bfs::path & imageID,
+              const bfs::path & maskID);
 	virtual ~IRTransform();
 	
 	const pnt2d_t & position() const;
@@ -86,8 +86,8 @@ public:
 	void addConnection(IRConnection* connection);
 	void removeConnection(IRConnection* connection);
 	base_transform_t::Pointer transformBase();
-	const std::string & imageID() const;
-	const std::string & maskID() const;
+	const bfs::path & imageID() const;
+	const bfs::path & maskID() const;
   
 	// DEBUG stuff
 	void printImageID( bool verbose );
@@ -96,8 +96,8 @@ public:
 private:
 	IRConnectionVector _connections;
 	base_transform_t::Pointer _transformBase;
-	std::string _imageID;
-  std::string _maskID;
+	bfs::path _imageID;
+  bfs::path _maskID;
 	
 	pnt2d_t _position;
 	vec2d_t _size;

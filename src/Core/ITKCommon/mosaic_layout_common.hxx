@@ -24,7 +24,7 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
-*/
+ */
 
 // File         : mosaic_layout_common.hxx
 // Author       : Pavel A. Koshevoy
@@ -50,7 +50,13 @@
 #include <itkImageRegistrationMethod.h>
 #include <itkMeanSquaresImageToImageMetric.h>
 
+// boost:
+#include <boost/filesystem.hpp>
+
+namespace bfs=boost::filesystem;
+
 #include <sstream>
+#include <string>
 
 //----------------------------------------------------------------
 // affine_transform_t
@@ -106,8 +112,8 @@ forward_transform<TImage, std::vector<const base_transform_t *> >
   
   typename TImage::PointType tile_min = origin;
   typename TImage::PointType tile_max;
-  tile_max[0] = tile_min[0] + spacing[0] * double(sz[0]);
-  tile_max[1] = tile_min[1] + spacing[1] * double(sz[1]);
+  tile_max[0] = tile_min[0] + spacing[0] * static_cast<double>(sz[0]);
+  tile_max[1] = tile_min[1] + spacing[1] * static_cast<double>(sz[1]);
   
   double w = sz[0] * spacing[0];
   double h = sz[1] * spacing[1];
@@ -169,7 +175,7 @@ std::vector<base_transform_t::Pointer> >                \
     // points along the image edges:
     for (unsigned int x = 0; x < samples; x++)
     {
-      const double t = double(x + 1) / double(samples + 1);
+      const double t = static_cast<double>(x + 1) / static_cast<double>(samples + 1);
       
       UPDATE_BBOX(t, 0.0);
       UPDATE_BBOX(t, 1.0);
@@ -193,9 +199,9 @@ std::vector<base_transform_t::Pointer> >                \
       const unsigned int k = i * samples + j;
       
       uv[k][0] =
-      mosaic_min[0] + W * (double(i) + drand()) / double(samples);
+      mosaic_min[0] + W * (static_cast<double>(i) + drand()) / static_cast<double>(samples);
       uv[k][1] =
-      mosaic_min[1] + H * (double(j) + drand()) / double(samples);
+      mosaic_min[1] + H * (static_cast<double>(j) + drand()) / static_cast<double>(samples);
       
       xy[k] = fwd_transform(fwd_cascade, cascade_len, uv[k]);
     }
@@ -246,7 +252,7 @@ refine_one_pair(const TImage * i0,
                 const double & min_step,
                 const double & max_step,
                 
-                const the_text_t & fn_prefix = the_text_t(""))
+                const std::string & fn_prefix)
 {
   // setup the registration object:
   typedef itk::ImageRegistrationMethod<TImage, TImage> registration_t;
@@ -256,7 +262,7 @@ refine_one_pair(const TImage * i0,
   typedef itk::LinearInterpolateImageFunction<TImage, double> interpolator_t;
   registration->SetInterpolator(interpolator_t::New());
   
-  if (fn_prefix.size() != 0)
+  if (! fn_prefix.empty())
   {
     save_rgb<TImage>(fn_prefix + "a.tif", i0, i1, t01, m0, m1);
   }
@@ -357,7 +363,7 @@ refine_one_pair(const TImage * i0,
     metric_after = metric_before;
   }
   
-  if (fn_prefix.size() != 0)
+  if (! fn_prefix.empty())
   {
     save_rgb<TImage>(fn_prefix + "b.tif", i0, i1, t01, m0, m1);
   }
@@ -382,29 +388,28 @@ refine_one_pair(const array2d(typename TImage::Pointer) & tile_pyramid,
                 const double & min_step,
                 const double & max_step,
                 
-                const the_text_t & prefix = the_text_t(""))
+                const bfs::path & prefix)
 {
   const unsigned int num_levels = tile_pyramid.size();
   
   double metric = std::numeric_limits<double>::max();
   for (unsigned int i = 0; i < num_levels; i++)
   {
-    the_text_t fn_prefix;
-    if (prefix.size() != 0)
+    std::ostringstream fn_prefix;
+    if (! prefix.empty())
     {
-      fn_prefix = prefix + "level-" + the_text_t::number(i) + "-";
+      fn_prefix << prefix << "level-" << the_text_t::number(i) << "-";
     }
     
-    metric = refine_one_pair<TImage, TMask>
-    (tile_pyramid[i][ia],
-     tile_pyramid[i][ib],
-     mask_pyramid[i][ia],
-     mask_pyramid[i][ib],
-     t01,
-     iterations,
-     min_step,
-     max_step /* * integer_power<double>(2.0, num_levels - i - 1)*/,
-     fn_prefix);
+    metric = refine_one_pair<TImage, TMask>(tile_pyramid[i][ia],
+                                            tile_pyramid[i][ib],
+                                            mask_pyramid[i][ia],
+                                            mask_pyramid[i][ib],
+                                            t01,
+                                            iterations,
+                                            min_step,
+                                            max_step /* * integer_power<double>(2.0, num_levels - i - 1)*/,
+                                            fn_prefix.str());
   }
   
   return metric;
@@ -428,7 +433,7 @@ refine_pairs(const std::vector<typename TImage::Pointer> & image,
              array2d(translate_transform_t::Pointer) & path,
              array2d(double) & cost,
              
-             const the_text_t & prefix = the_text_t(""))
+             const bfs::path & prefix)
 {
   static unsigned int pass = 0;
   
@@ -449,15 +454,11 @@ refine_pairs(const std::vector<typename TImage::Pointer> & image,
       << std::setw(2) << i << std::endl
       << "overlap: " << static_cast<int>(overlap * 100.0) << " percent" << std::endl;
       
-      the_text_t fn_prefix;
-      if (prefix.size() != 0)
+      std::ostringstream fn_prefix;
+      if (! prefix.empty())
       {
-        fn_prefix =
-        prefix +
-        "pair-" +
-        the_text_t::number(i, 2, '0') + "-" +
-        the_text_t::number(j, 2, '0') + "-pass-" +
-        the_text_t::number(pass, 2, '0') + "-";
+        fn_prefix << prefix << "pair-" << the_text_t::number(i, 2, '0') << "-" <<
+        the_text_t::number(j, 2, '0') << "-pass-" << the_text_t::number(pass, 2, '0') << "-";
       }
       
       cost[i][j] = refine_one_pair<TImage, TMask>(image[i],
@@ -468,7 +469,7 @@ refine_pairs(const std::vector<typename TImage::Pointer> & image,
                                                   iterations,
                                                   min_step,
                                                   max_step,
-                                                  fn_prefix);
+                                                  fn_prefix.str());
       
       overlap = overlap_ratio<TImage>(image[i], image[j], t_ij);
       
@@ -479,7 +480,7 @@ refine_pairs(const std::vector<typename TImage::Pointer> & image,
       }
       else
       {
-        // FIXME: encourage larger overlap:
+        // TODO: encourage larger overlap:
         // cost[i][j] = 1.0 - overlap; // encourage edge overlap
         // cost[i][j] = overlap; // encourage corner overlap, works well !!!
         path[i][j] = t_ij;
@@ -491,7 +492,7 @@ refine_pairs(const std::vector<typename TImage::Pointer> & image,
     oss << std::endl;
   }
   
-//  int prev_precision = oss.precision(2);
+  //  int prev_precision = oss.precision(2);
   oss << "\t";
   for (unsigned int i = 0; i < num_images; i++) oss << std::setw(9) << i;
   oss << std::endl;
@@ -515,7 +516,7 @@ refine_pairs(const std::vector<typename TImage::Pointer> & image,
     oss << std::endl;
   }
   oss << std::endl;
-//  oss.precision(prev_precision);
+  //  oss.precision(prev_precision);
   CORE_LOG_MESSAGE(oss.str());
 }
 
@@ -536,7 +537,7 @@ refine_pairs(const array2d(typename TImage::Pointer) & tile_pyramid,
              array2d(translate_transform_t::Pointer) & path,
              array2d(double) & cost,
              
-             const the_text_t & prefix = the_text_t(""))
+             const bfs::path & prefix)
 {
   static unsigned int pass = 0;
   pass++;
@@ -564,15 +565,11 @@ refine_pairs(const array2d(typename TImage::Pointer) & tile_pyramid,
       << std::setw(2) << i << std::endl
       << "overlap: " << static_cast<int>(overlap * 100.0) << " percent" << std::endl;
       
-      the_text_t fn_prefix;
-      if (prefix.size() != 0)
+      std::ostringstream fn_prefix;
+      if (! prefix.empty())
       {
-        fn_prefix =
-        prefix +
-        "pair-" +
-        the_text_t::number(i, 2, '0') + "-" +
-        the_text_t::number(j, 2, '0') + "-pass-" +
-        the_text_t::number(pass, 2, '0') + "-";
+        fn_prefix << prefix << "pair-" << the_text_t::number(i, 2, '0') << "-" <<
+        the_text_t::number(j, 2, '0') << "-pass-" << the_text_t::number(pass, 2, '0') << "-";
       }
       
       cost[i][j] = refine_one_pair<TImage, TMask>(tile_pyramid,
@@ -583,7 +580,7 @@ refine_pairs(const array2d(typename TImage::Pointer) & tile_pyramid,
                                                   iterations,
                                                   min_step,
                                                   max_step,
-                                                  fn_prefix);
+                                                  fn_prefix.str());
       
       overlap = overlap_ratio<TImage>(tile_pyramid[high_res_level][i],
                                       tile_pyramid[high_res_level][j],
@@ -596,7 +593,7 @@ refine_pairs(const array2d(typename TImage::Pointer) & tile_pyramid,
       }
       else
       {
-        // FIXME: encourage larger overlap:
+        // TODO: encourage larger overlap:
         // cost[i][j] = 1.0 - overlap; // encourage edge overlap
         // cost[i][j] = overlap; // encourage corner overlap, works well !!!
         path[i][j] = t_ij;
@@ -608,7 +605,7 @@ refine_pairs(const array2d(typename TImage::Pointer) & tile_pyramid,
     oss << std::endl;
   }
   
-//  int prev_precision = oss.precision(2);
+  //  int prev_precision = oss.precision(2);
   oss << "\t";
   for (unsigned int i = 0; i < num_images; i++) oss << std::setw(9) << i;
   oss << std::endl;
@@ -632,7 +629,7 @@ refine_pairs(const array2d(typename TImage::Pointer) & tile_pyramid,
     oss << std::endl;
   }
   oss << std::endl;
-//  oss.precision(prev_precision);
+  //  oss.precision(prev_precision);
   CORE_LOG_MESSAGE(oss.str());
 }
 
@@ -651,7 +648,7 @@ brute_force_one_pair(const TImage * i0,
                      const int & dx,
                      const int & dy,
                      
-                     const the_text_t & fn_prefix = the_text_t(""))
+                     const std::string & fn_prefix)
 {
   translate_transform_t::ParametersType init_params = t01->GetParameters();
   translate_transform_t::ParametersType best_params = init_params;
@@ -666,7 +663,7 @@ brute_force_one_pair(const TImage * i0,
   typename nn_interpolator_t::Pointer nn = nn_interpolator_t::New();
   nn->SetInputImage(i1);
   
-  if (fn_prefix.size() != 0)
+  if (! fn_prefix.empty())
   {
     save_rgb<TImage>(fn_prefix + "a.tif", i0, i1, t01, m0, m1);
   }
@@ -676,8 +673,8 @@ brute_force_one_pair(const TImage * i0,
     for (int y = -dy; y <= dy; y++)
     {
       // the window:
-      curr_params[0] = init_params[0] + sp[0] * double(x);
-      curr_params[1] = init_params[1] + sp[1] * double(y);
+      curr_params[0] = init_params[0] + sp[0] * static_cast<double>(x);
+      curr_params[1] = init_params[1] + sp[1] * static_cast<double>(y);
       
       t->SetParameters(curr_params);
       
@@ -696,7 +693,7 @@ brute_force_one_pair(const TImage * i0,
   
   t01->SetParameters(best_params);
   
-  if (fn_prefix.size() != 0)
+  if (! fn_prefix.empty())
   {
     save_rgb<TImage>(fn_prefix + "b.tif", i0, i1, t01, m0, m1);
   }
@@ -710,40 +707,38 @@ brute_force_one_pair(const TImage * i0,
 // 
 template <typename TImage, typename TMask>
 double
-brute_force_one_pair
-(const array2d(typename TImage::Pointer) & tile_pyramid,
- const array2d(typename TMask::ConstPointer) & mask_pyramid,
- const unsigned int & ia,
- const unsigned int & ib,
- translate_transform_t::Pointer & t01,
- 
- const int & dx,
- const int & dy,
- const unsigned int & coarse_to_fine_levels,
- 
- const the_text_t & prefix = the_text_t(""))
+brute_force_one_pair(const array2d(typename TImage::Pointer) & tile_pyramid,
+                     const array2d(typename TMask::ConstPointer) & mask_pyramid,
+                     const unsigned int & ia,
+                     const unsigned int & ib,
+                     translate_transform_t::Pointer & t01,
+                     
+                     const int & dx,
+                     const int & dy,
+                     const unsigned int & coarse_to_fine_levels,
+                     
+                     const bfs::path & prefix)
 {
   unsigned int num_levels = std::min(coarse_to_fine_levels,
-                                     (unsigned int)(tile_pyramid.size()));
+                                     static_cast<unsigned int>(tile_pyramid.size()));
   unsigned int high_res_level = num_levels - 1;
   
   for (unsigned int i = 0; i < num_levels; i++)
   {
-    the_text_t fn_prefix;
-    if (prefix.size() != 0)
+    std::ostringstream fn_prefix;
+    if (! prefix.empty())
     {
-      fn_prefix = prefix + "level-" + the_text_t::number(i) + "-";
+      fn_prefix << prefix << "level-" << the_text_t::number(i) << "-";
     }
     
-    brute_force_one_pair<TImage, TMask>
-    (tile_pyramid[i][ia].GetPointer(),
-     tile_pyramid[i][ib].GetPointer(),
-     mask_pyramid[i][ia].GetPointer(),
-     mask_pyramid[i][ib].GetPointer(),
-     t01,
-     dx,
-     dy,
-     fn_prefix);
+    brute_force_one_pair<TImage, TMask>(tile_pyramid[i][ia].GetPointer(),
+                                        tile_pyramid[i][ib].GetPointer(),
+                                        mask_pyramid[i][ia].GetPointer(),
+                                        mask_pyramid[i][ib].GetPointer(),
+                                        t01,
+                                        dx,
+                                        dy,
+                                        fn_prefix.str());
   }
   
   // setup the image-to-image metric:
@@ -776,7 +771,7 @@ brute_force_pairs(const std::vector<typename TImage::Pointer> & image,
                   array2d(translate_transform_t::Pointer) & path,
                   array2d(double) & cost,
                   
-                  const the_text_t & prefix = the_text_t(""))
+                  const bfs::path & prefix)
 {
   static unsigned int pass = 0;
   pass++;
@@ -797,17 +792,13 @@ brute_force_pairs(const std::vector<typename TImage::Pointer> & image,
       
       oss << "refining the mapping: " << std::setw(2) << j << " -> "
       << std::setw(2) << i << std::endl
-      << "overlap: " << int(overlap * 100.0) << " percent" << std::endl;
+      << "overlap: " << static_cast<int>(overlap * 100.0) << " percent" << std::endl;
       
-      the_text_t fn_prefix;
-      if (prefix.size() != 0)
+      std::ostringstream fn_prefix;
+      if (! prefix.empty())
       {
-        fn_prefix =
-        prefix +
-        "pair-" +
-        the_text_t::number(i, 2, '0') + "-" +
-        the_text_t::number(j, 2, '0') + "-pass-" +
-        the_text_t::number(pass, 2, '0') + "-";
+        fn_prefix << prefix << "pair-" << the_text_t::number(i, 2, '0') << "-" <<
+        the_text_t::number(j, 2, '0') << "-pass-" << the_text_t::number(pass, 2, '0') << "-";
       }
       
       cost[i][j] = brute_force_one_pair<TImage, TMask>(image[i],
@@ -817,7 +808,7 @@ brute_force_pairs(const std::vector<typename TImage::Pointer> & image,
                                                        t_ij,
                                                        dx,
                                                        dy,
-                                                       fn_prefix);
+                                                       fn_prefix.str());
       
       overlap = overlap_ratio<TImage>(image[i], image[j], t_ij);
       
@@ -840,7 +831,7 @@ brute_force_pairs(const std::vector<typename TImage::Pointer> & image,
     oss << std::endl;
   }
   
-//  int prev_precision = oss.precision(2);
+  //  int prev_precision = oss.precision(2);
   oss << "\t";
   for (unsigned int i = 0; i < num_images; i++) oss << std::setw(9) << i;
   oss << std::endl;
@@ -864,7 +855,7 @@ brute_force_pairs(const std::vector<typename TImage::Pointer> & image,
     oss << std::endl;
   }
   oss << std::endl;
-//  oss.precision(prev_precision);
+  //  oss.precision(prev_precision);
   CORE_LOG_MESSAGE(oss.str());
 }
 
@@ -887,7 +878,7 @@ brute_force_pairs(const array2d(typename TImage::Pointer) & tile_pyramid,
                   array2d(translate_transform_t::Pointer) & path,
                   array2d(double) & cost,
                   
-                  const the_text_t & prefix = the_text_t(""))
+                  const bfs::path & prefix)
 {
   static unsigned int pass = 0;
   pass++;
@@ -913,17 +904,13 @@ brute_force_pairs(const array2d(typename TImage::Pointer) & tile_pyramid,
       
       oss << "refining the mapping: " << std::setw(2) << j << " -> "
       << std::setw(2) << i << std::endl
-      << "overlap: " << int(overlap * 100.0) << " percent" << std::endl;
+      << "overlap: " << static_cast<int>(overlap * 100.0) << " percent" << std::endl;
       
-      the_text_t fn_prefix;
-      if (prefix.size() != 0)
+      std::ostringstream fn_prefix;
+      if (! prefix.empty())
       {
-        fn_prefix =
-        prefix +
-        "pair-" +
-        the_text_t::number(i, 2, '0') + "-" +
-        the_text_t::number(j, 2, '0') + "-pass-" +
-        the_text_t::number(pass, 2, '0') + "-";
+        fn_prefix << prefix << "pair-" << the_text_t::number(i, 2, '0') << "-" <<
+        the_text_t::number(j, 2, '0') << "-pass-" << the_text_t::number(pass, 2, '0') << "-";
       }
       
       cost[i][j] = brute_force_one_pair<TImage, TMask>(tile_pyramid,
@@ -934,7 +921,7 @@ brute_force_pairs(const array2d(typename TImage::Pointer) & tile_pyramid,
                                                        dx,
                                                        dy,
                                                        coarse_to_fine_levels,
-                                                       fn_prefix);
+                                                       fn_prefix.str());
       
       overlap = overlap_ratio<TImage>(tile_pyramid[high_res_level][i],
                                       tile_pyramid[high_res_level][j],
@@ -959,7 +946,7 @@ brute_force_pairs(const array2d(typename TImage::Pointer) & tile_pyramid,
     oss << std::endl;
   }
   
-//  int prev_precision = oss.precision(2);
+  //  int prev_precision = oss.precision(2);
   oss << "\t";
   for (unsigned int i = 0; i < num_images; i++) oss << std::setw(9) << i;
   oss << std::endl;
@@ -983,7 +970,7 @@ brute_force_pairs(const array2d(typename TImage::Pointer) & tile_pyramid,
     oss << std::endl;
   }
   oss << std::endl;
-//  oss.precision(prev_precision);
+  //  oss.precision(prev_precision);
   CORE_LOG_MESSAGE(oss.str());
 }
 
@@ -996,7 +983,7 @@ void
 dump_neighbors(const std::vector<typename TImage::Pointer> & image,
                const std::vector<typename TMask::ConstPointer> & mask,
                const array2d(translate_transform_t::Pointer) & path,
-               const the_text_t & prefix)
+               const bfs::path & prefix)
 {
   static unsigned int pass = 0;
   pass++;
@@ -1026,9 +1013,9 @@ dump_neighbors(const std::vector<typename TImage::Pointer> & image,
       mask_list.push_back(mask[j]);
       transform_list.push_back(path[i][j].GetPointer());
     }
-
+    
     CORE_LOG_MESSAGE(oss.str());
-   
+    
     std::vector<typename TImage::Pointer>
     images(image_list.begin(), image_list.end());
     
@@ -1048,13 +1035,10 @@ dump_neighbors(const std::vector<typename TImage::Pointer> & image,
                     255,
                     true);
     
-    the_text_t fn_save =
-    prefix + "neighbors-" +
-    the_text_t::number(i, 2, '0') +
-    "-pass-" +
-    the_text_t::number(pass) +
-    ".png";
-    save_rgb<typename TImage::Pointer>(mosaic, fn_save, true);
+    std::ostringstream fn_save;
+    fn_save << prefix << "neighbors-" << the_text_t::number(i, 2, '0') <<
+    "-pass-" << the_text_t::number(pass) << ".png";
+    save_rgb<typename TImage::Pointer>(mosaic, fn_save.str(), true);
   }
 }
 
@@ -1088,8 +1072,8 @@ calc_area_and_dist(const std::vector<typename TImage::Pointer> & image,
       
       pnt2d_t tile_min = image[i]->GetOrigin();
       pnt2d_t tile_max;
-      tile_max[0] = tile_min[0] + sp[0] * double(sz[0]);
-      tile_max[1] = tile_min[1] + sp[1] * double(sz[1]);
+      tile_max[0] = tile_min[0] + sp[0] * static_cast<double>(sz[0]);
+      tile_max[1] = tile_min[1] + sp[1] * static_cast<double>(sz[1]);
       
       ci = pnt2d(tile_min[0] + (tile_max[0] - tile_min[0]) / 2.0,
                  tile_min[1] + (tile_max[1] - tile_min[1]) / 2.0);
@@ -1115,8 +1099,8 @@ calc_area_and_dist(const std::vector<typename TImage::Pointer> & image,
         
         pnt2d_t tile_min = image[j]->GetOrigin();
         pnt2d_t tile_max;
-        tile_max[0] = tile_min[0] + sp[0] * double(sz[0]);
-        tile_max[1] = tile_min[1] + sp[1] * double(sz[1]);
+        tile_max[0] = tile_min[0] + sp[0] * static_cast<double>(sz[0]);
+        tile_max[1] = tile_min[1] + sp[1] * static_cast<double>(sz[1]);
         
         pnt2d_t center =
         pnt2d(tile_min[0] + (tile_max[0] - tile_min[0]) / 2.0,
@@ -1407,7 +1391,7 @@ match_pairs(std::vector<typename TImage::Pointer> & image,
       cost[best_match.id_][node_id] = best_match.metric_;
     }
   }
-
+  
   CORE_LOG_MESSAGE(oss.str()); 
   return perimeter_seeded;
 }
@@ -1459,7 +1443,7 @@ layout_mosaic(// multi-resolution image tiles and tile masks,
               unsigned int max_peaks,
               
               bool try_refining = false,
-              const the_text_t & prefix = the_text_t(""))
+              const bfs::path & prefix = "")
 {
   typedef itk::LinearInterpolateImageFunction<TImage, double> interpolator_t;
   
@@ -1482,7 +1466,7 @@ layout_mosaic(// multi-resolution image tiles and tile masks,
                              max_peaks);
   
   std::ostringstream oss;  
-  if (!perimeter_seeded)
+  if (! perimeter_seeded)
   {
     oss << "WARNING: none of the tiles matched..." << std::endl;
     CORE_LOG_MESSAGE(oss.str());
@@ -1514,7 +1498,7 @@ layout_mosaic(// multi-resolution image tiles and tile masks,
     
     // for each image, determine its immediate neighbors and establish
     // refined direct mappings to them:
-    //#if 1
+//#if 1
     brute_force_pairs<TImage, TMask>(tile_pyramid,
                                      mask_pyramid,
                                      overlap_min,
@@ -1540,7 +1524,7 @@ layout_mosaic(// multi-resolution image tiles and tile masks,
 //                                prefix);
 //#endif
     
-    if (prefix.size() != 0)
+    if (! prefix.empty())
     {
       dump_neighbors<TImage, TMask>(tile_pyramid[high_res_level],
                                     mask_pyramid[high_res_level],
@@ -1601,7 +1585,7 @@ layout_mosaic(// multi-resolution image tiles and tile masks,
 //    }
 //  }
 //#endif
-
+  
   // sort the tiles according to their distance to the target tile:
   std::list<local_mapping_t> perimeter;
   perimeter.push_back(local_mapping_t(best_target, best_target, 0.0));
@@ -1800,7 +1784,7 @@ layout_mosaic(// multi-resolution image tiles and tile masks,
       
       if (!failed_to_improve)
       {
-        oss << "IMPROVEMENT: " << std::setw(3) << int(100.0 * improvement) << "%" << std::endl;
+        oss << "IMPROVEMENT: " << std::setw(3) << static_cast<int>(100.0 * improvement) << "%" << std::endl;
       }
       
       if (failed_to_improve)

@@ -24,7 +24,7 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
-*/
+ */
 
 // File         : stos_common.cxx
 // Author       : Pavel A. Koshevoy
@@ -49,19 +49,19 @@ typedef std::list<bfs::path> path_list;
 // load_slice
 // 
 bool
-load_slice(const char * fn_mosaic,
-	   const bool & flip_mosaic,
-	   const unsigned int & shrink_factor,
-	   const double & clahe_slope,
-	   image_t::Pointer & mosaic,
-	   mask_t::Pointer & mosaic_mask,
-	   bool mosaic_mask_enabled,
-	   bool dont_allocate)
+load_slice(const bfs::path & fn_mosaic,
+           const bool & flip_mosaic,
+           const unsigned int & shrink_factor,
+           const double & clahe_slope,
+           image_t::Pointer & mosaic,
+           mask_t::Pointer & mosaic_mask,
+           bool mosaic_mask_enabled,
+           bool dont_allocate)
 {
   std::cout << "    reading " << fn_mosaic;
   
   std::fstream fin;
-  fin.open(fn_mosaic, std::ios::in);
+  fin.open(fn_mosaic.c_str(), std::ios::in);
   if (!fin.is_open())
   {
     std::cout << ", failed...." << std::endl;
@@ -77,11 +77,11 @@ load_slice(const char * fn_mosaic,
   double pixel_spacing = 1.0;
   bool use_std_mask = false;
   load_mosaic<base_transform_t>(fin,
-				pixel_spacing,
-				use_std_mask,
-				fn_tiles,
-				transform,
-        "testme");
+                                pixel_spacing,
+                                use_std_mask,
+                                fn_tiles,
+                                transform,
+                                "testme");
   fin.close();
   
   unsigned int num_images = transform.size();
@@ -110,7 +110,7 @@ load_slice(const char * fn_mosaic,
   // assempble the mosaic:
   std::cout << "    assembling a mosaic " << std::endl;
   mosaic = make_mosaic<image_t::ConstPointer, base_transform_t::Pointer>
-    (FEATHER_BLEND_E, transform, image, mask, dont_allocate);
+  (FEATHER_BLEND_E, transform, image, mask, dont_allocate);
   
   // reset the tile image origin and spacing:
   image_t::PointType origin = mosaic->GetOrigin();

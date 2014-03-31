@@ -93,7 +93,7 @@ public:
 // load_image
 // 
 extern image_t::Pointer
-load_image(const std::string & fn_load,
+load_image(const bfs::path & fn_load,
            const unsigned int & shrink_factor,
            const double & pixel_spacing);
 
@@ -104,13 +104,13 @@ load_image(const std::string & fn_load,
 extern void
 setup_pyramid(pyramid_t & pyramid,
               const unsigned int index,
-              const std::string & fn_load,
+              const bfs::path & fn_load,
               const image_t * image,
               const mask_t * image_mask,
               const unsigned int & descriptor_version,
               unsigned int num_scales = 1,
               const bool & generate_keys = true,
-              const std::string & fn_debug = "");
+              const bfs::path & fn_debug = "");
 
 //----------------------------------------------------------------
 // match_keys
@@ -126,7 +126,7 @@ match_keys(const pyramid_t & a,
 // prefilter_matches_v1
 // 
 extern void
-prefilter_matches_v1(const std::string & fn_prefix,
+prefilter_matches_v1(const bfs::path & fn_prefix,
                      const double & peak_ratio_threshold,
                      const std::list<const match_t *> & complete,
                      std::list<const match_t *> & filtered);
@@ -135,7 +135,7 @@ prefilter_matches_v1(const std::string & fn_prefix,
 // prefilter_matches_v2
 // 
 extern void
-prefilter_matches_v2(const std::string & fn_prefix,
+prefilter_matches_v2(const bfs::path & fn_prefix,
                      const double & distortion_threshold,
                      const std::list<const match_t *> & complete,
                      std::list<const match_t *> & filtered);
@@ -144,7 +144,7 @@ prefilter_matches_v2(const std::string & fn_prefix,
 // rematch_keys
 // 
 extern void
-rematch_keys(const std::string & fn_prefix,
+rematch_keys(const bfs::path & fn_prefix,
              const pyramid_t & pa, // FIXME: remove this
              const pyramid_t & pb, // FIXME: remove this
              const std::list<descriptor_t> & a,
@@ -157,7 +157,7 @@ rematch_keys(const std::string & fn_prefix,
 // rematch_keys
 // 
 extern void
-rematch_keys(const std::string & fn_prefix,
+rematch_keys(const bfs::path & fn_prefix,
              const pyramid_t & a,
              const pyramid_t & b,
              const base_transform_t * t_ab,
@@ -467,7 +467,7 @@ typename transform_t::Pointer
 match(const unsigned int order,
       const pyramid_t & a,
       const pyramid_t & b,
-      const std::string & fn_debug)
+      const bfs::path & fn_debug)
 {
   // a threshold value for determining when a data point fits a model:
   const double t = 2.0 * a.octave_[0].L_[0]->GetSpacing()[0]

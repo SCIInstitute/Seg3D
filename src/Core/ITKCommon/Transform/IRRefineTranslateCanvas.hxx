@@ -24,7 +24,7 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
-*/
+ */
 
 // File         : IRRefineTranslateCanvas.hxx
 // Author       : Joel Spaltenstein
@@ -44,6 +44,11 @@
 
 #include <Core/ITKCommon/common.hxx>
 
+// boost:
+#include <boost/filesystem.hpp>
+
+namespace bfs=boost::filesystem;
+
 // forward declarations:
 class IRTransform;
 class IRConnection;
@@ -61,17 +66,17 @@ class IRRefineTranslateCanvas
 {
 	typedef std::vector<IRTransform*> IRTransformationVector;
 	typedef std::vector<base_transform_t::Pointer> TrasformBasePointerVector;
-	typedef std::vector<std::string> TheTextVector;
-	typedef std::list<std::string> TheTextList;
+	typedef std::vector<bfs::path> TheTextVector;
+	typedef std::list<bfs::path> TheTextList;
 	
 public:
 	
 	IRRefineTranslateCanvas();
 	virtual ~IRRefineTranslateCanvas();
-    
+  
   // Refuse offsets bigger than this number.
   void setMaxOffset(const double maxOffset[], bool isPercent);
-
+  
   // Black out the center to force better fft matchings.
   void setBlackMaskPercent(const double blackMaskPercent[]);
 	
@@ -84,15 +89,15 @@ public:
   void doClahe( bool doClahe );
 	
 	void fillTransformAndImageIDVectors(TrasformBasePointerVector& transforms,
-										TheTextVector& imageIDs,
-                                        TheTextVector& maskIDs);
+                                      TheTextVector& imageIDs,
+                                      TheTextVector& maskIDs);
 	
 	// silly other version that uses a list because fo some reason
 	// paul likes using lists for the list of image IDs........
 	void fillTransformAndImageIDVectors(TrasformBasePointerVector& transforms,
-										TheTextList& imageIDs,
-                                        TheTextList& maskIDs);
-
+                                      TheTextList& imageIDs,
+                                      TheTextList& maskIDs);
+  
 	// based on the current positions of each of the transforms
 	// (which, when this is called will be the positions in the
 	// .mosaic file that was loaded) this routine creates IRConnections
@@ -100,11 +105,11 @@ public:
 	// the connections are not added to the individual transforms
 	// until findIdealTransformationOffsets is called
 	void buildConnections( bool verbose = false );
-
+  
 	// initializes the groupIDs so that all the connected transforms
 	// have the same groupID
 	void fillGroupIDs();
-
+  
 	// removes transforms that are in a group that make up less than
 	// cutoffPercentage of the mosaic
 	void pruneSmallGroups(float cutoffPercentage);
@@ -116,7 +121,7 @@ public:
 	float systemEnergy();
 	float maximumTension();
 	float maximumPullOnTransformation();
-
+  
 	// what is the signature of a thread entry again? keep on trying t
 	void findOffsetsThreadEntry();
 	
@@ -127,22 +132,22 @@ private:
 	IRConnection* getConectionToProcess();
 	
 	void setTransformAndNeighborsToGroupID(IRTransform* transform,
-										   long groupID);
+                                         long groupID);
 	
 	void removeTransformsWithGroupID(long groupID);
 	
 	// will be populated by buildConnections()
 	IRConnectionVector _preProcessedConnectionVector;
-
+  
 	IRTransformationVector _transformationVector;
 	IRConnectionVector _connectionVector;
-
-    double initialSize;
-
-    bool   maxOffsetIsPercent;
-    double maxOffset[2];
-    double blackMaskPercent[2];
-    bool   _doClahe;
+  
+  double initialSize;
+  
+  bool   maxOffsetIsPercent;
+  double maxOffset[2];
+  double blackMaskPercent[2];
+  bool   _doClahe;
 };
 
 

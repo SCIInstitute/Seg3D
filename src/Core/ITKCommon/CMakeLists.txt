@@ -26,6 +26,8 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
+# TODO: let's rename this to IRTOOLS...
+
 ##################################################
 # Set sources
 ##################################################

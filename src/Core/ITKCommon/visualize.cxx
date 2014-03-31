@@ -38,6 +38,7 @@
 #include <Core/ITKCommon/the_utils.hxx>
 
 // system includes:
+#include <sstream>
 #include <vector>
 
 
@@ -483,7 +484,7 @@ visualize_matches(const pyramid_t & a,
                   const unsigned int & io, // octave index
                   const unsigned int & is, // scale index
                   const std::list<match_t> & ab,
-                  const std::string & fn_prefix,
+                  const bfs::path & fn_prefix,
                   unsigned int num_keys)
 {
   static const xyz_t EAST  = xyz(1, 0, 0);
@@ -585,7 +586,7 @@ visualize_matches(const pyramid_t & a,
 // visualize_best_fit
 // 
 void
-visualize_best_fit(const std::string & fn_prefix,
+visualize_best_fit(const bfs::path & fn_prefix,
                    const image_t * a_img,
                    const image_t * b_img,
                    const base_transform_t * t_ab,
@@ -685,24 +686,24 @@ visualize_best_fit(const std::string & fn_prefix,
                           double(b.extrema_->octave_ + 1));
     }
     
-    // FIXME:
-    //#if 0
-    //    std::cout << fn_prefix
-    //	 << " a" << a.octave_ << '.' << a.scale_
-    //	 << " b" << b.octave_ << '.' << b.scale_
-    //	 << std::endl;
-    //#endif
+// FIXME:
+//#if 0
+//    std::cout << fn_prefix
+//	 << " a" << a.octave_ << '.' << a.scale_
+//	 << " b" << b.octave_ << '.' << b.scale_
+//	 << std::endl;
+//#endif
   }
   
   std::cout << "num inliers: " << num_inliers << std::endl
   << "step size:   " << step_size << std::endl;
   
   // save the keys:
-  save_rgb<native_image_t::Pointer>(a_rgb, fn_prefix + "a.tif");
-  save_rgb<native_image_t::Pointer>(b_rgb, fn_prefix + "b.tif");
+  save_rgb<native_image_t::Pointer>(a_rgb, fn_prefix.string() + "a.tif");
+  save_rgb<native_image_t::Pointer>(b_rgb, fn_prefix.string() + "b.tif");
   
   // save a mosaic:
-  save_rgb<image_t>(fn_prefix + "mosaic.tif",
+  save_rgb<image_t>(fn_prefix.string() + "mosaic.tif",
                     remap_min_max<image_t>(a_img),
                     remap_min_max<image_t>(b_img),
                     t_ab,
@@ -722,7 +723,7 @@ void
 visualize_matches_v2(const pyramid_t & a,
                      const pyramid_t & b,
                      const std::list<const match_t *> & ab,
-                     const std::string & fn_prefix,
+                     const bfs::path & fn_prefix,
                      unsigned int num_keys)
 {
   static const xyz_t EAST  = xyz(1, 0, 0);
@@ -802,16 +803,17 @@ visualize_matches_v2(const pyramid_t & a,
 //#endif
   }
   
-  std::string fn = fn_prefix + "matched";
-  save_rgb<native_image_t::Pointer>(a_rgb, fn + "-a.tif");
-  save_rgb<native_image_t::Pointer>(b_rgb, fn + "-b.tif");
+  std::ostringstream fn;
+  fn << fn_prefix << "matched";
+  save_rgb<native_image_t::Pointer>(a_rgb, fn.str() + "-a.tif");
+  save_rgb<native_image_t::Pointer>(b_rgb, fn.str() + "-b.tif");
 }
 
 //----------------------------------------------------------------
 // visualize_nn
 // 
 void
-visualize_nn(const std::string & fn_prefix,
+visualize_nn(const bfs::path & fn_prefix,
              const pyramid_t & a,
              const pyramid_t & b,
              const ext_wrapper_t & b_key_wrapper,
@@ -920,7 +922,8 @@ visualize_nn(const std::string & fn_prefix,
     }
   }
   
-  std::string fn = fn_prefix + "nn";
-  save_rgb<native_image_t::Pointer>(a_rgb, fn + "-a.tif");
-  save_rgb<native_image_t::Pointer>(b_rgb, fn + "-b.tif");
+  std::ostringstream fn;
+  fn << fn_prefix << "nn";
+  save_rgb<native_image_t::Pointer>(a_rgb, fn.str() + "-a.tif");
+  save_rgb<native_image_t::Pointer>(b_rgb, fn.str() + "-b.tif");
 }

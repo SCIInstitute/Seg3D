@@ -37,17 +37,23 @@
 
 #include <string>
 
+// boost:
+#include <boost/filesystem.hpp>
+
+namespace bfs=boost::filesystem;
+
 class IRPruner
 {
 public:
-  static void PruneImages(std::list<std::string> &image_names,
-                            std::vector<base_transform_t::Pointer> &transform,
-                            const unsigned int &shrink_factor,
-                            const double &pixel_spacing,
-                            const bool &use_std_mask,
-                            const unsigned int &tile_size,
-                            const double &intensity_tolerance,
-                            float overlap_percent = 1.0f);
+  typedef std::list<bfs::path> ImageList;
+  static void PruneImages(ImageList & image_names,
+                          std::vector<base_transform_t::Pointer> &transform,
+                          const unsigned int &shrink_factor,
+                          const double &pixel_spacing,
+                          const bool &use_std_mask,
+                          const unsigned int &tile_size,
+                          const double &intensity_tolerance,
+                          float overlap_percent = 1.0f);
 };
 
 #endif

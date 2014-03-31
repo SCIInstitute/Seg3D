@@ -42,7 +42,7 @@
 
 // TODO: replace cout and cerr with logging
 
-void IRPruner::PruneImages(std::list<std::string> &image_names,
+void IRPruner::PruneImages(ImageList & image_names,
                            std::vector<base_transform_t::Pointer> &transform,
                            const unsigned int &shrink_factor,
                            const double &pixel_spacing,
@@ -54,15 +54,14 @@ void IRPruner::PruneImages(std::list<std::string> &image_names,
   double min_interest = std::numeric_limits<unsigned int>::max();
   double max_interest = std::numeric_limits<unsigned int>::min();
 
-  std::list<std::string> passed;
-  std::list<std::string> failed;
+  ImageList passed;
+  ImageList failed;
 
   unsigned int i = 0;
-  for (std::list<std::string>::const_iterator fn_iter = image_names.begin();
-       fn_iter != image_names.end(); ++fn_iter, i++)
+  for (ImageList::const_iterator fn_iter = image_names.begin(); fn_iter != image_names.end(); ++fn_iter, i++)
   {
     // Load in an image...
-    image_t::Pointer image = std_tile<image_t>((*fn_iter).c_str(), 
+    image_t::Pointer image = std_tile<image_t>(*fn_iter, 
                                                shrink_factor, 
                                                pixel_spacing);
 
@@ -167,15 +166,14 @@ void IRPruner::PruneImages(std::list<std::string> &image_names,
   if ( transform.size() != 0 )
   {
     std::cout << "Images that passed:" << std::endl;
-    for (std::list<std::string>::const_iterator fn_iter = passed.begin();
+    for (ImageList::const_iterator fn_iter = passed.begin();
          fn_iter != passed.end(); ++fn_iter)
     {
       std::cout << "  " << (*fn_iter) << std::endl;
     }
 
     std::cout << std::endl << "Images that failed:" << std::endl;
-    for (std::list<std::string>::const_iterator fn_iter = failed.begin();
-         fn_iter != failed.end(); ++fn_iter)
+    for (ImageList::const_iterator fn_iter = failed.begin(); fn_iter != failed.end(); ++fn_iter)
     {
       std::cout << "  " << (*fn_iter) << std::endl;
       image_names.remove( *fn_iter );

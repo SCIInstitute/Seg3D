@@ -99,14 +99,14 @@ visualize_matches(const pyramid_t & a,
                   const unsigned int & io, // octave index
                   const unsigned int & is, // scale index
                   const std::list<match_t> & ab,
-                  const the_text_t & fn_prefix,
+                  const bfs::path & fn_prefix,
                   unsigned int num_keys = ~0);
 
 //----------------------------------------------------------------
 // visualize_best_fit
 // 
 extern void
-visualize_best_fit(const the_text_t & fn_prefix,
+visualize_best_fit(const bfs::path & fn_prefix,
                    const image_t * a_img,
                    const image_t * b_img,
                    const base_transform_t * t_ab,
@@ -124,14 +124,14 @@ extern void
 visualize_matches_v2(const pyramid_t & a,
                      const pyramid_t & b,
                      const std::list<const match_t *> & ab,
-                     const the_text_t & fn_prefix,
+                     const bfs::path & fn_prefix,
                      unsigned int num_keys = ~0);
 
 //----------------------------------------------------------------
 // visualize_nn
 // 
 extern void
-visualize_nn(const the_text_t & fn_prefix,
+visualize_nn(const bfs::path & fn_prefix,
              const pyramid_t & a,
              const pyramid_t & b,
              const ext_wrapper_t & b_key_wrapper,

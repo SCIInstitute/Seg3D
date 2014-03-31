@@ -24,7 +24,7 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
-*/
+ */
 
 // File         : the_utils.hxx
 // Author       : Pavel A. Koshevoy
@@ -90,11 +90,11 @@ clamp_angle(const double & absolute_angle)
 // 
 inline double
 calc_angle(const double & x,
-	   const double & y,
-	   const double & reference_angle = 0.0)
+           const double & y,
+           const double & reference_angle = 0.0)
 {
   return clamp_angle(fmod(atan2(y, x) + TWO_PI, TWO_PI) -
-		     fmod(reference_angle, TWO_PI));
+                     fmod(reference_angle, TWO_PI));
 }
 
 //----------------------------------------------------------------
@@ -228,10 +228,10 @@ resize(array3d(data_t) & array,
 template <class container_t, typename data_t>
 void
 push_back_unique(container_t & container,
-		 const data_t & data)
+                 const data_t & data)
 {
   typename container_t::const_iterator where =
-    std::find(container.begin(), container.end(), data);
+  std::find(container.begin(), container.end(), data);
   if (where != container.end()) return;
   
   container.push_back(data);
@@ -243,10 +243,10 @@ push_back_unique(container_t & container,
 template <class container_t, typename data_t>
 void
 push_front_unique(container_t & container,
-		  const data_t & data)
+                  const data_t & data)
 {
   typename container_t::const_iterator where =
-    std::find(container.begin(), container.end(), data);
+  std::find(container.begin(), container.end(), data);
   if (where != container.end()) return;
   
   container.push_front(data);
@@ -359,7 +359,7 @@ replace(container_t & container, const data_t & a, const data_t & b)
 template <typename data_t>
 typename std::list<data_t>::const_iterator
 iterator_at_index(const std::list<data_t> & container,
-		  const size_t & index)
+                  const size_t & index)
 {
   typename std::list<data_t>::const_iterator iter = container.begin();
   for (size_t i = 0; i < index && iter != container.end(); i++, ++iter) ;
@@ -372,7 +372,7 @@ iterator_at_index(const std::list<data_t> & container,
 template <typename data_t>
 typename std::list<data_t>::iterator
 iterator_at_index(std::list<data_t> & container,
-		  const size_t & index)
+                  const size_t & index)
 {
   typename std::list<data_t>::iterator iter = container.begin();
   for (size_t i = 0; i < index && iter != container.end(); i++, ++iter) ;
@@ -403,7 +403,7 @@ bool
 has(const std::list<data_t> & container, const data_t & data)
 {
   typename std::list<data_t>::const_iterator iter =
-    std::find(container.begin(), container.end(), data);
+  std::find(container.begin(), container.end(), data);
   
   return iter != container.end();
 }
@@ -463,7 +463,7 @@ stream_t &
 dump(stream_t & so, const std::list<data_t> & c)
 {
   for (typename std::list<data_t>::const_iterator
-	 i = c.begin(); i != c.end(); ++i)
+       i = c.begin(); i != c.end(); ++i)
   {
     so << *i << ' ';
   }
@@ -519,11 +519,11 @@ class inserter_t
 {
 public:
   inserter_t(container_t & container,
-	     const typename container_t::iterator & iter,
-	     const bool & expand):
-    container_(container),
-    iter_(iter),
-    expand_(expand)
+             const typename container_t::iterator & iter,
+             const bool & expand):
+  container_(container),
+  iter_(iter),
+  expand_(expand)
   {}
   
   inline inserter_t<container_t, data_t> & operator << (const data_t & data)
@@ -532,11 +532,11 @@ public:
     {
       if (expand_)
       {
-	iter_ = container_.insert(iter_, data);
+        iter_ = container_.insert(iter_, data);
       }
       else
       {
-	assert(0);
+        assert(0);
       }
     }
     else
@@ -568,7 +568,7 @@ inserter_t<std::vector<data_t>, data_t>
 operator << (std::vector<data_t> & container, const data_t & data)
 {
   inserter_t<std::vector<data_t>, data_t>
-    inserter(container, container.begin(), false);
+  inserter(container, container.begin(), false);
   return inserter << data;
 }
 
@@ -580,7 +580,7 @@ inserter_t<std::list<data_t>, data_t>
 operator << (std::list<data_t> & container, const data_t & data)
 {
   inserter_t<std::list<data_t>, data_t>
-    inserter(container, container.begin(), true);
+  inserter(container, container.begin(), true);
   return inserter << data;
 }
 
@@ -591,7 +591,7 @@ operator << (std::list<data_t> & container, const data_t & data)
 template <size_t dimensions, typename data_t>
 data_t
 calc_euclidian_distance_sqrd(const std::vector<data_t> & a,
-			     const std::vector<data_t> & b)
+                             const std::vector<data_t> & b)
 {
   data_t distance_sqrd = data_t(0);
   for (size_t i = 0; i < dimensions; i++)
@@ -609,7 +609,7 @@ calc_euclidian_distance_sqrd(const std::vector<data_t> & a,
 template <size_t dimensions, typename data_t>
 data_t
 calc_euclidian_distance(const std::vector<data_t> & a,
-			const std::vector<data_t> & b)
+                        const std::vector<data_t> & b)
 {
   data_t dist_sqrd = calc_euclidian_distance_sqrd<dimensions, data_t>(a, b);
   double dist = sqrt(double(dist_sqrd));
@@ -684,7 +684,7 @@ the_sign(const T & a)
 template <class T>
 void
 copy_a_to_b(const std::list<T> & container_a,
-	    std::vector<T> & container_b)
+            std::vector<T> & container_b)
 {
   container_b.assign(container_a.begin(), container_a.end());
 }
@@ -697,7 +697,7 @@ copy_a_to_b(const std::list<T> & container_a,
 template <class T>
 void
 copy_a_to_b(const std::list<T> & container_a,
-	    the_dynamic_array_t<T> & container_b)
+            the_dynamic_array_t<T> & container_b)
 {
   container_b.resize(container_a.size());
   
@@ -717,7 +717,7 @@ copy_a_to_b(const std::list<T> & container_a,
 template <class T>
 void
 copy_a_to_b(const the_dynamic_array_t<T> & container_a,
-	    std::vector<T> & container_b)
+            std::vector<T> & container_b)
 {
   container_b.resize(container_a.size());
   
@@ -737,13 +737,13 @@ class the_lock_t
 {
 public:
   the_lock_t(T * lock, bool lock_immediately = true):
-    lock_(lock),
-    armed_(false)
+  lock_(lock),
+  armed_(false)
   { if (lock_immediately) arm(); }
   
   the_lock_t(T & lock, bool lock_immediately = true):
-    lock_(&lock),
-    armed_(false)
+  lock_(&lock),
+  armed_(false)
   { if (lock_immediately) arm(); }
   
   ~the_lock_t()
@@ -784,7 +784,7 @@ class the_unlock_t
 {
 public:
   the_unlock_t(T * lock):
-    lock_(lock)
+  lock_(lock)
   {
     if (lock_ != NULL)
     {
@@ -793,7 +793,7 @@ public:
   }
   
   the_unlock_t(T & lock):
-    lock_(&lock)
+  lock_(&lock)
   {
     if (lock_ != NULL)
     {
@@ -825,11 +825,11 @@ class the_scoped_variable_t
 {
 public:
   the_scoped_variable_t(T & variable,
-			const T & in_scope_value,
-			const T & out_of_scope_value):
-    var_(variable),
-    in_(in_scope_value),
-    out_(out_of_scope_value)
+                        const T & in_scope_value,
+                        const T & out_of_scope_value):
+  var_(variable),
+  in_(in_scope_value),
+  out_(out_of_scope_value)
   {
     var_ = in_;
   }
@@ -838,7 +838,7 @@ public:
   {
     var_ = out_;
   }
-
+  
 private:
   the_scoped_variable_t(const the_scoped_variable_t &);
   the_scoped_variable_t & operator = (const the_scoped_variable_t &);
@@ -856,7 +856,7 @@ class the_scoped_increment_t
 {
 public:
   the_scoped_increment_t(T & variable):
-    var_(variable)
+  var_(variable)
   {
     var_++;
   }
@@ -900,15 +900,15 @@ restore_console_stdio();
 namespace the
 {
   extern int open_utf8(const char * filename_utf8,
-		       int oflag,
-		       int pmode);
+                       int oflag,
+                       int pmode);
   
   extern void open_utf8(std::fstream & fstream_to_open,
-			const char * filename_utf8,
-			std::ios_base::openmode mode);
+                        const char * filename_utf8,
+                        std::ios_base::openmode mode);
   
   extern FILE * fopen_utf8(const char * filename_utf8,
-			   const char * mode);
+                           const char * mode);
   
   extern int rename_utf8(const char * old_utf8, const char * new_utf8);
   extern int remove_utf8(const char * filename_utf8);
@@ -921,8 +921,8 @@ namespace the
   
   inline static bool
   close_enough(const float & ref,
-	       const float & given,
-	       const float tolerance = 1e-6f)
+               const float & given,
+               const float tolerance = 1e-6f)
   {
     float err = fabsf(given - ref);
     return err < tolerance;
@@ -930,8 +930,8 @@ namespace the
   
   inline static bool
   close_enough(const double & ref,
-	       const double & given,
-	       const double tolerance = 1e-6)
+               const double & given,
+               const double tolerance = 1e-6)
   {
     double err = fabs(given - ref);
     return err < tolerance;

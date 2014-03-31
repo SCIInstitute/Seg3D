@@ -37,6 +37,8 @@
 #include <Core/ITKCommon/FFT/fft_common.hxx>
 #include <Core/ITKCommon/the_utils.hxx>
 
+#include <Core/Utils/Exception.h>
+
 // system includes:
 #include <functional>
 
@@ -65,8 +67,8 @@ unsigned int
 find_maxima_cm(std::list<local_max_t> & max_list,
                const itk_image_t::Pointer & image,
                const double percentage,
-               const the_text_t & prefix,
-               const the_text_t & suffix)
+               const bfs::path & prefix,
+               const bfs::path & suffix)
 {
   typedef itk::ImageRegionConstIterator<itk_image_t> iter_t;
   typedef itk::ImageRegionConstIteratorWithIndex<itk_image_t> itex_t;
@@ -115,7 +117,7 @@ find_maxima_cm(std::list<local_max_t> & max_list,
   {
     const double v = iter.Get();
     const unsigned int bin =
-    (unsigned int)(double((v - v_min) / v_rng) * double(bins - 1));
+    static_cast<unsigned int>(static_cast<double>((v - v_min) / v_rng) * static_cast<double>(bins - 1));
     pdf[bin]++;
   }
   
@@ -137,8 +139,8 @@ find_maxima_cm(std::list<local_max_t> & max_list,
   double clip_min = 0.0;
   for (unsigned int i = 1; i < bins; i++)
   {
-    clip_min = v_min + (double(i) / double(bins - 1)) * v_rng;
-    if (double(cdf[i]) >= percentage * wh) break;
+    clip_min = v_min + (static_cast<double>(i) / static_cast<double>(bins - 1)) * v_rng;
+    if (static_cast<double>(cdf[i]) >= percentage * wh) break;
   }
   
   // threshold the peaks:
@@ -197,10 +199,10 @@ find_maxima_cm(std::list<local_max_t> & max_list,
     {
       int u = x + stencil[k][0];
       int v = y + stencil[k][1];
-      if ((unsigned int)(u) >= w || (unsigned int)(v) >= h) continue;
+      if (static_cast<unsigned int>(u) >= w || static_cast<unsigned int>(v) >= h) continue;
       
       unsigned int cluster_id = cluster_map[u * h + v];
-      if (cluster_id != (unsigned int)(~0))
+      if (cluster_id != static_cast<unsigned int>(~0))
       {
         push_back_unique(neighbors, cluster_id);
       }
@@ -270,17 +272,17 @@ find_maxima_cm(std::list<local_max_t> & max_list,
         int v = (y + dy + h) % h;
         
         unsigned int cluster_id = cluster_map[u * h + v];
-        if (cluster_id == i || cluster_id == (unsigned int)(~0)) continue;
+        if (cluster_id == i || cluster_id == static_cast<unsigned int>(~0)) continue;
         
         // figure out which boundaries this cluster was broken accross:
         cluster_bbox_t & ba = bboxes[i];
         cluster_bbox_t & bb = bboxes[cluster_id];
         
-        bool merge_x = ((bb.max_[0] - ba.min_[0] > int(w / 2)) ||
-                        (ba.max_[0] - bb.min_[0] > int(w / 2)));
+        bool merge_x = ((bb.max_[0] - ba.min_[0] > static_cast<int>(w / 2)) ||
+                        (ba.max_[0] - bb.min_[0] > static_cast<int>(w / 2)));
         
-        bool merge_y = ((bb.max_[1] - ba.min_[1] > int(h / 2)) ||
-                        (ba.max_[1] - bb.min_[1] > int(h / 2)));
+        bool merge_y = ((bb.max_[1] - ba.min_[1] > static_cast<int>(h / 2)) ||
+                        (ba.max_[1] - bb.min_[1] > static_cast<int>(h / 2)));
         
         int shift_x = (!merge_x) ? 0 : (ba.min_[0] <= 0) ? -w : w;
         int shift_y = (!merge_y) ? 0 : (ba.min_[1] <= 0) ? -h : h;
@@ -323,8 +325,8 @@ find_maxima_cm(std::list<local_max_t> & max_list,
          j != cluster.end(); ++j)
     {
       index_t ij = *j;
-      double x = double(ij[0]);
-      double y = double(ij[1]);
+      double x = static_cast<double>(ij[0]);
+      double y = static_cast<double>(ij[1]);
       
       // adjust index for periodicity:
       if (x < 0)  ij[0] += w;
@@ -340,7 +342,7 @@ find_maxima_cm(std::list<local_max_t> & max_list,
     
     double cm_x = mx / mt;
     double cm_y = my / mt;
-    double m = mt / double(cluster.size());
+    double m = mt / static_cast<double>(cluster.size());
     
     // FIXME:
 //#ifdef DEBUG_MARKERS
@@ -379,7 +381,7 @@ threshold_maxima(std::list<local_max_t> & max_list,
   for (std::list<local_max_t>::iterator i = max_list.begin();
        i != max_list.end(); ++i)
   {
-    double mass = double((*i).area_) * ((*i).value_);
+    double mass = static_cast<double>((*i).area_) * ((*i).value_);
     total_mass += mass;
   }
   
@@ -388,7 +390,7 @@ threshold_maxima(std::list<local_max_t> & max_list,
   for (std::list<local_max_t>::iterator i = max_list.begin();
        i != max_list.end(); ++i)
   {
-    double mass = double((*i).area_) * (*i).value_;
+    double mass = static_cast<double>((*i).area_) * (*i).value_;
     if (mass < threshold_mass) continue;
     
     new_list.push_back(*i);
@@ -513,16 +515,20 @@ find_correlation(std::list<local_max_t> & max_list,
   // calculate the displacement probability density function:
   fft_data_t ifft_P;
   
-#ifndef NDEBUG // get around an annoying compiler warning:
-  bool ok =
-#endif
-  ifft(P, ifft_P);
-  assert(ok);
+//#ifndef NDEBUG // get around an annoying compiler warning:
+//  bool ok =
+//#endif
+  bool ok =ifft(P, ifft_P);
+//  assert(ok);
+  if (! ok)
+  {
+    CORE_THROW_EXCEPTION("ifft failed");
+  }
   
   itk_image_t::Pointer PDF = ifft_P.real();
   
   // look for the maxima in the PDF:
-  double area = double(max_sz[0] * max_sz[1]);
+  double area = static_cast<double>(max_sz[0] * max_sz[1]);
   
   // a minimum of 5 pixels and a maximum of 64 pixels may be attributed
   // to local maxima in the image:
@@ -530,7 +536,11 @@ find_correlation(std::list<local_max_t> & max_list,
   double fraction = std::min(64.0 / area, std::max(5.0 / area, 1e-2));
   
   // the entire image should never be treated as a maxima cluster:
-  assert(fraction < 1.0);
+//  assert(fraction < 1.0);
+  if (fraction >= 1.0)
+  {
+    CORE_THROW_EXCEPTION("maxima cluster check failed");
+  }
   
   // find the maxima clusters:
   return find_maxima_cm(max_list, PDF, 1.0 - fraction);

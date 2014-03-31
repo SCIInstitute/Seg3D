@@ -43,6 +43,11 @@
 #include <Core/ITKCommon/the_utils.hxx>
 #include <Core/ITKCommon/the_text.hxx>
 
+// boost:
+#include <boost/filesystem.hpp>
+
+namespace bfs=boost::filesystem;
+
 
 //----------------------------------------------------------------
 // VIS_DEBUG
@@ -141,56 +146,56 @@ match_keys(const std::list<descriptor_t> & a,
            const std::list<descriptor_t> & b,
            std::list<match_t> & ab)
 {
-  //#if 0
-  //  typedef tree_t<KEY_SIZE, key_wrapper_t, double> key_tree_t;
-  //  
-  //  // build the tree from the A list:
-  //  key_tree_t tree;
-  //  std::vector<key_wrapper_t> tree_pt(a.size());
-  //  {
-  //    std::list<descriptor_t>::const_iterator iter = a.begin();
-  //    for (unsigned int i = 0; i < a.size(); i++, ++iter)
-  //    {
-  //      wrap(tree_pt[i], &(*iter));
-  //    }
-  //    
-  //    tree.setup(&(tree_pt[0]), tree_pt.size());
-  //  }
-  //  
-  //  // query the tree from the B list:
-  //  for (std::list<descriptor_t>::const_iterator i = b.begin();
-  //       i != b.end(); ++i)
-  //  {
-  //    key_wrapper_t query;
-  //    wrap(query, &(*i));
-  //    
-  //    // get the nearest neighbor match:
-  //    double distance = std::numeric_limits<double>::max();
-  //    std::list<key_tree_t::nn_t> nn_sorted;
-  //    if (!tree.nn(query, distance, nn_sorted, 2 * (KEY_SIZE), 2))
-  //    {
-  //      continue;
-  //    }
-  //    
-  //    const key_tree_t::nn_t & nn0 = *(nn_sorted.begin());
-  //    const double & d0 = nn0.dist_;
-  //    double r = 1.0;
-  //    if (nn_sorted.size() == 2)
-  //    {
-  //      const key_tree_t::nn_t & nn1 = *(++nn_sorted.begin());
-  //      const double & d1 = nn1.dist_;
-  //      r = d0 / d1;
-  //      
-  //      // if (r > 0.5) continue;
-  //    }
-  //    
-  //    for (unsigned int j = 0; j < nn0.node_->num_pts_; j++)
-  //    {
-  //      match_t rec(nn0.node_->points_[j].key_, query.key_, distance, r);
-  //      ab.push_back(rec);
-  //    }
-  //  }
-  //#else
+//#if 0
+//  typedef tree_t<KEY_SIZE, key_wrapper_t, double> key_tree_t;
+//  
+//  // build the tree from the A list:
+//  key_tree_t tree;
+//  std::vector<key_wrapper_t> tree_pt(a.size());
+//  {
+//    std::list<descriptor_t>::const_iterator iter = a.begin();
+//    for (unsigned int i = 0; i < a.size(); i++, ++iter)
+//    {
+//      wrap(tree_pt[i], &(*iter));
+//    }
+//    
+//    tree.setup(&(tree_pt[0]), tree_pt.size());
+//  }
+//  
+//  // query the tree from the B list:
+//  for (std::list<descriptor_t>::const_iterator i = b.begin();
+//       i != b.end(); ++i)
+//  {
+//    key_wrapper_t query;
+//    wrap(query, &(*i));
+//    
+//    // get the nearest neighbor match:
+//    double distance = std::numeric_limits<double>::max();
+//    std::list<key_tree_t::nn_t> nn_sorted;
+//    if (!tree.nn(query, distance, nn_sorted, 2 * (KEY_SIZE), 2))
+//    {
+//      continue;
+//    }
+//    
+//    const key_tree_t::nn_t & nn0 = *(nn_sorted.begin());
+//    const double & d0 = nn0.dist_;
+//    double r = 1.0;
+//    if (nn_sorted.size() == 2)
+//    {
+//      const key_tree_t::nn_t & nn1 = *(++nn_sorted.begin());
+//      const double & d1 = nn1.dist_;
+//      r = d0 / d1;
+//      
+//      // if (r > 0.5) continue;
+//    }
+//    
+//    for (unsigned int j = 0; j < nn0.node_->num_pts_; j++)
+//    {
+//      match_t rec(nn0.node_->points_[j].key_, query.key_, distance, r);
+//      ab.push_back(rec);
+//    }
+//  }
+//#else
   // find closest and second closest matches:
   key_wrapper_t query;
   key_wrapper_t nn0;
@@ -227,7 +232,7 @@ match_keys(const std::list<descriptor_t> & a,
     match_t rec(nn0.key_, query.key_, d0, r);
     ab.push_back(rec);
   }
-  //#endif
+//#endif
   
   // sort the matches:
   ab.sort();
@@ -337,7 +342,7 @@ remove_mismatches(const transform_t * t_ab,
 //    than a given percentage of the maximum histogram peak.
 // 
 void
-prefilter_matches_v1(const std::string & fn_prefix,
+prefilter_matches_v1(const bfs::path & fn_prefix,
                      const double & peak_ratio_threshold,
                      const std::list<const match_t *> & complete,
                      std::list<const match_t *> & filtered)
@@ -428,7 +433,7 @@ prefilter_matches_v1(const std::string & fn_prefix,
   }
   
   // FIXME:
-  save<volume_t>(histogram, fn_prefix + "histogram.mha");
+  save<volume_t>(histogram, fn_prefix / "histogram.mha");
   
   // find the min/max of the histogram:
   volume_t::PixelType min = std::numeric_limits<volume_t::PixelType>::max();
@@ -448,7 +453,7 @@ prefilter_matches_v1(const std::string & fn_prefix,
 //  (unsigned int)(2.0 * ceil(double(num_matches) /
 //                            double(dx_bins * dy_bins * da_bins)));
 //#else
-  unsigned int cutoff = (unsigned int)(peak_ratio_threshold * rng + min);
+  unsigned int cutoff = static_cast<unsigned int>(peak_ratio_threshold * rng + min);
 //#endif
   
   // discard matches that map to bins below a given threshold:
@@ -473,11 +478,10 @@ prefilter_matches_v1(const std::string & fn_prefix,
   }
   
   // FIXME:
-  save<volume_t>(tmp, fn_prefix + "histogram-thresholded.mha");
+  save<volume_t>(tmp, fn_prefix / "histogram-thresholded.mha");
   
   // FIXME:
-  std::cout << "filtered from " << complete.size() << " to " << filtered.size()
-  << std::endl;
+  std::cout << "filtered from " << complete.size() << " to " << filtered.size() << std::endl;
 }
 
 //----------------------------------------------------------------
@@ -489,7 +493,7 @@ prefilter_matches_v1(const std::string & fn_prefix,
 //    by more than a given percentage.
 // 
 void
-prefilter_matches_v2(const std::string & fn_prefix,
+prefilter_matches_v2(const bfs::path & fn_prefix,
                      const double & distortion_threshold,
                      const std::list<const match_t *> & complete,
                      std::list<const match_t *> & filtered)
@@ -576,7 +580,7 @@ prefilter_matches_v2(const std::string & fn_prefix,
 // rematch_keys
 // 
 void
-rematch_keys(const std::string & fn_prefix,
+rematch_keys(const bfs::path & fn_prefix,
              const pyramid_t & pa, // FIXME: remove this
              const pyramid_t & pb, // FIXME: remove this
              const std::list<descriptor_t> & a,
@@ -734,7 +738,7 @@ rematch_keys(const std::string & fn_prefix,
 // rematch_keys
 // 
 void
-rematch_keys(const std::string & fn_prefix,
+rematch_keys(const bfs::path & fn_prefix,
              const pyramid_t & a,
              const pyramid_t & b,
              const base_transform_t * t_ab,
@@ -788,7 +792,7 @@ rematch_keys(const std::string & fn_prefix,
 // load_image
 // 
 image_t::Pointer
-load_image(const std::string & fn_load,
+load_image(const bfs::path & fn_load,
            const unsigned int & shrink_factor,
            const double & pixel_spacing)
 {
@@ -806,21 +810,21 @@ load_image(const std::string & fn_load,
   spacing[1] = 1;
   image->SetSpacing(spacing);
   
-  //#if 0
-  //  // FIXME: this may be unnecessary, but Lowe recommended it (somewhere):
-  //  if (shrink_factor > 1)
-  //  {
-  //    shrink_factor /= 2;
-  //  }
-  //  else
-  //  {
-  //    std::cout << "    up-sampling " << std::endl;
-  //    image = resize<image_t>(image, 2.0);
-  //    spacing[0] = 0.5;
-  //    spacing[1] = 0.5;
-  //    image->SetSpacing(spacing);
-  //  }
-  //#endif
+//#if 0
+//  // FIXME: this may be unnecessary, but Lowe recommended it (somewhere):
+//  if (shrink_factor > 1)
+//  {
+//    shrink_factor /= 2;
+//  }
+//  else
+//  {
+//    std::cout << "    up-sampling " << std::endl;
+//    image = resize<image_t>(image, 2.0);
+//    spacing[0] = 0.5;
+//    spacing[1] = 0.5;
+//    image->SetSpacing(spacing);
+//  }
+//#endif
   
   // don't blur the images unnecessarily:
   if (shrink_factor > 1)
@@ -854,16 +858,16 @@ load_image(const std::string & fn_load,
 void
 setup_pyramid(pyramid_t & pyramid,
               const unsigned int index,
-              const std::string & fn_load,
+              const bfs::path & fn_load,
               const image_t * image,
               const mask_t * image_mask,
               const unsigned int & descriptor_version,
               unsigned int num_scales,
               const bool & generate_keys,
-              const std::string & fn_debug)
+              const bfs::path & fn_debug)
 {
-  std::string prefix = fn_debug;
-  if (fn_debug.size() != 0)
+  std::string prefix = fn_debug.string();
+  if (! fn_debug.empty())
   {
     prefix += the_text_t::number(index);
   }
@@ -915,7 +919,7 @@ bestfit_stats(const std::vector<const match_t *> & ab,
        iter != inliers.end(); ++iter)
   {
     const double & r = ab[*iter]->r_;
-    unsigned int idx = (unsigned int)(r * double(pdf_hit.size() - 1));
+    unsigned int idx = static_cast<unsigned int>(r * static_cast<double>(pdf_hit.size() - 1));
     pdf_hit[idx] += 1;
   }
   

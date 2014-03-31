@@ -24,7 +24,7 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
-*/
+ */
 
 // File         : stos.hxx
 // Author       : Pavel A. Koshevoy
@@ -39,6 +39,7 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
+#include <string>
 
 // boost:
 #include <boost/filesystem.hpp>
@@ -47,7 +48,6 @@
 #include <Core/ITKCommon/common.hxx>
 //#include "the_text.hxx"
 #include <Core/ITKCommon/the_utils.hxx>
-//#include "IRPath.h"
 
 namespace bfs=boost::filesystem;
 
@@ -69,8 +69,7 @@ public:
          const TImage * s0,
          const TImage * s1,
          const unsigned int & shrink_factor,
-         const base_transform_t * t01):
-    t01_(t01)
+         const base_transform_t * t01) : t01_(t01)
   {
     fn_[0] = fn_s0;
     fn_[1] = fn_s1;
@@ -112,8 +111,7 @@ public:
          const unsigned int size_y0,
          const unsigned int size_x1,
          const unsigned int size_y1,
-         const base_transform_t * t01):
-    t01_(t01)
+         const base_transform_t * t01) : t01_(t01)
   {
     fn_[0] = fn_s0;
     fn_[1] = fn_s1;
@@ -135,7 +133,7 @@ public:
     sz_[1][1] = size_y1;
   }
   
-  stos_t(const char * fn_load,
+  stos_t(const bfs::path & fn_load,
          const bfs::path & override_slice0_path = "",
          const bfs::path & override_slice1_path = "")
   {
@@ -143,23 +141,23 @@ public:
   }
   
   // load the filenames of the slices and the corresponding transform:
-  bool load(const char * fn_load,
+  bool load(const bfs::path & fn_load,
             const bfs::path & slice0_path = "",
             const bfs::path & slice1_path = "",
             const bool blab = true)
   {
     std::fstream si;
-    the::open_utf8(si, fn_load, ios::in);
+    the::open_utf8(si, fn_load.c_str(), std::ios::in);
     if (!si.is_open())
     {
-      cerr << "WARNING: could not open " << fn_load
-           << " for reading, skipping...." << endl;
+      std::cerr << "WARNING: could not open " << fn_load
+      << " for reading, skipping...." << std::endl;
       return false;
     }
     
-    fn_load_.assign(fn_load);
-    if (blab) cout << "loading " << fn_load_ << endl;
-
+    fn_load_ = fn_load;
+    if (blab) std::cout << "loading " << fn_load_ << std::endl;
+    
     bool ok = load(si, slice0_path, slice1_path);
     si.close();
     
@@ -170,9 +168,10 @@ public:
             const bfs::path & override_slice0_path = "",
             const bfs::path & override_slice1_path = "")
   {
-    getline(si, fn_[0]);
-    getline(si, fn_[1]);
-
+    std::string f[2];
+    std::getline(si, f[0]);
+    std::getline(si, f[1]);
+    
     // Setup slice paths...
     bfs::path corrected_path[2];
     corrected_path[0] = override_slice0_path;
@@ -181,24 +180,26 @@ public:
     // Override if needed.
     for (int i = 0; i < 2; i++)
     {
-      IRPath::CleanSlashes(fn_[i]);
-      corrected_path[i] = IRPath::CleanPath(corrected_path[i]);
-      if ( !corrected_path[i].is_empty() )
+//      IRPath::CleanSlashes(fn_[i]);
+//      corrected_path[i] = IRPath::CleanPath(corrected_path[i]);
+      if (! corrected_path[i].empty() )
       {
-        if ( fn_[i].contains('/') )
-        {
-          std::vector<bfs::path> split_list = 
-            fn_[i].splitAt('/', std::numeric_limits<unsigned int>::max());
-          fn_[i] = split_list.back();
-        }
-        fn_[i] = corrected_path[i] + fn_[i];
+//        if ( fn_[i].contains('/') )
+//        {
+//          std::vector<bfs::path> split_list = 
+//          fn_[i].splitAt('/', std::numeric_limits<unsigned int>::max());
+//          fn_[i] = split_list.back();
+//        }
+//        fn_[i] = corrected_path[i] + fn_[i];
+        bfs::path p(f[i]);
+        fn_[i] = corrected_path[i] / p.filename();
       }
     }
-
+    
     int sz[2][2];
     si >> flipped_[0] >> flipped_[1]
-       >> sp_[0][0] >> sp_[0][1] >> sz[0][0] >> sz[0][1]
-       >> sp_[1][0] >> sp_[1][1] >> sz[1][0] >> sz[1][1];
+    >> sp_[0][0] >> sp_[0][1] >> sz[0][0] >> sz[0][1]
+    >> sp_[1][0] >> sp_[1][1] >> sz[1][0] >> sz[1][1];
     
     sz_[0][0] = sz[0][0];
     sz_[0][1] = sz[0][1];
@@ -216,66 +217,76 @@ public:
     // skip to the next line (by skipping white space):
     si >> std::ws;
     
-    bfs::path optional;
-    getline(si, optional);
+    std::string optional;
+    std::getline(si, optional);
     if (optional == "two_user_supplied_masks:")
     {
-      getline(si, fn_mask_[0]);
-      getline(si, fn_mask_[1]);
+      std::string tmp;
+      std::getline(si, tmp);
+      if ( bfs::exists(bfs::path(tmp)) )
+      {
+        fn_mask_[0] = tmp;
+      }
+      tmp.clear();
+      std::getline(si, tmp);
+      if ( bfs::exists(bfs::path(tmp)) )
+      {
+        fn_mask_[1] = tmp;
+      }
     }
     
     return ok;
   }
   
   // save this slice-to-slice registration:
-  bool save(const char * fn_save, const bool blab = true) const
+  bool save(const bfs::path & fn_save, const bool blab = true) const
   {
     std::fstream so;
-    the::open_utf8(so, fn_save, ios::out);
+    the::open_utf8(so, fn_save.c_str(), std::ios::out);
     if (!so.is_open())
     {
-      cerr << "WARNING: could not open " << fn_save
-           << " for writing, skipping...." << endl;
+      std::cerr << "WARNING: could not open " << fn_save
+      << " for writing, skipping...." << std::endl;
       return false;
     }
-    if (blab) cout << "saving " << fn_save << endl;
+    if (blab) std::cout << "saving " << fn_save << std::endl;
     
     save(so);
     so.close();
     
     // FIXME: not sure if this is useful/necessary:
-    fn_load_.assign(fn_save);
+    fn_load_ = fn_save;
     
     return true;
   }
   
   void save(std::ostream & so) const
   {
-    ios::fmtflags old_flags = so.setf(ios::scientific);
+    std::ios::fmtflags old_flags = so.setf(std::ios::scientific);
     int old_precision = so.precision();
     so.precision(12);
     
-    so << fn_[0] << endl
-       << fn_[1] << endl
-       << flipped_[0] << endl
-       << flipped_[1] << endl
-       << sp_[0][0] << '\t'
-       << sp_[0][1] << '\t'
-       << int(sz_[0][0]) << '\t'
-       << int(sz_[0][1]) << endl
-       << sp_[1][0] << '\t'
-       << sp_[1][1] << '\t'
-       << int(sz_[1][0]) << '\t'
-       << int(sz_[1][1]) << endl;
+    so << fn_[0] << std::endl
+    << fn_[1] << std::endl
+    << flipped_[0] << std::endl
+    << flipped_[1] << std::endl
+    << sp_[0][0] << '\t'
+    << sp_[0][1] << '\t'
+    << static_cast<int>(sz_[0][0]) << '\t'
+    << static_cast<int>(sz_[0][1]) << std::endl
+    << sp_[1][0] << '\t'
+    << sp_[1][1] << '\t'
+    << static_cast<int>(sz_[1][0]) << '\t'
+    << static_cast<int>(sz_[1][1]) << std::endl;
     
     save_transform(so, t01_);
-    so << endl;
+    so << std::endl;
     
-    if (!fn_mask_[0].is_empty() && !fn_mask_[1].is_empty())
+    if (!fn_mask_[0].empty() && !fn_mask_[1].empty())
     {
-      so << "two_user_supplied_masks:" << endl
-         << fn_mask_[0].text() << endl
-         << fn_mask_[1].text() << endl;
+      so << "two_user_supplied_masks:" << std::endl
+      << fn_mask_[0] << std::endl
+      << fn_mask_[1] << std::endl;
     }
     
     so.setf(old_flags);
@@ -288,8 +299,8 @@ public:
   
   inline pnt2d_t tile_max(unsigned int i) const
   {
-    return pnt2d(sp_[i][0] * double(sz_[i][0]),
-                 sp_[i][1] * double(sz_[i][1]));
+    return pnt2d(sp_[i][0] * static_cast<double>(sz_[i][0]),
+                 sp_[i][1] * static_cast<double>(sz_[i][1]));
   }
   
   inline pnt2d_t tile_center(unsigned int i) const

@@ -38,16 +38,17 @@
 // local includes:
 #include <Core/ITKCommon/STOS/stos.hxx>
 #include <Core/ITKCommon/common.hxx>
-##include <Core/ITKCommon/the_text.hxx>
+#include <Core/ITKCommon/the_text.hxx>
 
 // Boost includes:
 #include <boost/shared_ptr.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/algorithm/string/predicate.hpp>
+namespace bfs=boost::filesystem;
 
 // system includes:
 #include <fstream>
 #include <list>
-
-//#include "IRPath.h"
 
 
 //----------------------------------------------------------------
@@ -136,7 +137,7 @@ sort(std::list<stos_t<TImage> > & stos)
 // 
 template <typename T>
 bool
-load_mosaic(const char * fn_mosaic,
+load_mosaic(const bfs::path & fn_mosaic,
             const bool & flip_mosaic,
             const unsigned int & shrink_factor,
             const bool & assemble_mosaic,
@@ -153,7 +154,7 @@ load_mosaic(const char * fn_mosaic,
   std::cout << "    reading " << fn_mosaic;
   
   std::fstream fin;
-  fin.open(fn_mosaic, ios::in);
+  fin.open(fn_mosaic.c_str(), std::ios::in);
   if (! fin.is_open())
   {
     std::cout << ", failed...." << std::endl;
@@ -192,7 +193,7 @@ load_mosaic(const char * fn_mosaic,
     const bfs::path & fn_image = *iter;
     
     // read the image:
-    std::cout << setw(3) << i << " ";
+    std::cout << std::setw(3) << i << " ";
     image[i] = std_tile<T>(fn_image, shrink_factor, pixel_spacing);
     mask[i] = std_mask<T>(image[i], use_std_mask);
   }
@@ -258,7 +259,7 @@ load_mosaic(const char * fn_mosaic,
 // 
 template <typename T>
 bool
-load_mosaic(const char * fn_mosaic,
+load_mosaic(const bfs::path & fn_mosaic,
             const bool & flip_mosaic,
             const unsigned int & shrink_factor,
             const double & clahe_slope,
@@ -289,7 +290,7 @@ load_mosaic(const char * fn_mosaic,
 // load_slice
 // 
 inline bool
-load_slice(const char * fn_mosaic,
+load_slice(const bfs::path & fn_mosaic,
            const bool & flip,
            const unsigned int & shrink_factor,
            const double & clahe_slope,
@@ -316,7 +317,7 @@ load_slice(const char * fn_mosaic,
 // load_slice
 // 
 inline static bool
-load_slice(const char * fn_mosaic,
+load_slice(const bfs::path & fn_mosaic,
            const bool & flip,
            const unsigned int & shrink_factor,
            const double & clahe_slope,
@@ -398,7 +399,7 @@ public:
               double clahe_slope = 1,
               unsigned int clahe_window = 64) const
     {
-      if (fn_data_.match_tail(".mosaic"))
+      if (fn_data_.extension() == ".mosaic")
       {
         load_mosaic<TImage>(fn_data_,
                             flipped_,
@@ -417,7 +418,7 @@ public:
                                 shrink_factor,
                                 std::max(spacing_[0], spacing_[1]));
         
-        if (fn_mask_.is_empty())
+        if (fn_mask_.empty())
         {
           mask = cast<TImage, mask_t>(data);
           mask->FillBuffer(1);
@@ -594,8 +595,12 @@ public:
            i = nodes_.begin(); i != nodes_.end(); ++i)
     {
       const boost::shared_ptr<node_t> & node = *i;
-      if (node->fn_data_.match_tail(fn_data, true) ||
-          fn_data.match_tail(node->fn_data_, true))
+//      if (node->fn_data_.match_tail(fn_data, true) ||
+//          fn_data.match_tail(node->fn_data_, true))
+//      {
+//        return node;
+//      }
+      if ( boost::iequals(node->fn_data_.string(), fn_data.string()) )
       {
         return node;
       }
@@ -725,8 +730,13 @@ public:
         const_cast<base_transform_t *>(node->parent_.stos_.t01_.GetPointer());
       transforms.push_front(t);
       
-      if (node->parent_.a_->fn_data_.match_tail(src) ||
-          src.match_tail(node->parent_.a_->fn_data_))
+//      if (node->parent_.a_->fn_data_.match_tail(src) ||
+//          src.match_tail(node->parent_.a_->fn_data_))
+//      {
+//        cascade.assign(transforms.begin(), transforms.end());
+//        return true;
+//      }
+      if ( boost::iequals(node->parent_.a_->fn_data_.string(), src.string()) )
       {
         cascade.assign(transforms.begin(), transforms.end());
         return true;

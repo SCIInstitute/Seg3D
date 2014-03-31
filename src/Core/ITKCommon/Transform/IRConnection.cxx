@@ -131,9 +131,9 @@ IRConnection::findIdealOffset(const double maxOffset[],
   //getMask(_secondTransformation->maskID());
 	
 	image_t::Pointer image1 = IRImageLoader::sharedImageLoader()->
-  getImage(_firstTransformation->imageID());
+  getImage(_firstTransformation->imageID().string());
 	image_t::Pointer image2 = IRImageLoader::sharedImageLoader()->
-  getImage(_secondTransformation->imageID());
+  getImage(_secondTransformation->imageID().string());
   
   image_t::RegionType region = image1->GetLargestPossibleRegion();
   image_t::SizeType size = region.GetSize();
