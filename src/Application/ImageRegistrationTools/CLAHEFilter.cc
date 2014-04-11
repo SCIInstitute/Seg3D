@@ -27,54 +27,38 @@
 */
 
 // StateEngine of the tool
-#include <Application/ImageRegistrationTools/FFTFilter.h>
+#include <Application/ImageRegistrationTools/CLAHEFilter.h>
 
 // Application includes
 #include <Application/Tool/ToolFactory.h>
 
-
-#include <Application/ImageRegistrationTools/Actions/ActionFFTFilter.h>
+#include <Application/ImageRegistrationTools/Actions/ActionCLAHEFilter.h>
 
 #include <iostream>
 
-SCI_REGISTER_TOOL(Seg3D, FFTFilter)
+SCI_REGISTER_TOOL(Seg3D, CLAHEFilter)
 
 namespace Seg3D
 {
 
-FFTFilter::FFTFilter(const std::string& toolid)
-  : SingleTargetTool( Core::VolumeType::DATA_E, toolid)
+CLAHEFilter::CLAHEFilter(const std::string& toolid)
+: SingleTargetTool( Core::VolumeType::DATA_E, toolid)
 {
-  this->add_state( "shrink_factor", this->highest_resolution_level_shrink_factor_state_, 8, 0, 20, 1 );
-  this->add_state( "overlap_min", this->overlap_min_state_, 0.2, 0.0, 1.0, 0.05 );
-  this->add_state( "overlap_max", this->overlap_max_state_, 1.0, 0.0, 1.0, 0.05 );
-  this->add_state( "pixel_spacing", this->pixel_spacing_state_, 1.0, 0.0, 5.0, 0.1 );
-  this->add_state( "files", this->input_files_state_ );
-  this->add_state( "directory", this->directory_state_, "" );
-  this->add_state( "output_mosaic_file", this->output_mosaic_file_state_, "" );
-
   // TODO: temporary hack
   this->valid_target_state_->set( true );
 }
 
-FFTFilter::~FFTFilter()
+CLAHEFilter::~CLAHEFilter()
 {
 }
 
 void
-FFTFilter::execute( Core::ActionContextHandle context)
+CLAHEFilter::execute( Core::ActionContextHandle context)
 {
-  std::cout << "FFTFilter::execute!" << std::endl;
+  std::cout << "CLAHEFilter::execute!" << std::endl;
 //  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
 //  
-//  ActionFFTFilter::Dispatch( context, this->target_layer_state_->get(),
-//                            highest_resolution_level_shrink_factor_state_->get(),
-//                            overlap_min_state_->get(),
-//                            overlap_max_state_->get(),
-//                            pixel_spacing_state_->get(),
-//                            input_files_state_->get(),
-//                            directory_state_->get(),
-//                            output_mosaic_file_state_->get() );
+//  ActionCLAHEFilter::Dispatch( context, this->target_layer_state_->get() );
 }
 
 }

@@ -160,6 +160,7 @@ refine_one_pair(const image_t * i0,
   catch (itk::ExceptionObject &err)
   {
     CORE_LOG_ERROR(err.GetDescription());
+    throw;
   }
   
   // setup the image-to-image metric:
@@ -226,6 +227,7 @@ refine_one_pair(const image_t * i0,
     catch (itk::ExceptionObject &err)
     {
       CORE_LOG_ERROR(err.GetDescription());
+      throw;
     }
   }
   
@@ -257,6 +259,7 @@ refine_one_pair(const image_t * i0,
       CORE_LOG_ERROR(err.GetDescription());
     }
 #endif
+    throw;
   }
   t01->SetParameters(optimizer->GetBestParams());
   
@@ -281,6 +284,7 @@ refine_one_pair(const image_t * i0,
     catch (itk::ExceptionObject &err)
     {
       CORE_LOG_ERROR(err.GetDescription());
+      throw;
     }
   }
   
@@ -718,10 +722,10 @@ brute_force(const bool & brute_force_rotation,
   b_interpolator->SetInputImage(b);
   
 #ifdef DEBUG_EVERYTHING
-  if (fn_debug.size() != 0)
+  if (! fn_debug.empty())
   {
     save<native_image_t>(cast<image_t, native_image_t>(a),
-                         fn_debug + "fixed.png");
+                         fn_debug.string() + "fixed.png");
   }
 #endif
   
@@ -740,7 +744,7 @@ brute_force(const bool & brute_force_rotation,
     
 #ifdef DEBUG_EVERYTHING
     std::ostringstream fn_dbg_pfx;
-    if (fn_debug.size() != 0)
+    if (! fn_debug.empty())
     {
       fn_dbg_pfx << fn_debug << "a" << the_text_t::number(static_cast<int>(0.5 + angle * 360.0 / TWO_PI), 3, '0') << "-";
     }
@@ -839,7 +843,7 @@ brute_force(const bool & brute_force_rotation,
       // best_overlap = overlap;
       
 #ifdef DEBUG_EVERYTHING
-      if (fn_debug.size() != 0)
+      if (! fn_debug.empty())
       {
         save_rgb<image_t>(fn_dbg_pfx.str() + "better.png",
                           
@@ -860,64 +864,6 @@ brute_force(const bool & brute_force_rotation,
   set_major_progress(0.99);
 }
 
-
-//----------------------------------------------------------------
-// usage
-//
-//static void
-//usage(const char * message = NULL)
-//{
-//  cerr << "USAGE: ir-stos-brute\n"
-//  << "\t[-sh shrink_factor] \n"
-//  << "\t[-sp pixel_spacing] \n"
-//  << "\t[-std_mask] \n"
-//  << "\t[-mask fixed.image moving.image] \n"
-//  << "\t[-clahe slope] \n"
-//  << "\t[-flip_0] \n"
-//  << "\t[-flip_1] \n"
-//  << "\t[-shift x y] \n"
-//  << "\t[-rotate degrees] \n"
-//  << "\t[-refine] \n"
-//  << "\t[-cubic] \n"
-//  << "\t[-regularize] \n"
-//  << "\t[-mask fixed moving] \n"
-//  << "\t[-image_dirs path_to_s0_images path_to_s1_images] \n"
-//  << "\t[-verbose] \n"
-//  << "\t-load fixed moving \n"
-//  << "\t-save filename.stos \n"
-//  << endl
-//  << "NOTE: \n"
-//  << "\t-load switch accepts images, .mosaic, and .pyramid files. \n"
-//  << "\t-mask switch accepts images only. \n"
-//  << endl
-//  << "\t-shift x y  - take given translation vector, do not search. \n"
-//  << "\t-rotate deg - take given rotation angle, do not search. \n"
-//  << endl
-//  << "\t-refine     - refine transform parameters. \n"
-//  << "\t-regularize - use low order intermediate transform. \n"
-//  << "\t-cubic      - use 4-th order Legendre polynomial transform. \n"
-//  << endl
-//  << "EXAMPLE: ir-stos-brute\n"
-//  << "\t-sh 8 \n"
-//  << "\t-clahe 2 \n"
-//  << "\t-rotate 130 \n"
-//  << "\t-refine \n"
-//  << "\t-cubic \n"
-//  << "\t-regularize \n"
-//  << "\t-load s6.tif s7.tif \n"
-//  << "\t-mask s6-mask.tif s7-mask.tif \n"
-//  << "\t-save s6-s7.stos \n"
-//  << endl
-//  << endl
-//  << "Pass in -help for more detailed information about the tool."
-//  << endl;
-//  
-//  if (message != NULL)
-//  {
-//    cerr << "ERROR: " << message << endl;
-//  }
-//}
-
 bool
 ActionSliceToSliceBruteFilter::validate( Core::ActionContextHandle& context )
 {
@@ -930,197 +876,201 @@ ActionSliceToSliceBruteFilter::validate( Core::ActionContextHandle& context )
 bool
 ActionSliceToSliceBruteFilter::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
-  // this is so that the printouts look better:
-  std::cout.precision(6);
-  std::cout.setf(std::ios::scientific);
-  
-  track_progress(true);
-  
-  // setup thread storage for the main thread:
-  set_the_thread_storage_provider(the_boost_thread_t::thread_storage);
-  the_boost_thread_t MAIN_THREAD_DUMMY;
-  MAIN_THREAD_DUMMY.set_stopped(false);
-  
-  // setup thread and mutex interface creators:
-  the_mutex_interface_t::set_creator(the_boost_mutex_t::create);
-  the_thread_interface_t::set_creator(the_boost_thread_t::create);
-  
-  bfs::path fn_load[2] = { this->input_fixed_file_, this->input_moving_file_ };
-//  fn_load[0] = this->input_fixed_file_;
-//  fn_load[1] = this->input_moving_file_;
-
-  bfs::path fn_mask[2];
-  bool flip[2] = { this->flip_fixed_, this->flip_moving_ };
-  
-  bfs::path image_dirs[2] = { this->image_dir_fixed_, this->image_dir_moving_ };
-//  image_dirs[0] = this->image_dir_fixed_;
-//  image_dirs[1] = this->image_dir_moving_;
-  
-  bfs::path fn_save(this->output_stos_file_);
-  
-  bool brute_force_rotation = true;
-  if (this->best_angle_ != 0)
+  try
   {
-    brute_force_rotation = false;
-    // convert degrees to radians:
-    this->best_angle_ = this->best_angle_ * TWO_PI / 360.0;
-  }
+    // this is so that the printouts look better:
+    std::cout.precision(6);
+    std::cout.setf(std::ios::scientific);
+    
+    track_progress(true);
+    
+    // setup thread storage for the main thread:
+    set_the_thread_storage_provider(the_boost_thread_t::thread_storage);
+    the_boost_thread_t MAIN_THREAD_DUMMY;
+    MAIN_THREAD_DUMMY.set_stopped(false);
+    
+    // setup thread and mutex interface creators:
+    the_mutex_interface_t::set_creator(the_boost_mutex_t::create);
+    the_thread_interface_t::set_creator(the_boost_thread_t::create);
+    
+    bfs::path fn_load[2] = { this->input_fixed_file_, this->input_moving_file_ };
+  //  fn_load[0] = this->input_fixed_file_;
+  //  fn_load[1] = this->input_moving_file_;
 
-  bool brute_force_translation = true;
-  vec2d_t best_shift = vec2d(0, 0);
-  if (this->best_shift_x_ != 0 && this->best_shift_y_ != 0)
-  {
-    brute_force_translation = false;
-    best_shift = vec2d(this->best_shift_x_, this->best_shift_y_);
-  }
+    bfs::path fn_mask[2] = { this->mask_fixed_, this->mask_moving_ };
+    bool flip[2] = { this->flip_fixed_, this->flip_moving_ };
+    
+    bfs::path image_dirs[2] = { this->image_dir_fixed_, this->image_dir_moving_ };
+  //  image_dirs[0] = this->image_dir_fixed_;
+  //  image_dirs[1] = this->image_dir_moving_;
+    
+    bfs::path fn_save(this->output_stos_file_);
+    
+    bool brute_force_rotation = true;
+    if (this->best_angle_ != 0)
+    {
+      brute_force_rotation = false;
+      // convert degrees to radians:
+      this->best_angle_ = this->best_angle_ * TWO_PI / 360.0;
+    }
 
-  // unsigned int num_orientations = 120;
-  unsigned int num_orientations = 360;
-  unsigned int step_size = 2;
+    bool brute_force_translation = true;
+    vec2d_t best_shift = vec2d(0, 0);
+    if (this->best_shift_x_ != 0 && this->best_shift_y_ != 0)
+    {
+      brute_force_translation = false;
+      best_shift = vec2d(this->best_shift_x_, this->best_shift_y_);
+    }
 
-  // TODO: expose?
-  bool verbose = false;
-  
-  if (fn_load[0].empty() || fn_load[1].empty())
-  {
-    CORE_LOG_ERROR("must specify 2 files with the -load option");
-  }
-  
-  if (fn_save.empty())
-  {
-    CORE_LOG_ERROR("must specify a file to open with the -save option");
-  }
-  
-  // dump the status:
-  std::cout << "shrink factor: " << this->shrink_factor_ << std::endl
-  << "search for rotation: " << brute_force_rotation << std::endl
-  << "search for translation: " << brute_force_translation << std::endl
-  << std::endl;
-  
-  bfs::path fn_debug;
+    // unsigned int num_orientations = 120;
+    unsigned int num_orientations = 360;
+    unsigned int step_size = 2;
+
+    // TODO: expose?
+    bool verbose = false;
+    
+    if (fn_load[0].empty() || fn_load[1].empty())
+    {
+      CORE_LOG_ERROR("must specify 2 files with the -load option");
+      return false;
+    }
+    
+    if (fn_save.empty())
+    {
+      CORE_LOG_ERROR("must specify a file to open with the -save option");
+      return false;
+    }
+    
+    // dump the status:
+    std::cout << "shrink factor: " << this->shrink_factor_ << std::endl
+    << "search for rotation: " << brute_force_rotation << std::endl
+    << "search for translation: " << brute_force_translation << std::endl
+    << std::endl;
+    
+    bfs::path fn_debug;
 #ifdef DEBUG_EVERYTHING
-  fn_debug = fn_save.string() + ".FIXME-";
+    fn_debug = fn_save.string() + ".FIXME-";
 #endif
-  
-  // load the images, assemble the pyramids, match them:
-  image_t::Pointer mosaic[2];
-  mask_t::Pointer mosaic_mask[2];
-  pyramid_t pyramid[2];
-  
-  if (fn_load[0].extension() == ".mosaic")
-  {
-    load_slice(fn_load[0],
-               flip[0],
-               this->shrink_factor_,
-               this->clahe_slope_,
-               image_dirs[0],
-               mosaic[0],
-               mosaic_mask[0]);
     
-    setup_pyramid(pyramid[0],
-                  0, // index
-                  fn_load[0],
-                  mosaic[0],
-                  mosaic_mask[0],
-                  STOS_BRUTE_PYRAMID_KEY,
-                  SCALES_PER_OCTAVE,
-                  DEFAULT_KEY_GENERATE_SETTING, // generate descriptors?
-                  fn_debug);
-  }
-  else if (fn_load[0].extension() == ".pyramid")
-  {
-    // load the pyramid:
-    load_pyramid(fn_load[0], pyramid[0], mosaic[0], mosaic_mask[0]);
-  }
-  else
-  {
-    // load first slice:
-    mosaic[0] = std_tile<image_t>(fn_load[0],
-                                  this->shrink_factor_,
-                                  this->pixel_spacing_);
+    // load the images, assemble the pyramids, match them:
+    image_t::Pointer mosaic[2];
+    mask_t::Pointer mosaic_mask[2];
+    pyramid_t pyramid[2];
     
-    if (!fn_mask[0].empty())
+    if (fn_load[0].extension() == ".mosaic")
     {
-      // load slice mask:
-      mosaic_mask[0] = std_tile<mask_t>(fn_mask[0],
-                                        this->shrink_factor_,
-                                        this->pixel_spacing_);
+      load_slice(fn_load[0],
+                 flip[0],
+                 this->shrink_factor_,
+                 this->clahe_slope_,
+                 image_dirs[0],
+                 mosaic[0],
+                 mosaic_mask[0]);
+      
+      setup_pyramid(pyramid[0],
+                    0, // index
+                    fn_load[0],
+                    mosaic[0],
+                    mosaic_mask[0],
+                    STOS_BRUTE_PYRAMID_KEY,
+                    SCALES_PER_OCTAVE,
+                    DEFAULT_KEY_GENERATE_SETTING, // generate descriptors?
+                    fn_debug);
+    }
+    else if (fn_load[0].extension() == ".pyramid")
+    {
+      // load the pyramid:
+      load_pyramid(fn_load[0], pyramid[0], mosaic[0], mosaic_mask[0]);
     }
     else
     {
-      mosaic_mask[0] = std_mask<image_t>(mosaic[0], this->use_standard_mask_);
+      // load first slice:
+      mosaic[0] = std_tile<image_t>(fn_load[0],
+                                    this->shrink_factor_,
+                                    this->pixel_spacing_);
+      
+      if (!fn_mask[0].empty())
+      {
+        // load slice mask:
+        mosaic_mask[0] = std_tile<mask_t>(fn_mask[0],
+                                          this->shrink_factor_,
+                                          this->pixel_spacing_);
+      }
+      else
+      {
+        mosaic_mask[0] = std_mask<image_t>(mosaic[0], this->use_standard_mask_);
+      }
+      
+      setup_pyramid(pyramid[0],
+                    0, // index
+                    fn_load[0],
+                    mosaic[0],
+                    mosaic_mask[0],
+                    STOS_BRUTE_PYRAMID_KEY,
+                    SCALES_PER_OCTAVE,
+                    DEFAULT_KEY_GENERATE_SETTING, // generate descriptors?
+                    fn_debug);
     }
     
-    setup_pyramid(pyramid[0],
-                  0, // index
-                  fn_load[0],
-                  mosaic[0],
-                  mosaic_mask[0],
-                  STOS_BRUTE_PYRAMID_KEY,
-                  SCALES_PER_OCTAVE,
-                  DEFAULT_KEY_GENERATE_SETTING, // generate descriptors?
-                  fn_debug);
-  }
-  
-  if (fn_load[1].extension() == ".mosaic")
-  {
-    load_slice(fn_load[1],
-               flip[1],
-               this->shrink_factor_,
-               this->clahe_slope_,
-               image_dirs[1],
-               mosaic[1],
-               mosaic_mask[1]);
-    
-    setup_pyramid(pyramid[1],
-                  1, // index
-                  fn_load[1],
-                  mosaic[1],
-                  mosaic_mask[1],
-                  STOS_BRUTE_PYRAMID_KEY,
-                  SCALES_PER_OCTAVE,
-                  DEFAULT_KEY_GENERATE_SETTING, // generate descriptors?
-                  fn_debug);
-  }
-  else if (fn_load[1].extension() == ".pyramid")
-  {
-    // load the pyramid:
-    load_pyramid(fn_load[1], pyramid[1], mosaic[1], mosaic_mask[1]);
-  }
-  else
-  {
-    // load second slice:
-    mosaic[1] = std_tile<image_t>(fn_load[1],
-                                  this->shrink_factor_,
-                                  this->pixel_spacing_);
-    
-    if (!fn_mask[1].empty())
+    if (fn_load[1].extension() == ".mosaic")
     {
-      // load slice mask:
-      mosaic_mask[1] = std_tile<mask_t>(fn_mask[1],
-                                        this->shrink_factor_,
-                                        this->pixel_spacing_);
+      load_slice(fn_load[1],
+                 flip[1],
+                 this->shrink_factor_,
+                 this->clahe_slope_,
+                 image_dirs[1],
+                 mosaic[1],
+                 mosaic_mask[1]);
+      
+      setup_pyramid(pyramid[1],
+                    1, // index
+                    fn_load[1],
+                    mosaic[1],
+                    mosaic_mask[1],
+                    STOS_BRUTE_PYRAMID_KEY,
+                    SCALES_PER_OCTAVE,
+                    DEFAULT_KEY_GENERATE_SETTING, // generate descriptors?
+                    fn_debug);
+    }
+    else if (fn_load[1].extension() == ".pyramid")
+    {
+      // load the pyramid:
+      load_pyramid(fn_load[1], pyramid[1], mosaic[1], mosaic_mask[1]);
     }
     else
     {
-      mosaic_mask[1] = std_mask<image_t>(mosaic[1], this->use_standard_mask_);
+      // load second slice:
+      mosaic[1] = std_tile<image_t>(fn_load[1],
+                                    this->shrink_factor_,
+                                    this->pixel_spacing_);
+      
+      if (!fn_mask[1].empty())
+      {
+        // load slice mask:
+        mosaic_mask[1] = std_tile<mask_t>(fn_mask[1],
+                                          this->shrink_factor_,
+                                          this->pixel_spacing_);
+      }
+      else
+      {
+        mosaic_mask[1] = std_mask<image_t>(mosaic[1], this->use_standard_mask_);
+      }
+      
+      setup_pyramid(pyramid[1],
+                    1, // index
+                    fn_load[1],
+                    mosaic[1],
+                    mosaic_mask[1],
+                    STOS_BRUTE_PYRAMID_KEY,
+                    SCALES_PER_OCTAVE,
+                    DEFAULT_KEY_GENERATE_SETTING, // generate descriptors?
+                    fn_debug);
     }
     
-    setup_pyramid(pyramid[1],
-                  1, // index
-                  fn_load[1],
-                  mosaic[1],
-                  mosaic_mask[1],
-                  STOS_BRUTE_PYRAMID_KEY,
-                  SCALES_PER_OCTAVE,
-                  DEFAULT_KEY_GENERATE_SETTING, // generate descriptors?
-                  fn_debug);
-  }
-  
-  const int num_levels = std::min(pyramid[0].octaves(), pyramid[1].octaves());
-  
-  // FIXME:
-#if 0
+    const int num_levels = std::min(pyramid[0].octaves(), pyramid[1].octaves());
+    
+    // FIXME:
+//#if 0
 //  for (unsigned int i = 0; i < 2; i++)
 //  {
 //    for (unsigned int j = 0; j < num_levels; j++)
@@ -1134,135 +1084,141 @@ ActionSliceToSliceBruteFilter::run( Core::ActionContextHandle& context, Core::Ac
 //       fn);
 //    }
 //  }
-#endif
-  
-  // brute force registration:
-  brute_force(brute_force_rotation,
-              brute_force_translation,
-              0.3, // minimum overlap
-              this->best_overlap_,
-              this->best_angle_,
-              best_shift,
-              fn_debug,
-              pyramid[0].octave_[num_levels - 1].L_[0],
-              pyramid[1].octave_[num_levels - 1].L_[0],
-              pyramid[0].octave_[num_levels - 1].mask_,
-              pyramid[1].octave_[num_levels - 1].mask_,
-              
-              // start/finish rotation angles:
-              0.0,
-              TWO_PI * (static_cast<double>(num_orientations - 1) /
-                        static_cast<double>(num_orientations)),
-              num_orientations,
-              step_size,
-              verbose);
-  
-  std::cout << "BEST SHIFT:   " << best_shift << std::endl
-  << "BEST ANGLE:   " << this->best_angle_ * 360.0 / TWO_PI<< std::endl
-  << "BEST OVERLAP: " << this->best_overlap_ << std::endl;
-  
-  coarse_transform_t::Pointer t_coarse = coarse_transform_t::New();
-  t_coarse->SetTranslation(best_shift);
-  t_coarse->SetCenterOfRotationComponent
-  (image_center<image_t>(pyramid[1].octave_[num_levels - 1].L_[0]));
-  t_coarse->Rotate2D(this->best_angle_);
-  
-  base_transform_t::ConstPointer t_final;
-  if (!this->use_refinement_)
-  {
-    t_final = t_coarse.GetPointer();
-  }
-  else
-  {
-    // calculate the octave range for initial transform estimation
-    // (low-order, or constrained high-order):
-    int octave_start = std::min(pyramid[0].octaves(),
-                                pyramid[1].octaves()) - 1;
-    // int octave_end = 0;
-    int octave_end = std::max(octave_start + 1 -
-                              std::min(3, static_cast<int>(std::min(pyramid[0].octaves(),
-                                                       pyramid[1].octaves()))),
-                              0);
+//#endif
     
-    if (! this->use_cubic_)
+    // brute force registration:
+    brute_force(brute_force_rotation,
+                brute_force_translation,
+                0.3, // minimum overlap
+                this->best_overlap_,
+                this->best_angle_,
+                best_shift,
+                fn_debug,
+                pyramid[0].octave_[num_levels - 1].L_[0],
+                pyramid[1].octave_[num_levels - 1].L_[0],
+                pyramid[0].octave_[num_levels - 1].mask_,
+                pyramid[1].octave_[num_levels - 1].mask_,
+                
+                // start/finish rotation angles:
+                0.0,
+                TWO_PI * (static_cast<double>(num_orientations - 1) /
+                          static_cast<double>(num_orientations)),
+                num_orientations,
+                step_size,
+                verbose);
+    
+    std::cout << "BEST SHIFT:   " << best_shift << std::endl
+    << "BEST ANGLE:   " << this->best_angle_ * 360.0 / TWO_PI<< std::endl
+    << "BEST OVERLAP: " << this->best_overlap_ << std::endl;
+    
+    coarse_transform_t::Pointer t_coarse = coarse_transform_t::New();
+    t_coarse->SetTranslation(best_shift);
+    t_coarse->SetCenterOfRotationComponent
+    (image_center<image_t>(pyramid[1].octave_[num_levels - 1].L_[0]));
+    t_coarse->Rotate2D(this->best_angle_);
+    
+    base_transform_t::ConstPointer t_final;
+    if (!this->use_refinement_)
     {
-      order2_transform_t::Pointer t_order2;
-      refine_one_pair(octave_start,
-                      octave_start - octave_end + 1,
-                      pyramid[0],
-                      pyramid[1],
-                      t_coarse,
-                      t_order2,
-                      DEFAULT_ITERATIONS,
-                      DEFAULT_MIN_STEP,
-                      DEFAULT_MAX_STEP, // FIXME: 1e-6
-                      fn_debug);
-      
-      t_final = t_order2.GetPointer();
+      t_final = t_coarse.GetPointer();
     }
     else
     {
-      order4_transform_t::Pointer t_order4;
-      refine_one_pair(octave_start,
-                      octave_start - octave_end + 1,
-                      pyramid[0],
-                      pyramid[1],
-                      this->regularize_,
-                      t_coarse,
-                      t_order4,
-                      DEFAULT_ITERATIONS,
-                      DEFAULT_MIN_STEP,
-                      DEFAULT_MAX_STEP, // FIXME: 1e-6
-                      fn_debug);
+      // calculate the octave range for initial transform estimation
+      // (low-order, or constrained high-order):
+      int octave_start = std::min(pyramid[0].octaves(),
+                                  pyramid[1].octaves()) - 1;
+      // int octave_end = 0;
+      int octave_end = std::max(octave_start + 1 -
+                                std::min(3, static_cast<int>(std::min(pyramid[0].octaves(),
+                                                         pyramid[1].octaves()))),
+                                0);
       
-      if (octave_end > 0)
+      if (! this->use_cubic_)
       {
-        itk::Array<double> scales( t_order4->GetNumberOfParameters() );
-        scales.Fill(1e-0);
+        order2_transform_t::Pointer t_order2;
+        refine_one_pair(octave_start,
+                        octave_start - octave_end + 1,
+                        pyramid[0],
+                        pyramid[1],
+                        t_coarse,
+                        t_order2,
+                        DEFAULT_ITERATIONS,
+                        DEFAULT_MIN_STEP,
+                        DEFAULT_MAX_STEP, // FIXME: 1e-6
+                        fn_debug);
         
-        // encourage translation:
-        scales[order4_transform_t::index_a(0, 0)] = 1e-1;
-        scales[order4_transform_t::index_b(0, 0)] = 1e-1;
-        
-        // Avoid ruining the previous transform results due to image
-        // artifacts in the low resolution octaves of the pyramid.
-        // Start with the next unprocessed octave and complete the process
-        // to the highest resolution:
-        refine_one_pair<order4_transform_t>(octave_end - 1,
-                                            octave_end,
-                                            pyramid[0],
-                                            pyramid[1],
-                                            t_order4,
-                                            DEFAULT_ITERATIONS,
-                                            DEFAULT_MIN_STEP,
-                                            DEFAULT_MAX_STEP, // FIXME: 1e-6
-                                            scales,
-                                            fn_debug.string() + "final-");
+        t_final = t_order2.GetPointer();
       }
-      
-      t_final = t_order4.GetPointer();
+      else
+      {
+        order4_transform_t::Pointer t_order4;
+        refine_one_pair(octave_start,
+                        octave_start - octave_end + 1,
+                        pyramid[0],
+                        pyramid[1],
+                        this->regularize_,
+                        t_coarse,
+                        t_order4,
+                        DEFAULT_ITERATIONS,
+                        DEFAULT_MIN_STEP,
+                        DEFAULT_MAX_STEP, // FIXME: 1e-6
+                        fn_debug);
+        
+        if (octave_end > 0)
+        {
+          itk::Array<double> scales( t_order4->GetNumberOfParameters() );
+          scales.Fill(1e-0);
+          
+          // encourage translation:
+          scales[order4_transform_t::index_a(0, 0)] = 1e-1;
+          scales[order4_transform_t::index_b(0, 0)] = 1e-1;
+          
+          // Avoid ruining the previous transform results due to image
+          // artifacts in the low resolution octaves of the pyramid.
+          // Start with the next unprocessed octave and complete the process
+          // to the highest resolution:
+          refine_one_pair<order4_transform_t>(octave_end - 1,
+                                              octave_end,
+                                              pyramid[0],
+                                              pyramid[1],
+                                              t_order4,
+                                              DEFAULT_ITERATIONS,
+                                              DEFAULT_MIN_STEP,
+                                              DEFAULT_MAX_STEP, // FIXME: 1e-6
+                                              scales,
+                                              fn_debug.string() + "final-");
+        }
+        
+        t_final = t_order4.GetPointer();
+      }
     }
-  }
-  
-  save_stos<image_t>(fn_save,
-                     fn_load[0],
-                     fn_load[1],
-                     fn_mask[0],
-                     fn_mask[1],
-                     flip[0],
-                     flip[1],
-                     mosaic[0],
-                     mosaic[1],
-                     this->shrink_factor_,
-                     t_final,
-                     true);
-  
-  set_major_progress(1.0);
+    
+    save_stos<image_t>(fn_save,
+                       fn_load[0],
+                       fn_load[1],
+                       fn_mask[0],
+                       fn_mask[1],
+                       flip[0],
+                       flip[1],
+                       mosaic[0],
+                       mosaic[1],
+                       this->shrink_factor_,
+                       t_final,
+                       true);
+    
+    set_major_progress(1.0);
 
-  CORE_LOG_SUCCESS("ir-stos-brute done");
-  
-  // done:
-  return true;
+    CORE_LOG_SUCCESS("ir-stos-brute done");
+    
+    // done:
+    return true;
+  }
+  catch (...)
+  {
+    CORE_LOG_ERROR("Exception caught");
+    return false;
+  }
 }
 
 

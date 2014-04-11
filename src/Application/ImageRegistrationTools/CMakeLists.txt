@@ -27,30 +27,49 @@
 #
 
 SET(APPLICATION_IRTOOLS_SRCS
-  AssembleFilter.h
   AssembleFilter.cc
-  FFTFilter.h
+  AssembleFilter.h
+  BlobFeatureEnhancementFilter.cc
+  BlobFeatureEnhancementFilter.h
+  CLAHEFilter.cc
+  CLAHEFilter.h
   FFTFilter.cc
-  RefineTranslateFilter.h
+  FFTFilter.h
+  RefineGridFilter.cc
+  RefineGridFilter.h
   RefineTranslateFilter.cc
+  RefineTranslateFilter.h
+  SliceToSliceBruteFilter.cc
+  SliceToSliceBruteFilter.h
+  SliceToSliceFilter.cc
+  SliceToSliceFilter.h
+  SliceToSliceGridFilter.cc
+  SliceToSliceGridFilter.h
+  SliceToVolumeFilter.cc
+  SliceToVolumeFilter.h
 )
 
 SET(APPLICATION_IRTOOLS_ACTIONS_SRCS
-  Actions/ActionAssembleFilter.h
   Actions/ActionAssembleFilter.cc
-  Actions/ActionFFTFilter.h
+  Actions/ActionAssembleFilter.h
+  Actions/ActionBlobFeatureEnhancementFilter.cc
+  Actions/ActionBlobFeatureEnhancementFilter.h
+  Actions/ActionCLAHEFilter.cc
+  Actions/ActionCLAHEFilter.h
   Actions/ActionFFTFilter.cc
-  Actions/ActionRefineTranslateFilter.h
+  Actions/ActionFFTFilter.h
+  Actions/ActionRefineGridFilter.cc
+  Actions/ActionRefineGridFilter.h
   Actions/ActionRefineTranslateFilter.cc
-)
-
-SET(APPLICATION_IRTOOLS_UTILS_SRCS
-  Utils/MosaicIO.h
-  Utils/MosaicIO.cc
-  Utils/MosaicLayout.h
-  Utils/MosaicLayout.cc
-  Utils/LocalMapping.h
-  Utils/LocalMapping.cc
+  Actions/ActionRefineTranslateFilter.h
+  Actions/ActionSliceToSliceBruteFilter.cc
+  Actions/ActionSliceToSliceBruteFilter.h
+  Actions/ActionSliceToSliceFilter.cc
+  Actions/ActionSliceToSliceFilter.h
+  Actions/ActionSliceToSliceGridFilter.cc
+  Actions/ActionSliceToSliceGridFilter.h
+  Actions/ActionSliceToVolumeFilter.cc
+  Actions/ActionSliceToVolumeFilter.h
 )
 
 IF(BUILD_WITH_PYTHON)
@@ -62,7 +81,6 @@ CORE_ADD_LIBRARY(Application_ImageRegistrationTools
   ${APPLICATION_IRTOOLS_NOREGISTER_SRCS}
   ${APPLICATION_IRTOOLS_SRCS}
   ${APPLICATION_IRTOOLS_ACTIONS_SRCS}
-  ${APPLICATION_IRTOOLS_UTILS_SRCS}
 )
             
 TARGET_LINK_LIBRARIES(Application_ImageRegistrationTools
@@ -73,7 +91,6 @@ TARGET_LINK_LIBRARIES(Application_ImageRegistrationTools
   Core_State
   Core_Geometry
   Core_ITKCommon
-  Core_IRTools_tmp
   Application_Filters
   Application_Tool
   Application_ToolManager
@@ -89,7 +106,6 @@ REGISTER_LIBRARY_AND_CLASSES(Application_ImageRegistrationTools
 
 IF(BUILD_TESTING)
   ADD_SUBDIRECTORY(
-    #Tests
     Actions/Tests
   )
 ENDIF(BUILD_TESTING)

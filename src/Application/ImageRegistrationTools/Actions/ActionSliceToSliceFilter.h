@@ -45,6 +45,23 @@ class ActionSliceToSliceFilter : public LayerAction
 CORE_ACTION(
   CORE_ACTION_TYPE( "SliceToSliceFilter", "ir-stos" )
   CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
+  CORE_ACTION_ARGUMENT( "input_fixed", "Fixed image file (images, .mosaic, .pyramid files)." )
+  CORE_ACTION_ARGUMENT( "input_moving", "Moving image file (images, .mosaic, .pyramid files)." )
+  CORE_ACTION_ARGUMENT( "output_stos", "Output slice to slice (.stos) data file." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "shrink_factor", "1", "Downsample factor." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "descriptor_version", "4", "" )
+// TODO: parameter commented out in original code.
+// Investigate code to see if useful or deprecated.
+//  CORE_ACTION_OPTIONAL_ARGUMENT( "transform_order", "2", "" )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "pixel_spacing", "1.0", "Pixel spacing." )          
+  CORE_ACTION_OPTIONAL_ARGUMENT( "clahe_slope", "1.0", "Maximum CLAHE slope." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "use_standard_mask", "false", "Use the default mask." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "flip_fixed", "false", "Flip fixed image file." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "flip_moving", "false", "Flip moving image file." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "mask_fixed", "", "Fixed image mask." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "mask_moving", "", "Moving image mask." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "image_dir_fixed", "", "Fixed image directory." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "image_dir_moving", "", "Moving image directory." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "sandbox", "-1", "The sandbox in which to run the action." )
   CORE_ACTION_ARGUMENT_IS_NONPERSISTENT( "sandbox" )
 )
@@ -52,6 +69,22 @@ CORE_ACTION(
 public:
   ActionSliceToSliceFilter()
   {
+    this->add_layer_id( this->target_layer_ );
+    this->add_parameter( this->shrink_factor_ );
+    this->add_parameter( this->descriptor_version_ );
+    this->add_parameter( this->pixel_spacing_ );
+    this->add_parameter( this->clahe_slope_ );
+    this->add_parameter( this->use_standard_mask_ );
+    this->add_parameter( this->flip_fixed_ );
+    this->add_parameter( this->flip_moving_ );
+    this->add_parameter( this->mask_fixed_ );
+    this->add_parameter( this->mask_moving_ );
+    this->add_parameter( this->input_fixed_file_ );
+    this->add_parameter( this->input_moving_file_ );
+    this->add_parameter( this->output_stos_file_ );
+    this->add_parameter( this->image_dir_fixed_ );
+    this->add_parameter( this->image_dir_moving_ );
+    this->add_parameter( this->sandbox_ );
   }
   
   virtual bool validate( Core::ActionContextHandle& context );
@@ -59,12 +92,41 @@ public:
   
   // DISPATCH:
   // Create and dispatch action that inserts the new layer
-  static void Dispatch( Core::ActionContextHandle context,
-                       std::string target_layer );
+  static void Dispatch(Core::ActionContextHandle context,
+                       std::string target_layer,
+                       unsigned int shrink_factor,
+                       unsigned int descriptor_version,
+                       double pixel_spacing,
+                       double clahe_slope,
+                       bool use_standard_mask,
+                       bool flip_fixed,
+                       bool flip_moving,
+                       std::string input_fixed_file,
+                       std::string input_moving_file,
+                       std::string output_stos_file,
+                       std::string mask_fixed,
+                       std::string mask_moving,
+                       std::string image_dir_fixed,
+                       std::string image_dir_moving);
   
 private:
   std::string target_layer_;
   SandboxID sandbox_;  
+
+  unsigned int shrink_factor_;
+  unsigned int descriptor_version_;
+  double pixel_spacing_;
+  double clahe_slope_;
+  bool use_standard_mask_;
+  bool flip_fixed_;
+  bool flip_moving_;
+  std::string input_fixed_file_;
+  std::string input_moving_file_;
+  std::string output_stos_file_;
+  std::string mask_fixed_;
+  std::string mask_moving_;
+  std::string image_dir_fixed_;
+  std::string image_dir_moving_;
 };
 
 }

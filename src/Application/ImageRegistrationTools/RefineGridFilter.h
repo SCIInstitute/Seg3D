@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_IMAGEREGISTRATIONTOOLS_FFTFILTER_H
-#define APPLICATION_IMAGEREGISTRATIONTOOLS_FFTFILTER_H
+#ifndef APPLICATION_IMAGEREGISTRATIONTOOLS_REFINEGRIDFILTER_H
+#define APPLICATION_IMAGEREGISTRATIONTOOLS_REFINEGRIDFILTER_H
 
 #include <Application/Tool/Tool.h>
 
@@ -37,38 +37,29 @@
 namespace Seg3D
 {
 
-class FFTFilter : public SingleTargetTool
+class RefineGridFilter : public SingleTargetTool
 {
-  
+
 SEG3D_TOOL(
-  SEG3D_TOOL_NAME( "FFTFilter", "" )
-  SEG3D_TOOL_MENULABEL( "ir-fft" )
+  SEG3D_TOOL_NAME( "RefineGridFilter", "" )
+  SEG3D_TOOL_MENULABEL( "ir-refine-grid" )
   SEG3D_TOOL_MENU( "Advanced Filters" )
-//  SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+R" )
-//  SEG3D_TOOL_URL( "" )
   SEG3D_TOOL_VERSION( "1" )
 )
   
 public:
-  FFTFilter( const std::string& toolid );
-  virtual ~FFTFilter();
+  RefineGridFilter( const std::string& toolid );
+  virtual ~RefineGridFilter();
   
   // -- state --
 public:
-  Core::StateRangedUIntHandle highest_resolution_level_shrink_factor_state_;
-  Core::StateRangedDoubleHandle overlap_min_state_;
-  Core::StateRangedDoubleHandle overlap_max_state_;
-  Core::StateRangedDoubleHandle pixel_spacing_state_;
-  Core::StateStringVectorHandle input_files_state_;
-  Core::StateStringHandle directory_state_;
-  Core::StateStringHandle output_mosaic_file_state_;
   
   // -- execute --
 public:
   /// Execute the tool and dispatch the action
   virtual void execute( Core::ActionContextHandle context );
 };
-  
+
 } // end namespace
 
 #endif

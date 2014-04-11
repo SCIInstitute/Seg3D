@@ -152,46 +152,7 @@ cubic_transform_t;
 //----------------------------------------------------------------
 // image_interpolator_t
 //
-typedef itk::LinearInterpolateImageFunction<image_t, double>
-image_interpolator_t;
-
-
-//----------------------------------------------------------------
-// usage
-//
-//static void
-//usage(const char * message = NULL)
-//{
-//  std::cerr << "USAGE: ir-refine-grid\n"
-//  << "\t[-sh shrink_factor] \n"
-//  << "\t[-it iterations] \n"
-//  << "\t[-sp pixel_spacing] \n"
-//  << "\t[-cell size] \n"
-//  << "\t[-mesh rows columns] \n"
-//  << "\t[-threads number_of_threads] \n"
-//  << "\t[-displacement_threshold offset_in_pixels] \n"
-//  << "\t[-image_dir path_to_images] \n"
-//  << "\t[-verbose] \n"
-//  << "\t-load any_transform_in \n"
-//  << "\t-save grid_transform_out \n"
-//  << std::endl
-//  << "EXAMPLE: ir-refine-grid\n"
-//  << "\t-sh 8 \n"
-//  << "\t-it 3 \n"
-//  << "\t-cell 96 \n"
-//  << "\t-mesh 8 8 \n"
-//  << "\t-load fft/s01.mosaic \n"
-//  << "\t-save grid/s01.mosaic \n"
-//  << std::endl
-//  << std::endl
-//  << "Pass in -help for more detailed information about the tool."
-//  << std::endl;
-//  
-//  if (message != NULL)
-//  {
-//    std::cerr << "ERROR: " << message << std::endl;
-//  }
-//}
+typedef itk::LinearInterpolateImageFunction<image_t, double> image_interpolator_t;
 
 
 bool
@@ -203,220 +164,228 @@ ActionRefineGridFilter::validate( Core::ActionContextHandle& context )
 bool
 ActionRefineGridFilter::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
-  // this is so that the printouts look better:
-  std::cout.precision(3);
-  std::cout.setf(std::ios::scientific);
-  
-  track_progress(true);
-  
-  // setup thread storage for the main thread:
-  set_the_thread_storage_provider(the_boost_thread_t::thread_storage);
-  the_boost_thread_t MAIN_THREAD_DUMMY;
-  MAIN_THREAD_DUMMY.set_stopped(false);
-  
-  // setup thread and mutex interface creators:
-  the_mutex_interface_t::set_creator(the_boost_mutex_t::create);
-  the_thread_interface_t::set_creator(the_boost_thread_t::create);
-  
-  bool pixel_spacing_user_override = false;
-  if (this->pixel_spacing_ != 1.0) // TODO: improve this check
+  try
   {
-    pixel_spacing_user_override = true;
-  }
-  bfs::path fn_results(this->output_mosaic_file_);
-  
-  bfs::path fn_in(this->input_mosaic_file_);
-  bfs::path image_dir(this->directory_);
-  
-  // TODO: expose?
-  bool verbose = true;
-  
-  // by default run as many threads as there are cores:
-  //  unsigned int num_threads = boost::thread::hardware_concurrency();
-  if (this->num_threads_ == 0)
-  {
-    this->num_threads_ = boost::thread::hardware_concurrency();
-  }
-  
-  fftwf_init_threads();
-  itk_fft::set_num_fftw_threads(1);
-  
-  std::list<bfs::path> in;
-  std::vector<base_transform_t::Pointer> tbase;
-  std::vector<image_t::Pointer> image;
-  std::vector<mask_t::ConstPointer> mask;
-  
-  std::fstream fin;
-  fin.open(fn_in.c_str(), ios::in);
-  if (!fin.is_open())
-  {
-    std::ostringstream oss;
-    oss << "Could not open " << fn_in << " for reading.";
-    CORE_LOG_ERROR(oss.str());
-    return false;
-  }
-  
-  double mosaic_pixel_spacing = 0;
-  load_mosaic<base_transform_t>(fin,
-                                mosaic_pixel_spacing,
-                                this->use_standard_mask_,
-                                in,
-                                tbase,
-                                image_dir);
-  if (! pixel_spacing_user_override)
-  {
-    this->pixel_spacing_ = mosaic_pixel_spacing;
-  }
-  
-  unsigned int num_images = tbase.size();
-//  assert(pixel_spacing != 0);
-  if (this->pixel_spacing_ == 0)
-  {
-    CORE_LOG_ERROR("Pixel spacing is zero");
-    return false;
-  }
-  
-  image.resize(num_images);
-  mask.resize(num_images);
-  
-  unsigned int i = 0;
-  for (std::list<bfs::path>::const_iterator iter = in.begin();
-       iter != in.end(); ++iter, ++i)
-  {
-    const bfs::path & fn_image = *iter;
+    // this is so that the printouts look better:
+    std::cout.precision(3);
+    std::cout.setf(std::ios::scientific);
     
-    // read the image:
-    std::cout << std::setw(3) << i << " ";
-    image[i] = std_tile<image_t>(fn_image, this->shrink_factor_, this->pixel_spacing_);
-    // TOOD: Anytime we do anything with itk we really should be at least
-    //       catching their itk::ExceptionObject.  Heck we could even
-    //       wrap the entire tool in a try catch block, it's better than
-    //       nothing.
+    track_progress(true);
     
-    if (this->use_standard_mask_)
+    // setup thread storage for the main thread:
+    set_the_thread_storage_provider(the_boost_thread_t::thread_storage);
+    the_boost_thread_t MAIN_THREAD_DUMMY;
+    MAIN_THREAD_DUMMY.set_stopped(false);
+    
+    // setup thread and mutex interface creators:
+    the_mutex_interface_t::set_creator(the_boost_mutex_t::create);
+    the_thread_interface_t::set_creator(the_boost_thread_t::create);
+    
+    bool pixel_spacing_user_override = false;
+    if (this->pixel_spacing_ != 1.0) // TODO: improve this check
     {
-      mask[i] = std_mask<image_t>(image[i]);
+      pixel_spacing_user_override = true;
     }
-  }
-  
-  fin.close();
-  
-  set_major_progress(0.05);
-  
-  // a minimum of two images are required for the registration:
-  num_images = in.size();
-  if (num_images == 0)
-  {
-    std::cout << "No images passed the test, nothing to save out." << std::endl;
-  }
-  
-  if (this->cell_size_ == 0 && (this->mesh_rows_ == 0 || this->mesh_cols_ == 0))
-  {
-//    usage("you must specify either the -cell or -mesh parameter");
-    CORE_LOG_ERROR("Set either cell_size or mesh parameters (mesh_rows and mesh_cols).");
-    return false;
-  }
-  else if (this->cell_size_ == 0)
-  {
-    // calculate the cell size from the rows/cols:
-    image_t::SizeType sz = image[0]->GetLargestPossibleRegion().GetSize();
-    unsigned int nx = 3 * sz[0] / (this->mesh_cols_ - 1);
-    unsigned int ny = 3 * sz[1] / (this->mesh_rows_ - 1);
-    this->cell_size_ = std::max(nx, ny);
-  }
-  else if (this->mesh_rows_ == 0 || this->mesh_cols_ == 0)
-  {
-    // calculate the cell size from the rows/cols:
-    image_t::SizeType sz = image[0]->GetLargestPossibleRegion().GetSize();
-    this->mesh_cols_ = 1 + 3 * sz[0] / this->cell_size_;
-    this->mesh_rows_ = 1 + 3 * sz[1] / this->cell_size_;
-  }
-  
-  // get the image bounding boxes:
-  std::vector<pnt2d_t> tile_min(num_images);
-  std::vector<pnt2d_t> tile_max(num_images);
-  calc_image_bboxes<image_t::Pointer>(image, tile_min, tile_max);
-  
-  // setup the mesh transforms:
-  std::vector<itk::GridTransform::Pointer> transform(num_images);
-  for (unsigned int i = 0; i < num_images; i++)
-  {
-    transform[i] = itk::GridTransform::New();
-    bool ok = setup_grid_transform(transform[i]->transform_,
-                                   this->mesh_rows_ - 1, // grid rows
-                                   this->mesh_cols_ - 1, // grid cols
-                                   tile_min[i],
-                                   tile_max[i],
-                                   mask[i].GetPointer(),
-                                   tbase[i].GetPointer(),
-                                   MAX_ITERATIONS,
-                                   MIN_STEP_SCALE,
-                                   MIN_ERROR_SQ,
-                                   PICKUP_PACE_STEPS);
-    if (!ok)
+    bfs::path fn_results(this->output_mosaic_file_);
+    
+    bfs::path fn_in(this->input_mosaic_file_);
+    bfs::path image_dir(this->directory_);
+    
+    // TODO: expose?
+    bool verbose = true;
+    
+    // by default run as many threads as there are cores:
+    //  unsigned int num_threads = boost::thread::hardware_concurrency();
+    if (this->num_threads_ == 0)
     {
-//      assert(false);
-      CORE_LOG_ERROR("setup_grid_transform failed");
+      this->num_threads_ = boost::thread::hardware_concurrency();
+    }
+    
+    fftwf_init_threads();
+    itk_fft::set_num_fftw_threads(1);
+    
+    std::list<bfs::path> in;
+    std::vector<base_transform_t::Pointer> tbase;
+    std::vector<image_t::Pointer> image;
+    std::vector<mask_t::ConstPointer> mask;
+    
+    std::fstream fin;
+    fin.open(fn_in.c_str(), ios::in);
+    if (!fin.is_open())
+    {
+      std::ostringstream oss;
+      oss << "Could not open " << fn_in << " for reading.";
+      CORE_LOG_ERROR(oss.str());
       return false;
     }
-    transform[i]->setup(transform[i]->transform_);
     
-    set_minor_progress(static_cast<double>(i)/static_cast<double>(num_images), 0.15);
-  }
-  
-  set_major_progress(0.15);
-  
-  std::cout << "shrink factor: " << this->shrink_factor_ << std::endl
-  << "pixel spacing: " << this->pixel_spacing_ << std::endl
-  << "iterations:    " << this->iterations_ << std::endl
-  << "neighborhood:  " << this->cell_size_ << std::endl
-  << "mesh rows:     " << this->mesh_rows_ << std::endl
-  << "mesh cols:     " << this->mesh_cols_ << std::endl
-  << "threads:       " << this->num_threads_ << std::endl
-  << std::endl;
-  
-  image_t::SizeType image_sz = image[0]->GetLargestPossibleRegion().GetSize();
-  
-  refine_mosaic_mt<image_t::Pointer, mask_t::ConstPointer>(transform,
-                                                           image,
-                                                           mask,
-                                                           this->cell_size_,
-                                                           PREWARP_TILES,
-                                                           MIN_OVERLAP,
-                                                           DEFAULT_MEDIAN_FILTER_RADIUS,
-                                                           this->iterations_, // number of refinement passes
-                                                           MOVE_ALL_TILES,
-                                                           this->displacement_threshold_,
-                                                           this->num_threads_); // number of threads to launch
-  
-  set_major_progress(0.95);
-  
-  // save the results:
-  std::fstream fout;
-  fout.open(fn_results.c_str(), ios::out);
-  
-  if (!fout.is_open())
-  {
-    std::ostringstream oss;
-    oss << "Could not open " << fn_results << " for writing.";
-    CORE_LOG_ERROR(oss.str());
-    return false;
-  }
-  
-  save_mosaic<itk::GridTransform>(fout,
-                                  this->pixel_spacing_,
+    double mosaic_pixel_spacing = 0;
+    load_mosaic<base_transform_t>(fin,
+                                  mosaic_pixel_spacing,
                                   this->use_standard_mask_,
                                   in,
-                                  transform);
-  
-  fout.close();
-  
-  set_major_progress(1.0);
-  
-  CORE_LOG_SUCCESS("ir-refine-grid done");
-  
-  // done:
-  return true;
+                                  tbase,
+                                  image_dir);
+    if (! pixel_spacing_user_override)
+    {
+      this->pixel_spacing_ = mosaic_pixel_spacing;
+    }
+    
+    unsigned int num_images = tbase.size();
+  //  assert(pixel_spacing != 0);
+    if (this->pixel_spacing_ == 0)
+    {
+      CORE_LOG_ERROR("Pixel spacing is zero");
+      return false;
+    }
+    
+    image.resize(num_images);
+    mask.resize(num_images);
+    
+    unsigned int i = 0;
+    for (std::list<bfs::path>::const_iterator iter = in.begin();
+         iter != in.end(); ++iter, ++i)
+    {
+      const bfs::path & fn_image = *iter;
+      
+      // read the image:
+      std::cout << std::setw(3) << i << " ";
+      image[i] = std_tile<image_t>(fn_image, this->shrink_factor_, this->pixel_spacing_);
+      // TODO: Anytime we do anything with itk we really should be at least
+      //       catching their itk::ExceptionObject.  Heck we could even
+      //       wrap the entire tool in a try catch block, it's better than
+      //       nothing.
+      
+      if (this->use_standard_mask_)
+      {
+        mask[i] = std_mask<image_t>(image[i]);
+      }
+    }
+    
+    fin.close();
+    
+    set_major_progress(0.05);
+    
+    // a minimum of two images are required for the registration:
+    num_images = in.size();
+    if (num_images == 0)
+    {
+      std::cout << "No images passed the test, nothing to save out." << std::endl;
+    }
+    
+    if (this->cell_size_ == 0 && (this->mesh_rows_ == 0 || this->mesh_cols_ == 0))
+    {
+  //    usage("you must specify either the -cell or -mesh parameter");
+      CORE_LOG_ERROR("Set either cell_size or mesh parameters (mesh_rows and mesh_cols).");
+      return false;
+    }
+    else if (this->cell_size_ == 0)
+    {
+      // calculate the cell size from the rows/cols:
+      image_t::SizeType sz = image[0]->GetLargestPossibleRegion().GetSize();
+      unsigned int nx = 3 * sz[0] / (this->mesh_cols_ - 1);
+      unsigned int ny = 3 * sz[1] / (this->mesh_rows_ - 1);
+      this->cell_size_ = std::max(nx, ny);
+    }
+    else if (this->mesh_rows_ == 0 || this->mesh_cols_ == 0)
+    {
+      // calculate the cell size from the rows/cols:
+      image_t::SizeType sz = image[0]->GetLargestPossibleRegion().GetSize();
+      this->mesh_cols_ = 1 + 3 * sz[0] / this->cell_size_;
+      this->mesh_rows_ = 1 + 3 * sz[1] / this->cell_size_;
+    }
+    
+    // get the image bounding boxes:
+    std::vector<pnt2d_t> tile_min(num_images);
+    std::vector<pnt2d_t> tile_max(num_images);
+    calc_image_bboxes<image_t::Pointer>(image, tile_min, tile_max);
+    
+    // setup the mesh transforms:
+    std::vector<itk::GridTransform::Pointer> transform(num_images);
+    for (unsigned int i = 0; i < num_images; i++)
+    {
+      transform[i] = itk::GridTransform::New();
+      bool ok = setup_grid_transform(transform[i]->transform_,
+                                     this->mesh_rows_ - 1, // grid rows
+                                     this->mesh_cols_ - 1, // grid cols
+                                     tile_min[i],
+                                     tile_max[i],
+                                     mask[i].GetPointer(),
+                                     tbase[i].GetPointer(),
+                                     MAX_ITERATIONS,
+                                     MIN_STEP_SCALE,
+                                     MIN_ERROR_SQ,
+                                     PICKUP_PACE_STEPS);
+      if (!ok)
+      {
+  //      assert(false);
+        CORE_LOG_ERROR("setup_grid_transform failed");
+        return false;
+      }
+      transform[i]->setup(transform[i]->transform_);
+      
+      set_minor_progress(static_cast<double>(i)/static_cast<double>(num_images), 0.15);
+    }
+    
+    set_major_progress(0.15);
+    
+    std::cout << "shrink factor: " << this->shrink_factor_ << std::endl
+    << "pixel spacing: " << this->pixel_spacing_ << std::endl
+    << "iterations:    " << this->iterations_ << std::endl
+    << "neighborhood:  " << this->cell_size_ << std::endl
+    << "mesh rows:     " << this->mesh_rows_ << std::endl
+    << "mesh cols:     " << this->mesh_cols_ << std::endl
+    << "threads:       " << this->num_threads_ << std::endl
+    << std::endl;
+    
+    image_t::SizeType image_sz = image[0]->GetLargestPossibleRegion().GetSize();
+    
+    refine_mosaic_mt<image_t::Pointer, mask_t::ConstPointer>(transform,
+                                                             image,
+                                                             mask,
+                                                             this->cell_size_,
+                                                             PREWARP_TILES,
+                                                             MIN_OVERLAP,
+                                                             DEFAULT_MEDIAN_FILTER_RADIUS,
+                                                             this->iterations_, // number of refinement passes
+                                                             MOVE_ALL_TILES,
+                                                             this->displacement_threshold_,
+                                                             this->num_threads_); // number of threads to launch
+    
+    set_major_progress(0.95);
+    
+    // save the results:
+    std::fstream fout;
+    fout.open(fn_results.c_str(), ios::out);
+    
+    if (!fout.is_open())
+    {
+      std::ostringstream oss;
+      oss << "Could not open " << fn_results << " for writing.";
+      CORE_LOG_ERROR(oss.str());
+      return false;
+    }
+    
+    save_mosaic<itk::GridTransform>(fout,
+                                    this->pixel_spacing_,
+                                    this->use_standard_mask_,
+                                    in,
+                                    transform);
+    
+    fout.close();
+    
+    set_major_progress(1.0);
+    
+    CORE_LOG_SUCCESS("ir-refine-grid done");
+    
+    // done:
+    return true;
+  }
+  catch (...)
+  {
+    CORE_LOG_ERROR("Exception caught");
+    return false;
+  }
 }
 
 

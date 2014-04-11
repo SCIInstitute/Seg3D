@@ -32,6 +32,10 @@
 // Application includes
 #include <Application/Tool/ToolFactory.h>
 
+#include <Application/ImageRegistrationTools/Actions/ActionRefineTranslateFilter.h>
+
+#include <iostream>
+
 SCI_REGISTER_TOOL(Seg3D, RefineTranslateFilter)
 
 namespace Seg3D
@@ -40,6 +44,8 @@ namespace Seg3D
 RefineTranslateFilter::RefineTranslateFilter(const std::string& toolid)
 : SingleTargetTool( Core::VolumeType::DATA_E, toolid)
 {
+  // TODO: temporary hack
+  this->valid_target_state_->set( true );
 }
 
 RefineTranslateFilter::~RefineTranslateFilter()
@@ -49,6 +55,10 @@ RefineTranslateFilter::~RefineTranslateFilter()
 void
 RefineTranslateFilter::execute( Core::ActionContextHandle context)
 {
+  std::cout << "RefineTranslateFilter::execute!" << std::endl;
+//  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+//  
+//  ActionRefineTranslateFilter::Dispatch( context, this->target_layer_state_->get() );
 }
 
 }

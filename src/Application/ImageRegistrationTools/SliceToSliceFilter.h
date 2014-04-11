@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_IMAGEREGISTRATIONTOOLS_FFTFILTER_H
-#define APPLICATION_IMAGEREGISTRATIONTOOLS_FFTFILTER_H
+#ifndef APPLICATION_IMAGEREGISTRATIONTOOLS_SLICETOSLICEFILTER_H
+#define APPLICATION_IMAGEREGISTRATIONTOOLS_SLICETOSLICEFILTER_H
 
 #include <Application/Tool/Tool.h>
 
@@ -36,32 +36,23 @@
 
 namespace Seg3D
 {
-
-class FFTFilter : public SingleTargetTool
-{
   
+class SliceToSliceFilter : public SingleTargetTool
+{
+
 SEG3D_TOOL(
-  SEG3D_TOOL_NAME( "FFTFilter", "" )
-  SEG3D_TOOL_MENULABEL( "ir-fft" )
+  SEG3D_TOOL_NAME( "SliceToSliceFilter", "" )
+  SEG3D_TOOL_MENULABEL( "ir-stos" )
   SEG3D_TOOL_MENU( "Advanced Filters" )
-//  SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+R" )
-//  SEG3D_TOOL_URL( "" )
   SEG3D_TOOL_VERSION( "1" )
 )
   
 public:
-  FFTFilter( const std::string& toolid );
-  virtual ~FFTFilter();
+  SliceToSliceFilter( const std::string& toolid );
+  virtual ~SliceToSliceFilter();
   
   // -- state --
 public:
-  Core::StateRangedUIntHandle highest_resolution_level_shrink_factor_state_;
-  Core::StateRangedDoubleHandle overlap_min_state_;
-  Core::StateRangedDoubleHandle overlap_max_state_;
-  Core::StateRangedDoubleHandle pixel_spacing_state_;
-  Core::StateStringVectorHandle input_files_state_;
-  Core::StateStringHandle directory_state_;
-  Core::StateStringHandle output_mosaic_file_state_;
   
   // -- execute --
 public:

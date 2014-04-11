@@ -141,7 +141,7 @@ calc_variance(pixel_t * pixel_cache,
   }
   
   if (!mass) return;
-  mean /= float(mass);
+  mean /= static_cast<float>(mass);
   
   // calculate variance:
   for (size_t i = 0; i < mass; i++)
@@ -150,7 +150,7 @@ calc_variance(pixel_t * pixel_cache,
     variance += d * d;
   }
   
-  variance /= float(mass);
+  variance /= static_cast<float>(mass);
 }
 
 
@@ -399,8 +399,8 @@ enhance_blobs(const image_t * image,
     {
       double metric =
       std::min<double>(threshold,
-                       double(global_variance_median + 1) /
-                       double(v + 1));
+                       static_cast<double>(global_variance_median + 1) /
+                       static_cast<double>(v + 1));
       iter.Set(metric);
       
       blob_image_mean += metric;
@@ -426,141 +426,111 @@ enhance_blobs(const image_t * image,
 }
 
 
-//----------------------------------------------------------------
-// usage
-//
-//static void
-//usage(const char * message = NULL)
-//{
-//  std::cerr << "USAGE: ir-blob\n"
-//  << "\t[-sh shrink_factor] \n"
-//  << "\t[-r radius_in_pixels] \n"
-//  << "\t[-median radius] \n"
-//  << "\t[-max threshold] \n"
-//  << "\t[-std_mask] \n"
-//  << "\t[-mask mask_in] \n"
-//  << "\t[-threads number_of_threads] \n"
-//  << "\t-load image_in \n"
-//  << "\t-save image_out \n"
-//  << std::endl
-//  << "EXAMPLE: ir-blob\n"
-//  << "\t-sh 8 \n"
-//  << "\t-r 8 \n"
-//  << "\t-median 2 \n"
-//  << "\t-max 3 \n"
-//  << "\t-mask mask/s10.tif \n"
-//  << "\t-threads 8 \n"
-//  << "\t-load raw/s10.tif \n"
-//  << "\t-save blobs/s10.tif \n"
-//  << std::endl
-//  << std::endl
-//  << "Pass in -help for more detailed information about the tool."
-//  << std::endl;
-//  
-//  if (message != NULL)
-//  {
-//    std::cerr << "ERROR: " << message << std::endl;
-//  }
-//}
-
-
 bool
 ActionBlobFeatureEnhancementFilter::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
-  // this is so that the printouts look better:
-  std::cout.precision(6);
-  std::cout.setf(std::ios::scientific);
-  
-  // setup thread storage for the main thread:
-  set_the_thread_storage_provider(the_boost_thread_t::thread_storage);
-  the_boost_thread_t MAIN_THREAD_DUMMY;
-  MAIN_THREAD_DUMMY.set_stopped(false);
-  
-  // setup thread and mutex interface creators:
-  the_mutex_interface_t::set_creator(the_boost_mutex_t::create);
-  the_thread_interface_t::set_creator(the_boost_thread_t::create);
-  
-  bfs::path fn_mask;
-  bfs::path fn_load(this->input_image_);
-  bfs::path fn_save(this->output_image_);
-  
-  mask_t::Pointer image_mask;
-  
-  // by default run as many threads as there are cores:
-//  unsigned int num_threads = boost::thread::hardware_concurrency();
-  if (this->num_threads_ == 0)
+  try
   {
-    this->num_threads_ = boost::thread::hardware_concurrency();
+    // this is so that the printouts look better:
+    std::cout.precision(6);
+    std::cout.setf(std::ios::scientific);
+    
+    // setup thread storage for the main thread:
+    set_the_thread_storage_provider(the_boost_thread_t::thread_storage);
+    the_boost_thread_t MAIN_THREAD_DUMMY;
+    MAIN_THREAD_DUMMY.set_stopped(false);
+    
+    // setup thread and mutex interface creators:
+    the_mutex_interface_t::set_creator(the_boost_mutex_t::create);
+    the_thread_interface_t::set_creator(the_boost_thread_t::create);
+    
+    bfs::path fn_mask;
+    bfs::path fn_load(this->input_image_);
+    bfs::path fn_save(this->output_image_);
+    
+    mask_t::Pointer image_mask;
+    
+    // by default run as many threads as there are cores:
+  //  unsigned int num_threads = boost::thread::hardware_concurrency();
+    if (this->num_threads_ == 0)
+    {
+      this->num_threads_ = boost::thread::hardware_concurrency();
+    }
+    
+    const unsigned int DEFAULT_PIXEL_SPACING = 1;
+    const unsigned int DEFAULT_COLS = 1;
+    const unsigned int DEFAULT_ROWS = 1;
+    
+    if (! bfs::exists(fn_load) )
+    {
+  //    usage("must specify a file to open with the -load option");
+      CORE_LOG_ERROR("Filter requires an input image file");
+      return false;
+    }
+    
+    if (fn_save.empty())
+    {
+  //    usage("must specify a file to open with the -save option");
+      CORE_LOG_ERROR("Filter requires an output image file");
+      return false;
+    }
+    
+    std::cout << "neighborhood:  " << this->radius_ * 2 + 1 << std::endl
+    << "threads:       " << this->num_threads_ << std::endl
+    << std::endl;
+    
+    // load an image:
+    image_t::Pointer image = std_tile<image_t>(fn_load, this->shrink_factor_, DEFAULT_PIXEL_SPACING);
+    
+    // setup the mask:
+    if (!fn_mask.empty())
+    {
+      image_mask = std_tile<mask_t>(fn_mask, this->shrink_factor_, DEFAULT_PIXEL_SPACING);
+    }
+    else
+    {
+      image_mask = std_mask<image_t>(image, this->use_standard_mask_);
+    }
+    
+    bool remap_values =
+      fn_save.extension() != ".mha" &&
+      fn_save.extension() != ".mhd" &&
+      fn_save.extension() != ".nrrd";
+    
+    // filter the image with a median filter:
+    if (this->median_radius_ != 0)
+    {
+      image = median<image_t>(image, this->median_radius_);
+    }
+    
+    image_t::Pointer blobs = enhance_blobs(image,
+                                           image_mask,
+                                           this->radius_,
+                                           this->threshold_,
+                                           this->num_threads_);
+
+    // pixel type == unsigned?
+    blobs = normalize<image_t>(blobs, DEFAULT_COLS, DEFAULT_ROWS, 0, 255, image_mask);
+    
+    if (remap_values)
+    {
+      save<native_image_t>(cast<image_t, native_image_t>(blobs), fn_save);
+    }
+    else
+    {
+      save<image_t>(blobs, fn_save);
+    }
+
+    CORE_LOG_SUCCESS("ir-blob done");
+    
+    // done:
+    return true;
   }
-  
-  const unsigned int DEFAULT_PIXEL_SPACING = 1;
-  const unsigned int DEFAULT_COLS = 1;
-  const unsigned int DEFAULT_ROWS = 1;
-  
-  if (! bfs::exists(fn_load) )
+  catch (...)
   {
-//    usage("must specify a file to open with the -load option");
-    CORE_LOG_ERROR("Filter requires an input image file");
+    CORE_LOG_ERROR("Exception caught");
     return false;
   }
-  
-  if (fn_save.empty())
-  {
-//    usage("must specify a file to open with the -save option");
-    CORE_LOG_ERROR("Filter requires an output image file");
-    return false;
-  }
-  
-  std::cout << "neighborhood:  " << this->radius_ * 2 + 1 << std::endl
-  << "threads:       " << this->num_threads_ << std::endl
-  << std::endl;
-  
-  // load an image:
-  image_t::Pointer image = std_tile<image_t>(fn_load, this->shrink_factor_, DEFAULT_PIXEL_SPACING);
-  
-  // setup the mask:
-  if (!fn_mask.empty())
-  {
-    image_mask = std_tile<mask_t>(fn_mask, this->shrink_factor_, DEFAULT_PIXEL_SPACING);
-  }
-  else
-  {
-    image_mask = std_mask<image_t>(image, this->use_standard_mask_);
-  }
-  
-  bool remap_values =
-    fn_save.extension() != ".mha" &&
-    fn_save.extension() != ".mhd" &&
-    fn_save.extension() != ".nrrd";
-  
-  // filter the image with a median filter:
-  if (this->median_radius_ != 0)
-  {
-    image = median<image_t>(image, this->median_radius_);
-  }
-  
-  image_t::Pointer blobs = enhance_blobs(image,
-                                         image_mask,
-                                         this->radius_,
-                                         this->threshold_,
-                                         this->num_threads_);
-
-  // pixel type == unsigned?
-  blobs = normalize<image_t>(blobs, DEFAULT_COLS, DEFAULT_ROWS, 0, 255, image_mask);
-  
-  if (remap_values)
-  {
-    save<native_image_t>(cast<image_t, native_image_t>(blobs), fn_save);
-  }
-  else
-  {
-    save<image_t>(blobs, fn_save);
-  }
-
-  CORE_LOG_SUCCESS("ir-blob done");
-  
-  // done:
-  return true;
 }
 
 

@@ -50,7 +50,7 @@ CORE_ACTION(
   CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
   CORE_ACTION_ARGUMENT( "directory", "Image file directory. If files is not used, then filter will search directory for image files." )
   CORE_ACTION_ARGUMENT( "output_mosaic_file", "Output mosaic file." )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "files", "<none>", "Image file names." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "files", "[]", "Image file names." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "shrink_factor", "1", "Downsample factor." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "pyramid_levels", "1", "Number of multiresolution pyramid levels." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "iterations_per_level", "5", "Iterations per pyramid level." )

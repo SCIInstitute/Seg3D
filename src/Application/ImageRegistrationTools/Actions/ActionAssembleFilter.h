@@ -50,6 +50,8 @@ CORE_ACTION(
   CORE_ACTION_ARGUMENT( "directory", "Image file directory." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "shrink_factor", "1", "Downsample factor." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "num_threads", "0", "Number of threads used (if 0, the number of cores will be used)." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "tile_width", "std::numeric_limits<unsigned int>::max()", "" )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "tile_height", "std::numeric_limits<unsigned int>::max()", "" )
   CORE_ACTION_OPTIONAL_ARGUMENT( "pixel_spacing", "1.0", "Pixel spacing." )          
   CORE_ACTION_OPTIONAL_ARGUMENT( "clahe_slope", "1.0", "Maximum CLAHE slope." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "use_standard_mask", "false", "Use the default mask." )
@@ -78,6 +80,8 @@ public:
     this->add_parameter( this->output_image_file_ );
     this->add_parameter( this->shrink_factor_ );
     this->add_parameter( this->num_threads_ );
+    this->add_parameter( this->tile_width_ );
+    this->add_parameter( this->tile_height_ );
     this->add_parameter( this->pixel_spacing_ );
     this->add_parameter( this->clahe_slope_ );
     this->add_parameter( this->use_standard_mask_ );
@@ -100,6 +104,8 @@ public:
                        std::string target_layer,
                        unsigned int shrink_factor,
                        unsigned int num_threads,
+                       unsigned int tile_width,
+                       unsigned int tile_height,
                        double pixel_spacing,
                        double clahe_slope,
                        bool use_standard_mask,
@@ -120,6 +126,8 @@ private:
   
   unsigned int shrink_factor_;
   unsigned int num_threads_;
+  unsigned int tile_width_;
+  unsigned int tile_height_;
   double pixel_spacing_;
   double clahe_slope_;
   bool use_standard_mask_;
