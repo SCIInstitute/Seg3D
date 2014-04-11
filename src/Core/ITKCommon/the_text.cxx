@@ -120,6 +120,31 @@ the_text_t::assign(const char * text, const size_t & text_size)
 }
 
 //----------------------------------------------------------------
+// the_text_t::append
+// 
+void
+the_text_t::append(const char * text, const size_t & text_size)
+{
+  char * text_copy = new char [size_ + text_size + 1];
+  
+  for (size_t i = 0; i < size_; i++)
+  {
+    text_copy[i] = text_[i];
+  }
+  
+  for (size_t i = 0; i < text_size; i++)
+  {
+    text_copy[i + size_] = text[i];
+  }
+  
+  text_copy[size_ + text_size] = '\0';
+  
+  delete [] text_;
+  text_ = text_copy;
+  size_ += text_size;
+}
+
+//----------------------------------------------------------------
 // the_text_t::fill
 // 
 void
