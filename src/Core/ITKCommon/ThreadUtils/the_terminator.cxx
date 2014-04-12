@@ -154,11 +154,11 @@ void
 the_terminators_t::terminate()
 {
   the_lock_t<the_terminators_t> lock(*this);
-  
+
 #ifndef NDEBUG
-  std::ostringstream os;
-  os << std::endl << &terminators_ << ": terminate_all -- begin";
-  CORE_LOG_DEBUG(os.str());
+  std::ostringstream os1;
+  os1 << std::endl << &terminators_ << ": terminate_all -- begin";
+  CORE_LOG_DEBUG(os1.str());
 #endif
   
   for (std::list<the_terminator_t *>::iterator i = terminators_.begin();
@@ -169,9 +169,9 @@ the_terminators_t::terminate()
   }
   
 #ifndef NDEBUG
-  std::ostringstream os;
-  os << &terminators_ << ": terminate_all -- end";
-  CORE_LOG_DEBUG(os.str());
+  std::ostringstream os2;
+  os2 << &terminators_ << ": terminate_all -- end";
+  CORE_LOG_DEBUG(os2.str());
 #endif
 }
 
