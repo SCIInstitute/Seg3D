@@ -50,8 +50,8 @@ CORE_ACTION(
   CORE_ACTION_ARGUMENT( "directory", "Image file directory." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "shrink_factor", "1", "Downsample factor." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "num_threads", "0", "Number of threads used (if 0, the number of cores will be used)." )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "tile_width", "std::numeric_limits<unsigned int>::max()", "" )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "tile_height", "std::numeric_limits<unsigned int>::max()", "" )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "tile_width", "max", "" )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "tile_height", "max", "" )
   CORE_ACTION_OPTIONAL_ARGUMENT( "pixel_spacing", "1.0", "Pixel spacing." )          
   CORE_ACTION_OPTIONAL_ARGUMENT( "clahe_slope", "1.0", "Maximum CLAHE slope." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "use_standard_mask", "false", "Use the default mask." )
@@ -61,7 +61,7 @@ CORE_ACTION(
   CORE_ACTION_OPTIONAL_ARGUMENT( "remap_values", "false", "" )
   CORE_ACTION_OPTIONAL_ARGUMENT( "defer_image_loading", "false", "" )
   CORE_ACTION_OPTIONAL_ARGUMENT( "feathering", "none", "Blend edges (none, blend, binary)." ) // none, blend, binary
-  CORE_ACTION_OPTIONAL_ARGUMENT( "mask", "", "Apply given mask." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "mask", "<none>", "Apply given mask." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "sandbox", "-1", "The sandbox in which to run the action." )
   CORE_ACTION_ARGUMENT_IS_NONPERSISTENT( "sandbox" )
   //  CORE_ACTION_CHANGES_PROJECT_DATA()
@@ -75,9 +75,9 @@ public:
     CLAHE_DEFAULT_BINS(256)
   {
     this->add_layer_id( this->target_layer_ );
+    this->add_parameter( this->input_mosaic_ );
+    this->add_parameter( this->output_image_ );
     this->add_parameter( this->directory_ );
-    this->add_parameter( this->input_mosaic_file_ );
-    this->add_parameter( this->output_image_file_ );
     this->add_parameter( this->shrink_factor_ );
     this->add_parameter( this->num_threads_ );
     this->add_parameter( this->tile_width_ );
@@ -114,8 +114,8 @@ public:
                        bool save_variance,
                        bool remap_values,
                        bool defer_image_loading,
-                       std::string input_mosaic_file,
-                       std::string output_image_file,
+                       std::string input_mosaic,
+                       std::string output_image,
                        std::string directory,
                        std::string mask,
                        std::string feathering);
@@ -136,8 +136,8 @@ private:
   bool save_variance_;
   bool remap_values_;
   bool defer_image_loading_;
-  std::string input_mosaic_file_;
-  std::string output_image_file_;
+  std::string input_mosaic_;
+  std::string output_image_;
   std::string directory_;
   std::string mask_;
   std::string feathering_;

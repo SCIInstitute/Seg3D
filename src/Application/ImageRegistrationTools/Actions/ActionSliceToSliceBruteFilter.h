@@ -61,10 +61,10 @@ CORE_ACTION(
   CORE_ACTION_OPTIONAL_ARGUMENT( "regularize", "false", "Regularize using low order intermediate." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "flip_fixed", "false", "Flip fixed image file." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "flip_moving", "false", "Flip moving image file." )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "mask_fixed", "", "Fixed image mask." )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "mask_moving", "", "Moving image mask." )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "image_dir_fixed", "", "Fixed image directory." )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "image_dir_moving", "", "Moving image directory." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "mask_fixed", "<none>", "Fixed image mask." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "mask_moving", "<none>", "Moving image mask." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "image_dir_fixed", "<none>", "Fixed image directory." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "image_dir_moving", "<none>", "Moving image directory." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "sandbox", "-1", "The sandbox in which to run the action." )
   CORE_ACTION_ARGUMENT_IS_NONPERSISTENT( "sandbox" )
 )
@@ -79,6 +79,9 @@ public:
   DEFAULT_KEY_GENERATE_SETTING(false)
   {
     this->add_layer_id( this->target_layer_ );
+    this->add_parameter( this->input_fixed_ );
+    this->add_parameter( this->input_moving_ );
+    this->add_parameter( this->output_stos_ );
     this->add_parameter( this->shrink_factor_ );
     this->add_parameter( this->pixel_spacing_ );
     this->add_parameter( this->clahe_slope_ );
@@ -92,9 +95,6 @@ public:
     this->add_parameter( this->regularize_ );
     this->add_parameter( this->flip_fixed_ );
     this->add_parameter( this->flip_moving_ );
-    this->add_parameter( this->input_fixed_file_ );
-    this->add_parameter( this->input_moving_file_ );
-    this->add_parameter( this->output_stos_file_ );
     this->add_parameter( this->mask_fixed_ );
     this->add_parameter( this->mask_moving_ );
     this->add_parameter( this->image_dir_fixed_ );
@@ -122,9 +122,9 @@ public:
                        bool regularize,
                        bool flip_fixed,
                        bool flip_moving,
-                       std::string input_fixed_file,
-                       std::string input_moving_file,
-                       std::string output_stos_file,
+                       std::string input_fixed,
+                       std::string input_moving,
+                       std::string output_stos,
                        std::string mask_fixed,
                        std::string mask_moving,
                        std::string image_dir_fixed,
@@ -147,9 +147,9 @@ private:
   bool regularize_;
   bool flip_fixed_;
   bool flip_moving_;
-  std::string input_fixed_file_;
-  std::string input_moving_file_;
-  std::string output_stos_file_;
+  std::string input_fixed_;
+  std::string input_moving_;
+  std::string output_stos_;
   std::string mask_fixed_;
   std::string mask_moving_;
   std::string image_dir_fixed_;

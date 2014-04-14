@@ -90,7 +90,7 @@ ActionFFTFilter::run( Core::ActionContextHandle& context, Core::ActionResultHand
     std::list<bfs::path> in;
 
     bfs::path fn_results(this->output_mosaic_file_);
-    if (! bfs::is_directory(fn_results.parent_path()) )
+    if (! bfs::is_directory( fn_results.parent_path() ) )
     {
       CORE_LOG_DEBUG(std::string("Creating parent path to ") + this->output_mosaic_file_);
       if (! boost::filesystem::create_directories(fn_results.parent_path()))

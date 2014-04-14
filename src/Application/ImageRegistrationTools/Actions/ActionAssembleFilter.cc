@@ -91,10 +91,26 @@ ActionAssembleFilter::run( Core::ActionContextHandle& context, Core::ActionResul
       pixel_spacing_user_override = true;
     }
     std::list<bfs::path> in;
-    bfs::path fn_save(this->output_image_file_);
+    bfs::path fn_save(this->output_image_);
+    if (! bfs::is_directory( fn_save.parent_path() ) )
+    {
+      CORE_LOG_DEBUG(std::string("Creating parent path to ") + this->output_image_);
+      if (! boost::filesystem::create_directories(fn_save.parent_path()))
+      {
+        std::ostringstream oss;
+        oss << "Could not create missing directory " << fn_save.parent_path() << " required to create output image.";
+        CORE_LOG_ERROR(oss.str());
+        return false;
+      }
+    }
+
     bfs::path extension;
     bfs::path filename;
-    bfs::path fn_mask(this->mask_);
+    bfs::path fn_mask;
+    if (this->mask_ != "<none>")
+    {
+     fn_mask = this->mask_;
+    }
     feathering_t feathering_val = FEATHER_NONE_E;
     if (this->feathering_ == "blend")
     {
@@ -104,22 +120,23 @@ ActionAssembleFilter::run( Core::ActionContextHandle& context, Core::ActionResul
     {
       feathering_val = FEATHER_BINARY_E;
     }
-  //  unsigned int tile_width = std::numeric_limits<unsigned int>::max();
-  //  unsigned int tile_height = std::numeric_limits<unsigned int>::max();
 
     // debug...
-    // TODO: expose
+    // TODO: expose?
     bool verbose = true;
     
-    //  the_text_t fn_in(input_mosaic_file.c_str());
-    //  the_text_t image_dir(directory.c_str());
-    bfs::path fn_in(this->input_mosaic_file_);
-    if (! bfs::exists(fn_in) )
+    bfs::path fn_in(this->input_mosaic_);
+    if (! bfs::exists(fn_in) && ! bfs::is_regular_file(this->input_mosaic_) )
     {
       std::ostringstream oss;
       oss << fn_in << " cannot be found." << std::endl;
       CORE_LOG_ERROR(oss.str());
       // return false;
+    }
+
+    if (fn_in.extension() != ".mosaic")
+    {
+      CORE_LOG_WARNING(fn_in.string() + " does not have the .mosaic extension.");
     }
 
     bfs::path image_dir(this->directory_);
@@ -144,7 +161,7 @@ ActionAssembleFilter::run( Core::ActionContextHandle& context, Core::ActionResul
     
     // extract output filename extension (excluding the '.'):
     //  extension = fn_save.reverse().cut('.', 0, 0).reverse();
-    extension = fn_save.extension();
+    extension = fn_save.extension(); // includes '.'
     
     // extract output filename (excluding the '.' and extension):
     //  filename = fn_save.extract(0, fn_save.size() - extension.size() - 1);
@@ -156,10 +173,6 @@ ActionAssembleFilter::run( Core::ActionContextHandle& context, Core::ActionResul
     //  {
     //    extension = the_text_t(".") + extension;
     //  }
-    
-  //  tile_width = -1;
-  //  tile_height = -1;
-    // test
     
     // Load in cached .mosaic:
     std::fstream fin;
@@ -239,7 +252,7 @@ ActionAssembleFilter::run( Core::ActionContextHandle& context, Core::ActionResul
                        this->tile_height_ != std::numeric_limits<unsigned int>::max());
     
     // sanity checks:
-    if (fn_save.empty() == 0)
+    if (fn_save.empty())
     {
       CORE_LOG_ERROR("Missing output filename.");
       return false;
@@ -692,11 +705,28 @@ ActionAssembleFilter::run( Core::ActionContextHandle& context, Core::ActionResul
     
     return true;
   }
+  catch (bfs::filesystem_error &err)
+  {
+    CORE_LOG_ERROR(err.what());
+  }
+  catch (itk::ExceptionObject &err)
+  {
+    CORE_LOG_ERROR(err.GetDescription());
+  }
+  catch (Core::Exception &err)
+  {
+    CORE_LOG_ERROR(err.what());
+    CORE_LOG_ERROR(err.message());
+  }
+  catch (std::exception &err)
+  {
+    CORE_LOG_ERROR(err.what());
+  }
   catch (...)
   {
-    CORE_LOG_ERROR("Exception caught");
-    return false;
+    CORE_LOG_ERROR("Unknown exception type caught.");
   }
+  return false;
 }
 
 void
@@ -714,8 +744,8 @@ ActionAssembleFilter::Dispatch(Core::ActionContextHandle context,
                                bool save_variance,
                                bool remap_values,
                                bool defer_image_loading,
-                               std::string input_mosaic_file,
-                               std::string output_image_file,
+                               std::string input_mosaic,
+                               std::string output_image,
                                std::string directory,
                                std::string mask,
                                std::string feathering)
@@ -737,8 +767,8 @@ ActionAssembleFilter::Dispatch(Core::ActionContextHandle context,
   action->save_variance_ = save_variance;
   action->remap_values_ = remap_values;
   action->defer_image_loading_ = defer_image_loading;
-  action->input_mosaic_file_ = input_mosaic_file;
-  action->output_image_file_ = output_image_file;
+  action->input_mosaic_ = input_mosaic;
+  action->output_image_ = output_image;
   action->directory_ = directory;
   action->mask_ = mask;
   action->feathering_ = feathering;
