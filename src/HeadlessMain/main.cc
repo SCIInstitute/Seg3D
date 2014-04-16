@@ -39,9 +39,12 @@
 // STL includes
 #include <iostream>
 #include <string>
+#include <csignal>
 
 // boost includes
 #include <boost/preprocessor.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/thread/thread.hpp>
 
 // Core includes
 #include <Core/Utils/Log.h>
@@ -52,19 +55,10 @@
 #include <Core/Action/ActionHistory.h>
 #include <Core/Log/RolloverLogFile.h>
 
-// QtUtils includes
-#include <QtUtils/Utils/QtApplication.h>
-
 // Application includes
 #include <Application/InterfaceManager/InterfaceManager.h>
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Socket/ActionSocket.h>
-
-// Interface includes
-#include <Interface/Application/ApplicationInterface.h>
-
-// Resource includes
-#include <Resources/QtResources.h>
 
 // File that contains a function that registers all the class that need registration,
 // such as Actions and Tools
@@ -78,6 +72,14 @@
 ///////////////////////////////////////////////////////////
 
 using namespace Seg3D;
+
+bool seg3d_forever = true;
+
+void sighandler(int sig)
+{
+  CORE_LOG_MESSAGE( std::string("Received signal: ") + Core::ExportToString( sig ) );
+  seg3d_forever = false;
+}
 
 int main( int argc, char **argv )
 {
@@ -126,26 +128,9 @@ int main( int argc, char **argv )
   // Trigger the application start signal
   Core::Application::Instance()->application_start_signal_();
   
-  // -- Setup the QT Interface Layer --
-  if ( !( QtUtils::QtApplication::Instance()->setup( argc, argv ) ) ) return ( -1 );
-
   // -- Warn user about being an alpha/beta version --
   std::string file_to_view = "";
   Core::Application::Instance()->check_command_line_parameter( "file_to_open_on_start", file_to_view );
-
-  {
-/*
-    std::string warning = std::string( "<h3>" ) +
-      Core::Application::GetApplicationName() + " " + Core::Application::GetVersion() + 
-      "</h3><h6><p align=\"justify\">Please note: This version of " + Core::Application::GetApplicationName()
-      + " is still under development. For daily use we recommend the released version, as" 
-      " stability of this version depends on on going development.</p></h6>";
-    
-    QMessageBox::information( 0, 
-      QString::fromStdString( Core::Application::GetApplicationNameAndVersion() ), 
-      QString::fromStdString( warning )  );
-*/
-  } 
 
   if ( sizeof( void * ) == 4 )
   {
@@ -158,9 +143,6 @@ int main( int argc, char **argv )
       " may run out of addressable memory. If you have a 64-bit machine,"
       " we would recommend to download the 64-bit version</p></h6>";
     
-    QMessageBox::information( 0, 
-      QString::fromStdString( Core::Application::GetApplicationNameAndVersion() ), 
-      QString::fromStdString( warning )  );
   }
 #ifdef BUILD_WITH_PYTHON
   size_t name_len = strlen( argv[ 0 ] );
@@ -196,31 +178,32 @@ int main( int argc, char **argv )
 //  std::string file_to_view = "";
 //  Core::Application::Instance()->check_command_line_parameter( "file_to_open_on_start", file_to_view );
   
-  ApplicationInterface* app_interface = new ApplicationInterface( file_to_view );
 
-  // Show the full interface
-  app_interface->show();
-
-  // Put the interface on top of all the other windows
-  app_interface->raise();
-
-  // The application window needs the qApplication as parent, which is
-  // defined in the QtApplication, which integrates the Qt eventloop with
-  // the interface eventloop of the Application layer.
-
-  // -- Run QT event loop --
-  if ( !( QtUtils::QtApplication::Instance()->exec() ) ) return ( -1 );
+  signal(SIGABRT, &sighandler);
+  signal(SIGTERM, &sighandler);
+  signal(SIGINT, &sighandler);
+  while(seg3d_forever)
+  {
+    // do nothing, check every second for a termination signal
+    boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+  }
 
   // Trigger the application stop signal
+  CORE_LOG_MESSAGE( std::string("sending application stop signal") );
   Core::Application::Instance()->application_stop_signal_();
 
+
   // Finish the remainder of the actions that are still on the application thread.
+  CORE_LOG_MESSAGE( std::string("finishing application") );
   Core::Application::Instance()->finish();
 
   // Indicate a successful finish of the program
+  CORE_LOG_MESSAGE( std::string("finishing log, then exit") );
   Core::Application::Instance()->log_finish();
 
-#if defined (_WIN32) || defined(__APPLE__)
+  // see if we can just return now that we're not using Qt
+  return ( 0 );
+  /*#if defined (_WIN32) || defined(__APPLE__)
   return ( 0 );
 #else
     // NOTE: On Linux Qt tends to crash in one of its static destructors. Since we do not need these
@@ -228,5 +211,5 @@ int main( int argc, char **argv )
     // we need to return in that case.
     exit ( 0 );
 #endif
-
+  */
 }

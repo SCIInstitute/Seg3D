@@ -59,6 +59,7 @@ TARGET_LINK_LIBRARIES(Application_ViewerManager
                       Core_Interface
                       Core_Action
                       Core_State
+          Core_VolumeRenderer
                       Application_Viewer
                       ${SCI_BOOST_LIBRARY})
 
