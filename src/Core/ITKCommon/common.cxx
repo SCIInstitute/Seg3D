@@ -324,7 +324,7 @@ save_mosaic(std::ostream & so,
   for (unsigned int i = 0; i < num_images; i++)
   {
     // Find just the filename to save out to the mosaic.
-    so << "image:" << std::endl << images[i] << std::endl;
+    so << "image:" << std::endl << images[i].string() << std::endl;
     save_transform(so, transform[i]);
     so << std::endl;
   }

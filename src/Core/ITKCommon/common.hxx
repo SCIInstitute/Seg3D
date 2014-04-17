@@ -1419,7 +1419,7 @@ load(const bfs::path& filename, bool blab = true)
   // FIXME: itk::SimpleFilterWatcher w(reader.GetPointer(), "reader");
   
   reader->SetFileName(filename.c_str());
-  if (blab) std::cout << "loading " << filename << std::endl;
+  if (blab) std::cout << "loading " << filename.string() << std::endl;
   
   WRAP(terminator_t<reader_t> terminator(reader));
   

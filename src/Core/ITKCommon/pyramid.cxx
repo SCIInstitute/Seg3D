@@ -2133,8 +2133,8 @@ pyramid_t::setup(const image_t * initial_image,
   if ( adjusted_min_edge > max_sz[1] )
     adjusted_min_edge = max_sz[1];
   unsigned int num_octaves =
-  1 + int(floor(std::min(log(static_cast<double>(max_sz[0]) / adjusted_min_edge),
-                         log(static_cast<double>(max_sz[1]) / adjusted_min_edge)) / LOG_2));
+  1 + static_cast<int>(floor(std::min(log(static_cast<double>(max_sz[0]) / adjusted_min_edge),
+                                      log(static_cast<double>(max_sz[1]) / adjusted_min_edge)) / LOG_2));
   
   // setup the octaves:
   octave_.resize(num_octaves);
@@ -2405,7 +2405,7 @@ save_images(std::ostream & fout,
   for (unsigned int j = 0; j < data.size(); j++)
   {
     std::ostringstream fn;
-    fn << pfx << ":" << the_text_t::number(j) << sfx;
+    fn << pfx.string() << ":" << the_text_t::number(j) << sfx.string();
     save_image<Ti>(fout, fn.str(), data[j]);
   }
 }

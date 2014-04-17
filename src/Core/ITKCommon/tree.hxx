@@ -334,15 +334,15 @@ public:
     {
       for (unsigned int i = 0; i < num_pts_; i++)
       {
-#if 0
-        for (unsigned int j = 0; j < kd; j++)
-        {
-          so << ' ' << points_[i][j];
-        }
-        so << std::endl;
-#else
+//#if 0
+//        for (unsigned int j = 0; j < kd; j++)
+//        {
+//          so << ' ' << points_[i][j];
+//        }
+//        so << std::endl;
+//#else
         so << points_[i] << std::endl;
-#endif
+//#endif
       }
     }
     else
