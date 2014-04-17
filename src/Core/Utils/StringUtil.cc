@@ -288,6 +288,50 @@ std::string StringToLower( std::string str )
   return str;
 }
 
+bool FromString( const std::string &str, unsigned int &value )
+{
+  // Clear out any markup of the numbers that make it easier to read and
+  // replace it all with spaces.
+  std::string data = str + " ";
+  for ( size_t j = 0; j < data.size(); j++ )
+    if ( ( data[ j ] == '\t' ) || ( data[ j ] == '\r' ) || ( data[ j ] == '\n' ) || ( data[ j ]
+          == '"' ) || ( data[ j ] == ',' ) || ( data[ j ] == '[' ) || ( data[ j ] == ']' )
+        || ( data[ j ] == '(' ) || ( data[ j ] == ')' ) ) data[ j ] = ' ';
+  
+  // if empty just return
+  if ( data.size() == 0 ) return ( false );
+  
+  // Handle special cases: max, min
+
+  // handle max
+  if ( data.size() > 2 && ( data[ 0 ] == 'm' || data[ 0 ] == 'M' ) && ( data[ 1 ] == 'a'
+    || data[ 1 ] == 'A' ) && ( data[ 2 ] == 'x' || data[ 2 ] == 'X' ) )
+  {
+    value = std::numeric_limits< double >::max();
+    return ( true );
+  }
+  // handle min
+  else if ( data.size() > 2 && ( data[ 0 ] == 'm' || data[ 0 ] == 'M' ) && ( data[ 1 ] == 'i'
+    || data[ 1 ] == 'I' ) && ( data[ 2 ] == 'n' || data[ 2 ] == 'N' ) )
+  {
+    value = std::numeric_limits< double >::min();
+    return ( true );
+  }
+
+  std::istringstream iss( data );
+  iss.exceptions( std::ifstream::eofbit | std::ifstream::failbit | std::ifstream::badbit );
+  try
+  {
+    iss >> value;
+    return ( true );
+  }
+  catch ( std::istringstream::failure e )
+  {
+    CORE_LOG_DEBUG(e.what());
+    return ( false );
+  }
+}
+  
 bool FromString( const std::string &str, double &value )
 {
   // Clear out any markup of the numbers that make it easier to read and
@@ -301,13 +345,27 @@ bool FromString( const std::string &str, double &value )
   // if empty just return
   if ( data.size() == 0 ) return ( false );
 
-  // Handle special cases: nan, inf, and -inf
+  // Handle special cases: nan, max, min, inf, and -inf
 
   // handle nan
   if ( data.size() > 2 && ( data[ 0 ] == 'n' || data[ 0 ] == 'N' ) && ( data[ 1 ] == 'a'
       || data[ 1 ] == 'A' ) && ( data[ 2 ] == 'n' || data[ 2 ] == 'N' ) )
   {
     value = std::numeric_limits< double >::quiet_NaN();
+    return ( true );
+  }
+  // handle max
+  else if ( data.size() > 2 && ( data[ 0 ] == 'm' || data[ 0 ] == 'M' ) && ( data[ 1 ] == 'a'
+    || data[ 1 ] == 'A' ) && ( data[ 2 ] == 'x' || data[ 2 ] == 'X' ) )
+  {
+    value = std::numeric_limits< double >::max();
+    return ( true );
+  }
+  // handle min
+  else if ( data.size() > 2 && ( data[ 0 ] == 'm' || data[ 0 ] == 'M' ) && ( data[ 1 ] == 'i'
+    || data[ 1 ] == 'I' ) && ( data[ 2 ] == 'n' || data[ 2 ] == 'N' ) )
+  {
+    value = std::numeric_limits< double >::min();
     return ( true );
   }
   // handle inf
@@ -379,6 +437,20 @@ bool FromString( const std::string &str, float &value )
       || data[ 1 ] == 'A' ) && ( data[ 2 ] == 'n' || data[ 2 ] == 'N' ) )
   {
     value = std::numeric_limits< float >::quiet_NaN();
+    return ( true );
+  }
+  // handle max
+  else if ( data.size() > 2 && ( data[ 0 ] == 'm' || data[ 0 ] == 'M' ) && ( data[ 1 ] == 'a'
+                                                                            || data[ 1 ] == 'A' ) && ( data[ 2 ] == 'x' || data[ 2 ] == 'X' ) )
+  {
+    value = std::numeric_limits< float >::max();
+    return ( true );
+  }
+  // handle min
+  else if ( data.size() > 2 && ( data[ 0 ] == 'm' || data[ 0 ] == 'M' ) && ( data[ 1 ] == 'i'
+                                                                            || data[ 1 ] == 'I' ) && ( data[ 2 ] == 'n' || data[ 2 ] == 'N' ) )
+  {
+    value = std::numeric_limits< float >::min();
     return ( true );
   }
   // handle inf
