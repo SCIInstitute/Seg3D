@@ -51,9 +51,9 @@ CORE_ACTION(
   CORE_ACTION_OPTIONAL_ARGUMENT( "shrink_factor", "1", "Downsample factor." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "num_threads", "0", "Number of threads used (if 0, number of cores will be used)." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "iterations", "10", "Run algorithm for given number of iterations." )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "cell_size", "1", "Cell size." )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "mesh_rows", "0", "Transform mesh rows." )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "mesh_cols", "0", "Transform mesh columns." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "cell_size", "0", "Cell size (4 or larger). Set either cell_size, or mesh_rows and mesh_cols." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "mesh_rows", "0", "Transform mesh rows (2 or larger). Set either cell_size, or mesh_rows and mesh_cols." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "mesh_cols", "0", "Transform mesh columns (2 or larger). Set either cell_size, or mesh_rows and mesh_cols." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "pixel_spacing", "1.0", "Pixel spacing." )          
   CORE_ACTION_OPTIONAL_ARGUMENT( "displacement_threshold", "1.0", "Pixel spacing." )          
   CORE_ACTION_OPTIONAL_ARGUMENT( "use_standard_mask", "false", "Use the default mask." )
@@ -75,8 +75,8 @@ public:
     MOVE_ALL_TILES(false)
   {
     this->add_layer_id( this->target_layer_ );
-    this->add_parameter( this->input_mosaic_file_ );
-    this->add_parameter( this->output_mosaic_file_ );
+    this->add_parameter( this->input_mosaic_ );
+    this->add_parameter( this->output_mosaic_ );
     this->add_parameter( this->directory_ );
     this->add_parameter( this->shrink_factor_ );
     this->add_parameter( this->num_threads_ );
@@ -106,8 +106,8 @@ public:
                        double pixel_spacing,
                        double displacement_threshold,
                        bool use_standard_mask,
-                       std::string input_mosaic_file,
-                       std::string output_mosaic_file,
+                       std::string input_mosaic,
+                       std::string output_mosaic,
                        std::string directory);
   
 private:
@@ -123,8 +123,8 @@ private:
   double pixel_spacing_;
   double displacement_threshold_;
   bool use_standard_mask_;  
-  std::string input_mosaic_file_;
-  std::string output_mosaic_file_;
+  std::string input_mosaic_;
+  std::string output_mosaic_;
   std::string directory_;
   
   const unsigned int MAX_ITERATIONS;

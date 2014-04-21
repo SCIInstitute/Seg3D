@@ -158,7 +158,38 @@ typedef itk::LinearInterpolateImageFunction<image_t, double> image_interpolator_
 bool
 ActionRefineGridFilter::validate( Core::ActionContextHandle& context )
 {
-  return true;
+  if (this->cell_size_ == 0 && (this->mesh_rows_ == 0 || this->mesh_cols_ == 0))
+  {
+    context->report_error("Set either cell_size or mesh parameters (mesh_rows and mesh_cols).");
+    return false;
+  }
+
+  if ( this->cell_size_ < 4 && (this->mesh_rows_ == 0 || this->mesh_cols_ == 0) )
+  {
+    context->report_error("The cell_size parameter needs to be larger than 4. Alternatively, set mesh_rows and mesh_cols (2 or larger).");
+    return false;
+  }
+  
+  bool result = true;
+  if ( this->cell_size_ == 0 && this->mesh_rows_ < 2 )
+  {
+    context->report_error("The mesh_rows parameter needs to be larger than 2. Alternatively, set cell_size (larger than 4).");
+    result = false;
+  }
+  
+  if ( this->cell_size_ == 0 && this->mesh_cols_ < 2 )
+  {
+    context->report_error("The mesh_cols parameter needs to be larger than 2. Alternatively, set cell_size (larger than 4).");
+    result = false;
+  }
+  
+  if ( this->cell_size_ > 0 && (this->mesh_rows_ > 0 || this->mesh_cols_ > 0) )
+  {
+    CORE_LOG_WARNING("Set either cell_size or mesh_rows and mesh_cols. The cell_size parameter will be ignored.");
+    this->cell_size_ = 0;
+  }
+  
+  return result;
 }
 
 bool
@@ -186,9 +217,20 @@ ActionRefineGridFilter::run( Core::ActionContextHandle& context, Core::ActionRes
     {
       pixel_spacing_user_override = true;
     }
-    bfs::path fn_results(this->output_mosaic_file_);
+    bfs::path fn_results(this->output_mosaic_);
+    if (! bfs::is_directory( fn_results.parent_path() ) )
+    {
+      CORE_LOG_DEBUG(std::string("Creating parent path to ") + this->output_mosaic_);
+      if (! boost::filesystem::create_directories(fn_results.parent_path()))
+      {
+        std::ostringstream oss;
+        oss << "Could not create missing directory " << fn_results.parent_path() << " required to create output mosaic.";
+        CORE_LOG_ERROR(oss.str());
+        return false;
+      }
+    }
     
-    bfs::path fn_in(this->input_mosaic_file_);
+    bfs::path fn_in(this->input_mosaic_);
     bfs::path image_dir(this->directory_);
     
     // TODO: expose?
@@ -232,10 +274,12 @@ ActionRefineGridFilter::run( Core::ActionContextHandle& context, Core::ActionRes
     }
     
     unsigned int num_images = tbase.size();
-  //  assert(pixel_spacing != 0);
+
     if (this->pixel_spacing_ == 0)
     {
-      CORE_LOG_ERROR("Pixel spacing is zero");
+      std::ostringstream oss;
+      oss << "Refine grid pixel spacing is zero after loading mosaic " << fn_in;
+      CORE_LOG_ERROR(oss.str());
       return false;
     }
     
@@ -273,13 +317,7 @@ ActionRefineGridFilter::run( Core::ActionContextHandle& context, Core::ActionRes
       std::cout << "No images passed the test, nothing to save out." << std::endl;
     }
     
-    if (this->cell_size_ == 0 && (this->mesh_rows_ == 0 || this->mesh_cols_ == 0))
-    {
-  //    usage("you must specify either the -cell or -mesh parameter");
-      CORE_LOG_ERROR("Set either cell_size or mesh parameters (mesh_rows and mesh_cols).");
-      return false;
-    }
-    else if (this->cell_size_ == 0)
+    if (this->cell_size_ == 0)
     {
       // calculate the cell size from the rows/cols:
       image_t::SizeType sz = image[0]->GetLargestPossibleRegion().GetSize();
@@ -318,7 +356,6 @@ ActionRefineGridFilter::run( Core::ActionContextHandle& context, Core::ActionRes
                                      PICKUP_PACE_STEPS);
       if (!ok)
       {
-  //      assert(false);
         CORE_LOG_ERROR("setup_grid_transform failed");
         return false;
       }
@@ -381,11 +418,28 @@ ActionRefineGridFilter::run( Core::ActionContextHandle& context, Core::ActionRes
     // done:
     return true;
   }
+  catch (bfs::filesystem_error &err)
+  {
+    context->report_error(err.what());
+  }
+  catch (itk::ExceptionObject &err)
+  {
+    context->report_error(err.GetDescription());
+  }
+  catch (Core::Exception &err)
+  {
+    context->report_error(err.what());
+    context->report_error(err.message());
+  }
+  catch (std::exception &err)
+  {
+    context->report_error(err.what());
+  }
   catch (...)
   {
-    CORE_LOG_ERROR("Exception caught");
-    return false;
+    context->report_error("Unknown exception type caught.");
   }
+  return false;
 }
 
 
@@ -401,8 +455,8 @@ ActionRefineGridFilter::Dispatch(Core::ActionContextHandle context,
                                  double pixel_spacing,
                                  double displacement_threshold,
                                  bool use_standard_mask,
-                                 std::string input_mosaic_file,
-                                 std::string output_mosaic_file,
+                                 std::string input_mosaic,
+                                 std::string output_mosaic,
                                  std::string directory)
 {
   // Create a new action
@@ -410,8 +464,8 @@ ActionRefineGridFilter::Dispatch(Core::ActionContextHandle context,
   
   // Setup the parameters
   action->target_layer_ = target_layer;
-  action->input_mosaic_file_ = input_mosaic_file;
-  action->output_mosaic_file_ = output_mosaic_file;
+  action->input_mosaic_ = input_mosaic;
+  action->output_mosaic_ = output_mosaic;
   action->directory_ = directory;
   action->shrink_factor_ = shrink_factor;
   action->num_threads_ = num_threads;

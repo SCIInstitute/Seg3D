@@ -89,15 +89,15 @@ ActionFFTFilter::run( Core::ActionContextHandle& context, Core::ActionResultHand
     // parse the command line arguments:
     std::list<bfs::path> in;
 
-    bfs::path fn_results(this->output_mosaic_file_);
+    bfs::path fn_results(this->output_mosaic_);
     if (! bfs::is_directory( fn_results.parent_path() ) )
     {
-      CORE_LOG_DEBUG(std::string("Creating parent path to ") + this->output_mosaic_file_);
+      CORE_LOG_DEBUG(std::string("Creating parent path to ") + this->output_mosaic_);
       if (! boost::filesystem::create_directories(fn_results.parent_path()))
       {
         std::ostringstream oss;
         oss << "Could not create missing directory " << fn_results.parent_path() << " required to create output mosaic.";
-        CORE_LOG_ERROR(oss.str());
+        context->report_error(oss.str());
         return false;
       }
     }
@@ -119,12 +119,12 @@ ActionFFTFilter::run( Core::ActionContextHandle& context, Core::ActionResultHand
     {
       std::ostringstream oss;
       oss << directory.string() << " is not a directory.";
-      CORE_LOG_ERROR(oss.str());
+      context->report_error(oss.str());
       return false;
     }
     // populate image list, filter for regular files before attempting to pass entries to ITK
     // providing list of files is not required
-    if ( this->files_.empty() )
+    if ( this->images_.empty() )
     {
       bfs::recursive_directory_iterator it(directory);
       bfs::recursive_directory_iterator end;
@@ -138,9 +138,9 @@ ActionFFTFilter::run( Core::ActionContextHandle& context, Core::ActionResultHand
     }
     else
     {
-      for (unsigned int i = 0; i < this->files_.size(); i++)
+      for (unsigned int i = 0; i < this->images_.size(); i++)
       {
-        bfs::path image_path = directory / this->files_[i];
+        bfs::path image_path = directory / this->images_[i];
         if ( bfs::is_regular_file(image_path) )
         {
           in.push_back(image_path);
@@ -151,7 +151,7 @@ ActionFFTFilter::run( Core::ActionContextHandle& context, Core::ActionResultHand
     
     if (in.size() < 2 && ! this->run_on_one_)
     {
-      CORE_LOG_ERROR("FFT filter requires at least 2 input images unless explicitly running on one image.");
+      context->report_error("FFT filter requires at least 2 input images unless explicitly running on one image.");
       return false;
     }
     
@@ -162,7 +162,7 @@ ActionFFTFilter::run( Core::ActionContextHandle& context, Core::ActionResultHand
     {
       std::ostringstream oss;
       oss << "Could not open " << fn_results.string() << " for writing.";
-      CORE_LOG_ERROR(oss.str());
+      context->report_error(oss.str());
       return false;
     }
     
@@ -220,7 +220,7 @@ ActionFFTFilter::run( Core::ActionContextHandle& context, Core::ActionResultHand
     if (image.size() < 2 && !this->run_on_one_)
     {
   //    usage("FFT requires 2 or more valid image files.");
-      CORE_LOG_ERROR("FFT requires 2 or more valid image files.");
+      context->report_error("FFT requires 2 or more valid image files.");
       return false;
     }
     
@@ -425,24 +425,24 @@ ActionFFTFilter::run( Core::ActionContextHandle& context, Core::ActionResultHand
   }
   catch (bfs::filesystem_error &err)
   {
-    CORE_LOG_ERROR(err.what());
+    context->report_error(err.what());
   }
   catch (itk::ExceptionObject &err)
   {
-    CORE_LOG_ERROR(err.GetDescription());
+    context->report_error(err.GetDescription());
   }
   catch (Core::Exception &err)
   {
-    CORE_LOG_ERROR(err.what());
-    CORE_LOG_ERROR(err.message());
+    context->report_error(err.what());
+    context->report_error(err.message());
   }
   catch (std::exception &err)
   {
-    CORE_LOG_ERROR(err.what());
+    context->report_error(err.what());
   }
   catch (...)
   {
-    CORE_LOG_ERROR("Unknown exception type caught.");
+    context->report_error("Unknown exception type caught.");
   }
   return false;
 }
@@ -451,8 +451,8 @@ void
 ActionFFTFilter::Dispatch(Core::ActionContextHandle context,
                           std::string target_layer,
                           std::string directory,
-                          std::string output_mosaic_file,
-                          std::vector<std::string> files,
+                          std::string output_mosaic,
+                          std::vector<std::string> images,
                           unsigned int shrink_factor,
                           unsigned int pyramid_levels,
                           unsigned int iterations_per_level,
@@ -470,9 +470,9 @@ ActionFFTFilter::Dispatch(Core::ActionContextHandle context,
   // Setup the parameters
   // TODO: file & directory mechanism is clumsy - fix this!!!
   action->target_layer_ = target_layer;
-  action->files_ = files;
+  action->images_ = images;
   action->directory_ = directory;
-  action->output_mosaic_file_ = output_mosaic_file;
+  action->output_mosaic_ = output_mosaic;
   action->shrink_factor_ = shrink_factor;
   action->pyramid_levels_ = pyramid_levels;
   action->iterations_per_level_ = iterations_per_level;

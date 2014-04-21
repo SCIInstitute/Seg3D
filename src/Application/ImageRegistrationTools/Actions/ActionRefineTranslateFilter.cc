@@ -108,7 +108,6 @@ ActionRefineTranslateFilter::run( Core::ActionContextHandle& context, Core::Acti
     the_thread_interface_t::set_creator(the_boost_thread_t::create);
     
     // parse the command line arguments:
-  //  unsigned int shrink_factor = 8;
     bool pixel_spacing_user_override = false;
     if (this->pixel_spacing_ != 1.0) // TODO: improve this check
     {
@@ -121,18 +120,26 @@ ActionRefineTranslateFilter::run( Core::ActionContextHandle& context, Core::Acti
       this->num_threads_ = boost::thread::hardware_concurrency();
     }
 
-    bfs::path fn_results(this->output_mosaic_file_);
+    bfs::path fn_results(this->output_mosaic_);
+    if (! bfs::is_directory( fn_results.parent_path() ) )
+    {
+      CORE_LOG_DEBUG(std::string("Creating parent path to ") + this->output_mosaic_);
+      if (! boost::filesystem::create_directories(fn_results.parent_path()))
+      {
+        std::ostringstream oss;
+        oss << "Could not create missing directory " << fn_results.parent_path() << " required to create output mosaic.";
+        context->report_error(oss.str());
+        return false;
+      }
+    }
+
     std::vector<bfs::path> imagePathVector;
     std::vector<bfs::path> maskPathVector;
     double max_offset[2];
-  //  max_offset[0] = std::numeric_limits<double>::max();
-  //  max_offset[1] = std::numeric_limits<double>::max();
     max_offset[0] = this->max_offset_x_;
     max_offset[1] = this->max_offset_y_;
 
     double black_mask_percent[2];
-  //  black_mask_percent[0] = std::numeric_limits<double>::max();
-  //  black_mask_percent[1] = std::numeric_limits<double>::max();
     black_mask_percent[0] = this->black_mask_x_;
     black_mask_percent[1] = this->black_mask_y_;
 
@@ -158,7 +165,7 @@ ActionRefineTranslateFilter::run( Core::ActionContextHandle& context, Core::Acti
     std::list<bfs::path> in;
     std::vector<base_transform_t::Pointer> tbase;
     
-    bfs::path fn_in(this->input_mosaic_file_);
+    bfs::path fn_in(this->input_mosaic_);
     bfs::path image_dir(this->directory_);
     
     IRRefineTranslateCanvas canvas;
@@ -169,7 +176,7 @@ ActionRefineTranslateFilter::run( Core::ActionContextHandle& context, Core::Acti
     {
       std::ostringstream oss;
       oss << "Could not open " << fn_in << " for reading.";
-      CORE_LOG_ERROR(oss.str());
+      context->report_error(oss.str());
       return false;
     }
     
@@ -199,9 +206,11 @@ ActionRefineTranslateFilter::run( Core::ActionContextHandle& context, Core::Acti
     
     unsigned int num_images = tbase.size();
     //if (num_images < 2) { usage("less than 2 images in the mosaic"); return false; }
-    if (!this->pixel_spacing_)
+    if (this->pixel_spacing_ == 0)
     {
-      CORE_LOG_ERROR("pixel spacing is zero");
+      std::ostringstream oss;
+      oss << "Refine translate pixel spacing is zero after loading mosaic " << fn_in;
+      context->report_error(oss.str());
       return false;
     }
     
@@ -277,6 +286,7 @@ ActionRefineTranslateFilter::run( Core::ActionContextHandle& context, Core::Acti
     canvas.fillTransformAndImageIDVectors(transforms, imageIDs, maskIDs);
     
     // save the results:
+    // TODO: rewrite so that empty mosaic files are not produced?
     std::fstream fout;
     fout.open(fn_results.c_str(), ios::out);
     
@@ -284,7 +294,7 @@ ActionRefineTranslateFilter::run( Core::ActionContextHandle& context, Core::Acti
     {
       std::ostringstream oss;
       oss << "Could not open " << fn_results << " for writing.";
-      CORE_LOG_ERROR(oss.str());
+      context->report_error(oss.str());
       return false;
     }
     
@@ -292,7 +302,7 @@ ActionRefineTranslateFilter::run( Core::ActionContextHandle& context, Core::Acti
     
     if (num_images == 1)
     {
-      std::cout << "Only one image passed the test, saving out without any registration." << std::endl;
+      CORE_LOG_DEBUG("Only one image passed the test, saving out without any registration.");
       
       save_mosaic<base_transform_t>(fout,
                                     this->pixel_spacing_,
@@ -304,7 +314,7 @@ ActionRefineTranslateFilter::run( Core::ActionContextHandle& context, Core::Acti
     
     if ( imageIDs.size() == 0 )
     {
-      std::cout << "No overlapping images found, nothing to save out." << std::endl;
+      context->report_warning("No overlapping images found, nothing to save out.");
     }
     else
     {
@@ -323,11 +333,28 @@ ActionRefineTranslateFilter::run( Core::ActionContextHandle& context, Core::Acti
     // done:
     return true;
   }
+  catch (bfs::filesystem_error &err)
+  {
+    context->report_error(err.what());
+  }
+  catch (itk::ExceptionObject &err)
+  {
+    context->report_error(err.GetDescription());
+  }
+  catch (Core::Exception &err)
+  {
+    context->report_error(err.what());
+    context->report_error(err.message());
+  }
+  catch (std::exception &err)
+  {
+    context->report_error(err.what());
+  }
   catch (...)
   {
-    CORE_LOG_ERROR("Exception caught");
-    return false;
+    context->report_error("Unknown exception type caught.");
   }
+  return false;
 }
 
 void
@@ -344,8 +371,8 @@ ActionRefineTranslateFilter::Dispatch(Core::ActionContextHandle context,
                                       double black_mask_y,
                                       bool use_standard_mask,
                                       bool use_clahe,
-                                      std::string input_mosaic_file,
-                                      std::string output_mosaic_file,
+                                      std::string input_mosaic,
+                                      std::string output_mosaic,
                                       std::string directory)
   {
     // Create a new action
@@ -364,8 +391,8 @@ ActionRefineTranslateFilter::Dispatch(Core::ActionContextHandle context,
     action->black_mask_y_ = black_mask_y;
     action->use_standard_mask_ = use_standard_mask;
     action->use_clahe_ = use_clahe;
-    action->input_mosaic_file_ = input_mosaic_file;
-    action->output_mosaic_file_ = output_mosaic_file;
+    action->input_mosaic_ = input_mosaic;
+    action->output_mosaic_ = output_mosaic;
     action->directory_ = directory;
     
     // Dispatch action to underlying engine

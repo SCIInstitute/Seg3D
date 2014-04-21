@@ -48,9 +48,10 @@ class ActionFFTFilter : public LayerAction
 CORE_ACTION(
   CORE_ACTION_TYPE( "FFTFilter", "ir-fft" )
   CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
-  CORE_ACTION_ARGUMENT( "directory", "Image file directory. If files is not used, then filter will search directory for image files." )
-  CORE_ACTION_ARGUMENT( "output_mosaic_file", "Output mosaic file." )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "files", "[]", "Image file names." )
+  CORE_ACTION_ARGUMENT( "directory",
+   "Image file directory. If 'images' parameter is not used, then filter will search directory for image files." )
+  CORE_ACTION_ARGUMENT( "output_mosaic", "Output mosaic file." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "images", "[]", "Image file names (optional, images can be detected in image file directory)." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "shrink_factor", "1", "Downsample factor." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "pyramid_levels", "1", "Number of multiresolution pyramid levels." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "iterations_per_level", "5", "Iterations per pyramid level." )
@@ -73,8 +74,8 @@ public:
   {
     this->add_layer_id( this->target_layer_ );
     this->add_parameter( this->directory_ );
-    this->add_parameter( this->output_mosaic_file_ );
-    this->add_parameter( this->files_ );
+    this->add_parameter( this->output_mosaic_ );
+    this->add_parameter( this->images_ );
     this->add_parameter( this->shrink_factor_ );
     this->add_parameter( this->pyramid_levels_ );
     this->add_parameter( this->iterations_per_level_ );
@@ -96,8 +97,8 @@ public:
   static void Dispatch(Core::ActionContextHandle context,
                        std::string target_layer,
                        std::string directory,
-                       std::string output_mosaic_file,
-                       std::vector<std::string> files,
+                       std::string output_mosaic,
+                       std::vector<std::string> images,
                        unsigned int shrink_factor,
                        unsigned int pyramid_levels,
                        unsigned int iterations_per_level,
@@ -114,8 +115,8 @@ private:
   SandboxID sandbox_;  
   
   std::string directory_;
-  std::string output_mosaic_file_;
-  std::vector<std::string> files_;
+  std::string output_mosaic_;
+  std::vector<std::string> images_;
   unsigned int shrink_factor_;
   unsigned int pyramid_levels_;
   unsigned int iterations_per_level_;

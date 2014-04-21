@@ -53,10 +53,10 @@ CORE_ACTION(
   CORE_ACTION_OPTIONAL_ARGUMENT( "prune_tile_size", "32", "" )
   CORE_ACTION_OPTIONAL_ARGUMENT( "pixel_spacing", "1.0", "Pixel spacing." )          
   CORE_ACTION_OPTIONAL_ARGUMENT( "intensity_tolerance", "0", "Intensity tolerance." )          
-  CORE_ACTION_OPTIONAL_ARGUMENT( "max_offset_x", "std::numeric_limits<double>::max()", "" )          
-  CORE_ACTION_OPTIONAL_ARGUMENT( "max_offset_y", "std::numeric_limits<double>::max()", "" )          
-  CORE_ACTION_OPTIONAL_ARGUMENT( "black_mask_x", "std::numeric_limits<double>::max()", "" )          
-  CORE_ACTION_OPTIONAL_ARGUMENT( "black_mask_y", "std::numeric_limits<double>::max()", "" )          
+  CORE_ACTION_OPTIONAL_ARGUMENT( "max_offset_x", "max", "" )          
+  CORE_ACTION_OPTIONAL_ARGUMENT( "max_offset_y", "max", "" )          
+  CORE_ACTION_OPTIONAL_ARGUMENT( "black_mask_x", "max", "" )          
+  CORE_ACTION_OPTIONAL_ARGUMENT( "black_mask_y", "max", "" )          
   CORE_ACTION_OPTIONAL_ARGUMENT( "use_standard_mask", "false", "Use the default mask." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "use_clahe", "true", "Use the default mask." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "sandbox", "-1", "The sandbox in which to run the action." )
@@ -69,6 +69,9 @@ public:
   ActionRefineTranslateFilter()
   {
     this->add_layer_id( this->target_layer_ );
+    this->add_parameter( this->input_mosaic_ );
+    this->add_parameter( this->output_mosaic_ );
+    this->add_parameter( this->directory_ );
     this->add_parameter( this->shrink_factor_ );
     this->add_parameter( this->num_threads_ );
     this->add_parameter( this->prune_tile_size_ );
@@ -80,9 +83,6 @@ public:
     this->add_parameter( this->black_mask_y_ );
     this->add_parameter( this->use_standard_mask_ );
     this->add_parameter( this->use_clahe_ );
-    this->add_parameter( this->input_mosaic_file_ );
-    this->add_parameter( this->output_mosaic_file_ );
-    this->add_parameter( this->directory_ );
     this->add_parameter( this->sandbox_ );
   }
   
@@ -104,8 +104,8 @@ public:
                        double black_mask_y,
                        bool use_standard_mask,
                        bool use_clahe,
-                       std::string input_mosaic_file,
-                       std::string output_mosaic_file,
+                       std::string input_mosaic,
+                       std::string output_mosaic,
                        std::string directory);
   
 private:
@@ -123,8 +123,8 @@ private:
   double black_mask_y_;
   bool use_standard_mask_;
   bool use_clahe_;
-  std::string input_mosaic_file_;
-  std::string output_mosaic_file_;
+  std::string input_mosaic_;
+  std::string output_mosaic_;
   std::string directory_;
 };
 

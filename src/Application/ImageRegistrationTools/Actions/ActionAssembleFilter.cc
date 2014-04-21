@@ -99,7 +99,7 @@ ActionAssembleFilter::run( Core::ActionContextHandle& context, Core::ActionResul
       {
         std::ostringstream oss;
         oss << "Could not create missing directory " << fn_save.parent_path() << " required to create output image.";
-        CORE_LOG_ERROR(oss.str());
+        context->report_error(oss.str());
         return false;
       }
     }
@@ -130,13 +130,13 @@ ActionAssembleFilter::run( Core::ActionContextHandle& context, Core::ActionResul
     {
       std::ostringstream oss;
       oss << fn_in << " cannot be found." << std::endl;
-      CORE_LOG_ERROR(oss.str());
+      context->report_error(oss.str());
       // return false;
     }
 
     if (fn_in.extension() != ".mosaic")
     {
-      CORE_LOG_WARNING(fn_in.string() + " does not have the .mosaic extension.");
+      context->report_warning(fn_in.string() + " does not have the .mosaic extension.");
     }
 
     bfs::path image_dir(this->directory_);
@@ -144,7 +144,7 @@ ActionAssembleFilter::run( Core::ActionContextHandle& context, Core::ActionResul
     {
       std::ostringstream oss;
       oss << image_dir << " cannot be found." << std::endl;
-      CORE_LOG_ERROR(oss.str());
+      context->report_error(oss.str());
       // return false;
     }
     
@@ -181,7 +181,7 @@ ActionAssembleFilter::run( Core::ActionContextHandle& context, Core::ActionResul
     {
       std::ostringstream oss;
       oss << "could not open " << fn_in << " for reading";
-      CORE_LOG_ERROR(oss.str());
+      context->report_error(oss.str());
       return false;
     }
     
@@ -199,10 +199,12 @@ ActionAssembleFilter::run( Core::ActionContextHandle& context, Core::ActionResul
     }
     
     unsigned int num_images = transform.size();
-  //  assert(this->pixel_spacing_ != 0);
+
     if (this->pixel_spacing_ == 0)
     {
-      CORE_LOG_ERROR("Pixel spacing is zero");
+      std::ostringstream oss;
+      oss << "Assemble pixel spacing is zero after loading mosaic " << fn_in;
+      context->report_error(oss.str());
       return false;
     }
     
@@ -212,8 +214,8 @@ ActionAssembleFilter::run( Core::ActionContextHandle& context, Core::ActionResul
     if ( ! this->defer_image_loading_ )
     {
       unsigned int i = 0;
-      //    for (std::list<the_text_t>::const_iterator iter = in.begin();
-      //         iter != in.end(); ++iter, i++)
+//    for (std::list<the_text_t>::const_iterator iter = in.begin();
+//         iter != in.end(); ++iter, i++)
       for (std::list<bfs::path>::const_iterator iter = in.begin();
            iter != in.end(); ++iter, i++)
       {
@@ -254,19 +256,19 @@ ActionAssembleFilter::run( Core::ActionContextHandle& context, Core::ActionResul
     // sanity checks:
     if (fn_save.empty())
     {
-      CORE_LOG_ERROR("Missing output filename.");
+      context->report_error("Missing output filename.");
       return false;
     }
     
     if (in.empty())
     {
-      CORE_LOG_ERROR("Missing input file(s).");
+      context->report_error("Missing input file(s).");
       return false;
     }
     
     if (this->defer_image_loading_ && !save_tiles)
     {
-      CORE_LOG_ERROR("Defer image loading requires tile_width and tile_height arguments.");
+      context->report_error("Defer image loading requires tile_width and tile_height arguments.");
       return false;
     }
     
@@ -707,24 +709,24 @@ ActionAssembleFilter::run( Core::ActionContextHandle& context, Core::ActionResul
   }
   catch (bfs::filesystem_error &err)
   {
-    CORE_LOG_ERROR(err.what());
+    context->report_error(err.what());
   }
   catch (itk::ExceptionObject &err)
   {
-    CORE_LOG_ERROR(err.GetDescription());
+    context->report_error(err.GetDescription());
   }
   catch (Core::Exception &err)
   {
-    CORE_LOG_ERROR(err.what());
-    CORE_LOG_ERROR(err.message());
+    context->report_error(err.what());
+    context->report_error(err.message());
   }
   catch (std::exception &err)
   {
-    CORE_LOG_ERROR(err.what());
+    context->report_error(err.what());
   }
   catch (...)
   {
-    CORE_LOG_ERROR("Unknown exception type caught.");
+    context->report_error("Unknown exception type caught.");
   }
   return false;
 }
