@@ -331,50 +331,50 @@ template<class TInputImage>
 void
 StatisticsImageFilterWithMask<TInputImage>
 ::ThreadedGenerateData(const RegionType& outputRegionForThread,
-                       int threadId) 
+                       ThreadIdType threadId) 
 {
   RealType realValue;
   PixelType value;
   ImageRegionConstIteratorWithIndex<TInputImage> it (this->GetInput(), outputRegionForThread);
-  
+
   // support progress methods/callbacks
   ProgressReporter progress(this, threadId, outputRegionForThread.GetNumberOfPixels());
-  
+
   const TInputImage * image = this->GetInput();
-  
+
   // do the work
   while (!it.IsAtEnd())
-    {
+  {
     bool skip = false;
     if (m_ImageMask)
-      {
-	// test the mask:
-	PointType point;
-	image->TransformIndexToPhysicalPoint( it.GetIndex(), point );
-	skip = !m_ImageMask->IsInside( point );
-      }
-    
+    {
+      // test the mask:
+      PointType point;
+      image->TransformIndexToPhysicalPoint( it.GetIndex(), point );
+      skip = !m_ImageMask->IsInside( point );
+    }
+
     if (!skip)
-      {
+    {
       value = it.Get();
       realValue = static_cast<RealType>( value );
       if (value < m_ThreadMin[threadId])
-        {
-	m_ThreadMin[threadId] = value;
-        }
+      {
+        m_ThreadMin[threadId] = value;
+      }
       if (value > m_ThreadMax[threadId])
-        {
-	m_ThreadMax[threadId] = value;
-        }
-      
+      {
+        m_ThreadMax[threadId] = value;
+      }
+
       m_ThreadSum[threadId] += realValue;
       m_SumOfSquares[threadId] += (realValue * realValue);
       m_Count[threadId]++;
-      }
-    
+    }
+
     ++it;
     progress.CompletedPixel();
-    }
+  }
 }
 
 template <class TImage>
