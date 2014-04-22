@@ -446,12 +446,29 @@ ActionBlobFeatureEnhancementFilter::run( Core::ActionContextHandle& context, Cor
     
     bfs::path fn_mask;
     bfs::path fn_load(this->input_image_);
+
     bfs::path fn_save(this->output_image_);
+    if (fn_save.empty())
+    {
+      context->report_error("Filter requires an output image file");
+      return false;
+    }
+
+    if (! bfs::is_directory( fn_save.parent_path() ) )
+    {
+      CORE_LOG_DEBUG(std::string("Creating parent path to ") + this->output_image_);
+      if (! boost::filesystem::create_directories(fn_save.parent_path()))
+      {
+        std::ostringstream oss;
+        oss << "Could not create missing directory " << fn_save.parent_path() << " required to create output image.";
+        context->report_error(oss.str());
+        return false;
+      }
+    }
     
     mask_t::Pointer image_mask;
     
     // by default run as many threads as there are cores:
-  //  unsigned int num_threads = boost::thread::hardware_concurrency();
     if (this->num_threads_ == 0)
     {
       this->num_threads_ = boost::thread::hardware_concurrency();
@@ -463,15 +480,7 @@ ActionBlobFeatureEnhancementFilter::run( Core::ActionContextHandle& context, Cor
     
     if (! bfs::exists(fn_load) )
     {
-  //    usage("must specify a file to open with the -load option");
-      CORE_LOG_ERROR("Filter requires an input image file");
-      return false;
-    }
-    
-    if (fn_save.empty())
-    {
-  //    usage("must specify a file to open with the -save option");
-      CORE_LOG_ERROR("Filter requires an output image file");
+      context->report_error("Filter requires an input image file");
       return false;
     }
     
@@ -526,11 +535,28 @@ ActionBlobFeatureEnhancementFilter::run( Core::ActionContextHandle& context, Cor
     // done:
     return true;
   }
+  catch (bfs::filesystem_error &err)
+  {
+    context->report_error(err.what());
+  }
+  catch (itk::ExceptionObject &err)
+  {
+    context->report_error(err.GetDescription());
+  }
+  catch (Core::Exception &err)
+  {
+    context->report_error(err.what());
+    context->report_error(err.message());
+  }
+  catch (std::exception &err)
+  {
+    context->report_error(err.what());
+  }
   catch (...)
   {
-    CORE_LOG_ERROR("Exception caught");
-    return false;
+    context->report_error("Unknown exception type caught.");
   }
+  return false;
 }
 
 
