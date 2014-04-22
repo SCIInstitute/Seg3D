@@ -1,1 +1,5 @@
-This directory contains some sample/test scripts for the registration tools recently added to Seg3D.
+This directory contains some sample/test scripts for the registration tools recently added to Seg3D. The configuration file settings.in contains file paths used on a test computer.
+
+Scripts:
+MV_basic_pipeline1.py: tests MouseVolume dataset registration using fft, stos brute and slice to volume filters.
+polson3319_pipeline1.py: tests Polson3319 dataset registration using fft, refine grid, stos brute and slice to volume filters.
