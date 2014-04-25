@@ -196,14 +196,28 @@ ActionFFTFilter::run( Core::ActionContextHandle& context, Core::ActionResultHand
         
         if (this->clahe_slope_ > 1.0)
         {
-          image[idx] = CLAHE<image_t>(image[idx],
-                                      255,
-                                      255,
-                                      this->clahe_slope_,
-                                      256,
-                                      0.0,
-                                      255.0,
-                                      mask[idx]);
+          try
+          {
+            image[idx] = CLAHE<image_t>(image[idx],
+                                        255,
+                                        255,
+                                        this->clahe_slope_,
+                                        256,
+                                        0.0,
+                                        255.0,
+                                        mask[idx]);
+          }
+          catch (itk::ExceptionObject &err)
+          {
+            context->report_error("Clahe failed.");
+            context->report_error(err.GetDescription());
+          }
+          catch (Core::Exception &err)
+          {
+            context->report_error("Clahe failed.");
+            context->report_error(err.what());
+            context->report_error(err.message());
+          }
         }
       }
     }
