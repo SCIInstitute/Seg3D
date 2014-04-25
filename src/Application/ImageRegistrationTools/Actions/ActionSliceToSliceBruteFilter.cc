@@ -729,7 +729,8 @@ brute_force(const bool & brute_force_rotation,
   }
 #endif
   
-  set_major_progress(0.05);
+  // TODO: this needs to be a state instead
+//  set_major_progress(0.05);
   
   bool done_rotation = false;
   for (int k = 0; k < num_orientations && !done_rotation; k++)
@@ -858,10 +859,12 @@ brute_force(const bool & brute_force_rotation,
       }
 #endif
     }
-    set_major_progress(0.94 * (k+1)/(num_orientations+1) + 0.05);
+    // TODO: this needs to be a state instead
+//    set_major_progress(0.94 * (k+1)/(num_orientations+1) + 0.05);
   }
   
-  set_major_progress(0.99);
+  // TODO: this needs to be a state instead
+//  set_major_progress(0.99);
 }
 
 bool
@@ -921,7 +924,7 @@ ActionSliceToSliceBruteFilter::run( Core::ActionContextHandle& context, Core::Ac
       {
         std::ostringstream oss;
         oss << "Could not create missing directory " << fn_save.parent_path() << " required to create output mosaic.";
-        CORE_LOG_ERROR(oss.str());
+        context->report_error(oss.str());
         return false;
       }
     }
@@ -951,13 +954,13 @@ ActionSliceToSliceBruteFilter::run( Core::ActionContextHandle& context, Core::Ac
     
     if (fn_load[0].empty() || fn_load[1].empty())
     {
-      CORE_LOG_ERROR("must specify 2 files with the -load option");
+      context->report_error("must specify 2 files with the -load option");
       return false;
     }
     
     if (fn_save.empty())
     {
-      CORE_LOG_ERROR("must specify a file to open with the -save option");
+      context->report_error("must specify a file to open with the -save option");
       return false;
     }
     
@@ -1227,7 +1230,8 @@ ActionSliceToSliceBruteFilter::run( Core::ActionContextHandle& context, Core::Ac
                        t_final,
                        true);
     
-    set_major_progress(1.0);
+    // TODO: this needs to be a state instead
+//    set_major_progress(1.0);
 
     CORE_LOG_SUCCESS("ir-stos-brute done");
     
@@ -1236,24 +1240,24 @@ ActionSliceToSliceBruteFilter::run( Core::ActionContextHandle& context, Core::Ac
   }
   catch (bfs::filesystem_error &err)
   {
-    CORE_LOG_ERROR(err.what());
+    context->report_error(err.what());
   }
   catch (itk::ExceptionObject &err)
   {
-    CORE_LOG_ERROR(err.GetDescription());
+    context->report_error(err.GetDescription());
   }
   catch (Core::Exception &err)
   {
-    CORE_LOG_ERROR(err.what());
-    CORE_LOG_ERROR(err.message());
+    context->report_error(err.what());
+    context->report_error(err.message());
   }
   catch (std::exception &err)
   {
-    CORE_LOG_ERROR(err.what());
+    context->report_error(err.what());
   }
   catch (...)
   {
-    CORE_LOG_ERROR("Unknown exception type caught.");
+    context->report_error("Unknown exception type caught.");
   }
   return false;
 }
