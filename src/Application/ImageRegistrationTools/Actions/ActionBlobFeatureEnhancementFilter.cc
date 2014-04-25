@@ -446,7 +446,19 @@ ActionBlobFeatureEnhancementFilter::run( Core::ActionContextHandle& context, Cor
     
     bfs::path fn_mask;
     bfs::path fn_load(this->input_image_);
-
+    if (fn_load.empty())
+    {
+      context->report_error("Filter requires an input image file");
+      return false;
+    }
+    if (! bfs::exists(fn_load) )
+    {
+      std::ostringstream oss;
+      oss << "Could not find image file " << fn_load;
+      context->report_error(oss.str());
+      return false;
+    }
+    
     bfs::path fn_save(this->output_image_);
     if (fn_save.empty())
     {
