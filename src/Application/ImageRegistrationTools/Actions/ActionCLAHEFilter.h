@@ -48,35 +48,36 @@ CORE_ACTION(
   CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
   CORE_ACTION_ARGUMENT( "input_image", "Input image file." )
   CORE_ACTION_ARGUMENT( "output_image", "Output image file." )
+  CORE_ACTION_ARGUMENT( "max_slope", "Maximum CLAHE slope" )
   CORE_ACTION_OPTIONAL_ARGUMENT( "shrink_factor", "1", "Downsample factor." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "window_x", "1", "Window size, X direction (if 1, default setting will be used)." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "window_y", "1", "Window size, Y direction (if 1, default setting will be used)." )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "max_slope", "0", "Maximum slope" )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "remap_min", "std::numeric_limits<long long>::max()", "Remap minumum (if 0, default setting will be used)." )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "remap_max", "0", "Remap maximum (if 0, default setting will be used)." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "remap_min", "max", "Remap minumum (if max, default setting will be used)." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "remap_max", "-max", "Remap maximum (if -max, default setting will be used)." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "median_radius", "0", "Median radius in pixels." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "bins", "256", "Number of bins." )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "sigma", "0", "Smoothing scale." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "sigma", "max", "Smoothing scale." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "use_standard_mask", "false", "Use the default mask." )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "mask", "", "Apply given mask." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "mask", "<none>", "Apply given mask." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "sandbox", "-1", "The sandbox in which to run the action." )
   CORE_ACTION_ARGUMENT_IS_NONPERSISTENT( "sandbox" )
 )
   
 public:
-  ActionCLAHEFilter()
+  ActionCLAHEFilter() :
+    DEFAULT_PIXEL_SPACING(1)
   {
     this->add_layer_id( this->target_layer_ );
     this->add_parameter( this->input_image_ );
     this->add_parameter( this->output_image_ );
+    this->add_parameter( this->max_slope_ );
     this->add_parameter( this->shrink_factor_ );
     this->add_parameter( this->window_x_ );
     this->add_parameter( this->window_y_ );
-    this->add_parameter( this->median_radius_ );
-    this->add_parameter( this->bins_ );
     this->add_parameter( this->remap_min_ );
     this->add_parameter( this->remap_max_ );
-    this->add_parameter( this->max_slope_ );
+    this->add_parameter( this->median_radius_ );
+    this->add_parameter( this->bins_ );
     this->add_parameter( this->sigma_ );
     this->add_parameter( this->use_standard_mask_ );
     this->add_parameter( this->mask_ );
@@ -121,6 +122,8 @@ private:
   double sigma_;
   bool use_standard_mask_;
   std::string mask_;
+
+  const unsigned int DEFAULT_PIXEL_SPACING;
 };
   
 }

@@ -54,6 +54,24 @@ namespace Seg3D
 bool
 ActionCLAHEFilter::validate( Core::ActionContextHandle& context )
 {
+  if (this->max_slope_ <= 1.0)
+  {
+    context->report_error("The max_slope parameter needs to be greater than 1.0.");
+    return false;
+  }
+
+  if (this->window_x_ < 2)
+  {
+    context->report_error("The window_x parameter needs to be greater than or equal to 2.");
+    return false;
+  }
+
+  if (this->window_y_ < 2)
+  {
+    context->report_error("The window_y parameter needs to be greater than or equal to 2.");
+    return false;
+  }
+
   return true;
 }
 
@@ -75,35 +93,58 @@ ActionCLAHEFilter::run( Core::ActionContextHandle& context, Core::ActionResultHa
     the_mutex_interface_t::set_creator(the_boost_mutex_t::create);
     the_thread_interface_t::set_creator(the_boost_thread_t::create);
 
-    const unsigned int DEFAULT_PIXEL_SPACING = 1;
-
     bfs::path fn_mask;
-    bfs::path fn_load(this->input_image_);
-    bfs::path fn_save(this->output_image_);
+    if (this->mask_ != "<none>")
+    {
+      fn_mask = this->mask_;
+    }
+    if ( fn_mask.empty() )
+    {
+      context->report_warning("Empty mask path, ignoring mask parameter.");
+    }
+    if (! bfs::exists(fn_mask) )
+    {
+      std::ostringstream oss;
+      oss << "Could not find mask file " << fn_mask << ", ignoring mask parameter.";
+      context->report_warning(oss.str());
+      fn_mask.clear();
+    }
     
-    unsigned int nx = this->window_x_; //~0;
-    unsigned int ny = this->window_y_; //~0;
-    // TODO: make parameters
-  //  pixel_t new_min = std::numeric_limits<pixel_t>::max();
-  //  pixel_t new_max = -new_min;
-    pixel_t new_min = static_cast<pixel_t>(this->remap_min_);
-    pixel_t new_max = static_cast<pixel_t>(this->remap_max_);
-    double sigma = std::numeric_limits<double>::max();
-    mask_t::Pointer mask;
-    
+    bfs::path fn_load(this->input_image_);    
     if ( fn_load.empty() )
     {
-  //    usage("must specify a file to open with the -load option");
-      CORE_LOG_ERROR("Missing input image file name.");
+      context->report_error("Missing input image file name.");
       return false;
     }
-    
+    if (! bfs::exists(fn_load) )
+    {
+      std::ostringstream oss;
+      oss << "Could not find image file " << fn_load;
+      context->report_error(oss.str());
+      return false;
+    }
+
+    bfs::path fn_save(this->output_image_);    
     if ( fn_save.empty() )
     {
-  //    usage("must specify a file to open with the -save option");
-      CORE_LOG_ERROR("Missing output image file name.");
+      context->report_error("Missing output image file name.");
       return false;
     }
+    if (! bfs::is_directory( fn_save.parent_path() ) )
+    {
+      CORE_LOG_DEBUG(std::string("Creating parent path to ") + this->output_image_);
+      if (! boost::filesystem::create_directories(fn_save.parent_path()))
+      {
+        std::ostringstream oss;
+        oss << "Could not create missing directory " << fn_save.parent_path() << " required to create output mosaic.";
+        context->report_error(oss.str());
+        return false;
+      }
+    }
+    
+    unsigned int nx = this->window_x_;
+    unsigned int ny = this->window_y_;
+    mask_t::Pointer mask;
     
     // read the input image:
     image_t::Pointer image = std_tile<image_t>(fn_load, this->shrink_factor_, DEFAULT_PIXEL_SPACING);
@@ -117,10 +158,8 @@ ActionCLAHEFilter::run( Core::ActionContextHandle& context, Core::ActionResultHa
     }
     
     image_t::SizeType sz = image->GetLargestPossibleRegion().GetSize();
-  //std::cerr << "~0u=" << ~0u << "std::numeric_limits<pixel_t>::max()=" << std::numeric_limits<pixel_t>::max() << "-std::numeric_limits<pixel_t>::max()=" << -std::numeric_limits<pixel_t>::max() <<std::endl;
-    if (nx == ~0u) nx = sz[0];
-    if (ny == ~0u) ny = sz[1];
-  //std::cerr << "nx=" << nx << ", ny=" << ny << std::endl;
+    if (nx == 1) nx = sz[0];
+    if (ny == 1) ny = sz[1];
     
     // filter the image with a median filter:
     if (this->median_radius_ != 0)
@@ -129,17 +168,32 @@ ActionCLAHEFilter::run( Core::ActionContextHandle& context, Core::ActionResultHa
     }
     
     // smooth the image prior to histogram equalization:
-    if (sigma != std::numeric_limits<double>::max())
+    if (this->sigma_ != std::numeric_limits<double>::max())
     {
-      image = smooth<image_t>(image, sigma);
+      image = smooth<image_t>(image, this->sigma_);
     }
-    
-  //  image_t::Pointer out =
-  //  CLAHE<image_t>(image, nx, ny, max_slope, bins, new_min, new_max, mask);
 
-    // hack! ignore supplied values...
+    pixel_t new_min, new_max;
+    if ( this->remap_min_ == std::numeric_limits<long long>::max() )
+    {
+      new_min = std::numeric_limits<pixel_t>::max();
+    }
+    else
+    {
+      new_min = static_cast<pixel_t>(this->remap_min_);
+    }
+
+    if ( this->remap_max_ == -std::numeric_limits<long long>::max() )
+    {
+      new_max = -std::numeric_limits<pixel_t>::max();
+    }
+    else
+    {
+      new_max = static_cast<pixel_t>(this->remap_max_);
+    }
+
     image_t::Pointer out =
-    CLAHE<image_t>(image, nx, ny, this->max_slope_, this->bins_);
+    CLAHE<image_t>(image, nx, ny, this->max_slope_, this->bins_, new_min, new_max, mask);
     
     bool remap_values = (fn_save.extension() == ".png" ||
                          fn_save.extension() == ".tif" ||
@@ -158,11 +212,28 @@ ActionCLAHEFilter::run( Core::ActionContextHandle& context, Core::ActionResultHa
     // done:
     return true;
   }
+  catch (bfs::filesystem_error &err)
+  {
+    context->report_error(err.what());
+  }
+  catch (itk::ExceptionObject &err)
+  {
+    context->report_error(err.GetDescription());
+  }
+  catch (Core::Exception &err)
+  {
+    context->report_error(err.what());
+    context->report_error(err.message());
+  }
+  catch (std::exception &err)
+  {
+    context->report_error(err.what());
+  }
   catch (...)
   {
-    CORE_LOG_ERROR("Exception caught");
-    return false;
+    context->report_error("Unknown exception type caught.");
   }
+  return false;
 }
 
 
