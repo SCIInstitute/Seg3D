@@ -48,23 +48,40 @@ namespace Core
 template< class T >
 bool FromString( const std::string &str, T &value )
 {
-    std::string data = str + " ";
-    for ( size_t j = 0; j < data.size(); j++ )
-        if ( ( data[ j ] == '\t' ) || ( data[ j ] == '\r' ) || ( data[ j ] == '\n' ) || ( data[ j ]
-                                                                                         == '"' ) || ( data[ j ] == ',' ) || ( data[ j ] == '[' ) || ( data[ j ] == ']' )
+  std::string data = str + " ";
+  for ( size_t j = 0; j < data.size(); j++ )
+      if ( ( data[ j ] == '\t' ) || ( data[ j ] == '\r' ) || ( data[ j ] == '\n' )
+            || ( data[ j ] == '"' ) || ( data[ j ] == ',' ) || ( data[ j ] == '[' ) || ( data[ j ] == ']' )
             || ( data[ j ] == '(' ) || ( data[ j ] == ')' ) ) data[ j ] = ' ';
-    
-    std::istringstream iss( data );
-    iss.exceptions( std::ifstream::eofbit | std::ifstream::failbit | std::ifstream::badbit );
-    try
-    {
-        iss >> value;
-        return ( true );
-    }
-    catch ( ... )
-    {
-        return ( false );
-    }
+
+  // Handle special cases: max, min
+  
+  // handle max
+  if ( data.size() > 2 && ( data[ 0 ] == 'm' || data[ 0 ] == 'M' ) && ( data[ 1 ] == 'a'
+        || data[ 1 ] == 'A' ) && ( data[ 2 ] == 'x' || data[ 2 ] == 'X' ) )
+  {
+    value = std::numeric_limits<T>::max();
+    return ( true );
+  }
+  // handle min
+  else if ( data.size() > 2 && ( data[ 0 ] == 'm' || data[ 0 ] == 'M' ) && ( data[ 1 ] == 'i'
+              || data[ 1 ] == 'I' ) && ( data[ 2 ] == 'n' || data[ 2 ] == 'N' ) )
+  {
+    value = std::numeric_limits<T>::min();
+    return ( true );
+  }
+
+  std::istringstream iss( data );
+  iss.exceptions( std::ifstream::eofbit | std::ifstream::failbit | std::ifstream::badbit );
+  try
+  {
+    iss >> value;
+    return ( true );
+  }
+  catch ( ... )
+  {
+    return ( false );
+  }
 }    
     
 template< class T >
@@ -286,50 +303,6 @@ std::string StringToLower( std::string str )
   for ( ; iter != iend; ++iter )
     *iter = tolower( *iter );
   return str;
-}
-
-bool FromString( const std::string &str, unsigned int &value )
-{
-  // Clear out any markup of the numbers that make it easier to read and
-  // replace it all with spaces.
-  std::string data = str + " ";
-  for ( size_t j = 0; j < data.size(); j++ )
-    if ( ( data[ j ] == '\t' ) || ( data[ j ] == '\r' ) || ( data[ j ] == '\n' ) || ( data[ j ]
-          == '"' ) || ( data[ j ] == ',' ) || ( data[ j ] == '[' ) || ( data[ j ] == ']' )
-        || ( data[ j ] == '(' ) || ( data[ j ] == ')' ) ) data[ j ] = ' ';
-  
-  // if empty just return
-  if ( data.size() == 0 ) return ( false );
-  
-  // Handle special cases: max, min
-
-  // handle max
-  if ( data.size() > 2 && ( data[ 0 ] == 'm' || data[ 0 ] == 'M' ) && ( data[ 1 ] == 'a'
-    || data[ 1 ] == 'A' ) && ( data[ 2 ] == 'x' || data[ 2 ] == 'X' ) )
-  {
-    value = std::numeric_limits< double >::max();
-    return ( true );
-  }
-  // handle min
-  else if ( data.size() > 2 && ( data[ 0 ] == 'm' || data[ 0 ] == 'M' ) && ( data[ 1 ] == 'i'
-    || data[ 1 ] == 'I' ) && ( data[ 2 ] == 'n' || data[ 2 ] == 'N' ) )
-  {
-    value = std::numeric_limits< double >::min();
-    return ( true );
-  }
-
-  std::istringstream iss( data );
-  iss.exceptions( std::ifstream::eofbit | std::ifstream::failbit | std::ifstream::badbit );
-  try
-  {
-    iss >> value;
-    return ( true );
-  }
-  catch ( std::istringstream::failure e )
-  {
-    CORE_LOG_DEBUG(e.what());
-    return ( false );
-  }
 }
   
 bool FromString( const std::string &str, double &value )
