@@ -48,7 +48,7 @@ CORE_ACTION(
   CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
   CORE_ACTION_ARGUMENT( "input_image", "Input image file." )
   CORE_ACTION_ARGUMENT( "output_image", "Output image file." )
-  CORE_ACTION_ARGUMENT( "max_slope", "Maximum CLAHE slope" )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "max_slope", "0", "Maximum CLAHE slope" )
   CORE_ACTION_OPTIONAL_ARGUMENT( "shrink_factor", "1", "Downsample factor." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "window_x", "1", "Window size, X direction (if 1, default setting will be used)." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "window_y", "1", "Window size, Y direction (if 1, default setting will be used)." )

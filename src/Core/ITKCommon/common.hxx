@@ -4904,15 +4904,20 @@ CLAHE(const T * in,
 //  assert(nx > 1 && ny > 1);
   if ( nx <= 1 && ny <= 1 )
   {
-    CORE_THROW_EXCEPTION("window dimensions (nx, ny) fail sanity check");
+    CORE_THROW_EXCEPTION("Window dimensions (nx, ny) fail sanity check");
   }
 
   //  assert(max_slope >= 1.0 || max_slope == 0.0);
-  if ( max_slope < 1.0 || max_slope != 0.0 ) // TODO: comparison tolerance?
+  if ( max_slope < 1.0 && max_slope != 0 ) // TODO: comparison tolerance?
   {
-    CORE_THROW_EXCEPTION("max_slope fails sanity check");
+    CORE_THROW_EXCEPTION("Max_slope fails sanity check");
   }
-  
+
+  if (in == 0)
+  {
+    CORE_THROW_EXCEPTION("Null input image");
+  }
+
   // range of the image intensities:
   pixel_t p_min;
   pixel_t p_max;
@@ -5076,7 +5081,7 @@ CLAHE(const T * in,
       {
         // update the histogram (add-remove rows):
 //        assert(shift_y == 1 || shift_y == -1);
-        if ( shift_x != 1 && shift_x != -1 )
+        if ( shift_y != 1 && shift_y != -1 )
         {
           CORE_THROW_EXCEPTION("bad histogram shift");
         }
@@ -5687,11 +5692,11 @@ solve_for_transform(const pnt2d_t & tile_min,
 {
   mosaic_to_tile_1->setup_translation(shift[0], shift[1]);
   
-  //#if 0
-  //  // FIXME:
-  //  cerr << "SHIFT:      " << shift << endl
-  //       << "ROUGH:      " << mosaic_to_tile_1->GetParameters() << endl;
-  //#endif
+//#if 0
+//  // FIXME:
+//  cerr << "SHIFT:      " << shift << endl
+//       << "ROUGH:      " << mosaic_to_tile_1->GetParameters() << endl;
+//#endif
   
   std::vector<pnt2d_t> xy;
   std::vector<pnt2d_t> uv;
@@ -5708,17 +5713,17 @@ solve_for_transform(const pnt2d_t & tile_min,
   unsigned int order = legendre_transform_t::Degree + 1;
   unsigned int loworder = std::min(2u, order);
   
-  //#if 1
+//#if 1
   mosaic_to_tile_1->solve_for_parameters(0, loworder, uv, xy);
   mosaic_to_tile_1->solve_for_parameters(loworder, order - loworder, uv, xy);
-  //#else
-  //  mosaic_to_tile_1->solve_for_parameters(0, order, uv, xy);
-  //#endif
+//#else
+//  mosaic_to_tile_1->solve_for_parameters(0, order, uv, xy);
+//#endif
   
-  //#if 0
-  //  // FIXME:
-  //  cerr << "FINAL: " << mosaic_to_tile_1->GetParameters() << endl;
-  //#endif
+//#if 0
+//  // FIXME:
+//  cerr << "FINAL: " << mosaic_to_tile_1->GetParameters() << endl;
+//#endif
 }
 
 //----------------------------------------------------------------

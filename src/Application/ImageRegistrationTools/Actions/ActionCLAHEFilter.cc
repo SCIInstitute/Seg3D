@@ -54,9 +54,9 @@ namespace Seg3D
 bool
 ActionCLAHEFilter::validate( Core::ActionContextHandle& context )
 {
-  if (this->max_slope_ <= 1.0)
+  if ( this->max_slope_ < 1.0 && this->max_slope_ != 0 )
   {
-    context->report_error("The max_slope parameter needs to be greater than 1.0.");
+    context->report_error("The max_slope parameter needs to be greater than 1.0 or equal to 0.");
     return false;
   }
 
