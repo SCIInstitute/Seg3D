@@ -111,21 +111,56 @@ ActionSliceToVolumeFilter::run( Core::ActionContextHandle& context, Core::Action
     the_thread_interface_t::set_creator(the_boost_thread_t::create);
     
     // parameters:
-  //  std::list<the_text_t > stos_fn;
-    pathList stos_fn;
-
+    pathList stos_fn;    
+    for (size_t i = 0; i < this->input_files_.size(); ++i)
+    {
+      bfs::path stosInput(this->input_files_[i]);
+      // needed, since mosaic loading functions do not check for file existence
+      if (! bfs::exists(stosInput) )
+      {
+        std::ostringstream oss;
+        oss << "STOS input file " << stosInput << " not found. Skipping...";
+        CORE_LOG_WARNING(oss.str());
+      }
+      else
+      {
+        stos_fn.push_back(stosInput);
+      }
+    }
+    
     std::list<stos_t<image_t> > stos_list;
 
     std::vector<std::vector<bfs::path > > image_dirs;
-    std::vector<std::vector<bfs::path > > slice_dirs;
 
+    std::vector<std::vector<bfs::path > > slice_dirs;
+//    std::vector<std::vector<bfs::path > > slice_dirs(stos_fn.size() + 1);
+//    for (size_t i = 0; i < this->slice_dirs_.size(); ++i)
+//    {
+//      slice_dirs[i].push_back(bfs::path(this->slice_dirs_[i]));
+//    }
+
+    // test
+    std::vector<bfs::path> slice_dirs_test;
+    for (size_t i = 0; i < this->slice_dirs_.size(); ++i)
+    {
+      slice_dirs_test.push_back(this->slice_dirs_[i]);
+    }
+
+    std::vector<bfs::path> image_dirs_test;
+    for (size_t i = 0; i < this->image_dirs_.size(); ++i)
+    {
+      image_dirs_test.push_back(this->image_dirs_[i]);
+    }
+    // test
+    
     bool old_image_list_type = true, old_slice_dirs_type = true;
     unsigned int image_list_idx = 0, slice_dirs_idx = 0;
 
   //  std::list<the_text_t>  fn_prefixes;
     pathList fn_prefixes;
 
-    bfs::path fn_extension(".tif");
+//    bfs::path fn_extension(".tif");
+    bfs::path fn_extension(".png");
 
     bool using_extra_padding = false;
     if (this->left_padding_ > 0 || this->right_padding_ > 0 ||
@@ -134,16 +169,10 @@ ActionSliceToVolumeFilter::run( Core::ActionContextHandle& context, Core::Action
       using_extra_padding = true;
     }
 
-    for (size_t i = 0; i < this->input_files_.size(); ++i)
+    for (size_t i = 0; i < this->output_prefixes_.size(); ++i)
     {
-std::cerr << "STOS input file: " << this->input_files_[i] << std::endl;
-      stos_fn.push_back(this->input_files_[i]);
-    }
-
-    for (size_t i = 0; i < this->output_files_prefixes_.size(); ++i)
-    {
-std::cerr << "Output file prefixes: " << this->input_files_[i] << std::endl;
-      fn_prefixes.push_back(this->output_files_prefixes_[i]);
+      bfs::path prefix(this->output_prefixes_[i]);
+      fn_prefixes.push_back(prefix);
     }
 
     int stos_names = stos_fn.size() + 1;
@@ -168,15 +197,11 @@ std::cerr << "Output file prefixes: " << this->input_files_[i] << std::endl;
         image_dirs[i].push_back( bfs::path() );
     }
     
-    if ( fn_prefixes.size() == 0 || fn_prefixes.size() > 1 && fn_prefixes.size() != stos_fn.size() + 1 )
+    if ( fn_prefixes.size() == 0 || (fn_prefixes.size() > 1 && (fn_prefixes.size() != stos_fn.size() + 1) ) )
     {
-      CORE_LOG_ERROR("There must be exactly one prefix for each slice, or one prefix for all slices.");
+      context->report_error("There must be exactly one prefix for each slice, or one prefix for all slices.");
       return false;
     }
-    
-    // Load up all of the stos files.
-    bool override_slice_dirs = ( slice_dirs.size() > 0 );
-    bool override_image_dirs = ( image_dirs.size() > 0 );
     
     int i = 0;
   //  for (std::list<the_text_t>::const_iterator fn_iter = stos_fn.begin();
@@ -185,15 +210,60 @@ std::cerr << "Output file prefixes: " << this->input_files_[i] << std::endl;
     {
       bfs::path slice0_dir, slice1_dir, image0_dir, image1_dir;
       
-      if ( slice_dirs[i].size() > 0 )
-        slice0_dir = slice_dirs[i][0];
-      if ( slice_dirs[i+1].size() > 0 )
-        slice1_dir = slice_dirs[i+1][0];
-      
-      if ( image_dirs[i].size() > 0 )
-        image0_dir = image_dirs[i][0];
-      if ( image_dirs[i+1].size() > 0 )
-        image1_dir = image_dirs[i+1][0];
+// temporarily disabling...
+//      if ( slice_dirs[i].size() > 0 )
+//        slice0_dir = slice_dirs[i][0];
+//      if ( slice_dirs[i+1].size() > 0 )
+//        slice1_dir = slice_dirs[i+1][0];
+//      
+//      if ( image_dirs[i].size() > 0 )
+//        image0_dir = image_dirs[i][0];
+//      if ( image_dirs[i+1].size() > 0 )
+//        image1_dir = image_dirs[i+1][0];
+
+      // test
+      slice0_dir = fn_prefixes.front();
+      if (! bfs::is_directory(slice0_dir) )
+      {
+        std::ostringstream oss;
+        oss << "Creating path to " << slice0_dir;
+        CORE_LOG_DEBUG(oss.str());
+        if (! boost::filesystem::create_directories(slice0_dir))
+        {
+          std::ostringstream oss;
+          oss << "Could not create missing directory " << slice0_dir << " required to create output image.";
+          context->report_error(oss.str());
+          return false;
+        }
+      }
+
+      slice1_dir = fn_prefixes.front();
+      if (! bfs::is_directory(slice1_dir) )
+      {
+        std::ostringstream oss;
+        oss << "Creating path to " << slice1_dir;
+        CORE_LOG_DEBUG(oss.str());
+        if (! boost::filesystem::create_directories(slice1_dir))
+        {
+          std::ostringstream oss;
+          oss << "Could not create missing directory " << slice1_dir << " required to create output image.";
+          context->report_error(oss.str());
+          return false;
+        }
+      }
+
+      // TODO: terrible - get a better handle on parameter
+      if (image_dirs_test.size() > 1)
+      {
+        image0_dir = image_dirs_test[i];
+        image1_dir = image_dirs_test[i+1];
+      }
+      else
+      {
+        image0_dir = image_dirs_test[0];
+        image1_dir = image_dirs_test[0];
+      }
+      // test
       
       stos_t<image_t> stos( *fn_iter, slice0_dir, slice1_dir );
       stos.image_dirs_[0] = image0_dir;
@@ -206,7 +276,7 @@ std::cerr << "Output file prefixes: " << this->input_files_[i] << std::endl;
     const unsigned int num_pairs = stos_list.size();
     if (num_pairs == 0)
     {
-      CORE_LOG_ERROR("A minimum of two images are required for registration.");
+      context->report_error("A minimum of two images are required for registration.");
       return false;
     }
     
@@ -237,15 +307,15 @@ std::cerr << "Output file prefixes: " << this->input_files_[i] << std::endl;
     {
       if (num_roots == 0)
       {
-        CORE_LOG_ERROR("There is more than one possible mapping for one or more slices, aborting...");
-        CORE_LOG_ERROR("Remove one of the ambiguous stos transforms and try again.");
+        context->report_error("There is more than one possible mapping for one or more slices, aborting...");
+        context->report_error("Remove one of the ambiguous stos transforms and try again.");
       }
       else
       {
         std::ostringstream oss;
         oss << "There are " << num_roots << " sets of interconnected stos transforms present."
         << std::endl << "This tool only works with one set, aborting...";
-        CORE_LOG_ERROR(oss.str());
+        context->report_error(oss.str());
       }
       stos_tree.dump(std::cerr);
       
@@ -299,7 +369,7 @@ std::cerr << "Output file prefixes: " << this->input_files_[i] << std::endl;
     
     mask_t::Pointer overlap_mask;
     
-    if (!this->use_base_mask_ && !using_extra_padding)
+    if ( (! this->use_base_mask_) && (! using_extra_padding) )
     {
       overlap_mask = tree_root->calc_overlap_mask(this->shrink_factor_,
                                                   DEFAULT_CLAHE_SLOPE,
@@ -364,8 +434,7 @@ std::cerr << "Output file prefixes: " << this->input_files_[i] << std::endl;
         }
         else
         {
-          //::exit(1);
-          CORE_LOG_ERROR("The base slice mask is empty, aborting...");
+          context->report_error("The base slice mask is empty, aborting...");
           return false;
         }
       }
@@ -407,7 +476,8 @@ std::cerr << "Output file prefixes: " << this->input_files_[i] << std::endl;
     
     pathList::const_iterator prefix_iter = fn_prefixes.begin();
     
-    set_major_progress(0.05);
+    // TODO: this needs to be a state instead
+//    set_major_progress(0.05);
     
     // generate the slices:
     for (unsigned int i = 0; i < fn_mosaic.size(); i++)
@@ -559,18 +629,19 @@ std::cerr << "Output file prefixes: " << this->input_files_[i] << std::endl;
       }
       
   //    the_text_t fn_filename = *prefix_iter;
-      bfs::path fn_filename = *prefix_iter;
+      std::ostringstream fn_filename;
+      fn_filename << prefix_iter->string();
       
       if ( fn_prefixes.size() != 1 )
         ++prefix_iter;
       else
-        fn_filename += the_text_t::number(i, 3, '0');
+        fn_filename << the_text_t::number(i, 3, '0');
       
       for ( int mosIdx = 0; mosIdx < grand_total; ++mosIdx )
       {
         // save the slice:
         std::ostringstream fn_save;
-        fn_save << fn_filename;
+        fn_save << fn_filename.str();
         if ( grand_total > 1 && boost::iequals(fn_extension.string(), ".idx") )
         {
           fn_save << "_" << the_text_t::number(mosIdx, 3, '0');
@@ -588,7 +659,7 @@ std::cerr << "Output file prefixes: " << this->input_files_[i] << std::endl;
           {
             typedef itk::Image<short int, 2> int16_image_t;
             save_as_tiles<int16_image_t>(cast<image_t, int16_image_t>(mosaic[mosIdx]),
-                                         fn_filename,
+                                         bfs::path(fn_filename.str()),
                                          fn_extension,
                                          this->tile_width_,
                                          this->tile_height_,
@@ -598,7 +669,7 @@ std::cerr << "Output file prefixes: " << this->input_files_[i] << std::endl;
           {
             typedef itk::Image<unsigned short int, 2> uint16_image_t;
             save_as_tiles<uint16_image_t>(cast<image_t, uint16_image_t>(mosaic[mosIdx]),
-                                          fn_filename,
+                                          bfs::path(fn_filename.str()),
                                           fn_extension,
                                           this->tile_width_,
                                           this->tile_height_,
@@ -607,7 +678,7 @@ std::cerr << "Output file prefixes: " << this->input_files_[i] << std::endl;
           else
           {
             save_as_tiles<native_image_t>(cast<image_t, native_image_t>(mosaic[mosIdx]),
-                                          fn_filename,
+                                          bfs::path(fn_filename.str()),
                                           fn_extension,
                                           this->tile_width_,
                                           this->tile_height_,
@@ -628,23 +699,44 @@ std::cerr << "Output file prefixes: " << this->input_files_[i] << std::endl;
           }
           else
           {
-            save<native_image_t>(cast<image_t, native_image_t>(mosaic[mosIdx]), bfs::path(fn_save.str()));
+//            save<native_image_t>(cast<image_t, native_image_t>(mosaic[mosIdx]), bfs::path(fn_save.str()));
+            bfs::path save_path = fn_prefixes.front() / fn_mosaic[i].stem();
+            save_path = save_path.replace_extension(fn_extension);
+            save<native_image_t>(cast<image_t, native_image_t>(mosaic[mosIdx]), save_path);
           }
           
         }
       }
-      set_major_progress(0.05 + 0.95 * ((i+1) / (fn_mosaic.size() + 1)));
+      // TODO: this needs to be a state instead
+//      set_major_progress(0.05 + 0.95 * ((i+1) / (fn_mosaic.size() + 1)));
     }
     
     CORE_LOG_SUCCESS("ir-stom done");
 
     return true;
   }
+  catch (bfs::filesystem_error &err)
+  {
+    context->report_error(err.what());
+  }
+  catch (itk::ExceptionObject &err)
+  {
+    context->report_error(err.GetDescription());
+  }
+  catch (Core::Exception &err)
+  {
+    context->report_error(err.what());
+    context->report_error(err.message());
+  }
+  catch (std::exception &err)
+  {
+    context->report_error(err.what());
+  }
   catch (...)
   {
-    CORE_LOG_ERROR("Exception caught");
-    return false;
+    context->report_error("Unknown exception type caught.");
   }
+  return false;
 }
 
 void
@@ -666,7 +758,9 @@ void
                                       bool save_int16_image,
                                       bool save_uint16_image,
                                       std::vector<std::string> input_files,
-                                      std::vector<std::string> output_files_prefixes)
+                                      std::vector<std::string> output_prefixes,
+                                      std::vector<std::string> slice_dirs,
+                                      std::vector<std::string> image_dirs)
 {
   // Create a new action
   ActionSliceToVolumeFilter* action = new ActionSliceToVolumeFilter;
@@ -689,7 +783,9 @@ void
   action->save_int16_image_ = save_int16_image;
   action->save_uint16_image_ = save_uint16_image;
   action->input_files_ = input_files;
-  action->output_files_prefixes_ = output_files_prefixes;
+  action->output_prefixes_ = output_prefixes;
+  action->slice_dirs_ = slice_dirs;
+  action->image_dirs_ = image_dirs;
   
   // Dispatch action to underlying engine
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );

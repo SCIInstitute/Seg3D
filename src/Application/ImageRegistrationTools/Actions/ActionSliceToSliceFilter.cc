@@ -630,15 +630,27 @@ ActionSliceToSliceFilter::run( Core::ActionContextHandle& context, Core::ActionR
     the_thread_interface_t::set_creator(the_boost_thread_t::create);
     
     // parameters:
-    bfs::path fn_load[2] = { this->input_fixed_file_, this->input_moving_file_ };
+    bfs::path fn_load[2] = { this->input_fixed_, this->input_moving_ };
     //  bfs::path fn_load_directory[2];
-    bfs::path fn_mask[2] = { this->mask_fixed_, this->mask_moving_ };
+
+    bfs::path fn_mask[2];
+    if ( (this->mask_fixed_ != "<none>") && (this->mask_moving_ != "<none>") )
+    {
+      fn_mask[0] = this->mask_fixed_;
+      fn_mask[1] = this->mask_moving_;
+    }
+
     bool flip[2] = { this->flip_fixed_, this->flip_moving_ };
     //  bool flip[2] = { false, false };
     
-    bfs::path image_dirs[2] = { this->image_dir_fixed_, this->image_dir_moving_ };
+    bfs::path image_dirs[2];
+    if ( (this->image_dir_fixed_ != "<none>") && (this->image_dir_moving_ != "<none>") )
+    {
+      image_dirs[0] = this->image_dir_fixed_;
+      image_dirs[1] = this->image_dir_moving_;
+    }
     
-    bfs::path fn_save(this->output_stos_file_);
+    bfs::path fn_save(this->output_stos_);
     
     if (fn_load[0].empty() || fn_load[1].empty())
     {
@@ -870,11 +882,28 @@ ActionSliceToSliceFilter::run( Core::ActionContextHandle& context, Core::ActionR
     // done:
     return true;
   }
+  catch (bfs::filesystem_error &err)
+  {
+    CORE_LOG_ERROR(err.what());
+  }
+  catch (itk::ExceptionObject &err)
+  {
+    CORE_LOG_ERROR(err.GetDescription());
+  }
+  catch (Core::Exception &err)
+  {
+    CORE_LOG_ERROR(err.what());
+    CORE_LOG_ERROR(err.message());
+  }
+  catch (std::exception &err)
+  {
+    CORE_LOG_ERROR(err.what());
+  }
   catch (...)
   {
-    CORE_LOG_ERROR("Exception caught");
-    return false;
+    CORE_LOG_ERROR("Unknown exception type caught.");
   }
+  return false;
 }
 
 
@@ -888,9 +917,9 @@ ActionSliceToSliceFilter::Dispatch(Core::ActionContextHandle context,
                                    bool use_standard_mask,
                                    bool flip_fixed,
                                    bool flip_moving,
-                                   std::string input_fixed_file,
-                                   std::string input_moving_file,
-                                   std::string output_stos_file,
+                                   std::string input_fixed,
+                                   std::string input_moving,
+                                   std::string output_stos,
                                    std::string mask_fixed,
                                    std::string mask_moving,
                                    std::string image_dir_fixed,
@@ -907,9 +936,9 @@ ActionSliceToSliceFilter::Dispatch(Core::ActionContextHandle context,
   action->use_standard_mask_ = use_standard_mask;
   action->flip_fixed_ = flip_fixed;
   action->flip_moving_ = flip_moving;
-  action->input_fixed_file_ = input_fixed_file;
-  action->input_moving_file_ = input_moving_file;
-  action->output_stos_file_ = output_stos_file;
+  action->input_fixed_ = input_fixed;
+  action->input_moving_ = input_moving;
+  action->output_stos_ = output_stos;
   action->mask_fixed_ = mask_fixed;
   action->mask_moving_ = mask_moving;
   action->image_dir_fixed_ = image_dir_fixed;

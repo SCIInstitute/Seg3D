@@ -44,16 +44,19 @@ class ActionSliceToVolumeFilter : public LayerAction
 CORE_ACTION(
   CORE_ACTION_TYPE( "SliceToVolumeFilter", "ir-stom" )
   CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
-  CORE_ACTION_ARGUMENT( "files", "Stos data file names." )
-  CORE_ACTION_ARGUMENT( "output_prefixes", "Output file prefixes." )
+  CORE_ACTION_ARGUMENT( "input_files", "Stos data file names." )
+  CORE_ACTION_ARGUMENT( "image_dirs", "Image directory(ies) (exactly one, or one for each slice)." )
+//  CORE_ACTION_ARGUMENT( "output_image", "Output image name.")
+  CORE_ACTION_ARGUMENT( "output_prefixes", "Output file prefix(es) (exactly one, or one for each slice)." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "slice_dirs", "[]", "Optional slice directory(ies)." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "shrink_factor", "1", "Downsample factor." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "clahe_window", "64", "" )
   CORE_ACTION_OPTIONAL_ARGUMENT( "left_padding", "0", "" )
   CORE_ACTION_OPTIONAL_ARGUMENT( "top_padding", "0", "" )
   CORE_ACTION_OPTIONAL_ARGUMENT( "right_padding", "0", "" )
   CORE_ACTION_OPTIONAL_ARGUMENT( "bottom_padding", "0", "" )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "tile_width", "std::numeric_limits<unsigned int>::max()", "" )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "tile_height", "std::numeric_limits<unsigned int>::max()", "" )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "tile_width", "max", "" )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "tile_height", "max", "" )
   CORE_ACTION_OPTIONAL_ARGUMENT( "clahe_slope", "1.0", "Maximum CLAHE slope." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "visualize_warp", "false", "" )
   CORE_ACTION_OPTIONAL_ARGUMENT( "use_base_mask", "false", "" )
@@ -71,6 +74,10 @@ public:
   DEFAULT_CLAHE_WINDOW(0)
   {
     this->add_layer_id( this->target_layer_ );
+    this->add_parameter( this->input_files_ );
+    this->add_parameter( this->image_dirs_ );
+    this->add_parameter( this->output_prefixes_ );
+    this->add_parameter( this->slice_dirs_ );
     this->add_parameter( this->shrink_factor_ );
     this->add_parameter( this->clahe_window_ );
     this->add_parameter( this->left_padding_ );
@@ -86,8 +93,6 @@ public:
     this->add_parameter( this->remap_values_ );
     this->add_parameter( this->save_int16_image_ );
     this->add_parameter( this->save_uint16_image_ );
-    this->add_parameter( this->input_files_ );
-    this->add_parameter( this->output_files_prefixes_ );
     this->add_parameter( this->sandbox_ );
   }
   
@@ -114,7 +119,9 @@ public:
                        bool save_int16_image,
                        bool save_uint16_image,
                        std::vector<std::string> input_files,
-                       std::vector<std::string> output_files_prefixes);
+                       std::vector<std::string> output_prefixes,
+                       std::vector<std::string> slice_dirs,
+                       std::vector<std::string> image_dirs);
   
 private:
   std::string target_layer_;
@@ -136,7 +143,10 @@ private:
   bool save_int16_image_;
   bool save_uint16_image_;
   std::vector<std::string> input_files_;
-  std::vector<std::string> output_files_prefixes_;
+  std::vector<std::string> output_prefixes_;
+  std::vector<std::string> slice_dirs_;
+  std::vector <std::string> image_dirs_;
+//  std::string output_image_;
 
   const double DEFAULT_CLAHE_SLOPE;
   const unsigned int DEFAULT_CLAHE_WINDOW;
