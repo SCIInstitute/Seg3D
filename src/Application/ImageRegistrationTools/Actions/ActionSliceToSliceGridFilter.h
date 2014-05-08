@@ -60,10 +60,10 @@ CORE_ACTION(
   CORE_ACTION_OPTIONAL_ARGUMENT( "displacement_threshold", "1.0", "" )
   CORE_ACTION_OPTIONAL_ARGUMENT( "disable_fft", "false", "Do not use FFT." )
   // TODO: better path handling?
-  CORE_ACTION_OPTIONAL_ARGUMENT( "slice_dir0", "", "Override path to slice 0." )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "slice_dir1", "", "Override path to slice 1." )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "image_dir0", "", "Override path to slice 0 images." )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "image_dir1", "", "Override path to slice 1 images." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "slice_dir0", "<none>", "Override path to slice 0." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "slice_dir1", "<none>", "Override path to slice 1." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "image_dir0", "<none>", "Override path to slice 0 images." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "image_dir1", "<none>", "Override path to slice 1 images." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "sandbox", "-1", "The sandbox in which to run the action." )
   CORE_ACTION_ARGUMENT_IS_NONPERSISTENT( "sandbox" )
 )
@@ -79,24 +79,24 @@ public:
   DEFAULT_CLAHE_WINDOW_SIZE(64)
   {
     this->add_layer_id( this->target_layer_ );
+    this->add_parameter( this->input_stos_ );
+    this->add_parameter( this->output_stos_ );
     this->add_parameter( this->shrink_factor_ );
-    this->add_parameter( this->num_threads_ );
     this->add_parameter( this->iterations_ );
     this->add_parameter( this->grid_spacing_ );
     this->add_parameter( this->grid_rows_ );
     this->add_parameter( this->grid_cols_ );
     this->add_parameter( this->neighborhood_ );
     this->add_parameter( this->median_radius_ );
+    this->add_parameter( this->num_threads_ );
     this->add_parameter( this->clahe_slope_ );
     this->add_parameter( this->minimum_overlap_ );
     this->add_parameter( this->displacement_threshold_ );
     this->add_parameter( this->disable_fft_ );
-    this->add_parameter( this->input_stos_ );
-    this->add_parameter( this->output_stos_ );
-    this->add_parameter( slice_dir0_ );
-    this->add_parameter( slice_dir1_ );
-    this->add_parameter( image_dir0_ );
-    this->add_parameter( image_dir1_ );
+    this->add_parameter( this->slice_dir0_ );
+    this->add_parameter( this->slice_dir1_ );
+    this->add_parameter( this->image_dir0_ );
+    this->add_parameter( this->image_dir1_ );
     this->add_parameter( this->sandbox_ );
   }
   

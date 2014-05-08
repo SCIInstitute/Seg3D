@@ -166,20 +166,20 @@ ActionRefineGridFilter::validate( Core::ActionContextHandle& context )
 
   if ( this->cell_size_ < 4 && (this->mesh_rows_ == 0 || this->mesh_cols_ == 0) )
   {
-    context->report_error("The cell_size parameter needs to be larger than 4. Alternatively, set mesh_rows and mesh_cols (2 or larger).");
+    context->report_error("The cell_size parameter needs to be greater than than 4. Alternatively, set mesh_rows and mesh_cols (2 or larger).");
     return false;
   }
   
   bool result = true;
   if ( this->cell_size_ == 0 && this->mesh_rows_ < 2 )
   {
-    context->report_error("The mesh_rows parameter needs to be larger than 2. Alternatively, set cell_size (larger than 4).");
+    context->report_error("The mesh_rows parameter needs to be greater than than 2. Alternatively, set cell_size (larger than 4).");
     result = false;
   }
   
   if ( this->cell_size_ == 0 && this->mesh_cols_ < 2 )
   {
-    context->report_error("The mesh_cols parameter needs to be larger than 2. Alternatively, set cell_size (larger than 4).");
+    context->report_error("The mesh_cols parameter needs to be greater than 2. Alternatively, set cell_size (larger than 4).");
     result = false;
   }
   

@@ -119,8 +119,18 @@ ActionSliceToSliceGridFilter::run( Core::ActionContextHandle& context, Core::Act
 
     // override slice and image directories
     // TODO: unclear how useful this is
-    bfs::path slice_dirs[2] = { this->slice_dir0_, this->slice_dir1_ };
-    bfs::path image_dirs[2] = { this->image_dir0_, this->image_dir1_ };
+    bfs::path slice_dirs[2];
+    if ( (this->slice_dir0_ != "<none>") && (this->slice_dir1_ != "<none>") )
+    {
+      slice_dirs[0] = this->slice_dir0_;
+      slice_dirs[1] = this->slice_dir1_;
+    }
+    bfs::path image_dirs[2];
+    if ( (this->image_dir0_ != "<none>") && (this->image_dir1_ != "<none>") )
+    {
+      image_dirs[0] = this->image_dir0_;
+      image_dirs[1] = this->image_dir1_;
+    }
     
   //  bool override_image_dir = false;
   //  bool override_slice_dirs = false;
@@ -476,11 +486,28 @@ ActionSliceToSliceGridFilter::run( Core::ActionContextHandle& context, Core::Act
     // done:
     return true;
   }
+  catch (bfs::filesystem_error &err)
+  {
+    CORE_LOG_ERROR(err.what());
+  }
+  catch (itk::ExceptionObject &err)
+  {
+    CORE_LOG_ERROR(err.GetDescription());
+  }
+  catch (Core::Exception &err)
+  {
+    CORE_LOG_ERROR(err.what());
+    CORE_LOG_ERROR(err.message());
+  }
+  catch (std::exception &err)
+  {
+    CORE_LOG_ERROR(err.what());
+  }
   catch (...)
   {
-    CORE_LOG_ERROR("Exception caught");
-    return false;
+    CORE_LOG_ERROR("Unknown exception type caught.");
   }
+  return false;
 }
 
 void
