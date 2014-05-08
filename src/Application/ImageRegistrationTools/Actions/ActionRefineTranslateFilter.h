@@ -58,7 +58,7 @@ CORE_ACTION(
   CORE_ACTION_OPTIONAL_ARGUMENT( "black_mask_x", "max", "" )          
   CORE_ACTION_OPTIONAL_ARGUMENT( "black_mask_y", "max", "" )          
   CORE_ACTION_OPTIONAL_ARGUMENT( "use_standard_mask", "false", "Use the default mask." )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "use_clahe", "true", "Use the default mask." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "use_clahe", "true", "Use CLAHE." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "sandbox", "-1", "The sandbox in which to run the action." )
   CORE_ACTION_ARGUMENT_IS_NONPERSISTENT( "sandbox" )
 //  CORE_ACTION_CHANGES_PROJECT_DATA()
