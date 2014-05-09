@@ -173,22 +173,28 @@ void SaveAsInfoPage::initializePage()
   
 void SaveAsInfoPage::set_path()
 {
+  //QDir converts the empty QString "" to the current directory
   this->warning_message_->hide();
 
-    QDir project_directory_ = QDir( QFileDialog::getExistingDirectory ( this, 
+    
+    QString path_name = QFileDialog::getExistingDirectory ( this, 
     tr( "Choose Save Directory..." ), this->project_path_lineedit_->text(), 
-    QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks  ) );
-  
+    QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks );
+
+    // getExistingString generates an empty string if canceled or closed.
+    //  If either happens, this will exit without changing anything.
+    if(path_name == "")
+    {
+  return;
+    }
+    QDir project_directory_ = QDir(path_name);
+    
   if( project_directory_.exists() )
     {
        this->project_path_lineedit_->setText( project_directory_.canonicalPath() );
     }
-    else
-    {
-    this->project_path_lineedit_->setText( "" );
-    }
-    
-    registerField( "projectPath", this->project_path_lineedit_ );
+
+        registerField( "projectPath", this->project_path_lineedit_ );
 }
 
 bool SaveAsInfoPage::validatePage()
