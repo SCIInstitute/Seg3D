@@ -25,15 +25,14 @@ mosaicExtension = config.get(datasetName, 'mosaic_ext')
 stosExtension = config.get(datasetName, 'stos_ext')
 shrinkFactor = config.get(datasetName, 'shrink')
 pixelSpacing = config.get(datasetName, 'spacing')
-clahe = config.get(datasetName, 'clahe_slope')
 pyramidIterations = config.get(datasetName, 'pyramid_iters')
+overlapMin = config.get(datasetName, 'overlap_min')
+overlapMax = config.get(datasetName, 'overlap_max')
 
 filePrefix = 'Image1-'
 fileSuffixList = ['_000-000.tif','_001-000.tif','_002-000.tif','_000-001.tif','_001-001.tif','_002-001.tif','_000-002.tif','_001-002.tif','_002-002.tif']
 
 
-overlapMin=0.08
-overlapMax=0.3
 #pyramidLevels=6 # TODO: produces segfault
 pyramidLevels=2
 refineGridIterations=20
@@ -55,10 +54,10 @@ for index in range(rangeMin, mosaicRangeMax):
     filename = "%s%03d%s" % (filePrefix, index, suffix)
     files.append(filename)
 
-    #print(files)
+  print(files)
 
   fftMosaic="{0}/{1}{2}".format(fftDir, outputName, mosaicExtension)
-  seg3d2.fftfilter(layerid=layerid, shrink_factor=shrinkFactor, overlap_min=overlapMin, overlap_max=overlapMax, pixel_spacing=pixelSpacing, images=files, directory=testRoot, output_mosaic=fftMosaic, clahe_slope=clahe, iterations_per_level=pyramidIterations, pyramid_levels=pyramidLevels)
+  seg3d2.fftfilter(layerid=layerid, shrink_factor=shrinkFactor, overlap_min=overlapMin, overlap_max=overlapMax, pixel_spacing=pixelSpacing, images=files, directory=testRoot, output_mosaic=fftMosaic, iterations_per_level=pyramidIterations, pyramid_levels=pyramidLevels)
 
   refineGridMosaic="{0}/{1}{2}".format(refineGridDir, outputName, mosaicExtension)
   seg3d2.refinegridfilter(layerid=layerid, shrink_factor=shrinkFactor, pixel_spacing=pixelSpacing, iterations=refineGridIterations, input_mosaic=fftMosaic, output_mosaic=refineGridMosaic, directory=testRoot, cell_size=cellSize)
@@ -70,7 +69,9 @@ for index in range(rangeMin, mosaicRangeMax):
     refineGridMosaic = fftMosaic
 
   imageOutputFile="{0}/{1}{2}".format(resultsDir, outputName, outputImageExtension)
-  seg3d2.assemblefilter(layerid=layerid, shrink_factor=shrinkFactor, pixel_spacing=pixelSpacing, input_mosaic=refineGridMosaic, output_image=imageOutputFile, directory=testRoot, feathering=blendEdges) 
+  seg3d2.assemblefilter(layerid=layerid, shrink_factor=shrinkFactor, pixel_spacing=pixelSpacing, input_mosaic=refineGridMosaic, output_image=imageOutputFile, directory=testRoot, feathering=blendEdges)
+
+  files = []
 
 for index in range(rangeMin, stosRangeMax):
   next_index = index + 1
@@ -98,5 +99,7 @@ for f in os.listdir(stosDir):
 
 print(stosfiles)
 
+# TODO: try 0 also
+volumeShrinkFactor = 1
 prefix=[volumeDir]
-seg3d2.slicetovolumefilter(layerid=layerid, input_files=stosfiles, output_prefixes=prefix, image_dirs=[testRoot], shrink_factor=shrinkFactor)
+seg3d2.slicetovolumefilter(layerid=layerid, input_files=stosfiles, output_prefixes=prefix, image_dirs=[testRoot], shrink_factor=volumeShrinkFactor)
