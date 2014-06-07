@@ -27,9 +27,9 @@
  */
 
 // HDF5 includes
-#include <hdf5.h>
-#include <hdf5_hl.h>
-#include <H5Cpp.h>
+#include <itk_hdf5.h>
+#include <itk_H5Cpp.h>
+#include <itk_hdf5_hl.h>
 
 // Core includes
 #include <Core/DataBlock/StdDataBlock.h>
