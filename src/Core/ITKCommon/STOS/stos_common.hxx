@@ -595,11 +595,7 @@ public:
            i = nodes_.begin(); i != nodes_.end(); ++i)
     {
       const boost::shared_ptr<node_t> & node = *i;
-//      if (node->fn_data_.match_tail(fn_data, true) ||
-//          fn_data.match_tail(node->fn_data_, true))
-//      {
-//        return node;
-//      }
+
       if ( boost::iequals(node->fn_data_.string(), fn_data.string()) )
       {
         return node;
@@ -651,7 +647,7 @@ public:
            i = stos_list.begin(); i != stos_list.end(); ++i)
     {
       const stos_t<TImage> & stos = *i;
-      
+
       boost::shared_ptr<node_t> a = lookup(stos.fn_[0]);
       boost::shared_ptr<node_t> b = lookup(stos.fn_[1]);
       
@@ -730,12 +726,6 @@ public:
         const_cast<base_transform_t *>(node->parent_.stos_.t01_.GetPointer());
       transforms.push_front(t);
       
-//      if (node->parent_.a_->fn_data_.match_tail(src) ||
-//          src.match_tail(node->parent_.a_->fn_data_))
-//      {
-//        cascade.assign(transforms.begin(), transforms.end());
-//        return true;
-//      }
       if ( boost::iequals(node->parent_.a_->fn_data_.string(), src.string()) )
       {
         cascade.assign(transforms.begin(), transforms.end());

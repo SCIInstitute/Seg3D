@@ -46,8 +46,10 @@
 
 // local includes:
 #include <Core/ITKCommon/common.hxx>
-//#include "the_text.hxx"
 #include <Core/ITKCommon/the_utils.hxx>
+
+#include <Core/Utils/Exception.h>
+#include <Core/Utils/Log.h>
 
 namespace bfs=boost::filesystem;
 
@@ -137,7 +139,10 @@ public:
          const bfs::path & override_slice0_path = "",
          const bfs::path & override_slice1_path = "")
   {
-    load(fn_load, override_slice0_path, override_slice1_path);
+    if (! load(fn_load, override_slice0_path, override_slice1_path) )
+    {
+      CORE_THROW_EXCEPTION("Loading stos file failed.");
+    }
   }
   
   // load the filenames of the slices and the corresponding transform:
@@ -150,13 +155,14 @@ public:
     the::open_utf8(si, fn_load.c_str(), std::ios::in);
     if (!si.is_open())
     {
-      std::cerr << "WARNING: could not open " << fn_load
-      << " for reading, skipping...." << std::endl;
+      std::ostringstream oss;
+      oss << "Could not open " << fn_load << " for reading, skipping....";
+      CORE_LOG_WARNING(oss.str());
       return false;
     }
     
     fn_load_ = fn_load;
-    if (blab) std::cout << "loading " << fn_load_ << std::endl;
+    if (blab) std::cout << "loading " << fn_load_.string() << std::endl;
     
     bool ok = load(si, slice0_path, slice1_path);
     si.close();
@@ -180,19 +186,22 @@ public:
     // Override if needed.
     for (int i = 0; i < 2; i++)
     {
-//      IRPath::CleanSlashes(fn_[i]);
-//      corrected_path[i] = IRPath::CleanPath(corrected_path[i]);
       if (! corrected_path[i].empty() )
       {
-//        if ( fn_[i].contains('/') )
-//        {
-//          std::vector<bfs::path> split_list = 
-//          fn_[i].splitAt('/', std::numeric_limits<unsigned int>::max());
-//          fn_[i] = split_list.back();
-//        }
-//        fn_[i] = corrected_path[i] + fn_[i];
-        bfs::path p(f[i]);
-        fn_[i] = corrected_path[i] / p.filename();
+        bfs::path mosaicPath(f[i]);
+        bfs::path p = corrected_path[i] / mosaicPath.filename();
+        if ( bfs::exists(p) )
+        {
+          fn_[i] = p;
+        }
+        else
+        {
+          std::ostringstream oss;
+          oss << "Overridden file path " << p << " does not exist. Ignoring path override.";
+          CORE_LOG_WARNING(oss.str());
+
+          fn_[i] = f[i];
+        }
       }
     }
     
@@ -245,8 +254,9 @@ public:
     the::open_utf8(so, fn_save.c_str(), std::ios::out);
     if (!so.is_open())
     {
-      std::cerr << "WARNING: could not open " << fn_save
-      << " for writing, skipping...." << std::endl;
+      std::ostringstream oss;
+      oss << "Could not open " << fn_save << " for writing, skipping....";
+      CORE_LOG_WARNING(oss.str());
       return false;
     }
     if (blab) std::cout << "saving " << fn_save << std::endl;
@@ -266,8 +276,8 @@ public:
     int old_precision = so.precision();
     so.precision(12);
     
-    so << fn_[0] << std::endl
-    << fn_[1] << std::endl
+    so << fn_[0].string() << std::endl
+    << fn_[1].string() << std::endl
     << flipped_[0] << std::endl
     << flipped_[1] << std::endl
     << sp_[0][0] << '\t'
@@ -285,8 +295,8 @@ public:
     if (!fn_mask_[0].empty() && !fn_mask_[1].empty())
     {
       so << "two_user_supplied_masks:" << std::endl
-      << fn_mask_[0] << std::endl
-      << fn_mask_[1] << std::endl;
+      << fn_mask_[0].string() << std::endl
+      << fn_mask_[1].string() << std::endl;
     }
     
     so.setf(old_flags);
