@@ -628,8 +628,20 @@ ActionSliceToVolumeFilter::run( Core::ActionContextHandle& context, Core::Action
           ++iter[itIdx];
       }
       
-  //    the_text_t fn_filename = *prefix_iter;
-      std::ostringstream fn_filename;
+      if (! bfs::is_directory( *prefix_iter ) )
+      {
+        CORE_LOG_DEBUG(std::string("Creating missing directory ") + prefix_iter->string());
+        if (! boost::filesystem::create_directories(*prefix_iter))
+        {
+          std::ostringstream oss;
+          oss << "Could not create missing directory " << *prefix_iter << " required to create output volume.";
+          context->report_error(oss.str());
+          return false;
+        }
+      }
+
+//    the_text_t fn_filename = *prefix_iter;
+     std::ostringstream fn_filename;
       fn_filename << prefix_iter->string();
       
       if ( fn_prefixes.size() != 1 )
