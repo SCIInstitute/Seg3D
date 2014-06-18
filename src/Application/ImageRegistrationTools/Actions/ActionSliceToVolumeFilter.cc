@@ -222,7 +222,7 @@ ActionSliceToVolumeFilter::run( Core::ActionContextHandle& context, Core::Action
 //        image1_dir = image_dirs[i+1][0];
 
       // test
-      slice0_dir = fn_prefixes.front();
+      slice0_dir = image_dirs_test.front();
       if (! bfs::is_directory(slice0_dir) )
       {
         std::ostringstream oss;
@@ -237,7 +237,7 @@ ActionSliceToVolumeFilter::run( Core::ActionContextHandle& context, Core::Action
         }
       }
 
-      slice1_dir = fn_prefixes.front();
+      slice1_dir = image_dirs_test.front();
       if (! bfs::is_directory(slice1_dir) )
       {
         std::ostringstream oss;
