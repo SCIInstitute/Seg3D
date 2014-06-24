@@ -437,15 +437,17 @@ void LayerWidgetPrivate::export_isosurface()
   }
 
   QString filename;
-  boost::filesystem::path current_folder = ProjectManager::Instance()->get_current_file_folder();
+  boost::filesystem::path current_folder = ProjectManager::Instance()->get_current_file_folder();  
 
-  filename = QFileDialog::getSaveFileName( this->parent_, "Export Isosurface As... ",
-    current_folder.string().c_str(), "VTK files (*.vtk)" );
+  filename = QFileDialog::getSaveFileName( this->parent_,
+                                           tr("Export Isosurface As... "),
+                                           current_folder.string().c_str(),
+                                           tr("VTK (*.vtk);;ASCII (*.fac *.pts *.val);;STL (*.stl)") );
 
-  if( filename == "" ) return;
+  if ( filename.isEmpty() ) return;
 
   ActionExportIsosurface::Dispatch( Core::Interface::GetWidgetActionContext(), 
-    this->layer_->get_layer_id(), filename.toStdString() );
+    this->layer_->get_layer_id(), filename.toStdString(), this->layer_->name_state_->get() );
 
 }
 
@@ -1321,60 +1323,60 @@ void LayerWidget::contextMenuEvent( QContextMenuEvent * event )
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
     data_state = this->private_->layer_->data_state_->get();
   }
-  
+
   if ( data_state == Layer::PROCESSING_C || data_state == Layer::CREATING_C )
   {
     event->accept();
     return;
   }
-  
+
   QMenu menu( this );
   QAction* qaction;
   qaction = menu.addAction( tr( "Duplicate Layer" ) );
   QtUtils::QtBridge::Connect( qaction,
     boost::bind( &ActionDuplicateLayer::Dispatch, Core::Interface::GetWidgetActionContext(), 
     this->private_->layer_->get_layer_id() ) );
-  
+
   if ( data_state != Layer::IN_USE_C  )
   {
     qaction = menu.addAction( tr( "Delete Layer" ) );
     connect( qaction, SIGNAL( triggered() ), this, SLOT( delete_layer_from_context_menu() ) );
   }
-  
+
   QMenu* export_menu;
   export_menu = new QMenu( this );
     
-    export_menu->setTitle( tr( "Export Data As..." ) );
-    qaction = export_menu->addAction( tr( "DICOM" ) );
-    connect( qaction, SIGNAL( triggered() ), this, SLOT( export_dicom() ) );
+  export_menu->setTitle( tr( "Export Data As..." ) );
+  qaction = export_menu->addAction( tr( "DICOM" ) );
+  connect( qaction, SIGNAL( triggered() ), this, SLOT( export_dicom() ) );
 
-  if( this->private_->layer_->get_type() == Core::VolumeType::MASK_E )
+  if ( this->private_->layer_->get_type() == Core::VolumeType::MASK_E )
   {
     export_menu->setTitle( tr( "Export Segmentation As..." ) );
     
     qaction = export_menu->addAction( tr( "BITMAP" ) );
     connect( qaction, SIGNAL( triggered() ), this, SLOT( export_bitmap() ) );
   }
-  
+
   qaction = export_menu->addAction( tr( "NRRD" ) );
   connect( qaction, SIGNAL( triggered() ), this, SLOT( export_nrrd() ) );
 
   qaction = export_menu->addAction( tr( "MATLAB" ) );
   connect( qaction, SIGNAL( triggered() ), this, SLOT( export_matlab() ) );
-  
+
   qaction = export_menu->addAction( tr( "PNG" ) );
   connect( qaction, SIGNAL( triggered() ), this, SLOT( export_png() ) );
-  
+
   qaction = export_menu->addAction( tr( "TIFF" ) );
   connect( qaction, SIGNAL( triggered() ), this, SLOT( export_tiff() ) );
-  
+
   qaction = export_menu->addAction( tr( "MRC" ) );
   connect( qaction, SIGNAL( triggered() ), this, SLOT( export_mrc() ) );
-  
-  menu.addMenu( export_menu );
-  
 
-  if( this->private_->layer_->get_type() == Core::VolumeType::MASK_E )
+  menu.addMenu( export_menu );
+
+
+  if ( this->private_->layer_->get_type() == Core::VolumeType::MASK_E )
   {
     QAction *qaction = menu.addAction( tr( "Export Isosurface..." ) );
     connect( qaction, SIGNAL( triggered() ), this, SLOT( export_isosurface() ) );
@@ -1440,6 +1442,5 @@ void LayerWidget::export_isosurface()
 {
   this->private_->export_isosurface();
 }
-
 
 } //end namespace Seg3D
