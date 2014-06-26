@@ -142,7 +142,7 @@ ADD_DEFINITIONS(-DBOOST_ALL_NO_LIB)
 ADD_DEFINITIONS(-DQT_NO_KEYWORDS)
 ADD_DEFINITIONS(-DTIXML_USE_STL)
   
-SET(ITK_BUILD_SHARED_LIBS "STATIC")
+SET(ITK_BUILD_SHARED_LIBS OFF)
 SET(Module_ITKReview ON CACHE BOOLEAN "Seg3D requires the ITK Review directory for proper filter operations." FORCE)
 
 ###########################################
