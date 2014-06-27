@@ -174,7 +174,6 @@ TARGET_LINK_LIBRARIES(Application_Tools
   Application_ToolManager
   ${SCI_BOOST_LIBRARY}
   ${ITKCommon_LIBRARIES}
-  #${SCI_ITK_LIBRARIES}
 )
 
 # Register tool classes

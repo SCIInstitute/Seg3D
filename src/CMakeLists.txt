@@ -138,10 +138,10 @@ ELSE(CMAKE_SIZEOF_VOID_P MATCHES 8)
   SET(SEG3D_BITS "32bit")
   SET(MSVC90_BUILD "x86")
   ADD_DEFINITIONS(-DSCI_32BITS)
-  IF(WIN32)
+  IF (WIN32)
     ADD_DEFINITIONS(-DBOOST_BIND_ENABLE_STDCALL)
-  ENDIF(WIN32)
-ENDIF(CMAKE_SIZEOF_VOID_P MATCHES 8)
+  ENDIF (WIN32)
+ENDIF (CMAKE_SIZEOF_VOID_P MATCHES 8)
 
 ###########################################
 # SETUP DEFINTIONS FOR EXTERNAL PACKAGES
@@ -157,9 +157,8 @@ ADD_DEFINITIONS(-DBOOST_ALL_NO_LIB)
 ADD_DEFINITIONS(-DQT_NO_KEYWORDS)
 ADD_DEFINITIONS(-DTIXML_USE_STL)
   
-SET(ITK_BUILD_SHARED_LIBS "STATIC")
-SET(ITK_USE_REVIEW TRUE CACHE BOOLEAN "Seg3D requires the ITK Review directory for proper filter operations." FORCE)
-SET(ITK_USE_REVIEW_STATISTICS TRUE CACHE BOOLEAN "Seg3D requires the ITK Review directory for proper filter operations." FORCE)
+SET(ITK_BUILD_SHARED_LIBS OFF)
+SET(Module_ITKReview ON CACHE BOOLEAN "Seg3D requires the ITK Review directory for proper filter operations." FORCE)
 
 ###########################################
 # Flags for Microsoft Compiler

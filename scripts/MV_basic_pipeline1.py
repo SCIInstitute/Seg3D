@@ -10,7 +10,7 @@ import os
 
 # set up parameters:
 config = configparser.ConfigParser()
-config.read('../scripts/MV_settings.ini')
+config.read('../scripts/settings.ini')
 testRoot = config.get('MouseVolume', 'dir')
 if not os.path.exists(testRoot):
   raise ValueError("Path %s does not exist." % testRoot)
@@ -37,7 +37,7 @@ for index in range(firstIndex, mosaicLastIndex):
   print(fftOutputMosaic)
   outputMosaicList.append(fftOutputMosaic)
 
-  seg3d2.fftfilter(layerid=layerid, directory=imageDir, output_mosaic_file=fftOutputMosaic, shrink_factor=shrinkFactor)
+  seg3d2.fftfilter(layerid=layerid, directory=imageDir, output_mosaic=fftOutputMosaic, shrink_factor=shrinkFactor)
 
   assembleOutputImage='{0}/results/{1}{2}'.format(testOutputRoot, outputStem, outputImageExtension)
   print(assembleOutputImage)
