@@ -2216,7 +2216,6 @@ bool Isosurface::export_vtk_isosurface( const boost::filesystem::path& filename 
 bool Isosurface::export_stl_isosurface( const boost::filesystem::path& filename, const std::string& name )
 {
   lock_type lock( this->get_mutex() );
-std::cerr << "Export STL file " << filename << ", " << name << std::endl;
   std::ofstream stl_file( filename.string().c_str() );
   if( ! stl_file.is_open() ) 
   {
