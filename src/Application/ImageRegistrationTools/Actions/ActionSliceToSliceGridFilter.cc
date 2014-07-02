@@ -120,22 +120,40 @@ ActionSliceToSliceGridFilter::run( Core::ActionContextHandle& context, Core::Act
     // override slice and image directories
     // TODO: unclear how useful this is
     bfs::path slice_dirs[2];
-    if ( (this->slice_dir0_ != "<none>") && (this->slice_dir1_ != "<none>") )
+    if ( (this->slice_dir_fixed_ != "<none>") && (this->slice_dir_moving_ != "<none>") )
     {
-      slice_dirs[0] = this->slice_dir0_;
-      slice_dirs[1] = this->slice_dir1_;
+      slice_dirs[0] = this->slice_dir_fixed_;
+      slice_dirs[1] = this->slice_dir_moving_;
     }
     bfs::path image_dirs[2];
-    if ( (this->image_dir0_ != "<none>") && (this->image_dir1_ != "<none>") )
+    if ( (this->image_dir_fixed_ != "<none>") && (this->image_dir_moving_ != "<none>") )
     {
-      image_dirs[0] = this->image_dir0_;
-      image_dirs[1] = this->image_dir1_;
+      image_dirs[0] = this->image_dir_fixed_;
+      image_dirs[1] = this->image_dir_moving_;
     }
     
   //  bool override_image_dir = false;
   //  bool override_slice_dirs = false;
     
     bfs::path fn_save(this->output_stos_);
+    
+    if (fn_save.empty())
+    {
+      CORE_LOG_ERROR("Missing output file.");
+      return false;
+    }
+
+    if (! bfs::is_directory( fn_save.parent_path() ) )
+    {
+      CORE_LOG_DEBUG(std::string("Creating parent path to ") + this->output_stos_);
+      if (! boost::filesystem::create_directories(fn_save.parent_path()))
+      {
+        std::ostringstream oss;
+        oss << "Could not create missing directory " << fn_save.parent_path() << " required to create output mosaic.";
+        CORE_LOG_ERROR(oss.str());
+        return false;
+      }
+    }
     
     // TODO: expose?
     bool verbose = false;
@@ -159,12 +177,6 @@ ActionSliceToSliceGridFilter::run( Core::ActionContextHandle& context, Core::Act
     if (fn_load.empty())
     {
       CORE_LOG_ERROR("Missing input file.");
-      return false;
-    }
-    
-    if (fn_save.empty())
-    {
-      CORE_LOG_ERROR("Missing output file.");
       return false;
     }
     
@@ -524,13 +536,13 @@ ActionSliceToSliceGridFilter::Dispatch(Core::ActionContextHandle context,
                                        double clahe_slope,
                                        double minimum_overlap,
                                        double displacement_threshold,
-                                       double disable_fft,
+                                       bool disable_fft,
                                        std::string input_stos,
                                        std::string output_stos,
-                                       std::string slice_dir0,
-                                       std::string slice_dir1,
-                                       std::string image_dir0,
-                                       std::string image_dir1)
+                                       std::string slice_dir_fixed,
+                                       std::string slice_dir_moving,
+                                       std::string image_dir_fixed,
+                                       std::string image_dir_moving)
 {
   // Create a new action
   ActionSliceToSliceGridFilter* action = new ActionSliceToSliceGridFilter;
@@ -551,10 +563,10 @@ ActionSliceToSliceGridFilter::Dispatch(Core::ActionContextHandle context,
   action->disable_fft_ = disable_fft;
   action->input_stos_ = input_stos;
   action->output_stos_ = output_stos;
-  action->slice_dir0_ = slice_dir0;
-  action->slice_dir1_ = slice_dir1;
-  action->image_dir0_ = image_dir0;
-  action->image_dir1_ = image_dir1;
+  action->slice_dir_fixed_ = slice_dir_fixed;
+  action->slice_dir_moving_ = slice_dir_moving;
+  action->image_dir_fixed_ = image_dir_fixed;
+  action->image_dir_moving_ = image_dir_moving;
   
   // Dispatch action to underlying engine
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );

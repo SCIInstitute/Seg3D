@@ -130,37 +130,26 @@ ActionSliceToVolumeFilter::run( Core::ActionContextHandle& context, Core::Action
     
     std::list<stos_t<image_t> > stos_list;
 
-    std::vector<std::vector<bfs::path > > image_dirs;
 
-    std::vector<std::vector<bfs::path > > slice_dirs;
-//    std::vector<std::vector<bfs::path > > slice_dirs(stos_fn.size() + 1);
-//    for (size_t i = 0; i < this->slice_dirs_.size(); ++i)
-//    {
-//      slice_dirs[i].push_back(bfs::path(this->slice_dirs_[i]));
-//    }
+    int stos_names = stos_fn.size() + 1;
+    std::vector<std::vector<bfs::path > > slice_dirs(stos_fn.size() + 1);
+    std::vector<std::vector<bfs::path > > image_dirs(stos_fn.size() + 1);
 
-    // test
-    std::vector<bfs::path> slice_dirs_test;
     for (size_t i = 0; i < this->slice_dirs_.size(); ++i)
     {
-      slice_dirs_test.push_back(this->slice_dirs_[i]);
+      slice_dirs[i].push_back(bfs::path(this->slice_dirs_[i]));
     }
-
-    std::vector<bfs::path> image_dirs_test;
+    
     for (size_t i = 0; i < this->image_dirs_.size(); ++i)
     {
-      image_dirs_test.push_back(this->image_dirs_[i]);
+      image_dirs[i].push_back(bfs::path(this->image_dirs_[i]));
     }
-    // test
     
     bool old_image_list_type = true, old_slice_dirs_type = true;
     unsigned int image_list_idx = 0, slice_dirs_idx = 0;
 
-  //  std::list<the_text_t>  fn_prefixes;
     pathList fn_prefixes;
-
-//    bfs::path fn_extension(".tif");
-    bfs::path fn_extension(".png");
+    bfs::path fn_extension(this->image_extension_);
 
     bool using_extra_padding = false;
     if (this->left_padding_ > 0 || this->right_padding_ > 0 ||
@@ -172,12 +161,22 @@ ActionSliceToVolumeFilter::run( Core::ActionContextHandle& context, Core::Action
     for (size_t i = 0; i < this->output_prefixes_.size(); ++i)
     {
       bfs::path prefix(this->output_prefixes_[i]);
+      if (! bfs::is_directory(prefix) )
+      {
+        std::ostringstream oss;
+        oss << "Creating path to " << prefix;
+        CORE_LOG_DEBUG(oss.str());
+        if (! boost::filesystem::create_directories(prefix))
+        {
+          std::ostringstream oss;
+          oss << "Could not create missing directory " << prefix << " required to create output image.";
+          context->report_error(oss.str());
+          return false;
+        }
+      }
+
       fn_prefixes.push_back(prefix);
     }
-
-    int stos_names = stos_fn.size() + 1;
-    slice_dirs.resize(stos_names);
-    image_dirs.resize(stos_names);
     
     // Note: (Slice/Image Dirs) - BCG - I'm not exactly sure of the ramifications of
     //       overriding the .mosaic slices below.  It seems to work, but it hasn't
@@ -188,13 +187,19 @@ ActionSliceToVolumeFilter::run( Core::ActionContextHandle& context, Core::Action
     for (int i = 0; i < stos_names; ++i)
     {
       if ( slice_dirs[i].empty() )
+      {
         slice_dirs[i].push_back( bfs::path() );
+      }
       if ( slice_dirs[i].size() > 1 )
-        std::cout << "WARNING: Overriding slice dirs with new .mosaic files has not been tested "
-        << "thoroughly.  Problems may arise as a result of building the mosaic mask.  "
-        << "Use at your own risk." << std::endl;
+      {
+        CORE_LOG_DEBUG("WARNING: Overriding slice dirs with new .mosaic files has not been tested "
+        "thoroughly.  Problems may arise as a result of building the mosaic mask.  "
+        "Use at your own risk.");
+      }
       if ( image_dirs[i].empty() )
+      {
         image_dirs[i].push_back( bfs::path() );
+      }
     }
     
     if ( fn_prefixes.size() == 0 || (fn_prefixes.size() > 1 && (fn_prefixes.size() != stos_fn.size() + 1) ) )
@@ -204,66 +209,29 @@ ActionSliceToVolumeFilter::run( Core::ActionContextHandle& context, Core::Action
     }
     
     int i = 0;
-  //  for (std::list<the_text_t>::const_iterator fn_iter = stos_fn.begin();
-  //       fn_iter != stos_fn.end(); ++fn_iter, ++i)
     for (pathList::const_iterator fn_iter = stos_fn.begin(); fn_iter != stos_fn.end(); ++fn_iter, ++i)
     {
       bfs::path slice0_dir, slice1_dir, image0_dir, image1_dir;
       
-// temporarily disabling...
-//      if ( slice_dirs[i].size() > 0 )
-//        slice0_dir = slice_dirs[i][0];
-//      if ( slice_dirs[i+1].size() > 0 )
-//        slice1_dir = slice_dirs[i+1][0];
-//      
-//      if ( image_dirs[i].size() > 0 )
-//        image0_dir = image_dirs[i][0];
-//      if ( image_dirs[i+1].size() > 0 )
-//        image1_dir = image_dirs[i+1][0];
-
-      // test
-      slice0_dir = image_dirs_test.front();
-      if (! bfs::is_directory(slice0_dir) )
+      if ( slice_dirs[i].size() > 0 )
       {
-        std::ostringstream oss;
-        oss << "Creating path to " << slice0_dir;
-        CORE_LOG_DEBUG(oss.str());
-        if (! boost::filesystem::create_directories(slice0_dir))
-        {
-          std::ostringstream oss;
-          oss << "Could not create missing directory " << slice0_dir << " required to create output image.";
-          context->report_error(oss.str());
-          return false;
-        }
+        slice0_dir = slice_dirs[i][0];
       }
 
-      slice1_dir = image_dirs_test.front();
-      if (! bfs::is_directory(slice1_dir) )
+      if ( slice_dirs[i+1].size() > 0 )
       {
-        std::ostringstream oss;
-        oss << "Creating path to " << slice1_dir;
-        CORE_LOG_DEBUG(oss.str());
-        if (! boost::filesystem::create_directories(slice1_dir))
-        {
-          std::ostringstream oss;
-          oss << "Could not create missing directory " << slice1_dir << " required to create output image.";
-          context->report_error(oss.str());
-          return false;
-        }
+        slice1_dir = slice_dirs[i+1][0];
+      }
+      
+      if ( image_dirs[i].size() > 0 )
+      {
+        image0_dir = image_dirs[i][0];
       }
 
-      // TODO: terrible - get a better handle on parameter
-      if (image_dirs_test.size() > 1)
+      if ( image_dirs[i+1].size() > 0 )
       {
-        image0_dir = image_dirs_test[i];
-        image1_dir = image_dirs_test[i+1];
+        image1_dir = image_dirs[i+1][0];
       }
-      else
-      {
-        image0_dir = image_dirs_test[0];
-        image1_dir = image_dirs_test[0];
-      }
-      // test
       
       stos_t<image_t> stos( *fn_iter, slice0_dir, slice1_dir );
       stos.image_dirs_[0] = image0_dir;
@@ -319,7 +287,6 @@ ActionSliceToVolumeFilter::run( Core::ActionContextHandle& context, Core::Action
       }
       stos_tree.dump(std::cerr);
       
-  //    ::exit(1);
       return false;
     }
     
@@ -640,8 +607,7 @@ ActionSliceToVolumeFilter::run( Core::ActionContextHandle& context, Core::Action
         }
       }
 
-//    the_text_t fn_filename = *prefix_iter;
-     std::ostringstream fn_filename;
+      std::ostringstream fn_filename;
       fn_filename << prefix_iter->string();
       
       if ( fn_prefixes.size() != 1 )
@@ -772,7 +738,8 @@ void
                                       std::vector<std::string> input_files,
                                       std::vector<std::string> output_prefixes,
                                       std::vector<std::string> slice_dirs,
-                                      std::vector<std::string> image_dirs)
+                                      std::vector<std::string> image_dirs,
+                                      std::string image_extension)
 {
   // Create a new action
   ActionSliceToVolumeFilter* action = new ActionSliceToVolumeFilter;
@@ -798,6 +765,7 @@ void
   action->output_prefixes_ = output_prefixes;
   action->slice_dirs_ = slice_dirs;
   action->image_dirs_ = image_dirs;
+  action->image_extension_ = image_extension;
   
   // Dispatch action to underlying engine
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );

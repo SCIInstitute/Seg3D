@@ -64,6 +64,7 @@ CORE_ACTION(
   CORE_ACTION_OPTIONAL_ARGUMENT( "remap_values", "false", "" )
   CORE_ACTION_OPTIONAL_ARGUMENT( "save_int16_image", "false", "" )
   CORE_ACTION_OPTIONAL_ARGUMENT( "save_uint16_image", "false", "" )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "image_extension", ".tif", "Image extension (.tif, .png known to work)." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "sandbox", "-1", "The sandbox in which to run the action." )
   CORE_ACTION_ARGUMENT_IS_NONPERSISTENT( "sandbox" )
 )
@@ -93,6 +94,7 @@ public:
     this->add_parameter( this->remap_values_ );
     this->add_parameter( this->save_int16_image_ );
     this->add_parameter( this->save_uint16_image_ );
+    this->add_parameter( this->image_extension_ );
     this->add_parameter( this->sandbox_ );
   }
   
@@ -121,7 +123,8 @@ public:
                        std::vector<std::string> input_files,
                        std::vector<std::string> output_prefixes,
                        std::vector<std::string> slice_dirs,
-                       std::vector<std::string> image_dirs);
+                       std::vector<std::string> image_dirs,
+                       std::string image_extension);
   
 private:
   std::string target_layer_;
@@ -146,6 +149,7 @@ private:
   std::vector<std::string> output_prefixes_;
   std::vector<std::string> slice_dirs_;
   std::vector <std::string> image_dirs_;
+  std::string image_extension_;
 //  std::string output_image_;
 
   const double DEFAULT_CLAHE_SLOPE;

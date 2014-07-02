@@ -47,23 +47,23 @@ CORE_ACTION(
   CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
   CORE_ACTION_ARGUMENT( "input_stos", "Input slice to slice (.stos) data file." )
   CORE_ACTION_ARGUMENT( "output_stos", "Output slice to slice (.stos) data file." )
+  CORE_ACTION_ARGUMENT( "neighborhood", "Pixel neighborhood to refine the grid." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "shrink_factor", "1", "Downsample factor." )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "iterations", "1", "" )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "grid_spacing", "1", "" )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "grid_rows", "1", "" )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "grid_cols", "1", "" )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "neighborhood", "1", "" )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "median_radius", "1", "" )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "iterations", "1", "Pyramid iterations." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "grid_spacing", "0", "Grid spacing (set either this, or set both grid_rows and grid_cols)." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "grid_rows", "0", "Grid rows (set either this with grid_cols, or set grid_spacing)." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "grid_cols", "0", "Grid columns (set either this with grid_rows, or set grid_spacing)." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "median_radius", "1", "Median filter radius." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "num_threads", "0", "Number of threads used (if 0, number of cores will be used)." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "clahe_slope", "1.0", "Maximum CLAHE slope." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "minimum_overlap", "0.5", "Minimum mask overlap." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "displacement_threshold", "1.0", "" )
   CORE_ACTION_OPTIONAL_ARGUMENT( "disable_fft", "false", "Do not use FFT." )
   // TODO: better path handling?
-  CORE_ACTION_OPTIONAL_ARGUMENT( "slice_dir0", "<none>", "Override path to slice 0." )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "slice_dir1", "<none>", "Override path to slice 1." )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "image_dir0", "<none>", "Override path to slice 0 images." )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "image_dir1", "<none>", "Override path to slice 1 images." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "slice_dir_fixed", "<none>", "Override path to fixed slice." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "slice_dir_moving", "<none>", "Override path to fixed slice." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "image_dir_fixed", "<none>", "Override path to fixed slice images." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "image_dir_moving", "<none>", "Override path to moving slice images." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "sandbox", "-1", "The sandbox in which to run the action." )
   CORE_ACTION_ARGUMENT_IS_NONPERSISTENT( "sandbox" )
 )
@@ -81,22 +81,22 @@ public:
     this->add_layer_id( this->target_layer_ );
     this->add_parameter( this->input_stos_ );
     this->add_parameter( this->output_stos_ );
+    this->add_parameter( this->neighborhood_ );
     this->add_parameter( this->shrink_factor_ );
     this->add_parameter( this->iterations_ );
     this->add_parameter( this->grid_spacing_ );
     this->add_parameter( this->grid_rows_ );
     this->add_parameter( this->grid_cols_ );
-    this->add_parameter( this->neighborhood_ );
     this->add_parameter( this->median_radius_ );
     this->add_parameter( this->num_threads_ );
     this->add_parameter( this->clahe_slope_ );
     this->add_parameter( this->minimum_overlap_ );
     this->add_parameter( this->displacement_threshold_ );
     this->add_parameter( this->disable_fft_ );
-    this->add_parameter( this->slice_dir0_ );
-    this->add_parameter( this->slice_dir1_ );
-    this->add_parameter( this->image_dir0_ );
-    this->add_parameter( this->image_dir1_ );
+    this->add_parameter( this->slice_dir_fixed_ );
+    this->add_parameter( this->slice_dir_moving_ );
+    this->add_parameter( this->image_dir_fixed_ );
+    this->add_parameter( this->image_dir_moving_ );
     this->add_parameter( this->sandbox_ );
   }
   
@@ -118,13 +118,13 @@ public:
                        double clahe_slope,
                        double minimum_overlap,
                        double displacement_threshold,
-                       double disable_fft,
+                       bool disable_fft,
                        std::string input_stos,
                        std::string output_stos,
-                       std::string slice_dir0,
-                       std::string slice_dir1,
-                       std::string image_dir0,
-                       std::string image_dir1);
+                       std::string slice_dir_fixed,
+                       std::string slice_dir_moving,
+                       std::string image_dir_fixed,
+                       std::string image_dir_moving);
   
 private:
   std::string target_layer_;
@@ -141,13 +141,13 @@ private:
   double clahe_slope_;
   double minimum_overlap_;
   double displacement_threshold_;
-  double disable_fft_;
+  bool disable_fft_;
   std::string input_stos_;
   std::string output_stos_;
-  std::string slice_dir0_;
-  std::string slice_dir1_;
-  std::string image_dir0_;
-  std::string image_dir1_;
+  std::string slice_dir_fixed_;
+  std::string slice_dir_moving_;
+  std::string image_dir_fixed_;
+  std::string image_dir_moving_;
   
   const double DEFAULT_MIN_STEP;
   const double DEFAULT_MAX_STEP;
