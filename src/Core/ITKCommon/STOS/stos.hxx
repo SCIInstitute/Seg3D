@@ -162,7 +162,7 @@ public:
     }
     
     fn_load_ = fn_load;
-    if (blab) std::cout << "loading " << fn_load_.string() << std::endl;
+    if (blab) std::cout << "stos_t loading " << fn_load_.string() << std::endl;
     
     bool ok = load(si, slice0_path, slice1_path);
     si.close();
@@ -203,17 +203,52 @@ public:
           fn_[i] = f[i];
         }
       }
+      else
+      {
+        if ( bfs::exists(f[i]) )
+        {
+          fn_[i] = f[i];
+        }
+        else
+        {
+          std::ostringstream oss;
+          oss << "File path " << f[i] << " does not exist.";
+          CORE_LOG_ERROR(oss.str());
+          return false;
+        }
+      }
+    }
+
+    std::cerr << fn_[0] << " " << fn_[1] << std::endl;
+
+    std::string line;
+    {
+      std::getline(si, line);
+      std::istringstream iss(line);
+      iss >> flipped_[0];
+      line.clear();
+    }
+
+    {
+      std::getline(si, line);
+      std::istringstream iss(line);
+      iss >> flipped_[1];
+      line.clear();
+    }
+
+    {
+      std::getline(si, line);
+      std::istringstream iss(line);
+      iss >> sp_[0][0] >> sp_[0][1] >> sz_[0][0] >> sz_[0][1];
+      line.clear();
     }
     
-    int sz[2][2];
-    si >> flipped_[0] >> flipped_[1]
-    >> sp_[0][0] >> sp_[0][1] >> sz[0][0] >> sz[0][1]
-    >> sp_[1][0] >> sp_[1][1] >> sz[1][0] >> sz[1][1];
-    
-    sz_[0][0] = sz[0][0];
-    sz_[0][1] = sz[0][1];
-    sz_[1][0] = sz[1][0];
-    sz_[1][1] = sz[1][1];
+    {
+      std::getline(si, line);
+      std::istringstream iss(line);
+      iss >> sp_[1][0] >> sp_[1][1] >> sz_[1][0] >> sz_[1][1];
+      line.clear();
+    }
     
     itk::TransformBase::Pointer tmp = load_transform(si);
     

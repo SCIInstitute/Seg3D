@@ -557,8 +557,8 @@ calc_tile_mosaic_bbox(const base_transform_t * mosaic_to_tile,
   
   pnt2d_t tile_min = tile->GetOrigin();
   pnt2d_t tile_max;
-  tile_max[0] = tile_min[0] + sp[0] * double(sz[0]);
-  tile_max[1] = tile_min[1] + sp[1] * double(sz[1]);
+  tile_max[0] = tile_min[0] + sp[0] * static_cast<double>(sz[0]);
+  tile_max[1] = tile_min[1] + sp[1] * static_cast<double>(sz[1]);
   
   return calc_tile_mosaic_bbox(mosaic_to_tile,
                                tile_min,
@@ -582,8 +582,8 @@ calc_image_bbox(const T * image, pnt2d_t & bbox_min, pnt2d_t & bbox_max)
   typename T::SizeType sz = image->GetLargestPossibleRegion().GetSize();
   typename T::SpacingType sp = image->GetSpacing();
   bbox_min = image->GetOrigin();
-  bbox_max[0] = bbox_min[0] + sp[0] * double(sz[0]);
-  bbox_max[1] = bbox_min[1] + sp[1] * double(sz[1]);
+  bbox_max[0] = bbox_min[0] + sp[0] * static_cast<double>(sz[0]);
+  bbox_max[1] = bbox_min[1] + sp[1] * static_cast<double>(sz[1]);
 }
 
 
@@ -968,7 +968,7 @@ image_min_max(const T * a,
     min = std::min(min, v);
     max = std::max(max, v);
     
-    mean += double(v);
+    mean += static_cast<double>(v);
     counter += 1.0;
   }
   
@@ -1303,8 +1303,8 @@ crop(const T * image,
   const unsigned int d = T::GetImageDimension();
   for (unsigned int i = 0; i < d; i++)
   {
-    reg_sz[i] = std::min((unsigned int)(max[i] - min[i] + 1),
-                         (unsigned int)(img_sz[i] - min[i]));
+    reg_sz[i] = std::min(static_cast<unsigned int>(max[i] - min[i] + 1),
+                         static_cast<unsigned int>(img_sz[i] - min[i]));
   }
   
   typename T::RegionType region;
@@ -1385,7 +1385,7 @@ shrink(const T * in,
   
   if (antialias)
   {
-    double variance = double(shrink_factor) / 2.0;
+    double variance = static_cast<double>(shrink_factor) / 2.0;
     double sigma = sqrt(variance);
     image = ::smooth<flt_img_t>(image, sigma, maximum_error);
   }
@@ -1421,7 +1421,7 @@ load(const bfs::path& filename, bool blab = true)
   reader->SetFileName(filename.c_str());
   if (blab) std::cout << "loading " << filename.string() << std::endl;
   
-  WRAP(terminator_t<reader_t> terminator(reader));
+//  WRAP(terminator_t<reader_t> terminator(reader));
   
   reader->Update();
   return reader->GetOutput();
@@ -1707,7 +1707,7 @@ calc_area(const itk::Vector<double, 2> & spacing,
           const unsigned long int pixels)
 {
   double pixel_area = spacing[0] * spacing[1];
-  double area = pixel_area * double(pixels);
+  double area = pixel_area * static_cast<double>(pixels);
   return area;
 }
 
@@ -1977,9 +1977,9 @@ my_metric(double & area,
     return std::numeric_limits<double>::max();
   }
   
-  aa = aa - ((sa * sa) / double(pixels));
-  bb = bb - ((sb * sb) / double(pixels));
-  ab = ab - ((sa * sb) / double(pixels));
+  aa = aa - ((sa * sa) / static_cast<double>(pixels));
+  bb = bb - ((sb * sb) / static_cast<double>(pixels));
+  ab = ab - ((sa * sb) / static_cast<double>(pixels));
   
   double result = -ab / sqrt(aa * bb);
   return result;
@@ -2021,16 +2021,16 @@ my_metric(double & overlap,
                                                mi_interpolator);
   if (overlap_area != 0)
   {
-#if 0
-    // this is very slow, but accurate:
-    double area_a = calc_area(fi, fi_mask);
-    double area_b = calc_area(mi, mi_mask);
-#else
+//#if 0
+//    // this is very slow, but accurate:
+//    double area_a = calc_area(fi, fi_mask);
+//    double area_b = calc_area(mi, mi_mask);
+//#else
     // this is fast, but approximate -- the mask is ingored,
     // only the image dimensions and pixel spacing are used:
     double area_a = get_area<TImage>(fi);
     double area_b = get_area<TImage>(mi);
-#endif
+//#endif
     
     double smaller_area = std::min(area_a, area_b);
     overlap = overlap_area / smaller_area;
@@ -2086,8 +2086,8 @@ my_metric(const TImage * fi,
 //  typename T::SizeType sz = image->GetLargestPossibleRegion().GetSize();
 //  typename T::SpacingType sp = image->GetSpacing();
 //  bbox_min = image->GetOrigin();
-//  bbox_max[0] = bbox_min[0] + sp[0] * double(sz[0]);
-//  bbox_max[1] = bbox_min[1] + sp[1] * double(sz[1]);
+//  bbox_max[0] = bbox_min[0] + sp[0] * static_cast<double>(sz[0]);
+//  bbox_max[1] = bbox_min[1] + sp[1] * static_cast<double>(sz[1]);
 //}
 
 //----------------------------------------------------------------
@@ -2228,8 +2228,8 @@ calc_image_bboxes_load_images(const std::list<bfs::path> & in,
 //  
 //  pnt2d_t tile_min = tile->GetOrigin();
 //  pnt2d_t tile_max;
-//  tile_max[0] = tile_min[0] + sp[0] * double(sz[0]);
-//  tile_max[1] = tile_min[1] + sp[1] * double(sz[1]);
+//  tile_max[0] = tile_min[0] + sp[0] * static_cast<double>(sz[0]);
+//  tile_max[1] = tile_min[1] + sp[1] * static_cast<double>(sz[1]);
 //  
 //  return calc_tile_mosaic_bbox(mosaic_to_tile,
 //                               tile_min,
@@ -2588,9 +2588,9 @@ make_mosaic_st
   
   // this is needed in order to prevent holes in the mask mosaic:
   bool integer_pixel = std::numeric_limits<pixel_t>::is_integer;
-  double pixel_max = double(std::numeric_limits<pixel_t>::max());
+  double pixel_max = static_cast<double>(std::numeric_limits<pixel_t>::max());
   double pixel_min = integer_pixel ?
-  double(std::numeric_limits<pixel_t>::min()) : -pixel_max;
+  static_cast<double>(std::numeric_limits<pixel_t>::min()) : -pixel_max;
   
   itex_t itex(mosaic, mosaic->GetLargestPossibleRegion());
   for (itex.GoToBegin(); !itex.IsAtEnd(); ++itex)
@@ -2774,9 +2774,9 @@ public:
     
     // this is needed in order to prevent holes in the mask mosaic:
     const bool integer_pixel = std::numeric_limits<pxl_t>::is_integer;
-    const double pixel_max = double(std::numeric_limits<pxl_t>::max());
+    const double pixel_max = static_cast<double>(std::numeric_limits<pxl_t>::max());
     const double pixel_min = integer_pixel ?
-    double(std::numeric_limits<pxl_t>::min()) : -pixel_max;
+    static_cast<double>(std::numeric_limits<pxl_t>::min()) : -pixel_max;
     
     rn_t region = mosaic_->GetLargestPossibleRegion();
     ix_t origin = region.GetIndex();
@@ -3243,9 +3243,9 @@ make_mosaic
  bool dont_allocate = false)
 {
   typename image_pointer_t::ObjectType::SizeType mosaic_sz;
-  mosaic_sz[0] = (unsigned int)((mosaic_max[0] - mosaic_min[0]) /
+  mosaic_sz[0] = static_cast<unsigned int>((mosaic_max[0] - mosaic_min[0]) /
                                 mosaic_sp[0]);
-  mosaic_sz[1] = (unsigned int)((mosaic_max[1] - mosaic_min[1]) /
+  mosaic_sz[1] = static_cast<unsigned int>((mosaic_max[1] - mosaic_min[1]) /
                                 mosaic_sp[1]);
   
   return make_mosaic<image_pointer_t, transform_pointer_t>
@@ -3452,9 +3452,9 @@ make_mask_st(const mask_t::SpacingType & mosaic_sp,
   mask_t::Pointer mosaic = mask_t::New();
   imagesz_t mosaic_sz;
   
-  mosaic_sz[0] = (unsigned int)((mosaic_max[0] - mosaic_min[0]) /
+  mosaic_sz[0] = static_cast<unsigned int>((mosaic_max[0] - mosaic_min[0]) /
                                 mosaic_sp[0]);
-  mosaic_sz[1] = (unsigned int)((mosaic_max[1] - mosaic_min[1]) /
+  mosaic_sz[1] = static_cast<unsigned int>((mosaic_max[1] - mosaic_min[1]) /
                                 mosaic_sp[1]);
   mosaic->SetOrigin(pnt2d(mosaic_min[0], mosaic_min[1]));
   mosaic->SetRegions(mosaic_sz);
@@ -3713,9 +3713,9 @@ make_mask_mt(unsigned int num_threads,
   // setup the mosaic image:
   mask_t::Pointer mosaic = mask_t::New();
   mask_t::RegionType::SizeType mosaic_sz;
-  mosaic_sz[0] = (unsigned int)((mosaic_max[0] - mosaic_min[0]) /
+  mosaic_sz[0] = static_cast<unsigned int>((mosaic_max[0] - mosaic_min[0]) /
                                 mosaic_sp[0]);
-  mosaic_sz[1] = (unsigned int)((mosaic_max[1] - mosaic_min[1]) /
+  mosaic_sz[1] = static_cast<unsigned int>((mosaic_max[1] - mosaic_min[1]) /
                                 mosaic_sp[1]);
   mosaic->SetOrigin(pnt2d(mosaic_min[0], mosaic_min[1]));
   mosaic->SetRegions(mosaic_sz);
@@ -3884,8 +3884,8 @@ resize(const T * in, unsigned int max_edge_size, double & scale)
   typename T::RegionType::SizeType sz =
   in->GetLargestPossibleRegion().GetSize();
   
-  double xScale = double(max_edge_size) / double(sz[0]);
-  double yScale = double(max_edge_size) / double(sz[1]);
+  double xScale = static_cast<double>(max_edge_size) / static_cast<double>(sz[0]);
+  double yScale = static_cast<double>(max_edge_size) / static_cast<double>(sz[1]);
   scale = xScale < yScale ? xScale : yScale;
   return resize<T>(in, scale);
 }
@@ -4100,9 +4100,9 @@ make_mosaic_rgb
  const feathering_t feathering = FEATHER_NONE_E)
 {
   typename image_pointer_t::ObjectType::SizeType mosaic_sz;
-  mosaic_sz[0] = (unsigned int)((mosaic_max[0] - mosaic_min[0]) /
+  mosaic_sz[0] = static_cast<unsigned int>((mosaic_max[0] - mosaic_min[0]) /
                                 mosaic_sp[0]);
-  mosaic_sz[1] = (unsigned int)((mosaic_max[1] - mosaic_min[1]) /
+  mosaic_sz[1] = static_cast<unsigned int>((mosaic_max[1] - mosaic_min[1]) /
                                 mosaic_sp[1]);
   
   make_mosaic_rgb<image_pointer_t, transform_pointer_t>
@@ -4748,14 +4748,16 @@ load_mosaic(std::istream & si,
   if ( image_path.empty() )
     return;
   
-  //  // Replace global paths for backwards compatibility.
-  //  for (std::list<bfs::path>::iterator iter = images.begin();
-  //				 iter != images.end(); ++iter)
-  //  {
-  //    IRPath::CleanSlashes( (*iter) );
-  //    (*iter) = IRPath::CleanPath( image_path ) + 
-  //              IRPath::FilenameFromPath( *iter );
-  //  }
+  // Replace global paths for backwards compatibility.
+  for (std::list<bfs::path>::iterator iter = images.begin();
+				 iter != images.end(); ++iter)
+  {
+    (*iter) = image_path / iter->filename();
+std::cerr << (*iter) << std::endl;
+//    IRPath::CleanSlashes( (*iter) );
+//    (*iter) = IRPath::CleanPath( image_path ) + 
+//              IRPath::FilenameFromPath( *iter );
+  }
 }
 
 //----------------------------------------------------------------
@@ -4824,17 +4826,17 @@ histogram_equalization(const T * in,
     {
       pixel_t p = iter.Get();
       unsigned int bin =
-      (unsigned int)(double(p - p_min) / double(p_rng) *
-                     double(bins - 1));
+      static_cast<unsigned int>(static_cast<double>(p - p_min) / static_cast<double>(p_rng) *
+                     static_cast<double>(bins - 1));
       pdf[bin]++;
     }
   }
   
   // build a cumulative distribution function (CDF):
-  cdf[0] = double(pdf[0]);
+  cdf[0] = static_cast<double>(pdf[0]);
   for (unsigned int i = 1; i < bins; i++)
   {
-    cdf[i] = cdf[i - 1] + double(pdf[i]);
+    cdf[i] = cdf[i - 1] + static_cast<double>(pdf[i]);
   }
   
   // update the image:
@@ -4848,11 +4850,11 @@ histogram_equalization(const T * in,
     if (pixel_in_mask<T>(in, mask, ix))
     {
       pixel_t p_in = iter.Get();
-      unsigned int bin = (unsigned int)((double(p_in - p_min) /
-                                         double(p_rng)) *
-                                        double(bins - 1));
-      p_out = pixel_t(double(new_min) + double(new_rng) *
-                      double(cdf[bin]) / double(cdf[bins - 1]));
+      unsigned int bin = static_cast<unsigned int>((static_cast<double>(p_in - p_min) /
+                                         static_cast<double>(p_rng)) *
+                                        static_cast<double>(bins - 1));
+      p_out = pixel_t(static_cast<double>(new_min) + static_cast<double>(new_rng) *
+                      static_cast<double>(cdf[bin]) / static_cast<double>(cdf[bins - 1]));
     }
     
     image->SetPixel(ix, p_out);
@@ -5219,13 +5221,13 @@ pixel_weight(const image_t::IndexType & min,
              const image_t::IndexType & max,
              const image_t::IndexType & ix)
 {
-  double w = double(max[0]) - double(min[0]);
-  double h = double(max[1]) - double(min[1]);
+  double w = static_cast<double>(max[0]) - static_cast<double>(min[0]);
+  double h = static_cast<double>(max[1]) - static_cast<double>(min[1]);
   double r = 0.5 * ((w > h) ? h : w);
-  double sx = std::min(double(ix[0]) - double(min[0]),
-                       double(max[0]) - double(ix[0]));
-  double sy = std::min(double(ix[1]) - double(min[1]),
-                       double(max[1]) - double(ix[1]));
+  double sx = std::min(static_cast<double>(ix[0]) - static_cast<double>(min[0]),
+                       static_cast<double>(max[0]) - static_cast<double>(ix[0]));
+  double sy = std::min(static_cast<double>(ix[1]) - static_cast<double>(min[1]),
+                       static_cast<double>(max[1]) - static_cast<double>(ix[1]));
   double s = (1.0 + std::min(sx, sy)) / (r + 1.0);
   return s;
 }
@@ -5274,8 +5276,8 @@ normalize(const T * image,
   // split the image into a set of overlapping tiles:
   typename T::SizeType sz = image->GetLargestPossibleRegion().GetSize();
   
-  double half_tw = double(sz[0]) / double(cols + 1);
-  double half_th = double(sz[1]) / double(rows + 1);
+  double half_tw = static_cast<double>(sz[0]) / static_cast<double>(cols + 1);
+  double half_th = static_cast<double>(sz[1]) / static_cast<double>(rows + 1);
   
   typename T::Pointer out = cast<T, T>(image);
   
@@ -5293,19 +5295,19 @@ normalize(const T * image,
   
   for (unsigned int i = 0; i < cols; i++)
   {
-    double x0 = double(i) * half_tw;
-    unsigned int ix0 = (unsigned int)(floor(x0));
-    double x1 = double(ix0) + (x0 - double(ix0)) + 2.0 * half_tw;
-    unsigned int ix1 = std::min((unsigned int)(sz[0] - 1),
-                                (unsigned int)(ceil(x1)));
+    double x0 = static_cast<double>(i) * half_tw;
+    unsigned int ix0 = static_cast<unsigned int>(floor(x0));
+    double x1 = static_cast<double>(ix0) + (x0 - static_cast<double>(ix0)) + 2.0 * half_tw;
+    unsigned int ix1 = std::min(static_cast<unsigned int>(sz[0] - 1),
+                                static_cast<unsigned int>(ceil(x1)));
     
     for (unsigned int j = 0; j < rows; j++)
     {
-      double y0 = double(j) * half_th;
-      unsigned int iy0 = (unsigned int)(floor(y0));
-      double y1 = double(iy0) + (y0 - double(iy0)) + 2.0 * half_th;
-      unsigned int iy1 = std::min((unsigned int)(sz[1] - 1),
-                                  (unsigned int)(ceil(y1)));
+      double y0 = static_cast<double>(j) * half_th;
+      unsigned int iy0 = static_cast<unsigned int>(floor(y0));
+      double y1 = static_cast<double>(iy0) + (y0 - static_cast<double>(iy0)) + 2.0 * half_th;
+      unsigned int iy1 = std::min(static_cast<unsigned int>(sz[1] - 1),
+                                  static_cast<unsigned int>(ceil(y1)));
       
       tile_min[i][j][0] = ix0;
       tile_min[i][j][1] = iy0;
@@ -5752,8 +5754,8 @@ solve_for_transform(const T * tile,
   typename T::SpacingType sp = tile->GetSpacing();
   typename T::SizeType sz = tile->GetLargestPossibleRegion().GetSize();
   const pnt2d_t min = tile->GetOrigin();
-  const pnt2d_t max = min + vec2d(sp[0] * double(sz[0]),
-                                  sp[1] * double(sz[1]));
+  const pnt2d_t max = min + vec2d(sp[0] * static_cast<double>(sz[0]),
+                                  sp[1] * static_cast<double>(sz[1]));
   
   solve_for_transform<legendre_transform_t>(min,
                                             max,
@@ -5843,8 +5845,8 @@ solve_for_transform(const T * tile,
   typename T::SpacingType sp = tile->GetSpacing();
   pnt2d_t tile_min = tile->GetOrigin();
   pnt2d_t tile_max;
-  tile_max[0] = tile_min[0] + sp[0] * double(sz[0]);
-  tile_max[1] = tile_min[1] + sp[1] * double(sz[1]);
+  tile_max[0] = tile_min[0] + sp[0] * static_cast<double>(sz[0]);
+  tile_max[1] = tile_min[1] + sp[1] * static_cast<double>(sz[1]);
   
   return solve_for_transform<legendre_transform_t>(tile_min,
                                                    tile_max,
