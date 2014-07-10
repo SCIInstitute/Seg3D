@@ -1,6 +1,45 @@
 Release Notes
 =============
 
+Version 2.1.5
+-------------
+This version is primarily a bug fix release.
+Among the improvements made since the last release, the following issues have been fixed
+and new features added:
+
+* Project generation counter bug has been fixed.
+* Infinite loop in Teem library has been identified and fixed.
+* Matlab v7.3 and MRC 2000 file importers and exporters have been implemented.
+* Isosurface exporter to VTK polydata and STL files has been added.
+* Tool for selecting and exporting points in a dataset has been added.
+* Support for compressed NIfTY files has been added. 
+* Argument checking in exporters has been added to fix segfaults in Python scripts and the command interface.
+
+
+Version 2.1.4
+-------------
+This version is a bug fix release.
+Among the improvements made since the last release, the following issues have been fixed:
+
+* Mouse event handling in the Paint tool has been improved.
+* Crash on exit in Ubuntu has been fixed.
+* Default project location has been changed from the executable file location to a user default directory.
+* Setting volume spacing bug from imported Matlab files has been fixed.
+
+
+Version 2.1.3
+-------------
+
+This version is a bug fix release with a small number of new features.
+
+* The crash on single file export bug has been fixed.
+* Support for exporting segmentations as single files in DICOM, Matlab, Tiff, BMP and PNG file formats has been added.
+* Keyboard and mouse shortcut documentation has been extended.
+* A build script (build.sh) has been added to simplify building on Unix-based platforms.
+* File association support on OS X has been added.
+* Bug fixes.
+
+
 Version 2.1.0
 -------------
 
