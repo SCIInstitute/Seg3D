@@ -160,25 +160,30 @@ void ProjectInfoPage::initializePage()
 
 void ProjectInfoPage::set_path()
 {
-  this->warning_message_->hide();
-  
-    QDir project_directory_ = QDir( QFileDialog::getExistingDirectory ( 
-    this, "Choose Directory...", this->project_path_lineedit_->text(), 
-    QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks ) );
-  
-    if ( project_directory_.exists() )
+        //QDir converts the empty QString "" to the current directory
+        this->warning_message_->hide();
+
+
+    QString path_name = QFileDialog::getExistingDirectory ( this,
+                tr( "Choose Save Directory..." ), this->project_path_lineedit_->text(),
+                QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks );
+
+    // getExistingString generates an empty string if canceled or closed.
+    //  If either happens, this will exit without changing anything.
+    if(path_name == "")
+    {
+        return;
+    }
+    QDir project_directory_ = QDir(path_name);
+
+        if( project_directory_.exists() )
     {
         this->project_path_lineedit_->setText( project_directory_.canonicalPath() );
-        this->most_recent_path_ = &project_directory_;
-    }
-    else
-    {
-    this->project_path_lineedit_->setText( "" );
-  }
-  
-    this->registerField( "projectPath", this->project_path_lineedit_ );
+            this->most_recent_path_ = &project_directory_;
 }
 
+        registerField( "projectPath", this->project_path_lineedit_ );
+}
 
 bool ProjectInfoPage::validatePage()
 {

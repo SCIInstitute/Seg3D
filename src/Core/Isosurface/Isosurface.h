@@ -136,11 +136,16 @@ public:
   /// ...
   ///
   /// Note: can't call this function "export" because it is reserved by the Visual C++ compiler.
-  bool export_legacy_isosurface( const boost::filesystem::path& path, const std::string& file_prefix ); 
+  bool export_legacy_isosurface( const boost::filesystem::path& path,
+                                 const std::string& file_prefix ); 
 
-  // EXPORT_ISOSURFACE:
+  // EXPORT_VTK_ISOSURFACE:
   /// Writes out an isosurface in VTK mesh format
   bool export_vtk_isosurface( const boost::filesystem::path& filename );
+
+  // EXPORT_STL_ISOSURFACE:
+  /// Writes out an isosurface in STL file format
+  bool export_stl_isosurface( const boost::filesystem::path& filename, const std::string& name );
 
   typedef boost::signals2::signal< void (double) > update_progress_signal_type;
 

@@ -52,6 +52,8 @@ class Point;
 class VectorF;
 class PointF;
 
+// TODO: explore templates with type restrictions
+
 class Vector
 {
 

@@ -1185,35 +1185,6 @@ double MeasurementToolPrivate::convert_world_to_unit( double length ) const
 	return length; // Current = World units
 }
 
-//void create_test_data( std::vector< Core::Measurement >& measurements )
-//{
-//	// Populate measurements list with test data
-//	measurements.push_back( 
-//		Core::Measurement( true, "M1", "Knee", Core::Point(0, 0, 0), 
-//		Core::Point(1, 1, 1), Core::AXIAL_E, 50, 1 ) );
-//	measurements.push_back( 
-//		Core::Measurement( true, "M2", "Heart", Core::Point(0, 0, 0), 
-//		Core::Point(2, 2, 2), Core::AXIAL_E, 50, 1 ) );
-//	measurements.push_back( 
-//		Core::Measurement( true, "M3", "Head", Core::Point(0, 0, 0), 
-//		Core::Point(3, 3, 3), Core::AXIAL_E, 50, 1 ) );	
-//	measurements.push_back( 
-//		Core::Measurement( true, "M4", "Toe", Core::Point(0, 0, 0), 
-//		Core::Point(4, 4, 4), Core::AXIAL_E, 50, 1 ) );	
-//	measurements.push_back( 
-//		Core::Measurement( true, "M5", "Eye", Core::Point(0, 0, 0), 
-//		Core::Point(5, 5, 5), Core::AXIAL_E, 50, 1 ) );	
-//	measurements.push_back( 
-//		Core::Measurement( true, "M6", "Nose", Core::Point(0, 0, 0), 
-//		Core::Point(6, 6, 6), Core::AXIAL_E, 50, 1 ) );	
-//	measurements.push_back( 
-//		Core::Measurement( true, "M7", "Hand", Core::Point(0, 0, 0), 
-//		Core::Point(7, 7, 7), Core::AXIAL_E, 50, 1 ) );	
-//	measurements.push_back( 
-//		Core::Measurement( true, "M8", "Ear", Core::Point(0, 0, 0), 
-//		Core::Point(8, 8, 8), Core::AXIAL_E, 50, 1 ) );	
-//}
-
 //////////////////////////////////////////////////////////////////////////
 // Class MeasurementTool
 //////////////////////////////////////////////////////////////////////////

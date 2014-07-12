@@ -1869,8 +1869,7 @@ void Isosurface::compute( double quality_factor, bool capping_enabled,
     
     num_faces += this->private_->max_face_index_[ j ] - this->private_->min_face_index_[ j ];
     
-    if ( num_faces > 1000000 ||
-      j == this->private_->min_point_index_.size() - 1 )
+    if ( num_faces > 0 && (num_faces > 1000000 || j == this->private_->min_point_index_.size() - 1 ) )
     {
       this->private_->part_points_.push_back( std::make_pair<unsigned int, unsigned int>(
         min_point_index, this->private_->max_point_index_[ j ] ) );
@@ -2115,8 +2114,8 @@ void Isosurface::redraw( bool use_colormap )
   } 
 }
 
-bool Isosurface::export_legacy_isosurface( const boost::filesystem::path& path, 
-  const std::string& file_prefix )
+bool Isosurface::export_legacy_isosurface( const boost::filesystem::path& path,
+                                           const std::string& file_prefix )
 {
   lock_type lock( this->get_mutex() );
 
@@ -2213,6 +2212,61 @@ bool Isosurface::export_vtk_isosurface( const boost::filesystem::path& filename 
   return true;
 }
 
+// ASCII STL format (http://en.wikipedia.org/wiki/STL_(file_format))
+bool Isosurface::export_stl_isosurface( const boost::filesystem::path& filename, const std::string& name )
+{
+  lock_type lock( this->get_mutex() );
+  std::ofstream stl_file( filename.string().c_str() );
+  if( ! stl_file.is_open() ) 
+  {
+    return false;
+  }
+
+  const std::string delim(" ");
+  const std::string indent_level1("  ");
+  const std::string indent_level2("    ");
+  const std::string indent_level3("      ");
+  stl_file << "solid " << name << std::endl;
+
+  for( size_t i = 0; i + 2 < this->private_->faces_.size(); i += 3 )
+  {
+    size_t vertex_index1 = this->private_->faces_[ i ];
+    size_t vertex_index2 = this->private_->faces_[ i + 1 ];
+    size_t vertex_index3 = this->private_->faces_[ i + 2 ];
+
+    // Get vertices of face
+    PointF p1 = this->private_->points_[ vertex_index1 ];
+    PointF p2 = this->private_->points_[ vertex_index2 ];
+    PointF p3 = this->private_->points_[ vertex_index3 ];
+
+    // compute face normal:
+    //   U = p2 - p1
+    //   V = p3 - p1
+    //   Ni = UyVz - UzVy
+    //   Nj = UzVx - UxVz
+    //   Nk = UxVy - UyVx
+
+    VectorF U = p2 - p1;
+    VectorF V = p3 - p1;
+
+    double Ni = U.y() * V.z() - U.z() * V.y();
+    double Nj = U.z() * V.x() - U.x() * V.z();
+    double Nk = U.x() * V.y() - U.y() * V.x();
+    
+    stl_file << indent_level1 << "facet normal " << std::fixed << Ni << delim << Nj << delim << Nk << std::endl;
+    stl_file << indent_level2 << "outer loop" << std::endl;
+    stl_file << indent_level3 << "vertex " << std::fixed << p1.x() << delim << p1.y() << delim << p1.z() << std::endl;
+    stl_file << indent_level3 << "vertex " << std::fixed << p2.x() << delim << p2.y() << delim << p2.z() << std::endl;
+    stl_file << indent_level3 << "vertex " << std::fixed << p3.x() << delim << p3.y() << delim << p3.z() << std::endl;
+    stl_file << indent_level2 << "endloop" << std::endl;    
+    stl_file << indent_level1 << "endfacet" << std::endl;
+  }
+  stl_file << "endsolid" << std::endl;
+
+  stl_file.close();
+  
+  return true;
+}
 
 float Isosurface::surface_area() const
 {

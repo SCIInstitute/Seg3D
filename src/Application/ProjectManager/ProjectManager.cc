@@ -441,7 +441,7 @@ boost::filesystem::path ProjectManager::get_current_project_folder()
   {
     current_project_folder = boost::filesystem::path(
       PreferencesManager::Instance()->project_path_state_->get() );
-          
+
     // Try the user directory
     if ( !boost::filesystem::exists( current_project_folder ) )
     {

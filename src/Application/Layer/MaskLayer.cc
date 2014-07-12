@@ -257,6 +257,9 @@ bool MaskLayer::set_mask_volume( Core::MaskVolumeHandle volume )
       this->private_->mask_volume_->unregister_data();
     }
     
+    // delete the isosurface
+    this->private_->isosurface_.reset();
+
     this->disconnect_all();
 
     this->private_->mask_volume_ = volume;

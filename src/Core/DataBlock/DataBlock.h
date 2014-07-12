@@ -46,6 +46,9 @@
 namespace Core
 {
 
+  // TODO: operators!
+  
+  
 // CLASS DataBlock
 /// This class is an abstract representation of a block of volume data in
 /// memory. It stores the pointer to where the data is located as well as 

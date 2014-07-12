@@ -298,12 +298,13 @@ void SplashScreen::quick_open_file()
     default_project_name = std::string( "New Project " ) + Core::ExportToString( default_name_count );
   } 
   
-  ActionNewProject::Dispatch( Core::Interface::GetWidgetActionContext(), "",
-    default_project_name );
   this->hide();
   
   if( LayerIOFunctions::ImportFiles( dynamic_cast< QMainWindow* >( this->parentWidget() ), "" ) )
   {
+      ActionNewProject::Dispatch( Core::Interface::GetWidgetActionContext(), "",
+    default_project_name );
+
     this->close();
   }
   else

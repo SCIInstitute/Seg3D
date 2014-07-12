@@ -1,4 +1,3 @@
-
 #
 #  For more information, please see: http://software.sci.utah.edu
 # 
@@ -70,6 +69,7 @@ SET(INTERFACE_TOOLINTERFACE_SRCS
   MeasurementToolInterface.cc
   PointSetFilterInterface.cc
   SpeedlineToolInterface.cc
+  PointsSelectToolInterface.cc
 )
 
 SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
@@ -115,6 +115,7 @@ SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
   detail/MeasurementTextEdit.h
   PointSetFilterInterface.h
   SpeedlineToolInterface.h
+  PointsSelectToolInterface.h
 )
 
 SET(INTERFACE_TOOLINTERFACE_NO_MOC_SRCS
@@ -163,6 +164,7 @@ SET(INTERFACE_TOOLINTERFACE_UI_SRCS
   MeasurementToolInterface.ui
   PointSetFilterInterface.ui
   SpeedlineToolInterface.ui
+  PointsSelectToolInterface.ui
 )
 
 ##################################################
@@ -195,27 +197,29 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 ##################################################
 
 CORE_ADD_LIBRARY(Interface_ToolInterface 
-            ${INTERFACE_TOOLINTERFACE_SRCS} 
-            ${INTERFACE_TOOLINTERFACE_QT_UI_SRCS}
-            ${INTERFACE_TOOLINTERFACE_QT_MOC_SRCS}
-            ${INTERFACE_TOOLINTERFACE_NO_MOC_SRCS} 
-            ${INTERFACE_TOOLINTERFACE_MOC_SRCS})      
-                      
+  ${INTERFACE_TOOLINTERFACE_SRCS} 
+  ${INTERFACE_TOOLINTERFACE_QT_UI_SRCS}
+  ${INTERFACE_TOOLINTERFACE_QT_MOC_SRCS}
+  ${INTERFACE_TOOLINTERFACE_NO_MOC_SRCS} 
+  ${INTERFACE_TOOLINTERFACE_MOC_SRCS}
+)
+                                        
 TARGET_LINK_LIBRARIES(Interface_ToolInterface
-                      Core_Utils
-                      Core_EventHandler
-                      Core_Application
-                      Core_Interface
-                      Core_Action
-                      Application_Tool
-            QtUtils_Utils
-                      QtUtils_Widgets
-            QtUtils_Bridge
-            Interface_Application
-                      ${QT_LIBRARIES} 
-                      ${SCI_BOOST_LIBRARY})
+  Core_Utils
+  Core_EventHandler
+  Core_Application
+  Core_Interface
+  Core_Action
+  Application_Tool
+  QtUtils_Utils
+  QtUtils_Widgets
+  QtUtils_Bridge
+  Interface_Application
+  ${QT_LIBRARIES} 
+  ${SCI_BOOST_LIBRARY}
+)
 
 # Register action classes
 REGISTER_LIBRARY_AND_CLASSES(Interface_ToolInterface
-            ${INTERFACE_TOOLINTERFACE_SRCS})
-
+  ${INTERFACE_TOOLINTERFACE_SRCS}
+)

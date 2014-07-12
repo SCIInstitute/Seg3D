@@ -62,10 +62,10 @@ SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR} CACHE PATH "" FORCE) # Needed by 
 # COMPILE OPTIONS
 ###########################################
 
-SET(SEG3D_BUILD_INTERFACE 1 CACHE BOOL "Build the interface to Seg3D")
-IF (WIN32)
-  SET(SEG3D_SHOW_CONSOLE FALSE CACHE BOOL "Show console for debugging")
-ENDIF (WIN32)
+OPTION(SEG3D_BUILD_INTERFACE "Build the GUI interface to Seg3D" ON)
+IF(WIN32)
+  OPTION(SEG3D_SHOW_CONSOLE "Show console for debugging (Windows only)" OFF)
+ENDIF(WIN32)
 
 ###########################################
 # SEG3D VERSION NUMBERS
@@ -191,9 +191,13 @@ IF(SEG3D_BUILD_INTERFACE)
 SET(QT_MIN_VERSION "4.6.0")
 #SET(QT_DIR "" CACHE PATH "Path to QT")
 INCLUDE(FindQt4)
-#SET(QT_USE_FILE ${CMAKE_CURRENT_SOURCE_DIR}/CMake/UseQt4.cmake)
 
 IF (QT_FOUND)
+  MESSAGE(STATUS "QTVERSION=${QTVERSION}")
+  IF(APPLE AND ${QTVERSION} VERSION_EQUAL 4.8 AND ${QTVERSION} VERSION_LESS 4.8.5)
+    MESSAGE(WARNING "Qt 4.8 versions earlier than 4.8.3 contain a bug that disables menu items under some circumstances. Upgrade to a more recent version.")
+  ENDIF()
+
   SET(QT_USE_QTOPENGL 1)
   INCLUDE(${QT_USE_FILE})
 ELSE (QT_FOUND)
@@ -368,7 +372,10 @@ ENDIF(SEG3D_BUILD_INTERFACE)
 # factories.
 ###########################################
 
-SET(IGNORE_RESOURCES FALSE CACHE INTERNAL "Ignore default resources library." FORCE)
+SET(IGNORE_RESOURCES OFF CACHE INTERNAL "Ignore default resources library.")
+IF(NOT SEG3D_BUILD_INTERFACE)
+  SET(IGNORE_RESOURCES ON CACHE INTERNAL "Ignore default resources library.")
+ENDIF(NOT SEG3D_BUILD_INTERFACE)
 
 MESSAGE(STATUS "Configuring Seg3D Plugins")
 FILE(GLOB PLUGIN_DIRS "Plugins/*" )
@@ -407,6 +414,9 @@ ENDIF(NOT IGNORE_RESOURCES)
 IF(SEG3D_BUILD_INTERFACE)
   MESSAGE(STATUS "Configuring Seg3D main")
   ADD_SUBDIRECTORY(Main)
+ELSE(SEG3D_BUILD_INTERFACE)
+  MESSAGE(STATUS "Configuring Seg3D headless main")
+  ADD_SUBDIRECTORY(HeadlessMain)
 ENDIF(SEG3D_BUILD_INTERFACE)
 
 
