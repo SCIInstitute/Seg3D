@@ -28,4 +28,4 @@
 
 ADD_SUBDIRECTORY(Application)
 ADD_SUBDIRECTORY(ToolInterface)
-ADD_SUBDIRECTORY(ImageRegistrationInterface)
+#ADD_SUBDIRECTORY(ImageRegistrationInterface)
