@@ -160,20 +160,21 @@ ActionSliceToVolumeFilter::run( Core::ActionContextHandle& context, Core::Action
 
     for (size_t i = 0; i < this->output_prefixes_.size(); ++i)
     {
+std::cerr << "Output prefix=" << this->output_prefixes_[i] << std::endl;
       bfs::path prefix(this->output_prefixes_[i]);
-      if (! bfs::is_directory(prefix) )
-      {
-        std::ostringstream oss;
-        oss << "Creating path to " << prefix;
-        CORE_LOG_DEBUG(oss.str());
-        if (! boost::filesystem::create_directories(prefix))
-        {
-          std::ostringstream oss;
-          oss << "Could not create missing directory " << prefix << " required to create output image.";
-          context->report_error(oss.str());
-          return false;
-        }
-      }
+//      if (! bfs::is_directory(prefix) )
+//      {
+//        std::ostringstream oss;
+//        oss << "Creating path to " << prefix;
+//        CORE_LOG_DEBUG(oss.str());
+//        if (! boost::filesystem::create_directories(prefix))
+//        {
+//          std::ostringstream oss;
+//          oss << "Could not create missing directory " << prefix << " required to create output image.";
+//          context->report_error(oss.str());
+//          return false;
+//        }
+//      }
 
       fn_prefixes.push_back(prefix);
     }
@@ -267,7 +268,8 @@ ActionSliceToVolumeFilter::run( Core::ActionContextHandle& context, Core::Action
     
     // shortcut:
     const unsigned int num_slices = num_pairs + 1;
-    
+std::cerr << "num_slices=" << num_slices << std::endl;
+
     stos_tree_t<image_t> stos_tree;
     std::size_t num_roots = stos_tree.build(stos_list);
     
@@ -445,10 +447,13 @@ ActionSliceToVolumeFilter::run( Core::ActionContextHandle& context, Core::Action
     
     // TODO: this needs to be a state instead
 //    set_major_progress(0.05);
-    
+
+std::cerr << "0.size()=" << fn_mosaic.size() << std::endl;
+
     // generate the slices:
     for (unsigned int i = 0; i < fn_mosaic.size(); i++)
     {
+std::cerr << "fn_mosaic[" << i << "]=" << fn_mosaic[i] << std::endl;
       int tot_slices = slice_dirs[i].size();
       int tot_images = image_dirs[i].size();
       int grand_total = (tot_slices > tot_images) ? tot_slices : tot_images;
@@ -609,11 +614,13 @@ ActionSliceToVolumeFilter::run( Core::ActionContextHandle& context, Core::Action
 
       std::ostringstream fn_filename;
       fn_filename << prefix_iter->string();
-      
-      if ( fn_prefixes.size() != 1 )
+
+      if ( fn_prefixes.size() > 1 )
         ++prefix_iter;
       else
         fn_filename << the_text_t::number(i, 3, '0');
+
+//std::cerr << "Saving " << fn_filename.str() << std::endl;
       
       for ( int mosIdx = 0; mosIdx < grand_total; ++mosIdx )
       {
@@ -624,7 +631,8 @@ ActionSliceToVolumeFilter::run( Core::ActionContextHandle& context, Core::Action
         {
           fn_save << "_" << the_text_t::number(mosIdx, 3, '0');
         }
-        fn_save << fn_extension;
+        fn_save << fn_extension.string();
+std::cerr << "Saving " << fn_save.str() << std::endl;
         
         if (this->remap_values_)
         {
@@ -637,7 +645,7 @@ ActionSliceToVolumeFilter::run( Core::ActionContextHandle& context, Core::Action
           {
             typedef itk::Image<short int, 2> int16_image_t;
             save_as_tiles<int16_image_t>(cast<image_t, int16_image_t>(mosaic[mosIdx]),
-                                         bfs::path(fn_filename.str()),
+                                         bfs::path(fn_save.str()),
                                          fn_extension,
                                          this->tile_width_,
                                          this->tile_height_,
@@ -647,7 +655,7 @@ ActionSliceToVolumeFilter::run( Core::ActionContextHandle& context, Core::Action
           {
             typedef itk::Image<unsigned short int, 2> uint16_image_t;
             save_as_tiles<uint16_image_t>(cast<image_t, uint16_image_t>(mosaic[mosIdx]),
-                                          bfs::path(fn_filename.str()),
+                                          bfs::path(fn_save.str()),
                                           fn_extension,
                                           this->tile_width_,
                                           this->tile_height_,
@@ -656,7 +664,7 @@ ActionSliceToVolumeFilter::run( Core::ActionContextHandle& context, Core::Action
           else
           {
             save_as_tiles<native_image_t>(cast<image_t, native_image_t>(mosaic[mosIdx]),
-                                          bfs::path(fn_filename.str()),
+                                          bfs::path(fn_save.str()),
                                           fn_extension,
                                           this->tile_width_,
                                           this->tile_height_,
@@ -678,8 +686,8 @@ ActionSliceToVolumeFilter::run( Core::ActionContextHandle& context, Core::Action
           else
           {
 //            save<native_image_t>(cast<image_t, native_image_t>(mosaic[mosIdx]), bfs::path(fn_save.str()));
-            bfs::path save_path = fn_prefixes.front() / fn_mosaic[i].stem();
-            save_path = save_path.replace_extension(fn_extension);
+            bfs::path save_path(fn_save.str());
+            save_path.replace_extension(fn_extension.string());
             save<native_image_t>(cast<image_t, native_image_t>(mosaic[mosIdx]), save_path);
           }
           
