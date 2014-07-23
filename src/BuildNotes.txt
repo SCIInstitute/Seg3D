@@ -1,0 +1,9 @@
+Seg3D Image Registrations tools build notes:
+
+Windows:
+- building FFTW as an ITK CMake external is NOT supported on Windows
+- tried downloading precompiled library zip file from fftw website, 3.3.4 64-bit release
+- enable ITK_USE_SYSTEM_FFTW
+- set FFTW_INCLUDE_PATH=c:/fftw-3.3.4-dll64,
+      FFTWD_LIB=c:/fftw-3.3.4-dll64/libfftw3-3.dll (not sure this is correct),
+      FFTWF_LIB=c:/fftw-3.3.4-dll64/libfftw3f-3.dll
