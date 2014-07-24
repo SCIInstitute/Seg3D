@@ -155,7 +155,7 @@ public:
             const bool blab = true)
   {
     std::fstream si;
-    the::open_utf8(si, fn_load.c_str(), std::ios::in);
+    the::open_utf8(si, fn_load.string().c_str(), std::ios::in);
     if (!si.is_open())
     {
       std::ostringstream oss;
@@ -289,7 +289,7 @@ public:
   bool save(const bfs::path & fn_save, const bool blab = true) const
   {
     std::fstream so;
-    the::open_utf8(so, fn_save.c_str(), std::ios::out);
+    the::open_utf8(so, fn_save.string().c_str(), std::ios::out);
     if (!so.is_open())
     {
       std::ostringstream oss;

@@ -1441,7 +1441,7 @@ save(const T * image, const bfs::path & filename, bool blab = true)
   writer->SetInput(image);
   
   if (blab) std::cout << "saving " << filename << std::endl;
-  writer->SetFileName(filename.c_str());
+  writer->SetFileName(filename.string().c_str());
   writer->Update();
 }
 
@@ -4005,7 +4005,7 @@ save_composite(const bfs::path & filename,
   
   typedef itk::ImageFileWriter<composite_image_t> composite_writer_t;
   composite_writer_t::Pointer writer = composite_writer_t::New();
-  writer->SetFileName(filename.c_str());
+  writer->SetFileName(filename.string().c_str());
   writer->SetInput(composer->GetOutput());
   
   if (blab) std::cout << "saving " << filename << std::endl;
@@ -4314,7 +4314,7 @@ save_rgb(const image_ptr_t * image, const bfs::path & filename, bool blab = true
   
   typedef itk::ImageFileWriter<composite_image_t> composite_writer_t;
   typename composite_writer_t::Pointer writer = composite_writer_t::New();
-  writer->SetFileName(filename.c_str());
+  writer->SetFileName(filename.string().c_str());
   writer->SetInput(composer->GetOutput());
   
   if (blab) std::cout << "saving " << filename << std::endl;
