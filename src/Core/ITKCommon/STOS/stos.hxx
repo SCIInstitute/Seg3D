@@ -141,7 +141,10 @@ public:
   {
     if (! load(fn_load, override_slice0_path, override_slice1_path) )
     {
-      CORE_THROW_EXCEPTION("Loading stos file failed.");
+      std::ostringstream oss;
+      oss << "Loading stos file " << fn_load << " (with slice path overrides "
+      << override_slice0_path << " and " << override_slice1_path << ") failed.";
+      CORE_THROW_EXCEPTION(oss.str());
     }
   }
   
