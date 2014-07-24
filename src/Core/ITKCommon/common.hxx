@@ -2170,7 +2170,7 @@ calc_image_bboxes_load_images(const std::list<bfs::path> & in,
     typedef typename itk::ImageFileReader<T> reader_t;
     typename reader_t::Pointer reader = reader_t::New();
     
-    reader->SetFileName((*iter).c_str());
+    reader->SetFileName((*iter).string().c_str());
     std::cout << "loading region from " << (*iter) << std::endl;
     
     WRAP(terminator_t<reader_t> terminator(reader));
