@@ -34,7 +34,6 @@
 #include <Core/ITKCommon/pyramid.hxx>
 #include <Core/ITKCommon/match.hxx>
 #include <Core/ITKCommon/the_utils.hxx>
-#include <Core/ITKCommon/the_text.hxx>
 #include <Core/ITKCommon/STOS/stos.hxx>
 #include <Core/ITKCommon/STOS/stos_common.hxx>
 #include <Core/ITKCommon/Transform/itkGridTransform.h>
@@ -160,22 +159,7 @@ ActionSliceToVolumeFilter::run( Core::ActionContextHandle& context, Core::Action
 
     for (size_t i = 0; i < this->output_prefixes_.size(); ++i)
     {
-std::cerr << "Output prefix=" << this->output_prefixes_[i] << std::endl;
       bfs::path prefix(this->output_prefixes_[i]);
-//      if (! bfs::is_directory(prefix) )
-//      {
-//        std::ostringstream oss;
-//        oss << "Creating path to " << prefix;
-//        CORE_LOG_DEBUG(oss.str());
-//        if (! boost::filesystem::create_directories(prefix))
-//        {
-//          std::ostringstream oss;
-//          oss << "Could not create missing directory " << prefix << " required to create output image.";
-//          context->report_error(oss.str());
-//          return false;
-//        }
-//      }
-
       fn_prefixes.push_back(prefix);
     }
     
@@ -268,7 +252,6 @@ std::cerr << "Output prefix=" << this->output_prefixes_[i] << std::endl;
     
     // shortcut:
     const unsigned int num_slices = num_pairs + 1;
-std::cerr << "num_slices=" << num_slices << std::endl;
 
     stos_tree_t<image_t> stos_tree;
     std::size_t num_roots = stos_tree.build(stos_list);
@@ -448,12 +431,9 @@ std::cerr << "num_slices=" << num_slices << std::endl;
     // TODO: this needs to be a state instead
 //    set_major_progress(0.05);
 
-std::cerr << "0.size()=" << fn_mosaic.size() << std::endl;
-
     // generate the slices:
     for (unsigned int i = 0; i < fn_mosaic.size(); i++)
     {
-std::cerr << "fn_mosaic[" << i << "]=" << fn_mosaic[i] << std::endl;
       int tot_slices = slice_dirs[i].size();
       int tot_images = image_dirs[i].size();
       int grand_total = (tot_slices > tot_images) ? tot_slices : tot_images;
@@ -599,28 +579,18 @@ std::cerr << "fn_mosaic[" << i << "]=" << fn_mosaic[i] << std::endl;
         for ( int itIdx = 0; itIdx < grand_total; ++itIdx )
           ++iter[itIdx];
       }
-      
-      if (! bfs::is_directory( *prefix_iter ) )
-      {
-        CORE_LOG_DEBUG(std::string("Creating missing directory ") + prefix_iter->string());
-        if (! boost::filesystem::create_directories(*prefix_iter))
-        {
-          std::ostringstream oss;
-          oss << "Could not create missing directory " << *prefix_iter << " required to create output volume.";
-          context->report_error(oss.str());
-          return false;
-        }
-      }
 
       std::ostringstream fn_filename;
       fn_filename << prefix_iter->string();
 
-      if ( fn_prefixes.size() > 1 )
+      if ( fn_prefixes.size() != 1 )
+      {
         ++prefix_iter;
+      }
       else
-        fn_filename << the_text_t::number(i, 3, '0');
-
-//std::cerr << "Saving " << fn_filename.str() << std::endl;
+      {
+        fn_filename << "_" << std::setfill('0') << std::setw(3) << i ;
+      }
       
       for ( int mosIdx = 0; mosIdx < grand_total; ++mosIdx )
       {
@@ -629,10 +599,9 @@ std::cerr << "fn_mosaic[" << i << "]=" << fn_mosaic[i] << std::endl;
         fn_save << fn_filename.str();
         if ( grand_total > 1 && boost::iequals(fn_extension.string(), ".idx") )
         {
-          fn_save << "_" << the_text_t::number(mosIdx, 3, '0');
+          fn_save << "_" << std::setfill('0') << std::setw(3) << mosIdx;
         }
         fn_save << fn_extension.string();
-std::cerr << "Saving " << fn_save.str() << std::endl;
         
         if (this->remap_values_)
         {

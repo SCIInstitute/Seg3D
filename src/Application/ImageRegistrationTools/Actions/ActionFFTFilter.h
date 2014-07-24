@@ -49,9 +49,10 @@ CORE_ACTION(
   CORE_ACTION_TYPE( "FFTFilter", "ir-fft" )
   CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
   CORE_ACTION_ARGUMENT( "directory",
-   "Image file directory. If 'images' parameter is not used, then filter will search directory for image files." )
+    "Image file directory. If 'images' parameter is not used, then filter will search directory for image files." )
   CORE_ACTION_ARGUMENT( "output_mosaic", "Output mosaic file." )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "images", "[]", "Image file names (optional, images can be detected in image file directory)." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "images", "[]",
+    "Image file names (optional, images can be detected in image file directory). Do not use full path." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "shrink_factor", "1", "Downsample factor." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "pyramid_levels", "1", "Number of multiresolution pyramid levels." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "iterations_per_level", "5", "Iterations per pyramid level." )
