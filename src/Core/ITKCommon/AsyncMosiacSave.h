@@ -67,7 +67,7 @@ public:
     writer->SetInput(m_image);
     
     if (m_blab) std::cout << "saving " << m_filename << std::endl;
-    writer->SetFileName(m_filename.c_str());
+    writer->SetFileName(m_filename.string().c_str());
     writer->Update();
   }
   

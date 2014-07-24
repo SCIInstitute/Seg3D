@@ -1418,7 +1418,7 @@ load(const bfs::path& filename, bool blab = true)
   
   // FIXME: itk::SimpleFilterWatcher w(reader.GetPointer(), "reader");
   
-  reader->SetFileName(filename.c_str());
+  reader->SetFileName(filename.string().c_str());
   if (blab) std::cout << "loading " << filename.string() << std::endl;
   
 //  WRAP(terminator_t<reader_t> terminator(reader));
@@ -1516,7 +1516,7 @@ save_image_tile(T * image,
     std::cout << "saving " << filename << std::endl;
   }
   
-  writer->SetFileName(filename.c_str());
+  writer->SetFileName(filename.string().c_str());
   writer->Update();
 }
 
