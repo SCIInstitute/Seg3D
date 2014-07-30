@@ -100,7 +100,8 @@ setup_grid_transform(the_grid_transform_t & transform,
 		     unsigned int max_iterations = 100,
 		     double min_step_scale = 1e-12,
 		     double min_error_sqrd = 1e-16,
-		     unsigned int pick_up_pace_steps = 5);
+		     unsigned int pick_up_pace_steps = 5 // successful steps to pick up pace
+);
 
 //----------------------------------------------------------------
 // setup_mesh_transform

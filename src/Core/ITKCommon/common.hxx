@@ -1833,8 +1833,9 @@ eval_metric(const base_transform_t * fi_to_mi,
   }
   catch (itk::ExceptionObject & exception)
   {
-    std::cerr << "image metric threw an exception:" << std::endl
-    << exception << std::endl;
+    std::ostringstream oss;
+    oss << "image metric threw an exception:" << exception;
+    CORE_LOG_WARNING(oss.str());
     measure = std::numeric_limits<double>::max();
   }
   
@@ -4753,10 +4754,6 @@ load_mosaic(std::istream & si,
 				 iter != images.end(); ++iter)
   {
     (*iter) = image_path / iter->filename();
-std::cerr << (*iter) << std::endl;
-//    IRPath::CleanSlashes( (*iter) );
-//    (*iter) = IRPath::CleanPath( image_path ) + 
-//              IRPath::FilenameFromPath( *iter );
   }
 }
 
@@ -6085,8 +6082,10 @@ load_volume_slice(std::istream & si,
     }
     else
     {
-      std::cerr << "WARNING: unknown token: '" << token << "', ignoring ..."
-      << std::endl;
+      std::ostringstream oss;
+      oss << "WARNING: unknown token: '" << token << "', ignoring ...";
+      CORE_LOG_WARNING(oss.str());
+
     }
   }
 }

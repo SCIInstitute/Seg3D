@@ -38,6 +38,8 @@ SET(CORE_ITKCOMMON_SRCS
   IRImageLoader.hxx
   IRPruner.cpp
   IRPruner.h
+  LineMath.cpp
+  LineMath.h
   cluster.cxx
   cluster.hxx
   common.cxx

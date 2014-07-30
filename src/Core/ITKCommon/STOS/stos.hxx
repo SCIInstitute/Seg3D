@@ -222,8 +222,6 @@ public:
       }
     }
 
-    std::cerr << fn_[0] << " " << fn_[1] << std::endl;
-
     std::string line;
     {
       std::getline(si, line);

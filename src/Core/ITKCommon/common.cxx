@@ -191,8 +191,9 @@ load_transform(std::istream & si, const std::string & transform_type)
   
   if (t.GetPointer() == NULL)
   {
-    std::cerr << "could not instantiate " << transform_type
-    << ", giving up ..." << std::endl;
+    std::ostringstream oss;
+    oss << "could not instantiate " << transform_type << ", giving up ...";
+    CORE_LOG_WARNING(oss.str());
     return t;
   }
   t->Register();
@@ -434,7 +435,9 @@ load_mosaic(std::istream & si,
     }
     else
     {
-      std::cerr << "WARNING: unknown token: '" << token << "', ignoring ..." << std::endl;
+      std::ostringstream oss;
+      oss << "WARNING: unknown token: '" << token << "', ignoring ...";
+      CORE_LOG_WARNING(oss.str());
     }
   }
 }

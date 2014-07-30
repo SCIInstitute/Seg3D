@@ -151,16 +151,16 @@ load_mosaic(const bfs::path & fn_mosaic,
             typename T::PixelType clahe_new_max = 255,
             const bool & dont_allocate = false)
 {
-  std::cout << "    reading " << fn_mosaic;
+//  std::cout << "    reading " << fn_mosaic;
   
   std::fstream fin;
   fin.open(fn_mosaic.c_str(), std::ios::in);
   if (! fin.is_open())
   {
-    std::cout << ", failed...." << std::endl;
+//    std::cout << ", failed...." << std::endl;
     return false;
   }
-  std::cout << std::endl;
+//  std::cout << std::endl;
   
   std::list<bfs::path> fn_tiles;
   std::vector<base_transform_t::Pointer> transform;
@@ -193,7 +193,7 @@ load_mosaic(const bfs::path & fn_mosaic,
     const bfs::path & fn_image = *iter;
     
     // read the image:
-    std::cout << std::setw(3) << i << " ";
+//    std::cout << std::setw(3) << i << " ";
     image[i] = std_tile<T>(fn_image, shrink_factor, pixel_spacing);
     mask[i] = std_mask<T>(image[i], use_std_mask);
   }

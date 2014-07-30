@@ -58,16 +58,16 @@ load_slice(const bfs::path & fn_mosaic,
            bool mosaic_mask_enabled,
            bool dont_allocate)
 {
-  std::cout << "    reading " << fn_mosaic;
+//  std::cout << "    reading " << fn_mosaic;
   
   std::fstream fin;
   fin.open(fn_mosaic.c_str(), std::ios::in);
   if (!fin.is_open())
   {
-    std::cout << ", failed...." << std::endl;
+//    std::cout << ", failed...." << std::endl;
     return false;
   }
-  std::cout << std::endl;
+//  std::cout << std::endl;
   
   path_list fn_tiles;
   std::vector<base_transform_t::Pointer> transform;
@@ -98,7 +98,7 @@ load_slice(const bfs::path & fn_mosaic,
     const bfs::path & fn_image = (*iter);
     
     // read the image:
-    std::cout << std::setw(3) << i << " ";
+//    std::cout << std::setw(3) << i << " ";
     image[i] = std_tile<image_t>(fn_image, shrink_factor, pixel_spacing);
     
     if (use_std_mask)
