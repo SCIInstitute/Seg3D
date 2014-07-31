@@ -3,7 +3,7 @@
 
  The MIT License
 
- Copyright (c) 2014 Scientific Computing and Imaging Institute,
+ Copyright (c) 2009 Scientific Computing and Imaging Institute,
  University of Utah.
 
 
@@ -35,18 +35,19 @@
 // Core includes
 #include <Core/Application/Application.h>
 #include <Core/State/StateIO.h>
+#include <Core/Utils/Exception.h>
 #include <Core/Utils/ScopedCounter.h>
 #include <Core/Utils/Log.h>
 
 // Application includes
 #include <Application/ProjectManager/ProjectManager.h>
-#include <Application/Layer/DataLayer.h>
+#include <Application/Layer/LargeVolumeLayer.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
 
 namespace Seg3D
 {
 
-class DataLayerPrivate
+class LargeVolumeLayerPrivate
 {
 public:
   void update_data_info();
@@ -55,14 +56,15 @@ public:
   void handle_contrast_brightness_changed();
   void handle_display_value_range_changed();
 
-  DataLayer* layer_;
+  LargeVolumeLayer* layer_;
+  Core::LargeVolumeHandle volume_;
   size_t signal_block_count_;
 };
 
-void DataLayerPrivate::update_data_info()
+void LargeVolumeLayerPrivate::update_data_info()
 {
-  if ( !this->layer_->data_volume_ ||
-    !this->layer_->data_volume_->is_valid() )
+  if ( !this->volume_ ||
+    !this->volume_->is_valid() )
   {
     this->layer_->data_type_state_->set( "unknown" );
     this->layer_->min_value_state_->set( std::numeric_limits< double >::quiet_NaN() );
@@ -101,18 +103,18 @@ void DataLayerPrivate::update_data_info()
     break;
   }
   
-  this->layer_->min_value_state_->set( this->layer_->data_volume_->get_min() );
-  this->layer_->max_value_state_->set( this->layer_->data_volume_->get_max() );
+  this->layer_->min_value_state_->set( this->volume_->get_min() );
+  this->layer_->max_value_state_->set( this->volume_->get_max() );
 }
 
-void DataLayerPrivate::update_display_value_range()
+void LargeVolumeLayerPrivate::update_display_value_range()
 {
   if ( !this->layer_->has_valid_data() )  return;
   
   {
     Core::ScopedCounter signal_block( this->signal_block_count_ );
-    double min_val = this->layer_->get_data_volume()->get_min();
-    double max_val = this->layer_->get_data_volume()->get_max();
+    double min_val = this->volume_->get_min();
+    double max_val = this->volume_->get_max();
     this->layer_->display_min_value_state_->set_range( min_val, max_val );
     this->layer_->display_max_value_state_->set_range( min_val, max_val );
   }
@@ -120,7 +122,7 @@ void DataLayerPrivate::update_display_value_range()
   this->handle_contrast_brightness_changed();
 }
 
-void DataLayerPrivate::handle_contrast_brightness_changed()
+void LargeVolumeLayerPrivate::handle_contrast_brightness_changed()
 {
   if ( this->signal_block_count_ > 0 || !this->layer_->has_valid_data() )
   {
@@ -141,7 +143,7 @@ void DataLayerPrivate::handle_contrast_brightness_changed()
   this->layer_->display_max_value_state_->set( mid_val + window_size * 0.5 );
 }
 
-void DataLayerPrivate::handle_display_value_range_changed()
+void LargeVolumeLayerPrivate::handle_display_value_range_changed()
 {
   if ( this->signal_block_count_ > 0 || !this->layer_->has_valid_data() )
   {
@@ -166,42 +168,55 @@ void DataLayerPrivate::handle_display_value_range_changed()
 }
 
 
-DataLayer::DataLayer( const std::string& name, const Core::DataVolumeHandle& volume ) :
-  Layer( name, !( volume->is_valid() ) ),
-  data_volume_( volume ),
-  private_( new DataLayerPrivate )
+LargeVolumeLayer::LargeVolumeLayer( const std::string& name, Core::LargeVolumeSchemaHandle schema ) :
+  Layer( name ),
+  private_( new LargeVolumeLayerPrivate )
 {
-  this->data_volume_->register_data();
+  this->private_->volume_ = Core::LargeVolumeHandle( new Core::LargeVolume( schema ) );
   this->private_->layer_ = this;
   this->private_->signal_block_count_ = 0;
   this->initialize_states();
+  this->dir_name_state_->set( schema->get_dir().string() );
   this->private_->update_display_value_range();
 }
-  
-DataLayer::DataLayer( const std::string& state_id ) :
+
+LargeVolumeLayer::LargeVolumeLayer( const std::string& name, Core::LargeVolumeSchemaHandle schema, 
+  const Core::GridTransform& crop_trans ) :
+  Layer( name ),
+  private_( new LargeVolumeLayerPrivate )
+{
+  this->private_->volume_ = Core::LargeVolumeHandle( new Core::LargeVolume( schema, crop_trans ) );
+  this->private_->layer_ = this;
+  this->private_->signal_block_count_ = 0;
+  this->initialize_states();
+  this->dir_name_state_->set( schema->get_dir().string() );
+  this->crop_volume_state_->set( true );
+  this->cropped_grid_state_->set( crop_trans );
+  this->private_->update_display_value_range();
+}
+
+LargeVolumeLayer::LargeVolumeLayer( const std::string& state_id ) :
   Layer( "not initialized", state_id ),
-  private_( new DataLayerPrivate )
+  private_( new LargeVolumeLayerPrivate )
 {
   this->private_->layer_ = this;
   this->private_->signal_block_count_ = 0;
   this->initialize_states();
 }
 
-DataLayer::~DataLayer()
+LargeVolumeLayer::~LargeVolumeLayer()
 {
   // Disconnect all current connections
   this->disconnect_all();
-  if ( this->data_volume_ )
-  {
-    this->data_volume_->unregister_data();
-  }
 }
 
-void DataLayer::initialize_states()
+void LargeVolumeLayer::initialize_states()
 {
   // NOTE: This function allows setting of state variables outside of application thread
   this->set_initializing( true ); 
 
+  this->add_state( "dir_name", this->dir_name_state_, "" );
+     
   // == The brightness of the layer ==
   this->add_state( "brightness", brightness_state_, 50.0, 0.0, 100.0, 0.1 );
 
@@ -215,39 +230,36 @@ void DataLayer::initialize_states()
 
   this->add_state( "adjust_minmax", this->adjust_display_min_max_state_, false );
 
-  // == Is this volume rendered through the volume renderer ==
-  this->add_state( "volume_rendered", volume_rendered_state_, false );
-  
-  if ( data_volume_ )
-  {
-    this->generation_state_->set( this->data_volume_->get_generation() );
-  }
-
   this->add_state( "data_type", this->data_type_state_, "unknown" );
   this->add_state( "min", this->min_value_state_, std::numeric_limits< double >::quiet_NaN() );
   this->add_state( "max", this->max_value_state_, std::numeric_limits< double >::quiet_NaN() );
 
+  this->add_state( "crop_volume", this->crop_volume_state_, false );
+  this->add_state( "cropped_grid", this->cropped_grid_state_, Core::GridTransform() );
+
   this->add_connection( this->contrast_state_->state_changed_signal_.connect( boost::bind(
-    &DataLayerPrivate::handle_contrast_brightness_changed, this->private_ ) ) );
+    &LargeVolumeLayerPrivate::handle_contrast_brightness_changed, this->private_ ) ) );
   this->add_connection( this->brightness_state_->state_changed_signal_.connect( boost::bind(
-    &DataLayerPrivate::handle_contrast_brightness_changed, this->private_ ) ) );
+    &LargeVolumeLayerPrivate::handle_contrast_brightness_changed, this->private_ ) ) );
   this->add_connection( this->display_min_value_state_->state_changed_signal_.connect( boost::bind(
-    &DataLayerPrivate::handle_display_value_range_changed, this->private_ ) ) );
+    &LargeVolumeLayerPrivate::handle_display_value_range_changed, this->private_ ) ) );
   this->add_connection( this->display_max_value_state_->state_changed_signal_.connect( boost::bind(
-    &DataLayerPrivate::handle_display_value_range_changed, this->private_ ) ) );
+    &LargeVolumeLayerPrivate::handle_display_value_range_changed, this->private_ ) ) );
 
   this->private_->update_data_info();
+
+
 
   this->set_initializing( false );
 }
 
-Core::GridTransform DataLayer::get_grid_transform() const 
+Core::GridTransform LargeVolumeLayer::get_grid_transform() const 
 { 
   Layer::lock_type lock( Layer::GetMutex() );
 
-  if ( this->data_volume_ )
+  if ( this->private_->volume_ )
   {
-    return this->data_volume_->get_grid_transform(); 
+    return this->private_->volume_->get_grid_transform();
   }
   else
   {
@@ -255,196 +267,96 @@ Core::GridTransform DataLayer::get_grid_transform() const
   }
 }
 
-void DataLayer::set_grid_transform( const Core::GridTransform& grid_transform, 
+void LargeVolumeLayer::set_grid_transform( const Core::GridTransform& grid_transform, 
   bool preserve_centering )
 {
   Layer::lock_type lock( Layer::GetMutex() );
 
-  if ( this->data_volume_ )
+  if ( this->private_->volume_ )
   {
-    this->data_volume_->set_grid_transform( grid_transform, preserve_centering ); 
+    this->private_->volume_->set_grid_transform(grid_transform, preserve_centering);
   }
 }
 
-Core::DataType DataLayer::get_data_type() const
+Core::DataType LargeVolumeLayer::get_data_type() const
 {
   Layer::lock_type lock( Layer::GetMutex() );
 
-  if ( this->data_volume_ )
+  if (this->private_->volume_)
   {
-    return this->data_volume_->get_data_type();
+    return this->private_->volume_->get_data_type();
   }
   
   return Core::DataType::UNKNOWN_E;
 }
 
-Core::DataVolumeHandle DataLayer::get_data_volume() const
+size_t LargeVolumeLayer::get_byte_size() const
 {
-  Layer::lock_type lock( Layer::GetMutex() );
+  Core::IndexVector size = this->private_->volume_->get_schema()->get_size();
+  Core::DataType type = this->get_data_type();
 
-  return this->data_volume_;
+  return size[0] * size[1] * size[2] * Core::GetSizeDataType( type );
 }
 
-size_t DataLayer::get_byte_size() const
+bool LargeVolumeLayer::has_valid_data() const
 {
-  Layer::lock_type lock( Layer::GetMutex() );
-  if ( this->data_volume_ && this->data_volume_->is_valid() )
+  return true;
+}
+
+Core::VolumeHandle LargeVolumeLayer::get_volume() const
+{
+  return this->private_->volume_;
+}
+
+bool LargeVolumeLayer::pre_save_states( Core::StateIO& state_io )
+{ 
+  return true;
+}
+
+bool LargeVolumeLayer::post_load_states( const Core::StateIO& state_io )
+{
+  Core::LargeVolumeSchemaHandle schema( new Core::LargeVolumeSchema);
+  schema->set_dir( this->dir_name_state_->get() );
+  std::string error;
+  
+  if (! schema->load( error) )
   {
-    return this->data_volume_->get_byte_size();
+    CORE_LOG_ERROR( error );
+    return false;
   }
-  return 0;
-}
 
-bool DataLayer::has_valid_data() const
-{
-  Layer::lock_type lock( Layer::GetMutex() );
-
-  if ( this->data_volume_ )
+  if (this->crop_volume_state_->get())
   {
-    return this->data_volume_->is_valid();
+    this->private_->volume_ = Core::LargeVolumeHandle( new Core::LargeVolume( schema, this->cropped_grid_state_->get() ) );
   }
   else
   {
-    return false;
+    this->private_->volume_ = Core::LargeVolumeHandle( new Core::LargeVolume( schema ) );
   }
-}
 
-Core::VolumeHandle DataLayer::get_volume() const
-{
-  return this->get_data_volume();
-}
-
-bool DataLayer::set_data_volume( Core::DataVolumeHandle data_volume )
-{ 
-  ASSERT_IS_APPLICATION_THREAD();
-
-  // Only insert the volume if the layer is still valid
-  if ( !this->is_valid() )  return false;
-  
-  {
-    Layer::lock_type lock( Layer::GetMutex() );
-
-    if ( this->data_volume_ )
-    {
-      // Unregister the old volume
-      this->data_volume_->unregister_data();
-    }
-    
-    this->data_volume_ = data_volume; 
-
-    if ( this->data_volume_ )
-    {
-      // Register the new volume
-      this->data_volume_->register_data();
-      this->generation_state_->set( this->data_volume_->get_generation() );
-    }
-
-    this->private_->update_data_info();
-    this->private_->update_display_value_range();
-  }
+  this->private_->update_data_info();
+  this->private_->update_display_value_range();
 
   return true;
-} 
-
-bool DataLayer::pre_save_states( Core::StateIO& state_io )
-{
-  if ( this->data_volume_ )
-  {
-    long long generation_number = this->data_volume_->get_generation();
-    this->generation_state_->set( generation_number );
-
-    // Add the number to the project so it can be recorded into the session database
-    ProjectManager::Instance()->get_current_project()->add_generation_number( generation_number );
-    
-    std::string data_file_name = this->generation_state_->export_to_string() + ".nrrd";
-    boost::filesystem::path full_data_file_name = ProjectManager::Instance()->
-      get_current_project()->get_project_data_path() / data_file_name;
-    
-    if ( boost::filesystem::exists( full_data_file_name ) )
-    {
-      // File has already been saved
-      return true;
-    }
-      
-    bool compress = PreferencesManager::Instance()->compression_state_->get();
-    int level = PreferencesManager::Instance()->compression_level_state_->get();
-    
-    std::string error;
-    if ( ! Core::DataVolume::SaveDataVolume( full_data_file_name.string(), this->data_volume_, 
-      error, compress, level ) )
-    {
-      CORE_LOG_ERROR( error );
-      return false;   
-    }
-
-    return true;
-  }
-  
-  return true;
-}
-
-bool DataLayer::post_load_states( const Core::StateIO& state_io )
-{
-  if ( this->generation_state_->get() >= 0 )
-  {
-    std::string generation = this->generation_state_->export_to_string() + ".nrrd";
-    boost::filesystem::path volume_path = ProjectManager::Instance()->get_current_project()->
-      get_project_data_path() / generation;
-    std::string error;
-    
-    if( Core::DataVolume::LoadDataVolume( volume_path, this->data_volume_, error ) )
-    {
-      this->data_volume_->register_data( this->generation_state_->get() );
-      this->private_->update_data_info();
-      this->private_->update_display_value_range();
-
-      // If the layer didn't have a valid provenance ID, generate one
-      if ( this->provenance_id_state_->get() < 0 )
-      {
-        this->provenance_id_state_->set( GenerateProvenanceID() );
-      }
-
-      return true;
-    }
-    CORE_LOG_ERROR( error );
-  }
-
-  return false;
 }
   
-void DataLayer::clean_up()
+void LargeVolumeLayer::clean_up()
 {
   // Abort any filter still using this layer
   this->abort_signal_();
-  
-  // Clean up the data that is still associated with this layer
-  {
-    Layer::lock_type lock( Layer::GetMutex() );
-    if ( this->data_volume_ ) 
-    {
-      this->data_volume_->unregister_data();
-      Core::DataVolume::CreateInvalidData( this->data_volume_->get_grid_transform(), 
-        this->data_volume_ );
-    }
-  }
-  
+    
   // Remove all the connections
   this->disconnect_all();   
 }
 
-LayerHandle DataLayer::duplicate() const
+LayerHandle LargeVolumeLayer::duplicate() const
 {
-  LayerHandle layer;
+  CORE_THROW_NOTIMPLEMENTEDERROR("LargeVolumeLayer does not implement duplicate.");
+}
 
-  Core::DataVolumeHandle data_volume;
-  if ( !( Core::DataVolume::DuplicateVolume( this->get_data_volume(), data_volume ) ) )
-  {
-    // NOTE: return an empty handle
-    return layer;
-  }
-  
-  return DataLayerHandle( new DataLayer( "Copy_" + this->get_layer_name(), data_volume ) );
-
+Core::LargeVolumeSchemaHandle LargeVolumeLayer::get_schema() const
+{
+  return this->private_->volume_->get_schema();
 }
 
 } // end namespace Seg3D

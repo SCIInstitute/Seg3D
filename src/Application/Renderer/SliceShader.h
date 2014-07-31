@@ -58,6 +58,7 @@ public:
   void set_lighting( bool enabled );
   void set_fog( bool enabled );
   void set_fog_range( float znear, float zfar );
+  void set_texture_clamp( float s_min, float s_max, float t_min, float t_max );
 
 protected:
   virtual bool get_vertex_shader_source( std::string& source );
@@ -77,6 +78,7 @@ private:
   int enable_lighting_loc_;
   int enable_fog_loc_;
   int fog_range_loc_;
+  int texture_clamp_loc_;
 };
 
 } // end namespace Seg3D

@@ -44,6 +44,7 @@
 #include <Application/StatusBar/StatusBar.h>
 #include <Application/ProjectManager/ProjectManager.h>
 #include <Application/UndoBuffer/UndoBuffer.h>
+#include <Application/Layer/LargeVolumeLayer.h>
 #include <Application/Layer/LayerAction.h>
 #include <Application/Layer/LayerManager.h>
 #include <Application/Layer/LayerUndoBufferItem.h>
@@ -731,6 +732,26 @@ bool LayerFilter::create_and_lock_data_layer( const Core::GridTransform& grid_tr
   // Hook up the abort signal from the layer
   this->connect_abort( dst_layer );
   this->connect_stop( dst_layer );
+
+  // Success
+  return true;
+}
+
+bool LayerFilter::create_cropped_large_volume_layer( const Core::GridTransform& crop_trans,
+  LayerHandle src_layer, LayerHandle& dst_layer )
+{
+  // Generate a new name for the filter
+  std::string name = this->get_layer_prefix() + "_" + src_layer->get_layer_name();
+
+  LargeVolumeLayerHandle lv_layer = boost::dynamic_pointer_cast<LargeVolumeLayer>( src_layer );
+  if (!lv_layer) return false;
+
+  // Create the layer in creating mode
+  LayerManager::CreateCroppedLargeVolumeLayer( lv_layer->get_schema(), crop_trans,
+    name, dst_layer, src_layer->get_meta_data(), this->private_->sandbox_ );
+
+  // Record that the layer is locked
+  this->private_->created_layers_.push_back( dst_layer );
 
   // Success
   return true;

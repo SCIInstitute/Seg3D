@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
-
+ 
  The MIT License
-
- Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ 
+ Copyright (c) 2014 Scientific Computing and Imaging Institute,
  University of Utah.
-
-
+ 
+ 
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
-
+ 
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
-
+ 
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -26,49 +26,50 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-// Application includes
-#include <Application/Tool/ToolFactory.h>
-#include <Application/Tools/InvertTool.h>
-#include <Application/Filters/Actions/ActionInvert.h>
-#include <Application/Layer/Layer.h>
-#include <Application/Layer/LayerManager.h>
+#ifndef APPLICATION_TOOLS_EXTRACTDATALAYER_H
+#define APPLICATION_TOOLS_EXTRACTDATALAYER_H
 
-// Register the tool into the tool factory
-SCI_REGISTER_TOOL( Seg3D, InvertTool )
+// Application includes
+#include <Application/Tool/SingleTargetTool.h>
 
 namespace Seg3D
 {
 
-InvertTool::InvertTool( const std::string& toolid ) :
-  SingleTargetTool( Core::VolumeType::ALL_REGULAR_E, toolid )
+class ExtractDataLayerPrivate;
+typedef boost::shared_ptr<ExtractDataLayerPrivate> ExtractDataLayerPrivateHandle;
+
+class ExtractDataLayer : public SingleTargetTool
 {
-  this->add_state( "replace", this->replace_state_, false );
-}
 
-InvertTool::~InvertTool()
-{
-  this->disconnect_all();
-}
+SEG3D_TOOL(
+SEG3D_TOOL_NAME( "ExtractDataLayer", "Extract a normal data layer from a large data layer." )
+SEG3D_TOOL_MENULABEL( "Extract DataLayer" )
+SEG3D_TOOL_MENU( "Tools" )
+SEG3D_TOOL_SHORTCUT_KEY( "" )
+SEG3D_TOOL_URL( "http://www.sci.utah.edu/SCIRunDocs/index.php/CIBC:Seg3D2:ExtractDataLayer:1" )
+SEG3D_TOOL_VERSION( "1" )
+)
 
-void InvertTool::execute( Core::ActionContextHandle context )
-{
-  std::string layer_id;
-  bool replace;
-  {
-    // NOTE: Need to lock state engine as this function is run from the interface thread
-    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+  // -- constructor/destructor --
+public:
+  ExtractDataLayer( const std::string& toolid );
+  virtual ~ExtractDataLayer();
 
-  
-    if ( !this->valid_target_state_->get() )
-    {
-      return;
-    }
-    layer_id = this->target_layer_state_->get();
-    replace = this->replace_state_->get();
-  }
+  // -- state --
+public:
+  /// Layerid of the mask layer
+  Core::StateLabeledOptionHandle level_state_;
 
-  ActionInvert::Dispatch( context, layer_id, replace );
-}
+  // -- execute --
+public:
+  /// Execute the tool and dispatch the action
+  virtual void execute( Core::ActionContextHandle context );
 
+private:
+  ExtractDataLayerPrivateHandle private_;
 
-} // end namespace Seg3D
+};
+
+} // end namespace
+
+#endif

@@ -72,6 +72,8 @@ SET(APPLICATION_TOOLS_SRCS
   DiscreteGaussianFilter.cc  
   DistanceFilter.h
   DistanceFilter.cc
+  ExtractDataLayer.h
+  ExtractDataLayer.cc
   FillHolesFilter.h
   FillHolesFilter.cc
   GradientAnisotropicDiffusionFilter.h
@@ -140,6 +142,8 @@ SET(APPLICATION_TOOLS_ACTIONS_SRCS
   Actions/ActionFloodFill.cc
   Actions/ActionSpeedline.h
   Actions/ActionSpeedline.cc
+  Actions/ActionExtractDataLayer.h
+  Actions/ActionExtractDataLayer.cc
 )
   
 IF(BUILD_WITH_PYTHON)

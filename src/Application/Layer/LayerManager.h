@@ -46,6 +46,7 @@
 #include <Application/Layer/Layer.h>
 #include <Application/Layer/DataLayer.h>
 #include <Application/Layer/MaskLayer.h>
+#include <Application/Layer/LargeVolumeLayer.h>
 #include <Application/Project/Project.h>
 
 namespace Seg3D
@@ -77,7 +78,7 @@ public:
 
   // -- Accessor Functions --
 public:
-    // Functions for getting a copy of the Layers and Groups with the proper locking
+  // Functions for getting a copy of the Layers and Groups with the proper locking
   /// GET_GROUPS:
   /// this function copies the groups into the vector that is passed
   void get_groups( std::vector< LayerGroupHandle >& groups );
@@ -140,6 +141,7 @@ public:
 
   // Layer Action Functions
 private:
+  friend class ActionImportLargeVolumeLayer;
   friend class ActionImportLayer;
   friend class ActionImportSeries;
   friend class ActionNewMaskLayer;
@@ -481,6 +483,12 @@ public:
   static bool CreateAndLockDataLayer( Core::GridTransform, const std::string& name,
     LayerHandle& layer, const LayerMetaData& meta_data, filter_key_type key = filter_key_type( 0 ), 
     SandboxID sandbox = -1 );
+
+  /// Create a cropped version of a large volume.
+  /// NOTE: This function can *only* be called from the Application thread.
+  static bool CreateCroppedLargeVolumeLayer( Core::LargeVolumeSchemaHandle schema,
+    const Core::GridTransform& crop_trans, const std::string& name,
+    LayerHandle& layer, const LayerMetaData& meta_data, SandboxID sandbox = -1 );
   
   // == functions for setting data and unlocking layers ==
 

@@ -53,7 +53,7 @@ class LayerInputEntry
 {
 public:
   LayerInputEntry() :
-    type_( Core::VolumeType::ALL_E ),
+    type_( Core::VolumeType::ALL_REGULAR_E ),
     required_( false )
   {}
 

@@ -50,11 +50,11 @@ ArithmeticFilter::ArithmeticFilter( const std::string& toolid ) :
     std::make_pair( Tool::NONE_OPTION_C, Tool::NONE_OPTION_C ) );
   
   this->add_state( "input_b", this->input_b_state_, Tool::NONE_OPTION_C, empty_list );
-  this->add_extra_layer_input( this->input_b_state_, Core::VolumeType::ALL_E );
+  this->add_extra_layer_input( this->input_b_state_, Core::VolumeType::ALL_REGULAR_E );
   this->add_state( "input_c", this->input_c_state_, Tool::NONE_OPTION_C, empty_list );
-  this->add_extra_layer_input( this->input_c_state_, Core::VolumeType::ALL_E );
+  this->add_extra_layer_input( this->input_c_state_, Core::VolumeType::ALL_REGULAR_E );
   this->add_state( "input_d", this->input_d_state_, Tool::NONE_OPTION_C, empty_list );
-  this->add_extra_layer_input( this->input_d_state_, Core::VolumeType::ALL_E );
+  this->add_extra_layer_input( this->input_d_state_, Core::VolumeType::ALL_REGULAR_E );
   
   this->add_state( "expressions", this->expressions_state_, "" );
 

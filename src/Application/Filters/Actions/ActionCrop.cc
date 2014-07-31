@@ -162,6 +162,16 @@ void CropAlgo::run_filter()
         boost::dynamic_pointer_cast< MaskLayer >( this->src_layers_[ i ] ),
         boost::dynamic_pointer_cast< MaskLayer >( this->dst_layers_[ i ] ) );
       break;
+    case Core::VolumeType::LARGE_DATA_E:
+      if (this->replace_)
+      {
+        this->dispatch_delete_layer( this->src_layers_[ i ] );
+      }
+      else
+      {
+        this->dispatch_unlock_layer( this->src_layers_[ i ] );
+      }
+      break;
     }
 
     if ( this->check_abort() )
@@ -460,6 +470,10 @@ bool ActionCrop::run( Core::ActionContextHandle& context,
         algo->src_layers_[ i ], algo->dst_layers_[ i ] );
       static_cast< MaskLayer* >( algo->dst_layers_[ i ].get() )->color_state_->set(
         static_cast< MaskLayer* >( algo->src_layers_[ i ].get() )->color_state_->get() );
+      break;
+    case Core::VolumeType::LARGE_DATA_E:
+      algo->create_cropped_large_volume_layer( this->private_->output_grid_trans_,
+        algo->src_layers_[ i ], algo->dst_layers_[ i ] );
       break;
     default:
       assert( false );

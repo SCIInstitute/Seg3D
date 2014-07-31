@@ -19,6 +19,7 @@ uniform float opacity;
 uniform vec2 scale_bias;
 uniform int border_width; // width of the mask border
 uniform vec2 pixel_size; // pixel size in texture space
+uniform vec4 texture_clamp; // texture coordinate ranges (s_min, s_max, t_min, t_max)
 
 uniform bool enable_lighting;
 uniform bool enable_fog;
@@ -137,10 +138,10 @@ void main()
   if ( opacity == 0.0 ) discard;
 
   // Discard if the slice texture is out of boundary
-  if ( gl_TexCoord[0].s < 0.0 ) discard;
-  if ( gl_TexCoord[0].s > 1.0 ) discard;
-  if ( gl_TexCoord[0].t < 0.0 ) discard;
-  if ( gl_TexCoord[0].t > 1.0 ) discard;
+  if ( gl_TexCoord[0].s < texture_clamp[0] ) discard;
+  if ( gl_TexCoord[0].s > texture_clamp[1] ) discard;
+  if ( gl_TexCoord[0].t < texture_clamp[2] ) discard;
+  if ( gl_TexCoord[0].t > texture_clamp[3] ) discard;
 
   vec4 slice_color;
   if ( volume_type == 2 )

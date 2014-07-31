@@ -84,6 +84,7 @@ bool SliceShader::post_initialize()
   this->enable_lighting_loc_ = this->get_uniform_location( "enable_lighting" );
   this->enable_fog_loc_ = this->get_uniform_location( "enable_fog" );
   this->fog_range_loc_ = this->get_uniform_location( "fog_range" );
+  this->texture_clamp_loc_ = this->get_uniform_location( "texture_clamp" );
   this->disable();
 
   return true;
@@ -147,6 +148,11 @@ void SliceShader::set_fog( bool enabled )
 void SliceShader::set_fog_range( float znear, float zfar )
 {
   glUniform2f( this->fog_range_loc_, znear, zfar );
+}
+
+void SliceShader::set_texture_clamp( float s_min, float s_max, float t_min, float t_max )
+{
+  glUniform4f( this->texture_clamp_loc_, s_min, s_max, t_min, t_max );
 }
 
 } // end namespace Seg3D

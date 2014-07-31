@@ -42,6 +42,7 @@
 #include <Application/Layer/Layer.h>
 #include <Application/Layer/DataLayer.h>
 #include <Application/Layer/MaskLayer.h>
+#include <Application/Layer/LargeVolumeLayer.h>
 #include <Application/Layer/LayerGroup.h>
 #include <Application/ViewerManager/ViewerManager.h>
 #include <Application/Layer/Actions/ActionComputeIsosurface.h>
@@ -419,7 +420,9 @@ void LayerGroup::insert_layer( LayerHandle new_layer )
     LayerList::iterator it = std::find_if( this->private_->layer_list_.begin(), 
       this->private_->layer_list_.end(), boost::lambda::bind( &Layer::get_type, 
       boost::lambda::bind( &LayerHandle::get, boost::lambda::_1 ) ) 
-      == Core::VolumeType::DATA_E );
+      == Core::VolumeType::DATA_E || boost::lambda::bind( &Layer::get_type, 
+      boost::lambda::bind( &LayerHandle::get, boost::lambda::_1 ) ) 
+      == Core::VolumeType::LARGE_DATA_E );
     this->private_->layer_list_.insert( it, new_layer );
   }
 
@@ -504,7 +507,7 @@ bool LayerGroup::move_layer( LayerHandle src_layer, LayerHandle dst_layer )
   }
   
   // If src_layer is a data layer, it must be below all mask layers
-  if ( src_layer->get_type() == Core::VolumeType::DATA_E )
+  if ( src_layer->get_type() == Core::VolumeType::DATA_E || src_layer->get_type() == Core::VolumeType::LARGE_DATA_E )
   {
     if ( dst_layer && dst_layer->get_type() == Core::VolumeType::MASK_E )
     {
@@ -522,7 +525,8 @@ bool LayerGroup::move_layer( LayerHandle src_layer, LayerHandle dst_layer )
     if ( tmp_it == this->private_->layer_list_.end() ) --tmp_it;
 
     while ( tmp_it != this->private_->layer_list_.begin() &&
-      ( *tmp_it )->get_type() == Core::VolumeType::DATA_E )
+      ( ( *tmp_it )->get_type() == Core::VolumeType::DATA_E || 
+      ( *tmp_it )->get_type() == Core::VolumeType::LARGE_DATA_E ) )
     {
       dst_it = tmp_it--;
     }
@@ -656,6 +660,10 @@ bool LayerGroup::post_load_states( const Core::StateIO& state_io )
     {
       layer.reset( new MaskLayer( layer_id ) );
     }
+    else if ( layer_type == "large" )
+    {
+      layer.reset( new LargeVolumeLayer( layer_id ) );
+    }   
     else
     {
       CORE_LOG_ERROR( "Unsupported layer type" );

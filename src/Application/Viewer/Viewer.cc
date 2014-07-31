@@ -38,12 +38,15 @@
 #include <Core/Utils/AtomicCounter.h>
 #include <Core/Volume/DataVolumeSlice.h>
 #include <Core/Volume/MaskVolumeSlice.h>
+#include <Core/Volume/LargeVolumeSlice.h>
+#include <Core/LargeVolume/LargeVolumeCache.h>
 #include <Core/Renderer/RendererBase.h>
 
 // Application includes
 #include <Application/PreferencesManager/PreferencesManager.h>
 #include <Application/Layer/DataLayer.h>
 #include <Application/Layer/MaskLayer.h>
+#include <Application/Layer/LargeVolumeLayer.h>
 #include <Application/Layer/LayerGroup.h>
 #include <Application/Layer/LayerManager.h>
 #include <Application/Layer/Actions/ActionShiftActiveLayer.h>
@@ -167,23 +170,41 @@ public:
 void ViewerPrivate::adjust_contrast_brightness( int dx, int dy )
 {
   LayerHandle active_layer = LayerManager::Instance()->get_active_layer();
-  if ( !active_layer || active_layer->get_type() != Core::VolumeType::DATA_E )
+  if ( !active_layer || ( active_layer->get_type() != Core::VolumeType::DATA_E && active_layer->get_type() != Core::VolumeType::LARGE_DATA_E ) )
   {
     return;
   }
 
-  DataLayer* data_layer = static_cast< DataLayer* >( active_layer.get() );
-  double contrast_step, brightness_step;
+  if ( active_layer->get_type() != Core::VolumeType::DATA_E )
   {
-    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-    data_layer->contrast_state_->get_step( contrast_step ); 
-    data_layer->brightness_state_->get_step( brightness_step );
-  }
+    DataLayer* data_layer = static_cast< DataLayer* >( active_layer.get() );
+    double contrast_step, brightness_step;
+    {
+      Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+      data_layer->contrast_state_->get_step( contrast_step ); 
+      data_layer->brightness_state_->get_step( brightness_step );
+    }
 
-  Core::ActionOffset::Dispatch( Core::Interface::GetMouseActionContext(), 
-    data_layer->contrast_state_, dy * contrast_step );
-  Core::ActionOffset::Dispatch( Core::Interface::GetMouseActionContext(),
-    data_layer->brightness_state_, dx * brightness_step );
+    Core::ActionOffset::Dispatch( Core::Interface::GetMouseActionContext(), 
+      data_layer->contrast_state_, dy * contrast_step );
+    Core::ActionOffset::Dispatch( Core::Interface::GetMouseActionContext(),
+      data_layer->brightness_state_, dx * brightness_step );
+  }
+  else if ( active_layer->get_type() != Core::VolumeType::LARGE_DATA_E )
+  {
+    LargeVolumeLayer* data_layer = static_cast< LargeVolumeLayer* >( active_layer.get() );
+    double contrast_step, brightness_step;
+    {
+      Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+      data_layer->contrast_state_->get_step( contrast_step ); 
+      data_layer->brightness_state_->get_step( brightness_step );
+    }
+
+    Core::ActionOffset::Dispatch( Core::Interface::GetMouseActionContext(), 
+      data_layer->contrast_state_, dy * contrast_step );
+    Core::ActionOffset::Dispatch( Core::Interface::GetMouseActionContext(),
+      data_layer->brightness_state_, dx * brightness_step );
+  }
 }
 
 void ViewerPrivate::pick_point( int window_x, int window_y )
@@ -286,6 +307,21 @@ void ViewerPrivate::insert_layer( LayerHandle layer )
 
   switch( layer->get_type() )
   {
+  case Core::VolumeType::LARGE_DATA_E:
+    {
+      LargeVolumeLayer* data_layer = dynamic_cast< LargeVolumeLayer* >( layer.get() );
+      volume_slice.reset( new Core::LargeVolumeSlice( 
+        boost::dynamic_pointer_cast<Core::LargeVolume>( data_layer->get_volume() ), slice_type ) );
+
+      this->layer_connection_map_.insert( std::make_pair( layer->get_layer_id(),
+        data_layer->contrast_state_->state_changed_signal_.connect(
+        boost::bind( &ViewerPrivate::layer_state_changed, this, ViewModeType::ALL_E ) ) ) );
+
+      this->layer_connection_map_.insert( std::make_pair( layer->get_layer_id(),
+        data_layer->brightness_state_->state_changed_signal_.connect(
+        boost::bind( &ViewerPrivate::layer_state_changed, this, ViewModeType::ALL_E ) ) ) );
+    }
+    break;
   case Core::VolumeType::DATA_E:
     {
       DataLayer* data_layer = dynamic_cast< DataLayer* >( layer.get() );
@@ -1118,6 +1154,8 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
     connect( boost::bind( &Viewer::redraw_scene, this ) ) );
   this->add_connection( this->volume_show_bounding_box_state_->state_changed_signal_.connect(
     boost::bind( &Viewer::redraw_scene, this ) ) );
+  this->add_connection( Core::LargeVolumeCache::Instance()->brick_loaded_signal_.connect(
+    boost::bind( &Viewer::redraw_scene, this ) ) );
 
   // Connect state variables that should trigger redraw_overlay
   this->add_connection( this->slice_grid_state_->state_changed_signal_.connect(
@@ -1648,7 +1686,7 @@ void Viewer::update_status_bar( int x, int y, const std::string& layer_id )
           Core::DataVolumeSlice* >( volume_slice.get() );
         value = data_slice->get_data_at( static_cast<size_t>( i ), static_cast<size_t>( j ) );
       }
-      else
+      else if ( volume_slice->volume_type() == Core::VolumeType::MASK_E )
       {
         Core::MaskVolumeSlice* mask_slice = dynamic_cast< 
           Core::MaskVolumeSlice* >( volume_slice.get() );
