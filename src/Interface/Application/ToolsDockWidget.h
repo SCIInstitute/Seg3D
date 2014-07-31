@@ -29,6 +29,8 @@
 #ifndef INTERFACE_APPLICATION_TOOLSDOCKWIDGET_H
 #define INTERFACE_APPLICATION_TOOLSDOCKWIDGET_H
 
+#ifndef Q_MOC_RUN
+
 // QT includes
 #include <QtCore/QPointer>
 #include <QtGui/QPushButton>
@@ -55,6 +57,8 @@
 // Interface includes
 #include <Interface/Application/ToolWidget.h>
 #include <Interface/Application/ToolBoxWidget.h>
+
+#endif
 
 namespace Seg3D
 {

@@ -29,11 +29,15 @@
 #ifndef INTERFACE_APPLICATION_QTLAYERLISTWIDGET_H
 #define INTERFACE_APPLICATION_QTLAYERLISTWIDGET_H
 
+#ifndef Q_MOC_RUN
+
 // QT Includes
 #include <QWidget>
 
 // Boost includes
 #include <boost/shared_ptr.hpp>
+
+#endif
 
 namespace Seg3D 
 {

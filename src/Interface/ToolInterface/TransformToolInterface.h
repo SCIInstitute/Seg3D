@@ -29,8 +29,12 @@
 #ifndef INTERFACE_TOOLINTERFACE_TRANSFORMTOOLINTERFACE_H
 #define INTERFACE_TOOLINTERFACE_TRANSFORMTOOLINTERFACE_H
 
+#ifndef Q_MOC_RUN
+
 // Base class of the tool widget include
 #include <Interface/Application/ToolWidget.h>
+
+#endif
 
 namespace Seg3D
 {

@@ -29,11 +29,15 @@
 #ifndef INTERFACE_TOOLINTERFACE_DETAIL_MEASUREMENTTABLEVIEW_H
 #define INTERFACE_TOOLINTERFACE_DETAIL_MEASUREMENTTABLEVIEW_H
 
+#ifndef Q_MOC_RUN
+
 // Qt includes
 #include <QtGui/QTableView>
 
 // Boost includes
 #include <boost/shared_ptr.hpp>
+
+#endif
 
 namespace Seg3D
 {

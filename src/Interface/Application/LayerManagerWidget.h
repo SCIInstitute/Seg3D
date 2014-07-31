@@ -33,11 +33,15 @@
 # pragma once
 #endif
 
+#ifndef Q_MOC_RUN
+
 // Qt includes
 #include <QScrollArea>
 
 // Core includes
 #include <Core/Utils/ConnectionHandler.h>
+
+#endif
 
 namespace Seg3D
 {

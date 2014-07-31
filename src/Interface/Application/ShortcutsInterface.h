@@ -29,6 +29,8 @@
 #ifndef INTERFACE_APPLICATION_KEYBOARDSHORTCUTS_H
 #define INTERFACE_APPLICATION_KEYBOARDSHORTCUTS_H
 
+#ifndef Q_MOC_RUN
+
 // QT includes
 #include <QtCore/QPointer>
 
@@ -46,6 +48,8 @@
 
 // Application includes
 #include <Application/Tool/ToolFWD.h>
+
+#endif
 
 namespace Seg3D
 {

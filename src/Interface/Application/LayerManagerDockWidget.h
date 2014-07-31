@@ -29,9 +29,12 @@
 #ifndef INTERFACE_APPLICATION_LAYERMANAGERDOCKWIDGET_H
 #define INTERFACE_APPLICATION_LAYERMANAGERDOCKWIDGET_H
 
+#ifndef Q_MOC_RUN
 
 // QtUtils includes
 #include <QtUtils/Widgets/QtCustomDockWidget.h>
+
+#endif
 
 namespace Seg3D
 {

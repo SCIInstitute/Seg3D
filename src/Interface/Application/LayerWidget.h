@@ -29,6 +29,8 @@
 #ifndef INTERFACE_APPLICATION_LAYERWIDGET_H
 #define INTERFACE_APPLICATION_LAYERWIDGET_H
 
+#ifndef Q_MOC_RUN
+
 // QT Includes
 #include <QWidget>
 #include <QFrame>
@@ -38,6 +40,8 @@
 
 // Interface includes
 #include <Interface/Application/GroupButtonMenu.h>
+
+#endif
 
 namespace Seg3D
 {

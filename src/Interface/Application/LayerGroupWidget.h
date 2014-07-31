@@ -29,11 +29,15 @@
 #ifndef INTERFACE_APPLICATION_LAYERGROUPWIDGET_H
 #define INTERFACE_APPLICATION_LAYERGROUPWIDGET_H
 
+#ifndef Q_MOC_RUN
+
 // QT Includes
 #include <QWidget>
 
 // Application includes
 #include <Application/Layer/LayerGroup.h>
+
+#endif
 
 namespace Seg3D
 {

@@ -29,6 +29,8 @@
 #ifndef INTERFACE_APLICATION_TRANSFERFUNCTIONFEATUREWIDGET_H
 #define INTERFACE_APLICATION_TRANSFERFUNCTIONFEATUREWIDGET_H
 
+#ifndef Q_MOC_RUN
+
 // Boost includes
 #include <boost/shared_ptr.hpp>
 
@@ -36,6 +38,7 @@
 
 #include <Core/VolumeRenderer/TransferFunctionFeature.h>
 
+#endif
 namespace Seg3D
 {
 

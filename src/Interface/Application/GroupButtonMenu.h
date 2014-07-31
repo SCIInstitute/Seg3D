@@ -29,6 +29,8 @@
 #ifndef INTERFACE_APPLICATION_GROUPBUTTONMENU_H
 #define INTERFACE_APPLICATION_GROUPBUTTONMENU_H
 
+#ifndef Q_MOC_RUN
+
 // QT Includes
 #include <QtGui/QWidget>
 #include <QtGui/QDragEnterEvent>
@@ -37,6 +39,8 @@
 #include <QtCore/QPointer>
 
 #include <Application/Layer/LayerGroup.h>
+
+#endif
 
 namespace Seg3D
 {

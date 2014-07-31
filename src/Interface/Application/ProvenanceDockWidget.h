@@ -29,11 +29,15 @@
 #ifndef INTERFACE_APPLICATION_PROVENANCEDOCKWIDGET_H
 #define INTERFACE_APPLICATION_PROVENANCEDOCKWIDGET_H
 
+#ifndef Q_MOC_RUN
+
 // Qt includes
 #include <QAbstractItemModel>
 
 // QtUtils includes
 #include <QtUtils/Widgets/QtCustomDockWidget.h>
+
+#endif
 
 namespace Seg3D
 {

@@ -29,8 +29,12 @@
 #ifndef INTERFACE_APPLICATION_PROVENANCETREEVIEW_H
 #define INTERFACE_APPLICATION_PROVENANCETREEVIEW_H
 
+#ifndef Q_MOC_RUN
+
 // Qt includes
 #include <QTreeView>
+
+#endif
 
 namespace Seg3D
 {

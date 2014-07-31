@@ -29,8 +29,12 @@
 #ifndef INTERFACE_TOOLINTERFACE_DETAIL_MEASUREMENTTEXTEDIT_H
 #define INTERFACE_TOOLINTERFACE_DETAIL_MEASUREMENTTEXTEDIT_H
 
+#ifndef Q_MOC_RUN
+
 // Qt includes
 #include <QtGui/QTextEdit>
+
+#endif
 
 namespace Seg3D
 {

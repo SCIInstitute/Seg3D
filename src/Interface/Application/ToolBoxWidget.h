@@ -33,6 +33,9 @@
 # pragma once
 #endif
 
+#ifndef Q_MOC_RUN
+
+
 // Qt includes
 #include <QtGui/QScrollArea>
 #include <QtGui/QVBoxLayout>
@@ -43,6 +46,8 @@
 #include <Application/Tool/ToolInterface.h>
 #include <Application/Tool/Tool.h>
 #include <Application/ToolManager/ToolManager.h>
+
+#endif
 
 namespace Seg3D
 {

@@ -48,6 +48,7 @@ SET(INTERFACE_TOOLINTERFACE_SRCS
   CurvatureAnisotropicDiffusionFilterInterface.cc
   DiscreteGaussianFilterInterface.cc
   DistanceFilterInterface.cc
+  ExtractDataLayerInterface.cc
   FillHolesFilterInterface.cc
   GradientAnisotropicDiffusionFilterInterface.cc
   GradientMagnitudeFilterInterface.cc
@@ -90,6 +91,7 @@ SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
   CurvatureAnisotropicDiffusionFilterInterface.h
   DiscreteGaussianFilterInterface.h
   DistanceFilterInterface.h
+  ExtractDataLayerInterface.h
   FillHolesFilterInterface.h
   GradientAnisotropicDiffusionFilterInterface.h
   GradientMagnitudeFilterInterface.h
@@ -143,6 +145,7 @@ SET(INTERFACE_TOOLINTERFACE_UI_SRCS
   CurvatureAnisotropicDiffusionFilterInterface.ui
   DiscreteGaussianFilterInterface.ui
   DistanceFilterInterface.ui
+  ExtractDataLayerInterface.ui
   FillHolesFilterInterface.ui
   GradientAnisotropicDiffusionFilterInterface.ui
   GradientMagnitudeFilterInterface.ui

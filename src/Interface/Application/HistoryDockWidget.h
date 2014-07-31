@@ -29,11 +29,15 @@
 #ifndef INTERFACE_APPLICATION_HISTORYDOCKWIDGET_H
 #define INTERFACE_APPLICATION_HISTORYDOCKWIDGET_H
 
+#ifndef Q_MOC_RUN
+
 // Boost includes
 #include <boost/shared_ptr.hpp>
 
 // QtUtils includes
 #include <QtUtils/Widgets/QtCustomDockWidget.h>
+
+#endif
 
 namespace Seg3D
 {

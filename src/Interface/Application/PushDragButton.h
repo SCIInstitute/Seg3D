@@ -29,9 +29,13 @@
 #ifndef INTERFACE_APPLICATION_PUSHDRAGBUTTON_H
 #define INTERFACE_APPLICATION_PUSHDRAGBUTTON_H
 
+#ifndef Q_MOC_RUN
+
 // QT includes
 #include <QtGui/QPushButton>
 #include <QtGui/QMouseEvent>
+
+#endif
 
 namespace Seg3D
 {

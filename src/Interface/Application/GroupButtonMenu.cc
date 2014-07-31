@@ -129,6 +129,17 @@ GroupButtonMenu::GroupButtonMenu( QWidget* parent, LayerGroupHandle group ) :
   QtUtils::QtBridge::Show( this->private_->ui_.duplicate_layers_,
     group->show_duplicate_menu_state_ );
   
+  /// TODO: At some point for none bricked volumes we should allow data to be bricked on the fly
+  /// when displaying them, until that time 4096 is the largest texture OpenGL will render\
+  /// If data is beyond that disable adding new layers of this resolution
+  Core::GridTransform gt =  this->private_->group_->get_grid_transform();
+  bool beyond_render_capabilities = ( gt.get_nx() > 4096 ) || ( gt.get_ny() > 4096) || ( gt.get_nz() > 4096);
+
+  if ( beyond_render_capabilities ) {
+    this->private_->ui_.group_new_mask_button_->setDisabled( true );
+    this->private_->ui_.group_new_mask_button_->setToolTip( "Adding mask is disable as layer is too large" );
+  }
+
   QtUtils::QtBridge::Connect( this->private_->ui_.group_new_mask_button_, 
     boost::bind( &ActionNewMaskLayer::Dispatch, 
     Core::Interface::GetWidgetActionContext(), this->private_->group_id_ ) );

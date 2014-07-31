@@ -29,11 +29,15 @@
 #ifndef INTERFACE_APPLICATION_PROVENANCETREEMODEL_H
 #define INTERFACE_APPLICATION_PROVENANCETREEMODEL_H
 
+#ifndef Q_MOC_RUN
+
 // Qt includes
 #include <QAbstractItemModel>
 
 // Application includes
 #include <Application/Provenance/ProvenanceStep.h>
+
+#endif
 
 namespace Seg3D
 {

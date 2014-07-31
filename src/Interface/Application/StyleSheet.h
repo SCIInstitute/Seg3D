@@ -29,8 +29,12 @@
 #ifndef INTERFACE_APPLICATION_STYLESHEET_H
 #define INTERFACE_APPLICATION_STYLESHEET_H
 
+#ifndef Q_MOC_RUN
+
 //Qt Includes
 #include <QtCore/QString>
+
+#endif
 
 namespace Seg3D
 {

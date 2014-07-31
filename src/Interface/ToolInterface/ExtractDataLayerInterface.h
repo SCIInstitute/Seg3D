@@ -3,7 +3,7 @@
  
  The MIT License
  
- Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ Copyright (c) 2014 Scientific Computing and Imaging Institute,
  University of Utah.
  
  
@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_TOOLINTERFACE_ANDFILTERINTERFACE_H
-#define INTERFACE_TOOLINTERFACE_ANDFILTERINTERFACE_H
+#ifndef INTERFACE_TOOLINTERFACE_EXTRACTDATALAYERINTERFACE_H
+#define INTERFACE_TOOLINTERFACE_EXTRACTDATALAYERINTERFACE_H
 
 #ifndef Q_MOC_RUN
 
@@ -38,17 +38,16 @@
 
 namespace Seg3D
 {
+class ExtractDataLayerInterfacePrivate;
 
-class AndFilterInterfacePrivate;
-
-class AndFilterInterface : public ToolWidget
+class ExtractDataLayerInterface : public ToolWidget
 {
 Q_OBJECT
 
 // -- Constructor/destructor --
 public:
-  AndFilterInterface();
-  virtual ~AndFilterInterface();
+  ExtractDataLayerInterface();
+  virtual ~ExtractDataLayerInterface();
 
 // -- create interface --
 public:
@@ -57,7 +56,7 @@ public:
   virtual bool build_widget( QFrame* frame );
 
 private:
-  boost::shared_ptr< AndFilterInterfacePrivate > private_;
+  boost::shared_ptr< ExtractDataLayerInterfacePrivate > private_;
 
 };
 

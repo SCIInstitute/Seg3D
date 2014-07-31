@@ -33,7 +33,11 @@
 # pragma once
 #endif 
 
+#ifndef Q_MOC_RUN
+
 #include <QMainWindow>
+
+#endif
 
 namespace Seg3D
 {
@@ -48,7 +52,11 @@ public:
   /// IMPORTSERIES:
   /// Import a data volume from a series of files using the ITK importer.
   static void ImportSeries( QMainWindow* main_window );
-  
+
+
+  /// IMPORTLARGEVOLUME:
+  static bool ImportLargeVolume( QMainWindow* main_window );
+
   /// EXPORTLAYER:
   /// Export the current layer to file
   static void ExportLayer( QMainWindow* main_window );

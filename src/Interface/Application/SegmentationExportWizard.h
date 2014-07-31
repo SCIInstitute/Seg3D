@@ -29,6 +29,8 @@
 #ifndef INTERFACE_APPLICATION_SEGMENTATIONEXPORTWIZARD_H
 #define INTERFACE_APPLICATION_SEGMENTATIONEXPORTWIZARD_H
 
+#ifndef Q_MOC_RUN
+
 #include <boost/shared_ptr.hpp>
 
 //Qt includes
@@ -36,6 +38,8 @@
 
 // Interface Includes
 #include <Interface/Application/QtLayerListWidget.h>
+
+#endif
 
 namespace Seg3D
 {
