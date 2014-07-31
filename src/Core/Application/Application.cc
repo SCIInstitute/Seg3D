@@ -97,7 +97,7 @@ Application::Application() :
       if ( version < 10 )
       {
         this->private_->is_osx_10_5_or_less_ = true;
-}
+            }
     }
   }
 
@@ -140,6 +140,17 @@ bool Application::check_command_line_parameter( const std::string &key, std::str
   }
 }
 
+std::string Application::get_argument(int idx)
+{
+  lock_type lock( get_mutex() );
+
+    if (this->arguments_.size() <= idx) {
+        return "";
+    }
+    return this->arguments_[idx];
+}
+
+
 //This function sets parameters in the parameters map.
 void Application::set_command_line_parameter( const std::string& key, const std::string& value )
 {
@@ -148,9 +159,12 @@ void Application::set_command_line_parameter( const std::string& key, const std:
 }
 
 // Function for parsing the command line parameters
-void Application::parse_command_line_parameters( int argc, char **argv )
+void Application::parse_command_line_parameters( int argc, char **argv, int num_arguments )
 {
   lock_type lock( get_mutex() );
+
+    this->arguments_.clear();
+    this->parameters_.clear();
 
   this->private_->app_filename_ = boost::filesystem::path( argv[0] );
   this->private_->app_filepath_ = this->private_->app_filename_.parent_path();
@@ -158,12 +172,17 @@ void Application::parse_command_line_parameters( int argc, char **argv )
   typedef boost::tokenizer< boost::char_separator< char > > tokenizer;
   boost::char_separator< char > seperator( ":-=|;" );
   
-  int count = 1;
+    int count = 1;
+    
+    for ( ; count < argc && count < (num_arguments+1); count++ )
+    {
+        this->arguments_.push_back(argv[count]);
+    }
   
-  if( ( argc > 1 ) && ( boost::filesystem::exists( boost::filesystem::path( argv[ 1 ] ) ) ) )
+  if( ( argc > count ) && ( boost::filesystem::exists( boost::filesystem::path( argv[ count ] ) ) ) )
   {
     std::string key = "file_to_open_on_start";
-    this->parameters_[ key ] = std::string( argv[ 1 ] );
+    this->parameters_[ key ] = std::string( argv[ count ] );
     count++;
   }
 
@@ -171,6 +190,7 @@ void Application::parse_command_line_parameters( int argc, char **argv )
 
   for ( ; count < argc; count++ )
   {
+    
     std::string arg( argv[ count ] );
     tokenizer tokens( arg, seperator );
     std::vector< std::string > param_vector;
@@ -356,7 +376,7 @@ bool Application::get_user_name( std::string& user_name )
 
 void Application::log_start()
 {
-  CORE_LOG_MESSAGE( std::string( "Application: " ) + GetApplicationName() );
+  CORE_LOG_MESSAGE( std::string( "Application: " ) + GetUtilName() );
   CORE_LOG_MESSAGE( std::string( "Version: " ) + GetVersion() + " " + GetReleaseName() );
   CORE_LOG_MESSAGE( std::string( "64Bit: " )  + Core::ExportToString( Is64Bit() ) );
 }
@@ -446,6 +466,24 @@ std::string Application::GetAbout()
   return CORE_APPLICATION_ABOUT;
 }
 
+std::string util_name_ = "";
+
+std::string Application::GetUtilName()
+{
+    if (util_name_.size() == 0)
+    {
+        return CORE_APPLICATION_NAME;
+    }
+    else
+    {
+        return util_name_;
+    }
+}
+
+void Application::SetUtilName(const std::string& name )
+{
+    util_name_ = name;
+}
 
 Application::mutex_type& Application::GetMutex()
 {

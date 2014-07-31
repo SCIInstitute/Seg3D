@@ -107,6 +107,11 @@ public:
     return project( Vector( 0.0, 0.0, 1.0 ) ).length();
   }
 
+  Point get_origin() const
+  {
+    return project( Point( 0.0, 0.0, 0.0 ) );
+  }
+
   // SET_NX, SET_NY, SET_NY
   /// Set the size of the grid
   void set_nx( size_t nx )

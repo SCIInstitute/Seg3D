@@ -125,7 +125,7 @@ bool DataSlice::Duplicate( const DataSliceHandle& src_data_slice, DataSliceHandl
   dst_data_slice = Core::DataSliceHandle( new Core::DataSlice( dst_slice, src_data_slice->type_,
     src_data_slice->index_ ) );
   
-  return dst_data_slice;
+  return (bool)dst_data_slice;
 } 
   
 } // end namespace Core

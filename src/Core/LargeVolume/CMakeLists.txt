@@ -4,7 +4,7 @@
 # 
 #  The MIT License
 # 
-#  Copyright (c) 2009 Scientific Computing and Imaging Institute,
+#  Copyright (c) 2014 Scientific Computing and Imaging Institute,
 #  University of Utah.
 # 
 #  
@@ -31,36 +31,28 @@
 # Set sources
 ##################################################
 
-SET(CORE_VOLUME_SRCS
-  Volume.h
-  Volume.cc
-  DataVolume.h
-  DataVolume.cc
-  MaskVolume.h
-  MaskVolume.cc
-  VolumeSlice.h
-  VolumeSlice.cc
-  MaskVolumeSlice.h
-  MaskVolumeSlice.cc
-  DataVolumeSlice.h
-  DataVolumeSlice.cc
-  DataVolumeBrick.h
-  DataVolumeBrick.cc
-  LargeVolume.h
-  LargeVolume.cc
-  LargeVolumeSlice.h
-  LargeVolumeSlice.cc
-  LargeVolumeBrickSlice.h
-  LargeVolumeBrickSlice.cc
+SET(CORE_LARGEVOLUME_SRCS
+  LargeVolumeSchema.h
+  LargeVolumeSchema.cc
+  LargeVolumeConverter.h
+  LargeVolumeConverter.cc
+  LargeVolumeCache.h
+  LargeVolumeCache.cc
   )
 
-CORE_ADD_LIBRARY(Core_Volume ${CORE_VOLUME_SRCS} )
+##################################################
+# Build static library
+##################################################
+
+ADD_DEFINITIONS(-DZ_PREFIX)
+
+CORE_ADD_LIBRARY(Core_LargeVolume ${CORE_LARGEVOLUME_SRCS} )
             
-TARGET_LINK_LIBRARIES(Core_Volume
-                      Core_Utils
-            Core_DataBlock
-            Core_Graphics
-            Core_LargeVolume
-                      ${SCI_TEEM_LIBRARY}
-                      ${SCI_BOOST_LIBRARY})
+TARGET_LINK_LIBRARIES(Core_LargeVolume
+  Core_Utils
+  Core_Geometry
+  Core_DataBlock
+  Core_Application
+  ${SCI_BOOST_LIBRARY}
+  ${SCI_ZLIB_LIBRARY})
 

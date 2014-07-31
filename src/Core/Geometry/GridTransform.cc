@@ -231,7 +231,7 @@ bool ImportFromString( const std::string& str, GridTransform& value )
     value.set_nx( static_cast< size_t > ( values[ 0 ] ) );
     value.set_ny( static_cast< size_t > ( values[ 1 ] ) );
     value.set_nz( static_cast< size_t > ( values[ 2 ] ) );
-    value.transform().set( &values[ 3 ] );
+    value.set( &values[ 3 ] );
     return ( true );
   }
   return ( false );

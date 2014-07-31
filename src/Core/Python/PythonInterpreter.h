@@ -78,7 +78,7 @@ private:
 public:
   // INITIALIZE:
   /// Initialize the python interpreter with extra modules.
-  void initialize( wchar_t* program_name, const module_list_type& init_list );
+  void initialize( const wchar_t* program_name, const module_list_type& init_list );
 
   // GET_ACTION_CONTEXT:
   /// Get the action context for running actions from python.

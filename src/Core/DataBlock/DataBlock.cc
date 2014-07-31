@@ -449,7 +449,6 @@ void DataBlock::swap_endian()
   {
     case DataType::CHAR_E: 
     case DataType::UCHAR_E:
-      SwapEndian( get_data(), get_size(), 1 );
       break;
     case DataType::SHORT_E:
     case DataType::USHORT_E:
@@ -1412,6 +1411,205 @@ bool DataBlock::IsLittleEndian()
   unsigned short test = 0xFF;
   unsigned char* test_ptr = reinterpret_cast<unsigned char*>( &test );
   if ( test_ptr[ 0 ] ) return true; else return false;
+}
+
+template<class T>
+bool PadInternal( DataBlockHandle src, DataBlockHandle dst, int pad, double val)
+{
+    T* src_data = reinterpret_cast<T*>(src->get_data());
+    T* dst_data = reinterpret_cast<T*>(dst->get_data());
+    T typed_val = static_cast<T>(val);
+
+    DataBlock::index_type nx = src->get_nx();
+    DataBlock::index_type ny = src->get_ny();
+    DataBlock::index_type nz = src->get_nz();
+    DataBlock::index_type pnx = dst->get_nx();
+    DataBlock::index_type pny = dst->get_ny();
+    DataBlock::index_type pnz = dst->get_nz();
+
+    DataBlock::index_type p = static_cast<DataBlock::index_type>(pad);
+    
+    if (p > 0)
+    {
+        size_t size = dst->get_size();
+        for(size_t j = 0; j< size; j++)
+        {
+            dst_data[j] = typed_val;
+        }
+    }
+
+    if (p >= 0)
+    {
+        DataBlock::index_type k = 0;
+        DataBlock::index_type m = p + p * pnx + p * pnx * pny;
+        for(DataBlock::index_type z = 0; z < nz ; z++, m += 2*p*pnx )
+        {
+            for(DataBlock::index_type y = 0; y < ny; y++, m += 2*p )
+            {
+                for(DataBlock::index_type x = 0; x < nx; x++, k++, m++ )
+                {
+                    dst_data[m] = src_data[k];
+                }
+            }
+        }
+    }
+    else
+    {
+        p = -p;
+        DataBlock::index_type k = p + p * nx + p * nx * ny;
+        DataBlock::index_type m = 0;
+
+        for(DataBlock::index_type z = 0; z < pnz ; z++, k += 2*p*nx )
+        {
+            for(DataBlock::index_type y =0; y < pny; y++, k += 2*p )
+            {
+                for(DataBlock::index_type x = 0; x < pnx; x++, k++, m++ )
+                {
+                    dst_data[m] = src_data[k];
+                }
+            }
+        }
+    }
+    
+    return true;
+}
+
+bool DataBlock::Pad( DataBlockHandle src_data_block,
+    DataBlockHandle& dst_data_block, int pad, double val )
+{
+  // Step (1) : Check whether there is a source data block
+  dst_data_block.reset();
+  if ( !src_data_block ) return false;
+
+    if ( src_data_block->get_nx() +  2*pad < 1 ||
+         src_data_block->get_ny() +  2*pad < 1 ||
+         src_data_block->get_nz() +  2*pad < 1) return false;
+
+  // Step (2) : Lock the source
+  shared_lock_type lock( src_data_block->get_mutex( ) );
+
+  // Step (3): Generate a new data block with the right type
+  dst_data_block = StdDataBlock::New( src_data_block->get_nx() +  2*pad,
+    src_data_block->get_ny() +  2*pad, src_data_block->get_nz() +  2*pad,
+        src_data_block->get_data_type() );
+    
+  switch( src_data_block->get_data_type() )
+  {
+    case DataType::CHAR_E:
+            return PadInternal<signed char>(src_data_block,dst_data_block,pad, val);
+    case DataType::UCHAR_E:
+            return PadInternal<unsigned char>(src_data_block,dst_data_block,pad, val);
+    case DataType::SHORT_E:
+            return PadInternal<short>(src_data_block,dst_data_block,pad, val);
+    case DataType::USHORT_E:
+            return PadInternal<unsigned short>(src_data_block,dst_data_block,pad, val);
+    case DataType::INT_E:
+            return PadInternal<int>(src_data_block,dst_data_block,pad, val);
+    case DataType::UINT_E:
+            return PadInternal<unsigned int>(src_data_block,dst_data_block,pad, val);
+    case DataType::FLOAT_E:
+            return PadInternal<float>(src_data_block,dst_data_block,pad, val);
+    case DataType::DOUBLE_E:
+            return PadInternal<double>(src_data_block,dst_data_block,pad, val);
+    default:
+      return false;
+  }
+}
+
+
+
+template<class T>
+bool ClipInternal( DataBlockHandle src, DataBlockHandle dst, double val)
+{
+    T* sdata = reinterpret_cast<T*>(src->get_data());
+    T* ddata = reinterpret_cast<T*>(dst->get_data());
+    T typed_val = static_cast<T>(val);
+
+    DataBlock::index_type snx = src->get_nx();
+    DataBlock::index_type sny = src->get_ny();
+    DataBlock::index_type snz = src->get_nz();
+    DataBlock::index_type dnx = dst->get_nx();
+    DataBlock::index_type dny = dst->get_ny();
+    DataBlock::index_type dnz = dst->get_nz();
+
+  DataBlock::index_type mnx = Min( snx, dnx );
+  DataBlock::index_type mny = Min( sny, dny );
+  DataBlock::index_type mnz = Min( snz, dnz );
+
+  DataBlock::index_type sk = 0;
+  DataBlock::index_type dk = 0;
+
+    DataBlock::index_type sx_offset = Max( DataBlock::index_type( 0 ) , snx - dnx );
+    DataBlock::index_type dx_offset = Max( DataBlock::index_type( 0 ), dnx - snx );
+
+    DataBlock::index_type sy_offset = Max( DataBlock::index_type( 0 ) , sny - dny ) * snx;
+    DataBlock::index_type dy_offset = Max( DataBlock::index_type( 0 ), dny - sny ) * dny;
+
+  DataBlock::index_type dz_offset = Max( DataBlock::index_type( 0 ),  dnz - snz ) * dny * dnx;
+
+  for ( DataBlock::index_type z = 0; z < mnz; z++,  sk += sy_offset)
+  {
+    for ( DataBlock::index_type y = 0; y < mny; y++, sk += sx_offset )
+    {
+      for ( DataBlock::index_type x = 0; x < mnx; x++, sk++, dk++ )
+      {
+        ddata[dk] = sdata[sk];
+      } 
+      for ( DataBlock::index_type x = 0; x < dx_offset; x++, dk++ )
+      {
+        ddata[dk] = typed_val;
+      }
+    } 
+    for ( DataBlock::index_type m = 0; m < dy_offset; m++, dk++ )
+    {
+      ddata[dk] = typed_val;
+    }
+  }
+  for ( DataBlock::index_type m = 0; m < dz_offset; m++, dk++ )
+  {
+    ddata[dk] = typed_val;
+  }
+    
+    return true;
+}
+
+bool DataBlock::Clip( DataBlockHandle src_data_block,
+    DataBlockHandle& dst_data_block, int width, int height, int depth, double val )
+{
+  // Step (1) : Check whether there is a source data block
+  dst_data_block.reset();
+  if ( !src_data_block ) return false;
+
+    if ( width < 1 || height < 1 ) return false;
+
+  // Step (2) : Lock the source
+  shared_lock_type lock( src_data_block->get_mutex( ) );
+
+  // Step (3): Generate a new data block with the right type
+  dst_data_block = StdDataBlock::New( width, height, depth,
+        src_data_block->get_data_type() );
+    
+  switch( src_data_block->get_data_type() )
+  {
+    case DataType::CHAR_E:
+            return ClipInternal<signed char>(src_data_block,dst_data_block, val);
+    case DataType::UCHAR_E:
+            return ClipInternal<unsigned char>(src_data_block,dst_data_block, val);
+    case DataType::SHORT_E:
+            return ClipInternal<short>(src_data_block,dst_data_block, val);
+    case DataType::USHORT_E:
+            return ClipInternal<unsigned short>(src_data_block,dst_data_block, val);
+    case DataType::INT_E:
+            return ClipInternal<int>(src_data_block,dst_data_block, val);
+    case DataType::UINT_E:
+            return ClipInternal<unsigned int>(src_data_block,dst_data_block, val);
+    case DataType::FLOAT_E:
+            return ClipInternal<float>(src_data_block,dst_data_block, val);
+    case DataType::DOUBLE_E:
+            return ClipInternal<double>(src_data_block,dst_data_block, val);
+    default:
+      return false;
+  }
 }
 
 

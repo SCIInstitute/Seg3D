@@ -44,6 +44,8 @@ SET(CORE_GEOMETRY_SRCS
   Transform.cc
   GridTransform.h
   GridTransform.cc
+  IndexVector.h
+  IndexVector.cc
   Vector.h
   Vector.cc
   View3D.h
