@@ -29,10 +29,14 @@
 #ifndef QTUTILS_WIDGETS_QTTRANSFERFUNCTIONCURVE_H
 #define QTUTILS_WIDGETS_QTTRANSFERFUNCTIONCURVE_H
 
+#ifndef Q_MOC_RUN
+
 #include <QObject>
 #include <QGraphicsScene>
 
 #include <Core/VolumeRenderer/TransferFunctionControlPoint.h>
+
+#endif
 
 namespace QtUtils
 {

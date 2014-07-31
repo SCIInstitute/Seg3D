@@ -33,17 +33,23 @@
 # pragma once
 #endif 
 
+#ifndef Q_MOC_RUN
+
 // Glew includes
-// NOTE: Glew needs to be included before any openGL headers
 #include <GL/glew.h>
 
 // Qt includes
+#undef __GLEW_H__
 #include <QtOpenGL>
+#define __GLEW_H__
+
 
 // Core includes
 #include <Core/Utils/ConnectionHandler.h>
 #include <Core/RenderResources/RenderResources.h> 
 #include <Core/Viewer/AbstractViewer.h>
+
+#endif
 
 namespace QtUtils
 {

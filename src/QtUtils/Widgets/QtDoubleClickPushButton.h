@@ -29,11 +29,15 @@
 #ifndef QTUTILS_WIDGETS_QTDOUBLECLICKPUSHBUTTON_H
 #define QTUTILS_WIDGETS_QTDOUBLECLICKPUSHBUTTON_H
 
+#ifndef Q_MOC_RUN
+
 // QT includes
 #include <QtGui/QPushButton>
 
 // Core includes
 #include <boost/function.hpp>
+
+#endif
 
 namespace QtUtils
 {

@@ -29,12 +29,16 @@
 #ifndef QTUTILS_BRIDGE_DETAIL_QTPLAINTEXTEDITCONNECTOR_H
 #define QTUTILS_BRIDGE_DETAIL_QTPLAINTEXTEDITCONNECTOR_H
 
+#ifndef Q_MOC_RUN
+
 #include <QPlainTextEdit>
 #include <QPointer>
 
 #include <Core/State/StateValue.h>
 
 #include <QtUtils/Bridge/detail/QtConnectorBase.h>
+
+#endif
 
 namespace QtUtils
 {

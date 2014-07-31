@@ -29,11 +29,15 @@
 #ifndef QTUTILS_WIDGETS_QTDOUBLECLICKTOOLBUTTON_H
 #define QTUTILS_WIDGETS_QTDOUBLECLICKTOOLBUTTON_H
 
+#ifndef Q_MOC_RUN
+
 // QT includes
 #include <QtGui/QToolButton>
 
 // Core includes
 #include <boost/function.hpp>
+
+#endif
 
 namespace QtUtils
 {

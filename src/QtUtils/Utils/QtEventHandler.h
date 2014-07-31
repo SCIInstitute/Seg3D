@@ -33,6 +33,8 @@
 # pragma once
 #endif 
 
+#ifndef Q_MOC_RUN
+
 // STL includes
 #include <queue>
 
@@ -52,6 +54,8 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/thread/condition_variable.hpp>
+
+#endif
 
 namespace QtUtils
 {

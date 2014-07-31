@@ -29,9 +29,13 @@
 #ifndef QTUTILS_WIDGETS_QTTRANSFERFUNCTIONSCENE_H
 #define QTUTILS_WIDGETS_QTTRANSFERFUNCTIONSCENE_H
 
+#ifndef Q_MOC_RUN
+
 #include <QGraphicsScene>
 
 #include <Core/Utils/ConnectionHandler.h>
+
+#endif
 
 namespace QtUtils
 {

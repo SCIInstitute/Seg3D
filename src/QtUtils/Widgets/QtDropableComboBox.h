@@ -29,12 +29,16 @@
 #ifndef QTUTILS_WIDGETS_QTDROPABLECOMBOBOX_H
 #define QTUTILS_WIDGETS_QTDROPABLECOMBOBOX_H
 
+#ifndef Q_MOC_RUN
+
 // QT includes
 #include <QtGui/QComboBox>
 #include <QtGui/QDropEvent>
 
 // Core includes
 #include <Core/Geometry/Color.h>
+
+#endif
 
 namespace QtUtils
 {

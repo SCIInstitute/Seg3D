@@ -29,9 +29,13 @@
 #ifndef QTUTILS_WIDGETS_QTSIGNALFOCUSLINEEDIT_H
 #define QTUTILS_WIDGETS_QTSIGNALFOCUSLINEEDIT_H
 
+#ifndef Q_MOC_RUN
+
 // QT includes
 #include <QtGui/QLineEdit>
 #include <QtGui/QFocusEvent>
+
+#endif
 
 namespace QtUtils
 {

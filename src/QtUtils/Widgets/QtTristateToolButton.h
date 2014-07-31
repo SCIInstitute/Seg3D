@@ -29,11 +29,15 @@
 #ifndef QTUTILS_WIDGETS_QTTRISTATETOOLBUTTON_H
 #define QTUTILS_WIDGETS_QTTRISTATETOOLBUTTON_H
 
+#ifndef Q_MOC_RUN
+
 // boost includes
 #include <boost/shared_ptr.hpp>
 
 // QT includes
 #include <QtGui/QToolButton>
+
+#endif
 
 namespace QtUtils
 {

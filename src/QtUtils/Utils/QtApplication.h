@@ -33,6 +33,9 @@
 # pragma once
 #endif 
 
+// Qt includes
+#include <QApplication>
+
 // Boost includes
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
@@ -46,8 +49,6 @@
 // QtUtils includes
 #include <QtUtils/Utils/QtRenderResources.h>
 
-// Qt includes
-#include <QApplication>
 
 namespace QtUtils
 {

@@ -29,6 +29,8 @@
 #ifndef QTUTILS_BRIDGE_DETAIL_QTSHOWCONNECTOR_H
 #define QTUTILS_BRIDGE_DETAIL_QTSHOWCONNECTOR_H
 
+#ifndef Q_MOC_RUN
+
 // Qt includes
 #include <QObject>
 #include <QPointer>
@@ -41,6 +43,8 @@
 // Core includes
 #include <Core/Utils/ConnectionHandler.h>
 #include <Core/State/StateValue.h>
+
+#endif
 
 namespace QtUtils
 {

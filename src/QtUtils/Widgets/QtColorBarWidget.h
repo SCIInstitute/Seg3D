@@ -29,6 +29,8 @@
 #ifndef QTUTILS_WIDGETS_QTCOLORBARWIDGET_H
 #define QTUTILS_WIDGETS_QTCOLORBARWIDGET_H
 
+#ifndef Q_MOC_RUN
+
 // QT includes
 #include <QWidget>
 
@@ -42,6 +44,8 @@
 
 // QtUtils includes
 #include <QtUtils/Widgets/QtColorButton.h>
+
+#endif
 
 namespace QtUtils
 {

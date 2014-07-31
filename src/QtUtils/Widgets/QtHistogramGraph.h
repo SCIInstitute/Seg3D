@@ -29,6 +29,8 @@
 #ifndef QTUTILS_WIDGETS_QTHISTOGRAMGRAPH_H
 #define QTUTILS_WIDGETS_QTHISTOGRAMGRAPH_H
 
+#ifndef Q_MOC_RUN
+
 // STL includes
 #include <vector>
 
@@ -39,6 +41,8 @@
 
 // Core includes
 #include <Core/DataBlock/Histogram.h>
+
+#endif
 
 namespace QtUtils
 {

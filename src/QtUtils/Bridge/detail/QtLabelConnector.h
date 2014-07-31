@@ -29,12 +29,16 @@
 #ifndef QTUTILS_BRIDGE_DETAIL_QTLABELCONNECTOR_H
 #define QTUTILS_BRIDGE_DETAIL_QTLABELCONNECTOR_H
 
+#ifndef Q_MOC_RUN
+
 #include <QLabel>
 #include <QPointer>
 
 #include <Core/State/StateBase.h>
 
 #include <QtUtils/Bridge/detail/QtConnectorBase.h>
+
+#endif
 
 namespace QtUtils
 {

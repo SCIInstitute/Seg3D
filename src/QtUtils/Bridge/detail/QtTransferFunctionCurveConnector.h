@@ -29,12 +29,16 @@
 #ifndef QTUTILS_BRIDGE_DETAIL_QTTRANSFERFUNCTIONCURVECONNECTOR_H
 #define QTUTILS_BRIDGE_DETAIL_QTTRANSFERFUNCTIONCURVECONNECTOR_H
 
+#ifndef Q_MOC_RUN
+
 #include <QPointer>
 
 #include <Core/VolumeRenderer/TransferFunctionFeature.h>
 
 #include <QtUtils/Widgets/QtTransferFunctionCurve.h>
 #include <QtUtils/Bridge/detail/QtConnectorBase.h>
+
+#endif
 
 namespace QtUtils
 {
