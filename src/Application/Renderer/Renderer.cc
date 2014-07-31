@@ -593,10 +593,10 @@ void RendererPrivate::draw_slice( LayerSceneItemHandle layer_item,
         if (texture)
         {
           this->slice_shader_->set_texture_clamp(
-            static_cast<float>( ( ileft - left ) / ( right - left ) ),
-            static_cast<float>( ( iright - left ) / ( right - left ) ),
-            static_cast<float>( ( ibottom - bottom ) / ( top - bottom ) ),
-            static_cast<float>( ( itop - bottom ) / ( top - bottom ) ) );
+            Core::Max( 0.0f, static_cast<float>( ( ileft - left ) / ( right - left ) ) ),
+            Core::Min( 1.0f, static_cast<float>( ( iright - left ) / ( right - left ) ) ),
+            Core::Max( 0.0f, static_cast<float>( ( ibottom - bottom ) / ( top - bottom ) ) ),
+            Core::Min( 1.0f, static_cast<float>( ( itop - bottom ) / ( top - bottom ) ) ) );
 
           this->map_large_slice_texture( texture, width, height, left, right, bottom, top, proj_mat, rect );
         }
@@ -742,11 +742,6 @@ bool RendererPrivate::render_volume_view( ViewerHandle viewer, const Core::Color
     Core::Matrix modelview_matrix, mvp_matrix;
     glGetDoublev( GL_PROJECTION_MATRIX, mvp_matrix.data() );
     glGetDoublev( GL_MODELVIEW_MATRIX, modelview_matrix.data() );
-    //Core::Transform::BuildPerspectiveMatrix( mvp_matrix, view3d.fov(),
-    //  this->renderer_->width_ / ( 1.0 * this->renderer_->height_ ), znear, zfar );
-    //Core::Transform::BuildViewMatrix( modelview_matrix, Core::Point( view3d.eyep().x(), view3d.eyep().y(), view3d.eyep().z() ),
-    //  Core::Point( view3d.lookat().x(), view3d.lookat().y(), view3d.lookat().z() ),
-    //  Core::Vector( view3d.up().x(), view3d.up().y(), view3d.up().z() ) );
     mvp_matrix = mvp_matrix * modelview_matrix;
     Core::Transform mvp_trans;
     mvp_trans.load_matrix( mvp_matrix );

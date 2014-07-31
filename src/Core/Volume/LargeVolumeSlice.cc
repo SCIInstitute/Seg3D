@@ -157,7 +157,7 @@ std::vector<LargeVolumeBrickSliceHandle> LargeVolumeSlice::load_3d_tiles( const 
     static_cast<double>( total_trans.get_nz() ) ) ) - total_trans.project( Vector( 0.5, 0.5, 0.5 ) ) );
 
   std::vector<BrickInfo> bricks = this->lv_schema_->get_bricks_for_volume( mvp_trans, 
-    width, height, this->get_slice_type(), this->depth(), load_key );
+    width, height, this->get_slice_type(), total, this->depth(), load_key );
 
   LargeVolumeSlicePrivate::tile_cache_type current_tiles;
   LargeVolumeSlicePrivate::tile_cache_type::iterator it;

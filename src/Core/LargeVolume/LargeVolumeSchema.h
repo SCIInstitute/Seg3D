@@ -230,8 +230,8 @@ public:
   std::vector<BrickInfo> get_bricks_for_region( const BBox& region, 
     double pixel_size, SliceType slice, const std::string& load_key );
 
-  std::vector<BrickInfo> get_bricks_for_volume(  Transform world_viewport, 
-  int width, int height, SliceType slice, double depth,
+  std::vector<BrickInfo> get_bricks_for_volume( Transform world_viewport, 
+  int width, int height, SliceType slice, const BBox& effective_bbox, double depth, 
   const std::string& load_key );
 
   /// GET_PARENT

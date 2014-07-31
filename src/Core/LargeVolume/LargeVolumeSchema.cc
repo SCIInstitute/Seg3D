@@ -1086,8 +1086,8 @@ bool LargeVolumeSchema::get_children( const BrickInfo& bi, SliceType slice, doub
 }
 
 
-std::vector<BrickInfo> LargeVolumeSchema::get_bricks_for_volume(  Transform world_viewport, 
-  int width, int height, SliceType slice, double depth,
+std::vector<BrickInfo> LargeVolumeSchema::get_bricks_for_volume( Transform world_viewport, 
+  int width, int height, SliceType slice, const BBox& effective_bbox, double depth,
   const std::string& load_key )
 {
   std::vector<BrickInfo> result;
@@ -1122,7 +1122,7 @@ std::vector<BrickInfo> LargeVolumeSchema::get_bricks_for_volume(  Transform worl
     {
       case SliceType::SAGITTAL_E:
       {
-        if ( depth <  bbox.min().x() || depth > bbox.max().x() ) continue;
+        if ( !effective_bbox.overlaps(bbox) || depth <  bbox.min().x() || depth > bbox.max().x() ) continue;
 
         Point p1 = Point( depth, bbox.min().y(), bbox.min().z() );
         Point p2 = Point( depth, bbox.max().y(), bbox.min().z() );
@@ -1179,7 +1179,7 @@ std::vector<BrickInfo> LargeVolumeSchema::get_bricks_for_volume(  Transform worl
 
     case SliceType::CORONAL_E:
       {
-        if ( depth <  bbox.min().y() || depth > bbox.max().y() ) continue;
+      if (!effective_bbox.overlaps( bbox ) || depth <  bbox.min().y() || depth > bbox.max().y()) continue;
 
         Point p1 = Point( bbox.min().x(), depth, bbox.min().z() );
         Point p2 = Point( bbox.max().x(), depth, bbox.min().z() );
@@ -1236,7 +1236,7 @@ std::vector<BrickInfo> LargeVolumeSchema::get_bricks_for_volume(  Transform worl
 
       case SliceType::AXIAL_E:
       {
-        if ( depth <  bbox.min().z() || depth > bbox.max().z() ) continue;
+        if (!effective_bbox.overlaps( bbox ) || depth <  bbox.min().z() || depth > bbox.max().z()) continue;
 
         Point p1 = Point( bbox.min().x(), bbox.min().y(), depth );
         Point p2 = Point( bbox.max().x(), bbox.min().y(), depth );
