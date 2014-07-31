@@ -60,7 +60,7 @@ CORE_ACTION(
   CORE_ACTION_OPTIONAL_ARGUMENT( "clahe_slope", "1.0", "Maximum CLAHE slope." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "visualize_warp", "false", "" )
   CORE_ACTION_OPTIONAL_ARGUMENT( "use_base_mask", "false", "" )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "add_transforms", "true", "" )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "preadded", "false", "" )
   CORE_ACTION_OPTIONAL_ARGUMENT( "remap_values", "false", "" )
   CORE_ACTION_OPTIONAL_ARGUMENT( "save_int16_image", "false", "" )
   CORE_ACTION_OPTIONAL_ARGUMENT( "save_uint16_image", "false", "" )
@@ -90,7 +90,7 @@ public:
     this->add_parameter( this->clahe_slope_ );
     this->add_parameter( this->visualize_warp_ );
     this->add_parameter( this->use_base_mask_ );
-    this->add_parameter( this->add_transforms_ );
+    this->add_parameter( this->preadded_ );
     this->add_parameter( this->remap_values_ );
     this->add_parameter( this->save_int16_image_ );
     this->add_parameter( this->save_uint16_image_ );
@@ -116,7 +116,7 @@ public:
                        double clahe_slope,
                        bool visualize_warp,
                        bool use_base_mask,
-                       bool add_transforms,
+                       bool preadded,
                        bool remap_values,
                        bool save_int16_image,
                        bool save_uint16_image,
@@ -141,7 +141,7 @@ private:
   double clahe_slope_;
   bool visualize_warp_;
   bool use_base_mask_;
-  bool add_transforms_;
+  bool preadded_;
   bool remap_values_;
   bool save_int16_image_;
   bool save_uint16_image_;

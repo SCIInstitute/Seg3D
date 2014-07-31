@@ -98,7 +98,7 @@ ActionSliceToVolumeFilter::run( Core::ActionContextHandle& context, Core::Action
     std::cout.precision(6);
     std::cout.setf(std::ios::scientific);
     
-    track_progress(true);
+//    track_progress(true);
     
     // setup thread storage for the main thread:
     set_the_thread_storage_provider(the_boost_thread_t::thread_storage);
@@ -110,6 +110,7 @@ ActionSliceToVolumeFilter::run( Core::ActionContextHandle& context, Core::Action
     the_thread_interface_t::set_creator(the_boost_thread_t::create);
     
     // parameters:
+    bool add_transforms = (! this->preadded_);
     pathList stos_fn;    
     for (size_t i = 0; i < this->input_files_.size(); ++i)
     {
@@ -159,7 +160,20 @@ ActionSliceToVolumeFilter::run( Core::ActionContextHandle& context, Core::Action
 
     for (size_t i = 0; i < this->output_prefixes_.size(); ++i)
     {
+      // assuming prefix looks something like: my_output_dir/filestem,
+      // so that output will be my_output_dir/filestem_*.*
       bfs::path prefix(this->output_prefixes_[i]);
+      if (! bfs::is_directory( prefix.parent_path() ) )
+      {
+        CORE_LOG_DEBUG(std::string("Creating parent path to ") + this->output_prefixes_[i]);
+        if (! boost::filesystem::create_directories( prefix.parent_path() ) )
+        {
+          std::ostringstream oss;
+          oss << "Could not create missing directory " << prefix.parent_path() << " required to create output image.";
+          context->report_error(oss.str());
+          return false;
+        }
+      }
       fn_prefixes.push_back(prefix);
     }
     
@@ -187,7 +201,7 @@ ActionSliceToVolumeFilter::run( Core::ActionContextHandle& context, Core::Action
       }
     }
     
-    if ( fn_prefixes.size() == 0 || (fn_prefixes.size() > 1 && (fn_prefixes.size() != stos_fn.size() + 1) ) )
+    if ( (fn_prefixes.size() == 0) || (fn_prefixes.size() > 1 && (fn_prefixes.size() != stos_fn.size() + 1) ) )
     {
       context->report_error("There must be exactly one prefix for each slice, or one prefix for all slices.");
       return false;
@@ -301,7 +315,7 @@ ActionSliceToVolumeFilter::run( Core::ActionContextHandle& context, Core::Action
         const_cast<base_transform_t *>(stos[i].t01_.GetPointer());
         
         // collect transforms involved in mapping from slice 0 to slice i + 1:
-        if ( this->add_transforms_ )
+        if ( add_transforms )
         {
           std::vector<base_transform_t::Pointer> cascade_0i1;
           stos_tree.get_cascade(fn_mosaic[0],
@@ -553,7 +567,7 @@ ActionSliceToVolumeFilter::run( Core::ActionContextHandle& context, Core::Action
         // 2. find where this point maps to in the current slice:
         mosaic[0]->TransformIndexToPhysicalPoint(index, pt[0]);
         
-        if ( this->add_transforms_ )
+        if ( add_transforms )
         {
           // Run through entire cascade.
           const base_transform_t * t = cascade[i].GetPointer();
@@ -589,7 +603,7 @@ ActionSliceToVolumeFilter::run( Core::ActionContextHandle& context, Core::Action
       }
       else
       {
-        fn_filename << "_" << std::setfill('0') << std::setw(3) << i ;
+        fn_filename << "_" << std::setfill('0') << std::setw(3) << i;
       }
       
       for ( int mosIdx = 0; mosIdx < grand_total; ++mosIdx )
@@ -708,7 +722,7 @@ void
                                       double clahe_slope,
                                       bool visualize_warp,
                                       bool use_base_mask,
-                                      bool add_transforms,
+                                      bool preadded,
                                       bool remap_values,
                                       bool save_int16_image,
                                       bool save_uint16_image,
@@ -734,7 +748,7 @@ void
   action->clahe_slope_ = clahe_slope;
   action->visualize_warp_ = visualize_warp;
   action->use_base_mask_ = use_base_mask;
-  action->add_transforms_ = add_transforms;
+  action->preadded_ = preadded;
   action->remap_values_ = remap_values;
   action->save_int16_image_ = save_int16_image;
   action->save_uint16_image_ = save_uint16_image;

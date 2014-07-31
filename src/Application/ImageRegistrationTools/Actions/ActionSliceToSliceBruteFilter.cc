@@ -30,7 +30,6 @@
 
 // the includes:
 #include <Core/ITKCommon/common.hxx>
-//#include <Core/ITKCommon/visualize.hxx>
 #include <Core/ITKCommon/pyramid.hxx>
 #include <Core/ITKCommon/match.hxx>
 #include <Core/ITKCommon/Transform/itkLegendrePolynomialTransform.h>
@@ -1262,30 +1261,29 @@ ActionSliceToSliceBruteFilter::run( Core::ActionContextHandle& context, Core::Ac
   return false;
 }
 
-
 void
-  ActionSliceToSliceBruteFilter::Dispatch(Core::ActionContextHandle context,
-                                          std::string target_layer,
-                                          unsigned int shrink_factor,
-                                          double pixel_spacing,
-                                          double clahe_slope,
-                                          double best_shift_x,
-                                          double best_shift_y,
-                                          double best_angle,
-                                          double best_overlap,
-                                          bool use_standard_mask,
-                                          bool use_refinement,
-                                          bool use_cubic,
-                                          bool regularize,
-                                          bool flip_fixed,
-                                          bool flip_moving,
-                                          std::string input_fixed,
-                                          std::string input_moving,
-                                          std::string output_stos,
-                                          std::string mask_fixed,
-                                          std::string mask_moving,
-                                          std::string image_dir_fixed,
-                                          std::string image_dir_moving)
+ActionSliceToSliceBruteFilter::Dispatch(Core::ActionContextHandle context,
+                                        std::string target_layer,
+                                        unsigned int shrink_factor,
+                                        double pixel_spacing,
+                                        double clahe_slope,
+                                        double best_shift_x,
+                                        double best_shift_y,
+                                        double best_angle,
+                                        double best_overlap,
+                                        bool use_standard_mask,
+                                        bool use_refinement,
+                                        bool use_cubic,
+                                        bool regularize,
+                                        bool flip_fixed,
+                                        bool flip_moving,
+                                        std::string input_fixed,
+                                        std::string input_moving,
+                                        std::string output_stos,
+                                        std::string mask_fixed,
+                                        std::string mask_moving,
+                                        std::string image_dir_fixed,
+                                        std::string image_dir_moving)
 {
   // Create a new action
   ActionSliceToSliceBruteFilter* action = new ActionSliceToSliceBruteFilter;

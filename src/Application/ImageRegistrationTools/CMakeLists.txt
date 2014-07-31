@@ -50,6 +50,8 @@ SET(APPLICATION_IRTOOLS_SRCS
 )
 
 SET(APPLICATION_IRTOOLS_ACTIONS_SRCS
+  Actions/ActionAddTransformsFilter.cc
+  Actions/ActionAddTransformsFilter.h
   Actions/ActionAssembleFilter.cc
   Actions/ActionAssembleFilter.h
   Actions/ActionBlobFeatureEnhancementFilter.cc
