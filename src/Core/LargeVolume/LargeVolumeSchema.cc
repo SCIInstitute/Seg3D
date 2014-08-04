@@ -33,7 +33,7 @@
 #include <set>
 #include <queue>
 
-#include <Core/Utils/FileSystemUtil.h>
+#include <Core/Utils/FilesystemUtil.h>
 #include <Core/Utils/StringUtil.h>
 #include <Core/Math/MathFunctions.h>
 #include <Core/DataBlock/StdDataBlock.h>
@@ -297,7 +297,7 @@ bool LargeVolumeSchema::load( std::string& error)
 
   try
   {
-    std::ifstream file_text( filename.string() );
+    std::ifstream file_text( filename.string().c_str() );
     std::string line;
     std::map<std::string,std::string> values;
     
@@ -484,7 +484,7 @@ bool LargeVolumeSchema::save( std::string& error ) const
   boost::filesystem::path filename = this->private_->dir_ / "volume.txt";
   
   try {
-    std::ofstream text_file( filename.string() );
+    std::ofstream text_file( filename.string().c_str() );
   
     text_file << "size: " << ExportToString( this->private_->size_ ) << std::endl;
     text_file << "origin: " << ExportToString( this->private_->origin_ ) << std::endl;
@@ -766,7 +766,7 @@ bool LargeVolumeSchema::read_brick( DataBlockHandle& brick, const BrickInfo& bi,
     {
       std::vector<char> buffer( file_size );
 
-      std::ifstream input( brick_file.string(), std::ios_base::in | std::ios_base::binary );
+      std::ifstream input( brick_file.string().c_str(), std::ios_base::in | std::ios_base::binary );
       input.read( &buffer[0],  file_size);
       input.close();
 
@@ -796,7 +796,7 @@ bool LargeVolumeSchema::read_brick( DataBlockHandle& brick, const BrickInfo& bi,
   {
     try
     {
-      std::ifstream input( brick_file.string(), std::ios_base::in | std::ios_base::binary );
+      std::ifstream input( brick_file.string().c_str(), std::ios_base::in | std::ios_base::binary );
       input.read( reinterpret_cast<char *>(brick->get_data()), brick_size );
       input.close();
     }
@@ -848,7 +848,7 @@ bool LargeVolumeSchema::append_brick_buffer( DataBlockHandle data_block, size_t 
 
   try
   {
-    std::ofstream output( brick_file.string(), std::ios_base::app | std::ios_base::binary | std::ios_base::out );
+    std::ofstream output( brick_file.string().c_str(), std::ios_base::app | std::ios_base::binary | std::ios_base::out );
     
     output.seekp( offset * size[0] * size[1] * GetSizeDataType( this->get_data_type()), std::ios_base::beg );
     output.write( reinterpret_cast<char *>( data_block->get_data() ) + buffer_offset, buffer_size );
@@ -901,7 +901,7 @@ bool LargeVolumeSchema::write_brick( DataBlockHandle data_block, const BrickInfo
       // Compression succeeded
       try
       {
-        std::ofstream output( brick_file.string(), std::ios_base::trunc | std::ios_base::binary | std::ios_base::out );
+        std::ofstream output( brick_file.string().c_str(), std::ios_base::trunc | std::ios_base::binary | std::ios_base::out );
         output.write( &buffer[0], brick_size_ul );
       }
       catch ( ... )
@@ -915,7 +915,7 @@ bool LargeVolumeSchema::write_brick( DataBlockHandle data_block, const BrickInfo
     {
       try
       {
-        std::ofstream output( brick_file.string(), std::ios_base::trunc | std::ios_base::binary | std::ios_base::out );
+        std::ofstream output( brick_file.string().c_str(), std::ios_base::trunc | std::ios_base::binary | std::ios_base::out );
         output.write( reinterpret_cast<char *>( data_block->get_data() ) , brick_size );
       }
       catch ( ... )
@@ -929,7 +929,7 @@ bool LargeVolumeSchema::write_brick( DataBlockHandle data_block, const BrickInfo
   {
     try
     {
-      std::ofstream output( brick_file.string(), std::ios_base::trunc | std::ios_base::binary | std::ios_base::out );
+      std::ofstream output( brick_file.string().c_str(), std::ios_base::trunc | std::ios_base::binary | std::ios_base::out );
       output.write( reinterpret_cast<char *>( data_block->get_data() ) , brick_size );
     }
     catch ( ... )
