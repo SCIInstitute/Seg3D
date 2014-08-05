@@ -90,7 +90,6 @@ NrrdData::NrrdData( DataBlockHandle data_block, GridTransform transform ) :
   {
     CORE_THROW_LOGICERROR( "Cannot create NrrdData from empty object" );
   }
-
   this->private_->own_data_ = false;
   this->private_->data_block_ = data_block;
   this->private_->nrrd_ = nrrdNew();
@@ -496,22 +495,22 @@ bool NrrdData::LoadNrrd( const std::string& filename, NrrdDataHandle& nrrddata, 
   lock_type lock( GetMutex() );
 
   Nrrd* nrrd = nrrdNew();
-    boost::filesystem::path nrrd_path = boost::filesystem::path( filename ).parent_path();
-    std::string filename_only = boost::filesystem::path( filename ).filename().string();
-    
-    boost::system::error_code ec;
-    boost::filesystem::path current_path = boost::filesystem::current_path( ec );
-    if ( ec )
-    {
+  boost::filesystem::path nrrd_path = boost::filesystem::path( filename ).parent_path();
+  std::string filename_only = boost::filesystem::path( filename ).filename().string();
+
+  boost::system::error_code ec;
+  boost::filesystem::path current_path = boost::filesystem::current_path( ec );
+  if ( ec )
+  {
     error = std::string( "Could not open file: " ) + filename + " : Could not get current directory.";
-        return false;
-    }
-    boost::filesystem::current_path( nrrd_path, ec );
-    if ( ec )
-    {
+    return false;
+  }
+  boost::filesystem::current_path( nrrd_path, ec );
+  if ( ec )
+  {
     error = std::string( "Could not open file: " ) + filename + " : Could not access path.";
-        return false;
-    }
+    return false;
+  }
 
   if ( nrrdLoad( nrrd, filename_only.c_str(), 0 ) )
   {
@@ -521,10 +520,10 @@ bool NrrdData::LoadNrrd( const std::string& filename, NrrdDataHandle& nrrddata, 
     biffDone( NRRD );
     nrrdNuke( nrrd );
     nrrddata.reset();
-        boost::filesystem::current_path( current_path, ec );
+    boost::filesystem::current_path( current_path, ec );
     return false;
   }
-    boost::filesystem::current_path( current_path, ec );
+  boost::filesystem::current_path( current_path, ec );
 
   if ( nrrd->dim < 2 )
   {
@@ -545,7 +544,7 @@ bool NrrdData::LoadNrrd( const std::string& filename, NrrdDataHandle& nrrddata, 
     nrrd->axis[ 2 ].kind = nrrd->axis[ 1].kind;
     nrrd->axis[ 2 ].label = 0;
     nrrd->axis[ 2 ].units = 0;
-    
+
     if ( nrrd->spaceDim == 2 )
     {
       nrrd->spaceDim = 3;
@@ -554,7 +553,7 @@ bool NrrdData::LoadNrrd( const std::string& filename, NrrdDataHandle& nrrddata, 
       nrrd->axis[ 2 ].spaceDirection[ 0 ] = 0.0;
       nrrd->axis[ 2 ].spaceDirection[ 1 ] = 0.0;
       nrrd->axis[ 2 ].spaceDirection[ 2 ] = 1.0;
-       
+
       nrrd->spaceUnits[ 2 ] = 0;
       nrrd->spaceOrigin[ 2 ] = 0.0;
       nrrd->measurementFrame[ 0 ][ 2 ] = 0.0;
@@ -577,6 +576,7 @@ bool NrrdData::LoadNrrd( const std::string& filename, NrrdDataHandle& nrrddata, 
       nrrd->axis[ 2 ].spaceDirection[ 2 ] = space_dir_2.z();    
     }
   }
+  
 
   // Fix a problem with nrrds with stub axes
   // In the old Seg3D this was once fashionable to add a dormant axis that would tell that the
