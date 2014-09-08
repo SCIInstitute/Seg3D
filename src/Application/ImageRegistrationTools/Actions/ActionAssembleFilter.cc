@@ -62,6 +62,11 @@ namespace Seg3D
 bool
 ActionAssembleFilter::validate( Core::ActionContextHandle& context )
 {
+  if (this->feathering_ != "blend" && this->feathering_ != "binary" && this->feathering_ != "none")
+  {
+    context->report_warning(this->feathering_ + " is not a recognized feathering option.");
+  }
+
   return true;
 }
 
@@ -115,10 +120,16 @@ ActionAssembleFilter::run( Core::ActionContextHandle& context, Core::ActionResul
     if (this->feathering_ == "blend")
     {
       feathering_val = FEATHER_BLEND_E;
+      CORE_LOG_DEBUG("Blended feathering will be applied to assembled image.");
     }
     else if (this->feathering_ == "binary")
     {
       feathering_val = FEATHER_BINARY_E;
+      CORE_LOG_DEBUG("Binary feathering will be applied to assembled image.");
+    }
+    else
+    {
+      CORE_LOG_DEBUG("Feathering will not be applied to assembled image.");
     }
 
     // debug...
