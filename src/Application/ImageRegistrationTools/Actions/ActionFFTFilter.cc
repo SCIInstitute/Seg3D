@@ -108,9 +108,12 @@ ActionFFTFilter::run( Core::ActionContextHandle& context, Core::ActionResultHand
     bool verbose = true;
     
     // by default run as many threads as there are cores:
-    unsigned int num_threads = boost::thread::hardware_concurrency();
+    if (this->num_threads_ == 0)
+    {
+      this->num_threads_ = boost::thread::hardware_concurrency();
+    }
     fftwf_init_threads();
-    itk_fft::set_num_fftw_threads(num_threads);
+    itk_fft::set_num_fftw_threads(this->num_threads_);
 
     // TODO: does it make sense to expose this?
     // for debugging:
@@ -468,6 +471,7 @@ ActionFFTFilter::Dispatch(Core::ActionContextHandle context,
                           std::string output_mosaic,
                           std::vector<std::string> images,
                           unsigned int shrink_factor,
+                          unsigned int num_threads,
                           unsigned int pyramid_levels,
                           unsigned int iterations_per_level,
                           double pixel_spacing,
@@ -488,6 +492,7 @@ ActionFFTFilter::Dispatch(Core::ActionContextHandle context,
   action->directory_ = directory;
   action->output_mosaic_ = output_mosaic;
   action->shrink_factor_ = shrink_factor;
+  action->num_threads_ = num_threads;
   action->pyramid_levels_ = pyramid_levels;
   action->iterations_per_level_ = iterations_per_level;
   action->pixel_spacing_ = pixel_spacing;

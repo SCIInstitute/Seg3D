@@ -79,7 +79,7 @@ ActionAssembleFilter::run( Core::ActionContextHandle& context, Core::ActionResul
     std::cout.precision(2);
     std::cout.setf(std::ios::scientific);
     
-    track_progress(true);
+//    track_progress(true);
     
     // setup thread storage for the main thread:
     set_the_thread_storage_provider(the_boost_thread_t::thread_storage);
@@ -256,7 +256,7 @@ ActionAssembleFilter::run( Core::ActionContextHandle& context, Core::ActionResul
     
     fin.close();
     
-    set_major_progress(0.05);
+//    set_major_progress(0.05);
     
     // calculate downsample.
     double downsample = this->shrink_factor_ * this->pixel_spacing_;

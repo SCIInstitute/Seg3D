@@ -54,6 +54,7 @@ CORE_ACTION(
   CORE_ACTION_OPTIONAL_ARGUMENT( "images", "[]",
     "Image file names (optional, images can be detected in image file directory). Do not use full path." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "shrink_factor", "1", "Downsample factor." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "num_threads", "0", "Number of threads used (if 0, the number of cores will be used)." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "pyramid_levels", "1", "Number of multiresolution pyramid levels." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "iterations_per_level", "5", "Iterations per pyramid level." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "pixel_spacing", "1.0", "Pixel spacing." )          
@@ -78,6 +79,7 @@ public:
     this->add_parameter( this->output_mosaic_ );
     this->add_parameter( this->images_ );
     this->add_parameter( this->shrink_factor_ );
+    this->add_parameter( this->num_threads_ );
     this->add_parameter( this->pyramid_levels_ );
     this->add_parameter( this->iterations_per_level_ );
     this->add_parameter( this->pixel_spacing_ );
@@ -101,6 +103,7 @@ public:
                        std::string output_mosaic,
                        std::vector<std::string> images,
                        unsigned int shrink_factor,
+                       unsigned int num_threads,
                        unsigned int pyramid_levels,
                        unsigned int iterations_per_level,
                        double pixel_spacing,
@@ -119,6 +122,7 @@ private:
   std::string output_mosaic_;
   std::vector<std::string> images_;
   unsigned int shrink_factor_;
+  unsigned int num_threads_;
   unsigned int pyramid_levels_;
   unsigned int iterations_per_level_;
   double pixel_spacing_;
