@@ -152,7 +152,7 @@ public:
   bool load(const bfs::path & fn_load,
             const bfs::path & slice0_path = "",
             const bfs::path & slice1_path = "",
-            const bool blab = true)
+            const bool blab = false)
   {
     std::fstream si;
     the::open_utf8(si, fn_load.string().c_str(), std::ios::in);
@@ -284,7 +284,7 @@ public:
   }
   
   // save this slice-to-slice registration:
-  bool save(const bfs::path & fn_save, const bool blab = true) const
+  bool save(const bfs::path & fn_save, const bool blab = false) const
   {
     std::fstream so;
     the::open_utf8(so, fn_save.string().c_str(), std::ios::out);
@@ -394,7 +394,7 @@ save_stos(const bfs::path & fn_save,
           const TImage * s1,
           const unsigned int & shrink_factor,
           const base_transform_t * transform,
-          const bool blab = true)
+          const bool blab = false)
 {
   stos_t<TImage> stos(fn_s0,
                       fn_s1,

@@ -193,7 +193,7 @@ typename T::Pointer
 std_tile(const bfs::path& fn_image,
          const unsigned int & shrink_factor,
          const double & pixel_spacing,
-         bool blab = true);
+         bool blab = false);
 
 //----------------------------------------------------------------
 // image_t
@@ -1411,7 +1411,7 @@ shrink(const T * in,
 // 
 template <typename T>
 typename T::Pointer
-load(const bfs::path& filename, bool blab = true)
+load(const bfs::path& filename, bool blab = false)
 {
   typedef typename itk::ImageFileReader<T> reader_t;
   typename reader_t::Pointer reader = reader_t::New();
@@ -1434,7 +1434,7 @@ load(const bfs::path& filename, bool blab = true)
 // 
 template <typename T>
 void
-save(const T * image, const bfs::path & filename, bool blab = true)
+save(const T * image, const bfs::path & filename, bool blab = false)
 {
   typedef typename itk::ImageFileWriter<T> writer_t;
   typename writer_t::Pointer writer = writer_t::New();
@@ -1460,7 +1460,7 @@ save_image_tile(T * image,
                 const unsigned int source_height, 
                 const unsigned int tile_width, 
                 const unsigned int tile_height,
-                bool blab = true)
+                bool blab = false)
 {
   typename itk::PasteImageFilter<T>::Pointer pasteImageFilter =
   itk::PasteImageFilter<T>::New();
@@ -1535,7 +1535,7 @@ save_as_tiles(T * image,
               unsigned int h,
               const double downsample,
               bool save_image = true,
-              bool blab = true)
+              bool blab = false)
 {
   //  the_text_t fileName = prefix;
 //  the_text_t xmlFileName = fileName;
@@ -1632,7 +1632,7 @@ save_tile_xml(const bfs::path & prefix,
               unsigned int full_height,
               const double downsample,
               bool save_image = true,
-              bool blab = true)
+              bool blab = false)
 {
   //  the_text_t fileName = prefix;
 //  the_text_t xmlFileName = fileName;
@@ -3982,7 +3982,7 @@ save_composite(const bfs::path & filename,
                const T * fi,
                const T * mi,
                const base_transform_t * xform,
-               bool blab = true)
+               bool blab = false)
 {
   typename T::Pointer fi_aligned;
   typename T::Pointer mi_aligned;
@@ -4299,7 +4299,7 @@ to_rgb(const T * image, native_image_t::Pointer * rgb)
 // 
 template <class image_ptr_t>
 void
-save_rgb(const image_ptr_t * image, const bfs::path & filename, bool blab = true)
+save_rgb(const image_ptr_t * image, const bfs::path & filename, bool blab = false)
 {
   typedef typename image_ptr_t::ObjectType::Pointer::ObjectType image_t;
   
@@ -4343,7 +4343,7 @@ save_mosaic_rgb(const bfs::path & filename,
                 std::vector<mask_t::ConstPointer>(0),
                 const double background = 255.0,
                 bool first_tile_white = false,
-                bool blab = true)
+                bool blab = false)
 {
   typedef typename image_pointer_t::ObjectType::Pointer::ObjectType image_t;
   typename image_t::Pointer mosaic[3];
@@ -4372,7 +4372,7 @@ save_rgb(const bfs::path & fn_save,
          const base_transform_t * xform,
          const mask_t * fi_mask = 0,
          const mask_t * mi_mask = 0,
-         bool blab = true)
+         bool blab = false)
 {
   std::vector<typename T::ConstPointer> image(2);
   std::vector<mask_t::ConstPointer> mask(2);
