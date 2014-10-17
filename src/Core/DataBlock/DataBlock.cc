@@ -1111,7 +1111,7 @@ bool ExtractSliceInternal( DataBlock* volume_data_block,
       for ( size_t z = 0; z < nz; z++ )
       {
         size_t y = 0;
-        // Main unroled loop
+        // Main unrolled loop
         for ( ; y < ny8; y += 8 )
         {
           // Copy the data over
