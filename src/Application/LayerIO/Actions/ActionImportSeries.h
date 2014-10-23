@@ -46,7 +46,7 @@ class ActionImportSeries : public LayerAction
 
 CORE_ACTION( 
   CORE_ACTION_TYPE( "ImportSeries", "This action imports a series into the layer manager.")
-  CORE_ACTION_ARGUMENT( "filenames", "The name of the file to load." )
+  CORE_ACTION_ARGUMENT( "filenames", "The list of files to load." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "importer", "", "Optional name for a specific importer." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "mode", "data", "The mode to use: data, single_mask, bitplane_mask, or label_mask.")
   CORE_ACTION_OPTIONAL_ARGUMENT( "inputfiles_id", "-1" , "Location of the file if it is in the data cache of the project." )
