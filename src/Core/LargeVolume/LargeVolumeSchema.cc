@@ -33,6 +33,10 @@
 #include <set>
 #include <queue>
 
+// test
+#include <iostream>
+// test
+
 #include <Core/Utils/FilesystemUtil.h>
 #include <Core/Utils/StringUtil.h>
 #include <Core/Math/MathFunctions.h>
@@ -40,6 +44,8 @@
 
 #include <Core/LargeVolume/LargeVolumeSchema.h>
 #include <Core/LargeVolume/LargeVolumeCache.h>
+
+namespace bfs=boost::filesystem;
 
 namespace Core
 {
@@ -54,7 +60,7 @@ public:
 public:
   LargeVolumeSchemaPrivate() :
     brick_size_( 256, 256, 256 ),
-    effective_brick_size_(256, 256, 256),
+    effective_brick_size_( 256, 256, 256 ),
     overlap_(0),
     data_type_(DataType::UNKNOWN_E),
     compression_(false),
@@ -108,9 +114,24 @@ public:
 
     return Ceil( size.xd() / effective_brick_size.x() ) * Ceil( size.yd() / effective_brick_size.y() ) * Ceil( size.zd() / effective_brick_size.z() );
   }
-
-  boost::filesystem::path get_brick_file_name( BrickInfo bi )
+  
+  IndexVector compute_remainder_brick( const BrickInfo& bi,
+                                  const IndexVector& index )
   {
+    const IndexVector& layout = this->level_layout_[ bi.level_ ];
+    const IndexVector& size = this->level_size_[ bi.level_ ];
+    const size_t overlap = this->overlap_;
+    IndexVector remainder_brick_size = this->brick_size_;
+    
+    if ( index.x() == layout.x() - 1 ) remainder_brick_size.x( size.x() - ( this->effective_brick_size_.x() * index.x()) + 2 * overlap );
+    if ( index.y() == layout.y() - 1 ) remainder_brick_size.y( size.y() - ( this->effective_brick_size_.y() * index.y()) + 2 * overlap );
+    if ( index.z() == layout.z() - 1 ) remainder_brick_size.z( size.z() - ( this->effective_brick_size_.z() * index.z()) + 2 * overlap );
+    return remainder_brick_size;
+  }
+
+  bfs::path get_brick_file_name( BrickInfo bi )
+  {
+    // 65 = A in ASCII char table
     std::string filename = std::string() + static_cast<char>( 65 + static_cast<int>( bi.level_ ) ) +
       ExportToString( bi.index_ ) + ".raw";
     return this->dir_ / filename;
@@ -133,14 +154,19 @@ public:
 
 
   template<class T>
-  bool insert_brick_internals( DataBlockHandle volume, DataBlockHandle brick, IndexVector offset,
-    IndexVector clip_start, IndexVector clip_end );
+  bool insert_brick_internals( DataBlockHandle volume, DataBlockHandle brick,
+                               const IndexVector& offset,
+                               const IndexVector& clip_start,
+                               const IndexVector& clip_end );
 
   template<class T>
-  bool insert_brick_internals( DataBlockHandle volume, DataBlockHandle brick, IndexVector offset );
+  bool insert_brick_internals( DataBlockHandle volume, DataBlockHandle brick,
+                               const IndexVector& offset);
 
-  bool insert_brick( DataBlockHandle volume, DataBlockHandle brick, IndexVector offset,
-    IndexVector clip_start, IndexVector clip_end );
+  bool insert_brick( DataBlockHandle volume, DataBlockHandle brick,
+                     const IndexVector& offset,
+                     const IndexVector& clip_start,
+                     const IndexVector& clip_end );
 
   void load_and_substitue_missing_bricks( std::vector<BrickInfo>& want_to_render, SliceType slice, 
     double depth, const std::string& load_key, std::vector<BrickInfo>& current_render );
@@ -173,46 +199,50 @@ public:
   double min_;
   double max_;
   
-  boost::filesystem::path dir_;
+  bfs::path dir_;
   LargeVolumeSchema* schema_;
 };
 
 template<class T>
-bool LargeVolumeSchemaPrivate::insert_brick_internals( DataBlockHandle volume, DataBlockHandle brick, IndexVector offset, 
-  IndexVector clip_start, IndexVector clip_end )
+bool LargeVolumeSchemaPrivate::insert_brick_internals( DataBlockHandle volume, DataBlockHandle brick,
+                                                       const IndexVector& offset,
+                                                       const IndexVector& clip_start,
+                                                       const IndexVector& clip_end )
 {
-  IndexVector::index_type overlap = static_cast<IndexVector::index_type>( this->overlap_ );
+  // TODO: too much repeated code
+  const IndexVector::index_type overlap = static_cast<IndexVector::index_type>( this->overlap_ );
 
+  const IndexVector::index_type bnx = static_cast<IndexVector::index_type>( brick->get_nx() );
+  const IndexVector::index_type bny = static_cast<IndexVector::index_type>( brick->get_ny() );
+  const IndexVector::index_type bnz = static_cast<IndexVector::index_type>( brick->get_nz() );
+  const IndexVector::index_type bnxy = bnx * bny;
+
+  const IndexVector::index_type bxstart = overlap + clip_start.x();
+  const IndexVector::index_type bystart = overlap + clip_start.y();
+  const IndexVector::index_type bzstart = overlap + clip_start.z();
+
+  const IndexVector::index_type bxend = overlap + clip_end.x();
+  const IndexVector::index_type byend = overlap + clip_end.y();
+  const IndexVector::index_type bzend = overlap + clip_end.z();
+
+  const IndexVector::index_type bxstride = ( bnx - ( bxend - bxstart ) );
+  const IndexVector::index_type bystride = ( bny - ( byend - bystart ) ) * bnx;
+
+  const IndexVector::index_type vnx = static_cast<IndexVector::index_type>( volume->get_nx() );
+  const IndexVector::index_type vny = static_cast<IndexVector::index_type>( volume->get_ny() );
+  const IndexVector::index_type vnz = static_cast<IndexVector::index_type>( volume->get_nz() );
+  const IndexVector::index_type vnxy = vnx * vny;
+
+  const IndexVector::index_type vxstride = vnx - ( bxend - bxstart  );
+  const IndexVector::index_type vystride = ( vny - ( byend - bystart ) ) * vnx;
+  
+  // same code from here to return
   T* src = reinterpret_cast<T*>( brick->get_data() );
   T* dst = reinterpret_cast<T*>( volume->get_data() );
 
-  IndexVector::index_type bnx = static_cast<IndexVector::index_type>( brick->get_nx() );
-  IndexVector::index_type bny = static_cast<IndexVector::index_type>( brick->get_ny() );
-  IndexVector::index_type bnz = static_cast<IndexVector::index_type>( brick->get_nz() );
-  IndexVector::index_type bnxy = bnx * bny;
-
-  IndexVector::index_type bxstart = overlap + clip_start.x();
-  IndexVector::index_type bystart = overlap + clip_start.y();
-  IndexVector::index_type bzstart = overlap + clip_start.z();
-
-  IndexVector::index_type bxend = overlap + clip_end.x();
-  IndexVector::index_type byend = overlap + clip_end.y();
-  IndexVector::index_type bzend = overlap + clip_end.z();
-
-  IndexVector::index_type bxstride = ( bnx - ( bxend - bxstart ) );
-  IndexVector::index_type bystride = ( bny - ( byend - bystart ) ) * bnx;
-
-  IndexVector::index_type vnx = static_cast<IndexVector::index_type>( volume->get_nx() );
-  IndexVector::index_type vny = static_cast<IndexVector::index_type>( volume->get_ny() );
-  IndexVector::index_type vnz = static_cast<IndexVector::index_type>( volume->get_nz() );
-  IndexVector::index_type vnxy = vnx * vny;
-
-  IndexVector::index_type vxstride = vnx - ( bxend - bxstart  );
-  IndexVector::index_type vystride = ( vny - ( byend - bystart ) ) * vnx;
-
-  dst += offset.z() * vnxy + offset.y() * vnx  + offset.x();
   src += bzstart * bnxy + bystart * bnx + bxstart;
-  
+  dst += offset.z() * vnxy + offset.y() * vnx  + offset.x();
+
   for ( IndexVector::index_type z = bzstart; z < bzend; z++, src += bystride, dst += vystride )
   {
     for ( IndexVector::index_type y = bystart; y < byend; y++, src += bxstride, dst += vxstride )
@@ -226,39 +256,41 @@ bool LargeVolumeSchemaPrivate::insert_brick_internals( DataBlockHandle volume, D
 
   return true;
 }
-
 
 template<class T>
-bool LargeVolumeSchemaPrivate::insert_brick_internals( DataBlockHandle volume, DataBlockHandle brick, IndexVector offset )
+bool LargeVolumeSchemaPrivate::insert_brick_internals( DataBlockHandle volume, DataBlockHandle brick,
+                                                       const IndexVector& offset )
 {
-  IndexVector::index_type overlap = static_cast<IndexVector::index_type>( this->overlap_ );
+  // TODO: too much repeated code
+  const IndexVector::index_type overlap = static_cast<IndexVector::index_type>( this->overlap_ );
 
+  const IndexVector::index_type bnx = static_cast<IndexVector::index_type>( brick->get_nx() );
+  const IndexVector::index_type bny = static_cast<IndexVector::index_type>( brick->get_ny() );
+  const IndexVector::index_type bnz = static_cast<IndexVector::index_type>( brick->get_nz() );
+  const IndexVector::index_type bnxy = bnx * bny;
+
+  const IndexVector::index_type bxstart = overlap;
+  const IndexVector::index_type bystart = overlap;
+  const IndexVector::index_type bzstart = overlap;
+  
+  const IndexVector::index_type bxend = bnx - overlap;
+  const IndexVector::index_type byend = bny - overlap;
+  const IndexVector::index_type bzend = bnz - overlap;
+
+  const IndexVector::index_type bxstride = ( bnx - ( bxend - bxstart ) );
+  const IndexVector::index_type bystride = ( bny - ( byend - bystart ) ) * bnx;
+
+  const IndexVector::index_type vnx = static_cast<IndexVector::index_type>( volume->get_nx() );
+  const IndexVector::index_type vny = static_cast<IndexVector::index_type>( volume->get_ny() );
+  const IndexVector::index_type vnz = static_cast<IndexVector::index_type>( volume->get_nz() );
+  const IndexVector::index_type vnxy = vnx * vny;
+
+  const IndexVector::index_type vxstride = vnx - ( bnx - 2 * overlap );
+  const IndexVector::index_type vystride = ( vny - ( bny - 2 * overlap ) ) * vnx;
+  
+  // same code from here to return
   T* src = reinterpret_cast<T*>( brick->get_data() );
   T* dst = reinterpret_cast<T*>( volume->get_data() );
-
-  IndexVector::index_type bnx = static_cast<IndexVector::index_type>( brick->get_nx() );
-  IndexVector::index_type bny = static_cast<IndexVector::index_type>( brick->get_ny() );
-  IndexVector::index_type bnz = static_cast<IndexVector::index_type>( brick->get_nz() );
-  IndexVector::index_type bnxy = bnx * bny;
-
-  IndexVector::index_type bxend = bnx - overlap;
-  IndexVector::index_type byend = bny - overlap;
-  IndexVector::index_type bzend = bnz - overlap;
-
-  IndexVector::index_type bxstart = overlap;
-  IndexVector::index_type bystart = overlap;
-  IndexVector::index_type bzstart = overlap;
-
-  IndexVector::index_type bxstride = ( bnx - ( bxend - bxstart ) );
-  IndexVector::index_type bystride = ( bny - ( byend - bystart ) ) * bnx;
-
-  IndexVector::index_type vnx = static_cast<IndexVector::index_type>( volume->get_nx() );
-  IndexVector::index_type vny = static_cast<IndexVector::index_type>( volume->get_ny() );
-  IndexVector::index_type vnz = static_cast<IndexVector::index_type>( volume->get_nz() );
-  IndexVector::index_type vnxy = vnx * vny;
-
-  IndexVector::index_type vxstride = vnx - ( bnx - 2 * overlap );
-  IndexVector::index_type vystride = ( vny - ( bny - 2 * overlap ) ) * vnx;
 
   src += bzstart * bnxy + bystart * bnx + bxstart;
   dst += offset.z() * vnxy + offset.y() * vnx  + offset.x();
@@ -276,9 +308,10 @@ bool LargeVolumeSchemaPrivate::insert_brick_internals( DataBlockHandle volume, D
 
   return true;
 }
-  
+
 LargeVolumeSchema::LargeVolumeSchema() :
-  private_(new LargeVolumeSchemaPrivate)
+  private_(new LargeVolumeSchemaPrivate),
+  VOLUME_FILE_NAME_("volume.txt")
 {
   this->private_->schema_ = this;
 }
@@ -286,10 +319,10 @@ LargeVolumeSchema::LargeVolumeSchema() :
 
 bool LargeVolumeSchema::load( std::string& error)
 {
-  boost::filesystem::path filename = this->private_->dir_ / "volume.txt";
+  bfs::path filename = this->private_->dir_ / VOLUME_FILE_NAME_;
 
   // Check if file exists
-  if ( ! boost::filesystem::exists( filename ) )
+  if ( ! bfs::exists( filename ) )
   {
     error = "Could not open volume file '" + filename.string() + "'.";
     return false;
@@ -481,7 +514,7 @@ bool LargeVolumeSchema::save( std::string& error ) const
     return false;
   }
 
-  boost::filesystem::path filename = this->private_->dir_ / "volume.txt";
+  bfs::path filename = this->private_->dir_ / VOLUME_FILE_NAME_;
   
   try {
     std::ofstream text_file( filename.string().c_str() );
@@ -571,7 +604,7 @@ double LargeVolumeSchema::get_max() const
   return this->private_->max_;
 }
 
-boost::filesystem::path LargeVolumeSchema::get_dir() const
+bfs::path LargeVolumeSchema::get_dir() const
 {
   return this->private_->dir_;
 }
@@ -580,35 +613,35 @@ boost::filesystem::path LargeVolumeSchema::get_dir() const
 GridTransform LargeVolumeSchema::get_grid_transform() const
 {
   return GridTransform( this->private_->size_[ 0 ], this->private_->size_[ 1 ], this->private_->size_[ 2 ],
-    this->private_->origin_, this->private_->spacing_[ 0 ] * Vector(1.0,0.0,0.0),
-    this->private_->spacing_[ 1 ] * Vector(0.0,1.0,0.0),
-    this->private_->spacing_[ 2 ] * Vector(0.0,0.0,1.0) );
+                        this->private_->origin_,
+                        this->private_->spacing_[ 0 ] * GridTransform::X_AXIS,
+                        this->private_->spacing_[ 1 ] * GridTransform::Y_AXIS,
+                        this->private_->spacing_[ 2 ] * GridTransform::Z_AXIS );
 }
 
 GridTransform LargeVolumeSchema::get_brick_grid_transform( const BrickInfo& bi ) const
 {
-  IndexVector layout = this->get_level_layout( bi.level_ );
-  IndexVector size = this->get_level_size( bi.level_ );
-
+  const IndexVector& layout = this->get_level_layout( bi.level_ );
   const IndexVector& index = this->private_->compute_brick_index_vector( layout, bi.index_ );
-  Vector spacing = this->get_level_spacing( bi.level_ );
+  const Vector spacing = this->get_level_spacing( bi.level_ );
 
-  Point origin = this->get_origin();
+  const Point origin = this->get_origin();
   const IndexVector& effective_brick_size = this->private_->effective_brick_size_;
-  const IndexVector& brick_size = this->private_->brick_size_;
-  size_t overlap = this->private_->overlap_;
+  const size_t overlap = this->private_->overlap_;
 
   Vector offset = Vector( index.x() * effective_brick_size.x() * spacing.x(),
-    index.y() * effective_brick_size.y() * spacing.y(),
-    index.z() * effective_brick_size.z() * spacing.z() ) - spacing * static_cast<double>( overlap );
-  
-  IndexVector bs = brick_size;
-  if ( index.x() == layout.x() - 1 ) bs.x( size.x() - ( effective_brick_size.x() * index.x()) + 2 * overlap );
-  if ( index.y() == layout.y() - 1 ) bs.y( size.y() - ( effective_brick_size.y() * index.y()) + 2 * overlap );
-  if ( index.z() == layout.z() - 1 ) bs.z( size.z() - ( effective_brick_size.z() * index.z()) + 2 * overlap );
+                          index.y() * effective_brick_size.y() * spacing.y(),
+                          index.z() * effective_brick_size.z() * spacing.z() )
+                    - spacing * static_cast<double>( overlap );
+  IndexVector bs = this->private_->compute_remainder_brick(bi, index);
 
-  return GridTransform( bs.x(), bs.y(), bs.z(), origin + offset, spacing.x() * Vector( 1.0, 0.0, 0.0 ),
-    spacing.y() * Vector( 0.0, 1.0, 0.0 ), spacing.z() * Vector( 0.0, 0.0, 1.0 ) );
+std::cerr << "actual brick_size= [" << bs.x() << " " << bs.y() << " " << bs.z() << "]" << std::endl;
+
+  return GridTransform( bs.x(), bs.y(), bs.z(),
+                        origin + offset,
+                        spacing.x() * GridTransform::X_AXIS,
+                        spacing.y() * GridTransform::Y_AXIS,
+                        spacing.z() * GridTransform::Z_AXIS );
 }
 
 void LargeVolumeSchema::set_min_max( double min, double max ) const
@@ -637,7 +670,7 @@ size_t LargeVolumeSchema::get_num_levels() const
   return this->private_->levels_.size();
 }
 
-void LargeVolumeSchema::set_dir( const boost::filesystem::path& dir )
+void LargeVolumeSchema::set_dir( const bfs::path& dir )
 {
   this->private_->dir_ = dir;
 }
@@ -723,17 +756,12 @@ IndexVector LargeVolumeSchema::get_level_layout( index_type level ) const
 IndexVector LargeVolumeSchema::get_brick_size( const BrickInfo& bi ) const
 {
   const IndexVector& effective_brick_size = this->private_->effective_brick_size_;
-  const size_t overlap = this->private_->overlap_;
-
-  IndexVector result = this->private_->brick_size_;
-
-  const IndexVector& size = this->get_level_size( bi.level_ );
-  const IndexVector& layout = this->private_->compute_brick_layout( size );
+  const IndexVector& layout = this->get_level_layout( bi.level_ );
   const IndexVector& index = this->private_->compute_brick_index_vector( layout, bi.index_ );
 
-  if ( index.x() == layout.x() - 1 ) result.x( size.x() - ( effective_brick_size.x() * index.x()) + 2 * overlap );
-  if ( index.y() == layout.y() - 1 ) result.y( size.y() - ( effective_brick_size.y() * index.y()) + 2 * overlap );
-  if ( index.z() == layout.z() - 1 ) result.z( size.z() - ( effective_brick_size.z() * index.z()) + 2 * overlap );
+  IndexVector result = this->private_->compute_remainder_brick(bi, index);
+
+std::cerr << "actual brick_size= [" << result.x() << " " << result.y() << " " << result.z() << "]" << std::endl;
 
   return result;
 }
@@ -749,15 +777,15 @@ bool LargeVolumeSchema::read_brick( DataBlockHandle& brick, const BrickInfo& bi,
     return false;
   }
 
-  boost::filesystem::path brick_file = this->private_->get_brick_file_name( bi );
+  bfs::path brick_file = this->private_->get_brick_file_name( bi );
 
-  if ( !boost::filesystem::exists(brick_file ) )
+  if ( !bfs::exists(brick_file ) )
   {
     error = "Could not open brick.";
     return false; 
   }
 
-  size_t file_size = boost::filesystem::file_size( brick_file );
+  size_t file_size = bfs::file_size( brick_file );
   size_t brick_size = size[0] * size[1] * size[2] * GetSizeDataType( this->get_data_type() );
 
   if ( brick_size > file_size )
@@ -841,7 +869,7 @@ bool LargeVolumeSchema::append_brick_buffer( DataBlockHandle data_block, size_t 
     return false;
   }
 
-  boost::filesystem::path brick_file = this->private_->get_brick_file_name( bi );
+  bfs::path brick_file = this->private_->get_brick_file_name( bi );
 
   size_t buffer_size = slice_size * ( z_end - z_start ) * GetSizeDataType( this->get_data_type() );
   size_t buffer_offset = z_start * slice_size * GetSizeDataType( this->get_data_type() );
@@ -879,7 +907,7 @@ bool LargeVolumeSchema::write_brick( DataBlockHandle data_block, const BrickInfo
     return false;
   }
 
-  boost::filesystem::path brick_file = this->private_->get_brick_file_name( bi );
+  bfs::path brick_file = this->private_->get_brick_file_name( bi );
 
   size_t brick_size = size[0] * size[1] * size[2] * GetSizeDataType( this->get_data_type() );
 
@@ -1476,8 +1504,8 @@ bool LargeVolumeSchema::reprocess_brick( const BrickInfo& bi,
   // Delete file, so that when we write the file again it will be more likely
   // to be in a continuous block, especially since we do it as one write, hence
   // a good FS should give us contiguous blocks on disk
-  boost::filesystem::path brick_file = this->private_->get_brick_file_name( bi );
-  if (! boost::filesystem::remove( brick_file ) )
+  bfs::path brick_file = this->private_->get_brick_file_name( bi );
+  if (! bfs::remove( brick_file ) )
   {
     error = "Could not remove brick file.";
     return false;
@@ -1499,7 +1527,7 @@ void LargeVolumeSchema::enable_downsample( bool downsample_x, bool downsample_y,
   this->private_->downsample_z_ = downsample_z;
 }
 
-boost::filesystem::path LargeVolumeSchema::get_brick_file_name( const BrickInfo& bi )
+bfs::path LargeVolumeSchema::get_brick_file_name( const BrickInfo& bi )
 {
   return this->private_->get_brick_file_name( bi );
 }
