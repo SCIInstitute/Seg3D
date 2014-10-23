@@ -4,6 +4,7 @@
 import seg3d2
 import configparser
 import os
+import sys
 
 config = configparser.ConfigParser()
 config.read('../scripts/settings.ini')
@@ -28,6 +29,10 @@ pixelSpacing = config.get(datasetName, 'spacing')
 pyramidIterations = config.get(datasetName, 'pyramid_iters')
 overlapMin = config.get(datasetName, 'overlap_min')
 overlapMax = config.get(datasetName, 'overlap_max')
+minPeak = config.get(datasetName, 'min_peak')
+peakThreshold = config.get(datasetName, 'peak_threshold')
+rangeMin = int(config.get(datasetName, 'first_slice'))
+rangeMax = int(config.get(datasetName, 'last_slice'))
 
 filePrefix = 'Image1-'
 fileSuffixList = ['_000-000.tif','_001-000.tif','_002-000.tif','_000-001.tif','_001-001.tif','_002-001.tif','_000-002.tif','_001-002.tif','_002-002.tif']
@@ -39,10 +44,6 @@ refineGridIterations=20
 cellSize=8
 blendEdges="blend"
 
-rangeMin=229
-rangeMax=247
-#rangeMin=225
-#rangeMax=228
 mosaicRangeMax=rangeMax+1
 stosRangeMax=rangeMax
 
@@ -57,22 +58,27 @@ for index in range(rangeMin, mosaicRangeMax):
   print(files)
 
   fftMosaic="{0}/{1}{2}".format(fftDir, outputName, mosaicExtension)
-  seg3d2.fftfilter(layerid=layerid, shrink_factor=shrinkFactor, overlap_min=overlapMin, overlap_max=overlapMax, pixel_spacing=pixelSpacing, images=files, directory=testRoot, output_mosaic=fftMosaic, iterations_per_level=pyramidIterations, pyramid_levels=pyramidLevels)
+  seg3d2.fftfilter(layerid=layerid, tile_strategy='top_left_book', 
+      min_peak=minPeak, peak_threshold=peakThreshold,
+      shrink_factor=shrinkFactor, overlap_min=overlapMin, 
+      overlap_max=overlapMax, pixel_spacing=pixelSpacing, 
+      images=files, directory=testRoot, output_mosaic=fftMosaic)
+  #, iterations_per_level=pyramidIterations, pyramid_levels=pyramidLevels)
 
-  refineGridMosaic="{0}/{1}{2}".format(refineGridDir, outputName, mosaicExtension)
-  seg3d2.refinegridfilter(layerid=layerid, shrink_factor=shrinkFactor, pixel_spacing=pixelSpacing, iterations=refineGridIterations, input_mosaic=fftMosaic, output_mosaic=refineGridMosaic, directory=testRoot, cell_size=cellSize)
+  #refineGridMosaic="{0}/{1}{2}".format(refineGridDir, outputName, mosaicExtension)
+  #seg3d2.refinegridfilter(layerid=layerid, shrink_factor=shrinkFactor, pixel_spacing=pixelSpacing, iterations=refineGridIterations, input_mosaic=fftMosaic, output_mosaic=refineGridMosaic, directory=testRoot, cell_size=cellSize)
 
 
   # in case refine grid failed:
-  if os.path.getsize(refineGridMosaic) == 0:
-    print("Refine grid failed for {0}. Using fft mosaic {1} instead.".format(refineGridMosaic, fftMosaic))
-    refineGridMosaic = fftMosaic
+  #if os.path.getsize(refineGridMosaic) == 0:
+  #  print("Refine grid failed for {0}. Using fft mosaic {1} instead.".format(refineGridMosaic, fftMosaic))
+  refineGridMosaic = fftMosaic
 
   imageOutputFile="{0}/{1}{2}".format(resultsDir, outputName, outputImageExtension)
-  seg3d2.assemblefilter(layerid=layerid, shrink_factor=shrinkFactor, pixel_spacing=pixelSpacing, input_mosaic=refineGridMosaic, output_image=imageOutputFile, directory=testRoot, feathering=blendEdges)
+  seg3d2.assemblefilter(layerid=layerid, shrink_factor=1, pixel_spacing=pixelSpacing, input_mosaic=refineGridMosaic, output_image=imageOutputFile, directory=testRoot, feathering=blendEdges)
 
   files = []
-
+#sys.exit()
 for index in range(rangeMin, stosRangeMax):
   next_index = index + 1
   print('index={0}, next_index={1}'.format(index, next_index))

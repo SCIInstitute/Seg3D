@@ -262,9 +262,9 @@ load_transform(std::istream & si, const std::string & transform_type)
       si >> fp[i];
 #endif
     }
-  }
-  else if (fp_token != "no_fp")
-  {
+  } else if (fp_token == "nan" || fp_token == "-nan") {
+    fp_token = "0.00e+00";
+  } else if (fp_token != "no_fp") {
     std::ostringstream oss;
     oss << "unexpected token: '" << fp_token << "', aborting load transform...";
     CORE_LOG_ERROR(oss.str());

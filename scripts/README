@@ -2,4 +2,5 @@ This directory contains some sample/test scripts for the registration tools rece
 
 Scripts:
 MV_basic_pipeline1.py: tests MouseVolume dataset registration using fft, stos brute and slice to volume filters.
-polson3319_pipeline1.py: tests Polson3319 dataset registration using fft, refine grid, stos brute and slice to volume filters.
+polson3319_pipeline1.py: tests Polson3319 dataset registration using fft, refine grid, stos brute and slice to volume filters. Uses tiling hints, currently.
+stitch.py: tests aagam's heart data set using tiling hints.

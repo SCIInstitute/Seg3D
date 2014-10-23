@@ -1419,7 +1419,7 @@ load(const bfs::path& filename, bool blab = false)
   // FIXME: itk::SimpleFilterWatcher w(reader.GetPointer(), "reader");
   
   reader->SetFileName(filename.string().c_str());
-  if (blab) std::cout << "loading " << filename.string() << std::endl;
+  //if (blab) std::cout << "loading " << filename.string() << std::endl;
   
 //  WRAP(terminator_t<reader_t> terminator(reader));
   
@@ -1440,7 +1440,7 @@ save(const T * image, const bfs::path & filename, bool blab = false)
   typename writer_t::Pointer writer = writer_t::New();
   writer->SetInput(image);
   
-  if (blab) std::cout << "saving " << filename << std::endl;
+  //if (blab) std::cout << "saving " << filename << std::endl;
   writer->SetFileName(filename.string().c_str());
   writer->Update();
 }
@@ -1511,10 +1511,10 @@ save_image_tile(T * image,
   typename writer_t::Pointer writer = writer_t::New();
   writer->SetInput(partialImage);
   
-  if (blab)
-  {
-    std::cout << "saving " << filename << std::endl;
-  }
+  //if (blab)
+  //{
+  //  std::cout << "saving " << filename << std::endl;
+  //}
   
   writer->SetFileName(filename.string().c_str());
   writer->Update();
@@ -2172,7 +2172,7 @@ calc_image_bboxes_load_images(const std::list<bfs::path> & in,
     typename reader_t::Pointer reader = reader_t::New();
     
     reader->SetFileName((*iter).string().c_str());
-    std::cout << "loading region from " << (*iter) << std::endl;
+    //std::cout << "loading region from " << (*iter) << std::endl;
     
     WRAP(terminator_t<reader_t> terminator(reader));
     
@@ -3929,7 +3929,7 @@ save_mosaic(const std::vector<image_pointer_t> & image,
                                                     false,
                                                     omit,
                                                     num_images);
-  save<image_t>(mosaic, filename);
+  save<image_t>(mosaic, filename,false);
 }
 
 //----------------------------------------------------------------
@@ -4009,7 +4009,7 @@ save_composite(const bfs::path & filename,
   writer->SetFileName(filename.string().c_str());
   writer->SetInput(composer->GetOutput());
   
-  if (blab) std::cout << "saving " << filename << std::endl;
+  //if (blab) std::cout << "saving " << filename << std::endl;
   writer->Update();
 }
 
@@ -4318,7 +4318,7 @@ save_rgb(const image_ptr_t * image, const bfs::path & filename, bool blab = fals
   writer->SetFileName(filename.string().c_str());
   writer->SetInput(composer->GetOutput());
   
-  if (blab) std::cout << "saving " << filename << std::endl;
+  //if (blab) std::cout << "saving " << filename << std::endl;
   writer->Update();
 }
 
@@ -6109,10 +6109,10 @@ calc_size(const pnt2d_t & min,
 inline static void
 track_progress(bool track)
 {
-  if ( track )
-    std::cout << "Tracking progress..." << std::endl;
-  else
-    std::cout << "Progress tracking disabled..." << std::endl;
+  //if ( track )
+  //  std::cout << "Tracking progress..." << std::endl;
+  //else
+  //  std::cout << "Progress tracking disabled..." << std::endl;
 }
 
 //----------------------------------------------------------------
@@ -6125,7 +6125,7 @@ set_major_progress(double major_percent)
 {
   // TODO: Draw out a nifty bar instead.  This would be easier to read, and
   // better understood.
-  std::cout << "Tool Percentage: " << major_percent << std::endl;
+  //std::cout << "Tool Percentage: " << major_percent << std::endl;
 }
 
 //----------------------------------------------------------------
@@ -6139,7 +6139,7 @@ set_minor_progress(double minor_percent, double major_percent)
 {
   // TODO: Draw out a nifty bar instead.  This would be easier to read, and
   // better understood.
-  std::cout << "Task Percentage: " << minor_percent << " until " << major_percent << std::endl;
+  //std::cout << "Task Percentage: " << minor_percent << " until " << major_percent << std::endl;
 }
 
 #endif // COMMON_HXX_

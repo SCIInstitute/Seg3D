@@ -51,6 +51,9 @@ CORE_ACTION(
   CORE_ACTION_ARGUMENT( "directory",
     "Image file directory. If 'images' parameter is not used, then filter will search directory for image files." )
   CORE_ACTION_ARGUMENT( "output_mosaic", "Output mosaic file." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "tile_strategy", "default", "The strategy for comparing tiles (if known). Options: default, top_left_book, top_left_snake. For the latter 2, the first row always goes to the right." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "min_peak", "0.1", "The minimum peak required to consider a match." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "peak_threshold", "0.3", "The percent of the best peak for matches to be the minimum allowed peak value." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "images", "[]",
     "Image file names (optional, images can be detected in image file directory). Do not use full path." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "shrink_factor", "1", "Downsample factor." )
@@ -72,11 +75,13 @@ CORE_ACTION(
   
 public:
   ActionFFTFilter()
-  : MAX_PEAKS(16)
   {
     this->add_layer_id( this->target_layer_ );
     this->add_parameter( this->directory_ );
     this->add_parameter( this->output_mosaic_ );
+    this->add_parameter( this->strategy_ );
+    this->add_parameter( this->min_peak_ );
+    this->add_parameter( this->peak_threshold_ );
     this->add_parameter( this->images_ );
     this->add_parameter( this->shrink_factor_ );
     this->add_parameter( this->num_threads_ );
@@ -101,6 +106,9 @@ public:
                        std::string target_layer,
                        std::string directory,
                        std::string output_mosaic,
+                       std::string strategy,
+                       double min_peak,
+                       double peakThreshold,
                        std::vector<std::string> images,
                        unsigned int shrink_factor,
                        unsigned int num_threads,
@@ -120,6 +128,9 @@ private:
   
   std::string directory_;
   std::string output_mosaic_;
+  std::string strategy_;
+  double min_peak_;
+  double peak_threshold_;
   std::vector<std::string> images_;
   unsigned int shrink_factor_;
   unsigned int num_threads_;
@@ -132,8 +143,6 @@ private:
   bool use_standard_mask_;
   bool try_refining_;
   bool run_on_one_;
-  
-  const int MAX_PEAKS;
 };
 
 }
