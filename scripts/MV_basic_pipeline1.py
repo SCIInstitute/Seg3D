@@ -58,4 +58,4 @@ for index in range(firstIndex,lastIndex):
   outputStosList.append(outputStos)
   seg3d2.slicetoslicebrutefilter(layerid=layerid, input_fixed=inputFixed, input_moving=inputMoving, output_stos=outputStos, shrink_factor=shrinkFactor)
 
-seg3d2.slicetovolumefilter(layerid=layerid, input_files=outputStosList, output_prefixes=[outputVolumeDir], image_dirs=imageDirList, shrink_factor=shrinkFactor)
+seg3d2.slicetovolumefilter(layerid=layerid, input_files=outputStosList, output_prefixes=[outputVolumeDir], image_dirs=imageDirList, shrink_factor=shrinkFactor, load_volume=True)
