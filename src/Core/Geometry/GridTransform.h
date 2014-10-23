@@ -94,22 +94,22 @@ public:
   /// The spacing in each of directions
   double spacing_x() const
   {
-    return project( Vector( 1.0, 0.0, 0.0 ) ).length();
+    return project( X_AXIS ).length();
   }
 
   double spacing_y() const
   {
-    return project( Vector( 0.0, 1.0, 0.0 ) ).length();
+    return project( Y_AXIS ).length();
   }
 
   double spacing_z() const
   {
-    return project( Vector( 0.0, 0.0, 1.0 ) ).length();
+    return project( Z_AXIS ).length();
   }
 
   Point get_origin() const
   {
-    return project( Point( 0.0, 0.0, 0.0 ) );
+    return project( DEFAULT_ORIGIN );
   }
 
   // SET_NX, SET_NY, SET_NY
@@ -164,6 +164,9 @@ private:
   static const bool DEFAULT_NODE_CENTERED_C;
 
 public:
+  static const Vector X_AXIS, Y_AXIS, Z_AXIS;
+  static const Point DEFAULT_ORIGIN;
+
   static void AlignToCanonicalCoordinates( const GridTransform& src_transform,
     std::vector< int >& permutation, GridTransform& dst_transform );
 };
