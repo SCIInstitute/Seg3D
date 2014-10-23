@@ -56,6 +56,8 @@
 
 #include <Core/Utils/Exception.h>
 #include <Core/Utils/Log.h>
+#include <Core/Renderer/Limits.h>
+#include <Application/LayerIO/Actions/ActionImportSeries.h>
 
 // boost:
 #include <boost/filesystem.hpp>
@@ -63,6 +65,7 @@
 
 namespace bfs=boost::filesystem;
 
+using namespace RendererLimits;
 
 CORE_REGISTER_ACTION( Seg3D, SliceToVolumeFilter )
 
@@ -89,9 +92,13 @@ ActionSliceToVolumeFilter::validate( Core::ActionContextHandle& context )
   return true;
 }
 
+// TODO: move to filter - similar to ITK filter?
 bool
 ActionSliceToVolumeFilter::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
+  image_t::SizeType mosaicSliceSize;
+  std::vector<std::string> sliceFileNames;
+
   try
   {
     // this is so that the printouts look better:
@@ -593,7 +600,22 @@ ActionSliceToVolumeFilter::run( Core::ActionContextHandle& context, Core::Action
         for ( int itIdx = 0; itIdx < grand_total; ++itIdx )
           ++iter[itIdx];
       }
+      
+      if (this->load_volume_)
+      {
+        image_t::RegionType region = mosaic[0]->GetLargestPossibleRegion();
+        mosaicSliceSize = region.GetSize();
+        if ( (mosaicSliceSize[0] > TextureDim) || (mosaicSliceSize[1] > TextureDim) )
+        {
+          std::ostringstream oss;
+          oss << "Volume has X or Y dimension > " << TextureDim
+          << ". Seg3D cannot support rendering slices with dimensions > "
+          << TextureDim << " at this time.";
+          CORE_LOG_WARNING(oss.str());
 
+          this->load_volume_ = false;
+        }
+      }
       std::ostringstream fn_filename;
       fn_filename << prefix_iter->string();
 
@@ -616,11 +638,14 @@ ActionSliceToVolumeFilter::run( Core::ActionContextHandle& context, Core::Action
           fn_save << "_" << std::setfill('0') << std::setw(3) << mosIdx;
         }
         fn_save << fn_extension.string();
-        
+        bfs::path save_path(fn_save.str());
+
         if (this->remap_values_)
         {
           remap_min_max_inplace<image_t>(mosaic[mosIdx]);
         }
+
+        if (this->load_volume_) sliceFileNames.push_back( save_path.string() );
         
         if (save_tiles)
         {
@@ -628,7 +653,7 @@ ActionSliceToVolumeFilter::run( Core::ActionContextHandle& context, Core::Action
           {
             typedef itk::Image<short int, 2> int16_image_t;
             save_as_tiles<int16_image_t>(cast<image_t, int16_image_t>(mosaic[mosIdx]),
-                                         bfs::path(fn_save.str()),
+                                         save_path,
                                          fn_extension,
                                          this->tile_width_,
                                          this->tile_height_,
@@ -638,7 +663,7 @@ ActionSliceToVolumeFilter::run( Core::ActionContextHandle& context, Core::Action
           {
             typedef itk::Image<unsigned short int, 2> uint16_image_t;
             save_as_tiles<uint16_image_t>(cast<image_t, uint16_image_t>(mosaic[mosIdx]),
-                                          bfs::path(fn_save.str()),
+                                          save_path,
                                           fn_extension,
                                           this->tile_width_,
                                           this->tile_height_,
@@ -647,7 +672,7 @@ ActionSliceToVolumeFilter::run( Core::ActionContextHandle& context, Core::Action
           else
           {
             save_as_tiles<native_image_t>(cast<image_t, native_image_t>(mosaic[mosIdx]),
-                                          bfs::path(fn_save.str()),
+                                          save_path,
                                           fn_extension,
                                           this->tile_width_,
                                           this->tile_height_,
@@ -659,27 +684,32 @@ ActionSliceToVolumeFilter::run( Core::ActionContextHandle& context, Core::Action
           if ( this->save_int16_image_ )
           {
             typedef itk::Image<short int, 2> int16_image_t;
-            save<int16_image_t>(cast<image_t, int16_image_t>(mosaic[mosIdx]), bfs::path(fn_save.str()));
+            save<int16_image_t>(cast<image_t, int16_image_t>(mosaic[mosIdx]), save_path);
           }
           else if ( this->save_uint16_image_ )
           {
             typedef itk::Image<unsigned short int, 2> uint16_image_t;
-            save<uint16_image_t>(cast<image_t, uint16_image_t>(mosaic[mosIdx]), bfs::path(fn_save.str()));
+            save<uint16_image_t>(cast<image_t, uint16_image_t>(mosaic[mosIdx]), save_path);
           }
           else
           {
-//            save<native_image_t>(cast<image_t, native_image_t>(mosaic[mosIdx]), bfs::path(fn_save.str()));
-            bfs::path save_path(fn_save.str());
-            save_path.replace_extension(fn_extension.string());
             save<native_image_t>(cast<image_t, native_image_t>(mosaic[mosIdx]), save_path);
           }
-          
+
+          std::ostringstream oss;
+          oss << "Saved " << save_path.string() << std::endl;
+          CORE_LOG_MESSAGE(oss.str());
         }
       }
       // TODO: this needs to be a state instead
 //      set_major_progress(0.05 + 0.95 * ((i+1) / (fn_mosaic.size() + 1)));
     }
     
+    if (this->load_volume_)
+    {
+      ActionImportSeries::Dispatch( context, sliceFileNames );
+    }
+
     CORE_LOG_SUCCESS("ir-stom done");
 
     return true;
@@ -726,6 +756,7 @@ void
                                       bool remap_values,
                                       bool save_int16_image,
                                       bool save_uint16_image,
+                                      bool load_volume,
                                       std::vector<std::string> input_files,
                                       std::vector<std::string> output_prefixes,
                                       std::vector<std::string> slice_dirs,
@@ -757,6 +788,7 @@ void
   action->slice_dirs_ = slice_dirs;
   action->image_dirs_ = image_dirs;
   action->image_extension_ = image_extension;
+  action->load_volume_ = load_volume;
   
   // Dispatch action to underlying engine
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );

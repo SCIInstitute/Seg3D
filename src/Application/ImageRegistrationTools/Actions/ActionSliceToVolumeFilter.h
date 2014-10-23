@@ -46,7 +46,6 @@ CORE_ACTION(
   CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
   CORE_ACTION_ARGUMENT( "input_files", "Stos data file names." )
   CORE_ACTION_ARGUMENT( "image_dirs", "Image directory(ies) (exactly one, or one for each slice)." )
-//  CORE_ACTION_ARGUMENT( "output_image", "Output image name.")
   CORE_ACTION_ARGUMENT( "output_prefixes", "Output file prefix(es) (exactly one, or one for each slice)." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "slice_dirs", "[]", "Optional slice directory(ies)." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "shrink_factor", "1", "Downsample factor." )
@@ -65,6 +64,10 @@ CORE_ACTION(
   CORE_ACTION_OPTIONAL_ARGUMENT( "save_int16_image", "false", "" )
   CORE_ACTION_OPTIONAL_ARGUMENT( "save_uint16_image", "false", "" )
   CORE_ACTION_OPTIONAL_ARGUMENT( "image_extension", ".tif", "Image extension (.tif, .png known to work)." )
+  // TODO: add note about using CreateLargeVolume to brick large data when projects are merged
+  CORE_ACTION_OPTIONAL_ARGUMENT( "load_volume", "false", "Attempt to load output as a volume. \
+                                                         Will fail if a slice dimension > 4096. \
+                                                         Not recommended for very large data.")
   CORE_ACTION_OPTIONAL_ARGUMENT( "sandbox", "-1", "The sandbox in which to run the action." )
   CORE_ACTION_ARGUMENT_IS_NONPERSISTENT( "sandbox" )
 )
@@ -95,6 +98,7 @@ public:
     this->add_parameter( this->save_int16_image_ );
     this->add_parameter( this->save_uint16_image_ );
     this->add_parameter( this->image_extension_ );
+    this->add_parameter( this->load_volume_ );
     this->add_parameter( this->sandbox_ );
   }
   
@@ -120,6 +124,7 @@ public:
                        bool remap_values,
                        bool save_int16_image,
                        bool save_uint16_image,
+                       bool load_volume,
                        std::vector<std::string> input_files,
                        std::vector<std::string> output_prefixes,
                        std::vector<std::string> slice_dirs,
@@ -145,6 +150,7 @@ private:
   bool remap_values_;
   bool save_int16_image_;
   bool save_uint16_image_;
+  bool load_volume_;
   std::vector<std::string> input_files_;
   std::vector<std::string> output_prefixes_;
   std::vector<std::string> slice_dirs_;
