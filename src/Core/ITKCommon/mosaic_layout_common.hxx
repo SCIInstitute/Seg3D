@@ -62,6 +62,13 @@ namespace bfs=boost::filesystem;
 //
 typedef itk::LegendrePolynomialTransform<double, 1> affine_transform_t;
 
+enum StrategyType
+{
+  DEFAULT,
+  TOP_LEFT_BOOK,
+  TOP_LEFT_SNAKE
+};
+
 
 //----------------------------------------------------------------
 // reset
@@ -1414,7 +1421,7 @@ match_pairs_strategy(std::vector<typename TImage::Pointer> & image,
 
     size_t shrink,
     int edgeLen,
-    int strategy,
+    const StrategyType strategy,
 
     double min_peak = 0.1,
     double peak_threshold = 0.3)
@@ -1448,19 +1455,24 @@ match_pairs_strategy(std::vector<typename TImage::Pointer> & image,
               i + row < 0 || i + row >= edgeLen ||
               j + column < 0 || j + column >= edgeLen)
             continue;
+          
           //forget the diagonal neighbors
           if (i && j) continue;
+          
           //get the neighbor
           int neighbor = seed + edgeLen * i + j;
-          if (strategy == 2) {
+          if (strategy == TOP_LEFT_SNAKE)
+          {
             int col = neighbor % edgeLen;
             int rw = ((double)neighbor) / ((double)edgeLen);
             if ((rw % 2) == 1)
               col = edgeLen - col - 1;
             neighbor = col + rw * edgeLen;
           }
+          
           if (neighbor > num_images || neighbor < 0)
             continue;
+          
           std::cout << "matching image " <<
             seed << " to " << neighbor << ". " << std::endl;
           //oss << "matching image " <<
@@ -1629,7 +1641,7 @@ layout_mosaic(// multi-resolution image tiles and tile masks,
 
     size_t shrink,
     int & edgeLen,
-    int & strategy = 0,
+    const StrategyType strategy = DEFAULT,
 
     bool try_refining = false,
     const bfs::path & prefix = "")
@@ -1642,7 +1654,7 @@ layout_mosaic(// multi-resolution image tiles and tile masks,
 
   bool perimeter_seeded = false;
 
-  if (strategy == 0)
+  if (strategy == DEFAULT)
     perimeter_seeded =
       match_pairs<TImage, TMask>(tile_pyramid[high_res_level],
           mask_pyramid[high_res_level],
@@ -1688,7 +1700,7 @@ layout_mosaic(// multi-resolution image tiles and tile masks,
   // try to improve the mappings as much as possible:
   // assemble cascaded transform chains with a prescribed maximum number of
   // intermediate nodes, try to choose the chain that is the most stable:
-  if (strategy == 0)
+  if (strategy == DEFAULT)
     assemble_cascades(num_tiles, max_cascade_len, path, cost, false);
 
   // collapse the graph into a mapping:
@@ -1705,7 +1717,8 @@ layout_mosaic(// multi-resolution image tiles and tile masks,
       mapping,
       mapping_cost);
 
-  if (strategy == 0) {
+  if (strategy == DEFAULT)
+  {
     reset(num_tiles, max_cascade_len, path, cost);
 
     brute_force_pairs<TImage, TMask>(tile_pyramid,
