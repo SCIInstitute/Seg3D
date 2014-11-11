@@ -3,7 +3,7 @@
 # 
 #  The MIT License
 # 
-#  Copyright (c) 2009 Scientific Computing and Imaging Institute,
+#  Copyright (c) 2014 Scientific Computing and Imaging Institute,
 #  University of Utah.
 # 
 #  
@@ -30,9 +30,24 @@
 # PROJECT: Seg3D
 ###########################################
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.4 FATAL_ERROR)
 
 PROJECT(Seg3D)
+
+
+###########################################
+# Configure testing support.
+# This should be done before any
+# MESSAGE(FATAL_ERROR ...) commands are
+# invoked.
+###########################################
+
+INCLUDE( CTest )
+IF(BUILD_TESTING)
+  ENABLE_TESTING()
+  INCLUDE(CMake/RegisterUnitTest.cmake)
+  INCLUDE_DIRECTORIES( ${SCI_GTEST_INCLUDE} )
+ENDIF(BUILD_TESTING)
 
 ###########################################
 # Verify build directory
@@ -258,13 +273,13 @@ IF(NOT WIN32 AND NOT APPLE)
 
   CHECK_C_SOURCE_COMPILES(
   "
-  #include <X11/Xlib.h>
+    #include <X11/Xlib.h>
 
-  int main()
-  {
-    XInitThreads();
-    return 1;
-  }
+    int main()
+    {
+      XInitThreads();
+      return 1;
+    }
   "
   X11_THREADSAFE
   )
@@ -528,36 +543,36 @@ IF(WIN32 AND NOT UNIX)
   SET(CPACK_NSIS_MODIFY_PATH ON)
   SET(CPACK_PACKAGE_EXECUTABLES "${APPLICATION_NAME}" "${APPLICATION_NAME}")
   SET(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "
-  WriteRegStr HKCR '.nrrd' '' '${APPLICATION_NAME}-nrrd'
-  WriteRegStr HKCR '${APPLICATION_NAME}-nrrd' '' '${APPLICATION_NAME} NRRD File'
-  WriteRegStr HKCR '${APPLICATION_NAME}-nrrd\\\\shell' '' 'open'
-  WriteRegStr HKCR '${APPLICATION_NAME}-nrrd\\\\DefaultIcon' '' '$INSTDIR\\\\bin\\\\${APPLICATION_NAME}.exe,0'
-  WriteRegStr HKCR '${APPLICATION_NAME}-nrrd\\\\shell\\\\open\\\\command' '' '$INSTDIR\\\\bin\\\\${APPLICATION_NAME}.exe \\\"%1\\\"'
-  WriteRegStr HKCR '${APPLICATION_NAME}-nrrd\\\\shell\\\\edit' '' 'Open NRRD Data File'
-  WriteRegStr HKCR '${APPLICATION_NAME}-nrrd\\\\shell\\\\edit\\\\command' '' '$INSTDIR\\\\bin\\\\${APPLICATION_NAME}.exe \\\"%1\\\"'
-  #System::Call 'Shell32::SHChangeNotify( i 0x800000, i 0, i 0, i 0)'
-  WriteRegStr HKCR '.nhdr' '' '${APPLICATION_NAME}-nhdr'
-  WriteRegStr HKCR '${APPLICATION_NAME}-nhdr' '' '${APPLICATION_NAME} NHDR File'
-  WriteRegStr HKCR '${APPLICATION_NAME}-nhdr\\\\shell' '' 'open'
-  WriteRegStr HKCR '${APPLICATION_NAME}-nhdr\\\\DefaultIcon' '' '$INSTDIR\\\\bin\\\\${APPLICATION_NAME}.exe,0'
-  WriteRegStr HKCR '${APPLICATION_NAME}-nhdr\\\\shell\\\\open\\\\command' '' '$INSTDIR\\\\bin\\\\${APPLICATION_NAME}.exe \\\"%1\\\"'
-  WriteRegStr HKCR '${APPLICATION_NAME}-nhdr\\\\shell\\\\edit' '' 'Open NHDR Data File'
-  WriteRegStr HKCR '${APPLICATION_NAME}-nhdr\\\\shell\\\\edit\\\\command' '' '$INSTDIR\\\\bin\\\\${APPLICATION_NAME}.exe \\\"%1\\\"'
-  #System::Call 'Shell32::SHChangeNotify( i 0x800000, i 0, i 0, i 0)'
-  WriteRegStr HKCR '${APPLICATION_EXTENSION}' '' '${APPLICATION_NAME}'
-  WriteRegStr HKCR '${APPLICATION_NAME}' '' '${APPLICATION_NAME} Project File'
-  WriteRegStr HKCR '${APPLICATION_NAME}\\\\shell' '' 'open'
-  WriteRegStr HKCR '${APPLICATION_NAME}\\\\DefaultIcon' '' '$INSTDIR\\\\bin\\\\${APPLICATION_NAME}.exe,0'
-  WriteRegStr HKCR '${APPLICATION_NAME}\\\\shell\\\\open\\\\command' '' '$INSTDIR\\\\bin\\\\${APPLICATION_NAME}.exe \\\"%1\\\"'
-  WriteRegStr HKCR '${APPLICATION_NAME}\\\\shell\\\\edit' '' 'Open ${APPLICATION_NAME} Project File'
-  WriteRegStr HKCR '${APPLICATION_NAME}\\\\shell\\\\edit\\\\command' '' '$INSTDIR\\\\bin\\\\${APPLICATION_NAME}.exe \\\"%1\\\"'
-  System::Call 'Shell32::SHChangeNotify( i 0x800000, i 0, i 0, i 0)'
+    WriteRegStr HKCR '.nrrd' '' '${APPLICATION_NAME}-nrrd'
+    WriteRegStr HKCR '${APPLICATION_NAME}-nrrd' '' '${APPLICATION_NAME} NRRD File'
+    WriteRegStr HKCR '${APPLICATION_NAME}-nrrd\\\\shell' '' 'open'
+    WriteRegStr HKCR '${APPLICATION_NAME}-nrrd\\\\DefaultIcon' '' '$INSTDIR\\\\bin\\\\${APPLICATION_NAME}.exe,0'
+    WriteRegStr HKCR '${APPLICATION_NAME}-nrrd\\\\shell\\\\open\\\\command' '' '$INSTDIR\\\\bin\\\\${APPLICATION_NAME}.exe \\\"%1\\\"'
+    WriteRegStr HKCR '${APPLICATION_NAME}-nrrd\\\\shell\\\\edit' '' 'Open NRRD Data File'
+    WriteRegStr HKCR '${APPLICATION_NAME}-nrrd\\\\shell\\\\edit\\\\command' '' '$INSTDIR\\\\bin\\\\${APPLICATION_NAME}.exe \\\"%1\\\"'
+    #System::Call 'Shell32::SHChangeNotify( i 0x800000, i 0, i 0, i 0)'
+    WriteRegStr HKCR '.nhdr' '' '${APPLICATION_NAME}-nhdr'
+    WriteRegStr HKCR '${APPLICATION_NAME}-nhdr' '' '${APPLICATION_NAME} NHDR File'
+    WriteRegStr HKCR '${APPLICATION_NAME}-nhdr\\\\shell' '' 'open'
+    WriteRegStr HKCR '${APPLICATION_NAME}-nhdr\\\\DefaultIcon' '' '$INSTDIR\\\\bin\\\\${APPLICATION_NAME}.exe,0'
+    WriteRegStr HKCR '${APPLICATION_NAME}-nhdr\\\\shell\\\\open\\\\command' '' '$INSTDIR\\\\bin\\\\${APPLICATION_NAME}.exe \\\"%1\\\"'
+    WriteRegStr HKCR '${APPLICATION_NAME}-nhdr\\\\shell\\\\edit' '' 'Open NHDR Data File'
+    WriteRegStr HKCR '${APPLICATION_NAME}-nhdr\\\\shell\\\\edit\\\\command' '' '$INSTDIR\\\\bin\\\\${APPLICATION_NAME}.exe \\\"%1\\\"'
+    #System::Call 'Shell32::SHChangeNotify( i 0x800000, i 0, i 0, i 0)'
+    WriteRegStr HKCR '${APPLICATION_EXTENSION}' '' '${APPLICATION_NAME}'
+    WriteRegStr HKCR '${APPLICATION_NAME}' '' '${APPLICATION_NAME} Project File'
+    WriteRegStr HKCR '${APPLICATION_NAME}\\\\shell' '' 'open'
+    WriteRegStr HKCR '${APPLICATION_NAME}\\\\DefaultIcon' '' '$INSTDIR\\\\bin\\\\${APPLICATION_NAME}.exe,0'
+    WriteRegStr HKCR '${APPLICATION_NAME}\\\\shell\\\\open\\\\command' '' '$INSTDIR\\\\bin\\\\${APPLICATION_NAME}.exe \\\"%1\\\"'
+    WriteRegStr HKCR '${APPLICATION_NAME}\\\\shell\\\\edit' '' 'Open ${APPLICATION_NAME} Project File'
+    WriteRegStr HKCR '${APPLICATION_NAME}\\\\shell\\\\edit\\\\command' '' '$INSTDIR\\\\bin\\\\${APPLICATION_NAME}.exe \\\"%1\\\"'
+    System::Call 'Shell32::SHChangeNotify( i 0x800000, i 0, i 0, i 0)'
   ")
   SET(CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS "
-  DeleteRegKey HKCR '.nrrd'
-  DeleteRegKey HKCR '.nhdr'
-  DeleteRegKey HKCR '${APPLICATION_EXTENSION}'
-  DeleteRegKey HKCR '${APPLICATION_NAME}'
+    DeleteRegKey HKCR '.nrrd'
+    DeleteRegKey HKCR '.nhdr'
+    DeleteRegKey HKCR '${APPLICATION_EXTENSION}'
+    DeleteRegKey HKCR '${APPLICATION_NAME}'
   ")
 ELSE(WIN32 AND NOT UNIX)
   IF(APPLE)
