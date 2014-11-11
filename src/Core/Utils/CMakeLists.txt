@@ -1,10 +1,9 @@
-
 #
 #  For more information, please see: http://software.sci.utah.edu
 # 
 #  The MIT License
 # 
-#  Copyright (c) 2009 Scientific Computing and Imaging Institute,
+#  Copyright (c) 2014 Scientific Computing and Imaging Institute,
 #  University of Utah.
 # 
 #  
@@ -78,3 +77,7 @@ SET(CORE_UTILS_SRCS
 
 CORE_ADD_LIBRARY(Core_Utils ${CORE_UTILS_SRCS})
 TARGET_LINK_LIBRARIES(Core_Utils ${SCI_BOOST_LIBRARY})
+
+IF(BUILD_TESTING)
+  ADD_SUBDIRECTORY(Tests)
+ENDIF()
