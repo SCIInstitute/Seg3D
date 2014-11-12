@@ -2488,11 +2488,11 @@ pyramid_t::save(const bfs::path & fn_save) const
     // save the masks:
     {
       std::ostringstream fn_mask;
-      fn_mask << fn_oct << ":mask.nrrd";
+      fn_mask << fn_oct.str() << ":mask.nrrd";
       save_image<mask_t>(fout, fn_mask.str(), o.mask_);
       
       std::ostringstream fn_mask_eroded;
-      fn_mask_eroded << fn_oct << ":mask_eroded.nrrd";
+      fn_mask_eroded << fn_oct.str() << ":mask_eroded.nrrd";
       save_image<mask_t>(fout, fn_mask_eroded.str(), o.mask_eroded_);
     }
     

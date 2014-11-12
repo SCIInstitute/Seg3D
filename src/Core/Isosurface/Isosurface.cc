@@ -1872,9 +1872,9 @@ void Isosurface::compute( double quality_factor, bool capping_enabled,
     if ( num_faces > 1000000 ||
       j == this->private_->min_point_index_.size() - 1 )
     {
-      this->private_->part_points_.push_back( std::make_pair<unsigned int, unsigned int>(
+      this->private_->part_points_.push_back( std::make_pair(
         min_point_index, this->private_->max_point_index_[ j ] ) );
-      this->private_->part_faces_.push_back( std::make_pair<unsigned int, unsigned int>(
+      this->private_->part_faces_.push_back( std::make_pair(
         min_face_index, this->private_->max_face_index_[ j ] ) );
       num_faces = 0;
     }
