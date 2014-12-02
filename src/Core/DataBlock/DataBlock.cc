@@ -24,7 +24,7 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
- */
+*/
 
 #include <Core/DataBlock/DataBlock.h>
 #include <Core/DataBlock/DataBlockManager.h>
@@ -110,6 +110,7 @@ double DataBlock::get_data_at( index_type index ) const
 
 void DataBlock::set_data_at( index_type index, double value )
 {
+  // range check?
   switch( this->data_type_ )
   {
     case DataType::CHAR_E:
@@ -163,6 +164,8 @@ void DataBlock::set_data_at( index_type index, double value )
   }
 }
 
+// TODO: type and size setters protected but not validated
+
 void DataBlock::set_type( DataType type )
 {
   this->data_type_ = type;
@@ -187,9 +190,11 @@ void DataBlock::set_data( void* data )
 {
   // TODO: this leaks memory
   // Make unit tests before attempting to correct
+  // TODO: no updates to size, type etc, data structure can be corrupted
   this->data_ = data;
 }
 
+// TODO: how do we know histogram is correct for data???
 void DataBlock::set_histogram( const Histogram& histogram )
 {
   this->histogram_ = histogram;
@@ -266,6 +271,7 @@ bool DataBlock::update_histogram()
   return false;
 }
 
+// same as set_type()
 void DataBlock::update_data_type( DataType type )
 {
   this->data_type_ = type;
@@ -1105,13 +1111,13 @@ bool ExtractSliceInternal( DataBlock* volume_data_block,
       
       // Short cut so we do not need to recompute this one over and over again
       size_t nxy = nx * ny;
-      // Size for loop unroling
+      // Size for loop unrolling
       size_t ny8 = RemoveRemainder8( ny );
 
       for ( size_t z = 0; z < nz; z++ )
       {
         size_t y = 0;
-        // Main unroled loop
+        // Main unrolled loop
         for ( ; y < ny8; y += 8 )
         {
           // Copy the data over
@@ -1126,7 +1132,7 @@ bool ExtractSliceInternal( DataBlock* volume_data_block,
           slice_ptr[ a ] = volume_ptr[ b ]; a++; b+= nx;
           slice_ptr[ a ] = volume_ptr[ b ]; a++; b+= nx;
         }
-        // Finish the part that could not be unroled
+        // Finish the part that could not be unrolled
         for ( ; y < ny; y++ )
         {
           slice_ptr[ y + z * ny ] = volume_ptr[ index + y * nx + z * nxy ];
@@ -1152,13 +1158,13 @@ bool ExtractSliceInternal( DataBlock* volume_data_block,
       
       // Short cut so we do not need to recompute this one over and over again
       size_t nxy = nx * ny;
-      // Size for loop unroling
+      // Size for loop unrolling
       size_t nx8 = RemoveRemainder8( nx );
 
       for ( size_t z = 0; z < nz; z++ )
       {
         size_t x = 0;
-        // Main unroled loop
+        // Main unrolled loop
         for ( ; x < nx8; x += 8 )
         {
           // Copy the data over
@@ -1173,7 +1179,7 @@ bool ExtractSliceInternal( DataBlock* volume_data_block,
           slice_ptr[ a ] = volume_ptr[ b ]; a++; b++;
           slice_ptr[ a ] = volume_ptr[ b ]; a++; b++;
         }
-        // Finish the part that could not be unroled
+        // Finish the part that could not be unrolled
         for ( ; x < nx; x++ )
         {
           slice_ptr[ x + z * nx ] = volume_ptr[ x + index * nx + z * nxy ];
@@ -1273,13 +1279,13 @@ bool InsertSliceInternal( DataBlock* volume_data_block, const DataSliceHandle& s
       T* slice_ptr = reinterpret_cast<T*>( slice_data_block->get_data() );
       
       size_t nxy = nx * ny;
-      // For loop unrolement 
+      // For loop unroll
       size_t ny8 = RemoveRemainder8( ny );
 
       for ( size_t z = 0; z < nz; z++ )
       {
         size_t y = 0;
-        // Unroled loop
+        // Unrolled loop
         for ( ; y < ny8; y += 8 )
         {
           // Copy data back
@@ -1294,7 +1300,7 @@ bool InsertSliceInternal( DataBlock* volume_data_block, const DataSliceHandle& s
           volume_ptr[ b ] = slice_ptr[ a ]; a++; b+= nx;
           volume_ptr[ b ] = slice_ptr[ a ]; a++; b+= nx;
         }
-        // Finish part that could not be unroled
+        // Finish part that could not be unrolled
         for ( ; y < ny; y++ )
         {
           volume_ptr[ index + y * nx + z * nxy ] = slice_ptr[ y + z * ny ];
@@ -1315,13 +1321,13 @@ bool InsertSliceInternal( DataBlock* volume_data_block, const DataSliceHandle& s
       T* slice_ptr = reinterpret_cast<T*>( slice_data_block->get_data() );
       
       size_t nxy = nx * ny;
-      // For loop unrolement 
+      // For loop unroll
       size_t nx8 = RemoveRemainder8( nx );
 
       for ( size_t z = 0; z < nz; z++ )
       {
         size_t x = 0;
-        // Unroled part of the loop
+        // Unrolled part of the loop
         for ( ; x < nx8; x += 8 )
         {
           // Copy data back
@@ -1336,7 +1342,7 @@ bool InsertSliceInternal( DataBlock* volume_data_block, const DataSliceHandle& s
           volume_ptr[ b ] = slice_ptr[ a ]; a++; b++;
           volume_ptr[ b ] = slice_ptr[ a ]; a++; b++;
         }
-        // Finish part that could not be unroled
+        // Finish part that could not be unrolled
         for ( ; x < nx; x++ )
         {
           volume_ptr[ x + index * nx + z * nxy ] = slice_ptr[ x + z * nx ];
