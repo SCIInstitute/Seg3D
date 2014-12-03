@@ -30,7 +30,7 @@
 # PROJECT: Seg3D
 ###########################################
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.4 FATAL_ERROR)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.9 FATAL_ERROR)
 
 PROJECT(Seg3D)
 
@@ -47,24 +47,24 @@ IF(BUILD_TESTING)
   ENABLE_TESTING()
   INCLUDE(CMake/RegisterUnitTest.cmake)
   INCLUDE_DIRECTORIES( ${SCI_GTEST_INCLUDE} )
-ENDIF(BUILD_TESTING)
+ENDIF()
 
 ###########################################
 # Verify build directory
 ###########################################
 
-IF ( ${CMAKE_BINARY_DIR} MATCHES ${CMAKE_SOURCE_DIR} )
+IF( ${CMAKE_BINARY_DIR} MATCHES ${CMAKE_SOURCE_DIR} )
   MESSAGE( FATAL_ERROR "Please delete the CMakeCache.txt from the src directory and build Seg3D in the bin directory. Run 'rm CMakeCache.txt; cd ../bin; cmake ../src' from the binary directory." )
-ENDIF ( ${CMAKE_BINARY_DIR} MATCHES ${CMAKE_SOURCE_DIR} )
+ENDIF()
 
 ###########################################
 # Set default CMAKE_BUILD_TYPE
 # if empty for Unix Makefile builds
 ###########################################
 
-IF (CMAKE_GENERATOR MATCHES "Unix Makefiles" AND NOT CMAKE_BUILD_TYPE)
+IF(CMAKE_GENERATOR MATCHES "Unix Makefiles" AND NOT CMAKE_BUILD_TYPE)
   SET(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
-ENDIF (CMAKE_GENERATOR MATCHES "Unix Makefiles" AND NOT CMAKE_BUILD_TYPE)
+ENDIF()
 
 ###########################################
 # WHERE TO COMPILE EXECUTABLES
@@ -80,7 +80,7 @@ SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR} CACHE PATH "" FORCE) # Needed by 
 OPTION(SEG3D_BUILD_INTERFACE "Build the GUI interface to Seg3D" ON)
 IF(WIN32)
   OPTION(SEG3D_SHOW_CONSOLE "Show console for debugging (Windows only)" OFF)
-ENDIF(WIN32)
+ENDIF()
 
 ###########################################
 # SEG3D VERSION NUMBERS
@@ -130,18 +130,18 @@ INCLUDE(CheckCSourceCompiles)
 # architecture settings
 ###########################################
 
-IF (CMAKE_SIZEOF_VOID_P MATCHES 8)
+IF(CMAKE_SIZEOF_VOID_P MATCHES 8)
   SET(SEG3D_BITS "64bit")
   SET(MSVC90_BUILD "amd64")
   ADD_DEFINITIONS(-DSCI_64BITS)
-ELSE (CMAKE_SIZEOF_VOID_P MATCHES 8)
+ELSE()
   SET(SEG3D_BITS "32bit")
   SET(MSVC90_BUILD "x86")
   ADD_DEFINITIONS(-DSCI_32BITS)
-  IF (WIN32)
-  ADD_DEFINITIONS(-DBOOST_BIND_ENABLE_STDCALL)
-  ENDIF (WIN32)
-ENDIF (CMAKE_SIZEOF_VOID_P MATCHES 8)
+  IF(WIN32)
+    ADD_DEFINITIONS(-DBOOST_BIND_ENABLE_STDCALL)
+  ENDIF()
+ENDIF()
 
 ###########################################
 # SETUP DEFINTIONS FOR EXTERNAL PACKAGES
@@ -165,7 +165,7 @@ SET(ITK_USE_REVIEW_STATISTICS TRUE CACHE BOOLEAN "Seg3D requires the ITK Review 
 # Flags for Microsoft Compiler
 ###########################################
 
-IF (WIN32 AND MSVC)
+IF(WIN32 AND MSVC)
   ADD_DEFINITIONS(-D_WIN32_WINNT=0x0501 -DNTDDI_VERSION=0x05010000)
   ADD_DEFINITIONS(-DPSAPI_VERSION=1)
   # Disable Visual C++ Secure Warnings
@@ -177,7 +177,7 @@ IF (WIN32 AND MSVC)
   SET(CMAKE_CXX_FLAGS "/Oi ${CMAKE_CXX_FLAGS}")
   # Build with multiple processes -- speeds up compilation on multi-processor machines.
   SET(CMAKE_CXX_FLAGS "/MP ${CMAKE_CXX_FLAGS}") 
-ENDIF (WIN32 AND MSVC)
+ENDIF()
 
 
 ###########################################
@@ -190,7 +190,7 @@ IF(UNIX)
   SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
   SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
   SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-ENDIF(UNIX)
+ENDIF()
 
 ###########################################
 # Find QT
@@ -208,7 +208,7 @@ SET(QT_MIN_VERSION "4.6.0")
 #SET(QT_DIR "" CACHE PATH "Path to QT")
 INCLUDE(FindQt4)
 
-IF (QT_FOUND)
+IF(QT_FOUND)
   MESSAGE(STATUS "QTVERSION=${QTVERSION}")
   IF(APPLE AND ${QTVERSION} VERSION_EQUAL 4.8 AND ${QTVERSION} VERSION_LESS 4.8.5)
     MESSAGE(WARNING "Qt 4.8 versions earlier than 4.8.3 contain a bug that disables menu items under some circumstances. Upgrade to a more recent version.")
@@ -216,11 +216,11 @@ IF (QT_FOUND)
 
   SET(QT_USE_QTOPENGL 1)
   INCLUDE(${QT_USE_FILE})
-ELSE (QT_FOUND)
+ELSE()
   MESSAGE(FATAL_ERROR "QT ${QT_MIN_VERSION} or later is required for building Seg3D")
-ENDIF (QT_FOUND)
+ENDIF()
 
-ENDIF(SEG3D_BUILD_INTERFACE)
+ENDIF()
 
 ###########################################
 # Configure python
@@ -230,7 +230,7 @@ IF(BUILD_WITH_PYTHON)
           -DPy_NO_ENABLE_SHARED 
           -DBOOST_PYTHON_STATIC_MODULE
           -DBOOST_PYTHON_STATIC_LIB)
-ENDIF(BUILD_WITH_PYTHON)
+ENDIF()
 
 ###########################################
 # External packages other than Qt
@@ -259,9 +259,9 @@ ADD_SUBDIRECTORY(Externals)
 
 IF(CMAKE_BUILD_TYPE MATCHES "Debug")
   SET(SEG3D_DEBUG_VERSION "\"(Debug)\"")
-ELSE(CMAKE_BUILD_TYPE MATCHES "Debug")
+ELSE()
   SET(SEG3D_DEBUG_VERSION "\"\"")
-ENDIF(CMAKE_BUILD_TYPE MATCHES "Debug")
+ENDIF()
 
 ###########################################
 # Check for "XInitThreads" on X-window
@@ -284,13 +284,13 @@ IF(NOT WIN32 AND NOT APPLE)
   X11_THREADSAFE
   )
   IF(${X11_THREADSAFE})
-  MESSAGE(STATUS "XInitThreads found")
-  OPTION(MULTITHREADED_RENDERING "Enable multi-threaded rendering." OFF)
-  IF(MULTITHREADED_RENDERING)
-    ADD_DEFINITIONS(-DX11_THREADSAFE)
-  ENDIF(MULTITHREADED_RENDERING)
-  ENDIF(${X11_THREADSAFE})
-ENDIF(NOT WIN32 AND NOT APPLE)
+    MESSAGE(STATUS "XInitThreads found")
+    OPTION(MULTITHREADED_RENDERING "Enable multi-threaded rendering." OFF)
+    IF(MULTITHREADED_RENDERING)
+      ADD_DEFINITIONS(-DX11_THREADSAFE)
+    ENDIF()
+  ENDIF()
+ENDIF()
 
 ###########################################
 # Build ApplicationConfiguration.h
@@ -332,7 +332,7 @@ IF(BUILD_WITH_PYTHON)
   INCLUDE_DIRECTORIES(${SCI_PYTHON_INCLUDE})
   ADD_DEFINITIONS(-DPy_NO_ENABLE_SHARED)
   INCLUDE(CMake/GenerateActionPythonWrapper.cmake)
-ENDIF(BUILD_WITH_PYTHON)
+ENDIF()
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -372,7 +372,7 @@ MESSAGE(STATUS "Configuring Seg3D Interface")
 IF(SEG3D_BUILD_INTERFACE)
   ADD_SUBDIRECTORY(QtUtils)
   ADD_SUBDIRECTORY(Interface)
-ENDIF(SEG3D_BUILD_INTERFACE)
+ENDIF()
 
 ###########################################
 # Plugins:
@@ -386,7 +386,7 @@ ENDIF(SEG3D_BUILD_INTERFACE)
 SET(IGNORE_RESOURCES OFF CACHE INTERNAL "Ignore default resources library.")
 IF(NOT SEG3D_BUILD_INTERFACE)
   SET(IGNORE_RESOURCES ON CACHE INTERNAL "Ignore default resources library.")
-ENDIF(NOT SEG3D_BUILD_INTERFACE)
+ENDIF()
 
 MESSAGE(STATUS "Configuring Seg3D Plugins")
 FILE(GLOB PLUGIN_DIRS "Plugins/*" )
@@ -395,11 +395,11 @@ INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/Plugins")
 
 FOREACH(DIR ${PLUGIN_DIRS})
   IF(NOT ${DIR} MATCHES "Plugins/.svn")
-  IF(IS_DIRECTORY ${DIR}) 
+    IF(IS_DIRECTORY ${DIR}) 
       ADD_SUBDIRECTORY(${DIR})
-  ENDIF(IS_DIRECTORY ${DIR}) 
-  ENDIF(NOT ${DIR} MATCHES "Plugins/.svn")
-ENDFOREACH(DIR ${PLUGIN_DIRS})
+    ENDIF() 
+  ENDIF()
+ENDFOREACH()
 
 ###########################################
 # Rsources:
@@ -408,11 +408,11 @@ ENDFOREACH(DIR ${PLUGIN_DIRS})
 
 
 IF(NOT IGNORE_RESOURCES)
-MESSAGE(STATUS "Configuring Seg3D Resources")
-IF(SEG3D_BUILD_INTERFACE)
-  ADD_SUBDIRECTORY(Resources)
-ENDIF(SEG3D_BUILD_INTERFACE)
-ENDIF(NOT IGNORE_RESOURCES)
+  MESSAGE(STATUS "Configuring Seg3D Resources")
+  IF(SEG3D_BUILD_INTERFACE)
+    ADD_SUBDIRECTORY(Resources)
+  ENDIF()
+ENDIF()
 
 
 ###########################################
@@ -425,10 +425,10 @@ ENDIF(NOT IGNORE_RESOURCES)
 IF(SEG3D_BUILD_INTERFACE)
   MESSAGE(STATUS "Configuring Seg3D main")
   ADD_SUBDIRECTORY(Main)
-ELSE(SEG3D_BUILD_INTERFACE)
+ELSE()
   MESSAGE(STATUS "Configuring Seg3D headless main")
   ADD_SUBDIRECTORY(HeadlessMain)
-ENDIF(SEG3D_BUILD_INTERFACE)
+ENDIF()
 
 
 ###########################################
@@ -448,7 +448,7 @@ GENERATE_REGISTRATION_FILES()
 IF(BUILD_WITH_PYTHON)
   MESSAGE(STATUS "Configuring action python wrapper functions")
   GENERATE_ACTION_PYTHON_WRAPPER_REGISTRATION_FILE()
-ENDIF(BUILD_WITH_PYTHON)
+ENDIF()
 
 ###########################################
 # Bootstrap
@@ -470,8 +470,8 @@ MARK_AS_ADVANCED(BUILD_DOCUMENTATION)
 IF(PDFLATEX_COMPILER)
   IF(BUILD_DOCUMENTATION)
     ADD_SUBDIRECTORY(Documentation)
-  ENDIF(BUILD_DOCUMENTATION)
-ENDIF(PDFLATEX_COMPILER)
+  ENDIF()
+ENDIF()
 
 IF(BUILD_DOCUMENTATION)
   OPTION(BUILD_DOXYGEN_DOCUMENTATION "Generate doxygen-based documentation." OFF)
@@ -485,9 +485,12 @@ IF(BUILD_DOCUMENTATION)
     ELSE()
       SET(BUILD_DOXYGEN_DOCUMENTATION OFF CACHE BOOL "Generate doxygen-based documentation." FORCE)
     ENDIF()
+  ENDIF()
+ENDIF()
 
-  ENDIF(BUILD_DOXYGEN_DOCUMENTATION)
-ENDIF(BUILD_DOCUMENTATION)
+IF(BUILD_TESTING)
+  ADD_SUBDIRECTORY(Testing)
+ENDIF()
 
 ###########################################
 # Packaging:
@@ -526,13 +529,13 @@ IF(WIN32 AND NOT UNIX)
   IF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     SET(CPACK_INSTALL_PREFIX "/" CACHE PATH "Install path prefix, prepended onto install directories." FORCE)
     SET(CMAKE_INSTALL_PREFIX "/" CACHE PATH "Install path prefix, prepended onto install directories." FORCE)
-  ENDIF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+  ENDIF()
   
   IF(CMAKE_SIZEOF_VOID_P MATCHES 8)
     SET(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES64")
-  ELSE(CMAKE_SIZEOF_VOID_P MATCHES 8)
+  ELSE()
     SET(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES")
-  ENDIF(CMAKE_SIZEOF_VOID_P MATCHES 8)  
+  ENDIF()  
   
   SET(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\${APPLICATION_NAME}")
   SET(CPACK_NSIS_MUI_ICON "${APPLICATION_WINDOWS_ICON}")
@@ -574,23 +577,23 @@ IF(WIN32 AND NOT UNIX)
     DeleteRegKey HKCR '${APPLICATION_EXTENSION}'
     DeleteRegKey HKCR '${APPLICATION_NAME}'
   ")
-ELSE(WIN32 AND NOT UNIX)
+ELSE()
   IF(APPLE)
     SET(CPACK_PACKAGE_DEFAULT_LOCATION "/Applications/")
     SET(CPACK_TOPLEVEL_TAG "")
     IF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
       SET(CPACK_INSTALL_PREFIX "/" CACHE PATH "Install path prefix, prepended onto install directories." FORCE)
       SET(CMAKE_INSTALL_PREFIX "/" CACHE PATH "Install path prefix, prepended onto install directories." FORCE)
-    ENDIF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+    ENDIF()
     SET(CPACK_PACKAGING_INSTALL_PREFIX "/")
     SET(CPACK_STRIP_FILES TRUE)
     SET(CPACK_SOURCE_STRIP_FILES TRUE)
     SET(CPACK_PACKAGE_EXECUTABLES "${APPLICATION_NAME}.app" "${APPLICATION_NAME}")
-  ELSE(APPLE)
+  ELSE()
     SET(CPACK_STRIP_FILES TRUE)
     SET(CPACK_SOURCE_STRIP_FILES TRUE)
     SET(CPACK_PACKAGE_EXECUTABLES "${APPLICATION_NAME}" "${APPLICATION_NAME}")
-  ENDIF(APPLE)
-ENDIF(WIN32 AND NOT UNIX)
+  ENDIF()
+ENDIF()
 
 INCLUDE(CPack)
