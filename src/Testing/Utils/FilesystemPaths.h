@@ -26,29 +26,25 @@
  DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef TESTING_UTILS_DATABLOCKSOURCE_H
-#define TESTING_UTILS_DATABLOCKSOURCE_H
+#ifndef TESTING_UTILS_FILESYSTEMPATHS_H
+#define TESTING_UTILS_FILESYSTEMPATHS_H
 
-#include <boost/assign.hpp>
-#include <vector>
+#include <boost/filesystem.hpp>
 
 namespace Testing {
+  
+namespace Utils {    
 
-namespace Utils {
-
-using namespace boost::assign;
-
-template<typename T>
-std::vector<T> generate3x3x3Data()
+inline
+boost::filesystem::path testOutputDir()
 {
-  std::vector<T> data;
-  data += 0, 1, 2, 3, 4, 5, 6, 7, 8,
-          9, 10, 11, 12, 13, 14, 15, 16, 17,
-          18, 19, 20, 21, 22, 23, 24, 25, 26;
-
-  return data;
+#ifdef BUILD_TESTING
+  return TEST_OUTPUT_PATH;
+#else
+  return boost::filesystem::path();
+#endif
 }
-
+  
 }}
 
 #endif
