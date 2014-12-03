@@ -156,8 +156,13 @@ public:
 
   // SAVENRRD:
   /// Save a nrrd to file from nrrd data structure
-  static bool SaveNrrd( const std::string& filename, NrrdDataHandle nrrddata, std::string& error, 
-    bool compress, int level );
+  /// If compress is false, level will be overridden and set to 0, which
+  /// corresponds to zlib setting for no compression
+  static bool SaveNrrd( const std::string& filename,
+                        NrrdDataHandle nrrddata,
+                        std::string& error,
+                        bool compress,
+                        int level );
 
   // -- Lock and Unlock Teem (Some parts of Teem are not thread safe) --
 public:

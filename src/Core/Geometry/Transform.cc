@@ -32,6 +32,9 @@
 namespace Core
 {
 
+const int Transform::TRANSFORM_LENGTH = 16;
+const int TransformF::TRANSFORM_LENGTH = 16;
+
 Transform::Transform()
 {
   load_identity();
@@ -259,12 +262,12 @@ const Matrix& Transform::get_matrix() const
 
 void Transform::get( double* data ) const
 {
-  std::memcpy( data, this->mat_.data(), sizeof(double) * 16 );
+  std::memcpy( data, this->mat_.data(), sizeof(double) * TRANSFORM_LENGTH );
 }
 
 void Transform::set( const double* data )
 {
-  std::memcpy( this->mat_.data(), data, sizeof(double) * 16 );
+  std::memcpy( this->mat_.data(), data, sizeof(double) * TRANSFORM_LENGTH );
 }
 
 void Transform::load_identity()
@@ -525,7 +528,7 @@ VectorF operator*( const Transform& t, const VectorF& d )
 
 std::string ExportToString( const Transform& value )
 {
-  std::vector< double > trans( 16 );
+  std::vector< double > trans( Transform::TRANSFORM_LENGTH );
   value.get( &trans[ 0 ] );
   return ExportToString( trans );
 }
@@ -534,15 +537,13 @@ bool ImportFromString( const std::string& str, Transform& value )
 {
   std::vector< double > values;
   ImportFromString( str, values );
-  if ( values.size() == 16 )
+  if ( values.size() == Transform::TRANSFORM_LENGTH )
   {
     value.set( &values[ 0 ] );
     return ( true );
   }
   return false;
 }
-
-
 
 
 
@@ -560,7 +561,6 @@ TransformF::TransformF( const Transform& copy )
 {
   this->mat_ = copy.mat_;
 }
-
 
 TransformF& TransformF::operator=( const TransformF& copy )
 {
@@ -774,12 +774,12 @@ const MatrixF& TransformF::get_matrix() const
 
 void TransformF::get( float* data ) const
 {
-  std::memcpy( data, this->mat_.data(), sizeof( float ) * 16 );
+  std::memcpy( data, this->mat_.data(), sizeof( float ) * TRANSFORM_LENGTH );
 }
 
 void TransformF::set( const float* data )
 {
-  std::memcpy( this->mat_.data(), data, sizeof( float ) * 16 );
+  std::memcpy( this->mat_.data(), data, sizeof( float ) * TRANSFORM_LENGTH );
 }
 
 void TransformF::load_identity()
@@ -1020,7 +1020,7 @@ VectorF operator*( const TransformF& t, const VectorF& d )
 
 std::string ExportToString( const TransformF& value )
 {
-  std::vector< float > trans( 16 );
+  std::vector< float > trans( TransformF::TRANSFORM_LENGTH );
   value.get( &trans[ 0 ] );
   return ExportToString( trans );
 }
@@ -1029,7 +1029,7 @@ bool ImportFromString( const std::string& str, TransformF& value )
 {
   std::vector< float > values;
   ImportFromString( str, values );
-  if ( values.size() == 16 )
+  if ( values.size() == TransformF::TRANSFORM_LENGTH )
   {
     value.set( &values[ 0 ] );
     return true;

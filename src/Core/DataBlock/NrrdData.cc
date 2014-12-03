@@ -90,6 +90,7 @@ NrrdData::NrrdData( DataBlockHandle data_block, GridTransform transform ) :
   {
     CORE_THROW_LOGICERROR( "Cannot create NrrdData from empty object" );
   }
+
   this->private_->own_data_ = false;
   this->private_->data_block_ = data_block;
   this->private_->nrrd_ = nrrdNew();
@@ -287,23 +288,25 @@ void NrrdData::set_transform( GridTransform& transform )
   // Set space origin and space direction
   this->private_->nrrd_->spaceDim = 3;
 
-  double Trans[ 16 ];
-  transform.get( Trans );
+  double transformArray[ Transform::TRANSFORM_LENGTH ];
+  transform.get( transformArray );
   for ( int p = 0; p < 3; p++ )
   {
-    this->private_->nrrd_->spaceOrigin[ p ] = Trans[ 12 + p ];
+    this->private_->nrrd_->spaceOrigin[ p ] = transformArray[ 12 + p ];
     for ( size_t q = 0; q < this->private_->nrrd_->dim; q++ )
     {
-      this->private_->nrrd_->axis[ q ].spaceDirection[ p ] = Trans[ q + 4 * p ];
+      this->private_->nrrd_->axis[ q ].spaceDirection[ p ] = transformArray[ q + 4 * p ];
     }
   }
 
   for ( int p = 0; p < 3; p++ )
+  {
     for ( int q = 0; q < 3; q++ )
     {
       if ( p == q ) this->private_->nrrd_->measurementFrame[ p ][ q ] = 1.0;
       else this->private_->nrrd_->measurementFrame[ p ][ q ] = 0.0;
     }
+  }
 
   this->private_->nrrd_->space = nrrdSpace3DRightHanded;
 
@@ -319,8 +322,9 @@ void NrrdData::set_transform( GridTransform& transform )
     {
       for ( size_t i = 0; i < static_cast<size_t>( nrrd->dim ); i++ )
       {
-        if ( i != j && ( nrrd->axis[ i ].spaceDirection[ j ] != 0.0 &&
-          ! IsNan( nrrd->axis[ i ].spaceDirection[ j ] ) ) )
+        if ( (i != j) &&
+             ( (nrrd->axis[ i ].spaceDirection[ j ] != 0.0) &&
+               (! IsNan(nrrd->axis[ i ].spaceDirection[ j ])) ) )
         {
           is_aligned_nrrd = false;
         }
@@ -331,8 +335,9 @@ void NrrdData::set_transform( GridTransform& transform )
     {
       for ( size_t i = 0; i < static_cast<size_t>( nrrd->spaceDim ); i++ )
       {
-        if ( i != j && ( nrrd->measurementFrame[ i ][ j ] != 0.0 &&
-          ! IsNan( nrrd->measurementFrame[ i ][ j ] ) ) )
+        if ( (i != j) &&
+             ( (nrrd->measurementFrame[ i ][ j ] != 0.0) &&
+               (! IsNan( nrrd->measurementFrame[ i ][ j ])) ) )
         {
           is_aligned_nrrd = false;
         }
@@ -495,22 +500,22 @@ bool NrrdData::LoadNrrd( const std::string& filename, NrrdDataHandle& nrrddata, 
   lock_type lock( GetMutex() );
 
   Nrrd* nrrd = nrrdNew();
-  boost::filesystem::path nrrd_path = boost::filesystem::path( filename ).parent_path();
-  std::string filename_only = boost::filesystem::path( filename ).filename().string();
-
-  boost::system::error_code ec;
-  boost::filesystem::path current_path = boost::filesystem::current_path( ec );
-  if ( ec )
-  {
+    boost::filesystem::path nrrd_path = boost::filesystem::path( filename ).parent_path();
+    std::string filename_only = boost::filesystem::path( filename ).filename().string();
+    
+    boost::system::error_code ec;
+    boost::filesystem::path current_path = boost::filesystem::current_path( ec );
+    if ( ec )
+    {
     error = std::string( "Could not open file: " ) + filename + " : Could not get current directory.";
-    return false;
-  }
-  boost::filesystem::current_path( nrrd_path, ec );
-  if ( ec )
-  {
+        return false;
+    }
+    boost::filesystem::current_path( nrrd_path, ec );
+    if ( ec )
+    {
     error = std::string( "Could not open file: " ) + filename + " : Could not access path.";
-    return false;
-  }
+        return false;
+    }
 
   if ( nrrdLoad( nrrd, filename_only.c_str(), 0 ) )
   {
@@ -520,10 +525,10 @@ bool NrrdData::LoadNrrd( const std::string& filename, NrrdDataHandle& nrrddata, 
     biffDone( NRRD );
     nrrdNuke( nrrd );
     nrrddata.reset();
-    boost::filesystem::current_path( current_path, ec );
+        boost::filesystem::current_path( current_path, ec );
     return false;
   }
-  boost::filesystem::current_path( current_path, ec );
+    boost::filesystem::current_path( current_path, ec );
 
   if ( nrrd->dim < 2 )
   {
@@ -544,7 +549,7 @@ bool NrrdData::LoadNrrd( const std::string& filename, NrrdDataHandle& nrrddata, 
     nrrd->axis[ 2 ].kind = nrrd->axis[ 1].kind;
     nrrd->axis[ 2 ].label = 0;
     nrrd->axis[ 2 ].units = 0;
-
+    
     if ( nrrd->spaceDim == 2 )
     {
       nrrd->spaceDim = 3;
@@ -553,7 +558,7 @@ bool NrrdData::LoadNrrd( const std::string& filename, NrrdDataHandle& nrrddata, 
       nrrd->axis[ 2 ].spaceDirection[ 0 ] = 0.0;
       nrrd->axis[ 2 ].spaceDirection[ 1 ] = 0.0;
       nrrd->axis[ 2 ].spaceDirection[ 2 ] = 1.0;
-
+       
       nrrd->spaceUnits[ 2 ] = 0;
       nrrd->spaceOrigin[ 2 ] = 0.0;
       nrrd->measurementFrame[ 0 ][ 2 ] = 0.0;
@@ -576,7 +581,6 @@ bool NrrdData::LoadNrrd( const std::string& filename, NrrdDataHandle& nrrddata, 
       nrrd->axis[ 2 ].spaceDirection[ 2 ] = space_dir_2.z();    
     }
   }
-  
 
   // Fix a problem with nrrds with stub axes
   // In the old Seg3D this was once fashionable to add a dormant axis that would tell that the
@@ -612,29 +616,36 @@ bool NrrdData::LoadNrrd( const std::string& filename, NrrdDataHandle& nrrddata, 
   return true;
 }
 
-bool NrrdData::SaveNrrd( const std::string& filename, NrrdDataHandle nrrddata, std::string& error, 
-  bool compress, int level )
+bool NrrdData::SaveNrrd( const std::string& filename,
+                         NrrdDataHandle nrrddata,
+                         std::string& error,
+                         bool compress,
+                         int level )
 {
   // Lock down the Teem library
   lock_type lock( GetMutex() );
-  // TODO:
-  // Fix filename handling so it always ends in .nrrd or .nhdr
 
-  if ( !( nrrddata.get() ) )
+  if ( ! nrrddata.get() )
   {
     error = "Error writing file: " + filename + " : no data volume available";
     return false;
   }
 
   NrrdIoState* nio = nrrdIoStateNew();
-  nrrdIoStateSet( nio,  nrrdIoStateZlibLevel, level );
 
   // Turn on compression if the user wants it.
-  if( compress )
+  if ( compress )
   { 
     nrrdIoStateEncodingSet( nio, nrrdEncodingGzip );
+    nrrdIoStateSet( nio,  nrrdIoStateZlibLevel, level );
   }
-  
+  else
+  {
+    // guarantees consistent compression settings
+    nrrdIoStateSet( nio,  nrrdIoStateZlibLevel, 0 );
+  }
+
+  // teem library should check for valid nrrd (including file extension?)
   if ( nrrdSave( filename.c_str(), nrrddata->nrrd(), nio ) )
   {
     char *err = biffGet( NRRD );
@@ -645,7 +656,7 @@ bool NrrdData::SaveNrrd( const std::string& filename, NrrdDataHandle nrrddata, s
     return false;
   }
 
-    nio = nrrdIoStateNix( nio );
+  nio = nrrdIoStateNix( nio );
 
   error = "";
   return true;

@@ -127,6 +127,8 @@ public:
           double top, double nearVal, double farVal );
   static void BuildOrtho2DMatrix( Matrix& m, double left, double right, double bottom, double top );
 
+  static const int TRANSFORM_LENGTH;
+
 protected:
   Matrix mat_;
 };
@@ -201,8 +203,7 @@ public:
 
   bool is_axis_aligned() const;
 
-public:
-
+public:  
   static void BuildPermuteMatrix( MatrixF& m, int xmap, int ymap, int zmap, bool pre );
   static void BuildRotateMatrix( MatrixF& m, float angle, const VectorF& axis );
   static void BuildShearMatrix( MatrixF& m, const VectorF& s, const Plane& p );
@@ -214,6 +215,8 @@ public:
   static void BuildOrthoMatrix( MatrixF& m, float left, float right, float bottom, 
           float top, float nearVal, float farVal );
   static void BuildOrtho2DMatrix( MatrixF& m, float left, float right, float bottom, float top );
+  
+  static const int TRANSFORM_LENGTH;
 
 protected:
   MatrixF mat_;
