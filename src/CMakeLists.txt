@@ -349,6 +349,14 @@ INCLUDE(CMake/RegisterClass.cmake)
 SET(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake/Modules")
 
 ###########################################
+# Configure testing code
+###########################################
+
+IF(BUILD_TESTING)
+  ADD_SUBDIRECTORY(Testing)
+ENDIF()
+
+###########################################
 # Application layers:
 #  Core - Core functionality
 #  Application - All pieces need for the
@@ -488,9 +496,6 @@ IF(BUILD_DOCUMENTATION)
   ENDIF()
 ENDIF()
 
-IF(BUILD_TESTING)
-  ADD_SUBDIRECTORY(Testing)
-ENDIF()
 
 ###########################################
 # Packaging:

@@ -26,17 +26,19 @@
  DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef TESTING_UTILS_FILESYSTEMPATHS_H
-#define TESTING_UTILS_FILESYSTEMPATHS_H
-
-#include <boost/filesystem.hpp>
+#include <Testing/Utils/FilesystemPaths.h>
 
 namespace Testing {
-  
+
 namespace Utils {    
 
-boost::filesystem::path testOutputDir();
-  
-}}
-
+boost::filesystem::path testOutputDir()
+{
+#ifdef BUILD_TESTING
+  return TEST_OUTPUT_PATH;
+#else
+  return boost::filesystem::path();
 #endif
+}
+
+}}
