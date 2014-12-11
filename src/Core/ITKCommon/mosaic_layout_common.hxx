@@ -1426,6 +1426,17 @@ match_pairs_strategy(std::vector<typename TImage::Pointer> & image,
     double min_peak = 0.1,
     double peak_threshold = 0.3)
 {
+#ifndef NDEBUG
+if (strategy == DEFAULT)
+  CORE_LOG_DEBUG("match_pairs_strategy: DEFAULT");
+else if (strategy == TOP_LEFT_BOOK)
+  CORE_LOG_DEBUG("match_pairs_strategy: TOP_LEFT_BOOK");
+else if (strategy == TOP_LEFT_SNAKE)
+  CORE_LOG_DEBUG("match_pairs_strategy: TOP_LEFT_SNAKE");
+else
+  CORE_LOG_DEBUG("match_pairs_strategy: UNKNOWN");
+#endif
+
   // shortcut:
   const unsigned int num_images = image.size();
   if (num_images < 2) return false;
