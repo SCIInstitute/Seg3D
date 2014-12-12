@@ -51,6 +51,8 @@
 
 // system includes:
 #include <iomanip>
+#include <istream>
+#include <cctype>
 
 
 //----------------------------------------------------------------
@@ -217,18 +219,51 @@ load_transform(std::istream & si, const std::string & transform_type)
   
   for (unsigned int i = 0; i < num_vp; i++)
   {
+    // discard whitespace
+    si >> std::ws;
+    int c = si.peek();
+    // if not string, then hopefully a numerical parameter
+    if ( std::isalpha(c) )
+    {
+      // nan is also valid (?), replace with 0
+      std::string vp_token;
+      si >> vp_token;
+      if (vp_token == "nan" || vp_token == "-nan")
+      {
+        vp[i] = 0;
+      }
+      else
+      {
+        std::ostringstream oss;
+        oss << "Token " << vp_token << " is not a valid variable parameter.";
+        CORE_LOG_ERROR(oss.str());
+        CORE_THROW_EXCEPTION(oss.str());
+      }
+    }
+    else
+    {
 #ifdef __APPLE__
-    // NOTE: OSX std::iostream is broken -- it can write out doubles
-    // so small that it can't read them back in.  The workaround is
-    // to read them in as long doubles, and then cast them down to
-    // a double:
-    long double tmp = 0;
-    si >> tmp;
-    if (si.fail()) si.clear();
-    vp[i] = static_cast<double>(tmp);
+      // NOTE: OSX std::iostream is broken -- it can write out doubles
+      // so small that it can't read them back in.  The workaround is
+      // to read them in as long doubles, and then cast them down to
+      // a double:
+      long double tmp = 0;
+      si >> tmp;
+      if (si.fail())
+      {
+        CORE_LOG_ERROR("Error converting variable parameter from stos file.");
+        si.clear();
+      }
+      vp[i] = static_cast<double>(tmp);
 #else
-    si >> vp[i];
+      si >> vp[i];
+      if (si.fail())
+      {
+        CORE_LOG_ERROR("Error converting variable parameter from stos file.");
+        si.clear();
+      }
 #endif
+    }
   }
   
   // load the fixed parameters:
@@ -262,9 +297,9 @@ load_transform(std::istream & si, const std::string & transform_type)
       si >> fp[i];
 #endif
     }
-  } else if (fp_token == "nan" || fp_token == "-nan") {
-    fp_token = "0.00e+00";
-  } else if (fp_token != "no_fp") {
+  }
+  else if (fp_token != "no_fp")
+  {
     std::ostringstream oss;
     oss << "unexpected token: '" << fp_token << "', aborting load transform...";
     CORE_LOG_ERROR(oss.str());
