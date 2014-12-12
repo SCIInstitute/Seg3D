@@ -291,10 +291,19 @@ load_transform(std::istream & si, const std::string & transform_type)
       // a double:
       long double tmp = 0;
       si >> tmp;
-      if (si.fail()) si.clear();
+      if (si.fail())
+      {
+        CORE_LOG_ERROR("Error converting variable parameter from stos file.");
+        si.clear();
+      }
       fp[i] = static_cast<double>(tmp);
 #else
       si >> fp[i];
+      if (si.fail())
+      {
+        CORE_LOG_ERROR("Error converting variable parameter from stos file.");
+        si.clear();
+      }
 #endif
     }
   }
