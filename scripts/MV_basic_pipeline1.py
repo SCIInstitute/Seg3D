@@ -1,5 +1,5 @@
 # how to call from Seg3D bin directory:
-#exec(open('scripts/MV_basic_pipeline1.py').read())
+#exec(open('../scripts/MV_basic_pipeline1.py').read())
 
 # very basic pipeline uses MouseVolume dataset on SCI file server
 # tests fft, assemble, stos brute, stom
@@ -10,7 +10,7 @@ import os
 
 # set up parameters:
 config = configparser.ConfigParser()
-config.read('/home/sci/brig/Documents/Tools/seg3d/scripts/settings.ini')
+config.read('../scripts/settings.ini')
 testRoot = config.get('MouseVolume', 'dir')
 if not os.path.exists(testRoot):
   raise ValueError("Path %s does not exist." % testRoot)
@@ -38,10 +38,10 @@ for index in range(firstIndex, mosaicLastIndex):
 
   seg3d2.fftfilter(layerid=layerid, directory=imageDir, output_mosaic=fftOutputMosaic, shrink_factor=shrinkFactor)
 
-  assmblOutImg='{0}/results/{1}{2}'.format(testOutputRoot, outputStem, outputImageExtension)
-  print(assmblOutImg)
+  assembleOutputImage='{0}/results/{1}{2}'.format(testOutputRoot, outputStem, outputImageExtension)
+  print(assembleOutputImage)
 
-  seg3d2.assemblefilter(layerid=layerid, input_mosaic=fftOutputMosaic, output_image=assmblOutImg, directory=imageDir, shrink_factor=shrinkFactor)
+  seg3d2.assemblefilter(layerid=layerid, input_mosaic=fftOutputMosaic, output_image=assembleOutputImage, directory=imageDir, shrink_factor=shrinkFactor, feathering="blend")
 
 fixedIndex=1
 inputFixed=outputMosaicList[0]
@@ -56,5 +56,7 @@ for index in range(firstIndex,lastIndex):
   print(outputStos)
   outputStosList.append(outputStos)
   seg3d2.slicetoslicebrutefilter(layerid=layerid, input_fixed=inputFixed, input_moving=inputMoving, output_stos=outputStos, shrink_factor=shrinkFactor)
+
+print(imageDirList)
 
 seg3d2.slicetovolumefilter(layerid=layerid, input_files=outputStosList, output_prefixes=[outputVolumeDir], image_dirs=imageDirList, shrink_factor=shrinkFactor, load_volume=True)

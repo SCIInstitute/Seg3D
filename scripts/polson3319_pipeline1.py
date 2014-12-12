@@ -14,11 +14,13 @@ testRoot = config.get(datasetName, 'dir')
 if not os.path.exists(testRoot):
   raise ValueError("Path %s does not exist." % testRoot)
 
-fftDir = "{0}/fft".format(testRoot)
-refineGridDir = "{0}/grid".format(testRoot)
-resultsDir = "{0}/results".format(testRoot)
-stosDir = "{0}/stos".format(testRoot)
-volumeDir = "{0}/volume".format(testRoot)
+testOutputRoot = config.get(datasetName, 'outputDir')
+
+fftDir = "{0}/fft".format(testOutputRoot)
+refineGridDir = "{0}/grid".format(testOutputRoot)
+resultsDir = "{0}/results".format(testOutputRoot)
+stosDir = "{0}/stos".format(testOutputRoot)
+volumeDir = "{0}/volume".format(testOutputRoot)
 
 layerid=''
 outputImageExtension = config.get(datasetName, 'image_ext')
@@ -58,12 +60,18 @@ for index in range(rangeMin, mosaicRangeMax):
   print(files)
 
   fftMosaic="{0}/{1}{2}".format(fftDir, outputName, mosaicExtension)
-  seg3d2.fftfilter(layerid=layerid, tile_strategy='top_left_book', 
-      min_peak=minPeak, peak_threshold=peakThreshold,
-      shrink_factor=shrinkFactor, overlap_min=overlapMin, 
-      overlap_max=overlapMax, pixel_spacing=pixelSpacing, 
-      images=files, directory=testRoot, output_mosaic=fftMosaic)
-  #, iterations_per_level=pyramidIterations, pyramid_levels=pyramidLevels)
+  seg3d2.fftfilter(layerid=layerid,
+                   tile_strategy='top_left_book',
+                   min_peak=minPeak,
+                   peak_threshold=peakThreshold,
+                   shrink_factor=shrinkFactor,
+                   overlap_min=overlapMin,
+                   overlap_max=overlapMax,
+                   pixel_spacing=pixelSpacing,
+                   images=files,
+                   directory=testRoot,
+                   output_mosaic=fftMosaic)
+  #iterations_per_level=pyramidIterations, pyramid_levels=pyramidLevels
 
   #refineGridMosaic="{0}/{1}{2}".format(refineGridDir, outputName, mosaicExtension)
   #seg3d2.refinegridfilter(layerid=layerid, shrink_factor=shrinkFactor, pixel_spacing=pixelSpacing, iterations=refineGridIterations, input_mosaic=fftMosaic, output_mosaic=refineGridMosaic, directory=testRoot, cell_size=cellSize)
