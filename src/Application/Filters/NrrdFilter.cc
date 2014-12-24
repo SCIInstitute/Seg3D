@@ -29,9 +29,6 @@
 // ITK includes 
 #include <itkCommand.h>
  
-// Boost includes
-#include <boost/signals.hpp> 
- 
 // Core includes
 #include <Core/Utils/Exception.h>
 #include <Core/DataBlock/StdDataBlock.h>
