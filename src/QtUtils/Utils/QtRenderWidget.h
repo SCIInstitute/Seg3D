@@ -38,7 +38,9 @@
 #include <GL/glew.h>
 
 // Qt includes
+#undef __GLEW_H__
 #include <QtOpenGL>
+#define __GLEW_H__
 
 // Core includes
 #include <Core/Utils/ConnectionHandler.h>
