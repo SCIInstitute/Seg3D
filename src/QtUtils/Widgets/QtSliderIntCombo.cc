@@ -85,9 +85,9 @@ void QtSliderIntCombo::set_tooltip( const std::string& tooltip )
 
 void QtSliderIntCombo::spinner_signal( int value )
 {
-    this->private_->ui_.horizontalSlider->blockSignals( true );
-    this->private_->ui_.horizontalSlider->setValue( value );
-    Q_EMIT valueAdjusted( value );
+  this->private_->ui_.horizontalSlider->blockSignals( true );
+  this->private_->ui_.horizontalSlider->setValue( value );
+  Q_EMIT valueAdjusted( value );
   this->private_->ui_.horizontalSlider->blockSignals( false );
   
   this->value_ = value;
@@ -95,11 +95,11 @@ void QtSliderIntCombo::spinner_signal( int value )
 
 void QtSliderIntCombo::slider_signal( int value )
 {
-    this->private_->ui_.spinBox->blockSignals( true );
-    this->private_->ui_.spinBox->setValue( value );
-    Q_EMIT valueAdjusted( value );
+  this->private_->ui_.spinBox->blockSignals( true );
+  this->private_->ui_.spinBox->setValue( value );
+  Q_EMIT valueAdjusted( value );
   this->private_->ui_.spinBox->blockSignals( false );
-  
+
   this->value_ = value;
 }
 
@@ -108,26 +108,37 @@ void QtSliderIntCombo::setStep(int step)
 {
   block_signals( true );
   this->private_->ui_.horizontalSlider->setPageStep( step );
-    this->private_->ui_.horizontalSlider->setSingleStep( step );
-    this->private_->ui_.spinBox->setSingleStep( step );
-    block_signals( false );
+  this->private_->ui_.horizontalSlider->setSingleStep( step );
+  this->private_->ui_.spinBox->setSingleStep( step );
+  block_signals( false );
 }
 
 void QtSliderIntCombo::setRange( int min, int max)
 {
   block_signals( true );
-    this->private_->ui_.horizontalSlider->setRange( min, max );
-    this->private_->ui_.spinBox->setRange( min, max );
-    this->private_->ui_.min_->setNum( min );
-    this->private_->ui_.max_->setNum( max );
-    
-    int tick = (max - min)/10;
-  
+  this->private_->ui_.horizontalSlider->setRange( min, max );
+  this->private_->ui_.spinBox->setRange( min, max );
+  this->private_->ui_.min_->setNum( min );
+  this->private_->ui_.max_->setNum( max );
+
+  int tick = (max - min)/10;
+
   // NOTE: Fix the cases where there are less than 10 options to choose from
-  if ( tick == 0 ) tick = 1;
-  
-    this->private_->ui_.horizontalSlider->setTickInterval( tick );
-    block_signals( false );
+  if ( tick == 0 )
+  {
+    tick = this->private_->ui_.horizontalSlider->singleStep();
+  }
+  else
+  {
+    if ( (this->private_->ui_.horizontalSlider->singleStep() % 2 != 0) &&
+         (tick % 2 != 0) )
+    {
+      tick += 1;
+    }
+  }
+
+  this->private_->ui_.horizontalSlider->setTickInterval( tick );
+  block_signals( false );
 }
 
 void QtSliderIntCombo::setCurrentValue( int value )
@@ -136,33 +147,33 @@ void QtSliderIntCombo::setCurrentValue( int value )
 
   block_signals( true );
   this->value_ = value;
-    this->private_->ui_.horizontalSlider->setValue( this->value_ );
-    this->private_->ui_.spinBox->setValue( this->value_ );
-    block_signals( false );
-    Q_EMIT valueAdjusted( this->value_ );
+  this->private_->ui_.horizontalSlider->setValue( this->value_ );
+  this->private_->ui_.spinBox->setValue( this->value_ );
+  block_signals( false );
+  Q_EMIT valueAdjusted( this->value_ );
 }
 
 
 void QtSliderIntCombo::change_min( int new_min )
 {
   block_signals( true );
-    this->private_->ui_.horizontalSlider->setMinimum( new_min );
-    this->private_->ui_.spinBox->setMinimum( new_min );
-    this->private_->ui_.min_->setNum(new_min);
-    int tick = (this->private_->ui_.max_->text().toInt() - this->private_->ui_.min_->text().toInt())/10;
-    this->private_->ui_.horizontalSlider->setTickInterval( tick );
-    block_signals( false );
+  this->private_->ui_.horizontalSlider->setMinimum( new_min );
+  this->private_->ui_.spinBox->setMinimum( new_min );
+  this->private_->ui_.min_->setNum(new_min);
+  int tick = (this->private_->ui_.max_->text().toInt() - this->private_->ui_.min_->text().toInt())/10;
+  this->private_->ui_.horizontalSlider->setTickInterval( tick );
+  block_signals( false );
 }
 
 void QtSliderIntCombo::change_max( int new_max )
 {
   block_signals( true );
-    this->private_->ui_.horizontalSlider->setMaximum( new_max );
-    this->private_->ui_.spinBox->setMaximum( new_max );
-    this->private_->ui_.max_->setNum( new_max );
-    int tick = (this->private_->ui_.max_->text().toInt() - this->private_->ui_.min_->text().toInt())/10;
-    this->private_->ui_.horizontalSlider->setTickInterval( tick );
-    block_signals( false );
+  this->private_->ui_.horizontalSlider->setMaximum( new_max );
+  this->private_->ui_.spinBox->setMaximum( new_max );
+  this->private_->ui_.max_->setNum( new_max );
+  int tick = (this->private_->ui_.max_->text().toInt() - this->private_->ui_.min_->text().toInt())/10;
+  this->private_->ui_.horizontalSlider->setTickInterval( tick );
+  block_signals( false );
 }
 
 void QtSliderIntCombo::block_signals( bool block )

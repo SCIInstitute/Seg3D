@@ -56,7 +56,7 @@ public:
     virtual ~QtSliderDoubleCombo();
     
 public Q_SLOTS:
-    void setStep( double );
+  void setStep( double );
   void setRange( double, double );
   void setCurrentValue( double );
 
