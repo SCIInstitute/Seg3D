@@ -50,32 +50,34 @@ Q_OBJECT
 
 // -- constructor/destructor --
 public:
-    QtSliderIntCombo( QWidget* parent = 0, bool edit_range = false );
-    virtual ~QtSliderIntCombo();
+  QtSliderIntCombo( QWidget* parent = 0, bool edit_range = false );
+  virtual ~QtSliderIntCombo();
 
 Q_SIGNALS:
   void valueAdjusted( int );
   void rangeChanged( int, int );
     
 public Q_SLOTS:
-    void setStep(int);
+  void setStep(int);
   void setRange( int, int );
   void setCurrentValue( int );
   
 public:
   int get_value() { return value_; }
-  void set_description( std::string description );
+
+  void set_description( const std::string& description );
+  void set_tooltip( const std::string& tooltip );
 
 // -- widget internals -- 
 private:
     QtSliderIntComboPrivateHandle private_;
     
 private Q_SLOTS:
-    void change_min( int new_min );
-    void change_max( int new_max );
-    void slider_signal( int value );
-    void spinner_signal( int value );
-    
+  void change_min( int new_min );
+  void change_max( int new_max );
+  void slider_signal( int value );
+  void spinner_signal( int value );
+
 private:
   void block_signals( bool block );
   int value_;

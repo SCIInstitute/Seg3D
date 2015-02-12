@@ -50,12 +50,12 @@ QtSliderIntCombo::QtSliderIntCombo( QWidget* parent, bool edit_range ) :
   value_( 0 ),
   private_( new QtSliderIntComboPrivate )
 {
-    this->private_->ui_.setupUi( this );
-    
-    this->connect( this->private_->ui_.horizontalSlider, SIGNAL( valueChanged( int ) ), 
-    this, SLOT( slider_signal( int ) ) );
-    this->connect( this->private_->ui_.spinBox, SIGNAL( valueChanged( int ) ), 
-    this, SLOT( spinner_signal( int ) ) );
+  this->private_->ui_.setupUi( this );
+
+  this->connect( this->private_->ui_.horizontalSlider, SIGNAL( valueChanged( int ) ), 
+  this, SLOT( slider_signal( int ) ) );
+  this->connect( this->private_->ui_.spinBox, SIGNAL( valueChanged( int ) ), 
+  this, SLOT( spinner_signal( int ) ) );
 
   QFont font = this->private_->ui_.min_->font();
 #ifdef __APPLE__
@@ -71,10 +71,16 @@ QtSliderIntCombo::QtSliderIntCombo( QWidget* parent, bool edit_range ) :
 QtSliderIntCombo::~QtSliderIntCombo()
 {
 }
-  
-void QtSliderIntCombo::set_description( std::string description )
+
+void QtSliderIntCombo::set_description( const std::string& description )
 {
   this->private_->ui_.description_->setText( QString::fromStdString( description ) );
+}
+
+void QtSliderIntCombo::set_tooltip( const std::string& tooltip )
+{
+  this->private_->ui_.horizontalSlider->setToolTip( QString::fromStdString( tooltip ) );
+  this->private_->ui_.spinBox->setToolTip( QString::fromStdString( tooltip ) );
 }
 
 void QtSliderIntCombo::spinner_signal( int value )

@@ -53,7 +53,7 @@ QtSliderDoubleCombo::QtSliderDoubleCombo( QWidget* parent ) :
   value_( 0 ),
     private_( new QtSliderDoubleComboPrivate )
 {
-    this->private_->ui_.setupUi( this );
+  this->private_->ui_.setupUi( this );
   this->private_->ui_.horizontalSlider->setRange( 0, 100 );
   this->private_->ui_.horizontalSlider->setTickInterval( 10 );
   this->private_->ui_.horizontalSlider->setPageStep( 10 );
@@ -68,19 +68,25 @@ QtSliderDoubleCombo::QtSliderDoubleCombo( QWidget* parent ) :
   this->private_->ui_.max_->setFont( font );
   this->private_->ui_.spinBox->setFont( font );
 
-    this->connect( this->private_->ui_.horizontalSlider, SIGNAL( valueChanged( int ) ), 
-    this, SLOT( slider_signal( int ) ) );
-    this->connect( this->private_->ui_.spinBox, SIGNAL( valueChanged( double ) ), 
-    this, SLOT( spinner_signal( double ) ) );
+  this->connect( this->private_->ui_.horizontalSlider, SIGNAL( valueChanged( int ) ), 
+  this, SLOT( slider_signal( int ) ) );
+  this->connect( this->private_->ui_.spinBox, SIGNAL( valueChanged( double ) ), 
+  this, SLOT( spinner_signal( double ) ) );
 }
 
 QtSliderDoubleCombo::~QtSliderDoubleCombo()
 {
 }
   
-void QtSliderDoubleCombo::set_description( std::string description )
+void QtSliderDoubleCombo::set_description( const std::string& description )
 {
   this->private_->ui_.description_->setText( QString::fromStdString( description ) );
+}
+
+void QtSliderDoubleCombo::set_tooltip( const std::string& tooltip )
+{
+  this->private_->ui_.horizontalSlider->setToolTip( QString::fromStdString( tooltip ) );
+  this->private_->ui_.spinBox->setToolTip( QString::fromStdString( tooltip ) );
 }
 
 // signal from the spinner
