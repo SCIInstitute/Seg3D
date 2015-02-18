@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 
+-------------
+
+* Upgrade to ITK 4.5
+* Upgrade to freetype 2.5.3
+* Upgrade to zlib 1.2.8
+* Upgrade to glew 1.9.0
+
 Version 2.1.5
 -------------
 This version is primarily a bug fix release.
