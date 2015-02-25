@@ -88,7 +88,7 @@ ENDIF()
 
 SET(SEG3D_MAJOR_VERSION 2 CACHE INTERNAL "Major version number" FORCE)
 SET(SEG3D_MINOR_VERSION 1 CACHE INTERNAL "Minor version number" FORCE)
-SET(SEG3D_PATCH_VERSION 5 CACHE INTERNAL "Patch version number" FORCE)
+SET(SEG3D_PATCH_VERSION 6 CACHE INTERNAL "Patch version number" FORCE)
 
 ###########################################
 # APPLICATION Information
@@ -157,9 +157,8 @@ ADD_DEFINITIONS(-DBOOST_ALL_NO_LIB)
 ADD_DEFINITIONS(-DQT_NO_KEYWORDS)
 ADD_DEFINITIONS(-DTIXML_USE_STL)
   
-SET(ITK_BUILD_SHARED_LIBS "STATIC")
-SET(ITK_USE_REVIEW TRUE CACHE BOOLEAN "Seg3D requires the ITK Review directory for proper filter operations." FORCE)
-SET(ITK_USE_REVIEW_STATISTICS TRUE CACHE BOOLEAN "Seg3D requires the ITK Review directory for proper filter operations." FORCE)
+SET(ITK_BUILD_SHARED_LIBS OFF)
+SET(Module_ITKReview ON CACHE BOOLEAN "Seg3D requires the ITK Review directory for proper filter operations." FORCE)
 
 ###########################################
 # Flags for Microsoft Compiler
@@ -321,10 +320,8 @@ INCLUDE_DIRECTORIES(${SCI_TEEM_INCLUDE})
 INCLUDE_DIRECTORIES(${SCI_GLEW_INCLUDE})
 INCLUDE_DIRECTORIES(${SCI_GDCM_INCLUDE})
 INCLUDE_DIRECTORIES(${SCI_FREETYPE_INCLUDE})
-INCLUDE_DIRECTORIES(${SCI_ITK_INCLUDE})
 INCLUDE_DIRECTORIES(${SCI_TINYXML_INCLUDE})
 INCLUDE_DIRECTORIES(${SCI_MATLABIO_INCLUDE})
-INCLUDE_DIRECTORIES(${SCI_HDF5_INCLUDE})
 INCLUDE_DIRECTORIES(${SCI_SQLITE_INCLUDE})
 INCLUDE_DIRECTORIES(${SCI_MRC2000IO_INCLUDE})
 
@@ -335,6 +332,13 @@ IF(BUILD_WITH_PYTHON)
 ENDIF()
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
+
+###########################################
+# Set up ITK
+###########################################
+
+INCLUDE(${ITK_BINARY_DIR}/ITKConfig.cmake)
+INCLUDE( ${ITK_USE_FILE} )
 
 ###########################################
 # Generate a variable for registering all

@@ -129,7 +129,7 @@ SET(APPLICATION_FILTERS_ACTIONS_SRCS
   Actions/ActionPointSetTransformFilter.cc
   Actions/ActionSpeedlineImageFilter.h
   Actions/ActionSpeedlineImageFilter.cc
-  )
+)
 
 IF(BUILD_WITH_PYTHON)
   GENERATE_ACTION_PYTHON_WRAPPER(PYTHON_WRAPPER Application_Filters ${APPLICATION_FILTERS_ACTIONS_SRCS})
@@ -147,9 +147,10 @@ TARGET_LINK_LIBRARIES(Application_Filters
                       Application_Layer
                       Application_Project
                       Application_ProjectManager
-                      ${SCI_BOOST_LIBRARY})
+                      ${SCI_BOOST_LIBRARY}
+)
 
 # Register action classes
 REGISTER_LIBRARY_AND_CLASSES(Application_Filters
-               ${APPLICATION_FILTERS_ACTIONS_SRCS})
+  ${APPLICATION_FILTERS_ACTIONS_SRCS})
                     
