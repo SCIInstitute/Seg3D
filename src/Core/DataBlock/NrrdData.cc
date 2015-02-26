@@ -288,7 +288,7 @@ void NrrdData::set_transform( GridTransform& transform )
   // Set space origin and space direction
   this->private_->nrrd_->spaceDim = 3;
 
-  double transformArray[ Transform::TRANSFORM_LENGTH ];
+  double *transformArray = new double[ Transform::TRANSFORM_LENGTH ];
   transform.get( transformArray );
   for ( int p = 0; p < 3; p++ )
   {
@@ -298,9 +298,10 @@ void NrrdData::set_transform( GridTransform& transform )
       this->private_->nrrd_->axis[ q ].spaceDirection[ p ] = transformArray[ q + 4 * p ];
     }
   }
+  delete [] transformArray;
 
   for ( int p = 0; p < 3; p++ )
-  {
+    {
     for ( int q = 0; q < 3; q++ )
     {
       if ( p == q ) this->private_->nrrd_->measurementFrame[ p ][ q ] = 1.0;
