@@ -29,6 +29,8 @@
 #ifndef INTERFACE_APPLICATION_VIEWERINTERFACE_H
 #define INTERFACE_APPLICATION_VIEWERINTERFACE_H
 
+#ifndef Q_MOC_RUN
+
 // QT includes
 #include <QtGui/QWidget>
 #include <QtCore/QPointer>
@@ -41,6 +43,8 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/shared_ptr.hpp>
+
+#endif
 
 namespace Seg3D
 {

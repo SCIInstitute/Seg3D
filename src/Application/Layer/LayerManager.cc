@@ -39,6 +39,7 @@
 
 // Application includes
 #include <Application/Layer/LayerGroup.h>
+#include <Application/Layer/LargeVolumeLayer.h>
 #include <Application/Layer/MaskLayer.h>
 #include <Application/Layer/DataLayer.h>
 #include <Application/Layer/LayerScene.h>
@@ -480,8 +481,8 @@ void LayerManager::shift_active_layer( bool downward /*= false */ )
 
 LayerGroupHandle LayerManager::find_group( const std::string& group_id )
 {
-    lock_type lock( this->get_mutex() );
-    
+  lock_type lock( this->get_mutex() );
+  
   for( GroupList::iterator i = this->private_->group_list_.begin(); 
     i != this->private_->group_list_.end(); ++i )
   {
@@ -495,8 +496,8 @@ LayerGroupHandle LayerManager::find_group( const std::string& group_id )
 
 LayerGroupHandle LayerManager::find_group( ProvenanceID prov_id )
 {
-    lock_type lock( this->get_mutex() );
-    
+  lock_type lock( this->get_mutex() );
+  
   for( GroupList::iterator i = this->private_->group_list_.begin(); 
     i != this->private_->group_list_.end(); ++i )
   {
@@ -639,15 +640,15 @@ MaskLayerHandle LayerManager::find_mask_layer_by_id( const std::string& layer_id
 
 void LayerManager::get_groups( std::vector< LayerGroupHandle >& groups )
 {
-    lock_type lock( this->get_mutex() );
+  lock_type lock( this->get_mutex() );
   groups.insert( groups.begin(), this->private_->group_list_.begin(), 
     this->private_->group_list_.end() );
 }
 
 void LayerManager::get_layers( std::vector< LayerHandle >& layers )
 {
-    lock_type lock( this->get_mutex() );
-    
+  lock_type lock( this->get_mutex() );
+  
   for( GroupList::const_iterator i = 
     this->private_->group_list_.begin(); i != this->private_->group_list_.end(); ++i )
   {
@@ -810,6 +811,21 @@ LayerSceneHandle LayerManager::compose_layer_scene( size_t viewer_id )
           mask_layer_scene_item->fill_ = mask_layer->fill_state_->index();
           mask_layer_scene_item->show_isosurface_ = mask_layer->
             show_isosurface_state_->get();
+        }
+        break;
+      case Core::VolumeType::LARGE_DATA_E:
+        {
+          LargeVolumeLayer* lv_layer = dynamic_cast<LargeVolumeLayer*>(layer.get());
+          LargeVolumeLayerSceneItem* lv_layer_scene_item = new LargeVolumeLayerSceneItem;
+          layer_scene_item = LayerSceneItemHandle(lv_layer_scene_item);
+          lv_layer_scene_item->data_min_ = lv_layer->min_value_state_->get();
+          lv_layer_scene_item->data_max_ = lv_layer->max_value_state_->get();
+          lv_layer_scene_item->display_min_ = lv_layer->display_min_value_state_->get();
+          lv_layer_scene_item->display_max_ = lv_layer->display_max_value_state_->get();
+          if (lv_layer_scene_item->display_min_ > lv_layer_scene_item->display_max_)
+          {
+            std::swap(lv_layer_scene_item->display_min_, lv_layer_scene_item->display_max_);
+          }
         }
         break;
       default:
@@ -1589,6 +1605,26 @@ bool LayerManager::CreateAndLockDataLayer( Core::GridTransform transform, const 
   // Insert the layer into the layer manager.
   LayerManager::Instance()->insert_layer( layer, sandbox );
   
+  return true;
+}
+
+bool LayerManager::CreateCroppedLargeVolumeLayer( Core::LargeVolumeSchemaHandle schema,
+  const Core::GridTransform& crop_trans, const std::string& name,
+  LayerHandle& layer, const LayerMetaData& meta_data, SandboxID sandbox )
+{
+  // NOTE: Security check to keep the program logic sane
+  // Only the Application Thread guarantees that nothing is changed in the program
+  if ( !Core::Application::IsApplicationThread() )
+  {
+    CORE_THROW_LOGICERROR( "CreateAndLockDataLayer can only be called from the"
+      " application thread." );
+  }
+
+  layer.reset( new LargeVolumeLayer( name, schema, crop_trans ) );
+  layer->set_meta_data( meta_data );
+
+  LayerManager::Instance()->insert_layer( layer, sandbox );
+
   return true;
 }
 

@@ -44,9 +44,11 @@
 // Core includes
 #include <Core/State/Actions/ActionSet.h>
 #include <Core/Utils/Log.h>
+#include <Core/LargeVolume/LargeVolumeSchema.h>
 
 // Application includes
 #include <Application/LayerIO/LayerIO.h>
+#include <Application/LayerIO/Actions/ActionImportLargeVolumeLayer.h>
 #include <Application/Layer/LayerManager.h>
 #include <Application/ProjectManager/ProjectManager.h>
 #include <Application/LayerIO/Actions/ActionExportLayer.h>
@@ -59,6 +61,40 @@
 
 namespace Seg3D
 {
+
+bool LayerIOFunctions::ImportLargeVolume( QMainWindow* main_window  )
+{   
+  boost::filesystem::path current_file_folder = 
+    ProjectManager::Instance()->get_current_file_folder();
+            
+  QString dir = QFileDialog::getExistingDirectory( main_window,
+    current_file_folder.string().c_str() );
+        
+  if ( dir.isNull() || dir.isEmpty() )
+  {
+    return false;
+  }
+
+  Core::LargeVolumeSchemaHandle schema( new Core::LargeVolumeSchema );
+  schema->set_dir( dir.toStdString() );
+  std::string error;
+
+  if (! schema->load( error ) )
+  {
+        QMessageBox message_box( main_window );
+        message_box.setWindowTitle( "Import Layer Error" );
+        message_box.addButton( QMessageBox::Ok );
+        message_box.setIcon( QMessageBox::Critical );
+        message_box.setText( QString::fromStdString( error ) );
+        message_box.exec(); 
+        return false; 
+  }
+
+  ActionImportLargeVolumeLayer::Dispatch( Core::Interface::GetWidgetActionContext(), schema->get_dir().string() );
+
+  return true;
+}
+
 
 bool LayerIOFunctions::ImportFiles( QMainWindow* main_window, std::string file_to_open )
 {

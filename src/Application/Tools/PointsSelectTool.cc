@@ -174,7 +174,7 @@ const std::string PointsSelectTool::INDEX_UNITS_C( "index_units" );
 const std::string PointsSelectTool::WORLD_UNITS_C( "world_units" );
 
 PointsSelectTool::PointsSelectTool( const std::string& toolid ) :
-  SeedPointsTool( Core::VolumeType::ALL_E, toolid ),
+  SeedPointsTool( Core::VolumeType::ALL_REGULAR_E, toolid ),
   private_( new PointsSelectToolPrivate )
 {
   this->private_->tool_ = this;

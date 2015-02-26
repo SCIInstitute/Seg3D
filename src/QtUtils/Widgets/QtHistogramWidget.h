@@ -29,6 +29,8 @@
 #ifndef QTUTILS_WIDGETS_QTHISTOGRAMWIDGET_H
 #define QTUTILS_WIDGETS_QTHISTOGRAMWIDGET_H
 
+#ifndef Q_MOC_RUN
+
 // STL includes
 #include <vector>
 
@@ -43,6 +45,8 @@
 
 // QtUtils includes
 #include <QtUtils/Widgets/QtSliderDoubleCombo.h>
+
+#endif
 
 namespace QtUtils
 {

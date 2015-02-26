@@ -33,6 +33,8 @@
 # pragma once
 #endif 
 
+#ifndef Q_MOC_RUN
+
 // QT includes
 #include <QtCore/QVariant>
 #include <QtCore/QModelIndex>
@@ -42,6 +44,8 @@
 // include all the headers associated with the action engine
 #include <Core/Action/Actions.h>
 #include <Core/Action/ActionHistory.h>
+
+#endif
 
 namespace Seg3D
 {

@@ -259,7 +259,7 @@ bool ActionImportLayer::run( Core::ActionContextHandle& context, Core::ActionRes
     // Create an undo item for this action
     LayerUndoBufferItemHandle item( new LayerUndoBufferItem( "Import Layer" ) );
 
-    // Tell which action has to be re-executed to obtain the result
+    // Tell which action has to be re-executed to obtain the resulthandle_active_layer_changed
     item->set_redo_action( this->shared_from_this() );
 
     // Tell which provenance record to delete when undone

@@ -29,6 +29,8 @@
 #ifndef INTERFACE_APPLICATION_SPLASHSCREEN_H
 #define INTERFACE_APPLICATION_SPLASHSCREEN_H
 
+#ifndef Q_MOC_RUN
+
 // QT includes
 #include <QtCore/QPointer>
 #include <QtGui/QListWidgetItem>
@@ -41,6 +43,8 @@
 
 // Interface includes
 #include <Interface/Application/ProjectWizard.h>
+
+#endif
 
 namespace Seg3D
 {

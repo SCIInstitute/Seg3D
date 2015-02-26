@@ -511,7 +511,7 @@ bool LayerIO::FindFileSeries( std::vector<std::string >& filenames )
       start = j;
       while ( j < filename.size() && ( filename[ j ] >= '0' && filename[ j ] <= '9' ) ) j++;
       end = j;      
-      if ( start != end ) numbers.push_back( std::make_pair<size_t,size_t>( start, end ) );
+      if ( start != end ) numbers.push_back( std::make_pair( start, end ) );
     }
     
     std::vector<std::string> dir_files;

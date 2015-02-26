@@ -29,11 +29,15 @@
 #ifndef INTERFACE_APPLICATION_OVERLAYWIDGET_H
 #define INTERFACE_APPLICATION_OVERLAYWIDGET_H
 
+#ifndef Q_MOC_RUN
+
 // Boost includes
 #include <boost/shared_ptr.hpp>
 
 // Qt includes
 #include <QtGui/QWidget>
+
+#endif
 
 namespace Seg3D
 {

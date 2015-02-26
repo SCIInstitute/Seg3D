@@ -29,6 +29,8 @@
 #ifndef INTERFACE_TOOLINTERFACE_DETAIL_MEASUREMENTTABLEMODEL_H
 #define INTERFACE_TOOLINTERFACE_DETAIL_MEASUREMENTTABLEMODEL_H
 
+#ifndef Q_MOC_RUN
+
 // QT Includes
 #include <QtCore/QAbstractTableModel>
 #include <QtCore/QModelIndex>
@@ -39,6 +41,8 @@
 
 // Core includes
 #include <Core/Utils/EnumClass.h>
+
+#endif
 
 namespace Seg3D
 {

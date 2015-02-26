@@ -36,6 +36,7 @@
 
 #include <Core/Volume/DataVolume.h>
 #include <Core/Volume/DataVolumeSlice.h>
+#include <Core/Volume/LargeVolumeBrickSlice.h>
 #include <Core/Volume/MaskVolume.h>
 #include <Core/Volume/MaskVolumeSlice.h>
 
@@ -75,6 +76,25 @@ public:
   double display_min_;
   double display_max_;
   bool volume_rendered_;
+};
+
+class LargeVolumeLayerSceneItem : public LayerSceneItem
+{
+public:
+  LargeVolumeLayerSceneItem() {}
+  virtual ~LargeVolumeLayerSceneItem() {}
+
+  virtual Core::VolumeType type()
+  {
+    return Core::VolumeType::LARGE_DATA_E;
+  }
+
+public:
+  double data_min_;
+  double data_max_;
+  double display_min_;
+  double display_max_;
+  std::vector<Core::LargeVolumeBrickSliceHandle> tiles_;
 };
 
 class MaskLayerSceneItem : public LayerSceneItem

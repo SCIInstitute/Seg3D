@@ -37,6 +37,10 @@ namespace Core
 // By default, assume data is node-centered unless otherwise indicated.  Intended to match 
 // unu resample behavior.
 const bool GridTransform::DEFAULT_NODE_CENTERED_C = true;
+const Vector GridTransform::X_AXIS( 1.0, 0.0, 0.0 );
+const Vector GridTransform::Y_AXIS( 0.0, 1.0, 0.0 );
+const Vector GridTransform::Z_AXIS( 0.0, 0.0, 1.0 );
+const Point GridTransform::DEFAULT_ORIGIN( 0.0, 0.0, 0.0 );
 
 GridTransform::GridTransform() :
   nx_( 0 ), ny_( 0 ), nz_( 0 ), originally_node_centered_( DEFAULT_NODE_CENTERED_C )
@@ -114,9 +118,9 @@ void GridTransform::AlignToCanonicalCoordinates( const GridTransform& src_transf
   // Step 1. Align the transformation frame to axes
   Vector axes[ 3 ];
   std::vector< Vector > canonical_axes( 3 );
-  canonical_axes[ 0 ] = Vector( 1.0, 0.0, 0.0 );
-  canonical_axes[ 1 ] = Vector( 0.0, 1.0, 0.0 );
-  canonical_axes[ 2 ] = Vector( 0.0, 0.0, 1.0 );
+  canonical_axes[ 0 ] = X_AXIS;
+  canonical_axes[ 1 ] = Y_AXIS;
+  canonical_axes[ 2 ] = Z_AXIS;
   axes[ 0 ] = src_transform.project( canonical_axes[ 0 ] );
   axes[ 1 ] = src_transform.project( canonical_axes[ 1 ] );
   axes[ 2 ] = src_transform.project( canonical_axes[ 2 ] );
@@ -142,7 +146,7 @@ void GridTransform::AlignToCanonicalCoordinates( const GridTransform& src_transf
     canonical_axes.erase( canonical_axes.begin() + index );
   }
   
-  Point src_origin = src_transform.project( Point( 0.0, 0.0, 0.0 ) );
+  Point src_origin = src_transform.project( DEFAULT_ORIGIN );
   
   std::vector< size_t > src_size( 3 );
   src_size[ 0 ] = src_transform.get_nx();
@@ -231,7 +235,7 @@ bool ImportFromString( const std::string& str, GridTransform& value )
     value.set_nx( static_cast< size_t > ( values[ 0 ] ) );
     value.set_ny( static_cast< size_t > ( values[ 1 ] ) );
     value.set_nz( static_cast< size_t > ( values[ 2 ] ) );
-    value.transform().set( &values[ 3 ] );
+    value.set( &values[ 3 ] );
     return ( true );
   }
   return ( false );

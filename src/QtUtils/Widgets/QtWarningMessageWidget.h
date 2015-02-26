@@ -29,11 +29,15 @@
 #ifndef QTUTILS_WIDGETS_QTWARNINGMESSAGEWIDGET_H
 #define QTUTILS_WIDGETS_QTWARNINGMESSAGEWIDGET_H
 
+#ifndef Q_MOC_RUN
+
 // Boost includes
 #include <boost/shared_ptr.hpp>
 
 // QT includes
 #include <QtGui/QWidget>
+
+#endif
 
 namespace QtUtils
 {

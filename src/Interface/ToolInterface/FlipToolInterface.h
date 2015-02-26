@@ -29,6 +29,8 @@
 #ifndef INTERFACE_TOOLINTERFACE_FLIPTOOLINTERFACE_H
 #define INTERFACE_TOOLINTERFACE_FLIPTOOLINTERFACE_H
 
+#ifndef Q_MOC_RUN
+
 // Qt includes
 #include <QPointer>
 
@@ -37,6 +39,8 @@
 
 // Base class of the tool widget include
 #include <Interface/Application/ToolWidget.h>
+
+#endif
 
 namespace Seg3D
 {

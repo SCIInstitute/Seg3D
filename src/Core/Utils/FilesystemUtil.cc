@@ -44,7 +44,7 @@ bool CreateOrIgnoreDirectory( const boost::filesystem::path& dir_path )
   {
     try
     {
-      boost::filesystem::create_directory( dir_path );
+      boost::filesystem::create_directories( dir_path );
     }
     catch ( ... )
     {

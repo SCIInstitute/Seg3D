@@ -29,9 +29,13 @@
 #ifndef QTUTILS_WIDGETS_QTCUSTOMDIALOG_H
 #define QTUTILS_WIDGETS_QTCUSTOMDIALOG_H
 
+#ifndef Q_MOC_RUN
+
 // QT includes
 #include <QtGui/QDialog>
 #include <QtGui/QCloseEvent>
+
+#endif
 
 namespace QtUtils
 {

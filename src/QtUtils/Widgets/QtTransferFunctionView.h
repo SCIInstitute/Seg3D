@@ -29,7 +29,11 @@
 #ifndef QTUTILS_WIDGETS_QTTRANSFERFUNCTIONVIEW_H
 #define QTUTILS_WIDGETS_QTTRANSFERFUNCTIONVIEW_H
 
+#ifndef Q_MOC_RUN
+
 #include <QGraphicsView>
+
+#endif
 
 namespace QtUtils
 {

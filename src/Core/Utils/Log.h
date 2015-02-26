@@ -134,6 +134,11 @@ public:
 #define CORE_LOG_ERROR(message)\
 Core::Log::Instance()->post_error(message,__LINE__,__FILE__)
 
+#define CORE_PRINT_AND_LOG_ERROR(message)\
+std::cerr << "ERROR: " << message << std::endl; \
+Core::Log::Instance()->post_error(message,__LINE__,__FILE__)
+
+
 #define CORE_LOG_WARNING(message)\
 Core::Log::Instance()->post_warning(message,__LINE__,__FILE__)
 

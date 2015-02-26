@@ -33,6 +33,8 @@
 # pragma once
 #endif 
 
+#ifndef Q_MOC_RUN
+
 // STL includes
 #include <string>
 #include <deque>
@@ -44,6 +46,8 @@
 
 // Core includes
 #include <Core/Utils/Log.h>
+
+#endif
 
 namespace Seg3D
 {

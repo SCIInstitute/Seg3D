@@ -33,6 +33,8 @@
 # pragma once
 #endif
 
+#ifndef Q_MOC_RUN
+
 // Qt includes
 #include <QWidget>
 #include <QPointer>
@@ -42,6 +44,8 @@
 
 // Application Includes
 #include <Core/Action/ActionProgress.h>
+
+#endif
 
 namespace Seg3D
 {

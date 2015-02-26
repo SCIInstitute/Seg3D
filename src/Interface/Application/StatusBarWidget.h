@@ -33,6 +33,8 @@
 # pragma once
 #endif 
 
+#ifndef Q_MOC_RUN
+
 // Boost includes
 #include <boost/shared_ptr.hpp>
 #include <boost/bind.hpp>
@@ -48,6 +50,8 @@
 
 // Application includes
 #include <Application/StatusBar/StatusBar.h>
+
+#endif
 
 namespace Seg3D
 {

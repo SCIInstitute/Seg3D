@@ -225,7 +225,7 @@ const std::string ResampleTool::SIZE_OTHER_GROUP_C( "other_group" );
 const std::string ResampleTool::SIZE_MANUAL_C( "manual" );
 
 ResampleTool::ResampleTool( const std::string& toolid ) :
-  GroupTargetTool( Core::VolumeType::ALL_E, toolid ),
+  GroupTargetTool( Core::VolumeType::ALL_REGULAR_E, toolid ),
   private_( new ResampleToolPrivate )
 {
   this->private_->tool_ = this;

@@ -29,12 +29,16 @@
 #ifndef QTUTILS_BRIDGE_DETAIL_QTTRISTATETOOLBUTTONCONNECTOR_H
 #define QTUTILS_BRIDGE_DETAIL_QTTRISTATETOOLBUTTONCONNECTOR_H
 
+#ifndef Q_MOC_RUN
+
 #include <QPointer>
 
 #include <Core/State/StateOption.h>
 
 #include <QtUtils/Widgets/QtTristateToolButton.h>
 #include <QtUtils/Bridge/detail/QtConnectorBase.h>
+
+#endif
 
 namespace QtUtils
 {

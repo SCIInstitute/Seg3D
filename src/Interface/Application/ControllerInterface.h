@@ -33,6 +33,8 @@
 # pragma once
 #endif 
 
+#ifndef Q_MOC_RUN
+
 // Boost includes
 #include <boost/shared_ptr.hpp>
 
@@ -50,6 +52,8 @@
 #include <Core/Utils/ConnectionHandler.h>
 #include <Core/Utils/Log.h>
 #include <Core/Action/Actions.h>
+
+#endif
 
 namespace Seg3D
 {

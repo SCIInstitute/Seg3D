@@ -306,6 +306,9 @@ bool Layer::post_save_states( Core::StateIO& state_io )
   case Core::VolumeType::LABEL_E:
     layer_type = "label";
     break;
+  case Core::VolumeType::LARGE_DATA_E:
+    layer_type = "large";
+    break;
   default:
     CORE_LOG_ERROR( "Unknown layer type" );
     assert( false );

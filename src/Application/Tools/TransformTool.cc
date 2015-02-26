@@ -391,7 +391,7 @@ void TransformToolPrivate::resize( ViewerHandle viewer, int x0, int y0, int x1, 
 //////////////////////////////////////////////////////////////////////////
 
 TransformTool::TransformTool( const std::string& toolid ) :
-  GroupTargetTool( Core::VolumeType::ALL_E, toolid ),
+  GroupTargetTool( Core::VolumeType::ALL_REGULAR_E, toolid ),
   private_( new TransformToolPrivate )
 {
   this->private_->tool_ = this;

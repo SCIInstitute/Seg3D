@@ -29,6 +29,8 @@
 #ifndef INTERFACE_APPLICATION_TOOLWIDGET_H
 #define INTERFACE_APPLICATION_TOOLWIDGET_H
 
+#ifndef Q_MOC_RUN
+
 // QT Includes
 #include <QtGui/QWidget>
 #include <QtGui/QFrame>
@@ -36,6 +38,8 @@
 // Application includes
 #include <Application/Tool/ToolInterface.h>
 #include <Application/Tool/ToolFactory.h>
+
+#endif
 
 namespace Seg3D
 {

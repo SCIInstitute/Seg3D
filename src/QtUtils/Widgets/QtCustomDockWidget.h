@@ -29,6 +29,7 @@
 #ifndef QTUTILS_WIDGETS_QTCUSTOMDOCKWIDGET_H
 #define QTUTILS_WIDGETS_QTCUSTOMDOCKWIDGET_H
 
+#ifndef Q_MOC_RUN
 
 // Boost includes
 #include <boost/shared_ptr.hpp>
@@ -38,6 +39,8 @@
 #include <QtGui/QDockWidget>
 #include <QtGui/QCloseEvent>
 #include <QtGui/QKeyEvent>
+
+#endif
 
 namespace QtUtils
 {

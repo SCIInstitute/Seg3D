@@ -39,6 +39,8 @@ SET(CORE_UTILS_SRCS
   Exception.cc
   FilesystemUtil.h
   FilesystemUtil.cc
+  FileUtil.h
+  FileUtil.cc
   GenerationNumber.h
   GenerationNumber.cc
   IntrusiveBase.h

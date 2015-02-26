@@ -117,10 +117,6 @@ public:
     {
       result = boost::python::object( GetValueFromVarient< Core::Point >( v ) );
     }
-    //else if ( value_type == typeid( std::vector< bool > ) )
-    //{
-    //  result = boost::python::object( GetValueFromVarient< std::vector< bool > >( v ) );
-    //}
     else if ( value_type == typeid( std::vector< double > ) )
     {
       result = boost::python::object( GetValueFromVarient< std::vector< double > >( v ) );
@@ -153,8 +149,6 @@ void RegisterToPythonConverters()
 {
   boost::python::to_python_converter< std::vector< std::string >, 
     StdVectorToListConverter< std::string >, true >();
-  boost::python::to_python_converter< std::vector< bool >,
-    StdVectorToListConverter< bool >, true >();
   boost::python::to_python_converter< std::vector< double >,
     StdVectorToListConverter< double >, true >();
   boost::python::to_python_converter< std::vector< Core::Point >,

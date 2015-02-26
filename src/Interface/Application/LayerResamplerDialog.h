@@ -29,9 +29,13 @@
 #ifndef INTERFACE_APPLICATION_LAYERRESAMPLERDIALOG_H
 #define INTERFACE_APPLICATION_LAYERRESAMPLERDIALOG_H
 
+#ifndef Q_MOC_RUN
+
 #include <QDialog>
 
 #include <Application/Filters/LayerResampler.h>
+
+#endif
 
 namespace Seg3D
 {

@@ -29,11 +29,15 @@
 #ifndef INTERFACE_TOOLINTERFACE_DETAIL_MEASUREMENTITEMDELEGATE_H
 #define INTERFACE_TOOLINTERFACE_DETAIL_MEASUREMENTITEMDELEGATE_H
 
+#ifndef Q_MOC_RUN
+
 // Boost includes
 #include <boost/shared_ptr.hpp>
 
 // Qt includes
 #include <QtGui/QItemDelegate>
+
+#endif
 
 namespace Seg3D
 {

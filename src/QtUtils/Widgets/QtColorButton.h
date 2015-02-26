@@ -29,11 +29,15 @@
 #ifndef QTUTILS_WIDGETS_QTCOLORBUTTON_H
 #define QTUTILS_WIDGETS_QTCOLORBUTTON_H
 
+#ifndef Q_MOC_RUN
+
 // QT includes
 #include <QtGui/QToolButton>
 
 // Core includes
 #include <Core/Geometry/Color.h>
+
+#endif
 
 namespace QtUtils
 {

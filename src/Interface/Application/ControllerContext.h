@@ -33,11 +33,15 @@
 # pragma once
 #endif 
 
+#ifndef Q_MOC_RUN
+
 // Include all action related classes
 #include <Core/Action/Actions.h>
 
 // Include interface code
 #include <Interface/Application/ControllerInterface.h>
+
+#endif
 
 namespace Seg3D
 {

@@ -29,6 +29,8 @@
 #ifndef INTERFACE_APPLICATION_MESSAGEHISTORYWIDGET_H
 #define INTERFACE_APPLICATION_MESSAGEHISTORYWIDGET_H
 
+#ifndef Q_MOC_RUN
+
 // QT includes
 #include <QtCore/QPointer>
 
@@ -43,6 +45,8 @@
 
 // Core includes
 #include <Core/Utils/ConnectionHandler.h>
+
+#endif
 
 namespace Seg3D
 {

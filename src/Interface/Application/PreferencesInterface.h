@@ -29,6 +29,8 @@
 #ifndef INTERFACE_APPLICATION_PREFERENCESINTERFACE_H
 #define INTERFACE_APPLICATION_PREFERENCESINTERFACE_H
 
+#ifndef Q_MOC_RUN
+
 // Boost includes
 #include <boost/shared_ptr.hpp>
 
@@ -44,6 +46,8 @@
 
 // QtUtils includes
 #include <QtUtils/Widgets/QtCustomDialog.h>
+
+#endif
 
 namespace Seg3D
 {

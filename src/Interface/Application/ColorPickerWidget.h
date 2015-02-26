@@ -29,6 +29,8 @@
 #ifndef INTERFACE_APPLICATION_COLORPICKERWIDGET_H
 #define INTERFACE_APPLICATION_COLORPICKERWIDGET_H
 
+#ifndef Q_MOC_RUN
+
 // Boost includes
 #include <boost/shared_ptr.hpp>
 
@@ -37,7 +39,7 @@
 
 #include <QtGui/QWidget>
 
-
+#endif
 
 namespace Seg3D
 {

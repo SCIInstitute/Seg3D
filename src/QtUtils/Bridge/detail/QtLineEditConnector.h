@@ -29,6 +29,8 @@
 #ifndef QTUTILS_BRIDGE_DETAIL_QTLINEEDITCONNECTOR_H
 #define QTUTILS_BRIDGE_DETAIL_QTLINEEDITCONNECTOR_H
 
+#ifndef Q_MOC_RUN
+
 #include <QLineEdit>
 #include <QPointer>
 
@@ -36,6 +38,8 @@
 #include <Core/State/StateName.h>
 
 #include <QtUtils/Bridge/detail/QtConnectorBase.h>
+
+#endif
 
 namespace QtUtils
 {

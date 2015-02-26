@@ -33,8 +33,12 @@
 # pragma once
 #endif
 
+#ifndef Q_MOC_RUN
+
 #include <QtCore/QObject>
 #include <QAction>
+
+#endif
 
 namespace Seg3D
 {

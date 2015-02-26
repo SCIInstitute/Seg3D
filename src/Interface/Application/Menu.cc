@@ -248,6 +248,14 @@ void Menu::create_file_menu( QMenuBar* menubar )
     QtUtils::QtBridge::Connect( qaction, 
       boost::bind( &LayerIOFunctions::ImportSeries, this->main_window_ ) );
 
+
+    // == Import Layer From Image Series... ==
+    qaction = qmenu->addAction( tr( "Import Large Volume File...") );
+    qaction->setShortcut( tr( "Ctrl+Shift+L" ) );
+    qaction->setToolTip( tr( "Import pregenerated large volume file." ) );
+    qaction->setEnabled( file_import );
+    QtUtils::QtBridge::Connect( qaction, 
+      boost::bind( &LayerIOFunctions::ImportLargeVolume, this->main_window_ ) );
   }
   qmenu->addSeparator();
 

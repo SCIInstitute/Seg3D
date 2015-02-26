@@ -37,7 +37,7 @@ namespace Seg3D
 {
 
 FlipTool::FlipTool( const std::string& toolid ) :
-  GroupTargetTool( Core::VolumeType::ALL_E, toolid )
+  GroupTargetTool( Core::VolumeType::ALL_REGULAR_E, toolid )
 {
   this->add_state( "replace", this->replace_state_, false );
 }

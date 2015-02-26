@@ -154,6 +154,12 @@ public:
   bool create_and_lock_data_layer( const Core::GridTransform& grid_trans, 
     LayerHandle src_layer, LayerHandle& dst_layer );
 
+  /// CREATE_CROPPED_LARGE_VOLUME_LAYER:
+  /// Create a cropped version of the soure large volume layer.
+  /// NOTE: This function can only be run from the application thread
+  bool create_cropped_large_volume_layer( const Core::GridTransform& crop_trans,
+    LayerHandle src_layer, LayerHandle& dst_layer );
+
   /// CREATE_AND_LOCK_MASK_LAYER_FROM_LAYER:
   /// Create a new mask layer with the same dimensions as another layer, the layer is immediately
   /// locked as it does not contain any data and will be in the creating state.

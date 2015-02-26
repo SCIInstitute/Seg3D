@@ -29,6 +29,8 @@
 #ifndef INTERFACE_APPLICATION_PROJECTWIZARD_H
 #define INTERFACE_APPLICATION_PROJECTWIZARD_H
 
+#ifndef Q_MOC_RUN
+
 //Qt includes
 #include <QtGui/QWizard>
 #include <QtGui/QLabel>
@@ -36,6 +38,8 @@
 #include <QtGui/QPushButton>
 #include <QtGui/QCheckBox>
 #include <QtGui/QFileDialog>
+
+#endif
 
 namespace Seg3D
 {

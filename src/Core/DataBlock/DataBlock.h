@@ -307,6 +307,16 @@ public:
   /// Clone the data in a datablock by generating a new one and copying the data into it.
   static bool Duplicate( const DataBlockHandle& src_data_block, DataBlockHandle& dst_data_block ); 
   
+  // PAD:
+  // Clone the data in a datablock by generating a new one and copying the data into it.
+  static bool Pad( DataBlockHandle src_data_block, DataBlockHandle& dst_data_block,
+        int pad = 1, double pad_value = 0.0 );
+
+  // CLIP:
+  // Clone the data in a datablock by generating a new one and copying the data into it.
+  static bool Clip( DataBlockHandle src_data_block, DataBlockHandle& dst_data_block,
+        int width, int height, int depth, double fill_value = 0.0 );
+
   // ISBIGENDIAN
   /// Check whether current architecture is big endian
   static bool IsBigEndian();

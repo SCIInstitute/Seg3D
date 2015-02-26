@@ -121,7 +121,7 @@ void RolloverLogFilePrivate::rollover_log_files()
       {
         // Log files are identified as starting with app name and ending with .log
         if( boost::algorithm::starts_with( itr->path().filename().string(), 
-          Application::GetApplicationName() ) && boost::filesystem::extension( itr->path() ) == ".log" ) 
+          Application::GetUtilName() ) && boost::filesystem::extension( itr->path() ) == ".log" )
         {
           std::time_t file_write_time = boost::filesystem::last_write_time( itr->path() );
           std::time_t current_time = std::time( 0 );
@@ -228,7 +228,7 @@ RolloverLogFile::RolloverLogFile( unsigned int log_flags ) :
     release_name += "_";
   }
 
-  this->private_->log_file_prefix_ = Application::GetApplicationName() + "_" + release_name  
+  this->private_->log_file_prefix_ = Application::GetUtilName() + "_" + release_name
     + Application::GetVersion();
 
   // Rollover log files if needed, and create new log file

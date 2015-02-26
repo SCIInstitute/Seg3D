@@ -29,8 +29,12 @@
 #ifndef QTUTILS_WIDGETS_SINGLESHOTTOOLBUTTON_H
 #define QTUTILS_WIDGETS_SINGLESHOTTOOLBUTTON_H
 
+#ifndef Q_MOC_RUN
+
 // Qt includes
 #include <QToolButton>
+
+#endif
 
 namespace QtUtils
 {

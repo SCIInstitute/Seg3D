@@ -29,8 +29,12 @@
 #ifndef QTUTILS_WIDGETS_QTTRANSFERFUNCTIONCONTROLPOINT_H
 #define QTUTILS_WIDGETS_QTTRANSFERFUNCTIONCONTROLPOINT_H
 
+#ifndef Q_MOC_RUN
+
 #include <QObject>
 #include <QGraphicsEllipseItem>
+
+#endif
 
 namespace QtUtils
 {

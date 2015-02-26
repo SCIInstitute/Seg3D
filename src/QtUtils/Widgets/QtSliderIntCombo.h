@@ -29,11 +29,15 @@
 #ifndef QTUTILS_WIDGETS_QTSLIDERINTCOMBO_H
 #define QTUTILS_WIDGETS_QTSLIDERINTCOMBO_H
 
+#ifndef Q_MOC_RUN
+
 // QT Includes
 #include <QWidget>
 
 // Boost includes
 #include <boost/shared_ptr.hpp>
+
+#endif
 
 namespace QtUtils 
 {

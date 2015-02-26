@@ -75,6 +75,8 @@ public:
   /// NOTE: This function should only be called in the application thread.
   void reset();
 
+
+
   // -- Command line parser --
 public:
   // IS_COMMAND_LINE_PARAMETERS:
@@ -85,17 +87,24 @@ public:
   /// if so it returns the value as a string
   bool check_command_line_parameter( const std::string& key, std::string& value );
 
+    // GET_ARGUMANT:
+    /// Get the argument (required parameter)
+    std::string get_argument(int idx);
+
   // SET_PARAMETER:
   /// put parameters from the command line into a map
   void set_command_line_parameter( const std::string& key, const std::string& value );
 
   // PARSE_COMMAND_LINE_PARAMETERS:
   /// parse parameters from the command line
-  void parse_command_line_parameters( int argc, char** argv );
+  void parse_command_line_parameters( int argc, char** argv, int num_arguments = 0 );
 
 private:
   typedef std::map< std::string, std::string > parameters_type;
   parameters_type parameters_;
+    
+    typedef std::vector<std::string> arguments_type;
+    arguments_type arguments_;
 
   // -- Log information on the current executable --
 public:
@@ -255,6 +264,14 @@ public:
   /// Get the information that should be shown in the about screen
   static std::string GetAbout();
   
+  // GETUTILNAME:
+  /// Get the name of the utility
+  static std::string GetUtilName();
+
+  // SETUTILNAME:
+  /// Set the name of the utility
+  static void SetUtilName(const std::string& name);
+
 };
 
 } // end namespace Core

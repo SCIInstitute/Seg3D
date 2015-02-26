@@ -53,6 +53,7 @@
 //Application Includes
 #include <Application/ViewerManager/ViewerManager.h>
 #include <Application/Layer/DataLayer.h>
+#include <Application/Layer/LargeVolumeLayer.h>
 #include <Application/Layer/LayerGroup.h>
 #include <Application/Layer/MaskLayer.h>
 #include <Application/Layer/LayerManager.h>
@@ -145,6 +146,7 @@ public:
   LayerHandle layer_;
   
   // Icons
+  QIcon large_data_layer_icon_;
   QIcon data_layer_icon_;
   QIcon label_layer_icon_;
   QIcon mask_layer_icon_; 
@@ -212,7 +214,9 @@ void LayerWidgetPrivate::update_appearance( bool locked, bool active, bool in_us
   // Update the background color inside the icon
   switch( this->get_volume_type() )
   {
-  case Core::VolumeType::DATA_E:
+
+    case Core::VolumeType::LARGE_DATA_E:
+    case Core::VolumeType::DATA_E:
     {
       if ( locked )
       {
@@ -225,24 +229,11 @@ void LayerWidgetPrivate::update_appearance( bool locked, bool active, bool in_us
       }
     }
     break;
-  case Core::VolumeType::MASK_E:
+    case Core::VolumeType::MASK_E:
     {
       int color_index =  dynamic_cast< MaskLayer* >( 
         this->layer_.get() )->color_state_->get();
       this->parent_->set_mask_background_color( color_index );
-    }
-    break;
-  case Core::VolumeType::LABEL_E:
-    {
-      if ( locked )
-      {
-        this->ui_.type_->setStyleSheet( 
-          StyleSheet::LAYER_WIDGET_BACKGROUND_LOCKED_C );
-      }
-      else
-      {
-        this->ui_.type_->setStyleSheet( StyleSheet::LABEL_VOLUME_COLOR_C );
-      }
     }
     break;
   }
@@ -567,6 +558,8 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   this->private_->data_layer_icon_.addFile( QString::fromUtf8( ":/Images/DataWhite.png" ), 
     QSize(), QIcon::Normal, QIcon::Off );
   this->private_->mask_layer_icon_.addFile( QString::fromUtf8( ":/Images/MaskWhite_shadow.png" ), 
+    QSize(), QIcon::Normal, QIcon::Off );
+  this->private_->large_data_layer_icon_.addFile( QString::fromUtf8( ":/Images/LargeWhite.png" ), 
     QSize(), QIcon::Normal, QIcon::Off );
 
   // Update the style sheet of this widget
@@ -909,7 +902,58 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
         }
       }
       break;
+
+      case Core::VolumeType::LARGE_DATA_E:
+      {
+        // Update the icons
+        this->private_->activate_button_->setIcon(this->private_->large_data_layer_icon_);
+      
+        // Hide the buttons that are not needed for this widget
+        this->private_->ui_.compute_iso_surface_button_->hide();
+        this->private_->ui_.delete_iso_surface_button_->hide();
+        this->private_->ui_.show_iso_surface_button_->hide();
+        this->private_->ui_.iso_control_separator_line_->hide();
+        this->private_->ui_.border_->hide();
+        this->private_->ui_.fill_->hide();
+        this->private_->ui_.mask_volume_widget_->hide();
+        this->private_->ui_.colors_->hide();
+        this->private_->ui_.isosurface_area_widget_->hide();
         
+        // Add the layer specific connections
+        LargeVolumeLayer* data_layer = dynamic_cast< LargeVolumeLayer* >( layer.get() );
+        if ( data_layer )
+        {
+          QtUtils::QtBridge::Connect( this->private_->ui_.brightness_adjuster_, 
+            data_layer->brightness_state_ );
+          QtUtils::QtBridge::Connect( this->private_->ui_.contrast_adjuster_, 
+            data_layer->contrast_state_ );
+          QtUtils::QtBridge::Connect( this->private_->ui_.datatype_label_,
+            data_layer->data_type_state_ );
+          QtUtils::QtBridge::Connect( this->private_->ui_.min_label_,
+            data_layer->min_value_state_ );
+          QtUtils::QtBridge::Connect( this->private_->ui_.max_label_,
+            data_layer->max_value_state_ );
+          QtUtils::QtBridge::Connect( this->private_->ui_.display_max_adjuster_,
+            data_layer->display_max_value_state_ );
+          QtUtils::QtBridge::Connect( this->private_->ui_.display_min_adjuster_,
+            data_layer->display_min_value_state_ );
+          QtUtils::QtBridge::Connect( this->private_->ui_.adjust_minmax_checkbox_,
+            data_layer->adjust_display_min_max_state_ );
+          QtUtils::QtBridge::Show( this->private_->ui_.brightness_, 
+            data_layer->adjust_display_min_max_state_, true );
+          QtUtils::QtBridge::Show( this->private_->ui_.contrast_, 
+            data_layer->adjust_display_min_max_state_, true );
+          QtUtils::QtBridge::Show( this->private_->ui_.display_max_, 
+            data_layer->adjust_display_min_max_state_ );
+          QtUtils::QtBridge::Show( this->private_->ui_.display_min_, 
+            data_layer->adjust_display_min_max_state_ );
+      
+          connect( this->private_->ui_.reset_brightness_contrast_button_, 
+            SIGNAL( clicked() ), this, SLOT( set_brightness_contrast_to_default() ) );
+        }
+      }
+      break;
+
       // This is for the Mask Layers  
       case Core::VolumeType::MASK_E:
       {
@@ -1332,10 +1376,13 @@ void LayerWidget::contextMenuEvent( QContextMenuEvent * event )
 
   QMenu menu( this );
   QAction* qaction;
-  qaction = menu.addAction( tr( "Duplicate Layer" ) );
-  QtUtils::QtBridge::Connect( qaction,
+  if ( this->private_->layer_->get_type() != Core::VolumeType::LARGE_DATA_E )
+  {
+    qaction = menu.addAction( tr( "Duplicate Layer" ) );
+    QtUtils::QtBridge::Connect( qaction,
     boost::bind( &ActionDuplicateLayer::Dispatch, Core::Interface::GetWidgetActionContext(), 
     this->private_->layer_->get_layer_id() ) );
+  }
 
   if ( data_state != Layer::IN_USE_C  )
   {
@@ -1343,38 +1390,40 @@ void LayerWidget::contextMenuEvent( QContextMenuEvent * event )
     connect( qaction, SIGNAL( triggered() ), this, SLOT( delete_layer_from_context_menu() ) );
   }
 
-  QMenu* export_menu;
-  export_menu = new QMenu( this );
-    
-  export_menu->setTitle( tr( "Export Data As..." ) );
-  qaction = export_menu->addAction( tr( "DICOM" ) );
-  connect( qaction, SIGNAL( triggered() ), this, SLOT( export_dicom() ) );
-
-  if ( this->private_->layer_->get_type() == Core::VolumeType::MASK_E )
+  if ( this->private_->layer_->get_type() != Core::VolumeType::LARGE_DATA_E )
   {
+    QMenu* export_menu;
+    export_menu = new QMenu( this );
+    
+    export_menu->setTitle( tr( "Export Data As..." ) );
+    qaction = export_menu->addAction( tr( "DICOM" ) );
+    connect( qaction, SIGNAL( triggered() ), this, SLOT( export_dicom() ) );
+
+    if ( this->private_->layer_->get_type() == Core::VolumeType::MASK_E )
+    {
     export_menu->setTitle( tr( "Export Segmentation As..." ) );
     
     qaction = export_menu->addAction( tr( "BITMAP" ) );
     connect( qaction, SIGNAL( triggered() ), this, SLOT( export_bitmap() ) );
+    }
+
+    qaction = export_menu->addAction( tr( "NRRD" ) );
+    connect( qaction, SIGNAL( triggered() ), this, SLOT( export_nrrd() ) );
+
+    qaction = export_menu->addAction( tr( "MATLAB" ) );
+    connect( qaction, SIGNAL( triggered() ), this, SLOT( export_matlab() ) );
+
+    qaction = export_menu->addAction( tr( "PNG" ) );
+    connect( qaction, SIGNAL( triggered() ), this, SLOT( export_png() ) );
+
+    qaction = export_menu->addAction( tr( "TIFF" ) );
+    connect( qaction, SIGNAL( triggered() ), this, SLOT( export_tiff() ) );
+
+    qaction = export_menu->addAction( tr( "MRC" ) );
+    connect( qaction, SIGNAL( triggered() ), this, SLOT( export_mrc() ) );
+
+    menu.addMenu( export_menu );
   }
-
-  qaction = export_menu->addAction( tr( "NRRD" ) );
-  connect( qaction, SIGNAL( triggered() ), this, SLOT( export_nrrd() ) );
-
-  qaction = export_menu->addAction( tr( "MATLAB" ) );
-  connect( qaction, SIGNAL( triggered() ), this, SLOT( export_matlab() ) );
-
-  qaction = export_menu->addAction( tr( "PNG" ) );
-  connect( qaction, SIGNAL( triggered() ), this, SLOT( export_png() ) );
-
-  qaction = export_menu->addAction( tr( "TIFF" ) );
-  connect( qaction, SIGNAL( triggered() ), this, SLOT( export_tiff() ) );
-
-  qaction = export_menu->addAction( tr( "MRC" ) );
-  connect( qaction, SIGNAL( triggered() ), this, SLOT( export_mrc() ) );
-
-  menu.addMenu( export_menu );
-
 
   if ( this->private_->layer_->get_type() == Core::VolumeType::MASK_E )
   {

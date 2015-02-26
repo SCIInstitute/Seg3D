@@ -40,7 +40,7 @@ namespace Seg3D
 {
 
 InvertTool::InvertTool( const std::string& toolid ) :
-  SingleTargetTool( Core::VolumeType::ALL_E, toolid )
+  SingleTargetTool( Core::VolumeType::ALL_REGULAR_E, toolid )
 {
   this->add_state( "replace", this->replace_state_, false );
 }

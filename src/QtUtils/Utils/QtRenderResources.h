@@ -37,8 +37,10 @@
 #include <GL/glew.h>
 
 // Qt includes
+#undef __GLEW_H__
 #include <QtOpenGL>
 #include <QPointer>
+#define __GLEW_H__
 
 // Application includes
 #include <Core/RenderResources/RenderResourcesContext.h>

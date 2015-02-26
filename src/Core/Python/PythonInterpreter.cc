@@ -310,7 +310,7 @@ void PythonInterpreter::initialize_eventhandler()
   this->private_->thread_condition_variable_.notify_one();
 }
 
-void PythonInterpreter::initialize( wchar_t* program_name, const module_list_type& init_list )
+void PythonInterpreter::initialize( const wchar_t* program_name, const module_list_type& init_list )
 {
   CORE_LOG_DEBUG( "Initializing Python ..." );
   this->private_->program_name_ = program_name;

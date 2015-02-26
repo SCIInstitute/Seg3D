@@ -29,9 +29,12 @@
 #ifndef INTERFACE_APPLICATION_DROPSPACEWIDGET_H
 #define INTERFACE_APPLICATION_DROPSPACEWIDGET_H
 
+#ifndef Q_MOC_RUN
+
 // QT includes
 #include <QtGui/QWidget>
 
+#endif
 
 namespace Seg3D
 {

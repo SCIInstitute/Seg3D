@@ -33,6 +33,8 @@
 #pragma once
 #endif 
 
+#ifndef Q_MOC_RUN
+
 // Qt includes
 #include <QtGui/QMainWindow>
 #include <QtGui/QDockWidget>
@@ -49,6 +51,8 @@
 
 #include <Core/Action/Actions.h>
 #include <Core/Utils/ConnectionHandler.h>
+
+#endif
 
 namespace Seg3D
 {

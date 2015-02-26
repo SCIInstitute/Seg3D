@@ -29,9 +29,13 @@
 #ifndef QTUTILS_BRIDGE_DETAIL_QTCONNECTORBASE_H
 #define QTUTILS_BRIDGE_DETAIL_QTCONNECTORBASE_H
 
+#ifndef Q_MOC_RUN
+
 #include <QObject>
 
 #include <Core/Utils/ConnectionHandler.h>
+
+#endif
 
 namespace QtUtils
 {

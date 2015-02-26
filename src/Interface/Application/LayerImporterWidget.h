@@ -33,6 +33,8 @@
 # pragma once
 #endif
 
+#ifndef Q_MOC_RUN
+
 // Qt includes
 #include <QtCore/QPointer>
 #include <QtGui/QDialog>
@@ -42,6 +44,8 @@
 
 // Application Includes
 #include <Application/LayerIO/LayerImporter.h>
+
+#endif
 
 namespace Seg3D
 {

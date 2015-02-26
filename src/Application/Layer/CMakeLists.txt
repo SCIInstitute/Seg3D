@@ -60,6 +60,8 @@ SET(APPLICATION_LAYER_SRCS
   LayerRecreationUndoBufferItem.cc
   ProvenanceScript.h
   ProvenanceScript.cc
+  LargeVolumeLayer.h
+  LargeVolumeLayer.cc
 )
 
 SET(APPLICATION_LAYER_ACTIONS_SRCS

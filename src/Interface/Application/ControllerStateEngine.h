@@ -33,6 +33,8 @@
 # pragma once
 #endif 
 
+#ifndef Q_MOC_RUN
+
 // STL includes
 #include <string>
 
@@ -40,6 +42,8 @@
 #include <QtCore/QAbstractTableModel>
 #include <QtCore/QObject>
 #include <QtCore/QVariant>
+
+#endif
 
 namespace Seg3D
 {

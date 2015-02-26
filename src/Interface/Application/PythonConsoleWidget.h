@@ -33,6 +33,8 @@
 # pragma once
 #endif 
 
+#ifndef Q_MOC_RUN
+
 // Boost includes
 #include <boost/shared_ptr.hpp>
 
@@ -45,6 +47,8 @@
 #include <Core/Action/Actions.h>
 
 #include <QtUtils/Widgets/QtCustomDialog.h>
+
+#endif
 
 namespace Seg3D
 {

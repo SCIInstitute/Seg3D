@@ -40,6 +40,8 @@
 #include <Core/Geometry/Point.h>
 #include <Core/Geometry/Vector.h>
 #include <Core/Geometry/Path.h>
+#include <Core/Geometry/BBox.h>
+#include <Core/Geometry/GridTransform.h>
 
 namespace Core
 {
@@ -84,6 +86,12 @@ typedef boost::weak_ptr< StateString > StateStringWeakHandle;
 
 typedef StateValue< Path > StateSpeedlinePath;
 typedef boost::shared_ptr< StateSpeedlinePath > StateSpeedlinePathHandle;
+
+typedef StateValue< BBox > StateBBox;
+typedef boost::shared_ptr< StateBBox > StateBBoxHandle;
+
+typedef StateValue< GridTransform > StateGridTransform;
+typedef boost::shared_ptr< StateGridTransform > StateGridTransformHandle;
 
 // Definition of the templated StateValue class
 

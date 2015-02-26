@@ -29,8 +29,12 @@
 #ifndef QTUTILS_WIDGETS_QTTRANSFERFUNCTIONEDGE_H
 #define QTUTILS_WIDGETS_QTTRANSFERFUNCTIONEDGE_H
 
+#ifndef Q_MOC_RUN
+
 #include <QObject>
 #include <QGraphicsLineItem>
+
+#endif
 
 namespace QtUtils
 {

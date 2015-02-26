@@ -29,6 +29,8 @@
 #ifndef QTUTILS_BRIDGE_DETAIL_QTCOMBOBOXCONNECTOR_H
 #define QTUTILS_BRIDGE_DETAIL_QTCOMBOBOXCONNECTOR_H
 
+#ifndef Q_MOC_RUN
+
 #include <QComboBox>
 #include <QPointer>
 
@@ -36,6 +38,8 @@
 #include <Core/State/StateOption.h>
 
 #include <QtUtils/Bridge/detail/QtConnectorBase.h>
+
+#endif
 
 namespace QtUtils
 {

@@ -33,6 +33,8 @@
 # pragma once
 #endif 
 
+#ifndef Q_MOC_RUN
+
 // Qt includes
 #include <QPointer>
 #include <QMenuBar>
@@ -42,6 +44,8 @@
 // Core Includes
 #include <Core/Utils/ConnectionHandler.h>
 #include <Core/Action/Actions.h>
+
+#endif
 
 namespace Seg3D
 {

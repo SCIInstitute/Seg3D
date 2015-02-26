@@ -29,12 +29,16 @@
 #ifndef QTUTILS_BRIDGE_DETAIL_QTLOGSLIDERINTCOMBOCONNECTOR_H
 #define QTUTILS_BRIDGE_DETAIL_QTLOGSLIDERINTCOMBOCONNECTOR_H
 
+#ifndef Q_MOC_RUN
+
 #include <QPointer>
 
 #include <Core/State/StateRangedValue.h>
 
 #include <QtUtils/Widgets/QtLogSliderIntCombo.h>
 #include <QtUtils/Bridge/detail/QtConnectorBase.h>
+
+#endif
 
 namespace QtUtils
 {

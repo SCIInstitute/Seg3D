@@ -46,6 +46,12 @@ SET(CORE_VOLUME_SRCS
   DataVolumeSlice.cc
   DataVolumeBrick.h
   DataVolumeBrick.cc
+  LargeVolume.h
+  LargeVolume.cc
+  LargeVolumeSlice.h
+  LargeVolumeSlice.cc
+  LargeVolumeBrickSlice.h
+  LargeVolumeBrickSlice.cc
   )
 
 CORE_ADD_LIBRARY(Core_Volume ${CORE_VOLUME_SRCS} )
@@ -54,6 +60,7 @@ TARGET_LINK_LIBRARIES(Core_Volume
                       Core_Utils
             Core_DataBlock
             Core_Graphics
+            Core_LargeVolume
                       ${SCI_TEEM_LIBRARY}
                       ${SCI_BOOST_LIBRARY})
 

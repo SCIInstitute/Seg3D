@@ -29,6 +29,8 @@
 #ifndef QTUTILS_BRIDGE_DETAIL_QTENABLECONNECTOR_H
 #define QTUTILS_BRIDGE_DETAIL_QTENABLECONNECTOR_H
 
+#ifndef Q_MOC_RUN
+
 #include <QObject>
 #include <QPointer>
 #include <QAction>
@@ -40,6 +42,8 @@
 // Qt Utils includes
 #include <QtUtils/Widgets/QtHistogramWidget.h>
 #include <QtUtils/Bridge/detail/QtConnectorBase.h>
+
+#endif
 
 namespace QtUtils
 {

@@ -29,6 +29,8 @@
 #ifndef INTERFACE_APPLICATION_VIEWERWIDGET_H
 #define INTERFACE_APPLICATION_VIEWERWIDGET_H
 
+#ifndef Q_MOC_RUN
+
 // QT includes
 #include <QWidget>
 #include <QPointer>
@@ -47,6 +49,8 @@
 
 // Application includes
 #include <Application/Viewer/Viewer.h>
+
+#endif
 
 namespace Seg3D
 {
