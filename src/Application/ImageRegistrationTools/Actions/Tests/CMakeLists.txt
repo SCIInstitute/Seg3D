@@ -3,7 +3,7 @@
 # 
 #  The MIT License
 # 
-#  Copyright (c) 2009 Scientific Computing and Imaging Institute,
+#  Copyright (c) 2013 Scientific Computing and Imaging Institute,
 #  University of Utah.
 # 
 #  
@@ -26,6 +26,17 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
-ADD_SUBDIRECTORY(Application)
-ADD_SUBDIRECTORY(ToolInterface)
-#ADD_SUBDIRECTORY(ImageRegistrationInterface)
+SET(APPLICATION_IRTOOLS_ACTIONS_TESTS_SRCS
+  ActionAssembleFilterTests.cc
+  ActionFFTFilterTests.cc
+  ActionRefineTranslateFilterTests.cc
+)
+
+REGISTER_UNIT_TEST(Application_ImageRegistrationTools_Actions_Tests
+  ${APPLICATION_IRTOOLS_ACTIONS_TESTS_SRCS}
+)
+
+TARGET_LINK_LIBRARIES(Application_ImageRegistrationTools_Actions_Tests
+  Application_ImageRegistrationTools
+  ${SCI_GTESTMAIN_LIBRARY}
+)

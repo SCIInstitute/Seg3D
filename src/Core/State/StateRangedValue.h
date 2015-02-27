@@ -60,6 +60,9 @@ typedef boost::shared_ptr< StateRangedDouble > StateRangedDoubleHandle;
 typedef StateRangedValue< int > StateRangedInt;
 typedef boost::shared_ptr< StateRangedInt > StateRangedIntHandle;
 
+typedef StateRangedValue< unsigned int > StateRangedUInt;
+typedef boost::shared_ptr< StateRangedUInt > StateRangedUIntHandle;
+  
 // Class StateValueBase:
 /// This pure virtual class defines an extra interface that StateValue provides.
 class StateRangedValueBase : public StateBase
