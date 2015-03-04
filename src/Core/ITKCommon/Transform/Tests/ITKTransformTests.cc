@@ -29,9 +29,9 @@
 #include <gtest/gtest.h>
 
 
-#include <Core/ITKCommon/itkCascadedTransform.h>
-#include <Core/ITKCommon/itkRBFTransform.h>
-#include <Core/ITKCommon/itkRadialDistortionTransform.h>
+#include <Core/ITKCommon/Transform/itkCascadedTransform.h>
+#include <Core/ITKCommon/Transform/itkRBFTransform.h>
+#include <Core/ITKCommon/Transform/itkRadialDistortionTransform.h>
 
 // TODO: get more test parameters from ITK unit tests
 TEST(ITKCascadedTransform, ITKTransformTests)

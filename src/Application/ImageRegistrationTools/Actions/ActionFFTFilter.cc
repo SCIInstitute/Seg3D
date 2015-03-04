@@ -257,7 +257,7 @@ ActionFFTFilter::run( Core::ActionContextHandle& context, Core::ActionResultHand
       // Just save out the one image to a file.
       std::vector<affine_transform_t::Pointer> affine(1);
       identity_transform_t::Pointer identity = identity_transform_t::New();
-      affine[0] = setup_transform<image_t>(image[0], identity);
+      affine[0] = setup_transform<image_t>(image[0], identity, 0);
       
       save_mosaic<affine_transform_t>
       (fout, this->pixel_spacing_, this->use_standard_mask_, in, affine);

@@ -1799,7 +1799,7 @@ layout_mosaic(// multi-resolution image tiles and tile masks,
     identity_transform_t::Pointer identity = identity_transform_t::New();
     affine[best_target] =
       setup_transform<TImage>(tile_pyramid[high_res_level][best_target],
-          identity);
+          identity, 0);
   }
 
   // setup the metric transform parameter masks:
