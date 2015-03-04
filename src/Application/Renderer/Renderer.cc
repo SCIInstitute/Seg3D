@@ -738,37 +738,6 @@ bool RendererPrivate::render_volume_view( ViewerHandle viewer, const Core::Color
 
   CORE_CHECK_OPENGL_ERROR();
 
-  if (draw_slices)
-  {
-    Core::Matrix modelview_matrix, mvp_matrix;
-    glGetDoublev( GL_PROJECTION_MATRIX, mvp_matrix.data() );
-    glGetDoublev( GL_MODELVIEW_MATRIX, modelview_matrix.data() );
-    mvp_matrix = mvp_matrix * modelview_matrix;
-    Core::Transform mvp_trans;
-    mvp_trans.load_matrix( mvp_matrix );
-
-    this->slice_shader_->enable();
-    this->slice_shader_->set_lighting( with_lighting );
-    this->slice_shader_->set_fog( with_fog );
-    this->slice_shader_->set_fog_range( static_cast< float >( znear ),
-      static_cast< float >( zfar ) );
-    this->draw_slices_3d( bbox, mvp_trans, layer_scenes, depths, view_modes );
-    this->slice_shader_->disable();
-    CORE_CHECK_OPENGL_ERROR();
-  }
-
-  if (draw_isosurfaces)
-  {
-    this->isosurface_shader_->enable();
-    this->isosurface_shader_->set_lighting( with_lighting );
-    this->isosurface_shader_->set_fog( with_fog );
-    this->isosurface_shader_->set_fog_range( static_cast< float >( znear ),
-      static_cast< float >( zfar ) );
-    this->draw_isosurfaces( isosurfaces );
-    this->isosurface_shader_->disable();
-    CORE_CHECK_OPENGL_ERROR();
-  }
-
   if (draw_bbox)
   {
     glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
@@ -798,6 +767,37 @@ bool RendererPrivate::render_volume_view( ViewerHandle viewer, const Core::Color
     glVertex3d( corner1[ 0 ], corner2[ 1 ], corner2[ 2 ] );
     glEnd();
     glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+  }
+
+  if (draw_slices)
+  {
+    Core::Matrix modelview_matrix, mvp_matrix;
+    glGetDoublev( GL_PROJECTION_MATRIX, mvp_matrix.data() );
+    glGetDoublev( GL_MODELVIEW_MATRIX, modelview_matrix.data() );
+    mvp_matrix = mvp_matrix * modelview_matrix;
+    Core::Transform mvp_trans;
+    mvp_trans.load_matrix( mvp_matrix );
+
+    this->slice_shader_->enable();
+    this->slice_shader_->set_lighting( with_lighting );
+    this->slice_shader_->set_fog( with_fog );
+    this->slice_shader_->set_fog_range( static_cast< float >( znear ),
+      static_cast< float >( zfar ) );
+    this->draw_slices_3d( bbox, mvp_trans, layer_scenes, depths, view_modes );
+    this->slice_shader_->disable();
+    CORE_CHECK_OPENGL_ERROR();
+  }
+
+  if (draw_isosurfaces)
+  {
+    this->isosurface_shader_->enable();
+    this->isosurface_shader_->set_lighting( with_lighting );
+    this->isosurface_shader_->set_fog( with_fog );
+    this->isosurface_shader_->set_fog_range( static_cast< float >( znear ),
+      static_cast< float >( zfar ) );
+    this->draw_isosurfaces( isosurfaces );
+    this->isosurface_shader_->disable();
+    CORE_CHECK_OPENGL_ERROR();
   }
 
   // NOTE: Volume rendering should happen the last
