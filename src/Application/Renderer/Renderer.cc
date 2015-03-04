@@ -88,6 +88,7 @@ class IsosurfaceRecord
 {
 public:
   Core::Color color_;
+  float opacity_;
   Core::IsosurfaceHandle isosurface_;
 };
 typedef boost::shared_ptr< IsosurfaceRecord > IsosurfaceRecordHandle;
@@ -877,8 +878,8 @@ void RendererPrivate::process_isosurfaces( IsosurfaceArray& isosurfaces )
       if ( mask_layer->show_isosurface_state_->get() )
       {
         IsosurfaceRecord* iso_record = new IsosurfaceRecord;
-        iso_record->color_ = PreferencesManager::Instance()->get_color( 
-          mask_layer->color_state_->get() );
+        iso_record->color_ = PreferencesManager::Instance()->get_color( mask_layer->color_state_->get() );
+        iso_record->opacity_ = layers[i]->opacity_state_->get();
         iso_record->isosurface_ = mask_layer->get_isosurface();
         isosurfaces.push_back( IsosurfaceRecordHandle( iso_record ) );
       }
@@ -891,7 +892,7 @@ void RendererPrivate::draw_isosurfaces( const IsosurfaceArray& isosurfaces )
   bool use_colormap = false;
 
   this->isosurface_shader_->set_use_colormap( use_colormap  );
-//  glEnable( GL_CULL_FACE );
+  // glEnable( GL_CULL_FACE );
 
   size_t num_of_isosurfaces = isosurfaces.size();
   for ( size_t i = 0; i < num_of_isosurfaces; ++i )
@@ -901,8 +902,9 @@ void RendererPrivate::draw_isosurfaces( const IsosurfaceArray& isosurfaces )
     {
       continue;
     }
-    glColor3d( isosurfaces[ i ]->color_.r() / 255.0, isosurfaces[ i ]->color_.g() / 255.0, 
-      isosurfaces[ i ]->color_.b() / 255.0 );
+                this->isosurface_shader_->set_opacity( isosurfaces[ i ]->opacity_ );
+                glColor4d( isosurfaces[ i ]->color_.r() / 255.0, isosurfaces[ i ]->color_.g() / 255.0,
+                        isosurfaces[ i ]->color_.b() / 255.0, isosurfaces[ i ]->opacity_ );
     Core::ColorMapHandle colormap = iso->get_color_map();
     if( use_colormap && iso->get_color_map().get() != 0 )
     {
@@ -933,7 +935,7 @@ void RendererPrivate::draw_orientation_arrows( const Core::View3D& view_3d )
   // Set the viewport to the top right corner of the scene
   int dimension = Core::Min( this->renderer_->width_, this->renderer_->height_ );
   dimension /= 5;
-  glViewport( this->renderer_->width_ - dimension, 
+  glViewport( this->renderer_->width_ - dimension,
     this->renderer_->height_ - dimension, dimension, dimension );
 
   // Compute the orientation of the axes

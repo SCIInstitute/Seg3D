@@ -12,17 +12,17 @@ void compute_lighting();
 void compute_fog_depth();
 
 void main()
-{ 
+{
   if ( enable_lighting )
   {
     compute_lighting();
   }
-  
+
   if ( enable_fog )
   {
     compute_fog_depth();
   }
-  
+
   gl_TexCoord[0] = gl_MultiTexCoord0;
   gl_TexCoord[1] = gl_MultiTexCoord1;
   gl_FrontColor = gl_Color;

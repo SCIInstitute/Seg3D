@@ -53,6 +53,7 @@ public:
   void set_val_range( float val_range );
   void set_fog( bool enabled );
   void set_fog_range( float znear, float zfar );
+  void set_opacity( float opacity );
 
 protected:
   virtual bool get_vertex_shader_source( std::string& source );
@@ -68,6 +69,7 @@ private:
   int val_range_loc_;
   int enable_fog_loc_;
   int fog_range_loc_;
+  int opacity_loc_;
 };
 
 } // end namespace Seg3D

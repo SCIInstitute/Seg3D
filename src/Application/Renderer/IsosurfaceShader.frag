@@ -5,6 +5,7 @@ uniform bool use_colormap;
 uniform sampler1D colormap;
 varying float normalized_value;
 uniform bool enable_fog;
+uniform float opacity;
 
 vec4 compute_lighting();
 float compute_fog_factor();
@@ -20,6 +21,8 @@ void main()
   {
     color = gl_Color;
   }
+
+  color.a = opacity;
 
   if ( enable_lighting )
   {

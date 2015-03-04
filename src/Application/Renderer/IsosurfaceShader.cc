@@ -84,6 +84,7 @@ bool IsosurfaceShader::post_initialize()
   this->val_range_loc_ = this->get_uniform_location( "val_range" );
   this->enable_fog_loc_ = this->get_uniform_location( "enable_fog" );
   this->fog_range_loc_ = this->get_uniform_location( "fog_range" );
+  this->opacity_loc_ = this->get_uniform_location( "opacity" );
   this->disable();
   return true;
 }
@@ -121,6 +122,11 @@ void IsosurfaceShader::set_fog( bool enabled )
 void IsosurfaceShader::set_fog_range( float znear, float zfar )
 {
   glUniform2f( this->fog_range_loc_, znear, zfar );
+}
+  
+void IsosurfaceShader::set_opacity( float opacity )
+{
+  glUniform1f( this->opacity_loc_, opacity );
 }
 
 } // end namespace Seg3D
