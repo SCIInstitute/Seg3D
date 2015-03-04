@@ -46,7 +46,6 @@ INCLUDE( CTest )
 IF(BUILD_TESTING)
   ENABLE_TESTING()
   INCLUDE(CMake/RegisterUnitTest.cmake)
-  INCLUDE_DIRECTORIES( ${SCI_GTEST_INCLUDE} )
 ENDIF()
 
 ###########################################
@@ -229,6 +228,8 @@ ENDIF()
 
 ###########################################
 # Configure python
+###########################################
+
 OPTION(BUILD_WITH_PYTHON "Build with python support." ON)
 IF(BUILD_WITH_PYTHON)
   ADD_DEFINITIONS(-DBUILD_WITH_PYTHON 
@@ -236,6 +237,15 @@ IF(BUILD_WITH_PYTHON)
           -DBOOST_PYTHON_STATIC_MODULE
           -DBOOST_PYTHON_STATIC_LIB)
 ENDIF()
+
+###########################################
+# Configure advanced features:
+#   * large volume (bricked dataset) support
+#   * mosaicing tools
+###########################################
+
+OPTION(BUILD_LARGE_VOLUME_TOOLS "Build with large volume (bricked) dataset support." OFF)
+OPTION(BUILD_MOSAIC_TOOLS "Build with mosaicing tool support." OFF)
 
 ###########################################
 # External packages other than Qt
@@ -337,6 +347,11 @@ IF(BUILD_WITH_PYTHON)
   INCLUDE(CMake/GenerateActionPythonWrapper.cmake)
 ENDIF()
 
+IF(BUILD_TESTING)
+  INCLUDE_DIRECTORIES( ${SCI_GTEST_INCLUDE} )
+ENDIF()
+
+
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 
 ###########################################
@@ -386,8 +401,10 @@ ADD_SUBDIRECTORY(Core)
 MESSAGE(STATUS "Configuring Seg3D Application")
 ADD_SUBDIRECTORY(Application)
 
-MESSAGE(STATUS "Configuring Seg3D Utils")
-ADD_SUBDIRECTORY(Utils)
+IF(BUILD_LARGE_VOLUME_TOOLS)
+  MESSAGE(STATUS "Configuring Large Volume tools")
+  ADD_SUBDIRECTORY(LargeVolumeUtils)
+ENDIF()
 
 MESSAGE(STATUS "Configuring Seg3D Interface")
 IF(SEG3D_BUILD_INTERFACE)
