@@ -183,8 +183,6 @@ void PreferencesManager::initialize_states()
   this->add_state( "embed_input_files_state", this->embed_input_files_state_, true );
   this->add_state( "generate_osx_project_bundle_state", this->generate_osx_project_bundle_state_, true );
 
-
-  
   this->add_state( "reverse_slice_navigation", this->reverse_slice_navigation_state_, false );
   this->add_state( "zero_based_slice_numbers", this->zero_based_slice_numbers_state_, false );
   this->add_state( "active_layer_navigation", this->active_layer_navigation_state_, true );
@@ -217,6 +215,8 @@ void PreferencesManager::initialize_states()
   this->add_state( "show_projectmanager_bar", this->show_projectmanager_bar_state_, true );
   this->add_state( "show_provenance_bar", this->show_provenance_bar_state_, false );
   this->add_state( "show_rendering_bar", this->show_rendering_bar_state_, false );
+
+  this->add_state( "enable_large_volume", this->enable_large_volume_state_, false );
 
   this->add_connection( this->axis_labels_option_state_->value_changed_signal_.connect(
     boost::bind( &PreferencesManagerPrivate::handle_axis_labels_option_changed, 

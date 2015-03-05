@@ -127,7 +127,7 @@ SET(INTERFACE_APPLICATION_MOC_SRCS
 IF(BUILD_WITH_PYTHON)
   SET(INTERFACE_APPLICATION_SRCS ${INTERFACE_APPLICATION_SRCS} PythonConsoleWidget.cc)
   SET(INTERFACE_APPLICATION_MOC_SRCS ${INTERFACE_APPLICATION_MOC_SRCS} PythonConsoleWidget.h)
-ENDIF(BUILD_WITH_PYTHON)
+ENDIF()
 
 SET(INTERFACE_APPLICATION_NO_MOC_SRCS
   ControllerContext.h
@@ -198,54 +198,54 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 ##################################################
 
 CORE_ADD_LIBRARY(Interface_Application 
-            ${INTERFACE_APPLICATION_SRCS} 
-            ${INTERFACE_APPLICATION_QT_UI_SRCS}
-            ${INTERFACE_APPLICATION_QT_MOC_SRCS}
-            ${INTERFACE_APPLICATION_NO_MOC_SRCS} 
-            ${INTERFACE_APPLICATION_MOC_SRCS}
-            ${INTERFACE_APPLICATION_QT_RCC_SRCS})
+  ${INTERFACE_APPLICATION_SRCS} 
+  ${INTERFACE_APPLICATION_QT_UI_SRCS}
+  ${INTERFACE_APPLICATION_QT_MOC_SRCS}
+  ${INTERFACE_APPLICATION_NO_MOC_SRCS} 
+  ${INTERFACE_APPLICATION_MOC_SRCS}
+  ${INTERFACE_APPLICATION_QT_RCC_SRCS})
 
 IF(APPLE)
-TARGET_LINK_LIBRARIES(Interface_Application
-                      Core_Utils
-                      Core_EventHandler
-                      Core_Action
-                      Core_Interface
-                      Core_State
-            Application_Project
-            Application_ProjectManager
-                  Application_Renderer
-                      Application_Tool
-                      Application_ToolManager
-                      Application_Tools
-                      Application_LayerIO
-                      QtUtils_Utils
-                      QtUtils_Widgets
-            QtUtils_Bridge
-                      ${QT_LIBRARIES} 
-                      ${SCI_BOOST_LIBRARY}
-            /System/Library/Frameworks/CoreServices.framework)
-ELSE(APPLE)
-TARGET_LINK_LIBRARIES(Interface_Application
-                      Core_Utils
-                      Core_EventHandler
-                      Core_Action
-                      Core_Interface
-                      Core_State
-            Application_Project
-            Application_ProjectManager
-                  Application_Renderer
-                      Application_Tool
-                      Application_ToolManager
-                      Application_Tools
-                      Application_LayerIO
-                      QtUtils_Utils
-                      QtUtils_Widgets
-            QtUtils_Bridge
-                      ${QT_LIBRARIES} 
-                      ${SCI_BOOST_LIBRARY})
-ENDIF(APPLE)
+  TARGET_LINK_LIBRARIES(Interface_Application
+    Core_Utils
+    Core_EventHandler
+    Core_Action
+    Core_Interface
+    Core_State
+    Application_Project
+    Application_ProjectManager
+    Application_Renderer
+    Application_Tool
+    Application_ToolManager
+    Application_Tools
+    Application_LayerIO
+    QtUtils_Utils
+    QtUtils_Widgets
+    QtUtils_Bridge
+    ${QT_LIBRARIES} 
+    ${SCI_BOOST_LIBRARY}
+    /System/Library/Frameworks/CoreServices.framework)
+ELSE()
+  TARGET_LINK_LIBRARIES(Interface_Application
+    Core_Utils
+    Core_EventHandler
+    Core_Action
+    Core_Interface
+    Core_State
+    Application_Project
+    Application_ProjectManager
+    Application_Renderer
+    Application_Tool
+    Application_ToolManager
+    Application_Tools
+    Application_LayerIO
+    QtUtils_Utils
+    QtUtils_Widgets
+    QtUtils_Bridge
+    ${QT_LIBRARIES} 
+    ${SCI_BOOST_LIBRARY})
+ENDIF()
 
 IF(BUILD_WITH_PYTHON)
   TARGET_LINK_LIBRARIES(Interface_Application Core_Python)
-ENDIF(BUILD_WITH_PYTHON)
+ENDIF()

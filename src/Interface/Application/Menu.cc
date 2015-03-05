@@ -47,6 +47,7 @@
 #include <Application/Tool/ToolFactory.h>
 #include <Application/ToolManager/ToolManager.h>
 #include <Application/Layer/LayerManager.h>
+#include <Application/PreferencesManager/PreferencesManager.h>
 #include <Application/ProjectManager/ProjectManager.h>
 #include <Application/ToolManager/Actions/ActionOpenTool.h>
 #include <Application/ViewerManager/ViewerManager.h>
@@ -130,7 +131,8 @@ Menu::Menu( QMainWindow* parent ) :
 
     // Check what type of layer is active
     this->enable_disable_mask_actions( mask_layer_found );
-    this->enable_disable_data_layer_actions( active_data_layer_found ); 
+    this->enable_disable_data_layer_actions( active_data_layer_found );
+    this->show_hide_large_volume_actions( PreferencesManager::Instance()->enable_large_volume_state_->get() );
 
     // Automatically update the recent file list in the menu
     this->add_connection( ProjectManager::Instance()->recent_projects_changed_signal_.connect( 
@@ -149,6 +151,9 @@ Menu::Menu( QMainWindow* parent ) :
 
     this->add_connection( LayerManager::Instance()->layer_data_changed_signal_.connect( 
       boost::bind( &Menu::EnableDisableLayerActions, qpointer_type( this ) ) ) );
+
+    this->add_connection( PreferencesManager::Instance()->enable_large_volume_state_->state_changed_signal_.connect(
+      boost::bind( &Menu::ShowHideLargeVolume, qpointer_type( this ) ) ) );
 
     // Automatically update the tag in the undo menu    
     this->add_connection( UndoBuffer::Instance()->update_undo_tag_signal_.connect(
@@ -250,11 +255,12 @@ void Menu::create_file_menu( QMenuBar* menubar )
 
 
     // == Import Layer From Image Series... ==
-    qaction = qmenu->addAction( tr( "Import Large Volume File...") );
-    qaction->setShortcut( tr( "Ctrl+Shift+L" ) );
-    qaction->setToolTip( tr( "Import pregenerated large volume file." ) );
-    qaction->setEnabled( file_import );
-    QtUtils::QtBridge::Connect( qaction, 
+    this->import_large_volume_qaction_ = qmenu->addAction( tr( "Import Large Volume File...") );
+    this->import_large_volume_qaction_->setShortcut( tr( "Ctrl+Shift+L" ) );
+    this->import_large_volume_qaction_->setToolTip( tr( "Import pregenerated large volume file." ) );
+    this->import_large_volume_qaction_->setEnabled( file_import );
+    this->import_large_volume_qaction_->setVisible( false );
+    QtUtils::QtBridge::Connect( this->import_large_volume_qaction_, 
       boost::bind( &LayerIOFunctions::ImportLargeVolume, this->main_window_ ) );
   }
   qmenu->addSeparator();
@@ -273,7 +279,7 @@ void Menu::create_file_menu( QMenuBar* menubar )
   this->export_active_data_layer_qaction_->setToolTip( tr( "Export the active data layer to file." ) );
   QtUtils::QtBridge::Connect( this->export_active_data_layer_qaction_, 
     boost::bind( &LayerIOFunctions::ExportLayer, this->main_window_ ) );
-  this->export_active_data_layer_qaction_->setEnabled( false ); 
+  this->export_active_data_layer_qaction_->setEnabled( false );
     
   qmenu->addSeparator();
     
@@ -294,17 +300,17 @@ void Menu::create_edit_menu( QMenuBar* menubar )
   QMenu* qmenu = menubar->addMenu( tr( "&Edit" ) );
   
   // == Undo ==
-  this->undo_action_ = qmenu->addAction( tr( "Undo" ) );
-  this->undo_action_->setShortcut( tr( "Ctrl+Z" ) );
-  this->undo_action_->setToolTip( tr( "Undo last action that modified the layers" ) );
-    QtUtils::QtBridge::Connect( this->undo_action_ , boost::bind(
+  this->undo_qaction_ = qmenu->addAction( tr( "Undo" ) );
+  this->undo_qaction_->setShortcut( tr( "Ctrl+Z" ) );
+  this->undo_qaction_->setToolTip( tr( "Undo last action that modified the layers" ) );
+    QtUtils::QtBridge::Connect( this->undo_qaction_ , boost::bind(
       &ActionUndo::Dispatch, Core::Interface::GetWidgetActionContext() ) );
 
   // == Redo ==
-  this->redo_action_ = qmenu->addAction( tr( "Redo" ) );
-  this->redo_action_->setShortcut( tr( "Shift+Ctrl+Z" ) );
-  this->redo_action_->setToolTip( tr( "Redo last action that modified the layers" ) );
-  QtUtils::QtBridge::Connect( this->redo_action_ , boost::bind(
+  this->redo_qaction_ = qmenu->addAction( tr( "Redo" ) );
+  this->redo_qaction_->setShortcut( tr( "Shift+Ctrl+Z" ) );
+  this->redo_qaction_->setToolTip( tr( "Redo last action that modified the layers" ) );
+  QtUtils::QtBridge::Connect( this->redo_qaction_ , boost::bind(
       &ActionRedo::Dispatch, Core::Interface::GetWidgetActionContext() ) );
       
   qmenu->addSeparator();    
@@ -674,21 +680,21 @@ void Menu::open_project()
     QString::fromStdString( project_file_type ) ) ).toStdString() ); 
 
 #else
-        // It seems Ubuntus Qt4 version is broken and its dialog tends to crash
-        // Hence use the other way of defining a dialog
-        QFileDialog* diag = new QFileDialog( this->main_window_,
-            QString::fromStdString( project_type ), 
-            QString::fromStdString( current_projects_path.string() ), 
-            QString::fromStdString( project_file_type ) );
-        diag->setFileMode(QFileDialog::ExistingFile);
-        diag->exec();
-        
-        QList<QString> files = diag->selectedFiles();
-        if ( files.count() )
-        {
-            full_path =  boost::filesystem::path( files[ 0 ].toStdString() );
-        }
-        delete diag;
+    // It seems Ubuntus Qt4 version is broken and its dialog tends to crash
+    // Hence use the other way of defining a dialog
+    QFileDialog* diag = new QFileDialog( this->main_window_,
+        QString::fromStdString( project_type ), 
+        QString::fromStdString( current_projects_path.string() ), 
+        QString::fromStdString( project_file_type ) );
+    diag->setFileMode(QFileDialog::ExistingFile);
+    diag->exec();
+    
+    QList<QString> files = diag->selectedFiles();
+    if ( files.count() )
+    {
+        full_path =  boost::filesystem::path( files[ 0 ].toStdString() );
+    }
+    delete diag;
 #endif
 
 
@@ -908,6 +914,11 @@ void Menu::enable_disable_data_layer_actions( bool active_data_layer_found )
   this->export_active_data_layer_qaction_->setEnabled( active_data_layer_found );
 }
 
+void Menu::show_hide_large_volume_actions( bool large_volume_visible )
+{
+  this->import_large_volume_qaction_->setVisible( large_volume_visible );
+}
+
 void Menu::save_project()
 {
   ProjectHandle current_project = ProjectManager::Instance()->get_current_project();
@@ -959,6 +970,15 @@ void Menu::SetRecentFileList( qpointer_type qpointer )
     &Menu::set_recent_file_list, qpointer.data() ) ) );
 }
 
+void Menu::ShowHideLargeVolume( qpointer_type qpointer )
+{
+  // This function should be called from the application thread
+  ASSERT_IS_APPLICATION_THREAD();
+
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
+    &Menu::show_hide_large_volume_actions, qpointer.data(), PreferencesManager::Instance()->enable_large_volume_state_->get() ) ) );
+}
+
 void Menu::EnableDisableLayerActions( qpointer_type qpointer )
 {
   // This function should be called from the application thread
@@ -1008,14 +1028,14 @@ void Menu::update_undo_tag( std::string tag )
 {
   if ( tag == "" )
   {
-    this->undo_action_->setEnabled( false );
-    this->undo_action_->setText( "Undo" );
+    this->undo_qaction_->setEnabled( false );
+    this->undo_qaction_->setText( "Undo" );
   }
   else
   {
-    this->undo_action_->setEnabled( true );
+    this->undo_qaction_->setEnabled( true );
     QString text = QString( "Undo " ) + QString::fromStdString( tag );
-    this->undo_action_->setText( text );    
+    this->undo_qaction_->setText( text );   
   }   
 }
 
@@ -1029,14 +1049,14 @@ void Menu::update_redo_tag( std::string tag )
 {
   if ( tag == "" )
   {
-    this->redo_action_->setEnabled( false );
-    this->redo_action_->setText( "Redo" );
+    this->redo_qaction_->setEnabled( false );
+    this->redo_qaction_->setText( "Redo" );
   }
   else
   {
-    this->redo_action_->setEnabled( true );
+    this->redo_qaction_->setEnabled( true );
     QString text = QString( "Redo " ) + QString::fromStdString( tag );
-    this->redo_action_->setText( text );    
+    this->redo_qaction_->setText( text );   
   }
 }   
 

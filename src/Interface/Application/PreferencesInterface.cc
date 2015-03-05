@@ -88,7 +88,8 @@ PreferencesInterface::PreferencesInterface( QWidget *parent ) :
   this->setup_general_prefs();
   this->setup_viewer_prefs();
   this->setup_sidebar_prefs();
-  this->setup_interface_controls_prefs();
+//  this->setup_interface_controls_prefs();
+  this->setup_large_volume_prefs();
 
   //Hide the interface controls since they arent connected yet
   this->private_->ui_.prefs_tabs_->removeTab( 3 );
@@ -299,7 +300,7 @@ void PreferencesInterface::setup_sidebar_prefs()
 //    PreferencesManager::Instance()->show_history_bar_state_->get() );
   
   // Connect Sidebars Preferences
-  QtUtils::QtBridge::Connect( this->private_->ui_.tools_filters_checkbox_, 
+  QtUtils::QtBridge::Connect( this->private_->ui_.tools_filters_checkbox_,
     PreferencesManager::Instance()->show_tools_bar_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.layer_manager_checkbox_, 
     PreferencesManager::Instance()->show_layermanager_bar_state_ );
@@ -352,12 +353,19 @@ void PreferencesInterface::setup_sidebar_prefs()
   }
   
 }
-  
-void PreferencesInterface::setup_interface_controls_prefs()
+
+// TODO: feasible to set up?
+//void PreferencesInterface::setup_interface_controls_prefs()
+//{
+//  //Interface Controls Preferences  
+//}
+
+void PreferencesInterface::setup_large_volume_prefs()
 {
-  //Interface Controls Preferences  
+  this->private_->ui_.large_volume_checkbox_->setChecked( PreferencesManager::Instance()->enable_large_volume_state_->get() );
+  QtUtils::QtBridge::Connect( this->private_->ui_.large_volume_checkbox_, PreferencesManager::Instance()->enable_large_volume_state_ );
 }
-  
+
 void PreferencesInterface::set_autosave_checked_state( bool state )
 {
   Core::ActionSet::Dispatch( Core::Interface::GetKeyboardActionContext(),

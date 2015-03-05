@@ -77,8 +77,10 @@ private:
   QAction* paste_qaction_;
   QAction* punch_qaction_;
   
-  QAction* undo_action_;
-  QAction* redo_action_;
+  QAction* undo_qaction_;
+  QAction* redo_qaction_;
+
+  QAction* import_large_volume_qaction_;
   
   // Keep a pointer to the main window
   QMainWindow*  main_window_;
@@ -124,7 +126,11 @@ private:
 
   /// ENABLE_DISABLE_LAYER_ACTIONS:
   /// Switch on/off export options depending on what is available
-  void enable_disable_mask_actions( bool mask_layer_found );  
+  void enable_disable_mask_actions( bool mask_layer_found );
+
+  /// SHOW_HIDE_LARGE_VOLUME_ACTIONS:
+  /// Show or hide large volume menus (doesn't include Tools).
+  void show_hide_large_volume_actions( bool large_volume_visible );
   
   /// ENABLE_DISABLE_DATA_LAYER_ACTIONS:
   /// switches off the export options based on whether or not the active layer is a data layer
@@ -147,6 +153,10 @@ public:
   /// ENABLEDISABLELAYERACTIONS:
   /// this function is called when new layers are added or layers are deleted
   static void EnableDisableLayerActions( qpointer_type qpointer );
+
+  /// SHOWHIDELARGEVOLUME:
+  /// toggle visibility of large volume menu items
+  static void ShowHideLargeVolume( qpointer_type qpointer );
 
   /// UPDATEUNDOTAG
   /// This function is called when there is a new undo tag

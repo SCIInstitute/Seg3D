@@ -57,7 +57,11 @@ class PreferencesManager : public Core::StateHandler
 private:
   PreferencesManager();
   virtual ~PreferencesManager();
-  
+
+//public:
+//  typedef boost::signals2::signal< void() > enable_large_volume_signal_type;
+//  enable_large_volume_signal_type enable_large_volume_signal_;
+
   // -- State variables --
 public:
   //General Preferences
@@ -107,6 +111,9 @@ public:
   Core::StateBoolHandle show_projectmanager_bar_state_;
   Core::StateBoolHandle show_provenance_bar_state_;
   Core::StateBoolHandle show_rendering_bar_state_;
+
+  // Large volume preferences
+  Core::StateBoolHandle enable_large_volume_state_;
   
 public:
   /// GET_DEFAULT_COLORS:

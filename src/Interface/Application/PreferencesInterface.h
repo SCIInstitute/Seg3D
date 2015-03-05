@@ -78,10 +78,12 @@ private:
   /// This function will initialize all the preferences contained within the sidebar tab
   void setup_sidebar_prefs();
 
-  /// SETUP_INTERFACE_CONTROLS_PREFS:
-  /// This function will initialize all the preferences contained within the interface control tab
-  void setup_interface_controls_prefs();
-  
+  // SETUP_INTERFACE_CONTROLS_PREFS:
+  // This function will initialize all the preferences contained within the interface control tab
+  // (NOTE: not implemented)
+//  void setup_interface_controls_prefs();
+
+  void setup_large_volume_prefs();
   
   void set_autosave_checkbox( bool state );
   
