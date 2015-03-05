@@ -77,23 +77,22 @@ public:
   {
     if (sizeof( void * ) == 4)
     {
-      // For 32 but systems do not exceed 1Gb of data usage:
-      // On windows addressable space is 2Gb hence this leaves enough space for the program it self
+      // For 32bit systems, do not exceed 1 GB of data usage.
+      // On Windows, addressable space is 2 GB, hence this leaves enough space for the program itself.
       this->cache_capacity_ = static_cast<long long>( 1 ) << 30;
     }
     else
     {
-      // For 64bit systems, try to get a lot of space
-
-      // Get total memory size and subtract 2Gb (for running program and operating system)
+      // For 64bit systems, try to get a lot of space.
+      // Get total memory size and subtract 2 GB (for running program and operating system).
       long long mem_size = Core::Application::Instance()->get_total_physical_memory();
       mem_size -= static_cast<long long>( 2 ) << 30;
       mem_size = static_cast<long long>( 0.5 * mem_size );
 
-      // If less than 1Gb use 1Gb
+      // If less than 1 GB, use 1 GB.
       if (mem_size < ( static_cast<long long>( 1 ) << 30 )) mem_size = static_cast<long long>( 1 ) << 30;
 
-      // Do not use more than 32Gb
+      // Do not use more than 32 GB, unless explicity requested.
       this->cache_capacity_ = Core::Min( static_cast<long long>( 32 ) << 30, mem_size );
     }
 
