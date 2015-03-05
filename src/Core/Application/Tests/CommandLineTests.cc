@@ -1,3 +1,4 @@
+
 /*
  For more information, please see: http://software.sci.utah.edu
  
@@ -30,8 +31,19 @@
 
 #include <Core/Application/Application.h>
 
+#include <Core/Geometry/Vector.h>
+
 // TODO: how to tell if parameter is invalid?
 // --socket (correct) vs --port (incorrect) is common error
+
+TEST(CommandLineTests, EmptyArgs)
+{
+  std::string nullArg0 = Core::Application::Instance()->get_argument(0);
+  ASSERT_TRUE( nullArg0.empty() );
+  
+  std::string nullArg1 = Core::Application::Instance()->get_argument(1);
+  ASSERT_TRUE( nullArg1.empty() );
+}
 
 TEST(CommandLineTests, EmptyParams)
 {
@@ -43,66 +55,112 @@ TEST(CommandLineTests, EmptyParams)
 
 TEST(CommandLineTests, BasicParamsFailsOnSingleParam)
 {
+  const int NUM_ARGS = 0; // also argument default
   // expects program name as argv[0]
   const int ARGC = 1;
-  char** argv = new char* [ARGC];
-  argv[0] = "--version";
+  char argv0[] = { '-', '-', 'v', 'e', 'r', 's', 'i', 'o', 'n', '\0' };
+  char* argv[] = { argv0 };
 
-  Core::Application::Instance()->parse_command_line_parameters( ARGC, argv );
+  Core::Application::Instance()->parse_command_line_parameters( ARGC, argv, NUM_ARGS );
   ASSERT_FALSE( Core::Application::Instance()->is_command_line_parameter( "version") );
-  
-  delete [] argv;
 }
 
 TEST(CommandLineTests, ParamNotSet)
 {
   const int ARGC = 1;
-  char** argv = new char* [ARGC];
-  argv[0] = "test";
+  char argv0[] = { 't', 'e', 's', 't', '\0' };
+  char* argv[] = { argv0 };
   
   Core::Application::Instance()->parse_command_line_parameters( ARGC, argv );
   ASSERT_FALSE( Core::Application::Instance()->is_command_line_parameter( "notaflag") );
-  
-  delete [] argv;
 }
 
 TEST(CommandLineTests, StringParam)
 {
   // expects program name as argv[0]
   const int ARGC = 2;
-  char** argv = new char* [ARGC];
-  argv[0] = "test";
-  argv[1] = "--version";
+  char argv0[] = { 't', 'e', 's', 't', '\0' };
+  char argv1[] = { '-', '-', 'v', 'e', 'r', 's', 'i', 'o', 'n', '\0' };
+  char* argv[] = { argv0, argv1 };
   
   Core::Application::Instance()->parse_command_line_parameters( ARGC, argv );
   ASSERT_TRUE( Core::Application::Instance()->is_command_line_parameter( "version") );
-
-  delete [] argv;
 }
 
+// accepts parameters without dashes
+// TODO: is this a good thing?
 TEST(CommandLineTests, StringParamNotFlag)
 {
   // expects program name as argv[0]
   const int ARGC = 2;
-  char** argv = new char* [ARGC];
-  argv[0] = "test";
-  argv[1] = "version";
+  char argv0[] = { 't', 'e', 's', 't', '\0' };
+  char argv1[] = { 'v', 'e', 'r', 's', 'i', 'o', 'n', '\0' };
+  char* argv[] = { argv0, argv1 };
   
   Core::Application::Instance()->parse_command_line_parameters( ARGC, argv );
   ASSERT_TRUE( Core::Application::Instance()->is_command_line_parameter( "version") );
-  
-  delete [] argv;
 }
 
-TEST(CommandLineTests, HelpParam)
+TEST(CommandLineTests, VectorParam)
 {
-  const int ARGC = 1;
-  char** argv = new char* [ARGC];
-  argv[0] = "test";
-  argv[1] = "--help";
+  const int ARGC = 2;
+  char argv0[] = { 't', 'e', 's', 't', '\0' };
+  char argv1[] = { '-', '-', 'v', 'e', 'c', 't', 'o', 'r', '=', '[', '0', '.', '1', ',', '0', '.', '1', ',', '0', '.', '1', ']', '\0' };
+  char* argv[] = { argv0, argv1 };
   
   Core::Application::Instance()->parse_command_line_parameters( ARGC, argv );
-  ASSERT_TRUE( Core::Application::Instance()->is_command_line_parameter( "help") );
-  
-  delete [] argv;
+  ASSERT_TRUE( Core::Application::Instance()->is_command_line_parameter( "vector") );
+
+  Core::Vector vector(1.0, 1.0, 1.0);
+  std::string vector_string;
+  ASSERT_TRUE( Core::Application::Instance()->check_command_line_parameter( "vector" , vector_string ) );
+  ASSERT_TRUE( Core::ImportFromString( vector_string, vector ) );
+
+  EXPECT_EQ( vector.x(), 0.1 );
+  EXPECT_EQ( vector.y(), 0.1 );
+  EXPECT_EQ( vector.z(), 0.1 );
 }
+
+TEST(CommandLineTests, PointParam)
+{
+  const int ARGC = 2;
+  char argv0[] = { 't', 'e', 's', 't', '\0' };
+  char argv1[] = { '-', '-', 'p', 'o', 'i', 'n', 't', '=', '0', '.', '1', ',', '0', '.', '1', ',', '0', '.', '1', '\0' };
+  char* argv[] = { argv0, argv1 };
+  
+  Core::Application::Instance()->parse_command_line_parameters( ARGC, argv );
+  ASSERT_TRUE( Core::Application::Instance()->is_command_line_parameter( "point") );
+  
+  Core::Point point(0, 0, 0);
+  std::string point_string;
+  ASSERT_TRUE( Core::Application::Instance()->check_command_line_parameter( "point" , point_string ) );
+  ASSERT_TRUE( Core::ImportFromString( point_string, point ) );
+  
+  EXPECT_EQ( point.x(), 0.1 );
+  EXPECT_EQ( point.y(), 0.1 );
+  EXPECT_EQ( point.z(), 0.1 );
+}
+
+TEST(CommandLineTests, VectorParamWithFileArgs)
+{
+  const int ARGC = 4;
+  const int FILE_ARGS = 2;
+  char argv0[] = { 't', 'e', 's', 't', '\0' };
+  char argv1[] = { 'f', 'i', 'l', 'e', '1', '\0' };
+  char argv2[] = { 'f', 'i', 'l', 'e', '2', '\0' };
+  char argv3[] = { '-', '-', 'v', 'e', 'c', 't', 'o', 'r', '=', '0', '.', '1', ',', '0', '.', '1', ',', '0', '.', '1', '\0' };
+  char* argv[] = { argv0, argv1, argv2, argv3 };
+  
+  Core::Application::Instance()->parse_command_line_parameters( ARGC, argv, FILE_ARGS );
+  ASSERT_TRUE( Core::Application::Instance()->is_command_line_parameter( "vector") );
+  
+  Core::Vector vector(1.0, 1.0, 1.0);
+  std::string vector_string;
+  ASSERT_TRUE( Core::Application::Instance()->check_command_line_parameter( "vector" , vector_string ) );
+  ASSERT_TRUE( Core::ImportFromString( vector_string, vector ) );
+  
+  EXPECT_EQ( vector.x(), 0.1 );
+  EXPECT_EQ( vector.y(), 0.1 );
+  EXPECT_EQ( vector.z(), 0.1 );
+}
+
