@@ -89,6 +89,10 @@ public:
   /// Remove all the seed points.
   void clear( Core::ActionContextHandle context );
 
+  /// FIND_POINT:
+  /// Find seed point in viewer and return coordinates.
+  bool find_point( ViewerHandle viewer, double world_x, double world_y, Core::VolumeSliceHandle vol_slice, Core::Point& pt );
+
 public:
   Core::StatePointVectorHandle seed_points_state_;
 

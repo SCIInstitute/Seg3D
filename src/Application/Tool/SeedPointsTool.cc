@@ -51,9 +51,6 @@ class SeedPointsToolPrivate
 {
 public:
   Core::VolumeSliceHandle get_target_slice( ViewerHandle viewer );
-  bool find_point( ViewerHandle viewer, double world_x, double world_y, 
-    Core::VolumeSliceHandle vol_slice, Core::Point& pt );
-
   SeedPointsTool* tool_;
 };
 
@@ -72,42 +69,6 @@ Core::VolumeSliceHandle SeedPointsToolPrivate::get_target_slice( ViewerHandle vi
   
   return vol_slice;
 }
-
-bool SeedPointsToolPrivate::find_point( ViewerHandle viewer, double world_x, double world_y,
-                     Core::VolumeSliceHandle vol_slice, Core::Point& pt )
-{
-  // Step 1. Compute the size of a pixel in world space
-  double x0, y0, x1, y1;
-  viewer->window_to_world( 0, 0, x0, y0 );
-  viewer->window_to_world( 1, 1, x1, y1 );
-  double pixel_width = Core::Abs( x1 - x0 );
-  double pixel_height = Core::Abs( y1 - y0 );
-
-  // Step 2: Search for the first seed point that's within 4 pixels in each direction
-  // from the given search position (world_x, world_y)
-  double range_x = pixel_width * 4;
-  double range_y = pixel_height * 4;
-  std::vector< Core::Point > seed_points;
-  {
-    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-    seed_points = this->tool_->seed_points_state_->get();
-  }
-  size_t num_of_pts = seed_points.size();
-  for ( size_t i = 0; i < num_of_pts; i++ )
-  {
-    double pt_x, pt_y;
-    vol_slice->project_onto_slice( seed_points[ i ], pt_x, pt_y );
-    if ( Core::Abs( pt_x - world_x ) <= range_x &&
-      Core::Abs( pt_y - world_y ) <= range_y )
-    {
-      pt = seed_points[ i ];
-      return true;
-    }
-  }
-  
-  return false;
-}
-
 
 //////////////////////////////////////////////////////////////////////////
 // Implementation of class SeedPointsTool
@@ -177,7 +138,7 @@ bool SeedPointsTool::handle_mouse_press( ViewerHandle viewer,
     modifiers & (Core::KeyModifier::ALT_MODIFIER_E) )  )
   {
     Core::Point pt;
-    if ( this->private_->find_point( viewer, world_x, world_y, target_slice, pt ) )
+    if ( this->find_point( viewer, world_x, world_y, target_slice, pt ) )
     {
       Core::ActionRemove::Dispatch( Core::Interface::GetMouseActionContext(),
         this->seed_points_state_, pt );
@@ -261,6 +222,41 @@ void SeedPointsTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
   }
   
   glPopAttrib();
+}
+
+bool SeedPointsTool::find_point( ViewerHandle viewer, double world_x, double world_y,
+                                 Core::VolumeSliceHandle vol_slice, Core::Point& pt )
+{
+  // Step 1. Compute the size of a pixel in world space
+  double x0, y0, x1, y1;
+  viewer->window_to_world( 0, 0, x0, y0 );
+  viewer->window_to_world( 1, 1, x1, y1 );
+  double pixel_width = Core::Abs( x1 - x0 );
+  double pixel_height = Core::Abs( y1 - y0 );
+
+  // Step 2: Search for the first seed point that's within 4 pixels in each direction
+  // from the given search position (world_x, world_y)
+  double range_x = pixel_width * 4;
+  double range_y = pixel_height * 4;
+  std::vector< Core::Point > seed_points;
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    seed_points = this->seed_points_state_->get();
+  }
+  size_t num_of_pts = seed_points.size();
+  for ( size_t i = 0; i < num_of_pts; i++ )
+  {
+    double pt_x, pt_y;
+    vol_slice->project_onto_slice( seed_points[ i ], pt_x, pt_y );
+    if ( Core::Abs( pt_x - world_x ) <= range_x &&
+         Core::Abs( pt_y - world_y ) <= range_y )
+    {
+      pt = seed_points[ i ];
+      return true;
+    }
+  }
+  
+  return false;
 }
 
 void SeedPointsTool::clear( Core::ActionContextHandle context )
