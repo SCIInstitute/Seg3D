@@ -96,6 +96,8 @@ public:
   /// Get the tool version
   int get_version() const;
 
+  bool get_is_large_volume() const;
+
 private:
   // Private implementation of this class
   ToolInfoPrivateHandle private_;

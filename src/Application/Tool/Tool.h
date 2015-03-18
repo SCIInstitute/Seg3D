@@ -237,6 +237,9 @@ public:
 #define SEG3D_TOOL_VERSION( version ) \
 "<version>" version "</version>"
 
+#define SEG3D_LARGE_VOLUME_TOOL( is_large_volume_tool ) \
+"<largevol>" is_large_volume_tool "</largevol>"
+
 #define SEG3D_TOOL( definition_string ) \
 public: \
   static std::string Definition() { return GetToolInfo()->get_definition(); }\
@@ -247,6 +250,7 @@ public: \
     static std::string Url() { return GetToolInfo()->get_url(); } \
     static std::string HotKeys() { return GetToolInfo()->get_hotkeys(); } \
     static int Version() { return GetToolInfo()->get_version(); } \
+    static bool IsLargeVolume() { return GetToolInfo()->get_is_large_volume(); } \
   static Seg3D::ToolInfoHandle GetToolInfo() \
   {\
     static bool initialized = false; \

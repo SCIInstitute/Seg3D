@@ -425,34 +425,32 @@ void Menu::create_tool_menus( QMenuBar* qmenubar )
 
   // Get all the different tool menus
   ToolFactory::Instance()->list_menus( menu_list );
-  ToolMenuList::const_iterator mit = menu_list.begin();
-  ToolMenuList::const_iterator mit_end = menu_list.end(); 
 
   // Build each of the tool menus
-  while ( mit != mit_end )
+  for (auto &menu : menu_list)
   {
-    QMenu* qmenu = qmenubar->addMenu( QString::fromUtf8( "&" ) + QString::fromStdString( *mit ) );
-
+    QMenu* qmenu = qmenubar->addMenu( QString::fromUtf8( "&" ) + QString::fromStdString( menu ) );
     ToolInfoList tool_types_list;
 
-    ToolFactory::Instance()->list_tools( tool_types_list, *mit );
-    ToolInfoList::const_iterator it = tool_types_list.begin();
-    ToolInfoList::const_iterator it_end = tool_types_list.end();
+    ToolFactory::Instance()->list_tools( tool_types_list, menu );
 
     // Loop through all the tools
     QAction* qaction;
-    while ( it != it_end )
+    for (auto &toolInfo: tool_types_list)
     {
       // Add menu option to open tool
-      qaction = qmenu->addAction( QString::fromStdString( ( *it )->get_menu_label() ) );
-      // qaction->setShortcut( QString::fromStdString( ( *it )->get_shortcut_key() ) );
+      qaction = qmenu->addAction( QString::fromStdString( toolInfo->get_menu_label() ) );
+      // qaction->setShortcut( QString::fromStdString( toolInfo->get_shortcut_key() ) );
+      if ( toolInfo->get_is_large_volume() )
+      {
+        large_volume_tools_.push_back( qaction );
+        qaction->setVisible( false );
+      }
 
       // Connect the action with dispatching a command in the ToolManager
       QtUtils::QtBridge::Connect( qaction, boost::bind( &ActionOpenTool::Dispatch, 
-          Core::Interface::GetWidgetActionContext(), ( *it )->get_name() ) );
-      ++it;
+          Core::Interface::GetWidgetActionContext(), toolInfo->get_name() ) );
     }
-    ++mit;
   }
 }
 
@@ -917,6 +915,10 @@ void Menu::enable_disable_data_layer_actions( bool active_data_layer_found )
 void Menu::show_hide_large_volume_actions( bool large_volume_visible )
 {
   this->import_large_volume_qaction_->setVisible( large_volume_visible );
+  for (QAction* a: large_volume_tools_)
+  {
+    a->setVisible( large_volume_visible );
+  }
 }
 
 void Menu::save_project()

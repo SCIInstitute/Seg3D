@@ -81,7 +81,9 @@ private:
   QAction* redo_qaction_;
 
   QAction* import_large_volume_qaction_;
-  
+
+  std::vector<QAction*> large_volume_tools_;
+
   // Keep a pointer to the main window
   QMainWindow*  main_window_;
   

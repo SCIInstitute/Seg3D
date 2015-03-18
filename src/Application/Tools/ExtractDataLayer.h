@@ -40,14 +40,14 @@ typedef boost::shared_ptr<ExtractDataLayerPrivate> ExtractDataLayerPrivateHandle
 
 class ExtractDataLayer : public SingleTargetTool
 {
-
 SEG3D_TOOL(
-SEG3D_TOOL_NAME( "ExtractDataLayer", "Extract a normal data layer from a large data layer." )
-SEG3D_TOOL_MENULABEL( "Extract DataLayer" )
-SEG3D_TOOL_MENU( "Tools" )
-SEG3D_TOOL_SHORTCUT_KEY( "" )
-SEG3D_TOOL_URL( "http://www.sci.utah.edu/SCIRunDocs/index.php/CIBC:Seg3D2:ExtractDataLayer:1" )
-SEG3D_TOOL_VERSION( "1" )
+  SEG3D_TOOL_NAME( "ExtractDataLayer", "Extract a normal data layer from a large data layer." )
+  SEG3D_TOOL_MENULABEL( "Extract DataLayer" )
+  SEG3D_TOOL_MENU( "Tools" )
+  SEG3D_TOOL_SHORTCUT_KEY( "" )
+  SEG3D_TOOL_URL( "http://www.sci.utah.edu/SCIRunDocs/index.php/CIBC:Seg3D2:ExtractDataLayer:1" )
+  SEG3D_TOOL_VERSION( "1" )
+  SEG3D_LARGE_VOLUME_TOOL( "true" )
 )
 
   // -- constructor/destructor --

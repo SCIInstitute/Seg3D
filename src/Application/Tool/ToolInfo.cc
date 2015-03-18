@@ -42,20 +42,22 @@ namespace Seg3D
 
 class ToolInfoPrivate 
 {
-  public:
-    std::string definition_;
-  
-    std::string name_;
-    std::string description_;
-    
-    std::string menu_;
-    std::string menu_label_;
-    std::string shortcut_key_;
-    std::string hotkeys_and_descriptions_;
+public:
+  ToolInfoPrivate() : version_(-1), is_large_volume_(false) {}
+  std::string definition_;
 
-    std::string url_;
-    
-    int version_;
+  std::string name_;
+  std::string description_;
+
+  std::string menu_;
+  std::string menu_label_;
+  std::string shortcut_key_;
+  std::string hotkeys_and_descriptions_;
+
+  std::string url_;
+
+  int version_;
+  bool is_large_volume_;
 };
 
 
@@ -168,7 +170,15 @@ ToolInfo::ToolInfo( const std::string& definition ) :
       }         
       this->private_->hotkeys_and_descriptions_ = hotkeys;
     }
-
+    else if ( type == "largevol" )
+    {
+      std::string is_largevol;
+      if( parameter_element->GetText() )
+      {
+        is_largevol = parameter_element->GetText();
+      }
+      Core::ImportFromString( is_largevol, this->private_->is_large_volume_ );
+    }
   }
 
   if ( found_tool == false )
@@ -221,6 +231,12 @@ int ToolInfo::get_version() const
 {
   return this->private_->version_;
 }
+
+bool ToolInfo::get_is_large_volume() const
+{
+  return this->private_->is_large_volume_;
+}
+
 
 // Needs to be defined somewhere, so it is unique
 ToolInfo::mutex_type ToolInfo::mutex_;
