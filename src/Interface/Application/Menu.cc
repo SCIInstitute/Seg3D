@@ -434,6 +434,7 @@ void Menu::create_tool_menus( QMenuBar* qmenubar )
 
     ToolFactory::Instance()->list_tools( tool_types_list, menu );
 
+    int largeVolCounter = 0;
     // Loop through all the tools
     QAction* qaction;
     for (auto &toolInfo: tool_types_list)
@@ -445,11 +446,19 @@ void Menu::create_tool_menus( QMenuBar* qmenubar )
       {
         large_volume_tools_.push_back( qaction );
         qaction->setVisible( false );
+        ++largeVolCounter;
       }
 
       // Connect the action with dispatching a command in the ToolManager
-      QtUtils::QtBridge::Connect( qaction, boost::bind( &ActionOpenTool::Dispatch, 
-          Core::Interface::GetWidgetActionContext(), toolInfo->get_name() ) );
+      QtUtils::QtBridge::Connect( qaction, boost::bind( &ActionOpenTool::Dispatch,
+        Core::Interface::GetWidgetActionContext(), toolInfo->get_name() ) );
+    }
+
+    // menu only contains large volume tools
+    if (tool_types_list.size() == largeVolCounter)
+    {
+      qmenu->menuAction()->setVisible( false );
+      large_volume_tools_.push_back( qmenu->menuAction() );
     }
   }
 }
