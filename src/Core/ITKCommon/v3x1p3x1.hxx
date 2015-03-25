@@ -112,14 +112,14 @@ public:
   inline bool operator < (const the_duplet_t<T> & d) const
   {
     return ((X_ < d.X_) ||
-	    (X_ == d.X_ && Y_ < d.Y_));
+      (X_ == d.X_ && Y_ < d.Y_));
   }
   
   // compare this duplet to a given duplet for equality:
   inline bool equal(const the_duplet_t<T> & d) const
   {
     return ((X_ == d.X_) &&
-	    (Y_ == d.Y_));
+      (Y_ == d.Y_));
   }
   
   // assign to this duplet:
@@ -151,8 +151,8 @@ public:
   inline void dump(ostream & stream, const char * type_name) const
   {
     stream << '(' << type_name << " *)(" << (void *)this << ") "
-	   << setw(12) << X_ << ' '
-	   << setw(12) << Y_;
+     << setw(12) << X_ << ' '
+     << setw(12) << Y_;
   }
   
   // const accessors:
@@ -227,16 +227,16 @@ public:
   inline bool operator < (const the_duplet_t<T> & d) const
   {
     return ((X_ < d.X_) ||
-	    (X_ == d.X_ && Y_ < d.Y_) ||
-	    (X_ == d.X_ && Y_ == d.Y_ && Z_ < d.Z_));
+      (X_ == d.X_ && Y_ < d.Y_) ||
+      (X_ == d.X_ && Y_ == d.Y_ && Z_ < d.Z_));
   }
   
   // compare this triplet to a given triplet for equality:
   inline bool equal(const the_triplet_t<T> & d) const
   {
     return ((X_ == d.X_) &&
-	    (Y_ == d.Y_) &&
-	    (Z_ == d.Z_));
+      (Y_ == d.Y_) &&
+      (Z_ == d.Z_));
   }
   
   // assign to this triplet:
@@ -281,9 +281,9 @@ public:
   inline void dump(ostream & stream, const char * type_name) const
   {
     stream << '(' << type_name << " *)(" << (void *)this << ") "
-	   << setw(12) << X_ << ' '
-	   << setw(12) << Y_ << ' '
-	   << setw(12) << Z_;
+     << setw(12) << X_ << ' '
+     << setw(12) << Y_ << ' '
+     << setw(12) << Z_;
   }
   
   // const accessors:
@@ -362,18 +362,18 @@ public:
   inline bool operator < (const the_duplet_t<T> & d) const
   {
     return ((X_ < d.X_) ||
-	    (X_ == d.X_ && Y_ < d.Y_) ||
-	    (X_ == d.X_ && Y_ == d.Y_ && Z_ < d.Z_) ||
-	    (X_ == d.X_ && Y_ == d.Y_ && Z_ == d.Z_ && W_ < d.W_));
+      (X_ == d.X_ && Y_ < d.Y_) ||
+      (X_ == d.X_ && Y_ == d.Y_ && Z_ < d.Z_) ||
+      (X_ == d.X_ && Y_ == d.Y_ && Z_ == d.Z_ && W_ < d.W_));
   }
   
   // compare this quadruplet to a given quadruplet for equality:
   inline bool equal(const the_quadruplet_t<T> & d) const
   {
     return ((X_ == d.X_) &&
-	    (Y_ == d.Y_) &&
-	    (Z_ == d.Z_) &&
-	    (W_ == d.W_));
+      (Y_ == d.Y_) &&
+      (Z_ == d.Z_) &&
+      (W_ == d.W_));
   }
   
   // assign to this quadruplet:
@@ -409,10 +409,10 @@ public:
   inline void dump(ostream & stream, const char * type_name) const
   {
     stream << '(' << type_name << " *)(" << (void *)this << ") "
-	   << setw(12) << X_ << ' '
-	   << setw(12) << Y_ << ' '
-	   << setw(12) << Z_ << ' '
-	   << setw(12) << W_;
+     << setw(12) << X_ << ' '
+     << setw(12) << Y_ << ' '
+     << setw(12) << Z_ << ' '
+     << setw(12) << W_;
   }
   
   // const accessors:
@@ -633,8 +633,8 @@ public:
   inline const v3x1_t operator % (const v3x1_t & v) const
   {
     return v3x1_t((Y_ * v.Z_) - (Z_ * v.Y_),
-		  (Z_ * v.X_) - (X_ * v.Z_),
-		  (X_ * v.Y_) - (v.X_ * Y_));
+      (Z_ * v.X_) - (X_ * v.Z_),
+      (X_ * v.Y_) - (v.X_ * Y_));
   }
   
   // norm operator (returns the magnitude/length/norm of this vector):
@@ -937,9 +937,9 @@ public:
   {}
   
   p4x1_t(const float & x,
-	 const float & y,
-	 const float & z,
-	 const float & w):
+   const float & y,
+   const float & z,
+   const float & w):
     the_quadruplet_t<float>(x, y, z, w)
   {}
   

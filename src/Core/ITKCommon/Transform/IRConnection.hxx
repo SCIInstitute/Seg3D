@@ -44,18 +44,18 @@ class IRTransform;
 class IRConnection
 {
 public:
-	IRConnection(IRTransform* fristTransform, 
+  IRConnection(IRTransform* fristTransform, 
                IRTransform* secondTransform,
                bool verbose = false);
-	~IRConnection();
-	
-	vec2d_t tensionOnTransformation(IRTransform* transform);
-	vec2d_t idealTransormationOffset();
-	
-	IRTransform* firstTransformation() {return _firstTransformation;}
-	IRTransform* secondTransformation() {return _secondTransformation;}
-	
-	int findIdealOffset(const double maxOffset[], 
+  ~IRConnection();
+  
+  vec2d_t tensionOnTransformation(IRTransform* transform);
+  vec2d_t idealTransormationOffset();
+  
+  IRTransform* firstTransformation() {return _firstTransformation;}
+  IRTransform* secondTransformation() {return _secondTransformation;}
+  
+  int findIdealOffset(const double maxOffset[], 
                       bool  maxOffsetIsPercent,
                       const double blackMaskPercent[],
                       bool  doClahe);
@@ -65,11 +65,11 @@ private:
   void printMessage( const char *str, bool verbose ) { if (verbose) printf("building an IRConnection between \n"); }
   
 private:
-	IRTransform* _firstTransformation;
-	IRTransform* _secondTransformation;
-	
-	vec2d_t _idealTransormationOffset;
-	double  _matchValue;
+  IRTransform* _firstTransformation;
+  IRTransform* _secondTransformation;
+  
+  vec2d_t _idealTransormationOffset;
+  double  _matchValue;
   bool    _verbose;
 };
 

@@ -55,15 +55,15 @@ class the_transaction_wrapper_t
 {
 public:
   the_transaction_wrapper_t(const unsigned int & num_parts,
-			    the_transaction_t * transaction);
+          the_transaction_t * transaction);
   ~the_transaction_wrapper_t();
   
   static void notify_cb(void * data,
-			the_transaction_t * t,
-			the_transaction_t::state_t s);
+      the_transaction_t * t,
+      the_transaction_t::state_t s);
   
   bool notify(the_transaction_t * t,
-	      the_transaction_t::state_t s);
+        the_transaction_t::state_t s);
   
 private:
   the_transaction_wrapper_t();
@@ -123,13 +123,13 @@ public:
   // This means the transaction will be executed by N threads, so
   // the transaction has to support concurrent execution internally.
   virtual void push_front(the_transaction_t * transaction,
-			  bool multithreaded = false);
+        bool multithreaded = false);
   
   virtual void push_back(the_transaction_t * transaction,
-			 bool multithreaded = false);
+       bool multithreaded = false);
   
   virtual void push_back(std::list<the_transaction_t *> & schedule,
-			 bool multithreaded = false);
+       bool multithreaded = false);
   
   // split the work among the threads:
   void pre_distribute_work();
@@ -139,7 +139,7 @@ public:
   
   // schedule a transaction and start the thread:
   virtual void start(the_transaction_t * transaction,
-		     bool multithreaded = false);
+         bool multithreaded = false);
   
   // abort the current transaction and clear pending transactions;
   // transactionFinished will be emitted for the aborted transaction
@@ -159,15 +159,15 @@ public:
   
   // terminate the current transactions and schedule a new transaction:
   void stop_and_go(the_transaction_t * transaction,
-		   bool multithreaded = false);
+       bool multithreaded = false);
   void stop_and_go(std::list<the_transaction_t *> & schedule,
-		   bool multithreaded = false);
+       bool multithreaded = false);
   
   // flush the current transactions and schedule a new transaction:
   void flush_and_go(the_transaction_t * transaction,
-		   bool multithreaded = false);
+       bool multithreaded = false);
   void flush_and_go(std::list<the_transaction_t *> & schedule,
-		   bool multithreaded = false);
+       bool multithreaded = false);
   
   // virtual: default transaction communication handlers:
   void handle(the_transaction_t * transaction, the_transaction_t::state_t s);

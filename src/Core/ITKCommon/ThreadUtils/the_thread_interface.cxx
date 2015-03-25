@@ -134,7 +134,7 @@ the_thread_interface_t::set_mutex(the_mutex_interface_t * mutex)
 // 
 void
 the_thread_interface_t::set_idle_sleep_duration(bool enable,
-						unsigned int microseconds)
+            unsigned int microseconds)
 {
   sleep_when_idle_ = enable;
   sleep_microsec_ = microseconds;
@@ -359,8 +359,8 @@ the_thread_interface_t::work()
 {
   the_lock_t<the_mutex_interface_t> lock_this(mutex_, false);
   the_lock_t<the_mutex_interface_t> lock_pool(thread_pool_ ?
-					      thread_pool_->mutex_ : NULL,
-					      false);
+                thread_pool_->mutex_ : NULL,
+                false);
   bool all_transactions_completed = true;
   
   while (!stopped_)
@@ -373,42 +373,42 @@ the_thread_interface_t::work()
       
       if (thread_pool_ != NULL)
       {
-	// call back the thread pool:
+  // call back the thread pool:
 #ifdef DEBUG_THREAD
-	cerr << "thread " << this << " calling the pool" << endl;
+  cerr << "thread " << this << " calling the pool" << endl;
 #endif
-	thread_pool_->handle_thread(thread_pool_cb_data_);
+  thread_pool_->handle_thread(thread_pool_cb_data_);
       }
       
       if (transactions_.empty())
       {
-	if (sleep_when_idle_ && !stopped_)
-	{
-	  lock_this.disarm();
-	  lock_pool.disarm();
-	  take_a_nap(sleep_microsec_);
+  if (sleep_when_idle_ && !stopped_)
+  {
+    lock_this.disarm();
+    lock_pool.disarm();
+    take_a_nap(sleep_microsec_);
 #ifdef DEBUG_THREAD
-	  cerr << this << " sleeping" << endl;
+    cerr << this << " sleeping" << endl;
 #endif
-	  continue;
-	}
-	else
-	{
-	  // NOTE: the mutex will remain locked until the function returns:
+    continue;
+  }
+  else
+  {
+    // NOTE: the mutex will remain locked until the function returns:
 #ifdef DEBUG_THREAD
-	  cerr << "thread " << this << " is finishing up" << endl;
+    cerr << "thread " << this << " is finishing up" << endl;
 #endif
-	  break;
-	}
+    break;
+  }
       }
       else
       {
-	t = remove_head(transactions_);
+  t = remove_head(transactions_);
 #ifdef DEBUG_THREAD
-	cerr << "thread " << this << " received " << t << endl;
+  cerr << "thread " << this << " received " << t << endl;
 #endif
-	lock_this.disarm();
-	lock_pool.disarm();
+  lock_this.disarm();
+  lock_pool.disarm();
       }
     }
     
@@ -428,8 +428,8 @@ the_thread_interface_t::work()
       cerr << "FIXME: caught exception: " << e.what() << endl;
 #endif
       t->notify(this,
-		the_transaction_t::ABORTED_E,
-		e.what());
+    the_transaction_t::ABORTED_E,
+    e.what());
     }
     catch (...)
     {
@@ -438,8 +438,8 @@ the_thread_interface_t::work()
       cerr << "FIXME: caught unknonwn exception" << endl;
 #endif
       t->notify(this,
-		the_transaction_t::ABORTED_E,
-		"unknown exception intercepted");
+    the_transaction_t::ABORTED_E,
+    "unknown exception intercepted");
     }
   }
   
@@ -452,7 +452,7 @@ the_thread_interface_t::work()
 #endif
   
   all_transactions_completed = (all_transactions_completed &&
-				transactions_.empty());
+        transactions_.empty());
   
   // abort pending transaction:
   while (!transactions_.empty())
@@ -483,7 +483,7 @@ the_thread_interface_t::work()
 // 
 void
 the_thread_interface_t::handle(the_transaction_t * transaction,
-			       the_transaction_t::state_t s)
+             the_transaction_t::state_t s)
 {
   switch (s)
   {

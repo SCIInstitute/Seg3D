@@ -246,7 +246,7 @@ namespace itk
     {
       itk::ExceptionObject e(__FILE__, __LINE__);
       e.SetDescription("could not perform a numeric inverse transformation "
-		       "for a Legendre polynomial transform");
+           "for a Legendre polynomial transform");
       throw e;
     }
     
@@ -289,11 +289,11 @@ namespace itk
 //    {
 //      for (unsigned int j = 0; j <= i; j++)
 //      {
-//	unsigned int k = i - j;
-//	
-//	double PjQk = P[j] * Q[k];
-//	this->m_Jacobian(0, index_a(j, k)) = Xmax * PjQk;
-//	this->m_Jacobian(1, index_b(j, k)) = Ymax * PjQk;
+//  unsigned int k = i - j;
+//  
+//  double PjQk = P[j] * Q[k];
+//  this->m_Jacobian(0, index_a(j, k)) = Xmax * PjQk;
+//  this->m_Jacobian(1, index_b(j, k)) = Ymax * PjQk;
 //      }
 //    }
 //    
@@ -436,12 +436,12 @@ namespace itk
   void
   LegendrePolynomialTransform<TScalarType, N>::
   setup_linear_system(const unsigned int start_with_degree,
-		      const unsigned int degrees_covered,
-		      const std::vector<InputPointType> & uv,
-		      const std::vector<OutputPointType> & xy,
-		      vnl_matrix<double> & M,
-		      vnl_vector<double> & bx,
-		      vnl_vector<double> & by) const
+          const unsigned int degrees_covered,
+          const std::vector<InputPointType> & uv,
+          const std::vector<OutputPointType> & xy,
+          vnl_matrix<double> & M,
+          vnl_vector<double> & bx,
+          vnl_vector<double> & by) const
   {
     if (degrees_covered == 0) return;
     
@@ -522,10 +522,10 @@ namespace itk
   void
   LegendrePolynomialTransform<TScalarType, N>::
   solve_for_parameters(const unsigned int start_with_degree,
-		       const unsigned int degrees_covered,
-		       const std::vector<InputPointType> & uv,
-		       const std::vector<OutputPointType> & xy,
-		       ParametersType & params) const
+           const unsigned int degrees_covered,
+           const std::vector<InputPointType> & uv,
+           const std::vector<OutputPointType> & xy,
+           ParametersType & params) const
   {
     if (degrees_covered == 0) return;
 
@@ -593,7 +593,7 @@ namespace itk
 //    for (unsigned int i = 0; i < ParameterVectorLength; i++)
 //    {
 //      os << indent << "params[" << i << "] = " << this->m_Parameters[i] << ';'
-//	 << std::endl;
+//   << std::endl;
 //    }
 //#endif
   }

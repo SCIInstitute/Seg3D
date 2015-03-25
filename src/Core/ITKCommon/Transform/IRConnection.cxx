@@ -58,12 +58,12 @@ _secondTransformation(secondTransform),
 _matchValue(0.0),
 _verbose(verbose)
 {
-	printMessage( "building an IRConnection between \n", _verbose );
-	_firstTransformation->printImageID( _verbose );
+  printMessage( "building an IRConnection between \n", _verbose );
+  _firstTransformation->printImageID( _verbose );
   printMessage( "\n", _verbose );
-	_secondTransformation->printImageID( _verbose );
+  _secondTransformation->printImageID( _verbose );
   printMessage( "\n", _verbose );
-	return;
+  return;
 }
 
 //----------------------------------------------------------------
@@ -71,7 +71,7 @@ _verbose(verbose)
 // 
 IRConnection::~IRConnection()
 {
-	return;
+  return;
 }
 
 //----------------------------------------------------------------
@@ -80,29 +80,29 @@ IRConnection::~IRConnection()
 vec2d_t
 IRConnection::tensionOnTransformation(IRTransform * transform)
 {
-	vec2d_t tension;
-	if (transform != _firstTransformation &&
+  vec2d_t tension;
+  if (transform != _firstTransformation &&
       transform != _secondTransformation)
-	{
+  {
     printMessage( "IRConnection::tensionOnTransformation: "
                  "Transform can't be found.\n", _verbose );
-		tension[0] = 0;
-		tension[1] = 0;
-		return tension;
-	}
-	
-	tension = (_secondTransformation->position() -
+    tension[0] = 0;
+    tension[1] = 0;
+    return tension;
+  }
+  
+  tension = (_secondTransformation->position() -
              _firstTransformation->position()) - _idealTransormationOffset; 
-	
-	if (transform == _secondTransformation)
-	{
-		tension[0] = -1*tension[0];
-		tension[1] = -1*tension[1];
-	}
-	
-	tension[0] = tension[0] * (_matchValue*_matchValue);
-	tension[1] = tension[1] * (_matchValue*_matchValue);
-	return tension;
+  
+  if (transform == _secondTransformation)
+  {
+    tension[0] = -1*tension[0];
+    tension[1] = -1*tension[1];
+  }
+  
+  tension[0] = tension[0] * (_matchValue*_matchValue);
+  tension[1] = tension[1] * (_matchValue*_matchValue);
+  return tension;
 }
 
 //----------------------------------------------------------------
@@ -111,7 +111,7 @@ IRConnection::tensionOnTransformation(IRTransform * transform)
 vec2d_t
 IRConnection::idealTransormationOffset()
 {
-	return _idealTransormationOffset;
+  return _idealTransormationOffset;
 }
 
 //----------------------------------------------------------------
@@ -124,15 +124,15 @@ IRConnection::findIdealOffset(const double maxOffset[],
                               bool doClahe
                               /*const double overlap[]*/)
 {
-	translate_transform_t::Pointer translationTransform;
-	mask_t::ConstPointer mask1;// = IRImageLoader::sharedImageLoader()->
+  translate_transform_t::Pointer translationTransform;
+  mask_t::ConstPointer mask1;// = IRImageLoader::sharedImageLoader()->
   //getMask(_firstTransformation->maskID());
   mask_t::ConstPointer mask2;// = IRImageLoader::sharedImageLoader()->
   //getMask(_secondTransformation->maskID());
-	
-	image_t::Pointer image1 = IRImageLoader::sharedImageLoader()->
+  
+  image_t::Pointer image1 = IRImageLoader::sharedImageLoader()->
   getImage(_firstTransformation->imageID().string());
-	image_t::Pointer image2 = IRImageLoader::sharedImageLoader()->
+  image_t::Pointer image2 = IRImageLoader::sharedImageLoader()->
   getImage(_secondTransformation->imageID().string());
   
   image_t::RegionType region = image1->GetLargestPossibleRegion();
@@ -198,19 +198,19 @@ IRConnection::findIdealOffset(const double maxOffset[],
     offset_max[1] = (pos1[1] - pos2[1]) + yOffset;
   }
   
-	vec2d_t tension;
-	int match_attempt = 0;
-	bool match_success = false;
-	double match_value = 0;
+  vec2d_t tension;
+  int match_attempt = 0;
+  bool match_success = false;
+  double match_value = 0;
   int total_attempts = doClahe ? 2 : 1;
-	
-	while (match_success == false && match_attempt < total_attempts)
-	{
-		switch (match_attempt)
-		{
-			case 0:
-			{
-				match_value =
+  
+  while (match_success == false && match_attempt < total_attempts)
+  {
+    switch (match_attempt)
+    {
+      case 0:
+      {
+        match_value =
         match_one_pair<image_t, mask_t>(false, // images_were_resampled
                                         false, // use_std_mask,
                                         image1, // fi,
@@ -223,15 +223,15 @@ IRConnection::findIdealOffset(const double maxOffset[],
                                         offset_max,
                                         translationTransform // ti
                                         );
-				break;
-			}
+        break;
+      }
         
-			case 1:
-			default:
-			{
-				translate_transform_t::Pointer claheTranslationTransform;
-				image2 = smooth<image_t>(image2, 2 /*sigma*/);
-				image1 = CLAHE<image_t>(image1,
+      case 1:
+      default:
+      {
+        translate_transform_t::Pointer claheTranslationTransform;
+        image2 = smooth<image_t>(image2, 2 /*sigma*/);
+        image1 = CLAHE<image_t>(image1,
                                 32 /*nx*/,
                                 32 /*ny*/,
                                 3 /*max_slope*/,
@@ -239,8 +239,8 @@ IRConnection::findIdealOffset(const double maxOffset[],
                                 0 /*new_min*/,
                                 255 /*new_max*/,
                                 mask1);
-				
-				image2 = CLAHE<image_t>(image2,
+        
+        image2 = CLAHE<image_t>(image2,
                                 32 /*nx*/,
                                 32 /*ny*/,
                                 3 /*max_slope*/,
@@ -248,8 +248,8 @@ IRConnection::findIdealOffset(const double maxOffset[],
                                 0 /*new_min*/,
                                 255 /*new_max*/,
                                 mask1);
-				
-				match_value = match_one_pair<image_t, mask_t>
+        
+        match_value = match_one_pair<image_t, mask_t>
         (false, // resampled
          false, // use_std_mask,
          image1, // fi,
@@ -262,87 +262,87 @@ IRConnection::findIdealOffset(const double maxOffset[],
          offset_max,
          claheTranslationTransform // ti
          );
-				
-				translationTransform = claheTranslationTransform;
-				break;
-			}
-		}
-		
-		if (!translationTransform.IsNull())
-		{
-			_idealTransormationOffset[0] = -1.0 * translationTransform->
+        
+        translationTransform = claheTranslationTransform;
+        break;
+      }
+    }
+    
+    if (!translationTransform.IsNull())
+    {
+      _idealTransormationOffset[0] = -1.0 * translationTransform->
       GetOffset()[0];
-			_idealTransormationOffset[1] = -1.0 * translationTransform->
+      _idealTransormationOffset[1] = -1.0 * translationTransform->
       GetOffset()[1];
-			_matchValue = match_value;
-			tension = tensionOnTransformation(_firstTransformation);
-		}
-		
-		if (translationTransform.IsNull() ||
+      _matchValue = match_value;
+      tension = tensionOnTransformation(_firstTransformation);
+    }
+    
+    if (translationTransform.IsNull() ||
         (translationTransform->GetOffset()[0] == 0.0f &&
          translationTransform->GetOffset()[1] == 0.0f))
-		{
+    {
       printMessage( "Could not build transform ", _verbose );
-			if (match_attempt == 1)
-			{
+      if (match_attempt == 1)
+      {
         printMessage( "Using clahe ", _verbose );
-			}
-			
+      }
+      
       printMessage( "between ", _verbose );
-			_firstTransformation->printImageID( _verbose );
+      _firstTransformation->printImageID( _verbose );
       printMessage( " and ", _verbose );
-			_secondTransformation->printImageID( _verbose );
+      _secondTransformation->printImageID( _verbose );
       printMessage( "\n", _verbose );
-			match_success = false;
-		}
-		else if (sqrtf(tension*tension) > ((_firstTransformation->size()[0] +
+      match_success = false;
+    }
+    else if (sqrtf(tension*tension) > ((_firstTransformation->size()[0] +
                                         _firstTransformation->size()[1]) /
                                        (2.0 * 4.0)))
-		{
-			// if the distance the image is moved is more than
-			// a quarter of the average of the two sides
+    {
+      // if the distance the image is moved is more than
+      // a quarter of the average of the two sides
       printMessage( "A displacement between ", _verbose );
-			_firstTransformation->printImageID( _verbose );
-			printMessage( " and ", _verbose );
-			_secondTransformation->printImageID( _verbose );
-			if (match_attempt == 1)
-			{
-			  printMessage( " using clahe", _verbose );
-			}
+      _firstTransformation->printImageID( _verbose );
+      printMessage( " and ", _verbose );
+      _secondTransformation->printImageID( _verbose );
+      if (match_attempt == 1)
+      {
+        printMessage( " using clahe", _verbose );
+      }
       
       std::ostringstream msg;
       msg << " of " << the_text_t::number( _idealTransormationOffset[0] ) << ", "
       << the_text_t::number( _idealTransormationOffset[1] ) << " is too great\n";
       printMessage( msg.str().c_str(), _verbose );
-			match_success = false;
-		}
-		else
-		{
-			printMessage( "the offset between ", _verbose );
-			_firstTransformation->printImageID( _verbose );
-			printMessage( " and ", _verbose );
-			_secondTransformation->printImageID( _verbose );
+      match_success = false;
+    }
+    else
+    {
+      printMessage( "the offset between ", _verbose );
+      _firstTransformation->printImageID( _verbose );
+      printMessage( " and ", _verbose );
+      _secondTransformation->printImageID( _verbose );
       
       std::ostringstream msg;
       msg << " is " << the_text_t::number( _idealTransormationOffset[0] ) << ", "
       << the_text_t::number( _idealTransormationOffset[1] ) << " with a match value of "
       << the_text_t::number( match_value ) << std::endl;
       printMessage( msg.str().c_str(), _verbose );
-			match_success = true;
-		}
+      match_success = true;
+    }
     
-		match_attempt++;
-	}
-	
-	if (!match_success)
-	{
-    printMessage( "Gave up on finding a connection between ", _verbose );
-		_firstTransformation->printImageID( _verbose );
-    printMessage( " and ", _verbose );
-		_secondTransformation->printImageID( _verbose );
-    printMessage( "\n", _verbose );
-		return -1;
-	}
+    match_attempt++;
+  }
   
-	return 0;
+  if (!match_success)
+  {
+    printMessage( "Gave up on finding a connection between ", _verbose );
+    _firstTransformation->printImageID( _verbose );
+    printMessage( " and ", _verbose );
+    _secondTransformation->printImageID( _verbose );
+    printMessage( "\n", _verbose );
+    return -1;
+  }
+  
+  return 0;
 }

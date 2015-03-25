@@ -161,10 +161,10 @@ RBFTransform::GetInverse(Self* inverse) const
   
 //  RBFTransform::Pointer inverse = RBFTransform::New();
   inverse->setup(tile_min,
-		 tile_max,
-		 num_pts,
-		 num_pts ? &(xy_vec[0]) : 0,
-		 num_pts ? &(uv_vec[0]) : 0);
+     tile_max,
+     num_pts,
+     num_pts ? &(xy_vec[0]) : 0,
+     num_pts ? &(uv_vec[0]) : 0);
   
 //  //return inverse.GetPointer();
 //  RBFTransform::InverseTransformPointer inverseTransform =
@@ -185,14 +185,14 @@ RBFTransform::GetInverseTransform() const
 // 
 void
 RBFTransform::setup(// image bounding box expressed in the image space,
-		    // defines transform normalization parameters:
-		    const OutputPointType & tile_min,	// tile space
-		    const OutputPointType & tile_max,	// tile space
-		    
-		    // landmark correspondences:
-		    const unsigned int num_pts,		// number of pairs
-		    const InputPointType * uv,		// mosaic space
-		    const OutputPointType * xy)		// tile space
+        // defines transform normalization parameters:
+        const OutputPointType & tile_min, // tile space
+        const OutputPointType & tile_max, // tile space
+        
+        // landmark correspondences:
+        const unsigned int num_pts,   // number of pairs
+        const InputPointType * uv,    // mosaic space
+        const OutputPointType * xy)   // tile space
 {
   this->m_FixedParameters.SetSize(4 + num_pts * 2);
   this->m_Parameters.SetSize(6 + num_pts * 2);
@@ -212,8 +212,8 @@ RBFTransform::setup(// image bounding box expressed in the image space,
   for (unsigned int i = 0; i < num_pts; i++)
   {
     unsigned int offset = i * 2;
-    uv_vec[offset]	= uv[i][0];
-    uv_vec[offset + 1]	= uv[i][1];
+    uv_vec[offset]  = uv[i][0];
+    uv_vec[offset + 1]  = uv[i][1];
     
     u_sum += uv[i][0];
     v_sum += uv[i][1];
@@ -250,7 +250,7 @@ RBFTransform::setup(// image bounding box expressed in the image space,
       // kernel components:
       for (unsigned int c = 0; c < num_pts; c++)
       {
-	M(r, c) = kernel(&(uv[r][0]), &(uv[c][0]), Xmax, Ymax);
+  M(r, c) = kernel(&(uv[r][0]), &(uv[c][0]), Xmax, Ymax);
       }
       
       // polynomial components:
@@ -266,8 +266,8 @@ RBFTransform::setup(// image bounding box expressed in the image space,
     // FIXME:
 #if 0
 //    cerr << "M: " << M << endl
-//	 << "bx: " << bx << endl
-//	 << "by: " << by << endl;
+//   << "bx: " << bx << endl
+//   << "by: " << by << endl;
 #endif
     
     // use SVD to solve the linear system:
@@ -392,8 +392,8 @@ RBFTransform::ComputeJacobianWithRespectToParameters( const InputPointType& poin
 // 
 //void
 //RBFTransform::eval(const std::vector<double> & point,
-//		   std::vector<double> & function,
-//		   std::vector<std::vector<double> > & jacobian) const
+//       std::vector<double> & function,
+//       std::vector<std::vector<double> > & jacobian) const
 //{
 //  // shortcuts:
 //  const double & Xmax = GetXmax();

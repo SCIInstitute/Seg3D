@@ -53,57 +53,57 @@ class IRConnection;
 // 
 class IRTransform
 {
-	typedef std::vector<IRConnection*> IRConnectionVector;
+  typedef std::vector<IRConnection*> IRConnectionVector;
   
 public:
-	IRTransform(base_transform_t::Pointer transformBase,
+  IRTransform(base_transform_t::Pointer transformBase,
               const bfs::path & imageID,
               const bfs::path & maskID);
-	virtual ~IRTransform();
-	
-	const pnt2d_t & position() const;
-	const vec2d_t & size() const;
-	
-	long groupID() const;
-	void setGroupID(long newID);
-	
-	const IRConnectionVector & connections() const;
-	
-	bool overlapsTransform(const IRTransform* otherTransform) const;
-	
-	// sets start and size to the area that is covered by otherTransfrom,
-	// the value returned by this function are with respect the the corner of
-	// the transformation.
-	// if they don't overlap at all this function returns an error (-1)
-	int trasformOverlapArea(const IRTransform* otherTransform,
+  virtual ~IRTransform();
+  
+  const pnt2d_t & position() const;
+  const vec2d_t & size() const;
+  
+  long groupID() const;
+  void setGroupID(long newID);
+  
+  const IRConnectionVector & connections() const;
+  
+  bool overlapsTransform(const IRTransform* otherTransform) const;
+  
+  // sets start and size to the area that is covered by otherTransfrom,
+  // the value returned by this function are with respect the the corner of
+  // the transformation.
+  // if they don't overlap at all this function returns an error (-1)
+  int trasformOverlapArea(const IRTransform* otherTransform,
                           pnt2d_t *start,
                           vec2d_t *size) const;
-	
-	vec2d_t totalTension();
-	void releaseTension();
-	
-	
-	void addConnection(IRConnection* connection);
-	void removeConnection(IRConnection* connection);
-	base_transform_t::Pointer transformBase();
-	const bfs::path & imageID() const;
-	const bfs::path & maskID() const;
   
-	// DEBUG stuff
-	void printImageID( bool verbose );
-	void printMaskID( bool verbose );
+  vec2d_t totalTension();
+  void releaseTension();
+  
+  
+  void addConnection(IRConnection* connection);
+  void removeConnection(IRConnection* connection);
+  base_transform_t::Pointer transformBase();
+  const bfs::path & imageID() const;
+  const bfs::path & maskID() const;
+  
+  // DEBUG stuff
+  void printImageID( bool verbose );
+  void printMaskID( bool verbose );
   
 private:
-	IRConnectionVector _connections;
-	base_transform_t::Pointer _transformBase;
-	bfs::path _imageID;
+  IRConnectionVector _connections;
+  base_transform_t::Pointer _transformBase;
+  bfs::path _imageID;
   bfs::path _maskID;
-	
-	pnt2d_t _position;
-	vec2d_t _size;
   
-	// all tiles that are connected share the same groupID once this
-	long _groupID;
+  pnt2d_t _position;
+  vec2d_t _size;
+  
+  // all tiles that are connected share the same groupID once this
+  long _groupID;
 };
 
 

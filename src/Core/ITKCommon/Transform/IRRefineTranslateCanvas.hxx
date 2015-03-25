@@ -64,83 +64,83 @@ typedef std::vector<IRConnection*> IRConnectionVector;
 // 
 class IRRefineTranslateCanvas
 {
-	typedef std::vector<IRTransform*> IRTransformationVector;
-	typedef std::vector<base_transform_t::Pointer> TrasformBasePointerVector;
-	typedef std::vector<bfs::path> TheTextVector;
-	typedef std::list<bfs::path> TheTextList;
-	
+  typedef std::vector<IRTransform*> IRTransformationVector;
+  typedef std::vector<base_transform_t::Pointer> TrasformBasePointerVector;
+  typedef std::vector<bfs::path> TheTextVector;
+  typedef std::list<bfs::path> TheTextList;
+  
 public:
-	
-	IRRefineTranslateCanvas();
-	virtual ~IRRefineTranslateCanvas();
+  
+  IRRefineTranslateCanvas();
+  virtual ~IRRefineTranslateCanvas();
   
   // Refuse offsets bigger than this number.
   void setMaxOffset(const double maxOffset[], bool isPercent);
   
   // Black out the center to force better fft matchings.
   void setBlackMaskPercent(const double blackMaskPercent[]);
-	
-	// takes ownership of the trans
-	void setBaseTransforms(const TrasformBasePointerVector& transforms,
+  
+  // takes ownership of the trans
+  void setBaseTransforms(const TrasformBasePointerVector& transforms,
                          const TheTextVector& imageIDs,
                          const TheTextVector& maskIDs);
   
   // Should we try a clahe run if the other run fails?
   void doClahe( bool doClahe );
-	
-	void fillTransformAndImageIDVectors(TrasformBasePointerVector& transforms,
+  
+  void fillTransformAndImageIDVectors(TrasformBasePointerVector& transforms,
                                       TheTextVector& imageIDs,
                                       TheTextVector& maskIDs);
-	
-	// silly other version that uses a list because fo some reason
-	// paul likes using lists for the list of image IDs........
-	void fillTransformAndImageIDVectors(TrasformBasePointerVector& transforms,
+  
+  // silly other version that uses a list because fo some reason
+  // paul likes using lists for the list of image IDs........
+  void fillTransformAndImageIDVectors(TrasformBasePointerVector& transforms,
                                       TheTextList& imageIDs,
                                       TheTextList& maskIDs);
   
-	// based on the current positions of each of the transforms
-	// (which, when this is called will be the positions in the
-	// .mosaic file that was loaded) this routine creates IRConnections
-	// for each overlap and puts them in _preProcessedConnectionVector,
-	// the connections are not added to the individual transforms
-	// until findIdealTransformationOffsets is called
-	void buildConnections( bool verbose = false );
+  // based on the current positions of each of the transforms
+  // (which, when this is called will be the positions in the
+  // .mosaic file that was loaded) this routine creates IRConnections
+  // for each overlap and puts them in _preProcessedConnectionVector,
+  // the connections are not added to the individual transforms
+  // until findIdealTransformationOffsets is called
+  void buildConnections( bool verbose = false );
   
-	// initializes the groupIDs so that all the connected transforms
-	// have the same groupID
-	void fillGroupIDs();
+  // initializes the groupIDs so that all the connected transforms
+  // have the same groupID
+  void fillGroupIDs();
   
-	// removes transforms that are in a group that make up less than
-	// cutoffPercentage of the mosaic
-	void pruneSmallGroups(float cutoffPercentage);
-	
-	void findIdealTransformationOffsets(unsigned int numThreads);
-	
-	void releaseTensionOnSystem();
-	
-	float systemEnergy();
-	float maximumTension();
-	float maximumPullOnTransformation();
+  // removes transforms that are in a group that make up less than
+  // cutoffPercentage of the mosaic
+  void pruneSmallGroups(float cutoffPercentage);
   
-	// what is the signature of a thread entry again? keep on trying t
-	void findOffsetsThreadEntry();
-	
+  void findIdealTransformationOffsets(unsigned int numThreads);
+  
+  void releaseTensionOnSystem();
+  
+  float systemEnergy();
+  float maximumTension();
+  float maximumPullOnTransformation();
+  
+  // what is the signature of a thread entry again? keep on trying t
+  void findOffsetsThreadEntry();
+  
 private:
-	void addProcessedConnection(IRConnection* connection);
-	
-	// returns NULL if there are no more entries to process
-	IRConnection* getConectionToProcess();
-	
-	void setTransformAndNeighborsToGroupID(IRTransform* transform,
-                                         long groupID);
-	
-	void removeTransformsWithGroupID(long groupID);
-	
-	// will be populated by buildConnections()
-	IRConnectionVector _preProcessedConnectionVector;
+  void addProcessedConnection(IRConnection* connection);
   
-	IRTransformationVector _transformationVector;
-	IRConnectionVector _connectionVector;
+  // returns NULL if there are no more entries to process
+  IRConnection* getConectionToProcess();
+  
+  void setTransformAndNeighborsToGroupID(IRTransform* transform,
+                                         long groupID);
+  
+  void removeTransformsWithGroupID(long groupID);
+  
+  // will be populated by buildConnections()
+  IRConnectionVector _preProcessedConnectionVector;
+  
+  IRTransformationVector _transformationVector;
+  IRConnectionVector _connectionVector;
   
   double initialSize;
   

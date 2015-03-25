@@ -40,45 +40,45 @@
 // 
 extern void
 smoothout_orientation_histogram(double * orientation,
-				const unsigned int & bins,
-				const unsigned int iterations = 3);
+        const unsigned int & bins,
+        const unsigned int iterations = 3);
 
 //----------------------------------------------------------------
 // isolate_orientation_histogram_peaks
 // 
 extern bool
 isolate_orientation_histogram_peaks(double * histogram,
-				    const unsigned int & bins,
-				    const bool normalize = false);
+            const unsigned int & bins,
+            const bool normalize = false);
 
 //----------------------------------------------------------------
 // calc_histogram_donations
 // 
 extern unsigned int
 calc_histogram_donations(const unsigned int & bins,
-			 const double & r0,
-			 const double & r1,
-			 const double & r,
-			 unsigned int * donation_bin,
-			 double * donation);
+       const double & r0,
+       const double & r1,
+       const double & r,
+       unsigned int * donation_bin,
+       double * donation);
 
 //----------------------------------------------------------------
 // calc_orientation_histogram_donations
 // 
 extern unsigned int
 calc_orientation_histogram_donations(const unsigned int & bins,
-				     const double & angle,
-				     unsigned int * donation_bin,
-				     double * donation);
+             const double & angle,
+             unsigned int * donation_bin,
+             double * donation);
 
 //----------------------------------------------------------------
 // update_orientation_histogram
 // 
 extern void
 update_orientation_histogram(double * orientation,
-			     const unsigned int & bins,
-			     const double & angle,
-			     const double & value);
+           const unsigned int & bins,
+           const double & angle,
+           const double & value);
 
 
 #endif // HISTOGRAM_HXX_

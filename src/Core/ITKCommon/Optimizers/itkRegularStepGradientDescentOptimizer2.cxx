@@ -158,35 +158,35 @@ RegularStepGradientDescentOptimizer2::ResumeOptimization()
     
     ParametersType currentPosition = this->GetCurrentPosition();
     m_CostFunction->GetValueAndDerivative(currentPosition,
-					  m_Value,
-					  m_Gradient);
+            m_Value,
+            m_Gradient);
     
     if ((this->m_Maximize && m_Value < m_PreviousValue) ||
-	(!this->m_Maximize && m_Value > m_PreviousValue))
+  (!this->m_Maximize && m_Value > m_PreviousValue))
     {
       // relax the step size:
       m_CurrentStepLength *= m_RelaxationFactor;
       
       if (m_BackTracking)
       {
-//	// FIXME:
-//	*log_ << m_Value << " vs " << m_BestValue
-//	      << " -- relaxing and backtracking, new step length: "
-//	      << m_CurrentStepLength << std::endl;
-	
-	// backtrack to the previous position:
-	this->SetCurrentPosition(m_BestParams);
-	currentPosition = this->GetCurrentPosition();
-	m_CostFunction->GetValueAndDerivative(currentPosition,
-					      m_Value,
-					      m_Gradient);
+//  // FIXME:
+//  *log_ << m_Value << " vs " << m_BestValue
+//        << " -- relaxing and backtracking, new step length: "
+//        << m_CurrentStepLength << std::endl;
+  
+  // backtrack to the previous position:
+  this->SetCurrentPosition(m_BestParams);
+  currentPosition = this->GetCurrentPosition();
+  m_CostFunction->GetValueAndDerivative(currentPosition,
+                m_Value,
+                m_Gradient);
       }
       else
       {
-//	// FIXME:
-//	*log_ << m_Value << " vs " << m_PreviousValue
-//	      << " -- relaxing, new step length: "
-//	      << m_CurrentStepLength << std::endl;
+//  // FIXME:
+//  *log_ << m_Value << " vs " << m_PreviousValue
+//        << " -- relaxing, new step length: "
+//        << m_CurrentStepLength << std::endl;
       }
       
       successful_steps = 0;
@@ -196,15 +196,15 @@ RegularStepGradientDescentOptimizer2::ResumeOptimization()
       successful_steps++;
       if (successful_steps % m_PickUpPaceSteps == 0)
       {
-	// pick up the pace after N successful steps:
-	m_CurrentStepLength =
-	  std::min(m_MaximumStepLength,
-		   m_CurrentStepLength / m_RelaxationFactor);
-	
-//	// FIXME:
-//	*log_ << successful_steps
-//	      << " successful steps -- increasing pace, new step length: "
-//	      << m_CurrentStepLength << std::endl;
+  // pick up the pace after N successful steps:
+  m_CurrentStepLength =
+    std::min(m_MaximumStepLength,
+       m_CurrentStepLength / m_RelaxationFactor);
+  
+//  // FIXME:
+//  *log_ << successful_steps
+//        << " successful steps -- increasing pace, new step length: "
+//        << m_CurrentStepLength << std::endl;
       }
     }
     
@@ -216,7 +216,7 @@ RegularStepGradientDescentOptimizer2::ResumeOptimization()
     }
     
     if ((this->m_Maximize && m_Value > m_BestValue) ||
-	(!this->m_Maximize && m_Value < m_BestValue))
+  (!this->m_Maximize && m_Value < m_BestValue))
     {
       m_BestValue = m_Value;
       m_BestParams = currentPosition;
@@ -309,7 +309,7 @@ RegularStepGradientDescentOptimizer2::
 StepAlongGradient(double factor, const DerivativeType & transformedGradient)
 { 
   itkDebugMacro(<< "factor = " << factor
-		<< " transformedGradient = " << transformedGradient);
+    << " transformedGradient = " << transformedGradient);
   
   const unsigned int spaceDimension =
     m_CostFunction->GetNumberOfParameters();

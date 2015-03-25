@@ -64,13 +64,13 @@ IRImageLoader *
 IRImageLoader::sharedImageLoader()
 {
   __IRImageLoaderSharedImageLoaderLock.Lock();
-	if (__sharedIRImageLoader == NULL)
-	{
-		__sharedIRImageLoader = new IRImageLoader();
-	}
-	
+  if (__sharedIRImageLoader == NULL)
+  {
+    __sharedIRImageLoader = new IRImageLoader();
+  }
+  
   __IRImageLoaderSharedImageLoaderLock.Unlock();
-	return __sharedIRImageLoader;
+  return __sharedIRImageLoader;
 }
 
 //----------------------------------------------------------------
@@ -102,17 +102,17 @@ void
 IRImageLoader::setTransformList(const IRTransformVector & transforms,
                                 const TheTextVector & imageIDs)
 {
-	__IRImageLoaderImageAcessLock.Lock();
-	
-	IRTransformVector::const_iterator transformIter = transforms.begin();
-	TheTextVector::const_iterator imageIDIter = imageIDs.begin();
-	for (; transformIter != transforms.end(); transformIter++, imageIDIter++)
-	{
-		_transformations[*imageIDIter] = *transformIter;
-	}
-	_images = imageMap();
-	
-	__IRImageLoaderImageAcessLock.Unlock();
+  __IRImageLoaderImageAcessLock.Lock();
+  
+  IRTransformVector::const_iterator transformIter = transforms.begin();
+  TheTextVector::const_iterator imageIDIter = imageIDs.begin();
+  for (; transformIter != transforms.end(); transformIter++, imageIDIter++)
+  {
+    _transformations[*imageIDIter] = *transformIter;
+  }
+  _images = imageMap();
+  
+  __IRImageLoaderImageAcessLock.Unlock();
 }
 
 //----------------------------------------------------------------
@@ -121,7 +121,7 @@ IRImageLoader::setTransformList(const IRTransformVector & transforms,
 void
 IRImageLoader::setShrinkFactor(unsigned int shrinkFactor)
 {
-	_shrinkFactor = shrinkFactor;
+  _shrinkFactor = shrinkFactor;
 }
 
 //----------------------------------------------------------------
@@ -130,7 +130,7 @@ IRImageLoader::setShrinkFactor(unsigned int shrinkFactor)
 unsigned int
 IRImageLoader::shrinkFactor()
 {
-	return _shrinkFactor;
+  return _shrinkFactor;
 }
 
 //----------------------------------------------------------------
@@ -139,7 +139,7 @@ IRImageLoader::shrinkFactor()
 void
 IRImageLoader::setPixelSpacing(double pixelSpacing)
 {
-	_pixelSpacing = pixelSpacing;
+  _pixelSpacing = pixelSpacing;
 }
 
 //----------------------------------------------------------------
@@ -148,7 +148,7 @@ IRImageLoader::setPixelSpacing(double pixelSpacing)
 double
 IRImageLoader::pixelSpacing()
 {
-	return _pixelSpacing;
+  return _pixelSpacing;
 }
 
 //----------------------------------------------------------------
@@ -158,32 +158,32 @@ vec2d_t
 IRImageLoader::getImageSize(const std::string& imageID,
                             base_transform_t::Pointer transform)
 {
-	vec2d_t imageSize;
-	itk::LegendrePolynomialTransform<double, 1>::Pointer legendrePointer;
-	legendrePointer =
+  vec2d_t imageSize;
+  itk::LegendrePolynomialTransform<double, 1>::Pointer legendrePointer;
+  legendrePointer =
   dynamic_cast<itk::LegendrePolynomialTransform<double, 1> *>
   (transform.GetPointer());
-	const double SCALE = 2.0;
+  const double SCALE = 2.0;
   
-	if (legendrePointer.IsNotNull())
-	{
-		imageSize[0] = legendrePointer->GetFixedParameters()[2] * SCALE;
-		imageSize[1] = legendrePointer->GetFixedParameters()[3] * SCALE;
-	}
-	else
-	{
-		// since this version does not rescale the image it is much faster
-		image_t::Pointer image = getFullResImage(imageID);
-		
-		// first find the size of the tile
-		pnt2d_t bbox_min;
-		pnt2d_t bbox_max;
-		calc_image_bbox<image_t>(image, bbox_min, bbox_max);
-		imageSize = bbox_max - bbox_min;
-		imageSize *= _pixelSpacing;
-	}
-	
-	return imageSize;
+  if (legendrePointer.IsNotNull())
+  {
+    imageSize[0] = legendrePointer->GetFixedParameters()[2] * SCALE;
+    imageSize[1] = legendrePointer->GetFixedParameters()[3] * SCALE;
+  }
+  else
+  {
+    // since this version does not rescale the image it is much faster
+    image_t::Pointer image = getFullResImage(imageID);
+    
+    // first find the size of the tile
+    pnt2d_t bbox_min;
+    pnt2d_t bbox_max;
+    calc_image_bbox<image_t>(image, bbox_min, bbox_max);
+    imageSize = bbox_max - bbox_min;
+    imageSize *= _pixelSpacing;
+  }
+  
+  return imageSize;
 }
 
 //----------------------------------------------------------------
@@ -201,7 +201,7 @@ IRImageLoader::getFullResImage(const std::string& imageID)
     oss << "Tile " << imageID << " cannot be found.";
     CORE_LOG_WARNING(oss.str());
   }
-	return std_tile<image_t>(imagePath,
+  return std_tile<image_t>(imagePath,
                            SHRINK_FACTOR,
                            PIXEL_SPACING);
 }
@@ -212,13 +212,13 @@ IRImageLoader::getFullResImage(const std::string& imageID)
 image_t::Pointer
 IRImageLoader::getImage(const std::string& imageID)
 {
-	imageCheckLoad(imageID);
+  imageCheckLoad(imageID);
   
-	__IRImageLoaderImageAcessLock.Lock();
-	image_t::Pointer image = _images[imageID];
-	__IRImageLoaderImageAcessLock.Unlock();
+  __IRImageLoaderImageAcessLock.Lock();
+  image_t::Pointer image = _images[imageID];
+  __IRImageLoaderImageAcessLock.Unlock();
   
-	return image;
+  return image;
 }
 
 //----------------------------------------------------------------
@@ -227,13 +227,13 @@ IRImageLoader::getImage(const std::string& imageID)
 mask_t::Pointer
 IRImageLoader::getMask(const std::string& maskID)
 {
-	maskCheckLoad(maskID);
+  maskCheckLoad(maskID);
   
-	__IRImageLoaderImageAcessLock.Lock();
-	mask_t::Pointer mask = _masks[maskID];
-	__IRImageLoaderImageAcessLock.Unlock();
+  __IRImageLoaderImageAcessLock.Lock();
+  mask_t::Pointer mask = _masks[maskID];
+  __IRImageLoaderImageAcessLock.Unlock();
   
-	return mask;
+  return mask;
 }
 
 //----------------------------------------------------------------
@@ -242,33 +242,33 @@ IRImageLoader::getMask(const std::string& maskID)
 void
 IRImageLoader::imageCheckLoad(const std::string& imageID)
 {
-	__IRImageLoaderImageAcessLock.Lock();
-	
-	if (_images.find(imageID) != _images.end())
-	{
-		while (_images[imageID].IsNull())
-		{
-			// if another thread is already loading this same image,
-			// spin until it is loaded
-			__IRImageLoaderImageAcessLock.Unlock();
-			sleep_msec(1000);
-			__IRImageLoaderImageAcessLock.Lock();
-		}
-		
-		__IRImageLoaderImageAcessLock.Unlock();
-		return;
-	}
-	
-	_images[imageID] = NULL;
-	__IRImageLoaderImageAcessLock.Unlock();
+  __IRImageLoaderImageAcessLock.Lock();
   
-	image_t::Pointer image = std_tile<image_t>(imageID.c_str(),
+  if (_images.find(imageID) != _images.end())
+  {
+    while (_images[imageID].IsNull())
+    {
+      // if another thread is already loading this same image,
+      // spin until it is loaded
+      __IRImageLoaderImageAcessLock.Unlock();
+      sleep_msec(1000);
+      __IRImageLoaderImageAcessLock.Lock();
+    }
+    
+    __IRImageLoaderImageAcessLock.Unlock();
+    return;
+  }
+  
+  _images[imageID] = NULL;
+  __IRImageLoaderImageAcessLock.Unlock();
+  
+  image_t::Pointer image = std_tile<image_t>(imageID.c_str(),
                                              _shrinkFactor,
                                              _pixelSpacing);
-	
-	__IRImageLoaderImageAcessLock.Lock();
-	_images[imageID] = image;
-	__IRImageLoaderImageAcessLock.Unlock();
+  
+  __IRImageLoaderImageAcessLock.Lock();
+  _images[imageID] = image;
+  __IRImageLoaderImageAcessLock.Unlock();
 }
 
 //----------------------------------------------------------------
@@ -277,10 +277,10 @@ IRImageLoader::imageCheckLoad(const std::string& imageID)
 void
 IRImageLoader::maskCheckLoad(const std::string& maskID)
 {
-	__IRImageLoaderMaskAcessLock.Lock();
-	
-	if (_masks.find(maskID) != _masks.end())
-	{
+  __IRImageLoaderMaskAcessLock.Lock();
+  
+  if (_masks.find(maskID) != _masks.end())
+  {
     if ( !maskID.empty() )
     {
       while (_masks[maskID].IsNull())
@@ -293,18 +293,18 @@ IRImageLoader::maskCheckLoad(const std::string& maskID)
       }
     }
     
-		__IRImageLoaderMaskAcessLock.Unlock();
-		return;
-	}
+    __IRImageLoaderMaskAcessLock.Unlock();
+    return;
+  }
   
-	_masks[maskID] = NULL;
-	__IRImageLoaderMaskAcessLock.Unlock();
+  _masks[maskID] = NULL;
+  __IRImageLoaderMaskAcessLock.Unlock();
   
-	mask_t::Pointer mask;
+  mask_t::Pointer mask;
   if ( !maskID.empty() )
     mask = std_tile<mask_t>(maskID.c_str(), _shrinkFactor, _pixelSpacing);
-	
-	__IRImageLoaderMaskAcessLock.Lock();
-	_masks[maskID] = mask;
-	__IRImageLoaderMaskAcessLock.Unlock();
+  
+  __IRImageLoaderMaskAcessLock.Lock();
+  _masks[maskID] = mask;
+  __IRImageLoaderMaskAcessLock.Unlock();
 }

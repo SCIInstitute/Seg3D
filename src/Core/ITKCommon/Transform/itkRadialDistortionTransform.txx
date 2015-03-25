@@ -348,7 +348,7 @@ namespace itk
     for (unsigned int i = 0; i < N; i++)
     {
       os << indent << "k[" << i << "] = " << this->m_Parameters[i]
-	 << std::endl;
+   << std::endl;
     }
     
     os << indent << "ta = " << this->m_Parameters[N] << std::endl

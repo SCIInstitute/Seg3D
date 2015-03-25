@@ -60,8 +60,8 @@ public:
     const TOptimizer * optimizer = dynamic_cast<const TOptimizer *>(object);
     std::ostringstream oss;
     oss << static_cast<unsigned int>(optimizer->GetCurrentIteration()) << '\t'
-	  << optimizer->GetValue() << '\t'
-	  << optimizer->GetCurrentPosition() << std::endl;
+    << optimizer->GetValue() << '\t'
+    << optimizer->GetCurrentPosition() << std::endl;
     CORE_LOG_MESSAGE(oss.str());
   }
   

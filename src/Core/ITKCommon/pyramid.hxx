@@ -95,10 +95,10 @@ typedef gradient_image_t::PixelType gradient_t;
 // Our goal is to compute every iterations sigma value so this
 // equation iteratively produces the next level.
 // 
-//      sigma	= sqrt{(k^{p+1})^2 - (k^p)^2}
-//		= sqrt{k^{2p+2} - k^{2p}}
-//		= sqrt{k^2p * (k^2 - 1)}
-//		= k^p * sqrt{k^2 - 1}
+//      sigma = sqrt{(k^{p+1})^2 - (k^p)^2}
+//    = sqrt{k^{2p+2} - k^{2p}}
+//    = sqrt{k^2p * (k^2 - 1)}
+//    = k^p * sqrt{k^2 - 1}
 // 
 class octave_t
 {

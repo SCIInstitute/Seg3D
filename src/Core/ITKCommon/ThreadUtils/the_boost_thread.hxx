@@ -57,8 +57,8 @@ class the_boost_terminators_t : public the_terminators_t
 {
 public:
   // virtual: concurrent access controls:
-  void lock()	{ mutex_.lock(); }
-  void unlock()	{ mutex_.unlock(); }
+  void lock() { mutex_.lock(); }
+  void unlock() { mutex_.unlock(); }
   
 private:
   mutable boost::mutex mutex_;

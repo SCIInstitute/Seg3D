@@ -114,12 +114,12 @@ public:
   
   // notify the transaction about a change in it's state:
   virtual void notify(the_transaction_handler_t * handler,
-		      state_t s,
-		      const char * message = NULL);
+          state_t s,
+          const char * message = NULL);
   
   // helper:
   virtual void blab(the_transaction_handler_t * handler,
-		    const char * message);
+        const char * message);
   
   // FIXME: this is a relic:
 //  inline static const the_text_t tr(const char * text)
@@ -184,7 +184,7 @@ public:
   virtual ~the_transaction_handler_t() {}
   
   virtual void handle(the_transaction_t * transaction,
-		      the_transaction_t::state_t s) = 0;
+          the_transaction_t::state_t s) = 0;
   virtual void blab(const char * message) const = 0;
 };
 

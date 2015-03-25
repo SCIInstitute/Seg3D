@@ -99,8 +99,8 @@ the_aa_bbox_t::operator += (const float & r)
   }
   
   assert((min_.x() < max_.x()) &&
-	 (min_.y() < max_.y()) &&
-	 (min_.z() < max_.z()));
+   (min_.y() < max_.y()) &&
+   (min_.z() < max_.z()));
   
   return *this;
 }
@@ -128,11 +128,11 @@ bool
 the_aa_bbox_t::is_empty() const
 {
   return ((min_.x() == FLT_MAX) &&
-	  (min_.y() == FLT_MAX) &&
-	  (min_.z() == FLT_MAX) &&
-	  (max_.x() == -FLT_MAX) &&
-	  (max_.y() == -FLT_MAX) &&
-	  (max_.z() == -FLT_MAX));
+    (min_.y() == FLT_MAX) &&
+    (min_.z() == FLT_MAX) &&
+    (max_.x() == -FLT_MAX) &&
+    (max_.y() == -FLT_MAX) &&
+    (max_.z() == -FLT_MAX));
 }
 
 //----------------------------------------------------------------
@@ -147,8 +147,8 @@ the_aa_bbox_t::is_linear() const
   float dy = max_.y() - min_.y();
   float dz = max_.z() - min_.z();
   return (((dx != 0.0) && (dy == 0.0) && (dz == 0.0)) ||
-	  ((dx == 0.0) && (dy != 0.0) && (dz == 0.0)) ||
-	  ((dx == 0.0) && (dy == 0.0) && (dz != 0.0)));
+    ((dx == 0.0) && (dy != 0.0) && (dz == 0.0)) ||
+    ((dx == 0.0) && (dy == 0.0) && (dz != 0.0)));
 }
 
 //----------------------------------------------------------------
@@ -163,8 +163,8 @@ the_aa_bbox_t::is_planar() const
   float dy = max_.y() - min_.y();
   float dz = max_.z() - min_.z();
   return (((dx == 0.0) && (dy != 0.0) && (dz != 0.0)) ||
-	  ((dx != 0.0) && (dy == 0.0) && (dz != 0.0)) ||
-	  ((dx != 0.0) && (dy != 0.0) && (dz == 0.0)));
+    ((dx != 0.0) && (dy == 0.0) && (dz != 0.0)) ||
+    ((dx != 0.0) && (dy != 0.0) && (dz == 0.0)));
 }
 
 //----------------------------------------------------------------
@@ -216,14 +216,14 @@ the_aa_bbox_t::radius(const p3x1_t & center) const
 //
 float
 the_aa_bbox_t::radius(const p3x1_t & center,
-		      const unsigned int & axis_w_id) const
+          const unsigned int & axis_w_id) const
 {
   assert(axis_w_id < 3);
   unsigned int axis_u_id = (axis_w_id + 1) % 3;
   unsigned int axis_v_id = (axis_u_id + 1) % 3;
   
   p2x1_t uv_center(center[axis_u_id],
-		   center[axis_v_id]);
+       center[axis_v_id]);
   
   p2x1_t uv_corner[] = {
     p2x1_t(min_[axis_u_id], min_[axis_v_id]),
@@ -248,17 +248,17 @@ the_aa_bbox_t::radius(const p3x1_t & center,
 // 
 void
 the_aa_bbox_t::contains(const p3x1_t & pt,
-			bool & contained_in_x,
-			bool & contained_in_y,
-			bool & contained_in_z) const
+      bool & contained_in_x,
+      bool & contained_in_y,
+      bool & contained_in_z) const
 {
   // check whether the point is within the bounding box limits:
   contained_in_x = ((pt.x() <= max_.x()) &&
-		    (pt.x() >= min_.x()));
+        (pt.x() >= min_.x()));
   contained_in_y = ((pt.y() <= max_.y()) &&
-		    (pt.y() >= min_.y()));
+        (pt.y() >= min_.y()));
   contained_in_z = ((pt.z() <= max_.z()) &&
-		    (pt.z() >= min_.z()));
+        (pt.z() >= min_.z()));
 }
 
 //----------------------------------------------------------------
@@ -297,9 +297,9 @@ the_aa_bbox_t::clamp(const the_aa_bbox_t & confines)
 // 
 bool
 the_aa_bbox_t::intersects_ray(const p3x1_t & o,
-			      const v3x1_t & d,
-			      float & t_min,
-			      float & t_max) const
+            const v3x1_t & d,
+            float & t_min,
+            float & t_max) const
 {
   float t[3][2];
   

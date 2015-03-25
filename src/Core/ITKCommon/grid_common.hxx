@@ -91,16 +91,16 @@ typedef itk::RegularStepGradientDescentOptimizer2 optimizer_t;
 //
 extern bool
 setup_grid_transform(the_grid_transform_t & transform,
-		     unsigned int rows,
-		     unsigned int cols,
-		     const pnt2d_t & tile_min,
-		     const pnt2d_t & tile_max,
-		     const mask_t * tile_mask,
-		     base_transform_t::ConstPointer mosaic_to_tile,
-		     unsigned int max_iterations = 100,
-		     double min_step_scale = 1e-12,
-		     double min_error_sqrd = 1e-16,
-		     unsigned int pick_up_pace_steps = 5 // successful steps to pick up pace
+         unsigned int rows,
+         unsigned int cols,
+         const pnt2d_t & tile_min,
+         const pnt2d_t & tile_max,
+         const mask_t * tile_mask,
+         base_transform_t::ConstPointer mosaic_to_tile,
+         unsigned int max_iterations = 100,
+         double min_step_scale = 1e-12,
+         double min_error_sqrd = 1e-16,
+         unsigned int pick_up_pace_steps = 5 // successful steps to pick up pace
 );
 
 //----------------------------------------------------------------
@@ -210,10 +210,10 @@ estimate_displacement(double & best_metric, // current best metric
 //    typedef itk::NormalizedCorrelationImageToImageMetric<TImage, TImage>
 //      metric_t;
 //    double metric = eval_metric<metric_t, interpolator_t>(ti,
-//							  a,
-//							  b,
-//							  mask_a,
-//							  mask_b);
+//                a,
+//                b,
+//                mask_a,
+//                mask_b);
 //#else
     double metric = my_metric<TImage>(area_ratio,
                                       a,
@@ -517,10 +517,10 @@ refine_one_point_fft(vec2d_t & shift,
                          vec2d(origin[0], origin[1]),
                          
                          0.25,// overlap min
-                         1.0,	// overlap max
-                         0.5,	// low pass filter r
-                         0.1,	// low pass filter s
-                         10,	// number of peaks
+                         1.0, // overlap max
+                         0.5, // low pass filter r
+                         0.1, // low pass filter s
+                         10,  // number of peaks
                          true); // consider the no-displacement case
   
 #ifdef DEBUG_REFINE_ONE_POINT
@@ -821,10 +821,10 @@ refine_one_point_fft(vec2d_t & shift,
                          period_sz,
                          
                          0.25,// overlap min
-                         1.0,	// overlap max
-                         0.5,	// low pass filter r
-                         0.1,	// low pass filter s
-                         10,	// number of peaks
+                         1.0, // overlap max
+                         0.5, // low pass filter r
+                         0.1, // low pass filter s
+                         10,  // number of peaks
                          true); // consider the no-displacement case
   
 #ifdef DEBUG_REFINE_ONE_POINT
@@ -1574,10 +1574,10 @@ refine_one_point_nofft(vec2d_t & shift,
    mask_0,
    img_1,
    msk_1,
-   3,		// number of pyramid levels
-   100,	// number of iterations
-   1e-8,	// min step
-   1e+4);	// max step
+   3,   // number of pyramid levels
+   100, // number of iterations
+   1e-8,  // min step
+   1e+4); // max step
   
   std::ostringstream oss;
   
@@ -1679,10 +1679,10 @@ refine_one_point_nofft(vec2d_t & shift,
    msk_0,
    img_1,
    msk_1,
-   3,		// number of pyramid levels
-   100,	// number of iterations
-   1e-8,	// min step
-   1e+4);	// max step
+   3,   // number of pyramid levels
+   100, // number of iterations
+   1e-8,  // min step
+   1e+4); // max step
   
 #ifdef DEBUG_REFINE_ONE_POINT
   static const bfs::path fn_save("/tmp/refine_one_point_nofft-");

@@ -647,8 +647,8 @@ visualize_best_fit(const bfs::path & fn_prefix,
      dump(std::cout, &(a.descriptor_[0]), a.descriptor_.size(), 10, true);
      dump(std::cout, &(b.descriptor_[0]), b.descriptor_.size(), 10, true);
      std::cout << "a: " << a.descriptor_ << std::endl
-	   << "b: " << b.descriptor_ << std::endl
-	   << std::endl;
+     << "b: " << b.descriptor_ << std::endl
+     << std::endl;
      #endif
      
      draw_feature_dot(a_rgb,
@@ -689,9 +689,9 @@ visualize_best_fit(const bfs::path & fn_prefix,
 // FIXME:
 //#if 0
 //    std::cout << fn_prefix
-//	 << " a" << a.octave_ << '.' << a.scale_
-//	 << " b" << b.octave_ << '.' << b.scale_
-//	 << std::endl;
+//   << " a" << a.octave_ << '.' << a.scale_
+//   << " b" << b.octave_ << '.' << b.scale_
+//   << std::endl;
 //#endif
   }
   

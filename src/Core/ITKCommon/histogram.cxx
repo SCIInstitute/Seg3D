@@ -48,8 +48,8 @@
 // 
 void
 smoothout_orientation_histogram(double * orientation,
-				const unsigned int & bins,
-				const unsigned int iterations)
+        const unsigned int & bins,
+        const unsigned int iterations)
 {
   std::vector<double> tmp(bins);
   for (unsigned int i = 0; i < iterations; i++)
@@ -57,9 +57,9 @@ smoothout_orientation_histogram(double * orientation,
     for (unsigned int j = 0; j < bins; j++)
     {
       tmp[j] =
-	(orientation[(j - 1 + bins) % bins] +
-	 orientation[j] +
-	 orientation[(j + 1) % bins]) / 3.0;
+  (orientation[(j - 1 + bins) % bins] +
+   orientation[j] +
+   orientation[(j + 1) % bins]) / 3.0;
     }
     
     for (unsigned int j = 0; j < bins; j++)
@@ -74,8 +74,8 @@ smoothout_orientation_histogram(double * orientation,
 // 
 bool
 isolate_orientation_histogram_peaks(double * histogram,
-				    const unsigned int & bins,
-				    const bool normalize)
+            const unsigned int & bins,
+            const bool normalize)
 {
   // find the min/max of the histogram so that it can be remapped
   // into the [0, 1] range:
@@ -123,8 +123,8 @@ isolate_orientation_histogram_peaks(double * histogram,
       if (d < 0.0) histogram[i] = 0.0;
       else
       {
-	new_avg += histogram[i];
-	counter++;
+  new_avg += histogram[i];
+  counter++;
       }
     }
     
@@ -164,11 +164,11 @@ isolate_orientation_histogram_peaks(double * histogram,
 // 
 unsigned int
 calc_histogram_donations(const unsigned int & bins,
-			 const double & r0,
-			 const double & r1,
-			 const double & r,
-			 unsigned int * donation_bin,
-			 double * donation)
+       const double & r0,
+       const double & r1,
+       const double & r,
+       unsigned int * donation_bin,
+       double * donation)
 {
   const unsigned int a0 = 0;
   const unsigned int a1 = bins - 1;
@@ -199,9 +199,9 @@ calc_histogram_donations(const unsigned int & bins,
 // 
 unsigned int
 calc_orientation_histogram_donations(const unsigned int & bins,
-				     const double & angle,
-				     unsigned int * donation_bin,
-				     double * donation)
+             const double & angle,
+             unsigned int * donation_bin,
+             double * donation)
 {
   double direction = clamp_angle(angle);
   
@@ -227,9 +227,9 @@ calc_orientation_histogram_donations(const unsigned int & bins,
 // 
 void
 update_orientation_histogram(double * orientation,
-			     const unsigned int & bins,
-			     const double & angle,
-			     const double & value)
+           const unsigned int & bins,
+           const double & angle,
+           const double & value)
 {
   static unsigned int bin[3];
   static double w[3];

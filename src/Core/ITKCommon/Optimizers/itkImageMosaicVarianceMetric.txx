@@ -62,15 +62,15 @@ template <class TImage, class TInterpolator>
 void
 ImageMosaicVarianceMetric<TImage, TInterpolator>::
 setup_param_map(const std::vector<bool> & param_shared,
-		const std::vector<bool> & param_active)
+    const std::vector<bool> & param_active)
 {
   const unsigned int num_transforms = transform_.size();
   assert(num_transforms > 0);
   
   const unsigned int n_params = param_shared.size();
   assert(n_params > 0 &&
-	 n_params == param_active.size() &&
-	 n_params == transform_[0]->GetNumberOfParameters());
+   n_params == param_active.size() &&
+   n_params == transform_[0]->GetNumberOfParameters());
   
   // save the active parameters mask:
   param_active_ = param_active;
@@ -99,13 +99,13 @@ setup_param_map(const std::vector<bool> & param_shared,
       
       if (param_shared[j])
       {
-	address_[i][j] = s_off;
-	s_off++;
+  address_[i][j] = s_off;
+  s_off++;
       }
       else
       {
-	address_[i][j] = u_off;
-	u_off++;
+  address_[i][j] = u_off;
+  u_off++;
       }
       
       // FIXME:
@@ -254,7 +254,7 @@ Initialize() throw (ExceptionObject)
     {
       // oops:
       std::cerr << "gradient filter threw an exception:" << std::endl
-	   << exception << std::endl;
+     << exception << std::endl;
       throw exception;
     }
     
@@ -275,8 +275,8 @@ template <class TImage, class TInterpolator>
 void
 ImageMosaicVarianceMetric<TImage, TInterpolator>::
 GetValueAndDerivative(const params_t & parameters,
-		      measure_t & measure,
-		      derivative_t & derivative) const
+          measure_t & measure,
+          derivative_t & derivative) const
 {
   WRAP(itk_terminator_t
        terminator("ImageMosaicVarianceMetric::GetValueAndDerivative"));
@@ -338,7 +338,7 @@ GetValueAndDerivative(const params_t & parameters,
   // calculate image bounding boxes in the mosaic space, as well as the
   // mosaic bounding box:
   pnt2d_t mosaic_min = pnt2d(std::numeric_limits<double>::max(),
-			   std::numeric_limits<double>::max());
+         std::numeric_limits<double>::max());
   pnt2d_t mosaic_max = pnt2d(-mosaic_min[0], -mosaic_min[1]);
   std::vector<pnt2d_t> min(num_images);
   std::vector<pnt2d_t> max(num_images);
@@ -407,7 +407,7 @@ GetValueAndDerivative(const params_t & parameters,
     for (unsigned int k = 0; k < num_images; k++)
     {
       if (point[0] < min[k][0] || point[0] > max[k][0] ||
-	  point[1] < min[k][1] || point[1] > max[k][1]) continue;
+    point[1] < min[k][1] || point[1] > max[k][1]) continue;
       
       typename transform_t::Pointer & t = transform_[k];
       pnt2d_t pt_k = t->TransformPoint(point);
@@ -451,7 +451,7 @@ GetValueAndDerivative(const params_t & parameters,
     measure_t Mu = measure_t(0);
     dMu.assign(n_concat, measure_t(0));
     for (typename std::list<const image_data_t *>::const_iterator
-	   i = overlap.begin(); i != overlap.end(); ++i)
+     i = overlap.begin(); i != overlap.end(); ++i)
     {
       const image_data_t & data = *(*i);
       const unsigned int * addr = &(address_[data.id_][0]);
@@ -461,9 +461,9 @@ GetValueAndDerivative(const params_t & parameters,
       
       for (unsigned int j = 0; j < n_params; j++)
       {
-	dMu[addr[j]] +=
-	  (J[0][j] * data.dPdx_ + J[1][j] * data.dPdy_)
-	  * normalization_factor;
+  dMu[addr[j]] +=
+    (J[0][j] * data.dPdx_ + J[1][j] * data.dPdy_)
+    * normalization_factor;
       }
     }
     Mu *= normalization_factor;
@@ -479,7 +479,7 @@ GetValueAndDerivative(const params_t & parameters,
     measure_t V = measure_t(0);
     dV.assign(n_concat, measure_t(0));
     for (typename std::list<const image_data_t *>::const_iterator
-	   i = overlap.begin(); i != overlap.end(); ++i)
+     i = overlap.begin(); i != overlap.end(); ++i)
     {
       const image_data_t & data = *(*i);
       const unsigned int * addr = &(address_[data.id_][0]);
@@ -490,10 +490,10 @@ GetValueAndDerivative(const params_t & parameters,
       
       for (unsigned int j = 0; j < n_params; j++)
       {
-	dV[addr[j]] +=
-	  measure_t(2) * d *
-	  (J[0][j] * data.dPdx_ + J[1][j] * data.dPdy_ - dMu[addr[j]])
-	  * normalization_factor;
+  dV[addr[j]] +=
+    measure_t(2) * d *
+    (J[0][j] * data.dPdx_ + J[1][j] * data.dPdy_ - dMu[addr[j]])
+    * normalization_factor;
       }
     }
     V *= normalization_factor;
@@ -510,22 +510,22 @@ GetValueAndDerivative(const params_t & parameters,
     {
       FIXME_FIRST_RUN = false;
       for (typename std::list<const image_data_t *>::const_iterator
-	     i = overlap.begin(); i != overlap.end(); ++i)
+       i = overlap.begin(); i != overlap.end(); ++i)
       {
-	const image_data_t & data = *(*i);
-	const unsigned int * addr = &(address_[data.id_][0]);
-	const jacobian_t & J = *(data.J_);
-	
-	for (unsigned int k = 0; k < 2; k++)
-	{
-	  cout << "J[" << k << "] =";
-	  for (unsigned int j = 0; j < n_params; j++)
-	  {
-	    cout << ' ' << J[k][j];
-	  }
-	  cout << endl;
-	}
-	cout << endl;
+  const image_data_t & data = *(*i);
+  const unsigned int * addr = &(address_[data.id_][0]);
+  const jacobian_t & J = *(data.J_);
+  
+  for (unsigned int k = 0; k < 2; k++)
+  {
+    cout << "J[" << k << "] =";
+    for (unsigned int j = 0; j < n_params; j++)
+    {
+      cout << ' ' << J[k][j];
+    }
+    cout << endl;
+  }
+  cout << endl;
       }
     }
 #endif
@@ -575,23 +575,23 @@ template <class TImage, class TInterpolator>
 void
 ImageMosaicVarianceMetric<TImage, TInterpolator>::
 CalcMosaicBBox(point_t & mosaic_min,
-	       point_t & mosaic_max,
-	       std::vector<point_t> & min,
-	       std::vector<point_t> & max) const
+         point_t & mosaic_max,
+         std::vector<point_t> & min,
+         std::vector<point_t> & max) const
 {
   // image space bounding boxes:
   std::vector<point_t> image_min;
   std::vector<point_t> image_max;
   calc_image_bboxes<typename image_t::ConstPointer>(image_,
-						    image_min,
-						    image_max);
+                image_min,
+                image_max);
   
   // mosaic space bounding boxes:
   calc_mosaic_bboxes<point_t, typename transform_t::Pointer>(transform_,
-							     image_min,
-							     image_max,
-							     min,
-							     max);
+                   image_min,
+                   image_max,
+                   min,
+                   max);
   
   // mosiac bounding box:
   calc_mosaic_bbox<point_t>(min, max, mosaic_min, mosaic_max);
@@ -604,7 +604,7 @@ template <class TImage, class TInterpolator>
 typename TImage::Pointer
 ImageMosaicVarianceMetric<TImage, TInterpolator>::
 variance(measure_t & max_var,
-	 measure_t & avg_var) const
+   measure_t & avg_var) const
 {
   max_var = measure_t(0);
   avg_var = measure_t(0);
@@ -617,17 +617,17 @@ variance(measure_t & max_var,
   }
   
   pnt2d_t mosaic_min = pnt2d(std::numeric_limits<double>::max(),
-			     std::numeric_limits<double>::max());
+           std::numeric_limits<double>::max());
   pnt2d_t mosaic_max = pnt2d(-mosaic_min[0], -mosaic_min[1]);
   std::vector<pnt2d_t> min(num_images);
   std::vector<pnt2d_t> max(num_images);
   CalcMosaicBBox(mosaic_min, mosaic_max, min, max);
   
   return variance(image_[0]->GetSpacing(),
-		  mosaic_min,
-		  mosaic_max,
-		  max_var,
-		  avg_var);
+      mosaic_min,
+      mosaic_max,
+      max_var,
+      avg_var);
 }
 
 //----------------------------------------------------------------
@@ -637,21 +637,21 @@ template <class TImage, class TInterpolator>
 typename TImage::Pointer
 ImageMosaicVarianceMetric<TImage, TInterpolator>::
 variance(const typename TImage::SpacingType & mosaic_sp,
-	 const pnt2d_t & mosaic_min,
-	 const pnt2d_t & mosaic_max,
-	 measure_t & max_var,
-	 measure_t & avg_var) const
+   const pnt2d_t & mosaic_min,
+   const pnt2d_t & mosaic_max,
+   measure_t & max_var,
+   measure_t & avg_var) const
 {
   typename TImage::SizeType mosaic_sz;
   mosaic_sz[0] = (unsigned int)((mosaic_max[0] - mosaic_min[0]) /
-				mosaic_sp[0]);
+        mosaic_sp[0]);
   mosaic_sz[1] = (unsigned int)((mosaic_max[1] - mosaic_min[1]) /
-				mosaic_sp[1]);
+        mosaic_sp[1]);
   return variance(mosaic_sp,
-		  mosaic_min,
-		  mosaic_sz,
-		  max_var,
-		  avg_var);
+      mosaic_min,
+      mosaic_sz,
+      max_var,
+      avg_var);
 }
 
 //----------------------------------------------------------------
@@ -661,10 +661,10 @@ template <class TImage, class TInterpolator>
 typename TImage::Pointer
 ImageMosaicVarianceMetric<TImage, TInterpolator>::
 variance(const typename TImage::SpacingType & mosaic_sp,
-	 const pnt2d_t & mosaic_min,
-	 const typename TImage::SizeType & mosaic_sz,
-	 measure_t & max_var,
-	 measure_t & avg_var) const
+   const pnt2d_t & mosaic_min,
+   const typename TImage::SizeType & mosaic_sz,
+   measure_t & max_var,
+   measure_t & avg_var) const
 {
   WRAP(itk_terminator_t
        terminator("ImageMosaicVarianceMetric::GetValueAndDerivative"));
@@ -685,7 +685,7 @@ variance(const typename TImage::SpacingType & mosaic_sp,
   // calculate image bounding boxes in the mosaic space, as well as the
   // mosaic bounding box:
   pnt2d_t global_min = pnt2d(std::numeric_limits<double>::max(),
-			     std::numeric_limits<double>::max());
+           std::numeric_limits<double>::max());
   pnt2d_t global_max = pnt2d(-global_min[0], -global_min[1]);
   std::vector<pnt2d_t> min(num_images);
   std::vector<pnt2d_t> max(num_images);
@@ -717,7 +717,7 @@ variance(const typename TImage::SpacingType & mosaic_sp,
     for (unsigned int k = 0; k < num_images; k++)
     {
       if (point[0] < min[k][0] || point[0] > max[k][0] ||
-	  point[1] < min[k][1] || point[1] > max[k][1]) continue;
+    point[1] < min[k][1] || point[1] > max[k][1]) continue;
       
       const typename transform_t::Pointer & t = transform_[k];
       pnt2d_t pt_k = t->TransformPoint(point);
@@ -746,7 +746,7 @@ variance(const typename TImage::SpacingType & mosaic_sp,
     // calculate the mean and derivative of the mean:
     measure_t Mu = measure_t(0);
     for (std::list<measure_t>::const_iterator i = overlap.begin();
-	 i != overlap.end(); ++i)
+   i != overlap.end(); ++i)
     {
       Mu += *i;
     }
@@ -755,7 +755,7 @@ variance(const typename TImage::SpacingType & mosaic_sp,
     // calculate the variance:
     measure_t V = measure_t(0);
     for (std::list<measure_t>::const_iterator i = overlap.begin();
-	 i != overlap.end(); ++i)
+   i != overlap.end(); ++i)
     {
       measure_t d = *i - Mu;
       V += d * d;

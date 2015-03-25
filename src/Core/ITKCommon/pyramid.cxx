@@ -131,8 +131,8 @@ calculate_curvature_ratio(const image_t * D1,
   double Dyy = (N[7] - 2.0 * N[4] + N[1]);
   double Dxy = (N[8] - N[6] + N[0] - N[2]) / 4.0;
   
-  double TrH = Dxx + Dyy;		// twice the mean curvature
-  double DetH = Dxx * Dyy - Dxy * Dxy;	// gaussian curvature
+  double TrH = Dxx + Dyy;   // twice the mean curvature
+  double DetH = Dxx * Dyy - Dxy * Dxy;  // gaussian curvature
   double ratio = TrH * TrH / DetH;
   
   return ratio;
@@ -1796,22 +1796,22 @@ octave_t::detect_extrema(const unsigned int & pyramid,
     
     // generate extrema points:
     collect_extrema(extrema_min_[i],
-                    pyramid,		// pyramid index
-                    octave,		// octave index
-                    i,			// scale index
-                    D1,			// DoG image
+                    pyramid,    // pyramid index
+                    octave,   // octave index
+                    i,      // scale index
+                    D1,     // DoG image
                     mask_eroded_,
-                    cm_min,		// centers of mass of maxima peaks
-                    1.1);		// principal curvature ratio
+                    cm_min,   // centers of mass of maxima peaks
+                    1.1);   // principal curvature ratio
     
     collect_extrema(extrema_max_[i],
-                    pyramid,		// pyramid index
-                    octave,		// octave index
-                    i,			// scale index
-                    D1,			// DoG image
+                    pyramid,    // pyramid index
+                    octave,   // octave index
+                    i,      // scale index
+                    D1,     // DoG image
                     mask_eroded_,
-                    cm_max,		// centers of mass of maxima peaks
-                    1.1);		// principal curvature ratio
+                    cm_max,   // centers of mass of maxima peaks
+                    1.1);   // principal curvature ratio
 //#else
 //    // try to isolate flat regions in the image:
 //    image_t::RegionType rn = L_[i]->GetLargestPossibleRegion();
@@ -2029,13 +2029,13 @@ octave_t::generate_keys()
     // generate feature keys:
     ::generate_orientations(keys_min_[i],
                             extrema_min_[i],
-                            gL_[i],		// gradient vector image
-                            sigma_[i]);		// keypoint sigma
+                            gL_[i],   // gradient vector image
+                            sigma_[i]);   // keypoint sigma
     
     ::generate_orientations(keys_max_[i],
                             extrema_max_[i],
-                            gL_[i],		// gradient vector image
-                            sigma_[i]);		// keypoint sigma
+                            gL_[i],   // gradient vector image
+                            sigma_[i]);   // keypoint sigma
   }
 }
 
@@ -2227,8 +2227,8 @@ pyramid_t::detect_extrema(const unsigned int & pyramid,
       prefix << "o" << the_text_t::number(i) << "-";
     }
     
-    octave_[i].detect_extrema(pyramid,	// pyramid id
-                              i,	// octave id
+    octave_[i].detect_extrema(pyramid,  // pyramid id
+                              i,  // octave id
                               percent_below_threshold,
                               threshold_by_area,
                               prefix.str());

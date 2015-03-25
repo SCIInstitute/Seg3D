@@ -57,7 +57,7 @@ using std::endl;
 // 
 the_transaction_wrapper_t::
 the_transaction_wrapper_t(const unsigned int & num_parts,
-			  the_transaction_t * transaction):
+        the_transaction_t * transaction):
   mutex_(the_mutex_interface_t::create()),
   cb_(transaction->notify_cb_),
   cb_data_(transaction->notify_cb_data_),
@@ -86,8 +86,8 @@ the_transaction_wrapper_t::~the_transaction_wrapper_t()
 // 
 void
 the_transaction_wrapper_t::notify_cb(void * data,
-				     the_transaction_t * t,
-				     the_transaction_t::state_t s)
+             the_transaction_t * t,
+             the_transaction_t::state_t s)
 {
   the_transaction_wrapper_t * wrapper = (the_transaction_wrapper_t *)(data);
   bool done = wrapper->notify(t, s);
@@ -102,7 +102,7 @@ the_transaction_wrapper_t::notify_cb(void * data,
 // 
 bool
 the_transaction_wrapper_t::notify(the_transaction_t * t,
-				  the_transaction_t::state_t s)
+          the_transaction_t::state_t s)
 {
   the_lock_t<the_mutex_interface_t> locker(mutex_);
   notified_[s]++;
@@ -118,7 +118,7 @@ the_transaction_wrapper_t::notify(the_transaction_t * t,
     case the_transaction_t::STARTED_E:
       if (notified_[s] == 1 && num_terminal_notifications == 0 && cb_ != NULL)
       {
-	cb_(cb_data_, t, s);
+  cb_(cb_data_, t, s);
       }
       return false;
       
@@ -126,34 +126,34 @@ the_transaction_wrapper_t::notify(the_transaction_t * t,
     case the_transaction_t::ABORTED_E:
     case the_transaction_t::DONE_E:
       {
-	if (num_terminal_notifications == num_parts_)
-	{
-	  // restore the transaction callback:
-	  t->set_notify_cb(cb_, cb_data_);
-	  
-	  // if necessary, consolidate the transaction state into one:
-	  if (num_terminal_notifications !=
-	      notified_[the_transaction_t::DONE_E])
-	  {
-	    the_transaction_t::state_t state =
-	      notified_[the_transaction_t::ABORTED_E] > 0 ?
-	      the_transaction_t::ABORTED_E :
-	      the_transaction_t::SKIPPED_E;
-	    t->set_state(state);
-	  }
-	  
-	  if (cb_ != NULL)
-	  {
-	    cb_(cb_data_, t, t->state());
-	  }
-	  else
-	  {
-	    delete t;
-	  }
-	  
-	  return true;
-	}
-	return false;
+  if (num_terminal_notifications == num_parts_)
+  {
+    // restore the transaction callback:
+    t->set_notify_cb(cb_, cb_data_);
+    
+    // if necessary, consolidate the transaction state into one:
+    if (num_terminal_notifications !=
+        notified_[the_transaction_t::DONE_E])
+    {
+      the_transaction_t::state_t state =
+        notified_[the_transaction_t::ABORTED_E] > 0 ?
+        the_transaction_t::ABORTED_E :
+        the_transaction_t::SKIPPED_E;
+      t->set_state(state);
+    }
+    
+    if (cb_ != NULL)
+    {
+      cb_(cb_data_, t, t->state());
+    }
+    else
+    {
+      delete t;
+    }
+    
+    return true;
+  }
+  return false;
       }
       
     default:
@@ -217,18 +217,18 @@ the_thread_pool_t::start()
       if (idle_.empty())
       {
 #ifdef DEBUG_THREAD
-	// sanity test:
-	for (unsigned int i = 0; i < pool_size_; i++)
-	{
-	  the_lock_t<the_mutex_interface_t> locker(pool_[i].thread_->mutex());
-	  if (!pool_[i].thread_->has_work())
-	  {
-	    cerr << "WARNING: thread " << i << ", " << pool_[i].thread_
-		 << " is actually idle" << endl;
-	  }
-	}
+  // sanity test:
+  for (unsigned int i = 0; i < pool_size_; i++)
+  {
+    the_lock_t<the_mutex_interface_t> locker(pool_[i].thread_->mutex());
+    if (!pool_[i].thread_->has_work())
+    {
+      cerr << "WARNING: thread " << i << ", " << pool_[i].thread_
+     << " is actually idle" << endl;
+    }
+  }
 #endif
-	return;
+  return;
       }
       
       // get the next worker thread:
@@ -243,18 +243,18 @@ the_thread_pool_t::start()
       
 #ifdef DEBUG_THREAD
       cerr << "starting thread " << id << ", " << thread(id) << ", " << t
-	   << endl;
+     << endl;
       
       for (std::list<unsigned int>::const_iterator i = idle_.begin();
-	   i != idle_.end(); ++i)
+     i != idle_.end(); ++i)
       {
-	cerr << "idle: thread " << *i << ", " << thread(*i) << endl;
+  cerr << "idle: thread " << *i << ", " << thread(*i) << endl;
       }
       
       for (std::list<unsigned int>::const_iterator i = busy_.begin();
-	   i != busy_.end(); ++i)
+     i != busy_.end(); ++i)
       {
-	cerr << "busy: thread " << *i << ", " << thread(*i) << endl;
+  cerr << "busy: thread " << *i << ", " << thread(*i) << endl;
       }
 #endif
     }
@@ -289,8 +289,8 @@ the_thread_pool_t::set_idle_sleep_duration(bool enable, unsigned int microsec)
 // 
 static void
 notify_cb(void * data,
-	  the_transaction_t * transaction,
-	  the_transaction_t::state_t s)
+    the_transaction_t * transaction,
+    the_transaction_t::state_t s)
 {
   the_thread_pool_t * pool = (the_thread_pool_t *)(data);
   pool->handle(transaction, s);
@@ -339,7 +339,7 @@ wrap(the_transaction_t * transaction,
 // 
 void
 the_thread_pool_t::push_front(the_transaction_t * transaction,
-			      bool multithreaded)
+            bool multithreaded)
 {
   the_lock_t<the_mutex_interface_t> locker(mutex_);
   no_lock_push_front(transaction, multithreaded);
@@ -350,7 +350,7 @@ the_thread_pool_t::push_front(the_transaction_t * transaction,
 // 
 void
 the_thread_pool_t::push_back(the_transaction_t * transaction,
-			     bool multithreaded)
+           bool multithreaded)
 {
   the_lock_t<the_mutex_interface_t> locker(mutex_);
   no_lock_push_back(transaction, multithreaded);
@@ -361,7 +361,7 @@ the_thread_pool_t::push_back(the_transaction_t * transaction,
 // 
 void
 the_thread_pool_t::push_back(std::list<the_transaction_t *> & schedule,
-			     bool multithreaded)
+           bool multithreaded)
 {
   the_lock_t<the_mutex_interface_t> locker(mutex_);
   no_lock_push_back(schedule, multithreaded);
@@ -402,7 +402,7 @@ the_thread_pool_t::has_work() const
   
   // make sure the busy threads have work:
   for (std::list<unsigned int>::const_iterator
-	 iter = busy_.begin(); iter != busy_.end(); ++iter)
+   iter = busy_.begin(); iter != busy_.end(); ++iter)
   {
     unsigned int i = *iter;
     if (pool_[i].thread_->has_work()) return true;
@@ -475,7 +475,7 @@ the_thread_pool_t::terminate_transactions()
 // 
 void
 the_thread_pool_t::stop_and_go(the_transaction_t * transaction,
-			       bool multithreaded)
+             bool multithreaded)
 {
   // safely manipulate the transactions:
   {
@@ -492,7 +492,7 @@ the_thread_pool_t::stop_and_go(the_transaction_t * transaction,
 // 
 void
 the_thread_pool_t::stop_and_go(std::list<the_transaction_t *> & schedule,
-			       bool multithreaded)
+             bool multithreaded)
 {
   // safely manipulate the transactions:
   {
@@ -509,7 +509,7 @@ the_thread_pool_t::stop_and_go(std::list<the_transaction_t *> & schedule,
 // 
 void
 the_thread_pool_t::flush_and_go(the_transaction_t * transaction,
-				bool multithreaded)
+        bool multithreaded)
 {
   // safely manipulate the transactions:
   {
@@ -526,7 +526,7 @@ the_thread_pool_t::flush_and_go(the_transaction_t * transaction,
 // 
 void
 the_thread_pool_t::flush_and_go(std::list<the_transaction_t *> & schedule,
-			       bool multithreaded)
+             bool multithreaded)
 {
   // safely manipulate the transactions:
   {
@@ -543,7 +543,7 @@ the_thread_pool_t::flush_and_go(std::list<the_transaction_t *> & schedule,
 // 
 void
 the_thread_pool_t::handle(the_transaction_t * transaction,
-			  the_transaction_t::state_t s)
+        the_transaction_t::state_t s)
 {
   switch (s)
   {
@@ -628,13 +628,13 @@ the_thread_pool_t::handle_thread(the_thread_pool_data_t * data)
     cerr << "no more work for thread: " << t << endl;
     
     for (std::list<unsigned int>::const_iterator i = idle_.begin();
-	 i != idle_.end(); ++i)
+   i != idle_.end(); ++i)
     {
       cerr << "idle: thread " << *i << ", " << thread(*i) << endl;
     }
     
     for (std::list<unsigned int>::const_iterator i = busy_.begin();
-	 i != busy_.end(); ++i)
+   i != busy_.end(); ++i)
     {
       cerr << "busy: thread " << *i << ", " << thread(*i) << endl;
     }
@@ -685,7 +685,7 @@ the_thread_pool_t::no_lock_terminate_transactions()
 // 
 void
 the_thread_pool_t::no_lock_push_front(the_transaction_t * transaction,
-				      bool multithreaded)
+              bool multithreaded)
 {
   wrap(transaction, this, multithreaded);
   transactions_.push_front(transaction);
@@ -700,7 +700,7 @@ the_thread_pool_t::no_lock_push_front(the_transaction_t * transaction,
 // 
 void
 the_thread_pool_t::no_lock_push_back(the_transaction_t * transaction,
-				     bool multithreaded)
+             bool multithreaded)
 {
   wrap(transaction, this, multithreaded);
   transactions_.push_back(transaction);
@@ -715,7 +715,7 @@ the_thread_pool_t::no_lock_push_back(the_transaction_t * transaction,
 // 
 void
 the_thread_pool_t::no_lock_push_back(std::list<the_transaction_t *> & schedule,
-				     bool multithreaded)
+             bool multithreaded)
 {
   // preprocess the transactions:
   for (std::list<the_transaction_t *>::iterator i = schedule.begin();
@@ -731,7 +731,7 @@ the_thread_pool_t::no_lock_push_back(std::list<the_transaction_t *> & schedule,
       the_transaction_t * t = remove_head(schedule);
       for (unsigned int i = 0; i < pool_size_; i++)
       {
-	transactions_.push_back(t);
+  transactions_.push_back(t);
       }
     }
   }

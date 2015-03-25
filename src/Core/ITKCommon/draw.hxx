@@ -87,14 +87,14 @@ namespace wu
   template <class image_t>
   void
   plot_pixel(typename image_t::Pointer & image,
-	     const unsigned int & width,
-	     const unsigned int & height,
-	     const typename image_t::IndexType & index,
-	     const double & w,
-	     const double & c)
+       const unsigned int & width,
+       const unsigned int & height,
+       const typename image_t::IndexType & index,
+       const double & w,
+       const double & c)
   {
     if ((unsigned int)(index[0]) >= width ||
-	(unsigned int)(index[1]) >= height)
+  (unsigned int)(index[1]) >= height)
     {
       return;
     }
@@ -112,12 +112,12 @@ namespace wu
   template <class image_t>
   void
   plot_normal(typename image_t::Pointer & image,
-	      const unsigned int & width,
-	      const unsigned int & height,
-	      const double & x,
-	      const double & y,
-	      const double & w,
-	      const double & c)
+        const unsigned int & width,
+        const unsigned int & height,
+        const double & x,
+        const double & y,
+        const double & w,
+        const double & c)
   {
     typename image_t::IndexType index;
     index[0] = (unsigned int)(x);
@@ -131,12 +131,12 @@ namespace wu
   template <class image_t>
   void
   plot_swapped(typename image_t::Pointer & image,
-	       const unsigned int & width,
-	       const unsigned int & height,
-	       const double & x,
-	       const double & y,
-	       const double & w,
-	       const double & c)
+         const unsigned int & width,
+         const unsigned int & height,
+         const double & x,
+         const double & y,
+         const double & w,
+         const double & c)
   {
     typename image_t::IndexType index;
     index[0] = (unsigned int)(y);
@@ -159,13 +159,13 @@ namespace wu
    double y1,
    double x2,
    double y2,
-   void(*draw_pixel)(typename image_t::Pointer &,	// image
-		     const unsigned int &,		// width
-		     const unsigned int &,		// height
-		     const double &,			// x
-		     const double &,			// y
-		     const double &,			// weight
-		     const double &))			// paint color
+   void(*draw_pixel)(typename image_t::Pointer &, // image
+         const unsigned int &,    // width
+         const unsigned int &,    // height
+         const double &,      // x
+         const double &,      // y
+         const double &,      // weight
+         const double &))     // paint color
   {
     typename image_t::SizeType sz =
       image->GetLargestPossibleRegion().GetSize();
@@ -216,11 +216,11 @@ namespace wu
 template <class image_t>
 void
 draw_line(typename image_t::Pointer & image,
-	  const typename image_t::PixelType color,
-	  double x1,
-	  double y1,
-	  double x2,
-	  double y2)
+    const typename image_t::PixelType color,
+    double x1,
+    double y1,
+    double x2,
+    double y2)
 {
   if (false)
   {
@@ -246,17 +246,17 @@ draw_line(typename image_t::Pointer & image,
   {
     // horizontal line:
     wu::draw_nearly_horizontal_line<image_t>(image,
-					     double(color),
-					     x1, y1, x2, y2,
-					     wu::plot_normal<image_t>);
+               double(color),
+               x1, y1, x2, y2,
+               wu::plot_normal<image_t>);
   }
   else if (dy != 0.0)
   {
     // vertical line:
     wu::draw_nearly_horizontal_line<image_t>(image,
-					     double(color),
-					     y1, x1, y2, x2,
-					     wu::plot_swapped<image_t>);
+               double(color),
+               y1, x1, y2, x2,
+               wu::plot_swapped<image_t>);
   }
 }
 
@@ -266,14 +266,14 @@ draw_line(typename image_t::Pointer & image,
 template <class image_t>
 void
 draw_line_rotated(typename image_t::Pointer & image,
-		  const typename image_t::PixelType color,
-		  const double & x1,
-		  const double & y1,
-		  const double & x2,
-		  const double & y2,
-		  const double & radians,
-		  const double & ox = 0.0,
-		  const double & oy = 0.0)
+      const typename image_t::PixelType color,
+      const double & x1,
+      const double & y1,
+      const double & x2,
+      const double & y2,
+      const double & radians,
+      const double & ox = 0.0,
+      const double & oy = 0.0)
 {
   const double ct = ::cos(radians);
   const double st = ::sin(radians);

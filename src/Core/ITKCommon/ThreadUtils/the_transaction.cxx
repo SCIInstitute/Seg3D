@@ -72,8 +72,8 @@ the_transaction_t::~the_transaction_t()
 // 
 void
 the_transaction_t::notify(the_transaction_handler_t * handler,
-			  state_t s,
-			  const char * message)
+        state_t s,
+        const char * message)
 {
   set_state(s);
   blab(handler, message);
@@ -93,7 +93,7 @@ the_transaction_t::notify(the_transaction_handler_t * handler,
 // 
 void
 the_transaction_t::blab(the_transaction_handler_t * handler,
-			const char * message)
+      const char * message)
 {
   if (message == NULL) return;
   

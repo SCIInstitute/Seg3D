@@ -190,9 +190,9 @@ public:
   // bounding box normal to the x, y, and z axis - if the point is
   // contained within all three, the point is inside the bounding box:
   void contains(const p3x1_t & pt,
-		bool & contained_in_x,
-		bool & contained_in_y,
-		bool & contained_in_z) const;
+    bool & contained_in_x,
+    bool & contained_in_y,
+    bool & contained_in_z) const;
   
   // check whether the bounding box contains a given point:
   inline bool contains(const p3x1_t & pt) const
@@ -225,9 +225,9 @@ public:
   
   // find the intersection of this bounding box with a given ray:
   bool intersects_ray(const p3x1_t & o,
-		      const v3x1_t & d,
-		      float & t_min,
-		      float & t_max) const;
+          const v3x1_t & d,
+          float & t_min,
+          float & t_max) const;
   
   // find the axis id of the largest/smallest dimension of the bounding box:
   unsigned int largest_dimension() const;

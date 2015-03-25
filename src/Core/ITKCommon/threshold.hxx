@@ -60,10 +60,10 @@
 template <class image_t>
 double
 threshold_by_intensity_inplace(typename image_t::Pointer & image,
-			       const double clip_param,
-			       const bool keep_pixels_above_threshold = true,
-			       const unsigned int bins = 256,
-			       const double bg_offset = 1e-3)
+             const double clip_param,
+             const bool keep_pixels_above_threshold = true,
+             const unsigned int bins = 256,
+             const double bg_offset = 1e-3)
 {
   typedef itk::ImageRegionConstIterator<image_t> iter_t;
   typedef typename image_t::IndexType index_t;
@@ -115,17 +115,17 @@ threshold_by_intensity_inplace(typename image_t::Pointer & image,
 template <class image_t>
 typename image_t::Pointer
 threshold_by_intensity(const image_t * image,
-		       const double clip_param,
-		       const bool keep_pixels_above_threshold = true,
-		       const unsigned int bins = 256,
-		       const double bg_offset = 1e-3)
+           const double clip_param,
+           const bool keep_pixels_above_threshold = true,
+           const unsigned int bins = 256,
+           const double bg_offset = 1e-3)
 {
   typename image_t::Pointer peaks = cast<image_t, image_t>(image);
   threshold_by_intensity_inplace(peaks,
-				 clip_param,
-				 keep_pixels_above_threshold,
-				 bins,
-				 bg_offset);
+         clip_param,
+         keep_pixels_above_threshold,
+         bins,
+         bg_offset);
   return peaks;
 }
 
@@ -156,10 +156,10 @@ threshold_by_intensity(const image_t * image,
 template <class image_t>
 double
 threshold_by_area_inplace(typename image_t::Pointer & image,
-			  const double clip_param,
-			  const bool keep_pixels_above_threshold = true,
-			  const unsigned int bins = 4096,
-			  const double bg_offset = 1e-3)
+        const double clip_param,
+        const bool keep_pixels_above_threshold = true,
+        const unsigned int bins = 4096,
+        const double bg_offset = 1e-3)
 {
   typedef itk::ImageRegionConstIterator<image_t> iter_t;
   typedef typename image_t::IndexType index_t;
@@ -250,17 +250,17 @@ threshold_by_area_inplace(typename image_t::Pointer & image,
 template <class image_t>
 typename image_t::Pointer
 threshold_by_area(const image_t * image,
-		  const double clip_param,
-		  const bool keep_pixels_above_threshold = true,
-		  const unsigned int bins = 256,
-		  const double bg_offset = 1e-3)
+      const double clip_param,
+      const bool keep_pixels_above_threshold = true,
+      const unsigned int bins = 256,
+      const double bg_offset = 1e-3)
 {
   typename image_t::Pointer peaks = cast<image_t, image_t>(image);
   threshold_by_area_inplace(peaks,
-			    clip_param,
-			    keep_pixels_above_threshold,
-			    bins,
-			    bg_offset);
+          clip_param,
+          keep_pixels_above_threshold,
+          bins,
+          bg_offset);
   return peaks;
 }
 

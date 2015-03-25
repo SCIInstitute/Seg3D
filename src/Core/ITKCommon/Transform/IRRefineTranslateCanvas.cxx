@@ -71,16 +71,16 @@ setBaseTransforms(const TrasformBasePointerVector & transforms,
                   const TheTextVector& imageIDs,
                   const TheTextVector& maskIDs)
 {
-	TrasformBasePointerVector::const_iterator transformIter =
+  TrasformBasePointerVector::const_iterator transformIter =
   transforms.begin();
-	
-	TheTextVector::const_iterator imageIDIter = imageIDs.begin();
-	TheTextVector::const_iterator maskIDIter = maskIDs.begin();
-	for (; transformIter != transforms.end(); transformIter++, imageIDIter++, maskIDIter++)
-	{
-		_transformationVector.
+  
+  TheTextVector::const_iterator imageIDIter = imageIDs.begin();
+  TheTextVector::const_iterator maskIDIter = maskIDs.begin();
+  for (; transformIter != transforms.end(); transformIter++, imageIDIter++, maskIDIter++)
+  {
+    _transformationVector.
     push_back(new IRTransform(*transformIter, *imageIDIter, *maskIDIter));
-	}
+  }
 }
 //----------------------------------------------------------------
 // IRRefineTranslateCanvas::setMaxOffset
@@ -122,16 +122,16 @@ fillTransformAndImageIDVectors(TrasformBasePointerVector& transforms,
                                TheTextVector& imageIDs,
                                TheTextVector& maskIDs)
 {
-	transforms.clear();
-	imageIDs.clear();
-	maskIDs.clear();
-	for (IRTransformationVector::iterator iter = _transformationVector.begin();
+  transforms.clear();
+  imageIDs.clear();
+  maskIDs.clear();
+  for (IRTransformationVector::iterator iter = _transformationVector.begin();
        iter != _transformationVector.end(); ++iter)
-	{
-		imageIDs.push_back((*iter)->imageID());
-		maskIDs.push_back((*iter)->maskID());
-		transforms.push_back((*iter)->transformBase());
-	}
+  {
+    imageIDs.push_back((*iter)->imageID());
+    maskIDs.push_back((*iter)->maskID());
+    transforms.push_back((*iter)->transformBase());
+  }
 }
 
 //----------------------------------------------------------------
@@ -146,19 +146,19 @@ fillTransformAndImageIDVectors(TrasformBasePointerVector& transforms,
                                TheTextList& imageIDs,
                                TheTextList& maskIDs)
 {
-	transforms.clear();
-	imageIDs.clear();
+  transforms.clear();
+  imageIDs.clear();
   maskIDs.clear();
-	for (IRTransformationVector::iterator iter = _transformationVector.begin();
+  for (IRTransformationVector::iterator iter = _transformationVector.begin();
        iter != _transformationVector.end(); ++iter)
-	{
+  {
     if ( (*iter)->connections().size() != 0 )
     {
-		  imageIDs.push_back((*iter)->imageID());
-		  maskIDs.push_back((*iter)->maskID());
-		  transforms.push_back((*iter)->transformBase());
+      imageIDs.push_back((*iter)->imageID());
+      maskIDs.push_back((*iter)->maskID());
+      transforms.push_back((*iter)->transformBase());
     }
-	}
+  }
 }
 
 //----------------------------------------------------------------
@@ -167,32 +167,32 @@ fillTransformAndImageIDVectors(TrasformBasePointerVector& transforms,
 void
 IRRefineTranslateCanvas::buildConnections( bool verbose )
 {
-	_preProcessedConnectionVector.clear();
+  _preProcessedConnectionVector.clear();
   
-	IRTransformationVector::const_iterator transformIter1, transformIter2;
-	for (transformIter1 = _transformationVector.begin();
+  IRTransformationVector::const_iterator transformIter1, transformIter2;
+  for (transformIter1 = _transformationVector.begin();
        transformIter1 != _transformationVector.end(); transformIter1++)
-	{
-		for (transformIter2 = transformIter1;
+  {
+    for (transformIter2 = transformIter1;
          transformIter2 != _transformationVector.end(); transformIter2++)
-		{
-			if (transformIter1 == transformIter2)
-			{
-				continue;
-			}
-			
-			if ((*transformIter1)->overlapsTransform(*transformIter2))
-			{
+    {
+      if (transformIter1 == transformIter2)
+      {
+        continue;
+      }
+      
+      if ((*transformIter1)->overlapsTransform(*transformIter2))
+      {
         
-				_preProcessedConnectionVector.push_back(new IRConnection(*transformIter1,
+        _preProcessedConnectionVector.push_back(new IRConnection(*transformIter1,
                                                                  *transformIter2,
                                                                  verbose));
         initialSize = _preProcessedConnectionVector.size();
-			}
-		}
-	}
-	
-	return;
+      }
+    }
+  }
+  
+  return;
 }
 
 //----------------------------------------------------------------
@@ -201,16 +201,16 @@ IRRefineTranslateCanvas::buildConnections( bool verbose )
 void
 IRRefineTranslateCanvas::fillGroupIDs()
 {
-	long groupID = 0;
-	for (IRTransformationVector::iterator iter = _transformationVector.begin();
+  long groupID = 0;
+  for (IRTransformationVector::iterator iter = _transformationVector.begin();
        iter != _transformationVector.end(); ++iter)
-	{
-		if ((*iter)->groupID() == -1)
-		{
-			setTransformAndNeighborsToGroupID((*iter), groupID);
-			groupID++;
-		}
-	}
+  {
+    if ((*iter)->groupID() == -1)
+    {
+      setTransformAndNeighborsToGroupID((*iter), groupID);
+      groupID++;
+    }
+  }
 }
 
 //----------------------------------------------------------------
@@ -222,36 +222,36 @@ IRRefineTranslateCanvas::fillGroupIDs()
 void
 IRRefineTranslateCanvas::pruneSmallGroups(float cutoffPercentage)
 {
-	long largestGroupID = -1;
-	for (IRTransformationVector::iterator iter = _transformationVector.begin();
+  long largestGroupID = -1;
+  for (IRTransformationVector::iterator iter = _transformationVector.begin();
        iter != _transformationVector.end(); ++iter)
-	{
-		largestGroupID = std::max<long>(largestGroupID, (*iter)->groupID());
-	}
-	
-	std::vector<float> groupCounts;
-	groupCounts.resize(largestGroupID + 1);
-	for (std::vector<float>::iterator iter = groupCounts.begin();
+  {
+    largestGroupID = std::max<long>(largestGroupID, (*iter)->groupID());
+  }
+  
+  std::vector<float> groupCounts;
+  groupCounts.resize(largestGroupID + 1);
+  for (std::vector<float>::iterator iter = groupCounts.begin();
        iter != groupCounts.end(); ++iter)
-	{
-		*iter = 0.0f;
-	}
-	
-	for (IRTransformationVector::iterator iter = _transformationVector.begin();
+  {
+    *iter = 0.0f;
+  }
+  
+  for (IRTransformationVector::iterator iter = _transformationVector.begin();
        iter != _transformationVector.end(); ++iter)
-	{
-		groupCounts[(*iter)->groupID()] += 1.0f;
-	}
-	
-	float transformCount = _transformationVector.size();
-	
-	for (size_t i = 0; i < groupCounts.size(); i++)
-	{
-		if (groupCounts[i] / transformCount < cutoffPercentage)
-		{
-			removeTransformsWithGroupID(i);
-		}
-	}
+  {
+    groupCounts[(*iter)->groupID()] += 1.0f;
+  }
+  
+  float transformCount = _transformationVector.size();
+  
+  for (size_t i = 0; i < groupCounts.size(); i++)
+  {
+    if (groupCounts[i] / transformCount < cutoffPercentage)
+    {
+      removeTransformsWithGroupID(i);
+    }
+  }
 }
 
 //----------------------------------------------------------------
@@ -260,18 +260,18 @@ IRRefineTranslateCanvas::pruneSmallGroups(float cutoffPercentage)
 class IRTransaction : public the_transaction_t
 {
 public:
-	IRTransaction(IRRefineTranslateCanvas * canvas):
+  IRTransaction(IRRefineTranslateCanvas * canvas):
   canvas_(canvas)
-	{}
+  {}
   
-	// virtual:
-	void execute(the_thread_interface_t * thread)
-	{
-		the_terminator_t terminator("IRTransaction");
-		canvas_->findOffsetsThreadEntry();
-	}
-	
-	IRRefineTranslateCanvas * canvas_;
+  // virtual:
+  void execute(the_thread_interface_t * thread)
+  {
+    the_terminator_t terminator("IRTransaction");
+    canvas_->findOffsetsThreadEntry();
+  }
+  
+  IRRefineTranslateCanvas * canvas_;
 };
 
 //----------------------------------------------------------------
@@ -280,17 +280,17 @@ public:
 void
 IRRefineTranslateCanvas::findIdealTransformationOffsets(unsigned int numThreads)
 {
-	the_thread_pool_t thread_pool(numThreads);
-	thread_pool.set_idle_sleep_duration(50); // 50 usec
-	
-	for(unsigned int i = 0; i < numThreads; i++)
-	{
-		IRTransaction * t = new IRTransaction(this);
-		thread_pool.push_back(t);
-	}
-	
-	thread_pool.start();
-	thread_pool.wait();
+  the_thread_pool_t thread_pool(numThreads);
+  thread_pool.set_idle_sleep_duration(50); // 50 usec
+  
+  for(unsigned int i = 0; i < numThreads; i++)
+  {
+    IRTransaction * t = new IRTransaction(this);
+    thread_pool.push_back(t);
+  }
+  
+  thread_pool.start();
+  thread_pool.wait();
 }
 
 //----------------------------------------------------------------
@@ -299,11 +299,11 @@ IRRefineTranslateCanvas::findIdealTransformationOffsets(unsigned int numThreads)
 void
 IRRefineTranslateCanvas::releaseTensionOnSystem()
 {
-	for (IRTransformationVector::iterator iter = _transformationVector.begin();
+  for (IRTransformationVector::iterator iter = _transformationVector.begin();
        iter != _transformationVector.end(); ++iter)
-	{
-		(*iter)->releaseTension();
-	}
+  {
+    (*iter)->releaseTension();
+  }
 }
 
 //----------------------------------------------------------------
@@ -312,16 +312,16 @@ IRRefineTranslateCanvas::releaseTensionOnSystem()
 float
 IRRefineTranslateCanvas::systemEnergy()
 {
-	float energy = 0;
-	for (IRConnectionVector::iterator iter = _connectionVector.begin();
+  float energy = 0;
+  for (IRConnectionVector::iterator iter = _connectionVector.begin();
        iter != _connectionVector.end(); ++iter)
-	{
-		vec2d_t tension =
+  {
+    vec2d_t tension =
     (*iter)->tensionOnTransformation((*iter)->firstTransformation());
-		
-		energy += tension*tension;
-	}
-	return energy;
+    
+    energy += tension*tension;
+  }
+  return energy;
 }
 
 //----------------------------------------------------------------
@@ -330,16 +330,16 @@ IRRefineTranslateCanvas::systemEnergy()
 float
 IRRefineTranslateCanvas::maximumTension()
 {
-	float maxTension = 0;
-	for (IRConnectionVector::iterator iter = _connectionVector.begin();
+  float maxTension = 0;
+  for (IRConnectionVector::iterator iter = _connectionVector.begin();
        iter != _connectionVector.end(); ++iter)
-	{
-		vec2d_t tension =
+  {
+    vec2d_t tension =
     (*iter)->tensionOnTransformation((*iter)->firstTransformation());
-		
-		maxTension = std::max<float>(sqrtf(tension*tension), maxTension);
-	}
-	return maxTension;
+    
+    maxTension = std::max<float>(sqrtf(tension*tension), maxTension);
+  }
+  return maxTension;
 }
 
 //----------------------------------------------------------------
@@ -348,14 +348,14 @@ IRRefineTranslateCanvas::maximumTension()
 float
 IRRefineTranslateCanvas::maximumPullOnTransformation()
 {
-	float maxTension = 0;
-	for (IRTransformationVector::iterator iter = _transformationVector.begin();
+  float maxTension = 0;
+  for (IRTransformationVector::iterator iter = _transformationVector.begin();
        iter != _transformationVector.end(); ++iter)
-	{
-		vec2d_t tension = (*iter)->totalTension();
-		maxTension = std::max<float>(sqrtf(tension*tension), maxTension);
-	}
-	return maxTension;
+  {
+    vec2d_t tension = (*iter)->totalTension();
+    maxTension = std::max<float>(sqrtf(tension*tension), maxTension);
+  }
+  return maxTension;
 }
 
 //----------------------------------------------------------------
@@ -369,18 +369,18 @@ static itk::SimpleMutexLock __IRRefineTranslateCanvasConnectionLock;
 void
 IRRefineTranslateCanvas::findOffsetsThreadEntry()
 {
-	while (true)
-	{
-		IRConnection * connection = getConectionToProcess();
-		if (!connection) break;
-		
-		if (connection->findIdealOffset(maxOffset, maxOffsetIsPercent, blackMaskPercent, _doClahe) == 0)
-		{
-			connection->firstTransformation()->addConnection(connection);
-			connection->secondTransformation()->addConnection(connection);
-			addProcessedConnection(connection);
-		}
-	}
+  while (true)
+  {
+    IRConnection * connection = getConectionToProcess();
+    if (!connection) break;
+    
+    if (connection->findIdealOffset(maxOffset, maxOffsetIsPercent, blackMaskPercent, _doClahe) == 0)
+    {
+      connection->firstTransformation()->addConnection(connection);
+      connection->secondTransformation()->addConnection(connection);
+      addProcessedConnection(connection);
+    }
+  }
 }
 
 //----------------------------------------------------------------
@@ -389,10 +389,10 @@ IRRefineTranslateCanvas::findOffsetsThreadEntry()
 void
 IRRefineTranslateCanvas::addProcessedConnection(IRConnection* connection)
 {
-	__IRRefineTranslateCanvasConnectionLock.Lock();
-	_connectionVector.push_back(connection);
-	__IRRefineTranslateCanvasConnectionLock.Unlock();
-	return;
+  __IRRefineTranslateCanvasConnectionLock.Lock();
+  _connectionVector.push_back(connection);
+  __IRRefineTranslateCanvasConnectionLock.Unlock();
+  return;
 }
 
 //----------------------------------------------------------------
@@ -405,35 +405,35 @@ IRRefineTranslateCanvas::getConectionToProcess()
 {
   double vectorSize = 1;
   
-	__IRRefineTranslateCanvasConnectionLock.Lock();
-	IRConnection* connection = NULL;
-	if (_preProcessedConnectionVector.size() > 0)
-	{
-		// by picking out  random connection we have less of a chance
-		// to keep on picking connection with the same trasformation
-		// and thus not having good multithreaded performance because
-		// multiple threads are waiting for the same image to load
-		int element;
-		element = rand() % _preProcessedConnectionVector.size();
-		connection = _preProcessedConnectionVector[element];
-		
-		_preProcessedConnectionVector[element] =
+  __IRRefineTranslateCanvasConnectionLock.Lock();
+  IRConnection* connection = NULL;
+  if (_preProcessedConnectionVector.size() > 0)
+  {
+    // by picking out  random connection we have less of a chance
+    // to keep on picking connection with the same trasformation
+    // and thus not having good multithreaded performance because
+    // multiple threads are waiting for the same image to load
+    int element;
+    element = rand() % _preProcessedConnectionVector.size();
+    connection = _preProcessedConnectionVector[element];
+    
+    _preProcessedConnectionVector[element] =
     _preProcessedConnectionVector.back();
-		
-		_preProcessedConnectionVector.pop_back();
+    
+    _preProcessedConnectionVector.pop_back();
     
     vectorSize = _preProcessedConnectionVector.size();
     
-		// for now give them in order since the tiles these
-		// are now preloaded and are BIG
-		//		connection = _preProcessedConnectionVector.back();
-		//		_preProcessedConnectionVector.pop_back();
-	}
-	__IRRefineTranslateCanvasConnectionLock.Unlock();
+    // for now give them in order since the tiles these
+    // are now preloaded and are BIG
+    //    connection = _preProcessedConnectionVector.back();
+    //    _preProcessedConnectionVector.pop_back();
+  }
+  __IRRefineTranslateCanvasConnectionLock.Unlock();
   
   double task_percent = (initialSize - vectorSize) / initialSize;
   set_minor_progress(task_percent, 0.9);
-	return connection;
+  return connection;
 }
 
 //----------------------------------------------------------------
@@ -443,38 +443,38 @@ void
 IRRefineTranslateCanvas::
 setTransformAndNeighborsToGroupID(IRTransform* transform, long groupID)
 {
-	std::stack<IRTransform*> transformStack;
-	
-	transformStack.push(transform);
-	
-	while (!transformStack.empty())
-	{
-		IRTransform* currentTransform = transformStack.top();
-		transformStack.pop();
-		
-		currentTransform->setGroupID(groupID);
-		
-		IRConnectionVector connections = currentTransform->connections();
-		for (IRConnectionVector::iterator iter = connections.begin();
+  std::stack<IRTransform*> transformStack;
+  
+  transformStack.push(transform);
+  
+  while (!transformStack.empty())
+  {
+    IRTransform* currentTransform = transformStack.top();
+    transformStack.pop();
+    
+    currentTransform->setGroupID(groupID);
+    
+    IRConnectionVector connections = currentTransform->connections();
+    for (IRConnectionVector::iterator iter = connections.begin();
          iter != connections.end(); ++iter)
-		{
-			IRTransform* neighbor = (*iter)->firstTransformation();
-			if (currentTransform == neighbor)
-			{
-				neighbor = (*iter)->secondTransformation();
-			}
-			
-			if (neighbor->groupID() != groupID)
-			{
-				if (neighbor->groupID() != -1)
-				{
-					printf("Error! why was this groupID aready set!");
-				}
-				
-				transformStack.push(neighbor);
-			}
-		}
-	}	
+    {
+      IRTransform* neighbor = (*iter)->firstTransformation();
+      if (currentTransform == neighbor)
+      {
+        neighbor = (*iter)->secondTransformation();
+      }
+      
+      if (neighbor->groupID() != groupID)
+      {
+        if (neighbor->groupID() != -1)
+        {
+          printf("Error! why was this groupID aready set!");
+        }
+        
+        transformStack.push(neighbor);
+      }
+    }
+  } 
 }
 
 //----------------------------------------------------------------
@@ -483,45 +483,45 @@ setTransformAndNeighborsToGroupID(IRTransform* transform, long groupID)
 void
 IRRefineTranslateCanvas::removeTransformsWithGroupID(long groupID)
 {
-	IRTransformationVector newTransVector;
-	for (IRTransformationVector::iterator transIter =
-			 _transformationVector.begin();
+  IRTransformationVector newTransVector;
+  for (IRTransformationVector::iterator transIter =
+       _transformationVector.begin();
        transIter != _transformationVector.end();
        ++transIter)
-	{
-		if ((*transIter)->groupID() == groupID)
-		{
-			IRConnectionVector connections = (*transIter)->connections();
-			for (IRConnectionVector::iterator connIter = connections.begin();
+  {
+    if ((*transIter)->groupID() == groupID)
+    {
+      IRConnectionVector connections = (*transIter)->connections();
+      for (IRConnectionVector::iterator connIter = connections.begin();
            connIter != connections.end(); ++connIter)
-			{
-				IRTransform* neighbor = (*connIter)->firstTransformation();
-				if ((*transIter) == neighbor)
-				{
-					neighbor = (*connIter)->secondTransformation();
-				}
-				
-				neighbor->removeConnection(*connIter);
-				(*transIter)->removeConnection(*connIter);
+      {
+        IRTransform* neighbor = (*connIter)->firstTransformation();
+        if ((*transIter) == neighbor)
+        {
+          neighbor = (*connIter)->secondTransformation();
+        }
         
-				for (size_t i = 0; i < _connectionVector.size(); i++)
-				{
-					if (_connectionVector[i] == *connIter)
-					{
-						_connectionVector[i] = _connectionVector.back();
-						_connectionVector.pop_back();
-						break;
-					}
-				}
+        neighbor->removeConnection(*connIter);
+        (*transIter)->removeConnection(*connIter);
         
-				delete *connIter;
-			}
-			delete *transIter;
-		}
-		else
-		{
-			newTransVector.push_back(*transIter);
-		}
-	}
-	_transformationVector = newTransVector;
+        for (size_t i = 0; i < _connectionVector.size(); i++)
+        {
+          if (_connectionVector[i] == *connIter)
+          {
+            _connectionVector[i] = _connectionVector.back();
+            _connectionVector.pop_back();
+            break;
+          }
+        }
+        
+        delete *connIter;
+      }
+      delete *transIter;
+    }
+    else
+    {
+      newTransVector.push_back(*transIter);
+    }
+  }
+  _transformationVector = newTransVector;
 }

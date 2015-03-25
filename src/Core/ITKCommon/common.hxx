@@ -4751,7 +4751,7 @@ load_mosaic(std::istream & si,
   
   // Replace global paths for backwards compatibility.
   for (std::list<bfs::path>::iterator iter = images.begin();
-				 iter != images.end(); ++iter)
+         iter != images.end(); ++iter)
   {
     (*iter) = image_path / iter->filename();
   }

@@ -115,11 +115,11 @@ utf8_to_utf16(const char * utf8, wchar_t *& utf16)
 {
   int wcs_size =
   MultiByteToWideChar(CP_UTF8, // encoding (ansi, utf, etc...)
-                      0,	   // flags (precomposed, composite,... )
+                      0,     // flags (precomposed, composite,... )
                       utf8,    // source multi-byte character string
-                      -1,	   // number of bytes in the source string
-                      NULL,	   // wide-character destination
-                      0);	   // destination buffer size
+                      -1,    // number of bytes in the source string
+                      NULL,    // wide-character destination
+                      0);    // destination buffer size
   
   utf16 = new wchar_t[wcs_size + 1];
   MultiByteToWideChar(CP_UTF8,

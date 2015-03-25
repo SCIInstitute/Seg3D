@@ -438,7 +438,7 @@ RANSAC(// RANSAC controls:
                                           degrees_included,
                                           ab,
                                           inliers);
-       	
+        
         // save the better result:
         bestquality = quality;
         best_params = t_ab->GetParameters();

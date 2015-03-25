@@ -71,33 +71,33 @@ class IRImageLoader
   typedef std::vector<std::string> TheTextVector;
   
 public:
-	static IRImageLoader* sharedImageLoader();
+  static IRImageLoader* sharedImageLoader();
   
-	virtual ~IRImageLoader();
-	
-	void setTransformList(const IRTransformVector& transforms, const TheTextVector& imageIDs);
-	
-	void setShrinkFactor(unsigned int shrinkFactor);
-	unsigned int shrinkFactor();
-	void setPixelSpacing(double pixelSpacing);
-	double pixelSpacing();
-	
-	image_t::Pointer getImage(const std::string& imageID);
+  virtual ~IRImageLoader();
+  
+  void setTransformList(const IRTransformVector& transforms, const TheTextVector& imageIDs);
+  
+  void setShrinkFactor(unsigned int shrinkFactor);
+  unsigned int shrinkFactor();
+  void setPixelSpacing(double pixelSpacing);
+  double pixelSpacing();
+  
+  image_t::Pointer getImage(const std::string& imageID);
   mask_t::Pointer  getMask(const std::string& maskID);
-	image_t::Pointer getFullResImage(const std::string& imageID); // this does not cache the image
-	vec2d_t getImageSize(const std::string& imageID, base_transform_t::Pointer transform);
-	
+  image_t::Pointer getFullResImage(const std::string& imageID); // this does not cache the image
+  vec2d_t getImageSize(const std::string& imageID, base_transform_t::Pointer transform);
+  
 private:
-	IRImageLoader();
-	
-	void imageCheckLoad(const std::string& imageID); 
-	void maskCheckLoad(const std::string& maskID); 
-	
-	unsigned int _shrinkFactor;
-	double _pixelSpacing;
-	imageMap _images;
-	maskMap _masks;
-	transformationMap _transformations;
+  IRImageLoader();
+  
+  void imageCheckLoad(const std::string& imageID); 
+  void maskCheckLoad(const std::string& maskID); 
+  
+  unsigned int _shrinkFactor;
+  double _pixelSpacing;
+  imageMap _images;
+  maskMap _masks;
+  transformationMap _transformations;
 
   const unsigned int SHRINK_FACTOR;
   const double PIXEL_SPACING;

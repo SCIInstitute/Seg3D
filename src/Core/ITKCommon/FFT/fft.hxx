@@ -82,7 +82,7 @@ namespace itk_fft
     fft_data_t(const unsigned int w, const unsigned int h);
     explicit fft_data_t(const itk_imageptr_t & real);
     fft_data_t(const itk_imageptr_t & real,
-	       const itk_imageptr_t & imag);
+         const itk_imageptr_t & imag);
     fft_data_t(const fft_data_t & data);
     ~fft_data_t() { cleanup(); }
     
@@ -95,7 +95,7 @@ namespace itk_fft
     void fill(const float real, const float imag = 0.0);
     
     void setup(const itk_imageptr_t & real,
-	       const itk_imageptr_t & imag = itk_imageptr_t(NULL));
+         const itk_imageptr_t & imag = itk_imageptr_t(NULL));
     
     // ITK helpers:
     itk_imageptr_t component(const bool imag = 0) const;
@@ -119,19 +119,19 @@ namespace itk_fft
     inline unsigned int ny() const { return ny_; }
     
     inline const fft_complex_t & operator() (const unsigned int & x,
-					     const unsigned int & y) const
+               const unsigned int & y) const
     { return at(x, y); }
     
     inline fft_complex_t & operator() (const unsigned int & x,
-				       const unsigned int & y)
+               const unsigned int & y)
     { return at(x, y); }
     
     inline const fft_complex_t & at(const unsigned int & x,
-				    const unsigned int & y) const
+            const unsigned int & y) const
     { return data_[y + ny_ * x]; }
     
     inline fft_complex_t & at(const unsigned int & x,
-			      const unsigned int & y)
+            const unsigned int & y)
     { return data_[y + ny_ * x]; }
     
   protected:
@@ -188,64 +188,64 @@ namespace itk_fft
   // fn_fft_cc_t
   // 
   typedef fft_complex_t(*fn_fft_cc_t)(const fft_complex_t & a,
-				      const fft_complex_t & b);
+              const fft_complex_t & b);
   
   //----------------------------------------------------------------
   // elem_by_elem
   // 
   extern void
   elem_by_elem(fn_fft_c_t f,
-	       const fft_data_t & in,
-	       fft_data_t & out);
+         const fft_data_t & in,
+         fft_data_t & out);
   
   //----------------------------------------------------------------
   // elem_by_elem
   // 
   extern void
   elem_by_elem(fft_complex_t(*f)(const float & a,
-				 const fft_complex_t & b),
-	       const float & a,
-	       const fft_data_t & b,
-	       fft_data_t & c);
+         const fft_complex_t & b),
+         const float & a,
+         const fft_data_t & b,
+         fft_data_t & c);
   
   //----------------------------------------------------------------
   // elem_by_elem
   // 
   extern void
   elem_by_elem(fft_complex_t(*f)(const fft_complex_t & a,
-				 const float & b),
-	       const fft_data_t & a,
-	       const float & b,
-	       fft_data_t & c);
+         const float & b),
+         const fft_data_t & a,
+         const float & b,
+         fft_data_t & c);
   
   //----------------------------------------------------------------
   // elem_by_elem
   // 
   extern void
   elem_by_elem(fft_complex_t(*f)(const fft_complex_t & a,
-				 const fft_complex_t & b),
-	       const fft_complex_t & a,
-	       const fft_data_t & b,
-	       fft_data_t & c);
+         const fft_complex_t & b),
+         const fft_complex_t & a,
+         const fft_data_t & b,
+         fft_data_t & c);
   
   //----------------------------------------------------------------
   // elem_by_elem
   // 
   extern void
   elem_by_elem(fft_complex_t(*f)(const fft_complex_t & a,
-				 const fft_complex_t & b),
-	       const fft_data_t & a,
-	       const fft_complex_t & b,
-	       fft_data_t & c);
+         const fft_complex_t & b),
+         const fft_data_t & a,
+         const fft_complex_t & b,
+         fft_data_t & c);
   
   //----------------------------------------------------------------
   // elem_by_elem
   // 
   extern void
   elem_by_elem(fn_fft_cc_t f,
-	       const fft_data_t & a,
-	       const fft_data_t & b,
-	       fft_data_t & c);
+         const fft_data_t & a,
+         const fft_data_t & b,
+         fft_data_t & c);
   
   
   //----------------------------------------------------------------

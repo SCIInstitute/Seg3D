@@ -165,7 +165,7 @@ public:
   // transaction callback accessor:
   inline void
   set_thread_pool_cb(the_thread_pool_t * pool,
-		     the_thread_pool_data_t * cb_data)
+         the_thread_pool_data_t * cb_data)
   {
     thread_pool_ = pool; 
     thread_pool_cb_data_ = cb_data;

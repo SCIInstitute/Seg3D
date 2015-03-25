@@ -56,7 +56,7 @@ class the_dynamic_array_ref_t
 {
 public:
   the_dynamic_array_ref_t(the_dynamic_array_t<T> & array,
-			  size_t index = 0):
+        size_t index = 0):
     array_(array),
     index_(index)
   {}
@@ -98,8 +98,8 @@ public:
   {}
   
   the_dynamic_array_t(const size_t & init_size,
-		      const size_t & page_size,
-		      const T & init_value):
+          const size_t & page_size,
+          const T & init_value):
     array_(NULL),
     page_size_(page_size),
     size_(0),
@@ -169,7 +169,7 @@ public:
     size_t old_num_pages = num_pages();
     size_t new_num_pages =
       std::max((size_t)(2 * old_num_pages),
-	       (size_t)(1 + size_ / page_size_));
+         (size_t)(1 + size_ / page_size_));
     
     // create a new array:
     std::vector< std::vector<T> * > * new_array =
@@ -187,7 +187,7 @@ public:
       (*new_array)[i] = new std::vector<T>(page_size_);
       for (size_t j = 0; j < page_size_; j++)
       {
-	(*(*new_array)[i])[j] = init_value_;
+  (*(*new_array)[i])[j] = init_value_;
       }
     }
     
