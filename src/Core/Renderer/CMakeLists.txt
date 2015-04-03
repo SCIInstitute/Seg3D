@@ -37,17 +37,17 @@ SET(CORE_RENDERER_SRCS
   PickPoint.h
   RendererBase.h
   RendererBase.cc
-  )
+)
   
 CORE_ADD_LIBRARY(Core_Renderer ${CORE_RENDERER_SRCS})
             
 TARGET_LINK_LIBRARIES(Core_Renderer
-                      Core_Utils
-                      Core_EventHandler
-            Core_TextRenderer
-            Core_Graphics
-            Core_RenderResources
-            Core_Interface
-                      ${SCI_GLEW_LIBRARY}
-                      ${SCI_BOOST_LIBRARY})
-
+  Core_Utils
+  Core_EventHandler
+  Core_TextRenderer
+  Core_Graphics
+  Core_RenderResources
+  Core_Interface
+  ${SCI_GLEW_LIBRARY}
+  ${SCI_BOOST_LIBRARY}
+)

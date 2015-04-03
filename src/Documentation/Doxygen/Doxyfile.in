@@ -146,7 +146,7 @@ FILE_PATTERNS          = *.c \
 RECURSIVE              = YES
 EXCLUDE                = 
 EXCLUDE_SYMLINKS       = NO
-EXCLUDE_PATTERNS       = */src/Externals/* \
+EXCLUDE_PATTERNS       = */src/ThirdParty/* \
                          */src/Bootstrap/*
 EXCLUDE_SYMBOLS        = 
 EXAMPLE_PATH           = 
