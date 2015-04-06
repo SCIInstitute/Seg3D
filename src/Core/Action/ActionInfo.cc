@@ -29,7 +29,7 @@
 #include <iostream>
 
 // TinyXML includes
-#include <Externals/tinyxml/tinyxml.h>
+#include <Thirdparty/tinyxml/tinyxml.h>
 
 // Core includes
 #include <Core/Utils/Exception.h>
