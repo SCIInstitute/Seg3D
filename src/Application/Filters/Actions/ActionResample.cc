@@ -28,7 +28,7 @@
 
 // teem includes
 #include <teem/nrrd.h>
-#include <teem/privateNrrd.h>
+#include <privateNrrd.h>
 
 // Core includes
 #include <Core/DataBlock/NrrdDataBlock.h>

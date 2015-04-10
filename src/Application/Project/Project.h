@@ -117,6 +117,7 @@ public:
   Core::StateBoolHandle save_custom_colors_state_;
 
   /// The colors for the project
+  // TODO: used???
   std::vector< Core::StateColorHandle > color_states_;
   
   // TODO: Should be moved in the database

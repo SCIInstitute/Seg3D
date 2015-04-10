@@ -40,6 +40,9 @@ ExternalProject_Add(Teem_external
   CMAKE_CACHE_ARGS
     -DCMAKE_VERBOSE_MAKEFILE:BOOL=${CMAKE_VERBOSE_MAKEFILE}
     -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=ON
+    -DZlib_DIR:PATH=${Zlib_DIR}
+    -DLibPNG_DIR:PATH=${LibPNG_DIR}
+    -DTeem_USE_NRRD_INTERNALS:BOOL=ON
 )
 
 ExternalProject_Get_Property(Teem_external BINARY_DIR)

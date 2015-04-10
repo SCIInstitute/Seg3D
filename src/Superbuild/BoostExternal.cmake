@@ -31,16 +31,26 @@
 SET_PROPERTY(DIRECTORY PROPERTY "EP_BASE" ${ep_base})
 
 # disable auto linking
-ADD_DEFINITIONS(-DBOOST_ALL_NO_LIB=1)
+# also set in Seg3D?
+SET(boost_CXX_Flags "-DBOOST_ALL_NO_LIB=1")
+IF(APPLE)
+  LIST(APPEND boost_CXX_Flag "-DBOOST_LCAST_NO_WCHAR_T" "-DBOOST_THREAD_DONT_USE_ATOMIC")
+ENDIF()
+IF(WIN32)
+  LIST(APPEND boost_CXX_Flag "-DBOOST_BIND_ENABLE_STDCALL")
+ENDIF()
+
 SET( boost_DEPENDENCIES )
 
-SET(boost_Libraries "atomic;date_time;exception;filesystem;system;thread"
+# explicitly set library list
+SET(boost_Libraries "atomic" "date_time" "exception" "filesystem" "system" "thread"
   CACHE INTERNAL "Boost library name.")
 
 IF(BUILD_WITH_PYTHON)
   ADD_DEFINITIONS(-DBOOST_PYTHON_STATIC_LIB=1)
   LIST(APPEND boost_Libraries python)
   LIST(APPEND boost_DEPENDENCIES Python_external)
+  LIST(APPEND boost_CXX_Flag "-DBOOST_PYTHON_STATIC_MODULE" "-DBOOST_PYTHON_STATIC_LIB")
 ENDIF()
 
 # TODO: set up 64-bit build detection
@@ -69,11 +79,11 @@ ExternalProject_Add(Boost_external
   CMAKE_CACHE_ARGS
     -DCMAKE_VERBOSE_MAKEFILE:BOOL=${CMAKE_VERBOSE_MAKEFILE}
     -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=ON
-    -DBUILD_PYTHON:BOOL=OFF
     -DBUILD_PYTHON:BOOL=${BUILD_WITH_PYTHON}
     -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
     -DFORCE_64BIT_BUILD:BOOL=${FORCE_64BIT_BUILD}
-    -DBOOST_LIBRARIES:STATIC=${boost_Libraries}
+    -DSCI_BOOST_LIBRARIES:STATIC=${boost_Libraries}
+    -DSCI_BOOST_CXX_FLAGS:STRING=${boost_CXX_Flags}
 )
 #-DSCI_PYTHON_INCLUDE:PATH=${SCI_PYTHON_INCLUDE}
 #-DSCI_PYTHON_LIBRARY:FILEPATH=${SCI_PYTHON_LIBRARY}
@@ -85,12 +95,7 @@ ExternalProject_Add(Boost_external
 #-DCMAKE_ANSI_CFLAGS:STRING="${jpeg_pic}"
 
 ExternalProject_Get_Property(Boost_external SOURCE_DIR)
-
-#ExternalProject_Get_Property(Zlib_external BINARY_DIR)
-#SET(Boost_DIR ${BINARY_DIR} CACHE PATH "")
-#MESSAGE(STATUS "Zlib_DIR=${Zlib_DIR}")
-
-SET(SCI_BOOST_INCLUDE ${SOURCE_DIR} CACHE PATH "")
+SET(SCI_BOOST_INCLUDE ${SOURCE_DIR})
 
 SET(BOOST_PREFIX "boost_")
 SET(THREAD_POSTFIX "-mt")
@@ -115,7 +120,7 @@ ENDIF()
 # adding Boost as a build target and dependency
 #
 # TODO: how to make boost include dependent on Boost_external?
-SET(SCI_BOOST_LIBRARY "" CACHE STRING "")
+SET(SCI_BOOST_LIBRARY)
 FOREACH(lib ${boost_Libraries})
   SET(FULL_LIB_NAME "${BOOST_PREFIX}${lib}${THREAD_POSTFIX}")
   LIST(APPEND SCI_BOOST_LIBRARY ${FULL_LIB_NAME})
@@ -152,4 +157,15 @@ FOREACH(lib ${boost_Libraries})
   #ENDIF()
 ENDFOREACH()
 
-#MESSAGE(STATUS "SCI_BOOST_LIBRARY: ${SCI_BOOST_LIBRARY}")
+ExternalProject_Get_Property(Boost_external BINARY_DIR)
+SET(SCI_BOOST_LIBRARY_DIR ${BINARY_DIR}/lib)
+SET(SCI_BOOST_USE_FILE ${BINARY_DIR}/UseBoost.cmake)
+
+# Boost is special case - normally this should be handled in external library repo
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/Superbuild/BoostConfig.cmake.in ${BINARY_DIR}/BoostConfig.cmake @ONLY)
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/Superbuild/UseBoost.cmake ${SCI_BOOST_USE_FILE} COPYONLY)
+
+SET(Boost_DIR ${BINARY_DIR} CACHE PATH "")
+
+MESSAGE(STATUS "Boost_DIR: ${Boost_DIR}")
+

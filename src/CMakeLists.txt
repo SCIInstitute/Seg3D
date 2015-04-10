@@ -43,6 +43,16 @@ ENDIF()
 
 PROJECT(Seg3D)
 
+############################################
+## Configure python
+############################################
+
+OPTION(BUILD_WITH_PYTHON "Build with python support." ON)
+
+############################################
+## Configure superbuild
+############################################
+
 IF(SUPERBUILD_CONFIGURED)
 
   ###########################################
@@ -143,9 +153,6 @@ IF(SUPERBUILD_CONFIGURED)
     SET(SEG3D_BITS "32bit")
     SET(MSVC90_BUILD "x86")
     ADD_DEFINITIONS(-DSCI_32BITS)
-    #IF(WIN32)
-    #  ADD_DEFINITIONS(-DBOOST_BIND_ENABLE_STDCALL)
-    #ENDIF()
   ENDIF()
 
 
@@ -153,25 +160,38 @@ IF(SUPERBUILD_CONFIGURED)
   ## Set Up External Projects
   ############################################
 
-  FIND_PACKAGE(Zlib CONFIGS ZlibConfig.cmake NO_SYSTEM_ENVIRONMENT_PATH)
-  FIND_PACKAGE(LibPNG CONFIGS LibPNGConfig.cmake NO_SYSTEM_ENVIRONMENT_PATH)
-  FIND_PACKAGE(ITK CONFIGS ITKConfig.cmake NO_SYSTEM_ENVIRONMENT_PATH)
+  FIND_PACKAGE(Zlib CONFIGS ZlibConfig.cmake HINTS ${Zlib_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
+  INCLUDE(${ZLIB_USE_FILE})
+
+  FIND_PACKAGE(LibPNG CONFIGS LibPNGConfig.cmake HINTS ${LibPNG_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
+  INCLUDE(${PNG_USE_FILE})
+
+  FIND_PACKAGE(SQLite CONFIGS SQLiteConfig.cmake HINTS ${SQLite_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
+  INCLUDE(${SQLITE_USE_FILE})
+
+  FIND_PACKAGE(ITK CONFIGS ITKConfig.cmake HINTS ${ITK_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
   INCLUDE(${ITK_USE_FILE})
-  FIND_PACKAGE(Teem CONFIGS TeemConfig.cmake NO_SYSTEM_ENVIRONMENT_PATH)
-  FIND_PACKAGE(Glew CONFIGS GlewConfig.cmake NO_SYSTEM_ENVIRONMENT_PATH)
-  FIND_PACKAGE(Freetype CONFIGS FreetypeConfig.cmake NO_SYSTEM_ENVIRONMENT_PATH)
+
+  FIND_PACKAGE(Teem CONFIGS TeemConfig.cmake HINTS ${Teem_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
+  INCLUDE(${Teem_USE_FILE})
+
+  FIND_PACKAGE(Glew CONFIGS GlewConfig.cmake HINTS ${GLEW_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
+  INCLUDE(${GLEW_USE_FILE})
+
+  FIND_PACKAGE(Python CONFIGS PythonConfig.cmake HINTS ${Python_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
+  INCLUDE(${PYTHON_USE_FILE})
+
+  FIND_PACKAGE(Freetype CONFIGS FreetypeConfig.cmake HINTS ${Freetype_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
+  INCLUDE(${FREETYPE_USE_FILE})
 
   # Boost is a special case
-  MESSAGE(STATUS "SCI_BOOST_INCLUDE: ${SCI_BOOST_INCLUDE}")
-  MESSAGE(STATUS "SCI_BOOST_LIBRARY: ${SCI_BOOST_LIBRARY}")
-
+  FIND_PACKAGE(Boost CONFIGS BoostConfig.cmake HINTS ${Boost_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
+  INCLUDE(${SCI_BOOST_USE_FILE})
   
   ############################################
   ## Configure python
   ############################################
 
-  OPTION(BUILD_WITH_PYTHON "Build with python support." OFF)
-  ##OPTION(BUILD_WITH_PYTHON "Build with python support." ON)
   ##IF(BUILD_WITH_PYTHON)
   ##  INCLUDE(${CMAKE_CURRENT_SOURCE_DIR}/CMake/PythonConfig.cmake)
   ##  EXTERNAL_PYTHON_LIBRARY(GIT)
@@ -180,8 +200,6 @@ IF(SUPERBUILD_CONFIGURED)
   ##
   ##  ADD_DEFINITIONS(-DBUILD_WITH_PYTHON 
   ##          -DPy_NO_ENABLE_SHARED 
-  ##          #-DBOOST_PYTHON_STATIC_MODULE
-  ##          #-DBOOST_PYTHON_STATIC_LIB
   ##)
   ##ENDIF()
 
@@ -190,20 +208,8 @@ IF(SUPERBUILD_CONFIGURED)
   ###########################################
 
   # To force a static build these flags need to be set project wide.
-  #ADD_DEFINITIONS(-DGLEW_STATIC)
-  #ADD_DEFINITIONS(-DTEEM_STATIC)
-  #ADD_DEFINITIONS(-DLIBXML_STATIC)
-  #ADD_DEFINITIONS(-DTINYXML_STATIC)
-  #ADD_DEFINITIONS(-DBOOST_ALL_NO_LIB)
-  #ADD_DEFINITIONS(-DTIXML_USE_STL)
-
-  #IF(APPLE)
-  #ADD_DEFINITIONS(-DBOOST_LCAST_NO_WCHAR_T)
-  #ADD_DEFINITIONS(-DBOOST_THREAD_DONT_USE_ATOMIC)
-  #ENDIF()
-    
-  #SET(ITK_BUILD_SHARED_LIBS OFF)
-  #SET(Module_ITKReview ON CACHE BOOLEAN "Seg3D requires the ITK Review directory for proper filter operations." FORCE)
+  ADD_DEFINITIONS(-DTINYXML_STATIC)
+  ADD_DEFINITIONS(-DTIXML_USE_STL)
 
 
   ###########################################
@@ -377,16 +383,17 @@ IF(SUPERBUILD_CONFIGURED)
   # Set the include paths
   ###########################################
 
-  # TODO: make use files for thirdparty projects
   INCLUDE_DIRECTORIES(${QT_INCLUDE_DIR})
-  INCLUDE_DIRECTORIES(${SCI_BOOST_INCLUDE})
+
+  # TODO: make use files for thirdparty projects
   INCLUDE_DIRECTORIES(${SCI_TEEM_INCLUDE})
   INCLUDE_DIRECTORIES(${SCI_FREETYPE_INCLUDE})
-  #INCLUDE_DIRECTORIES(${SCI_TINYXML_INCLUDE})
-  #INCLUDE_DIRECTORIES(${SCI_MATLABIO_INCLUDE})
   #INCLUDE_DIRECTORIES(${SCI_SQLITE_INCLUDE})
-  #INCLUDE_DIRECTORIES(${SCI_MRC2000IO_INCLUDE})
+  INCLUDE_DIRECTORIES(${SCI_GLEW_INCLUDE})
 
+  INCLUDE_DIRECTORIES(${SCI_MATLABIO_INCLUDE})
+  INCLUDE_DIRECTORIES(${SCI_MRC2000IO_INCLUDE})
+  INCLUDE_DIRECTORIES(${SCI_TINYXML_INCLUDE})
   IF(BUILD_WITH_PYTHON)
     INCLUDE(CMake/GenerateActionPythonWrapper.cmake)
   ENDIF()
@@ -672,5 +679,7 @@ IF(SUPERBUILD_CONFIGURED)
 ELSE()
 
   INCLUDE( ${CMAKE_SOURCE_DIR}/Superbuild/Superbuild.cmake )
+  # hack...
+  SET(SUPERBUILD_CONFIGURED ON CACHE BOOL "Is superbuild configured")
 
 ENDIF()

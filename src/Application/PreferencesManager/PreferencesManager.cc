@@ -99,6 +99,7 @@ PreferencesManager::PreferencesManager() :
   // Initialize the local config directory path
   Core::Application::Instance()->get_config_directory( this->private_->local_config_path_ );
 
+  // TODO: this is stupid - what happens if initializing colors fails???
   if( initialize_default_colors() )
     this->initialize_states();
 
@@ -130,8 +131,13 @@ void PreferencesManager::save_state()
 
 Core::Color PreferencesManager::get_color( int index ) const
 {
+  // TODO: assert in production code - bad!!!
   assert( index >= 0 && index < static_cast< int >( this->color_states_.size() ) );
   return this->color_states_[ index ]->get();
+}
+
+Core::Color PreferencesManager::get_color( const Core::Color& color ) const
+{
 }
 
 void PreferencesManager::initialize_states()
@@ -226,6 +232,7 @@ void PreferencesManager::initialize_states()
 
 bool PreferencesManager::initialize_default_colors()
 {
+  this->private_->default_colors_.clear();
   this->private_->default_colors_.push_back( Core::Color( 255, 175, 78 ) );
   this->private_->default_colors_.push_back( Core::Color( 116, 255, 122 ) );
   this->private_->default_colors_.push_back( Core::Color( 143, 214, 255 ) );
@@ -261,7 +268,8 @@ const std::vector< Core::Color >& PreferencesManager::get_default_colors() const
 {
   return this->private_->default_colors_;
 }
-  
+
+
 
 
 } // end namespace seg3D

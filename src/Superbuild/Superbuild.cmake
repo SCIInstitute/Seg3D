@@ -64,8 +64,14 @@ LIST(APPEND Seg3D_DEPENDENCIES Glew_external)
 INCLUDE( ${CMAKE_CURRENT_SOURCE_DIR}/Superbuild/FreetypeExternal.cmake )
 LIST(APPEND Seg3D_DEPENDENCIES Freetype_external)
 
+INCLUDE( ${CMAKE_CURRENT_SOURCE_DIR}/Superbuild/SQLiteExternal.cmake )
+LIST(APPEND Seg3D_DEPENDENCIES SQLite_external)
+
 INCLUDE( ${CMAKE_CURRENT_SOURCE_DIR}/Superbuild/LibPNGExternal.cmake )
 LIST(APPEND Seg3D_DEPENDENCIES LibPNG_external)
+
+INCLUDE( ${CMAKE_CURRENT_SOURCE_DIR}/Superbuild/PythonExternal.cmake )
+LIST(APPEND Seg3D_DEPENDENCIES Python_external)
 
 INCLUDE( ${CMAKE_CURRENT_SOURCE_DIR}/Superbuild/ITKExternal.cmake )
 LIST(APPEND Seg3D_DEPENDENCIES ITK_external)
@@ -92,6 +98,3 @@ ExternalProject_Add( Seg3D
   #  -DVTK_DIR:PATH=${VTK_DIR}
   INSTALL_COMMAND ""
 )
-
-# hack...
-SET(SUPERBUILD_CONFIGURED ON CACHE INTERNAL "" FORCE)
