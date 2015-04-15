@@ -3,7 +3,7 @@
 # 
 #  The MIT License
 # 
-#  Copyright (c) 2009 Scientific Computing and Imaging Institute,
+#  Copyright (c) 2015 Scientific Computing and Imaging Institute,
 #  University of Utah.
 # 
 #  
@@ -26,15 +26,8 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
-###########################################
-# Set Revision information for GLP
-###########################################
 
-INCLUDE(${CMAKE_SOURCE_DIR}/CMake/RevisionInfo.cmake)
-
-#GENERATE_REVISION_INFO()
-
-###########################################
+############################################
 # Set Seg3D main sources
 ###########################################
 

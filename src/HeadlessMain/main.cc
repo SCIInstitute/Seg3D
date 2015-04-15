@@ -91,7 +91,7 @@ int main( int argc, char **argv )
   {
     // NOTE: The revision information is gathered by cmake from svn. Hence if the local tree
     // contains modifications this information is not up-to-date
-    std::cout << SEG3D_REVISIONINFO << std::endl;
+    std::cout << GIT_SEG3D_REVISIONINFO << std::endl;
     return 0;
   }
 

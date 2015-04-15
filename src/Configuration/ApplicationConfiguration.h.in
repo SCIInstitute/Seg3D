@@ -37,7 +37,7 @@
 #define CORE_APPLICATION_MAJOR_VERSION @SEG3D_MAJOR_VERSION@
 #define CORE_APPLICATION_MINOR_VERSION @SEG3D_MINOR_VERSION@
 #define CORE_APPLICATION_PATCH_VERSION @SEG3D_PATCH_VERSION@
-#define CORE_APPLICATION_RELEASE ""
+#define CORE_APPLICATION_RELEASE "Seg3D @SEG3D_MAJOR_VERSION@.@SEG3D_MINOR_VERSION@.@SEG3D_PATCH_VERSION@"
 #define CORE_APPLICATION_NAME "Seg3D"
 #define CORE_APPLICATION_PROJECT_EXTENSION ".s3d"
 #define CORE_APPLICATION_PROJECT_FOLDER_EXTENSION ".seg3dproj"
@@ -48,6 +48,8 @@
       " and was developed in collaboration with Numira Biosciences. " \
         "Seg3D combines a flexible manual segmentation interface with powerful " \
         "image processing and segmentation tools from the Insight " \
-        "Toolkit.</p>"
+        "Toolkit.</p>" \
+        "<br>" \
+        "<p align=\"justify\">Seg3D Git build: @GIT_BUILD_INFO@</p>"
 
 #endif

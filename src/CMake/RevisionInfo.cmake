@@ -3,7 +3,7 @@
 # 
 #  The MIT License
 # 
-#  Copyright (c) 2009 Scientific Computing and Imaging Institute,
+#  Copyright (c) 2015 Scientific Computing and Imaging Institute,
 #  University of Utah.
 # 
 #  
@@ -26,25 +26,44 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
-MACRO( GENERATE_REVISION_INFO )
+function( GENERATE_REVISION_INFO )
+  string(TOUPPER "${PROJECT_NAME}" PROJECT_UPPERCASE_NAME)
 
-  STRING(TOUPPER "${PROJECT_NAME}" PROJECT_UPPERCASE_NAME)
-  FIND_PACKAGE( Subversion )
+  include(${CMAKE_SOURCE_DIR}/CMake/GetGitRevisionDescription.cmake)
 
-  IF( Subversion_FOUND AND EXISTS ${PROJECT_BINARY_DIR}/.svn )
-    Subversion_WC_INFO( ${PROJECT_SOURCE_DIR} "SVNINFO" )
-    SET( INFO_STRING "#define ${PROJECT_UPPERCASE_NAME}_REVISION \"${SVNINFO_WC_REVISION}\"\n" )
-    SET( INFO_STRING "${INFO_STRING}#define ${PROJECT_UPPERCASE_NAME}_DATE \"${SVNINFO_WC_LAST_CHANGED_DATE}\"\n" )
-    SET( INFO_STRING "${INFO_STRING}#define ${PROJECT_UPPERCASE_NAME}_REVISIONINFO \"${PROJECT_NAME} Revision: ${SVNINFO_WC_REVISION}\"\n\n" )
-  ELSE( Subversion_FOUND AND EXISTS ${PROJECT_BINARY_DIR}/.svn )
-    SET( INFO_STRING "#define ${PROJECT_UPPERCASE_NAME}_REVISION \"unknown\"\n" )
-    SET( INFO_STRING "${INFO_STRING}#define ${PROJECT_UPPERCASE_NAME}_DATE \"unknown\"\n" )
-    SET( INFO_STRING "${INFO_STRING}#define ${PROJECT_UPPERCASE_NAME}_REVISIONINFO \"${PROJECT_NAME} Revision:unknown\"\n\n" )
-  ENDIF( Subversion_FOUND AND EXISTS ${PROJECT_BINARY_DIR}/.svn )
+  git_describe(GIT_TAG --tag)
+  git_describe(REVISION_BRANCH --all)
+  get_git_head_revision(REVISION_REFSPEC REVISION_HASHVAR)
+  string(SUBSTRING ${REVISION_HASHVAR} 0 10 TRUNC_HASHVAR)
+  git_show_last_commit_date(GIT_LAST_COMMIT)
 
-  FILE( MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/${PROJECT_NAME}_RevisionInfo" )
-  SET( FILENAME "${PROJECT_BINARY_DIR}/${PROJECT_NAME}_RevisionInfo/${PROJECT_NAME}_RevisionInfo.h" )
-  FILE( WRITE ${FILENAME} ${INFO_STRING})
-  INCLUDE_DIRECTORIES( ${PROJECT_BINARY_DIR}/${PROJECT_NAME}_RevisionInfo )
+  message(STATUS "Git version branch: ${REVISION_BRANCH}")
+  message(STATUS "Git version tag: ${GIT_TAG}")
+  message(STATUS "Git last commit refspec and hash: ${REVISION_REFSPEC} ${REVISION_HASHVAR}")
+  message(STATUS "Git truncated hash: ${TRUNC_HASHVAR}")
+  message(STATUS "Git last commit date: ${GIT_LAST_COMMIT}")
 
-ENDMACRO( GENERATE_REVISION_INFO )
+  set( GIT_REVISION_INFO ${TRUNC_HASHVAR} )
+
+  if(REVISION_BRANCH MATCHES "-NOTFOUND")
+    if(NOT GIT_TAG MATCHES "-NOTFOUND")
+      set( GIT_REVISION_INFO ${GIT_TAG })
+    endif()
+  endif()
+
+  set( GIT_BUILD_INFO "${REVISION_BRANCH} ${TRUNC_HASHVAR}" CACHE INTERNAL "Git build information string." FORCE )
+
+  set( INFO_STRING "#define GIT_${PROJECT_UPPERCASE_NAME}_REVISION \"${GIT_REVISION_INFO}\"\n" )
+  set( INFO_STRING "${INFO_STRING}#define GIT_${PROJECT_UPPERCASE_NAME}_DATE \"${GIT_LAST_COMMIT}\"\n" )
+  set( INFO_STRING "${INFO_STRING}#define GIT_${PROJECT_UPPERCASE_NAME}_REVISIONINFO \"${PROJECT_NAME} ${GIT_BUILD_INFO}\"\n\n" )
+
+  #if( Subversion_FOUND AND EXISTS ${PROJECT_BINARY_DIR}/.svn )
+  #else( Subversion_FOUND AND EXISTS ${PROJECT_BINARY_DIR}/.svn )
+  #  set( INFO_STRING "#define ${PROJECT_UPPERCASE_NAME}_REVISION \"unknown\"\n" )
+  #  set( INFO_STRING "${INFO_STRING}#define ${PROJECT_UPPERCASE_NAME}_DATE \"unknown\"\n" )
+  #  set( INFO_STRING "${INFO_STRING}#define ${PROJECT_UPPERCASE_NAME}_REVISIONINFO \"${PROJECT_NAME} Revision:unknown\"\n\n" )
+  #endif()
+
+  set( fileNAME "${PROJECT_BINARY_DIR}/${PROJECT_NAME}_RevisionInfo.h" )
+  file( WRITE ${fileNAME} ${INFO_STRING})
+endfunction()

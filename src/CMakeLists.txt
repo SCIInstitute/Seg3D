@@ -161,31 +161,57 @@ IF(SUPERBUILD_CONFIGURED)
   ############################################
 
   FIND_PACKAGE(Zlib CONFIGS ZlibConfig.cmake HINTS ${Zlib_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
+  IF(NOT Zlib_FOUND)
+    MESSAGE(FATAL_ERROR "Zlib library not found in ${Zlib_DIR}")
+  ENDIF()
   INCLUDE(${ZLIB_USE_FILE})
 
   FIND_PACKAGE(LibPNG CONFIGS LibPNGConfig.cmake HINTS ${LibPNG_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
+  IF(NOT LibPNG_FOUND)
+    MESSAGE(FATAL_ERROR "Png library not found in ${LibPNG_DIR}")
+  ENDIF()
   INCLUDE(${PNG_USE_FILE})
 
   FIND_PACKAGE(SQLite CONFIGS SQLiteConfig.cmake HINTS ${SQLite_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
+  IF(NOT SQLite_FOUND)
+    MESSAGE(FATAL_ERROR "SQLite library not found in ${SQLite_DIR}")
+  ENDIF()
   INCLUDE(${SQLITE_USE_FILE})
 
   FIND_PACKAGE(ITK CONFIGS ITKConfig.cmake HINTS ${ITK_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
+  IF(NOT ITK_FOUND)
+    MESSAGE(FATAL_ERROR "ITK library not found in ${ITK_DIR}")
+  ENDIF()
   INCLUDE(${ITK_USE_FILE})
 
   FIND_PACKAGE(Teem CONFIGS TeemConfig.cmake HINTS ${Teem_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
+  IF(NOT Teem_FOUND)
+    MESSAGE(FATAL_ERROR "Teem library not found in ${Teem_DIR}")
+  ENDIF()
   INCLUDE(${Teem_USE_FILE})
 
   FIND_PACKAGE(Glew CONFIGS GlewConfig.cmake HINTS ${GLEW_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
+  IF(NOT Glew_FOUND)
+    MESSAGE(FATAL_ERROR "Glew library not found in ${Glew_DIR}")
+  ENDIF()
   INCLUDE(${GLEW_USE_FILE})
 
   FIND_PACKAGE(Python CONFIGS PythonConfig.cmake HINTS ${Python_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
+  IF(NOT Python_FOUND)
+    MESSAGE(FATAL_ERROR "Python library not found in ${Python_DIR}")
+  ENDIF()
   INCLUDE(${PYTHON_USE_FILE})
 
   FIND_PACKAGE(Freetype CONFIGS FreetypeConfig.cmake HINTS ${Freetype_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
+  IF(NOT Freetype_FOUND)
+    MESSAGE(FATAL_ERROR "Freetype library not found in ${Freetype_DIR}")
+  ENDIF()
   INCLUDE(${FREETYPE_USE_FILE})
 
-  # Boost is a special case
   FIND_PACKAGE(Boost CONFIGS BoostConfig.cmake HINTS ${Boost_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
+  IF(NOT Boost_FOUND)
+    MESSAGE(FATAL_ERROR "Boost library not found in ${Boost_DIR}")
+  ENDIF()
   INCLUDE(${SCI_BOOST_USE_FILE})
   
   ############################################
@@ -363,6 +389,14 @@ IF(SUPERBUILD_CONFIGURED)
   ENDIF()
 
   ###########################################
+  # Set Revision information for GLP
+  ###########################################
+
+  INCLUDE(${CMAKE_SOURCE_DIR}/CMake/RevisionInfo.cmake)
+
+  GENERATE_REVISION_INFO()
+
+  ###########################################
   # Build ApplicationConfiguration.h
   # this file contains information such as
   # version numbers and architecture
@@ -386,14 +420,10 @@ IF(SUPERBUILD_CONFIGURED)
   INCLUDE_DIRECTORIES(${QT_INCLUDE_DIR})
 
   # TODO: make use files for thirdparty projects
-  INCLUDE_DIRECTORIES(${SCI_TEEM_INCLUDE})
-  INCLUDE_DIRECTORIES(${SCI_FREETYPE_INCLUDE})
-  #INCLUDE_DIRECTORIES(${SCI_SQLITE_INCLUDE})
-  INCLUDE_DIRECTORIES(${SCI_GLEW_INCLUDE})
-
   INCLUDE_DIRECTORIES(${SCI_MATLABIO_INCLUDE})
   INCLUDE_DIRECTORIES(${SCI_MRC2000IO_INCLUDE})
   INCLUDE_DIRECTORIES(${SCI_TINYXML_INCLUDE})
+
   IF(BUILD_WITH_PYTHON)
     INCLUDE(CMake/GenerateActionPythonWrapper.cmake)
   ENDIF()
