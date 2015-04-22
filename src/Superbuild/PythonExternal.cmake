@@ -26,9 +26,8 @@
 
 SET_PROPERTY(DIRECTORY PROPERTY "EP_BASE" ${ep_base})
 
-# TODO: create variable for python module library
-#SET(PYTHON_MODULE_SEARCH_PATH "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/pythonlib.zip" CACHE INTERNAL "Python modules." FORCE)
-#SET(PYTHON_MODULE_SEARCH_PATH "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}" CACHE INTERNAL "Python modules." FORCE)
+FUNCTION(generate_cmake_info SOURCE_DIR INSTALL_DIR)
+ENDFUNCTION()
 
 #IF(WIN32)
 #  SET(python_LIB_PREFIX "")
@@ -41,29 +40,91 @@ SET_PROPERTY(DIRECTORY PROPERTY "EP_BASE" ${ep_base})
 ##SET(python_LIBRARY_PATH_RELEASE "${python_BINARY_DIR}/Release/${python_LIB_PREFIX}${SCI_PYTHON_LIBRARY}${CMAKE_STATIC_LIBRARY_SUFFIX}")
 ##SET(python_LIBRARY_PATH_DEBUG "${python_BINARY_DIR}/Debug/${python_LIB_PREFIX}${SCI_PYTHON_LIBRARY}${CMAKE_STATIC_LIBRARY_SUFFIX}")
 
-SET(python_GIT_TAG "origin/seg3d_external_test")
-SET(python_DEPENDENCIES "Zlib_external")
+# TODO: update when upgrading
+SET(PY_MAJOR 3)
+SET(PY_MINOR 3)
+SET(PY_PATCH 6)
+SET(SCI_PYTHON_VERSION "${PY_MAJOR}.${PY_MINOR}.${PY_PATCH}")
+SET(SCI_PYTHON_VERSION_SHORT "${PY_MAJOR}.${PY_MINOR}")
+
+# TODO: recheck when upgrading
+# --with-pydebug
+#SET(python_ABIFLAG_PYDEBUG "d")
+SET(python_ABIFLAG_PYDEBUG)
+# --with-pymalloc (default)
+# if disabling pymalloc (--without-pymalloc) for valgrind or to track other memory problems,
+# disable this ABI flag
+SET(python_ABIFLAG_PYMALLOC "m")
+SET(ABIFLAGS "${python_ABIFLAG_PYMALLOC}${python_ABIFLAG_PYDEBUG}")
+
+SET(python_GIT_TAG "origin/python_3.3.6")
+SET(python_GIT_URL "https://github.com/CIBC-Internal/python.git")
+
+IF(UNIX)
+  SET(python_CONFIGURE_FLAGS
+    "--prefix=<INSTALL_DIR>"
+#    "--exec-prefix=<INSTALL_DIR>"
+    "--with-threads"
+  )
+  IF(APPLE)
+    LIST(APPEND python_CONFIGURE_FLAGS "--enable-framework=<INSTALL_DIR>")
+  ELSE()
+    LIST(APPEND python_CONFIGURE_FLAGS "--enable-shared")
+  ENDIF()
+#ELSE()
+ENDIF()
 
 # If CMake ever allows overriding the checkout command or adding flags,
 # git checkout -q will silence message about detached head (harmless).
-ExternalProject_Add(Python_external
-  DEPENDS ${python_DEPENDENCIES}
-  GIT_REPOSITORY "https://github.com/CIBC-Internal/python.git"
-  GIT_TAG ${python_GIT_TAG}
-  PATCH_COMMAND ""
-  INSTALL_DIR ""
-  INSTALL_COMMAND ""
-  CMAKE_CACHE_ARGS
-    -DCMAKE_VERBOSE_MAKEFILE:BOOL=${CMAKE_VERBOSE_MAKEFILE}
-    -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
-    -DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}
-    #-DPYTHONLIB_DST_PATH:STRING=${CMAKE_BINARY_DIR}
-    #-DPYTHON_MODULE_SEARCH_PATH:INTERNAL=${PYTHON_MODULE_SEARCH_PATH}
-    #-DSCI_ZLIB_MANGLE:BOOL=${SCI_ZLIB_MANGLE}
-    -DZlib_DIR:PATH=${Zlib_DIR}
-)
+IF(UNIX)
+  ExternalProject_Add(Python_external
+    GIT_REPOSITORY ${python_GIT_URL}
+    GIT_TAG ${python_GIT_TAG}
+    BUILD_IN_SOURCE ON
+    CONFIGURE_COMMAND <SOURCE_DIR>/configure ${python_CONFIGURE_FLAGS}
+    PATCH_COMMAND ""
+  )
+ELSE()
+  # TODO: look into MSBuild
+  ExternalProject_Add(Python_external
+    GIT_REPOSITORY ${python_GIT_URL}
+    GIT_TAG ${python_GIT_TAG}
+    PATCH_COMMAND ""
+    INSTALL_DIR ""
+    INSTALL_COMMAND ""
+  )
+ENDIF()
 
-ExternalProject_Get_Property(Python_external BINARY_DIR)
-SET(Python_DIR ${BINARY_DIR} CACHE PATH "")
+ExternalProject_Get_Property(Python_external SOURCE_DIR)
+ExternalProject_Get_Property(Python_external INSTALL_DIR)
+
+SET(SCI_PYTHON_ROOT_DIR ${INSTALL_DIR}/Python.framework/Versions/3.3)
+
+IF(UNIX)
+  IF(APPLE)
+    SET(SCI_PYTHON_INCLUDE ${INSTALL_DIR}/Python.framework/Versions/3.3/Headers)
+    SET(SCI_PYTHON_LIBRARY_DIR ${INSTALL_DIR}/Python.framework/Versions/3.3/lib)
+    SET(SCI_PYTHON_LIBRARY python${SCI_PYTHON_VERSION_SHORT})
+  ELSE()
+    SET(SCI_PYTHON_INCLUDE ${INSTALL_DIR}/include)
+    SET(SCI_PYTHON_LIBRARY_DIR ${INSTALL_DIR}/lib)
+    SET(SCI_PYTHON_LIBRARY python${SCI_PYTHON_VERSION_SHORT}${ABIFLAGS})
+  ENDIF()
+ELSE()
+  SET(SCI_PYTHON_INCLUDE )
+  SET(SCI_PYTHON_LIBRARY_DIR )
+  SET(SCI_PYTHON_LIBRARY )
+ENDIF()
+
+SET(PYTHON_MODULE_SEARCH_PATH "${SOURCE_DIR}/pythonlib.zip" CACHE INTERNAL "Python modules." FORCE)
+SET(PYTHON_EXE ${INSTALL_DIR}/bin/python${SCI_PYTHON_VERSION_SHORT})
+
+SET(SCI_PYTHON_USE_FILE ${INSTALL_DIR}/UsePython.cmake)
+
+# Python is special case - normally this should be handled in external library repo
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/Superbuild/PythonConfig.cmake.in ${INSTALL_DIR}/PythonConfig.cmake @ONLY)
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/Superbuild/UsePython.cmake ${SCI_PYTHON_USE_FILE} COPYONLY)
+
+SET(Python_DIR ${INSTALL_DIR} CACHE PATH "")
 
 MESSAGE(STATUS "Python_DIR: ${Python_DIR}")

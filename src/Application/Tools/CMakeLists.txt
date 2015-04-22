@@ -162,8 +162,6 @@ CORE_ADD_LIBRARY(Application_Tools
   ${APPLICATION_TOOLS_SHADER_STRING_SRCS}
 )
 
-INCLUDE_DIRECTORIES(${ITKCommon_INCLUDE_DIRS})
-
 TARGET_LINK_LIBRARIES(Application_Tools
   Core_Utils
   Core_Application
@@ -171,6 +169,7 @@ TARGET_LINK_LIBRARIES(Application_Tools
   Core_Action
   Core_State
   Core_Geometry
+  Core_Renderer
   Application_Clipboard
   Application_Filters
   Application_Tool

@@ -73,6 +73,8 @@ TARGET_LINK_LIBRARIES(Core_DataBlock
   Core_Utils
   Core_Geometry
   ${ITKCommon_LIBRARIES}
+  ${SCI_ZLIB_LIBRARY}
+  ${SCI_PNG_LIBRARY}
   ${SCI_TEEM_LIBRARY}
   ${SCI_BOOST_LIBRARY}
 )

@@ -47,7 +47,8 @@ ADD_DEFINITIONS(-DPYTHONPATH=L"${PYTHON_MODULE_SEARCH_PATH}")
 CORE_ADD_LIBRARY(Core_Python ${CORE_PYTHON_SRCS})
             
 TARGET_LINK_LIBRARIES(Core_Python
-                      Core_Utils
-                      Core_Action
-                      ${SCI_PYTHON_LIBRARY}
-                      ${SCI_BOOST_LIBRARY})
+  Core_Utils
+  Core_Action
+  ${SCI_PYTHON_LIBRARY}
+  ${SCI_BOOST_LIBRARY}
+)

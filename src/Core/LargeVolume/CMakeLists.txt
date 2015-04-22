@@ -38,13 +38,11 @@ SET(CORE_LARGEVOLUME_SRCS
   LargeVolumeConverter.cc
   LargeVolumeCache.h
   LargeVolumeCache.cc
-  )
+)
 
 ##################################################
 # Build static library
 ##################################################
-
-ADD_DEFINITIONS(-DZ_PREFIX)
 
 CORE_ADD_LIBRARY(Core_LargeVolume ${CORE_LARGEVOLUME_SRCS} )
             
@@ -54,5 +52,5 @@ TARGET_LINK_LIBRARIES(Core_LargeVolume
   Core_DataBlock
   Core_Application
   ${SCI_BOOST_LIBRARY}
-  ${SCI_ZLIB_LIBRARY})
-
+  ${SCI_ZLIB_LIBRARY}
+)

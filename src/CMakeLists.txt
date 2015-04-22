@@ -196,17 +196,17 @@ IF(SUPERBUILD_CONFIGURED)
   ENDIF()
   INCLUDE(${GLEW_USE_FILE})
 
-  FIND_PACKAGE(Python CONFIGS PythonConfig.cmake HINTS ${Python_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
-  IF(NOT Python_FOUND)
-    MESSAGE(FATAL_ERROR "Python library not found in ${Python_DIR}")
-  ENDIF()
-  INCLUDE(${PYTHON_USE_FILE})
-
   FIND_PACKAGE(Freetype CONFIGS FreetypeConfig.cmake HINTS ${Freetype_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
   IF(NOT Freetype_FOUND)
     MESSAGE(FATAL_ERROR "Freetype library not found in ${Freetype_DIR}")
   ENDIF()
   INCLUDE(${FREETYPE_USE_FILE})
+
+  FIND_PACKAGE(Python CONFIGS PythonConfig.cmake HINTS ${Python_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
+  IF(NOT Python_FOUND)
+    MESSAGE(FATAL_ERROR "Python library not found in ${Python_DIR}")
+  ENDIF()
+  INCLUDE(${SCI_PYTHON_USE_FILE})
 
   FIND_PACKAGE(Boost CONFIGS BoostConfig.cmake HINTS ${Boost_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
   IF(NOT Boost_FOUND)

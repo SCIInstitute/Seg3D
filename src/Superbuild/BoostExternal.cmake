@@ -43,7 +43,14 @@ ENDIF()
 SET( boost_DEPENDENCIES )
 
 # explicitly set library list
-SET(boost_Libraries "atomic" "date_time" "exception" "filesystem" "system" "thread"
+SET(boost_Libraries
+  "atomic"
+  "date_time"
+  "exception"
+  "filesystem"
+  "regex"
+  "system"
+  "thread"
   CACHE INTERNAL "Boost library name.")
 
 IF(BUILD_WITH_PYTHON)
@@ -62,7 +69,7 @@ ENDIF()
 # TODO: temporary - switch git tag back to master for all
 #       builds once boost 1.56 is available and boost atomic
 #       library fix is verified.
-SET(boost_GIT_TAG "origin/seg3d_build_changes")
+SET(boost_GIT_TAG "origin/python_fixes")
 
 # TODO: fix install step
 #
@@ -80,6 +87,7 @@ ExternalProject_Add(Boost_external
     -DCMAKE_VERBOSE_MAKEFILE:BOOL=${CMAKE_VERBOSE_MAKEFILE}
     -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=ON
     -DBUILD_PYTHON:BOOL=${BUILD_WITH_PYTHON}
+    -DPython_DIR:PATH=${Python_DIR}
     -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
     -DFORCE_64BIT_BUILD:BOOL=${FORCE_64BIT_BUILD}
     -DSCI_BOOST_LIBRARIES:STATIC=${boost_Libraries}
