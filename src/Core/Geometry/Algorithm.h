@@ -54,25 +54,25 @@ void DistanceToLine2Aux( Point& result, int& node, const Point& p,
 // CLOSESTPOINTONTRIANGLE:
 /// Compute the point on the triangle closest to the given point.
 /// The distance to the triangle will be (P - result).length())
-void ClosestPointOnTriangle( Point& result, const Point& P, const Point& A, 
-              const Point& B, const Point& C, const double epsilon = 1e-12 );
+void ClosestPointOnTriangle( Point& result, const Point& p, const Point& a,
+              const Point& b, const Point& c, const double epsilon = 1e-12 );
 
-void ClosestPointOnTriangle( Point& result, int& edge, int& node, const Point& P, 
-              const Point& A, const Point& B, const Point& C, const double epsilon = 1e-12 );
+void ClosestPointOnTriangle( Point& result, int& edge, int& node, const Point& p,
+              const Point& a, const Point& b, const Point& c, const double epsilon = 1e-12 );
 
 
 // ESTIMATECLOSESTPOINTONQUAD:
 /// This is only an estimate for an element that is not flat, it is exact
 /// for a flat element.
-void EstimateClosestPointOnQuad( Point& result, const Point& P, const Point &A, 
-                 const Point& B, const Point& C, const Point& D, const double epsilon = 1e-12 );
+void EstimateClosestPointOnQuad( Point& result, const Point& p, const Point &a,
+                 const Point& b, const Point& c, const Point& d, const double epsilon = 1e-12 );
 
 // CLOSESTLINETOLINE:
-/// Compute s and t such that the distance between A0 + s * (A1 - AO)
-/// and B0 + t * (B1 - B0) is minimal.  Return false if the lines are
+/// Compute s and t such that the distance between a0 + s * (a1 - aO)
+/// and b0 + t * (b1 - b0) is minimal.  Return false if the lines are
 /// parallel, true otherwise.
-bool ClosestLineToLine( double& s, double& t, const Point& A0, const Point& A1,
-             const Point& B0, const Point& B1, const double epsilon = 1e-12 );
+bool ClosestLineToLine( double& s, double& t, const Point& a0, const Point& a1,
+             const Point& b0, const Point& b1, const double epsilon = 1e-12 );
 
 bool RayTriangleIntersection( Point& result, const Point& orig, const Vector& dir,
                const Point& p0, const Point& p1, const Point& p2 );
@@ -85,8 +85,8 @@ double RayPlaneIntersection( const Point& p, const Vector& dir, const Point& p0,
               const Vector& pn, const double epsilon = 1e-6 );
 
 
-void TriangleTriangleIntersection( const Point& A0, const Point& A1, const Point& A2,
-                  const Point& B0, const Point& B1, const Point& B2,
+void TriangleTriangleIntersection( const Point& a0, const Point& a1, const Point& a2,
+                  const Point& b0, const Point& b1, const Point& b2,
                   std::vector<Point>& results );
 
 double TetrahedraVolume( const Point& p0, const Point& p1, const Point& p2, 
