@@ -21,6 +21,11 @@
 *.groupproj eol=crlf
 *.vsprops eol=crlf
 *.props eol=crlf
+*.qrc eol=crlf
+*.qc eol=crlf
+
+# Declare files that will always have LF line endings on checkout.
+*.plist eol=lf
 
 # Denote all files that are truly binary and should not be modified.
 *.png binary
