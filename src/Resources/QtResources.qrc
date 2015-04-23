@@ -73,7 +73,7 @@
         <file>Images/IsosurfaceDeleteOff.png</file>
         <file>Images/IsosurfaceVisible.png</file>
         <file>Images/IsosurfaceVisibleOff.png</file>
-		<file>Images/IsosurfaceVisibleGrey.png</file>
+        <file>Images/IsosurfaceVisibleGrey.png</file>
         <file>Images/IsosurfaceVisibleOn.png</file>
         <file>Images/LabelMap.png</file>
         <file>Images/LabelMask.png</file>
@@ -111,8 +111,8 @@
         <file>Images/SingleMaskOff.png</file>
         <file>Images/SlicesVisible.png</file>
         <file>Images/SlicesVisibleOff.png</file>
-		<file>Images/Seg3DSplash.png</file>
-		<file>Images/Seg3DSplash-2-1.png</file>
+        <file>Images/Seg3DSplash.png</file>
+        <file>Images/Seg3DSplash-2-1.png</file>
         <file>Images/Transform.png</file>
         <file>Images/TransformOff.png</file>
         <file>Images/Text.png</file>
@@ -152,11 +152,11 @@
         <file>Images/InvisibleSlicesVisible.png</file>
         <file>Images/InvisibleSlicesVisibleOff.png</file>
         <file>Images/LargeWhite.png</file>
-	<file>Images/Clip.png</file>
+        <file>Images/Clip.png</file>
         <file>Images/ClipOff.png</file>
-	<file>Images/VolumeRendering.png</file>
+        <file>Images/VolumeRendering.png</file>
         <file>Images/VolumeRenderingOff.png</file>
-	<file>Images/Provenance.png</file>
-	<file>Images/ProvenanceOff.png</file>
+        <file>Images/Provenance.png</file>
+        <file>Images/ProvenanceOff.png</file>
     </qresource>
 </RCC>

@@ -13,6 +13,7 @@
 *.hpp text
 *.cmake text
 *.txt text
+*.qrc text 
 
 # Declare files that will always have CRLF line endings on checkout.
 *.sln text eol=crlf
@@ -21,7 +22,6 @@
 *.groupproj eol=crlf
 *.vsprops eol=crlf
 *.props eol=crlf
-*.qrc eol=crlf
 *.qc eol=crlf
 
 # Declare files that will always have LF line endings on checkout.
