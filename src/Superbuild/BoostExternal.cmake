@@ -79,8 +79,8 @@ ExternalProject_Add(Boost_external
   DEPENDS ${boost_DEPENDENCIES}
   GIT_REPOSITORY "https://github.com/CIBC-Internal/boost.git"
   GIT_TAG ${boost_GIT_TAG}
+  BUILD_IN_SOURCE ON
   PATCH_COMMAND ""
-  INSTALL_DIR ""
   INSTALL_COMMAND ""
   #CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX:PATH=${boost_BINARY_DIR}"
   CMAKE_CACHE_ARGS
@@ -165,15 +165,17 @@ FOREACH(lib ${boost_Libraries})
   #ENDIF()
 ENDFOREACH()
 
-ExternalProject_Get_Property(Boost_external BINARY_DIR)
-SET(SCI_BOOST_LIBRARY_DIR ${BINARY_DIR}/lib)
-SET(SCI_BOOST_USE_FILE ${BINARY_DIR}/UseBoost.cmake)
+ExternalProject_Get_Property(Boost_external SOURCE_DIR)
+ExternalProject_Get_Property(Boost_external INSTALL_DIR)
+
+SET(SCI_BOOST_LIBRARY_DIR ${SOURCE_DIR}/lib)
+SET(SCI_BOOST_USE_FILE ${INSTALL_DIR}/UseBoost.cmake)
 
 # Boost is special case - normally this should be handled in external library repo
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/Superbuild/BoostConfig.cmake.in ${BINARY_DIR}/BoostConfig.cmake @ONLY)
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/Superbuild/BoostConfig.cmake.in ${INSTALL_DIR}/BoostConfig.cmake @ONLY)
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/Superbuild/UseBoost.cmake ${SCI_BOOST_USE_FILE} COPYONLY)
 
-SET(Boost_DIR ${BINARY_DIR} CACHE PATH "")
+SET(Boost_DIR ${INSTALL_DIR} CACHE PATH "")
 
 MESSAGE(STATUS "Boost_DIR: ${Boost_DIR}")
 
