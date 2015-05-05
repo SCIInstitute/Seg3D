@@ -67,6 +67,7 @@ IF(UNIX)
     "--with-threads"
   )
   IF(APPLE)
+    # framework contains *.dylib
     LIST(APPEND python_CONFIGURE_FLAGS "--enable-framework=<INSTALL_DIR>")
   ELSE()
     LIST(APPEND python_CONFIGURE_FLAGS "--enable-shared")
@@ -98,13 +99,14 @@ ENDIF()
 ExternalProject_Get_Property(Python_external SOURCE_DIR)
 ExternalProject_Get_Property(Python_external INSTALL_DIR)
 
-SET(SCI_PYTHON_ROOT_DIR ${INSTALL_DIR}/Python.framework/Versions/3.3)
+SET(SCI_PYTHON_ROOT_DIR ${INSTALL_DIR}/Python.framework/Versions/${SCI_PYTHON_VERSION_SHORT})
 
 IF(UNIX)
   IF(APPLE)
-    SET(SCI_PYTHON_INCLUDE ${INSTALL_DIR}/Python.framework/Versions/3.3/Headers)
-    SET(SCI_PYTHON_LIBRARY_DIR ${INSTALL_DIR}/Python.framework/Versions/3.3/lib)
+    SET(SCI_PYTHON_INCLUDE ${INSTALL_DIR}/Python.framework/Versions/${SCI_PYTHON_VERSION_SHORT}/Headers)
+    SET(SCI_PYTHON_LIBRARY_DIR ${INSTALL_DIR}/Python.framework/Versions/${SCI_PYTHON_VERSION_SHORT}/lib)
     SET(SCI_PYTHON_LIBRARY python${SCI_PYTHON_VERSION_SHORT})
+    SET(PYTHON_MODULE_SEARCH_PATH "Python.framework/Versions/${SCI_PYTHON_VERSION_SHORT}/lib/python${SCI_PYTHON_VERSION_SHORT}" CACHE INTERNAL "Python modules." FORCE)
   ELSE()
     SET(SCI_PYTHON_INCLUDE ${INSTALL_DIR}/include)
     SET(SCI_PYTHON_LIBRARY_DIR ${INSTALL_DIR}/lib)
@@ -116,7 +118,6 @@ ELSE()
   SET(SCI_PYTHON_LIBRARY )
 ENDIF()
 
-SET(PYTHON_MODULE_SEARCH_PATH "${SOURCE_DIR}/pythonlib.zip" CACHE INTERNAL "Python modules." FORCE)
 SET(PYTHON_EXE ${INSTALL_DIR}/bin/python${SCI_PYTHON_VERSION_SHORT})
 
 SET(SCI_PYTHON_USE_FILE ${INSTALL_DIR}/UsePython.cmake)
