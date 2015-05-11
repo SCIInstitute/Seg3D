@@ -24,11 +24,13 @@
 #  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 #  DEALINGS IN THE SOFTWARE.
 
+# borrowed liberally from ParaView superbuild
+
 SET_PROPERTY(DIRECTORY PROPERTY "EP_BASE" ${ep_base})
 
-FUNCTION(generate_cmake_info SOURCE_DIR INSTALL_DIR)
-ENDFUNCTION()
-
+#FUNCTION(generate_cmake_info SOURCE_DIR INSTALL_DIR)
+#ENDFUNCTION()
+#
 #IF(WIN32)
 #  SET(python_LIB_PREFIX "")
 #ELSE()
@@ -46,6 +48,7 @@ SET(PY_MINOR 3)
 SET(PY_PATCH 6)
 SET(SCI_PYTHON_VERSION "${PY_MAJOR}.${PY_MINOR}.${PY_PATCH}")
 SET(SCI_PYTHON_VERSION_SHORT "${PY_MAJOR}.${PY_MINOR}")
+SET(SCI_PYTHON_VERSION_SHORT_WIN32 "${PY_MAJOR}${PY_MINOR}")
 
 # TODO: recheck when upgrading
 # --with-pydebug
@@ -60,6 +63,10 @@ SET(ABIFLAGS "${python_ABIFLAG_PYMALLOC}${python_ABIFLAG_PYDEBUG}")
 SET(python_GIT_TAG "origin/python_3.3.6")
 SET(python_GIT_URL "https://github.com/CIBC-Internal/python.git")
 
+SET(python_WIN32_ARCH)
+SET(python_WIN32_64BIT_DIR)
+SET(python_FRAMEWORK_ARCHIVE)
+
 IF(UNIX)
   SET(python_CONFIGURE_FLAGS
     "--prefix=<INSTALL_DIR>"
@@ -69,10 +76,17 @@ IF(UNIX)
   IF(APPLE)
     # framework contains *.dylib
     LIST(APPEND python_CONFIGURE_FLAGS "--enable-framework=<INSTALL_DIR>")
+    SET(python_FRAMEWORK_ARCHIVE "framework.tar")
   ELSE()
     LIST(APPEND python_CONFIGURE_FLAGS "--enable-shared")
   ENDIF()
-#ELSE()
+ELSE()
+  # TODO: 32-bit windows build?
+  SET(python_WIN32_ARCH "x64")
+  # 64-bit build only
+  # 32-bit build outputs to PCbuild dir
+  SET(python_WIN32_64BIT_DIR "/amd64")
+  #SET(python_ABIFLAG_PYDEBUG "_d")
 ENDIF()
 
 # If CMake ever allows overriding the checkout command or adding flags,
@@ -85,46 +99,81 @@ IF(UNIX)
     CONFIGURE_COMMAND <SOURCE_DIR>/configure ${python_CONFIGURE_FLAGS}
     PATCH_COMMAND ""
   )
+  IF(APPLE)
+    # Preserves links, permissions
+    ExternalProject_Add_Step(Python_external framework_tar_archive
+      COMMAND "${CMAKE_COMMAND}" -E tar cvf ${python_FRAMEWORK_ARCHIVE} Python.framework
+	DEPENDEES install
+	WORKING_DIRECTORY <INSTALL_DIR>
+    )
+  ENDIF()
 ELSE()
-  # TODO: look into MSBuild
   ExternalProject_Add(Python_external
     GIT_REPOSITORY ${python_GIT_URL}
     GIT_TAG ${python_GIT_TAG}
+	BUILD_IN_SOURCE ON
+	CONFIGURE_COMMAND ""
+    BUILD_COMMAND ${CMAKE_BUILD_TOOL} PCbuild/pcbuild.sln /nologo /property:Configuration=Release /property:Platform=${python_WIN32_ARCH}
     PATCH_COMMAND ""
-    INSTALL_DIR ""
-    INSTALL_COMMAND ""
+    INSTALL_COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+      <SOURCE_DIR>/PC/pyconfig.h
+      <SOURCE_DIR>/Include/pyconfig.h
+  )
+  # build both Release and Debug versions
+  ExternalProject_Add_Step(Python_external debug_build
+    COMMAND ${CMAKE_BUILD_TOOL} PCbuild/pcbuild.sln /nologo /property:Configuration=Debug /property:Platform=${python_WIN32_ARCH}
+      DEPENDEES build
+      DEPENDERS install
+      WORKING_DIRECTORY <SOURCE_DIR>
   )
 ENDIF()
 
 ExternalProject_Get_Property(Python_external SOURCE_DIR)
 ExternalProject_Get_Property(Python_external INSTALL_DIR)
 
-SET(SCI_PYTHON_ROOT_DIR ${INSTALL_DIR}/Python.framework/Versions/${SCI_PYTHON_VERSION_SHORT})
-
 IF(UNIX)
   IF(APPLE)
-    SET(SCI_PYTHON_INCLUDE ${INSTALL_DIR}/Python.framework/Versions/${SCI_PYTHON_VERSION_SHORT}/Headers)
-    SET(SCI_PYTHON_LIBRARY_DIR ${INSTALL_DIR}/Python.framework/Versions/${SCI_PYTHON_VERSION_SHORT}/lib)
+    SET(SCI_PYTHON_FRAMEWORK ${INSTALL_DIR}/Python.framework)
+    SET(SCI_PYTHON_ROOT_DIR ${SCI_PYTHON_FRAMEWORK}/Versions/${SCI_PYTHON_VERSION_SHORT})
+    SET(SCI_PYTHON_INCLUDE ${SCI_PYTHON_ROOT_DIR}/Headers)
+    SET(SCI_PYTHON_LIBRARY_DIR ${SCI_PYTHON_ROOT_DIR}/lib)
+    SET(SCI_PYTHON_EXE ${SCI_PYTHON_ROOT_DIR}/bin/python${SCI_PYTHON_VERSION_SHORT})
     SET(SCI_PYTHON_LIBRARY python${SCI_PYTHON_VERSION_SHORT})
-    SET(PYTHON_MODULE_SEARCH_PATH "Python.framework/Versions/${SCI_PYTHON_VERSION_SHORT}/lib/python${SCI_PYTHON_VERSION_SHORT}" CACHE INTERNAL "Python modules." FORCE)
+
+    # required by interpreter interface
+    SET(PYTHON_MODULE_SEARCH_PATH ../Frameworks/Python.framework/Versions/${SCI_PYTHON_VERSION_SHORT}/lib/python${SCI_PYTHON_VERSION_SHORT} CACHE INTERNAL "Python modules." FORCE)
+    SET(SCI_PYTHON_FRAMEWORK_ARCHIVE ${INSTALL_DIR}/${python_FRAMEWORK_ARCHIVE})
   ELSE()
+    SET(SCI_PYTHON_ROOT_DIR ${INSTALL_DIR})
     SET(SCI_PYTHON_INCLUDE ${INSTALL_DIR}/include)
     SET(SCI_PYTHON_LIBRARY_DIR ${INSTALL_DIR}/lib)
+    SET(SCI_PYTHON_EXE ${INSTALL_DIR}/bin/python${SCI_PYTHON_VERSION_SHORT})
     SET(SCI_PYTHON_LIBRARY python${SCI_PYTHON_VERSION_SHORT}${ABIFLAGS})
+
+    # required by interpreter interface
+    SET(PYTHON_MODULE_SEARCH_PATH "")
   ENDIF()
 ELSE()
-  SET(SCI_PYTHON_INCLUDE )
-  SET(SCI_PYTHON_LIBRARY_DIR )
-  SET(SCI_PYTHON_LIBRARY )
-ENDIF()
+  # Windows does not do install step
+  SET(SCI_PYTHON_ROOT_DIR ${SOURCE_DIR}/PCbuild)
+  SET(SCI_PYTHON_INCLUDE ${SOURCE_DIR}/Include)
+  SET(SCI_PYTHON_LIBRARY_DIR ${SCI_PYTHON_ROOT_DIR}${python_WIN32_64BIT_DIR})
+  # 32bit executable name?
+  SET(SCI_PYTHON_EXE ${SCI_PYTHON_ROOT_DIR}${python_WIN32_64BIT_DIR}/python.exe)
+  # release build
+  # debug build has _d suffix
+  SET(SCI_PYTHON_LIBRARY python${SCI_PYTHON_VERSION_SHORT_WIN32})
 
-SET(PYTHON_EXE ${INSTALL_DIR}/bin/python${SCI_PYTHON_VERSION_SHORT})
+  # required by interpreter interface
+  SET(PYTHON_MODULE_SEARCH_PATH "Lib" CACHE INTERNAL "Python modules." FORCE)
+  SET(SCI_PYTHON_DLL ${SCI_PYTHON_LIBRARY_DIR}/${SCI_PYTHON_LIBRARY})
+ENDIF()
 
 SET(SCI_PYTHON_USE_FILE ${INSTALL_DIR}/UsePython.cmake)
 
 # Python is special case - normally this should be handled in external library repo
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/Superbuild/PythonConfig.cmake.in ${INSTALL_DIR}/PythonConfig.cmake @ONLY)
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/Superbuild/UsePython.cmake ${SCI_PYTHON_USE_FILE} COPYONLY)
+CONFIGURE_FILE(${SUPERBUILD_DIR}/PythonConfig.cmake.in ${INSTALL_DIR}/PythonConfig.cmake @ONLY)
+CONFIGURE_FILE(${SUPERBUILD_DIR}/UsePython.cmake ${SCI_PYTHON_USE_FILE} COPYONLY)
 
 SET(Python_DIR ${INSTALL_DIR} CACHE PATH "")
 

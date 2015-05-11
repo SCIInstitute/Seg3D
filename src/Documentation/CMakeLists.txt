@@ -115,7 +115,7 @@ MACRO(ADD_PDF_DOCUMENT document)
       ${CMAKE_CURRENT_BINARY_DIR}/${document}_figures/${pdf_name} COPYONLY)
   ENDFOREACH(pdf_figure ${pdf_figures})
 
-  INSTALL(FILES ${SEG3D_OUTPUT_DIRECTORY}/Documentation/${document}.pdf DESTINATION Documentation)
+  INSTALL(FILES ${SEG3D_BINARY_DIR}/Documentation/${document}.pdf DESTINATION Documentation)
 
 ENDMACRO(ADD_PDF_DOCUMENT)
 

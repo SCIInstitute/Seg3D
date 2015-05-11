@@ -172,8 +172,8 @@ SET(SCI_BOOST_LIBRARY_DIR ${SOURCE_DIR}/lib)
 SET(SCI_BOOST_USE_FILE ${INSTALL_DIR}/UseBoost.cmake)
 
 # Boost is special case - normally this should be handled in external library repo
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/Superbuild/BoostConfig.cmake.in ${INSTALL_DIR}/BoostConfig.cmake @ONLY)
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/Superbuild/UseBoost.cmake ${SCI_BOOST_USE_FILE} COPYONLY)
+CONFIGURE_FILE(${SUPERBUILD_DIR}/BoostConfig.cmake.in ${INSTALL_DIR}/BoostConfig.cmake @ONLY)
+CONFIGURE_FILE(${SUPERBUILD_DIR}/UseBoost.cmake ${SCI_BOOST_USE_FILE} COPYONLY)
 
 SET(Boost_DIR ${INSTALL_DIR} CACHE PATH "")
 
