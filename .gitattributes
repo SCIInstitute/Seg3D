@@ -23,6 +23,7 @@
 *.vsprops eol=crlf
 *.props eol=crlf
 *.qc eol=crlf
+*.rc eol=crlf
 
 # Declare files that will always have LF line endings on checkout.
 *.plist eol=lf
