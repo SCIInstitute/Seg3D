@@ -27,7 +27,7 @@
  */
 
 // TinyXML includes
-#include <Thirdparty/tinyxml/tinyxml.h>
+#include <tinyxml.h>
 
 // Core includes
 #include <Core/Utils/Exception.h>

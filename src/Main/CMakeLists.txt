@@ -1,22 +1,21 @@
 #
 #  For more information, please see: http://software.sci.utah.edu
-# 
 #  The MIT License
-# 
+#
 #  Copyright (c) 2015 Scientific Computing and Imaging Institute,
 #  University of Utah.
-# 
-#  
+#
+#
 #  Permission is hereby granted, free of charge, to any person obtaining a
 #  copy of this software and associated documentation files (the "Software"),
 #  to deal in the Software without restriction, including without limitation
 #  the rights to use, copy, modify, merge, publish, distribute, sublicense,
 #  and/or sell copies of the Software, and to permit persons to whom the
 #  Software is furnished to do so, subject to the following conditions:
-# 
+#
 #  The above copyright notice and this permission notice shall be included
-#  in all copies or substantial portions of the Software. 
-# 
+#  in all copies or substantial portions of the Software.
+#
 #  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
 #  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 #  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -63,7 +62,7 @@ ELSE()
   ENDIF()
 ENDIF()
 
-TARGET_LINK_LIBRARIES(${APPLICATION_NAME} 
+TARGET_LINK_LIBRARIES(${APPLICATION_NAME}
   ${QT_LIBRARIES}
   ${SCI_BOOST_LIBRARY}
   Core_Utils
@@ -83,6 +82,9 @@ TARGET_LINK_LIBRARIES(${APPLICATION_NAME}
   QtUtils_Bridge
   Interface_Application
   Interface_ToolInterface
+  ${SCI_ZLIB_LIBRARY}
+  ${SCI_PNG_LIBRARY}
+  ${SCI_TEEM_LIBRARY}
   ${RESOURCES_LIBRARY}
 )
 
@@ -102,7 +104,7 @@ REGISTERED_TARGET_LINK_LIBRARIES(${APPLICATION_NAME})
 
 ###########################################
 # SETUP MACOSX APPLICATION BUNDLE
-# There is no good way for incorporating 
+# There is no good way for incorporating
 # external libraries into a bundle, hence
 # it is hard coded here what needs to be
 # done to generate an application that
@@ -117,9 +119,9 @@ IF(APPLE)
 
   IF(${CMAKE_GENERATOR} MATCHES "Xcode")
 
-    #ADD_CUSTOM_COMMAND(TARGET ${APPLICATION_NAME} 
+    #ADD_CUSTOM_COMMAND(TARGET ${APPLICATION_NAME}
     #   POST_BUILD
-    #   COMMAND [ ! -d ${CMAKE_CFG_INTDIR} ] || cp -rf "${QT_QTCORE_LIBRARY_RELEASE}/Versions/4/QtCore" "${CMAKE_CFG_INTDIR}/${APPLICATION_NAME}.app/Contents/MacOS/" 
+    #   COMMAND [ ! -d ${CMAKE_CFG_INTDIR} ] || cp -rf "${QT_QTCORE_LIBRARY_RELEASE}/Versions/4/QtCore" "${CMAKE_CFG_INTDIR}/${APPLICATION_NAME}.app/Contents/MacOS/"
     #   COMMAND [ ! -d ${CMAKE_CFG_INTDIR} ] || cp -rf "${QT_QTGUI_LIBRARY_RELEASE}/Versions/4/QtGui" "${CMAKE_CFG_INTDIR}/${APPLICATION_NAME}.app/Contents/MacOS/"
     #   COMMAND [ ! -d ${CMAKE_CFG_INTDIR} ] || cp -rf "${QT_QTOPENGL_LIBRARY_RELEASE}/Versions/4/QtOpenGL" "${CMAKE_CFG_INTDIR}/${APPLICATION_NAME}.app/Contents/MacOS/"
     #   COMMAND [ ! -d ${CMAKE_CFG_INTDIR} ] || install_name_tool -id QtCore ${CMAKE_CFG_INTDIR}/${APPLICATION_NAME}.app/Contents/MacOS/QtCore
@@ -137,14 +139,14 @@ IF(APPLE)
     #   WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
     #IF(BUILD_WITH_PYTHON)
-    #  ADD_CUSTOM_COMMAND(TARGET ${APPLICATION_NAME} 
+    #  ADD_CUSTOM_COMMAND(TARGET ${APPLICATION_NAME}
     #    POST_BUILD
     #    COMMAND [ ! -d "${CMAKE_CFG_INTDIR}/lib" ] || cp -rf "${CMAKE_CFG_INTDIR}/lib" "${CMAKE_CFG_INTDIR}/${APPLICATION_NAME}.app/Contents/MacOS/"
     #    WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
     #ENDIF()
   ELSE()
     IF(BUILD_WITH_PYTHON)
-      ADD_CUSTOM_COMMAND(TARGET ${APPLICATION_NAME} 
+      ADD_CUSTOM_COMMAND(TARGET ${APPLICATION_NAME}
         POST_BUILD
         # macdeployqt puts frameworks in app/Content/Frameworks
         COMMAND ${CMAKE_COMMAND} ARGS -E make_directory ${APPLICATION_NAME}.app/Contents/Frameworks
@@ -152,7 +154,7 @@ IF(APPLE)
         WORKING_DIRECTORY ${SEG3D_BINARY_DIR})
     ENDIF()
 
-    ADD_CUSTOM_COMMAND(TARGET ${APPLICATION_NAME} 
+    ADD_CUSTOM_COMMAND(TARGET ${APPLICATION_NAME}
        POST_BUILD
        #COMMAND cp -rf "${QT_QTCORE_LIBRARY_RELEASE}/Versions/4/QtCore" "${APPLICATION_NAME}.app/Contents/MacOS/"
        #COMMAND cp -rf "${QT_QTGUI_LIBRARY_RELEASE}/Versions/4/QtGui" "${APPLICATION_NAME}.app/Contents/MacOS/"
@@ -174,10 +176,18 @@ IF(APPLE)
        COMMAND ${MACDEPLOYQT} ${APPLICATION_NAME}.app -verbose=3
        WORKING_DIRECTORY ${SEG3D_BINARY_DIR})
   ENDIF()
+ELSE()
+  IF(BUILD_WITH_PYTHON)
+    ADD_CUSTOM_COMMAND(TARGET ${APPLICATION_NAME}
+      POST_BUILD
+      COMMAND ${CMAKE_COMMAND} ARGS -E make_directory ${PYTHON_MODULE_SEARCH_PATH}
+      COMMAND ${CMAKE_COMMAND} ARGS -E copy_directory ${SCI_PYTHON_MODULE_LIBRARY_PATH} ${PYTHON_MODULE_SEARCH_PATH}
+      WORKING_DIRECTORY ${SEG3D_BINARY_DIR})
+  ENDIF()
 ENDIF()
 
 IF(APPLE)
-  INSTALL(TARGETS ${APPLICATION_NAME} 
+  INSTALL(TARGETS ${APPLICATION_NAME}
         RUNTIME DESTINATION .
         BUNDLE DESTINATION .
   )
@@ -185,49 +195,61 @@ ELSE()
   GET_FILENAME_COMPONENT(QTCORENAME ${QT_QTCORE_LIBRARY_RELEASE} NAME_WE)
   GET_FILENAME_COMPONENT(QTGUINAME ${QT_QTGUI_LIBRARY_RELEASE} NAME_WE)
   GET_FILENAME_COMPONENT(QTOPENGLNAME ${QT_QTOPENGL_LIBRARY_RELEASE} NAME_WE)
-  
+
   IF(WIN32)
-    INSTALL(TARGETS ${APPLICATION_NAME} 
+    INSTALL(TARGETS ${APPLICATION_NAME}
         RUNTIME DESTINATION bin
     )
 
-    INSTALL(PROGRAMS 
-      ${QT_BINARY_DIR}/${QTCORENAME}.dll 
-      ${QT_BINARY_DIR}/${QTGUINAME}.dll 
+    INSTALL(PROGRAMS
+      ${QT_BINARY_DIR}/${QTCORENAME}.dll
+      ${QT_BINARY_DIR}/${QTGUINAME}.dll
       ${QT_BINARY_DIR}/${QTOPENGLNAME}.dll
       DESTINATION bin
     )
 
-    INSTALL(PROGRAMS
-      ${SCI_PYTHON_DLL}
+    INSTALL(FILES
+      ${CMAKE_SOURCE_DIR}/ReleaseNotes.txt
       DESTINATION bin
     )
 
-    INSTALL(FILES 
-      ${CMAKE_SOURCE_DIR}/ReleaseNotes.txt 
-      DESTINATION bin
-    )
-    
-    #IF(BUILD_WITH_PYTHON)
-    #  INSTALL(FILES 
-    #  ${PYTHON_SOURCE_DIR}/pythonlib.zip
-    #  DESTINATION bin/lib)
-    #ENDIF()
+    IF(BUILD_WITH_PYTHON)
+      INSTALL(PROGRAMS
+        ${SCI_PYTHON_LIBRARY_PATH}
+        DESTINATION bin
+      )
+
+      INSTALL(DIRECTORY
+        ${SCI_PYTHON_MODULE_LIBRARY_PATH}
+        DESTINATION bin/${PYTHON_MODULE_SEARCH_PATH}
+      )
+    ENDIF()
   ELSE()
-    INSTALL(TARGETS ${APPLICATION_NAME} 
+    INSTALL(TARGETS ${APPLICATION_NAME}
       RUNTIME DESTINATION bin
     )
-    
-    INSTALL(FILES 
-      ${QT_QTCORE_LIBRARY_RELEASE}.${QT_VERSION} 
-      ${QT_QTGUI_LIBRARY_RELEASE}.${QT_VERSION} 
-      ${QT_QTOPENGL_LIBRARY_RELEASE}.${QT_VERSION} 
+
+    INSTALL(FILES
+      ${QT_QTCORE_LIBRARY_RELEASE}.${QT_VERSION}
+      ${QT_QTGUI_LIBRARY_RELEASE}.${QT_VERSION}
+      ${QT_QTOPENGL_LIBRARY_RELEASE}.${QT_VERSION}
       DESTINATION lib
     )
 
-    INSTALL(FILES 
-      ${CMAKE_SOURCE_DIR}/ReleaseNotes.txt 
+    INSTALL(FILES
+      ${CMAKE_SOURCE_DIR}/ReleaseNotes.txt
       DESTINATION bin
     )
+
+    IF(BUILD_WITH_PYTHON)
+      INSTALL(FILES
+        ${SCI_PYTHON_LIBRARY_PATH}
+        DESTINATION bin
+      )
+      INSTALL(DIRECTORY
+        ${SCI_PYTHON_MODULE_LIBRARY_PATH}
+        DESTINATION bin/${PYTHON_MODULE_SEARCH_PATH}
+      )
+    ENDIF()
   ENDIF()
 ENDIF()
