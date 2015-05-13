@@ -10,7 +10,7 @@ Seg3D is a free volume segmentation and processing tool developed by the NIH Cen
 
 #### Windows Vista, 7, 8
 
-The current source code was optimized for use with Visual Studio (VS2013 ).
+The current source code was optimized for use with Visual Studio (VS2013).
 The code should compile fine using the Visual Studio Express versions as well. The code
 has not been tested under Cygwin or MinGW compilers.
 
@@ -43,21 +43,21 @@ Qt binaries are available on the Qt website or can be built from source code.
 
 ##### Linux
 
-Qt is available in most package managers. Look for Qt 4.7-4.8.
+Qt is available from most package managers. Look for Qt 4.7-4.8.
 
 
 ### Compiling Seg3D
 
 Once you have obtained a compatible compiler and installed Qt 4.7 on your system, you need to 
-download and install CMake ( www.cmake.org ) to actually build the software. CMake is a platform
+download and install CMake (www.cmake.org) to actually build the software. CMake is a platform
 independent configuring system that is used for generating Makefiles, Visual Studio project files,
 or Xcode project files. Once CMake has been installed, run CMake from your build (bin) directory and
-give a path to the source directory (src) containing the master CMakeLists.txt file.
+give a path to the CMake Superbuild directory containing the master CMakeLists.txt file.
 For example, on the command line:
 
 ```
 cd bin
-cmake ../src
+cmake ../Superbuild
 ```
 
 The console version ccmake or GUI version can also be used.
