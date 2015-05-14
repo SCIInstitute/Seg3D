@@ -70,7 +70,7 @@ SET(python_FRAMEWORK_ARCHIVE)
 IF(UNIX)
   SET(python_CONFIGURE_FLAGS
     "--prefix=<INSTALL_DIR>"
-#    "--exec-prefix=<INSTALL_DIR>"
+    "--exec-prefix=<INSTALL_DIR>"
     "--with-threads"
   )
   IF(APPLE)
