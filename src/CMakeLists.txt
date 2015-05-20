@@ -309,6 +309,21 @@ IF(SEG3D_BUILD_INTERFACE)
 
   ADD_DEFINITIONS(-DQT_NO_KEYWORDS)
 
+  # should be in $PATH
+  IF(APPLE)
+    FIND_PROGRAM(MACDEPLOYQT_EXE
+      NAMES macdeployqt
+    )
+    IF(MACDEPLOYQT_EXE MATCHES "NOTFOUND")
+      MESSAGE(FATAL_ERROR "macdeployqt is required to build the SCIRun app bundle. Please ensure that both are installed and in your path.")
+    ENDIF()
+    SET(MACDEPLOYQT ${MACDEPLOYQT_EXE} CACHE INTERNAL "macdeployqt executable")
+    MARK_AS_ADVANCED(MACDEPLOYQT)
+
+    SET(MACDEPLOYQT_OUTPUT_LEVEL 0 CACHE STRING "Set macdeployqt output level (0-3)")
+    MARK_AS_ADVANCED(MACDEPLOYQT_OUTPUT_LEVEL)
+  ENDIF()
+
 ENDIF()
 
 ###########################################
@@ -580,20 +595,6 @@ IF(BUILD_DOCUMENTATION)
   ENDIF()
 ENDIF()
 
-###########################################
-# Configure LaTeX and Doxygen documentation
-###########################################
-
-# should be in $PATH
-IF(APPLE)
-  FIND_PROGRAM(MACDEPLOYQT
-    NAMES macdeployqt
- )
- MARK_AS_ADVANCED(MACDEPLOYQT)
-
- #SET(MACDEPLOYQT_OUTPUT_LEVEL 0 CACHE STRING "Set macdeployqt output level (0-3)")
- #MARK_AS_ADVANCED(MACDEPLOYQT_OUTPUT_LEVEL)
-ENDIF()
 
 ###########################################
 # Packaging:
