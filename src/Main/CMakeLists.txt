@@ -113,10 +113,6 @@ REGISTERED_TARGET_LINK_LIBRARIES(${APPLICATION_NAME})
 ###########################################
 
 IF(APPLE)
-  IF(${MACDEPLOYQT} MATCHES "NOTFOUND")
-    MESSAGE(WARNING "macdeployqt is required to build the SCIRun app bundle. Please ensure that both are installed and in your path.")
-  ENDIF()
-
   IF(${CMAKE_GENERATOR} MATCHES "Xcode")
 
     #ADD_CUSTOM_COMMAND(TARGET ${APPLICATION_NAME}
@@ -173,6 +169,7 @@ IF(APPLE)
        #COMMAND [ -d ${APPLICATION_NAME}.app/Contents/MacOS/plugins ] || mkdir ${APPLICATION_NAME}.app/Contents/MacOS/plugins
 
        # configure Qt libs
+      #COMMAND echo "${MACDEPLOYQT} ${APPLICATION_NAME}.app -verbose=3"
        COMMAND ${MACDEPLOYQT} ${APPLICATION_NAME}.app -verbose=3
        WORKING_DIRECTORY ${SEG3D_BINARY_DIR})
   ENDIF()
