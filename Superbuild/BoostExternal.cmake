@@ -69,7 +69,7 @@ ENDIF()
 # TODO: temporary - switch git tag back to master for all
 #       builds once boost 1.56 is available and boost atomic
 #       library fix is verified.
-SET(boost_GIT_TAG "origin/python_fixes")
+SET(boost_GIT_TAG "origin/boost_1_58_test")
 
 # TODO: fix install step
 #
@@ -110,8 +110,8 @@ SET(THREAD_POSTFIX "-mt")
 
 # TODO: if static runtime link is supported, then ABI tag postfix must include s
 # see:
-# http://www.boost.org/doc/libs/1_57_0/more/getting_started/windows.html
-# http://www.boost.org/doc/libs/1_57_0/more/getting_started/unix-variants.html
+# http://www.boost.org/doc/libs/1_58_0/more/getting_started/windows.html
+# http://www.boost.org/doc/libs/1_58_0/more/getting_started/unix-variants.html
 
 IF(WIN32)
   SET(DEBUG_POSTFIX "-gd")
