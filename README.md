@@ -64,7 +64,8 @@ The console version ccmake or GUI version can also be used.
 You may be prompted to specify your location of the Qt installation.
 If you installed Qt in the default location, it should find Qt automatically.
 After configuration is done, generate the make files or project files for your favorite
-development environment and build.
+development environment and build. Following the previous example, the Seg3D application
+will be built in bin/Seg3D.
 
 For questions and issues regarding building the software from source, 
 please email our support list: seg3d@sci.utah.edu
