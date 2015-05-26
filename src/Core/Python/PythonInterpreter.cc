@@ -49,22 +49,22 @@
 
 // Py_IgnoreEnvironmentFlag:
 // Set this flag to tell python to ignore environment variables.
-extern int Py_IgnoreEnvironmentFlag;
+int Py_IgnoreEnvironmentFlag;
 
 // Py_InteractiveFlag:
 // Set this flag to run the interpreter in interactive mode when Py_Main is called.
-extern int Py_InteractiveFlag;
+int Py_InteractiveFlag;
 
 // Py_InspectFlag:
 // Set this flag so the program won't exit at SystemError
-extern int Py_InspectFlag;
+int Py_InspectFlag;
 
 // Py_NoSiteFlag:
 // Suppress 'import site'
-extern int Py_NoSiteFlag;
+int Py_NoSiteFlag;
 
 // Py_OptimizeFlag:
-extern int Py_OptimizeFlag;
+int Py_OptimizeFlag;
 
 namespace Core
 {
