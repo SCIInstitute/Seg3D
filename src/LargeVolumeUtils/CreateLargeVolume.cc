@@ -92,7 +92,6 @@ int main( int argc, char **argv )
       // NOTE: This information is gathered by cmake from the top-level CMakeLists.txt file.
       std::cout << Core::Application::Instance()->GetApplicationName()
       << " version: " <<
-      Core::Application::Instance()->GetReleaseName() << " " <<
       Core::Application::Instance()->GetVersion() << std::endl;
       return 0;
     }
