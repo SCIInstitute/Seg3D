@@ -40,6 +40,7 @@ A 64-bit version can be built from the source code download, configuring it as d
 ##### Mac OS X
 
 Qt binaries are available on the Qt website or can be built from source code.
+Clang with C++11 support is required.
 
 ##### Linux
 
@@ -60,12 +61,13 @@ cd bin
 cmake ../Superbuild
 ```
 
-The console version ccmake or GUI version can also be used.
+The console version ccmake, or GUI version can also be used.
 You may be prompted to specify your location of the Qt installation.
 If you installed Qt in the default location, it should find Qt automatically.
 After configuration is done, generate the make files or project files for your favorite
 development environment and build. Following the previous example, the Seg3D application
 will be built in bin/Seg3D.
+A bash build script (build.sh) is also available for Linux and Mac OS X to simplify the process.
 
 For questions and issues regarding building the software from source, 
 please email our support list: seg3d@sci.utah.edu
