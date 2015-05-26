@@ -377,7 +377,7 @@ bool Application::get_user_name( std::string& user_name )
 void Application::log_start()
 {
   CORE_LOG_MESSAGE( std::string( "Application: " ) + GetUtilName() );
-  CORE_LOG_MESSAGE( std::string( "Version: " ) + GetVersion() + " " + GetReleaseName() );
+  CORE_LOG_MESSAGE( std::string( "Version: " ) + GetVersion() );
   CORE_LOG_MESSAGE( std::string( "64Bit: " )  + Core::ExportToString( Is64Bit() ) );
 }
 
@@ -451,14 +451,9 @@ std::string Application::GetApplicationName()
   return CORE_APPLICATION_NAME;
 }
 
-std::string Application::GetReleaseName()
-{
-  return CORE_APPLICATION_RELEASE;
-}
-
 std::string Application::GetApplicationNameAndVersion()
 {
-  return GetApplicationName() + " " + GetReleaseName() + " " + GetVersion();
+  return GetApplicationName() + " " + GetVersion();
 }
 
 std::string Application::GetAbout()

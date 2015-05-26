@@ -219,17 +219,7 @@ RolloverLogFile::RolloverLogFile( unsigned int log_flags ) :
   Application::Instance()->get_config_directory( this->private_->log_dir_ );
 
   // Build log file prefix
-  std::string release_name = Application::GetReleaseName();
-  boost::algorithm::replace_all( release_name, "(", "" );
-  boost::algorithm::replace_all( release_name, ")", "" );
-  boost::algorithm::replace_all( release_name, " ", "" );
-  if( release_name != "" )
-  {
-    release_name += "_";
-  }
-
-  this->private_->log_file_prefix_ = Application::GetUtilName() + "_" + release_name
-    + Application::GetVersion();
+  this->private_->log_file_prefix_ = Application::GetUtilName() + "_" + Application::GetVersion();
 
   // Rollover log files if needed, and create new log file
   this->private_->rollover_log_files();
