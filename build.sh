@@ -4,7 +4,7 @@
 #  
 #  The MIT License
 #  
-#  Copyright (c) 2011 Scientific Computing and Imaging Institute,
+#  Copyright (c) 2015 Scientific Computing and Imaging Institute,
 #  University of Utah.
 #  
 #  License for the specific language governing rights and limitations under
@@ -41,14 +41,14 @@
 # architecture are also available.
 ##########################################################################
 
-CMAKE_MAJOR_VERSION=2
-CMAKE_MINOR_VERSION=8
-CMAKE_PATCH_VERSION=5
+CMAKE_MAJOR_VERSION=3
+CMAKE_MINOR_VERSION=0
+CMAKE_PATCH_VERSION=2
 CMAKE_VERSION="${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION}"
 CMAKE="cmake-${CMAKE_VERSION}"
 
-OSX_TARGET_VERSION="10.5"
-OSX_TARGET_VERSION_SDK="/Developer/SDKs/MacOSX10.5.sdk"
+OSX_TARGET_VERSION="10.7"
+OSX_TARGET_VERSION_SDK="/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk"
 OSX_TARGET_ARCH="x86_64"
 
 ##########################################################################
@@ -56,13 +56,18 @@ OSX_TARGET_ARCH="x86_64"
 ##########################################################################
 
 printhelp() {
-    echo -e "build.sh: configure Seg3D with CMake and build with either GNU make or Xcode [OS X only]."
+    echo -e "build.sh: configure Seg3D with CMake and build with either GNU make or Xcode [OS X only]"
     echo -e "--debug\t\t\tBuilds Seg3D with debug symbols"
     echo -e "--release\t\tBuilds Seg3D without debug symbols [default]"
+    echo -e "--verbose\t\tTurn on verbose build"
     echo -e "--set-osx-version-min\tTarget a minimum Mac OS X version (currently ${OSX_TARGET_VERSION}, ${OSX_TARGET_ARCH}) [OS X only]"
     echo -e "--xcode-build\t\tConfigure and build Xcode project against ALL_BUILD target [OS X only]"
+    echo -e "--cmake=<path to cmake>\t\tUse given CMake"
+    echo -e "--cmake-args=<cmake args>\t\tUse given CMake args"
     echo -e "--documentation\t\tEnable building documentation (requires LaTeX)"
+    echo -e "--custom-build-dir=<dir>\t\tBuild in dir"
     echo -e "-j#\t\t\tRuns # parallel make processes when building [GNU make only]"
+    echo -e "-D<var>:<type>=<value>\t\t\tDefine CMake variable."
     echo -e "-?\t\t\tThis help"
     exit 0
 }
@@ -106,7 +111,7 @@ get_cmake_version() {
 
 # Try to find a version of cmake
 find_cmake() {
-    if [[ $getcmake != "1" ]]; then
+    if [[ ! -e $cmakebin ]]; then
         cmakebin=`which cmake`
     fi
 
@@ -170,7 +175,7 @@ configure_seg3d_osx() {
     fi
 
     if [[ $xcodebuild -eq 1 ]]; then
-        try $cmakebin $DIR/src -G Xcode $build_opts $cmakeargs
+        try $cmakebin $DIR/Superbuild -G Xcode $build_opts $cmakeargs
     else
         configure_seg3d_make $build_opts
     fi
@@ -182,7 +187,7 @@ configure_seg3d_make() {
 
     build_opts="${build_opts} -DCMAKE_BUILD_TYPE:STRING=${buildtype} -DCMAKE_VERBOSE_MAKEFILE:BOOL=${verbosebuild}"
 
-    try $cmakebin $DIR/src $build_opts $cmakeargs
+    try $cmakebin $DIR/Superbuild $build_opts $cmakeargs
 }
 
 configure_seg3d() {
@@ -253,10 +258,10 @@ else
 fi
 
 buildtype="Release"
-makeflags=""
-cmakeflags=""
-getcmake=0  
-cmakeargs=""    
+makeflags=
+cmakeflags=
+cmakebin=
+cmakeargs=
 setosxmin=0
 verbosebuild="OFF"
 builddir="$DIR/bin"
@@ -270,8 +275,6 @@ while [[ $1 != "" ]]; do
             buildtype="Debug";;
         --release)
             buildtype="Release";;
-        --get-cmake)
-            getcmake=1;;
        --set-osx-version-min)
             if [[ $osx -eq 1 ]]; then
               setosxmin=1
@@ -280,6 +283,8 @@ while [[ $1 != "" ]]; do
             fi;;
        --verbose)
             verbosebuild="ON";;
+       --cmake=*)
+            cmakebin=`echo $1 | cut -c 9-`;;
        --cmake-args=*)
             cmakeargs=`echo $1 | cut -c 14-`;;
        --custom-build-dir=*)
@@ -318,8 +323,10 @@ done
 
 cmakeargs="${cmakeargs} ${cmakeflags}"
 
+if [[ ! -z $cmakebin ]]; then
+  echo "Using CMake: $cmakebin"
+fi
 echo "CMake args: $cmakeargs"
-echo "Get CMake: $getcmake"
 echo "Make Flags: $makeflags"
 if [[ $xcodebuild -eq 0 ]]; then
     # ensure make is on the system
