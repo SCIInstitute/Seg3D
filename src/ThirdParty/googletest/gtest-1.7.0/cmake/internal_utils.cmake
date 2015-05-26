@@ -24,7 +24,7 @@ macro(fix_default_compiler_settings_)
     foreach (flag_var
              CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
              CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
-      if (NOT BUILD_SHARED_LIBS AND NOT gtest_force_shared_crt)
+      #if (NOT BUILD_SHARED_LIBS AND NOT gtest_force_shared_crt)
         # When Google Test is built as a shared library, it should also use
         # shared runtime libraries.  Otherwise, it may end up with multiple
         # copies of runtime library data in different modules, resulting in
@@ -32,8 +32,8 @@ macro(fix_default_compiler_settings_)
         # preferable to use CRT as static libraries, as we don't have to rely
         # on CRT DLLs being available. CMake always defaults to using shared
         # CRT libraries, so we override that default here.
-        string(REPLACE "/MD" "-MT" ${flag_var} "${${flag_var}}")
-      endif()
+      #  string(REPLACE "/MD" "-MT" ${flag_var} "${${flag_var}}")
+      #endif()
 
       # We prefer more strict warning checking for building Google Test.
       # Replaces /W3 with /W4 in defaults.
