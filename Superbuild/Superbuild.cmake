@@ -37,6 +37,13 @@ ELSE()
   SET(SEG3D_BITS 32)
 ENDIF()
 
+###########################################
+# Set default CMAKE_BUILD_TYPE
+# if empty for Unix Makefile builds
+IF(CMAKE_GENERATOR MATCHES "Unix Makefiles" AND NOT CMAKE_BUILD_TYPE)
+  SET(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
+ENDIF()
+
 FIND_PACKAGE(Git)
 
 IF(NOT GIT_FOUND)
@@ -48,7 +55,12 @@ ENDIF()
 #   * large volume (bricked dataset) support
 #   * mosaicing tools
 OPTION(BUILD_LARGE_VOLUME_TOOLS "Build with large volume (bricked) dataset support." ON)
-OPTION(BUILD_MOSAIC_TOOLS "Build with mosaicing tool support." ON)
+SET(DEFAULT_MOSAIC_SETTING ON)
+IF(WIN32)
+  # still highly experimental on Windows...
+  SET(DEFAULT_MOSAIC_SETTING OFF)
+ENDIF()
+OPTION(BUILD_MOSAIC_TOOLS "Build with mosaicing tool support." ${DEFAULT_MOSAIC_SETTING})
 
 INCLUDE( ExternalProject )
 
@@ -129,6 +141,7 @@ LIST(APPEND Seg3D_DEPENDENCIES Teem_external)
 
 SET(SEG3D_CACHE_ARGS
     "-DCMAKE_VERBOSE_MAKEFILE:BOOL=${CMAKE_VERBOSE_MAKEFILE}"
+    "-DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}"
     "-DSEG3D_BINARY_DIR:PATH=${SEG3D_BINARY_DIR}"
     "-DBUILD_LARGE_VOLUME_TOOLS:BOOL=${BUILD_LARGE_VOLUME_TOOLS}"
     "-DBUILD_MOSAIC_TOOLS:BOOL=${BUILD_MOSAIC_TOOLS}"

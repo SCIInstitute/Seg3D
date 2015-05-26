@@ -1,3 +1,4 @@
 
 include_directories(${SCI_BOOST_INCLUDE})
 link_directories(${SCI_BOOST_LIBRARY_DIR})
+add_definitions(-DBOOST_ALL_NO_LIB -DBOOST_PYTHON_STATIC_LIB -DBOOST_PYTHON_STATIC_MODULE)
