@@ -27,6 +27,9 @@
 #
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.9 FATAL_ERROR)
+#CMAKE_MINIMUM_REQUIRED(VERSION 3.0 FATAL_ERROR)
+## TODO: check escape sequences and upgrade for v3.1
+#CMAKE_POLICY(SET CMP0053 OLD)
 
 ###########################################
 # Verify build directory
@@ -42,15 +45,6 @@ ENDIF()
 ###########################################
 
 PROJECT(Seg3D)
-
-###########################################
-# Set default CMAKE_BUILD_TYPE
-# if empty for Unix Makefile builds
-###########################################
-
-IF(CMAKE_GENERATOR MATCHES "Unix Makefiles" AND NOT CMAKE_BUILD_TYPE)
-  SET(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
-ENDIF()
 
 ###########################################
 # WHERE TO COMPILE EXECUTABLES
@@ -81,17 +75,10 @@ INCLUDE( CTest )
 IF(BUILD_TESTING)
   ENABLE_TESTING()
   INCLUDE(CMake/RegisterUnitTest.cmake)
+  IF(WIN32)
+    ADD_DEFINITIONS(-DGTEST_USE_OWN_TR1_TUPLE=0 -D_VARIADIC_MAX=10)
+  ENDIF()
 ENDIF()
-
-
-#  ###########################################
-#  # COMPILE OPTIONS
-#  ###########################################
-#
-#  OPTION(SEG3D_BUILD_INTERFACE "Build the GUI interface to Seg3D" ON)
-#  IF(WIN32)
-#    OPTION(SEG3D_SHOW_CONSOLE "Show console for debugging (Windows only)" OFF)
-#  ENDIF()
 
 
 ###########################################
@@ -99,8 +86,8 @@ ENDIF()
 ###########################################
 
 SET(SEG3D_MAJOR_VERSION 2 CACHE INTERNAL "Major version number" FORCE)
-SET(SEG3D_MINOR_VERSION 1 CACHE INTERNAL "Minor version number" FORCE)
-SET(SEG3D_PATCH_VERSION 6 CACHE INTERNAL "Patch version number" FORCE)
+SET(SEG3D_MINOR_VERSION 2 CACHE INTERNAL "Minor version number" FORCE)
+SET(SEG3D_PATCH_VERSION 0 CACHE INTERNAL "Patch version number" FORCE)
 
 
 ###########################################
@@ -231,17 +218,14 @@ ADD_DEFINITIONS(-DTIXML_USE_STL)
 
 IF(UNIX)
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall")
-ENDIF()
-
-IF(NOT APPLE)
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
-ENDIF()
-
-IF(APPLE)
-  SET(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++11")
-  SET(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -ftemplate-depth=256")
-  SET(CMAKE_CXX_FLAGS_DEBUG "-Wshorten-64-to-32 ${CMAKE_CXX_FLAGS_DEBUG}")
+  IF(APPLE)
+    SET(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++11")
+    SET(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -ftemplate-depth=256")
+    SET(CMAKE_CXX_FLAGS_DEBUG "-Wshorten-64-to-32 ${CMAKE_CXX_FLAGS_DEBUG}")
+  ELSE()
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
+  ENDIF()
 ENDIF()
 
 ###########################################
@@ -292,21 +276,8 @@ IF(SEG3D_BUILD_INTERFACE)
     MESSAGE(FATAL_ERROR "QT ${QT_MIN_VERSION} or later is required for building the Seg3D GUI")
   ENDIF()
 
-#    SET(QT_MIN_VERSION "4.6.0")
-#    INCLUDE(FindQt4)
-#
-#    IF(QT_FOUND)
-#      MESSAGE(STATUS "QTVERSION=${QTVERSION}")
-#      IF(APPLE AND ${QTVERSION} VERSION_EQUAL 4.8 AND ${QTVERSION} VERSION_LESS 4.8.5)
-#        MESSAGE(WARNING "Qt 4.8 versions earlier than 4.8.3 contain a bug that disables menu items under some circumstances. Upgrade to a more recent version.")
-#      ENDIF()
-#
   SET(QT_USE_QTOPENGL 1)
   INCLUDE(${QT_USE_FILE})
-#    ELSE()
-#      MESSAGE(FATAL_ERROR "QT ${QT_MIN_VERSION} or later is required for building Seg3D")
-#    ENDIF()
-
   ADD_DEFINITIONS(-DQT_NO_KEYWORDS)
 
   # should be in $PATH
@@ -339,23 +310,6 @@ ENDIF()
 
 ADD_SUBDIRECTORY(ThirdParty)
 
-###########################################
-# SETUP FOR DEBUG BUILDS
-# enable any extra compile warnings and 
-# set any debug-specific variables
-# NOTE: This needs to be here as ITK does
-#  *NOT* compile with the DEBUG flag set.
-#  It looks like ITK's vnl library is missing
-#  includes that would allow it to compile
-#  with this flag. Hence we only enable it
-#  for our code.
-###########################################
-#
-#IF(CMAKE_BUILD_TYPE MATCHES "Debug")
-#  SET(SEG3D_DEBUG_VERSION "\"(Debug)\"")
-#ELSE()
-#  SET(SEG3D_DEBUG_VERSION "\"\"")
-#ENDIF()
 
 ###########################################
 # Check for "XInitThreads" on X-window
@@ -391,7 +345,6 @@ ENDIF()
 ###########################################
 
 INCLUDE(${CMAKE_SOURCE_DIR}/CMake/RevisionInfo.cmake)
-
 GENERATE_REVISION_INFO()
 
 ###########################################
