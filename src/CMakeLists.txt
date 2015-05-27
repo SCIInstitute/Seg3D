@@ -176,32 +176,20 @@ IF(NOT Freetype_FOUND)
 ENDIF()
 INCLUDE(${FREETYPE_USE_FILE})
 
-FIND_PACKAGE(Python CONFIGS PythonConfig.cmake HINTS ${Python_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
-IF(NOT Python_FOUND)
-  MESSAGE(FATAL_ERROR "Python library not found in ${Python_DIR}")
+IF(BUILD_WITH_PYTHON)
+  FIND_PACKAGE(Python CONFIGS PythonConfig.cmake HINTS ${Python_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
+  IF(NOT Python_FOUND)
+    MESSAGE(FATAL_ERROR "Python library not found in ${Python_DIR}")
+  ENDIF()
+  INCLUDE(${SCI_PYTHON_USE_FILE})
 ENDIF()
-INCLUDE(${SCI_PYTHON_USE_FILE})
 
 FIND_PACKAGE(Boost CONFIGS BoostConfig.cmake HINTS ${Boost_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
 IF(NOT Boost_FOUND)
   MESSAGE(FATAL_ERROR "Boost library not found in ${Boost_DIR}")
 ENDIF()
 INCLUDE(${SCI_BOOST_USE_FILE})
-  
-############################################
-## Configure python
-############################################
 
-##IF(BUILD_WITH_PYTHON)
-##  INCLUDE(${CMAKE_CURRENT_SOURCE_DIR}/CMake/PythonConfig.cmake)
-##  EXTERNAL_PYTHON_LIBRARY(GIT)
-##
-##  #ADD_DEFINITIONS(-DPy_NO_ENABLE_SHARED)
-##
-##  ADD_DEFINITIONS(-DBUILD_WITH_PYTHON 
-##          -DPy_NO_ENABLE_SHARED 
-##)
-##ENDIF()
 
 ###########################################
 # Global defines
@@ -523,9 +511,6 @@ ADD_SUBDIRECTORY(Bootstrap)
 ###########################################
 
 FIND_PACKAGE(LATEX)
-
-OPTION(BUILD_DOCUMENTATION "Build documentation" OFF)
-MARK_AS_ADVANCED(BUILD_DOCUMENTATION)
 
 IF(PDFLATEX_COMPILER)
   IF(BUILD_DOCUMENTATION)
