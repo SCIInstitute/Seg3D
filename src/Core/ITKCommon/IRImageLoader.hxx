@@ -92,15 +92,15 @@ private:
   
   void imageCheckLoad(const std::string& imageID); 
   void maskCheckLoad(const std::string& maskID); 
+
+  const unsigned int SHRINK_FACTOR;
+  const double PIXEL_SPACING;
   
   unsigned int _shrinkFactor;
   double _pixelSpacing;
   imageMap _images;
   maskMap _masks;
   transformationMap _transformations;
-
-  const unsigned int SHRINK_FACTOR;
-  const double PIXEL_SPACING;
 };
 
 
