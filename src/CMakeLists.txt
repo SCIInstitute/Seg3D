@@ -190,6 +190,12 @@ IF(NOT Boost_FOUND)
 ENDIF()
 INCLUDE(${SCI_BOOST_USE_FILE})
 
+FIND_PACKAGE(ImplicitFunction CONFIGS ImplicitFunctionConfig.cmake HINTS ${ImplicitFunction_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
+IF(NOT ImplicitFunction_FOUND)
+  MESSAGE(FATAL_ERROR "ImplicitFunction library not found in ${ImplicitFunction_DIR}")
+ENDIF()
+INCLUDE(${ImplicitFunction_USE_FILE})
+
 
 ###########################################
 # Global defines
