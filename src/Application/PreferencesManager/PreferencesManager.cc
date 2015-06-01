@@ -136,10 +136,6 @@ Core::Color PreferencesManager::get_color( int index ) const
   return this->color_states_[ index ]->get();
 }
 
-Core::Color PreferencesManager::get_color( const Core::Color& color ) const
-{
-}
-
 void PreferencesManager::initialize_states()
 {
   boost::filesystem::path user_path;

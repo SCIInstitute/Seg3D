@@ -123,7 +123,6 @@ public:
   /// GET_COLOR:
   /// Get the color at the index.
   Core::Color get_color( int index ) const;
-  Core::Color get_color( const Core::Color& color ) const;
 
   /// GET_BACKGROUND_COLOR:
   /// Get the currently selected background color for the viewers.
