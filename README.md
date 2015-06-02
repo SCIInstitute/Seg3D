@@ -1,3 +1,23 @@
+Table of Contents
+=================
+
+  * [Seg3D](op="mainContentOfPage"><h1><)
+    * [Installing Seg3D from source](#installing-seg3d-from-source)
+      * [Compiler Requirements](#compiler-requirements)
+        * [Windows Vista, 7, 8](#windows-vista-7-8)
+        * [OS X](#os-x)
+        * [Linux](#linux)
+      * [Dependencies](#dependencies)
+        * [Qt](#qt)
+          * [Windows](#windows)
+          * [Mac OS X](#mac-os-x)
+          * [Linux](#linux-1)
+      * [Compiling Seg3D](#compiling-seg3d)
+    * [Seg3D Data](#seg3d-data)
+    * [Seg3D Support](#seg3d-support)
+
+<!-- Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc) -->
+
 # Seg3D
 Seg3D is a free volume segmentation and processing tool developed by the NIH Center for Integrative Biomedical Computing at the University of Utah Scientific Computing and Imaging (SCI) Institute.
 
