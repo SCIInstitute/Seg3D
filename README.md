@@ -5,12 +5,12 @@ Table of Contents
     * [Installing Seg3D from source](#installing-seg3d-from-source)
       * [Compiler Requirements](#compiler-requirements)
         * [Windows Vista, 7, 8](#windows-vista-7-8)
-        * [OS X](#os-x)
+        * [Mac OS X](#mac-os-x)
         * [Linux](#linux)
       * [Dependencies](#dependencies)
         * [Qt](#qt)
           * [Windows](#windows)
-          * [Mac OS X](#mac-os-x)
+          * [Mac OS X](#mac-os-x-1)
           * [Linux](#linux-1)
       * [Compiling Seg3D](#compiling-seg3d)
     * [Seg3D Data](#seg3d-data)
@@ -31,13 +31,13 @@ Seg3D is a free volume segmentation and processing tool developed by the NIH Cen
 #### Windows Vista, 7, 8
 
 The current source code was optimized for use with Visual Studio (VS2013).
-The code should compile fine using the Visual Studio Express versions as well. The code
+The code should compile on Windows Vista, 7 and 8 using the Visual Studio Express versions as well. The code
 has not been tested under Cygwin or MinGW compilers.
 
-#### OS X
+#### Mac OS X
 
-The source code base was using under Xcode as well as using make/gcc and works for both 
-environments.  
+The source code base was built with Xcode as well as GNU Make and works for both 
+environments on OS X 10.7+.
 
 #### Linux
 
