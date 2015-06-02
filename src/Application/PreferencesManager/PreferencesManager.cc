@@ -138,6 +138,7 @@ Core::Color PreferencesManager::get_color( int index ) const
 
 Core::Color PreferencesManager::get_color( const Core::Color& color ) const
 {
+  throw "todo";
 }
 
 void PreferencesManager::initialize_states()
