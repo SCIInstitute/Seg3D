@@ -69,5 +69,11 @@ development environment and build. Following the previous example, the Seg3D app
 will be built in bin/Seg3D.
 A bash build script (build.sh) is also available for Linux and Mac OS X to simplify the process.
 
+## Seg3D Data
+
+Seg3D sample data (also used in the tutorial) is available [here](https://github.com/CIBC-Internal/Seg3DData/releases).
+
+## Seg3D Support
+
 For questions and issues regarding building the software from source, 
 please email our support list: seg3d@sci.utah.edu
