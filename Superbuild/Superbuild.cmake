@@ -144,6 +144,12 @@ LIST(APPEND Seg3D_DEPENDENCIES Boost_external)
 INCLUDE( ${SUPERBUILD_DIR}/TeemExternal.cmake )
 LIST(APPEND Seg3D_DEPENDENCIES Teem_external)
 
+INCLUDE( ${SUPERBUILD_DIR}/ImplicitFunctionExternal.cmake )
+LIST(APPEND Seg3D_DEPENDENCIES ImplicitFunction_external)
+
+INCLUDE( ${SUPERBUILD_DIR}/DataExternal.cmake )
+LIST(APPEND Seg3D_DEPENDENCIES Data_external)
+
 SET(SEG3D_CACHE_ARGS
     "-DCMAKE_VERBOSE_MAKEFILE:BOOL=${CMAKE_VERBOSE_MAKEFILE}"
     "-DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}"
@@ -164,6 +170,7 @@ SET(SEG3D_CACHE_ARGS
     "-DFreetype_DIR:PATH=${Freetype_DIR}"
     "-DGlew_DIR:PATH=${Glew_DIR}"
     "-DTeem_DIR:PATH=${Teem_DIR}"
+    "-DImplicitFunction_DIR:PATH=${ImplicitFunction_DIR}"
 )
 
 IF(BUILD_WITH_PYTHON)
