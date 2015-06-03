@@ -114,17 +114,16 @@ public:
 
     // From RBF class. ThinPlate is the default kernel.
     Kernel kernel = ThinPlate;
-    if (this->actionInternal_->kernel_ != "gaussian")
+    if (this->actionInternal_->kernel_ == "gaussian")
     {
       kernel = Gaussian;
     }
-    else if (this->actionInternal_->kernel_ != "multi_quadratic")
+    else if (this->actionInternal_->kernel_ == "multi_quadratic")
     {
       kernel = MultiQuadratic;
     }
-    // TODO: set kernel???
 
-    RBFInterface rbfAlgo(rbfPointData, rbfOrigin, rbfGridSize, rbfGridSpacing, this->actionInternal_->normalOffset_);
+    RBFInterface rbfAlgo(rbfPointData, rbfOrigin, rbfGridSize, rbfGridSpacing, this->actionInternal_->normalOffset_, kernel);
     this->thresholdValue_ = rbfAlgo.getThresholdValue();
 
     Core::DataBlockHandle dstDataBlock = Core::StdDataBlock::New( srcGridTransform, Core::DataType::FLOAT_E );

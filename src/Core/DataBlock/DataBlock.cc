@@ -56,6 +56,7 @@ double DataBlock::get_data_at( index_type index ) const
 {
   // range check
   // TODO: exception would be clearer, but would there be a performance impact?
+  // TODO: numeric limit min better choice than 0?
   if (index >= get_size())
   {
     return 0.0;
