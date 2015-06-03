@@ -68,6 +68,7 @@ TARGET_LINK_LIBRARIES(${APPLICATION_NAME}
   Application_Tools
   Application_Filters
   Application_Socket
+  ${ImplicitFunction_LIBRARY}
 )
 
 IF(WIN32)
