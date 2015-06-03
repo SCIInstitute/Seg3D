@@ -66,6 +66,9 @@ IF(WIN32)
   SET(FORCE_64BIT_BUILD ON)
 ENDIF()
 
+# TODO: temporary - switch git tag back to master for all
+#       builds once boost 1.56 is available and boost atomic
+#       library fix is verified.
 SET(boost_GIT_TAG "origin/master")
 
 # TODO: fix install step
@@ -99,36 +102,11 @@ SET(SCI_BOOST_USE_FILE ${INSTALL_DIR}/UseBoost.cmake)
 SET(BOOST_PREFIX "boost_")
 SET(THREAD_POSTFIX "-mt")
 
-# TODO: if static runtime link is supported, then ABI tag postfix must include s
-# see:
-# http://www.boost.org/doc/libs/1_58_0/more/getting_started/windows.html
-# http://www.boost.org/doc/libs/1_58_0/more/getting_started/unix-variants.html
-
-IF(WIN32)
-  SET(DEBUG_POSTFIX "-gd")
-ELSE()
-  SET(DEBUG_POSTFIX "-d")
-ENDIF()
-
-IF(WIN32)
-  SET(boost_LIB_PREFIX "lib")
-ELSE()
-  SET(boost_LIB_PREFIX "")
-  #SET(boost_LIB_PREFIX ${CMAKE_STATIC_LIBRARY_PREFIX})
-ENDIF()
-
 SET(SCI_BOOST_LIBRARY)
-SET(SCI_BOOST_LIBRARY_RELEASE)
-SET(SCI_BOOST_LIBRARY_DEBUG)
 
 FOREACH(lib ${boost_Libraries})
-  SET(LIB_NAME "${boost_LIB_PREFIX}${BOOST_PREFIX}${lib}${THREAD_POSTFIX}")
-  SET(FULL_LIB_NAME_RELEASE "${SCI_BOOST_LIBRARY_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}${LIB_NAME}${CMAKE_STATIC_LIBRARY_SUFFIX}")
-  SET(FULL_LIB_NAME_DEBUG "${SCI_BOOST_LIBRARY_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}${LIB_NAME}${DEBUG_POSTFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}")
+  SET(LIB_NAME "${BOOST_PREFIX}${lib}${THREAD_POSTFIX}")
   LIST(APPEND SCI_BOOST_LIBRARY ${LIB_NAME})
-  LIST(APPEND SCI_BOOST_LIBRARY_RELEASE ${FULL_LIB_NAME_RELEASE})
-  LIST(APPEND SCI_BOOST_LIBRARY_DEBUG ${FULL_LIB_NAME_DEBUG})
-  MESSAGE(STATUS "Configure Boost library ${lib}")
 ENDFOREACH()
 
 # Boost is special case - normally this should be handled in external library repo
