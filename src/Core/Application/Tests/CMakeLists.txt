@@ -37,5 +37,6 @@ TARGET_LINK_LIBRARIES(Core_Application_Tests
   Core_Application
   Core_Utils
   Core_Geometry
+  ${SCI_BOOST_LIBRARY}
   ${SCI_GTESTMAIN_LIBRARY}
 )
