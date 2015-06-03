@@ -123,6 +123,8 @@ SET(APPLICATION_TOOLS_SRCS
   SpeedlineTool.cc
   PointsSelectTool.h
   PointsSelectTool.cc
+  RadialBasisFunctionTool.h
+  RadialBasisFunctionTool.cc
 )
 
 SET(APPLICATION_TOOLS_NOREGISTER_SRCS
