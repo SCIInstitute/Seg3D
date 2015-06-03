@@ -1,3 +1,23 @@
+Table of Contents
+=================
+
+  * [Seg3D](#seg3d)
+    * [Installing Seg3D from source](#installing-seg3d-from-source)
+      * [Compiler Requirements](#compiler-requirements)
+        * [Windows Vista, 7, 8](#windows-vista-7-8)
+        * [Mac OS X](#mac-os-x)
+        * [Linux](#linux)
+      * [Dependencies](#dependencies)
+        * [Qt](#qt)
+          * [Windows](#windows)
+          * [Mac OS X](#mac-os-x-1)
+          * [Linux](#linux-1)
+      * [Compiling Seg3D](#compiling-seg3d)
+    * [Seg3D Data](#seg3d-data)
+    * [Seg3D Support](#seg3d-support)
+
+<!-- Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc) -->
+
 # Seg3D
 Seg3D is a free volume segmentation and processing tool developed by the NIH Center for Integrative Biomedical Computing at the University of Utah Scientific Computing and Imaging (SCI) Institute.
 
@@ -11,13 +31,13 @@ Seg3D is a free volume segmentation and processing tool developed by the NIH Cen
 #### Windows Vista, 7, 8
 
 The current source code was optimized for use with Visual Studio (VS2013).
-The code should compile fine using the Visual Studio Express versions as well. The code
+The code should compile on Windows Vista, 7 and 8 using the Visual Studio Express versions as well. The code
 has not been tested under Cygwin or MinGW compilers.
 
-#### OS X
+#### Mac OS X
 
-The source code base was using under Xcode as well as using make/gcc and works for both 
-environments.  
+The source code base was built with Xcode as well as GNU Make and works for both 
+environments on OS X 10.7+.
 
 #### Linux
 
@@ -68,6 +88,12 @@ After configuration is done, generate the make files or project files for your f
 development environment and build. Following the previous example, the Seg3D application
 will be built in bin/Seg3D.
 A bash build script (build.sh) is also available for Linux and Mac OS X to simplify the process.
+
+## Seg3D Data
+
+Seg3D sample data (also used in the tutorial) is available [here](https://github.com/CIBC-Internal/Seg3DData/releases).
+
+## Seg3D Support
 
 For questions and issues regarding building the software from source, 
 please email our support list: seg3d@sci.utah.edu
