@@ -142,37 +142,27 @@ IF(APPLE)
     #    WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
     #ENDIF()
   ELSE()
-    IF(BUILD_WITH_PYTHON)
-      ADD_CUSTOM_COMMAND(TARGET ${APPLICATION_NAME}
-        POST_BUILD
-        # macdeployqt puts frameworks in app/Content/Frameworks
-        COMMAND ${CMAKE_COMMAND} ARGS -E make_directory ${APPLICATION_NAME}.app/Contents/Frameworks
-        COMMAND ${CMAKE_COMMAND} ARGS -E chdir  ${APPLICATION_NAME}.app/Contents/Frameworks tar xvf ${SCI_PYTHON_FRAMEWORK_ARCHIVE}
-        WORKING_DIRECTORY ${SEG3D_BINARY_DIR})
-    ENDIF()
-
     ADD_CUSTOM_COMMAND(TARGET ${APPLICATION_NAME}
        POST_BUILD
-       #COMMAND cp -rf "${QT_QTCORE_LIBRARY_RELEASE}/Versions/4/QtCore" "${APPLICATION_NAME}.app/Contents/MacOS/"
-       #COMMAND cp -rf "${QT_QTGUI_LIBRARY_RELEASE}/Versions/4/QtGui" "${APPLICATION_NAME}.app/Contents/MacOS/"
-       #COMMAND cp -rf "${QT_QTOPENGL_LIBRARY_RELEASE}/Versions/4/QtOpenGL" "${APPLICATION_NAME}.app/Contents/MacOS/"
-       #COMMAND install_name_tool -id QtCore ${APPLICATION_NAME}.app/Contents/MacOS/QtCore
-       #COMMAND install_name_tool -id QtGui ${APPLICATION_NAME}.app/Contents/MacOS/QtGui
-       #COMMAND install_name_tool -id QtOpenGL ${APPLICATION_NAME}.app/Contents/MacOS/QtOpenGL
-       #COMMAND install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore ${APPLICATION_NAME}.app/Contents/MacOS/QtGui
-       #COMMAND install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore ${APPLICATION_NAME}.app/Contents/MacOS/QtOpenGL
-       #COMMAND install_name_tool -change QtGui.framework/Versions/4/QtGui @executable_path/QtGui ${APPLICATION_NAME}.app/Contents/MacOS/QtOpenGL
-       #COMMAND install_name_tool -change QtGui.framework/Versions/4/QtGui @executable_path/QtGui ${APPLICATION_NAME}.app/Contents/MacOS/${APPLICATION_NAME}
-       #COMMAND install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore ${APPLICATION_NAME}.app/Contents/MacOS/${APPLICATION_NAME}
-       #COMMAND install_name_tool -change QtOpenGL.framework/Versions/4/QtOpenGL @executable_path/QtOpenGL ${APPLICATION_NAME}.app/Contents/MacOS/${APPLICATION_NAME}
-       #COMMAND cp "-rf" "${QT_QTGUI_LIBRARY_RELEASE}/Versions/Current/Resources" "${APPLICATION_NAME}.app/Contents"
-       #COMMAND cp -rf "${CMAKE_SOURCE_DIR}/CMake/qt.conf" ${APPLICATION_NAME}.app/Contents/Resources
-       #COMMAND [ -d ${APPLICATION_NAME}.app/Contents/MacOS/plugins ] || mkdir ${APPLICATION_NAME}.app/Contents/MacOS/plugins
-
        # configure Qt libs
       #COMMAND echo "${MACDEPLOYQT} ${APPLICATION_NAME}.app -verbose=3"
        COMMAND ${MACDEPLOYQT} ${APPLICATION_NAME}.app -verbose=3
        WORKING_DIRECTORY ${SEG3D_BINARY_DIR})
+    IF(BUILD_WITH_PYTHON)
+      SET(VERSION_PATH Versions/${SCI_PYTHON_VERSION_SHORT})
+      SET(FRAMEWORK_PATH Frameworks/Python.framework)
+      SET(PYTHON_PATH ${APPLICATION_NAME}.app/Contents/${FRAMEWORK_PATH}/${VERSION_PATH})
+      ADD_CUSTOM_COMMAND(TARGET ${APPLICATION_NAME}
+        POST_BUILD
+        # macdeployqt puts frameworks in app/Content/Frameworks
+        COMMAND ${CMAKE_COMMAND} ARGS -E chdir  ${APPLICATION_NAME}.app/Contents/Frameworks tar xvf ${SCI_PYTHON_FRAMEWORK_ARCHIVE}
+        COMMAND chmod u+w  ${PYTHON_PATH}/Python
+        COMMAND  install_name_tool -id Python ${PYTHON_PATH}/Python
+        COMMAND  install_name_tool -change ${SCI_PYTHON_FRAMEWORK}/${VERSION_PATH}/Python @executable_path/../${FRAMEWORK_PATH}/${VERSION_PATH}/Python ${APPLICATION_NAME}.app/Contents/MacOS/${APPLICATION_NAME}
+        # TODO: other executables...
+        COMMAND  install_name_tool -change ${SCI_PYTHON_FRAMEWORK}/${VERSION_PATH}/Python @executable_path/../Python ${PYTHON_PATH}/bin/python3.3
+        WORKING_DIRECTORY ${SEG3D_BINARY_DIR})
+    ENDIF()
   ENDIF()
 ELSE()
   IF(BUILD_WITH_PYTHON)
