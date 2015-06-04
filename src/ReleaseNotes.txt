@@ -1,13 +1,15 @@
 Release Notes
 =============
 
-Version 2.1.6
+Version 2.2.0
 -------------
 
+* Tool for creating implicit surface segmentations has been added
 * Upgrade to ITK 4.5
 * Upgrade to freetype 2.5.3
 * Upgrade to zlib 1.2.8
 * Upgrade to glew 1.9.0
+* Upgrade to python 3.3.6
 
 Version 2.1.5
 -------------
