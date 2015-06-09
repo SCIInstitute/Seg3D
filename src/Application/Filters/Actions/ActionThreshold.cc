@@ -3,7 +3,7 @@
  
  The MIT License
  
- Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
  
  
@@ -24,7 +24,9 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
- */
+*/
+
+#include <Application/Filters/Actions/ActionThreshold.h>
 
 #include <Core/DataBlock/MaskDataBlockManager.h>
 #include <Core/DataBlock/StdDataBlock.h>
@@ -32,8 +34,7 @@
 // Application includes
 #include <Application/Layer/LayerManager.h>
 #include <Application/StatusBar/StatusBar.h>
-#include <Application/Filters/LayerFilter.h>
-#include <Application/Filters/Actions/ActionThreshold.h>
+#include <Application/Filters/ThresholdFilter.h>
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
@@ -43,6 +44,8 @@ CORE_REGISTER_ACTION( Seg3D, Threshold )
 
 namespace Seg3D
 {
+
+using namespace Filter;
 
 ActionThreshold::ActionThreshold()
 {
@@ -85,164 +88,30 @@ bool ActionThreshold::validate( Core::ActionContextHandle& context )
   return true;
 }
 
-// ALGORITHM CLASS
-// This class does the actual work and is run on a separate thread.
-// NOTE: The separation of the algorithm into a private class is for the purpose of running the
-// filter on a separate thread.
-
-class ThresholdFilterAlgo : public LayerFilter
-{
-
-public:
-  DataLayerHandle src_layer_;
-  MaskLayerHandle dst_layer_;
-
-  double lower_threshold_;
-  double upper_threshold_;
-  
-public:
-  template< class T >
-  void threshold_data( Core::DataBlockHandle dst, double min_val, double max_val )
-  {
-    Core::DataBlockHandle src_data_block = this->src_layer_->
-      get_data_volume()->get_data_block();
-    T* src_data = reinterpret_cast< T* >( src_data_block->get_data() );
-    unsigned char* dst_data = reinterpret_cast< unsigned char* >( dst->get_data() );
-    size_t z_plane_size = src_data_block->get_nx() * src_data_block->get_ny();
-    size_t nz = src_data_block->get_nz();
-    size_t tenth_nz = nz / 10;
-
-    // Lock the source data block
-    Core::DataBlock::shared_lock_type lock( src_data_block->get_mutex() );
-    size_t index = 0;
-    for ( size_t z = 0; z < nz; ++z )
-    {
-      for ( size_t i = 0; i < z_plane_size; ++i, ++index )
-      {
-        dst_data[ index ] = ( src_data[ index ] >= min_val && 
-          src_data[ index ] <= max_val ) ? 1 : 0;
-      }
-      if ( this->check_abort() )
-      {
-        return;
-      }
-      if ( tenth_nz > 0 && z > 0 && z % tenth_nz == 0 )
-      {
-        this->dst_layer_->update_progress_signal_( ( z * 0.5 ) / nz );
-      }
-    }
-    this->dst_layer_->update_progress_signal_( 0.5 );
-  }
-
-  // RUN_FILTER:
-  // Implementation of run of the Runnable base class, this function is called when the thread
-  // is launched.
-  virtual void run_filter()
-  {
-    Core::DataBlockHandle threshold_result = Core::StdDataBlock::New( 
-      this->src_layer_->get_grid_transform(), 
-      Core::DataType::UCHAR_E );
-    switch ( this->src_layer_->get_data_type() )
-    {
-    case Core::DataType::CHAR_E:
-      this->threshold_data< signed char >( threshold_result, 
-        this->lower_threshold_, this->upper_threshold_ );
-      break;
-    case Core::DataType::UCHAR_E:
-      this->threshold_data< unsigned char >( threshold_result, 
-        this->lower_threshold_, this->upper_threshold_ );
-      break;
-    case Core::DataType::SHORT_E:
-      this->threshold_data< short >( threshold_result, 
-        this->lower_threshold_, this->upper_threshold_ );
-      break;
-    case Core::DataType::USHORT_E:
-      this->threshold_data< unsigned short >( threshold_result, 
-        this->lower_threshold_, this->upper_threshold_ );
-      break;
-    case Core::DataType::INT_E:
-      this->threshold_data< int >( threshold_result, 
-        this->lower_threshold_, this->upper_threshold_ );
-      break;
-    case Core::DataType::UINT_E:
-      this->threshold_data< unsigned int >( threshold_result, 
-        this->lower_threshold_, this->upper_threshold_ );
-      break;
-    case Core::DataType::FLOAT_E:
-      this->threshold_data< float >( threshold_result, 
-        this->lower_threshold_, this->upper_threshold_ );
-      break;
-    case Core::DataType::DOUBLE_E:
-      this->threshold_data< double >( threshold_result, 
-        this->lower_threshold_, this->upper_threshold_ );
-      break;
-    }
-    
-    if ( this->check_abort() )
-    {
-      return;
-    }
-    
-    Core::MaskDataBlockHandle threshold_mask;
-    Core::MaskDataBlockManager::Convert( threshold_result, 
-      this->dst_layer_->get_grid_transform(), threshold_mask );
-
-    if ( this->check_abort() )
-    {
-      return;
-    }
-
-    this->dst_layer_->update_progress_signal_( 1.0 );
-
-    this->dispatch_insert_mask_volume_into_layer( this->dst_layer_,
-      Core::MaskVolumeHandle( new Core::MaskVolume( 
-      this->dst_layer_->get_grid_transform(), threshold_mask ) ) );
-  }
-  
-  // GET_FITLER_NAME:
-  // The name of the filter, this information is used for generating new layer labels.
-  virtual std::string get_filter_name() const
-  {
-    return "Threshold Tool";
-  }
-
-  // GET_LAYER_PREFIX:
-  // This function returns the name of the filter. The latter is prepended to the new layer name, 
-  // when a new layer is generated. 
-  virtual std::string get_layer_prefix() const
-  {
-    return std::string( "Threshold" ) + Core::ExportToString( this->lower_threshold_ ) +
-        "TO" + Core::ExportToString( this->upper_threshold_ );
-  }
-};
-
-
 bool ActionThreshold::run( Core::ActionContextHandle& context, 
   Core::ActionResultHandle& result )
 {
   // Create algorithm
-  boost::shared_ptr< ThresholdFilterAlgo > algo( new ThresholdFilterAlgo );
-
-  // Copy the parameters over to the algorithm that runs the filter
+  boost::shared_ptr< ThresholdFilter > algo(
+    new ThresholdFilter( this->lower_threshold_, this->upper_threshold_) );
   algo->set_sandbox( this->sandbox_ );
-  algo->lower_threshold_ = this->lower_threshold_;
-  algo->upper_threshold_ = this->upper_threshold_;
 
   // Find the handle to the layer
   LayerHandle src_layer;
   algo->find_layer( this->target_layer_, src_layer );
-  algo->src_layer_ = boost::dynamic_pointer_cast< DataLayer >( src_layer );
+  algo->set_data_layer( boost::dynamic_pointer_cast< DataLayer >( src_layer ) );
+
+  // Create the destination layer, which will show progress
+  LayerHandle dst_layer;
+  algo->create_and_lock_mask_layer_from_layer( algo->data_layer(), dst_layer );
+  //  algo->set_mask_layer( boost::dynamic_pointer_cast< MaskLayer >( dst_layer ) );
+  algo->set_mask_layer( boost::dynamic_pointer_cast< MaskLayer >( dst_layer ) );
 
   // Lock the src layer, so it cannot be used else where
   algo->lock_for_use( src_layer );
-  
-  // Create the destination layer, which will show progress
-  LayerHandle dst_layer;
-  algo->create_and_lock_mask_layer_from_layer( algo->src_layer_, dst_layer );
-  algo->dst_layer_ = boost::dynamic_pointer_cast< MaskLayer >( dst_layer );
 
   // Return the id of the destination layer.
-  result = Core::ActionResultHandle( new Core::ActionResult( algo->dst_layer_->get_layer_id() ) );
+  result = Core::ActionResultHandle( new Core::ActionResult( algo->data_layer()->get_layer_id() ) );
   // If the action is run from a script (provenance is a special case of script),
   // return a notifier that the script engine can wait on.
   if ( context->source() == Core::ActionSource::SCRIPT_E ||
@@ -259,7 +128,6 @@ bool ActionThreshold::run( Core::ActionContextHandle& context,
 
   return true;
 }
-
 
 void ActionThreshold::Dispatch( Core::ActionContextHandle context, 
                  std::string target_layer, double lower_threshold,

@@ -44,6 +44,8 @@ SET(APPLICATION_FILTERS_SRCS
   LayerResampler.cc
   LayerFilterNotifier.h
   LayerFilterNotifier.cc
+  ThresholdFilter.h
+  ThresholdFilter.cc
 )
 
 SET(APPLICATION_FILTERS_ACTIONS_SRCS
