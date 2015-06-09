@@ -26,7 +26,7 @@ Seg3D is a free volume segmentation and processing tool developed by the NIH Cen
 
 ### Compiler Requirements
 
-**C++11 compiler support is required.**
+**C++11 64-bit compiler support is required.**
 
 #### Windows Vista, 7, 8
 
