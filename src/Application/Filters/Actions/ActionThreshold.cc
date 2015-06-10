@@ -104,7 +104,6 @@ bool ActionThreshold::run( Core::ActionContextHandle& context,
   // Create the destination layer, which will show progress
   LayerHandle dst_layer;
   algo->create_and_lock_mask_layer_from_layer( algo->data_layer(), dst_layer );
-  //  algo->set_mask_layer( boost::dynamic_pointer_cast< MaskLayer >( dst_layer ) );
   algo->set_mask_layer( boost::dynamic_pointer_cast< MaskLayer >( dst_layer ) );
 
   // Lock the src layer, so it cannot be used else where
@@ -112,10 +111,11 @@ bool ActionThreshold::run( Core::ActionContextHandle& context,
 
   // Return the id of the destination layer.
   result = Core::ActionResultHandle( new Core::ActionResult( algo->data_layer()->get_layer_id() ) );
+
   // If the action is run from a script (provenance is a special case of script),
   // return a notifier that the script engine can wait on.
   if ( context->source() == Core::ActionSource::SCRIPT_E ||
-    context->source() == Core::ActionSource::PROVENANCE_E )
+       context->source() == Core::ActionSource::PROVENANCE_E )
   {
     context->report_need_resource( algo->get_notifier() );
   }

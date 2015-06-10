@@ -35,6 +35,9 @@
 namespace RadialBasisFunction
 {
 
+class NotifierRunnable;
+typedef boost::shared_ptr<NotifierRunnable> NotifierRunnableHandle;
+
 class ActionRadialBasisFunctionPrivate;
 typedef boost::shared_ptr< ActionRadialBasisFunctionPrivate > ActionRadialBasisFunctionPrivateHandle;
 
@@ -68,7 +71,8 @@ public:
   // Each action needs to have this piece implemented. It spells out how the
   // action is run. It returns whether the action was successful or not.
   virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
-  
+  bool run_threshold( Core::ActionContextHandle& context );
+
 private:
   ActionRadialBasisFunctionPrivateHandle private_;
   Seg3D::SandboxID sandbox_;
