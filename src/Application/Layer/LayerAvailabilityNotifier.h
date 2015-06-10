@@ -68,12 +68,11 @@ public:
   /// GET_NAME:
   /// The name of the resource we are waiting for
   virtual std::string get_name() const;
-  
-  
+
 private:
   /// TRIGGER:
   /// this function is called when a change in the LayerManager occurs or a change in the
-  /// layer state. At that point in time we need to recheck whether 
+  /// layer state. At that point in time we need to recheck whether
   void trigger();
 
   /// Weak handle to the layer that we are monitoring

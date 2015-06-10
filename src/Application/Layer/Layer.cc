@@ -269,7 +269,7 @@ void Layer::initialize_states( const std::string& name, bool creating )
   this->private_->add_connection( this->data_state_->value_changed_signal_.connect( 
     boost::bind( &LayerPrivate::handle_data_state_changed, this->private_, _1 ) ) );
 
-  // Make suer handle_abort is called when the signal is triggered
+  // Make sure handle_abort is called when the signal is triggered
   this->private_->add_connection( this->abort_signal_.connect( boost::bind(
     &LayerPrivate::handle_abort, this->private_ ) ) );
 

@@ -29,7 +29,8 @@
 // Application includes 
 #include <Application/Layer/Layer.h> 
 #include <Application/Layer/LayerAvailabilityNotifier.h> 
- 
+#include <Core/Utils/Log.h>
+
 namespace Seg3D {
 
 LayerAvailabilityNotifier::LayerAvailabilityNotifier( LayerHandle layer ) :
@@ -53,6 +54,7 @@ LayerAvailabilityNotifier::~LayerAvailabilityNotifier()
 
 void LayerAvailabilityNotifier::wait()
 {
+  CORE_LOG_DEBUG( "Wait on layer " + layer_id_ );
   boost::mutex::scoped_lock lock( this->notifier_mutex_ );
   while ( ! this->triggered_ )
   {
@@ -83,7 +85,7 @@ void LayerAvailabilityNotifier::trigger()
   if ( this->triggered_ ) return;
   
   LayerHandle layer = this->layer_.lock();
-  
+
   if ( layer )
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
@@ -93,8 +95,9 @@ void LayerAvailabilityNotifier::trigger()
       boost::mutex::scoped_lock lock( this->notifier_mutex_ );
       this->triggered_ = true;
       this->notifier_cv_.notify_all();
+      CORE_LOG_DEBUG( layer_id_ + " is available.");
     }
-    
+    CORE_LOG_DEBUG( layer_id_ + " is not available.");
     // If this one was not triggered, the layer still exists and it is not available
   }
   else
