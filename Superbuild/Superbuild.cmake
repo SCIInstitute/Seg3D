@@ -47,7 +47,26 @@ ENDIF()
 FIND_PACKAGE(Git)
 
 IF(NOT GIT_FOUND)
-  MESSAGE(ERROR "Cannot find Git. Git is required for Seg3D's Superbuild")
+  MESSAGE(FATAL_ERROR "Cannot find Git. Git is required for Seg3D's Superbuild")
+ENDIF()
+###########################################
+# Configure compiler
+
+# TODO: move compiler flags here...
+
+# Compiler checks
+IF(MSVC AND NOT MSVC12)
+  MESSAGE(FATAL_ERROR "Visual Studio 2013 (MSVC 12) is required to build Seg3D")
+ENDIF()
+
+# TODO: revisit cmake compiler variables for GNU C++ and Clang in CMake 3
+IF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  INCLUDE(CheckCXXCompilerFlag)
+  # Check for C++11 support
+  CHECK_CXX_COMPILER_FLAG("-std=c++11" CXX11_SUPPORT)
+  IF(NOT CXX11_SUPPORT)
+    MESSAGE(FATAL_ERROR "GNU C++ or Clang compiler that supports C++11 is required.")
+  ENDIF()
 ENDIF()
 
 ###########################################
