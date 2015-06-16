@@ -65,7 +65,7 @@ printhelp() {
     echo -e "--cmake=<path to cmake>\t\tUse given CMake"
     echo -e "--cmake-args=<cmake args>\t\tUse given CMake args"
     echo -e "--documentation\t\tEnable building documentation (requires LaTeX)"
-    echo -e "--custom-build-dir=<dir>\t\tBuild in dir"
+    echo -e "--custom-build-dir=<dir>\t\tBuild in dir (use relative path)"
     echo -e "-j#\t\t\tRuns # parallel make processes when building [GNU make only]"
     echo -e "-D<var>:<type>=<value>\t\t\tDefine CMake variable."
     echo -e "-?\t\t\tThis help"
