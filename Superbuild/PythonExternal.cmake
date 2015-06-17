@@ -30,8 +30,8 @@ SET_PROPERTY(DIRECTORY PROPERTY "EP_BASE" ${ep_base})
 
 # TODO: update when upgrading
 SET(PY_MAJOR 3)
-SET(PY_MINOR 3)
-SET(PY_PATCH 6)
+SET(PY_MINOR 4)
+SET(PY_PATCH 3)
 SET(SCI_PYTHON_VERSION "${PY_MAJOR}.${PY_MINOR}.${PY_PATCH}")
 SET(SCI_PYTHON_VERSION_SHORT "${PY_MAJOR}.${PY_MINOR}")
 SET(SCI_PYTHON_VERSION_SHORT_WIN32 "${PY_MAJOR}${PY_MINOR}")
@@ -46,7 +46,7 @@ SET(python_ABIFLAG_PYDEBUG)
 SET(python_ABIFLAG_PYMALLOC "m")
 SET(ABIFLAGS "${python_ABIFLAG_PYMALLOC}${python_ABIFLAG_PYDEBUG}")
 
-SET(python_GIT_TAG "origin/python_3.3.6")
+SET(python_GIT_TAG "origin/python_3.4.3")
 SET(python_GIT_URL "https://github.com/CIBC-Internal/python.git")
 
 SET(python_WIN32_ARCH)
@@ -96,8 +96,7 @@ ELSE()
   ExternalProject_Add(Python_external
     GIT_REPOSITORY ${python_GIT_URL}
     GIT_TAG ${python_GIT_TAG}
-	BUILD_IN_SOURCE ON
-	CONFIGURE_COMMAND ""
+    BUILD_IN_SOURCE ON
     BUILD_COMMAND ${CMAKE_BUILD_TOOL} PCbuild/pcbuild.sln /nologo /property:Configuration=Release /property:Platform=${python_WIN32_ARCH}
     PATCH_COMMAND ""
     INSTALL_COMMAND "${CMAKE_COMMAND}" -E copy_if_different
@@ -155,7 +154,8 @@ ELSE()
   SET(SCI_PYTHON_NAME python${SCI_PYTHON_VERSION_SHORT_WIN32})
 
   SET(SCI_PYTHON_EXE ${SCI_PYTHON_ROOT_DIR}${python_WIN32_64BIT_DIR}/python.exe)
-  SET(SCI_PYTHON_LIBRARY ${SCI_PYTHON_ROOT_DIR}${python_WIN32_64BIT_DIR}/${SCI_PYTHON_NAME}.lib)
+  SET(SCI_PYTHON_LIBRARY ${SCI_PYTHON_NAME})
+  SET(SCI_PYTHON_LIBRARY_RELEASE ${SCI_PYTHON_ROOT_DIR}${python_WIN32_64BIT_DIR}/${SCI_PYTHON_NAME}.lib)
   SET(SCI_PYTHON_LIBRARY_DEBUG ${SCI_PYTHON_ROOT_DIR}${python_WIN32_64BIT_DIR}/${SCI_PYTHON_NAME}${python_ABIFLAG_PYDEBUG}.lib)
 
   # required by interpreter interface
