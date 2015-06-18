@@ -3,7 +3,7 @@
 
  The MIT License
 
- Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
 
 
@@ -24,7 +24,7 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
- */
+*/
 
 #if defined( __APPLE__ )  
 #include <CoreServices/CoreServices.h>
@@ -105,32 +105,16 @@ Menu::Menu( QMainWindow* parent ) :
     // Update to the most recent list
     this->set_recent_file_list(); 
 
-
     // Ensure we have the right state
     bool mask_layer_found = false;
-    bool active_data_layer_found = false;
-    std::vector< LayerHandle > layer_list;
-    LayerManager::Instance()->get_layers( layer_list );
-    for( size_t i = 0; i < layer_list.size(); ++i )
-    {
-      if( layer_list[ i ]->get_type() == Core::VolumeType::MASK_E &&
-        layer_list[ i ]->data_state_->get() != Layer::CREATING_C &&
-        layer_list[ i ]->data_state_->get() != Layer::PROCESSING_C )
-      {
-        mask_layer_found = true;
-      }
-    }
-
-    LayerHandle layer = LayerManager::Instance()->get_active_layer();
-    if ( layer )
-    {
-      if ( layer->get_type() == Core::VolumeType::DATA_E  &&
-        layer->data_state_->get() != Layer::CREATING_C &&
-        layer->data_state_->get() != Layer::PROCESSING_C ) active_data_layer_found = true;
-    }
+    bool mask_isosurface_found = false;
+    auto result = FindMaskLayer();
+    std::tie(mask_layer_found, mask_isosurface_found) = result;
+    bool active_data_layer_found = FindActiveLayer();
 
     // Check what type of layer is active
     this->enable_disable_mask_actions( mask_layer_found );
+    this->enable_disable_isosurface_actions( mask_isosurface_found );
     this->enable_disable_data_layer_actions( active_data_layer_found );
     this->show_hide_large_volume_actions( PreferencesManager::Instance()->enable_large_volume_state_->get() );
 
@@ -272,6 +256,14 @@ void Menu::create_file_menu( QMenuBar* menubar )
   QtUtils::QtBridge::Connect( this->export_segmentation_qaction_, 
     boost::bind( &LayerIOFunctions::ExportSegmentation, this->main_window_ ) );
   this->export_segmentation_qaction_->setEnabled( false );
+
+  // == Export Isosurface... ==
+  this->export_isosurface_qaction_ = qmenu->addAction( tr( "Export Isosurface..." ) );
+  this->export_isosurface_qaction_->setShortcut( tr( "Ctrl+I" ) );
+  this->export_isosurface_qaction_->setToolTip( tr( "Export isosurface to file." ) );
+  QtUtils::QtBridge::Connect( this->export_isosurface_qaction_,
+    boost::bind( &LayerIOFunctions::ExportIsosurface, this->main_window_ ) );
+  this->export_isosurface_qaction_->setEnabled( false );
 
   // == Export Active Data Layer... ==
   this->export_active_data_layer_qaction_ = qmenu->addAction( tr( "Export Active Data Layer...") );
@@ -916,6 +908,11 @@ void Menu::enable_disable_mask_actions( bool mask_layer_found )
   this->punch_qaction_->setEnabled( mask_layer_found );
 }
 
+void Menu::enable_disable_isosurface_actions( bool mask_isosurface_found )
+{
+  this->export_isosurface_qaction_->setEnabled( mask_isosurface_found );
+}
+
 void Menu::enable_disable_data_layer_actions( bool active_data_layer_found )
 {
   this->export_active_data_layer_qaction_->setEnabled( active_data_layer_found );
@@ -994,35 +991,18 @@ void Menu::EnableDisableLayerActions( qpointer_type qpointer )
 {
   // This function should be called from the application thread
   ASSERT_IS_APPLICATION_THREAD();
-  
-  
-  bool mask_layer_found = false;
-  bool active_data_layer_found = false;
-  std::vector< LayerHandle > layer_list;
-  LayerManager::Instance()->get_layers( layer_list );
-  for( size_t i = 0; i < layer_list.size(); ++i )
-  {
-    if( layer_list[ i ]->get_type() == Core::VolumeType::MASK_E &&
-      layer_list[ i ]->data_state_->get() != Layer::CREATING_C &&
-      layer_list[ i ]->data_state_->get() != Layer::PROCESSING_C )
-    {
-      mask_layer_found = true;
-    }
-  }
 
-  LayerHandle layer = LayerManager::Instance()->get_active_layer();
-  if ( layer )
-  {
-    if ( layer->get_type() == Core::VolumeType::DATA_E &&
-      layer->data_state_->get() != Layer::CREATING_C &&
-      layer->data_state_->get() != Layer::PROCESSING_C ) 
-    {
-      active_data_layer_found = true;
-    }
-  }
-  
+  bool mask_layer_found = false;
+  bool mask_isosurface_found = false;
+  auto result = FindMaskLayer();
+  std::tie(mask_layer_found, mask_isosurface_found) = result;
+  bool active_data_layer_found = FindActiveLayer();
+
   Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
     &Menu::enable_disable_mask_actions, qpointer.data(), mask_layer_found ) ) );
+
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
+    &Menu::enable_disable_isosurface_actions, qpointer.data(), mask_isosurface_found ) ) );
 
   Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
     &Menu::enable_disable_data_layer_actions, qpointer.data(), active_data_layer_found ) ) );
@@ -1070,5 +1050,46 @@ void Menu::update_redo_tag( std::string tag )
     this->redo_qaction_->setText( text );   
   }
 }   
+
+bool Menu::FindActiveLayer()
+{
+  LayerHandle layer = LayerManager::Instance()->get_active_layer();
+  if ( layer )
+  {
+    if ( layer->get_type() == Core::VolumeType::DATA_E &&
+        layer->data_state_->get() != Layer::CREATING_C &&
+        layer->data_state_->get() != Layer::PROCESSING_C )
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+std::tuple<bool, bool> Menu::FindMaskLayer()
+{
+  bool mask_layer_found = false;
+  bool mask_isosurface_found = false;
+
+  std::vector< LayerHandle > layer_list;
+  LayerManager::Instance()->get_layers( layer_list );
+  for( size_t i = 0; i < layer_list.size(); ++i )
+  {
+    if ( layer_list[ i ]->get_type() == Core::VolumeType::MASK_E &&
+        layer_list[ i ]->data_state_->get() != Layer::CREATING_C &&
+        layer_list[ i ]->data_state_->get() != Layer::PROCESSING_C )
+    {
+      mask_layer_found = true;
+      MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( layer_list[i].get() );
+      if ( mask_layer->iso_generated_state_->get() )
+      {
+        mask_isosurface_found = true;
+        // have enough information to enable mask related menus
+        break;
+      }
+    }
+  }
+  return std::tuple<bool, bool>(mask_layer_found, mask_isosurface_found);
+}
 
 } // end namespace Seg3D

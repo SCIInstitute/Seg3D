@@ -155,6 +155,8 @@ public:
   /// Progress is measured between 0.0 and 1.0.
   update_progress_signal_type update_progress_signal_;
 
+  static const std::string EXPORT_FORMATS_C;
+
 private:
   IsosurfacePrivateHandle private_;
 };

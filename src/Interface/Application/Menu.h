@@ -3,7 +3,7 @@
 
  The MIT License
 
- Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
 
 
@@ -24,7 +24,7 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
- */
+*/
 
 #ifndef INTERFACE_APPLICATION_MENU_H
 #define INTERFACE_APPLICATION_MENU_H
@@ -46,6 +46,8 @@
 #include <Core/Action/Actions.h>
 
 #endif
+
+#include <tuple>
 
 namespace Seg3D
 {
@@ -71,6 +73,7 @@ private:
   
   QMenu* file_menu_recents_;
   QAction* export_segmentation_qaction_;
+  QAction* export_isosurface_qaction_;
   QAction* export_active_data_layer_qaction_;
   
   QAction* copy_qaction_;
@@ -127,8 +130,12 @@ private:
   void set_recent_file_list();
 
   /// ENABLE_DISABLE_LAYER_ACTIONS:
-  /// Switch on/off export options depending on what is available
+  /// Switch on/off export options depending on whether mask is available
   void enable_disable_mask_actions( bool mask_layer_found );
+
+  /// ENABLE_DISABLE_ISOSURFACE_ACTIONS:
+  /// Switch on/off export actions depending on whether isosurface is available
+  void enable_disable_isosurface_actions( bool mask_isosurface_found );
 
   /// SHOW_HIDE_LARGE_VOLUME_ACTIONS:
   /// Show or hide large volume menus (doesn't include Tools).
@@ -145,9 +152,19 @@ private:
   /// UPDATE_REDO_TAG:
   /// set the redo tag of what the next undo will actually do
   void update_redo_tag( std::string tag );
-  
-public:
 
+private:
+  // static utility functions
+
+  /// FINDACTIVELAYER:
+  /// determine if active layer is data layer and available
+  static bool FindActiveLayer();
+
+  /// FINDMASKLAYER:
+  /// determine if there is a mask layer available and if it has an isosurface
+  static std::tuple<bool, bool> FindMaskLayer();
+
+public:
   /// SETRECENTFILELIST:
   /// This function is called when the recent file list is modified
   static void SetRecentFileList( qpointer_type app_menu );
