@@ -66,10 +66,8 @@ IF(WIN32)
   SET(FORCE_64BIT_BUILD ON)
 ENDIF()
 
-# TODO: temporary - switch git tag back to master for all
-#       builds once boost 1.56 is available and boost atomic
-#       library fix is verified.
 SET(boost_GIT_TAG "origin/master")
+SET(boost_GIT_URL "https://github.com/CIBC-Internal/boost.git")
 
 # TODO: fix install step
 #
@@ -77,7 +75,7 @@ SET(boost_GIT_TAG "origin/master")
 # git checkout -q will silence message about detached head (harmless).
 ExternalProject_Add(Boost_external
   DEPENDS ${boost_DEPENDENCIES}
-  GIT_REPOSITORY "https://github.com/CIBC-Internal/boost.git"
+  GIT_REPOSITORY ${boost_GIT_URL}
   GIT_TAG ${boost_GIT_TAG}
   BUILD_IN_SOURCE ON
   PATCH_COMMAND ""
