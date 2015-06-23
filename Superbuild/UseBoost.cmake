@@ -11,7 +11,7 @@ if(WIN32)
   set(DEBUG_POSTFIX "-gyd")
   set(boost_LIB_PREFIX "lib")
 else()
-  set(DEBUG_POSTFIX "-d")
+  set(DEBUG_POSTFIX "-yd")
   set(boost_LIB_PREFIX ${CMAKE_STATIC_LIBRARY_PREFIX})
 endif()
 
