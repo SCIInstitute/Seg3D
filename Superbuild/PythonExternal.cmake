@@ -98,9 +98,10 @@ ELSE()
   ExternalProject_Add(Python_external
     GIT_REPOSITORY ${python_GIT_URL}
     GIT_TAG ${python_GIT_TAG}
+    PATCH_COMMAND ""
+    CONFIGURE_COMMAND ""
     BUILD_IN_SOURCE ON
     BUILD_COMMAND ${CMAKE_BUILD_TOOL} PCbuild/pcbuild.sln /nologo /property:Configuration=Release /property:Platform=${python_WIN32_ARCH}
-    PATCH_COMMAND ""
     INSTALL_COMMAND "${CMAKE_COMMAND}" -E copy_if_different
       <SOURCE_DIR>/PC/pyconfig.h
       <SOURCE_DIR>/Include/pyconfig.h
