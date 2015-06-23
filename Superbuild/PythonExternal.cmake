@@ -54,9 +54,11 @@ SET(python_WIN32_64BIT_DIR)
 SET(python_FRAMEWORK_ARCHIVE)
 
 IF(UNIX)
+  # TODO: figure out pip package
   SET(python_CONFIGURE_FLAGS
     "--prefix=<INSTALL_DIR>"
     "--with-threads"
+    "--with-ensurepip=no"
   )
   IF(APPLE)
     # framework contains *.dylib
