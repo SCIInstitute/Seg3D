@@ -207,41 +207,6 @@ ADD_DEFINITIONS(-DTIXML_USE_STL)
 
 
 ###########################################
-# *Nix C++ compiler flags
-###########################################
-
-IF(UNIX)
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall")
-  IF(APPLE)
-    SET(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++11")
-    SET(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -ftemplate-depth=256")
-    SET(CMAKE_CXX_FLAGS_DEBUG "-Wshorten-64-to-32 ${CMAKE_CXX_FLAGS_DEBUG}")
-  ELSE()
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
-  ENDIF()
-ENDIF()
-
-###########################################
-# Microsoft VC compiler flags
-###########################################
-
-IF(WIN32 AND MSVC)
-  ADD_DEFINITIONS(-D_ALLOW_KEYWORD_MACROS)
-  ADD_DEFINITIONS(-D_WIN32_WINNT=0x0501 -DNTDDI_VERSION=0x05010000)
-  ADD_DEFINITIONS(-DPSAPI_VERSION=1)
-  # Disable Visual C++ Secure Warnings
-  ADD_DEFINITIONS(-D_SCL_SECURE_NO_WARNINGS)
-  ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
-  ADD_DEFINITIONS(-D_BIND_TO_CURRENT_VCLIBS_VERSION=1)
-  ADD_DEFINITIONS(-D_BIND_TO_CURRENT_CRT_VERSION=1)
-  # Enable Intrinsic Functions
-  SET(CMAKE_CXX_FLAGS "/Oi ${CMAKE_CXX_FLAGS}")
-  # Build with multiple processes -- speeds up compilation on multi-processor machines.
-  SET(CMAKE_CXX_FLAGS "/MP ${CMAKE_CXX_FLAGS}") 
-ENDIF()
-
-###########################################
 # RPATH settings for Linux
 ###########################################
 
