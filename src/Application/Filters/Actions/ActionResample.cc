@@ -801,6 +801,12 @@ void ResampleAlgo::pad_and_crop_data_layer( DataLayerHandle input, DataLayerHand
   case Core::DataType::UINT_E:
     this->pad_and_crop_typed_data< unsigned int >( input_datablock, output_datablock, output );
     break;
+  case Core::DataType::LONGLONG_E:
+    this->pad_and_crop_typed_data< long long >( input_datablock, output_datablock, output );
+    break;
+  case Core::DataType::ULONGLONG_E:
+    this->pad_and_crop_typed_data< unsigned long long >( input_datablock, output_datablock, output );
+    break;
   case Core::DataType::FLOAT_E:
     this->pad_and_crop_typed_data< float >( input_datablock, output_datablock, output );
     break;
@@ -808,7 +814,8 @@ void ResampleAlgo::pad_and_crop_data_layer( DataLayerHandle input, DataLayerHand
     this->pad_and_crop_typed_data< double >( input_datablock, output_datablock, output );
     break;
   default:
-    assert( false );
+    this->report_error("Unsupported data type");
+    return;
   }
   
   data_lock.unlock();
