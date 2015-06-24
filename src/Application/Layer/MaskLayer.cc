@@ -423,9 +423,9 @@ void MaskLayer::compute_isosurface( double quality_factor, bool capping_enabled 
   {
     this->isosurface_updated_signal_();
   }
-  
-  // now that we are done, we are going to set the proper 
+
   this->iso_generated_state_->set( true );
+  LayerManager::Instance()->mask_layer_isosurface_created_signal_();
 }
 
 void MaskLayer::delete_isosurface()
