@@ -86,27 +86,4 @@ void PythonActionContext::set_action_mode( PythonActionMode mode )
   this->action_mode_ = mode;
 }
 
-Core::NotifierHandle PythonActionContext::get_resource_notifier()
-{
-  return this->notifier_;
-}
-
-Core::ActionResultHandle PythonActionContext::get_result()
-{
-  return this->result_;
-}
-
-void PythonActionContext::reset_context()
-{
-  this->notifier_.reset();
-  this->result_.reset();
-  this->error_msg_.clear();
-}
-
-std::string PythonActionContext::get_error_message()
-{
-  return this->error_msg_;
-}
-
-
 } //end namespace Seg3D

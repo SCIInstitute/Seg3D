@@ -85,4 +85,21 @@ void ActionContextContainer::report_done()
   if ( this->context_ ) this->context_->report_done();
 }
 
+Core::NotifierHandle ActionContextContainer::get_resource_notifier()
+{
+  if ( this->context_ ) return this->context_->get_resource_notifier();
+  else return Core::NotifierHandle();
+}
+
+Core::ActionResultHandle ActionContextContainer::get_result()
+{
+  if ( this->context_ ) return this->context_->get_result();
+  else return Core::ActionResultHandle();
+}
+
+void ActionContextContainer::reset_context()
+{
+  if ( this->context_ ) this->context_->reset_context();
+}
+
 } // end namespace Core

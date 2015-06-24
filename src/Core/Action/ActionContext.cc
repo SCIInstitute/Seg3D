@@ -59,6 +59,7 @@ void ActionContext::report_message( const std::string& message )
 
 void ActionContext::report_result( const ActionResultHandle& result )
 {
+  this->result_ = result;
 }
 
 void ActionContext::report_status( ActionStatus status )
@@ -68,20 +69,48 @@ void ActionContext::report_status( ActionStatus status )
 
 void ActionContext::report_need_resource( NotifierHandle notifier )
 {
+  this->notifier_ = notifier;
+  this->error_msg_ = std::string( "'" ) + notifier->get_name() +
+    std::string("' is currently unavailable" );
 }
 
 ActionStatus ActionContext::status() const
 {
-  return ( status_ );
+  return status_;
 }
 
 ActionSource ActionContext::source() const
 {
-  return ( ActionSource::COMMANDLINE_E );
+  return ActionSource::COMMANDLINE_E;
 }
 
 void ActionContext::report_done()
 {
+  // currently no post action for base ActionContext
+  if (! is_success() ) CORE_LOG_DEBUG("ActionContext done: " + this->error_msg_);
 }
+
+Core::NotifierHandle ActionContext::get_resource_notifier()
+{
+  return this->notifier_;
+}
+
+Core::ActionResultHandle ActionContext::get_result()
+{
+  return this->result_;
+}
+
+void ActionContext::reset_context()
+{
+  this->notifier_.reset();
+  this->result_.reset();
+  this->error_msg_.clear();
+}
+
+std::string ActionContext::get_error_message()
+{
+  return this->error_msg_;
+}
+
 
 } // end namespace Core
