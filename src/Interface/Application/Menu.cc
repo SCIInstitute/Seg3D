@@ -136,6 +136,9 @@ Menu::Menu( QMainWindow* parent ) :
     this->add_connection( LayerManager::Instance()->layer_data_changed_signal_.connect( 
       boost::bind( &Menu::EnableDisableLayerActions, qpointer_type( this ) ) ) );
 
+    this->add_connection( LayerManager::Instance()->mask_layer_isosurface_deleted_signal_.connect(
+      boost::bind( &Menu::EnableDisableLayerActions, qpointer_type( this ) ) ) );
+
     this->add_connection( PreferencesManager::Instance()->enable_large_volume_state_->state_changed_signal_.connect(
       boost::bind( &Menu::ShowHideLargeVolume, qpointer_type( this ) ) ) );
 
@@ -1057,8 +1060,8 @@ bool Menu::FindActiveLayer()
   if ( layer )
   {
     if ( layer->get_type() == Core::VolumeType::DATA_E &&
-        layer->data_state_->get() != Layer::CREATING_C &&
-        layer->data_state_->get() != Layer::PROCESSING_C )
+         layer->data_state_->get() != Layer::CREATING_C &&
+         layer->data_state_->get() != Layer::PROCESSING_C )
     {
       return true;
     }
@@ -1076,17 +1079,22 @@ std::tuple<bool, bool> Menu::FindMaskLayer()
   for( size_t i = 0; i < layer_list.size(); ++i )
   {
     if ( layer_list[ i ]->get_type() == Core::VolumeType::MASK_E &&
-        layer_list[ i ]->data_state_->get() != Layer::CREATING_C &&
-        layer_list[ i ]->data_state_->get() != Layer::PROCESSING_C )
+         layer_list[ i ]->data_state_->get() != Layer::CREATING_C &&
+         layer_list[ i ]->data_state_->get() != Layer::PROCESSING_C )
     {
+      // just need one valid mask layer
       mask_layer_found = true;
-      MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( layer_list[i].get() );
-      if ( mask_layer->iso_generated_state_->get() )
-      {
-        mask_isosurface_found = true;
-        // have enough information to enable mask related menus
-        break;
-      }
+      break;
+    }
+  }
+
+  LayerHandle active_layer = LayerManager::Instance()->get_active_layer();
+  if ( active_layer )
+  {
+    MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( active_layer.get() );
+    if ( mask_layer->iso_generated_state_->get() )
+    {
+      mask_isosurface_found = true;
     }
   }
   return std::tuple<bool, bool>(mask_layer_found, mask_isosurface_found);
