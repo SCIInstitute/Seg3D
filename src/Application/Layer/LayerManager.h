@@ -271,6 +271,10 @@ public:
   /// NOTE: It is always triggered after the individual ones.
   boost::signals2::signal< void() > layers_changed_signal_;
 
+  /// MASK_LAYER_ISOSURFACE_DELETED_SIGNAL:
+  /// Triggered when isosurface is deleted.
+  boost::signals2::signal< void() > mask_layer_isosurface_deleted_signal_;
+
   /// ACTIVE_LAYER_CHANGED_SIGNAL:
   /// This signal is triggered after the active layer is changed
   boost::signals2::signal< void ( LayerHandle ) > active_layer_changed_signal_; 
