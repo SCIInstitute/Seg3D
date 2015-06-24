@@ -45,13 +45,15 @@
 #include <Core/State/Actions/ActionSet.h>
 #include <Core/Utils/Log.h>
 #include <Core/LargeVolume/LargeVolumeSchema.h>
+#include <Core/Isosurface/Isosurface.h>
 
 // Application includes
 #include <Application/LayerIO/LayerIO.h>
 #include <Application/LayerIO/Actions/ActionImportLargeVolumeLayer.h>
+#include <Application/LayerIO/Actions/ActionExportIsosurface.h>
+#include <Application/LayerIO/Actions/ActionExportLayer.h>
 #include <Application/Layer/LayerManager.h>
 #include <Application/ProjectManager/ProjectManager.h>
-#include <Application/LayerIO/Actions/ActionExportLayer.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
 
 // Interface includes
@@ -81,29 +83,30 @@ bool LayerIOFunctions::ImportLargeVolume( QMainWindow* main_window  )
 
   if (! schema->load( error ) )
   {
-        QMessageBox message_box( main_window );
-        message_box.setWindowTitle( "Import Layer Error" );
-        message_box.addButton( QMessageBox::Ok );
-        message_box.setIcon( QMessageBox::Critical );
-        message_box.setText( QString::fromStdString( error ) );
-        message_box.exec(); 
-        return false; 
+    QMessageBox message_box( main_window );
+    message_box.setWindowTitle( "Import Layer Error" );
+    message_box.addButton( QMessageBox::Ok );
+    message_box.setIcon( QMessageBox::Critical );
+    message_box.setText( QString::fromStdString( error ) );
+    message_box.exec(); 
+    return false; 
   }
 
-  ActionImportLargeVolumeLayer::Dispatch( Core::Interface::GetWidgetActionContext(), schema->get_dir().string() );
+  ActionImportLargeVolumeLayer::Dispatch(
+    Core::Interface::GetWidgetActionContext(), schema->get_dir().string() );
 
   return true;
 }
 
 
-bool LayerIOFunctions::ImportFiles( QMainWindow* main_window, std::string file_to_open )
+bool LayerIOFunctions::ImportFiles( QMainWindow* main_window, const std::string& file_to_open )
 {
   // List of files that need to be imported.
   QStringList file_list;
   // The name of the importer to use.
   std::string importer_name;
   
-  if( file_to_open != "" )
+  if ( ! file_to_open.empty() )
   {
     // If there is a file, do not open a dialog and just add it into the file_list.
     file_list << QString::fromStdString( file_to_open );
@@ -120,7 +123,7 @@ bool LayerIOFunctions::ImportFiles( QMainWindow* main_window, std::string file_t
     QString filters = "";
     for ( size_t j = 0; j < importer_types.size(); j++ )
     {
-      if( j == 0 )
+      if ( j == 0 )
       {
         filters = QString::fromStdString( importer_types[j] );
         continue;
@@ -133,30 +136,31 @@ bool LayerIOFunctions::ImportFiles( QMainWindow* main_window, std::string file_t
     
     boost::filesystem::path current_file_folder = 
       ProjectManager::Instance()->get_current_file_folder();
-      
-        qs_filtername = "All Importers (*)";
-            
+    qs_filtername = "All Importers (*)";
+
 #if defined(__APPLE__) || defined(_WIN32)
-        // Use native dialog
-    file_list = QFileDialog::getOpenFileNames( main_window, 
+    // Use native dialog
+    file_list = QFileDialog::getOpenFileNames( main_window,
       "Import Layer(s)... ", current_file_folder.string().c_str(), filters, &qs_filtername );
 #else
-        // It seems Ubuntus Qt4 version is broken and its dialog tends to crash
-        // Hence use the other way of defining a dialog
-        QFileDialog* diag = new QFileDialog( main_window, "Import Layer(s)...", 
-            current_file_folder.string().c_str(), filters );
-        diag->setFileMode(QFileDialog::ExistingFiles);
-        diag->setNameFilter( qs_filtername );
-        diag->exec();
-        
-        file_list = diag->selectedFiles();
-        qs_filtername = diag->selectedNameFilter();
+    // TODO: recheck this
 
-        delete diag;
-#endif    
+    // It seems Ubuntus Qt4 version is broken and its dialog tends to crash
+    // Hence use the other way of defining a dialog
+    QFileDialog* diag = new QFileDialog( main_window, "Import Layer(s)...", 
+        current_file_folder.string().c_str(), filters );
+    diag->setFileMode(QFileDialog::ExistingFiles);
+    diag->setNameFilter( qs_filtername );
+    diag->exec();
+
+    file_list = diag->selectedFiles();
+    qs_filtername = diag->selectedNameFilter();
+
+    delete diag;
+#endif
         
     // If no file was selected just return
-    if( file_list.size() == 0 )
+    if ( file_list.size() == 0 )
     {
       CORE_LOG_DEBUG("Zero files selected for import.");
       return false;
@@ -170,47 +174,47 @@ bool LayerIOFunctions::ImportFiles( QMainWindow* main_window, std::string file_t
   std::vector< LayerImporterHandle > importers;
 
   // Loop over all the selected files and generate an importer for them
-  for( int i = 0; i < file_list.size(); ++i )
+  for ( int i = 0; i < file_list.size(); ++i )
   {
     LayerImporterHandle importer;
     std::string error;
     
     // Create a new importer
-    if( ! ( LayerIO::Instance()->create_single_file_importer( file_list.at( i ).toStdString(), 
+    if ( ! ( LayerIO::Instance()->create_single_file_importer( file_list.at( i ).toStdString(),
       importer, error, importer_name ) ) )
     {
-            if ( i == 0 )
-            {
-                // Convert the filenames into STL strings
-                std::vector< std::string > filenames( file_list.size() );
-                for ( int j = 0; j < file_list.size(); j++ )
-                {
-                    filenames[ j ] = file_list.at( j ).toStdString();
-                }
-                    
-                // Find all the filenames that are associated with this series
-                if ( !( LayerIO::FindFileSeries( filenames ) ) )
-                {
-                    QMessageBox message_box( main_window );
-                    message_box.setWindowTitle( "Import Layer Error" );
-                    message_box.addButton( QMessageBox::Ok );
-                    message_box.setIcon( QMessageBox::Critical );
-                    message_box.setText( "Could not resolve filenames." );
-                    message_box.exec(); 
-                    return false;
-                }
+      if ( i == 0 )
+      {
+        // Convert the filenames into STL strings
+        std::vector< std::string > filenames( file_list.size() );
+        for ( int j = 0; j < file_list.size(); j++ )
+        {
+          filenames[ j ] = file_list.at( j ).toStdString();
+        }
+            
+        // Find all the filenames that are associated with this series
+        if ( !( LayerIO::FindFileSeries( filenames ) ) )
+        {
+          QMessageBox message_box( main_window );
+          message_box.setWindowTitle( "Import Layer Error" );
+          message_box.addButton( QMessageBox::Ok );
+          message_box.setIcon( QMessageBox::Critical );
+          message_box.setText( "Could not resolve filenames." );
+          message_box.exec(); 
+          return false;
+        }
 
-                LayerImporterHandle importer;
+        LayerImporterHandle importer;
 
-                // Try to load files as a series
-                if(  LayerIO::Instance()->create_file_series_importer( filenames, 
-                    importer, importer_name ) )
-                {                
-                    importers.push_back( importer );
-                    break;
-                }
-            }        
-        
+        // Try to load files as a series
+        if(  LayerIO::Instance()->create_file_series_importer( filenames, 
+            importer, importer_name ) )
+        {                
+          importers.push_back( importer );
+          break;
+        }
+      }        
+
       // Failed to create the importer, and warn the user explicitly
       std::string error_message = std::string( "ERROR: No importer is available for file '" ) 
         + file_list.at( i ).toStdString() + std::string( "'. " ) + error;
@@ -245,14 +249,13 @@ void LayerIOFunctions::ImportSeries( QMainWindow* main_window )
   QString filters = "";
   for ( size_t j = 0; j < importer_types.size(); j++ )
   {
-    if( j == 0 )
+    if ( j == 0 )
     {
       filters = QString::fromStdString( importer_types[ j ] );
       continue;
     }
     filters = filters + ";;" + QString::fromStdString( importer_types[ j ] );
   }
-
 
   boost::filesystem::path current_file_folder = 
     ProjectManager::Instance()->get_current_file_folder();
@@ -262,25 +265,27 @@ void LayerIOFunctions::ImportSeries( QMainWindow* main_window )
   QStringList file_list;
 
 #if defined(__APPLE__) || defined(_WIN32)
-        // Use native dialog
-    file_list = QFileDialog::getOpenFileNames( main_window, 
+    // Use native dialog
+    file_list = QFileDialog::getOpenFileNames( main_window,
       "Select a file from the series... ", current_file_folder.string().c_str(), filters, &filtername );
 #else
-        // It seems Ubuntus Qt4 version is broken and its dialog tends to crash
-        // Hence use the other way of defining a dialog
-        QFileDialog* diag = new QFileDialog( main_window, "Select a file from the series...", 
-            current_file_folder.string().c_str(), filters );
-        diag->setFileMode(QFileDialog::ExistingFiles);
-        diag->setNameFilter( filtername );
-        diag->exec();
-        
-        filtername = diag->selectedNameFilter();
-        file_list = diag->selectedFiles();
-        delete diag;
+    // TODO: recheck this!
+
+    // It seems Ubuntus Qt4 version is broken and its dialog tends to crash
+    // Hence use the other way of defining a dialog
+    QFileDialog* diag = new QFileDialog( main_window, "Select a file from the series...", 
+        current_file_folder.string().c_str(), filters );
+    diag->setFileMode(QFileDialog::ExistingFiles);
+    diag->setNameFilter( filtername );
+    diag->exec();
+    
+    filtername = diag->selectedNameFilter();
+    file_list = diag->selectedFiles();
+    delete diag;
 #endif
 
   // If no files were selected just exit
-  if( file_list.size() == 0 )
+  if ( file_list.size() == 0 )
   {
     CORE_LOG_DEBUG("Zero files from series selected for import.");
     return;
@@ -292,7 +297,7 @@ void LayerIOFunctions::ImportSeries( QMainWindow* main_window )
   {
     filenames[ j ] = file_list.at( j ).toStdString();
   }
-    
+
   // Find all the filenames that are associated with this series
   if ( !( LayerIO::FindFileSeries( filenames ) ) )
   {
@@ -304,12 +309,11 @@ void LayerIOFunctions::ImportSeries( QMainWindow* main_window )
     message_box.exec(); 
     return;
   }
-    
+
   std::string importer_name = filtername.toStdString();
 
   LayerImporterHandle importer;
-  if( ! ( LayerIO::Instance()->create_file_series_importer( filenames, importer, 
-    importer_name ) ) )
+  if ( ! LayerIO::Instance()->create_file_series_importer( filenames, importer, importer_name ) )
   {
     // If we are unable to create an importer we pop up an error message box
     std::string error_message = std::string( "ERROR: No importer is available for file '" ) + 
@@ -341,9 +345,9 @@ void LayerIOFunctions::ExportLayer( QMainWindow* main_window )
 {
   std::vector< LayerHandle > layer_handles;
   layer_handles.push_back( LayerManager::Instance()->get_active_layer() );
-  if( !layer_handles[ 0 ] ) return;
+  if ( !layer_handles[ 0 ] ) return;
 
-  if( layer_handles[ 0 ]->get_type() != Core::VolumeType::DATA_E )
+  if ( layer_handles[ 0 ]->get_type() != Core::VolumeType::DATA_E )
   {
     std::string error_message = 
       std::string( "ERROR: A Data layer is not set as the active layer" );
@@ -363,19 +367,19 @@ void LayerIOFunctions::ExportLayer( QMainWindow* main_window )
   QString filename = QFileDialog::getSaveFileName( main_window, "Export Data Layer As... ",
     QString::fromStdString( file_path.string() ),
     "NRRD files (*.nrrd);;DICOM files (*.dcm);;TIFF files (*.tiff);;PNG files (*.png);;MRC files (*.mrc);;Matlab files (*.mat)" );
-  
-  if( filename == "" ) return;
-  
+
+  if ( filename == "" ) return;
+
   std::string extension = boost::filesystem::extension( boost::filesystem::path( filename.toStdString() ) ); 
   std::string exportername;
-  
+
   if( extension == ".nrrd" ) exportername = "NRRD Exporter";
   else if( extension == ".mat" ) exportername = "Matlab Exporter";
   else if( extension == ".mrc" ) exportername = "MRC Exporter";
   else if( extension != "" ) exportername = "ITK Data Exporter";
-    
+
   LayerExporterHandle exporter;
-  if( ! ( LayerIO::Instance()->create_exporter( exporter, layer_handles, exportername, extension ) ) )
+  if ( ! LayerIO::Instance()->create_exporter( exporter, layer_handles, exportername, extension ) )
   {
     std::string error_message = std::string("ERROR: No exporter is available for file '") + 
       filename.toStdString() + std::string("'.");
@@ -399,5 +403,52 @@ void LayerIOFunctions::ExportSegmentation( QMainWindow* main_window )
     new SegmentationExportWizard( main_window );
   export_segmentation_wizard_->show();
 }
+
+void LayerIOFunctions::ExportIsosurface( QMainWindow* main_window )
+{
+  LayerHandle layerHandle = LayerManager::Instance()->get_active_layer();
+  if ( ! layerHandle ) return;
+
+  if ( layerHandle->get_type() != Core::VolumeType::MASK_E )
+  {
+    std::string error_message =
+    std::string( "ERROR: A Mask layer is not set as the active layer" );
+
+    QMessageBox message_box( main_window );
+    message_box.setWindowTitle( "Export Isosurface Error." );
+    message_box.addButton( QMessageBox::Ok );
+    message_box.setIcon( QMessageBox::Critical );
+    message_box.setText( QString::fromStdString( error_message ) );
+    message_box.exec();
+    return;
+  }
+
+  MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( layerHandle.get() );
+
+  if ( ! mask_layer->iso_generated_state_->get() )
+  {
+    QMessageBox message_box;
+    message_box.setWindowTitle( "Export Isosurface Error" );
+    message_box.addButton( QMessageBox::Ok );
+    message_box.setIcon( QMessageBox::Critical );
+    message_box.setText( "Isosurface must be created before it can be exported." );
+    message_box.exec();
+    return;
+  }
+
+  QString filename;
+  boost::filesystem::path current_folder = ProjectManager::Instance()->get_current_file_folder();
+
+  filename = QFileDialog::getSaveFileName( main_window,
+    "Export Isosurface As... ", QString::fromStdString( current_folder.string() ),
+    QString::fromStdString( Core::Isosurface::EXPORT_FORMATS_C ) );
+
+  if ( filename.isEmpty() ) return;
+
+  ActionExportIsosurface::Dispatch( Core::Interface::GetWidgetActionContext(),
+    layerHandle->get_layer_id(), filename.toStdString(), layerHandle->name_state_->get() );
+
+}
+
 
 } // end namespace Seg3D

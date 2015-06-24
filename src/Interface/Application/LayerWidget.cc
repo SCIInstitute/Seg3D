@@ -3,7 +3,7 @@
  
  The MIT License
  
- Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
  
  
@@ -24,7 +24,7 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
- */
+*/
 
 //Boost Includes
 #include <boost/lambda/lambda.hpp>
@@ -44,6 +44,7 @@
 //Core Includes - for logging
 #include <Core/Utils/Log.h>
 #include <Core/State/Actions/ActionSet.h>
+#include <Core/Isosurface/Isosurface.h>
 
 //QtUtils Includes
 #include <QtUtils/Bridge/QtBridge.h>
@@ -415,8 +416,7 @@ void LayerWidgetPrivate::export_isosurface()
 {
 
   MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( this->layer_.get() );
-
-  if( !mask_layer->iso_generated_state_->get() )
+  if ( ! mask_layer->iso_generated_state_->get() )
   {
     QMessageBox message_box;
     message_box.setWindowTitle( "Export Isosurface Error" );
@@ -431,9 +431,8 @@ void LayerWidgetPrivate::export_isosurface()
   boost::filesystem::path current_folder = ProjectManager::Instance()->get_current_file_folder();  
 
   filename = QFileDialog::getSaveFileName( this->parent_,
-                                           tr("Export Isosurface As... "),
-                                           current_folder.string().c_str(),
-                                           tr("VTK (*.vtk);;ASCII (*.fac *.pts *.val);;STL (*.stl)") );
+    tr("Export Isosurface As... "), QString::fromStdString( current_folder.string() ),
+    QString::fromStdString( Core::Isosurface::EXPORT_FORMATS_C ) );
 
   if ( filename.isEmpty() ) return;
 

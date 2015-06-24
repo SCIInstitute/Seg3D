@@ -25,22 +25,18 @@
 #  DEALINGS IN THE SOFTWARE.
 
 SET_PROPERTY(DIRECTORY PROPERTY "EP_BASE" ${ep_base})
+
+SET(data_GIT_URL "https://github.com/CIBC-Internal/Seg3DData.git")
 # master should be always be publicly released version
 SET(data_GIT_TAG "origin/master")
 
 SET(data_DIR "${SEG3D_BINARY_DIR}/Seg3DData")
-#SET(data_DOWNLOAD_DIR "${SEG3D_BINARY_DIR}/download/SCIRunTestData")
-
-# separate test data files from the rest of the external project files
-#SET(ep_base "${data_DOWNLOAD_DIR}")
-#SET_PROPERTY(DIRECTORY PROPERTY "EP_BASE" ${ep_base})
 
 # If CMake ever allows overriding the checkout command or adding flags,
 # git checkout -q will silence message about detached head (harmless).
 ExternalProject_Add(Data_external
-  GIT_REPOSITORY "https://github.com/CIBC-Internal/Seg3DData.git"
+  GIT_REPOSITORY ${data_GIT_URL}
   GIT_TAG ${data_GIT_TAG}
-  #BUILD_IN_SOURCE ON
   SOURCE_DIR ${data_DIR}
   BUILD_COMMAND ""
   CONFIGURE_COMMAND ""
