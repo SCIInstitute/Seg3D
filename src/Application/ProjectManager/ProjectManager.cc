@@ -3,7 +3,7 @@
 
  The MIT License
 
- Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
 
 
@@ -28,6 +28,7 @@
 
 // STL includes
 #include <ctime>
+#include <sstream>
 
 // Core includes
 #include <Core/State/StateIO.h>
@@ -109,27 +110,29 @@ public:
 bool ProjectManagerPrivate::initialize_project_database()
 {
   this->project_database_.reset( new DatabaseManager );
-  std::string sql_statements;
+  std::ostringstream sql_statements;
 
   // Create table for storing the database version
-  sql_statements += "CREATE TABLE database_version "
-    "(version INTEGER NOT NULL PRIMARY KEY);";
+  sql_statements << "CREATE TABLE database_version "
+                 << "(version INTEGER NOT NULL PRIMARY KEY);";
 
   // Create table for storing projects
-  sql_statements += "CREATE TABLE project "
-    "(project_id INTEGER NOT NULL PRIMARY KEY, "
-    "name TEXT NOT NULL, "
-    "path TEXT NOT NULL UNIQUE, "
-    "last_access_time INTEGER NOT NULL);";
+  sql_statements << "CREATE TABLE project "
+                 << "(project_id INTEGER NOT NULL PRIMARY KEY, "
+                 << "name TEXT NOT NULL, "
+                 << "path TEXT NOT NULL UNIQUE, "
+                 << "last_access_time INTEGER NOT NULL);";
 
   // Set the database version to 2
-  sql_statements += "INSERT INTO database_version VALUES ("
-    + Core::ExportToString( PROJECT_DATABASE_VERSION_C ) + ");";
+  sql_statements << "INSERT INTO database_version VALUES ("
+                 << Core::ExportToString( PROJECT_DATABASE_VERSION_C ) << ");";
 
   std::string error;
-  if ( !this->project_database_->run_sql_script( sql_statements, error ) )
+  if (! this->project_database_->run_sql_script( sql_statements.str(), error ) )
   {
-    CORE_LOG_ERROR( "Failed to initialize the project database: " + error );
+    std::ostringstream oss;
+    oss << "Failed to initialize the project database: " << error;
+    CORE_LOG_ERROR( oss.str() );
     return false;
   }
 
@@ -139,10 +142,10 @@ bool ProjectManagerPrivate::initialize_project_database()
 bool ProjectManagerPrivate::load_or_create_project_database()
 {
   // Find the directory where user settings are stored
-    if ( Core::Application::Instance()->get_config_directory( this->project_db_file_ ) )
-    {
-        this->project_db_file_ = this->project_db_file_ / PROJECT_DATABASE_C;
-    }
+  if ( Core::Application::Instance()->get_config_directory( this->project_db_file_ ) )
+  {
+    this->project_db_file_ = this->project_db_file_ / PROJECT_DATABASE_C;
+  }
   else
   {
     CORE_LOG_ERROR( "Could not access user directory." );
@@ -151,7 +154,7 @@ bool ProjectManagerPrivate::load_or_create_project_database()
   this->project_database_.reset( new DatabaseManager );
   std::string error;
   if ( boost::filesystem::exists( this->project_db_file_ ) &&
-    this->project_database_->load_database( this->project_db_file_, error ) )
+       this->project_database_->load_database( this->project_db_file_, error ) )
   {
     // Check the database version
     long long version = 0;
@@ -163,7 +166,10 @@ bool ProjectManagerPrivate::load_or_create_project_database()
       {
         version = boost::any_cast< long long >( results[ 0 ][ "version" ] );
       }
-      catch ( ... ) {}
+      catch ( ... )
+      {
+        CORE_LOG_DEBUG("Casting SELECT result from database query failed.");
+      }
     }
 
     // If the version is the same as current version
@@ -175,8 +181,10 @@ bool ProjectManagerPrivate::load_or_create_project_database()
     }
 
     // Otherwise log a warning
-    CORE_LOG_WARNING( "The project database is not compatible with this version of " +
-      Core::Application::GetApplicationName() + ". A new one will be created." );
+    std::ostringstream oss;
+    oss << "The project database is not compatible with this version of " <<
+      Core::Application::GetApplicationName() << ". A new one will be created.";
+    CORE_LOG_WARNING( oss.str() );
   }
 
   // The project database doesn't exist or isn't compatible
@@ -202,17 +210,17 @@ bool ProjectManagerPrivate::create_project_directory( const std::string& project
   }
   catch ( ... ) 
   {
-    std::string error = std::string( "Directory '" ) + project_loc.string() +
-      "' does not exist.";
-    CORE_LOG_ERROR( error );
+    std::ostringstream error;
+    error << "Directory '" << project_loc.string() << "' does not exist.";
+    CORE_LOG_ERROR( error.str() );
     return false;
   }
 
-  if ( ! boost::filesystem::exists( project_loc ) )
+  if (! boost::filesystem::exists( project_loc ) )
   {
-    std::string error = std::string( "Directory '" ) + project_loc.string() +
-      "' does not exist.";
-    CORE_LOG_ERROR( error );
+    std::ostringstream error;
+    error << "Directory '" << project_loc.string() << "' does not exist.";
+    CORE_LOG_ERROR( error.str() );
     return false;
   }
 
@@ -222,9 +230,9 @@ bool ProjectManagerPrivate::create_project_directory( const std::string& project
   // Check if the directory already existed
   if ( boost::filesystem::exists( project_path ) )
   {
-    std::string error = std::string( "Directory '" ) + project_path.string() +
-      "' already exists.";
-    CORE_LOG_ERROR( error );
+    std::ostringstream error;
+    error << "Directory '"  << project_path.string() << "' already exists.";
+    CORE_LOG_ERROR( error.str() );
     return false;
   }
 
@@ -235,9 +243,9 @@ bool ProjectManagerPrivate::create_project_directory( const std::string& project
   }
   catch ( ... ) // any errors that we might get thrown
   {
-    std::string error = std::string( "Could not create '" ) + project_path.filename().string()
-      + "'.";
-    CORE_LOG_ERROR( error );
+    std::ostringstream error;
+    error << "Could not create '" << project_path.filename().string() << "'.";
+    CORE_LOG_ERROR( error.str() );
     return false;
   }
 
@@ -253,11 +261,12 @@ void ProjectManagerPrivate::reset_current_project_folder()
 
 bool ProjectManagerPrivate::insert_or_update_project_entry( const boost::filesystem::path& project_file )
 {
-  std::string sql_str = "SELECT project_id FROM project WHERE path = '" + 
-    DatabaseManager::EscapeQuotes( project_file.generic_string() ) + "';";
+  std::ostringstream sql_str;
+  sql_str << "SELECT project_id FROM project WHERE path = '" <<
+    DatabaseManager::EscapeQuotes( project_file.generic_string() ) << "';";
   ResultSet results;
   std::string error;
-  if ( !this->project_database_->run_sql_statement( sql_str, results, error ) )
+  if (! this->project_database_->run_sql_statement( sql_str.str(), results, error ) )
   {
     CORE_LOG_ERROR( error );
     return false;
@@ -265,11 +274,18 @@ bool ProjectManagerPrivate::insert_or_update_project_entry( const boost::filesys
   
   if ( results.size() > 0 )
   {
-    assert( results.size() == 1 );
+    // TODO: this code replaces an assert.
+    // Test (unit tests) since an assert was found to be necessary.
+    if ( results.size() != 1 )
+    {
+      CORE_LOG_WARNING("One result should be returned from project entry query.");
+    }
+
     long long project_id = boost::any_cast< long long >( results[ 0 ][ "project_id" ] );
-    sql_str = "UPDATE project SET last_access_time = strftime('%s', 'now') WHERE project_id = " +
-      Core::ExportToString( project_id ) + ";";
-    if ( !this->project_database_->run_sql_statement( sql_str, error ) )
+    std::ostringstream sql_str_update;
+    sql_str_update << "UPDATE project SET last_access_time = strftime('%s', 'now') WHERE project_id = " <<
+      Core::ExportToString( project_id ) << ";";
+    if (! this->project_database_->run_sql_statement( sql_str_update.str(), error ) )
     {
       CORE_LOG_ERROR( error );
       return false;
@@ -277,10 +293,11 @@ bool ProjectManagerPrivate::insert_or_update_project_entry( const boost::filesys
   }
   else
   {
-    sql_str = "INSERT INTO project (name, path, last_access_time) VALUES ('" +
-      DatabaseManager::EscapeQuotes( project_file.stem().string() ) + "', '" + 
-      DatabaseManager::EscapeQuotes( project_file.generic_string() ) + "', strftime('%s', 'now'));";
-    if ( !this->project_database_->run_sql_statement( sql_str, error ) )
+    std::ostringstream sql_str_insert;
+    sql_str_insert << "INSERT INTO project (name, path, last_access_time) VALUES ('" <<
+      DatabaseManager::EscapeQuotes( project_file.stem().string() ) << "', '" <<
+      DatabaseManager::EscapeQuotes( project_file.generic_string() ) << "', strftime('%s', 'now'));";
+    if (! this->project_database_->run_sql_statement( sql_str_insert.str(), error ) )
     {
       CORE_LOG_ERROR( error );
       return false;
@@ -296,10 +313,10 @@ bool ProjectManagerPrivate::insert_or_update_project_entry( const boost::filesys
 void ProjectManagerPrivate::cleanup_project_database()
 {
   // Get all the entries from the database
-  std::string sql_str = "SELECT project_id, path FROM project;";
+  std::string sql_str("SELECT project_id, path FROM project;");
   std::string error;
   ResultSet results;
-  if ( !this->project_database_->run_sql_statement( sql_str, results, error ) )
+  if (! this->project_database_->run_sql_statement( sql_str, results, error ) )
   {
     CORE_LOG_ERROR( error );
     return;
@@ -317,16 +334,19 @@ void ProjectManagerPrivate::cleanup_project_database()
       std::string file_str = boost::any_cast< std::string >( results[ i ][ "path" ] );
       exists = boost::filesystem::exists( file_str ) && boost::filesystem::is_regular_file( file_str );
     }
-    catch( ... ) {}
+    catch( ... )
+    {
+      CORE_LOG_DEBUG("Verifying project file existence failed.");
+    }
 
-    if ( !exists )
+    if (! exists )
     {
       try
       {
         long long project_id = boost::any_cast< long long >( results[ i ][ "project_id" ] );
-        sql_str = "DELETE FROM project WHERE project_id = " +
-          Core::ExportToString( project_id ) + ";";
-        if ( !this->project_database_->run_sql_statement( sql_str, error ) )
+        std::ostringstream sql_str;
+        sql_str << "DELETE FROM project WHERE project_id = " << Core::ExportToString( project_id ) << ";";
+        if (! this->project_database_->run_sql_statement( sql_str.str(), error ) )
         {
           CORE_LOG_ERROR( error );
         }
@@ -335,7 +355,10 @@ void ProjectManagerPrivate::cleanup_project_database()
           changed = true;
         }
       }
-      catch( ... ) {}
+      catch( ... )
+      {
+        CORE_LOG_DEBUG("Project database cleanup failed.");
+      }
     }
   }
   
@@ -434,23 +457,26 @@ boost::filesystem::path ProjectManager::get_current_project_folder()
   }
   catch ( ... )
   {
-  }
+    std::ostringstream oss;
+    oss << "Converting '" << current_project_folder_string << "' to absolute path failed.";
+    CORE_LOG_DEBUG( oss.str() );
+}
 
   // If it does not exist reset the path to another path
-  if ( !boost::filesystem::exists( current_project_folder ) )
+  if (! boost::filesystem::exists( current_project_folder ) )
   {
     current_project_folder = boost::filesystem::path(
       PreferencesManager::Instance()->project_path_state_->get() );
 
     // Try the user directory
-    if ( !boost::filesystem::exists( current_project_folder ) )
+    if (! boost::filesystem::exists( current_project_folder ) )
     {
       Core::Application::Instance()->get_user_directory( current_project_folder );
       
       current_project_folder = current_project_folder / 
         ( Core::Application::GetApplicationName() + "-Projects" );
       // Try current working path
-      if ( !boost::filesystem::exists( current_project_folder ) )
+      if (! boost::filesystem::exists( current_project_folder ) )
       {     
         current_project_folder = current_project_folder.parent_path();
       }
@@ -473,15 +499,18 @@ boost::filesystem::path ProjectManager::get_current_file_folder()
   }
   catch ( ... )
   {
+    std::ostringstream oss;
+    oss << "Converting '" << current_file_folder.string() << "' to absolute path failed.";
+    CORE_LOG_DEBUG( oss.str() );
   }
 
   // If it does not exist reset the path to another path
-  if ( !boost::filesystem::exists( current_file_folder ) )
+  if (! boost::filesystem::exists( current_file_folder ) )
   {
     Core::Application::Instance()->get_user_directory( current_file_folder );
       
     // Try current working path
-    if ( !boost::filesystem::exists( current_file_folder ) )
+    if (! boost::filesystem::exists( current_file_folder ) )
     {
       current_file_folder = current_file_folder.parent_path();
     }
@@ -491,7 +520,7 @@ boost::filesystem::path ProjectManager::get_current_file_folder()
 }
 
 
-bool ProjectManager::new_project( const std::string& project_location, 
+bool ProjectManager::new_project( const std::string& project_location,
   const std::string& project_name )
 {
   // This function sets state variables directly, hence we need to be on the application thread
@@ -501,9 +530,9 @@ bool ProjectManager::new_project( const std::string& project_location,
 
   // If a project location is given, make the directory and check whether it is a new empty
   // directory.
-  if ( !project_location.empty() )
+  if (! project_location.empty() )
   {
-    if ( ! this->private_->create_project_directory( project_location, project_name, 
+    if (! this->private_->create_project_directory( project_location, project_name,
       project_path ) )
     {
       return false;
@@ -526,9 +555,9 @@ bool ProjectManager::new_project( const std::string& project_location,
   // Open the default tools
   ToolManager::Instance()->open_default_tools();
   
-  if ( !project_location.empty() )
+  if (! project_location.empty() )
   {
-    if ( !this->get_current_project()->save_project( project_path, project_name, false ) )
+    if (! this->get_current_project()->save_project( project_path, project_name, false ) )
     {
       // Need to update this so the old project
       this->current_project_changed_signal_();
@@ -568,8 +597,9 @@ bool ProjectManager::open_project( const std::string& project_file )
   }
   catch( ... ) 
   {
-    std::string error = std::string( "Could resolve filename '" ) + project_file + "'.";
-    CORE_LOG_ERROR( error );
+    std::ostringstream error;
+    error << "Converting '" << project_file << "' to absolute path failed.";
+    CORE_LOG_ERROR( error.str() );
     return false;
   }
   
@@ -595,7 +625,7 @@ bool ProjectManager::open_project( const std::string& project_file )
   if ( succeeded )
   {
     succeeded = new_proj->load_last_session();
-    if ( !succeeded )
+    if (! succeeded )
     {
       this->private_->set_current_project( ProjectHandle( 
         new Project( std::string( "Untitled Project" ) ) ) );
@@ -640,12 +670,12 @@ bool ProjectManager::save_project_as( const std::string& project_location,
   
   // Create a new directory for the project
   boost::filesystem::path project_path;
-  if ( ! this->private_->create_project_directory( project_location, project_name, project_path ) )
+  if (! this->private_->create_project_directory( project_location, project_name, project_path ) )
   {
     return false;
   }
 
-  if ( !this->get_current_project()->save_project( project_path, project_name, anonymize ) )
+  if (! this->get_current_project()->save_project( project_path, project_name, anonymize ) )
   {
     // An error should have been logged by the save_project function. 
     return false;
@@ -672,12 +702,12 @@ bool ProjectManager::export_project( const std::string& export_path,
 
   // Create a new directory for the project
   boost::filesystem::path project_path;
-  if ( ! this->private_->create_project_directory( export_path, project_name, project_path ) )
+  if (! this->private_->create_project_directory( export_path, project_name, project_path ) )
   {
     return false;
   }
 
-  if ( !this->get_current_project()->export_project( project_path, project_name, session_id ) )
+  if (! this->get_current_project()->export_project( project_path, project_name, session_id ) )
   {
     return false;
   }
@@ -761,14 +791,14 @@ void ProjectManager::checkpoint_projectmanager()
   stateio.initialize();
   this->save_states( stateio );
     
-    if ( boost::filesystem::exists( configuration_dir ) )
-    {
-        stateio.export_to_file( configuration_dir / CONFIGURATION_FILE_C );
+  if ( boost::filesystem::exists( configuration_dir ) )
+  {
+    stateio.export_to_file( configuration_dir / CONFIGURATION_FILE_C );
   }
     
   // Write out the database
   std::string error;
-  if ( !this->private_->project_database_->save_database( this->private_->project_db_file_, error ) )
+  if (! this->private_->project_database_->save_database( this->private_->project_db_file_, error ) )
   {
     // Just log the error if things do not work
     CORE_LOG_ERROR( error );
@@ -780,10 +810,10 @@ bool ProjectManager::get_recent_projects( ProjectInfoList& recent_projects )
   // Clean up the project database first
   this->private_->cleanup_project_database();
 
-  std::string sql_str = "SELECT * FROM project ORDER BY last_access_time DESC LIMIT 20";
+  std::string sql_str("SELECT * FROM project ORDER BY last_access_time DESC LIMIT 20");
   std::string error;
   ResultSet results;
-  if ( !this->private_->project_database_->run_sql_statement( sql_str, results, error ) )
+  if (! this->private_->project_database_->run_sql_statement( sql_str, results, error ) )
   {
     CORE_LOG_ERROR( error );
     return false;
@@ -809,15 +839,15 @@ bool ProjectManager::CheckProjectFile( const boost::filesystem::path& path, std:
   Core::StateIO stateio;
 
   // Check whether the XML file can be imported
-  if ( ! stateio.import_from_file( path, error ) )
-    {
-        return false;
+  if (! stateio.import_from_file( path, error ) )
+  {
+    return false;
   }
     
   // Check whether the version is equal or lower to the program version
   if ( stateio.get_major_version() > Core::Application::GetMajorVersion() )
   {
-        error = "This project was saved with a newer version of Seg3D.";
+    error = "This project was saved with a newer version of Seg3D.";
     return false;
   }
   
@@ -826,7 +856,7 @@ bool ProjectManager::CheckProjectFile( const boost::filesystem::path& path, std:
   {
     if ( stateio.get_minor_version() > Core::Application::GetMinorVersion() )
     {
-            error = "This project was saved with a newer version of Seg3D.";
+      error = "This project was saved with a newer version of Seg3D.";
       return false;
     }
   }
@@ -835,4 +865,4 @@ bool ProjectManager::CheckProjectFile( const boost::filesystem::path& path, std:
   return true;
 }
 
-} // end namespace seg3D
+} // end namespace Seg3D
