@@ -136,6 +136,9 @@ Menu::Menu( QMainWindow* parent ) :
     this->add_connection( LayerManager::Instance()->layer_data_changed_signal_.connect( 
       boost::bind( &Menu::EnableDisableLayerActions, qpointer_type( this ) ) ) );
 
+    this->add_connection( LayerManager::Instance()->mask_layer_isosurface_created_signal_.connect(
+      boost::bind( &Menu::EnableDisableLayerActions, qpointer_type( this ) ) ) );
+
     this->add_connection( LayerManager::Instance()->mask_layer_isosurface_deleted_signal_.connect(
       boost::bind( &Menu::EnableDisableLayerActions, qpointer_type( this ) ) ) );
 
@@ -1092,7 +1095,7 @@ std::tuple<bool, bool> Menu::FindMaskLayer()
   if ( active_layer )
   {
     MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( active_layer.get() );
-    if ( mask_layer->iso_generated_state_->get() )
+    if ( mask_layer && mask_layer->iso_generated_state_->get() )
     {
       mask_isosurface_found = true;
     }
