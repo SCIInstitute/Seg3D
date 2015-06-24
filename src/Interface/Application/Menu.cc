@@ -136,6 +136,9 @@ Menu::Menu( QMainWindow* parent ) :
     this->add_connection( LayerManager::Instance()->layer_data_changed_signal_.connect( 
       boost::bind( &Menu::EnableDisableLayerActions, qpointer_type( this ) ) ) );
 
+    this->add_connection( LayerManager::Instance()->mask_layer_isosurface_created_signal_.connect(
+      boost::bind( &Menu::EnableDisableLayerActions, qpointer_type( this ) ) ) );
+
     this->add_connection( LayerManager::Instance()->mask_layer_isosurface_deleted_signal_.connect(
       boost::bind( &Menu::EnableDisableLayerActions, qpointer_type( this ) ) ) );
 
