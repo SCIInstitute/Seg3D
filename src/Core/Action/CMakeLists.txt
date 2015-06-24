@@ -51,13 +51,12 @@ SET(CORE_ACTION_SRCS
   ActionHistory.cc
   ActionInfo.h
   ActionInfo.cc
-  )
+)
 
 CORE_ADD_LIBRARY(Core_Action ${CORE_ACTION_SRCS} )
             
 TARGET_LINK_LIBRARIES(Core_Action
-                      Core_Utils
-                      Core_EventHandler
-                      Core_Application
-                      ${SCI_BOOST_LIBRARY})
-
+  Core_Utils
+  Core_EventHandler
+  Core_Application
+  ${SCI_BOOST_LIBRARY})

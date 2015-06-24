@@ -8,10 +8,10 @@ add_definitions(-DBOOST_ALL_NO_LIB -DBOOST_PYTHON_STATIC_LIB -DBOOST_PYTHON_STAT
 # http://www.boost.org/doc/libs/1_58_0/more/getting_started/windows.html
 # http://www.boost.org/doc/libs/1_58_0/more/getting_started/unix-variants.html
 if(WIN32)
-  set(DEBUG_POSTFIX "-gd")
+  set(DEBUG_POSTFIX "-gyd")
   set(boost_LIB_PREFIX "lib")
 else()
-  set(DEBUG_POSTFIX "-d")
+  set(DEBUG_POSTFIX "-yd")
   set(boost_LIB_PREFIX ${CMAKE_STATIC_LIBRARY_PREFIX})
 endif()
 

@@ -117,8 +117,8 @@ class RadialBasisFunctionAlgo : public LayerFilter
 public:
   ActionRadialBasisFunctionPrivateHandle actionInternal_;
 
-	RadialBasisFunctionAlgo();
-	virtual ~RadialBasisFunctionAlgo();
+  RadialBasisFunctionAlgo();
+  virtual ~RadialBasisFunctionAlgo();
   
   SCI_BEGIN_RUN()
   {
@@ -252,17 +252,17 @@ bool ActionRadialBasisFunction::validate( ActionContextHandle& context )
 
 bool ActionRadialBasisFunction::run( ActionContextHandle& context, ActionResultHandle& result )
 {
-	boost::shared_ptr< RadialBasisFunctionAlgo > algo( new RadialBasisFunctionAlgo() );
-  
-	// Set up parameters
-	algo->set_sandbox( this->sandbox_ );
+  boost::shared_ptr< RadialBasisFunctionAlgo > algo( new RadialBasisFunctionAlgo() );
+
+  // Set up parameters
+  algo->set_sandbox( this->sandbox_ );
   algo->actionInternal_ = this->private_;
 
-	// Find the handle to the layer
-	if ( !( algo->find_layer( this->private_->targetLayerID_, this->private_->srcLayer_ ) ) )
-	{
-		return false;
-	}
+  // Find the handle to the layer
+  if ( !( algo->find_layer( this->private_->targetLayerID_, this->private_->srcLayer_ ) ) )
+  {
+    return false;
+  }
 
   // Lock the src layer, so it cannot be used else where
   algo->lock_for_use( this->private_->srcLayer_ );
@@ -270,22 +270,22 @@ bool ActionRadialBasisFunction::run( ActionContextHandle& context, ActionResultH
   // Create the destination layer, which will show progress
   algo->create_and_lock_data_layer_from_layer( this->private_->srcLayer_, private_->dstLayer_ );
 
-	// Return the id of the destination layer.
-	result = ActionResultHandle( new ActionResult( this->private_->dstLayer_->get_layer_id() ) );
+  // Return the id of the destination layer.
+  result = ActionResultHandle( new ActionResult( this->private_->dstLayer_->get_layer_id() ) );
 
-	// If the action is run from a script (provenance is a special case of script),
-	// return a notifier that the script engine can wait on.
-	if ( context->source() == ActionSource::SCRIPT_E ||
+  // If the action is run from a script (provenance is a special case of script),
+  // return a notifier that the script engine can wait on.
+  if ( context->source() == ActionSource::SCRIPT_E ||
        context->source() == ActionSource::PROVENANCE_E )
-	{
-		context->report_need_resource( algo->get_notifier() );
-	}
+  {
+    context->report_need_resource( algo->get_notifier() );
+  }
 
-	// Build the undo-redo record
-	algo->create_undo_redo_and_provenance_record( context, this->shared_from_this() );
+  // Build the undo-redo record
+  algo->create_undo_redo_and_provenance_record( context, this->shared_from_this() );
 
-	// Start the filter.
-	Runnable::Start( algo );
+  // Start the filter.
+  Runnable::Start( algo );
 
   ActionContextHandle layerContext( new ActionContext() );
   // wait for layer
