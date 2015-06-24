@@ -1092,7 +1092,7 @@ std::tuple<bool, bool> Menu::FindMaskLayer()
   if ( active_layer )
   {
     MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( active_layer.get() );
-    if ( mask_layer->iso_generated_state_->get() )
+    if ( mask_layer && mask_layer->iso_generated_state_->get() )
     {
       mask_isosurface_found = true;
     }
