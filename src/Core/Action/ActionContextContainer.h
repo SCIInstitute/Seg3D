@@ -51,23 +51,29 @@ public:
   // Virtual destructor for memory management
   virtual ~ActionContextContainer();
 
-  /// -- Reporting functions --
+  // -- Reporting functions --
 public:
   virtual void report_error( const std::string& error );
   virtual void report_warning( const std::string& warning );
   virtual void report_message( const std::string& message );
 
-  /// -- Report back status and results --
+  // -- Report back status and results --
 public:
   virtual void report_status( ActionStatus status );
   virtual void report_result( const ActionResultHandle& result );
   virtual void report_need_resource( NotifierHandle notifier );
 
-  /// -- Report that action was done --
+  // -- Utilities
+public:
+  virtual Core::NotifierHandle get_resource_notifier();
+  virtual void reset_context();
+  virtual Core::ActionResultHandle get_result();
+
+  // -- Report that action was done --
 public:
   virtual void report_done();
 
-  /// -- Source/Status information --
+  // -- Source/Status information --
 public:
   virtual ActionSource source() const;
 

@@ -107,19 +107,22 @@ IF(BUILD_WITH_PYTHON)
 ENDIF(BUILD_WITH_PYTHON)
 
 CORE_ADD_LIBRARY(Application_Layer ${APPLICATION_LAYER_SRCS}
-            ${APPLICATION_LAYER_ACTIONS_SRCS} )
+  ${APPLICATION_LAYER_ACTIONS_SRCS}
+)
             
 TARGET_LINK_LIBRARIES(Application_Layer
-                      Core_Action
-                      Core_Application
-                      Core_Interface
-                      Core_Isosurface
-            Core_State
-                      Core_Utils
-                      Application_InterfaceManager
-            Application_Provenance
-                      ${SCI_BOOST_LIBRARY})
+  Core_Action
+  Core_Application
+  Core_Interface
+  Core_Isosurface
+  Core_State
+  Core_Utils
+  Application_InterfaceManager
+  Application_Provenance
+  ${SCI_BOOST_LIBRARY}
+)
 
 # register actions            
 REGISTER_LIBRARY_AND_CLASSES(Application_Layer
-                    ${APPLICATION_LAYER_ACTIONS_SRCS})
+  ${APPLICATION_LAYER_ACTIONS_SRCS}
+)

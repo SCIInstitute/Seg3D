@@ -258,27 +258,21 @@ QPushButton:pressed{
    </item>
    <item>
     <widget class="QWidget" name="messageAlert_" native="true">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>48</height>
+       <height>32</height>
       </size>
      </property>
      <property name="styleSheet">
       <string notr="true">QLabel#message_{
-	color: white;
-	font: bold;
+  color: white;
+  font: bold;
 }
 
-QWidget#message_alert_{
-	border-radius: 3px;
-	background-color: red;
+QWidget#messageAlert_{
+  border-radius: 3px;
+  background-color: red;
 }</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_4">

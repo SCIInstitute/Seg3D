@@ -3,7 +3,7 @@
  
  The MIT License
  
- Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
  
  
@@ -24,7 +24,7 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
- */
+*/
 
 // teem includes
 #include <teem/nrrd.h>
@@ -246,72 +246,71 @@ ResampleAlgo::~ResampleAlgo()
 // NOTE: This function is copied from the _nrrdResampleOutputUpdate function
 static void UpdateNrrdAxisInfo( Nrrd* nout, NrrdResampleContext* rsmc )
 {
-    nrrdSpaceVecCopy( nout->spaceOrigin, rsmc->nin->spaceOrigin );
-    for ( unsigned int axIdx = 0; axIdx < rsmc->dim; axIdx++ ) 
+  nrrdSpaceVecCopy( nout->spaceOrigin, rsmc->nin->spaceOrigin );
+  for ( unsigned int axIdx = 0; axIdx < rsmc->dim; axIdx++ ) 
   {
-        double minIdxFull, maxIdxFull, zeroPos;
-        _nrrdAxisInfoCopy( nout->axis + axIdx, rsmc->nin->axis + axIdx,
-                          ( NRRD_AXIS_INFO_SIZE_BIT
-                           | NRRD_AXIS_INFO_SPACING_BIT
-                           | NRRD_AXIS_INFO_THICKNESS_BIT
-                           | NRRD_AXIS_INFO_MIN_BIT
-                           | NRRD_AXIS_INFO_MAX_BIT
-                           | NRRD_AXIS_INFO_SPACEDIRECTION_BIT
-                           | NRRD_AXIS_INFO_CENTER_BIT
-                           | NRRD_AXIS_INFO_KIND_BIT ) );
-        /* now set all the per-axis fields we just abstained from copying */
-        /* size was already set */
-        nout->axis[ axIdx ].spacing = ( rsmc->nin->axis[ axIdx ].spacing
-                                     / rsmc->axis[ axIdx ].ratio );
-        /* for now, we don't attempt to modify thickness */
-        nout->axis[ axIdx ].thickness = AIR_NAN;
-        /* We had to assume a specific centering when doing resampling */
-        nout->axis[ axIdx ].center = rsmc->axis[ axIdx ].center;
-        _nrrdResampleMinMaxFull( &minIdxFull, &maxIdxFull,
-                                rsmc->axis[ axIdx ].center,
-                                rsmc->nin->axis[ axIdx ].size );
-        nout->axis[ axIdx ].min = AIR_AFFINE( minIdxFull,
-                                           rsmc->axis[axIdx].min,
-                                           maxIdxFull,
-                                           rsmc->nin->axis[ axIdx ].min,
-                                           rsmc->nin->axis[ axIdx ].max );
-        nout->axis[ axIdx ].max = AIR_AFFINE( minIdxFull,
-                                           rsmc->axis[ axIdx ].max,
-                                           maxIdxFull,
-                                           rsmc->nin->axis[ axIdx ].min,
-                                           rsmc->nin->axis[ axIdx ].max );
-        nrrdSpaceVecScale( nout->axis[ axIdx ].spaceDirection,
-                          1.0 / rsmc->axis[ axIdx ].ratio,
-                          rsmc->nin->axis[ axIdx ].spaceDirection );
-        nout->axis[ axIdx ].kind = _nrrdKindAltered( rsmc->nin->axis[ axIdx ].kind,
-                                                  AIR_TRUE );
-        /* space origin may have translated along this axis;
-           only do this if the axis was already spatial */
-        if ( AIR_EXISTS( rsmc->nin->axis[ axIdx ].spaceDirection[ 0 ] ) ) 
+    double minIdxFull, maxIdxFull, zeroPos;
+    _nrrdAxisInfoCopy( nout->axis + axIdx, rsmc->nin->axis + axIdx,
+                       ( NRRD_AXIS_INFO_SIZE_BIT
+                       | NRRD_AXIS_INFO_SPACING_BIT
+                       | NRRD_AXIS_INFO_THICKNESS_BIT
+                       | NRRD_AXIS_INFO_MIN_BIT
+                       | NRRD_AXIS_INFO_MAX_BIT
+                       | NRRD_AXIS_INFO_SPACEDIRECTION_BIT
+                       | NRRD_AXIS_INFO_CENTER_BIT
+                       | NRRD_AXIS_INFO_KIND_BIT ) );
+    /* now set all the per-axis fields we just abstained from copying */
+    /* size was already set */
+    nout->axis[ axIdx ].spacing =
+      ( rsmc->nin->axis[ axIdx ].spacing / rsmc->axis[ axIdx ].ratio );
+    /* for now, we don't attempt to modify thickness */
+    nout->axis[ axIdx ].thickness = AIR_NAN;
+    /* We had to assume a specific centering when doing resampling */
+    nout->axis[ axIdx ].center = rsmc->axis[ axIdx ].center;
+    _nrrdResampleMinMaxFull( &minIdxFull, &maxIdxFull,
+                             rsmc->axis[ axIdx ].center,
+                             rsmc->nin->axis[ axIdx ].size );
+    nout->axis[ axIdx ].min = AIR_AFFINE( minIdxFull,
+                                          rsmc->axis[axIdx].min,
+                                          maxIdxFull,
+                                          rsmc->nin->axis[ axIdx ].min,
+                                          rsmc->nin->axis[ axIdx ].max );
+    nout->axis[ axIdx ].max = AIR_AFFINE( minIdxFull,
+                                          rsmc->axis[ axIdx ].max,
+                                          maxIdxFull,
+                                          rsmc->nin->axis[ axIdx ].min,
+                                          rsmc->nin->axis[ axIdx ].max );
+    nrrdSpaceVecScale( nout->axis[ axIdx ].spaceDirection,
+                       1.0 / rsmc->axis[ axIdx ].ratio,
+                       rsmc->nin->axis[ axIdx ].spaceDirection );
+    nout->axis[ axIdx ].kind = _nrrdKindAltered( rsmc->nin->axis[ axIdx ].kind, AIR_TRUE );
+    /* space origin may have translated along this axis;
+     only do this if the axis was already spatial */
+    if ( AIR_EXISTS( rsmc->nin->axis[ axIdx ].spaceDirection[ 0 ] ) ) 
     {
-          zeroPos = NRRD_POS( nout->axis[ axIdx ].center,
-                             rsmc->axis[ axIdx ].min,
-                             rsmc->axis[ axIdx ].max,
-                             rsmc->axis[ axIdx ].samples,
-                             0 );
-          nrrdSpaceVecScaleAdd2( nout->spaceOrigin,
-                                1.0, nout->spaceOrigin,
-                                zeroPos,
-                                rsmc->nin->axis[ axIdx ].spaceDirection );
-        }
+      zeroPos = NRRD_POS( nout->axis[ axIdx ].center,
+                          rsmc->axis[ axIdx ].min,
+                          rsmc->axis[ axIdx ].max,
+                          rsmc->axis[ axIdx ].samples,
+                          0 );
+      nrrdSpaceVecScaleAdd2( nout->spaceOrigin,
+                             1.0, nout->spaceOrigin,
+                             zeroPos,
+                             rsmc->nin->axis[ axIdx ].spaceDirection );
     }
+  }
 
   nrrdBasicInfoCopy( nout, rsmc->nin,
-    NRRD_BASIC_INFO_DATA_BIT
-    | NRRD_BASIC_INFO_TYPE_BIT
-    | NRRD_BASIC_INFO_BLOCKSIZE_BIT
-    | NRRD_BASIC_INFO_DIMENSION_BIT
-    | NRRD_BASIC_INFO_SPACEORIGIN_BIT
-    | NRRD_BASIC_INFO_CONTENT_BIT
-    | NRRD_BASIC_INFO_COMMENTS_BIT
-    | ( nrrdStateKeyValuePairsPropagate
-    ? 0
-    : NRRD_BASIC_INFO_KEYVALUEPAIRS_BIT ) );
+                     NRRD_BASIC_INFO_DATA_BIT
+                   | NRRD_BASIC_INFO_TYPE_BIT
+                   | NRRD_BASIC_INFO_BLOCKSIZE_BIT
+                   | NRRD_BASIC_INFO_DIMENSION_BIT
+                   | NRRD_BASIC_INFO_SPACEORIGIN_BIT
+                   | NRRD_BASIC_INFO_CONTENT_BIT
+                   | NRRD_BASIC_INFO_COMMENTS_BIT
+                   | ( nrrdStateKeyValuePairsPropagate
+                       ? 0
+                       : NRRD_BASIC_INFO_KEYVALUEPAIRS_BIT ) );
 }
 
 bool ResampleAlgo::compute_output_grid_transform( LayerHandle layer, 
@@ -353,8 +352,8 @@ bool ResampleAlgo::compute_output_grid_transform( LayerHandle layer,
   }
 
   Nrrd* nout = nrrdNew();
+  int error = AIR_FALSE;
 
-  int error = 0;
   error |= nrrdResampleNrrdSet( resample_context, nrrd_in->nrrd() );
   for ( unsigned int axis = 0; axis < nrrd_in->nrrd()->dim && !error; ++axis )
   {
@@ -372,15 +371,15 @@ bool ResampleAlgo::compute_output_grid_transform( LayerHandle layer,
     }
   }
   
-  if ( error 
-    || _nrrdResampleInputDimensionUpdate( resample_context )
-    || _nrrdResampleInputCentersUpdate( resample_context )
-    || _nrrdResampleInputSizesUpdate( resample_context )
-    || _nrrdResampleLineAllocateUpdate( resample_context )
-    || _nrrdResampleVectorAllocateUpdate( resample_context )
-    || _nrrdResampleLineFillUpdate( resample_context )
-    || _nrrdResampleVectorFillUpdate( resample_context )
-    || _nrrdResamplePermutationUpdate( resample_context ) )
+  if ( error ||
+       _nrrdResampleInputDimensionUpdate( resample_context ) ||
+       _nrrdResampleInputCentersUpdate( resample_context ) ||
+       _nrrdResampleInputSizesUpdate( resample_context ) ||
+       _nrrdResampleLineAllocateUpdate( resample_context ) ||
+       _nrrdResampleVectorAllocateUpdate( resample_context ) ||
+       _nrrdResampleLineFillUpdate( resample_context ) ||
+       _nrrdResampleVectorFillUpdate( resample_context ) ||
+       _nrrdResamplePermutationUpdate( resample_context ) )
   {
     nrrdNuke( nout );
     return false;
@@ -399,7 +398,7 @@ bool ResampleAlgo::compute_output_grid_transform( LayerHandle layer,
 
 bool ResampleAlgo::nrrd_resample( Nrrd* nin, Nrrd* nout, NrrdKernelSpec* unuk )
 {
-  int error = 0;
+  int error = AIR_FALSE;
   error |= nrrdResampleNrrdSet( this->current_resample_context_, nin );
   for ( unsigned int axis = 0; axis < nin->dim && !error; ++axis )
   {
@@ -417,7 +416,7 @@ bool ResampleAlgo::nrrd_resample( Nrrd* nin, Nrrd* nout, NrrdKernelSpec* unuk )
       error |= nrrdResampleRangeFullSet( this->current_resample_context_, axis );
     }
   }
-  if ( !error )
+  if ( ! error )
   {
     // For some reason the grid transform of nout isn't set (no min, max, or origin info)
     // unu resample works, so maybe we're doing something wrong?  Working around this for now.
@@ -441,26 +440,35 @@ void ResampleAlgo::resample_data_layer( DataLayerHandle input, DataLayerHandle o
   Core::NrrdDataHandle nrrd_in( new Core::NrrdData( 
     input->get_data_volume()->get_data_block(),
     input->get_grid_transform() ) );
+
   Nrrd* nrrd_out = nrrdNew();
+  int error = AIR_FALSE;
+
   if ( this->crop_ )
   {
     if ( this->padding_ == ActionResample::ZERO_C )
     {
-      nrrdResamplePadValueSet( this->current_resample_context_, 0.0 );
+      error |= nrrdResamplePadValueSet( this->current_resample_context_, 0.0 );
     }
     else if ( this->padding_ == ActionResample::MIN_C )
     {
-      nrrdResamplePadValueSet( this->current_resample_context_, input->get_data_volume()->
+      error |= nrrdResamplePadValueSet( this->current_resample_context_, input->get_data_volume()->
         get_data_block()->get_min() );
     }
     else
     {
-      nrrdResamplePadValueSet( this->current_resample_context_, input->get_data_volume()->
+      error |= nrrdResamplePadValueSet( this->current_resample_context_, input->get_data_volume()->
         get_data_block()->get_max() );
+    }
+    if (error)
+    {
+      nrrdNuke( nrrd_out );
+      CORE_LOG_ERROR( "Failed to set up padding." );
+      return;
     }
   }
   output->update_progress_signal_( 0.1 );
-  if ( !nrrd_resample( nrrd_in->nrrd(), nrrd_out, this->data_kernel_ ) )
+  if ( ! nrrd_resample( nrrd_in->nrrd(), nrrd_out, this->data_kernel_ ) )
   {
     nrrdNuke( nrrd_out );
     CORE_LOG_ERROR( "Failed to resample layer '" + input->get_layer_id() +"'" );
@@ -496,16 +504,25 @@ void ResampleAlgo::resample_mask_layer( MaskLayerHandle input, MaskLayerHandle o
   Core::DataBlockHandle input_data_block;
   Core::MaskDataBlockManager::Convert( input->get_mask_volume()->get_mask_data_block(),
     input_data_block, Core::DataType::UCHAR_E );
-  Core::NrrdDataHandle nrrd_in( new Core::NrrdData( input_data_block,
-    input->get_grid_transform() ) );
+  Core::NrrdDataHandle nrrd_in( new Core::NrrdData( input_data_block, input->get_grid_transform() ) );
+
   Nrrd* nrrd_out = nrrdNew();
+
   if ( this->crop_ )
   {
+    int error = AIR_FALSE;
+
     // Pad the mask layer with 0
-    nrrdResamplePadValueSet( this->current_resample_context_, 0.0 );
+    error |= nrrdResamplePadValueSet( this->current_resample_context_, 0.0 );
+    if (error)
+    {
+      nrrdNuke( nrrd_out );
+      CORE_LOG_ERROR( "Failed to set up padding." );
+      return;
+    }
   }
   output->update_progress_signal_( 0.1 );
-  if ( !nrrd_resample( nrrd_in->nrrd(), nrrd_out, this->mask_kernel_ ) )
+  if ( ! nrrd_resample( nrrd_in->nrrd(), nrrd_out, this->mask_kernel_ ) )
   {
     nrrdNuke( nrrd_out );
     CORE_LOG_ERROR( "Failed to resample layer '" + input->get_layer_id() +"'" );
@@ -515,8 +532,8 @@ void ResampleAlgo::resample_mask_layer( MaskLayerHandle input, MaskLayerHandle o
     Core::NrrdDataHandle nrrd_data( new Core::NrrdData( nrrd_out ) );
     Core::DataBlockHandle data_block = Core::NrrdDataBlock::New( nrrd_data );
     Core::MaskDataBlockHandle mask_data_block;
-    if ( !( Core::MaskDataBlockManager::Convert( data_block, this->current_output_transform_,
-      mask_data_block ) ) )
+    if ( ! Core::MaskDataBlockManager::Convert( data_block,
+      this->current_output_transform_, mask_data_block ) )
     {
       return;
     }
@@ -543,15 +560,21 @@ void ResampleAlgo::run_filter()
   {
     this->current_output_transform_ = this->output_transforms_[ i ];
     this->current_resample_context_ = this->resample_contexts_[ i ];
-    
+
+    int error = AIR_FALSE;
     if ( this->crop_ )
     {
       this->detect_padding_only();
-      nrrdResampleBoundarySet( this->current_resample_context_, nrrdBoundaryPad );
+      error |= nrrdResampleBoundarySet( this->current_resample_context_, nrrdBoundaryPad );
     }
     else
     {
-      nrrdResampleBoundarySet( this->current_resample_context_, nrrdBoundaryBleed );
+      error |= nrrdResampleBoundarySet( this->current_resample_context_, nrrdBoundaryBleed );
+    }
+    if (error)
+    {
+      this->report_error( "Resample boundary failed." );
+      return;
     }
 
     switch ( this->src_layers_[ i ]->get_type() )
@@ -1040,16 +1063,16 @@ bool ActionResample::validate( Core::ActionContextHandle& context )
   if ( this->private_->crop_ )
   {
     if ( this->private_->range_max_[ 0 ] <= this->private_->range_min_[ 0 ] ||
-      this->private_->range_max_[ 1 ] <= this->private_->range_min_[ 1 ] ||
-      this->private_->range_max_[ 2 ] <= this->private_->range_min_[ 2 ] )
+         this->private_->range_max_[ 1 ] <= this->private_->range_min_[ 1 ] ||
+         this->private_->range_max_[ 2 ] <= this->private_->range_min_[ 2 ] )
     {
       context->report_error( "Invalid resample range." );
       return false;
     }
     
     if ( this->private_->padding_ != ZERO_C &&
-      this->private_->padding_ != MIN_C &&
-      this->private_->padding_ != MAX_C )
+         this->private_->padding_ != MIN_C &&
+         this->private_->padding_ != MAX_C )
     {
       context->report_error( "Unknown padding option" );
       return false;
@@ -1057,11 +1080,11 @@ bool ActionResample::validate( Core::ActionContextHandle& context )
   }
   
   if ( this->private_->kernel_ != BOX_C &&
-    this->private_->kernel_ != TENT_C &&
-    this->private_->kernel_ != CUBIC_BS_C &&
-    this->private_->kernel_ != CUBIC_CR_C &&
-    this->private_->kernel_ != QUARTIC_C &&
-    this->private_->kernel_ != GAUSSIAN_C )
+       this->private_->kernel_ != TENT_C &&
+       this->private_->kernel_ != CUBIC_BS_C &&
+       this->private_->kernel_ != CUBIC_CR_C &&
+       this->private_->kernel_ != QUARTIC_C &&
+       this->private_->kernel_ != GAUSSIAN_C )
   {
     context->report_error( "Unknown kernel type" );
     return false;
@@ -1113,7 +1136,15 @@ bool ActionResample::run( Core::ActionContextHandle& context,
     // Compute grid transform for the output layers
     algo->resample_contexts_[ i ] = nrrdResampleContextNew();
     algo->resample_contexts_[ i ]->verbose = 0;
-    nrrdResampleDefaultCenterSet( algo->resample_contexts_[ i ], nrrdCenterCell );
+
+    int error = AIR_FALSE;
+    error |= nrrdResampleDefaultCenterSet( algo->resample_contexts_[ i ], nrrdCenterCell );
+    if (error)
+    {
+      context->report_error( "Setting resampled center fail" );
+      return false;
+    }
+
     if ( this->private_->match_grid_transform_ )
     {
       algo->output_transforms_[ i ] = this->private_->grid_transform_;
@@ -1122,8 +1153,12 @@ bool ActionResample::run( Core::ActionContextHandle& context,
     }
     else
     {
-      algo->compute_output_grid_transform( algo->src_layers_[ i ], 
-        algo->resample_contexts_[ i ], algo->output_transforms_[ i ] );
+      if (! algo->compute_output_grid_transform( algo->src_layers_[ i ],
+        algo->resample_contexts_[ i ], algo->output_transforms_[ i ] ) )
+      {
+        context->report_error( "Computing grid transform failed." );
+        return false;
+      }
     }
 
     switch ( algo->src_layers_[ i ]->get_type() )
@@ -1139,10 +1174,11 @@ bool ActionResample::run( Core::ActionContextHandle& context,
           static_cast< MaskLayer* >( algo->src_layers_[ i ].get() )->color_state_->get() );
         break;
       default:
-        assert( false );
+        context->report_error( "Unknown volume type." );
+        return false;
     }
 
-    if ( !algo->dst_layers_[ i ] )
+    if ( ! algo->dst_layers_[ i ] )
     {
       context->report_error( "Could not allocate enough memory." );
       return false;
