@@ -125,7 +125,7 @@ bool MatlabLayerExporter::export_layer( const std::string& mode, const std::stri
   const std::string& name )
 {
   boost::filesystem::path path = boost::filesystem::path( file_path ) / ( name + ".mat" );
-  bool success;
+  bool success = false;
   
     // Export data as single volume file
   if ( mode == "data" )

@@ -53,7 +53,7 @@ bool NrrdLayerExporter::export_layer( const std::string& mode,
                                       const std::string& name )
 {
   boost::filesystem::path path = boost::filesystem::path( file_path ) / ( name + ".nrrd" );
-  bool success;
+  bool success = false;
   
   if ( mode == "data" )
   {
