@@ -1,4 +1,3 @@
-
 #
 #  For more information, please see: http://software.sci.utah.edu
 # 
@@ -32,34 +31,34 @@
 ##################################################
 
 SET(APPLICATION_PROJECTMANAGER_SRCS
-    AutoSave.h
-    AutoSave.cc
-    ProjectManager.h
-    ProjectManager.cc
+  AutoSave.h
+  AutoSave.cc
+  ProjectManager.h
+  ProjectManager.cc
   ProjectInfo.h
 )
 
 SET(APPLICATION_PROJECTMANAGER_ACTIONS_SRCS
   Actions/ActionAddNote.h
   Actions/ActionAddNote.cc
-    Actions/ActionAutoSave.h
-    Actions/ActionAutoSave.cc
-    Actions/ActionDeleteSession.h
-    Actions/ActionDeleteSession.cc
-    Actions/ActionExportProject.h
-    Actions/ActionExportProject.cc
-    Actions/ActionLoadProject.h
-    Actions/ActionLoadProject.cc
-    Actions/ActionLoadSession.h
-    Actions/ActionLoadSession.cc
-    Actions/ActionNewProject.h
-    Actions/ActionNewProject.cc
-    Actions/ActionResetChangesMade.h
-    Actions/ActionResetChangesMade.cc
-    Actions/ActionSaveProjectAs.h
-    Actions/ActionSaveProjectAs.cc
-    Actions/ActionSaveSession.h
-    Actions/ActionSaveSession.cc
+  Actions/ActionAutoSave.h
+  Actions/ActionAutoSave.cc
+  Actions/ActionDeleteSession.h
+  Actions/ActionDeleteSession.cc
+  Actions/ActionExportProject.h
+  Actions/ActionExportProject.cc
+  Actions/ActionLoadProject.h
+  Actions/ActionLoadProject.cc
+  Actions/ActionLoadSession.h
+  Actions/ActionLoadSession.cc
+  Actions/ActionNewProject.h
+  Actions/ActionNewProject.cc
+  Actions/ActionResetChangesMade.h
+  Actions/ActionResetChangesMade.cc
+  Actions/ActionSaveProjectAs.h
+  Actions/ActionSaveProjectAs.cc
+  Actions/ActionSaveSession.h
+  Actions/ActionSaveSession.cc
 )
 
 IF(BUILD_WITH_PYTHON)
@@ -68,21 +67,21 @@ IF(BUILD_WITH_PYTHON)
 ENDIF(BUILD_WITH_PYTHON)
 
 CORE_ADD_LIBRARY(Application_ProjectManager ${APPLICATION_PROJECTMANAGER_SRCS}
-            ${APPLICATION_PROJECTMANAGER_ACTIONS_SRCS} )
+  ${APPLICATION_PROJECTMANAGER_ACTIONS_SRCS} )
             
 TARGET_LINK_LIBRARIES(Application_ProjectManager
-                      Core_Utils
-                      Core_EventHandler
-                      Core_Application
-                      Core_Interface
-                      Core_Action
-                      Core_State
-                      Application_Project
-                      Application_DatabaseManager
-                      ${SCI_BOOST_LIBRARY}
-                      ${SCI_SQLITE_LIBRARY})
+  Core_Utils
+  Core_EventHandler
+  Core_Application
+  Core_Interface
+  Core_Action
+  Core_State
+  Application_Project
+  Application_DatabaseManager
+  ${SCI_BOOST_LIBRARY}
+  ${SCI_SQLITE_LIBRARY})
 
 # Register action classes
 REGISTER_LIBRARY_AND_CLASSES(Application_ProjectManager
-                    ${APPLICATION_PROJECTMANAGER_ACTIONS_SRCS})
+  ${APPLICATION_PROJECTMANAGER_ACTIONS_SRCS})
 

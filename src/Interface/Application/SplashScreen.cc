@@ -296,21 +296,19 @@ void SplashScreen::quick_open_file()
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
     int default_name_count = ProjectManager::Instance()->default_project_name_counter_state_->get();
     default_project_name = std::string( "New Project " ) + Core::ExportToString( default_name_count );
-  } 
-  
+  }
+
+  ActionNewProject::Dispatch( Core::Interface::GetWidgetActionContext(), "", default_project_name );
   this->hide();
-  
+
   if( LayerIOFunctions::ImportFiles( dynamic_cast< QMainWindow* >( this->parentWidget() ), "" ) )
   {
-    ActionNewProject::Dispatch( Core::Interface::GetWidgetActionContext(), "", default_project_name );
-
     this->close();
   }
   else
   {
     this->show();
   }
-
 }
 
 void SplashScreen::quick_open_new_project()
