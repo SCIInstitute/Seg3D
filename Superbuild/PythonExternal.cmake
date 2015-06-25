@@ -46,7 +46,7 @@ SET(python_ABIFLAG_PYDEBUG)
 SET(python_ABIFLAG_PYMALLOC "m")
 SET(ABIFLAGS "${python_ABIFLAG_PYMALLOC}${python_ABIFLAG_PYDEBUG}")
 
-SET(python_GIT_TAG "origin/python_3.4.3")
+SET(python_GIT_TAG "origin/master")
 SET(python_GIT_URL "https://github.com/CIBC-Internal/python.git")
 
 SET(python_WIN32_ARCH)
