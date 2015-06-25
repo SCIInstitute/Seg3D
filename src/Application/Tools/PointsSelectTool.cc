@@ -144,8 +144,8 @@ PointsSelectToolPrivate::handle_units_selection_changed( std::string units )
   // If units have changed, emit signal
   if ( old_show_world_units_state != this->tool_->use_world_units_state_->get() )
   {
-    this->tool_->units_changed_signal_();
     this->update_unit_point_list();
+    this->tool_->units_changed_signal_();
   }
 }
 

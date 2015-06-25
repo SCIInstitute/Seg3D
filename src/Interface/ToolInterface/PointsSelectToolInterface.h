@@ -3,7 +3,7 @@
  
  The MIT License
  
- Copyright (c) 2014 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
  
  
@@ -70,6 +70,10 @@ public:
   /// Enable or disable save points button depending on whether points are available.
   /// Locks: StateEngine
   static void ToggleSaveButtonEnabled( qpointer_type points_select_interface );
+
+  /// UPDATETABLE
+  /// Update table containing list of points when seed points change.
+  static void UpdateTable( qpointer_type points_select_interface );
 };
 
 } // end namespace Seg3D
