@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>306</width>
+    <width>278</width>
     <height>381</height>
    </rect>
   </property>
@@ -150,6 +150,9 @@ QPushButton:pressed{
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
+     <property name="toolTip">
+      <string>Switch between pixel and world coordinates.</string>
+     </property>
      <property name="title">
       <string>Units</string>
      </property>
@@ -254,6 +257,9 @@ QPushButton:pressed{
        <height>30</height>
       </size>
      </property>
+     <property name="toolTip">
+      <string>Save points to file.</string>
+     </property>
      <property name="text">
       <string>Save Points</string>
      </property>
@@ -292,8 +298,11 @@ QPushButton:pressed{
        <height>30</height>
       </size>
      </property>
+     <property name="toolTip">
+      <string>Delete all points.</string>
+     </property>
      <property name="text">
-      <string>Clear Seeds</string>
+      <string>Clear Points</string>
      </property>
     </widget>
    </item>
@@ -315,9 +324,24 @@ QPushButton:pressed{
    </item>
    <item>
     <widget class="QTableWidget" name="points_table_">
+     <property name="toolTip">
+      <string>Point coordinates display.</string>
+     </property>
      <property name="frameShadow">
       <enum>QFrame::Sunken</enum>
      </property>
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <property name="gridStyle">
+      <enum>Qt::SolidLine</enum>
+     </property>
+     <attribute name="horizontalHeaderVisible">
+      <bool>true</bool>
+     </attribute>
+     <attribute name="horizontalHeaderDefaultSectionSize">
+      <number>80</number>
+     </attribute>
     </widget>
    </item>
    <item>
