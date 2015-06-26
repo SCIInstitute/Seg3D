@@ -4,12 +4,15 @@ Release Notes
 Version 2.2.0
 -------------
 
-* Tool for creating implicit surface segmentations has been added
+* More menu export options.
+* GUI update in points select tool.
+* Better error checking in resample tool.
 * Upgrade to ITK 4.5
+* Upgrade to boost 1.58
+* Upgrade to python 3.4.3
 * Upgrade to freetype 2.5.3
 * Upgrade to zlib 1.2.8
 * Upgrade to glew 1.9.0
-* Upgrade to python 3.3.6
 
 Version 2.1.5
 -------------
@@ -57,27 +60,16 @@ This version introduces a new cleaner look, first version of provenance tracking
 renderer.
 
 * Upgraded the look and feel of Seg3D. The colors are lighter and should focus more attention to the actual viewer.
-
 * Sliders and Histograms now have better default settings.
-
 * Options in tools are hidden if not used.
-
 * Highlighted the status bar coordinates.
-
 * Added volume rendering.
-
 * Refactored importers to have clearer logic.
-
 * Refactored the action mechanism to be easier to program.
-
 * Added provenance recording and a central database to each project.
-
 * Project Folders now have an extension.
-
 * Project Folders on the mac now generate a mac osx bundle.
-
 * Refactored project logic to manage files more efficient.
-
 
 Version 2.0.3
 ------------
@@ -85,9 +77,7 @@ Version 2.0.3
 This version adds several bug fixes and a few extra features.
 
 * Added a measurement tool.
-
 * Added capping for isosurfaces.
-
 * Fix world coordinates display.
 
 Version 2.0.2
@@ -96,17 +86,11 @@ Version 2.0.2
 This version address some major performance issues that were reported users for certain older graphics cards.
 
 * Changed the mask shading so it is a power of two, so older graphics drivers do not default to software rendering.
-
 * Disabled clipping for OS X 10.5 as bugs in the driver cause glitches in the rendering.
-
 * Added support for dicom files without extensions and added more heuristics for estimating slice distance.
-
 * Improved the selection of the importer.
-
 * Fixed a bug in drag and drop that could cause the program to crash.
-
 * Improved the fog computation.
-
 
 Version 2.0.1
 -------------
@@ -114,128 +98,67 @@ Version 2.0.1
 This version addresses a few minor problems that were encountered by users and affects mostly file io. This version also adds fog controls and clipping planes to the visual interface.
 
 * Upgraded dicom support to better deal with file names and spacing.
-
 * Improved checking of existance of project files and will prompt for new directories when files are deleted or network connectivity is lost.
-
 * Clipping plane support and fog control.
-
 * Cleanup of node vs cell centered data management.
-
 * Recent file list is now kept in a database.
-
 * Added database support.
-
 * Cleanup of dialog windows to better support Mac OS X.
-
-
 
 Version: 2.0
 ------------
 
 This new version of Seg3D represents a major rewrite from the original Seg3D 1.x versions. This version maintains the workflow of the previous versions, but has been reengineered from scratch in order to address major flaws in the original design of the code. This release is the first release based on the new code base, that includes most of the tools from previous release and many new features. There are however a few tools that have not yet been ported to the new architecture, and most of that functionality will follow in version 2.1. 
 
-
 New features
 ------------
 
 * New look and feel for the entire UI using a graphical user interface that is based on Qt. All the toolbars can now by undocked and the UI is optimized for use with wide screen monitors.
-
 * New Layer Manager: The layer manager widget now keeps track of layers by grouping them per size and dimension. This will quickly allow the user to see which masks can be used with which data layer.
-
 * New Layer Widgets: Appearance of layers can now be managed in the layer widgets. The layer widgets now manage iso surfaces as well and have context menus for exporting layers.
-
 * Drag and drop functionality: Layers can now be dragged to other groups in the layer manager and will automatically be resampled. Layers can be dropped onto tools as well to specify which layers to use.
-
 * New Tool Manager: The new tool manager allows multiple tools to stay open and allows for quickly switching between tools.
-
 * Coordinate Indicator: The coordinate indicator has been integrated in the status bar to allow more space to be used for tools and for the viewers.
-
 * New viewers: The new version allows up to 6 viewers to be used and allows them to be locked together for better navigation.
-
 * Volume viewers: The volume viewer now has lighting and fog. Also options to snap to the closest axis have been integrated. 
-
 * Slice viewers : Multiple slice viewers can now be coupled together and relative movements are forwarded to other viewers. Also the appearance of the mask layers can be tweaked on a mask by mask basis.
-
 * Advanced visibility: We have added an advance control that allows users to specify in which viewer a data layer or a mask layer is visible. Allowing for comparison of datasets side-by-side.
-
 * Preferences menu: We have added a preferences menu to setup mask colors, viewer defaults etc.
-
 * Project management: The new version has a menu for project management, meaning that sessions are grouped in one project and users can track session progression of an entire project.
-
 * Session management: We have completely rewritten the way sessions are saved and restored. Session saving now includes viewer settings and tools. Sessions are now saved incrementally saving a lot of time when saving a session.
-
 * Auto save: A smart auto save has been implemented that will save the project at set intervals when the program is idle.
-
 * New tool interfaces: All tool interfaces have been rewritten. Each tool now will now indicate whether a layer is replaced. Each tool can work with the active layer or the user can select the layer it should work on. All the tools now display an error if the input conditions are not met.
-
 * Interface simplification and sliders: Tools now display reasonable value ranges using sliders and some tools have less input variables as values are automatically estimated.
-
 * New tool: Constraint Painting: Painting can now be constrained by a data layer using two thresholds and/or by a combination of one or two mask layers. 
-
 * New tool: Arithmetic calculator: The new calculator module allows the user to parse a simple equation and evaluate an expression based up on data and mask values. This will expose almost all the basic math operations as well as selecting data from different data layers and combining them together.
-
 * New tool: Distance maps: Distance maps are useful in doing more complex segmentation work. In combination with the arithmetic tool this offers new ways of segmenting data.
-
 * New tool: Mean filter: Besides doing median filtering, a mean filter is often faster on large datasets. Hence both options are now available.
-
 * New tool: Connected Component Size: One can now create a datalayer with the size of each component which can be used then for thresholding based on size of a component.
-
 * New tool: Copy and Paste: All slices can now be copied and pasted into different slices. All this functionality has been replaced with an internal clipboard.
-
 * Transform tool: The transform tool now visually shows how a layer's spacing and origin is changed.
-
 * Deleting layers: Users can now delete multiple layers in a group at once.
-
 * Crop/Resample tool now work on groups of layers: Many layers can receive these operations at once.
-
 * Isosurface appearance: The new isosurfaces are based on marching cubes and compute are much faster and more efficient.
-
 * Isosurface deletion: Isosurfaces can be deleted
-
 * Isosurface visibility: The visibility of an isosurface can be controlled per layer and per viewer.
-
 * Layer locking: A layer can now be locked which will prevent any operations from altering it.
-
 * Information tab: The information on a layer is now integrated in the layer widget, so it is clear to which layer this information refers to.
-
 * Transparency: Transparency can now be set per layer.
-
 * Layer appearance: The line thickness and the layer fill can now be customized.
-
 * Parallel filters: Filters that take longer to compute now run in parallel and one can continue to do different things while a filter is running.
-
 * Aborting filters: Most filters can be aborted by pressing on the abort button in the layer widget.
-
 * Progress updates: Almost all filters now post progress to the user.
-
 * Importer: Files can now be imported as mask or as data layer and conversion will be done on the fly.
-
 * Data formats: Original data formats are mostly conserved in the program. Hence 8bit data will stay 8bit unless a filters output requires more accuracy. This allows for larger data to be dealt with in the program. All filters now allow for using each type of data.
-
 * Data formats: Currently unsigned and signed versions of 8, 16, and 32bit images are supported as well as float and double precision images.
-
 * File importer: The file importer is now split into a single volume file reader and file series importer. The file importer also reads masks.
-
 * DICOM support: We have rewritten the DICOM importer to read a larger variety of files.
-
 * File exporter: Now masks can be saved in a single file or combined into a new segmentation map. Output masks can now be both mask and bitmaps.
-
 * Stability: The new version is much more stable due to its new architecture.
-
 * File associations: The new installers will associate filenames, so one can double click on project files, nrrd files to open them in Seg3D.
-
 * Installers: The project now uses CPack to build installers for Windows and OS X.
-
 * Plugin architecture: A new plugin architecture was added so filters can be added to the program.
-
 * And many more features....
-
-
-Missing features:
------------------
-
-Volume rendering, Visual inspection of provenance, Speedlines, and more importers have been postponed to the next version, version 2.1. 
-
 
 -------
 The Seg3D 2.0 Team
