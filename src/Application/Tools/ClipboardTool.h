@@ -46,7 +46,7 @@ SEG3D_TOOL
   SEG3D_TOOL_MENULABEL( "Copy/Paste" )
   SEG3D_TOOL_MENU( "Tools" )
   SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+1" )
-  SEG3D_TOOL_URL( "http://www.sci.utah.edu/SCIRunDocs/index.php/CIBC:Seg3D2:CopyPasteTool:1" )
+  SEG3D_TOOL_URL( "http://scirundocwiki.sci.utah.edu/SCIRunDocs/index.php5/CIBC:Seg3D2:CopyPasteTool:1" )
 )
 
   // -- constructor/destructor --

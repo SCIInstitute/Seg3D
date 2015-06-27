@@ -43,7 +43,7 @@ SEG3D_TOOL_NAME( "IntensityCorrectionFilter", "Correct for gradual intensity cha
 SEG3D_TOOL_MENULABEL( "Intensity Correction" )
 SEG3D_TOOL_MENU( "Advanced Filters" )
 SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+I" )
-SEG3D_TOOL_URL( "http://www.sci.utah.edu/SCIRunDocs/index.php/CIBC:Seg3D2:IntensityCorrectionFilter:1" )
+SEG3D_TOOL_URL( "http://scirundocwiki.sci.utah.edu/SCIRunDocs/index.php5/CIBC:Seg3D2:IntensityCorrectionFilter:1" )
 SEG3D_TOOL_VERSION( "1" )
 )
 

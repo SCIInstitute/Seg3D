@@ -42,7 +42,7 @@ SEG3D_TOOL_NAME( "CurvatureAnisotropicDiffusionFilter", "Filter for smoothing da
 SEG3D_TOOL_MENULABEL( "Curvature AnisoDiff. Filter" )
 SEG3D_TOOL_MENU( "Advanced Filters" )
 SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+V" )
-SEG3D_TOOL_URL( "http://www.sci.utah.edu/SCIRunDocs/index.php/CIBC:Seg3D2:CurvatureAnistropicDiffusionFilter:1" )
+SEG3D_TOOL_URL( "http://scirundocwiki.sci.utah.edu/SCIRunDocs/index.php5/CIBC:Seg3D2:CurvatureAnistropicDiffusionFilter:1" )
 SEG3D_TOOL_VERSION( "1" )
 )
 

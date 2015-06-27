@@ -42,7 +42,7 @@ SEG3D_TOOL_NAME( "CannyEdgeDetectionFilter", "Compute the locations of edges ins
 SEG3D_TOOL_MENULABEL( "Canny Edge Detection" )
 SEG3D_TOOL_MENU( "Advanced Filters" )
 SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+E" )
-SEG3D_TOOL_URL( "http://www.sci.utah.edu/SCIRunDocs/index.php/CIBC:Seg3D2:CannyEdgeDetectionFilter:1" )
+SEG3D_TOOL_URL( "http://scirundocwiki.sci.utah.edu/SCIRunDocs/index.php5/CIBC:Seg3D2:CannyEdgeDetectionFilter:1" )
 SEG3D_TOOL_VERSION( "1" )
 )
 
