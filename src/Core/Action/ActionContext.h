@@ -188,11 +188,8 @@ public:
 
   // -- Status information --
 protected:
-
   // The last status report from the action engine
   ActionStatus status_;
-
-private:
   std::string error_msg_;
   Core::NotifierHandle notifier_;
   Core::ActionResultHandle result_;

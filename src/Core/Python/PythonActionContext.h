@@ -84,9 +84,6 @@ private:
 
 private:
   PythonActionMode action_mode_;
-  std::string error_msg_;
-  Core::NotifierHandle notifier_;
-  Core::ActionResultHandle result_;
 };
 
 } //end namespace Core
