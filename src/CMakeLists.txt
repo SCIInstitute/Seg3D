@@ -47,7 +47,7 @@ ENDIF()
 PROJECT(Seg3D)
 
 ###########################################
-# WHERE TO COMPILE EXECUTABLES
+# Where to compile executables
 ###########################################
 
 IF(NOT SEG3D_BINARY_DIR)
@@ -128,6 +128,14 @@ ELSE()
   SET(MSVC90_BUILD "x86")
   ADD_DEFINITIONS(-DSCI_32BITS)
 ENDIF()
+
+
+###########################################
+# Where to install command line tools, docs
+# and other extras on OS X
+###########################################
+
+SET(OSX_UTILS_DIR "Seg3DUtils")
 
 
 ############################################

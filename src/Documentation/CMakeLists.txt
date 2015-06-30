@@ -115,8 +115,11 @@ MACRO(ADD_PDF_DOCUMENT document)
       ${CMAKE_CURRENT_BINARY_DIR}/${document}_figures/${pdf_name} COPYONLY)
   ENDFOREACH(pdf_figure ${pdf_figures})
 
-  INSTALL(FILES ${SEG3D_BINARY_DIR}/Documentation/${document}.pdf DESTINATION Documentation)
-
+  IF(APPLE)
+    INSTALL(FILES ${SEG3D_BINARY_DIR}/Documentation/${document}.pdf DESTINATION ${OSX_UTILS_DIR})
+  ELSE()
+    INSTALL(FILES ${SEG3D_BINARY_DIR}/Documentation/${document}.pdf DESTINATION Documentation)
+  ENDIF()
 ENDMACRO(ADD_PDF_DOCUMENT)
 
 
@@ -124,5 +127,6 @@ ENDMACRO(ADD_PDF_DOCUMENT)
 
 ADD_PDF_DOCUMENT(Seg3DTutorial)
 ADD_PDF_DOCUMENT(Seg3DBasicFunctionality)
-ADD_PDF_DOCUMENT(Seg3DPythonCookbook)
+#ADD_PDF_DOCUMENT(Seg3DPythonCookbook)
+
 # Forcing documentation build
