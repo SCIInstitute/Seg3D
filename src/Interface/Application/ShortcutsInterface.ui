@@ -536,7 +536,7 @@ QWidget#scrollAreaWidgetContents_4{
                       <bool>true</bool>
                      </property>
                      <property name="text">
-                      <string>Drag layer To Other Group:</string>
+                      <string>Drag Layer To Other Group:</string>
                      </property>
                     </widget>
                    </item>
