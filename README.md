@@ -21,7 +21,7 @@ Table of Contents
 # Seg3D
 Seg3D (www.seg3d.org) is a free volume segmentation and processing tool developed by the NIH Center for Integrative Biomedical Computing at the University of Utah Scientific Computing and Imaging (SCI) Institute.
 
-See the Seg3D site (www.seg3d.org) for detailed information about the software and platform support.
+See the Seg3D site (www.seg3d.org) for detailed information about the software, platform support and documentation.
 
 ## Installing Seg3D from source
 
@@ -42,8 +42,8 @@ environments on OS X 10.7+.
 
 #### Linux
 
-The code base has been tested for use with GCC and this is the recommended compiler for
-linux.
+The code base has been tested for use with GCC, and this is the recommended compiler for
+linux. Compiler must support C++11.
 
 
 ### Dependencies
@@ -71,10 +71,10 @@ Qt is available from most package managers. Look for Qt 4.7-4.8.
 ### Compiling Seg3D
 
 Once you have obtained a compatible compiler and installed Qt 4.7 on your system, you need to 
-download and install CMake (www.cmake.org) to actually build the software. CMake is a platform
-independent configuring system that is used for generating Makefiles, Visual Studio project files,
-or Xcode project files. Once CMake has been installed, run CMake from your build (bin) directory and
-give a path to the CMake Superbuild directory containing the master CMakeLists.txt file.
+download and install CMake 2.8 (http://www.cmake.org/files/v2.8) to actually build the software.
+CMake is a platform independent configuring system that is used for generating Makefiles,
+Visual Studio project files, or Xcode project files.
+Once CMake has been installed, run CMake from your build (bin) directory and give a path to the CMake Superbuild directory containing the master CMakeLists.txt file.
 For example, on the command line:
 
 ```
@@ -86,8 +86,10 @@ The console version ccmake, or GUI version can also be used.
 You may be prompted to specify your location of the Qt installation.
 If you installed Qt in the default location, it should find Qt automatically.
 After configuration is done, generate the make files or project files for your favorite
-development environment and build. Following the previous example, the Seg3D application
-will be built in bin/Seg3D.
+development environment and build.
+
+Following the previous example, the Seg3D application will be built in bin/Seg3D.
+
 A bash build script (build.sh) is also available for Linux and Mac OS X to simplify the process.
 
 ## Seg3D Data
