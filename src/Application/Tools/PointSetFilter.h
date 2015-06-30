@@ -49,7 +49,7 @@ SEG3D_TOOL_NAME( "PointSetFilter", "Iterative Closest Point Registration operati
 SEG3D_TOOL_MENULABEL( "Point Set Registration" )
 SEG3D_TOOL_MENU( "Tools" )
 SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+I" )
-SEG3D_TOOL_URL( "http://www.sci.utah.edu/SCIRunDocs/index.php/CIBC:Seg3D2:PointSetFilter:1" )
+SEG3D_TOOL_URL( "http://scirundocwiki.sci.utah.edu/SCIRunDocs/index.php5/CIBC:Seg3D2:PointSetFilter:1" )
 SEG3D_TOOL_VERSION( "1" )
 )
 

@@ -31,10 +31,13 @@
 #endif
 
 #include <Python.h>
+
 #include <boost/filesystem.hpp>
 #include <boost/python.hpp>
 #include <boost/regex.hpp>
 #include <boost/thread/condition_variable.hpp>
+
+#include <sstream>
 
 #include <Core/Utils/Exception.h>
 #include <Core/Utils/Lockable.h>
@@ -262,8 +265,37 @@ void PythonInterpreter::initialize_eventhandler()
 
   Py_SetProgramName( const_cast< wchar_t* >( this->private_->program_name_ ) );
   boost::filesystem::path lib_path( this->private_->program_name_ );
-  lib_path = lib_path.parent_path() / PYTHONPATH;
-  Py_SetPath( lib_path.wstring().c_str() );
+  boost::filesystem::path top_lib_path = lib_path.parent_path() / PYTHONPATH;
+  boost::filesystem::path dynload_lib_path = top_lib_path / "lib-dynload";
+  boost::filesystem::path site_lib_path = top_lib_path / "site-packages";
+  std::wstringstream lib_paths;
+#if defined( _WIN32 )
+  const std::wstring PATH_SEP(L";");
+#else
+  const std::wstring PATH_SEP(L":");
+#endif
+
+#if defined( __APPLE__ )
+  boost::filesystem::path plat_lib_path = top_lib_path / "plat-darwin";
+  lib_paths << top_lib_path.wstring() << PATH_SEP
+            << plat_lib_path.wstring() << PATH_SEP
+            << dynload_lib_path.wstring() << PATH_SEP
+            << site_lib_path.wstring();
+  Py_SetPath( lib_paths.str().c_str() );
+#elif defined (_WIN32)
+  lib_paths << top_lib_path.wstring() << PATH_SEP
+            << site_lib_path.wstring();
+  Py_SetPath( lib_paths.str().c_str() );
+#else
+  // linux...
+  boost::filesystem::path plat_lib_path = top_lib_path / "plat-linux";
+  lib_paths << top_lib_path.wstring() << PATH_SEP
+            << plat_lib_path.wstring() << PATH_SEP
+            << dynload_lib_path.wstring() << PATH_SEP
+            << site_lib_path.wstring();
+  Py_SetPath( lib_paths.str().c_str() );
+#endif
+
   Py_IgnoreEnvironmentFlag = 1;
   Py_InspectFlag = 1;
   Py_OptimizeFlag = 2;

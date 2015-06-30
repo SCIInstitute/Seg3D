@@ -41,7 +41,7 @@ SEG3D_TOOL_NAME( "MedianFilter", "Filter for smoothing data." )
 SEG3D_TOOL_MENULABEL( "Median" )
 SEG3D_TOOL_MENU( "Data Filters" )
 SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+M" )
-SEG3D_TOOL_URL( "http://www.sci.utah.edu/SCIRunDocs/index.php/CIBC:Seg3D2:MedianFilter:1" )
+SEG3D_TOOL_URL( "http://scirundocwiki.sci.utah.edu/SCIRunDocs/index.php5/CIBC:Seg3D2:MedianFilter:1" )
 SEG3D_TOOL_VERSION( "1" )
 )
 

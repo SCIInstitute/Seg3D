@@ -46,7 +46,7 @@ SEG3D_TOOL
   SEG3D_TOOL_MENULABEL( "Transform" )
   SEG3D_TOOL_MENU( "Tools" )
   SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+9" )
-  SEG3D_TOOL_URL( "http://www.sci.utah.edu/SCIRunDocs/index.php/CIBC:Seg3D2:TransformTool:1" )
+  SEG3D_TOOL_URL( "http://scirundocwiki.sci.utah.edu/SCIRunDocs/index.php5/CIBC:Seg3D2:TransformTool:1" )
 )
 
   // -- constructor/destructor --

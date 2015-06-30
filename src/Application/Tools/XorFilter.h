@@ -43,7 +43,7 @@ SEG3D_TOOL_NAME( "XorFilter", "Boolean EXCLUSIVE OR operation between two mask l
 SEG3D_TOOL_MENULABEL( "Boolean XOR" )
 SEG3D_TOOL_MENU( "Mask Filters" )
 SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+X" )
-SEG3D_TOOL_URL( "http://www.sci.utah.edu/SCIRunDocs/index.php/CIBC:Seg3D2:XorFilter:1" )
+SEG3D_TOOL_URL( "http://scirundocwiki.sci.utah.edu/SCIRunDocs/index.php5/CIBC:Seg3D2:XorFilter:1" )
 SEG3D_TOOL_VERSION( "1" )
 )
 

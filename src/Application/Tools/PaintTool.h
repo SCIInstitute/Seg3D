@@ -87,7 +87,7 @@ SEG3D_TOOL
   SEG3D_TOOL_MENULABEL( "Paint Brush" )
   SEG3D_TOOL_MENU( "Tools" )
   SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+5" )
-  SEG3D_TOOL_URL( "http://www.sci.utah.edu/SCIRunDocs/index.php/CIBC:Seg3D2:PaintTool:1" )
+  SEG3D_TOOL_URL( "http://scirundocwiki.sci.utah.edu/SCIRunDocs/index.php5/CIBC:Seg3D2:PaintTool:1" )
   SEG3D_TOOL_HOTKEYS( "Increase Brush Size=Mouse Scroll Up|Decrease Brush Size=Mouse"
     "Scroll Down|Paint Floodfill=F|Erase Floodfill=E|Paint=Left Mouse Button|"
     "Erase=Right Mouse Button|Clear Seed Points=C|Insert Seed Point=Alt Left Mouse Button|"
