@@ -45,6 +45,11 @@ namespace Seg3D
 
 CORE_SINGLETON_IMPLEMENTATION( LayerIO );
 
+const std::string DATA_MODE = "data";
+const std::string SINGLE_MASK_MODE = "single_mask";
+const std::string LABEL_MASK_MODE = "label_mask";
+const std::string BITPLANE_MASK_MODE = "bitplane_mask";
+
 class LayerIOPrivate
 {
 public:

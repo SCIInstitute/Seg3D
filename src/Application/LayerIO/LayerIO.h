@@ -155,6 +155,11 @@ public:
   /// Process the names/name of a file in a file series and find all the files that should
   /// belong to that file series bsed on the filenames of the files in the same directory.
   static bool FindFileSeries( std::vector<std::string >& filenames );
+
+  static const std::string DATA_MODE;
+  static const std::string SINGLE_MASK_MODE;
+  static const std::string LABEL_MASK_MODE;
+  static const std::string BITPLANE_MASK_MODE;
     
 };
 
