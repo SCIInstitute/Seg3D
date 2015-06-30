@@ -635,8 +635,6 @@ GridTransform LargeVolumeSchema::get_brick_grid_transform( const BrickInfo& bi )
                     - spacing * static_cast<double>( overlap );
   IndexVector bs = this->private_->compute_remainder_brick(bi, index);
 
-std::cerr << "actual brick_size= [" << bs.x() << " " << bs.y() << " " << bs.z() << "]" << std::endl;
-
   return GridTransform( bs.x(), bs.y(), bs.z(),
                         origin + offset,
                         spacing.x() * GridTransform::X_AXIS,
@@ -760,9 +758,6 @@ IndexVector LargeVolumeSchema::get_brick_size( const BrickInfo& bi ) const
   const IndexVector& index = this->private_->compute_brick_index_vector( layout, bi.index_ );
 
   IndexVector result = this->private_->compute_remainder_brick(bi, index);
-
-std::cerr << "actual brick_size= [" << result.x() << " " << result.y() << " " << result.z() << "]" << std::endl;
-
   return result;
 }
 
