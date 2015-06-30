@@ -624,6 +624,9 @@ Names of masks can be manually changed by clicking the current name and typing i
 & IsosurfaceDelete Icon: This icon deletes active isosurfaces (if the mask\\
 & has one).\\
 \hline
+\multirow{1}{*}{}
+& Shift+Left Button Drag Layer: This moves a layer from one group to another with resampling. \\
+\hline
 \end{tabular}
 \end{table}
 
@@ -1137,11 +1140,13 @@ This tool will modify the original layer without an option to create a new layer
 
 \subsection{Crop}
 
-The crop tool will crop one or more layer to a specified size.  This tool will clip multiple layers from the same group to the same size  by choosing them in the list of layers near the top of the window.  
+The crop tool will crop one or more layer to a specified size. This tool will clip multiple layers from the same group to the same size  by choosing them in the list of layers near the top of the window. The crop tool also works on the new Seg3D large volume data layer format.
 
 The size of the new volume can be specified using the sliders in the tool window, or by adjusting the widget in the 2D viewing windows.   The sliders in the tools window will specify the origin and the size of the cropping region.  The buttons over the slider specify which parameter is displayed. It should be noted that you can display the indexed or geometric coordinates by checking/unchecking the `crop in indexed space' option near the bottom of the window.  
 
 The crop widget is shown as a red box in the 2d viewers.  This can be adjusted in any plane by clicking and dragging on the edge to change the size, or in the middle to change the origin.  The mouse pointer will change to indicate which function will be effected.  Press `Crop' to finish cropping the volumes.
+
+Currently, data layers should not have more than 4096 pixels in a single dimension, as data layers are not rendered as bricks, but as a single texture.
 
 \subsection{Flip/Rotate}
 
@@ -1213,6 +1218,11 @@ E & Erase flood fill\\
 \end{tabular}
 \end{table}
 
+\subsection{Select Points}
+
+Select set of points either in pixel or actual (world) coordinates and save as a text file. Works with either data or mask layers.
+Clicking on a layer in one of the 2D views places a point. Secondary (right mouse button) click deletes a point.
+
 \subsection{Point Set Registration}
 
 The point set registration tool will register one mask layer to another mask layer.  This is currently the only tool or filter that will take inputs from two different layer groups as the main purpose of this tool is to allow the user to map a segmentation from one grid to another with a similar mask layer.  The tool attempts to register the entire mask data to another mask data using the iterative closest points method(rigid registration) and will save and display the transform generated for use on the other layers in the registered layer's group.  Since this is an iterative method, the user can set the number of iterations. 
@@ -1254,7 +1264,9 @@ The resample tool will allow the user to resample one or more volumes to change 
 
 The resampling can be set manually using the sliders, or by trying to match the element number of another layer group.  To manually choose the resampling, there are options to resample with the same ratio in every direction (check `Constrain Aspect' option) or to resample each direction independently (must uncheck `Constrain Aspect' option to enable).  To resample to match another group, you must have another layer group loaded.  You may choose the desired group from the drop down menu and the padding value.  
 
-When resample, there is often interpolation of the data needed, especially with image data.  There are several options for interpolation in the resample tool: box, tent, cubic (Catmull-Rom and B-spline), quartic, and guassian.  You may choose the interpolation method in the drop down menu near the bottom of  the tool window.  
+Interpolation of the data is often needed when resampling, especially with image data.  There are several options for interpolation in the resample tool: box, tent, cubic (Catmull-Rom and B-spline), quartic, and guassian.  You may choose the interpolation method in the drop down menu near the bottom of  the tool window.
+
+Resampling a layer to match the geometry of another group can also be done by clicking (left mouse button) on a layer while holding down the Shift key, and dragging the layer to the destination group.
 
 \subsection{Speedline}
 
@@ -1372,6 +1384,19 @@ Though there appears to be several features similar to the fast binary dilate -$
 It should be noted that the edge of the volume provides complications to this filter.  If the mask layer is touching the edge of the volume and erode is performed, the edge slice will perform a 2D erosion only, so that the mask still connects to the edge.  This can  become a problem when the original mask data is near the edge, but not touching, then dilate -$>$ erode is run so that the dilate causes the mask to touch the edge.  The erosion will then leave the mask touching the edge of the volume.
 
 This filter and fast binary dilate -$>$ erode are similar in function, but are slightly different in the results.  As the name suggests, smooth binary dilate -$>$ erode will produce a smoother surface after each step due to an additional correction in the algorithm.  This additional step adds to runtime dramatically.  You should use this algorithm if the radii used are large, or if the erosion and dilation are performed multiple times each.  
+
+\section{Large Volume Tools}
+
+Seg3D introduced a custom bricked file format in v2.2, which is generated from an image stack using the \textbf{CreateLargeVolume} command line utility.
+The large data volume is a directory with the extension \emph{.s3dvol} containing the bricks and a \emph{volume.txt} file that stores the data set information.
+Usage information is available for the \textbf{CreateLargeVolume} command line utility using the \textbf{--help} flag.
+
+\subsection{Extract DataLayer}
+
+The Extract DataLayer tool allows user to select one of the levels of detail from the large data volume and convert it into a normal data layer. Once it is converted, the user can run any filter on the
+data. Currently, data layers should not have more than 4096 pixels in a single dimension, as data layers are not rendered as bricks, but as a single texture.
+
+It is expected that the Extract DataLayer and Crop tools will often be used together, with a user cropping a region of the large volume and then selecting an appropriate level of resolution to convert the large volume layer into a normal data layer.
 
 \section{Data Filters}
 
