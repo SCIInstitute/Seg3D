@@ -310,7 +310,8 @@ bool ActionRadialBasisFunction::run( ActionContextHandle& context, ActionResultH
   algo->lock_for_use( this->private_->srcLayer_ );
 
   // Create the destination layer, which will show progress
-  algo->create_and_lock_data_layer_from_layer( this->private_->srcLayer_, private_->dstLayer_ );
+  algo->create_and_lock_data_layer_from_layer( this->private_->srcLayer_, this->private_->dstLayer_ );
+  this->private_->dstLayer_->master_visible_state_->set(false);
 
   // Return the id of the destination layer.
   result = ActionResultHandle( new ActionResult( this->private_->dstLayer_->get_layer_id() ) );
