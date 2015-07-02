@@ -420,29 +420,29 @@ SegmentationSummaryPage::SegmentationSummaryPage( SegmentationPrivateHandle priv
 
 void SegmentationSummaryPage::initializePage()
 {
-    QString finishText = wizard()->buttonText(QWizard::FinishButton);
-    finishText.remove('&');
-    
-    this->private_->layers_->deleteLater();
-  
+  QString finishText = wizard()->buttonText(QWizard::FinishButton);
+  finishText.remove('&');
+
+  this->private_->layers_->deleteLater();
+
   this->private_->layers_ = new QWidget();
   this->private_->layers_->setObjectName( QString::fromUtf8( "layers_" ) );
   this->private_->layers_->setStyleSheet( QString::fromUtf8( "background-color: white;" ) );
-    
+
   this->private_->masks_layout_ = new QVBoxLayout( this->private_->layers_ );
   this->private_->masks_layout_->setObjectName( QString::fromUtf8( "masks_layout_" ) );
   this->private_->masks_layout_->setContentsMargins( 0, 0, 0, 0 );
   this->private_->masks_layout_->setSpacing( 0 );
   this->private_->masks_layout_->setAlignment( Qt::AlignTop );
   this->private_->mask_scroll_area_->setWidget( this->private_->layers_ );
-  
+
   bool save_as_single_file = this->private_->single_file_radio_button_->isChecked();
   
   // TODO: creates new mask layer widget for background -> where should underlying mask layer be created?
   // Alternatively, don't put new mask layer widget in vector passed to action (is this possible???)
   
   // insert the background layer settings
-  if( save_as_single_file )
+  if ( save_as_single_file )
   {
     QtLayerListWidget* new_mask = new QtLayerListWidget( this->private_->layers_ );
     new_mask->set_mask_name( "Background" );
@@ -451,7 +451,7 @@ void SegmentationSummaryPage::initializePage()
     connect( new_mask, SIGNAL( index_changed_signal() ), this, SIGNAL( completeChanged() ) ); 
   }
   
-  for( int i = 0; i < static_cast< int >( this->private_->masks_.size() ); ++i )
+  for ( int i = 0; i < static_cast< int >( this->private_->masks_.size() ); ++i )
   {
     this->private_->masks_[ i ]->set_mask_index( i );
     this->private_->masks_[ i ]->hide_counter( !save_as_single_file );

@@ -123,8 +123,8 @@ SET(APPLICATION_TOOLS_SRCS
   SpeedlineTool.cc
   PointsSelectTool.h
   PointsSelectTool.cc
-#  RadialBasisFunctionTool.h - TODO: get ImplicitFunction library update
-#  RadialBasisFunctionTool.cc - TODO: get ImplicitFunction library update
+  RadialBasisFunctionTool.h
+  RadialBasisFunctionTool.cc
 )
 
 SET(APPLICATION_TOOLS_NOREGISTER_SRCS

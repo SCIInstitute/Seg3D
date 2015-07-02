@@ -44,14 +44,17 @@ typedef boost::shared_ptr< ActionRadialBasisFunctionPrivate > ActionRadialBasisF
 typedef Core::Point VertexCoord;
 typedef std::vector< VertexCoord > VertexList;
 
+typedef std::vector< std::string > ViewModeList;
+
 class ActionRadialBasisFunction : public Seg3D::LayerAction
 {
 CORE_ACTION(
  CORE_ACTION_TYPE( "RadialBasisFunction", "Implicit function action interface" )
  CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
  CORE_ACTION_ARGUMENT( "vertices", "The 3D points needed to generate the radial basis function." )
+ CORE_ACTION_ARGUMENT( "view_modes", "The 2D view where each point was picked (axial or sagittal or coronal)." )
  CORE_ACTION_ARGUMENT( "normal_offset", "Normal vector offset parameter." )
- CORE_ACTION_OPTIONAL_ARGUMENT( "kernel", "thin_plate", "Kernel (options are thin_plate or gaussian or multi_quadratic)." )
+ CORE_ACTION_OPTIONAL_ARGUMENT( "kernel", "thin_plate", "Radial basis function kernel (thin_plate or gaussian or multi_quadratic)." )
  CORE_ACTION_OPTIONAL_ARGUMENT( "sandbox", "-1", "The sandbox in which to run the action." )
  CORE_ACTION_ARGUMENT_IS_NONPERSISTENT( "sandbox" )
  CORE_ACTION_CHANGES_PROJECT_DATA()
@@ -82,6 +85,7 @@ public:
                        Core::ActionContextHandle context,
                        const std::string& target,
                        const VertexList& vertices,
+                       const ViewModeList& viewModes,
                        double normalOffset,
                        const std::string& kernel
                       );
