@@ -31,6 +31,7 @@
 #include <Application/Filters/LayerFilter.h>
 #include <Application/Filters/Actions/ActionThreshold.h>
 #include <Application/Layer/LayerManager.h>
+#include <Application/Viewer/Viewer.h>
 
 #include <Core/Utils/ConnectionHandler.h>
 #include <Core/Utils/Log.h>
@@ -41,6 +42,7 @@
 #include <Core/Volume/DataVolume.h>
 
 #include <string>
+#include <sstream>
 #include <vector>
 
 // Boost includes
@@ -49,6 +51,7 @@
 
 // RBF library includes
 #include <RBFInterface.h>
+#include <ScatteredData.h>
 #include <vec3.h>
 
 CORE_REGISTER_ACTION( RadialBasisFunction, RadialBasisFunction )
@@ -107,6 +110,7 @@ public:
   LayerHandle dstLayer_;
   std::string targetLayerID_;
   VertexList vertices_;
+  ViewModeList view_modes_;
   double normalOffset_;
   std::string kernel_;
   double thresholdValue_;
@@ -126,14 +130,50 @@ public:
     DataLayerHandle dstDataLayer = boost::dynamic_pointer_cast<DataLayer>(this->actionInternal_->dstLayer_);
     GridTransform srcGridTransform = srcDataLayer->get_grid_transform();
 
+// test
+if ( this->actionInternal_->vertices_.size() != this->actionInternal_->view_modes_.size() )
+{
+  this->report_error("Bad points data.");
+  return;
+}
+for (int i = 0; i < this->actionInternal_->vertices_.size(); ++i)
+{
+std::cerr << "point and viewer mode: " << this->actionInternal_->vertices_[i] << ", " << this->actionInternal_->view_modes_[i] << std::endl;
+}
+// test
+
     std::vector<vec3> rbfPointData;
-    for (VertexList::iterator it = this->actionInternal_->vertices_.begin();
-         it != this->actionInternal_->vertices_.end();
-         ++it)
+    for ( auto &vertex : this->actionInternal_->vertices_ )
     {
-      std::cerr << *it << std::endl;
-      rbfPointData.push_back( vec3(it->x(), it->y(), it->z()) );
+      std::cerr << vertex << std::endl;
+      rbfPointData.push_back( vec3(vertex.x(), vertex.y(), vertex.z()) );
     }
+
+    std::vector<axis_t> axisData;
+    for ( auto &mode : this->actionInternal_->view_modes_ )
+    {
+      if ( mode == Viewer::SAGITTAL_C ) // X
+      {
+        axisData.push_back(axis_t::X);
+      }
+      else if (mode == Viewer::CORONAL_C ) // Y
+      {
+        axisData.push_back(axis_t::Y);
+      }
+      else if ( mode == Viewer::AXIAL_C ) // Z
+      {
+        axisData.push_back(axis_t::Z);
+      }
+      else
+      {
+        std::ostringstream oss;
+        oss << "Invalid viewer mode " << mode;
+        this->report_error( oss.str() );
+        return;
+      }
+    }
+
+
     // origin and size from source data layer
     Point origin = srcGridTransform.get_origin();
     // TODO: debug print
@@ -157,7 +197,8 @@ public:
       kernel = MultiQuadratic;
     }
 
-    RBFInterface rbfAlgo(rbfPointData, rbfOrigin, rbfGridSize, rbfGridSpacing, this->actionInternal_->normalOffset_, kernel);
+    RBFInterface rbfAlgo( rbfPointData, rbfOrigin, rbfGridSize, rbfGridSpacing,
+                          this->actionInternal_->normalOffset_, axisData, kernel );
     this->actionInternal_->thresholdValue_ = rbfAlgo.getThresholdValue();
 
     Core::DataBlockHandle dstDataBlock = Core::StdDataBlock::New( srcGridTransform, Core::DataType::FLOAT_E );
@@ -219,6 +260,7 @@ ActionRadialBasisFunction::ActionRadialBasisFunction() :
 {
   this->add_layer_id( this->private_->targetLayerID_ );
   this->add_parameter( this->private_->vertices_ );
+  this->add_parameter( this->private_->view_modes_ );
   this->add_parameter( this->private_->normalOffset_ );
   this->add_parameter( this->private_->kernel_ );
   this->add_parameter( this->sandbox_ );
@@ -268,7 +310,8 @@ bool ActionRadialBasisFunction::run( ActionContextHandle& context, ActionResultH
   algo->lock_for_use( this->private_->srcLayer_ );
 
   // Create the destination layer, which will show progress
-  algo->create_and_lock_data_layer_from_layer( this->private_->srcLayer_, private_->dstLayer_ );
+  algo->create_and_lock_data_layer_from_layer( this->private_->srcLayer_, this->private_->dstLayer_ );
+  this->private_->dstLayer_->master_visible_state_->set(false);
 
   // Return the id of the destination layer.
   result = ActionResultHandle( new ActionResult( this->private_->dstLayer_->get_layer_id() ) );
@@ -320,6 +363,7 @@ void ActionRadialBasisFunction::Dispatch(
                                            ActionContextHandle context,
                                            const std::string& target,
                                            const VertexList& vertices,
+                                           const ViewModeList& viewModes,
                                            double normalOffset,
                                            const std::string& kernel
                                          )
@@ -327,6 +371,7 @@ void ActionRadialBasisFunction::Dispatch(
   ActionRadialBasisFunction* action = new ActionRadialBasisFunction;
   action->private_->targetLayerID_ = target;
   action->private_->vertices_ = vertices;
+  action->private_->view_modes_ = viewModes;
   action->private_->normalOffset_ = normalOffset;
   action->private_->kernel_ = kernel;
 
