@@ -45,12 +45,13 @@ class ConnectedComponentFilter : public SeedPointsTool
 {
 
 SEG3D_TOOL(
-SEG3D_TOOL_NAME( "ConnectedComponentFilter", "Select all components connected to the seed points." )
-SEG3D_TOOL_MENULABEL( "Connected Component" )
-SEG3D_TOOL_MENU( "Mask Filters" )
-SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+C" )
-SEG3D_TOOL_URL( "http://scirundocwiki.sci.utah.edu/SCIRunDocs/index.php5/CIBC:Seg3D2:ConnectedComponentFilter:1" )
-SEG3D_TOOL_VERSION( "1" )
+  SEG3D_TOOL_NAME( "ConnectedComponentFilter", "Select all components connected to the seed points." )
+  SEG3D_TOOL_MENULABEL( "Connected Component" )
+  SEG3D_TOOL_MENU( "Mask Filters" )
+  SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+C" )
+  SEG3D_TOOL_URL( "http://scirundocwiki.sci.utah.edu/SCIRunDocs/index.php5/CIBC:Seg3D2:ConnectedComponentFilter:1" )
+  SEG3D_TOOL_VERSION( "1" )
+  SEG3D_TOOL_HOTKEYS("C=Clear seed points.|Left Mouse Button=Add seed point.|Right Mouse Button=Delete seed point.")
 )
 
   // -- constructor/destructor --
