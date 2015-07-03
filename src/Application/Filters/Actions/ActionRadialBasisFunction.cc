@@ -129,23 +129,15 @@ public:
     DataLayerHandle srcDataLayer = boost::dynamic_pointer_cast<DataLayer>(this->actionInternal_->srcLayer_);
     DataLayerHandle dstDataLayer = boost::dynamic_pointer_cast<DataLayer>(this->actionInternal_->dstLayer_);
     GridTransform srcGridTransform = srcDataLayer->get_grid_transform();
-
-// test
-if ( this->actionInternal_->vertices_.size() != this->actionInternal_->view_modes_.size() )
-{
-  this->report_error("Bad points data.");
-  return;
-}
-for (int i = 0; i < this->actionInternal_->vertices_.size(); ++i)
-{
-std::cerr << "point and viewer mode: " << this->actionInternal_->vertices_[i] << ", " << this->actionInternal_->view_modes_[i] << std::endl;
-}
-// test
+//    if ( this->actionInternal_->vertices_.size() != this->actionInternal_->view_modes_.size() )
+//    {
+//      this->report_error("Bad points data.");
+//      return;
+//    }
 
     std::vector<vec3> rbfPointData;
     for ( auto &vertex : this->actionInternal_->vertices_ )
     {
-      std::cerr << vertex << std::endl;
       rbfPointData.push_back( vec3(vertex.x(), vertex.y(), vertex.z()) );
     }
 
@@ -177,14 +169,14 @@ std::cerr << "point and viewer mode: " << this->actionInternal_->vertices_[i] <<
     // origin and size from source data layer
     Point origin = srcGridTransform.get_origin();
     // TODO: debug print
-    std::cerr << "Source data origin: " << origin << std::endl;
+//    std::cerr << "Source data origin: " << origin << std::endl;
     vec3 rbfOrigin(origin.x(), origin.y(), origin.z());
     vec3 rbfGridSize(srcGridTransform.get_nx(), srcGridTransform.get_ny(), srcGridTransform.get_nz());
     vec3 rbfGridSpacing(srcGridTransform.spacing_x(), srcGridTransform.spacing_y(), srcGridTransform.spacing_z());
     // TODO: debug print
-    std::cerr << "Source data size: " << rbfGridSize[0] << ", "
-                                      << rbfGridSize[1] << ", "
-                                      << rbfGridSize[2] << std::endl;
+//    std::cerr << "Source data size: " << rbfGridSize[0] << ", "
+//                                      << rbfGridSize[1] << ", "
+//                                      << rbfGridSize[2] << std::endl;
 
     // From RBF class. ThinPlate is the default kernel.
     Kernel kernel = ThinPlate;
@@ -219,7 +211,7 @@ std::cerr << "point and viewer mode: " << this->actionInternal_->vertices_[i] <<
       }
     }
     dstDataBlock->update_histogram();
-    std::cerr << "Min: " << dstDataBlock->get_min() << ", max: " << dstDataBlock->get_max() << std::endl;
+//    std::cerr << "Min: " << dstDataBlock->get_min() << ", max: " << dstDataBlock->get_max() << std::endl;
 
     // TODO: threshold from 0 to dataset max to get mask layer
 
@@ -348,9 +340,6 @@ bool ActionRadialBasisFunction::run_threshold( ActionContextHandle& context )
 {
   DataLayerHandle dstDataLayer = boost::dynamic_pointer_cast<DataLayer>( this->private_->dstLayer_ );
   double dstMaxValue = dstDataLayer->get_data_volume()->get_data_block()->get_max();
-  // TODO: debug print
-  std::cerr << "Threshold " << dstDataLayer->get_layer_id() << " min=" << this->private_->thresholdValue_ << ", max=" << dstMaxValue << std::endl;
-
   ActionThreshold::Dispatch(context,
                             dstDataLayer->get_layer_id(),
                             this->private_->thresholdValue_,
