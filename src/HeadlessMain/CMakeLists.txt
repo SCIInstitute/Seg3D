@@ -68,6 +68,9 @@ TARGET_LINK_LIBRARIES(${APPLICATION_NAME}
   Application_Tools
   Application_Filters
   Application_Socket
+  ${SCI_ZLIB_LIBRARY}
+  ${SCI_PNG_LIBRARY}
+  ${SCI_TEEM_LIBRARY}
   ${ImplicitFunction_LIBRARY}
 )
 
