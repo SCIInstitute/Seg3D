@@ -125,8 +125,7 @@ int main( int argc, char **argv )
     return -1;
   }
 
-  // TODO: DICOM support needed
-  if (! Core::FileUtil::CheckExtension( first_file, ".tif|.tiff|.png|.jpg|.jpeg" ) )
+  if (! Core::FileUtil::CheckExtension( first_file, ".tif|.tiff|.png|.jpg|.jpeg|.dcm|.dicom" ) )
   {
     printUsage();
     CORE_PRINT_AND_LOG_ERROR("Input file needs to be a png, jpg, or tiff file.");

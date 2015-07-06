@@ -71,7 +71,7 @@ SET(INTERFACE_TOOLINTERFACE_SRCS
   PointSetFilterInterface.cc
   SpeedlineToolInterface.cc
   PointsSelectToolInterface.cc
-#  RadialBasisFunctionToolInterface.cc - TODO: get ImplicitFunction library update
+  RadialBasisFunctionToolInterface.cc
 )
 
 SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
@@ -119,7 +119,7 @@ SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
   PointSetFilterInterface.h
   SpeedlineToolInterface.h
   PointsSelectToolInterface.h
-#  RadialBasisFunctionToolInterface.h - TODO: get ImplicitFunction library update
+  RadialBasisFunctionToolInterface.h
 )
 
 SET(INTERFACE_TOOLINTERFACE_NO_MOC_SRCS
@@ -170,7 +170,7 @@ SET(INTERFACE_TOOLINTERFACE_UI_SRCS
   PointSetFilterInterface.ui
   SpeedlineToolInterface.ui
   PointsSelectToolInterface.ui
-#  RadialBasisFunctionToolInterface.ui - TODO: get ImplicitFunction library update
+  RadialBasisFunctionToolInterface.ui
 )
 
 ##################################################

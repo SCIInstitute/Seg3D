@@ -49,39 +49,46 @@ bool ActionExportIsosurface::validate( Core::ActionContextHandle& context )
 {
   
   LayerHandle temp_handle = LayerManager::Instance()->find_layer_by_id( this->layer_ );
-  if( !temp_handle )
+  if ( ! temp_handle )
   {
-    context->report_error( std::string( "No valid layer was given" ) );
+    context->report_error( std::string( "No valid layer was given." ) );
     return false;
   }
   
   MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( temp_handle.get() );  
   
-  if( !mask_layer->iso_generated_state_->get() )
+  if ( ! mask_layer->iso_generated_state_->get() )
   {
-    context->report_error( std::string( "Isosurface not created for this layer.  Please create isosurface before exporting" ) );
+    context->report_error( std::string( "Isosurface not created for this layer.  Please create isosurface before exporting." ) );
+    return false;
+  }
+
+  if ( mask_layer->get_isosurface()->surface_area() == 0 )
+  {
+    context->report_error( std::string( "Isosurface is empty." ) );
     return false;
   }
   
   boost::filesystem::path isosurface_path( this->file_path_ );
-  if ( !( boost::filesystem::exists ( isosurface_path.parent_path() ) ) )
+  if ( ! boost::filesystem::exists ( isosurface_path.parent_path() ) )
   {
-    context->report_error( std::string( "The path '" ) + this->file_path_ +
-                          "' does not exist." );
+    std::ostringstream error;
+    error << "The path '" << this->file_path_ << "' does not exist.";
+    context->report_error( error.str() );
     return false;
   }
   
   boost::filesystem::path extension = isosurface_path.extension();
   
   if (! ( (extension == ".fac") ||
-         (extension == ".pts") ||
-         (extension == ".val") ||
-         (extension == ".stl") ||
-         (extension == ".vtk") ) )
+          (extension == ".pts") ||
+          (extension == ".val") ||
+          (extension == ".stl") ||
+          (extension == ".vtk") ) )
   {
-    std::ostringstream oss;
-    oss << extension << " is not supported for isosurface export.";
-    context->report_error(oss.str());
+    std::ostringstream error;
+    error << extension << " is not supported for isosurface export.";
+    context->report_error( error.str() );
   }
   
   if (this->name_ == "<none>")

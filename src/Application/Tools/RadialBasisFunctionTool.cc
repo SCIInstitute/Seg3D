@@ -33,8 +33,15 @@
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Layer/Layer.h>
 #include <Application/Layer/LayerManager.h>
+#include <Application/Viewer/Viewer.h>
+#include <Application/ViewerManager/ViewerManager.h>
 
-#include <Core/Utils/ScopedCounter.h>
+#include <Core/State/Actions/ActionAdd.h>
+#include <Core/State/Actions/ActionClear.h>
+#include <Core/State/Actions/ActionRemove.h>
+#include <Core/Viewer/Mouse.h>
+#include <Core/Volume/VolumeSlice.h>
+#include <Core/Interface/Interface.h>
 
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL( Seg3D, RadialBasisFunctionTool )
@@ -47,115 +54,99 @@ using namespace RadialBasisFunction;
 RadialBasisFunctionTool::RadialBasisFunctionTool( const std::string& toolid ) :
   SeedPointsTool( Core::VolumeType::DATA_E, toolid )
 {
-  // Create an empty list of label options
-
-  // add default values for the the states
-	double inf = std::numeric_limits< double >::infinity();
   // TODO: slider max should be up to 20% of source data range.
   // See threshold tool for good implementation example.
   this->add_state( "normal_offset", this->normalOffset_state_, 10.0, 1.0, 20.0, 0.1 );
-	this->add_state( "kernel", this->kernel_state_, "thin_plate",
+  this->add_state( "kernel", this->kernel_state_, "thin_plate",
                    "thin_plate|gaussian|multi_quadratic" );
+  this->add_state( "view_modes", this->view_modes_state_ );
 }
 
 RadialBasisFunctionTool::~RadialBasisFunctionTool()
 {
   this->disconnect_all();
 }
-//
-//bool RadialBasisFunctionTool::handle_mouse_press( ViewerHandle viewer, const Core::MouseHistory& mouse_history, int button, int buttons, int modifiers )
-//{
-//}
-//
-//bool RadialBasisFunctionTool::handle_mouse_release( ViewerHandle viewer, const Core::MouseHistory& mouse_history, int button, int buttons, int modifiers )
-//{
-//}
-//
-//bool RadialBasisFunctionTool::handle_mouse_move( ViewerHandle viewer, const Core::MouseHistory& mouse_history, int button, int buttons, int modifiers )
-//{
-//}
-//
-//void RadialBasisFunctionTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat, int viewer_width, int viewer_height )
-//{
-//}
-//
-//bool RadialBasisFunctionTool::has_2d_visual()
-//{
-//  return true;
-//}
 
-//void RadialBasisFunctionTool::handle_seed_points_changed()
-//{
-////	std::string target_layer_id = this->target_layer_state_->get();
-////	if ( target_layer_id == Tool::NONE_OPTION_C )
-////	{
-////		return;
-////	}
-////
-////	const Core::StatePointVector::value_type& seed_points = this->seed_points_state_->get();
-//////	if ( seed_points.size() == 0 )
-//////	{
-//////		this->private_->update_viewers();
-//////		return;
-//////	}
-////
-////	DataLayerHandle data_layer = boost::dynamic_pointer_cast< DataLayer >(
-////    LayerManager::Instance()->find_layer_by_id( target_layer_id ) );
-////	Core::DataVolumeHandle data_volume = data_layer->get_data_volume();
-////	Core::DataBlockHandle data_block = data_volume->get_data_block();
-////	double min_val = std::numeric_limits< double >::max();
-////	double max_val = std::numeric_limits< double >::min();
-////	for ( size_t i = 0; i < seed_points.size(); ++i )
-////	{
-////		Core::Point pt = data_volume->apply_inverse_grid_transform( seed_points[ i ] );
-////		int x = Core::Round( pt[ 0 ] );
-////		int y = Core::Round( pt[ 1 ] );
-////		int z = Core::Round( pt[ 2 ] );
-////		if ( x >= 0 && x < static_cast< int >( data_block->get_nx() ) &&
-////        y >= 0 && y < static_cast< int >( data_block->get_ny() ) &&
-////        z >= 0 && z < static_cast< int >( data_block->get_nz() ) )
-////		{
-////			double val = data_block->get_data_at( static_cast< size_t >( x ), static_cast< size_t >( y ), static_cast< size_t >( z ) );
-////			min_val = Core::Min( min_val, val );
-////			max_val = Core::Max( max_val, val );
-////		}
-////	}
-////
-////	{
-////		Core::ScopedCounter signal_block( this->private_->signal_block_count_ );
-////		this->upper_threshold_state_->set( max_val );
-////		this->lower_threshold_state_->set( min_val );
-////	}
-////  
-//////	this->private_->update_viewers();
-//}
+bool RadialBasisFunctionTool::handle_mouse_press( ViewerHandle viewer,
+                                                  const Core::MouseHistory& mouse_history,
+                                                  int button, int buttons, int modifiers )
+{
+  std::string view_mode;
+  Core::VolumeSliceHandle target_slice;
+  double world_x, world_y;
 
-//void RadialBasisFunctionTool::handle_target_layer_changed()
-//{
-//  std::string target_layer_id = this->target_layer_state_->get();
-//  if ( target_layer_id != Tool::NONE_OPTION_C )
-//  {
-////    Core::ScopedCounter signal_block( this->signal_block_count_ );
-//
-//    DataLayerHandle data_layer = boost::dynamic_pointer_cast< DataLayer >(
-//      LayerManager::Instance()->find_layer_by_id( target_layer_id ) );
-//    double min_val = data_layer->get_data_volume()->get_data_block()->get_min();
-//    double max_val = data_layer->get_data_volume()->get_data_block()->get_max();
-//
-//    //TODO: We need to fix this.  This causes an inconsistency in the threshold tool between
-//    // the histogram and the sliders
-//    // 		double epsilon = ( max_val - min_val ) * 0.005;
-//    // 		min_val -= epsilon;
-//    // 		max_val += epsilon;
-////    this->isovalue_state_->set_range( min_val, max_val );
-////    
-//    if ( this->seed_points_state_->get().size() > 0 )
-//    {
-//      this->handle_seed_points_changed();
-//    }
-//  }
-////  this->update_viewers();
-//}
+  {
+    Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
+
+    if ( viewer->is_volume_view() )
+    {
+      return false;
+    }
+
+    view_mode = viewer->view_mode_state_->get();
+
+    std::string target_layer_id = this->target_layer_state_->get();
+    if ( target_layer_id == Tool::NONE_OPTION_C )
+    {
+      return false;
+    }
+    target_slice = viewer->get_volume_slice( target_layer_id );
+
+    if ( ! target_slice || target_slice->out_of_boundary() )
+    {
+      return false;
+    }
+
+    viewer->window_to_world( mouse_history.current_.x_,
+                             mouse_history.current_.y_, world_x, world_y );
+  }
+
+  if ( button == Core::MouseButton::LEFT_BUTTON_E &&
+       ( modifiers == Core::KeyModifier::NO_MODIFIER_E ||
+         modifiers & ( Core::KeyModifier::ALT_MODIFIER_E) ) )
+  {
+    int u, v;
+    target_slice->world_to_index( world_x, world_y, u, v );
+    if ( u >= 0 && u < static_cast< int >( target_slice->nx() ) &&
+         v >= 0 && v < static_cast< int >( target_slice->ny() ) )
+    {
+      Core::Point pos;
+      target_slice->get_world_coord( world_x, world_y, pos );
+      Core::ActionAdd::Dispatch( Core::Interface::GetMouseActionContext(),
+                                 this->seed_points_state_, pos );
+      Core::ActionAdd::Dispatch( Core::Interface::GetMouseActionContext(),
+                                 this->view_modes_state_, view_mode );
+//      viewerPointMap.insert( std::make_pair(pos, view_mode) );
+      return true;
+    }
+  }
+  else if ( button == Core::MouseButton::RIGHT_BUTTON_E &&
+           ( modifiers == Core::KeyModifier::NO_MODIFIER_E ||
+            modifiers & (Core::KeyModifier::ALT_MODIFIER_E) )  )
+  {
+    Core::Point pt;
+    if ( this->find_point( viewer, world_x, world_y, target_slice, pt ) )
+    {
+      Core::ActionRemove::Dispatch( Core::Interface::GetMouseActionContext(),
+                                    this->seed_points_state_, pt );
+      Core::ActionRemove::Dispatch( Core::Interface::GetMouseActionContext(),
+                                    this->view_modes_state_, view_mode );
+//      viewerPointMap.erase(pt);
+    }
+    return true;
+  }
+
+  return false;
+}
+
+void RadialBasisFunctionTool::handle_seed_points_changed()
+{
+  if (this->seed_points_state_->size() == 0)
+  {
+    Core::ActionClear::Dispatch( Core::Interface::GetWidgetActionContext(), this->view_modes_state_ );
+  }
+  SeedPointsTool::handle_seed_points_changed();
+}
 
 void RadialBasisFunctionTool::execute( Core::ActionContextHandle context )
 {
@@ -165,6 +156,7 @@ void RadialBasisFunctionTool::execute( Core::ActionContextHandle context )
   ActionRadialBasisFunction::Dispatch( context,
                                        this->target_layer_state_->get(),
                                        this->seed_points_state_->get(),
+                                       this->view_modes_state_->get(),
                                        this->normalOffset_state_->get(),
                                        this->kernel_state_->get()
                                      );

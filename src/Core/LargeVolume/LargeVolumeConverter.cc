@@ -40,6 +40,7 @@
 #include <itkPNGImageIO.h>
 #include <itkTIFFImageIO.h>
 #include <itkJPEGImageIO.h>
+#include <itkGDCMImageIO.h>
 #include <itkImageSeriesReader.h>
 
 #include <Core/LargeVolume/LargeVolumeConverter.h>
@@ -629,6 +630,11 @@ bool LargeVolumeConverterPrivate::scan_file( const boost::filesystem::path& file
   else if ( Core::FileUtil::CheckExtension( filename, ".jpg|.jpeg") )
   {
     reader->SetImageIO( itk::JPEGImageIO::New() );  
+  }
+  else if ( Core::FileUtil::CheckExtension( filename, ".dcm|.dicom") )
+  {
+    // ITK defaults without additional checks in GDCM importer
+    reader->SetImageIO( itk::GDCMImageIO::New() );
   }
 
   // Setup the importer

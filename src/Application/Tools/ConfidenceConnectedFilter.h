@@ -43,6 +43,7 @@ SEG3D_TOOL(
   SEG3D_TOOL_MENU( "Advanced Filters" )
   SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+Z" )
   SEG3D_TOOL_URL( "http://scirundocwiki.sci.utah.edu/SCIRunDocs/index.php5/CIBC:Seg3D2:ConfidenceConnectedFilter:1" )
+  SEG3D_TOOL_HOTKEYS("C=Clear seed points.|Left Mouse Button=Add seed point.|Right Mouse Button=Delete seed point.")
 )
 
 public:

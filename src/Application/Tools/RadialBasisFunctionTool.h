@@ -30,11 +30,14 @@
 #define APPLICATION_TOOLS_RADIALBASISFUNCTIONTOOL_H
 
 #include <Application/Tool/SeedPointsTool.h>
+#include <Core/Geometry/Point.h>
+
+#include <map>
 
 namespace Seg3D
 {
 
-class RadialBasisFunctionTool;
+//typedef std::map< Point, std::string > ViewerPointMap;
 
 class RadialBasisFunctionTool : public SeedPointsTool
 {
@@ -44,7 +47,7 @@ SEG3D_TOOL(
   SEG3D_TOOL_MENU( "Tools" )
   SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+r" )
   SEG3D_TOOL_URL( "http://scirundocwiki.sci.utah.edu/SCIRunDocs/index.php5/CIBC:Seg3D2:RBF:1" )
-  SEG3D_TOOL_HOTKEYS( "" )
+  SEG3D_TOOL_HOTKEYS( "C=Clear seed points.|Left Mouse Button=Add point.|Right Mouse Button=Delete point." )
 )
 
 public:
@@ -54,50 +57,28 @@ public:
   // -- state --
 public:
   Core::StateRangedDoubleHandle normalOffset_state_;
-	Core::StateOptionHandle kernel_state_;
+  Core::StateOptionHandle kernel_state_;
+  Core::StateStringVectorHandle view_modes_state_;
 
   // -- execute --
 public:
   /// Execute the tool and dispatch the action
-  virtual void execute( Core::ActionContextHandle context );
+  virtual void execute( Core::ActionContextHandle context ) override;
 
-//  /// HANDLE_MOUSE_PRESS:
-//  /// Called when a mouse button has been pressed.
-//  virtual bool handle_mouse_press( ViewerHandle viewer,
-//                                   const Core::MouseHistory& mouse_history,
-//                                   int button, int buttons, int modifiers );
-//
-//  /// HANDLE_MOUSE_RELEASE:
-//  /// Called when a mouse button has been released.
-//  virtual bool handle_mouse_release( ViewerHandle viewer,
-//                                     const Core::MouseHistory& mouse_history,
-//                                     int button, int buttons, int modifiers );
-//
-//  /// HANDLE_MOUSE_MOVE:
-//  /// Called when the mouse moves in a viewer.
-//  virtual bool handle_mouse_move( ViewerHandle viewer,
-//                                  const Core::MouseHistory& mouse_history,
-//                                  int button, int buttons, int modifiers );
-//
-//  /// REDRAW:
-//  /// Draw seed points in the specified viewer.
-//  /// The function should only be called by the renderer, which has a valid GL context.
-//  virtual void redraw( size_t viewer_id, const Core::Matrix& proj_mat,
-//                       int viewer_width, int viewer_height );
-//
-//  /// HAS_2D_VISUAL:
-//  /// Returns true if the tool draws itself in the 2D view, otherwise false.
-//  /// The default implementation returns false.
-//  virtual bool has_2d_visual();
-//  
-//  /// HANDLE_SEED_POINTS_CHANGED:
-//  /// Called when the seed points have changed.
-//  /// The default implementation will cause all the 2D viewers to redraw overlay.
-//  virtual void handle_seed_points_changed();
+  /// HANDLE_MOUSE_PRESS:
+  /// Called when a mouse button has been pressed.
+  virtual bool handle_mouse_press( ViewerHandle viewer,
+                                   const Core::MouseHistory& mouse_history,
+                                   int button, int buttons, int modifiers ) override;
+
+  /// HANDLE_SEED_POINTS_CHANGED:
+  /// Called when the seed points have changed.
+  /// The default implementation will cause all the 2D viewers to redraw overlay.
+  virtual void handle_seed_points_changed() override;
 
 private:
   void handle_target_layer_changed();
-	size_t signal_block_count_;
+//  ViewerPointMap viewerPointMap;
 };
   
 } // end namespace
