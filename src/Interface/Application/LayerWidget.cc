@@ -1400,10 +1400,10 @@ void LayerWidget::contextMenuEvent( QContextMenuEvent * event )
 
     if ( this->private_->layer_->get_type() == Core::VolumeType::MASK_E )
     {
-    export_menu->setTitle( tr( "Export Segmentation As..." ) );
-    
-    qaction = export_menu->addAction( tr( "BITMAP" ) );
-    connect( qaction, SIGNAL( triggered() ), this, SLOT( export_bitmap() ) );
+      export_menu->setTitle( tr( "Export Segmentation As..." ) );
+
+      qaction = export_menu->addAction( tr( "BITMAP" ) );
+      connect( qaction, SIGNAL( triggered() ), this, SLOT( export_bitmap() ) );
     }
 
     qaction = export_menu->addAction( tr( "NRRD" ) );
@@ -1426,8 +1426,12 @@ void LayerWidget::contextMenuEvent( QContextMenuEvent * event )
 
   if ( this->private_->layer_->get_type() == Core::VolumeType::MASK_E )
   {
-    QAction *qaction = menu.addAction( tr( "Export Isosurface..." ) );
-    connect( qaction, SIGNAL( triggered() ), this, SLOT( export_isosurface() ) );
+    MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( this->private_->layer_.get() );
+    if ( mask_layer->iso_generated_state_->get() )
+    {
+      QAction *qaction = menu.addAction( tr( "Export Isosurface..." ) );
+      connect( qaction, SIGNAL( triggered() ), this, SLOT( export_isosurface() ) );
+    }
   }
 
   menu.exec( event->globalPos() );
