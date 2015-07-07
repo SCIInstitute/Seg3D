@@ -71,7 +71,8 @@ public:
 public:
   /// SET_EXTENSION:
   /// function that sets the extension to be used by the exporter
-  virtual void set_extension( std::string extension ){ this->extension_ = extension; }
+  virtual void set_extension( std::string extension ) override
+  { this->extension_ = extension; }
   
   // --Import the data as a specific type --  
 public: 
@@ -79,7 +80,7 @@ public:
   /// EXPORT_LAYER
   /// Export the layer to file
   virtual bool export_layer( const std::string& mode, const std::string& file_path, 
-    const std::string& name );
+    const std::string& name ) override;
     
 private:
   bool export_dcm_series( const std::string& file_path, const std::string& name );

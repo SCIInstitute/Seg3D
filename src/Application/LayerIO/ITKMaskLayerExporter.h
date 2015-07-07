@@ -68,9 +68,10 @@ public:
 
   // -- Import a file information --
 public:
-  virtual void set_extension( std::string extension ){ this->extension_ = extension; }
+  virtual void set_extension( std::string extension ) override
+  { this->extension_ = extension; }
   
-  virtual void set_label_layer_values( std::vector< double > values )
+  virtual void set_label_layer_values( std::vector< double > values ) override
   { 
     this->label_values_ = values;
   }
@@ -83,7 +84,7 @@ public:
   /// EXPORT_LAYER
   /// Export the layer to file
   virtual bool export_layer( const std::string& mode, const std::string& file_path, 
-    const std::string& name );
+    const std::string& name ) override;
 
 private:
   Core::DataType pixel_type_;

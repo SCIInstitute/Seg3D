@@ -150,7 +150,7 @@ bool ActionImportLayer::validate( Core::ActionContextHandle& context )
     return false;
   } 
 
-  if ( this->mode_ != LayerIO::DATA_MODE_C && !info->get_mask_compatible() )
+  if ( this->mode_ != LayerIO::DATA_MODE_C && ! info->get_mask_compatible() )
   {
     std::ostringstream error_stream;
     error_stream << "Import mode '" << this->mode_ << "' is not available for this importer.";
