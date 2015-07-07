@@ -3,7 +3,7 @@
  
  The MIT License
  
- Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
  
  
@@ -24,14 +24,15 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
- */
+*/
 
 // Boost includes
 #include <boost/filesystem.hpp>
 
+#include <sstream>
+
 // Application includes
 #include <Application/UndoBuffer/UndoBuffer.h>
-#include <Application/LayerIO/LayerIO.h>
 #include <Application/LayerIO/Actions/ActionImportSeries.h>
 #include <Application/Layer/LayerManager.h>
 #include <Application/Layer/LayerUndoBufferItem.h>
@@ -49,7 +50,7 @@ namespace Seg3D
 bool ActionImportSeries::validate( Core::ActionContextHandle& context )
 {
   // Make sure that the sandbox exists
-  if ( !LayerManager::CheckSandboxExistence( this->sandbox_, context ) )
+  if ( ! LayerManager::CheckSandboxExistence( this->sandbox_, context ) )
   {
     return false;
   }
@@ -90,9 +91,11 @@ bool ActionImportSeries::validate( Core::ActionContextHandle& context )
     }
     
     // Check whether the file exists
-    if ( !( boost::filesystem::exists( full_filename ) ) )
+    if ( ! boost::filesystem::exists( full_filename ) )
     {
-      context->report_error( std::string( "File '" ) + this->filenames_[ j ] + "' does not exist." );
+      std::ostringstream error;
+      error << "File '" << this->filenames_[ j ] << "' does not exist.";
+      context->report_error( error.str() );
       return false;
     }
 
@@ -103,8 +106,9 @@ bool ActionImportSeries::validate( Core::ActionContextHandle& context )
     }
     catch ( ... )
     {
-      context->report_error(  std::string( "Could not determine full path of '" ) +
-        this->filenames_[ j ] + "'." );
+      std::ostringstream error;
+      error << "Could not determine full path of '" << this->filenames_[ j ] << "'.";
+      context->report_error( error.str() );
       return false;
     }
     
@@ -115,43 +119,50 @@ bool ActionImportSeries::validate( Core::ActionContextHandle& context )
   // If there is no layer importer we need to generate one
   if ( !this->layer_importer_ )
   {
-    if ( !( LayerIO::Instance()->create_file_series_importer( this->filenames_,  
-      this->layer_importer_, this->importer_ ) ) )
+    if ( ! LayerIO::Instance()->create_file_series_importer( this->filenames_,
+      this->layer_importer_, this->importer_ ) )
     {
-      context->report_error( std::string( "Could not create importer with name '" ) +
-        this->importer_ + "'." );
+      std::ostringstream error;
+      error << "Could not create importer with name '" << this->importer_ << "'.";
+      context->report_error( error.str() );
       return false;
     }
 
-    if ( !this->layer_importer_ )
+    if ( ! this->layer_importer_ )
     {
-      context->report_error( std::string( "Could not create importer with name '" ) +
-        this->importer_ + "'." );
+      std::ostringstream error;
+      error << "Could not create importer with name '" << this->importer_ << "'.";
+      context->report_error( error.str() );
       return false;     
     }
   }
 
   // Check whether mode is a valid string
-  if ( this->mode_ != "data" && this->mode_ != "single_mask" && this->mode_ != "bitplane_mask" &&
-    this->mode_ != "label_mask" )
+  if ( this->mode_ != LayerIO::DATA_MODE_C &&
+       this->mode_ != LayerIO::SINGLE_MASK_MODE_C &&
+       this->mode_ != LayerIO::BITPLANE_MASK_MODE_C &&
+       this->mode_ != LayerIO::LABEL_MASK_MODE_C )
   {
-    context->report_error( "Importer mode needs to be data, single_mask, bitplane_mask, or"
-      " label_mask." );
+    std::ostringstream error;
+    error << "Importer mode needs to be " << LayerIO::DATA_MODE_C << ", " << LayerIO::SINGLE_MASK_MODE_C <<
+             ", " << LayerIO::BITPLANE_MASK_MODE_C << ", or " << LayerIO::LABEL_MASK_MODE_C << ".";
+    context->report_error( error.str() );
     return false;
   }
   
   // Check the information that we can retrieve from the header of this file
   LayerImporterFileInfoHandle info;
-  if ( !( this->layer_importer_->get_file_info( info ) ) )
+  if ( ! this->layer_importer_->get_file_info( info ) )
   {
     context->report_error( this->layer_importer_->get_error() );
     return false;
   } 
 
-  if ( this->mode_ != "data" && !info->get_mask_compatible() )
+  if ( this->mode_ != LayerIO::DATA_MODE_C && !info->get_mask_compatible() )
   {
-    context->report_error( std::string( "Import mode '") +  this->mode_ + 
-      "' is not available for this importer." );
+    std::ostringstream error;
+    error << "Import mode '" << this->mode_ << "' is not available for this importer.";
+    context->report_error( error.str() );
     return false;
   }
 
@@ -167,14 +178,14 @@ bool ActionImportSeries::run( Core::ActionContextHandle& context, Core::ActionRe
   // Forwarding a message to the UI that we are importing a layer. This generates a progress bar
   boost::filesystem::path full_filename = this->filenames_[ 0 ];
   boost::filesystem::path file_path = full_filename.parent_path();
-  std::string message = std::string("Importing file series from '") + file_path.filename().string() 
-    + std::string("'");
+  std::ostringstream message;
+  message << "Importing file series from '" << file_path.filename().string() << "'";
   Core::ActionProgressHandle progress;
 
   // Progress reporting is only needed if not running in a sandbox
   if ( this->sandbox_ == -1 )
   {
-    progress.reset( new Core::ActionProgress( message ) );
+    progress.reset( new Core::ActionProgress( message.str() ) );
     // Indicate that we have started the process
     progress->begin_progress_reporting();
   }
@@ -183,17 +194,17 @@ bool ActionImportSeries::run( Core::ActionContextHandle& context, Core::ActionRe
   LayerImporterFileDataHandle data;
   
   // Get the data from the file
-  if ( !( this->layer_importer_->get_file_data( data ) ) )
+  if ( ! this->layer_importer_->get_file_data( data ) )
   {
     if ( this->sandbox_ == -1 ) progress->end_progress_reporting();
 
-        std::string importer_error = this->layer_importer_->get_error();
-        if ( importer_error.size() ) context->report_error( importer_error );
+    std::string importer_error = this->layer_importer_->get_error();
+    if ( importer_error.size() ) context->report_error( importer_error );
 
     context->report_error( "Layer importer failed to extract volume data from file." );
     return false;
-  } 
-  
+  }
+
     std::string importer_warning = this->layer_importer_->get_warning();
     if ( importer_warning.size() ) context->report_warning( importer_warning );
     
@@ -201,7 +212,7 @@ bool ActionImportSeries::run( Core::ActionContextHandle& context, Core::ActionRe
   // NOTE: This step is only reformatting the header of the data and adds the state variables
   // for the layers.
   std::vector< LayerHandle > layers;
-  if ( !( data->convert_to_layers( this->mode_, layers ) ) )
+  if ( ! data->convert_to_layers( this->mode_, layers ) )
   {
     if ( this->sandbox_ == -1 ) progress->end_progress_reporting();
     context->report_error( "Importer could not convert data into the requested format." );
