@@ -150,7 +150,8 @@ private:
 public:
   /// SET_LABEL_LAYER_VALUES:
   /// this is used to set the values for the layers when exporting a label and for nothing else
-  virtual void set_label_layer_values( std::vector< double > values ){}
+  virtual void set_label_layer_values( std::vector< double > values ) {}
+  virtual bool label_layer_values_set() { return false; }
   
   virtual void set_extension( std::string extension ){}
 

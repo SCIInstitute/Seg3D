@@ -63,13 +63,15 @@ public:
   /// EXPORT_LAYER
   /// Export the layer to file
   virtual bool export_layer( const std::string& mode, const std::string& file_path, 
-    const std::string& name );
+    const std::string& name ) override;
     
-  virtual void set_label_layer_values( std::vector< double > values )
+  virtual void set_label_layer_values( std::vector< double > values ) override
   { 
     this->label_values_ = values;
   }
-    
+
+  virtual bool label_layer_values_set() override { return (! this->label_values_.empty() ); }
+
 private:
   bool export_nrrd( const std::string& file_path );
   bool export_single_masks( const std::string& file_path );
