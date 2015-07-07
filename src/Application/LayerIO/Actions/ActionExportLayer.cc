@@ -29,6 +29,8 @@
 // Boost includes
 #include <boost/filesystem.hpp>
 
+#include <sstream>
+
 // Application includes
 #include <Application/LayerIO/Actions/ActionExportLayer.h>
 #include <Application/LayerIO/LayerIO.h>
@@ -48,7 +50,7 @@ bool ActionExportLayer::validate( Core::ActionContextHandle& context )
 {
   // Check whether the layer exists and is of the right type and return an
   // error if not
-  if ( !( LayerManager::CheckLayerExistence( this->layer_id_, context ) ) ) return false;
+  if ( ! LayerManager::CheckLayerExistence( this->layer_id_, context ) ) return false;
 
     std::vector< LayerHandle > layer_handles;
   
@@ -68,16 +70,17 @@ bool ActionExportLayer::validate( Core::ActionContextHandle& context )
       return false;
     }
   
-    if ( this->extension_ == "" )
+    if ( this->extension_.empty() )
     {
       this->extension_ = boost::filesystem::extension( boost::filesystem::path( this->file_path_ ) );
     }
     else
     {
+      // TODO: test this!!!
       this->file_path_ += this->extension_;
     }
   
-    if ( this->exporter_ == "" )
+    if ( this->exporter_.empty() )
     {
       if ( this->extension_ == ".nrrd" ) this->exporter_ = "NRRD Exporter";
       else if ( this->extension_ == ".mat" ) this->exporter_ = "Matlab Exporter";
@@ -97,8 +100,9 @@ bool ActionExportLayer::validate( Core::ActionContextHandle& context )
     boost::filesystem::path segmentation_path( this->file_path_ );
     if ( !( boost::filesystem::exists ( segmentation_path.parent_path() ) ) )
     {
-      context->report_error( std::string( "The path '" ) + this->file_path_ +
-        "' does not exist." );
+      std::ostringstream error;
+      error << "The path '" << this->file_path_ << "' does not exist.";
+      context->report_error( error.str() );
       return false;
     }
 
@@ -114,12 +118,12 @@ bool ActionExportLayer::run( Core::ActionContextHandle& context, Core::ActionRes
     
   std::string message = std::string( "Exporting '" + filename_without_extension + "'" );
 
-  Core::ActionProgressHandle progress = 
+  Core::ActionProgressHandle progress =
     Core::ActionProgressHandle( new Core::ActionProgress( message ) );
 
   progress->begin_progress_reporting();
     
-  this->layer_exporter_->export_layer( "data", filename_and_path.parent_path().string(), 
+  this->layer_exporter_->export_layer( LayerIO::DATA_MODE_C, filename_and_path.parent_path().string(),
     filename_without_extension );
 
   ProjectManager::Instance()->current_file_folder_state_->set( 

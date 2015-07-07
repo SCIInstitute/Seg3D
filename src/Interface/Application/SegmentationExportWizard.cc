@@ -469,7 +469,7 @@ bool SegmentationSummaryPage::validatePage()
   QString selected_masks = "";
   for( int i = 0; i < this->private_->masks_.size(); ++i )
   {
-    if( selected_masks == "" )
+    if ( selected_masks.isEmpty() )
     {
       selected_masks = this->private_->masks_[ i ]->get_label() + QString::fromUtf8( "," ) + 
         QString::number( this->private_->masks_[ i ]->get_value() );
@@ -511,8 +511,8 @@ bool SegmentationSummaryPage::validatePage()
   {
     result = LayerIO::Instance()->create_exporter( exporter, layers, "ITK Mask Exporter", extension );
   }
-  
-  if ( !result )
+
+  if ( ! result )
   {
     std::string error_message = std::string("ERROR: No exporter is available for file '") + 
       this->private_->file_name_ + std::string("'.");
@@ -530,14 +530,14 @@ bool SegmentationSummaryPage::validatePage()
   { 
     exporter->set_label_layer_values( values );
     ActionExportSegmentation::Dispatch( Core::Interface::GetWidgetActionContext(), exporter,
-      "label_mask", this->private_->file_name_, extension );
+      LayerIO::LABEL_MASK_MODE_C, this->private_->file_name_, extension );
   }
   else
   {
     ActionExportSegmentation::Dispatch( Core::Interface::GetWidgetActionContext(), exporter,
-      "single_mask", this->private_->file_name_, extension );
+      LayerIO::SINGLE_MASK_MODE_C, this->private_->file_name_, extension );
   }
-    
+
   return true;
 }
 
