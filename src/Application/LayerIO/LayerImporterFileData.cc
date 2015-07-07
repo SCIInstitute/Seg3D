@@ -32,6 +32,7 @@
 #include <Core/DataBlock/MaskDataBlockManager.h>
 
 // Application includes
+#include <Application/LayerIO/LayerIO.h>
 #include <Application/LayerIO/LayerImporterFileData.h>
 #include <Application/Layer/DataLayer.h>
 #include <Application/Layer/MaskLayer.h>
@@ -132,7 +133,7 @@ bool LayerImporterFileData::convert_to_layers( const std::string& mode,
   Core::DataVolumeHandle canonical_vol;
   Core::DataVolume::ConvertToCanonicalVolume( src_volume, canonical_vol );
 
-  if ( mode == "data" )
+  if ( mode == LayerIO::DATA_MODE_C )
   {
     // Data Layers use the histogram. Hence update the histogram, so it is present when needed
     // in the user interface.
@@ -153,7 +154,7 @@ bool LayerImporterFileData::convert_to_layers( const std::string& mode,
     // Done
     return true;
   }
-  else if ( mode == "single_mask" )
+  else if ( mode == LayerIO::SINGLE_MASK_MODE_C )
   {
     // Handle to a new MaskDataBlock
     Core::MaskDataBlockHandle maskdatablock;
@@ -188,7 +189,7 @@ bool LayerImporterFileData::convert_to_layers( const std::string& mode,
 
     return true;
   }
-  else if ( mode == "bitplane_mask" )
+  else if ( mode == LayerIO::BITPLANE_MASK_MODE_C )
   {
     // Create a vector of mask data block handles in which we will store the mask data blocks.
     std::vector<Core::MaskDataBlockHandle> maskdatablocks;
@@ -232,7 +233,7 @@ bool LayerImporterFileData::convert_to_layers( const std::string& mode,
     // Successful
     return true;
   }
-  else if ( mode == "label_mask" )
+  else if ( mode == LayerIO::LABEL_MASK_MODE_C )
   {
     std::vector<Core::MaskDataBlockHandle> maskdatablocks;
 

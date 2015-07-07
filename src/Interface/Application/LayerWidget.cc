@@ -65,6 +65,7 @@
 #include <Application/Layer/Actions/ActionMoveLayer.h>
 #include <Application/Layer/Actions/ActionCalculateMaskVolume.h>
 #include <Application/Layer/Actions/ActionDuplicateLayer.h>
+#include <Application/LayerIO/LayerIO.h>
 #include <Application/LayerIO/Actions/ActionExportLayer.h>
 #include <Application/LayerIO/Actions/ActionExportSegmentation.h>
 #include <Application/LayerIO/Actions/ActionExportIsosurface.h>
@@ -398,7 +399,7 @@ void LayerWidgetPrivate::export_layer( const std::string& type_extension )
   if( this->get_volume_type() == Core::VolumeType::MASK_E )
   {
     ActionExportSegmentation::Dispatch( Core::Interface::GetWidgetActionContext(), 
-      this->layer_->get_layer_id(), "single_mask", 
+      this->layer_->get_layer_id(), LayerIO::SINGLE_MASK_MODE_C,
       export_path.toStdString(), type_extension );
   }
   else if( this->get_volume_type() == Core::VolumeType::DATA_E )
