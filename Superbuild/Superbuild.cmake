@@ -26,11 +26,16 @@
 
 ###########################################
 # TODO: build from archive - Git not used
+###########################################
+
 SET(compress_type "GIT" CACHE INTERNAL "")
 SET(ep_base "${CMAKE_BINARY_DIR}/Externals" CACHE INTERNAL "")
 
+###########################################
 # DETERMINE ARCHITECTURE
 # In order for the code to depend on the architecture settings
+###########################################
+
 IF(CMAKE_SIZEOF_VOID_P MATCHES 8)
   SET(SEG3D_BITS 64)
 ELSE()
@@ -40,6 +45,8 @@ ENDIF()
 ###########################################
 # Set default CMAKE_BUILD_TYPE
 # if empty for Unix Makefile builds
+###########################################
+
 IF(CMAKE_GENERATOR MATCHES "Unix Makefiles" AND NOT CMAKE_BUILD_TYPE)
   SET(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
 ENDIF()
@@ -54,6 +61,8 @@ ENDIF()
 # Configure advanced features:
 #   * large volume (bricked dataset) support
 #   * mosaicing tools
+###########################################
+
 OPTION(BUILD_LARGE_VOLUME_TOOLS "Build with large volume (bricked) dataset support." ON)
 SET(DEFAULT_MOSAIC_SETTING ON)
 IF(WIN32)
@@ -73,6 +82,8 @@ INCLUDE( ExternalProject )
 
 ###########################################
 # Options for console, headless mode
+###########################################
+
 OPTION(BUILD_TESTING "Build with tests." ON)
 
 OPTION(SEG3D_BUILD_INTERFACE "Build the GUI interface to Seg3D" ON)
@@ -82,10 +93,14 @@ ENDIF()
 
 ###########################################
 # Configure python
+###########################################
+
 OPTION(BUILD_WITH_PYTHON "Build with python support." ON)
 
 ###########################################
 # Configure Qt
+###########################################
+
 IF(SEG3D_BUILD_INTERFACE)
   SET(QT_MIN_VERSION "4.6.0")
   INCLUDE(FindQt4)
@@ -99,6 +114,12 @@ IF(SEG3D_BUILD_INTERFACE)
   ELSE()
     MESSAGE(FATAL_ERROR "QT ${QT_MIN_VERSION} or later is required for building the Seg3D GUI")
   ENDIF()
+
+  IF(APPLE)
+    SET(MACDEPLOYQT_OUTPUT_LEVEL 0 CACHE STRING "Set macdeployqt output level (0-3)")
+    MARK_AS_ADVANCED(MACDEPLOYQT_OUTPUT_LEVEL)
+  ENDIF()
+
 ENDIF()
 
 
@@ -141,11 +162,14 @@ ENDIF()
 
 ###########################################
 # Configure Doxygen documentation
+###########################################
+
 OPTION(BUILD_DOCUMENTATION "Build documentation" OFF)
 MARK_AS_ADVANCED(BUILD_DOCUMENTATION)
 
 ###########################################
 # Configure externals
+###########################################
 
 SET( Seg3D_DEPENDENCIES )
 
@@ -226,6 +250,7 @@ ENDIF()
 IF(SEG3D_BUILD_INTERFACE)
   LIST(APPEND SEG3D_CACHE_ARGS
     "-DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}"
+    "-DMACDEPLOYQT_OUTPUT_LEVEL:STRING=${MACDEPLOYQT_OUTPUT_LEVEL}"
   )
 ENDIF()
 
