@@ -77,7 +77,7 @@ OPTION(BUILD_TESTING "Build with tests." ON)
 
 OPTION(SEG3D_BUILD_INTERFACE "Build the GUI interface to Seg3D" ON)
 IF(WIN32)
-  OPTION(SEG3D_SHOW_CONSOLE "Show console for debugging (Windows only)" OFF)
+  OPTION(SEG3D_SHOW_CONSOLE "Show console for debugging (Windows GUI build only)" OFF)
 ENDIF()
 
 ###########################################
