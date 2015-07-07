@@ -312,13 +312,13 @@ bool SegmentationSelectionPage::validatePage()
 {
   this->private_->warning_message_->hide();
   this->private_->masks_.clear();
-  for( int i = 0; i < this->private_->group_with_masks_tree_->topLevelItemCount(); ++i )
+  for ( int i = 0; i < this->private_->group_with_masks_tree_->topLevelItemCount(); ++i )
   {
     QTreeWidgetItem* group = this->private_->group_with_masks_tree_->topLevelItem( i );
-    for( int j = 0; j < group->childCount(); ++j )
+    for ( int j = 0; j < group->childCount(); ++j )
     {
       QTreeWidgetItem* mask = group->child( j );
-      if( mask->checkState( 0 ) == Qt::Checked )
+      if ( mask->checkState( 0 ) == Qt::Checked )
       {
         QtLayerListWidget* new_mask = new QtLayerListWidget();
         new_mask->set_mask_name( mask->text( 0 ).toStdString() );
@@ -331,7 +331,7 @@ bool SegmentationSelectionPage::validatePage()
   QString filename;
   boost::filesystem::path current_folder = ProjectManager::Instance()->get_current_file_folder();
   
-  if( this->private_->single_file_radio_button_->isChecked() )
+  if ( this->private_->single_file_radio_button_->isChecked() )
   {
         std::string file_type = this->private_->export_selector_->currentText().toStdString();
         std::string file_selector = Core::StringToUpper( file_type.substr( 1 ) ) + 
@@ -454,7 +454,7 @@ void SegmentationSummaryPage::initializePage()
   for ( int i = 0; i < static_cast< int >( this->private_->masks_.size() ); ++i )
   {
     this->private_->masks_[ i ]->set_mask_index( i );
-    this->private_->masks_[ i ]->hide_counter( !save_as_single_file );
+    this->private_->masks_[ i ]->hide_counter( ! save_as_single_file );
     this->private_->masks_layout_->addWidget( this->private_->masks_[ i ] );
     connect( this->private_->masks_[ i ], SIGNAL( index_changed_signal() ), this, SIGNAL( completeChanged() ) ); 
   }
@@ -466,10 +466,11 @@ void SegmentationSummaryPage::initializePage()
 
 bool SegmentationSummaryPage::validatePage()
 {
+  // TODO: selected_masks never gets used???
   QString selected_masks = "";
   for( int i = 0; i < this->private_->masks_.size(); ++i )
   {
-    if( selected_masks == "" )
+    if ( selected_masks.isEmpty() )
     {
       selected_masks = this->private_->masks_[ i ]->get_label() + QString::fromUtf8( "," ) + 
         QString::number( this->private_->masks_[ i ]->get_value() );
@@ -511,8 +512,8 @@ bool SegmentationSummaryPage::validatePage()
   {
     result = LayerIO::Instance()->create_exporter( exporter, layers, "ITK Mask Exporter", extension );
   }
-  
-  if ( !result )
+
+  if ( ! result )
   {
     std::string error_message = std::string("ERROR: No exporter is available for file '") + 
       this->private_->file_name_ + std::string("'.");
@@ -530,33 +531,33 @@ bool SegmentationSummaryPage::validatePage()
   { 
     exporter->set_label_layer_values( values );
     ActionExportSegmentation::Dispatch( Core::Interface::GetWidgetActionContext(), exporter,
-      "label_mask", this->private_->file_name_, extension );
+      LayerIO::LABEL_MASK_MODE_C, this->private_->file_name_, extension );
   }
   else
   {
     ActionExportSegmentation::Dispatch( Core::Interface::GetWidgetActionContext(), exporter,
-      "single_mask", this->private_->file_name_, extension );
+      LayerIO::SINGLE_MASK_MODE_C, this->private_->file_name_, extension );
   }
-    
+
   return true;
 }
 
 bool SegmentationSummaryPage::isComplete() const
 {
   bool valid = true;
-  for( int i = 0; i < this->private_->masks_.size(); ++i )
+  for ( int i = 0; i < this->private_->masks_.size(); ++i )
   {
     bool found = false;
-    for( int j = 0; j < this->private_->masks_.size(); ++j )
+    for ( int j = 0; j < this->private_->masks_.size(); ++j )
     {
-      if( i == j ) continue;
-      if( this->private_->masks_[ i ]->get_value() == this->private_->masks_[ j ]->get_value() )
+      if ( i == j ) continue;
+      if ( this->private_->masks_[ i ]->get_value() == this->private_->masks_[ j ]->get_value() )
       {
         found = true;
         break;
       }
     }
-    if( found ) 
+    if ( found )
     {
       this->private_->masks_[ i ]->set_validity( false );
       valid = false;

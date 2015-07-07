@@ -368,13 +368,13 @@ ITKDataLayerExporter::ITKDataLayerExporter( std::vector< LayerHandle >& layers )
 bool ITKDataLayerExporter::export_layer( const std::string& mode, const std::string& file_path, 
   const std::string& name )
 {
-  if( this->extension_ == ".dcm" )
+  if ( this->extension_ == ".dcm" )
   {
-    if( !this->export_dcm_series( file_path, name ) ) return false;
+    if ( ! this->export_dcm_series( file_path, name ) ) return false;
   }
-  else if( this->extension_ != "" )
+  else if ( ! this->extension_.empty() )
   {
-    if( !this->export_itk_series( file_path ) ) return false;
+    if ( ! this->export_itk_series( file_path ) ) return false;
   }
   
   CORE_LOG_SUCCESS( "Data export has been successfully completed." );

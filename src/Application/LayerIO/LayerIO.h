@@ -156,10 +156,10 @@ public:
   /// belong to that file series bsed on the filenames of the files in the same directory.
   static bool FindFileSeries( std::vector<std::string >& filenames );
 
-  static const std::string DATA_MODE;
-  static const std::string SINGLE_MASK_MODE;
-  static const std::string LABEL_MASK_MODE;
-  static const std::string BITPLANE_MASK_MODE;
+  static const std::string DATA_MODE_C;
+  static const std::string SINGLE_MASK_MODE_C;
+  static const std::string LABEL_MASK_MODE_C;
+  static const std::string BITPLANE_MASK_MODE_C;
     
 };
 

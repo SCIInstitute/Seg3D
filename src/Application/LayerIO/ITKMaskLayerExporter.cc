@@ -359,7 +359,7 @@ bool ITKMaskLayerExporter::export_layer( const std::string& mode, const std::str
         is_dicom = true;
     }
 
-    if ( mode == "label_mask" )
+    if ( mode == LayerIO::LABEL_MASK_MODE_C )
     {
         MaskLayer* temp_mask = dynamic_cast< MaskLayer* >( this->layers_[ 1 ].get() );
         // Step 2: Get a handle to its MaskDataBlock and use that to build a new DataBlockHandle of the 

@@ -38,6 +38,7 @@
 #include <Core/Utils/Log.h>
 
 // Application includes
+#include <Application/LayerIO/LayerIO.h>
 #include <Application/LayerIO/Actions/ActionImportLayer.h>
 #include <Application/LayerIO/Actions/ActionImportSeries.h>
 
@@ -91,7 +92,7 @@ LayerImporterWidget::LayerImporterWidget( std::vector< LayerImporterHandle > imp
   // Copy importers to private class
   this->private_->importers_ = importers;
   // Set data as default importer
-  this->private_->mode_ = "data";
+  this->private_->mode_ = LayerIO::DATA_MODE_C;
 
   this->setup_ui();
 
@@ -185,19 +186,19 @@ void LayerImporterWidget::set_type( int file_type )
   switch( file_type )
   {
   case 0:
-    this->private_->mode_ = "data";
+    this->private_->mode_ = LayerIO::DATA_MODE_C;
     break;
 
   case 1:
-    this->private_->mode_ = "single_mask";
+    this->private_->mode_ = LayerIO::SINGLE_MASK_MODE_C;
     break;
 
   case 2:
-    this->private_->mode_ = "bitplane_mask";
+    this->private_->mode_ = LayerIO::BITPLANE_MASK_MODE_C;
     break;
 
   case 3:
-    this->private_->mode_ = "label_mask";
+    this->private_->mode_ = LayerIO::LABEL_MASK_MODE_C;
     break;
   default:
     break;
@@ -242,7 +243,7 @@ void LayerImporterWidget::list_import_options()
   // Show the data importer option
   this->private_->ui_.data_->show();
   this->private_->data_volume_button_->setMinimumSize( this->private_->ui_.data_->size() );
-  this->private_->data_volume_button_->setChecked( this->private_->mode_ == "data" );
+  this->private_->data_volume_button_->setChecked( this->private_->mode_ == LayerIO::DATA_MODE_C );
     
   if ( this->private_->info_->get_mask_compatible() )
   {
@@ -253,13 +254,13 @@ void LayerImporterWidget::list_import_options()
 
     // Ensure that the widgets have the right size
     this->private_->mask_1234_button_->setMinimumSize( this->private_->ui_.bitplane_mask_->size() );
-    this->private_->mask_1234_button_->setChecked( this->private_->mode_ == "label_mask" );
+    this->private_->mask_1234_button_->setChecked( this->private_->mode_ == LayerIO::LABEL_MASK_MODE_C );
     
     this->private_->mask_1248_button_->setMinimumSize( this->private_->ui_.label_mask_->size());
-    this->private_->mask_1248_button_->setChecked( this->private_->mode_ == "bitplane_mask" );
+    this->private_->mask_1248_button_->setChecked( this->private_->mode_ == LayerIO::BITPLANE_MASK_MODE_C );
 
     this->private_->mask_single_button_->setMinimumSize( this->private_->ui_.single_mask_->size() );
-    this->private_->mask_single_button_->setChecked( this->private_->mode_ == "single_mask" );
+    this->private_->mask_single_button_->setChecked( this->private_->mode_ == LayerIO::SINGLE_MASK_MODE_C );
   }
   else
   {
