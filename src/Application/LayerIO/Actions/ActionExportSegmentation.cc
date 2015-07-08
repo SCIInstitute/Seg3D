@@ -66,9 +66,12 @@ bool ActionExportSegmentation::validate( Core::ActionContextHandle& context )
     std::vector< LayerHandle > layer_handles;
     std::vector< double > values;
 
-    // insert empty background layer - datablock will be filled in by exporter
-    Core::MaskLayerHandle background_layer;
-    layer_handles.push_back(background_layer);
+    if ( this->mode_ == LayerIO::LABEL_MASK_MODE_C )
+    {
+      // insert empty background layer - datablock will be filled in by exporter
+      Core::MaskLayerHandle background_layer;
+      layer_handles.push_back(background_layer);
+    }
 
     // TODO: hardcode for now, list of values needs to be optional argument
     int valuesCounter = 0; // background label = 0 matches segmentation export wizard default
