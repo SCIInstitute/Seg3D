@@ -1,9 +1,18 @@
 Release Notes
 =============
 
+Version 2.2.1
+-------------
+This version is a primarily a bug fix release for the IBBM course.
+
+* Radial Basis Function segmentation tool (beta) added.
+* Segmentation export from script crash fixed.
+* Fix python support in command line (no GUI) version.
+
 Version 2.2.0
 -------------
 
+* Large volume data type and utilities added.
 * More menu export options.
 * GUI update in points select tool.
 * Better error checking in resample tool.
