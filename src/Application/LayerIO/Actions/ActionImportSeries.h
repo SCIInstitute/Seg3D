@@ -3,7 +3,7 @@
  
  The MIT License
  
- Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
  
  
@@ -24,7 +24,7 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
- */
+*/
 
 #ifndef APPLICATION_LAYERIO_ACTIONS_ACTIONIMPORTSERIES_H
 #define APPLICATION_LAYERIO_ACTIONS_ACTIONIMPORTSERIES_H
@@ -34,6 +34,7 @@
 #include <Core/Interface/Interface.h>
 
 // Application includes
+#include <Application/LayerIO/LayerIO.h>
 #include <Application/LayerIO/LayerImporter.h>
 #include <Application/Layer/LayerAction.h>
 #include <Application/Layer/LayerManager.h>
@@ -111,14 +112,14 @@ public:
   // Create and dispatch action that moves the layer above 
   static void Dispatch( Core::ActionContextHandle context, 
     const std::vector< std::string >& filenames, 
-    const std::string& mode = "data", const std::string importer = "" );
+    const std::string& mode = LayerIO::DATA_MODE_C, const std::string importer = "" );
 
   // DISPATCH:
   // To avoid reading a file twice, this action has a special option, so it can take an
   // importer that has already loaded the file. This prevents it from being read twice
   static void Dispatch( Core::ActionContextHandle context, 
     const LayerImporterHandle& importer, 
-    const std::string& mode = "data" );
+    const std::string& mode = LayerIO::DATA_MODE_C );
   
 };
   

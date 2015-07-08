@@ -64,17 +64,17 @@ bool MRCLayerExporter::export_layer( const std::string& mode,
   bool success = false;
 
   // Export data as single volume file
-  if ( mode == "data" )
+  if ( mode == LayerIO::DATA_MODE_C )
   {
     success = this->export_mrc( path.string() );
   }
   // Export data as separate files
-  else if (mode == "single_mask")
+  else if ( mode == LayerIO::SINGLE_MASK_MODE_C )
   {
     success = this->export_single_masks( file_path );
   }
   // Export data as a single file
-  else if (mode == "label_mask")
+  else if ( mode == LayerIO::LABEL_MASK_MODE_C )
   {
     success = this->export_mask_label( path.string() );
   }
