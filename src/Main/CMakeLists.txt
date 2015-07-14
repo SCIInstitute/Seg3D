@@ -136,7 +136,7 @@ IF(APPLE)
 ELSEIF(WIN32)
   IF(BUILD_WITH_PYTHON)
     # TODO: change $<CONFIGURATION> to $<CONFIG> when upgrading to cmake 3
-	# TODO: copy python dll
+    # TODO: copy python dll
     ADD_CUSTOM_COMMAND(TARGET ${APPLICATION_NAME}
       POST_BUILD
       COMMAND ${CMAKE_COMMAND} ARGS -E make_directory $<CONFIGURATION>/${PYTHON_MODULE_SEARCH_PATH}
