@@ -223,9 +223,14 @@ bool ITKSeriesLayerImporterPrivate::scan_simple_series()
   {
     reader->Update();
   }
-  catch( ... )
+  catch ( itk::ExceptionObject &err )
   {
-    this->importer_->set_error( "ITK Crashed while reading file." );
+    this->importer_->set_error( err.GetDescription() );
+    return false;
+  }
+  catch ( ... )
+  {
+    this->importer_->set_error( "ITK reader failed." );
     return false;
   }
 
@@ -280,11 +285,16 @@ bool ITKSeriesLayerImporterPrivate::import_simple_typed_series()
 
   try
   {
-    this->importer_->set_error( "ITK crashed while reading file." );
     reader->Update();
   }
-  catch( ... )
+  catch ( itk::ExceptionObject &err )
   {
+    this->importer_->set_error( err.GetDescription() );
+    return false;
+  }
+  catch ( ... )
+  {
+    this->importer_->set_error( "ITK crashed while reading file." );
     return false;
   }
 
@@ -422,7 +432,7 @@ bool ITKSeriesLayerImporter::get_file_data( LayerImporterFileDataHandle& data )
   try
   { 
     // Read the data from the file
-    if ( !this->private_->read_data() ) return false;
+    if ( ! this->private_->read_data() ) return false;
   
     // Create a data structure with handles to the actual data in this file 
     data = LayerImporterFileDataHandle( new LayerImporterFileData );

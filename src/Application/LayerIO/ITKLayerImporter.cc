@@ -3,7 +3,7 @@
 
  The MIT License
 
- Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
 
 
@@ -221,9 +221,14 @@ bool ITKLayerImporterPrivate::scan_simple_volume()
   {
     reader->Update();
   }
+  catch ( itk::ExceptionObject &err )
+  {
+    this->importer_->set_error( err.GetDescription() );
+    return false;
+  }
   catch( ... )
   {
-    this->importer_->set_error( "ITK Crashed while reading file." );
+    this->importer_->set_error( "ITK crashed while reading file." );
     return false;
   }
 
@@ -323,6 +328,11 @@ bool ITKLayerImporterPrivate::import_simple_typed_volume()
   try
   {
     reader->Update();
+  }
+  catch ( itk::ExceptionObject &err )
+  {
+    this->importer_->set_error( err.GetDescription() );
+    return false;
   }
   catch( ... )
   {
