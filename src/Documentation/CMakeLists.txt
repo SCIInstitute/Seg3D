@@ -3,7 +3,7 @@
 # 
 #  The MIT License
 # 
-#  Copyright (c) 2011 Scientific Computing and Imaging Institute,
+#  Copyright (c) 2015 Scientific Computing and Imaging Institute,
 #  University of Utah.
 # 
 #  
@@ -48,8 +48,7 @@ MACRO(ADD_PDF_DOCUMENT document)
   FILE(READ ${CMAKE_CURRENT_SOURCE_DIR}/${document}.tex tex_file)
   STRING(REGEX MATCH "bibliography" NEED_BIBTEX ${tex_file})
 
-
-  IF (NEED_BIBTEX)
+  IF(NEED_BIBTEX)
     ADD_CUSTOM_COMMAND(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${document}.bbl
         DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${document}.aux
@@ -74,7 +73,7 @@ MACRO(ADD_PDF_DOCUMENT document)
         ARGS    -interaction=batchmode ${CMAKE_CURRENT_BINARY_DIR}/${document}.tex
         COMMENT "PDFLatex ${document} (third pass)"  
       )
-  ELSE (NEED_BIBTEX)
+  ELSE()
     ADD_CUSTOM_COMMAND(
         OUTPUT  ${CMAKE_CURRENT_BINARY_DIR}/${document}.pdf
         DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${document}.aux
@@ -91,7 +90,7 @@ MACRO(ADD_PDF_DOCUMENT document)
         COMMENT "PDFLatex ${document} (third pass)"  
       )
 
-  ENDIF (NEED_BIBTEX)
+  ENDIF()
 
   ADD_CUSTOM_TARGET(${document} ALL 
                       DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${document}.log)
@@ -120,8 +119,7 @@ MACRO(ADD_PDF_DOCUMENT document)
   ELSE()
     INSTALL(FILES ${SEG3D_BINARY_DIR}/Documentation/${document}.pdf DESTINATION Documentation)
   ENDIF()
-ENDMACRO(ADD_PDF_DOCUMENT)
-
+ENDMACRO()
 
 # ADD DOCUMENTS
 

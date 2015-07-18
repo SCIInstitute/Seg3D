@@ -4,9 +4,9 @@
 #---------------------------------------------------------------------------
 DOXYFILE_ENCODING      = UTF-8
 PROJECT_NAME           = @PROJECT_NAME@
-PROJECT_NUMBER         = 2.1
-PROJECT_BRIEF          = "Seg3D is a free volume segmentation and processing tool developed by the NIH Center for Integrative Biomedical Computing at the University of Utah Scientific Computing and Imaging (SCI) Institute."
-PROJECT_LOGO           = @Seg3D_SOURCE_DIR@/Resources/Icons/Seg3DLarge.png
+PROJECT_NUMBER         = @SEG3D_MAJOR_VERSION@.@SEG3D_MINOR_VERSION@
+PROJECT_BRIEF          = "@PROJECT_NAME@ is a free volume segmentation and processing tool developed by the NIH Center for Integrative Biomedical Computing at the University of Utah Scientific Computing and Imaging (SCI) Institute."
+PROJECT_LOGO           = @SEG3D_SOURCE_DIR@/Resources/Icons/Seg3DLarge.png
 OUTPUT_DIRECTORY       = @CMAKE_CURRENT_BINARY_DIR@
 CREATE_SUBDIRS         = NO
 OUTPUT_LANGUAGE        = English
@@ -26,7 +26,7 @@ ABBREVIATE_BRIEF       = "The $name class" \
 ALWAYS_DETAILED_SEC    = NO
 INLINE_INHERITED_MEMB  = NO
 FULL_PATH_NAMES        = YES
-STRIP_FROM_PATH        = @Seg3D_SOURCE_DIR@
+STRIP_FROM_PATH        = @SEG3D_SOURCE_DIR@
 STRIP_FROM_INC_PATH    = 
 SHORT_NAMES            = NO
 JAVADOC_AUTOBRIEF      = NO
@@ -109,7 +109,7 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 # configuration options related to the input files
 #---------------------------------------------------------------------------
-INPUT                  = @Seg3D_SOURCE_DIR@
+INPUT                  = @SEG3D_SOURCE_DIR@
 INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          = *.c \
                          *.cc \

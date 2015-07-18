@@ -465,6 +465,7 @@ ENDIF()
 MESSAGE(STATUS "Configuring Seg3D registered functions")
 GENERATE_REGISTRATION_FILES()
 
+
 ###########################################
 # Generate the python functions registration file
 ###########################################
@@ -474,6 +475,20 @@ IF(BUILD_WITH_PYTHON)
   GENERATE_ACTION_PYTHON_WRAPPER_REGISTRATION_FILE()
 ENDIF()
 
+
+###########################################
+# Configure LaTeX and Doxygen documentation
+###########################################
+
+IF(BUILD_DOCUMENTATION)
+  ADD_SUBDIRECTORY(Documentation)
+ENDIF()
+
+IF(BUILD_DOXYGEN_DOCUMENTATION)
+  ADD_SUBDIRECTORY(Documentation/Doxygen)
+ENDIF()
+
+
 ###########################################
 # Bootstrap
 # Add code for packaging shaders and other
@@ -481,33 +496,6 @@ ENDIF()
 ###########################################
 
 ADD_SUBDIRECTORY(Bootstrap)
-
-###########################################
-# Configure LaTeX and Doxygen documentation
-###########################################
-
-FIND_PACKAGE(LATEX)
-
-IF(PDFLATEX_COMPILER)
-  IF(BUILD_DOCUMENTATION)
-    ADD_SUBDIRECTORY(Documentation)
-  ENDIF()
-ENDIF()
-
-IF(BUILD_DOCUMENTATION)
-  OPTION(BUILD_DOXYGEN_DOCUMENTATION "Generate doxygen-based documentation." OFF)
-  MARK_AS_ADVANCED(BUILD_DOXYGEN_DOCUMENTATION)
-
-  IF(BUILD_DOXYGEN_DOCUMENTATION)
-    FIND_PACKAGE(Doxygen)
-
-    IF(DOXYGEN_FOUND)
-      ADD_SUBDIRECTORY(Documentation/Doxygen)
-    ELSE()
-      SET(BUILD_DOXYGEN_DOCUMENTATION OFF CACHE BOOL "Generate doxygen-based documentation." FORCE)
-    ENDIF()
-  ENDIF()
-ENDIF()
 
 
 ###########################################
