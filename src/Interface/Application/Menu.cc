@@ -268,7 +268,7 @@ void Menu::create_file_menu( QMenuBar* menubar )
   this->export_isosurface_qaction_->setShortcut( tr( "Ctrl+I" ) );
   this->export_isosurface_qaction_->setToolTip( tr( "Export isosurface to file." ) );
   QtUtils::QtBridge::Connect( this->export_isosurface_qaction_,
-    boost::bind( &LayerIOFunctions::ExportIsosurface, this->main_window_ ) );
+    boost::bind( &LayerIOFunctions::ExportIsosurfaceFromActiveLayer, this->main_window_ ) );
   this->export_isosurface_qaction_->setEnabled( false );
 
   // == Export Active Data Layer... ==
