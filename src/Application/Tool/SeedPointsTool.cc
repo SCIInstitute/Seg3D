@@ -3,7 +3,7 @@
 
  The MIT License
 
- Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
 
 
@@ -42,6 +42,9 @@
 
 namespace Seg3D
 {
+
+const Core::Color SeedPointsTool::yellow( 1.0f, 1.0f, 0.0f );
+const Core::Color SeedPointsTool::dark_yellow( 0.6f, 0.6f, 0.0f );
 
 //////////////////////////////////////////////////////////////////////////
 // Implementation of class  SeedPointsToolPrivate
@@ -173,15 +176,16 @@ bool SeedPointsTool::handle_mouse_move( ViewerHandle viewer,
 }
 
 void SeedPointsTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
-  int viewer_width, int viewer_height )
+                             int viewer_width, int viewer_height )
 {
   ViewerHandle viewer = ViewerManager::Instance()->get_viewer( viewer_id );
   if ( viewer->is_volume_view() )
   {
     return;
   }
+
   Core::VolumeSliceHandle vol_slice = this->private_->get_target_slice( viewer );
-  if ( !vol_slice )
+  if ( ! vol_slice )
   {
     return;
   }
@@ -191,6 +195,7 @@ void SeedPointsTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
     seed_points = this->seed_points_state_->get();
   }
+
   size_t num_of_pts = seed_points.size();
   if ( num_of_pts == 0 )
   {
@@ -200,18 +205,19 @@ void SeedPointsTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
   glPushAttrib( GL_LINE_BIT );
   glLineWidth( 1.0f );
 
-  for ( size_t i = 0; i < num_of_pts; i++ )
+  for ( auto &seed_point : seed_points )
   {
     double x_pos, y_pos;
-    vol_slice->project_onto_slice( seed_points[ i ], x_pos, y_pos );
+    vol_slice->project_onto_slice( seed_point, x_pos, y_pos );
     Core::Point pt( x_pos, y_pos, 0 );
     pt = proj_mat * pt;
     int x = static_cast< int >( ( pt[ 0 ] + 1.0 ) * 0.5 * ( viewer_width - 1 ) );
     int y = static_cast< int >( ( pt[ 1 ] + 1.0 ) * 0.5 * ( viewer_height - 1 ) );
-    int slice_num = vol_slice->get_closest_slice( seed_points[ i ] );
-    bool in_slice = ( !vol_slice->out_of_boundary() && 
-      slice_num == static_cast< int >( vol_slice->get_slice_number() ) );
-    Core::Color color = in_slice ? Core::Color( 1.0f, 1.0f, 0.0f ) : Core::Color( 0.6f, 0.6f, 0.0f );
+    int slice_num = vol_slice->get_closest_slice( seed_point );
+    bool in_slice = ( ! vol_slice->out_of_boundary() &&
+                      static_cast< int >( vol_slice->get_slice_number() ) == slice_num );
+
+    Core::Color color = in_slice ? yellow : dark_yellow;
     glColor3f( color.r(), color.g(), color.b() );
     glBegin( GL_LINES );
       glVertex2i( x - 5, y );
@@ -236,22 +242,23 @@ bool SeedPointsTool::find_point( ViewerHandle viewer, double world_x, double wor
 
   // Step 2: Search for the first seed point that's within 4 pixels in each direction
   // from the given search position (world_x, world_y)
-  double range_x = pixel_width * 4;
-  double range_y = pixel_height * 4;
+  const int NEIGHBORHOOD_SIZE = 4;
+  double range_x = pixel_width * NEIGHBORHOOD_SIZE;
+  double range_y = pixel_height * NEIGHBORHOOD_SIZE;
   std::vector< Core::Point > seed_points;
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
     seed_points = this->seed_points_state_->get();
   }
-  size_t num_of_pts = seed_points.size();
-  for ( size_t i = 0; i < num_of_pts; i++ )
+
+  for ( auto &seed_point : seed_points )
   {
     double pt_x, pt_y;
-    vol_slice->project_onto_slice( seed_points[ i ], pt_x, pt_y );
+    vol_slice->project_onto_slice( seed_point, pt_x, pt_y );
     if ( Core::Abs( pt_x - world_x ) <= range_x &&
          Core::Abs( pt_y - world_y ) <= range_y )
     {
-      pt = seed_points[ i ];
+      pt = seed_point;
       return true;
     }
   }

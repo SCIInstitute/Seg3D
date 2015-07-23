@@ -3,7 +3,7 @@
  
  The MIT License
  
- Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
  
  
@@ -91,10 +91,15 @@ public:
 
   /// FIND_POINT:
   /// Find seed point in viewer and return coordinates.
-  bool find_point( ViewerHandle viewer, double world_x, double world_y, Core::VolumeSliceHandle vol_slice, Core::Point& pt );
+  bool find_point( ViewerHandle viewer, double world_x, double world_y,
+                   Core::VolumeSliceHandle vol_slice, Core::Point& pt );
 
 public:
   Core::StatePointVectorHandle seed_points_state_;
+
+public:
+  static const Core::Color yellow;
+  static const Core::Color dark_yellow;
 
 private:
   SeedPointsToolPrivateHandle private_;
