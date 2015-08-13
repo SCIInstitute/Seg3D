@@ -1,0 +1,15 @@
+language: c++
+
+sudo: false
+
+addons:
+  apt:
+    packages:
+      - g++
+      - cmake
+      - libqt4-dev
+
+script:
+  - cd bin
+  - cmake ../Superbuild
+  - make
