@@ -4,10 +4,16 @@ sudo: false
 
 addons:
   apt:
+    sources:
+      - ubuntu-toolchain-r-test
     packages:
-      - g++
-      - cmake
+      - g++-4.8
       - libqt4-dev
+
+before_script:
+  - wget http://www.sci.utah.edu/devbuilds/seg3d/travis-ci/cmake-2.8_ubuntu_12.tgz /tmp/cmake-2.8_ubuntu_12.tgz
+  - tar -xvf /tmp/cmake-2.8_ubuntu_12.tgz
+  - export PATH=$PWD/cmake-2.8/bin:$PATH
 
 script:
   - cd bin
