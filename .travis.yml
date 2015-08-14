@@ -14,6 +14,7 @@ before_script:
   - wget http://www.sci.utah.edu/devbuilds/seg3d/travis-ci/cmake-2.8_ubuntu_12.tgz -O /tmp/cmake-2.8_ubuntu_12.tgz
   - tar -xvf /tmp/cmake-2.8_ubuntu_12.tgz
   - export PATH=$PWD/cmake-2.8/bin:$PATH
+  - export CXX="g++-4.8" CC="gcc-4.8"
 
 script:
   - cd bin
