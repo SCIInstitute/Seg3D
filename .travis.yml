@@ -1,6 +1,6 @@
 language: c++
 
-sudo: false
+sudo: required
 
 addons:
   apt:
@@ -11,10 +11,16 @@ addons:
       - libqt4-dev
 
 before_script:
+  - sudo update-alternatives --remove-all gcc
+  - sudo update-alternatives --remove-all g++
+  - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 20
+  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 20
+  - sudo update-alternatives --config gcc
+  - sudo update-alternatives --config g++
+  - export CXX="g++-4.8" CC="gcc-4.8"
   - wget http://www.sci.utah.edu/devbuilds/seg3d/travis-ci/cmake-2.8_ubuntu_12.tgz -O /tmp/cmake-2.8_ubuntu_12.tgz
   - tar -xvf /tmp/cmake-2.8_ubuntu_12.tgz
   - export PATH=$PWD/cmake-2.8/bin:$PATH
-  - export CXX="g++-4.8" CC="gcc-4.8"
 
 script:
   - cd bin
