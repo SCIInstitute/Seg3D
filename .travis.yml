@@ -7,10 +7,12 @@ addons:
     sources:
       - ubuntu-toolchain-r-test
     packages:
-      - g++-4.8
+      #- g++-4.8
       - libqt4-dev
 
 before_script:
+  - sudo apt-get install gcc-4.8
+  - sudo apt-get install g++-4.8
   - sudo update-alternatives --remove-all gcc
   - sudo update-alternatives --remove-all g++
   - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 20
