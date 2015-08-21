@@ -26,5 +26,5 @@ before_script:
 
 script:
   - cd bin
-  - cmake ../Superbuild
-  - make
+  - cmake -DDEFAULT_MOSAIC_SETTING:BOOL=OFF ../Superbuild
+  - make -j2
