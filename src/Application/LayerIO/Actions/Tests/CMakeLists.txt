@@ -1,22 +1,21 @@
-#
 #  For more information, please see: http://software.sci.utah.edu
-# 
+#
 #  The MIT License
-# 
+#
 #  Copyright (c) 2015 Scientific Computing and Imaging Institute,
 #  University of Utah.
-# 
-#  
+#
+#
 #  Permission is hereby granted, free of charge, to any person obtaining a
 #  copy of this software and associated documentation files (the "Software"),
 #  to deal in the Software without restriction, including without limitation
 #  the rights to use, copy, modify, merge, publish, distribute, sublicense,
 #  and/or sell copies of the Software, and to permit persons to whom the
 #  Software is furnished to do so, subject to the following conditions:
-# 
+#
 #  The above copyright notice and this permission notice shall be included
-#  in all copies or substantial portions of the Software. 
-# 
+#  in all copies or substantial portions of the Software.
+#
 #  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
 #  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 #  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -24,12 +23,18 @@
 #  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 #  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 #  DEALINGS IN THE SOFTWARE.
+#
 
-SET(TEST_OUTPUT_PATH ${CMAKE_BINARY_DIR}/TestOutput CACHE PATH "Location for files written by tests." FORCE)
-FILE(MAKE_DIRECTORY ${TEST_OUTPUT_PATH})
+SET(Application_LayerIO_Tests_SRCS
+  ActionExportPointsTests.cc
+)
 
-ADD_SUBDIRECTORY(Utils)
+REGISTER_UNIT_TEST(Application_LayerIO_Tests
+  ${Application_LayerIO_Tests_SRCS}
+)
 
-FOREACH(test ${UNIT_TEST_LIST})
-  ADD_TEST(${test} ${SEG3D_BINARY_DIR}/${test})
-ENDFOREACH()
+TARGET_LINK_LIBRARIES(Application_LayerIO_Tests
+  Application_LayerIO
+  Testing_Utils
+  ${SCI_GTESTMAIN_LIBRARY}
+)
