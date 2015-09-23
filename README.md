@@ -37,8 +37,10 @@ has not been tested under Cygwin or MinGW compilers.
 
 #### Mac OS X
 
-The source code base was built with Xcode as well as GNU Make and works for both 
+The source code base was built with Xcode 4-6 as well as GNU Make and works for both 
 environments on OS X 10.7+.
+
+**Xcode 7 is not currently supported.**
 
 #### Linux
 
@@ -91,6 +93,11 @@ development environment and build.
 Following the previous example, the Seg3D application will be built in bin/Seg3D.
 
 A bash build script (build.sh) is also available for Linux and Mac OS X to simplify the process.
+Usage information is available using the --help flag:
+
+```
+./build.sh --help
+```
 
 ## Seg3D Data
 
