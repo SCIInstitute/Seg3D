@@ -473,7 +473,7 @@ void ResampleAlgo::resample_data_layer( DataLayerHandle input, DataLayerHandle o
     nrrdNuke( nrrd_out );
     CORE_LOG_ERROR( "Failed to resample layer '" + input->get_layer_id() +"'" );
   }
-  else if ( !this->check_abort() )
+  else if ( ! this->check_abort() )
   {
     Core::NrrdDataHandle nrrd_data( new Core::NrrdData( nrrd_out ) );
     Core::DataBlockHandle data_block = Core::NrrdDataBlock::New( nrrd_data );
@@ -577,18 +577,41 @@ void ResampleAlgo::run_filter()
       return;
     }
 
-    switch ( this->src_layers_[ i ]->get_type() )
+    if ( this->src_layers_[ i ]->get_type() == Core::VolumeType::DATA_E )
     {
-      case Core::VolumeType::DATA_E:
-        this->resample_data_layer(
-          boost::dynamic_pointer_cast< DataLayer >( this->src_layers_[ i ] ),
-          boost::dynamic_pointer_cast< DataLayer >( this->dst_layers_[ i ] ) );
-        break;
-      case Core::VolumeType::MASK_E:
-        this->resample_mask_layer(
-          boost::dynamic_pointer_cast< MaskLayer >( this->src_layers_[ i ] ),
-          boost::dynamic_pointer_cast< MaskLayer >( this->dst_layers_[ i ] ) );
-        break;
+      DataLayerHandle src_data_layer = boost::dynamic_pointer_cast< DataLayer >( this->src_layers_[ i ] );
+      if (! src_data_layer)
+      {
+        this->report_error("Error obtaining source data layer.");
+        return;
+      }
+      DataLayerHandle dst_data_layer = boost::dynamic_pointer_cast< DataLayer >( this->dst_layers_[ i ] );
+      if (! dst_data_layer)
+      {
+        this->report_error("Error obtaining destination data layer.");
+        return;
+      }
+      this->resample_data_layer( src_data_layer, dst_data_layer );
+    }
+    else if ( this->src_layers_[ i ]->get_type() == Core::VolumeType::MASK_E )
+    {
+      MaskLayerHandle src_mask_layer = boost::dynamic_pointer_cast< MaskLayer >( this->src_layers_[ i ] );
+      if (! src_mask_layer)
+      {
+        this->report_error("Error obtaining source mask layer.");
+        return;
+      }
+      MaskLayerHandle dst_mask_layer = boost::dynamic_pointer_cast< MaskLayer >( this->dst_layers_[ i ] );
+      if (! dst_mask_layer)
+      {
+        this->report_error("Error obtaining destination mask layer.");
+        return;
+      }
+      this->resample_mask_layer( src_mask_layer, dst_mask_layer );
+    }
+    else
+    {
+      CORE_LOG_WARNING("Attempting to resample unsupported layer type.");
     }
 
     if ( ! this->dst_layers_[ i ] )
@@ -596,7 +619,7 @@ void ResampleAlgo::run_filter()
       this->report_error( "Could not allocate enough memory." );
       return;
     }
-    
+
     if ( this->check_abort() ) break;
   }
 }
