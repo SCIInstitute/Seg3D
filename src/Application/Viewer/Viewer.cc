@@ -170,7 +170,9 @@ public:
 void ViewerPrivate::adjust_contrast_brightness( int dx, int dy )
 {
   LayerHandle active_layer = LayerManager::Instance()->get_active_layer();
-  if ( !active_layer || ( active_layer->get_type() != Core::VolumeType::DATA_E && active_layer->get_type() != Core::VolumeType::LARGE_DATA_E ) )
+  if ( ( ! active_layer ) ||
+       ( active_layer->get_type() != Core::VolumeType::DATA_E && active_layer->get_type() != Core::VolumeType::LARGE_DATA_E ) ||
+       ( ! active_layer->is_visible( this->viewer_->get_viewer_id() ) ) )
   {
     return;
   }
