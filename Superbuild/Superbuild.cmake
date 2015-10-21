@@ -64,7 +64,7 @@ ENDIF()
 ###########################################
 
 OPTION(BUILD_LARGE_VOLUME_TOOLS "Build with large volume (bricked) dataset support." ON)
-SET(DEFAULT_MOSAIC_SETTING ON)
+SET(DEFAULT_MOSAIC_SETTING OFF)
 IF(WIN32)
   # still highly experimental on Windows...
   SET(DEFAULT_MOSAIC_SETTING OFF)
