@@ -28,12 +28,17 @@
 
 // Application includes
 #include <Application/Filters/LayerResampler.h>
+
 #include <Application/Filters/Actions/ActionResample.h>
+#include <Application/Filters/NrrdResampleFilter.h>
+
 #include <Application/Layer/Layer.h>
 #include <Application/Layer/LayerGroup.h>
 
 namespace Seg3D
 {
+
+using namespace Filter;
 
 class LayerResamplerPrivate
 {
@@ -47,7 +52,7 @@ public:
 
 void LayerResamplerPrivate::handle_kernel_changed( std::string kernel_name )
 {
-  this->tool_->has_params_state_->set( kernel_name == ActionResample::GAUSSIAN_C );
+  this->tool_->has_params_state_->set( kernel_name == NrrdResampleFilter::GAUSSIAN_C );
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -63,20 +68,19 @@ LayerResampler::LayerResampler( LayerHandle src_layer, LayerHandle dst_layer ) :
   this->private_->dst_layer_ = dst_layer;
 
   std::vector< Core::OptionLabelPair > padding_values;
-  padding_values.push_back( std::make_pair( ActionResample::ZERO_C, "0" ) );
-  padding_values.push_back( std::make_pair( ActionResample::MIN_C, "Minimum Value" ) );
-  padding_values.push_back( std::make_pair( ActionResample::MAX_C, "Maximum Value" ) );
-  this->add_state( "pad_value", this->padding_value_state_, ActionResample::ZERO_C, 
-    padding_values );
+  padding_values.push_back( std::make_pair( NrrdResampleFilter::ZERO_C, "0" ) );
+  padding_values.push_back( std::make_pair( NrrdResampleFilter::MIN_C, "Minimum Value" ) );
+  padding_values.push_back( std::make_pair( NrrdResampleFilter::MAX_C, "Maximum Value" ) );
+  this->add_state( "pad_value", this->padding_value_state_, NrrdResampleFilter::ZERO_C, padding_values );
 
   std::vector< Core::OptionLabelPair > kernels;
-  kernels.push_back( std::make_pair( ActionResample::BOX_C, "Box" ) );
-  kernels.push_back( std::make_pair( ActionResample::TENT_C, "Tent" ) );
-  kernels.push_back( std::make_pair( ActionResample::CUBIC_CR_C, "Cubic (Catmull-Rom)" ) );
-  kernels.push_back( std::make_pair( ActionResample::CUBIC_BS_C, "Cubic (B-spline)" ) );
-  kernels.push_back( std::make_pair( ActionResample::QUARTIC_C, "Quartic" ) );
-  kernels.push_back( std::make_pair( ActionResample::GAUSSIAN_C, "Gaussian" ) );
-  this->add_state( "kernel", this->kernel_state_, ActionResample::BOX_C, kernels );
+  kernels.push_back( std::make_pair( NrrdResampleFilter::BOX_C, "Box" ) );
+  kernels.push_back( std::make_pair( NrrdResampleFilter::TENT_C, "Tent" ) );
+  kernels.push_back( std::make_pair( NrrdResampleFilter::CUBIC_CR_C, "Cubic (Catmull-Rom)" ) );
+  kernels.push_back( std::make_pair( NrrdResampleFilter::CUBIC_BS_C, "Cubic (B-spline)" ) );
+  kernels.push_back( std::make_pair( NrrdResampleFilter::QUARTIC_C, "Quartic" ) );
+  kernels.push_back( std::make_pair( NrrdResampleFilter::GAUSSIAN_C, "Gaussian" ) );
+  this->add_state( "kernel", this->kernel_state_, NrrdResampleFilter::BOX_C, kernels );
 
   this->add_state( "sigma", this->gauss_sigma_state_, 1.0, 1.0, 100.0, 0.01 );
   this->add_state( "cutoff", this->gauss_cutoff_state_, 1.0, 1.0, 100.0, 0.01 );

@@ -67,11 +67,11 @@ public:
 public:   
   /// RAISE_ABORT:
   /// Raise the abort flag
-  void raise_abort();
+  virtual void raise_abort() override;
     
   /// CHECK_ABORT:
   /// Check the abort flag
-  bool check_abort(); 
+  virtual bool check_abort() override;
 
   /// RAISE_STOP:
   /// Raise the stop flag
@@ -86,7 +86,7 @@ public:
   /// can be aborted. If not the state of the program is unclear. Hence this function will ensure
   /// that the filter has finished processing and that all locks are cleared.
   /// NOTE: This function should be run on the application thread only
-  virtual void abort_and_wait();  
+  virtual void abort_and_wait() override;
     
   /// CONNECT_ABORT:
   /// Monitor the abort flag of a layer

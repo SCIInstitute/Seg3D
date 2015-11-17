@@ -61,6 +61,15 @@ public:
   // -- abort handling -- 
 public:
   virtual void abort_and_wait() = 0;
+
+  /// RAISE_ABORT:
+  /// Raise the abort flag
+  virtual void raise_abort() = 0;
+
+  /// CHECK_ABORT:
+  /// Check the abort flag
+  virtual bool check_abort() = 0;
+
 };
 
 } // end namespace Seg3D

@@ -76,7 +76,7 @@ public:
   
 private:
   ActionResamplePrivateHandle private_;
-  
+
 public:
   static void Dispatch( Core::ActionContextHandle context, 
     const std::vector< std::string >& layer_ids, int x, int y, int z, 
@@ -90,18 +90,6 @@ public:
   static void Dispatch( Core::ActionContextHandle context, const std::string& src_layer,
     const std::string& dst_layer, const std::string& padding, const std::string& kernel, 
     double param1, double param2, bool replace );
-
-public:
-  static const std::string ZERO_C;
-  static const std::string MIN_C;
-  static const std::string MAX_C;
-
-  static const std::string BOX_C;
-  static const std::string TENT_C;
-  static const std::string CUBIC_CR_C;
-  static const std::string CUBIC_BS_C;
-  static const std::string QUARTIC_C;
-  static const std::string GAUSSIAN_C;
 };
   
 } //

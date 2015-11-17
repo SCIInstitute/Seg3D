@@ -32,6 +32,8 @@
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/ResampleTool.h>
 #include <Application/Filters/Actions/ActionResample.h>
+#include <Application/Filters/NrrdResampleFilter.h>
+
 #include <Application/Layer/Layer.h>
 #include <Application/Layer/LayerGroup.h>
 #include <Application/Layer/LayerManager.h>
@@ -41,6 +43,8 @@ SCI_REGISTER_TOOL( Seg3D, ResampleTool )
 
 namespace Seg3D
 {
+
+using namespace Filter;
 
 class ResampleToolPrivate
 {
@@ -184,7 +188,7 @@ void ResampleToolPrivate::handle_constraint_aspect_changed( bool constraint )
 
 void ResampleToolPrivate::handle_kernel_changed( std::string kernel_name )
 {
-  this->tool_->has_params_state_->set( kernel_name == ActionResample::GAUSSIAN_C );
+  this->tool_->has_params_state_->set( kernel_name == NrrdResampleFilter::GAUSSIAN_C );
 }
 
 void ResampleToolPrivate::handle_size_scheme_changed( std::string size_scheme )
@@ -243,11 +247,10 @@ ResampleTool::ResampleTool( const std::string& toolid ) :
   this->add_state( "dst_group", this->dst_group_state_, "", "" );
 
   std::vector< Core::OptionLabelPair > padding_values;
-  padding_values.push_back( std::make_pair( ActionResample::ZERO_C, "0" ) );
-  padding_values.push_back( std::make_pair( ActionResample::MIN_C, "Minimum Value" ) );
-  padding_values.push_back( std::make_pair( ActionResample::MAX_C, "Maximum Value" ) );
-  this->add_state( "pad_value", this->padding_value_state_, ActionResample::ZERO_C, 
-    padding_values );
+  padding_values.push_back( std::make_pair( NrrdResampleFilter::ZERO_C, "0" ) );
+  padding_values.push_back( std::make_pair( NrrdResampleFilter::MIN_C, "Minimum Value" ) );
+  padding_values.push_back( std::make_pair( NrrdResampleFilter::MAX_C, "Maximum Value" ) );
+  this->add_state( "pad_value", this->padding_value_state_, NrrdResampleFilter::ZERO_C, padding_values );
 
   this->add_state( "output_x", this->output_dimensions_state_[ 0 ], 1, 1, 500, 1 );
   this->add_state( "output_y", this->output_dimensions_state_[ 1 ], 1, 1, 500, 1 );
@@ -262,13 +265,13 @@ ResampleTool::ResampleTool( const std::string& toolid ) :
   this->output_dimensions_state_[ 2 ]->set_session_priority( Core::StateBase::LOAD_LAST_E );
 
   std::vector< Core::OptionLabelPair > kernels;
-  kernels.push_back( std::make_pair( ActionResample::BOX_C, "Box" ) );
-  kernels.push_back( std::make_pair( ActionResample::TENT_C, "Tent" ) );
-  kernels.push_back( std::make_pair( ActionResample::CUBIC_CR_C, "Cubic (Catmull-Rom)" ) );
-  kernels.push_back( std::make_pair( ActionResample::CUBIC_BS_C, "Cubic (B-spline)" ) );
-  kernels.push_back( std::make_pair( ActionResample::QUARTIC_C, "Quartic" ) );
-  kernels.push_back( std::make_pair( ActionResample::GAUSSIAN_C, "Gaussian" ) );
-  this->add_state( "kernel", this->kernel_state_, ActionResample::BOX_C, kernels );
+  kernels.push_back( std::make_pair( NrrdResampleFilter::BOX_C, "Box" ) );
+  kernels.push_back( std::make_pair( NrrdResampleFilter::TENT_C, "Tent" ) );
+  kernels.push_back( std::make_pair( NrrdResampleFilter::CUBIC_CR_C, "Cubic (Catmull-Rom)" ) );
+  kernels.push_back( std::make_pair( NrrdResampleFilter::CUBIC_BS_C, "Cubic (B-spline)" ) );
+  kernels.push_back( std::make_pair( NrrdResampleFilter::QUARTIC_C, "Quartic" ) );
+  kernels.push_back( std::make_pair( NrrdResampleFilter::GAUSSIAN_C, "Gaussian" ) );
+  this->add_state( "kernel", this->kernel_state_, NrrdResampleFilter::BOX_C, kernels );
 
   this->add_state( "sigma", this->gauss_sigma_state_, 1.0, 1.0, 100.0, 0.01 );
   this->add_state( "cutoff", this->gauss_cutoff_state_, 1.0, 1.0, 100.0, 0.01 );
