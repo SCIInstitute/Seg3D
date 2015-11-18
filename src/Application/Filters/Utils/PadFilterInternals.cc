@@ -41,58 +41,56 @@ using namespace Core;
 
 PadFilterInternals::PadFilterInternals(LayerHandle src_layer, LayerHandle dst_layer, const std::string& padding)
 : padding_( padding ),
-  src_trans( src_layer->get_grid_transform() ),
-  dst_trans( dst_layer->get_grid_transform() )
-{}
-
-void PadFilterInternals::detect_padding_only()
+  EPSILON(1e-2),
+  src_trans_( src_layer->get_grid_transform() ),
+  dst_trans_( dst_layer->get_grid_transform() )
 {
-  this->padding_only_ = false;
-  double epsilon = 1e-2;
-
-  // Compare spacing
-  Vector src_spacing = src_trans * Vector( 1.0, 1.0, 1.0 );
-  Vector dst_spacing = dst_trans * Vector( 1.0, 1.0, 1.0 );
-  if ( Abs( src_spacing[ 0 ] - dst_spacing[ 0 ] ) > epsilon * src_spacing[ 0 ] ||
-       Abs( src_spacing[ 1 ] - dst_spacing[ 1 ] ) > epsilon * src_spacing[ 1 ] ||
-       Abs( src_spacing[ 2 ] - dst_spacing[ 2 ] ) > epsilon * src_spacing[ 2 ] )
-  {
-    return;
-  }
-
-  // Check if source grid aligns with destination grid
-  Point src_origin = src_trans * Point( 0.0, 0.0, 0.0 );
-  Transform inv_dst_trans = dst_trans.get_inverse();
-  Point src_origin_to_dst_index = inv_dst_trans * src_origin;
-  if ( Abs( Fraction( src_origin_to_dst_index[ 0 ] ) ) > epsilon ||
-       Abs( Fraction( src_origin_to_dst_index[ 1 ] ) ) > epsilon ||
-       Abs( Fraction( src_origin_to_dst_index[ 2 ] ) ) > epsilon )
-  {
-    return;
-  }
-
-  CORE_LOG_DEBUG( "Resample tool: padding only situation detected." );
-  this->padding_only_ = true;
+  Point src_origin = src_trans_ * Point( 0.0, 0.0, 0.0 );
+  Transform inv_dst_trans = dst_trans_.get_inverse();
+  src_origin_to_dst_index_ = inv_dst_trans * src_origin;
 
   // Compute the range of the source volume mapped to the destination volume in index space
-  this->mapped_x_start_ = static_cast< int >( src_origin_to_dst_index[ 0 ] );
-  this->mapped_y_start_ = static_cast< int >( src_origin_to_dst_index[ 1 ] );
-  this->mapped_z_start_ = static_cast< int >( src_origin_to_dst_index[ 2 ] );
+  this->mapped_x_start_ = static_cast< int >( src_origin_to_dst_index_[ 0 ] );
+  this->mapped_y_start_ = static_cast< int >( src_origin_to_dst_index_[ 1 ] );
+  this->mapped_z_start_ = static_cast< int >( src_origin_to_dst_index_[ 2 ] );
   this->overlap_x_start_ = Max( 0, this->mapped_x_start_ );
   this->overlap_y_start_ = Max( 0, this->mapped_y_start_ );
   this->overlap_z_start_ = Max( 0, this->mapped_z_start_ );
-  this->overlap_nx_ = Max( Min( this->mapped_x_start_ +
-                                static_cast< int >( src_trans.get_nx() ),
-                                static_cast< int >( dst_trans.get_nx() ) ) -
+  this->overlap_nx_ = Max( Min( this->mapped_x_start_ + static_cast< int >( src_trans_.get_nx() ),
+                                static_cast< int >( dst_trans_.get_nx() ) ) -
                                 this->overlap_x_start_, 0 );
-  this->overlap_ny_ = Max( Min( this->mapped_y_start_ +
-                                static_cast< int >( src_trans.get_ny() ),
-                                static_cast< int >( dst_trans.get_ny() ) ) -
-                                this->overlap_y_start_, 0 );
-  this->overlap_nz_ = Max( Min( this->mapped_z_start_ +
-                                static_cast< int >( src_trans.get_nz() ),
-                                static_cast< int >( dst_trans.get_nz() ) ) -
-                                this->overlap_z_start_, 0 );
+  this->overlap_ny_ = Max( Min( this->mapped_y_start_ + static_cast< int >( src_trans_.get_ny() ),
+                                static_cast< int >( dst_trans_.get_ny() ) ) -
+                           this->overlap_y_start_, 0 );
+  this->overlap_nz_ = Max( Min( this->mapped_z_start_ + static_cast< int >( src_trans_.get_nz() ),
+                                static_cast< int >( dst_trans_.get_nz() ) ) -
+                           this->overlap_z_start_, 0 );
+}
+
+// for use in resample filters
+bool PadFilterInternals::detect_padding_only()
+{
+  // Compare spacing
+  Vector src_spacing = src_trans_ * Vector( 1.0, 1.0, 1.0 );
+  Vector dst_spacing = dst_trans_ * Vector( 1.0, 1.0, 1.0 );
+  if ( Abs( src_spacing[ 0 ] - dst_spacing[ 0 ] ) > EPSILON * src_spacing[ 0 ] ||
+       Abs( src_spacing[ 1 ] - dst_spacing[ 1 ] ) > EPSILON * src_spacing[ 1 ] ||
+       Abs( src_spacing[ 2 ] - dst_spacing[ 2 ] ) > EPSILON * src_spacing[ 2 ] )
+  {
+    return false;
+  }
+
+  // Check if source grid aligns with destination grid
+  if ( Abs( Fraction( this->src_origin_to_dst_index_[ 0 ] ) ) > EPSILON ||
+       Abs( Fraction( this->src_origin_to_dst_index_[ 1 ] ) ) > EPSILON ||
+       Abs( Fraction( this->src_origin_to_dst_index_[ 2 ] ) ) > EPSILON )
+  {
+    return false;
+  }
+
+  CORE_LOG_DEBUG( "Resample tool: padding only situation detected." );
+
+  return true;
 }
 
 template< class T >
@@ -101,13 +99,13 @@ void PadFilterInternals::pad_and_crop_typed_data( DataBlockHandle src,
                                                   DataLayerHandle output_layer,
                                                   LayerAbstractFilterHandle layer_filter )
 {
-  int src_nx = static_cast< int >( src_trans.get_nx() );
-  int src_ny = static_cast< int >( src_trans.get_ny() );
+  int src_nx = static_cast< int >( src_trans_.get_nx() );
+  int src_ny = static_cast< int >( src_trans_.get_ny() );
   int src_nxy = src_nx * src_ny;
 
-  int dst_nx = static_cast< int >( dst_trans.get_nx() );
-  int dst_ny = static_cast< int >( dst_trans.get_ny() );
-  int dst_nz = static_cast< int >( dst_trans.get_nz() );
+  int dst_nx = static_cast< int >( dst_trans_.get_nx() );
+  int dst_ny = static_cast< int >( dst_trans_.get_ny() );
+  int dst_nz = static_cast< int >( dst_trans_.get_nz() );
   int dst_nxy = dst_nx * dst_ny;
 
   const T* src_data = reinterpret_cast< T* >( src->get_data() );
@@ -279,15 +277,15 @@ DataBlockHandle PadFilterInternals::pad_and_crop_mask_layer( MaskLayerHandle inp
   unsigned char* dst_data = reinterpret_cast< unsigned char* >( output_mask->get_data() );
   unsigned char mask_value = input_mask->get_mask_value();
 
-  GridTransform src_trans = input->get_grid_transform();
-  int src_nx = static_cast< int >( src_trans.get_nx() );
-  int src_ny = static_cast< int >( src_trans.get_ny() );
+  GridTransform src_trans_ = input->get_grid_transform();
+  int src_nx = static_cast< int >( src_trans_.get_nx() );
+  int src_ny = static_cast< int >( src_trans_.get_ny() );
   int src_nxy = src_nx * src_ny;
 
-  GridTransform dst_trans = output->get_grid_transform();
-  int dst_nx = static_cast< int >( dst_trans.get_nx() );
-  int dst_ny = static_cast< int >( dst_trans.get_ny() );
-  int dst_nz = static_cast< int >( dst_trans.get_nz() );
+  GridTransform dst_trans_ = output->get_grid_transform();
+  int dst_nx = static_cast< int >( dst_trans_.get_nx() );
+  int dst_ny = static_cast< int >( dst_trans_.get_ny() );
+  int dst_nz = static_cast< int >( dst_trans_.get_nz() );
   int dst_nxy = dst_nx * dst_ny;
 
   // Pad the non-overlapped part in Z-direction

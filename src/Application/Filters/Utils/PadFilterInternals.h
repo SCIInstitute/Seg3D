@@ -51,8 +51,8 @@ public:
   PadFilterInternals( Seg3D::LayerHandle src_layer, Seg3D::LayerHandle dst_layer, const std::string& padding);
   ~PadFilterInternals() {}
 
-  bool padding_only() const { return this->padding_only_; }
-  void detect_padding_only();
+  bool detect_padding_only();
+
   Core::DataBlockHandle pad_and_crop_data_layer( Seg3D::DataLayerHandle input, Seg3D::DataLayerHandle output, Seg3D::LayerAbstractFilterHandle layer_filter );
   Core::DataBlockHandle pad_and_crop_mask_layer( Seg3D::MaskLayerHandle input, Seg3D::MaskLayerHandle output, Seg3D::LayerAbstractFilterHandle layer_filter );
 
@@ -63,7 +63,6 @@ private:
                                 Seg3D::DataLayerHandle output_layer,
                                 Seg3D::LayerAbstractFilterHandle layer_filter );
 
-  bool padding_only_;
   std::string padding_;
 
   int mapped_x_start_;
@@ -77,8 +76,11 @@ private:
   int overlap_ny_;
   int overlap_nz_;
 
-  Core::GridTransform src_trans;
-  Core::GridTransform dst_trans;
+  const double EPSILON;
+
+  Core::GridTransform src_trans_;
+  Core::GridTransform dst_trans_;
+  Core::Point src_origin_to_dst_index_;
 };
 
 }

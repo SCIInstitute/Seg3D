@@ -64,87 +64,6 @@ const std::string NrrdResampleFilter::QUARTIC_C( "quartic" );
 const std::string NrrdResampleFilter::GAUSSIAN_C( "gauss" );
 
 
-//NrrdResampleFilter::NrrdResampleFilter( const std::string& kernel, double param1, double param2, size_t num_layers, bool replace, bool crop, const std::string& padding, bool match_grid_transform, const GridTransform& grid_transform, const std::vector< std::string >& layer_ids, Core::Point range_min, Core::Point range_max, unsigned int dimX, unsigned int dimY, unsigned int dimZ, SandboxID sandbox )
-//: replace_(replace),
-//  crop_(crop),
-//  padding_(padding),
-//  range_min_(range_min),
-//  range_max_(range_max)
-//{
-//  // Set up parameters
-//  this->dst_layer_ids_.resize( num_layers );
-//  for ( size_t i = 0; i < num_layers; ++i )
-//  {
-//    this->find_layer( layer_ids[ i ], this->src_layers_[ i ] );
-//    if ( this->replace_ )
-//    {
-//      this->lock_for_deletion( this->src_layers_[ i ] );
-//    }
-//    else
-//    {
-//      this->lock_for_use( this->src_layers_[ i ] );
-//    }
-//
-//    // Compute grid transform for the output layers
-//    this->resample_contexts_[ i ] = nrrdResampleContextNew();
-//    this->resample_contexts_[ i ]->verbose = 0;
-//
-//    int error = AIR_FALSE;
-//    error |= nrrdResampleDefaultCenterSet( this->resample_contexts_[ i ], nrrdCenterCell );
-//    if (error)
-//    {
-//      //CORE_LOG_ERROR( "Setting resampled center fail" );
-//      //return false;
-//      CORE_THROW_EXCEPTION( "Setting resampled center fail." );
-//    }
-//
-//    if ( match_grid_transform )
-//    {
-//      this->output_transforms_[ i ] = grid_transform;
-//      this->output_transforms_[ i ].set_originally_node_centered( this->src_layers_[ i ]->get_grid_transform().get_originally_node_centered() );
-//    }
-//    else
-//    {
-//      if (! this->compute_output_grid_transform( this->src_layers_[ i ],
-//            this->resample_contexts_[ i ], this->output_transforms_[ i ] ) )
-//      {
-//        //CORE_LOG_ERROR( "Computing grid transform failed." );
-//        //return false;
-//        CORE_THROW_EXCEPTION( "Computing grid transform failed." );
-//      }
-//    }
-//
-//    switch ( this->src_layers_[ i ]->get_type() )
-//    {
-//      case Core::VolumeType::DATA_E:
-//        this->create_and_lock_data_layer( this->output_transforms_[ i ],
-//          this->src_layers_[ i ], this->dst_layers_[ i ] );
-//        break;
-//      case Core::VolumeType::MASK_E:
-//        this->create_and_lock_mask_layer( this->output_transforms_[ i ],
-//          this->src_layers_[ i ], this->dst_layers_[ i ] );
-//        static_cast< MaskLayer* >( this->dst_layers_[ i ].get() )->color_state_->set(
-//          static_cast< MaskLayer* >( this->src_layers_[ i ].get() )->color_state_->get() );
-//        break;
-//      default:
-//        //CORE_LOG_ERROR( "Unknown volume type." );
-//        //return false;
-//        CORE_THROW_EXCEPTION( "Unknown volume type." );
-//    }
-//
-//    if ( ! this->dst_layers_[ i ] )
-//    {
-//      //CORE_LOG_ERROR( "Could not allocate enough memory." );
-//      //return false;
-//      CORE_THROW_EXCEPTION( "Unknown volume type." );
-//    }
-//    
-//    this->dst_layer_ids_[ i ] = this->dst_layers_[ i ]->get_layer_id();
-//  }
-//
-//  this->pad_internals_ = PadFilterInternalsHandle( new PadFilterInternals( this->src_layers_[0], this->dst_layers_[0], padding ) );
-//}
-
 bool NrrdResampleFilter::setup_layers(const std::vector< std::string >& layer_ids,
                                       bool match_grid_transform, const Core::GridTransform& grid_transform,
                                       unsigned int dimX, unsigned int dimY, unsigned int dimZ)
@@ -228,11 +147,11 @@ bool NrrdResampleFilter::setup_layers(const std::vector< std::string >& layer_id
 NrrdResampleFilter::NrrdResampleFilter( const std::string& kernel, double param1, double param2, bool replace, bool crop, Core::Point range_min, Core::Point range_max, SandboxID sandbox )
   : replace_(replace),
     crop_(crop),
-    //padding_(padding),
+    padding_(NrrdResampleFilter::MAX_C),
+    padding_only_(false),
     range_min_(range_min),
     range_max_(range_max)
 {
-//  this->padding_only_ = false;
   this->data_kernel_ = nrrdKernelSpecNew();
   this->mask_kernel_ = nrrdKernelSpecNew();
 
@@ -470,7 +389,7 @@ bool NrrdResampleFilter::nrrd_resample( Nrrd* nin, Nrrd* nout, NrrdKernelSpec* u
 
 void NrrdResampleFilter::resample_data_layer( DataLayerHandle input, DataLayerHandle output )
 {
-  if ( this->pad_internals_->padding_only() )
+  if ( this->padding_only_ )
   {
     DataBlockHandle output_datablock = this->pad_internals_->pad_and_crop_data_layer( input, output, this->shared_from_this() );
 
@@ -551,7 +470,7 @@ void NrrdResampleFilter::resample_data_layer( DataLayerHandle input, DataLayerHa
 
 void NrrdResampleFilter::resample_mask_layer( MaskLayerHandle input, MaskLayerHandle output )
 {
-  if ( this->pad_internals_->padding_only() )
+  if ( this->padding_only_ )
   {
     DataBlockHandle output_mask = this->pad_internals_->pad_and_crop_mask_layer( input, output, this->shared_from_this() );
 
@@ -647,7 +566,7 @@ void NrrdResampleFilter::run_filter()
     int error = AIR_FALSE;
     if ( this->crop_ )
     {
-      this->pad_internals_->detect_padding_only();
+      this->padding_only_ = this->pad_internals_->detect_padding_only();
       error |= nrrdResampleBoundarySet( this->current_resample_context_, nrrdBoundaryPad );
     }
     else

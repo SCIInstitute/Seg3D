@@ -43,7 +43,8 @@ class NrrdResampleFilter : public Seg3D::LayerFilter
 private:
   bool replace_;
   bool crop_; // Whether to use a different dataset boundary than the original
-  std::string padding_;
+  std::string padding_; // default is max
+  bool padding_only_;
   unsigned int dims_[ 3 ];
 
   Core::Point range_min_; // resample range in index space of the input data
