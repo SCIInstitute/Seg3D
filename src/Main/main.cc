@@ -79,6 +79,16 @@
 
 using namespace Seg3D;
 
+void printUsage()
+{
+  std::cout << "USAGE: " << Core::Application::GetApplicationName() << std::endl;
+  std::cout << "Optional parameters:" << std::endl;
+  std::cout << "  --revision              - Get Git revision information." << std::endl;
+  std::cout << "  --version               - Version number." << std::endl;
+  std::cout << "  --socket=SCALAR         - Open a socket on the given port number." << std::endl;
+  std::cout << "  --help                  - Print this usage message." << std::endl << std::endl;
+}
+
 int main( int argc, char **argv )
 {
   // -- Parse the command line parameters --
@@ -87,7 +97,7 @@ int main( int argc, char **argv )
   // -- Check whether the user requested a version / revision number
   if ( Core::Application::Instance()->is_command_line_parameter( "revision") )
   {
-    // NOTE: The revision information is gathered by cmake from svn. Hence if the local tree
+    // NOTE: The revision information is gathered by cmake from git. Hence if the local tree
     // contains modifications this information is not up-to-date
     std::cout << GIT_SEG3D_REVISIONINFO << std::endl;
     return 0;
@@ -98,6 +108,12 @@ int main( int argc, char **argv )
     // NOTE: This information is gathered by cmake from the main cmake file.
     std::cout << Core::Application::Instance()->GetApplicationName() << " version: " <<  
       Core::Application::Instance()->GetVersion() << std::endl;
+    return 0;
+  }
+
+  if ( Core::Application::Instance()->is_command_line_parameter( "help") )
+  {
+    printUsage();
     return 0;
   }
 
@@ -175,9 +191,10 @@ int main( int argc, char **argv )
   Core::PythonInterpreter::Instance()->run_string( "from " + module_name + " import *\n" );
 #endif
 
-  // -- Checking for the socket parameter --
+  // -- Checking for the socket (accept port too) parameter --
   std::string port_number_string;
-  if( Core::Application::Instance()->check_command_line_parameter( "socket", port_number_string ) )
+  if ( Core::Application::Instance()->check_command_line_parameter( "socket", port_number_string ) ||
+       Core::Application::Instance()->check_command_line_parameter( "port", port_number_string ))
   {
     int port_number;
     if ( Core::ImportFromString( port_number_string, port_number) )

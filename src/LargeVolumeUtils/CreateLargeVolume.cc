@@ -52,7 +52,8 @@
 
 #include <Core/LargeVolume/LargeVolumeConverter.h>
 
-void printUsage() {
+void printUsage()
+{
   std::cout << "USAGE: " << Core::Application::Instance()->GetUtilName()
             <<  " first_file output_volume [OPTIONS]" << std::endl;
   std::cout << "Volume must be an image stack."
