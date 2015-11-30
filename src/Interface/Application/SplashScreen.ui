@@ -29,7 +29,7 @@
   </property>
   <property name="windowIcon">
    <iconset>
-    <normaloff>../../Resources/Icons/Seg3DLarge.png</normaloff>../../Resources/Icons/Seg3DLarge.png</iconset>
+    <normaloff>../../Resources/Icons/seg3d2_128.png</normaloff>../../Resources/Icons/seg3d2_128.png</iconset>
   </property>
   <property name="styleSheet">
    <string notr="true">QDialog#SplashScreen {
