@@ -1,22 +1,22 @@
 #
 #  For more information, please see: http://software.sci.utah.edu
-# 
+#
 #  The MIT License
-# 
+#
 #  Copyright (c) 2015 Scientific Computing and Imaging Institute,
 #  University of Utah.
-# 
-#  
+#
+#
 #  Permission is hereby granted, free of charge, to any person obtaining a
 #  copy of this software and associated documentation files (the "Software"),
 #  to deal in the Software without restriction, including without limitation
 #  the rights to use, copy, modify, merge, publish, distribute, sublicense,
 #  and/or sell copies of the Software, and to permit persons to whom the
 #  Software is furnished to do so, subject to the following conditions:
-# 
+#
 #  The above copyright notice and this permission notice shall be included
-#  in all copies or substantial portions of the Software. 
-# 
+#  in all copies or substantial portions of the Software.
+#
 #  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
 #  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 #  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -221,7 +221,7 @@ ADD_DEFINITIONS(-DTIXML_USE_STL)
 IF(UNIX)
   MESSAGE(STATUS "Configuring RPATH settings")
   SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
-  SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
+  SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
   SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
   SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 ENDIF()
@@ -233,18 +233,24 @@ ENDIF()
 #  # to search for different versions of QT
 #  # just point QT_DIR to the right directory
 #  # to skip the use of the default installed
-#  # QT distribution. 
+#  # QT distribution.
 #  ###########################################
 #
 IF(SEG3D_BUILD_INTERFACE)
-  FIND_PACKAGE(Qt4)
+  # see http://doc.qt.io/qt-5/cmake-manual.html
+  FIND_PACKAGE(Qt5Core REQUIRED)
+  FIND_PACKAGE(Qt5Gui REQUIRED)
+  FIND_PACKAGE(Qt5OpenGL REQUIRED)
+  FIND_PACKAGE(Qt5Widgets REQUIRED)
 
-  IF(NOT QT4_FOUND)
-    MESSAGE(FATAL_ERROR "QT ${QT_MIN_VERSION} or later is required for building the Seg3D GUI")
+  #IF(NOT Qt5Widgets_FOUND OR NOT Qt5Gui_FOUND OR NOT Qt5OpenGL_FOUND OR NOT Qt5Widgets_FOUND)
+  IF(NOT Qt5Widgets_FOUND OR NOT Qt5Gui_FOUND)
+    MESSAGE(FATAL_ERROR "Qt5 is required for building the Seg3D GUI")
   ENDIF()
 
-  SET(QT_USE_QTOPENGL 1)
-  INCLUDE(${QT_USE_FILE})
+  #SET(QT_USE_QTOPENGL 1)
+  #INCLUDE(${QT_USE_FILE})
+
   ADD_DEFINITIONS(-DQT_NO_KEYWORDS)
 
   # should be in $PATH
@@ -264,11 +270,11 @@ ENDIF()
 ###########################################
 # External packages other than Qt
 # Include the External packages, these are
-# the packages that are shipped with 
+# the packages that are shipped with
 # Seg3D to lower the number of dependencies.
 # QT is currently not included as the code
 # is a huge repository and to allow it to
-# be build against different licensed 
+# be build against different licensed
 # versions of Qt.
 ###########################################
 
@@ -318,12 +324,12 @@ GENERATE_REVISION_INFO()
 # on which code can depend.
 ###########################################
 
-CONFIGURE_FILE (${CMAKE_CURRENT_SOURCE_DIR}/Configuration/ApplicationConfiguration.h.in 
-  ${CMAKE_CURRENT_BINARY_DIR}/ApplicationConfiguration.h 
+CONFIGURE_FILE (${CMAKE_CURRENT_SOURCE_DIR}/Configuration/ApplicationConfiguration.h.in
+  ${CMAKE_CURRENT_BINARY_DIR}/ApplicationConfiguration.h
   @ONLY )
 
-CONFIGURE_FILE (${CMAKE_CURRENT_SOURCE_DIR}/Configuration/InterfaceConfiguration.h.in 
-  ${CMAKE_CURRENT_BINARY_DIR}/InterfaceConfiguration.h 
+CONFIGURE_FILE (${CMAKE_CURRENT_SOURCE_DIR}/Configuration/InterfaceConfiguration.h.in
+  ${CMAKE_CURRENT_BINARY_DIR}/InterfaceConfiguration.h
   @ONLY )
 
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
@@ -332,7 +338,12 @@ INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 # Set the include paths
 ###########################################
 
-INCLUDE_DIRECTORIES(${QT_INCLUDE_DIR})
+INCLUDE_DIRECTORIES(
+  ${Qt5Core_INCLUDE_DIRS}
+  ${Qt5Gui_INCLUDE_DIRS}
+  ${Qt5OpenGL_INCLUDE_DIRS}
+  ${Qt5Widgets_INCLUDE_DIRS}
+)
 
 # TODO: make use files for thirdparty projects
 INCLUDE_DIRECTORIES(${SCI_MATLABIO_INCLUDE})
@@ -405,7 +416,7 @@ ENDIF()
 # Plugin libraries need be generated before
 # we build the registration objects as they
 # may contain as well pieces that need to
-# be registered in the main object 
+# be registered in the main object
 # factories.
 ###########################################
 
@@ -421,9 +432,9 @@ INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/Plugins")
 
 FOREACH(DIR ${PLUGIN_DIRS})
   #IF(NOT ${DIR} MATCHES "Plugins/.svn")
-  IF(IS_DIRECTORY ${DIR}) 
+  IF(IS_DIRECTORY ${DIR})
     ADD_SUBDIRECTORY(${DIR})
-  ENDIF() 
+  ENDIF()
   #ENDIF()
 ENDFOREACH()
 
@@ -442,7 +453,7 @@ ENDIF()
 
 ###########################################
 # Main:
-# Main needs to be included after custom 
+# Main needs to be included after custom
 # plugins
 ###########################################
 
@@ -512,7 +523,7 @@ SET(CPACK_PACKAGE_NAME "${APPLICATION_NAME}")
 
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${APPLICATION_NAME}")
 SET(CPACK_PACKAGE_VENDOR "${APPLICATION_VENDOR}")
-        
+
 SET(CPACK_PACKAGE_DESCRIPTION_FILE ${PACKAGING_README} )
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${APPLICATION_NAME} ${SEG3D_MAJOR_VERSION}.${SEG3D_MINOR_VERSION}.${SEG3D_PATCH_VERSION} is a segmentation program")
 
@@ -525,23 +536,23 @@ SET(CPACK_PACKAGE_VERSION_MINOR "${SEG3D_MINOR_VERSION}")
 SET(CPACK_PACKAGE_VERSION_PATCH "${SEG3D_PATCH_VERSION}")
 
 SET(CPACK_PACKAGE_INSTALL_DIRECTORY "${APPLICATION_NAME} ${SEG3D_MAJOR_VERSION}.${SEG3D_MINOR_VERSION}")
-      
+
 IF(WIN32 AND NOT UNIX)
   # There is a bug in NSIS that does not handle full unix paths properly. Make
   # sure there is at least one set of four (4) backslashes.
   SET(CPACK_PACKAGE_ICON "${PACKAGING_ICON}")
-    
+
   IF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     SET(CPACK_INSTALL_PREFIX "/" CACHE PATH "Install path prefix, prepended onto install directories." FORCE)
     SET(CMAKE_INSTALL_PREFIX "/" CACHE PATH "Install path prefix, prepended onto install directories." FORCE)
   ENDIF()
-    
+
   IF(SEG3D_BITS MATCHES 64)
     SET(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES64")
   ELSE()
     SET(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES")
-  ENDIF()  
-    
+  ENDIF()
+
   SET(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\${APPLICATION_NAME}")
   SET(CPACK_NSIS_MUI_ICON "${APPLICATION_WINDOWS_ICON}")
   SET(CPACK_NSIS_DISPLAY_NAME "${APPLICATION_NAME} ${SEG3D_MAJOR_VERSION}.${SEG3D_MINOR_VERSION}")
