@@ -33,6 +33,6 @@
 
 // Set the version numbers of the application
 
-#define INTERFACE_ACCENT_COLOR "237, 165, 76"
+#define INTERFACE_ACCENT_COLOR "123, 143, 197"
 
 #endif
