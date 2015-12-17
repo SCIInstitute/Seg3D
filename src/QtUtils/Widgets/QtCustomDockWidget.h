@@ -36,9 +36,9 @@
 
 
 // QT includes
-#include <QtGui/QDockWidget>
-#include <QtGui/QCloseEvent>
-#include <QtGui/QKeyEvent>
+#include <QDockWidget>
+#include <QCloseEvent>
+#include <QKeyEvent>
 
 #endif
 

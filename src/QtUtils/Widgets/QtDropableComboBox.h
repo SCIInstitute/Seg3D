@@ -32,8 +32,8 @@
 #ifndef Q_MOC_RUN
 
 // QT includes
-#include <QtGui/QComboBox>
-#include <QtGui/QDropEvent>
+#include <QComboBox>
+#include <QDropEvent>
 
 // Core includes
 #include <Core/Geometry/Color.h>

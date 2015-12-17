@@ -32,7 +32,7 @@
 #ifndef Q_MOC_RUN
 
 // QT includes
-#include <QtGui/QToolButton>
+#include <QToolButton>
 
 // Core includes
 #include <Core/Geometry/Color.h>

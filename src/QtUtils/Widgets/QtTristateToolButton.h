@@ -35,7 +35,7 @@
 #include <boost/shared_ptr.hpp>
 
 // QT includes
-#include <QtGui/QToolButton>
+#include <QToolButton>
 
 #endif
 

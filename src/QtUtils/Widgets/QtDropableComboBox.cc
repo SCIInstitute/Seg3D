@@ -27,7 +27,8 @@
  */
 
 // Qt includes
-#include <QtGui/QPainter>
+#include <QPainter>
+#include <QMimeData>
 
 // QtUtils includes
 #include <QtUtils/Widgets/QtDropableComboBox.h>

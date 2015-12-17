@@ -32,8 +32,8 @@
 #ifndef Q_MOC_RUN
 
 // QT includes
-#include <QtGui/QDialog>
-#include <QtGui/QCloseEvent>
+#include <QDialog>
+#include <QCloseEvent>
 
 #endif
 
