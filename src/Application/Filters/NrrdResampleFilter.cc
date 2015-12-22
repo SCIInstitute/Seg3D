@@ -52,10 +52,6 @@ using namespace Filter;
 using namespace Seg3D;
 using namespace Core;
 
-const std::string NrrdResampleFilter::ZERO_C( "0" );
-const std::string NrrdResampleFilter::MIN_C( "min" );
-const std::string NrrdResampleFilter::MAX_C( "max" );
-
 const std::string NrrdResampleFilter::BOX_C( "box" );
 const std::string NrrdResampleFilter::TENT_C( "tent" );
 const std::string NrrdResampleFilter::CUBIC_CR_C( "cubic_cr" );
@@ -63,6 +59,66 @@ const std::string NrrdResampleFilter::CUBIC_BS_C( "cubic_bs" );
 const std::string NrrdResampleFilter::QUARTIC_C( "quartic" );
 const std::string NrrdResampleFilter::GAUSSIAN_C( "gauss" );
 
+
+NrrdResampleFilter::NrrdResampleFilter( const std::string& kernel, double param1, double param2, bool replace, bool crop, const std::string& padding, Core::Point range_min, Core::Point range_max, SandboxID sandbox )
+  : replace_(replace),
+    crop_(crop),
+    padding_(padding),
+    padding_only_(false),
+    range_min_(range_min),
+    range_max_(range_max)
+{
+  this->data_kernel_ = nrrdKernelSpecNew();
+  this->mask_kernel_ = nrrdKernelSpecNew();
+
+  this->mask_kernel_->kernel = nrrdKernelCheap;
+  this->mask_kernel_->parm[ 0 ] = 1.0;
+
+  this->data_kernel_->parm[ 0 ] = 1.0;
+  if ( kernel == NrrdResampleFilter::BOX_C )
+  {
+    this->data_kernel_->kernel = nrrdKernelBox;
+  }
+  else if ( kernel == NrrdResampleFilter::TENT_C )
+  {
+    this->data_kernel_->kernel = nrrdKernelTent;
+  }
+  else if ( kernel == NrrdResampleFilter::CUBIC_BS_C )
+  {
+    this->data_kernel_->kernel = nrrdKernelBCCubic;
+    this->data_kernel_->parm[ 1 ] = 1.0;
+    this->data_kernel_->parm[ 2 ] = 0.0;
+  }
+  else if ( kernel == NrrdResampleFilter::CUBIC_CR_C )
+  {
+    this->data_kernel_->kernel = nrrdKernelBCCubic;
+    this->data_kernel_->parm[ 1 ] = 0.0;
+    this->data_kernel_->parm[ 2 ] = 0.5;
+  }
+  else if ( kernel == NrrdResampleFilter::QUARTIC_C )
+  {
+    this->data_kernel_->kernel = nrrdKernelAQuartic;
+    this->data_kernel_->parm[ 1 ] = 0.0834;
+  }
+  else
+  {
+    this->data_kernel_->kernel = nrrdKernelGaussian;
+    this->data_kernel_->parm[ 0 ] = param1;
+    this->data_kernel_->parm[ 1 ] = param2;
+  }
+
+  this->set_sandbox( sandbox );
+}
+
+NrrdResampleFilter::~NrrdResampleFilter()
+{
+  nrrdKernelSpecNix( this->data_kernel_ );
+  nrrdKernelSpecNix( this->mask_kernel_ );
+  for( size_t i = 0; i < this->resample_contexts_.size(); i++ )
+  {
+    nrrdResampleContextNix( this->resample_contexts_[ i ] );
+  }
+}
 
 bool NrrdResampleFilter::setup_layers(const std::vector< std::string >& layer_ids,
                                       bool match_grid_transform, const Core::GridTransform& grid_transform,
@@ -131,7 +187,7 @@ bool NrrdResampleFilter::setup_layers(const std::vector< std::string >& layer_id
         CORE_LOG_ERROR( "Unknown volume type." );
         return false;
     }
-    
+
     if ( ! this->dst_layers_[ i ] )
     {
       CORE_LOG_ERROR( "Could not allocate enough memory." );
@@ -140,68 +196,8 @@ bool NrrdResampleFilter::setup_layers(const std::vector< std::string >& layer_id
     
     dst_layer_ids_[ i ] = this->dst_layers_[ i ]->get_layer_id();
   }
-
+  
   return true;
-}
-
-NrrdResampleFilter::NrrdResampleFilter( const std::string& kernel, double param1, double param2, bool replace, bool crop, Core::Point range_min, Core::Point range_max, SandboxID sandbox )
-  : replace_(replace),
-    crop_(crop),
-    padding_(NrrdResampleFilter::MAX_C),
-    padding_only_(false),
-    range_min_(range_min),
-    range_max_(range_max)
-{
-  this->data_kernel_ = nrrdKernelSpecNew();
-  this->mask_kernel_ = nrrdKernelSpecNew();
-
-  this->mask_kernel_->kernel = nrrdKernelCheap;
-  this->mask_kernel_->parm[ 0 ] = 1.0;
-
-  this->data_kernel_->parm[ 0 ] = 1.0;
-  if ( kernel == NrrdResampleFilter::BOX_C )
-  {
-    this->data_kernel_->kernel = nrrdKernelBox;
-  }
-  else if ( kernel == NrrdResampleFilter::TENT_C )
-  {
-    this->data_kernel_->kernel = nrrdKernelTent;
-  }
-  else if ( kernel == NrrdResampleFilter::CUBIC_BS_C )
-  {
-    this->data_kernel_->kernel = nrrdKernelBCCubic;
-    this->data_kernel_->parm[ 1 ] = 1.0;
-    this->data_kernel_->parm[ 2 ] = 0.0;
-  }
-  else if ( kernel == NrrdResampleFilter::CUBIC_CR_C )
-  {
-    this->data_kernel_->kernel = nrrdKernelBCCubic;
-    this->data_kernel_->parm[ 1 ] = 0.0;
-    this->data_kernel_->parm[ 2 ] = 0.5;
-  }
-  else if ( kernel == NrrdResampleFilter::QUARTIC_C )
-  {
-    this->data_kernel_->kernel = nrrdKernelAQuartic;
-    this->data_kernel_->parm[ 1 ] = 0.0834;
-  }
-  else
-  {
-    this->data_kernel_->kernel = nrrdKernelGaussian;
-    this->data_kernel_->parm[ 0 ] = param1;
-    this->data_kernel_->parm[ 1 ] = param2;
-  }
-
-  this->set_sandbox( sandbox );
-}
-
-NrrdResampleFilter::~NrrdResampleFilter()
-{
-  nrrdKernelSpecNix( this->data_kernel_ );
-  nrrdKernelSpecNix( this->mask_kernel_ );
-  for( size_t i = 0; i < this->resample_contexts_.size(); i++ )
-  {
-    nrrdResampleContextNix( this->resample_contexts_[ i ] );
-  }
 }
 
 // NOTE: This function is copied from the _nrrdResampleOutputUpdate function
@@ -275,25 +271,25 @@ static void UpdateNrrdAxisInfo( Nrrd* nout, NrrdResampleContext* rsmc )
 }
 
 bool NrrdResampleFilter::compute_output_grid_transform( LayerHandle layer,
-  NrrdResampleContext* resample_context, GridTransform& grid_transform )
+                                                        NrrdResampleContext* resample_context,
+                                                        GridTransform& grid_transform )
 {
   DataBlockHandle input_datablock;
   switch ( layer->get_type() )
   {
     case VolumeType::DATA_E:
       input_datablock = static_cast< DataLayer* >( layer.get() )->
-      get_data_volume()->get_data_block();
+        get_data_volume()->get_data_block();
       break;
     case VolumeType::MASK_E:
       // NOTE: The data block won't be used for any real processing, so it's
       // fine to use the whole underlying data block of the mask data
       input_datablock = static_cast< MaskLayer* >( layer.get() )->
-      get_mask_volume()->get_mask_data_block()->get_data_block();
+        get_mask_volume()->get_mask_data_block()->get_data_block();
       break;
   }
 
-  NrrdDataHandle nrrd_in( new NrrdData( input_datablock,
-                                                   layer->get_grid_transform() ) );
+  NrrdDataHandle nrrd_in( new NrrdData( input_datablock, layer->get_grid_transform() ) );
   for ( unsigned int axis = 0; axis < nrrd_in->nrrd()->dim; ++axis )
   {
     // Make sure both min and max are set since UpdateNrrdAxisInfo relies on this.  NrrdData
@@ -302,13 +298,11 @@ bool NrrdResampleFilter::compute_output_grid_transform( LayerHandle layer,
     NrrdAxisInfo nrrd_axis_info = nrrd_in->nrrd()->axis[ axis ];
     if( nrrd_axis_info.center == nrrdCenterCell )
     {
-      nrrd_in->nrrd()->axis[ axis ].max = nrrd_axis_info.min +
-      ( nrrd_axis_info.size * nrrd_axis_info.spacing );
+      nrrd_in->nrrd()->axis[ axis ].max = nrrd_axis_info.min + ( nrrd_axis_info.size * nrrd_axis_info.spacing );
     }
     else // Assume node-centering
     {
-      nrrd_in->nrrd()->axis[ axis ].max = nrrd_axis_info.min +
-      ( (nrrd_axis_info.size - 1 ) * nrrd_axis_info.spacing );
+      nrrd_in->nrrd()->axis[ axis ].max = nrrd_axis_info.min + ( (nrrd_axis_info.size - 1 ) * nrrd_axis_info.spacing );
     }
   }
 
@@ -422,11 +416,11 @@ void NrrdResampleFilter::resample_data_layer( DataLayerHandle input, DataLayerHa
 
   if ( this->crop_ )
   {
-    if ( this->padding_ == NrrdResampleFilter::ZERO_C )
+    if ( this->padding_ == PadValues::ZERO_C )
     {
       error |= nrrdResamplePadValueSet( this->current_resample_context_, 0.0 );
     }
-    else if ( this->padding_ == NrrdResampleFilter::MIN_C )
+    else if ( this->padding_ == PadValues::MIN_C )
     {
       error |= nrrdResamplePadValueSet( this->current_resample_context_, input->get_data_volume()->
                                        get_data_block()->get_min() );
@@ -477,8 +471,7 @@ void NrrdResampleFilter::resample_mask_layer( MaskLayerHandle input, MaskLayerHa
     if ( ! this->check_abort() )
     {
       MaskDataBlockHandle dst_mask_data_block;
-      if ( ! MaskDataBlockManager::Convert( output_mask, output->get_grid_transform(),
-                                            dst_mask_data_block ) )
+      if ( ! MaskDataBlockManager::Convert( output_mask, output->get_grid_transform(), dst_mask_data_block ) )
       {
         this->report_error( "Could not allocate enough memory." );
         return;
@@ -502,8 +495,7 @@ void NrrdResampleFilter::resample_mask_layer( MaskLayerHandle input, MaskLayerHa
   }
 
   DataBlockHandle input_data_block;
-  MaskDataBlockManager::Convert( input->get_mask_volume()->get_mask_data_block(),
-                                      input_data_block, DataType::UCHAR_E );
+  MaskDataBlockManager::Convert( input->get_mask_volume()->get_mask_data_block(), input_data_block, DataType::UCHAR_E );
   NrrdDataHandle nrrd_in( new NrrdData( input_data_block, input->get_grid_transform() ) );
 
   Nrrd* nrrd_out = nrrdNew();
@@ -533,13 +525,12 @@ void NrrdResampleFilter::resample_mask_layer( MaskLayerHandle input, MaskLayerHa
     DataBlockHandle data_block = NrrdDataBlock::New( nrrd_data );
     MaskDataBlockHandle mask_data_block;
     if ( ! MaskDataBlockManager::Convert( data_block,
-                                               this->current_output_transform_, mask_data_block ) )
+                                          this->current_output_transform_, mask_data_block ) )
     {
       return;
     }
 
-    MaskVolumeHandle mask_volume( new MaskVolume(
-                                                             this->current_output_transform_, mask_data_block ) );
+    MaskVolumeHandle mask_volume( new MaskVolume( this->current_output_transform_, mask_data_block ) );
     this->dispatch_insert_mask_volume_into_layer( output, mask_volume );
     output->update_progress_signal_( 1.0 );
     this->dispatch_unlock_layer( output );

@@ -30,6 +30,8 @@
 #include <Application/Layer/LayerManager.h>
 #include <Application/Filters/Actions/ActionResample.h>
 #include <Application/Filters/NrrdResampleFilter.h>
+#include <Application/Filters/ITKResampleFilter.h>
+#include <Application/Filters/Utils/PadValues.h>
 
 #include <Core/Utils/Log.h>
 
@@ -162,32 +164,31 @@ bool ActionResample::validate( Core::ActionContextHandle& context )
       return false;
     }
     
-    if ( ! NrrdResampleFilter::IsValidPadding( this->private_->padding_ ) )
+    if ( ! PadValues::IsValidPadding( this->private_->padding_ ) )
     {
       context->report_error( "Unknown padding option" );
       return false;
     }
   }
   
-  if ( ! NrrdResampleFilter::IsNrrdResample( this->private_->kernel_ ) )
+  if ( ! ( NrrdResampleFilter::IsNrrdResample( this->private_->kernel_ ) ||
+           ITKResampleFilter::IsITKResample( this->private_->kernel_ ) ) )
   {
     context->report_error( "Unknown kernel type" );
     return false;
   }
-  //else
-  //{}
-  
+
   // Validation successful
   return true;
 }
 
 bool ActionResample::run( Core::ActionContextHandle& context, 
-  Core::ActionResultHandle& result )
+                          Core::ActionResultHandle& result )
 {
   if ( NrrdResampleFilter::IsNrrdResample( this->private_->kernel_ ) )
   {
     // Create algorithm
-    boost::shared_ptr< NrrdResampleFilter > algo( new NrrdResampleFilter( this->private_->kernel_, this->private_->param1_, this->private_->param2_, this->private_->replace_, this->private_->crop_, this->private_->range_min_, this->private_->range_max_, this->private_->sandbox_ ) );
+    boost::shared_ptr< NrrdResampleFilter > algo( new NrrdResampleFilter( this->private_->kernel_, this->private_->param1_, this->private_->param2_, this->private_->replace_, this->private_->crop_, this->private_->padding_, this->private_->range_min_, this->private_->range_max_, this->private_->sandbox_ ) );
 
     algo->setup_layers( this->private_->layer_ids_, this->private_->match_grid_transform_, this->private_->grid_transform_, this->private_->x_, this->private_->y_, this->private_->z_ );
 
@@ -196,7 +197,7 @@ bool ActionResample::run( Core::ActionContextHandle& context,
     // If the action is run from a script (provenance is a special case of script),
     // return a notifier that the script engine can wait on.
     if ( context->source() == Core::ActionSource::SCRIPT_E ||
-      context->source() == Core::ActionSource::PROVENANCE_E )
+         context->source() == Core::ActionSource::PROVENANCE_E )
     {
       context->report_need_resource( algo->get_notifier() );
     }
@@ -207,17 +208,38 @@ bool ActionResample::run( Core::ActionContextHandle& context,
     // Start the filter.
     Core::Runnable::Start( algo );
   }
-//  else
-//  {
-//  }
+  else // ITK
+  {
+    // Create algorithm
+    boost::shared_ptr< ITKResampleFilter > algo( new ITKResampleFilter( this->private_->kernel_, this->private_->replace_, this->private_->crop_, this->private_->padding_, this->private_->range_min_, this->private_->range_max_, this->private_->sandbox_ ) );
+
+    algo->setup_layers( this->private_->layer_ids_, this->private_->x_, this->private_->y_, this->private_->z_ );
+
+    // Return the ids of the destination layer.
+    result = Core::ActionResultHandle( new Core::ActionResult( algo->get_dst_layer_ids() ) );
+    // If the action is run from a script (provenance is a special case of script),
+    // return a notifier that the script engine can wait on.
+    if ( context->source() == Core::ActionSource::SCRIPT_E ||
+         context->source() == Core::ActionSource::PROVENANCE_E )
+    {
+      context->report_need_resource( algo->get_notifier() );
+    }
+
+    // Build the undo-redo record
+    algo->create_undo_redo_and_provenance_record( context, this->shared_from_this(), true );
+
+    // Start the filter.
+    Core::Runnable::Start( algo );
+  }
 
   return true;
 }
 
-void ActionResample::Dispatch( Core::ActionContextHandle context, 
-                const std::vector< std::string >& layer_ids, 
-                int x, int y, int z, const std::string& kernel, 
-                double param1, double param2, bool replace )
+// used by resample tool
+void ActionResample::Dispatch( Core::ActionContextHandle context,
+                               const std::vector< std::string >& layer_ids,
+                               int x, int y, int z, const std::string& kernel,
+                               double param1, double param2, bool replace )
 {
   ActionResample* action = new ActionResample;
   action->private_->layer_ids_ = layer_ids;
@@ -232,11 +254,12 @@ void ActionResample::Dispatch( Core::ActionContextHandle context,
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }
 
-void ActionResample::Dispatch( Core::ActionContextHandle context, 
-                const std::vector< std::string >& layer_ids, 
-                const Core::GridTransform& grid_trans, 
-                const std::string& padding, const std::string& kernel, 
-                double param1, double param2, bool replace )
+// used by resample tool
+void ActionResample::Dispatch( Core::ActionContextHandle context,
+                               const std::vector< std::string >& layer_ids,
+                               const Core::GridTransform& grid_trans,
+                               const std::string& padding, const std::string& kernel,
+                               double param1, double param2, bool replace )
 {
   ActionResample* action = new ActionResample;
 
@@ -258,10 +281,11 @@ void ActionResample::Dispatch( Core::ActionContextHandle context,
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }
 
-void ActionResample::Dispatch( Core::ActionContextHandle context, 
-                const std::string& src_layer, const std::string& dst_layer, 
-                const std::string& padding, const std::string& kernel, 
-                double param1, double param2, bool replace )
+// used by layer resampler
+void ActionResample::Dispatch( Core::ActionContextHandle context,
+                               const std::string& src_layer, const std::string& dst_layer,
+                               const std::string& padding, const std::string& kernel,
+                               double param1, double param2, bool replace )
 {
   LayerHandle layer = LayerManager::FindLayer( dst_layer );
   if ( layer )

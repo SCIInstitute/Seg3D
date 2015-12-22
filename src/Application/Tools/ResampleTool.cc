@@ -33,6 +33,8 @@
 #include <Application/Tools/ResampleTool.h>
 #include <Application/Filters/Actions/ActionResample.h>
 #include <Application/Filters/NrrdResampleFilter.h>
+#include <Application/Filters/ITKResampleFilter.h>
+#include <Application/Filters/Utils/PadValues.h>
 
 #include <Application/Layer/Layer.h>
 #include <Application/Layer/LayerGroup.h>
@@ -247,10 +249,10 @@ ResampleTool::ResampleTool( const std::string& toolid ) :
   this->add_state( "dst_group", this->dst_group_state_, "", "" );
 
   std::vector< Core::OptionLabelPair > padding_values;
-  padding_values.push_back( std::make_pair( NrrdResampleFilter::ZERO_C, "0" ) );
-  padding_values.push_back( std::make_pair( NrrdResampleFilter::MIN_C, "Minimum Value" ) );
-  padding_values.push_back( std::make_pair( NrrdResampleFilter::MAX_C, "Maximum Value" ) );
-  this->add_state( "pad_value", this->padding_value_state_, NrrdResampleFilter::ZERO_C, padding_values );
+  padding_values.push_back( std::make_pair( PadValues::ZERO_C, "0" ) );
+  padding_values.push_back( std::make_pair( PadValues::MIN_C, "Minimum Value" ) );
+  padding_values.push_back( std::make_pair( PadValues::MAX_C, "Maximum Value" ) );
+  this->add_state( "pad_value", this->padding_value_state_, PadValues::ZERO_C, padding_values );
 
   this->add_state( "output_x", this->output_dimensions_state_[ 0 ], 1, 1, 500, 1 );
   this->add_state( "output_y", this->output_dimensions_state_[ 1 ], 1, 1, 500, 1 );
@@ -271,6 +273,7 @@ ResampleTool::ResampleTool( const std::string& toolid ) :
   kernels.push_back( std::make_pair( NrrdResampleFilter::CUBIC_BS_C, "Cubic (B-spline)" ) );
   kernels.push_back( std::make_pair( NrrdResampleFilter::QUARTIC_C, "Quartic" ) );
   kernels.push_back( std::make_pair( NrrdResampleFilter::GAUSSIAN_C, "Gaussian" ) );
+  kernels.push_back( std::make_pair( ITKResampleFilter::LINEAR_C, "Linear" ) );
   this->add_state( "kernel", this->kernel_state_, NrrdResampleFilter::BOX_C, kernels );
 
   this->add_state( "sigma", this->gauss_sigma_state_, 1.0, 1.0, 100.0, 0.01 );

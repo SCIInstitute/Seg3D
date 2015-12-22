@@ -35,8 +35,10 @@
 
 #include <Application/Filters/LayerFilter.h>
 #include <Application/Filters/Utils/PadFilterInternals.h>
+#include <Application/Filters/Utils/PadValues.h>
 
-namespace Filter {
+namespace Filter
+{
 
 class NrrdResampleFilter : public Seg3D::LayerFilter
 {
@@ -65,8 +67,7 @@ private:
   PadFilterInternalsHandle pad_internals_;
 
 public:
-//  NrrdResampleFilter( const std::string& kernel, double param1, double param2, size_t num_layers, bool replace, bool crop, const std::string& padding, bool match_grid_transform, const Core::GridTransform& grid_transform, const std::vector< std::string >& layer_ids, Core::Point range_min, Core::Point range_max, unsigned int dimX, unsigned int dimY, unsigned int dimZ, Seg3D::SandboxID sandbox );
-  NrrdResampleFilter( const std::string& kernel, double param1, double param2, bool replace, bool crop, Core::Point range_min, Core::Point range_max, Seg3D::SandboxID sandbox );
+  NrrdResampleFilter( const std::string& kernel, double param1, double param2, bool replace, bool crop, const std::string& padding, Core::Point range_min, Core::Point range_max, Seg3D::SandboxID sandbox );
   virtual ~NrrdResampleFilter();
 
   bool setup_layers(const std::vector< std::string >& layer_ids,
@@ -75,7 +76,8 @@ public:
 
   // COMPUTE_OUTPUT_GRID_TRANSFORM:
   // Compute the output grid transform of the input layer.
-  bool compute_output_grid_transform( Seg3D::LayerHandle layer, NrrdResampleContext* resample_context,
+  bool compute_output_grid_transform( Seg3D::LayerHandle layer,
+                                      NrrdResampleContext* resample_context,
                                       Core::GridTransform& grid_transform );
 
   // DETECT_PADDING_ONLY:
@@ -117,7 +119,7 @@ public:
   // The name of the filter, this information is used for generating new layer labels.
   virtual std::string get_filter_name() const
   {
-    return "Resample Tool";
+    return "Resample Filter";
   }
 
   // GET_LAYER_PREFIX:
@@ -131,10 +133,6 @@ public:
   const std::vector< std::string >& get_dst_layer_ids() const { return dst_layer_ids_; }
 
 public:
-  static const std::string ZERO_C;
-  static const std::string MIN_C;
-  static const std::string MAX_C;
-
   static const std::string BOX_C;
   static const std::string TENT_C;
   static const std::string CUBIC_CR_C;
@@ -150,13 +148,6 @@ public:
              ( kernel == CUBIC_BS_C ) ||
              ( kernel == QUARTIC_C ) ||
              ( kernel == GAUSSIAN_C ) );
-  }
-
-  static bool IsValidPadding( const std::string& padding )
-  {
-    return ( ( padding == ZERO_C ) ||
-             ( padding == MIN_C ) ||
-             ( padding == MAX_C ) );
   }
 };
 

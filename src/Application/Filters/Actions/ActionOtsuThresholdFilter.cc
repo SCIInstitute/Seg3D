@@ -179,7 +179,7 @@ bool ActionOtsuThresholdFilter::run( Core::ActionContextHandle& context,
   algo->amount_ = this->amount_;
 
   // Find the handle to the layer
-  if ( !( algo->find_layer( this->target_layer_, algo->src_layer_ ) ) )
+  if ( ! algo->find_layer( this->target_layer_, algo->src_layer_ ) )
   {
     return false;
   }
