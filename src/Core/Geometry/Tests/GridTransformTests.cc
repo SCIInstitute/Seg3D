@@ -36,4 +36,12 @@ TEST(GridTransformTests, EmptyGridTransform)
 {
   GridTransform *gridTransform = new GridTransform;
   ASSERT_FALSE(gridTransform == nullptr);
+
+  ASSERT_EQ(gridTransform->get_nx(), 0);
+  ASSERT_EQ(gridTransform->get_ny(), 0);
+  ASSERT_EQ(gridTransform->get_nz(), 0);
+
+  ASSERT_EQ(gridTransform->spacing_x(), 1);
+  ASSERT_EQ(gridTransform->spacing_y(), 1);
+  ASSERT_EQ(gridTransform->spacing_z(), 1);
 }

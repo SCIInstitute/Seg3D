@@ -26,6 +26,7 @@
 
 SET(Core_Geometry_Tests_SRCS
   GridTransformTests.cc
+  MatrixTests.cc
   PointTests.cc
   TransformTests.cc
   VectorTests.cc
