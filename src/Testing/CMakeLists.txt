@@ -3,7 +3,7 @@
 # 
 #  The MIT License
 # 
-#  Copyright (c) 2014 Scientific Computing and Imaging Institute,
+#  Copyright (c) 2015 Scientific Computing and Imaging Institute,
 #  University of Utah.
 # 
 #  
@@ -27,6 +27,8 @@
 
 SET(TEST_OUTPUT_PATH ${CMAKE_BINARY_DIR}/TestOutput CACHE PATH "Location for files written by tests." FORCE)
 FILE(MAKE_DIRECTORY ${TEST_OUTPUT_PATH})
+
 ADD_DEFINITIONS(-DTEST_OUTPUT_PATH="${TEST_OUTPUT_PATH}" -DBUILD_TESTING)
+ADD_DEFINITIONS(-DTEST_INPUT_PATH="${TEST_INPUT_PATH}" -DBUILD_TESTING)
 
 ADD_SUBDIRECTORY(Utils)

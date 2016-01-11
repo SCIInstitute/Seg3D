@@ -34,12 +34,12 @@ namespace Testing {
 namespace Utils {
     
 template<class T>
-boost::tuple<Core::DataBlockHandle, Core::GridTransform>
-generate3x3x3StdDataBlockInternal(Core::DataBlockHandle& dataBlock,
-                                  const Core::DataType& type,
-                                  const Core::Point& origin,
-                                  const Core::Vector& spacing,
-                                  bool nodeCentered)
+std::tuple<Core::DataBlockHandle, Core::GridTransform>
+generate3x3x3StdDataBlockInternal( Core::DataBlockHandle& dataBlock,
+                                   const Core::DataType& type,
+                                   const Core::Point& origin,
+                                   const Core::Vector& spacing,
+                                   bool nodeCentered )
 {
   std::vector<T> vec = generate3x3x3Data<T>();
   T* data = new T[27];
@@ -56,16 +56,16 @@ generate3x3x3StdDataBlockInternal(Core::DataBlockHandle& dataBlock,
   dataBlock = Core::StdDataBlock::New( gridTransform.get_nx(), 
                                        gridTransform.get_ny(),
                                        gridTransform.get_nz(),
-                                      type );
+                                       type );
   dataBlock->set_data(reinterpret_cast<void*>(data));
-  return boost::make_tuple(dataBlock, gridTransform);
+  return std::make_tuple(dataBlock, gridTransform);
 }
 
-boost::tuple<Core::DataBlockHandle, Core::GridTransform>
-generate3x3x3StdDataBlock(const Core::DataType& type,
-                          const Core::Point& origin,
-                          const Core::Vector& spacing,
-                          bool nodeCentered)
+std::tuple<Core::DataBlockHandle, Core::GridTransform>
+generate3x3x3StdDataBlock( const Core::DataType& type,
+                           const Core::Point& origin,
+                           const Core::Vector& spacing,
+                           bool nodeCentered )
 {
   Core::DataBlockHandle dataBlock;
   switch(type)
@@ -132,7 +132,7 @@ generate3x3x3StdDataBlock(const Core::DataType& type,
                                                        nodeCentered);
     default:
       Core::GridTransform gridTransform;
-      return boost::make_tuple(dataBlock, gridTransform);
+      return std::make_tuple(dataBlock, gridTransform);
   }
 }
 

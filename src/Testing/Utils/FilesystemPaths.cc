@@ -41,4 +41,13 @@ boost::filesystem::path testOutputDir()
 #endif
 }
 
+boost::filesystem::path testInputDir()
+{
+#ifdef BUILD_TESTING
+  return TEST_INPUT_PATH;
+#else
+  return boost::filesystem::path();
+#endif
+}
+
 }}
