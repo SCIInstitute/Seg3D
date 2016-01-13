@@ -81,7 +81,7 @@ public:
   LayerHandle src_layer_;
   std::vector<LayerHandle> dst_layer_;
 
-  double amount_;
+  int amount_;
   
 public:
   // RUN:
