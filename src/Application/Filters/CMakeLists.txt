@@ -1,4 +1,3 @@
-
 #
 #  For more information, please see: http://software.sci.utah.edu
 # 
@@ -42,6 +41,8 @@ SET(APPLICATION_FILTERS_SRCS
   NrrdFilter.cc
   NrrdResampleFilter.h
   NrrdResampleFilter.cc
+  ITKResampleFilter.h
+  ITKResampleFilter.cc
   LayerResampler.h
   LayerResampler.cc
   LayerFilterNotifier.h
@@ -53,6 +54,8 @@ SET(APPLICATION_FILTERS_SRCS
 SET(APPLICATION_FILTERS_UTILS_SRCS
   Utils/PadFilterInternals.h
   Utils/PadFilterInternals.cc
+  Utils/PadValues.h
+  Utils/PadValues.cc
 )
 
 SET(APPLICATION_FILTERS_ACTIONS_SRCS
@@ -140,6 +143,8 @@ SET(APPLICATION_FILTERS_ACTIONS_SRCS
   Actions/ActionSpeedlineImageFilter.cc
   Actions/ActionRadialBasisFunction.h
   Actions/ActionRadialBasisFunction.cc
+  Actions/ActionPadFilter.h
+  Actions/ActionPadFilter.cc
 )
 
 IF(BUILD_WITH_PYTHON)
@@ -168,3 +173,6 @@ TARGET_LINK_LIBRARIES(Application_Filters
 # Register action classes
 REGISTER_LIBRARY_AND_CLASSES(Application_Filters
   ${APPLICATION_FILTERS_ACTIONS_SRCS})
+
+#ADD_TEST_DIR(Tests)
+#ADD_TEST_DIR(Utils/Tests)

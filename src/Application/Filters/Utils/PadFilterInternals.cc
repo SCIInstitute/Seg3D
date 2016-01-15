@@ -28,7 +28,7 @@
 
 #include <Application/Filters/Utils/PadFilterInternals.h>
 #include <Application/Filters/LayerFilter.h>
-#include <Application/Filters/NrrdResampleFilter.h>
+#include <Application/Filters/Utils/PadValues.h>
 
 #include <Core/DataBlock/StdDataBlock.h>
 #include <Core/Utils/Log.h>
@@ -61,10 +61,10 @@ PadFilterInternals::PadFilterInternals(LayerHandle src_layer, LayerHandle dst_la
                                 this->overlap_x_start_, 0 );
   this->overlap_ny_ = Max( Min( this->mapped_y_start_ + static_cast< int >( src_trans_.get_ny() ),
                                 static_cast< int >( dst_trans_.get_ny() ) ) -
-                           this->overlap_y_start_, 0 );
+                                this->overlap_y_start_, 0 );
   this->overlap_nz_ = Max( Min( this->mapped_z_start_ + static_cast< int >( src_trans_.get_nz() ),
                                 static_cast< int >( dst_trans_.get_nz() ) ) -
-                           this->overlap_z_start_, 0 );
+                                this->overlap_z_start_, 0 );
 }
 
 // for use in resample filters
@@ -112,11 +112,11 @@ void PadFilterInternals::pad_and_crop_typed_data( DataBlockHandle src,
   T* dst_data = reinterpret_cast< T* >( dst->get_data() );
 
   T padding_val;
-  if ( this->padding_ == NrrdResampleFilter::ZERO_C )
+  if ( this->padding_ == PadValues::ZERO_C )
   {
     padding_val = T( 0 );
   }
-  else if ( this->padding_ == NrrdResampleFilter::MIN_C )
+  else if ( this->padding_ == PadValues::MIN_C )
   {
     padding_val = static_cast< T >( src->get_min() );
   }

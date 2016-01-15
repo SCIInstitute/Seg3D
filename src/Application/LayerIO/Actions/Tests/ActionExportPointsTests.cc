@@ -39,8 +39,11 @@
 #include <Core/Action/ActionContext.h>
 #include <Core/Geometry/Point.h>
 
+#include <Testing/Utils/FilesystemPaths.h>
+
 using namespace Core;
 using namespace Seg3D;
+using namespace Testing::Utils;
 
 class ActionExportPointsTests : public ::testing::Test
 {
@@ -48,7 +51,7 @@ protected:
   virtual void SetUp()
   {
     dummy_path = "/dummy/file/path/points.txt";
-    boost::filesystem::path path(TEST_OUTPUT_PATH);
+    boost::filesystem::path path = testOutputDir();
     path /= "points.txt";
     file_path = path.string();
     points.clear();

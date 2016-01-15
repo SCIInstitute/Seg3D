@@ -24,31 +24,14 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
-*/
+ */
 
-#ifndef APPLICATION_FILTERS_UTILS_PADVALUES_H
-#define APPLICATION_FILTERS_UTILS_PADVALUES_H
-
-#include <string>
+#include <Application/Filters/Utils/PadValues.h>
 
 namespace Filter {
 
-class PadValues
-{
-public:
-  static const std::string ZERO_C;
-  static const std::string MIN_C;
-  static const std::string MAX_C;
-
-
-  static bool IsValidPadding( const std::string& padding )
-  {
-    return ( ( padding == ZERO_C ) ||
-             ( padding == MIN_C ) ||
-             ( padding == MAX_C ) );
-  }
-};
+const std::string PadValues::ZERO_C( "0" );
+const std::string PadValues::MIN_C( "min" );
+const std::string PadValues::MAX_C( "max" );
 
 }
-
-#endif
