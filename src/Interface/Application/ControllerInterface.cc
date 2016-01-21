@@ -27,8 +27,8 @@
  */
 
 // QT includes
-#include <QtGui/QMenu>
-#include <QtGui/QScrollBar>
+#include <QMenu>
+#include <QScrollBar>
 
 // Core includes
 #include <Core/Action/Actions.h>

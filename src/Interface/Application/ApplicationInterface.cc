@@ -32,10 +32,10 @@
 // Boost include
 #include <boost/lexical_cast.hpp>
 
-#include <QtGui/QMessageBox>
-#include <QtGui/QDesktopWidget>
-#include <QtGui/QApplication>
-#include <QtGui/QCloseEvent>
+#include <QMessageBox>
+#include <QDesktopWidget>
+#include <QApplication>
+#include <QCloseEvent>
 
 // Core includes
 #include <Core/Application/Application.h>

@@ -30,8 +30,8 @@
 #include <boost/filesystem.hpp>
 
 // Qt includes
-#include <QtGui/QFileDialog>
-#include <QtGui/QMessageBox>
+#include <QFileDialog>
+#include <QMessageBox>
 
 // Core indcludes
 #include <Core/Utils/Log.h>

@@ -40,10 +40,10 @@
 #include <boost/bind.hpp>
 
 // QT includes
-#include <QtCore/QObject>
-#include <QtGui/QMainWindow>
-#include <QtGui/QStatusBar>
-#include <QtCore/QPointer>
+#include <QObject>
+#include <QMainWindow>
+#include <QStatusBar>
+#include <QPointer>
 
 // Core includes
 #include <Core/Utils/ConnectionHandler.h>

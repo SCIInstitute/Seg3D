@@ -32,8 +32,8 @@
 #ifndef Q_MOC_RUN
 
 // QT Includes
-#include <QtGui/QWidget>
-#include <QtGui/QFrame>
+#include <QWidget>
+#include <QFrame>
 
 // Application includes
 #include <Application/Tool/ToolInterface.h>

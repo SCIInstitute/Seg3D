@@ -32,8 +32,8 @@
 #ifndef Q_MOC_RUN
 
 // QT includes
-#include <QtCore/QPointer>
-#include <QtGui/QListWidgetItem>
+#include <QPointer>
+#include <QListWidgetItem>
 
 // Boost includes
 #include <boost/shared_ptr.hpp>

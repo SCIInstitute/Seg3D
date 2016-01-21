@@ -40,9 +40,9 @@
 #include <deque>
 
 // QT includes
-#include <QtCore/QObject>
-#include <QtCore/QVariant>
-#include <QtCore/QModelIndex>
+#include <QObject>
+#include <QVariant>
+#include <QModelIndex>
 
 // Core includes
 #include <Core/Utils/Log.h>

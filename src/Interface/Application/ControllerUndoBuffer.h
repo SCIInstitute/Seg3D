@@ -41,9 +41,9 @@
 #include <deque>
 
 // QT includes
-#include <QtCore/QAbstractTableModel>
-#include <QtCore/QObject>
-#include <QtCore/QVariant>
+#include <QAbstractTableModel>
+#include <QObject>
+#include <QVariant>
 
 // Core includes
 #include <Core/Utils/Log.h>

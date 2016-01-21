@@ -36,9 +36,9 @@
 #ifndef Q_MOC_RUN
 
 // QT includes
-#include <QtCore/QVariant>
-#include <QtCore/QModelIndex>
-#include <QtCore/QObject>
+#include <QVariant>
+#include <QModelIndex>
+#include <QObject>
 
 // Core includes
 // include all the headers associated with the action engine

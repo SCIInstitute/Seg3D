@@ -37,7 +37,7 @@
 // Core includes
 #include <Core/Geometry/Color.h>
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
 #endif
 

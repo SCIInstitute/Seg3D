@@ -29,7 +29,7 @@
 // QtUtils includes
 #include <QCoreApplication>
 #include <QPointer>
-#include <QtGui/QWidget>
+#include <QWidget>
 
 // Core includes
 #include <Core/Interface/Interface.h>

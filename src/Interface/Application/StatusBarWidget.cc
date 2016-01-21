@@ -30,7 +30,7 @@
 #include <boost/tokenizer.hpp>
 
 // Qt includes
-#include <QtCore/QPropertyAnimation>
+#include <QPropertyAnimation>
 
 // Core Includes - for logging
 #include <Core/Utils/Log.h>

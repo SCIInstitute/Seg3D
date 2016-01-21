@@ -27,9 +27,9 @@
  */
 
 // Qt includes
-#include <QtCore/QVariant>
-#include <QtGui/QGridLayout>
-#include <QtGui/QMessageBox>
+#include <QVariant>
+#include <QGridLayout>
+#include <QMessageBox>
 
 // Application includs
 #include <Application/ProjectManager/ProjectManager.h>

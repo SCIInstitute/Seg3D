@@ -30,10 +30,10 @@
 #include <boost/filesystem.hpp>
 
 // Qt includes
-#include <QtCore/QVariant>
-#include <QtGui/QGridLayout>
-#include <QtGui/QFileDialog>
-#include <QtGui/QMessageBox>
+#include <QVariant>
+#include <QGridLayout>
+#include <QFileDialog>
+#include <QMessageBox>
 
 // Core includes
 #include <Core/State/Actions/ActionSet.h>
