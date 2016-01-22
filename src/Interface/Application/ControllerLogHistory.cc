@@ -85,12 +85,12 @@ QVariant ControllerLogHistory::data( const QModelIndex& index, int role ) const
       log_entry_type log_entry = log_history_[ sz - index.row() - 1 ];
       if ( index.column() == 0 )
       {
-        if ( log_entry.first & Core::LogMessageType::ERROR_E ) return QBrush( QColor( 1.0, 0.0, 0.0 ) );
+        if ( log_entry.first & Core::LogMessageType::ERROR_E ) return QBrush( QColor( 255, 0, 0 ) );
         if ( log_entry.first & Core::LogMessageType::WARNING_E ) return QBrush(
-            QColor( 0.8, 0.2, 0.0 ) );
+            QColor( 204, 51, 0 ) );
         if ( log_entry.first & Core::LogMessageType::MESSAGE_E ) return QBrush(
-            QColor( 0.0, 0.0, 0.3 ) );
-        return QBrush( QColor( 0.3, 0.0, 0.0 ) );
+            QColor( 0, 0, 76 ) );
+        return QBrush( QColor( 76, 0, 0 ) );
       }
     }
     else
