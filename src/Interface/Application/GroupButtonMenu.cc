@@ -32,6 +32,7 @@
 // Qt includes
 #include <QMessageBox>
 #include <QtCore/QPropertyAnimation>
+#include <QtCore/QMimeData>
 
 //Core Includes - for logging
 #include <Core/Utils/Log.h>

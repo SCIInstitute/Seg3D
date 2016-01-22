@@ -40,6 +40,8 @@
 #include <QDragEnterEvent>
 #include <QDragLeaveEvent>
 #include <QDropEvent>
+#include <QtCore/QMimeData>
+#include <QtGui/QDrag>
 
 //Core Includes - for logging
 #include <Core/Utils/Log.h>

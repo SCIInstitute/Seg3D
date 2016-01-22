@@ -42,6 +42,7 @@
 #include <QTextEdit>
 #include <QScrollBar>
 #include <QVBoxLayout>
+#include <QtCore/QMimeData>
 
 // Core includes
 #include <Core/Interface/Interface.h>
