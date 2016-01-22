@@ -70,7 +70,7 @@ public:
 
   void add_log_entry( int message_type, std::string& message );
 
-  void update() { reset(); }
+  void update() { beginResetModel(); endResetModel(); }
 };
 
 } // end namespace Seg3D

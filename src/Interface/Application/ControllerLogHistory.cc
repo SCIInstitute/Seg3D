@@ -128,7 +128,8 @@ void ControllerLogHistory::add_log_entry( int message_type, std::string& message
     log_history_.pop_back();
   }
 
-  reset();
+  beginResetModel();
+  endResetModel();
 }
 
 } // end namespace Seg3D
