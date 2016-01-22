@@ -37,7 +37,7 @@
 
 // Qt includes
 #include <QtCore/QPointer>
-#include <QtGui/QDialog>
+#include <QDialog>
 
 // boost includes
 #include <boost/smart_ptr.hpp>

@@ -31,19 +31,19 @@
 
 // Qt includes
 #include <QtCore/QVariant>
-#include <QtGui/QFileDialog>
-#include <QtGui/QMessageBox>
-#include <QtGui/QLabel>
-#include <QtGui/QLineEdit>
-#include <QtGui/QPushButton>
-#include <QtGui/QCheckBox>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QRadioButton>
-#include <QtGui/QComboBox>
-#include <QtGui/QButtonGroup>
-#include <QtGui/QTreeWidget>
-#include <QtGui/QScrollArea>
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QLabel>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QCheckBox>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QRadioButton>
+#include <QComboBox>
+#include <QButtonGroup>
+#include <QTreeWidget>
+#include <QScrollArea>
 
 // Core includes
 #include <Core/State/Actions/ActionSet.h>

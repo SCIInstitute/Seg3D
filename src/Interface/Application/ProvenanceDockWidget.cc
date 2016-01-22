@@ -44,7 +44,7 @@
 
 // Qt includes
 #include <QtGui/QStandardItemModel>
-#include <QtGui/QMessageBox>
+#include <QMessageBox>
 
 //QtUtils Includes
 #include <QtUtils/Bridge/QtBridge.h>

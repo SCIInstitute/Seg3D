@@ -31,7 +31,7 @@
 #include <Core/Utils/Log.h>
 
 // Qt includes
-#include <QtGui/QFileDialog>
+#include <QFileDialog>
 
 // Qt Gui Includes
 #include <QtUtils/Bridge/QtBridge.h>

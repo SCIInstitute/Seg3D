@@ -30,14 +30,14 @@
 #include <boost/algorithm/string/replace.hpp>
 
 // Qt includes
-#include <QtGui/QAction>
-#include <QtGui/QApplication>
+#include <QAction>
+#include <QApplication>
 #include <QtGui/QClipboard>
 #include <QtGui/QContextMenuEvent>
-#include <QtGui/QHeaderView>
-#include <QtGui/QMenu>
-#include <QtGui/QMessageBox>
-#include <QtGui/QScrollBar>
+#include <QHeaderView>
+#include <QMenu>
+#include <QMessageBox>
+#include <QScrollBar>
 
 // Core includes
 #include <Core/Interface/Interface.h>

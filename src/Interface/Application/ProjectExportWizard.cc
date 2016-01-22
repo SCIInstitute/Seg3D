@@ -31,9 +31,9 @@
 
 // Qt includes
 #include <QtCore/QVariant>
-#include <QtGui/QGridLayout>
-#include <QtGui/QFileDialog>
-#include <QtGui/QMessageBox>
+#include <QGridLayout>
+#include <QFileDialog>
+#include <QMessageBox>
 
 // Core includes
 #include <Core/State/Actions/ActionSet.h>

@@ -32,7 +32,7 @@
 #ifndef Q_MOC_RUN
 
 // Qt includes
-#include <QtGui/QTableView>
+#include <QTableView>
 
 // Boost includes
 #include <boost/shared_ptr.hpp>

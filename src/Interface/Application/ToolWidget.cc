@@ -27,7 +27,7 @@
  */
 
 // Qt includes
-#include <QtGui/QHBoxLayout>
+#include <QHBoxLayout>
 
 // Boost includes
 #include <boost/lexical_cast.hpp>
