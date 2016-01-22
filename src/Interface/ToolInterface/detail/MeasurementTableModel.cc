@@ -394,7 +394,8 @@ void MeasurementTableModel::update_table()
   this->private_->update_visibility();
   this->private_->use_cached_active_name_ = false;
 
-  QAbstractTableModel::reset();
+  QAbstractTableModel::beginResetModel();
+  QAbstractTableModel::endResetModel();
 
   // Column resize doesn't work properly without this call
   this->update_cells();
