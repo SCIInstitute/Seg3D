@@ -3,7 +3,7 @@
 
  The MIT License
 
- Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
 
 
@@ -24,7 +24,7 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
- */
+*/
 
 // Core includes
 #include <Core/Volume/VolumeSlice.h>
@@ -43,7 +43,7 @@
 // Application includes
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/SpeedlineTool.h>
-#include <Application/Tools/Actions/ActionSpeedline.h>
+//#include <Application/Tools/Actions/ActionSpeedline.h>
 #include <Application/Tools/Actions/ActionPolyline.h>
 #include <Application/Layer/Layer.h>
 #include <Application/Layer/LayerManager.h>
@@ -52,7 +52,7 @@
 
 // Action associated with tool
 #include <Application/Filters/Actions/ActionGradientMagnitudeFilter.h>
-#include <Application/Filters/Actions/ActionSpeedlineImageFilter.h>
+//#include <Application/Filters/Actions/ActionSpeedlineImageFilter.h>
 #include "Core/RenderResources/RenderResources.h"
 
 // Register the tool into the tool factory
@@ -80,14 +80,15 @@ public:
   bool find_vertex( ViewerHandle viewer, int x, int y, int& index );
   bool find_closest_vertex( ViewerHandle viewer, int x, int y, int& index );
   void execute_fill_erase( Core::ActionContextHandle context, bool erase, 
-    ViewerHandle viewer = ViewerHandle() );
+                           ViewerHandle viewer = ViewerHandle() );
   void execute_path( bool update_all_paths );
 
   //To highlight the created speedline image
-  void handle_speedline_image_created( std::string layer_id, SpeedlineToolWeakHandle tool );
+//  void handle_speedline_image_created( std::string layer_id, SpeedlineToolWeakHandle tool );
 
   void handle_layers_changed();
-  void handle_gradient_layer_changed( std::string layer_id );
+//  void handle_gradient_layer_changed( std::string layer_id );
+  void handle_mask_layer_changed( std::string layer_id );
   void handle_target_data_layer_changed( std::string layer_id );
 
   bool get_update_paths(); 
@@ -127,14 +128,14 @@ void SpeedlineToolPrivate::set_update_paths( bool update_all_paths )
   this->update_all_paths_ = update_all_paths;
 }
 
-void SpeedlineToolPrivate::handle_speedline_image_created( std::string layer_id, SpeedlineToolWeakHandle tool )
-{
-  // Make sure that the tool still exists
-  if ( tool.lock() )
-  {
-    this->tool_->gradient_state_->set( layer_id );  
-  }
-}
+//void SpeedlineToolPrivate::handle_speedline_image_created( std::string layer_id, SpeedlineToolWeakHandle tool )
+//{
+//  // Make sure that the tool still exists
+//  if ( tool.lock() )
+//  {
+//    this->tool_->gradient_state_->set( layer_id );  
+//  }
+//}
 
 //void SpeedlineToolPrivate::handle_vertices_changed()
 //{
@@ -152,16 +153,20 @@ void SpeedlineToolPrivate::handle_slice_changed(  )
 }
 
 
-void SpeedlineToolPrivate::handle_gradient_layer_changed( std::string layer_id )
-{
-  this->tool_->valid_gradient_state_->set( layer_id != Tool::NONE_OPTION_C );
+//void SpeedlineToolPrivate::handle_gradient_layer_changed( std::string layer_id )
+//{
+//  this->tool_->valid_gradient_state_->set( layer_id != Tool::NONE_OPTION_C );
+//
+//  // In the loading, only vertices changed will update the path
+//  if ( !this->get_update_paths() )
+//  {
+//    this->execute_path( true );
+//  }
+//  
+//}
 
-  // In the loading, only vertices changed will update the path
-  if ( !this->get_update_paths() )
-  {
-    this->execute_path( true );
-  }
-  
+void SpeedlineToolPrivate::handle_mask_layer_changed( std::string layer_id )
+{
 }
 
 void SpeedlineToolPrivate::handle_target_data_layer_changed( std::string layer_id )
@@ -203,7 +208,7 @@ bool SpeedlineToolPrivate::find_vertex( ViewerHandle viewer, int x, int y, int& 
     double pt_x, pt_y;
     Core::VolumeSlice::ProjectOntoSlice( slice_type, vertices[ i ], pt_x, pt_y );
     if ( Core::Abs( pt_x - world_x ) <= range_x &&
-      Core::Abs( pt_y - world_y ) <= range_y )
+         Core::Abs( pt_y - world_y ) <= range_y )
     {
       index = static_cast< int >( i );
       return true;
@@ -358,93 +363,93 @@ void SpeedlineToolPrivate::execute_fill_erase( Core::ActionContextHandle context
 
 void SpeedlineToolPrivate::execute_path( bool update_all_paths )
 {
-  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-
-  if ( this->get_update_paths() )
-  {
-    update_all_paths = true;
-    this->set_update_paths( false );
-  }
-  
-  Core::ActionContextHandle context = Core::Interface::GetMouseActionContext();
-  ViewerHandle viewer = ViewerManager::Instance()->get_active_viewer();
-
-  if ( !this->tool_->valid_gradient_state_->get() )
-  {
-    return;
-  }
-
-  // If no viewer specified, use the current active viewer
-  if ( !viewer )
-  {
-    int active_viewer = ViewerManager::Instance()->active_viewer_state_->get();
-    if ( active_viewer < 0 )
-    {
-      return;
-    }
-    viewer = ViewerManager::Instance()->get_viewer( static_cast< size_t >( active_viewer ) );
-  }
-
-  if ( !viewer || viewer->is_volume_view() )
-  {
-    return;
-  }
-
-  Core::DataVolumeSliceHandle volume_slice = boost::dynamic_pointer_cast
-    < Core::DataVolumeSlice >( viewer->get_volume_slice( 
-    this->tool_->gradient_state_->get() ) );
-  if ( !volume_slice )
-  {
-    return;
-  }
- 
-  // Gradient Layer must be locked.
-
-  LayerHandle gradient_layer = LayerManager::Instance()->find_layer_by_id( 
-    this->tool_->gradient_state_->get() );
-
-  if ( gradient_layer->locked_state_->get() ) 
-  {
-    return;
-  }
-
-  (*this->action_counter_)++;
-  long action_id = (*this->action_counter_);
-
-  assert( action_id == (*this->action_counter_));
-
-  const std::vector< Core::Point > vertices = this->tool_->vertices_state_->get();
-
-  ActionSpeedline::Dispatch( context, this->tool_->gradient_state_->get(),
-    volume_slice->get_slice_type(), volume_slice->get_slice_number(), vertices, 
-    this->tool_->current_vertex_index_state_->get(),
-    this->tool_->iterations_state_->get(),
-    this->tool_->termination_state_->get(),
-    update_all_paths,
-    this->tool_->itk_path_state_->get_stateid(),
-    this->tool_->path_state_->get_stateid(),
-    this->tool_->path_vertices_state_->get_stateid(),
-    action_id,
-    this->action_counter_
-    );
+//  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+//
+//  if ( this->get_update_paths() )
+//  {
+//    update_all_paths = true;
+//    this->set_update_paths( false );
+//  }
+//  
+//  Core::ActionContextHandle context = Core::Interface::GetMouseActionContext();
+//  ViewerHandle viewer = ViewerManager::Instance()->get_active_viewer();
+//
+//  if ( !this->tool_->valid_gradient_state_->get() )
+//  {
+//    return;
+//  }
+//
+//  // If no viewer specified, use the current active viewer
+//  if ( !viewer )
+//  {
+//    int active_viewer = ViewerManager::Instance()->active_viewer_state_->get();
+//    if ( active_viewer < 0 )
+//    {
+//      return;
+//    }
+//    viewer = ViewerManager::Instance()->get_viewer( static_cast< size_t >( active_viewer ) );
+//  }
+//
+//  if ( !viewer || viewer->is_volume_view() )
+//  {
+//    return;
+//  }
+//
+//  Core::DataVolumeSliceHandle volume_slice = boost::dynamic_pointer_cast
+//    < Core::DataVolumeSlice >( viewer->get_volume_slice( 
+//    this->tool_->gradient_state_->get() ) );
+//  if ( !volume_slice )
+//  {
+//    return;
+//  }
+// 
+//  // Gradient Layer must be locked.
+//
+//  LayerHandle gradient_layer = LayerManager::Instance()->find_layer_by_id( 
+//    this->tool_->gradient_state_->get() );
+//
+//  if ( gradient_layer->locked_state_->get() ) 
+//  {
+//    return;
+//  }
+//
+//  (*this->action_counter_)++;
+//  long action_id = (*this->action_counter_);
+//
+//  assert( action_id == (*this->action_counter_));
+//
+//  const std::vector< Core::Point > vertices = this->tool_->vertices_state_->get();
+//
+//  ActionSpeedline::Dispatch( context, this->tool_->gradient_state_->get(),
+//    volume_slice->get_slice_type(), volume_slice->get_slice_number(), vertices, 
+//    this->tool_->current_vertex_index_state_->get(),
+//    this->tool_->iterations_state_->get(),
+//    this->tool_->termination_state_->get(),
+//    update_all_paths,
+//    this->tool_->itk_path_state_->get_stateid(),
+//    this->tool_->path_state_->get_stateid(),
+//    this->tool_->path_vertices_state_->get_stateid(),
+//    action_id,
+//    this->action_counter_
+//    );
 }
 
 //////////////////////////////////////////////////////////////////////////
 // Class SpeedlineTool
 //////////////////////////////////////////////////////////////////////////
 
-void SpeedlineTool::calculate_speedimage( Core::ActionContextHandle context )
-{
-  // NOTE: Need to lock state engine as this function is run from the interface thread
-  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-
-  ActionSpeedlineImageFilter::Dispatch( context,
-    this->target_data_layer_state_->get(),
-    this->use_smoothing_state_->get(),
-    this->use_rescale_state_->get(),
-    boost::bind( &SpeedlineToolPrivate::handle_speedline_image_created, this->private_, 
-    _1, SpeedlineToolWeakHandle( this->shared_from_this() ) ) );  
-}
+//void SpeedlineTool::calculate_speedimage( Core::ActionContextHandle context )
+//{
+//  // NOTE: Need to lock state engine as this function is run from the interface thread
+//  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+//
+//  ActionSpeedlineImageFilter::Dispatch( context,
+//    this->target_data_layer_state_->get(),
+//    this->use_smoothing_state_->get(),
+//    this->use_rescale_state_->get(),
+//    boost::bind( &SpeedlineToolPrivate::handle_speedline_image_created, this->private_, 
+//    _1, SpeedlineToolWeakHandle( this->shared_from_this() ) ) );  
+//}
 
 SpeedlineTool::SpeedlineTool( const std::string& toolid ) :
   SingleTargetTool( Core::VolumeType::MASK_E, toolid ),
@@ -464,21 +469,27 @@ SpeedlineTool::SpeedlineTool( const std::string& toolid ) :
   this->add_connection( this->vertices_state_->state_changed_signal_.connect(
     boost::bind( &SpeedlineToolPrivate::execute_path, this->private_, false ) ) );
 
-  this->add_state( "termination_state", this->termination_state_, 1.0, 0.0, 2.0, 0.1 );
-  this->add_state( "iterations", this->iterations_state_, 1000, 1, 2000, 1 );
+//  this->add_state( "termination_state", this->termination_state_, 1.0, 0.0, 2.0, 0.1 );
+//  this->add_state( "iterations", this->iterations_state_, 1000, 1, 2000, 1 );
+  // defaults from livewire tool test case
+  this->add_state( "grad_mag_weight", this->grad_mag_weight_state_, 0.43, 0.0, 10.0, 0.01 );
+  this->add_state( "zero_cross_weight", this->zero_cross_weight_state_, 0.43, 0.0, 10.0, 0.01 );
+  this->add_state( "grad_dir_weight", this->grad_dir_weight_state_, 0.14, 0.0, 10.0, 0.01 );
 
   std::vector< LayerIDNamePair > empty_list( 1, 
     std::make_pair( Tool::NONE_OPTION_C, Tool::NONE_OPTION_C ) );
 
   // Whether we use a mask to find which components to use
-  this->add_state( "gradient", this->gradient_state_, Tool::NONE_OPTION_C, empty_list );
-  this->gradient_state_->set_session_priority( Core::StateBase::DEFAULT_LOAD_E + 30 );
-  this->add_extra_layer_input( this->gradient_state_, Core::VolumeType::DATA_E, false, false );
-  this->add_state( "valid_gradient_layer", this->valid_gradient_state_, false );
+//  this->add_state( "gradient", this->gradient_state_, Tool::NONE_OPTION_C, empty_list );
+//  this->gradient_state_->set_session_priority( Core::StateBase::DEFAULT_LOAD_E + 30 );
+  this->add_state( "mask", this->mask_state_, Tool::NONE_OPTION_C, empty_list );
+  this->mask_state_->set_session_priority( Core::StateBase::DEFAULT_LOAD_E + 30 );
+  this->add_extra_layer_input( this->mask_state_, Core::VolumeType::MASK_E, false, false );
+//  this->add_state( "valid_gradient_layer", this->valid_gradient_state_, false );
 
   // When speed image changes, recompute speedline.
-  this->add_connection( this->gradient_state_->value_changed_signal_.connect(
-    boost::bind( &SpeedlineToolPrivate::handle_gradient_layer_changed, this->private_, _2 ) ) );
+  this->add_connection( this->mask_state_->value_changed_signal_.connect(
+    boost::bind( &SpeedlineToolPrivate::handle_mask_layer_changed, this->private_, _2 ) ) );
 
   this->add_state( "data_layer", this->target_data_layer_state_, Tool::NONE_OPTION_C, empty_list );
   this->add_extra_layer_input( this->target_data_layer_state_, Core::VolumeType::DATA_E, false, false );
@@ -496,8 +507,10 @@ SpeedlineTool::SpeedlineTool( const std::string& toolid ) :
   this->add_state( "current_vertex_index", this->current_vertex_index_state_, -1 );
   this->current_vertex_index_state_->set_session_priority( Core::StateBase::DEFAULT_LOAD_E + 50 );
 
-  this->add_state( "use_smoothing", this->use_smoothing_state_, true ); 
-  this->add_state( "use_rescale", this->use_rescale_state_, true ); 
+//  this->add_state( "use_smoothing", this->use_smoothing_state_, true ); 
+  this->add_state( "use_rescale", this->use_rescale_state_, true );
+  this->add_state( "use_face_conn", this->use_face_conn_state_, true );
+  this->add_state( "use_image_spacing", this->use_image_spacing_state_, true );
 
 }
 
@@ -525,22 +538,21 @@ void SpeedlineTool::activate()
         boost::bind( &SpeedlineToolPrivate::handle_slice_changed, this->private_ ) );
   }
 
-  if ( this->valid_gradient_state_->get() )
-  {
-    for ( size_t i = 0; i < 6; ++i )
-    {
-      Core::DataVolumeSliceHandle volume_slice = boost::dynamic_pointer_cast
-        < Core::DataVolumeSlice >( ViewerManager::Instance()->get_viewer( i )->get_volume_slice( 
-        this->gradient_state_->get() ) );
-      
-      if ( volume_slice->get_slice_number() != this->private_->slice_no_[ i ]  )
-      {
-        is_recompute = true;
-        break;
-      }
-    }
-  }
-  
+//  if ( this->valid_gradient_state_->get() )
+//  {
+//    for ( size_t i = 0; i < 6; ++i )
+//    {
+//      Core::DataVolumeSliceHandle volume_slice = boost::dynamic_pointer_cast
+//        < Core::DataVolumeSlice >( ViewerManager::Instance()->get_viewer( i )->get_volume_slice( 
+//        this->gradient_state_->get() ) );
+//      
+//      if ( volume_slice->get_slice_number() != this->private_->slice_no_[ i ]  )
+//      {
+//        is_recompute = true;
+//        break;
+//      }
+//    }
+//  }
 
   if ( is_recompute && this->private_->initialized_ )
   {
@@ -559,21 +571,21 @@ void SpeedlineTool::deactivate()
     this->private_->viewer_connection_[ i ].disconnect();
   }
 
-  if ( this->valid_gradient_state_->get() )
-  {
-    std::vector< int > slice_no_arr;
-    for ( size_t i = 0; i < 6; ++i )
-    {
-      Core::DataVolumeSliceHandle volume_slice = boost::dynamic_pointer_cast
-        < Core::DataVolumeSlice >( ViewerManager::Instance()->get_viewer( i )->get_volume_slice( 
-        this->gradient_state_->get() ) );
-
-      if ( volume_slice != NULL )
-      {
-        this->private_->slice_no_[ i ]  = volume_slice->get_slice_number();
-      } 
-    }
-  }
+//  if ( this->valid_gradient_state_->get() )
+//  {
+//    std::vector< int > slice_no_arr;
+//    for ( size_t i = 0; i < 6; ++i )
+//    {
+//      Core::DataVolumeSliceHandle volume_slice = boost::dynamic_pointer_cast
+//        < Core::DataVolumeSlice >( ViewerManager::Instance()->get_viewer( i )->get_volume_slice( 
+//        this->gradient_state_->get() ) );
+//
+//      if ( volume_slice != NULL )
+//      {
+//        this->private_->slice_no_[ i ]  = volume_slice->get_slice_number();
+//      } 
+//    }
+//  }
 }
 
 bool SpeedlineTool::post_load_states( const Core::StateIO& state_io )
@@ -626,10 +638,14 @@ void SpeedlineTool::reset( Core::ActionContextHandle context )
 
 void SpeedlineTool::reset_parameters( Core::ActionContextHandle context )
 {
-  Core::Application::PostEvent( boost::bind( &Core::StateRangedInt::set,
-    this->iterations_state_, 1000, Core::ActionSource::NONE_E ) );
-  Core::Application::PostEvent( boost::bind( &Core::StateRangedDouble::set,
-    this->termination_state_, 1.0, Core::ActionSource::NONE_E ) );
+//  Core::Application::PostEvent( boost::bind( &Core::StateRangedInt::set,
+//    this->iterations_state_, 1000, Core::ActionSource::NONE_E ) );
+//  Core::Application::PostEvent( boost::bind( &Core::StateRangedDouble::set,
+//    this->termination_state_, 1.0, Core::ActionSource::NONE_E ) );
+//  Core::Application::PostEvent( boost::bind( &Core::StateBool::set,
+//    this->use_face_conn_state_, true, Core::ActionSource::NONE_E ) );
+//  Core::Application::PostEvent( boost::bind( &Core::StateBool::set,
+//    this->use_image_spacing_state_, true, Core::ActionSource::NONE_E ) );
 }
 
 bool SpeedlineTool::handle_mouse_press( ViewerHandle viewer, 
@@ -642,10 +658,10 @@ bool SpeedlineTool::handle_mouse_press( ViewerHandle viewer,
     return false;
   }
 
-  if ( !this->valid_gradient_state_->get() )
-  {
-    return false;
-  }
+//  if ( ! this->valid_gradient_state_->get() )
+//  {
+//    return false;
+//  }
 
   if ( button == Core::MouseButton::LEFT_BUTTON_E &&
     ( modifiers == Core::KeyModifier::NO_MODIFIER_E ||
@@ -999,10 +1015,10 @@ bool SpeedlineTool::handle_mouse_release( ViewerHandle viewer,
     return false;
   }
 
-  if ( !this->valid_gradient_state_->get() )
-  {
-    return false;
-  }
+//  if ( !this->valid_gradient_state_->get() )
+//  {
+//    return false;
+//  }
 
   if ( this->private_->moving_vertex_ && 
     ( button == Core::MouseButton::LEFT_BUTTON_E ||
@@ -1031,11 +1047,10 @@ bool SpeedlineTool::handle_mouse_move( ViewerHandle viewer,
     return false;
   }
 
-  if ( !this->valid_gradient_state_->get() )
-  {
-    return false;
-  }
-
+//  if ( !this->valid_gradient_state_->get() )
+//  {
+//    return false;
+//  }
 
   if ( buttons == Core::MouseButton::NO_BUTTON_E )
   {

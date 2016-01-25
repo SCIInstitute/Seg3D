@@ -3,7 +3,7 @@
 
  The MIT License
 
- Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
 
 
@@ -24,10 +24,10 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
- */
+*/
 
-#ifndef APPLICATION_TOOLS_SpeedLINETOOL_H
-#define APPLICATION_TOOLS_SpeedLINETOOL_H
+#ifndef APPLICATION_TOOLS_SPEEDLINETOOL_H
+#define APPLICATION_TOOLS_SPEEDLINETOOL_H
 
 #include <Application/Tool/SingleTargetTool.h>
 
@@ -116,19 +116,24 @@ public:
   void fill( Core::ActionContextHandle context );
   void erase( Core::ActionContextHandle context );
   void reset( Core::ActionContextHandle context );
-  void calculate_speedimage( Core::ActionContextHandle context );
+//  void calculate_speedimage( Core::ActionContextHandle context );
   void reset_parameters( Core::ActionContextHandle context );
 
   // -- State Variables --
 public:
   Core::StatePointVectorHandle vertices_state_;
-  Core::StateRangedDoubleHandle termination_state_;
+//  Core::StateRangedDoubleHandle termination_state_;
+  Core::StateRangedDoubleHandle grad_mag_weight_state_;
+  Core::StateRangedDoubleHandle zero_cross_weight_state_;
+  Core::StateRangedDoubleHandle grad_dir_weight_state_;
 
   /// Number of iterations the filter needs to run
-  Core::StateRangedIntHandle iterations_state_;
+//  Core::StateRangedIntHandle iterations_state_;
 
-  Core::StateLabeledOptionHandle gradient_state_;
-  Core::StateBoolHandle gradient_created_state_; // user created, true; loaded false;
+//  Core::StateLabeledOptionHandle gradient_state_;
+//  Core::StateBoolHandle gradient_created_state_; // user created, true; loaded false;
+
+  Core::StateLabeledOptionHandle mask_state_;
 
   Core::StateSpeedlinePathHandle itk_path_state_;
   Core::StateSpeedlinePathHandle path_state_;
@@ -137,15 +142,17 @@ public:
   /// the current vertices state.
   Core::StatePointVectorHandle path_vertices_state_;   
 
-  Core::StateBoolHandle valid_gradient_state_;
+//  Core::StateBoolHandle valid_gradient_state_;
 
   Core::StateIntHandle current_vertex_index_state_;
 
   Core::StateLabeledOptionHandle target_data_layer_state_;
 
   Core::StateBoolHandle valid_target_data_layer_state_;
-  Core::StateBoolHandle use_smoothing_state_;
+//  Core::StateBoolHandle use_smoothing_state_;
   Core::StateBoolHandle use_rescale_state_;
+  Core::StateBoolHandle use_face_conn_state_;
+  Core::StateBoolHandle use_image_spacing_state_;
 
 private:
   SpeedlineToolPrivateHandle private_;

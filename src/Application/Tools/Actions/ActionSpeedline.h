@@ -50,13 +50,20 @@ CORE_ACTION
   CORE_ACTION_TYPE( "Speedline", "Fill or erase a slice of a mask layer within "
                     "the region enclosed by the Speedline.")
   CORE_ACTION_ARGUMENT( "target", "The ID of the target data layer." )
+  CORE_ACTION_ARGUMENT( "roi_mask", "Region of interest." )
+  CORE_ACTION_ARGUMENT( "mask", "The layerid of the mask that needs to be applied." )
   CORE_ACTION_ARGUMENT( "slice_type", "The slicing direction to be painted on." )
   CORE_ACTION_ARGUMENT( "slice_number", "The slice number to be painted on." )
   CORE_ACTION_ARGUMENT( "vertices", "The 2D coordinates of Speedline vertices." )
   CORE_ACTION_ARGUMENT( "current_vertex_index", "The vertex needes to compute paths." )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "iterations", "1000", "Number of iterations to perform." )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "termination", "1.0", "Unit of Termination." )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "update_all_path", "true", "Update all paths" )
+//  CORE_ACTION_OPTIONAL_ARGUMENT( "iterations", "1000", "Number of iterations to perform." )
+//  CORE_ACTION_OPTIONAL_ARGUMENT( "termination", "1.0", "Unit of Termination." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "grad_mag_weight", "0.43", "Gradient magnitude weight for cost function." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "zero_cross_weight", "0.43", "Zero cross weight for cost function." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "grad_dir_weight", "0.14", "Gradient direction weight for cost function." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "image_spacing", "true", "Determines the scaling factor for the neighborhood weighting." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "face_conn", "true", "Determines the local neighborhood." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "update_all_path", "true", "Update all paths." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "itk_path_state_id", "", "The statid of the state variable into which ITK continuous index values will be written." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "world_path_state_id", "", "The statid of the state variable into which world coordinate path values will be written." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "path_vertices_state_id", "", "The stateid of the state variable into which vertices values will be written." )
@@ -81,21 +88,36 @@ private:
   ActionSpeedlinePrivateHandle private_;
 
 public:
+//
+//  static void Dispatch( Core::ActionContextHandle context, const std::string& layer_id,
+//    Core::VolumeSliceType slice_type,
+//    size_t slice_number,
+//    const std::vector< Core::Point > vertices, 
+//    int current_vertex_index,
+//    int iterations, 
+//    double termination,
+//    bool update_all_paths,
+//    const std::string& itk_path_state_id,
+//    const std::string& world_path_state_id,
+//    const std::string& path_vertices_state_id,
+//    long  action_id,
+//    Core::AtomicCounterHandle action_handle
+//    );
 
-  static void Dispatch( Core::ActionContextHandle context, const std::string& layer_id,
-    Core::VolumeSliceType slice_type,
-    size_t slice_number,
-    const std::vector< Core::Point > vertices, 
-    int current_vertex_index,
-    int iterations, 
-    double termination,
-    bool update_all_paths,
-    const std::string& itk_path_state_id,
-    const std::string& world_path_state_id,
-    const std::string& path_vertices_state_id,
-    long  action_id,
-    Core::AtomicCounterHandle action_handle
-    );
+  void Dispatch( Core::ActionContextHandle context,
+                 const std::string& layer_id, Core::VolumeSliceType slice_type,
+                 size_t slice_number,
+                 const std::vector< Core::Point > vertices,
+                 int current_vertex_index,
+                 bool update_all_paths,
+                 const std::string& itk_path_state_id,
+                 const std::string& world_path_state_id,
+                 const std::string& path_vertices_state_id,
+                 long action_id,
+                 Core::AtomicCounterHandle action_handle
+               );
+
+
 };
 
 } // end namespace Seg3D
