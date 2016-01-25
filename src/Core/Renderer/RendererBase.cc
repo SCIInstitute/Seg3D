@@ -162,6 +162,13 @@ bool RendererBasePrivate::render_scene( PickPointHandle pick_point )
 {
 
 #if !MULTITHREADED_RENDERING
+  if ( !this->renderer_->is_renderer_thread() )
+  {
+    this->renderer_->post_renderer_event( boost::bind( &RendererBasePrivate::render_scene,
+                                                       this, pick_point) );
+    return;
+  }
+
   RenderContextBindingHandle context_binding( new RenderContextBinding( this->context_ ) );
 #endif
 
@@ -262,6 +269,12 @@ bool RendererBasePrivate::render_overlay()
 {
 
 #if !MULTITHREADED_RENDERING
+  if ( !this->renderer_->is_renderer_thread() )
+  {
+    this->renderer_->post_renderer_event( boost::bind( &RendererBasePrivate::render_overlay,
+      this) );
+    return;
+  }
   RenderContextBindingHandle context_binding( new RenderContextBinding( this->context_ ) );
 #endif
 
@@ -330,10 +343,6 @@ RendererBase::RendererBase() :
   height_( 0 ),
   private_( new RendererBasePrivate )
 {
-  if ( !Core::RenderResources::Instance()->create_render_context( this->private_->context_ ) )
-  {
-    CORE_THROW_EXCEPTION( "Failed to create a valid rendering context" );
-  }
   this->private_->renderer_ = this;
   this->private_->active_scene_texture_ = 0;
   this->private_->active_overlay_texture_ = 2;
@@ -370,6 +379,11 @@ void RendererBase::initialize()
   // Save old GL context so it can be restored at the end
   RenderContextHandle old_context = RenderResources::Instance()->get_current_context();
 #endif
+
+  if ( !Core::RenderResources::Instance()->create_render_context( this->private_->context_ ) )
+  {
+    CORE_THROW_EXCEPTION( "Failed to create a valid rendering context" );
+  }
 
   // Make the GL context current. In multi-threaded rendering mode,
   // this call is only needed once.
@@ -430,6 +444,12 @@ void RendererBase::resize( int width, int height )
   }
   
 #if !MULTITHREADED_RENDERING
+  if ( !this->renderer_->is_renderer_thread() )
+  {
+    this->renderer_->post_renderer_event( boost::bind( &RendererBase::resize,
+                                                       this, width, height) );
+    return;
+  }
   RenderContextBindingHandle context_binding( new RenderContextBinding( this->private_->context_ ) );
 #endif
 

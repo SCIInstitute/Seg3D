@@ -222,9 +222,6 @@ RenderResources::~RenderResources()
 void RenderResources::initialize_eventhandler()
 {
   boost::unique_lock< boost::mutex > lock( this->private_->thread_mutex_ );
-  this->private_->delete_context_->make_current();
-  this->private_->initialize_gl();
-  this->private_->query_video_memory_size();
   this->private_->thread_condition_variable_.notify_one();
 }
 
@@ -269,11 +266,11 @@ void RenderResources::install_resources_context( RenderResourcesContextHandle re
   
   this->private_->resources_context_ = resources_context;
 
-  // Create GL context for the event handler thread and start it
-  this->private_->resources_context_->create_render_context( this->private_->delete_context_ );
+  // Start the event handler thread and then create the GL context
   boost::unique_lock< boost::mutex > lock( this->private_->thread_mutex_ );
   this->start_eventhandler();
   this->private_->thread_condition_variable_.wait( lock );
+  this->initialize_on_event_thread();
 }
 
 bool RenderResources::valid_render_resources()
@@ -282,6 +279,22 @@ bool RenderResources::valid_render_resources()
          this->private_->resources_context_->valid_render_resources() && 
          this->private_->delete_context_ &&
          this->private_->gl_capable_ );
+}
+
+void RenderResources::initialize_on_event_thread()
+{
+  if (!this->is_eventhandler_thread())
+  {
+    this->post_event( boost::bind( &RenderResources::initialize_on_event_thread, this ) );
+    return;
+  }
+
+  boost::unique_lock< boost::mutex > lock( this->private_->thread_mutex_ );
+  this->private_->resources_context_->create_render_context( this->private_->delete_context_ );
+  this->private_->delete_context_->make_current();
+  this->private_->initialize_gl();
+  this->private_->query_video_memory_size();
+
 }
 
 void RenderResources::delete_texture( unsigned int texture_id )
