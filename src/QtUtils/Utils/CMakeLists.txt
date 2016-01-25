@@ -91,7 +91,8 @@ TARGET_LINK_LIBRARIES(QtUtils_Utils
   Core_Graphics
   Core_Viewer
   QtUtils_Widgets
-#  ${QT_LIBRARIES}
   ${SCI_GLEW_LIBRARY}
   ${SCI_BOOST_LIBRARY}
 )
+
+qt5_use_modules(QtUtils_Utils OpenGL)
