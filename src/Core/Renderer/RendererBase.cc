@@ -444,10 +444,10 @@ void RendererBase::resize( int width, int height )
   }
   
 #if !MULTITHREADED_RENDERING
-  if ( !this->renderer_->is_renderer_thread() )
+  if ( !this->is_renderer_thread() )
   {
-    this->renderer_->post_renderer_event( boost::bind( &RendererBase::resize,
-                                                       this, width, height) );
+    this->post_renderer_event( boost::bind( &RendererBase::resize,
+                                            this, width, height) );
     return;
   }
   RenderContextBindingHandle context_binding( new RenderContextBinding( this->private_->context_ ) );
