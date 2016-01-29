@@ -27,10 +27,14 @@
 */
 
 #include <Application/Filters/ITKResampleFilter.h>
+#include <Core/DataBlock/StdDataBlock.h>
+#include <Core/DataBlock/MaskDataBlockManager.h>
 
 #include <itkLinearInterpolateImageFunction.h>
 #include <itkBSplineInterpolateImageFunction.h>
 #include <itkNearestNeighborInterpolateImageFunction.h>
+//#include <itkAffineTransform.h>
+#include <itkIdentityTransform.h>
 #include <itkResampleImageFilter.h>
 #include <itkScaleTransform.h>
 
@@ -42,7 +46,7 @@ const std::string ITKResampleFilter::LINEAR_C( "linear" );
 const std::string ITKResampleFilter::B_SPLINE_C( "bspline" );
 const std::string ITKResampleFilter::NEAREST_NEIGHBOR_C( "nn" );
 
-ITKResampleFilter::ITKResampleFilter( const std::string& interpolator, bool replace, bool crop, const std::string& padding, Core::Point range_min, Core::Point range_max, SandboxID sandbox )
+ITKResampleFilter::ITKResampleFilter( const std::string& interpolator, bool replace, bool crop, const std::string& padding, Point range_min, Point range_max, SandboxID sandbox )
 : replace_(replace),
   crop_(crop),
   padding_(padding),
@@ -56,7 +60,7 @@ ITKResampleFilter::ITKResampleFilter( const std::string& interpolator, bool repl
 }
 
 bool ITKResampleFilter::setup_layers(const std::vector< std::string >& layer_ids,
-                  /*bool match_grid_transform, const Core::GridTransform& grid_transform,*/
+                  bool match_grid_transform, const GridTransform& grid_transform,
                   unsigned int dimX, unsigned int dimY, unsigned int dimZ)
 {
   this->dims_[ 0 ] = dimX;
@@ -66,7 +70,7 @@ bool ITKResampleFilter::setup_layers(const std::vector< std::string >& layer_ids
   size_t num_layers = layer_ids.size();
   this->src_layers_.resize( num_layers );
   this->dst_layers_.resize( num_layers );
-//  this->output_transforms_.resize( num_layers );
+  this->output_transforms_.resize( num_layers );
   this->dst_layer_ids_.resize( num_layers );
 
   for ( size_t i = 0; i < num_layers; ++i )
@@ -81,31 +85,36 @@ bool ITKResampleFilter::setup_layers(const std::vector< std::string >& layer_ids
       this->lock_for_use( this->src_layers_[ i ] );
     }
 
-//    if ( match_grid_transform )
-//    {
-//      this->output_transforms_[ i ] = grid_transform;
-//      this->output_transforms_[ i ].set_originally_node_centered( this->src_layers_[ i ]->get_grid_transform().get_originally_node_centered() );
-//    }
-//    else
-//    {
-//      if (! this->compute_output_grid_transform( this->src_layers_[ i ], this->resample_contexts_[ i ], this->output_transforms_[ i ] ) )
-//      {
-//        CORE_LOG_ERROR( "Computing grid transform failed." );
-//        return false;
-//      }
-//    }
+    if ( match_grid_transform )
+    {
+      this->output_transforms_[ i ] = grid_transform;
+      this->output_transforms_[ i ].set_originally_node_centered( this->src_layers_[ i ]->get_grid_transform().get_originally_node_centered() );
+    }
+    else
+    {
+      GridTransform grid_transform = this->src_layers_[ i ]->get_grid_transform();
+      Transform new_transform;
+
+      double spacing_x = grid_transform.spacing_x() * this->dims_[0] / grid_transform.get_nx();
+      double spacing_y = grid_transform.spacing_y() * this->dims_[1] / grid_transform.get_ny();
+      double spacing_z = grid_transform.spacing_z() * this->dims_[2] / grid_transform.get_nz();
+
+      new_transform = Transform( grid_transform.get_origin(),
+                                 Core::Vector( spacing_x, 0.0 , 0.0 ),
+                                 Core::Vector( 0.0, spacing_y, 0.0 ),
+                                 Core::Vector( 0.0, 0.0, spacing_z ) );
+      this->output_transforms_[ i ] = GridTransform( this->dims_[ 0 ], this->dims_[ 1 ], this->dims_[ 2 ], new_transform );
+      this->output_transforms_[ i ].set_originally_node_centered( this->src_layers_[ i ]->get_grid_transform().get_originally_node_centered() );
+    }
 
     switch ( this->src_layers_[ i ]->get_type() )
     {
       case Core::VolumeType::DATA_E:
-        //this->create_and_lock_data_layer( this->output_transforms_[ i ], this->src_layers_[ i ], this->dst_layers_[ i ] );
-        this->create_and_lock_data_layer_from_layer( this->src_layers_[ i ], this->dst_layers_[ i ] );
+        this->create_and_lock_data_layer( this->output_transforms_[ i ], this->src_layers_[ i ], this->dst_layers_[ i ] );
         break;
       case Core::VolumeType::MASK_E:
-        //this->create_and_lock_mask_layer( this->output_transforms_[ i ], this->src_layers_[ i ], this->dst_layers_[ i ] );
-        this->create_and_lock_mask_layer_from_layer( this->src_layers_[ i ], this->dst_layers_[ i ] );
-        static_cast< MaskLayer* >( this->dst_layers_[ i ].get() )->color_state_->set(
-          static_cast< MaskLayer* >( this->src_layers_[ i ].get() )->color_state_->get() );
+        this->create_and_lock_mask_layer( this->output_transforms_[ i ], this->src_layers_[ i ], this->dst_layers_[ i ] );
+        static_cast< MaskLayer* >( this->dst_layers_[ i ].get() )->color_state_->set( static_cast< MaskLayer* >( this->src_layers_[ i ].get() )->color_state_->get() );
         break;
       default:
         CORE_LOG_ERROR( "Unknown volume type." );
@@ -183,6 +192,8 @@ void ITKResampleFilter::pad_mask_layer( MaskLayerHandle input, MaskLayerHandle o
 template< class VALUE_TYPE>
 void ITKResampleFilter::typed_run_filter()
 {
+  typedef double SCALAR_TYPE;
+
   this->pad_internals_.reset( new PadFilterInternals( this->src_layers_[0], this->dst_layers_[0], this->padding_ ) );
   if ( this->crop_ )
   {
@@ -214,8 +225,7 @@ void ITKResampleFilter::typed_run_filter()
       }
 
       typedef itk::Image< VALUE_TYPE, 3 > TYPED_IMAGE_TYPE;
-      typedef Core::ITKImageDataT<VALUE_TYPE> TYPED_CONTAINER_TYPE;
-      typedef double SCALAR_TYPE;
+      typedef ITKImageDataT<VALUE_TYPE> TYPED_CONTAINER_TYPE;
 
       // Define the type of filter that we use.
       typedef itk::ResampleImageFilter< TYPED_IMAGE_TYPE, TYPED_IMAGE_TYPE > filter_type;
@@ -225,6 +235,48 @@ void ITKResampleFilter::typed_run_filter()
       typename ITKImageDataT<VALUE_TYPE>::Handle input_image;
       this->get_itk_image_from_layer<VALUE_TYPE>( this->src_layers_[ i ], input_image );
 
+      const typename TYPED_IMAGE_TYPE::PointType& origin = input_image->get_image()->GetOrigin();
+      // TODO: not match input origin?
+//      const typename TYPED_IMAGE_TYPE::DirectionType& direction = input_image->get_image()->GetDirection();
+      typename TYPED_IMAGE_TYPE::DirectionType direction;
+      direction.SetIdentity();
+
+      typename TYPED_IMAGE_TYPE::SizeType size;
+std::cerr << "data output dims: [" << dims_[0] << ", " << dims_[1] << ", " << dims_[2] << "]" << std::endl;
+      size[0] = dims_[0];
+      size[1] = dims_[1];
+      size[2] = dims_[2];
+
+      const typename TYPED_IMAGE_TYPE::RegionType& inputRegion = input_image->get_image()->GetLargestPossibleRegion();
+      const typename TYPED_IMAGE_TYPE::SizeType& inputSize = inputRegion.GetSize();
+
+      typedef itk::IdentityTransform< SCALAR_TYPE, 3 > TransformType;
+      TransformType::Pointer transform = TransformType::New();
+      transform->SetIdentity();
+
+//      typedef itk::ScaleTransform< SCALAR_TYPE, 3 > TransformType;
+//      TransformType::Pointer transform = TransformType::New();
+////      itk::FixedArray< SCALAR_TYPE, 3 > scale;
+////      scale[0] = inputSize[0] / dims_[0];
+////      scale[1] = inputSize[1] / dims_[1];
+////      scale[2] = inputSize[2] / dims_[2];
+////      transform->SetScale(scale);
+//      transform->SetIdentity();
+//
+//      itk::Point< SCALAR_TYPE, 3 > center;
+////      center[0] = image->GetLargestPossibleRegion().GetSize()[0]/2;
+////      center[1] = image->GetLargestPossibleRegion().GetSize()[1]/2;
+//      center[0] = 0;
+//      center[1] = 0;
+//      center[2] = 0;
+//      transform->SetCenter(center);
+
+      typename TYPED_IMAGE_TYPE::SpacingType inputSpacing = input_image->get_image()->GetSpacing();
+      typename TYPED_IMAGE_TYPE::SpacingType spacing;
+      spacing[0] = inputSpacing[0] * dims_[0] / inputSize[0];
+      spacing[1] = inputSpacing[1] * dims_[1] / inputSize[1];
+      spacing[2] = inputSpacing[2] * dims_[2] / inputSize[2];
+
       // Create a new ITK filter instantiation.
       typename filter_type::Pointer filter = filter_type::New();
 
@@ -233,7 +285,11 @@ void ITKResampleFilter::typed_run_filter()
       this->observe_itk_progress( filter, this->dst_layers_[ i ], 0.0, 0.75 );
 
       // Setup the filter parameters that we do not want to change.
-      filter->SetInput( input_image->get_image() );
+      filter->SetTransform( transform );
+      filter->SetOutputOrigin( origin );
+      filter->SetOutputSpacing( spacing );
+      filter->SetSize( size );
+      filter->SetOutputDirection( direction );
 
       VALUE_TYPE defaultPixelValue = 0;
       if ( this->padding_ == PadValues::MIN_C )
@@ -267,6 +323,8 @@ void ITKResampleFilter::typed_run_filter()
       {
         filter->SetInterpolator( nn_interp );
       }
+      filter->SetInput( input_image->get_image() );
+      filter->UpdateLargestPossibleRegion();
 
       // Ensure we will have some threads left for doing something else
       this->limit_number_of_itk_threads( filter );
@@ -291,8 +349,21 @@ void ITKResampleFilter::typed_run_filter()
         return;
       }
 
+      typename TYPED_IMAGE_TYPE::Pointer output_image = filter->GetOutput();
+      const typename TYPED_IMAGE_TYPE::RegionType& outputRegion = output_image->GetLargestPossibleRegion();
+      const typename TYPED_IMAGE_TYPE::SizeType& outputSize = outputRegion.GetSize();
+std::cerr << "Output size=[" << outputSize[0] << ", " << outputSize[1] << ", " << outputSize[2] << "]" << std::endl;
+
+//      GridTransform grid_transform;
+//      grid_transform.
+//      this->dst_layers_[ i ]->set_grid_transform( grid_transform, true );
+
       this->insert_itk_image_into_layer<VALUE_TYPE>( this->dst_layers_[ i ], filter->GetOutput() );
 
+      // output grid transform
+      //typename ITKImageDataT<VALUE_TYPE>::Handle output_image;
+      //this->get_itk_image_from_layer<VALUE_TYPE>( this->dst_layers_[ i ], output_image );
+      //output_image->get_transform()
     }
     else if ( this->src_layers_[ i ]->get_type() == VolumeType::MASK_E )
     {
@@ -316,7 +387,7 @@ void ITKResampleFilter::typed_run_filter()
       }
 
       typedef itk::Image< unsigned char, 3> TYPED_IMAGE_TYPE;
-      typedef Core::ITKImageDataT<unsigned char> TYPED_CONTAINER_TYPE;
+      typedef ITKImageDataT<unsigned char> TYPED_CONTAINER_TYPE;
 
       // Define the type of filter that we use.
       // Using default pixel value of 0.
@@ -327,6 +398,17 @@ void ITKResampleFilter::typed_run_filter()
       typename ITKImageDataT<unsigned char>::Handle input_image;
       this->get_itk_image_from_layer<unsigned char>( this->src_layers_[ i ], input_image );
 
+      typename TYPED_IMAGE_TYPE::SpacingType spacing = input_image->get_image()->GetSpacing();
+      typename TYPED_IMAGE_TYPE::PointType origin = input_image->get_image()->GetOrigin();
+
+      // TODO: not match input origin?
+      typename TYPED_IMAGE_TYPE::DirectionType direction = input_image->get_image()->GetDirection();
+      typename TYPED_IMAGE_TYPE::SizeType size;
+std::cerr << "mask output dims: [" << dims_[0] << ", " << dims_[1] << ", " << dims_[2] << "]" << std::endl;
+      size[0] = dims_[0];
+      size[1] = dims_[1];
+      size[2] = dims_[2];
+
       // Create a new ITK filter instantiation.
       typename filter_type::Pointer filter = filter_type::New();
 
@@ -335,7 +417,34 @@ void ITKResampleFilter::typed_run_filter()
       this->observe_itk_progress( filter, this->dst_layers_[ i ], 0.0, 0.75 );
 
       // Setup the filter parameters that we do not want to change.
+      filter->SetOutputOrigin( origin );
+      filter->SetOutputSpacing( spacing );
+      filter->SetSize( size );
+      filter->SetOutputDirection( direction );
+
+      typedef itk::LinearInterpolateImageFunction< TYPED_IMAGE_TYPE, SCALAR_TYPE > LinearInterpolatorType;
+      typename LinearInterpolatorType::Pointer linear_interp = LinearInterpolatorType::New();
+
+      typedef itk::BSplineInterpolateImageFunction< TYPED_IMAGE_TYPE, SCALAR_TYPE > BSplineInterpolatorType;
+      typename BSplineInterpolatorType::Pointer bspline_interp = BSplineInterpolatorType::New();
+
+      typedef itk::NearestNeighborInterpolateImageFunction< TYPED_IMAGE_TYPE, SCALAR_TYPE > NearestNeighborInterpolatorType;
+      typename NearestNeighborInterpolatorType::Pointer nn_interp = NearestNeighborInterpolatorType::New();
+
+      if ( this->interpolator_ == ITKResampleFilter::LINEAR_C )
+      {
+        filter->SetInterpolator( linear_interp );
+      }
+      else if ( this->interpolator_ == ITKResampleFilter::B_SPLINE_C )
+      {
+        filter->SetInterpolator( bspline_interp );
+      }
+      else // NEAREST_NEIGHBOR_C
+      {
+        filter->SetInterpolator( nn_interp );
+      }
       filter->SetInput( input_image->get_image() );
+      filter->UpdateLargestPossibleRegion();
 
       // Ensure we will have some threads left for doing something else
       this->limit_number_of_itk_threads( filter );
@@ -365,6 +474,10 @@ void ITKResampleFilter::typed_run_filter()
       if ( this->check_abort() ) return;
 
       this->insert_itk_label_into_mask_layer<unsigned char>( this->dst_layers_[ i ], filter->GetOutput(), 0 );
+      // output grid transform
+      //typename ITKImageDataT<VALUE_TYPE>::Handle output_image;
+      //this->get_itk_image_from_layer<VALUE_TYPE>( this->dst_layers_[ i ], output_image );
+      //output_image->get_transform()
     }
     else
     {

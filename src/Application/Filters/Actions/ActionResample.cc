@@ -213,7 +213,7 @@ bool ActionResample::run( Core::ActionContextHandle& context,
     // Create algorithm
     boost::shared_ptr< ITKResampleFilter > algo( new ITKResampleFilter( this->private_->kernel_, this->private_->replace_, this->private_->crop_, this->private_->padding_, this->private_->range_min_, this->private_->range_max_, this->private_->sandbox_ ) );
 
-    algo->setup_layers( this->private_->layer_ids_, this->private_->x_, this->private_->y_, this->private_->z_ );
+    algo->setup_layers( this->private_->layer_ids_, this->private_->match_grid_transform_, this->private_->grid_transform_, this->private_->x_, this->private_->y_, this->private_->z_ );
 
     // Return the ids of the destination layer.
     result = Core::ActionResultHandle( new Core::ActionResult( algo->get_dst_layer_ids() ) );

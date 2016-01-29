@@ -61,18 +61,8 @@ private:
   std::vector< Seg3D::LayerHandle > dst_layers_;
   std::vector< std::string > dst_layer_ids_;
 
-  int mapped_x_start_;
-  int mapped_y_start_;
-  int mapped_z_start_;
-  int overlap_x_start_;
-  int overlap_y_start_;
-  int overlap_z_start_;
-  int overlap_nx_;
-  int overlap_ny_;
-  int overlap_nz_;
-
-//  std::vector< Core::GridTransform > output_transforms_; // Per layer
-//  Core::GridTransform current_output_transform_;
+  std::vector< Core::GridTransform > output_transforms_; // Per layer
+  Core::GridTransform current_output_transform_;
 
   PadFilterInternalsHandle pad_internals_;
 
@@ -81,7 +71,7 @@ public:
   virtual ~ITKResampleFilter() {}
 
   bool setup_layers(const std::vector< std::string >& layer_ids,
-                    /*bool match_grid_transform, const Core::GridTransform& grid_transform,*/
+                    bool match_grid_transform, const Core::GridTransform& grid_transform,
                     unsigned int dimX, unsigned int dimY, unsigned int dimZ);
   void pad_data_layer( Seg3D::DataLayerHandle input, Seg3D::DataLayerHandle output );
   void pad_mask_layer( Seg3D::MaskLayerHandle input, Seg3D::MaskLayerHandle output );
