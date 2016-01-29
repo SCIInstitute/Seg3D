@@ -162,13 +162,6 @@ bool RendererBasePrivate::render_scene( PickPointHandle pick_point )
 {
 
 #if !MULTITHREADED_RENDERING
-  if ( !this->renderer_->is_renderer_thread() )
-  {
-    this->renderer_->post_renderer_event( boost::bind( &RendererBasePrivate::render_scene,
-                                                       this, pick_point) );
-    return;
-  }
-
   RenderContextBindingHandle context_binding( new RenderContextBinding( this->context_ ) );
 #endif
 
@@ -269,12 +262,6 @@ bool RendererBasePrivate::render_overlay()
 {
 
 #if !MULTITHREADED_RENDERING
-  if ( !this->renderer_->is_renderer_thread() )
-  {
-    this->renderer_->post_renderer_event( boost::bind( &RendererBasePrivate::render_overlay,
-      this) );
-    return;
-  }
   RenderContextBindingHandle context_binding( new RenderContextBinding( this->context_ ) );
 #endif
 
@@ -444,12 +431,6 @@ void RendererBase::resize( int width, int height )
   }
   
 #if !MULTITHREADED_RENDERING
-  if ( !this->is_renderer_thread() )
-  {
-    this->post_renderer_event( boost::bind( &RendererBase::resize,
-                                            this, width, height) );
-    return;
-  }
   RenderContextBindingHandle context_binding( new RenderContextBinding( this->private_->context_ ) );
 #endif
 
