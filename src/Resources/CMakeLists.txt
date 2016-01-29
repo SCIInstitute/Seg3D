@@ -88,7 +88,8 @@ CORE_ADD_LIBRARY(Resources_QtResources
 )
 
 TARGET_LINK_LIBRARIES(Resources_QtResources
-#  ${QT_LIBRARIES}
 )
+
+qt5_use_modules(Resources_QtResources Core)
 
 SET(RESOURCES_LIBRARY Resources_QtResources CACHE INTERNAL "Resources library." FORCE)
