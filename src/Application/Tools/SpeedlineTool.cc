@@ -43,7 +43,7 @@
 // Application includes
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/SpeedlineTool.h>
-//#include <Application/Tools/Actions/ActionSpeedline.h>
+#include <Application/Tools/Actions/ActionSpeedline.h>
 #include <Application/Tools/Actions/ActionPolyline.h>
 #include <Application/Layer/Layer.h>
 #include <Application/Layer/LayerManager.h>
@@ -71,11 +71,11 @@ public:
   SpeedlineToolPrivate();
   ~SpeedlineToolPrivate();
 
-  //void handle_vertices_changed();
+  void handle_vertices_changed();
   void handle_path_changed();
   // When slice changes, recompute the path
   // in private class, not virtual
-  void handle_slice_changed( );
+  void handle_slice_changed();
 
   bool find_vertex( ViewerHandle viewer, int x, int y, int& index );
   bool find_closest_vertex( ViewerHandle viewer, int x, int y, int& index );
@@ -137,17 +137,17 @@ void SpeedlineToolPrivate::set_update_paths( bool update_all_paths )
 //  }
 //}
 
-//void SpeedlineToolPrivate::handle_vertices_changed()
-//{
-//  ViewerManager::Instance()->update_2d_viewers_overlay();
-//}
+void SpeedlineToolPrivate::handle_vertices_changed()
+{
+  ViewerManager::Instance()->update_2d_viewers_overlay();
+}
 
 void SpeedlineToolPrivate::handle_path_changed()
 {
   ViewerManager::Instance()->update_2d_viewers_overlay();
 }
 
-void SpeedlineToolPrivate::handle_slice_changed(  )
+void SpeedlineToolPrivate::handle_slice_changed()
 {
   this->execute_path( true );
 }
@@ -303,7 +303,7 @@ void SpeedlineToolPrivate::execute_fill_erase( Core::ActionContextHandle context
     this->tool_->target_layer_state_->get() );
 
 
-  if ( !target_mask_layer->is_visible( viewer->get_viewer_id() )  )
+  if ( ! target_mask_layer->is_visible( viewer->get_viewer_id() )  )
   {
     return;
   }
@@ -322,26 +322,26 @@ void SpeedlineToolPrivate::execute_fill_erase( Core::ActionContextHandle context
     return;
   }
 
-  Core::Path paths;
+//  Core::Path paths;
   std::vector< Core::Point > full_path;
 
-  paths = this->tool_->path_state_->get();
+//  paths = this->tool_->path_state_->get();
 
   for ( unsigned int i = 0; i < num_of_vertices; ++i )
   {
     Core::Point p0 = vertices[ i ];
     Core::Point p1 = vertices[ (i + 1) % num_of_vertices ];
-    Core::SinglePath single_path;
-    bool found_path = paths.find_one_path( p0, p1, single_path );
-    if ( found_path )
-    {
-      int num_of_points_on_single_path = static_cast< int > ( single_path.get_points_num_on_path() );
-
-      for ( int j = num_of_points_on_single_path - 1; j >= 0; --j )
-      {
-        full_path.push_back( single_path.get_a_point( j ) );
-      }
-    } 
+//    Core::SinglePath single_path;
+//    bool found_path = paths.find_one_path( p0, p1, single_path );
+//    if ( found_path )
+//    {
+//      int num_of_points_on_single_path = static_cast< int > ( single_path.get_points_num_on_path() );
+//
+//      for ( int j = num_of_points_on_single_path - 1; j >= 0; --j )
+//      {
+//        full_path.push_back( single_path.get_a_point( j ) );
+//      }
+//    } 
   }
 
   size_t num_of_points_on_paths = full_path.size();
@@ -482,13 +482,13 @@ SpeedlineTool::SpeedlineTool( const std::string& toolid ) :
   // Whether we use a mask to find which components to use
 //  this->add_state( "gradient", this->gradient_state_, Tool::NONE_OPTION_C, empty_list );
 //  this->gradient_state_->set_session_priority( Core::StateBase::DEFAULT_LOAD_E + 30 );
-  this->add_state( "mask", this->mask_state_, Tool::NONE_OPTION_C, empty_list );
-  this->mask_state_->set_session_priority( Core::StateBase::DEFAULT_LOAD_E + 30 );
-  this->add_extra_layer_input( this->mask_state_, Core::VolumeType::MASK_E, false, false );
+  this->add_state( "roi_mask", this->roi_mask_state_, Tool::NONE_OPTION_C, empty_list );
+  this->roi_mask_state_->set_session_priority( Core::StateBase::DEFAULT_LOAD_E + 30 );
+  this->add_extra_layer_input( this->roi_mask_state_, Core::VolumeType::MASK_E, false, false );
 //  this->add_state( "valid_gradient_layer", this->valid_gradient_state_, false );
 
   // When speed image changes, recompute speedline.
-  this->add_connection( this->mask_state_->value_changed_signal_.connect(
+  this->add_connection( this->roi_mask_state_->value_changed_signal_.connect(
     boost::bind( &SpeedlineToolPrivate::handle_mask_layer_changed, this->private_, _2 ) ) );
 
   this->add_state( "data_layer", this->target_data_layer_state_, Tool::NONE_OPTION_C, empty_list );
@@ -498,10 +498,10 @@ SpeedlineTool::SpeedlineTool( const std::string& toolid ) :
   this->add_connection( this->target_data_layer_state_->value_changed_signal_.connect(
     boost::bind( &SpeedlineToolPrivate::handle_target_data_layer_changed, this->private_, _2 ) ) );
 
-  this->add_state( "itk_path", this->itk_path_state_, Core::Path() );
-  this->add_state( "path", this->path_state_,  Core::Path() );
-  this->add_connection( this->path_state_->state_changed_signal_.connect(
-    boost::bind( &SpeedlineToolPrivate::handle_path_changed, this->private_ ) ) );
+//  this->add_state( "itk_path", this->itk_path_state_, Core::Path() );
+//  this->add_state( "path", this->path_state_,  Core::Path() );
+//  this->add_connection( this->path_state_->state_changed_signal_.connect(
+//    boost::bind( &SpeedlineToolPrivate::handle_path_changed, this->private_ ) ) );
   this->add_state( "path_vertices", this->path_vertices_state_ );
 
   this->add_state( "current_vertex_index", this->current_vertex_index_state_, -1 );
@@ -630,10 +630,10 @@ bool SpeedlineTool::handle_key_press( ViewerHandle viewer, int key, int modifier
 void SpeedlineTool::reset( Core::ActionContextHandle context )
 {
   Core::ActionClear::Dispatch( context, this->vertices_state_ );
-  Core::Application::PostEvent( boost::bind( &Core::StateSpeedlinePath::set,
-    this->path_state_, Core::Path(), Core::ActionSource::NONE_E ) );
-  Core::Application::PostEvent( boost::bind( &Core::StateSpeedlinePath::set,
-    this->itk_path_state_, Core::Path(), Core::ActionSource::NONE_E ) );
+//  Core::Application::PostEvent( boost::bind( &Core::StateSpeedlinePath::set,
+//    this->path_state_, Core::Path(), Core::ActionSource::NONE_E ) );
+//  Core::Application::PostEvent( boost::bind( &Core::StateSpeedlinePath::set,
+//    this->itk_path_state_, Core::Path(), Core::ActionSource::NONE_E ) );
 }
 
 void SpeedlineTool::reset_parameters( Core::ActionContextHandle context )
@@ -648,9 +648,9 @@ void SpeedlineTool::reset_parameters( Core::ActionContextHandle context )
 //    this->use_image_spacing_state_, true, Core::ActionSource::NONE_E ) );
 }
 
-bool SpeedlineTool::handle_mouse_press( ViewerHandle viewer, 
-                    const Core::MouseHistory& mouse_history, 
-                    int button, int buttons, int modifiers )
+bool SpeedlineTool::handle_mouse_press( ViewerHandle viewer,
+                                        const Core::MouseHistory& mouse_history,
+                                        int button, int buttons, int modifiers )
 {
   Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
   if ( viewer->is_volume_view() )
@@ -663,343 +663,348 @@ bool SpeedlineTool::handle_mouse_press( ViewerHandle viewer,
 //    return false;
 //  }
 
-  if ( button == Core::MouseButton::LEFT_BUTTON_E &&
-    ( modifiers == Core::KeyModifier::NO_MODIFIER_E ||
-    modifiers == Core::KeyModifier::SHIFT_MODIFIER_E ) &&
-    this->private_->vertex_index_ != -1 )
+  if ( ! this->valid_target_data_layer_state_->get() )
   {
-    this->private_->moving_vertex_ = true;
-    viewer->set_cursor( Core::CursorShape::CLOSED_HAND_E );
-    return true;
-  }
-  else if ( button == Core::MouseButton::MID_BUTTON_E &&
-       ( modifiers == Core::KeyModifier::NO_MODIFIER_E ||
-        modifiers == Core::KeyModifier::SHIFT_MODIFIER_E ) )
-  {
-    if ( this->private_->find_closest_vertex( viewer, mouse_history.current_.x_, 
-      mouse_history.current_.y_, this->private_->vertex_index_ ) )
-    {
-      this->private_->moving_vertex_ = true;
-      viewer->set_cursor( Core::CursorShape::CLOSED_HAND_E );
-      return true;      
-    }
+    return false;
   }
 
-  else if ( !( modifiers & Core::KeyModifier::SHIFT_MODIFIER_E ) &&
-    button == Core::MouseButton::LEFT_BUTTON_E )
-  {
-    Core::VolumeSliceHandle active_slice = viewer->get_active_volume_slice();
-    if ( active_slice && !active_slice->out_of_boundary() )
-    {
-      double world_x, world_y;
-      viewer->window_to_world( mouse_history.current_.x_, 
-        mouse_history.current_.y_, world_x, world_y );
-      Core::Point pt;
-      active_slice->get_world_coord( world_x, world_y,  pt );
-      
-      double dmin = DBL_MAX;
-      double proj_min = DBL_MAX;
-      std::vector<Core::Point> points = this->vertices_state_->get();
-      size_t new_pt_idx = points.size();
-
-      Core::Path paths = this->path_state_->get();
-      size_t paths_num = paths.get_path_num();
-
-      //bool path_idx_changed = false;
-      //int path_indicator_min_perdicular = 0;
-
-      //if ( paths_num > 2 )
-      //{
-      //  double dp_perdicular_dist_min = DBL_MAX;
-
-      //  for ( unsigned int i = 0; i < paths_num; ++i )
-      //  {
-      //    Core::SinglePath single_path = paths.get_one_path( i );
-      //    Core::Point p00, p01;
-      //    single_path.get_point_on_ends( 0, p00 );
-      //    single_path.get_point_on_ends( 1, p01 );
-
-      //    Core::Vector edge_dir = p01 - p00;
-      //    double edge_length = edge_dir.length();
-      //    double alpha = Dot( pt - p00,  p01 - p00 )/ ( edge_length * edge_length );
-
-      //    if ( alpha >= 0.0 && alpha <= 1.0 )
-      //    {
-      //      //we need to compute the the point to straight line distance
-      //      double proj_dist = Dot( pt - p00,  p01 - p00 ) / edge_length;
-      //      double dp_perdicular_dist = 
-      //        ( pt - p00 ).length2() - proj_dist * proj_dist;
-      //      
-      //      if ( dp_perdicular_dist < dp_perdicular_dist_min )
-      //      {
-      //        dp_perdicular_dist_min = dp_perdicular_dist;
-      //        path_indicator_min_perdicular = i;
-      //        path_idx_changed = true;
-      //      }
-      //    }
-      //  }
-      //}
-
-      //if ( path_idx_changed )
-      //{
-      //  Core::SinglePath single_path = paths.get_one_path( path_indicator_min_perdicular );
-      //  Core::Point p00, p01;
-      //  single_path.get_point_on_ends( 0, p00 );
-      //  single_path.get_point_on_ends( 1, p01 );
-
-      //  std::vector<Core::Point>::iterator it_p0 = 
-      //    std::find( points.begin(), points.end(), p00 );
-
-      //  if ( it_p0 != points.end() )
-      //  {
-      //    new_pt_idx = it_p0 - points.begin() + 1;
-      //  }
-      //  else
-      //  {
-      //    std::vector<Core::Point>::iterator it_p1 = 
-      //      std::find( points.begin(), points.end(), p01 );
-
-      //    if ( it_p1 != points.end() )
-      //    {
-      //      new_pt_idx = it_p1 - points.begin();
-      //    }
-      //  }
-      //}
-
-      if ( paths_num > 1 )
-      {
-        double dp_perdicular_dist_min = DBL_MAX;
-        int path_indicator_min_perdicular = 0;
-        std::vector< double > dist_arr;
-
-        for ( unsigned int i = 0; i < paths_num; ++i )
-        {
-          Core::SinglePath single_path = paths.get_one_path( i );
-          double dist = single_path.get_smallest_distance2( pt );
-          dist_arr.push_back( dist );
-
-          if ( dist < dp_perdicular_dist_min )
-          {
-            dp_perdicular_dist_min = dist;
-            path_indicator_min_perdicular = i;
-          }
-
-        }
-
-        Core::SinglePath min_dist_single_path = 
-          paths.get_one_path( path_indicator_min_perdicular );
-
-        Core::Point p00, p01;
-        min_dist_single_path.get_point_on_ends( 0, p00 );
-        min_dist_single_path.get_point_on_ends( 1, p01 );
-
-        std::vector<Core::Point>::iterator it_p00 = 
-          std::find( points.begin(), points.end(), p00 );
-
-        std::vector<Core::Point>::iterator it_p01 = 
-          std::find( points.begin(), points.end(), p01 );
-
-        size_t p00_index = it_p00 - points.begin();
-        size_t p01_index = it_p01 - points.begin();
-
-        double dist_pt_p00 = ( pt - p00 ).length2();
-        double dist_pt_p01 = ( pt - p01 ).length2();
-
-        if ( ( dist_pt_p00 != dp_perdicular_dist_min )
-          && ( dist_pt_p01 != dp_perdicular_dist_min ) )
-        {
-          if ( it_p00 != points.end() )
-          {
-            new_pt_idx = p00_index + 1;
-          }
-        }
-
-        else  // p00 is the closest to pt OR p01 is the closest to pt
-        { 
-
-          // Find the other path has the same distance
-          int another_path_indicator = -1;
-          for ( unsigned int i = 0; i < paths_num; ++i )
-          {
-            if ( ( dist_arr[i] == dp_perdicular_dist_min ) 
-              && ( i != path_indicator_min_perdicular ) )
-            {
-              another_path_indicator = i;
-              break;
-            }
-          }
-
-          if ( another_path_indicator == -1 )
-          {
-            if ( dist_pt_p00 == dp_perdicular_dist_min )
-            {
-              if ( it_p00 != points.end() )
-              {
-                new_pt_idx = p00_index;
-              }
-
-            }
-
-            else
-            {
-              if ( it_p01 != points.end() )
-              {
-                new_pt_idx = p01_index + 1;
-              }
-            }
-          }
-          else  // Find the other path
-          {
-            Core::SinglePath another_min_dist_single_path = 
-              paths.get_one_path( another_path_indicator );
-
-            Core::Point p10, p11;
-
-            another_min_dist_single_path.get_point_on_ends( 0, p10 );
-            another_min_dist_single_path.get_point_on_ends( 1, p11 );
-
-            std::vector<Core::Point>::iterator it_p10 = 
-              std::find( points.begin(), points.end(), p10 );
-
-            std::vector<Core::Point>::iterator it_p11 = 
-              std::find( points.begin(), points.end(), p11 );
-
-            size_t p10_index = it_p10 - points.begin();
-            size_t p11_index = it_p11 - points.begin();
-
-            if ( ( p01_index == 0 && p00_index == points.size() - 1 )
-              || ( p11_index == 0 && p10_index == points.size() - 1 ) )
-            {
-              new_pt_idx = points.size();
-            }
-
-            else
-            {
-
-              double dist_pt_p10 = ( pt - p10 ).length2();
-              double dist_pt_p11 = ( pt - p11 ).length2();
-
-              if ( dist_pt_p00 == dp_perdicular_dist_min 
-                  && dist_pt_p10 == dp_perdicular_dist_min )
-              {
-                if ( it_p00 != points.end() &&  it_p10 != points.end() )
-                {
-                  if ( p00_index <= p10_index )
-                  {
-                    new_pt_idx = p10_index + 1;
-                  } 
-                  else
-                  {
-                    new_pt_idx = p00_index + 1;
-                  }
-
-                }
-              }
-
-              else if ( dist_pt_p00 == dp_perdicular_dist_min 
-                && dist_pt_p11 == dp_perdicular_dist_min )
-              {
-                if ( it_p00 != points.end() &&  it_p11 != points.end() )
-                {
-                  if ( p00_index <= p11_index )
-                  {
-                    new_pt_idx = p11_index + 1;
-                  } 
-                  else
-                  {
-                    new_pt_idx = p00_index + 1;
-                  }
-
-                }
-              }
-
-              else if ( dist_pt_p01 == dp_perdicular_dist_min 
-                && dist_pt_p10 == dp_perdicular_dist_min )
-              {
-                if ( it_p01 != points.end() &&  it_p10 != points.end() )
-                {
-                  if ( p01_index <= p10_index )
-                  {
-                    new_pt_idx = p10_index + 1;
-                  } 
-                  else
-                  {
-                    new_pt_idx = p01_index + 1;
-                  }
-
-                }
-              }
-
-              else if ( dist_pt_p01 == dp_perdicular_dist_min 
-                && dist_pt_p11 == dp_perdicular_dist_min )
-              {
-                if ( it_p01 != points.end() &&  it_p11 != points.end() )
-                {
-                  if ( p01_index <= p11_index )
-                  {
-                    new_pt_idx = p11_index + 1;
-                  } 
-                  else
-                  {
-                    new_pt_idx = p01_index + 1;
-                  }
-
-                }
-              }
-            }
-          }
-        }
-      }
-
-      points.insert( points.begin() + new_pt_idx, pt );
-      this->private_->vertex_index_ = static_cast< int >( new_pt_idx );
-
-      Core::Application::PostEvent( boost::bind( &Core::StateInt::set,
-        this->current_vertex_index_state_, static_cast< int >(new_pt_idx), Core::ActionSource::NONE_E ) );
-      Core::ActionSet::Dispatch( Core::Interface::GetMouseActionContext(),
-        this->vertices_state_, points );
-
-      viewer->set_cursor( Core::CursorShape::OPEN_HAND_E );
-
-      return true;
-    }
-  }
-
-  else if ( modifiers == Core::KeyModifier::NO_MODIFIER_E &&
-    button == Core::MouseButton::RIGHT_BUTTON_E )
-  {
-    //if ( this->private_->vertex_index_ != -1 )
-    if ( this->private_->vertex_index_ >= 0 )
-    {
-      Core::Point pt = this->vertices_state_->get()[ this->private_->vertex_index_ ];
-
-      // only one point left
-      if ( this->private_->vertex_index_ == 0 &&  ( this->vertices_state_->get().size() == 1 ) )
-      {
-        this->private_->vertex_index_ = -1;
-      }
-      else if ( this->private_->vertex_index_ == 0 &&  ( this->vertices_state_->get().size() > 1 ) )
-  
-      {
-        this->private_->vertex_index_ = 0;
-      } 
-      else 
-      {
-        this->private_->vertex_index_ = this->private_->vertex_index_ - 1;
-      }
-
-      Core::Application::PostEvent( boost::bind( &Core::StateInt::set,
-        this->current_vertex_index_state_, static_cast< int >( this->private_->vertex_index_ ), Core::ActionSource::NONE_E ) );
-
-      Core::ActionRemove::Dispatch( Core::Interface::GetMouseActionContext(),
-        this->vertices_state_, pt );
-
-      // Set to "not hovered over" state since the point no longer exists
-      viewer->set_cursor( Core::CursorShape::CROSS_E );
-
-      return true;
-    }   
-  }
+//  if ( button == Core::MouseButton::LEFT_BUTTON_E &&
+//       ( modifiers == Core::KeyModifier::NO_MODIFIER_E ||
+//         modifiers == Core::KeyModifier::SHIFT_MODIFIER_E ) &&
+//       this->private_->vertex_index_ != -1 )
+//  {
+//    this->private_->moving_vertex_ = true;
+//    viewer->set_cursor( Core::CursorShape::CLOSED_HAND_E );
+//    return true;
+//  }
+//  else if ( button == Core::MouseButton::MID_BUTTON_E &&
+//            ( modifiers == Core::KeyModifier::NO_MODIFIER_E ||
+//              modifiers == Core::KeyModifier::SHIFT_MODIFIER_E ) )
+//  {
+//    if ( this->private_->find_closest_vertex( viewer, mouse_history.current_.x_, 
+//        mouse_history.current_.y_, this->private_->vertex_index_ ) )
+//    {
+//      this->private_->moving_vertex_ = true;
+//      viewer->set_cursor( Core::CursorShape::CLOSED_HAND_E );
+//      return true;      
+//    }
+//  }
+//
+//  else if ( ! ( modifiers & Core::KeyModifier::SHIFT_MODIFIER_E ) &&
+//                button == Core::MouseButton::LEFT_BUTTON_E )
+//  {
+//    Core::VolumeSliceHandle active_slice = viewer->get_active_volume_slice();
+//    if ( active_slice && ! active_slice->out_of_boundary() )
+//    {
+//      double world_x, world_y;
+//      viewer->window_to_world( mouse_history.current_.x_, 
+//        mouse_history.current_.y_, world_x, world_y );
+//      Core::Point pt;
+//      active_slice->get_world_coord( world_x, world_y,  pt );
+//      
+//      double dmin = DBL_MAX;
+//      double proj_min = DBL_MAX;
+//      std::vector<Core::Point> points = this->vertices_state_->get();
+//      size_t new_pt_idx = points.size();
+//
+////      Core::Path paths = this->path_state_->get();
+////      size_t paths_num = paths.get_path_num();
+//
+//      //bool path_idx_changed = false;
+//      //int path_indicator_min_perdicular = 0;
+//
+//      //if ( paths_num > 2 )
+//      //{
+//      //  double dp_perdicular_dist_min = DBL_MAX;
+//
+//      //  for ( unsigned int i = 0; i < paths_num; ++i )
+//      //  {
+//      //    Core::SinglePath single_path = paths.get_one_path( i );
+//      //    Core::Point p00, p01;
+//      //    single_path.get_point_on_ends( 0, p00 );
+//      //    single_path.get_point_on_ends( 1, p01 );
+//
+//      //    Core::Vector edge_dir = p01 - p00;
+//      //    double edge_length = edge_dir.length();
+//      //    double alpha = Dot( pt - p00,  p01 - p00 )/ ( edge_length * edge_length );
+//
+//      //    if ( alpha >= 0.0 && alpha <= 1.0 )
+//      //    {
+//      //      //we need to compute the the point to straight line distance
+//      //      double proj_dist = Dot( pt - p00,  p01 - p00 ) / edge_length;
+//      //      double dp_perdicular_dist = 
+//      //        ( pt - p00 ).length2() - proj_dist * proj_dist;
+//      //      
+//      //      if ( dp_perdicular_dist < dp_perdicular_dist_min )
+//      //      {
+//      //        dp_perdicular_dist_min = dp_perdicular_dist;
+//      //        path_indicator_min_perdicular = i;
+//      //        path_idx_changed = true;
+//      //      }
+//      //    }
+//      //  }
+//      //}
+//
+//      //if ( path_idx_changed )
+//      //{
+//      //  Core::SinglePath single_path = paths.get_one_path( path_indicator_min_perdicular );
+//      //  Core::Point p00, p01;
+//      //  single_path.get_point_on_ends( 0, p00 );
+//      //  single_path.get_point_on_ends( 1, p01 );
+//
+//      //  std::vector<Core::Point>::iterator it_p0 = 
+//      //    std::find( points.begin(), points.end(), p00 );
+//
+//      //  if ( it_p0 != points.end() )
+//      //  {
+//      //    new_pt_idx = it_p0 - points.begin() + 1;
+//      //  }
+//      //  else
+//      //  {
+//      //    std::vector<Core::Point>::iterator it_p1 = 
+//      //      std::find( points.begin(), points.end(), p01 );
+//
+//      //    if ( it_p1 != points.end() )
+//      //    {
+//      //      new_pt_idx = it_p1 - points.begin();
+//      //    }
+//      //  }
+//      //}
+//
+//      if ( paths_num > 1 )
+//      {
+//        double dp_perdicular_dist_min = DBL_MAX;
+//        int path_indicator_min_perdicular = 0;
+//        std::vector< double > dist_arr;
+//
+//        for ( unsigned int i = 0; i < paths_num; ++i )
+//        {
+//          Core::SinglePath single_path = paths.get_one_path( i );
+//          double dist = single_path.get_smallest_distance2( pt );
+//          dist_arr.push_back( dist );
+//
+//          if ( dist < dp_perdicular_dist_min )
+//          {
+//            dp_perdicular_dist_min = dist;
+//            path_indicator_min_perdicular = i;
+//          }
+//
+//        }
+//
+//        Core::SinglePath min_dist_single_path = 
+//          paths.get_one_path( path_indicator_min_perdicular );
+//
+//        Core::Point p00, p01;
+//        min_dist_single_path.get_point_on_ends( 0, p00 );
+//        min_dist_single_path.get_point_on_ends( 1, p01 );
+//
+//        std::vector<Core::Point>::iterator it_p00 = 
+//          std::find( points.begin(), points.end(), p00 );
+//
+//        std::vector<Core::Point>::iterator it_p01 = 
+//          std::find( points.begin(), points.end(), p01 );
+//
+//        size_t p00_index = it_p00 - points.begin();
+//        size_t p01_index = it_p01 - points.begin();
+//
+//        double dist_pt_p00 = ( pt - p00 ).length2();
+//        double dist_pt_p01 = ( pt - p01 ).length2();
+//
+//        if ( ( dist_pt_p00 != dp_perdicular_dist_min )
+//          && ( dist_pt_p01 != dp_perdicular_dist_min ) )
+//        {
+//          if ( it_p00 != points.end() )
+//          {
+//            new_pt_idx = p00_index + 1;
+//          }
+//        }
+//
+//        else  // p00 is the closest to pt OR p01 is the closest to pt
+//        { 
+//
+//          // Find the other path has the same distance
+//          int another_path_indicator = -1;
+//          for ( unsigned int i = 0; i < paths_num; ++i )
+//          {
+//            if ( ( dist_arr[i] == dp_perdicular_dist_min ) 
+//              && ( i != path_indicator_min_perdicular ) )
+//            {
+//              another_path_indicator = i;
+//              break;
+//            }
+//          }
+//
+//          if ( another_path_indicator == -1 )
+//          {
+//            if ( dist_pt_p00 == dp_perdicular_dist_min )
+//            {
+//              if ( it_p00 != points.end() )
+//              {
+//                new_pt_idx = p00_index;
+//              }
+//
+//            }
+//
+//            else
+//            {
+//              if ( it_p01 != points.end() )
+//              {
+//                new_pt_idx = p01_index + 1;
+//              }
+//            }
+//          }
+//          else  // Find the other path
+//          {
+//            Core::SinglePath another_min_dist_single_path = 
+//              paths.get_one_path( another_path_indicator );
+//
+//            Core::Point p10, p11;
+//
+//            another_min_dist_single_path.get_point_on_ends( 0, p10 );
+//            another_min_dist_single_path.get_point_on_ends( 1, p11 );
+//
+//            std::vector<Core::Point>::iterator it_p10 = 
+//              std::find( points.begin(), points.end(), p10 );
+//
+//            std::vector<Core::Point>::iterator it_p11 = 
+//              std::find( points.begin(), points.end(), p11 );
+//
+//            size_t p10_index = it_p10 - points.begin();
+//            size_t p11_index = it_p11 - points.begin();
+//
+//            if ( ( p01_index == 0 && p00_index == points.size() - 1 )
+//              || ( p11_index == 0 && p10_index == points.size() - 1 ) )
+//            {
+//              new_pt_idx = points.size();
+//            }
+//
+//            else
+//            {
+//
+//              double dist_pt_p10 = ( pt - p10 ).length2();
+//              double dist_pt_p11 = ( pt - p11 ).length2();
+//
+//              if ( dist_pt_p00 == dp_perdicular_dist_min 
+//                  && dist_pt_p10 == dp_perdicular_dist_min )
+//              {
+//                if ( it_p00 != points.end() &&  it_p10 != points.end() )
+//                {
+//                  if ( p00_index <= p10_index )
+//                  {
+//                    new_pt_idx = p10_index + 1;
+//                  } 
+//                  else
+//                  {
+//                    new_pt_idx = p00_index + 1;
+//                  }
+//
+//                }
+//              }
+//
+//              else if ( dist_pt_p00 == dp_perdicular_dist_min 
+//                && dist_pt_p11 == dp_perdicular_dist_min )
+//              {
+//                if ( it_p00 != points.end() &&  it_p11 != points.end() )
+//                {
+//                  if ( p00_index <= p11_index )
+//                  {
+//                    new_pt_idx = p11_index + 1;
+//                  } 
+//                  else
+//                  {
+//                    new_pt_idx = p00_index + 1;
+//                  }
+//
+//                }
+//              }
+//
+//              else if ( dist_pt_p01 == dp_perdicular_dist_min 
+//                && dist_pt_p10 == dp_perdicular_dist_min )
+//              {
+//                if ( it_p01 != points.end() &&  it_p10 != points.end() )
+//                {
+//                  if ( p01_index <= p10_index )
+//                  {
+//                    new_pt_idx = p10_index + 1;
+//                  } 
+//                  else
+//                  {
+//                    new_pt_idx = p01_index + 1;
+//                  }
+//
+//                }
+//              }
+//
+//              else if ( dist_pt_p01 == dp_perdicular_dist_min 
+//                && dist_pt_p11 == dp_perdicular_dist_min )
+//              {
+//                if ( it_p01 != points.end() &&  it_p11 != points.end() )
+//                {
+//                  if ( p01_index <= p11_index )
+//                  {
+//                    new_pt_idx = p11_index + 1;
+//                  } 
+//                  else
+//                  {
+//                    new_pt_idx = p01_index + 1;
+//                  }
+//
+//                }
+//              }
+//            }
+//          }
+//        }
+//      }
+//
+//      points.insert( points.begin() + new_pt_idx, pt );
+//      this->private_->vertex_index_ = static_cast< int >( new_pt_idx );
+//
+//      Core::Application::PostEvent( boost::bind( &Core::StateInt::set,
+//        this->current_vertex_index_state_, static_cast< int >(new_pt_idx), Core::ActionSource::NONE_E ) );
+//      Core::ActionSet::Dispatch( Core::Interface::GetMouseActionContext(),
+//        this->vertices_state_, points );
+//
+//      viewer->set_cursor( Core::CursorShape::OPEN_HAND_E );
+//
+//      return true;
+//    }
+//  }
+//
+//  else if ( modifiers == Core::KeyModifier::NO_MODIFIER_E &&
+//            button == Core::MouseButton::RIGHT_BUTTON_E )
+//  {
+//    //if ( this->private_->vertex_index_ != -1 )
+//    if ( this->private_->vertex_index_ >= 0 )
+//    {
+//      Core::Point pt = this->vertices_state_->get()[ this->private_->vertex_index_ ];
+//
+//      // only one point left
+//      if ( this->private_->vertex_index_ == 0 &&  ( this->vertices_state_->get().size() == 1 ) )
+//      {
+//        this->private_->vertex_index_ = -1;
+//      }
+//      else if ( this->private_->vertex_index_ == 0 &&  ( this->vertices_state_->get().size() > 1 ) )
+//  
+//      {
+//        this->private_->vertex_index_ = 0;
+//      } 
+//      else 
+//      {
+//        this->private_->vertex_index_ = this->private_->vertex_index_ - 1;
+//      }
+//
+//      Core::Application::PostEvent( boost::bind( &Core::StateInt::set,
+//        this->current_vertex_index_state_, static_cast< int >( this->private_->vertex_index_ ), Core::ActionSource::NONE_E ) );
+//
+//      Core::ActionRemove::Dispatch( Core::Interface::GetMouseActionContext(),
+//        this->vertices_state_, pt );
+//
+//      // Set to "not hovered over" state since the point no longer exists
+//      viewer->set_cursor( Core::CursorShape::CROSS_E );
+//
+//      return true;
+//    }   
+//  }
 
   return false;
 }
@@ -1020,9 +1025,14 @@ bool SpeedlineTool::handle_mouse_release( ViewerHandle viewer,
 //    return false;
 //  }
 
+  if ( ! this->valid_target_data_layer_state_->get() )
+  {
+    return false;
+  }
+
   if ( this->private_->moving_vertex_ && 
-    ( button == Core::MouseButton::LEFT_BUTTON_E ||
-    button == Core::MouseButton::MID_BUTTON_E ) )
+       ( button == Core::MouseButton::LEFT_BUTTON_E ||
+         button == Core::MouseButton::MID_BUTTON_E ) )
   {
     this->private_->moving_vertex_ = false;
     this->private_->find_vertex( viewer, mouse_history.current_.x_, 
@@ -1051,6 +1061,11 @@ bool SpeedlineTool::handle_mouse_move( ViewerHandle viewer,
 //  {
 //    return false;
 //  }
+
+  if ( ! this->valid_target_data_layer_state_->get() )
+  {
+    return false;
+  }
 
   if ( buttons == Core::MouseButton::NO_BUTTON_E )
   {
@@ -1130,7 +1145,7 @@ void SpeedlineTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
   {
     Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
     vertices = this->path_vertices_state_->get();
-    paths = this->path_state_->get();
+//    paths = this->path_state_->get();
     if ( viewer->view_mode_state_->get() == Viewer::SAGITTAL_C )
     {
       slice_type = Core::VolumeSliceType::SAGITTAL_E;

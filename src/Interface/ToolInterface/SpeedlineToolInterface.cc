@@ -76,6 +76,9 @@ bool SpeedlineToolInterface::build_widget( QFrame* frame )
 
   //Step 3 - connect the gui to the tool through the QtBridge
   QtUtils::QtBridge::Connect( this->private_->ui_.target_mask_, tool->target_layer_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.target_data_layer_, tool->target_data_layer_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.roi_mask_layer_, tool->roi_mask_state_ );
+
   QtUtils::QtBridge::Connect( this->private_->ui_.use_active_layer_, tool->use_active_layer_state_ );
 //  QtUtils::QtBridge::Connect( this->private_->ui_.use_smooth_, tool->use_smoothing_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.use_image_spacing_, tool->use_image_spacing_state_ );
@@ -99,11 +102,12 @@ bool SpeedlineToolInterface::build_widget( QFrame* frame )
 //  QtUtils::QtBridge::Connect( this->private_->ui_.gradient_layer_, tool->gradient_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.target_data_layer_, tool->target_data_layer_state_ );
 
-  this->private_->ui_.grad_mag_weight_->set_description( "Gradient Magnitude Weight" );
+  // weights
+  this->private_->ui_.grad_mag_weight_->set_description( "Gradient Magnitude" );
   QtUtils::QtBridge::Connect( this->private_->ui_.grad_mag_weight_, tool->grad_mag_weight_state_ );
-  this->private_->ui_.zero_cross_weight_->set_description( "Zero Cross Weight" );
+  this->private_->ui_.zero_cross_weight_->set_description( "Zero Cross" );
   QtUtils::QtBridge::Connect( this->private_->ui_.zero_cross_weight_, tool->zero_cross_weight_state_ );
-  this->private_->ui_.grad_dir_weight_->set_description( "Gradient Direction Weight" );
+  this->private_->ui_.grad_dir_weight_->set_description( "Gradient Direction" );
   QtUtils::QtBridge::Connect( this->private_->ui_.grad_dir_weight_, tool->grad_dir_weight_state_ );
 
 //  this->private_->ui_.iterations_->set_description( "Iterations" );
@@ -119,8 +123,8 @@ bool SpeedlineToolInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Enable( this->private_->ui_.erase_button_, tool->valid_target_state_ );
 //  QtUtils::QtBridge::Enable( this->private_->ui_.run_gradient_button_, tool->valid_target_data_layer_state_ );
 
-//  QtUtils::QtBridge::Show( this->private_->ui_.message_mask_alert_, tool->valid_target_state_, true );
-//  QtUtils::QtBridge::Show( this->private_->ui_.message_gradient_magnitude_layer_alert_, tool->valid_gradient_state_, true );
+  QtUtils::QtBridge::Show( this->private_->ui_.message_mask_alert_, tool->valid_target_state_, true );
+  QtUtils::QtBridge::Show( this->private_->ui_.message_data_layer_alert_, tool->valid_target_data_layer_state_, true );
 
   
 

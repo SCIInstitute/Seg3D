@@ -1302,6 +1302,21 @@ void ActionSpeedline::Dispatch( Core::ActionContextHandle context,
                                 Core::AtomicCounterHandle action_handle
                               )
 {
+  ActionSpeedline* action = new ActionSpeedline;
+
+  action->private_->target_layer_id_ = layer_id;
+  action->private_->slice_type_ = slice_type;
+  action->private_->slice_number_ = slice_number;
+  action->private_->vertices_ = vertices;
+  action->private_->current_vertex_index_ = current_vertex_index;
+  action->private_->update_all_paths_ = update_all_paths;
+  action->private_->itk_path_state_id_ = itk_path_state_id;
+  action->private_->world_path_state_id_ = world_path_state_id;
+  action->private_->path_vertices_state_id_ = path_vertices_state_id;
+  action->private_->action_id_ = action_id;
+  action->private_->action_handle_ = action_handle;
+
+  Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }
 
 //void ActionSpeedline::Dispatch( Core::ActionContextHandle context,

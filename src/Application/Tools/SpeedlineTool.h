@@ -133,10 +133,10 @@ public:
 //  Core::StateLabeledOptionHandle gradient_state_;
 //  Core::StateBoolHandle gradient_created_state_; // user created, true; loaded false;
 
-  Core::StateLabeledOptionHandle mask_state_;
+  Core::StateLabeledOptionHandle roi_mask_state_;
 
-  Core::StateSpeedlinePathHandle itk_path_state_;
-  Core::StateSpeedlinePathHandle path_state_;
+//  Core::StateSpeedlinePathHandle itk_path_state_;
+//  Core::StateSpeedlinePathHandle path_state_;
 
   /// This state variable is only used for path, as we redraw when path state changes. We cannot use
   /// the current vertices state.
