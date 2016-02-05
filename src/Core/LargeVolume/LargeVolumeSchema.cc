@@ -50,6 +50,18 @@ namespace bfs=boost::filesystem;
 namespace Core
 {
 
+#ifdef Z_PREFIX
+  #define zlib_uLongf z_uLongf
+  #define zlib_Bytef z_Bytef
+  #define zlib_uncompress z_uncompress
+  #define zlib_compress2 z_compress2
+#else
+  #define zlib_uLongf uLongf
+  #define zlib_Bytef Bytef
+  #define zlib_uncompress uncompress
+  #define zlib_compress2 compress2
+#endif
+
 class LargeVolumeSchemaPrivate {
 
 public:
@@ -793,9 +805,9 @@ bool LargeVolumeSchema::read_brick( DataBlockHandle& brick, const BrickInfo& bi,
       input.read( &buffer[0],  file_size);
       input.close();
 
-      z_uLongf brick_size_ul = brick_size;
-      if ( z_uncompress( reinterpret_cast<z_Bytef*>( brick->get_data() ), &brick_size_ul,
-        reinterpret_cast<z_Bytef*>(&buffer[0]), file_size ) != Z_OK)
+      zlib_uLongf brick_size_ul = brick_size;
+      if ( zlib_uncompress( reinterpret_cast<zlib_Bytef*>( brick->get_data() ), &brick_size_ul,
+        reinterpret_cast<zlib_Bytef*>(&buffer[0]), file_size ) != Z_OK)
       {
         error = "Could not decompress file '" + brick_file.string() + "'.";
         return false;
@@ -909,10 +921,10 @@ bool LargeVolumeSchema::write_brick( DataBlockHandle data_block, const BrickInfo
   if ( this->private_->compression_) 
   {
     std::vector<char> buffer( brick_size + 12 );
-    z_uLongf brick_size_ul = brick_size + 12;
+    zlib_uLongf brick_size_ul = brick_size + 12;
 
-    int result = z_compress2( reinterpret_cast<z_Bytef*>( &buffer[0] ), &brick_size_ul,
-      reinterpret_cast<z_Bytef*>(data_block->get_data()), brick_size, Z_DEFAULT_COMPRESSION );
+    int result = zlib_compress2( reinterpret_cast<zlib_Bytef*>( &buffer[0] ), &brick_size_ul,
+      reinterpret_cast<zlib_Bytef*>(data_block->get_data()), brick_size, Z_DEFAULT_COMPRESSION );
     if (result != Z_OK )
     {
       error = "Could not compress file.";

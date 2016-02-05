@@ -213,6 +213,10 @@ INCLUDE(${ImplicitFunction_USE_FILE})
 ADD_DEFINITIONS(-DTINYXML_STATIC)
 ADD_DEFINITIONS(-DTIXML_USE_STL)
 
+# define z_prefix project wide if zlib was mangled
+IF (SCI_ZLIB_MANGLE)
+  ADD_DEFINITIONS(-DZ_PREFIX)
+ENDIF()
 
 ###########################################
 # RPATH settings for Linux
