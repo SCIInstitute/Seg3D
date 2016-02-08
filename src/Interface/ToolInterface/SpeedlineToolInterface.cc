@@ -83,10 +83,10 @@ bool SpeedlineToolInterface::build_widget( QFrame* frame )
 //  QtUtils::QtBridge::Connect( this->private_->ui_.use_smooth_, tool->use_smoothing_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.use_image_spacing_, tool->use_image_spacing_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.use_face_conn_, tool->use_face_conn_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.use_rescale_, tool->use_rescale_state_ );
+//  QtUtils::QtBridge::Connect( this->private_->ui_.use_rescale_, tool->use_rescale_state_ );
 
   // Hide the rescale option to user. The default setting is true.
-  this->private_->ui_.use_rescale_->hide();
+//  this->private_->ui_.use_rescale_->hide();
 
   QtUtils::QtBridge::Connect( this->private_->ui_.fill_button_, boost::bind(
     &SpeedlineTool::fill, tool, Core::Interface::GetWidgetActionContext() ) );

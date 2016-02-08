@@ -122,6 +122,7 @@ public:
   // -- State Variables --
 public:
   Core::StatePointVectorHandle vertices_state_;
+
 //  Core::StateRangedDoubleHandle termination_state_;
   Core::StateRangedDoubleHandle grad_mag_weight_state_;
   Core::StateRangedDoubleHandle zero_cross_weight_state_;
@@ -133,24 +134,27 @@ public:
 //  Core::StateLabeledOptionHandle gradient_state_;
 //  Core::StateBoolHandle gradient_created_state_; // user created, true; loaded false;
 
+  Core::StateLabeledOptionHandle mask_state_;
   Core::StateLabeledOptionHandle roi_mask_state_;
 
 //  Core::StateSpeedlinePathHandle itk_path_state_;
-//  Core::StateSpeedlinePathHandle path_state_;
+  Core::StateSpeedlinePathHandle path_state_;
 
   /// This state variable is only used for path, as we redraw when path state changes. We cannot use
   /// the current vertices state.
-  Core::StatePointVectorHandle path_vertices_state_;   
+//  Core::StatePointVectorHandle path_vertices_state_;   
 
 //  Core::StateBoolHandle valid_gradient_state_;
+//  Core::StatePointHandle anchor_point_state_;
+//  Core::StatePointHandle free_point_state_;
 
-  Core::StateIntHandle current_vertex_index_state_;
+//  Core::StateIntHandle current_vertex_index_state_;
 
   Core::StateLabeledOptionHandle target_data_layer_state_;
 
   Core::StateBoolHandle valid_target_data_layer_state_;
 //  Core::StateBoolHandle use_smoothing_state_;
-  Core::StateBoolHandle use_rescale_state_;
+//  Core::StateBoolHandle use_rescale_state_;
   Core::StateBoolHandle use_face_conn_state_;
   Core::StateBoolHandle use_image_spacing_state_;
 
