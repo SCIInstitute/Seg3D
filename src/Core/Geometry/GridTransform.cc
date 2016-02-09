@@ -219,6 +219,15 @@ VectorF operator*( const GridTransform& gt, const VectorF& d )
   return gt.project( d );
 }
 
+std::ostream& operator<<( std::ostream& os, const GridTransform& gt )
+{
+  os << "grid size: [" << gt.get_nx() << ", " << gt.get_ny() << ", " << gt.get_nz() << "]" << std::endl;
+  os << "spacing: [" << gt.spacing_x() << ", " << gt.spacing_y() << ", " << gt.spacing_z() << "]" << std::endl;
+  os << "originally node centered: " << gt.get_originally_node_centered() << std::endl;
+  os << gt.transform();
+  return os;
+}
+
 std::string ExportToString( const GridTransform& value )
 {
   return ( std::string( 1, '[' ) + ExportToString( value.get_nx() ) + ',' + ExportToString(

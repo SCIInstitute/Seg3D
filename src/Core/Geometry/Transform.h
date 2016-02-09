@@ -222,7 +222,8 @@ protected:
   MatrixF mat_;
 };
 
-
+std::ostream& operator<<( std::ostream& os, const Transform& t );
+std::ostream& operator<<( std::ostream& os, const TransformF& t );
 
 } // End namespace Core
 
