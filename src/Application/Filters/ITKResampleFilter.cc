@@ -33,10 +33,8 @@
 #include <itkLinearInterpolateImageFunction.h>
 #include <itkBSplineInterpolateImageFunction.h>
 #include <itkNearestNeighborInterpolateImageFunction.h>
-//#include <itkAffineTransform.h>
 #include <itkIdentityTransform.h>
 #include <itkResampleImageFilter.h>
-#include <itkScaleTransform.h>
 
 using namespace Filter;
 using namespace Seg3D;
@@ -95,9 +93,9 @@ bool ITKResampleFilter::setup_layers(const std::vector< std::string >& layer_ids
       GridTransform grid_transform = this->src_layers_[ i ]->get_grid_transform();
       Transform new_transform;
 
-      double spacing_x = grid_transform.spacing_x() * this->dims_[0] / grid_transform.get_nx();
-      double spacing_y = grid_transform.spacing_y() * this->dims_[1] / grid_transform.get_ny();
-      double spacing_z = grid_transform.spacing_z() * this->dims_[2] / grid_transform.get_nz();
+      double spacing_x = grid_transform.spacing_x() * grid_transform.get_nx() / this->dims_[0];
+      double spacing_y = grid_transform.spacing_y() * grid_transform.get_ny() / this->dims_[1];
+      double spacing_z = grid_transform.spacing_z() * grid_transform.get_nz() / this->dims_[2];
 
       new_transform = Transform( grid_transform.get_origin(),
                                  Core::Vector( spacing_x, 0.0 , 0.0 ),
@@ -202,6 +200,8 @@ void ITKResampleFilter::typed_run_filter()
 
   for ( size_t i = 0; i < this->src_layers_.size(); ++i )
   {
+    this->current_output_transform_ = this->output_transforms_[ i ];
+
     if ( this->src_layers_[ i ]->get_type() == VolumeType::DATA_E )
     {
       DataLayerHandle src_data_layer = boost::dynamic_pointer_cast< DataLayer >( this->src_layers_[ i ] );
@@ -232,50 +232,28 @@ void ITKResampleFilter::typed_run_filter()
 
       // Retrieve the image as an itk image from the underlying data structure
       // NOTE: This only does wrapping and does not regenerate the data.
-      typename ITKImageDataT<VALUE_TYPE>::Handle input_image;
-      this->get_itk_image_from_layer<VALUE_TYPE>( this->src_layers_[ i ], input_image );
+      typename ITKImageDataT< VALUE_TYPE >::Handle input_image;
+      this->get_itk_image_from_layer< VALUE_TYPE >( this->src_layers_[ i ], input_image );
 
       const typename TYPED_IMAGE_TYPE::PointType& origin = input_image->get_image()->GetOrigin();
+      const typename TYPED_IMAGE_TYPE::RegionType& inputRegion = input_image->get_image()->GetLargestPossibleRegion();
+      const typename TYPED_IMAGE_TYPE::SizeType& inputSize = inputRegion.GetSize();
+      const typename TYPED_IMAGE_TYPE::SpacingType& inputSpacing = input_image->get_image()->GetSpacing();
+
       // TODO: not match input origin?
 //      const typename TYPED_IMAGE_TYPE::DirectionType& direction = input_image->get_image()->GetDirection();
       typename TYPED_IMAGE_TYPE::DirectionType direction;
       direction.SetIdentity();
 
       typename TYPED_IMAGE_TYPE::SizeType size;
-std::cerr << "data output dims: [" << dims_[0] << ", " << dims_[1] << ", " << dims_[2] << "]" << std::endl;
       size[0] = dims_[0];
       size[1] = dims_[1];
       size[2] = dims_[2];
 
-      const typename TYPED_IMAGE_TYPE::RegionType& inputRegion = input_image->get_image()->GetLargestPossibleRegion();
-      const typename TYPED_IMAGE_TYPE::SizeType& inputSize = inputRegion.GetSize();
-
-      typedef itk::IdentityTransform< SCALAR_TYPE, 3 > TransformType;
-      TransformType::Pointer transform = TransformType::New();
-      transform->SetIdentity();
-
-//      typedef itk::ScaleTransform< SCALAR_TYPE, 3 > TransformType;
-//      TransformType::Pointer transform = TransformType::New();
-////      itk::FixedArray< SCALAR_TYPE, 3 > scale;
-////      scale[0] = inputSize[0] / dims_[0];
-////      scale[1] = inputSize[1] / dims_[1];
-////      scale[2] = inputSize[2] / dims_[2];
-////      transform->SetScale(scale);
-//      transform->SetIdentity();
-//
-//      itk::Point< SCALAR_TYPE, 3 > center;
-////      center[0] = image->GetLargestPossibleRegion().GetSize()[0]/2;
-////      center[1] = image->GetLargestPossibleRegion().GetSize()[1]/2;
-//      center[0] = 0;
-//      center[1] = 0;
-//      center[2] = 0;
-//      transform->SetCenter(center);
-
-      typename TYPED_IMAGE_TYPE::SpacingType inputSpacing = input_image->get_image()->GetSpacing();
       typename TYPED_IMAGE_TYPE::SpacingType spacing;
-      spacing[0] = inputSpacing[0] * dims_[0] / inputSize[0];
-      spacing[1] = inputSpacing[1] * dims_[1] / inputSize[1];
-      spacing[2] = inputSpacing[2] * dims_[2] / inputSize[2];
+      spacing[0] = this->current_output_transform_.spacing_x();
+      spacing[1] = this->current_output_transform_.spacing_y();
+      spacing[2] = this->current_output_transform_.spacing_z();
 
       // Create a new ITK filter instantiation.
       typename filter_type::Pointer filter = filter_type::New();
@@ -285,7 +263,6 @@ std::cerr << "data output dims: [" << dims_[0] << ", " << dims_[1] << ", " << di
       this->observe_itk_progress( filter, this->dst_layers_[ i ], 0.0, 0.75 );
 
       // Setup the filter parameters that we do not want to change.
-      filter->SetTransform( transform );
       filter->SetOutputOrigin( origin );
       filter->SetOutputSpacing( spacing );
       filter->SetSize( size );
@@ -352,7 +329,6 @@ std::cerr << "data output dims: [" << dims_[0] << ", " << dims_[1] << ", " << di
       typename TYPED_IMAGE_TYPE::Pointer output_image = filter->GetOutput();
       const typename TYPED_IMAGE_TYPE::RegionType& outputRegion = output_image->GetLargestPossibleRegion();
       const typename TYPED_IMAGE_TYPE::SizeType& outputSize = outputRegion.GetSize();
-std::cerr << "Output size=[" << outputSize[0] << ", " << outputSize[1] << ", " << outputSize[2] << "]" << std::endl;
 
 //      GridTransform grid_transform;
 //      grid_transform.
@@ -404,7 +380,6 @@ std::cerr << "Output size=[" << outputSize[0] << ", " << outputSize[1] << ", " <
       // TODO: not match input origin?
       typename TYPED_IMAGE_TYPE::DirectionType direction = input_image->get_image()->GetDirection();
       typename TYPED_IMAGE_TYPE::SizeType size;
-std::cerr << "mask output dims: [" << dims_[0] << ", " << dims_[1] << ", " << dims_[2] << "]" << std::endl;
       size[0] = dims_[0];
       size[1] = dims_[1];
       size[2] = dims_[2];
