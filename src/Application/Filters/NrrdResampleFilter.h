@@ -67,7 +67,7 @@ private:
   PadFilterInternalsHandle pad_internals_;
 
 public:
-  NrrdResampleFilter( const std::string& kernel, double param1, double param2, bool replace, bool crop, const std::string& padding, Core::Point range_min, Core::Point range_max, Seg3D::SandboxID sandbox );
+  NrrdResampleFilter( const std::string& kernel, double gauss_sigma, double gauss_cutoff, bool replace, bool crop, const std::string& padding, Core::Point range_min, Core::Point range_max, Seg3D::SandboxID sandbox );
   virtual ~NrrdResampleFilter();
 
   bool setup_layers(const std::vector< std::string >& layer_ids,

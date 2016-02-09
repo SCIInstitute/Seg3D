@@ -60,7 +60,7 @@ const std::string NrrdResampleFilter::QUARTIC_C( "quartic" );
 const std::string NrrdResampleFilter::GAUSSIAN_C( "gauss" );
 
 
-NrrdResampleFilter::NrrdResampleFilter( const std::string& kernel, double param1, double param2, bool replace, bool crop, const std::string& padding, Core::Point range_min, Core::Point range_max, SandboxID sandbox )
+NrrdResampleFilter::NrrdResampleFilter( const std::string& kernel, double gauss_sigma, double gauss_cutoff, bool replace, bool crop, const std::string& padding, Core::Point range_min, Core::Point range_max, SandboxID sandbox )
   : replace_(replace),
     crop_(crop),
     padding_(padding),
@@ -103,8 +103,8 @@ NrrdResampleFilter::NrrdResampleFilter( const std::string& kernel, double param1
   else
   {
     this->data_kernel_->kernel = nrrdKernelGaussian;
-    this->data_kernel_->parm[ 0 ] = param1;
-    this->data_kernel_->parm[ 1 ] = param2;
+    this->data_kernel_->parm[ 0 ] = gauss_sigma;
+    this->data_kernel_->parm[ 1 ] = gauss_cutoff;
   }
 
   this->set_sandbox( sandbox );
