@@ -274,6 +274,8 @@ ResampleTool::ResampleTool( const std::string& toolid ) :
   kernels.push_back( std::make_pair( NrrdResampleFilter::QUARTIC_C, "Quartic" ) );
   kernels.push_back( std::make_pair( NrrdResampleFilter::GAUSSIAN_C, "Gaussian" ) );
   kernels.push_back( std::make_pair( ITKResampleFilter::LINEAR_C, "Linear" ) );
+  kernels.push_back( std::make_pair( ITKResampleFilter::B_SPLINE_C, "B-spline" ) );
+  kernels.push_back( std::make_pair( ITKResampleFilter::NEAREST_NEIGHBOR_C, "Nearest Neighbor" ) );
   this->add_state( "kernel", this->kernel_state_, NrrdResampleFilter::BOX_C, kernels );
 
   this->add_state( "sigma", this->gauss_sigma_state_, 1.0, 1.0, 100.0, 0.01 );
