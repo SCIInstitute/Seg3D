@@ -187,7 +187,7 @@ void ITKResampleFilter::pad_mask_layer( MaskLayerHandle input, MaskLayerHandle o
   return;
 }
 
-template< class VALUE_TYPE>
+template< class VALUE_TYPE >
 void ITKResampleFilter::typed_run_filter()
 {
   typedef double SCALAR_TYPE;
@@ -205,7 +205,7 @@ void ITKResampleFilter::typed_run_filter()
     if ( this->src_layers_[ i ]->get_type() == VolumeType::DATA_E )
     {
       DataLayerHandle src_data_layer = boost::dynamic_pointer_cast< DataLayer >( this->src_layers_[ i ] );
-      if (! src_data_layer)
+      if ( ! src_data_layer )
       {
         this->report_error("Error obtaining source data layer.");
         return;
@@ -214,7 +214,7 @@ void ITKResampleFilter::typed_run_filter()
       if ( this->padding_only_ )
       {
         DataLayerHandle dst_data_layer = boost::dynamic_pointer_cast< DataLayer >( this->dst_layers_[ i ] );
-        if (! dst_data_layer)
+        if ( ! dst_data_layer )
         {
           this->report_error("Error obtaining destination data layer.");
           return;
@@ -225,7 +225,7 @@ void ITKResampleFilter::typed_run_filter()
       }
 
       typedef itk::Image< VALUE_TYPE, 3 > TYPED_IMAGE_TYPE;
-      typedef ITKImageDataT<VALUE_TYPE> TYPED_CONTAINER_TYPE;
+      typedef ITKImageDataT< VALUE_TYPE > TYPED_CONTAINER_TYPE;
 
       // Define the type of filter that we use.
       typedef itk::ResampleImageFilter< TYPED_IMAGE_TYPE, TYPED_IMAGE_TYPE > filter_type;
@@ -236,12 +236,6 @@ void ITKResampleFilter::typed_run_filter()
       this->get_itk_image_from_layer< VALUE_TYPE >( this->src_layers_[ i ], input_image );
 
       const typename TYPED_IMAGE_TYPE::PointType& origin = input_image->get_image()->GetOrigin();
-      const typename TYPED_IMAGE_TYPE::RegionType& inputRegion = input_image->get_image()->GetLargestPossibleRegion();
-      const typename TYPED_IMAGE_TYPE::SizeType& inputSize = inputRegion.GetSize();
-      const typename TYPED_IMAGE_TYPE::SpacingType& inputSpacing = input_image->get_image()->GetSpacing();
-
-      // TODO: not match input origin?
-//      const typename TYPED_IMAGE_TYPE::DirectionType& direction = input_image->get_image()->GetDirection();
       typename TYPED_IMAGE_TYPE::DirectionType direction;
       direction.SetIdentity();
 
@@ -271,33 +265,31 @@ void ITKResampleFilter::typed_run_filter()
       VALUE_TYPE defaultPixelValue = 0;
       if ( this->padding_ == PadValues::MIN_C )
       {
-        defaultPixelValue = static_cast<VALUE_TYPE>(src_data_layer->get_data_volume()->get_data_block()->get_min());
+        defaultPixelValue = static_cast< VALUE_TYPE >(src_data_layer->get_data_volume()->get_data_block()->get_min());
       }
       else if ( this->padding_ == PadValues::MAX_C )
       {
-        defaultPixelValue = static_cast<VALUE_TYPE>(src_data_layer->get_data_volume()->get_data_block()->get_max());
+        defaultPixelValue = static_cast< VALUE_TYPE >(src_data_layer->get_data_volume()->get_data_block()->get_max());
       }
       filter->SetDefaultPixelValue(defaultPixelValue);
 
       typedef itk::LinearInterpolateImageFunction< TYPED_IMAGE_TYPE, SCALAR_TYPE > LinearInterpolatorType;
-      typename LinearInterpolatorType::Pointer linear_interp = LinearInterpolatorType::New();
-
       typedef itk::BSplineInterpolateImageFunction< TYPED_IMAGE_TYPE, SCALAR_TYPE > BSplineInterpolatorType;
-      typename BSplineInterpolatorType::Pointer bspline_interp = BSplineInterpolatorType::New();
-
       typedef itk::NearestNeighborInterpolateImageFunction< TYPED_IMAGE_TYPE, SCALAR_TYPE > NearestNeighborInterpolatorType;
-      typename NearestNeighborInterpolatorType::Pointer nn_interp = NearestNeighborInterpolatorType::New();
 
       if ( this->interpolator_ == ITKResampleFilter::LINEAR_C )
       {
+        typename LinearInterpolatorType::Pointer linear_interp = LinearInterpolatorType::New();
         filter->SetInterpolator( linear_interp );
       }
       else if ( this->interpolator_ == ITKResampleFilter::B_SPLINE_C )
       {
+        typename BSplineInterpolatorType::Pointer bspline_interp = BSplineInterpolatorType::New();
         filter->SetInterpolator( bspline_interp );
       }
       else // NEAREST_NEIGHBOR_C
       {
+        typename NearestNeighborInterpolatorType::Pointer nn_interp = NearestNeighborInterpolatorType::New();
         filter->SetInterpolator( nn_interp );
       }
       filter->SetInput( input_image->get_image() );
@@ -326,33 +318,21 @@ void ITKResampleFilter::typed_run_filter()
         return;
       }
 
-      typename TYPED_IMAGE_TYPE::Pointer output_image = filter->GetOutput();
-      const typename TYPED_IMAGE_TYPE::RegionType& outputRegion = output_image->GetLargestPossibleRegion();
-      const typename TYPED_IMAGE_TYPE::SizeType& outputSize = outputRegion.GetSize();
-
-//      GridTransform grid_transform;
-//      grid_transform.
-//      this->dst_layers_[ i ]->set_grid_transform( grid_transform, true );
-
-      this->insert_itk_image_into_layer<VALUE_TYPE>( this->dst_layers_[ i ], filter->GetOutput() );
-
-      // output grid transform
-      //typename ITKImageDataT<VALUE_TYPE>::Handle output_image;
-      //this->get_itk_image_from_layer<VALUE_TYPE>( this->dst_layers_[ i ], output_image );
-      //output_image->get_transform()
+      this->insert_itk_image_into_layer< VALUE_TYPE >( this->dst_layers_[ i ], filter->GetOutput() );
     }
     else if ( this->src_layers_[ i ]->get_type() == VolumeType::MASK_E )
     {
       if ( this->padding_only_ )
       {
         MaskLayerHandle src_mask_layer = boost::dynamic_pointer_cast< MaskLayer >( this->src_layers_[ i ] );
-        if (! src_mask_layer)
+        if ( ! src_mask_layer )
         {
           this->report_error("Error obtaining source mask layer.");
           return;
         }
+        
         MaskLayerHandle dst_mask_layer = boost::dynamic_pointer_cast< MaskLayer >( this->dst_layers_[ i ] );
-        if (! dst_mask_layer)
+        if ( ! dst_mask_layer )
         {
           this->report_error("Error obtaining destination mask layer.");
           return;
@@ -362,27 +342,29 @@ void ITKResampleFilter::typed_run_filter()
         return;
       }
 
-      typedef itk::Image< unsigned char, 3> TYPED_IMAGE_TYPE;
-      typedef ITKImageDataT<unsigned char> TYPED_CONTAINER_TYPE;
+      typedef ITKImageDataT< unsigned char > TYPED_CONTAINER_TYPE;
 
       // Define the type of filter that we use.
-      // Using default pixel value of 0.
-      typedef itk::ResampleImageFilter< TYPED_IMAGE_TYPE, TYPED_IMAGE_TYPE > filter_type;
+      typedef itk::ResampleImageFilter< UCHAR_IMAGE_TYPE, UCHAR_IMAGE_TYPE > filter_type;
 
       // Retrieve the image as an itk image from the underlying data structure
       // NOTE: This only does wrapping and does not regenerate the data.
-      typename ITKImageDataT<unsigned char>::Handle input_image;
-      this->get_itk_image_from_layer<unsigned char>( this->src_layers_[ i ], input_image );
+      typename TYPED_CONTAINER_TYPE::Handle input_image;
+      this->get_itk_image_from_layer< unsigned char >( this->src_layers_[ i ], input_image );
 
-      typename TYPED_IMAGE_TYPE::SpacingType spacing = input_image->get_image()->GetSpacing();
-      typename TYPED_IMAGE_TYPE::PointType origin = input_image->get_image()->GetOrigin();
+      const typename UCHAR_IMAGE_TYPE::PointType& origin = input_image->get_image()->GetOrigin();
+      typename UCHAR_IMAGE_TYPE::DirectionType direction;
+      direction.SetIdentity();
 
-      // TODO: not match input origin?
-      typename TYPED_IMAGE_TYPE::DirectionType direction = input_image->get_image()->GetDirection();
-      typename TYPED_IMAGE_TYPE::SizeType size;
+      typename UCHAR_IMAGE_TYPE::SizeType size;
       size[0] = dims_[0];
       size[1] = dims_[1];
       size[2] = dims_[2];
+
+      typename UCHAR_IMAGE_TYPE::SpacingType spacing;
+      spacing[0] = this->current_output_transform_.spacing_x();
+      spacing[1] = this->current_output_transform_.spacing_y();
+      spacing[2] = this->current_output_transform_.spacing_z();
 
       // Create a new ITK filter instantiation.
       typename filter_type::Pointer filter = filter_type::New();
@@ -397,25 +379,23 @@ void ITKResampleFilter::typed_run_filter()
       filter->SetSize( size );
       filter->SetOutputDirection( direction );
 
-      typedef itk::LinearInterpolateImageFunction< TYPED_IMAGE_TYPE, SCALAR_TYPE > LinearInterpolatorType;
-      typename LinearInterpolatorType::Pointer linear_interp = LinearInterpolatorType::New();
-
-      typedef itk::BSplineInterpolateImageFunction< TYPED_IMAGE_TYPE, SCALAR_TYPE > BSplineInterpolatorType;
-      typename BSplineInterpolatorType::Pointer bspline_interp = BSplineInterpolatorType::New();
-
-      typedef itk::NearestNeighborInterpolateImageFunction< TYPED_IMAGE_TYPE, SCALAR_TYPE > NearestNeighborInterpolatorType;
-      typename NearestNeighborInterpolatorType::Pointer nn_interp = NearestNeighborInterpolatorType::New();
+      typedef itk::LinearInterpolateImageFunction< UCHAR_IMAGE_TYPE, SCALAR_TYPE > LinearInterpolatorType;
+      typedef itk::BSplineInterpolateImageFunction< UCHAR_IMAGE_TYPE, SCALAR_TYPE > BSplineInterpolatorType;
+      typedef itk::NearestNeighborInterpolateImageFunction< UCHAR_IMAGE_TYPE, SCALAR_TYPE > NearestNeighborInterpolatorType;
 
       if ( this->interpolator_ == ITKResampleFilter::LINEAR_C )
       {
+        typename LinearInterpolatorType::Pointer linear_interp = LinearInterpolatorType::New();
         filter->SetInterpolator( linear_interp );
       }
       else if ( this->interpolator_ == ITKResampleFilter::B_SPLINE_C )
       {
+        typename BSplineInterpolatorType::Pointer bspline_interp = BSplineInterpolatorType::New();
         filter->SetInterpolator( bspline_interp );
       }
       else // NEAREST_NEIGHBOR_C
       {
+        typename NearestNeighborInterpolatorType::Pointer nn_interp = NearestNeighborInterpolatorType::New();
         filter->SetInterpolator( nn_interp );
       }
       filter->SetInput( input_image->get_image() );
@@ -444,15 +424,7 @@ void ITKResampleFilter::typed_run_filter()
         return;
       }
 
-      // As ITK filters generate an inconsistent abort behavior, we record our own abort flag
-      // This one is set when the abort button is pressed and an abort is sent to ITK.
-      if ( this->check_abort() ) return;
-
-      this->insert_itk_label_into_mask_layer<unsigned char>( this->dst_layers_[ i ], filter->GetOutput(), 0 );
-      // output grid transform
-      //typename ITKImageDataT<VALUE_TYPE>::Handle output_image;
-      //this->get_itk_image_from_layer<VALUE_TYPE>( this->dst_layers_[ i ], output_image );
-      //output_image->get_transform()
+      this->insert_itk_image_into_layer< unsigned char >( this->dst_layers_[ i ], filter->GetOutput() );
     }
     else
     {
