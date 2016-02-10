@@ -44,12 +44,13 @@ const std::string ITKResampleFilter::LINEAR_C( "linear" );
 const std::string ITKResampleFilter::B_SPLINE_C( "bspline" );
 const std::string ITKResampleFilter::NEAREST_NEIGHBOR_C( "nn" );
 
-ITKResampleFilter::ITKResampleFilter( const std::string& interpolator, bool replace, bool crop, const std::string& padding, Point range_min, Point range_max, SandboxID sandbox )
+ITKResampleFilter::ITKResampleFilter( const std::string& interpolator, int spline_order, bool replace, bool crop, const std::string& padding, Point range_min, Point range_max, SandboxID sandbox )
 : replace_(replace),
   crop_(crop),
   padding_(padding),
   padding_only_(false),
   interpolator_(interpolator),
+  spline_order_(spline_order),
   range_min_(range_min),
   range_max_(range_max),
   data_type_(DataType::FLOAT_E)
@@ -93,9 +94,9 @@ bool ITKResampleFilter::setup_layers(const std::vector< std::string >& layer_ids
       GridTransform grid_transform = this->src_layers_[ i ]->get_grid_transform();
       Transform new_transform;
 
-      double spacing_x = grid_transform.spacing_x() * grid_transform.get_nx() / this->dims_[0];
-      double spacing_y = grid_transform.spacing_y() * grid_transform.get_ny() / this->dims_[1];
-      double spacing_z = grid_transform.spacing_z() * grid_transform.get_nz() / this->dims_[2];
+      double spacing_x = grid_transform.spacing_x() * grid_transform.get_nx() / static_cast<double>( this->dims_[0] );
+      double spacing_y = grid_transform.spacing_y() * grid_transform.get_ny() / static_cast<double>( this->dims_[1] );
+      double spacing_z = grid_transform.spacing_z() * grid_transform.get_nz() / static_cast<double>( this->dims_[2] );
 
       new_transform = Transform( grid_transform.get_origin(),
                                  Core::Vector( spacing_x, 0.0 , 0.0 ),
@@ -285,6 +286,7 @@ void ITKResampleFilter::typed_run_filter()
       else if ( this->interpolator_ == ITKResampleFilter::B_SPLINE_C )
       {
         typename BSplineInterpolatorType::Pointer bspline_interp = BSplineInterpolatorType::New();
+        bspline_interp->SetSplineOrder( this->spline_order_ );
         filter->SetInterpolator( bspline_interp );
       }
       else // NEAREST_NEIGHBOR_C
@@ -391,6 +393,7 @@ void ITKResampleFilter::typed_run_filter()
       else if ( this->interpolator_ == ITKResampleFilter::B_SPLINE_C )
       {
         typename BSplineInterpolatorType::Pointer bspline_interp = BSplineInterpolatorType::New();
+        bspline_interp->SetSplineOrder( this->spline_order_ );
         filter->SetInterpolator( bspline_interp );
       }
       else // NEAREST_NEIGHBOR_C

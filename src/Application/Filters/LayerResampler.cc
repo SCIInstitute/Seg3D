@@ -54,7 +54,8 @@ public:
 
 void LayerResamplerPrivate::handle_kernel_changed( std::string kernel_name )
 {
-  this->tool_->has_params_state_->set( kernel_name == NrrdResampleFilter::GAUSSIAN_C );
+  this->tool_->has_gaussian_params_state_->set( kernel_name == NrrdResampleFilter::GAUSSIAN_C );
+  this->tool_->has_bspline_params_state_->set( kernel_name == ITKResampleFilter::B_SPLINE_C );
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -89,7 +90,9 @@ LayerResampler::LayerResampler( LayerHandle src_layer, LayerHandle dst_layer ) :
 
   this->add_state( "sigma", this->gauss_sigma_state_, 1.0, 1.0, 100.0, 0.01 );
   this->add_state( "cutoff", this->gauss_cutoff_state_, 1.0, 1.0, 100.0, 0.01 );
-  this->add_state( "has_params", this->has_params_state_, false );
+  this->add_state( "spline_order", this->spline_order_state_, 3, 0, 5, 1 );
+  this->add_state( "has_gaussian_params", this->has_gaussian_params_state_, false );
+  this->add_state( "has_bspline_params", this->has_bspline_params_state_, false );
 
   this->add_connection( this->kernel_state_->value_changed_signal_.connect(
     boost::bind( &LayerResamplerPrivate::handle_kernel_changed, this->private_, _2 ) ) );
@@ -104,10 +107,15 @@ void LayerResampler::execute( Core::ActionContextHandle context )
 {
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
 
-  ActionResample::Dispatch( context, this->private_->src_layer_->get_layer_id(),
-    this->private_->dst_layer_->get_layer_id(), this->padding_value_state_->get(),
-    this->kernel_state_->get(), this->gauss_sigma_state_->get(),
-    this->gauss_cutoff_state_->get(), true );
+  ActionResample::Dispatch( context,
+                            this->private_->src_layer_->get_layer_id(),
+                            this->private_->dst_layer_->get_layer_id(),
+                            this->padding_value_state_->get(),
+                            this->kernel_state_->get(),
+                            this->gauss_sigma_state_->get(),
+                            this->gauss_cutoff_state_->get(),
+                            this->spline_order_state_->get(),
+                            true );
 }
 
 } // end namespace Seg3D

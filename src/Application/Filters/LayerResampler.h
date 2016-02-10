@@ -59,9 +59,13 @@ public:
 public:
   Core::StateLabeledOptionHandle padding_value_state_;
   Core::StateLabeledOptionHandle kernel_state_;
+
   Core::StateRangedDoubleHandle gauss_sigma_state_;
   Core::StateRangedDoubleHandle gauss_cutoff_state_;
-  Core::StateBoolHandle has_params_state_;
+  Core::StateRangedIntHandle spline_order_state_;
+
+  Core::StateBoolHandle has_gaussian_params_state_;
+  Core::StateBoolHandle has_bspline_params_state_;
 
 private:
   LayerResamplerPrivateHandle private_;

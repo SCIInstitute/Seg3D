@@ -56,8 +56,9 @@ CORE_ACTION(
   CORE_ACTION_OPTIONAL_ARGUMENT( "range_max", "[0,0,0]", "The maximum value of resample range in index space." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "padding", "0", "The value used to pad data outside the existing boundary." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "kernel", "box", "Name of the interpolation kernel to use")
-  CORE_ACTION_OPTIONAL_ARGUMENT( "param1", "1.0", "The first parameter for the kernel" )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "param2", "1.0", "The second parameter for the kernel" )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "gauss_sigma", "1.0", "Sigma parameter for the Gaussian kernel" )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "gauss_cutoff", "1.0", "Cutoff parameter for the Gaussian kernel" )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "spline_order", "3.0", "Spline order parameter for the (ITK) b-spline interpolator" )
   CORE_ACTION_OPTIONAL_ARGUMENT( "replace", "false", "Whether to delete the input layers when done" )
   CORE_ACTION_OPTIONAL_ARGUMENT( "sandbox", "-1", "The sandbox in which to run the action." )
   CORE_ACTION_ARGUMENT_IS_NONPERSISTENT( "sandbox" )  
@@ -79,17 +80,36 @@ private:
 
 public:
   static void Dispatch( Core::ActionContextHandle context, 
-    const std::vector< std::string >& layer_ids, int x, int y, int z, 
-    const std::string& kernel, double param1, double param2, bool replace );
+                        const std::vector< std::string >& layer_ids,
+                        int x, int y, int z,
+                        const std::string& kernel,
+                        double gauss_sigma,
+                        double gauss_cutoff,
+                        int spline_order,
+                        bool replace
+                      );
 
   static void Dispatch( Core::ActionContextHandle context,
-    const std::vector< std::string >& layer_ids, 
-    const Core::GridTransform& grid_trans, const std::string& padding, 
-    const std::string& kernel, double param1, double param2, bool replace );
+                        const std::vector< std::string >& layer_ids,
+                        const Core::GridTransform& grid_trans,
+                        const std::string& padding,
+                        const std::string& kernel,
+                        double gauss_sigma,
+                        double gauss_cutoff,
+                        int spline_order,
+                        bool replace
+                      );
 
-  static void Dispatch( Core::ActionContextHandle context, const std::string& src_layer,
-    const std::string& dst_layer, const std::string& padding, const std::string& kernel, 
-    double param1, double param2, bool replace );
+  static void Dispatch( Core::ActionContextHandle context,
+                        const std::string& src_layer,
+                        const std::string& dst_layer,
+                        const std::string& padding,
+                        const std::string& kernel,
+                        double gauss_sigma,
+                        double gauss_cutoff,
+                        int spline_order,
+                        bool replace
+                      );
 };
   
 } //

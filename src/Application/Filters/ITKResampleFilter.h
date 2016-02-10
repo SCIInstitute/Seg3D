@@ -51,6 +51,7 @@ private:
   bool padding_only_;
   std::string interpolator_;
   unsigned int dims_[ 3 ];
+  int spline_order_;
 
   Core::Point range_min_; // resample range in index space of the input data
   Core::Point range_max_; // resample range in index space of the input data
@@ -67,7 +68,7 @@ private:
   PadFilterInternalsHandle pad_internals_;
 
 public:
-  ITKResampleFilter( const std::string& kernel, bool replace, bool crop, const std::string& padding, Core::Point range_min, Core::Point range_max, Seg3D::SandboxID sandbox );
+  ITKResampleFilter( const std::string& interpolator, int spline_order, bool replace, bool crop, const std::string& padding, Core::Point range_min, Core::Point range_max, Seg3D::SandboxID sandbox );
   virtual ~ITKResampleFilter() {}
 
   bool setup_layers(const std::vector< std::string >& layer_ids,

@@ -102,10 +102,11 @@ bool ResampleToolInterface::build_widget( QFrame* frame )
   this->private_->ui_.output_y_->set_description( "Y" );
   this->private_->ui_.output_z_->set_description( "Z" );
   this->private_->ui_.scale_->set_description( "Scale" );
-  
+  this->private_->ui_.spline_order_->set_description( "Spline Order" );
 
   QtUtils::QtBridge::Connect( this->private_->ui_.aspect_checkbox_, tool->constraint_aspect_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.scale_, tool->scale_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.spline_order_, tool->spline_order_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.kernel_combobox_, tool->kernel_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.sigma_spinbox_, tool->gauss_sigma_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.cutoff_spinbox_, tool->gauss_cutoff_state_ );
@@ -124,17 +125,16 @@ bool ResampleToolInterface::build_widget( QFrame* frame )
   
   QtUtils::QtBridge::Show( this->private_->ui_.message_alert_, tool->valid_target_state_, true );
 
-  QtUtils::QtBridge::Enable( this->private_->ui_.target_group_, 
-    tool->use_active_group_state_, true ); 
+  QtUtils::QtBridge::Enable( this->private_->ui_.target_group_, tool->use_active_group_state_, true );
   QtUtils::QtBridge::Enable( this->private_->ui_.scale_, tool->constraint_aspect_state_ );
   QtUtils::QtBridge::Enable( this->private_->ui_.output_x_, tool->constraint_aspect_state_, true );
   QtUtils::QtBridge::Enable( this->private_->ui_.output_y_, tool->constraint_aspect_state_, true );
   QtUtils::QtBridge::Enable( this->private_->ui_.output_z_, tool->constraint_aspect_state_, true );
 
-  QtUtils::QtBridge::Show( this->private_->ui_.param_widget_, tool->has_params_state_ );
+  QtUtils::QtBridge::Show( this->private_->ui_.gaussian_param_widget_, tool->has_gaussian_params_state_ );
   QtUtils::QtBridge::Show( this->private_->ui_.widget_new_size_, tool->manual_size_state_ );
-  QtUtils::QtBridge::Show( this->private_->ui_.widget_another_group_, 
-    tool->manual_size_state_, true );
+  QtUtils::QtBridge::Show( this->private_->ui_.widget_another_group_, tool->manual_size_state_, true );
+  QtUtils::QtBridge::Show( this->private_->ui_.bspline_widget_, tool->has_bspline_params_state_ );
 
   CORE_LOG_DEBUG( "Finished building a Resample Tool Interface" );
 

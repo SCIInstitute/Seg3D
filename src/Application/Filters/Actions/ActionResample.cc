@@ -63,8 +63,9 @@ public:
   Core::Point range_max_;
   std::string padding_;
   std::string kernel_;
-  double param1_;
-  double param2_;
+  double gauss_sigma_;
+  double gauss_cutoff_;
+  int spline_order_;
   bool replace_;
   SandboxID sandbox_;
 
@@ -92,8 +93,9 @@ ActionResample::ActionResample() :
   this->add_parameter( this->private_->range_max_ );
   this->add_parameter( this->private_->padding_ );
   this->add_parameter( this->private_->kernel_ );
-  this->add_parameter( this->private_->param1_ );
-  this->add_parameter( this->private_->param2_ );
+  this->add_parameter( this->private_->gauss_sigma_ );
+  this->add_parameter( this->private_->gauss_cutoff_ );
+  this->add_parameter( this->private_->spline_order_ );
   this->add_parameter( this->private_->replace_ );
   this->add_parameter( this->private_->sandbox_ );
 
@@ -178,6 +180,13 @@ bool ActionResample::validate( Core::ActionContextHandle& context )
     return false;
   }
 
+  if ( ( this->private_->kernel_ == ITKResampleFilter::B_SPLINE_C ) &&
+       ( this->private_->spline_order_ < 0 || this->private_->spline_order_ > 5 ) )
+  {
+    context->report_error( "Spline order must be between 0 and 5." );
+    return false;
+  }
+
   // Validation successful
   return true;
 }
@@ -188,7 +197,7 @@ bool ActionResample::run( Core::ActionContextHandle& context,
   if ( NrrdResampleFilter::IsNrrdResample( this->private_->kernel_ ) )
   {
     // Create algorithm
-    boost::shared_ptr< NrrdResampleFilter > algo( new NrrdResampleFilter( this->private_->kernel_, this->private_->param1_, this->private_->param2_, this->private_->replace_, this->private_->crop_, this->private_->padding_, this->private_->range_min_, this->private_->range_max_, this->private_->sandbox_ ) );
+    boost::shared_ptr< NrrdResampleFilter > algo( new NrrdResampleFilter( this->private_->kernel_, this->private_->gauss_sigma_, this->private_->gauss_cutoff_, this->private_->replace_, this->private_->crop_, this->private_->padding_, this->private_->range_min_, this->private_->range_max_, this->private_->sandbox_ ) );
 
     algo->setup_layers( this->private_->layer_ids_, this->private_->match_grid_transform_, this->private_->grid_transform_, this->private_->x_, this->private_->y_, this->private_->z_ );
 
@@ -211,7 +220,7 @@ bool ActionResample::run( Core::ActionContextHandle& context,
   else // ITK
   {
     // Create algorithm
-    boost::shared_ptr< ITKResampleFilter > algo( new ITKResampleFilter( this->private_->kernel_, this->private_->replace_, this->private_->crop_, this->private_->padding_, this->private_->range_min_, this->private_->range_max_, this->private_->sandbox_ ) );
+    boost::shared_ptr< ITKResampleFilter > algo( new ITKResampleFilter( this->private_->kernel_, this->private_->spline_order_, this->private_->replace_, this->private_->crop_, this->private_->padding_, this->private_->range_min_, this->private_->range_max_, this->private_->sandbox_ ) );
 
     algo->setup_layers( this->private_->layer_ids_, this->private_->match_grid_transform_, this->private_->grid_transform_, this->private_->x_, this->private_->y_, this->private_->z_ );
 
@@ -238,8 +247,13 @@ bool ActionResample::run( Core::ActionContextHandle& context,
 // used by resample tool
 void ActionResample::Dispatch( Core::ActionContextHandle context,
                                const std::vector< std::string >& layer_ids,
-                               int x, int y, int z, const std::string& kernel,
-                               double param1, double param2, bool replace )
+                               int x, int y, int z,
+                               const std::string& kernel,
+                               double gauss_sigma,
+                               double gauss_cutoff,
+                               int spline_order,
+                               bool replace
+                             )
 {
   ActionResample* action = new ActionResample;
   action->private_->layer_ids_ = layer_ids;
@@ -247,8 +261,9 @@ void ActionResample::Dispatch( Core::ActionContextHandle context,
   action->private_->y_ = static_cast< unsigned int >(y);
   action->private_->z_ = static_cast< unsigned int >(z);
   action->private_->kernel_ = kernel;
-  action->private_->param1_ = param1;
-  action->private_->param2_ = param2;
+  action->private_->gauss_sigma_ = gauss_sigma;
+  action->private_->gauss_cutoff_ = gauss_cutoff;
+  action->private_->spline_order_ = spline_order;
   action->private_->replace_ = replace;
 
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
@@ -258,8 +273,13 @@ void ActionResample::Dispatch( Core::ActionContextHandle context,
 void ActionResample::Dispatch( Core::ActionContextHandle context,
                                const std::vector< std::string >& layer_ids,
                                const Core::GridTransform& grid_trans,
-                               const std::string& padding, const std::string& kernel,
-                               double param1, double param2, bool replace )
+                               const std::string& padding,
+                               const std::string& kernel,
+                               double gauss_sigma,
+                               double gauss_cutoff,
+                               int spline_order,
+                               bool replace
+                             )
 {
   ActionResample* action = new ActionResample;
 
@@ -274,8 +294,9 @@ void ActionResample::Dispatch( Core::ActionContextHandle context,
   action->private_->grid_transform_ = grid_trans;
 
   action->private_->kernel_ = kernel;
-  action->private_->param1_ = param1;
-  action->private_->param2_ = param2;
+  action->private_->gauss_sigma_ = gauss_sigma;
+  action->private_->gauss_cutoff_ = gauss_cutoff;
+  action->private_->spline_order_ = spline_order;
   action->private_->replace_ = replace;
 
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
@@ -283,16 +304,22 @@ void ActionResample::Dispatch( Core::ActionContextHandle context,
 
 // used by layer resampler
 void ActionResample::Dispatch( Core::ActionContextHandle context,
-                               const std::string& src_layer, const std::string& dst_layer,
-                               const std::string& padding, const std::string& kernel,
-                               double param1, double param2, bool replace )
+                               const std::string& src_layer,
+                               const std::string& dst_layer,
+                               const std::string& padding,
+                               const std::string& kernel,
+                               double gauss_sigma,
+                               double gauss_cutoff,
+                               int spline_order,
+                               bool replace
+                             )
 {
   LayerHandle layer = LayerManager::FindLayer( dst_layer );
   if ( layer )
   {
     std::vector< std::string > layer_ids( 1, src_layer );
     ActionResample::Dispatch( context, layer_ids, layer->get_grid_transform(),
-      padding, kernel, param1, param2, replace );
+      padding, kernel, gauss_sigma, gauss_cutoff, spline_order, replace );
   }
 }
 

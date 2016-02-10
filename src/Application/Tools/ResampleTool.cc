@@ -173,7 +173,7 @@ void ResampleToolPrivate::handle_scale_changed( double scale )
 
 void ResampleToolPrivate::handle_constraint_aspect_changed( bool constraint )
 {
-  if ( !constraint )
+  if ( ! constraint )
   {
     return;
   }
@@ -190,7 +190,8 @@ void ResampleToolPrivate::handle_constraint_aspect_changed( bool constraint )
 
 void ResampleToolPrivate::handle_kernel_changed( std::string kernel_name )
 {
-  this->tool_->has_params_state_->set( kernel_name == NrrdResampleFilter::GAUSSIAN_C );
+  this->tool_->has_gaussian_params_state_->set( kernel_name == NrrdResampleFilter::GAUSSIAN_C );
+  this->tool_->has_bspline_params_state_->set( kernel_name == ITKResampleFilter::B_SPLINE_C );
 }
 
 void ResampleToolPrivate::handle_size_scheme_changed( std::string size_scheme )
@@ -259,6 +260,7 @@ ResampleTool::ResampleTool( const std::string& toolid ) :
   this->add_state( "output_z", this->output_dimensions_state_[ 2 ], 1, 1, 500, 1 );
   this->add_state( "constraint_aspect", this->constraint_aspect_state_, true );
   this->add_state( "scale", this->scale_state_, 1.0, 0.01, 2.0, 0.01 );
+  this->add_state( "spline_order", this->spline_order_state_, 3, 0, 5, 1 );
 
   // Need to load dimensions after constraint_aspect_state_ is loaded so that scale isn't 
   // incorrectly used to overwrite output dimensions 
@@ -280,7 +282,8 @@ ResampleTool::ResampleTool( const std::string& toolid ) :
 
   this->add_state( "sigma", this->gauss_sigma_state_, 1.0, 1.0, 100.0, 0.01 );
   this->add_state( "cutoff", this->gauss_cutoff_state_, 1.0, 1.0, 100.0, 0.01 );
-  this->add_state( "has_params", this->has_params_state_, false );
+  this->add_state( "has_gaussian_params", this->has_gaussian_params_state_, false );
+  this->add_state( "has_bspline_params", this->has_bspline_params_state_, false );
 
   this->add_state( "valid_size", this->valid_size_state_, true );
   this->add_state( "replace", this->replace_state_, false );
@@ -297,12 +300,14 @@ ResampleTool::ResampleTool( const std::string& toolid ) :
     boost::bind( &ResampleToolPrivate::handle_scale_changed, this->private_, _1 ) ) );
   this->add_connection( this->kernel_state_->value_changed_signal_.connect(
     boost::bind( &ResampleToolPrivate::handle_kernel_changed, this->private_, _2 ) ) );
+
   for ( int i = 0; i < 3; ++i )
   {
     this->add_connection( this->output_dimensions_state_[ i ]->value_changed_signal_.connect(
       boost::bind( &ResampleToolPrivate::handle_output_dimension_changed, 
       this->private_, i, _1 ) ) );
   }
+
   // If groups were added or removed, update the destination group list in the tool interface
   this->add_connection( LayerManager::Instance()->layer_inserted_signal_.connect( 
     boost::bind( &ResampleToolPrivate::handle_layer_groups_changed, this->private_, _2 ) ) );
@@ -327,22 +332,33 @@ void ResampleTool::execute( Core::ActionContextHandle context )
 
   if ( this->manual_size_state_->get() )
   {
-    ActionResample::Dispatch( context, target_layers, 
-      this->output_dimensions_state_[ 0 ]->get(), this->output_dimensions_state_[ 1 ]->get(),
-      this->output_dimensions_state_[ 2 ]->get(), this->kernel_state_->get(),
-      this->gauss_sigma_state_->get(), this->gauss_cutoff_state_->get(), 
-      this->replace_state_->get() );
+    ActionResample::Dispatch( context,
+                              target_layers,
+                              this->output_dimensions_state_[ 0 ]->get(),
+                              this->output_dimensions_state_[ 1 ]->get(),
+                              this->output_dimensions_state_[ 2 ]->get(),
+                              this->kernel_state_->get(),
+                              this->gauss_sigma_state_->get(),
+                              this->gauss_cutoff_state_->get(),
+                              this->spline_order_state_->get(),
+                              this->replace_state_->get()
+                            );
   }
   else
   {
-    LayerGroupHandle dst_group = LayerManager::Instance()->find_group(
-      this->dst_group_state_->get() );
+    LayerGroupHandle dst_group = LayerManager::Instance()->find_group( this->dst_group_state_->get() );
     if ( dst_group )
     {
-      ActionResample::Dispatch( context, target_layers,
-        dst_group->get_grid_transform(), this->padding_value_state_->get(),
-        this->kernel_state_->get(), this->gauss_sigma_state_->get(),
-        this->gauss_cutoff_state_->get(), this->replace_state_->get() );
+      ActionResample::Dispatch( context,
+                                target_layers,
+                                dst_group->get_grid_transform(),
+                                this->padding_value_state_->get(),
+                                this->kernel_state_->get(),
+                                this->gauss_sigma_state_->get(),
+                                this->gauss_cutoff_state_->get(),
+                                this->spline_order_state_->get(),
+                                this->replace_state_->get()
+                              );
     }
   }
 }
