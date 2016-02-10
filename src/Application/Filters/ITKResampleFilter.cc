@@ -59,8 +59,8 @@ ITKResampleFilter::ITKResampleFilter( const std::string& interpolator, int splin
 }
 
 bool ITKResampleFilter::setup_layers(const std::vector< std::string >& layer_ids,
-                  bool match_grid_transform, const GridTransform& grid_transform,
-                  unsigned int dimX, unsigned int dimY, unsigned int dimZ)
+                                     bool match_grid_transform, const GridTransform& grid_transform,
+                                     unsigned int dimX, unsigned int dimY, unsigned int dimZ)
 {
   this->dims_[ 0 ] = dimX;
   this->dims_[ 1 ] = dimY;
@@ -320,7 +320,20 @@ void ITKResampleFilter::typed_run_filter()
         return;
       }
 
+      // As ITK filters generate an inconsistent abort behavior, we record our own abort flag
+      // This one is set when the abort button is pressed and an abort is sent to ITK.
+      if ( this->check_abort() ) return;
+
       this->insert_itk_image_into_layer< VALUE_TYPE >( this->dst_layers_[ i ], filter->GetOutput() );
+      this->dispatch_unlock_layer( this->dst_layers_[ i ] );
+      if ( this->replace_ )
+      {
+        this->dispatch_delete_layer( this->src_layers_[ i ] );
+      }
+      else
+      {
+        this->dispatch_unlock_layer( this->src_layers_[ i ] );
+      }
     }
     else if ( this->src_layers_[ i ]->get_type() == VolumeType::MASK_E )
     {
@@ -427,7 +440,19 @@ void ITKResampleFilter::typed_run_filter()
         return;
       }
 
+      // As ITK filters generate an inconsistent abort behavior, we record our own abort flag
+      // This one is set when the abort button is pressed and an abort is sent to ITK.
+      if ( this->check_abort() ) return;
+
       this->insert_itk_image_into_layer< unsigned char >( this->dst_layers_[ i ], filter->GetOutput() );
+      if ( this->replace_ )
+      {
+        this->dispatch_delete_layer( this->src_layers_[ i ] );
+      }
+      else
+      {
+        this->dispatch_unlock_layer( this->src_layers_[ i ] );
+      }
     }
     else
     {
