@@ -267,6 +267,17 @@ IF(SEG3D_BUILD_INTERFACE)
     ENDIF()
     SET(MACDEPLOYQT ${MACDEPLOYQT_EXE} CACHE INTERNAL "macdeployqt executable")
     MARK_AS_ADVANCED(MACDEPLOYQT)
+  ELSE()
+    IF(WIN32)
+      FIND_PROGRAM(WINDEPLOYQT_EXE
+        NAMES windeployqt.exe
+      )
+      IF (WINDEPLOYQT_EXE MATCHES "NOTFOUND")
+        MESSAGE(FATAL_ERROR "windeployqt.exe is required to build the Seg3D installer.  Please ensure that it is installed and in your path.  It should be found within the Qt5 install path.")
+      ENDIF()
+      SET(WINDEPLOYQT ${WINDEPLOYQT_EXE} CACHE INTERNAL "windeployqt executable")
+      MARK_AS_ADVANCED(WINDEPLOYQT)
+    ENDIF()
   ENDIF()
 
 ENDIF()
