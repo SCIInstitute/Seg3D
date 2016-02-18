@@ -24,7 +24,7 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
-*/
+ */
 
 #include <boost/math/special_functions/round.hpp>
 
@@ -32,6 +32,9 @@
 #include <Core/Volume/MaskVolumeSlice.h>
 #include <Core/Volume/DataVolumeSlice.h>
 #include <Core/Geometry/Path.h>
+
+//#include <Core/ITKSpeedLine/itkSpeedFunctionToPathFilter.h>
+//#include <Core/ITKSpeedLine/itkArrivalFunctionToPathFilter.h>
 
 #include <Core/ITKLiveWire/itkLiveWireImageFunction.h>
 
@@ -45,9 +48,21 @@
 #include <Application/Tools/SpeedlineTool.h>
 
 //ITK Includes
+//#include <itkRescaleIntensityImageFilter.h>
+//#include <itkDiscreteGaussianImageFilter.h>
 #include <itkExtractImageFilter.h>
+//#include <itkLinearInterpolateImageFunction.h>
 #include <itkPathIterator.h>
+//#include <itkIndex.h>
 #include <itkImageBase.h>
+
+//#ifdef min
+//#undef min
+//#endif
+//
+//#ifdef max
+//#undef max
+//#endif
 
 CORE_REGISTER_ACTION( Seg3D, Speedline )
 
@@ -60,8 +75,20 @@ class ActionSpeedlineAlgo : public  ITKFilter
 {
   static const unsigned int VOL_DIM_C = 3;
   static const unsigned int SLICE_DIM_C = 2;
+//  typedef double pixel_type;
+//  typedef itk::Image< pixel_type, SLICE_DIM_C > image_type;
+//  typedef itk::PolyLineParametricPath< SLICE_DIM_C > path_type;
+//  typedef itk::SpeedFunctionToPathFilter< image_type, path_type > path_filter_type;
+//  typedef path_filter_type::CostFunctionType::CoordRepType coord_rep_type; // double
+//
+//  typedef itk::ContinuousIndex< double, 3 >   continuous_index_type;
+//  typedef itk::Point< double, 3 > itk_point_type;
 
+//  Path itk_paths_;
   Path world_paths_;
+
+//  continuous_index_type start_point_cindex_; // Continuous index for start point
+//  std::vector< continuous_index_type > vertices_cindex_;
 
 public:
   std::string target_layer_id_;
@@ -70,23 +97,74 @@ public:
   int slice_type_;
   size_t slice_number_;
   std::vector< Point > vertices_;
+//  Point anchor_;
+
+//  std::vector< Point > path_vertices_;
+//  int current_vertex_index_;
 
   DataLayerHandle target_layer_;
   MaskLayerHandle roi_mask_layer_;
   MaskLayerHandle output_mask_layer_;
 
+//  int iterations_;
+//  double termination_;
   double grad_mag_weight_;
   double zero_cross_weight_;
   double grad_dir_weight_;
   bool image_spacing_;
   bool face_conn_;
 
+//  bool update_all_paths_;
+//  std::string itk_path_state_id_;
   std::string world_path_state_id_;
+//  std::string path_vertices_state_id_;
 
 //  long action_id_;
 //  AtomicCounterHandle action_handle_;
 
 public:
+  // When mouse is moved, clean the temporary paths
+//  bool clean_paths( )
+//  {
+//    bool delete_outdated_path = false;
+//    std::vector< SinglePath > tmp_paths;
+//
+//    size_t paths_num = this->itk_paths_.get_path_num();
+//    for ( unsigned int i = 0; i < paths_num; ++i )
+//    {
+//      SinglePath single_path = this->itk_paths_.get_one_path( i );
+//
+//      Point p0, p1;
+//      single_path.get_point_on_ends( 0, p0 );
+//      single_path.get_point_on_ends( 1, p1 );
+//
+//      std::vector< Point >::iterator it0  =
+//      std::find( this->vertices_.begin(), this->vertices_.end(), p0 );
+//
+//      std::vector< Point >::iterator it1  =
+//      std::find( this->vertices_.begin(), this->vertices_.end(), p1 );
+//
+//      if ( it0 == this->vertices_.end() || it1 == this->vertices_.end() )
+//      {
+//        delete_outdated_path = true;
+//      }
+//      else
+//      {
+//        tmp_paths.push_back( single_path );
+//      }
+//    }
+//
+//    this->itk_paths_.delete_all_paths();
+//    for ( std::vector< SinglePath >::iterator it = tmp_paths.begin(); it != tmp_paths.end(); ++it )
+//    {
+//      this->itk_paths_.add_one_path( *it );
+//    }
+//
+//    //this->itk_paths_.set_all_paths( tmp_paths );
+//
+//    return delete_outdated_path;
+//  }
+
   template< class TYPED_IMAGE_TYPE, class TYPED_IMAGE_TYPE_2D >
   typename TYPED_IMAGE_TYPE_2D::Pointer extract_2D_image( typename TYPED_IMAGE_TYPE::Pointer image )
   {
@@ -193,14 +271,14 @@ public:
   SCI_BEGIN_TYPED_ITK_RUN( this->target_layer_->get_data_type() )
   {
     StateSpeedlinePathHandle world_path_state;
-    StateBaseHandle state_var;
+    StateBaseHandle state_var_1;
 
     {
       StateEngine::lock_type lock( StateEngine::GetMutex() );
 
-      if ( StateEngine::Instance()->get_state( this->world_path_state_id_, state_var ) )
+      if ( StateEngine::Instance()->get_state( this->world_path_state_id_, state_var_1 ) )
       {
-        world_path_state = boost::dynamic_pointer_cast< StateSpeedlinePath >( state_var );
+        world_path_state = boost::dynamic_pointer_cast< StateSpeedlinePath >( state_var_1 );
         if ( world_path_state )
         {
           this->world_paths_ = world_path_state->get();
@@ -209,6 +287,8 @@ public:
     }
 
     this->world_paths_.delete_all_paths();
+
+std::cerr << "start paths" << std::endl;
 
     typedef itk::Image< int, VOL_DIM_C> MASK_IMAGE_TYPE;
     typedef itk::Image< int, SLICE_DIM_C > MASK_IMAGE_TYPE_2D;
@@ -248,6 +328,14 @@ public:
     const size_t num_of_vertices = this->vertices_.size();
     const size_t end_index = num_of_vertices - 1;
 
+//    typename TYPED_IMAGE_TYPE_2D::IndexType anchor = extract_2D_point< TYPED_IMAGE_TYPE_2D >( this->vertices_[end_index] );
+//    typename TYPED_IMAGE_TYPE_2D::IndexType anchor = extract_2D_point< TYPED_IMAGE_TYPE_2D >( this->anchor_ );
+//    typename TYPED_IMAGE_TYPE_2D::IndexType anchor = extract_2D_point< TYPED_IMAGE_TYPE_2D >( this->vertices_[0] );
+//    livewire->SetAnchorSeed( anchor );
+
+std::cerr << "first vertex: " << this->vertices_[0] << std::endl;
+std::cerr << "last vertex: " << this->vertices_[end_index] << std::endl << std::endl;
+
     this->world_paths_.set_start_point( this->vertices_[0] );
     this->world_paths_.set_end_point( this->vertices_[end_index] );
 
@@ -256,33 +344,63 @@ public:
       Point p0 = this->vertices_[ index ];
       Point p1 = this->vertices_[ ( index + 1 ) % num_of_vertices ];
 
-      SinglePath new_path( p0, p1 );
+//std::cerr << p0 << ", " << p1 << std::endl;
 
       typename TYPED_IMAGE_TYPE_2D::IndexType anchor = extract_2D_point< TYPED_IMAGE_TYPE_2D >( p0 );
       livewire->SetAnchorSeed( anchor );
 
-      typename TYPED_IMAGE_TYPE_2D::IndexType free = extract_2D_point< TYPED_IMAGE_TYPE_2D >( p1 );
-      typename PATH_TYPE::Pointer path = livewire->EvaluateAtIndex( free );
-      if ( path == nullptr )
-      {
-        // TODO: report point
-        CORE_LOG_WARNING( "Error computing path..." );
-        continue;
-      }
+      SinglePath new_path( p0, p1 );
+//      {
+//        typename TYPED_IMAGE_TYPE_2D::IndexType free = extract_2D_point< TYPED_IMAGE_TYPE_2D >( p0 );
+//        typename PATH_TYPE::Pointer path = livewire->EvaluateAtIndex( free );
+//        if ( path == nullptr )
+//        {
+//          // TODO: report point
+//          //this->report_error( "Error computing path..." );
+//          //return;
+//          CORE_LOG_WARNING( "Error computing path..." );
+//          continue;
+//        }
+//
+//        const typename PATH_TYPE::VertexListType* vertexList = path->GetVertexList();
+//        for (size_t j = 0; j < vertexList->Size(); ++j)
+//        {
+//std::cerr << vertexList->GetElement(j) << " ";
+//          Point point = build_3D_point< PATH_TYPE >( vertexList->GetElement(j) );
+//          new_path.add_a_point( point );
+//        }
+//      }
 
-      const typename PATH_TYPE::VertexListType* vertexList = path->GetVertexList();
-      for (size_t j = 0; j < vertexList->Size(); ++j)
-      {
-        Point point = build_3D_point< PATH_TYPE >( vertexList->GetElement(j) );
-        new_path.add_a_point( point );
-      }
+//      {
+        typename TYPED_IMAGE_TYPE_2D::IndexType free = extract_2D_point< TYPED_IMAGE_TYPE_2D >( p1 );
+        typename PATH_TYPE::Pointer path = livewire->EvaluateAtIndex( free );
+        if ( path == nullptr )
+        {
+          // TODO: report point
+          //this->report_error( "Error computing path..." );
+          //return;
+          CORE_LOG_WARNING( "Error computing path..." );
+          continue;
+        }
+
+        const typename PATH_TYPE::VertexListType* vertexList = path->GetVertexList();
+        for (size_t j = 0; j < vertexList->Size(); ++j)
+        {
+std::cerr << vertexList->GetElement(j) << " ";
+          Point point = build_3D_point< PATH_TYPE >( vertexList->GetElement(j) );
+          new_path.add_a_point( point );
+        }
+//      }
 
       this->world_paths_.add_one_path( new_path );
+      std::cerr << std::endl;
 
     }
 
     Application::PostEvent( boost::bind( &StateSpeedlinePath::set, world_path_state, this->world_paths_, ActionSource::NONE_E ) );
   }
+
+  std::cerr << "end paths" << std::endl;
 
   SCI_END_TYPED_ITK_RUN()
 
@@ -315,8 +433,18 @@ public:
   double grad_dir_weight_;
   bool image_spacing_;
   bool face_conn_;
+//  Point anchor_;
 
+//  int current_vertex_index_;
+//  std::string itk_path_state_id_;
   std::string world_path_state_id_;
+//  std::string path_vertices_state_id_;
+//  bool update_all_paths_;
+
+//  long action_id_;
+//  AtomicCounterHandle action_handle_;
+
+//  Core::MaskVolumeSliceHandle vol_slice_;
 };
 
 ActionSpeedline::ActionSpeedline() :
@@ -326,6 +454,7 @@ ActionSpeedline::ActionSpeedline() :
   this->add_layer_id( this->private_->output_mask_layer_id_ );
   this->add_parameter( this->private_->slice_type_ );
   this->add_parameter( this->private_->slice_number_ );
+//  this->add_parameter( this->private_->anchor_ );
   this->add_parameter( this->private_->vertices_ );
   this->add_layer_id( this->private_->roi_mask_layer_id_ );
   this->add_parameter( this->private_->grad_mag_weight_ );
@@ -333,7 +462,11 @@ ActionSpeedline::ActionSpeedline() :
   this->add_parameter( this->private_->grad_dir_weight_ );
   this->add_parameter( this->private_->image_spacing_ );
   this->add_parameter( this->private_->face_conn_ );
+//  this->add_parameter( this->private_->current_vertex_index_ );
+//  this->add_parameter( this->private_->update_all_paths_ );
+//  this->add_parameter( this->private_->itk_path_state_id_ );
   this->add_parameter( this->private_->world_path_state_id_ );
+//  this->add_parameter( this->private_->path_vertices_state_id_ );
 }
 
 bool ActionSpeedline::validate( ActionContextHandle& context )
@@ -427,11 +560,14 @@ bool ActionSpeedline::run( ActionContextHandle& context, ActionResultHandle& res
 
   algo->slice_type_ = this->private_->slice_type_ ;
   algo->slice_number_ = this->private_->slice_number_;
+//  algo->vertices_ = this->private_->vertices_;
+//  algo->current_vertex_index_ = this->private_->current_vertex_index_;
   algo->grad_mag_weight_ = this->private_->grad_mag_weight_;
   algo->zero_cross_weight_ = this->private_->zero_cross_weight_;
   algo->grad_dir_weight_ = this->private_->grad_dir_weight_;
   algo->image_spacing_ = this->private_->image_spacing_;
   algo->face_conn_ = this->private_->face_conn_;
+  //algo->anchor_ = this->private_->anchor_;
 
   algo->output_mask_layer_ = LayerManager::FindMaskLayer( this->private_->output_mask_layer_id_ );
   algo->target_layer_ = LayerManager::FindDataLayer( this->private_->target_layer_id_ );
@@ -484,7 +620,40 @@ bool ActionSpeedline::run( ActionContextHandle& context, ActionResultHandle& res
     algo->vertices_.push_back( indexPoint );
   }
 
+//  {
+//    Point vertex = this->private_->anchor_;
+//    int i = -1, j = -1;
+//
+//    if ( this->private_->slice_type_ == VolumeSliceType::AXIAL_E )
+//    {
+//      volume_slice->world_to_index(vertex.x(), vertex.y(), i, j);
+//    }
+//    else if ( this->private_->slice_type_ == VolumeSliceType::CORONAL_E )
+//    {
+//      volume_slice->world_to_index(vertex.x(), vertex.z(), i, j);
+//    }
+//    else if ( this->private_->slice_type_ == VolumeSliceType::SAGITTAL_E )
+//    {
+//      volume_slice->world_to_index(vertex.y(), vertex.z(), i, j);
+//    }
+//    else
+//    {
+//      // this should not happen!
+//      context->report_error( "Slice type is not volume, axial, coronal or sagittal." );
+//      return false;
+//    }
+//
+//    Core::Point indexPoint;
+//    volume_slice->to_index(i, j, indexPoint);
+//    algo->anchor_ = indexPoint;
+//  }
+
+//  algo->update_all_paths_ = this->private_->update_all_paths_;
+//  algo->itk_path_state_id_ = this->private_->itk_path_state_id_;
   algo->world_path_state_id_ = this->private_->world_path_state_id_;
+//  algo->path_vertices_state_id_ = this->private_->path_vertices_state_id_;
+//  algo->action_id_ = this->private_->action_id_;
+//  algo->action_handle_ = this->private_->action_handle_;
 
   Runnable::Start( algo );
 
@@ -503,12 +672,19 @@ void ActionSpeedline::Dispatch( ActionContextHandle context,
                                 VolumeSliceType slice_type,
                                 size_t slice_number,
                                 const std::vector< Point > vertices,
+//                                const Point& anchor,
                                 const double grad_mag_weight,
                                 const double zero_cross_weight,
                                 const double grad_dir_weight,
                                 const bool image_spacing,
                                 const bool face_conn,
+                                //int current_vertex_index,
+                                //bool update_all_paths,
+                                //const std::string& itk_path_state_id,
                                 const std::string& world_path_state_id
+                                //const std::string& path_vertices_state_id,
+                                //long action_id,
+                                //AtomicCounterHandle action_handle
                               )
 {
   ActionSpeedline* action = new ActionSpeedline;
@@ -519,12 +695,19 @@ void ActionSpeedline::Dispatch( ActionContextHandle context,
   action->private_->slice_type_ = slice_type;
   action->private_->slice_number_ = slice_number;
   action->private_->vertices_ = vertices;
+//  action->private_->anchor_ = anchor;
   action->private_->grad_mag_weight_ = grad_mag_weight;
   action->private_->zero_cross_weight_ = zero_cross_weight;
   action->private_->grad_dir_weight_ = grad_dir_weight;
   action->private_->image_spacing_ = image_spacing;
   action->private_->face_conn_ = face_conn;
+  //action->private_->current_vertex_index_ = current_vertex_index;
+  //action->private_->update_all_paths_ = update_all_paths;
+  //action->private_->itk_path_state_id_ = itk_path_state_id;
   action->private_->world_path_state_id_ = world_path_state_id;
+  //action->private_->path_vertices_state_id_ = path_vertices_state_id;
+  //action->private_->action_id_ = action_id;
+  //action->private_->action_handle_ = action_handle;
 
   ActionDispatcher::PostAction( ActionHandle( action ), context );
 }

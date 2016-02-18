@@ -24,7 +24,7 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
-*/
+ */
 
 #ifndef APPLICATION_TOOLS_ACTIONS_ACTIOINSPEEDLINE_H
 #define APPLICATION_TOOLS_ACTIONS_ACTIOINSPEEDLINE_H
@@ -53,14 +53,19 @@ CORE_ACTION
   CORE_ACTION_ARGUMENT( "mask", "The layerid of the mask that needs to be applied." )
   CORE_ACTION_ARGUMENT( "slice_type", "The slicing direction to be painted on." )
   CORE_ACTION_ARGUMENT( "slice_number", "The slice number to be painted on." )
+//  CORE_ACTION_ARGUMENT( "anchor", "The 2D coordinates of anchor Speedline vertex." )
   CORE_ACTION_ARGUMENT( "vertices", "The 2D coordinates of free Speedline vertices." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "roi_mask", "<none>", "Region of interest." )
+//  CORE_ACTION_ARGUMENT( "current_vertex_index", "The vertex needes to compute paths." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "grad_mag_weight", "0.43", "Gradient magnitude weight for cost function." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "zero_cross_weight", "0.43", "Zero cross weight for cost function." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "grad_dir_weight", "0.14", "Gradient direction weight for cost function." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "image_spacing", "true", "Determines the scaling factor for the neighborhood weighting." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "face_conn", "true", "Determines the local neighborhood." )
+//  CORE_ACTION_OPTIONAL_ARGUMENT( "update_all_path", "true", "Update all paths." )
+//  CORE_ACTION_OPTIONAL_ARGUMENT( "itk_path_state_id", "", "The statid of the state variable into which ITK continuous index values will be written." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "world_path_state_id", "", "The statid of the state variable into which world coordinate path values will be written." )
+//  CORE_ACTION_OPTIONAL_ARGUMENT( "path_vertices_state_id", "", "The stateid of the state variable into which vertices values will be written." )
   CORE_ACTION_CHANGES_PROJECT_DATA()
 )
 
@@ -93,12 +98,19 @@ public:
                         Core::VolumeSliceType slice_type,
                         size_t slice_number,
                         const std::vector< Core::Point > vertices,
+//                        const Core::Point& anchor,
                         const double grad_mag_weight,
                         const double zero_cross_weight,
                         const double grad_dir_weight,
                         const bool image_spacing,
                         const bool face_conn,
+                        //int current_vertex_index,
+                        //bool update_all_paths,
+                        //const std::string& itk_path_state_id,
                         const std::string& world_path_state_id
+                        //const std::string& path_vertices_state_id,
+                        //long action_id,
+                        //Core::AtomicCounterHandle action_handle
                       );
 
 };
