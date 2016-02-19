@@ -129,8 +129,6 @@ SET(APPLICATION_FILTERS_ACTIONS_SRCS
   Actions/ActionPointSetRegisterFilter.cc
   Actions/ActionPointSetTransformFilter.h
   Actions/ActionPointSetTransformFilter.cc
-  Actions/ActionSpeedlineImageFilter.h
-  Actions/ActionSpeedlineImageFilter.cc
   Actions/ActionRadialBasisFunction.h
   Actions/ActionRadialBasisFunction.cc
 )
