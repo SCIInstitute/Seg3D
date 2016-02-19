@@ -49,6 +49,8 @@
 #include <itkPathIterator.h>
 #include <itkImageBase.h>
 
+#include <sstream>
+
 CORE_REGISTER_ACTION( Seg3D, Speedline )
 
 namespace Seg3D
@@ -241,8 +243,7 @@ public:
         extract_2D_image< MASK_IMAGE_TYPE, MASK_IMAGE_TYPE_2D >( roi_mask_image->get_image() );
 
       livewire->SetMaskImage( roi_mask_image_2D );
-      // TODO: not sure about pixel value...
-      livewire->SetInsidePixelValue( 1 );
+      livewire->SetInsidePixelValue( this->roi_mask_layer_->get_mask_volume()->get_mask_data_block()->get_mask_bit() );
     }
 
     const size_t num_of_vertices = this->vertices_.size();
@@ -266,8 +267,12 @@ public:
       if ( path == nullptr )
       {
         // TODO: report point
-        CORE_LOG_WARNING( "Error computing path..." );
+        std::ostringstream oss;
+        oss << "Error computing path at " << p0 << " and " << p1 << "." << std::endl;
+        this->report_error( oss.str() );
         continue;
+        //this->world_paths_.delete_all_paths();
+        //return;
       }
 
       const typename PATH_TYPE::VertexListType* vertexList = path->GetVertexList();
@@ -278,7 +283,6 @@ public:
       }
 
       this->world_paths_.add_one_path( new_path );
-
     }
 
     Application::PostEvent( boost::bind( &StateSpeedlinePath::set, world_path_state, this->world_paths_, ActionSource::NONE_E ) );

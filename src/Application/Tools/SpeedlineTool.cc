@@ -75,19 +75,16 @@ public:
 
   void handle_vertices_changed();
   void handle_path_changed();
-  // When slice changes, recompute the path
-  // in private class, not virtual
   void handle_slice_changed();
+  void handle_speed_params_changed();
+  void handle_roi_mask_layer_changed( std::string layer_id );
+  void handle_target_data_layer_changed( std::string layer_id );
 
   bool find_vertex( ViewerHandle viewer, int x, int y, int& index );
   bool find_closest_vertex( ViewerHandle viewer, int x, int y, int& index );
   void execute_fill_erase( ActionContextHandle context, bool erase, 
                            ViewerHandle viewer = ViewerHandle() );
   void execute_path();
-
-  void handle_layers_changed();
-  void handle_mask_layer_changed( std::string layer_id );
-  void handle_target_data_layer_changed( std::string layer_id );
 
   bool get_update_paths(); 
   void set_update_paths( bool update_all_paths ); 
@@ -101,7 +98,7 @@ public:
   boost::signals2::connection viewer_connection_[ 6 ];
 
   // To ensure that the Speedline action performed in order
-  AtomicCounterHandle action_counter_;
+  //AtomicCounterHandle action_counter_;
 };
 
 SpeedlineToolPrivate::SpeedlineToolPrivate() :
@@ -109,7 +106,7 @@ SpeedlineToolPrivate::SpeedlineToolPrivate() :
   vertex_index_(-1),
   initialized_(false)
 {
-  action_counter_ = AtomicCounterHandle( new AtomicCounter( 0 ) );
+  //action_counter_ = AtomicCounterHandle( new AtomicCounter( 0 ) );
 }
 
 SpeedlineToolPrivate::~SpeedlineToolPrivate()
@@ -118,7 +115,6 @@ SpeedlineToolPrivate::~SpeedlineToolPrivate()
 
 void SpeedlineToolPrivate::handle_vertices_changed()
 {
-
   this->execute_path();
   ViewerManager::Instance()->update_2d_viewers_overlay();
 }
@@ -133,9 +129,17 @@ void SpeedlineToolPrivate::handle_slice_changed()
   this->execute_path();
 }
 
-void SpeedlineToolPrivate::handle_mask_layer_changed( std::string layer_id )
+void SpeedlineToolPrivate::handle_speed_params_changed()
 {
-std::cerr << "SpeedlineToolPrivate::handle_mask_layer_changed: " << layer_id << std::endl;
+  this->execute_path();
+}
+
+void SpeedlineToolPrivate::handle_roi_mask_layer_changed( std::string layer_id )
+{
+  if ( layer_id != Tool::NONE_OPTION_C )
+  {
+    this->execute_path();
+  }
 }
 
 void SpeedlineToolPrivate::handle_target_data_layer_changed( std::string layer_id )
@@ -252,7 +256,8 @@ void SpeedlineToolPrivate::execute_fill_erase( Core::ActionContextHandle context
 
   if ( ! viewer || viewer->is_volume_view() ) return;
 
-  Core::MaskVolumeSliceHandle volume_slice = boost::dynamic_pointer_cast< Core::MaskVolumeSlice >( viewer->get_volume_slice( this->tool_->target_layer_state_->get() ) );
+  Core::MaskVolumeSliceHandle volume_slice = boost::dynamic_pointer_cast< Core::MaskVolumeSlice >(
+    viewer->get_volume_slice( this->tool_->target_layer_state_->get() ) );
   if ( ! volume_slice ) return;
 
   // Target mask being filled must be visible.
@@ -266,20 +271,15 @@ void SpeedlineToolPrivate::execute_fill_erase( Core::ActionContextHandle context
   //const std::vector< Core::Point >& vertices = this->tool_->path_vertices_state_->get();
   size_t num_of_vertices = vertices.size();
 
-  if ( num_of_vertices < 2 ) return;
-//if ( num_of_vertices < 3 ) return;
-std::cerr << "execute_path: #vertices=" << num_of_vertices << std::endl;
+  if ( num_of_vertices < 3 ) return;
 
   Path paths = this->tool_->path_state_->get();
   std::vector< SinglePath > all_paths = paths.get_all_paths();
   std::vector< Point > full_path;
 
-std::cerr << "#paths=" << all_paths.size() << std::endl;
-
   for ( auto &single_path : all_paths )
   {
     size_t num_of_points_on_single_path = single_path.get_points_num_on_path();
-std::cerr << "#points on single path=" << num_of_points_on_single_path << std::endl;
     for ( int j = num_of_points_on_single_path - 1; j >= 0; --j )
     {
       full_path.push_back( single_path.get_a_point( j ) );
@@ -309,10 +309,7 @@ void SpeedlineToolPrivate::execute_path()
   ActionContextHandle context = Interface::GetMouseActionContext();
   ViewerHandle viewer = ViewerManager::Instance()->get_active_viewer();
 
-  if ( ! this->tool_->valid_target_data_layer_state_->get() )
-  {
-    return;
-  }
+  if ( ! this->tool_->valid_target_data_layer_state_->get() ) return;
 
   // If no viewer specified, use the current active viewer
   if ( ! viewer )
@@ -330,8 +327,7 @@ void SpeedlineToolPrivate::execute_path()
   if ( ! volume_slice ) return;
 
   const std::vector< Point > vertices = this->tool_->vertices_state_->get();
-std::cerr << "execute_path: #vertices=" << vertices.size() << std::endl;
-  if (vertices.size() < 2) { if (vertices.size() == 1) {std::cerr << vertices[0] << std::endl;} return; }
+  if (vertices.size() < 2) return;
 
   ActionSpeedline::Dispatch( context,
                              this->tool_->target_data_layer_state_->get(),
@@ -370,8 +366,14 @@ SpeedlineTool::SpeedlineTool( const std::string& toolid ) :
 
   // defaults from livewire tool test case
   this->add_state( "grad_mag_weight", this->grad_mag_weight_state_, 0.43, 0.0, 10.0, 0.01 );
+  this->add_connection( this->grad_mag_weight_state_->state_changed_signal_.connect(
+    boost::bind( &SpeedlineToolPrivate::handle_speed_params_changed, this->private_ ) ) );
   this->add_state( "zero_cross_weight", this->zero_cross_weight_state_, 0.43, 0.0, 10.0, 0.01 );
+  this->add_connection( this->zero_cross_weight_state_->state_changed_signal_.connect(
+    boost::bind( &SpeedlineToolPrivate::handle_speed_params_changed, this->private_ ) ) );
   this->add_state( "grad_dir_weight", this->grad_dir_weight_state_, 0.14, 0.0, 2.0, 0.01 );
+  this->add_connection( this->grad_dir_weight_state_->state_changed_signal_.connect(
+    boost::bind( &SpeedlineToolPrivate::handle_speed_params_changed, this->private_ ) ) );
 
   std::vector< LayerIDNamePair > empty_list( 1, 
     std::make_pair( Tool::NONE_OPTION_C, Tool::NONE_OPTION_C ) );
@@ -386,7 +388,7 @@ SpeedlineTool::SpeedlineTool( const std::string& toolid ) :
 
   // When speed image changes, recompute speedline.
   this->add_connection( this->roi_mask_state_->value_changed_signal_.connect(
-    boost::bind( &SpeedlineToolPrivate::handle_mask_layer_changed, this->private_, _2 ) ) );
+    boost::bind( &SpeedlineToolPrivate::handle_roi_mask_layer_changed, this->private_, _2 ) ) );
 
   this->add_state( "data_layer", this->target_data_layer_state_, Tool::NONE_OPTION_C, empty_list );
   this->add_extra_layer_input( this->target_data_layer_state_, VolumeType::DATA_E, false, false );
@@ -400,8 +402,11 @@ SpeedlineTool::SpeedlineTool( const std::string& toolid ) :
     boost::bind( &SpeedlineToolPrivate::handle_path_changed, this->private_ ) ) );
 
   this->add_state( "use_face_conn", this->use_face_conn_state_, true );
+  this->add_connection( this->use_face_conn_state_->state_changed_signal_.connect(
+    boost::bind( &SpeedlineToolPrivate::handle_speed_params_changed, this->private_ ) ) );
   this->add_state( "use_image_spacing", this->use_image_spacing_state_, true );
-
+  this->add_connection( this->use_image_spacing_state_->state_changed_signal_.connect(
+    boost::bind( &SpeedlineToolPrivate::handle_speed_params_changed, this->private_ ) ) );
 }
 
 SpeedlineTool::~SpeedlineTool()
@@ -522,21 +527,20 @@ void SpeedlineTool::reset( ActionContextHandle context )
   ActionClear::Dispatch( context, this->vertices_state_ );
   Application::PostEvent( boost::bind( &StateSpeedlinePath::set,
     this->path_state_, Path(), ActionSource::NONE_E ) );
-
-//  Application::PostEvent( boost::bind( &StateSpeedlinePath::set,
-//    this->itk_path_state_, Path(), ActionSource::NONE_E ) );
 }
 
 void SpeedlineTool::reset_parameters( ActionContextHandle context )
 {
-//  Application::PostEvent( boost::bind( &StateRangedInt::set,
-//    this->iterations_state_, 1000, ActionSource::NONE_E ) );
-//  Application::PostEvent( boost::bind( &StateRangedDouble::set,
-//    this->termination_state_, 1.0, ActionSource::NONE_E ) );
-//  Application::PostEvent( boost::bind( &StateBool::set,
-//    this->use_face_conn_state_, true, ActionSource::NONE_E ) );
-//  Application::PostEvent( boost::bind( &StateBool::set,
-//    this->use_image_spacing_state_, true, ActionSource::NONE_E ) );
+  Application::PostEvent( boost::bind( &StateRangedDouble::set,
+    this->grad_mag_weight_state_, 0.43, ActionSource::NONE_E ) );
+  Application::PostEvent( boost::bind( &StateRangedDouble::set,
+    this->zero_cross_weight_state_, 0.43, ActionSource::NONE_E ) );
+  Application::PostEvent( boost::bind( &StateRangedDouble::set,
+    this->grad_dir_weight_state_, 0.14, ActionSource::NONE_E ) );
+  Application::PostEvent( boost::bind( &StateBool::set,
+    this->use_face_conn_state_, true, ActionSource::NONE_E ) );
+  Application::PostEvent( boost::bind( &StateBool::set,
+    this->use_image_spacing_state_, true, ActionSource::NONE_E ) );
 }
 
 bool SpeedlineTool::handle_mouse_press( ViewerHandle viewer,
@@ -547,8 +551,6 @@ bool SpeedlineTool::handle_mouse_press( ViewerHandle viewer,
   if ( viewer->is_volume_view() ) return false;
 
   if ( ! this->valid_target_data_layer_state_->get() ) return false;
-
-std::cerr << "SpeedlineTool::handle_mouse_press" << std::endl;
 
   if ( button == Core::MouseButton::LEFT_BUTTON_E &&
        ( modifiers == Core::KeyModifier::NO_MODIFIER_E ||
