@@ -161,7 +161,7 @@ public:
     if ( this->m_AnchorSeed != index ) 
       {
       this->m_AnchorSeed = index;
-      if ( this->GetInputImage() != NULL )
+      if ( this->GetInputImage() != nullptr )
         {
         this->GeneratePathDirectionImage();
         }

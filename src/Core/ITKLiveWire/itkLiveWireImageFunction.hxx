@@ -42,8 +42,8 @@ LiveWireImageFunction<TInputImage>
   this->m_UseFaceConnectedness = true;
   this->m_UseImageSpacing = true;
 
-  this->m_ZeroCrossingImage = NULL;
-  this->m_MaskImage = NULL;
+  this->m_ZeroCrossingImage = nullptr;
+  this->m_MaskImage = nullptr;
 
   this->m_InsidePixelValue = NumericTraits<MaskPixelType>::One;
 
@@ -328,7 +328,7 @@ LiveWireImageFunction<TInputImage>
   if ( !this->IsInsideBuffer( index ) )
     {
     itkWarningMacro( "Requested index is not inside buffer." );
-    return NULL;
+    return nullptr;
     }
 
   if ( this->m_MaskImage && 
@@ -336,7 +336,7 @@ LiveWireImageFunction<TInputImage>
          != this->m_InsidePixelValue )
     {
     itkWarningMacro( "The index is outside the user-defined mask region." ); 
-    return NULL;
+    return nullptr;
     }    
 
   typename OutputType::Pointer output = OutputType::New();
