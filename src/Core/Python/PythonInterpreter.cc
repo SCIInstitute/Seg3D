@@ -3,7 +3,7 @@
 
  The MIT License
 
- Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
 
 
@@ -264,10 +264,8 @@ void PythonInterpreter::initialize_eventhandler()
   }
 
   Py_SetProgramName( const_cast< wchar_t* >( this->private_->program_name_ ) );
+
   boost::filesystem::path lib_path( this->private_->program_name_ );
-  boost::filesystem::path top_lib_path = lib_path.parent_path() / PYTHONPATH;
-  boost::filesystem::path dynload_lib_path = top_lib_path / "lib-dynload";
-  boost::filesystem::path site_lib_path = top_lib_path / "site-packages";
   std::wstringstream lib_paths;
 #if defined( _WIN32 )
   const std::wstring PATH_SEP(L";");
@@ -276,18 +274,40 @@ void PythonInterpreter::initialize_eventhandler()
 #endif
 
 #if defined( __APPLE__ )
-  boost::filesystem::path plat_lib_path = top_lib_path / "plat-darwin";
-  lib_paths << top_lib_path.wstring() << PATH_SEP
-            << plat_lib_path.wstring() << PATH_SEP
-            << dynload_lib_path.wstring() << PATH_SEP
-            << site_lib_path.wstring();
+  std::vector<boost::filesystem::path> lib_path_list;
+  // relative paths
+  lib_path_list.push_back(lib_path.parent_path().parent_path() / boost::filesystem::path("Frameworks") / PYTHONPATH);
+  lib_path_list.push_back(lib_path.parent_path() / PYTHONPATH);
+
+  for ( size_t i = 0; i < lib_path_list.size(); ++i )
+  {
+    auto path = lib_path_list[i];
+    boost::filesystem::path plat_lib_path = path / "plat-darwin";
+    boost::filesystem::path dynload_lib_path = path / "lib-dynload";
+    boost::filesystem::path site_lib_path = path / "site-packages";
+    if (i > 0)
+    {
+      lib_paths << PATH_SEP;
+    }
+    lib_paths << path.wstring() << PATH_SEP
+              << plat_lib_path.wstring() << PATH_SEP
+              << dynload_lib_path.wstring() << PATH_SEP
+              << site_lib_path.wstring();
+  }
+
   Py_SetPath( lib_paths.str().c_str() );
 #elif defined (_WIN32)
+  boost::filesystem::path top_lib_path = lib_path.parent_path() / PYTHONPATH / PYTHONNAME;
+  boost::filesystem::path dynload_lib_path = top_lib_path / "lib-dynload";
+  boost::filesystem::path site_lib_path = top_lib_path / "site-packages";
   lib_paths << top_lib_path.wstring() << PATH_SEP
             << site_lib_path.wstring();
   Py_SetPath( lib_paths.str().c_str() );
 #else
   // linux...
+  boost::filesystem::path top_lib_path = lib_path.parent_path() / PYTHONPATH;
+  boost::filesystem::path dynload_lib_path = top_lib_path / "lib-dynload";
+  boost::filesystem::path site_lib_path = top_lib_path / "site-packages";
   boost::filesystem::path plat_lib_path = top_lib_path / "plat-linux";
   lib_paths << top_lib_path.wstring() << PATH_SEP
             << plat_lib_path.wstring() << PATH_SEP
@@ -295,6 +315,9 @@ void PythonInterpreter::initialize_eventhandler()
             << site_lib_path.wstring();
   Py_SetPath( lib_paths.str().c_str() );
 #endif
+
+  // TODO: remove debug print when confident python initialization is stable
+  std::wcerr << lib_paths.str() << std::endl;
 
   Py_IgnoreEnvironmentFlag = 1;
   Py_InspectFlag = 1;

@@ -1,10 +1,9 @@
-
 #
 #  For more information, please see: http://software.sci.utah.edu
 # 
 #  The MIT License
 # 
-#  Copyright (c) 2009 Scientific Computing and Imaging Institute,
+#  Copyright (c) 2015 Scientific Computing and Imaging Institute,
 #  University of Utah.
 # 
 #  
@@ -40,12 +39,23 @@ SET(APPLICATION_FILTERS_SRCS
   ITKFilter.cc
   NrrdFilter.h
   NrrdFilter.cc
+  NrrdResampleFilter.h
+  NrrdResampleFilter.cc
+  ITKResampleFilter.h
+  ITKResampleFilter.cc
   LayerResampler.h
   LayerResampler.cc
   LayerFilterNotifier.h
   LayerFilterNotifier.cc
   ThresholdFilter.h
   ThresholdFilter.cc
+)
+
+SET(APPLICATION_FILTERS_UTILS_SRCS
+  Utils/PadFilterInternals.h
+  Utils/PadFilterInternals.cc
+  Utils/PadValues.h
+  Utils/PadValues.cc
 )
 
 SET(APPLICATION_FILTERS_ACTIONS_SRCS
@@ -131,15 +141,20 @@ SET(APPLICATION_FILTERS_ACTIONS_SRCS
   Actions/ActionPointSetTransformFilter.cc
   Actions/ActionRadialBasisFunction.h
   Actions/ActionRadialBasisFunction.cc
+  Actions/ActionPadFilter.h
+  Actions/ActionPadFilter.cc
 )
 
 IF(BUILD_WITH_PYTHON)
   GENERATE_ACTION_PYTHON_WRAPPER(PYTHON_WRAPPER Application_Filters ${APPLICATION_FILTERS_ACTIONS_SRCS})
   SET(APPLICATION_FILTERS_SRCS ${APPLICATION_FILTERS_SRCS} ${PYTHON_WRAPPER})
-ENDIF(BUILD_WITH_PYTHON)
+ENDIF()
   
-CORE_ADD_LIBRARY(Application_Filters ${APPLICATION_FILTERS_SRCS}
-  ${APPLICATION_FILTERS_ACTIONS_SRCS} )
+CORE_ADD_LIBRARY(Application_Filters
+  ${APPLICATION_FILTERS_SRCS}
+  ${APPLICATION_FILTERS_ACTIONS_SRCS}
+  ${APPLICATION_FILTERS_UTILS_SRCS}
+)
             
 TARGET_LINK_LIBRARIES(Application_Filters
   Core_Utils
@@ -156,3 +171,6 @@ TARGET_LINK_LIBRARIES(Application_Filters
 # Register action classes
 REGISTER_LIBRARY_AND_CLASSES(Application_Filters
   ${APPLICATION_FILTERS_ACTIONS_SRCS})
+
+#ADD_TEST_DIR(Tests)
+#ADD_TEST_DIR(Utils/Tests)

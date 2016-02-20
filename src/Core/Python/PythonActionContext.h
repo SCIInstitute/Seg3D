@@ -3,7 +3,7 @@
  
  The MIT License
  
- Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
  
  
@@ -71,12 +71,10 @@ public:
 
   // -- Reporting functions --
 public:
-  virtual void report_error( const std::string& error );
-  virtual void report_warning( const std::string& warning );
-  virtual void report_message( const std::string& message );
-  virtual void report_result( const Core::ActionResultHandle& result );
-  virtual void report_need_resource( Core::NotifierHandle notifier );
-  virtual Core::ActionSource source() const;
+  virtual void report_error( const std::string& error ) override;
+  virtual void report_warning( const std::string& warning ) override;
+  virtual void report_message( const std::string& message ) override;
+  virtual Core::ActionSource source() const override;
 
 private:
   friend class PythonInterpreter;

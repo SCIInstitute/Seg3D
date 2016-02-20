@@ -3,7 +3,7 @@
  
  The MIT License
  
- Copyright (c) 2014 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
  
  
@@ -52,7 +52,8 @@
 
 #include <Core/LargeVolume/LargeVolumeConverter.h>
 
-void printUsage() {
+void printUsage()
+{
   std::cout << "USAGE: " << Core::Application::Instance()->GetUtilName()
             <<  " first_file output_volume [OPTIONS]" << std::endl;
   std::cout << "Volume must be an image stack."
@@ -125,10 +126,10 @@ int main( int argc, char **argv )
     return -1;
   }
 
-  if (! Core::FileUtil::CheckExtension( first_file, ".tif|.tiff|.png|.jpg|.jpeg|.dcm|.dicom" ) )
+  if (! Core::FileUtil::CheckExtension( first_file, ".tif|.tiff|.png|.jpg|.jpeg|.dcm|.dicom|.nrrd|.nhdr" ) )
   {
     printUsage();
-    CORE_PRINT_AND_LOG_ERROR("Input file needs to be a png, jpg, or tiff file.");
+    CORE_PRINT_AND_LOG_ERROR("Input file needs to be a png, jpg, tiff, dicom or (2D) nrrd file.");
     return -1;
   }
   

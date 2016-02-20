@@ -195,44 +195,30 @@ ENDIF()
 
 SET( Seg3D_DEPENDENCIES )
 
+MACRO(ADD_EXTERNAL cmake_file external)
+  INCLUDE( ${cmake_file} )
+  LIST(APPEND Seg3D_DEPENDENCIES ${external})
+ENDMACRO()
+
 SET(SUPERBUILD_DIR ${CMAKE_CURRENT_SOURCE_DIR} CACHE INTERNAL "" FORCE)
 SET(SEG3D_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../src CACHE INTERNAL "" FORCE)
 SET(SEG3D_BINARY_DIR ${CMAKE_BINARY_DIR}/Seg3D CACHE INTERNAL "" FORCE)
 
-INCLUDE( ${SUPERBUILD_DIR}/ZlibExternal.cmake )
-LIST(APPEND Seg3D_DEPENDENCIES Zlib_external)
-
-INCLUDE( ${SUPERBUILD_DIR}/GlewExternal.cmake )
-LIST(APPEND Seg3D_DEPENDENCIES Glew_external)
-
-INCLUDE( ${SUPERBUILD_DIR}/FreetypeExternal.cmake )
-LIST(APPEND Seg3D_DEPENDENCIES Freetype_external)
-
-INCLUDE( ${SUPERBUILD_DIR}/SQLiteExternal.cmake )
-LIST(APPEND Seg3D_DEPENDENCIES SQLite_external)
-
-INCLUDE( ${SUPERBUILD_DIR}/LibPNGExternal.cmake )
-LIST(APPEND Seg3D_DEPENDENCIES LibPNG_external)
+ADD_EXTERNAL( ${SUPERBUILD_DIR}/DataExternal.cmake Data_external )
+ADD_EXTERNAL( ${SUPERBUILD_DIR}/ZlibExternal.cmake Zlib_external )
+ADD_EXTERNAL( ${SUPERBUILD_DIR}/GlewExternal.cmake Glew_external )
+ADD_EXTERNAL( ${SUPERBUILD_DIR}/FreetypeExternal.cmake Freetype_external )
+ADD_EXTERNAL( ${SUPERBUILD_DIR}/SQLiteExternal.cmake SQLite_external )
+ADD_EXTERNAL( ${SUPERBUILD_DIR}/LibPNGExternal.cmake LibPNG_external )
+ADD_EXTERNAL( ${SUPERBUILD_DIR}/TeemExternal.cmake Teem_external )
+ADD_EXTERNAL( ${SUPERBUILD_DIR}/ITKExternal.cmake ITK_external )
+ADD_EXTERNAL( ${SUPERBUILD_DIR}/ImplicitFunctionExternal.cmake ImplicitFunction_external )
 
 IF(BUILD_WITH_PYTHON)
-  INCLUDE( ${SUPERBUILD_DIR}/PythonExternal.cmake )
-  LIST(APPEND Seg3D_DEPENDENCIES Python_external)
+  ADD_EXTERNAL( ${SUPERBUILD_DIR}/PythonExternal.cmake Python_external )
 ENDIF()
 
-INCLUDE( ${SUPERBUILD_DIR}/ITKExternal.cmake )
-LIST(APPEND Seg3D_DEPENDENCIES ITK_external)
-
-INCLUDE( ${SUPERBUILD_DIR}/BoostExternal.cmake )
-LIST(APPEND Seg3D_DEPENDENCIES Boost_external)
-
-INCLUDE( ${SUPERBUILD_DIR}/TeemExternal.cmake )
-LIST(APPEND Seg3D_DEPENDENCIES Teem_external)
-
-INCLUDE( ${SUPERBUILD_DIR}/ImplicitFunctionExternal.cmake )
-LIST(APPEND Seg3D_DEPENDENCIES ImplicitFunction_external)
-
-INCLUDE( ${SUPERBUILD_DIR}/DataExternal.cmake )
-LIST(APPEND Seg3D_DEPENDENCIES Data_external)
+ADD_EXTERNAL( ${SUPERBUILD_DIR}/BoostExternal.cmake Boost_external )
 
 SET(SEG3D_CACHE_ARGS
     "-DCMAKE_VERBOSE_MAKEFILE:BOOL=${CMAKE_VERBOSE_MAKEFILE}"

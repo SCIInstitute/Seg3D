@@ -4,7 +4,7 @@
  
  The MIT License
  
- Copyright (c) 2014 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
  
  
@@ -101,6 +101,17 @@ TEST(CommandLineTests, StringParamNotFlag)
   ASSERT_TRUE( Core::Application::Instance()->is_command_line_parameter( "version") );
 }
 
+TEST(CommandLineTests, SingleLetterFlag)
+{
+  const int ARGC = 2;
+  char argv0[] = { 't', 'e', 's', 't', '\0' };
+  char argv1[] = { '-', 'h', '\0' };
+  char* argv[] = { argv0, argv1 };
+
+  Core::Application::Instance()->parse_command_line_parameters( ARGC, argv );
+  ASSERT_TRUE( Core::Application::Instance()->is_command_line_parameter( "h") );
+}
+
 TEST(CommandLineTests, VectorParam)
 {
   const int ARGC = 2;
@@ -162,5 +173,28 @@ TEST(CommandLineTests, VectorParamWithFileArgs)
   EXPECT_EQ( vector.x(), 0.1 );
   EXPECT_EQ( vector.y(), 0.1 );
   EXPECT_EQ( vector.z(), 0.1 );
+}
+
+TEST(CommandLineTests, NegativePointParamWithFileArgs)
+{
+  const int ARGC = 4;
+  const int FILE_ARGS = 2;
+  char argv0[] = { 't', 'e', 's', 't', '\0' };
+  char argv1[] = { 'f', 'i', 'l', 'e', '1', '\0' };
+  char argv2[] = { 'f', 'i', 'l', 'e', '2', '\0' };
+  char argv3[] = { '-', '-', 'p', 'o', 'i', 'n', 't', '=', '-', '0', '.', '1', ',', '-', '0', '.', '1', ',', '-', '0', '.', '1', '\0' };
+  char* argv[] = { argv0, argv1, argv2, argv3 };
+
+  Core::Application::Instance()->parse_command_line_parameters( ARGC, argv, FILE_ARGS );
+  ASSERT_TRUE( Core::Application::Instance()->is_command_line_parameter( "point") );
+
+  Core::Vector point(1.0, 1.0, 1.0);
+  std::string point_string;
+  ASSERT_TRUE( Core::Application::Instance()->check_command_line_parameter( "point" , point_string ) );
+  ASSERT_TRUE( Core::ImportFromString( point_string, point ) );
+
+  EXPECT_EQ( point.x(), -0.1 );
+  EXPECT_EQ( point.y(), -0.1 );
+  EXPECT_EQ( point.z(), -0.1 );
 }
 

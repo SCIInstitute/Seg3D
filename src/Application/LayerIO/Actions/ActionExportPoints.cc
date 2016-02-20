@@ -3,7 +3,7 @@
  
  The MIT License
  
- Copyright (c) 2014 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
  
  
@@ -113,11 +113,7 @@ void ActionExportPoints::Dispatch( Core::ActionContextHandle context,
                                    const PointVector& points )
 {
   // Create new action
-  ActionExportPoints* action = new ActionExportPoints;
-  
-  action->file_path_ = file_path;
-  action->points_ = points;
-  
+  ActionExportPoints* action = new ActionExportPoints(file_path, points);
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }
 
