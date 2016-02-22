@@ -96,6 +96,8 @@ public:
   /// NOTE: the indices returned can be out of the slice boundary.
   void world_to_index( double i_pos, double j_pos, int& i, int& j ) const;
 
+  void index_to_world( int i, int j, double& world_i, double& world_j ) const;
+
   /// Get the 3D world coordinate of the point
   void get_world_coord( double i_pos, double j_pos, Point& world_coord ) const;
 
