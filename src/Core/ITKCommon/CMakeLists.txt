@@ -159,6 +159,7 @@ TARGET_LINK_LIBRARIES(Core_ITKCommon
   Core_Utils
   ${ITKCommon_LIBRARIES}
   ${ITKIOTransformBase_LIBRARIES}
+  ${ITKOptimizers_LIBRARIES}
   ${ITKFFT_LIBRARIES}
 )
 
