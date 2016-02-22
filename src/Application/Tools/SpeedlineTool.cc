@@ -322,7 +322,8 @@ void SpeedlineToolPrivate::execute_path()
 
   if ( ! viewer || viewer->is_volume_view() ) return;
 
-  DataVolumeSliceHandle volume_slice = boost::dynamic_pointer_cast< DataVolumeSlice >( viewer->get_volume_slice( this->tool_->target_data_layer_state_->get() ) );
+  DataVolumeSliceHandle volume_slice = boost::dynamic_pointer_cast< DataVolumeSlice >(
+    viewer->get_volume_slice( this->tool_->target_data_layer_state_->get() ) );
 
   if ( ! volume_slice ) return;
 

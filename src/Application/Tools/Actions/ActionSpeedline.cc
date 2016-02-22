@@ -102,13 +102,13 @@ public:
 
     if ( this->slice_type_ == VolumeSliceType::SAGITTAL_E )
     {
-      // Collapse Dim X
+      // Collapse Dim X (YZ plane)
       size[ 0 ] = 0;
       start[ 0 ] = this->slice_number_;
     }
     else if ( this->slice_type_ == VolumeSliceType::CORONAL_E )
     {
-      // Collapse Dim Y
+      // Collapse Dim Y (XZ plane)
       size[ 1 ] = 0;
       start[ 1 ] = this->slice_number_;
 
@@ -116,7 +116,7 @@ public:
     else
     {
       // AXIAL_E
-      // Collapse Dim Z
+      // Collapse Dim Z (XY plane)
       size[ 2 ] = 0;
       start[ 2 ] = this->slice_number_;
     }
@@ -140,25 +140,16 @@ public:
   {
     typename TYPED_IMAGE_TYPE_2D::IndexType slice_point;
 
-    if ( this->slice_type_ == VolumeSliceType::SAGITTAL_E )
-    {
-      // Collapse Dim X (YZ plane)
-      slice_point[0] = point[1];
-      slice_point[1] = point[2];
-    }
-    else if ( this->slice_type_ == VolumeSliceType::CORONAL_E )
-    {
-      // Collapse Dim Y (XZ plane)
-      slice_point[0] = point[0];
-      slice_point[1] = point[2];
-    }
-    else
-    {
-      // AXIAL_E (XY plane)
-      // Collapse Dim Z
-      slice_point[0] = point[0];
-      slice_point[1] = point[1];
-    }
+    VolumeSliceType slice_type = static_cast< VolumeSliceType::enum_type >( this->slice_type_ );
+    DataVolumeSliceHandle volume_slice( new DataVolumeSlice( this->target_layer_->get_data_volume(), slice_type ) );
+
+    double world_x, world_y;
+    int x = -1, y = -1;
+    volume_slice->project_onto_slice( point, world_x, world_y );
+    volume_slice->world_to_index( world_x, world_y, x, y );
+    slice_point[0] = x;
+    slice_point[1] = y;
+
     return slice_point;
   }
 
@@ -167,28 +158,13 @@ public:
   {
     Point point;
 
-    if ( this->slice_type_ == VolumeSliceType::SAGITTAL_E )
-    {
-      // Restore Dim X (YZ plane)
-      point[0] = this->slice_number_;
-      point[1] = slice_point[0];
-      point[2] = slice_point[1];
-    }
-    else if ( this->slice_type_ == VolumeSliceType::CORONAL_E )
-    {
-      // Restore Dim Y (XZ plane)
-      point[0] = slice_point[0];
-      point[1] = this->slice_number_;
-      point[2] = slice_point[1];
-    }
-    else
-    {
-      // AXIAL_E (XY plane)
-      // Restore Dim Z
-      point[0] = slice_point[0];
-      point[1] = slice_point[1];
-      point[2] = this->slice_number_;
-    }
+    VolumeSliceType slice_type = static_cast< VolumeSliceType::enum_type >( this->slice_type_ );
+    DataVolumeSliceHandle volume_slice( new DataVolumeSlice( this->target_layer_->get_data_volume(), slice_type ) );
+
+    double world_x, world_y;
+    volume_slice->index_to_world( slice_point[0], slice_point[1], world_x, world_y );
+    volume_slice->get_world_coord( world_x, world_y, point );
+
     return point;
   }
 
@@ -270,9 +246,8 @@ public:
         std::ostringstream oss;
         oss << "Error computing path at " << p0 << " and " << p1 << "." << std::endl;
         this->report_error( oss.str() );
-        continue;
-        //this->world_paths_.delete_all_paths();
-        //return;
+        Application::PostEvent( boost::bind( &StateSpeedlinePath::set, world_path_state, Path(), ActionSource::NONE_E ) );
+        return;
       }
 
       const typename PATH_TYPE::VertexListType* vertexList = path->GetVertexList();
@@ -352,13 +327,13 @@ bool ActionSpeedline::validate( ActionContextHandle& context )
 //  {
 //    return false;
 //  }
-//
-//  // Check whether the target layer exists
-//  if ( !LayerManager::CheckLayerExistenceAndType( this->private_->target_layer_id_,
-//    VolumeType::DATA_E, context ) )
-//  {
-//    return false;
-//  }
+
+  // Check whether the target layer exists
+  if ( !LayerManager::CheckLayerExistenceAndType( this->private_->target_layer_id_,
+    VolumeType::DATA_E, context ) )
+  {
+    return false;
+  }
 
   if ( this->private_->vertices_.size() < 2 )
   {
@@ -455,39 +430,7 @@ bool ActionSpeedline::run( ActionContextHandle& context, ActionResultHandle& res
     }
   }
 
-  VolumeSliceType slice_type = static_cast< VolumeSliceType::enum_type >( this->private_->slice_type_ );
-  //this->private_->vol_slice_.reset( new Core::MaskVolumeSlice( algo->output_mask_layer_->get_mask_volume(), slice_type ) );
-  DataVolumeSliceHandle volume_slice( new DataVolumeSlice( algo->target_layer_->get_data_volume(), slice_type ) );
-
-  for ( auto &vertex : this->private_->vertices_ )
-  {
-    int i = -1, j = -1;
-
-    if ( this->private_->slice_type_ == VolumeSliceType::AXIAL_E )
-    {
-      volume_slice->world_to_index(vertex.x(), vertex.y(), i, j);
-    }
-    else if ( this->private_->slice_type_ == VolumeSliceType::CORONAL_E )
-    {
-      volume_slice->world_to_index(vertex.x(), vertex.z(), i, j);
-    }
-    else if ( this->private_->slice_type_ == VolumeSliceType::SAGITTAL_E )
-    {
-      volume_slice->world_to_index(vertex.y(), vertex.z(), i, j);
-    }
-    else
-    {
-      // this should not happen!
-      context->report_error( "Slice type is not volume, axial, coronal or sagittal." );
-      return false;
-    }
-
-    Core::Point indexPoint;
-    volume_slice->to_index(i, j, indexPoint);
-
-    algo->vertices_.push_back( indexPoint );
-  }
-
+  algo->vertices_ = this->private_->vertices_;
   algo->world_path_state_id_ = this->private_->world_path_state_id_;
 
   Runnable::Start( algo );
