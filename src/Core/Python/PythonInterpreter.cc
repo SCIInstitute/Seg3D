@@ -316,8 +316,10 @@ void PythonInterpreter::initialize_eventhandler()
   Py_SetPath( lib_paths.str().c_str() );
 #endif
 
+#ifndef NDEBUG
   // TODO: remove debug print when confident python initialization is stable
   std::wcerr << lib_paths.str() << std::endl;
+#endif
 
   Py_IgnoreEnvironmentFlag = 1;
   Py_InspectFlag = 1;
