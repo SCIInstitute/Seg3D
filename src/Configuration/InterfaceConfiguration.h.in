@@ -34,5 +34,6 @@
 // Set the version numbers of the application
 
 #define INTERFACE_ACCENT_COLOR "123, 143, 197"
+#define INTERFACE_ACCENT_HEX_COLOR "#7B8FC5"
 
 #endif

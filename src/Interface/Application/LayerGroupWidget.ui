@@ -16,71 +16,6 @@
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
-  <property name="styleSheet">
-   <string notr="true">QLabel#group_dimensions_label_{
-  color: white;
-  font: bold;
-}
-QWidget#LayerGroupWidget{
-  background-color: rgba( 0, 0, 0, 0 );
-}
-
-QToolButton#group_visibility_button_{
-  background-color: rgba(0, 0, 0, 0);
-  border: 1px solid rgba(0, 0, 0, 0);
-  margin: 0 0 0 0;
-  padding: 0 0 0 0;
-}
-QToolButton#group_visibility_button_:hover{
-  background-color: rgba( 0, 0, 0, 30 ); border-radius: 3px;
-}
-QToolButton#group_iso_visibility_button_{
-  background-color: rgba(0, 0, 0, 0);
-  border: 1px solid rgba(0, 0, 0, 0);
-  margin: 0 0 0 0;
-  padding: 0 0 0 0;
-}
-QToolButton#group_iso_visibility_button_:hover{
-  background-color: rgba( 0, 0, 0, 30 ); border-radius: 3px;
-}
-
-QFrame#group_frame_{
-  background-color: rgba(0, 0, 0, 0);
-  border: none;
-}
-
-QToolButton#open_button_{
-  background-color: rgba(0, 0, 0, 0);
-  border-radius: 4px;
-}
-
-QToolButton#open_button_:hover{
-  background-color: rgba( 0, 0, 0, 30 ); border-radius: 3px;
-}
-
-QWidget#group_header_{
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(0, 0, 0, 0), stop:0.45 rgba(0, 0, 0, 30), stop:1 rgba(0, 0, 0, 25));
-    border-radius: 3px;
-}
-
-QWidget#group_background_{
-  background-color: rgb(237, 165, 76);
-    border-radius: 3px;
-  border: 1px solid rgb(100, 100, 100);
-}
-
-QWidget#base_{
-  background-color: rgb( 100, 100, 100 );
-  border-radius:4px;
-  border: 1px solid rgb(60, 60, 60);
-  color: rgb(100, 100, 100);
-}
-
-QWidget#tools_and_layers_widget_{
-  background-color: rgba( 0, 0, 0, 0 );
-}
-</string>
-  </property>
   <layout class="QVBoxLayout" name="verticalLayout_12">
    <property name="spacing">
     <number>0</number>
@@ -95,7 +30,7 @@ QWidget#tools_and_layers_widget_{
        <number>0</number>
       </property>
       <property name="margin">
-       <number>1</number>
+       <number>0</number>
       </property>
       <item>
        <widget class="QWidget" name="group_background_" native="true">
@@ -305,7 +240,7 @@ QWidget#tools_and_layers_widget_{
             </size>
            </property>
            <property name="frameShape">
-            <enum>QFrame::StyledPanel</enum>
+            <enum>QFrame::NoFrame</enum>
            </property>
            <property name="frameShadow">
             <enum>QFrame::Raised</enum>
@@ -318,7 +253,7 @@ QWidget#tools_and_layers_widget_{
              <number>4</number>
             </property>
             <property name="margin">
-             <number>1</number>
+             <number>0</number>
             </property>
            </layout>
           </widget>

@@ -25,82 +25,6 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <property name="styleSheet">
-   <string notr="true">QToolButton{
-  background-color:  rgba( 0, 0, 0, 0 );
-  border: 1px solid  rgba( 0, 0, 0, 0 );
-  margin: 0, 0, 0, 0;
-  padding: 0, 0, 0, 0, ;
-}
-QToolButton:hover{
-  background-color: rgba( 0, 0, 0, 30 );
-}
-
-
- QComboBox {
-    /* padding: 1px 1px 1px 1px;
-    min-width: 6em;*/
-  background-color: rgba( 0,0,0,0 );
-  color: black;
- }
-
- QComboBox:editable {
- }
-
- QComboBox:!editable, QComboBox::drop-down:editable {
-  background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                  stop: 0 #E1E1E1, stop: 0.4 #DDDDDD,
-                                  stop: 0.5 #D8D8D8, stop: 1.0 #D3D3D3);
- }
-
- /* QComboBox gets the &quot;on&quot; state when the popup is open */
- QComboBox:!editable:on, QComboBox::drop-down:editable:on {
-     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                 stop: 0 #D3D3D3, stop: 0.4 #D8D8D8,
-                                 stop: 0.5 #DDDDDD, stop: 1.0 #E1E1E1);
- }
-
- QComboBox:on { /* shift the text when the popup opens */
- }
-
- QComboBox::drop-down {
-     subcontrol-origin: padding;
-     subcontrol-position: top right;
-    /* width: 16px;*/
-     border-top-right-radius: 2px;
-     border-bottom-right-radius: 2px;
- }
-
- QComboBox::down-arrow {
-     image: url(&quot;:/Images/Arrow.png&quot;);
- }
-
- QComboBox::down-arrow:on { /* shift the arrow when popup is open */
-     top: 0px;
-     left: 0px;
- }
-QComboBox::icon{
-  border: 1px solid rgba( 0, 0, 0, 0 );
-}
-
-QWidget#label_values_ {
-  background-color: rgba(50, 50, 50, 30 );
-  border-radius: 3px;
-    border: 1px solid  rgb( 150, 150, 150 );
-}
-
-QWidget#actives_{
-  background-color: rgba(50, 50, 50, 30 );
-  border-radius: 3px;
-    border: 1px solid  rgb( 150, 150, 150 );
-}
-
-QFrame#line{
-  background-color: rgb(150,150,150);
-}
-
-</string>
-  </property>
   <layout class="QHBoxLayout" name="horizontalLayout_11">
    <property name="spacing">
     <number>0</number>
@@ -163,8 +87,8 @@ QFrame#line{
         </property>
         <property name="icon">
          <iconset resource="../../Resources/QtResources.qrc">
-          <normaloff>:/Images/TextOff.png</normaloff>
-          <normalon>:/Images/Text.png</normalon>:/Images/TextOff.png</iconset>
+          <normaloff>:/Footer_Icons/new.png</normaloff>
+          <normalon>:/Footer_Icons/new.png</normalon>:/Footer_Icons/new.png</iconset>
         </property>
         <property name="checkable">
          <bool>true</bool>
@@ -454,8 +378,8 @@ QFrame#line{
            </property>
            <property name="icon">
             <iconset resource="../../Resources/QtResources.qrc">
-             <normaloff>:/Images/WorldOff.png</normaloff>
-             <normalon>:/Images/World.png</normalon>:/Images/WorldOff.png</iconset>
+             <normaloff>:/Footer_Icons/footer_01.png</normaloff>
+             <normalon>:/Footer_Icons/footer_01.png</normalon>:/Footer_Icons/footer_01.png</iconset>
            </property>
            <property name="checkable">
             <bool>true</bool>
@@ -864,7 +788,7 @@ QFrame#line{
         </property>
         <property name="icon">
          <iconset resource="../../Resources/QtResources.qrc">
-          <normaloff>:/Images/SwitchTool.png</normaloff>:/Images/SwitchTool.png</iconset>
+          <normaloff>:/Footer_Icons/switch_tool.png</normaloff>:/Footer_Icons/switch_tool.png</iconset>
         </property>
         <property name="iconSize">
          <size>

@@ -16,105 +16,34 @@
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
-  <property name="styleSheet">
-   <string notr="true">QToolButton#activate_button_{
-  background-color:rgba(0, 0, 0, 0);
-  border-color: rgba(0, 0, 0, 0);
-  border: none;
-  height: 24px;
-  text-align: left;
-  color: rgb(255, 255, 255);
-  padding-left:4px;
-  font: bold;
-}
+<!-- QWidget#page_header_{ -->
+<!--   background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(0, 0, 0, 0), stop:0.45 rgba(0, 0, 0,30), stop:1 rgba(0, 0, 0, 25)); -->
+<!--   /*background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(25, 25, 25, 0), stop:0.753769 rgba(0, 0, 0, 100), stop:1 rgba(0, 0, 0, 84));*/ -->
+<!--     border-radius: 3px; -->
+<!--   border: 1px solid rgb( 60, 60, 60 ); -->
+<!-- } -->
 
-QToolButton#spacer_{
-  background-color:rgba(0, 0, 0, 0);
-  border-color: rgba(0, 0, 0, 0);
-  border: none;
-  height: 24px;
-  text-align: left;
-  color: rgb(255, 255, 255);
-  padding-left:4px;
-  font: bold;
-}
+<!-- QWidget#page_background_{ -->
+<!--   /*background-color: rgb(255, 128, 0);*/ -->
+<!--   background-color: rgb( 237, 165, 76 ); -->
+<!--     border-radius: 3px; -->
+<!-- } -->
 
-QToolButton#activate_button_:hover{
-  color: rgb(255, 255, 255);
-}
-
-QToolButton#activate_button_:pressed{
-  background-color:rgba(0, 0, 0, 0);
-  border-color: rgba(0, 0, 0, 0);
-  padding-left: 4px;
-  border: none;
-  color:  rgb(100, 100, 100);
-}
-
-QToolButton#spacer_:pressed{
-  background-color:rgba(0, 0, 0, 0);
-  border-color: rgba(0, 0, 0, 0);
-  padding-left: 4px;
-  border: none;
-  color:  rgb(100, 100, 100);
-}
-
-QToolButton#close_button_{
-  background-color: rgba(0, 0, 0, 0);
-  border-radius: 4px;
-}
-
-QToolButton#close_button_:hover{
-  background-color: rgba(0, 0, 0, 20);
-}
-
-QToolButton#close_button_:pressed{
-  background-color: rgb(100, 100, 100);
-  border-radius: 4px;
-}
-
-QToolButton#help_button_{
-  background-color: rgba(0, 0, 0, 0);
-  border-radius: 4px;
-}
-
-QToolButton#help_button_:hover{
-  background-color: rgba(0, 0, 0, 20);
-}
-
-QToolButton#help_button_:pressed{
-  background-color: rgb(100, 100, 100);
-  border-radius: 4px;
-}
-
-QWidget#page_header_{
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(0, 0, 0, 0), stop:0.45 rgba(0, 0, 0,30), stop:1 rgba(0, 0, 0, 25));
-  /*background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(25, 25, 25, 0), stop:0.753769 rgba(0, 0, 0, 100), stop:1 rgba(0, 0, 0, 84));*/
-    border-radius: 3px;
-  border: 1px solid rgb( 60, 60, 60 );
-}
-
-QWidget#page_background_{
-  /*background-color: rgb(255, 128, 0);*/
-  background-color: rgb( 237, 165, 76 );
-    border-radius: 3px;
-}
-
-QWidget#ToolBoxPageWidget{
-  /*background-color: gray;*/
+<!-- QWidget#ToolBoxPageWidget{ -->
+<!--   /*background-color: gray;*/ -->
   
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(100, 100, 100, 255), stop:0.36 rgba(80, 80, 80, 255), stop:0.65 rgba(80, 80, 80, 255), stop:1 rgba(100, 100, 100, 255));
-  border-radius:3px;
-  border: 1px solid rgb( 100, 100, 100 );
-}
+<!--   background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(100, 100, 100, 255), stop:0.36 rgba(80, 80, 80, 255), stop:0.65 rgba(80, 80, 80, 255), stop:1 rgba(100, 100, 100, 255)); -->
+<!--   border-radius:3px; -->
+<!--   border: 1px solid rgb( 100, 100, 100 ); -->
+<!-- } -->
 
-QWidget#tool_frame_{
-  background-color: rgba(0, 0, 0, 0);
-  border: 1px solid rgba(0, 0, 0, 0);
-}
+<!-- QWidget#tool_frame_{ -->
+<!--   background-color: rgba(0, 0, 0, 0); -->
+<!--   border: 1px solid rgba(0, 0, 0, 0); -->
+<!-- } -->
 
-</string>
-  </property>
+<!-- </string> -->
+<!--   </property> -->
   <layout class="QVBoxLayout" name="verticalLayout_3">
    <property name="spacing">
     <number>0</number>
@@ -183,7 +112,7 @@ QWidget#tool_frame_{
           <number>0</number>
          </property>
          <property name="rightMargin">
-          <number>2</number>
+          <number>5</number>
          </property>
          <property name="bottomMargin">
           <number>0</number>
@@ -250,14 +179,14 @@ QWidget#tool_frame_{
           <widget class="QToolButton" name="close_button_">
            <property name="minimumSize">
             <size>
-             <width>16</width>
-             <height>16</height>
+             <width>10</width>
+             <height>10</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>16</width>
-             <height>16</height>
+             <width>10</width>
+             <height>10</height>
             </size>
            </property>
            <property name="text">
@@ -265,7 +194,7 @@ QWidget#tool_frame_{
            </property>
            <property name="icon">
             <iconset resource="../../Resources/QtResources.qrc">
-             <normaloff>:/Images/CloseWhite.png</normaloff>:/Images/CloseWhite.png</iconset>
+             <normaloff>:/General_Icons/exit.png</normaloff>:/General_Icons/exit.png</iconset>
            </property>
           </widget>
          </item>

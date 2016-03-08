@@ -271,7 +271,7 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
     group->layers_iso_visible_state_ );
 
   this->private_->ui_.group_frame_layout_->setAlignment( Qt::AlignTop );
-  this->private_->ui_.group_frame_layout_->setSpacing( 1 );
+  this->private_->ui_.group_frame_layout_->setSpacing( 0 );
   this->private_->ui_.verticalLayout_13->setAlignment( Qt::AlignTop );
 
   this->private_->overlay_ = new OverlayWidget( this );
@@ -422,6 +422,8 @@ void LayerGroupWidget::show_layers( bool show )
     this->private_->group_height = this->private_->ui_.tools_and_layers_widget_->height();
     this->private_->ui_.tools_and_layers_widget_->hide();
     this->private_->ui_.fake_widget_->setMinimumHeight( 0 );
+    this->private_->ui_.group_background_->setStyleSheet( StyleSheet::GROUP_WIDGET_BACKGROUND_INACTIVE_C );
+
   }
 }
   

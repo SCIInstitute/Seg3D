@@ -25,10 +25,12 @@
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
  */
- 
+// Qt Includes
 #include <QtGui/QColor>
 #include <QtGui/QBrush>
 
+// Interface Includes
+#include <Interface/Application/StyleSheet.h>
 #include <Interface/Application/ControllerLogHistory.h>
 
 namespace Seg3D
@@ -83,14 +85,34 @@ QVariant ControllerLogHistory::data( const QModelIndex& index, int role ) const
     if ( index.row() < sz )
     {
       log_entry_type log_entry = log_history_[ sz - index.row() - 1 ];
+      QBrush brush;
       if ( index.column() == 0 )
       {
-        if ( log_entry.first & Core::LogMessageType::ERROR_E ) return QBrush( QColor( 255, 0, 0 ) );
-        if ( log_entry.first & Core::LogMessageType::WARNING_E ) return QBrush(
-            QColor( 204, 51, 0 ) );
-        if ( log_entry.first & Core::LogMessageType::MESSAGE_E ) return QBrush(
-            QColor( 0, 0, 76 ) );
-        return QBrush( QColor( 76, 0, 0 ) );
+        switch( log_entry.first )
+        {
+        case Core::LogMessageType::ERROR_E:
+          brush = QBrush( QColor( StyleSheet::ERROR_COLOR_C ) );
+          break;
+        case Core::LogMessageType::CRITICAL_ERROR_E:
+          brush = QBrush( QColor( StyleSheet::CRITICAL_ERROR_COLOR_C ) );
+          break;
+        case Core::LogMessageType::WARNING_E:
+          brush = QBrush( QColor( StyleSheet::WARNING_COLOR_C ) );
+          break;
+        case Core::LogMessageType::MESSAGE_E:
+          brush = QBrush( QColor( StyleSheet::MESSAGE_COLOR_C ) );
+          break;
+        case Core::LogMessageType::SUCCESS_E:
+          brush = QBrush( QColor( StyleSheet::SUCCESS_COLOR_C ) );
+          break;
+        case Core::LogMessageType::DEBUG_E:
+          brush = QBrush( QColor( StyleSheet::DEBUG_COLOR_C ) );
+          break;
+        default:
+          brush = QBrush( QColor( StyleSheet::MESSAGE_COLOR_C ) );
+          break;
+        }
+        return brush;
       }
     }
     else

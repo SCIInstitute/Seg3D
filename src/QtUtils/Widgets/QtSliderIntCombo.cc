@@ -66,6 +66,12 @@ QtSliderIntCombo::QtSliderIntCombo( QWidget* parent, bool edit_range ) :
   this->private_->ui_.min_->setFont( font );
   this->private_->ui_.max_->setFont( font );
   this->private_->ui_.spinBox->setFont( font ); 
+
+#ifdef __APPLE__
+  font = this->private_->ui_.description_->font();
+  font.setPointSize( 12 );
+  this->private_->ui_.description_->setFont( font );
+#endif
 }
 
 QtSliderIntCombo::~QtSliderIntCombo()

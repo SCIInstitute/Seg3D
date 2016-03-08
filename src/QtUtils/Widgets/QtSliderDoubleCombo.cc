@@ -68,6 +68,12 @@ QtSliderDoubleCombo::QtSliderDoubleCombo( QWidget* parent ) :
   this->private_->ui_.max_->setFont( font );
   this->private_->ui_.spinBox->setFont( font );
 
+#ifdef __APPLE__
+  font = this->private_->ui_.description_->font();
+  font.setPointSize( 12 );
+  this->private_->ui_.description_->setFont( font );
+#endif
+
   this->connect( this->private_->ui_.horizontalSlider, SIGNAL( valueChanged( int ) ), 
   this, SLOT( slider_signal( int ) ) );
   this->connect( this->private_->ui_.spinBox, SIGNAL( valueChanged( double ) ), 

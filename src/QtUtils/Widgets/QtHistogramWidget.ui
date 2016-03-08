@@ -38,7 +38,7 @@ QLabel#label_3{
     <number>0</number>
    </property>
    <item>
-    <widget class="QWidget" name="base_" native="true">
+    <widget class="QWidget" name="histBase_" native="true">
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <property name="spacing">
        <number>2</number>

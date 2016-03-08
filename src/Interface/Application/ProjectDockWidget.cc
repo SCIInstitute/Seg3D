@@ -57,6 +57,7 @@
 
 // Interface includes
 #include <Interface/Application/ProjectDockWidget.h>
+#include <Interface/Application/StyleSheet.h>
 #include <Interface/Application/ProjectExportWizard.h>
 #include <Interface/Application/SaveProjectAsWizard.h>
 #include "ui_ProjectDockWidget.h"
@@ -298,10 +299,12 @@ ProjectDockWidget::ProjectDockWidget( QWidget *parent ) :
   this->private_ = new ProjectDockWidgetPrivate( this );
   // Setup the User Interface 
   this->private_->ui_.setupUi( this );
-  
+
+  this->private_->ui_.dockWidgetContents->setStyleSheet( StyleSheet::PROJECTDOCKWIDGET_C );
   // Update some settings in the design from QtDesigner that we cannot set directly
   QStringList headers; headers << "Time" << "Session Name";
   this->private_->ui_.sessions_list_->setHorizontalHeaderLabels( headers );
+  this->private_->ui_.sessions_list_->horizontalHeader()->setDefaultAlignment( Qt::AlignLeft );
   this->private_->ui_.horizontalLayout_2->setAlignment( Qt::AlignHCenter );
 
   this->private_->ui_.session_name_linedit_->setValidator( new QRegExpValidator( 

@@ -60,6 +60,7 @@
 
 // Interface includes
 #include <Interface/Application/ApplicationInterface.h>
+#include <Interface/Application/StyleSheet.h>
 #include <Interface/Application/ControllerInterface.h>
 #include <Interface/Application/HistoryDockWidget.h>
 #include <Interface/Application/LayerIOFunctions.h>
@@ -131,12 +132,14 @@ ApplicationInterface::ApplicationInterface( std::string file_to_view_on_open ) :
   // This function ensures that all the images are available
   InitQtResources();
 
+  this->setStyleSheet( StyleSheet::MAIN_STYLE_C );
+
   // Set the window information and set the version numbers
   this->setWindowTitle( QString::fromStdString( Core::Application::GetApplicationNameAndVersion() ) );
   this->setWindowIconText( QString::fromStdString( Core::Application::GetApplicationName() ) );
 
   // TODO: Do we need this one?
-  this->setDocumentMode( true );
+  this->setDocumentMode( false );
 
   // Tell Qt what size to start up in
   this->resize( 1280, 720 );

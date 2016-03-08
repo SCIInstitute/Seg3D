@@ -79,7 +79,8 @@ public:
 public:
   void set_enabled( bool enabled );
   
-
+protected:
+  QWidget* dock_base_;
   
 private:
   boost::shared_ptr< QtCustomDockWidgetPrivate > private_;

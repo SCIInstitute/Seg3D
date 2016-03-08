@@ -215,33 +215,6 @@ void LayerWidgetPrivate::update_appearance( bool locked, bool active, bool in_us
   this->active_ = active;
   this->in_use_ = in_use;
 
-  // Update the background color inside the icon
-  switch( this->get_volume_type() )
-  {
-
-    case Core::VolumeType::LARGE_DATA_E:
-    case Core::VolumeType::DATA_E:
-    {
-      if ( locked )
-      {
-        this->ui_.type_->setStyleSheet( 
-          StyleSheet::LAYER_WIDGET_BACKGROUND_LOCKED_C );
-      }
-      else
-      {
-        this->ui_.type_->setStyleSheet( StyleSheet::DATA_VOLUME_COLOR_C );
-      }
-    }
-    break;
-    case Core::VolumeType::MASK_E:
-    {
-      int color_index =  dynamic_cast< MaskLayer* >( 
-        this->layer_.get() )->color_state_->get();
-      this->parent_->set_mask_background_color( color_index );
-    }
-    break;
-  }
-
   if ( locked )
   {
     this->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_LOCKED_C );
@@ -558,11 +531,11 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   // Store the icons in the private class, so they only need to be generated once
   this->private_->label_layer_icon_.addFile( QString::fromUtf8( ":/Images/LabelMapWhite.png" ),
     QSize(), QIcon::Normal, QIcon::Off );
-  this->private_->data_layer_icon_.addFile( QString::fromUtf8( ":/Images/DataWhite.png" ), 
+  this->private_->data_layer_icon_.addFile( QString::fromUtf8( ":/Palette_Icons/layers.png" ), 
     QSize(), QIcon::Normal, QIcon::Off );
-  this->private_->mask_layer_icon_.addFile( QString::fromUtf8( ":/Images/MaskWhite_shadow.png" ), 
+  this->private_->mask_layer_icon_.addFile( QString::fromUtf8( ":/Palette_Icons/mask_transparent.png" ), 
     QSize(), QIcon::Normal, QIcon::Off );
-  this->private_->large_data_layer_icon_.addFile( QString::fromUtf8( ":/Images/LargeWhite.png" ), 
+  this->private_->large_data_layer_icon_.addFile( QString::fromUtf8( ":/Palette_Icons/windowed.png" ), 
     QSize(), QIcon::Normal, QIcon::Off );
 
   // Update the style sheet of this widget
@@ -571,27 +544,15 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
 
   // Add the Ui children onto the QWidget
   this->private_->ui_.setupUi( this );
-  
-#ifdef __APPLE__
-  QList<QLabel*> children = findChildren< QLabel* >();
-  QList<QLabel*>::iterator it = children.begin();
-  QList<QLabel*>::iterator it_end = children.end();
-  
-  while( it != it_end )
-  {
-    QFont font = ( *it )->font();
-    font.setPointSize( 11 );
-    ( *it )->setFont( font );
-    ++it;
-  }
-#endif  
-  
-  
+
+  this->setProperty( StyleSheet::PALETTE_BACKGROUND_PROPERTY_C, true );
+  this->setStyleSheet( StyleSheet::LAYERWIDGET_C );
+
   this->setUpdatesEnabled( false );
-  
+
   // set some Drag and Drop stuff
   this->setAcceptDrops( true );
-  
+
   // Set the defaults
   // this is a default setting until we can get the name of the layer from the file or by some other means
   this->private_->ui_.label_->setText( QString::fromStdString( layer->name_state_->get() ) );
@@ -622,13 +583,10 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   this->private_->activate_button_ = new PushDragButton( this->private_->ui_.typeGradient_ );
   this->private_->activate_button_->setObjectName( QString::fromUtf8( "activate_button_" ) );
   this->private_->activate_button_->setStyleSheet( StyleSheet::LAYER_PUSHDRAGBUTTON_C );
-  this->private_->activate_button_->setMinimumHeight( 37 );
-  this->private_->activate_button_->setMinimumWidth( 29 );
-  this->private_->activate_button_->setIconSize( QSize( 25, 25 ) );
-  this->private_->ui_.horizontalLayout_9->setContentsMargins( 1, 0, 1, 0 );
+  this->private_->ui_.horizontalLayout_9->setContentsMargins( 0, 0, 0, 0 );
   this->private_->ui_.horizontalLayout_9->addWidget( this->private_->activate_button_ );
   this->private_->activate_button_->setAcceptDrops( false );
-  
+ 
   // add the DropSpaceWidget
   this->private_->drop_space_ = new DropSpaceWidget( this );
   this->private_->ui_.verticalLayout_10->insertWidget( 0, this->private_->drop_space_ );
@@ -637,7 +595,8 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   this->private_->color_widget_ = new QtUtils::QtColorBarWidget( this );
   this->private_->ui_.horizontalLayout_14->addWidget( this->private_->color_widget_ );
   this->private_->color_widget_->setObjectName( QString::fromUtf8( "color_widget_" ) );
-        
+  this->private_->activate_button_->setIconSize( QSize(38, 43) );
+    
   this->connect( this->private_->ui_.abort_button_,
     SIGNAL ( pressed() ), this, SLOT( trigger_abort() ) );
 
@@ -1042,7 +1001,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   this->private_->overlay_->hide(); 
   this->private_->ui_.facade_widget_->hide();
   this->private_->ui_.verticalLayout_3->setAlignment( Qt::AlignBottom );
-  
+
   this->private_->update_widget_state( true );
   this->setUpdatesEnabled( true );
 }
@@ -1098,11 +1057,13 @@ void LayerWidget::set_mask_background_color( int color_index )
   int b = static_cast< int >( color.b() );
 
   QString style_sheet = QString::fromUtf8( 
-  "background-color: rgb(" ) + QString::number( r ) +
+  "QWidget#type_{ background-color: rgb(" ) + QString::number( r ) +
   QString::fromUtf8( ", " ) + QString::number( g ) +
   QString::fromUtf8( ", " ) + QString::number( b ) +
-  QString::fromUtf8( ");" );
-
+  QString::fromUtf8( ");"
+      " padding: 5px;"
+      " background-clip: content;"
+"}" );
   this->private_->ui_.type_->setStyleSheet( style_sheet );
 }
 

@@ -37,6 +37,7 @@
 #include <Core/Interface/Interface.h>
 
 // Interface includes
+#include <Interface/Application/StyleSheet.h>
 #include <Interface/ToolInterface/detail/MeasurementTableModel.h>
 
 // Application includes
@@ -227,7 +228,7 @@ QVariant MeasurementTableModel::data( const QModelIndex& index, int role ) const
     {
       // The active index is always selected, but if one column is highlighted it may not be
       // obvious which is the active index, so color it.
-      return QBrush( QColor( 225, 243, 252 ) ); // Light blue
+      return QBrush( QColor( StyleSheet::ACCENT_COLOR_C ) );
     }
   }
   return QVariant(); 

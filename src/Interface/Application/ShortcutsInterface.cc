@@ -45,6 +45,7 @@
 
 // Interface Includes
 #include <Interface/Application/ShortcutsInterface.h>
+#include <Interface/Application/StyleSheet.h>
 
 #include "ui_ShortcutsInterface.h"
 
@@ -66,6 +67,7 @@ ShortcutsInterface::ShortcutsInterface( QWidget *parent ) :
 {
   // Set up the private internals of the MessageWindow class
   this->private_->ui_.setupUi( this );
+  this->setStyleSheet( StyleSheet::SHORTCUTS_C );
   this->private_->ui_.python_shortcut_label_->hide();
   this->private_->ui_.controller_shortcut_label_->hide();
   
@@ -210,7 +212,7 @@ void ShortcutsInterface::show_active_tool_contols( ToolHandle tool )
   
   this->private_->new_active_tool_->deleteLater();
   
-  this->private_->new_active_tool_ = new QWidget();
+  this->private_->new_active_tool_ = new QWidget(this);
   this->private_->new_active_tool_->setObjectName( 
     QString::fromUtf8( "new_active_tool" ) );
   this->private_->new_active_tool_->setGeometry(QRect( 0, 0, 377, 152 ) );
@@ -219,8 +221,7 @@ void ShortcutsInterface::show_active_tool_contols( ToolHandle tool )
   new_verticalLayout_8->setContentsMargins( 0, 0, 0, 0 );
   new_verticalLayout_8->setObjectName( QString::fromUtf8( "new_verticalLayout_8" ) );
   new_verticalLayout_8->setAlignment( Qt::AlignTop );
-  this->private_->new_active_tool_->setStyleSheet( QString::fromUtf8( "background-color: white;" ) );
-  
+
   this->private_->ui_.scrollArea_3->setWidget( this->private_->new_active_tool_ );
   
   if( hotkeys == "" )

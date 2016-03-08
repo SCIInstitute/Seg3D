@@ -19,24 +19,6 @@
   <property name="windowTitle">
    <string>Seg3D 2.0 - Message History</string>
   </property>
-  <property name="styleSheet">
-   <string notr="true">QWidget#HistoryWidget {
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(221, 221, 221, 255), stop:0.155779 rgba(228, 228, 228, 255), stop:1 rgba(202, 204, 204, 255));
-}
-
-QLabel#message_label_{
-  color: rgb(3, 86, 2);
-}
-
-QLabel#error_label_{
-  color: rgb(121, 0, 0);
-}
-
-QLabel#warning_label_{
-  color: rgb(165, 161, 34);
-}
-</string>
-  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
     <number>0</number>

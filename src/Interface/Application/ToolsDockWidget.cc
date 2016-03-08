@@ -59,7 +59,7 @@ ToolsDockWidget::ToolsDockWidget( QWidget *parent ) :
 
   this->setMinimumSize( QSize( 300, 300 ) );
   this->tool_dock_widget_contents_ = new QWidget();
-    
+  
   // Create a new ToolBoxWidget that encapsulates all the tool widgets
   this->v_layout_ = new QVBoxLayout( this->tool_dock_widget_contents_ );
   this->v_layout_->setSpacing( 0 );

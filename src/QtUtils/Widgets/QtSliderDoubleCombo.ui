@@ -19,9 +19,6 @@
   <property name="windowTitle">
    <string>SliderCombo</string>
   </property>
-  <property name="styleSheet">
-   <string notr="true"/>
-  </property>
   <layout class="QHBoxLayout" name="horizontalLayout_4">
    <property name="spacing">
     <number>0</number>
@@ -30,42 +27,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QWidget" name="base_" native="true">
-     <property name="styleSheet">
-      <string notr="true">QWidget#base_
-{
-  border-radius: 3px;
-  border: 1px solid rgba(0,0,0,30);
-  background-color: qlineargradient(spread:pad, x1:0.475, y1:0, x2:0.486, y2:1, stop:0 rgba(0, 0, 0, 10), stop:0.276836 rgba(255, 255, 255, 0), stop:1 rgba(0, 0, 0,20));
-}
-
-QSlider#horizontalSlider
-{
-  background-color: rgba(255, 255, 255, 0);
-}
-
-QWidget#widget_2
-{
-  background-color: rgba(255, 255, 255, 0);
-}
-
-QLabel#description_{
-  color: rgb( 60,60,60 );
-}
-
-QLabel#description_:disabled{
-  color: rgb( 140,140,140 );
-}
-
-QLabel#description_:enabled{
-  color: rgb( 60,60,60 );
-}
-QWidget#widget_3{ 
-  border: 1px solid rgb(240, 240, 240); border-radius: 3px;
-}
-
-</string>
-     </property>
+    <widget class="QWidget" name="sliderDoubleBase_" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_3">
       <property name="spacing">
        <number>1</number>
@@ -189,9 +151,6 @@ QWidget#widget_3{
           <width>45</width>
           <height>0</height>
          </size>
-        </property>
-        <property name="styleSheet">
-         <string notr="true"/>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <property name="spacing">

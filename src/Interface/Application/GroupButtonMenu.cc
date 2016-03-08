@@ -41,8 +41,8 @@
 #include <QtUtils/Bridge/QtBridge.h>
 
 //Interface Includes
-#include <Interface/Application/GroupButtonMenu.h>
 #include <Interface/Application/StyleSheet.h>
+#include <Interface/Application/GroupButtonMenu.h>
 #include <Interface/Application/DropSpaceWidget.h>
 #include <Interface/Application/OverlayWidget.h>
 #include <Interface/Application/LayerWidget.h>
@@ -73,6 +73,9 @@ GroupButtonMenu::GroupButtonMenu( QWidget* parent, LayerGroupHandle group ) :
   private_( new GroupButtonMenuPrivate )
 { 
   this->private_->ui_.setupUi( this );
+
+  this->setProperty(StyleSheet::PALETTE_BACKGROUND_PROPERTY_C, true);
+  this->private_->ui_.background_->setStyleSheet(StyleSheet::GROUP_MENUBAR_C);
   
   // Set up the Drag and Drop
   this->setAcceptDrops( true );
@@ -156,7 +159,6 @@ GroupButtonMenu::GroupButtonMenu( QWidget* parent, LayerGroupHandle group ) :
   this->private_->overlay_ = new OverlayWidget( this ); 
   this->private_->overlay_->hide();
   
-  this->setStyleSheet( StyleSheet::GROUP_MENUBAR_C );
 }
 
 GroupButtonMenu::~GroupButtonMenu()

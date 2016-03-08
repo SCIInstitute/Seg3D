@@ -57,6 +57,7 @@
 #include <Application/Layer/Actions/ActionDeleteSandbox.h>
 
 //Interface Includes
+#include <Interface/Application/StyleSheet.h>
 #include <Interface/Application/LayerManagerWidget.h>
 #include <Interface/Application/LayerGroupWidget.h>
 #include "ui_LayerManagerWidget.h"
@@ -493,6 +494,9 @@ LayerManagerWidget::LayerManagerWidget( QWidget* parent ) :
   this->private_ = new LayerManagerWidgetPrivate( this );
   this->private_->ui_.setupUi( this );
 
+  // Setup style sheets
+  this->setStyleSheet( StyleSheet::LAYERMANAGERWIDGET_C );
+  
   // Setup the alignment of groups
   this->private_->ui_.group_layout_->setAlignment( Qt::AlignTop );
 

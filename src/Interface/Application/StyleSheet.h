@@ -42,19 +42,24 @@ namespace Seg3D
 class StyleSheet
 {
 public:
-
-  // == Group menubar == //
-    const static QString GROUP_MENUBAR_C;
-
-  // === ViewerWidget Styles === //
-    const static QString VIEWERWIDGET_TOOLBAR_C;
+  // == custom properties == //
+    const static char* PALETTE_BACKGROUND_PROPERTY_C;
   
+  // == Default Parent style == //
+    const static QString MAIN_STYLE_C;
+
+  // === GroupMenuBar === //
+    const static QString GROUP_MENUBAR_C;
+    
   // === StatusBar === //
     const static QString STATUSBAR_C;
     const static QString STATUSBAR_ERROR_C;
     const static QString STATUSBAR_WARNING_C;
     const static QString STATUSBAR_MESSAGE_C;
     const static QString STATUSBAR_DEBUG_C;
+    
+  // === ToolBoxWidget Styles === //
+    const static QString TOOLBOXWIDGET_C;
     
   // === ToolBoxPageWidget Styles === //
     // - page_background_ - //
@@ -63,12 +68,14 @@ public:
     // - activate_button_ - //
     const static QString TOOLBOXPAGEWIDGET_ACTIVATE_BUTTON_ACTIVE_C;
     const static QString TOOLBOXPAGEWIDGET_ACTIVATE_BUTTON_INACTIVE_C;
-    
+  
   // === LayerImporterWidget === //
     // - Buttons - //
     const static QString LAYERIMPORTERWIDGET_ACTIVE_BUTTON_C;
     const static QString LAYERIMPORTERWIDGET_INACTIVE_BUTTON_C;
 
+  // === LayerManagerWidget Styles === //
+    const static QString LAYERMANAGERWIDGET_C;
   
   // === LayerWidget Styles === //
     // - LayerWidget - //
@@ -109,14 +116,9 @@ public:
   
   // === LayerGroupWidget Styles === //
     // - ACTIVE - //
-    const static QString GROUP_WIDGET_BASE_ACTIVE_C;
     const static QString GROUP_WIDGET_BACKGROUND_ACTIVE_C;
-    const static QString GROUP_WIDGET_ACTIVATE_BUTTON_ACTIVE_C;
-    // - INACTIVE - //
-    const static QString GROUP_WIDGET_BASE_INACTIVE_C;
     const static QString GROUP_WIDGET_BACKGROUND_INACTIVE_C;
-    const static QString GROUP_WIDGET_ACTIVATE_BUTTON_INACTIVE_C;
-    
+
   // === PushDragButton's === //
     const static QString LAYER_PUSHDRAGBUTTON_C;
     const static QString GROUP_PUSHDRAGBUTTON_C;
@@ -125,10 +127,14 @@ public:
     const static QString DROPSPACEWIDGET_C;
   
   // === ViewerWidget === //
+    const static QString VIEWERWIDGET_C;
     const static QString VIEWERSELECTED_C;
     const static QString VIEWERNOTSELECTED_C;
+    const static QString VIEWERWIDGET_SINGLELINE_C;
+    const static QString VIEWERWIDGET_DOUBLELINE_C;
     
   // == Rendering DockWidget == //
+    const static QString RENDERINGWIDGET_C;
     const static QString RENDERING_CLIPPING_ACTIVE_C;
     const static QString RENDERING_CLIPPING_INACTIVE_C;   
 
@@ -138,11 +144,31 @@ public:
     const static QString RENDERING_VR_ACTIVE_C;
     const static QString RENDERING_VR_INACTIVE_C;   
 
+  // == Project DockWidget == //
+    const static QString PROJECTDOCKWIDGET_C;
+
   // == ProvenanceDockWidget == //
     const static QString PROVENANCE_LIST_HEADER_C;
     
     const static QString LAYERIO_C;
-    
+
+  // == SplashScreen == //
+    const static QString SPLASHSCREEN_C;
+
+  // == Preferences Interface == //
+    const static QString PREFERENCES_C;
+
+  // == Shortcuts Interface == //
+    const static QString SHORTCUTS_C;
+
+  // == Colors == //
+    const static QString ACCENT_COLOR_C;
+    const static QString CRITICAL_ERROR_COLOR_C;
+    const static QString ERROR_COLOR_C;
+    const static QString WARNING_COLOR_C;
+    const static QString MESSAGE_COLOR_C;
+    const static QString SUCCESS_COLOR_C;
+    const static QString DEBUG_COLOR_C;
 };    
 
 }  // end namespace Seg3D

@@ -59,6 +59,11 @@ QtColorButton::QtColorButton( QWidget *parent, int index, Core::Color button_col
     this->setSizePolicy( sizePolicy );
   }
 
+  //QIcon button_icon;
+  //button_icon.addFile( QString::fromUtf8(":/Palette_Icons/color_transparent.png"),
+  //                     QSize(), QIcon::Normal );
+  //this->setIcon(button_icon);
+
   connect( this, SIGNAL( toggled ( bool ) ), this, SLOT( trigger_signal( bool ) ) );
 }
   
@@ -74,7 +79,10 @@ void QtColorButton::set_color( Core::Color button_color )
     "background-color: rgb(" ) + QString::number( this->button_color_.r() ) +
     QString::fromUtf8( ", " ) + QString::number( this->button_color_.g() ) +
     QString::fromUtf8( ", " ) + QString::number( this->button_color_.b() ) +
-    QString::fromUtf8( ");" );
+    QString::fromUtf8( ");")  +
+    QString::fromUtf8( " border-radius: 3px; "
+      " border: 1px none rgba(106, 106, 112, 255);"
+      );
       
   this->setStyleSheet( style_sheet );
   

@@ -117,6 +117,7 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
 {
   this->private_->viewer_ = viewer;
   this->private_->ui_.setupUi( this );
+  this->setStyleSheet( StyleSheet::VIEWERWIDGET_C );
   
   // NOTE: IF YOU ADD ANOTHER BUTTON TO THE VIEWERWIDGET, PLEASE ADD IT TO THE buttons_ VECTOR.
   // We make a vector of all the buttons this way we can calculate the minimum size that the 
@@ -152,6 +153,7 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
   this->private_->ui_.button_layout_->setStretchFactor( this->private_->ui_.common_tools_, 0 );
   this->private_->ui_.button_layout_->setStretchFactor( this->private_->ui_.less_common_tools_, 1 );
   this->private_->ui_.button_layout_->setAlignment( Qt::AlignLeft );
+  this->private_->ui_.toolbar_layout_->setAlignment( Qt::AlignCenter );
   this->private_->ui_.common_tools_layout_->setAlignment( Qt::AlignLeft );
   this->private_->ui_.less_common_tools_layout_->setAlignment( Qt::AlignLeft );
   this->private_->ui_.horizontalLayout->setAlignment( Qt::AlignLeft );
@@ -347,8 +349,7 @@ void ViewerWidget::resizeEvent( QResizeEvent * event )
   {
 //    this->private_->ui_.sep_line_->hide();    
     this->private_->ui_.button_layout_->removeWidget( this->private_->ui_.less_common_tools_ );
-    this->private_->ui_.buttonbar_->setStyleSheet( QString::fromUtf8( "QWidget#buttonbar_{ border-bottom: 1px solid gray; }" ) );
-    this->private_->ui_.viewer_mode_holder_->setStyleSheet( QString::fromUtf8( "QWidget#viewer_mode_holder_{ border-bottom: 1px solid gray; }" ) );
+    this->private_->ui_.toolbar_->setStyleSheet( StyleSheet::VIEWERWIDGET_DOUBLELINE_C );
     this->private_->ui_.toolbar_layout_->addWidget( this->private_->ui_.less_common_tools_, 0 );
     
     this->update();
@@ -357,8 +358,7 @@ void ViewerWidget::resizeEvent( QResizeEvent * event )
   {
 //    this->private_->ui_.sep_line_->show();  
     this->private_->ui_.toolbar_layout_->removeWidget( this->private_->ui_.less_common_tools_ );
-    this->private_->ui_.buttonbar_->setStyleSheet( QString::fromUtf8( "QWidget#buttonbar_{ border-bottom: none; }" ) );
-    this->private_->ui_.viewer_mode_holder_->setStyleSheet( QString::fromUtf8( "QWidget#viewer_mode_holder_{ border-bottom: none; }" ) );
+    this->private_->ui_.toolbar_->setStyleSheet( StyleSheet::VIEWERWIDGET_SINGLELINE_C );
     this->private_->ui_.button_layout_->addWidget( this->private_->ui_.less_common_tools_, 1 );
     
     this->update();

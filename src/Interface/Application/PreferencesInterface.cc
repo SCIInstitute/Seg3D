@@ -45,6 +45,7 @@
 
 // Interface includes
 #include <Interface/Application/PreferencesInterface.h>
+#include <Interface/Application/StyleSheet.h>
 
 // Resource includes
 #include <Resources/QtResources.h>
@@ -70,7 +71,7 @@ PreferencesInterface::PreferencesInterface( QWidget *parent ) :
   InitQtResources();
 
     this->private_->ui_.setupUi( this );
-    
+    this->private_->ui_.prefs_tabs_->setStyleSheet( StyleSheet::PREFERENCES_C );
   // Update the title of the dialog
   std::string title = std::string( "Preferences - "  )
     + Core::Application::GetApplicationNameAndVersion();
