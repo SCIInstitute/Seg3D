@@ -160,8 +160,9 @@ public:
 
   /// EXPORT_LAYER
   /// Export the layer to file
-  virtual bool export_layer( const std::string& mode, const std::string& file_path, 
-    const std::string& name ) = 0;
+  virtual bool export_layer( const std::string& mode,
+                             const std::string& file_path,
+                             const std::string& name ) = 0;
 };
 
 

@@ -94,16 +94,11 @@ void set_data_series_names( itk::NumericSeriesFileNames::Pointer& name_series_ge
 { 
   boost::filesystem::path path = boost::filesystem::path( file_path );
 
-  // here we make sure that we dont have an extension and then afterwards we add the correct one
-//  std::string filename_without_extension = file_name;
-//  filename_without_extension = filename_without_extension.substr( 0, filename_without_extension.find_last_of( "." ) );
-
   std::string ext, filename_base;
   std::tie( ext, filename_base ) = Core::GetFullExtension( boost::filesystem::path( file_name ) );
 
-//  boost::filesystem::path filename_path = path / filename_without_extension;
   boost::filesystem::path filename_path = path / filename_base;
-std::cerr << "series name=[" << filename_path.string() << "]" << std::endl;
+
   if ( size < 100 )
   {
     name_series_generator->SetSeriesFormat( filename_path.string() + "-%02d" + extension );
@@ -457,7 +452,6 @@ bool ITKDataLayerExporter::export_layer_internal( const std::string& file_path,
   else if ( ! this->extension_.empty() )
   {
     return export_image_series< InputPixelType >( file_path, name, image_data->get_image(), this->extension_ );
-    //if ( ! this->export_itk_series( file_path ) ) return false;
   }
 
   CORE_LOG_SUCCESS( "Data export has been successfully completed." );
