@@ -30,12 +30,30 @@
 
 #include <Core/Geometry/Transform.h>
 
+#define EPSILON 10e-9
+#define EPSILONF 10e-9f
+
 using namespace Core;
 
 TEST(TransformTests, EmptyTransform)
 {
   Transform *transform = new Transform;
   ASSERT_FALSE(transform == nullptr);
+
+  // default rotation matrix should be identity
+  Matrix matrix = transform->get_matrix();
+  double *data = matrix.data();
+  for (size_t i =  0; i < 16; ++i)
+  {
+    if (i == 0 || i == 5 || i == 10 || i == 15)
+    {
+      ASSERT_NEAR(data[i], 1, EPSILON);
+    }
+    else
+    {
+      ASSERT_NEAR(data[i], 0, EPSILON);
+    }
+  }
 }
 
 
@@ -43,4 +61,19 @@ TEST(TransformTests, EmptyTransformF)
 {
   TransformF *transform = new TransformF;
   ASSERT_FALSE(transform == nullptr);
+
+  // default rotation matrix should be identity
+  MatrixF matrix = transform->get_matrix();
+  float *data = matrix.data();
+  for (size_t i =  0; i < 16; ++i)
+  {
+    if (i == 0 || i == 5 || i == 10 || i == 15)
+    {
+      ASSERT_NEAR(data[i], 1, EPSILONF);
+    }
+    else
+    {
+      ASSERT_NEAR(data[i], 0, EPSILONF);
+    }
+  }
 }
