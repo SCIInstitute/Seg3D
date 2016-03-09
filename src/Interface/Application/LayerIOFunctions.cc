@@ -44,6 +44,7 @@
 
 // Core includes
 #include <Core/State/Actions/ActionSet.h>
+#include <Core/Utils/FilesystemUtil.h>
 #include <Core/Utils/Log.h>
 #include <Core/LargeVolume/LargeVolumeSchema.h>
 #include <Core/Isosurface/Isosurface.h>
@@ -369,18 +370,21 @@ void LayerIOFunctions::ExportLayer( QMainWindow* main_window )
     ProjectManager::Instance()->get_current_file_folder();
 
   QString filename = QFileDialog::getSaveFileName( main_window, "Export Data Layer As... ",
-    QString::fromStdString( file_path.string() ),
-    "NRRD files (*.nrrd);;DICOM files (*.dcm);;TIFF files (*.tiff);;PNG files (*.png);;MRC files (*.mrc);;Matlab files (*.mat)" );
+  QString::fromStdString( file_path.string() ),
+    "NRRD files (*.nrrd);;DICOM files (*.dcm);;Compressed NIfTI files (*.nii.gz);;NIfTI files (*.nii);;TIFF files (*.tiff);;PNG files (*.png);;MRC files (*.mrc);;Matlab files (*.mat)" );
 
-  if ( filename == "" ) return;
+  if ( filename.isEmpty() ) return;
 
-  std::string extension = boost::filesystem::extension( boost::filesystem::path( filename.toStdString() ) ); 
+  //std::string extension = boost::filesystem::extension( boost::filesystem::path( filename.toStdString() ) );
+  std::string extension, base;
+  std::tie( extension, base ) = Core::GetFullExtension( boost::filesystem::path( filename.toStdString() ) );
+  std::cerr << "[" << extension << "]" << std::endl;
   std::string exportername;
 
-  if( extension == ".nrrd" ) exportername = "NRRD Exporter";
-  else if( extension == ".mat" ) exportername = "Matlab Exporter";
-  else if( extension == ".mrc" ) exportername = "MRC Exporter";
-  else if( extension != "" ) exportername = "ITK Data Exporter";
+  if ( extension == ".nrrd" ) exportername = "NRRD Exporter";
+  else if ( extension == ".mat" ) exportername = "Matlab Exporter";
+  else if ( extension == ".mrc" ) exportername = "MRC Exporter";
+  else if ( extension != "" ) exportername = "ITK Data Exporter";
 
   LayerExporterHandle exporter;
   if ( ! LayerIO::Instance()->create_exporter( exporter, layer_handles, exportername, extension ) )
@@ -389,7 +393,7 @@ void LayerIOFunctions::ExportLayer( QMainWindow* main_window )
       filename.toStdString() + std::string("'.");
 
     QMessageBox message_box( main_window );
-    message_box.setWindowTitle( "Import Layer..." );
+    message_box.setWindowTitle( "Export Layer..." );
     message_box.addButton( QMessageBox::Ok );
     message_box.setIcon( QMessageBox::Critical );
     message_box.setText( QString::fromStdString( error_message ) );

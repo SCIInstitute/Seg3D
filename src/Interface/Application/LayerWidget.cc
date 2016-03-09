@@ -1423,6 +1423,12 @@ void LayerWidget::contextMenuEvent( QContextMenuEvent * event )
     qaction = export_menu->addAction( tr( "MRC" ) );
     connect( qaction, SIGNAL( triggered() ), this, SLOT( export_mrc() ) );
 
+    qaction = export_menu->addAction( tr( "NIFTI" ) );
+    connect( qaction, SIGNAL( triggered() ), this, SLOT( export_nifti() ) );
+
+    qaction = export_menu->addAction( tr( "COMPRESSED NIFTI" ) );
+    connect( qaction, SIGNAL( triggered() ), this, SLOT( export_compressed_nifti() ) );
+
     menu.addMenu( export_menu );
   }
 
@@ -1490,6 +1496,16 @@ void LayerWidget::export_bitmap()
 void LayerWidget::export_png()
 {
   this->private_->export_layer( ".png" );
+}
+
+void LayerWidget::export_nifti()
+{
+  this->private_->export_layer( ".nii" );
+}
+
+void LayerWidget::export_compressed_nifti()
+{
+  this->private_->export_layer( ".nii.gz" );
 }
 
 void LayerWidget::export_isosurface()

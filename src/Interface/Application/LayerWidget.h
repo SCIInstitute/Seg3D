@@ -206,6 +206,14 @@ private Q_SLOTS:
   /// dispatches an action that exports the layer as a png
   void export_png();
 
+  /// EXPORT_NIFTI:
+  /// dispatches an action that exports the layer as a nifti
+  void export_nifti();
+
+  /// EXPORT_NIFTI:
+  /// dispatches an action that exports the layer as a gzip compressed nifti
+  void export_compressed_nifti();
+
   /// EXPORT_ISOSURFACE:
   /// dispatches an action that exports the isosurface for this layer
   void export_isosurface();

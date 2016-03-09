@@ -265,7 +265,8 @@ bool ITKLayerImporterPrivate::read_header()
   // Get the extension to see which reader to use
   // NOTE: We spell them out so we can read the header data returned by the IO class.
   boost::filesystem::path full_filename( this->importer_->get_filename() );
-  std::string extension = Core::GetFullExtension( full_filename );
+  std::string extension, base;
+  std::tie( extension, base ) = Core::GetFullExtension( full_filename );
 
   // Set file type and scan the file for data type and transform
   if ( detect_tiff(extension) )
@@ -407,7 +408,8 @@ bool ITKLayerImporterPrivate::read_data()
   
   // Get the extension of the file
   boost::filesystem::path full_filename( this->importer_->get_filename() );
-  std::string extension = Core::GetFullExtension( full_filename );
+  std::string extension, base;
+  std::tie( extension, base ) = Core::GetFullExtension( full_filename );
 
   if ( detect_tiff(extension) )
   {

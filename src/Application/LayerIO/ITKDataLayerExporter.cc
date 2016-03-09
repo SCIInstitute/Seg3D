@@ -30,6 +30,7 @@
 #include <boost/algorithm/string/case_conv.hpp>
 
 // itk includes
+#include <itkImageFileWriter.h>
 #include <itkImageSeriesWriter.h>
 #include <itkImageSeriesReader.h>
 #include <itkNumericSeriesFileNames.h>
@@ -91,7 +92,7 @@ cast_image( typename Core::ITKImageDataT< InputPixelType >::Handle image_data )
 void set_data_series_names( itk::NumericSeriesFileNames::Pointer& name_series_generator, 
                             const std::string& file_path, const std::string& file_name,
                             const size_t size, const std::string& extension )
-{ 
+{
   boost::filesystem::path path = boost::filesystem::path( file_path );
 
   std::string ext, filename_base;
@@ -117,6 +118,36 @@ void set_data_series_names( itk::NumericSeriesFileNames::Pointer& name_series_ge
   }
 }
 
+template< class PixelType >
+bool export_volume( const std::string& file_path,
+                    const std::string& file_name,
+                    typename itk::Image< PixelType, DIM_3D >::Pointer itk_image,
+                    const std::string& extension )
+{
+  boost::filesystem::path full_file(file_path);
+  full_file /= file_name;
+  full_file.replace_extension( extension );
+
+  typedef itk::Image< PixelType, DIM_3D > OutputImageType;
+  typedef itk::ImageFileWriter< OutputImageType > WriterType;
+  typename WriterType::Pointer writer = WriterType::New();
+
+  writer->SetInput( itk_image );
+  writer->SetFileName( full_file.string() );
+
+  try
+  {
+    writer->Update();
+  }
+  catch ( itk::ExceptionObject &err )
+  {
+    std::string itk_error = err.GetDescription();
+    CORE_LOG_ERROR(itk_error);
+    return false;
+  }
+
+  return true;
+}
 
 ////////////// - Templated functions for exporting bitmaps and DICOM's - ///////////////
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -268,7 +299,6 @@ bool export_dicom_series( const std::string& file_path,
       }
       catch (itk::ExceptionObject & err ) 
       {
-        //std::cerr << "error " << err << std::endl;
         std::string itk_error = err.GetDescription();
         CORE_LOG_ERROR(itk_error);
         return false;
@@ -444,11 +474,11 @@ bool ITKDataLayerExporter::export_layer_internal( const std::string& file_path,
       return export_image_series< InputPixelType >( file_path, name, image_data->get_image(), this->extension_ );
     }
   }
-//  else if ( this->extension_ == ".nii" || this->extension_ == ".nii.gz" )
-//  {
-//    // all
-//    //if ( ! this->export_itk_volume( file_path ) ) return false;
-//  }
+  else if ( this->extension_ == ".nii" || this->extension_ == ".nii.gz" )
+  {
+    // supports all
+    return export_volume< InputPixelType >( file_path, name, image_data->get_image(), this->extension_ );
+  }
   else if ( ! this->extension_.empty() )
   {
     return export_image_series< InputPixelType >( file_path, name, image_data->get_image(), this->extension_ );
