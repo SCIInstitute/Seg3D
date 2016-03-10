@@ -3,7 +3,7 @@
 
  The MIT License
 
- Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
 
 
@@ -224,7 +224,8 @@ protected:
   MatrixF mat_;
 };
 
-
+std::ostream& operator<<( std::ostream& os, const Transform& t );
+std::ostream& operator<<( std::ostream& os, const TransformF& t );
 
 } // End namespace Core
 

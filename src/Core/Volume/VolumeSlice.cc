@@ -3,7 +3,7 @@
 
  The MIT License
 
- Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
 
 
@@ -324,6 +324,33 @@ void VolumeSlice::world_to_index( double x_pos, double y_pos, int& i, int& j ) c
     break;
   default:
     break;
+  }
+}
+
+void VolumeSlice::index_to_world( int i, int j, double& world_i, double& world_j ) const
+{
+  Point pos;
+  double i_pos = static_cast< double >(i);
+  double j_pos = static_cast< double >(j);
+  switch ( this->private_->slice_type_ )
+  {
+    case VolumeSliceType::AXIAL_E:
+      pos = this->private_->grid_transform_ * Point( i_pos, j_pos, 0 );
+      world_i = pos.x();
+      world_j = pos.y();
+      break;
+    case VolumeSliceType::CORONAL_E:
+      pos = this->private_->grid_transform_ * Point( i_pos, 0, j_pos );
+      world_i = pos.x();
+      world_j = pos.z();
+      break;
+    case VolumeSliceType::SAGITTAL_E:
+      pos = this->private_->grid_transform_ * Point( 0, i_pos, j_pos );
+      world_i = pos.y();
+      world_j = pos.z();
+      break;
+    default:
+      break;
   }
 }
 

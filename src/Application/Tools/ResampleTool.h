@@ -3,7 +3,7 @@
 
  The MIT License
 
- Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
 
 
@@ -73,12 +73,15 @@ public:
   Core::StateRangedIntHandle output_dimensions_state_[ 3 ];
   Core::StateBoolHandle constraint_aspect_state_;
   Core::StateRangedDoubleHandle scale_state_;
+  Core::StateRangedIntHandle spline_order_state_;
   
   Core::StateLabeledOptionHandle kernel_state_;
   Core::StateRangedDoubleHandle gauss_sigma_state_;
   Core::StateRangedDoubleHandle gauss_cutoff_state_;
-  Core::StateBoolHandle has_params_state_;
-  
+
+  Core::StateBoolHandle has_gaussian_params_state_;
+  Core::StateBoolHandle has_bspline_params_state_;
+
   Core::StateBoolHandle valid_size_state_;
   Core::StateBoolHandle replace_state_;
 

@@ -3,7 +3,7 @@
 
  The MIT License
 
- Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
 
 
@@ -175,6 +175,8 @@ Point operator*( const GridTransform& gt, const Point& d );
 Vector operator*( const GridTransform& gt, const Vector& d );
 PointF operator*( const GridTransform& gt, const PointF& d );
 VectorF operator*( const GridTransform& gt, const VectorF& d );
+
+std::ostream& operator<<( std::ostream& os, const GridTransform& gt );
 
 std::string ExportToString( const GridTransform& value );
 bool ImportFromString( const std::string& str, GridTransform& value );

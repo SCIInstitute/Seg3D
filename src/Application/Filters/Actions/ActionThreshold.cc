@@ -110,7 +110,7 @@ bool ActionThreshold::run( Core::ActionContextHandle& context,
   algo->lock_for_use( src_layer );
 
   // Return the id of the destination layer.
-  result = Core::ActionResultHandle( new Core::ActionResult( algo->data_layer()->get_layer_id() ) );
+  result = Core::ActionResultHandle( new Core::ActionResult( algo->mask_layer()->get_layer_id() ) );
 
   // If the action is run from a script (provenance is a special case of script),
   // return a notifier that the script engine can wait on.

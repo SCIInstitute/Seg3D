@@ -1260,23 +1260,23 @@ E & Erase flood fill\\
 
 \subsection{Resample}
 
-The resample tool will allow the user to resample one or more volumes to change the resolution.  This tool can be performed on both mask and data layers.  
+The resample tool will allow the user to resample one or more volumes to change the resolution. This tool can be performed on both mask and data layers.
 
-The resampling can be set manually using the sliders, or by trying to match the element number of another layer group.  To manually choose the resampling, there are options to resample with the same ratio in every direction (check `Constrain Aspect' option) or to resample each direction independently (must uncheck `Constrain Aspect' option to enable).  To resample to match another group, you must have another layer group loaded.  You may choose the desired group from the drop down menu and the padding value.  
+The resampling can be set manually using the sliders, or by trying to match the element number of another layer group. To manually choose the resampling, there are options to resample with the same ratio in every direction (check `Constrain Aspect' option) or to resample each direction independently (must uncheck `Constrain Aspect' option to enable). To resample to match another group, you must have another layer group loaded. You may choose the desired group from the drop down menu and the padding value.
 
-Interpolation of the data is often needed when resampling, especially with image data.  There are several options for interpolation in the resample tool: box, tent, cubic (Catmull-Rom and B-spline), quartic, and guassian.  You may choose the interpolation method in the drop down menu near the bottom of  the tool window.
+Interpolation of the data is often needed when resampling, especially with image data. There are several options for interpolation in the resample tool: Box, Tent, Cubic (Catmull-Rom and B-spline), Quartic, and Gaussian which are provided by the Teem library, and Linear, B-spline and Nearest Neighbor from the ITK library. You may choose the interpolation method in the drop down menu near the bottom of the tool window.
 
 Resampling a layer to match the geometry of another group can also be done by clicking (left mouse button) on a layer while holding down the Shift key, and dragging the layer to the destination group.
 
 \subsection{Speedline}
 
-The speedline tool is similar to the polyline tool in that you use lines to identify a region to segment, but the speedline tool attempts to alter that path between set points to find edges in the image data.  This tool is very useful, but is one of the most complex tools presented in Seg3D.  However, it is not beyond the reach of even a beginner of the software. 
+The speedline tool, which is based on the \href{http://www.insight-journal.org/browse/publication/230}{Live-Wire algorithm}, is similar to the polyline tool in that you use lines to identify a region to segment, but the speedline tool attempts to alter that path between set points to find edges in the image data. The speedline tool computes the shortest path from a source to a target pixel using a cost function that uses the following parameters, which can be found in the tool interface: Gradient Magnitude (image gradient), Zero Cross (image zero-crossings), Gradient Direction (boundary smoothness constraint). The Face Connectiveness option is used to toggle the use of a local neighborhood. The Image Spacing option is used to toggle the use of a neighborhood weighting scaling factor.
 
-The primary input of the speedline tool is a mask layer which will be altered.  The second input is a speed image, which is similar to a gradient magnitude image.  This speedline image can be created with this tool by choosing the desired image layer in the `Image Data Layer' drop down menu (second one from the top of the tool window) and pressing the `create speed image' button.  The `smooth' option provides additional smoothing to the image and is not needed if the image data has already been smoothed.  When the 'create speed image' button is pressed, a new image layer will be created and the `speed image' option should automatically update to select this new layer.  Otherwise, the user should select the new speed image.  Now the speedline selection can begin.
+The primary input of the speedline tool is a mask layer which will be altered. The second input is a data volume. Smoothing the input data volume is recommended before using the speedline tool. An additional mask input can be used to constrain the speedline to a given region of interest. Now the speedline selection can begin.
 
-The selection of the the speedline is virtually identical to the selection of a polyline.  The user will place points and the software will create a shape with those points.  In the speedline case, a new point will be ordered to create as smooth a shape as possible, and the path of the connection will attempt to follow high intensity regions of the speed image (edges of the original image).  Once the desired shape is created, the user can fill the region, or erase it to the mask layer input.  
+The selection of the the speedline is virtually identical to the selection of a polyline. The user will place points and the software will create a shape with those points.  In the speedline case, a new point will be ordered to create as smooth a shape as possible, and the path of the connection will attempt to follow high intensity regions of the speed image (edges of the original image). Once the desired shape is created, the user can fill the region, or erase it to the mask layer input.
 
-it should be noted that if the active slice changes, the points will not change, but the connections will still attempt to follow the edge regions of the images.  This can therefore be used to segment multiple slices quickly if the slices do not dramatically change.  The speedline points can be cleared or reset in the tool window.  The user can also set the iterations and termination value to use in the path selection algorithm.  
+It should be noted that if the active slice changes, the points will not change, but the connections will still attempt to follow the edge regions of the images. This can therefore be used to segment multiple slices quickly if the slices do not dramatically change. The speedline points can be cleared or reset in the tool window. The user can also set the iterations and termination value to use in the path selection algorithm.
 
 \begin{table}[h!]
 \label{tab:speedlinekey}
@@ -1285,21 +1285,18 @@ it should be noted that if the active slice changes, the points will not change,
 \hline
 {\bf Action} & {\bf Function}\\
 \hline 
-left mouse & add or move point \\
+left mouse & add or move point\\
 \hline
 right mouse & erase point\\
 \hline
-Shift+left mouse & move polyline (on one of the points)\\
-\hline
 F & Paint flood fill\\
 \hline
-E & Erase flood fill\\ 
+E & Erase flood fill\\
 \hline
 C & Clear seed points\\
 \hline
 \end{tabular}
 \end{table}
-
 
 \subsection{Threshold}
 
@@ -1437,7 +1434,11 @@ The neighborhood connected filter is like a combination of the threshold tool an
 
 \subsection{Otsu Threshold}
 
-The Otsu threshold filter attempts to cluster data values in a data layer based upon how similar they are and create mask layers identifying the regions of similar data.  This filter provides a good quick segmentation in many cases.  There is a \href{http://en.wikipedia.org/wiki/Otsu's_method}{Wikipedia atricle} containing a good description of the Otsu threshold algorithm.
+The Otsu threshold filter attempts to cluster data values in a data
+layer based upon how similar they are and create mask layers
+identifying the regions of similar data.  This filter provides a good
+quick segmentation in many cases.  There is a
+\href{http://en.wikipedia.org/wiki/Otsu's_method}{Wikipedia article} containing a good description of the Otsu threshold algorithm.
 
 Using the Ostu threshold filter is simple.  The only parameter in this implementation is the number of thresholds (1 to 4), or the number of divisions in the volume.  The results of this filter are mutually exclusive (no output will mask the same pixel as another layer) and collectively exhaustive (the whole volume will be mask by one of the output layers) so that there will be one more mask layer generated than thresholds used.  A histogram is presented to aid the user in choosing the threshold number.
 

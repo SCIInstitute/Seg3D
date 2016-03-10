@@ -3,7 +3,7 @@
 
  The MIT License
 
- Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
 
 
@@ -226,7 +226,7 @@ typedef ITKDoubleImageData::handle_type ITKDoubleImageDataHandle;
 
 template<class T>
 ITKImageDataT<T>::ITKImageDataT( typename image_type::Pointer itk_image ) :
-  itk_image_(itk_image)
+  itk_image_( itk_image )
 {
 }
 
@@ -261,7 +261,7 @@ bool ITKImageDataT<T>::initialize( DataBlockHandle data_block, Transform transfo
   DataType image_data_type = GetDataType( reinterpret_cast<T*>(0) );
   if ( data_block->get_data_type() != image_data_type )
   {
-    if ( !( DataBlock::ConvertDataType( data_block, data_block_, image_data_type ) ) )
+    if ( ! DataBlock::ConvertDataType( data_block, data_block_, image_data_type ) )
     {
       data_block_.reset();
     }
@@ -272,7 +272,7 @@ bool ITKImageDataT<T>::initialize( DataBlockHandle data_block, Transform transfo
   }
   
   // If the data block could not be generated bail out of the code
-  if ( !data_block_ ) return false;
+  if ( ! data_block_ ) return false;
 
   // Step (2) : Use itk factory method for building new itk image object
   itk_image_ = image_type::New();

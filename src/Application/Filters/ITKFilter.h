@@ -3,7 +3,7 @@
 
  The MIT License
 
- Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
 
 
@@ -551,6 +551,26 @@ public:\
 
 #define SCI_END_TYPED_ITK_RUN() \
   }
+
+#define SCI_TYPED_ITK_RUN_DECL( DATATYPE ) \
+public:\
+  virtual void run_filter()\
+  {\
+    switch ( DATATYPE )\
+    {\
+      case Core::DataType::CHAR_E: this->typed_run_filter<signed char>(); break;\
+      case Core::DataType::UCHAR_E: this->typed_run_filter<unsigned char>(); break;\
+      case Core::DataType::SHORT_E: this->typed_run_filter<short>(); break;\
+      case Core::DataType::USHORT_E: this->typed_run_filter<unsigned short>(); break;\
+      case Core::DataType::INT_E: this->typed_run_filter<int>(); break;\
+      case Core::DataType::UINT_E: this->typed_run_filter<unsigned int>(); break;\
+      case Core::DataType::FLOAT_E: this->typed_run_filter<float>(); break;\
+      case Core::DataType::DOUBLE_E: this->typed_run_filter<double>(); break;\
+    };\
+  }\
+\
+  template< class VALUE_TYPE>\
+  void typed_run_filter();\
 
 
 #define SCI_BEGIN_ITK_RUN( ) \

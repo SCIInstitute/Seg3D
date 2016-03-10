@@ -3,7 +3,7 @@
 
  The MIT License
 
- Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
 
 
@@ -67,21 +67,21 @@ bool SpeedlineToolInterface::build_widget( QFrame* frame )
 {
   //Step 1 - build the Qt GUI Widget
   this->private_->ui_.setupUi( frame );
-  this->private_->ui_.horizontalLayout->setAlignment( Qt::AlignHCenter );
-  this->private_->ui_.horizontalLayout_2->setAlignment( Qt::AlignHCenter );
-  
+//  this->private_->ui_.horizontalLayout->setAlignment( Qt::AlignHCenter );
+//  this->private_->ui_.horizontalLayout_2->setAlignment( Qt::AlignHCenter );
+
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
   SpeedlineTool* tool = dynamic_cast< SpeedlineTool* > ( base_tool_.get() );
 
   //Step 3 - connect the gui to the tool through the QtBridge
   QtUtils::QtBridge::Connect( this->private_->ui_.target_mask_, tool->target_layer_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.use_active_layer_, tool->use_active_layer_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.use_smooth_, tool->use_smoothing_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.use_rescale_, tool->use_rescale_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.target_data_layer_, tool->target_data_layer_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.roi_mask_layer_, tool->roi_mask_state_ );
 
-  // Hide the rescale option to user. The default setting is true.
-  this->private_->ui_.use_rescale_->hide();
+  QtUtils::QtBridge::Connect( this->private_->ui_.use_active_layer_, tool->use_active_layer_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.use_image_spacing_, tool->use_image_spacing_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.use_face_conn_, tool->use_face_conn_state_ );
 
   QtUtils::QtBridge::Connect( this->private_->ui_.fill_button_, boost::bind(
     &SpeedlineTool::fill, tool, Core::Interface::GetWidgetActionContext() ) );
@@ -92,27 +92,23 @@ bool SpeedlineToolInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Connect( this->private_->ui_.reset_parameters_button_, boost::bind(
     &SpeedlineTool::reset_parameters, tool, Core::Interface::GetWidgetActionContext() ) );
 
-  QtUtils::QtBridge::Enable( this->private_->ui_.target_mask_, 
-    tool->use_active_layer_state_, true );
+  QtUtils::QtBridge::Enable( this->private_->ui_.target_mask_, tool->use_active_layer_state_, true );
 
-  QtUtils::QtBridge::Connect( this->private_->ui_.gradient_layer_, tool->gradient_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.target_data_layer_, tool->target_data_layer_state_ );
 
-  this->private_->ui_.iterations_->set_description( "Iterations" );
-  this->private_->ui_.termination_->set_description( "Termination" );
-  QtUtils::QtBridge::Connect( this->private_->ui_.iterations_, 
-    tool->iterations_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.termination_, 
-    tool->termination_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.run_gradient_button_, boost::bind(
-    &SpeedlineTool::calculate_speedimage, tool, Core::Interface::GetWidgetActionContext() ) );
+  // weights
+  this->private_->ui_.grad_mag_weight_->set_description( "Gradient Magnitude" );
+  QtUtils::QtBridge::Connect( this->private_->ui_.grad_mag_weight_, tool->grad_mag_weight_state_ );
+  this->private_->ui_.zero_cross_weight_->set_description( "Zero Cross" );
+  QtUtils::QtBridge::Connect( this->private_->ui_.zero_cross_weight_, tool->zero_cross_weight_state_ );
+  this->private_->ui_.grad_dir_weight_->set_description( "Gradient Direction" );
+  QtUtils::QtBridge::Connect( this->private_->ui_.grad_dir_weight_, tool->grad_dir_weight_state_ );
 
   QtUtils::QtBridge::Enable( this->private_->ui_.fill_button_, tool->valid_target_state_);
   QtUtils::QtBridge::Enable( this->private_->ui_.erase_button_, tool->valid_target_state_ );
-  QtUtils::QtBridge::Enable( this->private_->ui_.run_gradient_button_, tool->valid_target_data_layer_state_ );
 
   QtUtils::QtBridge::Show( this->private_->ui_.message_mask_alert_, tool->valid_target_state_, true );
-  QtUtils::QtBridge::Show( this->private_->ui_.message_gradient_magnitude_layer_alert_, tool->valid_gradient_state_, true );
+  QtUtils::QtBridge::Show( this->private_->ui_.message_data_layer_alert_, tool->valid_target_data_layer_state_, true );
 
   
 

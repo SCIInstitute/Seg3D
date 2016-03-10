@@ -3,7 +3,7 @@
 # 
 #  The MIT License
 # 
-#  Copyright (c) 2009 Scientific Computing and Imaging Institute,
+#  Copyright (c) 2015 Scientific Computing and Imaging Institute,
 #  University of Utah.
 # 
 #  
@@ -71,7 +71,7 @@ SET(INTERFACE_TOOLINTERFACE_SRCS
   PointSetFilterInterface.cc
   SpeedlineToolInterface.cc
   PointsSelectToolInterface.cc
-  RadialBasisFunctionToolInterface.cc
+  #RadialBasisFunctionToolInterface.cc
 )
 
 SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
@@ -119,7 +119,7 @@ SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
   PointSetFilterInterface.h
   SpeedlineToolInterface.h
   PointsSelectToolInterface.h
-  RadialBasisFunctionToolInterface.h
+  #RadialBasisFunctionToolInterface.h
 )
 
 SET(INTERFACE_TOOLINTERFACE_NO_MOC_SRCS
@@ -170,7 +170,7 @@ SET(INTERFACE_TOOLINTERFACE_UI_SRCS
   PointSetFilterInterface.ui
   SpeedlineToolInterface.ui
   PointsSelectToolInterface.ui
-  RadialBasisFunctionToolInterface.ui
+  #RadialBasisFunctionToolInterface.ui
 )
 
 ##################################################
