@@ -42,7 +42,7 @@ class ActionGetLayerGroup : public Core::Action
 
 CORE_ACTION(
   CORE_ACTION_TYPE( "GetLayerGroup", "Get the group ID for a given layer." )
-  CORE_ACTION_ARGUMENT( "layerid", "Layer ID" )
+  CORE_ACTION_ARGUMENT( "layerid", "Find the group ID for this layer." )
 )
 
   // -- Constructor/Destructor --
