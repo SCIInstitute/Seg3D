@@ -35,7 +35,6 @@
 
 // Application includes
 #include <Application/Layer/LayerFWD.h>
-#include <Application/Layer/LayerManager.h>
 
 namespace Seg3D
 {
