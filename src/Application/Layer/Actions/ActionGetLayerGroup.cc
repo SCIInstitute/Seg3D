@@ -29,54 +29,48 @@
 // Application includes
 #include <Application/Layer/Layer.h>
 #include <Application/Layer/LayerManager.h>
-#include <Application/Layer/Actions/ActionCalculateMaskVolume.h>
+#include <Application/Layer/LayerGroup.h>
+#include <Application/Layer/Actions/ActionGetLayerGroup.h>
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
-CORE_REGISTER_ACTION( Seg3D, CalculateMaskVolume )
+CORE_REGISTER_ACTION( Seg3D, GetLayerGroup )
 
 namespace Seg3D
 {
 
-bool ActionCalculateMaskVolume::validate( Core::ActionContextHandle& context )
+bool ActionGetLayerGroup::validate( Core::ActionContextHandle& context )
 {
-  if ( LayerManager::Instance()->find_mask_layer_by_id( this->mask_name_ ) ) return true;
-  
-  if( LayerManager::Instance()->find_layer_by_name( 
-    this->mask_name_ )->get_type() == Core::VolumeType::MASK_E )
+  if ( LayerManager::Instance()->find_layer_by_id( this->target_layer_ ) ) return true;
+
+  LayerHandle layer = LayerManager::Instance()->find_layer_by_name( this->target_layer_ );
+  if ( layer )
   {
     // If they passed the name instead, then we'll take the opportunity to get the id instead.
-    this->mask_name_ = LayerManager::Instance()->find_layer_by_name( 
-      this->mask_name_ )->get_layer_id();
+    this->target_layer_ = layer->get_layer_id();
     return true;
   }
+
   return false; // validated
 }
 
-bool ActionCalculateMaskVolume::run( Core::ActionContextHandle& context, 
-  Core::ActionResultHandle& result )
+bool ActionGetLayerGroup::run( Core::ActionContextHandle& context,
+                               Core::ActionResultHandle& result )
 {
-  std::string message = std::string( "Please wait, while your mask's volume is calculated..." );
+  LayerHandle layer = LayerManager::Instance()->find_layer_by_id( this->target_layer_ );
+  LayerGroupHandle group = layer->get_layer_group();
+  std::string group_id = group->get_group_id();
+  result.reset( new Core::ActionResult( group_id ) );
 
-  Core::ActionProgressHandle progress = 
-    Core::ActionProgressHandle( new Core::ActionProgress( message ) );
-
-  progress->begin_progress_reporting();
-
-  LayerManager::Instance()->find_mask_layer_by_id( this->mask_name_ )->calculate_volume();
-  
-  progress->end_progress_reporting();
-  
   return true;
 }
 
-void ActionCalculateMaskVolume::Dispatch( Core::ActionContextHandle context, 
-  const std::string& mask_name )
+void ActionGetLayerGroup::Dispatch( Core::ActionContextHandle context, const std::string& target_layer )
 {
-  ActionCalculateMaskVolume* action = new ActionCalculateMaskVolume;
-  action->mask_name_ = mask_name;
-  
+  ActionGetLayerGroup* action = new ActionGetLayerGroup;
+  action->target_layer_ = target_layer;
+
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }
 
