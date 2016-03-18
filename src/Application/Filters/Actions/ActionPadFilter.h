@@ -31,6 +31,7 @@
 
 // Core includes
 #include <Core/Action/Actions.h>
+#include <Core/Geometry/GridTransform.h>
 
 // Application includes
 #include <Application/Layer/LayerAction.h>
@@ -47,11 +48,7 @@ class ActionPadFilter : public LayerAction
 CORE_ACTION(
   CORE_ACTION_TYPE( "PadFilter", "Pad the input layers to the specified size" )
   CORE_ACTION_ARGUMENT( "layerids", "The layerids on which this tool needs to be run." )
-  CORE_ACTION_ARGUMENT( "pad_level_x", "Amount of padding along X-axis" )
-  CORE_ACTION_ARGUMENT( "pad_level_y",  "Amount of padding along Y-axis" )
-  CORE_ACTION_ARGUMENT( "pad_level_z",  "Amount of padding along Z-axis" )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "range_min", "[0,0,0]", "The minimum value of resample range in index space." )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "range_max", "[0,0,0]", "The maximum value of resample range in index space." )
+  CORE_ACTION_ARGUMENT( "pad_level", "Amount of padding along X, Y and Z axes (as [pad_x, pad_y, pad_z])" )
   CORE_ACTION_OPTIONAL_ARGUMENT( "padding", "0", "The value used to pad data outside the existing boundary." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "replace", "false", "Whether to delete the input layers when done" )
   CORE_ACTION_OPTIONAL_ARGUMENT( "sandbox", "-1", "The sandbox in which to run the action." )
@@ -75,22 +72,9 @@ private:
 public:
   static void Dispatch( Core::ActionContextHandle context,
                         const std::vector< std::string >& layer_ids,
-                        int pad_level_x, int pad_level_y, int pad_level_z,
+                        const Core::Vector& pad_level,
                         const std::string& padding,
                         bool replace );
-//  static void Dispatch( Core::ActionContextHandle context,
-//                       const std::vector< std::string >& layer_ids, int x, int y, int z,
-//                       const std::string& kernel, double param1, double param2, bool replace );
-//
-//  static void Dispatch( Core::ActionContextHandle context,
-//                       const std::vector< std::string >& layer_ids,
-//                       const Core::GridTransform& grid_trans, const std::string& padding,
-//                       const std::string& kernel, double param1, double param2, bool replace );
-//
-//  static void Dispatch( Core::ActionContextHandle context, const std::string& src_layer,
-//                       const std::string& dst_layer, const std::string& padding, const std::string& kernel,
-//                       double param1, double param2, bool replace );
-
 };
 
 }
