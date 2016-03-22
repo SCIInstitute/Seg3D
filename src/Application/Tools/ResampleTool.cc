@@ -75,7 +75,7 @@ void ResampleToolPrivate::update_dst_group_list()
 {
   const std::string& group_id = this->tool_->target_group_state_->get();
   std::vector< Core::OptionLabelPair > dst_groups;
-  if ( group_id == "" || group_id == Tool::NONE_OPTION_C )
+  if ( group_id.empty() || group_id == Tool::NONE_OPTION_C )
   {
     this->tool_->dst_group_state_->set_option_list( dst_groups );
     return;
@@ -95,8 +95,8 @@ void ResampleToolPrivate::update_dst_group_list()
     }
     const Core::GridTransform& grid_trans = layer_groups[ i ]->get_grid_transform();
     std::string group_name = Core::ExportToString( grid_trans.get_nx() ) + " x " +
-      Core::ExportToString( grid_trans.get_ny() ) + " x " + 
-      Core::ExportToString( grid_trans.get_nz() );
+                             Core::ExportToString( grid_trans.get_ny() ) + " x " +
+                             Core::ExportToString( grid_trans.get_nz() );
     dst_groups.push_back( std::make_pair( layer_groups[ i ]->get_group_id(), group_name ) );
   }
   this->tool_->dst_group_state_->set_option_list( dst_groups );
@@ -107,7 +107,7 @@ void ResampleToolPrivate::handle_target_group_changed()
   this->update_dst_group_list();
 
   const std::string& group_id = this->tool_->target_group_state_->get();
-  if ( group_id == "" || group_id == Tool::NONE_OPTION_C )
+  if ( group_id.empty() || group_id == Tool::NONE_OPTION_C )
   {
     return;
   }
@@ -139,14 +139,14 @@ void ResampleToolPrivate::handle_target_group_changed()
 void ResampleToolPrivate::handle_output_dimension_changed( int index, int size )
 {
   if ( this->signal_block_count_ > 0 ||
-    !this->tool_->constraint_aspect_state_->get() )
+       ! this->tool_->constraint_aspect_state_->get() )
   {
     return;
   }
   
   Core::ScopedCounter signal_block( this->signal_block_count_ );
 
-  double scale = size * 1.0 / this->tool_->input_dimensions_state_[ index ]->get();
+  double scale = size * 1.0 / static_cast<double>( this->tool_->input_dimensions_state_[ index ]->get() );
   this->tool_->scale_state_->set( scale );
   this->tool_->output_dimensions_state_[ ( index + 1 ) % 3 ]->set( Core::Round(
     this->tool_->input_dimensions_state_[ ( index + 1 ) % 3 ]->get() * scale ) );
@@ -157,7 +157,7 @@ void ResampleToolPrivate::handle_output_dimension_changed( int index, int size )
 void ResampleToolPrivate::handle_scale_changed( double scale )
 {
   if ( this->signal_block_count_ > 0 ||
-    !this->tool_->constraint_aspect_state_->get() )
+       ! this->tool_->constraint_aspect_state_->get() )
   {
     return;
   }

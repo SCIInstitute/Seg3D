@@ -27,6 +27,8 @@
 */
 
 #include <Application/Filters/Actions/ActionPadFilter.h>
+#include <Application/Filters/PadFilter.h>
+
 #include <Application/Layer/LayerManager.h>
 #include <Application/Layer/LayerGroup.h>
 
@@ -46,11 +48,6 @@ public:
   std::string padding_;
   bool replace_;
   SandboxID sandbox_;
-
-  // -- internal variables --
-public:
-  Core::Point range_min_;
-  Core::Point range_max_;
 };
 
 ActionPadFilter::ActionPadFilter() :
@@ -126,22 +123,41 @@ bool ActionPadFilter::run( Core::ActionContextHandle& context, Core::ActionResul
 {
   LayerHandle layer = LayerManager::Instance()->find_layer_by_id( this->private_->layer_ids_[0] );
   Core::GridTransform transform = layer->get_layer_group()->get_grid_transform();
-
-  double offset = transform.get_originally_node_centered() ? 0.0 : 1.0;
   Core::Point start( -this->private_->pad_level_[0], -this->private_->pad_level_[1], -this->private_->pad_level_[2] );
-  Core::Point end( transform.get_nx() + this->private_->pad_level_[0] - offset,
-                   transform.get_ny() + this->private_->pad_level_[1] - offset,
-                   transform.get_nz() + this->private_->pad_level_[2] - offset );
 
-  this->private_->range_min_ = transform * start;
-  this->private_->range_max_ = transform * end;
+  size_t padded_dim_x = transform.get_nx() + 2 * this->private_->pad_level_[0];
+  size_t padded_dim_y = transform.get_ny() + 2 * this->private_->pad_level_[1];
+  size_t padded_dim_z = transform.get_nz() + 2 * this->private_->pad_level_[2];
 
-std::cerr << start << std::endl;
-std::cerr << end << std::endl;
-std::cerr << this->private_->range_min_ << std::endl;
-std::cerr << this->private_->range_max_ << std::endl;
+  Core::GridTransform new_transform( padded_dim_x, padded_dim_y, padded_dim_z );
+  new_transform.set_originally_node_centered( transform.get_originally_node_centered() );
+  new_transform.load_basis( start, Core::Vector( transform.spacing_x(), 0, 0 ),
+                                   Core::Vector( 0, transform.spacing_y(), 0 ),
+                                   Core::Vector( 0, 0, transform.spacing_z() ) );
 
-  return false;
+  // Create algorithm
+  boost::shared_ptr< PadFilter > algo( new PadFilter( this->private_->replace_,
+                                                      this->private_->padding_,
+                                                      this->private_->sandbox_ ) );
+  algo->setup_layers( this->private_->layer_ids_, new_transform );
+
+  // Return the ids of the destination layer.
+  result = Core::ActionResultHandle( new Core::ActionResult( algo->get_dst_layer_ids() ) );
+  // If the action is run from a script (provenance is a special case of script),
+  // return a notifier that the script engine can wait on.
+  if ( context->source() == Core::ActionSource::SCRIPT_E ||
+       context->source() == Core::ActionSource::PROVENANCE_E )
+  {
+    context->report_need_resource( algo->get_notifier() );
+  }
+
+  // Build the undo-redo record
+  algo->create_undo_redo_and_provenance_record( context, this->shared_from_this(), true );
+
+  // Start the filter.
+  Core::Runnable::Start( algo );
+
+  return true;
 }
 
 void ActionPadFilter::Dispatch( Core::ActionContextHandle context,
