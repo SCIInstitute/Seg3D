@@ -49,6 +49,8 @@ SET(APPLICATION_FILTERS_SRCS
   LayerFilterNotifier.cc
   ThresholdFilter.h
   ThresholdFilter.cc
+  PadFilter.h
+  PadFilter.cc
 )
 
 SET(APPLICATION_FILTERS_UTILS_SRCS
