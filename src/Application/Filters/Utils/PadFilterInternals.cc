@@ -122,7 +122,7 @@ void PadFilterInternals::pad_and_crop_typed_data( DataBlockHandle src,
   }
   else
   {
-    padding_val = static_cast< T >( dst->get_max() );
+    padding_val = static_cast< T >( src->get_max() );
   }
 
   // Pad the non-overlapped part in Z-direction

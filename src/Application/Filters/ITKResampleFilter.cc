@@ -58,9 +58,9 @@ ITKResampleFilter::ITKResampleFilter( const std::string& interpolator, int splin
   this->set_sandbox( sandbox );
 }
 
-bool ITKResampleFilter::setup_layers(const std::vector< std::string >& layer_ids,
-                                     bool match_grid_transform, const GridTransform& grid_transform,
-                                     unsigned int dimX, unsigned int dimY, unsigned int dimZ)
+bool ITKResampleFilter::setup_layers( const std::vector< std::string >& layer_ids,
+                                      bool match_grid_transform, const GridTransform& grid_transform,
+                                      unsigned int dimX, unsigned int dimY, unsigned int dimZ )
 {
   this->dims_[ 0 ] = dimX;
   this->dims_[ 1 ] = dimY;
@@ -116,7 +116,7 @@ bool ITKResampleFilter::setup_layers(const std::vector< std::string >& layer_ids
         static_cast< MaskLayer* >( this->dst_layers_[ i ].get() )->color_state_->set( static_cast< MaskLayer* >( this->src_layers_[ i ].get() )->color_state_->get() );
         break;
       default:
-        CORE_LOG_ERROR( "Unknown volume type." );
+        CORE_LOG_ERROR( "Unsupported volume type." );
         return false;
     }
 
@@ -466,6 +466,5 @@ void ITKResampleFilter::typed_run_filter()
     }
 
     if ( this->check_abort() ) break;
-
   }
 }

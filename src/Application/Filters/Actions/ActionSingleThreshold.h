@@ -26,57 +26,58 @@
  DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_FILTERS_ACTIONS_ACTIONPADFILTER_H
-#define APPLICATION_FILTERS_ACTIONS_ACTIONPADFILTER_H
+#ifndef APPLICATION_FILTERS_ACTIONS_ACTIONSINGLETHRESHOLD_H
+#define APPLICATION_FILTERS_ACTIONS_ACTIONSINGLETHRESHOLD_H
 
 // Core includes
 #include <Core/Action/Actions.h>
-#include <Core/Geometry/GridTransform.h>
 
 // Application includes
 #include <Application/Layer/LayerAction.h>
-#include <Application/Filters/Utils/PadValues.h>
+#include <Application/Layer/LayerManager.h>
 
 namespace Seg3D
 {
 
-class ActionPadFilterPrivate;
-typedef boost::shared_ptr< ActionPadFilterPrivate > ActionPadFilterPrivateHandle;
-
-class ActionPadFilter : public LayerAction
+class ActionSingleThreshold : public LayerAction
 {
+
 CORE_ACTION(
-  CORE_ACTION_TYPE( "PadFilter", "Pad the input layers to the specified size" )
-  CORE_ACTION_ARGUMENT( "layerids", "The layerids on which this tool needs to be run." )
-  CORE_ACTION_ARGUMENT( "pad_level", "Amount of padding along X, Y and Z axes (as [pad_x, pad_y, pad_z])" )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "padding", "0", "The value used to pad data outside the existing boundary." )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "replace", "false", "Whether to delete the input layers when done" )
+  CORE_ACTION_TYPE( "SingleThreshold", "Build a mask layer by thresholding a data layer." )
+  CORE_ACTION_ARGUMENT( "layerid", "The ID of the data layer on which to run the tool." )
+  CORE_ACTION_ARGUMENT( "threshold", "The threshold value." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "sandbox", "-1", "The sandbox in which to run the action." )
-  CORE_ACTION_ARGUMENT_IS_NONPERSISTENT( "sandbox" )  
+  CORE_ACTION_ARGUMENT_IS_NONPERSISTENT( "sandbox" )
   CORE_ACTION_CHANGES_PROJECT_DATA()
   CORE_ACTION_IS_UNDOABLE()
 )
 
   // -- Constructor/Destructor --
 public:
-  ActionPadFilter();
+  ActionSingleThreshold();
 
   // -- Functions that describe action --
 public:
   virtual bool validate( Core::ActionContextHandle& context );
   virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
 
+  // -- Action parameters --
 private:
-  ActionPadFilterPrivateHandle private_;
 
+  std::string target_layer_;
+  double threshold_;
+  SandboxID sandbox_;
+
+  // -- Dispatch this action from the interface --
 public:
+  /// DISPATCH:
+  /// Create and dispatch action that inserts the new layer
   static void Dispatch( Core::ActionContextHandle context,
-                        const std::vector< std::string >& layer_ids,
-                        const Core::Vector& pad_level,
-                        const std::string& padding,
-                        bool replace );
+                        std::string target_layer,
+                        double threshold );
+  
 };
 
-}
+} // end namespace Seg3D
 
 #endif

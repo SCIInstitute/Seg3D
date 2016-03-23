@@ -27,7 +27,10 @@
 */
 
 #include <Application/Filters/Actions/ActionPadFilter.h>
+#include <Application/Filters/PadFilter.h>
+
 #include <Application/Layer/LayerManager.h>
+#include <Application/Layer/LayerGroup.h>
 
 CORE_REGISTER_ACTION( Seg3D, PadFilter )
 
@@ -41,20 +44,10 @@ class ActionPadFilterPrivate
   // -- action parameters --
 public:
   std::vector< std::string > layer_ids_;
-  int pad_level_x_;
-  int pad_level_y_;
-  int pad_level_z_;
-  Core::Point range_min_;
-  Core::Point range_max_;
+  Core::Vector pad_level_;
   std::string padding_;
   bool replace_;
   SandboxID sandbox_;
-
-  // -- internal variables --
-public:
-  bool match_grid_transform_;
-  Core::GridTransform grid_transform_;
-  
 };
 
 ActionPadFilter::ActionPadFilter() :
@@ -62,11 +55,7 @@ private_( new ActionPadFilterPrivate )
 {
   // Action arguments
   this->add_layer_id_list( this->private_->layer_ids_ );
-  this->add_parameter( this->private_->pad_level_x_ );
-  this->add_parameter( this->private_->pad_level_y_ );
-  this->add_parameter( this->private_->pad_level_z_ );
-  this->add_parameter( this->private_->range_min_ );
-  this->add_parameter( this->private_->range_max_ );
+  this->add_parameter( this->private_->pad_level_ );
   this->add_parameter( this->private_->padding_ );
   this->add_parameter( this->private_->replace_ );
   this->add_parameter( this->private_->sandbox_ );
@@ -80,38 +69,41 @@ bool ActionPadFilter::validate( Core::ActionContextHandle& context )
     return false;
   }
 
-  const std::vector< std::string >& layer_ids = this->private_->layer_ids_;
-  if ( layer_ids.size() == 0 )
+  if ( this->private_->layer_ids_.size() == 0 )
   {
     context->report_error( "No input layers specified" );
     return false;
   }
 
-  for ( size_t i = 0; i < layer_ids.size(); ++i )
+  for ( size_t i = 0; i < this->private_->layer_ids_.size(); ++i )
   {
+    std::string layerid = this->private_->layer_ids_[i];
+    if ( ! LayerManager::Instance()->find_layer_by_id( layerid ) )
+    {
+      LayerHandle layer = LayerManager::Instance()->find_layer_by_name( layerid );
+      if ( layer )
+      {
+        // If they passed the name instead, then we'll take the opportunity to get the id instead.
+        layerid = layer->get_layer_id();
+        this->private_->layer_ids_[i] = layerid;
+      }
+    }
+
     // Check for layer existence and type information
-    if ( ! LayerManager::CheckLayerExistence( layer_ids[ i ], context, this->private_->sandbox_ ) )
+    if ( ! LayerManager::CheckLayerExistence( layerid, context, this->private_->sandbox_ ) )
       return false;
 
     // Check for layer availability
-    if ( ! LayerManager::CheckLayerAvailability( layer_ids[ i ],
+    if ( ! LayerManager::CheckLayerAvailability( layerid,
                                                  this->private_->replace_,
                                                  context,
                                                  this->private_->sandbox_ ) )
       return false;
   }
 
-  if ( this->private_->range_max_[ 0 ] <= this->private_->range_min_[ 0 ] ||
-       this->private_->range_max_[ 1 ] <= this->private_->range_min_[ 1 ] ||
-       this->private_->range_max_[ 2 ] <= this->private_->range_min_[ 2 ] )
-  {
-    context->report_error( "Invalid resample range." );
-    return false;
-  }
-
-  if ( this->private_->pad_level_x_ < 1 ||
-       this->private_->pad_level_y_ < 1 ||
-       this->private_->pad_level_z_ < 1 )
+  if ( this->private_->pad_level_[ 0 ] < 1 ||
+       this->private_->pad_level_[ 1 ] < 1 ||
+       this->private_->pad_level_[ 2 ] < 1 )
   {
     context->report_error( "Invalid pad size" );
     return false;
@@ -129,16 +121,59 @@ bool ActionPadFilter::validate( Core::ActionContextHandle& context )
 
 bool ActionPadFilter::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
-  return false;
+  LayerHandle layer = LayerManager::Instance()->find_layer_by_id( this->private_->layer_ids_[0] );
+  Core::GridTransform transform = layer->get_layer_group()->get_grid_transform();
+  Core::Point start( -this->private_->pad_level_[0], -this->private_->pad_level_[1], -this->private_->pad_level_[2] );
+
+  size_t padded_dim_x = transform.get_nx() + 2 * this->private_->pad_level_[0];
+  size_t padded_dim_y = transform.get_ny() + 2 * this->private_->pad_level_[1];
+  size_t padded_dim_z = transform.get_nz() + 2 * this->private_->pad_level_[2];
+
+  Core::Point new_origin = transform * start;
+  Core::GridTransform new_transform( padded_dim_x, padded_dim_y, padded_dim_z );
+  new_transform.set_originally_node_centered( transform.get_originally_node_centered() );
+  new_transform.load_basis( new_origin, Core::Vector( transform.spacing_x(), 0, 0 ),
+                                        Core::Vector( 0, transform.spacing_y(), 0 ),
+                                        Core::Vector( 0, 0, transform.spacing_z() ) );
+
+  // Create algorithm
+  boost::shared_ptr< PadFilter > algo( new PadFilter( this->private_->replace_,
+                                                      this->private_->padding_,
+                                                      this->private_->sandbox_ ) );
+  algo->setup_layers( this->private_->layer_ids_, new_transform );
+
+  // Return the ids of the destination layer.
+  result = Core::ActionResultHandle( new Core::ActionResult( algo->get_dst_layer_ids() ) );
+  // If the action is run from a script (provenance is a special case of script),
+  // return a notifier that the script engine can wait on.
+  if ( context->source() == Core::ActionSource::SCRIPT_E ||
+       context->source() == Core::ActionSource::PROVENANCE_E )
+  {
+    context->report_need_resource( algo->get_notifier() );
+  }
+
+  // Build the undo-redo record
+  algo->create_undo_redo_and_provenance_record( context, this->shared_from_this(), true );
+
+  // Start the filter.
+  Core::Runnable::Start( algo );
+
+  return true;
 }
 
 void ActionPadFilter::Dispatch( Core::ActionContextHandle context,
                                 const std::vector< std::string >& layer_ids,
-                                int pad_level_x, int pad_level_y, int pad_level_z,
+                                const Core::Vector& pad_level,
                                 const std::string& padding,
-                                bool replace)
+                                bool replace )
 {
-  return;
+  ActionPadFilter* action = new ActionPadFilter;
+  action->private_->layer_ids_ = layer_ids;
+  action->private_->pad_level_ = pad_level;
+  action->private_->padding_ = padding;
+  action->private_->replace_ = replace;
+
+  Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }
 
 }
