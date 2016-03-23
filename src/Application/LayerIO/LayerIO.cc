@@ -503,7 +503,7 @@ bool LayerIO::FindFileSeries( std::vector<std::string >& filenames )
     // Step 3: now we want to see if we can figure out the file name pattern.  We will start by
     // checking to see if the sequence numbers are at the end of the file name.  
     std::string filename, extension;
-    std::tie( filename, extension ) = Core::GetFullExtension( full_filename );
+    std::tie( extension, filename ) = Core::GetFullExtension( full_filename );
 
     // Create a vector for finding numbers in the filename, for each one we will scan if there
     // is a sequential list available. The next vector denotes from where to where numbers can

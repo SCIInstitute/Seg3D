@@ -304,7 +304,7 @@ void LayerIOFunctions::ImportSeries( QMainWindow* main_window )
   }
 
   // Find all the filenames that are associated with this series
-  if ( !( LayerIO::FindFileSeries( filenames ) ) )
+  if ( ! LayerIO::FindFileSeries( filenames ) )
   {
     QMessageBox message_box( main_window );
     message_box.setWindowTitle( "Import Layer Error" );
@@ -375,7 +375,6 @@ void LayerIOFunctions::ExportLayer( QMainWindow* main_window )
 
   if ( filename.isEmpty() ) return;
 
-  //std::string extension = boost::filesystem::extension( boost::filesystem::path( filename.toStdString() ) );
   std::string extension, base;
   std::tie( extension, base ) = Core::GetFullExtension( boost::filesystem::path( filename.toStdString() ) );
   std::cerr << "[" << extension << "]" << std::endl;
