@@ -71,6 +71,7 @@ SET(INTERFACE_TOOLINTERFACE_SRCS
   PointSetFilterInterface.cc
   SpeedlineToolInterface.cc
   PointsSelectToolInterface.cc
+  PadToolInterface.cc
   #RadialBasisFunctionToolInterface.cc
 )
 
@@ -119,6 +120,7 @@ SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
   PointSetFilterInterface.h
   SpeedlineToolInterface.h
   PointsSelectToolInterface.h
+  PadToolInterface.h
   #RadialBasisFunctionToolInterface.h
 )
 
@@ -170,6 +172,7 @@ SET(INTERFACE_TOOLINTERFACE_UI_SRCS
   PointSetFilterInterface.ui
   SpeedlineToolInterface.ui
   PointsSelectToolInterface.ui
+  PadToolInterface.ui
   #RadialBasisFunctionToolInterface.ui
 )
 
