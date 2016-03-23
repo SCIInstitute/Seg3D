@@ -129,11 +129,12 @@ bool ActionPadFilter::run( Core::ActionContextHandle& context, Core::ActionResul
   size_t padded_dim_y = transform.get_ny() + 2 * this->private_->pad_level_[1];
   size_t padded_dim_z = transform.get_nz() + 2 * this->private_->pad_level_[2];
 
+  Core::Point new_origin = transform * start;
   Core::GridTransform new_transform( padded_dim_x, padded_dim_y, padded_dim_z );
   new_transform.set_originally_node_centered( transform.get_originally_node_centered() );
-  new_transform.load_basis( start, Core::Vector( transform.spacing_x(), 0, 0 ),
-                                   Core::Vector( 0, transform.spacing_y(), 0 ),
-                                   Core::Vector( 0, 0, transform.spacing_z() ) );
+  new_transform.load_basis( new_origin, Core::Vector( transform.spacing_x(), 0, 0 ),
+                                        Core::Vector( 0, transform.spacing_y(), 0 ),
+                                        Core::Vector( 0, 0, transform.spacing_z() ) );
 
   // Create algorithm
   boost::shared_ptr< PadFilter > algo( new PadFilter( this->private_->replace_,
