@@ -366,18 +366,49 @@ void LayerIOFunctions::ExportLayer( QMainWindow* main_window )
     return;
   }
 
-  boost::filesystem::path file_path = 
-    ProjectManager::Instance()->get_current_file_folder();
+  boost::filesystem::path file_path = ProjectManager::Instance()->get_current_file_folder();
+
+#if defined( __APPLE__ )
+  // Ugly apple hack because the native OS X file dialog does not play well with double file extensions.
+  // See https://bugreports.qt.io/browse/QTBUG-44227, https://bugreports.qt.io/browse/QTBUG-38303
+
+  QString selectedFilter;
+  std::string gzip_nifti("Compressed NIfTI files");
+  std::string gzip_nifti_ext(".nii.gz");
+  std::ostringstream oss;
+  oss << "NRRD files (*.nrrd);;DICOM files (*.dcm);;" << gzip_nifti << " (*);;NIfTI files (*.nii);;TIFF files (*.tiff);;PNG files (*.png);;MRC files (*.mrc);;Matlab files (*.mat)";
 
   QString filename = QFileDialog::getSaveFileName( main_window, "Export Data Layer As... ",
-  QString::fromStdString( file_path.string() ),
-    "NRRD files (*.nrrd);;DICOM files (*.dcm);;Compressed NIfTI files (*.nii.gz);;NIfTI files (*.nii);;TIFF files (*.tiff);;PNG files (*.png);;MRC files (*.mrc);;Matlab files (*.mat)" );
+    QString::fromStdString( file_path.string() ), QString::fromStdString( oss.str() ), &selectedFilter );
+
+std::cerr << selectedFilter.toStdString() << std::endl;
 
   if ( filename.isEmpty() ) return;
 
   std::string extension, base;
   std::tie( extension, base ) = Core::GetFullExtension( boost::filesystem::path( filename.toStdString() ) );
-  std::cerr << "[" << extension << "]" << std::endl;
+std::cerr << "[" << extension << "]" << std::endl;
+
+  if ( extension.empty() && selectedFilter.startsWith( gzip_nifti.c_str(), Qt::CaseInsensitive ) )
+  {
+    extension = gzip_nifti_ext;
+    std::cerr << "[" << extension << "]" << std::endl;
+    filename.append( gzip_nifti_ext.c_str() );
+  }
+#else
+  std::string filter("NRRD files (*.nrrd);;DICOM files (*.dcm);;Compressed NIfTI files (*.nii.gz);;NIfTI files (*.nii);;TIFF files (*.tiff);;PNG files (*.png);;MRC files (*.mrc);;Matlab files (*.mat)");
+
+  QString filename = QFileDialog::getSaveFileName( main_window, "Export Data Layer As... ",
+    QString::fromStdString( file_path.string() ), QString::fromStdString( filter ) );
+
+  if ( filename.isEmpty() ) return;
+
+  std::string extension, base;
+  std::tie( extension, base ) = Core::GetFullExtension( boost::filesystem::path( filename.toStdString() ) );
+std::cerr << "[" << extension << "]" << std::endl;
+
+#endif
+
   std::string exportername;
 
   if ( extension == ".nrrd" ) exportername = "NRRD Exporter";
@@ -399,7 +430,7 @@ void LayerIOFunctions::ExportLayer( QMainWindow* main_window )
     message_box.exec();
     return;
   }
-    
+
   ActionExportLayer::Dispatch( Core::Interface::GetWidgetActionContext(), 
     layer_handles[ 0 ]->get_layer_id(), exporter, filename.toStdString() );
 }
