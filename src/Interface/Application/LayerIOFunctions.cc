@@ -32,6 +32,7 @@
 #include <vector>
 #include <set>
 #include <sstream>
+#include <map>
 
 // Boost includes
 #include <boost/filesystem.hpp>
@@ -367,47 +368,65 @@ void LayerIOFunctions::ExportLayer( QMainWindow* main_window )
   }
 
   boost::filesystem::path file_path = ProjectManager::Instance()->get_current_file_folder();
-
-#if defined( __APPLE__ )
-  // Ugly apple hack because the native OS X file dialog does not play well with double file extensions.
-  // See https://bugreports.qt.io/browse/QTBUG-44227, https://bugreports.qt.io/browse/QTBUG-38303
-
   QString selectedFilter;
+
   std::string gzip_nifti("Compressed NIfTI files");
   std::string gzip_nifti_ext(".nii.gz");
+  std::map< std::string, std::string > filters;
+#if defined( __APPLE__ )
+  // Annoying Mac OS X hack because the native OS X file dialog does not play well with double file extensions.
+  // See https://bugreports.qt.io/browse/QTBUG-44227, https://bugreports.qt.io/browse/QTBUG-38303
+  filters[gzip_nifti] = "*";
+#else
+  filters[gzip_nifti] = std::string("*") + gzip_nifti_ext;
+#endif
+  filters["NRRD files"] = "*.nrrd";
+  filters["DICOM files"] = "*.dcm";
+  filters["NIfTI files"] = "*.nii";
+  filters["TIFF files"] = "*.tiff";
+  filters["PNG files"] = "*.png";
+  filters["MRC files"] = "*.mrc";
+  filters["Matlab files"] = "*.mat";
+
+  int counter = 1;
   std::ostringstream oss;
-  oss << "NRRD files (*.nrrd);;DICOM files (*.dcm);;" << gzip_nifti << " (*);;NIfTI files (*.nii);;TIFF files (*.tiff);;PNG files (*.png);;MRC files (*.mrc);;Matlab files (*.mat)";
+  for ( const auto &pair : filters )
+  {
+    oss << pair.first << " (" << pair.second << ")";
+    if ( counter < filters.size() )
+      oss << ";;";
+    counter++;
+  }
 
   QString filename = QFileDialog::getSaveFileName( main_window, "Export Data Layer As... ",
     QString::fromStdString( file_path.string() ), QString::fromStdString( oss.str() ), &selectedFilter );
 
-std::cerr << selectedFilter.toStdString() << std::endl;
-
   if ( filename.isEmpty() ) return;
 
   std::string extension, base;
   std::tie( extension, base ) = Core::GetFullExtension( boost::filesystem::path( filename.toStdString() ) );
-std::cerr << "[" << extension << "]" << std::endl;
 
-  if ( extension.empty() && selectedFilter.startsWith( gzip_nifti.c_str(), Qt::CaseInsensitive ) )
+  if ( extension.empty() )
   {
-    extension = gzip_nifti_ext;
-    std::cerr << "[" << extension << "]" << std::endl;
-    filename.append( gzip_nifti_ext.c_str() );
+    // some Linux file dialogs don't fill in extension
+    for ( const auto &pair : filters )
+    {
+      // because of Mac OS X hack
+      if ( selectedFilter.startsWith( QString::fromStdString( pair.first ) ) )
+      {
+        if ( selectedFilter.startsWith( gzip_nifti.c_str() ) )
+        {
+          extension = gzip_nifti_ext;
+          filename.append( gzip_nifti_ext.c_str() );
+        }
+        else
+        {
+          extension = pair.second;
+          filename.append( pair.second.c_str() );
+        }
+      }
+    }
   }
-#else
-  std::string filter("NRRD files (*.nrrd);;DICOM files (*.dcm);;Compressed NIfTI files (*.nii.gz);;NIfTI files (*.nii);;TIFF files (*.tiff);;PNG files (*.png);;MRC files (*.mrc);;Matlab files (*.mat)");
-
-  QString filename = QFileDialog::getSaveFileName( main_window, "Export Data Layer As... ",
-    QString::fromStdString( file_path.string() ), QString::fromStdString( filter ) );
-
-  if ( filename.isEmpty() ) return;
-
-  std::string extension, base;
-  std::tie( extension, base ) = Core::GetFullExtension( boost::filesystem::path( filename.toStdString() ) );
-std::cerr << "[" << extension << "]" << std::endl;
-
-#endif
 
   std::string exportername;
 
