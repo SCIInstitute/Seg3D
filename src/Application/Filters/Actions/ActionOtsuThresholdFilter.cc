@@ -3,7 +3,7 @@
  
  The MIT License
  
- Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
  
  
@@ -81,7 +81,7 @@ public:
   LayerHandle src_layer_;
   std::vector<LayerHandle> dst_layer_;
 
-  double amount_;
+  int amount_;
   
 public:
   // RUN:
@@ -179,7 +179,7 @@ bool ActionOtsuThresholdFilter::run( Core::ActionContextHandle& context,
   algo->amount_ = this->amount_;
 
   // Find the handle to the layer
-  if ( !( algo->find_layer( this->target_layer_, algo->src_layer_ ) ) )
+  if ( ! algo->find_layer( this->target_layer_, algo->src_layer_ ) )
   {
     return false;
   }

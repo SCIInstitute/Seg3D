@@ -1,0 +1,31 @@
+language: c++
+
+sudo: required
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      #- g++-4.8
+      - libqt4-dev
+
+before_script:
+  - sudo apt-get install gcc-4.8
+  - sudo apt-get install g++-4.8
+  #- sudo update-alternatives --remove-all gcc
+  #- sudo update-alternatives --remove-all g++
+  - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 20
+  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 20
+  - sudo update-alternatives --config gcc
+  - sudo update-alternatives --config g++
+  - export CXX="g++-4.8" CC="gcc-4.8"
+  - wget http://www.sci.utah.edu/devbuilds/seg3d/travis-ci/cmake-2.8_ubuntu_12.tgz -O /tmp/cmake-2.8_ubuntu_12.tgz
+  - tar -xf /tmp/cmake-2.8_ubuntu_12.tgz
+  - export PATH=$PWD/cmake-2.8/bin:$PATH
+
+script:
+  - cd bin
+  - cmake -DBUILD_MOSAIC_TOOLS:BOOL=OFF ../Superbuild
+  #- make -j2
+  - make

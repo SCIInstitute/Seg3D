@@ -43,3 +43,5 @@ ExternalProject_Add(Data_external
   PATCH_COMMAND ""
   INSTALL_COMMAND ""
 )
+
+SET(TEST_INPUT_PATH ${data_DIR} CACHE PATH "")

@@ -3,7 +3,7 @@
 
  The MIT License
 
- Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
 
 
@@ -170,8 +170,8 @@ void Application::parse_command_line_parameters( int argc, char **argv, int num_
   this->private_->app_filepath_ = this->private_->app_filename_.parent_path();
 
   typedef boost::tokenizer< boost::char_separator< char > > tokenizer;
-  boost::char_separator< char > seperator( ":-=|;" );
-  
+  boost::char_separator< char > seperator( ":=|; " );
+
     int count = 1;
     
     for ( ; count < argc && count < (num_arguments+1); count++ )
@@ -210,6 +210,17 @@ void Application::parse_command_line_parameters( int argc, char **argv, int num_
     if ( param_vector.size() > 0 )
     {
       std::string key = param_vector[ 0 ];
+      if (key.size() > 1 && key[0] == '-')
+      {
+        if (key.size() > 2 && key[1] == '-')
+        {
+          key = key.substr(2, std::string::npos);
+        }
+        else
+        {
+          key = key.substr(1, std::string::npos);
+        }
+      }
       this->parameters_[ key ] = value;
     }
   }

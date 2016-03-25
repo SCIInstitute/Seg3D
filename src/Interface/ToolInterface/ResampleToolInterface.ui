@@ -570,11 +570,11 @@ QPushButton:pressed{
        </widget>
       </item>
       <item>
-       <widget class="QWidget" name="param_widget_" native="true">
+       <widget class="QWidget" name="gaussian_param_widget_" native="true">
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>30</height>
+          <height>40</height>
          </size>
         </property>
         <property name="maximumSize">
@@ -622,6 +622,30 @@ QPushButton:pressed{
          </item>
          <item>
           <widget class="QDoubleSpinBox" name="cutoff_spinbox_"/>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QWidget" name="bspline_widget_" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>35</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>35</height>
+         </size>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_10">
+         <property name="margin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QtUtils::QtSliderIntCombo" name="spline_order_" native="true"/>
          </item>
         </layout>
        </widget>

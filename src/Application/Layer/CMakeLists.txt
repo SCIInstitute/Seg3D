@@ -4,7 +4,7 @@
 # 
 #  The MIT License
 # 
-#  Copyright (c) 2009 Scientific Computing and Imaging Institute,
+#  Copyright (c) 2015 Scientific Computing and Imaging Institute,
 #  University of Utah.
 # 
 #  
@@ -75,6 +75,8 @@ SET(APPLICATION_LAYER_ACTIONS_SRCS
   Actions/ActionComputeIsosurface.cc
   Actions/ActionDeleteIsosurface.h
   Actions/ActionDeleteIsosurface.cc
+  Actions/ActionGetLayerGroup.h
+  Actions/ActionGetLayerGroup.cc
   Actions/ActionDeleteLayers.h
   Actions/ActionDeleteLayers.cc
   Actions/ActionMoveGroup.h
@@ -109,7 +111,7 @@ ENDIF(BUILD_WITH_PYTHON)
 CORE_ADD_LIBRARY(Application_Layer ${APPLICATION_LAYER_SRCS}
   ${APPLICATION_LAYER_ACTIONS_SRCS}
 )
-            
+
 TARGET_LINK_LIBRARIES(Application_Layer
   Core_Action
   Core_Application

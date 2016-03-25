@@ -3,7 +3,7 @@
 # 
 #  The MIT License
 # 
-#  Copyright (c) 2014 Scientific Computing and Imaging Institute,
+#  Copyright (c) 2015 Scientific Computing and Imaging Institute,
 #  University of Utah.
 # 
 #  
@@ -26,10 +26,14 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
-SET(UNIT_TEST_LIST "" CACHE INTERNAL "List of unit tests." FORCE)
-
 MACRO(REGISTER_UNIT_TEST test)
+  SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SEG3D_BINARY_DIR})
   ADD_EXECUTABLE(${test} ${ARGN})
-  LIST(APPEND tmp ${test} ${UNIT_TEST_LIST})
-  SET(UNIT_TEST_LIST ${tmp} CACHE INTERNAL "List of unit tests." FORCE)
-ENDMACRO(REGISTER_UNIT_TEST)
+  LIST(APPEND UNIT_TEST_LIST ${test})
+ENDMACRO()
+
+MACRO(ADD_TEST_DIR directory)
+  IF(BUILD_TESTING)
+    ADD_SUBDIRECTORY(${directory})
+  ENDIF()
+ENDMACRO()

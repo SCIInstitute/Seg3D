@@ -3,7 +3,7 @@
 
  The MIT License
 
- Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
 
 
@@ -95,6 +95,8 @@ public:
   /// Get the index of the point that's closest to the given position in world space
   /// NOTE: the indices returned can be out of the slice boundary.
   void world_to_index( double i_pos, double j_pos, int& i, int& j ) const;
+
+  void index_to_world( int i, int j, double& world_i, double& world_j ) const;
 
   /// Get the 3D world coordinate of the point
   void get_world_coord( double i_pos, double j_pos, Point& world_coord ) const;

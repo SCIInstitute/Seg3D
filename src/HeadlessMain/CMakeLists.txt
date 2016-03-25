@@ -90,7 +90,7 @@ IF(APPLE)
     ADD_CUSTOM_COMMAND(TARGET ${APPLICATION_NAME}
       POST_BUILD
       # macdeployqt puts frameworks in app/Content/Frameworks
-      COMMAND ${CMAKE_COMMAND} ARGS -E tar xvf ${SCI_PYTHON_FRAMEWORK_ARCHIVE}
+      COMMAND ${CMAKE_COMMAND} ARGS -E tar xf ${SCI_PYTHON_FRAMEWORK_ARCHIVE}
       COMMAND chmod u+w  ${PYTHON_PATH}/Python
       COMMAND  install_name_tool -id Python ${PYTHON_PATH}/Python
       COMMAND  install_name_tool -change ${SCI_PYTHON_FRAMEWORK}/${VERSION_PATH}/Python @executable_path/${PYTHON_PATH}/Python ${APPLICATION_NAME}

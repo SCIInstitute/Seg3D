@@ -3,7 +3,7 @@
  
  The MIT License
  
- Copyright (c) 2014 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
  
  
@@ -52,12 +52,18 @@ CORE_ACTION(
 public:
   typedef std::vector< Core::Point > PointVector;
 
+  ActionExportPoints( const std::string& file_path, const PointVector& points ) :
+    file_path_(file_path),
+    points_(points)
+  {
+    init_parameters();
+  }
+
   ActionExportPoints()
   {
-    this->add_parameter( this->file_path_ );
-    this->add_parameter( this->points_ );
+    init_parameters();
   }
-  
+
   // -- Functions that describe action --
 public:
   // VALIDATE:
@@ -70,13 +76,21 @@ public:
   // Each action needs to have this piece implemented. It spells out how the
   // action is run. It returns whether the action was successful or not.
   virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
-  
+
+  void set_file_path( const std::string& file_path ) { file_path_ = file_path; }
+  void set_points( const PointVector& points ) { points_ = points; }
+
   // -- Action parameters --
 private:
-  
+  void init_parameters()
+  {
+    this->add_parameter( this->file_path_ );
+    this->add_parameter( this->points_ );
+  }
+
   // Where the layer should be exported
   std::string file_path_;
-
+  // Points to be exported
   PointVector points_;
   
   // -- Dispatch this action from the interface --
@@ -85,7 +99,7 @@ public:
   // DISPATCH:
   static void Dispatch( Core::ActionContextHandle context,
                         const std::string& file_path,
-                        const std::vector< Core::Point >& points );
+                        const PointVector& points );
   
 };
 

@@ -3,7 +3,7 @@
 #
 #  The MIT License
 #
-#  Copyright (c) 2013 Scientific Computing and Imaging Institute,
+#  Copyright (c) 2015 Scientific Computing and Imaging Institute,
 #  University of Utah.
 #
 #
@@ -159,10 +159,9 @@ TARGET_LINK_LIBRARIES(Core_ITKCommon
   Core_Utils
   ${ITKCommon_LIBRARIES}
   ${ITKIOTransformBase_LIBRARIES}
+  ${ITKOptimizers_LIBRARIES}
   ${ITKFFT_LIBRARIES}
 )
 
-IF(BUILD_TESTING)
-  ADD_SUBDIRECTORY(Transform/Tests)
-ENDIF(BUILD_TESTING)
+ADD_TEST_DIR(Transform/Tests)
 

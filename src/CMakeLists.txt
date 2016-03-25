@@ -28,8 +28,12 @@
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.9 FATAL_ERROR)
 #CMAKE_MINIMUM_REQUIRED(VERSION 3.0 FATAL_ERROR)
-## TODO: check escape sequences and upgrade for v3.1
-#CMAKE_POLICY(SET CMP0053 OLD)
+IF(CMAKE_VERSION VERSION_EQUAL 3.1 OR CMAKE_VERSION VERSION_GREATER 3.1)
+  CMAKE_POLICY(SET CMP0054 NEW)
+  # TODO: revisit on ITK upgrade
+  CMAKE_POLICY(SET CMP0053 OLD)
+ENDIF()
+
 
 ###########################################
 # Verify build directory
@@ -86,7 +90,7 @@ ENDIF()
 ###########################################
 
 SET(SEG3D_MAJOR_VERSION 2 CACHE INTERNAL "Major version number" FORCE)
-SET(SEG3D_MINOR_VERSION 2 CACHE INTERNAL "Minor version number" FORCE)
+SET(SEG3D_MINOR_VERSION 3 CACHE INTERNAL "Minor version number" FORCE)
 SET(SEG3D_PATCH_VERSION 1 CACHE INTERNAL "Patch version number" FORCE)
 
 
@@ -142,66 +146,43 @@ SET(OSX_UTILS_DIR "Seg3DUtils")
 # Set Up External Projects
 ############################################
 
-FIND_PACKAGE(Zlib CONFIGS ZlibConfig.cmake HINTS ${Zlib_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
-IF(NOT Zlib_FOUND)
-  MESSAGE(FATAL_ERROR "Zlib library not found in ${Zlib_DIR}")
-ENDIF()
+MACRO(CONFIG_STANDARD_EXTERNAL name config_file directory)
+  FIND_PACKAGE(${name} CONFIGS ${config_file} HINTS ${directory} NO_SYSTEM_ENVIRONMENT_PATH)
+  IF(NOT ${name}_FOUND)
+    MESSAGE(FATAL_ERROR "${name} library not found in ${directory}")
+  ENDIF()
+ENDMACRO()
+
+CONFIG_STANDARD_EXTERNAL( Zlib ZlibConfig.cmake ${Zlib_DIR} )
 INCLUDE(${ZLIB_USE_FILE})
 
-FIND_PACKAGE(LibPNG CONFIGS LibPNGConfig.cmake HINTS ${LibPNG_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
-IF(NOT LibPNG_FOUND)
-  MESSAGE(FATAL_ERROR "Png library not found in ${LibPNG_DIR}")
-ENDIF()
+CONFIG_STANDARD_EXTERNAL( LibPNG LibPNGConfig.cmake ${LibPNG_DIR} )
 INCLUDE(${PNG_USE_FILE})
 
-FIND_PACKAGE(SQLite CONFIGS SQLiteConfig.cmake HINTS ${SQLite_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
-IF(NOT SQLite_FOUND)
-  MESSAGE(FATAL_ERROR "SQLite library not found in ${SQLite_DIR}")
-ENDIF()
+CONFIG_STANDARD_EXTERNAL( SQLite SQLiteConfig.cmake ${SQLite_DIR} )
 INCLUDE(${SQLITE_USE_FILE})
 
-FIND_PACKAGE(ITK CONFIGS ITKConfig.cmake HINTS ${ITK_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
-IF(NOT ITK_FOUND)
-  MESSAGE(FATAL_ERROR "ITK library not found in ${ITK_DIR}")
-ENDIF()
-INCLUDE(${ITK_USE_FILE})
-
-FIND_PACKAGE(Teem CONFIGS TeemConfig.cmake HINTS ${Teem_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
-IF(NOT Teem_FOUND)
-  MESSAGE(FATAL_ERROR "Teem library not found in ${Teem_DIR}")
-ENDIF()
+CONFIG_STANDARD_EXTERNAL( Teem TeemConfig.cmake ${Teem_DIR} )
 INCLUDE(${Teem_USE_FILE})
 
-FIND_PACKAGE(Glew CONFIGS GlewConfig.cmake HINTS ${GLEW_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
-IF(NOT Glew_FOUND)
-  MESSAGE(FATAL_ERROR "Glew library not found in ${Glew_DIR}")
-ENDIF()
-INCLUDE(${GLEW_USE_FILE})
-
-FIND_PACKAGE(Freetype CONFIGS FreetypeConfig.cmake HINTS ${Freetype_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
-IF(NOT Freetype_FOUND)
-  MESSAGE(FATAL_ERROR "Freetype library not found in ${Freetype_DIR}")
-ENDIF()
-INCLUDE(${FREETYPE_USE_FILE})
-
 IF(BUILD_WITH_PYTHON)
-  FIND_PACKAGE(Python CONFIGS PythonConfig.cmake HINTS ${Python_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
-  IF(NOT Python_FOUND)
-    MESSAGE(FATAL_ERROR "Python library not found in ${Python_DIR}")
-  ENDIF()
+  CONFIG_STANDARD_EXTERNAL( Python PythonConfig.cmake ${Python_DIR} )
   INCLUDE(${SCI_PYTHON_USE_FILE})
 ENDIF()
 
-FIND_PACKAGE(Boost CONFIGS BoostConfig.cmake HINTS ${Boost_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
-IF(NOT Boost_FOUND)
-  MESSAGE(FATAL_ERROR "Boost library not found in ${Boost_DIR}")
-ENDIF()
+CONFIG_STANDARD_EXTERNAL( Boost BoostConfig.cmake ${Boost_DIR} )
 INCLUDE(${SCI_BOOST_USE_FILE})
 
-FIND_PACKAGE(ImplicitFunction CONFIGS ImplicitFunctionConfig.cmake HINTS ${ImplicitFunction_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
-IF(NOT ImplicitFunction_FOUND)
-  MESSAGE(FATAL_ERROR "ImplicitFunction library not found in ${ImplicitFunction_DIR}")
-ENDIF()
+CONFIG_STANDARD_EXTERNAL( ITK ITKConfig.cmake ${ITK_DIR} )
+INCLUDE(${ITK_USE_FILE})
+
+CONFIG_STANDARD_EXTERNAL( Glew GlewConfig.cmake ${Glew_DIR} )
+INCLUDE(${GLEW_USE_FILE})
+
+CONFIG_STANDARD_EXTERNAL( Freetype FreetypeConfig.cmake ${Freetype_DIR} )
+INCLUDE(${FREETYPE_USE_FILE})
+
+CONFIG_STANDARD_EXTERNAL( ImplicitFunction ImplicitFunctionConfig.cmake ${ImplicitFunction_DIR} )
 INCLUDE(${ImplicitFunction_USE_FILE})
 
 
