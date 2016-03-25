@@ -376,23 +376,23 @@ void LayerIOFunctions::ExportLayer( QMainWindow* main_window )
 #if defined( __APPLE__ )
   // Annoying Mac OS X hack because the native OS X file dialog does not play well with double file extensions.
   // See https://bugreports.qt.io/browse/QTBUG-44227, https://bugreports.qt.io/browse/QTBUG-38303
-  filters[gzip_nifti] = "*";
+  filters[gzip_nifti] = "";
 #else
-  filters[gzip_nifti] = std::string("*") + gzip_nifti_ext;
+  filters[gzip_nifti] = gzip_nifti_ext;
 #endif
-  filters["NRRD files"] = "*.nrrd";
-  filters["DICOM files"] = "*.dcm";
-  filters["NIfTI files"] = "*.nii";
-  filters["TIFF files"] = "*.tiff";
-  filters["PNG files"] = "*.png";
-  filters["MRC files"] = "*.mrc";
-  filters["Matlab files"] = "*.mat";
+  filters["NRRD files"] = ".nrrd";
+  filters["DICOM files"] = ".dcm";
+  filters["NIfTI files"] = ".nii";
+  filters["TIFF files"] = ".tiff";
+  filters["PNG files"] = ".png";
+  filters["MRC files"] = ".mrc";
+  filters["Matlab files"] = ".mat";
 
   int counter = 1;
   std::ostringstream oss;
   for ( const auto &pair : filters )
   {
-    oss << pair.first << " (" << pair.second << ")";
+    oss << pair.first << " (*" << pair.second << ")";
     if ( counter < filters.size() )
       oss << ";;";
     counter++;
