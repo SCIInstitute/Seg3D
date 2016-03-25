@@ -534,10 +534,10 @@ bool ITKDataLayerExporter::export_layer( const std::string& mode, const std::str
       return export_layer_internal< signed short >( file_path, name, temp_handle );
       break;
     case Core::DataType::UINT_E:
-      return export_layer_internal< signed int >( file_path, name, temp_handle );
+      return export_layer_internal< unsigned int >( file_path, name, temp_handle );
       break;
     case Core::DataType::INT_E:
-      return export_layer_internal< unsigned int >( file_path, name, temp_handle );
+      return export_layer_internal< signed int >( file_path, name, temp_handle );
       break;
     case Core::DataType::ULONGLONG_E:
       return export_layer_internal< unsigned long long >( file_path, name, temp_handle );
