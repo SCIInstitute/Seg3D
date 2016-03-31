@@ -493,14 +493,29 @@ void LayerIOFunctions::ExportIsosurface( QMainWindow* main_window )
     return;
   }
 
-  QString filename;
+  QString filename, selectedFilter;
   boost::filesystem::path current_folder = ProjectManager::Instance()->get_current_file_folder();
 
   filename = QFileDialog::getSaveFileName( main_window,
     "Export Isosurface As... ", QString::fromStdString( current_folder.string() ),
-    QString::fromStdString( Core::Isosurface::EXPORT_FORMATS_C ) );
+    QString::fromStdString( Core::Isosurface::EXPORT_FORMATS_C ), &selectedFilter );
 
   if ( filename.isEmpty() ) return;
+
+  std::string extension;
+  std::tie( extension, std::ignore ) = Core::GetFullExtension( boost::filesystem::path( filename.toStdString() ) );
+
+  if ( extension.empty() )
+  {
+    // some Linux file dialogs don't fill in extension
+    for ( const auto &pair : Core::Isosurface::EXPORT_FORMATS_MAP_C )
+    {
+      if ( selectedFilter.startsWith( QString::fromStdString( pair.first ) ) )
+      {
+        filename.append( pair.second.c_str() );
+      }
+    }
+  }
 
   ActionExportIsosurface::Dispatch( Core::Interface::GetWidgetActionContext(),
     layerHandle->get_layer_id(), filename.toStdString(), layerHandle->name_state_->get() );
