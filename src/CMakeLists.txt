@@ -146,6 +146,22 @@ ENDIF()
 
 
 ###########################################
+# Microsoft VC compiler flags
+###########################################
+
+IF(WIN32 AND MSVC)
+  ADD_DEFINITIONS(-D_ALLOW_KEYWORD_MACROS)
+  ADD_DEFINITIONS(-D_WIN32_WINNT=_WIN32_WINNT_WS03 -DNTDDI_VERSION=NTDDI_WS03SP2)
+  ADD_DEFINITIONS(-DPSAPI_VERSION=1)
+  # Disable Visual C++ Secure Warnings
+  ADD_DEFINITIONS(-D_SCL_SECURE_NO_WARNINGS)
+  ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
+  ADD_DEFINITIONS(-D_BIND_TO_CURRENT_VCLIBS_VERSION=1)
+  ADD_DEFINITIONS(-D_BIND_TO_CURRENT_CRT_VERSION=1)
+ENDIF()
+
+
+###########################################
 # Where to install command line tools, docs
 # and other extras on OS X
 ###########################################
