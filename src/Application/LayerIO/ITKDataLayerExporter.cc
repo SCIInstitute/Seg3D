@@ -3,7 +3,7 @@
 
  The MIT License
 
- Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
 
 
@@ -30,11 +30,14 @@
 #include <boost/algorithm/string/case_conv.hpp>
 
 // itk includes
+#include <itkImageFileWriter.h>
 #include <itkImageSeriesWriter.h>
 #include <itkImageSeriesReader.h>
 #include <itkNumericSeriesFileNames.h>
 #include <itkGDCMImageIO.h>
 #include <itkMetaDataObject.h>
+#include <itkRescaleIntensityImageFilter.h>
+#include <itkCastImageFilter.h>
 
 // GDCM includes
 #include <gdcmImageHelper.h>
@@ -42,6 +45,8 @@
 
 // Core includes
 #include <Core/Volume/DataVolume.h>
+#include <Core/Utils/FilesystemUtil.h>
+#include <Core/Utils/Log.h>
 
 // Application includes
 #include <Application/LayerIO/ITKDataLayerExporter.h>
@@ -49,60 +54,113 @@
 #include <Application/ProjectManager/ProjectManager.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
 
+#define DIM_3D 3
+#define DIM_2D 2
+
 SEG3D_REGISTER_EXPORTER( Seg3D, ITKDataLayerExporter );
 
 namespace Seg3D
 {
 
-void set_data_series_names( itk::NumericSeriesFileNames::Pointer& name_series_generator, 
-                           const std::string& file_path, const std::string& file_name, 
-                           const size_t size, const std::string& extension )
-{ 
-    boost::filesystem::path path = boost::filesystem::path( file_path );
-    
-    // here we make sure that we dont have an extension and then afterwards we add the correct one
-    std::string filename_without_extension = file_name;
-    filename_without_extension = filename_without_extension.substr( 0, 
-                                                                   filename_without_extension.find_last_of( "." ) );
-    
-    boost::filesystem::path filename_path = path / filename_without_extension;
-    
-    if( size < 100 )
-    {
-        name_series_generator->SetSeriesFormat( filename_path.string() + "-%02d" + extension );
-    }
-    else if ( size < 1000 )
-    {
-        name_series_generator->SetSeriesFormat( filename_path.string() + "-%03d" + extension );
-    }
-    else if ( size < 10000 )
-    {
-        name_series_generator->SetSeriesFormat( filename_path.string() + "-%04d" + extension );
-    }
-    else
-    {
-        name_series_generator->SetSeriesFormat( filename_path.string() + "-%10d" + extension );
-    }
-}
-    
-    
-////////////// - Templated functions for exporting bitmaps and DICOM's - ///////////////
-////////////////////////////////////////////////////////////////////////////////////////
 template< class InputPixelType, class OutputPixelType >
-bool export_nondicom_series( const std::string& file_path, const std::string& file_name, 
-  DataLayerHandle temp_handle, const std::string& extension )
+typename itk::Image< OutputPixelType, DIM_3D >::Pointer
+cast_image( typename Core::ITKImageDataT< InputPixelType >::Handle image_data )
 {
-  typedef itk::Image< InputPixelType, 3 > ImageType;
-  typedef itk::Image< OutputPixelType, 2 > OutputImageType;
-  typedef itk::ImageSeriesWriter< ImageType, OutputImageType > WriterType;
+  typedef itk::Image< InputPixelType, DIM_3D > InputImageType;
+  typedef itk::Image< OutputPixelType, DIM_3D > OutputImageType;
+  typedef typename Core::ITKImageDataT< OutputPixelType > OutputType;
+
+  typename InputImageType::Pointer itk_image = image_data->get_image();
+
+  typedef itk::RescaleIntensityImageFilter< InputImageType, InputImageType > RescaleType;
+  typename RescaleType::Pointer rescale = RescaleType::New();
+
+  // assumes casting to type with smaller range...
+  rescale->SetInput( itk_image );
+  rescale->SetOutputMinimum( itk::NumericTraits< OutputPixelType >::min() );
+  // TODO: problem for PNG?
+  rescale->SetOutputMaximum( itk::NumericTraits< OutputPixelType >::max() );
+
+  typedef itk::CastImageFilter< InputImageType, OutputImageType > CastFilterType;
+  typename CastFilterType::Pointer castFilter = CastFilterType::New();
+  castFilter->SetInput( rescale->GetOutput() );
+  castFilter->Update();
+
+  return castFilter->GetOutput();
+}
+
+void set_data_series_names( itk::NumericSeriesFileNames::Pointer& name_series_generator, 
+                            const std::string& file_path, const std::string& file_name,
+                            const size_t size, const std::string& extension )
+{
+  boost::filesystem::path path = boost::filesystem::path( file_path );
+
+  std::string ext, filename_base;
+  std::tie( ext, filename_base ) = Core::GetFullExtension( boost::filesystem::path( file_name ) );
+
+  boost::filesystem::path filename_path = path / filename_base;
+
+  if ( size < 100 )
+  {
+    name_series_generator->SetSeriesFormat( filename_path.string() + "-%02d" + extension );
+  }
+  else if ( size < 1000 )
+  {
+    name_series_generator->SetSeriesFormat( filename_path.string() + "-%03d" + extension );
+  }
+  else if ( size < 10000 )
+  {
+    name_series_generator->SetSeriesFormat( filename_path.string() + "-%04d" + extension );
+  }
+  else
+  {
+    name_series_generator->SetSeriesFormat( filename_path.string() + "-%10d" + extension );
+  }
+}
+
+template< class PixelType >
+bool export_volume( const std::string& file_path,
+                    const std::string& file_name,
+                    typename itk::Image< PixelType, DIM_3D >::Pointer itk_image,
+                    const std::string& extension )
+{
+  boost::filesystem::path full_file(file_path);
+  full_file /= file_name;
+  full_file.replace_extension( extension );
+
+  typedef itk::Image< PixelType, DIM_3D > OutputImageType;
+  typedef itk::ImageFileWriter< OutputImageType > WriterType;
   typename WriterType::Pointer writer = WriterType::New();
 
-  Core::ITKImageDataHandle image_data = typename Core::ITKImageDataT< InputPixelType >::Handle( 
-    new Core::ITKImageDataT< InputPixelType >( temp_handle->get_data_volume()->get_data_block(), 
-    temp_handle->get_grid_transform() ) );
+  writer->SetInput( itk_image );
+  writer->SetFileName( full_file.string() );
 
-  ImageType* itk_image = dynamic_cast< ImageType* >( 
-    image_data->get_base_image().GetPointer() );
+  try
+  {
+    writer->Update();
+  }
+  catch ( itk::ExceptionObject &err )
+  {
+    std::string itk_error = err.GetDescription();
+    CORE_LOG_ERROR(itk_error);
+    return false;
+  }
+
+  return true;
+}
+
+////////////// - Templated functions for exporting bitmaps and DICOM's - ///////////////
+////////////////////////////////////////////////////////////////////////////////////////
+template< class PixelType >
+bool export_image_series( const std::string& file_path,
+                          const std::string& file_name,
+                          typename itk::Image< PixelType, DIM_3D >::Pointer itk_image,
+                          const std::string& extension )
+{
+  typedef itk::Image< PixelType, DIM_3D > ImageType;
+  typedef itk::Image< PixelType, DIM_2D > OutputImageType;
+  typedef itk::ImageSeriesWriter< ImageType, OutputImageType > WriterType;
+  typename WriterType::Pointer writer = WriterType::New();
 
   typename ImageType::RegionType region = itk_image->GetLargestPossibleRegion();
   typename ImageType::IndexType start = region.GetIndex();
@@ -129,6 +187,7 @@ bool export_nondicom_series( const std::string& file_path, const std::string& fi
   catch ( itk::ExceptionObject &err )
   {
     std::string itk_error = err.GetDescription();
+    CORE_LOG_ERROR(itk_error);
     return false;
   }
 
@@ -159,26 +218,20 @@ void copy_dictionary( const itk::MetaDataDictionary &fromDict, itk::MetaDataDict
   }
 }
 
-template< class InputPixelType, class OutputPixelType >
-bool export_dicom_series( const std::string& file_path, const std::string& file_name, 
-  DataLayerHandle temp_handle, const std::string& extension )
+template< class PixelType >
+bool export_dicom_series( const std::string& file_path,
+                          const std::string& file_name,
+                          typename itk::Image< PixelType, DIM_3D >::Pointer itk_image,
+                          DataLayerHandle temp_handle,
+                          const std::string& extension )
 {
   typedef itk::GDCMImageIO ImageIOType;
   ImageIOType::Pointer dicom_io = ImageIOType::New();
 
-  typedef itk::Image< InputPixelType, 3 > ImageType;
-  typedef itk::Image< OutputPixelType, 2 > OutputImageType;
+  typedef itk::Image< PixelType, DIM_3D > ImageType;
+  typedef itk::Image< PixelType, DIM_2D > OutputImageType;
   typedef itk::ImageSeriesWriter< ImageType, OutputImageType > WriterType;
   typename WriterType::Pointer writer = WriterType::New();
-
-  Core::GridTransform grid_transform = temp_handle->get_grid_transform();
-
-  Core::ITKImageDataHandle image_data = typename Core::ITKImageDataT< InputPixelType >::Handle( 
-    new Core::ITKImageDataT< InputPixelType >( temp_handle->get_data_volume()->get_data_block(), 
-    grid_transform ) );
-
-  ImageType* itk_image = dynamic_cast< ImageType* >( 
-    image_data->get_base_image().GetPointer() );
 
   typename ImageType::RegionType region = itk_image->GetLargestPossibleRegion();
   typename ImageType::IndexType start = region.GetIndex();
@@ -195,7 +248,6 @@ bool export_dicom_series( const std::string& file_path, const std::string& file_
   names_generator->SetEndIndex( last_slice );
   names_generator->SetIncrementIndex( 1 );
 
-
   ///////////////////////////////////////////////////////////////////////////
 
   // Check whether header file was included
@@ -206,7 +258,6 @@ bool export_dicom_series( const std::string& file_path, const std::string& file_
   std::vector< std::string > header_files;
   ProjectHandle project = ProjectManager::Instance()->get_current_project();
   InputFilesID inputfiles_id = -1;
-
 
   if ( PreferencesManager::Instance()->export_dicom_headers_state_->get() )
   {
@@ -243,6 +294,8 @@ bool export_dicom_series( const std::string& file_path, const std::string& file_
     }
   }
 
+  // TODO: this is weird - why is it needed???
+  // If validation check, should be at function beginning!
   std::string l_extension = boost::to_lower_copy( extension );
   if ( l_extension == ".dcm" || l_extension == ".dicom" || l_extension == ".ima" )
   {
@@ -264,17 +317,18 @@ bool export_dicom_series( const std::string& file_path, const std::string& file_
     {
       reader = ReaderType::New();
       reader->SetImageIO( dicom_io );
-      reader->SetFileNames( header_files ); 
-      try 
+      reader->SetFileNames( header_files );
+      try
       {
         reader->Update();
       }
-      catch (itk::ExceptionObject & err ) 
+      catch (itk::ExceptionObject & err )
       {
-        std::cerr << "error " << err << std::endl;
-        return false;   
+        std::string itk_error = err.GetDescription();
+        CORE_LOG_ERROR(itk_error);
+        return false;
       }
-      catch ( ... ) 
+      catch ( ... )
       {
         return false;
       }
@@ -291,8 +345,9 @@ bool export_dicom_series( const std::string& file_path, const std::string& file_
 
     double min_value = temp_handle->min_value_state_->get();
     double max_value = temp_handle->max_value_state_->get();
+    Core::GridTransform grid_transform = temp_handle->get_grid_transform();
 
-    std::string series_uid = uid.Generate();    
+    std::string series_uid = uid.Generate();
     std::string description = "Data Generated by Seg3D";
     std::string data_center = Core::ExportToString( 0.5 * ( min_value + max_value ) );
     std::string data_width = Core::ExportToString( max_value - min_value );
@@ -319,11 +374,11 @@ bool export_dicom_series( const std::string& file_path, const std::string& file_
       itk::EncapsulateMetaData<std::string>( *dict, "0028|1051", data_width );
       // [Series Description]
       itk::EncapsulateMetaData<std::string>( *dict, "0008|103e", description );
-      // [Bits Allocated] 
+      // [Bits Allocated]
       itk::EncapsulateMetaData<std::string>( *dict, "0028|0100", "" );
       // [Bits Stored]
       itk::EncapsulateMetaData<std::string>( *dict, "0028|0101", "" );
-      // [High Bit] 
+      // [High Bit]
       itk::EncapsulateMetaData<std::string>( *dict, "0028|0102", "" );
       // [Pixel Representation]
       itk::EncapsulateMetaData<std::string>( *dict, "0028|0103", "" );
@@ -332,8 +387,8 @@ bool export_dicom_series( const std::string& file_path, const std::string& file_
       z_offset += 1.0;
       std::ostringstream patient_location;
       patient_location << Core::ExportToString( slice_origin.x() ) << "\\" <<
-        Core::ExportToString( slice_origin.y() ) << "\\" <<
-        Core::ExportToString( slice_origin.z() );
+      Core::ExportToString( slice_origin.y() ) << "\\" <<
+      Core::ExportToString( slice_origin.z() );
       itk::EncapsulateMetaData<std::string>( *dict, "0020|0032", patient_location.str() );
 
       double spacing_x = grid_transform.project( Core::Vector( 1.0, 0.0, 0.0 ) ).length();
@@ -346,7 +401,7 @@ bool export_dicom_series( const std::string& file_path, const std::string& file_
       typedef itk::Array< double > DoubleArrayType;
       DoubleArrayType originArray( 3 );
       DoubleArrayType spacingArray( 3 );
-      
+
       originArray[ 0 ]  = slice_origin.x();
       originArray[ 1 ]  = slice_origin.y();
       originArray[ 2 ]  = slice_origin.z();
@@ -364,7 +419,7 @@ bool export_dicom_series( const std::string& file_path, const std::string& file_
     writer->SetMetaDataDictionaryArray( &dict_array );
   }
   ////////////////////////////////////////////////////////////////////////////
-  
+
   gdcm::ImageHelper::SetForcePixelSpacing( true );
 
   try
@@ -374,6 +429,7 @@ bool export_dicom_series( const std::string& file_path, const std::string& file_
   catch ( itk::ExceptionObject &err )
   {
     std::string itk_error = err.GetDescription();
+    CORE_LOG_ERROR(itk_error);
     return false;
   }
 
@@ -387,110 +443,117 @@ ITKDataLayerExporter::ITKDataLayerExporter( std::vector< LayerHandle >& layers )
   LayerExporter( layers ),
   pixel_type_( Core::DataType::UCHAR_E )
 {
-  if( !layers[ 0 ] ) return;
+  if ( ! layers[ 0 ] ) return;
   this->pixel_type_ = layers[ 0 ]->get_data_type();
 }
 
-bool ITKDataLayerExporter::export_layer( const std::string& mode, const std::string& file_path, 
-  const std::string& name )
+template< class InputPixelType >
+bool ITKDataLayerExporter::export_layer_internal( const std::string& file_path,
+                                                  const std::string& name,
+                                                  DataLayerHandle temp_handle )
 {
+  typedef typename Core::ITKImageDataT< InputPixelType > ImageData;
+  typedef typename ImageData::Handle ImageDataHandle;
+  ImageDataHandle image_data = ImageDataHandle(
+    new ImageData( temp_handle->get_data_volume()->get_data_block(),
+                   temp_handle->get_grid_transform() ) );
+
   if ( this->extension_ == ".dcm" )
   {
-    if ( ! this->export_dcm_series( file_path, name ) ) return false;
+    if ( this->pixel_type_ == Core::DataType::FLOAT_E || this->pixel_type_ == Core::DataType::DOUBLE_E ||
+         this->pixel_type_ == Core::DataType::ULONGLONG_E || this->pixel_type_ == Core::DataType::LONGLONG_E )
+    {
+      typename itk::Image< int, DIM_3D >::Pointer new_image_data = cast_image< InputPixelType, int >( image_data );
+      return export_dicom_series< int >( file_path, name, new_image_data, temp_handle, this->extension_ );
+    }
+    else
+    {
+      return export_dicom_series< InputPixelType >( file_path, name, image_data->get_image(), temp_handle, this->extension_ );
+    }
+  }
+  else if ( this->extension_ == ".tiff" || this->extension_ == ".tif" )
+  {
+    if ( this->pixel_type_ == Core::DataType::DOUBLE_E)
+    {
+      typename itk::Image< float, DIM_3D >::Pointer new_image_data = cast_image< InputPixelType, float >( image_data );
+      return export_image_series< float >( file_path, name, new_image_data, this->extension_ );
+    }
+    else if ( this->pixel_type_ == Core::DataType::ULONGLONG_E || this->pixel_type_ == Core::DataType::LONGLONG_E )
+    {
+      typename itk::Image< int, DIM_3D >::Pointer new_image_data = cast_image< InputPixelType, int >( image_data );
+      return export_image_series< int >( file_path, name, new_image_data, this->extension_ );
+    }
+    else
+    {
+      return export_image_series< InputPixelType >( file_path, name, image_data->get_image(), this->extension_ );
+    }
+  }
+  else if ( this->extension_ == ".png" )
+  {
+    if (! ( this->pixel_type_ == Core::DataType::CHAR_E || this->pixel_type_ == Core::DataType::UCHAR_E ||
+            this->pixel_type_ == Core::DataType::USHORT_E ) )
+    {
+      typename itk::Image< unsigned short, DIM_3D >::Pointer new_image_data = cast_image< InputPixelType, unsigned short >( image_data );
+      return export_image_series< unsigned short >( file_path, name, new_image_data, this->extension_ );
+    }
+    else
+    {
+      return export_image_series< InputPixelType >( file_path, name, image_data->get_image(), this->extension_ );
+    }
+  }
+  else if ( this->extension_ == ".nii" || this->extension_ == ".nii.gz" )
+  {
+    // supports all
+    return export_volume< InputPixelType >( file_path, name, image_data->get_image(), this->extension_ );
   }
   else if ( ! this->extension_.empty() )
   {
-    if ( ! this->export_itk_series( file_path ) ) return false;
+    return export_image_series< InputPixelType >( file_path, name, image_data->get_image(), this->extension_ );
   }
-  
+
   CORE_LOG_SUCCESS( "Data export has been successfully completed." );
   return true;
 }
-  
-bool ITKDataLayerExporter::export_dcm_series( const std::string& file_path, const std::string& name )
+
+bool ITKDataLayerExporter::export_layer( const std::string& mode, const std::string& file_path, const std::string& name )
 {
-  DataLayerHandle temp_handle =  boost::dynamic_pointer_cast< DataLayer >( this->layers_[ 0 ] );
-  switch( this->layers_[ 0 ]->get_data_type() )
+  DataLayerHandle temp_handle = boost::dynamic_pointer_cast< DataLayer >( this->layers_[ 0 ] );
+
+  switch( this->pixel_type_ )
   {
     case Core::DataType::UCHAR_E:
-      return export_dicom_series< unsigned char, unsigned char >( file_path, name, 
-        temp_handle, this->extension_ );
+      return export_layer_internal< unsigned char >( file_path, name, temp_handle );
       break;
     case Core::DataType::CHAR_E:
-      return export_dicom_series< signed char, signed char >( file_path, name, 
-        temp_handle, this->extension_ );
+      return export_layer_internal< signed char >( file_path, name, temp_handle );
       break;
     case Core::DataType::USHORT_E:
-      return export_dicom_series< unsigned short, unsigned short >( file_path, name, 
-        temp_handle, this->extension_ );
+      return export_layer_internal< unsigned short >( file_path, name, temp_handle );
       break;
     case Core::DataType::SHORT_E:
-      return export_dicom_series< signed short, signed short >( file_path, name, 
-        temp_handle, this->extension_ );
+      return export_layer_internal< signed short >( file_path, name, temp_handle );
       break;
     case Core::DataType::UINT_E:
-      return export_dicom_series< signed int, signed int >( file_path, name, 
-        temp_handle, this->extension_ );
+      return export_layer_internal< unsigned int >( file_path, name, temp_handle );
       break;
     case Core::DataType::INT_E:
-      return export_dicom_series< unsigned int, unsigned int >( file_path, name, 
-        temp_handle, this->extension_ );
+      return export_layer_internal< signed int >( file_path, name, temp_handle );
+      break;
+    case Core::DataType::ULONGLONG_E:
+      return export_layer_internal< unsigned long long >( file_path, name, temp_handle );
+      break;
+    case Core::DataType::LONGLONG_E:
+      return export_layer_internal< long long >( file_path, name, temp_handle );
       break;
     case Core::DataType::FLOAT_E:
-      return export_dicom_series< float, signed short >( file_path, name, 
-        temp_handle, this->extension_ );
+      return export_layer_internal< float >( file_path, name, temp_handle );
       break;
     case Core::DataType::DOUBLE_E:
-      return export_dicom_series< double, signed short >( file_path, name, 
-        temp_handle, this->extension_ );
+      return export_layer_internal< double >( file_path, name, temp_handle );
       break;
     default:
       return false;
   }
-  return false;
-}
-  
-bool ITKDataLayerExporter::export_itk_series( const std::string& file_path )
-{
-  DataLayerHandle temp_handle =  boost::dynamic_pointer_cast< DataLayer >( this->layers_[ 0 ] );
-  switch( this->layers_[ 0 ]->get_data_type() )
-  {
-  case Core::DataType::UCHAR_E:
-    return export_nondicom_series< unsigned char, unsigned char >( file_path, 
-      ( temp_handle->get_layer_name() + this->extension_ ), temp_handle, this->extension_ );
-    break;
-  case Core::DataType::CHAR_E:
-    return export_nondicom_series< signed char, signed char >( file_path, 
-      ( temp_handle->get_layer_name() + this->extension_ ), temp_handle, this->extension_ );
-    break;
-  case Core::DataType::USHORT_E:
-    return export_nondicom_series< unsigned short, unsigned short >( file_path, 
-      ( temp_handle->get_layer_name() + this->extension_ ), temp_handle, this->extension_ );
-    break;
-  case Core::DataType::SHORT_E:
-    return export_nondicom_series< signed short, signed short >( file_path, 
-      ( temp_handle->get_layer_name() + this->extension_ ), temp_handle, this->extension_ );
-    break;
-  case Core::DataType::UINT_E:
-    return export_nondicom_series< signed int, signed int >( file_path, 
-      ( temp_handle->get_layer_name() + this->extension_ ), temp_handle, this->extension_ );
-    break;
-  case Core::DataType::INT_E:
-    return export_nondicom_series< unsigned int, unsigned int >( file_path, 
-      ( temp_handle->get_layer_name() + this->extension_ ), temp_handle, this->extension_ );
-    break;
-  case Core::DataType::FLOAT_E:
-    return export_nondicom_series< float, unsigned short >( file_path, 
-      ( temp_handle->get_layer_name() + this->extension_ ), temp_handle, this->extension_ );
-    break;
-  case Core::DataType::DOUBLE_E:
-    return export_nondicom_series< double, unsigned short >( file_path, 
-      ( temp_handle->get_layer_name() + this->extension_ ), temp_handle, this->extension_ );
-    break;
-  default:
-    return false;
-  }
-  return false;
 }
 
 } // end namespace seg3D

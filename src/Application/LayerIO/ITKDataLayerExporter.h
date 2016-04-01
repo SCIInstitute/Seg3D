@@ -55,7 +55,7 @@ namespace Seg3D
 
 class ITKDataLayerExporter : public LayerExporter
 {
-  SEG3D_EXPORTER_TYPE( "ITK Data Exporter", ".dcm;.tiff;.png;.bmp" )
+  SEG3D_EXPORTER_TYPE( "ITK Data Exporter", ".dcm;.tiff;.tif;.png;.bmp;.nii;.nii.gz" )
 
   // -- Constructor/Destructor --
 public:
@@ -73,19 +73,20 @@ public:
   /// function that sets the extension to be used by the exporter
   virtual void set_extension( std::string extension ) override
   { this->extension_ = extension; }
-  
+
   // --Import the data as a specific type --  
 public: 
 
   /// EXPORT_LAYER
   /// Export the layer to file
-  virtual bool export_layer( const std::string& mode, const std::string& file_path, 
-    const std::string& name ) override;
-    
+  virtual bool export_layer( const std::string& mode,
+                             const std::string& file_path,
+                             const std::string& name ) override;
+
 private:
-  bool export_dcm_series( const std::string& file_path, const std::string& name );
-  bool export_itk_series( const std::string& file_path );
-  
+  template< class InputPixelType >
+  bool export_layer_internal( const std::string& file_path, const std::string& name, DataLayerHandle temp_handle );
+
 private:
   Core::DataType pixel_type_;
   std::string extension_;

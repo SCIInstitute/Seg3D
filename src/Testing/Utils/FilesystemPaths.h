@@ -35,6 +35,7 @@ namespace Testing {
   
 namespace Utils {    
 
+boost::filesystem::path testInputDir();
 boost::filesystem::path testOutputDir();
   
 }}

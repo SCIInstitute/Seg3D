@@ -339,7 +339,9 @@ Transform ITKImageDataT<T>::get_transform() const
 {
   typename image_type::PointType point = itk_image_->GetOrigin();
   Point origin( point[ 0 ], point[ 1 ], point[ 2 ] );
-  
+
+  // ITK direction type is matrix of direction cosines
+  // Seg3D uses same LPS (Left, Posterior, Superior) 3D basis
   typename image_type::DirectionType direction = itk_image_->GetDirection();
   typename image_type::SpacingType spacing = itk_image_->GetSpacing();
   Vector direction_x( direction[ 0 ][ 0 ], direction[ 0 ][ 1 ], direction[ 0 ][ 2 ] );
@@ -356,10 +358,10 @@ Transform ITKImageDataT<T>::get_transform() const
 template<class T>
 void ITKImageDataT<T>::set_transform( Transform& transform )
 {
-  Point origin = transform.project( Point( 0.0, 0.0, 0.0 ) );
-  Vector direction_x = transform.project( Vector( 1.0, 0.0, 0.0 ) );
-  Vector direction_y = transform.project( Vector( 0.0, 1.0, 0.0 ) );
-  Vector direction_z = transform.project( Vector( 0.0, 0.0, 1.0 ) );
+  Point origin = transform.project( GridTransform::DEFAULT_ORIGIN );
+  Vector direction_x = transform.project( GridTransform::X_AXIS );
+  Vector direction_y = transform.project( GridTransform::Y_AXIS );
+  Vector direction_z = transform.project( GridTransform::Z_AXIS );
   
   double spacing_x = direction_x.length();
   double spacing_y = direction_y.length();

@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
- 
+
  The MIT License
- 
+
  Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
- 
- 
+
+
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -24,30 +24,30 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
-*/
+ */
 
-#include <Testing/Utils/FilesystemPaths.h>
+#include <gtest/gtest.h>
 
-namespace Testing {
+#include <Core/Geometry/Vector.h>
 
-namespace Utils {    
+using namespace Core;
 
-boost::filesystem::path testOutputDir()
+TEST(VectorTests, EmptyVector)
 {
-#ifdef BUILD_TESTING
-  return TEST_OUTPUT_PATH;
-#else
-  return boost::filesystem::path();
-#endif
+  Vector *vector = new Vector;
+  ASSERT_FALSE(vector == nullptr);
+
+  ASSERT_EQ(vector->x(), 0);
+  ASSERT_EQ(vector->y(), 0);
+  ASSERT_EQ(vector->z(), 0);
 }
 
-boost::filesystem::path testInputDir()
+TEST(VectorTests, EmptyVectorF)
 {
-#ifdef BUILD_TESTING
-  return TEST_INPUT_PATH;
-#else
-  return boost::filesystem::path();
-#endif
-}
+  VectorF *vector = new VectorF;
+  ASSERT_FALSE(vector == nullptr);
 
-}}
+  ASSERT_EQ(vector->x(), 0);
+  ASSERT_EQ(vector->y(), 0);
+  ASSERT_EQ(vector->z(), 0);
+}

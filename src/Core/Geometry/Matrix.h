@@ -198,6 +198,7 @@ public:
 
   // INVERT:
   /// Compute the inverse of the input matrix using LU decomposition
+  /// (boost ublas lu_factorize)
   static bool Invert( const MatrixF& mat, MatrixF& inverse );
 
   // TRANSPOSE:

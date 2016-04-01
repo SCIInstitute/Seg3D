@@ -40,7 +40,7 @@ namespace Core
 
 bool CreateOrIgnoreDirectory( const boost::filesystem::path& dir_path )
 {
-  if ( !boost::filesystem::exists( dir_path ) )
+  if ( ! boost::filesystem::exists( dir_path ) )
   {
     try
     {
@@ -51,7 +51,7 @@ bool CreateOrIgnoreDirectory( const boost::filesystem::path& dir_path )
       return false;
     }
   }
-  else if ( !boost::filesystem::is_directory( dir_path ) )
+  else if ( ! boost::filesystem::is_directory( dir_path ) )
   {
     return false;
   }
@@ -64,10 +64,10 @@ bool RecursiveCopyDirectory( const boost::filesystem::path& from, const boost::f
   using namespace boost::filesystem;
   
   // If the source path doesn't exist or it's not a directory
-  if ( !exists( from ) || !is_directory( from ) ) return false;
+  if ( ! exists( from ) || !is_directory( from ) ) return false;
   
   // Create the destination directory
-  if ( !CreateOrIgnoreDirectory( to ) ) return false;
+  if ( ! CreateOrIgnoreDirectory( to ) ) return false;
   
   try
   {
@@ -109,10 +109,11 @@ bool RecursiveCopyDirectory( const boost::filesystem::path& from, const boost::f
   return true;
 }
 
-std::string GetFullExtension( const boost::filesystem::path& filename )
+std::tuple< std::string, std::string > GetFullExtension( const boost::filesystem::path& filename )
 {
   // NOTE: extension includes the dot
   std::string extension = boost::to_lower_copy( boost::filesystem::extension( filename ) );
+  std::string filename_base = filename.stem().string();
   
   // Special case if gzipped (ITK, possibly others...)
   // TODO: check to see if there's another extension
@@ -120,9 +121,11 @@ std::string GetFullExtension( const boost::filesystem::path& filename )
   {
     std::ostringstream oss;
     oss << boost::to_lower_copy( boost::filesystem::extension( filename.stem() ) ) << ".gz";
-    return oss.str();
+    extension = oss.str();
+    filename_base = filename.stem().stem().string();
   }
-  return extension;
+
+  return std::make_tuple( extension, filename_base);
 }
 
 

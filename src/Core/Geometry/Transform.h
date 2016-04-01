@@ -130,6 +130,7 @@ public:
   static const int TRANSFORM_LENGTH;
 
 protected:
+  // rotation matrix
   Matrix mat_;
 };
 
@@ -219,6 +220,7 @@ public:
   static const int TRANSFORM_LENGTH;
 
 protected:
+  // rotation matrix
   MatrixF mat_;
 };
 

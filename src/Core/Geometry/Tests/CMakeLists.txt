@@ -1,23 +1,21 @@
-
-#
 #  For more information, please see: http://software.sci.utah.edu
-# 
+#
 #  The MIT License
-# 
+#
 #  Copyright (c) 2015 Scientific Computing and Imaging Institute,
 #  University of Utah.
-# 
-#  
+#
+#
 #  Permission is hereby granted, free of charge, to any person obtaining a
 #  copy of this software and associated documentation files (the "Software"),
 #  to deal in the Software without restriction, including without limitation
 #  the rights to use, copy, modify, merge, publish, distribute, sublicense,
 #  and/or sell copies of the Software, and to permit persons to whom the
 #  Software is furnished to do so, subject to the following conditions:
-# 
+#
 #  The above copyright notice and this permission notice shall be included
-#  in all copies or substantial portions of the Software. 
-# 
+#  in all copies or substantial portions of the Software.
+#
 #  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
 #  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 #  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -25,52 +23,21 @@
 #  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 #  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 #  DEALINGS IN THE SOFTWARE.
-#
 
-##################################################
-# Set sources
-##################################################
-
-SET(CORE_GEOMETRY_SRCS
-  BBox.h
-  BBox.cc
-  Color.h
-  Color.cc
-  Plane.h
-  Plane.cc
-  Point.h
-  Point.cc
-  Transform.h
-  Transform.cc
-  GridTransform.h
-  GridTransform.cc
-  IndexVector.h
-  IndexVector.cc
-  Vector.h
-  Vector.cc
-  View3D.h
-  View3D.cc
-  View2D.h
-  View2D.cc
-  Quaternion.h
-  Quaternion.cc
-  Matrix.h
-  Matrix.cc
-  Algorithm.h
-  Algorithm.cc
-  Measurement.h
-  Measurement.cc
-  SinglePath.h
-  Path.h
-  Path.cc
+SET(Core_Geometry_Tests_SRCS
+  GridTransformTests.cc
+  MatrixTests.cc
+  PointTests.cc
+  TransformTests.cc
+  VectorTests.cc
 )
 
-##################################################
-# Build static library
-##################################################
+REGISTER_UNIT_TEST(Core_Geometry_Tests
+  ${Core_Geometry_Tests_SRCS}
+)
 
-CORE_ADD_LIBRARY(Core_Geometry ${CORE_GEOMETRY_SRCS})
-
-TARGET_LINK_LIBRARIES(Core_Geometry ${SCI_BOOST_LIBRARY})
-
-ADD_TEST_DIR(Tests)
+TARGET_LINK_LIBRARIES(Core_Geometry_Tests
+  Core_Geometry
+  Testing_Utils
+  ${SCI_GTESTMAIN_LIBRARY}
+)

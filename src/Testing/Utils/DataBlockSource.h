@@ -30,8 +30,8 @@
 #define TESTING_UTILS_DATABLOCKSOURCE_H
 
 #include <boost/assign.hpp>
-#include <boost/tuple/tuple.hpp>
 
+#include <tuple>
 #include <vector>
 
 #include <Core/DataBlock/DataBlock.h>
@@ -55,12 +55,11 @@ std::vector<T> generate3x3x3Data()
   return data;
 }
 
-// use std::tuple when upgrading to C++11
-boost::tuple<Core::DataBlockHandle, Core::GridTransform>
-generate3x3x3StdDataBlock(const Core::DataType& type,
-                          const Core::Point& origin,
-                          const Core::Vector& spacing,
-                          bool nodeCentered);
+std::tuple<Core::DataBlockHandle, Core::GridTransform>
+generate3x3x3StdDataBlock( const Core::DataType& type,
+                           const Core::Point& origin,
+                           const Core::Vector& spacing,
+                           bool nodeCentered );
 
 }}
 

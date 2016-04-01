@@ -31,6 +31,8 @@
 
 // STL includes
 #include <vector>
+#include <map>
+#include <string>
 
 // Boost includes
 #include <boost/smart_ptr.hpp> // Needed for shared_ptr
@@ -60,7 +62,9 @@ typedef std::vector< VectorF > VectorFVector;
 typedef std::vector< unsigned char > UCharVector;
 typedef std::vector< size_t > IVector;
 
-/// Isosurface geometry and computation code
+typedef std::map<std::string, std::string> FilterMap;
+
+// Isosurface geometry and computation code 
 class Isosurface : public Core::RecursiveLockable
 {
 public:
@@ -169,6 +173,7 @@ public:
   update_progress_signal_type update_progress_signal_;
 
   static const std::string EXPORT_FORMATS_C;
+  static const FilterMap EXPORT_FORMATS_MAP_C;
 
 private:
   IsosurfacePrivateHandle private_;

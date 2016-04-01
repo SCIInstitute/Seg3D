@@ -28,6 +28,7 @@
 
 // STL includes
 #include <algorithm>
+#include <tuple>
 
 // Boost includes
 #include <boost/algorithm/minmax_element.hpp>
@@ -163,7 +164,8 @@ bool LayerIO::create_single_file_importer( const std::string& filename,
 
   // Determine the file extension  
   // NOTE: extension includes the dot
-  std::string extension = Core::GetFullExtension( full_filename );
+  std::string extension, filename_base;
+  std::tie( extension, filename_base ) = Core::GetFullExtension( full_filename );
 
   // Lock the factory
   lock_type lock( this->get_mutex() );
@@ -454,8 +456,10 @@ bool LayerIO::create_file_series_importer( const std::vector< std::string >& fil
 }
 
 
-bool LayerIO::create_exporter( LayerExporterHandle& exporter, std::vector< LayerHandle >& layers, 
-  const std::string full_exportername, const std::string extension )
+bool LayerIO::create_exporter( LayerExporterHandle& exporter,
+                               std::vector< LayerHandle >& layers,
+                               const std::string full_exportername,
+                               const std::string extension )
 {
   // Clean up the importer name.
   // TODO: Need to move this clean up to the Interface layer
@@ -498,9 +502,9 @@ bool LayerIO::FindFileSeries( std::vector<std::string >& filenames )
     
     // Step 3: now we want to see if we can figure out the file name pattern.  We will start by
     // checking to see if the sequence numbers are at the end of the file name.  
-    std::string filename = boost::filesystem::basename( full_filename );
-    std::string extension = Core::GetFullExtension( full_filename );
-    
+    std::string filename, extension;
+    std::tie( extension, filename ) = Core::GetFullExtension( full_filename );
+
     // Create a vector for finding numbers in the filename, for each one we will scan if there
     // is a sequential list available. The next vector denotes from where to where numbers can
     // be found.
@@ -551,7 +555,8 @@ bool LayerIO::FindFileSeries( std::vector<std::string >& filenames )
       
       for ( size_t k = 0; k < dir_files.size(); k++ )
       {
-        std::string filename_extension = Core::GetFullExtension( dir_full_filenames[ k ] );
+        std::string filename_extension, filename_base;
+        std::tie( filename_extension, filename_base ) = Core::GetFullExtension( dir_full_filenames[ k ] );
 
         if ( filename_extension == extension &&
           dir_files[ k ].substr( 0, start ) == filename_prefix &&
@@ -593,16 +598,17 @@ bool LayerIO::FindFileSeries( std::vector<std::string >& filenames )
       
       for ( size_t k = 0; k < dir_files.size(); k++ )
       {
-        std::string filename_extension = Core::GetFullExtension( dir_full_filenames[ k ] );
+        std::string filename_extension, filename_base;
+        std::tie( filename_extension, filename_base ) = Core::GetFullExtension( dir_full_filenames[ k ] );
         if ( filename_extension == extension &&
-          dir_files[ k ].substr( 0, start ) == filename_prefix &&
-          dir_files[ k ].size() >= end &&
-          dir_files[ k ].substr( dir_files[ k ].size() - end ) == filename_postfix )
+             dir_files[ k ].substr( 0, start ) == filename_prefix &&
+             dir_files[ k ].size() >= end &&
+             dir_files[ k ].substr( dir_files[ k ].size() - end ) == filename_postfix )
         {
           size_t val;
           if ( dir_files[ k ].size() >= end + start &&  
-            Core::ImportFromString( dir_files[ k ].substr( start, 
-            dir_files[ k ].size() - end - start ), val ) )
+               Core::ImportFromString( dir_files[ k ].substr( start,
+               dir_files[ k ].size() - end - start ), val ) )
           {
             order[ j ].first = val;
             order[ j ].second = j;
@@ -621,7 +627,7 @@ bool LayerIO::FindFileSeries( std::vector<std::string >& filenames )
       {
         filenames[ j ] = old_files[ order[ j ].second ];
       }
-      
+
       return  true;
     }
     else
@@ -634,12 +640,12 @@ bool LayerIO::FindFileSeries( std::vector<std::string >& filenames )
   {
     std::vector<std::string>::iterator it = filenames.begin();
     std::vector<std::string>::iterator it_end = filenames.end();
-    
+
     std::vector<std::vector<size_t> > file_numbers;
     while ( it != it_end )
     {
       std::string filename = (*it);
-      
+
       for ( size_t j = 0; j < filename.size(); j++ )
       {
         if ( filename[ j ] < '0' || filename[ j ] > '9' ) filename[ j ] = ' ';
@@ -650,7 +656,7 @@ bool LayerIO::FindFileSeries( std::vector<std::string >& filenames )
       file_numbers.push_back( filename_numbers );
       ++it;
     }
-    
+
     size_t max_size = 0;
     for ( size_t j = 0; j < file_numbers.size(); j++ )
     {
@@ -660,7 +666,7 @@ bool LayerIO::FindFileSeries( std::vector<std::string >& filenames )
     if ( max_size )
     {
       std::vector<std::set<size_t> > numbers( 2*max_size );
-      
+
       for ( size_t j = 0; j < file_numbers.size(); j++ )
       {
         for ( size_t k = 0; k < file_numbers[ j ].size(); k++ )
@@ -690,7 +696,7 @@ bool LayerIO::FindFileSeries( std::vector<std::string >& filenames )
           index_range = range;
         }
       }
-      
+
       if ( index_size != filenames.size() )
       {
         // Not enough for sorting, use alphabetical order
@@ -717,9 +723,9 @@ bool LayerIO::FindFileSeries( std::vector<std::string >& filenames )
               ( index - max_size ) ];
           }
         }
-        
+
         std::sort( order.begin(), order.end() );
-        
+
         std::vector<std::string> old_files = filenames;
         for ( size_t j = 0; j < order.size(); j++ )
         {
