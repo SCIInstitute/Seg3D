@@ -57,6 +57,7 @@
 
 // Interface includes
 #include <Interface/Application/SegmentationExportWizard.h>
+#include <Interface/Application/StyleSheet.h>
 
 namespace Seg3D
 {
@@ -218,9 +219,9 @@ SegmentationSelectionPage::SegmentationSelectionPage( SegmentationPrivateHandle 
   //  SLOT( change_type_text( int ) ) );
   
   this->private_->warning_message_ = new QLabel( QString::fromUtf8( "This location does not exist, please choose a valid location." ) );
-  this->private_->warning_message_->setObjectName( QString::fromUtf8( "warning_message_" ) );
+  this->private_->warning_message_->setObjectName( QString::fromUtf8( "message_" ) );
   this->private_->warning_message_->setWordWrap( true );
-  this->private_->warning_message_->setStyleSheet(QString::fromUtf8( "QLabel#warning_message_{ color: red; } " ) );
+  this->private_->warning_message_->setStyleSheet( StyleSheet::MAIN_STYLE_C );
   this->private_->warning_message_->hide();
   
   this->private_->selection_main_layout_->addWidget( this->private_->single_or_multiple_files_widget_ );
@@ -320,7 +321,7 @@ bool SegmentationSelectionPage::validatePage()
       QTreeWidgetItem* mask = group->child( j );
       if ( mask->checkState( 0 ) == Qt::Checked )
       {
-        QtLayerListWidget* new_mask = new QtLayerListWidget();
+        QtLayerListWidget* new_mask = new QtLayerListWidget( this );
         new_mask->set_mask_name( mask->text( 0 ).toStdString() );
         new_mask->set_mask_index( 0 );
         this->private_->masks_.push_front( new_mask );
@@ -406,9 +407,9 @@ SegmentationSummaryPage::SegmentationSummaryPage( SegmentationPrivateHandle priv
   this->private_->mask_scroll_area_->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
   this->private_->mask_scroll_area_->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
   
-  this->private_->layers_ = new QWidget();
+  this->private_->layers_ = new QWidget( this );
   this->private_->layers_->setObjectName( QString::fromUtf8( "layers_" ) );
-  this->private_->layers_->setStyleSheet( QString::fromUtf8( "background-color: white;" ) );
+  this->private_->mask_scroll_area_->setStyleSheet( StyleSheet::SEGMENTATION_EXPORT_C );
   this->private_->masks_layout_ = new QVBoxLayout( this->private_->layers_ );
   this->private_->masks_layout_->setObjectName( QString::fromUtf8( "masks_layout_" ) );
   this->private_->mask_scroll_area_->setWidget( this->private_->layers_ );
@@ -425,9 +426,9 @@ void SegmentationSummaryPage::initializePage()
 
   this->private_->layers_->deleteLater();
 
-  this->private_->layers_ = new QWidget();
+  this->private_->layers_ = new QWidget( this );
   this->private_->layers_->setObjectName( QString::fromUtf8( "layers_" ) );
-  this->private_->layers_->setStyleSheet( QString::fromUtf8( "background-color: white;" ) );
+  this->private_->mask_scroll_area_->setStyleSheet( StyleSheet::SEGMENTATION_EXPORT_C );
 
   this->private_->masks_layout_ = new QVBoxLayout( this->private_->layers_ );
   this->private_->masks_layout_->setObjectName( QString::fromUtf8( "masks_layout_" ) );
@@ -444,7 +445,7 @@ void SegmentationSummaryPage::initializePage()
   // insert the background layer settings
   if ( save_as_single_file )
   {
-    QtLayerListWidget* new_mask = new QtLayerListWidget( this->private_->layers_ );
+    QtLayerListWidget* new_mask = new QtLayerListWidget( this );
     new_mask->set_mask_name( "Background" );
     this->private_->masks_layout_->addWidget( new_mask );
     this->private_->masks_.push_front( new_mask );

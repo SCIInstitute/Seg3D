@@ -119,6 +119,9 @@ public:
     const static QString GROUP_WIDGET_BACKGROUND_ACTIVE_C;
     const static QString GROUP_WIDGET_BACKGROUND_INACTIVE_C;
 
+ // === LayerResamplerDialog Styles === //
+    const static QString LAYER_RESAMPLER_C;
+
   // === PushDragButton's === //
     const static QString LAYER_PUSHDRAGBUTTON_C;
     const static QString GROUP_PUSHDRAGBUTTON_C;
@@ -160,6 +163,12 @@ public:
 
   // == Shortcuts Interface == //
     const static QString SHORTCUTS_C;
+
+  // == Export Segmentations == //
+    const static QString SEGMENTATION_EXPORT_C;
+
+  // == Speedline Tool == //
+    const static QString SPEEDLINE_TOOL_C;
 
   // == Colors == //
     const static QString ACCENT_COLOR_C;

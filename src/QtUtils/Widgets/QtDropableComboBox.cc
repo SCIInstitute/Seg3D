@@ -40,6 +40,7 @@ QtDropableComboBox::QtDropableComboBox( QWidget *parent ) :
   QComboBox( parent )
 {
   this->setAcceptDrops( true );
+  this->setSizeAdjustPolicy( QComboBox::AdjustToContents );
 }
   
 QtDropableComboBox::~QtDropableComboBox()

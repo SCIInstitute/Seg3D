@@ -1327,9 +1327,6 @@
                      <height>150</height>
                     </size>
                    </property>
-                   <property name="styleSheet">
-                    <string notr="true">border: 1px solid gray</string>
-                   </property>
                    <layout class="QVBoxLayout" name="verticalLayout_24">
                     <property name="spacing">
                      <number>0</number>
@@ -1382,9 +1379,6 @@ border: 0px</string>
                      <width>0</width>
                      <height>25</height>
                     </size>
-                   </property>
-                   <property name="styleSheet">
-                    <string notr="true">border: 1px solid gray</string>
                    </property>
                    <layout class="QVBoxLayout" name="tf_preview_layout_">
                     <property name="spacing">

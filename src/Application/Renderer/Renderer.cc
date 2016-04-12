@@ -1402,7 +1402,7 @@ bool Renderer::render_overlay()
       // Blend the text onto the framebuffer
       glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_ADD );
       glBegin( GL_QUADS );
-      glColor4f( 0.482f, 0.561f, 0.773f, 0.75f );
+      glColor4f( 0.624f, 0.725f, 1.0f, 0.75f ); // INTERFACE_ACCENT_BRIGHT_COLOR
       glTexCoord2f( 0.0f, 0.0f );
       glVertex2i( 0, 0 );
       glTexCoord2f( 1.0f, 0.0f );

@@ -553,8 +553,8 @@
                       <height>16777215</height>
                      </size>
                     </property>
-                    <property name="styleSheet">
-                     <string notr="true"/>
+                    <property name="lineWidth">
+                     <number>0</number>
                     </property>
                     <property name="orientation">
                      <enum>Qt::Vertical</enum>

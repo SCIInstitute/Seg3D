@@ -32,6 +32,8 @@
 // Qt includes
 #include <QPainter>
 #include <QLinearGradient>
+#include <QStyle>
+#include <QStyleOption>
 
 // Interface includes
 #include <QtUtils/Widgets/QtHistogramGraph.h>
@@ -44,7 +46,6 @@ QtHistogramGraph::QtHistogramGraph( QWidget *parent )
     logarithmic_( false ),
     left_click_( false )
 {
-    setBackgroundRole( QPalette::Base );
     setAutoFillBackground( true );
     this->setMinimumWidth( 250 );
 }
@@ -67,8 +68,12 @@ void QtHistogramGraph::reset_histogram( )
 
 void QtHistogramGraph::paintEvent(QPaintEvent * event )
 {
-    QPainter painter( this );
-    painter.setRenderHint( QPainter::Antialiasing, true );
+  QStyleOption opt;
+  opt.init(this);
+  QPainter painter( this );
+  painter.setRenderHint( QPainter::Antialiasing, true );
+  style()->drawPrimitive(QStyle::PE_Widget, &opt, &painter, this);
+
   if ( ! this->histogram_.is_valid() ) return;
   
     double histogram_width = this->width();

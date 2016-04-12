@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/" >
-        <file>Images/VisibleGray.png</file>
         <file>Palette_Icons/isoMenu_01.png</file>
         <file>Palette_Icons/add_01.png</file>
         <file>Palette_Icons/minus_01.png</file>
@@ -31,6 +30,7 @@
         <file>General_Icons/exit.png</file>
         <file>General_Icons/maximize.png</file>
         <file>General_Icons/checkbox-unselected.png</file>
+        <file>General_Icons/checkbox-indeterminate.png</file>
         <file>General_Icons/checkbox-selected.png</file>
         <file>Images/Crop.png</file>
         <file>Images/CropOff.png</file>
@@ -102,6 +102,8 @@
         <file>Images/UpArrowWhite.png</file>
         <file>Palette_Icons/visibilityPlus_01.png</file>
         <file>Images/VisibleWhite.png</file>
+        <file>Images/VisibleOff.png</file>
+        <file>Images/VisibleGray.png</file>
         <file>Palette_Icons/visibility_01.png</file>
         <file>Viewport_Icons/visibility_01.png</file>
         <file>Images/VisiblePlusOff.png</file>

@@ -58,7 +58,7 @@ QtLogSliderIntCombo::QtLogSliderIntCombo( QWidget* parent ) :
     this->connect( this->private_->ui_.spinBox, SIGNAL( valueChanged( int ) ), 
     this, SLOT( spinner_signal( int ) ) );
   
-  this->private_->ui_.horizontalSlider->setTickPosition( QSlider::NoTicks );
+    this->private_->ui_.horizontalSlider->setTickInterval( 100 );
 
   QFont font = this->private_->ui_.min_->font();
 #ifdef __APPLE__
@@ -70,6 +70,11 @@ QtLogSliderIntCombo::QtLogSliderIntCombo( QWidget* parent ) :
   this->private_->ui_.max_->setFont( font );
   this->private_->ui_.spinBox->setFont( font );
 
+#ifdef __APPLE__
+  font = this->private_->ui_.description_->font();
+  font.setPointSize( 12 );
+  this->private_->ui_.description_->setFont( font );
+#endif
 }
 
 QtLogSliderIntCombo::~QtLogSliderIntCombo()
@@ -127,6 +132,7 @@ void QtLogSliderIntCombo::setRange( int min, int max )
     this->private_->ui_.spinBox->setRange( min, max );
     this->private_->ui_.min_->setNum( min );
     this->private_->ui_.max_->setNum( max );
+    this->private_->ui_.horizontalSlider->setTickInterval( max - min );
     
     block_signals( false );
 }

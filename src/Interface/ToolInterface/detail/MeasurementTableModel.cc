@@ -174,7 +174,7 @@ QVariant MeasurementTableModel::data( const QModelIndex& index, int role ) const
       {
         if( measurements[ index.row() ].get_visible() )
         {
-          return QIcon( QString::fromUtf8( ":/Images/Visible.png" ) );
+          return QIcon( QString::fromUtf8( ":/Images/VisibleWhite.png" ) );
         }
         else
         { 
@@ -306,7 +306,7 @@ QVariant MeasurementTableModel::headerData( int section, Qt::Orientation orienta
       {
         if( this->private_->visibility_ == MeasurementVisibility::ALL_VISIBLE_E )
         {
-          return QIcon( QString::fromUtf8( ":/Images/Visible.png" ) );
+          return QIcon( QString::fromUtf8( ":/Images/VisibleWhite.png" ) );
         }
         else if( this->private_->visibility_ == MeasurementVisibility::NONE_VISIBLE_E )
         {
@@ -319,7 +319,7 @@ QVariant MeasurementTableModel::headerData( int section, Qt::Orientation orienta
       }
       else if( section == MeasurementColumns::COLOR_E )
       {
-        return QIcon( QString::fromUtf8( ":/Images/AppearanceOff.png" ) );
+        return QIcon( QString::fromUtf8( ":/Palette_Icons/brush_01.png" ) );
       }
     }
   }
@@ -344,6 +344,21 @@ QVariant MeasurementTableModel::headerData( int section, Qt::Orientation orienta
       }
     }
   }
+  // else if( role == Qt::TextAlignmentRole )
+  // {
+  //   if( orientation == Qt::Horizontal )
+  //   {
+  //     if( section == MeasurementColumns::COLOR_E ||
+  //          section == MeasurementColumns::VISIBLE_E )
+  //     {
+  //       return int( Qt::AlignLeft | Qt::AlignVCenter );
+  //     }
+  //   }
+  //   else if( orientation == Qt::Vertical )
+  //   {
+  //     return int( Qt::AlignHCenter | Qt::AlignVCenter );
+  //   }
+  // }
 
   return QVariant();
 }

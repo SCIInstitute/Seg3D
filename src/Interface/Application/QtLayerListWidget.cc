@@ -72,11 +72,7 @@ bool QtLayerListWidget::counter_hidden() const
   
 void QtLayerListWidget::set_validity( bool valid )
 {
-  if( valid )
-  {
-    this->setStyleSheet( QString::fromUtf8( "background-color: white;" ) );
-  }
-  else
+  if( !valid )
   {
     this->setStyleSheet( QString::fromUtf8( "background-color: pink;" ) );
   }
