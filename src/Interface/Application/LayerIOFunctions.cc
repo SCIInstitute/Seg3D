@@ -392,7 +392,7 @@ void LayerIOFunctions::ExportLayer( QMainWindow* main_window )
   filters["MRC files"] = ".mrc";
   filters["Matlab files"] = ".mat";
 
-  int counter = 1;
+  size_t counter = 1;
   std::ostringstream oss;
   for ( const auto &pair : filters )
   {
@@ -499,7 +499,7 @@ void LayerIOFunctions::ExportIsosurface( QWidget* widget, LayerHandle layerHandl
     // some Linux file dialogs don't fill in extension
     for ( const auto &pair : Core::Isosurface::EXPORT_FORMATS_MAP_C )
     {
-      if ( selectedFilter.startsWith( QString::fromStdString( pair.first ) ) )
+      if ( selectedFilter.contains( QString::fromStdString( pair.first ) ) )
       {
         filename.append( pair.second.c_str() );
       }
