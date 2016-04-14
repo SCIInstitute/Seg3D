@@ -344,21 +344,6 @@ QVariant MeasurementTableModel::headerData( int section, Qt::Orientation orienta
       }
     }
   }
-  // else if( role == Qt::TextAlignmentRole )
-  // {
-  //   if( orientation == Qt::Horizontal )
-  //   {
-  //     if( section == MeasurementColumns::COLOR_E ||
-  //          section == MeasurementColumns::VISIBLE_E )
-  //     {
-  //       return int( Qt::AlignLeft | Qt::AlignVCenter );
-  //     }
-  //   }
-  //   else if( orientation == Qt::Vertical )
-  //   {
-  //     return int( Qt::AlignHCenter | Qt::AlignVCenter );
-  //   }
-  // }
 
   return QVariant();
 }
