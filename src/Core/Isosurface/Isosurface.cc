@@ -356,7 +356,12 @@ public:
 
 typedef boost::shared_ptr< VertexBufferBatch > VertexBufferBatchHandle;
 
+#if defined (_WIN32) || defined(__APPLE__)
+const std::string Isosurface::EXPORT_FORMATS_C( "VTK (*.vtk);;ASCII (*.fac *.pts *.val);;ASCII STL (*.stl);;Binary STL (*.stl)" );
+#else
 const std::string Isosurface::EXPORT_FORMATS_C( "VTK (*.vtk);;ASCII (*.fac *.pts *.val);;ASCII STL (*.stl);;Binary STL (*.stl *)" );
+#endif
+
 const FilterMap Isosurface::EXPORT_FORMATS_MAP_C = { { "VTK", ".vtk" }, { "ASCII", ".fac" }, { "ASCII STL", ".stl" }, { "Binary STL", ".stl" } };
 
 class IsosurfacePrivate 

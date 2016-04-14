@@ -499,7 +499,7 @@ void LayerIOFunctions::ExportIsosurface( QWidget* widget, LayerHandle layerHandl
     // some Linux file dialogs don't fill in extension
     for ( const auto &pair : Core::Isosurface::EXPORT_FORMATS_MAP_C )
     {
-      if ( selectedFilter.contains( QString::fromStdString( pair.first ) ) )
+      if ( selectedFilter == QString::fromStdString( pair.first ) )
       {
         filename.append( pair.second.c_str() );
       }
