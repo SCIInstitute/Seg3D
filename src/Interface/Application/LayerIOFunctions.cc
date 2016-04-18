@@ -487,21 +487,30 @@ void LayerIOFunctions::ExportIsosurface( QWidget* widget, LayerHandle layerHandl
       QString::fromStdString( Core::Isosurface::EXPORT_FORMATS_C ), &selectedFilter );
 
   if ( filename.isEmpty() ) return;
-  QStringList list = selectedFilter.split(" ", QString::SkipEmptyParts);
-  bool binary = false;
-  if ( list.contains( QString("Binary") ) ) binary = true;
 
   std::string extension;
   std::tie( extension, std::ignore ) = Core::GetFullExtension( boost::filesystem::path( filename.toStdString() ) );
 
-  if ( extension.empty() )
+  // Binary STL needs to be handled as a special case because some Linux file dialogs (i.e. OpenSuSE)
+  // always default to first filter for the same file extensions
+  bool binary = false;
+  if ( selectedFilter.startsWith("Binary STL") )
   {
-    // some Linux file dialogs don't fill in extension
-    for ( const auto &pair : Core::Isosurface::EXPORT_FORMATS_MAP_C )
+    binary = true;
+    if ( extension.empty() ) filename.append( ".stl" );
+  }
+  else
+  {
+    if ( extension.empty() )
     {
-      if ( selectedFilter == QString::fromStdString( pair.first ) )
+      // some Linux file dialogs don't fill in extension
+      for ( const auto &pair : Core::Isosurface::EXPORT_FORMATS_MAP_C )
       {
-        filename.append( pair.second.c_str() );
+        if ( selectedFilter == QString::fromStdString( pair.first ) )
+        {
+          filename.append( pair.second.c_str() );
+          break;
+        }
       }
     }
   }

@@ -362,7 +362,8 @@ const std::string Isosurface::EXPORT_FORMATS_C( "VTK (*.vtk);;ASCII (*.fac *.pts
 const std::string Isosurface::EXPORT_FORMATS_C( "VTK (*.vtk);;ASCII (*.fac *.pts *.val);;ASCII STL (*.stl);;Binary STL (*.stl *)" );
 #endif
 
-const FilterMap Isosurface::EXPORT_FORMATS_MAP_C = { { "VTK", ".vtk" }, { "ASCII", ".fac" }, { "ASCII STL", ".stl" }, { "Binary STL", ".stl" } };
+// Binary STL handled as special case in LayerIOFunctions::ExportIsosurface
+const FilterMap Isosurface::EXPORT_FORMATS_MAP_C = { { "VTK", ".vtk" }, { "ASCII", ".fac" }, { "ASCII STL", ".stl" } };
 
 class IsosurfacePrivate 
 {
