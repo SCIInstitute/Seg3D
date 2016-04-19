@@ -28,8 +28,20 @@
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.9 FATAL_ERROR)
 #CMAKE_MINIMUM_REQUIRED(VERSION 3.0 FATAL_ERROR)
-## TODO: check escape sequences and upgrade for v3.1
-#CMAKE_POLICY(SET CMP0053 OLD)
+IF(POLICY CMP0049)
+  CMAKE_POLICY(SET CMP0049 NEW)
+ENDIF()
+IF(POLICY CMP0043)
+  CMAKE_POLICY(SET CMP0043 OLD)
+ENDIF()
+IF(POLICY CMP0053)
+  # TODO: revisit on ITK upgrade
+  CMAKE_POLICY(SET CMP0053 OLD)
+ENDIF()
+IF(POLICY CMP0054)
+  CMAKE_POLICY(SET CMP0054 NEW)
+ENDIF()
+
 
 ###########################################
 # Verify build directory
@@ -74,19 +86,19 @@ INCLUDE(CheckCSourceCompiles)
 INCLUDE( CTest )
 IF(BUILD_TESTING)
   ENABLE_TESTING()
-  INCLUDE(CMake/RegisterUnitTest.cmake)
   IF(WIN32)
     ADD_DEFINITIONS(-DGTEST_USE_OWN_TR1_TUPLE=0 -D_VARIADIC_MAX=10)
   ENDIF()
 ENDIF()
 
+INCLUDE(CMake/RegisterUnitTest.cmake)
 
 ###########################################
 # SEG3D VERSION NUMBERS
 ###########################################
 
 SET(SEG3D_MAJOR_VERSION 2 CACHE INTERNAL "Major version number" FORCE)
-SET(SEG3D_MINOR_VERSION 2 CACHE INTERNAL "Minor version number" FORCE)
+SET(SEG3D_MINOR_VERSION 3 CACHE INTERNAL "Minor version number" FORCE)
 SET(SEG3D_PATCH_VERSION 1 CACHE INTERNAL "Patch version number" FORCE)
 
 
@@ -131,6 +143,22 @@ ENDIF()
 
 
 ###########################################
+# Microsoft VC compiler flags
+###########################################
+
+IF(WIN32 AND MSVC)
+  ADD_DEFINITIONS(-D_ALLOW_KEYWORD_MACROS)
+  ADD_DEFINITIONS(-D_WIN32_WINNT=_WIN32_WINNT_WS03 -DNTDDI_VERSION=NTDDI_WS03SP2)
+  ADD_DEFINITIONS(-DPSAPI_VERSION=1)
+  # Disable Visual C++ Secure Warnings
+  ADD_DEFINITIONS(-D_SCL_SECURE_NO_WARNINGS)
+  ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
+  ADD_DEFINITIONS(-D_BIND_TO_CURRENT_VCLIBS_VERSION=1)
+  ADD_DEFINITIONS(-D_BIND_TO_CURRENT_CRT_VERSION=1)
+ENDIF()
+
+
+###########################################
 # Where to install command line tools, docs
 # and other extras on OS X
 ###########################################
@@ -142,66 +170,43 @@ SET(OSX_UTILS_DIR "Seg3DUtils")
 # Set Up External Projects
 ############################################
 
-FIND_PACKAGE(Zlib CONFIGS ZlibConfig.cmake HINTS ${Zlib_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
-IF(NOT Zlib_FOUND)
-  MESSAGE(FATAL_ERROR "Zlib library not found in ${Zlib_DIR}")
-ENDIF()
+MACRO(CONFIG_STANDARD_EXTERNAL name config_file directory)
+  FIND_PACKAGE(${name} CONFIGS ${config_file} HINTS ${directory} NO_SYSTEM_ENVIRONMENT_PATH)
+  IF(NOT ${name}_FOUND)
+    MESSAGE(FATAL_ERROR "${name} library not found in ${directory}")
+  ENDIF()
+ENDMACRO()
+
+CONFIG_STANDARD_EXTERNAL( Zlib ZlibConfig.cmake ${Zlib_DIR} )
 INCLUDE(${ZLIB_USE_FILE})
 
-FIND_PACKAGE(LibPNG CONFIGS LibPNGConfig.cmake HINTS ${LibPNG_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
-IF(NOT LibPNG_FOUND)
-  MESSAGE(FATAL_ERROR "Png library not found in ${LibPNG_DIR}")
-ENDIF()
+CONFIG_STANDARD_EXTERNAL( LibPNG LibPNGConfig.cmake ${LibPNG_DIR} )
 INCLUDE(${PNG_USE_FILE})
 
-FIND_PACKAGE(SQLite CONFIGS SQLiteConfig.cmake HINTS ${SQLite_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
-IF(NOT SQLite_FOUND)
-  MESSAGE(FATAL_ERROR "SQLite library not found in ${SQLite_DIR}")
-ENDIF()
+CONFIG_STANDARD_EXTERNAL( SQLite SQLiteConfig.cmake ${SQLite_DIR} )
 INCLUDE(${SQLITE_USE_FILE})
 
-FIND_PACKAGE(ITK CONFIGS ITKConfig.cmake HINTS ${ITK_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
-IF(NOT ITK_FOUND)
-  MESSAGE(FATAL_ERROR "ITK library not found in ${ITK_DIR}")
-ENDIF()
-INCLUDE(${ITK_USE_FILE})
-
-FIND_PACKAGE(Teem CONFIGS TeemConfig.cmake HINTS ${Teem_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
-IF(NOT Teem_FOUND)
-  MESSAGE(FATAL_ERROR "Teem library not found in ${Teem_DIR}")
-ENDIF()
+CONFIG_STANDARD_EXTERNAL( Teem TeemConfig.cmake ${Teem_DIR} )
 INCLUDE(${Teem_USE_FILE})
 
-FIND_PACKAGE(Glew CONFIGS GlewConfig.cmake HINTS ${GLEW_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
-IF(NOT Glew_FOUND)
-  MESSAGE(FATAL_ERROR "Glew library not found in ${Glew_DIR}")
-ENDIF()
-INCLUDE(${GLEW_USE_FILE})
-
-FIND_PACKAGE(Freetype CONFIGS FreetypeConfig.cmake HINTS ${Freetype_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
-IF(NOT Freetype_FOUND)
-  MESSAGE(FATAL_ERROR "Freetype library not found in ${Freetype_DIR}")
-ENDIF()
-INCLUDE(${FREETYPE_USE_FILE})
-
 IF(BUILD_WITH_PYTHON)
-  FIND_PACKAGE(Python CONFIGS PythonConfig.cmake HINTS ${Python_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
-  IF(NOT Python_FOUND)
-    MESSAGE(FATAL_ERROR "Python library not found in ${Python_DIR}")
-  ENDIF()
+  CONFIG_STANDARD_EXTERNAL( Python PythonConfig.cmake ${Python_DIR} )
   INCLUDE(${SCI_PYTHON_USE_FILE})
 ENDIF()
 
-FIND_PACKAGE(Boost CONFIGS BoostConfig.cmake HINTS ${Boost_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
-IF(NOT Boost_FOUND)
-  MESSAGE(FATAL_ERROR "Boost library not found in ${Boost_DIR}")
-ENDIF()
+CONFIG_STANDARD_EXTERNAL( Boost BoostConfig.cmake ${Boost_DIR} )
 INCLUDE(${SCI_BOOST_USE_FILE})
 
-FIND_PACKAGE(ImplicitFunction CONFIGS ImplicitFunctionConfig.cmake HINTS ${ImplicitFunction_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
-IF(NOT ImplicitFunction_FOUND)
-  MESSAGE(FATAL_ERROR "ImplicitFunction library not found in ${ImplicitFunction_DIR}")
-ENDIF()
+CONFIG_STANDARD_EXTERNAL( ITK ITKConfig.cmake ${ITK_DIR} )
+INCLUDE(${ITK_USE_FILE})
+
+CONFIG_STANDARD_EXTERNAL( Glew GlewConfig.cmake ${Glew_DIR} )
+INCLUDE(${GLEW_USE_FILE})
+
+CONFIG_STANDARD_EXTERNAL( Freetype FreetypeConfig.cmake ${Freetype_DIR} )
+INCLUDE(${FREETYPE_USE_FILE})
+
+CONFIG_STANDARD_EXTERNAL( ImplicitFunction ImplicitFunctionConfig.cmake ${ImplicitFunction_DIR} )
 INCLUDE(${ImplicitFunction_USE_FILE})
 
 

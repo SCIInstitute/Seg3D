@@ -3,7 +3,7 @@
  
  The MIT License
  
- Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
  
  
@@ -77,6 +77,12 @@ public:
   // Clear any objects that were given as a short cut to improve performance.
   virtual void clear_cache(); 
 
+  void initialize_action( const std::string& layer_id,
+                          const std::string& file_path,
+                          LayerExporterHandle layer_exporter,
+                          const std::string& extension );
+
+
   // -- Action parameters --
 private:
   // Where the layer should be exported
@@ -90,6 +96,8 @@ private:
 
   // Extension for saving data
   std::string extension_;
+
+  std::string filename_base_;
   
   // Short cut to the layer exporter that has already loaded the data if the file
   // was read through the GUI

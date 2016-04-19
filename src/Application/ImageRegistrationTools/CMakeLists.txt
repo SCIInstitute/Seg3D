@@ -3,7 +3,7 @@
 # 
 #  The MIT License
 # 
-#  Copyright (c) 2013 Scientific Computing and Imaging Institute,
+#  Copyright (c) 2015 Scientific Computing and Imaging Institute,
 #  University of Utah.
 # 
 #  
@@ -106,8 +106,4 @@ REGISTER_LIBRARY_AND_CLASSES(Application_ImageRegistrationTools
   ${APPLICATION_IRTOOLS_ACTIONS_SRCS}
 )
 
-IF(BUILD_TESTING)
-  ADD_SUBDIRECTORY(
-    Actions/Tests
-  )
-ENDIF(BUILD_TESTING)
+ADD_TEST_DIR(Actions/Tests)

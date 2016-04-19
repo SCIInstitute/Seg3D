@@ -3,7 +3,7 @@
 
  The MIT License
 
- Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
 
 
@@ -32,6 +32,10 @@
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/ResampleTool.h>
 #include <Application/Filters/Actions/ActionResample.h>
+#include <Application/Filters/NrrdResampleFilter.h>
+#include <Application/Filters/ITKResampleFilter.h>
+#include <Application/Filters/Utils/PadValues.h>
+
 #include <Application/Layer/Layer.h>
 #include <Application/Layer/LayerGroup.h>
 #include <Application/Layer/LayerManager.h>
@@ -41,6 +45,8 @@ SCI_REGISTER_TOOL( Seg3D, ResampleTool )
 
 namespace Seg3D
 {
+
+using namespace Filter;
 
 class ResampleToolPrivate
 {
@@ -69,7 +75,7 @@ void ResampleToolPrivate::update_dst_group_list()
 {
   const std::string& group_id = this->tool_->target_group_state_->get();
   std::vector< Core::OptionLabelPair > dst_groups;
-  if ( group_id == "" || group_id == Tool::NONE_OPTION_C )
+  if ( group_id.empty() || group_id == Tool::NONE_OPTION_C )
   {
     this->tool_->dst_group_state_->set_option_list( dst_groups );
     return;
@@ -89,8 +95,8 @@ void ResampleToolPrivate::update_dst_group_list()
     }
     const Core::GridTransform& grid_trans = layer_groups[ i ]->get_grid_transform();
     std::string group_name = Core::ExportToString( grid_trans.get_nx() ) + " x " +
-      Core::ExportToString( grid_trans.get_ny() ) + " x " + 
-      Core::ExportToString( grid_trans.get_nz() );
+                             Core::ExportToString( grid_trans.get_ny() ) + " x " +
+                             Core::ExportToString( grid_trans.get_nz() );
     dst_groups.push_back( std::make_pair( layer_groups[ i ]->get_group_id(), group_name ) );
   }
   this->tool_->dst_group_state_->set_option_list( dst_groups );
@@ -101,7 +107,7 @@ void ResampleToolPrivate::handle_target_group_changed()
   this->update_dst_group_list();
 
   const std::string& group_id = this->tool_->target_group_state_->get();
-  if ( group_id == "" || group_id == Tool::NONE_OPTION_C )
+  if ( group_id.empty() || group_id == Tool::NONE_OPTION_C )
   {
     return;
   }
@@ -133,14 +139,14 @@ void ResampleToolPrivate::handle_target_group_changed()
 void ResampleToolPrivate::handle_output_dimension_changed( int index, int size )
 {
   if ( this->signal_block_count_ > 0 ||
-    !this->tool_->constraint_aspect_state_->get() )
+       ! this->tool_->constraint_aspect_state_->get() )
   {
     return;
   }
   
   Core::ScopedCounter signal_block( this->signal_block_count_ );
 
-  double scale = size * 1.0 / this->tool_->input_dimensions_state_[ index ]->get();
+  double scale = size * 1.0 / static_cast<double>( this->tool_->input_dimensions_state_[ index ]->get() );
   this->tool_->scale_state_->set( scale );
   this->tool_->output_dimensions_state_[ ( index + 1 ) % 3 ]->set( Core::Round(
     this->tool_->input_dimensions_state_[ ( index + 1 ) % 3 ]->get() * scale ) );
@@ -151,7 +157,7 @@ void ResampleToolPrivate::handle_output_dimension_changed( int index, int size )
 void ResampleToolPrivate::handle_scale_changed( double scale )
 {
   if ( this->signal_block_count_ > 0 ||
-    !this->tool_->constraint_aspect_state_->get() )
+       ! this->tool_->constraint_aspect_state_->get() )
   {
     return;
   }
@@ -167,7 +173,7 @@ void ResampleToolPrivate::handle_scale_changed( double scale )
 
 void ResampleToolPrivate::handle_constraint_aspect_changed( bool constraint )
 {
-  if ( !constraint )
+  if ( ! constraint )
   {
     return;
   }
@@ -184,7 +190,8 @@ void ResampleToolPrivate::handle_constraint_aspect_changed( bool constraint )
 
 void ResampleToolPrivate::handle_kernel_changed( std::string kernel_name )
 {
-  this->tool_->has_params_state_->set( kernel_name == ActionResample::GAUSSIAN_C );
+  this->tool_->has_gaussian_params_state_->set( kernel_name == NrrdResampleFilter::GAUSSIAN_C );
+  this->tool_->has_bspline_params_state_->set( kernel_name == ITKResampleFilter::B_SPLINE_C );
 }
 
 void ResampleToolPrivate::handle_size_scheme_changed( std::string size_scheme )
@@ -243,17 +250,17 @@ ResampleTool::ResampleTool( const std::string& toolid ) :
   this->add_state( "dst_group", this->dst_group_state_, "", "" );
 
   std::vector< Core::OptionLabelPair > padding_values;
-  padding_values.push_back( std::make_pair( ActionResample::ZERO_C, "0" ) );
-  padding_values.push_back( std::make_pair( ActionResample::MIN_C, "Minimum Value" ) );
-  padding_values.push_back( std::make_pair( ActionResample::MAX_C, "Maximum Value" ) );
-  this->add_state( "pad_value", this->padding_value_state_, ActionResample::ZERO_C, 
-    padding_values );
+  padding_values.push_back( std::make_pair( PadValues::ZERO_C, "0" ) );
+  padding_values.push_back( std::make_pair( PadValues::MIN_C, "Minimum Value" ) );
+  padding_values.push_back( std::make_pair( PadValues::MAX_C, "Maximum Value" ) );
+  this->add_state( "pad_value", this->padding_value_state_, PadValues::ZERO_C, padding_values );
 
   this->add_state( "output_x", this->output_dimensions_state_[ 0 ], 1, 1, 500, 1 );
   this->add_state( "output_y", this->output_dimensions_state_[ 1 ], 1, 1, 500, 1 );
   this->add_state( "output_z", this->output_dimensions_state_[ 2 ], 1, 1, 500, 1 );
   this->add_state( "constraint_aspect", this->constraint_aspect_state_, true );
   this->add_state( "scale", this->scale_state_, 1.0, 0.01, 2.0, 0.01 );
+  this->add_state( "spline_order", this->spline_order_state_, 3, 0, 5, 1 );
 
   // Need to load dimensions after constraint_aspect_state_ is loaded so that scale isn't 
   // incorrectly used to overwrite output dimensions 
@@ -262,17 +269,21 @@ ResampleTool::ResampleTool( const std::string& toolid ) :
   this->output_dimensions_state_[ 2 ]->set_session_priority( Core::StateBase::LOAD_LAST_E );
 
   std::vector< Core::OptionLabelPair > kernels;
-  kernels.push_back( std::make_pair( ActionResample::BOX_C, "Box" ) );
-  kernels.push_back( std::make_pair( ActionResample::TENT_C, "Tent" ) );
-  kernels.push_back( std::make_pair( ActionResample::CUBIC_CR_C, "Cubic (Catmull-Rom)" ) );
-  kernels.push_back( std::make_pair( ActionResample::CUBIC_BS_C, "Cubic (B-spline)" ) );
-  kernels.push_back( std::make_pair( ActionResample::QUARTIC_C, "Quartic" ) );
-  kernels.push_back( std::make_pair( ActionResample::GAUSSIAN_C, "Gaussian" ) );
-  this->add_state( "kernel", this->kernel_state_, ActionResample::BOX_C, kernels );
+  kernels.push_back( std::make_pair( NrrdResampleFilter::BOX_C, "Box" ) );
+  kernels.push_back( std::make_pair( NrrdResampleFilter::TENT_C, "Tent" ) );
+  kernels.push_back( std::make_pair( NrrdResampleFilter::CUBIC_CR_C, "Cubic (Catmull-Rom)" ) );
+  kernels.push_back( std::make_pair( NrrdResampleFilter::CUBIC_BS_C, "Cubic (B-spline)" ) );
+  kernels.push_back( std::make_pair( NrrdResampleFilter::QUARTIC_C, "Quartic" ) );
+  kernels.push_back( std::make_pair( NrrdResampleFilter::GAUSSIAN_C, "Gaussian" ) );
+  kernels.push_back( std::make_pair( ITKResampleFilter::LINEAR_C, "Linear" ) );
+  kernels.push_back( std::make_pair( ITKResampleFilter::B_SPLINE_C, "B-spline" ) );
+  kernels.push_back( std::make_pair( ITKResampleFilter::NEAREST_NEIGHBOR_C, "Nearest Neighbor" ) );
+  this->add_state( "kernel", this->kernel_state_, NrrdResampleFilter::BOX_C, kernels );
 
   this->add_state( "sigma", this->gauss_sigma_state_, 1.0, 1.0, 100.0, 0.01 );
   this->add_state( "cutoff", this->gauss_cutoff_state_, 1.0, 1.0, 100.0, 0.01 );
-  this->add_state( "has_params", this->has_params_state_, false );
+  this->add_state( "has_gaussian_params", this->has_gaussian_params_state_, false );
+  this->add_state( "has_bspline_params", this->has_bspline_params_state_, false );
 
   this->add_state( "valid_size", this->valid_size_state_, true );
   this->add_state( "replace", this->replace_state_, false );
@@ -289,12 +300,14 @@ ResampleTool::ResampleTool( const std::string& toolid ) :
     boost::bind( &ResampleToolPrivate::handle_scale_changed, this->private_, _1 ) ) );
   this->add_connection( this->kernel_state_->value_changed_signal_.connect(
     boost::bind( &ResampleToolPrivate::handle_kernel_changed, this->private_, _2 ) ) );
+
   for ( int i = 0; i < 3; ++i )
   {
     this->add_connection( this->output_dimensions_state_[ i ]->value_changed_signal_.connect(
       boost::bind( &ResampleToolPrivate::handle_output_dimension_changed, 
       this->private_, i, _1 ) ) );
   }
+
   // If groups were added or removed, update the destination group list in the tool interface
   this->add_connection( LayerManager::Instance()->layer_inserted_signal_.connect( 
     boost::bind( &ResampleToolPrivate::handle_layer_groups_changed, this->private_, _2 ) ) );
@@ -319,22 +332,33 @@ void ResampleTool::execute( Core::ActionContextHandle context )
 
   if ( this->manual_size_state_->get() )
   {
-    ActionResample::Dispatch( context, target_layers, 
-      this->output_dimensions_state_[ 0 ]->get(), this->output_dimensions_state_[ 1 ]->get(),
-      this->output_dimensions_state_[ 2 ]->get(), this->kernel_state_->get(),
-      this->gauss_sigma_state_->get(), this->gauss_cutoff_state_->get(), 
-      this->replace_state_->get() );
+    ActionResample::Dispatch( context,
+                              target_layers,
+                              this->output_dimensions_state_[ 0 ]->get(),
+                              this->output_dimensions_state_[ 1 ]->get(),
+                              this->output_dimensions_state_[ 2 ]->get(),
+                              this->kernel_state_->get(),
+                              this->gauss_sigma_state_->get(),
+                              this->gauss_cutoff_state_->get(),
+                              this->spline_order_state_->get(),
+                              this->replace_state_->get()
+                            );
   }
   else
   {
-    LayerGroupHandle dst_group = LayerManager::Instance()->find_group(
-      this->dst_group_state_->get() );
+    LayerGroupHandle dst_group = LayerManager::Instance()->find_group( this->dst_group_state_->get() );
     if ( dst_group )
     {
-      ActionResample::Dispatch( context, target_layers,
-        dst_group->get_grid_transform(), this->padding_value_state_->get(),
-        this->kernel_state_->get(), this->gauss_sigma_state_->get(),
-        this->gauss_cutoff_state_->get(), this->replace_state_->get() );
+      ActionResample::Dispatch( context,
+                                target_layers,
+                                dst_group->get_grid_transform(),
+                                this->padding_value_state_->get(),
+                                this->kernel_state_->get(),
+                                this->gauss_sigma_state_->get(),
+                                this->gauss_cutoff_state_->get(),
+                                this->spline_order_state_->get(),
+                                this->replace_state_->get()
+                              );
     }
   }
 }

@@ -3,7 +3,7 @@
  
  The MIT License
  
- Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
  
  
@@ -50,17 +50,17 @@ LayerResamplerDialog::LayerResamplerDialog(
 {
   this->private_->ui_.setupUi( this );
   this->setStyleSheet( StyleSheet::LAYER_RESAMPLER_C );
-  
-  QtUtils::QtBridge::Connect( this->private_->ui_.padding_combobox_, 
-    layer_resampler->padding_value_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.kernel_combobox_,
-    layer_resampler->kernel_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.sigma_spinbox_,
-    layer_resampler->gauss_sigma_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.cutoff_spinbox_,
-    layer_resampler->gauss_cutoff_state_ );
-  QtUtils::QtBridge::Show( this->private_->ui_.param_widget_,
-    layer_resampler->has_params_state_ );
+
+  QtUtils::QtBridge::Connect( this->private_->ui_.padding_combobox_, layer_resampler->padding_value_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.kernel_combobox_, layer_resampler->kernel_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.sigma_spinbox_, layer_resampler->gauss_sigma_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.cutoff_spinbox_, layer_resampler->gauss_cutoff_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.spline_order_, layer_resampler->spline_order_state_ );
+
+  this->private_->ui_.spline_order_->set_description( "Spline Order" );
+
+  QtUtils::QtBridge::Show( this->private_->ui_.param_widget_, layer_resampler->has_gaussian_params_state_ );
+  QtUtils::QtBridge::Show( this->private_->ui_.bspline_widget_, layer_resampler->has_bspline_params_state_ );
 }
 
 } // end namespace Seg3D

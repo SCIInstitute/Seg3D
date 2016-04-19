@@ -3,7 +3,7 @@
 # 
 #  The MIT License
 # 
-#  Copyright (c) 2013 Scientific Computing and Imaging Institute,
+#  Copyright (c) 2015 Scientific Computing and Imaging Institute,
 #  University of Utah.
 # 
 #  
@@ -84,6 +84,4 @@ TARGET_LINK_LIBRARIES(Core_DataBlock
 #  INCLUDE_DIRECTORIES "${ITKCommon_INCLUDE_DIRS}"
 #)
 
-IF(BUILD_TESTING)
-  ADD_SUBDIRECTORY(Tests)
-ENDIF()
+ADD_TEST_DIR(Tests)

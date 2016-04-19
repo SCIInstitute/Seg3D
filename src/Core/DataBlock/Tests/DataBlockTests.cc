@@ -3,7 +3,7 @@
  
  The MIT License
  
- Copyright (c) 2014 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
  
  
@@ -29,28 +29,12 @@
 #include <gtest/gtest.h>
 #include <algorithm>
 
-#include <Core/DataBlock/DataBlock.h>
-#include <Core/DataBlock/DataType.h>
 #include <Testing/Utils/DataBlockSource.h>
+#include <Testing/Utils/DummyDataBlock.h>
+
 
 using namespace Core;
 using namespace Testing::Utils;
-
-// use private implementation to test
-class DummyDataBlock : public DataBlock
-{
-public:
-  DummyDataBlock() {}
-  virtual ~DummyDataBlock() {}
-
-  // call protected setters
-  void set_size(size_t nx, size_t ny, size_t nz)
-  {
-    set_nx(nx);
-    set_ny(ny);
-    set_nz(nz);
-  }
-};
 
 class DataBlockTest : public ::testing::Test {
 protected:

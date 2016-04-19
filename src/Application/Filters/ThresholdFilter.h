@@ -31,7 +31,8 @@
 
 #include <Application/Filters/LayerFilter.h>
 
-namespace Filter {
+namespace Filter
+{
 
 class ThresholdFilter : public Seg3D::LayerFilter
 {

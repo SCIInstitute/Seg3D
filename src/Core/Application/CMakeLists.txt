@@ -3,7 +3,7 @@
 # 
 #  The MIT License
 # 
-#  Copyright (c) 2014 Scientific Computing and Imaging Institute,
+#  Copyright (c) 2015 Scientific Computing and Imaging Institute,
 #  University of Utah.
 # 
 #  
@@ -43,6 +43,4 @@ TARGET_LINK_LIBRARIES(Core_Application
   ${SCI_BOOST_LIBRARY}
 )
 
-IF(BUILD_TESTING)
-  ADD_SUBDIRECTORY(Tests)
-ENDIF()
+ADD_TEST_DIR(Tests)

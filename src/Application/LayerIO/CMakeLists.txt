@@ -3,7 +3,7 @@
 # 
 #  The MIT License
 # 
-#  Copyright (c) 2009 Scientific Computing and Imaging Institute,
+#  Copyright (c) 2015 Scientific Computing and Imaging Institute,
 #  University of Utah.
 # 
 #  
@@ -146,3 +146,5 @@ REGISTER_LIBRARY_AND_CLASSES(Application_LayerIO
   ${APPLICATION_LAYERIO_IMPORTERS_SRCS}
   ${APPLICATION_LAYERIO_EXPORTERS_SRCS}
 )
+
+ADD_TEST_DIR(Actions/Tests)

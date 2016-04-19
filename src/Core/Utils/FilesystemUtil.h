@@ -3,7 +3,7 @@
 
  The MIT License
 
- Copyright (c) 2013 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
 
 
@@ -36,6 +36,8 @@
 // Boost includes
 #include <boost/filesystem/path.hpp>
 
+#include <tuple>
+
 namespace Core
 {
 
@@ -52,7 +54,7 @@ bool RecursiveCopyDirectory( const boost::filesystem::path& from, const boost::f
 
 // GETFULLEXTENSION
 /// Detect and return file extension with multiple components (compressed, usually).
-std::string GetFullExtension( const boost::filesystem::path& filename );
+std::tuple< std::string, std::string > GetFullExtension( const boost::filesystem::path& filename );
 
 } // end namespace Core
 

@@ -3,7 +3,7 @@
 
  The MIT License
 
- Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
 
 
@@ -160,8 +160,9 @@ public:
 
   /// EXPORT_LAYER
   /// Export the layer to file
-  virtual bool export_layer( const std::string& mode, const std::string& file_path, 
-    const std::string& name ) = 0;
+  virtual bool export_layer( const std::string& mode,
+                             const std::string& file_path,
+                             const std::string& name ) = 0;
 };
 
 

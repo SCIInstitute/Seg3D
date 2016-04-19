@@ -3,7 +3,7 @@
 
  The MIT License
 
- Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
 
 
@@ -2038,7 +2038,7 @@ const QString StyleSheet::PROVENANCE_LIST_HEADER_C = QString::fromUtf8(
     " color: rgb(" FONT_COLOR ");"
     " font: bold;"
     "}"
-    "QWidget#message_gradient_magnitude_layer_alert_ {"
+    "QWidget#message_data_layer_alert_ {"
     " border-radius: 3px;"
     " background-color: rgb(" ALERT_BACKGROUND_COLOR ");"
     "}"

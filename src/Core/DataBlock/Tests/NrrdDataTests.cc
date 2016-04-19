@@ -3,7 +3,7 @@ For more information, please see: http://software.sci.utah.edu
 
 The MIT License
 
-Copyright (c) 2014 Scientific Computing and Imaging Institute,
+Copyright (c) 2015 Scientific Computing and Imaging Institute,
 University of Utah.
 
 
@@ -29,7 +29,9 @@ DEALINGS IN THE SOFTWARE.
 #include <gtest/gtest.h>
 
 #include <boost/filesystem.hpp>
+
 #include <algorithm>
+#include <tuple>
 #include <vector>
 #include <fstream>
 
@@ -46,12 +48,12 @@ TEST(NrrdDataTests, DetachedNrrdFromStdDataBlockNodeCentered)
 {
   Core::Point origin(1, 1, 1);
   Core::Vector spacing(0.5, 0.5, 0.5);
-  boost::tuple<Core::DataBlockHandle, Core::GridTransform> tuple =
+  std::tuple<Core::DataBlockHandle, Core::GridTransform> tuple =
     generate3x3x3StdDataBlock(Core::DataType::INT_E, origin, spacing, true);
 
   // TODO: switch to nullptr
-  Core::DataBlockHandle dataBlock = boost::get<0>(tuple);
-  Core::GridTransform gridTransform = boost::get<1>(tuple); 
+  Core::DataBlockHandle dataBlock = std::get<0>(tuple);
+  Core::GridTransform gridTransform = std::get<1>(tuple);
   ASSERT_FALSE(dataBlock.get() == 0);
 
   Core::NrrdDataHandle nrrd =

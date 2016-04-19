@@ -3,7 +3,7 @@
 
  The MIT License
 
- Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
 
 
@@ -352,9 +352,11 @@ public:
   VertexAttribArrayBufferHandle value_buffer_;
   ElementArrayBufferHandle faces_buffer_;
 };
+
 typedef boost::shared_ptr< VertexBufferBatch > VertexBufferBatchHandle;
 
-  const std::string Isosurface::EXPORT_FORMATS_C( "VTK (*.vtk);;ASCII (*.fac *.pts *.val);;STL (*.stl)" );
+const std::string Isosurface::EXPORT_FORMATS_C( "VTK (*.vtk);;ASCII (*.fac *.pts *.val);;STL (*.stl)" );
+const FilterMap Isosurface::EXPORT_FORMATS_MAP_C = { { "VTK", ".vtk" }, { "ASCII", ".fac" }, { "STL", ".stl" } };
 
 class IsosurfacePrivate 
 {

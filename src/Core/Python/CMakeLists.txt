@@ -4,7 +4,7 @@
 # 
 #  The MIT License
 # 
-#  Copyright (c) 2009 Scientific Computing and Imaging Institute,
+#  Copyright (c) 2015 Scientific Computing and Imaging Institute,
 #  University of Utah.
 # 
 #  
@@ -42,7 +42,16 @@ SET(CORE_PYTHON_SRCS
   ToPythonConverters.cc
 )
 
-ADD_DEFINITIONS(-DPYTHONPATH=L"${PYTHON_MODULE_SEARCH_PATH}")
+IF(WIN32)
+  ADD_DEFINITIONS(-DPYTHONPATH=L"${SCI_PYTHON_MODULE_PARENT_PATH}"
+                  -DPYTHONNAME=L"${SCI_PYTHON_NAME}")
+ELSEIF(APPLE)
+  ADD_DEFINITIONS(-DPYTHONPATH=L"${PYTHON_MODULE_SEARCH_PATH}"
+                  -DPYTHONLIBDIR=L"${SCI_PYTHON_LIBRARY_DIR}"
+                  -DPYTHONLIB=L"${SCI_PYTHON_LIBRARY}")
+ELSE()
+  ADD_DEFINITIONS(-DPYTHONPATH=L"${PYTHON_MODULE_SEARCH_PATH}")
+ENDIF()
 
 CORE_ADD_LIBRARY(Core_Python ${CORE_PYTHON_SRCS})
             

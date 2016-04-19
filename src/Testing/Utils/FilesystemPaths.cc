@@ -3,7 +3,7 @@
  
  The MIT License
  
- Copyright (c) 2014 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
  
  
@@ -36,6 +36,15 @@ boost::filesystem::path testOutputDir()
 {
 #ifdef BUILD_TESTING
   return TEST_OUTPUT_PATH;
+#else
+  return boost::filesystem::path();
+#endif
+}
+
+boost::filesystem::path testInputDir()
+{
+#ifdef BUILD_TESTING
+  return TEST_INPUT_PATH;
 #else
   return boost::filesystem::path();
 #endif

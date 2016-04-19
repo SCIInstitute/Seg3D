@@ -43,3 +43,8 @@ ExternalProject_Add(Data_external
   PATCH_COMMAND ""
   INSTALL_COMMAND ""
 )
+
+# test data location for tests
+SET(TEST_INPUT_PATH ${data_DIR} CACHE PATH "Root for all github-based data files")
+
+MESSAGE(STATUS "TEST_INPUT_PATH: ${TEST_INPUT_PATH}")

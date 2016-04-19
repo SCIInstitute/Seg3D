@@ -3,7 +3,7 @@
 
  The MIT License
 
- Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
 
 
@@ -130,6 +130,7 @@ public:
   static const int TRANSFORM_LENGTH;
 
 protected:
+  // rotation matrix
   Matrix mat_;
 };
 
@@ -219,10 +220,12 @@ public:
   static const int TRANSFORM_LENGTH;
 
 protected:
+  // rotation matrix
   MatrixF mat_;
 };
 
-
+std::ostream& operator<<( std::ostream& os, const Transform& t );
+std::ostream& operator<<( std::ostream& os, const TransformF& t );
 
 } // End namespace Core
 

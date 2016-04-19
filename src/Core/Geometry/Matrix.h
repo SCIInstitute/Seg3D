@@ -3,7 +3,7 @@
 
  The MIT License
 
- Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
 
 
@@ -198,6 +198,7 @@ public:
 
   // INVERT:
   /// Compute the inverse of the input matrix using LU decomposition
+  /// (boost ublas lu_factorize)
   static bool Invert( const MatrixF& mat, MatrixF& inverse );
 
   // TRANSPOSE:

@@ -3,7 +3,7 @@
  
  The MIT License
  
- Copyright (c) 2014 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
  
  
@@ -34,6 +34,7 @@
 #include <Core/Utils/ScopedCounter.h>
 #include <Core/RenderResources/RenderResources.h>
 #include <Core/Geometry/Point.h>
+#include <Core/Math/MathFunctions.h>
 
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/PointsSelectTool.h>
@@ -85,6 +86,8 @@ PointsSelectToolPrivate::update_unit_point_list()
   convert_units = ! this->tool_->use_world_units_state_->get();
 
   Core::VolumeSliceHandle active_slice = this->viewer_->get_active_volume_slice();
+  Core::Transform inverse_transform = active_slice->get_volume()->get_inverse_transform();
+
   // seed points are in world coordinates by default
   if ( convert_units && active_slice )
   {
@@ -92,34 +95,13 @@ PointsSelectToolPrivate::update_unit_point_list()
 
     this->tool_->seed_points_index_state_->clear();
 
-    PointVector::const_iterator iter = this->tool_->seed_points_state_->get().begin();
-    PointVector::const_iterator end = this->tool_->seed_points_state_->get().end();
-    while (iter != end)
+    for ( auto &point : this->tool_->seed_points_state_->get() )
     {
-      int i = -1, j = -1;
-
-      if ( view_mode == Viewer::AXIAL_C )
-      {
-        active_slice->world_to_index(iter->x(), iter->y(), i, j);
-      }
-      else if ( view_mode == Viewer::CORONAL_C )
-      {
-        active_slice->world_to_index(iter->x(), iter->z(), i, j);
-      }
-      else if ( view_mode == Viewer::SAGITTAL_C )
-      {
-        active_slice->world_to_index(iter->y(), iter->z(), i, j);
-      }
-      else
-      {
-        // this should not happen!
-        CORE_LOG_ERROR("Viewer is not volume, axial, coronal or sagittal.");
-      }
-
-      Core::Point indexPoint;
-      active_slice->to_index(i, j, indexPoint);
+      Core::Point indexPoint = inverse_transform * point;
+      indexPoint[0] = Core::Round( indexPoint.x() );
+      indexPoint[1] = Core::Round( indexPoint.y() );
+      indexPoint[2] = Core::Round( indexPoint.z() );
       this->tool_->seed_points_index_state_->add(indexPoint);
-      ++iter;
     }
   }
 }

@@ -3,7 +3,7 @@
  
  The MIT License
  
- Copyright (c) 2014 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
  
  
@@ -35,6 +35,7 @@ namespace Testing {
   
 namespace Utils {    
 
+boost::filesystem::path testInputDir();
 boost::filesystem::path testOutputDir();
   
 }}

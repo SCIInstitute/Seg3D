@@ -4,7 +4,7 @@
 # 
 #  The MIT License
 # 
-#  Copyright (c) 2009 Scientific Computing and Imaging Institute,
+#  Copyright (c) 2015 Scientific Computing and Imaging Institute,
 #  University of Utah.
 # 
 #  
@@ -72,3 +72,5 @@ SET(CORE_GEOMETRY_SRCS
 CORE_ADD_LIBRARY(Core_Geometry ${CORE_GEOMETRY_SRCS})
 
 TARGET_LINK_LIBRARIES(Core_Geometry ${SCI_BOOST_LIBRARY})
+
+ADD_TEST_DIR(Tests)

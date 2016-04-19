@@ -3,7 +3,7 @@
 
  The MIT License
 
- Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
 
 
@@ -32,6 +32,7 @@
 #include <vector>
 #include <set>
 #include <sstream>
+#include <map>
 
 // Boost includes
 #include <boost/filesystem.hpp>
@@ -44,6 +45,7 @@
 
 // Core includes
 #include <Core/State/Actions/ActionSet.h>
+#include <Core/Utils/FilesystemUtil.h>
 #include <Core/Utils/Log.h>
 #include <Core/LargeVolume/LargeVolumeSchema.h>
 #include <Core/Isosurface/Isosurface.h>
@@ -303,7 +305,7 @@ void LayerIOFunctions::ImportSeries( QMainWindow* main_window )
   }
 
   // Find all the filenames that are associated with this series
-  if ( !( LayerIO::FindFileSeries( filenames ) ) )
+  if ( ! LayerIO::FindFileSeries( filenames ) )
   {
     QMessageBox message_box( main_window );
     message_box.setWindowTitle( "Import Layer Error" );
@@ -365,22 +367,73 @@ void LayerIOFunctions::ExportLayer( QMainWindow* main_window )
     return;
   }
 
-  boost::filesystem::path file_path = 
-    ProjectManager::Instance()->get_current_file_folder();
+  boost::filesystem::path file_path = ProjectManager::Instance()->get_current_file_folder();
+  QString selectedFilter;
+
+  std::string gzip_nifti("Compressed NIfTI files");
+  std::string gzip_nifti_ext(".nii.gz");
+  std::map< std::string, std::string > filters;
+#if defined( __APPLE__ )
+  // Annoying Mac OS X hack because the native OS X file dialog does not play well with double file extensions.
+  // See https://bugreports.qt.io/browse/QTBUG-44227, https://bugreports.qt.io/browse/QTBUG-38303
+  filters[gzip_nifti] = "";
+#else
+  filters[gzip_nifti] = gzip_nifti_ext;
+#endif
+  filters["NRRD files"] = ".nrrd";
+  filters["DICOM files"] = ".dcm";
+  filters["NIfTI files"] = ".nii";
+  filters["TIFF files"] = ".tiff";
+  filters["PNG files"] = ".png";
+  filters["MRC files"] = ".mrc";
+  filters["Matlab files"] = ".mat";
+
+  int counter = 1;
+  std::ostringstream oss;
+  for ( const auto &pair : filters )
+  {
+    oss << pair.first << " (*" << pair.second << ")";
+    if ( counter < filters.size() )
+      oss << ";;";
+    counter++;
+  }
 
   QString filename = QFileDialog::getSaveFileName( main_window, "Export Data Layer As... ",
-    QString::fromStdString( file_path.string() ),
-    "NRRD files (*.nrrd);;DICOM files (*.dcm);;TIFF files (*.tiff);;PNG files (*.png);;MRC files (*.mrc);;Matlab files (*.mat)" );
+    QString::fromStdString( file_path.string() ), QString::fromStdString( oss.str() ), &selectedFilter );
 
-  if ( filename == "" ) return;
+  if ( filename.isEmpty() ) return;
 
-  std::string extension = boost::filesystem::extension( boost::filesystem::path( filename.toStdString() ) ); 
+  std::string extension, base;
+  std::tie( extension, base ) = Core::GetFullExtension( boost::filesystem::path( filename.toStdString() ) );
+
+  if ( extension.empty() )
+  {
+    // some Linux file dialogs don't fill in extension
+    for ( const auto &pair : filters )
+    {
+      // because of Mac OS X hack
+      if ( selectedFilter.startsWith( QString::fromStdString( pair.first ) ) )
+      {
+        if ( selectedFilter.startsWith( gzip_nifti.c_str() ) )
+        {
+          extension = gzip_nifti_ext;
+          filename.append( gzip_nifti_ext.c_str() );
+        }
+        else
+        {
+          extension = pair.second;
+          filename.append( pair.second.c_str() );
+        }
+      }
+    }
+  }
+
   std::string exportername;
 
-  if( extension == ".nrrd" ) exportername = "NRRD Exporter";
-  else if( extension == ".mat" ) exportername = "Matlab Exporter";
-  else if( extension == ".mrc" ) exportername = "MRC Exporter";
-  else if( extension != "" ) exportername = "ITK Data Exporter";
+  if ( extension == ".nrrd" ) exportername = "NRRD Exporter";
+  else if ( extension == ".mat" ) exportername = "Matlab Exporter";
+  else if ( extension == ".mrc" ) exportername = "MRC Exporter";
+  else if ( extension != "" ) exportername = "ITK Data Exporter";
 
   LayerExporterHandle exporter;
   if ( ! LayerIO::Instance()->create_exporter( exporter, layer_handles, exportername, extension ) )
@@ -389,14 +442,14 @@ void LayerIOFunctions::ExportLayer( QMainWindow* main_window )
       filename.toStdString() + std::string("'.");
 
     QMessageBox message_box( main_window );
-    message_box.setWindowTitle( "Import Layer..." );
+    message_box.setWindowTitle( "Export Layer..." );
     message_box.addButton( QMessageBox::Ok );
     message_box.setIcon( QMessageBox::Critical );
     message_box.setText( QString::fromStdString( error_message ) );
     message_box.exec();
     return;
   }
-    
+
   ActionExportLayer::Dispatch( Core::Interface::GetWidgetActionContext(), 
     layer_handles[ 0 ]->get_layer_id(), exporter, filename.toStdString() );
 }
@@ -440,14 +493,29 @@ void LayerIOFunctions::ExportIsosurface( QMainWindow* main_window )
     return;
   }
 
-  QString filename;
+  QString filename, selectedFilter;
   boost::filesystem::path current_folder = ProjectManager::Instance()->get_current_file_folder();
 
   filename = QFileDialog::getSaveFileName( main_window,
     "Export Isosurface As... ", QString::fromStdString( current_folder.string() ),
-    QString::fromStdString( Core::Isosurface::EXPORT_FORMATS_C ) );
+    QString::fromStdString( Core::Isosurface::EXPORT_FORMATS_C ), &selectedFilter );
 
   if ( filename.isEmpty() ) return;
+
+  std::string extension;
+  std::tie( extension, std::ignore ) = Core::GetFullExtension( boost::filesystem::path( filename.toStdString() ) );
+
+  if ( extension.empty() )
+  {
+    // some Linux file dialogs don't fill in extension
+    for ( const auto &pair : Core::Isosurface::EXPORT_FORMATS_MAP_C )
+    {
+      if ( selectedFilter.startsWith( QString::fromStdString( pair.first ) ) )
+      {
+        filename.append( pair.second.c_str() );
+      }
+    }
+  }
 
   ActionExportIsosurface::Dispatch( Core::Interface::GetWidgetActionContext(),
     layerHandle->get_layer_id(), filename.toStdString(), layerHandle->name_state_->get() );

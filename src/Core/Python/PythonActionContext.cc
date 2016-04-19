@@ -3,7 +3,7 @@
  
  The MIT License
  
- Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ Copyright (c) 2015 Scientific Computing and Imaging Institute,
  University of Utah.
  
  
@@ -54,18 +54,7 @@ void PythonActionContext::report_warning( const std::string& warning )
 
 void PythonActionContext::report_message( const std::string& message )
 {
-}
-
-void PythonActionContext::report_need_resource( Core::NotifierHandle notifier )
-{
-  this->notifier_ = notifier;
-  this->error_msg_ = std::string( "'" ) + notifier->get_name() + std::string(
-      "' is currently unavailable" );
-}
-
-void PythonActionContext::report_result( const Core::ActionResultHandle& result )
-{
-  this->result_ = result;
+  this->error_msg_ = message;
 }
 
 Core::ActionSource PythonActionContext::source() const
