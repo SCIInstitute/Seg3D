@@ -815,22 +815,6 @@ const QString StyleSheet::STATUSBAR_DEBUG_C = QString::fromUtf8(
   " font: bold;"
   "}" );
   
-// === LayerImporterWidget === //
-const QString StyleSheet::LAYERIMPORTERWIDGET_ACTIVE_BUTTON_C = QString( 
-  "QToolButton{"
-  " background-color: rgb(233, 111, 53);"
-  " border-radius: 3px;"
-  " border: 2px solid rgb(142, 67, 32);"
-  " color: white;"
-  "}" );
-const QString StyleSheet::LAYERIMPORTERWIDGET_INACTIVE_BUTTON_C = QString( 
-  "QToolButton{"
-  " background-color: rgb(150, 150, 150);"
-  " border-radius: 3px;"
-  " border: 2px solid rgb(30, 30, 30);"
-  " color: white;"
-  "}" );
-
 // === ToolBoxWidget Styles === //
 const QString StyleSheet::TOOLBOXWIDGET_C = QString( 
   "QWidget#tool_main_ {"
@@ -1411,19 +1395,6 @@ const QString StyleSheet::LAYERWIDGET_C = QString::fromUtf8(
   "}"
   );
 
-// - Volume Type Colors - //
-const QString StyleSheet::DATA_VOLUME_COLOR_C = QString::fromUtf8(
-  "QWidget#activate_button_{"
-  " background-color: rgb(90, 90, 90);"
-  "}");
-const QString StyleSheet::MASK_VOLUME_COLOR_C = QString::fromUtf8(
-  "QWidget#activate_button_{"
-  " background-color: rgb( " ACCENT_COLOR ") ;"
-  "}");
-const QString StyleSheet::LABEL_VOLUME_COLOR_C = QString::fromUtf8(
-  "QWidget#activate_button_{ background-color: rgb(90, 90, 90);"
-  "}");
-  
 // - ACTIVE - //
 const QString StyleSheet::LAYER_WIDGET_BASE_ACTIVE_C = QString::fromUtf8(
   "QWidget#base_ {"
@@ -1469,23 +1440,6 @@ const QString StyleSheet::LAYER_WIDGET_BASE_INACTIVE_C = QString::fromUtf8(
   " border-top-left-radius: 0px;"
   "}");
 
-
-const QString StyleSheet::LAYER_WIDGET_HEADER_ACTIVE_C = QString::fromUtf8(
-  ""
-);
-
-const QString StyleSheet::LAYER_WIDGET_HEADER_ACTIVE_IN_USE_C = QString::fromUtf8(
-  ""
-);
-
-const QString StyleSheet::LAYER_WIDGET_HEADER_IN_USE_C = QString::fromUtf8(
-  ""
-);
-
-const QString StyleSheet::LAYER_WIDGET_HEADER_INACTIVE_C = QString::fromUtf8(
-  ""
-);
-
 const QString StyleSheet::LAYER_WIDGET_LABEL_INACTIVE_C = QString::fromUtf8(
   "QLineEdit#label_:!focus{"
   " background-color: rgb( " PALETTE_BACKGROUND_COLOR ") ;"
@@ -1504,29 +1458,7 @@ const QString StyleSheet::LAYER_WIDGET_LABEL_ACTIVE_IN_USE_C = QString::fromUtf8
 const QString StyleSheet::LAYER_WIDGET_LABEL_IN_USE_C = QString::fromUtf8(
   "QLineEdit#label_:!focus{"
   " background-color: rgb( " HOVER_COLOR ") ;"
-  "}");
-      
-// - DROP - //
-const QString StyleSheet::LAYER_WIDGET_BASE_DROP_C = QString::fromUtf8(
-  "QWidget#base_{"
-  " background-color: rgb( " PALETTE_BACKGROUND_COLOR ") ;"
-  " border: 3px solid rgb( " BORDER_COLOR ") ;"
-  " border-top-width: 0px;"
-  " border-radius: 3px;"
-  " border-top-right-radius: 0px;"
-  " border-top-left-radius: 0px;"
-  "}");
-  
-const QString StyleSheet::LAYER_WIDGET_BASE_PICKED_UP_C = QString::fromUtf8(
-   "QWidget#base_{"
-  " background-color: rgba( 0, 0, 0, 0 );"
-  " border: 1px solid rgba( 0, 0, 0, 0 );"
-  " border-top-width: 0px;"
-  " border-radius: 3px;"
-  " border-top-right-radius: 0px;"
-  " border-top-left-radius: 0px;"
-  "}");
-  
+  "}");      
 // - VISUAL_LOCKED - //
 const QString StyleSheet::LAYER_WIDGET_BASE_LOCKED_C = QString::fromUtf8(
   "QWidget#base_ {"
@@ -1539,10 +1471,6 @@ const QString StyleSheet::LAYER_WIDGET_BASE_LOCKED_C = QString::fromUtf8(
   "}"
 );
   
-const QString StyleSheet::LAYER_WIDGET_BACKGROUND_LOCKED_C = QString::fromUtf8(
-  "QPushButton#activate_button_{"
-  " background-color: rgb( " HOVER_COLOR ") ;"
-  "}");
 const QString StyleSheet::LAYER_WIDGET_LABEL_LOCKED_C = QString::fromUtf8(
   "QLineEdit#label_:!focus{"
   " color: gray;"
@@ -1636,19 +1564,6 @@ const QString StyleSheet::GROUP_PUSHDRAGBUTTON_C = QString::fromUtf8(
   " margin: 0 0 0 0;"
   " padding: 0 0 0 0;"
   "}");
-
-const QString StyleSheet::DROPSPACEWIDGET_C = QString::fromUtf8(
-  " border-radius: 3px;"
-  " margin-top: 0;"
-  " margin-bottom: 0;"
-  " padding-top: 0;"
-  " padding-bottom: 0;"
-  " border: 1px solid rgba(50, 50, 50, 40);"
-  " background-color: qlineargradient( spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227,"
-  "   stop:0 rgba(0, 0, 0, 50)," 
-  "   stop:0.3 rgba(0, 0, 0, 100),"
-  "   stop:0.7 rgba(0, 0, 0, 100),"
-  "   stop:1 rgba(0, 0, 0, 50) );");
 
 // - ViewerWidget - //
 const QString StyleSheet::VIEWERWIDGET_C = QString::fromUtf8(
