@@ -39,6 +39,8 @@
 
 #endif
 
+#include <Application/Layer/Layer.h>
+
 namespace Seg3D
 {
 
@@ -67,7 +69,9 @@ public:
 
   /// EXPORTISOSURFACE
   /// Export isosurface generated from selected mask layer to file
-  static void ExportIsosurface( QMainWindow* main_window );
+  static void ExportIsosurfaceFromActiveLayer( QMainWindow* main_window );
+
+  static void ExportIsosurface( QWidget* widget, LayerHandle layerHandle );
 };
 
 } // end namespace Seg3D

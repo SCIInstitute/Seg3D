@@ -24,7 +24,7 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
- */
+*/
 
 // STL includes
 #include <fstream>
@@ -35,6 +35,7 @@
 // Core includes
 #include <Core/DataBlock/StdDataBlock.h>
 #include <Core/Isosurface/Isosurface.h>
+#include <Core/Isosurface/IsosurfaceExporter.h>
 #include <Core/Utils/StackVector.h>
 #include <Core/Utils/Parallel.h>
 #include <Core/Utils/Log.h>
@@ -355,8 +356,14 @@ public:
 
 typedef boost::shared_ptr< VertexBufferBatch > VertexBufferBatchHandle;
 
-const std::string Isosurface::EXPORT_FORMATS_C( "VTK (*.vtk);;ASCII (*.fac *.pts *.val);;STL (*.stl)" );
-const FilterMap Isosurface::EXPORT_FORMATS_MAP_C = { { "VTK", ".vtk" }, { "ASCII", ".fac" }, { "STL", ".stl" } };
+#if defined (_WIN32) || defined(__APPLE__)
+const std::string Isosurface::EXPORT_FORMATS_C( "VTK (*.vtk);;ASCII (*.fac *.pts *.val);;ASCII STL (*.stl);;Binary STL (*.stl)" );
+#else
+const std::string Isosurface::EXPORT_FORMATS_C( "VTK (*.vtk);;ASCII (*.fac *.pts *.val);;ASCII STL (*.stl);;Binary STL (*.stl *)" );
+#endif
+
+// Binary STL handled as special case in LayerIOFunctions::ExportIsosurface
+const FilterMap Isosurface::EXPORT_FORMATS_MAP_C = { { "VTK (*.vtk)", ".vtk" }, { "ASCII (*.fac *.pts *.val)", ".fac" }, { "ASCII STL (*.stl)", ".stl" } };
 
 class IsosurfacePrivate 
 {
@@ -420,10 +427,10 @@ public:
   unsigned char mask_value_; // Same for original volume and downsampled volume
 
   // Output mesh
-  std::vector< PointF > points_; 
-  std::vector< VectorF > normals_; 
-  std::vector< unsigned int > faces_; // unsigned int because GL expects this
-  std::vector< float > values_; // Should be in range [0, 1]
+  PointFVector points_;
+  VectorFVector normals_;
+  UIntVector faces_; // unsigned int because GL expects this
+  FloatVector values_; // Should be in range [0, 1]
   float area_; // Surface area of the isosurface
 
   // Single colormap shared by all isosurfaces
@@ -434,24 +441,24 @@ public:
   size_t nx_, ny_, nz_; // Mask dimensions of original or downsampled volume depending on quality
   size_t elem_nx_, elem_ny_, elem_nz_; // Number of (marching) cubes
 
-  std::vector<unsigned char> type_buffer_; 
-  std::vector<std::vector<unsigned int> > edge_buffer_;  
+  UCharVector type_buffer_;
+  std::vector< UIntVector > edge_buffer_;
 
-  std::vector<unsigned int> min_point_index_;
-  std::vector<unsigned int> max_point_index_;
-  std::vector<unsigned int> min_face_index_;
-  std::vector<unsigned int> max_face_index_;
+  UIntVector min_point_index_;
+  UIntVector max_point_index_;
+  UIntVector min_face_index_;
+  UIntVector max_face_index_;
 
-  std::vector< std::pair<unsigned int, unsigned int> > part_points_;
-  std::vector< std::pair<unsigned int, unsigned int> > part_faces_;
-  std::vector< std::vector< unsigned int > > part_indices_;
+  std::vector< std::pair< unsigned int, unsigned int > > part_points_;
+  std::vector< std::pair< unsigned int, unsigned int > > part_faces_;
+  std::vector< UIntVector > part_indices_;
 
-  std::vector< std::vector< PointF > > new_points_; 
+  std::vector< PointFVector > new_points_; 
   std::vector< std::vector< StackVector< size_t, 3 > > > new_elems_;
-  std::vector< float > new_elem_areas_;
+  FloatVector new_elem_areas_;
 
-  std::vector< size_t > front_offset_;
-  std::vector< size_t > back_offset_;
+  IVector front_offset_;
+  IVector back_offset_;
   size_t global_point_cnt_;
 
   unsigned int prev_point_min_;
@@ -737,7 +744,7 @@ void IsosurfacePrivate::parallel_compute_faces( int thread, int num_threads,
   }
 
   // Each thread generates new points for the isosurface
-  std::vector< PointF >& points = this->new_points_[ thread ];
+  PointFVector& points = this->new_points_[ thread ];
   // StackVector is a SCIRun class.  
   // StackVector implements a subclass of the std::vector class, except that
   // the vector is statically allocated on the stack for performance.
@@ -777,13 +784,13 @@ void IsosurfacePrivate::parallel_compute_faces( int thread, int num_threads,
     point_cnt = thread<<24; // upper 8 bits are used to store thread id -- efficiency trick
 
     // References to back/front/side tables
-    std::vector< unsigned int >& back_edge_x = this->edge_buffer_[ back_buffer_x ];
-    std::vector< unsigned int >& back_edge_y = this->edge_buffer_[ back_buffer_y ];
+    UIntVector& back_edge_x = this->edge_buffer_[ back_buffer_x ];
+    UIntVector& back_edge_y = this->edge_buffer_[ back_buffer_y ];
 
-    std::vector< unsigned int >& front_edge_x = this->edge_buffer_[ front_buffer_x ];
-    std::vector< unsigned int >& front_edge_y = this->edge_buffer_[ front_buffer_y ];
+    UIntVector& front_edge_x = this->edge_buffer_[ front_buffer_x ];
+    UIntVector& front_edge_y = this->edge_buffer_[ front_buffer_y ];
 
-    std::vector< unsigned int >& side_edge = this->edge_buffer_[ side_buffer ];
+    UIntVector& side_edge = this->edge_buffer_[ side_buffer ];
 
     // Use relative offsets to find edges
     edge_table[ 0 ] = &( this->edge_buffer_[ back_buffer_x ][ 0 ] );
@@ -1044,7 +1051,7 @@ void IsosurfacePrivate::parallel_compute_faces( int thread, int num_threads,
           this->back_offset_[ p ] = this->front_offset_[ p ];
         }
         local_size += this->new_points_[ p ].size();
-        std::vector< PointF >& points = this->new_points_[ p ];
+        PointFVector& points = this->new_points_[ p ];
         for ( size_t q = 0; q < points.size(); q++ )
         {
           this->points_.push_back( points[ q ] ); 
@@ -1307,7 +1314,7 @@ void IsosurfacePrivate::compute_cap_faces()
     // 0 - 3.
     // Create an array of type per index
     size_t num_cells = ( ni - 1 )* ( nj - 1 );
-    std::vector< unsigned char > cell_types( num_cells );
+    UCharVector cell_types( num_cells );
     // Loop through all 2D cells to find each cell type
     size_t cell_index = 0;
     bool some_nodes_on = false;
@@ -1902,7 +1909,7 @@ void Isosurface::compute( double quality_factor, bool capping_enabled,
   {
     unsigned int num_face_indices = this->private_->part_faces_[ i ].second - 
       this->private_->part_faces_[ i ].first;
-    std::vector< unsigned int > local_indices( num_face_indices );
+    UIntVector local_indices( num_face_indices );
     for ( size_t j = 0; j < num_face_indices; ++j )
     {
       size_t pt_global_idx = this->private_->part_faces_[ i ].first + j;
@@ -1935,27 +1942,27 @@ void Isosurface::compute( double quality_factor, bool capping_enabled,
   // this->export_legacy_isosurface( "", "test_isosurface" );
 }
 
-const std::vector< PointF >& Isosurface::get_points() const
+const PointFVector& Isosurface::get_points() const
 {
   return this->private_->points_;
 }
 
-const std::vector< unsigned int >& Isosurface::get_faces() const
+const UIntVector& Isosurface::get_faces() const
 {
   return this->private_->faces_;
 }
 
-const std::vector< VectorF >& Isosurface::get_normals() const
+const VectorFVector& Isosurface::get_normals() const
 { 
   return this->private_->normals_;
 }
 
-const std::vector< float >& Isosurface::get_values() const
+const FloatVector& Isosurface::get_values() const
 {
   return this->private_->values_;
 }
 
-bool Isosurface::set_values( const std::vector< float >& values )
+bool Isosurface::set_values( const FloatVector& values )
 {
   if( !( values.size() == this->private_->points_.size() || values.size() == 0 ) )
   {
@@ -2122,155 +2129,47 @@ bool Isosurface::export_legacy_isosurface( const boost::filesystem::path& path,
                                            const std::string& file_prefix )
 {
   lock_type lock( this->get_mutex() );
-
-  // Write points to .pts file
-  boost::filesystem::path points_path = path / ( file_prefix + ".pts" );
-  std::ofstream pts_file( points_path.string().c_str() );
-  if( !pts_file.is_open() ) 
-  {
-    return false;
-  }
-
-  for( size_t i = 0; i < this->private_->points_.size(); i++ )
-  {
-    PointF pt = this->private_->points_[ i ];
-    pts_file << pt.x() << " " << pt.y() << " " << pt.z() << std::endl; 
-  }
-  pts_file.close();
-
-  // Write faces to .fac file
-  boost::filesystem::path faces_path = path / ( file_prefix + ".fac" );
-  std::ofstream fac_file( faces_path.string().c_str() );
-  if( !fac_file.is_open() ) 
-  {
-    return false;
-  }
-
-  for( size_t i = 0; i + 2 < this->private_->faces_.size(); i += 3 )
-  {
-    fac_file << this->private_->faces_[ i ] << " " << this->private_->faces_[ i + 1 ] << " " 
-      << this->private_->faces_[ i + 2 ] << std::endl; 
-  }
-  fac_file.close();
-
-  // Write values to .val file
-  if( this->private_->values_.size() > 0 )
-  {
-    boost::filesystem::path values_path = path / ( file_prefix + ".val" );
-    std::ofstream val_file( values_path.string().c_str() );
-    if( !val_file.is_open() ) 
-    {
-      return false;
-    }
-
-    for( size_t i = 0; i < this->private_->values_.size(); i++ )
-    {
-      val_file << this->private_->values_[ i ] << std::endl; 
-    }
-    val_file.close();
-  }
-
-  return true;
+  bool result = IsosurfaceExporter::ExportLegacy( path, file_prefix,
+                                                  this->private_->points_,
+                                                  this->private_->faces_,
+                                                  this->private_->values_
+                                                );
+  return result;
 }
 
 
 bool Isosurface::export_vtk_isosurface( const boost::filesystem::path& filename )
 {
   lock_type lock( this->get_mutex() );
-
-  std::ofstream vtk_file( filename.string().c_str() );
-  if( !vtk_file.is_open() ) 
-  {
-    return false;
-  }
-
-  // Legacy VTK file format (http://vtk.org/VTK/img/file-formats.pdf)
-  //
-  // write header
-  vtk_file << "# vtk DataFile Version 3.0\n";
-  vtk_file << "vtk output\n";
-
-  vtk_file << "ASCII\n";
-  vtk_file << "DATASET POLYDATA\n";
-  vtk_file << "POINTS " << this->private_->points_.size() << " float\n";
-
-  for( size_t i = 0; i < this->private_->points_.size(); i++ )
-  {
-    PointF pt = this->private_->points_[ i ];
-    vtk_file << pt.x() << " " << pt.y() << " " << pt.z() << std::endl; 
-  }
-
-  unsigned int num_triangles = this->private_->faces_.size() / 3;
-  unsigned int triangle_list_size = num_triangles * 4;
-
-  vtk_file << "\nPOLYGONS " << num_triangles << " " << triangle_list_size << std::endl;
-
-  for( size_t i = 0; i + 2 < this->private_->faces_.size(); i += 3 )
-  {
-    vtk_file << "3 " << this->private_->faces_[ i ] << " " << this->private_->faces_[ i + 1 ] << " " 
-      << this->private_->faces_[ i + 2 ] << std::endl; 
-  }
-
-  vtk_file.close();
-
-  return true;
+  bool result = IsosurfaceExporter::ExportVTKASCII( filename,
+                                                    this->private_->points_,
+                                                    this->private_->faces_
+                                                  );
+  return result;
 }
 
-// ASCII STL format (http://en.wikipedia.org/wiki/STL_(file_format))
-bool Isosurface::export_stl_isosurface( const boost::filesystem::path& filename, const std::string& name )
+bool Isosurface::export_stl_ascii_isosurface( const boost::filesystem::path& filename,
+                                              const std::string& name )
 {
   lock_type lock( this->get_mutex() );
-  std::ofstream stl_file( filename.string().c_str() );
-  if( ! stl_file.is_open() ) 
-  {
-    return false;
-  }
-
-  const std::string delim(" ");
-  const std::string indent_level1("  ");
-  const std::string indent_level2("    ");
-  const std::string indent_level3("      ");
-  stl_file << "solid " << name << std::endl;
-
-  for( size_t i = 0; i + 2 < this->private_->faces_.size(); i += 3 )
-  {
-    size_t vertex_index1 = this->private_->faces_[ i ];
-    size_t vertex_index2 = this->private_->faces_[ i + 1 ];
-    size_t vertex_index3 = this->private_->faces_[ i + 2 ];
-
-    // Get vertices of face
-    PointF p1 = this->private_->points_[ vertex_index1 ];
-    PointF p2 = this->private_->points_[ vertex_index2 ];
-    PointF p3 = this->private_->points_[ vertex_index3 ];
-
-    // compute face normal:
-    //   U = p2 - p1
-    //   V = p3 - p1
-    //   Ni = UyVz - UzVy
-    //   Nj = UzVx - UxVz
-    //   Nk = UxVy - UyVx
-
-    VectorF U = p2 - p1;
-    VectorF V = p3 - p1;
-
-    double Ni = U.y() * V.z() - U.z() * V.y();
-    double Nj = U.z() * V.x() - U.x() * V.z();
-    double Nk = U.x() * V.y() - U.y() * V.x();
-    
-    stl_file << indent_level1 << "facet normal " << std::fixed << Ni << delim << Nj << delim << Nk << std::endl;
-    stl_file << indent_level2 << "outer loop" << std::endl;
-    stl_file << indent_level3 << "vertex " << std::fixed << p1.x() << delim << p1.y() << delim << p1.z() << std::endl;
-    stl_file << indent_level3 << "vertex " << std::fixed << p2.x() << delim << p2.y() << delim << p2.z() << std::endl;
-    stl_file << indent_level3 << "vertex " << std::fixed << p3.x() << delim << p3.y() << delim << p3.z() << std::endl;
-    stl_file << indent_level2 << "endloop" << std::endl;    
-    stl_file << indent_level1 << "endfacet" << std::endl;
-  }
-  stl_file << "endsolid" << std::endl;
-
-  stl_file.close();
-  
-  return true;
+  bool result = IsosurfaceExporter::ExportSTLASCII( filename, name,
+                                                    this->private_->points_,
+                                                    this->private_->faces_
+                                                  );
+  return result;
 }
+
+bool Isosurface::export_stl_binary_isosurface( const boost::filesystem::path& filename,
+                                               const std::string& name )
+{
+  lock_type lock( this->get_mutex() );
+  bool result = IsosurfaceExporter::ExportSTLBinary( filename, name,
+                                                     this->private_->points_,
+                                                     this->private_->faces_
+                                                   );
+  return result;
+}
+
 
 float Isosurface::surface_area() const
 {

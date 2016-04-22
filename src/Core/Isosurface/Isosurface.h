@@ -24,7 +24,7 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
- */
+*/
 
 #ifndef CORE_ISOSURFACE_ISOSURFACE_H
 #define CORE_ISOSURFACE_ISOSURFACE_H
@@ -55,6 +55,13 @@ typedef boost::shared_ptr< Isosurface > IsosurfaceHandle;
 class IsosurfacePrivate;
 typedef boost::shared_ptr< IsosurfacePrivate > IsosurfacePrivateHandle;
 
+typedef std::vector< unsigned int > UIntVector;
+typedef std::vector< float > FloatVector;
+typedef std::vector< PointF > PointFVector;
+typedef std::vector< VectorF > VectorFVector;
+typedef std::vector< unsigned char > UCharVector;
+typedef std::vector< size_t > IVector;
+
 typedef std::map<std::string, std::string> FilterMap;
 
 // Isosurface geometry and computation code 
@@ -71,19 +78,19 @@ public:
   /// Get 3D points for vertices, each stored only once
   /// NOTE: This function is not thread-safe, make sure you have the mutex
   /// allocated before using this array (use get_mutex())
-  const std::vector< PointF >& get_points() const;
+  const PointFVector& get_points() const;
 
   // GET_FACES:
   /// Indices into vertices, 3 per face
   /// NOTE: This function is not thread-safe, make sure you have the mutex
   /// allocated before using this array (use get_mutex())
-  const std::vector< unsigned int >& get_faces() const;
+  const UIntVector& get_faces() const;
 
   // GET_NORMALS:
   /// Get one normal per vertex, interpolated
   /// NOTE: This function is not thread-safe, make sure you have the mutex
   /// allocated before using this array (use get_mutex())
-  const std::vector< VectorF >& get_normals() const;
+  const VectorFVector& get_normals() const;
 
   // SURFACE_AREA:
   /// Return the area of the isosurface.
@@ -93,14 +100,14 @@ public:
   /// Get values per vertex.  Returns empty vector if use has not set values.
   /// NOTE: This function is not thread-safe, make sure you have the mutex
   /// allocated before using this array (use get_mutex())
-  const std::vector< float >& get_values() const; 
+  const FloatVector& get_values() const;
 
   // SET_VALUES:
   /// Set values for all vertices.  Vector must be same size as points and normals vectors 
   /// or empty.  Returns true on success, false on failure.
   /// NOTE: This function is not thread-safe, make sure you have the mutex
   /// allocated before using this array (use get_mutex())
-  bool set_values( const std::vector< float >& values );
+  bool set_values( const FloatVector& values );
 
   // SET_COLOR_MAP:
   /// Set mapping from vertex values to RGB colors.  
@@ -144,12 +151,18 @@ public:
                                  const std::string& file_prefix ); 
 
   // EXPORT_VTK_ISOSURFACE:
-  /// Writes out an isosurface in VTK mesh format
+  /// Writes out an isosurface in ASCII VTK mesh format
   bool export_vtk_isosurface( const boost::filesystem::path& filename );
 
-  // EXPORT_STL_ISOSURFACE:
-  /// Writes out an isosurface in STL file format
-  bool export_stl_isosurface( const boost::filesystem::path& filename, const std::string& name );
+  // EXPORT_STL_ASCII_ISOSURFACE:
+  /// Writes out an isosurface in ASCII STL file format
+  bool export_stl_ascii_isosurface( const boost::filesystem::path& filename,
+                                    const std::string& name );
+
+  // EXPORT_STL_BINARY_ISOSURFACE:
+  /// Writes out an isosurface in Binary STL file format
+  bool export_stl_binary_isosurface( const boost::filesystem::path& filename,
+                                     const std::string& name );
 
   typedef boost::signals2::signal< void (double) > update_progress_signal_type;
 

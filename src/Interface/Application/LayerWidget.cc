@@ -68,7 +68,6 @@
 #include <Application/LayerIO/LayerIO.h>
 #include <Application/LayerIO/Actions/ActionExportLayer.h>
 #include <Application/LayerIO/Actions/ActionExportSegmentation.h>
-#include <Application/LayerIO/Actions/ActionExportIsosurface.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
 #include <Application/Filters/LayerResampler.h>
 #include <Application/ProjectManager/ProjectManager.h>
@@ -80,6 +79,8 @@
 #include <Interface/Application/DropSpaceWidget.h>
 #include <Interface/Application/OverlayWidget.h>
 #include <Interface/Application/LayerResamplerDialog.h>
+#include <Interface/Application/LayerIOFunctions.h>
+
 
 //UI Includes
 #include "ui_LayerWidget.h"
@@ -129,10 +130,6 @@ public:
   // EXPORT_LAYER:
   // function that checks the type of the layer and calls the appropriate function to export the layer  
   void export_layer( const std::string& type_extension );
-
-  // EXPORT_ISOSURFACE
-  // function that exports an isosurface
-  void export_isosurface();
 
   // SET_DROP_TARGET:
   // this function is for keeping track of which layer the drop is going to happen on
@@ -412,37 +409,6 @@ void LayerWidgetPrivate::export_layer( const std::string& type_extension )
       this->layer_->get_layer_id(), file_name, type_extension );
   }
 }
-
-
-void LayerWidgetPrivate::export_isosurface()
-{
-
-  MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( this->layer_.get() );
-  if ( ! mask_layer->iso_generated_state_->get() )
-  {
-    QMessageBox message_box;
-    message_box.setWindowTitle( "Export Isosurface Error" );
-    message_box.addButton( QMessageBox::Ok );
-    message_box.setIcon( QMessageBox::Critical );
-    message_box.setText( "Isosurface must be created before it can be exported." );
-    message_box.exec();
-    return;
-  }
-
-  QString filename;
-  boost::filesystem::path current_folder = ProjectManager::Instance()->get_current_file_folder();  
-
-  filename = QFileDialog::getSaveFileName( this->parent_,
-    tr("Export Isosurface As... "), QString::fromStdString( current_folder.string() ),
-    QString::fromStdString( Core::Isosurface::EXPORT_FORMATS_C ) );
-
-  if ( filename.isEmpty() ) return;
-
-  ActionExportIsosurface::Dispatch( Core::Interface::GetWidgetActionContext(), 
-    this->layer_->get_layer_id(), filename.toStdString(), this->layer_->name_state_->get() );
-
-}
-
 
 void LayerWidgetPrivate::UpdateViewerButtons( qpointer_type qpointer, std::string layout )
 {
@@ -1510,7 +1476,7 @@ void LayerWidget::export_compressed_nifti()
 
 void LayerWidget::export_isosurface()
 {
-  this->private_->export_isosurface();
+  LayerIOFunctions::ExportIsosurface( this->private_->parent_, this->private_->layer_ );
 }
 
 } //end namespace Seg3D

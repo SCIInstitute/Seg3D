@@ -42,6 +42,7 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QPointer>
+#include <QString>
 
 // Core includes
 #include <Core/State/Actions/ActionSet.h>
@@ -51,11 +52,11 @@
 #include <Core/Isosurface/Isosurface.h>
 
 // Application includes
+#include <Application/Layer/LayerManager.h>
 #include <Application/LayerIO/LayerIO.h>
 #include <Application/LayerIO/Actions/ActionImportLargeVolumeLayer.h>
 #include <Application/LayerIO/Actions/ActionExportIsosurface.h>
 #include <Application/LayerIO/Actions/ActionExportLayer.h>
-#include <Application/Layer/LayerManager.h>
 #include <Application/ProjectManager/ProjectManager.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
 
@@ -147,13 +148,16 @@ bool LayerIOFunctions::ImportFiles( QMainWindow* main_window, const std::string&
 #if defined(__APPLE__) || defined(_WIN32)
     // Use native dialog
     file_list = QFileDialog::getOpenFileNames( main_window,
-      "Import Layer(s)... ", current_file_folder.string().c_str(), filters, &qs_filtername );
+                                               "Import Layer(s)... ",
+                                               current_file_folder.string().c_str(),
+                                               filters,
+                                               &qs_filtername );
 #else
     // TODO: recheck this
 
     // It seems Ubuntus Qt4 version is broken and its dialog tends to crash
     // Hence use the other way of defining a dialog
-    QFileDialog* diag = new QFileDialog( main_window, "Import Layer(s)...", 
+    QFileDialog* diag = new QFileDialog( main_window, "Import Layer(s)...",
         current_file_folder.string().c_str(), filters );
     diag->setFileMode(QFileDialog::ExistingFiles);
     diag->setNameFilter( qs_filtername );
@@ -388,7 +392,7 @@ void LayerIOFunctions::ExportLayer( QMainWindow* main_window )
   filters["MRC files"] = ".mrc";
   filters["Matlab files"] = ".mat";
 
-  int counter = 1;
+  size_t counter = 1;
   std::ostringstream oss;
   for ( const auto &pair : filters )
   {
@@ -461,7 +465,65 @@ void LayerIOFunctions::ExportSegmentation( QMainWindow* main_window )
   export_segmentation_wizard_->show();
 }
 
-void LayerIOFunctions::ExportIsosurface( QMainWindow* main_window )
+void LayerIOFunctions::ExportIsosurface( QWidget* widget, LayerHandle layerHandle )
+{
+  MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( layerHandle.get() );
+  if ( ! mask_layer->iso_generated_state_->get() )
+  {
+    QMessageBox message_box;
+    message_box.setWindowTitle( "Export Isosurface Error" );
+    message_box.addButton( QMessageBox::Ok );
+    message_box.setIcon( QMessageBox::Critical );
+    message_box.setText( "Isosurface must be created before it can be exported." );
+    message_box.exec();
+    return;
+  }
+
+  QString filename, selectedFilter;
+  boost::filesystem::path current_folder = ProjectManager::Instance()->get_current_file_folder();
+
+  filename = QFileDialog::getSaveFileName( widget,
+    "Export Isosurface As... ", QString::fromStdString( current_folder.string() ),
+      QString::fromStdString( Core::Isosurface::EXPORT_FORMATS_C ), &selectedFilter );
+
+  if ( filename.isEmpty() ) return;
+
+  std::string extension;
+  std::tie( extension, std::ignore ) = Core::GetFullExtension( boost::filesystem::path( filename.toStdString() ) );
+
+  // Binary STL needs to be handled as a special case because some Linux file dialogs (i.e. OpenSuSE)
+  // always default to first filter for the same file extensions
+  bool binary = false;
+  if ( selectedFilter.startsWith("Binary STL") )
+  {
+    binary = true;
+    if ( extension.empty() ) filename.append( ".stl" );
+  }
+  else
+  {
+    if ( extension.empty() )
+    {
+      // some Linux file dialogs don't fill in extension
+      for ( const auto &pair : Core::Isosurface::EXPORT_FORMATS_MAP_C )
+      {
+        if ( selectedFilter == QString::fromStdString( pair.first ) )
+        {
+          filename.append( pair.second.c_str() );
+          break;
+        }
+      }
+    }
+  }
+
+  ActionExportIsosurface::Dispatch( Core::Interface::GetWidgetActionContext(),
+                                    layerHandle->get_layer_id(),
+                                    filename.toStdString(),
+                                    layerHandle->name_state_->get(),
+                                    binary
+                                   );
+}
+
+void LayerIOFunctions::ExportIsosurfaceFromActiveLayer( QMainWindow* main_window )
 {
   LayerHandle layerHandle = LayerManager::Instance()->get_active_layer();
   if ( ! layerHandle ) return;
@@ -480,46 +542,7 @@ void LayerIOFunctions::ExportIsosurface( QMainWindow* main_window )
     return;
   }
 
-  MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( layerHandle.get() );
-
-  if ( ! mask_layer->iso_generated_state_->get() )
-  {
-    QMessageBox message_box;
-    message_box.setWindowTitle( "Export Isosurface Error" );
-    message_box.addButton( QMessageBox::Ok );
-    message_box.setIcon( QMessageBox::Critical );
-    message_box.setText( "Isosurface must be created before it can be exported." );
-    message_box.exec();
-    return;
-  }
-
-  QString filename, selectedFilter;
-  boost::filesystem::path current_folder = ProjectManager::Instance()->get_current_file_folder();
-
-  filename = QFileDialog::getSaveFileName( main_window,
-    "Export Isosurface As... ", QString::fromStdString( current_folder.string() ),
-    QString::fromStdString( Core::Isosurface::EXPORT_FORMATS_C ), &selectedFilter );
-
-  if ( filename.isEmpty() ) return;
-
-  std::string extension;
-  std::tie( extension, std::ignore ) = Core::GetFullExtension( boost::filesystem::path( filename.toStdString() ) );
-
-  if ( extension.empty() )
-  {
-    // some Linux file dialogs don't fill in extension
-    for ( const auto &pair : Core::Isosurface::EXPORT_FORMATS_MAP_C )
-    {
-      if ( selectedFilter.startsWith( QString::fromStdString( pair.first ) ) )
-      {
-        filename.append( pair.second.c_str() );
-      }
-    }
-  }
-
-  ActionExportIsosurface::Dispatch( Core::Interface::GetWidgetActionContext(),
-    layerHandle->get_layer_id(), filename.toStdString(), layerHandle->name_state_->get() );
-
+  ExportIsosurface( main_window, layerHandle );
 }
 
 
