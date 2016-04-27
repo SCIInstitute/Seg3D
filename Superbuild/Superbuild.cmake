@@ -101,8 +101,11 @@ OPTION(BUILD_WITH_PYTHON "Build with python support." ON)
 # Configure Qt
 ###########################################
 
+OPTION(DO_ZLIB_MANGLE "Mangle Zlib names to avoid conflicts with Qt5 or other external libraries" ON)
+
 IF(SEG3D_BUILD_INTERFACE)
   #SET(CMAKE_AUTOMOC ON)
+  SET(CMAKE_PREFIX_PATH "" CACHE PATH "PATH to find cmake package configs.  Can be used for custom qt install paths for instance.") 
   FIND_PACKAGE(Qt5Core REQUIRED)
   #FIND_PACKAGE(Qt5Gui REQUIRED)
   #FIND_PACKAGE(Qt5Widgets REQUIRED)
@@ -117,6 +120,7 @@ IF(SEG3D_BUILD_INTERFACE)
   ELSE()
     MESSAGE(FATAL_ERROR "Qt5 is required for building the Seg3D GUI")
   ENDIF()
+
 
   IF(APPLE)
     SET(MACDEPLOYQT_OUTPUT_LEVEL 0 CACHE STRING "Set macdeployqt output level (0-3)")
@@ -197,7 +201,6 @@ SET(SUPERBUILD_DIR ${CMAKE_CURRENT_SOURCE_DIR} CACHE INTERNAL "" FORCE)
 SET(SEG3D_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../src CACHE INTERNAL "" FORCE)
 SET(SEG3D_BINARY_DIR ${CMAKE_BINARY_DIR}/Seg3D CACHE INTERNAL "" FORCE)
 
-OPTION(DO_ZLIB_MANGLE "Mangle Zlib names to avoid conflicts" ON)
 ADD_EXTERNAL( ${SUPERBUILD_DIR}/DataExternal.cmake Data_external )
 ADD_EXTERNAL( ${SUPERBUILD_DIR}/ZlibExternal.cmake Zlib_external )
 ADD_EXTERNAL( ${SUPERBUILD_DIR}/GlewExternal.cmake Glew_external )
@@ -217,6 +220,7 @@ ADD_EXTERNAL( ${SUPERBUILD_DIR}/BoostExternal.cmake Boost_external )
 SET(SEG3D_CACHE_ARGS
     "-DCMAKE_VERBOSE_MAKEFILE:BOOL=${CMAKE_VERBOSE_MAKEFILE}"
     "-DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}"
+    "-DCMAKE_PREFIX_PATH:PATH=${CMAKE_PREFIX_PATH}"
     "-DSEG3D_SOURCE_DIR:PATH=${SEG3D_SOURCE_DIR}"
     "-DSEG3D_BINARY_DIR:PATH=${SEG3D_BINARY_DIR}"
     "-DBUILD_LARGE_VOLUME_TOOLS:BOOL=${BUILD_LARGE_VOLUME_TOOLS}"
