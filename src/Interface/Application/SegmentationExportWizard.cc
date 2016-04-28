@@ -143,6 +143,7 @@ SegmentationSelectionPage::SegmentationSelectionPage( SegmentationPrivateHandle 
   this->private_->group_with_masks_tree_->setIndentation( 15 );
   this->private_->group_with_masks_tree_->setItemsExpandable( true );
   this->private_->group_with_masks_tree_->setHeaderHidden( true );
+  this->private_->group_with_masks_tree_->setStyleSheet( StyleSheet::SEGMENTATION_EXPORT_C );
 
   this->private_->selection_main_layout_->addWidget( this->private_->group_with_masks_tree_ );
   
@@ -153,8 +154,8 @@ SegmentationSelectionPage::SegmentationSelectionPage( SegmentationPrivateHandle 
   this->private_->radio_button_group_ = new QButtonGroup( this );
   this->private_->radio_button_group_->setExclusive( true );
 
-  this->private_->single_or_multiple_files_widget_->setMinimumSize( QSize( 0, 24 ) );
-  this->private_->single_or_multiple_files_widget_->setMaximumSize( QSize( 16777215, 24 ) );
+  this->private_->single_or_multiple_files_widget_->setMinimumSize( QSize( 0, 30 ) );
+  this->private_->single_or_multiple_files_widget_->setMaximumSize( QSize( 16777215, 30 ) );
   this->private_->horizontalLayout_1 = new QHBoxLayout( this->private_->single_or_multiple_files_widget_ );
   this->private_->horizontalLayout_1->setSpacing( 0 );
   this->private_->horizontalLayout_1->setContentsMargins( 0, 0, 0, 0 );
@@ -193,8 +194,8 @@ SegmentationSelectionPage::SegmentationSelectionPage( SegmentationPrivateHandle 
   this->private_->horizontalLayout_1->addWidget( this->private_->multiple_files_widget_ );
   
   this->private_->bitmap_widget_ = new QWidget( this );
-  this->private_->bitmap_widget_->setMinimumSize( QSize( 0, 24) );
-  this->private_->bitmap_widget_->setMaximumSize( QSize( 16777215, 24 ) );
+  this->private_->bitmap_widget_->setMinimumSize( QSize( 0, 30) );
+  this->private_->bitmap_widget_->setMaximumSize( QSize( 16777215, 30 ) );
   this->private_->bitmap_layout_ = new QHBoxLayout( this->private_->bitmap_widget_ );
   this->private_->bitmap_layout_->setSpacing( 6 );
   this->private_->bitmap_layout_->setContentsMargins( 4, 4, 4, 4 );

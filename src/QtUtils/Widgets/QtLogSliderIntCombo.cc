@@ -36,6 +36,9 @@
 // QtUtils includes
 #include <QtUtils/Widgets/QtLogSliderIntCombo.h>
 
+// Qt includes
+#include <QProxyStyle>
+
 namespace QtUtils
 {
 
@@ -46,6 +49,21 @@ public:
   std::vector<QLabel> steps_;
 };
 
+class CustomFocusStyle : public QProxyStyle
+{
+public:
+  void drawPrimitive(PrimitiveElement element, const QStyleOption* option,
+                     QPainter* painter, const QWidget* widget) const
+  {
+    // do not draw focus rectangles for QSlider
+    if ( element == QStyle::PE_FrameFocusRect )
+    {
+      return;
+    }
+    QProxyStyle::drawPrimitive(element, option, painter, widget);
+  }
+};
+
 QtLogSliderIntCombo::QtLogSliderIntCombo( QWidget* parent ) :
   QWidget( parent ),
   value_( 0 ),
@@ -53,6 +71,8 @@ QtLogSliderIntCombo::QtLogSliderIntCombo( QWidget* parent ) :
 {
     this->private_->ui_.setupUi( this );
         
+    // Note that using setStyle here invalidates any QSlider stylesheet settings
+    this->private_->ui_.horizontalSlider->setStyle( new CustomFocusStyle() );
     this->connect( this->private_->ui_.horizontalSlider, SIGNAL( valueChanged( int ) ), 
     this, SLOT( slider_signal( int ) ) );
     this->connect( this->private_->ui_.spinBox, SIGNAL( valueChanged( int ) ), 

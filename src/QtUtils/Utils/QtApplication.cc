@@ -140,6 +140,10 @@ bool QtApplication::setup( int& argc, char **argv )
     // Set the native event filter for QApplication
     this->private_->qt_application_->installNativeEventFilter( this->private_->win32_event_filter_ );
 
+    // Set the style handler to fusion to get good
+    // fundamental behavior, especially for comboboxes
+    this->private_->qt_application_->setStyle( "fusion" );
+
     // Step 2: Create interface class to the main class of the event handler layer
     CORE_LOG_DEBUG( "Creating QtEventHandlerContext" );
     Core::EventHandlerContextHandle qt_eventhandler_context( new QtEventHandlerContext(
