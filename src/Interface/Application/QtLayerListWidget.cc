@@ -31,6 +31,7 @@
 
 // QtUtils includes
 #include <Interface/Application/QtLayerListWidget.h>
+#include <Interface/Application/StyleSheet.h>
 
 namespace Seg3D
 {
@@ -72,9 +73,13 @@ bool QtLayerListWidget::counter_hidden() const
   
 void QtLayerListWidget::set_validity( bool valid )
 {
-  if( !valid )
+  if( valid )
   {
-    this->setStyleSheet( QString::fromUtf8( "background-color: pink;" ) );
+    this->setStyleSheet( StyleSheet::QTLAYERLISTWIDGET_VALID_C );
+  }
+  else
+  {
+    this->setStyleSheet( StyleSheet::QTLAYERLISTWIDGET_INVALID_C );
   }
 }
 

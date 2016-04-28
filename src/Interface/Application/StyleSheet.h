@@ -144,6 +144,8 @@ public:
 
   // == Export Segmentations == //
     const static QString SEGMENTATION_EXPORT_C;
+    const static QString QTLAYERLISTWIDGET_VALID_C;
+    const static QString QTLAYERLISTWIDGET_INVALID_C;
 
   // == Speedline Tool == //
     const static QString SPEEDLINE_TOOL_C;

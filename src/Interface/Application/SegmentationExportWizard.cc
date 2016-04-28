@@ -111,6 +111,7 @@ SegmentationExportWizard::SegmentationExportWizard( QWidget *parent ) :
   this->setMinimumSize( 660, 400 );
   this->addPage( new SegmentationSelectionPage( private_, this ) );
     this->addPage( new SegmentationSummaryPage( private_, this ) );
+  this->setWizardStyle( QWizard::MacStyle );
   this->setPixmap( QWizard::BackgroundPixmap, QPixmap( QString::fromUtf8( 
     ":/Images/Symbol.png" ) ) );
   this->setWindowTitle( tr( "Segmentation Export Wizard" ) );

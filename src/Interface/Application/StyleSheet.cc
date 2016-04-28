@@ -513,6 +513,7 @@ namespace Seg3D
   " margin-top: 0px;"
   " margin-bottom: 0px;"
   " padding-left: 2px;"
+  " min-height: 20px;"
   "}"
   ".QDoubleSpinBox:disabled{"
   " background-color: rgb( " HOVER_COLOR ") ;"
@@ -529,6 +530,7 @@ namespace Seg3D
   " subcontrol-origin: margin;"
   " margin-top:2px;"
   " margin-bottom:6px;"
+  " height: 5px;"
   "}"
   "QDoubleSpinBox::down-button {"
   " background-color: transparent;"
@@ -541,6 +543,7 @@ namespace Seg3D
   " subcontrol-origin: margin;"
   " margin-top:6px;"
   " margin-bottom:2px;"
+  " height: 5px;"
   "}"
   "QWidget#sliderDoubleBase_ .QDoubleSpinBox{"
   " background-color: rgb( " SELECT_COLOR ") ;"
@@ -595,6 +598,7 @@ namespace Seg3D
   " margin-top: 0px;"
   " margin-bottom: 0px;"
   " padding-left: 2px;"
+  " min-height: 20px;"
   "}"
   ".QSpinBox:disabled{"
   " background-color: rgb( " HOVER_COLOR ") ;"
@@ -611,6 +615,7 @@ namespace Seg3D
   " subcontrol-origin: margin;"
   " margin-top:2px;"
   " margin-bottom:6px;"
+  " height: 5px;"
   "}"
   "QSpinBox::down-button {"
   " background-color: transparent;"
@@ -623,6 +628,7 @@ namespace Seg3D
   " subcontrol-origin: margin;"
   " margin-top:6px;"
   " margin-bottom:2px;"
+  " height: 5px;"
   "}"
   "QWidget#sliderIntBase_ .QSpinBox{"
   " background-color: rgb( " SELECT_COLOR ") ;"
@@ -2075,6 +2081,13 @@ const QString StyleSheet::PROVENANCE_LIST_HEADER_C = QString::fromUtf8(
    "QFrame#layer_line_{ "
    " background-color: rgb( " HOVER_COLOR ") ;"
    "}"
+  );
+
+  const QString StyleSheet::QTLAYERLISTWIDGET_VALID_C = QString::fromUtf8(
+    " background-color: transparent;"
+  );
+  const QString StyleSheet::QTLAYERLISTWIDGET_INVALID_C = QString::fromUtf8(
+    " background-color: rgb( " ALERT_BACKGROUND_COLOR ") ;"
   );
 
   const QString StyleSheet::SPEEDLINE_TOOL_C = QString::fromUtf8(

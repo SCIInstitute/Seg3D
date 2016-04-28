@@ -46,9 +46,10 @@ ProjectWizard::ProjectWizard( QWidget *parent ) :
   QWizard( parent ),
   path_to_delete_( "" )
 {
-    this->addPage( new ProjectInfoPage );
-    this->addPage( new SummaryPage );
+  this->addPage( new ProjectInfoPage );
+  this->addPage( new SummaryPage );
   
+  this->setWizardStyle (QWizard::MacStyle );
   this->setPixmap( QWizard::BackgroundPixmap, QPixmap( QString::fromUtf8( 
     ":/Images/Symbol.png" ) ) );
     

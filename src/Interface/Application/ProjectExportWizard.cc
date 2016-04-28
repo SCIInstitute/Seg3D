@@ -54,9 +54,10 @@ namespace Seg3D
 ProjectExportWizard::ProjectExportWizard( long long session_id, QWidget *parent ) :
     QWizard( parent )
 {
-    this->addPage( new ExportInfoPage );
-    this->addPage( new ExportSummaryPage );
-
+  this->addPage( new ExportInfoPage );
+  this->addPage( new ExportSummaryPage );
+ 
+  this->setWizardStyle( QWizard::MacStyle );
   this->setPixmap( QWizard::BackgroundPixmap, QPixmap( QString::fromUtf8( 
     ":/Images/Symbol.png" ) ) );
 
