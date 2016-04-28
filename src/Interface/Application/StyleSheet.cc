@@ -133,11 +133,7 @@ namespace Seg3D
   " subcontrol-origin: margin;"
   " position: absolute;"
   " padding: 2px;"
-#ifdef __APPLE__
-  " padding-left: -32px;"
-#else
   " padding-left: 4px;"
-#endif
   "}"
   "QDockWidget::close-button {"
   " subcontrol-position: top right;"
