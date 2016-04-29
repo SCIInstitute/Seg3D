@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+Version 2.3.2
+-------------
+Bug fix release
+(https://github.com/SCIInstitute/Seg3D/issues?q=milestone:2.3.2).
+
+* #60: Binary STL Export
+* #143: Pad Tool Documentation
+
+
 Version 2.3.1
 -------------
 Bug fix release
