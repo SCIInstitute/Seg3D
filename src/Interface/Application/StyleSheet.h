@@ -147,6 +147,11 @@ public:
     const static QString QTLAYERLISTWIDGET_VALID_C;
     const static QString QTLAYERLISTWIDGET_INVALID_C;
 
+  // == TriState Buttons == //
+    const static QString TRISTATE_UNCHECKED_C;
+    const static QString TRISTATE_INTERMEDIATE_C;
+    const static QString TRISTATE_CHECKED_C;
+
   // == Speedline Tool == //
     const static QString SPEEDLINE_TOOL_C;
 

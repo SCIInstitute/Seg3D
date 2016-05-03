@@ -245,28 +245,34 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   
   // Set the icons for the group visibility button
   QIcon none_visible_icon;
-  none_visible_icon.addFile( QString::fromUtf8( ":/Images/VisibleOff.png" ), QSize(), QIcon::Normal );
+  none_visible_icon.addFile( QString::fromUtf8( ":/Palette_Icons/visibility_01.png" ), QSize(), QIcon::Normal );
   QIcon some_visible_icon;
-  some_visible_icon.addFile( QString::fromUtf8( ":/Images/VisibleGray.png" ), QSize(), QIcon::Normal );
+  some_visible_icon.addFile( QString::fromUtf8( ":/Palette_Icons/visibility_01.png" ), QSize(), QIcon::Normal );
   QIcon all_visible_icon;
-  all_visible_icon.addFile( QString::fromUtf8( ":/Images/VisibleWhite.png" ), QSize(), QIcon::Normal );
+  all_visible_icon.addFile( QString::fromUtf8( ":/Palette_Icons/visibility_01.png" ), QSize(), QIcon::Normal );
   
   this->private_->ui_.group_visibility_button_->set_icons( none_visible_icon, 
     some_visible_icon, all_visible_icon );
+  this->private_->ui_.group_visibility_button_->set_stylesheets( StyleSheet::TRISTATE_UNCHECKED_C,
+                                                                 StyleSheet::TRISTATE_INTERMEDIATE_C,
+                                                                 StyleSheet::TRISTATE_CHECKED_C );
     
   QtUtils::QtBridge::Connect( this->private_->ui_.group_visibility_button_, 
     group->layers_visible_state_ );
   
   QIcon no_iso_visible_icon;
-  no_iso_visible_icon.addFile( QString::fromUtf8( ":/Images/IsosurfaceVisibleOff.png" ), QSize(), QIcon::Normal );
+  no_iso_visible_icon.addFile( QString::fromUtf8( ":/Palette_Icons/iso_01.png" ), QSize(), QIcon::Normal );
   QIcon some_iso_visible_icon;
-  some_iso_visible_icon.addFile( QString::fromUtf8( ":/Images/IsosurfaceVisibleGrey.png" ), QSize(), QIcon::Normal );
+  some_iso_visible_icon.addFile( QString::fromUtf8( ":/Palette_Icons/iso_01.png" ), QSize(), QIcon::Normal );
   QIcon all_iso_visible_icon;
-  all_iso_visible_icon.addFile( QString::fromUtf8( ":/Images/IsosurfaceVisibleOn.png" ), QSize(), QIcon::Normal );
+  all_iso_visible_icon.addFile( QString::fromUtf8( ":/Palette_Icons/iso_01.png" ), QSize(), QIcon::Normal );
   
   this->private_->ui_.group_iso_visibility_button_->set_icons( no_iso_visible_icon, 
     some_iso_visible_icon, all_iso_visible_icon );
-  
+  this->private_->ui_.group_iso_visibility_button_->set_stylesheets( StyleSheet::TRISTATE_UNCHECKED_C,
+                                                                     StyleSheet::TRISTATE_INTERMEDIATE_C,
+                                                                     StyleSheet::TRISTATE_CHECKED_C );
+
   QtUtils::QtBridge::Connect( this->private_->ui_.group_iso_visibility_button_, 
     group->layers_iso_visible_state_ );
 

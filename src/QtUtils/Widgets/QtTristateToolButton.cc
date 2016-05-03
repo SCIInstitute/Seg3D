@@ -36,6 +36,7 @@ class QtTristateToolButtonPrivate
 public:
   QIcon icons_[ 3 ];
   std::string state_strings_[ 3 ];
+  QString stylesheets_[ 3 ];
   QtTristateToolButton::State state_;
 };
 
@@ -48,6 +49,16 @@ QtTristateToolButton::QtTristateToolButton( QWidget *parent ) :
   this->private_->state_strings_[ 0 ] = "unchecked";
   this->private_->state_strings_[ 1 ] = "intermediate";
   this->private_->state_strings_[ 2 ] = "checked";
+  this->private_->stylesheets_[ 0 ] = QString::fromUtf8(
+    " background-color: rgba(0,0,0,0); "
+    );
+  this->private_->stylesheets_[ 1 ] = QString::fromUtf8(
+    " background-color: rgba(0,0,0,0); "
+    );
+  this->private_->stylesheets_[ 2 ] = QString::fromUtf8(
+    " background-color: rgb(0,0,0,0); "
+    );
+  
   this->private_->state_ = UNCHECKED_E;
 }
 
@@ -69,6 +80,15 @@ void QtTristateToolButton::set_state_strings( const std::string& unchecked_str,
   this->private_->state_strings_[ 2 ] = checked_str;
 }
 
+void QtTristateToolButton::set_stylesheets( const QString& unchecked_style,
+                       const QString& intermediate_style,
+                       const QString& checked_style )
+{
+  this->private_->stylesheets_[ 0 ] = unchecked_style;
+  this->private_->stylesheets_[ 1 ] = intermediate_style;
+  this->private_->stylesheets_[ 2 ] = checked_style;
+}
+
 QtTristateToolButton::State QtTristateToolButton::get_state()
 {
   return this->private_->state_;
@@ -78,6 +98,7 @@ void QtTristateToolButton::set_state( QtTristateToolButton::State state )
 {
   this->private_->state_ = state;
   this->setIcon( this->private_->icons_[ state ] );
+  this->setStyleSheet( this->private_->stylesheets_[ state ] );
 
   Q_EMIT this->state_changed( state );
   Q_EMIT this->state_changed( this->private_->state_strings_[ state ] );

@@ -43,13 +43,13 @@
         <property name="minimumSize">
          <size>
           <width>201</width>
-          <height>21</height>
+          <height>22</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
           <width>16777215</width>
-          <height>21</height>
+          <height>22</height>
          </size>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_13">
@@ -70,13 +70,13 @@
            <property name="minimumSize">
             <size>
              <width>215</width>
-             <height>21</height>
+             <height>22</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
              <width>16777215</width>
-             <height>21</height>
+             <height>22</height>
             </size>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0,0">
@@ -84,10 +84,10 @@
              <number>0</number>
             </property>
             <property name="leftMargin">
-             <number>0</number>
+             <number>4</number>
             </property>
             <property name="topMargin">
-             <number>0</number>
+             <number>2</number>
             </property>
             <property name="rightMargin">
              <number>6</number>
@@ -95,18 +95,18 @@
             <property name="bottomMargin">
              <number>0</number>
             </property>
-            <item>
+           <item>
              <widget class="QToolButton" name="open_button_">
               <property name="minimumSize">
                <size>
-                <width>21</width>
-                <height>21</height>
+                <width>16</width>
+                <height>16</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>21</width>
-                <height>21</height>
+                <width>16</width>
+                <height>16</height>
                </size>
               </property>
               <property name="toolTip">
@@ -138,14 +138,20 @@
              <widget class="QtUtils::QtTristateToolButton" name="group_visibility_button_">
               <property name="minimumSize">
                <size>
-                <width>21</width>
-                <height>21</height>
+                <width>16</width>
+                <height>16</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>21</width>
-                <height>21</height>
+                <width>16</width>
+                <height>16</height>
+               </size>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>16</width>
+                <height>16</height>
                </size>
               </property>
               <property name="text">
@@ -157,14 +163,20 @@
              <widget class="QtUtils::QtTristateToolButton" name="group_iso_visibility_button_">
               <property name="minimumSize">
                <size>
-                <width>21</width>
-                <height>21</height>
+                <width>16</width>
+                <height>16</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>21</width>
-                <height>21</height>
+                <width>16</width>
+                <height>16</height>
+               </size>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>16</width>
+                <height>16</height>
                </size>
               </property>
               <property name="toolTip">

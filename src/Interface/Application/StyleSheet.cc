@@ -239,6 +239,13 @@ namespace Seg3D
   "QSplitter::handle:pressed {"
   " background-image: url(:/General_Icons/radio_fill.png);"
   "}"
+  "QToolTip{"
+  " color: rgb( " FONT_COLOR ") ;"
+  " background-color: rgb( " BACKGROUND_COLOR ") ;"
+  " border: 2px solid rgb( " BORDER_COLOR ") ;"
+  " border-radius: 3px;"
+  " outline: none;"
+  "}"
   "QLabel{"
   " color: rgb( " FONT_COLOR ") ;"
   " outline: none;"
@@ -1613,7 +1620,7 @@ const QString StyleSheet::GROUP_WIDGET_BACKGROUND_ACTIVE_C = QString::fromUtf8(
   " background-color: rgb( " ACCENT_COLOR ") ;"
   " border: 3px solid rgb( " BORDER_COLOR ") ;"
   " border-radius: 3px;"
-  " border-bottom-width: 0px;"
+  " border-bottom: 0px solid transparent;"
   " border-bottom-right-radius:0px;"
   " border-bottom-left-radius:0px;"
   " color: white;"
@@ -2085,6 +2092,22 @@ const QString StyleSheet::PROVENANCE_LIST_HEADER_C = QString::fromUtf8(
   const QString StyleSheet::QTLAYERLISTWIDGET_INVALID_C = QString::fromUtf8(
     " background-color: rgb( " ALERT_BACKGROUND_COLOR ") ;"
   );
+
+  const QString StyleSheet::TRISTATE_UNCHECKED_C = QString::fromUtf8(
+    "QToolButton{"
+    " background-color: transparent;"
+    "}"
+    );
+  const QString StyleSheet::TRISTATE_INTERMEDIATE_C = QString::fromUtf8(
+    "QToolButton{"
+    " background-color: rgb( " HOVER_COLOR ") ;"
+    "}"
+    );
+  const QString StyleSheet::TRISTATE_CHECKED_C = QString::fromUtf8(
+    "QToolButton{"
+    " background-color: rgb( " SELECT_COLOR ") ;"
+    "}"
+    );
 
   const QString StyleSheet::SPEEDLINE_TOOL_C = QString::fromUtf8(
     "QLabel#message_1_ {"
