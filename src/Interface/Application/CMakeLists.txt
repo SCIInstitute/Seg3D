@@ -76,6 +76,7 @@ SET(INTERFACE_APPLICATION_SRCS
   TransferFunctionFeatureWidget.cc
   ProvenanceTreeModel.cc
   ProvenanceTreeView.cc
+  SliceRangeDialog.cc
 )
 
 SET(INTERFACE_APPLICATION_MOC_SRCS
@@ -122,6 +123,7 @@ SET(INTERFACE_APPLICATION_MOC_SRCS
   TransferFunctionFeatureWidget.h
   ProvenanceTreeModel.h
   ProvenanceTreeView.h
+  SliceRangeDialog.h
 )
 
 IF(BUILD_WITH_PYTHON)
@@ -161,6 +163,7 @@ SET(INTERFACE_APPLICATION_UI_SRCS
   ViewerWidget.ui
   RenderingDockWidget.ui
   TransferFunctionFeatureWidget.ui
+  SliceRangeDialog.ui
 )
 
 SET(INTERFACE_APPLICATION_RCC_SRCS

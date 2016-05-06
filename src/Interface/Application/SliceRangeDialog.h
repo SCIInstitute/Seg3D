@@ -24,7 +24,7 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
- */
+*/
 
 #ifndef INTERFACE_APPLICATION_SLICERANGEDIALOG_H
 #define INTERFACE_APPLICATION_SLICERANGEDIALOG_H
@@ -32,6 +32,8 @@
 #ifndef Q_MOC_RUN
 
 #include <QDialog>
+
+#include <Application/Tools/SliceRange.h>
 
 // Boost includes
 #include <boost/shared_ptr.hpp>
@@ -49,7 +51,7 @@ class SliceRangeDialog : public QDialog
   Q_OBJECT
 
 public:
-  SliceRangeDialog( QWidget* parent );
+  SliceRangeDialog( const SliceRangeHandle& slice_range, QWidget* parent );
   ~SliceRangeDialog() {}
 
 private:

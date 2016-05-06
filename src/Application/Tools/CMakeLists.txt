@@ -130,6 +130,8 @@ SET(APPLICATION_TOOLS_SRCS
 )
 
 SET(APPLICATION_TOOLS_NOREGISTER_SRCS
+  SliceRange.h
+  SliceRange.cc
   detail/MaskShader.h
   detail/MaskShader.cc
 )

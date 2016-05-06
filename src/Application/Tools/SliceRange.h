@@ -26,34 +26,36 @@
  DEALINGS IN THE SOFTWARE.
 */
 
-#include <QtUtils/Bridge/QtBridge.h>
+#ifndef APPLICATION_TOOLS_SLICERANGE_H
+#define APPLICATION_TOOLS_SLICERANGE_H
 
-#include <Interface/Application/SliceRangeDialog.h>
+#include <Core/State/StateHandler.h>
+#include <Application/Layer/LayerFWD.h>
 
-#include "ui_SliceRangeDialog.h"
+namespace Seg3D {
 
-#include <limits>
+class SliceRange;
+typedef boost::shared_ptr< SliceRange > SliceRangeHandle;
 
-namespace Seg3D
+class SliceRange : public Core::StateHandler
 {
-
-class SliceRangeDialogPrivate
-{
+  // -- constructor/destructor --
 public:
-  Ui::SliceRangeDialog ui_;
+  SliceRange( LayerHandle src_layer );
+  virtual ~SliceRange();
+
+public:
+  /// EXECUTE:
+  /// Execute the tool and dispatch the action
+  void execute( Core::ActionContextHandle context );
+
+public:
+  LayerHandle src_layer_;
+
+  Core::StateRangedIntHandle min_slice_state_;
+  Core::StateRangedIntHandle max_slice_state_;
 };
 
-SliceRangeDialog::SliceRangeDialog( const SliceRangeHandle& slice_range, QWidget* parent ) :
-  QDialog( parent ),
-  private_( new SliceRangeDialogPrivate )
-{
-  this->private_->ui_.setupUi( this );
-
-  this->private_->ui_.min_spinbox_->setRange( 1, std::numeric_limits< int >::max() );
-  this->private_->ui_.max_spinbox_->setRange( 1, std::numeric_limits< int >::max() );
-
-  QtUtils::QtBridge::Connect( this->private_->ui_.min_spinbox_, slice_range->min_slice_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.max_spinbox_, slice_range->max_slice_state_ );
 }
 
-} // end namespace Seg3D
+#endif
