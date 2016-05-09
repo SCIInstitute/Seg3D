@@ -26,52 +26,36 @@
  DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_FILTERS_LAYERRESAMPLER_H
-#define APPLICATION_FILTERS_LAYERRESAMPLER_H
+#ifndef APPLICATION_TOOLS_SLICERANGE_H
+#define APPLICATION_TOOLS_SLICERANGE_H
 
 #include <Core/State/StateHandler.h>
-
 #include <Application/Layer/LayerFWD.h>
 
-namespace Seg3D
-{
+namespace Seg3D {
 
-class LayerResampler;
-typedef boost::shared_ptr< LayerResampler > LayerResamplerHandle;
+class SliceRange;
+typedef boost::shared_ptr< SliceRange > SliceRangeHandle;
 
-class LayerResamplerPrivate;
-typedef boost::shared_ptr< LayerResamplerPrivate > LayerResamplerPrivateHandle;
-
-class LayerResampler : public Core::StateHandler
+class SliceRange : public Core::StateHandler
 {
   // -- constructor/destructor --
 public:
-  LayerResampler( LayerHandle src_layer, LayerHandle dst_layer );
-  virtual ~LayerResampler();
+  SliceRange( LayerHandle src_layer );
+  virtual ~SliceRange();
 
 public:
-
   /// EXECUTE:
   /// Execute the tool and dispatch the action
   void execute( Core::ActionContextHandle context );
 
-  // -- state --
 public:
-  Core::StateLabeledOptionHandle padding_value_state_;
-  Core::StateLabeledOptionHandle kernel_state_;
+  LayerHandle src_layer_;
 
-  Core::StateRangedDoubleHandle gauss_sigma_state_;
-  Core::StateRangedDoubleHandle gauss_cutoff_state_;
-  Core::StateRangedIntHandle spline_order_state_;
-
-  Core::StateBoolHandle has_gaussian_params_state_;
-  Core::StateBoolHandle has_bspline_params_state_;
-
-private:
-  LayerResamplerPrivateHandle private_;
-
+  Core::StateRangedIntHandle min_slice_state_;
+  Core::StateRangedIntHandle max_slice_state_;
 };
 
-} // end namespace
+}
 
 #endif

@@ -26,52 +26,38 @@
  DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_FILTERS_LAYERRESAMPLER_H
-#define APPLICATION_FILTERS_LAYERRESAMPLER_H
+#ifndef INTERFACE_APPLICATION_SLICERANGEDIALOG_H
+#define INTERFACE_APPLICATION_SLICERANGEDIALOG_H
 
-#include <Core/State/StateHandler.h>
+#ifndef Q_MOC_RUN
 
-#include <Application/Layer/LayerFWD.h>
+#include <QDialog>
+
+#include <Application/Tools/SliceRange.h>
+
+// Boost includes
+#include <boost/shared_ptr.hpp>
+
+#endif
 
 namespace Seg3D
 {
 
-class LayerResampler;
-typedef boost::shared_ptr< LayerResampler > LayerResamplerHandle;
+class SliceRangeDialogPrivate;
+typedef boost::shared_ptr< SliceRangeDialogPrivate > SliceRangeDialogPrivateHandle;
 
-class LayerResamplerPrivate;
-typedef boost::shared_ptr< LayerResamplerPrivate > LayerResamplerPrivateHandle;
-
-class LayerResampler : public Core::StateHandler
+class SliceRangeDialog : public QDialog
 {
-  // -- constructor/destructor --
-public:
-  LayerResampler( LayerHandle src_layer, LayerHandle dst_layer );
-  virtual ~LayerResampler();
+  Q_OBJECT
 
 public:
-
-  /// EXECUTE:
-  /// Execute the tool and dispatch the action
-  void execute( Core::ActionContextHandle context );
-
-  // -- state --
-public:
-  Core::StateLabeledOptionHandle padding_value_state_;
-  Core::StateLabeledOptionHandle kernel_state_;
-
-  Core::StateRangedDoubleHandle gauss_sigma_state_;
-  Core::StateRangedDoubleHandle gauss_cutoff_state_;
-  Core::StateRangedIntHandle spline_order_state_;
-
-  Core::StateBoolHandle has_gaussian_params_state_;
-  Core::StateBoolHandle has_bspline_params_state_;
+  SliceRangeDialog( const SliceRangeHandle& slice_range, QWidget* parent );
+  ~SliceRangeDialog() {}
 
 private:
-  LayerResamplerPrivateHandle private_;
-
+  SliceRangeDialogPrivateHandle private_;
 };
 
-} // end namespace
+} // end namespace Seg3D
 
 #endif
