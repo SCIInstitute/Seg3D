@@ -434,7 +434,7 @@ p, li { white-space: pre-wrap; }
               </property>
               <property name="icon">
                <iconset resource="../../Resources/QtResources.qrc">
-                <normaloff>:/Palette_Icons/mask_bitplane.png</normaloff>:/Palette_Icons/mask_bitplane.png</iconset>
+                <normaloff>:/Palette_Icons/mask_bitplane_1248.png</normaloff>:/Palette_Icons/mask_bitplane_1248.png</iconset>
               </property>
               <property name="iconSize">
                <size>
@@ -537,7 +537,7 @@ p, li { white-space: pre-wrap; }
               </property>
               <property name="icon">
                <iconset resource="../../Resources/QtResources.qrc">
-                <normaloff>:/Palette_Icons/mask_label_map.png</normaloff>:/Palette_Icons/mask_label_map.png</iconset>
+                <normaloff>:/Palette_Icons/mask_label_map_1234.png</normaloff>:/Palette_Icons/mask_label_map_1234.png</iconset>
               </property>
               <property name="iconSize">
                <size>

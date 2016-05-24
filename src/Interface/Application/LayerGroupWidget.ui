@@ -43,13 +43,13 @@
         <property name="minimumSize">
          <size>
           <width>201</width>
-          <height>22</height>
+          <height>24</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
           <width>16777215</width>
-          <height>22</height>
+          <height>24</height>
          </size>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_13">
@@ -70,13 +70,13 @@
            <property name="minimumSize">
             <size>
              <width>215</width>
-             <height>22</height>
+             <height>24</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
              <width>16777215</width>
-             <height>22</height>
+             <height>24</height>
             </size>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0,0">
@@ -99,14 +99,14 @@
              <widget class="QToolButton" name="open_button_">
               <property name="minimumSize">
                <size>
-                <width>16</width>
-                <height>16</height>
+                <width>18</width>
+                <height>18</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>16</width>
-                <height>16</height>
+                <width>18</width>
+                <height>18</height>
                </size>
               </property>
               <property name="toolTip">
@@ -122,8 +122,8 @@
               </property>
               <property name="iconSize">
                <size>
-                <width>16</width>
-                <height>16</height>
+                <width>18</width>
+                <height>18</height>
                </size>
               </property>
               <property name="checkable">
@@ -138,20 +138,20 @@
              <widget class="QtUtils::QtTristateToolButton" name="group_visibility_button_">
               <property name="minimumSize">
                <size>
-                <width>16</width>
-                <height>16</height>
+                <width>18</width>
+                <height>18</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>16</width>
-                <height>16</height>
+                <width>18</width>
+                <height>18</height>
                </size>
               </property>
               <property name="iconSize">
                <size>
-                <width>16</width>
-                <height>16</height>
+                <width>18</width>
+                <height>18</height>
                </size>
               </property>
               <property name="text">
@@ -163,20 +163,20 @@
              <widget class="QtUtils::QtTristateToolButton" name="group_iso_visibility_button_">
               <property name="minimumSize">
                <size>
-                <width>16</width>
-                <height>16</height>
+                <width>18</width>
+                <height>18</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>16</width>
-                <height>16</height>
+                <width>18</width>
+                <height>18</height>
                </size>
               </property>
               <property name="iconSize">
                <size>
-                <width>16</width>
-                <height>16</height>
+                <width>18</width>
+                <height>18</height>
                </size>
               </property>
               <property name="toolTip">

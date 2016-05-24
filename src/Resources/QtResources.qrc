@@ -4,25 +4,25 @@
         <file>Palette_Icons/add_01.png</file>
         <file>Palette_Icons/minus_01.png</file>
         <file>Viewport_Icons/center_01.png</file>
-        <file>Palette_Icons/mask_bitplane.png</file>
-        <file>Images/Circle0.png</file>
-        <file>Images/Circle20.png</file>
-        <file>Images/Circle40.png</file>
-        <file>Images/Circle60.png</file>
-        <file>Images/Circle80.png</file>
-        <file>Images/Circle100.png</file>
-        <file>Images/Circle120.png</file>
-        <file>Images/Circle140.png</file>
-        <file>Images/Circle160.png</file>
-        <file>Images/Circle180.png</file>
-        <file>Images/Circle200.png</file>
-        <file>Images/Circle220.png</file>
-        <file>Images/Circle240.png</file>
-        <file>Images/Circle260.png</file>
-        <file>Images/Circle280.png</file>
-        <file>Images/Circle300.png</file>
-        <file>Images/Circle320.png</file>
-        <file>Images/Circle340.png</file>
+        <file>Palette_Icons/mask_bitplane_1248.png</file>
+        <file>General_Icons/Progress0.png</file>
+        <file>General_Icons/Progress20.png</file>
+        <file>General_Icons/Progress40.png</file>
+        <file>General_Icons/Progress60.png</file>
+        <file>General_Icons/Progress80.png</file>
+        <file>General_Icons/Progress100.png</file>
+        <file>General_Icons/Progress120.png</file>
+        <file>General_Icons/Progress140.png</file>
+        <file>General_Icons/Progress160.png</file>
+        <file>General_Icons/Progress180.png</file>
+        <file>General_Icons/Progress200.png</file>
+        <file>General_Icons/Progress220.png</file>
+        <file>General_Icons/Progress240.png</file>
+        <file>General_Icons/Progress260.png</file>
+        <file>General_Icons/Progress280.png</file>
+        <file>General_Icons/Progress300.png</file>
+        <file>General_Icons/Progress320.png</file>
+        <file>General_Icons/Progress340.png</file>
         <file>General_Icons/exit.png</file>
         <file>General_Icons/maximize.png</file>
         <file>General_Icons/checkbox-unselected.png</file>
@@ -46,7 +46,7 @@
         <file>Images/IsosurfaceVisibleGrey.png</file>
         <file>Viewport_Icons/ISO_01.png</file>
         <file>Images/LabelMapWhite.png</file>
-        <file>Palette_Icons/mask_label_map.png</file>
+        <file>Palette_Icons/mask_label_map_1234.png</file>
         <file>Viewport_Icons/lighting_01.png</file>
         <file>Palette_Icons/lock_01.png</file>
         <file>Palette_Icons/lock_03.png</file>
@@ -82,7 +82,6 @@
         <file>Viewport_Icons/showSlicePlanes_01.png</file>
         <file>Palette_Icons/windowed.png</file>
         <file>Viewport_Icons/cut_01.png</file>
-        <file>Viewport_Icons/volumeRendering_01.png</file>
         <file>Viewport_Icons/wireframe_01.png</file>
     </qresource>
 </RCC>
