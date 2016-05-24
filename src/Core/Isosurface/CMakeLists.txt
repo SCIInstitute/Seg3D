@@ -4,7 +4,7 @@
 # 
 #  The MIT License
 # 
-#  Copyright (c) 2015 Scientific Computing and Imaging Institute,
+#  Copyright (c) 2016 Scientific Computing and Imaging Institute,
 #  University of Utah.
 # 
 #  
@@ -34,16 +34,20 @@
 SET(CORE_ISOSURFACE_SRCS
   Isosurface.h
   Isosurface.cc
-  )
+  IsosurfaceExporter.h
+  IsosurfaceExporter.cc
+)
 
 ##################################################
 # Build static library
 ##################################################
 
-CORE_ADD_LIBRARY(Core_Isosurface ${CORE_ISOSURFACE_SRCS} )
+CORE_ADD_LIBRARY(Core_Isosurface ${CORE_ISOSURFACE_SRCS})
             
 TARGET_LINK_LIBRARIES(Core_Isosurface 
   Core_Utils
   Core_Graphics
-  ${SCI_BOOST_LIBRARY})
+  ${SCI_BOOST_LIBRARY}
+)
 
+#ADD_TEST_DIR(Tests)

@@ -3,7 +3,7 @@
 
  The MIT License
 
- Copyright (c) 2015 Scientific Computing and Imaging Institute,
+ Copyright (c) 2016 Scientific Computing and Imaging Institute,
  University of Utah.
 
 
@@ -55,6 +55,7 @@
 #include <Application/ProjectManager/Actions/ActionLoadProject.h>
 #include <Application/Tools/Actions/ActionCopy.h>
 #include <Application/Tools/Actions/ActionPaste.h>
+#include <Application/Tools/SliceRange.h>
 #include <Application/UndoBuffer/UndoBuffer.h>
 #include <Application/UndoBuffer/Actions/ActionRedo.h>
 #include <Application/UndoBuffer/Actions/ActionUndo.h>
@@ -71,7 +72,7 @@
 #include <Interface/Application/SaveProjectAsWizard.h>
 #include <Interface/Application/ViewAction.h>
 #include <Interface/Application/ViewerInterface.h>
-
+#include <Interface/Application/SliceRangeDialog.h>
 
 namespace Seg3D
 {
@@ -268,7 +269,7 @@ void Menu::create_file_menu( QMenuBar* menubar )
   this->export_isosurface_qaction_->setShortcut( tr( "Ctrl+I" ) );
   this->export_isosurface_qaction_->setToolTip( tr( "Export isosurface to file." ) );
   QtUtils::QtBridge::Connect( this->export_isosurface_qaction_,
-    boost::bind( &LayerIOFunctions::ExportIsosurface, this->main_window_ ) );
+    boost::bind( &LayerIOFunctions::ExportIsosurfaceFromActiveLayer, this->main_window_ ) );
   this->export_isosurface_qaction_->setEnabled( false );
 
   // == Export Active Data Layer... ==
@@ -337,6 +338,12 @@ void Menu::create_edit_menu( QMenuBar* menubar )
     Core::Interface::GetWidgetActionContext(), true ) );
   this->punch_qaction_->setEnabled( false );
 
+  // == Punch Through Volume Subset ==
+  this->punch_subset_qaction_ = qmenu->addAction( tr( "Punch Through Volume Subset" ) );
+  this->punch_subset_qaction_->setShortcut( tr( "Shift+Ctrl+P" ) );
+  this->punch_subset_qaction_->setToolTip( tr( "Punch the copied mask slice through a subset of the volume" ) );
+  connect( this->punch_subset_qaction_, SIGNAL( triggered() ), this, SLOT( punch_through() ) );
+  this->punch_subset_qaction_->setEnabled( false );
 }
 
 void Menu::create_view_menu( QMenuBar* menubar )
@@ -564,10 +571,24 @@ void Menu::create_help_menu( QMenuBar* menubar )
   QtUtils::QtBridge::Connect( qaction, 
     InterfaceManager::Instance()->keyboard_shortcut_visibility_state_ );
 }
-  
+
+void Menu::punch_through()
+{
+  LayerHandle layer = LayerManager::Instance()->get_active_layer();
+
+  SliceRangeHandle slice_range( new SliceRange( layer ) );
+  SliceRangeDialog* dialog = new SliceRangeDialog( slice_range, this->main_window_ );
+
+  if ( dialog->exec() == QDialog::Accepted )
+  {
+    slice_range->execute( Core::Interface::GetWidgetActionContext() );
+  }
+  dialog->deleteLater();
+}
+
 void Menu::about()
 {
-  std::string about = std::string( "About " ) + 
+  std::string about = std::string( "About " ) +
     Core::Application::GetApplicationNameAndVersion();
 
   QMessageBox::about( this->main_window_, QString::fromStdString( about ), 
@@ -612,7 +633,7 @@ void Menu::new_project()
   }
 
   // Let the project wizard do the rest of the logic
-  ProjectWizard* new_project_wizard_ = new ProjectWizard( this->main_window_);
+  ProjectWizard* new_project_wizard_ = new ProjectWizard( this->main_window_ );
   new_project_wizard_->exec();
 }
 
@@ -912,6 +933,7 @@ void Menu::enable_disable_mask_actions( bool mask_layer_found )
   this->copy_qaction_->setEnabled( mask_layer_found );
   this->paste_qaction_->setEnabled( mask_layer_found );
   this->punch_qaction_->setEnabled( mask_layer_found );
+  this->punch_subset_qaction_->setEnabled( mask_layer_found );
 }
 
 void Menu::enable_disable_isosurface_actions( bool mask_isosurface_found )

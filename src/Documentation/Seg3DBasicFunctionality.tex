@@ -1223,6 +1223,12 @@ E & Erase flood fill\\
 Select set of points either in pixel or actual (world) coordinates and save as a text file. Works with either data or mask layers.
 Clicking on a layer in one of the 2D views places a point. Secondary (right mouse button) click deletes a point.
 
+\subsection{Pad}
+
+The pad tool allows the user to pad one or more volumes. This tool can be used on both mask and data layers.
+
+The pad amount is set manually using the sliders. There are options to resample with the same ratio in every direction (check "Constrain Aspect" option) or to resample each direction independently (must uncheck "Constrain Aspect" option to enable). Pad values can be zero, the dataset min or max.
+
 \subsection{Point Set Registration}
 
 The point set registration tool will register one mask layer to another mask layer.  This is currently the only tool or filter that will take inputs from two different layer groups as the main purpose of this tool is to allow the user to map a segmentation from one grid to another with a similar mask layer.  The tool attempts to register the entire mask data to another mask data using the iterative closest points method(rigid registration) and will save and display the transform generated for use on the other layers in the registered layer's group.  Since this is an iterative method, the user can set the number of iterations. 

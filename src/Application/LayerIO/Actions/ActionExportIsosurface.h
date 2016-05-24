@@ -3,7 +3,7 @@ For more information, please see: http://software.sci.utah.edu
 
 The MIT License
 
-Copyright (c) 2015 Scientific Computing and Imaging Institute,
+Copyright (c) 2016 Scientific Computing and Imaging Institute,
 University of Utah.
 
 
@@ -46,6 +46,7 @@ CORE_ACTION(
   CORE_ACTION_ARGUMENT( "layer", "layer to be exported." )
   CORE_ACTION_ARGUMENT( "file_path", "A path, including the name of the file where the layer should be exported to." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "name", "<none>", "Optional dataset name. Currently only used for STL files (defaults to layer ID if name is not set)." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "binary", "false", "Optionally export binary file. Currently only available for STL files.")
   CORE_ACTION_CHANGES_PROJECT_DATA()
 )
   
@@ -56,6 +57,7 @@ public:
     this->add_parameter( this->layer_ );
     this->add_parameter( this->file_path_ );
     this->add_parameter( this->name_ );
+    this->add_parameter( this->binary_file_export_ );
   }
   
   // -- Functions that describe action --
@@ -86,16 +88,19 @@ private:
   
   // Optional dataset name
   std::string name_;
-  
+
+  // Optionally export binary file format
+  bool binary_file_export_;
+
   // -- Dispatch this action from the interface --
 public:
-  
+
   // DISPATCH:
   static void Dispatch( Core::ActionContextHandle context,
                        const std::string& layer_id, 
                        const std::string& file_path,
-                       const std::string& name = "<none>" );
-  
+                       const std::string& name = "<none>",
+                       const bool binary_file_export = false );
 };
 
 } // end namespace Seg3D

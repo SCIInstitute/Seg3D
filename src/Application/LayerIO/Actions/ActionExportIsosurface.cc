@@ -3,7 +3,7 @@ For more information, please see: http://software.sci.utah.edu
 
 The MIT License
 
-Copyright (c) 2015 Scientific Computing and Imaging Institute,
+Copyright (c) 2016 Scientific Computing and Imaging Institute,
 University of Utah.
 
 
@@ -47,7 +47,6 @@ namespace Seg3D
 
 bool ActionExportIsosurface::validate( Core::ActionContextHandle& context )
 {
-  
   LayerHandle temp_handle = LayerManager::Instance()->find_layer_by_id( this->layer_ );
   if ( ! temp_handle )
   {
@@ -123,7 +122,14 @@ bool ActionExportIsosurface::run( Core::ActionContextHandle& context, Core::Acti
   }
   else if (extension == ".stl")
   {
-    mask_layer->get_isosurface()->export_stl_isosurface( filename_and_path, this->name_ );
+    if (this->binary_file_export_)
+    {
+      mask_layer->get_isosurface()->export_stl_binary_isosurface( filename_and_path, this->name_ );
+    }
+    else
+    {
+      mask_layer->get_isosurface()->export_stl_ascii_isosurface( filename_and_path, this->name_ );
+    }
   }
   else
   {
@@ -144,9 +150,10 @@ void ActionExportIsosurface::clear_cache()
 }
 
 void ActionExportIsosurface::Dispatch( Core::ActionContextHandle context,
-                                      const std::string& layer_id, 
-                                      const std::string& file_path,
-                                      const std::string& name )
+                                       const std::string& layer_id,
+                                       const std::string& file_path,
+                                       const std::string& name,
+                                       const bool binary_file_export )
 {
   // Create new action
   ActionExportIsosurface* action = new ActionExportIsosurface;
@@ -154,6 +161,7 @@ void ActionExportIsosurface::Dispatch( Core::ActionContextHandle context,
   action->layer_ = layer_id;
   action->file_path_ = file_path;
   action->name_ = name;
+  action->binary_file_export_ = binary_file_export;
   
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }

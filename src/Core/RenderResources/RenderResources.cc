@@ -3,7 +3,7 @@
 
  The MIT License
 
- Copyright (c) 2015 Scientific Computing and Imaging Institute,
+ Copyright (c) 2016 Scientific Computing and Imaging Institute,
  University of Utah.
 
 
@@ -32,7 +32,9 @@
 #include <Windows.h>
 #endif
 #ifdef __APPLE__
-#include <AGL/agl.h>
+//#include <AGL/agl.h>
+#include <OpenGL/OpenGL.h>
+#include <ApplicationServices/ApplicationServices.h>
 #endif
 
 // boost includes
@@ -109,6 +111,7 @@ void RenderResourcesPrivate::initialize_gl()
 void RenderResourcesPrivate::query_video_memory_size()
 {
   this->vram_size_ = 0;
+  unsigned long vram_size_MB = 0;
   
 #if defined(_WIN32)
   const char HARDWARE_DEVICEMAP_VIDEO_C[] = "HARDWARE\\DEVICEMAP\\VIDEO";
@@ -165,37 +168,42 @@ void RenderResourcesPrivate::query_video_memory_size()
           reinterpret_cast< LPBYTE >( &vram_size ), &buffer_size ) == ERROR_SUCCESS )
         {
           this->vram_size_ = vram_size;
+          vram_size_MB = this->vram_size_ >> 20;
         }
         RegCloseKey( video_device_key );
       } // end for
       
-    } 
+    }
 
     RegCloseKey( video_devicemap_key );
   }
 #elif defined(__APPLE__)
-  AGLRendererInfo head_info = aglQueryRendererInfoForCGDirectDisplayIDs( NULL, 0 );
-  AGLRendererInfo info = head_info;
-  while ( info != NULL ) 
+
+  CGLRendererInfoObj info;
+  GLint infoCount = 0;
+
+  CGLError e = CGLQueryRendererInfo( CGDisplayIDToOpenGLDisplayMask( CGMainDisplayID() ), &info, &infoCount );
+  if (e != kCGLNoError)
   {
-    int accelerated;
-    if ( aglDescribeRenderer( info, AGL_ACCELERATED, &accelerated ) && accelerated )
-    {
-      int vram_size;
-      if ( aglDescribeRenderer( info, AGL_VIDEO_MEMORY, &vram_size ) &&
-        vram_size > 0 ) 
-      {
-        this->vram_size_ = static_cast< unsigned long >( vram_size );
-        break;
-      }
-    }
-    info = aglNextRendererInfo( info );
+    CORE_LOG_WARNING( CGLErrorString(e) );
   }
-  aglDestroyRendererInfo( head_info );
+
+  for (int i = 0; i < infoCount; ++i)
+  {
+    GLint vram_size = 0;
+    CGLDescribeRenderer(info, i, kCGLRPVideoMemoryMegabytes, &vram_size);
+    if ( vram_size > 0 && vram_size > this->vram_size_ )
+    {
+      this->vram_size_ = static_cast< unsigned long >( vram_size );
+      vram_size_MB = this->vram_size_;
+    }
+  }
+  CGLDestroyRendererInfo(info);
+
 #else
   // TODO: Add support for Linux
 #endif
-  
+
   if ( this->vram_size_ == 0 ) 
   {
     CORE_LOG_WARNING( "Failed to query video memory size." );
@@ -204,8 +212,7 @@ void RenderResourcesPrivate::query_video_memory_size()
   }
   else 
   {
-    CORE_LOG_MESSAGE( "Video Memory Size: " + 
-             ExportToString( this->vram_size_ >> 20 ) + "MB." );
+    CORE_LOG_MESSAGE( "Video Memory Size: " + ExportToString( vram_size_MB ) + " MB." );
   }
 }
 

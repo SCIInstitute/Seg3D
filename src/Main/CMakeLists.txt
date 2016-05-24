@@ -2,7 +2,7 @@
 #  For more information, please see: http://software.sci.utah.edu
 #  The MIT License
 #
-#  Copyright (c) 2015 Scientific Computing and Imaging Institute,
+#  Copyright (c) 2016 Scientific Computing and Imaging Institute,
 #  University of Utah.
 #
 #
@@ -93,6 +93,12 @@ IF(WIN32)
   SET_TARGET_PROPERTIES(${APPLICATION_NAME}
     PROPERTIES
     LINK_FLAGS "/INCREMENTAL:NO")
+ENDIF()
+
+IF(APPLE)
+  SET_TARGET_PROPERTIES(${APPLICATION_NAME}
+    PROPERTIES
+    LINK_FLAGS "-framework CoreGraphics")
 ENDIF()
 
 IF(BUILD_WITH_PYTHON)

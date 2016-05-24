@@ -3,7 +3,7 @@
 
  The MIT License
 
- Copyright (c) 2015 Scientific Computing and Imaging Institute,
+ Copyright (c) 2016 Scientific Computing and Imaging Institute,
  University of Utah.
 
 
@@ -79,6 +79,7 @@ private:
   QAction* copy_qaction_;
   QAction* paste_qaction_;
   QAction* punch_qaction_;
+  QAction* punch_subset_qaction_;
   
   QAction* undo_qaction_;
   QAction* redo_qaction_;
@@ -111,6 +112,10 @@ private Q_SLOTS:
   /// SAVE_PROJECT AS:
   /// Triggered by Save Project As
   void save_project_as();
+
+  /// PUNCH_THROUGH:
+  /// Triggered by Punch Through Volume
+  void punch_through();
   
   /// ABOUT:
   /// This launches the about dialog
