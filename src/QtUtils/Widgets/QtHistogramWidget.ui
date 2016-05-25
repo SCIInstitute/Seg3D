@@ -19,17 +19,6 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <property name="styleSheet">
-   <string notr="true">QWidget#histogram_window_{
-  border: 1px solid gray;
-  background-color: white;
-
-}
-
-QLabel#label_3{
-  color: rgb(68, 68, 68);
-}</string>
-  </property>
   <layout class="QHBoxLayout" name="horizontalLayout_4">
    <property name="spacing">
     <number>0</number>
@@ -38,7 +27,7 @@ QLabel#label_3{
     <number>0</number>
    </property>
    <item>
-    <widget class="QWidget" name="base_" native="true">
+    <widget class="QWidget" name="histBase_" native="true">
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <property name="spacing">
        <number>2</number>
@@ -220,6 +209,9 @@ QLabel#label_3{
                </property>
                <item>
                 <widget class="QComboBox" name="log_histogram_combo_">
+                 <property name="sizeAdjustPolicy">
+                  <enum>QComboBox::AdjustToContents</enum>
+                 </property>
                  <property name="currentIndex">
                   <number>0</number>
                  </property>

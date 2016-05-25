@@ -26,7 +26,7 @@
  DEALINGS IN THE SOFTWARE.
  */
  
-#include <QtCore/QSize>
+#include <QSize>
 
 #include <Interface/Application/ControllerActionHistory.h>
 

@@ -36,9 +36,9 @@
 
 
 // QT includes
-#include <QtGui/QDockWidget>
-#include <QtGui/QCloseEvent>
-#include <QtGui/QKeyEvent>
+#include <QDockWidget>
+#include <QCloseEvent>
+#include <QKeyEvent>
 
 #endif
 
@@ -79,7 +79,8 @@ public:
 public:
   void set_enabled( bool enabled );
   
-
+protected:
+  QWidget* dock_base_;
   
 private:
   boost::shared_ptr< QtCustomDockWidgetPrivate > private_;

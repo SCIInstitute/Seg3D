@@ -34,9 +34,9 @@
 #include <boost/filesystem.hpp>
 
 // Qt includes
-#include <QtGui/QMenuBar>
-#include <QtGui/QFileDialog>
-#include <QtGui/QMessageBox>
+#include <QMenuBar>
+#include <QFileDialog>
+#include <QMessageBox>
 #include <QtCore/QProcess>
 
 // Core includes

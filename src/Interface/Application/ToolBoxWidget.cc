@@ -76,14 +76,14 @@ ToolBoxWidget::ToolBoxWidget( QWidget* parent ) :
 {
 
   { // Prepare the icons!!
-    this->active_close_icon_.addFile( QString::fromUtf8( ":/Images/CloseWhite.png" ), QSize(),
+    this->active_close_icon_.addFile( QString::fromUtf8( ":/General_Icons/exit.png" ), QSize(),
         QIcon::Normal, QIcon::Off );
-    this->inactive_close_icon_.addFile( QString::fromUtf8( ":/Images/Close.png" ), QSize(),
+    this->inactive_close_icon_.addFile( QString::fromUtf8( ":/General_Icons/exit.png" ), QSize(),
         QIcon::Normal, QIcon::Off );
 
     this->active_help_icon_.addFile( QString::fromUtf8( ":/Images/HelpWhite.png" ), QSize(),
         QIcon::Normal, QIcon::Off );
-    this->inactive_help_icon_.addFile( QString::fromUtf8( ":/Images/Help.png" ), QSize(),
+    this->inactive_help_icon_.addFile( QString::fromUtf8( ":/Images/HelpWhite.png" ), QSize(),
         QIcon::Normal, QIcon::Off );
   }
 
@@ -99,6 +99,8 @@ ToolBoxWidget::ToolBoxWidget( QWidget* parent ) :
   this->setLineWidth( 0 );
 
   this->main_ = new QWidget( this );
+  this->main_->setObjectName( QString::fromUtf8( "tool_main_" ) );
+  this->main_->setStyleSheet( StyleSheet::TOOLBOXWIDGET_C );
   setWidget( this->main_ );
   
   this->tool_layout_ = new QVBoxLayout;

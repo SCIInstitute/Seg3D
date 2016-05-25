@@ -16,150 +16,6 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <property name="styleSheet">
-   <string notr="true">QPushButton{
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(221, 221, 221, 255), stop:0.155779 rgba(238, 238, 238, 255), stop:1 rgba(192, 194, 194, 255));
-  border-radius: 4px;
-  border: 1px solid rgb(90, 90, 90);
-  margin:4px;
-}
-
-QPushButton:hover{
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(195, 195, 195, 255), stop:0.253769 rgba(206, 206, 206, 255), stop:1 rgba(185, 185, 185, 255));
-  border-radius: 4px;
-  border: 1px solid rgb(90, 90, 90);
-  margin:4px;
-}
-
-QPushButton:pressed{
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(150, 150, 150, 255), stop:0.753769 rgba(206, 206, 206, 255), stop:1 rgba(185, 185, 185, 255));
-  border-radius: 4px;
-  border: 1px solid rgb(90, 90, 90);
-  margin:4px;
-}
-
-QWidget#background_{
-  background-color: rgb( 100, 100, 100 );
-}
-
-QLabel#facade_widget_{
-  background-color: rgba(0, 0, 0, 0);
-}
-
-QFrame#iso_control_separator_line_{
-  background-color: gray;
-}
-
-QWidget#base_{
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(211, 211, 211, 255), stop:0.155779 rgba(225, 225, 225, 255),         stop:1 rgba(194, 194, 194, 255));
-border-radius: 3px;
-}
-
-QWidget#buttons_widget_{
-  border-top: 1px solid gray;
-}
-
-QToolButton#viewer_0_button_{
-  border: 2px solid rgb( 100, 100, 100 );
-  border-radius: 3px;
-}
-
-QToolButton#viewer_0_button_:checked{
-  background-color: rgb(255, 128, 0);
-}
-
-
-QToolButton#viewer_1_button_{
-  border: 1px solid rgb( 100, 100, 100 );
-  border-radius: 3px;
-}
-
-QToolButton#viewer_1_button_:checked{
-  background-color: rgb(255, 128, 0);
-}
-
-
-QToolButton#viewer_2_button_{
-  border: 1px solid rgb( 100, 100, 100 );
-  border-radius: 3px;
-}
-
-QToolButton#viewer_2_button_:checked{
-  background-color: rgb(255, 128, 0);
-}
-
-QToolButton#viewer_3_button_{
-  border: 1px solid rgb( 100, 100, 100 );
-  border-radius: 3px;
-}
-
-QToolButton#viewer_3_button_:checked{
-  background-color: rgb(255, 128, 0);
-}
-
-QToolButton#viewer_4_button_{
-  border: 1px solid rgb( 100, 100, 100 );
-  border-radius: 3px;
-}
-
-QToolButton#viewer_4_button_:checked{
-  background-color: rgb(255, 128, 0);
-}
-
-QToolButton#viewer_5_button_{
-  border: 1px solid rgb( 100, 100, 100 );
-  border-radius: 3px;
-}
-
-QToolButton#viewer_5_button_:checked{
-  background-color: rgb(255, 128, 0);
-}
-
-QLineEdit#label_{
-  text-align: left;
-  color: black;
-  background-color: rgba(255, 255, 255, 0);
-}
-/*QLineEdit#label_:focus{
-  background-color: rgb(255, 255, 255);
-}*/
-
-QWidget#type_{
-  background-color: rgb(255, 128, 0);
-  border-radius: 3px;
-  border: 1px solid rgba(165, 165, 165, 200);
-}
-QWidget#typeGradient_{
-  border-radius: 2px;
-  border: 1px solid white;
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(0, 0, 0, 25), stop:0.258706 rgba(40, 40, 40, 0), stop:1 rgba(0, 0, 0, 30));
-}
-
-
-/* Buttons */
-
-QToolButton{
-  background-color: rgba(0, 0, 0, 0);
-}
-QToolButton:hover{
-  background-color: rgba( 0, 0, 0, 30 );
-}
-QToolButton:pressed{
-  background-color: rgba(0, 0, 0, 0);
-  margin:0;
-}
-QToolButton:checked{
-  background-color: rgba(0, 0, 0, 0);
-  margin:0;
-}
-
-QPushButton#activate_button_{
-  border-radius: 3px;
-  margin-left:1px;
-  color: white;
-}
-</string>
-  </property>
   <layout class="QHBoxLayout" name="horizontalLayout_22">
    <property name="spacing">
     <number>0</number>
@@ -195,7 +51,7 @@ QPushButton#activate_button_{
           <number>0</number>
          </property>
          <property name="margin">
-          <number>0</number>
+          <number>1</number>
          </property>
          <item>
           <widget class="QWidget" name="header_" native="true">
@@ -289,13 +145,13 @@ QPushButton#activate_button_{
               </property>
               <property name="minimumSize">
                <size>
-                <width>31</width>
+                <width>34</width>
                 <height>39</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>31</width>
+                <width>34</width>
                 <height>39</height>
                </size>
               </property>
@@ -307,7 +163,7 @@ QPushButton#activate_button_{
                 <number>0</number>
                </property>
                <property name="margin">
-                <number>1</number>
+                <number>0</number>
                </property>
                <item>
                 <widget class="QWidget" name="typeGradient_" native="true">
@@ -322,14 +178,14 @@ QPushButton#activate_button_{
                  </property>
                  <property name="minimumSize">
                   <size>
-                   <width>29</width>
-                   <height>37</height>
+                   <width>34</width>
+                   <height>39</height>
                   </size>
                  </property>
                  <property name="maximumSize">
                   <size>
-                   <width>31</width>
-                   <height>37</height>
+                   <width>34</width>
+                   <height>39</height>
                   </size>
                  </property>
                  <property name="mouseTracking">
@@ -479,8 +335,8 @@ QPushButton#activate_button_{
                     </property>
                     <property name="icon">
                      <iconset resource="../../Resources/QtResources.qrc">
-                      <normaloff>:/Images/VisibleOff.png</normaloff>
-                      <normalon>:/Images/Visible.png</normalon>:/Images/VisibleOff.png</iconset>
+                      <normaloff>:/Palette_Icons/visibility_01.png</normaloff>
+                      <normalon>:/Palette_Icons/visibility_01.png</normalon>:/Palette_Icons/visibility_01.png</iconset>
                     </property>
                     <property name="checkable">
                      <bool>true</bool>
@@ -512,8 +368,8 @@ QPushButton#activate_button_{
                     </property>
                     <property name="icon">
                      <iconset resource="../../Resources/QtResources.qrc">
-                      <normaloff>:/Images/VisiblePlusOff.png</normaloff>
-                      <normalon>:/Images/VisiblePlus.png</normalon>:/Images/VisiblePlusOff.png</iconset>
+                      <normaloff>:/Palette_Icons/visibilityPlus_01.png</normaloff>
+                      <normalon>:/Palette_Icons/visibilityePlus_01.png</normalon>:/Palette_Icons/visibilityPlus_01.png</iconset>
                     </property>
                     <property name="checkable">
                      <bool>true</bool>
@@ -542,8 +398,8 @@ QPushButton#activate_button_{
                     </property>
                     <property name="icon">
                      <iconset resource="../../Resources/QtResources.qrc">
-                      <normaloff>:/Images/InfoOff.png</normaloff>
-                      <normalon>:/Images/Info.png</normalon>:/Images/InfoOff.png</iconset>
+                      <normaloff>:/Palette_Icons/info_01.png</normaloff>
+                      <normalon>:/Palette_Icons/info_01.png</normalon>:/Palette_Icons/info_01.png</iconset>
                     </property>
                     <property name="checkable">
                      <bool>true</bool>
@@ -572,8 +428,8 @@ QPushButton#activate_button_{
                     </property>
                     <property name="icon">
                      <iconset resource="../../Resources/QtResources.qrc">
-                      <normaloff>:/Images/OpacityOff.png</normaloff>
-                      <normalon>:/Images/Opacity.png</normalon>:/Images/OpacityOff.png</iconset>
+                      <normaloff>:/Palette_Icons/opacity_01.png</normaloff>
+                      <normalon>:/Palette_Icons/opacity_01.png</normalon>:/Palette_Icons/opacity_01.png</iconset>
                     </property>
                     <property name="checkable">
                      <bool>true</bool>
@@ -602,10 +458,10 @@ QPushButton#activate_button_{
                     </property>
                     <property name="icon">
                      <iconset resource="../../Resources/QtResources.qrc">
-                      <normaloff>:/Images/AppearanceOff.png</normaloff>
-                      <normalon>:/Images/Appearance.png</normalon>:/Images/AppearanceOff.png</iconset>
+                      <normaloff>:/Palette_Icons/brush_01.png</normaloff>
+                      <normalon>:/Palette_Icons/brush_01.png</normalon>:/Palette_Icons/brush_01.png</iconset>
                     </property>
-                    <property name="checkable">
+                  <property name="checkable">
                      <bool>true</bool>
                     </property>
                    </widget>
@@ -639,8 +495,8 @@ QPushButton#activate_button_{
                     </property>
                     <property name="icon">
                      <iconset resource="../../Resources/QtResources.qrc">
-                      <normaloff>:/Images/LockOff.png</normaloff>
-                      <normalon>:/Images/Lock.png</normalon>:/Images/LockOff.png</iconset>
+                      <normaloff>:/Palette_Icons/lock_01.png</normaloff>
+                      <normalon>:/Palette_Icons/lock_03.png</normalon>:/Palette_Icons/lock_03.png</iconset>
                     </property>
                     <property name="iconSize">
                      <size>
@@ -678,8 +534,8 @@ QPushButton#activate_button_{
                     </property>
                     <property name="icon">
                      <iconset resource="../../Resources/QtResources.qrc">
-                      <normaloff>:/Images/VolumeVisibleOff.png</normaloff>
-                      <normalon>:/Images/VolumeVisible.png</normalon>:/Images/VolumeVisibleOff.png</iconset>
+                      <normaloff>:/Viewport_Icons/volumeRendering_01.png</normaloff>
+                      <normalon>:/Viewport_Icons/volumeRendering_01.png</normalon>:/Viewport_Icons/volumeRendering_01.png</iconset>
                     </property>
                    </widget>
                   </item>
@@ -697,8 +553,8 @@ QPushButton#activate_button_{
                       <height>16777215</height>
                      </size>
                     </property>
-                    <property name="styleSheet">
-                     <string notr="true"/>
+                    <property name="lineWidth">
+                     <number>0</number>
                     </property>
                     <property name="orientation">
                      <enum>Qt::Vertical</enum>
@@ -727,8 +583,8 @@ QPushButton#activate_button_{
                     </property>
                     <property name="icon">
                      <iconset resource="../../Resources/QtResources.qrc">
-                      <normaloff>:/Images/IsosurfaceVisibleOff.png</normaloff>
-                      <normalon>:/Images/IsosurfaceVisible.png</normalon>:/Images/IsosurfaceVisibleOff.png</iconset>
+                      <normaloff>:/Palette_Icons/iso_01.png</normaloff>
+                      <normalon>:/Palette_Icons/iso_01.png</normalon>:/Palette_Icons/iso_01.png</iconset>
                     </property>
                     <property name="checkable">
                      <bool>true</bool>
@@ -757,8 +613,8 @@ QPushButton#activate_button_{
                     </property>
                     <property name="icon">
                      <iconset resource="../../Resources/QtResources.qrc">
-                      <normaloff>:/Images/IsosurfaceComputeOff.png</normaloff>
-                      <normalon>:/Images/IsosurfaceCompute.png</normalon>:/Images/IsosurfaceComputeOff.png</iconset>
+                      <normaloff>:/Palette_Icons/isoGo_01.png</normaloff>
+                      <normalon>:/Palette_Icons/isoGo_01.png</normalon>:/Palette_Icons/isoGo_01.png</iconset>
                     </property>
                     <property name="checkable">
                      <bool>false</bool>
@@ -787,8 +643,8 @@ QPushButton#activate_button_{
                     </property>
                     <property name="icon">
                      <iconset resource="../../Resources/QtResources.qrc">
-                      <normaloff>:/Images/IsosurfaceDeleteOff.png</normaloff>
-                      <normalon>:/Images/IsosurfaceDelete.png</normalon>:/Images/IsosurfaceDeleteOff.png</iconset>
+                      <normaloff>:/Palette_Icons/isoX_01.png</normaloff>
+                      <normalon>:/Palette_Icons/isoX_01.png</normalon>:/Palette_Icons/isoX_01.png</iconset>
                     </property>
                    </widget>
                   </item>
@@ -1136,8 +992,8 @@ QPushButton#activate_button_{
                     </property>
                     <property name="icon">
                      <iconset resource="../../Resources/QtResources.qrc">
-                      <normaloff>:/Images/VisibleOff.png</normaloff>
-                      <normalon>:/Images/VisibleWhite.png</normalon>:/Images/VisibleOff.png</iconset>
+                      <normaloff>:/Palette_Icons/visibility_01.png</normaloff>
+                      <normalon>:/Palette_Icons/visibility_01.png</normalon>:/Palette_Icons/visibility_01.png</iconset>
                     </property>
                     <property name="checkable">
                      <bool>true</bool>
@@ -1160,8 +1016,8 @@ QPushButton#activate_button_{
                     </property>
                     <property name="icon">
                      <iconset resource="../../Resources/QtResources.qrc">
-                      <normaloff>:/Images/VisibleOff.png</normaloff>
-                      <normalon>:/Images/VisibleWhite.png</normalon>:/Images/VisibleOff.png</iconset>
+                      <normaloff>:/Palette_Icons/visibility_01.png</normaloff>
+                      <normalon>:/Palette_Icons/visibility_01.png</normalon>:/Palette_Icons/visibility_01.png</iconset>
                     </property>
                     <property name="checkable">
                      <bool>true</bool>
@@ -1187,8 +1043,8 @@ QPushButton#activate_button_{
                     </property>
                     <property name="icon">
                      <iconset resource="../../Resources/QtResources.qrc">
-                      <normaloff>:/Images/VisibleOff.png</normaloff>
-                      <normalon>:/Images/VisibleWhite.png</normalon>:/Images/VisibleOff.png</iconset>
+                      <normaloff>:/Palette_Icons/visibility_01.png</normaloff>
+                      <normalon>:/Palette_Icons/visibility_01.png</normalon>:/Palette_Icons/visibility_01.png</iconset>
                     </property>
                     <property name="checkable">
                      <bool>true</bool>
@@ -1223,8 +1079,8 @@ QPushButton#activate_button_{
                     </property>
                     <property name="icon">
                      <iconset resource="../../Resources/QtResources.qrc">
-                      <normaloff>:/Images/VisibleOff.png</normaloff>
-                      <normalon>:/Images/VisibleWhite.png</normalon>:/Images/VisibleOff.png</iconset>
+                      <normaloff>:/Palette_Icons/visibility_01.png</normaloff>
+                      <normalon>:/Palette_Icons/visibility_01.png</normalon>:/Palette_Icons/visibility_01.png</iconset>
                     </property>
                     <property name="checkable">
                      <bool>true</bool>
@@ -1247,8 +1103,8 @@ QPushButton#activate_button_{
                     </property>
                     <property name="icon">
                      <iconset resource="../../Resources/QtResources.qrc">
-                      <normaloff>:/Images/VisibleOff.png</normaloff>
-                      <normalon>:/Images/VisibleWhite.png</normalon>:/Images/VisibleOff.png</iconset>
+                      <normaloff>:/Palette_Icons/visibility_01.png</normaloff>
+                      <normalon>:/Palette_Icons/visibility_01.png</normalon>:/Palette_Icons/visibility_01.png</iconset>
                     </property>
                     <property name="checkable">
                      <bool>true</bool>
@@ -1271,8 +1127,8 @@ QPushButton#activate_button_{
                     </property>
                     <property name="icon">
                      <iconset resource="../../Resources/QtResources.qrc">
-                      <normaloff>:/Images/VisibleOff.png</normaloff>
-                      <normalon>:/Images/VisibleWhite.png</normalon>:/Images/VisibleOff.png</iconset>
+                      <normaloff>:/Palette_Icons/visibility_01.png</normaloff>
+                      <normalon>:/Palette_Icons/visibility_01.png</normalon>:/Palette_Icons/visibility_01.png</iconset>
                     </property>
                     <property name="checkable">
                      <bool>true</bool>
@@ -1925,7 +1781,7 @@ QPushButton#activate_button_{
                  </property>
                  <property name="icon">
                   <iconset resource="../../Resources/QtResources.qrc">
-                   <normaloff>:/Images/Close.png</normaloff>:/Images/Close.png</iconset>
+                   <normaloff>:/General_Icons/exit.png</normaloff>:/General_Icons/exit.png</iconset>
                  </property>
                  <property name="iconSize">
                   <size>

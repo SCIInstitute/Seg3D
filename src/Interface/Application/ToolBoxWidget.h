@@ -37,10 +37,10 @@
 
 
 // Qt includes
-#include <QtGui/QScrollArea>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QIcon>
-#include <QtCore/QPointer>
+#include <QScrollArea>
+#include <QVBoxLayout>
+#include <QIcon>
+#include <QPointer>
 
 // Application includes
 #include <Application/Tool/ToolInterface.h>

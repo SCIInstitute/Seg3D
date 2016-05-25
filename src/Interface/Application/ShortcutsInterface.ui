@@ -19,23 +19,6 @@
   <property name="windowTitle">
    <string>Seg3D 2.0 - Shortcuts</string>
   </property>
-  <property name="styleSheet">
-   <string notr="true">QWidget#scrollAreaWidgetContents{
-  background-color: rgb(255, 255, 255);
-}
-
-QWidget#scrollAreaWidgetContents_2{
-  background-color: rgb(255, 255, 255);
-}
-
-QWidget#scrollAreaWidgetContents_3{
-  background-color: rgb(255, 255, 255);
-}
-
-QWidget#scrollAreaWidgetContents_4{
-  background-color: rgb(255, 255, 255);
-}</string>
-  </property>
   <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,1">
    <property name="spacing">
     <number>4</number>

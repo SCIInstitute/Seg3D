@@ -108,6 +108,12 @@ private:
   friend class Renderbuffer;
   friend class GLSLShader;
   friend class GLSLProgram;
+
+  // INITIALIZE_ON_EVENT_THREAD:
+  /// Initialize the delete context on the event handler thread.  This method takes care
+  /// of any initialization that must take place either AFTER the eventhandler
+  /// thread has been started OR the delete_context_ has been created.
+  void initialize_on_event_thread();
   
   // DELETE_TEXTURE:
   /// Delete a texture within the right context

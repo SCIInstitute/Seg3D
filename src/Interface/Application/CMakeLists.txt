@@ -1,23 +1,23 @@
 
 #
 #  For more information, please see: http://software.sci.utah.edu
-# 
+#
 #  The MIT License
 # 
 #  Copyright (c) 2016 Scientific Computing and Imaging Institute,
 #  University of Utah.
-# 
-#  
+#
+#
 #  Permission is hereby granted, free of charge, to any person obtaining a
 #  copy of this software and associated documentation files (the "Software"),
 #  to deal in the Software without restriction, including without limitation
 #  the rights to use, copy, modify, merge, publish, distribute, sublicense,
 #  and/or sell copies of the Software, and to permit persons to whom the
 #  Software is furnished to do so, subject to the following conditions:
-# 
+#
 #  The above copyright notice and this permission notice shall be included
-#  in all copies or substantial portions of the Software. 
-# 
+#  in all copies or substantial portions of the Software.
+#
 #  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
 #  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 #  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -109,7 +109,7 @@ SET(INTERFACE_APPLICATION_MOC_SRCS
   PushDragButton.h
   QtLayerListWidget.h
   SaveProjectAsWizard.h
-  SegmentationExportWizard.h 
+  SegmentationExportWizard.h
   ShortcutsInterface.h
   SplashScreen.h
   StatusBarWidget.h
@@ -174,20 +174,20 @@ SET(INTERFACE_APPLICATION_RCC_SRCS
 # Resource files
 ##################################################
 
-QT4_ADD_RESOURCES(INTERFACE_APPLICATION_QT_RCC_SRCS ${INTERFACE_APPLICATION_RCC_SRCS})
+QT5_ADD_RESOURCES(INTERFACE_APPLICATION_QT_RCC_SRCS ${INTERFACE_APPLICATION_RCC_SRCS})
 
 ##################################################
 # Generate header out of UI code
 ##################################################
 
-QT4_WRAP_UI(INTERFACE_APPLICATION_QT_UI_SRCS ${INTERFACE_APPLICATION_UI_SRCS})
+QT5_WRAP_UI(INTERFACE_APPLICATION_QT_UI_SRCS ${INTERFACE_APPLICATION_UI_SRCS})
 
 
 ##################################################
 # Wrap QT code to expand all the moc code
 ##################################################
 
-QT4_WRAP_CPP(INTERFACE_APPLICATION_QT_MOC_SRCS ${INTERFACE_APPLICATION_MOC_SRCS})
+QT5_WRAP_CPP(INTERFACE_APPLICATION_QT_MOC_SRCS ${INTERFACE_APPLICATION_MOC_SRCS})
 
 ##################################################
 # Ensure that we can find the files generated
@@ -200,11 +200,11 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 # Build the Components library
 ##################################################
 
-CORE_ADD_LIBRARY(Interface_Application 
-  ${INTERFACE_APPLICATION_SRCS} 
+CORE_ADD_LIBRARY(Interface_Application
+  ${INTERFACE_APPLICATION_SRCS}
   ${INTERFACE_APPLICATION_QT_UI_SRCS}
   ${INTERFACE_APPLICATION_QT_MOC_SRCS}
-  ${INTERFACE_APPLICATION_NO_MOC_SRCS} 
+  ${INTERFACE_APPLICATION_NO_MOC_SRCS}
   ${INTERFACE_APPLICATION_MOC_SRCS}
   ${INTERFACE_APPLICATION_QT_RCC_SRCS})
 
@@ -225,7 +225,7 @@ IF(APPLE)
     QtUtils_Utils
     QtUtils_Widgets
     QtUtils_Bridge
-    ${QT_LIBRARIES} 
+#    ${QT_LIBRARIES}
     ${SCI_BOOST_LIBRARY}
     /System/Library/Frameworks/CoreServices.framework)
 ELSE()
@@ -245,7 +245,7 @@ ELSE()
     QtUtils_Utils
     QtUtils_Widgets
     QtUtils_Bridge
-    ${QT_LIBRARIES} 
+#    ${QT_LIBRARIES}
     ${SCI_BOOST_LIBRARY})
 ENDIF()
 

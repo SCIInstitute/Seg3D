@@ -16,71 +16,6 @@
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
-  <property name="styleSheet">
-   <string notr="true">QLabel#group_dimensions_label_{
-  color: white;
-  font: bold;
-}
-QWidget#LayerGroupWidget{
-  background-color: rgba( 0, 0, 0, 0 );
-}
-
-QToolButton#group_visibility_button_{
-  background-color: rgba(0, 0, 0, 0);
-  border: 1px solid rgba(0, 0, 0, 0);
-  margin: 0 0 0 0;
-  padding: 0 0 0 0;
-}
-QToolButton#group_visibility_button_:hover{
-  background-color: rgba( 0, 0, 0, 30 ); border-radius: 3px;
-}
-QToolButton#group_iso_visibility_button_{
-  background-color: rgba(0, 0, 0, 0);
-  border: 1px solid rgba(0, 0, 0, 0);
-  margin: 0 0 0 0;
-  padding: 0 0 0 0;
-}
-QToolButton#group_iso_visibility_button_:hover{
-  background-color: rgba( 0, 0, 0, 30 ); border-radius: 3px;
-}
-
-QFrame#group_frame_{
-  background-color: rgba(0, 0, 0, 0);
-  border: none;
-}
-
-QToolButton#open_button_{
-  background-color: rgba(0, 0, 0, 0);
-  border-radius: 4px;
-}
-
-QToolButton#open_button_:hover{
-  background-color: rgba( 0, 0, 0, 30 ); border-radius: 3px;
-}
-
-QWidget#group_header_{
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(0, 0, 0, 0), stop:0.45 rgba(0, 0, 0, 30), stop:1 rgba(0, 0, 0, 25));
-    border-radius: 3px;
-}
-
-QWidget#group_background_{
-  background-color: rgb(237, 165, 76);
-    border-radius: 3px;
-  border: 1px solid rgb(100, 100, 100);
-}
-
-QWidget#base_{
-  background-color: rgb( 100, 100, 100 );
-  border-radius:4px;
-  border: 1px solid rgb(60, 60, 60);
-  color: rgb(100, 100, 100);
-}
-
-QWidget#tools_and_layers_widget_{
-  background-color: rgba( 0, 0, 0, 0 );
-}
-</string>
-  </property>
   <layout class="QVBoxLayout" name="verticalLayout_12">
    <property name="spacing">
     <number>0</number>
@@ -95,7 +30,7 @@ QWidget#tools_and_layers_widget_{
        <number>0</number>
       </property>
       <property name="margin">
-       <number>1</number>
+       <number>0</number>
       </property>
       <item>
        <widget class="QWidget" name="group_background_" native="true">
@@ -108,13 +43,13 @@ QWidget#tools_and_layers_widget_{
         <property name="minimumSize">
          <size>
           <width>201</width>
-          <height>21</height>
+          <height>24</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
           <width>16777215</width>
-          <height>21</height>
+          <height>24</height>
          </size>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_13">
@@ -135,13 +70,13 @@ QWidget#tools_and_layers_widget_{
            <property name="minimumSize">
             <size>
              <width>215</width>
-             <height>21</height>
+             <height>24</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
              <width>16777215</width>
-             <height>21</height>
+             <height>24</height>
             </size>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0,0">
@@ -149,10 +84,10 @@ QWidget#tools_and_layers_widget_{
              <number>0</number>
             </property>
             <property name="leftMargin">
-             <number>0</number>
+             <number>4</number>
             </property>
             <property name="topMargin">
-             <number>0</number>
+             <number>2</number>
             </property>
             <property name="rightMargin">
              <number>6</number>
@@ -160,18 +95,18 @@ QWidget#tools_and_layers_widget_{
             <property name="bottomMargin">
              <number>0</number>
             </property>
-            <item>
+           <item>
              <widget class="QToolButton" name="open_button_">
               <property name="minimumSize">
                <size>
-                <width>21</width>
-                <height>21</height>
+                <width>18</width>
+                <height>18</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>21</width>
-                <height>21</height>
+                <width>18</width>
+                <height>18</height>
                </size>
               </property>
               <property name="toolTip">
@@ -187,8 +122,8 @@ QWidget#tools_and_layers_widget_{
               </property>
               <property name="iconSize">
                <size>
-                <width>16</width>
-                <height>16</height>
+                <width>18</width>
+                <height>18</height>
                </size>
               </property>
               <property name="checkable">
@@ -203,14 +138,20 @@ QWidget#tools_and_layers_widget_{
              <widget class="QtUtils::QtTristateToolButton" name="group_visibility_button_">
               <property name="minimumSize">
                <size>
-                <width>21</width>
-                <height>21</height>
+                <width>18</width>
+                <height>18</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>21</width>
-                <height>21</height>
+                <width>18</width>
+                <height>18</height>
+               </size>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>18</width>
+                <height>18</height>
                </size>
               </property>
               <property name="text">
@@ -222,14 +163,20 @@ QWidget#tools_and_layers_widget_{
              <widget class="QtUtils::QtTristateToolButton" name="group_iso_visibility_button_">
               <property name="minimumSize">
                <size>
-                <width>21</width>
-                <height>21</height>
+                <width>18</width>
+                <height>18</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>21</width>
-                <height>21</height>
+                <width>18</width>
+                <height>18</height>
+               </size>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>18</width>
+                <height>18</height>
                </size>
               </property>
               <property name="toolTip">
@@ -305,7 +252,7 @@ QWidget#tools_and_layers_widget_{
             </size>
            </property>
            <property name="frameShape">
-            <enum>QFrame::StyledPanel</enum>
+            <enum>QFrame::NoFrame</enum>
            </property>
            <property name="frameShadow">
             <enum>QFrame::Raised</enum>
@@ -318,7 +265,7 @@ QWidget#tools_and_layers_widget_{
              <number>4</number>
             </property>
             <property name="margin">
-             <number>1</number>
+             <number>0</number>
             </property>
            </layout>
           </widget>

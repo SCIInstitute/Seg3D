@@ -35,7 +35,7 @@
 
 // Qt includes
 #include <QtGui/QClipboard>
-#include <QtGui/QColorDialog>
+#include <QColorDialog>
 
 // Qt Gui Includes
 #include <QtUtils/Bridge/QtBridge.h>

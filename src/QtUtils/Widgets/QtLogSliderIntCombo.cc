@@ -36,6 +36,9 @@
 // QtUtils includes
 #include <QtUtils/Widgets/QtLogSliderIntCombo.h>
 
+// Qt includes
+#include <QProxyStyle>
+
 namespace QtUtils
 {
 
@@ -46,6 +49,21 @@ public:
   std::vector<QLabel> steps_;
 };
 
+class CustomFocusStyle : public QProxyStyle
+{
+public:
+  void drawPrimitive(PrimitiveElement element, const QStyleOption* option,
+                     QPainter* painter, const QWidget* widget) const
+  {
+    // do not draw focus rectangles for QSlider
+    if ( element == QStyle::PE_FrameFocusRect )
+    {
+      return;
+    }
+    QProxyStyle::drawPrimitive(element, option, painter, widget);
+  }
+};
+
 QtLogSliderIntCombo::QtLogSliderIntCombo( QWidget* parent ) :
   QWidget( parent ),
   value_( 0 ),
@@ -53,12 +71,14 @@ QtLogSliderIntCombo::QtLogSliderIntCombo( QWidget* parent ) :
 {
     this->private_->ui_.setupUi( this );
         
+    // Note that using setStyle here invalidates any QSlider stylesheet settings
+    this->private_->ui_.horizontalSlider->setStyle( new CustomFocusStyle() );
     this->connect( this->private_->ui_.horizontalSlider, SIGNAL( valueChanged( int ) ), 
     this, SLOT( slider_signal( int ) ) );
     this->connect( this->private_->ui_.spinBox, SIGNAL( valueChanged( int ) ), 
     this, SLOT( spinner_signal( int ) ) );
   
-  this->private_->ui_.horizontalSlider->setTickPosition( QSlider::NoTicks );
+    this->private_->ui_.horizontalSlider->setTickInterval( 100 );
 
   QFont font = this->private_->ui_.min_->font();
 #ifdef __APPLE__
@@ -70,6 +90,11 @@ QtLogSliderIntCombo::QtLogSliderIntCombo( QWidget* parent ) :
   this->private_->ui_.max_->setFont( font );
   this->private_->ui_.spinBox->setFont( font );
 
+#ifdef __APPLE__
+  font = this->private_->ui_.description_->font();
+  font.setPointSize( 12 );
+  this->private_->ui_.description_->setFont( font );
+#endif
 }
 
 QtLogSliderIntCombo::~QtLogSliderIntCombo()
@@ -127,6 +152,7 @@ void QtLogSliderIntCombo::setRange( int min, int max )
     this->private_->ui_.spinBox->setRange( min, max );
     this->private_->ui_.min_->setNum( min );
     this->private_->ui_.max_->setNum( max );
+    this->private_->ui_.horizontalSlider->setTickInterval( max - min );
     
     block_signals( false );
 }

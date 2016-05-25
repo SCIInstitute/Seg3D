@@ -37,6 +37,9 @@
 // QtUtils includes
 #include <QtUtils/Widgets/QtSliderDoubleCombo.h>
 
+// Qt includes
+#include <QProxyStyle>
+
 namespace QtUtils
 {
 
@@ -48,12 +51,30 @@ public:
   double max_;
 };
 
+class CustomFocusStyle : public QProxyStyle
+{
+public:
+  void drawPrimitive(PrimitiveElement element, const QStyleOption* option,
+                     QPainter* painter, const QWidget* widget) const
+  {
+    // do not draw focus rectangles for QSlider
+    if ( element == QStyle::PE_FrameFocusRect )
+    {
+      return;
+    }
+    QProxyStyle::drawPrimitive(element, option, painter, widget);
+  }
+};
+
 QtSliderDoubleCombo::QtSliderDoubleCombo( QWidget* parent ) :
   QWidget( parent ),
   value_( 0 ),
     private_( new QtSliderDoubleComboPrivate )
 {
   this->private_->ui_.setupUi( this );
+
+  // Note that using setStyle here invalidates any QSlider stylesheet settings
+  this->private_->ui_.horizontalSlider->setStyle( new CustomFocusStyle() );
   this->private_->ui_.horizontalSlider->setRange( 0, 100 );
   this->private_->ui_.horizontalSlider->setTickInterval( 10 );
   this->private_->ui_.horizontalSlider->setPageStep( 10 );
@@ -67,6 +88,12 @@ QtSliderDoubleCombo::QtSliderDoubleCombo( QWidget* parent ) :
   this->private_->ui_.min_->setFont( font );
   this->private_->ui_.max_->setFont( font );
   this->private_->ui_.spinBox->setFont( font );
+
+#ifdef __APPLE__
+  font = this->private_->ui_.description_->font();
+  font.setPointSize( 12 );
+  this->private_->ui_.description_->setFont( font );
+#endif
 
   this->connect( this->private_->ui_.horizontalSlider, SIGNAL( valueChanged( int ) ), 
   this, SLOT( slider_signal( int ) ) );

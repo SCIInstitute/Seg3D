@@ -30,10 +30,10 @@
 #include <boost/filesystem.hpp>
 
 // Qt includes
-#include <QtCore/QVariant>
-#include <QtGui/QGridLayout>
-#include <QtGui/QFileDialog>
-#include <QtGui/QMessageBox>
+#include <QVariant>
+#include <QGridLayout>
+#include <QFileDialog>
+#include <QMessageBox>
 
 // Core includes
 #include <Core/State/Actions/ActionSet.h>
@@ -55,13 +55,14 @@ SaveProjectAsWizard::SaveProjectAsWizard( QWidget *parent ) :
     QWizard( parent ),
     path_to_delete_( "" )
 {
-    this->addPage( new SaveAsInfoPage );
-    this->addPage( new SaveAsSummaryPage );
+  this->addPage( new SaveAsInfoPage );
+  this->addPage( new SaveAsSummaryPage );
     
   connect( this->page( 0 ), SIGNAL( just_a_save() ), this, SLOT( finish_early() ) );
   connect( this->page( 0 ), SIGNAL( need_to_set_delete_path( QString ) ), this, 
     SLOT( set_delete_path( QString ) ) );
   
+  this->setWizardStyle( QWizard::MacStyle );
   this->setPixmap( QWizard::BackgroundPixmap, 
     QPixmap( QString::fromUtf8( ":/Images/Symbol.png" ) ) );
   

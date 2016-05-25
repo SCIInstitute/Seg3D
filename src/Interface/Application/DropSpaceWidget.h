@@ -32,7 +32,7 @@
 #ifndef Q_MOC_RUN
 
 // QT includes
-#include <QtGui/QWidget>
+#include <QWidget>
 
 #endif
 

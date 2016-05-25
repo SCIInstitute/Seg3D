@@ -30,14 +30,14 @@
 #include <boost/algorithm/string/replace.hpp>
 
 // Qt includes
-#include <QtGui/QAction>
-#include <QtGui/QApplication>
+#include <QAction>
+#include <QApplication>
 #include <QtGui/QClipboard>
 #include <QtGui/QContextMenuEvent>
-#include <QtGui/QHeaderView>
-#include <QtGui/QMenu>
-#include <QtGui/QMessageBox>
-#include <QtGui/QScrollBar>
+#include <QHeaderView>
+#include <QMenu>
+#include <QMessageBox>
+#include <QScrollBar>
 
 // Core includes
 #include <Core/Interface/Interface.h>
@@ -144,7 +144,7 @@ MeasurementTableView::MeasurementTableView( QWidget* parent ) :
   this->setItemDelegate( 
     new MeasurementItemDelegate( MeasurementColumns::COLOR_E, MeasurementColumns::NAME_E, 
     MeasurementColumns::LENGTH_E, this ) );
-  this->horizontalHeader()->setClickable( true );
+  this->horizontalHeader()->setSectionsClickable( true );
   QObject::connect( this->horizontalHeader(), SIGNAL( sectionClicked( int ) ), 
     this, SLOT( handle_header_clicked( int ) ) );
   this->setVerticalScrollBar( new MeasurementScrollBar( this ) );
@@ -183,7 +183,7 @@ void MeasurementTableView::handle_model_reset()
   this->setColumnHidden( MeasurementColumns::COMMENT_E, true );
 
   // Have to resize rows/columns *after* model has been populated
-  this->horizontalHeader()->setResizeMode( MeasurementColumns::NAME_E, QHeaderView::Stretch );
+  this->horizontalHeader()->setSectionResizeMode( MeasurementColumns::NAME_E, QHeaderView::Stretch );
   this->resizeColumnsToContents();
   this->resizeRowsToContents();
   

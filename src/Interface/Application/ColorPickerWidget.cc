@@ -44,7 +44,7 @@ namespace Seg3D
 class ColorPickerWidgetPrivate
 {
 public:
-    Ui::ColorPickerWidget ui_;
+  Ui::ColorPickerWidget ui_;
   QtUtils::QtSliderIntCombo* r_adjuster_;
   QtUtils::QtSliderIntCombo* g_adjuster_;
   QtUtils::QtSliderIntCombo* b_adjuster_;

@@ -71,7 +71,7 @@ ProgressWidget::ProgressWidget( QWidget *parent ) :
   // Step (3): Setup pixmaps for animation
   for (size_t j = 0; j < 18; j++)
   {
-    std::string pixmap_name = std::string(":/Images/Circle") + Core::ExportToString( 20 * j ) + 
+    std::string pixmap_name = std::string(":/General_Icons/Progress") + Core::ExportToString( 20 * j ) +
       std::string( ".png" );
     this->private_->running_pixmap_[ j ].load( QString::fromStdString( pixmap_name ) ); 
   }

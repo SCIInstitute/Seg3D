@@ -30,8 +30,8 @@
 #include <boost/filesystem.hpp>
 
 // Qt includes
-#include <QtGui/QFileDialog>
-#include <QtGui/QMessageBox>
+#include <QFileDialog>
+#include <QMessageBox>
 
 // Core indcludes
 #include <Core/Utils/Log.h>
@@ -48,6 +48,9 @@
 
 // Resources includes
 #include <Resources/QtResources.h>
+
+// Interface includes
+#include <Interface/Application/StyleSheet.h>
 
 #include "ui_SplashScreen.h"
 
@@ -79,7 +82,7 @@ SplashScreen::SplashScreen( QWidget *parent ) :
   this->private_->ui_.setupUi( this );
   this->setObjectName( QString::fromUtf8( "splashscreen" ) );
 
-  //this->setStyleSheet( QString::fromUtf8( "SplashScreen#splashscreen{ background-color: none; }" ) );
+  this->setStyleSheet( StyleSheet::SPLASHSCREEN_C );
 
   // Disable these since they arent being used yet.
   this->private_->ui_.load_recent_button_->setEnabled( false );

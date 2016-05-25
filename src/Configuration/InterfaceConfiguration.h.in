@@ -33,6 +33,11 @@
 
 // Set the version numbers of the application
 
-#define INTERFACE_ACCENT_COLOR "237, 165, 76"
+#define INTERFACE_ACCENT_COLOR "123, 143, 197"
+#define INTERFACE_ACCENT_HEX_COLOR "#7B8FC5"
+// Use INTERFACE_ACCENT_BRIGHT_COLOR when opacity < 1
+// or when text is this color against a darker background
+#define INTERFACE_ACCENT_BRIGHT_COLOR "151, 176, 242"
+#define INTERFACE_ACCENT_BRIGHT_HEX_COLOR "#97B0F2"
 
 #endif

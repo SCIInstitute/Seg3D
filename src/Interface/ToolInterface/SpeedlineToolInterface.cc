@@ -34,6 +34,7 @@
 #include <QtUtils/Bridge/QtBridge.h>
 
 //Qt Gui Includes
+#include <Interface/Application/StyleSheet.h>
 #include <Interface/ToolInterface/SpeedlineToolInterface.h>
 #include "ui_SpeedlineToolInterface.h"
 
@@ -67,8 +68,7 @@ bool SpeedlineToolInterface::build_widget( QFrame* frame )
 {
   //Step 1 - build the Qt GUI Widget
   this->private_->ui_.setupUi( frame );
-//  this->private_->ui_.horizontalLayout->setAlignment( Qt::AlignHCenter );
-//  this->private_->ui_.horizontalLayout_2->setAlignment( Qt::AlignHCenter );
+  this->setStyleSheet( StyleSheet::SPEEDLINE_TOOL_C );
 
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();

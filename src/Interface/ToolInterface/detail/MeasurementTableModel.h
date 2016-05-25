@@ -34,7 +34,7 @@
 // QT Includes
 #include <QtCore/QAbstractTableModel>
 #include <QtCore/QModelIndex>
-#include <QtGui/QItemSelection>
+#include <QItemSelection>
 
 // Application includes
 #include <Application/Tools/MeasurementTool.h>

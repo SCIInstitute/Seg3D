@@ -25,7 +25,6 @@
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
  */
-
 // boost includes
 #include<boost/tokenizer.hpp>
 
@@ -42,6 +41,7 @@
 
 // Interface Includes
 #include <Interface/Application/MessageWindow.h>
+#include <Interface/Application/StyleSheet.h>
 
 // Automatically generated UI file
 #include "ui_MessageWindow.h"
@@ -93,27 +93,27 @@ void MessageWindow::add_message( int msg_type, std::string message )
   switch( msg_type )
   {
     case Core::LogMessageType::CRITICAL_ERROR_E:
-      color_ = QColor(200, 0, 0);
+      color_ = QColor( StyleSheet::CRITICAL_ERROR_COLOR_C );
       break;
     case Core::LogMessageType::ERROR_E:
-      color_ = QColor(121, 0, 0);
+      color_ = QColor( StyleSheet::ERROR_COLOR_C );
       break;
     case Core::LogMessageType::WARNING_E:
-      color_ = QColor(165, 161, 34);
+      color_ = QColor( StyleSheet::WARNING_COLOR_C );
       break;
     case Core::LogMessageType::MESSAGE_E:
-      color_ = QColor(3, 86, 2);
+      color_ = QColor( StyleSheet::MESSAGE_COLOR_C );
       break;
     case Core::LogMessageType::SUCCESS_E:
-      color_ = QColor(3, 86, 2);
+      color_ = QColor( StyleSheet::SUCCESS_COLOR_C );
       break;
     case Core::LogMessageType::DEBUG_E:
-      color_ = QColor("purple");
+      color_ = QColor( StyleSheet::DEBUG_COLOR_C );
       break;
     default:
       break;
   }
-  
+
   QListWidgetItem* item = new QListWidgetItem( QString::fromStdString( message ), this->private_->ui_.history_list_ );
   item->setTextColor( color_ );
   this->private_->ui_.history_list_->addItem( item );

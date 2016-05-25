@@ -27,9 +27,9 @@
  */
 
 // Qt includes
-#include <QtCore/QVariant>
-#include <QtGui/QGridLayout>
-#include <QtGui/QMessageBox>
+#include <QVariant>
+#include <QGridLayout>
+#include <QMessageBox>
 
 // Application includs
 #include <Application/ProjectManager/ProjectManager.h>
@@ -46,9 +46,10 @@ ProjectWizard::ProjectWizard( QWidget *parent ) :
   QWizard( parent ),
   path_to_delete_( "" )
 {
-    this->addPage( new ProjectInfoPage );
-    this->addPage( new SummaryPage );
+  this->addPage( new ProjectInfoPage );
+  this->addPage( new SummaryPage );
   
+  this->setWizardStyle (QWizard::MacStyle );
   this->setPixmap( QWizard::BackgroundPixmap, QPixmap( QString::fromUtf8( 
     ":/Images/Symbol.png" ) ) );
     

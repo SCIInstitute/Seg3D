@@ -36,9 +36,9 @@
 #ifndef Q_MOC_RUN
 
 // QT includes
-#include <QtCore/QVariant>
-#include <QtCore/QModelIndex>
-#include <QtCore/QObject>
+#include <QVariant>
+#include <QModelIndex>
+#include <QObject>
 
 // Core includes
 // include all the headers associated with the action engine
@@ -65,7 +65,7 @@ public:
   QVariant data( const QModelIndex& index, int role ) const;
   QVariant headerData( int section, Qt::Orientation orientation, int role ) const;
 
-  void update() { reset(); }
+  void update() { beginResetModel(); endResetModel(); }
 
 private:
   // Short cut to where the history is stored

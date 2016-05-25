@@ -40,9 +40,9 @@
 #include <deque>
 
 // QT includes
-#include <QtCore/QObject>
-#include <QtCore/QVariant>
-#include <QtCore/QModelIndex>
+#include <QObject>
+#include <QVariant>
+#include <QModelIndex>
 
 // Core includes
 #include <Core/Utils/Log.h>
@@ -70,7 +70,7 @@ public:
 
   void add_log_entry( int message_type, std::string& message );
 
-  void update() { reset(); }
+  void update() { beginResetModel(); endResetModel(); }
 };
 
 } // end namespace Seg3D

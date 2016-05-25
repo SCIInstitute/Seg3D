@@ -32,8 +32,8 @@
 #ifndef Q_MOC_RUN
 
 // QT includes
-#include <QtGui/QLineEdit>
-#include <QtGui/QFocusEvent>
+#include <QLineEdit>
+#include <QFocusEvent>
 
 #endif
 

@@ -1,21 +1,21 @@
 #  For more information, please see: http://software.sci.utah.edu
-# 
+#
 #  The MIT License
 # 
 #  Copyright (c) 2016 Scientific Computing and Imaging Institute,
 #  University of Utah.
-# 
-#  
+#
+#
 #  Permission is hereby granted, free of charge, to any person obtaining a
 #  copy of this software and associated documentation files (the "Software"),
 #  to deal in the Software without restriction, including without limitation
 #  the rights to use, copy, modify, merge, publish, distribute, sublicense,
 #  and/or sell copies of the Software, and to permit persons to whom the
 #  Software is furnished to do so, subject to the following conditions:
-# 
+#
 #  The above copyright notice and this permission notice shall be included
-#  in all copies or substantial portions of the Software. 
-# 
+#  in all copies or substantial portions of the Software.
+#
 #  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
 #  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 #  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -101,19 +101,26 @@ OPTION(BUILD_WITH_PYTHON "Build with python support." ON)
 # Configure Qt
 ###########################################
 
-IF(SEG3D_BUILD_INTERFACE)
-  SET(QT_MIN_VERSION "4.6.0")
-  INCLUDE(FindQt4)
+OPTION(DO_ZLIB_MANGLE "Mangle Zlib names to avoid conflicts with Qt5 or other external libraries" ON)
 
-  IF(QT4_FOUND)
-    MESSAGE(STATUS "QTVERSION=${QTVERSION}")
-    MESSAGE(STATUS "Found use file: ${QT_USE_FILE}")
-    IF(APPLE AND ${QTVERSION} VERSION_EQUAL 4.8 AND ${QTVERSION} VERSION_LESS 4.8.5)
-      MESSAGE(WARNING "Qt 4.8 versions earlier than 4.8.3 contain a bug that disables menu items under some circumstances. Upgrade to a more recent version.")
-    ENDIF()
+IF(SEG3D_BUILD_INTERFACE)
+  #SET(CMAKE_AUTOMOC ON)
+  SET(CMAKE_PREFIX_PATH "" CACHE PATH "PATH to find cmake package configs.  Can be used for custom qt install paths for instance.") 
+  FIND_PACKAGE(Qt5Core REQUIRED)
+  #FIND_PACKAGE(Qt5Gui REQUIRED)
+  #FIND_PACKAGE(Qt5Widgets REQUIRED)
+
+  IF(Qt5Core_FOUND)
+    MESSAGE(STATUS "Qt5Core_QMAKE_EXECUTABLE=${Qt5Core_QMAKE_EXECUTABLE}")
+    #MESSAGE(STATUS "QTVERSION=${QTVERSION}")
+    #MESSAGE(STATUS "Found use file: ${QT_USE_FILE}")
+    #IF(APPLE AND ${QTVERSION} VERSION_EQUAL 4.8 AND ${QTVERSION} VERSION_LESS 4.8.5)
+    #  MESSAGE(WARNING "Qt 4.8 versions earlier than 4.8.3 contain a bug that disables menu items under some circumstances. Upgrade to a more recent version.")
+    #ENDIF()
   ELSE()
-    MESSAGE(FATAL_ERROR "QT ${QT_MIN_VERSION} or later is required for building the Seg3D GUI")
+    MESSAGE(FATAL_ERROR "Qt5 is required for building the Seg3D GUI")
   ENDIF()
+
 
   IF(APPLE)
     SET(MACDEPLOYQT_OUTPUT_LEVEL 0 CACHE STRING "Set macdeployqt output level (0-3)")
@@ -213,6 +220,7 @@ ADD_EXTERNAL( ${SUPERBUILD_DIR}/BoostExternal.cmake Boost_external )
 SET(SEG3D_CACHE_ARGS
     "-DCMAKE_VERBOSE_MAKEFILE:BOOL=${CMAKE_VERBOSE_MAKEFILE}"
     "-DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}"
+    "-DCMAKE_PREFIX_PATH:PATH=${CMAKE_PREFIX_PATH}"
     "-DSEG3D_SOURCE_DIR:PATH=${SEG3D_SOURCE_DIR}"
     "-DSEG3D_BINARY_DIR:PATH=${SEG3D_BINARY_DIR}"
     "-DBUILD_LARGE_VOLUME_TOOLS:BOOL=${BUILD_LARGE_VOLUME_TOOLS}"
@@ -228,6 +236,7 @@ SET(SEG3D_CACHE_ARGS
     "-DSEG3D_BUILD_INTERFACE:BOOL=${SEG3D_BUILD_INTERFACE}"
     "-DSEG3D_SHOW_CONSOLE:BOOL=${SEG3D_SHOW_CONSOLE}"
     "-DBUILD_WITH_PYTHON:BOOL=${BUILD_WITH_PYTHON}"
+    "-DSCI_ZLIB_MANGLE:BOOL=${DO_ZLIB_MANGLE}"
     "-DZlib_DIR:PATH=${Zlib_DIR}"
     "-DLibPNG_DIR:PATH=${LibPNG_DIR}"
     "-DSQLite_DIR:PATH=${SQLite_DIR}"
@@ -259,7 +268,7 @@ ENDIF()
 
 IF(SEG3D_BUILD_INTERFACE)
   LIST(APPEND SEG3D_CACHE_ARGS
-    "-DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}"
+    #"-DQt5Core_QMAKE_EXECUTABLE:FILEPATH=${Qt5Core_QMAKE_EXECUTABLE}"
     "-DMACDEPLOYQT_OUTPUT_LEVEL:STRING=${MACDEPLOYQT_OUTPUT_LEVEL}"
   )
 ENDIF()

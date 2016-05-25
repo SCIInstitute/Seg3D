@@ -28,6 +28,7 @@
 
 #include <QtUtils/Bridge/QtBridge.h>
 
+#include <Interface/Application/StyleSheet.h>
 #include <Interface/Application/LayerResamplerDialog.h>
 
 #include "ui_LayerResamplerDialog.h"
@@ -48,6 +49,7 @@ LayerResamplerDialog::LayerResamplerDialog(
   private_( new LayerResamplerDialogPrivate )
 {
   this->private_->ui_.setupUi( this );
+  this->setStyleSheet( StyleSheet::LAYER_RESAMPLER_C );
 
   QtUtils::QtBridge::Connect( this->private_->ui_.padding_combobox_, layer_resampler->padding_value_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.kernel_combobox_, layer_resampler->kernel_state_ );

@@ -37,6 +37,7 @@
 #include <Core/Interface/Interface.h>
 
 // Interface includes
+#include <Interface/Application/StyleSheet.h>
 #include <Interface/ToolInterface/detail/MeasurementTableModel.h>
 
 // Application includes
@@ -173,7 +174,7 @@ QVariant MeasurementTableModel::data( const QModelIndex& index, int role ) const
       {
         if( measurements[ index.row() ].get_visible() )
         {
-          return QIcon( QString::fromUtf8( ":/Images/Visible.png" ) );
+          return QIcon( QString::fromUtf8( ":/Images/VisibleWhite.png" ) );
         }
         else
         { 
@@ -227,7 +228,7 @@ QVariant MeasurementTableModel::data( const QModelIndex& index, int role ) const
     {
       // The active index is always selected, but if one column is highlighted it may not be
       // obvious which is the active index, so color it.
-      return QBrush( QColor( 225, 243, 252 ) ); // Light blue
+      return QBrush( QColor( StyleSheet::ACCENT_COLOR_C ) );
     }
   }
   return QVariant(); 
@@ -305,7 +306,7 @@ QVariant MeasurementTableModel::headerData( int section, Qt::Orientation orienta
       {
         if( this->private_->visibility_ == MeasurementVisibility::ALL_VISIBLE_E )
         {
-          return QIcon( QString::fromUtf8( ":/Images/Visible.png" ) );
+          return QIcon( QString::fromUtf8( ":/Images/VisibleWhite.png" ) );
         }
         else if( this->private_->visibility_ == MeasurementVisibility::NONE_VISIBLE_E )
         {
@@ -318,7 +319,7 @@ QVariant MeasurementTableModel::headerData( int section, Qt::Orientation orienta
       }
       else if( section == MeasurementColumns::COLOR_E )
       {
-        return QIcon( QString::fromUtf8( ":/Images/AppearanceOff.png" ) );
+        return QIcon( QString::fromUtf8( ":/Palette_Icons/brush_01.png" ) );
       }
     }
   }
@@ -394,7 +395,8 @@ void MeasurementTableModel::update_table()
   this->private_->update_visibility();
   this->private_->use_cached_active_name_ = false;
 
-  QAbstractTableModel::reset();
+  QAbstractTableModel::beginResetModel();
+  QAbstractTableModel::endResetModel();
 
   // Column resize doesn't work properly without this call
   this->update_cells();

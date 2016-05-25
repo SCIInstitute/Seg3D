@@ -27,7 +27,8 @@
  */
 
 // Qt includes
-#include <QtGui/QPainter>
+#include <QPainter>
+#include <QMimeData>
 
 // QtUtils includes
 #include <QtUtils/Widgets/QtDropableComboBox.h>
@@ -39,6 +40,7 @@ QtDropableComboBox::QtDropableComboBox( QWidget *parent ) :
   QComboBox( parent )
 {
   this->setAcceptDrops( true );
+  this->setSizeAdjustPolicy( QComboBox::AdjustToContents );
 }
   
 QtDropableComboBox::~QtDropableComboBox()

@@ -32,8 +32,8 @@
 #ifndef Q_MOC_RUN
 
 // QT includes
-#include <QtGui/QPushButton>
-#include <QtGui/QMouseEvent>
+#include <QPushButton>
+#include <QMouseEvent>
 
 #endif
 

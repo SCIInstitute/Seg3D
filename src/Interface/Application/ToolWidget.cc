@@ -27,7 +27,8 @@
  */
 
 // Qt includes
-#include <QtGui/QHBoxLayout>
+#include <QHBoxLayout>
+#include <QVariant>
 
 // Boost includes
 #include <boost/lexical_cast.hpp>
@@ -36,6 +37,7 @@
 #include <Core/Utils/Log.h>
 
 // Interface includes
+#include <Interface/Application/StyleSheet.h>
 #include <Interface/Application/ToolWidget.h>
 
 namespace Seg3D

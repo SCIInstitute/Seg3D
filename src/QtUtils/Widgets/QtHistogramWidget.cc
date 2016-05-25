@@ -36,6 +36,9 @@
 #include <QtUtils/Widgets/QtHistogramWidget.h>
 #include <QtUtils/Widgets/QtHistogramGraph.h>
 
+// Interface configuration
+#include "InterfaceConfiguration.h"
+
 namespace QtUtils
 {
 
@@ -77,6 +80,7 @@ QtHistogramWidget::QtHistogramWidget( QWidget *parent, QtSliderDoubleCombo* uppe
   this->private_->max_threshold_value_ = 0;
   
   this->private_->histogram_graph_ = new QtHistogramGraph( this );
+  this->private_->histogram_graph_->setObjectName( QString::fromUtf8( "histogram_" ) );
   this->private_->ui_.histogramLayout->addWidget( this->private_->histogram_graph_ );
   
   connect( this->private_->histogram_graph_, SIGNAL( lower_position( int ) ), this, 
@@ -201,9 +205,9 @@ void QtHistogramWidget::set_min( double min )
     
   double min_location = ( ( this->private_->histogram_graph_->width() - 4 ) * percentage ) + 4;
   this->private_->min_bar_->setGeometry( min_location, 4 , 4, 129 );
-  this->private_->min_bar_->setStyleSheet( QString::fromUtf8( "border-left: 2px solid rgb( 237, 148, 31 );"
-    "border-bottom: 2px solid rgb( 237, 148, 31 );"
-    "border-top: 2px solid rgb( 237, 148, 31 );" ) );
+  this->private_->min_bar_->setStyleSheet( QString::fromUtf8( "border-left: 2px solid rgb( " INTERFACE_ACCENT_COLOR " );"
+    "border-bottom: 2px solid rgb( " INTERFACE_ACCENT_COLOR " );"
+    "border-top: 2px solid rgb( " INTERFACE_ACCENT_COLOR " );" ) );
 }
 
 void QtHistogramWidget::set_max( double max )
@@ -226,9 +230,9 @@ void QtHistogramWidget::set_max( double max )
   double percentage = max / temp_max;
   double max_location = ( ( this->private_->histogram_graph_->width() - 4 ) * percentage ) + 4;
   this->private_->max_bar_->setGeometry( max_location, 4, 4, 129 );
-  this->private_->max_bar_->setStyleSheet( QString::fromUtf8( "border-right: 2px solid rgb( 237, 148, 31 );"
-    "border-bottom: 2px solid rgb( 237, 148, 31 );"
-    "border-top: 2px solid rgb( 237, 148, 31 );" ) );
+  this->private_->max_bar_->setStyleSheet( QString::fromUtf8( "border-right: 2px solid rgb( " INTERFACE_ACCENT_COLOR " );"
+    "border-bottom: 2px solid rgb( " INTERFACE_ACCENT_COLOR " );"
+    "border-top: 2px solid rgb( " INTERFACE_ACCENT_COLOR " );" ) );
 }
 
 void QtHistogramWidget::handle_left_button_click( int lower_location )

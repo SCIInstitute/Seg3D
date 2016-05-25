@@ -35,8 +35,8 @@
 #include <boost/shared_ptr.hpp>
 
 // Qt includes
-#include <QtGui/QFileDialog>
-#include <QtCore/QPointer>
+#include <QFileDialog>
+#include <QPointer>
 
 // Core includes
 #include <Core/Utils/ConnectionHandler.h>

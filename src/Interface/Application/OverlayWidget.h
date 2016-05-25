@@ -35,7 +35,7 @@
 #include <boost/shared_ptr.hpp>
 
 // Qt includes
-#include <QtGui/QWidget>
+#include <QWidget>
 
 #endif
 

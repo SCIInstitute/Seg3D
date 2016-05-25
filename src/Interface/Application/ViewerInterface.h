@@ -32,8 +32,8 @@
 #ifndef Q_MOC_RUN
 
 // QT includes
-#include <QtGui/QWidget>
-#include <QtCore/QPointer>
+#include <QWidget>
+#include <QPointer>
 
 // STL includes
 #include <set>

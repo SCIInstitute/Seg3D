@@ -16,48 +16,6 @@
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
-  <property name="styleSheet">
-   <string notr="true">QWidget#base_{
-  
-  background-color: rgba(211, 211, 211, 212);
-}
-
-QWidget#message_box_{
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(241, 241, 241, 255), stop:0.155779 rgba(248, 248, 248, 255), stop:1 rgba(224, 224, 224, 255));
-  border: 1px solid silver;
-  border-radius: 3px;
-}
-
-QToolButton#lock_button_:checked{
-  background-color: rgba(0, 0, 0, 0);
-  border: 1px solid rgb(139, 139, 139);
-  margin:0;
-}
-
-QToolButton#opacity_button_{
-  background-color: rgba(0, 0, 0, 0);
-  border: 1px solid rgba(0, 0, 0, 0);
-}
-QToolButton#opacity_button_:pressed{
-  background-color: rgba(0, 0, 0, 0);
-  border: 1px solid rgb(139, 139, 139);
-  margin:0;
-}
-QToolButton#opacity_button_:checked{
-  background-color: rgba(0, 0, 0, 0);
-  border: 1px solid rgb(139, 139, 139);
-  margin:0;
-}
-
-QToolButton#cancel_button_{
-  background-color: rgba(0, 0, 0, 0);
-  border: 1px solid rgba(0, 0, 0, 0);
-}
-QToolButton#cancel_button_:pressed{
-  background-color: rgba(0, 0, 0, 0);
-}
-</string>
-  </property>
   <layout class="QHBoxLayout" name="horizontalLayout_8">
    <property name="spacing">
     <number>0</number>
@@ -137,7 +95,7 @@ QToolButton#cancel_button_:pressed{
                <string/>
               </property>
               <property name="pixmap">
-               <pixmap>:/Images/Circle.png</pixmap>
+               <pixmap>:/General_Icons/Progress0.png</pixmap>
               </property>
               <property name="scaledContents">
                <bool>true</bool>
@@ -188,7 +146,7 @@ QToolButton#cancel_button_:pressed{
               </property>
               <property name="icon">
                <iconset resource="../../Resources/QtResources.qrc">
-                <normaloff>:/Images/Close.png</normaloff>:/Images/Close.png</iconset>
+                <normaloff>:/General_Icons/exit.png</normaloff>:/General_Icons/exit.png</iconset>
               </property>
               <property name="iconSize">
                <size>

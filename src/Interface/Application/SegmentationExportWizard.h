@@ -34,7 +34,7 @@
 #include <boost/shared_ptr.hpp>
 
 //Qt includes
-#include <QtGui/QWizard>
+#include <QWizard>
 
 // Interface Includes
 #include <Interface/Application/QtLayerListWidget.h>

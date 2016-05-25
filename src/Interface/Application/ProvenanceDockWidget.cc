@@ -44,7 +44,7 @@
 
 // Qt includes
 #include <QtGui/QStandardItemModel>
-#include <QtGui/QMessageBox>
+#include <QMessageBox>
 
 //QtUtils Includes
 #include <QtUtils/Bridge/QtBridge.h>
@@ -323,7 +323,7 @@ ProvenanceDockWidget::ProvenanceDockWidget( QWidget *parent ) :
   this->private_->ui_.provenance_list_->header()->resizeSection( 0, 120 );
   this->private_->ui_.provenance_list_->header()->resizeSection( 1, 50 );
   this->private_->ui_.provenance_list_->header()->setDefaultAlignment( Qt::AlignHCenter );
-  this->private_->ui_.header_bkg_->setStyleSheet( StyleSheet::PROVENANCE_LIST_HEADER_C );
+  this->private_->ui_.active_layer_prov_widget_->setStyleSheet( StyleSheet::PROVENANCE_LIST_HEADER_C );
 
   ProvenanceDockWidgetPrivate::qpointer_type qpointer( this->private_ );
   this->private_->add_connection( ProjectManager::Instance()->current_project_changed_signal_.

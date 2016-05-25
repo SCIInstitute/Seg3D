@@ -32,8 +32,8 @@
 #ifndef Q_MOC_RUN
 
 // QT includes
-#include <QtCore/QPointer>
-#include <QtGui/QPushButton>
+#include <QPointer>
+#include <QPushButton>
 
 // STL includes
 #include <string>

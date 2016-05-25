@@ -32,7 +32,7 @@
 #ifndef Q_MOC_RUN
 
 // Qt includes
-#include <QtGui/QTextEdit>
+#include <QTextEdit>
 
 #endif
 

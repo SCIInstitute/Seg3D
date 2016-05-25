@@ -42,6 +42,9 @@
 #include <X11/Xlib.h>
 #endif
 
+// Qt includes
+#include <QAbstractNativeEventFilter>
+
 namespace QtUtils
 {
 
@@ -71,37 +74,43 @@ protected:
   }
 };
 
+class QtWin32ApplicationEventFilter : public QAbstractNativeEventFilter
+{
+public:
+  virtual bool nativeEventFilter(const QByteArray &eventType, void *message, long *) Q_DECL_OVERRIDE
+  {
+#ifdef _WIN32
+// test
+// should be "windows_generic_MSG" (http://doc.qt.io/qt-5/qwidget.html#nativeEvent)?
+std::cerr << "Event type: " << eventType.constData() << std::endl;
+// test
 
+    MSG* msg = reinterpret_cast< MSG* >( message );
+    if ( msg->message == WM_ENTERSIZEMOVE )
+    {
+      QtApplication::Instance()->enter_size_move_signal_();
+    }
+    else if ( msg->message == WM_EXITSIZEMOVE )
+    {
+      QtApplication::Instance()->exit_size_move_signal_();
+    }
+#endif
+
+    return false;
+  }
+};
 
 class QtApplicationPrivate
 {
 public:
   // Main QT application class
   QApplication* qt_application_;
+  QtWin32ApplicationEventFilter* win32_event_filter_;
 
   // Class for managing the opengl rendering resources
   QtRenderResourcesContextHandle qt_renderresources_context_;
-
-public:
-  static bool FilterEvent( void* message, long* result );
 };
 
-bool QtApplicationPrivate::FilterEvent( void* message, long* result )
-{
-#ifdef _WIN32
-  MSG* msg = reinterpret_cast< MSG* >( message );
-  if ( msg->message == WM_ENTERSIZEMOVE )
-  {
-    QtApplication::Instance()->enter_size_move_signal_();
-  }
-  else if ( msg->message == WM_EXITSIZEMOVE )
-  {
-    QtApplication::Instance()->exit_size_move_signal_();
-  }
-#endif
-
-  return false;
-}
 
 CORE_SINGLETON_IMPLEMENTATION( QtApplication );
 
@@ -109,6 +118,7 @@ QtApplication::QtApplication() :
   private_( new QtApplicationPrivate )
 {
   this->private_->qt_application_ = 0;
+  this->private_->win32_event_filter_ = 0;
 }
 
 bool QtApplication::setup( int& argc, char **argv )
@@ -125,9 +135,14 @@ bool QtApplication::setup( int& argc, char **argv )
     // Step 1: Main application class
     CORE_LOG_DEBUG( "Creating QApplication" );
     this->private_->qt_application_ = new OverrideQApplication( argc, argv );
+    this->private_->win32_event_filter_ = new QtWin32ApplicationEventFilter;
 
-    // Set the event filter for QApplication
-    this->private_->qt_application_->setEventFilter( &QtApplicationPrivate::FilterEvent );
+    // Set the native event filter for QApplication
+    this->private_->qt_application_->installNativeEventFilter( this->private_->win32_event_filter_ );
+
+    // Set the style handler to fusion to get good
+    // fundamental behavior, especially for comboboxes
+    this->private_->qt_application_->setStyle( "fusion" );
 
     // Step 2: Create interface class to the main class of the event handler layer
     CORE_LOG_DEBUG( "Creating QtEventHandlerContext" );

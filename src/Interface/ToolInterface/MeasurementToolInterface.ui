@@ -25,132 +25,6 @@
   <property name="windowTitle">
    <string>Measurement Tool</string>
   </property>
-  <property name="styleSheet">
-   <string notr="true">QWidget#MeasurementToolInterface{
-  border-radius: 3px;
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(241, 241, 241, 255), stop:0.155779 rgba(250, 250, 250, 255), stop:1 rgba(222, 224, 224, 255));  
-}
-
-QPushButton#copy_button_{
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(221, 221, 221, 255), stop:0.155779 rgba(238, 238, 238, 255), stop:1 rgba(192, 194, 194, 255));
-  border-radius: 4px;
-  border: 1px solid rgb(90, 90, 90);
-  margin:4px;
-  padding: 2px;
-}
-
-QPushButton#copy_button_:hover{
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(195, 195, 195, 255), stop:0.253769 rgba(206, 206, 206, 255), stop:1 rgba(185, 185, 185, 255));
-  border-radius: 4px;
-  border: 1px solid rgb(90, 90, 90);
-  margin:4px;
-}
-
-QPushButton#copy_button_:pressed{
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(150, 150, 150, 255), stop:0.753769 rgba(206, 206, 206, 255), stop:1 rgba(185, 185, 185, 255));
-  border-radius: 4px;
-  border: 1px solid rgb(90, 90, 90);
-  margin:4px;
-}
-
-/*************************/
-QPushButton#delete_button_{
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(221, 221, 221, 255), stop:0.155779 rgba(238, 238, 238, 255), stop:1 rgba(192, 194, 194, 255));
-  border-radius: 4px;
-  border: 1px solid rgb(90, 90, 90);
-  margin:4px;
-  padding: 2px;
-}
-
-QPushButton#delete_button_:hover{
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(195, 195, 195, 255), stop:0.253769 rgba(206, 206, 206, 255), stop:1 rgba(185, 185, 185, 255));
-  border-radius: 4px;
-  border: 1px solid rgb(90, 90, 90);
-  margin:4px;
-}
-
-QPushButton#delete_button_:pressed{
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(150, 150, 150, 255), stop:0.753769 rgba(206, 206, 206, 255), stop:1 rgba(185, 185, 185, 255));
-  border-radius: 4px;
-  border: 1px solid rgb(90, 90, 90);
-  margin:4px;
-}
-
-/*************************/
-QPushButton#export_button_{
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(221, 221, 221, 255), stop:0.155779 rgba(238, 238, 238, 255), stop:1 rgba(192, 194, 194, 255));
-  border-radius: 4px;
-  border: 1px solid rgb(90, 90, 90);
-  margin:4px;
-  padding: 2px
-}
-
-QPushButton#export_button_:hover{
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(195, 195, 195, 255), stop:0.253769 rgba(206, 206, 206, 255), stop:1 rgba(185, 185, 185, 255));
-  border-radius: 4px;
-  border: 1px solid rgb(90, 90, 90);
-  margin:4px;
-}
-
-QPushButton#export_button_:pressed{
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(150, 150, 150, 255), stop:0.753769 rgba(206, 206, 206, 255), stop:1 rgba(185, 185, 185, 255));
-  border-radius: 4px;
-  border: 1px solid rgb(90, 90, 90);
-  margin:4px;
-}
-
-/*************************/
-QPushButton#goto_first_button_{
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(221, 221, 221, 255), stop:0.155779 rgba(238, 238, 238, 255), stop:1 rgba(192, 194, 194, 255));
-  border-radius: 4px;
-  border: 1px solid rgb(90, 90, 90);
-  margin:4px;
-  padding: 2px
-}
-
-QPushButton#goto_first_button_:hover{
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(195, 195, 195, 255), stop:0.253769 rgba(206, 206, 206, 255), stop:1 rgba(185, 185, 185, 255));
-  border-radius: 4px;
-  border: 1px solid rgb(90, 90, 90);
-  margin:4px;
-}
-
-QPushButton#goto_first_button_:pressed{
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(150, 150, 150, 255), stop:0.753769 rgba(206, 206, 206, 255), stop:1 rgba(185, 185, 185, 255));
-  border-radius: 4px;
-  border: 1px solid rgb(90, 90, 90);
-  margin:4px;
-}
-
-/*************************/
-QPushButton#goto_second_button_{
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(221, 221, 221, 255), stop:0.155779 rgba(238, 238, 238, 255), stop:1 rgba(192, 194, 194, 255));
-  border-radius: 4px;
-  border: 1px solid rgb(90, 90, 90);
-  margin:4px;
-  padding: 2px
-}
-
-QPushButton#goto_second_button_:hover{
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(195, 195, 195, 255), stop:0.253769 rgba(206, 206, 206, 255), stop:1 rgba(185, 185, 185, 255));
-  border-radius: 4px;
-  border: 1px solid rgb(90, 90, 90);
-  margin:4px;
-}
-
-QPushButton#goto_second_button_:pressed{
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(150, 150, 150, 255), stop:0.753769 rgba(206, 206, 206, 255), stop:1 rgba(185, 185, 185, 255));
-  border-radius: 4px;
-  border: 1px solid rgb(90, 90, 90);
-  margin:4px;
-}
-
-/*
-QWidget#general_tab_, QWidget#active_tab_{ 
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(241, 241, 241, 255), stop:0.155779 rgba(250, 250, 250, 255), stop:1 rgba(222, 224, 224, 255));
-} 
-*/</string>
-  </property>
   <layout class="QVBoxLayout" name="verticalLayout_6">
    <property name="spacing">
     <number>0</number>
@@ -172,13 +46,6 @@ QWidget#general_tab_, QWidget#active_tab_{
        <height>0</height>
       </size>
      </property>
-     <property name="styleSheet">
-      <string notr="true">QWidget#base_{
-  border-radius: 3px;
-  border: 1px solid rgb(80, 80,80);
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(221, 221, 221, 255), stop:0.155779 rgba(228, 228, 228, 255), stop:1 rgba(202, 204, 204, 255));      
-}</string>
-     </property>
      <layout class="QVBoxLayout" name="verticalLayout_7">
       <property name="spacing">
        <number>0</number>
@@ -193,13 +60,6 @@ QWidget#general_tab_, QWidget#active_tab_{
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QTabWidget#general_tab_{
-  border-radius: 3px;
-  border: 1px solid rgb(80, 80,80);
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(221, 221, 221, 255), stop:0.155779 rgba(228, 228, 228, 255), stop:1 rgba(202, 204, 204, 255));      
-}</string>
         </property>
         <property name="currentIndex">
          <number>0</number>
@@ -853,6 +713,9 @@ QWidget#general_tab_, QWidget#active_tab_{
                           <horstretch>0</horstretch>
                           <verstretch>0</verstretch>
                          </sizepolicy>
+                        </property>
+                        <property name="sizeAdjustPolicy">
+                         <enum>QComboBox::AdjustToContents</enum>
                         </property>
                        </widget>
                       </item>

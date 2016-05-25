@@ -13,113 +13,6 @@
   <property name="windowTitle">
    <string>GroupButtonMenu</string>
   </property>
-  <property name="styleSheet">
-   <string notr="true">QPushButton{
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(221, 221, 221, 255), stop:0.155779 rgba(238, 238, 238, 255), stop:1 rgba(192, 194, 194, 255));
-  border-radius: 4px;
-  border: 1px solid rgb(90, 90, 90);
-  margin:4px;
-  padding: 2px;
-}
-
-QPushButton:hover{
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(195, 195, 195, 255), stop:0.253769 rgba(206, 206, 206, 255), stop:1 rgba(185, 185, 185, 255));
-  border-radius: 4px;
-  border: 1px solid rgb(90, 90, 90);
-  margin:4px;
-}
-
-QPushButton:pressed{
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(150, 150, 150, 255), stop:0.753769 rgba(206, 206, 206, 255), stop:1 rgba(185, 185, 185, 255));
-  border-radius: 4px;
-  border: 1px solid rgb(90, 90, 90);
-  margin:4px;
-}
-
-
-QWidget#background_{
-  background-color: rgb( 90,90,90 );
-} 
-
-/*group_new_mask_button_ */
-QToolButton#group_new_mask_button_{
-  background-color: rgba(0, 0, 0, 0);
-  border: 1px solid rgba(0, 0, 0, 0);
-  margin: 0 0 0 0;
-  padding: 0 0 0 0;
-}
-QToolButton#group_new_mask_button_:hover{
-  background-color: rgba( 0, 0, 0, 30 ); border-radius: 3px;
-}
-QToolButton#group_new_mask_button_:pressed{
-  background-color: rgb(233, 111, 53);
-  border-radius: 3px;
-  border: 1px solid rgb(142, 67, 32);
-  margin: 0 0 0 0;
-  padding: 0 0 0 0; 
-}
-
-/* group_delete_button_ */
-QToolButton#group_delete_button_{
-  background-color: rgba(0, 0, 0, 0);
-  border: 1px solid rgba(0, 0, 0, 0);
-  margin: 0 0 0 0;
-  padding: 0 0 0 0;
-}
-QToolButton#group_delete_button_:hover{
-  background-color: rgba( 0, 0, 0, 30 ); border-radius: 3px;
-}
-QToolButton#group_delete_button_:checked{
-  background-color: rgba(0, 0, 0, 0);
-  border: 1px solid rgba(0, 0, 0, 0);
-  margin: 0 0 0 0;
-  padding: 0 0 0 0;
-}
-
-/* group_iso_button_ */
-QToolButton#group_iso_button_{
-  background-color: rgba(0, 0, 0, 0);
-  border: 1px solid rgba(0, 0, 0, 0);
-  margin: 0 0 0 0;
-  padding: 0 0 0 0;
-}
-QToolButton#group_iso_button_:hover{
-  background-color: rgba( 0, 0, 0, 30 ); border-radius: 3px;
-}
-QToolButton#group_iso_button_:checked{
-  background-color: rgba(0, 0, 0, 0);
-  border: 1px solid rgba(0, 0, 0, 0);
-  margin: 0 0 0 0;
-  padding: 0 0 0 0;
-}
-
-/* duplicate_layer_button_ */
-QToolButton#duplicate_layer_button_{
-  background-color: rgba(0, 0, 0, 0);
-  border: 1px solid rgba(0, 0, 0, 0);
-  margin: 0 0 0 0;
-  padding: 0 0 0 0;
-}
-QToolButton#duplicate_layer_button_:hover{
-  background-color: rgba( 0, 0, 0, 30 ); border-radius: 3px;
-}
-QToolButton#duplicate_layer_button_:checked{
-  background-color: rgba(0, 0, 0, 0);
-  border: 1px solid rgba(0, 0, 0, 0);
-  margin: 0 0 0 0;
-  padding: 0 0 0 0;
-}
-
-QWidget#group_tools_{
-  border-radius: 4px;
-  border: 1px solid rgb(90, 90, 90);
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(161, 161, 161, 255), stop:0.155779 rgba(175, 175, 175, 255), stop:1 rgba(144, 144, 144, 255));
-}
-
-QWidget#buttons_{
-  border-bottom: 1px solid rgb(90, 90, 90);
-}</string>
-  </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <property name="spacing">
     <number>0</number>
@@ -204,8 +97,8 @@ QWidget#buttons_{
               </property>
               <property name="icon">
                <iconset resource="../../Resources/QtResources.qrc">
-                <normaloff>:/Images/DuplicateOff.png</normaloff>
-                <normalon>:/Images/Duplicate.png</normalon>:/Images/DuplicateOff.png</iconset>
+                <normaloff>:/Palette_Icons/duplicate_01.png</normaloff>
+                <normalon>:/Palette_Icons/duplicate_01.png</normalon>:/Palette_Icons/duplicate_01.png</iconset>
               </property>
               <property name="iconSize">
                <size>
@@ -240,8 +133,8 @@ QWidget#buttons_{
               </property>
               <property name="icon">
                <iconset resource="../../Resources/QtResources.qrc">
-                <normaloff>:/Images/IsosurfaceMenuOff.png</normaloff>
-                <normalon>:/Images/IsosurfaceMenu.png</normalon>:/Images/IsosurfaceMenuOff.png</iconset>
+                <normaloff>:/Palette_Icons/isoMenu_01.png</normaloff>
+                <normalon>:/Palette_Icons/isoMenu_01.png</normalon>:/Palette_Icons/isoMenu_01.png</iconset>
               </property>
               <property name="iconSize">
                <size>
@@ -276,8 +169,8 @@ QWidget#buttons_{
               </property>
               <property name="icon">
                <iconset resource="../../Resources/QtResources.qrc">
-                <normaloff>:/Images/Minus.png</normaloff>
-                <normalon>:/Images/MinusOn.png</normalon>:/Images/Minus.png</iconset>
+                <normaloff>:/Palette_Icons/minus_01.png</normaloff>
+                <normalon>:/Palette_Icons/minus_01.png</normalon>:/Palette_Icons/minus_01.png</iconset>
               </property>
               <property name="iconSize">
                <size>
@@ -312,8 +205,8 @@ QWidget#buttons_{
               </property>
               <property name="icon">
                <iconset resource="../../Resources/QtResources.qrc">
-                <normaloff>:/Images/Add.png</normaloff>
-                <normalon>:/Images/AddOn.png</normalon>:/Images/Add.png</iconset>
+                <normaloff>:/Palette_Icons/add_01.png</normaloff>
+                <normalon>:/Palette_Icons/add_01.png</normalon>:/Palette_Icons/add_01.png</iconset>
               </property>
               <property name="iconSize">
                <size>
@@ -377,7 +270,7 @@ QWidget#buttons_{
                   <string>Isosurface Quality:</string>
                  </property>
                  <property name="alignment">
-                  <set>Qt::AlignCenter</set>
+                  <set>Qt::AlignLeft</set>
                  </property>
                 </widget>
                </item>

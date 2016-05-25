@@ -256,8 +256,8 @@ Core::Color PreferencesManager::get_background_color() const
 {
   static Core::Color bkg_colors_s[] = 
   { 
-    Core::Color( 0.0f, 0.0f, 0.0f ), Core::Color( 0.3f, 0.3f, 0.3f ),
-    Core::Color( 0.6f, 0.6f, 0.6f ), Core::Color( 0.75f, 0.75f, 0.75f ),
+    Core::Color( 0.0f, 0.0f, 0.0f ), Core::Color( 0.278f, 0.278f, 0.290f ),
+    Core::Color( 0.416f, 0.416f, 0.439f ), Core::Color( 0.886f, 0.875f, 0.925f ),
     Core::Color( 1.0f, 1.0f, 1.0f )
   };
 

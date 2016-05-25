@@ -35,7 +35,7 @@
 #include <boost/shared_ptr.hpp>
 
 // QT includes
-#include <QtGui/QToolButton>
+#include <QToolButton>
 
 #endif
 
@@ -70,6 +70,11 @@ public:
   /// Set the string representation of each state.
   void set_state_strings( const std::string& unchecked_str, 
     const std::string& intermediate_str, const std::string& checked_str );
+
+  /// SET_STYLESHEETS:
+  /// Set the stylesheet for each state.
+  void set_stylesheets( const QString& unchecked_style,
+    const QString& intermediate_style, const QString& checked_style );
 
   /// GET_STATE:
   /// Return the current state.

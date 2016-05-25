@@ -32,11 +32,11 @@
 #ifndef Q_MOC_RUN
 
 //Qt includes
-#include <QtGui/QWizard>
-#include <QtGui/QLabel>
-#include <QtGui/QLineEdit>
-#include <QtGui/QPushButton>
-#include <QtGui/QCheckBox>
+#include <QWizard>
+#include <QLabel>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QCheckBox>
 
 #endif
 

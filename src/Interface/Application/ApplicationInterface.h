@@ -36,10 +36,10 @@
 #ifndef Q_MOC_RUN
 
 // Qt includes
-#include <QtGui/QMainWindow>
-#include <QtGui/QDockWidget>
-#include <QtGui/QWidget>
-#include <QtCore/QPointer>
+#include <QMainWindow>
+#include <QDockWidget>
+#include <QWidget>
+#include <QPointer>
 
 // Boost includes
 #include <boost/thread/mutex.hpp>

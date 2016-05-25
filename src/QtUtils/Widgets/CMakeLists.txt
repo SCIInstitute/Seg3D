@@ -1,23 +1,23 @@
 
 #
 #  For more information, please see: http://software.sci.utah.edu
-# 
+#
 #  The MIT License
 # 
 #  Copyright (c) 2016 Scientific Computing and Imaging Institute,
 #  University of Utah.
-# 
-#  
+#
+#
 #  Permission is hereby granted, free of charge, to any person obtaining a
 #  copy of this software and associated documentation files (the "Software"),
 #  to deal in the Software without restriction, including without limitation
 #  the rights to use, copy, modify, merge, publish, distribute, sublicense,
 #  and/or sell copies of the Software, and to permit persons to whom the
 #  Software is furnished to do so, subject to the following conditions:
-# 
+#
 #  The above copyright notice and this permission notice shall be included
-#  in all copies or substantial portions of the Software. 
-# 
+#  in all copies or substantial portions of the Software.
+#
 #  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
 #  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 #  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -94,13 +94,13 @@ SET(QTUTILS_WIDGETS_UI_SRCS
 # Generate header out of UI code
 ##################################################
 
-QT4_WRAP_UI(QTUTILS_WIDGETS_QT_UI_SRCS ${QTUTILS_WIDGETS_UI_SRCS})
+QT5_WRAP_UI(QTUTILS_WIDGETS_QT_UI_SRCS ${QTUTILS_WIDGETS_UI_SRCS})
 
 ##################################################
 # Wrap QT code to expand all the moc code
 ##################################################
 
-QT4_WRAP_CPP(QTUTILS_WIDGETS_QT_MOC_SRCS ${QTUTILS_WIDGETS_MOC_SRCS})
+QT5_WRAP_CPP(QTUTILS_WIDGETS_QT_MOC_SRCS ${QTUTILS_WIDGETS_MOC_SRCS})
 
 ##################################################
 # Ensure that we can find the files generated
@@ -114,14 +114,18 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 ##################################################
 
 CORE_ADD_LIBRARY( QtUtils_Widgets
-            ${QTUTILS_WIDGETS_SRCS} 
-            ${QTUTILS_WIDGETS_QT_UI_SRCS}
-            ${QTUTILS_WIDGETS_QT_MOC_SRCS}
-            ${QTUTILS_WIDGETS_MOC_SRCS}
-            ${QTUTILS_WIDGETS_NO_MOC_SRCS} )
-            
+  ${QTUTILS_WIDGETS_SRCS}
+  ${QTUTILS_WIDGETS_QT_UI_SRCS}
+  ${QTUTILS_WIDGETS_QT_MOC_SRCS}
+  ${QTUTILS_WIDGETS_MOC_SRCS}
+  ${QTUTILS_WIDGETS_NO_MOC_SRCS}
+)
+
 TARGET_LINK_LIBRARIES( QtUtils_Widgets
-                       Core_Utils
-                       Core_Geometry
-                       ${QT_LIBRARIES} 
-                       ${SCI_BOOST_LIBRARY} )
+  Core_Utils
+  Core_Geometry
+  ${Qt5Core_LIBRARIES}
+  ${Qt5Gui_LIBRARIES}
+  ${Qt5Widgets_LIBRARIES}
+  ${SCI_BOOST_LIBRARY}
+)

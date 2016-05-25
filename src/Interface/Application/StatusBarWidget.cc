@@ -30,7 +30,7 @@
 #include <boost/tokenizer.hpp>
 
 // Qt includes
-#include <QtCore/QPropertyAnimation>
+#include <QPropertyAnimation>
 
 // Core Includes - for logging
 #include <Core/Utils/Log.h>
@@ -92,7 +92,7 @@ StatusBarWidget::StatusBarWidget( QMainWindow* parent ) :
 
   this->private_->statusbar_->addWidget( this->private_->statusbar_widget_, 1 );
   
-//  this->private_->statusbar_->setStyleSheet( StyleSheet::STATUSBAR_C );
+  this->private_->statusbar_widget_->setStyleSheet( StyleSheet::STATUSBAR_C );
   
   connect( this->private_->ui_.swap_visibility_button_, 
     SIGNAL( clicked() ), this, SLOT( swap_bars() ) );
@@ -129,8 +129,8 @@ StatusBarWidget::StatusBarWidget( QMainWindow* parent ) :
   
   this->private_->last_message_time_ = boost::posix_time::second_clock::local_time();
   
-  this->private_->normal_message_icon_.addFile( QString::fromUtf8( ":/Images/TextOff.png" ), QSize(), QIcon::Normal );
-  this->private_->error_message_icon_.addFile( QString::fromUtf8( ":/Images/TextOffError.png" ), QSize(), QIcon::Normal );
+  this->private_->normal_message_icon_.addFile( QString::fromUtf8( ":/Footer_Icons/new.png" ), QSize(), QIcon::Normal );
+  this->private_->error_message_icon_.addFile( QString::fromUtf8( ":/Footer_Icons/new.png" ), QSize(), QIcon::Normal );
   this->private_->error_icon_set_ = false;
   this->private_->animating_ = false;
   

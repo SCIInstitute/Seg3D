@@ -31,19 +31,19 @@
 
 // Qt includes
 #include <QtCore/QVariant>
-#include <QtGui/QFileDialog>
-#include <QtGui/QMessageBox>
-#include <QtGui/QLabel>
-#include <QtGui/QLineEdit>
-#include <QtGui/QPushButton>
-#include <QtGui/QCheckBox>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QRadioButton>
-#include <QtGui/QComboBox>
-#include <QtGui/QButtonGroup>
-#include <QtGui/QTreeWidget>
-#include <QtGui/QScrollArea>
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QLabel>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QCheckBox>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QRadioButton>
+#include <QComboBox>
+#include <QButtonGroup>
+#include <QTreeWidget>
+#include <QScrollArea>
 
 // Core includes
 #include <Core/State/Actions/ActionSet.h>
@@ -57,6 +57,7 @@
 
 // Interface includes
 #include <Interface/Application/SegmentationExportWizard.h>
+#include <Interface/Application/StyleSheet.h>
 
 namespace Seg3D
 {
@@ -110,6 +111,7 @@ SegmentationExportWizard::SegmentationExportWizard( QWidget *parent ) :
   this->setMinimumSize( 660, 400 );
   this->addPage( new SegmentationSelectionPage( private_, this ) );
     this->addPage( new SegmentationSummaryPage( private_, this ) );
+  this->setWizardStyle( QWizard::MacStyle );
   this->setPixmap( QWizard::BackgroundPixmap, QPixmap( QString::fromUtf8( 
     ":/Images/Symbol.png" ) ) );
   this->setWindowTitle( tr( "Segmentation Export Wizard" ) );
@@ -142,6 +144,7 @@ SegmentationSelectionPage::SegmentationSelectionPage( SegmentationPrivateHandle 
   this->private_->group_with_masks_tree_->setIndentation( 15 );
   this->private_->group_with_masks_tree_->setItemsExpandable( true );
   this->private_->group_with_masks_tree_->setHeaderHidden( true );
+  this->private_->group_with_masks_tree_->setStyleSheet( StyleSheet::SEGMENTATION_EXPORT_C );
 
   this->private_->selection_main_layout_->addWidget( this->private_->group_with_masks_tree_ );
   
@@ -152,8 +155,8 @@ SegmentationSelectionPage::SegmentationSelectionPage( SegmentationPrivateHandle 
   this->private_->radio_button_group_ = new QButtonGroup( this );
   this->private_->radio_button_group_->setExclusive( true );
 
-  this->private_->single_or_multiple_files_widget_->setMinimumSize( QSize( 0, 24 ) );
-  this->private_->single_or_multiple_files_widget_->setMaximumSize( QSize( 16777215, 24 ) );
+  this->private_->single_or_multiple_files_widget_->setMinimumSize( QSize( 0, 30 ) );
+  this->private_->single_or_multiple_files_widget_->setMaximumSize( QSize( 16777215, 30 ) );
   this->private_->horizontalLayout_1 = new QHBoxLayout( this->private_->single_or_multiple_files_widget_ );
   this->private_->horizontalLayout_1->setSpacing( 0 );
   this->private_->horizontalLayout_1->setContentsMargins( 0, 0, 0, 0 );
@@ -192,8 +195,8 @@ SegmentationSelectionPage::SegmentationSelectionPage( SegmentationPrivateHandle 
   this->private_->horizontalLayout_1->addWidget( this->private_->multiple_files_widget_ );
   
   this->private_->bitmap_widget_ = new QWidget( this );
-  this->private_->bitmap_widget_->setMinimumSize( QSize( 0, 24) );
-  this->private_->bitmap_widget_->setMaximumSize( QSize( 16777215, 24 ) );
+  this->private_->bitmap_widget_->setMinimumSize( QSize( 0, 30) );
+  this->private_->bitmap_widget_->setMaximumSize( QSize( 16777215, 30 ) );
   this->private_->bitmap_layout_ = new QHBoxLayout( this->private_->bitmap_widget_ );
   this->private_->bitmap_layout_->setSpacing( 6 );
   this->private_->bitmap_layout_->setContentsMargins( 4, 4, 4, 4 );
@@ -218,9 +221,9 @@ SegmentationSelectionPage::SegmentationSelectionPage( SegmentationPrivateHandle 
   //  SLOT( change_type_text( int ) ) );
   
   this->private_->warning_message_ = new QLabel( QString::fromUtf8( "This location does not exist, please choose a valid location." ) );
-  this->private_->warning_message_->setObjectName( QString::fromUtf8( "warning_message_" ) );
+  this->private_->warning_message_->setObjectName( QString::fromUtf8( "message_" ) );
   this->private_->warning_message_->setWordWrap( true );
-  this->private_->warning_message_->setStyleSheet(QString::fromUtf8( "QLabel#warning_message_{ color: red; } " ) );
+  this->private_->warning_message_->setStyleSheet( StyleSheet::MAIN_STYLE_C );
   this->private_->warning_message_->hide();
   
   this->private_->selection_main_layout_->addWidget( this->private_->single_or_multiple_files_widget_ );
@@ -320,7 +323,7 @@ bool SegmentationSelectionPage::validatePage()
       QTreeWidgetItem* mask = group->child( j );
       if ( mask->checkState( 0 ) == Qt::Checked )
       {
-        QtLayerListWidget* new_mask = new QtLayerListWidget();
+        QtLayerListWidget* new_mask = new QtLayerListWidget( this );
         new_mask->set_mask_name( mask->text( 0 ).toStdString() );
         new_mask->set_mask_index( 0 );
         this->private_->masks_.push_front( new_mask );
@@ -406,9 +409,9 @@ SegmentationSummaryPage::SegmentationSummaryPage( SegmentationPrivateHandle priv
   this->private_->mask_scroll_area_->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
   this->private_->mask_scroll_area_->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
   
-  this->private_->layers_ = new QWidget();
+  this->private_->layers_ = new QWidget( this );
   this->private_->layers_->setObjectName( QString::fromUtf8( "layers_" ) );
-  this->private_->layers_->setStyleSheet( QString::fromUtf8( "background-color: white;" ) );
+  this->private_->mask_scroll_area_->setStyleSheet( StyleSheet::SEGMENTATION_EXPORT_C );
   this->private_->masks_layout_ = new QVBoxLayout( this->private_->layers_ );
   this->private_->masks_layout_->setObjectName( QString::fromUtf8( "masks_layout_" ) );
   this->private_->mask_scroll_area_->setWidget( this->private_->layers_ );
@@ -425,9 +428,9 @@ void SegmentationSummaryPage::initializePage()
 
   this->private_->layers_->deleteLater();
 
-  this->private_->layers_ = new QWidget();
+  this->private_->layers_ = new QWidget( this );
   this->private_->layers_->setObjectName( QString::fromUtf8( "layers_" ) );
-  this->private_->layers_->setStyleSheet( QString::fromUtf8( "background-color: white;" ) );
+  this->private_->mask_scroll_area_->setStyleSheet( StyleSheet::SEGMENTATION_EXPORT_C );
 
   this->private_->masks_layout_ = new QVBoxLayout( this->private_->layers_ );
   this->private_->masks_layout_->setObjectName( QString::fromUtf8( "masks_layout_" ) );
@@ -444,7 +447,7 @@ void SegmentationSummaryPage::initializePage()
   // insert the background layer settings
   if ( save_as_single_file )
   {
-    QtLayerListWidget* new_mask = new QtLayerListWidget( this->private_->layers_ );
+    QtLayerListWidget* new_mask = new QtLayerListWidget( this );
     new_mask->set_mask_name( "Background" );
     this->private_->masks_layout_->addWidget( new_mask );
     this->private_->masks_.push_front( new_mask );

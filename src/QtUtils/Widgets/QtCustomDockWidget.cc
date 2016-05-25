@@ -40,13 +40,16 @@ class QtCustomDockWidgetPrivate
 {
 public:
   QWidget* overlay_;
-  
+
 };
   
 QtCustomDockWidget::QtCustomDockWidget( QWidget *parent ) :
   QDockWidget( parent ),
   private_( new QtCustomDockWidgetPrivate )
 {
+  this->dock_base_ = new QWidget( this );
+  this->dock_base_->setObjectName( QString::fromUtf8( "dock_base_" ) );
+
   this->private_->overlay_ = new QWidget( this );
   this->private_->overlay_->setObjectName( QString::fromUtf8( "overlay_" ) );
   this->private_->overlay_->setStyleSheet( QString::fromUtf8( "QWidget#overlay_{"
