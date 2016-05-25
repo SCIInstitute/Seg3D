@@ -53,6 +53,7 @@ namespace Core
 // Forward declaration
 class Log;
 
+// Please update LogTests if enums change
 CORE_ENUM_CLASS
 (
   LogMessageType,
