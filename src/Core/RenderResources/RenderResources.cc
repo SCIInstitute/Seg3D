@@ -194,8 +194,8 @@ void RenderResourcesPrivate::query_video_memory_size()
     CGLDescribeRenderer(info, i, kCGLRPVideoMemoryMegabytes, &vram_size);
     if ( vram_size > 0 && vram_size > this->vram_size_ )
     {
-      this->vram_size_ = static_cast< unsigned long >( vram_size );
-      vram_size_MB = this->vram_size_;
+      vram_size_MB = static_cast< unsigned long >( vram_size );
+      this->vram_size_ = vram_size_MB << 20;
     }
   }
   CGLDestroyRendererInfo(info);
