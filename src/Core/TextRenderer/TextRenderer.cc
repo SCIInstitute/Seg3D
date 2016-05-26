@@ -72,13 +72,21 @@ TextRenderer::TextRenderer() :
 
     if (! boost::filesystem::exists(font_path) )
     {
-      // TODO: would it make sense to throw an exception here?
-      // object will be incompletely constructed if font path cannot be found
-      //
-      // alternatively, configure location of font path on program startup, so this check
-      // does not have to be run every time the object is constructed? (AYK)
-      CORE_LOG_ERROR( "Unable to locate FreeSerif.ttf in /usr/share/fonts/truetype/freefont or /usr/share/fonts/truetype." );
-      return;
+
+      // alternative path to freefont paths on some other linux distros (CentOS for example)
+      font_path = "/usr/share/fonts/gnu-free/FreeSerif.ttf";
+
+      if (! boost::filesystem::exists(font_path) )
+      {
+
+        // TODO: would it make sense to throw an exception here?
+        // object will be incompletely constructed if font path cannot be found
+        //
+        // alternatively, configure location of font path on program startup, so this check
+        // does not have to be run every time the object is constructed? (AYK)
+        CORE_LOG_ERROR( "Unable to locate FreeSerif.ttf in /usr/share/fonts/truetype/freefont or /usr/share/fonts/truetype or /usr/share/fonts/gnu-free." );
+        return;
+      }
     }
   }
   this->font_file_.assign( font_path );
