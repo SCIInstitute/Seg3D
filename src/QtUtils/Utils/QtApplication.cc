@@ -80,10 +80,6 @@ public:
   virtual bool nativeEventFilter(const QByteArray &eventType, void *message, long *) Q_DECL_OVERRIDE
   {
 #ifdef _WIN32
-// test
-// should be "windows_generic_MSG" (http://doc.qt.io/qt-5/qwidget.html#nativeEvent)?
-std::cerr << "Event type: " << eventType.constData() << std::endl;
-// test
 
     MSG* msg = reinterpret_cast< MSG* >( message );
     if ( msg->message == WM_ENTERSIZEMOVE )
