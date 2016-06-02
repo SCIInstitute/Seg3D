@@ -104,7 +104,7 @@ OPTION(BUILD_WITH_PYTHON "Build with python support." ON)
 OPTION(DO_ZLIB_MANGLE "Mangle Zlib names to avoid conflicts with Qt5 or other external libraries" ON)
 
 IF(SEG3D_BUILD_INTERFACE)
-  SET(QT5_PATH "" CACHE PATH "Path to directory where Qt 5 is installed.")
+  SET(QT5_PATH "" CACHE PATH "Path to directory where Qt 5 is installed. Directory should contain lib and bin subdirectories.")
   #SET(CMAKE_AUTOMOC ON)
 
   IF(IS_DIRECTORY ${QT5_PATH})
@@ -112,7 +112,7 @@ IF(SEG3D_BUILD_INTERFACE)
     FIND_PACKAGE(Qt5Gui REQUIRED HINTS ${QT5_PATH})
     FIND_PACKAGE(Qt5OpenGL REQUIRED HINTS ${QT5_PATH})
   ELSE()
-    MESSAGE(SEND_ERROR "Set path to directory where Qt 5 is installed or set SEG3D_BUILD_INTERFACE to OFF.")
+    MESSAGE(SEND_ERROR "Set path to directory where Qt 5 is installed (containing lib and bin subdirectories) or set SEG3D_BUILD_INTERFACE to OFF.")
   ENDIF()
 
   IF(Qt5Core_FOUND)
