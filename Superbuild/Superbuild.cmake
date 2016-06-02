@@ -104,15 +104,20 @@ OPTION(BUILD_WITH_PYTHON "Build with python support." ON)
 OPTION(DO_ZLIB_MANGLE "Mangle Zlib names to avoid conflicts with Qt5 or other external libraries" ON)
 
 IF(SEG3D_BUILD_INTERFACE)
+  SET(QT5_PATH "" CACHE PATH "Path to directory where Qt 5 is installed.")
   #SET(CMAKE_AUTOMOC ON)
-  SET(CMAKE_PREFIX_PATH "" CACHE PATH "PATH to find cmake package configs.  Can be used for custom qt install paths for instance.") 
-  FIND_PACKAGE(Qt5Core REQUIRED)
-  #FIND_PACKAGE(Qt5Gui REQUIRED)
-  #FIND_PACKAGE(Qt5Widgets REQUIRED)
+
+  IF(IS_DIRECTORY ${QT5_PATH})
+    FIND_PACKAGE(Qt5Core REQUIRED HINTS ${QT5_PATH})
+    FIND_PACKAGE(Qt5Gui REQUIRED HINTS ${QT5_PATH})
+    FIND_PACKAGE(Qt5OpenGL REQUIRED HINTS ${QT5_PATH})
+  ELSE()
+    MESSAGE(SEND_ERROR "Set path to directory where Qt 5 is installed or set SEG3D_BUILD_INTERFACE to OFF.")
+  ENDIF()
 
   IF(Qt5Core_FOUND)
-    MESSAGE(STATUS "Qt5Core_QMAKE_EXECUTABLE=${Qt5Core_QMAKE_EXECUTABLE}")
-    #MESSAGE(STATUS "QTVERSION=${QTVERSION}")
+    #MESSAGE(STATUS "Qt5Core_QMAKE_EXECUTABLE=${Qt5Core_QMAKE_EXECUTABLE}")
+    MESSAGE(STATUS "QTVERSION=${QTVERSION}")
     #MESSAGE(STATUS "Found use file: ${QT_USE_FILE}")
     #IF(APPLE AND ${QTVERSION} VERSION_EQUAL 4.8 AND ${QTVERSION} VERSION_LESS 4.8.5)
     #  MESSAGE(WARNING "Qt 4.8 versions earlier than 4.8.3 contain a bug that disables menu items under some circumstances. Upgrade to a more recent version.")
@@ -268,7 +273,9 @@ ENDIF()
 
 IF(SEG3D_BUILD_INTERFACE)
   LIST(APPEND SEG3D_CACHE_ARGS
-    #"-DQt5Core_QMAKE_EXECUTABLE:FILEPATH=${Qt5Core_QMAKE_EXECUTABLE}"
+    "-DQt5Core_DIR:PATH=${Qt5Core_DIR}"
+    "-DQt5Gui_DIR:PATH=${Qt5Gui_DIR}"
+    "-DQt5OpenGL_DIR:PATH=${Qt5OpenGL_DIR}"
     "-DMACDEPLOYQT_OUTPUT_LEVEL:STRING=${MACDEPLOYQT_OUTPUT_LEVEL}"
   )
 ENDIF()
