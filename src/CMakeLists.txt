@@ -99,8 +99,8 @@ INCLUDE(CMake/RegisterUnitTest.cmake)
 ###########################################
 
 SET(SEG3D_MAJOR_VERSION 2 CACHE INTERNAL "Major version number" FORCE)
-SET(SEG3D_MINOR_VERSION 3 CACHE INTERNAL "Minor version number" FORCE)
-SET(SEG3D_PATCH_VERSION 2 CACHE INTERNAL "Patch version number" FORCE)
+SET(SEG3D_MINOR_VERSION 4 CACHE INTERNAL "Minor version number" FORCE)
+SET(SEG3D_PATCH_VERSION 0 CACHE INTERNAL "Patch version number" FORCE)
 
 
 ###########################################
@@ -263,10 +263,12 @@ IF(SEG3D_BUILD_INTERFACE)
 
   ADD_DEFINITIONS(-DQT_NO_KEYWORDS)
 
-  # should be in $PATH
+  # should be in ${Qt5_PATH}/bin
   IF(APPLE)
     FIND_PROGRAM(MACDEPLOYQT_EXE
+      HINTS ${Qt5_PATH} ${Qt5_PATH}/bin
       NAMES macdeployqt
+      NO_DEFAULT_PATH
     )
     IF(MACDEPLOYQT_EXE MATCHES "NOTFOUND")
       MESSAGE(FATAL_ERROR "macdeployqt is required to build the SCIRun app bundle. Please ensure that both are installed and in your path.")
