@@ -101,7 +101,11 @@ OPTION(BUILD_WITH_PYTHON "Build with python support." ON)
 # Configure Qt
 ###########################################
 
-OPTION(DO_ZLIB_MANGLE "Mangle Zlib names to avoid conflicts with Qt5 or other external libraries" ON)
+IF(WIN32)
+  OPTION(DO_ZLIB_MANGLE "Mangle Zlib names" OFF)
+ELSE()
+  OPTION(DO_ZLIB_MANGLE "Mangle Zlib names to avoid conflicts with Qt5 or other external libraries" ON)
+ENDIF()
 
 IF(SEG3D_BUILD_INTERFACE)
   SET(Qt5_PATH "" CACHE PATH "Path to directory where Qt 5 is installed. Directory should contain lib and bin subdirectories.")
@@ -240,7 +244,7 @@ SET(SEG3D_CACHE_ARGS
     "-DSEG3D_BUILD_INTERFACE:BOOL=${SEG3D_BUILD_INTERFACE}"
     "-DSEG3D_SHOW_CONSOLE:BOOL=${SEG3D_SHOW_CONSOLE}"
     "-DBUILD_WITH_PYTHON:BOOL=${BUILD_WITH_PYTHON}"
-    "-DSCI_ZLIB_MANGLE:BOOL=${DO_ZLIB_MANGLE}"
+    "-DDO_ZLIB_MANGLE:BOOL=${DO_ZLIB_MANGLE}"
     "-DZlib_DIR:PATH=${Zlib_DIR}"
     "-DLibPNG_DIR:PATH=${LibPNG_DIR}"
     "-DSQLite_DIR:PATH=${SQLite_DIR}"
@@ -269,6 +273,7 @@ IF(BUILD_DOCUMENTATION)
     "-DDOXYGEN_EXECUTABLE:FILEPATH=${DOXYGEN_EXECUTABLE}"
   )
 ENDIF()
+
 
 IF(SEG3D_BUILD_INTERFACE)
   LIST(APPEND SEG3D_CACHE_ARGS
