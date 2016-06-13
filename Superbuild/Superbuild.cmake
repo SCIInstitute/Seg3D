@@ -101,18 +101,26 @@ OPTION(BUILD_WITH_PYTHON "Build with python support." ON)
 # Configure Qt
 ###########################################
 
-OPTION(DO_ZLIB_MANGLE "Mangle Zlib names to avoid conflicts with Qt5 or other external libraries" ON)
+IF(WIN32)
+  OPTION(DO_ZLIB_MANGLE "Mangle Zlib names" OFF)
+ELSE()
+  OPTION(DO_ZLIB_MANGLE "Mangle Zlib names to avoid conflicts with Qt5 or other external libraries" ON)
+ENDIF()
 
 IF(SEG3D_BUILD_INTERFACE)
+  SET(Qt5_PATH "" CACHE PATH "Path to directory where Qt 5 is installed. Directory should contain lib and bin subdirectories.")
   #SET(CMAKE_AUTOMOC ON)
-  SET(CMAKE_PREFIX_PATH "" CACHE PATH "PATH to find cmake package configs.  Can be used for custom qt install paths for instance.") 
-  FIND_PACKAGE(Qt5Core REQUIRED)
-  #FIND_PACKAGE(Qt5Gui REQUIRED)
-  #FIND_PACKAGE(Qt5Widgets REQUIRED)
+
+  IF(IS_DIRECTORY ${Qt5_PATH})
+    FIND_PACKAGE(Qt5Core REQUIRED HINTS ${Qt5_PATH})
+    FIND_PACKAGE(Qt5Gui REQUIRED HINTS ${Qt5_PATH})
+    FIND_PACKAGE(Qt5OpenGL REQUIRED HINTS ${Qt5_PATH})
+  ELSE()
+    MESSAGE(SEND_ERROR "Set Qt5_PATH to directory where Qt 5 is installed (containing lib and bin subdirectories) or set SEG3D_BUILD_INTERFACE to OFF.")
+  ENDIF()
 
   IF(Qt5Core_FOUND)
-    MESSAGE(STATUS "Qt5Core_QMAKE_EXECUTABLE=${Qt5Core_QMAKE_EXECUTABLE}")
-    #MESSAGE(STATUS "QTVERSION=${QTVERSION}")
+    MESSAGE(STATUS "Found Qt version: ${Qt5Core_VERSION_STRING}")
     #MESSAGE(STATUS "Found use file: ${QT_USE_FILE}")
     #IF(APPLE AND ${QTVERSION} VERSION_EQUAL 4.8 AND ${QTVERSION} VERSION_LESS 4.8.5)
     #  MESSAGE(WARNING "Qt 4.8 versions earlier than 4.8.3 contain a bug that disables menu items under some circumstances. Upgrade to a more recent version.")
@@ -236,7 +244,7 @@ SET(SEG3D_CACHE_ARGS
     "-DSEG3D_BUILD_INTERFACE:BOOL=${SEG3D_BUILD_INTERFACE}"
     "-DSEG3D_SHOW_CONSOLE:BOOL=${SEG3D_SHOW_CONSOLE}"
     "-DBUILD_WITH_PYTHON:BOOL=${BUILD_WITH_PYTHON}"
-    "-DSCI_ZLIB_MANGLE:BOOL=${DO_ZLIB_MANGLE}"
+    "-DDO_ZLIB_MANGLE:BOOL=${DO_ZLIB_MANGLE}"
     "-DZlib_DIR:PATH=${Zlib_DIR}"
     "-DLibPNG_DIR:PATH=${LibPNG_DIR}"
     "-DSQLite_DIR:PATH=${SQLite_DIR}"
@@ -266,9 +274,13 @@ IF(BUILD_DOCUMENTATION)
   )
 ENDIF()
 
+
 IF(SEG3D_BUILD_INTERFACE)
   LIST(APPEND SEG3D_CACHE_ARGS
-    #"-DQt5Core_QMAKE_EXECUTABLE:FILEPATH=${Qt5Core_QMAKE_EXECUTABLE}"
+    "-DQt5_PATH:PATH=${Qt5_PATH}"
+    "-DQt5Core_DIR:PATH=${Qt5Core_DIR}"
+    "-DQt5Gui_DIR:PATH=${Qt5Gui_DIR}"
+    "-DQt5OpenGL_DIR:PATH=${Qt5OpenGL_DIR}"
     "-DMACDEPLOYQT_OUTPUT_LEVEL:STRING=${MACDEPLOYQT_OUTPUT_LEVEL}"
   )
 ENDIF()

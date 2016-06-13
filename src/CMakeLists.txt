@@ -27,7 +27,11 @@
 #
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.9 FATAL_ERROR)
+#CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12 FATAL_ERROR)
 #CMAKE_MINIMUM_REQUIRED(VERSION 3.0 FATAL_ERROR)
+IF(POLICY CMP0020)
+  CMAKE_POLICY(SET CMP0020 NEW)
+ENDIF()
 IF(POLICY CMP0049)
   CMAKE_POLICY(SET CMP0049 NEW)
 ENDIF()
@@ -98,8 +102,8 @@ INCLUDE(CMake/RegisterUnitTest.cmake)
 ###########################################
 
 SET(SEG3D_MAJOR_VERSION 2 CACHE INTERNAL "Major version number" FORCE)
-SET(SEG3D_MINOR_VERSION 3 CACHE INTERNAL "Minor version number" FORCE)
-SET(SEG3D_PATCH_VERSION 2 CACHE INTERNAL "Patch version number" FORCE)
+SET(SEG3D_MINOR_VERSION 4 CACHE INTERNAL "Minor version number" FORCE)
+SET(SEG3D_PATCH_VERSION 0 CACHE INTERNAL "Patch version number" FORCE)
 
 
 ###########################################
@@ -219,7 +223,7 @@ ADD_DEFINITIONS(-DTINYXML_STATIC)
 ADD_DEFINITIONS(-DTIXML_USE_STL)
 
 # define z_prefix project wide if zlib was mangled
-IF (SCI_ZLIB_MANGLE)
+IF (DO_ZLIB_MANGLE)
   ADD_DEFINITIONS(-DZ_PREFIX)
 ENDIF()
 
@@ -247,25 +251,34 @@ ENDIF()
 #
 IF(SEG3D_BUILD_INTERFACE)
   # see http://doc.qt.io/qt-5/cmake-manual.html
-  FIND_PACKAGE(Qt5Core REQUIRED)
-  FIND_PACKAGE(Qt5Gui REQUIRED)
-  FIND_PACKAGE(Qt5OpenGL REQUIRED)
-  FIND_PACKAGE(Qt5Widgets REQUIRED)
+  FIND_PACKAGE(Qt5Core REQUIRED HINTS ${Qt5_PATH})
+  GET_TARGET_PROPERTY(QtCore_location_Release Qt5::Core LOCATION_Release)
+  #GET_TARGET_PROPERTY(QtCore_location_Debug Qt5::Core LOCATION_Debug)
 
-  #IF(NOT Qt5Widgets_FOUND OR NOT Qt5Gui_FOUND OR NOT Qt5OpenGL_FOUND OR NOT Qt5Widgets_FOUND)
+  FIND_PACKAGE(Qt5Gui REQUIRED HINTS ${Qt5_PATH})
+  GET_TARGET_PROPERTY(QtGui_location_Release Qt5::Gui LOCATION_Release)
+
+  FIND_PACKAGE(Qt5OpenGL REQUIRED HINTS ${Qt5_PATH})
+  GET_TARGET_PROPERTY(QtOpenGL_location_Release Qt5::OpenGL LOCATION_Release)
+
+  FIND_PACKAGE(Qt5Widgets REQUIRED HINTS ${Qt5_PATH})
+  GET_TARGET_PROPERTY(QtWidgets_location_Release Qt5::Widgets LOCATION_Release)
+
+  FIND_PACKAGE(Qt5Svg REQUIRED HINTS ${Qt5_PATH})
+  GET_TARGET_PROPERTY(QtSvg_location_Release Qt5::Svg LOCATION_Release)
+
   IF(NOT Qt5Widgets_FOUND OR NOT Qt5Gui_FOUND)
     MESSAGE(FATAL_ERROR "Qt5 is required for building the Seg3D GUI")
   ENDIF()
 
-  #SET(QT_USE_QTOPENGL 1)
-  #INCLUDE(${QT_USE_FILE})
-
   ADD_DEFINITIONS(-DQT_NO_KEYWORDS)
 
-  # should be in $PATH
+  # should be in ${Qt5_PATH}/bin
   IF(APPLE)
     FIND_PROGRAM(MACDEPLOYQT_EXE
+      HINTS ${Qt5_PATH} ${Qt5_PATH}/bin
       NAMES macdeployqt
+      NO_DEFAULT_PATH
     )
     IF(MACDEPLOYQT_EXE MATCHES "NOTFOUND")
       MESSAGE(FATAL_ERROR "macdeployqt is required to build the SCIRun app bundle. Please ensure that both are installed and in your path.")
@@ -275,6 +288,7 @@ IF(SEG3D_BUILD_INTERFACE)
   ELSE()
     IF(WIN32)
       FIND_PROGRAM(WINDEPLOYQT_EXE
+        HINTS ${Qt5_PATH} ${Qt5_PATH}/bin
         NAMES windeployqt.exe
       )
       IF (WINDEPLOYQT_EXE MATCHES "NOTFOUND")

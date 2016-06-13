@@ -47,8 +47,8 @@ CMAKE_PATCH_VERSION=2
 CMAKE_VERSION="${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION}"
 CMAKE="cmake-${CMAKE_VERSION}"
 
-OSX_TARGET_VERSION="10.7"
-OSX_TARGET_VERSION_SDK="/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk"
+OSX_TARGET_VERSION="10.8"
+OSX_TARGET_VERSION_SDK="/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk"
 OSX_TARGET_ARCH="x86_64"
 
 ##########################################################################
@@ -57,6 +57,7 @@ OSX_TARGET_ARCH="x86_64"
 
 printhelp() {
     echo -e "build.sh: configure Seg3D with CMake and build with either GNU make or Xcode [OS X only]"
+    echo -e "--qt5=<dir>\t\tPath to Qt5 directory (use full path, will contain lib and bin subdirectories)\n"
     echo -e "--debug\t\t\tBuilds Seg3D with debug symbols"
     echo -e "--release\t\tBuilds Seg3D without debug symbols [default]"
     echo -e "--verbose\t\tTurn on verbose build"
@@ -168,7 +169,7 @@ find_cmake() {
 
 # handle both types of OS X generators
 configure_seg3d_osx() {
-    local build_opts=$1
+    local build_opts=$@
 
     if [[ $setosxmin -eq 1 ]]; then
         build_opts="${build_opts} -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${OSX_TARGET_VERSION} -DCMAKE_OSX_SYSROOT:PATH=${OSX_TARGET_VERSION_SDK} -DCMAKE_OSX_ARCHITECTURES:STRING=${OSX_TARGET_ARCH}"
@@ -183,7 +184,7 @@ configure_seg3d_osx() {
 
 # generic Unix makefile build
 configure_seg3d_make() {
-    local build_opts=$1
+    local build_opts=$@
 
     build_opts="${build_opts} -DCMAKE_BUILD_TYPE:STRING=${buildtype} -DCMAKE_VERBOSE_MAKEFILE:BOOL=${verbosebuild}"
 
@@ -197,7 +198,7 @@ configure_seg3d() {
     fi
     try cd $builddir
 
-    local COMMON_BUILD_OPTS="-DBUILD_DOCUMENTATION:BOOL=$documentation"
+    local COMMON_BUILD_OPTS="-DBUILD_DOCUMENTATION:BOOL=$documentation -DQt5_PATH:PATH=$qt5dir"
 
     if [[ $osx -eq 1 ]]; then
         configure_seg3d_osx $COMMON_BUILD_OPTS
@@ -265,6 +266,7 @@ cmakeargs=
 setosxmin=0
 verbosebuild="OFF"
 builddir="$DIR/bin"
+qt5dir=
 xcodebuild=0
 documentation="OFF"
 
@@ -301,6 +303,9 @@ while [[ $1 != "" ]]; do
                     builddir="${DIR}/${dirarg}"
                 fi
             fi;;
+       --qt5=*)
+	   dirarg=`echo $1 | cut -c 7-`
+	   qt5dir=$dirarg;;
         --xcode-build)
             if [[ $osx -eq 1 ]]; then
               xcodebuild=1
