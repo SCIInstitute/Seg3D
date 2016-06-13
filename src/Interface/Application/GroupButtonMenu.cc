@@ -237,8 +237,7 @@ void GroupButtonMenu::prep_for_animation( bool move_time )
   if( move_time )
   {
     this->private_->ui_.facade_->setMinimumSize( this->private_->ui_.group_tools_->size() );
-    this->private_->ui_.facade_->setPixmap( 
-      QPixmap::grabWidget( this->private_->ui_.group_tools_ ) );
+    this->private_->ui_.facade_->setPixmap( this->private_->ui_.group_tools_->grab() );
     this->private_->ui_.group_tools_->hide();
     this->private_->ui_.facade_->show();
   }

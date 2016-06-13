@@ -111,6 +111,7 @@ namespace Seg3D
   " border: none;"
   "}"
   "QDockWidget{"
+  " background-color: rgb( " BACKGROUND_COLOR ") ;"
   " color: rgb( " FONT_COLOR ") ;"
   " titlebar-close-icon: url(:/General_Icons/exit.png);"
   " titlebar-normal-icon: url(:/General_Icons/maximize.png);"

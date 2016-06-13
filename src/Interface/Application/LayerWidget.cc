@@ -1242,7 +1242,7 @@ void LayerWidget::prep_for_animation( bool move_time )
   if( move_time )
   {
     this->private_->ui_.facade_widget_->setMinimumSize( this->private_->ui_.base_->size() );
-    this->private_->ui_.facade_widget_->setPixmap( QPixmap::grabWidget( this ) );
+    this->private_->ui_.facade_widget_->setPixmap( this->grab() );
     this->private_->ui_.base_->hide();
     this->private_->ui_.facade_widget_->show();
   }
