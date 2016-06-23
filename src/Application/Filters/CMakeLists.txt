@@ -149,6 +149,8 @@ SET(APPLICATION_FILTERS_ACTIONS_SRCS
   Actions/ActionPadFilter.cc
   Actions/ActionSingleThreshold.h
   Actions/ActionSingleThreshold.cc
+  Actions/ActionWatershedFilter.h
+  Actions/ActionWatershedFilter.cc
 )
 
 IF(BUILD_WITH_PYTHON)
