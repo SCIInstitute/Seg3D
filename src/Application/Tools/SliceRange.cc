@@ -66,7 +66,6 @@ SliceRange::~SliceRange()
 void SliceRange::execute( Core::ActionContextHandle context )
 {
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-std::cerr << "SliceRange::execute" << std::endl;
   ViewerHandle viewer = ViewerManager::Instance()->get_active_viewer();
   Core::VolumeSliceHandle vol_slice = viewer->get_active_volume_slice();
 
