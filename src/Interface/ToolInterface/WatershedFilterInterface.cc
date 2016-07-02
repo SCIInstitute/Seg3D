@@ -85,6 +85,9 @@ bool WatershedFilterInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Connect( this->private_->ui_.watershedLevel_val,
                               tool->watershedLevel_state_ );
   
+  QtUtils::QtBridge::Connect( this->private_->ui_.watershedVerboseLayerPrefix,
+							  tool->watershedVerboseLayerPrefix_state_ );
+  
   QtUtils::QtBridge::Enable( this->private_->ui_.runFilterButton,
                             tool->valid_target_state_ );
   

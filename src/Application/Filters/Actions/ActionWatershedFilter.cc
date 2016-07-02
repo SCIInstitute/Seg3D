@@ -81,7 +81,7 @@
 #include <sstream>
 
 
-#ifdef NDEBUG
+#ifndef NDEBUG
 //TIMING STUFF
 //		Courtesy of https://github.com/arhuaco/junkcode/blob/master/emqbit-bench/bench.c
 #include <sys/time.h>
@@ -153,7 +153,8 @@ public:
 	LayerHandle src_layer_;
 	//std::vector<LayerHandle> dst_layer_;
 	LayerHandle dst_layer_;
-
+	
+	bool watershedVerboseLayerPrefix_;
 	double watershedThreshold_val_;
 	double watershedLevel_val_;
 
@@ -161,12 +162,6 @@ public:
 	std::vector<WtrLabelType> watershed_image_output_labels_;
 
 public:
-
-	void report_debug_message( const std::string& msg )
-	{
-		std::string filter_message = this->get_filter_name() +": " + msg;
-		CORE_LOG_DEBUG( filter_message );
-	}
 	
 	// RUN:
 	// Implemtation of run of the Runnable base class, this function is called when the thread
@@ -176,7 +171,7 @@ public:
 	// a member variable of the algorithm class.
 	SCI_BEGIN_TYPED_ITK_RUN( this->src_layer_->get_data_type() )
 	{
-		this->report_debug_message( "Initializing watershedding filter..." );
+		CORE_LOG_DEBUG( this->get_filter_name() + ": Initializing watershedding filter..." );
 		
 		// Define the type of filter that we use.
 		typedef itk::WatershedImageFilter< TYPED_IMAGE_TYPE > filter_type;
@@ -203,7 +198,7 @@ public:
 		// Run the actual ITK filter.
 		// This needs to be in a try/catch statement as certain filters throw exceptions when they
 		// are aborted. In that case we will relay a message to the status bar for information.
-		this->report_debug_message( "Updating watershedding filter..." );
+		CORE_LOG_DEBUG( this->get_filter_name() + ": Updating watershedding filter..." );
 		try{ 
 			filter->Update(); 
 		} 
@@ -221,14 +216,14 @@ public:
 		// This one is set when the abort button is pressed and an abort is sent to ITK.
 		if ( this->check_abort() ) return;
 		
-		this->report_debug_message( "Casting filter to output type..." );
+		CORE_LOG_DEBUG( this->get_filter_name() + ": Casting filter to output type..." );
 		typedef itk::CastImageFilter< WtrImageTypeFilter, WtrImageTypeOut > CastImageFilter_FilterToOut;
 		CastImageFilter_FilterToOut::Pointer castImage_FilterToOut = CastImageFilter_FilterToOut::New();
 		castImage_FilterToOut->SetInput( filter->GetOutput() );
 		castImage_FilterToOut->Update();
 		
-		this->report_debug_message( "Reading in all labels (extreme patience required)..." );
-#ifdef NDEBUG
+		CORE_LOG_DEBUG( this->get_filter_name() + ": Reading in all labels (extreme patience required)..." );
+#ifndef NDEBUG
 		timestamp_t t0 = get_timestamp();
 #endif
 		// Relabel the output
@@ -244,15 +239,15 @@ public:
 			   this->watershed_image_output_labels_.push_back( val );
 			}
 		}
-#ifdef NDEBUG
+#ifndef NDEBUG
 		timestamp_t t1 = get_timestamp();
 		double secs = (t1 - t0) / 1000000.0L;
 		
 		std::ostringstream oss_msg;
 		oss_msg << "\t" << iterCount << " iterations for " << this->watershed_image_output_labels_.size() << " labels in " << secs << " seconds.";
-		this->report_debug_message( oss_msg.str() );
+		CORE_LOG_DEBUG( oss_msg.str() );
 #endif
-		this->report_debug_message( "Creating new labels..." );
+		CORE_LOG_DEBUG( this->get_filter_name() + ": Creating new labels..." );
 		
 		std::vector< WtrLabelType > new_labels;
 		// Could be an issue if the size of watershed_image_ouput_labels is larger than unsigned int can handle.  Doubt it, but still...
@@ -309,28 +304,28 @@ public:
  * make sure to insert the rgb image into the layer
  */ 		
  
-		this->report_debug_message( "Shuffling new labels..." );
+		CORE_LOG_DEBUG( this->get_filter_name() + ": Shuffling new labels..." );
 		random_shuffle( new_labels.begin(), new_labels.end() );
 		
-		this->report_debug_message( "Mapping old labels to new..." );
+		CORE_LOG_DEBUG( this->get_filter_name() + ": Mapping old labels to new..." );
 		std::map< WtrLabelType, WtrLabelType > label_map;
 		for( unsigned int i=0; i<this->watershed_image_output_labels_.size(); i++ ){
 			label_map[ this->watershed_image_output_labels_[i] ] = new_labels[i];
 		}
 		
-		this->report_debug_message( "Setting new labels..." );
+		CORE_LOG_DEBUG( this->get_filter_name() + ": Setting new labels..." );
 		for( wtrImg_iter.GoToBegin(); !wtrImg_iter.IsAtEnd(); ++wtrImg_iter )
 		{
 			wtrImg_iter.Set( label_map[ wtrImg_iter.Get() ] );
 		}
 		
-		this->report_debug_message( "Linking new labels..." );
+		CORE_LOG_DEBUG( this->get_filter_name() + ": Linking new labels..." );
 		this->watershed_image_output_labels_ = new_labels;
 		
-		this->report_debug_message( "Inserting output into layer..." );
+		CORE_LOG_DEBUG( this->get_filter_name() + ": Inserting output into layer..." );
 		this->insert_itk_image_into_layer( this->dst_layer_, castImage_FilterToOut->GetOutput() );
 		
-		this->report_debug_message( "Finished.\n" );
+		CORE_LOG_DEBUG( this->get_filter_name() + ": Finished.\n" );
 	}
 	SCI_END_TYPED_ITK_RUN()
   
@@ -347,8 +342,12 @@ public:
 	virtual std::string get_layer_prefix() const
 	{
 		std::ostringstream oss;
-		oss << "Watershed_threshold_" << Core::ExportToString(this->watershedThreshold_val_) << "_level_"
-		    << Core::ExportToString(this->watershedLevel_val_) << "_";
+		if( this->watershedVerboseLayerPrefix_ ){
+			oss << "Watershed_threshold_" << Core::ExportToString(this->watershedThreshold_val_) << "_level_"
+				<< Core::ExportToString(this->watershedLevel_val_) << "_";
+		} else {
+			oss << "Watershed";
+		}
 		return oss.str();
 	}
 };
@@ -362,6 +361,7 @@ bool ActionWatershedFilter::run( Core::ActionContextHandle& context,
 
 	// Copy the parameters over to the algorithm that runs the filter
 	algo->set_sandbox( this->sandbox_ );
+	algo->watershedVerboseLayerPrefix_ = this->watershedVerboseLayerPrefix_;
 	algo->watershedThreshold_val_ = this->watershedThreshold_val_;
 	algo->watershedLevel_val_ = this->watershedLevel_val_;
 
@@ -398,13 +398,14 @@ bool ActionWatershedFilter::run( Core::ActionContextHandle& context,
 
 
 void ActionWatershedFilter::Dispatch( Core::ActionContextHandle context, std::string target_layer,
-                                      double watershedThreshold_val, double watershedLevel_val )
+                                      bool watershedVerboseLayerPrefix, double watershedThreshold_val, double watershedLevel_val )
 {	
 	// Create a new action
 	ActionWatershedFilter* action = new ActionWatershedFilter;
 
 	// Setup the parameters
 	action->target_layer_ = target_layer;
+	action->watershedVerboseLayerPrefix_ = watershedVerboseLayerPrefix;
 	action->watershedThreshold_val_ = watershedThreshold_val;
 	action->watershedLevel_val_ = watershedLevel_val;
 

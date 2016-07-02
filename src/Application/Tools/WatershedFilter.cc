@@ -47,6 +47,7 @@ WatershedFilter::WatershedFilter( const std::string& toolid ) :
 SingleTargetTool( Core::VolumeType::DATA_E, toolid )
 {
   // Need to set ranges and default values for all parameters
+  this->add_state( "watershedVerboseLayerPrefix", this->watershedVerboseLayerPrefix_state_, false );
   this->add_state( "watershedThreshold_val", this->watershedThreshold_state_,           0.0100, 0.0000, 1.0000, .0010 );
   this->add_state( "watershedLevel_val", this->watershedLevel_state_,                   0.2000, 0.0000, 1.0000, .0010 );
 }
@@ -63,6 +64,7 @@ void WatershedFilter::execute( Core::ActionContextHandle context )
   
   ActionWatershedFilter::Dispatch( context,
 										 this->target_layer_state_->get(),
+										 this->watershedVerboseLayerPrefix_state_->get(),
                                          this->watershedThreshold_state_->get(),
                                          this->watershedLevel_state_->get()
                                          );
