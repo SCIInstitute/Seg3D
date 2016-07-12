@@ -119,7 +119,7 @@ void ActionDispatcher::post_and_wait_action( ActionHandle action,
       " that processes the actions. This will lead to a dead lock");
   }
 
-  CORE_LOG_DEBUG(std::string("Posting Action: ")+action->export_to_string());
+  CORE_LOG_DEBUG(std::string("Posting and Waiting Action: ") + action->export_to_string());
   ++this->private_->action_count_;
   Application::Instance()->post_and_wait_event( boost::bind( &ActionDispatcherPrivate::run_action, 
     this->private_.get(), action, action_context ) );
