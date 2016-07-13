@@ -44,9 +44,9 @@ class ActionExportLayer : public Core::Action
 CORE_ACTION( 
   CORE_ACTION_TYPE( "ExportLayer", "This action exports a data layer to file.")
   CORE_ACTION_ARGUMENT( "layer", "The name of the data layer to be exported." )
-  CORE_ACTION_ARGUMENT( "file_path", "A path, including the name of the file where the layer should be exported to." )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "exporter", "", "Optional name for a specific exporter." )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "extension", "", "Extension used for saving file." )
+  CORE_ACTION_ARGUMENT( "file_path", "A path, including the name of the file where the layer should be exported to. Can include file extension, or not (if extension parameter is defined). Extension parameter, if defined, overrides file extension in file_path." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "extension", "<none>", "Optional extension used for saving file. Overrides file extension in file_path." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "exporter", "<none>", "Optional name for a specific exporter. Supported exporters: [NRRD Exporter], [Matlab Exporter], [MRC Exporter], [ITK Data Exporter]." )
   CORE_ACTION_CHANGES_PROJECT_DATA()
 )
 
@@ -56,8 +56,8 @@ public:
   {
     this->add_parameter( this->layer_id_ );
     this->add_parameter( this->file_path_ );
-    this->add_parameter( this->exporter_ );
     this->add_parameter( this->extension_ );
+    this->add_parameter( this->exporter_ );
   }
   
   // -- Functions that describe action --
@@ -66,16 +66,18 @@ public:
   // Each action needs to be validated just before it is posted. This way we
   // enforce that every action that hits the main post_action signal will be
   // a valid action to execute.
-  virtual bool validate( Core::ActionContextHandle& context );
+  virtual bool validate( Core::ActionContextHandle& context ) override;
 
   // RUN:
   // Each action needs to have this piece implemented. It spells out how the
   // action is run. It returns whether the action was successful or not.
-  virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
+  virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result ) override;
   
   // CLEAR_CACHE:
   // Clear any objects that were given as a short cut to improve performance.
-  virtual void clear_cache(); 
+  virtual void clear_cache() override;
+
+  virtual bool post_create( Core::ActionContextHandle& context ) override;
 
   void initialize_action( const std::string& layer_id,
                           const std::string& file_path,
