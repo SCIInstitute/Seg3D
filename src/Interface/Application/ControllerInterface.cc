@@ -193,7 +193,7 @@ void ControllerInterface::post_action()
   std::string action_usage;
 
   Core::ActionHandle action;
-  if ( !( Core::ActionFactory::CreateAction( action_string, action, action_error, action_usage ) ) )
+  if ( ! Core::ActionFactory::CreateAction( action_string, action, action_error, action_usage ) )
   {
     qpointer_type controller( this );
     ControllerInterface::PostActionMessage( controller, action_error );
