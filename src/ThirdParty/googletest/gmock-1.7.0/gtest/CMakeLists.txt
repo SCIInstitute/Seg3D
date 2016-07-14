@@ -15,12 +15,16 @@ option(
   gtest_force_shared_crt
   "Use shared (DLL) run-time lib even when Google Test is built as static lib."
   OFF)
+mark_as_advanced(gtest_force_shared_crt)
 
 option(gtest_build_tests "Build all of gtest's own tests." OFF)
+mark_as_advanced(gtest_build_tests)
 
 option(gtest_build_samples "Build gtest's sample programs." OFF)
+mark_as_advanced(gtest_build_samples)
 
 option(gtest_disable_pthreads "Disable uses of pthreads in gtest." OFF)
+mark_as_advanced(gtest_disable_pthreads)
 
 # Defines pre_project_set_up_hermetic_build() and set_up_hermetic_build().
 include(cmake/hermetic_build.cmake OPTIONAL)
@@ -60,6 +64,18 @@ include_directories(
 link_directories(${gtest_BINARY_DIR}/src)
 
 ########################################################################
+# Customized SCI build
+#
+# Set library name, include directories in CMake cache
+
+SET(SCI_GTEST_LIBRARY gtest CACHE INTERNAL "Google Test library" FORCE)
+SET(SCI_GTESTMAIN_LIBRARY gtest_main CACHE INTERNAL "Google Test library" FORCE)
+
+SET(SCI_GTEST_INCLUDE ${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR}
+ CACHE INTERNAL "Google Test include directories " FORCE)
+
+
+########################################################################
 #
 # Defines the gtest & gtest_main libraries.  User tests should link
 # with one of them.
@@ -67,9 +83,9 @@ link_directories(${gtest_BINARY_DIR}/src)
 # Google Test libraries.  We build them using more strict warnings than what
 # are used for other targets, to ensure that gtest can be compiled by a user
 # aggressive about warnings.
-cxx_library(gtest "${cxx_strict}" src/gtest-all.cc)
-cxx_library(gtest_main "${cxx_strict}" src/gtest_main.cc)
-target_link_libraries(gtest_main gtest)
+cxx_library(${SCI_GTEST_LIBRARY} "${cxx_strict}" src/gtest-all.cc)
+cxx_library(${SCI_GTESTMAIN_LIBRARY} "${cxx_strict}" src/gtest_main.cc)
+target_link_libraries(${SCI_GTESTMAIN_LIBRARY} ${SCI_GTEST_LIBRARY})
 
 ########################################################################
 #
