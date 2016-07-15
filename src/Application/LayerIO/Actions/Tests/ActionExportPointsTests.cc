@@ -44,8 +44,9 @@
 using namespace Core;
 using namespace Seg3D;
 using namespace Testing::Utils;
+using namespace ::testing;
 
-class ActionExportPointsTests : public ::testing::Test
+class ActionExportPointsTests : public Test
 {
 protected:
   virtual void SetUp()
