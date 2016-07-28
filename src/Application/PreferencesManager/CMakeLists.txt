@@ -1,4 +1,3 @@
-
 #
 #  For more information, please see: http://software.sci.utah.edu
 # 
@@ -32,30 +31,31 @@
 ##################################################
 
 SET(APPLICATION_PREFERENCESMANAGER_SRCS
-    PreferencesManager.h
-    PreferencesManager.cc
-  )
+  PreferencesManager.h
+  PreferencesManager.cc
+)
 
 SET(APPLICATION_PREFERENCESMANAGER_ACTIONS_SRCS
   Actions/ActionSavePreferences.h
   Actions/ActionSavePreferences.cc
-  )
-
+)
 
 CORE_ADD_LIBRARY(Application_PreferencesManager ${APPLICATION_PREFERENCESMANAGER_SRCS}
-            ${APPLICATION_PREFERENCESMANAGER_ACTIONS_SRCS} )
-            
+  ${APPLICATION_PREFERENCESMANAGER_ACTIONS_SRCS}
+)
+
 TARGET_LINK_LIBRARIES(Application_PreferencesManager
-                      Core_Utils
-                      Core_EventHandler
-                      Core_Application
-                      Core_Interface
-                      Core_Action
-                      Core_State
-                      ${SCI_BOOST_LIBRARY}
-                      ${SCI_TINYXML_LIBRARY})
+  Core_Utils
+  Core_EventHandler
+  Core_Application
+  Core_Interface
+  Core_Action
+  Core_State
+  ${SCI_BOOST_LIBRARY}
+  ${SCI_TINYXML_LIBRARY}
+)
 
 # Register action classes
 REGISTER_LIBRARY_AND_CLASSES(Application_PreferencesManager
-                    ${APPLICATION_PREFERENCESMANAGER_ACTIONS_SRCS})
-
+  ${APPLICATION_PREFERENCESMANAGER_ACTIONS_SRCS}
+)

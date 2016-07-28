@@ -1,4 +1,3 @@
-
 #
 #  For more information, please see: http://software.sci.utah.edu
 # 
@@ -42,10 +41,11 @@ SET(APPLICATION_RENDERER_SHADER_SRCS
   IsosurfaceShader.vert
   OrientationArrowsShader.vert
   OrientationArrowsShader.frag
-  )
+)
   
 CORE_IMPORT_SHADER(APPLICATION_RENDERER_SHADER_STRING_SRCS
-          ${APPLICATION_RENDERER_SHADER_SRCS})
+  ${APPLICATION_RENDERER_SHADER_SRCS}
+)
           
 ##################################################
 # Set sources
@@ -62,21 +62,22 @@ SET(APPLICATION_RENDERER_SRCS
   OrientationArrows.cc
   OrientationArrowsShader.h
   OrientationArrowsShader.cc
-  )
+)
   
 CORE_ADD_LIBRARY(Application_Renderer ${APPLICATION_RENDERER_SRCS}
-      ${APPLICATION_RENDERER_SHADER_SRCS}
-      ${APPLICATION_RENDERER_SHADER_STRING_SRCS})
-            
-TARGET_LINK_LIBRARIES(Application_Renderer
-                      Core_Utils
-                      Core_EventHandler
-            Core_TextRenderer
-            Core_Graphics
-            Core_RenderResources
-            Core_Renderer
-            Core_VolumeRenderer
-                      Application_Viewer
-                      ${SCI_GLEW_LIBRARY}
-                      ${SCI_BOOST_LIBRARY})
+  ${APPLICATION_RENDERER_SHADER_SRCS}
+  ${APPLICATION_RENDERER_SHADER_STRING_SRCS}
+)
 
+TARGET_LINK_LIBRARIES(Application_Renderer
+  Core_Utils
+  Core_EventHandler
+  Core_TextRenderer
+  Core_Graphics
+  Core_RenderResources
+  Core_Renderer
+  Core_VolumeRenderer
+  Application_Viewer
+  ${SCI_GLEW_LIBRARY}
+  ${SCI_BOOST_LIBRARY}
+)

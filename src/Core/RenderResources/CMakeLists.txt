@@ -1,4 +1,3 @@
-
 #
 #  For more information, please see: http://software.sci.utah.edu
 # 
@@ -40,11 +39,11 @@ SET(CORE_RENDERRESOURCES_SRCS
   RenderContext.cc
   RenderContextBinding.h
   RenderContextBinding.cc
-  )
+)
 
 CORE_ADD_LIBRARY(Core_RenderResources ${CORE_RENDERRESOURCES_SRCS})
             
 TARGET_LINK_LIBRARIES(Core_RenderResources
-                      ${SCI_GLEW_LIBRARY}
-                      ${SCI_BOOST_LIBRARY})
-
+  ${SCI_GLEW_LIBRARY}
+  ${SCI_BOOST_LIBRARY}
+)

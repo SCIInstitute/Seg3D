@@ -1,4 +1,3 @@
-
 #
 #  For more information, please see: http://software.sci.utah.edu
 # 
@@ -34,7 +33,7 @@
 SET(APPLICATION_TOOLMANAGER_SRCS
   ToolManager.h
   ToolManager.cc
-  )
+)
 
 SET(APPLICATION_TOOLMANAGER_ACTIONS_SRCS
   Actions/ActionOpenTool.h
@@ -43,7 +42,7 @@ SET(APPLICATION_TOOLMANAGER_ACTIONS_SRCS
   Actions/ActionCloseTool.cc
   Actions/ActionActivateTool.h
   Actions/ActionActivateTool.cc
-  )
+)
 
 IF(BUILD_WITH_PYTHON)
   GENERATE_ACTION_PYTHON_WRAPPER(PYTHON_WRAPPER Application_ToolManager ${APPLICATION_TOOLMANAGER_ACTIONS_SRCS})
@@ -51,18 +50,20 @@ IF(BUILD_WITH_PYTHON)
 ENDIF(BUILD_WITH_PYTHON)
 
 CORE_ADD_LIBRARY(Application_ToolManager ${APPLICATION_TOOLMANAGER_SRCS}
-            ${APPLICATION_TOOLMANAGER_ACTIONS_SRCS} )
-            
+  ${APPLICATION_TOOLMANAGER_ACTIONS_SRCS}
+)
+
 TARGET_LINK_LIBRARIES(Application_ToolManager
-                      Core_Utils
-                      Core_Application
-                      Core_Interface
-                      Core_Action
-                      Core_State
-                      Application_Tool
-                      ${SCI_BOOST_LIBRARY})
+  Core_Utils
+  Core_Application
+  Core_Interface
+  Core_Action
+  Core_State
+  Application_Tool
+  ${SCI_BOOST_LIBRARY}
+)
 
 # Register action classes
 REGISTER_LIBRARY_AND_CLASSES(Application_ToolManager
-                    ${APPLICATION_TOOLMANAGER_ACTIONS_SRCS})
-                    
+  ${APPLICATION_TOOLMANAGER_ACTIONS_SRCS}
+)

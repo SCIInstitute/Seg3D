@@ -157,6 +157,13 @@ TEST_F(ActionTests, ActionImportFromString)
 
   std::string actionExportString = action.export_to_string();
   ASSERT_EQ( actionExportString, actionString );
+
+  ASSERT_TRUE( action.translate( context ) );
+  ASSERT_TRUE( action.post_create( context ) );
+  ASSERT_TRUE( action.validate( context ) );
+  ASSERT_TRUE( action.run( context, result ) );
+  ASSERT_FALSE( action.is_undoable() );
+  ASSERT_FALSE( action.changes_project_data() );
 }
 
 TEST_F(ActionTests, ActionImportFromStringWithError)
@@ -168,6 +175,13 @@ TEST_F(ActionTests, ActionImportFromStringWithError)
   std::string actionExportString = action.export_to_string();
   ASSERT_EQ( actionExportString, actionString );
   ASSERT_TRUE( error.empty() );
+
+  ASSERT_TRUE( action.translate( context ) );
+  ASSERT_TRUE( action.post_create( context ) );
+  ASSERT_TRUE( action.validate( context ) );
+  ASSERT_TRUE( action.run( context, result ) );
+  ASSERT_FALSE( action.is_undoable() );
+  ASSERT_FALSE( action.changes_project_data() );
 }
 
 TEST_F(ActionTests, ActionImportFromStringWithParam)
@@ -181,6 +195,13 @@ TEST_F(ActionTests, ActionImportFromStringWithParam)
   ASSERT_TRUE( retVal );
   std::string actionExportString = action.export_to_string();
   ASSERT_EQ( actionExportString, "DummyAction param_required=\'param\' " );
+
+  ASSERT_TRUE( action.translate( context ) );
+  ASSERT_TRUE( action.post_create( context ) );
+  ASSERT_TRUE( action.validate( context ) );
+  ASSERT_TRUE( action.run( context, result ) );
+  ASSERT_FALSE( action.is_undoable() );
+  ASSERT_FALSE( action.changes_project_data() );
 }
 
 TEST_F(ActionTests, ActionImportFromStringWithParamError)
@@ -192,6 +213,13 @@ TEST_F(ActionTests, ActionImportFromStringWithParamError)
   bool retVal = false;
   ASSERT_NO_THROW( retVal = action.import_from_string( actionImportStringWithParam, error ) );
   ASSERT_FALSE( retVal );
+
+  ASSERT_TRUE( action.translate( context ) );
+  ASSERT_TRUE( action.post_create( context ) );
+  ASSERT_TRUE( action.validate( context ) );
+  ASSERT_TRUE( action.run( context, result ) );
+  ASSERT_FALSE( action.is_undoable() );
+  ASSERT_FALSE( action.changes_project_data() );
 }
 
 TEST_F(ActionTests, ActionImportFromStringWithParamsError)
@@ -203,6 +231,13 @@ TEST_F(ActionTests, ActionImportFromStringWithParamsError)
   bool retVal = false;
   ASSERT_NO_THROW( retVal = action.import_from_string( actionImportStringWithParams, error ) );
   ASSERT_FALSE( retVal );
+
+  ASSERT_TRUE( action.translate( context ) );
+  ASSERT_TRUE( action.post_create( context ) );
+  ASSERT_TRUE( action.validate( context ) );
+  ASSERT_TRUE( action.run( context, result ) );
+  ASSERT_FALSE( action.is_undoable() );
+  ASSERT_FALSE( action.changes_project_data() );
 }
 
 TEST_F(ActionTests, ActionImportFromStringWithParamsWithOptionalError)
@@ -215,5 +250,12 @@ TEST_F(ActionTests, ActionImportFromStringWithParamsWithOptionalError)
   ASSERT_NO_THROW( retVal = action.import_from_string( actionImportStringWithParams, error ) );
   std::string actionExportString = action.export_to_string();
   ASSERT_FALSE( retVal );
+
+  ASSERT_TRUE( action.translate( context ) );
+  ASSERT_TRUE( action.post_create( context ) );
+  ASSERT_TRUE( action.validate( context ) );
+  ASSERT_TRUE( action.run( context, result ) );
+  ASSERT_FALSE( action.is_undoable() );
+  ASSERT_FALSE( action.changes_project_data() );
 }
 
