@@ -87,13 +87,13 @@ LiveWireImageFunction<TInputImage>
   this->m_GradientMagnitudeImage->SetSpacing( 
     this->GetInputImage()->GetSpacing() );
   this->m_GradientMagnitudeImage->SetRegions( 
-    this->GetInputImage()->GetRequestedRegion() );
+    this->GetInputImage()->GetLargestPossibleRegion() );
   this->m_GradientMagnitudeImage->Allocate();
 
   ImageRegionIterator<GradientImageType> ItG( this->m_GradientImage, 
-    this->m_GradientImage->GetRequestedRegion() );
+    this->m_GradientImage->GetLargestPossibleRegion() );
   ImageRegionIterator<RealImageType> ItM( this->m_GradientMagnitudeImage, 
-    this->m_GradientMagnitudeImage->GetRequestedRegion() );
+    this->m_GradientMagnitudeImage->GetLargestPossibleRegion() );
   for ( ItG.GoToBegin(), ItM.GoToBegin(); !ItG.IsAtEnd(); ++ItG, ++ItM )
     {
     ItM.Set( ( ItG.Get() ).GetNorm() );
@@ -140,21 +140,29 @@ LiveWireImageFunction<TInputImage>
   typename BooleanImageType::Pointer expanded = BooleanImageType::New();
   expanded->SetOrigin( this->GetInputImage()->GetOrigin() );
   expanded->SetSpacing( this->GetInputImage()->GetSpacing() );
-  expanded->SetRegions( this->GetInputImage()->GetRequestedRegion() );
+  expanded->SetRegions( this->GetInputImage()->GetLargestPossibleRegion() );
   expanded->Allocate();
   expanded->FillBuffer( false );
   expanded->SetPixel( this->m_AnchorSeed, true );
 
+  typename RealImageType::Pointer costImage = RealImageType::New();
+  costImage->SetOrigin( this->GetInputImage()->GetOrigin() );
+  costImage->SetSpacing( this->GetInputImage()->GetSpacing() );
+  costImage->SetRegions( this->GetInputImage()->GetLargestPossibleRegion() );
+  costImage->Allocate();
+  costImage->FillBuffer( NumericTraits<RealType>::max() );
+  costImage->SetPixel( this->m_AnchorSeed, 0.0 );
+  
   this->m_PathDirectionImage = OffsetImageType::New();
   this->m_PathDirectionImage->SetOrigin( this->GetInputImage()->GetOrigin() );
   this->m_PathDirectionImage->SetSpacing( this->GetInputImage()->GetSpacing() );
-  this->m_PathDirectionImage->SetRegions( this->GetInputImage()->GetRequestedRegion() );
+  this->m_PathDirectionImage->SetRegions( this->GetInputImage()->GetLargestPossibleRegion() );
   this->m_PathDirectionImage->Allocate();
 
   typename ConstNeighborhoodIterator<InputImageType>::RadiusType radius;
   radius.Fill( 1 );
   ConstNeighborhoodIterator<BooleanImageType> It( radius, expanded, 
-    expanded->GetRequestedRegion() );
+    expanded->GetLargestPossibleRegion() );
   unsigned int numberOfNeighbors = 1;
   for ( unsigned int d = 0; d < ImageDimension; d++ )
     {
@@ -251,7 +259,7 @@ LiveWireImageFunction<TInputImage>
         }  
 
 						IndexType neighborIndex = It.GetIndex( n );
-
+            
 						if ( this->m_MaskImage && this->m_MaskImage->GetPixel( 
 						  neighborIndex ) != this->m_InsidePixelValue )
 								{
@@ -296,19 +304,20 @@ LiveWireImageFunction<TInputImage>
 										vcl_acos( neighborMin / ( neighborNorm * vectorNorm ) ) )
 										/ vnl_math::pi;
 								}
-
+            
 						RealType neighborCost 
 						  = centerElement.m_Priority + scaleFactors[n] *
         ( fg * this->m_GradientMagnitudeWeight
 								+ fz * this->m_ZeroCrossingWeight
 								+ fd * this->m_GradientDirectionWeight );
 
-					 PriorityQueueElementType neighborElement( neighborIndex, neighborCost );
-
-						Q->Push( neighborElement ); 
-
-						this->m_PathDirectionImage->SetPixel( neighborIndex, 
-								centerElement.m_Element - neighborElement.m_Element ); 
+            PriorityQueueElementType neighborElement( neighborIndex, neighborCost );
+            if ( neighborCost < costImage->GetPixel( neighborIndex ) ) {
+              costImage->SetPixel( neighborIndex, neighborCost );
+              this->m_PathDirectionImage->SetPixel( neighborIndex,
+								  centerElement.m_Element - neighborElement.m_Element );
+              Q->Push( neighborElement );
+              }
 
 						PriorityQueueElementType element = Q->Peek();
 						while ( expanded->GetPixel( element.m_Element ) )
@@ -316,8 +325,8 @@ LiveWireImageFunction<TInputImage>
 								Q->Pop();
 								element = Q->Peek();
 								} 
-      }  
-    }  
+            }  
+    }
 }
 
 template <class TInputImage>
