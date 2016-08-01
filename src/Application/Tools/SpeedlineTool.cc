@@ -126,7 +126,6 @@ void SpeedlineToolPrivate::handle_path_changed()
 
 void SpeedlineToolPrivate::handle_slice_changed()
 {
-  this->execute_path();
 }
 
 void SpeedlineToolPrivate::handle_speed_params_changed()
@@ -144,7 +143,9 @@ void SpeedlineToolPrivate::handle_roi_mask_layer_changed( std::string layer_id )
 
 void SpeedlineToolPrivate::handle_target_data_layer_changed( std::string layer_id )
 {
+  Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
   this->tool_->valid_target_data_layer_state_->set( layer_id != Tool::NONE_OPTION_C );
+  this->execute_path();
 }
 
 // TODO: copied code - move to external helper function
@@ -165,6 +166,7 @@ bool SpeedlineToolPrivate::find_vertex( ViewerHandle viewer, int x, int y, int& 
   double range_x = pixel_width * 4;
   double range_y = pixel_height * 4;
 
+  Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
   std::vector< Point > vertices = this->tool_->vertices_state_->get();
 
   VolumeSliceType slice_type( VolumeSliceType::AXIAL_E );
@@ -201,6 +203,7 @@ bool SpeedlineToolPrivate::find_closest_vertex( ViewerHandle viewer, int x, int 
   viewer->window_to_world( x, y, world_x, world_y );
   
   // Step 2. Search for the closest vertex to the current mouse position
+  Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
   std::vector< Point > vertices = this->tool_->vertices_state_->get();
   VolumeSliceType slice_type( VolumeSliceType::AXIAL_E );
   if ( viewer->view_mode_state_->get() == Viewer::CORONAL_C )
@@ -309,7 +312,8 @@ void SpeedlineToolPrivate::execute_path()
   ActionContextHandle context = Interface::GetMouseActionContext();
   ViewerHandle viewer = ViewerManager::Instance()->get_active_viewer();
 
-  if ( ! this->tool_->valid_target_data_layer_state_->get() ) return;
+  if ( (! this->tool_->valid_target_data_layer_state_->get()) ||
+     this->tool_->target_data_layer_state_->get() == Tool::NONE_OPTION_C ) return;
 
   // If no viewer specified, use the current active viewer
   if ( ! viewer )
@@ -392,7 +396,7 @@ SpeedlineTool::SpeedlineTool( const std::string& toolid ) :
     boost::bind( &SpeedlineToolPrivate::handle_roi_mask_layer_changed, this->private_, _2 ) ) );
 
   this->add_state( "data_layer", this->target_data_layer_state_, Tool::NONE_OPTION_C, empty_list );
-  this->add_extra_layer_input( this->target_data_layer_state_, VolumeType::DATA_E, false, false );
+  this->add_extra_layer_input( this->target_data_layer_state_, VolumeType::DATA_E, true, true );
 
   this->add_state( "valid_target_data_layer", this->valid_target_data_layer_state_, false );
   this->add_connection( this->target_data_layer_state_->value_changed_signal_.connect(
@@ -426,6 +430,7 @@ SpeedlineTool::~SpeedlineTool()
 void SpeedlineTool::activate()
 {
   bool is_recompute = false;
+  Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
 
   for ( size_t i = 0; i < 6; ++i )
   {
@@ -526,12 +531,14 @@ bool SpeedlineTool::handle_key_press( ViewerHandle viewer, int key, int modifier
 void SpeedlineTool::reset( ActionContextHandle context )
 {
   ActionClear::Dispatch( context, this->vertices_state_ );
+  Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
   Application::PostEvent( boost::bind( &StateSpeedlinePath::set,
     this->path_state_, Path(), ActionSource::NONE_E ) );
 }
 
 void SpeedlineTool::reset_parameters( ActionContextHandle context )
 {
+  Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
   Application::PostEvent( boost::bind( &StateRangedDouble::set,
     this->grad_mag_weight_state_, 0.43, ActionSource::NONE_E ) );
   Application::PostEvent( boost::bind( &StateRangedDouble::set,
