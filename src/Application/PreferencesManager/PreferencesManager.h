@@ -87,6 +87,7 @@ public:
   Core::StateBoolHandle generate_osx_project_bundle_state_;
 
   Core::StateBoolHandle export_dicom_headers_state_;
+  Core::StateBoolHandle export_nrrd0005_state_;
   
   //Viewers Preferences
   Core::StateOptionHandle default_viewer_mode_state_;

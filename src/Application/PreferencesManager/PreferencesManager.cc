@@ -169,6 +169,7 @@ void PreferencesManager::initialize_states()
   this->add_state( "compression_level", this->compression_level_state_, 2, 0, 9, 1 );
   this->add_state( "slice_step_multiplier", this->slice_step_multiplier_state_, 8 );
   this->add_state( "add_dicom_headers", this->export_dicom_headers_state_, true );
+  this->add_state( "use_nrrd0005_format", this->export_nrrd0005_state_, true );
   
   this->add_state( "axis_labels_option", this->axis_labels_option_state_, "sca", 
     "sca=Sagittal/Coronal/Axial|sct=Sagittal/Coronal/Transverse|"
