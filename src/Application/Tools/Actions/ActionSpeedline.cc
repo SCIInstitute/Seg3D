@@ -204,13 +204,13 @@ public:
 
     typename LiveWireType::Pointer livewire = LiveWireType::New();
 
-    livewire->SetInputImage( input_image_2D );
-
     livewire->SetGradientMagnitudeWeight( this->grad_mag_weight_ );
     livewire->SetZeroCrossingWeight( this->zero_cross_weight_ );
     livewire->SetGradientDirectionWeight( this->grad_dir_weight_ );
     livewire->SetUseImageSpacing( this->image_spacing_ );
     livewire->SetUseFaceConnectedness( this->face_conn_ );
+
+    livewire->SetInputImage( input_image_2D );
 
     if ( this->roi_mask_layer_id_ != "<none>" )
     {
@@ -218,8 +218,8 @@ public:
       typename MASK_IMAGE_TYPE_2D::Pointer roi_mask_image_2D =
         extract_2D_image< MASK_IMAGE_TYPE, MASK_IMAGE_TYPE_2D >( roi_mask_image->get_image() );
 
-      livewire->SetMaskImage( roi_mask_image_2D );
       livewire->SetInsidePixelValue( this->roi_mask_layer_->get_mask_volume()->get_mask_data_block()->get_mask_bit() );
+      livewire->SetMaskImage( roi_mask_image_2D );
     }
 
     const size_t num_of_vertices = this->vertices_.size();
@@ -246,6 +246,7 @@ public:
         std::ostringstream oss;
         oss << "Error computing path at " << p0 << " and " << p1 << "." << std::endl;
         this->report_error( oss.str() );
+        StateEngine::lock_type lock( StateEngine::GetMutex() );
         Application::PostEvent( boost::bind( &StateSpeedlinePath::set, world_path_state, Path(), ActionSource::NONE_E ) );
         return;
       }
@@ -260,6 +261,7 @@ public:
       this->world_paths_.add_one_path( new_path );
     }
 
+    StateEngine::lock_type lock( StateEngine::GetMutex() );
     Application::PostEvent( boost::bind( &StateSpeedlinePath::set, world_path_state, this->world_paths_, ActionSource::NONE_E ) );
   }
 
