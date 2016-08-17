@@ -163,6 +163,12 @@ public:
   /// for a provenance record.
   virtual void clear_cache();
 
+  /// POST_CREATE:
+  /// Extra processing needed after creating action (either from import_from_string
+  /// or through the constructor) and before validation.
+  /// This is a good place to manipulate action parameters.
+  virtual bool post_create( ActionContextHandle& context ) { return true; }
+
   // -- Action parameters --
 public:
 

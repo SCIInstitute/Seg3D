@@ -99,6 +99,7 @@ public:
 
 void SingleTargetToolPrivate::update_dependent_layers()
 {
+  Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
   if ( this->tool_->valid_primary_target_state_->get()  )
   {
     // Fill in the new list and reset the option to the first one, if none of the options
@@ -136,6 +137,7 @@ void SingleTargetToolPrivate::update_dependent_layers()
 
 void SingleTargetToolPrivate::update_independent_layers()
 {
+  Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
   for ( size_t i = 0; i < this->independent_layers_.size(); ++i )
   {
     std::vector< LayerIDNamePair > layer_names( 1, 
@@ -150,6 +152,7 @@ void SingleTargetToolPrivate::update_independent_layers()
 
 void SingleTargetToolPrivate::handle_active_layer_changed( LayerHandle layer )
 {
+  Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
   if ( ! this->tool_->use_active_layer_state_->get() )
   {
     return;
@@ -176,6 +179,7 @@ void SingleTargetToolPrivate::handle_use_active_layer_changed( bool use_active_l
 {
   if ( use_active_layer )
   {
+    Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
     LayerHandle layer = LayerManager::Instance()->get_active_layer();
     this->tool_->valid_primary_target_state_->set( layer && layer->has_valid_data() &&
       ( layer->get_type() & this->target_type_ ) );
@@ -187,6 +191,7 @@ void SingleTargetToolPrivate::handle_use_active_layer_changed( bool use_active_l
 
 void SingleTargetToolPrivate::handle_target_layer_changed( std::string layer_id )
 {
+  Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
   if ( this->tool_->use_active_layer_state_->get() )
   {
     LayerHandle active_layer = LayerManager::Instance()->get_active_layer();
@@ -254,6 +259,7 @@ void SingleTargetToolPrivate::handle_layer_name_changed( std::string layer_id )
 
 void SingleTargetToolPrivate::check_dependent_layers()
 {
+  Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
   for( size_t j = 0; j < this->dependent_layers_.size(); j++ )
   {
     if ( !this->dependent_layers_[ j ].required_ ) continue;

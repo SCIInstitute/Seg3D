@@ -60,3 +60,5 @@ TARGET_LINK_LIBRARIES(Core_Action
   Core_EventHandler
   Core_Application
   ${SCI_BOOST_LIBRARY})
+
+ADD_TEST_DIR(Tests)

@@ -1,22 +1,21 @@
-#
 #  For more information, please see: http://software.sci.utah.edu
-# 
+#
 #  The MIT License
-# 
+#
 #  Copyright (c) 2016 Scientific Computing and Imaging Institute,
 #  University of Utah.
-# 
-#  
+#
+#
 #  Permission is hereby granted, free of charge, to any person obtaining a
 #  copy of this software and associated documentation files (the "Software"),
 #  to deal in the Software without restriction, including without limitation
 #  the rights to use, copy, modify, merge, publish, distribute, sublicense,
 #  and/or sell copies of the Software, and to permit persons to whom the
 #  Software is furnished to do so, subject to the following conditions:
-# 
+#
 #  The above copyright notice and this permission notice shall be included
-#  in all copies or substantial portions of the Software. 
-# 
+#  in all copies or substantial portions of the Software.
+#
 #  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
 #  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 #  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -26,36 +25,16 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
-##################################################
-# Set sources
-##################################################
-
-SET(APPLICATION_PREFERENCESMANAGER_SRCS
-  PreferencesManager.h
-  PreferencesManager.cc
+SET(Core_Action_Tests_SRCS
+  ActionTests.cc
 )
 
-SET(APPLICATION_PREFERENCESMANAGER_ACTIONS_SRCS
-  Actions/ActionSavePreferences.h
-  Actions/ActionSavePreferences.cc
+REGISTER_UNIT_TEST(Core_Action_Tests
+  ${Core_Action_Tests_SRCS}
 )
 
-CORE_ADD_LIBRARY(Application_PreferencesManager ${APPLICATION_PREFERENCESMANAGER_SRCS}
-  ${APPLICATION_PREFERENCESMANAGER_ACTIONS_SRCS}
-)
-
-TARGET_LINK_LIBRARIES(Application_PreferencesManager
-  Core_Utils
-  Core_EventHandler
-  Core_Application
-  Core_Interface
+TARGET_LINK_LIBRARIES(Core_Action_Tests
   Core_Action
-  Core_State
-  ${SCI_BOOST_LIBRARY}
+  Testing_Utils
   ${SCI_TINYXML_LIBRARY}
-)
-
-# Register action classes
-REGISTER_LIBRARY_AND_CLASSES(Application_PreferencesManager
-  ${APPLICATION_PREFERENCESMANAGER_ACTIONS_SRCS}
 )

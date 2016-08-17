@@ -13,7 +13,7 @@ option(gmock_build_tests "Build all of Google Mock's own tests." OFF)
 
 # A directory to find Google Test sources.
 if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/gtest/CMakeLists.txt")
-  set(gtest_dir gtest)
+  set(gtest_dir ${CMAKE_CURRENT_SOURCE_DIR}/gtest)
 else()
   set(gtest_dir ../gtest)
 endif()
@@ -64,6 +64,17 @@ include_directories("${gmock_SOURCE_DIR}/include"
                     "${gtest_SOURCE_DIR}")
 
 ########################################################################
+# Customized SCI build
+#
+# Set library name, include directories in CMake cache
+
+SET(SCI_GMOCK_LIBRARY gmock CACHE INTERNAL "Google Mock library" FORCE)
+SET(SCI_GMOCKMAIN_LIBRARY gmock_main CACHE INTERNAL "Google Mock library" FORCE)
+
+SET(SCI_GMOCK_INCLUDE ${gmock_SOURCE_DIR}/include ${gmock_SOURCE_DIR}
+ CACHE INTERNAL "Google Mock include directories " FORCE)
+
+########################################################################
 #
 # Defines the gmock & gmock_main libraries.  User tests should link
 # with one of them.
@@ -71,12 +82,12 @@ include_directories("${gmock_SOURCE_DIR}/include"
 # Google Mock libraries.  We build them using more strict warnings than what
 # are used for other targets, to ensure that Google Mock can be compiled by
 # a user aggressive about warnings.
-cxx_library(gmock
+cxx_library(${SCI_GMOCK_LIBRARY}
             "${cxx_strict}"
             "${gtest_dir}/src/gtest-all.cc"
             src/gmock-all.cc)
 
-cxx_library(gmock_main
+cxx_library(${SCI_GMOCKMAIN_LIBRARY}
             "${cxx_strict}"
             "${gtest_dir}/src/gtest-all.cc"
             src/gmock-all.cc

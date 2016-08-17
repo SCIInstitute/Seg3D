@@ -69,7 +69,7 @@ boost::python::object RunActionFromPython( boost::python::tuple args,
 
   Core::ActionHandle action;
 
-  if ( !Core::ActionFactory::CreateAction( action_str, action, action_error, action_usage ) )
+  if ( ! Core::ActionFactory::CreateAction( action_str, action, action_error, action_usage ) )
   {
     action_error = action_error + "\nUsage: " + action_usage;
     PyErr_SetString( PyExc_Exception, action_error.c_str() );

@@ -1,4 +1,3 @@
-
 #
 #  For more information, please see: http://software.sci.utah.edu
 # 
@@ -34,7 +33,7 @@
 SET(APPLICATION_VIEWMANAGER_SRCS
   ViewerManager.h
   ViewerManager.cc
-  )
+)
 
 SET(APPLICATION_VIEWMANAGER_ACTIONS_SRCS
   Actions/ActionPickPoint.h
@@ -43,7 +42,7 @@ SET(APPLICATION_VIEWMANAGER_ACTIONS_SRCS
   Actions/ActionNewFeature.cc
   Actions/ActionDeleteFeature.h
   Actions/ActionDeleteFeature.cc
-  )
+)
 
 IF(BUILD_WITH_PYTHON)
   GENERATE_ACTION_PYTHON_WRAPPER(PYTHON_WRAPPER Application_ViewerManager ${APPLICATION_VIEWMANAGER_ACTIONS_SRCS})
@@ -51,19 +50,21 @@ IF(BUILD_WITH_PYTHON)
 ENDIF(BUILD_WITH_PYTHON)
 
 CORE_ADD_LIBRARY(Application_ViewerManager ${APPLICATION_VIEWMANAGER_SRCS}
-            ${APPLICATION_VIEWMANAGER_ACTIONS_SRCS} )
+ ${APPLICATION_VIEWMANAGER_ACTIONS_SRCS}
+)
             
 TARGET_LINK_LIBRARIES(Application_ViewerManager
-                      Core_Utils
-                      Core_Application
-                      Core_Interface
-                      Core_Action
-                      Core_State
-          Core_VolumeRenderer
-                      Application_Viewer
-                      ${SCI_BOOST_LIBRARY})
+  Core_Utils
+  Core_Application
+  Core_Interface
+  Core_Action
+  Core_State
+  Core_VolumeRenderer
+  Application_Viewer
+  ${SCI_BOOST_LIBRARY}
+)
 
 # Register action classes
 REGISTER_LIBRARY_AND_CLASSES(Application_ViewerManager
-                    ${APPLICATION_VIEWMANAGER_ACTIONS_SRCS})
-                    
+  ${APPLICATION_VIEWMANAGER_ACTIONS_SRCS}
+)

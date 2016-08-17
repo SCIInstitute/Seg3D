@@ -30,6 +30,7 @@ SET(TESTING_UTILS_SRCS
   DataBlockSource.cc
   FilesystemPaths.h
   FilesystemPaths.cc
+  MockAction.h
 )
 
 CORE_ADD_LIBRARY(Testing_Utils ${TESTING_UTILS_SRCS} )
@@ -39,4 +40,5 @@ TARGET_LINK_LIBRARIES(Testing_Utils
   Core_Geometry
   ${SCI_BOOST_LIBRARY}
   ${SCI_ITK_LIBRARY}
+  ${SCI_GMOCKMAIN_LIBRARY}
 )

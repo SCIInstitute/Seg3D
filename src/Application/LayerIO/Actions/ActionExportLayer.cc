@@ -56,8 +56,11 @@ void ActionExportLayer::initialize_action( const std::string& layer_id,
   this->file_path_ = file_path;
   this->layer_exporter_ = layer_exporter;
   this->extension_ = extension;
+}
 
-  if ( this->extension_.empty() )
+bool ActionExportLayer::post_create( Core::ActionContextHandle& context )
+{
+  if ( this->extension_.empty() || this->extension_ == "<none>" )
   {
     std::tie( this->extension_, this->filename_base_ ) = Core::GetFullExtension( boost::filesystem::path( this->file_path_ ) );
   }
@@ -68,7 +71,7 @@ void ActionExportLayer::initialize_action( const std::string& layer_id,
     this->filename_base_ = boost::filesystem::path( this->file_path_ ).stem().string();
   }
 
-  if ( this->exporter_.empty() )
+  if ( this->exporter_.empty() || this->exporter_ ==  "<none>" || ( ! this->layer_exporter_ ) )
   {
     if ( this->extension_ == ".nrrd" ) this->exporter_ = "NRRD Exporter";
     else if ( this->extension_ == ".mat" ) this->exporter_ = "Matlab Exporter";
@@ -77,6 +80,7 @@ void ActionExportLayer::initialize_action( const std::string& layer_id,
     // assume all other file extensions supported by ITK
     else if ( this->extension_ != "" ) this->exporter_ = "ITK Data Exporter";
   }
+  return true;
 }
 
 bool ActionExportLayer::validate( Core::ActionContextHandle& context )
@@ -85,64 +89,71 @@ bool ActionExportLayer::validate( Core::ActionContextHandle& context )
   // error if not
   if ( ! LayerManager::CheckLayerExistence( this->layer_id_, context ) ) return false;
 
-    std::vector< LayerHandle > layer_handles;
-  
-    LayerHandle layer = LayerManager::Instance()->find_layer_by_id( this->layer_id_ );
-    if (! layer ) 
-    {
-      return false;
-    }
+  std::vector< LayerHandle > layer_handles;
 
-    if ( layer->get_type() == Core::VolumeType::DATA_E )
-    {
-      layer_handles.push_back( layer );
-    }
-    else
-    {
-      context->report_error("ExportLayer exports a data layer to file. Use ExportSegmentation for mask layers.");
-      return false;
-    }
+  LayerHandle layer = LayerManager::Instance()->find_layer_by_id( this->layer_id_ );
+  if (! layer )
+  {
+    return false;
+  }
 
-    if ( this->exporter_.empty() && this->extension_.empty() )
-    {
-      context->report_error( "Either exporter or file extension needed." );
-    }
+  if ( layer->get_type() == Core::VolumeType::DATA_E )
+  {
+    layer_handles.push_back( layer );
+  }
+  else
+  {
+    context->report_error("ExportLayer exports a data layer to file. Use ExportSegmentation for mask layers.");
+    return false;
+  }
 
-    if ( ! LayerIO::Instance()->create_exporter( this->layer_exporter_, layer_handles,
-                                                 this->exporter_, this->extension_ ) )
-    {
-      context->report_error( "Could not create the specified exporter." );
-      return false;
-    }
-  
-    // first we validate the path for saving the segmentation
-    boost::filesystem::path segmentation_path( this->file_path_ );
-    if ( ! boost::filesystem::exists ( segmentation_path.parent_path() ) )
-    {
-      std::ostringstream error;
-      error << "The path '" << this->file_path_ << "' does not exist.";
-      context->report_error( error.str() );
-      return false;
-    }
+  if ( this->exporter_.empty() && this->extension_.empty() )
+  {
+    context->report_error( "Either exporter or file extension needed." );
+  }
 
-    return true; // validated
+  // first we validate the path for saving the layer
+  boost::filesystem::path layer_path( this->file_path_ );
+  if ( ! boost::filesystem::exists ( layer_path.parent_path() ) )
+  {
+    std::ostringstream error;
+    error << "The path '" << this->file_path_ << "' does not exist.";
+    context->report_error( error.str() );
+    return false;
+  }
+
+  if ( ! LayerIO::Instance()->create_exporter( this->layer_exporter_, layer_handles,
+                                              this->exporter_, this->extension_ ) )
+  {
+    context->report_error( "Could not create the specified exporter." );
+    return false;
+  }
+
+  return true; // validated
 }
 
 bool ActionExportLayer::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
   boost::filesystem::path filename_and_path = boost::filesystem::path( this->file_path_ );
   std::string message = std::string( "Exporting '" + this->filename_base_ + "'" );
+  CORE_LOG_DEBUG( message );
 
   Core::ActionProgressHandle progress =
     Core::ActionProgressHandle( new Core::ActionProgress( message ) );
 
   progress->begin_progress_reporting();
-    
-  this->layer_exporter_->export_layer( LayerIO::DATA_MODE_C, filename_and_path.parent_path().string(),
-                                       this->filename_base_ );
 
-  ProjectManager::Instance()->current_file_folder_state_->set( 
-    filename_and_path.parent_path().string() );
+  if ( ! this->layer_exporter_->export_layer( LayerIO::DATA_MODE_C, filename_and_path.parent_path().string(), this->filename_base_ ) )
+  {
+    std::ostringstream oss;
+    oss << "Exporting " << filename_and_path.string() << " failed" << std::endl;
+    context->report_error( oss.str() );
+
+    progress->end_progress_reporting();
+    return false;
+  }
+
+  ProjectManager::Instance()->current_file_folder_state_->set( filename_and_path.parent_path().string() );
   ProjectManager::Instance()->checkpoint_projectmanager();
 
   progress->end_progress_reporting();
