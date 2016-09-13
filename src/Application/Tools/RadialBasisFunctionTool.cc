@@ -60,6 +60,7 @@ RadialBasisFunctionTool::RadialBasisFunctionTool( const std::string& toolid ) :
   this->add_state( "kernel", this->kernel_state_, "thin_plate",
                    "thin_plate|gaussian|multi_quadratic" );
   this->add_state( "view_modes", this->view_modes_state_ );
+  this->add_state( "use_2D_convex_hull", this->use_2D_convex_hull_state_, false );
 }
 
 RadialBasisFunctionTool::~RadialBasisFunctionTool()
@@ -158,6 +159,7 @@ void RadialBasisFunctionTool::execute( Core::ActionContextHandle context )
                                        this->seed_points_state_->get(),
                                        this->view_modes_state_->get(),
                                        this->normalOffset_state_->get(),
+                                       this->use_2D_convex_hull_state_->get(),
                                        this->kernel_state_->get()
                                      );
 }

@@ -72,7 +72,7 @@ SET(INTERFACE_TOOLINTERFACE_SRCS
   SpeedlineToolInterface.cc
   PointsSelectToolInterface.cc
   PadToolInterface.cc
-  #RadialBasisFunctionToolInterface.cc
+  RadialBasisFunctionToolInterface.cc
 )
 
 SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
@@ -121,7 +121,7 @@ SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
   SpeedlineToolInterface.h
   PointsSelectToolInterface.h
   PadToolInterface.h
-  #RadialBasisFunctionToolInterface.h
+  RadialBasisFunctionToolInterface.h
 )
 
 SET(INTERFACE_TOOLINTERFACE_NO_MOC_SRCS
@@ -173,7 +173,7 @@ SET(INTERFACE_TOOLINTERFACE_UI_SRCS
   SpeedlineToolInterface.ui
   PointsSelectToolInterface.ui
   PadToolInterface.ui
-  #RadialBasisFunctionToolInterface.ui
+  RadialBasisFunctionToolInterface.ui
 )
 
 ##################################################

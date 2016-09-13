@@ -104,6 +104,7 @@ class ActionRadialBasisFunctionPrivate
 public:
   ActionRadialBasisFunctionPrivate() :
     normalOffset_(0),
+    use2DConvexHull_(false),
     thresholdValue_(0) {}
 
   LayerHandle srcLayer_;
@@ -112,6 +113,7 @@ public:
   VertexList vertices_;
   ViewModeList view_modes_;
   double normalOffset_;
+  bool use2DConvexHull_;
   std::string kernel_;
   double thresholdValue_;
 };
@@ -190,7 +192,7 @@ public:
     }
 
     RBFInterface rbfAlgo( rbfPointData, rbfOrigin, rbfGridSize, rbfGridSpacing,
-                          this->actionInternal_->normalOffset_, axisData, kernel );
+                          this->actionInternal_->normalOffset_, axisData, this->actionInternal_->use2DConvexHull_, kernel );
     this->actionInternal_->thresholdValue_ = rbfAlgo.getThresholdValue();
 
     Core::DataBlockHandle dstDataBlock = Core::StdDataBlock::New( srcGridTransform, Core::DataType::FLOAT_E );
@@ -254,6 +256,7 @@ ActionRadialBasisFunction::ActionRadialBasisFunction() :
   this->add_parameter( this->private_->vertices_ );
   this->add_parameter( this->private_->view_modes_ );
   this->add_parameter( this->private_->normalOffset_ );
+  this->add_parameter( this->private_->use2DConvexHull_ );
   this->add_parameter( this->private_->kernel_ );
   this->add_parameter( this->sandbox_ );
 }
@@ -354,6 +357,7 @@ void ActionRadialBasisFunction::Dispatch(
                                            const VertexList& vertices,
                                            const ViewModeList& viewModes,
                                            double normalOffset,
+                                           bool use2DConvexHull,
                                            const std::string& kernel
                                          )
 {
@@ -362,6 +366,7 @@ void ActionRadialBasisFunction::Dispatch(
   action->private_->vertices_ = vertices;
   action->private_->view_modes_ = viewModes;
   action->private_->normalOffset_ = normalOffset;
+  action->private_->use2DConvexHull_ = use2DConvexHull;
   action->private_->kernel_ = kernel;
 
   ActionDispatcher::PostAction( ActionHandle( action ), context );

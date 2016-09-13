@@ -84,6 +84,8 @@ bool RadialBasisFunctionToolInterface::build_widget( QFrame* frame )
 	QtUtils::QtBridge::Connect( this->private_->ui_.normalOffsetRange_, tool->normalOffset_state_ );
 	QtUtils::QtBridge::Connect( this->private_->ui_.kernel_, tool->kernel_state_ );
 
+  QtUtils::QtBridge::Connect( this->private_->ui_.use2DConvexHull_, tool->use_2D_convex_hull_state_ );
+
 	QtUtils::QtBridge::Connect( this->private_->ui_.runFilterButton_, boost::bind(
 		&Tool::execute, tool, Core::Interface::GetWidgetActionContext() ) );
 	QtUtils::QtBridge::Connect( this->private_->ui_.clearSeedsButton_, boost::bind(
