@@ -34,6 +34,7 @@
 SET(QTUTILS_BRIDGE_SRCS
   QtBridge.cc
   QtConnection.cc
+  detail/QtGroupBoxConnector.cc
   detail/QtComboBoxConnector.cc
   detail/QtSpinBoxConnector.cc
   detail/QtLineEditConnector.cc
@@ -60,6 +61,7 @@ SET(QTUTILS_BRIDGE_SRCS
 
 SET(QTUTILS_BRIDGE_MOC_SRCS
   detail/QtConnectorBase.h
+  detail/QtGroupBoxConnector.h
   detail/QtComboBoxConnector.h
   detail/QtSpinBoxConnector.h
   detail/QtLineEditConnector.h

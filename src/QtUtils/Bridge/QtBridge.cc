@@ -64,6 +64,7 @@
 #include <QtUtils/Bridge/detail/QtTristateToolButtonConnector.h>
 #include <QtUtils/Bridge/detail/QtTransferFunctionSceneConnector.h>
 #include <QtUtils/Bridge/detail/QtTransferFunctionCurveConnector.h>
+#include <QtUtils/Bridge/detail/QtGroupBoxConnector.h>
 
 namespace QtUtils
 {
@@ -86,12 +87,30 @@ Core::ConnectionHandle QtBridge::ConnectBoolean( QAbstractButton* qbutton, boost
     new QtAbstractButtonConnector( qbutton, function ) ) );
 }
 
-Core::ConnectionHandle QtBridge::Connect( QAbstractButton* qbutton, 
-             std::vector<Core::StateBoolHandle>& state,
-             Core::StateIntSetHandle& index)
+Core::ConnectionHandle QtBridge::Connect( QAbstractButton* qbutton,
+                                          std::vector<Core::StateBoolHandle>& state,
+                                          Core::StateIntSetHandle& index)
 {
   return Core::ConnectionHandle( new QtConnection(
     new QtAbstractButtonVectorConnector( qbutton, state, index ) ) );
+}
+
+Core::ConnectionHandle QtBridge::Connect( QGroupBox* qbox, Core::StateBoolHandle& state )
+{
+  return Core::ConnectionHandle( new QtConnection(
+    new QtGroupBoxConnector( qbox, state ) ) );
+}
+
+Core::ConnectionHandle QtBridge::Connect( QGroupBox* qbox, boost::function< void() > function )
+{
+  return Core::ConnectionHandle( new QtConnection(
+    new QtGroupBoxConnector( qbox, function ) ) );
+}
+
+Core::ConnectionHandle QtBridge::ConnectBoolean( QGroupBox* qbox, boost::function< void( bool ) > function )
+{
+  return Core::ConnectionHandle( new QtConnection(
+    new QtGroupBoxConnector( qbox, function ) ) );
 }
 
 Core::ConnectionHandle QtBridge::Connect( QLineEdit* qlineedit, Core::StateStringHandle& state,

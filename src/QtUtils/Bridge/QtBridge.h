@@ -39,6 +39,7 @@
 #include <QActionGroup>
 #include <QListWidget>
 #include <QPlainTextEdit>
+#include <QGroupBox>
 
 // QtUtils includes
 #include <QtUtils/Widgets/QtHistogramWidget.h>
@@ -87,12 +88,21 @@ public:
   
   static Core::ConnectionHandle ConnectBoolean( QAbstractButton* qbutton, 
     boost::function< void( bool ) > function );
-    
+
   /// Connect vector of bools to one button controlled by an index
-  static Core::ConnectionHandle Connect(  QAbstractButton* qbutton, 
-    std::vector<Core::StateBoolHandle>& state_handles, 
+  static Core::ConnectionHandle Connect(  QAbstractButton* qbutton,
+    std::vector<Core::StateBoolHandle>& state_handles,
     Core::StateIntSetHandle& index_handle );
-  
+
+  /// Connect a QGroupBox or its subclasses to StateValue<bool>
+  static Core::ConnectionHandle Connect( QGroupBox* qbox, Core::StateBoolHandle& state );
+
+  static Core::ConnectionHandle Connect( QGroupBox* qbox,
+    boost::function< void() > function );
+
+  static Core::ConnectionHandle ConnectBoolean( QGroupBox* qbox,
+    boost::function< void( bool ) > function );
+
   /// Connect a QtTristateToolButton to a tri-option state.
   static Core::ConnectionHandle Connect( QtTristateToolButton* tristate_button, 
     Core::StateOptionHandle& state );
