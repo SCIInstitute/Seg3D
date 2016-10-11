@@ -104,7 +104,8 @@ class ActionRadialBasisFunctionPrivate
 public:
   ActionRadialBasisFunctionPrivate() :
     normalOffset_(0),
-    use2DConvexHull_(false),
+    useConvexHull_(false),
+    compute2DConvexHull_(true),
     thresholdValue_(0) {}
 
   LayerHandle srcLayer_;
@@ -113,7 +114,8 @@ public:
   VertexList vertices_;
   ViewModeList view_modes_;
   double normalOffset_;
-  bool use2DConvexHull_;
+  bool useConvexHull_;
+  bool compute2DConvexHull_;
   std::string kernel_;
   double thresholdValue_;
 };
@@ -192,7 +194,9 @@ public:
     }
 
     RBFInterface rbfAlgo( rbfPointData, rbfOrigin, rbfGridSize, rbfGridSpacing,
-                          this->actionInternal_->normalOffset_, axisData, this->actionInternal_->use2DConvexHull_, kernel );
+                          this->actionInternal_->normalOffset_, axisData,
+                          this->actionInternal_->useConvexHull_, this->actionInternal_->compute2DConvexHull_,
+                          kernel );
     this->actionInternal_->thresholdValue_ = rbfAlgo.getThresholdValue();
 
     Core::DataBlockHandle dstDataBlock = Core::StdDataBlock::New( srcGridTransform, Core::DataType::FLOAT_E );
@@ -202,13 +206,14 @@ public:
       return;
     }
 
+    const DataStorage rasterData = rbfAlgo.getRasterData();
     for (size_t i = 0; i < dstDataBlock->get_nx(); ++i)
     {
       for (size_t j = 0; j < dstDataBlock->get_ny(); ++j)
       {
         for (size_t k = 0; k < dstDataBlock->get_nz(); ++k)
         {
-          dstDataBlock->set_data_at( i, j, k, rbfAlgo.value[i][j][k] );
+          dstDataBlock->set_data_at( i, j, k, rasterData[i][j][k] );
         }
       }
     }
@@ -256,7 +261,8 @@ ActionRadialBasisFunction::ActionRadialBasisFunction() :
   this->add_parameter( this->private_->vertices_ );
   this->add_parameter( this->private_->view_modes_ );
   this->add_parameter( this->private_->normalOffset_ );
-  this->add_parameter( this->private_->use2DConvexHull_ );
+  this->add_parameter( this->private_->useConvexHull_ );
+  this->add_parameter( this->private_->compute2DConvexHull_ );
   this->add_parameter( this->private_->kernel_ );
   this->add_parameter( this->sandbox_ );
 }
@@ -278,9 +284,9 @@ bool ActionRadialBasisFunction::validate( ActionContextHandle& context )
   }
 
   // let's just not allow negative or too small values for now
-  if ( this->private_->normalOffset_ < 1.0 )
+  if ( this->private_->normalOffset_ < 0 )
   {
-    context->report_error("Normal offset must be positive and at least 1.0.");
+    context->report_error("Normal offset must be positive and at least 0.");
     return false;
   }
 
@@ -357,7 +363,8 @@ void ActionRadialBasisFunction::Dispatch(
                                            const VertexList& vertices,
                                            const ViewModeList& viewModes,
                                            double normalOffset,
-                                           bool use2DConvexHull,
+                                           bool useConvexHull,
+                                           bool compute2DConvexHull,
                                            const std::string& kernel
                                          )
 {
@@ -366,7 +373,8 @@ void ActionRadialBasisFunction::Dispatch(
   action->private_->vertices_ = vertices;
   action->private_->view_modes_ = viewModes;
   action->private_->normalOffset_ = normalOffset;
-  action->private_->use2DConvexHull_ = use2DConvexHull;
+  action->private_->useConvexHull_ = useConvexHull;
+  action->private_->compute2DConvexHull_ = compute2DConvexHull;
   action->private_->kernel_ = kernel;
 
   ActionDispatcher::PostAction( ActionHandle( action ), context );

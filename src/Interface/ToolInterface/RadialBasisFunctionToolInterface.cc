@@ -84,7 +84,12 @@ bool RadialBasisFunctionToolInterface::build_widget( QFrame* frame )
 	QtUtils::QtBridge::Connect( this->private_->ui_.normalOffsetRange_, tool->normalOffset_state_ );
 	QtUtils::QtBridge::Connect( this->private_->ui_.kernel_, tool->kernel_state_ );
 
-  QtUtils::QtBridge::Connect( this->private_->ui_.use2DConvexHull_, tool->use_2D_convex_hull_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.convexHullGroupBox, tool->use_convex_hull_state_ );
+  QButtonGroup* convex_hull_group = new QButtonGroup( this );
+  convex_hull_group->addButton( this->private_->ui_.convex_hull_2D_ );
+  convex_hull_group->addButton( this->private_->ui_.convex_hull_3D_ );
+
+  QtUtils::QtBridge::Connect( convex_hull_group, tool->convex_hull_selection_state_ );
 
 	QtUtils::QtBridge::Connect( this->private_->ui_.runFilterButton_, boost::bind(
 		&Tool::execute, tool, Core::Interface::GetWidgetActionContext() ) );
@@ -97,6 +102,9 @@ bool RadialBasisFunctionToolInterface::build_widget( QFrame* frame )
 	QtUtils::QtBridge::Enable( this->private_->ui_.targetLayer_, tool->use_active_layer_state_, true );
 
 	this->private_->ui_.normalOffsetRange_->set_description( "Normal Offset" );
+  this->private_->ui_.bbox_size_x_->set_description( "Bounding Box X" );
+  this->private_->ui_.bbox_size_y_->set_description( "Bounding Box Y" );
+  this->private_->ui_.bbox_size_z_->set_description( "Bounding Box Z" );
 
 	boost::function< bool () > condition = boost::lambda::bind( &Core::StateLabeledOption::get,
     tool->target_layer_state_.get() ) != Tool::NONE_OPTION_C;
