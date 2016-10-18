@@ -3,7 +3,7 @@
  
  The MIT License
  
- Copyright (c) 2012 Scientific Computing and Imaging Institute,
+ Copyright (c) 2016 Scientific Computing and Imaging Institute,
  University of Utah.
  
  
@@ -58,7 +58,6 @@ public:
   // Watershed parameters
   Core::StateRangedDoubleHandle watershedThreshold_state_;
   Core::StateRangedDoubleHandle watershedLevel_state_;
-  Core::StateBoolHandle watershedVerboseLayerPrefix_state_;
   
   // -- execute --
 public:

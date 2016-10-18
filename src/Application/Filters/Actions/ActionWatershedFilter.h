@@ -3,7 +3,7 @@
  
  The MIT License
  
- Copyright (c) 2012 Scientific Computing and Imaging Institute,
+ Copyright (c) 2016 Scientific Computing and Imaging Institute,
  University of Utah.
  
  
@@ -46,7 +46,6 @@ class ActionWatershedFilter : public LayerAction
 CORE_ACTION(
   CORE_ACTION_TYPE( "WatershedFilter", "ITK filter that watersheds data" )
   CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
-  CORE_ACTION_ARGUMENT( "watershedVerboseLayerPrefix", "If checked, parameters will be included in the layer prefix." )
   CORE_ACTION_ARGUMENT( "watershedThreshold_val", "The absolute minimum height value.  Use units of percentage points of the maximum height value in the input." )
   CORE_ACTION_ARGUMENT( "watershedLevel_val", "The maximum saliency value of interest; viz. the flooding depth.  Use units of percentage points of the maximum height value in the input." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "sandbox", "-1", "The sandbox in which to run the action." )
@@ -60,7 +59,6 @@ public:
   ActionWatershedFilter()
   {
     this->add_layer_id( this->target_layer_ );
-    this->add_parameter( this->watershedVerboseLayerPrefix_ );
     this->add_parameter( this->watershedThreshold_val_ );
     this->add_parameter( this->watershedLevel_val_ );
     this->add_parameter( this->sandbox_ );
@@ -75,7 +73,6 @@ public:
 private:
   
   std::string target_layer_;
-  bool watershedVerboseLayerPrefix_;
   double watershedThreshold_val_;
   double watershedLevel_val_;
   SandboxID sandbox_;
@@ -85,7 +82,7 @@ public:
   // DISPATCH:
   // Create and dispatch action that inserts the new layer
   static void Dispatch( Core::ActionContextHandle context, std::string target_layer,
-                        bool watershedVerboseLayerPrefix, double watershedThreshold_val, double watershedLevel_val );
+                        double watershedThreshold_val, double watershedLevel_val );
   
 };
 	

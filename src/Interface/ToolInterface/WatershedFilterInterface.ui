@@ -266,13 +266,6 @@ Unit used is the fraction of the original image's maximum height value.</string>
     </widget>
    </item>
    <item>
-    <widget class="QCheckBox" name="watershedVerboseLayerPrefix">
-     <property name="text">
-      <string>Include parameters in layer prefix</string>
-     </property>
-    </widget>
-   </item>
-   <item>
     <widget class="QLabel" name="label_2">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Minimum">

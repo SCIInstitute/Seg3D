@@ -3,7 +3,7 @@
  
  The MIT License
  
- Copyright (c) 2012 Scientific Computing and Imaging Institute,
+ Copyright (c) 2016 Scientific Computing and Imaging Institute,
  University of Utah.
  
  
@@ -85,17 +85,15 @@ bool WatershedFilterInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Connect( this->private_->ui_.watershedLevel_val,
                               tool->watershedLevel_state_ );
   
-  QtUtils::QtBridge::Connect( this->private_->ui_.watershedVerboseLayerPrefix,
-							  tool->watershedVerboseLayerPrefix_state_ );
-  
   QtUtils::QtBridge::Enable( this->private_->ui_.runFilterButton,
                             tool->valid_target_state_ );
   
   QtUtils::QtBridge::Show( this->private_->ui_.message_alert_, tool->valid_target_state_, true );
   
   QtUtils::QtBridge::Enable( this->private_->ui_.target_layer_, 
-                            tool->use_active_layer_state_, true );
-  QtUtils::QtBridge::Connect( this->private_->ui_.runFilterButton, boost::bind(&Tool::execute, tool, Core::Interface::GetWidgetActionContext()) );
+                             tool->use_active_layer_state_, true );
+  QtUtils::QtBridge::Connect( this->private_->ui_.runFilterButton,
+                              boost::bind(&Tool::execute, tool, Core::Interface::GetWidgetActionContext()) );
   
   return true;
 } // end build_widget

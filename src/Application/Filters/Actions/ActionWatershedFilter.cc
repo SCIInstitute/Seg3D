@@ -3,7 +3,7 @@
  
  The MIT License
  
- Copyright (c) 2012 Scientific Computing and Imaging Institute,
+ Copyright (c) 2016 Scientific Computing and Imaging Institute,
  University of Utah.
  
  
@@ -154,7 +154,6 @@ public:
 	//std::vector<LayerHandle> dst_layer_;
 	LayerHandle dst_layer_;
 	
-	bool watershedVerboseLayerPrefix_;
 	double watershedThreshold_val_;
 	double watershedLevel_val_;
 
@@ -336,20 +335,13 @@ public:
 		return "Watershed Filter";
 	}
 
-	// GET_LAYER_PREFIX:
-	// This function returns the name of the filter. The latter is prepended to the new layer name, 
-	// when a new layer is generated. 
-	virtual std::string get_layer_prefix() const
-	{
-		std::ostringstream oss;
-		if( this->watershedVerboseLayerPrefix_ ){
-			oss << "Watershed_threshold_" << Core::ExportToString(this->watershedThreshold_val_) << "_level_"
-				<< Core::ExportToString(this->watershedLevel_val_) << "_";
-		} else {
-			oss << "Watershed";
-		}
-		return oss.str();
-	}
+  // GET_LAYER_PREFIX:
+  // This function returns the name of the filter. The latter is prepended to the new layer name,
+  // when a new layer is generated.
+  virtual std::string get_layer_prefix() const
+  {
+    return "Watershed";
+  }
 };
 
 
@@ -361,7 +353,6 @@ bool ActionWatershedFilter::run( Core::ActionContextHandle& context,
 
 	// Copy the parameters over to the algorithm that runs the filter
 	algo->set_sandbox( this->sandbox_ );
-	algo->watershedVerboseLayerPrefix_ = this->watershedVerboseLayerPrefix_;
 	algo->watershedThreshold_val_ = this->watershedThreshold_val_;
 	algo->watershedLevel_val_ = this->watershedLevel_val_;
 
@@ -398,14 +389,13 @@ bool ActionWatershedFilter::run( Core::ActionContextHandle& context,
 
 
 void ActionWatershedFilter::Dispatch( Core::ActionContextHandle context, std::string target_layer,
-                                      bool watershedVerboseLayerPrefix, double watershedThreshold_val, double watershedLevel_val )
+                                      double watershedThreshold_val, double watershedLevel_val )
 {	
 	// Create a new action
 	ActionWatershedFilter* action = new ActionWatershedFilter;
 
 	// Setup the parameters
 	action->target_layer_ = target_layer;
-	action->watershedVerboseLayerPrefix_ = watershedVerboseLayerPrefix;
 	action->watershedThreshold_val_ = watershedThreshold_val;
 	action->watershedLevel_val_ = watershedLevel_val;
 

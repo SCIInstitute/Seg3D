@@ -3,7 +3,7 @@
  
  The MIT License
  
- Copyright (c) 2012 Scientific Computing and Imaging Institute,
+ Copyright (c) 2016 Scientific Computing and Imaging Institute,
  University of Utah.
  
  
@@ -24,7 +24,7 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
- */
+*/
 
 // Application includes
 #include <Application/Tool/ToolFactory.h>
@@ -44,12 +44,11 @@ namespace Seg3D
 {
   
 WatershedFilter::WatershedFilter( const std::string& toolid ) :
-SingleTargetTool( Core::VolumeType::DATA_E, toolid )
+  SingleTargetTool( Core::VolumeType::DATA_E, toolid )
 {
   // Need to set ranges and default values for all parameters
-  this->add_state( "watershedVerboseLayerPrefix", this->watershedVerboseLayerPrefix_state_, false );
-  this->add_state( "watershedThreshold_val", this->watershedThreshold_state_,           0.0100, 0.0000, 1.0000, .0010 );
-  this->add_state( "watershedLevel_val", this->watershedLevel_state_,                   0.2000, 0.0000, 1.0000, .0010 );
+  this->add_state( "watershedThreshold_val", this->watershedThreshold_state_, 0.0100, 0.0000, 1.0000, .0010 );
+  this->add_state( "watershedLevel_val", this->watershedLevel_state_, 0.2000, 0.0000, 1.0000, .0010 );
 }
 
 WatershedFilter::~WatershedFilter()
@@ -63,11 +62,10 @@ void WatershedFilter::execute( Core::ActionContextHandle context )
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
   
   ActionWatershedFilter::Dispatch( context,
-										 this->target_layer_state_->get(),
-										 this->watershedVerboseLayerPrefix_state_->get(),
-                                         this->watershedThreshold_state_->get(),
-                                         this->watershedLevel_state_->get()
-                                         );
+                                   this->target_layer_state_->get(),
+                                   this->watershedThreshold_state_->get(),
+                                   this->watershedLevel_state_->get()
+                                 );
 }
   
 } // end namespace Seg3D
