@@ -15,7 +15,7 @@ install:
 addons:
   apt:
     sources:
-    - ubuntu-sdk-team/ppa
+    - ubuntu-sdk-team
     - ubuntu-toolchain-r-test
     - george-edison55-precise-backports
     packages:
@@ -25,7 +25,7 @@ addons:
     - g++-4.8
     - clang
     - qtbase5-dev
-    #- qtdeclarative5-dev
+    - qtdeclarative5-dev
 #before_script:
 script:
   - cd bin
