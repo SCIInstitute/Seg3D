@@ -15,6 +15,7 @@ install:
 addons:
   apt:
     sources:
+    - ubuntu-sdk-team
     - ubuntu-toolchain-r-test
     - george-edison55-precise-backports
     packages:
@@ -23,10 +24,14 @@ addons:
     - gcc-4.8
     - g++-4.8
     - clang
+    - qt5-default
+    - qttools5-dev-tools
+    - qtbase5-dev
+    - qtdeclarative5-dev
 #before_script:
 script:
   - cd bin
-  - cmake -DBUILD_TESTING:BOOL=OFF -DBUILD_MOSAIC_TOOLS:BOOL=OFF ../Superbuild
+  - cmake -DBUILD_TESTING:BOOL=OFF -DBUILD_MOSAIC_TOOLS:BOOL=OFF -DQt5_PATH:PATH=/usr ../Superbuild
   - make -j4
 #after_failure:
 #after_success:
