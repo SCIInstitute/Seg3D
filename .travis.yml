@@ -9,7 +9,12 @@ compiler:
 cache:
   directories:
     - bin/Externals
-#before_install:
+    - $HOME/deps
+before_install:
+  # set up dependency cache
+  - if [ ! -d "$HOME/deps" ]; then mkdir $HOME/deps; fi
+  - if [ ! -f "$HOME/deps/qt5.tgz" ]; then wget --quiet --directory-prefix=$HOME/deps http://www.sci.utah.edu/devbuilds/seg3d/qt5.tgz; fi
+  - if [ ! -f "$HOME/deps/cmake3.tgz" ]; then wget --quiet --directory-prefix=$HOME/deps http://www.sci.utah.edu/devbuilds/seg3d/cmake3.tgz; fi
 install:
   # C++11 support required
   - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
@@ -23,12 +28,12 @@ addons:
     - gcc-4.8
     - g++-4.8
     - clang
-    - qtbase5-dev
-    #- qtdeclarative5-dev
 #before_script:
 script:
+  - tar xzvf $HOME/deps/qt5.tgz
+  - tar xzvf $HOME/deps/cmake3.tgz
   - cd bin
-  - cmake -DBUILD_TESTING:BOOL=OFF -DBUILD_MOSAIC_TOOLS:BOOL=OFF -DQt5_PATH:PATH=/usr ../Superbuild
+  - $HOME/cmake3/bin/cmake -DBUILD_TESTING:BOOL=OFF -DBUILD_MOSAIC_TOOLS:BOOL=OFF -DQt5_PATH:PATH=$HOME/qt5.5.1 ../Superbuild
   - make -j4
 #after_failure:
 #after_success:
