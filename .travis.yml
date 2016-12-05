@@ -30,6 +30,8 @@ addons:
     - clang
 #before_script:
 script:
+  - pwd
+  - echo $HOME
   - tar xzvf $HOME/deps/qt5.tgz
   - tar xzvf $HOME/deps/cmake3.tgz
   - cd bin
