@@ -30,12 +30,10 @@ addons:
     - clang
 #before_script:
 script:
-  - pwd
-  - echo $HOME
   - tar xzvf $HOME/deps/qt5.tgz
   - tar xzvf $HOME/deps/cmake3.tgz
   - cd bin
-  - $HOME/cmake3/bin/cmake -DBUILD_TESTING:BOOL=OFF -DBUILD_MOSAIC_TOOLS:BOOL=OFF -DQt5_PATH:PATH=$HOME/qt5.5.1 ../Superbuild
+  - $TRAVIS_BUILD_DIR/cmake3/bin/cmake -DBUILD_TESTING:BOOL=OFF -DBUILD_MOSAIC_TOOLS:BOOL=OFF -DQt5_PATH:PATH=$TRAVIS_BUILD_DIR/qt5.5.1 ../Superbuild
   - make -j4
 #after_failure:
 #after_success:
