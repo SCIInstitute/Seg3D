@@ -209,7 +209,12 @@ SET(SUPERBUILD_DIR ${CMAKE_CURRENT_SOURCE_DIR} CACHE INTERNAL "" FORCE)
 SET(SEG3D_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../src CACHE INTERNAL "" FORCE)
 SET(SEG3D_BINARY_DIR ${CMAKE_BINARY_DIR}/Seg3D CACHE INTERNAL "" FORCE)
 
-ADD_EXTERNAL( ${SUPERBUILD_DIR}/DataExternal.cmake Data_external )
+OPTION(DOWNLOAD_DATA "Download Seg3D sample and test data repository." ON)
+
+IF(DOWNLOAD_DATA)
+  ADD_EXTERNAL( ${SUPERBUILD_DIR}/DataExternal.cmake Data_external )
+ENDIF()
+
 ADD_EXTERNAL( ${SUPERBUILD_DIR}/ZlibExternal.cmake Zlib_external )
 ADD_EXTERNAL( ${SUPERBUILD_DIR}/GlewExternal.cmake Glew_external )
 ADD_EXTERNAL( ${SUPERBUILD_DIR}/FreetypeExternal.cmake Freetype_external )
