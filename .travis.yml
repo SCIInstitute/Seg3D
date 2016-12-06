@@ -4,7 +4,7 @@ dist: trusty
 
 compiler:
   - gcc
-  - clang
+#  - clang
 #before_cache:
 cache:
   directories:
@@ -23,16 +23,16 @@ addons:
     sources:
     - ubuntu-toolchain-r-test
     packages:
-    - cmake
-    - cmake-data
     - gcc-4.8
     - g++-4.8
-    - clang
+    - clang-3.4
 #before_script:
 script:
   - tar xzf $HOME/deps/qt5.tgz
   - tar xzf $HOME/deps/cmake3.tgz
   - cd bin
+  - ls -l Externals/Build/Teem_external
+  - ls -l Externals/Build/Teem_external/bin
   - $TRAVIS_BUILD_DIR/cmake3/bin/cmake -DBUILD_TESTING:BOOL=OFF -DBUILD_MOSAIC_TOOLS:BOOL=OFF -DQt5_PATH:PATH=$TRAVIS_BUILD_DIR/qt5.5.1 ../Superbuild
   - make
 #  - make -j4
