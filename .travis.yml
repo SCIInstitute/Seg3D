@@ -13,7 +13,7 @@ cache:
 before_install:
   # set up dependency cache
   - if [ ! -d "$HOME/deps" ]; then mkdir $HOME/deps; fi
-  - if [ ! -f "$HOME/deps/qt5.tgz" ]; then wget --quiet --directory-prefix=$HOME/deps http://www.sci.utah.edu/devbuilds/seg3d/qt5.tgz; fi
+#  - if [ ! -f "$HOME/deps/qt5.tgz" ]; then wget --quiet --directory-prefix=$HOME/deps http://www.sci.utah.edu/devbuilds/seg3d/qt5.tgz; fi
   - if [ ! -f "$HOME/deps/cmake3.tgz" ]; then wget --quiet --directory-prefix=$HOME/deps http://www.sci.utah.edu/devbuilds/seg3d/cmake3.tgz; fi
 install:
   # C++11 support required
@@ -26,14 +26,16 @@ addons:
     - gcc-4.8
     - g++-4.8
     - clang-3.4
+    - qtbase5-dev-tools
+    - libqt5core5a
 #before_script:
 script:
-  - tar xzf $HOME/deps/qt5.tgz
+#  - tar xzf $HOME/deps/qt5.tgz
   - tar xzf $HOME/deps/cmake3.tgz
   - cd bin
 #  - if [ -d "Externals" ]; then export BUILD_SEG3D_ONLY=1; fi
   - if [ -d "Externals" ]; then export SEG3D_TARGET="Seg3D_external"; fi
-  - $TRAVIS_BUILD_DIR/cmake3/bin/cmake -DBUILD_TESTING:BOOL=OFF -DBUILD_MOSAIC_TOOLS:BOOL=OFF -DDOWNLOAD_DATA:BOOL=OFF -DQt5_PATH:PATH=$TRAVIS_BUILD_DIR/qt5.5.1 ../Superbuild
+  - $TRAVIS_BUILD_DIR/cmake3/bin/cmake -DBUILD_TESTING:BOOL=OFF -DBUILD_MOSAIC_TOOLS:BOOL=OFF -DDOWNLOAD_DATA:BOOL=OFF -DQt5_PATH:PATH=/usr ../Superbuild
 #  - if [ $BUILD_SEG3D_ONLY ]; then make Seg3D_external; else make ; fi
   - make -j4 $SEG3D_TARGET
 #after_failure:
