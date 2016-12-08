@@ -12,9 +12,8 @@ cache:
     - $HOME/deps
 before_install:
   # set up dependency cache
-  - if [ ! -d "$HOME/deps" ]; then mkdir $HOME/deps; fi
-#  - if [ ! -f "$HOME/deps/qt5.tgz" ]; then wget --quiet --directory-prefix=$HOME/deps http://www.sci.utah.edu/devbuilds/seg3d/qt5.tgz; fi
-  - if [ ! -f "$HOME/deps/cmake3.tgz" ]; then wget --quiet --directory-prefix=$HOME/deps http://www.sci.utah.edu/devbuilds/seg3d/cmake3.tgz; fi
+  - if [ ! -d $HOME/deps ]; then mkdir $HOME/deps; fi
+  - if [ ! -f $HOME/deps/cmake3.tgz ]; then wget --quiet --directory-prefix=$HOME/deps http://www.sci.utah.edu/devbuilds/seg3d/cmake3.tgz; fi
 install:
   # C++11 support required
   - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
@@ -26,11 +25,14 @@ addons:
     - gcc-4.8
     - g++-4.8
     - clang-3.4
+    - qt5-default
+    - qttools5-dev-tools
     - qtbase5-dev-tools
     - libqt5core5a
+    - libqt5opengl5
+    - libqt5widgets5
 #before_script:
 script:
-#  - tar xzf $HOME/deps/qt5.tgz
   - tar xzf $HOME/deps/cmake3.tgz
   - cd bin
 #  - if [ -d "Externals" ]; then export BUILD_SEG3D_ONLY=1; fi
