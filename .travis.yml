@@ -17,16 +17,21 @@ before_install:
 install:
   # C++11 support required
   - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
+  - ls /usr
+  - ls /opt
 addons:
   apt:
     sources:
     - ubuntu-toolchain-r-test
+    - beineri/opt-qt551-trusty
     packages:
     - gcc-4.8
     - g++-4.8
-    - clang-3.4
+    - clang
     - qt5-default
+    - qttools5-dev
     - qttools5-dev-tools
+    - qtbase5-dev
     - qtbase5-dev-tools
     - libqt5core5a
     - libqt5opengl5
