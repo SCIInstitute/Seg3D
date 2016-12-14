@@ -1,6 +1,7 @@
 sudo: false
 language: c++
 dist: trusty
+sudo: required
 
 compiler:
   - gcc
@@ -14,28 +15,34 @@ before_install:
   # set up dependency cache
   - if [ ! -d $HOME/deps ]; then mkdir $HOME/deps; fi
   - if [ ! -f $HOME/deps/cmake3.tgz ]; then wget --quiet --directory-prefix=$HOME/deps http://www.sci.utah.edu/devbuilds/seg3d/cmake3.tgz; fi
+  - sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
+  - sudo add-apt-repository --yes ppa:beineri/opt-qt551-trusty
+  - sudo apt-get -qq --yes update
+  - sudo apt-get -qq --yes install gcc-4.8 g++-4.8 clang
+  - sudo apt-get -qq --yes install qt5-default qttools5-dev-tools qtbase5-dev-tools libqt5core5a libqt5opengl5 libqt5widgets5
+
 install:
   # C++11 support required
   - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
   - ls /usr
   - ls /opt
-addons:
-  apt:
-    sources:
-    - ubuntu-toolchain-r-test
-    - beineri/opt-qt551-trusty
-    packages:
-    - gcc-4.8
-    - g++-4.8
-    - clang
-    - qt5-default
-    - qttools5-dev
-    - qttools5-dev-tools
-    - qtbase5-dev
-    - qtbase5-dev-tools
-    - libqt5core5a
-    - libqt5opengl5
-    - libqt5widgets5
+#addons:
+#  apt:
+#    sources:
+#    - ubuntu-toolchain-r-test
+#    - beineri/opt-qt551-trusty
+#    packages:
+#    - gcc-4.8
+#    - g++-4.8
+#    - clang
+#    - qt5-default
+#    - qttools5-dev
+#    - qttools5-dev-tools
+#    - qtbase5-dev
+#    - qtbase5-dev-tools
+#    - libqt5core5a
+#    - libqt5opengl5
+#    - libqt5widgets5
 #before_script:
 script:
   - tar xzf $HOME/deps/cmake3.tgz
