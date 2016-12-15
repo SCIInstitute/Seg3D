@@ -1,21 +1,21 @@
 #  For more information, please see: http://software.sci.utah.edu
-# 
+#
 #  The MIT License
-# 
+#
 #  Copyright (c) 2016 Scientific Computing and Imaging Institute,
 #  University of Utah.
-# 
-#  
+#
+#
 #  Permission is hereby granted, free of charge, to any person obtaining a
 #  copy of this software and associated documentation files (the "Software"),
 #  to deal in the Software without restriction, including without limitation
 #  the rights to use, copy, modify, merge, publish, distribute, sublicense,
 #  and/or sell copies of the Software, and to permit persons to whom the
 #  Software is furnished to do so, subject to the following conditions:
-# 
+#
 #  The above copyright notice and this permission notice shall be included
-#  in all copies or substantial portions of the Software. 
-# 
+#  in all copies or substantial portions of the Software.
+#
 #  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
 #  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 #  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -33,9 +33,14 @@ SET(itk_ARGS
   "-DBUILD_TESTING:BOOL=OFF"
 )
 
-IF(UNIX)
-  # works for both clang and g++
-  SET(INHIBIT_ALL_WARNINGS "-w")
+IF(TRAVIS_BUILD)
+  LIST(APPEND itk_ARGS
+    "-Wno-dev"
+    "-Wno-deprecated"
+  )
+
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
+  SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
 ENDIF()
 
 SET(itk_CACHE_ARGS
@@ -52,8 +57,9 @@ SET(itk_CACHE_ARGS
   "-DModule_ITKReview:BOOL=ON"
   "-DModule_ITKDeprecated:BOOL=ON"
   "-DITKV3_COMPATIBILITY:BOOL=ON"
-  "-DCMAKE_CXX_FLAGS:STATIC=${CMAKE_CXX_FLAGS} ${INHIBIT_ALL_WARNINGS}"
+  "-DCMAKE_CXX_FLAGS:STATIC=${CMAKE_CXX_FLAGS}"
   "-DCMAKE_CXX_FLAGS_DEBUG:STATIC=${CMAKE_CXX_FLAGS_DEBUG}"
+  "-DCMAKE_C_FLAGS:STATIC=${CMAKE_C_FLAGS}"
   "-DCMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD:STATIC=${CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD}"
   "-DCMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY:STATIC=${CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY}"
 )

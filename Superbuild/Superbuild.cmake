@@ -1,7 +1,7 @@
 #  For more information, please see: http://software.sci.utah.edu
 #
 #  The MIT License
-# 
+#
 #  Copyright (c) 2016 Scientific Computing and Imaging Institute,
 #  University of Utah.
 #
@@ -56,6 +56,7 @@ FIND_PACKAGE(Git)
 IF(NOT GIT_FOUND)
   MESSAGE(ERROR "Cannot find Git. Git is required for Seg3D's Superbuild")
 ENDIF()
+
 
 ###########################################
 # Configure advanced features:
@@ -139,18 +140,44 @@ ENDIF()
 
 
 ###########################################
+# Configure sample data download
+###########################################
+
+OPTION(DOWNLOAD_DATA "Download Seg3D sample and test data repository." ON)
+
+
+###########################################
+# Travis CI build needs to be as slim as possible
+###########################################
+
+OPTION(TRAVIS_BUILD "Slim build for Travis CI" OFF)
+MARK_AS_ADVANCED(TRAVIS_BUILD)
+
+IF(TRAVIS_BUILD)
+  SET(BUILD_TESTING OFF)
+  SET(BUILD_MOSAIC_TOOLS OFF)
+  SET(BUILD_LARGE_VOLUME_TOOLS OFF)
+  SET(DOWNLOAD_DATA OFF)
+  SET(DISABLED_WARNINGS_GCC "-Wno-unused-local-typedefs")
+  SET(DISABLED_WARNINGS_CLANG "-Wno-unused-local-typedef")
+ELSE()
+  SET(ENABLED_WARNINGS "-Wall")
+ENDIF()
+
+
+###########################################
 # *Nix C++ compiler flags
 ###########################################
 
 IF(UNIX)
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall")
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 ${ENABLED_WARNINGS}")
   IF(APPLE)
     SET(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++11")
     SET(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -ftemplate-depth=256")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -ftemplate-depth=256 ${DISABLED_WARNINGS_CLANG}")
     SET(CMAKE_CXX_FLAGS_DEBUG "-Wshorten-64-to-32 ${CMAKE_CXX_FLAGS_DEBUG}")
   ELSE()
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive ${DISABLED_WARNINGS_GCC}")
     SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--no-as-needed -ldl -lrt")
   ENDIF()
 ENDIF()
@@ -208,8 +235,6 @@ ENDMACRO()
 SET(SUPERBUILD_DIR ${CMAKE_CURRENT_SOURCE_DIR} CACHE INTERNAL "" FORCE)
 SET(SEG3D_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../src CACHE INTERNAL "" FORCE)
 SET(SEG3D_BINARY_DIR ${CMAKE_BINARY_DIR}/Seg3D CACHE INTERNAL "" FORCE)
-
-OPTION(DOWNLOAD_DATA "Download Seg3D sample and test data repository." ON)
 
 IF(DOWNLOAD_DATA)
   ADD_EXTERNAL( ${SUPERBUILD_DIR}/DataExternal.cmake Data_external )
