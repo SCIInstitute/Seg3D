@@ -106,6 +106,7 @@ public:
     normalOffset_(0),
     useConvexHull_(false),
     compute2DConvexHull_(true),
+    invertSeedOrder_(false),
     thresholdValue_(0) {}
 
   LayerHandle srcLayer_;
@@ -116,6 +117,7 @@ public:
   double normalOffset_;
   bool useConvexHull_;
   bool compute2DConvexHull_;
+  bool invertSeedOrder_;
   std::string kernel_;
   double thresholdValue_;
 };
@@ -172,15 +174,9 @@ public:
 
     // origin and size from source data layer
     Point origin = srcGridTransform.get_origin();
-    // TODO: debug print
-//    std::cerr << "Source data origin: " << origin << std::endl;
     vec3 rbfOrigin(origin.x(), origin.y(), origin.z());
     vec3 rbfGridSize(srcGridTransform.get_nx(), srcGridTransform.get_ny(), srcGridTransform.get_nz());
     vec3 rbfGridSpacing(srcGridTransform.spacing_x(), srcGridTransform.spacing_y(), srcGridTransform.spacing_z());
-    // TODO: debug print
-//    std::cerr << "Source data size: " << rbfGridSize[0] << ", "
-//                                      << rbfGridSize[1] << ", "
-//                                      << rbfGridSize[2] << std::endl;
 
     // From RBF class. ThinPlate is the default kernel.
     Kernel kernel = ThinPlate;
@@ -193,39 +189,52 @@ public:
       kernel = MultiQuadratic;
     }
 
-    RBFInterface rbfAlgo( rbfPointData, rbfOrigin, rbfGridSize, rbfGridSpacing,
-                          this->actionInternal_->normalOffset_, axisData,
-                          this->actionInternal_->useConvexHull_, this->actionInternal_->compute2DConvexHull_,
-                          kernel );
-    this->actionInternal_->thresholdValue_ = rbfAlgo.getThresholdValue();
+//    try
+//    {
+      RBFInterface rbfAlgo( rbfPointData, rbfOrigin, rbfGridSize, rbfGridSpacing,
+                            this->actionInternal_->normalOffset_, axisData,
+                            this->actionInternal_->useConvexHull_, this->actionInternal_->compute2DConvexHull_,
+                            this->actionInternal_->invertSeedOrder_, kernel );
 
-    Core::DataBlockHandle dstDataBlock = Core::StdDataBlock::New( srcGridTransform, Core::DataType::FLOAT_E );
-    if ( ! dstDataBlock )
-    {
-      this->report_error( "Could not allocate enough memory." );
-      return;
-    }
+      this->actionInternal_->thresholdValue_ = rbfAlgo.getThresholdValue();
 
-    const DataStorage rasterData = rbfAlgo.getRasterData();
-    for (size_t i = 0; i < dstDataBlock->get_nx(); ++i)
-    {
-      for (size_t j = 0; j < dstDataBlock->get_ny(); ++j)
+      Core::DataBlockHandle dstDataBlock = Core::StdDataBlock::New( srcGridTransform, Core::DataType::DOUBLE_E );
+      if ( ! dstDataBlock )
       {
-        for (size_t k = 0; k < dstDataBlock->get_nz(); ++k)
+        this->report_error( "Could not allocate enough memory." );
+        return;
+      }
+
+      const DataStorage rasterData = rbfAlgo.getRasterData();
+      for (size_t i = 0; i < dstDataBlock->get_nx(); ++i)
+      {
+        for (size_t j = 0; j < dstDataBlock->get_ny(); ++j)
         {
-          dstDataBlock->set_data_at( i, j, k, rasterData[i][j][k] );
+          for (size_t k = 0; k < dstDataBlock->get_nz(); ++k)
+          {
+            dstDataBlock->set_data_at( i, j, k, rasterData[i][j][k] );
+          }
         }
       }
-    }
-    dstDataBlock->update_histogram();
-//    std::cerr << "Min: " << dstDataBlock->get_min() << ", max: " << dstDataBlock->get_max() << std::endl;
+      dstDataBlock->update_histogram();
 
-    // TODO: threshold from 0 to dataset max to get mask layer
-
-    this->dispatch_insert_data_volume_into_layer(
-      this->actionInternal_->dstLayer_,
-      Core::DataVolumeHandle(new Core::DataVolume( this->actionInternal_->dstLayer_->get_grid_transform(), dstDataBlock ) ),
-      true );
+      // TODO: threshold from 0 to dataset max to get mask layer
+      this->dispatch_insert_data_volume_into_layer(
+                                                    this->actionInternal_->dstLayer_,
+                                                    Core::DataVolumeHandle(new Core::DataVolume( this->actionInternal_->dstLayer_->get_grid_transform(), dstDataBlock ) ),
+                                                    true
+                                                   );
+//    }
+//    catch (std::exception& e)
+//    {
+//      this->report_error( e.what() );
+//      return;
+//    }
+//    catch (...)
+//    {
+//      this->report_error( "RBFInterface terminated with exception." );
+//      return;
+//    }
   }
   SCI_END_RUN()
 
@@ -263,6 +272,7 @@ ActionRadialBasisFunction::ActionRadialBasisFunction() :
   this->add_parameter( this->private_->normalOffset_ );
   this->add_parameter( this->private_->useConvexHull_ );
   this->add_parameter( this->private_->compute2DConvexHull_ );
+  this->add_parameter( this->private_->invertSeedOrder_ );
   this->add_parameter( this->private_->kernel_ );
   this->add_parameter( this->sandbox_ );
 }
@@ -365,6 +375,7 @@ void ActionRadialBasisFunction::Dispatch(
                                            double normalOffset,
                                            bool useConvexHull,
                                            bool compute2DConvexHull,
+                                           bool invertSeedOrder,
                                            const std::string& kernel
                                          )
 {
@@ -374,6 +385,7 @@ void ActionRadialBasisFunction::Dispatch(
   action->private_->view_modes_ = viewModes;
   action->private_->normalOffset_ = normalOffset;
   action->private_->useConvexHull_ = useConvexHull;
+  action->private_->invertSeedOrder_ = invertSeedOrder;
   action->private_->compute2DConvexHull_ = compute2DConvexHull;
   action->private_->kernel_ = kernel;
 

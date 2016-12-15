@@ -172,6 +172,7 @@ TARGET_LINK_LIBRARIES(Application_Filters
   Application_ProjectManager
   ${SCI_BOOST_LIBRARY}
   ${ImplicitFunction_LIBRARY}
+  ${TETGEN_LIBRARY}
 )
 
 # Register action classes
