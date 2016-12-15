@@ -30,6 +30,11 @@
 
 SET_PROPERTY(DIRECTORY PROPERTY "EP_BASE" ${ep_base})
 
+IF(UNIX)
+  # works for both clang and g++
+  SET(INHIBIT_ALL_WARNINGS "-w")
+ENDIF()
+
 # disable auto linking
 # also set in Seg3D?
 SET(boost_CXX_Flags "-DBOOST_ALL_NO_LIB=1")
@@ -88,7 +93,7 @@ ExternalProject_Add(Boost_external
     -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
     -DFORCE_64BIT_BUILD:BOOL=${FORCE_64BIT_BUILD}
     -DSCI_BOOST_LIBRARIES:STATIC=${boost_Libraries}
-    -DSCI_BOOST_CXX_FLAGS:STRING=${boost_CXX_Flags}
+    -DSCI_BOOST_CXX_FLAGS:STRING="${boost_CXX_Flags} ${INHIBIT_ALL_WARNINGS}"
 )
 
 ExternalProject_Get_Property(Boost_external INSTALL_DIR)
