@@ -1,10 +1,9 @@
-sudo: false
+sudo: required
 language: c++
 dist: trusty
-sudo: required
 
 git:
-  depth: 3
+  depth: 5
 compiler:
   - gcc
 #  - clang
@@ -26,8 +25,8 @@ before_install:
 install:
   # C++11 support required
   - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
- addons:
-  apt:
+addons:
+#  apt:
 #    sources:
 #    - ubuntu-toolchain-r-test
   packages:
