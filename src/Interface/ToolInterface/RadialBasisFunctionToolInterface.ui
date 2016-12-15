@@ -236,7 +236,7 @@
        <widget class="QtUtils::QtSliderDoubleCombo" name="bbox_size_z_" native="true"/>
       </item>
       <item>
-       <widget class="QCheckBox" name="invertSeedOrder_">
+       <widget class="QCheckBox" name="invert_seed_order_">
         <property name="text">
          <string>Invert Seed Order</string>
         </property>

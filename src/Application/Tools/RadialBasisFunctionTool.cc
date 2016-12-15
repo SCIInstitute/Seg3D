@@ -65,6 +65,7 @@ RadialBasisFunctionTool::RadialBasisFunctionTool( const std::string& toolid ) :
   this->add_state( "view_modes", this->view_modes_state_ );
   this->add_state( "use_convex_hull", this->use_convex_hull_state_, true );
   this->add_state( "compute_2D_convex_hull", this->compute_2D_convex_hull_state_, true );
+  this->add_state( "invert_seed_order", this->invert_seed_order_state_, false );
   this->add_state( "convex_hull_selection",
                    this->convex_hull_selection_state_,
                    CONVEX_HULL_2D_C,
@@ -72,6 +73,11 @@ RadialBasisFunctionTool::RadialBasisFunctionTool( const std::string& toolid ) :
 
   this->add_connection( this->convex_hull_selection_state_->value_changed_signal_.connect(
     boost::bind( &RadialBasisFunctionTool::handle_convex_hull_type_changed, this, _2 ) ) );
+
+  // TODO: temporary
+  this->add_state( "disabled", this->disabled_widget_state_, false );
+
+
 }
 
 RadialBasisFunctionTool::~RadialBasisFunctionTool()
@@ -187,6 +193,7 @@ void RadialBasisFunctionTool::execute( Core::ActionContextHandle context )
                                        this->normalOffset_state_->get(),
                                        this->use_convex_hull_state_->get(),
                                        this->compute_2D_convex_hull_state_->get(),
+                                       this->invert_seed_order_state_->get(),
                                        this->kernel_state_->get()
                                      );
 }

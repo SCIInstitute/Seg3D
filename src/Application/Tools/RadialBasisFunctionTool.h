@@ -61,7 +61,11 @@ public:
   Core::StateStringVectorHandle view_modes_state_;
   Core::StateBoolHandle use_convex_hull_state_;
   Core::StateBoolHandle compute_2D_convex_hull_state_;
+  Core::StateBoolHandle invert_seed_order_state_;
   Core::StateLabeledOptionHandle convex_hull_selection_state_;
+
+  // TODO: temporary
+  Core::StateBoolHandle disabled_widget_state_;
 
 public:
   static const std::string CONVEX_HULL_2D_C;

@@ -90,6 +90,7 @@ bool RadialBasisFunctionToolInterface::build_widget( QFrame* frame )
   convex_hull_group->addButton( this->private_->ui_.convex_hull_3D_ );
 
   QtUtils::QtBridge::Connect( convex_hull_group, tool->convex_hull_selection_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.invert_seed_order_, tool->invert_seed_order_state_ );
 
 	QtUtils::QtBridge::Connect( this->private_->ui_.runFilterButton_, boost::bind(
 		&Tool::execute, tool, Core::Interface::GetWidgetActionContext() ) );
@@ -108,7 +109,12 @@ bool RadialBasisFunctionToolInterface::build_widget( QFrame* frame )
 
 	boost::function< bool () > condition = boost::lambda::bind( &Core::StateLabeledOption::get,
     tool->target_layer_state_.get() ) != Tool::NONE_OPTION_C;
-	QtUtils::QtBridge::Enable( this->private_->ui_.normalOffsetRange_, tool->target_layer_state_, condition );
+
+  QtUtils::QtBridge::Enable( this->private_->ui_.normalOffsetRange_, tool->target_layer_state_, condition );
+
+  QtUtils::QtBridge::Enable( this->private_->ui_.bbox_size_x_, tool->disabled_widget_state_ );
+  QtUtils::QtBridge::Enable( this->private_->ui_.bbox_size_y_, tool->disabled_widget_state_ );
+  QtUtils::QtBridge::Enable( this->private_->ui_.bbox_size_z_, tool->disabled_widget_state_ );
 
 	return true;
 }
