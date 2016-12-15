@@ -213,6 +213,9 @@ INCLUDE(${FREETYPE_USE_FILE})
 CONFIG_STANDARD_EXTERNAL( ImplicitFunction ImplicitFunctionConfig.cmake ${ImplicitFunction_DIR} )
 INCLUDE(${ImplicitFunction_USE_FILE})
 
+CONFIG_STANDARD_EXTERNAL( Tetgen TetgenConfig.cmake ${Tetgen_DIR} )
+INCLUDE(${TETGEN_USE_FILE})
+
 
 ###########################################
 # Global defines
