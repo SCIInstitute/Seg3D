@@ -45,8 +45,8 @@ script:
 #  - if [ -d Externals ]; then export SEG3D_TARGET="Seg3D_external"; fi
 #  - $TRAVIS_BUILD_DIR/cmake3/bin/cmake -DBUILD_TESTING:BOOL=OFF -DBUILD_MOSAIC_TOOLS:BOOL=OFF -DDOWNLOAD_DATA:BOOL=OFF -DQt5_PATH:PATH=/usr ../Superbuild
   - $TRAVIS_BUILD_DIR/cmake3/bin/cmake -DTRAVIS_BUILD:BOOL=ON -DQt5_PATH:PATH=/usr ../Superbuild
-#  - make -j8 Seg3D_external 1> /dev/null
-  - make -j4 Seg3D_external
+  - make -j8 Seg3D_external 1> /dev/null
+#  - make -j4 Seg3D_external
 #after_failure:
 #after_success:
 #after_script:
