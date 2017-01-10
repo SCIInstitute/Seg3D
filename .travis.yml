@@ -11,17 +11,18 @@ compiler:
 # TODO: caching builds per compiler and os?
 cache:
   directories:
-    - $TRAVIS_BUILD_DIR/bin/Externals
+#    - $TRAVIS_BUILD_DIR/bin/Externals
     - $HOME/deps
 before_install:
   # set up dependency cache
   - if [ ! -d $HOME/deps ]; then mkdir $HOME/deps; fi
   - if [ ! -f $HOME/deps/cmake3.tgz ]; then wget --quiet --directory-prefix=$HOME/deps http://www.sci.utah.edu/devbuilds/seg3d/cmake3.tgz; fi
   - sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
+  # TODO: temporarily building headless
  # - sudo add-apt-repository --yes ppa:beineri/opt-qt551-trusty
   - sudo apt-get -qq --yes update
   # TODO: whitelisted packages?
-  - sudo apt-get install mesa-common-dev libgl1-mesa-dev mesa-utils-extra libglapi-mesa
+  - sudo apt-get -qq --yes install mesa-common-dev libgl1-mesa-dev mesa-utils-extra libglapi-mesa
   # TODO: temporarily building headless
   # packages currently not whitelisted
  # - sudo apt-get -qq --yes install qt5-default qttools5-dev-tools qtbase5-dev-tools libqt5core5a libqt5widgets5 libqt5opengl5-dev libqt5svg5-dev
@@ -45,7 +46,7 @@ script:
 #  - $TRAVIS_BUILD_DIR/cmake3/bin/cmake -DBUILD_TESTING:BOOL=OFF -DBUILD_MOSAIC_TOOLS:BOOL=OFF -DDOWNLOAD_DATA:BOOL=OFF -DQt5_PATH:PATH=/usr ../Superbuild
   - $TRAVIS_BUILD_DIR/cmake3/bin/cmake -DTRAVIS_BUILD:BOOL=ON -DQt5_PATH:PATH=/usr ../Superbuild
 #  - make -j8 Seg3D_external 1> /dev/null
-  - make -j8 Seg3D_external
+  - make -j4 Seg3D_external
 #after_failure:
 #after_success:
 #after_script:
