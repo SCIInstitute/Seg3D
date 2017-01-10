@@ -81,6 +81,7 @@ INCLUDE( ExternalProject )
 #  set(gen "${CMAKE_GENERATOR}" )
 #endif()
 
+
 ###########################################
 # Options for console, headless mode
 ###########################################
@@ -92,11 +93,33 @@ IF(WIN32)
   OPTION(SEG3D_SHOW_CONSOLE "Show console for debugging (Windows GUI build only)" OFF)
 ENDIF()
 
+
 ###########################################
 # Configure python
 ###########################################
 
 OPTION(BUILD_WITH_PYTHON "Build with python support." ON)
+
+
+###########################################
+# Travis CI build needs to be as slim as possible
+###########################################
+
+OPTION(TRAVIS_BUILD "Slim build for Travis CI" OFF)
+MARK_AS_ADVANCED(TRAVIS_BUILD)
+
+IF(TRAVIS_BUILD)
+  SET(SEG3D_BUILD_INTERFACE OFF) # TODO: hopefully temporary, try to speed up build in other ways
+  SET(BUILD_TESTING OFF)
+  SET(BUILD_MOSAIC_TOOLS OFF)
+  SET(BUILD_LARGE_VOLUME_TOOLS OFF)
+  SET(DOWNLOAD_DATA OFF)
+  SET(DISABLED_WARNINGS_GCC "-Wno-unused-local-typedefs")
+  SET(DISABLED_WARNINGS_CLANG "-Wno-unused-local-typedef")
+ELSE()
+  SET(ENABLED_WARNINGS "-Wall")
+ENDIF()
+
 
 ###########################################
 # Configure Qt
@@ -130,7 +153,6 @@ IF(SEG3D_BUILD_INTERFACE)
     MESSAGE(FATAL_ERROR "Qt5 is required for building the Seg3D GUI")
   ENDIF()
 
-
   IF(APPLE)
     SET(MACDEPLOYQT_OUTPUT_LEVEL 0 CACHE STRING "Set macdeployqt output level (0-3)")
     MARK_AS_ADVANCED(MACDEPLOYQT_OUTPUT_LEVEL)
@@ -144,26 +166,6 @@ ENDIF()
 ###########################################
 
 OPTION(DOWNLOAD_DATA "Download Seg3D sample and test data repository." ON)
-
-
-###########################################
-# Travis CI build needs to be as slim as possible
-###########################################
-
-OPTION(TRAVIS_BUILD "Slim build for Travis CI" OFF)
-MARK_AS_ADVANCED(TRAVIS_BUILD)
-
-IF(TRAVIS_BUILD)
-  SET(SEG3D_BUILD_INTERFACE OFF) # TODO: hopefully temporary, try to speed up build in other ways
-  SET(BUILD_TESTING OFF)
-  SET(BUILD_MOSAIC_TOOLS OFF)
-  SET(BUILD_LARGE_VOLUME_TOOLS OFF)
-  SET(DOWNLOAD_DATA OFF)
-  SET(DISABLED_WARNINGS_GCC "-Wno-unused-local-typedefs")
-  SET(DISABLED_WARNINGS_CLANG "-Wno-unused-local-typedef")
-ELSE()
-  SET(ENABLED_WARNINGS "-Wall")
-ENDIF()
 
 
 ###########################################
