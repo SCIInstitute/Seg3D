@@ -28,7 +28,6 @@ SET_PROPERTY(DIRECTORY PROPERTY "EP_BASE" ${ep_base})
 
 SET(TETGEN_LIBRARY "tet")
 
-# TODO: test on Windows
 ExternalProject_Add(Tetgen_external
   URL "http://tetgen.org/files/tetgen1.4.3.tar.gz"
   PATCH_COMMAND ""
