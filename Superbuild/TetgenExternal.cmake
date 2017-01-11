@@ -2,7 +2,7 @@
 #
 #  The MIT License
 #
-#  Copyright (c) 2015 Scientific Computing and Imaging Institute,
+#  Copyright (c) 2017 Scientific Computing and Imaging Institute,
 #  University of Utah.
 #
 #
@@ -26,19 +26,27 @@
 
 SET_PROPERTY(DIRECTORY PROPERTY "EP_BASE" ${ep_base})
 
+SET(TETGEN_LIBRARY "tet")
+
 # TODO: test on Windows
 ExternalProject_Add(Tetgen_external
   URL "http://tetgen.org/files/tetgen1.4.3.tar.gz"
   PATCH_COMMAND ""
-  CONFIGURE_COMMAND ""
-  BUILD_IN_SOURCE ON
-  BUILD_COMMAND make tetlib
+  #CONFIGURE_COMMAND ""
+  #BUILD_IN_SOURCE ON
+  #BUILD_COMMAND ""
   INSTALL_COMMAND ""
-  #CMAKE_CACHE_ARGS
-  #  -DCMAKE_VERBOSE_MAKEFILE:BOOL=${CMAKE_VERBOSE_MAKEFILE}
-  #  -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
-  #  -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=ON
-  #  #-DTETLIBRARY
+  CMAKE_CACHE_ARGS
+    -DCMAKE_VERBOSE_MAKEFILE:BOOL=${CMAKE_VERBOSE_MAKEFILE}
+    -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
+    -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=ON
+    -DTETGEN_LIBRARY:STRING=${TETGEN_LIBRARY}
+)
+
+ExternalProject_Add_Step(Tetgen_external add_cmakelists
+  COMMAND "${CMAKE_COMMAND}" -E copy ${SUPERBUILD_DIR}/TetgenCMakeLists.txt CMakeLists.txt
+  DEPENDEES download
+  WORKING_DIRECTORY <SOURCE_DIR>
 )
 
 ExternalProject_Get_Property(Tetgen_external SOURCE_DIR)
@@ -48,7 +56,6 @@ SET(TETGEN_INCLUDE ${SOURCE_DIR})
 SET(TETGEN_LIBRARY_DIR ${BINARY_DIR})
 SET(TETGEN_USE_FILE ${INSTALL_DIR}/UseTetgen.cmake)
 # see Tetgen CMakeLists.txt file
-SET(TETGEN_LIBRARY "tet")
 SET(Tetgen_DIR ${INSTALL_DIR} CACHE PATH "")
 
 # Normally this should be handled in external library repo
