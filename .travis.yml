@@ -24,6 +24,7 @@ before_install:
 #  - sudo apt-get -qq --yes install ninja-build mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev mesa-utils-extra libglapi-mesa
 #    qt5-default qttools5-dev-tools qtbase5-dev-tools libqt5core5a libqt5widgets5 libqt5opengl5-dev libqt5svg5-dev
   - sudo apt-get -qq --yes install ninja-build mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev mesa-utils-extra libglapi-mesa
+    openssl libssl-dev libcurl4-openssl-dev
 install:
   # C++11 support required
   - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
