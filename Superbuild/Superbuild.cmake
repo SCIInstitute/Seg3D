@@ -57,6 +57,7 @@ IF(NOT GIT_FOUND)
   MESSAGE(ERROR "Cannot find Git. Git is required for Seg3D's Superbuild")
 ENDIF()
 
+
 ###########################################
 # Configure advanced features:
 #   * large volume (bricked dataset) support
@@ -80,6 +81,7 @@ INCLUDE( ExternalProject )
 #  set(gen "${CMAKE_GENERATOR}" )
 #endif()
 
+
 ###########################################
 # Options for console, headless mode
 ###########################################
@@ -91,11 +93,34 @@ IF(WIN32)
   OPTION(SEG3D_SHOW_CONSOLE "Show console for debugging (Windows GUI build only)" OFF)
 ENDIF()
 
+
 ###########################################
 # Configure python
 ###########################################
 
 OPTION(BUILD_WITH_PYTHON "Build with python support." ON)
+
+
+###########################################
+# Travis CI build needs to be as slim as possible
+###########################################
+
+OPTION(TRAVIS_BUILD "Slim build for Travis CI" OFF)
+MARK_AS_ADVANCED(TRAVIS_BUILD)
+
+IF(TRAVIS_BUILD)
+  SET(SEG3D_BUILD_INTERFACE OFF) # TODO: hopefully temporary, try to speed up build in other ways
+  SET(BUILD_WITH_PYTHON OFF) # TODO: hopefully temporary etc.
+  SET(BUILD_TESTING OFF)
+  SET(BUILD_MOSAIC_TOOLS OFF)
+  SET(BUILD_LARGE_VOLUME_TOOLS OFF)
+  SET(DOWNLOAD_DATA OFF)
+  SET(DISABLED_WARNINGS_GCC "-Wno-unused-local-typedefs")
+  SET(DISABLED_WARNINGS_CLANG "-Wno-unused-local-typedef")
+ELSE()
+  SET(ENABLED_WARNINGS "-Wall")
+ENDIF()
+
 
 ###########################################
 # Configure Qt
@@ -129,7 +154,6 @@ IF(SEG3D_BUILD_INTERFACE)
     MESSAGE(FATAL_ERROR "Qt5 is required for building the Seg3D GUI")
   ENDIF()
 
-
   IF(APPLE)
     SET(MACDEPLOYQT_OUTPUT_LEVEL 0 CACHE STRING "Set macdeployqt output level (0-3)")
     MARK_AS_ADVANCED(MACDEPLOYQT_OUTPUT_LEVEL)
@@ -139,18 +163,25 @@ ENDIF()
 
 
 ###########################################
+# Configure sample data download
+###########################################
+
+OPTION(DOWNLOAD_DATA "Download Seg3D sample and test data repository." ON)
+
+
+###########################################
 # *Nix C++ compiler flags
 ###########################################
 
 IF(UNIX)
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall")
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 ${ENABLED_WARNINGS}")
   IF(APPLE)
     SET(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++11")
     SET(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -ftemplate-depth=256")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -ftemplate-depth=256 ${DISABLED_WARNINGS_CLANG}")
     SET(CMAKE_CXX_FLAGS_DEBUG "-Wshorten-64-to-32 ${CMAKE_CXX_FLAGS_DEBUG}")
   ELSE()
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive ${DISABLED_WARNINGS_GCC}")
     SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--no-as-needed -ldl -lrt")
   ENDIF()
 ENDIF()
@@ -209,7 +240,10 @@ SET(SUPERBUILD_DIR ${CMAKE_CURRENT_SOURCE_DIR} CACHE INTERNAL "" FORCE)
 SET(SEG3D_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../src CACHE INTERNAL "" FORCE)
 SET(SEG3D_BINARY_DIR ${CMAKE_BINARY_DIR}/Seg3D CACHE INTERNAL "" FORCE)
 
-ADD_EXTERNAL( ${SUPERBUILD_DIR}/DataExternal.cmake Data_external )
+IF(DOWNLOAD_DATA)
+  ADD_EXTERNAL( ${SUPERBUILD_DIR}/DataExternal.cmake Data_external )
+ENDIF()
+
 ADD_EXTERNAL( ${SUPERBUILD_DIR}/ZlibExternal.cmake Zlib_external )
 ADD_EXTERNAL( ${SUPERBUILD_DIR}/GlewExternal.cmake Glew_external )
 ADD_EXTERNAL( ${SUPERBUILD_DIR}/FreetypeExternal.cmake Freetype_external )

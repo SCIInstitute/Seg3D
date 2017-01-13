@@ -50,9 +50,11 @@ SET(UTILS_LIBS
   Core_LargeVolume
   Application_Tools
   Application_Filters
-  Application_Socket
 )
 
+IF(BUILD_WITH_PYTHON)
+  LIST(APPEND UTILS_LIBS Application_Socket)
+ENDIF()
 
 ###########################################
 # Build the Seg3D utilities

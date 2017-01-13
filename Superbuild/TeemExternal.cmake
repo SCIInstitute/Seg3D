@@ -28,6 +28,11 @@ SET_PROPERTY(DIRECTORY PROPERTY "EP_BASE" ${ep_base})
 SET(teem_GIT_TAG "origin/master")
 SET(teem_DEPENDENCIES "Zlib_external;LibPNG_external")
 
+IF(TRAVIS_BUILD)
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
+  SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
+ENDIF()
+
 # If CMake ever allows overriding the checkout command or adding flags,
 # git checkout -q will silence message about detached head (harmless).
 ExternalProject_Add(Teem_external
@@ -41,6 +46,8 @@ ExternalProject_Add(Teem_external
     -DCMAKE_VERBOSE_MAKEFILE:BOOL=${CMAKE_VERBOSE_MAKEFILE}
     -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
     -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=ON
+    -DCMAKE_CXX_FLAGS:STATIC=${CMAKE_CXX_FLAGS}
+    -DCMAKE_C_FLAGS:STATIC=${CMAKE_C_FLAGS}
     -DDO_ZLIB_MANGLE:BOOL=${DO_ZLIB_MANGLE}
     -DZlib_DIR:PATH=${Zlib_DIR}
     -DLibPNG_DIR:PATH=${LibPNG_DIR}

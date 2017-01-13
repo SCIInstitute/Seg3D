@@ -143,12 +143,14 @@ SET(APPLICATION_FILTERS_ACTIONS_SRCS
   Actions/ActionPointSetRegisterFilter.cc
   Actions/ActionPointSetTransformFilter.h
   Actions/ActionPointSetTransformFilter.cc
-  Actions/ActionRadialBasisFunction.h
-  Actions/ActionRadialBasisFunction.cc
+  #Actions/ActionRadialBasisFunction.h
+  #Actions/ActionRadialBasisFunction.cc
   Actions/ActionPadFilter.h
   Actions/ActionPadFilter.cc
   Actions/ActionSingleThreshold.h
   Actions/ActionSingleThreshold.cc
+  Actions/ActionWatershedFilter.h
+  Actions/ActionWatershedFilter.cc
 )
 
 IF(BUILD_WITH_PYTHON)

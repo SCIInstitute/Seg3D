@@ -73,6 +73,7 @@ SET(INTERFACE_TOOLINTERFACE_SRCS
   PointsSelectToolInterface.cc
   PadToolInterface.cc
   RadialBasisFunctionToolInterface.cc
+  WatershedFilterInterface.cc
 )
 
 SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
@@ -122,6 +123,7 @@ SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
   PointsSelectToolInterface.h
   PadToolInterface.h
   RadialBasisFunctionToolInterface.h
+  WatershedFilterInterface.h
 )
 
 SET(INTERFACE_TOOLINTERFACE_NO_MOC_SRCS
@@ -174,6 +176,7 @@ SET(INTERFACE_TOOLINTERFACE_UI_SRCS
   PointsSelectToolInterface.ui
   PadToolInterface.ui
   RadialBasisFunctionToolInterface.ui
+  WatershedFilterInterface.ui
 )
 
 ##################################################

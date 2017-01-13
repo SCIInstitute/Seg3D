@@ -33,6 +33,8 @@
 #ifdef BUILD_WITH_PYTHON
 #include <Python.h>
 #include <Core/Python/PythonInterpreter.h>
+#include <Application/Socket/ActionSocket.h>
+
 #include "ActionPythonWrapperRegistration.h"
 #endif
 
@@ -58,7 +60,6 @@
 // Application includes
 #include <Application/InterfaceManager/InterfaceManager.h>
 #include <Application/Tool/ToolFactory.h>
-#include <Application/Socket/ActionSocket.h>
 
 // Interface includes
 #include <Interface/Application/ApplicationInterface.h>
@@ -189,7 +190,6 @@ int main( int argc, char **argv )
   Core::PythonInterpreter::Instance()->initialize( &program_name[ 0 ], python_modules );
   Core::PythonInterpreter::Instance()->run_string( "import " + module_name + "\n" );
   Core::PythonInterpreter::Instance()->run_string( "from " + module_name + " import *\n" );
-#endif
 
   // -- Checking for the socket (accept port too) parameter --
   std::string port_number_string;
@@ -207,6 +207,18 @@ int main( int argc, char **argv )
       InterfaceManager::Instance()->set_initializing( false );
     }
   }
+#else
+  std::string port_number_string;
+  if ( Core::Application::Instance()->check_command_line_parameter( "socket", port_number_string ) ||
+       Core::Application::Instance()->check_command_line_parameter( "port", port_number_string ))
+  {
+    std::string warning("<h6><p align=\"justify\">Opening a socket is not supported without Python.</p></h6>");
+
+    QMessageBox::information( 0,
+      QString::fromStdString( Core::Application::GetApplicationNameAndVersion() ),
+      QString::fromStdString( warning )  );
+  }
+#endif
 
   // -- Setup Application Interface Window --
 //  std::string file_to_view = "";
