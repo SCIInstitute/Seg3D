@@ -2,4 +2,4 @@
 
 Seg3D [build instructions and documentation](http://sciinstitute.github.io/seg3d.pages).
 
-[![Build Status]([![Build Status](https://travis-ci.org/SCIInstitute/Seg3D.svg?branch=master)](https://travis-ci.org/SCIInstitute/Seg3D))
+[![Build Status](https://travis-ci.org/SCIInstitute/Seg3D.svg?branch=master)](https://travis-ci.org/SCIInstitute/Seg3D)
