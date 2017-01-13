@@ -18,14 +18,11 @@ before_install:
   - if [ ! -d $HOME/deps ]; then mkdir $HOME/deps; fi
   - if [ ! -f $HOME/deps/cmake3.tgz ]; then wget --quiet --directory-prefix=$HOME/deps http://www.sci.utah.edu/devbuilds/seg3d/cmake3.tgz; fi
   - sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
-  # TODO: temporarily building headless
- # - sudo add-apt-repository --yes ppa:beineri/opt-qt551-trusty
+  - sudo add-apt-repository --yes ppa:beineri/opt-qt551-trusty
   - sudo apt-get -qq --yes update
-  # TODO: whitelisted packages?
-  - sudo apt-get -qq --yes install ninja-build mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev mesa-utils-extra libglapi-mesa
-  # TODO: temporarily building headless
   # packages currently not whitelisted
- # - sudo apt-get -qq --yes install qt5-default qttools5-dev-tools qtbase5-dev-tools libqt5core5a libqt5widgets5 libqt5opengl5-dev libqt5svg5-dev
+  - sudo apt-get -qq --yes install ninja-build mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev mesa-utils-extra libglapi-mesa
+    qt5-default qttools5-dev-tools qtbase5-dev-tools libqt5core5a libqt5widgets5 libqt5opengl5-dev libqt5svg5-dev
 
 install:
   # C++11 support required
@@ -43,7 +40,6 @@ script:
   - tar xzf $HOME/deps/cmake3.tgz
   - cd bin
 #  - if [ -d Externals ]; then export SEG3D_TARGET="Seg3D_external"; fi
-#  - $TRAVIS_BUILD_DIR/cmake3/bin/cmake -DBUILD_TESTING:BOOL=OFF -DBUILD_MOSAIC_TOOLS:BOOL=OFF -DDOWNLOAD_DATA:BOOL=OFF -DQt5_PATH:PATH=/usr ../Superbuild
   - $TRAVIS_BUILD_DIR/cmake3/bin/cmake -GNinja -DTRAVIS_BUILD:BOOL=ON ../Superbuild
   - travis_wait 45 ninja
 #after_failure:
