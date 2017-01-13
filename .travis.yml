@@ -39,8 +39,7 @@ addons:
 script:
   - tar xzf $HOME/deps/cmake3.tgz
   - cd bin
-#  - if [ -d Externals ]; then export SEG3D_TARGET="Seg3D_external"; fi
-  - $TRAVIS_BUILD_DIR/cmake3/bin/cmake -GNinja -DTRAVIS_BUILD:BOOL=ON ../Superbuild
+  - $TRAVIS_BUILD_DIR/cmake3/bin/cmake -GNinja -DTRAVIS_BUILD:BOOL=ON -DQt5_PATH:PATH=/usr ../Superbuild
   - travis_wait 45 ninja
 #after_failure:
 #after_success:
