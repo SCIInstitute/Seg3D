@@ -225,7 +225,6 @@ IF(APPLE)
     QtUtils_Utils
     QtUtils_Widgets
     QtUtils_Bridge
-#    ${QT_LIBRARIES}
     ${SCI_BOOST_LIBRARY}
     /System/Library/Frameworks/CoreServices.framework)
 ELSE()
@@ -245,7 +244,6 @@ ELSE()
     QtUtils_Utils
     QtUtils_Widgets
     QtUtils_Bridge
-#    ${QT_LIBRARIES}
     ${SCI_BOOST_LIBRARY})
 ENDIF()
 

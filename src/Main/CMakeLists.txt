@@ -75,7 +75,6 @@ TARGET_LINK_LIBRARIES(${APPLICATION_NAME}
   Core_Log
   Application_Tools
   Application_Filters
-  Application_Socket
   QtUtils_Utils
   QtUtils_Widgets
   QtUtils_Bridge
@@ -102,7 +101,10 @@ IF(APPLE)
 ENDIF()
 
 IF(BUILD_WITH_PYTHON)
-  TARGET_LINK_LIBRARIES(${APPLICATION_NAME} Core_Python)
+  TARGET_LINK_LIBRARIES(${APPLICATION_NAME}
+    Core_Python
+    Application_Socket
+  )
 ENDIF()
 
 # add libraries with plug-ins and extensions
