@@ -45,7 +45,7 @@ script:
   - cd bin
 #  - if [ -d Externals ]; then export SEG3D_TARGET="Seg3D_external"; fi
 #  - $TRAVIS_BUILD_DIR/cmake3/bin/cmake -DBUILD_TESTING:BOOL=OFF -DBUILD_MOSAIC_TOOLS:BOOL=OFF -DDOWNLOAD_DATA:BOOL=OFF -DQt5_PATH:PATH=/usr ../Superbuild
-  - $TRAVIS_BUILD_DIR/cmake3/bin/cmake -GNinja-DTRAVIS_BUILD:BOOL=ON ../Superbuild
+  - $TRAVIS_BUILD_DIR/cmake3/bin/cmake -GNinja -DTRAVIS_BUILD:BOOL=ON ../Superbuild
   - ninja
 #after_failure:
 #after_success:
