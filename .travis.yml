@@ -6,12 +6,10 @@ git:
   depth: 5
 compiler:
   - gcc
-#  - clang
+  - clang
 #before_cache:
-# TODO: caching builds per compiler and os?
 cache:
   directories:
-#    - $TRAVIS_BUILD_DIR/bin/Externals
     - $HOME/deps
 before_install:
   # set up dependency cache
