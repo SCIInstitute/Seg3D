@@ -22,7 +22,7 @@ before_install:
  # - sudo add-apt-repository --yes ppa:beineri/opt-qt551-trusty
   - sudo apt-get -qq --yes update
   # TODO: whitelisted packages?
-  - sudo apt-get -qq --yes install mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev mesa-utils-extra libglapi-mesa
+  - sudo apt-get -qq --yes install ninja-build mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev mesa-utils-extra libglapi-mesa
   # TODO: temporarily building headless
   # packages currently not whitelisted
  # - sudo apt-get -qq --yes install qt5-default qttools5-dev-tools qtbase5-dev-tools libqt5core5a libqt5widgets5 libqt5opengl5-dev libqt5svg5-dev
@@ -38,7 +38,6 @@ addons:
     - gcc-4.8
     - g++-4.8
     - clang
-    - ninja-build
 #before_script:
 script:
   - tar xzf $HOME/deps/cmake3.tgz
