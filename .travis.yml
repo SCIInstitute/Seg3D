@@ -40,7 +40,7 @@ script:
   - tar xzf $HOME/deps/cmake3.tgz
   - cd bin
   - $TRAVIS_BUILD_DIR/cmake3/bin/cmake -GNinja -DTRAVIS_BUILD:BOOL=ON -DQt5_PATH:PATH=/usr ../Superbuild
-  - travis_wait 45 ninja
+  - travis_wait 50 ninja
 #after_failure:
 #after_success:
 #after_script:
