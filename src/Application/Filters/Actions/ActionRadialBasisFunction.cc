@@ -193,7 +193,7 @@ public:
 //    {
       RBFInterface rbfAlgo( rbfPointData, rbfOrigin, rbfGridSize, rbfGridSpacing,
                             this->actionInternal_->normalOffset_, axisData,
-                            false, this->actionInternal_->compute2DConvexHull_,
+                            this->actionInternal_->compute2DConvexHull_,
                             this->actionInternal_->invertSeedOrder_, kernel );
 
       this->actionInternal_->thresholdValue_ = rbfAlgo.getThresholdValue();
