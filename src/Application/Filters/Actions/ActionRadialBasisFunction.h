@@ -54,7 +54,7 @@ CORE_ACTION(
   CORE_ACTION_ARGUMENT( "vertices", "The 3D points needed to generate the radial basis function." )
   CORE_ACTION_ARGUMENT( "view_modes", "The 2D view where each point was picked (axial or sagittal or coronal)." )
   CORE_ACTION_ARGUMENT( "normal_offset", "Normal vector offset parameter." )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "convex_hull", "false", "" )
+//  CORE_ACTION_OPTIONAL_ARGUMENT( "convex_hull", "false", "" )
   CORE_ACTION_OPTIONAL_ARGUMENT( "convex_hull_2D", "true", "" )
   CORE_ACTION_OPTIONAL_ARGUMENT( "invert_seed_order", "false", "" )
   CORE_ACTION_OPTIONAL_ARGUMENT( "kernel", "thin_plate", "Radial basis function kernel (thin_plate or gaussian or multi_quadratic)." )
@@ -90,7 +90,7 @@ public:
                        const VertexList& vertices,
                        const ViewModeList& viewModes,
                        double normalOffset,
-                       bool useConvexHull,
+                       //bool useConvexHull,
                        bool compute2DConvexHull,
                        bool invertSeedOrder,
                        const std::string& kernel

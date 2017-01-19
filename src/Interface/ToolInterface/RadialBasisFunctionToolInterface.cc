@@ -84,7 +84,7 @@ bool RadialBasisFunctionToolInterface::build_widget( QFrame* frame )
 	QtUtils::QtBridge::Connect( this->private_->ui_.normalOffsetRange_, tool->normalOffset_state_ );
 	QtUtils::QtBridge::Connect( this->private_->ui_.kernel_, tool->kernel_state_ );
 
-  QtUtils::QtBridge::Connect( this->private_->ui_.convexHullGroupBox, tool->use_convex_hull_state_ );
+//  QtUtils::QtBridge::Connect( this->private_->ui_.convexHullGroupBox, tool->use_convex_hull_state_ );
   QButtonGroup* convex_hull_group = new QButtonGroup( this );
   convex_hull_group->addButton( this->private_->ui_.convex_hull_2D_ );
   convex_hull_group->addButton( this->private_->ui_.convex_hull_3D_ );

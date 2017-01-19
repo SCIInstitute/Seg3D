@@ -104,7 +104,7 @@ class ActionRadialBasisFunctionPrivate
 public:
   ActionRadialBasisFunctionPrivate() :
     normalOffset_(0),
-    useConvexHull_(false),
+//    useConvexHull_(false),
     compute2DConvexHull_(true),
     invertSeedOrder_(false),
     thresholdValue_(0) {}
@@ -115,7 +115,7 @@ public:
   VertexList vertices_;
   ViewModeList view_modes_;
   double normalOffset_;
-  bool useConvexHull_;
+//  bool useConvexHull_;
   bool compute2DConvexHull_;
   bool invertSeedOrder_;
   std::string kernel_;
@@ -193,7 +193,7 @@ public:
 //    {
       RBFInterface rbfAlgo( rbfPointData, rbfOrigin, rbfGridSize, rbfGridSpacing,
                             this->actionInternal_->normalOffset_, axisData,
-                            this->actionInternal_->useConvexHull_, this->actionInternal_->compute2DConvexHull_,
+                            false, this->actionInternal_->compute2DConvexHull_,
                             this->actionInternal_->invertSeedOrder_, kernel );
 
       this->actionInternal_->thresholdValue_ = rbfAlgo.getThresholdValue();
@@ -270,7 +270,7 @@ ActionRadialBasisFunction::ActionRadialBasisFunction() :
   this->add_parameter( this->private_->vertices_ );
   this->add_parameter( this->private_->view_modes_ );
   this->add_parameter( this->private_->normalOffset_ );
-  this->add_parameter( this->private_->useConvexHull_ );
+//  this->add_parameter( this->private_->useConvexHull_ );
   this->add_parameter( this->private_->compute2DConvexHull_ );
   this->add_parameter( this->private_->invertSeedOrder_ );
   this->add_parameter( this->private_->kernel_ );
@@ -373,7 +373,7 @@ void ActionRadialBasisFunction::Dispatch(
                                            const VertexList& vertices,
                                            const ViewModeList& viewModes,
                                            double normalOffset,
-                                           bool useConvexHull,
+                                           //bool useConvexHull,
                                            bool compute2DConvexHull,
                                            bool invertSeedOrder,
                                            const std::string& kernel
@@ -384,7 +384,7 @@ void ActionRadialBasisFunction::Dispatch(
   action->private_->vertices_ = vertices;
   action->private_->view_modes_ = viewModes;
   action->private_->normalOffset_ = normalOffset;
-  action->private_->useConvexHull_ = useConvexHull;
+  //action->private_->useConvexHull_ = useConvexHull;
   action->private_->invertSeedOrder_ = invertSeedOrder;
   action->private_->compute2DConvexHull_ = compute2DConvexHull;
   action->private_->kernel_ = kernel;
