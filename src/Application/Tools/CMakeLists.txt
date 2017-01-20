@@ -125,8 +125,10 @@ SET(APPLICATION_TOOLS_SRCS
   PointsSelectTool.cc
   PadTool.h
   PadTool.cc
-  #RadialBasisFunctionTool.h
-  #RadialBasisFunctionTool.cc
+  RadialBasisFunctionTool.h
+  RadialBasisFunctionTool.cc
+  WatershedFilter.h
+  WatershedFilter.cc
 )
 
 SET(APPLICATION_TOOLS_NOREGISTER_SRCS

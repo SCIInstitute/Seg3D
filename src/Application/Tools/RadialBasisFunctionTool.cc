@@ -51,15 +51,32 @@ namespace Seg3D
 
 using namespace RadialBasisFunction;
 
+const std::string RadialBasisFunctionTool::CONVEX_HULL_2D_C( "2d" );
+const std::string RadialBasisFunctionTool::CONVEX_HULL_3D_C( "3d" );
+
 RadialBasisFunctionTool::RadialBasisFunctionTool( const std::string& toolid ) :
   SeedPointsTool( Core::VolumeType::DATA_E, toolid )
 {
   // TODO: slider max should be up to 20% of source data range.
   // See threshold tool for good implementation example.
-  this->add_state( "normal_offset", this->normalOffset_state_, 10.0, 1.0, 20.0, 0.1 );
+  this->add_state( "normal_offset", this->normalOffset_state_, 2.0, 0.0, 20.0, 0.1 );
   this->add_state( "kernel", this->kernel_state_, "thin_plate",
                    "thin_plate|gaussian|multi_quadratic" );
   this->add_state( "view_modes", this->view_modes_state_ );
+  this->add_state( "compute_2D_convex_hull", this->compute_2D_convex_hull_state_, true );
+  this->add_state( "invert_seed_order", this->invert_seed_order_state_, false );
+  this->add_state( "convex_hull_selection",
+                   this->convex_hull_selection_state_,
+                   CONVEX_HULL_2D_C,
+                   CONVEX_HULL_2D_C + "=2D_convex_hull|" + CONVEX_HULL_3D_C + "=3D_convex_hull" );
+
+  this->add_connection( this->convex_hull_selection_state_->value_changed_signal_.connect(
+    boost::bind( &RadialBasisFunctionTool::handle_convex_hull_type_changed, this, _2 ) ) );
+
+  // TODO: temporary
+  this->add_state( "disabled", this->disabled_widget_state_, false );
+
+
 }
 
 RadialBasisFunctionTool::~RadialBasisFunctionTool()
@@ -116,7 +133,6 @@ bool RadialBasisFunctionTool::handle_mouse_press( ViewerHandle viewer,
                                  this->seed_points_state_, pos );
       Core::ActionAdd::Dispatch( Core::Interface::GetMouseActionContext(),
                                  this->view_modes_state_, view_mode );
-//      viewerPointMap.insert( std::make_pair(pos, view_mode) );
       return true;
     }
   }
@@ -131,7 +147,6 @@ bool RadialBasisFunctionTool::handle_mouse_press( ViewerHandle viewer,
                                     this->seed_points_state_, pt );
       Core::ActionRemove::Dispatch( Core::Interface::GetMouseActionContext(),
                                     this->view_modes_state_, view_mode );
-//      viewerPointMap.erase(pt);
     }
     return true;
   }
@@ -139,11 +154,26 @@ bool RadialBasisFunctionTool::handle_mouse_press( ViewerHandle viewer,
   return false;
 }
 
+void RadialBasisFunctionTool::handle_convex_hull_type_changed( const std::string& type )
+{
+  ASSERT_IS_APPLICATION_THREAD();
+
+  if ( type == RadialBasisFunctionTool::CONVEX_HULL_2D_C )
+  {
+    this->compute_2D_convex_hull_state_->set( true );
+  }
+  else
+  {
+    this->compute_2D_convex_hull_state_->set( false );
+  }
+}
+
 void RadialBasisFunctionTool::handle_seed_points_changed()
 {
   if (this->seed_points_state_->size() == 0)
   {
-    Core::ActionClear::Dispatch( Core::Interface::GetWidgetActionContext(), this->view_modes_state_ );
+    Core::ActionClear::Dispatch( Core::Interface::GetWidgetActionContext(),
+                                 this->view_modes_state_ );
   }
   SeedPointsTool::handle_seed_points_changed();
 }
@@ -158,6 +188,8 @@ void RadialBasisFunctionTool::execute( Core::ActionContextHandle context )
                                        this->seed_points_state_->get(),
                                        this->view_modes_state_->get(),
                                        this->normalOffset_state_->get(),
+                                       this->compute_2D_convex_hull_state_->get(),
+                                       this->invert_seed_order_state_->get(),
                                        this->kernel_state_->get()
                                      );
 }

@@ -24,7 +24,7 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
- */
+*/
 
 // Qt includes
 #include <QtGui/QColor>
@@ -747,6 +747,16 @@ namespace Seg3D
   " color: rgb( " FONT_COLOR ") ;"
   " font: normal;"
   " font-size: 10px;"
+  "}"
+  "QGroupBox::indicator {"
+  " width: 13px;"
+  " height: 13px;"
+  "}"
+  "QGroupBox::indicator:unchecked {"
+  " image: url(:/General_Icons/checkbox-unselected.png);"
+  "}"
+  "QGroupBox::indicator:checked {"
+  " image: url(:/General_Icons/checkbox-selected.png);"
   "}"
   "QComboBox{"
   " background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, "

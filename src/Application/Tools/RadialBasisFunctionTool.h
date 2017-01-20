@@ -59,6 +59,16 @@ public:
   Core::StateRangedDoubleHandle normalOffset_state_;
   Core::StateOptionHandle kernel_state_;
   Core::StateStringVectorHandle view_modes_state_;
+  Core::StateBoolHandle compute_2D_convex_hull_state_;
+  Core::StateBoolHandle invert_seed_order_state_;
+  Core::StateLabeledOptionHandle convex_hull_selection_state_;
+
+  // TODO: temporary
+  Core::StateBoolHandle disabled_widget_state_;
+
+public:
+  static const std::string CONVEX_HULL_2D_C;
+  static const std::string CONVEX_HULL_3D_C;
 
   // -- execute --
 public:
@@ -78,7 +88,7 @@ public:
 
 private:
   void handle_target_layer_changed();
-//  ViewerPointMap viewerPointMap;
+  void handle_convex_hull_type_changed( const std::string& type );
 };
   
 } // end namespace

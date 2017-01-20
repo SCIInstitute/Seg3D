@@ -149,6 +149,8 @@ SET(APPLICATION_FILTERS_ACTIONS_SRCS
   Actions/ActionPadFilter.cc
   Actions/ActionSingleThreshold.h
   Actions/ActionSingleThreshold.cc
+  Actions/ActionWatershedFilter.h
+  Actions/ActionWatershedFilter.cc
 )
 
 IF(BUILD_WITH_PYTHON)
@@ -172,6 +174,7 @@ TARGET_LINK_LIBRARIES(Application_Filters
   Application_ProjectManager
   ${SCI_BOOST_LIBRARY}
   ${ImplicitFunction_LIBRARY}
+  ${TETGEN_LIBRARY}
 )
 
 # Register action classes

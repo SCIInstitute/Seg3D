@@ -1,22 +1,22 @@
 #
 #  For more information, please see: http://software.sci.utah.edu
-# 
+#
 #  The MIT License
-# 
+#
 #  Copyright (c) 2016 Scientific Computing and Imaging Institute,
 #  University of Utah.
-# 
-#  
+#
+#
 #  Permission is hereby granted, free of charge, to any person obtaining a
 #  copy of this software and associated documentation files (the "Software"),
 #  to deal in the Software without restriction, including without limitation
 #  the rights to use, copy, modify, merge, publish, distribute, sublicense,
 #  and/or sell copies of the Software, and to permit persons to whom the
 #  Software is furnished to do so, subject to the following conditions:
-# 
+#
 #  The above copyright notice and this permission notice shall be included
-#  in all copies or substantial portions of the Software. 
-# 
+#  in all copies or substantial portions of the Software.
+#
 #  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
 #  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 #  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -48,7 +48,7 @@ ENDIF()
 
 ADD_EXECUTABLE(${APPLICATION_NAME} ${MAIN_SRCS})
 
-TARGET_LINK_LIBRARIES(${APPLICATION_NAME} 
+TARGET_LINK_LIBRARIES(${APPLICATION_NAME}
   ${SCI_BOOST_LIBRARY}
   Core_Utils
   Core_DataBlock
@@ -62,7 +62,6 @@ TARGET_LINK_LIBRARIES(${APPLICATION_NAME}
   Core_Log
   Application_Tools
   Application_Filters
-  Application_Socket
   ${SCI_ZLIB_LIBRARY}
   ${SCI_PNG_LIBRARY}
   ${SCI_TEEM_LIBRARY}
@@ -76,8 +75,17 @@ IF(WIN32)
     LINK_FLAGS "/INCREMENTAL:NO")
 ENDIF(WIN32)
 
+IF(APPLE)
+  SET_TARGET_PROPERTIES(${APPLICATION_NAME}
+    PROPERTIES
+    LINK_FLAGS "-framework CoreGraphics")
+ENDIF()
+
 IF(BUILD_WITH_PYTHON)
-  TARGET_LINK_LIBRARIES(${APPLICATION_NAME} Core_Python)
+  TARGET_LINK_LIBRARIES(${APPLICATION_NAME}
+    Core_Python
+    Application_Socket
+  )
 ENDIF()
 
 # add libraries with plug-ins and extensions

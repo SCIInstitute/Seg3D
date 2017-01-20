@@ -33,6 +33,8 @@
 #ifdef BUILD_WITH_PYTHON
 #include <Python.h>
 #include <Core/Python/PythonInterpreter.h>
+#include <Application/Socket/ActionSocket.h>
+
 #include "ActionPythonWrapperRegistration.h"
 #endif
 
@@ -58,7 +60,6 @@
 // Application includes
 #include <Application/InterfaceManager/InterfaceManager.h>
 #include <Application/Tool/ToolFactory.h>
-#include <Application/Socket/ActionSocket.h>
 
 // File that contains a function that registers all the class that need registration,
 // such as Actions and Tools
@@ -141,7 +142,8 @@ int main( int argc, char **argv )
       + Core::Application::GetApplicationName() +
       " may run out of addressable memory. If you have a 64-bit machine,"
       " we would recommend to download the 64-bit version</p></h6>";
-    
+
+      CORE_LOG_WARNING(warning);
   }
 #ifdef BUILD_WITH_PYTHON
   size_t name_len = strlen( argv[ 0 ] );
@@ -155,11 +157,11 @@ int main( int argc, char **argv )
   Core::PythonInterpreter::Instance()->initialize( &program_name[ 0 ], python_modules );
   Core::PythonInterpreter::Instance()->run_string( "import " + module_name + "\n" );
   Core::PythonInterpreter::Instance()->run_string( "from " + module_name + " import *\n" );
-#endif
 
   // -- Checking for the socket parameter --
   std::string port_number_string;
-  if( Core::Application::Instance()->check_command_line_parameter( "socket", port_number_string ) )
+  if ( Core::Application::Instance()->check_command_line_parameter( "socket", port_number_string ) ||
+       Core::Application::Instance()->check_command_line_parameter( "port", port_number_string ))
   {
     int port_number;
     if ( Core::ImportFromString( port_number_string, port_number) )
@@ -172,6 +174,14 @@ int main( int argc, char **argv )
       InterfaceManager::Instance()->set_initializing( false );
     }
   }
+#else
+  std::string port_number_string;
+  if ( Core::Application::Instance()->check_command_line_parameter( "socket", port_number_string ) ||
+       Core::Application::Instance()->check_command_line_parameter( "port", port_number_string ))
+  {
+    CORE_LOG_WARNING("Opening a socket is not supported without Python.");
+  }
+#endif
 
   // -- Setup Application Interface Window --
 //  std::string file_to_view = "";

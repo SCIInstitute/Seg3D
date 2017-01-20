@@ -2,7 +2,7 @@
 #
 #  The MIT License
 #
-#  Copyright (c) 2016 Scientific Computing and Imaging Institute,
+#  Copyright (c) 2015 Scientific Computing and Imaging Institute,
 #  University of Utah.
 #
 #
@@ -25,35 +25,18 @@
 #  DEALINGS IN THE SOFTWARE.
 
 SET_PROPERTY(DIRECTORY PROPERTY "EP_BASE" ${ep_base})
-SET(libpng_GIT_TAG "origin/master")
-SET(libpng_DEPENDENCIES "Zlib_external")
 
-IF(TRAVIS_BUILD)
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
-  SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
-ENDIF()
-
-# If CMake ever allows overriding the checkout command or adding flags,
-# git checkout -q will silence message about detached head (harmless).
-ExternalProject_Add(LibPNG_external
-  DEPENDS ${libpng_DEPENDENCIES}
-  GIT_REPOSITORY "https://github.com/CIBC-Internal/libpng.git"
-  GIT_TAG ${libpng_GIT_TAG}
+# TODO: test on Windows
+ExternalProject_Add(Eigen_external
+  URL "https://bitbucket.org/eigen/eigen/get/3.2.10.tar.gz"
   PATCH_COMMAND ""
-  INSTALL_DIR ""
+  CONFIGURE_COMMAND ""
+  BUILD_IN_SOURCE ON
+  BUILD_COMMAND ""
   INSTALL_COMMAND ""
-  CMAKE_CACHE_ARGS
-    -DCMAKE_VERBOSE_MAKEFILE:BOOL=${CMAKE_VERBOSE_MAKEFILE}
-    -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
-    -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=ON
-    -DCMAKE_CXX_FLAGS:STATIC=${CMAKE_CXX_FLAGS}
-    -DCMAKE_C_FLAGS:STATIC=${CMAKE_C_FLAGS}
-    -DPNG_STATIC:BOOL=ON
-    -DDO_ZLIB_MANGLE:BOOL=${DO_ZLIB_MANGLE}
-    -DZlib_DIR:PATH=${Zlib_DIR}
 )
 
-ExternalProject_Get_Property(LibPNG_external BINARY_DIR)
-SET(LibPNG_DIR ${BINARY_DIR} CACHE PATH "")
+ExternalProject_Get_Property(Eigen_external SOURCE_DIR)
+SET(Eigen_DIR ${SOURCE_DIR} CACHE PATH "")
 
-MESSAGE(STATUS "LibPNG_DIR: ${LibPNG_DIR}")
+MESSAGE(STATUS "Eigen_DIR: ${Eigen_DIR}")
