@@ -143,8 +143,8 @@ SET(APPLICATION_FILTERS_ACTIONS_SRCS
   Actions/ActionPointSetRegisterFilter.cc
   Actions/ActionPointSetTransformFilter.h
   Actions/ActionPointSetTransformFilter.cc
-  #Actions/ActionRadialBasisFunction.h
-  #Actions/ActionRadialBasisFunction.cc
+  Actions/ActionRadialBasisFunction.h
+  Actions/ActionRadialBasisFunction.cc
   Actions/ActionPadFilter.h
   Actions/ActionPadFilter.cc
   Actions/ActionSingleThreshold.h
@@ -174,6 +174,7 @@ TARGET_LINK_LIBRARIES(Application_Filters
   Application_ProjectManager
   ${SCI_BOOST_LIBRARY}
   ${ImplicitFunction_LIBRARY}
+  ${TETGEN_LIBRARY}
 )
 
 # Register action classes

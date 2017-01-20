@@ -251,6 +251,8 @@ ADD_EXTERNAL( ${SUPERBUILD_DIR}/SQLiteExternal.cmake SQLite_external )
 ADD_EXTERNAL( ${SUPERBUILD_DIR}/LibPNGExternal.cmake LibPNG_external )
 ADD_EXTERNAL( ${SUPERBUILD_DIR}/TeemExternal.cmake Teem_external )
 ADD_EXTERNAL( ${SUPERBUILD_DIR}/ITKExternal.cmake ITK_external )
+ADD_EXTERNAL( ${SUPERBUILD_DIR}/TetgenExternal.cmake Tetgen_external )
+ADD_EXTERNAL( ${SUPERBUILD_DIR}/EigenExternal.cmake Eigen_external )
 ADD_EXTERNAL( ${SUPERBUILD_DIR}/ImplicitFunctionExternal.cmake ImplicitFunction_external )
 
 IF(BUILD_WITH_PYTHON)
@@ -288,6 +290,7 @@ SET(SEG3D_CACHE_ARGS
     "-DGlew_DIR:PATH=${Glew_DIR}"
     "-DTeem_DIR:PATH=${Teem_DIR}"
     "-DImplicitFunction_DIR:PATH=${ImplicitFunction_DIR}"
+    "-DTetgen_DIR:PATH=${Tetgen_DIR}"
 )
 
 IF(BUILD_WITH_PYTHON)

@@ -2,7 +2,7 @@
 #
 #  The MIT License
 #
-#  Copyright (c) 2016 Scientific Computing and Imaging Institute,
+#  Copyright (c) 2017 Scientific Computing and Imaging Institute,
 #  University of Utah.
 #
 #
@@ -25,38 +25,40 @@
 #  DEALINGS IN THE SOFTWARE.
 
 SET_PROPERTY(DIRECTORY PROPERTY "EP_BASE" ${ep_base})
-SET(implicitFunction_GIT_TAG "origin/master")
-SET(implicitFunction_DEPENDENCIES "Tetgen_external;Eigen_external")
 
-IF(TRAVIS_BUILD)
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
-ENDIF()
+SET(TETGEN_LIBRARY "tet")
 
-# If CMake ever allows overriding the checkout command or adding flags,
-# git checkout -q will silence message about detached head (harmless).
-ExternalProject_Add(ImplicitFunction_external
-  DEPENDS ${implicitFunction_DEPENDENCIES}
-  GIT_REPOSITORY "https://github.com/SCIInstitute/ImplicitFunction.git"
-  GIT_TAG ${implicitFunction_GIT_TAG}
+ExternalProject_Add(Tetgen_external
+  URL "http://tetgen.org/files/tetgen1.4.3.tar.gz"
   PATCH_COMMAND ""
-  INSTALL_DIR ""
+  #CONFIGURE_COMMAND ""
+  #BUILD_IN_SOURCE ON
+  #BUILD_COMMAND ""
   INSTALL_COMMAND ""
   CMAKE_CACHE_ARGS
     -DCMAKE_VERBOSE_MAKEFILE:BOOL=${CMAKE_VERBOSE_MAKEFILE}
     -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
     -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=ON
-    -DCMAKE_CXX_FLAGS:STATIC=${CMAKE_CXX_FLAGS}
-    -DCMAKE_CXX_FLAGS_DEBUG:STATIC=${CMAKE_CXX_FLAGS_DEBUG}
-    -DCMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD:STATIC=${CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD}
-    -DCMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY:STATIC=${CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY}
-    -DBUILD_TESTING:BOOL=OFF
-    -DTravisCI_BUILD:BOOL=OFF
-    -DEIGEN3_INSTALL_DIR:PATH=${Eigen_DIR}
-    -DTetgen_DIR:PATH=${Tetgen_DIR}
-    -DBUILD_TESTING:BOOL=OFF
+    -DTETGEN_LIBRARY:STRING=${TETGEN_LIBRARY}
 )
 
-ExternalProject_Get_Property(ImplicitFunction_external BINARY_DIR)
-SET(ImplicitFunction_DIR ${BINARY_DIR} CACHE PATH "")
+ExternalProject_Add_Step(Tetgen_external add_cmakelists
+  COMMAND "${CMAKE_COMMAND}" -E copy ${SUPERBUILD_DIR}/TetgenCMakeLists.txt CMakeLists.txt
+  DEPENDEES download
+  WORKING_DIRECTORY <SOURCE_DIR>
+)
 
-MESSAGE(STATUS "ImplicitFunction_DIR: ${ImplicitFunction_DIR}")
+ExternalProject_Get_Property(Tetgen_external SOURCE_DIR)
+ExternalProject_Get_Property(Tetgen_external BINARY_DIR)
+ExternalProject_Get_Property(Tetgen_external INSTALL_DIR)
+SET(TETGEN_INCLUDE ${SOURCE_DIR})
+SET(TETGEN_LIBRARY_DIR ${BINARY_DIR})
+SET(TETGEN_USE_FILE ${INSTALL_DIR}/UseTetgen.cmake)
+# see Tetgen CMakeLists.txt file
+SET(Tetgen_DIR ${INSTALL_DIR} CACHE PATH "")
+
+# Normally this should be handled in external library repo
+CONFIGURE_FILE(${SUPERBUILD_DIR}/TetgenConfig.cmake.in ${INSTALL_DIR}/TetgenConfig.cmake @ONLY)
+CONFIGURE_FILE(${SUPERBUILD_DIR}/UseTetgen.cmake ${TETGEN_USE_FILE} COPYONLY)
+
+MESSAGE(STATUS "Tetgen_DIR: ${Tetgen_DIR}")
