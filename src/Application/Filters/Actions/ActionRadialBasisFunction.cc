@@ -104,7 +104,6 @@ class ActionRadialBasisFunctionPrivate
 public:
   ActionRadialBasisFunctionPrivate() :
     normalOffset_(0),
-//    useConvexHull_(false),
     compute2DConvexHull_(true),
     invertSeedOrder_(false),
     thresholdValue_(0) {}
@@ -115,7 +114,6 @@ public:
   VertexList vertices_;
   ViewModeList view_modes_;
   double normalOffset_;
-//  bool useConvexHull_;
   bool compute2DConvexHull_;
   bool invertSeedOrder_;
   std::string kernel_;
@@ -135,11 +133,6 @@ public:
     DataLayerHandle srcDataLayer = boost::dynamic_pointer_cast<DataLayer>(this->actionInternal_->srcLayer_);
     DataLayerHandle dstDataLayer = boost::dynamic_pointer_cast<DataLayer>(this->actionInternal_->dstLayer_);
     GridTransform srcGridTransform = srcDataLayer->get_grid_transform();
-//    if ( this->actionInternal_->vertices_.size() != this->actionInternal_->view_modes_.size() )
-//    {
-//      this->report_error("Bad points data.");
-//      return;
-//    }
 
     std::vector<vec3> rbfPointData;
     for ( auto &vertex : this->actionInternal_->vertices_ )
@@ -189,8 +182,6 @@ public:
       kernel = MultiQuadratic;
     }
 
-//    try
-//    {
       RBFInterface rbfAlgo( rbfPointData, rbfOrigin, rbfGridSize, rbfGridSpacing,
                             this->actionInternal_->normalOffset_, axisData,
                             this->actionInternal_->compute2DConvexHull_,
@@ -224,17 +215,6 @@ public:
                                                     Core::DataVolumeHandle(new Core::DataVolume( this->actionInternal_->dstLayer_->get_grid_transform(), dstDataBlock ) ),
                                                     true
                                                    );
-//    }
-//    catch (std::exception& e)
-//    {
-//      this->report_error( e.what() );
-//      return;
-//    }
-//    catch (...)
-//    {
-//      this->report_error( "RBFInterface terminated with exception." );
-//      return;
-//    }
   }
   SCI_END_RUN()
 
@@ -270,7 +250,6 @@ ActionRadialBasisFunction::ActionRadialBasisFunction() :
   this->add_parameter( this->private_->vertices_ );
   this->add_parameter( this->private_->view_modes_ );
   this->add_parameter( this->private_->normalOffset_ );
-//  this->add_parameter( this->private_->useConvexHull_ );
   this->add_parameter( this->private_->compute2DConvexHull_ );
   this->add_parameter( this->private_->invertSeedOrder_ );
   this->add_parameter( this->private_->kernel_ );
@@ -373,7 +352,6 @@ void ActionRadialBasisFunction::Dispatch(
                                            const VertexList& vertices,
                                            const ViewModeList& viewModes,
                                            double normalOffset,
-                                           //bool useConvexHull,
                                            bool compute2DConvexHull,
                                            bool invertSeedOrder,
                                            const std::string& kernel
@@ -384,7 +362,6 @@ void ActionRadialBasisFunction::Dispatch(
   action->private_->vertices_ = vertices;
   action->private_->view_modes_ = viewModes;
   action->private_->normalOffset_ = normalOffset;
-  //action->private_->useConvexHull_ = useConvexHull;
   action->private_->invertSeedOrder_ = invertSeedOrder;
   action->private_->compute2DConvexHull_ = compute2DConvexHull;
   action->private_->kernel_ = kernel;
