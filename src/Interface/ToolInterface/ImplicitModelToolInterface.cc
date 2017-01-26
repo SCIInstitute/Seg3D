@@ -34,48 +34,48 @@
 #include <Core/Interface/Interface.h>
 
 // QtGui includes
-#include "ui_RadialBasisFunctionToolInterface.h"
+#include "ui_ImplicitModelToolInterface.h"
 
 //Application Includes
-#include <Application/Tools/RadialBasisFunctionTool.h>
+#include <Application/Tools/ImplicitModelTool.h>
 
 // QtUtils includes
 #include <QtUtils/Bridge/QtBridge.h>
 
 //Interface Includes
-#include <Interface/ToolInterface/RadialBasisFunctionToolInterface.h>
+#include <Interface/ToolInterface/ImplicitModelToolInterface.h>
 
 
-SCI_REGISTER_TOOLINTERFACE( Seg3D, RadialBasisFunctionToolInterface )
+SCI_REGISTER_TOOLINTERFACE( Seg3D, ImplicitModelToolInterface )
 
 namespace Seg3D
 {
 
-class RadialBasisFunctionToolInterfacePrivate
+class ImplicitModelToolInterfacePrivate
 {
 public:
-	Ui::RadialBasisFunctionToolInterface ui_;	
+	Ui::ImplicitModelToolInterface ui_;	
 };
 
 // constructor
-RadialBasisFunctionToolInterface::RadialBasisFunctionToolInterface() :
-	private_( new RadialBasisFunctionToolInterfacePrivate )
+ImplicitModelToolInterface::ImplicitModelToolInterface() :
+	private_( new ImplicitModelToolInterfacePrivate )
 {
 }
 
 // destructor
-RadialBasisFunctionToolInterface::~RadialBasisFunctionToolInterface()
+ImplicitModelToolInterface::~ImplicitModelToolInterface()
 {
 }
 
 // build the interface and connect it to the state manager
-bool RadialBasisFunctionToolInterface::build_widget( QFrame* frame )
+bool ImplicitModelToolInterface::build_widget( QFrame* frame )
 {
 	//Step 1 - build the Qt GUI Widget
 	this->private_->ui_.setupUi( frame );
 
 	//Step 2 - get a pointer to the tool
-	RadialBasisFunctionTool* tool = dynamic_cast< RadialBasisFunctionTool* > ( this->tool().get() );
+	ImplicitModelTool* tool = dynamic_cast< ImplicitModelTool* > ( this->tool().get() );
 	    
 	//Step 3 - connect the gui to the tool through the QtBridge
 	QtUtils::QtBridge::Connect( this->private_->ui_.targetLayer_, tool->target_layer_state_ );

@@ -26,7 +26,7 @@
  DEALINGS IN THE SOFTWARE.
 */
 
-#include <Application/Filters/Actions/ActionRadialBasisFunction.h>
+#include <Application/Filters/Actions/ActionImplicitModel.h>
 
 #include <Application/Filters/LayerFilter.h>
 #include <Application/Filters/Actions/ActionThreshold.h>
@@ -54,12 +54,12 @@
 #include <ScatteredData.h>
 #include <vec3.h>
 
-CORE_REGISTER_ACTION( RadialBasisFunction, RadialBasisFunction )
+CORE_REGISTER_ACTION( ImplicitModel, ImplicitModel )
 
-namespace RadialBasisFunction
+namespace ImplicitModel
 {
 
-typedef boost::shared_ptr< ActionRadialBasisFunction > ActionRadialBasisFunctionHandle;
+typedef boost::shared_ptr< ActionImplicitModel > ActionImplicitModelHandle;
 
 using namespace ::Seg3D;
 using namespace ::Core;
@@ -73,15 +73,15 @@ public:
   std::string layerID_;
   ActionContextHandle layerContext_;
   NotifierHandle notifier_;
-  ActionRadialBasisFunctionHandle action_;
+  ActionImplicitModelHandle action_;
 
-  NotifierRunnable(const std::string& layerID, ActionContextHandle& layerContext, ActionRadialBasisFunctionHandle action) :
+  NotifierRunnable(const std::string& layerID, ActionContextHandle& layerContext, ActionImplicitModelHandle action) :
     layerID_(layerID),
     layerContext_(layerContext),
     action_(action)
   {
     this->add_connection(
-      this->runThresholdSignal_.connect( boost::bind(&ActionRadialBasisFunction::run_threshold, action_, _1) ) );
+      this->runThresholdSignal_.connect( boost::bind(&ActionImplicitModel::run_threshold, action_, _1) ) );
   }
 
   ~NotifierRunnable()
@@ -99,10 +99,10 @@ public:
   }
 };
 
-class ActionRadialBasisFunctionPrivate
+class ActionImplicitModelPrivate
 {
 public:
-  ActionRadialBasisFunctionPrivate() :
+  ActionImplicitModelPrivate() :
     normalOffset_(0),
     compute2DConvexHull_(true),
     invertSeedOrder_(false),
@@ -120,13 +120,13 @@ public:
   double thresholdValue_;
 };
 
-class RadialBasisFunctionAlgo : public LayerFilter
+class ImplicitModelAlgo : public LayerFilter
 {
 public:
-  ActionRadialBasisFunctionPrivateHandle actionInternal_;
+  ActionImplicitModelPrivateHandle actionInternal_;
 
-  RadialBasisFunctionAlgo();
-  virtual ~RadialBasisFunctionAlgo();
+  ImplicitModelAlgo();
+  virtual ~ImplicitModelAlgo();
   
   SCI_BEGIN_RUN()
   {
@@ -134,10 +134,10 @@ public:
     DataLayerHandle dstDataLayer = boost::dynamic_pointer_cast<DataLayer>(this->actionInternal_->dstLayer_);
     GridTransform srcGridTransform = srcDataLayer->get_grid_transform();
 
-    std::vector<vec3> rbfPointData;
+    std::vector<vec3> modelPointData;
     for ( auto &vertex : this->actionInternal_->vertices_ )
     {
-      rbfPointData.push_back( vec3(vertex.x(), vertex.y(), vertex.z()) );
+      modelPointData.push_back( vec3(vertex.x(), vertex.y(), vertex.z()) );
     }
 
     std::vector<axis_t> axisData;
@@ -164,12 +164,11 @@ public:
       }
     }
 
-
     // origin and size from source data layer
     Point origin = srcGridTransform.get_origin();
-    vec3 rbfOrigin(origin.x(), origin.y(), origin.z());
-    vec3 rbfGridSize(srcGridTransform.get_nx(), srcGridTransform.get_ny(), srcGridTransform.get_nz());
-    vec3 rbfGridSpacing(srcGridTransform.spacing_x(), srcGridTransform.spacing_y(), srcGridTransform.spacing_z());
+    vec3 modelOrigin(origin.x(), origin.y(), origin.z());
+    vec3 modelGridSize(srcGridTransform.get_nx(), srcGridTransform.get_ny(), srcGridTransform.get_nz());
+    vec3 modelGridSpacing(srcGridTransform.spacing_x(), srcGridTransform.spacing_y(), srcGridTransform.spacing_z());
 
     // From RBF class. ThinPlate is the default kernel.
     Kernel kernel = ThinPlate;
@@ -182,12 +181,12 @@ public:
       kernel = MultiQuadratic;
     }
 
-      RBFInterface rbfAlgo( rbfPointData, rbfOrigin, rbfGridSize, rbfGridSpacing,
+      RBFInterface modelAlgo( modelPointData, modelOrigin, modelGridSize, modelGridSpacing,
                             this->actionInternal_->normalOffset_, axisData,
                             this->actionInternal_->compute2DConvexHull_,
                             this->actionInternal_->invertSeedOrder_, kernel );
 
-      this->actionInternal_->thresholdValue_ = rbfAlgo.getThresholdValue();
+      this->actionInternal_->thresholdValue_ = modelAlgo.getThresholdValue();
 
       Core::DataBlockHandle dstDataBlock = Core::StdDataBlock::New( srcGridTransform, Core::DataType::DOUBLE_E );
       if ( ! dstDataBlock )
@@ -196,7 +195,7 @@ public:
         return;
       }
 
-      const DataStorage rasterData = rbfAlgo.getRasterData();
+      const DataStorage rasterData = modelAlgo.getRasterData();
       for (size_t i = 0; i < dstDataBlock->get_nx(); ++i)
       {
         for (size_t j = 0; j < dstDataBlock->get_ny(); ++j)
@@ -222,7 +221,7 @@ public:
   // The name of the filter, this information is used for generating new layer labels.
   virtual std::string get_filter_name() const
   {
-    return "RadialBasisFunction Tool";
+    return "ImplicitModel Tool";
   }
   
   // GET_LAYER_PREFIX:
@@ -230,20 +229,20 @@ public:
   // when a new layer is generated.
   virtual std::string get_layer_prefix() const
   {
-    return "RadialBasisFunction";	
+    return "ImplicitModel";	
   }	
 };
 
-RadialBasisFunctionAlgo::RadialBasisFunctionAlgo()
+ImplicitModelAlgo::ImplicitModelAlgo()
 {
 }
 
-RadialBasisFunctionAlgo::~RadialBasisFunctionAlgo()
+ImplicitModelAlgo::~ImplicitModelAlgo()
 {
 }
 
-ActionRadialBasisFunction::ActionRadialBasisFunction() :
-  private_( new ActionRadialBasisFunctionPrivate )
+ActionImplicitModel::ActionImplicitModel() :
+  private_( new ActionImplicitModelPrivate )
 
 {
   this->add_layer_id( this->private_->targetLayerID_ );
@@ -256,7 +255,7 @@ ActionRadialBasisFunction::ActionRadialBasisFunction() :
   this->add_parameter( this->sandbox_ );
 }
 
-bool ActionRadialBasisFunction::validate( ActionContextHandle& context )
+bool ActionImplicitModel::validate( ActionContextHandle& context )
 {
   if (this->private_->vertices_.size() < 3)
   {
@@ -282,9 +281,9 @@ bool ActionRadialBasisFunction::validate( ActionContextHandle& context )
   return true;
 }
 
-bool ActionRadialBasisFunction::run( ActionContextHandle& context, ActionResultHandle& result )
+bool ActionImplicitModel::run( ActionContextHandle& context, ActionResultHandle& result )
 {
-  boost::shared_ptr< RadialBasisFunctionAlgo > algo( new RadialBasisFunctionAlgo() );
+  boost::shared_ptr< ImplicitModelAlgo > algo( new ImplicitModelAlgo() );
 
   // Set up parameters
   algo->set_sandbox( this->sandbox_ );
@@ -327,14 +326,14 @@ bool ActionRadialBasisFunction::run( ActionContextHandle& context, ActionResultH
     NotifierRunnableHandle notifierThread_(
       new NotifierRunnable( this->private_->dstLayer_->get_layer_id(),
                             layerContext,
-                            boost::dynamic_pointer_cast< ActionRadialBasisFunction >(this->shared_from_this()) ) );
+                            boost::dynamic_pointer_cast< ActionImplicitModel >(this->shared_from_this()) ) );
       Runnable::Start( notifierThread_ );
   }
 
 	return true;
 }
 
-bool ActionRadialBasisFunction::run_threshold( ActionContextHandle& context )
+bool ActionImplicitModel::run_threshold( ActionContextHandle& context )
 {
   DataLayerHandle dstDataLayer = boost::dynamic_pointer_cast<DataLayer>( this->private_->dstLayer_ );
   double dstMaxValue = dstDataLayer->get_data_volume()->get_data_block()->get_max();
@@ -346,18 +345,18 @@ bool ActionRadialBasisFunction::run_threshold( ActionContextHandle& context )
   return true;
 }
 
-void ActionRadialBasisFunction::Dispatch(
-                                           ActionContextHandle context,
-                                           const std::string& target,
-                                           const VertexList& vertices,
-                                           const ViewModeList& viewModes,
-                                           double normalOffset,
-                                           bool compute2DConvexHull,
-                                           bool invertSeedOrder,
-                                           const std::string& kernel
-                                         )
+void ActionImplicitModel::Dispatch(
+                                    ActionContextHandle context,
+                                    const std::string& target,
+                                    const VertexList& vertices,
+                                    const ViewModeList& viewModes,
+                                    double normalOffset,
+                                    bool compute2DConvexHull,
+                                    bool invertSeedOrder,
+                                    const std::string& kernel
+                                  )
 {
-  ActionRadialBasisFunction* action = new ActionRadialBasisFunction;
+  ActionImplicitModel* action = new ActionImplicitModel;
   action->private_->targetLayerID_ = target;
   action->private_->vertices_ = vertices;
   action->private_->view_modes_ = viewModes;

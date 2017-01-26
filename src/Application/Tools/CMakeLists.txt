@@ -125,8 +125,8 @@ SET(APPLICATION_TOOLS_SRCS
   PointsSelectTool.cc
   PadTool.h
   PadTool.cc
-  RadialBasisFunctionTool.h
-  RadialBasisFunctionTool.cc
+  ImplicitModelTool.h
+  ImplicitModelTool.cc
   WatershedFilter.h
   WatershedFilter.cc
 )

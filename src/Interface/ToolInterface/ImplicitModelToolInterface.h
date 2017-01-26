@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_TOOLINTERFACE_RADIALBASISFUNCTIONTOOLINTERFACE_H
-#define INTERFACE_TOOLINTERFACE_RADIALBASISFUNCTIONTOOLINTERFACE_H
+#ifndef INTERFACE_TOOLINTERFACE_IMPLICITMODELTOOLINTERFACE_H
+#define INTERFACE_TOOLINTERFACE_IMPLICITMODELTOOLINTERFACE_H
 
 // Base class of the tool widget
 #include <Interface/Application/ToolWidget.h>
@@ -35,16 +35,16 @@
 namespace Seg3D
 {
 
-class RadialBasisFunctionToolInterfacePrivate;
+class ImplicitModelToolInterfacePrivate;
 
-class RadialBasisFunctionToolInterface : public ToolWidget
+class ImplicitModelToolInterface : public ToolWidget
 {
 Q_OBJECT
 
 // -- Constructor/destructor --
 public:
-	RadialBasisFunctionToolInterface();
-	virtual ~RadialBasisFunctionToolInterface();
+	ImplicitModelToolInterface();
+	virtual ~ImplicitModelToolInterface();
 
 // -- create interface --
 public:
@@ -53,7 +53,7 @@ public:
 	virtual bool build_widget( QFrame* frame );
 
 private:
-	boost::shared_ptr< RadialBasisFunctionToolInterfacePrivate > private_;
+	boost::shared_ptr< ImplicitModelToolInterfacePrivate > private_;
 
 };
 
