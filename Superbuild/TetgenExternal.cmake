@@ -31,9 +31,6 @@ SET(TETGEN_LIBRARY "tet")
 ExternalProject_Add(Tetgen_external
   URL "http://tetgen.org/files/tetgen1.4.3.tar.gz"
   PATCH_COMMAND ""
-  #CONFIGURE_COMMAND ""
-  #BUILD_IN_SOURCE ON
-  #BUILD_COMMAND ""
   INSTALL_COMMAND ""
   CMAKE_CACHE_ARGS
     -DCMAKE_VERBOSE_MAKEFILE:BOOL=${CMAKE_VERBOSE_MAKEFILE}
@@ -45,6 +42,8 @@ ExternalProject_Add(Tetgen_external
 ExternalProject_Add_Step(Tetgen_external add_cmakelists
   COMMAND "${CMAKE_COMMAND}" -E copy ${SUPERBUILD_DIR}/TetgenCMakeLists.txt CMakeLists.txt
   DEPENDEES download
+  DEPENDERS configure
+  ALWAYS 1
   WORKING_DIRECTORY <SOURCE_DIR>
 )
 
