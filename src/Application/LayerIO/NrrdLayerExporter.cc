@@ -78,14 +78,17 @@ bool NrrdLayerExporter::export_nrrd( const std::string& file_path )
   DataLayer* temp_handle = dynamic_cast< DataLayer* >( 
     this->layers_[ 0 ].get() );
 
+  bool no_downgrade = PreferencesManager::Instance()->export_nrrd0005_state_->get();
+
   Core::NrrdDataHandle nrrd = Core::NrrdDataHandle( new Core::NrrdData( 
-    temp_handle->get_data_volume()->get_data_block(), temp_handle->get_grid_transform() ) );
+    temp_handle->get_data_volume()->get_data_block(), temp_handle->get_grid_transform(),
+    no_downgrade ) );
   
   bool compress = PreferencesManager::Instance()->compression_state_->get();
   int level = PreferencesManager::Instance()->compression_level_state_->get();
 
   std::string error;
-  if ( !( Core::NrrdData::SaveNrrd( file_path, nrrd, error, compress, level ) ) ) 
+  if ( !( Core::NrrdData::SaveNrrd( file_path, nrrd, error, compress, level ) ) )
   {
     CORE_LOG_ERROR( error );
     return false;

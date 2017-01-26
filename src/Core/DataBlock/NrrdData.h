@@ -80,8 +80,10 @@ public:
   /// Construct a NrrdData object from an existing DataBlock of data
   /// The datablock handle will be stored internally until the object is deleted
   /// and the memory with the data is shared between the object and the nrrd object.
+  /// no_downgrade specifies whether the nrrd format will be downgraded to NRRD0001 when possible.
+  /// when no_downgrade is true, nrrd format is always NRRD0005.
   NrrdData( DataBlockHandle data_block );
-  NrrdData( DataBlockHandle data_block, GridTransform transform );
+  NrrdData( DataBlockHandle data_block, GridTransform transform, bool no_downgrade = true );
 
   virtual ~NrrdData();
 
@@ -109,7 +111,7 @@ public:
 
   // SET_TRANSFORM:
   /// Set the transfrom in the nrrd data
-  void set_transform( GridTransform& transform );
+  void set_transform( GridTransform& transform, bool no_downgrade );
 
   // GET_HISTOGRAM:
   /// Get the histogram from the nrrd

@@ -162,6 +162,8 @@ void PreferencesInterface::setup_general_prefs()
     PreferencesManager::Instance()->active_layer_navigation_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.export_dicom_headers_,
     PreferencesManager::Instance()->export_dicom_headers_state_ );  
+  QtUtils::QtBridge::Connect( this->private_->ui_.export_nrrd0005_,
+    PreferencesManager::Instance()->export_nrrd0005_state_ );
   
   QtUtils::QtBridge::Connect( this->private_->ui_.enable_compression_checkbox_,
     PreferencesManager::Instance()->compression_state_ );
