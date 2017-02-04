@@ -556,8 +556,8 @@ prefilter_matches_v2(const bfs::path & fn_prefix,
     const image_t::PointType & b1 = (*best_jter)->b_->extrema_->local_coords_;
     
     // find the canonical transform of this point pair:
-    itk::Vector<double, 2> a = (a1 - a0);
-    itk::Vector<double, 2> b = (b1 - b0);
+    //itk::Vector<double, 2> a = (a1 - a0);
+    //itk::Vector<double, 2> b = (b1 - b0);
     
     double norm_0 = (b0 - a0).GetSquaredNorm();
     double norm_1 = (b1 - a1).GetSquaredNorm();
@@ -592,7 +592,7 @@ rematch_keys(const bfs::path & fn_prefix,
 //#if 1
   typedef tree_t<2, ext_wrapper_t, double> ext_tree_t;
   typedef tree_t<KEY_SIZE, key_wrapper_t, double> key_tree_t;
-  typedef node_t<KEY_SIZE, key_wrapper_t, double> key_node_t;
+  //typedef node_t<KEY_SIZE, key_wrapper_t, double> key_node_t;
   
   itk::Vector<double, 2> x_axis;
   x_axis[0] = 1.0;
