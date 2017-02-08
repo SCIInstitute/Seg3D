@@ -63,11 +63,11 @@ ImplicitModelTool::ImplicitModelTool( const std::string& toolid ) :
   this->add_state( "kernel", this->kernel_state_, "thin_plate",
                    "thin_plate|gaussian|multi_quadratic" );
   this->add_state( "view_modes", this->view_modes_state_ );
-  this->add_state( "compute_2D_convex_hull", this->compute_2D_convex_hull_state_, true );
+  this->add_state( "compute_2D_convex_hull", this->compute_2D_convex_hull_state_, false );
   this->add_state( "invert_seed_order", this->invert_seed_order_state_, false );
   this->add_state( "convex_hull_selection",
                    this->convex_hull_selection_state_,
-                   CONVEX_HULL_2D_C,
+                   CONVEX_HULL_3D_C,
                    CONVEX_HULL_2D_C + "=2D_convex_hull|" + CONVEX_HULL_3D_C + "=3D_convex_hull" );
 
   this->add_connection( this->convex_hull_selection_state_->value_changed_signal_.connect(
