@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Radial Basis Function Tool</string>
+   <string>Implicit Model Tool</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
