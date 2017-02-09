@@ -213,10 +213,13 @@ void StatusBarWidget::update_data_point_info( DataPointInfoHandle data_point )
 void StatusBarWidget::update_data_point_label()
 {
   bool zero_based_slice_numbers = false;
+  bool status_sci_notation = false;
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
     zero_based_slice_numbers = PreferencesManager::Instance()->
       zero_based_slice_numbers_state_->get();
+    status_sci_notation = PreferencesManager::Instance()->
+      status_sci_notation_state_->get();
   }
   
   // If there is no data to display
@@ -247,8 +250,8 @@ void StatusBarWidget::update_data_point_label()
   }
   
   // In the case that all the coordinates are 0 then show nice 0's.
-  if( ( world_x == 0 ) && ( world_y == 0 ) && ( world_z == 0 ) && 
-    ( this->private_->data_point_info_->value() == 0 ) )
+  if ( ( world_x == 0 ) && ( world_y == 0 ) && ( world_z == 0 ) &&
+       ( this->private_->data_point_info_->value() == 0 ) )
   { 
     this->private_->ui_.x_->setText( QString::fromUtf8("0.000") );
     this->private_->ui_.y_->setText( QString::fromUtf8("0.000") );
@@ -258,9 +261,9 @@ void StatusBarWidget::update_data_point_label()
 
   // In the case that the coordinates are outside of .0001-1000.00,
   // format them with scientific notation.
-  if( this->private_->show_world_coord_ ) // World coordinates
+  if ( this->private_->show_world_coord_ ) // World coordinates
   {
-    if( Core::Abs( world_x ) < 0.0001 || Core::Abs( world_x ) > 1000 ) // Use scientific notation
+    if ( status_sci_notation && (Core::Abs( world_x ) < 0.0001 || Core::Abs( world_x ) > 1000) ) // Use scientific notation
     {
       this->private_->ui_.x_->setText( QString( "%1" ).arg( world_x, 0, 'e', 2 ) );
     }
@@ -268,7 +271,7 @@ void StatusBarWidget::update_data_point_label()
     {
       this->private_->ui_.x_->setText( QString( "%1" ).arg( world_x, 0, 'f', 2 ) );
     }
-    if( Core::Abs( world_y ) < 0.0001 || Core::Abs( world_y ) > 1000 ) // Use scientific notation
+    if ( status_sci_notation && (Core::Abs( world_y ) < 0.0001 || Core::Abs( world_y ) > 1000) ) // Use scientific notation
     {
       this->private_->ui_.y_->setText( QString( "%1" ).arg( world_y, 0, 'e', 2 ) );
     }
@@ -276,7 +279,7 @@ void StatusBarWidget::update_data_point_label()
     {
       this->private_->ui_.y_->setText( QString( "%1" ).arg( world_y, 0, 'f', 2 ) );
     }
-    if( Core::Abs( world_z ) < 0.0001 || Core::Abs( world_z ) > 1000  ) // Use scientific notation
+    if ( status_sci_notation && (Core::Abs( world_z ) < 0.0001 || Core::Abs( world_z ) > 1000) ) // Use scientific notation
     {
       this->private_->ui_.z_->setText( QString( "%1" ).arg( world_z, 0, 'e', 2 ) );
     }
@@ -287,7 +290,7 @@ void StatusBarWidget::update_data_point_label()
   }
   else // Index coordinates
   {
-    if( 10000 < index_x ) // Use scientific notation
+    if ( status_sci_notation && 10000 < index_x ) // Use scientific notation
     {
       this->private_->ui_.x_->setText( QString( "%1" ).arg( index_x, 0, 'e', 2 ) );
     }
@@ -295,7 +298,7 @@ void StatusBarWidget::update_data_point_label()
     {
       this->private_->ui_.x_->setText( QString( "%1" ).arg( index_x, 0, 'f', 0 ) );
     }
-    if( 10000 < index_y ) // Use scientific notation
+    if ( status_sci_notation && 10000 < index_y ) // Use scientific notation
     {
       this->private_->ui_.y_->setText( QString( "%1" ).arg( index_y, 0, 'e', 2 ) );
     }
@@ -303,7 +306,7 @@ void StatusBarWidget::update_data_point_label()
     {
       this->private_->ui_.y_->setText( QString( "%1" ).arg( index_y, 0, 'f', 0 ) );
     }
-    if( 10000 < index_z ) // Use scientific notation
+    if ( status_sci_notation && 10000 < index_z ) // Use scientific notation
     {
       this->private_->ui_.z_->setText( QString( "%1" ).arg( index_z, 0, 'e', 2 ) );
     }
@@ -315,7 +318,7 @@ void StatusBarWidget::update_data_point_label()
 
   // Value 
   double val = this->private_->data_point_info_->value();
-  if( ( 0.0 < val && val < 0.0001 ) || 1000 < val ) // Use scientific notation
+  if ( status_sci_notation &&  (( 0.0 < val && val < 0.0001 ) || 1000 < val ) ) // Use scientific notation
   {
     this->private_->ui_.value_->setText( QString( "%1" ).arg( val, 0, 'e', 2 ) );
   }
@@ -330,14 +333,14 @@ void StatusBarWidget::set_message( int msg_type, std::string message )
   this->private_->message_type_ = msg_type;
   this->private_->current_message_ = QString::fromStdString( message );
   
-  if( this->private_->message_type_ == Core::LogMessageType::ERROR_E ||
+  if ( this->private_->message_type_ == Core::LogMessageType::ERROR_E ||
     this->private_->message_type_ == Core::LogMessageType::CRITICAL_ERROR_E )
   {
     this->private_->ui_.info_button_->setIcon( this->private_->error_message_icon_ );
     this->private_->error_icon_set_ = true;
   }
   
-  if( this->private_->ui_.status_report_label_->text() == "" )
+  if ( this->private_->ui_.status_report_label_->text() == "" )
   {
     this->slide_in();
   }
@@ -379,7 +382,7 @@ void StatusBarWidget::check_time()
   double time_since_last_message = static_cast< double >
   ( duration.total_milliseconds() ) * 0.001;
   
-  if( ( time_since_last_message > 10 ) && ( this->private_->ui_.status_report_label_->text() != "" ) )
+  if ( ( time_since_last_message > 10 ) && ( this->private_->ui_.status_report_label_->text() != "" ) )
   {
     this->slide_out();
   }
@@ -438,7 +441,7 @@ void StatusBarWidget::slide_in()
 
 void StatusBarWidget::slide_out_then_in()
 {
-  if( this->private_->animating_ ) return;
+  if ( this->private_->animating_ ) return;
   
   QPropertyAnimation *animation = new QPropertyAnimation( this->private_->ui_.status_report_widget_, "geometry" );
   animation->setDuration( 1000 );
@@ -454,7 +457,7 @@ void StatusBarWidget::slide_out_then_in()
 
 void StatusBarWidget::slide_out()
 {
-  if( this->private_->animating_ ) return;
+  if ( this->private_->animating_ ) return;
   
   QPropertyAnimation *animation = new QPropertyAnimation( this->private_->ui_.status_report_widget_, "geometry" );
   animation->setDuration( 1000 );
