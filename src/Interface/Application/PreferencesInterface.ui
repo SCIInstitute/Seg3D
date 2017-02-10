@@ -820,6 +820,13 @@
                </property>
               </widget>
              </item>
+             <item row="3" column="2">
+              <widget class="QCheckBox" name="status_sci_notation_">
+               <property name="text">
+                <string>Show coordinates &gt; 999 in scientific notation</string>
+               </property>
+              </widget>
+             </item>
             </layout>
            </widget>
           </item>

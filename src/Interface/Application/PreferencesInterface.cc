@@ -145,7 +145,6 @@ void PreferencesInterface::setup_general_prefs()
     value_changed_signal_.connect( boost::bind( 
     &PreferencesInterface::HandleAutosaveStateChanged, qpointer_type( this ), _1 ) ) );
   
-  
   QtUtils::QtBridge::Connect( this->private_->ui_.smart_save_checkbox_,
     PreferencesManager::Instance()->smart_save_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.auto_save_timer_adjuster_,
@@ -158,20 +157,23 @@ void PreferencesInterface::setup_general_prefs()
     PreferencesManager::Instance()->paint_cursor_invisibility_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.zero_based_slice_numbers_,
     PreferencesManager::Instance()->zero_based_slice_numbers_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.status_sci_notation_,
+    PreferencesManager::Instance()->status_sci_notation_state_ );
+
   QtUtils::QtBridge::Connect( this->private_->ui_.active_layer_navigation_,
     PreferencesManager::Instance()->active_layer_navigation_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.export_dicom_headers_,
     PreferencesManager::Instance()->export_dicom_headers_state_ );  
   QtUtils::QtBridge::Connect( this->private_->ui_.export_nrrd0005_,
     PreferencesManager::Instance()->export_nrrd0005_state_ );
-  
+
   QtUtils::QtBridge::Connect( this->private_->ui_.enable_compression_checkbox_,
     PreferencesManager::Instance()->compression_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.compression_adjuster_,
     PreferencesManager::Instance()->compression_level_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.slice_step_multiplier_spinbox_,
     PreferencesManager::Instance()->slice_step_multiplier_state_ );
-    
+
   QtUtils::QtBridge::Connect( this->private_->ui_.axis_combobox_,
     PreferencesManager::Instance()->axis_labels_option_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.x_lineedit_,
@@ -180,12 +182,12 @@ void PreferencesInterface::setup_general_prefs()
     PreferencesManager::Instance()->y_axis_label_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.z_lineedit_,
     PreferencesManager::Instance()->z_axis_label_state_ );
-    
+
   QtUtils::QtBridge::Connect( this->private_->ui_.enable_undo_,
     PreferencesManager::Instance()->enable_undo_state_ ); 
   QtUtils::QtBridge::Connect( this->private_->ui_.percent_of_memory_,
     PreferencesManager::Instance()->percent_of_memory_state_ );
-    
+
   QtUtils::QtBridge::Enable( this->private_->ui_.x_lineedit_, 
     PreferencesManager::Instance()->axis_labels_option_state_,
     boost::lambda::bind( &Core::StateLabeledOption::get, 
@@ -198,16 +200,16 @@ void PreferencesInterface::setup_general_prefs()
     PreferencesManager::Instance()->axis_labels_option_state_,
     boost::lambda::bind( &Core::StateLabeledOption::get, 
     PreferencesManager::Instance()->axis_labels_option_state_.get() ) == "custom" );
-  
+
   QtUtils::QtBridge::Enable( this->private_->ui_.compression_adjuster_, 
     PreferencesManager::Instance()->compression_state_ );
 
   QtUtils::QtBridge::Connect( this->private_->ui_.embed_input_files_,
     PreferencesManager::Instance()->embed_input_files_state_ );
-  
+
   QtUtils::QtBridge::Connect( this->private_->ui_.generate_osx_project_bundle_,
     PreferencesManager::Instance()->generate_osx_project_bundle_state_ );
-    
+
 #ifndef __APPLE__
   this->private_->ui_.generate_osx_project_bundle_->hide();
 #endif  
