@@ -90,8 +90,8 @@ public:
     this->add_parameter( this->sandbox_ );
   }
   
-  virtual bool validate( Core::ActionContextHandle& context );
-  virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
+  virtual bool validate( Core::ActionContextHandle& context ) override;
+  virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result ) override;
   
   // DISPATCH:
   // Create and dispatch action that inserts the new layer

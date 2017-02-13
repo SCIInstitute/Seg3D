@@ -123,7 +123,7 @@ public:
   void Execute(itk::Object *caller, const itk::EventObject & event)
   { Execute((const itk::Object *)(caller), event); }
   
-  void Execute(const itk::Object * object, const itk::EventObject & event)
+  void Execute(const itk::Object * object, const itk::EventObject & event) override
   {
     if (typeid(event) != typeid(itk::IterationEvent)) return;
     
