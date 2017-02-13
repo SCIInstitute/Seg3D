@@ -33,6 +33,10 @@
 #include <Core/Action/ActionParameter.h>
 #include <Core/Action/Action.h>
 
+#include <algorithm>
+#include <locale>
+#include <sstream>
+
 namespace Core
 {
 
@@ -108,18 +112,68 @@ std::string Action::export_to_string() const
 #endif
 
   // Add action name to string
-  std::string command = std::string( this->get_type() ) + " ";
-  
-  for ( size_t j = 0; j < this->parameters_.size(); j++ )
+  std::ostringstream command;
+  command << this->get_type() << " ";
+
+  for ( size_t j = 0; j < this->parameters_.size(); ++j )
   {
     if ( this->parameters_[ j ]->is_persistent() )
     {
-      command += this->get_key( j ) + "=" + this->parameters_[ j ]->export_to_string() + " ";
-    } 
+      std::string param = this->parameters_[ j ]->export_to_string();
+      if ( param == "'[]'" )
+      {
+        // correction, since empty square brackets don't play well with action interface
+        param.clear();
+      }
+
+      command << this->get_key( j ) << "=" << param << " ";
+    }
   }
 
   // Return the command
-  return command;
+  return command.str();
+}
+
+std::string Action::export_to_python_string() const
+{
+#ifndef NDEBUG
+  if ( this->num_params() != this->get_action_info()->get_num_key_value_pairs() )
+  {
+    CORE_THROW_LOGICERROR( "Number of parameters doesn't match action definition." );
+  }
+#endif
+
+  // Add action name to string
+  std::string type( this->get_type() );
+  std::transform( type.begin(), type.end(), type.begin(),
+                  [](unsigned char c) { return std::tolower(c); } );
+
+  std::ostringstream command;
+  command << type << "(";
+
+  for ( size_t j = 0; j < this->parameters_.size(); ++j )
+  {
+    if ( this->parameters_[ j ]->is_persistent() )
+    {
+      std::string param = this->parameters_[ j ]->export_to_string();
+      if ( param == "'[]'" )
+      {
+        // correction, since empty square brackets don't play well with python interface
+        param = "''";
+      }
+
+      command << this->get_key( j ) << "=" << param;
+      if ( (j < this->parameters_.size() - 1) && ( this->parameters_[ j+1 ]->is_persistent() ) )
+      {
+        command << ",";
+      }
+    }
+  }
+
+  command << ");";
+
+  // Return the command
+  return command.str();
 }
 
 bool Action::import_from_string( const std::string& action )

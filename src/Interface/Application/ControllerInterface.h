@@ -81,6 +81,7 @@ public Q_SLOTS:
   void post_action();
   void post_action_message( std::string message );
   void post_action_usage( std::string usage );
+  void custom_context_menu( QPoint pos );
 
 private:
   ControllerInterfacePrivateHandle private_;
