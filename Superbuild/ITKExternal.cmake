@@ -70,6 +70,10 @@ SET(itk_CACHE_ARGS
   "-DModule_ITKHDF5:BOOL=ON"
   "-DModule_ITKIOHDF5:BOOL=ON"
   "-DModule_ITKIOLSM:BOOL=ON"
+  "-DModule_ITKIOJPEG:BOOL=ON"
+  "-DModule_ITKIOGIPL:BOOL=ON"
+  "-DModule_IITKIOMeta:BOOL=ON"
+  "-DModule_ITKIONRRD:BOOL=ON"
   "-DCMAKE_CXX_FLAGS:STATIC=${CMAKE_CXX_FLAGS}"
   "-DCMAKE_CXX_FLAGS_DEBUG:STATIC=${CMAKE_CXX_FLAGS_DEBUG}"
   "-DCMAKE_C_FLAGS:STATIC=${CMAKE_C_FLAGS}"
@@ -89,7 +93,7 @@ IF(BUILD_MOSAIC_TOOLS)
   )
 ENDIF()
 
-SET(itk_GIT_TAG "origin/v4.10.1_upgrade")
+SET(itk_GIT_TAG "origin/v4.10.1_upgrade_pq_mod")
 
 # If CMake ever allows overriding the checkout command or adding flags,
 # git checkout -q will silence message about detached head (harmless).
