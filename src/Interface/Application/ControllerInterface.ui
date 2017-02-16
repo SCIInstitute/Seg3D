@@ -307,6 +307,9 @@
        </property>
        <item>
         <widget class="QTableView" name="TV_STATE_ENGINE">
+         <property name="contextMenuPolicy">
+          <enum>Qt::CustomContextMenu</enum>
+         </property>
          <property name="horizontalScrollBarPolicy">
           <enum>Qt::ScrollBarAlwaysOff</enum>
          </property>
