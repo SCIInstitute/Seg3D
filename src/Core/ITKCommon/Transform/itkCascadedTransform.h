@@ -243,7 +243,7 @@ public:
   virtual const JacobianType & GetJacobian(const PointType & pt) const override
   { return transform_[active_params_]->GetJacobian(pt); }
 
-  virtual void ComputeJacobianWithRespectToParameters(const InputPointType &, JacobianType &) const
+  virtual void ComputeJacobianWithRespectToParameters(const InputPointType &, JacobianType &) const override
   {
     itkExceptionMacro(<< "mputeJacobianWithRespectToParameters is not implemented for CascadedTransform");
   }
