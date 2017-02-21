@@ -71,8 +71,10 @@ class PythonConsoleEdit : public QTextEdit
 public:
   PythonConsoleEdit( PythonConsoleWidget* parent );
 
-  virtual void keyPressEvent( QKeyEvent* e );
+  virtual void keyPressEvent( QKeyEvent* e ) override;
   //virtual void focusOutEvent( QFocusEvent* e );
+
+  virtual void insertFromMimeData( const QMimeData *source ) override;
 
   const int document_end();
   QString& command_buffer();
@@ -142,9 +144,9 @@ void PythonConsoleEdit::keyPressEvent( QKeyEvent* e )
     text_cursor.position() < this->interactive_position_;
 
   // Allow copying anywhere in the console ...
-  if( e->key() == Qt::Key_C && e->modifiers() == Qt::ControlModifier )
+  if ( e->key() == Qt::Key_C && e->modifiers() == Qt::ControlModifier )
   {
-    if( selection )
+    if ( selection )
     {
       this->copy();
     }
@@ -157,7 +159,7 @@ void PythonConsoleEdit::keyPressEvent( QKeyEvent* e )
   }
 
   // Allow cut only if the selection is limited to the interactive area ...
-  if( e->key() == Qt::Key_X && e->modifiers() == Qt::ControlModifier )
+  if ( e->key() == Qt::Key_X && e->modifiers() == Qt::ControlModifier )
   {
     if( selection && !history_area )
     {
@@ -168,13 +170,13 @@ void PythonConsoleEdit::keyPressEvent( QKeyEvent* e )
   }
 
   // Allow paste only if the selection is in the interactive area ...
-  if( e->key() == Qt::Key_V && e->modifiers() == Qt::ControlModifier )
+  if ( e->key() == Qt::Key_V && e->modifiers() == Qt::ControlModifier )
   {
-    if( !history_area )
+    if ( ! history_area )
     {
       const QMimeData* const clipboard = QApplication::clipboard()->mimeData();
       const QString text = clipboard->text();
-      if( !text.isNull() )
+      if( ! text.isNull() )
       {
         text_cursor.insertText( text );
         this->update_command_buffer();
@@ -186,7 +188,7 @@ void PythonConsoleEdit::keyPressEvent( QKeyEvent* e )
   }
 
   // Force the cursor back to the interactive area
-  if( history_area && e->key() != Qt::Key_Control )
+  if ( history_area && e->key() != Qt::Key_Control )
   {
     text_cursor.setPosition( this->document_end() );
     this->setTextCursor( text_cursor );
@@ -234,7 +236,7 @@ void PythonConsoleEdit::keyPressEvent( QKeyEvent* e )
 
   case Qt::Key_Backspace:
     e->accept();
-    if( text_cursor.position() > this->interactive_position_ )
+    if ( text_cursor.position() > this->interactive_position_ )
     {
       QTextEdit::keyPressEvent( e );
       this->update_command_buffer();
@@ -265,6 +267,25 @@ void PythonConsoleEdit::keyPressEvent( QKeyEvent* e )
     QTextEdit::keyPressEvent( e );
     this->update_command_buffer();
     break;
+  }
+}
+
+void PythonConsoleEdit::insertFromMimeData( const QMimeData *source )
+{
+  // see also PythonConsoleEdit::keyPressEvent
+  this->setTextColor( Qt::black );
+  QTextCursor text_cursor = this->textCursor();
+  const bool history_area = text_cursor.anchor() < this->interactive_position_ ||
+  text_cursor.position() < this->interactive_position_;
+
+  if ( ! history_area )
+  {
+    const QString text = source->text();
+    if( ! text.isNull() )
+    {
+      text_cursor.insertText( text );
+      this->update_command_buffer();
+    }
   }
 }
 
@@ -304,7 +325,7 @@ void PythonConsoleEdit::issue_command()
 {
   QString command = this->command_buffer();
   // Update the command history.
-  if ( !command.isEmpty() )
+  if ( ! command.isEmpty() )
   {
     this->command_history_.push_back( "" );
     this->command_position_ = this->command_history_.size() - 1;
@@ -315,11 +336,21 @@ void PythonConsoleEdit::issue_command()
   c.insertText( "\n" );
 
   this->interactive_position_ = this->document_end();
-  Core::PythonInterpreter::Instance()->run_string( command.toStdString() );
+
+  auto lines = command.split(QRegExp("[\r\n]"), QString::SkipEmptyParts);
+  for (const auto& line : lines)
+  {
+    if ( ! line.isEmpty() )
+      Core::PythonInterpreter::Instance()->run_string( line.toStdString() );
+  }
 }
 
 void PythonConsoleEdit::prompt( const std::string text )
 {
+  QString text_to_insert = QString::fromStdString( text );
+  // remove whitespace from beginning and end
+  text_to_insert = text_to_insert.trimmed();
+
   QTextCursor text_cursor( this->document() );
   // Move the cursor to the end of the document
   text_cursor.setPosition( this->document_end() );
@@ -333,7 +364,7 @@ void PythonConsoleEdit::prompt( const std::string text )
 
   // Make sure the new text will be in the right color
   QTextCharFormat char_format = this->currentCharFormat();
-  char_format.setForeground( Qt::green );
+  char_format.setForeground( Qt::black );
   text_cursor.setCharFormat( char_format );
 
   if ( endpos != startpos )
@@ -341,7 +372,7 @@ void PythonConsoleEdit::prompt( const std::string text )
     text_cursor.insertText( "\n" );
   }
 
-  text_cursor.insertText( QString::fromStdString( text ) );
+  text_cursor.insertText( text_to_insert );
   this->setTextCursor( text_cursor );
   this->interactive_position_ = this->document_end();
   this->ensureCursorVisible();
@@ -440,13 +471,17 @@ PythonConsoleWidget::PythonConsoleWidget( QWidget* parent ) :
 
   this->setMinimumSize( 500, 500 );
 
+  setWindowTitle("Python console");
+
   PythonConsoleEditQWeakPointer qpointer( this->private_->console_edit_ );
+
   this->add_connection( Core::PythonInterpreter::Instance()->prompt_signal_.connect(
     boost::bind( &PythonConsoleEdit::Prompt, qpointer, _1 ) ) );
   this->add_connection( Core::PythonInterpreter::Instance()->output_signal_.connect(
     boost::bind( &PythonConsoleEdit::PrintOutput, qpointer, _1 ) ) );
   this->add_connection( Core::PythonInterpreter::Instance()->error_signal_.connect(
     boost::bind( &PythonConsoleEdit::PrintError, qpointer, _1 ) ) );
+
   Core::PythonInterpreter::Instance()->print_banner();
 }
 
