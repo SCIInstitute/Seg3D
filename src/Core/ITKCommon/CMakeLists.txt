@@ -145,6 +145,8 @@ SET(CORE_ITKCOMMON_STOS_SRCS
   STOS/stos_common.hxx
 )
 
+SET(FFTW_LIBS "fftw3;fftw3f;fftw3f_threads")
+
 CORE_ADD_LIBRARY(Core_ITKCommon
   ${CORE_ITKCOMMON_SRCS}
   ${CORE_ITKCOMMON_FILTERING_SRCS}
@@ -160,8 +162,9 @@ TARGET_LINK_LIBRARIES(Core_ITKCommon
   ${ITKCommon_LIBRARIES}
   ${ITKIOTransformBase_LIBRARIES}
   ${ITKOptimizers_LIBRARIES}
+  ${ITKTransformFactory_LIBRARIES}
+  ${FFTW_LIBS}
   ${ITKFFT_LIBRARIES}
 )
 
 ADD_TEST_DIR(Transform/Tests)
-
