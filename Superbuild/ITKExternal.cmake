@@ -74,6 +74,7 @@ SET(itk_CACHE_ARGS
   "-DModule_ITKIOGIPL:BOOL=ON"
   "-DModule_IITKIOMeta:BOOL=ON"
   "-DModule_ITKIONRRD:BOOL=ON"
+  "-DModule_ITKDeprecated:BOOL=ON"
   "-DCMAKE_CXX_FLAGS:STATIC=${CMAKE_CXX_FLAGS}"
   "-DCMAKE_CXX_FLAGS_DEBUG:STATIC=${CMAKE_CXX_FLAGS_DEBUG}"
   "-DCMAKE_C_FLAGS:STATIC=${CMAKE_C_FLAGS}"
@@ -89,7 +90,6 @@ IF(BUILD_MOSAIC_TOOLS)
     "-DModule_ITKImageIntensity:BOOL=ON"
     "-DModule_ITKThresholding:BOOL=ON"
     "-DModule_ITKTransformFactory:BOOL=ON"
-    "-DModule_ITKDeprecated:BOOL=ON"
   )
 ENDIF()
 
