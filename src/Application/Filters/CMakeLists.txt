@@ -174,6 +174,7 @@ TARGET_LINK_LIBRARIES(Application_Filters
   Application_ProjectManager
   ${SCI_BOOST_LIBRARY}
   ${ITKWatersheds_LIBRARIES}
+  ${ITKOptimizers_LIBRARIES}
   ${ImplicitFunction_LIBRARY}
   ${TETGEN_LIBRARY}
 )
