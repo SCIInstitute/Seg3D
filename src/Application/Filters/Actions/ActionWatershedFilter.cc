@@ -80,8 +80,9 @@
 #include <vector>
 #include <sstream>
 
-
-#ifndef NDEBUG
+#undef ENABLE_TIMING
+// TODO: rewrite with platform agnostic code (currently not compatible with Windows)
+#if defined (ENABLE_TIMING)
 //TIMING STUFF
 //		Courtesy of https://github.com/arhuaco/junkcode/blob/master/emqbit-bench/bench.c
 #include <sys/time.h>
@@ -101,9 +102,6 @@ get_timestamp ()
 // registered in the CMake file.
 // NOTE: Registration needs to be done outside of any namespace
 CORE_REGISTER_ACTION( Seg3D, WatershedFilter )
-
-
-
 
 namespace Seg3D
 {
@@ -222,7 +220,7 @@ public:
 		castImage_FilterToOut->Update();
 		
 		CORE_LOG_DEBUG( this->get_filter_name() + ": Reading in all labels (extreme patience required)..." );
-#ifndef NDEBUG
+#if defined (ENABLE_TIMING)
 		timestamp_t t0 = get_timestamp();
 #endif
 		// Relabel the output
@@ -238,7 +236,7 @@ public:
 			   this->watershed_image_output_labels_.push_back( val );
 			}
 		}
-#ifndef NDEBUG
+#if defined (ENABLE_TIMING)
 		timestamp_t t1 = get_timestamp();
 		double secs = (t1 - t0) / 1000000.0L;
 		
