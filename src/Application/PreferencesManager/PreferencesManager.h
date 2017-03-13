@@ -87,6 +87,7 @@ public:
   Core::StateBoolHandle generate_osx_project_bundle_state_;
 
   Core::StateBoolHandle export_dicom_headers_state_;
+  Core::StateBoolHandle export_nrrd0005_state_;
   
   //Viewers Preferences
   Core::StateOptionHandle default_viewer_mode_state_;
@@ -95,6 +96,7 @@ public:
   Core::StateBoolHandle show_slice_number_state_;
   Core::StateBoolHandle zero_based_slice_numbers_state_;
   Core::StateBoolHandle active_layer_navigation_state_;
+  Core::StateBoolHandle status_sci_notation_state_;
 
   //Layers Preferences
   Core::StateRangedDoubleHandle default_layer_opacity_state_;

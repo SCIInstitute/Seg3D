@@ -169,6 +169,7 @@ void PreferencesManager::initialize_states()
   this->add_state( "compression_level", this->compression_level_state_, 2, 0, 9, 1 );
   this->add_state( "slice_step_multiplier", this->slice_step_multiplier_state_, 8 );
   this->add_state( "add_dicom_headers", this->export_dicom_headers_state_, true );
+  this->add_state( "use_nrrd0005_format", this->export_nrrd0005_state_, true );
   
   this->add_state( "axis_labels_option", this->axis_labels_option_state_, "sca", 
     "sca=Sagittal/Coronal/Axial|sct=Sagittal/Coronal/Transverse|"
@@ -193,6 +194,7 @@ void PreferencesManager::initialize_states()
   this->add_state( "reverse_slice_navigation", this->reverse_slice_navigation_state_, false );
   this->add_state( "zero_based_slice_numbers", this->zero_based_slice_numbers_state_, false );
   this->add_state( "active_layer_navigation", this->active_layer_navigation_state_, true );
+  this->add_state( "status_sci_notation", this->status_sci_notation_state_, false );
   
   //Viewer Preferences
   this->add_state( "default_viewer_mode", this->default_viewer_mode_state_, "1and3", 

@@ -83,7 +83,7 @@ NrrdData::NrrdData( DataBlockHandle data_block ) :
 }
 
 
-NrrdData::NrrdData( DataBlockHandle data_block, GridTransform transform ) :
+NrrdData::NrrdData( DataBlockHandle data_block, GridTransform transform, bool no_downgrade ) :
   private_( new  NrrdDataPrivate )
 {
   if ( !data_block )
@@ -102,7 +102,7 @@ NrrdData::NrrdData( DataBlockHandle data_block, GridTransform transform ) :
       data_block->get_nx(), data_block->get_ny(),
       data_block->get_nz() );
 
-    set_transform( transform );
+    set_transform( transform, no_downgrade );
   }
 }
 
@@ -264,7 +264,7 @@ GridTransform NrrdData::get_grid_transform() const
   return grid_transform;
 }
 
-void NrrdData::set_transform( GridTransform& transform )
+void NrrdData::set_transform( GridTransform& transform, bool no_downgrade )
 {
   if ( !this->private_->nrrd_ ) return;
 
@@ -319,32 +319,39 @@ void NrrdData::set_transform( GridTransform& transform )
   if ( nrrd->spaceDim > 0 && nrrd->spaceDim == nrrd->dim )
   {
     bool is_aligned_nrrd = true;
-    for ( size_t j = 0; j < static_cast<size_t>( nrrd->spaceDim ); j++ )
+    if ( no_downgrade )
     {
-      for ( size_t i = 0; i < static_cast<size_t>( nrrd->dim ); i++ )
+      is_aligned_nrrd = false;
+    }
+    else
+    {
+      for ( size_t j = 0; j < static_cast<size_t>( nrrd->spaceDim ); j++ )
       {
-        if ( (i != j) &&
-             ( (nrrd->axis[ i ].spaceDirection[ j ] != 0.0) &&
-               (! IsNan(nrrd->axis[ i ].spaceDirection[ j ])) ) )
+        for ( size_t i = 0; i < static_cast<size_t>( nrrd->dim ); i++ )
         {
-          is_aligned_nrrd = false;
+          if ( (i != j) &&
+               ( (nrrd->axis[ i ].spaceDirection[ j ] != 0.0) &&
+                 (! IsNan(nrrd->axis[ i ].spaceDirection[ j ])) ) )
+          {
+            is_aligned_nrrd = false;
+          }
+        }
+      }
+
+      for ( size_t j = 0; j < static_cast<size_t>( nrrd->spaceDim ); j++ )
+      {
+        for ( size_t i = 0; i < static_cast<size_t>( nrrd->spaceDim ); i++ )
+        {
+          if ( (i != j) &&
+               ( (nrrd->measurementFrame[ i ][ j ] != 0.0) &&
+                 (! IsNan( nrrd->measurementFrame[ i ][ j ])) ) )
+          {
+            is_aligned_nrrd = false;
+          }
         }
       }
     }
-
-    for ( size_t j = 0; j < static_cast<size_t>( nrrd->spaceDim ); j++ )
-    {
-      for ( size_t i = 0; i < static_cast<size_t>( nrrd->spaceDim ); i++ )
-      {
-        if ( (i != j) &&
-             ( (nrrd->measurementFrame[ i ][ j ] != 0.0) &&
-               (! IsNan( nrrd->measurementFrame[ i ][ j ])) ) )
-        {
-          is_aligned_nrrd = false;
-        }
-      }
-    }
-
+    
     if ( is_aligned_nrrd )
     {
       // Down grade nrrd

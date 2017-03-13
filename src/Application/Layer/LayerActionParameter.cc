@@ -60,7 +60,7 @@ bool LayerActionLayerID::import_from_string( const std::string& str )
 
 std::string LayerActionLayerID::export_to_string() const
 {
-  return Core::ExportToString( this->layer_id_ );
+  return "'" + Core::ExportToString( this->layer_id_ ) + "'";
 }
 
 bool LayerActionLayerID::translate_provenance( ProvenanceIDList& input_provenance )
@@ -122,7 +122,7 @@ bool LayerActionGroupID::import_from_string( const std::string& str )
 
 std::string LayerActionGroupID::export_to_string() const
 {
-  return Core::ExportToString( this->group_id_ );
+  return "'" + Core::ExportToString( this->group_id_ ) + "'";
 }
 
 bool LayerActionGroupID::translate_provenance( ProvenanceIDList& input_provenance )

@@ -142,6 +142,9 @@ TEST_F(ActionTests, EmptyAction)
   std::string actionExportString = action.export_to_string();
   ASSERT_EQ( actionExportString, actionString );
 
+  std::string pythonActionExportString = action.export_to_python_string();
+  ASSERT_EQ( pythonActionExportString, "dummyaction();");
+
   ASSERT_TRUE( action.translate( context ) );
   ASSERT_TRUE( action.post_create( context ) );
   ASSERT_TRUE( action.validate( context ) );
@@ -157,6 +160,9 @@ TEST_F(ActionTests, ActionImportFromString)
 
   std::string actionExportString = action.export_to_string();
   ASSERT_EQ( actionExportString, actionString );
+
+  std::string pythonActionExportString = action.export_to_python_string();
+  ASSERT_EQ( pythonActionExportString, "dummyaction();");
 
   ASSERT_TRUE( action.translate( context ) );
   ASSERT_TRUE( action.post_create( context ) );
@@ -174,6 +180,10 @@ TEST_F(ActionTests, ActionImportFromStringWithError)
 
   std::string actionExportString = action.export_to_string();
   ASSERT_EQ( actionExportString, actionString );
+
+  std::string pythonActionExportString = action.export_to_python_string();
+  ASSERT_EQ( pythonActionExportString, "dummyaction();");
+
   ASSERT_TRUE( error.empty() );
 
   ASSERT_TRUE( action.translate( context ) );
@@ -195,6 +205,9 @@ TEST_F(ActionTests, ActionImportFromStringWithParam)
   ASSERT_TRUE( retVal );
   std::string actionExportString = action.export_to_string();
   ASSERT_EQ( actionExportString, "DummyAction param_required=\'param\' " );
+
+  std::string pythonActionExportString = action.export_to_python_string();
+  ASSERT_EQ( pythonActionExportString, "dummyaction(param_required='param');");
 
   ASSERT_TRUE( action.translate( context ) );
   ASSERT_TRUE( action.post_create( context ) );
@@ -248,7 +261,6 @@ TEST_F(ActionTests, ActionImportFromStringWithParamsWithOptionalError)
   std::string actionImportStringWithParams( "dummyaction param_optional=param" );
   bool retVal = false;
   ASSERT_NO_THROW( retVal = action.import_from_string( actionImportStringWithParams, error ) );
-  std::string actionExportString = action.export_to_string();
   ASSERT_FALSE( retVal );
 
   ASSERT_TRUE( action.translate( context ) );

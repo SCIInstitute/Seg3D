@@ -24,11 +24,12 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
- */
+*/
 
 // QT includes
 #include <QMenu>
 #include <QScrollBar>
+#include <QClipboard>
 
 // Core includes
 #include <Core/Action/Actions.h>
@@ -112,14 +113,21 @@ ControllerInterface::ControllerInterface( QWidget* parent ) :
 
   // Set up the model view widgets
   this->private_->ui_.TV_ACTION_HISTORY->setModel( private_->action_history_model_ );
-  this->private_->ui_.TV_ACTION_HISTORY->setColumnWidth( 0, 600 );
-  this->private_->ui_.TV_ACTION_HISTORY->setColumnWidth( 1, 200 );
+  this->private_->ui_.TV_ACTION_HISTORY->setColumnWidth( 0, 400 );
+  this->private_->ui_.TV_ACTION_HISTORY->setColumnWidth( 1, 400 );
+  this->private_->ui_.TV_ACTION_HISTORY->setColumnWidth( 2, 50 );
   this->private_->ui_.TV_ACTION_HISTORY->resizeRowsToContents();
+  this->connect( this->private_->ui_.TV_ACTION_HISTORY,
+                 SIGNAL( customContextMenuRequested( QPoint ) ),
+                 this, SLOT( action_history_menu( QPoint ) ) );
 
   this->private_->ui_.TV_STATE_ENGINE->setModel(private_->state_engine_model_ );
   this->private_->ui_.TV_STATE_ENGINE->setColumnWidth( 0, 500 );
   this->private_->ui_.TV_STATE_ENGINE->setColumnWidth( 1, 500 );
   this->private_->ui_.TV_STATE_ENGINE->resizeRowsToContents();
+  this->connect( this->private_->ui_.TV_STATE_ENGINE,
+                SIGNAL( customContextMenuRequested( QPoint ) ),
+                this, SLOT( state_engine_menu( QPoint ) ) );
 
   this->private_->ui_.TV_LOG_HISTORY->setModel( private_->log_history_model_ );
   this->private_->ui_.TV_LOG_HISTORY->setColumnWidth( 0, 1000 );
@@ -213,6 +221,45 @@ void ControllerInterface::post_action_message( std::string message )
 void ControllerInterface::post_action_usage( std::string usage )
 {
   this->private_->ui_.L_ACTION_USAGE->setText( QString::fromStdString( usage ) );
+}
+
+void ControllerInterface::state_engine_menu( QPoint pos )
+{
+  int row = this->private_->ui_.TV_STATE_ENGINE->rowAt( pos.y() );
+  int col = this->private_->ui_.TV_STATE_ENGINE->columnAt( pos.x() );
+  if ( row < 0 ) return;
+
+  QMenu *context_menu = new QMenu(this);
+  QAction *copy_text = context_menu->addAction( tr("Copy") );
+
+  connect( copy_text, &QAction::triggered, [=](){
+    QModelIndex index = this->private_->ui_.TV_STATE_ENGINE->model()->index(row, col);
+    QString data_string = index.data().toString();
+    qApp->clipboard()->setText( data_string );
+  } );
+
+  context_menu->popup( this->private_->ui_.TV_STATE_ENGINE->viewport()->mapToGlobal(pos) );
+}
+
+void ControllerInterface::action_history_menu( QPoint pos )
+{
+  int row = this->private_->ui_.TV_ACTION_HISTORY->rowAt( pos.y() );
+  int col = this->private_->ui_.TV_ACTION_HISTORY->columnAt( pos.x() );
+  if ( row < 0 ) return;
+
+  QMenu *context_menu = new QMenu(this);
+  QAction *copy_text = context_menu->addAction( tr("Copy") );
+
+  connect( copy_text, &QAction::triggered, [=](){
+    QModelIndex index = this->private_->ui_.TV_ACTION_HISTORY->model()->index(row, col);
+    QString data_string = index.data().toString();
+
+    if ( col == 0 ) data_string.remove( QChar('\'') );
+
+    qApp->clipboard()->setText( data_string );
+  } );
+
+  context_menu->popup( this->private_->ui_.TV_ACTION_HISTORY->viewport()->mapToGlobal(pos) );
 }
 
 void ControllerInterface::UpdateActionHistory( qpointer_type controller )

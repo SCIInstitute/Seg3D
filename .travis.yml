@@ -11,6 +11,7 @@ compiler:
 cache:
   directories:
     - $HOME/deps
+    - $TRAVIS_BUILD_DIR/bin/Externals/Download
 before_install:
   # set up dependency cache
   - if [ ! -d $HOME/deps ]; then mkdir $HOME/deps; fi
