@@ -43,6 +43,7 @@ script:
   - $TRAVIS_BUILD_DIR/cmake3/bin/cmake -GNinja -DTRAVIS_BUILD:BOOL=ON -DQt5_PATH:PATH=/usr ../Superbuild
 #  - $TRAVIS_BUILD_DIR/cmake3/bin/cmake -GNinja -DTRAVIS_BUILD:BOOL=ON ../Superbuild
   - travis_wait 70 ninja
+  - cd Seg3D
   - ./Core_Action_Tests
   - ./Core_Application_Tests
   - ./Core_DataBlock_Tests
