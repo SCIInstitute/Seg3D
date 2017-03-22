@@ -48,7 +48,6 @@ script:
   - ./Core_Application_Tests
   - ./Core_DataBlock_Tests
   - ./Core_Geometry_Tests
-  - ./Core_ITKCommon_Transform_Tests
   - ./Core_Utils_Tests
   - ./Application_LayerIO_Tests
 
