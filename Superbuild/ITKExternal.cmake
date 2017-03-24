@@ -93,7 +93,7 @@ IF(BUILD_MOSAIC_TOOLS)
   )
 ENDIF()
 
-SET(itk_GIT_TAG "origin/v4.10.1_upgrade_pq_mod")
+SET(itk_GIT_TAG "origin/master")
 
 # If CMake ever allows overriding the checkout command or adding flags,
 # git checkout -q will silence message about detached head (harmless).
