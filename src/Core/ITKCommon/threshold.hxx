@@ -66,7 +66,7 @@ threshold_by_intensity_inplace(typename image_t::Pointer & image,
              const double bg_offset = 1e-3)
 {
   typedef itk::ImageRegionConstIterator<image_t> iter_t;
-  typedef typename image_t::IndexType index_t;
+  //typedef typename image_t::IndexType index_t;
   
   // first find minima/maxima of the image:
   double v_min = std::numeric_limits<double>::max();
@@ -162,7 +162,7 @@ threshold_by_area_inplace(typename image_t::Pointer & image,
         const double bg_offset = 1e-3)
 {
   typedef itk::ImageRegionConstIterator<image_t> iter_t;
-  typedef typename image_t::IndexType index_t;
+  //typedef typename image_t::IndexType index_t;
   
   // first find minima/maxima of the image:
   double v_min = std::numeric_limits<double>::max();

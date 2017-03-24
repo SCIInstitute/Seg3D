@@ -79,14 +79,16 @@ public:
   itkStaticConstMacro(OutputSpaceDimension, unsigned int, 2);
 
   // shortcuts:
-  typedef Superclass::ParametersType ParametersType;
-  typedef Superclass::JacobianType JacobianType;
+  typedef typename Superclass::FixedParametersType      FixedParametersType;
+  typedef typename Superclass::FixedParametersValueType FixedParametersValueType;
+  typedef Superclass::ParametersType                    ParametersType;
+  typedef Superclass::JacobianType                      JacobianType;
   
   typedef Superclass::InputPointType InputPointType;
   typedef Superclass::OutputPointType OutputPointType;
   
   // virtual:
-  virtual OutputPointType TransformPoint(const InputPointType & x) const
+  virtual OutputPointType TransformPoint(const InputPointType & x) const override
   {
     OutputPointType y;
     if (is_inverse())
@@ -148,11 +150,11 @@ public:
   }
   
   // virtual:
-  virtual void SetFixedParameters(const ParametersType & params)
+  virtual void SetFixedParameters(const FixedParametersType & params) override
   { this->m_FixedParameters = params; }
   
   // virtual:
-  virtual const ParametersType & GetFixedParameters() const
+  virtual const FixedParametersType & GetFixedParameters() const override
   {
     ParametersType params = this->m_FixedParameters;
     
@@ -170,7 +172,7 @@ public:
   }
 
   // virtual:
-  virtual void SetParameters(const ParametersType & params)
+  virtual void SetParameters(const ParametersType & params) override
   {
     this->m_Parameters = params;
     
@@ -208,7 +210,7 @@ public:
   }
 
   // virtual:
-  virtual const ParametersType & GetParameters() const
+  virtual const ParametersType & GetParameters() const override
   {
     ParametersType params(GetNumberOfParameters());
     unsigned int num_pts = params.size() / 2;
@@ -231,11 +233,11 @@ public:
   }
 
   // virtual:
-  virtual NumberOfParametersType GetNumberOfParameters(void) const
+  virtual NumberOfParametersType GetNumberOfParameters(void) const override
   { return 2 * transform_.grid_.mesh_.size(); }
 
   // virtual: return an inverse of this transform.
-  virtual InverseTransformBasePointer GetInverseTransform() const
+  virtual InverseTransformBasePointer GetInverseTransform() const override
   {
     GridTransform::Pointer inv = GridTransform::New();
     inv->setup(transform_, !is_inverse());
@@ -292,7 +294,7 @@ public:
 
   virtual
   void
-  ComputeJacobianWithRespectToParameters( const InputPointType &point, JacobianType &jacobian ) const
+  ComputeJacobianWithRespectToParameters( const InputPointType &point, JacobianType &jacobian ) const override
   {
     // FIXME: 20061227 -- this function was written and not tested:
     

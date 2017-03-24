@@ -46,8 +46,8 @@ public:
   ActionNewFeature();
   virtual ~ActionNewFeature();
 
-  virtual bool validate( Core::ActionContextHandle& context );
-  virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
+  virtual bool validate( Core::ActionContextHandle& context ) override;;
+  virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result ) override;;
 
 public:
   static void Dispatch( Core::ActionContextHandle context );

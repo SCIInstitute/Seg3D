@@ -45,7 +45,7 @@
 #include <Core/DataBlock/DataBlock.h>
 #include <Core/DataBlock/StdDataBlock.h>
 #include <Core/DataBlock/MaskDataBlockManager.h>
-
+#include <Core/Utils/FilesystemUtil.h>
 
 
 // Application includes
@@ -64,16 +64,13 @@ void set_mask_series_names( itk::NumericSeriesFileNames::Pointer& name_series_ge
   const std::string& file_path, const std::string& file_name, const size_t size )
 { 
   boost::filesystem::path path = boost::filesystem::path( file_path );
+  
+  boost::filesystem::path full_filename( file_name );
+  std::string extension, base;
+  std::tie( extension, base ) = Core::GetFullExtension( full_filename );
 
-  std::string extension = boost::filesystem::extension( boost::filesystem::path( file_name ) );
-
-  std::string filename_without_extension = file_name;
-  filename_without_extension = filename_without_extension.substr( 0, 
-    filename_without_extension.find_last_of( "." ) );
-
-  boost::filesystem::path filename_path = path / filename_without_extension;
-
-
+  boost::filesystem::path filename_path = path / base;
+  
   if( size < 100 )
   {
     name_series_generator->SetSeriesFormat( filename_path.string() + "-%02d" + extension );
@@ -118,9 +115,6 @@ bool export_dicom_series( const std::string& file_path, const std::string& file_
 
   unsigned int first_slice = start[ 2 ];
   unsigned int last_slice = start[ 2 ] + size[ 2 ] - 1;
-
-  std::string extension = 
-    boost::to_lower_copy( boost::filesystem::extension( boost::filesystem::path( file_name ) ) );
 
   typedef itk::NumericSeriesFileNames NamesGeneratorType;
   NamesGeneratorType::Pointer names_generator = NamesGeneratorType::New();
@@ -287,7 +281,7 @@ bool export_dicom_series( const std::string& file_path, const std::string& file_
 
 bool export_mask_series( const std::string& file_path, const std::string& file_name, 
   Core::DataVolumeHandle data_volume, LayerMetaData meta_data )
-{    
+{
   typedef itk::Image< unsigned char, 3 > ImageType;
   typedef itk::Image< unsigned char, 2 > OutputImageType;
   typedef itk::ImageSeriesWriter< ImageType, OutputImageType > WriterType;
@@ -308,9 +302,6 @@ bool export_mask_series( const std::string& file_path, const std::string& file_n
 
   unsigned int first_slice = start[ 2 ];
   unsigned int last_slice = start[ 2 ] + size[ 2 ] - 1;
-
-  std::string extension = 
-    boost::to_lower_copy( boost::filesystem::extension( boost::filesystem::path( file_name ) ) );
 
   typedef itk::NumericSeriesFileNames NamesGeneratorType;
   NamesGeneratorType::Pointer names_generator = NamesGeneratorType::New();

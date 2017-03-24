@@ -61,16 +61,16 @@ public:
   // Each action needs to be validated just before it is posted. This way we
   // enforce that every action that hits the main post_action signal will be
   // a valid action to execute.
-  virtual bool validate( Core::ActionContextHandle& context );
+  virtual bool validate( Core::ActionContextHandle& context ) override;
 
   // RUN:
   // Each action needs to have this piece implemented. It spells out how the
   // action is run. It returns whether the action was successful or not.
-  virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
+  virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result ) override;
 
   // CLEAR_CACHE:
   // Clear any objects that were given as a short cut to improve performance.
-  virtual void clear_cache(); 
+  virtual void clear_cache() override; 
 
 private:
   ActionCopyPrivateHandle private_;

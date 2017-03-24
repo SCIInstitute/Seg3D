@@ -50,8 +50,8 @@ public:
     this->add_parameter( this->viewer_id_ );
   }
 
-  virtual bool validate( Core::ActionContextHandle& context );
-  virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
+  virtual bool validate( Core::ActionContextHandle& context ) override;;
+  virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result ) override;;
 
 private:
   size_t viewer_id_;

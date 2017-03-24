@@ -89,14 +89,11 @@ public:
   inline void MinimizeOn()    { SetMaximize(false); }
   inline void MinimizeOff()   { SetMaximize(true); }
   
-  // virtual:
-  void StartOptimization();
+  virtual void StartOptimization() override;
   
-  // virtual:
-  void ResumeOptimization();
+  virtual void ResumeOptimization();
   
-  // virtual:
-  void StopOptimization();
+  virtual void StopOptimization();
   
   // Set/Get parameters to control the optimization process:
   itkSetMacro(MaximumStepLength, double);
@@ -141,7 +138,7 @@ protected:
          const DerivativeType & step_direction);
   
   // virtual:
-  void PrintSelf(std::ostream& os, Indent indent) const;
+  virtual void PrintSelf(std::ostream& os, Indent indent) const override;
   
   // data members:
   DerivativeType  m_Gradient; 

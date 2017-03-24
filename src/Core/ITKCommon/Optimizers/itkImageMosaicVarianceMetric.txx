@@ -670,7 +670,7 @@ variance(const typename TImage::SpacingType & mosaic_sp,
        terminator("ImageMosaicVarianceMetric::GetValueAndDerivative"));
   
   typedef typename image_t::IndexType index_t;
-  typedef typename image_t::RegionType::SizeType imagesz_t;
+  //typedef typename image_t::RegionType::SizeType imagesz_t;
   
   max_var = measure_t(0);
   avg_var = measure_t(0);

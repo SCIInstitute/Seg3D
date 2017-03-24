@@ -105,14 +105,16 @@ public:
   itkStaticConstMacro(OutputSpaceDimension, unsigned int, 2);
   
   // shortcuts:
-  typedef Superclass::ParametersType ParametersType;
-  typedef Superclass::JacobianType JacobianType;
+  typedef  typename Superclass::FixedParametersType      FixedParametersType;
+  typedef  typename Superclass::FixedParametersValueType FixedParametersValueType;
+  typedef Superclass::ParametersType                     ParametersType;
+  typedef Superclass::JacobianType                       JacobianType;
   
   typedef Superclass::InputPointType  InputPointType;
   typedef Superclass::OutputPointType OutputPointType;
   
   // virtual:
-  virtual OutputPointType TransformPoint(const InputPointType & uv) const;
+  virtual OutputPointType TransformPoint(const InputPointType & uv) const override;
   
   // Inverse transformations:
   // If y = Transform(x), then x = BackTransform(y);
@@ -121,33 +123,33 @@ public:
   
   // virtual:
   virtual
-  void SetFixedParameters(const ParametersType & params)
+  void SetFixedParameters(const ParametersType & params) override
   { this->m_FixedParameters = params; }
   
   // virtual:
   virtual
-  const ParametersType & GetFixedParameters() const
+  const ParametersType & GetFixedParameters() const override
   { return this->m_FixedParameters; }
   
   // virtual:
   virtual
-  void SetParameters(const ParametersType & params)
+  void SetParameters(const ParametersType & params) override
   { this->m_Parameters = params; }
   
   // virtual:
   virtual
-  const ParametersType & GetParameters() const
+  const ParametersType & GetParameters() const override
   { return this->m_Parameters; }
   
   // virtual:
   virtual
-  NumberOfParametersType GetNumberOfParameters() const
+  NumberOfParametersType GetNumberOfParameters() const override
   { return this->m_Parameters.size(); }
 
   bool GetInverse(Self* inverse) const;
   
   // virtual: return an inverse of this transform.
-  virtual InverseTransformBasePointer GetInverseTransform() const;
+  virtual InverseTransformBasePointer GetInverseTransform() const override;
   
   // setup the transform parameters:
   void setup(// image bounding box expressed in the image space,
@@ -164,7 +166,7 @@ public:
 //  virtual
 //  const JacobianType & GetJacobian(const InputPointType & point) const;
 
-  virtual void ComputeJacobianWithRespectToParameters( const InputPointType &, JacobianType & ) const;
+  virtual void ComputeJacobianWithRespectToParameters( const InputPointType &, JacobianType & ) const override;
   
 #if 0
 //    // helper required for numeric inverse transform calculation;
@@ -244,7 +246,7 @@ protected:
   
   // virtual:
   virtual
-  void PrintSelf(std::ostream & s, Indent indent) const;
+  void PrintSelf(std::ostream & s, Indent indent) const override;
   
 private:
   // disable default copy constructor and assignment operator:

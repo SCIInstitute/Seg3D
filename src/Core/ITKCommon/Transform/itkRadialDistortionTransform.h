@@ -105,15 +105,17 @@ public:
   typedef typename Superclass::NumberOfParametersType NumberOfParametersType;
   
   // shortcuts:
-  typedef typename Superclass::ParametersType ParametersType;
-  typedef typename Superclass::JacobianType JacobianType;
+  typedef typename Superclass::FixedParametersType      FixedParametersType;
+  typedef typename Superclass::FixedParametersValueType FixedParametersValueType;
+  typedef typename Superclass::ParametersType           ParametersType;
+  typedef typename Superclass::JacobianType             JacobianType;
   
   typedef typename Superclass::InputPointType  InputPointType;
   typedef typename Superclass::OutputPointType OutputPointType;
   
   // virtual:
   virtual
-  OutputPointType TransformPoint(const InputPointType & p) const;
+  OutputPointType TransformPoint(const InputPointType & p) const override;
   
   // virtual: Inverse transformations:
   // If y = Transform(x), then x = BackTransform(y);
@@ -122,36 +124,36 @@ public:
   
   // virtual:
   virtual
-  void SetFixedParameters(const ParametersType & params)
+  void SetFixedParameters(const FixedParametersType &params) override
   { this->m_FixedParameters = params; }
   
   // virtual:
   virtual
-  const ParametersType & GetFixedParameters() const
+  const FixedParametersType & GetFixedParameters() const override
   { return this->m_FixedParameters; }
   
   // virtual:
   virtual
-  void SetParameters(const ParametersType & params)
+  void SetParameters(const ParametersType & params) override
   { this->m_Parameters = params; }
   
   // virtual:
   virtual
-  const ParametersType & GetParameters() const
+  const ParametersType & GetParameters() const override
   { return this->m_Parameters; }
   
   // virtual: mumber of parameters that define this transform:
   virtual
-  NumberOfParametersType GetNumberOfParameters() const
+  NumberOfParametersType GetNumberOfParameters() const override
   { return N + 2; }
   
   // virtual:
 //  virtual
 //  const JacobianType & GetJacobian(const InputPointType & point) const;
-  virtual void ComputeJacobianWithRespectToParameters( const InputPointType &, JacobianType & ) const;
+  virtual void ComputeJacobianWithRespectToParameters( const InputPointType &, JacobianType & ) const override;
   
   // virtual: return an inverse of this transform.
-  virtual InverseTransformBasePointer GetInverseTransform() const
+  virtual InverseTransformBasePointer GetInverseTransform() const override
   {
     typedef InverseTransform<Self> InvTransformType;
     typename InvTransformType::Pointer inv = InvTransformType::New();
@@ -234,7 +236,7 @@ protected:
   
   // virtual:
   virtual
-  void PrintSelf(std::ostream & s, Indent indent) const;
+  void PrintSelf(std::ostream & s, Indent indent) const override;
   
 private:
   // disable default copy constructor and assignment operator:

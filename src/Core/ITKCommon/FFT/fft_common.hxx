@@ -312,8 +312,8 @@ estimate_displacement(const TImage * a,
 
   // evaluate 4 permutations of the maxima:
   // typedef itk::NormalizedCorrelationImageToImageMetric<TImage, TImage>
-  typedef itk::MeanSquaresImageToImageMetric<TImage, TImage> metric_t;
-  typedef itk::LinearInterpolateImageFunction<TImage, double> interpolator_t;
+  //typedef itk::MeanSquaresImageToImageMetric<TImage, TImage> metric_t;
+  //typedef itk::LinearInterpolateImageFunction<TImage, double> interpolator_t;
 
   typedef typename TImage::SpacingType spacing_t;
   spacing_t spacing = a->GetSpacing();

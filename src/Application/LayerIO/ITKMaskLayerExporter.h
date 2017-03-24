@@ -54,7 +54,7 @@ namespace Seg3D
 
 class ITKMaskLayerExporter : public LayerExporter
 {
-  SEG3D_EXPORTER_TYPE( "ITK Mask Exporter", ".tiff;.bmp;.png;.dcm" )
+  SEG3D_EXPORTER_TYPE( "ITK Mask Exporter", ".tiff;.bmp;.png;.dcm;.nii;.nii.gz" )
 
   // -- Constructor/Destructor --
 public:
