@@ -1349,6 +1349,9 @@ void LayerWidget::contextMenuEvent( QContextMenuEvent * event )
 
     qaction = export_menu->addAction( tr( "COMPRESSED NIFTI" ) );
     connect( qaction, SIGNAL( triggered() ), this, SLOT( export_compressed_nifti() ) );
+    
+    qaction = export_menu->addAction( tr( "MHA" ) );
+    connect( qaction, SIGNAL( triggered() ), this, SLOT( export_mha() ) );
 
     menu.addMenu( export_menu );
   }
@@ -1427,6 +1430,11 @@ void LayerWidget::export_nifti()
 void LayerWidget::export_compressed_nifti()
 {
   this->private_->export_layer( ".nii.gz" );
+}
+
+void LayerWidget::export_mha()
+{
+  this->private_->export_layer( ".mha" );
 }
 
 void LayerWidget::export_isosurface()

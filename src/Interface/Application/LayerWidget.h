@@ -213,6 +213,10 @@ private Q_SLOTS:
   /// EXPORT_NIFTI:
   /// dispatches an action that exports the layer as a gzip compressed nifti
   void export_compressed_nifti();
+  
+  /// EXPORT_MHA:
+  /// dispatches an action that exports the layer as a mha
+  void export_mha();
 
   /// EXPORT_ISOSURFACE:
   /// dispatches an action that exports the isosurface for this layer
