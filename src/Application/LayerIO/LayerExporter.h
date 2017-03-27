@@ -183,8 +183,8 @@ public:
     static std::string  GetName()       { return exporter_name; }\
     static std::string  GetFileTypes()  { return exporter_file_types; }\
     \
-    virtual std::string  get_name() const       { return GetName(); } \
-    virtual std::string  get_file_types() const { return GetFileTypes(); } \
+    virtual std::string  get_name() const override       { return GetName(); } \
+    virtual std::string  get_file_types() const override { return GetFileTypes(); } \
 
 } // end namespace seg3D
 
