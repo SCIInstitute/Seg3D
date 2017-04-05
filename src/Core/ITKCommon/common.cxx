@@ -730,21 +730,21 @@ calc_tile_mosaic_bbox(const base_transform_t * mosaic_to_tile,
 void
 make_colors(const unsigned int & num_colors, std::vector<xyz_t> & color)
 {
-  static const xyz_t EAST  = xyz(1, 0, 0);
-  static const xyz_t NORTH = xyz(0, 1, 0);
-  static const xyz_t WEST  = xyz(0, 0, 1);
-  static const xyz_t SOUTH = xyz(0, 0, 0);
+  //static const xyz_t EAST  = xyz(1, 0, 0);
+  //static const xyz_t NORTH = xyz(0, 1, 0);
+  //static const xyz_t WEST  = xyz(0, 0, 1);
+  //static const xyz_t SOUTH = xyz(0, 0, 0);
   
   color.resize(num_colors);
   
   for (unsigned int i = 0; i < num_colors; i++)
   {
-#if 1
+//#if 1
     double t = fmod(double(i % 2) / 2.0 +
                     double(i) / double(num_colors - 1), 1.0);
-#else
-    double t = double(i) / double(num_colors);
-#endif
+//#else
+//    double t = double(i) / double(num_colors);
+//#endif
     
     double s = 0.5 + 0.5 * fmod(double((i + 1) % 3) / 3.0 +
                                 double(i) / double(num_colors - 1), 1.0);
@@ -830,8 +830,10 @@ find_inverse(const pnt2d_t & tile_min,        // tile space
   p10[0] += x_unit;
   p01[1] += y_unit;
   
+#ifdef DEBUG_FIND_INVERSE
   vec2d_t x_axis = p10 - p00;
   vec2d_t y_axis = p01 - p00;
+#endif
   
   // FIXME: this may fail, because inverse may be unstable:
   // the same coordinate system in the mosaic space:
@@ -1094,8 +1096,10 @@ generate_landmarks_v1(const pnt2d_t & tile_min,
   p10[0] += x_unit;
   p01[1] += y_unit;
   
+#ifdef DEBUG_LANDMARKS
   vec2d_t x_axis = p10 - p00;
   vec2d_t y_axis = p01 - p00;
+#endif
   
   // FIXME: this may fail, because tile_to_mosaic may be unstable:
   // the same coordinate system in the mosaic space:
@@ -1302,8 +1306,10 @@ generate_landmarks_v2(const pnt2d_t & tile_min,
   p10[0] += x_unit;
   p01[1] += y_unit;
   
+#ifdef DEBUG_LANDMARKS
   vec2d_t x_axis = p10 - p00;
   vec2d_t y_axis = p01 - p00;
+#endif
   
   // FIXME: this may fail, because tile_to_mosaic may be unstable:
   // the same coordinate system in the mosaic space:

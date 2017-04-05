@@ -237,7 +237,7 @@ protected:
 
   /// RUN:
   /// The function called by runnable
-  virtual void run();
+  virtual void run() override;
 
   // -- error handling --
 public:

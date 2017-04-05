@@ -197,7 +197,17 @@ void matfile::mfreadheader()
     
     m_->byteswap_ = 0;
     mfread(static_cast<void *>(&endian),1,sizeof(short),126);
-    if (endian != 19785) if (endian == 18765) m_->byteswap_ = 1; else throw invalid_file_format();
+    if (endian != 19785)
+    {
+      if (endian == 18765)
+      {
+        m_->byteswap_ = 1;
+      }
+      else
+      {
+        throw invalid_file_format();
+      }
+    }
 
     mfread(static_cast<void *>(&(m_->headertext_[0])),sizeof(char),116,0);
 	  mfread(static_cast<void *>(&(m_->subsysdata_[0])),sizeof(int32_t),2,116);

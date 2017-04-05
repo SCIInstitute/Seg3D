@@ -59,9 +59,9 @@ public:
 
 // -- Functions that describe action --
 public:
-  virtual bool validate( Core::ActionContextHandle& context );
+  virtual bool validate( Core::ActionContextHandle& context ) override;
   virtual bool run( Core::ActionContextHandle& context, 
-    Core::ActionResultHandle& result );
+    Core::ActionResultHandle& result ) override;
 
 private:
   std::vector< std::string > layerids_;

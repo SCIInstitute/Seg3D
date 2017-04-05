@@ -152,8 +152,8 @@ ActionSliceToVolumeFilter::run( Core::ActionContextHandle& context, Core::Action
       image_dirs[i].push_back(bfs::path(this->image_dirs_[i]));
     }
     
-    bool old_image_list_type = true, old_slice_dirs_type = true;
-    unsigned int image_list_idx = 0, slice_dirs_idx = 0;
+    //bool old_image_list_type = true, old_slice_dirs_type = true;
+    //unsigned int image_list_idx = 0, slice_dirs_idx = 0;
 
     pathList fn_prefixes;
     bfs::path fn_extension(this->image_extension_);

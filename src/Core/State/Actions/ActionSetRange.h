@@ -54,8 +54,8 @@ public:
     this->add_parameter( this->max_value_ );
   }
 
-  virtual bool validate( ActionContextHandle& context );
-  virtual bool run( ActionContextHandle& context, ActionResultHandle& result );
+  virtual bool validate( ActionContextHandle& context ) override;
+  virtual bool run( ActionContextHandle& context, ActionResultHandle& result ) override;
 
 private:
   std::string stateid_;

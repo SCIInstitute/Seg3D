@@ -262,7 +262,7 @@ public: \
   {\
     return GetTypedActionInfo(); \
   }\
-  virtual Core::ActionInfoHandle get_action_info() const { return GetActionInfo(); } \
+  virtual Core::ActionInfoHandle get_action_info() const override { return GetActionInfo(); } \
   \
   static info_class::handle_type GetTypedActionInfo() \
   {\

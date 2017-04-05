@@ -57,10 +57,10 @@ public:
 
 // -- Functions that describe action --
 public:
-  virtual bool validate( Core::ActionContextHandle& context );
+  virtual bool validate( Core::ActionContextHandle& context ) override;
   virtual bool run( Core::ActionContextHandle& context, 
-    Core::ActionResultHandle& result );
-  virtual void clear_cache();
+    Core::ActionResultHandle& result ) override;
+  virtual void clear_cache() override;
   
 private:
   ActionRecreateLayerPrivateHandle private_;

@@ -2106,8 +2106,8 @@ calc_image_bboxes(const std::vector<image_pointer_t> & image,
                   std::vector<pnt2d_t> & image_max)
 {
   typedef typename image_pointer_t::ObjectType::Pointer::ObjectType T;
-  typedef typename T::RegionType::SizeType imagesz_t;
-  typedef typename T::SpacingType spacing_t;
+  //typedef typename T::RegionType::SizeType imagesz_t;
+  //typedef typename T::SpacingType spacing_t;
   
   const unsigned int num_images = image.size();
   image_min.resize(num_images);
@@ -2149,8 +2149,8 @@ calc_image_bboxes_load_images(const std::list<bfs::path> & in,
                               const double pixel_spacing)
 {
   typedef typename image_pointer_t::ObjectType::Pointer::ObjectType T;
-  typedef typename T::RegionType::SizeType imagesz_t;
-  typedef typename T::SpacingType spacing_t;
+  //typedef typename T::RegionType::SizeType imagesz_t;
+  //typedef typename T::SpacingType spacing_t;
   
   const unsigned int num_images = in.size();
   image_min.resize(num_images);
@@ -2509,11 +2509,11 @@ make_mosaic_st
   WRAP(itk_terminator_t terminator("make_mosaic_st"));
   
   typedef typename image_pointer_t::ObjectType::Pointer::ObjectType image_t;
-  typedef typename image_t::IndexType index_t;
+  //typedef typename image_t::IndexType index_t;
   typedef typename image_t::PointType point_t;
   typedef typename image_t::PixelType pixel_t;
-  typedef typename image_t::SpacingType spacing_t;
-  typedef typename image_t::RegionType::SizeType imagesz_t;
+  //typedef typename image_t::SpacingType spacing_t;
+  //typedef typename image_t::RegionType::SizeType imagesz_t;
   typedef typename itk::ImageRegionIteratorWithIndex<image_t> itex_t;
   
   // setup the image interpolators:
@@ -3409,10 +3409,10 @@ make_mask_st(const mask_t::SpacingType & mosaic_sp,
 {
   WRAP(itk_terminator_t terminator("make_mask_st"));
   
-  typedef mask_t::IndexType index_t;
+  //typedef mask_t::IndexType index_t;
   typedef mask_t::PointType point_t;
   typedef mask_t::PixelType pixel_t;
-  typedef mask_t::SpacingType spacing_t;
+  //typedef mask_t::SpacingType spacing_t;
   typedef mask_t::RegionType::SizeType imagesz_t;
   typedef itk::ImageRegionIteratorWithIndex<mask_t> itex_t;
   
@@ -4210,10 +4210,10 @@ make_mosaic_rgb(typename image_pointer_t::ObjectType::Pointer * mosaic,
                 // should the first tile be white?
                 bool first_tile_white = false)
 {
-  static const xyz_t EAST  = xyz(1, 0, 0);
-  static const xyz_t NORTH = xyz(0, 1, 0);
-  static const xyz_t WEST  = xyz(0, 0, 1);
-  static const xyz_t SOUTH = xyz(0, 0, 0);
+  //static const xyz_t EAST  = xyz(1, 0, 0);
+  //static const xyz_t NORTH = xyz(0, 1, 0);
+  //static const xyz_t WEST  = xyz(0, 0, 1);
+  //static const xyz_t SOUTH = xyz(0, 0, 0);
   
   unsigned int num_images = image.size();
   xyz_t background_color = xyz(background, background, background);
@@ -4502,7 +4502,7 @@ mark(typename T::Pointer & image,
      const int arm_length = 2,
      const char symbol = '+')
 {
-  typedef typename T::SpacingType spacing_t;
+  //typedef typename T::SpacingType spacing_t;
   typedef typename T::RegionType::SizeType image_size_t;
   typedef typename T::IndexType index_t;
   
@@ -4776,7 +4776,7 @@ histogram_equalization(const T * in,
                        const mask_t * mask = NULL)
 {
   // local typedefs:
-  typedef typename T::RegionType rn_t;
+  //typedef typename T::RegionType rn_t;
   typedef typename T::IndexType  ix_t;
   typedef typename T::SizeType   sz_t;
   typedef typename T::PixelType  pixel_t;
@@ -4894,7 +4894,7 @@ CLAHE(const T * in,
       const mask_t * mask = NULL)
 {
   // local typedefs:
-  typedef typename T::RegionType rn_t;
+  //typedef typename T::RegionType rn_t;
   typedef typename T::IndexType  ix_t;
   typedef typename T::SizeType   sz_t;
   typedef typename T::PixelType  pixel_t;

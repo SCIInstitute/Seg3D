@@ -82,7 +82,9 @@ public:
   typedef typename Superclass::ScalarType ScalarType;
   
   /** Type of the input parameters. */
-  typedef typename Superclass::ParametersType ParametersType;
+  typedef typename Superclass::FixedParametersType      FixedParametersType;
+  typedef typename Superclass::FixedParametersValueType FixedParametersValueType;
+  typedef typename Superclass::ParametersType           ParametersType;
   
   /** Type of the Jacobian matrix. */
   typedef typename Superclass::JacobianType JacobianType;
@@ -108,7 +110,7 @@ public:
   { forward_ = forward; }
   
   /**  Method to transform a point. */
-  virtual OutputPointType TransformPoint(const InputPointType & y) const
+  virtual OutputPointType TransformPoint(const InputPointType & y) const override
   {
     // TODO: replace with exception
 //    assert(forward_ != NULL);
@@ -119,25 +121,25 @@ public:
     return forward_->BackTransformPoint(y);
   }
 
-  virtual void ComputeJacobianWithRespectToParameters( const InputPointType &, JacobianType & ) const
+  virtual void ComputeJacobianWithRespectToParameters( const InputPointType &, JacobianType & ) const override
   {
     itkExceptionMacro(<< "ComputeJacobianWithRespectToParameters is not implemented for InverseTransform");
   }
 
-  virtual void SetFixedParameters(const ParametersType &)
+  virtual void SetFixedParameters(const FixedParametersType &) override
   {
     itkExceptionMacro(<< "SetFixedParameters is not implemented for InverseTransform");
   }
   
-  virtual void SetParameters(const ParametersType &)
+  virtual void SetParameters(const ParametersType &) override
   {
     itkExceptionMacro(<< "SetParameters is not implemented for InverseTransform");
   }
 
-  virtual NumberOfParametersType GetNumberOfParameters() const 
+  virtual NumberOfParametersType GetNumberOfParameters() const override
   { return 0; }
 
-  virtual InverseTransformBasePointer GetInverseTransform() const
+  virtual InverseTransformBasePointer GetInverseTransform() const override
   { return const_cast<ForwardTransform *>(forward_); }
 
 protected:

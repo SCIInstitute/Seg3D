@@ -89,8 +89,10 @@ public:
   itkStaticConstMacro(OutputSpaceDimension, unsigned int, Dimension);
   
   // shortcuts:
-  typedef typename Superclass::ParametersType ParametersType;
-  typedef typename Superclass::JacobianType JacobianType;
+  typedef typename Superclass::FixedParametersType      FixedParametersType;
+  typedef typename Superclass::FixedParametersValueType FixedParametersValueType;
+  typedef typename Superclass::ParametersType           ParametersType;
+  typedef typename Superclass::JacobianType             JacobianType;
   
   typedef typename Superclass::InputPointType PointType;
   typedef PointType InputPointType;
@@ -112,7 +114,7 @@ public:
   typedef typename Superclass::NumberOfParametersType NumberOfParametersType;
   
   // virtual:
-  virtual PointType TransformPoint(const PointType & x) const
+  virtual PointType TransformPoint(const PointType & x) const override
   {
     PointType y = x;
     
@@ -132,7 +134,7 @@ public:
   }
   
   // virtual:
-  virtual VectorType TransformVector(const VectorType & x) const
+  virtual VectorType TransformVector(const VectorType & x) const override
   {
     VectorType y(x);
     
@@ -146,7 +148,7 @@ public:
   }
   
   // virtual:
-  virtual VnlVectorType TransformVector(const VnlVectorType & x) const
+  virtual VnlVectorType TransformVector(const VnlVectorType & x) const override
   {
     VnlVectorType y(x);
     
@@ -161,7 +163,7 @@ public:
   
   // virtual:
   virtual CovariantVectorType
-  TransformCovariantVector(const CovariantVectorType & x) const
+  TransformCovariantVector(const CovariantVectorType & x) const override
   {
     CovariantVectorType y(x);
     
@@ -214,33 +216,38 @@ public:
     return true;
   }
 
-  virtual InverseTransformBasePointer GetInverseTransform() const
+  virtual InverseTransformBasePointer GetInverseTransform() const override
   {
     Pointer inv = Self::New();
     return this->GetInverse(inv) ? inv.GetPointer() : 0;
   }
 
   // virtual:
-  virtual void SetParameters(const ParametersType & params)
+  virtual void SetParameters(const ParametersType & params) override
   { transform_[active_params_]->SetParameters(params); }
   
-  virtual void SetFixedParameters(const ParametersType &)
+  virtual void SetFixedParameters(const FixedParametersType &) override
   {
     itkExceptionMacro(<< "SetFixedParameters is not implemented for CascadedTransform");
   }
 
   // virtual:
-  virtual const ParametersType & GetParameters() const
+  virtual const ParametersType & GetParameters() const override
   { return transform_[active_params_]->GetParameters(); }
   
   // virtual:
-  virtual NumberOfParametersType GetNumberOfParameters() const
+  virtual NumberOfParametersType GetNumberOfParameters() const override
   { return transform_[active_params_]->GetNumberOfParameters(); }
   
   // virtual:
-  virtual const JacobianType & GetJacobian(const PointType & pt) const
+  virtual const JacobianType & GetJacobian(const PointType & pt) const override
   { return transform_[active_params_]->GetJacobian(pt); }
-  
+
+  virtual void ComputeJacobianWithRespectToParameters(const InputPointType &, JacobianType &) const override
+  {
+    itkExceptionMacro(<< "mputeJacobianWithRespectToParameters is not implemented for CascadedTransform");
+  }
+
   // add a transform to the stack:
   void append(TransformPointer transform)
   {
@@ -327,7 +334,7 @@ protected:
   {}
   
   // virtual:
-  virtual void PrintSelf(std::ostream & os, Indent indent) const
+  virtual void PrintSelf(std::ostream & os, Indent indent) const override
   {
     Superclass::PrintSelf(os, indent);
     

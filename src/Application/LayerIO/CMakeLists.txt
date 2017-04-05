@@ -1,22 +1,22 @@
 #
 #  For more information, please see: http://software.sci.utah.edu
-# 
+#
 #  The MIT License
-# 
+#
 #  Copyright (c) 2016 Scientific Computing and Imaging Institute,
 #  University of Utah.
-# 
-#  
+#
+#
 #  Permission is hereby granted, free of charge, to any person obtaining a
 #  copy of this software and associated documentation files (the "Software"),
 #  to deal in the Software without restriction, including without limitation
 #  the rights to use, copy, modify, merge, publish, distribute, sublicense,
 #  and/or sell copies of the Software, and to permit persons to whom the
 #  Software is furnished to do so, subject to the following conditions:
-# 
+#
 #  The above copyright notice and this permission notice shall be included
-#  in all copies or substantial portions of the Software. 
-# 
+#  in all copies or substantial portions of the Software.
+#
 #  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
 #  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 #  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -124,16 +124,21 @@ TARGET_LINK_LIBRARIES(Application_LayerIO
   Application_Layer
   ${SCI_BOOST_LIBRARY}
   ${ITKCommon_LIBRARIES}
+  ${ITKDeprecated_LIBRARIES}
+  ${ITKReview_LIBRARIES}
   ${ITKIOImageBase_LIBRARIES}
   ${ITKIOGDCM_LIBRARIES}
-  ${ITKDeprecated_LIBRARIES}
   ${ITKIOBMP_LIBRARIES}
   ${ITKIOTIFF_LIBRARIES}
+  ${ITKIOJPEG_LIBRARIES}
+  ${ITKIOLSM_LIBRARIES}
+  ${ITKIOGIPL_LIBRARIES}
+  ${ITKIOMeta_LIBRARIES}
+  ${ITKIONRRD_LIBRARIES}
   ${ITKIONIFTI_LIBRARIES}
   ${ITKIOPNG_LIBRARIES}
-  ${ITKReview_LIBRARIES}
-  ${ITKIOHDF5_LIBRARIES}
   ${ITKHDF5_LIBRARIES}
+  ${ITKIOHDF5_LIBRARIES}
   ${ITKIOMRC_LIBRARIES}
   ${ITKIOVTK_LIBRARIES}
   ${SCI_MATLABIO_LIBRARY}
@@ -141,7 +146,7 @@ TARGET_LINK_LIBRARIES(Application_LayerIO
 )
 
 # Register actions and importers
-REGISTER_LIBRARY_AND_CLASSES(Application_LayerIO 
+REGISTER_LIBRARY_AND_CLASSES(Application_LayerIO
   ${APPLICATION_LAYERIO_ACTIONS_SRCS}
   ${APPLICATION_LAYERIO_IMPORTERS_SRCS}
   ${APPLICATION_LAYERIO_EXPORTERS_SRCS}

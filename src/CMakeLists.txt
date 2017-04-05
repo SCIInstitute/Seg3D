@@ -39,7 +39,6 @@ IF(POLICY CMP0043)
   CMAKE_POLICY(SET CMP0043 OLD)
 ENDIF()
 IF(POLICY CMP0053)
-  # TODO: revisit on ITK upgrade
   CMAKE_POLICY(SET CMP0053 OLD)
 ENDIF()
 IF(POLICY CMP0054)
@@ -229,6 +228,7 @@ ADD_DEFINITIONS(-DTIXML_USE_STL)
 IF (DO_ZLIB_MANGLE)
   ADD_DEFINITIONS(-DZ_PREFIX)
 ENDIF()
+
 
 ###########################################
 # RPATH settings for Linux
@@ -468,11 +468,9 @@ FILE(GLOB PLUGIN_DIRS "Plugins/*" )
 INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/Plugins")
 
 FOREACH(DIR ${PLUGIN_DIRS})
-  #IF(NOT ${DIR} MATCHES "Plugins/.svn")
   IF(IS_DIRECTORY ${DIR})
     ADD_SUBDIRECTORY(${DIR})
   ENDIF()
-  #ENDIF()
 ENDFOREACH()
 
 ###########################################

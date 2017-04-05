@@ -42,7 +42,7 @@ namespace itk
  * extraction", Medical Image Analysis, 1(4):331-341, 1996/7.
  * \ingroup ImageFunctions
  */
-template <class TInputImage>
+template <typename TInputImage>
 class ITK_EXPORT LiveWireImageFunction 
 : public ImageFunction<TInputImage, typename itk::PolyLineParametricPath< TInputImage::ImageDimension >::Pointer >
 {
@@ -78,6 +78,8 @@ public:
   typedef typename Superclass::IndexType                    IndexType;
   typedef typename Superclass::PointType                    PointType;
   typedef typename Superclass::ContinuousIndexType          ContinuousIndexType;
+ 
+  typedef itk::IdentifierType                               ElementIdentifier;
 
   typedef typename OutputType::VertexType                   VertexType;
 
@@ -98,7 +100,7 @@ public:
    * Priority queue typedefs
    */
   typedef MinPriorityQueueElementWrapper
-    <IndexType, RealType>                            PriorityQueueElementType;
+    <IndexType, RealType, ElementIdentifier>         PriorityQueueElementType;
   typedef PriorityQueueContainer<
     PriorityQueueElementType, 
     PriorityQueueElementType,
@@ -109,10 +111,10 @@ public:
    * \warning this method caches BufferedRegion information.
    * If the BufferedRegion has changed, user must call
    * SetInputImage again to update cached values. */
-  virtual void SetInputImage( const InputImageType * ptr );
+  virtual void SetInputImage( const InputImageType * ptr ) override;
 
   /** Evaluate the function at specified Point position. */
-  virtual typename OutputType::Pointer Evaluate( const PointType &point ) const
+  virtual typename OutputType::Pointer Evaluate( const PointType &point ) const override
 				{
 						IndexType index;
       this->ConvertPointToNearestIndex( point, index );
@@ -122,7 +124,7 @@ public:
   /** Evaluate the function at specified ContinousIndex position.
    * Subclasses must provide this method. */
   virtual typename OutputType::Pointer 
-    EvaluateAtContinuousIndex( const ContinuousIndexType &cindex ) const
+    EvaluateAtContinuousIndex( const ContinuousIndexType &cindex ) const override
 				{
 						IndexType index;
       this->ConvertContinuousIndexToNearestIndex( cindex, index );
@@ -132,7 +134,7 @@ public:
   /** Evaluate the function at specified Index position.
    * Subclasses must provide this method. */
   virtual typename OutputType::Pointer 
-    EvaluateAtIndex( const IndexType &index ) const;
+    EvaluateAtIndex( const IndexType &index ) const override;
 
   itkSetClampMacro( GradientMagnitudeWeight, RealType, 
                     0, NumericTraits<RealType>::max() );
@@ -182,7 +184,7 @@ protected:
 
   LiveWireImageFunction(); 
   virtual ~LiveWireImageFunction();
-  void PrintSelf(std::ostream& os, Indent indent) const;
+  void PrintSelf(std::ostream& os, Indent indent) const override;
   
 private:
   LiveWireImageFunction(const Self&); //purposely not implemented
