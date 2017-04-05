@@ -177,6 +177,8 @@ public:
   /// The action factory can recreate the action from this string
   std::string export_to_string() const;
 
+  std::string export_to_python_string() const;
+
   // IMPORT_ACTION_FROM_STRING:
   /// Import an action command from a string. This function is used by the
   /// ActionFactory.
@@ -260,7 +262,7 @@ public: \
   {\
     return GetTypedActionInfo(); \
   }\
-  virtual Core::ActionInfoHandle get_action_info() const { return GetActionInfo(); } \
+  virtual Core::ActionInfoHandle get_action_info() const override { return GetActionInfo(); } \
   \
   static info_class::handle_type GetTypedActionInfo() \
   {\

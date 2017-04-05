@@ -40,6 +40,7 @@ TARGET_LINK_LIBRARIES(Core_ITKCommon_Transform_Tests
   Core_ITKCommon
   ${ITKCommon_LIBRARIES}
   ${ITKIOTransformBase_LIBRARIES}
+  ${ITKTransformFactory_LIBRARIES}
   ${ITKFFT_LIBRARIES}
   ${SCI_GTESTMAIN_LIBRARY}
 )

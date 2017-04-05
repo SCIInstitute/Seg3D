@@ -49,7 +49,7 @@ int ControllerActionHistory::rowCount( const QModelIndex& /*index*/) const
 
 int ControllerActionHistory::columnCount( const QModelIndex& /*index*/) const
 {
-  return ( 2 );
+  return ( 3 );
 }
 
 QVariant ControllerActionHistory::data( const QModelIndex& index, int role ) const
@@ -65,17 +65,25 @@ QVariant ControllerActionHistory::data( const QModelIndex& index, int role ) con
     int sz = static_cast< int > ( history_->history_size() );
     if ( index.row() < sz )
     {
-      if ( index.column() == 0 )
-      {
-        Core::ActionHandle action = history_->action( sz - index.row() - 1 );
-        if ( action.get() == 0 ) return QString( "" );
-        return QString::fromStdString( action->export_to_string() );
-      }
-      else
+      if ( index.column() == 2 )
       {
         Core::ActionResultHandle result = history_->result( sz - index.row() - 1 );
         if ( result.get() == 0 ) return QString( "" );
         return QString::fromStdString( result->export_to_string() );
+      }
+      else
+      {
+        Core::ActionHandle action = history_->action( sz - index.row() - 1 );
+        if ( action.get() == 0 ) return QString( "" );
+
+        if ( index.column() == 0 )
+        {
+          return QString::fromStdString( action->export_to_string() );
+        }
+        else
+        {
+          return QString::fromStdString( action->export_to_python_string() );
+        }
       }
     }
     else
@@ -85,8 +93,8 @@ QVariant ControllerActionHistory::data( const QModelIndex& index, int role ) con
   }
   else if ( role == Qt::SizeHintRole )
   {
-    if ( index.column() == 0 ) return QSize( 200, 12 );
-    else return QSize( 100, 12 );
+    if ( index.column() == 2 ) return QSize( 100, 12 );
+    else return QSize( 200, 12 );
   }
   else
   {
@@ -102,7 +110,8 @@ QVariant ControllerActionHistory::headerData( int section, Qt::Orientation orien
   }
 
   if ( section == 0 ) return QString( "Action" );
-  if ( section == 1 ) return QString( "Result" );
+  if ( section == 1 ) return QString( "Python Action" );
+  if ( section == 2 ) return QString( "Result" );
   else return QVariant();
 }
 

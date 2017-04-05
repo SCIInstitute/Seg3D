@@ -70,12 +70,12 @@ public:
   // Each action needs to be validated just before it is posted. This way we
   // enforce that every action that hits the main post_action signal will be
   // a valid action to execute.
-  virtual bool validate( Core::ActionContextHandle& context );
+  virtual bool validate( Core::ActionContextHandle& context ) override;
   
   // RUN:
   // Each action needs to have this piece implemented. It spells out how the
   // action is run. It returns whether the action was successful or not.
-  virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
+  virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result ) override;
 
   void set_file_path( const std::string& file_path ) { file_path_ = file_path; }
   void set_points( const PointVector& points ) { points_ = points; }

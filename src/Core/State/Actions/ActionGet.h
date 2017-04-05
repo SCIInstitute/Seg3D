@@ -50,8 +50,8 @@ public:
   }
 
   // -- Functions that describe action --
-  virtual bool validate( ActionContextHandle& context );
-  virtual bool run( ActionContextHandle& context, ActionResultHandle& result );
+  virtual bool validate( ActionContextHandle& context ) override;
+  virtual bool run( ActionContextHandle& context, ActionResultHandle& result ) override;
 
   // -- Action parameters --
 private:

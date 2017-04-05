@@ -55,11 +55,11 @@ public:
   } 
 
   // -- Functions that describe action --
-  virtual bool validate( ActionContextHandle& context );
-  virtual bool run( ActionContextHandle& context, ActionResultHandle& result );
+  virtual bool validate( ActionContextHandle& context ) override;
+  virtual bool run( ActionContextHandle& context, ActionResultHandle& result ) override;
 
   // -- Function that describes whether the action changes the data of the program --
-  virtual bool changes_project_data();
+  virtual bool changes_project_data() override;
 
 
 private:

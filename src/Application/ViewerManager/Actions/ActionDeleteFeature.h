@@ -47,8 +47,8 @@ public:
   ActionDeleteFeature();
   virtual ~ActionDeleteFeature();
 
-  virtual bool validate( Core::ActionContextHandle& context );
-  virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
+  virtual bool validate( Core::ActionContextHandle& context ) override;;
+  virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result ) override;;
 
 private:
   std::string feature_id_;

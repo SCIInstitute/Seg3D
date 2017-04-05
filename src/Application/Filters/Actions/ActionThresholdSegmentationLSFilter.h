@@ -79,8 +79,8 @@ public:
   
   // -- Functions that describe action --
 public:
-  virtual bool validate( Core::ActionContextHandle& context );
-  virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
+  virtual bool validate( Core::ActionContextHandle& context ) override;
+  virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result ) override;
   
   void set_iterations( int iterations ) { this->iterations_ = iterations; }
   // -- Action parameters --

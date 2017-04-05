@@ -54,7 +54,7 @@ namespace Seg3D
 
 class ITKMaskLayerExporter : public LayerExporter
 {
-  SEG3D_EXPORTER_TYPE( "ITK Mask Exporter", ".tiff;.bmp;.png;.dcm" )
+  SEG3D_EXPORTER_TYPE( "ITK Mask Exporter", ".tiff;.bmp;.png;.dcm;.nii;.nii.gz;.mha" )
 
   // -- Constructor/Destructor --
 public:
@@ -83,8 +83,15 @@ public:
 
   /// EXPORT_LAYER
   /// Export the layer to file
-  virtual bool export_layer( const std::string& mode, const std::string& file_path, 
-    const std::string& name ) override;
+  virtual bool export_layer( const std::string& mode,
+                             const std::string& file_path,
+                             const std::string& name ) override;
+  
+private:
+  template< class InputPixelType >
+  bool export_layer_internal( const std::string& mode,
+                              const std::string& file_path,
+                              const std::string& name );
 
 private:
   Core::DataType pixel_type_;
