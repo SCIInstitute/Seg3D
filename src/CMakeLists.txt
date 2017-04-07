@@ -397,6 +397,7 @@ ENDIF()
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 
+
 ###########################################
 # Generate a variable for registering all
 # the plugins
@@ -409,13 +410,6 @@ INCLUDE(CMake/RegisterClass.cmake)
 
 SET(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake/Modules")
 
-###########################################
-# Configure testing code
-###########################################
-
-IF(BUILD_TESTING)
-  ADD_SUBDIRECTORY(Testing)
-ENDIF()
 
 ###########################################
 # Application layers:
@@ -542,6 +536,15 @@ ENDIF()
 ###########################################
 
 ADD_SUBDIRECTORY(Bootstrap)
+
+
+###########################################
+# Configure testing code
+###########################################
+
+IF(BUILD_TESTING)
+  ADD_SUBDIRECTORY(Testing)
+ENDIF()
 
 
 ###########################################
