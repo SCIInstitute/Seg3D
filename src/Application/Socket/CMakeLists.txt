@@ -40,3 +40,5 @@ CORE_ADD_LIBRARY(Application_Socket ${APPLICATION_SOCKET_SRCS} )
             
 TARGET_LINK_LIBRARIES(Application_Socket
   Core_Python)
+
+ADD_TEST_DIR(Tests)
