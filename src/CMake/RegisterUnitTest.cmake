@@ -28,7 +28,6 @@
 
 
 MACRO(REGISTER_UNIT_TEST test)
-  MESSAGE(STATUS "Register unit test: ${test}")
   SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SEG3D_BINARY_DIR})
   ADD_EXECUTABLE(${test} ${ARGN})
   ADD_TEST(${test} ${SEG3D_BINARY_DIR}/${test})

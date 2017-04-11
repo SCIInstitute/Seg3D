@@ -32,11 +32,13 @@
 
 // STL includes
 #include <fstream>
+#include <sstream>
 
 // Boost includes
 #include <boost/asio.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/ref.hpp>
+#include <boost/system/system_error.hpp>
 
 // Core includes
 #include <Core/Utils/ConnectionHandler.h>
@@ -49,6 +51,8 @@
 namespace Seg3D
 {
 
+using namespace boost::system;
+
 CORE_SINGLETON_IMPLEMENTATION( ActionSocket );
 
 ActionSocket::ActionSocket() :
@@ -59,8 +63,8 @@ ActionSocket::ActionSocket() :
 void ActionSocket::start( int portnum )
 {
   // Create new thread for running socket code
-  action_socket_thread_ = new boost::thread( boost::bind( &ActionSocket::run_action_socket,
-      portnum ) );
+  this->action_socket_thread_ = new boost::thread(
+    boost::bind( &ActionSocket::run_action_socket, portnum ) );
 }
 
 ActionSocket::~ActionSocket()
@@ -69,11 +73,51 @@ ActionSocket::~ActionSocket()
 
 static void WriteOutputToSocket( boost::asio::ip::tcp::socket& socket, std::string output )
 {
-  try
+  error_code ec;
+  boost::asio::write( socket, boost::asio::buffer( output ), ec );
+
+  // ignore errors in release builds
+#ifndef NDEBUG
+  if ( ec.value() == errc::broken_pipe )
   {
-    boost::asio::write( socket, boost::asio::buffer( output ) );
+    CORE_LOG_DEBUG( "write to socket failed: broken pipe" );
   }
-  catch ( ... ) {}
+  else if ( ec )
+  {
+    std::ostringstream oss;
+    oss << "write to socket failed: " << ec.category().name() << " (" << ec.value() << "): " << ec.message();
+    CORE_LOG_ERROR( oss.str() );
+  }
+#endif
+}
+
+static void WriteErrorToSocket( boost::asio::ip::tcp::socket& socket, std::string output)
+{
+  // TODO: trying to differentiate from sending output, since error output
+  //       from python interpreter is probably better logged by Seg3D
+  // TODO: revisit and come up with better message to client
+  error_code ec;
+  boost::asio::write( socket, boost::asio::buffer( "error\r\n" ), ec );
+
+  // ignore errors in release builds
+#ifndef NDEBUG
+  {
+    std::ostringstream oss;
+    oss << "Error output from Python interpreter: [" << output << "]";
+    CORE_LOG_DEBUG( oss.str() );
+  }
+
+  if ( ec.value() == errc::broken_pipe )
+  {
+    CORE_LOG_DEBUG( "write to socket failed: broken pipe" );
+  }
+  else if ( ec )
+  {
+    std::ostringstream oss;
+    oss << "write to socket failed: " << ec.category().name() << " (" << ec.value() << "): " << ec.message();
+    CORE_LOG_ERROR( oss.str() );
+  }
+#endif
 }
 
 static void WritePromptToSocket( boost::asio::ip::tcp::socket& socket, std::string output )
@@ -82,26 +126,11 @@ static void WritePromptToSocket( boost::asio::ip::tcp::socket& socket, std::stri
   WriteOutputToSocket( socket, output );
 }
 
+
 void ActionSocket::run_action_socket( int portnum )
 {
   boost::asio::io_service io_service;
-
-  boost::asio::ip::tcp::acceptor acceptor( io_service );
-  try
-  {
-    boost::asio::ip::tcp::endpoint endpoint( boost::asio::ip::tcp::v4(), portnum );
-    acceptor.open( endpoint.protocol() );
-    acceptor.set_option( boost::asio::socket_base::reuse_address( true ) );
-    acceptor.bind( endpoint );
-    acceptor.listen();
-  }
-  catch ( ... )
-  {
-    CORE_LOG_ERROR( "Failed to open socket on port " + 
-      Core::ExportToString( portnum ) + "." );
-    return;
-  }
-
+  boost::asio::ip::tcp::acceptor acceptor(io_service, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), portnum));
   portnum = acceptor.local_endpoint().port();
 
   // Write the port number out to file
@@ -112,10 +141,13 @@ void ActionSocket::run_action_socket( int portnum )
       boost::filesystem::remove( "port" );
     }
   }
-  catch ( ... ) 
+  catch ( system_error& error )
   {
-    CORE_LOG_ERROR( "Couldn't remove port file." );
+    std::ostringstream oss;
+    oss << "Couldn't remove port file: " << error.what();
+    CORE_LOG_ERROR( oss.str() );
   }
+
   std::ofstream ofile( "port_tmp" );
   if ( ofile )
   {
@@ -127,58 +159,56 @@ void ActionSocket::run_action_socket( int portnum )
   Core::ConnectionHandler connection_handler;
   CORE_LOG_MESSAGE( "Started listening on port " + Core::ExportToString( portnum ) );
 
-  while ( 1 )
+  for (;;)
   {
-    boost::asio::ip::tcp::socket socket( io_service );
-    try
+    boost::asio::ip::tcp::socket socket(io_service);
+    error_code ec;
+    acceptor.accept(socket, ec);
+    if (ec)
     {
-      acceptor.accept( socket );
-    }
-    catch ( ... )
-    {
-      break;
+      std::ostringstream oss;
+      oss << "Could not connect to client: "  << ec.category().name() << " (" << ec.value() << "): " << ec.message();
+      CORE_LOG_ERROR( oss.str() );
+      return;
     }
 
     // Connect to PythonInterpreter signals
-    connection_handler.add_connection( Core::PythonInterpreter::Instance()->prompt_signal_.connect( 
+    connection_handler.add_connection( Core::PythonInterpreter::Instance()->prompt_signal_.connect(
       boost::bind( &WritePromptToSocket, boost::ref( socket ), _1 ) ) );
-    connection_handler.add_connection( Core::PythonInterpreter::Instance()->error_signal_.connect( 
-      boost::bind( &WriteOutputToSocket, boost::ref( socket ), _1 ) ) );
-    connection_handler.add_connection( Core::PythonInterpreter::Instance()->output_signal_.connect( 
+    connection_handler.add_connection( Core::PythonInterpreter::Instance()->error_signal_.connect(
+      boost::bind( &WriteErrorToSocket, boost::ref( socket ), _1 ) ) );
+    connection_handler.add_connection( Core::PythonInterpreter::Instance()->output_signal_.connect(
       boost::bind( &WriteOutputToSocket, boost::ref( socket ), _1 ) ) );
 
     CORE_LOG_MESSAGE( "Socket connected." );
-    try
-    {
-      boost::asio::write( socket, boost::asio::buffer( std::string( "Welcome to Seg3D\r\n" ) ) );
-    }
-    catch ( ... ) {}
 
-    boost::system::error_code read_ec;
-    while ( !read_ec )
+    error_code ignored_error;
+    boost::asio::write(socket, boost::asio::buffer( std::string( "Welcome to Seg3D\r\n" ) ), ignored_error);
+
+    // read until exit or error
+    error_code read_ec;
+    while ( ! read_ec )
     {
       boost::asio::streambuf buffer;
+      boost::asio::read_until(socket, buffer, "\r\n", read_ec);
 
-      boost::asio::read_until( socket, buffer, std::string( "\r\n" ), read_ec );
-      std::istream is( &buffer );
-
-      std::string action_string;
-      std::getline( is, action_string );
-
-      if ( !read_ec )
+      if ( ! read_ec )
       {
+        std::istream is(&buffer);
+        std::string action_string;
+        std::getline(is, action_string);
+
         if ( action_string == "exit\r" )
         {
-          try
-          {
-            boost::asio::write( socket, boost::asio::buffer( "Goodbye!\r\n" ) );
-            socket.close();
-          }
-          catch ( ... ) {}
+          error_code exit_ignored_error;
+          boost::asio::write( socket, boost::asio::buffer( "Goodbye!\r\n" ), exit_ignored_error );
+          socket.close();
           break;
         }
-
-        Core::PythonInterpreter::Instance()->run_string( action_string );
+        else
+        {
+          Core::PythonInterpreter::Instance()->run_string( action_string );
+        }
       }
     }
 
