@@ -392,7 +392,7 @@ void PythonInterpreter::print_banner()
 {
   if ( !this->is_eventhandler_thread() )
   {
-    this->post_event( boost::bind( &PythonInterpreter::print_banner, this ) );
+    this->post_and_wait_event( boost::bind( &PythonInterpreter::print_banner, this ) );
     return;
   }
 
@@ -400,7 +400,7 @@ void PythonInterpreter::print_banner()
   this->prompt_signal_( this->private_->prompt1_ );
 }
 
-void PythonInterpreter::run_string( std::string command )
+void PythonInterpreter::run_string( const std::string& command )
 {
   {
     PythonInterpreterPrivate::lock_type lock( this->private_->get_mutex() );
@@ -424,7 +424,7 @@ void PythonInterpreter::run_string( std::string command )
       }
     }
 
-    this->post_event( boost::bind( &PythonInterpreter::run_string, this, command ) );
+    this->post_and_wait_event( boost::bind( &PythonInterpreter::run_string, this, command ) );
     return;
   }
 
@@ -454,7 +454,7 @@ void PythonInterpreter::run_string( std::string command )
   catch ( ... ) {}
 
   // If an error happened during compilation, print the error message
-  if ( PyErr_Occurred() != NULL )
+  if ( PyErr_Occurred() != nullptr )
   {
     PyErr_Print();
   }
@@ -464,12 +464,12 @@ void PythonInterpreter::run_string( std::string command )
     this->private_->action_context_->set_action_mode( PythonActionMode::INTERACTIVE_E );
     try
     {
-      PyObject* result = PyEval_EvalCode( code_obj.ptr(), this->private_->globals_.ptr(), NULL );
+      PyObject* result = PyEval_EvalCode( code_obj.ptr(), this->private_->globals_.ptr(), nullptr );
       Py_XDECREF( result );
     }
     catch ( ... ) {}
 
-    if ( PyErr_Occurred() != NULL )
+    if ( PyErr_Occurred() != nullptr )
     {
       if ( PyErr_ExceptionMatches( PyExc_EOFError ) )
       {
@@ -493,7 +493,7 @@ void PythonInterpreter::run_string( std::string command )
   this->prompt_signal_( this->private_->prompt1_ );
 }
 
-void PythonInterpreter::run_script( std::string script )
+void PythonInterpreter::run_script( const std::string& script )
 {
   {
     PythonInterpreterPrivate::lock_type lock( this->private_->get_mutex() );
@@ -505,8 +505,7 @@ void PythonInterpreter::run_script( std::string script )
 
   if ( !this->is_eventhandler_thread() )
   {
-    this->post_event( boost::bind( static_cast< void ( PythonInterpreter::* ) ( std::string ) >( 
-      &PythonInterpreter::run_script ), this, script ) );
+    this->post_and_wait_event( boost::bind( static_cast< void ( PythonInterpreter::* ) ( const std::string& ) >( &PythonInterpreter::run_script ), this, script ) );
     return;
   }
 
@@ -526,7 +525,7 @@ void PythonInterpreter::run_script( std::string script )
   catch ( ... ) {}
 
   // If an error happened during compilation, print the error message
-  if ( PyErr_Occurred() != NULL )
+  if ( PyErr_Occurred() != nullptr )
   {
     PyErr_Print();
   }
@@ -537,7 +536,7 @@ void PythonInterpreter::run_script( std::string script )
     boost::python::dict local_var;
     PyObject* result = PyEval_EvalCode( code_obj.ptr(), this->private_->globals_.ptr(), local_var.ptr() );
     Py_XDECREF( result );
-    if ( PyErr_Occurred() != NULL )
+    if ( PyErr_Occurred() != nullptr )
     {
       PyErr_Print();
     }
@@ -559,8 +558,7 @@ void PythonInterpreter::run_script( StringVectorConstHandle script )
 
   if ( !this->is_eventhandler_thread() )
   {
-    this->post_event( boost::bind( static_cast< void ( PythonInterpreter::* ) ( StringVectorConstHandle ) >(
-      &PythonInterpreter::run_script ), this, script ) );
+    this->post_and_wait_event( boost::bind( static_cast< void ( PythonInterpreter::* ) ( StringVectorConstHandle ) >( &PythonInterpreter::run_script ), this, script ) );
     return;
   }
 
@@ -573,7 +571,7 @@ void PythonInterpreter::run_script( StringVectorConstHandle script )
   this->run_script( str );
 }
 
-void PythonInterpreter::run_file( std::string file_name )
+void PythonInterpreter::run_file( const std::string& file_name )
 {
   {
     PythonInterpreterPrivate::lock_type lock( this->private_->get_mutex() );
@@ -585,7 +583,7 @@ void PythonInterpreter::run_file( std::string file_name )
 
   if ( !this->is_eventhandler_thread() )
   {
-    this->post_event( boost::bind( &PythonInterpreter::run_file, this, file_name ) );
+    this->post_and_wait_event( boost::bind( &PythonInterpreter::run_file, this, file_name ) );
     return;
   }
 
@@ -602,7 +600,7 @@ void PythonInterpreter::interrupt()
   {
     PyErr_SetInterrupt();
     this->private_->thread_condition_variable_.notify_all();
-    this->post_event( boost::bind( &PythonInterpreter::interrupt, this ) );
+    this->post_and_wait_event( boost::bind( &PythonInterpreter::interrupt, this ) );
   }
   else
   {
@@ -632,7 +630,7 @@ void PythonInterpreter::start_terminal()
 
   if ( !this->is_eventhandler_thread() )
   {
-    this->post_event( boost::bind( &PythonInterpreter::start_terminal, this ) );
+    this->post_and_wait_event( boost::bind( &PythonInterpreter::start_terminal, this ) );
     return;
   }
   
