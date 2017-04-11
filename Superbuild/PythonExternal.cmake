@@ -1,21 +1,21 @@
 #  For more information, please see: http://software.sci.utah.edu
-# 
+#
 #  The MIT License
-# 
+#
 #  Copyright (c) 2016 Scientific Computing and Imaging Institute,
 #  University of Utah.
-# 
-#  
+#
+#
 #  Permission is hereby granted, free of charge, to any person obtaining a
 #  copy of this software and associated documentation files (the "Software"),
 #  to deal in the Software without restriction, including without limitation
 #  the rights to use, copy, modify, merge, publish, distribute, sublicense,
 #  and/or sell copies of the Software, and to permit persons to whom the
 #  Software is furnished to do so, subject to the following conditions:
-# 
+#
 #  The above copyright notice and this permission notice shall be included
-#  in all copies or substantial portions of the Software. 
-# 
+#  in all copies or substantial portions of the Software.
+#
 #  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
 #  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 #  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -134,10 +134,11 @@ IF(UNIX)
     SET(SCI_PYTHON_LIBRARY ${SCI_PYTHON_NAME})
 
     # required by interpreter interface
+    SET(PYTHON_MODULE_SEARCH_ROOT Python.framework/Versions/${SCI_PYTHON_VERSION_SHORT}/lib/${SCI_PYTHON_NAME} CACHE INTERNAL "Python modules." FORCE)
     IF(SEG3D_BUILD_INTERFACE)
-      SET(PYTHON_MODULE_SEARCH_PATH ../Frameworks/Python.framework/Versions/${SCI_PYTHON_VERSION_SHORT}/lib/${SCI_PYTHON_NAME} CACHE INTERNAL "Python modules." FORCE)
+      SET(PYTHON_MODULE_SEARCH_PATH ../Frameworks/${PYTHON_MODULE_SEARCH_ROOT} CACHE INTERNAL "Python modules." FORCE)
     ELSE()
-      SET(PYTHON_MODULE_SEARCH_PATH Python.framework/Versions/${SCI_PYTHON_VERSION_SHORT}/lib/${SCI_PYTHON_NAME} CACHE INTERNAL "Python modules." FORCE)
+      SET(PYTHON_MODULE_SEARCH_PATH ${PYTHON_MODULE_SEARCH_ROOT} CACHE INTERNAL "Python modules." FORCE)
     ENDIF()
     SET(SCI_PYTHON_FRAMEWORK_ARCHIVE ${INSTALL_DIR}/${python_FRAMEWORK_ARCHIVE})
   ELSE()

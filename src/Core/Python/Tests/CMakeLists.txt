@@ -1,5 +1,3 @@
-
-#
 #  For more information, please see: http://software.sci.utah.edu
 #
 #  The MIT License
@@ -27,48 +25,17 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
-##################################################
-# Set sources
-##################################################
-
-SET(CORE_PYTHON_SRCS
-  Util.h
-  Util.cc
-  PythonInterpreter.h
-  PythonInterpreter.cc
-  PythonActionContext.h
-  PythonActionContext.cc
-  ToPythonConverters.h
-  ToPythonConverters.cc
+SET(Core_Python_Tests_SRCS
+  PythonInterpreterTests.cc
 )
 
-IF(WIN32)
-  ADD_DEFINITIONS(-DPYTHONPATH=L"${SCI_PYTHON_MODULE_PARENT_PATH}"
-                  -DPYTHONNAME=L"${SCI_PYTHON_NAME}")
-ELSEIF(APPLE)
-  IF(BUILD_TESTING)
-    ADD_DEFINITIONS(-DPYTHONPATH=L"${PYTHON_MODULE_SEARCH_PATH}:${APPLICATION_NAME}.app/Contents/Frameworks/${PYTHON_MODULE_SEARCH_ROOT}")
-  ELSE()
-    ADD_DEFINITIONS(-DPYTHONPATH=L"${PYTHON_MODULE_SEARCH_PATH}")
-  ENDIF()
-  ADD_DEFINITIONS(-DPYTHONLIBDIR=L"${SCI_PYTHON_LIBRARY_DIR}"
-                  -DPYTHONLIB=L"${SCI_PYTHON_LIBRARY}")
-ELSE()
-  ADD_DEFINITIONS(-DPYTHONPATH=L"${PYTHON_MODULE_SEARCH_PATH}")
-ENDIF()
+REGISTER_UNIT_TEST(Core_Python_Tests
+  ${Core_Python_Tests_SRCS}
+)
 
-CORE_ADD_LIBRARY(Core_Python ${CORE_PYTHON_SRCS})
-
-TARGET_LINK_LIBRARIES(Core_Python
-  Core_Utils
-  Core_Action
+TARGET_LINK_LIBRARIES(Core_Python_Tests
+  Core_Python
+  Testing_Utils
   ${SCI_PYTHON_LIBRARY}
-  ${SCI_BOOST_LIBRARY}
+  ${SCI_GTESTMAIN_LIBRARY}
 )
-
-SET_TARGET_PROPERTIES(Core_Python
-  PROPERTIES
-  COMPILE_DEFINITIONS_DEBUG "BOOST_DEBUG_PYTHON"
-)
-
-ADD_TEST_DIR(Tests)

@@ -91,12 +91,12 @@ public:
   // RUN_STRING:
   /// Execute a single python command.
   /// NOTE: The command is run in the main namespace.
-  void run_string( std::string command );
+  void run_string( const std::string& command );
 
   // RUN_SCRIPT:
   /// Execute a python script.
   /// NOTE: The script is run in its own local namespace.
-  void run_script( std::string script );
+  void run_script( const std::string& script );
 
   // RUN_SCRIPT:
   /// Execute a python script.
@@ -106,7 +106,7 @@ public:
   // RUN_FILE:
   /// Execute a python script from file.
   /// NOTE: The script is run in its own local namespace.
-  void run_file( std::string file_name );
+  void run_file( const std::string& file_name );
 
   // INTERRUPT:
   /// Interrupt the current execution.
