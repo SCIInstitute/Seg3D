@@ -41,16 +41,11 @@ script:
   - tar xzf $HOME/deps/cmake3.tgz
   - cd bin
   - $TRAVIS_BUILD_DIR/cmake3/bin/cmake -GNinja -DTRAVIS_BUILD:BOOL=ON -DQt5_PATH:PATH=/usr ../Superbuild
-#  - $TRAVIS_BUILD_DIR/cmake3/bin/cmake -GNinja -DTRAVIS_BUILD:BOOL=ON ../Superbuild
   - travis_wait 70 ninja
-  - cd Seg3D
-  - ./Core_Action_Tests
-  - ./Core_Application_Tests
-  - ./Core_DataBlock_Tests
-  - ./Core_Geometry_Tests
-  - ./Core_Utils_Tests
-  - ./Application_LayerIO_Tests
 
 #after_failure:
-#after_success:
+after_success:
+  - cd Seg3D
+  - ninja test
+
 #after_script:
