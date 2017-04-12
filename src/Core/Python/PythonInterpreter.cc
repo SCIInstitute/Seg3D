@@ -476,6 +476,13 @@ void PythonInterpreter::run_string( const std::string& command )
         this->error_signal_( "\nKeyboardInterrupt\n" );
         PyErr_Clear();
       }
+      else if ( PyErr_ExceptionMatches( PyExc_SystemExit ) )
+      {
+        // trap exit(), since it brings down entire application
+        CORE_LOG_DEBUG( "Python exit() trapped" );
+        PyErr_Clear();
+        PyRun_SimpleString("print(\"exit() function ignored in interpreter\")\n");
+      }
       else
       {
         PyErr_Print();
