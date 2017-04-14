@@ -31,6 +31,7 @@
 
 // ITK includes
 #include <itkRGBPixel.h>
+#include <itkPNGImageIO.h>
 #include <itkTIFFImageIO.h>
 #include <itkVTKImageIO.h>
 #include <itkLSMImageIO.h>
@@ -127,6 +128,11 @@ public:
 
 public:
   // file type detection helpers
+  bool detect_png( const std::string& extension )
+  {
+    return extension == ".png";
+  }
+
   bool detect_tiff( const std::string& extension )
   {
     return ( extension == ".tif" || extension == ".tiff" || extension == ".stk" );
@@ -161,35 +167,35 @@ public:
 Core::DataType ITKLayerImporterPrivate::convert_data_type( std::string& type )
 {
   // Convert ITK types into our enum
-  if( type == "unsigned_char" )
+  if ( type == "unsigned_char" )
   {
     return Core::DataType::UCHAR_E;
   }
-  else if( type == "char" )
+  else if ( type == "char" )
   {
     return Core::DataType::CHAR_E;
   }
-  else if( type == "unsigned_short" )
+  else if ( type == "unsigned_short" )
   {
     return Core::DataType::USHORT_E;
   }
-  else if( type == "short" )
+  else if ( type == "short" )
   {
     return Core::DataType::SHORT_E;
   }
-  else if( type == "unsigned_int" )
+  else if ( type == "unsigned_int" )
   {
     return Core::DataType::UINT_E;
   }
-  else if( type == "int" )
+  else if ( type == "int" )
   {
     return Core::DataType::INT_E;
   }
-  else if( type == "float" )
+  else if ( type == "float" )
   {
     return Core::DataType::FLOAT_E;
   }
-  else if( type == "double" )
+  else if ( type == "double" )
   {
     return Core::DataType::DOUBLE_E;
   }
@@ -269,7 +275,12 @@ bool ITKLayerImporterPrivate::read_header()
   std::tie( extension, base ) = Core::GetFullExtension( full_filename );
 
   // Set file type and scan the file for data type and transform
-  if ( detect_tiff(extension) )
+  if ( detect_png(extension) )
+  {
+    this->file_type_ = "png";
+    return this->scan_simple_volume< itk::PNGImageIO >();
+  }
+  else if ( detect_tiff(extension) )
   {
     this->file_type_ = "tiff";
     return this->scan_simple_volume< itk::TIFFImageIO >();
@@ -411,7 +422,11 @@ bool ITKLayerImporterPrivate::read_data()
   std::string extension, base;
   std::tie( extension, base ) = Core::GetFullExtension( full_filename );
 
-  if ( detect_tiff(extension) )
+  if ( detect_png(extension) )
+  {
+    return this->import_simple_volume<itk::PNGImageIO>();
+  }
+  else if ( detect_tiff(extension) )
   {
     return this->import_simple_volume<itk::TIFFImageIO>();
   }
