@@ -31,6 +31,14 @@ def wait_on_layer(layer):
   thread.start()
   thread.join()
 
+# since this is a batch script, truth_region and im_gray need to be set beforehand
+# i.e. set as command via socket
+if not truth_region:
+  raise ValueError
+
+if not im_gray:
+  raise ValueError
+
 truth_region_files = [os.path.join(truth_region, f) for f in os.listdir(truth_region) if os.path.isfile(os.path.join(truth_region, f)) and f.lower().endswith('.png')]
 im_gray_files = [os.path.join(im_gray, f) for f in os.listdir(im_gray) if os.path.isfile(os.path.join(im_gray, f)) and f.lower().endswith('.mha')]
 
