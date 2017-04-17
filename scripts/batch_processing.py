@@ -4,7 +4,9 @@ import os, sys, shutil, socket, getopt, subprocess
 paths = {
   'data': '/Users/ayla/devel/dhs_batch/U308',
   'tools': '/Users/ayla/devel/Seg3D_DHS/tools',
-  'hmtscript': '/Users/ayla/devel/Seg3D_DHS'
+  'glia_bin': '/Users/ayla/devel/glia/code/build',
+  'hmtscript': '/Users/ayla/devel/Seg3D_DHS/hmt_test_batch.py',
+  'glia_results': '/Users/ayla/devel/dhs_batch/U308/output'
 }
 
 def seg3d_connect(port, size):
@@ -85,6 +87,9 @@ def main(argv):
   # TODO: not sure if needed
   #truth_cropped_gray = os.path.join(truth_cropped, 'gray')
 
+  seg_ushort = os.path.join(paths['glia_results'], 'seg')
+  seg_uchar = os.path.join(paths['glia_results'], 'segtest')
+
   ensure_directories( (im_gray_training, im_gray_all, im_cropped, im_cropped_gray, im_cropped_chm, im_cropped_blur, im_gray_test, truth_region, truth_cropped, truth_cropped_region) )
 
   rgbToGray2D_tool = os.path.join(paths['tools'], 'RGBToGray2D')
@@ -95,7 +100,7 @@ def main(argv):
   for f in truth_raw_files:
     # shorten filename, remove spaces, change directory
     newfile = update_filepath(f, { 'U3O8_': '', 'Particle ': 'p', truth_raw: truth_region })
-    os.rename(f, newfile)
+    shutil.copyfile(f, newfile)
 
   raw_files = im_raw_files + im_raw_test_files
 
@@ -107,15 +112,15 @@ def main(argv):
     subprocess.check_call([rgbToGray2D_tool, f, newfile, 'float'])
     shutil.copy(newfile, im_gray_all)
 
-  # clientsocket = seg3d_connect(port, size)
-  # # add some variables to Seg3D's interpreter
-  # retval = seg3d_command(clientsocket, size, "im_gray_all='{}'\r\n".format(im_gray_all))
-  # retval = seg3d_command(clientsocket, size, "im_cropped_gray='{}'\r\n".format(im_cropped_gray))
-  # retval = seg3d_command(clientsocket, size, "im_cropped_chm='{}'\r\n".format(im_cropped_chm))
-  # retval = seg3d_command(clientsocket, size, "truth_region='{}'\r\n".format(truth_region))
-  # retval = seg3d_command(clientsocket, size, "truth_cropped_region='{}'\r\n".format(truth_cropped_region))
-  # retval = seg3d_command(clientsocket, size, "exec(open('/Users/ayla/devel/Seg3D_DHS/scripts/seg3d_filters.py').read())\r\n")
-  # seg3d_disconnect(clientsocket, size)
+  clientsocket = seg3d_connect(port, size)
+  # add some variables to Seg3D's interpreter
+  retval = seg3d_command(clientsocket, size, "im_gray_all='{}'\r\n".format(im_gray_all))
+  retval = seg3d_command(clientsocket, size, "im_cropped_gray='{}'\r\n".format(im_cropped_gray))
+  retval = seg3d_command(clientsocket, size, "im_cropped_chm='{}'\r\n".format(im_cropped_chm))
+  retval = seg3d_command(clientsocket, size, "truth_region='{}'\r\n".format(truth_region))
+  retval = seg3d_command(clientsocket, size, "truth_cropped_region='{}'\r\n".format(truth_cropped_region))
+  retval = seg3d_command(clientsocket, size, "exec(open('/Users/ayla/devel/Seg3D_DHS/scripts/seg3d_filters.py').read())\r\n")
+  seg3d_disconnect(clientsocket, size)
 
   # cleanup
   truth_cropped_files = [os.path.join(truth_cropped_region, f) for f in os.listdir(truth_cropped_region) if os.path.isfile(os.path.join(truth_cropped_region, f)) and f.lower().endswith('.png')]
@@ -132,15 +137,21 @@ def main(argv):
     subprocess.check_call([blur_image_tool, "--inputImage={}".format(f), "--outputImage={}".format(newfile), "--sigma=1", "--kernelWidth=3"])
 
   # Call GLIA script
-  subprocess.check_call(['python', '/Users/ayla/devel/Seg3D_DHS/hmt_test_batch.py', im_gray_training, im_gray_test, im_gray_all, im_cropped_chm, im_cropped_blur, truth_cropped_region ])
+  subprocess.check_call(['python', paths['hmtscript'], im_gray_training, im_gray_test, im_gray_all, im_cropped_chm, im_cropped_blur, truth_cropped_region, paths['glia_bin'], paths['glia_results'] ])
+
+  seg_ushort_files = [os.path.join(seg_ushort, f) for f in os.listdir(seg_ushort) if os.path.isfile(os.path.join(seg_ushort, f)) and f.lower().endswith('.png')]
+  seg_uchar_files = [os.path.join(seg_uchar, f) for f in os.listdir(seg_uchar) if os.path.isfile(os.path.join(seg_uchar, f)) and f.lower().endswith('.png')]
 
   # Pad to original dimensions
-  # ./PadImage gm_rep1_A_004.png gm_rep1_A_004_padded.png 0 0 0 59 0
-  #for f in raw_files:
-  #  # shorten filename, remove spaces, change directory
-  # newfile =
-  #  subprocess.check_call([padImage_tool f, newfile, '0', '0', '0', '59', '0', 'ushort'])
-  #  subprocess.check_call([padImage_tool f, newfile, '0', '0', '0', '59', '0', 'uchar'])
+  for f in seg_ushort_files:
+    # shorten filename, remove spaces, change directory
+    newfile = update_filepath(f, { '.png': '_pad.png' })
+    subprocess.check_call([padImage_tool, f, newfile, '0', '0', '0', '59', '0', 'ushort'])
+
+  for f in seg_uchar_files:
+    # shorten filename, remove spaces, change directory
+    newfile = update_filepath(f, { '.png': '_pad.png' })
+    subprocess.check_call([padImage_tool, f, newfile, '0', '0', '0', '59', '0', 'uchar'])
 
 if __name__ == "__main__":
   main(sys.argv[1:])

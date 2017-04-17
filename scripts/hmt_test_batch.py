@@ -11,17 +11,10 @@ from script_util import *
 t_resume = False
 #t_resume = (len(sys.argv) > 1 and sys.argv[1] == '-r')
 
-# paths
-p_d = {
-  'bin': '/Users/ayla/devel/glia/code/build',
-  'res': '/Users/ayla/devel/dhs_batch/U308/output'
-}
-p_dbin = p_d['bin'] + '/{b}'
-
 def main(argv):
   #print(argv)
-  if len(argv) < 7:
-    raise StandardError('{} requires at least 7 arguments'.format(argv[0]))
+  if len(argv) < 9:
+    raise StandardError('{} requires at least 9 arguments'.format(argv[0]))
 
   im_gray_training = argv[1]
   im_gray_test = argv[2]
@@ -29,6 +22,15 @@ def main(argv):
   im_cropped_chm = argv[4]
   im_cropped_blur = argv[5]
   truth_cropped_region = argv[6]
+  glia_bin = argv[7]
+  glia_results = argv[8]
+
+  # paths
+  p_d = {
+    'bin': glia_bin,
+    'res': glia_results
+  }
+  p_dbin = p_d['bin'] + '/{b}'
 
   gray_training_files = [os.path.join(im_gray_training, f) for f in os.listdir(im_gray_training) if os.path.isfile(os.path.join(im_gray_training, f)) and f.lower().endswith('.mha')]
   if len(gray_training_files) < 1:
