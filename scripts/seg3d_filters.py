@@ -12,17 +12,11 @@ if not truth_region:
   raise ValueError
 if not truth_cropped_region:
   raise ValueError
-if not im_gray:
+if not im_gray_all:
   raise ValueError
 if not im_cropped_gray:
   raise ValueError
 if not im_cropped_chm:
-  raise ValueError
-if not im_gray_test:
-  raise ValueError
-if not im_cropped_gray_test:
-  raise ValueError
-if not im_cropped_chm_test:
   raise ValueError
 
 class MyThread(threading.Thread):
@@ -52,10 +46,7 @@ def wait_on_layer(layer, timeout=2.0):
   thread.join()
 
 truth_region_files = [os.path.join(truth_region, f) for f in os.listdir(truth_region) if os.path.isfile(os.path.join(truth_region, f)) and f.lower().endswith('.png')]
-im_gray_files = [os.path.join(im_gray, f) for f in os.listdir(im_gray) if os.path.isfile(os.path.join(im_gray, f)) and f.lower().endswith('.mha')]
-im_gray_files_test = [os.path.join(im_gray_test, f) for f in os.listdir(im_gray_test) if os.path.isfile(os.path.join(im_gray_test, f)) and f.lower().endswith('.mha')]
-
-gray_files=im_gray_files+im_gray_files_test
+gray_files = [os.path.join(im_gray_all, f) for f in os.listdir(im_gray_all) if os.path.isfile(os.path.join(im_gray_all, f)) and f.lower().endswith('.mha')]
 
 # ground truth segmentations:
 # import -> crop -> export
@@ -79,7 +70,7 @@ for f in gray_files:
   layers = crop(layerids="{}".format(layers[0]),origin='[-0.5,-0.5,-0.5]',size='[1024,883.5,1]',replace='true')
   layer = layers[0]
   wait_on_layer(layer)
-  export_file = update_filepath(f, { im_gray_test: im_cropped_gray_test, im_gray: im_cropped_gray })
+  export_file = update_filepath(f, { im_gray_all: im_cropped_gray })
   retval = exportlayer(layer="{}".format(layer),file_path='{}'.format(export_file),extension='.mha',exporter='[ITK Data Exporter]')
   if not retval:
     print("exportlayer failed")
@@ -91,7 +82,7 @@ for f in gray_files:
   wait_on_layer(layer)
   layer = gradientmagnitudefilter(layerid="{}".format(layer),replace='true',preserve_data_format='true')
   wait_on_layer(layer)
-  export_file = update_filepath(f, { im_gray_test: im_cropped_chm_test, im_gray: im_cropped_chm })
+  export_file = update_filepath(f, { im_gray_all: im_cropped_chm })
   retval = exportlayer(layer="{}".format(layer),file_path='{}'.format(export_file),extension='.mha')
   if not retval:
     print("exportlayer failed")
