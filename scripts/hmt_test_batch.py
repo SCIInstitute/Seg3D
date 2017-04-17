@@ -67,9 +67,6 @@ def main(argv):
     name, ext = os.path.splitext(basename)
     test_names.append(name)
 
-  print(file_names)
-  print(test_names)
-
   p_fdat = {
     # ground truth segmentations
     'truth': truth_cropped_region + '/{i}.png',
@@ -221,7 +218,7 @@ def main(argv):
       _job.extend([
         '--f', p_fres['bcf'].format(s='', i=i),
         '--l', p_fres['bcl'].format(s='', i=i)])
-    print(_job)
+    #print(_job)
     _jobs.append(_job)
   execute(_jobs, nproc=1, nt=1, name='bcm')
 
@@ -236,7 +233,7 @@ def main(argv):
         '--m', p_fres['bcm'].format(s=''), '--l', '-1',
         '--f', p_fres['bcf'].format(s='', i=i),
         '--p', p_fres['bcp'].format(s='', i=i)]
-      print(_job)
+      #print(_job)
       _jobs.append(_job)
   execute(_jobs, nproc=t_nproc, nt=1, name='bcp')
 
