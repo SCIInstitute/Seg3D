@@ -58,7 +58,7 @@ typedef boost::shared_ptr<ITKLayerImporterPrivate> ITKLayerImporterPrivateHandle
 class ITKLayerImporter : public LayerSingleFileImporter
 {
   SEG3D_IMPORTER_TYPE( "ITK Importer",".lsm;.LSM;"
-                    ".tiff;.tif;.TIFF;.TIF;.stk;.STK;"
+                    ".png;.tiff;.tif;.TIFF;.TIF;.stk;.STK;"
                     ".nii;.nii.gz;.img;.hdr;"
                     ".vtk;.VTK;"
                     ".mha;.mhd", 5 )

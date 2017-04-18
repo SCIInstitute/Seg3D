@@ -45,6 +45,7 @@
 #include <Core/DataBlock/ITKImageData.h>
 #include <Core/DataBlock/ITKDataBlock.h>
 #include <Core/Volume/DataVolume.h>
+#include <Core/Utils/FilesystemUtil.h>
 
 // Application includes
 #include <Application/LayerIO/ITKSeriesLayerImporter.h>
@@ -120,35 +121,35 @@ public:
 Core::DataType ITKSeriesLayerImporterPrivate::convert_data_type( std::string& type )
 {
   // Convert ITK types into our enum
-  if( type == "unsigned_char" )
+  if ( type == "unsigned_char" )
   {
     return Core::DataType::UCHAR_E;
   }
-  else if( type == "char" )
+  else if ( type == "char" )
   {
     return Core::DataType::CHAR_E;
   }
-  else if( type == "unsigned_short" )
+  else if ( type == "unsigned_short" )
   {
     return Core::DataType::USHORT_E;
   }
-  else if( type == "short" )
+  else if ( type == "short" )
   {
     return Core::DataType::SHORT_E;
   }
-  else if( type == "unsigned_int" )
+  else if ( type == "unsigned_int" )
   {
     return Core::DataType::UINT_E;
   }
-  else if( type == "int" )
+  else if ( type == "int" )
   {
     return Core::DataType::INT_E;
   }
-  else if( type == "float" )
+  else if ( type == "float" )
   {
     return Core::DataType::FLOAT_E;
   }
-  else if( type == "double" )
+  else if ( type == "double" )
   {
     return Core::DataType::DOUBLE_E;
   }
@@ -167,29 +168,30 @@ bool ITKSeriesLayerImporterPrivate::read_header()
   // Extract the extension from the file name and use this to define
   // which importer to use.
   boost::filesystem::path full_filename( this->importer_->get_filename() );
-  std::string extension = boost::to_lower_copy( boost::filesystem::extension( full_filename ) );
+  std::string extension, base;
+  std::tie( extension, base ) = Core::GetFullExtension( full_filename );
   
-  if( extension == ".png" )
+  if ( extension == ".png" )
   {
     this->file_type_ = "png";
     return this->scan_simple_series< itk::PNGImageIO >();
   }
-  else if( extension == ".tif" || extension == ".tiff" )
+  else if ( extension == ".tif" || extension == ".tiff" )
   {
     this->file_type_ = "tiff";
     return this->scan_simple_series< itk::TIFFImageIO >();
   }
-  else if( extension == ".jpg" || extension == ".jpeg" )
+  else if ( extension == ".jpg" || extension == ".jpeg" )
   {
     this->file_type_ = "jpeg";
     return this->scan_simple_series< itk::JPEGImageIO >();
   }
-  else if( extension == ".bmp" )
+  else if ( extension == ".bmp" )
   {
     this->file_type_ = "bitmap";
     return this->scan_simple_series< itk::BMPImageIO >();
   }
-  else if( extension == ".vtk" )
+  else if ( extension == ".vtk" )
   {
     this->file_type_ = "VTK";
     return this->scan_simple_series< itk::VTKImageIO >();

@@ -170,7 +170,7 @@ std::string Action::export_to_python_string() const
     }
   }
 
-  command << ");";
+  command << ")";
 
   // Return the command
   return command.str();
