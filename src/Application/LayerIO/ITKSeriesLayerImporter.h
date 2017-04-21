@@ -57,7 +57,7 @@ class ITKSeriesLayerImporter : public LayerFileSeriesImporter
   /// NOTE: Since this one accepts any type, the upper case version are ignored, as they
   /// do not fit on the line
   SEG3D_IMPORTER_TYPE( "ITK FileSeries Importer","*;"
-            ".dcm;.dicom;.ima;.tiff;.tif;.png;.jpeg;.jpg;.bmp;.vtk", 5 )
+            ".dcm;.dicom;.ima;.tiff;.tif;.TIFF;.TIF;.png;.jpeg;.jpg;.bmp;.vtk", 5 )
 
   // -- Constructor/Destructor --
 public:

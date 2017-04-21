@@ -390,6 +390,7 @@ void LayerIOFunctions::ExportLayer( QMainWindow* main_window )
   filters["TIFF files"] = ".tiff";
   filters["PNG files"] = ".png";
   filters["MRC files"] = ".mrc";
+  filters["MHA files"] = ".mha";
   filters["Matlab files"] = ".mat";
 
   size_t counter = 1;

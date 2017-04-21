@@ -143,7 +143,7 @@ TEST_F(ActionTests, EmptyAction)
   ASSERT_EQ( actionExportString, actionString );
 
   std::string pythonActionExportString = action.export_to_python_string();
-  ASSERT_EQ( pythonActionExportString, "dummyaction();");
+  ASSERT_EQ( pythonActionExportString, "dummyaction()");
 
   ASSERT_TRUE( action.translate( context ) );
   ASSERT_TRUE( action.post_create( context ) );
@@ -162,7 +162,7 @@ TEST_F(ActionTests, ActionImportFromString)
   ASSERT_EQ( actionExportString, actionString );
 
   std::string pythonActionExportString = action.export_to_python_string();
-  ASSERT_EQ( pythonActionExportString, "dummyaction();");
+  ASSERT_EQ( pythonActionExportString, "dummyaction()");
 
   ASSERT_TRUE( action.translate( context ) );
   ASSERT_TRUE( action.post_create( context ) );
@@ -182,7 +182,7 @@ TEST_F(ActionTests, ActionImportFromStringWithError)
   ASSERT_EQ( actionExportString, actionString );
 
   std::string pythonActionExportString = action.export_to_python_string();
-  ASSERT_EQ( pythonActionExportString, "dummyaction();");
+  ASSERT_EQ( pythonActionExportString, "dummyaction()");
 
   ASSERT_TRUE( error.empty() );
 
@@ -207,7 +207,7 @@ TEST_F(ActionTests, ActionImportFromStringWithParam)
   ASSERT_EQ( actionExportString, "DummyAction param_required=\'param\' " );
 
   std::string pythonActionExportString = action.export_to_python_string();
-  ASSERT_EQ( pythonActionExportString, "dummyaction(param_required='param');");
+  ASSERT_EQ( pythonActionExportString, "dummyaction(param_required='param')");
 
   ASSERT_TRUE( action.translate( context ) );
   ASSERT_TRUE( action.post_create( context ) );
