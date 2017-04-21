@@ -360,6 +360,14 @@ void PythonInterpreter::initialize_eventhandler()
     "sys.stdin = __term_io\n"
     "sys.stdout = __term_io\n"
     "sys.stderr = __term_err\n" );
+  
+  // Graceful exit
+  PyRun_SimpleString(
+   "import atexit\n"
+   "def quit_gracefully():\n"
+   "\tprint('Goodbye!')\n"
+   "atexit.register(quit_gracefully)\n"
+   );
 
   // Remove intermediate python variables
   PyRun_SimpleString( "del (interpreter, __internal_compiler, __term_io, __term_err)\n" );
@@ -467,6 +475,13 @@ void PythonInterpreter::run_string( const std::string& command )
       {
         this->error_signal_( "\nKeyboardInterrupt\n" );
         PyErr_Clear();
+      }
+      else if ( PyErr_ExceptionMatches( PyExc_SystemExit ) )
+      {
+        // trap exit(), since it brings down entire application
+        CORE_LOG_DEBUG( "Python exit() trapped" );
+        PyErr_Clear();
+        PyRun_SimpleString("print(\"exit() function ignored in interpreter\")\n");
       }
       else
       {
