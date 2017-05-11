@@ -124,9 +124,7 @@ public:
     // We changed the behavior of this parameter to be more intuitive. It is now relative to
     // the dynamic range of the data. So a similar setting will behave similarly on a
     // different data set.
-    double range = this->src_layer_->get_volume()->get_cum_value( 0.99) - 
-      this->src_layer_->get_volume()->get_cum_value( 0.01 );
-    filter->SetConductanceParameter( this->sensitivity_ * range * 0.01 );
+    filter->SetConductanceParameter( this->sensitivity_ );
 
     // Ensure we will have some threads left for doing something else
     this->limit_number_of_itk_threads( filter );
