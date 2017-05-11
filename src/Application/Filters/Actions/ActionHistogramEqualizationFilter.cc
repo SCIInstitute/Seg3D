@@ -47,34 +47,34 @@ namespace Seg3D
 bool ActionHistogramEqualizationFilter::validate( Core::ActionContextHandle& context )
 {
   // Make sure that the sandbox exists
-  if ( !LayerManager::CheckSandboxExistence( this->sandbox_, context ) ) return false;
+  if ( ! LayerManager::CheckSandboxExistence( this->sandbox_, context ) ) return false;
 
   // Check for layer existence and type information
   if ( ! LayerManager::CheckLayerExistenceAndType( this->target_layer_, 
-    Core::VolumeType::DATA_E, context, this->sandbox_ ) ) return false;
+           Core::VolumeType::DATA_E, context, this->sandbox_ ) ) return false;
   
   // Check for layer availability 
   if ( ! LayerManager::CheckLayerAvailability( this->target_layer_, 
-    this->replace_, context, this->sandbox_ ) ) return false;
+           this->replace_, context, this->sandbox_ ) ) return false;
     
   // Check amount
-  if( this->amount_ < 0.0 || this->amount_ > 1.0 )
+  if ( ( this->amount_ < 0.0 ) || (this->amount_ > 1.0 ) )
   {
     context->report_error( "Equalization amount needs to be between 0.0 and 1.0." );
     return false;
   }
 
   // Check bins
-  if( this->bins_ < 2 )
+  if ( this->bins_ < 2 )
   {
-    context->report_error( "Bins needs to be bigger than 1." );
+    context->report_error( "Number of bins needs to be bigger than 1." );
     return false;
   }
 
   // Check how many bins to ignore
-  if( this->ignore_bins_ < 0 )
+  if ( ( this->ignore_bins_ < 0 ) || ( this->ignore_bins_ >= this->bins_ ) )
   {
-    context->report_error( "Number of bins to ignore needs to be bigger than or equal to 0." );
+    context->report_error( "Number of bins to ignore must be greater than 0 and less than number of bins." );
     return false;
   }
 

@@ -50,7 +50,7 @@ HistogramEqualizationFilter::HistogramEqualizationFilter( const std::string& too
   this->add_state( "replace", this->replace_state_, false );
   this->add_state( "amount", this->amount_state_, 1.0, 0.0, 1.0, 0.01 );
   this->add_state( "bins", this->bins_state_, 3000, 10, 10000, 1 );
-  this->add_state( "ignore_bins", this->ignore_bins_state_, 1, 0, 10, 1 );
+  this->add_state( "ignore_bins", this->ignore_bins_state_, 1, 0, 10000, 1 );
 }
 
 HistogramEqualizationFilter::~HistogramEqualizationFilter()
