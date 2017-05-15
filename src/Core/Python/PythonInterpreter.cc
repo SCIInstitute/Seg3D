@@ -36,6 +36,7 @@
 #include <boost/python.hpp>
 #include <boost/regex.hpp>
 #include <boost/thread/condition_variable.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include <sstream>
 
@@ -409,8 +410,21 @@ void PythonInterpreter::run_string( const std::string& command )
       CORE_THROW_LOGICERROR( "The python interpreter hasn't been initialized!" );
     }
   }
-  
-  if ( !this->is_eventhandler_thread() )
+
+  std::string trimmed_command = command;
+  boost::algorithm::trim( trimmed_command );
+  if ( trimmed_command == "help()" )
+  {
+    // trap help(), since it hangs interpreter and therefore the entire app
+    CORE_LOG_DEBUG( "Python help() trapped" );
+    PyErr_Clear();
+    PyRun_SimpleString("print(\"help() function ignored in interpreter\")\n");
+    this->private_->command_buffer_.clear();
+    this->prompt_signal_( this->private_->prompt1_ );
+    return;
+  }
+
+  if ( ! this->is_eventhandler_thread() )
   {
     {
       PythonInterpreterPrivate::lock_type lock( this->private_->get_mutex() );
@@ -615,7 +629,6 @@ void PythonInterpreter::interrupt()
     {
       this->error_signal_( "\nKeyboardInterrupt\n" );
       this->private_->command_buffer_.clear();
-      this->prompt_signal_( this->private_->prompt1_ );
     }
   }
 }
