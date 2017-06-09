@@ -329,7 +329,7 @@ void SplashScreen::quick_open_new_project()
   } 
   
   ActionNewProject::Dispatch( Core::Interface::GetWidgetActionContext(), "", default_project_name );
-  this->hide();
+  //  this->hide();
   this->close();
 }
   
