@@ -28,8 +28,16 @@ SET_PROPERTY(DIRECTORY PROPERTY "EP_BASE" ${ep_base})
 
 SET(TETGEN_LIBRARY "tet")
 
+IF(TRAVIS_BUILD OR ${CMAKE_VERSION} VERSION_GREATER 3.7.2)
+  # allowed since CMake 3.7.2
+  # only supporting in CI builds for now, since CMake version is so new
+  SET(DOWNLOAD_URL "http://tetgen.org/files/tetgen1.4.3.tar.gz http://www.sci.utah.edu/devbuilds/seg3d/tetgen1.4.3.tar.gz")
+ELSE()
+  SET(DOWNLOAD_URL "http://tetgen.org/files/tetgen1.4.3.tar.gz")
+ENDIF()
+
 ExternalProject_Add(Tetgen_external
-  URL "http://tetgen.org/files/tetgen1.4.3.tar.gz"
+  URL ${DOWNLOAD_URL}
   PATCH_COMMAND ""
   INSTALL_COMMAND ""
   CMAKE_CACHE_ARGS

@@ -2053,7 +2053,7 @@ const QString StyleSheet::PROVENANCE_LIST_HEADER_C = QString::fromUtf8(
 
   const QString StyleSheet::SPLASHSCREEN_C = QString::fromUtf8(
   "SplashScreen#splashscreen{"
-  " background-color: none; "
+  " background-color: transparent; "
   "}"
 );
 
