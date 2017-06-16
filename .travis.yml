@@ -18,7 +18,7 @@ before_install:
   - if [ ! -f $HOME/deps/cmake3.tgz ]; then wget --quiet --directory-prefix=$HOME/deps http://www.sci.utah.edu/devbuilds/seg3d/cmake3.tgz; fi
   - sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
   # TODO: build (hopefully) temporarily headless
-  - sudo add-apt-repository --yes ppa:beineri/opt-qt551-trusty
+  - sudo add-apt-repository --yes ppa:beineri/opt-qt59-trusty
   - sudo apt-get -qq --yes update
   # TODO: build (hopefully) temporarily headless
   # packages currently not whitelisted
