@@ -644,8 +644,10 @@ ELSE()
     # call repair_package.sh after running package target in build
     # Tip: can inspect packages using the pkgutil --expand command
     IF(CPACK_GENERATOR MATCHES "productbuild")
+      # make sure there are paths to packaging tools
       FIND_PROGRAM(PKGBUILD_EXE pkgbuild)
       FIND_PROGRAM(PRODUCTBUILD_EXE productbuild)
+      FIND_PROGRAM(PKGUTIL_EXE pkgutil)
       SET(PKG_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-Darwin")
       SET(PKG_BUILD_DIR "${CMAKE_BINARY_DIR}/_CPack_Packages/productbuild/${PKG_FILE_NAME}")
       SET(PKG_ROOT_DIR "${PKG_BUILD_DIR}/Applications")
