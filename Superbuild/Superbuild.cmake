@@ -114,7 +114,7 @@ OPTION(TRAVIS_BUILD "Slim build for Travis CI" OFF)
 MARK_AS_ADVANCED(TRAVIS_BUILD)
 
 IF(TRAVIS_BUILD)
-  SET(SEG3D_BUILD_INTERFACE ON) # TODO: hopefully temporary, try to speed up build in other ways
+  SET(SEG3D_BUILD_INTERFACE OFF) # TODO: Qt 5.9 packages needed, hopefully temporary
   SET(BUILD_WITH_PYTHON OFF) # TODO: hopefully temporary etc.
   SET(BUILD_TESTING ON)
   SET(BUILD_MOSAIC_TOOLS OFF)
