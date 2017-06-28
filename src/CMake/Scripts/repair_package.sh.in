@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+seg3dbuild_dir=@CMAKE_BINARY_DIR@
+productbuild_dir=@PKG_BUILD_DIR@
+productroot_dir=@PKG_ROOT_DIR@
+
+if [[ ! -e $productroot_dir ]]; then
+  echo "$productroot_dir does not exist"
+  exit 1
+fi
+
+pkgbuild --analyze --root $productroot_dir $seg3dbuild_dir/Seg3D2.plist
+pkgbuild --identifier edu.utah.sci.Seg3D2 --root $productroot_dir \
+         --component-plist $seg3dbuild_dir/Seg3D2.plist \
+         --install-location /Applications $seg3dbuild_dir/Seg3D2.pkg
+productbuild --distribution $seg3dbuild_dir/CPack.Distribution.dist --package-path $productroot_dir $productroot_dir/tmp.pkg
+pkgutil --expand $productroot_dir/tmp.pkg $productroot_dir/tmp
+pkgutil --flatten $productroot_dir/tmp $seg3dbuild_dir/@PKG_FILE_NAME@.pkg
+#rm -f $seg3dbuild_dir/Seg3D2.pkg $seg3dbuild_dir/Seg3D2.plist

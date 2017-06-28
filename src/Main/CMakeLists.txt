@@ -125,6 +125,7 @@ REGISTERED_TARGET_LINK_LIBRARIES(${APPLICATION_NAME})
 ###########################################
 
 IF(APPLE)
+  # set up app bundle
   ADD_CUSTOM_COMMAND(TARGET ${APPLICATION_NAME}
     POST_BUILD
     # configure Qt libs
