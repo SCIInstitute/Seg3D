@@ -12,6 +12,7 @@ The following issues have also been fixed:
 * #85: Curvature AnisoDiff Filter Error
 * #168: Curvature AnisioDiff Filter Mutilates/evicerates input data
 * #172: NIfTI file export failing for masks
+* #207: Update CPack settings for new OS X package generator
 
 
 Version 2.3.2
