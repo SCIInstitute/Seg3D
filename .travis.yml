@@ -1,4 +1,5 @@
 sudo: required
+group: deprecated-2017Q2
 language: c++
 dist: trusty
 
@@ -40,8 +41,6 @@ addons:
 script:
   - tar xzf $HOME/deps/cmake3.tgz
   - cd bin
-  - ls -la /usr/bin
-  - /usr/bin/moc --version
   - $TRAVIS_BUILD_DIR/cmake3/bin/cmake -GNinja -DTRAVIS_BUILD:BOOL=ON -DQt5_PATH:PATH=/usr ../Superbuild
   - travis_wait 70 ninja
 
