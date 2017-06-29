@@ -284,7 +284,7 @@ IF(SEG3D_BUILD_INTERFACE)
       NO_DEFAULT_PATH
     )
     IF(MACDEPLOYQT_EXE MATCHES "NOTFOUND")
-      MESSAGE(FATAL_ERROR "macdeployqt is required to build the SCIRun app bundle. Please ensure that both are installed and in your path.")
+      MESSAGE(FATAL_ERROR "macdeployqt is required to build the Seg3D app bundle. Please ensure it is installed and in your path.")
     ENDIF()
     SET(MACDEPLOYQT ${MACDEPLOYQT_EXE} CACHE INTERNAL "macdeployqt executable")
     MARK_AS_ADVANCED(MACDEPLOYQT)
@@ -572,8 +572,9 @@ SET(CPACK_RESOURCE_FILE_WELCOME ${PACKAGING_WELCOME})
 SET(CPACK_PACKAGE_VERSION_MAJOR "${SEG3D_MAJOR_VERSION}")
 SET(CPACK_PACKAGE_VERSION_MINOR "${SEG3D_MINOR_VERSION}")
 SET(CPACK_PACKAGE_VERSION_PATCH "${SEG3D_PATCH_VERSION}")
+SET(CPACK_PACKAGE_VERSION "${SEG3D_MAJOR_VERSION}.${SEG3D_MINOR_VERSION}.${SEG3D_PATCH_VERSION}")
 
-SET(CPACK_PACKAGE_INSTALL_DIRECTORY "${APPLICATION_NAME} ${SEG3D_MAJOR_VERSION}.${SEG3D_MINOR_VERSION}")
+SET(CPACK_PACKAGE_INSTALL_DIRECTORY "${APPLICATION_NAME}_${SEG3D_MAJOR_VERSION}.${SEG3D_MINOR_VERSION}")
 
 IF(WIN32 AND NOT UNIX)
   # There is a bug in NSIS that does not handle full unix paths properly. Make
@@ -633,16 +634,29 @@ IF(WIN32 AND NOT UNIX)
   ")
 ELSE()
   IF(APPLE)
-    SET(CPACK_PACKAGE_DEFAULT_LOCATION "/Applications/")
+    SET(CPACK_GENERATOR "productbuild;TGZ")
     SET(CPACK_TOPLEVEL_TAG "")
     IF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
       SET(CPACK_INSTALL_PREFIX "/" CACHE PATH "Install path prefix, prepended onto install directories." FORCE)
       SET(CMAKE_INSTALL_PREFIX "/" CACHE PATH "Install path prefix, prepended onto install directories." FORCE)
     ENDIF()
-    SET(CPACK_PACKAGING_INSTALL_PREFIX "/")
-    SET(CPACK_STRIP_FILES TRUE)
-    SET(CPACK_SOURCE_STRIP_FILES TRUE)
-    SET(CPACK_PACKAGE_EXECUTABLES "${APPLICATION_NAME}.app" "${APPLICATION_NAME}")
+    # productbuild packaging repair hack
+    # call repair_package.sh after running package target in build
+    # Tip: can inspect packages using the pkgutil --expand command
+    IF(CPACK_GENERATOR MATCHES "productbuild")
+      # make sure there are paths to packaging tools
+      FIND_PROGRAM(PKGBUILD_EXE pkgbuild)
+      FIND_PROGRAM(PRODUCTBUILD_EXE productbuild)
+      FIND_PROGRAM(PKGUTIL_EXE pkgutil)
+      SET(PKG_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-Darwin")
+      SET(PKG_BUILD_DIR "${CMAKE_BINARY_DIR}/_CPack_Packages/productbuild/${PKG_FILE_NAME}")
+      SET(PKG_ROOT_DIR "${PKG_BUILD_DIR}/Applications")
+
+      CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/CMake/Modules/CPack.Distribution.dist.in
+                     ${CMAKE_BINARY_DIR}/CPack.Distribution.dist)
+      CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/CMake/Scripts/repair_package.sh.in
+                     ${CMAKE_BINARY_DIR}/repair_package.sh)
+    ENDIF()
   ELSE()
     SET(CPACK_STRIP_FILES TRUE)
     SET(CPACK_SOURCE_STRIP_FILES TRUE)

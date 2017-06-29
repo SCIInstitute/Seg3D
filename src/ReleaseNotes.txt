@@ -1,6 +1,20 @@
 Release Notes
 =============
 
+Version 2.4.0
+-------------
+This version features the GUI upgrade to Qt 5 and a new look for the application.
+The minimum supported Qt version is 5.9.
+The Implicit Model tool (formerly RBF tool) has been updated and works in 3D.
+The following issues have also been fixed:
+
+* #35: Upgrade ITK (to 4.10)
+* #85: Curvature AnisoDiff Filter Error
+* #168: Curvature AnisioDiff Filter Mutilates/evicerates input data
+* #172: NIfTI file export failing for masks
+* #207: Update CPack settings for new OS X package generator
+
+
 Version 2.3.2
 -------------
 Bug fix release
@@ -59,7 +73,7 @@ and new features added:
 * Matlab v7.3 and MRC 2000 file importers and exporters have been implemented.
 * Isosurface exporter to VTK polydata and STL files has been added.
 * Tool for selecting and exporting points in a dataset has been added.
-* Support for compressed NIfTY files has been added. 
+* Support for compressed NIfTY files has been added.
 * Argument checking in exporters has been added to fix segfaults in Python scripts and the command interface.
 
 
@@ -142,7 +156,7 @@ This version addresses a few minor problems that were encountered by users and a
 Version: 2.0
 ------------
 
-This new version of Seg3D represents a major rewrite from the original Seg3D 1.x versions. This version maintains the workflow of the previous versions, but has been reengineered from scratch in order to address major flaws in the original design of the code. This release is the first release based on the new code base, that includes most of the tools from previous release and many new features. There are however a few tools that have not yet been ported to the new architecture, and most of that functionality will follow in version 2.1. 
+This new version of Seg3D represents a major rewrite from the original Seg3D 1.x versions. This version maintains the workflow of the previous versions, but has been reengineered from scratch in order to address major flaws in the original design of the code. This release is the first release based on the new code base, that includes most of the tools from previous release and many new features. There are however a few tools that have not yet been ported to the new architecture, and most of that functionality will follow in version 2.1.
 
 New features
 ------------
@@ -154,7 +168,7 @@ New features
 * New Tool Manager: The new tool manager allows multiple tools to stay open and allows for quickly switching between tools.
 * Coordinate Indicator: The coordinate indicator has been integrated in the status bar to allow more space to be used for tools and for the viewers.
 * New viewers: The new version allows up to 6 viewers to be used and allows them to be locked together for better navigation.
-* Volume viewers: The volume viewer now has lighting and fog. Also options to snap to the closest axis have been integrated. 
+* Volume viewers: The volume viewer now has lighting and fog. Also options to snap to the closest axis have been integrated.
 * Slice viewers : Multiple slice viewers can now be coupled together and relative movements are forwarded to other viewers. Also the appearance of the mask layers can be tweaked on a mask by mask basis.
 * Advanced visibility: We have added an advance control that allows users to specify in which viewer a data layer or a mask layer is visible. Allowing for comparison of datasets side-by-side.
 * Preferences menu: We have added a preferences menu to setup mask colors, viewer defaults etc.
@@ -163,7 +177,7 @@ New features
 * Auto save: A smart auto save has been implemented that will save the project at set intervals when the program is idle.
 * New tool interfaces: All tool interfaces have been rewritten. Each tool now will now indicate whether a layer is replaced. Each tool can work with the active layer or the user can select the layer it should work on. All the tools now display an error if the input conditions are not met.
 * Interface simplification and sliders: Tools now display reasonable value ranges using sliders and some tools have less input variables as values are automatically estimated.
-* New tool: Constraint Painting: Painting can now be constrained by a data layer using two thresholds and/or by a combination of one or two mask layers. 
+* New tool: Constraint Painting: Painting can now be constrained by a data layer using two thresholds and/or by a combination of one or two mask layers.
 * New tool: Arithmetic calculator: The new calculator module allows the user to parse a simple equation and evaluate an expression based up on data and mask values. This will expose almost all the basic math operations as well as selecting data from different data layers and combining them together.
 * New tool: Distance maps: Distance maps are useful in doing more complex segmentation work. In combination with the arithmetic tool this offers new ways of segmenting data.
 * New tool: Mean filter: Besides doing median filtering, a mean filter is often faster on large datasets. Hence both options are now available.
@@ -196,4 +210,3 @@ New features
 
 -------
 The Seg3D 2.0 Team
-

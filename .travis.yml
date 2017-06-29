@@ -18,13 +18,15 @@ before_install:
   - if [ ! -f $HOME/deps/cmake3.tgz ]; then wget --quiet --directory-prefix=$HOME/deps http://www.sci.utah.edu/devbuilds/seg3d/cmake3.tgz; fi
   - sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
   # TODO: build (hopefully) temporarily headless
-  - sudo add-apt-repository --yes ppa:beineri/opt-qt551-trusty
+  #- sudo add-apt-repository --yes ppa:beineri/opt-qt59-trusty
   - sudo apt-get -qq --yes update
-  # TODO: build (hopefully) temporarily headless
-  # packages currently not whitelisted
-  - sudo apt-get -qq --yes install ninja-build mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev mesa-utils-extra libglapi-mesa
-    qt5-default qttools5-dev-tools qtbase5-dev-tools libqt5core5a libqt5widgets5 libqt5opengl5-dev libqt5svg5-dev
+
+  # Qt 5 packages currently not whitelisted needed for GUI build
   #- sudo apt-get -qq --yes install ninja-build mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev mesa-utils-extra libglapi-mesa
+  #  qt5-default qttools5-dev-tools qtbase5-dev-tools libqt5core5a libqt5widgets5 libqt5opengl5-dev libqt5svg5-dev
+
+  # packages for headless build
+  - sudo apt-get -qq --yes install ninja-build mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev mesa-utils-extra libglapi-mesa
 install:
   # C++11 support required
   - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
@@ -40,7 +42,8 @@ addons:
 script:
   - tar xzf $HOME/deps/cmake3.tgz
   - cd bin
-  - $TRAVIS_BUILD_DIR/cmake3/bin/cmake -GNinja -DTRAVIS_BUILD:BOOL=ON -DQt5_PATH:PATH=/usr ../Superbuild
+  #- $TRAVIS_BUILD_DIR/cmake3/bin/cmake -GNinja -DTRAVIS_BUILD:BOOL=ON -DQt5_PATH:PATH=/usr ../Superbuild
+  - $TRAVIS_BUILD_DIR/cmake3/bin/cmake -GNinja -DTRAVIS_BUILD:BOOL=ON ../Superbuild
   - travis_wait 70 ninja
 
 #after_failure:

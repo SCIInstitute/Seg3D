@@ -42,6 +42,11 @@ ELSE()
   SET(SEG3D_BITS 32)
 ENDIF()
 
+# Hardcode (unfortunately) minumum OS X version for
+# productbuild's Distribution.xml
+SET(OSX_MINIMUM_OS_VERSION "10.10" CACHE STRING "Set the minimum Mac OS X version for the installer package XML configuration file.")
+MARK_AS_ADVANCED(OSX_MINIMUM_OS_VERSION)
+
 ###########################################
 # Set default CMAKE_BUILD_TYPE
 # if empty for Unix Makefile builds
@@ -109,7 +114,7 @@ OPTION(TRAVIS_BUILD "Slim build for Travis CI" OFF)
 MARK_AS_ADVANCED(TRAVIS_BUILD)
 
 IF(TRAVIS_BUILD)
-  SET(SEG3D_BUILD_INTERFACE ON) # TODO: hopefully temporary, try to speed up build in other ways
+  SET(SEG3D_BUILD_INTERFACE OFF) # TODO: Qt 5.9 packages needed, hopefully temporary
   SET(BUILD_WITH_PYTHON OFF) # TODO: hopefully temporary etc.
   SET(BUILD_TESTING ON)
   SET(BUILD_MOSAIC_TOOLS OFF)
@@ -145,11 +150,10 @@ IF(SEG3D_BUILD_INTERFACE)
   ENDIF()
 
   IF(Qt5Core_FOUND)
-    MESSAGE(STATUS "Found Qt version: ${Qt5Core_VERSION_STRING}")
-    #MESSAGE(STATUS "Found use file: ${QT_USE_FILE}")
-    #IF(APPLE AND ${QTVERSION} VERSION_EQUAL 4.8 AND ${QTVERSION} VERSION_LESS 4.8.5)
-    #  MESSAGE(WARNING "Qt 4.8 versions earlier than 4.8.3 contain a bug that disables menu items under some circumstances. Upgrade to a more recent version.")
-    #ENDIF()
+    MESSAGE(STATUS "Found Qt version: ${Qt5Core_VERSION}")
+    IF(${Qt5Core_VERSION} VERSION_LESS "5.9")
+      MESSAGE(FATAL_ERROR "Qt 5.9 or greater is required for building the Seg3D GUI")
+    ENDIF()
   ELSE()
     MESSAGE(FATAL_ERROR "Qt5 is required for building the Seg3D GUI")
   ENDIF()
@@ -268,6 +272,7 @@ SET(SEG3D_CACHE_ARGS
     "-DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${CMAKE_OSX_DEPLOYMENT_TARGET}"
     "-DCMAKE_OSX_SYSROOT:STRING=${CMAKE_OSX_SYSROOT}"
     "-DCMAKE_PREFIX_PATH:PATH=${CMAKE_PREFIX_PATH}"
+    "-DOSX_MINIMUM_OS_VERSION:STRING=${OSX_MINIMUM_OS_VERSION}"
     "-DSEG3D_SOURCE_DIR:PATH=${SEG3D_SOURCE_DIR}"
     "-DSEG3D_BINARY_DIR:PATH=${SEG3D_BINARY_DIR}"
     "-DBUILD_LARGE_VOLUME_TOOLS:BOOL=${BUILD_LARGE_VOLUME_TOOLS}"
