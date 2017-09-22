@@ -46,7 +46,7 @@ SEG3D_TOOL
   SEG3D_TOOL_MENULABEL( "Crop" )
   SEG3D_TOOL_MENU( "Tools" )
   SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+2" )
-  SEG3D_TOOL_URL( "http://scirundocwiki.sci.utah.edu/SCIRunDocs/index.php5/CIBC:Seg3D2:CropTool:1" )
+  SEG3D_TOOL_URL( "http://sciinstitute.github.io/seg3d.pages/Tools/CropTool.html" )
 )
 
   // -- constructor/destructor --
