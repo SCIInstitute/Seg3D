@@ -41,8 +41,6 @@
 // STL includes
 #include <iostream>
 #include <string>
-#include <fstream>
-#include <streambuf>
 
 // boost includes
 #include <boost/preprocessor.hpp>
