@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
- 
+
  The MIT License
- 
+
  Copyright (c) 2016 Scientific Computing and Imaging Institute,
  University of Utah.
- 
- 
+
+
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -41,6 +41,8 @@
 // STL includes
 #include <iostream>
 #include <string>
+#include <fstream>
+#include <streambuf>
 
 // boost includes
 #include <boost/preprocessor.hpp>
@@ -87,6 +89,7 @@ void printUsage()
   std::cout << "  --revision              - Get Git revision information." << std::endl;
   std::cout << "  --version               - Version number." << std::endl;
   std::cout << "  --socket=SCALAR         - Open a socket on the given port number." << std::endl;
+  std::cout << "  --python=FILE           - Run the python script in the given file." << std::endl;
   std::cout << "  --help                  - Print this usage message." << std::endl << std::endl;
 }
 
@@ -94,7 +97,7 @@ int main( int argc, char **argv )
 {
   // -- Parse the command line parameters --
   Core::Application::Instance()->parse_command_line_parameters( argc, argv );
-  
+
   // -- Check whether the user requested a version / revision number
   if ( Core::Application::Instance()->is_command_line_parameter( "revision") )
   {
@@ -107,7 +110,7 @@ int main( int argc, char **argv )
   if ( Core::Application::Instance()->is_command_line_parameter( "version") )
   {
     // NOTE: This information is gathered by cmake from the main cmake file.
-    std::cout << Core::Application::Instance()->GetApplicationName() << " version: " <<  
+    std::cout << Core::Application::Instance()->GetApplicationName() << " version: " <<
       Core::Application::Instance()->GetVersion() << std::endl;
     return 0;
   }
@@ -118,7 +121,7 @@ int main( int argc, char **argv )
     return 0;
   }
 
-  // -- Send message to revolving log file -- 
+  // -- Send message to revolving log file --
   // Logs messages in response to Log::Instance()->post_log_signal_
   Core::RolloverLogFile event_log( Core::LogMessageType::ALL_E );
 
@@ -130,7 +133,7 @@ int main( int argc, char **argv )
   // -- Log application information --
   Core::Application::Instance()->log_start();
 
-  // -- Add plugins into the architecture  
+  // -- Add plugins into the architecture
   Core::RegisterClasses();
 
   // -- Start the application event handler --
@@ -138,10 +141,10 @@ int main( int argc, char **argv )
 
   // Initialize the startup tools list
   ToolFactory::Instance()->initialize_states();
-  
+
   // Trigger the application start signal
   Core::Application::Instance()->application_start_signal_();
-  
+
   // -- Setup the QT Interface Layer --
   if ( !( QtUtils::QtApplication::Instance()->setup( argc, argv ) ) ) return ( -1 );
 
@@ -152,30 +155,30 @@ int main( int argc, char **argv )
   {
 /*
     std::string warning = std::string( "<h3>" ) +
-      Core::Application::GetApplicationName() + " " + Core::Application::GetVersion() + 
+      Core::Application::GetApplicationName() + " " + Core::Application::GetVersion() +
       "</h3><h6><p align=\"justify\">Please note: This version of " + Core::Application::GetApplicationName()
-      + " is still under development. For daily use we recommend the released version, as" 
+      + " is still under development. For daily use we recommend the released version, as"
       " stability of this version depends on on going development.</p></h6>";
-    
-    QMessageBox::information( 0, 
-      QString::fromStdString( Core::Application::GetApplicationNameAndVersion() ), 
+
+    QMessageBox::information( 0,
+      QString::fromStdString( Core::Application::GetApplicationNameAndVersion() ),
       QString::fromStdString( warning )  );
 */
-  } 
+  }
 
   if ( sizeof( void * ) == 4 )
   {
     std::string warning = std::string( "<h3>" ) +
-      Core::Application::GetApplicationName() + " " + Core::Application::GetVersion() + " 32BIT" 
+      Core::Application::GetApplicationName() + " " + Core::Application::GetVersion() + " 32BIT"
       "</h3><h6><p align=\"justify\">Please note: " + Core::Application::GetApplicationName()
       + " is meant to run in 64-bit mode. "
       "In 32-bit mode the size of volumes that can be processed are limited, as "
       + Core::Application::GetApplicationName() +
       " may run out of addressable memory. If you have a 64-bit machine,"
       " we would recommend to download the 64-bit version</p></h6>";
-    
-    QMessageBox::information( 0, 
-      QString::fromStdString( Core::Application::GetApplicationNameAndVersion() ), 
+
+    QMessageBox::information( 0,
+      QString::fromStdString( Core::Application::GetApplicationNameAndVersion() ),
       QString::fromStdString( warning )  );
   }
 #ifdef BUILD_WITH_PYTHON
@@ -185,7 +188,7 @@ int main( int argc, char **argv )
 
   Core::PythonInterpreter::module_list_type python_modules;
   std::string module_name = Core::StringToLower( BOOST_PP_STRINGIZE( APPLICATION_NAME ) );
-  python_modules.push_back( Core::PythonInterpreter::module_entry_type( module_name, 
+  python_modules.push_back( Core::PythonInterpreter::module_entry_type( module_name,
     BOOST_PP_CAT( PyInit_, APPLICATION_NAME ) ) );
   Core::PythonInterpreter::Instance()->initialize( &program_name[ 0 ], python_modules );
   Core::PythonInterpreter::Instance()->run_string( "import " + module_name + "\n" );
@@ -207,6 +210,15 @@ int main( int argc, char **argv )
       InterfaceManager::Instance()->set_initializing( false );
     }
   }
+
+  // -- Checking for python script request --
+  std::string python_script;
+  if ( Core::Application::Instance()->check_command_line_parameter( "python", python_script ) )
+  {
+    CORE_LOG_ERROR(python_script);
+    Core::PythonInterpreter::Instance()->run_file(python_script);
+  }
+
 #else
   std::string port_number_string;
   if ( Core::Application::Instance()->check_command_line_parameter( "socket", port_number_string ) ||
@@ -223,7 +235,7 @@ int main( int argc, char **argv )
   // -- Setup Application Interface Window --
 //  std::string file_to_view = "";
 //  Core::Application::Instance()->check_command_line_parameter( "file_to_open_on_start", file_to_view );
-  
+
   ApplicationInterface* app_interface = new ApplicationInterface( file_to_view );
 
   // Show the full interface
