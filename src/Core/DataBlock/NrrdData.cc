@@ -26,7 +26,7 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <locale.h>
+#include <locale>
 
 // Core includes
 #include <Core/Utils/Log.h>
@@ -656,9 +656,12 @@ bool NrrdData::SaveNrrd( const std::string& filename,
   }
 
   // teem library should check for valid nrrd (including file extension?)
-  setlocale(LC_NUMERIC, "C");
+
+  std::locale current_locale; // automatically populated with the current locale
+  std::locale::global(std::locale("C"));
   if ( nrrdSave( filename.c_str(), nrrddata->nrrd(), nio ) )
   {
+    std::locale::global(current_locale);
     char *err = biffGet( NRRD );
     error = "Error writing file: " + filename + " : " + std::string( err );
     free( err );
@@ -666,6 +669,7 @@ bool NrrdData::SaveNrrd( const std::string& filename,
 
     return false;
   }
+  std::locale::global(current_locale);
 
   nio = nrrdIoStateNix( nio );
 
