@@ -33,6 +33,7 @@
 #ifdef BUILD_WITH_PYTHON
 #include <Python.h>
 #include <Core/Python/PythonInterpreter.h>
+#include <Core/Python/PythonCLI.h>
 #include <Application/Socket/ActionSocket.h>
 
 #include "ActionPythonWrapperRegistration.h"
@@ -213,8 +214,8 @@ int main( int argc, char **argv )
   std::string python_script;
   if ( Core::Application::Instance()->check_command_line_parameter( "python", python_script ) )
   {
-    CORE_LOG_ERROR(python_script);
-    Core::PythonInterpreter::Instance()->run_file(python_script);
+    Core::PythonCLI::Instance()->execute_file(python_script);
+    return 0;
   }
 
 #else
