@@ -33,6 +33,7 @@
 //STL includes
 #include <iostream>
 
+
 // Core includes
 #include <Core/Utils/Log.h>
 
@@ -45,14 +46,12 @@ CORE_SINGLETON_IMPLEMENTATION( PythonCLI );
 
 static void PythonCLIPrint( std::string output )
 {
-  CORE_LOG_MESSAGE(output);
+  std::cout << output;
+  std::cout.flush();
 }
 
 PythonCLI::PythonCLI()
 {
-  this->log_streamer = new Core::LogStreamer( Core::LogMessageType::ALL_E, &std::cout );
-  this->connection_handler.add_connection( Core::PythonInterpreter::Instance()->prompt_signal_.connect(
-    boost::bind( &PythonCLIPrint, _1 ) ) );
   this->connection_handler.add_connection( Core::PythonInterpreter::Instance()->error_signal_.connect(
     boost::bind( &PythonCLIPrint, _1 ) ) );
   this->connection_handler.add_connection( Core::PythonInterpreter::Instance()->output_signal_.connect(
@@ -60,14 +59,10 @@ PythonCLI::PythonCLI()
 }
 
 PythonCLI::~PythonCLI()
-{
-  delete this->log_streamer;
-}
+{ }
 
 void PythonCLI::execute_file( std::string& python_script )
 {
-  std::string crazy = std::string("HELLO!!!");
-  PythonCLIPrint(crazy);
   PythonInterpreter::Instance()->run_file(python_script);
 }
 

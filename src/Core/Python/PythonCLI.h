@@ -52,7 +52,6 @@ class PythonCLI : public boost::noncopyable
     ~PythonCLI();
 
     Core::ConnectionHandler connection_handler;
-    Core::LogStreamer* log_streamer;
 };
 
 

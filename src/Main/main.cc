@@ -215,7 +215,6 @@ int main( int argc, char **argv )
   if ( Core::Application::Instance()->check_command_line_parameter( "python", python_script ) )
   {
     Core::PythonCLI::Instance()->execute_file(python_script);
-    return 0;
   }
 
 #else
