@@ -31,7 +31,7 @@
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 #pragma once
-#endif 
+#endif
 
 #ifndef Q_MOC_RUN
 
@@ -46,7 +46,7 @@
 #include <boost/thread/thread.hpp>
 #include <boost/shared_ptr.hpp>
 
-// Application Interface components. 
+// Application Interface components.
 #include <Application/InterfaceManager/InterfaceManager.h>
 
 #include <Core/Action/Actions.h>
@@ -64,9 +64,9 @@ namespace Seg3D
 /// loop for the program
 
 /// Although there is only one instance of this class
-/// in the program 
-  
-  
+/// in the program
+
+
 class ApplicationInterfacePrivate;
 
 
@@ -81,7 +81,15 @@ public:
 
   // virtual constructor needed by Qt to destroy this object
   virtual ~ApplicationInterface();
-// 
+
+  /// OPEN_INITIAL_PROJECT:
+  /// Opens a project. Intended for use on startup.
+  bool open_initial_project ( std::string filename );
+
+  /// ACTIVATE_SPLASH_SCREEN:
+  /// opens the splash screen
+  void activate_splash_screen();
+//
 //  // -- functions to handle the properties of the interface --
 private:
   // TODO:
@@ -90,7 +98,7 @@ private:
   void end_progress( Core::ActionProgressHandle handle );
   void report_progress( Core::ActionProgressHandle handle );
   void center_seg3d_gui_on_screen( QWidget *widget );
-  
+
   /// SAVE_PREFERENCES:
   /// this function is called when the visibility of the PreferencesManager is changed and when it
   /// is changed to false, the preferences are saved
@@ -100,18 +108,18 @@ private:
   /// Overload the default addDockWidget and upgrade it, so docks are added
   /// on top of each other
   void addDockWidget( Qt::DockWidgetArea area, QDockWidget* dock_widget );
-  
+
   /// RAISE_ERROR_MESSAGEBOX:
-  /// is called by the function that handles critical error signals, pops up a critical error 
+  /// is called by the function that handles critical error signals, pops up a critical error
   /// messagebox
   void raise_error_messagebox( int msg_type, std::string message );
-  
+
   void set_full_screen( bool full_screen );
-  
+
   /// SET_PROJECT_NAME:
   /// Update the name of the project in the title bar
   void set_project_name( std::string project_name );
-  
+
   /// UPDATE_PROJECT_CONNECTIONS:
   /// Update the project connections when a new project is opened
   void update_project_connections();
@@ -123,10 +131,6 @@ private:
   /// FILE_PROJECT_FILE:
   /// Finds the project file within a bundle directory, or returns the project file if already given
   std::string find_project_file ( std::string path );
-  
-  /// OPEN_INITIAL_PROJECT:
-  /// Opens a project on startup
-  bool open_initial_project ( std::string filename );
 
   // NOTE:
   // We need to override these events for the progress widget that draws an transparent layer
@@ -136,13 +140,13 @@ protected:
   /// Function called when the closew button is pressed. The application needs to check whether
   /// data needs to be saved if this button is pressed.
   virtual void closeEvent ( QCloseEvent* event );
-  
+
   /// RESIZEEVENT:
   /// Function called when window is redrawn. This function updates widgets that depend on being
   /// displayed on top of the full window.
   virtual void resizeEvent( QResizeEvent *event );
 
-private:  
+private:
   boost::shared_ptr< ApplicationInterfacePrivate > private_;
 
   // -- Main Window management functions --
@@ -165,25 +169,25 @@ public:
   /// HANDLEREPORTPROGRESS:
   /// Report progress to the modal window
   static void HandleReportProgress( qpointer_type qpointer, Core::ActionProgressHandle handle);
-  
+
   /// HANDLEPREFERENCESMANAGERSAVE:
   /// Dispatches the SavePreferences action
   static void HandlePreferencesManagerSave( qpointer_type qpointer, bool visible );
-  
+
   /// HANDLECRITICALERROR:
   /// handles critical error signals and passes them to a function that pops up an error message
   static void HandleCriticalErrorMessage(  qpointer_type qpointer, int msg_type, std::string message );
 
   /// SETFULLSCREEN:
   /// Set full screen mode of the Main Window
-  static void SetFullScreen( qpointer_type app_interface, bool full_screen, 
+  static void SetFullScreen( qpointer_type app_interface, bool full_screen,
     Core::ActionSource source );
-    
+
   /// SETPROJECTNAME:
-  /// handles signals that the project name needs to change 
-  static void SetProjectName( qpointer_type qpointer, std::string project_name, 
+  /// handles signals that the project name needs to change
+  static void SetProjectName( qpointer_type qpointer, std::string project_name,
     Core::ActionSource source );
-  
+
   /// UPDATEPROJECTCONNECTIONS
   /// Update the connections to the current project
   static void UpdateProjectConnections( qpointer_type qpointer );
@@ -192,4 +196,3 @@ public:
 } //end namespace
 
 #endif
-

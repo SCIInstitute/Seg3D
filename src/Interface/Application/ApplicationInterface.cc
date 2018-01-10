@@ -86,13 +86,13 @@
 
 namespace Seg3D
 {
-  
+
 class ApplicationInterfacePrivate {
 
 public:
   // Pointer to the main canvas of the main window
   QPointer< ViewerInterface > viewer_interface_;
-  
+
   // Pointers to dialog widgets
   QPointer< ControllerInterface > controller_interface_;
   QPointer< PreferencesInterface > preferences_interface_;
@@ -102,7 +102,7 @@ public:
 #ifdef BUILD_WITH_PYTHON
   QPointer< PythonConsoleWidget > python_console_;
 #endif
-  
+
   // The dock widgets
   //QPointer< HistoryDockWidget > history_dock_window_;
   QPointer< ProjectDockWidget > project_dock_window_;
@@ -111,16 +111,16 @@ public:
   QPointer< RenderingDockWidget > rendering_dock_window_;
   QPointer< ProvenanceDockWidget > provenance_dock_window_;
   QPointer< ProgressWidget > progress_;
-  
+
   // Pointer to the new project wizard
   static QPointer< ProjectWizard > new_project_wizard_;
-  
+
   // Application menu, statusbar
   QPointer< Menu > menu_;
   QPointer< StatusBarWidget > status_bar_;
-  
-  QPointer< QWidget > focused_item_; 
-  
+
+  QPointer< QWidget > focused_item_;
+
   bool critical_message_active_;
 
 };
@@ -143,7 +143,7 @@ ApplicationInterface::ApplicationInterface( std::string file_to_view_on_open ) :
 
   // Tell Qt what size to start up in
   this->resize( 1280, 720 );
-  
+
   // Tell Qt where to dock the toolbars
   this->setCorner( Qt::TopLeftCorner, Qt::LeftDockWidgetArea );
   this->setCorner( Qt::TopRightCorner, Qt::RightDockWidgetArea );
@@ -153,11 +153,11 @@ ApplicationInterface::ApplicationInterface( std::string file_to_view_on_open ) :
   // Define the main window viewer canvas
   this->private_->viewer_interface_ = new ViewerInterface( this );
   this->setCentralWidget( this->private_->viewer_interface_ );
-  
+
   // Setup the menubar and statusbar
   this->private_->menu_ = new Menu( this );
   this->private_->status_bar_ = new StatusBarWidget( this );
-  
+
   // Instantiate the peripheral windows
   this->private_->preferences_interface_ = new PreferencesInterface( this );
   this->private_->controller_interface_ = new ControllerInterface( this );
@@ -169,7 +169,7 @@ ApplicationInterface::ApplicationInterface( std::string file_to_view_on_open ) :
 #endif
 
   this->private_->critical_message_active_ = false;
-  
+
   // Instantiate the dock widgets
   this->private_->rendering_dock_window_ = new RenderingDockWidget( this );
   this->addDockWidget( Qt::RightDockWidgetArea, this->private_->rendering_dock_window_ );
@@ -178,68 +178,68 @@ ApplicationInterface::ApplicationInterface( std::string file_to_view_on_open ) :
   this->addDockWidget( Qt::RightDockWidgetArea, this->private_->layer_manager_dock_window_ );
 
   this->private_->project_dock_window_ = new ProjectDockWidget( this );
-  this->addDockWidget( Qt::LeftDockWidgetArea, this->private_->project_dock_window_ );  
-  
+  this->addDockWidget( Qt::LeftDockWidgetArea, this->private_->project_dock_window_ );
+
   this->private_->provenance_dock_window_ = new ProvenanceDockWidget( this );
   this->addDockWidget( Qt::LeftDockWidgetArea, this->private_->provenance_dock_window_ );
 
   this->private_->tools_dock_window_ = new ToolsDockWidget( this );
   this->addDockWidget( Qt::LeftDockWidgetArea, this->private_->tools_dock_window_ );
-  
-  
+
+
   // Connect the windows and widgets to their visibility states
   QtUtils::QtBridge::Show( this->private_->rendering_dock_window_,
     InterfaceManager::Instance()->rendering_dockwidget_visibility_state_ );
 
-  QtUtils::QtBridge::Show( this->private_->layer_manager_dock_window_, 
+  QtUtils::QtBridge::Show( this->private_->layer_manager_dock_window_,
     InterfaceManager::Instance()->layermanager_dockwidget_visibility_state_ );
 
-  QtUtils::QtBridge::Show( this->private_->tools_dock_window_, 
+  QtUtils::QtBridge::Show( this->private_->tools_dock_window_,
     InterfaceManager::Instance()->toolmanager_dockwidget_visibility_state_ );
 
-  QtUtils::QtBridge::Show( this->private_->project_dock_window_, 
+  QtUtils::QtBridge::Show( this->private_->project_dock_window_,
     InterfaceManager::Instance()->project_dockwidget_visibility_state_ );
 
-  QtUtils::QtBridge::Show( this->private_->provenance_dock_window_, 
+  QtUtils::QtBridge::Show( this->private_->provenance_dock_window_,
     InterfaceManager::Instance()->provenance_dockwidget_visibility_state_ );
 
-//  QtUtils::QtBridge::Show( this->private_->history_dock_window_, 
+//  QtUtils::QtBridge::Show( this->private_->history_dock_window_,
 //    InterfaceManager::Instance()->history_dockwidget_visibility_state_ );
 
-  QtUtils::QtBridge::Show( this->private_->preferences_interface_, 
+  QtUtils::QtBridge::Show( this->private_->preferences_interface_,
     InterfaceManager::Instance()->preferences_manager_visibility_state_ );
-  
+
   this->add_connection( InterfaceManager::Instance()->preferences_manager_visibility_state_->
-    value_changed_signal_.connect( boost::bind( 
+    value_changed_signal_.connect( boost::bind(
     &ApplicationInterface::HandlePreferencesManagerSave, qpointer_type( this ), _1 ) ) );
-    
-  QtUtils::QtBridge::Show( this->private_->controller_interface_, 
+
+  QtUtils::QtBridge::Show( this->private_->controller_interface_,
     InterfaceManager::Instance()->controller_visibility_state_ );
-    
-  QtUtils::QtBridge::Show( this->private_->message_widget_, 
+
+  QtUtils::QtBridge::Show( this->private_->message_widget_,
     InterfaceManager::Instance()->message_window_visibility_state_ );
-    
-  QtUtils::QtBridge::Show( this->private_->keyboard_shortcuts_, 
+
+  QtUtils::QtBridge::Show( this->private_->keyboard_shortcuts_,
     InterfaceManager::Instance()->keyboard_shortcut_visibility_state_ );
 
 #ifdef BUILD_WITH_PYTHON
   QtUtils::QtBridge::Show( this->private_->python_console_,
     InterfaceManager::Instance()->python_console_visibility_state_ );
 #endif
-    
-  this->add_connection( Core::ActionDispatcher::Instance()->begin_progress_signal_.connect( 
+
+  this->add_connection( Core::ActionDispatcher::Instance()->begin_progress_signal_.connect(
     boost::bind( &ApplicationInterface::HandleBeginProgress, qpointer_type( this ), _1 ) ) );
 
-  this->add_connection( Core::ActionDispatcher::Instance()->end_progress_signal_.connect( 
+  this->add_connection( Core::ActionDispatcher::Instance()->end_progress_signal_.connect(
     boost::bind( &ApplicationInterface::HandleEndProgress, qpointer_type( this ), _1 ) ) );
 
-  this->add_connection( Core::ActionDispatcher::Instance()->report_progress_signal_.connect( 
+  this->add_connection( Core::ActionDispatcher::Instance()->report_progress_signal_.connect(
     boost::bind( &ApplicationInterface::HandleReportProgress, qpointer_type( this ), _1 ) ) );
-    
-  this->add_connection( Core::Log::Instance()->post_critical_signal_.connect( 
+
+  this->add_connection( Core::Log::Instance()->post_critical_signal_.connect(
     boost::bind( &ApplicationInterface::HandleCriticalErrorMessage, qpointer_type( this ), _1, _2 ) ) );
-    
-  
+
+
   // NOTE: Connect state and reflect the current state (needs to be atomic, hence the lock)
   {
     // NOTE: State Engine is locked so the application thread cannot make
@@ -248,41 +248,32 @@ ApplicationInterface::ApplicationInterface( std::string file_to_view_on_open ) :
 
     // Connect and update full screen state
     this->add_connection( InterfaceManager::Instance()->full_screen_state_->
-      value_changed_signal_.connect( boost::bind( &ApplicationInterface::SetFullScreen, 
+      value_changed_signal_.connect( boost::bind( &ApplicationInterface::SetFullScreen,
       qpointer_type( this ), _1, _2 ) ) );
-      
+
     this->add_connection( ProjectManager::Instance()->get_current_project()->project_name_state_->
-      value_changed_signal_.connect( boost::bind( &ApplicationInterface::SetProjectName, 
-      qpointer_type( this ), _1, _2 ) ) ); 
-      
+      value_changed_signal_.connect( boost::bind( &ApplicationInterface::SetProjectName,
+      qpointer_type( this ), _1, _2 ) ) );
+
     this->add_connection( ProjectManager::Instance()->current_project_changed_signal_.connect(
-      boost::bind( &ApplicationInterface::UpdateProjectConnections, 
-      qpointer_type( this ) ) ) );  
+      boost::bind( &ApplicationInterface::UpdateProjectConnections,
+      qpointer_type( this ) ) ) );
   }
 
   if( PreferencesManager::Instance()->full_screen_on_startup_state_->get() )
   {
     this->set_full_screen( true );
   }
-  else 
+  else
   {
     this->center_seg3d_gui_on_screen( this );
   }
-  
+
   this->private_->progress_ = new ProgressWidget( this->private_->viewer_interface_->parentWidget() );
-  
+
   // add signal connection for OS X file assocation open event
-  this->add_connection( QtUtils::QtApplication::Instance()->osx_file_open_event_signal_.connect( boost::bind( 
+  this->add_connection( QtUtils::QtApplication::Instance()->osx_file_open_event_signal_.connect( boost::bind(
     &ApplicationInterface::handle_osx_file_open_event, this, _1 ) ) );
-
-  file_to_view_on_open = this->find_project_file( file_to_view_on_open );
-
-  if ( ! this->open_initial_project ( file_to_view_on_open ) )
-  {
-    QtUtils::QtBridge::Show( this->private_->splash_screen_, 
-       InterfaceManager::Instance()->splash_screen_visibility_state_ );
-    this->center_seg3d_gui_on_screen( this->private_->splash_screen_ );
-  }
 }
 
 ApplicationInterface::~ApplicationInterface()
@@ -290,11 +281,18 @@ ApplicationInterface::~ApplicationInterface()
   this->disconnect_all();
 }
 
+void ApplicationInterface::activate_splash_screen()
+{
+  QtUtils::QtBridge::Show( this->private_->splash_screen_,
+     InterfaceManager::Instance()->splash_screen_visibility_state_ );
+  this->center_seg3d_gui_on_screen( this->private_->splash_screen_ );
+}
+
 void ApplicationInterface::closeEvent( QCloseEvent* event )
 {
   // We are going to save the PreferencesManager when we exit
   ActionSavePreferences::Dispatch( Core::Interface::GetWidgetActionContext() );
-  
+
   if ( ProjectManager::Instance()->get_current_project()->check_project_changed() )
   {
 
@@ -303,13 +301,13 @@ void ApplicationInterface::closeEvent( QCloseEvent* event )
       "Your current session has not been saved.\n"
       "Do you want to save your changes?",
       QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel );
-    
+
     if ( ret == QMessageBox::Cancel )
     {
       event->ignore();
       return;
     }
-    
+
     if ( ret == QMessageBox::Save )
     {
       this->disconnect_all();
@@ -325,12 +323,12 @@ void ApplicationInterface::closeEvent( QCloseEvent* event )
       }
       else
       {
-        ActionSaveSession::Dispatch( Core::Interface::GetWidgetActionContext(), "" ); 
+        ActionSaveSession::Dispatch( Core::Interface::GetWidgetActionContext(), "" );
       }
     }
   }
   this->disconnect_all();
-  
+
 
   if( this->private_->viewer_interface_ )
   {
@@ -343,31 +341,31 @@ void ApplicationInterface::closeEvent( QCloseEvent* event )
     this->private_->controller_interface_->close();
     this->private_->controller_interface_->deleteLater();
   }
-  
+
   if( this->private_->preferences_interface_ )
   {
     this->private_->preferences_interface_->close();
     this->private_->preferences_interface_->deleteLater();
   }
-  
+
   if( this->private_->splash_screen_ )
   {
     this->private_->splash_screen_->close();
     this->private_->splash_screen_->deleteLater();
   }
-  
+
   if( this->private_->message_widget_ )
   {
     this->private_->message_widget_->close();
     this->private_->message_widget_->deleteLater();
   }
-  
+
   if( this->private_->keyboard_shortcuts_ )
   {
     this->private_->keyboard_shortcuts_->close();
     this->private_->keyboard_shortcuts_->deleteLater();
   }
-  
+
 #ifdef BUILD_WITH_PYTHON
   if ( this->private_->python_console_ )
   {
@@ -380,19 +378,19 @@ void ApplicationInterface::closeEvent( QCloseEvent* event )
 //    this->private_->history_dock_window_->close();
 //    this->private_->history_dock_window_->deleteLater();
 //  }
-  
+
   if( this->private_->project_dock_window_ )
   {
     this->private_->project_dock_window_->close();
     this->private_->project_dock_window_->deleteLater();
   }
-  
+
   if( this->private_->tools_dock_window_ )
   {
     this->private_->tools_dock_window_->close();
     this->private_->tools_dock_window_->deleteLater();
   }
-  
+
   if( this->private_->layer_manager_dock_window_ )
   {
     this->private_->layer_manager_dock_window_->close();
@@ -404,7 +402,7 @@ void ApplicationInterface::closeEvent( QCloseEvent* event )
     this->private_->rendering_dock_window_->close();
     this->private_->rendering_dock_window_->deleteLater();
   }
-  
+
   event->accept();
 }
 
@@ -414,12 +412,12 @@ void ApplicationInterface::resizeEvent( QResizeEvent *event )
   {
     this->private_->progress_->resize( event->size() );
   }
-  
+
   event->accept();
 }
-  
-  
-void ApplicationInterface::center_seg3d_gui_on_screen( QWidget *widget ) 
+
+
+void ApplicationInterface::center_seg3d_gui_on_screen( QWidget *widget )
 {
   QRect rect = QApplication::desktop()->availableGeometry();
 
@@ -445,14 +443,14 @@ void ApplicationInterface::set_project_name( std::string project_name )
 void ApplicationInterface::update_project_connections()
 {
   this->add_connection( ProjectManager::Instance()->get_current_project()->project_name_state_->
-    value_changed_signal_.connect( boost::bind( &ApplicationInterface::SetProjectName, 
-    qpointer_type( this ), _1, _2 ) ) ); 
+    value_changed_signal_.connect( boost::bind( &ApplicationInterface::SetProjectName,
+    qpointer_type( this ), _1, _2 ) ) );
 }
 
 void ApplicationInterface::begin_progress( Core::ActionProgressHandle handle )
 {
   this->private_->focused_item_ = QApplication::focusWidget();
-  
+
   // Disable updates from Qt.
   this->setUpdatesEnabled( false );
 
@@ -463,7 +461,7 @@ void ApplicationInterface::begin_progress( Core::ActionProgressHandle handle )
   // Make picture of all the widgets, so things will not change in the background.
   CORE_LOG_DEBUG( "-- Picturizing the Viewer Interface --" );
   this->private_->viewer_interface_->set_pic_mode( true );
-  
+
   // Put overlays on all floating widgets.
   CORE_LOG_DEBUG( "-- Putting overlays over all the floating dock widgets --" );
   this->private_->layer_manager_dock_window_->set_enabled( false );
@@ -471,12 +469,12 @@ void ApplicationInterface::begin_progress( Core::ActionProgressHandle handle )
   this->private_->tools_dock_window_->set_enabled( false );
   this->private_->project_dock_window_->set_enabled( false );
 //  this->private_->history_dock_window_->set_enabled( false );
-  
+
   // Draw the progress widget on top of everything.
   CORE_LOG_DEBUG( "-- Start progress widget --" );
   this->private_->progress_->setup_progress_widget( handle );
   this->private_->progress_->resize( this->size() );
-  
+
   // Allow Qt to send updates to the widgets behind the progress interface.
   this->setUpdatesEnabled( true );
 }
@@ -490,20 +488,20 @@ void ApplicationInterface::end_progress( Core::ActionProgressHandle /*handle*/ )
   this->private_->rendering_dock_window_->set_enabled( true );
   this->private_->tools_dock_window_->set_enabled( true );
   this->private_->project_dock_window_->set_enabled( true );
-  
+
   //this->private_->history_dock_window_->set_enabled( true );
-  
+
   CORE_LOG_DEBUG( "-- Unpicturizing the Viewer Interface --" );
   this->private_->viewer_interface_->set_pic_mode( false );
-  
+
   CORE_LOG_DEBUG( "-- Enabling the menubar --" );
   this->menuBar()->setEnabled( true );
-  
+
   CORE_LOG_DEBUG( "-- Finish progress widget --" );
   this->private_->progress_->cleanup_progress_widget();
-  
+
   this->setUpdatesEnabled( true );
-  
+
   if( this->private_->focused_item_ ) // if the item still exists, give it focus.
   {
     this->private_->focused_item_->setFocus();
@@ -542,28 +540,28 @@ void ApplicationInterface::save_preferences( bool visible )
     ActionSavePreferences::Dispatch( Core::Interface::GetWidgetActionContext() );
   }
 }
-  
+
 void ApplicationInterface::HandlePreferencesManagerSave( qpointer_type qpointer, bool visible )
 {
-  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, 
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer,
     boost::bind( &ApplicationInterface::save_preferences, qpointer.data(), visible ) ) );
 }
-  
+
 void ApplicationInterface::HandleBeginProgress( qpointer_type qpointer, Core::ActionProgressHandle handle )
 {
-  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, 
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer,
     boost::bind( &ApplicationInterface::begin_progress, qpointer.data(), handle ) ) );
 }
 
 void ApplicationInterface::HandleEndProgress( qpointer_type qpointer, Core::ActionProgressHandle handle )
 {
-  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, 
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer,
     boost::bind( &ApplicationInterface::end_progress, qpointer.data(), handle ) ) );
 }
 
 void ApplicationInterface::HandleReportProgress( qpointer_type qpointer, Core::ActionProgressHandle handle )
 {
-  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, 
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer,
     boost::bind( &ApplicationInterface::report_progress, qpointer.data(), handle ) ) );
 }
 
@@ -589,61 +587,59 @@ void ApplicationInterface::UpdateProjectConnections( qpointer_type qpointer )
     Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
       &ApplicationInterface::set_project_name, qpointer.data(), project_name ) ) );
   }
-  
+
   Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
     &ApplicationInterface::update_project_connections, qpointer.data() ) ) );
 }
 
 void ApplicationInterface::raise_error_messagebox( int msg_type, std::string message )
 {
-  
+
   if( this->private_->critical_message_active_ ) return;
-    
+
   this->private_->critical_message_active_ = true;
-  
+
   int return_value = QMessageBox::critical( this, "CRITICAL ERROR!!",
     QString::fromStdString( "CRITICAL ERROR!!\n\n" + message ) );
-  
+
   if( return_value )
   {
     this->private_->critical_message_active_ = false;
   }
-  
+
 }
 
 void ApplicationInterface::HandleCriticalErrorMessage( qpointer_type qpointer, int msg_type, std::string message )
 {
-  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, 
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer,
     boost::bind( &ApplicationInterface::raise_error_messagebox, qpointer.data(), msg_type, message ) ) );
 }
 
-void ApplicationInterface::handle_osx_file_open_event (std::string filename) 
+void ApplicationInterface::handle_osx_file_open_event (std::string filename)
 {
   Seg3D::ProjectHandle current_project = Seg3D::ProjectManager::Instance()->get_current_project();
-  
+
   // must do this to make sure a double-click on a project file doesn't use this executable session
   bool new_session = InterfaceManager::Instance()->splash_screen_visibility_state_->get();
-  if ( !this->private_->splash_screen_ || this->private_->splash_screen_->get_user_interacted() ) 
+  if ( !this->private_->splash_screen_ || this->private_->splash_screen_->get_user_interacted() )
   {
     new_session = false;
   }
-  
-  if ( !new_session ) 
+
+  if ( !new_session )
   {
     boost::filesystem::path app_filepath;
     Core::Application::Instance()->get_application_filepath( app_filepath );
-    
-    std::string command = std::string( "" ) + 
+
+    std::string command = std::string( "" ) +
     app_filepath.parent_path().parent_path().string() + "/Contents/MacOS/Seg3D2 \"" + filename + "\" &";
-    
+
     system( command.c_str() );
-  } 
-  else 
+  }
+  else
   {
-    std::vector<std::string> project_file_extensions = Project::GetProjectFileExtensions(); 
-    
-    filename = this->find_project_file ( filename );
- 
+    std::vector<std::string> project_file_extensions = Project::GetProjectFileExtensions();
+
     this->open_initial_project (filename);
   }
 }
@@ -651,7 +647,7 @@ void ApplicationInterface::handle_osx_file_open_event (std::string filename)
 
 std::string ApplicationInterface::find_project_file ( std::string path )
 {
-  std::vector<std::string> project_file_extensions = Project::GetProjectFileExtensions(); 
+  std::vector<std::string> project_file_extensions = Project::GetProjectFileExtensions();
 
   boost::filesystem::path full_path =  boost::filesystem::path(path);
 
@@ -660,7 +656,7 @@ std::string ApplicationInterface::find_project_file ( std::string path )
   if ( boost::filesystem::is_directory( full_path ) )
   {
     boost::filesystem::directory_iterator dir_end;
-    for( boost::filesystem::directory_iterator dir_itr( full_path ); 
+    for( boost::filesystem::directory_iterator dir_itr( full_path );
          dir_itr != dir_end; ++dir_itr )
     {
       std::string file = dir_itr->path().filename().string();
@@ -675,7 +671,7 @@ std::string ApplicationInterface::find_project_file ( std::string path )
           break;
         }
       }
-    
+
       if ( found_s3d_file ) break;
     }
   }
@@ -684,35 +680,37 @@ std::string ApplicationInterface::find_project_file ( std::string path )
 
 bool ApplicationInterface::open_initial_project ( std::string filename )
 {
+  filename = this->find_project_file ( filename );
+
   if ( filename == "" ) return false;
-  
+
   std::string extension = boost::filesystem::extension( boost::filesystem::path( filename ) );
 
-  Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
+  Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
                              InterfaceManager::Instance()->splash_screen_visibility_state_, false );
-  
+
   if ( ( extension == ".nrrd" ) || ( extension == ".nhdr" ) )
   {
     // No location is set, so no project will be generated on disk for now
-    ActionNewProject::Dispatch( Core::Interface::GetWidgetActionContext(), 
+    ActionNewProject::Dispatch( Core::Interface::GetWidgetActionContext(),
                                 "", "Untitled Project" );
     LayerIOFunctions::ImportFiles( NULL, filename );
     return true;
   }
-  
-  std::vector<std::string> project_file_extensions = Project::GetProjectFileExtensions(); 
+
+  std::vector<std::string> project_file_extensions = Project::GetProjectFileExtensions();
   if ( std::find( project_file_extensions.begin(), project_file_extensions.end(), extension ) !=
        project_file_extensions.end() )
   {
-    ActionLoadProject::Dispatch( Core::Interface::GetWidgetActionContext(), filename ); 
+    ActionLoadProject::Dispatch( Core::Interface::GetWidgetActionContext(), filename );
   }
-  
+
   std::vector<std::string> project_folder_extensions = Project::GetProjectPathExtensions();
   if ( std::find( project_folder_extensions.begin(), project_folder_extensions.end(), extension ) !=
        project_folder_extensions.end() )
   {
-    ActionLoadProject::Dispatch( Core::Interface::GetWidgetActionContext(), filename ); 
-  } 
+    ActionLoadProject::Dispatch( Core::Interface::GetWidgetActionContext(), filename );
+  }
   return true;
 }
 
