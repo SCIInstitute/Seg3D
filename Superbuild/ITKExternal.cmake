@@ -84,7 +84,7 @@ IF(BUILD_MOSAIC_TOOLS)
   )
 ENDIF()
 
-SET(itk_GIT_TAG "origin/master")
+SET(itk_GIT_TAG "origin/osx_fix")
 
 # If CMake ever allows overriding the checkout command or adding flags,
 # git checkout -q will silence message about detached head (harmless).
