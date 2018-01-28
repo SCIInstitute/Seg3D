@@ -33,6 +33,7 @@
 #ifdef BUILD_WITH_PYTHON
 #include <Python.h>
 #include <Core/Python/PythonInterpreter.h>
+#include <Core/Python/PythonCLI.h>
 #include <Application/Socket/ActionSocket.h>
 
 #include "ActionPythonWrapperRegistration.h"
@@ -88,6 +89,7 @@ void printUsage()
   std::cout << "  --version               - Version number." << std::endl;
   std::cout << "  --socket=SCALAR         - Open a socket on the given port number." << std::endl;
   std::cout << "  --python=FILE           - Run the python script in the given file." << std::endl;
+  std::cout << "  --nosplash              - Do not display the splash screen." << std::endl;
   std::cout << "  --help                  - Print this usage message." << std::endl << std::endl;
 }
 
@@ -119,6 +121,11 @@ int main( int argc, char **argv )
     return 0;
   }
 
+  std::string file_to_view = "";
+  Core::Application::Instance()->check_command_line_parameter( "file_to_open_on_start", file_to_view );
+  bool display_splash_screen = !Core::Application::Instance()->is_command_line_parameter( "nosplash");
+  std::cout << display_splash_screen << std::endl;
+
   // -- Send message to revolving log file --
   // Logs messages in response to Log::Instance()->post_log_signal_
   Core::RolloverLogFile event_log( Core::LogMessageType::ALL_E );
@@ -145,10 +152,6 @@ int main( int argc, char **argv )
 
   // -- Setup the QT Interface Layer --
   if ( !( QtUtils::QtApplication::Instance()->setup( argc, argv ) ) ) return ( -1 );
-
-  // -- Warn user about being an alpha/beta version --
-  std::string file_to_view = "";
-  Core::Application::Instance()->check_command_line_parameter( "file_to_open_on_start", file_to_view );
 
   {
 /*
@@ -213,8 +216,8 @@ int main( int argc, char **argv )
   std::string python_script;
   if ( Core::Application::Instance()->check_command_line_parameter( "python", python_script ) )
   {
-    CORE_LOG_ERROR(python_script);
-    Core::PythonInterpreter::Instance()->run_file(python_script);
+    Core::PythonCLI::Instance()->execute_file(python_script);
+    display_splash_screen = false;
   }
 
 #else
@@ -230,11 +233,11 @@ int main( int argc, char **argv )
   }
 #endif
 
-  // -- Setup Application Interface Window --
-//  std::string file_to_view = "";
-//  Core::Application::Instance()->check_command_line_parameter( "file_to_open_on_start", file_to_view );
-
-  ApplicationInterface* app_interface = new ApplicationInterface( file_to_view );
+  ApplicationInterface* app_interface = new ApplicationInterface();
+  bool opened_init_project = app_interface->open_initial_project( file_to_view );
+  if (!opened_init_project && display_splash_screen) {
+      app_interface->activate_splash_screen();
+  }
 
   // Show the full interface
   app_interface->show();
