@@ -25,7 +25,9 @@
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
  */
- 
+
+#include <locale>
+
 // Core includes
 #include <Core/Utils/Log.h>
 #include <Core/Utils/StringUtil.h>
@@ -47,8 +49,8 @@ public:
   Nrrd* nrrd_;
 
   // Do we need to clear the nrrd when done
-  bool own_data_; 
-  
+  bool own_data_;
+
   // Location of the data block from which this nrrd was derived
   DataBlockHandle data_block_;
 };
@@ -75,7 +77,7 @@ NrrdData::NrrdData( DataBlockHandle data_block ) :
 
   if ( this->private_->nrrd_ )
   {
-    nrrdWrap_va( this->private_->nrrd_, data_block->get_data(), 
+    nrrdWrap_va( this->private_->nrrd_, data_block->get_data(),
       GetNrrdDataType( data_block->get_data_type() ), 3,
       data_block->get_nx(), data_block->get_ny(),
       data_block->get_nz() );
@@ -97,7 +99,7 @@ NrrdData::NrrdData( DataBlockHandle data_block, GridTransform transform, bool no
 
   if ( this->private_->nrrd_ )
   {
-    nrrdWrap_va( this->private_->nrrd_, data_block->get_data(), 
+    nrrdWrap_va( this->private_->nrrd_, data_block->get_data(),
       GetNrrdDataType( data_block->get_data_type() ), 3,
       data_block->get_nx(), data_block->get_ny(),
       data_block->get_nz() );
@@ -117,7 +119,7 @@ NrrdData::~NrrdData()
   {
     nrrdNix( this->private_->nrrd_ );
   }
-  
+
   this->private_->data_block_.reset();
 }
 
@@ -137,11 +139,11 @@ bool NrrdData::own_data() const
   return this->private_->own_data_;
 }
 
-// Represents grid transform using Teem's concept of space origin and space direction.  This 
-// representation is independent of the cell- versus node-centering of the data 
-// (http://teem.sourceforge.net/nrrd/format.html#spaceorigin).  However, the the 
+// Represents grid transform using Teem's concept of space origin and space direction.  This
+// representation is independent of the cell- versus node-centering of the data
+// (http://teem.sourceforge.net/nrrd/format.html#spaceorigin).  However, the the
 // cell- versus node-centering of the data does affect the values used for space
-// origin and space direction in the case where axis mins and/or axis maxs are used 
+// origin and space direction in the case where axis mins and/or axis maxs are used
 // (http://teem.sourceforge.net/nrrd/format.html#centers)
 Transform NrrdData::get_transform() const
 {
@@ -149,7 +151,7 @@ Transform NrrdData::get_transform() const
   transform.load_identity();
 
   // Step 1: Find domain axes
-  // Note: nrrdDomainAxesGet is based on the per-axis "kind" field.  If this field is not set then 
+  // Note: nrrdDomainAxesGet is based on the per-axis "kind" field.  If this field is not set then
   // the axis is assumed to be a domain axis, even if it is in fact a 3-component color value,
   // for example.
   unsigned int axis_idx_array[ NRRD_DIM_MAX ];
@@ -167,18 +169,18 @@ Transform NrrdData::get_transform() const
 
   if( space_dim > 0 ) // We have the space direction info already
   {
-    
+
     // For space direction for each axis
     for( size_t axis_lookup = 0; axis_lookup < axis_idx_num; axis_lookup++ )
     {
       for( size_t space_dir_idx = 0; space_dir_idx < space_dim; space_dir_idx++ )
       {
         size_t axis_idx = axis_idx_array[ axis_lookup ];
-        space_directions[ axis_lookup ][ space_dir_idx ] = 
+        space_directions[ axis_lookup ][ space_dir_idx ] =
           this->private_->nrrd_->axis[ axis_idx ].spaceDirection[ space_dir_idx ];
       }
     }
-    
+
     if( axis_idx_num == 2 && space_dim == 3 ) // Special case: 2D nrrd with 3D space dimensions
     {
       // Calculate third space direction as the cross product of the first two
@@ -192,14 +194,14 @@ Transform NrrdData::get_transform() const
     {
       size_t axis_idx = axis_idx_array[ axis_lookup ];
       NrrdAxisInfo nrrd_axis_info = this->private_->nrrd_->axis[ axis_idx ];
-      double spacing = nrrdDefaultSpacing; 
+      double spacing = nrrdDefaultSpacing;
       if( IsFinite( nrrd_axis_info.spacing ) ) // Spacing
       {
         spacing = nrrd_axis_info.spacing;
       }
       else if( IsFinite( nrrd_axis_info.min ) && IsFinite( nrrd_axis_info.max ) ) // Min & max
       {
-        spacing = NRRD_SPACING( nrrd_axis_info.center, nrrd_axis_info.min, 
+        spacing = NRRD_SPACING( nrrd_axis_info.center, nrrd_axis_info.min,
           nrrd_axis_info.max, nrrd_axis_info.size );
       }
       space_directions[ axis_lookup ] *= spacing;
@@ -212,14 +214,14 @@ Transform NrrdData::get_transform() const
   {
     for( size_t space_origin_idx = 0; space_origin_idx < space_dim; space_origin_idx++ )
     {
-      space_origin[ space_origin_idx ] = 
+      space_origin[ space_origin_idx ] =
         this->private_->nrrd_->spaceOrigin[ space_origin_idx ];
     }
   }
   else // If possible, calculate space origin from mins, maxs, spacing
   {
     double origin_array[ NRRD_DIM_MAX ];
-    unsigned int ret_val = nrrdOriginCalculate( this->private_->nrrd_, axis_idx_array, 
+    unsigned int ret_val = nrrdOriginCalculate( this->private_->nrrd_, axis_idx_array,
       axis_idx_num, nrrdCenterNode, origin_array );
     if( ret_val == nrrdOriginStatusOkay )
     {
@@ -250,7 +252,7 @@ Transform NrrdData::get_transform() const
   }
 
   // Step 4: Build transform from space origin and space directions
-  transform.load_basis( space_origin, space_directions[ 0 ], space_directions[ 1 ], 
+  transform.load_basis( space_origin, space_directions[ 0 ], space_directions[ 1 ],
     space_directions[ 2 ] );
 
   return transform;
@@ -259,7 +261,7 @@ Transform NrrdData::get_transform() const
 
 GridTransform NrrdData::get_grid_transform() const
 {
-  Core::GridTransform grid_transform( this->get_nx(), this->get_ny(), this->get_nz(), 
+  Core::GridTransform grid_transform( this->get_nx(), this->get_ny(), this->get_nz(),
     this->get_transform(), this->get_originally_node_centered() );
   return grid_transform;
 }
@@ -270,7 +272,7 @@ void NrrdData::set_transform( GridTransform& transform, bool no_downgrade )
 
   // Restore original centering
   int centerdata[ NRRD_DIM_MAX ];
-  unsigned int centering = 
+  unsigned int centering =
     transform.get_originally_node_centered() ? nrrdCenterNode : nrrdCenterCell;
   for ( int p = 0; p < NRRD_DIM_MAX; p++ )
   {
@@ -351,7 +353,7 @@ void NrrdData::set_transform( GridTransform& transform, bool no_downgrade )
         }
       }
     }
-    
+
     if ( is_aligned_nrrd )
     {
       // Down grade nrrd
@@ -360,25 +362,25 @@ void NrrdData::set_transform( GridTransform& transform, bool no_downgrade )
       // Get domain axes
       unsigned int axis_idx_array[ NRRD_DIM_MAX ];
       unsigned int axis_idx_num = nrrdDomainAxesGet( nrrd, axis_idx_array );
-      
-      // nrrdOrientationReduce doesn't handle centering properly (or at all).  It puts the 
+
+      // nrrdOrientationReduce doesn't handle centering properly (or at all).  It puts the
       // min at the origin regardless of centering.  If cell-centered, need to adjust min.
       for( size_t axis_lookup = 0; axis_lookup < axis_idx_num; axis_lookup++ )
       {
         size_t axis_idx = axis_idx_array[ axis_lookup ];
         if( nrrd->axis[ axis_idx ].center == nrrdCenterCell )
         {
-          if( IsFinite( nrrd->axis[ axis_idx ].min ) && 
+          if( IsFinite( nrrd->axis[ axis_idx ].min ) &&
             IsFinite( nrrd->axis[ axis_idx ].spacing ) )
           {
-            nrrd->axis[ axis_idx ].min -= ( nrrd->axis[ axis_idx ].spacing / 2.0 ); 
+            nrrd->axis[ axis_idx ].min -= ( nrrd->axis[ axis_idx ].spacing / 2.0 );
           }
         }
       }
 
       for ( size_t i = 0; i < static_cast<size_t>( nrrd->dim ); i++ )
       {
-        nrrd->axis[ i ].kind = nrrdKindUnknown; 
+        nrrd->axis[ i ].kind = nrrdKindUnknown;
       }
     }
   }
@@ -388,7 +390,7 @@ void NrrdData::set_histogram( const Histogram& histogram )
 {
   if ( this->private_->nrrd_ )
   {
-    nrrdKeyValueAdd( this->private_->nrrd_, "seg3d-histogram", 
+    nrrdKeyValueAdd( this->private_->nrrd_, "seg3d-histogram",
       ExportToString( histogram ).c_str() );
   }
 }
@@ -409,7 +411,7 @@ Histogram NrrdData::get_histogram( bool trust_meta_data )
     free ( value );
     }
   }
-  
+
   switch ( this->get_data_type() )
   {
     case Core::DataType::CHAR_E:
@@ -442,7 +444,7 @@ Histogram NrrdData::get_histogram( bool trust_meta_data )
 
 size_t NrrdData::get_nx() const
 {
-  if ( this->private_->nrrd_ && this->private_->nrrd_->dim > 0 ) 
+  if ( this->private_->nrrd_ && this->private_->nrrd_->dim > 0 )
   {
     return this->private_->nrrd_->axis[ 0 ].size;
   }
@@ -451,7 +453,7 @@ size_t NrrdData::get_nx() const
 
 size_t NrrdData::get_ny() const
 {
-  if ( this->private_->nrrd_ && this->private_->nrrd_->dim > 1 ) 
+  if ( this->private_->nrrd_ && this->private_->nrrd_->dim > 1 )
   {
     return this->private_->nrrd_->axis[ 1 ].size;
   }
@@ -460,7 +462,7 @@ size_t NrrdData::get_ny() const
 
 size_t NrrdData::get_nz() const
 {
-  if ( this->private_->nrrd_ && this->private_->nrrd_->dim > 2 ) 
+  if ( this->private_->nrrd_ && this->private_->nrrd_->dim > 2 )
   {
     return this->private_->nrrd_->axis[ 2 ].size;
   }
@@ -493,7 +495,7 @@ DataType NrrdData::get_data_type() const
 
 bool NrrdData::get_originally_node_centered() const
 {
-  if ( this->private_->nrrd_ && this->private_->nrrd_->dim > 0 ) 
+  if ( this->private_->nrrd_ && this->private_->nrrd_->dim > 0 )
   {
     // unknown = node-centered to match unu resample
     return ( this->private_->nrrd_->axis[ 0 ].center != nrrdCenterCell );
@@ -510,7 +512,7 @@ bool NrrdData::LoadNrrd( const std::string& filename, NrrdDataHandle& nrrddata, 
   Nrrd* nrrd = nrrdNew();
     boost::filesystem::path nrrd_path = boost::filesystem::path( filename ).parent_path();
     std::string filename_only = boost::filesystem::path( filename ).filename().string();
-    
+
     boost::system::error_code ec;
     boost::filesystem::path current_path = boost::filesystem::current_path( ec );
     if ( ec )
@@ -557,7 +559,7 @@ bool NrrdData::LoadNrrd( const std::string& filename, NrrdDataHandle& nrrddata, 
     nrrd->axis[ 2 ].kind = nrrd->axis[ 1].kind;
     nrrd->axis[ 2 ].label = 0;
     nrrd->axis[ 2 ].units = 0;
-    
+
     if ( nrrd->spaceDim == 2 )
     {
       nrrd->spaceDim = 3;
@@ -566,7 +568,7 @@ bool NrrdData::LoadNrrd( const std::string& filename, NrrdDataHandle& nrrddata, 
       nrrd->axis[ 2 ].spaceDirection[ 0 ] = 0.0;
       nrrd->axis[ 2 ].spaceDirection[ 1 ] = 0.0;
       nrrd->axis[ 2 ].spaceDirection[ 2 ] = 1.0;
-       
+
       nrrd->spaceUnits[ 2 ] = 0;
       nrrd->spaceOrigin[ 2 ] = 0.0;
       nrrd->measurementFrame[ 0 ][ 2 ] = 0.0;
@@ -578,15 +580,15 @@ bool NrrdData::LoadNrrd( const std::string& filename, NrrdDataHandle& nrrddata, 
     else if ( nrrd->spaceDim == 3 )
     {
       // Build two vectors, take cross product to find third space direction
-      Vector space_dir_0( nrrd->axis[ 0 ].spaceDirection[ 0 ], 
+      Vector space_dir_0( nrrd->axis[ 0 ].spaceDirection[ 0 ],
         nrrd->axis[ 0 ].spaceDirection[ 1 ], nrrd->axis[ 0 ].spaceDirection[ 2 ] );
-      Vector space_dir_1( nrrd->axis[ 1 ].spaceDirection[ 0 ], 
+      Vector space_dir_1( nrrd->axis[ 1 ].spaceDirection[ 0 ],
         nrrd->axis[ 1 ].spaceDirection[ 1 ], nrrd->axis[ 1 ].spaceDirection[ 2 ] );
       Vector space_dir_2 = Cross( space_dir_0, space_dir_1 );
 
       nrrd->axis[ 2 ].spaceDirection[ 0 ] = space_dir_2.x();
       nrrd->axis[ 2 ].spaceDirection[ 1 ] = space_dir_2.y();
-      nrrd->axis[ 2 ].spaceDirection[ 2 ] = space_dir_2.z();    
+      nrrd->axis[ 2 ].spaceDirection[ 2 ] = space_dir_2.z();
     }
   }
 
@@ -609,7 +611,7 @@ bool NrrdData::LoadNrrd( const std::string& filename, NrrdDataHandle& nrrddata, 
         {
           free( nrrd->axis[ j ].units );
         }
-      
+
         for ( unsigned int k = j + 1; k < nrrd->dim; k++ )
         {
           nrrd->axis[ k - 1 ] = nrrd->axis[ k ];
@@ -618,7 +620,7 @@ bool NrrdData::LoadNrrd( const std::string& filename, NrrdDataHandle& nrrddata, 
       }
     }
   }
-  
+
   error = "";
   nrrddata = NrrdDataHandle( new NrrdData( nrrd ) );
   return true;
@@ -643,7 +645,7 @@ bool NrrdData::SaveNrrd( const std::string& filename,
 
   // Turn on compression if the user wants it.
   if ( compress )
-  { 
+  {
     nrrdIoStateEncodingSet( nio, nrrdEncodingGzip );
     nrrdIoStateSet( nio,  nrrdIoStateZlibLevel, level );
   }
@@ -654,8 +656,12 @@ bool NrrdData::SaveNrrd( const std::string& filename,
   }
 
   // teem library should check for valid nrrd (including file extension?)
+
+  std::locale current_locale; // automatically populated with the current locale
+  std::locale::global(std::locale("C"));
   if ( nrrdSave( filename.c_str(), nrrddata->nrrd(), nio ) )
   {
+    std::locale::global(current_locale);
     char *err = biffGet( NRRD );
     error = "Error writing file: " + filename + " : " + std::string( err );
     free( err );
@@ -663,6 +669,7 @@ bool NrrdData::SaveNrrd( const std::string& filename,
 
     return false;
   }
+  std::locale::global(current_locale);
 
   nio = nrrdIoStateNix( nio );
 
