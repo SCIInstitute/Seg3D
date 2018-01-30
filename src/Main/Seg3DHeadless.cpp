@@ -27,59 +27,55 @@
  */
 
 #ifdef _MSC_VER
-#pragma warning( disable: 4244 4267 )
+#pragma warning( disable: 4244 )
 #endif
 
-// Core includes
-#include <Core/Application/Application.h>
+#include <csignal>
+#include <string>
 
-// QtUtils includes
-#include <QtUtils/Utils/QtApplication.h>
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/thread/thread.hpp>
 
-#include "Seg3DGui.h"
+#include "Core/Utils/StringUtil.h"
+#include <Core/Utils/Log.h>
+
 #include "Seg3DHeadless.h"
 
-///////////////////////////////////////////////////////////
-// Main Seg3D entry point
-///////////////////////////////////////////////////////////
-
-using namespace Seg3D;
-
-
-int main( int argc, char **argv )
+namespace Seg3D
 {
-  Core::Application::Instance()->parse_command_line_parameters( argc, argv );
-  Seg3DBase* app = NULL;
-  bool headless = Core::Application::Instance()->is_command_line_parameter( "headless" );
-  if ( headless )
-    app = new Seg3DHeadless();
-  else
-    app = new Seg3DGui();
 
-  if (app->information_only())
-    return 0;
-
-  if (!app->initialize())
-    return -1;
-
-  if (!headless &&
-      !( QtUtils::QtApplication::Instance()->setup( argc, argv ) ) )
-    return ( -1 );
-
-  app->run();
-  app->close();
-
-  delete app;
-
-  if (headless)
-    return ( 0 );
-
-#if defined (_WIN32) || defined(__APPLE__)
-  return ( 0 );
-#else
-    // NOTE: On Linux Qt tends to crash in one of its static destructors. Since we do not need these
-    // destructors to be executed, we just exit in stead. For Windows we return to WinMain, hence
-    // we need to return in that case.
-    exit ( 0 );
-#endif
+bool seg3d_forever = true;
+static void sighandler(int sig)
+{
+  CORE_LOG_MESSAGE( std::string("Received signal: ") + Core::ExportToString( sig ) );
+  seg3d_forever = false;
 }
+
+void Seg3DHeadless::warning(std::string& message)
+{
+  CORE_LOG_WARNING(message);
+}
+
+bool Seg3DHeadless::keep_running()
+{
+  if (this->python_script != "")
+    return false;
+  else
+    return seg3d_forever;
+}
+
+bool Seg3DHeadless::run()
+{
+  signal(SIGABRT, &sighandler);
+  signal(SIGTERM, &sighandler);
+  signal(SIGINT, &sighandler);
+  while(this->keep_running())
+  {
+    // do nothing, check every second for a termination signal
+    boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+  }
+
+  return true;
+}
+
+} //namespace Seg3D
