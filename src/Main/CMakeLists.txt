@@ -33,11 +33,11 @@
 SET(MAIN_SRCS
   main.cc
   Seg3DBase.h
-  Seg3DBase.cpp
+  Seg3DBase.cc
   Seg3DGui.h
-  Seg3DGui.cpp
+  Seg3DGui.cc
   Seg3DHeadless.h
-  Seg3DHeadless.cpp
+  Seg3DHeadless.cc
 )
 
 ###########################################
