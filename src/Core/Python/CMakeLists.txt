@@ -41,7 +41,7 @@ SET(CORE_PYTHON_SRCS
   ToPythonConverters.h
   ToPythonConverters.cc
   PythonCLI.h
-  PythonCLI.cpp
+  PythonCLI.cc
 )
 
 IF(WIN32)
