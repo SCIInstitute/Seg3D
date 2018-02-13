@@ -29,7 +29,7 @@
 // HDF5 includes
 #include <itk_hdf5.h>
 #include <itk_H5Cpp.h>
-#include <H5LTpublic.h>
+#include <itkhdf5/H5LTpublic.h>
 
 // Core includes
 #include <Core/DataBlock/StdDataBlock.h>

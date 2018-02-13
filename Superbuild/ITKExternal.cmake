@@ -31,7 +31,8 @@ SET(itk_ARGS
   "-DITK_BUILD_SHARED_LIBS:BOOL=OFF"
   "-DBUILD_EXAMPLES:BOOL=OFF"
   "-DBUILD_TESTING:BOOL=OFF"
-  "-DITK_USE_SYSTEM_HDF5:BOOL=ON"
+  "-DITK_USE_SYSTEM_HDF5:BOOL=OFF"
+  "-DITK_INSTALL_NO_DEVELOPMENT:BOOL=OFF"
 )
 
 IF(TRAVIS_BUILD)
@@ -85,7 +86,7 @@ IF(BUILD_MOSAIC_TOOLS)
   )
 ENDIF()
 
-SET(itk_GIT_TAG "origin/itk-mirror-4.12.2")
+SET(itk_GIT_TAG "origin/itk-4.13.0")
 
 # If CMake ever allows overriding the checkout command or adding flags,
 # git checkout -q will silence message about detached head (harmless).
@@ -99,6 +100,6 @@ ExternalProject_Add(ITK_external
 
 # hardcoded, since we need this before ITK's configure step
 ExternalProject_Get_Property(ITK_external INSTALL_DIR)
-SET(ITK_DIR "${INSTALL_DIR}/lib/cmake/ITK-4.12" CACHE PATH "")
+SET(ITK_DIR "${INSTALL_DIR}/lib/cmake/ITK-4.13" CACHE PATH "")
 
 MESSAGE(STATUS "ITK_DIR=${ITK_DIR}")
