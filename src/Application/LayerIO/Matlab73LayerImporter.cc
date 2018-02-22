@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
- 
+
  The MIT License
- 
+
  Copyright (c) 2016 Scientific Computing and Imaging Institute,
  University of Utah.
- 
- 
+
+
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -91,18 +91,18 @@ public:
   // SCAN_MAT_FILE:
   // Scan whether there is a compatible object in the mat file
   bool scan_mat_file( const std::string& filename );
-  
+
   // IMPORT_MAT_STRUCT:
   //bool import_mat_struct( H5::Group& group, std::string& error );
-  
+
   // IMPORT_MAT_ARRAY:
   // Import the matlab array into the program.
-  bool import_mat_array( H5::DataSet& dataset, std::string& error );  
+  bool import_mat_array( H5::DataSet& dataset, std::string& error );
 
   // IMPORT_MAT_FILE:
   // Scan through the file and now import the data
   bool import_mat_file( const std::string& filename );
-  
+
   // CONVERT_TYPE:
   // Convert the matlabio types to Seg3D types
   Core::DataType convert_type( const std::string& matlab_type );
@@ -116,7 +116,7 @@ public:
   bool object_is_struct_;
 
   const std::string ROOT_GROUP_C;
-};    
+};
 
 class H5ObjectWrapperPrivate
 {
@@ -154,7 +154,7 @@ Core::DataType Matlab73LayerImporterPrivate::convert_type( const std::string& ma
 bool Matlab73LayerImporterPrivate::scan_mat_object( hid_t obj_id, H5O_type_t type, H5::Group& parent_group, std::string& error )
 {
   error = "";
-  
+
   if ( H5Aexists(obj_id, "MATLAB_sparse") > 0)
   {
     error = "importing sparse matrices is not supported";
@@ -170,7 +170,7 @@ bool Matlab73LayerImporterPrivate::scan_mat_object( hid_t obj_id, H5O_type_t typ
     error = "error opening dataset MATLAB_class attribute";
     return false;
   }
-  
+
   char attribute_data[BUFFER_SIZE];
 
   if (H5LTget_attribute_string(mat_class_id, ".", "MATLAB_class", attribute_data ) < 0)
@@ -196,7 +196,7 @@ bool Matlab73LayerImporterPrivate::scan_mat_object( hid_t obj_id, H5O_type_t typ
 bool Matlab73LayerImporterPrivate::scan_mat_array( hid_t obj_id, const char *attribute_data, std::string& error )
 {
   error = "";
-  
+
   hsize_t storage_size = H5Dget_storage_size(obj_id);
   if (storage_size == 0)
   {
@@ -235,7 +235,7 @@ bool Matlab73LayerImporterPrivate::scan_mat_array( hid_t obj_id, const char *att
     else
       vdims.push_back(1);
   }
-  
+
   this->grid_transform_ = Core::GridTransform(static_cast<size_t>( vdims[ 2 ] ),
                                               static_cast<size_t>( vdims[ 1 ] ),
                                               static_cast<size_t>( vdims[ 0 ] ));
@@ -254,16 +254,16 @@ bool Matlab73LayerImporterPrivate::scan_mat_struct( hid_t obj_id, H5::Group& par
   {
     H5::Group group(parent_group.openGroup(this->matlab_object_name_));
     hid_t group_id = group.getId();
-    
+
     const hsize_t num_obj = group.getNumObjs();
     if (num_obj < 0)
     {
       error = "H5Gget_num_objs failed";
       return false;
     }
-    
+
     for ( hsize_t i = 0; i < num_obj; ++i)
-    {        
+    {
       // there doesn't seem to be another way to do this through the C++ interface
       hid_t obj_id;
       if ( (obj_id = H5Oopen_by_idx(group_id, ".", H5_INDEX_NAME, H5_ITER_NATIVE, i, H5P_DEFAULT)) < 0 )
@@ -272,14 +272,14 @@ bool Matlab73LayerImporterPrivate::scan_mat_struct( hid_t obj_id, H5::Group& par
         return false;
       }
       H5ObjectWrapperPrivate object_wrapper(obj_id);
-      
+
       H5O_info_t obj_info;
       if (H5Oget_info(obj_id, &obj_info) < 0)
       {
         error = "H5Oopen_by_idx failed";
         return false;
       }
-      
+
       H5std_string obj_name = group.getObjnameByIdx(i);
 
       // TODO: could not find a Matlab dataset with an 'axis' field
@@ -341,7 +341,7 @@ bool Matlab73LayerImporterPrivate::scan_mat_file( const std::string& filename )
     }
 
     for ( hsize_t i = 0; i < num_obj; ++i)
-    {        
+    {
       // there doesn't seem to be another way to do this through the C++ interface
       hid_t obj_id;
       if ( (obj_id = H5Oopen_by_idx(root_id, ".", H5_INDEX_NAME, H5_ITER_NATIVE, i, H5P_DEFAULT)) < 0 )
@@ -401,7 +401,7 @@ bool Matlab73LayerImporterPrivate::scan_mat_file( const std::string& filename )
         if (scan_mat_object( obj_id, obj_info.type, root_group, error ))
         {
           return true;
-        }       
+        }
       }
     }
   }
@@ -430,7 +430,7 @@ bool Matlab73LayerImporterPrivate::scan_mat_file( const std::string& filename )
 bool Matlab73LayerImporterPrivate::import_mat_array( H5::DataSet& dataset, std::string& error )
 {
   // Generate a new data block
-  this->data_block_ = Core::StdDataBlock::New( this->grid_transform_.get_nx(), 
+  this->data_block_ = Core::StdDataBlock::New( this->grid_transform_.get_nx(),
                     this->grid_transform_.get_ny(),
                     this->grid_transform_.get_nz(),
                     this->data_type_ );
@@ -496,7 +496,7 @@ bool Matlab73LayerImporterPrivate::import_mat_array( H5::DataSet& dataset, std::
       unsigned char* data = reinterpret_cast<unsigned char*>( this->data_block_->get_data() );
       dataset.read(data, H5::PredType::NATIVE_UCHAR, memspace, dataspace);
       break;
-    }     
+    }
     case Core::DataType::SHORT_E:
     {
       short* data = reinterpret_cast<short*>( this->data_block_->get_data() );
@@ -535,7 +535,7 @@ bool Matlab73LayerImporterPrivate::import_mat_array( H5::DataSet& dataset, std::
     }
     default:
       error = "trying to read unknown data type";
-      return false;       
+      return false;
     }
     return true;
   }
@@ -556,9 +556,9 @@ bool Matlab73LayerImporterPrivate::import_mat_file( const std::string& filename 
 {
   // Check if we already read the data.
   if ( this->read_data_ ) return true;
-  
+
   // Ensure that we read the header of this file.
-  if ( ! this->read_header_ ) 
+  if ( ! this->read_header_ )
   {
     this->importer_->set_error( "Failed to read header of Matlab file." );
     return false;
@@ -570,17 +570,17 @@ bool Matlab73LayerImporterPrivate::import_mat_file( const std::string& filename 
   try
   {
     H5::Exception::dontPrint();
-    
+
     H5::H5File file(filename.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
     H5::Group root_group(file.openGroup(ROOT_GROUP_C.c_str()));
     hid_t root_id = root_group.getId();
-    
+
     CORE_LOG_DEBUG( std::string( "H5Fopen " ) + filename );
 
     if (this->object_is_struct_)
     {
       H5::Group group = root_group.openGroup(this->matlab_object_name_);
-      dataset = group.openDataSet(this->matlab_dataset_name_);      
+      dataset = group.openDataSet(this->matlab_dataset_name_);
     }
     else
     {
@@ -609,7 +609,7 @@ bool Matlab73LayerImporterPrivate::import_mat_file( const std::string& filename 
   {
     error = "Matlab v7.3 Importer crashed while reading file.";
   }
-  
+
   // If the cause is known report an error to the user
   if ( ! error.empty() )
   {
