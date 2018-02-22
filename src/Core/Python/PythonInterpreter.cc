@@ -608,8 +608,8 @@ void PythonInterpreter::run_file( const std::string& file_name )
     return;
   }
 
-  FILE* fp = fopen( file_name.c_str(), "r" );
-  if ( fp != 0 )
+  FILE* fp = _Py_fopen(file_name.c_str(), "r+");
+  if ( fp != NULL )
   {
     PyRun_SimpleFileEx( fp, file_name.c_str(), 1 );
   }

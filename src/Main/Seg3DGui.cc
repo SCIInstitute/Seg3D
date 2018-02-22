@@ -27,59 +27,52 @@
  */
 
 #ifdef _MSC_VER
-#pragma warning( disable: 4244 4267 )
+#pragma warning( disable: 4244 )
 #endif
 
-// Core includes
-#include <Core/Application/Application.h>
+#include <string>
+
+#include <Core/Utils/Log.h>
+
+// Interface includes
+#include <Interface/Application/ApplicationInterface.h>
 
 // QtUtils includes
 #include <QtUtils/Utils/QtApplication.h>
 
 #include "Seg3DGui.h"
-#include "Seg3DHeadless.h"
 
-///////////////////////////////////////////////////////////
-// Main Seg3D entry point
-///////////////////////////////////////////////////////////
-
-using namespace Seg3D;
-
-
-int main( int argc, char **argv )
+namespace Seg3D
 {
-  Core::Application::Instance()->parse_command_line_parameters( argc, argv );
-  Seg3DBase* app = NULL;
-  bool headless = Core::Application::Instance()->is_command_line_parameter( "headless" );
-  if ( headless )
-    app = new Seg3DHeadless();
-  else
-    app = new Seg3DGui();
 
-  if (app->information_only())
-    return 0;
-
-  if (!app->initialize())
-    return -1;
-
-  if (!headless &&
-      !( QtUtils::QtApplication::Instance()->setup( argc, argv ) ) )
-    return ( -1 );
-
-  app->run();
-  app->close();
-
-  delete app;
-
-  if (headless)
-    return ( 0 );
-
-#if defined (_WIN32) || defined(__APPLE__)
-  return ( 0 );
-#else
-    // NOTE: On Linux Qt tends to crash in one of its static destructors. Since we do not need these
-    // destructors to be executed, we just exit in stead. For Windows we return to WinMain, hence
-    // we need to return in that case.
-    exit ( 0 );
-#endif
+void Seg3DGui::warning(std::string& message)
+{
+  QMessageBox::information( 0,
+    QString::fromStdString( Core::Application::GetApplicationNameAndVersion() ),
+    QString::fromStdString( message ) );
 }
+
+bool Seg3DGui::run()
+{
+  ApplicationInterface* app_interface = new ApplicationInterface();
+
+  bool opened_init_project = app_interface->open_initial_project( this->file_to_view );
+  if (!opened_init_project && this->display_splash_screen) {
+      app_interface->activate_splash_screen();
+  }
+
+  // Show the full interface
+  app_interface->show();
+
+  // Put the interface on top of all the other windows
+  app_interface->raise();
+
+  // The application window needs the qApplication as parent, which is
+  // defined in the QtApplication, which integrates the Qt eventloop with
+  // the interface eventloop of the Application layer.
+
+  // -- Run QT event loop --
+  return QtUtils::QtApplication::Instance()->exec();
+}
+
+} //namespace Seg3D
