@@ -30,6 +30,8 @@
 #pragma warning( disable: 4244 4267 )
 #endif
 
+#include <locale>
+
 // Core includes
 #include <Core/Application/Application.h>
 
@@ -65,6 +67,8 @@ int main( int argc, char **argv )
   if (!headless &&
       !( QtUtils::QtApplication::Instance()->setup( argc, argv ) ) )
     return ( -1 );
+
+  std::locale::global(std::locale("C"));
 
   app->run();
   app->close();
