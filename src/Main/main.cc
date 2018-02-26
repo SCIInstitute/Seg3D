@@ -30,9 +30,6 @@
 #pragma warning( disable: 4244 4267 )
 #endif
 
-#include <thread>
-#include <chrono>
-
 // Core includes
 #include <Core/Application/Application.h>
 
@@ -63,7 +60,7 @@ int main( int argc, char **argv )
   }
 
   if (app->information_only())
-	  return 0; 
+	return 0; 
 
   if (!app->initialize())
     return -1;
