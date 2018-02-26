@@ -30,6 +30,9 @@
 #pragma warning( disable: 4244 4267 )
 #endif
 
+#include <thread>
+#include <chrono>
+
 // Core includes
 #include <Core/Application/Application.h>
 
@@ -54,17 +57,16 @@ int main( int argc, char **argv )
   if ( headless )
     app = new Seg3DHeadless();
   else
-    app = new Seg3DGui();
+  {
+	app = new Seg3DGui();
+	if (!(QtUtils::QtApplication::Instance()->setup(argc, argv))) return (-1);
+  }
 
   if (app->information_only())
-    return 0;
+	  return 0; 
 
   if (!app->initialize())
     return -1;
-
-  if (!headless &&
-      !( QtUtils::QtApplication::Instance()->setup( argc, argv ) ) )
-    return ( -1 );
 
   app->run();
   app->close();
