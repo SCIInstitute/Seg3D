@@ -640,7 +640,11 @@ void ApplicationInterface::handle_osx_file_open_event (std::string filename)
   {
     std::vector<std::string> project_file_extensions = Project::GetProjectFileExtensions();
 
-    this->open_initial_project (filename);
+    //this->open_initial_project (filename);
+     
+    if (this->open_initial_project (filename)){
+      this->private_->splash_screen_->close();
+    }
   }
 }
 
