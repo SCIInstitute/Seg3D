@@ -625,26 +625,19 @@ void ApplicationInterface::handle_osx_file_open_event (std::string filename)
   {
     new_session = false;
   }
+    
+  boost::filesystem::path app_filepath;
+  Core::Application::Instance()->get_application_filepath( app_filepath );
+    
+  std::string command = std::string( "" ) +
+  app_filepath.parent_path().parent_path().string() + "/Contents/MacOS/Seg3D2 \"" + filename + "\" &";
+    
+  system( command.c_str() );
 
-  if ( !new_session )
+  if ( new_session )
   {
-    boost::filesystem::path app_filepath;
-    Core::Application::Instance()->get_application_filepath( app_filepath );
-
-    std::string command = std::string( "" ) +
-    app_filepath.parent_path().parent_path().string() + "/Contents/MacOS/Seg3D2 \"" + filename + "\" &";
-
-    system( command.c_str() );
-  }
-  else
-  {
-    std::vector<std::string> project_file_extensions = Project::GetProjectFileExtensions();
-
-    //this->open_initial_project (filename);
-     
-    if (this->open_initial_project (filename)){
-      this->private_->splash_screen_->close();
-    }
+      //kill this instance of Seg3D
+      this->close();
   }
 }
 
