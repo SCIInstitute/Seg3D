@@ -689,7 +689,7 @@ bool ApplicationInterface::open_initial_project ( std::string filename )
     // No location is set, so no project will be generated on disk for now
     ActionNewProject::Dispatch( Core::Interface::GetWidgetActionContext(),
                                 "", "Untitled Project" );
-    LayerIOFunctions::ImportFiles( NULL, filename );
+    LayerIOFunctions::ImportFiles( this, filename );
     return true;
   }
 
