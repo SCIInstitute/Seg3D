@@ -616,27 +616,25 @@ void ApplicationInterface::HandleCriticalErrorMessage( qpointer_type qpointer, i
 
 void ApplicationInterface::handle_osx_file_open_event (std::string filename)
 {
-  Seg3D::ProjectHandle current_project = Seg3D::ProjectManager::Instance()->get_current_project();
-
   // must do this to make sure a double-click on a project file doesn't use this executable session
-  bool new_session = InterfaceManager::Instance()->splash_screen_visibility_state_->get();
+  bool useCurrentSession = InterfaceManager::Instance()->splash_screen_visibility_state_->get();
   if ( !this->private_->splash_screen_ || this->private_->splash_screen_->get_user_interacted() )
   {
-    new_session = false;
+    useCurrentSession = false;
   }
     
+  if ( useCurrentSession )
+  {
+    this->close();
+  }
+
   boost::filesystem::path app_filepath;
   Core::Application::Instance()->get_application_filepath( app_filepath );
     
-  std::string command = std::string( "" ) +
-  app_filepath.parent_path().parent_path().string() + "/Contents/MacOS/Seg3D2 \"" + filename + "\" &";
+  std::string command = app_filepath.parent_path().parent_path().string()
+      + "/Contents/MacOS/Seg3D2 \"" + filename + "\" &";
     
   system( command.c_str() );
-
-  if ( new_session )
-  {
-      this->close();
-  }
 }
 
 
