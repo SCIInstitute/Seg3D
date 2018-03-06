@@ -93,6 +93,7 @@ SET(itk_GIT_TAG "origin/itk-4.13.0")
 ExternalProject_Add(ITK_external
   GIT_REPOSITORY "https://github.com/CIBC-Internal/itk.git"
   GIT_TAG ${itk_GIT_TAG}
+  UPDATE_COMMAND ""
   PATCH_COMMAND ""
   CMAKE_ARGS ${itk_ARGS}
   CMAKE_CACHE_ARGS ${itk_CACHE_ARGS}

@@ -186,7 +186,6 @@ ApplicationInterface::ApplicationInterface( std::string file_to_view_on_open ) :
   this->private_->tools_dock_window_ = new ToolsDockWidget( this );
   this->addDockWidget( Qt::LeftDockWidgetArea, this->private_->tools_dock_window_ );
 
-
   // Connect the windows and widgets to their visibility states
   QtUtils::QtBridge::Show( this->private_->rendering_dock_window_,
     InterfaceManager::Instance()->rendering_dockwidget_visibility_state_ );
@@ -617,31 +616,25 @@ void ApplicationInterface::HandleCriticalErrorMessage( qpointer_type qpointer, i
 
 void ApplicationInterface::handle_osx_file_open_event (std::string filename)
 {
-  Seg3D::ProjectHandle current_project = Seg3D::ProjectManager::Instance()->get_current_project();
-
   // must do this to make sure a double-click on a project file doesn't use this executable session
-  bool new_session = InterfaceManager::Instance()->splash_screen_visibility_state_->get();
+  bool useCurrentSession = InterfaceManager::Instance()->splash_screen_visibility_state_->get();
   if ( !this->private_->splash_screen_ || this->private_->splash_screen_->get_user_interacted() )
   {
-    new_session = false;
+    useCurrentSession = false;
   }
-
-  if ( !new_session )
+    
+  if ( useCurrentSession )
   {
-    boost::filesystem::path app_filepath;
-    Core::Application::Instance()->get_application_filepath( app_filepath );
-
-    std::string command = std::string( "" ) +
-    app_filepath.parent_path().parent_path().string() + "/Contents/MacOS/Seg3D2 \"" + filename + "\" &";
-
-    system( command.c_str() );
+    this->close();
   }
-  else
-  {
-    std::vector<std::string> project_file_extensions = Project::GetProjectFileExtensions();
 
-    this->open_initial_project (filename);
-  }
+  boost::filesystem::path app_filepath;
+  Core::Application::Instance()->get_application_filepath( app_filepath );
+    
+  std::string command = app_filepath.parent_path().parent_path().string()
+      + "/Contents/MacOS/Seg3D2 \"" + filename + "\" &";
+    
+  system( command.c_str() );
 }
 
 
@@ -694,7 +687,7 @@ bool ApplicationInterface::open_initial_project ( std::string filename )
     // No location is set, so no project will be generated on disk for now
     ActionNewProject::Dispatch( Core::Interface::GetWidgetActionContext(),
                                 "", "Untitled Project" );
-    LayerIOFunctions::ImportFiles( NULL, filename );
+    LayerIOFunctions::ImportFiles( this, filename );
     return true;
   }
 
