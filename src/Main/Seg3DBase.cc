@@ -128,9 +128,6 @@ Seg3DBase::Seg3DBase() :
   display_splash_screen(!Core::Application::Instance()->is_command_line_parameter( "nosplash")),
   start_sockets(false)
 {
-#if defined (_WIN32)
-	RedirectIOToConsole();
-#endif
   boost::filesystem::path path;
   Core::Application::Instance()->get_application_filename(path);
   this->program_name = path.string();
@@ -187,6 +184,9 @@ bool Seg3DBase::initialize()
   Core::RolloverLogFile event_log( Core::LogMessageType::ALL_E );
 
 #ifndef NDEBUG
+#if defined (_WIN32)
+  RedirectIOToConsole();
+#endif
   // -- Stream errors to console window
   new Core::LogStreamer( Core::LogMessageType::ALL_E, &std::cerr );
 #endif
