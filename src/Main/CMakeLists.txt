@@ -32,6 +32,12 @@
 
 SET(MAIN_SRCS
   main.cc
+  Seg3DBase.h
+  Seg3DBase.cc
+  Seg3DGui.h
+  Seg3DGui.cc
+  Seg3DHeadless.h
+  Seg3DHeadless.cc
 )
 
 ###########################################

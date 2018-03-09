@@ -40,6 +40,8 @@ SET(CORE_PYTHON_SRCS
   PythonActionContext.cc
   ToPythonConverters.h
   ToPythonConverters.cc
+  PythonCLI.h
+  PythonCLI.cc
 )
 
 IF(WIN32)
