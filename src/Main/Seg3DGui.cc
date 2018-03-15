@@ -68,9 +68,6 @@ bool Seg3DGui::run()
             app_interface->activate_splash_screen();
           }
       }
-      else {
-        app_interface->activate_splash_screen();
-      }
 #else
     app_interface->activate_splash_screen();
 #endif
