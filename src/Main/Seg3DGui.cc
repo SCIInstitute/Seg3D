@@ -57,12 +57,16 @@ bool Seg3DGui::run()
   ApplicationInterface* app_interface = new ApplicationInterface();
 
   bool opened_init_project = app_interface->open_initial_project( this->file_to_view );
+
   if (!opened_init_project && this->display_splash_screen) {
 //Trying to catch osx file open event when double click on .nrrd file.
 #if defined(__APPLE__)
       if (QtUtils::QtApplication::Instance()->qt_application()->hasPendingEvents())
       {
         QtUtils::QtApplication::Instance()->qt_application()->processEvents();
+        if (this->file_to_view == "") {
+            app_interface->activate_splash_screen();
+          }
       }
       else {
         app_interface->activate_splash_screen();
