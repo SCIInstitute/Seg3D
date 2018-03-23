@@ -61,7 +61,8 @@ TextRenderer::TextRenderer() :
   this->font_file_.assign( &buffer[0] );
   this->font_file_ += "\\fonts\\arial.ttf";
 #elif defined( __APPLE__ )
-  this->font_file_.assign( "/System/Library/Fonts/Helvetica.dfont" );
+  //this->font_file_.assign( "/System/Library/Fonts/Helvetica.dfont" );
+  this->font_file_.assign( "/System/Library/Fonts/Geneva.dfont");
   this->face_index_ = 2;
 #else
   const char* font_path = "/usr/share/fonts/truetype/freefont/FreeSerif.ttf";
