@@ -64,7 +64,7 @@ TextRenderer::TextRenderer() :
   this->font_file_.assign( "/System/Library/Fonts/Helvetica.dfont" );
     if ( !boost::filesystem::exists( this->font_file_ ) )
     {
-      this->font_file_.assign( "/System/Library/Fonts/Geneva.dfont");
+      this->font_file_.assign( "/System/Library/Fonts/Helvetica.ttc");
     }
   this->face_index_ = 2;
 #else
