@@ -416,8 +416,7 @@ public:
           }
         }
       }
-    }
-
+    }	
   }
   SCI_END_TYPED_ITK_RUN()
   
