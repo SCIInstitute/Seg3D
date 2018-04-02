@@ -117,7 +117,7 @@ bool PointSetFilterInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Enable( this->private_->ui_.label_ty_, tool->registration_ready_state_ );
   QtUtils::QtBridge::Enable( this->private_->ui_.label_tz_, tool->registration_ready_state_ );
 
-  QtUtils::QtBridge::Connect(this->private_->ui_.transformationMatrix, tool->complete_transform_matrix_state_);
+  QtUtils::QtBridge::Connect(this->private_->ui_.transformationMatrix, tool->complete_transform_matrix_state_,4,4);
 
   return true;      
 }

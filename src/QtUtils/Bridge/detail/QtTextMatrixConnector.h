@@ -56,15 +56,11 @@ public:
   // NOTE: These functions need to be static because they might be called outside the 
   // main Qt thread, when the Qt object pointed to by qpointer might no longer exist.
 private:  
-  static void SetListWidgetSelectedItems( QPointer< QtTextMatrixConnector > qpointer, 
-    std::vector< std::string > selections, Core::ActionSource source );
-
-  static void UpdateListWidgetOptionItems( QPointer< QtTextMatrixConnector > qpointer );
-  static void UpdateListWidgetStringItems( QPointer< QtTextMatrixConnector > qpointer );
+  static void UpdateMatrixEntries( QPointer< QtTextMatrixConnector > qpointer );
 
   // -- Slot functions for Qt signals --
 private Q_SLOTS:
-  void set_state();
+  //void set_state();
 
 private:
   QPlainTextEdit* parent_;
