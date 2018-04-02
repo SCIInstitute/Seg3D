@@ -78,9 +78,14 @@ void QtTextMatrixConnector::UpdateMatrixEntries(
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
   const std::vector< double >& dbls = qpointer->double_vector_state_->get();
   lock.unlock();
-  for ( size_t i = 0; i < dbls.size(); ++i )
-  {
-	 textwidget->appendPlainText(QString::number(dbls[i]) + " ");
+  if (dbls.size() == qpointer->dim1_*qpointer->dim2_){
+	  for (int i = 0; i < qpointer->dim1_; i++){
+		  QString str;
+		  for (int j = 0; j < qpointer->dim2_; j++){
+			  str += QString::number(dbls[i]) + "\t";
+		  }
+		  textwidget->appendPlainText(str);
+	  }
   }
 }
 

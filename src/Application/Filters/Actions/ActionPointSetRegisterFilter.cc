@@ -113,6 +113,29 @@ private:
 
 };
 
+typedef itk::Euler3DTransform< double > transform_type;
+
+//Calculate Transformation Matrix
+std::vector<double> calculateTransformationMatrix(transform_type::Pointer transform)
+{
+	std::vector<double> transformation((16, 0.0));
+	transformation[15] = 1.0;
+
+	//Fill matrix
+	int inx = 0;
+	for (int i = 0; i < 3; i++)
+	{
+		for (int j = 0; j < 3; j++)
+		{
+			transformation[inx] = transform->GetMatrix()[i][j];
+			inx++;
+		}
+		transformation[inx] = transform->GetTranslation()[i];
+		inx++;
+	}
+	return transformation;
+}
+
 // ALGORITHM CLASS
 // This class does the actual work and is run on a separate thread.
 // NOTE: The separation of the algorithm into a private class is for the purpose of running the
@@ -251,8 +274,6 @@ public:
     //-----------------------------------------------------------
     // Set up a Transform
     //-----------------------------------------------------------
-
-    typedef itk::Euler3DTransform< double > transform_type;
 
     transform_type::Pointer transform = transform_type::New();
 
@@ -416,7 +437,8 @@ public:
           }
         }
       }
-    }	
+    }
+	std::vector<double> transformation = calculateTransformationMatrix(transform);
   }
   SCI_END_TYPED_ITK_RUN()
   

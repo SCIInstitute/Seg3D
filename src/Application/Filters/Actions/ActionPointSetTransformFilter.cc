@@ -73,22 +73,6 @@ public:
 
 typedef itk::Euler3DTransform< double > transform_type;
 
-//Calculate Transformation Matrix
-std::vector<std::vector<double>> calculateTransformationMatrix(transform_type::Pointer transform)
-{
-	std::vector<std::vector<double>> transformation(4,std::vector<double>(4,0.0));
-	transformation[3][3] = 1.0;
-
-	//Fill matrix
-	for (int i = 0; i < 3; i++){
-		for (int j = 0; j < 3; j++){
-			transformation[i][j] = transform->GetMatrix()[i][j];
-		}
-		transformation[i][3] = transform->GetTranslation()[i];
-	}
-	return transformation;
-}
-
 class PointSetTransformAlgo : public  ITKFilter
 {
 
@@ -176,8 +160,6 @@ public:
 		  {
 			  this->insert_itk_image_into_layer(dst_layer, resampler->GetOutput());
 		  }
-
-		  std::vector<std::vector<double>> transformation = calculateTransformationMatrix(transform);
 	  }
   }
 
