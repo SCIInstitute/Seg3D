@@ -88,6 +88,7 @@ void QtTextMatrixConnector::UpdateMatrixEntries(
 			  }
 			  else
 			  {
+				  str += QString::number(dbls[inx], 'f', 5) + "\t";
 			  }
 			  inx++;
 		  }
