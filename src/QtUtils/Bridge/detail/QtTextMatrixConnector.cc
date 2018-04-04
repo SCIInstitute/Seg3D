@@ -83,7 +83,12 @@ void QtTextMatrixConnector::UpdateMatrixEntries(
 	  for (int i = 0; i < qpointer->dim1_; i++){
 		  QString str;
 		  for (int j = 0; j < qpointer->dim2_; j++){
-			  str += QString::number(dbls[inx]) + "\t";
+			  if (j == 3){
+				  str += QString::number(dbls[inx], 'f', 5);
+			  }
+			  else
+			  {
+			  }
 			  inx++;
 		  }
 		  textwidget->appendPlainText(str);

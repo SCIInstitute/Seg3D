@@ -127,7 +127,7 @@ std::vector<double> calculateTransformationMatrix(transform_type::Pointer transf
 	for (int i = 0; i < 3; i++)
 	{
 		for (int j = 0; j < 3; j++)
-		{
+		{ 
 			transformation[inx] = transform->GetMatrix()[i][j];
 			inx++;
 		}
