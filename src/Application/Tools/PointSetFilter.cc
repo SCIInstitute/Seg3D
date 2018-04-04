@@ -237,7 +237,8 @@ void PointSetFilter::registration( Core::ActionContextHandle context )
     this->target_layer_state_->get(),
     this->mask_state_->get(),
     this->iterations_state_->get(),
-    this->transform_matrix_state_->get_stateid()
+    this->transform_matrix_state_->get_stateid(),
+	this->complete_transform_matrix_state_->get_stateid()
     );  
 
 }

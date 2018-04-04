@@ -79,10 +79,12 @@ void QtTextMatrixConnector::UpdateMatrixEntries(
   const std::vector< double >& dbls = qpointer->double_vector_state_->get();
   lock.unlock();
   if (dbls.size() == qpointer->dim1_*qpointer->dim2_){
+	  int inx = 0;
 	  for (int i = 0; i < qpointer->dim1_; i++){
 		  QString str;
 		  for (int j = 0; j < qpointer->dim2_; j++){
-			  str += QString::number(dbls[i]) + "\t";
+			  str += QString::number(dbls[inx]) + "\t";
+			  inx++;
 		  }
 		  textwidget->appendPlainText(str);
 	  }
