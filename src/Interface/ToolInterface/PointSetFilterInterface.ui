@@ -590,6 +590,9 @@
    </item>
    <item>
     <widget class="QPlainTextEdit" name="transformationMatrix">
+     <property name="lineWrapMode">
+      <enum>QPlainTextEdit::NoWrap</enum>
+     </property>
      <property name="readOnly">
       <bool>true</bool>
      </property>
