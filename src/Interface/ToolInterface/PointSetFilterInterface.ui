@@ -599,6 +599,13 @@
     </widget>
    </item>
    <item>
+    <widget class="QPushButton" name="save_matrix_button">
+     <property name="text">
+      <string>Save Matrix</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QWidget" name="replaceRunWidget_2" native="true">
      <property name="minimumSize">
       <size>
