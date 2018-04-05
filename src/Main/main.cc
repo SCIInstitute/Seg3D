@@ -31,6 +31,7 @@
 #endif
 
 #include <locale>
+#include <cstdlib>
 
 // Core includes
 #include <Core/Application/Application.h>
@@ -50,6 +51,8 @@ using namespace Seg3D;
 
 int main( int argc, char **argv )
 {
+  putenv("LANG=C");
+
   Core::Application::Instance()->parse_command_line_parameters( argc, argv );
   Seg3DBase* app = NULL;
   bool headless = Core::Application::Instance()->is_command_line_parameter( "headless" );
@@ -57,18 +60,15 @@ int main( int argc, char **argv )
     app = new Seg3DHeadless();
   else
   {
-	app = new Seg3DGui();
-	if (!(QtUtils::QtApplication::Instance()->setup(argc, argv))) return (-1);
+  	app = new Seg3DGui();
+  	if (!(QtUtils::QtApplication::Instance()->setup(argc, argv))) return (-1);
   }
 
   if (app->information_only())
-	return 0; 
+	  return 0;
 
   if (!app->initialize())
     return -1;
-
-  std::locale::global(std::locale("C"));
-
 
   app->run();
   app->close();
