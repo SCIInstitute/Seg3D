@@ -93,7 +93,7 @@ bool ActionExportMatrix::run( Core::ActionContextHandle& context, Core::ActionRe
 	{
 		for (int j = 0; j < 4; j++)
 		{
-			outputfile << matrix(inx);
+			outputfile << matrix_[inx] << "\t";
 			inx++;
 		}
 		outputfile << std::endl;
@@ -115,10 +115,10 @@ bool ActionExportMatrix::run( Core::ActionContextHandle& context, Core::ActionRe
 
 void ActionExportMatrix::Dispatch( Core::ActionContextHandle context,
                                    const std::string& file_path,
-                                   const std::vector<double> matrix )
+                                   const std::vector<double>& matrix )
 {
   // Create new action
-  ActionExportPoints* action = new ActionExportMatrix(file_path, matrix);
+  ActionExportMatrix* action = new ActionExportMatrix(file_path, matrix);
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }
 

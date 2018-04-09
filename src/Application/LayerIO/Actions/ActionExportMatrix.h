@@ -38,7 +38,7 @@
 namespace Seg3D
 {
 
-class ActionExportPoints : public Core::Action
+class ActionExportMatrix : public Core::Action
 {
 
 CORE_ACTION( 
@@ -50,7 +50,7 @@ CORE_ACTION(
 
   // -- Constructor/Destructor --
 public:
-  ActionExportMatrix( const std::string& file_path, const std::vector<double> matrix ) :
+  ActionExportMatrix( const std::string& file_path, const std::vector<double>& matrix ) :
     file_path_(file_path),
     matrix_(matrix)
   {
@@ -97,7 +97,7 @@ public:
   // DISPATCH:
   static void Dispatch( Core::ActionContextHandle context,
                         const std::string& file_path,
-                        const std::vector<double> matrix_ );
+                        const std::vector<double>& matrix_ );
   
 };
 

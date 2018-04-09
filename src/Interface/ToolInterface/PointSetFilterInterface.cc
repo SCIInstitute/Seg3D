@@ -58,10 +58,10 @@ public:
   Ui::PointSetFilterInterface ui_;
   PointSetFilterInterface* interface_;
 
-  void export_points_to_file() const;
+  void export_matrix_to_file() const;
 };
 
-void PointSetFilterInterfacePrivate::export_points_to_file() const
+void PointSetFilterInterfacePrivate::export_matrix_to_file() const
 {
 	Core::StateEngine::lock_type lock(Core::StateEngine::GetMutex());
 
@@ -72,7 +72,7 @@ void PointSetFilterInterfacePrivate::export_points_to_file() const
 	std::string file_selector = Core::StringToUpper("Text File ") + "(*.txt)";
 
 	filename = QFileDialog::getSaveFileName(this->interface_,
-		"Export Points As...",
+		"Export Matrix As...",
 		current_folder.string().c_str(),
 		QString::fromStdString(file_selector));
 	if (!filename.isNull() && !filename.isEmpty())
@@ -94,11 +94,13 @@ void PointSetFilterInterfacePrivate::export_points_to_file() const
 PointSetFilterInterface::PointSetFilterInterface() :
   private_( new PointSetFilterInterfacePrivate )
 {
+	this->private_->interface_ = this;
 }
 
 // destructor
 PointSetFilterInterface::~PointSetFilterInterface()
 {
+	this->disconnect_all();
 }
 
 // build the interface and connect it to the state manager
@@ -137,7 +139,7 @@ bool PointSetFilterInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Enable( this->private_->ui_.runFilterButton_2, tool->registration_ready_state_ );
 
   QtUtils::QtBridge::Connect(this->private_->ui_.save_matrix_button, boost::bind(
-	  &PointSetFilterInterfacePrivate::export_points_to_file, this->private_));
+	  &PointSetFilterInterfacePrivate::export_matrix_to_file, this->private_));
 
   QtUtils::QtBridge::Enable(this->private_->ui_.save_matrix_button, tool->registration_ready_state_);
 
