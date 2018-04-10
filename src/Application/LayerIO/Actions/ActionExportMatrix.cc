@@ -65,7 +65,7 @@ bool ActionExportMatrix::validate( Core::ActionContextHandle& context )
 
 bool ActionExportMatrix::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
-  std::string message = std::string( "Exporting matrix." );
+  std::string message( "Exporting matrix." );
   
   Core::ActionProgressHandle progress = 
   Core::ActionProgressHandle( new Core::ActionProgress( message ) );

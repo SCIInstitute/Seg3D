@@ -65,7 +65,7 @@ bool ActionExportPoints::validate( Core::ActionContextHandle& context )
 
 bool ActionExportPoints::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
-  std::string message = std::string( "Exporting list of points." );
+  std::string message( "Exporting list of points." );
   
   Core::ActionProgressHandle progress = 
   Core::ActionProgressHandle( new Core::ActionProgress( message ) );
