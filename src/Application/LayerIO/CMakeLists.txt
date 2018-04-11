@@ -62,12 +62,10 @@ SET(APPLICATION_LAYERIO_ACTIONS_SRCS
   Actions/ActionImportLayer.cc
   Actions/ActionImportSeries.h
   Actions/ActionImportSeries.cc
-  Actions/ActionExportPoints.h
-  Actions/ActionExportPoints.cc
+  Actions/ActionExportVector.h
+  Actions/ActionExportVector.cc
   Actions/ActionImportLargeVolumeLayer.h
   Actions/ActionImportLargeVolumeLayer.cc
-  Actions/ActionExportMatrix.h
-  Actions/ActionExportMatrix.cc
 )
 
 SET(APPLICATION_LAYERIO_IMPORTERS_SRCS

@@ -37,7 +37,7 @@
 
 //Application Includes
 #include <Application/Tools/PointSetFilter.h>
-#include <Application/LayerIO/Actions/ActionExportMatrix.h>
+#include <Application/LayerIO/Actions/ActionExportVector.h>
 #include <Application/ProjectManager/ProjectManager.h>
 
 // QtUtils includes
@@ -85,7 +85,7 @@ void PointSetFilterInterfacePrivate::export_matrix_to_file() const
 
 		//Get matrix
 		ActionExportMatrix::Dispatch(Core::Interface::GetWidgetActionContext(),filename.toStdString(),
-			tool->complete_transform_matrix_state_->get());
+			tool->complete_transform_matrix_state_->get(),4,4);
 	
 	}
 }
