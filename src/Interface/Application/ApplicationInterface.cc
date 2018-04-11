@@ -686,7 +686,7 @@ bool ApplicationInterface::open_initial_project ( std::string filename )
   Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
                              InterfaceManager::Instance()->splash_screen_visibility_state_, false );
 
-  if ( ( extension == ".nrrd" ) || ( extension == ".nhdr" ) )
+  if ( ( extension != ".s3d" ) && ( extension != ".seg3dproj" ) )
   {
     // No location is set, so no project will be generated on disk for now
     ActionNewProject::Dispatch( Core::Interface::GetWidgetActionContext(),
