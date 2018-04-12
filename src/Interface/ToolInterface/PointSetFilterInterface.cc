@@ -37,7 +37,7 @@
 
 //Application Includes
 #include <Application/Tools/PointSetFilter.h>
-#include <Application/LayerIO/Actions/ActionExportVector.h>
+#include <Application/LayerIO/Actions/ActionExportMatrix.h>
 #include <Application/ProjectManager/ProjectManager.h>
 
 // QtUtils includes

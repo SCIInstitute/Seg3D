@@ -44,7 +44,7 @@
 #include <Application/Layer/LayerManager.h>
 #include <Application/Tools/PointsSelectTool.h>
 #include <Application/ViewerManager/Actions/ActionPickPoint.h>
-#include <Application/LayerIO/Actions/ActionExportVector.h>
+#include <Application/LayerIO/Actions/ActionExportPoints.h>
 #include <Application/ProjectManager/ProjectManager.h>
 
 // Core Includes

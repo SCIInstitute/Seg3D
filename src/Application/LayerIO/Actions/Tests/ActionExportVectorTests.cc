@@ -34,7 +34,8 @@
 
 #include <boost/filesystem.hpp>
 
-#include <Application/LayerIO/Actions/ActionExportVector.h>
+#include <Application/LayerIO/Actions/ActionExportPoints.h>
+#include <Application/LayerIO/Actions/ActionExportMatrix.h>
 
 #include <Core/Action/ActionContext.h>
 #include <Core/Geometry/Point.h>
