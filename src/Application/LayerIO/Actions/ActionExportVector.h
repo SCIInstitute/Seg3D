@@ -35,6 +35,8 @@
 
 #include <Core/Geometry/Point.h>
 
+#include <fstream>
+
 namespace Seg3D
 {
 
