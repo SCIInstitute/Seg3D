@@ -42,7 +42,8 @@
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
-CORE_REGISTER_ACTION( Seg3D, ExportVector )
+CORE_REGISTER_ACTION( Seg3D, ExportPoints )
+CORE_REGISTER_ACTION( Seg3D, ExportMatrix )
 
 namespace Seg3D
 {
