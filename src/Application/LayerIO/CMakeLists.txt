@@ -64,8 +64,14 @@ SET(APPLICATION_LAYERIO_ACTIONS_SRCS
   Actions/ActionImportSeries.cc
   Actions/ActionExportPoints.h
   Actions/ActionExportPoints.cc
+  Actions/ActionExportMatrix.h
+  Actions/ActionExportMatrix.cc
   Actions/ActionImportLargeVolumeLayer.h
   Actions/ActionImportLargeVolumeLayer.cc
+)
+
+SET(APPLICATION_LAYERIO_ACTIONS_SRCS_OTHER
+  Actions/ActionExportVector.h
 )
 
 SET(APPLICATION_LAYERIO_IMPORTERS_SRCS
@@ -109,6 +115,7 @@ CORE_ADD_LIBRARY(Application_LayerIO ${APPLICATION_LAYERIO_SRCS}
   ${APPLICATION_LAYERIO_IMPORTERS_SRCS}
   ${APPLICATION_LAYERIO_EXPORTERS_SRCS}
   ${APPLICATION_LAYERIO_ACTIONS_SRCS}
+  ${APPLICATION_LAYERIO_ACTIONS_SRCS_OTHER}
 )
 
 TARGET_LINK_LIBRARIES(Application_LayerIO

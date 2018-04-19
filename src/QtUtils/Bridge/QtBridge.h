@@ -195,6 +195,9 @@ public:
   static Core::ConnectionHandle Connect( QtTransferFunctionCurve* tf_curve, 
     Core::TransferFunctionFeatureHandle& feature );
 
+  static Core::ConnectionHandle Connect(QPlainTextEdit* plain_text,
+	 Core::StateDoubleVectorHandle& state_vector,int dim1,int dim2);
+
   /// Enable / Disable a button from state engine
   static Core::ConnectionHandle Enable( QAction* qaction, Core::StateBoolHandle& state, 
     bool opposite_logic = false );
