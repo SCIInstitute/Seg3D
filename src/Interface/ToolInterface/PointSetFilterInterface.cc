@@ -29,11 +29,16 @@
 // Core includes
 #include <Core/Interface/Interface.h>
 
+//Qt includes
+#include <QFileDialog>
+
 // QtGui includes
 #include "ui_PointSetFilterInterface.h"
 
 //Application Includes
 #include <Application/Tools/PointSetFilter.h>
+#include <Application/LayerIO/Actions/ActionExportMatrix.h>
+#include <Application/ProjectManager/ProjectManager.h>
 
 // QtUtils includes
 #include <QtUtils/Bridge/QtBridge.h>
@@ -51,17 +56,51 @@ class PointSetFilterInterfacePrivate
 {
 public:
   Ui::PointSetFilterInterface ui_;
+  PointSetFilterInterface* interface_;
+
+  void export_matrix_to_file() const;
 };
+
+void PointSetFilterInterfacePrivate::export_matrix_to_file() const
+{
+	Core::StateEngine::lock_type lock(Core::StateEngine::GetMutex());
+
+	PointSetFilter* tool = dynamic_cast< PointSetFilter* > (this->interface_->tool().get());
+
+	QString filename;
+	boost::filesystem::path current_folder = ProjectManager::Instance()->get_current_file_folder();
+	std::string file_selector = Core::StringToUpper("Text File ") + "(*.txt)";
+
+	filename = QFileDialog::getSaveFileName(this->interface_,
+		"Export Matrix As...",
+		current_folder.string().c_str(),
+		QString::fromStdString(file_selector));
+	if (!filename.isNull() && !filename.isEmpty())
+	{
+		QFileInfo file(filename);
+		if (file.suffix().isEmpty())
+		{
+			filename += ".txt";
+		}
+
+		//Get matrix
+		ActionExportMatrix::Dispatch(Core::Interface::GetWidgetActionContext(),filename.toStdString(),
+			tool->complete_transform_matrix_state_->get(),4,4);
+	
+	}
+}
 
 // constructor
 PointSetFilterInterface::PointSetFilterInterface() :
   private_( new PointSetFilterInterfacePrivate )
 {
+	this->private_->interface_ = this;
 }
 
 // destructor
 PointSetFilterInterface::~PointSetFilterInterface()
 {
+	this->disconnect_all();
 }
 
 // build the interface and connect it to the state manager
@@ -99,7 +138,12 @@ bool PointSetFilterInterface::build_widget( QFrame* frame )
     &PointSetFilter::apply, tool, Core::Interface::GetWidgetActionContext() ) );
   QtUtils::QtBridge::Enable( this->private_->ui_.runFilterButton_2, tool->registration_ready_state_ );
 
-  //std::vector<double> matrix_params;
+  QtUtils::QtBridge::Connect(this->private_->ui_.save_matrix_button, boost::bind(
+	  &PointSetFilterInterfacePrivate::export_matrix_to_file, this->private_));
+
+  QtUtils::QtBridge::Enable(this->private_->ui_.save_matrix_button, tool->registration_ready_state_);
+
+  //this->private_->ui_.save_matrix_button->setEnabled(tool->complete_transform_matrix_state_->size() > 0);
 
   QtUtils::QtBridge::Connect( this->private_->ui_.label_rx_, tool->rotation_state_[ 0 ] );
   QtUtils::QtBridge::Connect( this->private_->ui_.label_ry_, tool->rotation_state_[ 1 ] );
@@ -116,6 +160,8 @@ bool PointSetFilterInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Enable( this->private_->ui_.label_tx_, tool->registration_ready_state_ );
   QtUtils::QtBridge::Enable( this->private_->ui_.label_ty_, tool->registration_ready_state_ );
   QtUtils::QtBridge::Enable( this->private_->ui_.label_tz_, tool->registration_ready_state_ );
+
+  QtUtils::QtBridge::Connect(this->private_->ui_.transformationMatrix, tool->complete_transform_matrix_state_,4,4);
 
   return true;      
 }
