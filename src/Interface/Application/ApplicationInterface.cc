@@ -130,7 +130,7 @@ ApplicationInterface::ApplicationInterface( std::string file_to_view_on_open ) :
 {
   // Ensure that resources are available
   // This function ensures that all the images are available
-  InitQtResources();
+    InitQtResources();
 
   this->setStyleSheet( StyleSheet::MAIN_STYLE_C );
 
@@ -236,7 +236,8 @@ ApplicationInterface::ApplicationInterface( std::string file_to_view_on_open ) :
     boost::bind( &ApplicationInterface::HandleReportProgress, qpointer_type( this ), _1 ) ) );
 
   this->add_connection( Core::Log::Instance()->post_critical_signal_.connect(
-    boost::bind( &ApplicationInterface::HandleCriticalErrorMessage, qpointer_type( this ), _1, _2 ) ) );
+    boost::bind( &ApplicationInterface::HandleCriticalErrorMessage, qpointer_type( this ),
+                _1, _2 )));
 
 
   // NOTE: Connect state and reflect the current state (needs to be atomic, hence the lock)
@@ -271,8 +272,7 @@ ApplicationInterface::ApplicationInterface( std::string file_to_view_on_open ) :
   this->private_->progress_ = new ProgressWidget( this->private_->viewer_interface_->parentWidget() );
 
   // add signal connection for OS X file assocation open event
-  this->add_connection( QtUtils::QtApplication::Instance()->osx_file_open_event_signal_.connect( boost::bind(
-    &ApplicationInterface::handle_osx_file_open_event, this, _1 ) ) );
+  this->add_connection( QtUtils::QtApplication::Instance()->osx_file_open_event_signal_.connect( boost::bind(&ApplicationInterface::handle_osx_file_open_event, this, _1 ) ) );
 }
 
 ApplicationInterface::~ApplicationInterface()
@@ -616,25 +616,29 @@ void ApplicationInterface::HandleCriticalErrorMessage( qpointer_type qpointer, i
 
 void ApplicationInterface::handle_osx_file_open_event (std::string filename)
 {
-  // must do this to make sure a double-click on a project file doesn't use this executable session
-  bool useCurrentSession = InterfaceManager::Instance()->splash_screen_visibility_state_->get();
-  if ( !this->private_->splash_screen_ || this->private_->splash_screen_->get_user_interacted() )
-  {
-    useCurrentSession = false;
-  }
+    // must do this to make sure a double-click on a project file doesn't use this executable session
+    bool new_session = InterfaceManager::Instance()->splash_screen_visibility_state_->get();
+    if ( !this->private_->splash_screen_ || this->private_->splash_screen_->get_user_interacted() )
+    {
+        new_session = false;
+    }
     
-  if ( useCurrentSession )
-  {
-    this->close();
-  }
-
-  boost::filesystem::path app_filepath;
-  Core::Application::Instance()->get_application_filepath( app_filepath );
-    
-  std::string command = app_filepath.parent_path().parent_path().string()
-      + "/Contents/MacOS/Seg3D2 \"" + filename + "\" &";
-    
-  system( command.c_str() );
+    if ( !new_session )
+    {
+        boost::filesystem::path app_filepath;
+        Core::Application::Instance()->get_application_filepath( app_filepath );
+        
+        std::string command = std::string( "" ) +
+        app_filepath.parent_path().parent_path().string() + "/Contents/MacOS/Seg3D2 \"" + filename + "\" &";
+        
+        system( command.c_str() );
+    }
+    else
+    {
+        std::vector<std::string> project_file_extensions = Project::GetProjectFileExtensions();
+        
+        this->open_initial_project (filename);
+    }
 }
 
 
@@ -682,7 +686,7 @@ bool ApplicationInterface::open_initial_project ( std::string filename )
   Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
                              InterfaceManager::Instance()->splash_screen_visibility_state_, false );
 
-  if ( ( extension == ".nrrd" ) || ( extension == ".nhdr" ) )
+  if ( ( extension != ".s3d" ) && ( extension != ".seg3dproj" ) )
   {
     // No location is set, so no project will be generated on disk for now
     ActionNewProject::Dispatch( Core::Interface::GetWidgetActionContext(),
@@ -692,6 +696,7 @@ bool ApplicationInterface::open_initial_project ( std::string filename )
   }
 
   std::vector<std::string> project_file_extensions = Project::GetProjectFileExtensions();
+    
   if ( std::find( project_file_extensions.begin(), project_file_extensions.end(), extension ) !=
        project_file_extensions.end() )
   {
@@ -699,6 +704,7 @@ bool ApplicationInterface::open_initial_project ( std::string filename )
   }
 
   std::vector<std::string> project_folder_extensions = Project::GetProjectPathExtensions();
+    
   if ( std::find( project_folder_extensions.begin(), project_folder_extensions.end(), extension ) !=
        project_folder_extensions.end() )
   {

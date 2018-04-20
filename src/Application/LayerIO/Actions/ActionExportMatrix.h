@@ -26,42 +26,46 @@
  DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_LAYERIO_ACTIONS_ACTIONEXPORTPOINTS_H
-#define APPLICATION_LAYERIO_ACTIONS_ACTIONEXPORTPOINTS_H
+#ifndef APPLICATION_LAYERIO_ACTIONS_ACTIONEXPORTMATRIX_H
+#define APPLICATION_LAYERIO_ACTIONS_ACTIONEXPORTMATRIX_H
 
 // Core includes
 #include <Core/Action/Actions.h>
 #include <Core/Interface/Interface.h>
 
-#include <Core/Geometry/Point.h>
 #include <Application/LayerIO/Actions/ActionExportVector.h>
 
 namespace Seg3D
 {
-struct PointWriter
+class MatrixDoubleWriter
 {
-  void operator()(std::ostream& o, const Core::Point& p) const;
+public:
+  MatrixDoubleWriter() {}
+  MatrixDoubleWriter(int dim1, int dim2) : dim1_(dim1), dim2_(dim2) {}
+  void operator()(std::ostream& o, const double& x);
+private:
+  int dim1_{ 0 }, dim2_{ 0 };
+  int index_{ 0 };
 };
 
-
-class ActionExportPoints : public ActionExportVector<Core::Point, PointWriter>
+class ActionExportMatrix : public ActionExportVector<double, MatrixDoubleWriter>
 {
   CORE_ACTION(
-    CORE_ACTION_TYPE("ExportPoints", "This action exports a list of points (x y z) to file.")
-    CORE_ACTION_ARGUMENT("file_path", "Path to the file that the points will be written to.")
-    CORE_ACTION_ARGUMENT("points", "3D points.")
+    CORE_ACTION_TYPE("ExportMatrix", "This action exports a maxtrix of a given size.")
+    CORE_ACTION_ARGUMENT("file_path", "Path to the file that the matrix will be written to.")
+    CORE_ACTION_ARGUMENT("matrix", "matrix")
     CORE_ACTION_CHANGES_PROJECT_DATA()
     )
 
-    
+
 public:
-  using Base = ActionExportVector<Core::Point, PointWriter>;
-  ActionExportPoints(const std::string& file_path, const std::vector<Core::Point>& points) :
-    Base(file_path, points, PointWriter())
+  using Base = ActionExportVector<double, MatrixDoubleWriter>;
+  ActionExportMatrix(const std::string& file_path, const std::vector<double>& matrix, int dim1, int dim2) :
+    Base(file_path, matrix, MatrixDoubleWriter(dim1, dim2))
   {
     init_parameters();
   }
-  ActionExportPoints()
+  ActionExportMatrix()
   {
     init_parameters();
   }
@@ -69,9 +73,9 @@ public:
   // DISPATCH:
   static void Dispatch(Core::ActionContextHandle context,
     const std::string& file_path,
-    const std::vector<Core::Point>& points)
+    const std::vector<double>& matrix, int dim1, int dim2)
   {
-    auto action = new ActionExportPoints(file_path, points);
+    auto action = new ActionExportMatrix(file_path, matrix, dim1, dim2);
     Core::ActionDispatcher::PostAction(Core::ActionHandle(action), context);
   }
 };

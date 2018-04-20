@@ -57,6 +57,7 @@ SET(QTUTILS_BRIDGE_SRCS
   detail/QtTristateToolButtonConnector.cc
   detail/QtTransferFunctionCurveConnector.cc
   detail/QtTransferFunctionSceneConnector.cc
+  detail/QtTextMatrixConnector.cc
 )
 
 SET(QTUTILS_BRIDGE_MOC_SRCS
@@ -84,6 +85,7 @@ SET(QTUTILS_BRIDGE_MOC_SRCS
   detail/QtTristateToolButtonConnector.h
   detail/QtTransferFunctionCurveConnector.h
   detail/QtTransferFunctionSceneConnector.h
+  detail/QtTextMatrixConnector.h
 )
 
 SET(QTUTILS_BRIDGE_NO_MOC_SRCS
