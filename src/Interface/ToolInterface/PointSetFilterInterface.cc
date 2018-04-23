@@ -143,8 +143,6 @@ bool PointSetFilterInterface::build_widget( QFrame* frame )
 
   QtUtils::QtBridge::Enable(this->private_->ui_.save_matrix_button, tool->registration_ready_state_);
 
-  //this->private_->ui_.save_matrix_button->setEnabled(tool->complete_transform_matrix_state_->size() > 0);
-
   QtUtils::QtBridge::Connect( this->private_->ui_.label_rx_, tool->rotation_state_[ 0 ] );
   QtUtils::QtBridge::Connect( this->private_->ui_.label_ry_, tool->rotation_state_[ 1 ] );
   QtUtils::QtBridge::Connect( this->private_->ui_.label_rz_, tool->rotation_state_[ 2 ] );

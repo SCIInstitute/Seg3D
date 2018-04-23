@@ -36,6 +36,7 @@
 // Qt includes
 #include <QtGui/QClipboard>
 #include <QColorDialog>
+#include <QFileDialog>
 
 // Qt Gui Includes
 #include <QtUtils/Bridge/QtBridge.h>
@@ -49,6 +50,8 @@
 // Application Includes
 #include <Application/Layer/LayerManager.h>
 #include <Application/ViewerManager/Actions/ActionPickPoint.h>
+#include <Application/LayerIO/Actions/ActionExportPoints.h>
+#include <Application/ProjectManager/ProjectManager.h>
 
 // Core Includes
 #include <Core/State/Actions/ActionSetAt.h>
@@ -69,6 +72,7 @@ public:
 
   void go_to_active_measurement( int point_index );
   void export_measurements_to_clipboard() const;
+  void export_points_to_file() const;
 };
 
 void MeasurementToolInterfacePrivate::go_to_active_measurement( int point_index )
@@ -131,6 +135,34 @@ void MeasurementToolInterfacePrivate::export_measurements_to_clipboard() const
   {
     qApp->clipboard()->setText( text );
   } 
+}
+
+void MeasurementToolInterfacePrivate::export_points_to_file() const
+{
+	Core::StateEngine::lock_type lock(Core::StateEngine::GetMutex());
+
+	MeasurementTool* tool = dynamic_cast< MeasurementTool* > (this->interface_->tool().get());
+
+	QString filename;
+	boost::filesystem::path current_folder = ProjectManager::Instance()->get_current_file_folder();
+	std::string file_selector = Core::StringToUpper("Text File ") + "(*.txt)";
+
+	filename = QFileDialog::getSaveFileName(this->interface_,
+		"Export Points As...",
+		current_folder.string().c_str(),
+		QString::fromStdString(file_selector));
+	if (!filename.isNull() && !filename.isEmpty())
+	{
+		QFileInfo file(filename);
+		if (file.suffix().isEmpty())
+		{
+			filename += ".txt";
+		}
+
+		//Get points -- fix!
+		ActionExportPoints::Dispatch(Core::Interface::GetWidgetActionContext(),filename.toStdString(),
+			tool->seed_points_state_->get());
+	}
 }
 
 // constructor
@@ -215,6 +247,10 @@ bool MeasurementToolInterface::build_widget( QFrame* frame )
     &MeasurementToolInterfacePrivate::go_to_active_measurement, this->private_, 0 ) );
   QtUtils::QtBridge::Connect( this->private_->ui_.goto_second_button_, boost::bind(
     &MeasurementToolInterfacePrivate::go_to_active_measurement, this->private_, 1 ) );
+  //fix
+  QtUtils::QtBridge::Connect(this->private_->ui_.savePoints, boost::bind(
+	  &MeasurementToolInterfacePrivate::export_points_to_file, this->private_));
+
   // Don't have a QtBridge that can connect a widget to a particular attribute of a measurement
   // in a StateVector, so use Qt signals/slots directly.  Widgets are updated to reflect state
   // in UpdateActiveTab().
