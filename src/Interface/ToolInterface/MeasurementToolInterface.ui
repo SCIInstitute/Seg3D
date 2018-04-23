@@ -778,15 +778,9 @@
                           </widget>
                          </item>
                          <item>
-                          <widget class="QLabel" name="p0_value_">
-                           <property name="sizePolicy">
-                            <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-                             <horstretch>0</horstretch>
-                             <verstretch>0</verstretch>
-                            </sizepolicy>
-                           </property>
-                           <property name="text">
-                            <string>(X, Y, Z)</string>
+                          <widget class="QLineEdit" name="p0_value_">
+                           <property name="readOnly">
+                            <bool>true</bool>
                            </property>
                           </widget>
                          </item>
@@ -838,15 +832,9 @@
                           </widget>
                          </item>
                          <item>
-                          <widget class="QLabel" name="p1_value_">
-                           <property name="sizePolicy">
-                            <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-                             <horstretch>0</horstretch>
-                             <verstretch>0</verstretch>
-                            </sizepolicy>
-                           </property>
-                           <property name="text">
-                            <string>(X, Y, Z)</string>
+                          <widget class="QLineEdit" name="p1_value_">
+                           <property name="readOnly">
+                            <bool>true</bool>
                            </property>
                           </widget>
                          </item>
@@ -1049,13 +1037,6 @@
                   </property>
                   <property name="text">
                    <string>Go To Second Point</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="savePoints">
-                  <property name="text">
-                   <string>Save Points</string>
                   </property>
                  </widget>
                 </item>
