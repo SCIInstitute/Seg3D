@@ -781,7 +781,7 @@
                           <widget class="QLineEdit" name="p0_value_">
                            <property name="minimumSize">
                             <size>
-                             <width>175</width>
+                             <width>150</width>
                              <height>0</height>
                             </size>
                            </property>
@@ -839,6 +839,12 @@
                          </item>
                          <item>
                           <widget class="QLineEdit" name="p1_value_">
+                           <property name="minimumSize">
+                            <size>
+                             <width>150</width>
+                             <height>0</height>
+                            </size>
+                           </property>
                            <property name="readOnly">
                             <bool>true</bool>
                            </property>
