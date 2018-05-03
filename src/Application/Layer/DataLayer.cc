@@ -59,6 +59,64 @@ public:
   size_t signal_block_count_;
 };
 
+// counter for generating new colors for each new data layer
+size_t ColorCount = 0;
+boost::mutex ColorCountMutex;
+
+void DataLayer::initialize_states()
+{
+	// NOTE: This function allows setting of state variables outside of application thread
+	this->set_initializing(true);
+
+	// == Color of the layer ==
+
+	{
+		boost::mutex::scoped_lock lock(ColorCountMutex);
+		this->private_->layer_->add_state("color", this->private_->layer_->color_state_, 
+			static_cast<int>(ColorCount % PreferencesManager::Instance()->color_states_.size()));
+
+		ColorCount++;
+	}
+
+	// == The brightness of the layer ==
+	this->add_state("brightness", brightness_state_, 50.0, 0.0, 100.0, 0.1);
+
+	// == The contrast of the layer ==
+	this->add_state("contrast", contrast_state_, 0.0, 0.0, 100.0, 0.1);
+
+	this->add_state("display_min", this->display_min_value_state_, 0.0, 0.0, 1.0, 1.0);
+	this->display_min_value_state_->set_session_priority(Core::StateBase::DO_NOT_LOAD_E);
+	this->add_state("display_max", this->display_max_value_state_, 1.0, 0.0, 1.0, 1.0);
+	this->display_max_value_state_->set_session_priority(Core::StateBase::DO_NOT_LOAD_E);
+
+	this->add_state("adjust_minmax", this->adjust_display_min_max_state_, false);
+
+	// == Is this volume rendered through the volume renderer ==
+	this->add_state("volume_rendered", volume_rendered_state_, false);
+
+	if (data_volume_)
+	{
+		this->generation_state_->set(this->data_volume_->get_generation());
+	}
+
+	this->add_state("data_type", this->data_type_state_, "unknown");
+	this->add_state("min", this->min_value_state_, std::numeric_limits< double >::quiet_NaN());
+	this->add_state("max", this->max_value_state_, std::numeric_limits< double >::quiet_NaN());
+
+	this->add_connection(this->contrast_state_->state_changed_signal_.connect(boost::bind(
+		&DataLayerPrivate::handle_contrast_brightness_changed, this->private_)));
+	this->add_connection(this->brightness_state_->state_changed_signal_.connect(boost::bind(
+		&DataLayerPrivate::handle_contrast_brightness_changed, this->private_)));
+	this->add_connection(this->display_min_value_state_->state_changed_signal_.connect(boost::bind(
+		&DataLayerPrivate::handle_display_value_range_changed, this->private_)));
+	this->add_connection(this->display_max_value_state_->state_changed_signal_.connect(boost::bind(
+		&DataLayerPrivate::handle_display_value_range_changed, this->private_)));
+
+	this->private_->update_data_info();
+
+	this->set_initializing(false);
+}
+
 void DataLayerPrivate::update_data_info()
 {
   if ( !this->layer_->data_volume_ ||
@@ -195,50 +253,6 @@ DataLayer::~DataLayer()
   {
     this->data_volume_->unregister_data();
   }
-}
-
-void DataLayer::initialize_states()
-{
-  // NOTE: This function allows setting of state variables outside of application thread
-  this->set_initializing( true ); 
-
-  // == The brightness of the layer ==
-  this->add_state( "brightness", brightness_state_, 50.0, 0.0, 100.0, 0.1 );
-
-  // == The contrast of the layer ==
-  this->add_state( "contrast", contrast_state_, 0.0, 0.0, 100.0, 0.1 );
-
-  this->add_state( "display_min", this->display_min_value_state_, 0.0, 0.0, 1.0, 1.0 );
-  this->display_min_value_state_->set_session_priority( Core::StateBase::DO_NOT_LOAD_E );
-  this->add_state( "display_max", this->display_max_value_state_, 1.0, 0.0, 1.0, 1.0 );
-  this->display_max_value_state_->set_session_priority( Core::StateBase::DO_NOT_LOAD_E );
-
-  this->add_state( "adjust_minmax", this->adjust_display_min_max_state_, false );
-
-  // == Is this volume rendered through the volume renderer ==
-  this->add_state( "volume_rendered", volume_rendered_state_, false );
-  
-  if ( data_volume_ )
-  {
-    this->generation_state_->set( this->data_volume_->get_generation() );
-  }
-
-  this->add_state( "data_type", this->data_type_state_, "unknown" );
-  this->add_state( "min", this->min_value_state_, std::numeric_limits< double >::quiet_NaN() );
-  this->add_state( "max", this->max_value_state_, std::numeric_limits< double >::quiet_NaN() );
-
-  this->add_connection( this->contrast_state_->state_changed_signal_.connect( boost::bind(
-    &DataLayerPrivate::handle_contrast_brightness_changed, this->private_ ) ) );
-  this->add_connection( this->brightness_state_->state_changed_signal_.connect( boost::bind(
-    &DataLayerPrivate::handle_contrast_brightness_changed, this->private_ ) ) );
-  this->add_connection( this->display_min_value_state_->state_changed_signal_.connect( boost::bind(
-    &DataLayerPrivate::handle_display_value_range_changed, this->private_ ) ) );
-  this->add_connection( this->display_max_value_state_->state_changed_signal_.connect( boost::bind(
-    &DataLayerPrivate::handle_display_value_range_changed, this->private_ ) ) );
-
-  this->private_->update_data_info();
-
-  this->set_initializing( false );
 }
 
 Core::GridTransform DataLayer::get_grid_transform() const 
@@ -445,6 +459,18 @@ LayerHandle DataLayer::duplicate() const
   
   return DataLayerHandle( new DataLayer( "Copy_" + this->get_layer_name(), data_volume ) );
 
+}
+
+size_t DataLayer::GetColorCount()
+{
+	boost::mutex::scoped_lock lock(ColorCountMutex);
+	return ColorCount;
+}
+
+void DataLayer::SetColorCount(size_t count)
+{
+	boost::mutex::scoped_lock lock(ColorCountMutex);
+	ColorCount = count;
 }
 
 } // end namespace Seg3D

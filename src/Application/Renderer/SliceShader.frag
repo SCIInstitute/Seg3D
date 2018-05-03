@@ -15,6 +15,7 @@ uniform int mask_mode;
 uniform int volume_type; 
 
 uniform vec3 mask_color;  // color of mask
+uniform vec3 data_color; // color of data layer
 uniform float opacity;
 uniform vec2 scale_bias;
 uniform int border_width; // width of the mask border
@@ -28,7 +29,7 @@ vec4 shade_data_slice()
 {
   float value = texture2D( slice_tex, gl_TexCoord[0].st ).r;
   value = value * scale_bias[0] + scale_bias[1];
-  vec4 color = vec4( vec3( value ), opacity );
+  vec4 color = vec4( value*data_color, opacity );
   return color;
 }
 

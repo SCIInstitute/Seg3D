@@ -785,8 +785,16 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
         this->private_->ui_.border_->hide();
         this->private_->ui_.fill_->hide();
         this->private_->ui_.mask_volume_widget_->hide();
-        this->private_->ui_.colors_->hide();
+        //this->private_->ui_.colors_->hide();
         this->private_->ui_.isosurface_area_widget_->hide();
+
+		this->connect(this->private_->color_widget_, SIGNAL(color_index_changed(int)),
+			this, SLOT(set_mask_background_color(int)));
+
+		// Color changes only come from preferences and we only want to change the mask
+		// background color if the color was changed for the current index 
+		this->connect(this->private_->color_widget_, SIGNAL(color_changed(int)),
+			this, SLOT(set_mask_background_color_from_preference_change(int)));
         
         // Add the layer specific connections
         DataLayer* data_layer = dynamic_cast< DataLayer* >( layer.get() );
@@ -817,6 +825,12 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
           QtUtils::QtBridge::Show( this->private_->ui_.display_min_, 
             data_layer->adjust_display_min_max_state_ );
       
+		  QtUtils::QtBridge::Connect(this->private_->color_widget_,
+			  data_layer->color_state_,
+			  PreferencesManager::Instance()->color_states_);
+
+		  this->set_mask_background_color(data_layer->color_state_->get());
+
           connect( this->private_->ui_.reset_brightness_contrast_button_, 
             SIGNAL( clicked() ), this, SLOT( set_brightness_contrast_to_default() ) );
         }
@@ -836,8 +850,16 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
         this->private_->ui_.border_->hide();
         this->private_->ui_.fill_->hide();
         this->private_->ui_.mask_volume_widget_->hide();
-        this->private_->ui_.colors_->hide();
+        //this->private_->ui_.colors_->hide();
         this->private_->ui_.isosurface_area_widget_->hide();
+
+		this->connect(this->private_->color_widget_, SIGNAL(color_index_changed(int)),
+			this, SLOT(set_mask_background_color(int)));
+
+		// Color changes only come from preferences and we only want to change the mask
+		// background color if the color was changed for the current index 
+		this->connect(this->private_->color_widget_, SIGNAL(color_changed(int)),
+			this, SLOT(set_mask_background_color_from_preference_change(int)));
         
         // Add the layer specific connections
         LargeVolumeLayer* data_layer = dynamic_cast< LargeVolumeLayer* >( layer.get() );
@@ -867,9 +889,15 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
             data_layer->adjust_display_min_max_state_ );
           QtUtils::QtBridge::Show( this->private_->ui_.display_min_, 
             data_layer->adjust_display_min_max_state_ );
+
+		  QtUtils::QtBridge::Connect(this->private_->color_widget_,
+			  data_layer->color_state_,
+			  PreferencesManager::Instance()->color_states_);
       
           connect( this->private_->ui_.reset_brightness_contrast_button_, 
             SIGNAL( clicked() ), this, SLOT( set_brightness_contrast_to_default() ) );
+
+		  this->set_mask_background_color(data_layer->color_state_->get());
         }
       }
       break;
