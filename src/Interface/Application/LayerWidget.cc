@@ -1057,11 +1057,19 @@ void LayerWidget::set_mask_background_color_from_preference_change( int color_in
 {
   // We only want to change the mask background color if the color was changed for the 
   // selected index 
-  if( dynamic_cast< MaskLayer* >( this->private_->layer_.get()  )->color_state_->get() == 
-    color_index )
-  {
-    this->set_mask_background_color( color_index );
-  }
+	if (this->private_->get_volume_type() == Core::VolumeType::MASK_E){
+		if (dynamic_cast<MaskLayer*>(this->private_->layer_.get())->color_state_->get() ==
+			color_index)
+		{
+			this->set_mask_background_color(color_index);
+		}
+	} else if(this->private_->get_volume_type() == Core::VolumeType::DATA_E){
+		if (dynamic_cast<DataLayer*>(this->private_->layer_.get())->color_state_->get() ==
+			color_index)
+		{
+			this->set_mask_background_color(color_index);
+		}
+	}
 }
 
 void LayerWidget::trigger_abort()
