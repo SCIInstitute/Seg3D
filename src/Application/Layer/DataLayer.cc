@@ -60,8 +60,8 @@ public:
 };
 
 // counter for generating new colors for each new data layer
-size_t ColorCount = 0;
-boost::mutex ColorCountMutex;
+size_t data_ColorCount = 0;
+boost::mutex data_ColorCountMutex;
 
 void DataLayer::initialize_states()
 {
@@ -71,11 +71,11 @@ void DataLayer::initialize_states()
 	// == Color of the layer ==
 
 	{
-		boost::mutex::scoped_lock lock(ColorCountMutex);
+		boost::mutex::scoped_lock lock(data_ColorCountMutex);
 		this->private_->layer_->add_state("color", this->private_->layer_->color_state_, 
-			static_cast<int>(ColorCount % PreferencesManager::Instance()->color_states_.size()));
+			static_cast<int>(data_ColorCount % PreferencesManager::Instance()->color_states_.size()));
 
-		ColorCount++;
+		data_ColorCount++;
 	}
 
 	// == The brightness of the layer ==
@@ -463,14 +463,14 @@ LayerHandle DataLayer::duplicate() const
 
 size_t DataLayer::GetColorCount()
 {
-	boost::mutex::scoped_lock lock(ColorCountMutex);
-	return ColorCount;
+	boost::mutex::scoped_lock lock(data_ColorCountMutex);
+	return data_ColorCount;
 }
 
 void DataLayer::SetColorCount(size_t count)
 {
-	boost::mutex::scoped_lock lock(ColorCountMutex);
-	ColorCount = count;
+	boost::mutex::scoped_lock lock(data_ColorCountMutex);
+	data_ColorCount = count;
 }
 
 } // end namespace Seg3D
