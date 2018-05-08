@@ -138,7 +138,7 @@ void SliceShader::set_mask_color( float r, float g, float b )
 
 void SliceShader::set_data_color(float r, float g, float b)
 {
-	glUniform3f(this->data_color_loc_, r, g, b);
+	glUniform3f(this->data_color_loc_, r, g, b );
 }
 
 void SliceShader::set_lighting( bool enabled )
