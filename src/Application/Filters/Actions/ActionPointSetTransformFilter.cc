@@ -27,7 +27,6 @@
  */
 
 //ITK Includes
-#include <itkEuler3DTransform.h>
 #include <itkResampleImageFilter.h>
 
 // Core includes
@@ -72,6 +71,7 @@ public:
   //std::string pointset_tool_id_;
 };
 
+typedef itk::Euler3DTransform< double > transform_type;
 
 class PointSetTransformAlgo : public  ITKFilter
 {
@@ -94,75 +94,73 @@ public:
   // Implementation of run of the Runnable base class, this function is called 
   // when the thread is launched.
 
-  SCI_BEGIN_TYPED_ITK_RUN( this->target_layer_->get_data_type() )
+  SCI_BEGIN_TYPED_ITK_RUN(this->target_layer_->get_data_type())
   {
-    MaskLayerHandle input_fixed_layer = 
-      boost::dynamic_pointer_cast<MaskLayer>( this->target_layer_ );
+	  MaskLayerHandle input_fixed_layer =
+		  boost::dynamic_pointer_cast<MaskLayer>(this->target_layer_);
 
-    for ( size_t i = 0; i < this->src_layers_.size(); ++i )
-    {
+	  for (size_t i = 0; i < this->src_layers_.size(); ++i)
+	  {
 
-      MaskLayerHandle fixed_layer = input_fixed_layer;
-      MaskLayerHandle moving_layer = 
-        boost::dynamic_pointer_cast< MaskLayer >( this->src_layers_[ i ] );
+		  MaskLayerHandle fixed_layer = input_fixed_layer;
+		  MaskLayerHandle moving_layer =
+			  boost::dynamic_pointer_cast<MaskLayer>(this->src_layers_[i]);
 
-      MaskLayerHandle dst_layer =
-        boost::dynamic_pointer_cast< MaskLayer >( this->dst_layers_[ i ] );
+		  MaskLayerHandle dst_layer =
+			  boost::dynamic_pointer_cast<MaskLayer>(this->dst_layers_[i]);
 
-      typedef itk::Euler3DTransform< double > transform_type;
-      transform_type::Pointer transform = transform_type::New();
+		  transform_type::Pointer transform = transform_type::New();
 
-      //PointSetFilterHandle pointset_tool = 
-      //  boost::dynamic_pointer_cast<PointSetFilter> (ToolManager::Instance()->get_tool(this->pointset_tool_id_));
+		  //PointSetFilterHandle pointset_tool = 
+		  //  boost::dynamic_pointer_cast<PointSetFilter> (ToolManager::Instance()->get_tool(this->pointset_tool_id_));
 
-      //std::vector<double> matrix_params;
-      //{
-      //  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-      //  matrix_params = pointset_tool->transform_matrix_state_->get();
-      //}
+		  //std::vector<double> matrix_params;
+		  //{
+		  //  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+		  //  matrix_params = pointset_tool->transform_matrix_state_->get();
+		  //}
 
 
-      transform_type::ParametersType params = 
-        transform_type::ParametersType( this->matrix_params_.size() );
+		  transform_type::ParametersType params =
+			  transform_type::ParametersType(this->matrix_params_.size());
 
-      for ( unsigned int i = 0; i < this->matrix_params_.size(); ++i )
-      {
-        params.SetElement( i, this->matrix_params_[i] );
-      }
+		  for (unsigned int i = 0; i < this->matrix_params_.size(); ++i)
+		  {
+			  params.SetElement(i, this->matrix_params_[i]);
+		  }
 
-      transform->SetParameters( params );
+		  transform->SetParameters(params);
 
-      typedef itk:: LinearInterpolateImageFunction<
-        TYPED_IMAGE_TYPE,
-        double          >    InterpolatorType;
+		  typedef itk::LinearInterpolateImageFunction<
+			  TYPED_IMAGE_TYPE,
+			  double          >    InterpolatorType;
 
-      typedef itk::ResampleImageFilter<
-        TYPED_IMAGE_TYPE,
-        TYPED_IMAGE_TYPE > ResampleFilterType;
+		  typedef itk::ResampleImageFilter<
+			  TYPED_IMAGE_TYPE,
+			  TYPED_IMAGE_TYPE > ResampleFilterType;
 
-      typename ResampleFilterType::Pointer resampler = ResampleFilterType::New();
-      typename Core::ITKImageDataT<VALUE_TYPE>::Handle moving_image; 
-      this->get_itk_image_from_layer<VALUE_TYPE>( moving_layer, moving_image );
-      resampler->SetInput( moving_image->get_image() );
-      transform->GetInverse( transform );
-      resampler->SetTransform( transform );
+		  typename ResampleFilterType::Pointer resampler = ResampleFilterType::New();
+		  typename Core::ITKImageDataT<VALUE_TYPE>::Handle moving_image;
+		  this->get_itk_image_from_layer<VALUE_TYPE>(moving_layer, moving_image);
+		  resampler->SetInput(moving_image->get_image());
+		  transform->GetInverse(transform);
+		  resampler->SetTransform(transform);
 
-      typename Core::ITKImageDataT<VALUE_TYPE>::Handle fixed_image;
-      this->get_itk_image_from_layer<VALUE_TYPE>( fixed_layer, fixed_image );
-      resampler->SetSize( fixed_image->get_image()->GetLargestPossibleRegion().GetSize() );
-      resampler->SetOutputOrigin(  fixed_image->get_image()->GetOrigin() );
-      resampler->SetOutputSpacing( fixed_image->get_image()->GetSpacing() );
-      resampler->SetOutputDirection( fixed_image->get_image()->GetDirection() );
-      resampler->SetDefaultPixelValue( 0 );
+		  typename Core::ITKImageDataT<VALUE_TYPE>::Handle fixed_image;
+		  this->get_itk_image_from_layer<VALUE_TYPE>(fixed_layer, fixed_image);
+		  resampler->SetSize(fixed_image->get_image()->GetLargestPossibleRegion().GetSize());
+		  resampler->SetOutputOrigin(fixed_image->get_image()->GetOrigin());
+		  resampler->SetOutputSpacing(fixed_image->get_image()->GetSpacing());
+		  resampler->SetOutputDirection(fixed_image->get_image()->GetDirection());
+		  resampler->SetDefaultPixelValue(0);
 
-      resampler->Update();
+		  resampler->Update();
 
-      if (resampler->GetOutput() != NULL )
-      {
-        this->insert_itk_image_into_layer( dst_layer, resampler->GetOutput() ); 
-      }
-
-    }
+		  if (resampler->GetOutput() != NULL)
+		  {
+			  this->insert_itk_image_into_layer(dst_layer, resampler->GetOutput());
+		  }
+	  }
   }
 
   SCI_END_TYPED_ITK_RUN()
@@ -184,49 +182,49 @@ public:
 
 };
 
-bool ActionPointSetTransformFilter::validate( Core::ActionContextHandle& context )
-{
-  // Make sure that the sandbox exists
-  if ( !LayerManager::CheckSandboxExistence( this->private_->sandbox_, context ) ) return false;
-
-  // Check for layer existence and type information
-  const std::vector< std::string >& layer_ids = this->private_->layer_ids_;
-  if ( layer_ids.size() == 0 )
+  bool ActionPointSetTransformFilter::validate(Core::ActionContextHandle& context)
   {
-    context->report_error( "No input layers specified" );
-    return false;
+	  // Make sure that the sandbox exists
+	  if (!LayerManager::CheckSandboxExistence(this->private_->sandbox_, context)) return false;
+
+	  // Check for layer existence and type information
+	  const std::vector< std::string >& layer_ids = this->private_->layer_ids_;
+	  if (layer_ids.size() == 0)
+	  {
+		  context->report_error("No input layers specified");
+		  return false;
+	  }
+
+	  Core::GridTransform grid_trans;
+	  for (size_t i = 0; i < layer_ids.size(); ++i)
+	  {
+		  // Check for layer existence
+		  LayerHandle layer = LayerManager::FindLayer(layer_ids[i], this->private_->sandbox_);
+		  if (!layer)
+		  {
+			  context->report_error("Layer '" + layer_ids[i] + "' doesn't exist");
+			  return false;
+		  }
+
+		  // Make sure that all the layers are in the same group
+		  if (i == 0)
+		  {
+			  grid_trans = layer->get_grid_transform();
+		  }
+		  else if (grid_trans != layer->get_grid_transform())
+		  {
+			  context->report_error("Input layers do not belong to the same group");
+			  return false;
+		  }
+
+		  // Check for layer availability 
+		  if (!LayerManager::CheckLayerAvailability(layer_ids[i],
+			  false, context, this->private_->sandbox_)) return false;
+	  }
+
+	  // Validation successful
+	  return true;
   }
-
-  Core::GridTransform grid_trans;
-  for ( size_t i = 0; i < layer_ids.size(); ++i )
-  {
-    // Check for layer existence
-    LayerHandle layer = LayerManager::FindLayer( layer_ids[ i ], this->private_->sandbox_ );
-    if ( !layer )
-    {
-      context->report_error( "Layer '" + layer_ids[ i ] + "' doesn't exist" );
-      return false;
-    }
-
-    // Make sure that all the layers are in the same group
-    if ( i == 0 )
-    {
-      grid_trans = layer->get_grid_transform();
-    }
-    else if ( grid_trans != layer->get_grid_transform() )
-    {
-      context->report_error( "Input layers do not belong to the same group" );
-      return false;
-    }
-
-    // Check for layer availability 
-    if ( !LayerManager::CheckLayerAvailability( layer_ids[ i ], 
-      false, context, this->private_->sandbox_ ) ) return false;
-  }
-
-  // Validation successful
-  return true;
-}
 
 
 // ALGORITHM CLASS

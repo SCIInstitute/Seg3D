@@ -71,7 +71,7 @@ MessageWindow::MessageWindow( QWidget *parent ) :
   this->setWindowFlags( flags );
   this->setWindowIcon( icon );
 
-  this->add_connection( StatusBar::Instance()->message_updated_signal_.connect( 
+  this->add_connection( StatusBar::Instance()->message_updated_signal_.connect(
     boost::bind( &MessageWindow::AddMessage, QPointer< MessageWindow >( this ), _1, _2 ) ) );
 }
 
