@@ -785,7 +785,6 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
         this->private_->ui_.border_->hide();
         this->private_->ui_.fill_->hide();
         this->private_->ui_.mask_volume_widget_->hide();
-        //this->private_->ui_.colors_->hide();
         this->private_->ui_.isosurface_area_widget_->hide();
 
 		this->connect(this->private_->color_widget_, SIGNAL(color_index_changed(int)),
@@ -850,7 +849,6 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
         this->private_->ui_.border_->hide();
         this->private_->ui_.fill_->hide();
         this->private_->ui_.mask_volume_widget_->hide();
-        //this->private_->ui_.colors_->hide();
         this->private_->ui_.isosurface_area_widget_->hide();
 
 		this->connect(this->private_->color_widget_, SIGNAL(color_index_changed(int)),
