@@ -81,6 +81,7 @@ bool SliceShader::post_initialize()
   this->border_width_loc_ = this->get_uniform_location( "border_width" );
   this->volume_type_loc_ = this->get_uniform_location( "volume_type" );
   this->mask_color_loc_ = this->get_uniform_location( "mask_color" );
+  this->data_color_loc_ = this->get_uniform_location("data_color");
   this->enable_lighting_loc_ = this->get_uniform_location( "enable_lighting" );
   this->enable_fog_loc_ = this->get_uniform_location( "enable_fog" );
   this->fog_range_loc_ = this->get_uniform_location( "fog_range" );
@@ -133,6 +134,11 @@ void SliceShader::set_volume_type( int volume_type )
 void SliceShader::set_mask_color( float r, float g, float b )
 {
   glUniform3f( this->mask_color_loc_, r, g, b );
+}
+
+void SliceShader::set_data_color(float r, float g, float b)
+{
+	glUniform3f(this->data_color_loc_, r, g, b );
 }
 
 void SliceShader::set_lighting( bool enabled )
