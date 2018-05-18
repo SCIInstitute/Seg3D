@@ -35,6 +35,7 @@
 #include <boost/filesystem.hpp>
 
 #include <Application/LayerIO/Actions/ActionExportPoints.h>
+#include <Application/LayerIO/Actions/ActionExportMatrix.h>
 
 #include <Core/Action/ActionContext.h>
 #include <Core/Geometry/Point.h>
@@ -90,7 +91,7 @@ TEST_F(ActionExportPointsTests, ValidateEmptyFilePath)
 {
   ActionExportPoints action;
   SinglePointVector();
-  action.set_points( points );
+  action.set_vector( points );
   ASSERT_FALSE( action.validate(context) );
 }
 
@@ -123,4 +124,85 @@ TEST_F(ActionExportPointsTests, RunValidPath)
   ASSERT_DOUBLE_EQ(x, 0);
   ASSERT_DOUBLE_EQ(y, 0);
   ASSERT_DOUBLE_EQ(z, 0);
+}
+
+
+class ActionExportMatrixTests : public Test
+{
+protected:
+  virtual void SetUp()
+  {
+    dummy_path = "/dummy/file/path/matrix.txt";
+    boost::filesystem::path path = testOutputDir();
+    path /= "matrix.txt";
+    file_path = path.string();
+    matrix.clear();
+    context.reset(new ActionContext());
+    result.reset(new ActionResult());
+  }
+
+  void TwoByTwoIdentityMatrix()
+  {
+    matrix = { 1, 0, 0, 1 };
+  }
+
+  std::string dummy_path;
+  std::string file_path;
+  std::vector< double > matrix;
+  ActionContextHandle context;
+  ActionResultHandle result;
+};
+
+
+TEST_F(ActionExportMatrixTests, EmptyAction)
+{
+  // factory instantiation
+  ActionExportMatrix action;
+}
+
+TEST_F(ActionExportMatrixTests, ValidateEmptyParams)
+{
+  ActionExportMatrix action;
+  ASSERT_FALSE(action.validate(context));
+}
+
+TEST_F(ActionExportMatrixTests, ValidateEmptyFilePath)
+{
+  ActionExportMatrix action;
+  TwoByTwoIdentityMatrix();
+  action.set_vector(matrix);
+  ASSERT_FALSE(action.validate(context));
+}
+
+TEST_F(ActionExportMatrixTests, ValidateEmptyPoints)
+{
+  ActionExportMatrix action;
+  action.set_file_path(dummy_path);
+  ASSERT_FALSE(action.validate(context));
+}
+
+TEST_F(ActionExportMatrixTests, RunInvalidPath)
+{
+  TwoByTwoIdentityMatrix();
+  ActionExportMatrix action(dummy_path, matrix, 2, 2);
+  ASSERT_TRUE(action.validate(context));
+  ASSERT_FALSE(action.run(context, result));
+}
+
+TEST_F(ActionExportMatrixTests, RunValidPath)
+{
+  TwoByTwoIdentityMatrix();
+  ActionExportMatrix action(file_path, matrix, 2, 2);
+  ASSERT_TRUE(action.validate(context));
+  ASSERT_TRUE(action.run(context, result));
+
+  std::ifstream inputfile;
+  inputfile.open(file_path.c_str());
+
+  double w = -1, x = -1.0, y = -1.0, z = -1.0;
+  inputfile >> w >> x >> y >> z;
+  ASSERT_DOUBLE_EQ(w, 1);
+  ASSERT_DOUBLE_EQ(x, 0);
+  ASSERT_DOUBLE_EQ(y, 0);
+  ASSERT_DOUBLE_EQ(z, 1);
 }

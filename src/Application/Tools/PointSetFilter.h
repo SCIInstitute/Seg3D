@@ -75,6 +75,7 @@ public:
   Core::StateBoolHandle registration_ready_state_;
 
   Core::StateDoubleVectorHandle transform_matrix_state_;
+  Core::StateDoubleVectorHandle complete_transform_matrix_state_;
 
   Core::StateDoubleHandle translation_state_[ 3 ];
   Core::StateDoubleHandle rotation_state_[ 3 ];

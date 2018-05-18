@@ -43,6 +43,7 @@
 // Core includes
 #include <Core/Math/MathFunctions.h>
 #include <Core/Geometry/Point.h>
+#include <Core/State/StateVectorHelper.h>
 
 // Application includes
 #include <Application/Layer/LayerManager.h>
@@ -113,6 +114,29 @@ private:
 
 };
 
+typedef itk::Euler3DTransform< double > transform_type;
+
+//Calculate Transformation Matrix
+std::vector<double> calculateTransformationMatrix(transform_type::Pointer transform)
+{
+	std::vector<double> transformation(16, 0.0);
+	transformation[15] = 1.0;
+
+	//Fill matrix
+	int inx = 0;
+	for (int i = 0; i < 3; i++)
+	{
+		for (int j = 0; j < 3; j++)
+		{ 
+			transformation[inx] = transform->GetMatrix()[i][j];
+			inx++;
+		}
+		transformation[inx] = transform->GetTranslation()[i];
+		inx++;
+	}
+	return transformation;
+}
+
 // ALGORITHM CLASS
 // This class does the actual work and is run on a separate thread.
 // NOTE: The separation of the algorithm into a private class is for the purpose of running the
@@ -128,7 +152,7 @@ public:
   LayerHandle dst_layer_;
 
   int iterations_;
-  std::string transform_state_id_;
+  std::string transform_state_id_, complete_transform_state_id_;
 
 public:
   // RUN:
@@ -252,8 +276,6 @@ public:
     // Set up a Transform
     //-----------------------------------------------------------
 
-    typedef itk::Euler3DTransform< double > transform_type;
-
     transform_type::Pointer transform = transform_type::New();
 
     // Optimizer Type
@@ -361,11 +383,7 @@ public:
     CORE_LOG_MESSAGE( std::string("Solution = ") + 
       solution );
 
-    std::vector< double > matrix_entries;
-    for ( unsigned int i = 0; i < final_parameters.size(); ++i )
-    {
-      matrix_entries.push_back( final_parameters[i] );
-    }
+	std::vector< double > matrix_entries(final_parameters.begin(), final_parameters.end());
 
     transform_type::Pointer final_transform = transform_type::New();
     final_transform->SetParameters( final_parameters );
@@ -403,21 +421,12 @@ public:
       // Only output the state variable value when not in a sandbox
       if ( this->get_sandbox() == -1 )
       {
-        Core::StateBaseHandle state_var;
-        if ( Core::StateEngine::Instance()->get_state( 
-          this->transform_state_id_, state_var ) )
-        {
-          Core::StateDoubleVectorHandle transform_state = boost::dynamic_pointer_cast<
-            Core::StateDoubleVector > ( state_var );
-          if ( transform_state )
-          {
-            Core::Application::PostEvent( boost::bind( &Core::StateDoubleVector::set,
-              transform_state, matrix_entries, Core::ActionSource::NONE_E ) );
-          }
-        }
+		  Core::setStateVector(transform_state_id_, matrix_entries);
+
+		  auto transformation = calculateTransformationMatrix(transform);
+		  Core::setStateVector(complete_transform_state_id_, transformation);
       }
     }
-
   }
   SCI_END_TYPED_ITK_RUN()
   
@@ -524,6 +533,8 @@ bool ActionPointSetRegisterFilter::run( Core::ActionContextHandle& context,
   algo->mask_layer_ = LayerManager::FindLayer( this->mask_layer_, this->sandbox_ );
   algo->iterations_ = this->iterations_;
   algo->transform_state_id_ = this->transform_state_id_;
+  algo->complete_transform_state_id_ = this->complete_transform_state_id_;
+
   
   // Check whether the source layer was found
   if ( !algo->src_layer_ || !algo->mask_layer_ ) return false;
@@ -567,7 +578,7 @@ bool ActionPointSetRegisterFilter::run( Core::ActionContextHandle& context,
 
 void ActionPointSetRegisterFilter::Dispatch( Core::ActionContextHandle context,
   const std::string& target_layer, const std::string& mask_layer,  
-  int iterations, const std::string& transform_state_id )
+  int iterations, const std::string& transform_state_id, const std::string& complete_transform_state_id)
 { 
   // Create a new action
   ActionPointSetRegisterFilter* action = new ActionPointSetRegisterFilter;
@@ -576,6 +587,7 @@ void ActionPointSetRegisterFilter::Dispatch( Core::ActionContextHandle context,
   action->target_layer_ = target_layer;
   action->mask_layer_ = mask_layer;
   action->transform_state_id_ = transform_state_id;
+  action->complete_transform_state_id_ = complete_transform_state_id;
   action->iterations_ = iterations;
 
   // Dispatch action to underlying engine

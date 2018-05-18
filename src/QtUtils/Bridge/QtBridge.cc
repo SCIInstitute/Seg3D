@@ -65,6 +65,8 @@
 #include <QtUtils/Bridge/detail/QtTransferFunctionSceneConnector.h>
 #include <QtUtils/Bridge/detail/QtTransferFunctionCurveConnector.h>
 #include <QtUtils/Bridge/detail/QtGroupBoxConnector.h>
+#include <QtUtils/Bridge/detail/QtTextMatrixConnector.h>
+
 
 namespace QtUtils
 {
@@ -236,6 +238,13 @@ Core::ConnectionHandle QtBridge::Connect( QListWidget* qlistwidget, Core::StateL
 {
   return Core::ConnectionHandle( new QtConnection(
     new QtListWidgetConnector( qlistwidget, state ) ) );
+}
+
+Core::ConnectionHandle QtBridge::Connect(QPlainTextEdit* plain_text,
+	Core::StateDoubleVectorHandle& state_vector, int dim1, int dim2)
+{
+	return Core::ConnectionHandle(new QtConnection(
+		new QtTextMatrixConnector(plain_text,state_vector,dim1,dim2)));
 }
 
 Core::ConnectionHandle QtBridge::Connect( QListWidget* qwidget, Core::StateStringVectorHandle& state )

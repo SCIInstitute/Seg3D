@@ -35,6 +35,8 @@
 #include <Application/Layer/Layer.h>
 #include <Application/Layer/LayerAction.h>
 
+#include <itkEuler3DTransform.h>
+
 namespace Seg3D
 {
 
@@ -79,7 +81,6 @@ public:
     std::string target_layer,
     const std::vector< std::string >& layer_ids,
     const std::vector< double >& matrix_params );
-
 };
   
 } // end namespace Seg3D

@@ -34,7 +34,7 @@
 #include <fstream>
 
 // Application includes
-#include <Application/LayerIO/Actions/ActionExportPoints.h>
+#include <Application/LayerIO/Actions/ActionExportMatrix.h>
 #include <Application/LayerIO/LayerIO.h>
 #include <Application/Layer/LayerManager.h>
 #include <Application/ProjectManager/ProjectManager.h>
@@ -42,12 +42,18 @@
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
-CORE_REGISTER_ACTION( Seg3D, ExportPoints )
+CORE_REGISTER_ACTION( Seg3D, ExportMatrix )
 
 namespace Seg3D
 {
-  void PointWriter::operator()(std::ostream& o, const Core::Point& p) const
+  void MatrixDoubleWriter::operator()(std::ostream& o, const double& x) 
   {
-    o << p.x() << " " << p.y() << " " << p.z() << std::endl;
+    index_++;
+    o << x << "\t";
+    if (index_ % dim2_ == 0)
+    {
+      o << std::endl;
+    }
   }
+
 } // end namespace Seg3D
