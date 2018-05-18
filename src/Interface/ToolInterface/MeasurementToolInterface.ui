@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>321</width>
-    <height>549</height>
+    <height>573</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -62,7 +62,7 @@
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="general_tab_">
          <property name="sizePolicy">
@@ -234,9 +234,6 @@
                    </sizepolicy>
                   </property>
                   <layout class="QVBoxLayout" name="verticalLayout_17">
-                   <property name="spacing">
-                    <number>6</number>
-                   </property>
                    <property name="margin">
                     <number>0</number>
                    </property>
@@ -781,15 +778,15 @@
                           </widget>
                          </item>
                          <item>
-                          <widget class="QLabel" name="p0_value_">
-                           <property name="sizePolicy">
-                            <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-                             <horstretch>0</horstretch>
-                             <verstretch>0</verstretch>
-                            </sizepolicy>
+                          <widget class="QLineEdit" name="p0_value_">
+                           <property name="minimumSize">
+                            <size>
+                             <width>150</width>
+                             <height>0</height>
+                            </size>
                            </property>
-                           <property name="text">
-                            <string>(X, Y, Z)</string>
+                           <property name="readOnly">
+                            <bool>true</bool>
                            </property>
                           </widget>
                          </item>
@@ -841,15 +838,15 @@
                           </widget>
                          </item>
                          <item>
-                          <widget class="QLabel" name="p1_value_">
-                           <property name="sizePolicy">
-                            <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-                             <horstretch>0</horstretch>
-                             <verstretch>0</verstretch>
-                            </sizepolicy>
+                          <widget class="QLineEdit" name="p1_value_">
+                           <property name="minimumSize">
+                            <size>
+                             <width>150</width>
+                             <height>0</height>
+                            </size>
                            </property>
-                           <property name="text">
-                            <string>(X, Y, Z)</string>
+                           <property name="readOnly">
+                            <bool>true</bool>
                            </property>
                           </widget>
                          </item>
@@ -1014,9 +1011,6 @@
                 </sizepolicy>
                </property>
                <layout class="QVBoxLayout" name="verticalLayout_13">
-                <property name="spacing">
-                 <number>6</number>
-                </property>
                 <property name="margin">
                  <number>0</number>
                 </property>
