@@ -101,6 +101,9 @@ public:
   // -- state variables --
 public:
 
+  /// Which color to use for displaying the mask
+  Core::StateIntHandle color_state_;
+
   /// State describing contrast
   Core::StateRangedDoubleHandle contrast_state_;
 

@@ -236,7 +236,8 @@ void PreferencesManager::initialize_states()
 bool PreferencesManager::initialize_default_colors()
 {
   this->private_->default_colors_.clear();
-  this->private_->default_colors_.push_back( Core::Color( 255, 175, 78 ) );
+  this->private_->default_colors_.push_back(Core::Color(255, 255, 255));
+  //this->private_->default_colors_.push_back( Core::Color( 255, 175, 78 ) );
   this->private_->default_colors_.push_back( Core::Color( 116, 255, 122 ) );
   this->private_->default_colors_.push_back( Core::Color( 143, 214, 255 ) );
   this->private_->default_colors_.push_back( Core::Color( 255, 0, 0 ) );

@@ -51,6 +51,7 @@ public:
   void set_mask_mode( int mask_mode );
   void set_volume_type( int volume_type );
   void set_mask_color( float r, float g, float b );
+  void set_data_color(float r, float g, float b);
   void set_opacity( float opacity );
   void set_scale_bias( float scale, float bias );
   void set_pixel_size( float width, float height );
@@ -71,6 +72,7 @@ private:
   int mask_mode_loc_;
   int volume_type_loc_;
   int mask_color_loc_;
+  int data_color_loc_;
   int opacity_loc_;
   int scale_bias_loc_;
   int border_width_loc_;
