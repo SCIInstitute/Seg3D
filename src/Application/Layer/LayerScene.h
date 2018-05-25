@@ -71,6 +71,7 @@ public:
   }
 
 public:
+  int color_;
   double data_min_;
   double data_max_;
   double display_min_;
@@ -90,6 +91,7 @@ public:
   }
 
 public:
+  int color_;
   double data_min_;
   double data_max_;
   double display_min_;
