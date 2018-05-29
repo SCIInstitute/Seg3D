@@ -115,6 +115,7 @@ public:
   Core::StateRangedDoubleHandle display_max_value_state_;
 
   Core::StateBoolHandle adjust_display_min_max_state_;
+  Core::StateBoolHandle pick_color_state_;
 
   Core::StateStringHandle data_type_state_;
   Core::StateDoubleHandle min_value_state_;
