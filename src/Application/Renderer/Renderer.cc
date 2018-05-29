@@ -532,6 +532,7 @@ void RendererPrivate::draw_slice( LayerSceneItemHandle layer_item,
         data_layer_item->display_min_, data_layer_item->display_max_ );
 	  Core::Color color = PreferencesManager::Instance()->get_color(data_layer_item->color_);
       bool pick_color = data_layer_item->pick_color_;
+
       if (pick_color)
       {
         this->slice_shader_->set_data_color(static_cast< float >(color.r() / 255),
@@ -586,6 +587,7 @@ void RendererPrivate::draw_slice( LayerSceneItemHandle layer_item,
         data_layer_item->display_min_, data_layer_item->display_max_);
 	  Core::Color color = PreferencesManager::Instance()->get_color(data_layer_item->color_);
       bool pick_color = data_layer_item->pick_color_;
+
       if (pick_color)
       {
         this->slice_shader_->set_data_color(static_cast< float >(color.r() / 255),
@@ -595,6 +597,7 @@ void RendererPrivate::draw_slice( LayerSceneItemHandle layer_item,
       {
         this->slice_shader_->set_data_color(1.0,1.0,1.0);
       }
+
       const std::vector<Core::LargeVolumeBrickSliceHandle>& tiles = data_layer_item->tiles_;
       double left, right, bottom, top;
       int width, height;
