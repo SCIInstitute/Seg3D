@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>321</width>
-    <height>642</height>
+    <height>669</height>
    </rect>
   </property>
   <property name="mouseTracking">
@@ -815,6 +815,43 @@
              </widget>
             </item>
             <item>
+              <widget class="QWidget" name="widget_21" native="true">
+                <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                  </sizepolicy>
+                </property>
+                <layout class="QHBoxLayout" name="horizontalLayout_251">
+                  <property name="spacing">
+                    <number>0</number>
+                  </property>
+                  <property name="leftMargin">
+                    <number>0</number>
+                  </property>
+                    <property name="topMargin">
+                    <number>0</number>
+                  </property>
+                    <property name="rightMargin">
+                    <number>0</number>
+                  </property>
+                    <property name="bottomMargin">
+                    <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QCheckBox" name="pick_color_checkbox_">
+                    <property name="toolTip">
+                      <string>Enable selection of colors</string>
+                    </property>
+                    <property name="text">
+                     <string>Pick Color</string>
+                    </property>
+                   </widget>
+                  </item>
+                </layout>
+              </widget>
+            </item>
+            <item>
              <widget class="QWidget" name="fill_" native="true">
               <property name="minimumSize">
                <size>
@@ -1394,7 +1431,9 @@
              <number>4</number>
             </property>
             <item>
-             <widget class="QtUtils::QtSliderDoubleCombo" name="opacity_adjuster_" native="true"/>
+             <widget class="QtUtils::QtSliderDoubleCombo" name="opacity_adjuster_" native="true">
+              <zorder>bright_contrast_</zorder>
+             </widget>
             </item>
            </layout>
           </widget>
